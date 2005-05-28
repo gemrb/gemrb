@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.18 2005/04/06 21:43:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.19 2005/05/28 19:02:11 avenger_teambg Exp $
  *
  */
 
@@ -72,7 +72,10 @@ public:
 	void SetPos(unsigned int index);
 	/** Sets ScriptName for area animation */
 	void SetScriptName(const char *name);
+	/** returns the frame count */
 	unsigned int GetFrameCount() { return indicesCount; }
+	/** returns the current frame's index */
+	int GetCurrentFrame();
 };
 
 #endif

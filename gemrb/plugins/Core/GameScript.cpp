@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.276 2005/05/27 21:55:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.277 2005/05/28 19:02:11 avenger_teambg Exp $
  *
  */
 
@@ -75,13 +75,18 @@ static TriggerLink triggernames[] = {
 	{"areacheckobject", GameScript::AreaCheckObject,0},
 	{"areaflag", GameScript::AreaFlag,0},
 	{"areatype", GameScript::AreaType,0},
+	{"arearestdisabled", GameScript::AreaRestDisabled,0},
 	{"atlocation", GameScript::AtLocation,0},
 	{"bitcheck", GameScript::BitCheck,TF_MERGESTRINGS},
 	{"bitcheckexact", GameScript::BitCheckExact,TF_MERGESTRINGS},
 	{"bitglobal", GameScript::BitGlobal_Trigger,TF_MERGESTRINGS},
 	{"breakingpoint", GameScript::BreakingPoint,0},
 	{"calledbyname", GameScript::CalledByName,0}, //this is still a question
+	{"chargecount", GameScript::ChargeCount,0},
 	{"charname", GameScript::CharName,0}, //not scripting name
+	{"checkdoorflags", GameScript::CheckDoorFlags,0},
+	{"checkpartyaveragelevel", GameScript::CheckPartyAverageLevel,0},
+	{"checkpartylevel", GameScript::CheckPartyLevel,0},
 	{"checkstat", GameScript::CheckStat,0},
 	{"checkstatgt", GameScript::CheckStatGT,0},
 	{"checkstatlt", GameScript::CheckStatLT,0},
@@ -95,6 +100,7 @@ static TriggerLink triggernames[] = {
 	{"combatcountergt", GameScript::CombatCounterGT,0},
 	{"combatcounterlt", GameScript::CombatCounterLT,0},
 	{"contains", GameScript::Contains,0},
+	{"currentareais", GameScript::AreaCheck,0},
 	{"creatureinarea", GameScript::AreaCheck,0}, //cannot check others
 	{"damagetaken", GameScript::DamageTaken,0},
 	{"damagetakengt", GameScript::DamageTakenGT,0},
@@ -114,6 +120,7 @@ static TriggerLink triggernames[] = {
 	{"fallenpaladin", GameScript::FallenPaladin,0},
 	{"fallenranger", GameScript::FallenRanger,0},
 	{"false", GameScript::False,0},
+	{"frame", GameScript::Frame,0},
 	{"g", GameScript::G_Trigger,0},
 	{"gender", GameScript::Gender,0},
 	{"general", GameScript::General,0},
@@ -141,6 +148,7 @@ static TriggerLink triggernames[] = {
 	{"happinessgt", GameScript::HappinessGT,0},
 	{"happinesslt", GameScript::HappinessLT,0},
 	{"harmlessentered", GameScript::Entered,0}, //this isn't sure the same
+	{"hasinnateability", GameScript::HaveSpell,0}, //these must be the same
 	{"hasitem", GameScript::HasItem,0},
 	{"hasitemequiped", GameScript::HasItemEquipped,0}, //typo in bg2
 	{"hasitemequipped", GameScript::HasItemEquipped,0},
@@ -156,7 +164,11 @@ static TriggerLink triggernames[] = {
 	{"hitby", GameScript::HitBy,0},
 	{"hotkey", GameScript::HotKey,0},
 	{"hp", GameScript::HP,0},
-	{"hpgt", GameScript::HPGT,0}, {"hplt", GameScript::HPLT,0},
+	{"hpgt", GameScript::HPGT,0},
+	{"hplost", GameScript::HPLost,0},
+	{"hplostgt", GameScript::HPLostGT,0},
+	{"hplostlt", GameScript::HPLostLT,0},
+	{"hplt", GameScript::HPLT,0},
 	{"hppercent", GameScript::HPPercent,0},
 	{"hppercentgt", GameScript::HPPercentGT,0},
 	{"hppercentlt", GameScript::HPPercentLT,0},
@@ -176,6 +188,9 @@ static TriggerLink triggernames[] = {
 	{"isaclown", GameScript::IsAClown,0},
 	{"isactive", GameScript::IsActive,0},
 	{"isanimationid", GameScript::AnimationID,0},
+	{"iscreatureareaflag", GameScript::IsCreatureAreaFlag,0},
+	{"isfacingobject", GameScript::IsFacingObject,0},
+	{"isfacingsavedrotation", GameScript::IsFacingSavedRotation,0},
 	{"isgabber", GameScript::IsGabber,0},
 	{"islocked", GameScript::IsLocked,0},
 	{"isextendednight", GameScript::IsExtendedNight,0},
@@ -189,6 +204,9 @@ static TriggerLink triggernames[] = {
 	{"lastmarkedobject", GameScript::LastMarkedObject_Trigger,0},
 	{"level", GameScript::Level,0},
 	{"levelgt", GameScript::LevelGT,0},
+	{"levelinclass", GameScript::ClassLevel,0},
+	{"levelinclassgt", GameScript::ClassLevelGT,0},
+	{"levelinclasslt", GameScript::ClassLevelLT,0},
 	{"levellt", GameScript::LevelLT,0},
 	{"levelparty", GameScript::LevelParty,0},
 	{"levelpartygt", GameScript::LevelPartyGT,0},
@@ -327,6 +345,7 @@ static ActionLink actionnames[] = {
 	{"changealignment", GameScript::ChangeAlignment,0},
 	{"changeallegiance", GameScript::ChangeAllegiance,0},
 	{"changeclass", GameScript::ChangeClass,0},
+	{"changecurrentscript", GameScript::ChangeAIScript,AF_SCRIPTLEVEL},
 	{"changedialog", GameScript::ChangeDialogue,0},
 	{"changedialogue", GameScript::ChangeDialogue,0},
 	{"changegender", GameScript::ChangeGender,0},
@@ -440,7 +459,8 @@ static ActionLink actionnames[] = {
 	{"hideareaonmap", GameScript::HideAreaOnMap,0},
 	{"hidecreature", GameScript::HideCreature,0},
 	{"hidegui", GameScript::HideGUI,0},
-	{"incinternal", GameScript::IncInternal,0},
+	{"incinternal", GameScript::IncInternal,0}, //pst
+	{"incrementinternal", GameScript::IncInternal,0},//iwd
 	{"incmoraleai", GameScript::IncMoraleAI,0},
 	{"incrementchapter", GameScript::IncrementChapter,0},
 	{"incrementglobal", GameScript::IncrementGlobal,AF_MERGESTRINGS},
@@ -541,7 +561,8 @@ static ActionLink actionnames[] = {
 	{"saveplace", GameScript::SaveLocation,0},
 	{"saveobjectlocation", GameScript::SaveObjectLocation,0},
 	{"screenshake", GameScript::ScreenShake,AF_BLOCKING},
-	{"setanimstate", GameScript::SetAnimState,AF_BLOCKING},
+	{"sequence", GameScript::SetAnimState,0}, //not blocking this object
+	{"setanimstate", GameScript::SetAnimState,0},//not blocking this object
 	{"setapparentnamestrref", GameScript::SetApparentName,0},
 	{"setareaflags", GameScript::SetAreaFlags,0},
 	{"setarearestflag", GameScript::SetAreaRestFlag,0},
@@ -582,6 +603,7 @@ static ActionLink actionnames[] = {
 	{"setscriptname", GameScript::SetScriptName,0},
 	{"setsequence", GameScript::PlaySequence,0},
 	{"setteam", GameScript::SetTeam,0},
+	{"setteambit", GameScript::SetTeamBit,0},
 	{"settextcolor", GameScript::SetTextColor,0},
 	{"settoken", GameScript::SetToken,0},
 	{"settokenglobal", GameScript::SetTokenGlobal,AF_MERGESTRINGS},
@@ -1006,7 +1028,7 @@ void Targets::Clear()
 
 /********************** GameScript *******************************/
 GameScript::GameScript(ieResRef ResRef, unsigned char ScriptType,
-	Variables* local)
+	Variables* local, int ScriptLevel)
 {
 	if (local) {
 		locals = local;
@@ -1016,6 +1038,8 @@ GameScript::GameScript(ieResRef ResRef, unsigned char ScriptType,
 		locals->SetType( GEM_VARIABLES_INT );
 		freeLocals = true;
 	}
+	scriptlevel = ScriptLevel;
+
 	if (!initialized) {
 		initialized = 1;
 		InitScriptTables();
@@ -1508,10 +1532,6 @@ Response* GameScript::ReadResponse(DataStream* stream)
 		Action* aC = new Action(false);
 		count = stream->ReadLine( line, 1024 );
 		aC->actionID = (unsigned short)strtoul(line, NULL,10);
-		if (aC->actionID>=MAX_ACTIONS) {
-			aC->actionID=0;
-			printMessage("GameScript","Invalid script action ID!",LIGHT_RED);
-		}
 		for (int i = 0; i < 3; i++) {
 			stream->ReadLine( line, 1024 );
 			Object* oB = DecodeObject( line );
@@ -1526,6 +1546,14 @@ Response* GameScript::ReadResponse(DataStream* stream)
 			aC->string1Parameter );
 		strupr(aC->string0Parameter);
 		strupr(aC->string1Parameter);
+		if (aC->actionID>=MAX_ACTIONS) {
+			aC->actionID=0;
+			printMessage("GameScript","Invalid script action ID!",LIGHT_RED);
+		} else {
+			if (actionflags[aC->actionID] & AF_SCRIPTLEVEL) {
+				aC->int0Parameter = scriptlevel;
+			}
+		}
 		aCv.push_back( aC );
 		stream->ReadLine( line, 1024 );
 		if (strncmp( line, "RE", 2 ) == 0)
@@ -4091,6 +4119,19 @@ int GameScript::InventoryFull( Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+int GameScript::HasInnateAbility(Scriptable *Sender, Trigger *parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+	if (parameters->string0Parameter[0]) {
+		return actor->spellbook.HaveSpell(parameters->string0Parameter, 0);
+	}
+	return actor->spellbook.HaveSpell(parameters->int0Parameter, 0);
+}
+
 int GameScript::HaveSpell(Scriptable *Sender, Trigger *parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
@@ -4101,11 +4142,6 @@ int GameScript::HaveSpell(Scriptable *Sender, Trigger *parameters)
 		return actor->spellbook.HaveSpell(parameters->string0Parameter, 0);
 	}
 	return actor->spellbook.HaveSpell(parameters->int0Parameter, 0);
-/*
-	ieResRef tmpname;
-	CreateSpellName(tmpname, parameters->int0Parameter);
-	return actor->spellbook.HaveSpell(tmpname, 0);
-*/
 }
 
 int GameScript::HaveAnySpells(Scriptable* Sender, Trigger* /*parameters*/)
@@ -4442,6 +4478,57 @@ int GameScript::HPLT(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor* actor = ( Actor* ) scr;
 	if ( (signed) actor->GetStat( IE_HITPOINTS ) < parameters->int0Parameter) {
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::HPLost(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr) {
+		return 0;
+	}
+	if (scr->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) scr;
+	//Mod == actual-original
+	if (-actor->GetMod( IE_HITPOINTS ) == parameters->int0Parameter) {
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::HPLostGT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr) {
+		return 0;
+	}
+	if (scr->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) scr;
+	//Mod == actual-original
+	if (-actor->GetMod( IE_HITPOINTS ) > parameters->int0Parameter) {
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::HPLostLT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr) {
+		return 0;
+	}
+	if (scr->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) scr;
+	//Mod == actual-original
+	if (-actor->GetMod( IE_HITPOINTS ) < parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -4906,21 +4993,25 @@ int GameScript::UnselectableVariableLT(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::AreaCheck(Scriptable* Sender, Trigger* parameters)
 {
+/*
 	if (Sender->Type != ST_ACTOR) {
 		return 0;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	return strnicmp(actor->Area, parameters->string0Parameter, 8)==0;
+*/
+	return strnicmp(Sender->GetCurrentArea()->GetScriptName(), parameters->string0Parameter, 8)==0;
 }
 
 int GameScript::AreaCheckObject(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+/*
 	if (!tar || tar->Type != ST_ACTOR) {
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return strnicmp(actor->Area, parameters->string0Parameter, 8)==0;
+*/
+	return strnicmp(tar->GetCurrentArea()->GetScriptName(), parameters->string0Parameter, 8)==0;
 }
 
 int GameScript::EntirePartyOnMap(Scriptable* /*Sender*/, Trigger* /*parameters*/)
@@ -5401,6 +5492,8 @@ int GameScript::IsRotation(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+//GemRB currently stores the saved location in a local variable, but it is
+//actually stored in the .gam structure (only for PCs)
 int GameScript::IsFacingSavedRotation(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
@@ -5415,6 +5508,22 @@ int GameScript::IsFacingSavedRotation(Scriptable* Sender, Trigger* parameters)
 	value = (ieDword) CheckVariable( tar, parameters->string0Parameter );
 	Point p = { *(unsigned short *) &value, *(((unsigned short *) &value)+1) };
 	if (actor->GetOrientation() == GetOrient( p, actor->Pos ) ) {
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::IsFacingObject(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return 0;
+	}
+	Scriptable* target = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!target) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	if (actor->GetOrientation()==GetOrient( target->Pos, actor->Pos ) ) {
 		return 1;
 	}
 	return 0;
@@ -5659,6 +5768,120 @@ int GameScript::StuffGlobalRandom( Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+int GameScript::IsCreatureAreaFlag( Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	if (actor->GetStat(IE_MC_FLAGS) & parameters->int0Parameter) {
+		return 1;
+	}
+	return 0;
+}
+
+// 0 - ability, 1 - number, 2 - mode
+int GameScript::ChargeCount( Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	int Slot = actor->inventory.FindItem(parameters->string0Parameter,0);
+	if (Slot<0) {
+		return 0;
+	}
+	CREItem *item = actor->inventory.GetSlotItem (Slot);
+	if (!item) {//bah
+		return 0;
+	}
+	if (parameters->int0Parameter>2) {
+		return 0;
+	}
+	int charge = item->Usages[parameters->int0Parameter];
+	switch (parameters->int2Parameter) {
+		case DM_EQUAL:
+			if (charge == parameters->int1Parameter)
+				return 1;
+			break;
+		case DM_LESS:
+			if (charge < parameters->int1Parameter)
+				return 1;
+			break;
+		case DM_GREATER:
+			if (charge > parameters->int1Parameter)
+				return 1;
+			break;
+		default:
+			return 0;
+	}
+	return 0;
+}
+
+// no idea if it checks only alive partymembers
+int GameScript::CheckPartyLevel( Scriptable* /*Sender*/, Trigger* parameters)
+{
+	if (core->GetGame()->GetPartyLevel(false)<parameters->int0Parameter) {
+		return 0;
+	}
+	return 1;
+}
+
+// no idea if it checks only alive partymembers
+int GameScript::CheckPartyAverageLevel( Scriptable* /*Sender*/, Trigger* parameters)
+{
+	int level = core->GetGame()->GetPartyLevel(false);
+	switch (parameters->int1Parameter) {
+		case DM_EQUAL:
+			if (level ==parameters->int0Parameter) {
+				return 1;
+			}
+			break;
+		case DM_LESS:
+			if (level < parameters->int0Parameter) {
+				return 1;
+			}
+			break;
+		case DM_GREATER:
+			if (level > parameters->int0Parameter) {
+				return 1;
+			}
+			break;
+		default:
+			return 0;
+	}
+	return 1;
+}
+
+int GameScript::CheckDoorFlags( Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type!=ST_DOOR) {
+		return 0;
+	}
+	Door* door = ( Door* ) tar;
+	if (door->Flags&parameters->int0Parameter) {
+		return 1;
+	}
+	return 0;
+}
+
+/* works only on animations?*/
+int GameScript::Frame( Scriptable* Sender, Trigger* parameters)
+{
+	Animation* anim = Sender->GetCurrentArea()->GetAnimation(parameters->objectParameter->objectName);
+	if (!anim) {
+		return 0;
+	}
+	int frame = anim->GetCurrentFrame();
+	if ((frame>=parameters->int0Parameter) &&
+	(frame<=parameters->int1Parameter) ) {
+		return 1;
+	}
+	return 0;
+}
 //-------------------------------------------------------------
 // Action Functions
 //-------------------------------------------------------------
@@ -5905,6 +6128,20 @@ void GameScript::SetTeam(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) scr;
 	actor->SetStat( IE_TEAM, parameters->int0Parameter );
+}
+
+void GameScript::SetTeamBit(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!scr || scr->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) scr;
+	if (parameters->int0Parameter) {
+		actor->SetStat( IE_TEAM, actor->GetStat(IE_TEAM) | parameters->int0Parameter );
+	} else {
+		actor->SetStat( IE_TEAM, actor->GetStat(IE_TEAM) & ~parameters->int0Parameter );
+	}
 }
 
 void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)

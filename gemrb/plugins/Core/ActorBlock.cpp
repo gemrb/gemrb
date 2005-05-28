@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.90 2005/05/19 14:56:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.91 2005/05/28 19:02:11 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -106,7 +106,7 @@ void Scriptable::SetScript(ieResRef aScript, int idx)
 	// NONE is an 'invalid' script name, never used seriously
 	// This hack is to prevent flooding of the console
 	if (aScript[0] && stricmp(aScript, "NONE") ) {
-		Scripts[idx] = new GameScript( aScript, Type, locals );
+		Scripts[idx] = new GameScript( aScript, Type, locals, idx );
 		Scripts[idx]->MySelf = this;
 	}
 }

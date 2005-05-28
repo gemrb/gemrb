@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.180 2005/05/27 21:55:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.181 2005/05/28 19:02:13 avenger_teambg Exp $
  *
  */
 
@@ -36,6 +36,11 @@ class Action;
 #define DS_CONSOLE 4
 #define DS_CONST   8
 #define DS_NONAME  16
+
+//diffmode (iwd2)
+#define DM_EQUAL   1
+#define DM_LESS    2
+#define DM_GREATER 3
 
 //attack core flags
 #define AC_REEVALUATE 1
@@ -583,6 +588,7 @@ struct TriggerLink {
 //opcodes, it would be a very useful and easy to implement feature!
 #define AF_RESTRICTED    16 
 //#define AF_RESTRICTED_LEVEL2  32 //maybe we could use 2 bits for this???
+#define AF_SCRIPTLEVEL   64  //this hack will transfer scriptlevel to int0parameter at runtime (changecurrentscript relies on it)
 
 struct ActionLink {
 	const char* Name;
@@ -613,6 +619,7 @@ public:
 	Scriptable* MySelf;
 	unsigned long scriptRunDelay;
 	bool endReached;
+	int scriptlevel;
 	void Update();
 	void EvaluateAllBlocks();
 private: //Internal Functions
@@ -664,7 +671,7 @@ private: //Script Internal Variables
 	bool freeLocals;
 public:
 	GameScript(ieResRef ResRef, unsigned char ScriptType,
-		Variables* local = NULL);
+		Variables* local = NULL, int ScriptLevel = 0);
 	~GameScript();
 	const char *GetName() { return this?Name:"<NULL>"; }
 	static void ReplaceMyArea(Scriptable* Sender, char* newVarName);
@@ -713,6 +720,10 @@ public: //Script Functions
 	static int BreakingPoint(Scriptable* Sender, Trigger* parameters);
 	static int CalledByName(Scriptable* Sender, Trigger* parameters);
 	static int CharName(Scriptable* Sender, Trigger* parameters);
+	static int ChargeCount(Scriptable* Sender, Trigger* parameters);
+	static int CheckDoorFlags(Scriptable* Sender, Trigger* parameters);
+	static int CheckPartyAverageLevel(Scriptable* Sender, Trigger* parameters);
+	static int CheckPartyLevel(Scriptable* Sender, Trigger* parameters);
 	static int CheckStat(Scriptable* Sender, Trigger* parameters);
 	static int CheckStatGT(Scriptable* Sender, Trigger* parameters);
 	static int CheckStatLT(Scriptable* Sender, Trigger* parameters);
@@ -744,6 +755,7 @@ public: //Script Functions
 	static int FallenPaladin(Scriptable* Sender, Trigger* parameters);
 	static int FallenRanger(Scriptable* Sender, Trigger* parameters);
 	static int False(Scriptable* Sender, Trigger* parameters);
+	static int Frame(Scriptable* Sender, Trigger* parameters);
 	static int Gender(Scriptable* Sender, Trigger* parameters);
 	static int General(Scriptable* Sender, Trigger* parameters);
 	static int G_Trigger(Scriptable* Sender, Trigger* parameters);
@@ -768,6 +780,7 @@ public: //Script Functions
 	static int Happiness(Scriptable* Sender, Trigger* parameters);
 	static int HappinessGT(Scriptable* Sender, Trigger* parameters);
 	static int HappinessLT(Scriptable* Sender, Trigger* parameters);
+	static int HasInnateAbility(Scriptable* Sender, Trigger* parameters);
 	static int HasItem(Scriptable* Sender, Trigger* parameters);
 	static int HasItemEquipped(Scriptable* Sender, Trigger* parameters);
 	static int HasItemSlot(Scriptable* Sender, Trigger* parameters);
@@ -781,6 +794,9 @@ public: //Script Functions
 	static int HotKey(Scriptable* Sender, Trigger* parameters);
 	static int HP(Scriptable* Sender, Trigger* parameters);
 	static int HPGT(Scriptable* Sender, Trigger* parameters);
+	static int HPLost(Scriptable* Sender, Trigger* parameters);
+	static int HPLostGT(Scriptable* Sender, Trigger* parameters);
+	static int HPLostLT(Scriptable* Sender, Trigger* parameters);
 	static int HPLT(Scriptable* Sender, Trigger* parameters);
 	static int HPPercent(Scriptable* Sender, Trigger* parameters);
 	static int HPPercentGT(Scriptable* Sender, Trigger* parameters);
@@ -799,8 +815,10 @@ public: //Script Functions
 	static int InWeaponRange(Scriptable* Sender, Trigger* parameter);
 	static int IsAClown(Scriptable* Sender, Trigger* parameters);
 	static int IsActive(Scriptable* Sender, Trigger* parameters);
+	static int IsCreatureAreaFlag( Scriptable* Sender, Trigger* parameters);
 	static int IsGabber(Scriptable* Sender, Trigger* parameters);
 	static int IsExtendedNight(Scriptable* Sender, Trigger* parameters);
+	static int IsFacingObject(Scriptable* Sender, Trigger* parameters);
 	static int IsFacingSavedRotation(Scriptable* Sender, Trigger* parameters);
 	static int IsLocked(Scriptable* Sender, Trigger* parameters);
 	static int IsPlayerNumber( Scriptable* Sender, Trigger* parameters);
@@ -892,6 +910,9 @@ public: //Script Functions
 	static int TimeGT(Scriptable* Sender, Trigger* parameters);
 	static int TimeLT(Scriptable* Sender, Trigger* parameters);
 	static int TookDamage(Scriptable* Sender, Trigger* parameters);
+	static int TotalItemCnt(Scriptable* Sender, Trigger* parameters);
+	static int TotalItemCntGT(Scriptable* Sender, Trigger* parameters);
+	static int TotalItemCntLT(Scriptable* Sender, Trigger* parameters);
 	static int True(Scriptable* Sender, Trigger* parameters);
 	static int TrapTriggered(Scriptable* Sender, Trigger* parameters);
 	static int UnselectableVariable(Scriptable* Sender, Trigger* parameters);
@@ -931,6 +952,7 @@ public:
 	static void ChangeAlignment(Scriptable* Sender, Action* parameters);
 	static void ChangeAllegiance(Scriptable* Sender, Action* parameters);
 	static void ChangeClass(Scriptable* Sender, Action* parameters);
+	static void ChangeCurrentScript(Scriptable* Sender, Action* parameters);
 	static void ChangeDialogue(Scriptable* Sender, Action* parameters);
 	static void ChangeGender(Scriptable* Sender, Action* parameters);
 	static void ChangeGeneral(Scriptable* Sender, Action* parameters);
@@ -1151,6 +1173,7 @@ public:
 	static void SetRestEncounterProbabilityNight(Scriptable* Sender, Action* parameters);
 	static void SetScriptName(Scriptable* Sender, Action* parameters);
 	static void SetTeam(Scriptable* Sender, Action* parameters);
+	static void SetTeamBit(Scriptable* Sender, Action* parameters);
 	static void SetTextColor(Scriptable* Sender, Action* parameters);
 	static void SetToken(Scriptable* Sender, Action* parameters);
 	static void SetTokenGlobal(Scriptable* Sender, Action* parameters);

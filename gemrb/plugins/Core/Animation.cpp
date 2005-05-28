@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.30 2005/04/06 21:43:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.31 2005/05/28 19:02:11 avenger_teambg Exp $
  *
  */
 
@@ -102,6 +102,13 @@ void Animation::AddFrame(Sprite2D* frame, unsigned int index)
 	if (h > animArea.h) {
 		animArea.h = h;
 	}
+}
+
+int Animation::GetCurrentFrame()
+{
+	if (playReversed)
+		return indicesCount-pos-1;
+	return pos;
 }
 
 Sprite2D* Animation::NextFrame(void)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.163 2005/05/26 19:43:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.164 2005/05/28 19:02:13 avenger_teambg Exp $
  *
  */
 
@@ -417,8 +417,9 @@ void Map::UpdateScripts()
 		Actor* actor = queue[0][q];
 		actor->ProcessActions();
 		for (unsigned int i = 0; i < 8; i++) {
-		if (actor->Scripts[i]) {
-			if (actor->GetNextAction()) break;
+			if (actor->Scripts[i]) {
+				if (actor->GetNextAction())
+					break;
 				actor->ExecuteScript( actor->Scripts[i] );
 			}
 		}
