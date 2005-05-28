@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.35 2005/04/08 22:27:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.36 2005/05/28 09:32:24 avenger_teambg Exp $
  *
  */
 
@@ -77,7 +77,7 @@
 #define IE_ANI_FOUR_FILES		2
 #define IE_ANI_TWO_FILES		3
 #define IE_ANI_CODE_MIRROR_2		4
-#define IE_ANI_ONE_FILE_2		5
+#define IE_ANI_SIX_FILES_2		5    //MOGR
 #define IE_ANI_TWENTYTWO		6
 #define IE_ANI_CODE_MIRROR_3		7
 #define IE_ANI_SIX_FILES		8    //MCAR/MWYV
@@ -158,6 +158,8 @@ private:
 	void AddLRSuffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void AddLR2Suffix(char* ResRef, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient);
+	void AddLR3Suffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void GetAnimResRef(unsigned char AnimID, unsigned char Orient,
 		char* ResRef, unsigned char& Cycle);

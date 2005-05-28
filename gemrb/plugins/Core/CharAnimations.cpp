@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.59 2005/04/19 16:00:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.60 2005/05/28 09:32:24 avenger_teambg Exp $
  *
  */
 
@@ -289,6 +289,8 @@ IE_ANI_SIX_FILES:	The layout for these files is:
 			G2 contains stand, ready, get hit, die and twitch.
 			G3 contains 3 attacks.
 
+IE_ANI_SIX_FILES_2:     Similar to SIX_FILES, but the orientation numbers are reduced like in FOUR_FILES. Only one animation uses it: MOGR 
+
 IE_ANI_TWO_FILES_2:	Animations using this type are stored using the following template:
 			[NAME]G1[/E]
 			Each state contains 8 Orientations, but the second 4 are stored in the East file.
@@ -491,6 +493,7 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 		case IE_ANI_TWO_FILES_2:
 		case IE_ANI_TWO_FILES_3:
 		case IE_ANI_FOUR_FILES:
+		case IE_ANI_SIX_FILES_2:
 			Orient&=~1;
 			Anims[StanceID][Orient] = a;
 			Anims[StanceID][Orient + 1] = a;
@@ -570,6 +573,10 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID, unsigned char Orient,
 
 		case IE_ANI_FOUR_FILES:
 			AddLRSuffix( ResRef, StanceID, Cycle, Orient );
+			break;
+
+		case IE_ANI_SIX_FILES_2: //MOGR (variant of FOUR_FILES)
+			AddLR3Suffix( ResRef, StanceID, Cycle, Orient );
 			break;
 
 		case IE_ANI_CODE_MIRROR_2: //9 orientations
@@ -1090,6 +1097,7 @@ void CharAnimations::AddLRSuffix( char* ResRef, unsigned char StanceID,
 			strcat( ResRef, "G1" );
 			Cycle = 8 + Orient / 2;
 			break;
+		case IE_ANI_HEAD_TURN: //could be wrong
 		case IE_ANI_AWAKE:
 			strcat( ResRef, "G1" );
 			Cycle = 16 + Orient / 2;
@@ -1105,6 +1113,65 @@ void CharAnimations::AddLRSuffix( char* ResRef, unsigned char StanceID,
 		case IE_ANI_TWITCH:
 			strcat( ResRef, "G1" );
 			Cycle = 40 + Orient / 2;
+			break;
+	}
+	if (Orient > 9) {
+		strcat( ResRef, "E" );
+	}
+}
+
+//Only for the ogre animation (MOGR)
+void CharAnimations::AddLR3Suffix( char* ResRef, unsigned char StanceID,
+	unsigned char& Cycle, unsigned char Orient)
+{
+	switch (StanceID) {
+		case IE_ANI_ATTACK:
+		case IE_ANI_ATTACK_BACKSLASH:
+			strcat( ResRef, "G2" );
+			Cycle = Orient / 2;
+			break;
+		case IE_ANI_ATTACK_SLASH:
+			strcat( ResRef, "G2" );
+			Cycle = 8 + Orient / 2;
+			break;
+		case IE_ANI_ATTACK_JAB:
+			strcat( ResRef, "G2" );
+			Cycle = 16 + Orient / 2;
+			break;
+		case IE_ANI_CAST:
+		case IE_ANI_CONJURE:
+		case IE_ANI_SHOOT:
+			strcat( ResRef, "G3" );
+			Cycle = Orient / 2;
+			break;
+		case IE_ANI_WALK:
+			strcat( ResRef, "G1" );
+			Cycle = 16 + Orient / 2;
+			break;
+		case IE_ANI_READY:
+			strcat( ResRef, "G1" );
+			Cycle = 8 + Orient / 2;
+			break;
+		case IE_ANI_HEAD_TURN: //could be wrong
+		case IE_ANI_AWAKE:
+			strcat( ResRef, "G1" );
+			Cycle = Orient / 2;
+			break;
+		case IE_ANI_DAMAGE:
+			strcat( ResRef, "G3" );
+			Cycle = 8 + Orient / 2;
+			break;
+		case IE_ANI_DIE:
+			strcat( ResRef, "G3" );
+			Cycle = 16 + Orient / 2;
+			break;
+		case IE_ANI_TWITCH:
+			strcat( ResRef, "G3" );
+			Cycle = 24 + Orient / 2;
+			break;
+		default:
+			printf("Unhandled stance: %s %d\n", ResRef, StanceID);
+			abort();
 			break;
 	}
 	if (Orient > 9) {
