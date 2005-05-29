@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/configure.in,v 1.48 2005/03/15 17:58:10 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/configure.in,v 1.49 2005/05/29 12:24:01 avenger_teambg Exp $
 
 ###################################################
 
@@ -28,7 +28,7 @@
 dnl Initialize autoconf and automake
 
 AC_PREREQ([2.57])
-AC_INIT(gemrb, 0.2.4)
+AC_INIT(gemrb, 0.2.5)
 AC_CONFIG_AUX_DIR([admin])
 AC_CONFIG_SRCDIR([gemrb/])
 AC_CANONICAL_SYSTEM

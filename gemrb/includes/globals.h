@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.73 2005/05/18 12:28:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.74 2005/05/29 12:24:01 avenger_teambg Exp $
  *
  */
 
@@ -28,7 +28,7 @@
 
 #include "ie_types.h"
 
-#define VERSION_GEMRB "0.2.4"
+#define VERSION_GEMRB "0.2.5"
 
 #define GEMRB_STRING "GemRB v" VERSION_GEMRB
 
