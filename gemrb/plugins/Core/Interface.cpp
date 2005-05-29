@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.312 2005/05/27 20:03:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.313 2005/05/29 22:16:22 avenger_teambg Exp $
  *
  */
 
@@ -2388,6 +2388,13 @@ void Interface::SetCutSceneMode(bool active)
 	GameControl *gc = GetGameControl();
 	if (gc) {
 		gc->SetCutSceneMode( active );
+	}
+	if (game) {
+		if (active) {
+			game->ControlStatus |= CS_HIDEGUI;
+		} else {
+			game->ControlStatus &= ~CS_HIDEGUI;
+		}
 	}
 	video->DisableMouse = active;
 	video->moveX = 0;

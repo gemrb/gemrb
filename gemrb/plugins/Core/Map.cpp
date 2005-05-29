@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.164 2005/05/28 19:02:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.165 2005/05/29 22:16:22 avenger_teambg Exp $
  *
  */
 
@@ -615,7 +615,7 @@ void Map::DrawMap(Region screen, GameControl* gc)
 					continue;
 				//turning actor inactive
 				actor->Active&=~SCR_ACTIVE;
-				actor->SetStance(IE_ANI_READY);
+				//actor->SetStance(IE_ANI_READY);
 				continue;
 			}
 			//0 means opaque
@@ -767,9 +767,7 @@ void Map::DeleteActor(int i)
 {
 	Actor *actor = actors[i];
 	Game *game = core->GetGame();
-printf("Leaveparty\n");
 	game->LeaveParty( actor );
-printf("DelNPC\n");
 	game->DelNPC( game->InStore(actor) );
 	actors.erase( actors.begin()+i );
 	delete (actor);

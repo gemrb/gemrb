@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.181 2005/05/28 19:02:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.182 2005/05/29 22:16:22 avenger_teambg Exp $
  *
  */
 
@@ -44,6 +44,16 @@ class Action;
 
 //attack core flags
 #define AC_REEVALUATE 1
+
+//indebug flags
+#define ID_REFERENCE 1
+#define ID_CUTSCENE  2
+#define ID_VARIABLES 4
+#define ID_ACTIONS   8
+#define ID_TRIGGERS  16
+
+//trigger flags stored in triggers in .bcs files
+#define NEGATE_TRIGGER 1
 
 #define MAX_OBJECT_FIELDS	10
 #define MAX_NESTING			5

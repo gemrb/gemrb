@@ -82,46 +82,47 @@ def OnLoad():
 	TextAreaControl= GemRB.GetControl(CharGenWindow,9)
 	
 	GemRB.SetText(CharGenWindow, TextAreaControl, 1047)
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, ": ")
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, GemRB.GetToken("CHARNAME") )
+	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, ": ")
+	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, GemRB.GetToken("CHARNAME") )
 
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, 12135, -1)
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
+	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 12135, -1)
+	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,": ")
 	if GemRB.GetVar("Gender") == 1:
-		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, 1050)
+		GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 1050)
 	else:
-		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, 1051)
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,1048,-1) # new line
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(RaceTable,GemRB.GetVar("Race")-1,2))
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,12136, -1)
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
+		GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 1051)
+	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,1048,-1) # new line
+	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,": ")
+	row = GemRB.FindTableValue (RaceTable, 3, GemRB.GetVar ("Race") )
+	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,GemRB.GetTableValue(RaceTable,row,2))
+	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,12136, -1)
+	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,": ")
 	KitIndex = GemRB.GetVar("Class Kit")
 	if KitIndex == 0:
-		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(ClassTable,GemRB.GetVar("Class")-1,2))
+		GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,GemRB.GetTableValue(ClassTable,GemRB.GetVar("Class")-1,2))
 	else:
-		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, GemRB.GetTableValue(KitTable, KitIndex,2) )
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,1049, -1)
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
+		GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, GemRB.GetTableValue(KitTable, KitIndex,2) )
+	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,1049, -1)
+	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,": ")
 	print "Using alignmenttable",AlignmentTable
 	v = GemRB.FindTableValue(AlignmentTable,3,GemRB.GetVar("Alignment"))
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(AlignmentTable,v,2))
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"\n[color=FFFF00]",-1) #2 new lines
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,17088)
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"[/color]")
+	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,GemRB.GetTableValue(AlignmentTable,v,2))
+	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,"\n[color=FFFF00]",-1) #2 new lines
+	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,17088)
+	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,"[/color]")
 	for i in range(0,6):
 		v = GemRB.GetTableValue(AbilityTable, i,2)
-		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, v, -1)
-		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": "+str(GemRB.GetVar("Ability "+str(i))))
+		GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, v, -1)
+		GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,": "+str(GemRB.GetVar("Ability "+str(i))))
 
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"\n[color=FFFF00]",-1) #2 new lines
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,11983)
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"[/color]")
+	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,"\n[color=FFFF00]",-1) #2 new lines
+	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,11983)
+	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,"[/color]")
 	# todo: list skills
 
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"\n[color=FFFF00]",-1) #2 new lines
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,36310)
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"[/color]")
+	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,"\n[color=FFFF00]",-1) #2 new lines
+	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,36310)
+	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,"[/color]")
 	# todo: list feats
 
 
@@ -140,6 +141,7 @@ def NextPress():
 	GemRB.SetPlayerStat(MyChar, IE_SEX, GemRB.GetVar("Gender") )
 	GemRB.SetPlayerStat(MyChar, IE_RACE, GemRB.GetVar("BaseRace") )
 	GemRB.SetPlayerStat(MyChar, IE_SUBRACE, GemRB.GetVar("Race") )
+	print "Race:",GemRB.GetVar("BaseRace"), "Subrace", GemRB.GetVar("Race")
 	#base class
 	Class=GemRB.GetVar("BaseClass")
 	GemRB.SetPlayerStat(MyChar, IE_CLASS, Class)

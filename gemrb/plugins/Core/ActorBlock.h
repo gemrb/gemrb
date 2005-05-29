@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.72 2005/05/20 16:41:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.73 2005/05/29 22:16:20 avenger_teambg Exp $
  *
  */
 
@@ -113,6 +113,8 @@ class Door;
 typedef enum ScriptableType { ST_ACTOR = 0, ST_PROXIMITY = 1, ST_TRIGGER = 2,
 ST_TRAVEL = 3, ST_DOOR = 4, ST_CONTAINER = 5, ST_AREA = 6, ST_GLOBAL = 7 } ScriptableType;
 
+typedef std::list<Actor **> TriggerObjects;
+
 //#define SEA_RESET		0x00000002
 //#define SEA_PARTY_REQUIRED	0x00000004
 
@@ -121,6 +123,7 @@ public:
 	Scriptable(ScriptableType type);
 	virtual ~Scriptable(void);
 private:
+	TriggerObjects tolist;
 	unsigned long startTime;
 	unsigned long interval;
 	unsigned long WaitCounter;
@@ -142,8 +145,8 @@ public:
 	//8 = scripting name overwritten with area actor entry label
 	//other flags are in CREAREAFL in iwd2
 	ieDword Active;
-	Scriptable* LastTrigger;
-	Scriptable* LastEntered;
+	Actor* LastTrigger;
+	Actor* LastEntered;
 	std::list< Action*> actionQueue;
 	Action* CurrentAction;
 	bool resetAction;
@@ -166,6 +169,11 @@ public:
 	Action* PopNextAction();
 	void ClearActions();
 	virtual void ProcessActions();
+	//these functions handle clearing of triggers that resulted a
+	//true condition (whole triggerblock returned true)
+	void InitTriggers();
+	void ClearTriggers();
+	void AddTrigger(Actor **actorref);
 };
 
 class GEM_EXPORT Selectable : public Scriptable {

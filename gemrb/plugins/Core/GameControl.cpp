@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.229 2005/05/19 14:56:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.230 2005/05/29 22:16:20 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -805,9 +805,10 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor)
 					trap->LastTrigger = actor;
 					trap->Scripts[0]->Update();
 					//if reset trap flag not set, deactivate it
-					if (!(trap->Flags&TRAP_RESET)) {
-						trap->Flags|=TRAP_DEACTIVATED;
-					}
+					//hmm, better not, info triggers don't deactivate themselves on click
+					//if (!(trap->Flags&TRAP_RESET)) {
+					//	trap->Flags|=TRAP_DEACTIVATED;
+					//}
 				}
 			} else {
 				if (trap->overHeadText) {
@@ -1087,11 +1088,9 @@ void GameControl::SetCutSceneMode(bool active)
 {
 	if (active) {
 		ScreenFlags |= (SF_DISABLEMOUSE | SF_LOCKSCROLL);
-		HideGUI();
 	}
 	else {
 		ScreenFlags &= ~(SF_DISABLEMOUSE | SF_LOCKSCROLL);
-		UnhideGUI();
 	}
 }
 
@@ -1344,8 +1343,8 @@ void GameControl::InitDialog(Actor* speaker, Scriptable* target, const char* dlg
 	if (!(dlg->Flags&7) ) {
 		DialogueFlags |= DF_FREEZE_SCRIPTS;
 	}
-	//opening control size to maximum
-	ieDword index = core->GetGame()->ControlStatus&~CS_DIALOGSIZEMASK;
+	//opening control size to maximum, enabling dialog window
+	ieDword index = core->GetGame()->ControlStatus&~(CS_DIALOGSIZEMASK|CS_HIDEGUI);
 	core->GetGame()->SetControlStatus(index | CS_LARGE, BM_SET);
 }
 

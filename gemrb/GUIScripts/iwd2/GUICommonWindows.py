@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUICommonWindows.py,v 1.9 2005/05/27 20:03:55 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUICommonWindows.py,v 1.10 2005/05/29 22:16:18 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -125,22 +125,32 @@ def SetupActionsWindowControls (Window):
 	GemRB.SetTooltip (Window, Button, 44945)
 	return
 
+def GetActorRaceTitle (actor):
+        Table = GemRB.LoadTable ("races")
+        RaceID = GemRB.GetPlayerStat (actor, IE_SUBRACE)
+        if RaceID:
+                RaceID += GemRB.GetPlayerStat (actor, IE_RACE)<<16
+        else:
+                RaceID = GemRB.GetPlayerStat (actor, IE_RACE)
+        row = GemRB.FindTableValue (Table, 3, RaceID )
+        RaceTitle = GemRB.GetTableValue (Table, row, 2)
+        GemRB.UnloadTable (Table)
+	return RaceTitle
+
 def GetActorClassTitle (actor):
 	ClassTitle = GemRB.GetPlayerStat (actor, IE_TITLE1)
-	KitIndex = GemRB.GetPlayerStat (actor, IE_KIT) & 0xfff
+	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
 	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
 	ClassTable = GemRB.LoadTable ("classes")
-	Class = GemRB.FindTableValue( ClassTable, 5, Class )
-	KitTable = GemRB.LoadTable ("kitlist")
+	if Kit==0x4000 or Kit==0: #pure class
+		ClassIndex = Class
+	else: #bad, because kit clashes with classid
+		ClassIndex = GemRB.FindTableValue (ClassTable, Kit, 2)
 
 	if ClassTitle==0:
-		if KitIndex == 0:
-			ClassTitle=GemRB.GetTableValue(ClassTable, Class, 2)
-		else:
-			ClassTitle=GemRB.GetTableValue(KitTable, KitIndex, 2)
+		ClassTitle=GemRB.GetTableValue (ClassTable, ClassIndex, 0)
 
 	GemRB.UnloadTable (ClassTable)
-	GemRB.UnloadTable (KitTable)
 	return ClassTitle
 
 def GetActorPaperDoll (actor):
@@ -319,7 +329,7 @@ def SetEncumbranceLabels (Window, Label, Label2, pc):
 	sstr = GemRB.GetPlayerStat (pc, IE_STR)
 	ext_str = GemRB.GetPlayerStat (pc, IE_STREXTRA)
 
-	max_encumb = GemRB.GetTableValue(Table, sstr, 3) + GemRB.GetTableValue(TableEx, ext_str, 3)
+	max_encumb = GemRB.GetTableValue (Table, sstr, 3) + GemRB.GetTableValue(TableEx, ext_str, 3)
 	encumbrance = GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)
 
 	Label = GemRB.GetControl (Window, 0x10000043)

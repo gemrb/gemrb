@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.91 2005/05/28 19:02:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.92 2005/05/29 22:16:20 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -237,13 +237,6 @@ void Scriptable::ProcessActions()
 				CutSceneId = NULL;
 			break;
 		}
-/*
-		if (Type == ST_ACTOR) {
-			Moveble* actor = ( Moveble* )this;
-			if (actor->GetStance() == IE_ANI_SLEEP )
-				actor->SetStance( IE_ANI_GET_UP );
-		}
-*/
 		GameScript::ExecuteAction( this, CurrentAction );
 		neverExecuted = false;
 	}
@@ -257,6 +250,26 @@ void Scriptable::SetWait(unsigned long time)
 unsigned long Scriptable::GetWait()
 {
 	return WaitCounter;
+}
+
+void Scriptable::InitTriggers()
+{
+	tolist.clear();
+}
+
+void Scriptable::ClearTriggers()
+{
+	for (TriggerObjects::iterator m = tolist.begin(); m != tolist.end (); m++) {
+		// clearing the trigger object
+		// typecast is to ensure that i'm sane :)
+		*(*m) = (Actor *) NULL;
+	}
+
+}
+
+void Scriptable::AddTrigger(Actor **actorref)
+{
+	tolist.push_back(actorref);
 }
 
 /********************
@@ -391,9 +404,9 @@ Moveble::~Moveble(void)
 
 void Moveble::SetStance(unsigned int arg)
 {
-	if (arg<MAX_ANIMS) StanceID=(unsigned char) arg;
-	else
-	{
+	if (arg<MAX_ANIMS) {
+		 StanceID=(unsigned char) arg;
+	} else {
 		StanceID=IE_ANI_AWAKE; //
 		printf("Tried to set invalid stance id (%u)\n", arg);
 	}
@@ -788,27 +801,39 @@ bool InfoPoint::VisibleTrap(bool see_all)
 //trap that will fire now
 bool InfoPoint::TriggerTrap(int skill)
 {
-	if (Type!=ST_TRIGGER) return false;
-	//actually this could be script name[0]
-	if (!Scripts[0]) return false;
-	if (Flags&TRAP_DEACTIVATED) return false;
-	TrapDetected=1; //probably too late :)
-	if ((skill>=100) && (skill!=256) ) skill=100;
-	if (skill/2+core->Roll(1,skill/2,0)>TrapDetectionDifficulty) {
-		//tumble???
+	if (Type!=ST_PROXIMITY) {
 		return false;
 	}
-	if (Flags&TRAP_RESET) return true;
+	//actually this could be script name[0]
+	if (!Scripts[0]) {
+		return false;
+	}
+	if (Flags&TRAP_DEACTIVATED) {
+		return false;
+	}
+	if (Flags&TRAP_DETECTABLE) {
+		TrapDetected=1; //probably too late :)
+		if ((skill>=100) && (skill!=256) ) skill=100;
+		if (skill/2+core->Roll(1,skill/2,0)>TrapDetectionDifficulty) {
+			//tumble???
+			return false;
+		}
+	}
+	if (Flags&TRAP_RESET) {
+		return true;
+	}
 	Flags|=TRAP_DEACTIVATED;
 	return true;
 }
 
 void InfoPoint::Entered(Actor *actor)
 {
-	if (Flags&TRAP_DEACTIVATED) return;
 	if (actor->InParty || (Flags&TRAP_NPC) ) {
-		LastEntered = actor;
-		LastTrigger = actor;
+		//skill?
+		if (TriggerTrap(0) ) {
+			LastEntered = actor;
+			LastTrigger = actor;
+		}
 	}
 }
 

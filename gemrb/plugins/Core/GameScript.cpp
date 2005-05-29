@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.277 2005/05/28 19:02:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.278 2005/05/29 22:16:21 avenger_teambg Exp $
  *
  */
 
@@ -1167,7 +1167,7 @@ GameScript::~GameScript(void)
 	if (script) {
 		//set 3. parameter to true if you want instant free
 		//and possible death
-		if (InDebug&1) {
+		if (InDebug&ID_REFERENCE) {
 			printf("One instance of %s is dropped from %d.\n", Name, BcsCache.RefCount(Name) );
 		}
 		int res = BcsCache.DecRef(script, Name, true);
@@ -1191,7 +1191,7 @@ Script* GameScript::CacheScript(ieResRef ResRef)
 
 	Script *newScript = (Script *) BcsCache.GetResource(ResRef);
 	if ( newScript ) {
-		if (InDebug&1) {
+		if (InDebug&ID_REFERENCE) {
 			printf("Caching %s for the %d. time\n", ResRef, BcsCache.RefCount(ResRef) );
 		}
 		return newScript;
@@ -1210,7 +1210,7 @@ Script* GameScript::CacheScript(ieResRef ResRef)
 	}
 	newScript = new Script( );
 	BcsCache.SetAt( ResRef, (void *) newScript );
-	if (InDebug&1) {
+	if (InDebug&ID_REFERENCE) {
 		printf("Caching %s for the %d. time\n", ResRef, BcsCache.RefCount(ResRef) );
 	}
 	
@@ -1235,7 +1235,7 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
 {
 	char newVarName[8+33];
 
-	if (InDebug&4) {
+	if (InDebug&ID_VARIABLES) {
 		printf( "Setting variable(\"%s%s\", %d)\n", Context,
 			VarName, value );
 	}
@@ -1260,7 +1260,7 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
 		if (map) {
 			map->vars->SetAt( VarName, value);
 		}
-		else if (InDebug&4) {
+		else if (InDebug&ID_VARIABLES) {
 			printMessage("GameScript"," ",YELLOW);
 			printf("Invalid variable %s %s in checkvariable\n",Context, VarName);
 		}
@@ -1274,7 +1274,7 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName, ieDword va
 {
 	char newVarName[8];
 
-	if (InDebug&4) {
+	if (InDebug&ID_VARIABLES) {
 		printf( "Setting variable(\"%s\", %d)\n", VarName, value );
 	}
 	strncpy( newVarName, VarName, 6 );
@@ -1297,7 +1297,7 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName, ieDword va
 		if (map) {
 			map->vars->SetAt( &VarName[6], value);
 		}
-		else if (InDebug&4) {
+		else if (InDebug&ID_VARIABLES) {
 			printMessage("GameScript"," ",YELLOW);
 			printf("Invalid variable %s in setvariable\n",VarName);
 		}
@@ -1316,14 +1316,14 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName)
 	newVarName[6]=0;
 	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
 		Sender->GetCurrentArea()->locals->SetAt( VarName, value );
-		if (InDebug&4) {
+		if (InDebug&ID_VARIABLES) {
 			printf("CheckVariable %s: %d\n",VarName, value);
 		}
 		return value;
 	}
 	if (strnicmp( newVarName, "LOCALS", 6 ) == 0) {
 		Sender->locals->Lookup( &VarName[6], value );
-		if (InDebug&4) {
+		if (InDebug&ID_VARIABLES) {
 			printf("CheckVariable %s: %d\n",VarName, value);
 		}
 		return value;
@@ -1331,7 +1331,7 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName)
 	Game *game = core->GetGame();
 	if (!strnicmp(newVarName,"KAPUTZ",6) && core->HasFeature(GF_HAS_KAPUTZ) ) {
 		game->kaputz->Lookup( &VarName[6], value );
-		if (InDebug&4) {
+		if (InDebug&ID_VARIABLES) {
 			printf("CheckVariable %s: %d\n",VarName, value);
 		}
 		return value;
@@ -1341,7 +1341,7 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName)
 		if (map) {
 			map->vars->Lookup( &VarName[6], value);
 		}
-		else if (InDebug&4) {
+		else if (InDebug&ID_VARIABLES) {
 			printMessage("GameScript"," ",YELLOW);
 			printf("Invalid variable %s in checkvariable\n",VarName);
 		}
@@ -1349,7 +1349,7 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName)
 	else {
 		game->globals->Lookup( &VarName[6], value );
 	}
-	if (InDebug&4) {
+	if (InDebug&ID_VARIABLES) {
 		printf("CheckVariable %s: %d\n",VarName, value);
 	}
 	return value;
@@ -1364,14 +1364,14 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName, const
 	newVarName[6]=0;
 	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
 		Sender->GetCurrentArea()->locals->SetAt( VarName, value );
-		if (InDebug&4) {
+		if (InDebug&ID_VARIABLES) {
 			printf("CheckVariable %s%s: %d\n",Context, VarName, value);
 		}
 		return value;
 	}
 	if (strnicmp( newVarName, "LOCALS", 6 ) == 0) {
 		Sender->locals->Lookup( VarName, value );
-		if (InDebug&4) {
+		if (InDebug&ID_VARIABLES) {
 			printf("CheckVariable %s%s: %d\n",Context, VarName, value);
 		}
 		return value;
@@ -1379,7 +1379,7 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName, const
 	Game *game = core->GetGame();
 	if (!strnicmp(newVarName,"KAPUTZ",6) && core->HasFeature(GF_HAS_KAPUTZ) ) {
 		game->kaputz->Lookup( VarName, value );
-		if (InDebug&4) {
+		if (InDebug&ID_VARIABLES) {
 			printf("CheckVariable %s%s: %d\n",Context, VarName, value);
 		}
 		return value;
@@ -1389,14 +1389,14 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName, const
 		if (map) {
 			map->vars->Lookup( VarName, value);
 		}
-		else if (InDebug&4) {
+		else if (InDebug&ID_VARIABLES) {
 			printMessage("GameScript"," ",YELLOW);
 			printf("Invalid variable %s %s in checkvariable\n",Context, VarName);
 		}
 	} else {
 		game->globals->Lookup( VarName, value );
 	}
-	if (InDebug&4) {
+	if (InDebug&ID_VARIABLES) {
 		printf("CheckVariable %s%s: %d\n",Context, VarName, value);
 	}
 	return value;
@@ -1416,12 +1416,16 @@ void GameScript::Update()
 	if (!script) {
 		return;
 	}
+	RandomNumValue=rand();
 	for (unsigned int a = 0; a < script->responseBlocksCount; a++) {
 		ResponseBlock* rB = script->responseBlocks[a];
-		if (EvaluateCondition( this->MySelf, rB->condition )) {
-			continueExecution = ( ExecuteResponseSet( this->MySelf,
+		MySelf->InitTriggers();
+		if (EvaluateCondition( MySelf, rB->condition )) {
+			continueExecution = ( ExecuteResponseSet( MySelf,
 						rB->responseSet ) != 0 );
 			endReached = false;
+			//clear triggers after response executed
+			MySelf->ClearTriggers();
 			if (!continueExecution)
 				break;
 			continueExecution = false;
@@ -1656,7 +1660,6 @@ bool GameScript::EvaluateCondition(Scriptable* Sender, Condition* condition)
 	unsigned int result = 0;
 	bool subresult = true;
 
-	RandomNumValue=rand();
 	for (int i = 0; i < condition->triggersCount; i++) {
 		Trigger* tR = condition->triggers[i];
 		//do not evaluate triggers in an Or() block if one of them
@@ -1694,7 +1697,7 @@ bool GameScript::EvaluateCondition(Scriptable* Sender, Condition* condition)
 int GameScript::EvaluateTrigger(Scriptable* Sender, Trigger* trigger)
 {
 	if (!trigger) {
-		printMessage( "GameScript","Trigger evaluation fails due to NULL trigger.\n",YELLOW );
+		printMessage( "GameScript","Trigger evaluation fails due to NULL trigger.\n",LIGHT_RED );
 		return 0;
 	}
 	TriggerFunction func = triggers[trigger->triggerID];
@@ -1704,19 +1707,18 @@ int GameScript::EvaluateTrigger(Scriptable* Sender, Trigger* trigger)
 	}
 	if (!func) {
 		triggers[trigger->triggerID] = False;
-		//hope this is enough, snprintf will prevent buffer overflow
-		char Tmp[256]; 
-		snprintf(Tmp,sizeof(Tmp),"Unhandled trigger code: 0x%04x %s\n",
+		printMessage("GameScript"," ",YELLOW);
+		printf("Unhandled trigger code: 0x%04x %s\n",
 			trigger->triggerID, tmpstr );
-		printMessage( "GameScript",Tmp,YELLOW);
 		return 0;
 	}
-	if (InDebug&16) {
-		printf( "[GameScript]: Executing trigger code: 0x%04x %s\n",
+	if (InDebug&ID_TRIGGERS) {
+		printMessage("GameScript"," ",YELLOW);
+		printf( "Executing trigger code: 0x%04x %s\n",
 				trigger->triggerID, tmpstr );
 	}
 	int ret = func( Sender, trigger );
-	if (trigger->flags & 1) {
+	if (trigger->flags & NEGATE_TRIGGER) {
 		return !ret;
 	}
 	return ret;
@@ -1783,7 +1785,8 @@ int GameScript::ExecuteResponse(Scriptable* Sender, Response* rE)
 
 void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 {
-	if (InDebug&8) {
+	if (InDebug&ID_ACTIONS) {
+		printMessage("GameScript"," ",YELLOW);
 		printf("Sender: %s\n",Sender->GetScriptName() );
 	}
 	ActionFunction func = actions[aC->actionID];
@@ -1800,8 +1803,9 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 			return;
 		}
 		else {
-			if (InDebug&8) {
-				printf( "[GameScript]: Executing action code: %d %s\n", aC->actionID , actionsTable->GetValue(aC->actionID) );
+			if (InDebug&ID_ACTIONS) {
+				printMessage("GameScript"," ",YELLOW);
+				printf( "Executing action code: %d %s\n", aC->actionID , actionsTable->GetValue(aC->actionID) );
 			}
 			//turning off interruptable flag
 			//uninterruptable actions will set it back
@@ -1814,9 +1818,8 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 	}
 	else {
 		actions[aC->actionID] = NoActionAtAll;
-		char Tmp[256]; 
-		snprintf(Tmp, sizeof(Tmp), "Unhandled action code: %d %s\n", aC->actionID , actionsTable->GetValue(aC->actionID) );
-		printMessage("GameScript", Tmp, YELLOW);
+		printMessage("GameScript", " ", YELLOW);
+		printf("Unhandled action code: %d %s\n", aC->actionID , actionsTable->GetValue(aC->actionID) );
 		Sender->CurrentAction = NULL;
 		aC->Release();
 		return;
@@ -1911,7 +1914,8 @@ bool GameScript::MatchActor(Scriptable *Sender, Actor* actor, Object* oC)
 			tgts = func( Sender, tgts);
 		}
 		else {
-			printf("[GameScript]: Unknown object filter: %d %s\n",filterid, objectsTable->GetValue(filterid) );
+			printMessage("GameScript", " ", LIGHT_RED);
+			printf("Unknown object filter: %d %s\n",filterid, objectsTable->GetValue(filterid) );
 		}
 		if (!tgts->Count()) {
 			delete tgts;
@@ -2039,11 +2043,9 @@ static int GetIdsValue(const char *&symbol, const char *idsname)
 	SymbolMgr *valHook = core->GetSymbol(idsfile);
 	if (!valHook) {
 		//FIXME:missing ids file!!!
-		if (InDebug&16) {
-			char Tmp[256];
-
-			sprintf(Tmp,"Missing IDS file %s for symbol %s!\n",idsname, symbol);
-			printMessage("GameScript",Tmp,LIGHT_RED);
+		if (InDebug&ID_TRIGGERS) {
+			printMessage("GameScript"," ",LIGHT_RED);
+			printf("Missing IDS file %s for symbol %s!\n",idsname, symbol);
 		}
 		return -1;
 	}
@@ -2317,13 +2319,14 @@ Action*GameScript::GenerateActionCore(const char *src, const char *str, int acIn
 Action* GameScript::GenerateAction(char* String, bool autoFree)
 {
 	strlwr( String );
-	if (InDebug&8) {
+	if (InDebug&ID_ACTIONS) {
+		printMessage("GameScript"," ",YELLOW);
 		printf("Compiling:%s\n",String);
 	}
 	int len = strlench(String,'(')+1; //including (
 	int i = actionsTable->FindString(String, len);
 	if (i<0) {
-		printMessage("GameScript"," ",YELLOW);
+		printMessage("GameScript"," ",LIGHT_RED);
 		printf("Invalid scripting action: %s\n", String);
 		return NULL;
 	}
@@ -2475,7 +2478,8 @@ Trigger *GameScript::GenerateTriggerCore(const char *src, const char *str, int t
 Trigger* GameScript::GenerateTrigger(char* String)
 {
 	strlwr( String );
-	if (InDebug&16) {
+	if (InDebug&ID_TRIGGERS) {
+		printMessage("GameScript"," ",YELLOW);
 		printf("Compiling:%s\n",String);
 	}
 	int negate = 0;
@@ -3467,7 +3471,16 @@ int GameScript::SubRace(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = (Actor*)scr;
-	return ID_Subrace( actor, parameters->int0Parameter);
+	//subrace trigger uses a weird system, cannot use ID_*
+	//return ID_Subrace( actor, parameters->int0Parameter);
+	int value = actor->GetStat(IE_SUBRACE);
+	if (value) {
+		value |= actor->GetStat(IE_RACE)<<16;
+	}
+	if (value == parameters->int0Parameter) {
+		return 1;
+	}
+	return 0;
 }
 
 int GameScript::IsTeamBitOn(Scriptable* Sender, Trigger* parameters)
@@ -4324,12 +4337,14 @@ int GameScript::Clicked(Scriptable* Sender, Trigger* parameters)
 {
 	if (parameters->objectParameter->objectFields[0] == 0) {
 		if (Sender->LastTrigger) {
+			Sender->AddTrigger (&Sender->LastTrigger);
 			return 1;
 		}
 		return 0;
 	}
 	Scriptable* target = GetActorFromObject( Sender, parameters->objectParameter );
 	if (Sender->LastTrigger == target) {
+		Sender->AddTrigger (&Sender->LastTrigger);
 		return 1;
 	}
 	return 0;
@@ -4342,13 +4357,14 @@ int GameScript::Entered(Scriptable* Sender, Trigger* parameters)
 	}
 	if (parameters->objectParameter->objectFields[0] == 0) {
 		if (Sender->LastEntered) {
+			Sender->AddTrigger (&Sender->LastEntered);
 			return 1;
-		} else {
-			return 0;
 		}
+		return 0;
 	}
 	Scriptable* target = GetActorFromObject( Sender, parameters->objectParameter );
 	if (Sender->LastEntered == target) {
+		Sender->AddTrigger (&Sender->LastEntered);
 		return 1;
 	}
 	return 0;
@@ -5457,7 +5473,11 @@ int GameScript::TrapTriggered(Scriptable* Sender, Trigger* parameters)
 	if (!tar || tar->Type != ST_ACTOR) {
 		return 0;
 	}
-	return (Sender->LastTrigger==tar);
+	if (Sender->LastTrigger == tar) {
+		Sender->AddTrigger (&Sender->LastTrigger);
+		return 1;
+	}
+	return 0;
 }
 
 int GameScript::InteractingWith(Scriptable* Sender, Trigger* parameters)
@@ -5536,7 +5556,8 @@ int GameScript::TookDamage(Scriptable* Sender, Trigger* /*parameters*/)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	if (actor->LastDamage) {
-//mark actor to clear this trigger?
+		//well, int and Actor * are not compatible
+		//Sender->AddTrigger (&actor->LastDamage);
 		return 1;
 	}
 	return 0;
@@ -5549,7 +5570,8 @@ int GameScript::DamageTaken(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	if (actor->LastDamage==parameters->int0Parameter) {
-//mark actor to clear this trigger?
+		//well, int and Actor * are not compatible
+		//Sender->AddTrigger (&actor->LastDamage);
 		return 1;
 	}
 	return 0;
@@ -5562,7 +5584,8 @@ int GameScript::DamageTakenGT(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	if (actor->LastDamage>parameters->int0Parameter) {
-//mark actor to clear this trigger?
+		//well, int and Actor * are not compatible
+		//Sender->AddTrigger (&actor->LastDamage);
 		return 1;
 	}
 	return 0;
@@ -5575,7 +5598,8 @@ int GameScript::DamageTakenLT(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	if (actor->LastDamage<parameters->int0Parameter) {
-//mark actor to clear this trigger?
+		//well, int and Actor * are not compatible
+		//Sender->AddTrigger (&actor->LastDamage);
 		return 1;
 	}
 	return 0;
@@ -5592,7 +5616,11 @@ int GameScript::HitBy(Scriptable* Sender, Trigger* parameters)
 			return 0;
 		}
 	}
-	return MatchActor(Sender, actor->LastHitter, parameters->objectParameter);
+	if (MatchActor(Sender, actor->LastHitter, parameters->objectParameter)) {
+		Sender->AddTrigger(&actor->LastHitter);
+		return 1;
+	}
+	return 0;
 }
 
 int GameScript::Heard(Scriptable* Sender, Trigger* parameters)
@@ -5606,7 +5634,11 @@ int GameScript::Heard(Scriptable* Sender, Trigger* parameters)
 			return 0;
 		}
 	}
-	return MatchActor(Sender, actor->LastHeard, parameters->objectParameter);
+	if (MatchActor(Sender, actor->LastHeard, parameters->objectParameter)) {
+		Sender->AddTrigger(&actor->LastHeard);
+		return 1;
+	}
+	return 0;
 }
 
 int GameScript::LastMarkedObject_Trigger(Scriptable* Sender, Trigger* parameters)
@@ -5615,7 +5647,11 @@ int GameScript::LastMarkedObject_Trigger(Scriptable* Sender, Trigger* parameters
 		return 0;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	return MatchActor(Sender, actor->LastSeen, parameters->objectParameter);
+	if (MatchActor(Sender, actor->LastSeen, parameters->objectParameter)) {
+		Sender->AddTrigger(&actor->LastSeen);
+		return 1;
+	}
+	return 0;
 }
 
 int GameScript::Help_Trigger(Scriptable* Sender, Trigger* parameters)
@@ -5624,7 +5660,11 @@ int GameScript::Help_Trigger(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	return MatchActor(Sender, actor->LastHelp, parameters->objectParameter);
+	if (MatchActor(Sender, actor->LastHelp, parameters->objectParameter)) {
+		Sender->AddTrigger(&actor->LastHelp);
+		return 1;
+	}
+	return 0;
 }
 
 int GameScript::FallenPaladin(Scriptable* Sender, Trigger* /*parameters*/)
@@ -6392,6 +6432,7 @@ void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,
 			}
 			break;
 	}
+
 	printf("CreateCreature: %s at [%d.%d] face:%d\n",parameters->string0Parameter, pnt.x,pnt.y,parameters->int0Parameter);
 	Map *map = Sender->GetCurrentArea();
 	ab->SetPosition(map, pnt, flags&CC_CHECK_IMPASSABLE, radius );
@@ -6468,7 +6509,7 @@ void GameScript::CutSceneID(Scriptable* Sender, Action* parameters)
 	} else {
 		Sender->CutSceneId = GetActorFromObject( Sender, parameters->objects[1] );
 	}
-	if (InDebug&2) {
+	if (InDebug&ID_CUTSCENE) {
 		if (!Sender->CutSceneId) {
 			printMessage("GameScript","Failed to set CutSceneID!\n",YELLOW);
 		}
@@ -7155,7 +7196,7 @@ void GameScript::BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 {
 	Scriptable* tar, *scr;
 
-	if (InDebug&4) {
+	if (InDebug&ID_VARIABLES) {
 		printf("BeginDialog core\n");
 	}
 	if (Flags & BD_OWN) {

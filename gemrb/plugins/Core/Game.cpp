@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.72 2005/05/19 14:56:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.73 2005/05/29 22:16:20 avenger_teambg Exp $
  *
  */
 
@@ -206,7 +206,6 @@ int Game::LeaveParty(Actor* actor)
 	PCs.erase( m );
 	NPCs.push_back( actor );
 	//actors leaving team are not selectable anymore
-printf("Removing actor called\n");
 	SelectActor (actor, false, SELECT_NORMAL);
 	return ( int ) NPCs.size() - 1;
 }
@@ -281,7 +280,6 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 {
 	std::vector< Actor*>::iterator m;
 
-printf("Selectactor called\n");
 	// actor was not specified, which means all PCs should be (de)selected
 	if (! actor) {
 		if (select) {
@@ -328,10 +326,8 @@ printf("Selectactor called\n");
 		selected.push_back( actor );
 	}
 	else {
-printf("Selection clear called llooking\n");
 		for ( m = selected.begin(); m != selected.end(); ++m) {
 			if ((*m) == actor) {
-printf("Selected erase called\n");
 				selected.erase( m );
 				break;
 			}

@@ -98,7 +98,8 @@ def OnLoad():
 		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, 1051)
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,1048,-1) # new line
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(RaceTable,GemRB.GetVar("Race")-1,2))
+	row = GemRB.FindTableValue (RaceTable, 3, GemRB.GetVar ("Race") )
+	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,GemRB.GetTableValue(RaceTable,row,2))
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,11959,-1) # new line
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(ClassTable,GemRB.GetVar("Class")-1,0))
