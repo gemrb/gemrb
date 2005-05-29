@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.23 2005/05/16 12:01:16 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.24 2005/05/29 22:52:47 edheldil Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -29,7 +29,7 @@ from GUIDefines import *
 import ie_stats
 import GemRB
 from GUICommon import CloseOtherWindow
-from GUICommonWindows import GetActorPortrait, SetSelectionChangeHandler
+from GUICommonWindows import GetActorPortrait, SetSelectionChangeHandler, SetEncumbranceButton
 
 
 InventoryWindow = None
@@ -149,36 +149,7 @@ def UpdateInventoryWindow ():
 	Button = GemRB.GetControl (Window, 44)
 	GemRB.SetButtonPicture (Window, Button, GetActorPortrait (pc, 'INVENTORY'))
 
-	# encumbrance
-	Button = GemRB.GetControl (Window, 46)
-
-	# Current encumbrance
-	encumbrance = GemRB.GetPlayerStat (pc, ie_stats.IE_ENCUMBRANCE)
-
-	# Loading tables of modifications
-	Table = GemRB.LoadTable("strmod")
-	TableEx = GemRB.LoadTable("strmodex")
-	# Getting the character's strength
-	sstr = GemRB.GetPlayerStat (pc, ie_stats.IE_STR)
-	ext_str = GemRB.GetPlayerStat (pc, ie_stats.IE_STREXTRA)
-
-	max_encumb = GemRB.GetTableValue(Table, sstr, 3) + GemRB.GetTableValue(TableEx, ext_str, 3)
-	# FIXME: there should be a space before LB symbol
-	GemRB.SetText (Window, Button, str (encumbrance) + ":\n\n\n\n" + str (max_encumb) + ":")
-
- 	ratio = (0.0 + encumbrance) / max_encumb
- 	if ratio > 1.0:
- 		GemRB.SetButtonTextColor (Window, Button, 255, 0, 0, True)
- 	elif ratio > 0.8:
- 		GemRB.SetButtonTextColor (Window, Button, 255, 255, 0, True)
- 	else:
- 		GemRB.SetButtonTextColor (Window, Button, 255, 255, 255, True)
-
-		
-	# FIXME: Current encumbrance is hardcoded
-	# Unloading tables is not necessary, i think (they will stay cached)
-	#GemRB.UnloadTable (Table)
-	#GemRB.UnloadTable (TableEx)
+	SetEncumbranceButton (Window, 46, pc)
 
 	# armor class
 	ac = GemRB.GetPlayerStat (pc, ie_stats.IE_ARMORCLASS)

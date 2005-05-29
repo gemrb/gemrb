@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.31 2005/05/14 16:47:54 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.32 2005/05/29 22:52:47 edheldil Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -34,6 +34,8 @@ MenuWindow = None
 MainWindow = None
 global PortraitWindow
 PortraitWindow = None
+ActionsWindow = None
+
 # Buttons:
 # 0 CNTREACH
 # 1 INVNT
@@ -388,6 +390,19 @@ def PortraitButtonOnMouseLeave ():
 		Button = GemRB.GetControl (PortraitWindow, i)
 		GemRB.EnableButtonBorder (PortraitWindow, Button, FRAME_PC_TARGET, 0)
 
+
+def DisableAnimatedWindows ():
+	global ActionsWindow
+	#PortraitWindow = GemRB.GetVar ("PortraitWindow")
+	GemRB.SetVar ("PortraitWindow", -1)
+	ActionsWindow = GemRB.GetVar ("ActionsWindow")
+	GemRB.SetVar ("ActionsWindow", -1)
+
+def EnableAnimatedWindows ():
+	GemRB.SetVar ("PortraitWindow", PortraitWindow)
+	GemRB.SetVar ("ActionsWindow", ActionsWindow)
+
+
 def GetSavingThrow (SaveName, row, level):
 	SaveTable = GemRB.LoadTable (SaveName)
 	tmp = GemRB.GetTableValue (SaveTable, level)
@@ -429,3 +444,77 @@ def SetupSavingThrows (pc):
 		print "Savingthrow:", tmp1
 	return
 
+
+def SetEncumbranceButton (Window, ButtonID, pc):
+	"""Set current/maximum encumbrance button for a given pc,
+	using numeric font"""
+	
+	# Loading tables of modifications
+	Table = GemRB.LoadTable ("strmod")
+	TableEx = GemRB.LoadTable ("strmodex")
+	
+	# Getting the character's strength
+	sstr = GemRB.GetPlayerStat (pc, IE_STR)
+	ext_str = GemRB.GetPlayerStat (pc, IE_STREXTRA)
+
+	# Compute encumbrance
+	maximum = GemRB.GetTableValue (Table, sstr, 3) + GemRB.GetTableValue (TableEx, ext_str, 3)
+	current = GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)
+
+	Button = GemRB.GetControl (Window, ButtonID)
+	# FIXME: there should be a space before LB symbol (':')
+	GemRB.SetText (Window, Button, str (current) + ":\n\n\n\n" + str (maximum) + ":")
+
+	# Set button color for overload
+	ratio = (0.0 + current) / maximum
+	if ratio > 1.0:
+		GemRB.SetButtonTextColor (Window, Button, 255, 0, 0, True)
+	elif ratio > 0.8:
+		GemRB.SetButtonTextColor (Window, Button, 255, 255, 0, True)
+	else:
+		GemRB.SetButtonTextColor (Window, Button, 255, 255, 255, True)
+
+	# FIXME: Current encumbrance is hardcoded
+	# Unloading tables is not necessary, i think (they will stay cached)
+	#GemRB.UnloadTable (Table)
+	#GemRB.UnloadTable (TableEx)
+
+
+def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler):
+	if Slot != None:
+		Item = GemRB.GetItem (Slot['ItemResRef'])
+		identified = Slot['Flags'] & IE_INV_ITEM_IDENTIFIED
+		#GemRB.SetVarAssoc (Window, Button, "LeftIndex", LeftTopIndex+i)
+		#GemRB.SetButtonSprites (Window, Button, 'IVSLOT', 0,  0, 0, 0, 0)
+		GemRB.SetItemIcon (Window, Button, Slot['ItemResRef'],0)
+
+		if Item['StackAmount'] > 1:
+			GemRB.SetText (Window, Button, str (Slot['Usages0']))
+		else:
+			GemRB.SetText (Window, Button, '')
+
+
+		if not identified or Item['ItemNameIdentified'] == -1:
+			GemRB.SetTooltip (Window, Button, Item['ItemName'])
+		else:
+			GemRB.SetTooltip (Window, Button, Item['ItemNameIdentified'])
+
+		#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
+		#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
+
+		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, PressHandler)
+		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, RightPressHandler)
+		#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, ShiftPressHandler)
+		#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, DragDropHandler)
+
+	else:
+		#GemRB.SetVarAssoc (Window, Button, "LeftIndex", -1)
+		GemRB.SetItemIcon (Window, Button, '')
+		GemRB.SetTooltip (Window, Button, 4273)  # Ground Item
+		GemRB.SetText (Window, Button, '')
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_NAND)
+
+		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")
+		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
+		#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
+		#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "")

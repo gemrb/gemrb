@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIJRNL.py,v 1.14 2005/05/13 16:34:20 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIJRNL.py,v 1.15 2005/05/29 22:52:47 edheldil Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -31,14 +31,13 @@
 import GemRB
 from GUIDefines import *
 from GUICommon import CloseOtherWindow
+from GUICommonWindows import EnableAnimatedWindows, DisableAnimatedWindows
 
 ###################################################
 JournalWindow = None
 LogWindow = None
 BeastsWindow = None
 QuestsWindow = None
-PortraitWindow = None
-ActionsWindow = None
 
 # list of all assigned (0) or completed (1) quests
 global quests
@@ -78,8 +77,7 @@ def OpenJournalWindow ():
 		
 		GemRB.UnloadWindow(JournalWindow)
 		#making the portraitwindow visible again
-		GemRB.SetVar ("PortraitWindow", PortraitWindow)
-		GemRB.SetVar ("ActionsWindow", ActionsWindow)
+		EnableAnimatedWindows ()
 		GemRB.SetVar ("OtherWindow", -1)
 		PortraitWindow = None
 		ActionsWindow = None
@@ -92,10 +90,7 @@ def OpenJournalWindow ():
 	GemRB.LoadWindowPack ("GUIJRNL")
 	JournalWindow = GemRB.LoadWindow (0)
 	GemRB.SetVar ("OtherWindow", JournalWindow)
-	PortraitWindow = GemRB.GetVar ("PortraitWindow")
-	GemRB.SetVar ("PortraitWindow", -1)
-	ActionsWindow = GemRB.GetVar ("ActionsWindow")
-	GemRB.SetVar ("ActionsWindow", -1)
+	DisableAnimatedWindows ()
 
 	# Quests
 	Button = GemRB.GetControl (JournalWindow, 0)
@@ -439,6 +434,7 @@ def OpenLogWindow ():
 		#   of the first journal entry compared to journal in
 		#   orig. game. So it's probably computed since "awakening"
 		#   there instead of start of the day.
+		# FIXME: use strref 19310 or 64192
 
 		gt = StartTime + je["GameTime"]
 		dt = int (gt/86400)
