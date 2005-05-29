@@ -16,11 +16,16 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/MessageWindow.py,v 1.23 2005/05/18 15:37:11 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/MessageWindow.py,v 1.24 2005/05/29 12:59:43 avenger_teambg Exp $
+
+# MessageWindow.py - scripts and GUI for main (walk) window
+
+###################################################
 
 import GemRB
-
 from GUICommonWindows import *
+import GUICommonWindows
+
 from GUIJRNL import *
 from GUIMA import *
 from GUIMG import *
@@ -123,8 +128,6 @@ def UpdateControlStatus():
 	Expand = GSFlags&GS_DIALOGMASK
 	GSFlags = GSFlags-Expand
 
-	print "UpdateControlStatus", Expand, GSFlags
-
 	MessageWindow = GemRB.GetVar("MessageWindow")
 
 	GemRB.LoadWindowPack(GetWindowPack())
@@ -148,7 +151,6 @@ def UpdateControlStatus():
 		ExpandButton = GemRB.GetControl(TMessageWindow, 2)
 		GemRB.SetEvent(TMessageWindow, ExpandButton, IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
 
-
 	GemRB.SetTextAreaFlags(TMessageWindow, TMessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
 
 	GemRB.HideGUI()
@@ -169,5 +171,4 @@ def UpdateControlStatus():
 	else:
 		GemRB.SetVar("PortraitWindow", PortraitWindow)
 
-	print "Unhidegui"
 	GemRB.UnhideGUI()

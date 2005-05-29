@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/Start.py,v 1.11 2005/04/04 20:44:37 guidoj Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/Start.py,v 1.12 2005/05/29 12:59:42 avenger_teambg Exp $
 
 
 # Start.py - intro and main menu screens
@@ -54,7 +54,6 @@ def OnLoad():
 #main window
 	StartWindow = GemRB.LoadWindow(0)
 	GemRB.SetWindowFrame(StartWindow)
-	#GemRB.SetWindowSize(StartWindow, 800, 600)
 	ProtocolButton = GemRB.GetControl(StartWindow, 0x00)
 	CreateGameButton = GemRB.GetControl(StartWindow, 0x02)
 	LoadGameButton = GemRB.GetControl(StartWindow, 0x07)
