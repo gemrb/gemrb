@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIWORLD.py,v 1.4 2005/05/29 22:52:47 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIWORLD.py,v 1.5 2005/05/30 21:52:31 edheldil Exp $
 
 
 # GUIWORLD.py - scripts to control some windows from GUIWORLD winpack
@@ -37,15 +37,9 @@ Container = None
 
 
 def OpenContainerWindow ():
-	global ContainerWindow, PortraitWindow, ActionsWindow
+	global ContainerWindow
 
-	if CloseOtherWindow(OpenContainerWindow):
-		GemRB.HideGUI ()
-		GemRB.UnloadWindow (ContainerWindow)
-		ContainerWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
-		EnableAnimatedWindows ()
-		GemRB.UnhideGUI ()
+	if ContainerWindow:
 		return
 
        	GemRB.HideGUI ()
@@ -83,10 +77,27 @@ def OpenContainerWindow ():
 	Text = GemRB.GetControl (Window, 0x10000036)
 	GemRB.SetText (Window, Text, str (party_gold))
 
+
+
+	Count = 1
+
+	# Ground items scrollbar
+	ScrollBar = GemRB.GetControl (Window, 52)
+	GemRB.SetEvent(Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawContainerWindow")
+	GemRB.SetVar ("LeftTopIndex", 0)
+	GemRB.SetVarAssoc (Window, ScrollBar, "LeftTopIndex", Count)
+
+	# Personal items scrollbar
+	ScrollBar = GemRB.GetControl (Window, 53)
+	GemRB.SetEvent(Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawContainerWindow")
+	GemRB.SetVar ("RightTopIndex", 0)
+	GemRB.SetVarAssoc (Window, ScrollBar, "RightTopIndex", Count)
+
+
 	# Done
 	Button = GemRB.GetControl (Window, 51)
 	GemRB.SetText (Window, Button, 1403)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenContainerWindow")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "LeaveContainer")
 
 	UpdateContainerWindow ()
 
@@ -141,11 +152,12 @@ def RedrawContainerWindow ():
 		Slot = GemRB.GetContainerItem (0, i + LeftTopIndex)
 		Button = GemRB.GetControl (Window, i)
 
-		SetItemButton (Window, Button, Slot, '', '')
 
 		if Slot != None:
+			SetItemButton (Window, Button, Slot, 'TakeItemContainer', '')
 			GemRB.SetVarAssoc (Window, Button, "LeftIndex", LeftTopIndex+i)
 		else:
+			SetItemButton (Window, Button, Slot, '', '')
 			GemRB.SetVarAssoc (Window, Button, "LeftIndex", -1)
 
 
@@ -159,34 +171,34 @@ def RedrawContainerWindow ():
 		SetItemButton (Window, Button, Slot, '', '')
 
 		if Slot != None:
+			SetItemButton (Window, Button, Slot, 'DropItemContainer', '')
 			GemRB.SetVarAssoc (Window, Button, "RightIndex", RightTopIndex+i)
 		else:
+			SetItemButton (Window, Button, Slot, '', '')
 			GemRB.SetVarAssoc (Window, Button, "RightIndex", -1)
 
 
 
 def CloseContainerWindow ():
-	global OldActionsWindow, OldMessageWindow, ContainerWindow
+	global ContainerWindow
 
 	if ContainerWindow == None:
 		return
 
 	GemRB.HideGUI ()
 
+	#Table = GemRB.LoadTable ("containr")
+	#row = Container['Type']
+	#tmp = GemRB.GetTableValue (Table, row, 2)
+	##play closing sound if applicable
+	#if tmp!='*':
+	#	GemRB.PlaySound (tmp)
+	#GemRB.UnloadTable (Table)
+
 	GemRB.UnloadWindow (ContainerWindow)
 	ContainerWindow = None
-	GemRB.SetVar ("ActionsWindow", OldActionsWindow)
-	GemRB.SetVar ("MessageWindow", OldMessageWindow)
-	Table = GemRB.LoadTable ("containr")
-	row = Container['Type']
-	tmp = GemRB.GetTableValue (Table, row, 2)
-	#play closing sound if applicable
-	if tmp!='*':
-		GemRB.PlaySound (tmp)
-
-	#it is enough to close here
-	GemRB.UnloadTable (Table)
-
+	EnableAnimatedWindows ()
+	
 	GemRB.UnhideGUI ()
 
 
