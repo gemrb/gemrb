@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.278 2005/05/29 22:16:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.279 2005/05/30 18:47:31 avenger_teambg Exp $
  *
  */
 
@@ -9730,14 +9730,20 @@ void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 	Sender->CurrentAction = NULL;
 }
 
-//these are stored in the Game structure i guess
-void GameScript::SetMazeEasier(Scriptable* /*Sender*/, Action* /*parameters*/)
+//these actions directly manipulate a game variable (as the original engine)
+void GameScript::SetMazeEasier(Scriptable* Sender, Action* /*parameters*/)
 {
-printf("Easier\n");
+	int value = CheckVariable( Sender, "MAZEDIFFICULTY","GLOBAL");
+	if (value>0) {
+		SetVariable(Sender, "MAZEDIFFICULTY", "GLOBAL", value-1);
+	}
 }
 
-void GameScript::SetMazeHarder(Scriptable* /*Sender*/, Action* /*parameters*/)
+void GameScript::SetMazeHarder(Scriptable* Sender, Action* /*parameters*/)
 {
-printf("Harder\n");
+	int value = CheckVariable( Sender, "MAZEDIFFICULTY","GLOBAL");
+	if (value<2) {
+		SetVariable(Sender, "MAZEDIFFICULTY", "GLOBAL", value+1);
+	}
 }
 
