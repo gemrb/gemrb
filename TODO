@@ -56,3 +56,5 @@ How to: replace GemRB.SetVar with GemRB.SetPlayerStat. Don't forget to create th
 - fix include paths during compilation, so the files do not use #include "../../Core/something.h" etc.
 
 - various directories (GemRB override, game override ...) should be resolved right after loading config files and remain static afterwards. Maybe define some PATH variable describing all the directories searched for files
+
+- fix CIA reporting email address (FIXED?)
