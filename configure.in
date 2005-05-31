@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/configure.in,v 1.49 2005/05/29 12:24:01 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/configure.in,v 1.50 2005/05/31 22:02:10 avenger_teambg Exp $
 
 ###################################################
 
@@ -234,5 +234,6 @@ gemrb/docs/Makefile
 gemrb/docs/en/Makefile 
 gemrb/docs/en/GUIScript/Makefile 
 gemrb/docs/en/Tables/Makefile 
+gemrb/docs/en/Engine/Makefile 
 ])
 AC_OUTPUT
