@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.17 2005/05/29 22:52:47 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.18 2005/05/31 21:36:46 avenger_teambg Exp $
 
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
@@ -56,7 +56,7 @@ KeysWindow = None
 ###################################################
 def OpenOptionsWindow ():
 	"""Open main options window (peacock tail)"""
-	global OptionsWindow, PortraitWindow, ActionsWindow
+	global OptionsWindow
 
 	if CloseOtherWindow (OpenOptionsWindow):
 		if VideoOptionsWindow: OpenVideoOptionsWindow ()
@@ -73,11 +73,7 @@ def OpenOptionsWindow ():
 		GemRB.UnloadWindow (OptionsWindow)
 		GemRB.SetVar ("OtherWindow", -1)
 		EnableAnimatedWindows ()
-		GemRB.SetVar ("PortraitWindow", PortraitWindow)
-		GemRB.SetVar ("ActionsWindow", ActionsWindow)
 		OptionsWindow = None
-		PortraitWindow = None
-		ActionsWindow = None
 		
 		GemRB.UnhideGUI ()
 		return

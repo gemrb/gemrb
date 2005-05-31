@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.32 2005/05/29 22:52:47 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.33 2005/05/31 21:36:46 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -133,10 +133,10 @@ def SetupMenuWindowControls (Window):
 	GemRB.SetTooltip (Window, Button, 41626)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenOptionsWindow")
 
-	# Rest (temporary store window for debug purpose)
+	# Rest
 	Button = GemRB.GetControl (Window, 9)
 	GemRB.SetTooltip (Window, Button, 41628)
-	GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreWindow")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "DoRest")
 
 
 	# AI
@@ -393,7 +393,6 @@ def PortraitButtonOnMouseLeave ():
 
 def DisableAnimatedWindows ():
 	global ActionsWindow
-	#PortraitWindow = GemRB.GetVar ("PortraitWindow")
 	GemRB.SetVar ("PortraitWindow", -1)
 	ActionsWindow = GemRB.GetVar ("ActionsWindow")
 	GemRB.SetVar ("ActionsWindow", -1)
