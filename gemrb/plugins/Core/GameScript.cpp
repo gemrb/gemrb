@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.280 2005/06/01 19:09:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.281 2005/06/01 20:45:13 avenger_teambg Exp $
  *
  */
 
@@ -388,6 +388,7 @@ static ActionLink actionnames[] = {
 	{"destroypartygold", GameScript::DestroyPartyGold,0},
 	{"destroypartyitem", GameScript::DestroyPartyItem,0},
 	{"destroyself", GameScript::DestroySelf,0},
+	{"detectsecretdoor", GameScript::DetectSecretDoor,0},
 	{"dialogue", GameScript::Dialogue,AF_BLOCKING},
 	{"dialogueforceinterrupt", GameScript::DialogueForceInterrupt,AF_BLOCKING},
 	{"displaymessage", GameScript::DisplayMessage,0},
@@ -482,7 +483,7 @@ static ActionLink actionnames[] = {
 	{"leavearealuapanic", GameScript::LeaveAreaLUAPanic,0},
 	{"leavearealuapanicentry", GameScript::LeaveAreaLUAPanicEntry,AF_BLOCKING},
 	{"leaveparty", GameScript::LeaveParty,0},
-	{"lock", GameScript::Lock,AF_BLOCKING},//key not checked at this time!
+	{"lock", GameScript::Lock,0},//key not checked at this time!
 	{"lockscroll", GameScript::LockScroll,0},
 	{"log", GameScript::Debug,0}, //the same until we know better
 	{"makeglobal", GameScript::MakeGlobal,0},
@@ -530,6 +531,7 @@ static ActionLink actionnames[] = {
 	{"quitgame", GameScript::QuitGame, 0},
 	{"randomfly", GameScript::RandomFly, AF_BLOCKING},
 	{"randomwalk", GameScript::RandomWalk, AF_BLOCKING},
+	{"randomwalkcontinuous", GameScript::RandomWalkContinuous, AF_BLOCKING},
 	{"realsetglobaltimer", GameScript::RealSetGlobalTimer,AF_MERGESTRINGS},
 	{"recoil", GameScript::Recoil,0},
 	{"regainpaladinhood", GameScript::RegainPaladinHood,0},
@@ -7591,15 +7593,30 @@ static Point &FindNearPoint(Scriptable* Sender, Point &p1, Point &p2, double& di
 	}
 }
 
+//this is an immediate action without checking Sender
+void GameScript::DetectSecretDoor(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		return;
+	}
+	if (tar->Type != ST_DOOR) {
+		return;
+	}
+	Door* door = ( Door* ) tar;
+	if (door->Flags & DOOR_SECRET) {
+		door->Flags |= DOOR_FOUND;
+	}
+}
+
+//this is an immediate action without checking Sender
 void GameScript::Lock(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
-		Sender->CurrentAction = NULL;
 		return;
 	}
 	if (tar->Type != ST_DOOR) {
-		Sender->CurrentAction = NULL;
 		return;
 	}
 	Door* door = ( Door* ) tar;
@@ -9428,6 +9445,11 @@ void GameScript::Shout( Scriptable* Sender, Action* parameters)
 	if (Sender->Type!=ST_ACTOR) {
 		return;
 	}
+	//according to IESDP silenced creatures cannot use shout
+	Actor *actor = (Actor *) Sender;
+	if (actor->GetStat( IE_STATE_ID) & STATE_SILENCED) {
+		return;
+	}
 	Map *map=Sender->GetCurrentArea();
 	//max. shouting distance
 	map->Shout(Sender, parameters->int0Parameter, 40);
@@ -9438,7 +9460,13 @@ void GameScript::GlobalShout( Scriptable* Sender, Action* parameters)
 	if (Sender->Type!=ST_ACTOR) {
 		return;
 	}
+	//according to IESDP silenced creatures cannot use shout
+	Actor *actor = (Actor *) Sender;
+	if (actor->GetStat( IE_STATE_ID) & STATE_SILENCED) {
+		return;
+	}
 	Map *map=Sender->GetCurrentArea();
+	// 0 means unlimited shout distance
 	map->Shout(Sender, parameters->int0Parameter, 0);
 }
 
@@ -9657,7 +9685,17 @@ void GameScript::RandomWalk(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->RandomWalk( );
+	actor->RandomWalk( true );
+}
+
+void GameScript::RandomWalkContinuous(Scriptable* Sender, Action* /*parameters*/)
+{
+	if (Sender->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	actor->RandomWalk( false );
 }
 
 void GameScript::RandomFly(Scriptable* Sender, Action* parameters)

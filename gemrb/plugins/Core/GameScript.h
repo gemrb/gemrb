@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.183 2005/06/01 19:09:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.184 2005/06/01 20:45:15 avenger_teambg Exp $
  *
  */
 
@@ -1000,6 +1000,7 @@ public:
 	static void DestroyPartyItem(Scriptable* Sender, Action* parameters);
 	static void DestroyPartyItemNum(Scriptable* Sender, Action* parameters);
 	static void DestroySelf(Scriptable* Sender, Action* parameters);
+	static void DetectSecretDoor(Scriptable* Sender, Action* parameters);
 	static void Dialogue(Scriptable* Sender, Action* parameters);
 	static void DialogueForceInterrupt(Scriptable* Sender, Action* parameters);
 	static void DisplayMessage(Scriptable* Sender, Action* parameters);
@@ -1123,8 +1124,9 @@ public:
 	static void PlaySoundPoint(Scriptable* Sender, Action* parameters);
 	static void Plunder(Scriptable* Sender, Action* parameters);
 	static void QuitGame(Scriptable* Sender, Action* parameters);
-	static void RandomWalk(Scriptable* Sender, Action* parameters);
 	static void RandomFly(Scriptable* Sender, Action* parameters);
+	static void RandomWalk(Scriptable* Sender, Action* parameters);
+	static void RandomWalkContinuous(Scriptable* Sender, Action* parameters);
 	static void RealSetGlobalTimer(Scriptable* Sender, Action* parameters);
 	static void Recoil(Scriptable* Sender, Action* parameters);
 	static void RegainPaladinHood(Scriptable* Sender, Action* parameters);

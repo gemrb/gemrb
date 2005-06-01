@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.92 2005/05/29 22:16:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.93 2005/06/01 20:45:01 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -490,9 +490,14 @@ void Moveble::RunAwayFrom(Point &Des, int PathLength, int flags)
 	path = area->RunAway( Pos, Des, PathLength, flags );
 }
 
-void Moveble::RandomWalk()
+void Moveble::RandomWalk(bool can_stop)
 {
 	ClearPath();
+	//if not continous random walk, then stops for a while
+	if (can_stop && !(rand()%10) ) {
+		SetWait(10);
+		return;
+	}
 	path = area->RunAway( Pos, Pos, 10, 0 );
 }
 
