@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.182 2005/05/29 22:16:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.183 2005/06/01 19:09:03 avenger_teambg Exp $
  *
  */
 
@@ -1151,7 +1151,6 @@ public:
 	static void SetAreaRestFlag(Scriptable* Sender, Action* parameters);
 	static void SetArmourLevel(Scriptable* Sender, Action* parameters);
 	static void SetBeenInPartyFlags(Scriptable* Sender, Action* parameters);
-	static void SetCorpseEnabled(Scriptable* Sender, Action* parameters);
 	static void SetCreatureAreaFlags(Scriptable* Sender, Action* parameters);
 	static void SetDialogue(Scriptable* Sender, Action* parameters);
 	static void SetDialogueRange(Scriptable* Sender, Action* parameters);

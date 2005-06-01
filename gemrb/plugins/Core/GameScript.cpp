@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.279 2005/05/30 18:47:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.280 2005/06/01 19:09:02 avenger_teambg Exp $
  *
  */
 
@@ -567,7 +567,7 @@ static ActionLink actionnames[] = {
 	{"setareaflags", GameScript::SetAreaFlags,0},
 	{"setarearestflag", GameScript::SetAreaRestFlag,0},
 	{"setbeeninpartyflags", GameScript::SetBeenInPartyFlags,0},
-	{"setcorpseenabled", GameScript::SetCorpseEnabled,0},
+	{"setcorpseenabled", GameScript::AmbientActivate,0},//another weird name
 	{"setcreatureareaflags", GameScript::SetCreatureAreaFlags,0},
 	{"setdialog", GameScript::SetDialogue,AF_BLOCKING},
 	{"setdialogue", GameScript::SetDialogue,AF_BLOCKING},
@@ -4375,7 +4375,7 @@ int GameScript::Entered(Scriptable* Sender, Trigger* parameters)
 //you can also use an object parameter (like in iwd)
 int GameScript::Dead(Scriptable* Sender, Trigger* parameters)
 {
-	if (parameters->string0Parameter) {
+	if (parameters->string0Parameter[0]) {
 		char Variable[40];
 		if (core->HasFeature( GF_HAS_KAPUTZ )) {
 			sprintf( Variable, "KAPUTZ%32.32s", parameters->string0Parameter );
@@ -7376,10 +7376,13 @@ void GameScript::SoundActivate(Scriptable* /*Sender*/, Action* parameters)
 // according to IESDP this action is about animations
 void GameScript::AmbientActivate(Scriptable* Sender, Action* parameters)
 {
-	Animation* anim = Sender->GetCurrentArea( )->GetAnimation( parameters->objects[1]->objectName );
+	Animation* anim = Sender->GetCurrentArea( )->GetAnimation( parameters->string0Parameter);
 	if (!anim) {
-		printf( "Script error: No Animation Named \"%s\"\n",
-			parameters->objects[1]->objectName );
+		anim = Sender->GetCurrentArea( )->GetAnimation( parameters->objects[1]->objectName );
+	}
+	if (!anim) {
+		printf( "Script error: No Animation Named \"%s\" or \"%s\"\n",
+			parameters->string0Parameter,parameters->objects[1]->objectName );
 		return;
 	}
 	if (parameters->int0Parameter) {
@@ -8561,25 +8564,6 @@ void GameScript::SetBeenInPartyFlags(Scriptable* Sender, Action* /*parameters*/)
 	Actor* actor = ( Actor* ) Sender;
 	//it is bit 15 of the multi-class flags (confirmed)
 	actor->SetStat(IE_MC_FLAGS,actor->GetStat(IE_MC_FLAGS)|MC_BEENINPARTY);
-}
-
-/*pst sets the corpse enabled flags */
-void GameScript::SetCorpseEnabled(Scriptable* Sender, Action* parameters)
-{
-	if (Sender->Type!=ST_ACTOR) {
-		return;
-	}
-	Actor* act = ( Actor* ) Sender;
-	int value = act->GetStat(IE_MC_FLAGS);
-	if ( parameters->int0Parameter) {
-		value |= MC_KEEP_CORPSE;
-		value &= ~MC_REMOVE_CORPSE;
-	}
-	else {
-		value |= MC_REMOVE_CORPSE;
-		value &= ~MC_KEEP_CORPSE;
-	}
-	act->SetStat(IE_MC_FLAGS, value);
 }
 
 /*iwd2 sets the high MC bits this way*/
