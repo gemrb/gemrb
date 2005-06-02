@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.281 2005/06/01 20:45:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.282 2005/06/02 19:35:49 avenger_teambg Exp $
  *
  */
 
@@ -633,6 +633,7 @@ static ActionLink actionnames[] = {
 	{"startdialogueoverrideinterrupt", GameScript::StartDialogueOverrideInterrupt,AF_BLOCKING},
 	{"startmovie", GameScript::StartMovie,AF_BLOCKING},
 	{"startmusic", GameScript::StartMusic,0},
+	{"startrainnow", GameScript::StartRainNow,0},
 	{"startsong", GameScript::StartSong,0},
 	{"startstore", GameScript::StartStore,0},
 	{"staticpalette", GameScript::StaticPalette,0},
@@ -666,6 +667,7 @@ static ActionLink actionnames[] = {
 	{"wait", GameScript::Wait, AF_BLOCKING},
 	{"waitanimation", GameScript::WaitAnimation,AF_BLOCKING},
 	{"waitrandom", GameScript::WaitRandom, AF_BLOCKING}, { NULL,NULL,0},
+	{"weather", GameScript::Weather,0},
 };
 
 //Make this an ordered list, so we could use bsearch!
@@ -9769,3 +9771,26 @@ void GameScript::SetMazeHarder(Scriptable* Sender, Action* /*parameters*/)
 	}
 }
 
+void GameScript::StartRainNow(Scriptable* /*Sender*/, Action* /*parameters*/)
+{
+	core->GetGame()->StartRainOrSnow( false, WB_RAIN|WB_START|WB_LIGHTNING);
+}
+
+void GameScript::Weather(Scriptable* /*Sender*/, Action* parameters)
+{
+	Game *game = core->GetGame();
+	switch(parameters->int0Parameter & WB_FOG) {
+		case WB_NORMAL:
+			game->StartRainOrSnow( false, 0);
+			break;
+		case WB_RAIN:
+			game->StartRainOrSnow( true, WB_RAIN|WB_START|WB_LIGHTNING);
+			break;
+		case WB_SNOW:
+			game->StartRainOrSnow( true, WB_SNOW|WB_START);
+			break;
+		case WB_FOG:
+			game->StartRainOrSnow( true, WB_FOG|WB_START);
+			break;
+	}
+}

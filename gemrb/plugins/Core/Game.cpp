@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.73 2005/05/29 22:16:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.74 2005/06/02 19:35:48 avenger_teambg Exp $
  *
  */
 
@@ -38,6 +38,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	Reputation = 0;
 	ControlStatus = 0;
 	CombatCounter = 0; //stored here until we know better
+	WeatherBits = 0;
 	globals = NULL;
 	kaputz = NULL;
 	beasts = NULL;
@@ -703,4 +704,14 @@ void Game::SetControlStatus(int value, int mode)
 		case BM_AND: ControlStatus&=value; break;
 		case BM_XOR: ControlStatus^=value; break;
 	}
+}
+
+/* sets the weather type */
+void Game::StartRainOrSnow(bool conditional, int weather)
+{
+	if (conditional && weather) {
+		if (WeatherBits & (WB_RAIN| WB_SNOW) )
+			return;
+	}
+	WeatherBits = weather;
 }

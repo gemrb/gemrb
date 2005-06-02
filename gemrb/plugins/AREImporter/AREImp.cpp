@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.110 2005/05/19 14:56:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.111 2005/06/02 19:35:47 avenger_teambg Exp $
  *
  */
 
@@ -347,6 +347,9 @@ Map* AREImp::GetMap(const char *ResRef)
 		//Getting Door Information from the WED File
 		bool BaseClosed;
 		unsigned short * indices = tmm->GetDoorIndices( ShortName, &count, BaseClosed );
+		if (core->HasFeature(GF_REVERSE_DOOR)) {
+			BaseClosed = !BaseClosed;
+		}
 		Door* door;
 		door = tm->AddDoor( ShortName, LongName, Flags, BaseClosed,
 					indices, count, open, closed );

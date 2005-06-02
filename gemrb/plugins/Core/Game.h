@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.51 2005/05/20 13:28:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.52 2005/06/02 19:35:48 avenger_teambg Exp $
  *
  */
 
@@ -60,6 +60,14 @@ class Game;
 #define CS_HIDEGUI   16  //hide all gui
 #define CS_ACTION    32  //hide action pane
 #define CS_PORTRAIT  64  //hide portrait pane
+
+//Weather bits
+#define WB_NORMAL    0
+#define WB_RAIN      1
+#define WB_SNOW      2
+#define WB_FOG       3
+#define WB_LIGHTNING 8
+#define WB_START     0x80
 
 typedef struct PCStruct {
 	ieWord   Selected;
@@ -216,6 +224,7 @@ public:
 	void SetReputation(int r);
 	/* sets the gamescreen control status (pane states, dialog textarea size) */
 	void SetControlStatus(int value, int operation);
+	void StartRainOrSnow(bool conditional, int weather);
 };
 
 #endif

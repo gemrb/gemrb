@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.184 2005/06/01 20:45:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.185 2005/06/02 19:35:49 avenger_teambg Exp $
  *
  */
 
@@ -1206,6 +1206,7 @@ public:
 		Action* parameters);
 	static void StartMovie(Scriptable* Sender, Action* parameters);
 	static void StartMusic(Scriptable* Sender, Action* parameters);
+	static void StartRainNow(Scriptable* Sender, Action* parameters);
 	static void StartSong(Scriptable* Sender, Action* parameters);
 	static void StartStore(Scriptable* Sender, Action* parameters);
 	static void StaticPalette(Scriptable* Sender, Action* parameters);
@@ -1234,6 +1235,7 @@ public:
 	static void Wait(Scriptable* Sender, Action* parameters);
 	static void WaitAnimation(Scriptable* Sender, Action* parameters);
 	static void WaitRandom(Scriptable* Sender, Action* parameters);
+	static void Weather(Scriptable* Sender, Action* parameters);
 	static void XEquipItem(Scriptable *Sender, Action *parameters);
 public:
 	//Objects
