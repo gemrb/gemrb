@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.314 2005/06/04 17:10:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.315 2005/06/04 17:52:40 avenger_teambg Exp $
  *
  */
 
@@ -1926,6 +1926,12 @@ void Interface::DrawWindows(void)
 		//end of gui hacks
 	}
 	
+	if (quitflag!=-1) {
+		QuitGame (quitflag!=0);
+		quitflag = -1;
+	}
+
+	//here comes the REAL drawing of windows
 	if (ModalWindow) {
 		ModalWindow->DrawWindow();
 		return;
@@ -1938,10 +1944,6 @@ void Interface::DrawWindows(void)
 		if (windows[( *t )] != NULL && windows[( *t )]->Visible)
 			windows[( *t )]->DrawWindow();
 		++t;
-	}
-	if (quitflag!=-1) {
-		QuitGame (quitflag!=0);
-		quitflag = -1;
 	}
 }
 
