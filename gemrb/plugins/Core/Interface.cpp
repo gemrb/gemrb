@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.313 2005/05/29 22:16:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.314 2005/06/04 17:10:56 avenger_teambg Exp $
  *
  */
 
@@ -1850,10 +1850,10 @@ int Interface::ShowModal(unsigned short WindowIndex, int Shadow)
 	evntmgr->Clear();
 	SetOnTop( WindowIndex );
 	evntmgr->AddWindow( win );
-	win->Invalidate();
 
 	ModalWindow = NULL;
 	DrawWindows();
+	win->Invalidate();
 
 	Color gray = {
 		0, 0, 0, 128
