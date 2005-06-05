@@ -1,22 +1,21 @@
 Scripts:
-1. (DONE) Run All creature scripts when the creatures are 'activated'. 
+1. (DONE?) Run All creature scripts when the creatures are 'activated'. 
 
 2. Run All area scripts not just the active areas.
 Area scripts are queued, master areas get on the head of the queue, non-master areas get in the tail of the queue. See also: SetMasterArea action/mastarea.2da
 
-3. (DONE) Fix script compiler to group string parameters depending on opcode
+3. (DONE?) TLK tags
 
-4. (DONE) TLK tags
-
-5. fix loading of local variables of creatures (needs effect framework)
+4. fix loading of local variables of creatures (needs effect framework)
 
 Items:
 1. (DONE) Loading containers/items in areas
 2. Dropping of items (first create an opcode)
-2a. Render dropped items in area (ground icon)
-3. Picking up an item (create opcode)
+2a. Render dropped items in area (ground icon) (DONE)
+3. Picking up an item (create opcode too) (piles DONE)
 4. Equipping items
 5. Equipped weapon range (create triggers)
+6. Break swords and stuff
 
 Effects:
 1. Create base system for effect blocks (ED)
@@ -24,27 +23,23 @@ Effects:
 
 Area:
 1. Implement cover (wallgroups)
-2. (DONE) Fog of war
-3. (DONE) Blocking doors
-4. Don't load scripts for pile items? (research when a script is unused)
+2. Don't load scripts for pile items? (research when a script is unused)
+
+Store:
+1. Save stores, handle containers
 
 Animation:
 1. (PARTLY) fix char animation sequences
 2. (DONE) animationfactory->one single palette
 
+Actor:
+1. Fix reputation
+
 Window/Widget management:
 - implement grabbing mouse pointer by a control to fix dragging of Float menu window
 
 Known Bugs:
-1. problem: Dialog options that are disabled by the trigger condition are still accessible via hotkey. (FIXED)
-
-2. problem: reloading of an area doesn't check if it was already loaded, thus eating memory (FIXED)
-
-3. problem: actors who have joined are still loaded by the area (duplicated). (FIXED)
-
-4. problem: sound isn't working in movies (FIXED)
-
-5. problem: stanceID is still fuzzy. Fix it. (FIXED?)
+1. problem: stanceID is still fuzzy. Fix it. (FIXED?)
 
 Ideas:
 1. Use the character sheet (Actor.cpp) itself to store attributes of the character during character generation.
