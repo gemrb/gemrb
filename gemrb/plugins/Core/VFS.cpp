@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.12 2005/02/25 15:09:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.13 2005/06/05 12:02:38 avenger_teambg Exp $
  *
  */
 
@@ -73,8 +73,8 @@ void closedir(DIR* dirp)
 
 _FILE* _fopen(const char* filename, const char* mode)
 {
-	DWORD OpenFlags;
-	DWORD AccessFlags;
+	DWORD OpenFlags = 0;
+	DWORD AccessFlags = 0;
 	while (*mode) {
 		if (( *mode == 'w' ) || ( *mode == 'W' )) {
 			OpenFlags |= OPEN_ALWAYS;
@@ -90,8 +90,8 @@ _FILE* _fopen(const char* filename, const char* mode)
 		}
 		mode++;
 	}
-	HANDLE hFile = CreateFile( filename, GENERIC_READ, FILE_SHARE_READ, NULL,
-					OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
+	HANDLE hFile = CreateFile( filename, AccessFlags, FILE_SHARE_READ, NULL,
+					OpenFlags, FILE_ATTRIBUTE_NORMAL, NULL );
 	if (hFile == INVALID_HANDLE_VALUE) {
 		return NULL;
 	}
