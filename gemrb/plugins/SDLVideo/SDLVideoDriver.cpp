@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.104 2005/05/19 14:56:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.105 2005/06/05 23:57:14 edheldil Exp $
  *
  */
 
@@ -753,6 +753,32 @@ void SDLVideoDriver::DrawRect(Region& rgn, Color& color, bool fill, bool clipped
 		DrawVLine( rgn.x + rgn.w - 1, rgn.y, rgn.y + rgn.h - 1, color, clipped );
 	}
 }
+
+/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
+void SDLVideoDriver::DrawRectSprite(Region& rgn, Color& color, Sprite2D* sprite, bool fill, bool clipped)
+{
+	SDL_Surface* surf = ( SDL_Surface* ) sprite->vptr;
+	SDL_Rect drect = {
+		rgn.x, rgn.y, rgn.w, rgn.h
+	};
+	if ( SDL_ALPHA_TRANSPARENT == color.a ) {
+		return;
+	} else if ( SDL_ALPHA_OPAQUE == color.a ) {
+		long val = SDL_MapRGBA( surf->format, color.r, color.g, color.b, color.a );
+		SDL_FillRect( surf, &drect, val );
+	} else {
+		SDL_Surface * rectsurf = SDL_CreateRGBSurface( SDL_HWSURFACE | SDL_SRCALPHA, rgn.w, rgn.h, 8, 0, 0, 0, 0 );
+		SDL_Color c;
+		c.r = color.r;
+		c.b = color.b;
+		c.g = color.g;
+		SDL_SetPalette( rectsurf, SDL_LOGPAL, &c, 0, 1 );
+		SDL_SetAlpha( rectsurf, SDL_SRCALPHA | SDL_RLEACCEL, color.a );
+		SDL_BlitSurface( rectsurf, NULL, surf, &drect );
+		SDL_FreeSurface( rectsurf );
+	}
+}
+
 void SDLVideoDriver::SetPixel(short x, short y, Color& color, bool clipped)
 {
 	//printf("x: %d; y: %d; XC: %d; YC: %d, VX: %d, VY: %d, VW: %d, VH: %d\n", x, y, xCorr, yCorr, Viewport.x, Viewport.y, Viewport.w, Viewport.h);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.28 2005/04/03 21:00:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.29 2005/06/05 23:57:17 edheldil Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -31,9 +31,10 @@
 static int MAP_DIV   = 3;
 static int MAP_MULT  = 32;
 
-typedef enum colorcode {gray=0, violet, green, orange, red, blue, darkblue, darkgreen};
+typedef enum colorcode {black=0, gray, violet, green, orange, red, blue, darkblue, darkgreen};
 
-Color colors[8]={
+Color colors[]={
+  { 0x00, 0x00, 0x00, 0xff }, //black
   { 0x60, 0x60, 0x60, 0xff }, //gray
   { 0xa0, 0x00, 0xa0, 0xff }, //violet
   { 0x00, 0xff, 0x00, 0xff }, //green
@@ -60,8 +61,8 @@ Color colors[8]={
 MapControl::MapControl(void)
 {
 	if(core->HasFeature(GF_IWD_MAP_DIMENSIONS) ) {
-		MAP_DIV=1;
-		MAP_MULT=8;
+		MAP_DIV=4;
+		MAP_MULT=32;
 	}
 	else {
 		MAP_DIV=3;
@@ -84,6 +85,8 @@ MapControl::MapControl(void)
 
 	MyMap = core->GetGame()->GetCurrentArea();
 	MapMOS = MyMap->SmallMap->GetImage();
+	if (core->FogOfWar)
+		DrawFog();
 }
 
 MapControl::~MapControl(void)
@@ -96,6 +99,28 @@ MapControl::~MapControl(void)
 	for(int i=0;i<8;i++) {
 		if(Flag[i]) {
 			video->FreeSprite(Flag[i]);
+		}
+	}
+}
+
+// Draw fog on the small bitmap
+void MapControl::DrawFog()
+{
+	Video *video = core->GetVideoDriver();
+
+	// FIXME: this is ugly, the knowledge of Map and ExploredMask
+	//   sizes should be in Map.cpp
+	int w = MyMap->GetWidth() / 2;
+	int h = MyMap->GetHeight() / 2;
+
+	for (int y = 0; y < h; y++) {
+		for (int x = 0; x < w; x++) {
+			Point p = { MAP_MULT * x, MAP_MULT * y };
+			bool visible = MyMap->IsVisible( p, true );
+			if (! visible) {
+				Region rgn = Region ( MAP_DIV * x, MAP_DIV * y, MAP_DIV, MAP_DIV );
+				video->DrawRectSprite( rgn, colors[black], MapMOS );
+			}
 		}
 	}
 }

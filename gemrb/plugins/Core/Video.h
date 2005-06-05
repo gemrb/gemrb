@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.42 2005/05/19 14:56:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.43 2005/06/05 23:57:17 edheldil Exp $
  *
  */
 
@@ -77,6 +77,7 @@ public:
 	virtual void SetPalette(Sprite2D* spr, Color* pal) = 0;
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	virtual void DrawRect(Region& rgn, Color& color, bool fill = true, bool clipped = false) = 0;
+	virtual void DrawRectSprite(Region& rgn, Color& color, Sprite2D* sprite, bool fill = true, bool clipped = false) = 0;
 	/** This functions Draws a Circle */
 	virtual void DrawCircle(short cx, short cy, unsigned short r, Color& color) = 0;
 	/** This functions Draws an Ellipse */
