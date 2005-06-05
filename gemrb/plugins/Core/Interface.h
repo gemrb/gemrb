@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.156 2005/06/05 09:53:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.157 2005/06/05 10:54:59 avenger_teambg Exp $
  *
  */
 
@@ -377,6 +377,8 @@ public:
 	const char * QuerySlotResRef(int idx) const;
 	/*returns true if an itemtype is acceptable for a slottype */
 	int CanUseItemType(int itype, int slottype) const;
+	/*removes single file from cache*/
+	void RemoveFromCache( ieResRef resref);
 	/*removes all files from directory*/
 	void DelTree(const char *path, bool onlysaved);
 	/*returns true if the file should be saved */

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/StoreMgr.h,v 1.3 2005/03/07 18:26:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/StoreMgr.h,v 1.4 2005/06/05 10:54:59 avenger_teambg Exp $
  *
  */
 
@@ -44,6 +44,9 @@ public:
 	virtual ~StoreMgr(void);
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
 	virtual Store* GetStore(Store *s) = 0;
+
+	virtual int GetStoredFileSize(Store *s) = 0;
+	virtual int PutStore(DataStream* stream, Store *s) = 0;
 };
 
 #endif

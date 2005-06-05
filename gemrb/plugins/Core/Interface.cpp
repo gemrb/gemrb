@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.316 2005/06/05 09:53:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.317 2005/06/05 10:54:59 avenger_teambg Exp $
  *
  */
 
@@ -2803,6 +2803,15 @@ bool Interface::SavedExtension(const char *filename)
 	return false;
 }
 
+void Interface::RemoveFromCache( ieResRef resref)
+{
+	char filename[_MAX_PATH];
+
+	strcpy( filename, CachePath );
+        strcat( filename, resref );
+	unlink ( filename);
+}
+
 void Interface::DelTree(const char* Pt, bool onlysave)
 {
 	char Path[_MAX_PATH];
@@ -3161,8 +3170,24 @@ int Interface::CloseCurrentStore()
 	if (sm == NULL) {
 		return -1;
 	}
-	// save current store to cache!
-	//
+	int size = sm->GetStoredFileSize (CurrentStore);
+	if (size > 0) {
+	 	//created streams are always autofree (close file on destruct)
+		//this one will be destructed when we return from here
+		FileStream str;
+		str.Create( CurrentStore->Name );
+		int ret = sm->PutStore (&str, CurrentStore);
+		if (ret <0) {
+			printMessage("Core"," ", YELLOW);
+			printf("Store removed: %s\n", CurrentStore->Name);
+			RemoveFromCache(CurrentStore->Name);
+		}
+	} else {
+		printMessage("Core"," ", YELLOW);
+		printf("Store removed: %s\n", CurrentStore->Name);
+		RemoveFromCache(CurrentStore->Name);
+	}
+	//make sure the stream isn't connected to sm, or it will be double freed
 	FreeInterface( sm );
 	delete CurrentStore;
 	CurrentStore = NULL;
