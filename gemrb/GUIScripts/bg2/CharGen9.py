@@ -130,6 +130,7 @@ def NextPress():
 	ClassIndex = GemRB.GetVar("Class")-1
 	Class = GemRB.GetTableValue(ClassTable, ClassIndex, 5)
 	GemRB.SetPlayerStat(MyChar, IE_CLASS, Class)
+	print "Class: ", Class
 	KitIndex = GemRB.GetVar("Class Kit")
 	GemRB.SetPlayerStat(MyChar, IE_KIT, KitIndex)
 	t = GemRB.GetVar("Alignment")
@@ -157,8 +158,12 @@ def NextPress():
 	TmpTable=GemRB.LoadTable("repstart")
 	AlignmentTable = GemRB.LoadTable("aligns")
 	t=GemRB.FindTableValue(AlignmentTable, 3, t)
-	t=GemRB.GetTableValue(TmpTable,t,0)
+	t=GemRB.GetTableValue(TmpTable,t,0) * 10
 	GemRB.SetPlayerStat(MyChar, IE_REPUTATION, t)
+
+	#slot 1 is the protagonist
+	if MyChar == 1:
+		GemRB.GameSetReputation( t )
 
 	GemRB.UnloadTable(TmpTable)
 	TmpTable=GemRB.LoadTable("strtgold")
