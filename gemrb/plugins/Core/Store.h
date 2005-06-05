@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.12 2005/03/07 18:26:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.13 2005/06/05 09:53:17 avenger_teambg Exp $
  *
  */
 
@@ -125,6 +125,10 @@ public:
 
 	// IWD2 only
 	char unknown3[80];
+
+	// version for saving stores
+	// so far only version 0 'gemrb compatible' is supported
+	int version;
 
 public: //queries
 	int AcceptableItemType(ieDword type, ieDword invflags) const;

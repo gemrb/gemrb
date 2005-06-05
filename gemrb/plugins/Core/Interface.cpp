@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.315 2005/06/04 17:52:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.316 2005/06/05 09:53:17 avenger_teambg Exp $
  *
  */
 
@@ -1125,6 +1125,9 @@ bool Interface::LoadConfig(const char* filename)
 		return false;
 	}
 	char name[65], value[_MAX_PATH + 3];
+
+	SaveAsOriginal = 0;
+
 	while (!feof( config )) {
 		char rem;
 		fread( &rem, 1, 1, config );
@@ -1177,15 +1180,17 @@ bool Interface::LoadConfig(const char* filename)
 		} else if (stricmp( name, "GameSoundsPath" ) == 0) {
 			strncpy( GameSounds, value, sizeof(GameSounds) );
 		} else if (stricmp( name, "GameName" ) == 0) {
-			strcpy( GameName, value );
+			strncpy( GameName, value, sizeof(GameName) );
 		} else if (stricmp( name, "GameType" ) == 0) {
-			strcpy( GameType, value );
+			strncpy( GameType, value, sizeof(GameType) );
+		} else if (stricmp( name, "SaveAsOriginal") == 0) {
+			SaveAsOriginal = atoi(value);
 		} else if (stricmp( name, "GemRBPath" ) == 0) {
 			strcpy( GemRBPath, value );
 		} else if (stricmp( name, "ScriptDebugMode" ) == 0) {
 			SetScriptDebugMode(atoi(value));
 		} else if (stricmp( name, "CachePath" ) == 0) {
-			strcpy( CachePath, value );
+			strncpy( CachePath, value, sizeof(CachePath) );
 			FixPath( CachePath, false );
 			mkdir( CachePath, S_IREAD|S_IWRITE );
 			if (! dir_exists( CachePath )) {
@@ -1195,58 +1200,63 @@ bool Interface::LoadConfig(const char* filename)
 			}
 			DelTree((const char *) CachePath, false);
 		} else if (stricmp( name, "GUIScriptsPath" ) == 0) {
-			strcpy( GUIScriptsPath, value );
+			strncpy( GUIScriptsPath, value, sizeof(GUIScriptsPath) );
 #ifndef WIN32
 			ResolveFilePath( GUIScriptsPath );
 #endif
 		} else if (stricmp( name, "PluginsPath" ) == 0) {
-			strcpy( PluginsPath, value );
+			strncpy( PluginsPath, value, sizeof(PluginsPath) );
 #ifndef WIN32
 			ResolveFilePath( PluginsPath );
 #endif
 		} else if (stricmp( name, "GamePath" ) == 0) {
-			strcpy( GamePath, value );
+			strncpy( GamePath, value, sizeof(GamePath) );
 #ifndef WIN32
 			ResolveFilePath( GamePath );
 #endif
 		} else if (stricmp( name, "SavePath" ) == 0) {
-			strcpy( SavePath, value );
+			strncpy( SavePath, value, sizeof(SavePath) );
 #ifndef WIN32
 			ResolveFilePath( SavePath );
 #endif
 		} else if (stricmp( name, "CD1" ) == 0) {
-			strcpy( CD1, value );
+			strncpy( CD1, value, sizeof(CD1) );
 #ifndef WIN32
 			ResolveFilePath( CD1 );
 #endif
 		} else if (stricmp( name, "CD2" ) == 0) {
-			strcpy( CD2, value );
+			strncpy( CD2, value, sizeof(CD2) );
 #ifndef WIN32
 			ResolveFilePath( CD2 );
 #endif
 		} else if (stricmp( name, "CD3" ) == 0) {
-			strcpy( CD3, value );
+			strncpy( CD3, value, sizeof(CD3) );
 #ifndef WIN32
 			ResolveFilePath( CD3 );
 #endif
 		} else if (stricmp( name, "CD4" ) == 0) {
-			strcpy( CD4, value );
+			strncpy( CD4, value, sizeof(CD4) );
 #ifndef WIN32
 			ResolveFilePath( CD4 );
 #endif
 		} else if (stricmp( name, "CD5" ) == 0) {
-			strcpy( CD5, value );
+			strncpy( CD5, value, sizeof(CD5) );
 #ifndef WIN32
 			ResolveFilePath( CD5 );
 #endif
 		} else if (stricmp( name, "CD6" ) == 0) {
-			strcpy( CD6, value );
+			strncpy( CD6, value, sizeof(CD6) );
 #ifndef WIN32
 			ResolveFilePath( CD6 );
 #endif
 		}
 	}
 	fclose( config );
+
+	if (!GameType[0]) {
+		strcpy( GameType, "gemrb");
+	}
+
 #ifdef DATADIR
 	if (!GemRBPath[0]) {
 		strcpy( GemRBPath, DATADIR );

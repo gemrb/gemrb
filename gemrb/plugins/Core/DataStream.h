@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.h,v 1.14 2005/04/30 22:48:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.h,v 1.15 2005/06/05 09:53:16 avenger_teambg Exp $
  *
  */
 
@@ -56,7 +56,7 @@ public:
 	int WriteResRef(ieResRef src);
 	virtual int Seek(int pos, int startpos) = 0;
 	unsigned long Remains() const;
-  unsigned long Size() const;
+	unsigned long Size() const;
 	/** Returns true if the stream is encrypted */
 	bool CheckEncrypted();
 	/** No descriptions */

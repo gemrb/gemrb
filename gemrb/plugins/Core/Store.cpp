@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.cpp,v 1.9 2005/04/30 18:59:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.cpp,v 1.10 2005/06/05 09:53:17 avenger_teambg Exp $
  *
  */
 
@@ -29,6 +29,7 @@ Store::Store(void)
 	purchased_categories=NULL;
 	drinks=NULL;
 	cures=NULL;
+	version=0;
 }
 
 Store::~Store(void)
@@ -38,11 +39,6 @@ Store::~Store(void)
 	for (i = 0; i < items.size(); i++) {
 		delete( items[i] );
 	}
-	//	for (i = 0; i < drinks.size(); i++) {
-	//		delete( drinks[i] );
-	//	}
-	//	for (i = 0; i < cures.size(); i++) {
-	//		delete( cures[i] );
 	if(drinks)
 		free(drinks);
 	if(cures)
@@ -65,7 +61,9 @@ bool Store::IsItemAvailable(unsigned int slot)
 int Store::GetRealStockSize()
 {
 	int count=ItemsCount;
-	if (!HasTriggers) return count;
+	if (!HasTriggers) {
+		return count;
+	}
 	for (unsigned int i=0;i<ItemsCount;i++) {
 		if (!IsItemAvailable(i) ) {
 			count--;

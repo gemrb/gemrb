@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.155 2005/05/27 20:03:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.156 2005/06/05 09:53:17 avenger_teambg Exp $
  *
  */
 
@@ -164,6 +164,7 @@ private:
 	// Index of current container
 	Container* CurrentContainer;
 public:
+	int SaveAsOriginal; //if true, saves files in compatible mode
 	int quitflag; // Quit Signal, set it to 0 or 1
 	int SlotTypes; //this is the same as the inventory size
 	ieResRef GlobalScript;
