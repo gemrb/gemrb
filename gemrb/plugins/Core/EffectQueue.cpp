@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.16 2005/05/20 16:41:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.17 2005/06/05 12:12:10 avenger_teambg Exp $
  *
  */
 
@@ -93,10 +93,10 @@ static EffectLink effectnames[] = {
 
 inline bool valid_number(const char* string, long& val)
 {
-        char* endpr;
+	char* endpr;
 
-        val = strtol( string, &endpr, 0 );
-        return ( const char * ) endpr != string;
+	val = strtol( string, &endpr, 0 );
+	return ( const char * ) endpr != string;
 }
 
 static EffectLink* FindEffect(const char* effectname)
@@ -142,9 +142,9 @@ bool Init_EffectQueue()
 			if(efftextTable) {
 				int row=efftextTable->GetRowCount();
 				while(row--) {
-                			char* ret = efftextTable->GetRowName( row );
-		        	        long val;
-                			if (valid_number( ret, val ) && (i == val) ) {
+					char* ret = efftextTable->GetRowName( row );
+					long val;
+					if (valid_number( ret, val ) && (i == val) ) {
 						efftexts[i] = atoi(efftextTable->QueryField( row, 1 ) );
 					}
 				}
@@ -233,10 +233,10 @@ void EffectQueue::ApplyEffect(Actor* target, Effect* fx)
 }
 
 #define CHECK_LEVEL() { \
-        int level = target->GetStat( IE_LEVEL ); \
-        if ((fx->DiceSides != 0 || fx->DiceThrown != 0) && (level < (int)fx->DiceSides || level > (int)fx->DiceThrown)) \
-                return FX_NOT_APPLIED; \
-        }
+	int level = target->GetStat( IE_LEVEL ); \
+	if ((fx->DiceSides != 0 || fx->DiceThrown != 0) && (level < (int)fx->DiceSides || level > (int)fx->DiceThrown)) \
+		return FX_NOT_APPLIED; \
+	}
 
 inline int MIN(int a, int b)
 {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.165 2005/05/29 22:16:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.166 2005/06/05 12:12:10 avenger_teambg Exp $
  *
  */
 
@@ -1337,7 +1337,7 @@ PathNode* Map::GetLine(Point &start, int Steps, int Orientation, int flags)
 PathNode* Map::GetLine(Point &start, Point &dest, int Steps, int Orientation, int flags)
 {
 	PathNode* StartNode = new PathNode;
-			  PathNode *Return = StartNode;
+	PathNode *Return = StartNode;
 	StartNode->Next = NULL;
 	StartNode->Parent = NULL;
 	StartNode->x = start.x;
@@ -1345,18 +1345,18 @@ PathNode* Map::GetLine(Point &start, Point &dest, int Steps, int Orientation, in
 	StartNode->orient = Orientation;
 
 	int Max = Steps;
-			  while(Steps--) {
+	while(Steps--) {
 		int x,y;
 
 		StartNode->Next = new PathNode;
 		StartNode->Next->Parent = StartNode;
 		StartNode = StartNode->Next;
-			          StartNode->Next = NULL;
+		StartNode->Next = NULL;
 		x = (start.x + dest.x) * Steps / Max;
 		y = (start.y + dest.y) * Steps / Max;
-			          StartNode->x = x;
-			          StartNode->y = y;
-			          StartNode->orient = Orientation;
+		StartNode->x = x;
+		StartNode->y = y;
+		StartNode->orient = Orientation;
 		bool wall = (!( Passable[SearchMap->GetPixelIndex( x, y )] & PATH_MAP_PASSABLE ));
 		if (wall) switch (flags) {
 			case GL_REBOUND:

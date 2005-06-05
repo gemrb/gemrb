@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.73 2005/04/11 17:40:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.74 2005/06/05 12:12:10 avenger_teambg Exp $
  *
  */
 
@@ -461,7 +461,7 @@ void TextArea::CopyTo(TextArea* ta)
 void TextArea::RedrawTextArea(char* VariableName, unsigned int Sum)
 {
 	if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
-	        return;
+		return;
 	}
 	Value = Sum;
 	Changed = true;
@@ -470,7 +470,7 @@ void TextArea::RedrawTextArea(char* VariableName, unsigned int Sum)
 const char* TextArea::QueryText()
 {
 	if( Value<lines.size() ) {
-	        return ( const char * ) lines[Value];
+		return ( const char * ) lines[Value];
 	}
 	return ( const char *) "";
 }

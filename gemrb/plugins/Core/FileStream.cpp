@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.34 2005/04/30 22:48:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.35 2005/06/05 12:12:10 avenger_teambg Exp $
  *
  */
 
@@ -98,7 +98,7 @@ bool FileStream::Open(_FILE* stream, int spos, int maxsize, bool aF)
 }
 
 //Create is ALWAYS autofree
-bool FileStream::Create(const char* fname)
+bool FileStream::Create(const char* fname, SClass_ID ClassID)
 {
 	char path[_MAX_PATH];
 
@@ -112,6 +112,7 @@ bool FileStream::Create(const char* fname)
 	ExtractFileFromPath( filename, fname );
 	strcpy( path, core->CachePath );
 	strcat( path, filename );
+	strcat( path, core->TypeExt( ClassID ) );
 	str = _fopen( path, "wb" );
 	if (str == NULL) {
 		return false;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.317 2005/06/05 10:54:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.318 2005/06/05 12:12:10 avenger_teambg Exp $
  *
  */
 
@@ -2808,7 +2808,7 @@ void Interface::RemoveFromCache( ieResRef resref)
 	char filename[_MAX_PATH];
 
 	strcpy( filename, CachePath );
-        strcat( filename, resref );
+	strcat( filename, resref );
 	unlink ( filename);
 }
 
@@ -3175,7 +3175,7 @@ int Interface::CloseCurrentStore()
 	 	//created streams are always autofree (close file on destruct)
 		//this one will be destructed when we return from here
 		FileStream str;
-		str.Create( CurrentStore->Name );
+		str.Create( CurrentStore->Name, IE_STO_CLASS_ID );
 		int ret = sm->PutStore (&str, CurrentStore);
 		if (ret <0) {
 			printMessage("Core"," ", YELLOW);
@@ -3225,7 +3225,7 @@ Store *Interface::SetCurrentStore( ieResRef resname )
 		return NULL;
 	}
 	FreeInterface( sm );
-	memcpy(CurrentStore->Name, resname, 8);
+	strnuprcpy(CurrentStore->Name, resname, 8);
 
 	return CurrentStore;
 }
@@ -3299,34 +3299,34 @@ ScriptedAnimation* Interface::GetScriptedAnimation( const char *effect, Point &p
 
 Actor *Interface::GetFirstSelectedPC()
 {
-        for (int i = 0; i < game->GetPartySize( false ); i++) {
-                Actor* actor = game->GetPC( i );
-                if (actor->IsSelected()) {
-                        return actor;
-                }
-        }
-        return NULL;
+	for (int i = 0; i < game->GetPartySize( false ); i++) {
+		Actor* actor = game->GetPC( i );
+		if (actor->IsSelected()) {
+			return actor;
+		}
+	}
+	return NULL;
 }
 
 // Return single BAM frame as a sprite. Use if you want one frame only,
 // otherwise it's not efficient
 Sprite2D* Interface::GetBAMSprite(ieResRef ResRef, int cycle, int frame)
 {
-        AnimationMgr* bam = ( AnimationMgr* ) GetInterface( IE_BAM_CLASS_ID );
-        DataStream *str = key->GetResource( ResRef, IE_BAM_CLASS_ID );
-        if (!bam->Open( str, true ) ) {
-                return NULL;
-        }
-        Sprite2D *tspr;
-        if (cycle==-1) {
-                tspr = bam->GetFrame( frame );
-        }
-        else {
-                tspr = bam->GetFrameFromCycle( (unsigned char) cycle, frame );
-        }
-        FreeInterface( bam );
+	AnimationMgr* bam = ( AnimationMgr* ) GetInterface( IE_BAM_CLASS_ID );
+	DataStream *str = key->GetResource( ResRef, IE_BAM_CLASS_ID );
+	if (!bam->Open( str, true ) ) {
+		return NULL;
+	}
+	Sprite2D *tspr;
+	if (cycle==-1) {
+		tspr = bam->GetFrame( frame );
+	}
+	else {
+		tspr = bam->GetFrameFromCycle( (unsigned char) cycle, frame );
+	}
+	FreeInterface( bam );
 
-        return tspr;
+	return tspr;
 }
 
 Sprite2D *Interface::GetCursorSprite()

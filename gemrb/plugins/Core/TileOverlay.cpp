@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.16 2005/03/31 10:06:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.17 2005/06/05 12:12:10 avenger_teambg Exp $
  *
  */
 
@@ -89,7 +89,7 @@ void TileOverlay::Draw(Region viewport)
 			Tile* tile = tiles[( y* w ) + x];
 			//this hack is for alternate tiles with a value of -1
 			if (!tile->anim[tile->tileIndex]) {
-		        	tile->tileIndex=0;
+				tile->tileIndex=0;
 			}
 			if (tile->anim[tile->tileIndex]) {
 				vid->BlitSprite( tile->anim[tile->tileIndex]->NextFrame(),
