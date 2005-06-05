@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.11 2005/06/05 10:55:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.12 2005/06/05 12:11:11 avenger_teambg Exp $
  *
  */
 
@@ -250,8 +250,8 @@ int STOImp::PutHeader(DataStream *stream, Store *s)
 	char Signature[8];
 
 	memcpy( Signature, "STORV0.0", 8);
-	Signature[5]='0'+version/10;
-	Signature[7]='0'+version%10;
+	Signature[5]+=s->version/10;
+	Signature[7]+=s->version%10;
 	stream->Write( Signature, 8);
 	stream->WriteDword( &s->Type);
 	stream->WriteDword( &s->StoreName);
@@ -289,6 +289,7 @@ int STOImp::PutHeader(DataStream *stream, Store *s)
 	}
 	stream->WriteDword( &s->CuresOffset);
 	stream->WriteDword( &s->CuresCount);
+	stream->Write (s->unknown3, 36);
 	return 0;
 }
 
@@ -297,7 +298,7 @@ int STOImp::PutItem(DataStream *stream, STOItem *it)
 	stream->WriteResRef( it->ItemResRef);
 	stream->WriteWord( &it->unknown);
 	for (unsigned int i=0;i<3;i++) {
-	        str->WriteWord( it->Usages+i );
+		str->WriteWord( it->Usages+i );
 	}
 	str->WriteDword( &it->Flags );
 	str->WriteDword( &it->AmountInStock );
