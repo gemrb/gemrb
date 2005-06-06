@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.12 2005/06/05 12:11:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.13 2005/06/06 16:42:44 avenger_teambg Exp $
  *
  */
 
@@ -298,26 +298,26 @@ int STOImp::PutItem(DataStream *stream, STOItem *it)
 	stream->WriteResRef( it->ItemResRef);
 	stream->WriteWord( &it->unknown);
 	for (unsigned int i=0;i<3;i++) {
-		str->WriteWord( it->Usages+i );
+		stream->WriteWord( it->Usages+i );
 	}
-	str->WriteDword( &it->Flags );
-	str->WriteDword( &it->AmountInStock );
+	stream->WriteDword( &it->Flags );
+	stream->WriteDword( &it->AmountInStock );
 	switch (version) {
 	case 0: //gemrb
 		if (it->InfiniteSupply) {
 			ieDword tmp = (ieDword) -1;
-			str->WriteDword( &tmp );
+			stream->WriteDword( &tmp );
 		} else {
-			str->WriteDword( &it->TriggerRef );
+			stream->WriteDword( &it->TriggerRef );
 		}
 		break;
 	case 10: case 90: //bg, iwd
-		str->WriteDword( &it->InfiniteSupply);
+		stream->WriteDword( &it->InfiniteSupply);
 		break;
 	case 11: //pst
-		str->WriteDword( &it->InfiniteSupply);
-		str->WriteDword( &it->TriggerRef);
-		str->Write( it->unknown2, 56);
+		stream->WriteDword( &it->InfiniteSupply);
+		stream->WriteDword( &it->TriggerRef);
+		stream->Write( it->unknown2, 56);
 		break;
 	}
 
