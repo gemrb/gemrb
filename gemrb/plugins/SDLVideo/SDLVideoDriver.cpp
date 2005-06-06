@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.105 2005/06/05 23:57:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.106 2005/06/06 00:20:10 edheldil Exp $
  *
  */
 
@@ -755,7 +755,7 @@ void SDLVideoDriver::DrawRect(Region& rgn, Color& color, bool fill, bool clipped
 }
 
 /** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
-void SDLVideoDriver::DrawRectSprite(Region& rgn, Color& color, Sprite2D* sprite, bool fill, bool clipped)
+void SDLVideoDriver::DrawRectSprite(Region& rgn, Color& color, Sprite2D* sprite)
 {
 	SDL_Surface* surf = ( SDL_Surface* ) sprite->vptr;
 	SDL_Rect drect = {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.49 2005/06/05 23:57:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.50 2005/06/06 00:20:10 edheldil Exp $
  *
  */
 
@@ -79,7 +79,7 @@ public:
 	void SetPalette(Sprite2D* spr, Color* pal);
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	void DrawRect(Region& rgn, Color& color, bool fill = true, bool clipped = false);
-	void DrawRectSprite(Region& rgn, Color& color, Sprite2D* sprite, bool fill = true, bool clipped = false);
+	void DrawRectSprite(Region& rgn, Color& color, Sprite2D* sprite);
 	/** This functions Draws a Circle */
 	void DrawCircle(short cx, short cy, unsigned short r, Color& color);
 	/** This functions Draws an Ellipse */
