@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.71 2005/05/29 22:16:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.72 2005/06/06 22:21:21 avenger_teambg Exp $
  *
  */
 
@@ -209,6 +209,11 @@ Actor* CREImp::GetActor()
 	Actor* act = new Actor();
 	if (!act)
 		return NULL;
+	// saving in original version requires the original version
+	// otherwise it is set to 0 at construction time
+	if (core->SaveAsOriginal) {
+		act->version = CREVersion;
+	}
 	act->InParty = 0;
 	ieDword strref;
 	str->ReadDword( &strref );
@@ -226,9 +231,6 @@ Actor* CREImp::GetActor()
 	str->ReadDword( &act->BaseStats[IE_XP] );
 	str->ReadDword( &act->BaseStats[IE_GOLD] );
 	str->ReadDword( &act->BaseStats[IE_STATE_ID] );
-if (act->BaseStats[IE_STATE_ID]) {
-printf("STATE: %d\n",act->BaseStats[IE_STATE_ID]);
-}
 	ieWord tmp;
 	str->ReadWord( &tmp );
 	act->BaseStats[IE_HITPOINTS]=tmp;

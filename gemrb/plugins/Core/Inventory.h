@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.30 2005/05/21 14:17:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.31 2005/06/06 22:21:22 avenger_teambg Exp $
  *
  */
 
@@ -78,11 +78,13 @@ typedef enum ieCREItemFlagBits {
 	//just recently acquired
 	IE_INV_ITEM_ACQUIRED = 0x10,	//this is a gemrb extension
 	//is this item destructible normally?
-	IE_INV_ITEM_DESTRUCTIBLE = 0x20,    //this is a gemrb extension
+	IE_INV_ITEM_DESTRUCTIBLE = 0x20,//this is a gemrb extension
 	//is this item already equipped?
-	IE_INV_ITEM_EQUIPPED = 0x40,	//this is a gemrb extension 
+	IE_INV_ITEM_EQUIPPED = 0x40,	//this is a gemrb extension
+	//selected for sale, using the same bit, hope it is ok
+	IE_INV_ITEM_SELECTED = 0x40,    //this is a gemrb extension
 	//is this item stackable?
-	IE_INV_ITEM_STACKED = 0x80	        //this is a gemrb extension
+	IE_INV_ITEM_STACKED = 0x80	//this is a gemrb extension
 } ieCREItemFlagBits;
 
 class GEM_EXPORT CREItem {

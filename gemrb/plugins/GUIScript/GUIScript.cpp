@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.314 2005/05/27 20:03:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.315 2005/06/06 22:21:22 avenger_teambg Exp $
  *
  */
 
@@ -3541,7 +3541,9 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 		int table = core->LoadTable( poi );
 		TableMgr* tm = core->GetTable( table );
 		int StatID = atoi( tm->QueryField() );
+printf("Stat: %d", StatID);
 		StatID = MyActor->GetBase( StatID );
+printf("Value: %d\n", StatID);
 		poi = tm->QueryField( StatID );
 		AnimID += strtoul( poi, NULL, 0 );
 		core->DelTable( table );
@@ -3977,7 +3979,7 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_IsValidStoreItem__doc,
 "IsValidStoreItem(pc, idx[, type]) => int\n\n"
-"Returns if a pc's inventory item is valid for buying, selling, identifying or stealing.\n\n" );
+"Returns if a pc's inventory item or a store item is valid for buying, selling, identifying or stealing. It also has a flag for selected items.\n\n" );
 
 static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 {
@@ -4018,13 +4020,17 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 	}
 	Item *item = core->GetItem( ItemResRef );
 	ret = store->AcceptableItemType( item->ItemType, Flags );
+	//this is a hack to report on selected items
+	if (Flags & IE_INV_ITEM_SELECTED) {
+		ret |= IE_INV_ITEM_SELECTED;
+	}
 	core->FreeItem( item, ItemResRef, false );
 	return PyInt_FromLong(ret);
 }
 
 PyDoc_STRVAR( GemRB_ChangeStoreItem__doc,
 "ChangeStoreItem(pc, idx, action) => int\n\n"
-"Performs an action of buying, selling, identifying or stealing.\n\n" );
+"Performs an action of buying, selling, identifying or stealing. It can also toggle the selection of an item.\n\n" );
 
 static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 {
@@ -4061,6 +4067,25 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			return NULL;
 		}
 		si->Flags|=IE_INV_ITEM_IDENTIFIED;
+		break;
+	}
+	case IE_STORE_SELECT|IE_STORE_BUY:
+	{
+		STOItem* si = store->GetItem( Slot );
+		if (!si) {
+			return NULL;
+		}
+		si->Flags^=IE_INV_ITEM_SELECTED;
+		break;
+	}
+
+	case IE_STORE_SELECT|IE_STORE_SELL:
+	{
+		CREItem* si = actor->inventory.GetSlotItem( Slot );
+		if (!si) {
+			return NULL;
+		}
+		si->Flags^=IE_INV_ITEM_SELECTED;
 		break;
 	}
 	case IE_STORE_SELL:

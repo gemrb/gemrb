@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.103 2005/05/19 14:56:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.104 2005/06/06 22:21:22 avenger_teambg Exp $
  *
  */
 
@@ -159,6 +159,7 @@ Actor::Actor()
 	if (classcount<0) {
 		InitActorTables();
 	}
+	version = 0;
 }
 
 Actor::~Actor(void)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.282 2005/06/02 19:35:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.283 2005/06/06 22:21:22 avenger_teambg Exp $
  *
  */
 
@@ -2826,6 +2826,7 @@ Targets *GameScript::StrongestOfMale(Scriptable* /*Sender*/, Targets *parameters
 	int pos=-1;
 	int worsthp=-1;
 	targettype *select = NULL;
+	//assignment intentional
 	while ( (t = parameters->GetNextTarget(m) ) ) {
 		if (t->actor->GetStat(IE_SEX)!=1) continue;
 		int hp=t->actor->GetStat(IE_HITPOINTS);
@@ -4173,12 +4174,9 @@ int GameScript::HaveAnySpells(Scriptable* Sender, Trigger* /*parameters*/)
 int GameScript::HaveSpellParty(Scriptable* /*Sender*/, Trigger *parameters)
 {
 	Actor *actor;
-	//char *poi;
-	//ieResRef tmpname;
 	Game *game=core->GetGame();
 
 	if (parameters->string0Parameter[0]) {
-		//poi=parameters->string0Parameter;
 		//there is an assignment here
 		for (int i=0; (actor = game->GetPC(i)) ; i++) {
 			if (actor->spellbook.HaveSpell(parameters->string0Parameter, 0) ) {
@@ -4187,13 +4185,12 @@ int GameScript::HaveSpellParty(Scriptable* /*Sender*/, Trigger *parameters)
 		}
 	}
 	else {
+		//there is an assignment here too
 		for (int i=0; (actor = game->GetPC(i)) ; i++) {
 			if (actor->spellbook.HaveSpell(parameters->int0Parameter, 0) ) {
 				return 1;
 			}
 		}
-		//CreateSpellName(tmpname, parameters->int0Parameter);
-		//poi=tmpname;
 	}
 	return 0;
 }
