@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/TextScreen.py,v 1.3 2005/03/28 10:36:21 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/TextScreen.py,v 1.4 2005/06/06 19:56:46 avenger_teambg Exp $
 
 # TextScreen.py - display Loading screen
 
@@ -45,7 +45,7 @@ def StartTextScreen ():
 	if LoadPic != "":
 		GemRB.SetWindowPicture (TextScreen, LoadPic)
 	TextArea = GemRB.GetControl (TextScreen, 2)
-	GemRB.SetTextAreaFlags (TextScreen, TextArea, IE_GUI_TEXTAREA_SMOOTHSCROLL);
+	GemRB.SetTextAreaFlags (TextScreen, TextArea, IE_GUI_TEXTAREA_SMOOTHSCROLL)
 
 	#done
 	Button=GemRB.GetControl (TextScreen, 0)
