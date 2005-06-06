@@ -203,19 +203,11 @@ Set this parameter to
 .I 1
 on Unix-like systems.
 
-.\".TP
-.\".BR AllStringsTagged =(0|1)
-.\"Whether the game should replace tags like <PAGE> or <points> with
-.\"their values. Should be always
-.\".IR 1 .
-.\"This flag will be removed soon.
-
-.\".TP
-.\".BR IgnoreButtonFrames =(0|1)
-.\"Buttons in PST usually have zeros for frame indices for selected and
-.\"disabled states (which should usually be 2 and 3). Setting this to
-.\".IR 1 .
-.\"makes GemRB ignore the zeroed indices and just use 2 and 3.
+.TP
+.BR SaveAsOriginal =(0|1)
+Set this parameter to
+.IR 1 ,
+if you want to keep the save game compatible with the original engine.
 
 .TP
 .BR CachePath =PATH
