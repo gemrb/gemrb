@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.cpp,v 1.10 2005/06/05 09:53:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.cpp,v 1.11 2005/06/07 21:33:46 avenger_teambg Exp $
  *
  */
 
@@ -106,21 +106,31 @@ int Store::AcceptableItemType(ieDword type, ieDword invflags) const
 	return 0;
 }
 
-STOCure *Store::GetCure(int idx) const
+STOCure *Store::GetCure(unsigned int idx) const
 {
+	if (idx>=CuresCount) {
+		return NULL;
+	}
 	return cures+idx;
 }
 
-STODrink *Store::GetDrink(int idx) const
+STODrink *Store::GetDrink(unsigned int idx) const
 {
+	if (idx>=DrinksCount) {
+		return NULL;
+	}
 	return drinks+idx;
 }
 
 //We need this weirdness for PST item lookup
-STOItem *Store::GetItem(int idx)
+STOItem *Store::GetItem(unsigned int idx)
 {
-	if (!HasTriggers)
+	if (!HasTriggers) {
+		if (idx>=items.size()) {
+			return NULL;
+		}
 		return items[idx];
+	}
 
 	for (unsigned int i=0;i<ItemsCount;i++) {
 		if (IsItemAvailable(i)) {
@@ -131,5 +141,14 @@ STOItem *Store::GetItem(int idx)
 		}
 	}
 	return NULL;
+}
+
+void Store::AddItem(CREItem *item)
+{
+	STOItem *temp = new STOItem();
+	//wonder if this is needed
+	//memset( temp, 0, sizeof (STOItem ) );
+	memcpy( temp, item, sizeof( CREItem ) );
+	items.push_back (temp );
 }
 

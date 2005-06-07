@@ -1,5 +1,5 @@
 
-Prototype: IsValidStoreItem( PartyID, slot, type )
+Prototype: IsValidStoreItem( PartyID, slot[, type] )
 
 Description: Returns if a pc's inventory item or a store item is valid for buying, selling, identifying or stealing. If Type is 1, then this is a store item.
 
@@ -12,6 +12,7 @@ Return value: bitfield
 2 - valid for sell
 4 - valid for identify
 8 - valid for steal
+0x40 - selected for buy or sell
 
 See also: EnterStore, GetSlotItem, GetStoreItem, ChangeStoreItem
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.315 2005/06/06 22:21:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.316 2005/06/07 21:33:47 avenger_teambg Exp $
  *
  */
 
@@ -3979,7 +3979,7 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_IsValidStoreItem__doc,
 "IsValidStoreItem(pc, idx[, type]) => int\n\n"
-"Returns if a pc's inventory item or a store item is valid for buying, selling, identifying or stealing. It also has a flag for selected items.\n\n" );
+"Returns if a pc's inventory item or a store item is valid for buying, selling, identifying or stealing. It also has a flag for selected items. Type is 1 for store items and 0 for PC items.\n\n" );
 
 static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 {
@@ -4057,6 +4057,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		if (!si) {
 			return NULL;
 		}
+		si->Flags &= ~IE_INV_ITEM_SELECTED;
 		actor->inventory.AddSlotItem(si, action, 1);
 		break;
 	}
@@ -4066,7 +4067,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		if (!si) {
 			return NULL;
 		}
-		si->Flags|=IE_INV_ITEM_IDENTIFIED;
+		si->Flags |= IE_INV_ITEM_IDENTIFIED;
 		break;
 	}
 	case IE_STORE_SELECT|IE_STORE_BUY:
@@ -4075,7 +4076,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		if (!si) {
 			return NULL;
 		}
-		si->Flags^=IE_INV_ITEM_SELECTED;
+		si->Flags ^= IE_INV_ITEM_SELECTED;
 		break;
 	}
 
@@ -4085,15 +4086,23 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		if (!si) {
 			return NULL;
 		}
-		si->Flags^=IE_INV_ITEM_SELECTED;
+		si->Flags ^= IE_INV_ITEM_SELECTED;
 		break;
 	}
 	case IE_STORE_SELL:
 	{
+		//store/bag is at full capacity
+		if (store->Capacity && (store->Capacity >= store->GetRealStockSize()) ) {
+			printMessage("GUIScript", "Store is full", GREEN);
+			Py_INCREF( Py_None );
+			return Py_None;
+		}
 		CREItem* si = actor->inventory.GetSlotItem( Slot );
 		if (!si) {
 			return NULL;
 		}
+		si->Flags &= ~IE_INV_ITEM_SELECTED;
+		store->AddItem( si );
 		break;
 	}
 	}

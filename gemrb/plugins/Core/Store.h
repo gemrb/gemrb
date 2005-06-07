@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.14 2005/06/06 22:21:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.15 2005/06/07 21:33:46 avenger_teambg Exp $
  *
  */
 
@@ -27,6 +27,8 @@
 
 #include "AnimationMgr.h"
 
+//bah!
+class CREItem;
 
 #ifdef WIN32
 
@@ -133,10 +135,12 @@ public:
 
 public: //queries
 	int AcceptableItemType(ieDword type, ieDword invflags) const;
-	STOCure *GetCure(int idx) const;
-	STODrink *GetDrink(int idx) const;
-	STOItem *GetItem(int idx);
+	STOCure *GetCure(unsigned int idx) const;
+	STODrink *GetDrink(unsigned int idx) const;
+	STOItem *GetItem(unsigned int idx);
 	int GetRealStockSize();
+	//add a new item to the store (selling)
+	void AddItem(CREItem* item);
 private:
 	bool IsItemAvailable(unsigned int slot);
 };

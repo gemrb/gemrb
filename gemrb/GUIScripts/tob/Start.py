@@ -6,6 +6,7 @@ StartWindow = 0
 def OnLoad():
 	global StartWindow
 
+	GemRB.EnableCheatKeys(1)
 	skip_videos = GemRB.GetVar ("SkipIntroVideos")
 	if not skip_videos:
 		GemRB.PlayMovie ("BISLOGO")
