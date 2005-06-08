@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.50 2005/06/05 12:12:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.51 2005/06/08 20:37:12 avenger_teambg Exp $
  *
  */
 
@@ -72,10 +72,24 @@ void Inventory::CalculateWeight()
 		if (!slot) {
 			continue;
 		}
-		slot->Flags &= ~IE_INV_ITEM_ACQUIRED;
 		//printf ("%2d: %8s : %d x %d\n", (int) i, slot->ItemResRef, slot->Weight, slot->Usages[0]);
 		if (slot->Weight == 0) {
 			Item *itm = core->GetItem( slot->ItemResRef );
+			slot->Flags &= ~IE_INV_ITEM_ACQUIRED;
+			if (!(itm->Flags & IE_ITEM_CRITICAL)) {
+				slot->Flags |= IE_INV_ITEM_DESTRUCTIBLE;
+			}
+			if (!(itm->Flags & IE_ITEM_MOVABLE)) {
+				slot->Flags |= IE_INV_ITEM_UNDROPPABLE;
+			}
+			if (itm->Flags & IE_ITEM_CURSED) {
+				slot->Flags |= IE_INV_ITEM_UNDROPPABLE;
+			}
+
+			if (itm->Flags & IE_ITEM_STOLEN) {
+				slot->Flags |= IE_INV_ITEM_STOLEN;
+			}
+
 			slot->Weight = -1;
 			if (itm) {
 				if (itm->Weight) {
@@ -125,7 +139,7 @@ bool Inventory::HasItemInSlot(const char *resref, int slot)
 }
 
 /** counts the items in the inventory, if stacks == 1 then stacks are 
-    accounted for their heap size */
+		accounted for their heap size */
 int Inventory::CountItems(const char *resref, bool stacks)
 {
 	int count = 0;
@@ -150,8 +164,8 @@ int Inventory::CountItems(const char *resref, bool stacks)
 }
 
 /** this function can look for stolen, equipped, identified, destructible
-    etc, items. You just have to specify the flags in the bitmask
-    specifying 1 in a bit signifies a requirement */
+		etc, items. You just have to specify the flags in the bitmask
+		specifying 1 in a bit signifies a requirement */
 bool Inventory::HasItem(const char *resref, ieDword flags)
 {
 	int slot = Slots.size();
@@ -172,9 +186,9 @@ bool Inventory::HasItem(const char *resref, ieDword flags)
 }
 
 /** if resref is "", then destroy ALL items
-    this function can look for stolen, equipped, identified, destructible
-    etc, items. You just have to specify the flags in the bitmask
-    specifying 1 in a bit signifies a requirement */
+this function can look for stolen, equipped, identified, destructible
+etc, items. You just have to specify the flags in the bitmask
+specifying 1 in a bit signifies a requirement */
 unsigned int Inventory::DestroyItem(const char *resref, ieDword flags, ieDword count)
 {
 	unsigned int destructed = 0;
@@ -328,7 +342,7 @@ int Inventory::AddSlotItem(CREItem* item, int slot)
 	return res;
 }
 
-int Inventory::AddSlotItem(STOItem* item, int action, int count)
+int Inventory::AddSlotItem(STOItem* item, int action)
 {
 	CREItem *temp;
 	int ret = -1;
@@ -336,8 +350,8 @@ int Inventory::AddSlotItem(STOItem* item, int action, int count)
 	// FIXME:  Why the loop? Copy whole amount in single step.
 	// Because: count is the number of items bought (you can still add
 	// grouped objects in a single step, just set up STOItem)
-	for (int i = 0; i < count; i++) {
-		if (!item->InfiniteSupply) {
+	for (int i = 0; i < item->PurchasedAmount; i++) {
+		if (item->InfiniteSupply==(ieDword) -1) {
 			if (!item->AmountInStock) {
 				break;
 			}
@@ -357,6 +371,7 @@ int Inventory::AddSlotItem(STOItem* item, int action, int count)
 			delete temp;
 		}
 	}
+	item->PurchasedAmount = 0;
 	return ret;
 }
 
@@ -497,7 +512,7 @@ void Inventory::dump()
 			continue;
 		}
 
-		printf ( "%2u: %8.8s   %d (%d %d %d) %x Wt: %d x %dLb\n", i, itm->ItemResRef, itm->Unknown08, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags, itm->StackAmount, itm->Weight );
+		printf ( "%2u: %8.8s   (%d %d %d) %x Wt: %d x %dLb\n", i, itm->ItemResRef, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags, itm->StackAmount, itm->Weight );
 	}
 
 	printf( "Equipped: %d\n", Equipped );

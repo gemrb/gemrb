@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.73 2005/05/26 17:48:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.74 2005/06/08 20:37:12 avenger_teambg Exp $
  *
  */
 
@@ -118,6 +118,7 @@ public:
 	Variables *vars;
 	ieByte* ExploredBitmap;
 	ieByte* VisibleBitmap;
+	int version;
 private:
 	unsigned short* MapSet;
 	std::queue< unsigned int> InternalStack;

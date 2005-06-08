@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.13 2005/06/06 16:42:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.14 2005/06/08 20:37:13 avenger_teambg Exp $
  *
  */
 
@@ -127,7 +127,7 @@ Store* STOImp::GetStore(Store *s)
 	str->Seek( s->ItemsOffset, GEM_STREAM_START );
 	for (i = 0; i < s->ItemsCount; i++) {
 		GetItem(s->items[i]);
-		if (s->items[i]->TriggerRef>0) { 
+		if (s->items[i]->InfiniteSupply>0) { 
 			//if there are no triggers, GetRealStockSize is simpler
 			//also it is compatible only with pst/gemrb saved stores
 			s->HasTriggers=true;
@@ -150,27 +150,33 @@ Store* STOImp::GetStore(Store *s)
 void STOImp::GetItem(STOItem *it)
 {
 	str->ReadResRef( it->ItemResRef );
-	str->ReadWord( &it->unknown );
+	str->ReadWord( &it->PurchasedAmount );
 	for (int i=0;i<3;i++) {
 		str->ReadWord( it->Usages+i );
 	}
 	str->ReadDword( &it->Flags );
 	str->ReadDword( &it->AmountInStock );
 	str->ReadDword( &it->InfiniteSupply );
+	ieDword tmp;
+
 	switch (version) {
 		case 11: //pst
-			str->ReadDword( &it->TriggerRef );
+			if (it->InfiniteSupply) {
+				it->InfiniteSupply=(ieDword) -1;
+			}
+			str->ReadDword( &tmp );
+			if ((int) tmp>0) {
+				it->InfiniteSupply=tmp;
+			}
 			str->Read( it->unknown2, 56 );
 			break;
 		case 0: //gemrb version stores trigger ref in infinitesupply
-			if (it->InfiniteSupply != (ieDword) -1) {
-				it->TriggerRef = it->InfiniteSupply;
-				//don't care about unknown2 in gemrb
-				break;
-			//falling through
-			}
+			memset( it->unknown2, 0, 56 );
+			break;
 		default:
-			it->TriggerRef = 0;
+			if (it->InfiniteSupply) {
+				it->InfiniteSupply=(ieDword) -1;
+			}
 			memset( it->unknown2, 0, 56 );
 	}
 }
@@ -293,59 +299,54 @@ int STOImp::PutHeader(DataStream *stream, Store *s)
 	return 0;
 }
 
-int STOImp::PutItem(DataStream *stream, STOItem *it)
+int STOImp::PutItems(DataStream *stream, Store *store)
 {
-	stream->WriteResRef( it->ItemResRef);
-	stream->WriteWord( &it->unknown);
-	for (unsigned int i=0;i<3;i++) {
-		stream->WriteWord( it->Usages+i );
-	}
-	stream->WriteDword( &it->Flags );
-	stream->WriteDword( &it->AmountInStock );
-	switch (version) {
-	case 0: //gemrb
-		if (it->InfiniteSupply) {
-			ieDword tmp = (ieDword) -1;
-			stream->WriteDword( &tmp );
-		} else {
-			stream->WriteDword( &it->TriggerRef );
+	for (unsigned int ic=0;ic<store->ItemsCount;ic++) {
+		STOItem *it = store->items[ic];
+
+		stream->WriteResRef( it->ItemResRef);
+		stream->WriteWord( &it->PurchasedAmount);
+		for (unsigned int i=0;i<3;i++) {
+			stream->WriteWord( it->Usages+i );
 		}
-		break;
-	case 10: case 90: //bg, iwd
-		stream->WriteDword( &it->InfiniteSupply);
-		break;
-	case 11: //pst
-		stream->WriteDword( &it->InfiniteSupply);
-		stream->WriteDword( &it->TriggerRef);
-		stream->Write( it->unknown2, 56);
-		break;
+		stream->WriteDword( &it->Flags );
+		stream->WriteDword( &it->AmountInStock );
+		if (store->version==11) {
+			stream->WriteDword( &it->InfiniteSupply);
+			stream->WriteDword( &it->InfiniteSupply);
+			stream->Write( it->unknown2, 56);
+		} else {
+			stream->WriteDword( &it->InfiniteSupply );
+		}
 	}
-
 	return 0;
 }
 
-int STOImp::PutCure(DataStream *stream, STOCure *c)
+int STOImp::PutCures(DataStream *stream, Store *s)
 {
-	stream->WriteResRef( c->CureResRef);
-	stream->WriteDword( &c->Price);
-
+	for (unsigned int i=0;i<s->CuresCount;i++) {
+		STOCure *c = s->cures+i;
+		stream->WriteResRef( c->CureResRef);
+		stream->WriteDword( &c->Price);
+	}
 	return 0;
 }
 
-int STOImp::PutDrink(DataStream *stream, STODrink *d)
+int STOImp::PutDrinks(DataStream *stream, Store *s)
 {
-	stream->WriteResRef( d->RumourResRef); //?
-	stream->WriteDword( &d->DrinkName);
-	stream->WriteDword( &d->Price);
-	stream->WriteDword( &d->Strength);
-
+	for (unsigned int i=0;i<s->DrinksCount;i++) {
+		STODrink *d = s->drinks+i;
+		stream->WriteResRef( d->RumourResRef); //?
+		stream->WriteDword( &d->DrinkName);
+		stream->WriteDword( &d->Price);
+		stream->WriteDword( &d->Strength);
+	}
 	return 0;
 }
 
 //saves the store into a datastream, be it memory or file
 int STOImp::PutStore(DataStream *stream, Store *store)
 {
-	unsigned int i;
 	int ret;
 
 	if (!stream || !store) {
@@ -357,28 +358,22 @@ int STOImp::PutStore(DataStream *stream, Store *store)
 		return ret;
 	}
 
-	for (i=0;i<store->DrinksCount;i++) {
-		ret = PutDrink( stream, store->drinks+i);
-		if (ret) {
-			return ret;
-		}
+	ret = PutDrinks( stream, store);
+	if (ret) {
+		return ret;
 	}
 
-	for (i=0;i<store->CuresCount;i++) {
-		ret = PutCure( stream, store->cures+i);
-		if (ret) {
-			return ret;
-		}
+	ret = PutCures( stream, store);
+	if (ret) {
+		return ret;
 	}
 
 	ret = PutPurchasedCategories (stream, store);
-
-	for (i=0;i<store->ItemsCount;i++) {
-		ret = PutItem( stream, store->items[i]);
-		if (ret) {
-			return ret;
-		}
+	if (ret) {
+		return ret;
 	}
+
+	ret = PutItems( stream, store);
 
 	return ret;
 }

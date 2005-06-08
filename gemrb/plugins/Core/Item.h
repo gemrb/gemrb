@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.16 2005/05/19 14:56:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.17 2005/06/08 20:37:12 avenger_teambg Exp $
  *
  */
 
@@ -180,10 +180,10 @@ public:
 
 	ITMExtHeader *GetExtHeader(int which)
 	{
-        	if(ExtHeaderCount>=which) {
-                	return NULL;
-	        }
-        	return ext_headers+which;
+		if(ExtHeaderCount>=which) {
+			return NULL;
+		}
+		return ext_headers+which;
 	}
 };
 

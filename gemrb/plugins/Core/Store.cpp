@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.cpp,v 1.11 2005/06/07 21:33:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.cpp,v 1.12 2005/06/08 20:37:12 avenger_teambg Exp $
  *
  */
 
@@ -50,7 +50,11 @@ Store::~Store(void)
 bool Store::IsItemAvailable(unsigned int slot)
 {
 	Game * game = core->GetGame();
-	int trigger =items[slot]->TriggerRef;
+	//0     - not infinite, not conditional
+	//-1    - infinite
+	//other - pst trigger ref
+
+	int trigger = (int) items[slot]->InfiniteSupply;
 	if (trigger>0) {
 		char *TriggerCode = core->GetString( trigger );
 		return GameScript::EvaluateString (game->GetPC(game->GetSelectedPCSingle()),TriggerCode)!=0;
@@ -72,7 +76,7 @@ int Store::GetRealStockSize()
 	return count;
 }
 
-int Store::AcceptableItemType(ieDword type, ieDword invflags) const
+int Store::AcceptableItemType(ieDword type, ieDword invflags, bool pc) const
 {
 	int ret;
 
@@ -87,18 +91,23 @@ int Store::AcceptableItemType(ieDword type, ieDword invflags) const
 	if (!(invflags&IE_INV_ITEM_IDENTIFIED) ) {
 		ret |= IE_STORE_ID;
 	}
-	if (Type<STT_BG2CONT) {
-		//can't sell undroppable or critical items
+	if (pc && (Type<STT_BG2CONT) ) {
+		//can't sell critical items
 		if (!(invflags&IE_INV_ITEM_DESTRUCTIBLE)) {
-			ret&=~IE_STORE_SELL;
+			ret &= ~IE_STORE_SELL;
 		}
 		//check if store buys stolen items
 		if ((invflags&IE_INV_ITEM_STOLEN) && !(Type&IE_STORE_FENCE) ) {
-			ret&=~IE_STORE_SELL;
+			ret &= ~IE_STORE_SELL;
 		}
 	}
 
+	if (!pc) {
+		return ret;
+	}
+
 	for (ieDword i=0;i<PurchasedCategoriesCount;i++) {
+		printf ("%d == %d\n", type, purchased_categories[i]);
 		if (type==purchased_categories[i]) {
 			return ret;
 		}
@@ -143,12 +152,59 @@ STOItem *Store::GetItem(unsigned int idx)
 	return NULL;
 }
 
+STOItem *Store::FindItem(CREItem *item, bool exact)
+{
+	for (unsigned int i=0;i<ItemsCount;i++) {
+		if (!IsItemAvailable(i) ) {
+			continue;
+		}
+		STOItem *temp = items[i];
+
+		if (strnicmp(item->ItemResRef, temp->ItemResRef, 8) ) {
+			continue;
+		}
+		if(exact) {
+			if (temp->InfiniteSupply==(ieDword) -1) {
+				return temp;
+			}
+			//check if we could simply merge the item into the stock or need a new entry
+			if ((temp->StackAmount>=99) || memcmp(temp->Usages, item->Usages, sizeof(item->Usages))) {
+				continue;
+			}
+		}
+		return temp;
+	}
+	return NULL;
+}
+
 void Store::AddItem(CREItem *item)
 {
-	STOItem *temp = new STOItem();
+	STOItem *temp = FindItem(item, true);
+
+	if (temp) {
+		if (temp->InfiniteSupply!=(ieDword) -1) {
+			temp->StackAmount++;
+		}
+		return;
+	}
+
+	temp = new STOItem();
 	//wonder if this is needed
 	//memset( temp, 0, sizeof (STOItem ) );
 	memcpy( temp, item, sizeof( CREItem ) );
 	items.push_back (temp );
+	ItemsCount++;
 }
 
+void Store::RemoveItem( unsigned int idx )
+{
+	if (items.size()!=ItemsCount) {
+		printMessage("Store","Inconsistent store", LIGHT_RED);
+		abort();
+	}
+	if (ItemsCount<=idx) {
+		return;
+	}
+	items.erase(items.begin()+idx);
+	ItemsCount--;
+}

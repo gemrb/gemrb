@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.31 2005/06/06 22:21:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.32 2005/06/08 20:37:12 avenger_teambg Exp $
  *
  */
 
@@ -90,12 +90,12 @@ typedef enum ieCREItemFlagBits {
 class GEM_EXPORT CREItem {
 public:
 	ieResRef ItemResRef;
-        ieWord Unknown08;
-        ieWord Usages[3];
-        ieDword Flags;
-        // 2 cached values from associated item. LEAVE IT SIGNED!
-        int Weight;
-        int StackAmount;
+	ieWord PurchasedAmount; //actually, this field is useless in creatures
+	ieWord Usages[3];
+	ieDword Flags;
+	// 2 cached values from associated item. LEAVE IT SIGNED!
+	int Weight;
+	int StackAmount;
 
 	CREItem()
 	{
@@ -150,12 +150,12 @@ public:
 	** first eligible slot, eventually splitting the item to
 	** more slots. Returns 2 if completely successful, 1 if partially, 0 else.*/
 	int AddSlotItem(CREItem* item, int slot);
-	/** Adds STOItem to the inventory, it never wielded, action might be STA_STEAL or STA_BUY */
-
-	int AddSlotItem(STOItem* item, int action, int count);
+	/** Adds STOItem to the inventory, it is never wielded, action might be STA_STEAL or STA_BUY */
+  /** The amount of items is stored in PurchasedAmount */
+	int AddSlotItem(STOItem* item, int action);
 
 	/** flags: see ieCREItemFlagBits */
-        /** count == ~0 means to destroy all */
+	/** count == ~0 means to destroy all */
 	/** returns the number of destroyed items */
 	unsigned int DestroyItem(const char *resref, ieDword flags, ieDword count);
 	/** flags: see ieCREItemFlagBits */

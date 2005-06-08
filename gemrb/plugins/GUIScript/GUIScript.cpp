@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.316 2005/06/07 21:33:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.317 2005/06/08 20:37:13 avenger_teambg Exp $
  *
  */
 
@@ -3806,7 +3806,6 @@ PyDoc_STRVAR( GemRB_ChangeContainerItem__doc,
 "ChangeContainerItem(pc, idx, action) => int\n\n"
 "Takes an item from a container, or puts it there. If PC is 0 then it uses the first selected PC and the current container, if it is not 0 then it autoselects the container.\n\n");
 
-
 static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 {
 	int PartyID, Slot;
@@ -3846,14 +3845,14 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 
 		res = core->CanMoveItem(container->inventory.GetSlotItem(Slot) );
 		if (!res) { //cannot move
-			printf("Cannot move item, it is undroppable!\n");
+			printMessage("GUIScript","Cannot move item, it is undroppable!\n", GREEN);
 			Py_INCREF( Py_None );
 			return Py_None;
 		}
 
 		item = container->inventory.GetItem(Slot);
 		if (!item) {
-			printf("Cannot move item, there is something weird!\n");
+			printMessage("GUIScript","Cannot move item, there is something weird!\n", YELLOW);
 			Py_INCREF( Py_None );
 			return Py_None;
 		}
@@ -3863,7 +3862,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 		
 		int slot = actor->inventory.FindCandidateSlot( SLOT_INVENTORY, 0);
 		if (slot<0) { //actually we should return something here!
-			printf("Cannot move item, inventory is full!\n");
+			printMessage("GUIScript","Cannot move item, inventory is full!\n", GREEN);
 			Py_INCREF( Py_None );
 			return Py_None;
 		}
@@ -3871,14 +3870,14 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 	} else { //put stuff in container, simple!
 		res = core->CanMoveItem(actor->inventory.GetSlotItem(Slot) );
 		if (!res) { //cannot move
-			printf("Cannot move item, it is undroppable!\n");
+			printMessage("GUIScript","Cannot move item, it is undroppable!\n", GREEN);
 			Py_INCREF( Py_None );
 			return Py_None;
 		}
 
 		item = actor->inventory.RemoveItem(Slot);
 		if (!item) {
-			printf("Cannot move item, there is something weird!\n");
+			printMessage("GUIScript","Cannot move item, there is something weird!\n", YELLOW);
 			Py_INCREF( Py_None );
 			return Py_None;
 		}
@@ -4019,13 +4018,51 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 		Flags = si->Flags;
 	}
 	Item *item = core->GetItem( ItemResRef );
-	ret = store->AcceptableItemType( item->ItemType, Flags );
+	ret = store->AcceptableItemType( item->ItemType, Flags, !type );
 	//this is a hack to report on selected items
 	if (Flags & IE_INV_ITEM_SELECTED) {
 		ret |= IE_INV_ITEM_SELECTED;
 	}
 	core->FreeItem( item, ItemResRef, false );
 	return PyInt_FromLong(ret);
+}
+
+PyDoc_STRVAR( GemRB_SetPurchasedAmount__doc,
+"SetPurchasedAmount(idx, amount)\n\n"
+"Sets the amount of purchased items of a type.\n\n");
+
+static PyObject* GemRB_SetPurchasedAmount(PyObject * /*self*/, PyObject* args)
+{
+	int Slot, tmp;
+	ieDword amount;
+
+	if (!PyArg_ParseTuple( args, "ii", &Slot, &tmp)) {
+		return AttributeError( GemRB_SetPurchasedAmount__doc );
+	}
+	amount = (ieDword) tmp;
+	Store *store = core->GetCurrentStore();
+	if (!store) {
+		return RuntimeError("No current store!");
+	}
+	STOItem* si = store->GetItem( Slot );
+	if (!si) {
+		return NULL;
+	}
+	
+	if (si->InfiniteSupply!= (ieDword) -1) {
+		if (si->AmountInStock<amount) {
+			amount=si->AmountInStock;
+		}
+	}
+	si->PurchasedAmount=amount;
+	if (amount) {
+		si->Flags |= IE_INV_ITEM_SELECTED;
+	} else {
+		si->Flags &= ~IE_INV_ITEM_SELECTED;
+	}
+
+	Py_INCREF( Py_None );
+	return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_ChangeStoreItem__doc,
@@ -4057,8 +4094,14 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		if (!si) {
 			return NULL;
 		}
-		si->Flags &= ~IE_INV_ITEM_SELECTED;
-		actor->inventory.AddSlotItem(si, action, 1);
+		//the amount of items is stored in si->PurchasedAmount
+		actor->inventory.AddSlotItem(si, action);
+		if ((si->InfiniteSupply==(ieDword) -1) || si->AmountInStock) {
+			si->Flags &= ~IE_INV_ITEM_SELECTED;
+			si->PurchasedAmount=0;
+		} else {
+			store->RemoveItem( Slot );
+		}
 		break;
 	}
 	case IE_STORE_ID:
@@ -4077,6 +4120,11 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			return NULL;
 		}
 		si->Flags ^= IE_INV_ITEM_SELECTED;
+		if (si->Flags & IE_INV_ITEM_SELECTED) {
+			si->PurchasedAmount=1;
+		} else {
+			si->PurchasedAmount=0;
+		}
 		break;
 	}
 
@@ -4087,6 +4135,11 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			return NULL;
 		}
 		si->Flags ^= IE_INV_ITEM_SELECTED;
+		if (si->Flags & IE_INV_ITEM_SELECTED) {
+			si->PurchasedAmount=1;
+		} else {
+			si->PurchasedAmount=0;
+		}
 		break;
 	}
 	case IE_STORE_SELL:
@@ -4102,6 +4155,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			return NULL;
 		}
 		si->Flags &= ~IE_INV_ITEM_SELECTED;
+		si->PurchasedAmount=0;
 		store->AddItem( si );
 		break;
 	}
@@ -4136,9 +4190,10 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "Usages1", PyInt_FromLong (si->Usages[1]));
 	PyDict_SetItemString(dict, "Usages2", PyInt_FromLong (si->Usages[2]));
 	PyDict_SetItemString(dict, "Flags", PyInt_FromLong (si->Flags));
+	PyDict_SetItemString(dict, "Purchased", PyInt_FromLong (si->PurchasedAmount) );
 
 	int amount;
-	if (si->InfiniteSupply) {
+	if (si->InfiniteSupply==(ieDword) -1) {
 		PyDict_SetItemString(dict, "Amount", PyInt_FromLong( -1 ) );
 		amount = 100;
 	} else {
@@ -4148,7 +4203,7 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 
 	Item *item = core->GetItem( si->ItemResRef );
 
-	int identified = !(si->Flags & IE_INV_ITEM_IDENTIFIED);
+	int identified = !!(si->Flags & IE_INV_ITEM_IDENTIFIED);
 	PyDict_SetItemString(dict, "ItemName", PyInt_FromLong( item->GetItemName( identified )) );
 	PyDict_SetItemString(dict, "ItemDesc", PyInt_FromLong( item->GetItemDesc( identified )) );
 
@@ -4885,7 +4940,7 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 
 	TmpItem = new CREItem();
 	strnuprcpy(TmpItem->ItemResRef, ItemResRef, 8);
-	TmpItem->Unknown08=0;
+	TmpItem->PurchasedAmount=0;
 	TmpItem->Usages[0]=Charge0;
 	TmpItem->Usages[1]=Charge1;
 	TmpItem->Usages[2]=Charge2;
@@ -5177,6 +5232,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetRumour, METH_VARARGS),
 	METHOD(IsValidStoreItem, METH_VARARGS),
 	METHOD(ChangeStoreItem, METH_VARARGS),
+	METHOD(SetPurchasedAmount, METH_VARARGS),
 	METHOD(ChangeContainerItem, METH_VARARGS),
 	// terminating entry	
 	{NULL, NULL, 0, NULL}

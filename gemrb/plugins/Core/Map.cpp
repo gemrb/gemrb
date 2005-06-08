@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.166 2005/06/05 12:12:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.167 2005/06/08 20:37:12 avenger_teambg Exp $
  *
  */
 
@@ -225,6 +225,7 @@ Map::Map(void)
 	}
 	ExploredBitmap = NULL;
 	VisibleBitmap = NULL;
+	version = 0;
 }
 
 Map::~Map(void)

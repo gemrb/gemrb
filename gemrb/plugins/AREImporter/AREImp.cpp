@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.111 2005/06/02 19:35:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.112 2005/06/08 20:36:56 avenger_teambg Exp $
  *
  */
 
@@ -107,7 +107,7 @@ bool AREImp::Open(DataStream* stream, bool autoFree)
 	this->autoFree = autoFree;
 	char Signature[8];
 	str->Read( Signature, 8 );
-	int bigheader;
+
 	if (strncmp( Signature, "AREAV1.0", 8 ) != 0) {
 		if (strncmp( Signature, "AREAV9.1", 8 ) != 0) {
 			return false;
@@ -175,6 +175,10 @@ Map* AREImp::GetMap(const char *ResRef)
 		printf("Can't allocate map (out of memory).\n");
 		abort();
 	}
+        if (core->SaveAsOriginal) {
+                map->version = bigheader;
+        }
+
 	map->AreaFlags=AreaFlags;
 	map->AreaType=AreaType;
 
@@ -723,7 +727,6 @@ Map* AREImp::GetMap(const char *ResRef)
 					bmp->GetPalette(0, 256, Palette);
 					core->FreeInterface( bmp );
 				}
-printf("Setting palette: %s\n",animPal);
 				anim->SetPalette( Palette, true );
 				free (Palette);
 			}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.h,v 1.5 2005/06/05 10:55:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.h,v 1.6 2005/06/08 20:37:13 avenger_teambg Exp $
  *
  */
 
@@ -58,9 +58,9 @@ private:
 	void GetCure(STOCure *cure);
 	void GetPurchasedCategories(Store* s);
 
-	int PutItem(DataStream *stream, STOItem *item);
-	int PutDrink(DataStream *stream, STODrink *drink);
-	int PutCure(DataStream *stream, STOCure *cure);
+	int PutItems(DataStream *stream, Store* s);
+	int PutDrinks(DataStream *stream, Store* s);
+	int PutCures(DataStream *stream, Store* s);
 	int PutPurchasedCategories(DataStream *stream, Store* s);
 	int PutHeader(DataStream *stream, Store *store);
 };

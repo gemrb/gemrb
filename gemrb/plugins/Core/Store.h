@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.15 2005/06/07 21:33:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.16 2005/06/08 20:37:12 avenger_teambg Exp $
  *
  */
 
@@ -62,7 +62,7 @@ STA_CURE=3, STA_DONATE=4, STA_DRINK=5, STA_ROOMRENT=6, STA_OPTIONAL=0x80} StoreA
 
 typedef struct STOItem {
 	ieResRef ItemResRef;
-	ieWord unknown;
+	ieWord PurchasedAmount;
 	ieWord Usages[3];
 	ieDword Flags;
 	// 2 cached values from associated item. LEAVE IT SIGNED!
@@ -71,7 +71,7 @@ typedef struct STOItem {
 	ieDword AmountInStock;
 	ieDword InfiniteSupply;
 	// V1.1
-	ieDword TriggerRef;
+	//ieDword TriggerRef; use infinitesupply
 	char unknown2[56];
 } STOItem;
 
@@ -134,14 +134,18 @@ public:
 	int version;
 
 public: //queries
-	int AcceptableItemType(ieDword type, ieDword invflags) const;
+	int AcceptableItemType(ieDword type, ieDword invflags, bool pc) const;
 	STOCure *GetCure(unsigned int idx) const;
 	STODrink *GetDrink(unsigned int idx) const;
 	STOItem *GetItem(unsigned int idx);
+	//evaluates item availability triggers
 	int GetRealStockSize();
 	//add a new item to the store (selling)
 	void AddItem(CREItem* item);
+	void RemoveItem(unsigned int idx);
 private:
+  //finds a mergeable item in the stock, if exact is set, it checks for usage counts too
+	STOItem *FindItem(CREItem *item, bool exact);
 	bool IsItemAvailable(unsigned int slot);
 };
 
