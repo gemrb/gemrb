@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.33 2005/05/25 18:55:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.34 2005/06/10 21:12:38 avenger_teambg Exp $
  *
  */
 
@@ -58,6 +58,7 @@ public:
 	Door* GetDoor(Point &position);
 	Door* GetDoor(unsigned int idx);
 	Door* GetDoor(const char* Name);
+	unsigned int GetDoorCount() { return doors.size(); }
 
 	Container* AddContainer(const char* Name, unsigned short Type,
 		Gem_Polygon* outline);
@@ -67,14 +68,17 @@ public:
 	Container* GetContainer(unsigned int idx);
 	/* this function returns/creates a pile container at position */
 	Container *GetPile(Point &position);
-	void CleanupContainer(Container *container);
+	/* cleans up empty heaps, returns 1 if container removed*/
+	int CleanupContainer(Container *container);
 	void AddItemToLocation(Point &position, CREItem *item);
+	unsigned int GetContainerCount() { return containers.size(); }
 
 	InfoPoint* AddInfoPoint(const char* Name, unsigned short Type,
 		Gem_Polygon* outline);
 	InfoPoint* GetInfoPoint(Point &position);
 	InfoPoint* GetInfoPoint(const char* Name);
 	InfoPoint* GetInfoPoint(unsigned int idx);
+	unsigned int GetInfoPointCount() { return infoPoints.size(); }
 
 	void AddOverlay(TileOverlay* overlay);
 	void DrawOverlay(unsigned int index, Region screen);

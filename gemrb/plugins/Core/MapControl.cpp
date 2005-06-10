@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.30 2005/06/07 17:24:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.31 2005/06/10 21:12:38 avenger_teambg Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -115,7 +115,7 @@ void MapControl::DrawFog()
 
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
-			Point p = { MAP_MULT * x, MAP_MULT * y };
+			Point p( MAP_MULT * x, MAP_MULT * y );
 			bool visible = MyMap->IsVisible( p, true );
 			if (! visible) {
 				Region rgn = Region ( MAP_DIV * x, MAP_DIV * y, MAP_DIV, MAP_DIV );

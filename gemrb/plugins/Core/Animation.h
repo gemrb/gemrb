@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.19 2005/05/28 19:02:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.20 2005/06/10 21:12:37 avenger_teambg Exp $
  *
  */
 
@@ -55,6 +55,7 @@ public:
 	unsigned char fps;
 	bool playReversed;
 	Region animArea;
+	ieDword appearance;
 	ieDword Flags;
 	Color *Palette;
 	Animation(int count);

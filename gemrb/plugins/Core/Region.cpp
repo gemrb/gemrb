@@ -15,13 +15,62 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Region.cpp,v 1.11 2004/09/12 21:58:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Region.cpp,v 1.12 2005/06/10 21:12:38 avenger_teambg Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "Region.h"
 
+/*************** point ****************************/
+Point::Point(void)
+{
+	x = y = 0;
+	//memset(this, 0, sizeof(*this));
+}
+
+Point::~Point(void)
+{
+}
+
+Point::Point(const Point& pnt)
+{
+	x=pnt.x;
+	y=pnt.y;
+	//memcpy(this, &pnt, sizeof(*this));
+}
+
+Point& Point::operator=(const Point& pnt)
+{
+	x = pnt.x;
+	y = pnt.y;
+	//memcpy(this, &pnt, sizeof(*this));
+	return *this;
+}
+
+bool Point::operator==(const Point& pnt)
+{
+	if (( x == pnt.x ) && ( y == pnt.y )) {
+		return true;
+	}
+	return false;
+	//return !memcmp( this, &pnt, sizeof(*this));
+}
+
+Point::Point(short x, short y)
+{
+	this->x = x;
+	this->y = y;
+}
+
+bool Point::isempty() const
+{
+	if (x==-1 && y==-1) {
+		return true;
+	}
+	return false;
+}
+/*************** region ****************************/
 Region::Region(void)
 {
 	x = y = w = h = 0;

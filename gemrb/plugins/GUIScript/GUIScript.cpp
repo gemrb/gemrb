@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.317 2005/06/08 20:37:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.318 2005/06/10 21:12:39 avenger_teambg Exp $
  *
  */
 
@@ -2592,7 +2592,7 @@ static PyObject* GemRB_GetGameVar(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GetGameVar__doc );
 	}
 
-	if (!core->GetGame()->globals->Lookup( Variable, value )) {
+	if (!core->GetGame()->locals->Lookup( Variable, value )) {
 		return PyInt_FromLong( ( unsigned long ) 0 );
 	}
 

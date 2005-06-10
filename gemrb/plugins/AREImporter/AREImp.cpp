@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.112 2005/06/08 20:36:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.113 2005/06/10 21:12:36 avenger_teambg Exp $
  *
  */
 
@@ -121,19 +121,22 @@ bool AREImp::Open(DataStream* stream, bool autoFree)
 	str->ReadResRef( WEDResRef );
 	str->ReadDword( &LastSave );
 	str->ReadDword( &AreaFlags );
-	str->Seek( 0x48 + bigheader, GEM_STREAM_START );
+	//skipping bg1 area connection fields
+	str->Seek( 0x48, GEM_STREAM_START );
 	str->ReadWord( &AreaType );
 	str->ReadWord( &WRain );
 	str->ReadWord( &WSnow );
 	str->ReadWord( &WFog );
 	str->ReadWord( &WLightning );
 	str->ReadWord( &WUnknown );
+	//bigheader gap is here
+	str->Seek( 0x54 + bigheader, GEM_STREAM_START );
 	str->ReadDword( &ActorOffset );
 	str->ReadWord( &ActorCount );
-	str->Seek( 0x5A + bigheader, GEM_STREAM_START );
 	str->ReadWord( &InfoPointsCount );
 	str->ReadDword( &InfoPointsOffset );
-	str->Seek( 0x68 + bigheader, GEM_STREAM_START );
+	str->ReadDword( &SpawnOffset );
+	str->ReadDword( &SpawnCount );
 	str->ReadDword( &EntrancesOffset );
 	str->ReadDword( &EntrancesCount );
 	str->ReadDword( &ContainersOffset );
@@ -175,11 +178,15 @@ Map* AREImp::GetMap(const char *ResRef)
 		printf("Can't allocate map (out of memory).\n");
 		abort();
 	}
-        if (core->SaveAsOriginal) {
-                map->version = bigheader;
-        }
+	if (core->SaveAsOriginal) {
+		map->version = bigheader;
+	}
 
 	map->AreaFlags=AreaFlags;
+	map->Rain=WRain;
+	map->Snow=WSnow;
+	map->Fog=WFog;
+	map->Lightning=WLightning;
 	map->AreaType=AreaType;
 
 	//we have to set this here because the actors will receive their
@@ -223,6 +230,7 @@ Map* AREImp::GetMap(const char *ResRef)
 	sm->Open( smstr, true );
 
 	map->AddTileMap( tm, lm, sr, sm );
+	strnuprcpy( map->WEDResRef, WEDResRef, 8);
 
 	str->Seek( SongHeader, GEM_STREAM_START );
 	//5 is the number of song indices
@@ -265,6 +273,8 @@ Map* AREImp::GetMap(const char *ResRef)
 		ieDword TrapFlags, Locked, LockRemoval;
 		Region BBClosed, BBOpen;
 		ieDword OpenStrRef;
+		ieDword NameStrRef;
+		ieResRef Dialog;
 
 		str->Read( LongName, 32 );
 		LongName[32] = 0;
@@ -321,6 +331,8 @@ Map* AREImp::GetMap(const char *ResRef)
 		//odd field, needs a bit of hacking
 		str->Read( LinkedInfo, 24);
 		LinkedInfo[24] = 0;
+		str->ReadDword( &NameStrRef);
+		str->ReadResRef( Dialog );
 
 		//Reading Open Polygon
 		str->Seek( VerticesOffset + ( OpenFirstVertex * 4 ), GEM_STREAM_START );
@@ -422,19 +434,24 @@ Map* AREImp::GetMap(const char *ResRef)
 		door->OpenStrRef=OpenStrRef;
 		//this is an odd field, only 24 chars!
 		strnuprcpy(door->LinkedInfo, LinkedInfo, 24);
+		door->NameStrRef=NameStrRef;
+		strnuprcpy(door->Dialog, Dialog, 8);
 	}
 
 	printf( "Loading containers\n" );
 	//Loading Containers
 	for (i = 0; i < ContainersCount; i++) {
 		str->Seek( ContainersOffset + ( i * 0xC0 ), GEM_STREAM_START );
+		char Name[33];
 		ieWord Type, LockDiff;
 		ieDword Flags;
 		ieWord TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
 		ieWord XPos, YPos;
 		ieWord LaunchX, LaunchY;
 		ieDword ItemIndex, ItemCount;
-		char Name[33];
+		ieResRef KeyResRef;
+		ieStrRef OpenFail;
+
 		str->Read( Name, 32 );
 		Name[32] = 0;
 		str->ReadWord( &XPos );
@@ -464,6 +481,12 @@ Map* AREImp::GetMap(const char *ResRef)
 		ieDword firstIndex, vertCount;
 		str->ReadDword( &firstIndex );
 		str->ReadDword( &vertCount );
+		//str->Read( Name, 32 );
+		str->Seek( 32, GEM_CURRENT_POS);
+		str->ReadResRef( KeyResRef);
+		str->Seek( 4, GEM_CURRENT_POS);
+		str->ReadDword( &OpenFail );
+
 		str->Seek( VerticesOffset + ( firstIndex * 4 ), GEM_STREAM_START );
 		Point* points = ( Point* ) malloc( vertCount*sizeof( Point ) );
 		for (unsigned int x = 0; x < vertCount; x++) {
@@ -498,6 +521,8 @@ Map* AREImp::GetMap(const char *ResRef)
 			c->Scripts[0]->MySelf = c;
 		} else
 			c->Scripts[0] = NULL;
+		strnuprcpy(c->KeyResRef, KeyResRef, 8);
+		c->OpenFail = OpenFail;
 	}
 
 	printf( "Loading regions\n" );
@@ -585,6 +610,13 @@ Map* AREImp::GetMap(const char *ResRef)
 		} else
 			ip->Scripts[0] = NULL;
 	}
+
+	printf( "Loading spawnpoints\n" );
+	//Loading SpawnPoints
+	for (i = 0; i < SpawnCount; i++) {
+		str->Seek( SpawnOffset + ( i * 0xC4 ), GEM_STREAM_START );
+	}
+
 	printf( "Loading actors\n" );
 	//Loading Actors
 	str->Seek( ActorOffset, GEM_STREAM_START );
@@ -709,6 +741,7 @@ Map* AREImp::GetMap(const char *ResRef)
 				printf("Cannot load animation: %s\n", animBam);
 				continue;
 			}
+			anim->appearance = animSchedule;
 			anim->Flags = animFlags;
 			anim->x = animX;
 			anim->y = animY;
@@ -751,8 +784,8 @@ Map* AREImp::GetMap(const char *ResRef)
 
 	printf( "Loading variables\n" );
 	//Loading Variables
-	map->vars=new Variables();
-	map->vars->SetType( GEM_VARIABLES_INT );
+	//map->vars=new Variables();
+	//map->vars->SetType( GEM_VARIABLES_INT );
 
 	str->Seek( VariablesOffset, GEM_STREAM_START );
 	for (i = 0; i < VariablesCount; i++) {
@@ -763,7 +796,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->Seek( 8, GEM_CURRENT_POS );
 		str->ReadDword( &Value );
 		str->Seek( 40, GEM_CURRENT_POS );
-		map->vars->SetAt( Name, Value );
+		map->locals->SetAt( Name, Value );
 	}
 	
 	printf( "Loading ambients\n" );
@@ -891,5 +924,540 @@ Map* AREImp::GetMap(const char *ResRef)
 
 	core->FreeInterface( tmm );
 	return map;
+}
+
+int AREImp::GetStoredFileSize(Map *map)
+{
+	int headersize = map->version+0x11c;
+	ActorOffset = headersize;
+
+	ActorCount = (ieWord) map->GetActorCount();
+	headersize += ActorCount * 0x110;
+	InfoPointsOffset = headersize;
+
+	InfoPointsCount = (ieWord) map->TMap->GetInfoPointCount();
+	headersize += InfoPointsCount * 0xc4;
+	SpawnOffset = headersize;
+
+	SpawnCount = (ieDword) map->GetSpawnCount();
+	headersize += SpawnCount * 0xc8;
+	EntrancesOffset = headersize;
+
+	EntrancesCount = (ieDword) map->GetEntranceCount();
+	headersize += EntrancesCount * 0x68;
+	ContainersOffset = headersize;
+
+	//this one removes empty heaps and counts items, should be before
+	//getting ContainersCount
+	ItemsCount = (ieDword) map->ConsolidateContainers();
+	ContainersCount = (ieDword) map->TMap->GetContainerCount();
+	headersize += ContainersCount * 0xc0;
+	ItemsOffset = headersize;
+	headersize += ItemsCount * 0x14;
+	AmbiOffset = headersize;
+
+	AmbiCount = (ieDword) map->GetAmbientCount();
+	headersize += AmbiCount * 0xd8;
+	VariablesOffset = headersize;
+
+	VariablesCount = (ieDword) map->locals->GetCount();
+	headersize += VariablesCount * 0x52;
+	DoorsOffset = headersize;
+
+	DoorsCount = (ieDword) map->TMap->GetDoorCount();
+	headersize += DoorsCount * 0xc8;
+  SongHeader = headersize;
+
+	headersize += 0x90;
+	RestHeader = headersize;
+
+	headersize += 0xe4;
+	ExploredBitmapOffset = headersize;
+
+	ExploredBitmapSize = map->GetExploredMapSize();
+	headersize += ExploredBitmapSize;
+	AnimOffset = headersize;
+
+	AnimCount = (ieDword) map->GetAnimationCount();
+	headersize += AnimCount * 0x4c;
+	NoteOffset = headersize;
+
+	NoteCount = (ieDword) map->GetMapNoteCount();
+	headersize += NoteCount * 0xc0;
+
+	return headersize;
+}
+
+int AREImp::PutHeader(DataStream *stream, Map *map)
+{
+	char Signature[8];
+	ieDword tmpdword = 0;
+	ieWord tmpword = 0;
+	int pst = core->HasFeature( GF_AUTOMAP_INI );
+
+	memcpy( Signature, "ARE V1.0", 8);
+	if (map->version==16) {
+		Signature[5]='9';
+		Signature[7]='1';
+	}
+	stream->Write( Signature, 8);
+	stream->WriteResRef( map->WEDResRef);
+	stream->WriteDword( &core->GetGame()->GameTime ); //lastsaved
+	stream->WriteDword( &map->AreaFlags);
+	
+	memset(Signature, 0, sizeof(Signature)); //8 bytes 0
+	stream->Write( Signature, 8); //northref
+	stream->WriteDword( &tmpdword);
+	stream->Write( Signature, 8); //westref
+	stream->WriteDword( &tmpdword);
+	stream->Write( Signature, 8); //southref
+	stream->WriteDword( &tmpdword);
+	stream->Write( Signature, 8); //eastref
+	stream->WriteDword( &tmpdword);
+
+	stream->WriteWord( &map->AreaType);
+	stream->WriteWord( &map->Rain);
+	stream->WriteWord( &map->Snow);
+	stream->WriteWord( &map->Fog);
+	stream->WriteWord( &map->Lightning);
+	stream->WriteWord( &tmpword);
+
+	if (map->version==16) { //writing 16 bytes of 0's
+		stream->Write( Signature, 8);
+		stream->Write( Signature, 8);
+	}
+
+	stream->WriteDword( &ActorOffset);
+	stream->WriteWord( &ActorCount);
+	stream->WriteWord( &InfoPointsCount );
+	stream->WriteDword( &InfoPointsOffset );
+	stream->WriteDword( &SpawnOffset );
+	stream->WriteDword( &SpawnCount );
+	stream->WriteDword( &EntrancesOffset );
+	stream->WriteDword( &EntrancesCount );
+	stream->WriteDword( &ContainersOffset );
+	stream->WriteWord( &ContainersCount );
+	stream->WriteWord( &ItemsCount );
+	stream->WriteDword( &ItemsOffset );
+	stream->WriteDword( &VerticesOffset );
+	stream->WriteWord( &VerticesCount );
+	stream->WriteWord( &AmbiCount );
+	stream->WriteDword( &AmbiOffset );
+	stream->WriteDword( &VariablesOffset );
+	stream->WriteDword( &VariablesCount );
+	stream->WriteDword( &tmpdword);
+	stream->WriteResRef( map->Scripts[0]->GetName());
+	stream->WriteDword( &ExploredBitmapSize);
+	stream->WriteDword( &ExploredBitmapOffset);
+	stream->WriteDword( &DoorsCount );
+	stream->WriteDword( &DoorsOffset );
+	stream->WriteDword( &AnimCount );
+	stream->WriteDword( &AnimOffset );
+	//tiled object offset/count
+	stream->WriteDword( &tmpdword);
+	stream->WriteDword( &tmpdword);
+	stream->WriteDword( &SongHeader);
+	stream->WriteDword( &RestHeader);
+	//an empty dword for pst
+	if (pst) {
+		stream->WriteDword( &tmpdword);
+	}
+	stream->WriteDword( &NoteOffset );
+	stream->WriteDword( &NoteCount );
+	return 0;
+}
+
+int AREImp::PutDoors( DataStream *stream, Map *map)
+{
+	ieDword FirstVertex = 0;
+	ieDword tmpdword = 0;
+	ieWord tmpword = 0;
+
+	for (unsigned int i=0;i<DoorsCount;i++) {
+		Door *d = map->TMap->GetDoor(i);
+
+		stream->Write( d->GetScriptName(), 32);
+		stream->WriteResRef( d->ID);
+		stream->WriteDword( &tmpdword);
+		stream->WriteDword( &d->Flags);
+		stream->WriteDword( &FirstVertex);
+		tmpword = (ieWord) d->open->count;
+		stream->WriteWord( &tmpword);
+		FirstVertex+=tmpword;
+		tmpword = (ieWord) d->closed->count;
+		stream->WriteWord( &tmpword);
+		stream->WriteDword( &FirstVertex);
+		FirstVertex+=tmpword;
+		//open bounding box
+		tmpword = (ieWord) d->open->BBox.x;
+		stream->WriteWord( &tmpword);
+		tmpword = (ieWord) d->open->BBox.y;
+		stream->WriteWord( &tmpword);
+		tmpword = (ieWord) d->open->BBox.w;
+		stream->WriteWord( &tmpword);
+		tmpword = (ieWord) d->open->BBox.h;
+		stream->WriteWord( &tmpword);
+		//closed bounding box
+		tmpword = (ieWord) d->closed->BBox.x;
+		stream->WriteWord( &tmpword);
+		tmpword = (ieWord) d->closed->BBox.y;
+		stream->WriteWord( &tmpword);
+		tmpword = (ieWord) d->closed->BBox.w;
+		stream->WriteWord( &tmpword);
+		tmpword = (ieWord) d->closed->BBox.h;
+		stream->WriteWord( &tmpword);
+		//open and closed impeded blocks
+		stream->WriteDword( &FirstVertex);
+		tmpword = (ieWord) d->oibcount;
+		FirstVertex +=tmpword;
+		tmpword = (ieWord) d->cibcount;
+		stream->WriteDword( &FirstVertex);
+		FirstVertex +=tmpword;
+		//unknown54
+		stream->WriteDword( &tmpdword);
+		stream->WriteResRef( d->OpenSound);
+		stream->WriteResRef( d->CloseSound);
+		stream->WriteDword( &d->Cursor);
+		stream->WriteWord( &d->TrapDetectionDiff);
+		stream->WriteWord( &d->TrapRemovalDiff);
+		stream->WriteDword( &d->TrapFlags);
+		tmpword = (ieWord) d->TrapLaunch.x;
+		stream->WriteWord( &tmpword);
+		tmpword = (ieWord) d->TrapLaunch.y;
+		stream->WriteWord( &tmpword);
+		stream->WriteResRef( d->KeyResRef);
+		stream->WriteResRef( d->Scripts[0]->GetName() );
+		//unknown field 0-100
+		//stream->WriteDword( &d->Locked);
+		stream->WriteDword( &tmpdword);
+		//lock difficulty field
+		stream->WriteDword( &d->LockDifficulty);
+		//opening locations
+		tmpword = (ieWord) d->toOpen[0].x;
+		stream->WriteWord( &tmpword);
+		tmpword = (ieWord) d->toOpen[0].y;
+		stream->WriteWord( &tmpword);
+		tmpword = (ieWord) d->toOpen[1].x;
+		stream->WriteWord( &tmpword);
+		tmpword = (ieWord) d->toOpen[1].y;
+		stream->WriteWord( &tmpword);
+		stream->WriteDword( &d->OpenStrRef);
+		stream->Write( d->LinkedInfo, 24);
+		stream->WriteDword( &d->NameStrRef);
+		
+	}
+	return 0;
+}
+
+int AREImp::PutContainers( DataStream *stream, Map *map)
+{
+	ieDword ItemIndex = 0;
+	ieDword VertIndex = 0;
+	ieDword tmpdword;
+	ieWord tmpword;
+
+	for (unsigned int i=0;i<ContainersCount;i++) {
+		Container *c = map->TMap->GetContainer(i);
+
+		//this is the editor name
+		stream->Write( c->GetScriptName(), 32);
+		tmpword = (ieWord) c->Pos.x;
+		stream->WriteWord( &tmpword);
+		tmpword = (ieWord) c->Pos.y;
+		stream->WriteWord( &tmpword);
+		stream->WriteWord( &c->LockDifficulty);
+		stream->WriteDword( &c->Flags);
+		stream->WriteWord( &c->TrapDetectionDiff);
+		stream->WriteWord( &c->TrapRemovalDiff);
+		stream->WriteWord( &c->Trapped);
+		stream->WriteWord( &c->TrapDetected);
+		tmpword = (ieWord) c->TrapLaunch.x;
+		stream->WriteWord( &tmpword);
+		tmpword = (ieWord) c->TrapLaunch.y;
+		stream->WriteWord( &tmpword);
+		//outline bounding box
+		tmpword = (ieWord) c->outline->BBox.x;
+		stream->WriteWord( &tmpword);
+		tmpword = (ieWord) c->outline->BBox.y;
+		stream->WriteWord( &tmpword);
+		tmpword = (ieWord) (c->outline->BBox.x + c->outline->BBox.w);
+		stream->WriteWord( &tmpword);
+		tmpword = (ieWord) (c->outline->BBox.h + c->outline->BBox.h);
+		stream->WriteWord( &tmpword);
+		//item index and offset
+		tmpdword = c->inventory.GetSlotCount();
+		stream->WriteDword( &ItemIndex);
+		stream->WriteDword( &tmpdword);
+		ItemIndex +=tmpdword;
+		stream->WriteResRef( c->Scripts[0]->GetName());
+		//outline polygon index and count
+		tmpdword = c->outline->count;
+		stream->WriteDword( &VertIndex);
+		stream->WriteDword( &tmpdword);
+		VertIndex +=tmpdword;
+		//this is the real scripting name
+		stream->Write( c->GetScriptName(), 32);
+		stream->WriteResRef( c->KeyResRef);
+		stream->WriteDword( &tmpdword);
+		stream->WriteDword( &c->OpenFail);
+	}
+	return 0;
+}
+
+int AREImp::PutRegions( DataStream *stream, Map *map)
+{
+	ieWord tmpword;
+
+	for (unsigned int i=0;i<InfoPointsCount;i++) {
+		InfoPoint *ip = map->TMap->GetInfoPoint(i);
+
+		stream->Write( ip->GetScriptName(), 32);
+		tmpword = (ieWord) ip->Type;
+		stream->WriteWord( &tmpword);
+		//outline bounding box
+		tmpword = (ieWord) ip->outline->BBox.x;
+		stream->WriteWord( &tmpword);
+		tmpword = (ieWord) ip->outline->BBox.y;
+		stream->WriteWord( &tmpword);
+		tmpword = (ieWord) (ip->outline->BBox.x + ip->outline->BBox.w);
+		stream->WriteWord( &tmpword);
+		tmpword = (ieWord) (ip->outline->BBox.h + ip->outline->BBox.h);
+		stream->WriteWord( &tmpword);
+	}
+	return 0;
+}
+
+int AREImp::PutSpawns( DataStream *stream, Map *map)
+{
+	ieWord tmpword;
+
+	for (unsigned int i=0;i<SpawnCount;i++) {
+		Spawn *sp = map->GetSpawn(i);
+
+		stream->Write( sp->Name, 32);
+		tmpword = (ieWord) sp->Pos.x;
+		stream->WriteWord( &tmpword);
+		tmpword = (ieWord) sp->Pos.y;
+		stream->WriteWord( &tmpword);
+	}
+	return 0;
+}
+
+int AREImp::PutActors( DataStream *stream, Map *map)
+{
+	ieWord tmpword;
+
+	for (unsigned int i=0;i<ActorCount;i++) {
+		Actor *ac = map->GetActor(i);
+
+		stream->Write( ac->GetScriptName(), 32);
+		tmpword = (ieWord) ac->Pos.x;
+		stream->WriteWord( &tmpword);
+		tmpword = (ieWord) ac->Pos.y;
+		stream->WriteWord( &tmpword);
+	}
+	return 0;
+}
+
+int AREImp::PutAnimations( DataStream *stream, Map *map)
+{
+	ieDword tmpdword;
+	ieWord tmpword;
+
+	for (unsigned int i=0;i<ActorCount;i++) {
+		Animation *an = map->GetAnimation(i);
+
+		stream->Write( an->ScriptName, 32);
+		tmpword = (ieWord) an->x;
+		stream->WriteWord( &tmpword);
+		tmpword = (ieWord) an->y;
+		stream->WriteWord( &tmpword);
+		stream->WriteDword( &an->appearance);
+		//stream->WriteResRef( an->BAM);
+		//stream->WriteDword( &an->Cycle);
+		//stream->WriteDword( &an->Frame);
+		stream->WriteDword( &an->Flags);
+		stream->WriteDword( &tmpdword);
+		stream->WriteDword( &tmpdword);
+		//stream->WriteResRef( an->Palette);
+		stream->WriteDword( &tmpdword);
+	}
+	return 0;
+}
+
+int AREImp::PutEntrances( DataStream *stream, Map *map)
+{
+	ieWord tmpword;
+	char filling[62];
+
+	memset(filling,0,sizeof(filling) );
+	for (unsigned int i=0;i<EntrancesCount;i++) {
+		Entrance *e = map->GetEntrance(i);
+
+		stream->Write( e->Name, 32);
+		tmpword = (ieWord) e->Pos.x;
+		stream->WriteWord( &tmpword);
+		tmpword = (ieWord) e->Pos.y;
+		stream->WriteWord( &tmpword);
+		stream->WriteDword( &e->Face);
+		//a large empty piece of crap
+		stream->Write( filling, 62);
+	}
+	return 0;
+}
+
+int AREImp::PutVariables( DataStream *stream, Map *map)
+{
+	char filling[40];
+	POSITION pos=NULL;
+	const char *name;
+	ieDword value;
+
+	memset(filling,0,sizeof(filling) );
+	for (unsigned int i=0;i<VariablesCount;i++) {
+		map->locals->GetNextAssoc( pos, name, value);
+		stream->Write( name, 32);
+		stream->Write( filling, 8);
+		stream->WriteDword( &value);
+		//40 bytes of empty crap
+		stream->Write( filling, 40);
+	}
+	return 0;
+}
+
+int AREImp::PutAmbients( DataStream *stream, Map *map)
+{
+	char filling[8];
+	ieWord tmpWord;
+
+	memset(filling,0,sizeof(filling) );
+	for (unsigned int i=0;i<AmbiCount;i++) {
+		Ambient *am = map->GetAmbient(i);
+		stream->Write( am->name, 32 );
+		tmpWord = (ieWord) am->origin.x;
+		stream->WriteWord( &tmpWord );
+		tmpWord = (ieWord) am->origin.y;
+		stream->WriteWord( &tmpWord );
+		stream->ReadWord( &am->radius );
+		stream->ReadWord( &am->height );
+		stream->Write( filling, 6 );
+		stream->WriteWord( &am->gain );
+		tmpWord = am->sounds.size();
+		int j;
+		for (j = 0;j < tmpWord; j++) {
+			stream->WriteResRef( am->sounds[j] );
+		}
+		while( j++<MAX_RESCOUNT) {
+			stream->Write( filling, 8);
+		}
+		stream->WriteWord( &tmpWord );
+		stream->Write( filling, 2 );
+		stream->WriteDword( &am->interval );
+		stream->WriteDword( &am->perset );
+		stream->WriteDword( &am->appearance );
+		stream->WriteDword( &am->flags );
+	}
+	return 0;
+}
+
+int AREImp::PutMapnotes( DataStream *stream, Map *map)
+{
+	ieDword tmpDword;
+	ieWord tmpWord;
+
+	//different format
+	int pst = core->HasFeature( GF_AUTOMAP_INI );
+
+	for (unsigned int i=0;i<NoteCount;i++) {
+		MapNote *mn = map->GetMapNote(i);
+
+		if (pst) {
+			tmpDword = (ieWord) mn->Pos.x;
+			stream->WriteDword( &tmpDword );
+			tmpDword = (ieDword) mn->Pos.y;
+			stream->WriteDword( &tmpDword );
+		} else {
+			tmpWord = (ieWord) mn->Pos.x;
+			stream->WriteWord( &tmpWord );
+			tmpWord = (ieWord) mn->Pos.y;
+			stream->WriteWord( &tmpWord );
+		}
+	}
+	return 0;
+}
+
+int AREImp::PutExplored( DataStream *stream, Map *map)
+{
+	stream->Write( map->ExploredBitmap, ExploredBitmapSize);
+	return 0;
+}
+
+int AREImp::PutTiles( DataStream * /*stream*/, Map * /*map*/)
+{
+	return 0;
+}
+
+/* no saving of tiled objects, are they used anywhere? */
+int AREImp::PutArea(DataStream *stream, Map *map)
+{
+	int ret;
+
+	if (!stream || !map) {
+		return -1;
+	}
+
+	ret = PutHeader( stream, map);
+	if (ret) {
+		return ret;
+	}
+
+	ret = PutDoors( stream, map);
+	if (ret) {
+		return ret;
+	}
+
+	ret = PutContainers( stream, map);
+	if (ret) {
+		return ret;
+	}
+
+	ret = PutRegions( stream, map);
+	if (ret) {
+		return ret;
+	}
+
+	ret = PutActors( stream, map);
+	if (ret) {
+		return ret;
+	}
+
+	ret = PutAnimations( stream, map);
+	if (ret) {
+		return ret;
+	}
+
+	ret = PutEntrances( stream, map);
+	if (ret) {
+		return ret;
+	}
+
+	ret = PutVariables( stream, map);
+	if (ret) {
+		return ret;
+	}
+
+	ret = PutAmbients( stream, map);
+	if (ret) {
+		return ret;
+	}
+
+	ret = PutMapnotes( stream, map);
+	if (ret) {
+		return ret;
+	}
+
+	ret = PutExplored( stream, map);
+
+	return ret;
 }
 

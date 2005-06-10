@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.44 2005/05/25 18:55:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.45 2005/06/10 21:12:38 avenger_teambg Exp $
  *
  */
 
@@ -362,43 +362,45 @@ Container* TileMap::GetContainer(Point &position, int type)
 	for (size_t i = 0; i < containers.size(); i++) {
 		Container* c = containers[i];
 		if (type!=-1) {
-			if (c->Type!=type)
+			if (c->Type!=type) {
 				continue;
-	  }
-	  if (c->outline->BBox.x > position.x)
-	    continue;
-	  if (c->outline->BBox.y > position.y)
-	    continue;
-	  if (c->outline->BBox.x + c->outline->BBox.w < position.x)
-	    continue;
-	  if (c->outline->BBox.y + c->outline->BBox.h < position.y)
-	    continue;
+			}
+		}
+		if (c->outline->BBox.x > position.x)
+			continue;
+		if (c->outline->BBox.y > position.y)
+			continue;
+		if (c->outline->BBox.x + c->outline->BBox.w < position.x)
+			continue;
+		if (c->outline->BBox.y + c->outline->BBox.h < position.y)
+			continue;
 	
-	  //IE piles don't have polygons, the bounding box is enough for them
-	  if (c->Type==IE_CONTAINER_PILE)
-	    return c;
+		//IE piles don't have polygons, the bounding box is enough for them
+		if (c->Type==IE_CONTAINER_PILE)
+			return c;
 		if (c->outline->PointIn( position ))
 			return c;
 	}
 	return NULL;
 }
 
-void TileMap::CleanupContainer(Container *container)
+int TileMap::CleanupContainer(Container *container)
 {
 	if (container->Type!=IE_CONTAINER_PILE)
-		return;
+		return 0;
 	if (container->inventory.GetSlotCount())
-		return;
+		return 0;
 	
 	for (size_t i = 0; i < containers.size(); i++) {
 		if (containers[i]==container) {
 			containers.erase(containers.begin()+i);
 			delete container;
-			return;
+			return 1;
 		}
 	}
 	printMessage("TileMap", " ", LIGHT_RED);
 	printf("Invalid container cleanup: %s\n", container->GetScriptName());
+	return 1;
 }
 
 Container *TileMap::GetPile(Point &position)

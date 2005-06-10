@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.230 2005/05/29 22:16:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.231 2005/06/10 21:12:37 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -226,7 +226,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		area->UpdateScripts();
 	if (ScreenFlags & SF_DISABLEMOUSE)
 		return;
-	Point p = {lastMouseX, lastMouseY};
+	Point p(lastMouseX, lastMouseY);
 	video->ConvertToGame( p.x, p.y );
 
 	// Draw selection rect
@@ -322,7 +322,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	if (drawPath) {
 		PathNode* node = drawPath;
 		while (true) {
-			Point p = { ( node-> x*16) + 8, ( node->y*12 ) + 6 };
+			Point p( ( node-> x*16) + 8, ( node->y*12 ) + 6 );
 			if (!node->Parent) {
 				video->DrawCircle( p.x, p.y, 2, red );
 			} else {
@@ -465,7 +465,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			case 'p':
 				//path
 				 {
-					Point p = {lastMouseX, lastMouseY};
+					Point p(lastMouseX, lastMouseY);
 					core->GetVideoDriver()->ConvertToGame( p.x, p.y );
 					if (drawPath) {
 						PathNode* nextNode = drawPath->Next;
@@ -503,10 +503,10 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				// jump
 				for (i = 0; i < game->selected.size(); i++) {
 					Actor* actor = game->selected[i];
-					Point c = {lastMouseX, lastMouseY};
-					core->GetVideoDriver()->ConvertToGame( c.x, c.y );
-					GameScript::MoveBetweenAreasCore(actor, core->GetGame()->CurrentArea, c, -1, true);
-					printf( "Teleported to %d, %d\n", c.x, c.y );
+					Point p(lastMouseX, lastMouseY);
+					core->GetVideoDriver()->ConvertToGame( p.x, p.y );
+					GameScript::MoveBetweenAreasCore(actor, core->GetGame()->CurrentArea, p, -1, true);
+					printf( "Teleported to %d, %d\n", p.x, p.y );
 				}
 				break;
 
@@ -534,7 +534,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				// explore map from point
 				 {
 					Map* area = game->GetCurrentArea( );
-					Point p = {lastMouseX, lastMouseY};
+					Point p(lastMouseX, lastMouseY);
 					core->GetVideoDriver()->ConvertToGame( p.x, p.y );
 					area->ExploreMapChunk( p, rand()%30, true );
 				}
@@ -551,7 +551,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				break;
 			case 'r':
 				if (!lastActor) {
-					Point p={lastMouseX,lastMouseY};
+					Point p(lastMouseX,lastMouseY);
 					Map* area = game->GetCurrentArea( );
 					lastActor = area->GetActor( p, GA_DEFAULT);
 				}
@@ -625,7 +625,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 
 	lastMouseX = x;
 	lastMouseY = y;
-	Point p = { x,y };
+	Point p( x,y );
 	core->GetVideoDriver()->ConvertToGame( p.x, p.y );
 	if (MouseIsDown && ( !DrawSelectionRect )) {
 		if (( abs( p.x - StartX ) > 5 ) || ( abs( p.y - StartY ) > 5 )) {
@@ -831,7 +831,7 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y,
 	if ((ScreenFlags&SF_DISABLEMOUSE) || (Button != GEM_MB_ACTION) ) {
 		return;
 	}
-	Point p = {x,y};
+	Point p(x,y);
 	core->GetVideoDriver()->ConvertToGame( p.x, p.y );
 	MouseIsDown = true;
 	SelectionRect.x = p.x;
@@ -864,7 +864,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 	}
 
 	MouseIsDown = false;
-	Point p = {x,y};
+	Point p(x,y);
 	core->GetVideoDriver()->ConvertToGame( p.x, p.y );
 	Game* game = core->GetGame();
 	Map* area = game->GetCurrentArea( );

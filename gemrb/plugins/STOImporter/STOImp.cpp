@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.14 2005/06/08 20:37:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.15 2005/06/10 21:12:39 avenger_teambg Exp $
  *
  */
 
@@ -353,7 +353,7 @@ int STOImp::PutStore(DataStream *stream, Store *store)
 		return -1;
 	}
 
-	ret = PutHeader (stream, store);
+	ret = PutHeader( stream, store);
 	if (ret) {
 		return ret;
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.74 2005/06/08 20:37:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.75 2005/06/10 21:12:38 avenger_teambg Exp $
  *
  */
 
@@ -106,6 +106,28 @@ public:
 	~MapNote() { if(text) free(text); };
 } MapNote;
 
+typedef class Spawn {
+public:
+	char Name[33];
+	Point Pos;
+	ieResRef *Creatures;
+	unsigned int Count;
+	Spawn(const char *name, ieResRef *creatures, unsigned int count)
+	{
+		strnuprcpy(Name, name, 32);
+		if (count>10) {
+			count=10;
+		}
+		Count = count;
+		Creatures = (ieResRef *) calloc( count, sizeof(ieResRef) );
+		for( unsigned int i=0;i<count;i++) {
+			strnuprcpy(Creatures[i],creatures[i],8);
+		}
+	}
+	~Spawn() { free(Creatures); } //only constructor always allocates it
+	unsigned int GetCreatureCount() { return Count; }
+} Spawn;
+
 class GEM_EXPORT Map : public Scriptable {
 public:
 	TileMap* TMap;
@@ -114,11 +136,13 @@ public:
 	ImageMgr* SmallMap;
 	ieDword AreaFlags;
 	ieWord AreaType;
+	ieWord Rain, Snow, Fog, Lightning;
 	bool ChangeArea; //set true if movement is allowed between areas
-	Variables *vars;
+	//Variables *vars;
 	ieByte* ExploredBitmap;
 	ieByte* VisibleBitmap;
 	int version;
+	ieResRef WEDResRef;
 private:
 	unsigned short* MapSet;
 	std::queue< unsigned int> InternalStack;
@@ -130,6 +154,7 @@ private:
 	std::vector< Entrance*> entrances;
 	std::vector< Ambient*> ambients;
 	std::vector< MapNote*> mapnotes;
+	std::vector< Spawn*> spawns;
 	Actor** queue[3];
 	int Qcount[3];
 	unsigned int lastActorCount[3];
@@ -143,30 +168,42 @@ public:
 	void AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm);
 	void CreateMovement(char *command, const char *area, const char *entrance);
 	void UpdateScripts();
+	/* removes empty heaps and returns total itemcount */
+	int ConsolidateContainers();
+	/* transfers all piles (loose items) to another map */
+	void CopyGroundPiles(Map *othermap, Point &Pos);
 	void DrawContainers(Region screen, Container *overContainer);
 	void DrawMap(Region screen, GameControl* gc);
 	void PlayAreaSong(int);
 	void AddAnimation(Animation* anim);
 	Animation* GetAnimation(const char* Name);
+	Animation* GetAnimation(int i) { return animations[i]; }
+	int GetAnimationCount() const { return (int) animations.size(); }
+
 	void Shout(Scriptable* Sender, int shoutID, unsigned int radius);
 	void AddActor(Actor* actor);
 	void AddWallGroup(WallGroup* wg);
 	int GetBlocked(Point &p);
 	Actor* GetActor(Point &p, int flags);
 	Actor* GetActor(const char* Name);
+	Actor* GetActor(int i) { return actors[i]; }
 	Actor* GetActorByDialog(const char* resref);
 	bool HasActor(Actor *actor);
 	void RemoveActor(Actor* actor);
 	//returns actors in rect (onlyparty could be more sophisticated)
 	int GetActorInRect(Actor**& actors, Region& rgn, bool onlyparty);
+	int GetActorCount() const { return (int) actors.size(); }
+
 	SongHeaderType SongHeader;
 	RestHeaderType RestHeader;
 	void AddVVCCell(ScriptedAnimation* vvc);
+	bool CanFree();
+
 	void AddEntrance(char* Name, int XPos, int YPos, short Face);
 	Entrance* GetEntrance(const char* Name);
-	bool CanFree();
-	Actor* GetActor(int i) { return actors[i]; }
-	int GetActorCount() const { return (int) actors.size(); }
+	Entrance* GetEntrance(int i) { return entrances[i]; }
+	int GetEntranceCount() const { return (int) entrances.size(); }
+
 	int GetWidth() const { return Width; }
 	int GetHeight() const { return Height; }
 	int GetExploredMapSize() const;
@@ -204,6 +241,8 @@ public:
 	//ambients
 	void AddAmbient(Ambient *ambient) { ambients.push_back(ambient); }
 	void SetupAmbients();
+	Ambient *GetAmbient(int i) { return ambients[i]; }
+	unsigned int GetAmbientCount() { return (unsigned int) ambients.size(); }
 
 	//mapnotes
 	void AddMapNote(Point point, int color, char *text);
@@ -211,11 +250,20 @@ public:
 	MapNote *GetMapNote(int i) { return mapnotes[i]; }
 	MapNote *GetMapNote(Point point);
 	unsigned int GetMapNoteCount() { return (unsigned int) mapnotes.size(); }
-
+	//restheader
 	/* May spawn creature(s), returns true in case of an interrupted rest */
 	bool Rest(Point pos, int hours);
 	/* Spawns creature(s) in radius of position */
 	void SpawnCreature(Point pos, char *CreName, int radius = 0);
+
+	//spawns
+	Spawn *GetSpawn(int i) { return spawns[i]; }
+	//returns spawn by name
+	Spawn *GetSpawn(const char *Name);
+	//returns spawn inside circle, checks for schedule and other
+	//conditions as well
+	Spawn *GetSpawnRadius(Point &point, unsigned int radius);
+	unsigned int GetSpawnCount() { return (unsigned int) spawns.size(); }
 private:
 	void GenerateQueues();
 	Actor* GetRoot(int priority, int &index);

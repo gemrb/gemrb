@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.h,v 1.21 2005/02/10 22:41:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.h,v 1.22 2005/06/10 21:12:38 avenger_teambg Exp $
  *
  */
 
@@ -100,24 +100,24 @@ public:
 	void RemoveAll();
 	void InitHashTable(unsigned int hashSize, bool bAllocNow = true);
 
+	POSITION GetNextAssoc(POSITION rNextPosition, const char*& rKey,
+		ieDword& rValue) const;
 	// Implementation
 protected:
-  Variables::MyAssoc** m_pHashTable;
+	Variables::MyAssoc** m_pHashTable;
 	unsigned int m_nHashTableSize;
 	bool m_lParseKey;
 	int m_nCount;
-  Variables::MyAssoc* m_pFreeList;
+	Variables::MyAssoc* m_pFreeList;
 	MemBlock* m_pBlocks;
 	int m_nBlockSize;
 	int m_type; //could be string or ieDword 
 
-  Variables::MyAssoc* NewAssoc(const char* key);
-  void FreeAssoc(Variables::MyAssoc*);
-  Variables::MyAssoc* GetAssocAt(const char*, unsigned int&) const;
+	Variables::MyAssoc* NewAssoc(const char* key);
+	void FreeAssoc(Variables::MyAssoc*);
+	Variables::MyAssoc* GetAssocAt(const char*, unsigned int&) const;
 	inline bool MyCopyKey(char*& dest, const char* key) const;
 	inline unsigned int MyHashKey(const char*) const;
-	POSITION GetNextAssoc(POSITION rNextPosition, const char*& rKey,
-		ieDword& rValue) const;
 
 public:
 	~Variables();

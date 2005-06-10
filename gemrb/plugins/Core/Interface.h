@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.157 2005/06/05 10:54:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.158 2005/06/10 21:12:38 avenger_teambg Exp $
  *
  */
 
@@ -426,6 +426,10 @@ public:
 	/** returns 0 for unmovable, -1 for movable items, otherwise it
 	    returns gold value! */
 	int CanMoveItem(CREItem *item);
+	/** dumps an area object to the cache */
+	int SwapoutArea(Map *map);
+	/** saves the game to the destination folder  */
+	int CreateSaveGame(const char *folder);
 private:
 	bool LoadConfig(void);
 	bool LoadConfig(const char *filename);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.104 2005/06/06 22:21:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.105 2005/06/10 21:12:37 avenger_teambg Exp $
  *
  */
 
@@ -532,7 +532,7 @@ void Actor::DebugDump()
 		}
 	}
 	ieDword tmp=0;
-	core->GetGame()->globals->Lookup("APPEARANCE",tmp);
+	core->GetGame()->locals->Lookup("APPEARANCE",tmp);
 	printf( "\nDisguise: %d\n", tmp);
 	inventory.dump();
 	spellbook.dump();

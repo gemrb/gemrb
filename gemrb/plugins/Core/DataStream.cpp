@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.cpp,v 1.17 2005/04/30 22:48:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.cpp,v 1.18 2005/06/10 21:12:37 avenger_teambg Exp $
  *
  */
 
@@ -148,7 +148,7 @@ int DataStream::ReadResRef(ieResRef dest)
 	return len;
 }
 
-int DataStream::WriteResRef(ieResRef src)
+int DataStream::WriteResRef(const ieResRef src)
 {
 	return Write( src, 8);
 }

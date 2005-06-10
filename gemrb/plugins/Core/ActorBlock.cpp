@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.93 2005/06/01 20:45:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.94 2005/06/10 21:12:37 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -472,7 +472,7 @@ void Moveble::AddWayPoint(Point &Des)
 	while(endNode->Next) {
 		endNode=endNode->Next;
 	}
-	Point p = {endNode->x, endNode->y};
+	Point p(endNode->x, endNode->y);
 	PathNode *path2 = area->FindPath( p, Des );
 	endNode->Next=path2;
 }

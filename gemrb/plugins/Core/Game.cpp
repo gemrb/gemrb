@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.74 2005/06/02 19:35:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.75 2005/06/10 21:12:37 avenger_teambg Exp $
  *
  */
 
@@ -39,7 +39,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	ControlStatus = 0;
 	CombatCounter = 0; //stored here until we know better
 	WeatherBits = 0;
-	globals = NULL;
+	//globals = NULL;
 	kaputz = NULL;
 	beasts = NULL;
 	int mtab = core->LoadTable("mastarea");
@@ -72,9 +72,11 @@ Game::~Game(void)
 	for (i = 0; i < mastarea.size(); i++) {
 		free ( mastarea[i] );
 	}
+	/* globals are the game's locals
 	if (globals) {
 		delete globals;
 	}
+	*/
 	if (kaputz) {
 		delete kaputz;
 	}
@@ -370,18 +372,6 @@ int Game::FindMap(const char *ResRef)
 	return -1;
 }
 
-/*  TODO, create save game
-int Game::WriteGame()
-{
-//write .gam structure
-	int index=Maps.size();
-	while (index--) {
-		Map *map = Maps[index];
-	//write map
-	}
-}
-*/
-
 Map* Game::GetMap(unsigned int index) const
 {
 	if (index >= Maps.size()) {
@@ -464,6 +454,7 @@ int Game::DelMap(unsigned int index, bool forced)
 	}
 	if (forced || ((Maps.size()>MAX_MAPS_LOADED) && map->CanFree() ) )
 	{
+		core->SwapoutArea(Maps[index]);
 		delete( Maps[index] );
 		Maps.erase( Maps.begin()+index);
 		//current map will be decreased
@@ -569,7 +560,7 @@ void Game::AddJournalEntry(ieStrRef strref, int Section, int Group)
 	GAMJournalEntry *je = new GAMJournalEntry;
 	je->GameTime = GameTime;
 	ieDword chapter = 0;
-	globals->Lookup("CHAPTER", chapter);
+	locals->Lookup("CHAPTER", chapter);
 	je->Chapter = (ieByte) chapter;
 	je->Section = Section;
 	je->Group = Group;
@@ -681,8 +672,8 @@ void Game::IncrementChapter()
 		PCs[i]->PCStats->IncrementChapter();
 	}
 	ieDword chapter = 0;
-	globals->Lookup("CHAPTER",chapter);
-	globals->SetAt("CHAPTER",chapter+1);
+	locals->Lookup("CHAPTER",chapter);
+	locals->SetAt("CHAPTER",chapter+1);
 }
 
 void Game::SetReputation(int r)

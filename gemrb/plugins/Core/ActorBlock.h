@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.74 2005/06/01 20:45:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.75 2005/06/10 21:12:37 avenger_teambg Exp $
  *
  */
 
@@ -204,7 +204,7 @@ public:
 public:
 	Gem_Polygon* outline;
 	Color outlineColor;
-	unsigned long Cursor;
+	ieDword Cursor;
 	bool Highlight;
 	ieResRef DialogResRef;
 	Point TrapLaunch;
@@ -305,10 +305,13 @@ public:
 	ieResRef CloseSound;
 	ieResRef LockSound;
 	ieResRef UnLockSound;
+	ieDword LockDifficulty; //this is a dword?
 	ieWord TrapDetectionDiff;
 	ieWord TrapRemovalDiff;
 	ieDword TrapFlags;
 	ieDword OpenStrRef;
+	ieDword NameStrRef;
+	ieResRef Dialog;
 private:
 	void ToggleTiles(int State, bool playsound = false);
 	void UpdateDoor();
@@ -342,13 +345,15 @@ private:
 public:
 	Point toOpen;
 	unsigned short Type;
-	unsigned short LockDifficulty;
 	unsigned int Flags;
-	unsigned short TrapDetectionDiff;
-	unsigned short TrapRemovalDiff;
+	ieWord LockDifficulty;
+	ieWord TrapDetectionDiff;
+	ieWord TrapRemovalDiff;
 	unsigned short Trapped;
 	unsigned short TrapDetected;
 	Inventory inventory;
+	ieResRef KeyResRef;
+	ieStrRef OpenFail;
 	//these are not saved
 	Sprite2D *groundicons[3];
 };

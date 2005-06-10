@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.167 2005/06/08 20:37:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.168 2005/06/10 21:12:38 avenger_teambg Exp $
  *
  */
 
@@ -203,7 +203,7 @@ Map::Map(void)
 	: Scriptable( ST_AREA )
 {
 	area=this;
-	vars = NULL;
+	//vars = NULL;
 	TMap = NULL;
 	LightMap = NULL;
 	SearchMap = NULL;
@@ -231,11 +231,11 @@ Map::Map(void)
 Map::~Map(void)
 {
 	unsigned int i;
-
+/*
 	if (vars) {
 		delete vars;
 	}
-
+*/
 	if (MapSet) {
 		free( MapSet );
 	}
@@ -1188,8 +1188,8 @@ void Map::FixAllPositions()
 //run away from dX, dY (ie.: find the best path of limited length that brings us the farthest from dX, dY)
 PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, int flags)
 {
-	Point start = {s.x/16, s.y/12};
-	Point goal = {d.x/16, d.y/12};
+	Point start(s.x/16, s.y/12);
+	Point goal (d.x/16, d.y/12);
 	unsigned int dist;
 
 	memset( MapSet, 0, Width * Height * sizeof( unsigned short ) );
@@ -1281,8 +1281,8 @@ PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, int flags)
 
 bool Map::TargetUnreachable(Point &s, Point &d)
 {
-	Point start = { s.x/16, s.y/12 };
-	Point goal = { d.x/16, d.y/12 };
+	Point start( s.x/16, s.y/12 );
+	Point goal ( d.x/16, d.y/12 );
 	memset( MapSet, 0, Width * Height * sizeof( unsigned short ) );
 	while (InternalStack.size())
 		InternalStack.pop();
@@ -1375,8 +1375,8 @@ PathNode* Map::GetLine(Point &start, Point &dest, int Steps, int Orientation, in
 
 PathNode* Map::FindPath(Point &s, Point &d)
 {
-	Point start = { s.x/16, s.y/12 };
-	Point goal = { d.x/16, d.y/12 };
+	Point start( s.x/16, s.y/12 );
+	Point goal ( d.x/16, d.y/12 );
 	memset( MapSet, 0, Width * Height * sizeof( unsigned short ) );
 	while (InternalStack.size())
 		InternalStack.pop();
@@ -1722,4 +1722,66 @@ void Map::UpdateFog()
 		if (state&STATE_BLIND) vis2=2; //can see only themselves
 		ExploreMapChunk (actor->Pos, vis2, true);
 	}	
+}
+
+Spawn* Map::GetSpawn(const char* Name)
+{
+	for (size_t i = 0; i < spawns.size(); i++) {
+		Spawn* sp = spawns[i];
+		if (stricmp( sp->Name, Name ) == 0)
+			return sp;
+	}
+	return NULL;
+}
+
+Spawn *Map::GetSpawnRadius(Point &point, unsigned int radius)
+{
+	for (size_t i = 0; i < spawns.size(); i++) {
+		Spawn* sp = spawns[i];
+
+		if (Distance(point, sp->Pos)<radius) {
+			return sp;
+		}
+	}
+	return NULL;
+}
+
+int Map::ConsolidateContainers()
+{
+	int itemcount = 0;
+	int containercount = TMap->GetContainerCount();
+	while (containercount--) {
+		Container * c = TMap->GetContainer( containercount);
+
+		if (TMap->CleanupContainer(c) ) {
+			continue;
+		}
+		itemcount += c->inventory.GetSlotCount();
+	}
+	return itemcount;
+}
+
+//Pos could be [-1,-1] in which case it copies the ground piles to their
+//original position in the second area
+void Map::CopyGroundPiles(Map *othermap, Point &Pos)
+{
+	int containercount = TMap->GetContainerCount();
+	while (containercount--) {
+		Container * c = TMap->GetContainer( containercount);
+		if (c->Type==IE_CONTAINER_PILE) {
+			//creating (or grabbing the container in the other map at the given position
+			Container *othercontainer;
+			if (Pos.isempty()) {
+				 othercontainer = othermap->TMap->GetPile(c->Pos);
+			} else {
+				 othercontainer = othermap->TMap->GetPile(Pos);
+			}
+			//transfer the pile to the other container
+			unsigned int i=c->inventory.GetSlotCount();
+			while (i--) {
+				CREItem *item = c->RemoveItem(i);
+				othercontainer->AddItem(item);
+			}
+		}
+	}
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.319 2005/06/08 20:37:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.320 2005/06/10 21:12:38 avenger_teambg Exp $
  *
  */
 
@@ -47,6 +47,7 @@
 #include "DialogMgr.h"
 #include "MapControl.h"
 #include "EffectQueue.h"
+#include "MapMgr.h"
 
 GEM_EXPORT Interface* core;
 
@@ -3344,4 +3345,67 @@ int Interface::CanMoveItem(CREItem *item)
 		return 1;
 	//gold, returns the gold value (stack size)
 	return item->Usages[0];
+}
+
+int Interface::SwapoutArea(Map *map)
+{
+	MapMgr* mm = ( MapMgr* ) GetInterface( IE_ARE_CLASS_ID );
+	if (mm == NULL) {
+		return -1;
+	}
+	int size = mm->GetStoredFileSize (map);
+	if (size > 0) {
+	 	//created streams are always autofree (close file on destruct)
+		//this one will be destructed when we return from here
+		FileStream str;
+		str.Create( map->GetScriptName(), IE_ARE_CLASS_ID );
+		int ret = mm->PutArea (&str, map);
+		if (ret <0) {
+			printMessage("Core"," ", YELLOW);
+			printf("Area removed: %s\n", map->GetScriptName());
+			RemoveFromCache(map->GetScriptName());
+		}
+	} else {
+		printMessage("Core"," ", YELLOW);
+		printf("Area removed: %s\n", map->GetScriptName());
+		RemoveFromCache(map->GetScriptName());
+	}
+	//make sure the stream isn't connected to sm, or it will be double freed
+	FreeInterface( mm );
+	return 0;
+}
+
+int Interface::CreateSaveGame(const char *folder)
+{
+	//some of these restrictions might not be needed
+	if (CurrentStore) {
+		return -1; //can't save while store is open
+	}
+	GameControl *gc = GetGameControl();
+	if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
+		return -1; //can't save while in dialog?
+	}
+	//saving areas to cache currently in memory
+	unsigned int index = 0;
+	do {
+		Map *map = game->GetMap(index);
+		if (!map) {
+			break;
+		}
+		SwapoutArea(map);
+	} while(true);
+	
+	//create empty savegame folder
+	mkdir(folder,S_IWRITE|S_IREAD);
+	DelTree(folder, false);
+
+	//compress files in cache named: .STO and .ARE
+	//no .CRE would be saved in cache
+
+	//Create .gam file from Game() object
+
+	//Create .wmp file from WorldMap() object
+
+	//Create .bmp's (area preview and portraits)
+	return 0;
 }

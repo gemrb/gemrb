@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.51 2005/05/20 13:28:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.52 2005/06/10 21:12:39 avenger_teambg Exp $
  *
  */
 
@@ -141,8 +141,8 @@ Game* GAMImp::GetGame()
 			break;
 	}
 
-	newGame->globals = new Variables();
-	newGame->globals->SetType( GEM_VARIABLES_INT );
+	//newGame->globals = new Variables();
+	//newGame->globals->SetType( GEM_VARIABLES_INT );
 
 	if (!newGame->CurrentArea[0]) {
 		// 0 - single player, 1 - tutorial, 2 - multiplayer
@@ -181,7 +181,7 @@ Game* GAMImp::GetGame()
 		str->Seek( 8, GEM_CURRENT_POS );
 		str->ReadDword( &Value );
 		str->Seek( 40, GEM_CURRENT_POS );
-		newGame->globals->SetAt( Name, Value );
+		newGame->locals->SetAt( Name, Value );
 	}
 	if(core->HasFeature(GF_HAS_KAPUTZ) ) {
 		newGame->kaputz = new Variables();

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.283 2005/06/06 22:21:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.284 2005/06/10 21:12:37 avenger_teambg Exp $
  *
  */
 
@@ -360,6 +360,7 @@ static ActionLink actionnames[] = {
 	{"closedoor", GameScript::CloseDoor,AF_BLOCKING},
 	{"containerenable", GameScript::ContainerEnable,0},
 	{"continue", GameScript::Continue,AF_INSTANT | AF_CONTINUE},
+	{"copygroundpilesto", GameScript::CopyGroundPilesTo, 0},
 	{"createcreature", GameScript::CreateCreature,0}, //point is relative to Sender
 	{"createcreatureatfeet", GameScript::CreateCreatureAtFeet,0}, 
 	{"createcreatureatlocation", GameScript::CreateCreatureAtLocation,0},
@@ -668,6 +669,7 @@ static ActionLink actionnames[] = {
 	{"waitanimation", GameScript::WaitAnimation,AF_BLOCKING},
 	{"waitrandom", GameScript::WaitRandom, AF_BLOCKING}, { NULL,NULL,0},
 	{"weather", GameScript::Weather,0},
+	{"xequipitem", GameScript::XEquipItem,0},
 };
 
 //Make this an ordered list, so we could use bsearch!
@@ -1262,7 +1264,7 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
 	if (strnicmp(newVarName,"GLOBAL",6) ) {
 		Map *map=game->GetMap(game->FindMap(newVarName));
 		if (map) {
-			map->vars->SetAt( VarName, value);
+			map->locals->SetAt( VarName, value);
 		}
 		else if (InDebug&ID_VARIABLES) {
 			printMessage("GameScript"," ",YELLOW);
@@ -1270,7 +1272,7 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName,
 		}
 	}
 	else {
-		game->globals->SetAt( VarName, ( ieDword ) value );
+		game->locals->SetAt( VarName, ( ieDword ) value );
 	}
 }
 
@@ -1299,7 +1301,7 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName, ieDword va
 	if (strnicmp(newVarName,"GLOBAL",6) ) {
 		Map *map=game->GetMap(game->FindMap(newVarName));
 		if (map) {
-			map->vars->SetAt( &VarName[6], value);
+			map->locals->SetAt( &VarName[6], value);
 		}
 		else if (InDebug&ID_VARIABLES) {
 			printMessage("GameScript"," ",YELLOW);
@@ -1307,7 +1309,7 @@ void GameScript::SetVariable(Scriptable* Sender, const char* VarName, ieDword va
 		}
 	}
 	else {
-		game->globals->SetAt( &VarName[6], ( ieDword ) value );
+		game->locals->SetAt( &VarName[6], ( ieDword ) value );
 	}
 }
 
@@ -1343,7 +1345,7 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName)
 	if (strnicmp(newVarName,"GLOBAL",6) ) {
 		Map *map=game->GetMap(game->FindMap(newVarName));
 		if (map) {
-			map->vars->Lookup( &VarName[6], value);
+			map->locals->Lookup( &VarName[6], value);
 		}
 		else if (InDebug&ID_VARIABLES) {
 			printMessage("GameScript"," ",YELLOW);
@@ -1351,7 +1353,7 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName)
 		}
 	}
 	else {
-		game->globals->Lookup( &VarName[6], value );
+		game->locals->Lookup( &VarName[6], value );
 	}
 	if (InDebug&ID_VARIABLES) {
 		printf("CheckVariable %s: %d\n",VarName, value);
@@ -1391,14 +1393,14 @@ ieDword GameScript::CheckVariable(Scriptable* Sender, const char* VarName, const
 	if (strnicmp(newVarName,"GLOBAL",6) ) {
 		Map *map=game->GetMap(game->FindMap(newVarName));
 		if (map) {
-			map->vars->Lookup( VarName, value);
+			map->locals->Lookup( VarName, value);
 		}
 		else if (InDebug&ID_VARIABLES) {
 			printMessage("GameScript"," ",YELLOW);
 			printf("Invalid variable %s %s in checkvariable\n",Context, VarName);
 		}
 	} else {
-		game->globals->Lookup( VarName, value );
+		game->locals->Lookup( VarName, value );
 	}
 	if (InDebug&ID_VARIABLES) {
 		printf("CheckVariable %s%s: %d\n",Context, VarName, value);
@@ -4074,6 +4076,9 @@ int GameScript::HasItemSlot(Scriptable* Sender, Trigger* parameters)
 int GameScript::HasItemEquipped(Scriptable * Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if ( !scr || scr->Type!=ST_ACTOR) {
+		return 0;
+	}
 	Actor *actor = (Actor *) scr;
 	if (actor->inventory.HasItem(parameters->string0Parameter, IE_INV_ITEM_EQUIPPED) ) {
 		return 1;
@@ -4290,6 +4295,9 @@ int GameScript::Range(Scriptable* Sender, Trigger* parameters)
 int GameScript::AtLocation( Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar) {
+		return 0;
+	}
 	if ( (tar->Pos.x==parameters->pointParameter.x) &&
 	     (tar->Pos.y==parameters->pointParameter.y) ) {
 		return 1;
@@ -4321,7 +4329,7 @@ int GameScript::NearSavedLocation(Scriptable* Sender, Trigger* parameters)
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
 	value = (ieDword) CheckVariable( scr, parameters->string0Parameter );
-	Point p = { *(unsigned short *) &value, *(((unsigned short *) &value)+1)};
+	Point p( *(unsigned short *) &value, *(((unsigned short *) &value)+1));
 	int distance = Distance(p, scr);
 	if (distance <= ( parameters->int0Parameter * 20 )) {
 		return 1;
@@ -4637,8 +4645,7 @@ int GameScript::XPLT(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::CheckStat(Scriptable* Sender, Trigger* parameters)
 {
-	Scriptable* target = GetActorFromObject( Sender,
-							parameters->objectParameter );
+	Scriptable* target = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!target) {
 		return 0;
 	}
@@ -5010,24 +5017,16 @@ int GameScript::UnselectableVariableLT(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::AreaCheck(Scriptable* Sender, Trigger* parameters)
 {
-/*
-	if (Sender->Type != ST_ACTOR) {
-		return 0;
-	}
-	Actor* actor = ( Actor* ) Sender;
-*/
 	return strnicmp(Sender->GetCurrentArea()->GetScriptName(), parameters->string0Parameter, 8)==0;
 }
 
 int GameScript::AreaCheckObject(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
-/*
-	if (!tar || tar->Type != ST_ACTOR) {
+
+	if (!tar) {
 		return 0;
 	}
-	Actor* actor = ( Actor* ) tar;
-*/
 	return strnicmp(tar->GetCurrentArea()->GetScriptName(), parameters->string0Parameter, 8)==0;
 }
 
@@ -5527,7 +5526,7 @@ int GameScript::IsFacingSavedRotation(Scriptable* Sender, Trigger* parameters)
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
 	value = (ieDword) CheckVariable( tar, parameters->string0Parameter );
-	Point p = { *(unsigned short *) &value, *(((unsigned short *) &value)+1) };
+	Point p(*(unsigned short *) &value, *(((unsigned short *) &value)+1));
 	if (actor->GetOrientation() == GetOrient( p, actor->Pos ) ) {
 		return 1;
 	}
@@ -6541,13 +6540,16 @@ void GameScript::ChangeAIScript(Scriptable* Sender, Action* parameters)
 	if (parameters->int0Parameter>7) {
 		return;
 	}
+	if (Sender->Type!=ST_ACTOR && parameters->int0Parameter) {
+		return;
+	}
 	Sender->SetScript( parameters->string0Parameter, parameters->int0Parameter );
 }
 
 void GameScript::ForceAIScript(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	if (tar->Type != ST_ACTOR) {
+	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
 	Actor* actor = ( Actor* ) tar;
@@ -6605,6 +6607,9 @@ void GameScript::SaveObjectLocation(Scriptable* Sender, Action* parameters)
 	unsigned int value;
 
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		return;
+	}
 	*((unsigned short *) &value) = tar->Pos.x;
 	*(((unsigned short *) &value)+1) = (unsigned short) tar->Pos.y;
 	if (!parameters->string0Parameter[0]) {
@@ -6666,6 +6671,9 @@ void GameScript::MoveViewPoint(Scriptable* /*Sender*/, Action* parameters)
 void GameScript::MoveViewObject(Scriptable* Sender, Action* parameters)
 {
 	Scriptable * scr = GetActorFromObject( Sender, parameters->objects[1]);
+	if (!scr) {
+		return;
+	}
 	core->MoveViewportTo( scr->Pos.x, scr->Pos.y, true );
 }
 
@@ -6808,8 +6816,8 @@ void GameScript::RestorePartyLocation(Scriptable* Sender, Action* /*parameters*/
 			ieDword value=CheckVariable( act, "LOCALSsavedlocation");
 			Map *map = Sender->GetCurrentArea();
 			//setting position, don't put actor on another actor
-			Point p = { *((unsigned short *) &value),
-				*(((unsigned short *) &value)+1) };
+			Point p( *((unsigned short *) &value),
+				*(((unsigned short *) &value)+1) );
 			act->SetPosition( map, p , -1 );
 		}
 	}
@@ -6824,7 +6832,7 @@ void GameScript::MoveToCenterOfScreen(Scriptable* Sender, Action* /*parameters*/
 	}
 	Region vp = core->GetVideoDriver()->GetViewport();
 	Actor* actor = ( Actor* ) Sender;
-	Point p = {vp.x+vp.w/2, vp.y+vp.h/2};
+	Point p(vp.x+vp.w/2, vp.y+vp.h/2);
 	actor->WalkTo( p );
 }
 
@@ -6835,7 +6843,7 @@ void GameScript::MoveToOffset(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	Point p = {Sender->Pos.x+parameters->pointParameter.x, Sender->Pos.y+parameters->pointParameter.y};
+	Point p(Sender->Pos.x+parameters->pointParameter.x, Sender->Pos.y+parameters->pointParameter.y);
 	actor->WalkTo( p );
 }
 
@@ -6847,6 +6855,10 @@ void GameScript::RunAwayFrom(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
 	actor->RunAwayFrom( tar->Pos, parameters->int0Parameter, false);
 }
 
@@ -6858,6 +6870,10 @@ void GameScript::RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
 	actor->InternalFlags|=IF_NOINT;
 	actor->RunAwayFrom( tar->Pos, parameters->int0Parameter, false);
 }
@@ -7035,7 +7051,7 @@ void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
 	value = (ieDword) CheckVariable( target, parameters->string0Parameter );
-	Point p = { *(unsigned short *) &value, *(((unsigned short *) &value)+1)};
+	Point p( *(unsigned short *) &value, *(((unsigned short *) &value)+1));
 	actor->SetOrientation ( GetOrient( p, actor->Pos ),0 );
 	actor->resetAction = true;
 	actor->SetWait( 1 );
@@ -8539,7 +8555,7 @@ void GameScript::TextScreen(Scriptable* /*Sender*/, Action* parameters)
 	}
 	else {//iwd/iwd2 has a single table named chapters
 		chapter = core->LoadTable ( "CHAPTERS" );
-		core->GetGame()->globals->Lookup( "CHAPTER", line );
+		core->GetGame()->locals->Lookup( "CHAPTER", line );
 		iwd = true;
 	}
 
@@ -9131,7 +9147,7 @@ void GameScript::XEquipItem(Scriptable *Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 
-	if (tar->Type!=ST_ACTOR) {
+	if (!tar || tar->Type!=ST_ACTOR) {
 		return;
 	}
 	Actor *actor = (Actor *) tar;
@@ -9791,3 +9807,17 @@ void GameScript::Weather(Scriptable* /*Sender*/, Action* parameters)
 			break;
 	}
 }
+
+void GameScript::CopyGroundPilesTo(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_AREA) {
+		return;
+	}
+	Map *map = (Map *) Sender;
+	Map *othermap = core->GetGame()->GetMap( parameters->string0Parameter, false );
+	if (!othermap) {
+		return;
+	}
+	map->CopyGroundPiles( othermap, parameters->pointParameter );
+}
+
