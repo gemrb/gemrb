@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.114 2005/06/11 20:17:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.115 2005/06/11 20:41:42 avenger_teambg Exp $
  *
  */
 
@@ -765,8 +765,8 @@ Map* AREImp::GetMap(const char *ResRef)
 			if (anim->Flags & A_ANI_ALLCYCLES) {
 				anim->animcount = af->GetCycleCount();
 				anim->animation = (Animation **) malloc(anim->animcount * sizeof(Animation *) );
-				for(i=0;i<anim->animcount;i++) {
-				  anim->animation[i]=GetAnimationPiece(af, i, anim);
+				for(int j=0;j<anim->animcount;j++) {
+				  anim->animation[i]=GetAnimationPiece(af, j, anim);
 				}
 			} else {
 				anim->animcount = 1;
@@ -1634,7 +1634,7 @@ int AREImp::PutMapnotes( DataStream *stream, Map *map)
 			if (len>500) len=500;
 			stream->Write( mn->text, len);
 			x = 500-len;
-			for (unsigned int j=0;j<x/8;j++) {
+			for (int j=0;j<x/8;j++) {
 				stream->Write( filling, 8);
 			}
 			x = x%8;
