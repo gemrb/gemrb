@@ -3,8 +3,8 @@
 use strict;
 use Digest::MD5 qw(md5_hex);
 
-my $SRCFILE = "gemrb/plugins/GUIScript/GUIScript.cpp";
-my $TGTDIR = "gemrb/docs/en/GUIScript";
+my $SRCFILE = "../gemrb/plugins/GUIScript/GUIScript.cpp";
+my $TGTDIR = "../gemrb/docs/en/GUIScript";
 
 my %fn_hash = ();
 my %file_hash = ();

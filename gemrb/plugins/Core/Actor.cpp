@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.105 2005/06/10 21:12:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.106 2005/06/11 20:18:00 avenger_teambg Exp $
  *
  */
 
@@ -136,6 +136,8 @@ Actor::Actor()
 
 	LongName = NULL;
 	ShortName = NULL;
+	LongStrRef = (ieStrRef) -1;
+	ShortStrRef = (ieStrRef) -1;
 
 	LastTarget = NULL;
 	LastTalkedTo = NULL;
@@ -159,6 +161,8 @@ Actor::Actor()
 	if (classcount<0) {
 		InitActorTables();
 	}
+	TalkCount = 0;
+	appearance = 0xffffff; //might be important for created creatures
 	version = 0;
 }
 

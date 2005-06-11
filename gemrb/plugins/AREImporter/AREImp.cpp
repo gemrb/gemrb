@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.113 2005/06/10 21:12:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.114 2005/06/11 20:17:59 avenger_teambg Exp $
  *
  */
 
@@ -245,8 +245,8 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->ReadResRef( map->RestHeader.CreResRef[i] );
 	}
 	str->ReadWord( &map->RestHeader.CreatureNum );
-	if( map->RestHeader.CreatureNum>10 ) {
-		map->RestHeader.CreatureNum = 10;
+	if( map->RestHeader.CreatureNum>MAX_RESCOUNT ) {
+		map->RestHeader.CreatureNum = MAX_RESCOUNT;
 	}
 	str->Seek( 14, GEM_CURRENT_POS );
 	str->ReadWord( &map->RestHeader.DayChance );
@@ -272,8 +272,8 @@ Map* AREImp::GetMap(const char *ResRef)
 		ieWord LaunchX, LaunchY;
 		ieDword TrapFlags, Locked, LockRemoval;
 		Region BBClosed, BBOpen;
-		ieDword OpenStrRef;
-		ieDword NameStrRef;
+		ieStrRef OpenStrRef;
+		ieStrRef NameStrRef;
 		ieResRef Dialog;
 
 		str->Read( LongName, 32 );
@@ -585,8 +585,8 @@ Map* AREImp::GetMap(const char *ResRef)
 		Gem_Polygon* poly = new Gem_Polygon( points, VertexCount, &bbox);
 		free( points );
 		InfoPoint* ip = tm->AddInfoPoint( Name, Type, poly );
-		ip->TrapDetectionDifficulty = TrapDetDiff;
-		ip->TrapRemovalDifficulty = TrapRemDiff;
+		ip->TrapDetectionDiff = TrapDetDiff;
+		ip->TrapRemovalDiff = TrapRemDiff;
 		//we don't need this flag, because the script is loaded
 		//only if it exists
 		ip->TrapDetected = TrapDetected;
@@ -594,6 +594,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		ip->TrapLaunch.y = LaunchY;
 		ip->Cursor = Cursor;
 		ip->overHeadText = string;
+		ip->StrRef = StrRef; //we need this when saving area
 		ip->textDisplaying = 0;
 		ip->timeStartDisplaying = 0;
 		ip->SetMap(map);
@@ -614,7 +615,38 @@ Map* AREImp::GetMap(const char *ResRef)
 	printf( "Loading spawnpoints\n" );
 	//Loading SpawnPoints
 	for (i = 0; i < SpawnCount; i++) {
-		str->Seek( SpawnOffset + ( i * 0xC4 ), GEM_STREAM_START );
+		char Name[33];
+		ieWord XPos, YPos;
+		ieWord count, Difficulty;
+		ieResRef creatures[MAX_RESCOUNT];
+		ieWord DayChance, NightChance;
+		ieWord Minimum, Maximum;
+		ieDword Schedule;
+		
+		str->Read( Name, 32 );
+		Name[32] = 0;
+		str->ReadWord( &XPos );
+		str->ReadWord( &YPos );
+		for (unsigned int j = 0;j < MAX_RESCOUNT; j++) {
+			str->ReadResRef( creatures[j] );
+		}
+		str->ReadWord( &count);
+		str->ReadWord( &Difficulty);
+		str->Seek( 12, GEM_CURRENT_POS); //skipping unknowns
+		str->ReadWord( &Minimum);
+		str->ReadWord( &Maximum);
+		str->ReadDword( &Schedule);
+		str->ReadWord( &DayChance);
+		str->ReadWord( &NightChance);
+
+		Spawn *sp = map->AddSpawn(Name, XPos, YPos, creatures, count);
+		sp->appearance = Schedule;
+		sp->Difficulty = Difficulty;
+		sp->Minimum = Minimum;
+		sp->Maximum = Maximum;
+		sp->DayChance = DayChance;
+		sp->NightChance = NightChance;
+		str->Seek( 56, GEM_CURRENT_POS );
 	}
 
 	printf( "Loading actors\n" );
@@ -707,61 +739,39 @@ Map* AREImp::GetMap(const char *ResRef)
 		printf( "[AREImporter]: No Animation Manager Available, skipping animations\n" );
 	} else {
 		for (i = 0; i < AnimCount; i++) {
-			Animation* anim;
-			char animName[33];
-			str->Read(animName, 32);
+			AreaAnimation* anim = new AreaAnimation();
+			str->Read(anim->Name, 32);
 			ieWord animX, animY;
 			str->ReadWord( &animX );
 			str->ReadWord( &animY );
-			ieDword animSchedule;
-			str->ReadDword( &animSchedule );
-			ieResRef animBam;
-			str->ReadResRef( animBam );
-			ieWord animCycle, animFrame;
-			str->ReadWord( &animCycle );
-			str->ReadWord( &animFrame );
-			ieDword animFlags;
-			str->ReadDword( &animFlags );
+			anim->Pos.x=animX;
+			anim->Pos.y=animY;
+			str->ReadDword( &anim->appearance );
+			str->ReadResRef( anim->BAM );			
+			str->ReadWord( &anim->sequence );
+			str->ReadWord( &anim->frame );
+			str->ReadDword( &anim->Flags );
 			ieDword unused;
-			ieResRef animPal;
 			str->ReadDword( &unused );
 			str->ReadDword( &unused );
-			str->ReadResRef( animPal );
+			str->ReadResRef( anim->Palette );
 			str->ReadDword( &unused );
 			AnimationFactory* af = ( AnimationFactory* )
-			core->GetResourceMgr()->GetFactoryResource( animBam, IE_BAM_CLASS_ID );
+			core->GetResourceMgr()->GetFactoryResource( anim->BAM, IE_BAM_CLASS_ID );
 			if (!af) {
-				printf("Cannot load animation: %s\n", animBam);
+				printf("Cannot load animation: %s\n", anim->BAM);
 				continue;
 			}
-			anim = af->GetCycle( ( unsigned char ) animCycle );
-			if (!anim)
-				anim = af->GetCycle( 0 );
-			if (!anim) {
-				printf("Cannot load animation: %s\n", animBam);
-				continue;
-			}
-			anim->appearance = animSchedule;
-			anim->Flags = animFlags;
-			anim->x = animX;
-			anim->y = animY;
-			//they are autofree by default
-			//anim->autofree = false;
-			anim->SetScriptName(animName);
-			if (animFlags&A_ANI_MIRROR) {
-				anim->MirrorAnimation();
-			}
-			if (animFlags&A_ANI_PALETTE) {
-				Color *Palette = (Color *) malloc(sizeof(Color) * 256);
-				ImageMgr *bmp = (ImageMgr *) core->GetInterface( IE_BMP_CLASS_ID);
-				if (bmp) {
-					DataStream* s = core->GetResourceMgr()->GetResource( animPal, IE_BMP_CLASS_ID );
-					bmp->Open( s, true);
-					bmp->GetPalette(0, 256, Palette);
-					core->FreeInterface( bmp );
+			if (anim->Flags & A_ANI_ALLCYCLES) {
+				anim->animcount = af->GetCycleCount();
+				anim->animation = (Animation **) malloc(anim->animcount * sizeof(Animation *) );
+				for(i=0;i<anim->animcount;i++) {
+				  anim->animation[i]=GetAnimationPiece(af, i, anim);
 				}
-				anim->SetPalette( Palette, true );
-				free (Palette);
+			} else {
+				anim->animcount = 1;
+				anim->animation = (Animation **) malloc( sizeof(Animation *) );
+				anim->animation[0]=GetAnimationPiece(af, anim->sequence, anim);
 			}
 			map->AddAnimation( anim );
 		}
@@ -926,16 +936,60 @@ Map* AREImp::GetMap(const char *ResRef)
 	return map;
 }
 
-int AREImp::GetStoredFileSize(Map *map)
+Animation *AREImp::GetAnimationPiece(AnimationFactory *af, int animCycle, AreaAnimation *a)
 {
+	Animation *anim = af->GetCycle( ( unsigned char ) animCycle );
+	if (!anim)
+		anim = af->GetCycle( 0 );
+	if (!anim) {
+		printf("Cannot load animation: %s\n", a->BAM);
+		return NULL;
+	}
+	anim->pos = a->frame;
+	anim->Flags = a->Flags;
+	anim->x = a->Pos.x;
+	anim->y = a->Pos.y;
+	if (anim->Flags&A_ANI_MIRROR) {
+		anim->MirrorAnimation();
+	}
+	if (anim->Flags&A_ANI_PALETTE) {
+		Color *Palette = (Color *) malloc(sizeof(Color) * 256);
+		ImageMgr *bmp = (ImageMgr *) core->GetInterface( IE_BMP_CLASS_ID);
+		if (bmp) {
+			DataStream* s = core->GetResourceMgr()->GetResource( a->Palette, IE_BMP_CLASS_ID );
+			bmp->Open( s, true);
+			bmp->GetPalette(0, 256, Palette);
+			core->FreeInterface( bmp );
+		}
+		anim->SetPalette( Palette, true );
+		free (Palette);
+	}
+	return anim;
+}
+
+int AREImp::GetStoredFileSize(Map *map)
+{  
+	unsigned int i;
 	int headersize = map->version+0x11c;
 	ActorOffset = headersize;
 
 	ActorCount = (ieWord) map->GetActorCount();
 	headersize += ActorCount * 0x110;
+
+	//getting the embedded creature sizes
+	/* not for now
+	ActorMgr* am = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
+	EmbeddedCreOffset = headersize;
+
+	for (i=0;i<ActorCount;i++) {
+		headersize += am->GetStoredFileSize(map->GetActor(i) );
+	}
+	core->FreeInterface(am);
+	*/
+
 	InfoPointsOffset = headersize;
 
-	InfoPointsCount = (ieWord) map->TMap->GetInfoPointCount();
+	InfoPointsCount = (ieWord) map->TMap->GetInfoPointCount();  
 	headersize += InfoPointsCount * 0xc4;
 	SpawnOffset = headersize;
 
@@ -966,7 +1020,25 @@ int AREImp::GetStoredFileSize(Map *map)
 
 	DoorsCount = (ieDword) map->TMap->GetDoorCount();
 	headersize += DoorsCount * 0xc8;
-  SongHeader = headersize;
+	VerticesCount = 0;
+
+	for(i=0;i<InfoPointsCount;i++) {
+		InfoPoint *ip=map->TMap->GetInfoPoint(i);
+		VerticesCount+=ip->outline->count;
+	}
+	for(i=0;i<ContainersCount;i++) {
+		Container *c=map->TMap->GetContainer(i);
+		VerticesCount+=c->outline->count;
+	}
+	for(i=0;i<DoorsCount;i++) {
+		Door *d=map->TMap->GetDoor(i);
+		VerticesCount+=d->open->count+d->closed->count+d->oibcount+d->cibcount;
+	}
+
+	VerticesOffset = headersize;
+
+	headersize += VerticesCount * 4;
+	SongHeader = headersize;
 
 	headersize += 0x90;
 	RestHeader = headersize;
@@ -982,8 +1054,9 @@ int AREImp::GetStoredFileSize(Map *map)
 	headersize += AnimCount * 0x4c;
 	NoteOffset = headersize;
 
+	int pst = core->HasFeature( GF_AUTOMAP_INI );
 	NoteCount = (ieDword) map->GetMapNoteCount();
-	headersize += NoteCount * 0xc0;
+	headersize += NoteCount * pst?0x214: 0xc0;
 
 	return headersize;
 }
@@ -991,8 +1064,8 @@ int AREImp::GetStoredFileSize(Map *map)
 int AREImp::PutHeader(DataStream *stream, Map *map)
 {
 	char Signature[8];
-	ieDword tmpdword = 0;
-	ieWord tmpword = 0;
+	ieDword tmpDword = 0;
+	ieWord tmpWord = 0;
 	int pst = core->HasFeature( GF_AUTOMAP_INI );
 
 	memcpy( Signature, "ARE V1.0", 8);
@@ -1007,20 +1080,20 @@ int AREImp::PutHeader(DataStream *stream, Map *map)
 	
 	memset(Signature, 0, sizeof(Signature)); //8 bytes 0
 	stream->Write( Signature, 8); //northref
-	stream->WriteDword( &tmpdword);
+	stream->WriteDword( &tmpDword);
 	stream->Write( Signature, 8); //westref
-	stream->WriteDword( &tmpdword);
+	stream->WriteDword( &tmpDword);
 	stream->Write( Signature, 8); //southref
-	stream->WriteDword( &tmpdword);
+	stream->WriteDword( &tmpDword);
 	stream->Write( Signature, 8); //eastref
-	stream->WriteDword( &tmpdword);
+	stream->WriteDword( &tmpDword);
 
 	stream->WriteWord( &map->AreaType);
 	stream->WriteWord( &map->Rain);
 	stream->WriteWord( &map->Snow);
 	stream->WriteWord( &map->Fog);
 	stream->WriteWord( &map->Lightning);
-	stream->WriteWord( &tmpword);
+	stream->WriteWord( &tmpWord);
 
 	if (map->version==16) { //writing 16 bytes of 0's
 		stream->Write( Signature, 8);
@@ -1045,8 +1118,13 @@ int AREImp::PutHeader(DataStream *stream, Map *map)
 	stream->WriteDword( &AmbiOffset );
 	stream->WriteDword( &VariablesOffset );
 	stream->WriteDword( &VariablesCount );
-	stream->WriteDword( &tmpdword);
-	stream->WriteResRef( map->Scripts[0]->GetName());
+	stream->WriteDword( &tmpDword);
+	GameScript *s = map->Scripts[0];
+	if (s) {
+		stream->WriteResRef( s->GetName() );
+	} else {
+		stream->Write( Signature, 8);
+	}
 	stream->WriteDword( &ExploredBitmapSize);
 	stream->WriteDword( &ExploredBitmapOffset);
 	stream->WriteDword( &DoorsCount );
@@ -1054,93 +1132,103 @@ int AREImp::PutHeader(DataStream *stream, Map *map)
 	stream->WriteDword( &AnimCount );
 	stream->WriteDword( &AnimOffset );
 	//tiled object offset/count
-	stream->WriteDword( &tmpdword);
-	stream->WriteDword( &tmpdword);
+	stream->WriteDword( &tmpDword);
+	stream->WriteDword( &tmpDword);
 	stream->WriteDword( &SongHeader);
 	stream->WriteDword( &RestHeader);
 	//an empty dword for pst
 	if (pst) {
-		stream->WriteDword( &tmpdword);
+		stream->WriteDword( &tmpDword);
 	}
 	stream->WriteDword( &NoteOffset );
 	stream->WriteDword( &NoteCount );
+	//8*10 bytes of crap
+	for (int i=0;i<10;i++) {
+		stream->Write( Signature, 8);
+	}
 	return 0;
 }
 
-int AREImp::PutDoors( DataStream *stream, Map *map)
+int AREImp::PutDoors( DataStream *stream, Map *map, ieDword &VertIndex)
 {
-	ieDword FirstVertex = 0;
-	ieDword tmpdword = 0;
-	ieWord tmpword = 0;
+	char filling[8];
+	ieDword tmpDword = 0;
+	ieWord tmpWord = 0;
 
+	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<DoorsCount;i++) {
 		Door *d = map->TMap->GetDoor(i);
 
 		stream->Write( d->GetScriptName(), 32);
 		stream->WriteResRef( d->ID);
-		stream->WriteDword( &tmpdword);
+		stream->WriteDword( &tmpDword);
 		stream->WriteDword( &d->Flags);
-		stream->WriteDword( &FirstVertex);
-		tmpword = (ieWord) d->open->count;
-		stream->WriteWord( &tmpword);
-		FirstVertex+=tmpword;
-		tmpword = (ieWord) d->closed->count;
-		stream->WriteWord( &tmpword);
-		stream->WriteDword( &FirstVertex);
-		FirstVertex+=tmpword;
+		stream->WriteDword( &VertIndex);
+		tmpWord = (ieWord) d->open->count;
+		stream->WriteWord( &tmpWord);
+		VertIndex += tmpWord;
+		tmpWord = (ieWord) d->closed->count;
+		stream->WriteWord( &tmpWord);
+		stream->WriteDword( &VertIndex);
+		VertIndex += tmpWord;
 		//open bounding box
-		tmpword = (ieWord) d->open->BBox.x;
-		stream->WriteWord( &tmpword);
-		tmpword = (ieWord) d->open->BBox.y;
-		stream->WriteWord( &tmpword);
-		tmpword = (ieWord) d->open->BBox.w;
-		stream->WriteWord( &tmpword);
-		tmpword = (ieWord) d->open->BBox.h;
-		stream->WriteWord( &tmpword);
+		tmpWord = (ieWord) d->open->BBox.x;
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) d->open->BBox.y;
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) d->open->BBox.w;
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) d->open->BBox.h;
+		stream->WriteWord( &tmpWord);
 		//closed bounding box
-		tmpword = (ieWord) d->closed->BBox.x;
-		stream->WriteWord( &tmpword);
-		tmpword = (ieWord) d->closed->BBox.y;
-		stream->WriteWord( &tmpword);
-		tmpword = (ieWord) d->closed->BBox.w;
-		stream->WriteWord( &tmpword);
-		tmpword = (ieWord) d->closed->BBox.h;
-		stream->WriteWord( &tmpword);
+		tmpWord = (ieWord) d->closed->BBox.x;
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) d->closed->BBox.y;
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) d->closed->BBox.w;
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) d->closed->BBox.h;
+		stream->WriteWord( &tmpWord);
 		//open and closed impeded blocks
-		stream->WriteDword( &FirstVertex);
-		tmpword = (ieWord) d->oibcount;
-		FirstVertex +=tmpword;
-		tmpword = (ieWord) d->cibcount;
-		stream->WriteDword( &FirstVertex);
-		FirstVertex +=tmpword;
+		stream->WriteDword( &VertIndex);
+		tmpWord = (ieWord) d->oibcount;
+		VertIndex += tmpWord;
+		tmpWord = (ieWord) d->cibcount;
+		stream->WriteDword( &VertIndex);
+		VertIndex += tmpWord;
 		//unknown54
-		stream->WriteDword( &tmpdword);
+		stream->WriteDword( &tmpDword);
 		stream->WriteResRef( d->OpenSound);
 		stream->WriteResRef( d->CloseSound);
 		stream->WriteDword( &d->Cursor);
 		stream->WriteWord( &d->TrapDetectionDiff);
 		stream->WriteWord( &d->TrapRemovalDiff);
 		stream->WriteDword( &d->TrapFlags);
-		tmpword = (ieWord) d->TrapLaunch.x;
-		stream->WriteWord( &tmpword);
-		tmpword = (ieWord) d->TrapLaunch.y;
-		stream->WriteWord( &tmpword);
+		tmpWord = (ieWord) d->TrapLaunch.x;
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) d->TrapLaunch.y;
+		stream->WriteWord( &tmpWord);
 		stream->WriteResRef( d->KeyResRef);
-		stream->WriteResRef( d->Scripts[0]->GetName() );
+		GameScript *s = d->Scripts[0];
+		if (s) {
+			stream->WriteResRef( s->GetName() );
+		} else {
+			stream->Write( filling, 8);
+		}
 		//unknown field 0-100
 		//stream->WriteDword( &d->Locked);
-		stream->WriteDword( &tmpdword);
+		stream->WriteDword( &tmpDword);
 		//lock difficulty field
 		stream->WriteDword( &d->LockDifficulty);
 		//opening locations
-		tmpword = (ieWord) d->toOpen[0].x;
-		stream->WriteWord( &tmpword);
-		tmpword = (ieWord) d->toOpen[0].y;
-		stream->WriteWord( &tmpword);
-		tmpword = (ieWord) d->toOpen[1].x;
-		stream->WriteWord( &tmpword);
-		tmpword = (ieWord) d->toOpen[1].y;
-		stream->WriteWord( &tmpword);
+		tmpWord = (ieWord) d->toOpen[0].x;
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) d->toOpen[0].y;
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) d->toOpen[1].x;
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) d->toOpen[1].y;
+		stream->WriteWord( &tmpWord);
 		stream->WriteDword( &d->OpenStrRef);
 		stream->Write( d->LinkedInfo, 24);
 		stream->WriteDword( &d->NameStrRef);
@@ -1149,145 +1237,308 @@ int AREImp::PutDoors( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImp::PutContainers( DataStream *stream, Map *map)
+int AREImp::PutPoints( DataStream *stream, Point *p, unsigned int count)
 {
-	ieDword ItemIndex = 0;
-	ieDword VertIndex = 0;
-	ieDword tmpdword;
-	ieWord tmpword;
+	ieWord tmpWord;
+	unsigned int j;
 
+	for(j=0;j<count;j++) {
+		tmpWord = p[j].x;
+		stream->WriteWord( &tmpWord);
+		tmpWord = p[j].y;
+		stream->WriteWord( &tmpWord);
+	}
+	return 0;
+}
+
+int AREImp::PutVertices( DataStream *stream, Map *map)
+{
+	unsigned int i;
+
+	//regions
+	for(i=0;i<InfoPointsCount;i++) {
+		InfoPoint *ip = map->TMap->GetInfoPoint(i);
+		PutPoints(stream, ip->outline->points, ip->outline->count);
+	}
+	//containers
+	for(i=0;i<ContainersCount;i++) {
+		Container *c = map->TMap->GetContainer(i);
+		PutPoints(stream, c->outline->points, c->outline->count);
+	}
+	//doors
+	for(i=0;i<DoorsCount;i++) {
+		Door *d = map->TMap->GetDoor(i);
+		PutPoints(stream, d->open->points, d->open->count);
+		PutPoints(stream, d->closed->points, d->closed->count);
+		PutPoints(stream, d->open_ib, d->oibcount);
+		PutPoints(stream, d->closed_ib, d->cibcount);
+	}
+	return 0;
+}
+
+int AREImp::PutItems( DataStream *stream, Map *map)
+{
+	for (unsigned int i=0;i<ContainersCount;i++) {
+		Container *c = map->TMap->GetContainer(i);
+
+		for(int j=0;j<c->inventory.GetSlotCount();j++) {
+			CREItem *ci = c->inventory.GetSlotItem(j);
+
+			stream->WriteResRef( ci->ItemResRef);
+			stream->WriteWord( &ci->PurchasedAmount);
+			stream->WriteWord( &ci->Usages[0]);
+			stream->WriteWord( &ci->Usages[1]);
+			stream->WriteWord( &ci->Usages[2]);
+			stream->WriteDword( &ci->Flags);
+		}
+	}
+	return 0;
+}
+
+int AREImp::PutContainers( DataStream *stream, Map *map, ieDword &VertIndex)
+{
+	char filling[56];
+	ieDword ItemIndex = 0;
+	ieDword tmpDword;
+	ieWord tmpWord;
+
+	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<ContainersCount;i++) {
 		Container *c = map->TMap->GetContainer(i);
 
 		//this is the editor name
 		stream->Write( c->GetScriptName(), 32);
-		tmpword = (ieWord) c->Pos.x;
-		stream->WriteWord( &tmpword);
-		tmpword = (ieWord) c->Pos.y;
-		stream->WriteWord( &tmpword);
+		tmpWord = (ieWord) c->Pos.x;
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) c->Pos.y;
+		stream->WriteWord( &tmpWord);
 		stream->WriteWord( &c->LockDifficulty);
 		stream->WriteDword( &c->Flags);
 		stream->WriteWord( &c->TrapDetectionDiff);
 		stream->WriteWord( &c->TrapRemovalDiff);
 		stream->WriteWord( &c->Trapped);
 		stream->WriteWord( &c->TrapDetected);
-		tmpword = (ieWord) c->TrapLaunch.x;
-		stream->WriteWord( &tmpword);
-		tmpword = (ieWord) c->TrapLaunch.y;
-		stream->WriteWord( &tmpword);
+		tmpWord = (ieWord) c->TrapLaunch.x;
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) c->TrapLaunch.y;
+		stream->WriteWord( &tmpWord);
 		//outline bounding box
-		tmpword = (ieWord) c->outline->BBox.x;
-		stream->WriteWord( &tmpword);
-		tmpword = (ieWord) c->outline->BBox.y;
-		stream->WriteWord( &tmpword);
-		tmpword = (ieWord) (c->outline->BBox.x + c->outline->BBox.w);
-		stream->WriteWord( &tmpword);
-		tmpword = (ieWord) (c->outline->BBox.h + c->outline->BBox.h);
-		stream->WriteWord( &tmpword);
+		tmpWord = (ieWord) c->outline->BBox.x;
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) c->outline->BBox.y;
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) (c->outline->BBox.x + c->outline->BBox.w);
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) (c->outline->BBox.h + c->outline->BBox.h);
+		stream->WriteWord( &tmpWord);
 		//item index and offset
-		tmpdword = c->inventory.GetSlotCount();
+		tmpDword = c->inventory.GetSlotCount();
 		stream->WriteDword( &ItemIndex);
-		stream->WriteDword( &tmpdword);
-		ItemIndex +=tmpdword;
-		stream->WriteResRef( c->Scripts[0]->GetName());
+		stream->WriteDword( &tmpDword);
+		ItemIndex +=tmpDword;
+		GameScript *s = c->Scripts[0];
+		if (s) {
+			stream->WriteResRef( s->GetName() );
+		} else {
+			stream->Write( filling, 8);
+		}
 		//outline polygon index and count
-		tmpdword = c->outline->count;
+		tmpDword = c->outline->count;
 		stream->WriteDword( &VertIndex);
-		stream->WriteDword( &tmpdword);
-		VertIndex +=tmpdword;
+		stream->WriteDword( &tmpDword);
+		VertIndex +=tmpDword;
 		//this is the real scripting name
 		stream->Write( c->GetScriptName(), 32);
 		stream->WriteResRef( c->KeyResRef);
-		stream->WriteDword( &tmpdword);
+		stream->WriteDword( &tmpDword); //unknown80
 		stream->WriteDword( &c->OpenFail);
+		stream->Write( filling, 56); //unknown or unused stuff
 	}
 	return 0;
 }
 
-int AREImp::PutRegions( DataStream *stream, Map *map)
+int AREImp::PutRegions( DataStream *stream, Map *map, ieDword &VertIndex)
 {
-	ieWord tmpword;
+	ieDword tmpDword = 0;
+	ieWord tmpWord;
+	char filling[56];
 
+	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<InfoPointsCount;i++) {
 		InfoPoint *ip = map->TMap->GetInfoPoint(i);
 
 		stream->Write( ip->GetScriptName(), 32);
-		tmpword = (ieWord) ip->Type;
-		stream->WriteWord( &tmpword);
+		tmpWord = (ieWord) ip->Type;
+		stream->WriteWord( &tmpWord);
 		//outline bounding box
-		tmpword = (ieWord) ip->outline->BBox.x;
-		stream->WriteWord( &tmpword);
-		tmpword = (ieWord) ip->outline->BBox.y;
-		stream->WriteWord( &tmpword);
-		tmpword = (ieWord) (ip->outline->BBox.x + ip->outline->BBox.w);
-		stream->WriteWord( &tmpword);
-		tmpword = (ieWord) (ip->outline->BBox.h + ip->outline->BBox.h);
-		stream->WriteWord( &tmpword);
+		tmpWord = (ieWord) ip->outline->BBox.x;
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) ip->outline->BBox.y;
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) (ip->outline->BBox.x + ip->outline->BBox.w);
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) (ip->outline->BBox.h + ip->outline->BBox.h);
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) ip->outline->count;
+		stream->WriteWord( &tmpWord);
+		stream->WriteDword( &VertIndex);
+		VertIndex += tmpWord;
+		stream->WriteDword( &tmpDword); //unknown30
+		stream->WriteDword( &ip->Cursor);
+		stream->WriteResRef( ip->Destination);
+		stream->Write( ip->EntranceName, 32);
+		stream->WriteDword( &ip->Flags);
+		stream->WriteDword( &ip->StrRef);
+		stream->WriteWord( &ip->TrapDetectionDiff);
+		stream->WriteWord( &ip->TrapRemovalDiff);
+		stream->WriteWord( &ip->Trapped); //unknown???
+		stream->WriteWord( &ip->TrapDetected);
+		tmpWord = (ieWord) ip->TrapLaunch.x;
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) ip->TrapLaunch.y;
+		stream->WriteWord( &tmpWord);
+		stream->WriteResRef( ip->KeyResRef);
+		GameScript *s = ip->Scripts[0];
+		if (s) {
+			stream->WriteResRef( s->GetName() );
+		} else {
+			stream->Write( filling, 8);
+		}
+		stream->Write( filling, 56); //unknown, including some points
+		stream->WriteResRef( ip->DialogResRef);
 	}
 	return 0;
 }
 
 int AREImp::PutSpawns( DataStream *stream, Map *map)
 {
-	ieWord tmpword;
+	ieWord tmpWord;
+	char filling[56];
 
+	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<SpawnCount;i++) {
 		Spawn *sp = map->GetSpawn(i);
 
 		stream->Write( sp->Name, 32);
-		tmpword = (ieWord) sp->Pos.x;
-		stream->WriteWord( &tmpword);
-		tmpword = (ieWord) sp->Pos.y;
-		stream->WriteWord( &tmpword);
+		tmpWord = (ieWord) sp->Pos.x;
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) sp->Pos.y;
+		stream->WriteWord( &tmpWord);
+		tmpWord = sp->GetCreatureCount();
+		int j;
+		for (j = 0;j < tmpWord; j++) {
+			stream->WriteResRef( sp->Creatures[j] );
+		}
+		while( j++<MAX_RESCOUNT) {
+			stream->Write( filling, 8);
+		}
+		stream->WriteWord( &tmpWord );
+		stream->WriteWord( &sp->Difficulty);
+		stream->Write( filling, 12); //these values may actually mean something, but we don't care now
+		stream->WriteWord( &sp->Minimum);
+		stream->WriteWord( &sp->Maximum);
+		stream->WriteDword( &sp->appearance);
+		stream->WriteWord( &sp->DayChance);
+		stream->WriteWord( &sp->NightChance);
+		stream->Write( filling, 56);  //most likely unused crap
 	}
 	return 0;
 }
 
 int AREImp::PutActors( DataStream *stream, Map *map)
 {
-	ieWord tmpword;
+	ieDword tmpDword = 0;
+	ieWord tmpWord;
+	ieDword CreatureOffset = EmbeddedCreOffset;
+	char filling[120];
+	unsigned int i;
 
-	for (unsigned int i=0;i<ActorCount;i++) {
+//	ActorMgr *am = (ActorMgr *) core->GetInterface( IE_CRE_CLASS_ID );
+	memset(filling,0,sizeof(filling) );
+	for (i=0;i<ActorCount;i++) {
 		Actor *ac = map->GetActor(i);
 
 		stream->Write( ac->GetScriptName(), 32);
-		tmpword = (ieWord) ac->Pos.x;
-		stream->WriteWord( &tmpword);
-		tmpword = (ieWord) ac->Pos.y;
-		stream->WriteWord( &tmpword);
+		tmpWord = (ieWord) ac->Pos.x;
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) ac->Pos.y;
+		stream->WriteWord( &tmpWord);
+		stream->WriteDword( &tmpDword); //used fields flag always 0 for saved areas
+		stream->WriteDword( &tmpDword); //unknown2c
+		stream->WriteDword( &tmpDword); //actor animation, unused
+		tmpWord = ac->GetOrientation();
+		stream->WriteWord( &tmpWord);
+		tmpWord = 0;
+		stream->WriteWord( &tmpWord); //unknown
+		stream->WriteDword( &tmpDword);
+		stream->WriteDword( &tmpDword); //more unknowns
+		stream->WriteDword( &ac->appearance);
+		stream->WriteDword( &ac->TalkCount);
+		stream->WriteResRef( ac->Dialog);
+		for( int j=0;j<6;j++) {
+			GameScript *s = ac->Scripts[j];
+			if (s) {
+				stream->WriteResRef( s->GetName() );
+			} else {
+				stream->Write( filling, 8);
+			}
+		}
+		stream->Write( filling, 8); //creature reference is empty because we are embedding it
+		stream->WriteDword( &CreatureOffset);
+		ieDword CreatureSize = 0;//am->GetStoredFileSize(ac);
+		stream->WriteDword( &CreatureSize);
+		CreatureOffset += CreatureSize;
+		GameScript *s = ac->Scripts[6];
+		if (s) {
+			stream->WriteResRef( s->GetName() );
+		} else {
+			stream->Write( filling, 8);
+		}
+		stream->Write( filling, 120);
 	}
+	/*
+	CreatureOffset = EmbeddedCreOffset;
+	for (i=0;i<ActorCount;i++) {
+		Actor *ac = map->GetActor(i);
+
+		//reconstructing offsets again
+		am->GetStoredFileSize(ac);
+		am->PutActor( stream, ac);
+	}
+	core->FreeInterface( am);
+	*/
 	return 0;
 }
 
 int AREImp::PutAnimations( DataStream *stream, Map *map)
 {
-	ieDword tmpdword;
-	ieWord tmpword;
+	ieDword tmpDword = 0;
+	ieWord tmpWord;
 
-	for (unsigned int i=0;i<ActorCount;i++) {
-		Animation *an = map->GetAnimation(i);
+	for (unsigned int i=0;i<AnimCount;i++) {
+		AreaAnimation *an = map->GetAnimation(i);
 
-		stream->Write( an->ScriptName, 32);
-		tmpword = (ieWord) an->x;
-		stream->WriteWord( &tmpword);
-		tmpword = (ieWord) an->y;
-		stream->WriteWord( &tmpword);
-		stream->WriteDword( &an->appearance);
-		//stream->WriteResRef( an->BAM);
-		//stream->WriteDword( &an->Cycle);
-		//stream->WriteDword( &an->Frame);
+		stream->Write( an->Name, 32);
+		tmpWord = (ieWord) an->Pos.x;
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) an->Pos.y;
+		stream->WriteWord( &tmpWord);
+		stream->WriteDword( &an->appearance);    
+		stream->WriteResRef( an->BAM);
+		stream->WriteWord( &an->sequence);
+		stream->WriteWord( &an->frame);
 		stream->WriteDword( &an->Flags);
-		stream->WriteDword( &tmpdword);
-		stream->WriteDword( &tmpdword);
-		//stream->WriteResRef( an->Palette);
-		stream->WriteDword( &tmpdword);
+		stream->WriteDword( &tmpDword);
+		stream->WriteDword( &tmpDword);
+		stream->WriteResRef( an->Palette);
+		stream->WriteDword( &tmpDword);
 	}
 	return 0;
 }
 
 int AREImp::PutEntrances( DataStream *stream, Map *map)
 {
-	ieWord tmpword;
+	ieWord tmpWord;
 	char filling[62];
 
 	memset(filling,0,sizeof(filling) );
@@ -1295,10 +1546,10 @@ int AREImp::PutEntrances( DataStream *stream, Map *map)
 		Entrance *e = map->GetEntrance(i);
 
 		stream->Write( e->Name, 32);
-		tmpword = (ieWord) e->Pos.x;
-		stream->WriteWord( &tmpword);
-		tmpword = (ieWord) e->Pos.y;
-		stream->WriteWord( &tmpword);
+		tmpWord = (ieWord) e->Pos.x;
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) e->Pos.y;
+		stream->WriteWord( &tmpWord);
 		stream->WriteDword( &e->Face);
 		//a large empty piece of crap
 		stream->Write( filling, 62);
@@ -1362,25 +1613,53 @@ int AREImp::PutAmbients( DataStream *stream, Map *map)
 
 int AREImp::PutMapnotes( DataStream *stream, Map *map)
 {
+	char filling[8];
 	ieDword tmpDword;
 	ieWord tmpWord;
 
 	//different format
 	int pst = core->HasFeature( GF_AUTOMAP_INI );
 
+	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<NoteCount;i++) {
 		MapNote *mn = map->GetMapNote(i);
+		int x;
 
 		if (pst) {
 			tmpDword = (ieWord) mn->Pos.x;
 			stream->WriteDword( &tmpDword );
 			tmpDword = (ieDword) mn->Pos.y;
 			stream->WriteDword( &tmpDword );
+			int len = strlen(mn->text);
+			if (len>500) len=500;
+			stream->Write( mn->text, len);
+			x = 500-len;
+			for (unsigned int j=0;j<x/8;j++) {
+				stream->Write( filling, 8);
+			}
+			x = x%8;
+			if (x) {
+				stream->Write( filling, x);
+			}
+			stream->WriteWord( &mn->color);
+			stream->WriteWord( &tmpWord);
+			for (x=0;x<5;x++) { //5 empty dwords
+				stream->Write( filling, 4);
+			}
 		} else {
 			tmpWord = (ieWord) mn->Pos.x;
 			stream->WriteWord( &tmpWord );
 			tmpWord = (ieWord) mn->Pos.y;
 			stream->WriteWord( &tmpWord );
+			//strref
+			stream->WriteDword( &tmpDword);
+			stream->WriteWord( &tmpWord);
+			stream->WriteWord( &mn->color);
+			tmpDword = 1;
+			stream->WriteDword( &tmpDword);
+			for (x=0;x<9;x++) { //9 empty dwords
+				stream->Write( filling, 4);
+			}
 		}
 	}
 	return 0;
@@ -1400,6 +1679,7 @@ int AREImp::PutTiles( DataStream * /*stream*/, Map * /*map*/)
 /* no saving of tiled objects, are they used anywhere? */
 int AREImp::PutArea(DataStream *stream, Map *map)
 {
+	ieDword VertIndex = 0;
 	int ret;
 
 	if (!stream || !map) {
@@ -1411,32 +1691,47 @@ int AREImp::PutArea(DataStream *stream, Map *map)
 		return ret;
 	}
 
-	ret = PutDoors( stream, map);
-	if (ret) {
-		return ret;
-	}
-
-	ret = PutContainers( stream, map);
-	if (ret) {
-		return ret;
-	}
-
-	ret = PutRegions( stream, map);
-	if (ret) {
-		return ret;
-	}
-
 	ret = PutActors( stream, map);
 	if (ret) {
 		return ret;
 	}
 
-	ret = PutAnimations( stream, map);
+	ret = PutRegions( stream, map, VertIndex);
+	if (ret) {
+		return ret;
+	}
+
+	ret = PutSpawns( stream, map);
 	if (ret) {
 		return ret;
 	}
 
 	ret = PutEntrances( stream, map);
+	if (ret) {
+		return ret;
+	}
+
+	ret = PutContainers( stream, map, VertIndex);
+	if (ret) {
+		return ret;
+	}
+
+	ret = PutItems( stream, map);
+	if (ret) {
+		return ret;
+	}
+
+	ret = PutDoors( stream, map, VertIndex);
+	if (ret) {
+		return ret;
+	}
+
+	ret = PutVertices( stream, map);
+	if (ret) {
+		return ret;
+	}
+
+	ret = PutAnimations( stream, map);
 	if (ret) {
 		return ret;
 	}

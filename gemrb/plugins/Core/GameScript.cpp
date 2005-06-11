@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.284 2005/06/10 21:12:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.285 2005/06/11 20:18:00 avenger_teambg Exp $
  *
  */
 
@@ -5911,11 +5911,11 @@ int GameScript::CheckDoorFlags( Scriptable* Sender, Trigger* parameters)
 /* works only on animations?*/
 int GameScript::Frame( Scriptable* Sender, Trigger* parameters)
 {
-	Animation* anim = Sender->GetCurrentArea()->GetAnimation(parameters->objectParameter->objectName);
+	AreaAnimation* anim = Sender->GetCurrentArea()->GetAnimation(parameters->objectParameter->objectName);
 	if (!anim) {
 		return 0;
 	}
-	int frame = anim->GetCurrentFrame();
+	int frame = anim->frame;
 	if ((frame>=parameters->int0Parameter) &&
 	(frame<=parameters->int1Parameter) ) {
 		return 1;
@@ -6426,7 +6426,7 @@ void GameScript::CreateCreatureCore(Scriptable* Sender, Action* parameters,
 		default: //absolute point, but -1,-1 means AtFeet
 			pnt.x = parameters->pointParameter.x;
 			pnt.y = parameters->pointParameter.y;
-			if ((pnt.x==-1) && (pnt.y==-1)) {
+			if (pnt.isempty()) {
 				pnt.x = Sender->Pos.x;
 				pnt.y = Sender->Pos.y;
 			}
@@ -7393,7 +7393,7 @@ void GameScript::SoundActivate(Scriptable* /*Sender*/, Action* parameters)
 // according to IESDP this action is about animations
 void GameScript::AmbientActivate(Scriptable* Sender, Action* parameters)
 {
-	Animation* anim = Sender->GetCurrentArea( )->GetAnimation( parameters->string0Parameter);
+	AreaAnimation* anim = Sender->GetCurrentArea( )->GetAnimation( parameters->string0Parameter);
 	if (!anim) {
 		anim = Sender->GetCurrentArea( )->GetAnimation( parameters->objects[1]->objectName );
 	}
@@ -7411,7 +7411,7 @@ void GameScript::AmbientActivate(Scriptable* Sender, Action* parameters)
 
 void GameScript::StaticStart(Scriptable* Sender, Action* parameters)
 {
-	Animation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objects[1]->objectName);
+	AreaAnimation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objects[1]->objectName);
 	if (!anim) {
 		printf( "Script error: No Animation Named \"%s\"\n",
 			parameters->objects[1]->objectName );
@@ -7422,7 +7422,7 @@ void GameScript::StaticStart(Scriptable* Sender, Action* parameters)
 
 void GameScript::StaticStop(Scriptable* Sender, Action* parameters)
 {
-	Animation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objects[1]->objectName);
+	AreaAnimation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objects[1]->objectName);
 	if (!anim) {
 		printf( "Script error: No Animation Named \"%s\"\n",
 			parameters->objects[1]->objectName );
@@ -7433,23 +7433,12 @@ void GameScript::StaticStop(Scriptable* Sender, Action* parameters)
 
 void GameScript::StaticPalette(Scriptable* Sender, Action* parameters)
 {
-	Animation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objects[1]->objectName);
+	AreaAnimation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objects[1]->objectName);
 	if (!anim) {
 		printf( "Script error: No Animation Named \"%s\"\n",
 			parameters->objects[1]->objectName );
 		return;
 	}
-	ImageMgr *bmp = (ImageMgr *) core->GetInterface( IE_BMP_CLASS_ID);
-	if (!bmp) {
-		return;
-	}
-	DataStream* s = core->GetResourceMgr()->GetResource( parameters->string0Parameter, IE_BMP_CLASS_ID );
-	bmp->Open( s, true );
-	Color *pal = (Color *) malloc( sizeof(Color) * 256 );
-	bmp->GetPalette( 0, 256, pal );
-	core->FreeInterface( bmp );
-	anim->SetPalette( pal, true );
-	free (pal);
 }
 
 void GameScript::WaitAnimation(Scriptable* Sender, Action* parameters)
@@ -9267,7 +9256,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	//check for success, failure sends an attackedby trigger and a
 	//pickpocket failed trigger sent to the target and sender respectively
 	//slot == -1 here means money
-	if (slot==-1) { 
+	if (slot == -1) { 
 		scr->NewStat(IE_GOLD,-money,MOD_ADDITIVE);
 		snd->NewStat(IE_GOLD,money,MOD_ADDITIVE);
 		return;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.cpp,v 1.10 2004/10/04 22:33:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.cpp,v 1.11 2005/06/11 20:17:58 avenger_teambg Exp $
  *
  */
 
@@ -31,23 +31,23 @@
 #ifdef HAS_VORBIS_SUPPORT
 static size_t ovfd_read(void *ptr, size_t size, size_t nmemb, void *datasource)
 {
-        DataStream *vb = (DataStream *) datasource;
-        int bytesToRead = size * nmemb;
+	DataStream *vb = (DataStream *) datasource;
+	int bytesToRead = size * nmemb;
 
 	int remains = vb->Remains();
-        if(remains<=0) {
-                /* no more reading, we're at the end */
-                return 0;
-        }
-        if(bytesToRead > remains ) {
-                bytesToRead = remains;
-        }
-        vb->Read(ptr, bytesToRead);
-        return bytesToRead;
+	if(remains<=0) {
+		/* no more reading, we're at the end */
+		return 0;
+	}
+	if(bytesToRead > remains ) {
+		bytesToRead = remains;
+	}
+	vb->Read(ptr, bytesToRead);
+	return bytesToRead;
 }
 
 static int ovfd_seek(void *datasource, int64_t offset, int whence) {
-        DataStream *vb = (DataStream *) datasource;
+	DataStream *vb = (DataStream *) datasource;
 	switch(whence) {
 		case SEEK_SET:
 			if(vb->Seek(offset, GEM_STREAM_START)<0)
@@ -68,11 +68,11 @@ static int ovfd_seek(void *datasource, int64_t offset, int whence) {
 }
 
 static int ovfd_close(void */*datasource*/) {
-        return 0;
+	return 0;
 }
 
 static long ovfd_tell(void *datasource) {
-        DataStream *vb = (DataStream *) datasource;
+	DataStream *vb = (DataStream *) datasource;
 	return (long) vb->Pos;
 }
 
@@ -81,7 +81,7 @@ int COGGReader::init_reader()
 	vorbis_info *info;
 	int res;
 	ov_callbacks cbstruct = {
-	        ovfd_read, ovfd_seek, ovfd_close, ovfd_tell
+		ovfd_read, ovfd_seek, ovfd_close, ovfd_tell
 	};
 
 	res=ov_open_callbacks(stream, &OggStream, NULL, 0, cbstruct);

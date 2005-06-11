@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.168 2005/06/10 21:12:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.169 2005/06/11 20:18:01 avenger_teambg Exp $
  *
  */
 
@@ -541,24 +541,29 @@ void Map::DrawMap(Region screen, GameControl* gc)
 	//Blit the Background Map Animations (before actors)
 	Video* video = core->GetVideoDriver();  
 	for (i = 0; i < animations.size(); i++) {
-		Animation *anim = animations[i];
-
-		if (!(anim->Flags&A_ANI_BACKGROUND)) continue; //these are drawn after actors
-		if (!(anim->Flags&A_ANI_ACTIVE)) continue;
+		AreaAnimation *a  = animations[i];
+		int animcount=a->animcount;
 		
-		Point p;
-		p.x = anim->x;
-		p.y = anim->y;
-		if (!IsVisible( p, !(anim->Flags & A_ANI_NOT_IN_FOG)) )
+		if (!(a->Flags&A_ANI_BACKGROUND)) continue; //these are drawn after actors
+		if (!(a->Flags&A_ANI_ACTIVE)) continue;
+		
+		if (!IsVisible( a->Pos, !(a->Flags & A_ANI_NOT_IN_FOG)) )
 			continue;
 		Color tint = {0,0,0,0};
-		if (!(anim->Flags&A_ANI_NO_SHADOW)) {
-			tint = LightMap->GetPixel( p.x / 16, p.y / 12);
+		if (!(a->Flags&A_ANI_NO_SHADOW)) {
+			tint = LightMap->GetPixel( a->Pos.x / 16, a->Pos.y / 12);
+		}
+		if (a->Flags&A_ANI_BLEND) {
+			tint.a = 0xa0;
+		} else {
 			tint.a = 255;
 		}
-		video->BlitSpriteTinted( anim->NextFrame(),
-			p.x + screen.x, p.y + screen.y,
-			tint, anim->Palette, &screen );		
+		while (animcount--) {
+			Animation *anim = a->animation[animcount];
+			video->BlitSpriteTinted( anim->NextFrame(),
+				a->Pos.x + screen.x, a->Pos.y + screen.y,
+				tint, anim->Palette, &screen );		
+		}
 	}
 	//Draw Selected Door Outline
 	if (gc->overDoor) {
@@ -679,24 +684,29 @@ void Map::DrawMap(Region screen, GameControl* gc)
 
 	//draw normal animations after actors
 	for (i = 0; i < animations.size(); i++) {
-		Animation *anim = animations[i];
+		AreaAnimation *a  = animations[i];
+		int animcount=a->animcount;
+		
+		if (a->Flags&A_ANI_BACKGROUND) continue; //these are drawn before actors
+		if (!(a->Flags&A_ANI_ACTIVE)) continue;
 
-		if (anim->Flags&A_ANI_BACKGROUND) continue; //these are drawn before actors
-		if (!(anim->Flags&A_ANI_ACTIVE)) continue;
-
-		Point p;
-		p.x = anim->x;
-		p.y = anim->y;
-		if (!IsVisible( p, !(anim->Flags & A_ANI_NOT_IN_FOG)) )
+		if (!IsVisible( a->Pos, !(a->Flags & A_ANI_NOT_IN_FOG)) )
 			continue;
 		Color tint = {0,0,0,0};
-		if (!(anim->Flags&A_ANI_NO_SHADOW)) {
-			tint = LightMap->GetPixel( p.x / 16, p.y / 12);
-			tint.a = 0xA0;
+		if (!(a->Flags&A_ANI_NO_SHADOW)) {
+			tint = LightMap->GetPixel( a->Pos.x / 16, a->Pos.y / 12);
 		}
-		video->BlitSpriteTinted( anim->NextFrame(),
-			p.x + screen.x, p.y + screen.y,
-			tint, anim->Palette, &screen );
+		if (a->Flags&A_ANI_BLEND) {
+			tint.a = 0xa0;
+		} else {
+			tint.a = 255;
+		}
+		while (animcount--) {
+			Animation *anim = a->animation[animcount];
+			video->BlitSpriteTinted( anim->NextFrame(),
+				a->Pos.x + screen.x, a->Pos.y + screen.y,
+				tint, anim->Palette, &screen );
+		}
 	}
 
 	for (i = 0; i < vvcCells.size(); i++) {
@@ -733,7 +743,7 @@ void Map::DrawMap(Region screen, GameControl* gc)
 	}
 }
 
-void Map::AddAnimation(Animation* anim)
+void Map::AddAnimation(AreaAnimation* anim)
 {
 	animations.push_back( anim );
 }
@@ -991,17 +1001,34 @@ void Map::AddVVCCell(ScriptedAnimation* vvc)
 	vvcCells.push_back( vvc );
 }
 
-Animation* Map::GetAnimation(const char* Name)
+AreaAnimation* Map::GetAnimation(const char* Name)
 {
 	unsigned int i=animations.size();
 	while (i--) {
-		Animation *anim = animations[i];
+		AreaAnimation *anim = animations[i];
 
-		if (anim->ScriptName && (strnicmp( anim->ScriptName, Name, 32 ) == 0)) {
+		if (anim->Name && (strnicmp( anim->Name, Name, 32 ) == 0)) {
 			return anim;
 		}
 	}
 	return NULL;
+}
+
+Spawn *Map::AddSpawn(char* Name, int XPos, int YPos, ieResRef *creatures, unsigned int count)
+{
+	Spawn* sp = new Spawn();
+	strnuprcpy(sp->Name, Name, 32);
+	if (count>10) {
+		count=10;
+	}
+	sp->Pos.x = XPos;
+	sp->Pos.y = YPos;
+	sp->Count = count;
+	sp->Creatures = (ieResRef *) calloc( count, sizeof(ieResRef) );
+	for( unsigned int i=0;i<count;i++) {
+		strnuprcpy(sp->Creatures[i],creatures[i],8);
+	}
+	return sp;
 }
 
 void Map::AddEntrance(char* Name, int XPos, int YPos, short Face)
@@ -1018,8 +1045,10 @@ Entrance* Map::GetEntrance(const char* Name)
 {
 	unsigned int i=entrances.size();
 	while (i--) {
-		if (stricmp( entrances[i]->Name, Name ) == 0) {
-			return entrances[i];
+		Entrance *e = entrances[i];
+
+		if (stricmp( e->Name, Name ) == 0) {
+			return e;
 		}
 	}
 	return NULL;
@@ -1549,7 +1578,7 @@ void Map::SetupAmbients()
 }
 //--------mapnotes----------------
 //text must be a pointer we can claim ownership of
-void Map::AddMapNote(Point point, int color, char *text)
+void Map::AddMapNote(Point &point, int color, char *text)
 {
 	MapNote *mn = new MapNote;
 
@@ -1560,7 +1589,7 @@ void Map::AddMapNote(Point point, int color, char *text)
 	mapnotes.push_back(mn);
 }
 
-void Map::RemoveMapNote(Point point)
+void Map::RemoveMapNote(Point &point)
 {
 	int i = mapnotes.size();
 	while (i--) {
@@ -1572,7 +1601,7 @@ void Map::RemoveMapNote(Point point)
 	}
 }
 
-MapNote *Map::GetMapNote(Point point)
+MapNote *Map::GetMapNote(Point &point)
 {
 	int i = mapnotes.size();
 	while (i--) {
@@ -1583,7 +1612,7 @@ MapNote *Map::GetMapNote(Point point)
 	return NULL;
 }
 //--------spawning------------------
-void Map::SpawnCreature(Point pos, char *CreName, int radius)
+void Map::SpawnCreature(Point &pos, char *CreName, int radius)
 {
 	char *Spawngroup=NULL;
 	Actor *creature;
@@ -1610,7 +1639,7 @@ void Map::SpawnCreature(Point pos, char *CreName, int radius)
 }
 
 //--------restheader----------------
-bool Map::Rest(Point pos, int hours)
+bool Map::Rest(Point &pos, int hours)
 {
 	int chance=RestHeader.DayChance; //based on ingame timer
 	if ( !RestHeader.CreatureNum) return false;
@@ -1728,6 +1757,7 @@ Spawn* Map::GetSpawn(const char* Name)
 {
 	for (size_t i = 0; i < spawns.size(); i++) {
 		Spawn* sp = spawns[i];
+
 		if (stricmp( sp->Name, Name ) == 0)
 			return sp;
 	}
@@ -1784,4 +1814,41 @@ void Map::CopyGroundPiles(Map *othermap, Point &Pos)
 			}
 		}
 	}
+}
+
+////////////////////AreaAnimation//////////////////
+//Area animation
+
+AreaAnimation::AreaAnimation()
+{
+	animation=NULL;
+	animcount=0;
+}
+
+AreaAnimation::~AreaAnimation()
+{
+	for(int i=0;i<animcount;i++) {
+		if (animation[i]) {
+			delete (animation[i]);
+		}
+	}
+	free(animation);
+}
+
+void AreaAnimation::SetPalette(ieResRef Pal)
+{
+	strnuprcpy(Palette, Pal, 8);
+	ImageMgr *bmp = (ImageMgr *) core->GetInterface( IE_BMP_CLASS_ID);
+	if (!bmp) {
+		return;
+	}
+	DataStream* s = core->GetResourceMgr()->GetResource( Pal, IE_BMP_CLASS_ID );
+	bmp->Open( s, true );
+	Color *pal = (Color *) malloc( sizeof(Color) * 256 );
+	bmp->GetPalette( 0, 256, pal );
+	core->FreeInterface( bmp );
+	for (int i=0;i<animcount;i++) {
+		animation[i]->SetPalette( pal, true );
+	}
+	free (pal);
 }

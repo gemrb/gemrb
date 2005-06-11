@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorMgr.h,v 1.3 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorMgr.h,v 1.4 2005/06/11 20:18:00 avenger_teambg Exp $
  *
  */
 
@@ -44,6 +44,11 @@ public:
 	virtual ~ActorMgr(void);
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
 	virtual Actor* GetActor() = 0;
+
+	//returns saved size, updates internal offsets before save
+	virtual int GetStoredFileSize(Actor *ac) = 0;
+	//saves file
+	virtual int PutActor(DataStream *stream, Actor *actor) = 0;
 };
 
 #endif

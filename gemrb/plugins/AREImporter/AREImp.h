@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.h,v 1.24 2005/06/10 21:12:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.h,v 1.25 2005/06/11 20:17:59 avenger_teambg Exp $
  *
  */
 
@@ -33,7 +33,7 @@ private:
 	ieDword LastSave;
 	ieDword AreaFlags;
 	ieWord  AreaType, WRain, WSnow, WFog, WLightning, WUnknown;
-	ieDword ActorOffset, AnimOffset, AnimCount;
+	ieDword ActorOffset, EmbeddedCreOffset, AnimOffset, AnimCount;
 	ieDword VerticesOffset;
 	ieDword DoorsCount, DoorsOffset;
 	ieDword ExploredBitmapSize, ExploredBitmapOffset;
@@ -53,7 +53,7 @@ public:
 	~AREImp(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	Map* GetMap(const char* ResRef);
-	int GetStoredFileSize(Map *st);
+	int GetStoredFileSize(Map *map);
 	/* stores an area in the Cache (swaps it out) */
 	int PutArea(DataStream *stream, Map *map);
 	void release(void)
@@ -61,11 +61,15 @@ public:
 		delete this;
 	}
 private:
+	Animation *GetAnimationPiece(AnimationFactory *af, int animCycle, AreaAnimation *a);
 	CREItem* GetItem();
 	int PutHeader(DataStream *stream, Map *map);
-	int PutDoors(DataStream *stream, Map *map);
-	int PutContainers(DataStream *stream, Map *map);
-	int PutRegions(DataStream *stream, Map *map);
+	int PutPoints(DataStream *stream, Point *p, unsigned int count);
+	int PutDoors(DataStream *stream, Map *map, ieDword &VertIndex);
+	int PutItems(DataStream *stream, Map *map);
+	int PutContainers(DataStream *stream, Map *map, ieDword &VertIndex);
+	int PutRegions(DataStream *stream, Map *map, ieDword &VertIndex);
+	int PutVertices(DataStream *stream, Map *map);
 	int PutSpawns(DataStream *stream, Map *map);
 	int PutActors(DataStream *stream, Map *map);
 	int PutAnimations(DataStream *stream, Map *map);

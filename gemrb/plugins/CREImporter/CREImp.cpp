@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.72 2005/06/06 22:21:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.73 2005/06/11 20:17:59 avenger_teambg Exp $
  *
  */
 
@@ -215,13 +215,12 @@ Actor* CREImp::GetActor()
 		act->version = CREVersion;
 	}
 	act->InParty = 0;
-	ieDword strref;
-	str->ReadDword( &strref );
-	char* poi = core->GetString( strref );
+	str->ReadDword( &act->LongStrRef );
+	char* poi = core->GetString( act->LongStrRef );
 	act->SetText( poi, 1 ); //setting longname
 	free( poi );
-	str->ReadDword( &strref );
-	poi = core->GetString( strref );
+	str->ReadDword( &act->ShortStrRef );
+	poi = core->GetString( act->ShortStrRef );
 	act->SetText( poi, 2 ); //setting shortname (for tooltips)
 	free( poi );
 	act->BaseStats[IE_VISUALRANGE] = 30; //this is just a hack
@@ -1076,3 +1075,226 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 
 	str->ReadResRef( act->Dialog );
 }
+
+int CREImp::GetStoredFileSize(Actor *actor)
+{
+	int headersize;
+
+	switch (actor->version) {
+		case IE_CRE_GEMRB:
+		case IE_CRE_V1_0://bg1/bg2
+			headersize = 0x2d4;
+			break;
+		case IE_CRE_V1_2: //pst
+			headersize = 0x378;
+			break;
+		case IE_CRE_V2_2://iwd2
+			headersize = 0x33c; //?
+			break;
+		case IE_CRE_V9_0://iwd
+			headersize = 0x33c;
+			break;
+		default:
+			return -1;
+	}
+	return headersize;
+}
+
+int CREImp::PutInventory(DataStream *stream, Actor *actor, unsigned int size)
+{
+	unsigned int i;
+	ieDword tmpDword;
+	ieWord ItemCount = 0;
+	ieWord *indices =(ieWord *) malloc(size*sizeof(ieWord) );
+	
+	for(i=0;i<size;i++) {
+		indices[i]=(ieWord) -1;
+	}
+	for(i=0;i<size;i++) {
+		CREItem *it = actor->inventory.GetSlotItem(i);
+		if (!it) {
+			continue;
+		}
+		stream->WriteResRef( it->ItemResRef);
+		stream->WriteWord( &it->PurchasedAmount);
+		stream->WriteWord( &it->Usages[0]);
+		stream->WriteWord( &it->Usages[1]);
+		stream->WriteWord( &it->Usages[2]);
+		stream->WriteDword( &it->Flags);
+		indices[i] = ItemCount++;
+	}
+	for(i=0;i<size;i++) {
+		stream->WriteWord( indices+i);
+	}
+	tmpDword = actor->inventory.GetEquippedSlot();
+	stream->WriteDword( &tmpDword);
+	free(indices);
+	return 0;
+}
+
+int CREImp::PutHeader(DataStream *stream, Actor *actor)
+{
+	char Signature[8];
+	ieWord tmpWord;
+
+	memcpy( Signature, "CRE V0.0", 8);
+	Signature[5]+=actor->version/10;
+	Signature[7]+=actor->version%10;
+	stream->Write( Signature, 8);
+	stream->WriteDword( &actor->ShortStrRef);
+	stream->WriteDword( &actor->LongStrRef);
+	stream->WriteDword( &actor->BaseStats[IE_MC_FLAGS]);
+	stream->WriteDword( &actor->BaseStats[IE_XP]);
+	stream->WriteDword( &actor->BaseStats[IE_XPVALUE]);
+	stream->WriteDword( &actor->BaseStats[IE_GOLD]);
+	stream->WriteDword( &actor->BaseStats[IE_STATE_ID]);
+	tmpWord = actor->BaseStats[IE_HITPOINTS];
+	stream->WriteWord( &tmpWord);
+	tmpWord = actor->BaseStats[IE_MAXHITPOINTS];
+	stream->WriteWord( &tmpWord);
+	stream->WriteDword( &actor->BaseStats[IE_ANIMATION_ID]);
+	for(int i=0;i<7;i++) {
+		Signature[i] = (char) actor->BaseStats[IE_METAL_COLOR+i];
+	}
+	//old effect type (additional check needed for bg1)
+	if (actor->version==IE_CRE_V1_2) { //pst effect
+		Signature[8] = 0;
+	} else {
+		Signature[8] = 1;
+	}
+	stream->Write( Signature, 8);
+	stream->WriteResRef( actor->SmallPortrait);
+	stream->WriteResRef( actor->LargePortrait);
+
+	return 0;
+}
+
+int CREImp::PutActorGemRB(DataStream *stream, Actor *actor)
+{
+	ieByte tmpByte;
+
+	tmpByte = actor->BaseStats[IE_REPUTATION];
+	stream->Write( &tmpByte, 1 );
+	tmpByte = actor->BaseStats[IE_HIDEINSHADOWS];
+	stream->Write( &tmpByte, 1 );
+	return 0;
+}
+
+int CREImp::PutActorBG(DataStream *stream, Actor *actor)
+{
+	ieByte tmpByte;
+
+	tmpByte = actor->BaseStats[IE_REPUTATION];
+	stream->Write( &tmpByte, 1 );
+	tmpByte = actor->BaseStats[IE_HIDEINSHADOWS];
+	stream->Write( &tmpByte, 1 );
+	return 0;
+}
+
+int CREImp::PutActorPST(DataStream *stream, Actor *actor)
+{
+	ieByte tmpByte;
+
+	tmpByte = actor->BaseStats[IE_REPUTATION];
+	stream->Write( &tmpByte, 1 );
+	tmpByte = actor->BaseStats[IE_HIDEINSHADOWS];
+	stream->Write( &tmpByte, 1 );
+	return 0;
+}
+
+int CREImp::PutActorIWD1(DataStream *stream, Actor *actor)
+{
+	ieByte tmpByte;
+
+	tmpByte = actor->BaseStats[IE_REPUTATION];
+	stream->Write( &tmpByte, 1 );
+	tmpByte = actor->BaseStats[IE_HIDEINSHADOWS];
+	stream->Write( &tmpByte, 1 );
+	return 0;
+}
+
+int CREImp::PutActorIWD2(DataStream *stream, Actor *actor)
+{
+	ieByte tmpByte;
+
+	tmpByte = actor->BaseStats[IE_REPUTATION];
+	stream->Write( &tmpByte, 1 );
+	tmpByte = actor->BaseStats[IE_HIDEINSHADOWS];
+	stream->Write( &tmpByte, 1 );
+	return 0;
+}
+
+//add as effect!
+int CREImp::PutVariables( DataStream *stream, Actor *actor)
+{
+	char filling[40];
+	POSITION pos=NULL;
+	const char *name;
+	ieDword value;
+
+	memset(filling,0,sizeof(filling) );
+	unsigned int VariablesCount = actor->locals->GetCount();
+	for (unsigned int i=0;i<VariablesCount;i++) {
+		actor->locals->GetNextAssoc( pos, name, value);
+		stream->Write( name, 32);
+		stream->Write( filling, 8);
+		stream->WriteDword( &value);
+		//40 bytes of empty crap
+		stream->Write( filling, 40);
+	}
+	return 0;
+}
+
+int CREImp::PutActor(DataStream *stream, Actor *actor)
+{
+	int ret;
+
+	if (!stream || !actor) {
+		return -1;
+	}
+
+	ret = PutHeader( stream, actor);
+	if (ret) {
+		return ret;
+	}
+	unsigned int Inventory_Size;
+
+	switch (actor->version) {
+		case IE_CRE_GEMRB:
+			Inventory_Size=actor->inventory.GetSlotCount();
+			ret = PutActorGemRB(stream, actor);
+			break;
+		case IE_CRE_V1_2:
+			Inventory_Size=46;
+			ret = PutActorPST(stream, actor);
+			break;
+		case IE_CRE_V1_0: //bg1 too
+			Inventory_Size=38;
+			ret = PutActorBG(stream, actor);
+			break;
+		case IE_CRE_V2_2:
+			Inventory_Size=50;
+			ret = PutActorIWD2(stream, actor);
+			break;
+		case IE_CRE_V9_0:
+			Inventory_Size=38;
+			ret = PutActorIWD1(stream, actor);
+			break;
+		default:
+			return -1;
+	}
+	if (ret) {
+		return ret;
+	}
+	//spells, spellbook etc
+
+	//variables
+
+	//items and inventory slots
+	ret = PutInventory( stream, actor, Inventory_Size);
+	if (ret) {
+		return ret;
+	}
+	return 0;
+}
+

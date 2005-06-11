@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.31 2005/05/28 19:02:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.32 2005/06/11 20:18:00 avenger_teambg Exp $
  *
  */
 
@@ -48,7 +48,6 @@ Animation::Animation(int count)
 	Flags = A_ANI_ACTIVE;
 	fps = 15;
 	endReached = false;
-	ScriptName = NULL;
 	//behaviour flags
 	playReversed = false;
 }
@@ -64,7 +63,6 @@ Animation::~Animation(void)
 	}
 	free(frames);
 	if (Palette) video->FreePalette(Palette);
-	if (ScriptName) free(ScriptName);
 }
 
 void Animation::SetPos(unsigned int index)
@@ -134,12 +132,17 @@ Sprite2D* Animation::NextFrame(void)
 	unsigned long time;
 	GetTime(time);
 
+	//it could be that we skip more than one frame in case of slow rendering
+	//large, composite animations (dragons, multi-part area anims) require synchronisation
 	if (( time - starttime ) >= ( unsigned long ) ( 1000 / fps )) {
-		pos++;
-		starttime = time;
+		int inc = (time-starttime)*fps/1000;
+		pos += inc;
+		starttime += inc*1000/fps;
 	}	
 	if (pos >= indicesCount ) {
-		pos = 0;
+		if (indicesCount) {
+			pos = pos%indicesCount;
+		}
 		endReached = true;
 	}
 	return ret;
@@ -190,10 +193,4 @@ void Animation::MirrorAnimation()
 	}
 	// This function will create independent sprites we have to free
 	autofree = true;
-}
-
-void Animation::SetScriptName(const char *name)
-{
-	if (!ScriptName) ScriptName=(char *) malloc(33);
-	strnuprcpy( ScriptName, name, 32 );
 }

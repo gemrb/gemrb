@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.75 2005/06/10 21:12:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.76 2005/06/11 20:18:01 avenger_teambg Exp $
  *
  */
 
@@ -102,8 +102,8 @@ public:
 	Point Pos;
 	ieWord color;
 	char *text;
-	MapNote() { text=NULL; };
-	~MapNote() { if(text) free(text); };
+	MapNote() { text=NULL; }
+	~MapNote() { if(text) free(text); }
 } MapNote;
 
 typedef class Spawn {
@@ -112,21 +112,33 @@ public:
 	Point Pos;
 	ieResRef *Creatures;
 	unsigned int Count;
-	Spawn(const char *name, ieResRef *creatures, unsigned int count)
-	{
-		strnuprcpy(Name, name, 32);
-		if (count>10) {
-			count=10;
-		}
-		Count = count;
-		Creatures = (ieResRef *) calloc( count, sizeof(ieResRef) );
-		for( unsigned int i=0;i<count;i++) {
-			strnuprcpy(Creatures[i],creatures[i],8);
-		}
-	}
-	~Spawn() { free(Creatures); } //only constructor always allocates it
+	ieDword appearance;
+	ieWord Difficulty;
+	ieWord Minimum;
+	ieWord Maximum;
+	ieWord DayChance;
+	ieWord NightChance;
+	Spawn() { Creatures=NULL;  }
+	~Spawn() { if(Creatures) free(Creatures); } 
 	unsigned int GetCreatureCount() { return Count; }
 } Spawn;
+
+class GEM_EXPORT AreaAnimation {
+public:
+	char Name[33];
+	Point Pos;
+	Animation **animation;
+	int animcount;
+	ieDword appearance;
+	ieDword Flags;
+	ieResRef BAM; //only for saving back
+	ieWord sequence;
+	ieWord frame;
+	ieResRef Palette;
+	AreaAnimation();
+	~AreaAnimation();
+	void SetPalette(ieResRef Palette);
+};
 
 class GEM_EXPORT Map : public Scriptable {
 public:
@@ -137,7 +149,7 @@ public:
 	ieDword AreaFlags;
 	ieWord AreaType;
 	ieWord Rain, Snow, Fog, Lightning;
-	bool ChangeArea; //set true if movement is allowed between areas
+	//bool ChangeArea; //set true if movement is allowed between areas
 	//Variables *vars;
 	ieByte* ExploredBitmap;
 	ieByte* VisibleBitmap;
@@ -147,7 +159,7 @@ private:
 	unsigned short* MapSet;
 	std::queue< unsigned int> InternalStack;
 	unsigned int Width, Height;
-	std::vector< Animation*> animations;
+	std::vector< AreaAnimation*> animations;
 	std::vector< Actor*> actors;
 	std::vector< WallGroup*> wallGroups;
 	std::vector< ScriptedAnimation*> vvcCells;
@@ -175,9 +187,9 @@ public:
 	void DrawContainers(Region screen, Container *overContainer);
 	void DrawMap(Region screen, GameControl* gc);
 	void PlayAreaSong(int);
-	void AddAnimation(Animation* anim);
-	Animation* GetAnimation(const char* Name);
-	Animation* GetAnimation(int i) { return animations[i]; }
+	void AddAnimation(AreaAnimation* anim);
+	AreaAnimation* GetAnimation(const char* Name);
+	AreaAnimation* GetAnimation(int i) { return animations[i]; }
 	int GetAnimationCount() const { return (int) animations.size(); }
 
 	void Shout(Scriptable* Sender, int shoutID, unsigned int radius);
@@ -245,18 +257,19 @@ public:
 	unsigned int GetAmbientCount() { return (unsigned int) ambients.size(); }
 
 	//mapnotes
-	void AddMapNote(Point point, int color, char *text);
-	void RemoveMapNote(Point point);
+	void AddMapNote(Point &point, int color, char *text);
+	void RemoveMapNote(Point &point);
 	MapNote *GetMapNote(int i) { return mapnotes[i]; }
-	MapNote *GetMapNote(Point point);
+	MapNote *GetMapNote(Point &point);
 	unsigned int GetMapNoteCount() { return (unsigned int) mapnotes.size(); }
 	//restheader
 	/* May spawn creature(s), returns true in case of an interrupted rest */
-	bool Rest(Point pos, int hours);
+	bool Rest(Point &pos, int hours);
 	/* Spawns creature(s) in radius of position */
-	void SpawnCreature(Point pos, char *CreName, int radius = 0);
+	void SpawnCreature(Point &pos, char *CreName, int radius = 0);
 
 	//spawns
+	Spawn *AddSpawn(char* Name, int XPos, int YPos, ieResRef *creatures, unsigned int count);
 	Spawn *GetSpawn(int i) { return spawns[i]; }
 	//returns spawn by name
 	Spawn *GetSpawn(const char *Name);

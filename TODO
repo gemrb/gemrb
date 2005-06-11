@@ -26,7 +26,7 @@ Area:
 2. Don't load scripts for pile items? (research when a script is unused)
 
 Store:
-1. Save stores, handle containers
+1. (PARTLY) Save stores, handle containers
 
 Animation:
 1. (PARTLY) fix char animation sequences

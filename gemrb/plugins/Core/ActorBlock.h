@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.75 2005/06/10 21:12:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.76 2005/06/11 20:18:00 avenger_teambg Exp $
  *
  */
 
@@ -237,7 +237,6 @@ public:
 	PathNode* step;
 	unsigned long timeStartStep;
 	Sprite2D* lastFrame;
-	ieDword TalkCount;
 	int InternalFlags;
 	ieResRef Area;
 public:
@@ -309,8 +308,8 @@ public:
 	ieWord TrapDetectionDiff;
 	ieWord TrapRemovalDiff;
 	ieDword TrapFlags;
-	ieDword OpenStrRef;
-	ieDword NameStrRef;
+	ieStrRef OpenStrRef;
+	ieStrRef NameStrRef;
 	ieResRef Dialog;
 private:
 	void ToggleTiles(int State, bool playsound = false);
@@ -344,18 +343,18 @@ private:
 	void FreeGroundIcons();
 public:
 	Point toOpen;
-	unsigned short Type;
-	unsigned int Flags;
+	ieWord Type;
+	ieDword Flags;
 	ieWord LockDifficulty;
 	ieWord TrapDetectionDiff;
 	ieWord TrapRemovalDiff;
-	unsigned short Trapped;
-	unsigned short TrapDetected;
+	ieWord Trapped;
+	ieWord TrapDetected;
 	Inventory inventory;
-	ieResRef KeyResRef;
 	ieStrRef OpenFail;
 	//these are not saved
 	Sprite2D *groundicons[3];
+	//keyresref is stored in Highlightable
 };
 
 class GEM_EXPORT InfoPoint : public Highlightable {
@@ -378,10 +377,13 @@ public:
 public:
 	ieResRef Destination;
 	char EntranceName[33];
-	unsigned int Flags;
-	unsigned short TrapDetectionDifficulty;
-	unsigned short TrapRemovalDifficulty;
-	unsigned short TrapDetected;
+	ieDword Flags;
+	ieWord TrapDetectionDiff;
+	ieWord TrapRemovalDiff;
+	ieWord Trapped;
+	ieWord TrapDetected;
+	//overheadtext contains the string, but we have to save this
+	ieStrRef StrRef; 
 };
 
 #endif

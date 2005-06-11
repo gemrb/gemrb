@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.94 2005/06/10 21:12:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.95 2005/06/11 20:18:00 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -350,6 +350,7 @@ Highlightable::Highlightable(ScriptableType type)
 	outline = NULL;
 	Highlight = false;
 	Cursor = IE_CURSOR_NORMAL;
+	KeyResRef[0] = 0;
 }
 
 Highlightable::~Highlightable(void)
@@ -395,7 +396,6 @@ Moveble::Moveble(ScriptableType type)
 	timeStartStep = 0;
 	lastFrame = NULL;
 	Area[0] = 0;
-	TalkCount = 0;
 }
 
 Moveble::~Moveble(void)
@@ -738,12 +738,11 @@ InfoPoint::InfoPoint(void)
 	Destination[0] = 0;
 	EntranceName[0] = 0;
 	Flags = 0;
-	TrapDetectionDifficulty = 0;
-	TrapRemovalDifficulty = 0;
+	TrapDetectionDiff = 0;
+	TrapRemovalDiff = 0;
 	TrapDetected = 0;
 	TrapLaunch.x = 0; 
 	TrapLaunch.y = 0;
-	KeyResRef[0] = 0;
 	DialogResRef[0] = 0;
 }
 
@@ -785,7 +784,7 @@ void InfoPoint::DetectTrap(int skill)
 	if (!Scripts[0]) return;
 	if (Flags&(TRAP_DEACTIVATED|TRAP_INVISIBLE) ) return;
 	if ((skill>=100) && (skill!=256) ) skill=100;
-	if (skill/2+core->Roll(1,skill/2,0)>TrapDetectionDifficulty) {
+	if (skill/2+core->Roll(1,skill/2,0)>TrapDetectionDiff) {
 		TrapDetected=1; //probably could be set to the player #?
 	}
 }
@@ -819,7 +818,7 @@ bool InfoPoint::TriggerTrap(int skill)
 	if (Flags&TRAP_DETECTABLE) {
 		TrapDetected=1; //probably too late :)
 		if ((skill>=100) && (skill!=256) ) skill=100;
-		if (skill/2+core->Roll(1,skill/2,0)>TrapDetectionDifficulty) {
+		if (skill/2+core->Roll(1,skill/2,0)>TrapDetectionDiff) {
 			//tumble???
 			return false;
 		}
@@ -859,8 +858,8 @@ void InfoPoint::DebugDump()
 			break;
 	}
 	printf( "TrapDetected: %d  Trapped: %s\n", TrapDetected, YESNO(Scripts[0]));
-	printf( "Trap detection: %d  Trap removal: %d\n", TrapDetectionDifficulty,
-		TrapRemovalDifficulty );
+	printf( "Trap detection: %d  Trap removal: %d\n", TrapDetectionDiff,
+		TrapRemovalDiff );
 	printf( "Key: %s  Dialog: %s\n", KeyResRef, DialogResRef );
 	printf( "Active: %s\n", YESNO(Active));
 }
@@ -972,4 +971,3 @@ void Container::DebugDump()
 	printf( "Trap detection: %d  Trap removal: %d\n", TrapDetectionDiff,
 		TrapRemovalDiff );
 }
-

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.69 2005/06/06 22:21:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.70 2005/06/11 20:18:00 avenger_teambg Exp $
  *
  */
 
@@ -121,6 +121,7 @@ public:
 	/** 0: NPC, 1-8 party slot */
 	unsigned char InParty;
 	char* LongName, * ShortName;
+	ieStrRef ShortStrRef, LongStrRef;
 	ieStrRef StrRefs[100];
 
 	ieWord AppearanceFlags1;
@@ -142,6 +143,9 @@ public:
 	Spellbook spellbook;
 	//savefile version (creatures embedded in area)
 	int version;
+	//in game or area actor header
+	ieDword TalkCount;
+	ieDword appearance;
 public:
 
 	Actor *LastTarget;

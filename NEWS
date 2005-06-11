@@ -1,3 +1,11 @@
+GemRB V0.2.5 (2005-05-29):
+  New features:
+    - Save game
+
+  Improved features:
+    - Last* script triggers fire once and clear the trigger reason correctly
+    - fully working Store screen 
+
 GemRB V0.2.4 (2005-05-29):
   New features:
     - Store dialogs (Temple, Inn, Container, Tavern, Store)
