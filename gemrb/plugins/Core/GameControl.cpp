@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.231 2005/06/10 21:12:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.232 2005/06/12 16:57:22 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -702,21 +702,21 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			lastActor = actor;
 			lastActor->SetOver( true );
 			switch (lastActor->Modified[IE_EA]) {
-				case EVILCUTOFF:
-				case GOODCUTOFF:
+				case EA_EVILCUTOFF:
+				case EA_GOODCUTOFF:
 					break;
 
-				case PC:
-				case FAMILIAR:
-				case ALLY:
-				case CONTROLLED:
-				case CHARMED:
-				case EVILBUTGREEN:
+				case EA_PC:
+				case EA_FAMILIAR:
+				case EA_ALLY:
+				case EA_CONTROLLED:
+				case EA_CHARMED:
+				case EA_EVILBUTGREEN:
 					nextCursor = IE_CURSOR_NORMAL;
 					break;
 
-				case ENEMY:
-				case GOODBUTRED:
+				case EA_ENEMY:
+				case EA_GOODBUTRED:
 					nextCursor = IE_CURSOR_ATTACK;
 					break;
 				default:
@@ -940,12 +940,12 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 	int type;
 
 	type = actor->GetStat(IE_EA);
-	if ( type >= EVILCUTOFF ) {
+	if ( type >= EA_EVILCUTOFF ) {
 		type = 2; //hostile
 	}
 	//can't control GOODBUTBLUE, so: CHARMED
-	//else if ( type > GOODCUTOFF ) {
-	else if ( type > CHARMED ) {
+	//else if ( type > EA_GOODCUTOFF ) {
+	else if ( type > EA_CHARMED ) {
 		type = 1; //neutral
 	}
 	else {

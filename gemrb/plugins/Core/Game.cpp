@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.75 2005/06/10 21:12:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.76 2005/06/12 16:57:21 avenger_teambg Exp $
  *
  */
 
@@ -636,7 +636,7 @@ bool Game::EveryoneNearPoint(const char *area, Point &p, int flags)
 		}
 		if (flags&ENP_CANMOVE) {
 			//someone is uncontrollable, can't move
-			if (PCs[i]->GetStat(IE_EA)>GOODCUTOFF) {
+			if (PCs[i]->GetStat(IE_EA)>EA_GOODCUTOFF) {
 				return false;
 			}
 

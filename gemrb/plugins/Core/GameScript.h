@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.186 2005/06/10 21:12:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.187 2005/06/12 16:57:23 avenger_teambg Exp $
  *
  */
 
@@ -848,6 +848,7 @@ public: //Script Functions
 	static int LocalsGT(Scriptable* Sender, Trigger* parameters);
 	static int LocalsLT(Scriptable* Sender, Trigger* parameters);
 	static int LOS(Scriptable* Sender, Trigger* parameters);
+	static int ModalState(Scriptable* Sender, Trigger* parameters);
 	static int Morale(Scriptable* Sender, Trigger* parameters);
 	static int MoraleGT(Scriptable* Sender, Trigger* parameters);
 	static int MoraleLT(Scriptable* Sender, Trigger* parameters);
@@ -1025,6 +1026,7 @@ public:
 	static void FaceSavedLocation(Scriptable* Sender, Action* parameters);
 	static void FadeFromColor(Scriptable* Sender, Action* parameters);
 	static void FadeToColor(Scriptable* Sender, Action* parameters);
+	static void FindTraps(Scriptable* Sender, Action* parameters);
 	static void FloatMessageFixed(Scriptable* Sender, Action* parameters);
 	static void FloatMessageFixedRnd(Scriptable* Sender, Action* parameters);
 	static void FloatMessageRnd(Scriptable* Sender, Action* parameters);
@@ -1060,6 +1062,7 @@ public:
 	static void GlobalXor(Scriptable* Sender, Action* parameters);
 	static void GlobalXorGlobal(Scriptable* Sender, Action* parameters);
 	static void Help(Scriptable* Sender, Action* parameters);
+	static void Hide(Scriptable* Sender, Action* parameters);
 	static void HideAreaOnMap(Scriptable* Sender, Action* parameters);
 	static void HideCreature(Scriptable* Sender, Action* parameters);
 	static void HideGUI(Scriptable* Sender, Action* parameters);
@@ -1116,6 +1119,7 @@ public:
 	static void OpenDoor(Scriptable* Sender, Action* parameters);
 	static void Panic(Scriptable* Sender, Action* parameters);
 	static void PickPockets(Scriptable* Sender, Action* parameters);
+	static void PlayBardSong(Scriptable* Sender, Action* parameters);
 	static void PlayDead(Scriptable* Sender, Action* parameters);
 	static void PlayDeadInterruptable(Scriptable* Sender, Action* parameters);
 	static void PlayerDialogue(Scriptable* Sender, Action* parameters);
@@ -1226,6 +1230,7 @@ public:
 	static void TeleportParty(Scriptable* Sender, Action* parameters);
 	static void TextScreen(Scriptable* Sender, Action* parameters);
 	static void TriggerActivation(Scriptable* Sender, Action* parameters);
+	static void Turn(Scriptable* Sender, Action* parameters);
 	static void UndoExplore(Scriptable *Sender, Action *parameters);
 	static void UnhideGUI(Scriptable* Sender, Action* parameters);
 	static void Unlock(Scriptable* Sender, Action* parameters);

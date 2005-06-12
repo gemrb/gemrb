@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.286 2005/06/12 10:23:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.287 2005/06/12 16:57:22 avenger_teambg Exp $
  *
  */
 
@@ -417,6 +417,7 @@ static ActionLink actionnames[] = {
 	{"fadefromcolor", GameScript::FadeFromColor,0},
 	{"fadetoblack", GameScript::FadeToColor,0}, //probably the same
 	{"fadetocolor", GameScript::FadeToColor,0},
+	{"findtraps", GameScript::FindTraps,0},
 	{"floatmessage", GameScript::DisplayStringHead,0},
 	{"floatmessagefixed", GameScript::FloatMessageFixed,0},
 	{"floatmessagefixedrnd", GameScript::FloatMessageFixedRnd,0},
@@ -458,6 +459,7 @@ static ActionLink actionnames[] = {
 	{"globalxorglobal", GameScript::GlobalXorGlobal,AF_MERGESTRINGS},
 	{"gotostartscreen", GameScript::QuitGame, 0},
 	{"help", GameScript::Help,0},
+	{"hide", GameScript::Hide,0},
 	{"hideareaonmap", GameScript::HideAreaOnMap,0},
 	{"hidecreature", GameScript::HideCreature,0},
 	{"hidegui", GameScript::HideGUI,0},
@@ -655,6 +657,7 @@ static ActionLink actionnames[] = {
 	{"textscreen", GameScript::TextScreen,0},
 	{"tomsstringdisplayer", GameScript::DisplayMessage,0},
 	{"triggeractivation", GameScript::TriggerActivation,0},
+	{"turn", GameScript::Turn,0},
 	{"undoexplore", GameScript::UndoExplore,0},
 	{"unhidegui", GameScript::UnhideGUI,0},
 	{"unloadarea", GameScript::UnloadArea,0},
@@ -2979,10 +2982,10 @@ Targets *GameScript::XthNearestEnemyOfType(Scriptable *origin, Targets *paramete
 	Actor *actor = (Actor *) origin;
 	//determining the allegiance of the origin
 	int type = 2; //neutral, has no enemies
-	if (actor->GetStat(IE_EA) <= GOODCUTOFF) {
+	if (actor->GetStat(IE_EA) <= EA_GOODCUTOFF) {
 		type = 1; //PC
 	}
-	if (actor->GetStat(IE_EA) >= EVILCUTOFF) {
+	if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
 		type = 0;
 	}
 	if (type==2) {
@@ -2992,13 +2995,13 @@ Targets *GameScript::XthNearestEnemyOfType(Scriptable *origin, Targets *paramete
 
 	while ( t ) {
 		if (type) { //origin is PC
-			if (t->actor->GetStat(IE_EA) <= GOODCUTOFF) {
+			if (t->actor->GetStat(IE_EA) <= EA_GOODCUTOFF) {
 				t=parameters->RemoveTargetAt(m);
 				continue;
 			}
 		}
 		else {
-			if (t->actor->GetStat(IE_EA) >= EVILCUTOFF) {
+			if (t->actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
 				t=parameters->RemoveTargetAt(m);
 				continue;
 			}
@@ -3017,10 +3020,10 @@ Targets *GameScript::XthNearestEnemyOf(Targets *parameters, int count)
 	}
 	//determining the allegiance of the origin
 	int type = 2; //neutral, has no enemies
-	if (origin->GetStat(IE_EA) <= GOODCUTOFF) {
+	if (origin->GetStat(IE_EA) <= EA_GOODCUTOFF) {
 		type = 1; //PC
 	}
-	if (origin->GetStat(IE_EA) >= EVILCUTOFF) {
+	if (origin->GetStat(IE_EA) >= EA_EVILCUTOFF) {
 		type = 0;
 	}
 	if (type==2) {
@@ -3033,12 +3036,12 @@ Targets *GameScript::XthNearestEnemyOf(Targets *parameters, int count)
 		ac=map->GetActor(i);
 		int distance = Distance(ac, origin);
 		if (type) { //origin is PC
-			if (ac->GetStat(IE_EA) >= EVILCUTOFF) {
+			if (ac->GetStat(IE_EA) >= EA_EVILCUTOFF) {
 				parameters->AddTarget(ac, distance);
 			}
 		}
 		else {
-			if (ac->GetStat(IE_EA) <= GOODCUTOFF) {
+			if (ac->GetStat(IE_EA) <= EA_GOODCUTOFF) {
 				parameters->AddTarget(ac, distance);
 			}
 		}
@@ -3274,28 +3277,26 @@ int GameScript::ID_Allegiance(Actor *actor, int parameter)
 {
 	int value = actor->GetStat( IE_EA );
 	switch (parameter) {
-		case GOODCUTOFF:
+		case EA_GOODCUTOFF:
 			//goodcutoff
-			return value <= GOODCUTOFF;
+			return value <= EA_GOODCUTOFF;
 
-		case NOTGOOD:
+		case EA_NOTGOOD:
 			//notgood
-			return value >= NOTGOOD;
+			return value >= EA_NOTGOOD;
 
-		case NOTEVIL:
+		case EA_NOTEVIL:
 			//notevil
-			return value <= NOTEVIL;
-			break;
+			return value <= EA_NOTEVIL;
 
-		case EVILCUTOFF:
+		case EA_EVILCUTOFF:
 			//evilcutoff
-			return value >= EVILCUTOFF;
+			return value >= EA_EVILCUTOFF;
 
 		case 0:
 		case 126:
 			//anything
 			return true;
-			break;
 
 	}
 	//default
@@ -4742,21 +4743,21 @@ int GameScript::NumCreaturesGT(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::NumCreatureVsParty(Scriptable* Sender, Trigger* parameters)
 {
-	parameters->objectParameter->objectFields[0]=EVILCUTOFF;
+	parameters->objectParameter->objectFields[0]=EA_EVILCUTOFF;
 	int value = GetObjectCount(Sender, parameters->objectParameter);
 	return value == parameters->int0Parameter;
 }
 
 int GameScript::NumCreatureVsPartyGT(Scriptable* Sender, Trigger* parameters)
 {
-	parameters->objectParameter->objectFields[0]=EVILCUTOFF;
+	parameters->objectParameter->objectFields[0]=EA_EVILCUTOFF;
 	int value = GetObjectCount(Sender, parameters->objectParameter);
 	return value > parameters->int0Parameter;
 }
 
 int GameScript::NumCreatureVsPartyLT(Scriptable* Sender, Trigger* parameters)
 {
-	parameters->objectParameter->objectFields[0]=EVILCUTOFF;
+	parameters->objectParameter->objectFields[0]=EA_EVILCUTOFF;
 	int value = GetObjectCount(Sender, parameters->objectParameter);
 	return value < parameters->int0Parameter;
 }
@@ -5922,6 +5923,19 @@ int GameScript::Frame( Scriptable* Sender, Trigger* parameters)
 	}
 	return 0;
 }
+
+int GameScript::ModalState( Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) Sender;
+
+	if (actor->ModalState==(ieDword) parameters->int0Parameter) {
+		return 1;
+	}
+	return 0;
+}
 //-------------------------------------------------------------
 // Action Functions
 //-------------------------------------------------------------
@@ -5987,9 +6001,14 @@ void GameScript::NoActionAtAll(Scriptable* /*Sender*/, Action* /*parameters*/)
 	//thats all :)
 }
 
-void GameScript::NoAction(Scriptable* /*Sender*/, Action* /*parameters*/)
+// this action stops modal actions, so... 
+void GameScript::NoAction(Scriptable* Sender, Action* /*parameters*/)
 {
-	//thats all :)
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+	actor->SetModal( MS_NONE);
 }
 
 void GameScript::SG(Scriptable* Sender, Action* parameters)
@@ -6522,7 +6541,7 @@ void GameScript::Enemy(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->SetStat( IE_EA, 255 );
+	actor->SetStat( IE_EA, EA_ENEMY );
 }
 
 void GameScript::Ally(Scriptable* Sender, Action* /*parameters*/)
@@ -6531,7 +6550,7 @@ void GameScript::Ally(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->SetStat( IE_EA, 4 );
+	actor->SetStat( IE_EA, EA_ALLY );
 }
 
 /** GemRB extension: you can replace baldur.bcs */
@@ -7078,12 +7097,6 @@ void GameScript::StartMusic(Scriptable* Sender, Action* parameters)
 {
 	Map *map = Sender->GetCurrentArea();
 	map->PlayAreaSong(parameters->int0Parameter);
-}
-
-void GameScript::BattleSong(Scriptable* Sender, Action* /*parameters*/)
-{
-	Map *map = Sender->GetCurrentArea();
-	map->PlayAreaSong(3); //battlesong is in slot 3
 }
 
 /*iwd2 can set an areasong slot*/
@@ -8052,7 +8065,7 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 	/* i'm not sure this is required here at all */
 	SetBeenInPartyFlags(Sender, parameters);
 	Actor* act = ( Actor* ) Sender;
-	act->SetStat( IE_EA, PC );
+	act->SetStat( IE_EA, EA_PC );
 	if (core->HasFeature( GF_HAS_DPLAYER )) {
 		act->SetScript( "DPLAYER2", SCR_DEFAULT );
 	}
@@ -8078,7 +8091,7 @@ void GameScript::LeaveParty(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor* act = ( Actor* ) Sender;
-	act->SetStat( IE_EA, NEUTRAL );
+	act->SetStat( IE_EA, EA_NEUTRAL );
 	core->GetGame()->LeaveParty( act );
 	if (core->HasFeature( GF_HAS_DPLAYER )) {
 		act->SetScript( "", SCR_DEFAULT );
@@ -9809,5 +9822,52 @@ void GameScript::CopyGroundPilesTo(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	map->CopyGroundPiles( othermap, parameters->pointParameter );
+}
+
+//iwd2 specific
+void GameScript::PlayBardSong(Scriptable* Sender, Action* /*parameters*/)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	//actually this one must use int0Parameter to set a bardsong
+	Actor *actor = (Actor *) Sender;
+	actor->SetModal( MS_BATTLESONG);
+}
+
+void GameScript::BattleSong(Scriptable* Sender, Action* /*parameters*/)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+	actor->SetModal( MS_BATTLESONG);
+}
+
+void GameScript::FindTraps(Scriptable* Sender, Action* /*parameters*/)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+	actor->SetModal( MS_DETECTTRAPS);
+}
+
+void GameScript::Hide(Scriptable* Sender, Action* /*parameters*/)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+	actor->SetModal( MS_STEALTH);
+}
+
+void GameScript::Turn(Scriptable* Sender, Action* /*parameters*/)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+	actor->SetModal( MS_TURNUNDEAD);
 }
 

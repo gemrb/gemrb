@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.70 2005/06/11 20:18:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.71 2005/06/12 16:57:21 avenger_teambg Exp $
  *
  */
 
@@ -55,6 +55,13 @@ class Map;
 #include "Spellbook.h"
 
 #define MAX_STATS 256
+
+//modal states
+#define MS_NONE        0
+#define MS_BATTLESONG  1
+#define MS_DETECTTRAPS 2
+#define MS_STEALTH     3
+#define MS_TURNUNDEAD  4
 
 //stat modifier type
 #define MOD_ADDITIVE  0
@@ -129,16 +136,6 @@ public:
 
 	char KillVar[33]; //this second field is present in pst and iwd1
 
-	ieDword KnownSpellsOffset;
-	ieDword KnownSpellsCount;
-	ieDword SpellMemorizationOffset;
-	ieDword SpellMemorizationCount;
-	ieDword MemorizedSpellsOffset;
-	ieDword MemorizedSpellsCount;
-	ieDword ItemSlotsOffset;
-	ieDword ItemsOffset;
-	ieDword ItemsCount;
-
 	Inventory inventory;
 	Spellbook spellbook;
 	//savefile version (creatures embedded in area)
@@ -146,6 +143,7 @@ public:
 	//in game or area actor header
 	ieDword TalkCount;
 	ieDword appearance;
+	ieDword ModalState;
 public:
 
 	Actor *LastTarget;
@@ -266,6 +264,8 @@ public:
 	int GetEncumbrance();
 	/* checks on death of actor, returns true if it should be removed*/
 	bool CheckOnDeath();
+	/* receives undead turning message */
+	void Turn(Scriptable *cleric, int turnlevel);
 	/* sets the actor in panic (turn/morale break) */
 	void Panic();
 	/* deals damage to this actor */
@@ -290,5 +290,7 @@ public:
 	/* Creates player statistics */
 	void CreateStats();
 	int GetHPMod();
+	/* Sets the modal state after checks */
+	void SetModal(ieDword newstate);
 };
 #endif

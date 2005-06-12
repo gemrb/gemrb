@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.31 2005/05/16 12:01:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.32 2005/06/12 16:57:20 avenger_teambg Exp $
  *
  */
 
@@ -27,23 +27,32 @@
 #define IE_STATS_H
 
 //EA values
-#define INANIMATE   			1
-#define PC  					2
-#define FAMILIAR				3
-#define ALLY					4
-#define CONTROLLED  			5
-#define CHARMED 				6
-#define GOODBUTRED  			28
-#define GOODBUTBLUE 			29
-#define GOODCUTOFF  			30
-#define NOTGOOD 				31
-#define ANYTHING				126
-#define NEUTRAL 				128
-#define NOTEVIL 				199
-#define EVILCUTOFF  			200
-#define EVILBUTGREEN	201
-#define EVILBUTBLUE 			202
-#define ENEMY   				255
+#define EA_INANIMATE   		1
+#define EA_PC  			2
+#define EA_FAMILIAR		3
+#define EA_ALLY			4
+#define EA_CONTROLLED  		5
+#define EA_CHARMED 		6
+#define EA_GOODBUTRED  		28
+#define EA_GOODBUTBLUE 		29
+#define EA_GOODCUTOFF  		30
+#define EA_NOTGOOD 		31
+#define EA_ANYTHING		126
+#define EA_NEUTRAL 		128
+#define EA_NOTEVIL 		199
+#define EA_EVILCUTOFF  		200
+#define EA_EVILBUTGREEN		201
+#define EA_EVILBUTBLUE 		202
+#define EA_ENEMY   		255
+
+//GENERAL values
+#define GEN_HUMANOID  1  //charm?
+#define GEN_ANIMAL    2  //charm animals
+#define GEN_DEAD      3  //???
+#define GEN_UNDEAD    4  //turn
+#define GEN_GIANT     5  //???
+#define GEN_FROZEN    6  //???
+#define GEN_MONSTER   255
 
 //state bits (IE_STATE)
 #define STATE_SLEEP      0x00000001

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.73 2005/06/11 20:17:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.74 2005/06/12 16:57:21 avenger_teambg Exp $
  *
  */
 
@@ -473,16 +473,16 @@ void CREImp::GetActorPST(Actor *act)
 	act->SetScriptName(scriptname);
 	strnuprcpy(act->KillVar, KillVar, 32);
 
-	str->ReadDword( &act->KnownSpellsOffset );
-	str->ReadDword( &act->KnownSpellsCount );
-	str->ReadDword( &act->SpellMemorizationOffset );
-	str->ReadDword( &act->SpellMemorizationCount );
-	str->ReadDword( &act->MemorizedSpellsOffset );
-	str->ReadDword( &act->MemorizedSpellsCount );
+	str->ReadDword( &KnownSpellsOffset );
+	str->ReadDword( &KnownSpellsCount );
+	str->ReadDword( &SpellMemorizationOffset );
+	str->ReadDword( &SpellMemorizationCount );
+	str->ReadDword( &MemorizedSpellsOffset );
+	str->ReadDword( &MemorizedSpellsCount );
 
-	str->ReadDword( &act->ItemSlotsOffset );
-	str->ReadDword( &act->ItemsOffset );
-	str->ReadDword( &act->ItemsCount );
+	str->ReadDword( &ItemSlotsOffset );
+	str->ReadDword( &ItemsOffset );
+	str->ReadDword( &ItemsCount );
 
 	str->Seek( 8, GEM_CURRENT_POS );
 
@@ -494,21 +494,21 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	CREItem** items;
 	unsigned int i,j,k;
 
-	str->Seek( act->ItemsOffset, GEM_STREAM_START );
-	items = (CREItem **) calloc (act->ItemsCount, sizeof(CREItem *) );
+	str->Seek( ItemsOffset, GEM_STREAM_START );
+	items = (CREItem **) calloc (ItemsCount, sizeof(CREItem *) );
 
-	for (i = 0; i < act->ItemsCount; i++) {
+	for (i = 0; i < ItemsCount; i++) {
 		items[i] = core->ReadItem(str); //could be NULL item
 	}
 	act->inventory.SetSlotCount(Inventory_Size);
 
-	str->Seek( act->ItemSlotsOffset, GEM_STREAM_START );
+	str->Seek( ItemSlotsOffset, GEM_STREAM_START );
 	for (i = 0; i < Inventory_Size; i++) {
 		ieWord index;
 		str->Read( &index, 2 );
 
 		if (index != 0xFFFF) {
-			if (index>=act->ItemsCount) {
+			if (index>=ItemsCount) {
 				printf("[CREImp]: Invalid item index (%d) in creature!\n", index);
 				continue;
 			}
@@ -521,7 +521,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 		}
 	}
 
-	i = act->ItemsCount;
+	i = ItemsCount;
 	while(i--) {
 		if ( items[i]) {
 			printf("[CREImp]: Dangling item in creature: %s!\n", items[i]->ItemResRef);
@@ -539,24 +539,24 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	act->inventory.SetEquippedSlot( Equipped );
 	// Reading spellbook
 
-	CREKnownSpell **known_spells=(CREKnownSpell **) calloc(act->KnownSpellsCount, sizeof(CREKnownSpell *) );
-	CREMemorizedSpell **memorized_spells=(CREMemorizedSpell **) calloc(act->MemorizedSpellsCount, sizeof(CREKnownSpell *) );
+	CREKnownSpell **known_spells=(CREKnownSpell **) calloc(KnownSpellsCount, sizeof(CREKnownSpell *) );
+	CREMemorizedSpell **memorized_spells=(CREMemorizedSpell **) calloc(MemorizedSpellsCount, sizeof(CREKnownSpell *) );
 
-	str->Seek( act->KnownSpellsOffset, GEM_STREAM_START );
-	for (i = 0; i < act->KnownSpellsCount; i++) {
+	str->Seek( KnownSpellsOffset, GEM_STREAM_START );
+	for (i = 0; i < KnownSpellsCount; i++) {
 		known_spells[i]=GetKnownSpell();
 	}
 
-	str->Seek( act->MemorizedSpellsOffset, GEM_STREAM_START );
-	for (i = 0; i < act->MemorizedSpellsCount; i++) {
+	str->Seek( MemorizedSpellsOffset, GEM_STREAM_START );
+	for (i = 0; i < MemorizedSpellsCount; i++) {
 		memorized_spells[i]=GetMemorizedSpell();
 	}
 
-	str->Seek( act->SpellMemorizationOffset, GEM_STREAM_START );
-	for (i = 0; i < act->SpellMemorizationCount; i++) {
+	str->Seek( SpellMemorizationOffset, GEM_STREAM_START );
+	for (i = 0; i < SpellMemorizationCount; i++) {
 		CRESpellMemorization* sm = GetSpellMemorization();
 
-		j=act->KnownSpellsCount;
+		j=KnownSpellsCount;
 		while(j--) {
 			CREKnownSpell* spl = known_spells[j];
 			if (!spl) {
@@ -580,19 +580,21 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 		act->spellbook.AddSpellMemorization( sm );
 	}
 
-	i=act->KnownSpellsCount;
+	i=KnownSpellsCount;
 	while(i--) {
 		if (known_spells[i]) {
-			printf("[CREImp]: Dangling spell in creature: %s!\n", known_spells[i]->SpellResRef);
+			printMessage("CREImp"," ", YELLOW);
+			printf("Dangling spell in creature: %s!\n", known_spells[i]->SpellResRef);
 			delete known_spells[i];
 		}
 	}
 	free(known_spells);
 
-	i=act->MemorizedSpellsCount;
+	i=MemorizedSpellsCount;
 	while(i--) {
 		if (memorized_spells[i]) {
-			printf("[CREImp]: Dangling spell in creature: %s!\n", memorized_spells[i]->SpellResRef);
+			printMessage("CREImp"," ", YELLOW);
+			printf("Dangling spell in creature: %s!\n", memorized_spells[i]->SpellResRef);
 			delete memorized_spells[i];
 		}
 	}
@@ -751,16 +753,16 @@ void CREImp::GetActorBG(Actor *act)
 	act->SetScriptName(scriptname);
 	act->KillVar[0]=0;
 
-	str->ReadDword( &act->KnownSpellsOffset );
-	str->ReadDword( &act->KnownSpellsCount );
-	str->ReadDword( &act->SpellMemorizationOffset );
-	str->ReadDword( &act->SpellMemorizationCount );
-	str->ReadDword( &act->MemorizedSpellsOffset );
-	str->ReadDword( &act->MemorizedSpellsCount );
+	str->ReadDword( &KnownSpellsOffset );
+	str->ReadDword( &KnownSpellsCount );
+	str->ReadDword( &SpellMemorizationOffset );
+	str->ReadDword( &SpellMemorizationCount );
+	str->ReadDword( &MemorizedSpellsOffset );
+	str->ReadDword( &MemorizedSpellsCount );
 	 
-	str->ReadDword( &act->ItemSlotsOffset );
-	str->ReadDword( &act->ItemsOffset );
-	str->ReadDword( &act->ItemsCount );
+	str->ReadDword( &ItemSlotsOffset );
+	str->ReadDword( &ItemsOffset );
+	str->ReadDword( &ItemsCount );
 
 	str->Seek( 8, GEM_CURRENT_POS );
 
@@ -896,18 +898,18 @@ void CREImp::GetActorIWD2(Actor *act)
 	//not sure
 	act->KillVar[0]=0;
 
-	act->KnownSpellsOffset = 0;
-	act->KnownSpellsCount = 0;
-	act->SpellMemorizationOffset = 0;
-	act->SpellMemorizationCount = 0;
-	act->MemorizedSpellsOffset = 0;
-	act->MemorizedSpellsCount = 0;
+	KnownSpellsOffset = 0;
+	KnownSpellsCount = 0;
+	SpellMemorizationOffset = 0;
+	SpellMemorizationCount = 0;
+	MemorizedSpellsOffset = 0;
+	MemorizedSpellsCount = 0;
 	//skipping spellbook offsets
 	str->Seek( 606, GEM_CURRENT_POS);
 
-	str->ReadDword( &act->ItemSlotsOffset );
-	str->ReadDword( &act->ItemsOffset );
-	str->ReadDword( &act->ItemsCount );
+	str->ReadDword( &ItemSlotsOffset );
+	str->ReadDword( &ItemsOffset );
+	str->ReadDword( &ItemsCount );
 
 	str->Seek( 8, GEM_CURRENT_POS );
 
@@ -1060,16 +1062,16 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	//not sure
 	act->KillVar[0]=0;
 
-	str->ReadDword( &act->KnownSpellsOffset );
-	str->ReadDword( &act->KnownSpellsCount );
-	str->ReadDword( &act->SpellMemorizationOffset );
-	str->ReadDword( &act->SpellMemorizationCount );
-	str->ReadDword( &act->MemorizedSpellsOffset );
-	str->ReadDword( &act->MemorizedSpellsCount );
+	str->ReadDword( &KnownSpellsOffset );
+	str->ReadDword( &KnownSpellsCount );
+	str->ReadDword( &SpellMemorizationOffset );
+	str->ReadDword( &SpellMemorizationCount );
+	str->ReadDword( &MemorizedSpellsOffset );
+	str->ReadDword( &MemorizedSpellsCount );
 
-	str->ReadDword( &act->ItemSlotsOffset );
-	str->ReadDword( &act->ItemsOffset );
-	str->ReadDword( &act->ItemsCount );
+	str->ReadDword( &ItemSlotsOffset );
+	str->ReadDword( &ItemsOffset );
+	str->ReadDword( &ItemsCount );
 
 	str->Seek( 8, GEM_CURRENT_POS );
 

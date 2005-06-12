@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.106 2005/06/11 20:18:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.107 2005/06/12 16:57:21 avenger_teambg Exp $
  *
  */
 
@@ -164,6 +164,8 @@ Actor::Actor()
 	TalkCount = 0;
 	appearance = 0xffffff; //might be important for created creatures
 	version = 0;
+	//this one doesn't seem to get saved
+	ModalState = 0;
 }
 
 Actor::~Actor(void)
@@ -266,19 +268,19 @@ void Actor::SetCircleSize()
 		color = &yellow;
 	} else {
 		switch (Modified[IE_EA]) {
-			case PC:
-			case FAMILIAR:
-			case ALLY:
-			case CONTROLLED:
-			case CHARMED:
-			case EVILBUTGREEN:
-			case GOODCUTOFF:
+			case EA_PC:
+			case EA_FAMILIAR:
+			case EA_ALLY:
+			case EA_CONTROLLED:
+			case EA_CHARMED:
+			case EA_EVILBUTGREEN:
+			case EA_GOODCUTOFF:
 				color = &green;
 				break;
 
-			case ENEMY:
-			case GOODBUTRED:
-			case EVILCUTOFF:
+			case EA_ENEMY:
+			case EA_GOODBUTRED:
+			case EA_EVILCUTOFF:
 				color = &red;
 				break;
 			default:
@@ -490,9 +492,10 @@ int Actor::Damage(int damage, int damagetype, Actor *hitter)
 {
 	//recalculate damage based on resistances and difficulty level
 	//the lower 2 bits are actually modifier types
-	NewStat(IE_HITPOINTS, -damage, damagetype&3);
+	NewStat(IE_HITPOINTS, (ieDword) -damage, damagetype&3);
+	NewStat(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
 	//this is just a guess, probably morale is much more complex
-	if(GetStat(IE_HITPOINTS)<GetStat(IE_MORALEBREAK) ) {
+	if(GetStat(IE_MORALE)<GetStat(IE_MORALEBREAK) ) {
 		Panic();
 	}
 	LastDamageType=damagetype;
@@ -573,6 +576,26 @@ int Actor::GetXPLevel(int modified) const
 int Actor::GetEncumbrance()
 {
 	return inventory.GetWeight();
+}
+
+//receive turning
+void Actor::Turn(Scriptable *cleric, int turnlevel)
+{
+	//this is safely hardcoded i guess
+	if (GetStat(IE_GENERAL)!=GEN_UNDEAD) {
+		return;
+	}
+	//determine if we see the cleric (distance)
+	
+	//determine alignment (if equals, then no turning)
+
+	//determine panic or destruction
+	//we get the modified level
+	if (turnlevel>GetXPLevel(true)) {
+		Die(cleric);
+	} else {
+		Panic();
+	}
 }
 
 void Actor::Resurrect()
@@ -657,7 +680,7 @@ bool Actor::ValidTarget(int ga_flags)
 		//can't talk to dead
 		if (Modified[IE_STATE_ID] & STATE_CANTLISTEN) return false;
 		//can't talk to hostile
-		if (Modified[IE_EA]>=EVILCUTOFF) return false;
+		if (Modified[IE_EA]>=EA_EVILCUTOFF) return false;
 		break;
 	}
 	if (ga_flags&GA_NO_DEAD) {
@@ -758,7 +781,7 @@ const char *Actor::GetDialog(bool checks) const
 	if (!checks) {
 		return Dialog;
 	}
-	if (GetStat(IE_EA)>=EVILCUTOFF) {
+	if (GetStat(IE_EA)>=EA_EVILCUTOFF) {
 		return NULL;
 	}
 
@@ -780,3 +803,24 @@ const char* Actor::GetScript(int ScriptIndex) const
 {
 	return Scripts[ScriptIndex]->GetName();
 }
+
+void Actor::SetModal(ieDword newstate)
+{
+	switch(newstate) {
+		case MS_NONE:
+			break;
+		case MS_BATTLESONG:
+			break;
+		case MS_DETECTTRAPS:
+			break;
+		case MS_STEALTH:
+			break;
+		case MS_TURNUNDEAD:
+			break;
+		default:
+			return;
+	}
+	//come here only if success
+	ModalState = newstate;
+}
+

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.h,v 1.11 2005/06/11 20:17:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.h,v 1.12 2005/06/12 16:57:21 avenger_teambg Exp $
  *
  */
 
@@ -35,6 +35,16 @@ private:
 	DataStream* str;
 	bool autoFree;
 	unsigned char CREVersion;
+	ieDword KnownSpellsOffset;
+	ieDword KnownSpellsCount;
+	ieDword SpellMemorizationOffset;
+	ieDword SpellMemorizationCount;
+	ieDword MemorizedSpellsOffset;
+	ieDword MemorizedSpellsCount;
+	ieDword ItemSlotsOffset;
+	ieDword ItemsOffset;
+	ieDword ItemsCount;
+
 public:
 	CREImp(void);
 	~CREImp(void);
