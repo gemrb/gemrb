@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.115 2005/06/11 20:41:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.116 2005/06/12 10:23:35 avenger_teambg Exp $
  *
  */
 
@@ -766,13 +766,17 @@ Map* AREImp::GetMap(const char *ResRef)
 				anim->animcount = af->GetCycleCount();
 				anim->animation = (Animation **) malloc(anim->animcount * sizeof(Animation *) );
 				for(int j=0;j<anim->animcount;j++) {
-				  anim->animation[i]=GetAnimationPiece(af, j, anim);
+					anim->animation[j]=GetAnimationPiece(af, j, anim);
 				}
 			} else {
 				anim->animcount = 1;
 				anim->animation = (Animation **) malloc( sizeof(Animation *) );
 				anim->animation[0]=GetAnimationPiece(af, anim->sequence, anim);
 			}
+			if (anim->Flags & A_ANI_PALETTE) {
+				anim->SetPalette(anim->Palette);
+			}
+
 			map->AddAnimation( anim );
 		}
 	}

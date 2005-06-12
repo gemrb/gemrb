@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.106 2005/06/06 00:20:10 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.107 2005/06/12 10:23:37 avenger_teambg Exp $
  *
  */
 
@@ -549,7 +549,7 @@ void SDLVideoDriver::BlitSpriteNoShadow(Sprite2D* spr, int x, int y, Color tint,
 		pal[i].g = ( tint.g * pal[i].g ) >> 8;
 		pal[i].b = ( tint.b * pal[i].b ) >> 8;
 	}
-	SDL_Color backup=pal[1];
+	//SDL_Color backup=pal[1];
 	pal[1] = TRANSPARENT_BLACK;
 	SDL_UnlockSurface( tmp );
 	SDL_SetAlpha( tmp, SDL_SRCALPHA, tint.a);

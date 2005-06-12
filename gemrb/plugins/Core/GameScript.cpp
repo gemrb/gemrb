@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.285 2005/06/11 20:18:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.286 2005/06/12 10:23:36 avenger_teambg Exp $
  *
  */
 
@@ -7439,6 +7439,7 @@ void GameScript::StaticPalette(Scriptable* Sender, Action* parameters)
 			parameters->objects[1]->objectName );
 		return;
 	}
+	anim->SetPalette( parameters->string0Parameter );
 }
 
 void GameScript::WaitAnimation(Scriptable* Sender, Action* parameters)

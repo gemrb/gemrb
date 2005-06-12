@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.32 2005/06/11 20:18:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.33 2005/06/12 10:23:36 avenger_teambg Exp $
  *
  */
 
@@ -169,8 +169,10 @@ void Animation::SetPalette(Color* Pal, bool local)
 		if (!Palette) {
 			Palette=video->GetPalette( frames[0] );
 		}
-		if (Pal)
-			memcpy( Palette, Pal, sizeof(Palette) );
+		if (Pal) {
+			//cannot use sizeof(Palette), it is just a pointer!
+			memcpy( Palette, Pal, 256 * sizeof(Color) );
+		}
 	} else {
 	//no idea if this part will ever be used
 		for (size_t i = 0; i < indicesCount; i++) {
