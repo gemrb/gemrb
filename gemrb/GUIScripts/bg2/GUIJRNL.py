@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIJRNL.py,v 1.10 2005/05/18 15:37:09 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIJRNL.py,v 1.11 2005/06/14 17:52:55 avenger_teambg Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -43,8 +43,8 @@ StartYear = 0
 
 ###################################################
 def OpenJournalWindow ():
-        global JournalWindow, OptionsWindow, PortraitWindow
-        global OldPortraitWindow
+	global JournalWindow, OptionsWindow, PortraitWindow
+	global OldPortraitWindow
 	global StartTime, StartYear
 	global Chapter
 
@@ -53,14 +53,14 @@ def OpenJournalWindow ():
 		if QuestsWindow: OpenQuestsWindow ()
 		
 		GemRB.UnloadWindow (JournalWindow)
-                GemRB.UnloadWindow (OptionsWindow)
-                GemRB.UnloadWindow (PortraitWindow)
+		GemRB.UnloadWindow (OptionsWindow)
+		GemRB.UnloadWindow (PortraitWindow)
 
 		JournalWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-                GemRB.SetVisible (0,1)
-                GemRB.UnhideGUI ()
-                GUICommonWindows.PortraitWindow = OldPortraitWindow
+		GemRB.SetVisible (0,1)
+		GemRB.UnhideGUI ()
+		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
 		return
 		
@@ -70,17 +70,17 @@ def OpenJournalWindow ():
 	GemRB.UnloadTable(Table)
 
 	GemRB.HideGUI ()
-        GemRB.SetVisible (0,0)
+	GemRB.SetVisible (0,0)
 
 	GemRB.LoadWindowPack ("GUIJRNL", 640, 480)
 	JournalWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", JournalWindow)
-        #saving the original portrait window
-        OldPortraitWindow = GUICommonWindows.PortraitWindow
-        PortraitWindow = OpenPortraitWindow (0)
-        OptionsWindow = GemRB.LoadWindow (0)
-        SetupMenuWindowControls (OptionsWindow, 0)
-        GemRB.SetWindowFrame (OptionsWindow)
+	#saving the original portrait window
+	OldPortraitWindow = GUICommonWindows.PortraitWindow
+	PortraitWindow = OpenPortraitWindow (0)
+	OptionsWindow = GemRB.LoadWindow (0)
+	SetupMenuWindowControls (OptionsWindow, 0)
+	GemRB.SetWindowFrame (OptionsWindow)
 
 	# prev. chapter
 	Button = GemRB.GetControl (JournalWindow, 3)
@@ -127,9 +127,9 @@ def OpenJournalWindow ():
 
 	Chapter = GemRB.GetGameVar("chapter")
 	UpdateLogWindow ()
-        GemRB.SetVisible (OptionsWindow, 1)
-        GemRB.SetVisible (Window, 1)
-        GemRB.SetVisible (PortraitWindow, 1)
+	GemRB.SetVisible (OptionsWindow, 1)
+	GemRB.SetVisible (Window, 1)
+	GemRB.SetVisible (PortraitWindow, 1)
 	return
 
 def ToggleOrderWindow ():

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIOPT.py,v 1.6 2005/06/04 18:38:12 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIOPT.py,v 1.7 2005/06/14 17:52:59 avenger_teambg Exp $
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
 # Ingame options
@@ -25,8 +25,9 @@
 import GemRB
 from GUIDefines import *
 from GUICommon import CloseOtherWindow
-import MessageWindow
+#import MessageWindow
 import GUICommonWindows
+from GUISAVE import *
 from GUICommonWindows import *
 
 ###################################################
@@ -43,22 +44,30 @@ LoadMsgWindow = None
 QuitMsgWindow = None
 
 ###################################################
+def CloseOptionsWindow ():
+	global GameOptionsWindow, OptionsWindow, PortraitWindow
+	global OldPortraitWindow
+	
+	GemRB.UnloadWindow (GameOptionsWindow)
+	GemRB.UnloadWindow (OptionsWindow)
+	GemRB.UnloadWindow (PortraitWindow)
+
+	GameOptionsWindow = None
+	GemRB.SetVar ("OtherWindow", -1)
+	GemRB.SetVisible (0,1)
+	GemRB.UnhideGUI ()
+	GUICommonWindows.PortraitWindow = OldPortraitWindow
+	OldPortraitWindow = None
+	SetSelectionChangeHandler (None)
+	return
+
+###################################################
 def OpenOptionsWindow ():
 	global GameOptionsWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow
 
 	if CloseOtherWindow (OpenOptionsWindow):
-		GemRB.UnloadWindow (GameOptionsWindow)
-		GemRB.UnloadWindow (OptionsWindow)
-		GemRB.UnloadWindow (PortraitWindow)
-
-		GameOptionsWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.SetVisible (0,1)
-		GemRB.UnhideGUI ()
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		OldPortraitWindow = None
-		SetSelectionChangeHandler (None)
+		CloseOptionsWindow ()
 		return
 
 	GemRB.HideGUI ()
@@ -92,7 +101,7 @@ def OpenOptionsWindow ():
 	# Save Game
 	Button = GemRB.GetControl (Window, 6)
 	GemRB.SetText (Window, Button, 13730)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenSaveWindow")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenSaveMsgWindow")
 
 	# Video Options
 	Button = GemRB.GetControl (Window, 7)
@@ -409,8 +418,9 @@ def DisplayHelpEndOfRound ():
 
 ###################################################
 
-def OpenSaveWindow ():
-	OpenOptionsWindow ()
+def OpenSaveMsgWindow ():
+	#CloseOptionsWindow ()
+	OpenSaveWindow ()
 	#save the game without quitting
 	return
 
@@ -458,8 +468,8 @@ def LoadGamePress ():
 
 #save game AND quit
 def SaveGamePress():
-	OpenOptionsWindow ()
-	#save game now
+	#CloseOptionsWindow ()
+	OpenSaveWindow ()	
 	GemRB.QuitGame ()
 	GemRB.SetNextScript ("Start")
 	return

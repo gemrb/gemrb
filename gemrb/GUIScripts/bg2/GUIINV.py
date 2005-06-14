@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.23 2005/06/04 18:38:12 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.24 2005/06/14 17:52:54 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -45,8 +45,8 @@ def OpenInventoryWindow ():
 	
 	if CloseOtherWindow (OpenInventoryWindow):
 		GemRB.UnloadWindow (InventoryWindow)
-        	GemRB.UnloadWindow (OptionsWindow)
-	        GemRB.UnloadWindow (PortraitWindow)
+		GemRB.UnloadWindow (OptionsWindow)
+		GemRB.UnloadWindow (PortraitWindow)
 
 		InventoryWindow = None
 		GemRB.SetVar ("OtherWindow", -1)

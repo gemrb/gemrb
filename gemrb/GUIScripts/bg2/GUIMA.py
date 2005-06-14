@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIMA.py,v 1.21 2005/05/18 15:37:09 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIMA.py,v 1.22 2005/06/14 17:52:55 avenger_teambg Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -167,17 +167,17 @@ def WorldMapWindowCommon(Travel):
 		GemRB.UnloadWindow (WorldMapWindow)
 
 		WorldMapWindow = None
-                GemRB.SetVisible (0,1)
-                GemRB.UnhideGUI ()
+		GemRB.SetVisible (0,1)
+		GemRB.UnhideGUI ()
 		return
 
-        GemRB.HideGUI ()
-        GemRB.SetVisible (0,0)
+	GemRB.HideGUI ()
+	GemRB.SetVisible (0,0)
 
 	GemRB.LoadWindowPack ("GUIWMAP", 640, 480)
 	WorldMapWindow = Window = GemRB.LoadWindow (0)
-        #saving the original portrait window
-        GemRB.SetWindowFrame (Window)
+	#saving the original portrait window
+	GemRB.SetWindowFrame (Window)
 
 	GemRB.CreateWorldMapControl (Window, 4, 0, 62, 640, 418, Travel)
 	WorldMapControl = GemRB.GetControl (Window, 4)
@@ -221,7 +221,7 @@ def WorldMapWindowCommon(Travel):
 	# Done
 	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenWorldMapWindow")
-        GemRB.SetVisible (Window, 1)
+	GemRB.SetVisible (Window, 1)
 	return
 
 def MapN():

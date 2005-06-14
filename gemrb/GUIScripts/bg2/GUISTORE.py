@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUISTORE.py,v 1.26 2005/06/08 20:36:53 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUISTORE.py,v 1.27 2005/06/14 17:52:59 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -471,8 +471,8 @@ def UpdateStoreCommon (Window, title, name, gold):
 	
 
 def UpdateStoreShoppingWindow ():
-        global Store
-        
+	global Store
+ 
 	Window = StoreShoppingWindow
 	#reget store in case of a change
 	Store = GemRB.GetStore()
@@ -599,13 +599,13 @@ def RedrawStoreShoppingWindow ():
 			else:
 				GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
 
-                        if Flags & SHOP_ID:
-        			GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemName']))
-        			GemRB.EnableButtonBorder (Window, Button, 0, 1)
-                        else:
-        			GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemNameIdentified']))
-        			GemRB.EnableButtonBorder (Window, Button, 0, 0)
-        			
+			if Flags & SHOP_ID:
+				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemName']))
+				GemRB.EnableButtonBorder (Window, Button, 0, 1)
+			else:
+				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemNameIdentified']))
+				GemRB.EnableButtonBorder (Window, Button, 0, 0)
+				
 			Price = Item['Price'] * Store['SellMarkup'] / 100
 			if Price <= 0:
 				Price = 1
@@ -640,13 +640,13 @@ def RedrawStoreShoppingWindow ():
 			else:
 				GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
 
-                        if Flags & SHOP_ID:
-        			GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemName']))
-        			GemRB.EnableButtonBorder (Window, Button, 0, 1)
-                        else:
-        			GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemNameIdentified']))
-        			GemRB.EnableButtonBorder (Window, Button, 0, 0)
-        			
+			if Flags & SHOP_ID:
+				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemName']))
+				GemRB.EnableButtonBorder (Window, Button, 0, 1)
+			else:
+				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemNameIdentified']))
+				GemRB.EnableButtonBorder (Window, Button, 0, 0)
+				
 			GemRB.SetToken ("ITEMCOST", str(Price) )
 			GemRB.SetText (Window, Label, 10162)
 		else:
@@ -695,13 +695,13 @@ def RedrawStoreIdentifyWindow ():
 			GemRB.SetText (Window, Label, str(IDPrice))
 			if Flags & SHOP_ID:
 				GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
-        			GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemName']))
-        			GemRB.EnableButtonBorder (Window, Button, 0, 1)
+				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemName']))
+				GemRB.EnableButtonBorder (Window, Button, 0, 1)
 			else:
 				GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
-        			GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemNameIdentified']))
-        			GemRB.EnableButtonBorder (Window, Button, 0, 0)
-        			
+				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemNameIdentified']))
+				GemRB.EnableButtonBorder (Window, Button, 0, 0)
+				
 			GemRB.SetToken ("ITEMCOST", str(IDPrice) )
 			GemRB.SetText (Window, Label, 10162)
 		else:
@@ -761,8 +761,8 @@ def InfoIdentifyWindow ():
 
 
 def UpdateStoreStealWindow ():
-        global Store
-        
+	global Store
+ 
 	Window = StoreStealWindow
 
 	#reget store in case of a change
@@ -806,13 +806,13 @@ def RedrawStoreStealWindow ():
 			else:
 				GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
 
-                        if Flags & SHOP_ID:
-        			GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemName']))
-        			GemRB.EnableButtonBorder (Window, Button, 0, 1)
-                        else:
-        			GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemNameIdentified']))
-        			GemRB.EnableButtonBorder (Window, Button, 0, 0)
-        			
+			if Flags & SHOP_ID:
+				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemName']))
+				GemRB.EnableButtonBorder (Window, Button, 0, 1)
+			else:
+				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemNameIdentified']))
+				GemRB.EnableButtonBorder (Window, Button, 0, 0)
+				
 			GemRB.SetToken ("ITEMCOST", str(Slot['Price']) )
 			GemRB.SetText (Window, Label, 10162)
 		else:
@@ -836,13 +836,13 @@ def RedrawStoreStealWindow ():
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
 			Price = Item['Price'] * Store['BuyMarkup'] / 100
 			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
-                        if Flags & SHOP_ID:
-        			GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemName']))
-        			GemRB.EnableButtonBorder (Window, Button, 0, 1)
-                        else:
-        			GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemNameIdentified']))
-        			GemRB.EnableButtonBorder (Window, Button, 0, 0)
-        			
+			if Flags & SHOP_ID:
+				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemName']))
+				GemRB.EnableButtonBorder (Window, Button, 0, 1)
+			else:
+				GemRB.SetToken ("ITEMNAME", GemRB.GetString (Item['ItemNameIdentified']))
+				GemRB.EnableButtonBorder (Window, Button, 0, 0)
+
 			GemRB.SetToken ("ITEMCOST", str(Price) )
 			GemRB.SetText (Window, Label, 10162)
 		else:
