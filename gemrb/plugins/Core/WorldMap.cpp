@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.15 2005/03/19 16:15:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.16 2005/06/14 22:29:38 avenger_teambg Exp $
  *
  */
 
@@ -126,7 +126,14 @@ WorldMap::~WorldMap(void)
 	}
 }
 
-WMPAreaEntry* WorldMap::GetArea(const ieResRef AreaName, int &i)
+void WorldMap::SetMapMOS(Sprite2D *newmos) {
+	if (MapMOS) {
+		core->GetVideoDriver()->FreeSprite(MapMOS);
+	}
+	MapMOS = newmos;
+}
+
+WMPAreaEntry* WorldMap::GetArea(const ieResRef AreaName, unsigned int &i)
 {
 	i=area_entries.size();
 	while (i--) {
@@ -168,7 +175,7 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 {
 	if (direction<0 || direction>3)
 		return -1;
-	int i;
+	unsigned int i;
 	if (!GetArea(AreaName, i)) {
 		return -1;
 	}
@@ -219,7 +226,7 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 }
 
 //returns the index of the area owning this link
-int WorldMap::WhoseLinkAmI(int link_index)
+unsigned int WorldMap::WhoseLinkAmI(int link_index)
 {
 	for (unsigned int i=0;i<AreaEntriesCount;i++) {
 		WMPAreaEntry *ae=area_entries[i];
@@ -234,7 +241,7 @@ int WorldMap::WhoseLinkAmI(int link_index)
 			}
 		}
 	}
-	return -1;
+	return (ieDword) -1;
 }
 
 //call this function to find out which area we fall into
@@ -245,7 +252,7 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ieResRef AreaName, bool &encounter
 	if (!GotHereFrom) {
 		return NULL;
 	}
-	int i;
+	unsigned int i;
 	WMPAreaEntry *ae=GetArea( AreaName, i ); //target area
 	if (!ae) {
 		return NULL;
@@ -256,7 +263,7 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ieResRef AreaName, bool &encounter
 		printf("Adding path to %d\n", i);
 		walkpath.push_back(area_links[GotHereFrom[i]]);
 		i = WhoseLinkAmI(GotHereFrom[i]);
-		if (i==-1) {
+		if (i==(ieDword) -1) {
 			printf("Something has been screwed up here (incorrect path)!\n");
 			abort();
 		}
@@ -286,7 +293,7 @@ int WorldMap::GetDistance(const ieResRef AreaName)
 	if (!Distances) {
 		return -1;
 	}
-	int i;
+	unsigned int i;
 	if (GetArea( AreaName, i )) {
 			return Distances[i];
 	}
@@ -297,7 +304,7 @@ void WorldMap::UpdateAreaVisibility(const ieResRef AreaName, int direction)
 {
 	if (direction<0 || direction>3)
 		return;
-	int i;
+	unsigned int i;
 	WMPAreaEntry* ae=GetArea(AreaName,i);
 	if (!ae)
 		return;
@@ -314,7 +321,7 @@ void WorldMap::UpdateAreaVisibility(const ieResRef AreaName, int direction)
 
 void WorldMap::SetAreaStatus(const ieResRef AreaName, int Bits, int Op)
 {
-	int i;
+	unsigned int i;
 	WMPAreaEntry* ae=GetArea(AreaName,i);
 	if (!ae)
 		return;
@@ -335,4 +342,57 @@ void WorldMap::SetAreaStatus(const ieResRef AreaName, int Bits, int Op)
 			ae->AreaStatus&=~Bits;
 			break;
 	}
+}
+
+/****************** WorldMapArray *******************/
+WorldMapArray::WorldMapArray(int count)
+{
+	CurrentMap = 0;
+	MapCount = count;
+	all_maps = (WorldMap **) calloc(count, sizeof(WorldMap *) );
+}
+
+WorldMapArray::~WorldMapArray()
+{
+	for (unsigned int i = 0; i<MapCount; i++) {
+		if (all_maps[i]) {
+			delete all_maps[i];
+		}
+	}
+	free( all_maps );
+}
+
+int WorldMapArray::FindAndSetCurrentMap(const ieResRef area)
+{
+	unsigned int i, idx;
+
+	for (i = CurrentMap; i<MapCount; i++) {
+		if (all_maps[i]->GetArea (area, idx) ) {
+			CurrentMap = i;
+			return i;
+		}
+	}
+	for (i = 0; i<CurrentMap; i++) {
+		if (all_maps[i]->GetArea (area, idx) ) {
+			CurrentMap = i;
+			return i;
+		}
+	}
+	return -1;
+}
+
+void WorldMapArray::SetWorldMap(WorldMap *m, unsigned int index)
+{
+	if (index<MapCount) {
+		all_maps[index]=m;
+	}
+}
+
+WorldMap *WorldMapArray::NewWorldMap(unsigned int index)
+{
+	if (all_maps[index]) {
+		delete all_maps[index];
+	}
+	all_maps[index] = new WorldMap();
+	return all_maps[index];
 }

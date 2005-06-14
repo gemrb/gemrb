@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.cpp,v 1.11 2005/06/11 20:17:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.cpp,v 1.12 2005/06/14 22:29:36 avenger_teambg Exp $
  *
  */
 
@@ -64,7 +64,7 @@ static int ovfd_seek(void *datasource, int64_t offset, int whence) {
 		default:
 			return -1;
 	}
-	return vb->Pos;
+	return vb->GetPos();
 }
 
 static int ovfd_close(void */*datasource*/) {
@@ -73,7 +73,7 @@ static int ovfd_close(void */*datasource*/) {
 
 static long ovfd_tell(void *datasource) {
 	DataStream *vb = (DataStream *) datasource;
-	return (long) vb->Pos;
+	return (long) vb->GetPos();
 }
 
 int COGGReader::init_reader()

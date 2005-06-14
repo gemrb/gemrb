@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.38 2005/03/31 10:06:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.39 2005/06/14 22:29:37 avenger_teambg Exp $
  *
  */
 
@@ -224,7 +224,7 @@ void* BAMImp::GetFramePixels(unsigned short findex)
 				// into override/ dir?
 				if (i + ( *p ) + 1 > pixelcount) {
 					memset( &Buffer[i], CompressedColorIndex, pixelcount - i );
-					printf ("Broken frame %d in %s\n", findex, str->filename);
+					printf ("Broken frame %d\n", findex);
 				} else {
 					memset( &Buffer[i], CompressedColorIndex, ( *p ) + 1 );
 				}

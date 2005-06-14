@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.15 2005/05/18 15:37:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.16 2005/06/14 22:29:38 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -65,15 +65,16 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 	Changed = false;
 	Video* video = core->GetVideoDriver();
 	Region r( XWin+XPos, YWin+YPos, Width, Height );
-	video->BlitSprite( worldmap->MapMOS, MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), true, &r );
+	video->BlitSprite( worldmap->GetMapMOS(), MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), true, &r );
 
-	std::vector< WMPAreaEntry*>::iterator m;
+	unsigned int i;
+	unsigned int ec = worldmap->GetEntryCount();
+	for(i=0;i<ec;i++) {
+		WMPAreaEntry *m = worldmap->GetEntry(i);
+		if (! (m->AreaStatus & WMP_ENTRY_VISIBLE)) continue;
 
-	for (m = worldmap->area_entries.begin(); m != worldmap->area_entries.end(); ++m) {
-		if (! ((*m)->AreaStatus & WMP_ENTRY_VISIBLE)) continue;
-
-		if( (*m)->MapIcon) {
-			video->BlitSprite( (*m)->MapIcon, MAP_TO_SCREENX((*m)->X), MAP_TO_SCREENY((*m)->Y), true, &r );
+		if( m->MapIcon) {
+			video->BlitSprite( m->MapIcon, MAP_TO_SCREENX(m->X), MAP_TO_SCREENY(m->Y), true, &r );
 		}
 
 		// wmpty.bam
@@ -82,19 +83,20 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 	Font* fnt = core->GetButtonFont();
 
 	// Draw WMP entry labels
-	for (m = worldmap->area_entries.begin(); m != worldmap->area_entries.end(); ++m) {
-		if (! ((*m)->AreaStatus & WMP_ENTRY_VISIBLE)) continue;
-		Sprite2D *icon=(*m)->MapIcon;
+	for(i=0;i<ec;i++) {
+		WMPAreaEntry *m = worldmap->GetEntry(i);
+		if (! (m->AreaStatus & WMP_ENTRY_VISIBLE)) continue;
+		Sprite2D *icon=m->MapIcon;
 		int h=0,w=0;
 		if (icon) {
 			h=icon->Height;
 			w=icon->Width;
 		}
 
-		Region r2 = Region( MAP_TO_SCREENX((*m)->X), MAP_TO_SCREENY((*m)->Y), w, h );
+		Region r2 = Region( MAP_TO_SCREENX(m->X), MAP_TO_SCREENY(m->Y), w, h );
 		if (r2.y+r2.h<r.y) continue;
 
-		char *text = core->GetString( (*m)->LocCaptionName );
+		char *text = core->GetString( m->LocCaptionName );
 		int tw = fnt->CalcStringWidth( text ) + 5;
 		int th = fnt->maxHeight;
 
@@ -125,10 +127,11 @@ void WorldMapControl::AdjustScrolling(short x, short y)
 	WorldMap* worldmap = core->GetWorldMap();
 	ScrollX += x;
 	ScrollY += y;
-	if (ScrollX > worldmap->MapMOS->Width - Width)
-		ScrollX = worldmap->MapMOS->Width - Width;
-	if (ScrollY > worldmap->MapMOS->Height - Height)
-		ScrollY = worldmap->MapMOS->Height - Height;
+	Sprite2D *MapMOS = worldmap->GetMapMOS();
+	if (ScrollX > MapMOS->Width - Width)
+		ScrollX = MapMOS->Width - Width;
+	if (ScrollY > MapMOS->Height - Height)
+		ScrollY = MapMOS->Height - Height;
 	if (ScrollX < 0)
 		ScrollX = 0;
 	if (ScrollY < 0)
@@ -154,11 +157,13 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 		x += ScrollX;
 		y += ScrollY;
 
-		std::vector< WMPAreaEntry*>::iterator m;
-		for (m = worldmap->area_entries.begin(); m != worldmap->area_entries.end(); ++m) {
-			if (! ((*m)->AreaStatus & WMP_ENTRY_VISIBLE)) continue;
+		unsigned int i;
+		unsigned int ec = worldmap->GetEntryCount();
+		for (i=0;i<ec;i++) {
+			WMPAreaEntry *ae = worldmap->GetEntry(i);
+			if (! (ae->AreaStatus & WMP_ENTRY_VISIBLE)) continue;
 
-			Sprite2D *icon=(*m)->MapIcon;
+			Sprite2D *icon=ae->MapIcon;
 			int h=0,w=0;
 			if (icon) {
 				h=icon->Height;
@@ -168,13 +173,13 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 				h=48;
 			if(w<48)
 				w=48;
-			if ((*m)->X > x) continue;
-			if ((*m)->X + w < x) continue;
-			if ((*m)->Y > y) continue;
-			if ((*m)->Y + h < y) continue;
+			if (ae->X > x) continue;
+			if (ae->X + w < x) continue;
+			if (ae->Y > y) continue;
+			if (ae->Y + h < y) continue;
 			nextCursor = IE_CURSOR_NORMAL;
-			if(Area!=*m) {
-				Area=*m;
+			if(Area!=ae) {
+				Area=ae;
 				printf("A: %s, Distance: %d\n", Area->AreaName, worldmap->GetDistance(Area->AreaName) );
 				break;
 			}
@@ -238,10 +243,11 @@ void WorldMapControl::OnSpecialKeyPress(unsigned char Key)
 			break;
 	}
 
-	if (ScrollX > worldmap->MapMOS->Width - Width)
-		ScrollX = worldmap->MapMOS->Width - Width;
-	if (ScrollY > worldmap->MapMOS->Height - Height)
-		ScrollY = worldmap->MapMOS->Height - Height;
+	Sprite2D *MapMOS = worldmap->GetMapMOS();
+	if (ScrollX > MapMOS->Width - Width)
+		ScrollX = MapMOS->Width - Width;
+	if (ScrollY > MapMOS->Height - Height)
+		ScrollY = MapMOS->Height - Height;
 	if (ScrollX < 0)
 		ScrollX = 0;
 	if (ScrollY < 0)

@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.95 2005/06/11 20:18:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.96 2005/06/14 22:29:37 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -318,7 +318,7 @@ bool Selectable::IsOver(Point &Pos)
 
 bool Selectable::IsSelected()
 {
-	return Selected;
+	return Selected==1;
 }
 
 void Selectable::SetOver(bool over)
@@ -326,9 +326,11 @@ void Selectable::SetOver(bool over)
 	Over = over;
 }
 
-void Selectable::Select(bool Value)
+void Selectable::Select(int Value)
 {
-	Selected = Value;
+	if (Selected!=0x80 || Value!=1) {
+		Selected = Value;
+	}
 }
 
 void Selectable::SetCircle(int circlesize, Color color)
@@ -538,7 +540,7 @@ void Moveble::DrawTargetPoint()
 		return;
 
 	// generates "step" from sequence 3 2 1 0 1 2 3 4
-	//   updated each 1/15 sec
+	// updated each 1/15 sec
 	unsigned long step;
 	GetTime( step );
 	step = tp_steps [(step >> 6) & 7];
@@ -611,10 +613,10 @@ void Door::UpdateDoor()
 
 	oval = 1; //passable searchmap entry
 	if (Flags & DOOR_TRANSPARENT) {
-		cval = 8;  //transparent door searchmap entry
+		cval = 8; //transparent door searchmap entry
 	}
 	else {
-		cval = 0;  //opaque door searchmap entry
+		cval = 0; //opaque door searchmap entry
 	}
 	if (Flags &DOOR_OPEN) {
 		oidx=cval;
@@ -857,10 +859,10 @@ void InfoPoint::DebugDump()
 			printf( "Debugdump of Unsupported Region %s:\n", GetScriptName() );
 			break;
 	}
-	printf( "TrapDetected: %d  Trapped: %s\n", TrapDetected, YESNO(Scripts[0]));
-	printf( "Trap detection: %d  Trap removal: %d\n", TrapDetectionDiff,
+	printf( "TrapDetected: %d, Trapped: %s\n", TrapDetected, YESNO(Scripts[0]));
+	printf( "Trap detection: %d, Trap removal: %d\n", TrapDetectionDiff,
 		TrapRemovalDiff );
-	printf( "Key: %s  Dialog: %s\n", KeyResRef, DialogResRef );
+	printf( "Key: %s, Dialog: %s\n", KeyResRef, DialogResRef );
 	printf( "Active: %s\n", YESNO(Active));
 }
 
@@ -966,8 +968,8 @@ void Container::RefreshGroundIcons()
 void Container::DebugDump()
 {
 	printf( "Debugdump of Container %s\n", GetScriptName() );
-	printf( "Type: %d   LockDifficulty: %d\n", Type, LockDifficulty );
-	printf( "Flags: %d  Trapped: %d\n", Flags, Trapped );
-	printf( "Trap detection: %d  Trap removal: %d\n", TrapDetectionDiff,
+	printf( "Type: %d,  LockDifficulty: %d\n", Type, LockDifficulty );
+	printf( "Flags: %d, Trapped: %d\n", Flags, Trapped );
+	printf( "Trap detection: %d, Trap removal: %d\n", TrapDetectionDiff,
 		TrapRemovalDiff );
 }

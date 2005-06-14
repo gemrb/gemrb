@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IDSImporter/IDSImp.cpp,v 1.14 2004/08/07 21:00:34 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IDSImporter/IDSImp.cpp,v 1.15 2005/06/14 22:29:39 avenger_teambg Exp $
  *
  */
 
@@ -53,13 +53,12 @@ bool IDSImp::Open(DataStream* stream, bool autoFree)
 	str = stream;
 	this->autoFree = autoFree;
 
-	bool Encrypted = str->CheckEncrypted();
+	str->CheckEncrypted();
 	char tmp[11];
 	str->ReadLine( tmp, 10 );
 	tmp[10] = 0;
 	if (tmp[0] != 'I') {
-		str->Seek( Encrypted ? 2 : 0, GEM_STREAM_START );
-		str->Pos = 0;
+		str->Rewind();
 	}
 	while (true) {
 		char* line = ( char* ) malloc( 256 );

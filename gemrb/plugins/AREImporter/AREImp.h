@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.h,v 1.25 2005/06/11 20:17:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.h,v 1.26 2005/06/14 22:29:37 avenger_teambg Exp $
  *
  */
 
@@ -47,6 +47,7 @@ private:
 	ieDword AmbiOffset, VariablesOffset;
 	ieDword NoteOffset;
 	ieDword SpawnOffset, SpawnCount;
+	ieDword TileOffset, TileCount;
 	ieResRef Script;
 public:
 	AREImp(void);
@@ -79,6 +80,8 @@ private:
 	int PutMapnotes(DataStream *stream, Map *map);
 	int PutExplored(DataStream *stream, Map *map);
 	int PutTiles(DataStream *stream, Map *map);
+	int PutRestHeader(DataStream *stream, Map *map);
+	int PutSongHeader(DataStream *stream, Map *map);
 };
 
 #endif

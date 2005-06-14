@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.320 2005/06/10 21:12:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.321 2005/06/14 22:29:38 avenger_teambg Exp $
  *
  */
 
@@ -864,6 +864,12 @@ end_of_init:
 bool Interface::IsAvailable(SClass_ID filetype)
 {
 	return plugin->IsAvailable( filetype );
+}
+
+WorldMap *Interface::GetWorldMap()
+{
+	unsigned int index = worldmap->FindAndSetCurrentMap(game->CurrentArea);
+	return worldmap->GetWorldMap(index);
 }
 
 void* Interface::GetInterface(SClass_ID filetype)
@@ -2466,7 +2472,7 @@ void Interface::LoadGame(int index)
 	WorldMapMgr* wmp_mgr = NULL;
 
 	Game* new_game = NULL;
-	WorldMap* new_worldmap = NULL;
+	WorldMapArray* new_worldmap = NULL;
 
 	LoadProgress(0);
 	DelTree((const char *) CachePath, true);
@@ -2516,7 +2522,7 @@ void Interface::LoadGame(int index)
 	if (!wmp_mgr->Open( wmp_str, true ))
 		goto cleanup;
 
-	new_worldmap = wmp_mgr->GetWorldMap( 0 );
+	new_worldmap = wmp_mgr->GetWorldMapArray( );
 
 	FreeInterface( wmp_mgr );
 	wmp_mgr = NULL;
@@ -2698,9 +2704,9 @@ TextArea *Interface::GetMessageTextArea()
 	vars->Lookup( "MessageWindow", WinIndex );
 	if (( WinIndex != (ieDword) -1 ) &&
 		( vars->Lookup( "MessageTextArea", TAIndex ) )) {
-		Window* win = GetWindow( WinIndex );
+		Window* win = GetWindow( (unsigned short) WinIndex );
 		if (win) {
-			Control *ctrl = win->GetControl( TAIndex );
+			Control *ctrl = win->GetControl( (unsigned short) TAIndex );
 			if (ctrl->ControlType==IE_GUI_TEXTAREA)
 				return (TextArea *) ctrl;
 		}
@@ -2804,7 +2810,7 @@ bool Interface::SavedExtension(const char *filename)
 	return false;
 }
 
-void Interface::RemoveFromCache( ieResRef resref)
+void Interface::RemoveFromCache(const ieResRef resref)
 {
 	char filename[_MAX_PATH];
 
@@ -2859,7 +2865,7 @@ void Interface::DragItem(CREItem *item)
 	DraggedItem = item;
 }
 
-bool Interface::ReadItemTable(ieResRef TableName, const char * Prefix)
+bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)
 {
 	ieResRef ItemName;
 	TableMgr * tab;
@@ -3012,7 +3018,7 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 	return false;
 }
 
-Item* Interface::GetItem(ieResRef resname)
+Item* Interface::GetItem(const ieResRef resname)
 {
 	Item *item = (Item *) ItemCache.GetResource(resname);
 	if (item) {
@@ -3041,7 +3047,7 @@ Item* Interface::GetItem(ieResRef resname)
 }
 
 //you can supply name for faster access
-void Interface::FreeItem(Item *itm, ieResRef name, bool free)
+void Interface::FreeItem(Item *itm, const ieResRef name, bool free)
 {
 	int res;
 
@@ -3055,7 +3061,7 @@ void Interface::FreeItem(Item *itm, ieResRef name, bool free)
 	if (free) delete itm;
 }
 
-Spell* Interface::GetSpell(ieResRef resname)
+Spell* Interface::GetSpell(const ieResRef resname)
 {
 	Spell *spell = (Spell *) SpellCache.GetResource(resname);
 	if (spell) {
@@ -3083,7 +3089,7 @@ Spell* Interface::GetSpell(ieResRef resname)
 	return spell;
 }
 
-void Interface::FreeSpell(Spell *spl, ieResRef name, bool free)
+void Interface::FreeSpell(Spell *spl, const ieResRef name, bool free)
 {
 	int res;
 
@@ -3126,9 +3132,9 @@ void Interface::FreeSPLExt(SPLExtHeader *p, Effect *e)
 	delete [] e;
 }
 
-WorldMap *Interface::NewWorldMap()
+WorldMapArray *Interface::NewWorldMapArray(int count)
 {
-	return new WorldMap();
+	return new WorldMapArray(count);
 }
 
 Container *Interface::GetCurrentContainer()
@@ -3176,6 +3182,7 @@ int Interface::CloseCurrentStore()
 	 	//created streams are always autofree (close file on destruct)
 		//this one will be destructed when we return from here
 		FileStream str;
+
 		str.Create( CurrentStore->Name, IE_STO_CLASS_ID );
 		int ret = sm->PutStore (&str, CurrentStore);
 		if (ret <0) {
@@ -3195,7 +3202,7 @@ int Interface::CloseCurrentStore()
 	return 0;
 }
 
-Store *Interface::SetCurrentStore( ieResRef resname )
+Store *Interface::SetCurrentStore(const ieResRef resname )
 {
 	if ( CurrentStore ) {
 		if ( !strnicmp(CurrentStore->Name, resname, 8) ) {
@@ -3231,7 +3238,7 @@ Store *Interface::SetCurrentStore( ieResRef resname )
 	return CurrentStore;
 }
 
-ieStrRef Interface::GetRumour(ieResRef dlgref)
+ieStrRef Interface::GetRumour(const ieResRef dlgref)
 {
 	DialogMgr* dm = ( DialogMgr* ) GetInterface( IE_DLG_CLASS_ID );
 	dm->Open( key->GetResource( dlgref, IE_DLG_CLASS_ID ), true );
@@ -3311,7 +3318,7 @@ Actor *Interface::GetFirstSelectedPC()
 
 // Return single BAM frame as a sprite. Use if you want one frame only,
 // otherwise it's not efficient
-Sprite2D* Interface::GetBAMSprite(ieResRef ResRef, int cycle, int frame)
+Sprite2D* Interface::GetBAMSprite(const ieResRef ResRef, int cycle, int frame)
 {
 	AnimationMgr* bam = ( AnimationMgr* ) GetInterface( IE_BAM_CLASS_ID );
 	DataStream *str = key->GetResource( ResRef, IE_BAM_CLASS_ID );
@@ -3358,6 +3365,7 @@ int Interface::SwapoutArea(Map *map)
 	 	//created streams are always autofree (close file on destruct)
 		//this one will be destructed when we return from here
 		FileStream str;
+
 		str.Create( map->GetScriptName(), IE_ARE_CLASS_ID );
 		int ret = mm->PutArea (&str, map);
 		if (ret <0) {
@@ -3375,37 +3383,63 @@ int Interface::SwapoutArea(Map *map)
 	return 0;
 }
 
-int Interface::CreateSaveGame(const char *folder)
+int Interface::WriteGame(const char *folder)
 {
-	//some of these restrictions might not be needed
-	if (CurrentStore) {
-		return -1; //can't save while store is open
+	SaveGameMgr* gm = ( SaveGameMgr* ) GetInterface( IE_GAM_CLASS_ID );
+	if (gm == NULL) {
+		return -1;
 	}
-	GameControl *gc = GetGameControl();
-	if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
-		return -1; //can't save while in dialog?
-	}
-	//saving areas to cache currently in memory
-	unsigned int index = 0;
-	do {
-		Map *map = game->GetMap(index);
-		if (!map) {
-			break;
+
+	int size = gm->GetStoredFileSize (game);
+	if (size > 0) {
+	 	//created streams are always autofree (close file on destruct)
+		//this one will be destructed when we return from here
+		FileStream str;
+
+		str.Create( folder, GameNameResRef, IE_GAM_CLASS_ID );
+		int ret = gm->PutGame (&str, game);
+		if (ret <0) {
+			printMessage("Core"," ", YELLOW);
+			printf("Internal error, game cannot be saved: %s\n", GameNameResRef);
 		}
-		SwapoutArea(map);
-	} while(true);
-	
-	//create empty savegame folder
-	mkdir(folder,S_IWRITE|S_IREAD);
-	DelTree(folder, false);
-
-	//compress files in cache named: .STO and .ARE
-	//no .CRE would be saved in cache
-
-	//Create .gam file from Game() object
-
-	//Create .wmp file from WorldMap() object
-
-	//Create .bmp's (area preview and portraits)
+	} else {
+		printMessage("Core"," ", YELLOW);
+			printf("Internal error, game cannot be saved: %s\n", GameNameResRef);
+	}
+	//make sure the stream isn't connected to sm, or it will be double freed
+	FreeInterface( gm );
 	return 0;
+}
+
+int Interface::WriteWorldMap(const char *folder)
+{
+	WorldMapMgr* wmm = ( WorldMapMgr* ) GetInterface( IE_WMP_CLASS_ID );
+	if (wmm == NULL) {
+		return -1;
+	}
+
+	int size = wmm->GetStoredFileSize (worldmap);
+	if (size > 0) {
+	 	//created streams are always autofree (close file on destruct)
+		//this one will be destructed when we return from here
+		FileStream str;
+
+		str.Create( folder, WorldMapName, IE_WMP_CLASS_ID );
+		int ret = wmm->PutWorldMap (&str, worldmap);
+		if (ret <0) {
+			printMessage("Core"," ", YELLOW);
+			printf("Internal error, worldmap cannot be saved: %s\n",  WorldMapName);
+		}
+	} else {
+		printMessage("Core"," ", YELLOW);
+		printf("Internal error, worldmap cannot be saved: %s\n",  WorldMapName);
+	}
+	//make sure the stream isn't connected to sm, or it will be double freed
+	FreeInterface( wmm );
+	return 0;
+}
+
+int Interface::CompressSave(const char * /*folder*/)
+{
+	return -1;
 }

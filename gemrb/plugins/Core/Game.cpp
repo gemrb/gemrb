@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.76 2005/06/12 16:57:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.77 2005/06/14 22:29:37 avenger_teambg Exp $
  *
  */
 
@@ -26,10 +26,11 @@
 #include "Interface.h"
 #include "../../includes/strrefs.h"
 
-#define MAX_MAPS_LOADED  5
+#define MAX_MAPS_LOADED  2
 
 Game::Game(void) : Scriptable( ST_GLOBAL )
 {
+	version = 0;
 	LoadMos[0] = 0;
 	SelectedSingle = 1; //the PC we are looking at (inventory, shop)
 	PartyGold = 0;
@@ -42,6 +43,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	//globals = NULL;
 	kaputz = NULL;
 	beasts = NULL;
+	mazedata = NULL;
 	int mtab = core->LoadTable("mastarea");
 	if (mtab) {
 		TableMgr *table = core->GetTable(mtab);
@@ -72,11 +74,10 @@ Game::~Game(void)
 	for (i = 0; i < mastarea.size(); i++) {
 		free ( mastarea[i] );
 	}
-	/* globals are the game's locals
-	if (globals) {
-		delete globals;
+
+	if (mazedata) {
+		free (mazedata);
 	}
-	*/
 	if (kaputz) {
 		delete kaputz;
 	}
@@ -430,7 +431,7 @@ int Game::AddMap(Map* map)
 	return i;
 }
 
-int Game::DelMap(unsigned int index, bool forced)
+int Game::DelMap(unsigned int index, int forced)
 {
 //this function should archive the area, and remove it only if the area
 //contains no active actors (combat, partymembers, etc)
@@ -490,7 +491,10 @@ int Game::LoadMap(const char* ResRef)
 		core->FreeInterface( mM );
 		return -1;
 	}
-	mM->Open( ds, true );
+	if(!mM->Open( ds, true )) {
+		core->FreeInterface( mM );
+		return -1;
+	}
 	Map* newMap = mM->GetMap(ResRef);
 	core->FreeInterface( mM );
 	if (!newMap) {

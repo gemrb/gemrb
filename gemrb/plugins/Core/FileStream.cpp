@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.36 2005/06/10 21:12:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.37 2005/06/14 22:29:37 avenger_teambg Exp $
  *
  */
 
@@ -97,8 +97,15 @@ bool FileStream::Open(_FILE* stream, int spos, int maxsize, bool aF)
 	return true;
 }
 
+//Creating file in the cache
 //Create is ALWAYS autofree
 bool FileStream::Create(const char* fname, SClass_ID ClassID)
+{
+	return Create(core->CachePath, fname, ClassID);
+}
+
+//Creating file outside of the cache
+bool FileStream::Create(const char *folder, const char* fname, SClass_ID ClassID)
 {
 	char path[_MAX_PATH];
 
@@ -110,7 +117,7 @@ bool FileStream::Create(const char* fname, SClass_ID ClassID)
 	}
 	autoFree = true;
 	ExtractFileFromPath( filename, fname );
-	strcpy( path, core->CachePath );
+	strcpy( path, folder );
 	strcat( path, filename );
 	strcat( path, core->TypeExt( ClassID ) );
 	str = _fopen( path, "wb" );

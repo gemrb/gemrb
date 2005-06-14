@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.116 2005/06/12 10:23:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.117 2005/06/14 22:29:36 avenger_teambg Exp $
  *
  */
 
@@ -28,9 +28,6 @@
 #include "../Core/CachedFileStream.h"
 #include "../Core/ImageMgr.h"
 #include "../Core/Ambient.h"
-
-//in areas 10 is a magic number for resref counts
-#define MAX_RESCOUNT 10 
 
 #define DEF_OPEN   0
 #define DEF_CLOSE  1
@@ -203,6 +200,7 @@ Map* AREImp::GetMap(const char *ResRef)
 	TileMap* tm = tmm->GetTileMap();
 	if (!tm) {
 		printf( "[AREImporter]: No Tile Map Available.\n" );
+		core->FreeInterface( tmm );
 		return false;
 	}
 
@@ -234,7 +232,7 @@ Map* AREImp::GetMap(const char *ResRef)
 
 	str->Seek( SongHeader, GEM_STREAM_START );
 	//5 is the number of song indices
-	for (i = 0; i < 5; i++) {
+	for (i = 0; i < MAX_RESCOUNT; i++) {
 		str->ReadDword( map->SongHeader.SongList + i );
 	}
 	str->Seek( RestHeader, GEM_STREAM_START );
@@ -252,6 +250,180 @@ Map* AREImp::GetMap(const char *ResRef)
 	str->ReadWord( &map->RestHeader.DayChance );
 	str->ReadWord( &map->RestHeader.NightChance );
 
+	printf( "Loading regions\n" );
+	//Loading InfoPoints
+	for (i = 0; i < InfoPointsCount; i++) {
+		str->Seek( InfoPointsOffset + ( i * 0xC4 ), GEM_STREAM_START );
+		ieWord Type, VertexCount;
+		ieDword FirstVertex, Cursor, Flags;
+		ieWord TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
+		ieWord LaunchX, LaunchY;
+		char Name[33], Entrance[33];
+		ieResRef Script, DialogResRef, KeyResRef, Destination;
+		str->Read( Name, 32 );
+		Name[32] = 0;
+		str->ReadWord( &Type );
+		Region bbox;
+		ieWord tmp;
+		str->ReadWord( &tmp );
+		bbox.x = tmp;
+		str->ReadWord( &tmp );
+		bbox.y = tmp;
+		str->ReadWord( &tmp );
+		bbox.w = tmp - bbox.x;
+		str->ReadWord( &tmp );
+		bbox.h = tmp - bbox.y;
+		str->ReadWord( &VertexCount );
+		str->ReadDword( &FirstVertex );
+		ieDword tmp2;
+		str->ReadDword( &tmp2 );
+		str->ReadDword( &Cursor );
+		str->ReadResRef( Destination );
+		str->Read( Entrance, 32 );
+		Entrance[32] = 0;
+		str->ReadDword( &Flags );
+		ieStrRef StrRef;
+		str->ReadDword( &StrRef );
+		str->ReadWord( &TrapDetDiff );
+		str->ReadWord( &TrapRemDiff );
+		str->ReadWord( &Trapped );
+		str->ReadWord( &TrapDetected );
+		str->ReadWord( &LaunchX );
+		str->ReadWord( &LaunchY );
+		str->ReadResRef( KeyResRef );
+		//don't even bother reading the script if it isn't trapped
+		if(Trapped || Type) {
+			str->ReadResRef( Script );
+		}
+		else {
+			Script[0] = 0;
+		}
+		str->Seek( 56, GEM_CURRENT_POS );
+		str->ReadResRef( DialogResRef );
+		char* string = core->GetString( StrRef );
+		str->Seek( VerticesOffset + ( FirstVertex * 4 ), GEM_STREAM_START );
+		Point* points = ( Point* ) malloc( VertexCount*sizeof( Point ) );
+		for (x = 0; x < VertexCount; x++) {
+			str->ReadWord( (ieWord*) &points[x].x );
+			str->ReadWord( (ieWord*) &points[x].y );
+		}
+		Gem_Polygon* poly = new Gem_Polygon( points, VertexCount, &bbox);
+		free( points );
+		InfoPoint* ip = tm->AddInfoPoint( Name, Type, poly );
+		ip->TrapDetectionDiff = TrapDetDiff;
+		ip->TrapRemovalDiff = TrapRemDiff;
+		//we don't need this flag, because the script is loaded
+		//only if it exists
+		ip->TrapDetected = TrapDetected;
+		ip->TrapLaunch.x = LaunchX;
+		ip->TrapLaunch.y = LaunchY;
+		ip->Cursor = Cursor;
+		ip->overHeadText = string;
+		ip->StrRef = StrRef; //we need this when saving area
+		ip->textDisplaying = 0;
+		ip->timeStartDisplaying = 0;
+		ip->SetMap(map);
+		ip->Pos.x = bbox.x + ( bbox.w / 2 );
+		ip->Pos.y = bbox.y + ( bbox.h / 2 );
+		ip->Flags = Flags;
+		memcpy( ip->Destination, Destination, sizeof(Destination) );
+		memcpy( ip->EntranceName, Entrance, sizeof(Entrance) );
+		memcpy( ip->KeyResRef, KeyResRef, sizeof(KeyResRef) );
+		memcpy( ip->DialogResRef, DialogResRef, sizeof(DialogResRef) );
+		if (Script[0] != 0) {
+			ip->Scripts[0] = new GameScript( Script, ST_TRIGGER );
+			ip->Scripts[0]->MySelf = ip;
+		} else
+			ip->Scripts[0] = NULL;
+	}
+
+	printf( "Loading containers\n" );
+	//Loading Containers
+	for (i = 0; i < ContainersCount; i++) {
+		str->Seek( ContainersOffset + ( i * 0xC0 ), GEM_STREAM_START );
+		char Name[33];
+		ieWord Type, LockDiff;
+		ieDword Flags;
+		ieWord TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
+		ieWord XPos, YPos;
+		ieWord LaunchX, LaunchY;
+		ieDword ItemIndex, ItemCount;
+		ieResRef KeyResRef;
+		ieStrRef OpenFail;
+
+		str->Read( Name, 32 );
+		Name[32] = 0;
+		str->ReadWord( &XPos );
+		str->ReadWord( &YPos );
+		str->ReadWord( &Type );
+		str->ReadWord( &LockDiff );
+		str->ReadDword( &Flags );
+		str->ReadWord( &TrapDetDiff );
+		str->ReadWord( &TrapRemDiff );
+		str->ReadWord( &Trapped );
+		str->ReadWord( &TrapDetected );
+		str->ReadWord( &LaunchX );
+		str->ReadWord( &LaunchY );
+		Region bbox;
+		ieWord tmp;
+		str->ReadWord( &tmp );
+		bbox.x = tmp;
+		str->ReadWord( &tmp );
+		bbox.y = tmp;
+		str->ReadWord( &tmp );
+		bbox.w = tmp - bbox.x;
+		str->ReadWord( &tmp );
+		bbox.h = tmp - bbox.y;
+		str->ReadDword( &ItemIndex );
+		str->ReadDword( &ItemCount );
+		str->ReadResRef( Script );
+		ieDword firstIndex, vertCount;
+		str->ReadDword( &firstIndex );
+		str->ReadDword( &vertCount );
+		//str->Read( Name, 32 );
+		str->Seek( 32, GEM_CURRENT_POS);
+		str->ReadResRef( KeyResRef);
+		str->Seek( 4, GEM_CURRENT_POS);
+		str->ReadDword( &OpenFail );
+
+		str->Seek( VerticesOffset + ( firstIndex * 4 ), GEM_STREAM_START );
+		Point* points = ( Point* ) malloc( vertCount*sizeof( Point ) );
+		for (unsigned int x = 0; x < vertCount; x++) {
+			ieWord tmp;
+			str->ReadWord( &tmp );
+			points[x].x = tmp;
+			str->ReadWord( &tmp );
+			points[x].y = tmp;
+		}
+		Gem_Polygon* poly = new Gem_Polygon( points, vertCount, &bbox );
+		free( points );
+		Container* c = tm->AddContainer( Name, Type, poly );
+		c->SetMap(map);
+		c->Pos.x = XPos;
+		c->Pos.y = YPos;
+		c->LockDifficulty = LockDiff;
+		c->Flags = Flags;
+		c->TrapDetectionDiff = TrapDetDiff;
+		c->TrapRemovalDiff = TrapRemDiff;
+		c->Trapped = Trapped;
+		c->TrapDetected = TrapDetected;
+		c->TrapLaunch.x = LaunchX;
+		c->TrapLaunch.y = LaunchY;
+		//reading items into a container
+		str->Seek( ItemsOffset+( ItemIndex * 0x14 ), GEM_STREAM_START);
+		while(ItemCount--) {
+			//cannot add directly to inventory (ground piles)
+			c->AddItem( core->ReadItem(str));
+		}
+		if (Script[0] != 0) {
+			c->Scripts[0] = new GameScript( Script, ST_CONTAINER );
+			c->Scripts[0]->MySelf = c;
+		} else
+			c->Scripts[0] = NULL;
+		strnuprcpy(c->KeyResRef, KeyResRef, 8);
+		c->OpenFail = OpenFail;
+	}
+
 	printf( "Loading doors\n" );
 	//Loading Doors
 	for (i = 0; i < DoorsCount; i++) {
@@ -263,7 +435,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		ieWord OpenVerticesCount, ClosedVerticesCount;
 		ieWord OpenImpededCount, ClosedImpededCount;
 		char LongName[33];
-		char LinkedInfo[25];
+		char LinkedInfo[33];
 		ieResRef ShortName;
 		ieWord minX, maxX, minY, maxY;
 		ieDword cursor;
@@ -328,9 +500,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->ReadWord( &maxY );
 		toOpen[1].y = maxY;
 		str->ReadDword( &OpenStrRef);
-		//odd field, needs a bit of hacking
-		str->Read( LinkedInfo, 24);
-		LinkedInfo[24] = 0;
+		str->Read( LinkedInfo, 32);
 		str->ReadDword( &NameStrRef);
 		str->ReadResRef( Dialog );
 
@@ -431,185 +601,12 @@ Map* AREImp::GetMap(const char *ResRef)
 			else
 				memcpy( door->CloseSound, Sounds[DEF_CLOSE], 9 );
 		}
+		door->LockDifficulty=LockRemoval;
 		door->OpenStrRef=OpenStrRef;
-		//this is an odd field, only 24 chars!
-		strnuprcpy(door->LinkedInfo, LinkedInfo, 24);
+		strnuprcpy(door->LinkedInfo, LinkedInfo, 32);
+		//these 2 fields are not sure
 		door->NameStrRef=NameStrRef;
 		strnuprcpy(door->Dialog, Dialog, 8);
-	}
-
-	printf( "Loading containers\n" );
-	//Loading Containers
-	for (i = 0; i < ContainersCount; i++) {
-		str->Seek( ContainersOffset + ( i * 0xC0 ), GEM_STREAM_START );
-		char Name[33];
-		ieWord Type, LockDiff;
-		ieDword Flags;
-		ieWord TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
-		ieWord XPos, YPos;
-		ieWord LaunchX, LaunchY;
-		ieDword ItemIndex, ItemCount;
-		ieResRef KeyResRef;
-		ieStrRef OpenFail;
-
-		str->Read( Name, 32 );
-		Name[32] = 0;
-		str->ReadWord( &XPos );
-		str->ReadWord( &YPos );
-		str->ReadWord( &Type );
-		str->ReadWord( &LockDiff );
-		str->ReadDword( &Flags );
-		str->ReadWord( &TrapDetDiff );
-		str->ReadWord( &TrapRemDiff );
-		str->ReadWord( &Trapped );
-		str->ReadWord( &TrapDetected );
-		str->ReadWord( &LaunchX );
-		str->ReadWord( &LaunchY );
-		Region bbox;
-		ieWord tmp;
-		str->ReadWord( &tmp );
-		bbox.x = tmp;
-		str->ReadWord( &tmp );
-		bbox.y = tmp;
-		str->ReadWord( &tmp );
-		bbox.w = tmp - bbox.x;
-		str->ReadWord( &tmp );
-		bbox.h = tmp - bbox.y;
-		str->ReadDword( &ItemIndex );
-		str->ReadDword( &ItemCount );
-		str->ReadResRef( Script );
-		ieDword firstIndex, vertCount;
-		str->ReadDword( &firstIndex );
-		str->ReadDword( &vertCount );
-		//str->Read( Name, 32 );
-		str->Seek( 32, GEM_CURRENT_POS);
-		str->ReadResRef( KeyResRef);
-		str->Seek( 4, GEM_CURRENT_POS);
-		str->ReadDword( &OpenFail );
-
-		str->Seek( VerticesOffset + ( firstIndex * 4 ), GEM_STREAM_START );
-		Point* points = ( Point* ) malloc( vertCount*sizeof( Point ) );
-		for (unsigned int x = 0; x < vertCount; x++) {
-			ieWord tmp;
-			str->ReadWord( &tmp );
-			points[x].x = tmp;
-			str->ReadWord( &tmp );
-			points[x].y = tmp;
-		}
-		Gem_Polygon* poly = new Gem_Polygon( points, vertCount, &bbox );
-		free( points );
-		Container* c = tm->AddContainer( Name, Type, poly );
-		c->SetMap(map);
-		c->Pos.x = XPos;
-		c->Pos.y = YPos;
-		c->LockDifficulty = LockDiff;
-		c->Flags = Flags;
-		c->TrapDetectionDiff = TrapDetDiff;
-		c->TrapRemovalDiff = TrapRemDiff;
-		c->Trapped = Trapped;
-		c->TrapDetected = TrapDetected;
-		c->TrapLaunch.x = LaunchX;
-		c->TrapLaunch.y = LaunchY;
-		//reading items into a container
-		str->Seek( ItemsOffset+( ItemIndex * 0x14 ), GEM_STREAM_START);
-		while(ItemCount--) {
-			//cannot add directly to inventory (ground piles)
-			c->AddItem( core->ReadItem(str));
-		}
-		if (Script[0] != 0) {
-			c->Scripts[0] = new GameScript( Script, ST_CONTAINER );
-			c->Scripts[0]->MySelf = c;
-		} else
-			c->Scripts[0] = NULL;
-		strnuprcpy(c->KeyResRef, KeyResRef, 8);
-		c->OpenFail = OpenFail;
-	}
-
-	printf( "Loading regions\n" );
-	//Loading InfoPoints
-	for (i = 0; i < InfoPointsCount; i++) {
-		str->Seek( InfoPointsOffset + ( i * 0xC4 ), GEM_STREAM_START );
-		ieWord Type, VertexCount;
-		ieDword FirstVertex, Cursor, Flags;
-		ieWord TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
-		ieWord LaunchX, LaunchY;
-		char Name[33], Entrance[33];
-		ieResRef Script, DialogResRef, KeyResRef, Destination;
-		str->Read( Name, 32 );
-		Name[32] = 0;
-		str->ReadWord( &Type );
-		Region bbox;
-		ieWord tmp;
-		str->ReadWord( &tmp );
-		bbox.x = tmp;
-		str->ReadWord( &tmp );
-		bbox.y = tmp;
-		str->ReadWord( &tmp );
-		bbox.w = tmp - bbox.x;
-		str->ReadWord( &tmp );
-		bbox.h = tmp - bbox.y;
-		str->ReadWord( &VertexCount );
-		str->ReadDword( &FirstVertex );
-		ieDword tmp2;
-		str->ReadDword( &tmp2 );
-		str->ReadDword( &Cursor );
-		str->ReadResRef( Destination );
-		str->Read( Entrance, 32 );
-		Entrance[32] = 0;
-		str->ReadDword( &Flags );
-		ieStrRef StrRef;
-		str->ReadDword( &StrRef );
-		str->ReadWord( &TrapDetDiff );
-		str->ReadWord( &TrapRemDiff );
-		str->ReadWord( &Trapped );
-		str->ReadWord( &TrapDetected );
-		str->ReadWord( &LaunchX );
-		str->ReadWord( &LaunchY );
-		str->ReadResRef( KeyResRef );
-		//don't even bother reading the script if it isn't trapped
-		if(Trapped || Type) {
-			str->ReadResRef( Script );
-		}
-		else {
-			Script[0] = 0;
-		}
-		str->Seek( 56, GEM_CURRENT_POS );
-		str->ReadResRef( DialogResRef );
-		char* string = core->GetString( StrRef );
-		str->Seek( VerticesOffset + ( FirstVertex * 4 ), GEM_STREAM_START );
-		Point* points = ( Point* ) malloc( VertexCount*sizeof( Point ) );
-		for (x = 0; x < VertexCount; x++) {
-			str->ReadWord( (ieWord*) &points[x].x );
-			str->ReadWord( (ieWord*) &points[x].y );
-		}
-		Gem_Polygon* poly = new Gem_Polygon( points, VertexCount, &bbox);
-		free( points );
-		InfoPoint* ip = tm->AddInfoPoint( Name, Type, poly );
-		ip->TrapDetectionDiff = TrapDetDiff;
-		ip->TrapRemovalDiff = TrapRemDiff;
-		//we don't need this flag, because the script is loaded
-		//only if it exists
-		ip->TrapDetected = TrapDetected;
-		ip->TrapLaunch.x = LaunchX;
-		ip->TrapLaunch.y = LaunchY;
-		ip->Cursor = Cursor;
-		ip->overHeadText = string;
-		ip->StrRef = StrRef; //we need this when saving area
-		ip->textDisplaying = 0;
-		ip->timeStartDisplaying = 0;
-		ip->SetMap(map);
-		ip->Pos.x = bbox.x + ( bbox.w / 2 );
-		ip->Pos.y = bbox.y + ( bbox.h / 2 );
-		ip->Flags = Flags;
-		memcpy( ip->Destination, Destination, sizeof(Destination) );
-		memcpy( ip->EntranceName, Entrance, sizeof(Entrance) );
-		memcpy( ip->KeyResRef, KeyResRef, sizeof(KeyResRef) );
-		memcpy( ip->DialogResRef, DialogResRef, sizeof(DialogResRef) );
-		if (Script[0] != 0) {
-			ip->Scripts[0] = new GameScript( Script, ST_TRIGGER );
-			ip->Scripts[0]->MySelf = ip;
-		} else
-			ip->Scripts[0] = NULL;
 	}
 
 	printf( "Loading spawnpoints\n" );
@@ -1012,20 +1009,13 @@ int AREImp::GetStoredFileSize(Map *map)
 	headersize += ContainersCount * 0xc0;
 	ItemsOffset = headersize;
 	headersize += ItemsCount * 0x14;
-	AmbiOffset = headersize;
-
-	AmbiCount = (ieDword) map->GetAmbientCount();
-	headersize += AmbiCount * 0xd8;
-	VariablesOffset = headersize;
-
-	VariablesCount = (ieDword) map->locals->GetCount();
-	headersize += VariablesCount * 0x52;
 	DoorsOffset = headersize;
 
 	DoorsCount = (ieDword) map->TMap->GetDoorCount();
 	headersize += DoorsCount * 0xc8;
-	VerticesCount = 0;
+	VerticesOffset = headersize;
 
+	VerticesCount = 0;
 	for(i=0;i<InfoPointsCount;i++) {
 		InfoPoint *ip=map->TMap->GetInfoPoint(i);
 		VerticesCount+=ip->outline->count;
@@ -1038,30 +1028,38 @@ int AREImp::GetStoredFileSize(Map *map)
 		Door *d=map->TMap->GetDoor(i);
 		VerticesCount+=d->open->count+d->closed->count+d->oibcount+d->cibcount;
 	}
-
-	VerticesOffset = headersize;
-
 	headersize += VerticesCount * 4;
-	SongHeader = headersize;
+	AmbiOffset = headersize;
 
-	headersize += 0x90;
-	RestHeader = headersize;
+	AmbiCount = (ieDword) map->GetAmbientCount();
+	headersize += AmbiCount * 0xd4;
+	VariablesOffset = headersize;
 
-	headersize += 0xe4;
-	ExploredBitmapOffset = headersize;
-
-	ExploredBitmapSize = map->GetExploredMapSize();
-	headersize += ExploredBitmapSize;
+	VariablesCount = (ieDword) map->locals->GetCount();
+	headersize += VariablesCount * 0x54;
 	AnimOffset = headersize;
 
 	AnimCount = (ieDword) map->GetAnimationCount();
 	headersize += AnimCount * 0x4c;
+	TileOffset = headersize;
+
+	TileCount = 0;
+	headersize += TileCount * 0x6c;
+	ExploredBitmapOffset = headersize;
+
+	ExploredBitmapSize = map->GetExploredMapSize();
+	headersize += ExploredBitmapSize;
 	NoteOffset = headersize;
 
 	int pst = core->HasFeature( GF_AUTOMAP_INI );
 	NoteCount = (ieDword) map->GetMapNoteCount();
-	headersize += NoteCount * pst?0x214: 0xc0;
+	headersize += NoteCount * (pst?0x214: 0xc0);
+	RestHeader = headersize;
 
+	headersize += 0xe4;
+	SongHeader = headersize;
+
+	headersize += 0x90;
 	return headersize;
 }
 
@@ -1134,10 +1132,9 @@ int AREImp::PutHeader(DataStream *stream, Map *map)
 	stream->WriteDword( &DoorsCount );
 	stream->WriteDword( &DoorsOffset );
 	stream->WriteDword( &AnimCount );
-	stream->WriteDword( &AnimOffset );
-	//tiled object offset/count
-	stream->WriteDword( &tmpDword);
-	stream->WriteDword( &tmpDword);
+	stream->WriteDword( &AnimOffset );	
+	stream->WriteDword( &TileCount);
+	stream->WriteDword( &TileOffset);
 	stream->WriteDword( &SongHeader);
 	stream->WriteDword( &RestHeader);
 	//an empty dword for pst
@@ -1234,9 +1231,9 @@ int AREImp::PutDoors( DataStream *stream, Map *map, ieDword &VertIndex)
 		tmpWord = (ieWord) d->toOpen[1].y;
 		stream->WriteWord( &tmpWord);
 		stream->WriteDword( &d->OpenStrRef);
-		stream->Write( d->LinkedInfo, 24);
+		stream->Write( d->LinkedInfo, 32);
 		stream->WriteDword( &d->NameStrRef);
-		
+		stream->WriteResRef( d->Dialog);
 	}
 	return 0;
 }
@@ -1316,6 +1313,7 @@ int AREImp::PutContainers( DataStream *stream, Map *map, ieDword &VertIndex)
 		stream->WriteWord( &tmpWord);
 		tmpWord = (ieWord) c->Pos.y;
 		stream->WriteWord( &tmpWord);
+		stream->WriteWord( &c->Type);
 		stream->WriteWord( &c->LockDifficulty);
 		stream->WriteDword( &c->Flags);
 		stream->WriteWord( &c->TrapDetectionDiff);
@@ -1347,10 +1345,12 @@ int AREImp::PutContainers( DataStream *stream, Map *map, ieDword &VertIndex)
 			stream->Write( filling, 8);
 		}
 		//outline polygon index and count
-		tmpDword = c->outline->count;
+		tmpWord = c->outline->count;
 		stream->WriteDword( &VertIndex);
-		stream->WriteDword( &tmpDword);
-		VertIndex +=tmpDword;
+		stream->WriteWord( &tmpWord);
+		VertIndex +=tmpWord;
+		tmpWord = 0;
+		stream->WriteWord( &tmpWord); //vertex count is made short
 		//this is the real scripting name
 		stream->Write( c->GetScriptName(), 32);
 		stream->WriteResRef( c->KeyResRef);
@@ -1467,6 +1467,11 @@ int AREImp::PutActors( DataStream *stream, Map *map)
 		stream->WriteWord( &tmpWord);
 		tmpWord = (ieWord) ac->Pos.y;
 		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) ac->Destination.x;
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) ac->Destination.y;
+		stream->WriteWord( &tmpWord);
+
 		stream->WriteDword( &tmpDword); //used fields flag always 0 for saved areas
 		stream->WriteDword( &tmpDword); //unknown2c
 		stream->WriteDword( &tmpDword); //actor animation, unused
@@ -1543,7 +1548,7 @@ int AREImp::PutAnimations( DataStream *stream, Map *map)
 int AREImp::PutEntrances( DataStream *stream, Map *map)
 {
 	ieWord tmpWord;
-	char filling[62];
+	char filling[66];
 
 	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<EntrancesCount;i++) {
@@ -1554,9 +1559,9 @@ int AREImp::PutEntrances( DataStream *stream, Map *map)
 		stream->WriteWord( &tmpWord);
 		tmpWord = (ieWord) e->Pos.y;
 		stream->WriteWord( &tmpWord);
-		stream->WriteDword( &e->Face);
+		stream->WriteWord( &e->Face);
 		//a large empty piece of crap
-		stream->Write( filling, 62);
+		stream->Write( filling, 66);
 	}
 	return 0;
 }
@@ -1570,7 +1575,7 @@ int AREImp::PutVariables( DataStream *stream, Map *map)
 
 	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<VariablesCount;i++) {
-		map->locals->GetNextAssoc( pos, name, value);
+		pos=map->locals->GetNextAssoc( pos, name, value);
 		stream->Write( name, 32);
 		stream->Write( filling, 8);
 		stream->WriteDword( &value);
@@ -1582,7 +1587,7 @@ int AREImp::PutVariables( DataStream *stream, Map *map)
 
 int AREImp::PutAmbients( DataStream *stream, Map *map)
 {
-	char filling[8];
+	char filling[64];
 	ieWord tmpWord;
 
 	memset(filling,0,sizeof(filling) );
@@ -1593,8 +1598,8 @@ int AREImp::PutAmbients( DataStream *stream, Map *map)
 		stream->WriteWord( &tmpWord );
 		tmpWord = (ieWord) am->origin.y;
 		stream->WriteWord( &tmpWord );
-		stream->ReadWord( &am->radius );
-		stream->ReadWord( &am->height );
+		stream->WriteWord( &am->radius );
+		stream->WriteWord( &am->height );
 		stream->Write( filling, 6 );
 		stream->WriteWord( &am->gain );
 		tmpWord = am->sounds.size();
@@ -1611,6 +1616,7 @@ int AREImp::PutAmbients( DataStream *stream, Map *map)
 		stream->WriteDword( &am->perset );
 		stream->WriteDword( &am->appearance );
 		stream->WriteDword( &am->flags );
+		stream->Write( filling, 64);
 	}
 	return 0;
 }
@@ -1680,6 +1686,59 @@ int AREImp::PutTiles( DataStream * /*stream*/, Map * /*map*/)
 	return 0;
 }
 
+int AREImp::PutSongHeader( DataStream *stream, Map *map)
+{
+	int i;
+	char filling[8];
+	ieDword tmpDword = 0;
+
+	memset(filling,0,sizeof(filling) );
+	for(i=0;i<MAX_RESCOUNT;i++) {
+		stream->WriteDword( map->SongHeader.SongList);
+	}
+	//day
+	stream->Write( filling,8);
+	stream->Write( filling,8);
+	stream->WriteDword( &tmpDword);
+	//night
+	stream->Write( filling,8);
+	stream->Write( filling,8);
+	stream->WriteDword( &tmpDword);
+	//song flag
+	stream->WriteDword( &tmpDword);
+	//lots of empty crap
+	for(i=0;i<15;i++) {
+		stream->WriteDword( &tmpDword);
+	}
+	return 0;
+}
+
+int AREImp::PutRestHeader( DataStream *stream, Map *map)
+{
+	int i;
+	ieDword tmpDword = 0;
+	ieWord tmpWord = 0;
+
+	for(i=0;i<MAX_RESCOUNT;i++) {
+		stream->WriteDword( &map->RestHeader.Strref[i]);
+	}
+	for(i=0;i<MAX_RESCOUNT;i++) {
+		stream->WriteResRef( map->RestHeader.CreResRef[i]);
+	}
+	stream->WriteWord( &map->RestHeader.CreatureNum);
+	//lots of unknowns
+	stream->WriteWord( &tmpWord);
+	for(i=0;i<6;i++) {
+		stream->WriteWord( &tmpWord);
+	}
+	stream->WriteWord( &map->RestHeader.DayChance);
+	stream->WriteWord( &map->RestHeader.NightChance);
+	for(i=0;i<14;i++) {
+		stream->WriteDword( &tmpDword);
+	}
+	return 0;
+}
+
 /* no saving of tiled objects, are they used anywhere? */
 int AREImp::PutArea(DataStream *stream, Map *map)
 {
@@ -1735,7 +1794,7 @@ int AREImp::PutArea(DataStream *stream, Map *map)
 		return ret;
 	}
 
-	ret = PutAnimations( stream, map);
+	ret = PutAmbients( stream, map);
 	if (ret) {
 		return ret;
 	}
@@ -1745,7 +1804,12 @@ int AREImp::PutArea(DataStream *stream, Map *map)
 		return ret;
 	}
 
-	ret = PutAmbients( stream, map);
+	ret = PutAnimations( stream, map);
+	if (ret) {
+		return ret;
+	}
+
+	ret = PutTiles( stream, map);
 	if (ret) {
 		return ret;
 	}
@@ -1756,7 +1820,16 @@ int AREImp::PutArea(DataStream *stream, Map *map)
 	}
 
 	ret = PutExplored( stream, map);
+	if (ret) {
+		return ret;
+	}
 
+	ret = PutRestHeader( stream, map);
+	if (ret) {
+		return ret;
+	}
+
+	ret = PutSongHeader( stream, map);
 	return ret;
 }
 

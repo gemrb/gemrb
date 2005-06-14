@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.187 2005/06/12 16:57:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.188 2005/06/14 22:29:38 avenger_teambg Exp $
  *
  */
 
@@ -953,6 +953,7 @@ public:
 	static void AmbientActivate(Scriptable* Sender, Action* parameters);
 	static void ApplyDamage(Scriptable* Sender, Action* parameters);
 	static void ApplyDamagePercent(Scriptable* Sender, Action* parameters);
+	static void AttachTransitionToDoor(Scriptable* Sender, Action* parameters);
 	static void Attack(Scriptable* Sender, Action* parameters);
 	static void AttackReevaluate(Scriptable* Sender, Action* parameters);
 	static void BattleSong(Scriptable* Sender, Action* parameters);

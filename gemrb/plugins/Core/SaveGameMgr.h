@@ -23,6 +23,9 @@ public:
 	virtual ~SaveGameMgr(void);
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
 	virtual Game* GetGame() = 0;
+
+	virtual int GetStoredFileSize(Game *game) = 0;
+	virtual int PutGame(DataStream* stream, Game *game) = 0;
 };
 
 #endif

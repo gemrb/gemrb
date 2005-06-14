@@ -15,11 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/2DAImporter/2DAImp.cpp,v 1.19 2005/03/10 23:53:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/2DAImporter/2DAImp.cpp,v 1.20 2005/06/14 22:29:35 avenger_teambg Exp $
  *
  */
 
 #include "../../includes/win32def.h"
+#include "../Core/Interface.h"
 #include "2DAImp.h"
 #include "../Core/FileStream.h"
 
@@ -57,7 +58,7 @@ bool p2DAImp::Open(DataStream* stream, bool autoFree)
 	while (*strp == ' ')
 		strp++;
 	if (strncmp( strp, "2DA V1.0", 8 ) != 0) {
-		printf( "Bad signature!\n" );
+		printMessage("2DAImporter", "Bad signature!\n",YELLOW );
 // we don't care about this, so exptable.2da of iwd2 won't cause a bigger problem
 //		return false;
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.h,v 1.14 2005/06/10 21:12:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.h,v 1.15 2005/06/14 22:29:37 avenger_teambg Exp $
  *
  */
 
@@ -48,6 +48,7 @@ public:
 
 	bool Open(const char* filename, bool autoFree = true);
 	bool Open(_FILE* stream, int startpos, int size, bool autoFree = false);
+	bool Create(const char* folder, const char* filename, SClass_ID ClassID);
 	bool Create(const char* filename, SClass_ID ClassID);
 	int Read(void* dest, unsigned int length);
 	int Write(const void* src, unsigned int length);

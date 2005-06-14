@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.24 2004/08/25 11:55:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.25 2005/06/14 22:29:38 avenger_teambg Exp $
  *
  */
 
@@ -186,7 +186,7 @@ SaveGame* SaveGameIterator::GetSaveGame(int index)
 	return sg;
 }
 
-void SaveGameIterator::CreateSaveGame(int index, const char *slotname)
+int SaveGameIterator::CreateSaveGame(int index, const char *slotname)
 {
 	char Path[_MAX_PATH];
 
@@ -201,6 +201,43 @@ void SaveGameIterator::CreateSaveGame(int index, const char *slotname)
 	snprintf( Path, _MAX_PATH, "%s%s%s%s", core->SavePath, PlayMode(), SPathDelimiter, slotname );
 	mkdir(Path,S_IWRITE|S_IREAD);
 	//save files here
+	//some of these restrictions might not be needed
+	if (core->GetCurrentStore()) {
+		return 1; //can't save while store is open
+	}
+	GameControl *gc = core->GetGameControl();
+	if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
+		return 2; //can't save while in dialog?
+	}
+
+	Game *game = core->GetGame();
+	//saving areas to cache currently in memory
+	size_t mc = game->GetLoadedMapCount();
+	while(mc--) {
+		Map *map = game->GetMap(mc);
+		if(core->SwapoutArea(map)) {
+			return -1;
+		}
+	}
+	
+	//compress files in cache named: .STO and .ARE
+	//no .CRE would be saved in cache
+	if(core->CompressSave(Path)) {
+		return -1;
+	}
+
+	//Create .gam file from Game() object
+	if(core->WriteGame(Path)) {
+		return -1;
+	}
+
+	//Create .wmp file from WorldMap() object
+	if(core->WriteWorldMap(Path)) {
+		return -1;
+	}
+
+	//Create .bmp's (area preview and portraits)
+	return 0;
 }
 
 void SaveGameIterator::DeleteSaveGame(int index)

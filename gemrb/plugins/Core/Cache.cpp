@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.cpp,v 1.8 2005/04/11 17:37:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.cpp,v 1.9 2005/06/14 22:29:37 avenger_teambg Exp $
  *
  */
 
@@ -200,7 +200,7 @@ Cache::MyAssoc* Cache::GetAssocAt(const ieResRef key) const
 	return NULL;
 }
 
-void *Cache::GetResource(ieResRef key)
+void *Cache::GetResource(const ieResRef key)
 {
 	Cache::MyAssoc* pAssoc = GetAssocAt( key );
 	if (pAssoc == NULL) {
@@ -212,7 +212,7 @@ void *Cache::GetResource(ieResRef key)
 }
 
 //returns true if it was successful
-bool Cache::SetAt(ieResRef key, void *rValue)
+bool Cache::SetAt(const ieResRef key, void *rValue)
 {
 	int i;
 
@@ -247,7 +247,7 @@ bool Cache::SetAt(ieResRef key, void *rValue)
 	return true;
 }
 
-int Cache::RefCount(ieResRef key)
+int Cache::RefCount(const ieResRef key) const
 {
 	Cache::MyAssoc* pAssoc=GetAssocAt( key );
 	if (pAssoc) {
@@ -256,7 +256,7 @@ int Cache::RefCount(ieResRef key)
 	return -1;
 }
 
-int Cache::DecRef(void *data, ieResRef key, bool remove)
+int Cache::DecRef(void *data, const ieResRef key, bool remove)
 {
 	Cache::MyAssoc* pAssoc;
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.76 2005/06/11 20:18:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.77 2005/06/14 22:29:38 avenger_teambg Exp $
  *
  */
 
@@ -74,13 +74,16 @@ class Ambient;
 #define GL_PASS           1
 #define GL_REBOUND        2
 
+//in areas 10 is a magic number for resref counts
+#define MAX_RESCOUNT 10 
+
 typedef struct SongHeaderType {
-	ieDword SongList[5];
+	ieDword SongList[MAX_RESCOUNT];
 } SongHeaderType;
 
 typedef struct RestHeaderType {
-	ieDword Strref[10];
-	ieResRef CreResRef[10];
+	ieDword Strref[MAX_RESCOUNT];
+	ieResRef CreResRef[MAX_RESCOUNT];
 	ieWord CreatureNum;
 	ieWord DayChance;
 	ieWord NightChance;
@@ -94,7 +97,7 @@ typedef struct WallGroup {
 typedef struct Entrance {
 	char Name[33];
 	Point Pos;
-	ieDword Face;
+	ieWord Face;
 } Entrance;
 
 typedef class MapNote {

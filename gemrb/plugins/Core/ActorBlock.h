@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.76 2005/06/11 20:18:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.77 2005/06/14 22:29:37 avenger_teambg Exp $
  *
  */
 
@@ -182,7 +182,7 @@ public:
 	virtual ~Selectable(void);
 public:
 	Region BBox;
-	bool Selected;
+	ieWord Selected; //could be 0x80 for unselectable
 	bool Over;
 	Color selectedColor;
 	Color overColor;
@@ -193,7 +193,7 @@ public:
 	bool IsOver(Point &Pos);
 	void SetOver(bool over);
 	bool IsSelected();
-	void Select(bool Value);
+	void Select(int Value);
 	void SetCircle(int size, Color color);
 };
 
@@ -286,7 +286,7 @@ public:
 	Door(TileOverlay* Overlay);
 	~Door(void);
 public:
-	char LinkedInfo[25];
+	char LinkedInfo[33];
 	ieResRef ID;    //WED ID
 	TileOverlay* overlay;
 	unsigned short* tiles;

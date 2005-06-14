@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.13 2005/03/19 16:15:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.14 2005/06/14 22:29:38 avenger_teambg Exp $
  *
  */
 
@@ -104,13 +104,19 @@ public: //struct members
 	ieDword AreaLinksCount;
 	ieResRef MapIconResRef;
 
-public: //non-struct members
+private: //non-struct members
 	Sprite2D* MapMOS;
 	std::vector< WMPAreaEntry*> area_entries;
 	std::vector< WMPAreaLink*> area_links;
 	int *Distances;
 	int *GotHereFrom;
 public:
+	Sprite2D* GetMapMOS() { return MapMOS; }
+	void SetMapMOS(Sprite2D *newmos);
+	int GetEntryCount() { return area_entries.size(); }
+	WMPAreaEntry *GetEntry(unsigned int index) { return area_entries[index]; }
+	int GetLinkCount() { return area_links.size(); }
+	WMPAreaLink *GetLink(unsigned int index) { return area_links[index]; }
 	void SetAreaEntry(unsigned int index, WMPAreaEntry *areaentry);
 	void SetAreaLink(unsigned int index, WMPAreaLink *arealink);
 	void AddAreaEntry(WMPAreaEntry *ae);
@@ -126,14 +132,35 @@ public:
 	WMPAreaLink *GetEncounterLink(const ieResRef B, bool &encounter);
 	/* sets area status */
 	void SetAreaStatus(const ieResRef, int Bits, int Op);
+	//internal function to get area pointer and index from area name
+	//also called from WorldMapArray to find the right map	
+	WMPAreaEntry* GetArea(const ieResRef AreaName, unsigned int &i);
 private:
 	// updates visibility of adjacent areas, called from CalculateDistances
 	void UpdateAreaVisibility(const ieResRef AreaName, int direction);
-	//internal function to get area pointer and index from area name
-	WMPAreaEntry* GetArea(const ieResRef AreaName, int &i);
 	//internal function to calculate the distances from areaindex
 	void CalculateDistance(int areaindex, int direction);
-	int WhoseLinkAmI(int link_index);
+	unsigned int WhoseLinkAmI(int link_index);
+};
+
+class GEM_EXPORT WorldMapArray {
+public:
+	WorldMapArray(int count);
+	~WorldMapArray();
+	void SetWorldMap(WorldMap *m, unsigned int index);
+private:
+	WorldMap **all_maps;
+	unsigned int MapCount;
+	unsigned int CurrentMap;
+public:
+	int GetMapCount() { return MapCount; }
+	int GetCurrentMapIndex() { return CurrentMap; }
+	WorldMap *NewWorldMap(unsigned int index);
+	WorldMap *GetWorldMap(unsigned int index) { return all_maps[index]; }
+	WorldMap *GetCurrentMap() { return all_maps[CurrentMap]; }
+	void SetWorldMap(unsigned int index);
+	void SetCurrentMap(unsigned int index) { CurrentMap = index; }
+	int FindAndSetCurrentMap(const ieResRef area);
 };
 
 #endif // ! WORLDMAP_H

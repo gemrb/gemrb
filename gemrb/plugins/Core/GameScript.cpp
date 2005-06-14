@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.287 2005/06/12 16:57:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.288 2005/06/14 22:29:37 avenger_teambg Exp $
  *
  */
 
@@ -333,6 +333,7 @@ static ActionLink actionnames[] = {
 	{"ambientactivate", GameScript::AmbientActivate,0},
 	{"applydamage", GameScript::ApplyDamage,0},
 	{"applydamagepercent", GameScript::ApplyDamagePercent,0},
+	{"attachtransitiontodoor", GameScript::AttachTransitionToDoor,0},
 	{"attack", GameScript::Attack,AF_BLOCKING},
 	{"attackreevaluate", GameScript::AttackReevaluate,AF_BLOCKING},
 	{"bashdoor", GameScript::OpenDoor,AF_BLOCKING}, //the same until we know better
@@ -9044,12 +9045,17 @@ void CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
 {
 	strncpy(item->ItemResRef, resref, 8);
 	if (a==-1) {
-		//get the usages right
+		Item *origitem = core->GetItem(resref);
+		for(int i=0;i<3;i++) {
+			ITMExtHeader *e = origitem->GetExtHeader(i);			
+			item->Usages[i]=e?e->Charges:0;
+		}
+		core->FreeItem(origitem, resref, false);
 	}
 	else {
-		item->Usages[0]=a;
-		item->Usages[1]=b;
-		item->Usages[2]=c;
+		item->Usages[0]=(ieWord) a;
+		item->Usages[1]=(ieWord) b;
+		item->Usages[2]=(ieWord) c;
 	}
 	//no need, when Inventory receives it, it will be set
 	//item->Flags=IE_INV_ITEM_ACQUIRED; //get the flags right
@@ -9871,3 +9877,17 @@ void GameScript::Turn(Scriptable* Sender, Action* /*parameters*/)
 	actor->SetModal( MS_TURNUNDEAD);
 }
 
+void GameScript::AttachTransitionToDoor(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	if (tar->Type != ST_DOOR) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Door* door = ( Door* ) tar;
+	strnuprcpy(door->LinkedInfo, parameters->string0Parameter, 32);
+}

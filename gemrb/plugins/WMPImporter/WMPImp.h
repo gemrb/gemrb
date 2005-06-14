@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.h,v 1.4 2005/02/20 13:00:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.h,v 1.5 2005/06/14 22:29:40 avenger_teambg Exp $
  *
  */
 
@@ -43,16 +43,22 @@ public:
 	WMPImp(void);
 	~WMPImp(void);
 	bool Open(DataStream* stream, bool autoFree = true);
-	WorldMap* GetWorldMap(unsigned int index);
-	unsigned int GetWorldMapsCount();
+	WorldMapArray *GetWorldMapArray();
 
+	int GetStoredFileSize(WorldMapArray *wmap);
+	int PutWorldMap(DataStream* stream, WorldMapArray *wmap);
 	void release(void)
 	{
 		delete this;
 	}
 private:
+	void GetWorldMap(WorldMap *m, unsigned int index);
+
 	WMPAreaEntry* GetAreaEntry(WMPAreaEntry* ae);
 	WMPAreaLink* GetAreaLink(WMPAreaLink* al);
+	int PutMaps(DataStream *stream, WorldMapArray *wmap);
+	int PutLinks(DataStream *stream, WorldMap *wmap);
+	int PutAreas(DataStream *stream, WorldMap *wmap);
 };
 
 

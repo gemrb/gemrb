@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.318 2005/06/10 21:12:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.319 2005/06/14 22:29:39 avenger_teambg Exp $
  *
  */
 
@@ -2622,6 +2622,22 @@ static PyObject* GemRB_PlayMovie(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( ind );
 }
 
+PyDoc_STRVAR( GemRB_SaveGame__doc,
+"SaveGame(SlotCount, GameName)\n\n"
+"Dumps the save game.\n\n");
+
+static PyObject* GemRB_SaveGame(PyObject * /*self*/, PyObject * args)
+{
+	int SlotCount;
+	char *folder;
+
+	if (!PyArg_ParseTuple( args, "is", &SlotCount, &folder )) {
+		return AttributeError( GemRB_SaveGame__doc );
+	}
+	return PyInt_FromLong(
+			core->GetSaveGameIterator()->CreateSaveGame(SlotCount, folder) );
+}
+
 PyDoc_STRVAR( GemRB_GetSaveGameCount__doc,
 "GetSaveGameCount() => int\n\n"
 "Returns the number of saved games." );
@@ -2635,7 +2651,7 @@ static PyObject* GemRB_GetSaveGameCount(PyObject * /*self*/,
 
 PyDoc_STRVAR( GemRB_DeleteSaveGame__doc,
 "DeleteSaveGame(SlotCount)\n\n"
-"Deletes a saved game folder completely." );
+"Deletes a saved game folder completely.\n\n" );
 
 static PyObject* GemRB_DeleteSaveGame(PyObject * /*self*/, PyObject* args)
 {
@@ -5077,6 +5093,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(EvaluateString, METH_VARARGS),
 	METHOD(GetGameString, METH_VARARGS),
 	METHOD(LoadGame, METH_VARARGS),
+	METHOD(SaveGame, METH_VARARGS),
 	METHOD(EnterGame, METH_NOARGS),
 	METHOD(QuitGame, METH_NOARGS),
 	METHOD(StatComment, METH_VARARGS),

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.158 2005/06/10 21:12:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.159 2005/06/14 22:29:38 avenger_teambg Exp $
  *
  */
 
@@ -137,7 +137,7 @@ private:
 	DataFileMgr * INIbeasts;
 	DataFileMgr * INIquests;
 	Game * game;
-	WorldMap* worldmap;
+	WorldMapArray* worldmap;
 	int GameFeatures;
 	ieResRef ButtonFont;
 	ieResRef CursorBam;
@@ -360,11 +360,8 @@ public:
 	{
 		return game;
 	}
-	/** Gets the WorldMap class */
-	WorldMap * GetWorldMap()
-	{
-		return worldmap;
-	}
+	/** Gets the WorldMap class, returns the current worldmap */
+	WorldMap * GetWorldMap();
 	GameControl *GetGameControl();
 
 	void QuitGame(bool backtomain);
@@ -378,7 +375,7 @@ public:
 	/*returns true if an itemtype is acceptable for a slottype */
 	int CanUseItemType(int itype, int slottype) const;
 	/*removes single file from cache*/
-	void RemoveFromCache( ieResRef resref);
+	void RemoveFromCache(const ieResRef resref);
 	/*removes all files from directory*/
 	void DelTree(const char *path, bool onlysaved);
 	/*returns true if the file should be saved */
@@ -390,17 +387,17 @@ public:
 	CREItem* GetDraggedItem() { return DraggedItem; }
 	CREItem *ReadItem(DataStream *str);
 	bool ResolveRandomItem(CREItem *itm);
-	Item* GetItem(ieResRef resname);
-	void FreeItem(Item *itm, ieResRef name, bool free=false);
-	Spell* GetSpell(ieResRef resname);
-	void FreeSpell(Spell *spl, ieResRef name, bool free=false);
-	ieStrRef GetRumour(ieResRef resname);
+	Item* GetItem(const ieResRef resname);
+	void FreeItem(Item *itm, const ieResRef name, bool free=false);
+	Spell* GetSpell(const ieResRef resname);
+	void FreeSpell(Spell *spl, const ieResRef name, bool free=false);
+	ieStrRef GetRumour(const ieResRef resname);
 	Container *GetCurrentContainer();
 	int CloseCurrentContainer();
 	void SetCurrentContainer(Actor *actor, Container *arg);
 	Store *GetCurrentStore();
 	int CloseCurrentStore();
-	Store *SetCurrentStore(ieResRef resname);
+	Store *SetCurrentStore(const ieResRef resname);
 	// FIXME: due to Win32 we have to allocate/release all common
 	// memory from Interface. Yes, it is ugly.
 	ITMExtHeader *GetITMExt(int count);
@@ -408,7 +405,7 @@ public:
 	Effect *GetFeatures(int count);
 	void FreeITMExt(ITMExtHeader *p, Effect *e);
 	void FreeSPLExt(SPLExtHeader *p, Effect *e);
-	WorldMap *NewWorldMap();
+	WorldMapArray *NewWorldMapArray(int count);
 	void DoTheStoreHack(Store *s);
 	void MoveViewportTo(int x, int y, bool center);
 	/** plays stock gui sound referenced by index */
@@ -420,7 +417,7 @@ public:
 	/** returns the first selected PC */
 	Actor *GetFirstSelectedPC();
 	/** returns a single sprite (not cached) from a BAM resource */
-	Sprite2D* GetBAMSprite(ieResRef ResRef, int cycle, int frame);
+	Sprite2D* GetBAMSprite(const ieResRef ResRef, int cycle, int frame);
 	/** returns a cursor sprite (not cached) */
 	Sprite2D *GetCursorSprite();
 	/** returns 0 for unmovable, -1 for movable items, otherwise it
@@ -428,8 +425,12 @@ public:
 	int CanMoveItem(CREItem *item);
 	/** dumps an area object to the cache */
 	int SwapoutArea(Map *map);
-	/** saves the game to the destination folder  */
-	int CreateSaveGame(const char *folder);
+	/** saves the game object to the destination folder  */
+	int WriteGame(const char *folder);
+	/** saves the worldmap object to the destination folder  */
+	int WriteWorldMap(const char *folder);
+	/** saves the .are and .sto files to the destination folder */
+	int CompressSave(const char *folder);
 private:
 	bool LoadConfig(void);
 	bool LoadConfig(const char *filename);
@@ -438,7 +439,7 @@ private:
 	bool InitItemTypes();
 	bool ReadStrrefs();
 	bool ReadRandomItems();
-	bool ReadItemTable(ieResRef item, const char *Prefix);
+	bool ReadItemTable(const ieResRef item, const char *Prefix);
 
 public:
 	char GameData[12];

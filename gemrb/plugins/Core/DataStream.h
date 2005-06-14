@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.h,v 1.16 2005/06/10 21:12:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.h,v 1.17 2005/06/14 22:29:37 avenger_teambg Exp $
  *
  */
 
@@ -40,10 +40,13 @@
 #endif
 
 class GEM_EXPORT DataStream {
-public:
+protected:
 	unsigned long Pos;
 	unsigned long size;
 	bool Encrypted;
+public: //FIXME: this is a bit ugly
+	char filename[_MAX_PATH];
+public:
 	DataStream(void);
 	virtual ~DataStream(void);
 	virtual int Read(void* dest, unsigned int len) = 0;
@@ -57,6 +60,8 @@ public:
 	virtual int Seek(int pos, int startpos) = 0;
 	unsigned long Remains() const;
 	unsigned long Size() const;
+	unsigned long GetPos() const;
+	void Rewind();
 	/** Returns true if the stream is encrypted */
 	bool CheckEncrypted();
 	/** No descriptions */
@@ -66,7 +71,6 @@ public:
 	/** Endian Switch setup*/
 	static void SetEndianSwitch(int par);
 	static bool IsEndianSwitch();
-	char filename[_MAX_PATH];
 };
 
 #endif

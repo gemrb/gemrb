@@ -24,18 +24,38 @@
 #include "../Core/SaveGameMgr.h"
 #include "../Core/ActorMgr.h"
 
+#define GAM_VER_GEMRB  0 
+#define GAM_VER_BG  10   
+#define GAM_VER_IWD 11  
+#define GAM_VER_PST 12 
+#define GAM_VER_BG2 20 
+#define GAM_VER_IWD2 22
+
 class GAMImp : public SaveGameMgr {
 private:
 	DataStream* str;
 	bool autoFree;
 	int version;
 	unsigned int PCSize;
+	ieDword PCOffset, PCCount;
+	ieDword MazeOffset;
+	ieDword NPCOffset, NPCCount;
+	ieDword GlobalOffset, GlobalCount;
+	ieDword JournalOffset, JournalCount;
+	ieDword KillVarsOffset, KillVarsCount;
+	ieDword FamiliarsOffset;
+	ieDword BestiaryOffset;
+	ieDword SavedLocOffset, SavedLocCount;
 
 public:
 	GAMImp(void);
 	~GAMImp(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	Game* GetGame();
+
+	int GetStoredFileSize(Game *game);
+	/* stores a gane in the savegame folder */
+	int PutGame(DataStream *stream, Game *game);
 public:
 	void release(void)
 	{
@@ -45,6 +65,15 @@ private:
 	Actor* GetActor( ActorMgr* aM, bool is_in_party );
 	PCStatsStruct* GetPCStats();
 	GAMJournalEntry* GetJournalEntry();
+
+	int PutHeader(DataStream *stream, Game *game);
+	int PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CREOffset);
+	int PutPCs(DataStream *stream, Game *game);
+	int PutNPCs(DataStream *stream, Game *game);
+	int PutJournals(DataStream *stream, Game *game);
+	int PutVariables( DataStream *stream, Game *game);
+	int PutKillVars(DataStream *stream, Game *game);
+	int PutMaze(DataStream *stream, Game *game);
 };
 
 #endif
