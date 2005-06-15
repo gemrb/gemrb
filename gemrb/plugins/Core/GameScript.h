@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.189 2005/06/15 16:39:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.190 2005/06/15 19:56:40 avenger_teambg Exp $
  *
  */
 
@@ -1170,6 +1170,7 @@ public:
 	static void SetGlobal(Scriptable* Sender, Action* parameters);
 	static void SetGlobalRandom(Scriptable* Sender, Action* parameters);
 	static void SetGlobalTimer(Scriptable* Sender, Action* parameters);
+	static void SetGlobalTimerOnce(Scriptable* Sender, Action* parameters);
 	static void SetGlobalTint(Scriptable* Sender, Action* parameters);
 	static void SetHomeLocation(Scriptable* Sender, Action* parameters);
 	static void SetHP(Scriptable* Sender, Action* parameters);

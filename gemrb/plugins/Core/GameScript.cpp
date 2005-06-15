@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.289 2005/06/15 16:39:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.290 2005/06/15 19:56:39 avenger_teambg Exp $
  *
  */
 
@@ -584,6 +584,7 @@ static ActionLink actionnames[] = {
 	{"setgabber", GameScript::SetGabber,0},
 	{"setglobal", GameScript::SetGlobal,AF_MERGESTRINGS},
 	{"setglobaltimer", GameScript::SetGlobalTimer,AF_MERGESTRINGS},
+	{"setglobaltimeronce", GameScript::SetGlobalTimerOnce,AF_MERGESTRINGS},
 	{"setglobaltint", GameScript::SetGlobalTint,0},
 	{"sethomelocation", GameScript::SetHomeLocation,0},
 	{"sethp", GameScript::SetHP,0},
@@ -6145,6 +6146,17 @@ void GameScript::SetGlobalTimer(Scriptable* Sender, Action* parameters)
 {
 	ieDword mytime;
 
+	mytime=core->GetGame()->GameTime; //gametime (should increase it)
+	SetVariable( Sender, parameters->string0Parameter,
+		parameters->int0Parameter + mytime);
+}
+
+void GameScript::SetGlobalTimerOnce(Scriptable* Sender, Action* parameters)
+{
+	ieDword mytime = CheckVariable( Sender, parameters->string0Parameter );
+	if (mytime != 0) {
+		return;
+	}
 	mytime=core->GetGame()->GameTime; //gametime (should increase it)
 	SetVariable( Sender, parameters->string0Parameter,
 		parameters->int0Parameter + mytime);
