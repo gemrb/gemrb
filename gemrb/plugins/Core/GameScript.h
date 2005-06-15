@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.188 2005/06/14 22:29:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.189 2005/06/15 16:39:56 avenger_teambg Exp $
  *
  */
 
@@ -670,6 +670,7 @@ private:
 	static Targets *XthNearestOf(Targets *parameters, int count);
 	static Targets *XthNearestEnemyOf(Targets *parameters, int count);
 	static Targets *XthNearestEnemyOfType(Scriptable *origin, Targets *parameters, int count);
+	static Targets *XthNearestMyGroupOfType(Scriptable *origin, Targets *parameters, int count);
 
 	//static unsigned char GetOrient(Point &s, Point &d);
 private: //Internal variables
@@ -1232,6 +1233,7 @@ public:
 	static void TextScreen(Scriptable* Sender, Action* parameters);
 	static void TriggerActivation(Scriptable* Sender, Action* parameters);
 	static void Turn(Scriptable* Sender, Action* parameters);
+	static void TurnAMT(Scriptable* Sender, Action* parameters);
 	static void UndoExplore(Scriptable *Sender, Action *parameters);
 	static void UnhideGUI(Scriptable* Sender, Action* parameters);
 	static void Unlock(Scriptable* Sender, Action* parameters);
@@ -1250,13 +1252,16 @@ public:
 	static Targets *EighthNearest(Scriptable *Sender, Targets *parameters);
 	static Targets *EighthNearestEnemyOf(Scriptable *Sender, Targets *parameters);
 	static Targets *EighthNearestEnemyOfType(Scriptable *Sender, Targets *parameters);
+	static Targets *EighthNearestMyGroupOfType(Scriptable *Sender, Targets *parameters);
 	static Targets *Farthest(Scriptable *Sender, Targets *parameters);
 	static Targets *FifthNearest(Scriptable *Sender, Targets *parameters);
 	static Targets *FifthNearestEnemyOf(Scriptable *Sender, Targets *parameters);
 	static Targets *FifthNearestEnemyOfType(Scriptable *Sender, Targets *parameters);
+	static Targets *FifthNearestMyGroupOfType(Scriptable *Sender, Targets *parameters);
 	static Targets *FourthNearest(Scriptable *Sender, Targets *parameters);
 	static Targets *FourthNearestEnemyOf(Scriptable *Sender, Targets *parameters);
 	static Targets *FourthNearestEnemyOfType(Scriptable *Sender, Targets *parameters);
+	static Targets *FourthNearestMyGroupOfType(Scriptable *Sender, Targets *parameters);
 	static Targets *Gabber(Scriptable *Sender, Targets *parameters);
 	static Targets *LastAttackerOf(Scriptable *Sender, Targets *parameters);
 	static Targets *LastCommandedBy(Scriptable *Sender, Targets *parameters);
@@ -1274,10 +1279,12 @@ public:
 	static Targets *Nearest(Scriptable *Sender, Targets *parameters);
 	static Targets *NearestEnemyOf(Scriptable *Sender, Targets *parameters);
 	static Targets *NearestEnemyOfType(Scriptable *Sender, Targets *parameters);
+	static Targets *NearestMyGroupOfType(Scriptable *Sender, Targets *parameters);
 	static Targets *NearestPC(Scriptable *Sender, Targets *parameters);
 	static Targets *NinthNearest(Scriptable *Sender, Targets *parameters);
 	static Targets *NinthNearestEnemyOf(Scriptable *Sender, Targets *parameters);
 	static Targets *NinthNearestEnemyOfType(Scriptable *Sender, Targets *parameters);
+	static Targets *NinthNearestMyGroupOfType(Scriptable *Sender, Targets *parameters);
 	static Targets *Nothing(Scriptable *Sender, Targets *parameters);
 	static Targets *Player1(Scriptable *Sender, Targets *parameters);
 	static Targets *Player1Fill(Scriptable *Sender, Targets *parameters);
@@ -1295,21 +1302,26 @@ public:
 	static Targets *SecondNearest(Scriptable *Sender, Targets *parameters);
 	static Targets *SecondNearestEnemyOf(Scriptable *Sender, Targets *parameters);
 	static Targets *SecondNearestEnemyOfType(Scriptable *Sender, Targets *parameters);
+	static Targets *SecondNearestMyGroupOfType(Scriptable *Sender, Targets *parameters);
 	static Targets *SelectedCharacter(Scriptable *Sender, Targets *parameters);
 	static Targets *SeventhNearest(Scriptable *Sender, Targets *parameters);
 	static Targets *SeventhNearestEnemyOf(Scriptable *Sender, Targets *parameters);
 	static Targets *SeventhNearestEnemyOfType(Scriptable *Sender, Targets *parameters);
+	static Targets *SeventhNearestMyGroupOfType(Scriptable *Sender, Targets *parameters);
 	static Targets *SixthNearest(Scriptable *Sender, Targets *parameters);
 	static Targets *SixthNearestEnemyOf(Scriptable *Sender, Targets *parameters);
 	static Targets *SixthNearestEnemyOfType(Scriptable *Sender, Targets *parameters);
+	static Targets *SixthNearestMyGroupOfType(Scriptable *Sender, Targets *parameters);
 	static Targets *StrongestOf(Scriptable *Sender, Targets *parameters);
 	static Targets *StrongestOfMale(Scriptable *Sender, Targets *parameters);
 	static Targets *TenthNearest(Scriptable *Sender, Targets *parameters);
 	static Targets *TenthNearestEnemyOf(Scriptable *Sender, Targets *parameters);
 	static Targets *TenthNearestEnemyOfType(Scriptable *Sender, Targets *parameters);
+	static Targets *TenthNearestMyGroupOfType(Scriptable *Sender, Targets *parameters);
 	static Targets *ThirdNearest(Scriptable *Sender, Targets *parameters);
 	static Targets *ThirdNearestEnemyOf(Scriptable *Sender, Targets *parameters);
 	static Targets *ThirdNearestEnemyOfType(Scriptable *Sender, Targets *parameters);
+	static Targets *ThirdNearestMyGroupOfType(Scriptable *Sender, Targets *parameters);
 	static Targets *WeakestOf(Scriptable *Sender, Targets *parameters);
 	static Targets *WorstAC(Scriptable *Sender, Targets *parameters);
 

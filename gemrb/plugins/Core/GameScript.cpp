@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.288 2005/06/14 22:29:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.289 2005/06/15 16:39:55 avenger_teambg Exp $
  *
  */
 
@@ -659,6 +659,7 @@ static ActionLink actionnames[] = {
 	{"tomsstringdisplayer", GameScript::DisplayMessage,0},
 	{"triggeractivation", GameScript::TriggerActivation,0},
 	{"turn", GameScript::Turn,0},
+	{"turnamt", GameScript::TurnAMT,0},
 	{"undoexplore", GameScript::UndoExplore,0},
 	{"unhidegui", GameScript::UnhideGUI,0},
 	{"unloadarea", GameScript::UnloadArea,0},
@@ -682,14 +683,19 @@ static ObjectLink objectnames[] = {
 	{"eighthnearest", GameScript::EighthNearest},
 	{"eighthnearestenemyof", GameScript::EighthNearestEnemyOf},
 	{"eighthnearestenemyoftype", GameScript::EighthNearestEnemyOfType},
+	{"eighthnearestmygroupoftype", GameScript::EighthNearestEnemyOfType},
 	{"eigthnearestenemyof", GameScript::EighthNearestEnemyOf}, //typo in iwd
+	{"eigthnearestenemyoftype", GameScript::EighthNearestEnemyOfType}, //bg2
+	{"eigthnearestmygroupoftype", GameScript::EighthNearestEnemyOfType},//bg2
 	{"farthest", GameScript::Farthest},
 	{"fifthnearest", GameScript::FifthNearest},
 	{"fifthnearestenemyof", GameScript::FifthNearestEnemyOf},
 	{"fifthnearestenemyoftype", GameScript::FifthNearestEnemyOfType},
+	{"fifthnearestmygroupoftype", GameScript::FifthNearestEnemyOfType},
 	{"fourthnearest", GameScript::FourthNearest},
 	{"fourthnearestenemyof", GameScript::FourthNearestEnemyOf},
 	{"fourthnearestenemyoftype", GameScript::FourthNearestEnemyOfType},
+	{"fourthnearestmygroupoftype", GameScript::FourthNearestEnemyOfType},
 	{"lastattackerof", GameScript::LastAttackerOf},
 	{"lastcommandedby", GameScript::LastCommandedBy},
 	{"lastheardby", GameScript::LastHeardBy},
@@ -707,10 +713,12 @@ static ObjectLink objectnames[] = {
 	{"nearest", GameScript::Nearest}, //actually this seems broken in IE and resolve as Myself
 	{"nearestenemyof", GameScript::NearestEnemyOf},
 	{"nearestenemyoftype", GameScript::NearestEnemyOfType},
+	{"nearestmygroupoftype", GameScript::NearestMyGroupOfType},
 	{"nearestpc", GameScript::NearestPC},
 	{"ninthnearest", GameScript::NinthNearest},
 	{"ninthnearestenemyof", GameScript::NinthNearestEnemyOf},
 	{"ninthnearestenemyoftype", GameScript::NinthNearestEnemyOfType},
+	{"ninthnearestmygroupoftype", GameScript::NinthNearestMyGroupOfType},
 	{"nothing", GameScript::Nothing},
 	{"player1", GameScript::Player1},
 	{"player1fill", GameScript::Player1Fill},
@@ -732,21 +740,26 @@ static ObjectLink objectnames[] = {
 	{"secondnearest", GameScript::SecondNearest},
 	{"secondnearestenemyof", GameScript::SecondNearestEnemyOf},
 	{"secondnearestenemyoftype", GameScript::SecondNearestEnemyOfType},
+	{"secondnearestmygroupoftype", GameScript::SecondNearestMyGroupOfType},
 	{"selectedcharacter", GameScript::SelectedCharacter},
 	{"seventhnearest", GameScript::SeventhNearest},
 	{"seventhnearestenemyof", GameScript::SeventhNearestEnemyOf},
 	{"seventhnearestenemyoftype", GameScript::SeventhNearestEnemyOfType},
+	{"seventhnearestmygroupoftype", GameScript::SeventhNearestMyGroupOfType},
 	{"sixthnearest", GameScript::SixthNearest},
 	{"sixthnearestenemyof", GameScript::SixthNearestEnemyOf},
 	{"sixthnearestenemyoftype", GameScript::SixthNearestEnemyOfType},
+	{"sixthnearestmygroupoftype", GameScript::SixthNearestMyGroupOfType},
 	{"strongestof", GameScript::StrongestOf},
 	{"strongestofmale", GameScript::StrongestOfMale},
 	{"tenthnearest", GameScript::TenthNearest},
 	{"tenthnearestenemyof", GameScript::TenthNearestEnemyOf},
 	{"tenthnearestenemyoftype", GameScript::TenthNearestEnemyOfType},
+	{"tenthnearestmygroupoftype", GameScript::TenthNearestMyGroupOfType},
 	{"thirdnearest", GameScript::ThirdNearest},
 	{"thirdnearestenemyof", GameScript::ThirdNearestEnemyOf},
 	{"thirdnearestenemyoftype", GameScript::ThirdNearestEnemyOfType},
+	{"thirdnearestmygroupoftype", GameScript::ThirdNearestMyGroupOfType},
 	{"weakestof", GameScript::WeakestOf},
 	{"worstac", GameScript::WorstAC},
 	{ NULL,NULL},
@@ -2968,6 +2981,50 @@ Targets *GameScript::XthNearestOf(Targets *parameters, int count)
 	return parameters;
 }
 
+Targets *GameScript::XthNearestMyGroupOfType(Scriptable *origin, Targets *parameters, int count)
+{
+	if (origin->Type != ST_ACTOR) {
+		parameters->Clear();
+		return parameters;
+	}
+
+	targetlist::iterator m;
+	targettype *t = parameters->GetFirstTarget(m);
+	if (!t) {
+		return parameters;
+	}
+	Actor *actor = (Actor *) origin;
+	//determining the allegiance of the origin
+	int type = 2; //neutral, has no enemies
+	if (actor->GetStat(IE_EA) <= EA_GOODCUTOFF) {
+		type = 0; //PC
+	}
+	if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+		type = 1;
+	}
+	if (type==2) {
+		parameters->Clear();
+		return parameters;
+	}
+
+	while ( t ) {
+		if (type) { //origin is enemy, so we remove PC groups
+			if (t->actor->GetStat(IE_EA) <= EA_GOODCUTOFF) {
+				t=parameters->RemoveTargetAt(m);
+				continue;
+			}
+		}
+		else {
+			if (t->actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+				t=parameters->RemoveTargetAt(m);
+				continue;
+			}
+		}
+		t = parameters->GetNextTarget(m);
+	}
+	return XthNearestOf(parameters,count);
+}
+
 Targets *GameScript::XthNearestEnemyOfType(Scriptable *origin, Targets *parameters, int count)
 {
 	if (origin->Type != ST_ACTOR) {
@@ -3158,6 +3215,56 @@ Targets *GameScript::NinthNearestEnemyOfType(Scriptable* Sender, Targets *parame
 Targets *GameScript::TenthNearestEnemyOfType(Scriptable* Sender, Targets *parameters)
 {
 	return XthNearestEnemyOfType(Sender, parameters, 9);
+}
+
+Targets *GameScript::NearestMyGroupOfType(Scriptable* Sender, Targets *parameters)
+{
+	return XthNearestMyGroupOfType(Sender, parameters, 0);
+}
+
+Targets *GameScript::SecondNearestMyGroupOfType(Scriptable* Sender, Targets *parameters)
+{
+	return XthNearestMyGroupOfType(Sender, parameters, 1);
+}
+
+Targets *GameScript::ThirdNearestMyGroupOfType(Scriptable* Sender, Targets *parameters)
+{
+	return XthNearestMyGroupOfType(Sender, parameters, 2);
+}
+
+Targets *GameScript::FourthNearestMyGroupOfType(Scriptable* Sender, Targets *parameters)
+{
+	return XthNearestMyGroupOfType(Sender, parameters, 3);
+}
+
+Targets *GameScript::FifthNearestMyGroupOfType(Scriptable* Sender, Targets *parameters)
+{
+	return XthNearestMyGroupOfType(Sender, parameters, 4);
+}
+
+Targets *GameScript::SixthNearestMyGroupOfType(Scriptable* Sender, Targets *parameters)
+{
+	return XthNearestMyGroupOfType(Sender, parameters, 5);
+}
+
+Targets *GameScript::SeventhNearestMyGroupOfType(Scriptable* Sender, Targets *parameters)
+{
+	return XthNearestMyGroupOfType(Sender, parameters, 6);
+}
+
+Targets *GameScript::EighthNearestMyGroupOfType(Scriptable* Sender, Targets *parameters)
+{
+	return XthNearestMyGroupOfType(Sender, parameters, 7);
+}
+
+Targets *GameScript::NinthNearestMyGroupOfType(Scriptable* Sender, Targets *parameters)
+{
+	return XthNearestMyGroupOfType(Sender, parameters, 8);
+}
+
+Targets *GameScript::TenthNearestMyGroupOfType(Scriptable* Sender, Targets *parameters)
+{
+	return XthNearestMyGroupOfType(Sender, parameters, 9);
 }
 
 Targets *GameScript::NearestPC(Scriptable* Sender, Targets *parameters)
@@ -9874,6 +9981,17 @@ void GameScript::Turn(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
+	actor->SetModal( MS_TURNUNDEAD);
+}
+
+/* this could be far from reality*/
+void GameScript::TurnAMT(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+	actor->SetStat(IE_TURNUNDEADLEVEL, parameters->int0Parameter);
 	actor->SetModal( MS_TURNUNDEAD);
 }
 
