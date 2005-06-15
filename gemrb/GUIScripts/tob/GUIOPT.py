@@ -9,14 +9,14 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIOPT.py,v 1.7 2005/06/14 17:53:00 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIOPT.py,v 1.8 2005/06/15 15:40:33 avenger_teambg Exp $
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
 # Ingame options
@@ -420,6 +420,7 @@ def DisplayHelpEndOfRound ():
 
 def OpenSaveMsgWindow ():
 	#CloseOptionsWindow ()
+	GemRB.SetVar("QuitAfterSave",0)
 	OpenSaveWindow ()
 	#save the game without quitting
 	return
@@ -469,9 +470,11 @@ def LoadGamePress ():
 #save game AND quit
 def SaveGamePress():
 	#CloseOptionsWindow ()
+	#we need to set a state: quit after save
+	GemRB.SetVar("QuitAfterSave",1)
 	OpenSaveWindow ()	
-	GemRB.QuitGame ()
-	GemRB.SetNextScript ("Start")
+	#GemRB.QuitGame ()
+	#GemRB.SetNextScript ("Start")
 	return
 
 def QuitGamePress():
@@ -543,11 +546,11 @@ key_list = [
 ###################################################
 
 # These functions help to setup controls found
-#   in Video, Audio, Gameplay, Feedback and Autopause
-#   options windows
+# in Video, Audio, Gameplay, Feedback and Autopause
+# options windows
 
 # These controls are usually made from an active
-#   control (button, slider ...) and a label
+# control (button, slider ...) and a label
 
 
 def OptSlider (name, window, slider_id, label_id, label_strref):
