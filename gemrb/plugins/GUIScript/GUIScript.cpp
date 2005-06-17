@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.319 2005/06/14 22:29:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.320 2005/06/17 19:33:07 avenger_teambg Exp $
  *
  */
 
@@ -29,6 +29,7 @@
 #include "../Core/WorldMapControl.h"
 #include "../Core/MapControl.h"
 #include "../Core/SoundMgr.h"
+#include "../Core/GSUtils.h" //checkvariable
 
 //this stuff is missing from Python 2.2
 #ifndef PyDoc_VAR
@@ -169,7 +170,7 @@ static PyObject* GemRB_UnhideGUI(PyObject*, PyObject* /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_HideGUI__doc,
-"HideGUI()\n\n"
+"HideGUI()=>returns 1 if it did something\n\n"
 "Hides the Game GUI." );
 
 static PyObject* GemRB_HideGUI(PyObject*, PyObject* /*args*/)
@@ -178,10 +179,9 @@ static PyObject* GemRB_HideGUI(PyObject*, PyObject* /*args*/)
 	if (!gc) {
 		return NULL;
 	}
-	gc->HideGUI();
+	int ret = gc->HideGUI();
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	return PyInt_FromLong( ret );
 }
 
 GameControl* StartGameControl()
@@ -2572,7 +2572,7 @@ static PyObject* GemRB_CheckVar(PyObject * /*self*/, PyObject* args)
 		printMessage("GUIScript","No Game!\n", LIGHT_RED);
 		return NULL;
 	}
-	long value =(long) GameScript::CheckVariable(Sender, Variable, Context);
+	long value =(long) CheckVariable(Sender, Variable, Context);
 	printMessage("GUISCript"," ",YELLOW);
 	printf("%s %s=%ld\n",Context, Variable, value);
 	textcolor(WHITE);
@@ -3755,7 +3755,7 @@ static PyObject* GemRB_GetContainer(PyObject * /*self*/, PyObject* args)
 	if (autoselect) { //autoselect works only with piles
 		Map *map = actor->GetCurrentArea();
 		//GetContainer should create an empty container
-		container = map->TMap->GetPile(actor->Pos);
+		container = map->GetPile(actor->Pos);    
 	} else {
 		container = core->GetCurrentContainer();
 	}
@@ -3875,14 +3875,10 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 		if (res!=-1) { //it is gold!
 			goto item_is_gold;
 		}
-		
-		int slot = actor->inventory.FindCandidateSlot( SLOT_INVENTORY, 0);
-		if (slot<0) { //actually we should return something here!
-			printMessage("GUIScript","Cannot move item, inventory is full!\n", GREEN);
-			Py_INCREF( Py_None );
-			return Py_None;
+		res = actor->inventory.AddSlotItem(item, -1);
+		if (res !=2) { //putting it back
+			container->AddItem(item);
 		}
-		actor->inventory.SetSlotItem(item, slot);
 	} else { //put stuff in container, simple!
 		res = core->CanMoveItem(actor->inventory.GetSlotItem(Slot) );
 		if (!res) { //cannot move
@@ -4827,10 +4823,10 @@ PyDoc_STRVAR( GemRB_DragItem__doc,
 
 static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 {
-	int PartyID, Slot, Count = 0, CycleIndex = 0, FrameIndex = 0;
+	int PartyID, Slot, Count = 0, Type = 0;
 	char *ResRef;
 
-	if (!PyArg_ParseTuple( args, "iis|iii", &PartyID, &Slot, &ResRef, &Count, &CycleIndex, &FrameIndex)) {
+	if (!PyArg_ParseTuple( args, "iis|ii", &PartyID, &Slot, &ResRef, &Count, &Type)) {
 		return AttributeError( GemRB_DragItem__doc );
 	}
 
@@ -4848,14 +4844,24 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Actor not found" );
 	}
 
-	CREItem* si = actor->inventory.RemoveItem( Slot, Count );
+	CREItem* si;
+	if (Type) {
+		Map *map = actor->GetCurrentArea();
+		Container *cc = map->GetPile(actor->Pos);
+		if (!cc) {
+			return RuntimeError( "No current container" );
+		}
+		si = cc->RemoveItem(Slot, Count);
+	} else {
+		si = actor->inventory.RemoveItem( Slot, Count );
+	}
 	if (! si) {
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
 
 	core->DragItem (si);
-	Sprite2D *Picture = core->GetBAMSprite( ResRef, CycleIndex, FrameIndex );
+	Sprite2D *Picture = core->GetBAMSprite( ResRef, 0, 0 );
 	if (Picture == NULL) {
 		return RuntimeError( "BAM not found");
 	}
@@ -4890,7 +4896,18 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Actor not found" );
 	}
 
-	int res = actor->inventory.AddSlotItem( core->GetDraggedItem(), Slot );
+	int res;
+	
+	if (Slot==-2) {
+		Map *map = actor->GetCurrentArea();
+		Container *cc = map->GetPile(actor->Pos);
+		if (!cc) {
+			return RuntimeError( "No current container" );
+		}
+		res = cc->AddItem(core->GetDraggedItem());
+	} else {
+		res = actor->inventory.AddSlotItem( core->GetDraggedItem(), Slot );
+	}
 
 	if (res == 2) {
 		// Whole amount was placed

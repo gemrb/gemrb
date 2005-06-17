@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.32 2005/06/08 20:37:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.33 2005/06/17 19:33:06 avenger_teambg Exp $
  *
  */
 
@@ -141,7 +141,7 @@ public:
 
 
 	/** returns CREItem in specified slot. if count !=0 it
-	** splits the item and returns only requested amount */
+	** splits the item and returns only requested amount*/
 	CREItem* RemoveItem(unsigned int slot, unsigned int count = 0);
 	/** returns slot of removed item, you can delete the removed item */
 	int RemoveItem(const char* resref, unsigned int flags, CREItem **res_item);
@@ -151,7 +151,7 @@ public:
 	** more slots. Returns 2 if completely successful, 1 if partially, 0 else.*/
 	int AddSlotItem(CREItem* item, int slot);
 	/** Adds STOItem to the inventory, it is never wielded, action might be STA_STEAL or STA_BUY */
-  /** The amount of items is stored in PurchasedAmount */
+	/** The amount of items is stored in PurchasedAmount */
 	int AddSlotItem(STOItem* item, int action);
 
 	/** flags: see ieCREItemFlagBits */
@@ -179,6 +179,7 @@ public:
 	void dump();
 private:
 	int FindRanged();
+	void KillSlot(unsigned int index);
 };
 
 #endif

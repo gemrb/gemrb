@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.321 2005/06/14 22:29:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.322 2005/06/17 19:33:05 avenger_teambg Exp $
  *
  */
 
@@ -1787,6 +1787,17 @@ void Interface::DisplayTooltip(int x, int y, Control *ctrl)
 	tooltip_ctrl = ctrl;
 }
 
+int Interface::GetVisible(unsigned short WindowIndex)
+{
+	if (WindowIndex >= windows.size()) {
+		return -1;
+	}
+	Window* win = windows[WindowIndex];
+	if (win == NULL) {
+		return -1;
+	}
+	return win->Visible;
+}
 /** Set a Window Visible Flag */
 int Interface::SetVisible(unsigned short WindowIndex, int visible)
 {
@@ -1934,8 +1945,10 @@ void Interface::DrawWindows(void)
 			SetControlStatus(0,0,0x7f000000|IE_GUI_CONTROL_FOCUSED);
 			GameControl *gc = GetGameControl();
 			//this is the only value we can use here
-			if (game->ControlStatus & CS_HIDEGUI) gc->HideGUI();
-			else gc->UnhideGUI();
+			if (game->ControlStatus & CS_HIDEGUI)
+				gc->HideGUI();
+			else
+				gc->UnhideGUI();
 			if (flg & DF_START_DIALOG) {
 				gc->DialogChoose( (unsigned int) -1);
 			}
@@ -3342,6 +3355,7 @@ Sprite2D *Interface::GetCursorSprite()
 	return GetBAMSprite(CursorBam, 0, 0);
 }
 
+/* we should return -1 if it isn't gold, otherwise return the gold value */
 int Interface::CanMoveItem(CREItem *item)
 {
 	if (item->Flags & IE_INV_ITEM_UNDROPPABLE)
@@ -3349,7 +3363,7 @@ int Interface::CanMoveItem(CREItem *item)
 	//not gold, we allow only one single coin ResRef, this is good
 	//for all of the original games
 	if (strnicmp(item->ItemResRef, GoldResRef, 8 ) )
-		return 1;
+		return -1;
 	//gold, returns the gold value (stack size)
 	return item->Usages[0];
 }

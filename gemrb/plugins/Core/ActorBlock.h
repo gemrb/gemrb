@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.77 2005/06/14 22:29:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.78 2005/06/17 19:33:05 avenger_teambg Exp $
  *
  */
 
@@ -332,9 +332,9 @@ public:
 	//turns the container to a pile
 	void DestroyContainer();
 	//removes an item from the container's inventory
-	CREItem *RemoveItem(int idx);
+	CREItem *RemoveItem(unsigned int idx, unsigned int count);
 	//adds an item to the container's inventory
-	void AddItem(CREItem *item);
+	int AddItem(CREItem *item);
 	//draws the ground icons
 	void DrawPile(bool highlight, Region screen, Color tint);
 private:

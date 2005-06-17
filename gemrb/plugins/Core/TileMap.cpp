@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.45 2005/06/10 21:12:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.46 2005/06/17 19:33:06 avenger_teambg Exp $
  *
  */
 
@@ -329,16 +329,11 @@ Door* TileMap::GetDoor(const char* Name)
 	return NULL;
 }
 
-Container* TileMap::AddContainer(const char* Name, unsigned short Type,
-	Gem_Polygon* outline)
+void TileMap::AddContainer(Container *c)
 {
-	Container* c = new Container();
-	c->SetScriptName( Name );
-	c->Type = Type;
-	c->outline = outline;
-	containers.push_back( c );
-	return c;
+	containers.push_back(c);
 }
+
 Container* TileMap::GetContainer(unsigned int idx)
 {
 	if (idx >= containers.size()) {
@@ -403,42 +398,7 @@ int TileMap::CleanupContainer(Container *container)
 	return 1;
 }
 
-Container *TileMap::GetPile(Point &position)
-{
-	Point tmp[4];
-	char heapname[32];
-
-	//converting to search square
-	position.x/=16;
-	position.y/=12;
-	sprintf(heapname,"heap_%hd.%hd",position.x,position.y);
-	//pixel position is centered on search square
-	position.x=position.x*16+8;
-	position.y=position.y*12+6;
-	Container *container = GetContainer(position,IE_CONTAINER_PILE);
-	if (!container) {
-		//bounding box covers the search square
-		tmp[0].x=position.x-8;
-		tmp[0].y=position.y-6;
-		tmp[1].x=position.x+8;
-		tmp[1].y=position.y-6;
-		tmp[2].x=position.x+8;
-		tmp[2].y=position.y+6;
-		tmp[3].x=position.x-8;
-		tmp[3].y=position.y+6;
-		Gem_Polygon* outline = new Gem_Polygon( tmp, 4 );
-		container = AddContainer(heapname, IE_CONTAINER_PILE, outline);
-		container->Pos=position;
-	}
-	return container;
-}
-
-void TileMap::AddItemToLocation(Point &position, CREItem *item)
-{
-	Container *container = GetPile(position);
-	container->AddItem(item);
-}
-
+//infopoints
 InfoPoint* TileMap::AddInfoPoint(const char* Name, unsigned short Type,
 	Gem_Polygon* outline)
 {

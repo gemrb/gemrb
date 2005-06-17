@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.170 2005/06/12 10:23:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.171 2005/06/17 19:33:06 avenger_teambg Exp $
  *
  */
 
@@ -364,7 +364,7 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 
 				pc->ClearPath();
 				pc->ClearActions();
-				pc->AddAction( GameScript::GenerateAction( Tmp ) );
+				pc->AddAction( GenerateAction( Tmp ) );
 			}
 			return;
 		}
@@ -376,13 +376,13 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 				if (!pc->IsSelected()) continue;
 				pc->ClearPath();
 				pc->ClearActions();
-				pc->AddAction( GameScript::GenerateAction( Tmp ) );
+				pc->AddAction( GenerateAction( Tmp ) );
 			}
 		}
 
 		actor->ClearPath();
 		actor->ClearActions();
-		actor->AddAction( GameScript::GenerateAction( Tmp ) );
+		actor->AddAction( GenerateAction( Tmp ) );
 	} else {
 		if (ip->Scripts[0]) {
 			ip->LastEntered = actor;
@@ -1800,21 +1800,69 @@ void Map::CopyGroundPiles(Map *othermap, Point &Pos)
 	while (containercount--) {
 		Container * c = TMap->GetContainer( containercount);
 		if (c->Type==IE_CONTAINER_PILE) {
-			//creating (or grabbing the container in the other map at the given position
+			//creating (or grabbing) the container in the other map at the given position
 			Container *othercontainer;
 			if (Pos.isempty()) {
-				 othercontainer = othermap->TMap->GetPile(c->Pos);
+				 othercontainer = othermap->GetPile(c->Pos);
 			} else {
-				 othercontainer = othermap->TMap->GetPile(Pos);
+				 othercontainer = othermap->GetPile(Pos);
 			}
 			//transfer the pile to the other container
 			unsigned int i=c->inventory.GetSlotCount();
 			while (i--) {
-				CREItem *item = c->RemoveItem(i);
+				CREItem *item = c->RemoveItem(i, 0);
 				othercontainer->AddItem(item);
 			}
 		}
 	}
+}
+
+Container *Map::GetPile(Point &position)
+{
+	Point tmp[4];
+	char heapname[32];
+
+	//converting to search square
+	position.x/=16;
+	position.y/=12;
+	sprintf(heapname,"heap_%hd.%hd",position.x,position.y);
+	//pixel position is centered on search square
+	position.x=position.x*16+8;
+	position.y=position.y*12+6;
+	Container *container = TMap->GetContainer(position,IE_CONTAINER_PILE);
+	if (!container) {
+		//bounding box covers the search square
+		tmp[0].x=position.x-8;
+		tmp[0].y=position.y-6;
+		tmp[1].x=position.x+8;
+		tmp[1].y=position.y-6;
+		tmp[2].x=position.x+8;
+		tmp[2].y=position.y+6;
+		tmp[3].x=position.x-8;
+		tmp[3].y=position.y+6;
+		Gem_Polygon* outline = new Gem_Polygon( tmp, 4 );
+		container = AddContainer(heapname, IE_CONTAINER_PILE, outline);
+		container->Pos=position;
+	}
+	return container;
+}
+
+void Map::AddItemToLocation(Point &position, CREItem *item)
+{
+	Container *container = GetPile(position);
+	container->AddItem(item);
+}
+
+Container* Map::AddContainer(const char* Name, unsigned short Type,
+	Gem_Polygon* outline)
+{
+	Container* c = new Container();
+	c->SetScriptName( Name );
+	c->Type = Type;
+	c->outline = outline;
+  c->SetMap(this);
+	TMap->AddContainer( c );
+	return c;
 }
 
 ////////////////////AreaAnimation//////////////////

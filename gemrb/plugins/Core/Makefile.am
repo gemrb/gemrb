@@ -6,6 +6,9 @@ libgemrb_core_la_SOURCES = \
 	Progressbar.cpp \
 	ScriptedAnimation.cpp \
 	GameScript.cpp \
+	Actions.cpp \
+	Triggers.cpp \
+	GSUtils.cpp \
 	GlobalTimer.cpp \
 	Polygon.cpp \
 	Game.cpp \

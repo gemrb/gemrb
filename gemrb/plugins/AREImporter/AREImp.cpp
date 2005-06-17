@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.117 2005/06/14 22:29:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.118 2005/06/17 19:33:04 avenger_teambg Exp $
  *
  */
 
@@ -397,8 +397,8 @@ Map* AREImp::GetMap(const char *ResRef)
 		}
 		Gem_Polygon* poly = new Gem_Polygon( points, vertCount, &bbox );
 		free( points );
-		Container* c = tm->AddContainer( Name, Type, poly );
-		c->SetMap(map);
+		Container* c = map->AddContainer( Name, Type, poly );
+		//c->SetMap(map);
 		c->Pos.x = XPos;
 		c->Pos.y = YPos;
 		c->LockDifficulty = LockDiff;

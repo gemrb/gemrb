@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUICommon.py,v 1.5 2004/12/09 22:08:04 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUICommon.py,v 1.6 2005/06/17 19:33:03 avenger_teambg Exp $
 
 import GemRB
 # GUICommon.py - common functions for GUIScripts of all game types
@@ -27,6 +27,7 @@ OtherWindowFn = None
 def CloseOtherWindow (NewWindowFn):
 	global OtherWindowFn
 
+	GemRB.LeaveContainer()
 	if OtherWindowFn and OtherWindowFn != NewWindowFn:
 		OtherWindowFn ()
 		OtherWindowFn = NewWindowFn

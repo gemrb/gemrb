@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.232 2005/06/12 16:57:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.233 2005/06/17 19:33:05 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -169,7 +169,7 @@ void GameControl::MoveToPointFormation(Actor *actor, Point p, int Orient)
 		break;
 	}
 	sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
-	actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
+	actor->AddAction( GenerateAction( Tmp, true ) );
 }
 
 GameControl::~GameControl(void)
@@ -567,7 +567,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					lastActor->ClearActions();
 					char Tmp[40];
 					strncpy(Tmp,"Kill(Myself)",sizeof(Tmp) );
-					lastActor->AddAction( GameScript::GenerateAction(Tmp) );
+					lastActor->AddAction( GenerateAction(Tmp) );
 				}
 				break;
 			case 'z': 
@@ -741,7 +741,7 @@ void GameControl::TryToAttack(Actor *source, Actor *tgt)
 	source->ClearActions();
 	strncpy(Tmp,"Attack()",sizeof(Tmp) );
 	target=tgt; //this is a hack, a deadly one
-	source->AddAction( GameScript::GenerateAction( Tmp, true ) );
+	source->AddAction( GenerateAction( Tmp, true ) );
 }
 
 void GameControl::TryToTalk(Actor *source, Actor *tgt)
@@ -756,7 +756,7 @@ void GameControl::TryToTalk(Actor *source, Actor *tgt)
 	source->ClearActions();
 	strncpy(Tmp,"NIDSpecial1()",sizeof(Tmp) );
 	target=tgt; //this is a hack, a deadly one
-	source->AddAction( GameScript::GenerateAction( Tmp, true ) );
+	source->AddAction( GenerateAction( Tmp, true ) );
 }
 
 void GameControl::HandleContainer(Container *container, Actor *actor)
@@ -767,7 +767,7 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 	actor->ClearActions();
 	strncpy(Tmp,"UseContainer()",sizeof(Tmp) );
 	target=container; //this is another hack, even more deadly
-	actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
+	actor->AddAction( GenerateAction( Tmp, true ) );
 }
 
 void GameControl::HandleDoor(Door *door, Actor *actor)
@@ -778,12 +778,12 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 		actor->ClearPath();
 		actor->ClearActions();
 		sprintf( Tmp, "CloseDoor(\"%s\")", door->GetScriptName() );
-		actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
+		actor->AddAction( GenerateAction( Tmp, true ) );
 	} else {
 		actor->ClearPath();
 		actor->ClearActions();
 		sprintf( Tmp, "OpenDoor(\"%s\")", door->GetScriptName() );
-		actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
+		actor->AddAction( GenerateAction( Tmp, true ) );
 	}
 }
 
@@ -908,11 +908,11 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			actor->ClearPath();
 			actor->ClearActions();
 			sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
-			actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
+			actor->AddAction( GenerateAction( Tmp, true ) );
 			//we clicked over a searchmap travel region
 				if ( ( ( Window * ) Owner )->Cursor == IE_CURSOR_TRAVEL) {
 				sprintf( Tmp, "NIDSpecial2()" );
-				actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
+				actor->AddAction( GenerateAction( Tmp, true ) );
 			}
 			return;
 		}
@@ -929,7 +929,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 		//we clicked over a searchmap travel region
 		if ( ( ( Window * ) Owner )->Cursor == IE_CURSOR_TRAVEL) {
 			sprintf( Tmp, "NIDSpecial2()" );
-			actor->AddAction( GameScript::GenerateAction( Tmp, true ) );
+			actor->AddAction( GenerateAction( Tmp, true ) );
 		}
 		return;
 	}
@@ -1115,10 +1115,15 @@ void GameControl::HandleWindowHide(const char *WindowName, const char *WindowPos
 	}
 }
 
-void GameControl::HideGUI()
+int GameControl::HideGUI()
 {
+	//hidegui is in effect
 	if (!(ScreenFlags&SF_GUIENABLED) ) {
-		return;
+		return 0;
+	}
+	//no gamecontrol visible
+	if (core->GetVisible(0) == 0 ) {
+		return 0;
 	}
 	ScreenFlags &=~SF_GUIENABLED;
 	HandleWindowHide("PortraitWindow", "PortraitPosition");
@@ -1137,6 +1142,7 @@ void GameControl::HideGUI()
 		}
 	}
 	core->GetVideoDriver()->SetViewport( ( ( Window * ) Owner )->XPos, ( ( Window * ) Owner )->YPos, Width, Height );
+	return 1;
 }
 
 
@@ -1161,10 +1167,10 @@ void GameControl::HandleWindowReveal(const char *WindowName, const char *WindowP
 	}
 }
 
-void GameControl::UnhideGUI()
+int GameControl::UnhideGUI()
 {
 	if (ScreenFlags&SF_GUIENABLED) {
-		return;
+		return 0;
 	}
 	ScreenFlags |= SF_GUIENABLED;
 	// Unhide the gamecontrol window
@@ -1189,6 +1195,7 @@ void GameControl::UnhideGUI()
 		}
 	}
 	core->GetVideoDriver()->SetViewport( ( ( Window * ) Owner )->XPos, ( ( Window * ) Owner )->YPos, Width, Height );
+	return 1;
 }
 
 void GameControl::ResizeDel(Window* win, unsigned char type)
@@ -1334,6 +1341,7 @@ void GameControl::InitDialog(Actor* speaker, Scriptable* target, const char* dlg
 	if (DialogueFlags&DF_IN_DIALOG) {
 		return;
 	}
+	UnhideGUI();
 	this->speaker = speaker;
 	ScreenFlags |= SF_GUIENABLED|SF_DISABLEMOUSE|SF_CENTERONACTOR|SF_LOCKSCROLL;
 	DialogueFlags |= DF_IN_DIALOG|DF_START_DIALOG;
@@ -1448,7 +1456,7 @@ void GameControl::DialogChoose(unsigned int choose)
 
 		if (tr->action) {
 			for (unsigned int i = 0; i < tr->action->count; i++) {
-				Action* action = GameScript::GenerateAction( tr->action->strings[i], true );
+				Action* action = GenerateAction( tr->action->strings[i], true );
 				if (action) {
 						target->AddAction( action );
 				} else {

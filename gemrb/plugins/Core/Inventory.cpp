@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.51 2005/06/08 20:37:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.52 2005/06/17 19:33:05 avenger_teambg Exp $
  *
  */
 
@@ -185,6 +185,14 @@ bool Inventory::HasItem(const char *resref, ieDword flags)
 	return false;
 }
 
+void Inventory::KillSlot(unsigned int index)
+{
+	if (InventoryType==INVENTORY_HEAP) {
+		Slots.erase(Slots.begin()+index);
+	} else {
+		Slots[index] = NULL;
+	}
+}
 /** if resref is "", then destroy ALL items
 this function can look for stolen, equipped, identified, destructible
 etc, items. You just have to specify the flags in the bitmask
@@ -217,12 +225,11 @@ unsigned int Inventory::DestroyItem(const char *resref, ieDword flags, ieDword c
 				item = RemoveItem( slot, removed );
 			}
 			else {
-				Slots[slot] = NULL;
+				KillSlot(slot);
 			}
-		}
-		else {
+		}	else {
 			removed=1;
-			Slots[slot] = NULL;
+			KillSlot(slot);
 		}
 		delete item;
 		Changed = true;
@@ -244,11 +251,11 @@ CREItem *Inventory::RemoveItem(unsigned int slot, unsigned int count)
 	Changed = true;
 	item = Slots[slot];
 	if (!count || !(item->Flags&IE_INV_ITEM_STACKED) ) {
-		Slots[slot] = NULL;
+		KillSlot(slot);
 		return item;
 	}
 	if (count >= item->Usages[0]) {
-		Slots[slot] = NULL;
+		KillSlot(slot);
 		return item;
 	}
 
@@ -425,7 +432,7 @@ void Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
 			continue;
 		}
-		map->TMap->AddItemToLocation(loc, item);
+		map->AddItemToLocation(loc, item);
 		Changed = true;
 		Slots[i]=NULL;
 		//if it isn't all items then we stop here

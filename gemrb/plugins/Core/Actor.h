@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.71 2005/06/12 16:57:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.72 2005/06/17 19:33:05 avenger_teambg Exp $
  *
  */
 
@@ -150,7 +150,6 @@ public:
 	Actor *LastTalkedTo;
 	Actor *LastAttacker;
 	Actor *LastHitter;
-	Actor *LastProtecter;
 	Actor *LastProtected;
 	Actor *LastCommander;
 	Actor *LastHelp;

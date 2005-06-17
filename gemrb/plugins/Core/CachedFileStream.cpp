@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.cpp,v 1.32 2005/06/10 21:12:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.cpp,v 1.33 2005/06/17 19:33:05 avenger_teambg Exp $
  *
  */
 
@@ -189,8 +189,6 @@ int CachedFileStream::ReadLine(void* buf, unsigned int maxlen)
 	unsigned int i = 0;
 	while (i < ( maxlen - 1 )) {
 		int ch = _fgetc( str );
-		if (_feof( str ))
-			break;
 		if (Pos == size)
 			break;
 		if (Encrypted)
@@ -202,6 +200,9 @@ int CachedFileStream::ReadLine(void* buf, unsigned int maxlen)
 			ch = ' ';
 		if (( ( char ) ch ) != '\r')
 			p[i++] = ch;
+		//Warning:this feof implementation reads forward one byte
+		if (_feof( str ))
+			break;
 	}
 	p[i] = 0;
 	return i;

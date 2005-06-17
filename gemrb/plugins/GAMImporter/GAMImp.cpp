@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.53 2005/06/14 22:29:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.54 2005/06/17 19:33:06 avenger_teambg Exp $
  *
  */
 
@@ -167,6 +167,9 @@ Game* GAMImp::GetGame()
 		str->Seek( PCOffset + ( i * PCSize ), GEM_STREAM_START );
 		Actor *actor = GetActor( aM, true );
 		newGame->JoinParty( actor, false );
+		if (actor->Selected) {
+			newGame->SelectActor(actor, true, 0);
+		}
 	}
 
 	//Loading NPCs
@@ -300,6 +303,7 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 
 	actor->PCStats = ps;
 	actor->Selected = pcInfo.Selected;
+
 	return actor;
 }
 

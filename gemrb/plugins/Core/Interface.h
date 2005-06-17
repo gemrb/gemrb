@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.159 2005/06/14 22:29:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.160 2005/06/17 19:33:05 avenger_teambg Exp $
  *
  */
 
@@ -276,6 +276,8 @@ public:
 	void DisplayConstantStringName(int stridx, unsigned int color, Scriptable *speaker);
 	/** displays a string in the textarea, starting with speaker's name */
 	void DisplayStringName(int stridx, unsigned int color, Scriptable *speaker);
+	/** returns the Window Visible Flag */
+	int GetVisible(unsigned short WindowIndex);
 	/** Set a Window Visible Flag */
 	int SetVisible(unsigned short WindowIndex, int visible);
 	/** Show a Window in Modal Mode */

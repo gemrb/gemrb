@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.96 2005/06/14 22:29:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.97 2005/06/17 19:33:05 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -931,9 +931,9 @@ void Container::DestroyContainer()
 }
 
 //Takes an item from the container's inventory and returns its pointer
-CREItem *Container::RemoveItem(int idx)
+CREItem *Container::RemoveItem(unsigned int idx, unsigned int count)
 {
-	CREItem *ret = inventory.RemoveItem(idx, 0);
+	CREItem *ret = inventory.RemoveItem(idx, count);
 	//we just took the 3. or less item, groundpile changed
 	if ((Type==IE_CONTAINER_PILE) && (inventory.GetSlotCount()<3)) {
 		RefreshGroundIcons();
@@ -942,13 +942,15 @@ CREItem *Container::RemoveItem(int idx)
 }
 
 //Adds an item to the container's inventory
-void Container::AddItem(CREItem *item)
+//containers always have enough capacity (so far), thus we always return 2
+int Container::AddItem(CREItem *item)
 {
 	inventory.AddItem(item);
 	//we just added a 3. or less item, groundpile changed
 	if ((Type==IE_CONTAINER_PILE) && (inventory.GetSlotCount()<4)) {
 		RefreshGroundIcons();
 	}
+	return 2;
 }
 
 void Container::RefreshGroundIcons()
