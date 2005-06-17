@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.13 2005/06/08 20:36:53 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.14 2005/06/17 22:08:37 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -170,8 +170,8 @@ def UpdateRecordsWindow ():
 
 	sstr = GemRB.GetPlayerStat (pc, IE_STR)
 	sstrx = GemRB.GetPlayerStat (pc, IE_STREXTRA)
-
-	if sstrx > 0 and sstr==18 and HasExtra:
+	
+	if sstrx > 0 and sstr==18:
 		sstr = "%d/%02d" %(sstr, sstrx % 100)
 	else:
 		sstr = str(sstr)
@@ -214,7 +214,7 @@ def UpdateRecordsWindow ():
 
 	Table = GemRB.LoadTable ("aligns")
 
-	text = GemRB.GetTableValue (Table, GemRB.FindTableValue( Table, 3, GemRB.GetPlayerStat (pc, IE_ALIGNMENT) ), 0)
+	text = GemRB.GetTableValue (Table, GemRB.FindTableValue ( Table, 3, GemRB.GetPlayerStat (pc, IE_ALIGNMENT) ), 0)
 	GemRB.UnloadTable (Table)
 	Label = GemRB.GetControl (Window, 0x10000010)
 	GemRB.SetText (Window, Label, text)

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIWORLD.py,v 1.11 2005/05/27 20:03:54 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIWORLD.py,v 1.12 2005/06/17 22:08:37 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -98,7 +98,7 @@ def CloseContainerWindow ():
 	if ContainerWindow == None:
 		return
 
-	GemRB.HideGUI ()
+	hideflag = GemRB.HideGUI ()
 
 	GemRB.UnloadWindow (ContainerWindow)
 	ContainerWindow = None
@@ -114,7 +114,8 @@ def CloseContainerWindow ():
 	#it is enough to close here
 	GemRB.UnloadTable (Table)
 
-	GemRB.UnhideGUI ()
+	if hideflag:
+		GemRB.UnhideGUI ()
 
 
 def UpdateContainerWindow ():
