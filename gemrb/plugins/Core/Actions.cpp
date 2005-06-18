@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.2 2005/06/18 21:33:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.3 2005/06/18 21:52:33 avenger_teambg Exp $
  *
  */
 
@@ -3006,6 +3006,7 @@ void GameScript::EquipItem(Scriptable *Sender, Action* parameters)
 void GameScript::DropItem(Scriptable *Sender, Action* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
+		Sender->CurrentAction = NULL;
 		return;
 	}
 	if (Distance(parameters->pointParameter, Sender) > 10) {
@@ -3027,6 +3028,16 @@ void GameScript::DropInventory(Scriptable *Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *scr = (Actor *) Sender;
+	scr->DropItem("",0);
+}
+
+void GameScript::DropInventoryEX(Scriptable *Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (tar->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *scr = (Actor *) tar;
 	scr->DropItem("",0);
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.293 2005/06/18 21:33:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.294 2005/06/18 21:52:33 avenger_teambg Exp $
  *
  */
 
@@ -375,6 +375,7 @@ static ActionLink actionnames[] = {
 	{"displaystringnonamehead", GameScript::DisplayStringNoNameHead, 0},
 	{"displaystringwait", GameScript::DisplayStringWait,AF_BLOCKING},
 	{"dropinventory", GameScript::DropInventory, 0},
+	{"dropinventoryex", GameScript::DropInventoryEX, 0},
 	{"dropitem", GameScript::DropItem, AF_BLOCKING},
 	{"endcredits", GameScript::EndCredits, 0},//movie
 	{"endcutscenemode", GameScript::EndCutSceneMode, 0},
@@ -480,7 +481,7 @@ static ActionLink actionnames[] = {
 	{"moveglobalobject", GameScript::MoveGlobalObject, 0}, 
 	{"moveglobalobjectoffscreen", GameScript::MoveGlobalObjectOffScreen, 0},
 	{"moveglobalsto", GameScript::MoveGlobalsTo, 0}, 
-	{"moveinventory", GameScript::MoveInventory, 0}, 
+	{"transferinventory", GameScript::MoveInventory, 0}, 
 	{"movetocenterofscreen", GameScript::MoveToCenterOfScreen,AF_BLOCKING},
 	{"movetoobject", GameScript::MoveToObject,AF_BLOCKING},
 	{"movetoobjectnointerrupt", GameScript::MoveToObjectNoInterrupt,AF_BLOCKING},
