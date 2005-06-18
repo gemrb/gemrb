@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.1 2005/06/17 19:33:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.2 2005/06/18 21:33:40 avenger_teambg Exp $
  *
  */
 
@@ -298,7 +298,8 @@ Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC)
 	return NULL;
 }
 
-void PolymorphCopyCore(Actor *src, Actor *tar)
+/*FIXME: what is 'base'*/
+void PolymorphCopyCore(Actor *src, Actor *tar, bool /*base*/)
 {
 	tar->SetStat(IE_ANIMATION_ID, src->GetStat(IE_ANIMATION_ID) );
 	//add more attribute copying
@@ -385,6 +386,21 @@ void ChangeAnimationCore(Actor *src, const char *resref, bool effect)
 		if (effect) {
 			CreateVisualEffectCore(tar, tar->Pos,"smokepuffeffect");
 		}
+	}
+}
+
+void EscapeAreaCore(Actor* src, const char* resref, Point &enter, Point &exit, int flags)
+{
+	src->ClearActions();
+	char Tmp[256];
+	sprintf( Tmp, "MoveToPoint([%hd.%hd])", exit.x, exit.y );
+	src->AddAction( GenerateAction( Tmp, true ) );
+	src->SetWait(5);
+	if (flags &EA_DESTROY) {
+		src->AddAction( GenerateAction("DestroySelf()") );
+	} else {
+		sprintf( Tmp, "JumpToPoint(\"%s\",[%hd.%hd])", resref, enter.x, enter.y );
+		src->AddAction( GenerateAction( Tmp, true ) );
 	}
 }
 

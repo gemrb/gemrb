@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.191 2005/06/17 19:33:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.192 2005/06/18 21:33:40 avenger_teambg Exp $
  *
  */
 
@@ -29,6 +29,9 @@ class Action;
 #include "Variables.h"
 #include "SymbolMgr.h"
 #include "Actor.h"
+
+//escapearea flags
+#define EA_DESTROY 1
 
 //displaystring flags
 #define DS_WAIT    1
@@ -563,9 +566,10 @@ struct TriggerLink {
 #define CC_OBJECT    2  
 #define CC_OFFSCREEN 3
 #define CC_MASK      3
-#define CC_CHECK_IMPASSABLE  4  //adjust position
+#define CC_CHECK_IMPASSABLE  4  //adjust position (searchmap)
 #define CC_PLAY_ANIM 8          //play animation
 #define CC_STRING1   16         //resref is in second string
+#define CC_CHECK_OVERLAP 32     //other actors
 
 //begindialog flags
 #define BD_STRING0   0
@@ -955,6 +959,7 @@ public:
 	static void Berserk(Scriptable* Sender, Action* parameters);
 	static void BitClear(Scriptable* Sender, Action* parameters);
 	static void BitGlobal(Scriptable* Sender, Action* parameters);
+	static void Calm(Scriptable* Sender, Action* parameters);
 	static void ChangeAIScript(Scriptable* Sender, Action* parameters);
 	static void ChangeAlignment(Scriptable* Sender, Action* parameters);
 	static void ChangeAllegiance(Scriptable* Sender, Action* parameters);
@@ -978,6 +983,7 @@ public:
 	static void CreateCreatureAtLocation(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureAtFeet(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureImpassable(Scriptable* Sender, Action* parameters);
+	static void CreateCreatureImpassableAllowOverlap(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureObject(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureObjectOffset(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureObjectOffScreen(Scriptable* Sender, Action* parameters);
@@ -1015,6 +1021,10 @@ public:
 	static void EndCredits(Scriptable* Sender, Action* parameters);
 	static void EndCutSceneMode(Scriptable* Sender, Action* parameters);
 	static void Enemy(Scriptable* Sender, Action* parameters);
+	static void EscapeArea(Scriptable* Sender, Action* parameters);
+	static void EscapeAreaDestroy(Scriptable* Sender, Action* parameters);
+	static void EscapeAreaObject(Scriptable* Sender, Action* parameters);
+	static void EscapeAreaObjectNoSee(Scriptable* Sender, Action* parameters);
 	static void EquipItem(Scriptable *Sender, Action *parameters);
 	static void ExpansionEndCredits(Scriptable* Sender, Action* parameters);
 	static void Explore(Scriptable *Sender, Action *parameters);
@@ -1128,7 +1138,9 @@ public:
 	static void PlaySoundNotRanged(Scriptable* Sender, Action* parameters);
 	static void PlaySoundPoint(Scriptable* Sender, Action* parameters);
 	static void Plunder(Scriptable* Sender, Action* parameters);
+	static void Polymorph(Scriptable* Sender, Action* parameters);
 	static void PolymorphCopy(Scriptable* Sender, Action* parameters);
+	static void PolymorphCopyBase(Scriptable* Sender, Action* parameters);
 	static void Protect(Scriptable* Sender, Action* parameters);
 	static void ProtectPoint(Scriptable* Sender, Action* parameters);
 	static void QuitGame(Scriptable* Sender, Action* parameters);
@@ -1232,6 +1244,7 @@ public:
 	static void TakePartyItem(Scriptable* Sender, Action* parameters);
 	static void TakePartyItemAll(Scriptable* Sender, Action* parameters);
 	static void TakePartyItemNum(Scriptable* Sender, Action* parameters);
+	static void TakePartyItemRange(Scriptable* Sender, Action* parameters);
 	static void TeleportParty(Scriptable* Sender, Action* parameters);
 	static void TextScreen(Scriptable* Sender, Action* parameters);
 	static void TriggerActivation(Scriptable* Sender, Action* parameters);

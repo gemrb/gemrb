@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.1 2005/06/17 19:33:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.2 2005/06/18 21:33:40 avenger_teambg Exp $
  *
  */
 
@@ -504,11 +504,16 @@ int GameScript::GetHPPercent(Scriptable* Sender)
 //don't use offset from Sender
 void GameScript::CreateCreature(Scriptable* Sender, Action* parameters)
 {
-	CreateCreatureCore( Sender, parameters, CC_CHECK_IMPASSABLE );
+	CreateCreatureCore( Sender, parameters, CC_CHECK_IMPASSABLE|CC_CHECK_OVERLAP );
 }
 
 //don't use offset from Sender
 void GameScript::CreateCreatureImpassable(Scriptable* Sender, Action* parameters)
+{
+	CreateCreatureCore( Sender, parameters, CC_CHECK_OVERLAP );
+}
+
+void GameScript::CreateCreatureImpassableAllowOverlap(Scriptable* Sender, Action* parameters)
 {
 	CreateCreatureCore( Sender, parameters, 0 );
 }
@@ -516,24 +521,24 @@ void GameScript::CreateCreatureImpassable(Scriptable* Sender, Action* parameters
 //use offset from Sender
 void GameScript::CreateCreatureAtFeet(Scriptable* Sender, Action* parameters)
 {
-	CreateCreatureCore( Sender, parameters, CC_OFFSET | CC_CHECK_IMPASSABLE );
+	CreateCreatureCore( Sender, parameters, CC_OFFSET | CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP);
 }
 
 void GameScript::CreateCreatureOffScreen(Scriptable* Sender, Action* parameters)
 {
-	CreateCreatureCore( Sender, parameters, 0 ); //don't check impassable
+	CreateCreatureCore( Sender, parameters, CC_OFFSCREEN | CC_CHECK_OVERLAP ); //don't check impassable?
 }
 
 //this is the same, object + offset
 //using this for simple createcreatureobject, (0 offsets)
 void GameScript::CreateCreatureObjectOffset(Scriptable* Sender, Action* parameters)
 {
-	CreateCreatureCore( Sender, parameters, CC_OBJECT | CC_CHECK_IMPASSABLE );
+	CreateCreatureCore( Sender, parameters, CC_OBJECT | CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP );
 }
 
 void GameScript::CreateCreatureObjectOffScreen(Scriptable* Sender, Action* parameters)
 {
-	CreateCreatureCore( Sender, parameters, CC_OFFSCREEN | CC_OBJECT | CC_CHECK_IMPASSABLE );
+	CreateCreatureCore( Sender, parameters, CC_OFFSCREEN | CC_OBJECT | CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP);
 }
 
 void GameScript::StartCutSceneMode(Scriptable* /*Sender*/, Action* /*parameters*/)
@@ -2827,6 +2832,18 @@ void GameScript::TakePartyItemNum(Scriptable* Sender, Action* parameters)
 	}
 }
 
+void GameScript::TakePartyItemRange(Scriptable* Sender, Action* parameters)
+{
+	Game *game=core->GetGame();
+	int i=game->GetPartySize(false);
+	while (i--) {
+		Actor *ac = game->GetPC(i);
+		if (Distance(Sender, ac)<MAX_OPERATING_DISTANCE) {
+			while (MoveItemCore(ac, Sender, parameters->string0Parameter,0)==MIC_GOTITEM);
+		}
+	}
+}
+
 void GameScript::TakePartyItemAll(Scriptable* Sender, Action* parameters)
 {
 	Game *game=core->GetGame();
@@ -3011,6 +3028,19 @@ void GameScript::DropInventory(Scriptable *Sender, Action* /*parameters*/)
 	}
 	Actor *scr = (Actor *) Sender;
 	scr->DropItem("",0);
+}
+
+void GameScript::GivePartyAllEquipment(Scriptable *Sender, Action* /*parameters*/)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Game *game = core->GetGame();
+	int i = game->GetPartySize(false);
+	while (i--) {
+		Actor *tar = game->GetPC(i);
+		while(MoveItemCore(Sender, tar, "",0)!=MIC_NOITEM);
+	}
 }
 
 void GameScript::Plunder(Scriptable *Sender, Action* parameters)
@@ -3267,6 +3297,16 @@ void GameScript::Panic(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor *act = (Actor *) Sender;
 	act->Panic();
+}
+
+/* as of now: removes panic and berserk */
+void GameScript::Calm(Scriptable* Sender, Action* /*parameters*/)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *act = (Actor *) Sender;
+	act->NewStat(IE_STATE_ID, act->GetStat(IE_STATE_ID) & ~(STATE_BERSERK|STATE_PANIC), MOD_ABSOLUTE);
 }
 
 void GameScript::RevealAreaOnMap(Scriptable* /*Sender*/, Action* parameters)
@@ -3694,26 +3734,25 @@ void GameScript::Turn(Scriptable* Sender, Action* /*parameters*/)
 	actor->SetModal( MS_TURNUNDEAD);
 }
 
-/* this could be far from reality*/
 void GameScript::TurnAMT(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
+		Sender->CurrentAction = NULL;
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
-	actor->SetStat(IE_TURNUNDEADLEVEL, parameters->int0Parameter);
-	actor->SetModal( MS_TURNUNDEAD);
+	actor->SetOrientation(actor->GetOrientation()+parameters->int0Parameter,0);
+	actor->resetAction = true;
+	actor->SetWait( 1 );
 }
 
 void GameScript::AttachTransitionToDoor(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
-		Sender->CurrentAction = NULL;
 		return;
 	}
 	if (tar->Type != ST_DOOR) {
-		Sender->CurrentAction = NULL;
 		return;
 	}
 	Door* door = ( Door* ) tar;
@@ -3726,12 +3765,24 @@ void GameScript::ChangeAnimation(Scriptable* Sender, Action* parameters)
 	if (Sender->Type!=ST_ACTOR) {
 		return;
 	}
-	DataStream* ds = core->GetResourceMgr()->GetResource( parameters->string1Parameter, IE_CRE_CLASS_ID );
-	Actor *tar = core->GetCreature(ds);
-	if (tar) {
-		PolymorphCopyCore((Actor *) Sender, tar);
+	ChangeAnimationCore((Actor *) Sender, parameters->string0Parameter,0);
+}
+
+void GameScript::ChangeAnimationNoEffect(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
 	}
-	delete tar;
+	ChangeAnimationCore((Actor *) Sender, parameters->string0Parameter,1);
+}
+
+void GameScript::Polymorph(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *act = (Actor *) Sender;
+	act->SetStat(IE_ANIMATION_ID, parameters->int0Parameter);
 }
 
 void GameScript::PolymorphCopy(Scriptable* Sender, Action* parameters)
@@ -3743,6 +3794,78 @@ void GameScript::PolymorphCopy(Scriptable* Sender, Action* parameters)
 	if (!tar || tar->Type!=ST_ACTOR) {
 		return;
 	}
-	PolymorphCopyCore((Actor *) Sender, (Actor *) tar);
+	PolymorphCopyCore((Actor *) Sender, (Actor *) tar, false);
 }
 
+/* so far it is the same, probably more stuff to copy*/
+void GameScript::PolymorphCopyBase(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return;
+	}
+	PolymorphCopyCore((Actor *) Sender, (Actor *) tar, true);
+}
+
+void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
+{
+	int type;
+	char *folder = "";
+
+	int SlotTable = core->LoadTable( "savegame" );
+	if (SlotTable >= 0) {
+		TableMgr* tab = core->GetTable( SlotTable );
+		type = atoi(tab->QueryField());
+		folder = tab->QueryField(parameters->int0Parameter);
+	}
+	core->GetSaveGameIterator()->CreateSaveGame(parameters->int0Parameter, folder);
+	if (SlotTable >= 0) {
+		core->DelTable(SlotTable);
+	}
+}
+
+/*EscapeAreaMove(S:Area*,I:X*,I:Y*,I:Face*)*/
+void GameScript::EscapeArea(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Point p(parameters->int0Parameter, parameters->int1Parameter);
+	EscapeAreaCore((Actor *) Sender, parameters->string0Parameter, p, p, 0 );
+}
+
+void GameScript::EscapeAreaDestroy(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Point p(0,0);
+	EscapeAreaCore((Actor *) Sender, parameters->string0Parameter, p, p, EA_DESTROY );
+}
+
+void GameScript::EscapeAreaObject(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (tar) {
+		Point p(parameters->int0Parameter, parameters->int1Parameter);
+		EscapeAreaCore((Actor *) Sender, parameters->string0Parameter, p, tar->Pos, 0 );
+	}
+}
+
+void GameScript::EscapeAreaObjectNoSee(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (tar) {
+		Point p(parameters->int0Parameter, parameters->int1Parameter);
+		EscapeAreaCore((Actor *) Sender, parameters->string0Parameter, p, tar->Pos, 0 );
+	}
+}

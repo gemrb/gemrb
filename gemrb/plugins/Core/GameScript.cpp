@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.292 2005/06/17 22:08:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.293 2005/06/18 21:33:40 avenger_teambg Exp $
  *
  */
 
@@ -312,6 +312,7 @@ static ActionLink actionnames[] = {
 	{"bitclear", GameScript::BitClear,AF_MERGESTRINGS},
 	{"bitglobal", GameScript::BitGlobal,AF_MERGESTRINGS},
 	{"bitset", GameScript::GlobalBOr,AF_MERGESTRINGS}, //probably the same
+	{"calm", GameScript::Calm, 0}, 
 	{"changeaiscript", GameScript::ChangeAIScript, 0},
 	{"changealignment", GameScript::ChangeAlignment, 0},
 	{"changeallegiance", GameScript::ChangeAllegiance, 0},
@@ -337,6 +338,7 @@ static ActionLink actionnames[] = {
 	{"createcreatureatfeet", GameScript::CreateCreatureAtFeet, 0}, 
 	{"createcreatureatlocation", GameScript::CreateCreatureAtLocation, 0},
 	{"createcreatureimpassable", GameScript::CreateCreatureImpassable, 0},
+	{"createcreatureimpassableallowoverlap", GameScript::CreateCreatureImpassableAllowOverlap, 0},
 	{"createcreatureobject", GameScript::CreateCreatureObjectOffset, 0}, //the same
 	{"createcreatureobjectoffscreen", GameScript::CreateCreatureObjectOffScreen, 0}, //same as createcreature object, but starts looking for a place far away from the player
 	{"createcreatureobjectoffset", GameScript::CreateCreatureObjectOffset, 0}, //the same
@@ -379,6 +381,10 @@ static ActionLink actionnames[] = {
 	{"enemy", GameScript::Enemy, 0},
 	{"equipitem", GameScript::EquipItem, AF_BLOCKING},
 	{"erasejournalentry", GameScript::RemoveJournalEntry, 0},
+	{"escapearea", GameScript::EscapeArea, 0},
+	{"escapeareadestroy", GameScript::EscapeAreaDestroy, 0},
+	{"escapeareaobject", GameScript::EscapeAreaObject, 0},
+	{"escapeareaobjectnosee", GameScript::EscapeAreaObjectNoSee, 0},
 	{"expansionendcredits", GameScript::QuitGame, 0},//ends game too
 	{"explore", GameScript::Explore, 0},
 	{"exploremapchunk", GameScript::ExploreMapChunk, 0},
@@ -405,6 +411,7 @@ static ActionLink actionnames[] = {
 	{"givegoldforce", GameScript::CreatePartyGold, 0}, //this is the same
 	{"giveitem", GameScript::GiveItem, 0},
 	{"giveitemcreate", GameScript::CreateItem, 0}, //actually this is a targeted createitem
+	{"givepartyallequipment", GameScript::GivePartyAllEquipment, 0},
 	{"givepartygold", GameScript::GivePartyGold, 0},
 	{"givepartygoldglobal", GameScript::GivePartyGoldGlobal,AF_MERGESTRINGS},
 	{"globaladdglobal", GameScript::GlobalAddGlobal,AF_MERGESTRINGS},
@@ -536,6 +543,7 @@ static ActionLink actionnames[] = {
 	{"runtopoint", GameScript::MoveToPoint,AF_BLOCKING}, //until we know better
 	{"runtopointnorecticle", GameScript::MoveToPoint,AF_BLOCKING},//until we know better
 	{"runtosavedlocation", GameScript::MoveToSavedLocation,AF_BLOCKING},//
+	{"savegame", GameScript::SaveGame, 0},
 	{"savelocation", GameScript::SaveLocation, 0},
 	{"saveplace", GameScript::SaveLocation, 0},
 	{"saveobjectlocation", GameScript::SaveObjectLocation, 0},
@@ -628,12 +636,13 @@ static ActionLink actionnames[] = {
 	{"takepartyitem", GameScript::TakePartyItem, 0},
 	{"takepartyitemall", GameScript::TakePartyItemAll, 0},
 	{"takepartyitemnum", GameScript::TakePartyItemNum, 0},
+	{"takepartyitemrange", GameScript::TakePartyItemRange, 0},
 	{"teleportparty", GameScript::TeleportParty, 0}, 
 	{"textscreen", GameScript::TextScreen, 0},
 	{"tomsstringdisplayer", GameScript::DisplayMessage, 0},
 	{"triggeractivation", GameScript::TriggerActivation, 0},
 	{"turn", GameScript::Turn, 0},
-	{"turnamt", GameScript::TurnAMT, 0},
+	{"turnamt", GameScript::TurnAMT, AF_BLOCKING}, //relative Face()
 	{"undoexplore", GameScript::UndoExplore, 0},
 	{"unhidegui", GameScript::UnhideGUI, 0},
 	{"unloadarea", GameScript::UnloadArea, 0},
