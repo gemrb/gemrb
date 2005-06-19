@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.322 2005/06/17 19:33:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.323 2005/06/19 22:59:34 avenger_teambg Exp $
  *
  */
 
@@ -837,6 +837,15 @@ int Interface::Init()
 		printStatus( "ERROR", LIGHT_RED );
 	}
 
+	printMessage( "Core", "Initializing Spellbook Management...", WHITE );
+	ret = Spellbook::InitializeSpellbook();
+	if (ret) {
+		printStatus( "OK", LIGHT_GREEN );
+	}
+	else {
+		printStatus( "ERROR", LIGHT_RED );
+	}
+
 	printMessage( "Core", "Initializing string constants...", WHITE );
 	ret = ReadStrrefs();
 	if (ret) {
@@ -1396,18 +1405,8 @@ bool Interface::LoadGemRBINI()
 			}
 		}
 	}
-/*
-	upperlower(165,185);
-	upperlower(198,230);
-	upperlower(202,234);
-	upperlower(163,179);
-	upperlower(209,241);
-	upperlower(211,243);
-	upperlower(140,156);
-	upperlower(175,191);
-	upperlower(143,159);
-*/
 
+	SetFeature( ini->GetKeyAsInt( "resources", "HasSpellList", 0 ), GF_HAS_SPELLLIST );
 	SetFeature( ini->GetKeyAsInt( "resources", "ProtagonistTalks", 0 ), GF_PROTAGONIST_TALKS );
 	SetFeature( ini->GetKeyAsInt( "resources", "AutomapIni", 0 ), GF_AUTOMAP_INI );
 	SetFeature( ini->GetKeyAsInt( "resources", "IWDMapDimensions", 0 ), GF_IWD_MAP_DIMENSIONS );
@@ -2124,7 +2123,7 @@ MusicMgr* Interface::GetMusicMgr()
 	return music;
 }
 /** Loads a 2DA Table, returns -1 on error or the Table Index on success */
-int Interface::LoadTable(const char* ResRef)
+int Interface::LoadTable(const ieResRef ResRef)
 {
 	int ind = GetTableIndex( ResRef );
 	if (ind != -1) {
@@ -2808,7 +2807,7 @@ void Interface::DisplayStringName(int stridx, unsigned int color, Scriptable *sp
 	free( newstr );
 }
 
-static char *saved_extensions[]={".are",".sto",0};
+static char *saved_extensions[]={".are",".sto",".tot",".toh",0};
 
 //returns true if file should be saved
 bool Interface::SavedExtension(const char *filename)
@@ -3262,7 +3261,7 @@ ieStrRef Interface::GetRumour(const ieResRef dlgref)
 		printf( "[Interface]: Cannot load dialog: %s\n", dlgref );
 		return (ieStrRef) -1;
 	}
-	Scriptable *pc=game->GetPC( game->GetSelectedPCSingle() );
+	Scriptable *pc=game->GetPC( game->GetSelectedPCSingle(), false );
 	
 	ieStrRef ret = (ieStrRef) -1;
 	int i = dlg->FindRandomState( pc );
@@ -3321,7 +3320,7 @@ ScriptedAnimation* Interface::GetScriptedAnimation( const char *effect, Point &p
 Actor *Interface::GetFirstSelectedPC()
 {
 	for (int i = 0; i < game->GetPartySize( false ); i++) {
-		Actor* actor = game->GetPC( i );
+		Actor* actor = game->GetPC( i,false );
 		if (actor->IsSelected()) {
 			return actor;
 		}
@@ -3453,7 +3452,39 @@ int Interface::WriteWorldMap(const char *folder)
 	return 0;
 }
 
-int Interface::CompressSave(const char * /*folder*/)
+int Interface::CompressSave(const char *folder)
 {
-	return -1;
+	FileStream str;
+
+	str.Create( folder, GameNameResRef, IE_SAV_CLASS_ID );
+	DIR* dir = opendir( CachePath );
+	if (dir == NULL) {
+		return -1;
+	}
+	struct dirent* de = readdir( dir ); //Lookup the first entry in the Directory
+	if (de == NULL) {
+		closedir( dir );
+		return -1;
+	}
+	//BIF and SAV are the same
+	ArchiveImporter * ai = (ArchiveImporter*)GetInterface(IE_BIF_CLASS_ID);
+	ai->CreateArchive( &str);
+
+	do {
+		char dtmp[_MAX_PATH];
+		struct stat fst;
+		snprintf( dtmp, _MAX_PATH, "%s%s", CachePath, de->d_name );
+		stat( dtmp, &fst );
+		if (S_ISDIR( fst.st_mode ))
+			continue;
+		if (de->d_name[0] == '.')
+			continue;
+		if (SavedExtension(de->d_name) ) {
+			FileStream fs;
+			fs.Open(dtmp, true);
+			ai->AddToSaveGame(&str, &fs);
+		}
+	} while (( de = readdir( dir ) ) != NULL);
+	closedir( dir );
+	return 0;
 }

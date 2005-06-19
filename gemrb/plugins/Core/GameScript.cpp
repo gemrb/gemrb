@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.294 2005/06/18 21:52:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.295 2005/06/19 22:59:34 avenger_teambg Exp $
  *
  */
 
@@ -1613,7 +1613,7 @@ Targets *GameScript::Player1(Scriptable* /*Sender*/, Targets *parameters)
 Targets *GameScript::Player1Fill(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(0), 0);
+	parameters->AddTarget(core->GetGame()->GetPC(0,false), 0);
 	return parameters;
 }
 
@@ -1627,7 +1627,7 @@ Targets *GameScript::Player2(Scriptable* /*Sender*/, Targets *parameters)
 Targets *GameScript::Player2Fill(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(1), 0);
+	parameters->AddTarget(core->GetGame()->GetPC(1,false), 0);
 	return parameters;
 }
 
@@ -1641,7 +1641,7 @@ Targets *GameScript::Player3(Scriptable* /*Sender*/, Targets *parameters)
 Targets *GameScript::Player3Fill(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(2), 0);
+	parameters->AddTarget(core->GetGame()->GetPC(2,false), 0);
 	return parameters;
 }
 
@@ -1655,7 +1655,7 @@ Targets *GameScript::Player4(Scriptable* /*Sender*/, Targets *parameters)
 Targets *GameScript::Player4Fill(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(3), 0);
+	parameters->AddTarget(core->GetGame()->GetPC(3,false), 0);
 	return parameters;
 }
 
@@ -1669,7 +1669,7 @@ Targets *GameScript::Player5(Scriptable* /*Sender*/, Targets *parameters)
 Targets *GameScript::Player5Fill(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(4), 0);
+	parameters->AddTarget(core->GetGame()->GetPC(4,false), 0);
 	return parameters;
 }
 
@@ -1683,7 +1683,7 @@ Targets *GameScript::Player6(Scriptable* /*Sender*/, Targets *parameters)
 Targets *GameScript::Player6Fill(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(5), 0);
+	parameters->AddTarget(core->GetGame()->GetPC(5,false), 0);
 	return parameters;
 }
 
@@ -1697,7 +1697,7 @@ Targets *GameScript::Player7(Scriptable* /*Sender*/, Targets *parameters)
 Targets *GameScript::Player7Fill(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(6), 0);
+	parameters->AddTarget(core->GetGame()->GetPC(6,false), 0);
 	return parameters;
 }
 
@@ -1711,7 +1711,7 @@ Targets *GameScript::Player8(Scriptable* /*Sender*/, Targets *parameters)
 Targets *GameScript::Player8Fill(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(7), 0);
+	parameters->AddTarget(core->GetGame()->GetPC(7,false), 0);
 	return parameters;
 }
 
@@ -1992,10 +1992,10 @@ Targets *GameScript::XthNearestEnemyOf(Targets *parameters, int count)
 		return parameters;
 	}
 	Map *map = origin->GetCurrentArea();
-	int i = map->GetActorCount();
+	int i = map->GetActorCount(true);
 	Actor *ac;
 	while (i--) {
-		ac=map->GetActor(i);
+		ac=map->GetActor(i,true);
 		int distance = Distance(ac, origin);
 		if (type) { //origin is PC
 			if (ac->GetStat(IE_EA) >= EA_EVILCUTOFF) {
@@ -2171,15 +2171,20 @@ Targets *GameScript::TenthNearestMyGroupOfType(Scriptable* Sender, Targets *para
 	return XthNearestMyGroupOfType(Sender, parameters, 9);
 }
 
+/* returns only living PC's? if not, alter getpartysize/getpc flag*/
 Targets *GameScript::NearestPC(Scriptable* Sender, Targets *parameters)
 {
 	parameters->Clear();
 	Map *map = Sender->GetCurrentArea();
-	int i = map->GetActorCount();
+	Game *game = core->GetGame();
+	int i = game->GetPartySize(true);
 	int mindist = -1;
 	Actor *ac = NULL;
 	while (i--) {
-		Actor *newactor=map->GetActor(i);
+		Actor *newactor=game->GetPC(i,true);
+		if (newactor->GetCurrentArea()!=map) {
+			continue;
+		}
 		int dist = Distance(Sender, ac);
 		if (ac->InParty) {
 			if ( (mindist == -1) || (dist<mindist) ) {
@@ -2248,9 +2253,12 @@ Targets *GameScript::SelectedCharacter(Scriptable* Sender, Targets* parameters)
 {
 	Map *cm = Sender->GetCurrentArea();
 	parameters->Clear();
-	int i = cm->GetActorCount();
+	int i = cm->GetActorCount(true);
 	while (i--) {
-		Actor *ac=cm->GetActor(i);
+		Actor *ac=cm->GetActor(i,true);
+		if (ac->GetCurrentArea()!=cm) {
+			continue;
+		}
 		if (ac->IsSelected()) {
 			parameters->AddTarget(ac, Distance(Sender, ac) );
 		}

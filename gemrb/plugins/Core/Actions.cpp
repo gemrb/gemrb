@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.3 2005/06/18 21:52:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.4 2005/06/19 22:59:33 avenger_teambg Exp $
  *
  */
 
@@ -401,7 +401,7 @@ void GameScript::TeleportParty(Scriptable* /*Sender*/, Action* parameters)
 	Game *game = core->GetGame();
 	int i = game->GetPartySize(false);
 	while (i--) {
-		Actor *tar = game->GetPC(i);
+		Actor *tar = game->GetPC(i, false);
 		MoveBetweenAreasCore( tar, parameters->string1Parameter, 
 			parameters->pointParameter, -1, true);
 	}
@@ -412,7 +412,7 @@ void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 	Game *game = core->GetGame();
 	int i = game->GetPartySize(false);
 	while (i--) {
-		Actor *tar = game->GetPC(i);
+		Actor *tar = game->GetPC(i, false);
 		//if the actor isn't in the area, we don't care
 		if (strnicmp(tar->Area, parameters->string0Parameter,8) ) {
 			continue;
@@ -853,8 +853,8 @@ void GameScript::MoveToObject(Scriptable* Sender, Action* parameters)
 void GameScript::StorePartyLocation(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	Game *game = core->GetGame();
-	for (int i = 0; i < game->GetPartySize(0); i++) {
-		Actor* act = game->GetPC( i );
+	for (int i = 0; i < game->GetPartySize(false); i++) {
+		Actor* act = game->GetPC( i, false );
 		if (act) {
 			ieDword value;
 			*((unsigned short *) &value) = act->Pos.x;
@@ -868,8 +868,8 @@ void GameScript::StorePartyLocation(Scriptable* /*Sender*/, Action* /*parameters
 void GameScript::RestorePartyLocation(Scriptable* Sender, Action* /*parameters*/)
 {
 	Game *game = core->GetGame();
-	for (int i = 0; i < game->GetPartySize(0); i++) {
-		Actor* act = game->GetPC( i );
+	for (int i = 0; i < game->GetPartySize(false); i++) {
+		Actor* act = game->GetPC( i, false );
 		if (act) {
 			ieDword value=CheckVariable( act, "LOCALSsavedlocation");
 			Map *map = Sender->GetCurrentArea();
@@ -985,11 +985,11 @@ void GameScript::KillFloatMessage(Scriptable* Sender, Action* parameters)
 
 void GameScript::DisplayStringHeadOwner(Scriptable* /*Sender*/, Action* parameters)
 {
-	Actor *actor;
 	Game *game=core->GetGame();
 
-	//there is an assignment here
-	for (int i=0; (actor = game->GetPC(i)) ; i++) {
+	int i = game->GetPartySize(true);
+	while(i--) {
+		Actor *actor = game->GetPC(i, true);
 		if (actor->inventory.HasItem(parameters->string0Parameter,parameters->int0Parameter) ) {
 			DisplayStringCore(actor, parameters->int0Parameter, DS_CONSOLE|DS_HEAD );
 		}
@@ -2346,8 +2346,8 @@ void GameScript::ClearAllActions(Scriptable* /*Sender*/, Action* /*parameters*/)
 	//just a hack
 	Game* game = core->GetGame();
 
-	for (int i = 0; i < game->GetPartySize(0); i++) {
-		Actor* act = game->GetPC( i );
+	for (int i = 0; i < game->GetPartySize(false); i++) {
+		Actor* act = game->GetPC( i,false );
 		if (act) {
 			act->ClearActions();
 		}
@@ -2643,7 +2643,7 @@ void GameScript::DestroyPartyItem(Scriptable* /*Sender*/, Action* parameters)
 	if (parameters->int0Parameter) count=~0;
 	else count=1;
 	while (i--) {
-		Inventory *inv = &(game->GetPC(i)->inventory);
+		Inventory *inv = &(game->GetPC( i,false )->inventory);
 		int res=inv->DestroyItem(parameters->string0Parameter,0,count);
 		if ( (count == 1) && res) {
 			break;
@@ -2659,7 +2659,7 @@ void GameScript::DestroyPartyItemNum(Scriptable* /*Sender*/, Action* parameters)
 	ieDword count;
 	count = parameters->int0Parameter;
 	while (i--) {
-		Inventory *inv = &(game->GetPC(i)->inventory);
+		Inventory *inv = &(game->GetPC( i,false )->inventory);
 		count -= inv->DestroyItem(parameters->string0Parameter,0,count);
 		if (!count ) {
 			break;
@@ -2811,7 +2811,7 @@ void GameScript::TakePartyItem(Scriptable* Sender, Action* parameters)
 	Game *game=core->GetGame();
 	int i=game->GetPartySize(false);
 	while (i--) {
-		int res=MoveItemCore(game->GetPC(i), Sender, parameters->string0Parameter,0);
+		int res=MoveItemCore(game->GetPC(i,false), Sender, parameters->string0Parameter,0);
 		if (res!=MIC_NOITEM) return;
 	}
 }
@@ -2823,7 +2823,7 @@ void GameScript::TakePartyItemNum(Scriptable* Sender, Action* parameters)
 	Game *game=core->GetGame();
 	int i=game->GetPartySize(false);
 	while (i--) {
-		int res=MoveItemCore(game->GetPC(i), Sender, parameters->string0Parameter,0);
+		int res=MoveItemCore(game->GetPC(i,false), Sender, parameters->string0Parameter,0);
 		if (res == MIC_GOTITEM) {
 			i++;
 			count--;
@@ -2837,7 +2837,7 @@ void GameScript::TakePartyItemRange(Scriptable* Sender, Action* parameters)
 	Game *game=core->GetGame();
 	int i=game->GetPartySize(false);
 	while (i--) {
-		Actor *ac = game->GetPC(i);
+		Actor *ac = game->GetPC(i,false);
 		if (Distance(Sender, ac)<MAX_OPERATING_DISTANCE) {
 			while (MoveItemCore(ac, Sender, parameters->string0Parameter,0)==MIC_GOTITEM);
 		}
@@ -2849,7 +2849,7 @@ void GameScript::TakePartyItemAll(Scriptable* Sender, Action* parameters)
 	Game *game=core->GetGame();
 	int i=game->GetPartySize(false);
 	while (i--) {
-		while (MoveItemCore(game->GetPC(i), Sender, parameters->string0Parameter,0)==MIC_GOTITEM);
+		while (MoveItemCore(game->GetPC(i,false), Sender, parameters->string0Parameter,0)==MIC_GOTITEM);
 	}
 }
 
@@ -3049,7 +3049,7 @@ void GameScript::GivePartyAllEquipment(Scriptable *Sender, Action* /*parameters*
 	Game *game = core->GetGame();
 	int i = game->GetPartySize(false);
 	while (i--) {
-		Actor *tar = game->GetPC(i);
+		Actor *tar = game->GetPC(i,false);
 		while(MoveItemCore(Sender, tar, "",0)!=MIC_NOITEM);
 	}
 }

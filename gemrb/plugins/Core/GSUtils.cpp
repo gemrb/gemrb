@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.2 2005/06/18 21:33:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.3 2005/06/19 22:59:34 avenger_teambg Exp $
  *
  */
 
@@ -227,10 +227,10 @@ static Targets* EvaluateObject(Scriptable* Sender, Object* oC)
 		else {
 			//we need to get a subset of actors from the large array
 			//if this gets slow, we will need some index tables
-			int i = map->GetActorCount();
+			int i = map->GetActorCount(true);
 			tgts = new Targets();
 			while (i--) {
-				Actor *ac=map->GetActor(i);
+				Actor *ac=map->GetActor(i,true);
 				int dist = Distance(Sender->Pos, ac->Pos);
 				if (ac && func(ac, oC->objectFields[j]) ) {
 					tgts->AddTarget(ac, dist);

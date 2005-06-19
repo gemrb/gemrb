@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.54 2005/06/17 19:33:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.55 2005/06/19 22:59:34 avenger_teambg Exp $
  *
  */
 
@@ -27,7 +27,7 @@
 #include "../Core/MemoryStream.h"
 
 
-#define MAZE_DATA_SIZE    1720
+#define MAZE_DATA_SIZE 1720
 
 GAMImp::GAMImp(void)
 {
@@ -249,8 +249,8 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 	str->ReadWord( &pcInfo.YPos );
 	str->ReadWord( &pcInfo.ViewXPos );
 	str->ReadWord( &pcInfo.ViewYPos );
-	str->ReadWord( &pcInfo.ModalState );  //see Modal.ids
-	str->ReadWord( &pcInfo.Happiness );   //
+	str->ReadWord( &pcInfo.ModalState ); //see Modal.ids
+	str->ReadWord( &pcInfo.Happiness );
 	str->Read( &pcInfo.Unknown2c, 96 );
 	for (i = 0; i < 4; i++) {
 		str->ReadWord( &pcInfo.QuickWeaponSlot[i] );
@@ -392,7 +392,7 @@ int GAMImp::GetStoredFileSize(Game *game)
 	PCCount = game->GetPartySize(false);
 	headersize += PCCount * PCSize;
 	for (i = 0;i<PCCount; i++) {
-		Actor *ac=game->GetPC(i);
+		Actor *ac=game->GetPC(i, false);
 		headersize +=am->GetStoredFileSize(ac);
 	}
 	NPCOffset = headersize;
@@ -419,6 +419,13 @@ int GAMImp::GetStoredFileSize(Game *game)
 		headersize += KillVarsCount * 0x54;
 	}
 
+	if (game->version==GAM_VER_GEMRB ||
+		game->version==GAM_VER_BG2 ||
+		game->version==GAM_VER_IWD2 ||
+		game->version==GAM_VER_IWD) {
+		FamiliarsOffset = headersize;
+	}
+	headersize += 9 * 8 + 82 * 4;
 	core->FreeInterface( am );
 	return headersize;
 }
@@ -483,6 +490,7 @@ int GAMImp::PutVariables(DataStream *stream, Game *game)
 
 int GAMImp::PutHeader(DataStream *stream, Game *game)
 {
+	int i;
 	char Signature[8];
 	ieDword tmpDword = 0;
 
@@ -495,10 +503,13 @@ int GAMImp::PutHeader(DataStream *stream, Game *game)
 		Signature[7]+=game->version%10;
 	}
 	stream->Write( Signature, 8);
+	//using Signature for padding
+	memset(Signature, 0, sizeof(Signature));
 	stream->WriteDword( &game->GameTime );
 	stream->WriteWord( &game->WhichFormation );
-	for(int i=0;i<5;i++)
+	for(i=0;i<5;i++) {
 		stream->WriteWord( &game->Formations[i]);
+	}
 	stream->WriteDword( &game->PartyGold );
 	stream->WriteDword( &game->WeatherBits );
 	stream->WriteDword( &PCOffset );
@@ -524,6 +535,10 @@ int GAMImp::PutHeader(DataStream *stream, Game *game)
 		stream->WriteDword( &game->Reputation );
 		stream->WriteResRef( game->CurrentArea );
 		stream->WriteDword( &game->ControlStatus );
+		stream->WriteDword( &tmpDword);
+		stream->WriteDword( &FamiliarsOffset);
+		stream->WriteDword( &SavedLocCount);
+		stream->WriteDword( &SavedLocOffset);
 		break;
 	case GAM_VER_PST:
 		stream->WriteDword( &MazeOffset );
@@ -534,16 +549,19 @@ int GAMImp::PutHeader(DataStream *stream, Game *game)
 		stream->WriteDword( &BestiaryOffset );
 		break;
 	}
-
+	for (i=0;i<8;i++) {
+		stream->Write( Signature, 8);
+	}
 	return 0;
 }
 
 int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CREOffset)
 {
+	int i;
 	ieDword tmpDword;
 	ieWord tmpWord;
 
-	char filling[8];
+	char filling[50];
 
 	memset(filling,0,sizeof(filling) );
 	if (ac->Selected) {
@@ -561,6 +579,63 @@ int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CRE
 	stream->Write( filling, 8);
 	tmpDword = ac->GetOrientation();
 	stream->WriteDword (&tmpDword);
+	stream->WriteResRef(ac->Area);
+	tmpWord = ac->Pos.x;
+	stream->WriteWord( &tmpWord);
+	tmpWord = ac->Pos.y;
+	stream->WriteWord( &tmpWord);
+	//no viewport, we cheat
+	tmpWord = ac->Pos.x;
+	stream->WriteWord( &tmpWord);
+	tmpWord = ac->Pos.y;
+	stream->WriteWord( &tmpWord);
+	//a lot of crap
+	stream->Write( filling, 50);
+	stream->Write( filling, 50);
+	//4 quickweapons, lets make 0xff
+	tmpWord = (ieWord) -1;
+	stream->WriteWord( &tmpWord);
+	stream->WriteWord( &tmpWord);
+	stream->WriteWord( &tmpWord);
+	stream->WriteWord( &tmpWord);
+	//some resrefs (quickspells?)
+	stream->Write(filling,8);
+	stream->Write(filling,8);
+	stream->Write(filling,8);
+	stream->Write(filling,8);
+	//more weirdo, quickitems?
+	stream->WriteWord( &tmpWord);
+	stream->WriteWord( &tmpWord);
+	stream->WriteWord( &tmpWord);
+	stream->WriteWord( &tmpWord);
+	stream->WriteWord( &tmpWord);
+	stream->WriteWord( &tmpWord);
+
+	strncpy(filling, ac->LongName, 32);
+	stream->Write( filling, 32);
+	stream->WriteDword( &ac->TalkCount);
+	stream->WriteDword( &ac->PCStats->BestKilledName);
+	stream->WriteDword( &ac->PCStats->BestKilledXP);
+	stream->WriteDword( &ac->PCStats->AwayTime);
+	stream->WriteDword( &ac->PCStats->JoinDate);
+	stream->WriteDword( &ac->PCStats->unknown10);
+	stream->WriteDword( &ac->PCStats->KillsChapterXP);
+	stream->WriteDword( &ac->PCStats->KillsChapterCount);
+	stream->WriteDword( &ac->PCStats->KillsTotalXP);
+	stream->WriteDword( &ac->PCStats->KillsTotalCount);
+	for (i=0;i<4;i++) {
+		stream->WriteResRef( ac->PCStats->FavouriteSpells[i]);
+	}
+	for (i=0;i<4;i++) {
+		stream->WriteWord( &ac->PCStats->FavouriteSpellsCount[i]);
+	}
+	for (i=0;i<4;i++) {
+		stream->WriteResRef( ac->PCStats->FavouriteWeapons[i]);
+	}
+	for (i=0;i<4;i++) {
+		stream->WriteWord( &ac->PCStats->FavouriteWeaponsCount[i]);
+	}
+	stream->Write( filling, 8); //soundset
 	return 0;
 }
 
@@ -571,19 +646,19 @@ int GAMImp::PutPCs(DataStream *stream, Game *game)
 	ieDword CREOffset = PCOffset + PCCount * PCSize;
 
 	for(i=0;i<PCCount;i++) {
-		Actor *ac = game->GetPC(i);
-                ieDword CRESize = am->GetStoredFileSize(ac);
+		Actor *ac = game->GetPC(i, false);
+		ieDword CRESize = am->GetStoredFileSize(ac);
 		PutActor(stream, ac, CRESize, CREOffset);
 		CREOffset += CRESize;
 	}
 
 	for(i=0;i<PCCount;i++) {
-		Actor *ac = game->GetPC(i);
-                //reconstructing offsets again
-                am->GetStoredFileSize(ac);
-                am->PutActor( stream, ac);
+		Actor *ac = game->GetPC(i, false);
+		//reconstructing offsets again
+		am->GetStoredFileSize(ac);
+		am->PutActor( stream, ac);
 	}
-        core->FreeInterface( am );
+	core->FreeInterface( am );
 	return 0;
 }
 
@@ -595,17 +670,17 @@ int GAMImp::PutNPCs(DataStream *stream, Game *game)
 
 	for(i=0;i<NPCCount;i++) {
 		Actor *ac = game->GetNPC(i);
-                ieDword CRESize = am->GetStoredFileSize(ac);
+		ieDword CRESize = am->GetStoredFileSize(ac);
 		PutActor(stream, ac, CRESize, CREOffset);
 		CREOffset += CRESize;
 	}
-	for(i=0;i<PCCount;i++) {
-		Actor *ac = game->GetPC(i);
-                //reconstructing offsets again
-                am->GetStoredFileSize(ac);
-                am->PutActor( stream, ac);
+	for(i=0;i<NPCCount;i++) {
+		Actor *ac = game->GetNPC(i);
+		//reconstructing offsets again
+		am->GetStoredFileSize(ac);
+		am->PutActor( stream, ac);
 	}
-        core->FreeInterface( am );
+	core->FreeInterface( am );
 	return 0;
 }
 

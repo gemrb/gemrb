@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.118 2005/06/17 19:33:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.119 2005/06/19 22:59:33 avenger_teambg Exp $
  *
  */
 
@@ -969,28 +969,27 @@ Animation *AREImp::GetAnimationPiece(AnimationFactory *af, int animCycle, AreaAn
 }
 
 int AREImp::GetStoredFileSize(Map *map)
-{  
+{
 	unsigned int i;
 	int headersize = map->version+0x11c;
 	ActorOffset = headersize;
 
-	ActorCount = (ieWord) map->GetActorCount();
+	//get only saved actors (no familiars or partymembers)
+	//summons?
+	ActorCount = (ieWord) map->GetActorCount(false);
 	headersize += ActorCount * 0x110;
 
-	//getting the embedded creature sizes
-	/* not for now
 	ActorMgr* am = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
 	EmbeddedCreOffset = headersize;
 
 	for (i=0;i<ActorCount;i++) {
-		headersize += am->GetStoredFileSize(map->GetActor(i) );
+		headersize += am->GetStoredFileSize(map->GetActor(i, false) );
 	}
 	core->FreeInterface(am);
-	*/
 
 	InfoPointsOffset = headersize;
 
-	InfoPointsCount = (ieWord) map->TMap->GetInfoPointCount();  
+	InfoPointsCount = (ieWord) map->TMap->GetInfoPointCount();
 	headersize += InfoPointsCount * 0xc4;
 	SpawnOffset = headersize;
 
@@ -1053,7 +1052,7 @@ int AREImp::GetStoredFileSize(Map *map)
 
 	int pst = core->HasFeature( GF_AUTOMAP_INI );
 	NoteCount = (ieDword) map->GetMapNoteCount();
-	headersize += NoteCount * (pst?0x214: 0xc0);
+	headersize += NoteCount * (pst?0x214: 0x22);
 	RestHeader = headersize;
 
 	headersize += 0xe4;
@@ -1444,7 +1443,7 @@ int AREImp::PutSpawns( DataStream *stream, Map *map)
 		stream->WriteDword( &sp->appearance);
 		stream->WriteWord( &sp->DayChance);
 		stream->WriteWord( &sp->NightChance);
-		stream->Write( filling, 56);  //most likely unused crap
+		stream->Write( filling, 56); //most likely unused crap
 	}
 	return 0;
 }
@@ -1457,10 +1456,10 @@ int AREImp::PutActors( DataStream *stream, Map *map)
 	char filling[120];
 	unsigned int i;
 
-//	ActorMgr *am = (ActorMgr *) core->GetInterface( IE_CRE_CLASS_ID );
+	ActorMgr *am = (ActorMgr *) core->GetInterface( IE_CRE_CLASS_ID );
 	memset(filling,0,sizeof(filling) );
 	for (i=0;i<ActorCount;i++) {
-		Actor *ac = map->GetActor(i);
+		Actor *ac = map->GetActor(i, false);
 
 		stream->Write( ac->GetScriptName(), 32);
 		tmpWord = (ieWord) ac->Pos.x;
@@ -1505,17 +1504,17 @@ int AREImp::PutActors( DataStream *stream, Map *map)
 		}
 		stream->Write( filling, 120);
 	}
-	/*
+
 	CreatureOffset = EmbeddedCreOffset;
 	for (i=0;i<ActorCount;i++) {
-		Actor *ac = map->GetActor(i);
+		Actor *ac = map->GetActor(i, false);
 
 		//reconstructing offsets again
 		am->GetStoredFileSize(ac);
 		am->PutActor( stream, ac);
 	}
 	core->FreeInterface( am);
-	*/
+
 	return 0;
 }
 
@@ -1532,7 +1531,7 @@ int AREImp::PutAnimations( DataStream *stream, Map *map)
 		stream->WriteWord( &tmpWord);
 		tmpWord = (ieWord) an->Pos.y;
 		stream->WriteWord( &tmpWord);
-		stream->WriteDword( &an->appearance);    
+		stream->WriteDword( &an->appearance);
 		stream->WriteResRef( an->BAM);
 		stream->WriteWord( &an->sequence);
 		stream->WriteWord( &an->frame);
@@ -1814,12 +1813,12 @@ int AREImp::PutArea(DataStream *stream, Map *map)
 		return ret;
 	}
 
-	ret = PutMapnotes( stream, map);
+	ret = PutExplored( stream, map);
 	if (ret) {
 		return ret;
 	}
 
-	ret = PutExplored( stream, map);
+	ret = PutMapnotes( stream, map);
 	if (ret) {
 		return ret;
 	}
@@ -1830,6 +1829,7 @@ int AREImp::PutArea(DataStream *stream, Map *map)
 	}
 
 	ret = PutSongHeader( stream, map);
+
 	return ret;
 }
 

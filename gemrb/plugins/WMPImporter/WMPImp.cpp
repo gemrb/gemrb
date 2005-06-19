@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.13 2005/06/14 22:29:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.14 2005/06/19 22:59:36 avenger_teambg Exp $
  *
  */
 
@@ -192,7 +192,7 @@ int WMPImp::PutWorldMap(DataStream *stream, WorldMapArray *wmap)
 		return -1;
 	}
 
-	stream->Write( "WMAP V1.0", 8);
+	stream->Write( "WMAPV1.0", 8);
 	stream->WriteDword( &WorldMapsCount);
 	stream->WriteDword( &WorldMapsOffset);
 
@@ -240,8 +240,8 @@ int WMPImp::PutAreas(DataStream *stream, WorldMap *wmap)
 		stream->WriteResRef( ae->LoadScreenResRef );
 
 		for (unsigned int dir = 0; dir < 4; dir++) {
-			str->ReadDword( &ae->AreaLinksIndex[dir] );
-			str->ReadDword( &ae->AreaLinksCount[dir] );
+			stream->WriteDword( &ae->AreaLinksIndex[dir] );
+			stream->WriteDword( &ae->AreaLinksCount[dir] );
 		}
 		stream->Write(filling,128);
 	}

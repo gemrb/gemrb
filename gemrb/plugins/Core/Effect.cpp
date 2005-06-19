@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.cpp,v 1.3 2005/04/03 21:00:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.cpp,v 1.4 2005/06/19 22:59:34 avenger_teambg Exp $
  *
  */
 
@@ -42,24 +42,25 @@ void AddEffect(Effect* fx, Actor* self, Actor* pretarget)
 	case FX_TARGET_PARTY:
 		game=core->GetGame();
 		for (i = game->GetPartySize(true); i >= 0; i--) {
-			Actor* actor = game->GetPC( i );
+			Actor* actor = game->GetPC( i, true );
 			actor->fxqueue.AddEffect( fx );
 		}
 		break;
 
 	case FX_TARGET_GLOBAL_INCL_PARTY:
 		map=self->GetCurrentArea();
-		for (i = map->GetActorCount(); i >= 0; i--) {
-			Actor* actor = map->GetActor( i );
+		for (i = map->GetActorCount(true); i >= 0; i--) {
+			Actor* actor = map->GetActor( i, true );
 			actor->fxqueue.AddEffect( fx );
 		}
 		break;
 
 	case FX_TARGET_GLOBAL_EXCL_PARTY:
 		map=self->GetCurrentArea();
-		for (i = map->GetActorCount(); i >= 0; i--) {
-			Actor* actor = map->GetActor( i );
-			if (actor->InParty) continue;
+		for (i = map->GetActorCount(false); i >= 0; i--) {
+			Actor* actor = map->GetActor( i, false );
+			//GetActorCount can now return all nonparty critters
+			//if (actor->InParty) continue;
 			actor->fxqueue.AddEffect( fx );
 		}
 		break;

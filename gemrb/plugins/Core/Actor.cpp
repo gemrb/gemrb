@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.108 2005/06/17 19:33:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.109 2005/06/19 22:59:33 avenger_teambg Exp $
  *
  */
 
@@ -163,6 +163,10 @@ Actor::Actor()
 	TalkCount = 0;
 	appearance = 0xffffff; //might be important for created creatures
 	version = 0;
+	//these are used only in iwd2 so we have to default them
+	for(i=0;i<7;i++) {
+		BaseStats[IE_HATEDRACE2+i]=0xff;
+	}	
 	//this one doesn't seem to get saved
 	ModalState = 0;
 }

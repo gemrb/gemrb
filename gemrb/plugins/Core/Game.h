@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.54 2005/06/14 22:29:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.55 2005/06/19 22:59:34 avenger_teambg Exp $
  *
  */
 
@@ -146,7 +146,7 @@ public:
 	/* returns the PC's slot count for partyID*/
 	int FindPlayer(unsigned int partyID);
 	/* returns actor by slot */
-	Actor* GetPC(unsigned int slot);
+	Actor* GetPC(unsigned int slot, bool onlyalive);
 	/* finds an actor in party by party ID, returns Actor, if not there, returns NULL*/
 	Actor* FindPC(unsigned int partyID);
 	Actor* FindNPC(unsigned int partyID);

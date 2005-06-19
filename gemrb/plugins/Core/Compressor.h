@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Compressor.h,v 1.4 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Compressor.h,v 1.5 2005/06/19 22:59:34 avenger_teambg Exp $
  *
  */
 
@@ -44,8 +44,10 @@ public:
 	virtual ~Compressor(void);
 	/** Initialization Function. Returns FALSE if there was an error during initialization, else returns TRUE. */
 	virtual int Init(void);
-	/** Decompress Function. 'Byte * dest' is the preallocated destination buffer, 'ulong* dlen' is a pointer to the destination buffer size, 'Byte * src' is the source buffer, 'ulong slen' is the source buffer size */
+	/** decompresses a datastream (memory or file) to a FILE * stream */
 	virtual int Decompress(FILE* dest, DataStream* source) = 0;
+	/** compresses a datastream (memory or file) to another DataStream */
+	virtual int Compress(DataStream *dest, DataStream* source) = 0;
 };
 
 #endif

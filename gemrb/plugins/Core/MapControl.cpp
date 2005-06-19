@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.32 2005/06/17 19:33:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.33 2005/06/19 22:59:34 avenger_teambg Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -186,9 +186,10 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 
 	int i;
 	// Draw PCs' ellipses
-	i = core->GetGame()->GetPartySize(false);
+	Game *game = core->GetGame();
+	i = game->GetPartySize(true);
 	while (i--) {
-		Actor* actor = core->GetGame()->GetPC( i );
+		Actor* actor = game->GetPC( i, true );
 		if (MyMap->HasActor(actor) ) {
 			video->DrawEllipse( GAME_TO_SCREENX(actor->Pos.x), GAME_TO_SCREENY(actor->Pos.y), 3, 2, actor->Selected ? colors[green] : colors[darkgreen], false );
 		}

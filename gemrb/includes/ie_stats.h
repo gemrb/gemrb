@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.32 2005/06/12 16:57:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.33 2005/06/19 22:59:31 avenger_teambg Exp $
  *
  */
 
@@ -122,6 +122,9 @@
 #define IE_SAVEVSPOLY		11
 #define IE_SAVEVSBREATH		12
 #define IE_SAVEVSSPELL		13
+#define IE_SAVEFORTITUDE 9
+#define IE_SAVEREFLEX 10
+#define IE_SAVEWILL 11
 #define IE_RESISTFIRE		14
 #define IE_RESISTCOLD		15
 #define IE_RESISTELECTRICITY	16
@@ -143,6 +146,7 @@
 #define IE_LUCK		32
 #define IE_TRACKING	33
 #define IE_LEVEL		34
+#define IE_LEVELFIGHTER  34 //for pst, iwd2
 #define IE_SEX		35
 #define IE_STR		36
 #define IE_STREXTRA	37
@@ -159,8 +163,8 @@
 #define IE_REPUTATION	48
 #define IE_HATEDRACE	49
 #define IE_DAMAGEBONUS	50
-#define IE_SPELLFAILUREMAGE	51 // In PST this stores secondary level exp
-#define IE_SPELLFAILUREPRIEST	52 // In PST this stores tertiary level exp
+#define IE_SPELLFAILUREMAGE	51 
+#define IE_SPELLFAILUREPRIEST	52 
 #define IE_SPELLDURATIONMODMAGE	53
 #define IE_SPELLDURATIONMODPRIEST	54
 #define IE_TURNUNDEADLEVEL	55
@@ -177,7 +181,9 @@
 #define IE_GREASE		66
 #define IE_WEB		67
 #define IE_LEVEL2   	   68
+#define IE_LEVELMAGE     68 //pst, iwd2
 #define IE_LEVEL3   	   69
+#define IE_LEVELTHIEF    69 //pst, iwd2
 #define IE_CASTERHOLD	70
 #define IE_ENCUMBRANCE    71
 #define IE_MISSILETHAC0BONUS	  72  
@@ -265,6 +271,16 @@
 #define IE_FORCESURGE   			  153
 #define IE_SURGEMOD 				  154
 #define IE_IMPROVEDHASTE			  155
+#define IE_INTERNAL_0            156
+#define IE_INTERNAL_1            157
+#define IE_INTERNAL_2            158
+#define IE_INTERNAL_3            159
+#define IE_INTERNAL_4            160
+#define IE_INTERNAL_5            161
+#define IE_INTERNAL_6            162
+#define IE_INTERNAL_7            163
+#define IE_INTERNAL_8            164
+#define IE_INTERNAL_9            165
 #define IE_SCRIPTINGSTATE1  		  156
 #define IE_SCRIPTINGSTATE2  		  157
 #define IE_SCRIPTINGSTATE3  		  158
@@ -292,15 +308,24 @@
 #define IE_MORALE               180 // this has no place
 //
 #define IE_ENABLEOFFSCREENAI    184 // bg2 has this on this spot
+//temporarily here for iwd2
+#define IE_HATEDRACE2       192
+#define IE_HATEDRACE3       193
+#define IE_HATEDRACE4       194
+#define IE_HATEDRACE5       195
+#define IE_HATEDRACE6       196
+#define IE_HATEDRACE7       197
+#define IE_HATEDRACE8       198
 //
 #define IE_STONESKINSGOLEM	199
 #define IE_LEVELDRAIN		200
+//GemRB Specific Defines
 #define IE_RACE			201
 #define IE_CLASS		202
 #define IE_GENERAL		203
 #define IE_EA			204
 #define IE_SPECIFIC		205
-//GemRB Specific Defines
+
 #define IE_ANIMATION_ID		206
 #define IE_STATE_ID		207
 #define IE_METAL_COLOR		208
@@ -313,7 +338,7 @@
 #define IE_HAIR_COLOR		214
 #define IE_COLORCOUNT		214 //same
 #define IE_MC_FLAGS		215
-//#define IE_TALKCOUNT		216, unused slot!
+#define IE_CLASSLEVELSUM		216 //iwd2
 #define IE_ALIGNMENT		217
 #define IE_UNSELECTABLE		218
 #define IE_ARMOR_TYPE		219
@@ -321,6 +346,7 @@
 #define IE_FACTION		221
 #define IE_SUBRACE		222
 #define IE_SPECIES              223
+//probably these should be stored in the spellbook structure
 #define IE_PRIESTBONUS1         224
 #define IE_PRIESTBONUS2         225
 #define IE_PRIESTBONUS3         226
@@ -337,21 +363,14 @@
 #define IE_WIZARDBONUS7         237
 #define IE_WIZARDBONUS8         238
 #define IE_WIZARDBONUS9         239
-//These are in original PST, IWD, IWD2, but not as stats
-#define IE_INTERNAL_0            240
-#define IE_INTERNAL_1            241
-#define IE_INTERNAL_2            242
-#define IE_INTERNAL_3            243
-#define IE_INTERNAL_4            244
-#define IE_INTERNAL_5            245
-#define IE_INTERNAL_6            246
-#define IE_INTERNAL_7            247
-#define IE_INTERNAL_8            248
-#define IE_INTERNAL_9            249
-#define IE_INTERNAL_A            250
-#define IE_INTERNAL_B            251
-#define IE_INTERNAL_C            252
-#define IE_INTERNAL_D            253
-#define IE_INTERNAL_E            254
-#define IE_INTERNAL_F            255
+//These are in IWD2, but in a different place
+#define IE_LEVELBARBARIAN        240 //iwd2 class levels (fighter, mage, thief are already stored)
+#define IE_LEVELBARD             241 
+#define IE_LEVELCLERIC           242 
+#define IE_LEVELDRUID            243
+#define IE_LEVELMONK             244
+#define IE_LEVELPALADIN          245
+#define IE_LEVELRANGER           246
+#define IE_LEVELSORCEROR         247
+// place for more classes
 #endif

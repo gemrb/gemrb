@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.11 2005/04/26 21:02:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.12 2005/06/19 22:59:34 avenger_teambg Exp $
  *
  */
 
@@ -57,14 +57,26 @@
 #define LSR_LEVEL   5  //insufficient level (low mage, etc level)
 #define LSR_FULL    6  //can't learn more spells of this level (due to level)
 
-const int NUM_SPELL_TYPES = 3;
-
 // !!! Keep these synchronized with GUIDefines.py !!!
 typedef enum ieSpellType {
 	IE_SPELL_TYPE_PRIEST = 0,
 	IE_SPELL_TYPE_WIZARD = 1,
 	IE_SPELL_TYPE_INNATE = 2
 } ieSpellType;
+
+typedef enum ieIWD2SpellType {
+	IE_IWD2_SPELL_BARD = 0,
+	IE_IWD2_SPELL_CLERIC = 1,
+	IE_IWD2_SPELL_DRUID = 2,
+	IE_IWD2_SPELL_PALADIN = 3,
+	IE_IWD2_SPELL_RANGER = 4,
+	IE_IWD2_SPELL_SORCEROR = 5,
+	IE_IWD2_SPELL_WIZARD = 6,
+	IE_IWD2_SPELL_DOMAIN = 7,
+	IE_IWD2_SPELL_INNATE = 8,
+	IE_IWD2_SPELL_SONG = 9,
+	IE_IWD2_SPELL_SHAPE = 10
+} ieIWD2SPellType;
 
 typedef struct CREKnownSpell {
 	ieResRef SpellResRef;
@@ -76,13 +88,6 @@ typedef struct CREMemorizedSpell {
 	ieResRef SpellResRef;
 	ieDword Flags;
 } CREMemorizedSpell;
-
-typedef struct CRECastSpell {    // IWD2 only
-	ieDword Type;
-	ieDword TotalCount;
-	ieDword RemainingCount;
-	ieDword Unknown0B;
-} CRECastSpell;
 
 typedef struct CRESpellMemorization {
 	ieWord  Level;
@@ -99,26 +104,33 @@ typedef struct CRESpellMemorization {
 
 class GEM_EXPORT Spellbook {
 private:
-	std::vector<CRESpellMemorization*> spells[NUM_SPELL_TYPES];
+	std::vector<CRESpellMemorization*> *spells;
 
 public: 
 	Spellbook();
-	virtual ~Spellbook();
+	~Spellbook();
+	static bool InitializeSpellbook();
+	static void ReleaseMemory();
 
 	void FreeSpellPage(CRESpellMemorization* sm);
+	/* check if the spell exists, optionally deplete it (casting) */
 	bool HaveSpell(const char *resref, ieDword flags);
 	bool HaveSpell(int spellid, ieDword flags);
 
 	bool AddSpellMemorization(CRESpellMemorization* sm);
-
-	unsigned int GetKnownSpellsCount(int type, unsigned int level);
+	int GetTypes() const;
+	unsigned int GetSpellLevelCount(int type) const;
+	unsigned int GetTotalPageCount() const;
+	unsigned int GetTotalKnownSpellsCount() const;
+	unsigned int GetTotalMemorizedSpellsCount() const;
+	unsigned int GetKnownSpellsCount(int type, unsigned int level) const;
 	bool AddKnownSpell(int type, unsigned int level, CREKnownSpell *spl);
 	CREKnownSpell* GetKnownSpell(int type, unsigned int level, unsigned int index);
-	unsigned int GetMemorizedSpellsCount(int type, unsigned int level);
+	unsigned int GetMemorizedSpellsCount(int type, unsigned int level) const;
 	CREMemorizedSpell* GetMemorizedSpell(int type, unsigned int level, unsigned int index);
 
-	int GetMemorizableSpellsCount(ieSpellType type, unsigned int level, bool bonus);
-	void SetMemorizableSpellsCount(int Value, ieSpellType type, unsigned int level, bool bonus);
+	int GetMemorizableSpellsCount(int type, unsigned int level, bool bonus) const;
+	void SetMemorizableSpellsCount(int Value, int type, unsigned int level, bool bonus);
 
 	/** Adds spell from known to memorized */
 	bool MemorizeSpell(CREKnownSpell* spl, bool usable);

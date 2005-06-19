@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.77 2005/06/14 22:29:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.78 2005/06/19 22:59:34 avenger_teambg Exp $
  *
  */
 
@@ -26,7 +26,7 @@
 #include "Interface.h"
 #include "../../includes/strrefs.h"
 
-#define MAX_MAPS_LOADED  2
+#define MAX_MAPS_LOADED 2
 
 Game::Game(void) : Scriptable( ST_GLOBAL )
 {
@@ -90,6 +90,14 @@ Game::~Game(void)
 	}
 }
 
+bool IsAlive(Actor *pc)
+{
+	if (pc->GetStat(IE_STATE_ID)&STATE_DEAD) {
+		return false;
+	}
+	return true;
+}
+
 int Game::FindPlayer(unsigned int partyID)
 {
 	for (unsigned int slot=0; slot<PCs.size(); slot++) {
@@ -138,9 +146,22 @@ Actor* Game::FindNPC(const char *scriptingname)
 	return NULL;
 }
 
-Actor* Game::GetPC(unsigned int slot)
+Actor* Game::GetPC(unsigned int slot, bool onlyalive)
 {
 	if (slot >= PCs.size()) {
+		return NULL;
+	}
+	if (onlyalive) {
+		unsigned int i=0;
+		while(slot && i<PCs.size() ) {
+			Actor *ac = PCs[i++];
+			
+			if (IsAlive(ac) ) {
+				if (slot--) {
+					return ac;
+				}
+			}
+		}
 		return NULL;
 	}
 	return PCs[slot];
@@ -243,7 +264,7 @@ int Game::GetPartySize(bool onlyalive)
 	if (onlyalive) {
 		int count = 0;
 		for (unsigned int i = 0; i < PCs.size(); i++) {
-			if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
+			if (!IsAlive(PCs[i])) {			
 				continue;
 			}
 			count++;
@@ -270,7 +291,7 @@ int Game::GetSelectedPCSingle()
 
 /*
  * SelectActor() - handle (de)selecting actors.
- *     If selection was changed, runs "SelectionChanged" handler
+ * If selection was changed, runs "SelectionChanged" handler
  *
  * actor - either specific actor, or NULL for all
  * select - whether actor(s) should be selected or deselected
@@ -523,7 +544,7 @@ int Game::AddNPC(Actor* npc)
 	slot = InParty( npc );
 	if (slot != -1) {
 		return -1;
-	}     //can't add as npc already in party
+	} //can't add as npc already in party
 	npc->InternalFlags|=IF_FROMGAME;
 	NPCs.push_back( npc );
 	return NPCs.size() - 1;

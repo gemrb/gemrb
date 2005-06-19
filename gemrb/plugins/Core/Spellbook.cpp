@@ -8,23 +8,116 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.22 2005/04/26 21:02:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.23 2005/06/19 22:59:34 avenger_teambg Exp $
  *
  */
 
-#include <stdio.h>
-#include "../../includes/win32def.h"
-#include "Spellbook.h"
+#include "Interface.h"
+
+static ieResRef *spelllist = NULL;
+static ieResRef *innatelist = NULL;
+static ieResRef *songlist = NULL;
+static ieResRef *shapelist = NULL;
+
+static bool SBInitialized = false;
+static int NUM_SPELL_TYPES = 3;
+/* temporarily out
+static ieResRef *ResolveSpellName(ieDword index)
+{
+	if (spelllist) {
+		return spelllist+index;
+	}
+	return NULL;
+}
+
+static ieResRef *ResolveInnateName(ieDword index)
+{
+	if (innatelist) {
+		return innatelist+index;
+	}
+	return NULL;
+}
+
+static ieResRef *ResolveSongName(ieDword index)
+{
+	if (songlist) {
+		return songlist+index;
+	}
+	return NULL;
+}
+
+static ieResRef *ResolveShapeName(ieDword index)
+{
+	if (shapelist) {
+		return shapelist+index;
+	}
+	return NULL;
+}
+*/
+static ieResRef *GetSpellTable(const ieResRef tableresref, int column)
+{
+	int table = core->LoadTable(tableresref);
+	if (table<0) {
+		return NULL;
+	}
+	TableMgr *tab = core->GetTable((unsigned int) table);
+	int count = tab->GetRowCount();
+	ieResRef *reslist = (ieResRef *) malloc (sizeof(ieResRef) * count);
+	for(int i = 0; i<count;i++) {
+		strnuprcpy(reslist[i], tab->QueryField(i, column), 8);
+	}
+	core->DelTable((unsigned int) table);
+	return reslist;
+}
 
 Spellbook::Spellbook()
 {
+	if (!SBInitialized) {
+		printMessage("Spellbook","Spellbook is not initialized, assuming BG2", LIGHT_RED);
+		NUM_SPELL_TYPES = 3;
+		SBInitialized = true;
+	}
+	spells = new std::vector<CRESpellMemorization*> [NUM_SPELL_TYPES];
+}
+
+
+bool Spellbook::InitializeSpellbook()
+{
+	if (!SBInitialized) {
+		SBInitialized=true;
+		if (core->HasFeature(GF_HAS_SPELLLIST)) {
+			spelllist = GetSpellTable("listspll",7); //this is fucked up
+			innatelist = GetSpellTable("listinnt",0);
+			songlist = GetSpellTable("listsong",0);
+			shapelist = GetSpellTable("listshap",0);
+		}
+		return true;
+	}
+	return false;
+}
+
+void Spellbook::ReleaseMemory()
+{
+	if(spelllist) {
+		free(spelllist);
+		spelllist=NULL;
+	}
+	if(innatelist) {
+		free(innatelist);
+		innatelist=NULL;
+	}
+	if(songlist) {
+		free(songlist);
+		songlist=NULL;
+	}
+	SBInitialized=false;
 }
 
 Spellbook::~Spellbook()
@@ -103,7 +196,50 @@ bool Spellbook::HaveSpell(const char *resref, ieDword flags)
 	return false;
 }
 
-unsigned int Spellbook::GetKnownSpellsCount(int type, unsigned int level)
+int Spellbook::GetTypes() const
+{
+	return NUM_SPELL_TYPES;
+}
+
+unsigned int Spellbook::GetSpellLevelCount(int type) const
+{
+	return spells[type].size();
+}
+
+unsigned int Spellbook::GetTotalPageCount() const
+{
+	unsigned int total = 0;
+	for(int type =0; type<NUM_SPELL_TYPES; type++) {
+		total += spells[type].size();
+	}
+	return total;
+}
+
+unsigned int Spellbook::GetTotalKnownSpellsCount() const
+{
+	unsigned int total = 0;
+	for(int type =0; type<NUM_SPELL_TYPES; type++) {
+		unsigned int level = spells[type].size();
+		while(level--) {
+			total += GetKnownSpellsCount(type, level);
+		}
+	}
+	return total;
+}
+
+unsigned int Spellbook::GetTotalMemorizedSpellsCount() const
+{
+	unsigned int total = 0;
+	for(int type =0; type<NUM_SPELL_TYPES; type++) {
+		unsigned int level = spells[type].size();
+		while(level--) {
+			total += GetMemorizedSpellsCount(type, level);
+		}
+	}
+	return total;
+}
+
+unsigned int Spellbook::GetKnownSpellsCount(int type, unsigned int level) const
 {
 	if (type >= NUM_SPELL_TYPES || level >= spells[type].size())
 		return 0;
@@ -136,7 +272,7 @@ CREKnownSpell* Spellbook::GetKnownSpell(int type, unsigned int level, unsigned i
 	return spells[type][level]->known_spells[index];
 }
 
-unsigned int Spellbook::GetMemorizedSpellsCount(int type, unsigned int level)
+unsigned int Spellbook::GetMemorizedSpellsCount(int type, unsigned int level) const
 {
 	if (type >= NUM_SPELL_TYPES || level >= spells[type].size())
 		return 0;
@@ -153,7 +289,8 @@ CREMemorizedSpell* Spellbook::GetMemorizedSpell(int type, unsigned int level, un
 bool Spellbook::AddSpellMemorization(CRESpellMemorization* sm)
 {
 	std::vector<CRESpellMemorization*>* s = &spells[sm->Type];
-	unsigned int level = sm->Level-1;
+	//when loading, level starts on 0
+	unsigned int level = sm->Level;
 	if (level > 8 ) {
 		return false;
 	}
@@ -169,7 +306,7 @@ bool Spellbook::AddSpellMemorization(CRESpellMemorization* sm)
 	return true;
 }
 
-void Spellbook::SetMemorizableSpellsCount(int Value, ieSpellType type, unsigned int level, bool bonus)
+void Spellbook::SetMemorizableSpellsCount(int Value, int type, unsigned int level, bool bonus)
 {
 	int diff;
 
@@ -197,7 +334,7 @@ void Spellbook::SetMemorizableSpellsCount(int Value, ieSpellType type, unsigned 
 	}
 }
 
-int Spellbook::GetMemorizableSpellsCount(ieSpellType type, unsigned int level, bool bonus)
+int Spellbook::GetMemorizableSpellsCount(int type, unsigned int level, bool bonus) const
 {
 	if (type >= NUM_SPELL_TYPES || level >= spells[type].size())
 		return 0;
@@ -283,21 +420,21 @@ void Spellbook::dump()
 				 sm->Level, sm->Number, sm->Number2, sm->Type, sm->MemorizedIndex, sm->MemorizedCount );
 
 			if (sm->known_spells.size()) 
-				printf( "  Known spells:\n" );
+				printf( " Known spells:\n" );
 			for (k = 0; k < sm->known_spells.size(); k++) {
 				CREKnownSpell* spl = sm->known_spells[k];
 				if (!spl) continue;
 
-				printf ( "  %2d: %8s  L: %d  T: %d\n", k, spl->SpellResRef, spl->Level, spl->Type );
+				printf ( " %2d: %8s L: %d T: %d\n", k, spl->SpellResRef, spl->Level, spl->Type );
 			}
 
 			if (sm->memorized_spells.size()) 
-				printf( "  Memorized spells:\n" );
+				printf( " Memorized spells:\n" );
 			for (k = 0; k < sm->memorized_spells.size (); k++) {
 				CREMemorizedSpell* spl = sm->memorized_spells[k];
 				if (!spl) continue;
 
-				printf ( "  %2u: %8s  %x\n", k, spl->SpellResRef, spl->Flags );
+				printf ( " %2u: %8s %x\n", k, spl->SpellResRef, spl->Flags );
 			}
 		}
 	}

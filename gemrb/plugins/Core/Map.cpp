@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.171 2005/06/17 19:33:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.172 2005/06/19 22:59:34 avenger_teambg Exp $
  *
  */
 
@@ -61,6 +61,16 @@ void Map::ReleaseMemory()
 			free(VisibilityMasks[i]);
 		}
 	}
+}
+
+//returns true if creature must be embedded in the area
+static bool MustSave(Actor *actor)
+{
+	if (actor->InParty) {
+		return false;
+	}
+	//check for familiars, summons?
+	return true;
 }
 
 void InitSpawnGroups()
@@ -360,7 +370,7 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 		if (EveryOne&CT_GO_CLOSER) {
 			int i=game->GetPartySize(false);
 			while (i--) {
-				Actor *pc = game->GetPC(i);
+				Actor *pc = game->GetPC(i,false);
 
 				pc->ClearPath();
 				pc->ClearActions();
@@ -371,7 +381,7 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 		if (EveryOne&CT_SELECTED) {
 			int i=game->GetPartySize(false);
 			while (i--) {
-				Actor *pc = game->GetPC(i);
+				Actor *pc = game->GetPC(i,false);
 				
 				if (!pc->IsSelected()) continue;
 				pc->ClearPath();
@@ -816,6 +826,37 @@ Actor* Map::GetActor(const char* Name)
 	return NULL;
 }
 
+int Map::GetActorCount(bool any) const
+{
+	if (any) {
+		return (int) actors.size();
+	}
+	int ret = 0;
+	unsigned int i=actors.size();
+	while(i--) {
+		if (MustSave(actors[i])) {
+			ret++;
+		}
+	}
+	return ret;
+}
+
+Actor* Map::GetActor(int index, bool any)
+{
+	if(any) {
+		return actors[index];
+	}
+	unsigned int i=0;
+	while(i<actors.size() ) {
+		Actor *ac = actors[i++];
+		if (MustSave(ac) ) {
+			if (!index--) {
+				return ac;
+			}
+		}
+	}
+	return NULL;
+}
 Actor* Map::GetActorByDialog(const char *resref)
 {
 	unsigned int i = actors.size();
@@ -1860,7 +1901,7 @@ Container* Map::AddContainer(const char* Name, unsigned short Type,
 	c->SetScriptName( Name );
 	c->Type = Type;
 	c->outline = outline;
-  c->SetMap(this);
+	c->SetMap(this);
 	TMap->AddContainer( c );
 	return c;
 }

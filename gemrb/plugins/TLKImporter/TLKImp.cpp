@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.47 2005/05/02 17:26:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.48 2005/06/19 22:59:36 avenger_teambg Exp $
  *
  */
 
@@ -117,7 +117,7 @@ inline Actor *GetActorFromSlot(int slot)
 		return NULL;
 	}
 	if(slot==0) {
-		return game->GetPC(0); //protagonist
+		return game->GetPC(0, false); //protagonist
 	}
 	return game->FindPC(slot);
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ArchiveImporter.h,v 1.6 2004/08/02 18:00:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ArchiveImporter.h,v 1.7 2005/06/19 22:59:33 avenger_teambg Exp $
  *
  */
 
@@ -41,9 +41,11 @@ class GEM_EXPORT ArchiveImporter : public Plugin {
 public:
 	ArchiveImporter(void);
 	virtual ~ArchiveImporter(void);
-	virtual int OpenArchive(char* filename) = 0;
+	virtual int OpenArchive(const char* filename) = 0;
+	virtual int CreateArchive(DataStream *stream) = 0;
 	//decompressing a .sav file similar to CBF
 	virtual int DecompressSaveGame(DataStream *compressed) = 0;
+	virtual int AddToSaveGame(DataStream *str, DataStream *uncompressed) = 0;
 	virtual DataStream* GetStream(unsigned long Resource, unsigned long Type) = 0;
 };
 

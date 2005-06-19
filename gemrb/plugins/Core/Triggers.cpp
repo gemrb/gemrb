@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.1 2005/06/17 19:33:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.2 2005/06/19 22:59:34 avenger_teambg Exp $
  *
  */
 
@@ -216,7 +216,7 @@ int GameScript::InPartyAllowDead(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::InPartySlot(Scriptable* Sender, Trigger* parameters)
 {
-	Actor *actor = core->GetGame()->GetPC(parameters->int0Parameter);
+	Actor *actor = core->GetGame()->GetPC(parameters->int0Parameter, false);
 	return MatchActor(Sender, actor, parameters->objectParameter);
 }
 
@@ -561,11 +561,11 @@ int GameScript::OnCreation(Scriptable* Sender, Trigger* /*parameters*/)
 int GameScript::NumItemsParty(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	int cnt = 0;
-	Actor *actor;
 	Game *game=core->GetGame();
 
-	//there is an assignment here
-	for (int i=0; (actor = game->GetPC(i)) ; i++) {
+	int i = game->GetPartySize(true);
+	while(i--) {
+		Actor *actor = game->GetPC(i, true);
 		cnt+=actor->inventory.CountItems(parameters->string0Parameter,1);
 	}
 	return cnt==parameters->int0Parameter;
@@ -574,11 +574,11 @@ int GameScript::NumItemsParty(Scriptable* /*Sender*/, Trigger* parameters)
 int GameScript::NumItemsPartyGT(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	int cnt = 0;
-	Actor *actor;
 	Game *game=core->GetGame();
 
-	//there is an assignment here
-	for (int i=0; (actor = game->GetPC(i)) ; i++) {
+	int i = game->GetPartySize(true);
+	while(i--) {
+		Actor *actor = game->GetPC(i, true);
 		cnt+=actor->inventory.CountItems(parameters->string0Parameter,1);
 	}
 	return cnt>parameters->int0Parameter;
@@ -587,11 +587,11 @@ int GameScript::NumItemsPartyGT(Scriptable* /*Sender*/, Trigger* parameters)
 int GameScript::NumItemsPartyLT(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	int cnt = 0;
-	Actor *actor;
 	Game *game=core->GetGame();
 
-	//there is an assignment here
-	for (int i=0; (actor = game->GetPC(i)) ; i++) {
+	int i = game->GetPartySize(true);
+	while(i--) {
+		Actor *actor = game->GetPC(i, true);
 		cnt+=actor->inventory.CountItems(parameters->string0Parameter,1);
 	}
 	return cnt<parameters->int0Parameter;
@@ -718,11 +718,11 @@ int GameScript::Acquired(Scriptable * Sender, Trigger* parameters)
 /** this is a GemRB extension */
 int GameScript::PartyHasItem(Scriptable * /*Sender*/, Trigger* parameters)
 {
-	Actor *actor;
 	Game *game=core->GetGame();
 
-	//there is an assignment here
-	for (int i=0; (actor = game->GetPC(i)) ; i++) {
+	int i = game->GetPartySize(true);
+	while(i--) {
+		Actor *actor = game->GetPC(i, true);
 		if (actor->inventory.HasItem(parameters->string0Parameter,parameters->int0Parameter) ) {
 			return 1;
 		}
@@ -732,11 +732,11 @@ int GameScript::PartyHasItem(Scriptable * /*Sender*/, Trigger* parameters)
 
 int GameScript::PartyHasItemIdentified(Scriptable * /*Sender*/, Trigger* parameters)
 {
-	Actor *actor;
 	Game *game=core->GetGame();
 
-	//there is an assignment here
-	for (int i=0; (actor = game->GetPC(i)) ; i++) {
+	int i = game->GetPartySize(true);
+	while(i--) {
+		Actor *actor = game->GetPC(i, true);
 		if (actor->inventory.HasItem(parameters->string0Parameter, IE_INV_ITEM_IDENTIFIED) ) {
 			return 1;
 		}
@@ -793,20 +793,21 @@ int GameScript::HaveAnySpells(Scriptable* Sender, Trigger* /*parameters*/)
 
 int GameScript::HaveSpellParty(Scriptable* /*Sender*/, Trigger *parameters)
 {
-	Actor *actor;
 	Game *game=core->GetGame();
 
+	int i = game->GetPartySize(true);
+
 	if (parameters->string0Parameter[0]) {
-		//there is an assignment here
-		for (int i=0; (actor = game->GetPC(i)) ; i++) {
+		while(i--) {
+			Actor *actor = game->GetPC(i, true);
 			if (actor->spellbook.HaveSpell(parameters->string0Parameter, 0) ) {
 				return 1;
 			}
 		}
 	}
-	else {
-		//there is an assignment here too
-		for (int i=0; (actor = game->GetPC(i)) ; i++) {
+	else {		
+		while(i--) {
+			Actor *actor = game->GetPC(i, true);
 			if (actor->spellbook.HaveSpell(parameters->int0Parameter, 0) ) {
 				return 1;
 			}
@@ -940,7 +941,7 @@ int GameScript::AtLocation( Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	if ( (tar->Pos.x==parameters->pointParameter.x) &&
-	     (tar->Pos.y==parameters->pointParameter.y) ) {
+		(tar->Pos.y==parameters->pointParameter.y) ) {
 		return 1;
 	}
 	return 0;
@@ -1676,7 +1677,7 @@ int GameScript::EntirePartyOnMap(Scriptable* /*Sender*/, Trigger* /*parameters*/
 	Game *game=core->GetGame();
 	int i=game->GetPartySize(false);
 	while (i--) {
-		Actor *actor=game->GetPC(i);
+		Actor *actor=game->GetPC(i,false);
 		if (strnicmp(game->CurrentArea, actor->Area, 8) ) return 0;
 	}
 	return 1;
@@ -1687,7 +1688,7 @@ int GameScript::AnyPCOnMap(Scriptable* /*Sender*/, Trigger* /*parameters*/)
 	Game *game=core->GetGame();
 	int i=game->GetPartySize(false);
 	while (i--) {
-		Actor *actor=game->GetPC(i);
+		Actor *actor=game->GetPC(i,false);
 		if (!strnicmp(game->CurrentArea, actor->Area, 8) ) return 1;
 	}
 	return 0;

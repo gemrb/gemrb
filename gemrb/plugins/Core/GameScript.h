@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.193 2005/06/18 21:52:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.194 2005/06/19 22:59:34 avenger_teambg Exp $
  *
  */
 
@@ -52,14 +52,14 @@ class Action;
 #define NEGATE_TRIGGER 1
 
 #define MAX_OBJECT_FIELDS	10
-#define MAX_NESTING			5
+#define MAX_NESTING		5
 
 #define GSASSERT(f,c) \
-  if(!(f))  \
-  {  \
-  printf("Assertion failed: %s [0x%08lX] Line %d",#f, c, __LINE__); \
-		abort(); \
-  }
+ if(!(f))  \
+ {  \
+ printf("Assertion failed: %s [0x%08lX] Line %d",#f, c, __LINE__); \
+	abort(); \
+ }
 
 #ifdef WIN32
 
@@ -680,7 +680,7 @@ public:
 	GameScript(ieResRef ResRef, unsigned char ScriptType,
 		Variables* local = NULL, int ScriptLevel = 0);
 	~GameScript();
-	const char *GetName() { return this?Name:"<NULL>"; }
+	const char *GetName() { return this?Name:"NONE\0\0\0\0"; }
 	//static void ReplaceMyArea(Scriptable* Sender, char* newVarName);
 	//static ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Context);
 	//static ieDword CheckVariable(Scriptable* Sender, const char* VarName);

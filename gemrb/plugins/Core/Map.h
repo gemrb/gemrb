@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.78 2005/06/17 19:33:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.79 2005/06/19 22:59:34 avenger_teambg Exp $
  *
  */
 
@@ -201,13 +201,13 @@ public:
 	int GetBlocked(Point &p);
 	Actor* GetActor(Point &p, int flags);
 	Actor* GetActor(const char* Name);
-	Actor* GetActor(int i) { return actors[i]; }
+	Actor* GetActor(int i, bool any);
 	Actor* GetActorByDialog(const char* resref);
 	bool HasActor(Actor *actor);
 	void RemoveActor(Actor* actor);
 	//returns actors in rect (onlyparty could be more sophisticated)
 	int GetActorInRect(Actor**& actors, Region& rgn, bool onlyparty);
-	int GetActorCount() const { return (int) actors.size(); }
+	int GetActorCount(bool any) const;
 
 	SongHeaderType SongHeader;
 	RestHeaderType RestHeader;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.320 2005/06/17 19:33:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.321 2005/06/19 22:59:34 avenger_teambg Exp $
  *
  */
 
@@ -269,7 +269,7 @@ static PyObject* GemRB_EnterGame(PyObject*, PyObject* /*args*/)
 		return RuntimeError( "No game loaded!" );
 	}
 	GameControl* gc = StartGameControl();
-	Actor* actor = game->GetPC (0);
+	Actor* actor = game->GetPC (0, false);
 	gc->ChangeMap(actor, true);
 
 	Py_INCREF( Py_None );
@@ -2377,7 +2377,7 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 	flags=0;
 	Game *game=core->GetGame();
 	if (game) {
-		Scriptable *pc=game->GetPC(game->GetSelectedPCSingle());
+		Scriptable *pc=game->GetPC(game->GetSelectedPCSingle(), false);
 		if (pc) {
 			XPos=pc->Pos.x;
 			YPos=pc->Pos.y;
@@ -3238,7 +3238,7 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "No game loaded!" );
 	}
 	PlayerSlot = game->FindPlayer( PlayerSlot );
-	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot );
+	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot, false );
 	if (!MyActor) {
 		return NULL;
 	}
@@ -3403,7 +3403,7 @@ static PyObject* GemRB_GameIsPCSelected(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "No game loaded!" );
 	}
 	PlayerSlot = game->FindPlayer( PlayerSlot );
-	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot );
+	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot, false );
 	if (!MyActor) {
 		return PyInt_FromLong( 0 );
 	}
@@ -3470,7 +3470,7 @@ static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "No game loaded!" );
 	}
 	PlayerSlot = game->FindPlayer( PlayerSlot );
-	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot );
+	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot, false );
 	if (!MyActor) {
 		return PyString_FromString( "");
 	}
@@ -3533,7 +3533,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "No game loaded!" );
 	}
 	PlayerSlot = game->FindPlayer( PlayerSlot );
-	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot );
+	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot, false );
 	if (!MyActor) {
 		return NULL;
 	}
@@ -4414,7 +4414,7 @@ static PyObject* GemRB_MoveToArea(PyObject * /*self*/, PyObject* args)
 	}
 	int i = game->GetPartySize(true);
 	while (i--) {
-		Actor* actor = game->GetPC(i);
+		Actor* actor = game->GetPC(i, false);
 		if (!actor->Selected) {
 			continue;
 		}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ZLibMgr/ZLibManager.h,v 1.5 2004/02/24 22:20:35 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ZLibMgr/ZLibManager.h,v 1.6 2005/06/19 22:59:36 avenger_teambg Exp $
  *
  */
 
@@ -30,6 +30,8 @@ public:
 	~ZLibManager(void);
 	// ZLib Decompression Routine
 	int Decompress(FILE* dest, DataStream* source);
+	// ZLib Compression
+	int Compress(DataStream* dest, DataStream* source);
 public:
 	void release(void)
 	{

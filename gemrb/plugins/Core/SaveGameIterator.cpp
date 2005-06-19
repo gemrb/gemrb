@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.25 2005/06/14 22:29:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.26 2005/06/19 22:59:34 avenger_teambg Exp $
  *
  */
 
@@ -88,10 +88,6 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 #ifndef WIN32
 	ResolveFilePath( ftmp );
 #endif
-	//FILE* exist = fopen( ftmp, "rb" );
-	//if (!exist)
-	//	return false;
-	//fclose( exist );
 	if (access( ftmp, R_OK ))
 		return false;
 
@@ -186,21 +182,24 @@ SaveGame* SaveGameIterator::GetSaveGame(int index)
 	return sg;
 }
 
+bool SaveGameIterator::ExistingSlotName(int index)
+{
+	char strindex[10];
+
+	snprintf(strindex, sizeof(strindex), "%09d", index);
+	unsigned int i=GetSaveGameCount();
+	while(i--) {
+		if (!strnicmp(save_slots[i], strindex, 9) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
 int SaveGameIterator::CreateSaveGame(int index, const char *slotname)
 {
 	char Path[_MAX_PATH];
 
-	if (index < 0 || index >= GetSaveGameCount()) {
-		index=GetSaveGameCount();
-	} else {
-		char* oldslotname  = save_slots[index];
-		snprintf( Path, _MAX_PATH, "%s%s%s%s", core->SavePath, PlayMode(), SPathDelimiter, oldslotname );
-		core->DelTree(Path, false);
-		rmdir(Path);
-	}
-	snprintf( Path, _MAX_PATH, "%s%s%s%s", core->SavePath, PlayMode(), SPathDelimiter, slotname );
-	mkdir(Path,S_IWRITE|S_IREAD);
-	//save files here
 	//some of these restrictions might not be needed
 	if (core->GetCurrentStore()) {
 		return 1; //can't save while store is open
@@ -209,6 +208,28 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname)
 	if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
 		return 2; //can't save while in dialog?
 	}
+
+	//if index is not an existing savegame, we create a unique slotname
+	if (index < 0 || index >= GetSaveGameCount()) {
+		index=GetSaveGameCount();
+		//leave space for autosaves
+		//probably the hardcoded slot names should be read by this object
+		//in that case 5 == size of hardcoded slot names array (savegame.2da)
+		if (index<5) {
+			index=5; 
+		}
+		while(ExistingSlotName(index) ) {
+			index++;
+		}
+	} else {
+		char* oldslotname  = save_slots[index];
+		snprintf( Path, _MAX_PATH, "%s%s%s%s", core->SavePath, PlayMode(), SPathDelimiter, oldslotname );
+		core->DelTree(Path, false);
+		rmdir(Path);
+	}
+	snprintf( Path, _MAX_PATH, "%s%s%s%09d-%s", core->SavePath, PlayMode(), SPathDelimiter, index, slotname );
+	mkdir(Path,S_IWRITE|S_IREAD);
+	//save files here
 
 	Game *game = core->GetGame();
 	//saving areas to cache currently in memory
@@ -246,7 +267,6 @@ void SaveGameIterator::DeleteSaveGame(int index)
 		return;
 
 	char* slotname  = save_slots[index];
-
 
 	char Path[_MAX_PATH];
 	snprintf( Path, _MAX_PATH, "%s%s%s%s", core->SavePath, PlayMode(), SPathDelimiter, slotname );

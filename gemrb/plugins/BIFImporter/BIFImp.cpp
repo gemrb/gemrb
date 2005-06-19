@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.20 2004/10/17 15:37:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.21 2005/06/19 22:59:33 avenger_teambg Exp $
  *
  */
 
@@ -77,14 +77,60 @@ int BIFImp::DecompressSaveGame(DataStream *compressed)
 		core->FreeInterface( comp );
 		fclose( in_cache );
 		Current = compressed->Remains();
-		//starting at 50% going up to 100%
-		core->LoadProgress( 50+(All-Current)*50/All );
+		//starting at 25% going up to 75%
+		core->LoadProgress( 25+(All-Current)*50/All );
 	}
 	while(Current);
 	return GEM_OK;
 }
 
-int BIFImp::OpenArchive(char* filename)
+//this one can create .sav files only
+int BIFImp::CreateArchive(DataStream *compressed)
+{
+	if (stream) {
+		delete( stream );
+		stream = NULL;
+	}
+	if (!compressed) {
+		return GEM_ERROR;
+	}
+	char Signature[8];
+	
+	memcpy(Signature,"SAV V1.0",8);
+	compressed->Write(Signature, 8);
+
+	return GEM_OK;
+}
+
+int BIFImp::AddToSaveGame(DataStream *str, DataStream *uncompressed)
+{
+	ieDword fnlen, declen, complen;
+
+	fnlen = strlen(uncompressed->filename)+1;
+	declen = uncompressed->Size();
+	str->WriteDword( &fnlen);
+	str->Write( uncompressed->filename, fnlen);
+	str->WriteDword( &declen);
+	//baaah
+	complen = 0xcdcdcdcd;
+	unsigned long Pos = str->GetPos();
+	str->WriteDword( &complen);
+
+	Compressor* comp = ( Compressor* )
+		core->GetInterface( IE_COMPRESSION_CLASS_ID );  
+	comp->Compress( str, uncompressed );
+	core->FreeInterface( comp );
+
+	//writing compressed length (calculated)
+	unsigned long Pos2 = str->GetPos();
+	str->Seek(Pos, GEM_STREAM_START);
+	complen = Pos2-Pos;
+	str->WriteDword( &complen);
+	str->Seek(Pos2, GEM_STREAM_START);
+	return GEM_OK;
+}
+
+int BIFImp::OpenArchive(const char* filename)
 {
 	if (stream) {
 		delete( stream );
@@ -188,7 +234,7 @@ int BIFImp::OpenArchive(char* filename)
 			if (( int ) ( finalsize * ( 10.0 / unCompBifSize ) ) != laststep) {
 				laststep++;
 				printf( "\b\b\b\b\b\b\b\b\b\b\b" );
-			        int l;
+				int l;
 
 				for (l = 0; l < laststep; l++)
 					printf( "|" );

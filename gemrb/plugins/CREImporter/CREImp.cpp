@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.74 2005/06/12 16:57:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.75 2005/06/19 22:59:33 avenger_teambg Exp $
  *
  */
 
@@ -85,6 +85,11 @@ bool CREImp::Open(DataStream* stream, bool autoFree)
 		CREVersion = IE_CRE_V9_0;
 		return true;
 	}
+	if (strncmp( Signature, "CRE V0.0", 8 ) == 0) {
+		CREVersion = IE_CRE_GEMRB;
+		return true;
+	}
+
 	printf( "[CREImporter]: Not a CRE File or File Version not supported: %8.8s\n", Signature );
 	return false;
 }
@@ -243,7 +248,6 @@ Actor* CREImp::GetActor()
 		SetupColor(act->BaseStats[IE_METAL_COLOR+i]);
 	}
 
-	ieByte TotSCEFF;
 	str->Read( &TotSCEFF, 1 );
 	str->ReadResRef( act->SmallPortrait );
 	str->ReadResRef( act->LargePortrait );
@@ -823,13 +827,39 @@ void CREImp::GetActorIWD2(Actor *act)
 	act->BaseStats[IE_RESISTMISSILE]=(ieByteSigned) tmpByte;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_MAGICDAMAGERESISTANCE]=(ieByteSigned) tmpByte;
-	str->Seek( 6, GEM_CURRENT_POS );
+	str->Seek( 4, GEM_CURRENT_POS );
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_FATIGUE]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_INTOXICATION]=tmpByte;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_LUCK]=tmpByte;
 	str->Seek( 34, GEM_CURRENT_POS ); //unknowns
 	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_LEVEL]=tmpByte; //total levels
-	str->Seek( 33, GEM_CURRENT_POS ); //levels for classes
+	act->BaseStats[IE_CLASSLEVELSUM]=tmpByte; //total levels
+	str->Read( & tmpByte, 1 );
+	act->BaseStats[IE_LEVELBARBARIAN]=tmpByte;
+	str->Read( & tmpByte, 1 );
+	act->BaseStats[IE_LEVELBARD]=tmpByte;
+	str->Read( & tmpByte, 1 );
+	act->BaseStats[IE_LEVELCLERIC]=tmpByte;
+	str->Read( & tmpByte, 1 );
+	act->BaseStats[IE_LEVELDRUID]=tmpByte;
+	str->Read( & tmpByte, 1 );
+	act->BaseStats[IE_LEVELFIGHTER]=tmpByte;
+	str->Read( & tmpByte, 1 );
+	act->BaseStats[IE_LEVELMAGE]=tmpByte;
+	str->Read( & tmpByte, 1 );
+	act->BaseStats[IE_LEVELMONK]=tmpByte;
+	str->Read( & tmpByte, 1 );
+	act->BaseStats[IE_LEVELPALADIN]=tmpByte;
+	str->Read( & tmpByte, 1 );
+	act->BaseStats[IE_LEVELRANGER]=tmpByte;
+	str->Read( & tmpByte, 1 );
+	act->BaseStats[IE_LEVELTHIEF]=tmpByte;
+	str->Read( & tmpByte, 1 );
+	act->BaseStats[IE_LEVELSORCEROR]=tmpByte;
+	str->Seek( 22, GEM_CURRENT_POS ); //levels for classes
 	for(i=0;i<64;i++) {
 		str->ReadDword( &act->StrRefs[i] );
 	}
@@ -841,7 +871,11 @@ void CREImp::GetActorIWD2(Actor *act)
 	str->Seek( 159, GEM_CURRENT_POS );
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_HATEDRACE]=tmpByte;
-	str->Seek( 7, GEM_CURRENT_POS ); //actually we got 7 more hated races
+	//we got 7 more hated races
+	for(i=0;i<7;i++) {
+		str->Read( &tmpByte, 1 );
+		act->BaseStats[IE_HATEDRACE2+i]=tmpByte;
+	}	
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_SUBRACE]=tmpByte;
 	str->ReadWord( &tmpWord );
@@ -1081,25 +1115,71 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 int CREImp::GetStoredFileSize(Actor *actor)
 {
 	int headersize;
+	int Inventory_Size;
+	int i;
 
 	switch (actor->version) {
 		case IE_CRE_GEMRB:
+			headersize = 0x2d4;
+			Inventory_Size=actor->inventory.GetSlotCount();
+			break;
 		case IE_CRE_V1_0://bg1/bg2
 			headersize = 0x2d4;
+			Inventory_Size=38;
 			break;
 		case IE_CRE_V1_2: //pst
 			headersize = 0x378;
+			Inventory_Size=46;
 			break;
 		case IE_CRE_V2_2://iwd2
 			headersize = 0x33c; //?
+			Inventory_Size=50; 
 			break;
 		case IE_CRE_V9_0://iwd
 			headersize = 0x33c;
+			Inventory_Size=38; 
 			break;
 		default:
 			return -1;
 	}
-	return headersize;
+	KnownSpellsOffset = headersize;
+
+	//adding known spells
+	KnownSpellsCount = actor->spellbook.GetTotalKnownSpellsCount();
+	headersize += KnownSpellsCount * 16;
+	SpellMemorizationOffset = headersize;
+
+	//adding spell pages
+	SpellMemorizationCount = actor->spellbook.GetTotalPageCount();
+	headersize += SpellMemorizationCount * 16;
+	MemorizedSpellsOffset = headersize;
+
+	MemorizedSpellsCount = actor->spellbook.GetTotalMemorizedSpellsCount();
+	headersize += MemorizedSpellsCount * 12;
+	EffectsOffset = headersize;
+
+	//adding effects
+	EffectsCount = actor->locals->GetCount();
+	if (TotSCEFF) {
+		headersize += EffectsCount * 0x10;
+	} else {
+		headersize += EffectsCount * 0x20;
+	}
+	ItemsOffset = headersize;
+
+	//counting items (calculating item storage)
+	ItemsCount = 0;
+	for(i=0;i<Inventory_Size;i++) {
+		CREItem *it = actor->inventory.GetSlotItem(i);
+		if (it) {
+			ItemsCount++;
+		}
+	}
+	headersize += ItemsCount * 20;
+	ItemSlotsOffset = headersize;
+
+	//adding in itemslot table
+	return headersize + (Inventory_Size+1)*sizeof(ieWord);
 }
 
 int CREImp::PutInventory(DataStream *stream, Actor *actor, unsigned int size)
@@ -1137,7 +1217,9 @@ int CREImp::PutInventory(DataStream *stream, Actor *actor, unsigned int size)
 int CREImp::PutHeader(DataStream *stream, Actor *actor)
 {
 	char Signature[8];
+	ieByte tmpByte;
 	ieWord tmpWord;
+	int i;
 
 	memcpy( Signature, "CRE V0.0", 8);
 	Signature[5]+=actor->version/10;
@@ -1155,7 +1237,7 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 	tmpWord = actor->BaseStats[IE_MAXHITPOINTS];
 	stream->WriteWord( &tmpWord);
 	stream->WriteDword( &actor->BaseStats[IE_ANIMATION_ID]);
-	for(int i=0;i<7;i++) {
+	for(i=0;i<7;i++) {
 		Signature[i] = (char) actor->BaseStats[IE_METAL_COLOR+i];
 	}
 	//old effect type (additional check needed for bg1)
@@ -1165,84 +1247,455 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 		Signature[8] = 1;
 	}
 	stream->Write( Signature, 8);
+	//clearing it again to use as filling
+	memset(Signature, 0, sizeof(Signature));
 	stream->WriteResRef( actor->SmallPortrait);
 	stream->WriteResRef( actor->LargePortrait);
+	tmpByte = actor->BaseStats[IE_REPUTATION];
+	stream->Write( &tmpByte, 1 );
+	tmpByte = actor->BaseStats[IE_HIDEINSHADOWS];
+	stream->Write( &tmpByte, 1 );
+	//from here it differs, slightly
+	tmpWord = actor->BaseStats[IE_ARMORCLASS];
+	stream->WriteWord( &tmpWord);
+	//iwd2 doesn't store this, probably we shouldn't either?
+	if (actor->version != IE_CRE_V2_2) {
+		tmpWord = actor->Modified[IE_ARMORCLASS];
+		stream->WriteWord( &tmpWord);
+	}
+	tmpWord = actor->BaseStats[IE_ACCRUSHINGMOD];
+	stream->WriteWord( &tmpWord);
+	tmpWord = actor->BaseStats[IE_ACMISSILEMOD];
+	stream->WriteWord( &tmpWord);
+	tmpWord = actor->BaseStats[IE_ACPIERCINGMOD];
+	stream->WriteWord( &tmpWord);
+	tmpWord = actor->BaseStats[IE_ACSLASHINGMOD];
+	stream->WriteWord( &tmpWord);
+	tmpByte = actor->BaseStats[IE_THAC0];
+	stream->Write( &tmpByte, 1);
+	tmpByte = actor->BaseStats[IE_NUMBEROFATTACKS];
+	stream->Write( &tmpByte, 1);
+	if (actor->version == IE_CRE_V2_2) {
+		tmpByte = actor->BaseStats[IE_SAVEFORTITUDE];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_SAVEREFLEX];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_SAVEWILL];
+		stream->Write( &tmpByte,1);
+	} else {
+		tmpByte = actor->BaseStats[IE_SAVEVSDEATH];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_SAVEVSWANDS];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_SAVEVSPOLY];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_SAVEVSBREATH];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_SAVEVSSPELL];
+		stream->Write( &tmpByte,1);
+	}
+	tmpByte = actor->BaseStats[IE_RESISTFIRE];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_RESISTCOLD];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_RESISTELECTRICITY];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_RESISTACID];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_RESISTMAGIC];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_RESISTMAGICFIRE];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_RESISTMAGICCOLD];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_RESISTSLASHING];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_RESISTCRUSHING];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_RESISTPIERCING];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_RESISTMISSILE];
+	stream->Write( &tmpByte,1);
+	if (actor->version == IE_CRE_V2_2) {
+		tmpByte = actor->BaseStats[IE_MAGICDAMAGERESISTANCE];
+		stream->Write( &tmpByte,1);
+		stream->Write( Signature, 4);
+	} else {
+		tmpByte = actor->BaseStats[IE_DETECTILLUSIONS];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_SETTRAPS];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_LORE];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_LOCKPICKING];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_STEALTH];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_TRAPS];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_PICKPOCKET];
+		stream->Write( &tmpByte,1);
+	}
+	tmpByte = actor->BaseStats[IE_FATIGUE];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_INTOXICATION];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_LUCK];
+	stream->Write( &tmpByte,1);
 
+	if (actor->version == IE_CRE_V2_2) {
+		//this is rather fuzzy
+		//turnundead level, + 33 bytes of zero
+		tmpByte = actor->BaseStats[IE_TURNUNDEADLEVEL];
+		stream->Write(&tmpByte,1);
+		tmpByte = 0;
+		stream->Write(&tmpByte,1);
+		for (i=0;i<4;i++) {
+			stream->Write(Signature, 8);
+		}
+		//total levels
+		tmpByte = actor->BaseStats[IE_CLASSLEVELSUM];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_LEVELBARBARIAN];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_LEVELBARD];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_LEVELCLERIC];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_LEVELDRUID];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_LEVELFIGHTER];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_LEVELMONK];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_LEVELPALADIN];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_LEVELRANGER];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_LEVELTHIEF];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_LEVELSORCEROR];
+		stream->Write( &tmpByte,1);
+		for (i=0;i<64;i++) {
+			stream->WriteDword( &actor->StrRefs[i]);
+		}
+	} else {
+		for (i=0;i<21;i++) {
+			tmpByte = actor->BaseStats[IE_PROFICIENCYBASTARDSWORD+i];
+			stream->Write( &tmpByte,1);
+		}
+		tmpByte = actor->BaseStats[IE_TRACKING];
+		stream->Write( &tmpByte,1);
+		for (i=0;i<4;i++)
+		{
+			stream->Write( Signature, 8);
+		}
+		for (i=0;i<100;i++) {
+			stream->WriteDword( &actor->StrRefs[i]);
+		}
+		tmpByte = actor->BaseStats[IE_LEVEL];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_LEVEL2];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_LEVEL3];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_SEX]; //
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_STR];
+		stream->Write( &tmpByte,1);
+		if (actor->version!=IE_CRE_V2_2) {
+			tmpByte = actor->BaseStats[IE_STREXTRA];
+			stream->Write( &tmpByte,1);
+		}
+		tmpByte = actor->BaseStats[IE_INT];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_WIS];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_DEX];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_CON];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_CHR];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_MORALE];
+		stream->Write( &tmpByte,1);
+		tmpByte = actor->BaseStats[IE_MORALEBREAK];
+		stream->Write( &tmpByte,1);
+		if (actor->version!=IE_CRE_V2_2) {
+			tmpByte = actor->BaseStats[IE_HATEDRACE];
+			stream->Write( &tmpByte,1);
+		}
+		tmpByte = actor->BaseStats[IE_MORALERECOVERYTIME];
+		stream->Write( &tmpByte,1);
+		// unknown byte
+		stream->Write( &Signature,1);
+		stream->WriteDword( &actor->BaseStats[IE_KIT] );
+		stream->WriteResRef( actor->Scripts[0]->GetName() );
+		stream->WriteResRef( actor->Scripts[2]->GetName() );
+		stream->WriteResRef( actor->Scripts[3]->GetName() );
+		stream->WriteResRef( actor->Scripts[4]->GetName() );
+		stream->WriteResRef( actor->Scripts[5]->GetName() );
+	}
+	//now follows the fuzzy part in separate putactor... functions
 	return 0;
 }
 
 int CREImp::PutActorGemRB(DataStream *stream, Actor *actor)
 {
 	ieByte tmpByte;
+	char filling[5];
 
-	tmpByte = actor->BaseStats[IE_REPUTATION];
-	stream->Write( &tmpByte, 1 );
-	tmpByte = actor->BaseStats[IE_HIDEINSHADOWS];
-	stream->Write( &tmpByte, 1 );
+	memset(filling,0,sizeof(filling));
+	//similar in all engines
+	tmpByte = actor->BaseStats[IE_EA];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_GENERAL];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_RACE];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_CLASS];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_SPECIFIC];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_SEX];
+	stream->Write( &tmpByte,1);
+	stream->Write( filling, 5); //unknown bytes
+	tmpByte = actor->BaseStats[IE_ALIGNMENT];
+	stream->Write( &tmpByte,1);
+	stream->Write( filling,4); //this is called ID in iwd2, and contains 2 words
+	stream->Write( actor->GetScriptName(), 32);
 	return 0;
 }
 
 int CREImp::PutActorBG(DataStream *stream, Actor *actor)
 {
 	ieByte tmpByte;
+	char filling[5];
 
-	tmpByte = actor->BaseStats[IE_REPUTATION];
-	stream->Write( &tmpByte, 1 );
-	tmpByte = actor->BaseStats[IE_HIDEINSHADOWS];
-	stream->Write( &tmpByte, 1 );
+	memset(filling,0,sizeof(filling));
+	//similar in all engines
+	tmpByte = actor->BaseStats[IE_EA];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_GENERAL];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_RACE];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_CLASS];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_SPECIFIC];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_SEX];
+	stream->Write( &tmpByte,1);
+	stream->Write( filling, 5); //unknown bytes
+	tmpByte = actor->BaseStats[IE_ALIGNMENT];
+	stream->Write( &tmpByte,1);
+	stream->Write( filling,4); //this is called ID in iwd2, and contains 2 words
+	stream->Write( actor->GetScriptName(), 32);
 	return 0;
 }
 
 int CREImp::PutActorPST(DataStream *stream, Actor *actor)
 {
 	ieByte tmpByte;
+	ieWord tmpWord;
+	int i;
+	char filling[44];
 
-	tmpByte = actor->BaseStats[IE_REPUTATION];
-	stream->Write( &tmpByte, 1 );
-	tmpByte = actor->BaseStats[IE_HIDEINSHADOWS];
-	stream->Write( &tmpByte, 1 );
+	memset(filling,0,sizeof(filling));
+	stream->Write(filling, 44); //11*4 totally unknown
+	stream->WriteDword( &actor->BaseStats[IE_XP_MAGE]);
+	stream->WriteDword( &actor->BaseStats[IE_XP_THIEF]);
+	for(i = 0; i<10; i++) {
+		tmpWord = actor->BaseStats[IE_INTERNAL_0];
+		stream->WriteWord( &tmpWord );
+	}
+	stream->Write(filling,4); //unknown
+	stream->Write(actor->KillVar, 32);
+	stream->Write(filling,3); //unknown
+	tmpByte=actor->BaseStats[IE_COLORCOUNT];
+	stream->Write( &tmpByte, 1);
+	stream->WriteWord( &actor->AppearanceFlags1);
+	stream->WriteWord( &actor->AppearanceFlags2);
+	for(i=0;i<7;i++) {
+		tmpWord = actor->BaseStats[IE_COLORS+i];
+		stream->WriteWord( &tmpWord);
+	}
+	stream->Write(filling,31);
+	tmpByte = actor->BaseStats[IE_SPECIES];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_TEAM];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_FACTION];
+	stream->Write( &tmpByte,1);
+	//similar in all engines
+	tmpByte = actor->BaseStats[IE_EA];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_GENERAL];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_RACE];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_CLASS];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_SPECIFIC];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_SEX];
+	stream->Write( &tmpByte,1);
+	stream->Write( filling, 5); //unknown bytes
+	tmpByte = actor->BaseStats[IE_ALIGNMENT];
+	stream->Write( &tmpByte,1);
+	stream->Write( filling,4); //this is called ID in iwd2, and contains 2 words
+	stream->Write( actor->GetScriptName(), 32);
 	return 0;
 }
 
 int CREImp::PutActorIWD1(DataStream *stream, Actor *actor)
 {
 	ieByte tmpByte;
+	char filling[52];
 
-	tmpByte = actor->BaseStats[IE_REPUTATION];
-	stream->Write( &tmpByte, 1 );
-	tmpByte = actor->BaseStats[IE_HIDEINSHADOWS];
-	stream->Write( &tmpByte, 1 );
+	memset(filling,0,sizeof(filling));
+	stream->Write(filling, 28); //7*4 totally unknown
+	stream->Write(actor->KillVar, 32); //some variable names in iwd
+	stream->Write(actor->KillVar, 32); //some variable names in iwd
+	stream->Write(filling, 52); //13*4 totally unknown
+	//similar in all engines
+	tmpByte = actor->BaseStats[IE_EA];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_GENERAL];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_RACE];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_CLASS];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_SPECIFIC];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_SEX];
+	stream->Write( &tmpByte,1);
+	stream->Write( filling, 5); //unknown bytes
+	tmpByte = actor->BaseStats[IE_ALIGNMENT];
+	stream->Write( &tmpByte,1);
+	stream->Write( filling,4); //this is called ID in iwd2, and contains 2 words
+	stream->Write( actor->GetScriptName(), 32);
 	return 0;
 }
 
 int CREImp::PutActorIWD2(DataStream *stream, Actor *actor)
 {
 	ieByte tmpByte;
+	char filling[5];
 
-	tmpByte = actor->BaseStats[IE_REPUTATION];
-	stream->Write( &tmpByte, 1 );
-	tmpByte = actor->BaseStats[IE_HIDEINSHADOWS];
-	stream->Write( &tmpByte, 1 );
+	memset(filling,0,sizeof(filling) );
+	//similar in all engines
+	tmpByte = actor->BaseStats[IE_EA];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_GENERAL];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_RACE];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_CLASS];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_SPECIFIC];
+	stream->Write( &tmpByte,1);
+	tmpByte = actor->BaseStats[IE_SEX];
+	stream->Write( &tmpByte,1);
+	stream->Write( filling, 5); //unknown bytes
+	tmpByte = actor->BaseStats[IE_ALIGNMENT];
+	stream->Write( &tmpByte,1);
+	stream->Write( filling,4); //this is called ID in iwd2, and contains 2 words
+	stream->Write( actor->GetScriptName(), 32);
 	return 0;
 }
 
+int CREImp::PutKnownSpells( DataStream *stream, Actor *actor)
+{
+	int type=actor->spellbook.GetTypes();
+	for(int i=0;i<type;i++) {
+		unsigned int level = actor->spellbook.GetSpellLevelCount(i);
+		for(unsigned int j=0;j<level;j++) {
+			unsigned int count = actor->spellbook.GetKnownSpellsCount(i, j);
+			for(unsigned int k=0;k<count;k++) {
+				CREKnownSpell *ck = actor->spellbook.GetKnownSpell(i, j, k);
+				stream->WriteResRef(ck->SpellResRef);
+
+				ieDword tmpDword;
+
+				tmpDword = ck->Level;
+				stream->WriteDword( &tmpDword);
+				tmpDword = ck->Type;
+				stream->WriteDword( &tmpDword);
+			}
+		}
+	}
+	return 0;
+}
+
+int CREImp::PutSpellPages( DataStream *stream, Actor *actor)
+{
+	ieWord tmpWord;
+	ieDword tmpDword;
+	ieDword SpellIndex = 0;
+
+	int type=actor->spellbook.GetTypes();
+	for(int i=0;i<type;i++) {
+		unsigned int level = actor->spellbook.GetSpellLevelCount(i);
+		for(unsigned int j=0;j<level;j++) {
+			tmpWord = j+1;
+			stream->WriteWord( &tmpWord);
+			tmpWord = actor->spellbook.GetMemorizableSpellsCount(i,j,false);
+			stream->WriteWord( &tmpWord);
+			tmpWord = actor->spellbook.GetMemorizableSpellsCount(i,j,true);
+			stream->WriteWord( &tmpWord);
+			tmpWord = type;
+			stream->WriteWord( &tmpWord);
+			stream->WriteDword( &SpellIndex);
+			tmpDword = actor->spellbook.GetMemorizedSpellsCount(i,j);
+			stream->WriteDword( &tmpDword);
+			SpellIndex += tmpDword;
+		}
+	}
+	return 0;
+}
+
+int CREImp::PutMemorizedSpells(DataStream *stream, Actor *actor)
+{
+	int type=actor->spellbook.GetTypes();
+	for(int i=0;i<type;i++) {
+		unsigned int level = actor->spellbook.GetSpellLevelCount(i);
+		for(unsigned int j=0;j<level;j++) {
+			unsigned int count = actor->spellbook.GetMemorizedSpellsCount(i,j);
+			for(unsigned int k=0;k<count;k++) {
+				CREMemorizedSpell *cm = actor->spellbook.GetMemorizedSpell(i,j,k);
+
+				stream->WriteResRef( cm->SpellResRef);
+				stream->WriteDword( &cm->Flags);
+			}
+		}
+	}
+	return 0;
+}
 //add as effect!
 int CREImp::PutVariables( DataStream *stream, Actor *actor)
 {
-	char filling[40];
+	char filling[92];
 	POSITION pos=NULL;
 	const char *name;
-	ieDword value;
+	ieDword tmpDword, value;
 
 	memset(filling,0,sizeof(filling) );
 	unsigned int VariablesCount = actor->locals->GetCount();
 	for (unsigned int i=0;i<VariablesCount;i++) {
 		actor->locals->GetNextAssoc( pos, name, value);
+		stream->Write(filling,8);
+		tmpDword = FAKE_VARIABLE_OPCODE;
+		stream->WriteDword( &tmpDword);
+		stream->Write(filling,8); //type, power
+		stream->WriteDword( &value); //param #1
+		stream->Write( filling, 40); //param #2, timing, duration, chance, resource, dices, saves
+		tmpDword = FAKE_VARIABLE_MARKER;
+		stream->WriteDword( &value); //variable marker
+		stream->Write( filling, 92); //23 * 4
 		stream->Write( name, 32);
-		stream->Write( filling, 8);
-		stream->WriteDword( &value);
-		//40 bytes of empty crap
-		stream->Write( filling, 40);
+		stream->Write( filling, 72); //18 * 4
 	}
 	return 0;
 }
@@ -1259,26 +1712,33 @@ int CREImp::PutActor(DataStream *stream, Actor *actor)
 	if (ret) {
 		return ret;
 	}
+	//here comes the fuzzy part
 	unsigned int Inventory_Size;
 
 	switch (actor->version) {
 		case IE_CRE_GEMRB:
+			TotSCEFF = 1;
 			Inventory_Size=actor->inventory.GetSlotCount();
 			ret = PutActorGemRB(stream, actor);
 			break;
 		case IE_CRE_V1_2:
+			TotSCEFF = 0;
 			Inventory_Size=46;
 			ret = PutActorPST(stream, actor);
 			break;
-		case IE_CRE_V1_0: //bg1 too
+		case IE_CRE_V1_0: //bg1/bg2
+			// somehow we have to know if it is bg1
+			TotSCEFF = 1;
 			Inventory_Size=38;
 			ret = PutActorBG(stream, actor);
 			break;
 		case IE_CRE_V2_2:
+			TotSCEFF = 1;
 			Inventory_Size=50;
 			ret = PutActorIWD2(stream, actor);
 			break;
 		case IE_CRE_V9_0:
+			TotSCEFF = 1;
 			Inventory_Size=38;
 			ret = PutActorIWD1(stream, actor);
 			break;
@@ -1288,9 +1748,43 @@ int CREImp::PutActor(DataStream *stream, Actor *actor)
 	if (ret) {
 		return ret;
 	}
+
+	//writing offsets
+	if (actor->version==IE_CRE_V2_2) {
+		//
+	} else {
+		stream->WriteDword( &KnownSpellsOffset);
+		stream->WriteDword( &KnownSpellsCount);
+		stream->WriteDword( &SpellMemorizationOffset );
+		stream->WriteDword( &SpellMemorizationCount );
+		stream->WriteDword( &MemorizedSpellsOffset );
+		stream->WriteDword( &MemorizedSpellsCount );
+	}
+	stream->WriteDword( &ItemSlotsOffset );
+	stream->WriteDword( &ItemsOffset );
+	stream->WriteDword( &ItemsCount );
+	stream->WriteDword( &EffectsOffset );
+	stream->WriteDword( &EffectsCount );
+	stream->WriteResRef( actor->Dialog);
 	//spells, spellbook etc
 
-	//variables
+	ret = PutKnownSpells( stream, actor);
+	if (ret) {
+		return ret;
+	}
+	ret = PutSpellPages(stream, actor);
+	if (ret) {
+		return ret;
+	}
+	ret = PutMemorizedSpells(stream, actor);
+	if (ret) {
+		return ret;
+	}
+	//effects and variables
+	ret = PutVariables(stream, actor);
+	if (ret) {
+		return ret;
+	}
 
 	//items and inventory slots
 	ret = PutInventory( stream, actor, Inventory_Size);

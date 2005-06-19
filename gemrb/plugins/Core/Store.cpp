@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.cpp,v 1.12 2005/06/08 20:37:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.cpp,v 1.13 2005/06/19 22:59:34 avenger_teambg Exp $
  *
  */
 
@@ -57,7 +57,7 @@ bool Store::IsItemAvailable(unsigned int slot)
 	int trigger = (int) items[slot]->InfiniteSupply;
 	if (trigger>0) {
 		char *TriggerCode = core->GetString( trigger );
-		return GameScript::EvaluateString (game->GetPC(game->GetSelectedPCSingle()),TriggerCode)!=0;
+		return GameScript::EvaluateString (game->GetPC(game->GetSelectedPCSingle(), false),TriggerCode)!=0;
 	}
 	return false;
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.cpp,v 1.33 2005/06/17 19:33:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.cpp,v 1.34 2005/06/19 22:59:33 avenger_teambg Exp $
  *
  */
 
@@ -25,7 +25,7 @@
 
 extern Interface* core;
 
-CachedFileStream::CachedFileStream(char* stream, bool autoFree)
+CachedFileStream::CachedFileStream(const char* stream, bool autoFree)
 {
 	char fname[_MAX_PATH];
 	ExtractFileFromPath( fname, stream );
