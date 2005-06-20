@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.52 2005/06/17 19:33:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.53 2005/06/20 17:15:26 avenger_teambg Exp $
  *
  */
 
@@ -73,31 +73,37 @@ void Inventory::CalculateWeight()
 			continue;
 		}
 		//printf ("%2d: %8s : %d x %d\n", (int) i, slot->ItemResRef, slot->Weight, slot->Usages[0]);
-		if (slot->Weight == 0) {
+		if (slot->Weight == -1) {
 			Item *itm = core->GetItem( slot->ItemResRef );
-			slot->Flags &= ~IE_INV_ITEM_ACQUIRED;
-			if (!(itm->Flags & IE_ITEM_CRITICAL)) {
+			//simply adding the item flags to the slot
+			slot->Flags |= (itm->Flags<<8);
+			//some slot flags might be affected by the item flags
+			if (!(slot->Flags & IE_INV_ITEM_CRITICAL)) {
 				slot->Flags |= IE_INV_ITEM_DESTRUCTIBLE;
 			}
-			if (!(itm->Flags & IE_ITEM_MOVABLE)) {
+			if (!(slot->Flags & IE_INV_ITEM_MOVABLE)) {
 				slot->Flags |= IE_INV_ITEM_UNDROPPABLE;
 			}
-			if (itm->Flags & IE_ITEM_CURSED) {
-				slot->Flags |= IE_INV_ITEM_UNDROPPABLE;
-			}
+			//this is not correct, cursed items are droppable if unwielded
+			//the consolidated flags will help this, new flag: IE_INV_ITEM_CURSED
+			//if (itm->Flags & IE_ITEM_CURSED) {
+			//	slot->Flags |= IE_INV_ITEM_UNDROPPABLE;
+			//}
 
-			if (itm->Flags & IE_ITEM_STOLEN) {
+			if (slot->Flags & IE_INV_ITEM_STOLEN2) {
 				slot->Flags |= IE_INV_ITEM_STOLEN;
 			}
 
-			slot->Weight = -1;
 			if (itm) {
-				if (itm->Weight) {
-					slot->Weight = itm->Weight;
-					slot->StackAmount = itm->StackAmount;
-				}
+				slot->Weight = itm->Weight;
+				slot->StackAmount = itm->StackAmount;
 				core->FreeItem( itm, slot->ItemResRef, false );
 			}
+			else {
+				slot->Weight = 0;
+			}
+		} else {
+			slot->Flags &= ~IE_INV_ITEM_ACQUIRED;
 		}
 		if (slot->Weight > 0) {
 			Weight += slot->Weight * ((slot->Usages[0] && slot->StackAmount > 1) ? slot->Usages[0] : 1);
@@ -314,13 +320,18 @@ int Inventory::AddSlotItem(CREItem* item, int slot)
 			return 2;
 		}
 
-		if (ItemsAreCompatible( Slots[slot], item )) {
+		CREItem *myslot  = Slots[slot];
+		if (ItemsAreCompatible( myslot, item )) {			
  			//calculate with the max movable stock
 			int chunk = item->Usages[0];
+			int newamount = myslot->Usages[0]+chunk;
+			if (newamount>myslot->StackAmount) {
+				newamount=myslot->StackAmount;
+				chunk = item->Usages[0]-newamount;
+			}
 			if (!chunk) {
 				return -1;
-			}
-			CREItem *myslot  = Slots[slot];
+			}	
 			myslot->Flags |= IE_INV_ITEM_ACQUIRED;
 			myslot->Usages[0] += chunk;
 			item->Usages[0] -= chunk;
@@ -329,8 +340,9 @@ int Inventory::AddSlotItem(CREItem* item, int slot)
 				delete item;
 				return 2;
 			}
-			else 
+			else {
 				return 1;
+			}
 		}
 		return 0;
 	}
@@ -382,9 +394,12 @@ int Inventory::AddSlotItem(STOItem* item, int action)
 	return ret;
 }
 
+/* could the source item be dropped on the target item to merge them */
 bool Inventory::ItemsAreCompatible(CREItem* target, CREItem* source)
 {
 	if (!target) {
+		//this isn't always ok, please check!
+		printMessage("Inventory","Null item encountered by ItemsAreCompatible()",YELLOW);
 		return true;
 	}
 
@@ -393,9 +408,7 @@ bool Inventory::ItemsAreCompatible(CREItem* target, CREItem* source)
 	}
 
 	if (!strnicmp( target->ItemResRef, source->ItemResRef,8 )) {
-		if (target->Flags&IE_INV_ITEM_STACKED) {
-			return true;
-		}
+		return true;
 	}
 	return false;
 }
@@ -426,6 +439,8 @@ void Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 		if (!item) {
 			continue;
 		}
+		//if you want to drop undoppable items, simply set IE_INV_UNDROPPABLE
+		//by default, it won't drop them
 		if ( ((flags^IE_INV_ITEM_UNDROPPABLE)&item->Flags)!=flags) {
 				continue;
 		}

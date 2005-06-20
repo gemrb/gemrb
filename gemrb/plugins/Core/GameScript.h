@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.194 2005/06/19 22:59:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.195 2005/06/20 17:15:26 avenger_teambg Exp $
  *
  */
 
@@ -870,6 +870,9 @@ public: //Script Functions
 	static int NumItemsParty(Scriptable* Sender, Trigger* parameters);
 	static int NumItemsPartyGT(Scriptable* Sender, Trigger* parameters);
 	static int NumItemsPartyLT(Scriptable* Sender, Trigger* parameters);
+	static int NumTimesInteracted(Scriptable* Sender, Trigger* parameters);
+	static int NumTimesInteractedGT(Scriptable* Sender, Trigger* parameters);
+	static int NumTimesInteractedLT(Scriptable* Sender, Trigger* parameters);
 	static int NumTimesTalkedTo(Scriptable* Sender, Trigger* parameters);
 	static int NumTimesTalkedToGT(Scriptable* Sender, Trigger* parameters);
 	static int NumTimesTalkedToLT(Scriptable* Sender, Trigger* parameters);

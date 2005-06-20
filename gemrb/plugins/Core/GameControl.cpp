@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.234 2005/06/19 22:59:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.235 2005/06/20 17:15:25 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1405,8 +1405,22 @@ void GameControl::DialogChoose(unsigned int choose)
 	}
 
 	//get the first state with true triggers!
-	if (choose == (unsigned int) -1) {
-		int si = dlg->FindFirstState( target );
+	int si;
+	if (choose == (unsigned int) -2) {
+		si = dlg->FindRandomState( target);
+		if (si < 0) {
+			EndDialog();
+			return;
+		}
+		if (DialogueFlags&DF_TALKCOUNT) {
+			DialogueFlags&=~DF_TALKCOUNT; //turning it off just in case
+			if (target->Type == ST_ACTOR) {
+				((Actor *) target)->InteractCount++;
+			}
+		}
+		ds = dlg->GetState( si );
+	} else if (choose == (unsigned int) -1) {
+		si = dlg->FindFirstState( target );
 		if (si < 0) {
 			core->DisplayConstantStringName(STR_NOTHINGTOSAY,0xff0000,target);
 			ta->SetMinRow( false );
@@ -1420,7 +1434,6 @@ void GameControl::DialogChoose(unsigned int choose)
 				((Actor *) target)->TalkCount++;
 			}
 		}
-
 		ds = dlg->GetState( si );
 	} else {
 		if (ds->transitionsCount <= choose)

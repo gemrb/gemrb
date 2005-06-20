@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.73 2005/06/19 22:59:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.74 2005/06/20 17:15:25 avenger_teambg Exp $
  *
  */
 
@@ -142,6 +142,7 @@ public:
 	int version;
 	//in game or area actor header
 	ieDword TalkCount;
+	ieDword InteractCount; //this is accessible in iwd2, probably exists in other games too
 	ieDword appearance;
 	ieDword ModalState;
 public:

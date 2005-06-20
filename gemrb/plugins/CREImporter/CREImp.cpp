@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.75 2005/06/19 22:59:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.76 2005/06/20 17:15:24 avenger_teambg Exp $
  *
  */
 
@@ -1242,9 +1242,9 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 	}
 	//old effect type (additional check needed for bg1)
 	if (actor->version==IE_CRE_V1_2) { //pst effect
-		Signature[8] = 0;
+		Signature[7] = 0;
 	} else {
-		Signature[8] = 1;
+		Signature[7] = 1;
 	}
 	stream->Write( Signature, 8);
 	//clearing it again to use as filling

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.3 2005/06/19 22:59:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.4 2005/06/20 17:15:25 avenger_teambg Exp $
  *
  */
 
@@ -586,7 +586,14 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			gc->SetDialogueFlags(DF_TALKCOUNT, BM_OR);
 		}
 
-		gc->InitDialog( (Actor *) scr, tar, Dialog );
+		if (Flags & BD_INTERACT) {
+			//random dialog
+			core->GetDictionary()->SetAt("DialogChoose",(ieDword) -2);
+		} else {
+			//first top level
+			core->GetDictionary()->SetAt("DialogChoose",(ieDword) -1);
+		}
+		gc->InitDialog( (Actor *) scr, tar, Dialog);
 	}
 //if pdtable was allocated, free it now, it will release Dialog
 end_of_quest:

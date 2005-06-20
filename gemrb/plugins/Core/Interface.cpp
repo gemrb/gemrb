@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.323 2005/06/19 22:59:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.324 2005/06/20 17:15:26 avenger_teambg Exp $
  *
  */
 
@@ -1914,13 +1914,22 @@ void Interface::DrawWindows(void)
 
 		//the following part is a series of hardcoded gui behaviour
 		if (flg & DF_IN_DIALOG) {
-			ieDword var = 1;
+			ieDword var = 2;
 			vars->Lookup("DialogChoose", var);
-			//end or continue
-			if ((var == 0) || (var == (ieDword) ~0)) {
+			//end dialog = 1
+			//continue = 0
+			//start dialog = -1
+			//start banter = -2
+			switch((int) var) {
+			case -1: case -2:
 				gc->DialogChoose(var);
+				break;
+			case 1:
+				gc->EndDialog(true);
+				break;
+			default:;
 			}
-			vars->SetAt("DialogChoose",1);
+			vars->SetAt("DialogChoose",2);
 		}
 		if (CurrentContainer) {
 			if (!(flg & DF_IN_CONTAINER) ) {
@@ -1948,9 +1957,6 @@ void Interface::DrawWindows(void)
 				gc->HideGUI();
 			else
 				gc->UnhideGUI();
-			if (flg & DF_START_DIALOG) {
-				gc->DialogChoose( (unsigned int) -1);
-			}
 		}
 		//end of gui hacks
 	}

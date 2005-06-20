@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIWORLD.py,v 1.12 2005/06/17 22:08:37 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIWORLD.py,v 1.13 2005/06/20 17:15:24 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -65,7 +65,7 @@ def OpenEndMessageWindow ():
 	#end dialog
 	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, Button, 9371)
-	GemRB.SetVarAssoc (Window, Button, "DialogChoose", -1)
+	GemRB.SetVarAssoc (Window, Button, "DialogChoose", DIALOGCHOOSE_END)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
 	
 	GemRB.UnhideGUI ()
@@ -86,7 +86,7 @@ def OpenContinueMessageWindow ():
 	#continue
 	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, Button, 9372)
-	GemRB.SetVarAssoc (Window, Button, "DialogChoose", 0)
+	GemRB.SetVarAssoc (Window, Button, "DialogChoose", DIALOGCHOOSE_CONTINUE)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
 	
 	GemRB.UnhideGUI ()

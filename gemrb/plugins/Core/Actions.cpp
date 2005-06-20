@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.4 2005/06/19 22:59:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.5 2005/06/20 17:15:24 avenger_teambg Exp $
  *
  */
 
@@ -1448,7 +1448,8 @@ void GameScript::StartDialogueNoSetInterrupt(Scriptable* Sender,
 	BeginDialog( Sender, parameters, BD_TALKCOUNT | BD_SOURCE | BD_INTERRUPT );
 }
 
-//no talkcount, using banter scripts
+//no talkcount, using banter dialogs
+//probably banter dialogs are random, like rumours!
 void GameScript::Interact(Scriptable* Sender, Action* parameters)
 {
 	BeginDialog( Sender, parameters, BD_INTERACT );

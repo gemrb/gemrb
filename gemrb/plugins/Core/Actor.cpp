@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.109 2005/06/19 22:59:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.110 2005/06/20 17:15:25 avenger_teambg Exp $
  *
  */
 
@@ -161,6 +161,7 @@ Actor::Actor()
 		InitActorTables();
 	}
 	TalkCount = 0;
+	InteractCount = 0; //numtimesinteracted depends on this
 	appearance = 0xffffff; //might be important for created creatures
 	version = 0;
 	//these are used only in iwd2 so we have to default them

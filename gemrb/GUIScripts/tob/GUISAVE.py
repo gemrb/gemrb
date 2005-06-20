@@ -166,9 +166,10 @@ def SavePress():
 			GemRB.SetButtonPicture(ConfirmWindow, Button, "")
 	
 	#save	
-	DeleteButton=GemRB.GetControl (ConfirmWindow, 7)
-	GemRB.SetText(ConfirmWindow, DeleteButton, 15588)
-	GemRB.SetEvent (ConfirmWindow, DeleteButton, IE_GUI_BUTTON_ON_PRESS, "ConfirmedSaveGame")
+	SaveButton=GemRB.GetControl (ConfirmWindow, 7)
+	GemRB.SetText(ConfirmWindow, SaveButton, 15588)
+	GemRB.SetEvent (ConfirmWindow, SaveButton, IE_GUI_BUTTON_ON_PRESS, "ConfirmedSaveGame")
+	GemRB.SetButtonFlags (ConfirmWindow, SaveButton, IE_GUI_BUTTON_DEFAULT, OP_OR) 
 	
 	#cancel
 	CancelButton=GemRB.GetControl (ConfirmWindow, 8)

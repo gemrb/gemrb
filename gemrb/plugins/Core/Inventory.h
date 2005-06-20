@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.33 2005/06/17 19:33:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.34 2005/06/20 17:15:26 avenger_teambg Exp $
  *
  */
 
@@ -84,7 +84,21 @@ typedef enum ieCREItemFlagBits {
 	//selected for sale, using the same bit, hope it is ok
 	IE_INV_ITEM_SELECTED = 0x40,    //this is a gemrb extension
 	//is this item stackable?
-	IE_INV_ITEM_STACKED = 0x80	//this is a gemrb extension
+	IE_INV_ITEM_STACKED = 0x80,	//this is a gemrb extension
+	//these flags are coming from the original item, but these are immutable
+	IE_INV_ITEM_CRITICAL = 0x100, //coming from original item
+	IE_INV_ITEM_TWOHANDED = 0x200,
+	IE_INV_ITEM_MOVABLE = 0x400, //same as undroppable
+	IE_INV_ITEM_UNKNOWN800 = 0x800, //displayable in shop???
+	IE_INV_ITEM_CURSED = 0x1000, //item is cursed
+	IE_INV_ITEM_UNKNOWN2000 = 0x2000, //totally unknown
+	IE_INV_ITEM_MAGICAL = 0x4000, //magical
+	IE_INV_ITEM_BOW = 0x8000, //
+	IE_INV_ITEM_SILVER = 0x10000,
+	IE_INV_ITEM_COLDIRON = 0x20000,
+	IE_INV_ITEM_STOLEN2 = 0x40000, //same as 4
+	IE_INV_ITEM_CONVERSIBLE = 0x80000,
+	IE_INV_ITEM_PULSATING = 0x100000
 } ieCREItemFlagBits;
 
 class GEM_EXPORT CREItem {
@@ -99,7 +113,7 @@ public:
 
 	CREItem()
 	{
-		Weight=0;
+		Weight=-1; //invalid weight
 		StackAmount=0;
 	}
 };
@@ -167,8 +181,8 @@ public:
 	/*finds the first slot of named item, if resref is empty, finds the first filled! slot*/
 	int FindItem(const char *resref, unsigned int flags);
 	void DropItemAtLocation(const char *resref, unsigned int flags, Map *map, Point &loc);
-	void SetEquippedSlot(ieDword slotcode)  { Equipped = slotcode; }
-	ieDword GetEquippedSlot()  { return Equipped; }
+	void SetEquippedSlot(ieDword slotcode) { Equipped = slotcode; }
+	ieDword GetEquippedSlot() { return Equipped; }
 	// Returns item in specified slot. Does NOT change inventory
 	CREItem* GetSlotItem(unsigned int slot);
 	// Returns equipped weapon
