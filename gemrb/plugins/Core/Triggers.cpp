@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.3 2005/06/20 17:15:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.4 2005/06/20 22:53:33 avenger_teambg Exp $
  *
  */
 
@@ -901,6 +901,45 @@ int GameScript::NumTimesInteractedLT(Scriptable* Sender, Trigger* parameters)
 	Actor* actor = ( Actor* ) scr;
 	return actor->InteractCount < (ieDword) parameters->int1Parameter ? 1 : 0;
 }
+ 
+int GameScript::NumTimesInteractedObject(Scriptable* Sender, Trigger* parameters) 
+{ 
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter ); 
+	if (!scr) { 
+		scr = Sender; 
+	} 
+	if (scr->Type != ST_ACTOR) { 
+		return 0; 
+	} 
+	Actor* actor = ( Actor* ) scr; 
+	return actor->InteractCount == (ieDword) parameters->int0Parameter ? 1 : 0; 
+} 
+ 
+int GameScript::NumTimesInteractedObjectGT(Scriptable* Sender, Trigger* parameters) 
+{ 
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter ); 
+	if (!scr) { 
+		scr = Sender; 
+	} 
+	if (scr->Type != ST_ACTOR) { 
+		return 0; 
+	} 
+	Actor* actor = ( Actor* ) scr; 
+	return actor->InteractCount > (ieDword) parameters->int0Parameter ? 1 : 0; 
+} 
+ 
+int GameScript::NumTimesInteractedObjectLT(Scriptable* Sender, Trigger* parameters) 
+{ 
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter ); 
+	if (!scr) { 
+		scr = Sender; 
+	} 
+	if (scr->Type != ST_ACTOR) { 
+		return 0; 
+	} 
+	Actor* actor = ( Actor* ) scr; 
+	return actor->InteractCount < (ieDword) parameters->int0Parameter ? 1 : 0; 
+} 
 
 /* this single function works for ActionListEmpty and ObjectActionListEmpty */
 int GameScript::ActionListEmpty(Scriptable* Sender, Trigger* parameters)

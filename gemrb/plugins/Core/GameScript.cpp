@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.296 2005/06/20 17:15:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.297 2005/06/20 22:53:32 avenger_teambg Exp $
  *
  */
 
@@ -170,6 +170,7 @@ static TriggerLink triggernames[] = {
 	{"itemisidentified", GameScript::ItemIsIdentified, 0},
 	{"kit", GameScript::Kit, 0},
 	{"lastmarkedobject", GameScript::LastMarkedObject_Trigger, 0},
+	{"lastpersontalkedto", GameScript::InteractingWith, 0}, //pst
 	{"level", GameScript::Level, 0},
 	{"levelgt", GameScript::LevelGT, 0},
 	{"levelinclass", GameScript::ClassLevel, 0},
@@ -215,9 +216,12 @@ static TriggerLink triggernames[] = {
 	{"numitemsparty", GameScript::NumItemsParty, 0},
 	{"numitemspartygt", GameScript::NumItemsPartyGT, 0},
 	{"numitemspartylt", GameScript::NumItemsPartyLT, 0},
-	{"numtimesinteractedto", GameScript::NumTimesTalkedTo, 0},
-	{"numtimesinteractedgt", GameScript::NumTimesTalkedToGT, 0},
-	{"numtimesinteractedlt", GameScript::NumTimesTalkedToLT, 0},
+	{"numtimesinteracted", GameScript::NumTimesInteracted, 0},
+	{"numtimesinteractedgt", GameScript::NumTimesInteractedGT, 0},
+	{"numtimesinteractedlt", GameScript::NumTimesInteractedLT, 0},
+	{"numtimesinteractedobject", GameScript::NumTimesInteractedObject, 0},    //gemrb
+	{"numtimesinteractedobjectgt", GameScript::NumTimesInteractedObjectGT, 0},//gemrb
+	{"numtimesinteractedobjectlt", GameScript::NumTimesInteractedObjectLT, 0},//gemrb
 	{"numtimestalkedto", GameScript::NumTimesTalkedTo, 0},
 	{"numtimestalkedtogt", GameScript::NumTimesTalkedToGT, 0},
 	{"numtimestalkedtolt", GameScript::NumTimesTalkedToLT, 0},
