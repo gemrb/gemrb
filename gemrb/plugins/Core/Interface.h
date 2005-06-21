@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.160 2005/06/17 19:33:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.161 2005/06/21 19:57:57 edheldil Exp $
  *
  */
 
@@ -78,6 +78,7 @@ typedef struct SlotType {
 	ieDword slottype;
 	ieDword slottip;
 	ieDword slotid;
+	ieDword sloteffects;
 	ieResRef slotresref;
 } SlotType;
 
@@ -373,6 +374,7 @@ public:
 	int QuerySlotType(int idx) const;
 	int QuerySlottip(int idx) const;
 	int QuerySlotID(int idx) const;
+	int QuerySlotEffects(int idx) const;
 	const char * QuerySlotResRef(int idx) const;
 	/*returns true if an itemtype is acceptable for a slottype */
 	int CanUseItemType(int itype, int slottype) const;

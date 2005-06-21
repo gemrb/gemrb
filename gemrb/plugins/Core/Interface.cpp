@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.324 2005/06/20 17:15:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.325 2005/06/21 19:57:57 edheldil Exp $
  *
  */
 
@@ -1417,6 +1417,7 @@ bool Interface::LoadGemRBINI()
 	SetFeature( ini->GetKeyAsInt( "resources", "HasPickSound", 0 ), GF_HAS_PICK_SOUND );
 	SetFeature( ini->GetKeyAsInt( "resources", "HasDescIcon", 0 ), GF_HAS_DESC_ICON );
 	SetFeature( ini->GetKeyAsInt( "resources", "HasEXPTABLE", 0 ), GF_HAS_EXPTABLE );
+	SetFeature( ini->GetKeyAsInt( "resources", "HasKaputz", 0 ), GF_HAS_KAPUTZ );
 	SetFeature( ini->GetKeyAsInt( "resources", "SoundFolders", 0 ), GF_SOUNDFOLDERS );
 	SetFeature( ini->GetKeyAsInt( "resources", "HasSongList", 0 ), GF_HAS_SONGLIST );
 	SetFeature( ini->GetKeyAsInt( "resources", "UpperButtonText", 0 ), GF_UPPER_BUTTON_TEXT );
@@ -2656,6 +2657,7 @@ bool Interface::InitItemTypes()
 			slottypes[i].slottype = (ieDword) strtol(st->QueryField(i,0),NULL,0 );
 			slottypes[i].slotid = (ieDword) strtol(st->QueryField(i,1),NULL,0 );
 			slottypes[i].slottip = (ieDword) strtol(st->QueryField(i,3),NULL,0 );
+			slottypes[i].sloteffects = (ieDword) strtol(st->QueryField(i,4),NULL,0 );
 			//make a macro for this?
 			/*
 			strncpy(slottypes[i].slotresref, st->QueryField(i,2), 8 );
@@ -2691,6 +2693,14 @@ int Interface::QuerySlottip(int idx) const
 		return 0;
 	}
 	return slottypes[idx].slottip;
+}
+
+int Interface::QuerySlotEffects(int idx) const
+{
+	if (idx>=SlotTypes) {
+		return 0;
+	}
+	return slottypes[idx].sloteffects;
 }
 
 const char *Interface::QuerySlotResRef(int idx) const
