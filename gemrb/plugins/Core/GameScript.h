@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.196 2005/06/20 22:53:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.197 2005/06/22 15:55:25 avenger_teambg Exp $
  *
  */
 
@@ -92,7 +92,7 @@ public:
 		Clear();
 	};
 private:
-	std::list<targettype> objects;
+	targetlist objects;
 public:
 	int Count() const;
 	targettype *RemoveTargetAt(targetlist::iterator &m);
@@ -835,6 +835,7 @@ public: //Script Functions
 	static int ItemIsIdentified(Scriptable* Sender, Trigger* parameters);
 	static int Kit(Scriptable* Sender, Trigger* parameters);
 	static int LastMarkedObject_Trigger(Scriptable* Sender, Trigger* parameters);
+	static int LastPersonTalkedTo(Scriptable* Sender, Trigger* parameters);
 	static int Level(Scriptable* Sender, Trigger* parameters);
 	static int LevelGT(Scriptable* Sender, Trigger* parameters);
 	static int LevelLT(Scriptable* Sender, Trigger* parameters);
@@ -1135,7 +1136,9 @@ public:
 	static void NoActionAtAll(Scriptable* Sender, Action* parameters);
 	static void OpenDoor(Scriptable* Sender, Action* parameters);
 	static void Panic(Scriptable* Sender, Action* parameters);
+	static void PickLock(Scriptable* Sender, Action* parameters);
 	static void PickPockets(Scriptable* Sender, Action* parameters);
+	static void PickUpItem(Scriptable* Sender, Action* parameters);
 	static void PlayBardSong(Scriptable* Sender, Action* parameters);
 	static void PlayDead(Scriptable* Sender, Action* parameters);
 	static void PlayDeadInterruptable(Scriptable* Sender, Action* parameters);

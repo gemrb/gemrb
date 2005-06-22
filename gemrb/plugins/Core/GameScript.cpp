@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.297 2005/06/20 22:53:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.298 2005/06/22 15:55:24 avenger_teambg Exp $
  *
  */
 
@@ -170,7 +170,7 @@ static TriggerLink triggernames[] = {
 	{"itemisidentified", GameScript::ItemIsIdentified, 0},
 	{"kit", GameScript::Kit, 0},
 	{"lastmarkedobject", GameScript::LastMarkedObject_Trigger, 0},
-	{"lastpersontalkedto", GameScript::InteractingWith, 0}, //pst
+	{"lastpersontalkedto", GameScript::LastPersonTalkedTo, 0}, //pst
 	{"level", GameScript::Level, 0},
 	{"levelgt", GameScript::LevelGT, 0},
 	{"levelinclass", GameScript::ClassLevel, 0},
@@ -324,6 +324,7 @@ static ActionLink actionnames[] = {
 	{"changealignment", GameScript::ChangeAlignment, 0},
 	{"changeallegiance", GameScript::ChangeAllegiance, 0},
 	{"changeanimation", GameScript::ChangeAnimation, 0},
+	{"changeanimationnoeffect", GameScript::ChangeAnimationNoEffect, 0},
 	{"changeclass", GameScript::ChangeClass, 0},
 	{"changecurrentscript", GameScript::ChangeAIScript,AF_SCRIPTLEVEL},
 	{"changedialog", GameScript::ChangeDialogue, 0},
@@ -507,8 +508,9 @@ static ActionLink actionnames[] = {
 	{"opendoor", GameScript::OpenDoor,AF_BLOCKING},
 	{"panic", GameScript::Panic, 0},
 	{"permanentstatchange", GameScript::ChangeStat, 0}, //probably the same
-	{"picklock", GameScript::OpenDoor,AF_BLOCKING}, //the same until we know better
+	{"picklock", GameScript::PickLock,AF_BLOCKING},
 	{"pickpockets", GameScript::PickPockets, AF_BLOCKING},
+	{"pickupitem", GameScript::PickUpItem, 0}, 
 	{"playdead", GameScript::PlayDead,AF_BLOCKING},
 	{"playdeadinterruptable", GameScript::PlayDeadInterruptable,AF_BLOCKING},
 	{"playerdialog", GameScript::PlayerDialogue,AF_BLOCKING},
@@ -1009,7 +1011,11 @@ GameScript::GameScript(ieResRef ResRef, unsigned char ScriptType,
 			//maybe we should watch for this bit?
 			//bool triggerflag = i & 0x4000;
 			i &= 0x3fff;
-			if (triggers[i]) continue; //we already found an alternative
+			if (triggers[i]) {
+				printMessage("GameScript"," ", WHITE);
+				printf("%s is a synonym\n", triggersTable->GetStringIndex( j ));
+				continue; //we already found an alternative
+			}
 			TriggerLink* poi = FindTrigger(triggersTable->GetStringIndex( j ) );
 			if (poi == NULL) {
 				triggers[i] = NULL;
@@ -1024,7 +1030,11 @@ GameScript::GameScript(ieResRef ResRef, unsigned char ScriptType,
 		j = actionsTable->GetSize();
 		while (j--) {
 			i = actionsTable->GetValueIndex( j );
-			if (actions[i]) continue; //we already found an alternative
+			if (actions[i]) {
+				printMessage("GameScript"," ", WHITE);
+				printf("%s is a synonym\n", actionsTable->GetStringIndex( j ));
+				continue; //we already found an alternative
+			}
 			ActionLink* poi = FindAction( actionsTable->GetStringIndex( j ) );
 			if (poi == NULL) {
 				actions[i] = NULL;
@@ -1037,7 +1047,11 @@ GameScript::GameScript(ieResRef ResRef, unsigned char ScriptType,
 		j = objectsTable->GetSize();
 		while (j--) {
 			i = objectsTable->GetValueIndex( j );
-			if (objects[i]) continue;
+			if (objects[i]) {
+				printMessage("GameScript"," ", WHITE);
+				printf("%s is a synonym\n", objectsTable->GetStringIndex( j ));
+				continue;
+			}
 			ObjectLink* poi = FindObject( objectsTable->GetStringIndex( j ) );
 			if (poi == NULL) {
 				objects[i] = NULL;

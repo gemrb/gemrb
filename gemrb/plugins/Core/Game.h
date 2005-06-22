@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.55 2005/06/19 22:59:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.56 2005/06/22 15:55:24 avenger_teambg Exp $
  *
  */
 
@@ -151,9 +151,9 @@ public:
 	Actor* FindPC(unsigned int partyID);
 	Actor* FindNPC(unsigned int partyID);
 	/* finds an actor in party, returns slot, if not there, returns -1*/
-	int InParty(Actor* pc);
+	int InParty(Actor* pc) const;
 	/* finds an actor in store, returns slot, if not there, returns -1*/
-	int InStore(Actor* pc);
+	int InStore(Actor* pc) const;
 	/* finds an actor in party by scripting name*/
 	Actor* FindPC(const char *deathvar);
 	/* finds an actor in store by scripting name*/
@@ -161,18 +161,18 @@ public:
 	/* joins party */
 	int JoinParty(Actor* pc, bool join=true);
 	/* return current party size */
-	int GetPartySize(bool onlyalive);
+	int GetPartySize(bool onlyalive) const;
 	/* returns the npcs count */
-	int GetNPCCount() { return (int)NPCs.size(); }
+	int GetNPCCount() const { return (int)NPCs.size(); }
 	/* select PC for non-walking environment (shops, inventory, ...) */
 	bool SelectPCSingle(int index);
 	/* get index of selected PC for non-walking env (shops, inventory, ...) */
-	int GetSelectedPCSingle();
+	int GetSelectedPCSingle() const;
 	/* (De)selects actor. */
 	bool SelectActor( Actor* actor, bool select, unsigned flags );
 
 	/* return current party level count for xp calculations */
-	int GetPartyLevel(bool onlyalive);
+	int GetPartyLevel(bool onlyalive) const;
 	/* removes actor from party (if in there) */
 	int LeaveParty(Actor* pc);
 	/* returns slot*/
@@ -204,21 +204,27 @@ public:
 	void AddJournalEntry(ieStrRef strref, int section, int group);
 	/* adds a journal entry while loading the .gam structure */
 	void AddJournalEntry(GAMJournalEntry* entry);
-	int GetJournalCount();
+	int GetJournalCount() const;
 	GAMJournalEntry* GetJournalEntry(unsigned int Index);
 	void DeleteJournalGroup(ieByte Group);
 	void DeleteJournalEntry(ieStrRef strref);
 
-	bool IsBeastKnown(unsigned int Index) {
+	bool IsBeastKnown(unsigned int Index) const {
+		if (!beasts) {
+			return false;
+		}
 		return beasts[Index] != 0;
 	}
-	void SetBeastKnown(unsigned int Index) {
+	void SetBeastKnown(unsigned int Index) const {
+		if (!beasts) {
+			return;
+		}
 		beasts[Index] = 1;
 	}
 	void ShareXP(int XP, bool divide);
-	bool EveryoneStopped();
-	bool EveryoneNearPoint(const char *area, Point &p, int flags);
-	bool PartyMemberDied();
+	bool EveryoneStopped() const;
+	bool EveryoneNearPoint(const char *area, Point &p, int flags) const;
+	bool PartyMemberDied() const;
 	/* increments chapter variable and refreshes kill stats */
 	void IncrementChapter();
 	/* sets party reputation */
@@ -226,7 +232,7 @@ public:
 	/* sets the gamescreen control status (pane states, dialog textarea size) */
 	void SetControlStatus(int value, int operation);
 	void StartRainOrSnow(bool conditional, int weather);
-	size_t GetLoadedMapCount() { return Maps.size(); }
+	size_t GetLoadedMapCount() const { return Maps.size(); }
 };
 
 #endif

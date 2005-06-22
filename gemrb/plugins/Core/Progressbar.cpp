@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.cpp,v 1.14 2005/03/18 20:01:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.cpp,v 1.15 2005/06/22 15:55:26 avenger_teambg Exp $
  *
  */
 
@@ -103,7 +103,7 @@ void Progressbar::Draw(unsigned short x, unsigned short y)
 	Count=Value*KnobStepsCount/100;
 	for(unsigned int i=0; i<Count ;i++ ) {
 		Sprite2D *Knob = PBarAnim->GetFrame(i);
-		core->GetVideoDriver()->BlitSprite( Knob, x , y , false );
+		core->GetVideoDriver()->BlitSprite( Knob, x , y , true );
 	}
 }
 

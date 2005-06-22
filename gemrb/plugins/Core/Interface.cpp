@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.325 2005/06/21 19:57:57 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.326 2005/06/22 15:55:25 avenger_teambg Exp $
  *
  */
 
@@ -316,6 +316,45 @@ Interface::~Interface(void)
 	delete( plugin );
 	// Removing all stuff from Cache, except bifs
 	DelTree((const char *) CachePath, true);
+}
+
+/** this is the main loop */
+void Interface::Main()
+{
+	video->CreateDisplay( Width, Height, Bpp, FullScreen );
+	video->SetDisplayTitle( GameName, GameType );
+	Font* fps = GetFont( ( unsigned int ) 0 );
+	char fpsstring[_MAX_PATH];
+	Color fpscolor = {0xff,0xff,0xff,0xff}, fpsblack = {0x00,0x00,0x00,0xff};
+	unsigned long frame = 0, time, timebase;
+	GetTime(timebase);
+	double frames = 0.0;
+	Region bg( 0, 0, 100, 30 );
+	Color* palette = video->CreatePalette( fpscolor, fpsblack );
+	do {
+		//don't change script when quitting is pending
+		if (ChangeScript && (quitflag==-1) ) {
+			guiscript->LoadScript( NextScript );
+			ChangeScript = false;
+			guiscript->RunFunction( "OnLoad" );
+		}
+		DrawWindows();
+		if (DrawFPS) {
+			frame++;
+			GetTime( time );
+			if (time - timebase > 1000) {
+				frames = ( frame * 1000.0 / ( time - timebase ) );
+				timebase = time;
+				frame = 0;
+				sprintf( fpsstring, "%.3f fps", frames );
+			}
+			video->DrawRect( bg, fpsblack );
+			fps->Print( Region( 0, 0, 100, 20 ),
+						( unsigned char * ) fpsstring, palette,
+						IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true );
+		}
+	} while (video->SwapBuffers() == GEM_OK);
+	video->FreePalette( palette );
 }
 
 bool Interface::ReadStrrefs()
@@ -1810,13 +1849,20 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 	}
 	win->Visible = visible;
 	switch (visible) {
-		case 2:
+		case WINDOW_GRAYED:
 			win->Invalidate();
-		case 0:
+		case WINDOW_INVISIBLE:
+			//hiding the viewport if the gamecontrol window was made invisible
+			if (win->WindowID==65535) {
+				video->SetViewport( 0,0,0,0 );
+			}
 			evntmgr->DelWindow( win->WindowID );
 			break;
 
-		case 1:
+		case WINDOW_VISIBLE:
+			if (win->WindowID==65535) {
+				video->SetViewport( win->XPos, win->YPos, win->Width, win->Height);
+			}
 			evntmgr->AddWindow( win );
 			win->Invalidate();
 			SetOnTop( WindowIndex );
@@ -1874,7 +1920,7 @@ int Interface::ShowModal(unsigned short WindowIndex, int Shadow)
 		printMessage( "Core", "Window already freed", LIGHT_RED );
 		return -1;
 	}
-	win->Visible = 1;
+	win->Visible = WINDOW_VISIBLE;
 	evntmgr->Clear();
 	SetOnTop( WindowIndex );
 	evntmgr->AddWindow( win );
@@ -1915,22 +1961,25 @@ void Interface::DrawWindows(void)
 
 		//the following part is a series of hardcoded gui behaviour
 		if (flg & DF_IN_DIALOG) {
-			ieDword var = 2;
+			// -3 noaction
+			// -2 close
+			// -1 open
+			// choose option
+			ieDword var = (ieDword) -3;
 			vars->Lookup("DialogChoose", var);
-			//end dialog = 1
-			//continue = 0
-			//start dialog = -1
-			//start banter = -2
-			switch((int) var) {
-			case -1: case -2:
+			if ((int) var == -2) {
+				gc->EndDialog();
+			} else if ( (int)var !=-3) {
 				gc->DialogChoose(var);
-				break;
-			case 1:
-				gc->EndDialog(true);
-				break;
-			default:;
+				vars->SetAt("DialogChoose", (ieDword) -3);
 			}
-			vars->SetAt("DialogChoose",2);
+			if (flg & DF_OPENCONTINUEWINDOW) {
+				guiscript->RunFunction( "OpenContinueMessageWindow" );
+				gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW|DF_OPENENDWINDOW, BM_NAND);
+			} else if (flg & DF_OPENENDWINDOW) {
+				guiscript->RunFunction( "OpenEndMessageWindow" );
+				gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW|DF_OPENENDWINDOW, BM_NAND);
+			}
 		}
 		if (CurrentContainer) {
 			if (!(flg & DF_IN_CONTAINER) ) {
@@ -2304,7 +2353,7 @@ int Interface::PlayMovie(char* ResRef)
 	// are different story
 	GameControl* gc = GetGameControl();
 	if (gc) gc->HideGUI();
-	else SetVisible (0, 0);
+	else SetVisible (0, WINDOW_INVISIBLE);
 
 	//shutting down music and ambients before movie
 	if (music) music->HardEnd();
@@ -2314,7 +2363,7 @@ int Interface::PlayMovie(char* ResRef)
 	if (music) music->Start();
 	soundmgr->GetAmbientMgr()->activate();
 	if (gc) gc->UnhideGUI();
-	else SetVisible (0, 1);
+	else SetVisible (0, WINDOW_VISIBLE);
 
 	FreeInterface( mp );
 	//Setting the movie name to 1

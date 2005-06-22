@@ -15,13 +15,97 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.26 2005/06/19 22:59:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.27 2005/06/22 15:55:26 avenger_teambg Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "SaveGameIterator.h"
 #include "Interface.h"
+
+SaveGame::SaveGame(char* path, char* name, char* prefix, int pCount)
+{
+	strncpy( Prefix, prefix, sizeof( Prefix ) );
+	strncpy( Path, path, sizeof( Path ) );
+	strncpy( Name, name, sizeof( Name ) );
+	PortraitCount = pCount;
+	char nPath[_MAX_PATH];
+	struct stat my_stat;
+	sprintf( nPath, "%s%s%s.bmp", Path, SPathDelimiter, Prefix );
+#ifndef WIN32
+	ResolveFilePath( nPath );
+#endif
+	memset(&my_stat,0,sizeof(my_stat));
+	stat( nPath, &my_stat );
+	strftime( Date, _MAX_PATH, "%c", localtime( &my_stat.st_mtime ) );
+}
+
+SaveGame::~SaveGame()
+{
+}
+
+DataStream* SaveGame::GetPortrait(int index)
+{
+		if (index > PortraitCount) {
+			return NULL;
+		}
+		char nPath[_MAX_PATH];
+		sprintf( nPath, "%s%sPORTRT%d.bmp", Path, SPathDelimiter, index );
+#ifndef WIN32
+		ResolveFilePath( nPath );
+#endif
+		FileStream* fs = new FileStream();
+		fs->Open( nPath, true );
+		return fs;
+}
+
+DataStream* SaveGame::GetScreen()
+{
+		char nPath[_MAX_PATH];
+		sprintf( nPath, "%s%s%s.bmp", Path, SPathDelimiter, Prefix );
+#ifndef WIN32
+		ResolveFilePath( nPath );
+#endif
+		FileStream* fs = new FileStream();
+		fs->Open( nPath, true );
+		return fs;
+}
+
+DataStream* SaveGame::GetGame()
+{
+		char nPath[_MAX_PATH];
+		sprintf( nPath, "%s%s%s.gam", Path, SPathDelimiter, Prefix );
+#ifndef WIN32
+		ResolveFilePath( nPath );
+#endif
+		FileStream* fs = new FileStream();
+		fs->Open( nPath, true );
+		return fs;
+}
+
+DataStream* SaveGame::GetWmap()
+{
+		char nPath[_MAX_PATH];
+		sprintf( nPath, "%s%s%s.wmp", Path, SPathDelimiter, "worldmap" );
+#ifndef WIN32
+		ResolveFilePath( nPath );
+#endif
+		FileStream* fs = new FileStream();
+		fs->Open( nPath, true );
+		return fs;
+}
+
+DataStream* SaveGame::GetSave()
+{
+		char nPath[_MAX_PATH];
+		sprintf( nPath, "%s%s%s.sav", Path, SPathDelimiter, Prefix );
+#ifndef WIN32
+		ResolveFilePath( nPath );
+#endif
+		FileStream* fs = new FileStream();
+		fs->Open( nPath, true );
+		return fs;
+}
 
 SaveGameIterator::SaveGameIterator(void)
 {
@@ -30,10 +114,13 @@ SaveGameIterator::SaveGameIterator(void)
 
 SaveGameIterator::~SaveGameIterator(void)
 {
-	unsigned int i = save_slots.size();
-	while(i--) {
-		free( save_slots[i] );
+	for (charlist::iterator i = save_slots.begin();i!=save_slots.end();i++) {
+		free (*i);
 	}
+//	unsigned int i = save_slots.size();
+//	while (i--) {
+//		free( save_slots[i] );
+//	}
 }
 
 static const char* PlayMode()
@@ -99,9 +186,8 @@ bool SaveGameIterator::RescanSaveGames()
 	loaded = true;
 
 	// delete old entries
-	unsigned int i = save_slots.size();
-	while(i--) {
-		free( save_slots[i] );
+	for (charlist::iterator i = save_slots.begin();i!=save_slots.end();i++) {
+		free (*i);
 	}
 	save_slots.clear();
 
@@ -120,12 +206,13 @@ bool SaveGameIterator::RescanSaveGames()
 	}
 	do {
 		if (IsSaveGameSlot( Path, de->d_name )) {
-			save_slots.push_back( strdup( de->d_name ) );
-		}
+			charlist::iterator i;
 
+			for (i=save_slots.begin(); i!=save_slots.end() && stricmp((*i), de->d_name)<0; i++);
+			save_slots.insert( i, strdup( de->d_name ) );
+		}
 	} while (( de = readdir( dir ) ) != NULL);
 	closedir( dir );  //No other files in the directory, close it
-
 	return true;
 }
 
@@ -137,13 +224,21 @@ int SaveGameIterator::GetSaveGameCount()
 	return save_slots.size();
 }
 
-SaveGame* SaveGameIterator::GetSaveGame(int index)
+char *SaveGameIterator::GetSaveName(int index)
 {
 	if (index < 0 || index >= GetSaveGameCount())
 		return NULL;
 
-	char* slotname  = save_slots[index];
+	charlist::iterator i=save_slots.begin();
+	while (index--) {
+		i++;
+	}
+	return (*i);
+}
 
+SaveGame* SaveGameIterator::GetSaveGame(int index)
+{
+	char* slotname  = GetSaveName(index);
 
 	int prtrt = 0;
 	char Path[_MAX_PATH];
@@ -155,7 +250,7 @@ SaveGame* SaveGameIterator::GetSaveGame(int index)
 	int savegameNumber = 0;
 
 	int cnt = sscanf( slotname, SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName );
-	if(cnt != 2) {
+	if (cnt != 2) {
 		printf( "Invalid savegame directory '%s' in %s.\n", slotname, Path );
 		return false;
 	}
@@ -182,23 +277,25 @@ SaveGame* SaveGameIterator::GetSaveGame(int index)
 	return sg;
 }
 
-bool SaveGameIterator::ExistingSlotName(int index)
+int SaveGameIterator::ExistingSlotName(int index)
 {
 	char strindex[10];
 
 	snprintf(strindex, sizeof(strindex), "%09d", index);
-	unsigned int i=GetSaveGameCount();
-	while(i--) {
-		if (!strnicmp(save_slots[i], strindex, 9) ) {
-			return true;
+	int idx = 0;
+	for (charlist::iterator i = save_slots.begin();i!=save_slots.end();i++) {
+		if (!strnicmp((*i), strindex, 9) ) {
+			return idx;
 		}
+		idx++;
 	}
-	return false;
+	return -1;
 }
 
 int SaveGameIterator::CreateSaveGame(int index, const char *slotname)
 {
 	char Path[_MAX_PATH];
+	char FName[12];
 
 	//some of these restrictions might not be needed
 	if (core->GetCurrentStore()) {
@@ -214,18 +311,21 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname)
 		index=GetSaveGameCount();
 		//leave space for autosaves
 		//probably the hardcoded slot names should be read by this object
-		//in that case 5 == size of hardcoded slot names array (savegame.2da)
-		if (index<5) {
-			index=5; 
+		//in that case 7 == size of hardcoded slot names array (savegame.2da)
+		if (index<7) {
+			index=7; 
 		}
-		while(ExistingSlotName(index) ) {
+		while (ExistingSlotName(index) !=-1 ) {
 			index++;
 		}
 	} else {
-		char* oldslotname  = save_slots[index];
-		snprintf( Path, _MAX_PATH, "%s%s%s%s", core->SavePath, PlayMode(), SPathDelimiter, oldslotname );
-		core->DelTree(Path, false);
-		rmdir(Path);
+		int oldindex = ExistingSlotName(index);
+		if (oldindex>=0) {
+			char *oldslotname = GetSaveName(oldindex);
+			snprintf( Path, _MAX_PATH, "%s%s%s%s", core->SavePath, PlayMode(), SPathDelimiter, oldslotname );
+			core->DelTree(Path, false);
+			rmdir(Path);
+		}
 	}
 	snprintf( Path, _MAX_PATH, "%s%s%s%09d-%s", core->SavePath, PlayMode(), SPathDelimiter, index, slotname );
 	mkdir(Path,S_IWRITE|S_IREAD);
@@ -234,47 +334,68 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname)
 	Game *game = core->GetGame();
 	//saving areas to cache currently in memory
 	size_t mc = game->GetLoadedMapCount();
-	while(mc--) {
+	while (mc--) {
 		Map *map = game->GetMap(mc);
-		if(core->SwapoutArea(map)) {
+		if (core->SwapoutArea(map)) {
 			return -1;
 		}
 	}
 	
 	//compress files in cache named: .STO and .ARE
 	//no .CRE would be saved in cache
-	if(core->CompressSave(Path)) {
+	if (core->CompressSave(Path)) {
 		return -1;
 	}
 
 	//Create .gam file from Game() object
-	if(core->WriteGame(Path)) {
+	if (core->WriteGame(Path)) {
 		return -1;
 	}
 
 	//Create .wmp file from WorldMap() object
-	if(core->WriteWorldMap(Path)) {
+	if (core->WriteWorldMap(Path)) {
 		return -1;
 	}
 
-	//Create .bmp's (area preview and portraits)
+	//Create portraits
+	ImageMgr *im = (ImageMgr *) core->GetInterface(IE_BMP_CLASS_ID);
+	for (int i=0;i<game->GetPartySize(false); i++) {
+		Actor *actor = game->GetPC(i, false);
+		DataStream *str = core->GetResourceMgr()->GetResource(actor->GetPortrait(true), IE_BMP_CLASS_ID);
+		if (str) {
+			snprintf( Path, _MAX_PATH, "%s%s%s%09d-%s", core->SavePath, PlayMode(), SPathDelimiter, index, slotname);
+			snprintf( FName, sizeof(FName), "PORTRT%d", i );
+			FileStream outfile;
+			outfile.Create(Path, FName, IE_BMP_CLASS_ID);
+			im->Open( str, true);
+			im->PutImage(&outfile,1);
+		}
+	}
+	//area preview
+
+	core->FreeInterface(im);
 	return 0;
 }
 
 void SaveGameIterator::DeleteSaveGame(int index)
 {
-	if (index < 0 || index >= GetSaveGameCount())
+	char* slotname  = GetSaveName(index);
+	if (!slotname) {
 		return;
-
-	char* slotname  = save_slots[index];
+	}
 
 	char Path[_MAX_PATH];
 	snprintf( Path, _MAX_PATH, "%s%s%s%s", core->SavePath, PlayMode(), SPathDelimiter, slotname );
 	core->DelTree( Path, false ); //remove all files from folder
 	rmdir( Path );
 
-	delete slotname;
-	save_slots.erase(save_slots.begin()+index);
+	charlist::iterator i=save_slots.begin();
+	while (index--) {
+		i++;
+	}
 
-	loaded = false;
+	free( (*i));
+	save_slots.erase(i);
+
+//	loaded = false;
 }

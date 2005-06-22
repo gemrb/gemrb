@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ImageMgr.h,v 1.9 2005/03/14 16:42:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ImageMgr.h,v 1.10 2005/06/22 15:55:25 avenger_teambg Exp $
  *
  */
 
@@ -38,6 +38,8 @@
 #define GEM_EXPORT
 #endif
 
+#define BMP_HEADER_SIZE  54
+
 class GEM_EXPORT ImageMgr : public Plugin {
 public:
 	ImageMgr(void);
@@ -51,6 +53,10 @@ public:
 	/** Gets a Pixel from the Image */
 	virtual Color GetPixel(unsigned int x, unsigned int y) = 0;
 	virtual unsigned int GetPixelIndex(unsigned int x, unsigned int y) = 0;
+	virtual int GetWidth() = 0;
+	virtual int GetHeight() = 0;
+	/** not virtual */
+	void PutImage(DataStream *output, int ratio);
 };
 
 #endif

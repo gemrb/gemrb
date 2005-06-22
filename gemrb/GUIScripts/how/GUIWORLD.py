@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIWORLD.py,v 1.2 2005/05/27 20:03:54 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIWORLD.py,v 1.3 2005/06/22 15:55:23 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -42,20 +42,25 @@ def CloseContinueWindow ():
 
 	if ContinueWindow == None:
 		return
+
+	hideflag = GemRB.HideGUI ()
+
 	GemRB.UnloadWindow (ContinueWindow)
 	GemRB.SetVar ("ActionsWindow", OldActionsWindow)
+	GemRB.SetVar ("DialogChoose", GemRB.GetVar ("DialogOption"))
 	ContinueWindow = None
 	OldActionsWindow = None
-	GemRB.UnhideGUI ()
+	if hideflag:
+		GemRB.UnhideGUI ()
 
 
 def OpenEndMessageWindow ():
 	global ContinueWindow, OldActionsWindow
 
-	GemRB.HideGUI ()
-
 	if ContinueWindow:
 		return
+
+	hideflag = GemRB.HideGUI ()
 
 	GemRB.LoadWindowPack (GetWindowPack())
 	ContinueWindow = Window = GemRB.LoadWindow (9)
@@ -64,19 +69,19 @@ def OpenEndMessageWindow ():
 
 	#end dialog
 	Button = GemRB.GetControl (Window, 0)
-	GemRB.SetText (Window, Button, 9371)
-	GemRB.SetVarAssoc (Window, Button, "DialogChoose", -1)
+	GemRB.SetText (Window, Button, 9371)	
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
-	
-	GemRB.UnhideGUI ()
+	if hideflag:
+		GemRB.UnhideGUI ()
+
 
 def OpenContinueMessageWindow ():
 	global ContinueWindow, OldActionsWindow
 
-	GemRB.HideGUI ()
-
 	if ContinueWindow:
 		return
+
+	hideflag = GemRB.HideGUI ()
 
 	GemRB.LoadWindowPack (GetWindowPack())
 	ContinueWindow = Window = GemRB.LoadWindow (9)
@@ -86,10 +91,9 @@ def OpenContinueMessageWindow ():
 	#continue
 	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, Button, 9372)
-	GemRB.SetVarAssoc (Window, Button, "DialogChoose", 0)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
-	
-	GemRB.UnhideGUI ()
+	if hideflag:
+		GemRB.UnhideGUI ()
 
 
 def CloseContainerWindow ():
@@ -98,7 +102,7 @@ def CloseContainerWindow ():
 	if ContainerWindow == None:
 		return
 
-	GemRB.HideGUI ()
+	hideflag = GemRB.HideGUI ()
 
 	GemRB.UnloadWindow (ContainerWindow)
 	ContainerWindow = None
@@ -114,7 +118,8 @@ def CloseContainerWindow ():
 	#it is enough to close here
 	GemRB.UnloadTable (Table)
 
-	GemRB.UnhideGUI ()
+	if hideflag:
+		GemRB.UnhideGUI ()
 
 
 def UpdateContainerWindow ():

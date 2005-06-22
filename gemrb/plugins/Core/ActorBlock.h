@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.78 2005/06/17 19:33:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.79 2005/06/22 15:55:24 avenger_teambg Exp $
  *
  */
 
@@ -321,6 +321,7 @@ public:
 	void SetDoorOpen(bool Open, bool playsound = false);
 	void SetPolygon(bool Open, Gem_Polygon* poly);
 	bool IsOpen() const;
+	void TryPickLock(Actor *actor);
 	void DebugDump();
 };
 

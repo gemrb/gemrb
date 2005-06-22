@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.161 2005/06/21 19:57:57 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.162 2005/06/22 15:55:25 avenger_teambg Exp $
  *
  */
 
@@ -101,6 +101,10 @@ typedef struct SlotType {
 #define MODAL_SHADOW_NONE	0
 #define MODAL_SHADOW_GRAY	1
 #define MODAL_SHADOW_BLACK	2
+
+#define WINDOW_INVISIBLE 0
+#define WINDOW_VISIBLE   1
+#define WINDOW_GRAYED    2
 
 class GEM_EXPORT Interface : public InterfaceDesc
 {
@@ -475,6 +479,8 @@ public:
 	unsigned int TooltipDelay;
 	unsigned int FogOfWar;
 	bool FullScreen, CaseSensitive, GameOnCD, SkipIntroVideos, DrawFPS;
+	/** The Main Loop */
+	void Main(void);
 	/** Draws the Visible windows in the Windows Array */
 	void DrawWindows(void);
 	/** Sends a termination signal to the Video Driver */

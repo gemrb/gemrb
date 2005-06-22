@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.53 2005/06/20 17:15:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.54 2005/06/22 15:55:26 avenger_teambg Exp $
  *
  */
 
@@ -463,6 +463,44 @@ CREItem *Inventory::GetSlotItem(unsigned int slot)
 		abort();
 	}
 	return Slots[slot];
+}
+
+//this is the low level equipping
+//all checks have been made previously
+bool Inventory::EquipItem(unsigned int slot)
+{
+	CREItem *item = GetSlotItem(slot);
+	if (!item) {
+		return false;
+	}
+	item->Flags|=IE_INV_ITEM_EQUIPPED;
+	if (item->Flags & IE_INV_ITEM_CURSED) {
+		item->Flags|=IE_INV_ITEM_UNDROPPABLE;
+	}
+	return true;
+}
+
+//the removecurse flag will check if it is possible to move the item to the inventory
+//after a remove curse spell
+bool Inventory::UnEquipItem(unsigned int slot, bool removecurse)
+{
+	CREItem *item = GetSlotItem(slot);
+	if (!item) {
+		return false;
+	}
+	if (removecurse) {
+		if (item->Flags & IE_INV_ITEM_MOVABLE) {
+			item->Flags&=~IE_INV_ITEM_UNDROPPABLE;
+		}
+		if (FindCandidateSlot(-1,0,item->ItemResRef)<0) {
+			return false;
+		}
+	}
+	if (item->Flags&IE_INV_ITEM_UNDROPPABLE) {
+		return false;
+	}
+	item->Flags&=IE_INV_ITEM_EQUIPPED;
+	return true;
 }
 
 // find which bow is attached to the projectile marked by 'Equipped'

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.97 2005/06/17 19:33:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.98 2005/06/22 15:55:24 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -716,6 +716,25 @@ void Door::SetPolygon(bool Open, Gem_Polygon* poly)
 			delete( closed );
 		closed = poly;
 	}
+}
+
+void Door::TryPickLock(Actor *actor)
+{
+	if (TrapFlags) {
+		//trap fired
+		if (!(Flags & DOOR_RESET) ) {
+			//trap removed
+		}
+		return;
+	}
+	if (actor->GetStat(IE_LOCKPICKING)<LockDifficulty) {
+		if (LockDifficulty==100) {
+			//special message
+		}
+		return;
+	}
+	SetDoorLocked( false, true);
+	//add XP ?
 }
 
 void Door::DebugDump()

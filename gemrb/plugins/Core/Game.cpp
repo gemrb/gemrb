@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.78 2005/06/19 22:59:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.79 2005/06/22 15:55:24 avenger_teambg Exp $
  *
  */
 
@@ -167,7 +167,7 @@ Actor* Game::GetPC(unsigned int slot, bool onlyalive)
 	return PCs[slot];
 }
 
-int Game::InStore(Actor* pc)
+int Game::InStore(Actor* pc) const
 {
 	for (unsigned int i = 0; i < NPCs.size(); i++) {
 		if (NPCs[i] == pc) {
@@ -177,7 +177,7 @@ int Game::InStore(Actor* pc)
 	return -1;
 }
 
-int Game::InParty(Actor* pc)
+int Game::InParty(Actor* pc) const
 {
 	for (unsigned int i = 0; i < PCs.size(); i++) {
 		if (PCs[i] == pc) {
@@ -259,7 +259,7 @@ int Game::JoinParty(Actor* actor, bool join)
 	return ( int ) PCs.size() - 1;
 }
 
-int Game::GetPartySize(bool onlyalive)
+int Game::GetPartySize(bool onlyalive) const
 {
 	if (onlyalive) {
 		int count = 0;
@@ -284,7 +284,7 @@ bool Game::SelectPCSingle(int index)
 	return true;
 }
 
-int Game::GetSelectedPCSingle()
+int Game::GetSelectedPCSingle() const
 {
 	return SelectedSingle;
 }
@@ -367,7 +367,7 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 }
 
 // Gets average party level, of onlyalive is true, then counts only living PCs
-int Game::GetPartyLevel(bool onlyalive)
+int Game::GetPartyLevel(bool onlyalive) const
 {
 	int count = 0;
 	for (unsigned int i = 0; i<PCs.size(); i++) {
@@ -598,7 +598,7 @@ void Game::AddJournalEntry(GAMJournalEntry* entry)
 	Journals.push_back( entry );
 }
 
-int Game::GetJournalCount()
+int Game::GetJournalCount() const
 {
 	return Journals.size();
 }
@@ -639,7 +639,7 @@ void Game::ShareXP(int xp, bool divide)
 	core->DisplayConstantString( STR_GOTXP, 0xc0c000); //you have gained ... xp
 }
 
-bool Game::EveryoneStopped()
+bool Game::EveryoneStopped() const
 {
 	for (unsigned int i=0; i<PCs.size(); i++) {
 		if (PCs[i]->path ) return false;
@@ -648,7 +648,7 @@ bool Game::EveryoneStopped()
 }
 
 //canmove=true: if some PC can't move (or hostile), then this returns false 
-bool Game::EveryoneNearPoint(const char *area, Point &p, int flags)
+bool Game::EveryoneNearPoint(const char *area, Point &p, int flags) const
 {
 	for (unsigned int i=0; i<PCs.size(); i++) {
 		if (flags&ENP_ONLYSELECT) {
@@ -679,7 +679,7 @@ bool Game::EveryoneNearPoint(const char *area, Point &p, int flags)
 	return true;
 }
 
-bool Game::PartyMemberDied()
+bool Game::PartyMemberDied() const
 {
 	for (unsigned int i=0; i<PCs.size(); i++) {
 		if (PCs[i]->InternalFlags&IF_JUSTDIED)

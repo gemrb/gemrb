@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PLTImporter/PLTImp.h,v 1.13 2005/03/14 16:42:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PLTImporter/PLTImp.h,v 1.14 2005/06/22 15:55:28 avenger_teambg Exp $
  *
  */
 
@@ -56,6 +56,8 @@ public:
 		};
 		return null;
 	}
+	int GetWidth() { return (int) Width; }
+	int GetHeight() { return (int) Height; }
 	int GetCycleCount()
 	{
 		return 1;

@@ -15,12 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.31 2005/03/25 22:11:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GemRB.cpp,v 1.32 2005/06/22 15:55:20 avenger_teambg Exp $
  *
  */
 
 // GemRB.cpp : Defines the entry point for the application.
-
 
 #define GEM_APP
 
@@ -47,41 +46,11 @@ int main(int argc, char** argv)
 	core = new Interface( argc, argv );
 	if (core->Init() == GEM_ERROR) {
 		delete( core );
+		printf("Press enter to continue...");
+		getc(stdin);
 		return -1;
 	}
-	core->GetVideoDriver()->CreateDisplay( core->Width, core->Height,
-								core->Bpp, core->FullScreen );
-	core->GetVideoDriver()->SetDisplayTitle( core->GameName, core->GameType );
-	Font* fps = core->GetFont( ( unsigned int ) 0 );
-	char fpsstring[_MAX_PATH];
-	Color fpscolor = {0xff,0xff,0xff,0xff}, fpsblack = {0x00,0x00,0x00,0xff};
-	unsigned long frame = 0, time, timebase;
-	GetTime(timebase);
-	int frames = 0;
-	Region bg( 0, 0, 50, 20 );
-	Color* palette = core->GetVideoDriver()->CreatePalette( fpscolor, fpsblack );
-	do {
-		core->DrawWindows();
-		if (core->ChangeScript) {
-			core->GetGUIScriptEngine()->LoadScript( core->NextScript );
-			core->ChangeScript = false;
-			core->GetGUIScriptEngine()->RunFunction( "OnLoad" );
-		}
-		if (core->DrawFPS) {
-			frame++;
-			GetTime( time );
-			if (time - timebase > 1000) {
-				frames = ( frame * 1000 / ( time - timebase ) );
-				timebase = time;
-				frame = 0;
-				sprintf( fpsstring, "%d fps", frames );
-			}
-			core->GetVideoDriver()->DrawRect( bg, fpsblack );
-			fps->Print( bg, ( unsigned char *) fpsstring, palette,
-				IE_FONT_ALIGN_RIGHT, true);
-		}
-	} while (core->GetVideoDriver()->SwapBuffers() == GEM_OK);
-	core->GetVideoDriver()->FreePalette( palette );
+	core->Main();
 	delete( core );
 	return 0;
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.4 2005/06/20 22:53:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.5 2005/06/22 15:55:26 avenger_teambg Exp $
  *
  */
 
@@ -2217,6 +2217,22 @@ int GameScript::InteractingWith(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	return 1;
+}
+
+int GameScript::LastPersonTalkedTo(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *scr = (Actor *) Sender;
+	if (scr->LastTalkedTo==(Actor *) tar) {
+		return 1;
+	}
+	return 0;
 }
 
 int GameScript::IsRotation(Scriptable* Sender, Trigger* parameters)

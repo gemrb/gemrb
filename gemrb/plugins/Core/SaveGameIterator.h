@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.h,v 1.17 2005/06/19 22:59:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.h,v 1.18 2005/06/22 15:55:26 avenger_teambg Exp $
  *
  */
 
@@ -24,6 +24,7 @@
 
 #include <time.h>
 #include <sys/stat.h>
+#include <list> 
 #include "FileStream.h"
 
 #ifdef WIN32
@@ -42,24 +43,8 @@
 
 class GEM_EXPORT SaveGame {
 public:
-	SaveGame(char* path, char* name, char* prefix, int pCount)
-	{
-		strncpy( Prefix, prefix, sizeof( Prefix ) );
-		strncpy( Path, path, sizeof( Path ) );
-		strncpy( Name, name, sizeof( Name ) );
-		PortraitCount = pCount;
-		char nPath[_MAX_PATH];
-		struct stat my_stat;
-		sprintf( nPath, "%s%s%s.bmp", Path, SPathDelimiter, Prefix );
-#ifndef WIN32
-		ResolveFilePath( nPath );
-#endif
-		stat( nPath, &my_stat );
-		strftime( Date, _MAX_PATH, "%c", localtime( &my_stat.st_mtime ) );
-	};
-	~SaveGame()
-	{
-	};
+	SaveGame(char* path, char* name, char* prefix, int pCount);
+	~SaveGame();
 	int GetPortraitCount()
 	{
 		return PortraitCount;
@@ -81,64 +66,11 @@ public:
 		return Date;
 	};
 
-	DataStream* GetPortrait(int index)
-	{
-		if (index > PortraitCount) {
-			return NULL;
-		}
-		char nPath[_MAX_PATH];
-		sprintf( nPath, "%s%sPORTRT%d.bmp", Path, SPathDelimiter, index );
-#ifndef WIN32
-		ResolveFilePath( nPath );
-#endif
-		FileStream* fs = new FileStream();
-		fs->Open( nPath, true );
-		return fs;
-	};
-	DataStream* GetScreen()
-	{
-		char nPath[_MAX_PATH];
-		sprintf( nPath, "%s%s%s.bmp", Path, SPathDelimiter, Prefix );
-#ifndef WIN32
-		ResolveFilePath( nPath );
-#endif
-		FileStream* fs = new FileStream();
-		fs->Open( nPath, true );
-		return fs;
-	};
-	DataStream* GetGame()
-	{
-		char nPath[_MAX_PATH];
-		sprintf( nPath, "%s%s%s.gam", Path, SPathDelimiter, Prefix );
-#ifndef WIN32
-		ResolveFilePath( nPath );
-#endif
-		FileStream* fs = new FileStream();
-		fs->Open( nPath, true );
-		return fs;
-	};
-	DataStream* GetWmap()
-	{
-		char nPath[_MAX_PATH];
-		sprintf( nPath, "%s%s%s.wmp", Path, SPathDelimiter, "worldmap" );
-#ifndef WIN32
-		ResolveFilePath( nPath );
-#endif
-		FileStream* fs = new FileStream();
-		fs->Open( nPath, true );
-		return fs;
-	};
-	DataStream* GetSave()
-	{
-		char nPath[_MAX_PATH];
-		sprintf( nPath, "%s%s%s.sav", Path, SPathDelimiter, Prefix );
-#ifndef WIN32
-		ResolveFilePath( nPath );
-#endif
-		FileStream* fs = new FileStream();
-		fs->Open( nPath, true );
-		return fs;
-	};
+	DataStream* GetPortrait(int index);
+	DataStream* GetScreen();
+	DataStream* GetGame();
+	DataStream* GetWmap();
+	DataStream* GetSave();
 private:
 	char Path[_MAX_PATH];
 	char Prefix[10];
@@ -147,10 +79,12 @@ private:
 	int PortraitCount;
 };
 
+typedef std::list<char *> charlist;
+
 class GEM_EXPORT SaveGameIterator {
 private:
 	bool loaded;
-	std::vector<char*> save_slots;
+	charlist save_slots;
 
 public:
 	SaveGameIterator(void);
@@ -159,8 +93,10 @@ public:
 	int GetSaveGameCount();
 	SaveGame* GetSaveGame(int index);
 	void DeleteSaveGame(int index);
-	bool ExistingSlotName(int index);
+	int ExistingSlotName(int index);
 	int CreateSaveGame(int index, const char *slotname);
+private:
+	char *GetSaveName(int index);
 };
 
 #endif

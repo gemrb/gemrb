@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.321 2005/06/19 22:59:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.322 2005/06/22 15:55:26 avenger_teambg Exp $
  *
  */
 
@@ -200,7 +200,7 @@ GameControl* StartGameControl()
 	gc->ControlType = IE_GUI_GAMECONTROL;
 	gamewin->AddControl( gc );
 	core->AddWindow( gamewin );
-	core->SetVisible( 0, 1 );
+	core->SetVisible( 0, WINDOW_VISIBLE );
 	//setting the focus to the game control 
 	core->GetEventMgr()->SetFocused(gamewin, gc); 
 	if (core->GetGUIScriptEngine()->LoadScript( "MessageWindow" )) {
@@ -3866,7 +3866,8 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 			return Py_None;
 		}
 
-		item = container->inventory.GetItem(Slot);
+		//this will update the container
+		item = container->RemoveItem(Slot,0);
 		if (!item) {
 			printMessage("GUIScript","Cannot move item, there is something weird!\n", YELLOW);
 			Py_INCREF( Py_None );

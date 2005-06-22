@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.16 2005/03/14 23:27:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.17 2005/06/22 15:55:23 avenger_teambg Exp $
  *
  */
 
@@ -78,7 +78,7 @@ public:
 		if (BitCount == 4) {
 			p += ( PaddedRowLength * y ) + ( x >> 1 );
 		} else {
-			p += ( PaddedRowLength * y ) + ( x * ( BitCount / 8 ) );
+			p += ( Width * y +  x) * ( BitCount / 8 );
 		}
 		if (BitCount == 24) {
 			unsigned int ret = *( unsigned int* ) p;
@@ -107,7 +107,7 @@ public:
 		if (BitCount == 4) {
 			p += ( PaddedRowLength * y ) + ( x >> 1 );
 		} else {
-			p += ( PaddedRowLength * y ) + ( x * ( BitCount / 8 ) );
+			p += ( Width * y +  x) * ( BitCount / 8 );
 		}
 		if (BitCount == 24) {
 			ret.b = *p++;
@@ -132,6 +132,8 @@ public:
 		}
 		return ret;
 	}
+	int GetWidth() { return (int) Width; }
+	int GetHeight() { return (int) Height; }
 public:
 	void release(void)
 	{

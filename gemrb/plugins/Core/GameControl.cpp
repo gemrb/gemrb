@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.235 2005/06/20 17:15:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.236 2005/06/22 15:55:24 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -174,6 +174,8 @@ void GameControl::MoveToPointFormation(Actor *actor, Point p, int Orient)
 
 GameControl::~GameControl(void)
 {
+	//releasing the viewport of GameControl
+	core->GetVideoDriver()->SetViewport( 0,0,0,0 );
 	if (formations)	{
 		free( formations );
 		formations = NULL;
@@ -1024,21 +1026,7 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 		core->MoveViewportTo( Viewport.x, Viewport.y, false );
 	}
 }
-/*
-Map *GameControl::SetCurrentArea(int Index)
-{
-	Game* game = core->GetGame();
-	game->MapIndex = Index;
-	Map* area = game->GetCurrentArea( );
-	memcpy(game->CurrentArea, area->GetScriptName(), 9);
-	area->SetupAmbients();
-	//night or day?
-	//if in combat, play battlesong (or don't stop song here)
-	//if night, play night song
-	area->PlayAreaSong( 0 );
-	return area;
-}
-*/
+
 void GameControl::CalculateSelection(Point &p)
 {
 	unsigned int i;
@@ -1103,7 +1091,7 @@ void GameControl::HandleWindowHide(const char *WindowName, const char *WindowPos
 		if (index != (ieDword) -1) {
 			Window* w = core->GetWindow( index );
 			if (w) {
-				core->SetVisible( index, 0 );
+				core->SetVisible( index, WINDOW_INVISIBLE );
 				if (dict->Lookup( WindowPosition, index )) {
 					ResizeDel( w, index );
 				}
@@ -1138,7 +1126,7 @@ int GameControl::HideGUI()
 
 	if (dict->Lookup( "FloatWindow", index )) {
 		if (index != (ieDword) -1) {
-			core->SetVisible( index, 0 );
+			core->SetVisible( index, WINDOW_INVISIBLE );
 		}
 	}
 	core->GetVideoDriver()->SetViewport( ( ( Window * ) Owner )->XPos, ( ( Window * ) Owner )->YPos, Width, Height );
@@ -1155,7 +1143,7 @@ void GameControl::HandleWindowReveal(const char *WindowName, const char *WindowP
 		if (index != (ieDword) -1) {
 			Window* w = core->GetWindow( index );
 			if (w) {
-				core->SetVisible( index, 1 );
+				core->SetVisible( index, WINDOW_VISIBLE );
 				if (dict->Lookup( WindowPosition, index )) {
 					ResizeAdd( w, index );
 				}
@@ -1174,7 +1162,7 @@ int GameControl::UnhideGUI()
 	}
 	ScreenFlags |= SF_GUIENABLED;
 	// Unhide the gamecontrol window
-	core->SetVisible( 0, 1 );
+	core->SetVisible( 0, WINDOW_VISIBLE );
 
 	HandleWindowReveal("ActionsWindow", "ActionsPosition");
 	HandleWindowReveal("MessageWindow", "MessagePosition");
@@ -1189,7 +1177,7 @@ int GameControl::UnhideGUI()
 	if (dict->Lookup( "FloatWindow", index )) {
 		if (index != (ieDword) -1) {
 			Window* fw = core->GetWindow( index );
-			core->SetVisible( index, 1 );
+			core->SetVisible( index, WINDOW_VISIBLE );
 			fw->Floating = true;
 			core->SetOnTop( index );
 		}
@@ -1344,7 +1332,7 @@ void GameControl::InitDialog(Actor* speaker, Scriptable* target, const char* dlg
 	UnhideGUI();
 	this->speaker = speaker;
 	ScreenFlags |= SF_GUIENABLED|SF_DISABLEMOUSE|SF_CENTERONACTOR|SF_LOCKSCROLL;
-	DialogueFlags |= DF_IN_DIALOG|DF_START_DIALOG;
+	DialogueFlags |= DF_IN_DIALOG;//|DF_START_DIALOG;
 	//allow mouse selection from dialog (even though screen is locked)
 	core->GetVideoDriver()->DisableMouse = false;
 	//there are 3 bits, if they are all unset, the dialog freezes scripts
@@ -1365,13 +1353,6 @@ void GameControl::EndDialog(bool try_to_break)
 	}
 
 	if (target) {
-/* talkcount increases after the top level condition was evaluated
-		if (DialogueFlags&DF_TALKCOUNT) {
-			if (target->Type == ST_ACTOR) {
-				((Actor *) target)->TalkCount++;
-			}
-		}
-*/
 		//this could be wrong
 		target->CurrentAction = NULL;
 	}
@@ -1396,7 +1377,7 @@ void GameControl::DialogChoose(unsigned int choose)
 {
 	char Tmp[256];
 
-	DialogueFlags&=~DF_START_DIALOG;
+//	DialogueFlags&=~DF_START_DIALOG;
 	TextArea* ta = core->GetMessageTextArea();
 	if (!ta) {
 		printMessage("GameControl","Dialog aborted???",LIGHT_RED);
@@ -1436,8 +1417,9 @@ void GameControl::DialogChoose(unsigned int choose)
 		}
 		ds = dlg->GetState( si );
 	} else {
-		if (ds->transitionsCount <= choose)
+		if (ds->transitionsCount <= choose) {
 			return;
+		}
 
 		DialogTransition* tr = ds->transitions[choose];
 
@@ -1485,7 +1467,7 @@ void GameControl::DialogChoose(unsigned int choose)
 			ta->SetMinRow( false );
 			EndDialog();
 			return;
-		}
+		}		
 		int si = tr->stateIndex;
 		//follow external linkage, if required
 		if (tr->Dialog[0] && strnicmp( tr->Dialog, dlg->ResRef, 8 )) {
@@ -1506,22 +1488,40 @@ void GameControl::DialogChoose(unsigned int choose)
 	}
 	core->DisplayStringName( ds->StrRef, 0x70FF70, target );
 	int i;
-	ta->SetMinRow( true );
 	int idx = 0;
-	for (unsigned int x = 0; x < ds->transitionsCount; x++) {
+	ta->SetMinRow( true );
+	//first looking for a 'continue' opportunity, the order is descending (a la IE)
+	unsigned int x = ds->transitionsCount;
+	while(x--) {
+		if (ds->transitions[x]->Flags & IE_DLG_TR_FINAL) {
+			continue;
+		}
+		if (ds->transitions[x]->textStrRef != 0xffffffff) {
+			continue;
+		}
 		if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
 			if (!dlg->EvaluateDialogTrigger(target, ds->transitions[x]->trigger)) {
 				continue;
 			}
 		}
-		char *string = ( char * ) malloc( 40 );
+		core->GetDictionary()->SetAt("ChooseOption",x);
+		DialogueFlags |= DF_OPENCONTINUEWINDOW;
+		goto end_of_choose;
+	}
+	for (x = 0; x < ds->transitionsCount; x++) {
+		if (ds->transitions[x]->Flags & IE_DLG_TR_TRIGGER) {
+			if (!dlg->EvaluateDialogTrigger(target, ds->transitions[x]->trigger)) {
+				continue;
+			}
+		}
 		idx++;
 		if (ds->transitions[x]->textStrRef == 0xffffffff) {
-			sprintf( string, "[s=%d,ffffff,ff0000]Continue", x );
-			i = ta->AppendText( string, -1 );
-			free( string );
-			ta->AppendText( "[/s]", i );
+			//dialogchoose should be set to x
+			//it isn't important which END option was chosen, as it ends
+			core->GetDictionary()->SetAt("ChooseOption",x);
+			DialogueFlags |= DF_OPENENDWINDOW;
 		} else {
+			char *string = ( char * ) malloc( 40 );
 			sprintf( string, "[s=%d,ffffff,ff0000]%d - [p]", x, idx );
 			i = ta->AppendText( string, -1 );
 			free( string );
@@ -1533,13 +1533,10 @@ void GameControl::DialogChoose(unsigned int choose)
 	}
 	// this happens if a trigger isn't implemented or the dialog is wrong
 	if (!idx) {
-		//adding -1 as invalid dialog option to end the dialog
-		char *string = ( char * ) malloc( 60 );
-		sprintf( string, "[s=%d,ffffff,ff0000]No valid dialog option", -1);
-		i = ta->AppendText( string, -1 );
-		free( string );
-		ta->AppendText( "[/s]", i );
+		printMessage("Dialog", "There were no valid dialog options!", YELLOW);
+		DialogueFlags |= DF_OPENENDWINDOW;
 	}
+end_of_choose:
 	ta->AppendText( "", -1 );
 	// is this correct?
 	if (DialogueFlags & DF_FREEZE_SCRIPTS) {

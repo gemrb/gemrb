@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.41 2005/03/20 23:36:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.42 2005/06/22 15:55:26 avenger_teambg Exp $
  *
  */
 
@@ -38,7 +38,7 @@ Window::Window(unsigned short WindowID, unsigned short XPos,
 	this->BackGround = NULL;
 	lastC = NULL;
 	lastFocus = NULL;
-	Visible = 0;
+	Visible = WINDOW_INVISIBLE;
 	Changed = true;
 	Floating = false;
 	Cursor = IE_CURSOR_NORMAL;
@@ -115,7 +115,7 @@ void Window::DrawWindow()
 	for (m = Controls.begin(); m != Controls.end(); ++m) {
 		( *m )->Draw( XPos, YPos );
 	}
-	if (Changed && (Visible==2) ) {
+	if (Changed && (Visible == WINDOW_GRAYED) ) {
 		Color black = { 0, 0, 0, 128 };
 		video->DrawRect(clip, black);
 	}

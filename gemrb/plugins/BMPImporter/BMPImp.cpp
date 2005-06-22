@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.19 2005/03/18 20:01:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.20 2005/06/22 15:55:23 avenger_teambg Exp $
  *
  */
 
@@ -138,11 +138,12 @@ bool BMPImp::Open(DataStream* stream, bool autoFree)
 	void* rpixels = malloc( PaddedRowLength* Height );
 	str->Read( rpixels, PaddedRowLength * Height );
 	if (BitCount == 24) {
-		pixels = malloc( Width * Height * 3 );
+		int size = Width * Height * 3;
+		pixels = malloc( size );
 		unsigned char * dest = ( unsigned char * ) pixels;
-		dest += ( Height ) * ( Width * 3 );
+		dest += size;
 		unsigned char * src = ( unsigned char * ) rpixels;
-		for (int i = Height - 1; i >= 0; i--) {
+		for (int i = Height; i; i--) {
 			dest -= ( Width * 3 );
 			memcpy( dest, src, Width * 3 );
 			src += PaddedRowLength;
@@ -152,7 +153,7 @@ bool BMPImp::Open(DataStream* stream, bool autoFree)
 		unsigned char * dest = ( unsigned char * ) pixels;
 		dest += Height * Width;
 		unsigned char * src = ( unsigned char * ) rpixels;
-		for (int i = Height - 1; i >= 0; i--) {
+		for (int i = Height; i; i--) {
 			dest -= Width;
 			memcpy( dest, src, Width );
 			src += PaddedRowLength;
@@ -163,7 +164,7 @@ bool BMPImp::Open(DataStream* stream, bool autoFree)
 		unsigned char * dest = ( unsigned char * ) pixels;
 		dest += size;
 		unsigned char * src = ( unsigned char * ) rpixels;
-		for (int i = Height - 1; i >= 0; i--) {
+		for (int i = Height; i; i--) {
 			dest -= PaddedRowLength;
 			memcpy( dest, src, PaddedRowLength );
 			src += PaddedRowLength;

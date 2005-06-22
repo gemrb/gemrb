@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.5 2005/06/20 17:15:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.6 2005/06/22 15:55:24 avenger_teambg Exp $
  *
  */
 
@@ -1526,6 +1526,43 @@ void GameScript::SetDoorLocked(Scriptable* Sender, Action* parameters)
 	}
 	Door* door = ( Door* ) tar;
 	door->SetDoorLocked( parameters->int0Parameter!=0, false);
+}
+
+void GameScript::PickLock(Scriptable* Sender, Action* parameters)
+{
+	//only actors may try to pick a lock
+	if (Sender->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	if (tar->Type != ST_DOOR) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Door* door = ( Door* ) tar;
+	if (door->IsOpen()) {
+		//door is already open
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	double distance;
+	Point &p = FindNearPoint( Sender, door->toOpen[0], door->toOpen[1],
+				distance );
+	if (distance <= MAX_OPERATING_DISTANCE) {
+		if (door->Flags&DOOR_LOCKED) {
+			door->TryPickLock((Actor *) Sender);
+		} else {
+			//notlocked
+		}
+	} else {
+		GoNearAndRetry(Sender, p);
+	}
+	Sender->CurrentAction = NULL;
 }
 
 void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
@@ -3100,10 +3137,12 @@ void GameScript::MoveInventory(Scriptable *Sender, Action* parameters)
 void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
+		Sender->CurrentAction=NULL;
 		return;
 	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar || tar->Type!=ST_ACTOR) {
+		Sender->CurrentAction=NULL;
 		return;
 	}
 	Actor *snd = (Actor *) Sender;
@@ -3126,7 +3165,8 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		}
 		if (!money) {
 			//no stuff to steal
-			return;
+				Sender->CurrentAction=NULL;
+				return;
 		}
 	}
 	else {
@@ -3138,10 +3178,12 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	if (slot == -1) { 
 		scr->NewStat(IE_GOLD,-money,MOD_ADDITIVE);
 		snd->NewStat(IE_GOLD,money,MOD_ADDITIVE);
+		Sender->CurrentAction=NULL;
 		return;
 	}
 	// now this is a kind of giveitem
 //	MoveItemCore(tar, Sender, MOVABLE, slot);
+	Sender->CurrentAction=NULL;
 }
 
 void GameScript::TakeItemList(Scriptable * Sender, Action* parameters)
@@ -3880,4 +3922,42 @@ void GameScript::EscapeAreaObjectNoSee(Scriptable* Sender, Action* parameters)
 		Point p(parameters->int0Parameter, parameters->int1Parameter);
 		EscapeAreaCore((Actor *) Sender, parameters->string0Parameter, p, tar->Pos, 0 );
 	}
+}
+
+//takes first fitting item from container at feet, doesn't seem to be working in the original engines
+void GameScript::PickUpItem(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *scr = (Actor *) Sender;
+	Map *map = scr->GetCurrentArea();
+	Container *c = map->GetPile(scr->Pos);
+	if (!c) { //this shouldn't happen, but lets prepare for the worst
+		return;
+	}
+
+	//the following part is coming from GUISCript.cpp with trivial changes
+	int Slot = c->inventory.FindItem(parameters->string0Parameter, 0);
+	if (Slot<0) {
+	}
+	int res = core->CanMoveItem(c->inventory.GetSlotItem(Slot) );
+	if (!res) { //cannot move
+		return;
+	}
+	CREItem *item = c->RemoveItem(Slot,0);
+	if (!item) {
+		return;
+	}
+	if (res!=-1 && scr->InParty) { //it is gold and we got the party pool!
+		goto item_is_gold;
+	}
+	res = scr->inventory.AddSlotItem(item, -1);
+	if (res !=2) { //putting it back
+		c->AddItem(item);
+	}
+	return;
+item_is_gold: //we take gold!
+	core->GetGame()->PartyGold += res;
+	delete item;
 }

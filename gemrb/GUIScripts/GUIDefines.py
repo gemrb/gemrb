@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.41 2005/06/20 17:15:23 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.42 2005/06/22 15:55:21 avenger_teambg Exp $
 
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
@@ -180,11 +180,6 @@ PARTY_SIZE = 6
 #game strings
 STR_LOADMOS  = 0
 
-#DialogChoose values
-DIALOGCHOOSE_BANTER   = -2
-DIALOGCHOOSE_START    = -1
-DIALOGCHOOSE_CONTINUE = 0
-DIALOGCHOOSE_END      = 1
 #game integers
 SV_BPP = 0
 SV_WIDTH = 1

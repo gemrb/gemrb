@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.34 2005/06/20 17:15:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.35 2005/06/22 15:55:26 avenger_teambg Exp $
  *
  */
 
@@ -185,6 +185,8 @@ public:
 	ieDword GetEquippedSlot() { return Equipped; }
 	// Returns item in specified slot. Does NOT change inventory
 	CREItem* GetSlotItem(unsigned int slot);
+	bool EquipItem(unsigned int slot);
+	bool UnEquipItem(unsigned int slot, bool removecurse);
 	// Returns equipped weapon
 	CREItem *GetUsedWeapon();
 	// Returns a slot which might be empty, or capable of holding item (or part of it)
