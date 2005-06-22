@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.14 2005/06/19 22:59:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.15 2005/06/22 21:17:25 avenger_teambg Exp $
  *
  */
 
@@ -177,10 +177,10 @@ int WMPImp::GetStoredFileSize(WorldMapArray *wmap)
 		WorldMap *map = wmap->GetWorldMap(i);
 
 		ieDword AreaLinksCount = map->GetLinkCount();
-		headersize += AreaLinksCount * 256;
+		headersize += AreaLinksCount * 240;
 
 		ieDword AreaEntriesCount = map->GetEntryCount();
-		headersize += AreaEntriesCount * 256;
+		headersize += AreaEntriesCount * 212;
 	}
 
 	return headersize;
@@ -274,9 +274,9 @@ int WMPImp::PutMaps(DataStream *stream, WorldMapArray *wmap)
 
 		stream->WriteDword( &AreaEntriesCount );
 		stream->WriteDword( &AreaEntriesOffset );
-		AreaLinksOffset = AreaEntriesOffset + AreaEntriesCount * 256;
+		AreaLinksOffset = AreaEntriesOffset + AreaEntriesCount * 240;
 		stream->WriteDword( &AreaLinksOffset );
-		AreaEntriesOffset = AreaLinksOffset + AreaLinksCount * 256;
+		AreaEntriesOffset = AreaLinksOffset + AreaLinksCount * 212;
 		stream->WriteDword( &AreaLinksCount );
 		stream->WriteResRef( map->MapIconResRef );
 
