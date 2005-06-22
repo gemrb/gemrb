@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.21 2005/06/19 22:59:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.22 2005/06/22 21:18:39 avenger_teambg Exp $
  *
  */
 
@@ -111,9 +111,10 @@ int BIFImp::AddToSaveGame(DataStream *str, DataStream *uncompressed)
 	str->WriteDword( &fnlen);
 	str->Write( uncompressed->filename, fnlen);
 	str->WriteDword( &declen);
-	//baaah
-	complen = 0xcdcdcdcd;
-	unsigned long Pos = str->GetPos();
+	//baaah, we dump output right in the stream, we get the compressed length
+	//only after the compressed data was written
+	complen = 0xcdcdcdcd; //placeholder
+	unsigned long Pos = str->GetPos(); //storing the stream position
 	str->WriteDword( &complen);
 
 	Compressor* comp = ( Compressor* )
@@ -123,10 +124,10 @@ int BIFImp::AddToSaveGame(DataStream *str, DataStream *uncompressed)
 
 	//writing compressed length (calculated)
 	unsigned long Pos2 = str->GetPos();
-	str->Seek(Pos, GEM_STREAM_START);
-	complen = Pos2-Pos;
-	str->WriteDword( &complen);
-	str->Seek(Pos2, GEM_STREAM_START);
+	complen = Pos2-Pos-sizeof(ieDword); //calculating the compressed stream size
+	str->Seek(Pos, GEM_STREAM_START); //going back to the placeholder
+	str->WriteDword( &complen);       //updating size
+	str->Seek(Pos2, GEM_STREAM_START);//resuming work
 	return GEM_OK;
 }
 
