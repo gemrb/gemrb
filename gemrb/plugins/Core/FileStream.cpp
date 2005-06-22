@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.39 2005/06/19 22:59:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.40 2005/06/22 21:21:15 avenger_teambg Exp $
  *
  */
 
@@ -129,6 +129,7 @@ bool FileStream::Create(const char *folder, const char* fname, SClass_ID ClassID
 	created = true;
 	Pos = 0;
 	size = 0;
+	startpos = 0;
 	return true;
 }
 
@@ -165,7 +166,6 @@ int FileStream::Write(const void* src, unsigned int length)
 		return GEM_ERROR;
 	}
 	Pos += c;
-	//this is needed only if you want to Seek in a written file
 	if (Pos>size) {
 		size = Pos;
 	}
@@ -174,8 +174,7 @@ int FileStream::Write(const void* src, unsigned int length)
 
 int FileStream::Seek(int newpos, int type)
 {
-	//change this to !opened & !created if you want to Seek in written file
-	if (!opened) {
+	if (!opened && !created) {
 		return GEM_ERROR;
 	}
 	switch (type) {

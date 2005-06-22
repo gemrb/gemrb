@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ImageMgr.cpp,v 1.4 2005/06/22 15:55:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ImageMgr.cpp,v 1.5 2005/06/22 21:21:15 avenger_teambg Exp $
  *
  */
 
@@ -38,8 +38,28 @@ static int GetScanLineLength(int width, int bitsperpixel)
 	return paddedwidth;
 }
 
+Color ImageMgr::GetPixelSum(unsigned int xbase, unsigned int ybase, unsigned int ratio)
+{
+	Color sum;
+	unsigned int count = ratio*ratio;
+	unsigned int r=0,g=0,b=0;
+
+	for(unsigned int x=0;x<ratio;x++) {
+		for(unsigned int y=0;y<ratio;y++) {
+			Color c = GetPixel(xbase*ratio+x,ybase*ratio+y);
+			r+=c.r;
+			g+=c.g;
+			b+=c.b;
+		}
+	}
+	sum.r=r/count;
+	sum.g=g/count;
+	sum.b=b/count;
+	return sum;
+}
+
 /* this is here because we have to provide .bmp images from any image type*/
-void ImageMgr::PutImage(DataStream *output, int ratio)
+void ImageMgr::PutImage(DataStream *output, unsigned int ratio)
 {
 	ieDword tmpDword;
 	ieWord tmpWord;
@@ -56,7 +76,7 @@ void ImageMgr::PutImage(DataStream *output, int ratio)
 	ieDword fullsize = PaddedRowLength*Height;
 
 	//always save in truecolor (24 bit), no palette
-	output->Write(  filling, 2);
+	output->Write( filling, 2);
 	tmpDword = fullsize+BMP_HEADER_SIZE;
 	output->WriteDword( &tmpDword);
 	tmpDword = 0;
@@ -82,7 +102,8 @@ void ImageMgr::PutImage(DataStream *output, int ratio)
 	memset( filling,0,sizeof(filling) );
 	for (unsigned int y=0;y<Height;y++) {
 		for (unsigned int x=0;x<Width;x++) {
-			Color c = GetPixel(x,Height-y-1);
+			Color c = GetPixelSum(x,Height-y-1,ratio);
+			//Color c = GetPixel(x,Height-y-1);
 
 			output->Write( &c.b, 1);
 			output->Write( &c.g, 1);

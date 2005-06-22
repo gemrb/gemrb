@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.23 2005/06/19 22:59:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.24 2005/06/22 21:21:15 avenger_teambg Exp $
  *
  */
 
@@ -347,7 +347,7 @@ int Spellbook::GetMemorizableSpellsCount(int type, unsigned int level, bool bonu
 bool Spellbook::MemorizeSpell(CREKnownSpell* spell, bool usable)
 {
 	CRESpellMemorization* sm = spells[spell->Type][spell->Level];
-	if (sm->Number2 <= sm->MemorizedCount)
+	if (sm->Number2 <= sm->memorized_spells.size())
 		return false;
 
 	CREMemorizedSpell* mem_spl = new CREMemorizedSpell();
@@ -355,7 +355,6 @@ bool Spellbook::MemorizeSpell(CREKnownSpell* spell, bool usable)
 	mem_spl->Flags = usable ? 1 : 0; // FIXME: is it all it's used for?
 
 	sm->memorized_spells.push_back( mem_spl );
-	sm->MemorizedCount++;
 
 	return true;
 }
@@ -371,7 +370,6 @@ bool Spellbook::UnmemorizeSpell(CREMemorizedSpell* spell)
 
 					delete *s;
 					(*sm)->memorized_spells.erase( s );
-					(*sm)->MemorizedCount--;
 					return true;
 				}
 			}
@@ -416,8 +414,8 @@ void Spellbook::dump()
 			//if (!sm || !sm->Number) continue;
 			if (!sm) continue;
 
-			printf ( "type: %d: L: %d; N1: %d; N2: %d; T: %d; MI: %d; MC: %d\n", i,
-				 sm->Level, sm->Number, sm->Number2, sm->Type, sm->MemorizedIndex, sm->MemorizedCount );
+			printf ( "type: %d: L: %d; N1: %d; N2: %d; T: %d; KC: %d; MC: %d\n", i,
+				 sm->Level, sm->Number, sm->Number2, sm->Type, sm->known_spells.size(), sm->memorized_spells.size() );
 
 			if (sm->known_spells.size()) 
 				printf( " Known spells:\n" );

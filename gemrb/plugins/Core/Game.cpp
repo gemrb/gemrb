@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.79 2005/06/22 15:55:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.80 2005/06/22 21:21:15 avenger_teambg Exp $
  *
  */
 
@@ -609,6 +609,11 @@ GAMJournalEntry* Game::GetJournalEntry(unsigned int Index)
 		return NULL;
 	}
 	return Journals[Index];
+}
+
+char *Game::GetFamiliar(unsigned int Index)
+{
+	return Familiars[Index];
 }
 
 void Game::ShareXP(int xp, bool divide)

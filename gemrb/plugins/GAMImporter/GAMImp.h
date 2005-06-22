@@ -74,6 +74,7 @@ private:
 	int PutVariables( DataStream *stream, Game *game);
 	int PutKillVars(DataStream *stream, Game *game);
 	int PutMaze(DataStream *stream, Game *game);
+	int PutFamiliars(DataStream *stream, Game *game);
 };
 
 #endif

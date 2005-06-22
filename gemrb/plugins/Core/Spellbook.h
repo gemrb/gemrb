@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.12 2005/06/19 22:59:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.13 2005/06/22 21:21:15 avenger_teambg Exp $
  *
  */
 
@@ -78,24 +78,24 @@ typedef enum ieIWD2SpellType {
 	IE_IWD2_SPELL_SHAPE = 10
 } ieIWD2SPellType;
 
-typedef struct CREKnownSpell {
+typedef struct {
 	ieResRef SpellResRef;
 	ieWord Level;
 	ieWord Type;
 } CREKnownSpell;
 
-typedef struct CREMemorizedSpell {
+typedef struct {
 	ieResRef SpellResRef;
 	ieDword Flags;
 } CREMemorizedSpell;
 
-typedef struct CRESpellMemorization {
+typedef struct {
 	ieWord  Level;
 	ieWord  Number;
 	ieWord  Number2;
 	ieWord  Type;
-	ieDword MemorizedIndex;
-	ieDword MemorizedCount;
+//	ieDword MemorizedIndex;
+//	ieDword MemorizedCount;
 
 	std::vector<CREKnownSpell*> known_spells;
 	std::vector<CREMemorizedSpell*> memorized_spells;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.56 2005/06/22 15:55:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.57 2005/06/22 21:21:15 avenger_teambg Exp $
  *
  */
 
@@ -125,6 +125,7 @@ public:
 	Variables* kaputz;
 	ieByte* beasts;
 	ieByte* mazedata; //only in PST
+	ieResRef Familiars[9];
 	ieDword CombatCounter;
 
 	/** index of PC selected in non-walking environment (shops, inventory...) */
@@ -132,6 +133,7 @@ public:
 
 public:
 	ieDword GameTime;
+	ieDword RealTime;
 	ieWord  WhichFormation;
 	ieWord  Formations[5];
 	ieDword PartyGold;
@@ -199,6 +201,10 @@ public:
 	int DelMap(unsigned int index, int forced = 0);
 	int AddNPC(Actor* npc);
 	Actor* GetNPC(unsigned int Index);
+
+	//journal entries
+	void DeleteJournalEntry(ieStrRef strref);
+	void DeleteJournalGroup(ieByte Group);
 	/* adds a journal entry from dialog data */
 	/* time and chapter are calculated on the fly */
 	void AddJournalEntry(ieStrRef strref, int section, int group);
@@ -206,8 +212,8 @@ public:
 	void AddJournalEntry(GAMJournalEntry* entry);
 	int GetJournalCount() const;
 	GAMJournalEntry* GetJournalEntry(unsigned int Index);
-	void DeleteJournalGroup(ieByte Group);
-	void DeleteJournalEntry(ieStrRef strref);
+
+	char *GetFamiliar(unsigned int Index);
 
 	bool IsBeastKnown(unsigned int Index) const {
 		if (!beasts) {

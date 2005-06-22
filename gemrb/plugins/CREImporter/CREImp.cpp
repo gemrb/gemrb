@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.76 2005/06/20 17:15:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.77 2005/06/22 21:21:13 avenger_teambg Exp $
  *
  */
 
@@ -153,8 +153,8 @@ CRESpellMemorization* CREImp::GetSpellMemorization()
 	str->ReadWord( &spl->Number );
 	str->ReadWord( &spl->Number2 );
 	str->ReadWord( &spl->Type );
-	str->ReadDword( &spl->MemorizedIndex );
-	str->ReadDword( &spl->MemorizedCount );
+	str->ReadDword( &MemorizedIndex );
+	str->ReadDword( &MemorizedCount );
 
 	return spl;
 }
@@ -198,7 +198,7 @@ void CREImp::SetupColor(ieDword &stat)
 				return;
 			}
 		}
-		for(i=(int) stat+1;i<RandColor;i++) {
+		for (i=(int) stat+1;i<RandColor;i++) {
 			if (randcolors[i][0]==stat) {
 				stat=randcolors[i][ rand()%RandRows + 1];
 				return;
@@ -243,7 +243,7 @@ Actor* CREImp::GetActor()
 	str->ReadDword( &act->BaseStats[IE_ANIMATION_ID] );//animID is a dword 
 	ieByte tmp2[7];
 	str->Read( tmp2, 7);
-	for(int i=0;i<7;i++) {
+	for (int i=0;i<7;i++) {
 		act->BaseStats[IE_METAL_COLOR+i]=tmp2[i];
 		SetupColor(act->BaseStats[IE_METAL_COLOR+i]);
 	}
@@ -373,14 +373,14 @@ void CREImp::GetActorPST(Actor *act)
 	act->BaseStats[IE_INTOXICATION]=tmpByte;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_LUCK]=tmpByte;
-	for(i=0;i<21;i++) {
+	for (i=0;i<21;i++) {
 		str->Read( &tmpByte, 1 );
 		act->BaseStats[IE_PROFICIENCYBASTARDSWORD+i]=tmpByte;
 	}
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_TRACKING]=tmpByte;
 	str->Seek( 32, GEM_CURRENT_POS );
-	for(i=0;i<100;i++) {
+	for (i=0;i<100;i++) {
 		str->ReadDword( &act->StrRefs[i] );
 	}
 	str->Read( &tmpByte, 1 );
@@ -425,7 +425,7 @@ void CREImp::GetActorPST(Actor *act)
 	str->Seek( 44, GEM_CURRENT_POS );
 	str->ReadDword( &act->BaseStats[IE_XP_MAGE] ); // Exp for secondary class
 	str->ReadDword( &act->BaseStats[IE_XP_THIEF] ); // Exp for tertiary class
-	for(i = 0; i<10; i++) {
+	for (i = 0; i<10; i++) {
 		str->ReadWord( &tmpWord );
 		act->BaseStats[IE_INTERNAL_0+i]=tmpWord;
 	}
@@ -572,8 +572,8 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 				continue;
 			}
 		}
-		for (j = 0; j < sm->MemorizedCount; j++) {
-			k = sm->MemorizedIndex+j;
+		for (j = 0; j < MemorizedCount; j++) {
+			k = MemorizedIndex+j;
 			if (memorized_spells[k]) {
 				sm->memorized_spells.push_back( memorized_spells[k]);
 				memorized_spells[k] = NULL;
@@ -685,7 +685,7 @@ void CREImp::GetActorBG(Actor *act)
 	act->BaseStats[IE_INTOXICATION]=tmpByte;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_LUCK]=tmpByte;
-	for(i=0;i<21;i++) {
+	for (i=0;i<21;i++) {
 		str->Read( &tmpByte, 1 );
 		act->BaseStats[IE_PROFICIENCYBASTARDSWORD+i]=tmpByte;
 	}
@@ -693,7 +693,7 @@ void CREImp::GetActorBG(Actor *act)
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_TRACKING]=tmpByte;
 	str->Seek( 32, GEM_CURRENT_POS );
-	for(i=0;i<100;i++) {
+	for (i=0;i<100;i++) {
 		str->ReadDword( &act->StrRefs[i] );
 	}
 	str->Read( &tmpByte, 1 );
@@ -860,7 +860,7 @@ void CREImp::GetActorIWD2(Actor *act)
 	str->Read( & tmpByte, 1 );
 	act->BaseStats[IE_LEVELSORCEROR]=tmpByte;
 	str->Seek( 22, GEM_CURRENT_POS ); //levels for classes
-	for(i=0;i<64;i++) {
+	for (i=0;i<64;i++) {
 		str->ReadDword( &act->StrRefs[i] );
 	}
 	ReadScript( act, 1);
@@ -872,7 +872,7 @@ void CREImp::GetActorIWD2(Actor *act)
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_HATEDRACE]=tmpByte;
 	//we got 7 more hated races
-	for(i=0;i<7;i++) {
+	for (i=0;i<7;i++) {
 		str->Read( &tmpByte, 1 );
 		act->BaseStats[IE_HATEDRACE2+i]=tmpByte;
 	}	
@@ -1028,14 +1028,14 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	act->BaseStats[IE_INTOXICATION]=tmpByte;
 	str->Read( &tmpByte, 1 ); 
 	act->BaseStats[IE_LUCK]=tmpByte;
-	for(i=0;i<21;i++) {
+	for (i=0;i<21;i++) {
 		str->Read( &tmpByte, 1 ); 
 		act->BaseStats[IE_PROFICIENCYBASTARDSWORD+i]=tmpByte;
 	}
 	str->Read( &tmpByte, 1 ); 
 	act->BaseStats[IE_TRACKING]=tmpByte;
 	str->Seek( 32, GEM_CURRENT_POS );
-	for(i=0;i<100;i++) {
+	for (i=0;i<100;i++) {
 		str->ReadDword( &act->StrRefs[i] );
 	}
 	str->Read( &tmpByte, 1 ); 
@@ -1146,7 +1146,7 @@ int CREImp::GetStoredFileSize(Actor *actor)
 
 	//adding known spells
 	KnownSpellsCount = actor->spellbook.GetTotalKnownSpellsCount();
-	headersize += KnownSpellsCount * 16;
+	headersize += KnownSpellsCount * 12;
 	SpellMemorizationOffset = headersize;
 
 	//adding spell pages
@@ -1161,15 +1161,15 @@ int CREImp::GetStoredFileSize(Actor *actor)
 	//adding effects
 	EffectsCount = actor->locals->GetCount();
 	if (TotSCEFF) {
-		headersize += EffectsCount * 0x10;
+		headersize += EffectsCount * 264;
 	} else {
-		headersize += EffectsCount * 0x20;
+		headersize += EffectsCount * 48;
 	}
 	ItemsOffset = headersize;
 
 	//counting items (calculating item storage)
 	ItemsCount = 0;
-	for(i=0;i<Inventory_Size;i++) {
+	for (i=0;i<Inventory_Size;i++) {
 		CREItem *it = actor->inventory.GetSlotItem(i);
 		if (it) {
 			ItemsCount++;
@@ -1178,8 +1178,8 @@ int CREImp::GetStoredFileSize(Actor *actor)
 	headersize += ItemsCount * 20;
 	ItemSlotsOffset = headersize;
 
-	//adding in itemslot table
-	return headersize + (Inventory_Size+1)*sizeof(ieWord);
+	//adding itemslot table size and equipped slot field
+	return headersize + (Inventory_Size)*sizeof(ieWord)+sizeof(ieDword);
 }
 
 int CREImp::PutInventory(DataStream *stream, Actor *actor, unsigned int size)
@@ -1189,10 +1189,10 @@ int CREImp::PutInventory(DataStream *stream, Actor *actor, unsigned int size)
 	ieWord ItemCount = 0;
 	ieWord *indices =(ieWord *) malloc(size*sizeof(ieWord) );
 	
-	for(i=0;i<size;i++) {
+	for (i=0;i<size;i++) {
 		indices[i]=(ieWord) -1;
 	}
-	for(i=0;i<size;i++) {
+	for (i=0;i<size;i++) {
 		CREItem *it = actor->inventory.GetSlotItem(i);
 		if (!it) {
 			continue;
@@ -1205,7 +1205,7 @@ int CREImp::PutInventory(DataStream *stream, Actor *actor, unsigned int size)
 		stream->WriteDword( &it->Flags);
 		indices[i] = ItemCount++;
 	}
-	for(i=0;i<size;i++) {
+	for (i=0;i<size;i++) {
 		stream->WriteWord( indices+i);
 	}
 	tmpDword = actor->inventory.GetEquippedSlot();
@@ -1237,7 +1237,7 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 	tmpWord = actor->BaseStats[IE_MAXHITPOINTS];
 	stream->WriteWord( &tmpWord);
 	stream->WriteDword( &actor->BaseStats[IE_ANIMATION_ID]);
-	for(i=0;i<7;i++) {
+	for (i=0;i<7;i++) {
 		Signature[i] = (char) actor->BaseStats[IE_METAL_COLOR+i];
 	}
 	//old effect type (additional check needed for bg1)
@@ -1505,7 +1505,7 @@ int CREImp::PutActorPST(DataStream *stream, Actor *actor)
 	stream->Write(filling, 44); //11*4 totally unknown
 	stream->WriteDword( &actor->BaseStats[IE_XP_MAGE]);
 	stream->WriteDword( &actor->BaseStats[IE_XP_THIEF]);
-	for(i = 0; i<10; i++) {
+	for (i = 0; i<10; i++) {
 		tmpWord = actor->BaseStats[IE_INTERNAL_0];
 		stream->WriteWord( &tmpWord );
 	}
@@ -1516,7 +1516,7 @@ int CREImp::PutActorPST(DataStream *stream, Actor *actor)
 	stream->Write( &tmpByte, 1);
 	stream->WriteWord( &actor->AppearanceFlags1);
 	stream->WriteWord( &actor->AppearanceFlags2);
-	for(i=0;i<7;i++) {
+	for (i=0;i<7;i++) {
 		tmpWord = actor->BaseStats[IE_COLORS+i];
 		stream->WriteWord( &tmpWord);
 	}
@@ -1609,20 +1609,15 @@ int CREImp::PutActorIWD2(DataStream *stream, Actor *actor)
 int CREImp::PutKnownSpells( DataStream *stream, Actor *actor)
 {
 	int type=actor->spellbook.GetTypes();
-	for(int i=0;i<type;i++) {
+	for (int i=0;i<type;i++) {
 		unsigned int level = actor->spellbook.GetSpellLevelCount(i);
-		for(unsigned int j=0;j<level;j++) {
+		for (unsigned int j=0;j<level;j++) {
 			unsigned int count = actor->spellbook.GetKnownSpellsCount(i, j);
-			for(unsigned int k=0;k<count;k++) {
+			for (unsigned int k=0;k<count;k++) {
 				CREKnownSpell *ck = actor->spellbook.GetKnownSpell(i, j, k);
 				stream->WriteResRef(ck->SpellResRef);
-
-				ieDword tmpDword;
-
-				tmpDword = ck->Level;
-				stream->WriteDword( &tmpDword);
-				tmpDword = ck->Type;
-				stream->WriteDword( &tmpDword);
+				stream->WriteWord( &ck->Level);
+				stream->WriteWord( &ck->Type);
 			}
 		}
 	}
@@ -1636,9 +1631,9 @@ int CREImp::PutSpellPages( DataStream *stream, Actor *actor)
 	ieDword SpellIndex = 0;
 
 	int type=actor->spellbook.GetTypes();
-	for(int i=0;i<type;i++) {
+	for (int i=0;i<type;i++) {
 		unsigned int level = actor->spellbook.GetSpellLevelCount(i);
-		for(unsigned int j=0;j<level;j++) {
+		for (unsigned int j=0;j<level;j++) {
 			tmpWord = j+1;
 			stream->WriteWord( &tmpWord);
 			tmpWord = actor->spellbook.GetMemorizableSpellsCount(i,j,false);
@@ -1659,11 +1654,11 @@ int CREImp::PutSpellPages( DataStream *stream, Actor *actor)
 int CREImp::PutMemorizedSpells(DataStream *stream, Actor *actor)
 {
 	int type=actor->spellbook.GetTypes();
-	for(int i=0;i<type;i++) {
+	for (int i=0;i<type;i++) {
 		unsigned int level = actor->spellbook.GetSpellLevelCount(i);
-		for(unsigned int j=0;j<level;j++) {
+		for (unsigned int j=0;j<level;j++) {
 			unsigned int count = actor->spellbook.GetMemorizedSpellsCount(i,j);
-			for(unsigned int k=0;k<count;k++) {
+			for (unsigned int k=0;k<count;k++) {
 				CREMemorizedSpell *cm = actor->spellbook.GetMemorizedSpell(i,j,k);
 
 				stream->WriteResRef( cm->SpellResRef);
@@ -1673,6 +1668,21 @@ int CREImp::PutMemorizedSpells(DataStream *stream, Actor *actor)
 	}
 	return 0;
 }
+int CREImp::PutEffects( DataStream *stream, Actor *actor)
+{
+	char filling[0x268];
+
+	memset(filling,0,sizeof(filling) );
+	for(unsigned int i=0;i<EffectsCount-actor->locals->GetCount();i++) {
+		if (TotSCEFF) {
+			stream->Write( filling, 264);
+		} else {
+			stream->Write( filling, 48);
+		}
+	}
+	return 0;
+}
+
 //add as effect!
 int CREImp::PutVariables( DataStream *stream, Actor *actor)
 {
@@ -1777,6 +1787,10 @@ int CREImp::PutActor(DataStream *stream, Actor *actor)
 		return ret;
 	}
 	ret = PutMemorizedSpells(stream, actor);
+	if (ret) {
+		return ret;
+	}
+	ret = PutEffects(stream, actor);
 	if (ret) {
 		return ret;
 	}

@@ -1,4 +1,3 @@
-
 /* GemRB - Infinity Engine Emulator
  * Copyright (C) 2003 The GemRB Project
  *
@@ -16,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.h,v 1.13 2005/06/19 22:59:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.h,v 1.14 2005/06/22 21:21:13 avenger_teambg Exp $
  *
  */
 
@@ -46,12 +45,14 @@ private:
 	ieDword SpellMemorizationCount;
 	ieDword MemorizedSpellsOffset;
 	ieDword MemorizedSpellsCount;
+	ieDword MemorizedIndex;
+	ieDword MemorizedCount;
 	ieDword ItemSlotsOffset;
 	ieDword ItemsOffset;
 	ieDword ItemsCount;
 	ieDword EffectsOffset;
 	ieDword EffectsCount;
-  ieByte TotSCEFF;
+	ieByte TotSCEFF;
 
 public:
 	CREImp(void);
@@ -87,11 +88,11 @@ private:
 	int PutActorBG(DataStream *stream, Actor *actor);
 	int PutActorIWD1(DataStream *stream, Actor *actor);
 	int PutActorIWD2(DataStream *stream, Actor *actor);
-  int PutKnownSpells(DataStream *stream, Actor *actor);
-  int PutSpellPages(DataStream *stream, Actor *actor);
-  int PutMemorizedSpells(DataStream *stream, Actor *actor);
+	int PutKnownSpells(DataStream *stream, Actor *actor);
+	int PutSpellPages(DataStream *stream, Actor *actor);
+	int PutMemorizedSpells(DataStream *stream, Actor *actor);
 	int PutEffects(DataStream *stream, Actor *actor);
-  int PutVariables(DataStream *stream, Actor *actor);
+	int PutVariables(DataStream *stream, Actor *actor);
 	int PutInventory(DataStream *stream, Actor *actor, unsigned int size);
 	int PutHeader(DataStream *stream, Actor *actor);
 };

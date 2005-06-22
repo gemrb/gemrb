@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.55 2005/06/19 22:59:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.56 2005/06/22 21:21:15 avenger_teambg Exp $
  *
  */
 
@@ -28,6 +28,7 @@
 
 
 #define MAZE_DATA_SIZE 1720
+#define FAMILIAR_FILL_SIZE 324
 
 GAMImp::GAMImp(void)
 {
@@ -131,7 +132,8 @@ Game* GAMImp::GetGame()
 			str->ReadDword( &FamiliarsOffset );
 			str->ReadDword( &SavedLocOffset );
 			str->ReadDword( &SavedLocCount );
-			str->Seek( 64, GEM_CURRENT_POS);
+			str->ReadDword( &newGame->RealTime);
+			str->Seek( 60, GEM_CURRENT_POS);
 			break;
 
 		case GAM_VER_PST:
@@ -140,15 +142,13 @@ Game* GAMImp::GetGame()
 			str->ReadResRef( newGame->AnotherArea );
 			str->ReadDword( &KillVarsOffset );
 			str->ReadDword( &KillVarsCount );
-			str->ReadDword( &FamiliarsOffset );
-			str->ReadDword( &SavedLocOffset );
-			str->ReadDword( &SavedLocCount );
+			str->ReadDword( &FamiliarsOffset ); //bestiary
+			str->ReadResRef( newGame->AnotherArea ); //yet another area
+			SavedLocOffset = 0;
+			SavedLocCount = 0;
 			str->Seek( 64, GEM_CURRENT_POS);
 			break;
 	}
-
-	//newGame->globals = new Variables();
-	//newGame->globals->SetType( GEM_VARIABLES_INT );
 
 	if (!newGame->CurrentArea[0]) {
 		// 0 - single player, 1 - tutorial, 2 - multiplayer
@@ -219,16 +219,27 @@ Game* GAMImp::GetGame()
 			newGame->mazedata = (ieByte*)malloc(MAZE_DATA_SIZE);
 			str->Seek(MazeOffset, GEM_STREAM_START );
 			str->Read(newGame->mazedata, MAZE_DATA_SIZE); 
-		}
-		// Loading known creatures array (beasts)
-		if(core->GetBeastsINI() != NULL) {
-			int beasts_count = core->GetBeastsINI()->GetTagsCount();
-			newGame->beasts = (ieByte*)malloc(beasts_count);
 			str->Seek( FamiliarsOffset, GEM_STREAM_START );
-			str->Read( newGame->beasts, beasts_count );
+		}
+	} else {
+		if (FamiliarsOffset) {
+			str->Seek( FamiliarsOffset, GEM_STREAM_START );
+			for (i=0; i<9;i++) {
+				str->ReadResRef( newGame->GetFamiliar(i) );
+			}
 		}
 	}
+	// Loading known creatures array (beasts)
+	if(core->GetBeastsINI() != NULL) {
+		int beasts_count = core->GetBeastsINI()->GetTagsCount();
+		newGame->beasts = (ieByte*)malloc(beasts_count);
+		str->Read( newGame->beasts, beasts_count );
+	}
 	
+	if (SavedLocCount && SavedLocOffset) {
+		str->Seek( SavedLocOffset, GEM_STREAM_START );
+		//reading saved locations
+	}
 	return newGame;
 }
 
@@ -356,13 +367,16 @@ int GAMImp::GetStoredFileSize(Game *game)
 	int headersize;
 	unsigned int i;
 
-	ActorMgr *am = (ActorMgr *) core->GetInterface( IE_CRE_CLASS_ID );
+	//moved this here, so one can disable killvars in a pst style game
+	//or enable them in gemrb
+	if(core->HasFeature(GF_HAS_KAPUTZ) ) {
+		KillVarsCount = game->kaputz->GetCount();
+	} else {
+		KillVarsCount = 0;
+	}
 	switch(game->version)
 	{
 	case GAM_VER_GEMRB:
-		if(core->HasFeature(GF_HAS_KAPUTZ) ) {
-			KillVarsCount = game->kaputz->GetCount();
-		}
 		headersize = 0xb4;
 		PCSize = 0x160;
 		break;
@@ -382,13 +396,13 @@ int GAMImp::GetStoredFileSize(Game *game)
 	case GAM_VER_PST:
 		headersize = 0xb8;
 		PCSize = 0x168;
-		KillVarsCount = game->kaputz->GetCount();
 		break;
 	default:
 		return -1;
 	}
 	PCOffset = headersize;
 
+	ActorMgr *am = (ActorMgr *) core->GetInterface( IE_CRE_CLASS_ID );
 	PCCount = game->GetPartySize(false);
 	headersize += PCCount * PCSize;
 	for (i = 0;i<PCCount; i++) {
@@ -404,6 +418,7 @@ int GAMImp::GetStoredFileSize(Game *game)
 		Actor *ac=game->GetNPC(i);
 		headersize +=am->GetStoredFileSize(ac);
 	}
+	core->FreeInterface( am );
 	JournalOffset = headersize;
 
 	JournalCount = game->GetJournalCount();
@@ -411,23 +426,28 @@ int GAMImp::GetStoredFileSize(Game *game)
 	GlobalOffset = headersize;
 
 	GlobalCount = game->locals->GetCount();
-	headersize += GlobalCount * 0x54;
+	headersize += GlobalCount * 84;
 
 	if (core->HasFeature(GF_HAS_KAPUTZ) ) {
 		KillVarsOffset = headersize;
 		KillVarsCount = game->locals->GetCount();
-		headersize += KillVarsCount * 0x54;
+		headersize += KillVarsCount * 84;
 	}
 
-	if (game->version==GAM_VER_GEMRB ||
-		game->version==GAM_VER_BG2 ||
-		game->version==GAM_VER_IWD2 ||
-		game->version==GAM_VER_IWD) {
+	if (game->version==GAM_VER_BG) {
+		FamiliarsOffset = 0;
+	} else {
 		FamiliarsOffset = headersize;
+		if (core->GetBeastsINI()) {
+			headersize +=core->GetBeastsINI()->GetTagsCount();
+		} else {
+			headersize += 9 * 8 + 82 * 4;
+		}
 	}
-	headersize += 9 * 8 + 82 * 4;
-	core->FreeInterface( am );
-	return headersize;
+	SavedLocOffset = headersize;
+	//i don't use this yet, it should be used only for bg2
+	SavedLocCount = 0;
+	return headersize + SavedLocCount * 20;
 }
 
 int GAMImp::PutJournals(DataStream *stream, Game *game)
@@ -451,6 +471,7 @@ int GAMImp::PutJournals(DataStream *stream, Game *game)
 int GAMImp::PutKillVars(DataStream *stream, Game *game)
 {
 	char filling[40];
+	char tmpname[33];
 	POSITION pos=NULL;
 	const char *name;
 	ieDword value;
@@ -459,7 +480,8 @@ int GAMImp::PutKillVars(DataStream *stream, Game *game)
 	for (unsigned int i=0;i<KillVarsCount;i++) {
 		//global variables are locals for game, that's why the local/global confusion
 		pos=game->kaputz->GetNextAssoc( pos, name, value);
-		stream->Write( name, 32);
+		strnuprcpy(tmpname,name,32);
+		stream->Write( tmpname, 32);
 		stream->Write( filling, 8);
 		stream->WriteDword( &value);
 		//40 bytes of empty crap
@@ -471,6 +493,7 @@ int GAMImp::PutKillVars(DataStream *stream, Game *game)
 int GAMImp::PutVariables(DataStream *stream, Game *game)
 {
 	char filling[40];
+	char tmpname[33];
 	POSITION pos=NULL;
 	const char *name;
 	ieDword value;
@@ -479,7 +502,8 @@ int GAMImp::PutVariables(DataStream *stream, Game *game)
 	for (unsigned int i=0;i<GlobalCount;i++) {
 		//global variables are locals for game, that's why the local/global confusion
 		pos=game->locals->GetNextAssoc( pos, name, value);
-		stream->Write( name, 32);
+		strnuprcpy(tmpname,name,32);
+		stream->Write( tmpname, 32);
 		stream->Write( filling, 8);
 		stream->WriteDword( &value);
 		//40 bytes of empty crap
@@ -537,8 +561,8 @@ int GAMImp::PutHeader(DataStream *stream, Game *game)
 		stream->WriteDword( &game->ControlStatus );
 		stream->WriteDword( &tmpDword);
 		stream->WriteDword( &FamiliarsOffset);
-		stream->WriteDword( &SavedLocCount);
 		stream->WriteDword( &SavedLocOffset);
+		stream->WriteDword( &SavedLocCount);
 		break;
 	case GAM_VER_PST:
 		stream->WriteDword( &MazeOffset );
@@ -549,7 +573,9 @@ int GAMImp::PutHeader(DataStream *stream, Game *game)
 		stream->WriteDword( &BestiaryOffset );
 		break;
 	}
-	for (i=0;i<8;i++) {
+	stream->WriteDword( &game->RealTime ); //this isn't correct, this field is the realtime
+	stream->WriteDword( &SavedLocOffset);
+	for (i=0;i<7;i++) {
 		stream->Write( Signature, 8);
 	}
 	return 0;
@@ -560,7 +586,6 @@ int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CRE
 	int i;
 	ieDword tmpDword;
 	ieWord tmpWord;
-
 	char filling[50];
 
 	memset(filling,0,sizeof(filling) );
@@ -686,7 +711,33 @@ int GAMImp::PutNPCs(DataStream *stream, Game *game)
 
 int GAMImp::PutMaze(DataStream *stream, Game *game)
 {
-	stream->Write (game->mazedata, MAZE_DATA_SIZE);
+	stream->Write( game->mazedata, MAZE_DATA_SIZE);
+	return 0;
+}
+
+int GAMImp::PutFamiliars(DataStream *stream, Game *game)
+{
+	int len = 0;
+	if (core->GetBeastsINI()) {
+		len = core->GetBeastsINI()->GetTagsCount();
+		if (game->version==GAM_VER_PST) {
+			stream->Write( game->beasts, len );
+			//only GemRB version can have all features, return when it is PST
+			return 0;
+		}
+	}
+
+	char filling[FAMILIAR_FILL_SIZE];
+
+	memset( filling,0,sizeof(filling) );
+	for (unsigned int i=0;i<9;i++) {
+		stream->WriteResRef( game->GetFamiliar(i) );
+	}
+	stream->WriteDword( &SavedLocOffset);
+	if (len) {
+		stream->Write( game->beasts, len );
+	}
+	stream->Write( filling, FAMILIAR_FILL_SIZE - len);
 	return 0;
 }
 
@@ -730,6 +781,13 @@ int GAMImp::PutGame(DataStream *stream, Game *game)
 		}
 
 		ret = PutMaze( stream, game);
+		if (ret) {
+			return ret;
+		}
+	}
+
+	if (FamiliarsOffset) {
+		ret = PutFamiliars( stream, game);
 		if (ret) {
 			return ret;
 		}

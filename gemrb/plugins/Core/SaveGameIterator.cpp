@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.27 2005/06/22 15:55:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.28 2005/06/22 21:21:15 avenger_teambg Exp $
  *
  */
 
@@ -136,7 +136,7 @@ static const char* PlayMode()
 
 /*
  * Return true if directory Path/slotname is a potential save game
- *   slot, otherwise return false.
+ * slot, otherwise return false.
  */
 static bool IsSaveGameSlot(const char* Path, const char* slotname)
 {
@@ -149,7 +149,7 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 	int cnt = sscanf( slotname, SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName );
 	if (cnt != 2) { 
 		//The matcher didn't match: either this is not a valid dir
-		//   or the SAVEGAME_DIRECTORY_MATCHER needs updating.
+		//or the SAVEGAME_DIRECTORY_MATCHER needs updating.
 		printf( "Invalid savegame directory '%s' in %s.\n", slotname, Path );
 		return false;
 	}
@@ -161,7 +161,7 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 	char dtmp[_MAX_PATH];
 	snprintf( dtmp, _MAX_PATH, "%s%s%s", Path, SPathDelimiter, slotname );
 
-	struct stat  fst;
+	struct stat fst;
 	if (stat( dtmp, &fst ))
 		return false;
 
@@ -199,7 +199,7 @@ bool SaveGameIterator::RescanSaveGames()
 	{
 		return false;
 	}
-	struct dirent* de = readdir( dir );  //Lookup the first entry in the Directory
+	struct dirent* de = readdir( dir ); //Lookup the first entry in the Directory
 	if (de == NULL) {
 		closedir( dir );
 		return false;
@@ -212,7 +212,7 @@ bool SaveGameIterator::RescanSaveGames()
 			save_slots.insert( i, strdup( de->d_name ) );
 		}
 	} while (( de = readdir( dir ) ) != NULL);
-	closedir( dir );  //No other files in the directory, close it
+	closedir( dir ); //No other files in the directory, close it
 	return true;
 }
 
@@ -238,7 +238,7 @@ char *SaveGameIterator::GetSaveName(int index)
 
 SaveGame* SaveGameIterator::GetSaveGame(int index)
 {
-	char* slotname  = GetSaveName(index);
+	char* slotname = GetSaveName(index);
 
 	int prtrt = 0;
 	char Path[_MAX_PATH];
@@ -261,7 +261,7 @@ SaveGame* SaveGameIterator::GetSaveGame(int index)
 	if (ndir == NULL) {
 		return NULL;
 	}
-	struct dirent* de2 = readdir( ndir );  //Lookup the first entry in the Directory
+	struct dirent* de2 = readdir( ndir ); //Lookup the first entry in the Directory
 	if (de2 == NULL) {
 		// No first entry!!!
 		closedir( ndir );
@@ -271,7 +271,7 @@ SaveGame* SaveGameIterator::GetSaveGame(int index)
 		if (strnicmp( de2->d_name, "PORTRT", 6 ) == 0)
 			prtrt++;
 	} while (( de2 = readdir( ndir ) ) != NULL);
-	closedir( ndir );  //No other files in the directory, close it
+	closedir( ndir ); //No other files in the directory, close it
 
 	SaveGame* sg = new SaveGame( Path, savegameName, core->GameNameResRef, prtrt );
 	return sg;
@@ -328,6 +328,7 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname)
 		}
 	}
 	snprintf( Path, _MAX_PATH, "%s%s%s%09d-%s", core->SavePath, PlayMode(), SPathDelimiter, index, slotname );
+	core->DelTree(Path, false); //this is required in case the old slot wasn't recognised but still there
 	mkdir(Path,S_IWRITE|S_IREAD);
 	//save files here
 
@@ -358,6 +359,12 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname)
 	}
 
 	//Create portraits
+	int ratio=2; //portrait shrink ratio
+	//this is just a random PST specific trait
+	//you can make it less random with a new feature bit
+	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
+		ratio=1; //pst doesn't shrink the portrait icons any further
+	}
 	ImageMgr *im = (ImageMgr *) core->GetInterface(IE_BMP_CLASS_ID);
 	for (int i=0;i<game->GetPartySize(false); i++) {
 		Actor *actor = game->GetPC(i, false);
@@ -368,7 +375,7 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname)
 			FileStream outfile;
 			outfile.Create(Path, FName, IE_BMP_CLASS_ID);
 			im->Open( str, true);
-			im->PutImage(&outfile,1);
+			im->PutImage(&outfile,ratio);
 		}
 	}
 	//area preview
@@ -379,7 +386,7 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname)
 
 void SaveGameIterator::DeleteSaveGame(int index)
 {
-	char* slotname  = GetSaveName(index);
+	char* slotname = GetSaveName(index);
 	if (!slotname) {
 		return;
 	}
