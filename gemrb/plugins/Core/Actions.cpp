@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.6 2005/06/22 15:55:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.7 2005/06/23 20:17:22 avenger_teambg Exp $
  *
  */
 
@@ -2426,6 +2426,7 @@ void GameScript::SetLeavePartyDialogFile(Scriptable* Sender, Action* /*parameter
 
 void GameScript::TextScreen(Scriptable* /*Sender*/, Action* parameters)
 {
+	/*
 	int chapter;
 	ieDword line;
 	bool iwd=false;
@@ -2447,19 +2448,23 @@ void GameScript::TextScreen(Scriptable* /*Sender*/, Action* parameters)
 	}
 
 	TableMgr *table = core->GetTable(chapter);
-	strnuprcpy(core->GetGame()->LoadMos, table->QueryField(0xffffffff),8);
+	strnuprcpy(core->GetGame()->LoadMos, table->QueryField(),8);
+	
 	GameControl *gc=core->GetGameControl();
 	if (gc) {
 		char *strref = table->QueryField(line, 0);
 		char *str=core->GetString( strtol(strref,NULL,0) );
 		core->DisplayString(str);
 		free(str);
+		int cols = table->GetColumnCount(line);    
 		strref = table->QueryField(line, 1);
 		str=core->GetString( strtol(strref,NULL,0) );
 		core->DisplayString(str);
 		free(str);
 	}
 	core->DelTable(chapter);
+	*/
+	strnuprcpy(core->GetGame()->LoadMos, parameters->string0Parameter,8);
 	core->GetGUIScriptEngine()->RunFunction( "StartTextScreen" );
 }
 

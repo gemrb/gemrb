@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.110 2005/06/20 17:15:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.111 2005/06/23 20:17:22 avenger_teambg Exp $
  *
  */
 
@@ -265,7 +265,7 @@ void Actor::SetCircleSize()
 {
 	Color* color;
 	if (Modified[IE_UNSELECTABLE]) {
-		color = &magenta;    
+		color = &magenta;
 	} else if (GetMod(IE_MORALE)<0) {//if current morale < the max morale ?
 		color = &yellow;
 	} else if (Modified[IE_STATE_ID] & STATE_PANIC) {
@@ -652,12 +652,34 @@ bool Actor::CheckOnDeath()
 	//sequence yet, then we could return now
 	ClearActions();
 
+	Game *game = core->GetGame();
 	if (InternalFlags&IF_GIVEXP) {
 		//give experience to party
-		core->GetGame()->ShareXP(GetStat(IE_XPVALUE), true );
+		game->ShareXP(GetStat(IE_XPVALUE), true );
 		//handle reputation here
 		//
 	}
+	if (KillVar[0]) {
+		if (core->HasFeature(GF_HAS_KAPUTZ) ) {
+			ieDword value = 0;
+
+			game->kaputz->Lookup(KillVar, value);
+			game->kaputz->SetAt(KillVar, value+1);
+		} else {
+			ieDword value = 0;
+
+			game->locals->Lookup(KillVar, value);
+			game->locals->SetAt(KillVar, value+1);
+		}
+	} else {
+		char varname[33];
+		ieDword value = 0;
+
+		snprintf(varname, 32, "SPRITE_IS_DEAD%s", scriptName);
+		game->locals->Lookup(varname, value);
+		game->locals->SetAt(KillVar, value+1);
+	}
+
 	DropItem("",0);
 	//remove all effects that are not 'permanent after death' here
 	//permanent after death type is 9
