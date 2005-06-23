@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.77 2005/06/22 21:21:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.78 2005/06/23 20:12:05 avenger_teambg Exp $
  *
  */
 
@@ -929,7 +929,6 @@ void CREImp::GetActorIWD2(Actor *act)
 	str->Read( scriptname, 32);
 	scriptname[32]=0;
 	act->SetScriptName(scriptname);
-	//not sure
 	act->KillVar[0]=0;
 
 	KnownSpellsOffset = 0;
@@ -1078,7 +1077,11 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	ReadScript(act, 4);
 	ReadScript(act, 5);
 	
-	str->Seek( 104, GEM_CURRENT_POS );
+	str->Seek( 46, GEM_CURRENT_POS );
+	char KillVar[33]; //use this as needed
+	str->Read(KillVar,32);
+	KillVar[32]=0;
+	str->Seek( 26, GEM_CURRENT_POS );
  
 	str->Read( &act->BaseStats[IE_EA], 1 );
 	str->Read( &act->BaseStats[IE_GENERAL], 1 );
@@ -1093,8 +1096,7 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	str->Read( scriptname, 32);
 	scriptname[32]=0;
 	act->SetScriptName(scriptname);
-	//not sure
-	act->KillVar[0]=0;
+	strnuprcpy(act->KillVar, KillVar, 32);
 
 	str->ReadDword( &KnownSpellsOffset );
 	str->ReadDword( &KnownSpellsCount );
