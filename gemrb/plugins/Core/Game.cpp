@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.81 2005/06/23 20:17:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.82 2005/06/24 16:54:20 avenger_teambg Exp $
  *
  */
 
@@ -153,11 +153,11 @@ Actor* Game::GetPC(unsigned int slot, bool onlyalive)
 	}
 	if (onlyalive) {
 		unsigned int i=0;
-		while(slot && i<PCs.size() ) {
+		while(i<PCs.size() ) {
 			Actor *ac = PCs[i++];
 			
 			if (IsAlive(ac) ) {
-				if (slot--) {
+				if (!slot--) {
 					return ac;
 				}
 			}
