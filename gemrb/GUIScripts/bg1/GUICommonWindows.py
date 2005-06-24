@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICommonWindows.py,v 1.2 2005/03/23 22:14:17 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICommonWindows.py,v 1.3 2005/06/24 23:19:56 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -200,7 +200,7 @@ def OpenPortraitWindow ():
 
 	PortraitWindow = Window = GemRB.LoadWindow(1)
 	#GemRB.SetVar ("PortraitWindow", PortraitWindow)
-        #GemRB.SetVar ("PortraitPosition", 2)    # Right
+	#GemRB.SetVar ("PortraitPosition", 2)    # Right
 
 	for i in range (PARTY_SIZE):
 		Button = GemRB.GetControl (Window, i)
@@ -347,4 +347,34 @@ def SetupSavingThrows (pc):
 		GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+row, tmp1)
 		print "Savingthrow:", tmp1
 	return
+
+def SetEncumbranceLabels (Window, Label, Label2, pc):
+	# encumbrance
+	# Loading tables of modifications
+	Table = GemRB.LoadTable("strmod")
+	TableEx = GemRB.LoadTable("strmodex")
+	# Getting the character's strength
+	sstr = GemRB.GetPlayerStat (pc, IE_STR)
+	ext_str = GemRB.GetPlayerStat (pc, IE_STREXTRA)
+
+	max_encumb = GemRB.GetTableValue(Table, sstr, 3) + GemRB.GetTableValue(TableEx, ext_str, 3)
+	encumbrance = GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)
+
+	Label = GemRB.GetControl (Window, 0x10000043)
+	GemRB.SetText (Window, Label, str(encumbrance) + ":")
+
+	Label2 = GemRB.GetControl (Window, 0x10000044)
+	GemRB.SetText (Window, Label2, str(max_encumb) + ":")
+	ratio = (0.0 + encumbrance) / max_encumb
+	if ratio > 1.0:
+		GemRB.SetLabelTextColor (Window, Label, 255, 0, 0)
+		GemRB.SetLabelTextColor (Window, Label2, 255, 0, 0)
+	elif ratio > 0.8:
+		GemRB.SetLabelTextColor (Window, Label, 255, 255, 0)
+		GemRB.SetLabelTextColor (Window, Label2, 255, 0, 0)
+	else:
+		GemRB.SetLabelTextColor (Window, Label, 255, 255, 255)
+		GemRB.SetLabelTextColor (Window, Label2, 255, 0, 0)
+	return
+
 

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIWORLD.py,v 1.3 2005/06/22 15:55:22 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIWORLD.py,v 1.4 2005/06/24 23:19:56 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -218,12 +218,6 @@ def OpenContainerWindow ():
 
 	pc = GemRB.GameGetFirstSelectedPC()
 	Container = GemRB.GetContainer(0)
-
-	# Gears (time) when options pane is down
-	Button = GemRB.GetControl (Window, 62)
-	GemRB.SetAnimation (Window, Button, "CGEAR")
-	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
-	GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_LOCKED)
 
 	# 0 - 5 - Ground Item
 	# 10 - 13 - Personal Item

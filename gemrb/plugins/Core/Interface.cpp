@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.326 2005/06/22 15:55:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.327 2005/06/24 23:20:00 avenger_teambg Exp $
  *
  */
 
@@ -1053,7 +1053,9 @@ char* Interface::GetString(ieStrRef strref, unsigned long options)
 {
 	ieDword flags = 0;
 
-	vars->Lookup( "Strref On", flags );
+	if (!(options & IE_STR_STRREFOFF)) {
+		vars->Lookup( "Strref On", flags );
+	}
 	return strings->GetString( strref, flags | options );
 }
 
@@ -3506,11 +3508,11 @@ int Interface::WriteWorldMap(const char *folder)
 		int ret = wmm->PutWorldMap (&str, worldmap);
 		if (ret <0) {
 			printMessage("Core"," ", YELLOW);
-			printf("Internal error, worldmap cannot be saved: %s\n",  WorldMapName);
+			printf("Internal error, worldmap cannot be saved: %s\n", WorldMapName);
 		}
 	} else {
 		printMessage("Core"," ", YELLOW);
-		printf("Internal error, worldmap cannot be saved: %s\n",  WorldMapName);
+		printf("Internal error, worldmap cannot be saved: %s\n", WorldMapName);
 	}
 	//make sure the stream isn't connected to sm, or it will be double freed
 	FreeInterface( wmm );

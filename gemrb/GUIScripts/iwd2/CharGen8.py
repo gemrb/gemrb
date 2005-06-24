@@ -108,7 +108,7 @@ def OnLoad():
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"\n[color=FFFF00]",-1) #2 new lines
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,17088)
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"[/color]")
-	for i in range(0,6):
+	for i in range(6):
 		v = GemRB.GetTableValue(AbilityTable, i,2)
 		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, v, -1)
 		v = GemRB.GetVar("Ability "+str(i) )

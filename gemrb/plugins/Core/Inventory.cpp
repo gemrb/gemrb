@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.54 2005/06/22 15:55:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.55 2005/06/24 23:20:01 avenger_teambg Exp $
  *
  */
 
@@ -75,31 +75,33 @@ void Inventory::CalculateWeight()
 		//printf ("%2d: %8s : %d x %d\n", (int) i, slot->ItemResRef, slot->Weight, slot->Usages[0]);
 		if (slot->Weight == -1) {
 			Item *itm = core->GetItem( slot->ItemResRef );
-			//simply adding the item flags to the slot
-			slot->Flags |= (itm->Flags<<8);
-			//some slot flags might be affected by the item flags
-			if (!(slot->Flags & IE_INV_ITEM_CRITICAL)) {
-				slot->Flags |= IE_INV_ITEM_DESTRUCTIBLE;
-			}
-			if (!(slot->Flags & IE_INV_ITEM_MOVABLE)) {
-				slot->Flags |= IE_INV_ITEM_UNDROPPABLE;
-			}
-			//this is not correct, cursed items are droppable if unwielded
-			//the consolidated flags will help this, new flag: IE_INV_ITEM_CURSED
-			//if (itm->Flags & IE_ITEM_CURSED) {
-			//	slot->Flags |= IE_INV_ITEM_UNDROPPABLE;
-			//}
-
-			if (slot->Flags & IE_INV_ITEM_STOLEN2) {
-				slot->Flags |= IE_INV_ITEM_STOLEN;
-			}
-
 			if (itm) {
+				//simply adding the item flags to the slot
+				slot->Flags |= (itm->Flags<<8);
+				//some slot flags might be affected by the item flags
+				if (!(slot->Flags & IE_INV_ITEM_CRITICAL)) {
+					slot->Flags |= IE_INV_ITEM_DESTRUCTIBLE;
+				}
+				if (!(slot->Flags & IE_INV_ITEM_MOVABLE)) {
+					slot->Flags |= IE_INV_ITEM_UNDROPPABLE;
+				}
+				//this is not correct, cursed items are droppable if unwielded
+				//the consolidated flags will help this, new flag: IE_INV_ITEM_CURSED
+				//if (itm->Flags & IE_ITEM_CURSED) {
+				//	slot->Flags |= IE_INV_ITEM_UNDROPPABLE;
+				//}
+				
+				if (slot->Flags & IE_INV_ITEM_STOLEN2) {
+					slot->Flags |= IE_INV_ITEM_STOLEN;
+				}
+				
 				slot->Weight = itm->Weight;
 				slot->StackAmount = itm->StackAmount;
 				core->FreeItem( itm, slot->ItemResRef, false );
 			}
 			else {
+				printMessage( "Inventory", " ", LIGHT_RED);
+				printf("Invalid item: %s!", slot->ItemResRef);
 				slot->Weight = 0;
 			}
 		} else {

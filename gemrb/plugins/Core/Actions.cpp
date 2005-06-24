@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.7 2005/06/23 20:17:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.8 2005/06/24 23:20:00 avenger_teambg Exp $
  *
  */
 
@@ -2448,7 +2448,7 @@ void GameScript::TextScreen(Scriptable* /*Sender*/, Action* parameters)
 	}
 
 	TableMgr *table = core->GetTable(chapter);
-	strnuprcpy(core->GetGame()->LoadMos, table->QueryField(),8);
+	strnuprcpy(core->GetGame()->LoadMos, table->QueryField((ieDword)-1),8);
 	
 	GameControl *gc=core->GetGameControl();
 	if (gc) {
@@ -3872,13 +3872,20 @@ void GameScript::PolymorphCopyBase(Scriptable* Sender, Action* parameters)
 void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 {
 	int type;
+	char FolderName[_MAX_PATH];
 	char *folder = "";
 
 	int SlotTable = core->LoadTable( "savegame" );
 	if (SlotTable >= 0) {
 		TableMgr* tab = core->GetTable( SlotTable );
-		type = atoi(tab->QueryField());
-		folder = tab->QueryField(parameters->int0Parameter);
+		type = atoi(tab->QueryField((unsigned int) -1));
+		if (type) {
+			snprintf (FolderName, sizeof(FolderName), "%s - %s", tab->QueryField(0), 
+				core->GetString( parameters->int0Parameter, IE_STR_STRREFOFF) );
+			folder = FolderName;
+		} else {
+			folder = tab->QueryField(parameters->int0Parameter);
+		}
 	}
 	core->GetSaveGameIterator()->CreateSaveGame(parameters->int0Parameter, folder);
 	if (SlotTable >= 0) {

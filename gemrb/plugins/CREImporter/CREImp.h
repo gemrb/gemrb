@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.h,v 1.14 2005/06/22 21:21:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.h,v 1.15 2005/06/24 23:20:00 avenger_teambg Exp $
  *
  */
 
@@ -53,7 +53,7 @@ private:
 	ieDword EffectsOffset;
 	ieDword EffectsCount;
 	ieByte TotSCEFF;
-
+	ieByte IsCharacter;
 public:
 	CREImp(void);
 	~CREImp(void);
@@ -70,6 +70,7 @@ public:
 		delete this;
 	}
 private:
+	void ReadChrHeader(Actor *actor);
 	bool SeekCreHeader(char *Signature);
 	void GetActorPST(Actor *actor);
 	void GetActorBG(Actor *actor);

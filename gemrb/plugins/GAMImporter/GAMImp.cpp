@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.56 2005/06/22 21:21:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.57 2005/06/24 23:20:02 avenger_teambg Exp $
  *
  */
 
@@ -636,7 +636,7 @@ int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CRE
 	stream->WriteWord( &tmpWord);
 	stream->WriteWord( &tmpWord);
 
-	strncpy(filling, ac->LongName, 32);
+	strncpy(filling, core->GetString(ac->LongStrRef, IE_STR_STRREFOFF), 32);
 	stream->Write( filling, 32);
 	stream->WriteDword( &ac->TalkCount);
 	stream->WriteDword( &ac->PCStats->BestKilledName);

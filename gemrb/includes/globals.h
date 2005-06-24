@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.75 2005/06/19 22:59:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.76 2005/06/24 23:19:59 avenger_teambg Exp $
  *
  */
 
@@ -69,6 +69,8 @@
 #define IE_STR_STRREFON 1
 #define IE_STR_SOUND	2
 #define IE_STR_SPEECH   4
+
+#define IE_STR_STRREFOFF 256
 
 // bitflag operations
 #define BM_SET  0 //gemrb extension

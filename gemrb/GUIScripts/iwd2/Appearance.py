@@ -49,7 +49,7 @@ def OnLoad():
 	ColorWindow=GemRB.LoadWindow(13)
 
 	RaceTable = GemRB.LoadTable("races")
-	Race = GemRB.GetVar("Race")-1
+	Race = GemRB.FindTableValue (RaceTable, 3, GemRB.GetVar ("Race") )
 	HairTable = GemRB.LoadTable(GemRB.GetTableValue(RaceTable, Race, 5))
 	SkinTable = GemRB.LoadTable(GemRB.GetTableValue(RaceTable, Race, 6))
 	ColorTable = GemRB.LoadTable("clowncol")
@@ -96,6 +96,11 @@ def OnLoad():
 	GemRB.SetVisible(ColorWindow,1)
 	return
 
+def RandomDonePress():
+	#should be better
+	GemRB.SetVar("Selected", GemRB.Roll(1,5,0) )
+	DonePress()
+	
 def DonePress():
 	global Color1, Color2, Color3, Color4
 	GemRB.UnloadWindow(ColorPicker)
@@ -132,7 +137,7 @@ def GetColor():
 
 	ColorPicker=GemRB.LoadWindow(14)
 	GemRB.SetVar("Selected",-1)
-	for i in range(0,33):
+	for i in range(33):
 		Button = GemRB.GetControl(ColorPicker, i)
 		GemRB.SetButtonState(ColorPicker, Button, IE_GUI_BUTTON_DISABLED)
 		GemRB.SetButtonFlags(ColorPicker, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
@@ -150,7 +155,6 @@ def GetColor():
 			MyColor=GemRB.GetTableValue(t,i,0)
 		else:
 			MyColor=GemRB.GetTableValue(ColorTable, ColorIndex-2, i)
-			print i, MyColor
 		if MyColor == "*":
 			break
 		Button = GemRB.GetControl(ColorPicker, i)
@@ -165,7 +169,8 @@ def GetColor():
 	Button = GemRB.GetControl(ColorPicker, 33)
 	#default button
 	GemRB.SetVarAssoc(ColorPicker, Button, "Selected", 0)
-	GemRB.SetEvent(ColorPicker, Button, IE_GUI_BUTTON_ON_PRESS, "DonePress")
+	GemRB.SetEvent(ColorPicker, Button, IE_GUI_BUTTON_ON_PRESS, "RandomDonePress")
+	GemRB.SetText(ColorPicker, Button, "RANDOM")
 	GemRB.SetVisible(ColorPicker,1)
 	return
 

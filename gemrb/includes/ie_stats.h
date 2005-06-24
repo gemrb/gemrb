@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.33 2005/06/19 22:59:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.34 2005/06/24 23:19:59 avenger_teambg Exp $
  *
  */
 
@@ -230,14 +230,23 @@
 #define IE_PROFICIENCYSINGLEWEAPON		113
 #define IE_PROFICIENCY2WEAPON		 114  
 #define IE_EXTRAPROFICIENCY1 		 115
+#define IE_ALCHEMY               115
 #define IE_EXTRAPROFICIENCY2 		 116
+#define IE_ANIMALS               116
 #define IE_EXTRAPROFICIENCY3 		 117
+#define IE_BLUFF                 117
 #define IE_EXTRAPROFICIENCY4 		 118
+#define IE_CONCENTRATION         118
 #define IE_EXTRAPROFICIENCY5 		 119
+#define IE_DIPLOMACY             119
 #define IE_EXTRAPROFICIENCY6 		 120
+#define IE_INTIMIDATE            120
 #define IE_EXTRAPROFICIENCY7 		 121
+#define IE_SEARCH                121
 #define IE_EXTRAPROFICIENCY8 		 122
+#define IE_SPELLCRAFT            122
 #define IE_EXTRAPROFICIENCY9 		 123
+#define IE_MAGICDEVICE           123
 #define IE_EXTRAPROFICIENCY10 		 124
 #define IE_EXTRAPROFICIENCY11 		 125
 #define IE_EXTRAPROFICIENCY12 		 126
@@ -246,8 +255,11 @@
 #define IE_EXTRAPROFICIENCY15 		 129
 #define IE_EXTRAPROFICIENCY16 		 130
 #define IE_EXTRAPROFICIENCY17 		 131
+#define IE_FEATS1                  131
 #define IE_EXTRAPROFICIENCY18 		 132
+#define IE_FEATS2                  132
 #define IE_EXTRAPROFICIENCY19 		 133
+#define IE_FEATS3                  133
 #define IE_EXTRAPROFICIENCY20 		 134
 #define IE_FREESLOTS	 		 134 //same as above
 #define IE_HIDEINSHADOWS			  135
@@ -338,7 +350,7 @@
 #define IE_HAIR_COLOR		214
 #define IE_COLORCOUNT		214 //same
 #define IE_MC_FLAGS		215
-#define IE_CLASSLEVELSUM		216 //iwd2
+#define IE_CLASSLEVELSUM	216 //iwd2
 #define IE_ALIGNMENT		217
 #define IE_UNSELECTABLE		218
 #define IE_ARMOR_TYPE		219
@@ -372,5 +384,9 @@
 #define IE_LEVELPALADIN          245
 #define IE_LEVELRANGER           246
 #define IE_LEVELSORCEROR         247
+
+#define IE_SAVEDXPOS             253
+#define IE_SAVEDYPOS             254
+#define IE_SAVEDFACE             255
 // place for more classes
 #endif

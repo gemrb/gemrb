@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.15 2005/06/22 21:17:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.16 2005/06/24 23:20:02 avenger_teambg Exp $
  *
  */
 
@@ -176,11 +176,12 @@ int WMPImp::GetStoredFileSize(WorldMapArray *wmap)
 	for (unsigned int i=0;i<WorldMapsCount; i++) {
 		WorldMap *map = wmap->GetWorldMap(i);
 
-		ieDword AreaLinksCount = map->GetLinkCount();
-		headersize += AreaLinksCount * 240;
-
 		ieDword AreaEntriesCount = map->GetEntryCount();
-		headersize += AreaEntriesCount * 212;
+		headersize += AreaEntriesCount * 240;
+
+		ieDword AreaLinksCount = map->GetLinkCount();
+		headersize += AreaLinksCount * 216;
+
 	}
 
 	return headersize;
@@ -250,13 +251,21 @@ int WMPImp::PutAreas(DataStream *stream, WorldMap *wmap)
 
 int WMPImp::PutMaps(DataStream *stream, WorldMapArray *wmap)
 {
+	unsigned int i;
 	int ret;
 	char filling[128];
 
 	memset (filling,0,sizeof(filling));
-	ieDword AreaLinksOffset;
-	ieDword AreaEntriesOffset = stream->GetPos() + 184;
-	for (unsigned int i=0;i<WorldMapsCount; i++) {
+	ieDword AreaEntriesOffset = WorldMapsOffset + WorldMapsCount * 184;
+	ieDword AreaLinksOffset = AreaEntriesOffset;
+	for (i=0;i<WorldMapsCount; i++) {
+		WorldMap *map = wmap->GetWorldMap(i);
+
+		AreaLinksOffset += map->GetEntryCount() * 240;
+	}
+
+	//map headers
+	for (i=0;i<WorldMapsCount; i++) {
 		ieDword AreaEntriesCount, AreaLinksCount;
 
 		WorldMap *map = wmap->GetWorldMap(i);
@@ -274,18 +283,29 @@ int WMPImp::PutMaps(DataStream *stream, WorldMapArray *wmap)
 
 		stream->WriteDword( &AreaEntriesCount );
 		stream->WriteDword( &AreaEntriesOffset );
-		AreaLinksOffset = AreaEntriesOffset + AreaEntriesCount * 240;
 		stream->WriteDword( &AreaLinksOffset );
-		AreaEntriesOffset = AreaLinksOffset + AreaLinksCount * 212;
 		stream->WriteDword( &AreaLinksCount );
 		stream->WriteResRef( map->MapIconResRef );
+		AreaEntriesOffset += AreaEntriesCount * 240;
+		AreaLinksOffset += AreaLinksCount * 216;
 
 		stream->Write( filling, 128);
+	}
+
+	//area entries
+	for (i=0;i<WorldMapsCount; i++) {
+		WorldMap *map = wmap->GetWorldMap(i);
 
 		ret = PutAreas( stream, map);
 		if (ret) {
 			return ret;
 		}
+	}
+
+	//links
+	for (i=0;i<WorldMapsCount; i++) {
+		WorldMap *map = wmap->GetWorldMap(i);
+
 		PutLinks( stream, map);
 		if (ret) {
 			return ret;
