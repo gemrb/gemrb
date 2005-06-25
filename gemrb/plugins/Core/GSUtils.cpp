@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.5 2005/06/20 22:53:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.6 2005/06/25 08:50:19 avenger_teambg Exp $
  *
  */
 
@@ -457,11 +457,16 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	}
 	if (!tar) {
 		printf("[GameScript]: Target for dialog couldn't be found (Sender: %s, Type: %d).\n", Sender->GetScriptName(), Sender->Type);
-		parameters->Dump();
 		if (Sender->Type == ST_ACTOR) {
 			((Actor *) Sender)->DebugDump();
 		}
-		parameters->objects[1]->Dump();
+		//parameters->Dump();
+		printf ("Target object: ");
+		if (parameters->objects[1]) {
+			parameters->objects[1]->Dump();
+		} else {
+			printf("<NULL>\n");
+		}
 		Sender->CurrentAction = NULL;
 		return;
 	}
