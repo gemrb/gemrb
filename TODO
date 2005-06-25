@@ -1,16 +1,16 @@
 Scripts:
-1. (DONE?) Run All creature scripts when the creatures are 'activated'. 
+1. (DONE) Run All creature scripts when the creatures are 'activated'. 
 
-2. Run All area scripts not just the active areas.
+2. (?) Run All area scripts not just the active areas.
 Area scripts are queued, master areas get on the head of the queue, non-master areas get in the tail of the queue. See also: SetMasterArea action/mastarea.2da
 
-3. (DONE?) TLK tags
+3. (DONE) TLK tags
 
-4. fix loading of local variables of creatures (needs effect framework)
+4. fix loading/saving of local variables of creatures (needs effect framework)
 
 Items:
 1. (DONE) Loading containers/items in areas
-2. Dropping of items (first create an opcode)
+2. (DONE) Dropping of items (first create an opcode)
 2a. Render dropped items in area (ground icon) (DONE)
 3. Picking up an item (create opcode too) (piles DONE)
 4. Equipping items
@@ -26,7 +26,7 @@ Area:
 2. Don't load scripts for pile items? (research when a script is unused)
 
 Store:
-1. (PARTLY) Save stores, handle containers
+1. (DONE) Save stores, handle containers
 
 Animation:
 1. (PARTLY) fix char animation sequences
@@ -38,8 +38,14 @@ Actor:
 Window/Widget management:
 - implement grabbing mouse pointer by a control to fix dragging of Float menu window
 
+Game GUI:
+1. fix TextScreen/IncrementChapter
+2. implement class based (but customisable) action button bar. Generally port the IWD2 system to all engines
+
 Known Bugs:
 1. problem: stanceID is still fuzzy. Fix it. (FIXED?)
+
+2. problem: valgrind reports invalid memory access due to Unqueueing buffers and using them in another thread (openal weirdness?)
 
 Ideas:
 1. Use the character sheet (Actor.cpp) itself to store attributes of the character during character generation.
@@ -48,8 +54,15 @@ How to: replace GemRB.SetVar with GemRB.SetPlayerStat. Don't forget to create th
 
 - make tool to scan GUIScript.cpp and parse function comments. compute hashes of them and compare them to hashes stored in gemrb/docs/en/GUIScript/*.txt - if hashes differ, the description in GUIScript.cpp has been updated and the *.txt should be updated as well (ED, DONE)
 
-- fix include paths during compilation, so the files do not use #include "../../Core/something.h" etc.
-
 - various directories (GemRB override, game override ...) should be resolved right after loading config files and remain static afterwards. Maybe define some PATH variable describing all the directories searched for files
 
-- fix CIA reporting email address (FIXED?)
+- fix CIA reporting email address (DONE)
+
+Compile scripts:
+
+- fix include paths during compilation, so the files do not use #include "../../Core/something.h" etc.
+
+- make sure GemRB vs. OpenAL still works on both Win32 and Linux
+
+- employ ccache?
+
