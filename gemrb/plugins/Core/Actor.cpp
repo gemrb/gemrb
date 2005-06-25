@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.111 2005/06/23 20:17:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.112 2005/06/25 20:05:52 avenger_teambg Exp $
  *
  */
 
@@ -334,6 +334,8 @@ void pcf_stat(Actor *actor, ieDword Value)
 
 void pcf_gold(Actor *actor, ieDword Value)
 {
+	//this function will make a party member automatically donate their
+	//gold to the party pool, not the same as in the original engine
 	if (actor->InParty) {
 		Game *game = core->GetGame();
 		game->PartyGold += Value;

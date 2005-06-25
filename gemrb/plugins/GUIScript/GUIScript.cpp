@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.322 2005/06/22 15:55:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.323 2005/06/25 20:05:53 avenger_teambg Exp $
  *
  */
 
@@ -37,11 +37,11 @@
 #endif
 
 #ifndef PyDoc_STR
-#  ifdef WITH_DOC_STRINGS
-#  define PyDoc_STR(str) str
-#  else
-#  define PyDoc_STR(str) ""
-#  endif
+# ifdef WITH_DOC_STRINGS
+# define PyDoc_STR(str) str
+# else
+# define PyDoc_STR(str) ""
+# endif
 #endif
 
 #ifndef PyDoc_STRVAR
@@ -164,7 +164,8 @@ static PyObject* GemRB_UnhideGUI(PyObject*, PyObject* /*args*/)
 		return NULL;
 	}
 	gc->UnhideGUI();
-	gc->SetCutSceneMode( false );
+	//this enables mouse in dialogs, which is wrong
+	//gc->SetCutSceneMode( false );
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -188,7 +189,7 @@ GameControl* StartGameControl()
 {
 	//making sure that our window is the first one
 	core->DelWindow(~0); //deleting ALL windows
-	core->DelTable(~0);  //dropping ALL tables
+	core->DelTable(~0); //dropping ALL tables
 	Window* gamewin = new Window( 0xffff, 0, 0, core->Width, core->Height );
 	GameControl* gc = new GameControl();
 	gc->XPos = 0;
@@ -414,7 +415,7 @@ static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 	}
 
 	// If the current winpack windows are placed for screen resolution
-	//   other than the current one, reposition them
+	// other than the current one, reposition them
 	Window* win = core->GetWindow( ret );
 	if (CHUWidth && CHUWidth != core->Width)
 		win->XPos += (core->Width - CHUWidth) / 2;
@@ -2978,7 +2979,11 @@ PyDoc_STRVAR( GemRB_GameGetPartyGold__doc,
 
 static PyObject* GemRB_GameGetPartyGold(PyObject * /*self*/, PyObject* /*args*/)
 {
-	int Gold = core->GetGame()->PartyGold;
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( GemRB_GameGetPartyGold__doc );
+	}
+	int Gold = game->PartyGold;
 	return PyInt_FromLong( Gold );
 }
 
@@ -2988,12 +2993,20 @@ PyDoc_STRVAR( GemRB_GameSetPartyGold__doc,
 
 static PyObject* GemRB_GameSetPartyGold(PyObject * /*self*/, PyObject* args)
 {
-	int Gold;
+	int Gold, flag = 0;
 
-	if (!PyArg_ParseTuple( args, "i", &Gold )) {
+	if (!PyArg_ParseTuple( args, "i|i", &Gold, &flag )) {
 		return AttributeError( GemRB_GameSetPartyGold__doc );
 	}
-	core->GetGame()->PartyGold=Gold;
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( GemRB_GameSetPartyGold__doc );
+	}
+	if (flag) {
+		game->AddGold((ieDword) Gold);
+	} else {
+		game->PartyGold=Gold;
+	}
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -3755,7 +3768,7 @@ static PyObject* GemRB_GetContainer(PyObject * /*self*/, PyObject* args)
 	if (autoselect) { //autoselect works only with piles
 		Map *map = actor->GetCurrentArea();
 		//GetContainer should create an empty container
-		container = map->GetPile(actor->Pos);    
+		container = map->GetPile(actor->Pos);
 	} else {
 		container = core->GetCurrentContainer();
 	}
@@ -4222,7 +4235,7 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 
 	int price = item->Price * store->SellMarkup / 100;
 	//calculate depreciation too
-	//store->DepreciationRate,  mount
+	//store->DepreciationRate, mount
 
 	if (item->StackAmount>1) {
 		price *= si->Usages[0];

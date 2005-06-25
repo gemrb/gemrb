@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.8 2005/06/24 23:20:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.9 2005/06/25 20:05:51 avenger_teambg Exp $
  *
  */
 
@@ -1769,34 +1769,37 @@ void GameScript::UnMakeGlobal(Scriptable* Sender, Action* /*parameters*/)
 //this apparently doesn't check the gold, thus could be used from non actors
 void GameScript::GivePartyGoldGlobal(Scriptable* Sender, Action* parameters)
 {
-/*
-	if (Sender->Type != ST_ACTOR) {
-		return;
+	ieDword gold = (ieDword) CheckVariable( Sender, parameters->string0Parameter, parameters->string1Parameter );
+	if (Sender->Type == ST_ACTOR) {
+		Actor* act = ( Actor* ) Sender;
+		ieDword mygold = act->GetStat(IE_GOLD);
+		if (mygold < gold) {
+			gold = mygold;
+		}
+		//will get saved, not adjusted
+		act->NewStat(IE_GOLD, -gold, MOD_ADDITIVE);
 	}
-	Actor* act = ( Actor* ) Sender;
-*/
-	ieDword gold = (unsigned long) CheckVariable( Sender, parameters->string0Parameter );
-	//act->NewStat(IE_GOLD, -gold, MOD_ADDITIVE);
-	core->GetGame()->PartyGold += gold;
+	core->GetGame()->AddGold(gold);
 }
 
 void GameScript::CreatePartyGold(Scriptable* /*Sender*/, Action* parameters)
 {
-	core->GetGame()->PartyGold+=parameters->int0Parameter;
+	core->GetGame()->AddGold(parameters->int0Parameter);
 }
 
 void GameScript::GivePartyGold(Scriptable* Sender, Action* parameters)
 {
-	if (Sender->Type != ST_ACTOR) {
-		return;
+	ieDword gold = (ieDword) parameters->int0Parameter;
+	if (Sender->Type == ST_ACTOR) {
+		Actor* act = ( Actor* ) Sender;
+		ieDword mygold = act->GetStat(IE_GOLD);
+		if (mygold < gold) {
+			gold = mygold;
+		}
+		//will get saved, not adjusted
+		act->NewStat(IE_GOLD, -gold, MOD_ADDITIVE);
 	}
-	Actor* act = ( Actor* ) Sender;
-	int gold = act->GetStat(IE_GOLD);
-	if (gold>parameters->int0Parameter) {
-		gold=parameters->int0Parameter;
-	}
-	act->NewStat(IE_GOLD, -gold, MOD_ADDITIVE);
-	core->GetGame()->PartyGold+=gold;
+	core->GetGame()->AddGold(gold);
 }
 
 void GameScript::DestroyPartyGold(Scriptable* /*Sender*/, Action* parameters)
@@ -1805,21 +1808,20 @@ void GameScript::DestroyPartyGold(Scriptable* /*Sender*/, Action* parameters)
 	if (gold>parameters->int0Parameter) {
 		gold=parameters->int0Parameter;
 	}
-	core->GetGame()->PartyGold-=gold;
+	core->GetGame()->AddGold(-gold);
 }
 
 void GameScript::TakePartyGold(Scriptable* Sender, Action* parameters)
 {
-	if (Sender->Type != ST_ACTOR) {
-		return;
+	ieDword gold = core->GetGame()->PartyGold;
+	if (gold>(ieDword) parameters->int0Parameter) {
+		gold=(ieDword) parameters->int0Parameter;
 	}
-	Actor* act = ( Actor* ) Sender;
-	int gold = core->GetGame()->PartyGold;
-	if (gold>parameters->int0Parameter) {
-		gold=parameters->int0Parameter;
+	core->GetGame()->AddGold((ieDword) -(int) gold);
+	if (Sender->Type == ST_ACTOR) {
+		Actor* act = ( Actor* ) Sender;
+		act->NewStat(IE_GOLD, gold, MOD_ADDITIVE);
 	}
-	act->NewStat(IE_GOLD, gold, MOD_ADDITIVE);
-	core->GetGame()->PartyGold-=gold;
 }
 
 void GameScript::AddXPObject(Scriptable* Sender, Action* parameters)
@@ -2456,7 +2458,7 @@ void GameScript::TextScreen(Scriptable* /*Sender*/, Action* parameters)
 		char *str=core->GetString( strtol(strref,NULL,0) );
 		core->DisplayString(str);
 		free(str);
-		int cols = table->GetColumnCount(line);    
+		int cols = table->GetColumnCount(line);
 		strref = table->QueryField(line, 1);
 		str=core->GetString( strtol(strref,NULL,0) );
 		core->DisplayString(str);

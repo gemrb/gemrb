@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.119 2005/06/19 22:59:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.120 2005/06/25 20:05:51 avenger_teambg Exp $
  *
  */
 
@@ -45,7 +45,7 @@ static ieResRef Sounds[DEF_COUNT] = {
 DataFileMgr *INInote = NULL;
 
 //called from ~areimpcd (which is destructed at unloading of the dll)
-void ReleaseMemory()
+void AREImp::ReleaseMemory()
 {
 	if(INInote) {
 		core->FreeInterface( INInote );

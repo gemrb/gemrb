@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.57 2005/06/22 21:21:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.58 2005/06/25 20:05:52 avenger_teambg Exp $
  *
  */
 
@@ -239,6 +239,8 @@ public:
 	void SetControlStatus(int value, int operation);
 	void StartRainOrSnow(bool conditional, int weather);
 	size_t GetLoadedMapCount() const { return Maps.size(); }
+	/* adds or removes gold */
+	void AddGold(ieDword add);
 };
 
 #endif

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.327 2005/06/24 23:20:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.328 2005/06/25 20:05:52 avenger_teambg Exp $
  *
  */
 
@@ -1962,6 +1962,26 @@ void Interface::DrawWindows(void)
 		GSUpdate(!(flg & DF_FREEZE_SCRIPTS) );
 
 		//the following part is a series of hardcoded gui behaviour
+
+		//updating panes according to the saved game
+		//pst requires this before initiating dialogs because it has
+		//no dialog window by default
+		ieDword index = 0;
+
+		if (!vars->Lookup( "MessageWindowSize", index ) || (index!=game->ControlStatus) ) {
+			vars->SetAt( "MessageWindowSize", game->ControlStatus);
+			guiscript->RunFunction( "UpdateControlStatus" );
+			//giving control back to GameControl
+			SetControlStatus(0,0,0x7f000000|IE_GUI_CONTROL_FOCUSED);
+			GameControl *gc = GetGameControl();
+			//this is the only value we can use here
+			if (game->ControlStatus & CS_HIDEGUI)
+				gc->HideGUI();
+			else
+				gc->UnhideGUI();
+		}
+
+		//initiating dialog
 		if (flg & DF_IN_DIALOG) {
 			// -3 noaction
 			// -2 close
@@ -1983,6 +2003,8 @@ void Interface::DrawWindows(void)
 				gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW|DF_OPENENDWINDOW, BM_NAND);
 			}
 		}
+
+		//handling container
 		if (CurrentContainer) {
 			if (!(flg & DF_IN_CONTAINER) ) {
 				gc->SetDialogueFlags(DF_IN_CONTAINER, BM_OR);
@@ -1993,22 +2015,6 @@ void Interface::DrawWindows(void)
 				gc->SetDialogueFlags(DF_IN_CONTAINER, BM_NAND);
 				guiscript->RunFunction( "CloseContainerWindow" );
 			}
-		}
-
-		//updating panes according to the saved game
-		ieDword index = 0;
-
-		if (!vars->Lookup( "MessageWindowSize", index ) || (index!=game->ControlStatus) ) {
-			vars->SetAt( "MessageWindowSize", game->ControlStatus);
-			guiscript->RunFunction( "UpdateControlStatus" );
-			//giving control back to GameControl
-			SetControlStatus(0,0,0x7f000000|IE_GUI_CONTROL_FOCUSED);
-			GameControl *gc = GetGameControl();
-			//this is the only value we can use here
-			if (game->ControlStatus & CS_HIDEGUI)
-				gc->HideGUI();
-			else
-				gc->UnhideGUI();
 		}
 		//end of gui hacks
 	}
@@ -2802,13 +2808,25 @@ void Interface::DisplayString(const char* Text)
 
 static const char* DisplayFormatName = "[color=%lX]%s - [/color][p][color=%lX]%s[/color][/p]";
 static const char* DisplayFormat = "[/color][p][color=%lX]%s[/color][/p]";
+static const char* DisplayFormatValue = "[/color][p][color=%lX]%s: %d[/color][/p]";
 
 void Interface::DisplayConstantString(int stridx, unsigned int color)
 {
 	char* text = GetString( strref_table[stridx], IE_STR_SOUND );
-	int newlen = (int)(strlen( DisplayFormat ) + strlen( text ) + 10);
+	int newlen = (int)(strlen( DisplayFormat ) + strlen( text ) + 12);
 	char* newstr = ( char* ) malloc( newlen );
 	snprintf( newstr, newlen, DisplayFormat, color, text );
+	free( text );
+	DisplayString( newstr );
+	free( newstr );
+}
+
+void Interface::DisplayConstantStringValue(int stridx, unsigned int color, ieDword value)
+{
+	char* text = GetString( strref_table[stridx], IE_STR_SOUND );
+	int newlen = (int)(strlen( DisplayFormat ) + strlen( text ) + 28);
+	char* newstr = ( char* ) malloc( newlen );
+	snprintf( newstr, newlen, DisplayFormatValue, color, text, (int) value );
 	free( text );
 	DisplayString( newstr );
 	free( newstr );

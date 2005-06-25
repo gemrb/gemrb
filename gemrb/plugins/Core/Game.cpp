@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.82 2005/06/24 16:54:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.83 2005/06/25 20:05:52 avenger_teambg Exp $
  *
  */
 
@@ -636,12 +636,16 @@ void Game::ShareXP(int xp, bool divide)
 		}
 		PCs[i]->NewStat(IE_XP,xp,MOD_ADDITIVE);
 	}
-	char value[10];
+	//char value[10];
 
-	sprintf( value, "%d", xp );
+	//sprintf( value, "%d", xp );
 	//value is a string and must be copied because it is not on heap
-	core->GetTokenDictionary()->SetAtCopy( "XP", value );
-	core->DisplayConstantString( STR_GOTXP, 0xc0c000); //you have gained ... xp
+	//core->GetTokenDictionary()->SetAtCopy( "XP", value );
+	if (xp>0) {
+		core->DisplayConstantStringValue( STR_GOTXP, 0xc0c000, (ieDword) xp); //you have gained ... xp
+	} else {
+		core->DisplayConstantStringValue( STR_LOSTXP, 0xc0c000, (ieDword) -xp); //you have gained ... xp
+	}
 }
 
 bool Game::EveryoneStopped() const
@@ -735,4 +739,20 @@ void Game::StartRainOrSnow(bool conditional, int weather)
 			return;
 	}
 	WeatherBits = weather;
+}
+
+void Game::AddGold(ieDword add)
+{
+	ieDword old;
+
+	if (!add) {
+		return;
+	}
+	old = PartyGold;
+	PartyGold += add;
+	if (old<PartyGold) {
+		core->DisplayConstantStringValue( STR_GOTGOLD, 0xc0c000, PartyGold-old); 
+	} else {
+		core->DisplayConstantStringValue( STR_LOSTGOLD, 0xc0c000, old-PartyGold);
+	}
 }

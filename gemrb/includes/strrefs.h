@@ -28,11 +28,16 @@
 #define STR_CANTSAVEMOVIE   22
 #define STR_TARGETBUSY      23
 #define STR_CANTTALKTRANS   24
-#define STR_GOTXP           25
-#define STR_GOTABILITY      26
-#define STR_GOTSPELL        27
-#define STR_GOTSONG         28
-#define STR_NOTHINGTOSAY    29
-#define STR_JOURNALCHANGE   30
-#define STR_WORLDMAPCHANGE  31
+#define STR_GOTGOLD         25
+#define STR_LOSTGOLD        26
+#define STR_GOTXP           27
+#define STR_LOSTXP          28
+#define STR_GOTITEM         29
+#define STR_LOSTITEM        30
+#define STR_GOTABILITY      31
+#define STR_GOTSPELL        32
+#define STR_GOTSONG         33
+#define STR_NOTHINGTOSAY    34
+#define STR_JOURNALCHANGE   35
+#define STR_WORLDMAPCHANGE  36
 #endif //IE_STRINGS_H
