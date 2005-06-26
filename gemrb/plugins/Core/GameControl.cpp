@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.237 2005/06/25 20:05:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.238 2005/06/26 13:57:51 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -104,7 +104,6 @@ GameControl::GameControl(void)
 	dlg = NULL;
 	target = NULL;
 	speaker = NULL;
-	HotKey = 0;
 }
 
 //actually the savegame contains some formation data too, how to use it?
@@ -364,7 +363,7 @@ int GameControl::SetText(const char* /*string*/, int /*pos*/)
 /** Key Press Event */
 void GameControl::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {
-	HotKey=toupper(Key);
+	core->GetGame()->SetHotKey(toupper(Key));
 }
 
 void GameControl::DeselectAll()

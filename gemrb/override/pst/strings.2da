@@ -32,6 +32,8 @@ GOTXP           -1
 LOSTXP          -1
 GOTITEM         -1
 LOSTITEM        -1 
+GOTREP          -1
+LOSTREP         -1
 GOTABILITY     10514
 GOTSPELL       -1
 GOTSONG        -1

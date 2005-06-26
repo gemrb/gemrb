@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.5 2005/06/22 15:55:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.6 2005/06/26 13:57:52 avenger_teambg Exp $
  *
  */
 
@@ -29,6 +29,27 @@ int GameScript::BreakingPoint(Scriptable* Sender, Trigger* /*parameters*/)
 {
 	int value=GetHappiness(Sender, core->GetGame()->Reputation );
 	return value < -300;
+}
+
+int GameScript::Reaction(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	int value=GetReaction(scr);
+	return value == parameters->int0Parameter;
+}
+
+int GameScript::ReactionGT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	int value=GetReaction(scr);
+	return value > parameters->int0Parameter;
+}
+
+int GameScript::ReactionLT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	int value=GetReaction(scr);
+	return value < parameters->int0Parameter;
 }
 
 int GameScript::Happiness(Scriptable* Sender, Trigger* parameters)
@@ -2158,13 +2179,17 @@ int GameScript::TimeLT(Scriptable* /*Sender*/, Trigger* parameters)
 	return core->GetGame()->GameTime < (ieDword) parameters->int0Parameter;
 }
 
-int GameScript::HotKey(Scriptable* /*Sender*/, Trigger* parameters)
+int GameScript::HotKey(Scriptable* Sender, Trigger* parameters)
 {
-	int ret=core->GetGameControl()->HotKey==parameters->int0Parameter;
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *scr = (Actor *) Sender;
+	int ret=(int) scr->HotKey==parameters->int0Parameter;
 	//probably we need to implement a trigger mechanism, clear
 	//the hotkey only when the triggerblock was evaluated as true
 	if (ret) {
-		core->GetGameControl()->HotKey=0;
+		Sender->AddTrigger (&scr->HotKey);
 	}
 	return ret;
 }
@@ -2291,9 +2316,9 @@ int GameScript::TookDamage(Scriptable* Sender, Trigger* /*parameters*/)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	if (actor->LastDamage) {
-		//well, int and Actor * are not compatible
-		//Sender->AddTrigger (&actor->LastDamage);
+	//zero damage doesn't count?
+	if (actor->LastHitter && actor->LastDamage) {
+		Sender->AddTrigger(&actor->LastHitter);
 		return 1;
 	}
 	return 0;
@@ -2305,9 +2330,8 @@ int GameScript::DamageTaken(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	if (actor->LastDamage==parameters->int0Parameter) {
-		//well, int and Actor * are not compatible
-		//Sender->AddTrigger (&actor->LastDamage);
+	if (actor->LastHitter && (actor->LastDamage==parameters->int0Parameter)) {
+		Sender->AddTrigger(&actor->LastHitter);
 		return 1;
 	}
 	return 0;
@@ -2319,9 +2343,8 @@ int GameScript::DamageTakenGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	if (actor->LastDamage>parameters->int0Parameter) {
-		//well, int and Actor * are not compatible
-		//Sender->AddTrigger (&actor->LastDamage);
+	if (actor->LastHitter && (actor->LastDamage>parameters->int0Parameter)) {
+		Sender->AddTrigger(&actor->LastHitter);
 		return 1;
 	}
 	return 0;
@@ -2333,9 +2356,8 @@ int GameScript::DamageTakenLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	if (actor->LastDamage<parameters->int0Parameter) {
-		//well, int and Actor * are not compatible
-		//Sender->AddTrigger (&actor->LastDamage);
+	if (actor->LastHitter && (actor->LastDamage<parameters->int0Parameter)) {
+		Sender->AddTrigger(&actor->LastHitter);
 		return 1;
 	}
 	return 0;
@@ -2366,7 +2388,7 @@ int GameScript::Heard(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	if (parameters->int0Parameter) {
-		if (!(parameters->int0Parameter&actor->LastShout) ) {
+		if (parameters->int0Parameter!=actor->LastShout) {
 			return 0;
 		}
 	}

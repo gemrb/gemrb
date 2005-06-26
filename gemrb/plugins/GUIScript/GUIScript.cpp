@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.323 2005/06/25 20:05:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.324 2005/06/26 13:57:53 avenger_teambg Exp $
  *
  */
 
@@ -2917,7 +2917,7 @@ static PyObject* GemRB_GameSetReputation(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "i", &Reputation )) {
 		return AttributeError( GemRB_GameSetReputation__doc );
 	}
-	core->GetGame()->SetReputation( Reputation );
+	core->GetGame()->SetReputation( (unsigned int) Reputation );
 
 	Py_INCREF( Py_None );
 	return Py_None;

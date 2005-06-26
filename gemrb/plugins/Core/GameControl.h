@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.70 2005/06/22 15:55:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.71 2005/06/26 13:57:51 avenger_teambg Exp $
  */
 
 class GameControl;
@@ -88,7 +88,6 @@ private:
 	short StartX, StartY;
 	int action;
 public:
-	char HotKey;
 	Door* overDoor;
 	Container* overContainer;
 	InfoPoint* overInfoPoint;

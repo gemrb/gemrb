@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.34 2005/06/24 23:19:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.35 2005/06/26 13:57:47 avenger_teambg Exp $
  *
  */
 
@@ -53,6 +53,10 @@
 #define GEN_GIANT     5  //???
 #define GEN_FROZEN    6  //???
 #define GEN_MONSTER   255
+
+//alignment values
+#define AL_GNE_MASK  3  //good neutral evil
+#define AL_LNC_MASK  0x30 //lawful neutral evil
 
 //state bits (IE_STATE)
 #define STATE_SLEEP      0x00000001

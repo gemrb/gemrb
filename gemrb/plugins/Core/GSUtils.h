@@ -35,8 +35,11 @@ extern int InDebug;
 #define MIC_NOITEM 0
 #define MIC_GOTITEM 1
 
-extern int happiness[3][20];
+//extern int happiness[3][20];
 
+int GetReaction(Scriptable *Sender);
+int GetHappiness(Scriptable *Sender, int reputation);
+int GetHPPercent(Scriptable *Sender);
 void CreateVisualEffectCore(Scriptable *Sender, Point &position, const char *effect);
 void GetPositionFromScriptable(Scriptable* scr, Point &position, bool trap);
 int CanSee(Scriptable* Sender, Scriptable* target);

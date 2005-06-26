@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.197 2005/06/22 15:55:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.198 2005/06/26 13:57:52 avenger_teambg Exp $
  *
  */
 
@@ -636,39 +636,23 @@ private: //Internal Functions
 	ResponseSet* ReadResponseSet(DataStream* stream);
 	Response* ReadResponse(DataStream* stream);
 	Trigger* ReadTrigger(DataStream* stream);
-	//Object* DecodeObject(const char* line);
 	bool EvaluateCondition(Scriptable* Sender, Condition* condition);
 	static int EvaluateTrigger(Scriptable* Sender, Trigger* trigger);
 	int ExecuteResponseSet(Scriptable* Sender, ResponseSet* rS);
 	int ExecuteResponse(Scriptable* Sender, Response* rE);
-	//static Targets* EvaluateObject(Scriptable* Sender, Object* oC);
 	static int ParseInt(const char*& src);
 	static void ParseString(const char*& src, char* tmp);
-	//static void DisplayStringCore(Scriptable* Sender, int Strref, int flags);
-	//static int ValidForDialogCore(Scriptable* Sender, Actor* target);
 private:
-	//static void CreateVisualEffectCore(Scriptable *Sender, Point &position, const char *effect);
-	//static int SeeCore(Scriptable* Sender, Trigger* parameters, int flags);
-	//static void BeginDialog(Scriptable* Sender, Action* parameters, int flags);
-	//static void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags);
-	//static int MoveItemCore(Scriptable *Sender, Scriptable *Target, const char *resref, int flags);
-	//static void AttackCore(Scriptable *actor, Scriptable *target, Action *parameters, int flags);
-	//static Action *GenerateActionCore(const char *src, const char *str, int acIndex, bool autoFree);
-	//static Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int negate);
-	//static Trigger* GenerateTrigger(char* String);
 	/* returns true if actor matches the object specs. */
 	static bool MatchActor(Scriptable *Sender, Actor* actor, Object* oC);
 	/* returns the number of actors matching the IDS targeting */
 	static int GetObjectCount(Scriptable* Sender, Object* oC);
 	
-	static int GetHappiness(Scriptable* Sender, int reputation);
-	static int GetHPPercent(Scriptable* Sender);
 	static Targets *XthNearestOf(Targets *parameters, int count);
 	static Targets *XthNearestEnemyOf(Targets *parameters, int count);
 	static Targets *XthNearestEnemyOfType(Scriptable *origin, Targets *parameters, int count);
 	static Targets *XthNearestMyGroupOfType(Scriptable *origin, Targets *parameters, int count);
 
-	//static unsigned char GetOrient(Point &s, Point &d);
 private: //Internal variables
 	unsigned long lastRunTime;
 	unsigned long scriptType;
@@ -681,17 +665,9 @@ public:
 		Variables* local = NULL, int ScriptLevel = 0);
 	~GameScript();
 	const char *GetName() { return this?Name:"NONE\0\0\0\0"; }
-	//static void ReplaceMyArea(Scriptable* Sender, char* newVarName);
-	//static ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Context);
-	//static ieDword CheckVariable(Scriptable* Sender, const char* VarName);
-
-	//static void SetVariable(Scriptable* Sender, const char* VarName,
-	//	const char* Context, ieDword value);
-	//static void SetVariable(Scriptable* Sender, const char* VarName, ieDword value);
 	static void ExecuteString(Scriptable* Sender, char* String);
 	static int EvaluateString(Scriptable* Sender, char* String);
 	static void ExecuteAction(Scriptable* Sender, Action* aC);
-	//static Action* GenerateAction(char* String, bool autoFree=false);
 	static void MoveBetweenAreasCore(Actor* actor, const char *area, Point &position, int face, bool adjust);
 public: //Script Functions
 	static int ID_Alignment(Actor *actor, int parameter);
@@ -909,6 +885,9 @@ public: //Script Functions
 	static int RandomNumGT(Scriptable* Sender, Trigger* parameters);
 	static int RandomNumLT(Scriptable* Sender, Trigger* parameters);
 	static int Range(Scriptable* Sender, Trigger* parameters);
+	static int Reaction(Scriptable* Sender, Trigger* parameters);
+	static int ReactionLT(Scriptable* Sender, Trigger* parameters);
+	static int ReactionGT(Scriptable* Sender, Trigger* parameters);
 	static int RealGlobalTimerExact(Scriptable* Sender, Trigger* parameters);
 	static int RealGlobalTimerExpired(Scriptable* Sender, Trigger* parameters);
 	static int RealGlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters);

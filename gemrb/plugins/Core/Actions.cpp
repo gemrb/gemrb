@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.9 2005/06/25 20:05:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.10 2005/06/26 13:57:51 avenger_teambg Exp $
  *
  */
 
@@ -469,36 +469,6 @@ void GameScript::MoveGlobalObjectOffScreen(Scriptable* Sender, Action* parameter
 	}
 	MoveBetweenAreasCore( (Actor *) tar, parameters->string0Parameter,
 		to->Pos, -1, false);
-}
-
-int GameScript::GetHappiness(Scriptable* Sender, int reputation)
-{
-	if (Sender->Type != ST_ACTOR) {
-		return 0;
-	}
-	Actor* ab = ( Actor* ) Sender;
-	int alignment = ab->GetStat(IE_ALIGNMENT)&3; //good, neutral, evil
-	if (reputation>19) {
-		reputation=19;
-	}
-	return happiness[alignment][reputation/10];
-}
-
-int GameScript::GetHPPercent(Scriptable* Sender)
-{
-	if (Sender->Type != ST_ACTOR) {
-		return 0;
-	}
-	Actor* ab = ( Actor* ) Sender;
-	int hp1 = ab->GetStat(IE_MAXHITPOINTS);
-	if (hp1<1) {
-		return 0;
-	}
-	int hp2 = ab->GetStat(IE_HITPOINTS);
-	if (hp2<1) {
-		return 0;
-	}
-	return hp2*100/hp1;
 }
 
 //don't use offset from Sender
@@ -2786,13 +2756,13 @@ void GameScript::SetGabber(Scriptable* Sender, Action* parameters)
 
 void GameScript::ReputationSet(Scriptable* /*Sender*/, Action* parameters)
 {
-	core->GetGame()->SetReputation(parameters->int0Parameter);
+	core->GetGame()->SetReputation(parameters->int0Parameter*10);
 }
 
 void GameScript::ReputationInc(Scriptable* /*Sender*/, Action* parameters)
 {
 	Game *game = core->GetGame();
-	game->SetReputation( (int) game->Reputation + parameters->int0Parameter);
+	game->SetReputation( (int) game->Reputation + parameters->int0Parameter*10);
 }
 
 void GameScript::FullHeal(Scriptable* Sender, Action* parameters)

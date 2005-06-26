@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.74 2005/06/20 17:15:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.75 2005/06/26 13:57:51 avenger_teambg Exp $
  *
  */
 
@@ -146,7 +146,6 @@ public:
 	ieDword appearance;
 	ieDword ModalState;
 public:
-
 	Actor *LastTarget;
 	Actor *LastTalkedTo;
 	Actor *LastAttacker;
@@ -157,10 +156,14 @@ public:
 	Actor *LastSeen;
 	Actor *LastHeard;
 	Actor *LastSummoner;
-	int LastCommand;
-	int LastShout;
-	int LastDamage;
-	int LastDamageType;
+	//this is an ugly ugly hack, the triggers are stored on a pointer
+	//these triggers are not pointers by nature
+	Actor *HotKey; 
+
+	int LastCommand;   //lastcommander
+	int LastShout;     //lastheard
+	int LastDamage;    //lasthitter
+	int LastDamageType;//lasthitter
 
 	EffectQueue fxqueue;
 private:

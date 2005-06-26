@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.58 2005/06/25 20:05:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.59 2005/06/26 13:57:51 avenger_teambg Exp $
  *
  */
 
@@ -166,6 +166,8 @@ public:
 	int GetPartySize(bool onlyalive) const;
 	/* returns the npcs count */
 	int GetNPCCount() const { return (int)NPCs.size(); }
+	/* sends the hotkey trigger to all selected pcs */
+	void SetHotKey(int Key);
 	/* select PC for non-walking environment (shops, inventory, ...) */
 	bool SelectPCSingle(int index);
 	/* get index of selected PC for non-walking env (shops, inventory, ...) */
@@ -234,7 +236,7 @@ public:
 	/* increments chapter variable and refreshes kill stats */
 	void IncrementChapter();
 	/* sets party reputation */
-	void SetReputation(int r);
+	void SetReputation(ieDword r);
 	/* sets the gamescreen control status (pane states, dialog textarea size) */
 	void SetControlStatus(int value, int operation);
 	void StartRainOrSnow(bool conditional, int weather);

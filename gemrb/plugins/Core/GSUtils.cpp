@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.6 2005/06/25 08:50:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.7 2005/06/26 13:57:51 avenger_teambg Exp $
  *
  */
 
@@ -44,21 +44,84 @@ int ObjectFieldsCount = 7;
 int ExtraParametersCount = 0;
 int InDebug = 0;
 int happiness[3][20];
+int rmodrep[20];
+int rmodchr[25];
 int RandomNumValue;
 
 void InitScriptTables()
 {
 	//initializing the happiness table
-	int hptable = core->LoadTable( "happy" );
-	TableMgr *tab = core->GetTable( hptable );
+	{
+	int table = core->LoadTable( "happy" );
+	TableMgr *tab = core->GetTable( table );
 	for (int alignment=0;alignment<3;alignment++) {
 		for (int reputation=0;reputation<20;reputation++) {
 			happiness[alignment][reputation]=strtol(tab->QueryField(reputation,alignment), NULL, 0);
 		}
 	}
-	core->DelTable( hptable );
+	core->DelTable( table );
+	}
 
-	//
+	//initializing the reaction mod. reputation table
+	{
+	int table = core->LoadTable( "rmodrep" );
+	TableMgr *tab = core->GetTable( table );
+	for (int reputation=0;reputation<20;reputation++) {
+		rmodrep[reputation]=strtol(tab->QueryField(0,reputation), NULL, 0);
+	}
+	core->DelTable( table );
+	}
+
+	//initializing the reaction mod. charisma table
+	{
+	int table = core->LoadTable( "rmodchr" );
+	TableMgr *tab = core->GetTable( table );
+	for (int charisma=0;charisma<25;charisma++) {
+		rmodchr[charisma]=strtol(tab->QueryField(0,charisma), NULL, 0);
+	}
+	core->DelTable( table );
+	}
+}
+
+int GetReaction(Scriptable* Sender)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* ab = ( Actor* ) Sender;
+	int chr = ab->GetStat(IE_CHR)-1;
+	int rep = core->GetGame()->Reputation/10;
+	return 10 + rmodrep[rep]+rmodchr[chr];
+}
+
+int GetHappiness(Scriptable* Sender, int reputation)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* ab = ( Actor* ) Sender;
+	int alignment = ab->GetStat(IE_ALIGNMENT)&AL_GNE_MASK; //good, neutral, evil
+	if (reputation>19) {
+		reputation=19;
+	}
+	return happiness[alignment][reputation/10];
+}
+
+int GetHPPercent(Scriptable* Sender)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* ab = ( Actor* ) Sender;
+	int hp1 = ab->GetStat(IE_MAXHITPOINTS);
+	if (hp1<1) {
+		return 0;
+	}
+	int hp2 = ab->GetStat(IE_HITPOINTS);
+	if (hp2<1) {
+		return 0;
+	}
+	return hp2*100/hp1;
 }
 
 void HandleBitMod(ieDword &value1, ieDword value2, int opcode)

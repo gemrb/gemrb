@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.83 2005/06/25 20:05:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.84 2005/06/26 13:57:51 avenger_teambg Exp $
  *
  */
 
@@ -272,6 +272,20 @@ int Game::GetPartySize(bool onlyalive) const
 		return count;
 	}
 	return PCs.size();
+}
+
+/* sends the hotkey trigger to all selected actors */
+void Game::SetHotKey(int Key)
+{
+	for(unsigned int i=0;i<PCs.size();i++) {
+		Actor *actor = PCs[i];
+
+		if (actor->IsSelected()) {
+// the hotkey is cleared by the standard trigger handling protocol 
+// we'll never use it as a pointer
+			actor->HotKey = (Actor *) Key;
+		}
+	}
 }
 
 bool Game::SelectPCSingle(int index)
@@ -636,11 +650,6 @@ void Game::ShareXP(int xp, bool divide)
 		}
 		PCs[i]->NewStat(IE_XP,xp,MOD_ADDITIVE);
 	}
-	//char value[10];
-
-	//sprintf( value, "%d", xp );
-	//value is a string and must be copied because it is not on heap
-	//core->GetTokenDictionary()->SetAtCopy( "XP", value );
 	if (xp>0) {
 		core->DisplayConstantStringValue( STR_GOTXP, 0xc0c000, (ieDword) xp); //you have gained ... xp
 	} else {
@@ -710,11 +719,16 @@ void Game::IncrementChapter()
 	}
 }
 
-void Game::SetReputation(int r)
+void Game::SetReputation(ieDword r)
 {
 	if (r<10) r=10;
 	else if (r>200) r=200;
-	Reputation = (ieDword) r;
+	if (Reputation>r) {
+		core->DisplayConstantStringValue(STR_LOSTREP,0xc0c000,(Reputation-r)/10);
+	} else if (Reputation<r) {
+		core->DisplayConstantStringValue(STR_GOTREP,0xc0c000,(r-Reputation)/10);
+	}
+	Reputation = r;
 	for (unsigned int i=0; i<PCs.size(); i++) {
 		PCs[i]->SetStat(IE_REPUTATION, Reputation);
 	}
