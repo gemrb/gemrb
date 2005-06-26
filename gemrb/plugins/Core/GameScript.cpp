@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.299 2005/06/26 13:57:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.300 2005/06/26 19:21:32 avenger_teambg Exp $
  *
  */
 
@@ -1210,7 +1210,7 @@ static Trigger* ReadTrigger(DataStream* stream)
 	}
 	stream->ReadLine( line, 1024 );
 	Trigger* tR = new Trigger();
-	if (strcmp( core->GameType, "pst" ) == 0) {
+	if (HasAdditionalRect) {
 		sscanf( line, "%hu %d %d %d %d [%hd,%hd] \"%[^\"]\" \"%[^\"]\" OB",
 			&tR->triggerID, &tR->int0Parameter, &tR->flags,
 			&tR->int1Parameter, &tR->int2Parameter, &tR->pointParameter.x,
@@ -1221,6 +1221,8 @@ static Trigger* ReadTrigger(DataStream* stream)
 			&tR->int1Parameter, &tR->int2Parameter, tR->string0Parameter,
 			tR->string1Parameter );
 	}
+	strupr(tR->string0Parameter);
+	strupr(tR->string1Parameter);
 	tR->triggerID &= 0x3fff;
 	stream->ReadLine( line, 1024 );
 	tR->objectParameter = DecodeObject( line );

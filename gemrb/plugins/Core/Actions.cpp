@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.10 2005/06/26 13:57:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.11 2005/06/26 19:21:32 avenger_teambg Exp $
  *
  */
 
@@ -1420,6 +1420,7 @@ void GameScript::StartDialogueNoSetInterrupt(Scriptable* Sender,
 
 //no talkcount, using banter dialogs
 //probably banter dialogs are random, like rumours!
+//no, they aren't, but they increase interactcount
 void GameScript::Interact(Scriptable* Sender, Action* parameters)
 {
 	BeginDialog( Sender, parameters, BD_INTERACT );
@@ -1568,6 +1569,7 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 			if (!Key || !actor->inventory.HasItem(Key,0) ) {
 				//playsound unsuccessful opening of door
 				core->PlaySound(DS_OPEN_FAIL);
+				Sender->CurrentAction = NULL;
 				return;
 			}
 
@@ -3404,76 +3406,53 @@ void GameScript::RemoveMapnote( Scriptable* Sender, Action* parameters)
 	map->RemoveMapNote(parameters->pointParameter);
 }
 
-//It is possible to attack CONTAINERS/DOORS as well!!!
-static void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int flags)
-{
-	//this is a dangerous cast, make sure actor is Actor * !!!
-	Actor *actor = (Actor *) Sender;
-	unsigned int wrange = actor->GetWeaponRange() * 10;
-	if ( wrange == 0) {
-		printMessage("[GameScript]","Zero weapon range!\n",LIGHT_RED);
-		if (flags&AC_REEVALUATE) {
-			delete parameters;
-		}
-		return;
-	}
-	if ( Distance(Sender, target) > wrange ) {
-		GoNearAndRetry(Sender, target);
-		if (flags&AC_REEVALUATE) {
-			delete parameters;
-		}
-		return;
-	}
-	//TODO:
-	//send Attack trigger to attacked
-	//calculate attack/damage
-	actor->SetStance( IE_ANI_ATTACK );
-	actor->SetWait( 1 );
-	//attackreevaluate
-	if ( (flags&AC_REEVALUATE) && parameters->int0Parameter) {
-		parameters->int0Parameter--;
-		Sender->AddAction( parameters );
-	}
-}
-
 void GameScript::Attack( Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
 		return;
 	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
+		Sender->CurrentAction = NULL;
 		return;
 	}
 	AttackCore(Sender, tar, NULL, 0);
+	Sender->CurrentAction = NULL;
 }
 
 void GameScript::ForceAttack( Scriptable* Sender, Action* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!scr || scr->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
 		return;
 	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[2] );
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
+		Sender->CurrentAction = NULL;
 		return;
 	}
 	AttackCore(scr, tar, NULL, 0);
+	Sender->CurrentAction = NULL;
 }
 
 void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
 		return;
 	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
+		Sender->CurrentAction = NULL;
 		return;
 	}
 	//pumping parameters back for AttackReevaluate
 	//FIXME: we should make a copy of parameters here
 	Action *newAction = ParamCopy( parameters );
 	AttackCore(Sender, tar, newAction, AC_REEVALUATE);
+	Sender->CurrentAction = NULL;
 }
 
 void GameScript::Explore( Scriptable* Sender, Action* /*parameters*/)

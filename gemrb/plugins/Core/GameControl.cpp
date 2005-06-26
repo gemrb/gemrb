@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.238 2005/06/26 13:57:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.239 2005/06/26 19:21:32 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1385,20 +1385,7 @@ void GameControl::DialogChoose(unsigned int choose)
 
 	//get the first state with true triggers!
 	int si;
-	if (choose == (unsigned int) -2) {
-		si = dlg->FindRandomState( target);
-		if (si < 0) {
-			EndDialog();
-			return;
-		}
-		if (DialogueFlags&DF_TALKCOUNT) {
-			DialogueFlags&=~DF_TALKCOUNT; //turning it off just in case
-			if (target->Type == ST_ACTOR) {
-				((Actor *) target)->InteractCount++;
-			}
-		}
-		ds = dlg->GetState( si );
-	} else if (choose == (unsigned int) -1) {
+	if (choose == (unsigned int) -1) {
 		si = dlg->FindFirstState( target );
 		if (si < 0) {
 			core->DisplayConstantStringName(STR_NOTHINGTOSAY,0xff0000,target);
@@ -1408,9 +1395,14 @@ void GameControl::DialogChoose(unsigned int choose)
 		}
 		//increasing talkcount after top level condition was determined
 		if (DialogueFlags&DF_TALKCOUNT) {
-			DialogueFlags&=~DF_TALKCOUNT; //turning it off just in case
+			DialogueFlags&=~DF_TALKCOUNT; 
 			if (target->Type == ST_ACTOR) {
 				((Actor *) target)->TalkCount++;
+			}
+		} else if (DialogueFlags&DF_INTERACT) {
+			DialogueFlags&=~DF_INTERACT;
+			if (target->Type == ST_ACTOR) {
+				((Actor *) target)->InteractCount++;
 			}
 		}
 		ds = dlg->GetState( si );

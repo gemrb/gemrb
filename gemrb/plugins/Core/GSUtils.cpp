@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.7 2005/06/26 13:57:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.8 2005/06/26 19:21:32 avenger_teambg Exp $
  *
  */
 
@@ -231,12 +231,12 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 	}
 	Actor *scr = (Actor *) target;
 	CREItem *item;
-	scr->inventory.RemoveItem(resref, flags, &item);
+	myinv->RemoveItem(resref, flags, &item);
 	if (!item)
 		return MIC_NOITEM;
-	if ( 2 != myinv->AddSlotItem(item, -1)) {
+	if ( scr->inventory.AddSlotItem(item, -1) !=2) {
 		// drop it at my feet
-		map->AddItemToLocation(Sender->Pos, item);
+		map->AddItemToLocation(target->Pos, item);
 		return MIC_FULL;
 	}
 	return MIC_GOTITEM;
@@ -649,19 +649,14 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	}
 
 	if (Dialog[0]) {
-		//increasing NumTimesTalkedTo
+		//increasing NumTimesTalkedTo or NumTimesInteracted
 		if (Flags & BD_TALKCOUNT) {
 			gc->SetDialogueFlags(DF_TALKCOUNT, BM_OR);
+		} else if ((Flags & BD_LOCMASK) == BD_INTERACT) {
+			gc->SetDialogueFlags(DF_INTERACT, BM_OR);
 		}
 
-		//actually it isn't random...
-//		if (Flags & BD_INTERACT) {
-//			//random dialog
-//			core->GetDictionary()->SetAt("DialogChoose",(ieDword) -2);
-//		} else {
-			//first top level
-			core->GetDictionary()->SetAt("DialogChoose",(ieDword) -1);
-//		}
+		core->GetDictionary()->SetAt("DialogChoose",(ieDword) -1);
 		gc->InitDialog( (Actor *) scr, tar, Dialog);
 	}
 //if pdtable was allocated, free it now, it will release Dialog
@@ -671,6 +666,37 @@ end_of_quest:
 	}
 }
 
+//It is possible to attack CONTAINERS/DOORS as well!!!
+void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int flags)
+{
+	//this is a dangerous cast, make sure actor is Actor * !!!
+	Actor *actor = (Actor *) Sender;
+	unsigned int wrange = actor->GetWeaponRange() * 10;
+	if ( wrange == 0) {
+		printMessage("[GameScript]","Zero weapon range!\n",LIGHT_RED);
+		if (flags&AC_REEVALUATE) {
+			delete parameters;
+		}
+		return;
+	}
+	if ( Distance(Sender, target) > wrange ) {
+		GoNearAndRetry(Sender, target);
+		if (flags&AC_REEVALUATE) {
+			delete parameters;
+		}
+		return;
+	}
+	//TODO:
+	//send Attack trigger to attacked
+	//calculate attack/damage
+	actor->SetStance( IE_ANI_ATTACK );
+	actor->SetWait( 1 );
+	//attackreevaluate
+	if ( (flags&AC_REEVALUATE) && parameters->int0Parameter) {
+		parameters->int0Parameter--;
+		Sender->AddAction( parameters );
+	}
+}
 
 bool GameScript::MatchActor(Scriptable *Sender, Actor* actor, Object* oC)
 {
@@ -1165,7 +1191,7 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 				while (*src != '"') {
 					//sizeof(context+name) = 40
 					if (i<40) {
-						*dst++ = *src;
+						*dst++ = toupper(*src);
 						i++;
 					}
 					src++;
@@ -1193,7 +1219,7 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 					i=0;
 					while (*src != '"') {
 						if (i++<6) {
-							*dst++ = *src;
+							*dst++ = toupper(*src);
 						}
 						src++;
 					}

@@ -35,8 +35,6 @@ extern int InDebug;
 #define MIC_NOITEM 0
 #define MIC_GOTITEM 1
 
-//extern int happiness[3][20];
-
 int GetReaction(Scriptable *Sender);
 int GetHappiness(Scriptable *Sender, int reputation);
 int GetHPPercent(Scriptable *Sender);
@@ -50,6 +48,7 @@ void PolymorphCopyCore(Actor *src, Actor *tar, bool base);
 void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags);
 Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC);
 int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int flags);
+void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int flags);
 void InitScriptTables();
 void HandleBitMod(ieDword &value1, ieDword value2, int opcode);
 void DisplayStringCore(Scriptable* Sender, int Strref, int flags);
