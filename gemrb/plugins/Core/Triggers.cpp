@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.7 2005/06/28 18:16:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.8 2005/06/28 20:05:22 guidoj Exp $
  *
  */
 
@@ -2199,11 +2199,12 @@ int GameScript::TimeLT(Scriptable* /*Sender*/, Trigger* parameters)
 
 int GameScript::HotKey(Scriptable* Sender, Trigger* parameters)
 {
-	if (Sender->Type!=ST_ACTOR) {
+	if (Sender->Type != ST_ACTOR) {
 		return 0;
 	}
 	Actor *scr = (Actor *) Sender;
-	int ret=(int) scr->HotKey==parameters->int0Parameter;
+        // FIXME: this is never going to work on 64 bit archs ...
+	int ret = (unsigned long) scr->HotKey == (unsigned long) parameters->int0Parameter;
 	//probably we need to implement a trigger mechanism, clear
 	//the hotkey only when the triggerblock was evaluated as true
 	if (ret) {
@@ -2229,7 +2230,7 @@ int GameScript::CombatCounterLT(Scriptable* /*Sender*/, Trigger* parameters)
 
 int GameScript::TrapTriggered(Scriptable* Sender, Trigger* parameters)
 {
-	if (Sender->Type!=ST_TRIGGER) {
+	if (Sender->Type != ST_TRIGGER) {
 		return 0;
 	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
@@ -2253,7 +2254,7 @@ int GameScript::InteractingWith(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	GameControl *gc = core->GetGameControl();
-	if (Sender != gc->target && Sender!=gc->speaker) {
+	if (Sender != gc->target && Sender != gc->speaker) {
 		return 0;
 	}
 	if (tar != gc->target && tar!=gc->speaker) {
@@ -2281,7 +2282,7 @@ int GameScript::LastPersonTalkedTo(Scriptable* Sender, Trigger* parameters)
 int GameScript::IsRotation(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
-	if (!tar || tar->Type!=ST_ACTOR) {
+	if (!tar || tar->Type != ST_ACTOR) {
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
