@@ -1,3 +1,4 @@
+
 /* GemRB - Infinity Engine Emulator
  * Copyright (C) 2003-2004 The GemRB Project
  *
@@ -15,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.172 2005/06/19 22:59:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.173 2005/06/28 18:16:01 avenger_teambg Exp $
  *
  */
 
@@ -471,7 +472,7 @@ void Map::UpdateScripts()
 		q=Qcount[0];
 		while (q--) {
 			Actor* actor = queue[0][q];
-			if (ip->Type == ST_PROXIMITY) {
+			if ((ip->Type == ST_PROXIMITY) && !(ip->Flags&TRAP_DEACTIVATED) ) {
 				if (ip->outline->PointIn( actor->Pos )) {
 					ip->Entered(actor);
 				}
@@ -561,7 +562,7 @@ void Map::DrawMap(Region screen, GameControl* gc)
 			continue;
 		//maybe we should divide only by 128, so brightening is possible too? In that case use 128,128,128 here
 		Color tint = {255,255,255,0};
-		if (!(a->Flags&A_ANI_NO_SHADOW)) {
+		if ((a->Flags&A_ANI_NO_SHADOW)) {
 			tint = LightMap->GetPixel( a->Pos.x / 16, a->Pos.y / 12);
 		}
 		if (a->Flags&A_ANI_BLEND) {
@@ -704,7 +705,7 @@ void Map::DrawMap(Region screen, GameControl* gc)
 		if (!IsVisible( a->Pos, !(a->Flags & A_ANI_NOT_IN_FOG)) )
 			continue;
 		Color tint = {255,255,255,0};
-		if (!(a->Flags&A_ANI_NO_SHADOW)) {
+		if ((a->Flags&A_ANI_NO_SHADOW)) {
 			tint = LightMap->GetPixel( a->Pos.x / 16, a->Pos.y / 12);
 		}
 		if (a->Flags&A_ANI_BLEND) {

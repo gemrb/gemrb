@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.120 2005/06/25 20:05:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.121 2005/06/28 18:15:58 avenger_teambg Exp $
  *
  */
 
@@ -291,13 +291,8 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->ReadWord( &LaunchX );
 		str->ReadWord( &LaunchY );
 		str->ReadResRef( KeyResRef );
-		//don't even bother reading the script if it isn't trapped
-		if(Trapped || Type) {
-			str->ReadResRef( Script );
-		}
-		else {
-			Script[0] = 0;
-		}
+		str->ReadResRef( Script );
+		  //maybe we have to store this
 		str->Seek( 56, GEM_CURRENT_POS );
 		str->ReadResRef( DialogResRef );
 		char* string = core->GetString( StrRef );
@@ -312,8 +307,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		InfoPoint* ip = tm->AddInfoPoint( Name, Type, poly );
 		ip->TrapDetectionDiff = TrapDetDiff;
 		ip->TrapRemovalDiff = TrapRemDiff;
-		//we don't need this flag, because the script is loaded
-		//only if it exists
+		ip->Trapped = Trapped;
 		ip->TrapDetected = TrapDetected;
 		ip->TrapLaunch.x = LaunchX;
 		ip->TrapLaunch.y = LaunchY;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.199 2005/06/26 19:21:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.200 2005/06/28 18:16:01 avenger_teambg Exp $
  *
  */
 
@@ -154,6 +154,7 @@ public:
 		canary = 0xdddddddd;
 		delete this;
 	}
+	bool ReadyToDie();
 };
 
 class GEM_EXPORT Trigger {
@@ -598,6 +599,7 @@ struct TriggerLink {
 #define AF_RESTRICTED    16 
 //#define AF_RESTRICTED_LEVEL2  32 //maybe we could use 2 bits for this???
 #define AF_SCRIPTLEVEL   64  //this hack will transfer scriptlevel to int0parameter at runtime (changecurrentscript relies on it)
+#define AF_INVALID       128
 
 struct ActionLink {
 	const char* Name;
@@ -669,8 +671,8 @@ public:
 	const char *GetName() { return this?Name:"NONE\0\0\0\0"; }
 	static void ExecuteString(Scriptable* Sender, char* String);
 	static int EvaluateString(Scriptable* Sender, char* String);
+	static void AddAction(Scriptable* Sender, Action* aC);
 	static void ExecuteAction(Scriptable* Sender, Action* aC);
-	static void MoveBetweenAreasCore(Actor* actor, const char *area, Point &position, int face, bool adjust);
 public: //Script Functions
 	static int ID_Alignment(Actor *actor, int parameter);
 	static int ID_Allegiance(Actor *actor, int parameter);

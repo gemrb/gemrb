@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.8 2005/06/26 19:21:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.9 2005/06/28 18:16:00 avenger_teambg Exp $
  *
  */
 
@@ -445,6 +445,9 @@ void ChangeAnimationCore(Actor *src, const char *resref, bool effect)
 	if (tar) {
 		Map *map = src->GetCurrentArea();
 		tar->SetPosition(map, src->Pos, 1);
+		tar->SetOrientation(src->GetOrientation(), 0 );
+		map->AddActor( tar );
+
 		src->InternalFlags|=IF_CLEANUP;
 		if (effect) {
 			CreateVisualEffectCore(tar, tar->Pos,"smokepuffeffect");
@@ -666,6 +669,35 @@ end_of_quest:
 	}
 }
 
+void MoveBetweenAreasCore(Actor* actor, const char *area, Point &position, int face, bool adjust)
+{
+	printMessage("GameScript", " ", WHITE);
+	printf("MoveBetweenAreas: %s to %s [%d.%d] face: %d\n", actor->GetName(0), area,position.x,position.y, face);
+	Map* map2;
+	Game* game = core->GetGame();
+	if (area[0]) { //do we need to switch area?
+		Map* map1 = actor->GetCurrentArea();
+		//we have to change the pathfinder
+		//to the target area if adjust==true
+		map2 = game->GetMap(area, false);
+		if ( map1!=map2 ) {
+			if (map1) {
+				map1->RemoveActor( actor );
+			}
+			map2->AddActor( actor );
+		}
+	}
+	else {
+		map2=actor->GetCurrentArea();
+	}
+	actor->SetPosition(map2, position, adjust);
+	if (face !=-1) {
+		actor->SetOrientation( face,0 );
+	}
+	GameControl *gc=core->GetGameControl();
+	gc->SetScreenFlags(SF_CENTERONACTOR,BM_OR);
+}
+
 //It is possible to attack CONTAINERS/DOORS as well!!!
 void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int flags)
 {
@@ -700,7 +732,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 
 bool GameScript::MatchActor(Scriptable *Sender, Actor* actor, Object* oC)
 {
-	if (!actor) {
+	if (!actor || !oC) {
 		return false;
 	}
 	if (oC->objectName[0]) {
@@ -1094,6 +1126,22 @@ Action *ParamCopy(Action *parameters)
 	for (int c=0;c<3;c++) {
 		newAction->objects[c]= ObjectCopy( parameters->objects[c] );
 	}
+	return newAction;
+}
+
+Action *ParamCopyNoOverride(Action *parameters)
+{
+	Action *newAction = new Action(true);
+	newAction->actionID = parameters->actionID;
+	newAction->int0Parameter = parameters->int0Parameter;
+	newAction->int1Parameter = parameters->int1Parameter;
+	newAction->int2Parameter = parameters->int2Parameter;
+	newAction->pointParameter = parameters->pointParameter;
+	MEMCPY( newAction->string0Parameter, parameters->string0Parameter );
+	MEMCPY( newAction->string1Parameter, parameters->string1Parameter );
+	newAction->objects[0]= NULL;
+	newAction->objects[1]= ObjectCopy( parameters->objects[1] );
+	newAction->objects[2]= ObjectCopy( parameters->objects[2] );
 	return newAction;
 }
 

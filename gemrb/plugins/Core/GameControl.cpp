@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.239 2005/06/26 19:21:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.240 2005/06/28 18:16:00 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -28,6 +28,7 @@
 #include "DialogMgr.h"
 #include "../../includes/strrefs.h"
 #include "Effect.h"
+#include "GSUtils.h"
 
 #define DEBUG_SHOW_INFOPOINTS   0x01
 #define DEBUG_SHOW_CONTAINERS   0x02
@@ -41,6 +42,9 @@ static Color cyan = {
 };
 static Color red = {
 	0xff, 0x00, 0x00, 0xff
+};
+static Color magenta = {
+	0xff, 0x00, 0xff, 0xff
 };
 static Color green = {
 	0x00, 0xff, 0x00, 0xff
@@ -243,6 +247,19 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		for (unsigned int idx = 0;
 			(d = area->TMap->GetDoor( idx ));
 			idx++) {
+			if (d->TrapFlags) {
+				d->outlineColor = red;
+			} else {
+				if (d->Flags &DOOR_SECRET) {
+					if (d->Flags & DOOR_FOUND) {
+						d->outlineColor = magenta;
+					} else {
+						//secret door is invisible
+						continue;
+					}
+				}
+				d->outlineColor = cyan;
+			}
 			d->DrawOutline();
 		}
 	}
@@ -251,16 +268,16 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	if (DebugFlags & DEBUG_SHOW_CONTAINERS) {
 		Container* c;
 
-		DialogueFlags |= DF_FREEZE_SCRIPTS;
 		//there is a real assignment in the loop!
 		for (unsigned int idx = 0;
 			(c = area->TMap->GetContainer( idx ));
 			idx++) {
 			if (c->TrapDetected && c->Trapped) {
-				video->DrawPolyline( c->outline, red, true );
+				c->outlineColor = red;
 			} else {
-				video->DrawPolyline( c->outline, cyan, true );
+				c->outlineColor = cyan;
 			}
+			c->DrawOutline();			
 		}
 	}
 
@@ -274,21 +291,27 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		}
 	}
 
-	// Show traps and containers
-	if (DebugFlags & (DEBUG_SHOW_INFOPOINTS | DEBUG_SHOW_CONTAINERS)) {
+	// Show traps
+	if (DebugFlags & DEBUG_SHOW_INFOPOINTS) {
 		//draw infopoints with blue overlay
 		InfoPoint* i;
 		//there is a real assignment in the loop!
 		for (unsigned int idx = 0; (i = area->TMap->GetInfoPoint( idx )); idx++) {
-			if (i->VisibleTrap( DebugFlags & DEBUG_SHOW_INFOPOINTS ) ) {
-				video->DrawPolyline( i->outline, red, true );
-			} else if (DebugFlags & DEBUG_SHOW_INFOPOINTS) {
-				video->DrawPolyline( i->outline, blue, true );
+			if (i->VisibleTrap( 1 ) ) {
+				i->outlineColor = red; //traps
+				i->DrawOutline();
+			} else {
+				i->outlineColor = blue; //infopoints
+				i->DrawOutline();
 			}
 		}
-	} else if (overInfoPoint) {
-		if (overInfoPoint->VisibleTrap(0) ) {
-			video->DrawPolyline( overInfoPoint->outline, red, true );
+	} else {
+		InfoPoint* i;
+		for (unsigned int idx = 0; (i = area->TMap->GetInfoPoint( idx )); idx++) {
+			if (i->VisibleTrap( 0 ) ) {
+				i->outlineColor = red; //traps
+				i->DrawOutline();
+			}
 		}
 	}
 
@@ -399,6 +422,9 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 	Game* game = core->GetGame();
 
 	switch (Key) {
+		case GEM_ALT:
+			DebugFlags &= ~DEBUG_SHOW_CONTAINERS;
+			break;
 		case '=':
 			SelectActor(-1);
 			break;
@@ -507,7 +533,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					Actor* actor = game->selected[i];
 					Point p(lastMouseX, lastMouseY);
 					core->GetVideoDriver()->ConvertToGame( p.x, p.y );
-					GameScript::MoveBetweenAreasCore(actor, core->GetGame()->CurrentArea, p, -1, true);
+					MoveBetweenAreasCore(actor, core->GetGame()->CurrentArea, p, -1, true);
 					printf( "Teleported to %d, %d\n", p.x, p.y );
 				}
 				break;
@@ -1006,8 +1032,7 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 				Viewport.x += 64;
 			break;
 		case GEM_ALT:
-			DebugFlags ^= DEBUG_SHOW_CONTAINERS;
-			printf( "ALT pressed\n" );
+			DebugFlags |= DEBUG_SHOW_CONTAINERS;
 			break;
 		case GEM_TAB:
 			DebugFlags |= DEBUG_XXX;

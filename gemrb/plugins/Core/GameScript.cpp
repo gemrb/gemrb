@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.300 2005/06/26 19:21:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.301 2005/06/28 18:16:00 avenger_teambg Exp $
  *
  */
 
@@ -161,6 +161,7 @@ static TriggerLink triggernames[] = {
 	{"isgabber", GameScript::IsGabber, 0},
 	{"islocked", GameScript::IsLocked, 0},
 	{"isextendednight", GameScript::IsExtendedNight, 0},
+  {"isoverme", GameScript::Entered, 0}, // same as harmlessentered
 	{"isplayernumber", GameScript::IsPlayerNumber, 0},
 	{"isrotation", GameScript::IsRotation, 0},
 	{"isscriptname", GameScript::CalledByName, 0}, //seems the same
@@ -292,7 +293,7 @@ static TriggerLink triggernames[] = {
 
 //Make this an ordered list, so we could use bsearch!
 static ActionLink actionnames[] = {
-	{"actionoverride",NULL, 0},
+	{"actionoverride",NULL, AF_INVALID}, //will this function ever be reached
 	{"activate", GameScript::Activate, 0},
 	{"addareaflag", GameScript::AddAreaFlag, 0},
 	{"addareatype", GameScript::AddAreaType, 0},
@@ -1196,6 +1197,10 @@ static Object* DecodeObject(const char* line)
 	line++; //Skip " (the same as above)
 	for (i = 0; i < ExtraParametersCount; i++) {
 		oB->objectFields[i + ObjectFieldsCount] = ParseInt( line );
+	}
+	//let the object realize it has no future (in case of null objects)
+	if (oB->ReadyToDie()) {
+		oB = NULL;
 	}
 	return oB;
 }
@@ -2540,10 +2545,14 @@ int GameScript::ExecuteResponse(Scriptable* Sender, Response* rE)
 				ExecuteAction( Sender, aC );
 				break;
 			case AF_NONE:
-				if (Sender->CutSceneId)
+				if (Sender->CutSceneId) {
 					Sender->CutSceneId->AddAction( aC );
-				else
-					Sender->AddAction( aC );
+					//AddAction( Sender->CutSceneId, aC );
+				}
+        else {
+					//Sender->AddAction( aC );
+					AddAction( Sender, aC );
+        }
 				break;
 			case AF_CONTINUE:
 			case AF_MASK:
@@ -2554,40 +2563,54 @@ int GameScript::ExecuteResponse(Scriptable* Sender, Response* rE)
 	return ret;
 }
 
+//resolving actionoverride in delayed actions
+void GameScript::AddAction(Scriptable* Sender, Action* aC)
+{
+	if (aC->objects[0]) { //this is an actionoverride
+			Sender = GetActorFromObject( Sender, aC->objects[0]);
+			if (Sender) {
+				Sender->AddAction(ParamCopyNoOverride(aC) );
+      } else {
+        printMessage("GameScript","Actionoverride failed for object: \n",LIGHT_RED);
+				aC->objects[0]->Dump();
+      }
+			return;
+	}
+	Sender->AddAction(aC);
+}
+
 void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 {
+  if (aC->objects[0]) {
+    Scriptable *scr = GetActorFromObject(Sender, aC->objects[0]);
+    if (scr) {
+      if (InDebug&ID_ACTIONS) {
+        printMessage("GameScript"," ",YELLOW);
+        printf("Sender: %s-->override: %s\n",Sender->GetScriptName(), scr->GetScriptName() );
+      }      
+      scr->AddAction(ParamCopyNoOverride(Sender->CurrentAction));
+    } else {
+      printMessage("GameScript","Actionoverride failed for object: \n",LIGHT_RED);
+      aC->objects[0]->Dump();
+    }
+    Sender->CurrentAction=NULL;
+    aC->Release();
+    return;
+  }
 	if (InDebug&ID_ACTIONS) {
 		printMessage("GameScript"," ",YELLOW);
 		printf("Sender: %s\n",Sender->GetScriptName() );
 	}
 	ActionFunction func = actions[aC->actionID];
 	if (func) {
-		Scriptable* scr = GetActorFromObject( Sender, aC->objects[0]);
-		if (scr && scr!=Sender) {
-			//this is an Action* Override
-			scr->AddAction( Sender->CurrentAction );
-			Sender->CurrentAction = NULL;
-			//maybe we should always release here???
-			if (!(actionflags[aC->actionID] & AF_INSTANT) ) {
-				aC->Release();
-			}
-			return;
-		}
-		else {
-			if (InDebug&ID_ACTIONS) {
-				printMessage("GameScript"," ",YELLOW);
-				printf( "Executing action code: %d %s\n", aC->actionID , actionsTable->GetValue(aC->actionID) );
-			}
-			//turning off interruptable flag
-			//uninterruptable actions will set it back
-			if (Sender->Type==ST_ACTOR) {
-				Sender->Active|=SCR_ACTIVE;
-				((Actor *)Sender)->InternalFlags&=~IF_NOINT;
-			}
-			func( Sender, aC );
-		}
-	}
-	else {
+    //turning off interruptable flag
+    //uninterruptable actions will set it back
+    if (Sender->Type==ST_ACTOR) {
+      Sender->Active|=SCR_ACTIVE;
+      ((Actor *)Sender)->InternalFlags&=~IF_NOINT;
+    }
+    func( Sender, aC );
+  } else {
 		actions[aC->actionID] = NoActionAtAll;
 		printMessage("GameScript", " ", YELLOW);
 		printf("Unhandled action code: %d %s\n", aC->actionID , actionsTable->GetValue(aC->actionID) );
@@ -2643,4 +2666,22 @@ Action* GenerateAction(char* String, bool autoFree)
 	char *src = String+len;
 	char *str = actionsTable->GetStringIndex( i )+len;
 	return GenerateActionCore( src, str, i, autoFree);
+}
+
+bool Object::ReadyToDie()
+{
+	if (objectName[0]!=0) {
+		return false;
+	}
+	if (objectFilters[0]) {
+		return false;
+	}
+	for (int i=0;i<ObjectFieldsCount;i++) {
+		if (objectFields[i]) {
+			return false;
+		}
+	}
+	//commit suicide
+	Release();
+	return true;
 }

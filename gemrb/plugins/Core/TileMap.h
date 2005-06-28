@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.35 2005/06/17 19:33:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.36 2005/06/28 18:16:08 avenger_teambg Exp $
  *
  */
 
@@ -61,7 +61,7 @@ public:
 	unsigned int GetDoorCount() { return doors.size(); }
 
 	/* type is an optional filter for container type*/
-  void AddContainer(Container *c);
+	void AddContainer(Container *c);
 	Container* GetContainer(Point &position, int type=-1);
 	Container* GetContainer(const char* Name);
 	Container* GetContainer(unsigned int idx);

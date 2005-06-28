@@ -58,9 +58,11 @@ void GoNearAndRetry(Scriptable *Sender, Point &p);
 void FreeSrc(SrcVector *poi, const ieResRef key);
 SrcVector *LoadSrc(const ieResRef resname);
 Action *ParamCopy(Action *parameters);
+Action *ParamCopyNoOverride(Action *parameters);
 void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, ieDword value);
 void SetVariable(Scriptable* Sender, const char* VarName, ieDword value);
 //these are used from other plugins
+GEM_EXPORT void MoveBetweenAreasCore(Actor* actor, const char *area, Point &position, int face, bool adjust);
 GEM_EXPORT ieDword CheckVariable(Scriptable* Sender, const char* VarName);
 GEM_EXPORT ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Context);
 Action* GenerateActionCore(const char *src, const char *str, int acIndex, bool autoFree);

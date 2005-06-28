@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.h,v 1.18 2005/06/22 15:55:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.h,v 1.19 2005/06/28 18:16:08 avenger_teambg Exp $
  *
  */
 
@@ -39,7 +39,7 @@
 #define GEM_EXPORT
 #endif
 
-#define SAVEGAME_DIRECTORY_MATCHER "%d - %[A-Za-z0-9- ]"
+#define SAVEGAME_DIRECTORY_MATCHER "%d - %[A-Za-z0-9- _]"
 
 class GEM_EXPORT SaveGame {
 public:

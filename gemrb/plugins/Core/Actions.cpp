@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.11 2005/06/26 19:21:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.12 2005/06/28 18:15:59 avenger_teambg Exp $
  *
  */
 
@@ -531,12 +531,7 @@ void GameScript::StartCutScene(Scriptable* Sender, Action* parameters)
 
 void GameScript::CutSceneID(Scriptable* Sender, Action* parameters)
 {
-	if (parameters->objects[1]->objectName[0]) {
-		Map *map = Sender->GetCurrentArea();
-		Sender->CutSceneId = map->GetActor( parameters->objects[1]->objectName );
-	} else {
-		Sender->CutSceneId = GetActorFromObject( Sender, parameters->objects[1] );
-	}
+	Sender->CutSceneId = GetActorFromObject( Sender, parameters->objects[1]);
 	if (InDebug&ID_CUTSCENE) {
 		if (!Sender->CutSceneId) {
 			printMessage("GameScript","Failed to set CutSceneID!\n",YELLOW);
@@ -1646,34 +1641,6 @@ void GameScript::ContainerEnable(Scriptable* Sender, Action* parameters)
 	else {
 		cnt->Flags|=CONT_DISABLED;
 	}
-}
-
-void GameScript::MoveBetweenAreasCore(Actor* actor, const char *area, Point &position, int face, bool adjust)
-{
-	printf("MoveBetweenAreas: %s to %s [%d.%d] face: %d\n", actor->GetName(0), area,position.x,position.y, face);
-	Map* map2;
-	Game* game = core->GetGame();
-	if (area[0]) { //do we need to switch area?
-		Map* map1 = actor->GetCurrentArea();
-		//we have to change the pathfinder
-		//to the target area if adjust==true
-		map2 = game->GetMap(area, false);
-		if ( map1!=map2 ) {
-			if (map1) {
-				map1->RemoveActor( actor );
-			}
-			map2->AddActor( actor );
-		}
-	}
-	else {
-		map2=actor->GetCurrentArea();
-	}
-	actor->SetPosition(map2, position, adjust);
-	if (face !=-1) {
-		actor->SetOrientation( face,0 );
-	}
-	GameControl *gc=core->GetGameControl();
-	gc->SetScreenFlags(SF_CENTERONACTOR,BM_OR);
 }
 
 void GameScript::MoveBetweenAreas(Scriptable* Sender, Action* parameters)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.6 2005/06/26 13:57:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.7 2005/06/28 18:16:08 avenger_teambg Exp $
  *
  */
 
@@ -1085,7 +1085,10 @@ int GameScript::Or(Scriptable* /*Sender*/, Trigger* parameters)
 
 int GameScript::Clicked(Scriptable* Sender, Trigger* parameters)
 {
-	if (parameters->objectParameter->objectFields[0] == 0) {
+	//now objects suicide themselves if they are empty objects
+	//so checking an empty object is easier
+	//if (parameters->objectParameter->objectFields[0] == 0) {
+	if (parameters->objectParameter == NULL) {
 		if (Sender->LastTrigger) {
 			Sender->AddTrigger (&Sender->LastTrigger);
 			return 1;
@@ -1105,7 +1108,7 @@ int GameScript::Entered(Scriptable* Sender, Trigger* parameters)
 	if (Sender->Type != ST_PROXIMITY) {
 		return 0;
 	}
-	if (parameters->objectParameter->objectFields[0] == 0) {
+	if (parameters->objectParameter == NULL) {
 		if (Sender->LastEntered) {
 			Sender->AddTrigger (&Sender->LastEntered);
 			return 1;
@@ -1426,15 +1429,13 @@ int GameScript::CheckStatLT(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+//non actors can see too (reducing function to LOS)
+//non actors can be seen too (reducing function to LOS)
 static int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 {
-	if (Sender->Type != ST_ACTOR) {
-		return 0;
-	}
-	Actor* snd = ( Actor* ) Sender;
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
 	/* don't set LastSeen if this isn't an actor */
-	if (!tar || tar->Type !=ST_ACTOR) {
+	if (!tar) {
 		return 0;
 	}
 	//both are actors
@@ -1442,8 +1443,11 @@ static int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 		if (justlos) {
 			return 1;
 		}
-		//additional checks for invisibility?
-		snd->LastSeen = (Actor *) tar;
+		if (Sender->Type==ST_ACTOR && tar->Type==ST_ACTOR) {
+			Actor* snd = ( Actor* ) Sender;
+			//additional checks for invisibility?
+			snd->LastSeen = (Actor *) tar;
+		}
 		return 1;
 	}
 	return 0;
@@ -1483,6 +1487,10 @@ int GameScript::NumCreaturesGT(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::NumCreatureVsParty(Scriptable* Sender, Trigger* parameters)
 {
+	//creating object on the spot
+	if (!parameters->objectParameter) {
+		parameters->objectParameter = new Object();
+	}
 	parameters->objectParameter->objectFields[0]=EA_EVILCUTOFF;
 	int value = GetObjectCount(Sender, parameters->objectParameter);
 	return value == parameters->int0Parameter;
@@ -1490,6 +1498,9 @@ int GameScript::NumCreatureVsParty(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::NumCreatureVsPartyGT(Scriptable* Sender, Trigger* parameters)
 {
+	if (!parameters->objectParameter) {
+		parameters->objectParameter = new Object();
+	}
 	parameters->objectParameter->objectFields[0]=EA_EVILCUTOFF;
 	int value = GetObjectCount(Sender, parameters->objectParameter);
 	return value > parameters->int0Parameter;
@@ -1497,6 +1508,9 @@ int GameScript::NumCreatureVsPartyGT(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::NumCreatureVsPartyLT(Scriptable* Sender, Trigger* parameters)
 {
+	if (!parameters->objectParameter) {
+		parameters->objectParameter = new Object();
+	}
 	parameters->objectParameter->objectFields[0]=EA_EVILCUTOFF;
 	int value = GetObjectCount(Sender, parameters->objectParameter);
 	return value < parameters->int0Parameter;
@@ -1589,7 +1603,8 @@ int GameScript::OpenState(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!tar) {
-		printf("[GameScript]: couldn't find door/container:%s\n",parameters->objectParameter->objectName);
+		printMessage("[GameScript]"," ",LIGHT_RED);
+		printf("couldn't find door/container:%s\n", parameters->objectParameter? parameters->objectParameter->objectName:"<NULL>");
 		return 0;
 	}
 	switch(tar->Type) {
@@ -1605,7 +1620,8 @@ int GameScript::OpenState(Scriptable* Sender, Trigger* parameters)
 		}
 		default:; //to remove a warning
 	}
-	printf("[GameScript]: couldn't find door/container:%s\n",parameters->string0Parameter);
+	printMessage("[GameScript]"," ",LIGHT_RED);	
+	printf("Not a door/container:%s\n", tar->GetScriptName());
 	return 0;
 }
 
@@ -1613,7 +1629,8 @@ int GameScript::IsLocked(Scriptable * Sender, Trigger *parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!tar) {
-		printf("[GameScript]: couldn't find door/container:%s\n",parameters->objectParameter->objectName);
+		printMessage("[GameScript]"," ",LIGHT_RED);
+		printf("couldn't find door/container:%s\n", parameters->objectParameter? parameters->objectParameter->objectName:"<NULL>");
 		return 0;
 	}
 	switch(tar->Type) {
@@ -1629,7 +1646,8 @@ int GameScript::IsLocked(Scriptable * Sender, Trigger *parameters)
 		}
 		default:; //to remove a warning
 	}
-	printf("[GameScript]: couldn't find door/container:%s\n",parameters->string0Parameter);
+	printMessage("[GameScript]"," ",LIGHT_RED);	
+	printf("Not a door/container:%s\n", tar->GetScriptName());
 	return 0;
 }
 
