@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.84 2005/06/26 13:57:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.85 2005/06/28 20:08:13 guidoj Exp $
  *
  */
 
@@ -275,9 +275,9 @@ int Game::GetPartySize(bool onlyalive) const
 }
 
 /* sends the hotkey trigger to all selected actors */
-void Game::SetHotKey(int Key)
+void Game::SetHotKey(unsigned long Key)
 {
-	for(unsigned int i=0;i<PCs.size();i++) {
+	for(unsigned int i = 0; i < PCs.size(); i++) {
 		Actor *actor = PCs[i];
 
 		if (actor->IsSelected()) {
