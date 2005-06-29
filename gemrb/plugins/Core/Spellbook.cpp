@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.25 2005/06/28 20:06:03 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.26 2005/06/29 17:59:24 avenger_teambg Exp $
  *
  */
 
@@ -414,8 +414,9 @@ void Spellbook::dump()
 			//if (!sm || !sm->Number) continue;
 			if (!sm) continue;
 
-			printf ( "type: %d: L: %d; N1: %d; N2: %d; T: %d; KC: %ld; MC: %ld\n", i,
-				 sm->Level, sm->Number, sm->Number2, sm->Type, sm->known_spells.size(), sm->memorized_spells.size() );
+			//Never ever use field length qualifiers it is not portable, if you need to convert, convert to compatible values, anyway we don't need this!
+			//printf ( "type: %d: L: %d; N1: %d; N2: %d; T: %d; KC: %d; MC: %d\n", i,
+			//	 sm->Level, sm->Number, sm->Number2, sm->Type, (int) sm->known_spells.size(), (int) sm->memorized_spells.size() );
 
 			if (sm->known_spells.size()) 
 				printf( " Known spells:\n" );
