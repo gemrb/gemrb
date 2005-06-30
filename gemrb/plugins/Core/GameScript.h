@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.200 2005/06/28 18:16:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.201 2005/06/30 21:16:42 avenger_teambg Exp $
  *
  */
 
@@ -808,6 +808,7 @@ public: //Script Functions
 	static int IsFacingObject(Scriptable* Sender, Trigger* parameters);
 	static int IsFacingSavedRotation(Scriptable* Sender, Trigger* parameters);
 	static int IsLocked(Scriptable* Sender, Trigger* parameters);
+	static int IsOverMe(Scriptable* Sender, Trigger* parameters);
 	static int IsPlayerNumber( Scriptable* Sender, Trigger* parameters);
 	static int IsRotation(Scriptable* Sender, Trigger* parameters);
 	static int IsTeamBitOn(Scriptable* Sender, Trigger* parameters);
@@ -963,6 +964,7 @@ public:
 	static void ChangeRace(Scriptable* Sender, Action* parameters);
 	static void ChangeSpecifics(Scriptable* Sender, Action* parameters);
 	static void ChangeStat(Scriptable* Sender, Action* parameters);
+	static void ChangeStoreMarkup(Scriptable* Sender, Action* parameters);
 	static void ClearActions(Scriptable* Sender, Action* parameters);
 	static void ClearAllActions(Scriptable* Sender, Action* parameters);
 	static void CloseDoor(Scriptable* Sender, Action* parameters);

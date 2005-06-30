@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.12 2005/06/28 18:15:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.13 2005/06/30 21:16:41 avenger_teambg Exp $
  *
  */
 
@@ -3814,11 +3814,18 @@ void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 /*EscapeAreaMove(S:Area*,I:X*,I:Y*,I:Face*)*/
 void GameScript::EscapeArea(Scriptable* Sender, Action* parameters)
 {
+	//find nearest exit
+	Point p(0,0);
 	if (Sender->Type!=ST_ACTOR) {
 		return;
 	}
-	Point p(parameters->int0Parameter, parameters->int1Parameter);
-	EscapeAreaCore((Actor *) Sender, parameters->string0Parameter, p, p, 0 );
+	Sender->SetWait(5);
+	if (parameters->string0Parameter[0]) {
+		Point q(parameters->int0Parameter, parameters->int1Parameter);
+		EscapeAreaCore((Actor *) Sender, parameters->string0Parameter, q, p, 0 );
+	} else {
+		EscapeAreaCore((Actor *) Sender, parameters->string0Parameter, p, p, EA_DESTROY );
+	}
 }
 
 void GameScript::EscapeAreaDestroy(Scriptable* Sender, Action* parameters)
@@ -3826,31 +3833,36 @@ void GameScript::EscapeAreaDestroy(Scriptable* Sender, Action* parameters)
 	if (Sender->Type!=ST_ACTOR) {
 		return;
 	}
+	//find nearest exit
 	Point p(0,0);
+	Sender->SetWait(parameters->int0Parameter);
 	EscapeAreaCore((Actor *) Sender, parameters->string0Parameter, p, p, EA_DESTROY );
 }
 
+/*EscapeAreaObjectMove(S:Area*,I:X*,I:Y*,I:Face*)*/
 void GameScript::EscapeAreaObject(Scriptable* Sender, Action* parameters)
 {
-	if (Sender->Type!=ST_ACTOR) {
-		return;
-	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	if (tar) {
-		Point p(parameters->int0Parameter, parameters->int1Parameter);
-		EscapeAreaCore((Actor *) Sender, parameters->string0Parameter, p, tar->Pos, 0 );
+	if (tar && tar->Type == ST_ACTOR) {
+		//find nearest exit
+		Point p(0,0);
+		if (parameters->string0Parameter[0]) {
+			Point q(parameters->int0Parameter, parameters->int1Parameter);
+			EscapeAreaCore((Actor *) tar, parameters->string0Parameter, p, q, 0 );
+		} else {
+			EscapeAreaCore((Actor *) tar, 0, p, p, EA_DESTROY );
+		}
 	}
 }
 
 void GameScript::EscapeAreaObjectNoSee(Scriptable* Sender, Action* parameters)
 {
-	if (Sender->Type!=ST_ACTOR) {
-		return;
-	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	if (tar) {
-		Point p(parameters->int0Parameter, parameters->int1Parameter);
-		EscapeAreaCore((Actor *) Sender, parameters->string0Parameter, p, tar->Pos, 0 );
+	if (tar && tar->Type == ST_ACTOR) {
+		//find nearest exit
+		Point p(0,0);
+		Point q(parameters->int0Parameter, parameters->int1Parameter);
+		EscapeAreaCore((Actor *) tar, parameters->string0Parameter, p, q, EA_DESTROY );
 	}
 }
 
@@ -3890,4 +3902,29 @@ void GameScript::PickUpItem(Scriptable* Sender, Action* parameters)
 item_is_gold: //we take gold!
 	core->GetGame()->PartyGold += res;
 	delete item;
+}
+
+void GameScript::ChangeStoreMarkup(Scriptable* /*Sender*/, Action* parameters)
+{
+	bool has_current = false;
+	ieResRef current;
+
+	Store *store = core->GetCurrentStore();
+	if (!store) {
+		store = core->SetCurrentStore(parameters->string0Parameter);
+	} else {
+		if (strnicmp(store->Name, parameters->string0Parameter, 8) ) {
+			//not the current store, we need some dirty hack
+			has_current = true;
+			strnuprcpy(current, store->Name, 8);
+		}
+	}
+	store->BuyMarkup = parameters->int0Parameter;
+	store->SellMarkup = parameters->int1Parameter;
+	//additional markup, is this depreciation???
+	store->DepreciationRate = parameters->int2Parameter;
+	if (has_current) {
+		//setting back old store (this will save our current store)
+		core->SetCurrentStore(current);
+	}
 }

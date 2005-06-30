@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.301 2005/06/28 18:16:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.302 2005/06/30 21:16:41 avenger_teambg Exp $
  *
  */
 
@@ -114,7 +114,7 @@ static TriggerLink triggernames[] = {
 	{"happiness", GameScript::Happiness, 0},
 	{"happinessgt", GameScript::HappinessGT, 0},
 	{"happinesslt", GameScript::HappinessLT, 0},
-	{"harmlessentered", GameScript::Entered, 0}, //this isn't sure the same
+	{"harmlessentered", GameScript::IsOverMe, 0}, //pst, not sure
 	{"hasinnateability", GameScript::HaveSpell, 0}, //these must be the same
 	{"hasitem", GameScript::HasItem, 0},
 	{"hasitemequiped", GameScript::HasItemEquipped, 0}, //typo in bg2
@@ -161,7 +161,7 @@ static TriggerLink triggernames[] = {
 	{"isgabber", GameScript::IsGabber, 0},
 	{"islocked", GameScript::IsLocked, 0},
 	{"isextendednight", GameScript::IsExtendedNight, 0},
-  {"isoverme", GameScript::Entered, 0}, // same as harmlessentered
+	{"isoverme", GameScript::IsOverMe, 0}, // same as harmlessentered?
 	{"isplayernumber", GameScript::IsPlayerNumber, 0},
 	{"isrotation", GameScript::IsRotation, 0},
 	{"isscriptname", GameScript::CalledByName, 0}, //seems the same
@@ -339,6 +339,7 @@ static ActionLink actionnames[] = {
 	{"changerace", GameScript::ChangeRace, 0},
 	{"changespecifics", GameScript::ChangeSpecifics, 0},
 	{"changestat", GameScript::ChangeStat, 0},
+	{"changestoremarkup", GameScript::ChangeStoreMarkup, 0},//iwd2
 	{"chunkcreature", GameScript::Kill, 0}, //should be more graphical
 	{"clearactions", GameScript::ClearActions, 0},
 	{"clearallactions", GameScript::ClearAllActions, 0},
@@ -2549,10 +2550,10 @@ int GameScript::ExecuteResponse(Scriptable* Sender, Response* rE)
 					Sender->CutSceneId->AddAction( aC );
 					//AddAction( Sender->CutSceneId, aC );
 				}
-        else {
+				else {
 					//Sender->AddAction( aC );
 					AddAction( Sender, aC );
-        }
+				}
 				break;
 			case AF_CONTINUE:
 			case AF_MASK:
@@ -2570,10 +2571,10 @@ void GameScript::AddAction(Scriptable* Sender, Action* aC)
 			Sender = GetActorFromObject( Sender, aC->objects[0]);
 			if (Sender) {
 				Sender->AddAction(ParamCopyNoOverride(aC) );
-      } else {
-        printMessage("GameScript","Actionoverride failed for object: \n",LIGHT_RED);
+			} else {
+				printMessage("GameScript","Actionoverride failed for object: \n",LIGHT_RED);
 				aC->objects[0]->Dump();
-      }
+			}
 			return;
 	}
 	Sender->AddAction(aC);
@@ -2581,36 +2582,36 @@ void GameScript::AddAction(Scriptable* Sender, Action* aC)
 
 void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 {
-  if (aC->objects[0]) {
-    Scriptable *scr = GetActorFromObject(Sender, aC->objects[0]);
-    if (scr) {
-      if (InDebug&ID_ACTIONS) {
-        printMessage("GameScript"," ",YELLOW);
-        printf("Sender: %s-->override: %s\n",Sender->GetScriptName(), scr->GetScriptName() );
-      }      
-      scr->AddAction(ParamCopyNoOverride(Sender->CurrentAction));
-    } else {
-      printMessage("GameScript","Actionoverride failed for object: \n",LIGHT_RED);
-      aC->objects[0]->Dump();
-    }
-    Sender->CurrentAction=NULL;
-    aC->Release();
-    return;
-  }
+	if (aC->objects[0]) {
+		Scriptable *scr = GetActorFromObject(Sender, aC->objects[0]);
+		if (scr) {
+			if (InDebug&ID_ACTIONS) {
+				printMessage("GameScript"," ",YELLOW);
+				printf("Sender: %s-->override: %s\n",Sender->GetScriptName(), scr->GetScriptName() );
+			}      
+			scr->AddAction(ParamCopyNoOverride(Sender->CurrentAction));
+		} else {
+			printMessage("GameScript","Actionoverride failed for object: \n",LIGHT_RED);
+			aC->objects[0]->Dump();
+		}
+		Sender->CurrentAction=NULL;
+		aC->Release();
+		return;
+	}
 	if (InDebug&ID_ACTIONS) {
 		printMessage("GameScript"," ",YELLOW);
 		printf("Sender: %s\n",Sender->GetScriptName() );
 	}
 	ActionFunction func = actions[aC->actionID];
 	if (func) {
-    //turning off interruptable flag
-    //uninterruptable actions will set it back
-    if (Sender->Type==ST_ACTOR) {
-      Sender->Active|=SCR_ACTIVE;
-      ((Actor *)Sender)->InternalFlags&=~IF_NOINT;
-    }
-    func( Sender, aC );
-  } else {
+		//turning off interruptable flag
+		//uninterruptable actions will set it back
+		if (Sender->Type==ST_ACTOR) {
+			Sender->Active|=SCR_ACTIVE;
+			((Actor *)Sender)->InternalFlags&=~IF_NOINT;
+		}
+		func( Sender, aC );
+	} else {
 		actions[aC->actionID] = NoActionAtAll;
 		printMessage("GameScript", " ", YELLOW);
 		printf("Unhandled action code: %d %s\n", aC->actionID , actionsTable->GetValue(aC->actionID) );

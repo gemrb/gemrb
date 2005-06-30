@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.328 2005/06/25 20:05:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.329 2005/06/30 21:16:42 avenger_teambg Exp $
  *
  */
 
@@ -3306,7 +3306,8 @@ Store *Interface::SetCurrentStore(const ieResRef resname )
 			return CurrentStore;
 		}
 
-		delete CurrentStore;
+		//not simply delete the old store, but save it
+		CloseCurrentStore();
 	}
 
 	DataStream* str = key->GetResource( resname, IE_STO_CLASS_ID );

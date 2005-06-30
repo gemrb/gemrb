@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.9 2005/06/28 18:16:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.10 2005/06/30 21:16:41 avenger_teambg Exp $
  *
  */
 
@@ -457,17 +457,16 @@ void ChangeAnimationCore(Actor *src, const char *resref, bool effect)
 
 void EscapeAreaCore(Actor* src, const char* resref, Point &enter, Point &exit, int flags)
 {
-	src->ClearActions();
 	char Tmp[256];
-	sprintf( Tmp, "MoveToPoint([%hd.%hd])", exit.x, exit.y );
-	src->AddAction( GenerateAction( Tmp, true ) );
-	src->SetWait(5);
+
 	if (flags &EA_DESTROY) {
-		src->AddAction( GenerateAction("DestroySelf()") );
+		src->AddActionInFront( GenerateAction("DestroySelf()") );
 	} else {
 		sprintf( Tmp, "JumpToPoint(\"%s\",[%hd.%hd])", resref, enter.x, enter.y );
-		src->AddAction( GenerateAction( Tmp, true ) );
+		src->AddActionInFront( GenerateAction( Tmp, true ) );
 	}
+	sprintf( Tmp, "MoveToPoint([%hd.%hd])", exit.x, exit.y );
+	src->AddActionInFront( GenerateAction( Tmp, true ) );
 }
 
 void GetPositionFromScriptable(Scriptable* scr, Point &position, bool trap)

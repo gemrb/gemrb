@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.8 2005/06/28 20:05:22 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.9 2005/06/30 21:16:42 avenger_teambg Exp $
  *
  */
 
@@ -1118,6 +1118,22 @@ int GameScript::Entered(Scriptable* Sender, Trigger* parameters)
 	Scriptable* target = GetActorFromObject( Sender, parameters->objectParameter );
 	if (Sender->LastEntered == target) {
 		Sender->AddTrigger (&Sender->LastEntered);
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::IsOverMe(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type != ST_PROXIMITY || Sender->Type != ST_TRAVEL) {
+		return 0;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Highlightable *trigger = (Highlightable *) Sender;
+	if (trigger->IsOver(tar->Pos) ) {
 		return 1;
 	}
 	return 0;
