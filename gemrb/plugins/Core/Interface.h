@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.163 2005/06/25 20:05:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.164 2005/07/01 20:39:36 avenger_teambg Exp $
  *
  */
 
@@ -369,8 +369,8 @@ public:
 	{
 		return game;
 	}
-	/** Gets the WorldMap class, returns the current worldmap */
-	WorldMap * GetWorldMap();
+	/** Gets the WorldMap class, returns the current worldmap or the first worldmap containing the area*/
+	WorldMap * GetWorldMap(const char *area = NULL);
 	GameControl *GetGameControl();
 
 	void QuitGame(bool backtomain);

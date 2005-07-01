@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.13 2005/06/30 21:16:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.14 2005/07/01 20:39:33 avenger_teambg Exp $
  *
  */
 
@@ -3927,4 +3927,18 @@ void GameScript::ChangeStoreMarkup(Scriptable* /*Sender*/, Action* parameters)
 		//setting back old store (this will save our current store)
 		core->SetCurrentStore(current);
 	}
+}
+
+void GameScript::SetEncounterProbability(Scriptable* /*Sender*/, Action* parameters)
+{
+	WorldMap *wmap = core->GetWorldMap(parameters->string0Parameter);
+	if (!wmap) {
+		//no such starting area
+		return;
+	}
+	WMPAreaLink *link = wmap->GetLink(parameters->string0Parameter, parameters->string1Parameter);
+	if (!link) {
+		return;
+	}
+	link->EncounterChance = parameters->int0Parameter;
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.14 2005/06/14 22:29:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.15 2005/07/01 20:39:36 avenger_teambg Exp $
  *
  */
 
@@ -125,8 +125,8 @@ public:
 	int CalculateDistances(const ieResRef A, int direction);
 	/* returns the precalculated distance to area B */
 	int GetDistance(const ieResRef A);
-	/* returns the link to area B we will fall into if we head in B direction */
-	//WMPAreaLink *GetLink(const ieResRef B);
+	/* returns the link between area A and area B */
+	WMPAreaLink *GetLink(const ieResRef A, const ieResRef B);
 	/* returns the area link we will fall into if we head in B direction */
 	/* if the area name differs it means we are in a random encounter */
 	WMPAreaLink *GetEncounterLink(const ieResRef B, bool &encounter);

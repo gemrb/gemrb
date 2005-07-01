@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.16 2005/06/14 22:29:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.17 2005/07/01 20:39:36 avenger_teambg Exp $
  *
  */
 
@@ -244,6 +244,30 @@ unsigned int WorldMap::WhoseLinkAmI(int link_index)
 	return (ieDword) -1;
 }
 
+WMPAreaLink *WorldMap::GetLink(const ieResRef A, const ieResRef B)
+{
+	unsigned int i,j,k;
+
+	WMPAreaEntry *ae=GetArea( A, i );
+	if (!ae) {
+		return NULL;
+	}
+	//looking for destination area, returning the first link found
+	for (i=0;i<4;i++) {
+		j=ae->AreaLinksCount[i];
+		k=ae->AreaLinksIndex[i];
+		while(j--) {
+			WMPAreaLink *al = area_links[k++];
+			WMPAreaEntry *ae2 = area_entries[al->AreaIndex];
+			//or arearesref?
+			if (strnicmp(ae2->AreaName, B, 8)==0) {
+				return al;
+			}
+		}
+	}
+	return NULL;
+}
+
 //call this function to find out which area we fall into
 //not necessarily the target area
 //if it isn't the same, then a random encounter happened!
@@ -295,7 +319,7 @@ int WorldMap::GetDistance(const ieResRef AreaName)
 	}
 	unsigned int i;
 	if (GetArea( AreaName, i )) {
-			return Distances[i];
+		return Distances[i];
 	}
 	return -1;
 }

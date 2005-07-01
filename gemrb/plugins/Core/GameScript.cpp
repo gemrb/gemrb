@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.302 2005/06/30 21:16:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.303 2005/07/01 20:39:33 avenger_teambg Exp $
  *
  */
 
@@ -575,6 +575,7 @@ static ActionLink actionnames[] = {
 	{"setdialogue", GameScript::SetDialogue,AF_BLOCKING},
 	{"setdialoguerange", GameScript::SetDialogueRange, 0},
 	{"setdoorlocked", GameScript::SetDoorLocked,AF_BLOCKING},
+	{"setencounterprobability", GameScript::SetEncounterProbability,0},
 	{"setextendednight", GameScript::SetExtendedNight, 0},
 	{"setfaction", GameScript::SetFaction, 0},
 	{"setgabber", GameScript::SetGabber, 0},
