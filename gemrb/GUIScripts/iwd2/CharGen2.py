@@ -38,6 +38,7 @@ def OnLoad():
 	RaceButton = GemRB.GetControl(CharGenWindow,1)
 	GemRB.SetText(CharGenWindow,RaceButton, 11957)
 	GemRB.SetButtonState(CharGenWindow,RaceButton,IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonFlags(CharGenWindow,RaceButton,IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	ClassButton = GemRB.GetControl(CharGenWindow,2)
 	GemRB.SetText(CharGenWindow,ClassButton, 11959)

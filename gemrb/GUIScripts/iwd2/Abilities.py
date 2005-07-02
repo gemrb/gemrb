@@ -147,6 +147,7 @@ def RightPress():
 	PointsLeft = PointsLeft + 1
 	SumLabel = GemRB.GetControl(AbilityWindow, 0x10000002)
 	GemRB.SetText(AbilityWindow, SumLabel, str(PointsLeft) )
+	GemRB.SetLabelTextColor(AbilityWindow,SumLabel, 255, 255, 0)
 	Label = GemRB.GetControl(AbilityWindow, 0x10000003+Abidx)
 	GemRB.SetText(AbilityWindow, Label, str(Ability-1) )
 	Label = GemRB.GetControl(AbilityWindow, 0x10000024+Abidx)
@@ -188,6 +189,8 @@ def LeftPress():
 	GemRB.SetVar("Ability "+str(Abidx), Ability+1)
 	PointsLeft = PointsLeft - 1
 	SumLabel = GemRB.GetControl(AbilityWindow, 0x10000002)
+	if PointsLeft == 0:
+		GemRB.SetLabelTextColor(AbilityWindow,SumLabel, 255, 255, 255)
 	GemRB.SetText(AbilityWindow, SumLabel, str(PointsLeft) )
 	Label = GemRB.GetControl(AbilityWindow, 0x10000003+Abidx)
 	GemRB.SetText(AbilityWindow, Label, str(Ability+1) )

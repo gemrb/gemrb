@@ -50,6 +50,7 @@ def OnLoad():
 	AlignmentButton = GemRB.GetControl(CharGenWindow,3)
 	GemRB.SetText(CharGenWindow,AlignmentButton, 11958)
 	GemRB.SetButtonState(CharGenWindow,AlignmentButton,IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonFlags(CharGenWindow,AlignmentButton,IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	AbilitiesButton = GemRB.GetControl(CharGenWindow,4)
 	GemRB.SetText(CharGenWindow,AbilitiesButton, 11960)

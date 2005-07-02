@@ -14,10 +14,12 @@ ClassColumn = 0
 def RedrawSkills():
 	global CostTable, TopIndex
 
+	SumLabel = GemRB.GetControl(SkillWindow, 0x1000000c)
 	if PointsLeft == 0:
 		GemRB.SetButtonState(SkillWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
-
-	SumLabel = GemRB.GetControl(SkillWindow, 0x1000000c)
+		GemRB.SetLabelTextColor(SkillWindow,SumLabel, 255, 255, 255)
+	else:
+		GemRB.SetLabelTextColor(SkillWindow,SumLabel, 255, 255, 0)
 	GemRB.SetText(SkillWindow, SumLabel, str(PointsLeft) )
 
 	for i in range(0,10):

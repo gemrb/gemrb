@@ -63,6 +63,7 @@ def OnLoad():
 	AppearanceButton = GemRB.GetControl(CharGenWindow,6)
 	GemRB.SetText(CharGenWindow,AppearanceButton, 11961)
 	GemRB.SetButtonState(CharGenWindow,AppearanceButton,IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonFlags(CharGenWindow,AppearanceButton,IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	NameButton = GemRB.GetControl(CharGenWindow,7)
 	GemRB.SetText(CharGenWindow,NameButton, 11963)
