@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.303 2005/07/01 20:39:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.304 2005/07/02 20:52:04 avenger_teambg Exp $
  *
  */
 
@@ -300,6 +300,7 @@ static ActionLink actionnames[] = {
 	{"addexperienceparty", GameScript::AddExperienceParty, 0},
 	{"addexperiencepartyglobal", GameScript::AddExperiencePartyGlobal,AF_MERGESTRINGS},
 	{"addglobals", GameScript::AddGlobals, 0},
+	{"addhp", GameScript::AddHP, 0},
 	{"addjournalentry", GameScript::AddJournalEntry, 0},
 	{"addmapnote", GameScript::AddMapnote, 0},
 	{"addpartyexperience", GameScript::AddExperienceParty, 0},
@@ -580,8 +581,10 @@ static ActionLink actionnames[] = {
 	{"setfaction", GameScript::SetFaction, 0},
 	{"setgabber", GameScript::SetGabber, 0},
 	{"setglobal", GameScript::SetGlobal,AF_MERGESTRINGS},
+	{"setglobalrandom", GameScript::SetGlobalRandom, AF_MERGESTRINGS},
 	{"setglobaltimer", GameScript::SetGlobalTimer,AF_MERGESTRINGS},
 	{"setglobaltimeronce", GameScript::SetGlobalTimerOnce,AF_MERGESTRINGS},
+	{"setglobaltimerrandom", GameScript::SetGlobalTimerRandom,AF_MERGESTRINGS},
 	{"setglobaltint", GameScript::SetGlobalTint, 0},
 	{"sethomelocation", GameScript::SetHomeLocation, 0},
 	{"sethp", GameScript::SetHP, 0},

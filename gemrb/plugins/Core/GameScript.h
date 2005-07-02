@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.202 2005/07/01 20:39:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.203 2005/07/02 20:52:04 avenger_teambg Exp $
  *
  */
 
@@ -932,6 +932,7 @@ public:
 	static void AddExperienceParty(Scriptable *Sender, Action* parameters);
 	static void AddExperiencePartyGlobal(Scriptable *Sender, Action* parameters);
 	static void AddGlobals(Scriptable* Sender, Action* parameters);
+	static void AddHP(Scriptable* Sender, Action* parameters);
 	static void AddJournalEntry(Scriptable* Sender, Action* parameters);
 	static void AddMapnote(Scriptable* Sender, Action* parameters);
 	static void AddSpecialAbility(Scriptable* Sender, Action* parameters);
@@ -1181,6 +1182,7 @@ public:
 	static void SetGlobalRandom(Scriptable* Sender, Action* parameters);
 	static void SetGlobalTimer(Scriptable* Sender, Action* parameters);
 	static void SetGlobalTimerOnce(Scriptable* Sender, Action* parameters);
+	static void SetGlobalTimerRandom(Scriptable* Sender, Action* parameters);
 	static void SetGlobalTint(Scriptable* Sender, Action* parameters);
 	static void SetHomeLocation(Scriptable* Sender, Action* parameters);
 	static void SetHP(Scriptable* Sender, Action* parameters);

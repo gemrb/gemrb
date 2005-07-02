@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.14 2005/07/01 20:39:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.15 2005/07/02 20:52:04 avenger_teambg Exp $
  *
  */
 
@@ -109,11 +109,11 @@ void GameScript::SetGlobal(Scriptable* Sender, Action* parameters)
 
 void GameScript::SetGlobalRandom(Scriptable* Sender, Action* parameters)
 {
-	unsigned int max=parameters->int0Parameter+1;
-	if (max) {
-		SetVariable( Sender, parameters->string0Parameter, RandomNumValue%max );
+	int max=parameters->int1Parameter-parameters->int0Parameter+1;
+	if (max>0) {
+		SetVariable( Sender, parameters->string0Parameter, RandomNumValue%max+parameters->int0Parameter );
 	} else {
-		SetVariable( Sender, parameters->string0Parameter, RandomNumValue );
+		SetVariable( Sender, parameters->string0Parameter, 0);
 	}
 }
 
@@ -124,6 +124,20 @@ void GameScript::SetGlobalTimer(Scriptable* Sender, Action* parameters)
 	mytime=core->GetGame()->GameTime; //gametime (should increase it)
 	SetVariable( Sender, parameters->string0Parameter,
 		parameters->int0Parameter + mytime);
+}
+
+void GameScript::SetGlobalTimerRandom(Scriptable* Sender, Action* parameters)
+{
+	ieDword mytime;
+
+	int random=parameters->int1Parameter-parameters->int0Parameter+1;
+	if (random>0) {
+		random = RandomNumValue % random + parameters->int0Parameter;
+	} else {
+		random = 0;
+	}
+	mytime=core->GetGame()->GameTime; //gametime (should increase it)
+	SetVariable( Sender, parameters->string0Parameter, random + mytime);
 }
 
 void GameScript::SetGlobalTimerOnce(Scriptable* Sender, Action* parameters)
@@ -272,6 +286,16 @@ void GameScript::SetHP(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) scr;
 	actor->SetStat( IE_HITPOINTS, parameters->int0Parameter );
+}
+
+void GameScript::AddHP(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!scr || scr->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) scr;
+	actor->NewStat( IE_HITPOINTS, parameters->int0Parameter,MOD_ADDITIVE );
 }
 
 void GameScript::SetTeam(Scriptable* Sender, Action* parameters)
@@ -642,7 +666,7 @@ void GameScript::SaveObjectLocation(Scriptable* Sender, Action* parameters)
 	SetVariable(Sender, parameters->string0Parameter, value);
 }
 
-/** you may omit the string0parameter, in this case this will be a */
+/** you may omit the string0Parameter, in this case this will be a */
 /** CreateCreatureAtSavedLocation */
 void GameScript::CreateCreatureAtLocation(Scriptable* Sender, Action* parameters)
 {
