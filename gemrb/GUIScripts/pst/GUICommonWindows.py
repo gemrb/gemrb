@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.33 2005/05/31 21:36:46 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.34 2005/07/04 20:40:21 edheldil Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -35,6 +35,7 @@ MainWindow = None
 global PortraitWindow
 PortraitWindow = None
 ActionsWindow = None
+OptionsWindow = None
 
 # Buttons:
 # 0 CNTREACH
@@ -392,14 +393,17 @@ def PortraitButtonOnMouseLeave ():
 
 
 def DisableAnimatedWindows ():
-	global ActionsWindow
+	global ActionsWindow, OptionsWindow
 	GemRB.SetVar ("PortraitWindow", -1)
 	ActionsWindow = GemRB.GetVar ("ActionsWindow")
 	GemRB.SetVar ("ActionsWindow", -1)
+	OptionsWindow = GemRB.GetVar ("OptionsWindow")
+	GemRB.SetVar ("OptionsWindow", -1)
 
 def EnableAnimatedWindows ():
 	GemRB.SetVar ("PortraitWindow", PortraitWindow)
 	GemRB.SetVar ("ActionsWindow", ActionsWindow)
+	GemRB.SetVar ("OptionsWindow", OptionsWindow)
 
 
 def GetSavingThrow (SaveName, row, level):
