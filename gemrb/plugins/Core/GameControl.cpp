@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.240 2005/06/28 18:16:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.241 2005/07/04 18:41:00 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1121,7 +1121,7 @@ void GameControl::HandleWindowHide(const char *WindowName, const char *WindowPos
 				}
 				return;
 			}
-			printMessage("GameControl", "Invalid Window Index", LIGHT_RED);
+			printMessage("GameControl", "Invalid Window Index: ", LIGHT_RED);
 			printf("%s:%u\n",WindowName, index);
 		}
 	}
@@ -1173,7 +1173,7 @@ void GameControl::HandleWindowReveal(const char *WindowName, const char *WindowP
 				}
 				return;
 			}
-			printMessage("GameControl", "Invalid Window Index", LIGHT_RED);
+			printMessage("GameControl", "Invalid Window Index ", LIGHT_RED);
 			printf("%s:%u\n",WindowName, index);
 		}
 	}

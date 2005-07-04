@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.15 2005/07/02 20:52:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.16 2005/07/04 18:41:00 avenger_teambg Exp $
  *
  */
 
@@ -1300,38 +1300,48 @@ void GameScript::StaticPalette(Scriptable* Sender, Action* parameters)
 	anim->SetPalette( parameters->string0Parameter );
 }
 
-void GameScript::WaitAnimation(Scriptable* Sender, Action* parameters)
+//this is a special case of PlaySequence (with wait time, not for area anims)
+//waitanimation of iwd2 also uses it
+void GameScript::PlaySequenceTimed(Scriptable* Sender, Action* parameters)
 {
-	if (Sender->Type != ST_ACTOR) {
-		return;
-	}
-	Actor* actor = ( Actor* ) Sender;
-	actor->SetStance( parameters->int0Parameter );
-	actor->SetWait( 1 );
-}
-
-/* sender itself */
-void GameScript::PlaySequence(Scriptable* Sender, Action* parameters)
-{
-	if (Sender->Type != ST_ACTOR) {
-		return;
-	}
-	Actor* actor = ( Actor* ) Sender;
-	actor->SetStance( parameters->int0Parameter );
-}
-
-/* another object */
-void GameScript::SetAnimState(Scriptable* Sender, Action* parameters)
-{
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!tar) {
-		return;
+	Scriptable* tar;
+	if (parameters->objects[1]) {
+		tar = GetActorFromObject( Sender, parameters->objects[1] );
+	} else {
+		tar=Sender;
 	}
 	if (tar->Type != ST_ACTOR) {
 		return;
 	}
-	Actor* target = ( Actor* ) tar;
-	target->SetStance( parameters->int0Parameter );
+	Actor* actor = ( Actor* ) tar;
+	actor->SetStance( parameters->int0Parameter );
+	int delay = parameters->int1Parameter || 1;
+	actor->SetWait( delay );
+}
+
+// PlaySequence without object parameter defaults to Sender
+void GameScript::PlaySequence(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar;
+	if (parameters->objects[1]) {
+		tar = GetActorFromObject( Sender, parameters->objects[1] );
+		if (!tar) {
+			//could be an animation
+			AreaAnimation* anim = Sender->GetCurrentArea( )->GetAnimation( parameters->string0Parameter);
+			if (anim) {
+				//set animation's cycle to parameters->int0Parameter;
+			}
+			return;
+		}
+
+	} else {
+		tar = Sender;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	actor->SetStance( parameters->int0Parameter );
 }
 
 void GameScript::SetDialogue(Scriptable* Sender, Action* parameters)

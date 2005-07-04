@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIWORLD.py,v 1.5 2005/05/30 21:52:31 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIWORLD.py,v 1.6 2005/07/04 18:40:59 avenger_teambg Exp $
 
 
 # GUIWORLD.py - scripts to control some windows from GUIWORLD winpack
@@ -37,16 +37,19 @@ Container = None
 
 
 def OpenContainerWindow ():
-	global ContainerWindow
+	global ContainerWindow, Container
 
 	if ContainerWindow:
 		return
 
-       	GemRB.HideGUI ()
+       	hideflag = GemRB.HideGUI ()
+
 	GemRB.LoadWindowPack ("GUIWORLD")
 	ContainerWindow = Window = GemRB.LoadWindow (8)
-	GemRB.SetVar ("OtherWindow", Window)
 	DisableAnimatedWindows ()
+	GemRB.SetVar ("ActionsWindow", Window)
+
+	Container = GemRB.GetContainer(0)
 
 	# 0 - 5 - Ground Item
 	# 10 - 13 - Personal Item
@@ -78,7 +81,6 @@ def OpenContainerWindow ():
 	GemRB.SetText (Window, Text, str (party_gold))
 
 
-
 	Count = 1
 
 	# Ground items scrollbar
@@ -101,7 +103,8 @@ def OpenContainerWindow ():
 
 	UpdateContainerWindow ()
 
-	GemRB.UnhideGUI ()
+	if hideflag:
+		GemRB.UnhideGUI ()
 
 
 def UpdateContainerWindow ():
@@ -185,26 +188,20 @@ def CloseContainerWindow ():
 	if ContainerWindow == None:
 		return
 
-	GemRB.HideGUI ()
-
-	#Table = GemRB.LoadTable ("containr")
-	#row = Container['Type']
-	#tmp = GemRB.GetTableValue (Table, row, 2)
-	##play closing sound if applicable
-	#if tmp!='*':
-	#	GemRB.PlaySound (tmp)
-	#GemRB.UnloadTable (Table)
+	hideflag = GemRB.HideGUI ()
 
 	GemRB.UnloadWindow (ContainerWindow)
 	ContainerWindow = None
 	EnableAnimatedWindows ()
 	
-	GemRB.UnhideGUI ()
+	if hideflag:
+		GemRB.UnhideGUI ()
 
 
 #doing this way it will inform the core system too, which in turn will call
 #CloseContainerWindow ()
 def LeaveContainer ():
+	print "LeaveContainer"
 	GemRB.LeaveContainer()
 
 def DropItemContainer ():

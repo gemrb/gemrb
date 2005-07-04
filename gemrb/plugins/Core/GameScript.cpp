@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.304 2005/07/02 20:52:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.305 2005/07/04 18:41:00 avenger_teambg Exp $
  *
  */
 
@@ -522,6 +522,7 @@ static ActionLink actionnames[] = {
 	{"playerdialog", GameScript::PlayerDialogue,AF_BLOCKING},
 	{"playerdialogue", GameScript::PlayerDialogue,AF_BLOCKING},
 	{"playsequence", GameScript::PlaySequence, 0},
+	{"playsequencetimed", GameScript::PlaySequenceTimed, 0},//pst
 	{"playsong", GameScript::StartSong, 0},
 	{"playsound", GameScript::PlaySound, 0},
 	{"playsoundnotranged", GameScript::PlaySoundNotRanged, 0},
@@ -564,8 +565,8 @@ static ActionLink actionnames[] = {
 	{"saveplace", GameScript::SaveLocation, 0},
 	{"saveobjectlocation", GameScript::SaveObjectLocation, 0},
 	{"screenshake", GameScript::ScreenShake,AF_BLOCKING},
-	{"sequence", GameScript::SetAnimState, 0}, //not blocking this object
-	{"setanimstate", GameScript::SetAnimState, 0},//not blocking this object
+	//{"sequence", GameScript::PlaySequence, 0}, //which engine has this
+	{"setanimstate", GameScript::PlaySequence, 0},//pst
 	{"setapparentnamestrref", GameScript::SetApparentName, 0},
 	{"setareaflags", GameScript::SetAreaFlags, 0},
 	{"setarearestflag", GameScript::SetAreaRestFlag, 0},
@@ -608,7 +609,7 @@ static ActionLink actionnames[] = {
 	{"setsavedlocation", GameScript::SaveObjectLocation, 0},
 	{"setsavedlocationpoint", GameScript::SaveLocation, 0},
 	{"setscriptname", GameScript::SetScriptName, 0},
-	{"setsequence", GameScript::PlaySequence, 0},
+	{"setsequence", GameScript::PlaySequence, 0}, //bg2 (only own)
 	{"setteam", GameScript::SetTeam, 0},
 	{"setteambit", GameScript::SetTeamBit, 0},
 	{"settextcolor", GameScript::SetTextColor, 0},
@@ -642,6 +643,7 @@ static ActionLink actionnames[] = {
 	{"startsong", GameScript::StartSong, 0},
 	{"startstore", GameScript::StartStore, 0},
 	{"staticpalette", GameScript::StaticPalette, 0},
+	{"staticsequence", GameScript::PlaySequence, 0},//bg2 animation sequence
 	{"staticstart", GameScript::StaticStart, 0},
 	{"staticstop", GameScript::StaticStop, 0},
 	{"stickysinisterpoof", GameScript::CreateVisualEffectObject, 0},
@@ -673,7 +675,7 @@ static ActionLink actionnames[] = {
 	{"verbalconstant", GameScript::VerbalConstant, 0},
 	{"verbalconstanthead", GameScript::VerbalConstantHead, 0},
 	{"wait", GameScript::Wait, AF_BLOCKING},
-	{"waitanimation", GameScript::WaitAnimation,AF_BLOCKING},
+	{"waitanimation", GameScript::PlaySequenceTimed,AF_BLOCKING},//iwd2
 	{"waitrandom", GameScript::WaitRandom, AF_BLOCKING},
 	{"weather", GameScript::Weather, 0},
 	{"xequipitem", GameScript::XEquipItem, 0},

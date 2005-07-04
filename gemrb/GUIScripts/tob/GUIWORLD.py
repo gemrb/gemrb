@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIWORLD.py,v 1.14 2005/06/22 15:55:23 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIWORLD.py,v 1.15 2005/07/04 18:40:59 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -149,6 +149,7 @@ def UpdateContainerWindow ():
 	if Count<1:
 		Count=1
 	GemRB.SetVarAssoc (Window, ScrollBar, "RightTopIndex", Count)
+
 	RedrawContainerWindow ()
 
 
@@ -168,6 +169,7 @@ def RedrawContainerWindow ():
 		#this is an autoselected container, but we could use PC too
 		Slot = GemRB.GetContainerItem (0, i+LeftTopIndex)
 		Button = GemRB.GetControl (Window, i)
+
 		if Slot != None:
 			Item = GemRB.GetItem (Slot['ItemResRef'])
 			GemRB.SetVarAssoc (Window, Button, "LeftIndex", LeftTopIndex+i)
@@ -207,7 +209,7 @@ def OpenContainerWindow ():
 	if ContainerWindow:
 		return
 
-	GemRB.HideGUI ()
+	hideflag = GemRB.HideGUI ()
 
 	GemRB.LoadWindowPack (GetWindowPack())
 	ContainerWindow = Window = GemRB.LoadWindow (8)
@@ -216,7 +218,6 @@ def OpenContainerWindow ():
 	GemRB.SetVar ("ActionsWindow", Window)
 	GemRB.SetVar ("MessageWindow", -1)
 
-	pc = GemRB.GameGetFirstSelectedPC()
 	Container = GemRB.GetContainer(0)
 
 	# Gears (time) when options pane is down
@@ -273,7 +274,8 @@ def OpenContainerWindow ():
 	GemRB.SetVar ("LeftTopIndex", 0)
 	GemRB.SetVar ("RightTopIndex", 0)
 	UpdateContainerWindow ()
-	GemRB.UnhideGUI ()
+	if hideflag:
+		GemRB.UnhideGUI ()
 
 
 #doing this way it will inform the core system too, which in turn will call

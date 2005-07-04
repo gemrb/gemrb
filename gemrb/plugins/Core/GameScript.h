@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.203 2005/07/02 20:52:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.204 2005/07/04 18:41:01 avenger_teambg Exp $
  *
  */
 
@@ -1130,6 +1130,7 @@ public:
 	static void PlayDeadInterruptable(Scriptable* Sender, Action* parameters);
 	static void PlayerDialogue(Scriptable* Sender, Action* parameters);
 	static void PlaySequence(Scriptable* Sender, Action* parameters);
+	static void PlaySequenceTimed(Scriptable* Sender, Action* parameters);
 	static void PlaySound(Scriptable* Sender, Action* parameters);
 	static void PlaySoundNotRanged(Scriptable* Sender, Action* parameters);
 	static void PlaySoundPoint(Scriptable* Sender, Action* parameters);
@@ -1256,7 +1257,6 @@ public:
 	static void VerbalConstant(Scriptable* Sender, Action* parameters);
 	static void VerbalConstantHead(Scriptable* Sender, Action* parameters);
 	static void Wait(Scriptable* Sender, Action* parameters);
-	static void WaitAnimation(Scriptable* Sender, Action* parameters);
 	static void WaitRandom(Scriptable* Sender, Action* parameters);
 	static void Weather(Scriptable* Sender, Action* parameters);
 	static void XEquipItem(Scriptable *Sender, Action *parameters);
