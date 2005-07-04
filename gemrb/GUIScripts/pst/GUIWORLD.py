@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIWORLD.py,v 1.7 2005/07/04 21:55:33 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIWORLD.py,v 1.8 2005/07/04 22:21:06 edheldil Exp $
 
 
 # GUIWORLD.py - scripts to control some windows from GUIWORLD winpack
@@ -42,14 +42,14 @@ def CloseContinueWindow ():
 def OpenEndMessageWindow ():
 	Window = GemRB.GetVar ("MessageWindow")
         Button = GemRB.GetControl (Window, 0)
-        GemRB.SetText (Window, Button, 9371)
+        GemRB.SetText (Window, Button, 34602)
         GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
 
 
 def OpenContinueMessageWindow ():
 	Window = GemRB.GetVar ("MessageWindow")
         Button = GemRB.GetControl (Window, 0)
-        GemRB.SetText (Window, Button, 9372)
+        GemRB.SetText (Window, Button, 34603)
         GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
 
 
