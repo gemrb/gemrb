@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.60 2005/05/28 09:32:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.61 2005/07/05 22:14:21 avenger_teambg Exp $
  *
  */
 
@@ -381,7 +381,7 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 	//pst animations don't have separate animation for sleep/die
 	if (AnimType >= IE_ANI_PST_ANIMATION_1) {
 		if (StanceID==IE_ANI_DIE) {
-			StanceID=IE_ANI_SLEEP;
+			StanceID=IE_ANI_TWITCH;
 		}
 	}
 
@@ -424,8 +424,10 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 			printf ("Invalid Stance: %d\n", StanceID);
 			break;
 	}
-	if (Anims[StanceID][Orient]) {
-		return Anims[StanceID][Orient];
+	Animation *a = Anims[StanceID][Orient];
+
+	if (a) {
+		return a;
 	}
 	//newresref is based on the prefix (ResRef) and various other things
 	char NewResRef[12]; //this is longer than expected so it won't overflow
@@ -437,14 +439,13 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
  	AnimationFactory* af = ( AnimationFactory* )
 		core->GetResourceMgr()->GetFactoryResource( NewResRef, IE_BAM_CLASS_ID, IE_NORMAL );
 
-	Animation* a = af->GetCycle( Cycle );
+	a = af->GetCycle( Cycle );
 
 	if (!a) {
 		return NULL;
 	}
 	
-	a->pos = 0;
-	a->endReached = false;
+	a->SetPos( 0 );
 	SetupColors( a );
 
 	//setting up the sequencing of animation cycles

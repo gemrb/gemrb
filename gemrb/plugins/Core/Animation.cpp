@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.33 2005/06/12 10:23:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.34 2005/07/05 22:14:20 avenger_teambg Exp $
  *
  */
 
@@ -70,6 +70,8 @@ void Animation::SetPos(unsigned int index)
 	if (index<indicesCount) {
 		pos=index;
 	}
+	starttime = 0;
+	endReached = false;
 }
 
 /* when adding NULL, it means we already added a frame of index */
@@ -141,9 +143,16 @@ Sprite2D* Animation::NextFrame(void)
 	}	
 	if (pos >= indicesCount ) {
 		if (indicesCount) {
-			pos = pos%indicesCount;
+			if (Flags&A_ANI_PLAYONCE) {
+				pos = indicesCount-1;
+			} else {
+				pos = pos%indicesCount;
+			}
+		} else {
+			pos = 0;
 		}
 		endReached = true;
+		starttime = 0;
 	}
 	return ret;
 }
