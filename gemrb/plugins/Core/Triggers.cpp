@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.9 2005/06/30 21:16:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.10 2005/07/05 17:13:31 avenger_teambg Exp $
  *
  */
 
@@ -200,7 +200,8 @@ int GameScript::IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor *target = (Actor *) scr;
-	if (!core->GetGame()->InParty( target )) {
+	//inparty returns -1 if not in party
+	if (core->GetGame()->InParty( target )<0) {
 		return 0;
 	}
 	return ValidForDialogCore( Sender, target );

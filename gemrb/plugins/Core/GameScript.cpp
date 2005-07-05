@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.305 2005/07/04 18:41:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.306 2005/07/05 17:13:28 avenger_teambg Exp $
  *
  */
 
@@ -73,6 +73,7 @@ static TriggerLink triggernames[] = {
 	{"damagetakengt", GameScript::DamageTakenGT, 0},
 	{"damagetakenlt", GameScript::DamageTakenLT, 0},
 	{"dead", GameScript::Dead, 0},
+	{"detect", GameScript::See, 0}, //so far i see no difference
 	{"die", GameScript::Die, 0},
 	{"difficulty", GameScript::Difficulty, 0},
 	{"difficultygt", GameScript::DifficultyGT, 0},
