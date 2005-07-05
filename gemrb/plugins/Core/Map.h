@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.79 2005/06/19 22:59:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.80 2005/07/05 17:25:45 avenger_teambg Exp $
  *
  */
 
@@ -134,9 +134,10 @@ public:
 	int animcount;
 	ieDword appearance;
 	ieDword Flags;
-	ieResRef BAM; //only for saving back
+	ieResRef BAM; //not only for saving back (StaticSequence depends on this)
 	ieWord sequence;
 	ieWord frame;
+	ieWord transparency;
 	ieResRef Palette;
 	AreaAnimation();
 	~AreaAnimation();

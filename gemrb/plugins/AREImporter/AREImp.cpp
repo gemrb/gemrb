@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.121 2005/06/28 18:15:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.122 2005/07/05 17:25:43 avenger_teambg Exp $
  *
  */
 
@@ -742,8 +742,10 @@ Map* AREImp::GetMap(const char *ResRef)
 			str->ReadWord( &anim->sequence );
 			str->ReadWord( &anim->frame );
 			str->ReadDword( &anim->Flags );
+			ieWord unused2;
 			ieDword unused;
-			str->ReadDword( &unused );
+			str->ReadWord( &unused2 );
+			str->ReadWord( &anim->transparency );
 			str->ReadDword( &unused );
 			str->ReadResRef( anim->Palette );
 			str->ReadDword( &unused );
