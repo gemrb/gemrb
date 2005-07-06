@@ -70,7 +70,10 @@ void GlobalTimer::Update()
 		Game* game = core->GetGame();
 		if (game) {
 			Map* map = game->GetCurrentArea();
-			if (map) map->UpdateFog();
+			if (map) {
+				map->UpdateFog();
+				map->UpdateEffects();
+			}
 		}
 		if (CutScene) {
 			if (CutScene->endReached) {

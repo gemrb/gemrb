@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.174 2005/07/05 17:25:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.175 2005/07/06 23:37:34 edheldil Exp $
  *
  */
 
@@ -757,6 +757,18 @@ void Map::DrawMap(Region screen, GameControl* gc)
 void Map::AddAnimation(AreaAnimation* anim)
 {
 	animations.push_back( anim );
+}
+
+void Map::UpdateEffects()
+{
+	unsigned int i = actors.size();
+	while (i--) {
+		Actor* actor = actors[i];
+		if (! IsVisible( actor->Pos, true ) )
+			continue;
+
+		actor->fxqueue.ApplyAllEffects( actor );
+	}
 }
 
 void Map::Shout(Scriptable* actor, int shoutID, unsigned int radius)

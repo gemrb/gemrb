@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.324 2005/06/26 13:57:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.325 2005/07/06 23:37:35 edheldil Exp $
  *
  */
 
@@ -3277,6 +3277,7 @@ static PyObject* GemRB_GetSlotType(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "ID", PyInt_FromLong(core->QuerySlotID(idx)));
 	PyDict_SetItemString(dict, "Tip", PyInt_FromLong(core->QuerySlottip(idx)));
 	PyDict_SetItemString(dict, "ResRef", PyString_FromString (core->QuerySlotResRef(idx)));
+	PyDict_SetItemString(dict, "Effects", PyInt_FromLong (core->QuerySlotEffects(idx)));
 	return dict;
 }
 
@@ -4832,7 +4833,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_DragItem__doc,
-"DragItem(PartyID, Slot, ResRef, [Count=0])\n\n"
+"DragItem(PartyID, Slot, ResRef, [Count=0, Type])\n\n"
 "Start dragging specified item" );
 
 static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
@@ -4867,6 +4868,14 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		}
 		si = cc->RemoveItem(Slot, Count);
 	} else {
+		if (Slot >= 0 && core->QuerySlotEffects( Slot )) {
+			// Item is worn
+			if (! actor->inventory.UnEquipItem( Slot, false )) {
+				// Item is currently undroppable/cursed
+				Py_INCREF( Py_None );
+				return Py_None;
+			}
+		}
 		si = actor->inventory.RemoveItem( Slot, Count );
 	}
 	if (! si) {
@@ -4888,7 +4897,10 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_DropDraggedItem__doc,
 "DropDraggedItem(PartyID, Slot)=>int\n\n"
-"Stop dragging specified item. Returns 0 (unsuccessful), 1 (partial success) or 2 (complete success)." );
+"Put currently dragged item to specified PC and slot. "
+"If Slot==-1, puts it to a first empty slot. "
+"If Slot==-2, puts it to a ground pile. "
+"Returns 0 (unsuccessful), 1 (partial success) or 2 (complete success)." );
 
 static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 {
@@ -4921,6 +4933,9 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		res = cc->AddItem(core->GetDraggedItem());
 	} else {
 		res = actor->inventory.AddSlotItem( core->GetDraggedItem(), Slot );
+		if (Slot >= 0 && core->QuerySlotEffects( Slot )) {
+			actor->inventory.EquipItem( Slot );
+		}
 	}
 
 	if (res == 2) {

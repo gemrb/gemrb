@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.h,v 1.15 2005/06/24 23:20:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.h,v 1.16 2005/07/06 23:37:33 edheldil Exp $
  *
  */
 
@@ -77,6 +77,8 @@ private:
 	void GetActorIWD1(Actor *actor);
 	void GetActorIWD2(Actor *actor);
 	void ReadInventory(Actor*, unsigned int);
+	void ReadEffects(Actor* actor);
+	void GetEffect(Effect *fx);
 	void ReadScript(Actor *actor, int ScriptLevel);
 	CREKnownSpell* GetKnownSpell();
 	CRESpellMemorization* GetSpellMemorization();

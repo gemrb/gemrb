@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.24 2005/05/29 22:52:47 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.25 2005/07/06 23:37:31 edheldil Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -60,7 +60,7 @@ ItemHash = {}
 
 
 # Maps from ControlID to inventory Slot number
-ControlToSlotMap = [6, 7, 5, 3, 19, 0, 1, 4, 8, 2,   9, 10, 11, 12,   20, 21, 22, 23, 24,   13, 14, 15, 16, 17,   25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44]
+ControlToSlotMap = [6, 19, 5, 3, 7, 0, 1, 4, 8, 2,   9, 10, 11, 12,   20, 21, 22, 23, 24,   13, 14, 15, 16, 17,   25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44]
 
 def OpenInventoryWindow ():
 	global AvSlotsTable
@@ -202,9 +202,11 @@ def UpdateSlot (pc, ControlID):
 	slottype = slot_list[slot]
 	slotdict = GemRB.GetSlotType (slottype)
 
+	#print "SLOT", slot, "CTL:", ControlID, "TYPE:", slottype, "DICT:", slotdict, "ITEM", slot_item
+
 	# NOTE: there are invisible items (e.g. MORTEP) in inaccessible slots
 	#   used to assign powers and protections
-	if slot_item and slottype:
+	if slot_item and slottype >= 0:
 		item = GemRB.GetItem (slot_item['ItemResRef'])
 		identified = slot_item['Flags'] & IE_INV_ITEM_IDENTIFIED
 		ItemHash[ControlID] = [slot, slot_item, item]
@@ -229,7 +231,7 @@ def UpdateSlot (pc, ControlID):
 		GemRB.SetItemIcon (Window, Button, '')
 		GemRB.SetText (Window, Button, '')
 		
-		if slottype:
+		if slottype >= 0:
 			GemRB.SetButtonSprites (Window, Button, slotdict['ResRef'], 0,  0, 0, 0, 0)
 			GemRB.SetTooltip (Window, Button, slotdict['Tip'])
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
@@ -250,11 +252,11 @@ def OnDragItem ():
 
 	if not GemRB.IsDraggingItem ():
 		slot, slot_item, item = ItemHash[GemRB.GetVar ('ItemButton')]
-		GemRB.DragItem (pc, slot, item['ItemIcon'], 0, 0, 0)
+		GemRB.DragItem (pc, slot, item['ItemIcon'], 0, 0)
 	else:
 		slot = ControlToSlotMap[GemRB.GetVar ('ItemButton')]
 		GemRB.DropDraggedItem (pc, slot)
-		
+
 	UpdateInventoryWindow ()
 
 def OnDropItemToPC ():

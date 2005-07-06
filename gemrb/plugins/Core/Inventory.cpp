@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.55 2005/06/24 23:20:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.56 2005/07/06 23:37:34 edheldil Exp $
  *
  */
 
@@ -31,6 +31,7 @@ static int SLOT_MELEE = 12;
 
 Inventory::Inventory()
 {
+	Owner = NULL;
 	InventoryType = INVENTORY_HEAP;
 	Changed = false;
 	Weight = 0;
@@ -113,6 +114,36 @@ void Inventory::CalculateWeight()
 	}
 	Changed = false;
 }
+
+void Inventory::AddSlotEffects(CREItem* slot)
+{
+	Item* itm = core->GetItem( slot->ItemResRef );
+	for (int i = 0; i < itm->EquippingFeatureCount; i++) {
+		Owner->fxqueue.AddEffect( &itm->equipping_features[i] );
+	}
+}
+
+void Inventory::AddAllEffects()
+{
+	for (size_t i = 0; i < Slots.size(); i++) {
+		CREItem *slot = Slots[i];
+		if (slot && core->QuerySlotEffects( i )) {
+			AddSlotEffects( slot );
+		}
+	}
+}
+
+void Inventory::RemoveSlotEffects(CREItem* slot)
+{
+	Item* itm = core->GetItem( slot->ItemResRef );
+	for (int i = 0; i < itm->EquippingFeatureCount; i++) {
+		Effect* fx = &itm->equipping_features[i];
+		if (fx->TimingMode == FX_DURATION_INSTANT_WHILE_EQUIPPED) {
+			Owner->fxqueue.RemoveEffect( fx );
+		}
+	}
+}
+
 
 void Inventory::SetInventoryType(int arg)
 {
@@ -352,7 +383,7 @@ int Inventory::AddSlotItem(CREItem* item, int slot)
 	int res = 0;
 	for (size_t i = 0; i<Slots.size(); i++) {
 		//looking for default inventory slot (-1)
-		if (core->QuerySlotType(i)!=-1) {
+		if (core->QuerySlotType(i) != -1) {
 			continue;
 		}
 		int part_res = AddSlotItem (item, i);
@@ -479,6 +510,10 @@ bool Inventory::EquipItem(unsigned int slot)
 	if (item->Flags & IE_INV_ITEM_CURSED) {
 		item->Flags|=IE_INV_ITEM_UNDROPPABLE;
 	}
+	// add effects of an item just being equipped to actor's effect queue
+	if (core->QuerySlotEffects( slot )) {
+		AddSlotEffects( item );
+	}
 	return true;
 }
 
@@ -498,10 +533,13 @@ bool Inventory::UnEquipItem(unsigned int slot, bool removecurse)
 			return false;
 		}
 	}
-	if (item->Flags&IE_INV_ITEM_UNDROPPABLE) {
+	if (item->Flags & IE_INV_ITEM_UNDROPPABLE) {
 		return false;
 	}
-	item->Flags&=IE_INV_ITEM_EQUIPPED;
+	item->Flags &= ~IE_INV_ITEM_EQUIPPED;
+	if (core->QuerySlotEffects( slot )) {
+		RemoveSlotEffects( item );
+	}
 	return true;
 }
 

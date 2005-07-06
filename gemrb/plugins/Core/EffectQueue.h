@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.3 2005/01/09 15:08:17 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.4 2005/07/06 23:37:34 edheldil Exp $
  *
  */
 
@@ -36,17 +36,22 @@ bool Init_EffectQueue();
 
 class EffectQueue {
 	std::vector< Effect* >  effects;
-
+	Actor* Owner;
 public:
 	EffectQueue();
 	virtual ~EffectQueue();
 
+	void SetOwner(Actor* act) { Owner = act; }
+	Actor* GetOwner() { return Owner; }
+
 	// Returns true is successful. fx is just a reference, AddEffect()
 	// will malloc its own copy
 	bool AddEffect(Effect* fx);
+	bool RemoveEffect(Effect* fx);
 
 	void ApplyAllEffects(Actor* target);
 	void ApplyEffect(Actor* target, Effect* fx);
+	void dump();
 };
 
 typedef int (* EffectFunction)(Actor*, Effect*);

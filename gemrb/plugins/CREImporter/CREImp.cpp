@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.79 2005/06/24 23:19:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.80 2005/07/06 23:37:33 edheldil Exp $
  *
  */
 
@@ -300,7 +300,10 @@ Actor* CREImp::GetActor()
 	}
 
 	// Reading inventory, spellbook, etc
-	ReadInventory(act, Inventory_Size);
+	ReadInventory( act, Inventory_Size );
+	ReadEffects( act );
+	act->inventory.AddAllEffects();
+
 	// Setting up derived stats
 	act->SetAnimationID( ( ieWord ) act->BaseStats[IE_ANIMATION_ID] );
 	if (act->BaseStats[IE_STATE_ID] & STATE_DEAD) {
@@ -508,8 +511,8 @@ void CREImp::GetActorPST(Actor *act)
 	str->ReadDword( &ItemSlotsOffset );
 	str->ReadDword( &ItemsOffset );
 	str->ReadDword( &ItemsCount );
-
-	str->Seek( 8, GEM_CURRENT_POS );
+	str->ReadDword( &EffectsOffset );
+	str->ReadDword( &EffectsCount );
 
 	str->ReadResRef( act->Dialog );
 }
@@ -627,6 +630,47 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 
 	act->Init(); //applies effects, updates Modified
 }
+
+void CREImp::ReadEffects(Actor *act)
+{
+	unsigned int i;
+
+	str->Seek( EffectsOffset, GEM_STREAM_START );
+
+	for (i = 0; i < EffectsCount; i++) {
+		Effect fx;
+		GetEffect( &fx );
+		// NOTE: AddEffect() allocates a new effect
+		act->fxqueue.AddEffect( &fx ); // FIXME: don't reroll dice, time, etc!!
+	}
+}
+
+// FIXME: this fn is mostly a copy of ITMImp::GetFeature(). This would
+//   be best moved to its own plugin
+void CREImp::GetEffect(Effect *fx)
+{
+	//Effect* fx = new Effect();
+
+	str->ReadWord( &fx->Opcode );
+	str->Read( &fx->Target,1 );
+	str->Read( &fx->Power,1 );
+	str->ReadDword( &fx->Parameter1 );
+	str->ReadDword( &fx->Parameter2 );
+	str->Read( &fx->TimingMode,1 );
+	str->Read( &fx->Resistance,1 );
+	str->ReadDword( &fx->Duration );
+	str->Read( &fx->Probability1,1 );
+	str->Read( &fx->Probability2,1 );
+	str->ReadResRef( fx->Resource );
+	str->ReadDword( &fx->DiceThrown );
+	str->ReadDword( &fx->DiceSides );
+	str->ReadDword( &fx->SavingThrowType );
+	str->ReadDword( &fx->SavingThrowBonus );
+	str->ReadDword( &fx->unknown );
+
+	//return f;
+}
+
 
 void CREImp::GetActorBG(Actor *act)
 {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.35 2005/06/22 15:55:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.36 2005/07/06 23:37:34 edheldil Exp $
  *
  */
 
@@ -121,6 +121,7 @@ public:
 class GEM_EXPORT Inventory {
 private:
 	std::vector<CREItem*> Slots;
+	Actor* Owner;
 	int InventoryType;
 	int Changed;
 	int Weight;
@@ -146,6 +147,7 @@ public:
 
 	void CalculateWeight(void);
 	void SetInventoryType(int arg);
+	void SetOwner(Actor* act) { Owner = act; };
 
 	/** returns number of all slots in the inventory */
 	int GetSlotCount() { return (int)Slots.size(); };
@@ -183,6 +185,9 @@ public:
 	void DropItemAtLocation(const char *resref, unsigned int flags, Map *map, Point &loc);
 	void SetEquippedSlot(ieDword slotcode) { Equipped = slotcode; }
 	ieDword GetEquippedSlot() { return Equipped; }
+	void AddSlotEffects( CREItem* slot );
+	void AddAllEffects();
+	void RemoveSlotEffects( CREItem* slot );
 	// Returns item in specified slot. Does NOT change inventory
 	CREItem* GetSlotItem(unsigned int slot);
 	bool EquipItem(unsigned int slot);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.112 2005/06/25 20:05:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.113 2005/07/06 23:37:33 edheldil Exp $
  *
  */
 
@@ -157,6 +157,8 @@ Actor::Actor()
 
 	InternalFlags = 0;
 	inventory.SetInventoryType(INVENTORY_CREATURE);
+	fxqueue.SetOwner( this );
+	inventory.SetOwner( this );
 	if (classcount<0) {
 		InitActorTables();
 	}
@@ -549,6 +551,7 @@ void Actor::DebugDump()
 	printf( "\nDisguise: %d\n", tmp);
 	inventory.dump();
 	spellbook.dump();
+	fxqueue.dump();
 }
 
 void Actor::SetPosition(Map *map, Point &position, int jump, int radius)
