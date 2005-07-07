@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.204 2005/07/04 18:41:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.205 2005/07/07 16:09:44 avenger_teambg Exp $
  *
  */
 
@@ -803,6 +803,7 @@ public: //Script Functions
 	static int IsAClown(Scriptable* Sender, Trigger* parameters);
 	static int IsActive(Scriptable* Sender, Trigger* parameters);
 	static int IsCreatureAreaFlag( Scriptable* Sender, Trigger* parameters);
+	static int IsCreatureHiddenInShadows( Scriptable* Sender, Trigger* parameters);
 	static int IsGabber(Scriptable* Sender, Trigger* parameters);
 	static int IsExtendedNight(Scriptable* Sender, Trigger* parameters);
 	static int IsFacingObject(Scriptable* Sender, Trigger* parameters);

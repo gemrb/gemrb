@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.16 2005/07/04 18:41:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.17 2005/07/07 16:09:42 avenger_teambg Exp $
  *
  */
 
@@ -3034,9 +3034,17 @@ void GameScript::DropItem(Scriptable *Sender, Action* parameters)
 	}
 	Actor *scr = (Actor *) Sender;
 	Map *map = Sender->GetCurrentArea();
-	//dropping location isn't exactly our place, this is why i didn't use
-	scr->inventory.DropItemAtLocation(parameters->string0Parameter, 0, map,
-		parameters->pointParameter);
+
+	if (parameters->string0Parameter[0]) {
+		//dropping location isn't exactly our place, this is why i didn't use a simple DropItem
+		scr->inventory.DropItemAtLocation(parameters->string0Parameter,
+0, map, parameters->pointParameter);
+	} else {
+		//this should be converted from scripting slot to physical slot
+                scr->inventory.DropItemAtLocation(parameters->int0Parameter, 0,
+map, parameters->pointParameter);
+	}
+
 	Sender->CurrentAction = NULL;
 }
 

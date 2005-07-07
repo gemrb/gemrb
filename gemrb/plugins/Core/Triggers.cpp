@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.10 2005/07/05 17:13:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.11 2005/07/07 16:09:49 avenger_teambg Exp $
  *
  */
 
@@ -2725,6 +2725,20 @@ int GameScript::ModalState( Scriptable* Sender, Trigger* parameters)
 	Actor *actor = (Actor *) Sender;
 
 	if (actor->ModalState==(ieDword) parameters->int0Parameter) {
+		return 1;
+	}
+	return 0;
+}
+
+/* a special redundant trigger for iwd2 - could do something extra */
+int GameScript::IsCreatureHiddenInShadows( Scriptable* Sender, Trigger* /*parameters*/)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) Sender;
+
+	if (actor->ModalState==MS_STEALTH) {
 		return 1;
 	}
 	return 0;

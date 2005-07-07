@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.56 2005/07/06 23:37:34 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.57 2005/07/07 16:09:49 avenger_teambg Exp $
  *
  */
 
@@ -462,6 +462,25 @@ int Inventory::FindItem(const char *resref, unsigned int flags)
 		return i;
 	}
 	return -1;
+}
+
+void Inventory::DropItemAtLocation(unsigned int slot, unsigned int flags, Map *map, Point &loc)
+{
+	if (slot>Slots.size()) {
+		return;
+	}
+	CREItem *item = Slots[slot];
+	if (!item) {
+		return;
+	}
+	//if you want to drop undoppable items, simply set IE_INV_UNDROPPABLE
+	//by default, it won't drop them
+	if ( ((flags^IE_INV_ITEM_UNDROPPABLE)&item->Flags)!=flags) {
+		return;
+	}
+	map->AddItemToLocation(loc, item);
+	Changed = true;
+	Slots[slot]=NULL;
 }
 
 void Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *map, Point &loc)

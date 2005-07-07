@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.10 2005/06/30 21:16:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.11 2005/07/07 16:09:43 avenger_teambg Exp $
  *
  */
 
@@ -987,6 +987,11 @@ Action* GenerateActionCore(const char *src, const char *str, int acIndex, bool a
 					dst = newAction->string0Parameter;
 				} else {
 					dst = newAction->string1Parameter;
+				}
+				//if there are 3 strings, the first 2 will be merged,
+				//the last one will be left alone
+				if (*str==')') {
+					mergestrings = 0;
 				}
 				//skipping the context part, which
 				//is to be readed later
