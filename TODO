@@ -24,6 +24,7 @@ Effects:
 Area:
 1. Implement cover (wallgroups)
 2. Don't load scripts for pile items? (research when a script is unused)
+3. Create real streaming ambients (do not preload them, just use them when needed)
 
 Store:
 1. (DONE) Save stores, handle containers
@@ -31,6 +32,7 @@ Store:
 Animation:
 1. (PARTLY) fix char animation sequences
 2. (DONE) animationfactory->one single palette
+3. Use animation factory instead of local caching in CharAnimations (some way of rendering bitmaps with different palettes, but do it efficiently)
 
 Actor:
 1. Fix reputation
