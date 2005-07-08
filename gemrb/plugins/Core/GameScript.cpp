@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.306 2005/07/05 17:13:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.307 2005/07/08 14:13:02 avenger_teambg Exp $
  *
  */
 
@@ -106,12 +106,12 @@ static TriggerLink triggernames[] = {
 	{"globallt", GameScript::GlobalLT,TF_MERGESTRINGS},
 	{"globalltglobal", GameScript::GlobalLTGlobal,TF_MERGESTRINGS},
 	{"globalorglobal", GameScript::GlobalOrGlobal_Trigger,TF_MERGESTRINGS},
-	{"globalsequal", GameScript::GlobalsEqual,TF_MERGESTRINGS},
-	{"globalsgt", GameScript::GlobalsGT,TF_MERGESTRINGS},
-	{"globalslt", GameScript::GlobalsLT,TF_MERGESTRINGS},
-	{"globaltimerexact", GameScript::GlobalTimerExact,TF_MERGESTRINGS},
-	{"globaltimerexpired", GameScript::GlobalTimerExpired,TF_MERGESTRINGS},
-	{"globaltimernotexpired", GameScript::GlobalTimerNotExpired,TF_MERGESTRINGS},
+	{"globalsequal", GameScript::GlobalsEqual, 0},
+	{"globalsgt", GameScript::GlobalsGT, 0},
+	{"globalslt", GameScript::GlobalsLT, 0},
+	{"globaltimerexact", GameScript::GlobalTimerExact, 0},
+	{"globaltimerexpired", GameScript::GlobalTimerExpired, 0},
+	{"globaltimernotexpired", GameScript::GlobalTimerNotExpired, 0},
 	{"happiness", GameScript::Happiness, 0},
 	{"happinessgt", GameScript::HappinessGT, 0},
 	{"happinesslt", GameScript::HappinessLT, 0},
@@ -182,9 +182,9 @@ static TriggerLink triggernames[] = {
 	{"levelparty", GameScript::LevelParty, 0},
 	{"levelpartygt", GameScript::LevelPartyGT, 0},
 	{"levelpartylt", GameScript::LevelPartyLT, 0},
-	{"localsequal", GameScript::LocalsEqual,TF_MERGESTRINGS},
-	{"localsgt", GameScript::LocalsGT,TF_MERGESTRINGS},
-	{"localslt", GameScript::LocalsLT,TF_MERGESTRINGS},
+	{"localsequal", GameScript::LocalsEqual, 0},
+	{"localsgt", GameScript::LocalsGT, 0},
+	{"localslt", GameScript::LocalsLT, 0},
 	{"los", GameScript::LOS, 0},
 	{"modalstate", GameScript::ModalState, 0},
 	{"morale", GameScript::Morale, 0},
@@ -262,9 +262,9 @@ static TriggerLink triggernames[] = {
 	{"reaction", GameScript::Reaction, 0},
 	{"reactiongt", GameScript::ReactionGT, 0},
 	{"reactionlt", GameScript::ReactionLT, 0},
-	{"realglobaltimerexact", GameScript::RealGlobalTimerExact,TF_MERGESTRINGS},
-	{"realglobaltimerexpired", GameScript::RealGlobalTimerExpired,TF_MERGESTRINGS},
-	{"realglobaltimernotexpired", GameScript::RealGlobalTimerNotExpired,TF_MERGESTRINGS},
+	{"realglobaltimerexact", GameScript::RealGlobalTimerExact, 0},
+	{"realglobaltimerexpired", GameScript::RealGlobalTimerExpired, 0},
+	{"realglobaltimernotexpired", GameScript::RealGlobalTimerNotExpired,0},
 	{"reputation", GameScript::Reputation, 0},
 	{"reputationgt", GameScript::ReputationGT, 0},
 	{"reputationlt", GameScript::ReputationLT, 0},
@@ -299,7 +299,7 @@ static ActionLink actionnames[] = {
 	{"addareaflag", GameScript::AddAreaFlag, 0},
 	{"addareatype", GameScript::AddAreaType, 0},
 	{"addexperienceparty", GameScript::AddExperienceParty, 0},
-	{"addexperiencepartyglobal", GameScript::AddExperiencePartyGlobal,AF_MERGESTRINGS},
+	{"addexperiencepartyglobal", GameScript::AddExperiencePartyGlobal, 0},
 	{"addglobals", GameScript::AddGlobals, 0},
 	{"addhp", GameScript::AddHP, 0},
 	{"addjournalentry", GameScript::AddJournalEntry, 0},
@@ -429,7 +429,7 @@ static ActionLink actionnames[] = {
 	{"giveitemcreate", GameScript::CreateItem, 0}, //actually this is a targeted createitem
 	{"givepartyallequipment", GameScript::GivePartyAllEquipment, 0},
 	{"givepartygold", GameScript::GivePartyGold, 0},
-	{"givepartygoldglobal", GameScript::GivePartyGoldGlobal,AF_MERGESTRINGS},
+	{"givepartygoldglobal", GameScript::GivePartyGoldGlobal,0},//no mergestrings!
 	{"globaladdglobal", GameScript::GlobalAddGlobal,AF_MERGESTRINGS},
 	{"globalandglobal", GameScript::GlobalAndGlobal,AF_MERGESTRINGS},
 	{"globalband", GameScript::GlobalBAnd,AF_MERGESTRINGS},

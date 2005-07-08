@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.17 2005/07/07 16:09:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.18 2005/07/08 14:13:02 avenger_teambg Exp $
  *
  */
 
@@ -1848,7 +1848,7 @@ void GameScript::AddExperienceParty(Scriptable* /*Sender*/, Action* parameters)
 
 void GameScript::AddExperiencePartyGlobal(Scriptable* Sender, Action* parameters)
 {
-	ieDword xp = CheckVariable( Sender, parameters->string0Parameter );
+	ieDword xp = CheckVariable( Sender, parameters->string0Parameter, parameters->string1Parameter );
 	core->GetGame()->ShareXP(xp, true);
 }
 
@@ -2145,12 +2145,9 @@ void GameScript::GlobalSetGlobal(Scriptable* Sender, Action* parameters)
 /* adding the second variable to the first, they must be GLOBAL */
 void GameScript::AddGlobals(Scriptable* Sender, Action* parameters)
 {
-	ieDword value1 = CheckVariable( Sender, "GLOBAL",
-		parameters->string0Parameter );
-	ieDword value2 = CheckVariable( Sender, "GLOBAL",
-		parameters->string1Parameter );
-	SetVariable( Sender, "GLOBAL", parameters->string0Parameter,
-		value1 + value2 );
+	ieDword value1 = CheckVariable( Sender, parameters->string0Parameter, "GLOBAL");
+	ieDword value2 = CheckVariable( Sender, parameters->string1Parameter, "GLOBAL");
+	SetVariable( Sender, parameters->string0Parameter, "GLOBAL", value1 + value2 );
 }
 
 /* adding the second variable to the first, they could be area or locals */
@@ -2641,6 +2638,7 @@ void GameScript::DestroyItem(Scriptable* Sender, Action* parameters)
 	}
 }
 
+//negative destroygold creates gold
 void GameScript::DestroyGold(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type!=ST_ACTOR)
