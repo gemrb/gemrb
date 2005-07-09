@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.40 2005/05/17 10:20:24 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.41 2005/07/09 21:09:31 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -937,8 +937,28 @@ def OpenBiographyWindow ():
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 	
 
+def AcceptLevelUp():
+	OpenLevelUpWindow()
+	#do level up
+	pc = GemRB.GameGetSelectedPCSingle ()
+	GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH, DeaSavThr)
+	GemRB.SetPlayerStat (pc, IE_SAVEVSWANDS, WanSavThr)
+	GemRB.SetPlayerStat (pc, IE_SAVEVSPOLY, PolSavThr)
+	GemRB.SetPlayerStat (pc, IE_SAVEVSBREATH, BreSavThr)
+	GemRB.SetPlayerStat (pc, IE_SAVEVSSPELL, SpeSavThr)
+	oldhp = GemRB.GetPlayerStat (pc, IE_HITPOINTS)
+	GemRB.SetPlayerStat (pc, IE_HITPOINTS, HPBonus+oldhp)
+	oldhp = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)
+	GemRB.SetPlayerStat (pc, IE_MAXHITPOINTS, HPBonus+oldhp)
+	#this is not good in case of the nameless one, who is dual classed
+	GemRB.SetPlayerStat (pc, IE_LEVEL, GemRB.GetPlayerStat (pc, IE_LEVEL)+1)
+	UpdateRecordsWindow ()
+
+
 def OpenLevelUpWindow ():
 	global LevelUpWindow
+	global DeaSavThr, WanSavThr, PolSavThr, BreSavThr, SpeSavThr
+	global HPBonus
 
 	GemRB.HideGUI ()
 
@@ -956,7 +976,7 @@ def OpenLevelUpWindow ():
 	# Accept
 	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, Button, 4192)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenLevelUpWindow")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "AcceptLevelUp")
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ClassTable = GemRB.LoadTable ("classes")
@@ -974,6 +994,9 @@ def OpenLevelUpWindow ():
 	PolSavThr = GemRB.GetPlayerStat (pc, IE_SAVEVSPOLY)
 	BreSavThr = GemRB.GetPlayerStat (pc, IE_SAVEVSBREATH)
 	SpeSavThr = GemRB.GetPlayerStat (pc, IE_SAVEVSSPELL)
+
+	HPGained = 0
+	ConHPBon = 0
 
 	# name
 	Label = GemRB.GetControl (Window, 0x10000000)
@@ -1039,8 +1062,7 @@ def OpenLevelUpWindow ():
 			# The smaller the number, the better saving throw it is.
 			# We also need to check if any of the levels are larger than 21, since
 			# after that point the table runs out, and the throws remain the
-			# same (WARNING: This is an assumption. We need to check what happens after 21
-			# in the IE version!).
+			# same
 			if FighterLevel < 21:
 				# Death
 				if GemRB.GetTableValue (FigSavThrTable, 0, FighterLevel) < DeaSavThr:
@@ -1116,8 +1138,7 @@ def OpenLevelUpWindow ():
 			# new ones are better than current. The smaller the number, the better.
 			# We need to substract one from the NextLevel, so that we get right values.
 			# We also need to check if NextLevel is larger than 21, since after that point
-			# the table runs out, and the throws remain the same (WARNING: This is an
-			# assumption. We need to check what happens after 21 in the IE version!).
+			# the table runs out, and the throws remain the same 
 			if NextLevel < 22:
 				# Death
 				if GemRB.GetTableValue (SavThrTable, 0, NextLevel - 1) < DeaSavThr:
@@ -1141,6 +1162,12 @@ def OpenLevelUpWindow ():
 					SavThrUpdated = True
 			# Cleaning Up
 			GemRB.UnloadTable (SavThrTable)
+
+			# Hit Points Gained and Hit Points from Constitution Bonus
+			for i in range (NumOfLevUp):
+				HPGained = HPGained + GetSingleClassHP (Class, avatar_header['PrimLevel'])
+				ConHPBon = ConHPBon + GetConHPBonus (pc)
+
 	else:
 		# avatar is multi class
 		print "TODO: implement Multi-Class."
@@ -1162,9 +1189,59 @@ def OpenLevelUpWindow ():
 	Label = GemRB.GetControl (Window, 0x10000021)
 	GemRB.SetText (Window, Label, str (SpeSavThr))
 
+	HPBonus = ConHPBon + HPGained
+
+	# Displaying level up info
+	overview = ""
+	overview = overview + str (HPGained) + " " + GemRB.GetString (38713) + '\n'
+	overview = overview + str (ConHPBon) + " " + GemRB.GetString (38727) + '\n'
+
+	if SavThrUpdated:
+		overview = overview + GemRB.GetString (38719) + '\n'
+
+	Text = GemRB.GetControl (Window, 3)
+	GemRB.SetText (Window, Text, overview)
 
 	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
+
+def GetSingleClassHP (Class, Level):
+	ClassTable = GemRB.LoadTable ("classes")
+	HPTable = GemRB.LoadTable (GemRB.GetTableValue (ClassTable, Class, "HP"))
+
+	# We need to check if Level is larger than 20, since after that point
+	# the table runs out, and the formula remain the same.
+	if Level > 20:
+		Level = 20
+
+	# We need the Level as a string, so that we can use the collumn names
+	Level = str (Level)
+
+	Sides = GemRB.GetTableValue (HPTable, Level, "SIDES")
+	Rolls = GemRB.GetTableValue (HPTable, Level, "ROLLS")
+	Modif = GemRB.GetTableValue (HPTable, Level, "MODIFIER")
+
+	GemRB.UnloadTable (HPTable)
+
+	return GemRB.Roll (Rolls, Sides, Modif)
+
+def GetConHPBonus (pc):
+	ConHPBonTable = GemRB.LoadTable ("HPCONBON")
+	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
+
+	if Class == 2:
+		# Fighter
+		return GemRB.GetTableValue (ConHPBonTable, str (GemRB.GetPlayerStat (pc, IE_CON)), "WARRIOR")
+	elif (Class == 7) or (Class == 9):
+		# Fighter/Mage or Fighter/Thief
+		# Just like HP, multi-class'es CON bonus is divided by the number of classes. In
+		# case of Planescape, it is always two. Also since Annah and Dak'kon are Fighters,
+		# Warrior collumn is used.
+		return GemRB.GetTableValue (ConHPBonTable, str (GemRB.GetPlayerStat (pc, IE_CON)), "WARRIOR") / 2
+	else:
+		# Mage, Priest or Thief
+		return GemRB.GetTableValue (ConHPBonTable, str (GemRB.GetPlayerStat (pc, IE_CON)), "OTHER")
+
 
 ###################################################
 # End of file GUIREC.py
