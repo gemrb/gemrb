@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.11 2005/07/07 16:09:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.12 2005/07/09 14:58:33 avenger_teambg Exp $
  *
  */
 
@@ -2341,6 +2341,20 @@ int GameScript::IsFacingObject(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	if (actor->GetOrientation()==GetOrient( target->Pos, actor->Pos ) ) {
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::AttackedBy(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *scr = (Actor *) Sender;
+	Map *map = scr->GetCurrentArea();
+	Actor *Attacker = map->GetActorByTarget( scr, parameter->int0Parameter );
+	if (Attacker) {
 		return 1;
 	}
 	return 0;

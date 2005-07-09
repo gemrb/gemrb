@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.307 2005/07/08 14:13:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.308 2005/07/09 14:58:31 avenger_teambg Exp $
  *
  */
 
@@ -623,6 +623,9 @@ static ActionLink actionnames[] = {
 	{"smallwait", GameScript::SmallWait,AF_BLOCKING},
 	{"smallwaitrandom", GameScript::SmallWaitRandom,AF_BLOCKING},
 	{"soundactivate", GameScript::SoundActivate, 0},
+	{"spawnptactivate", GameScript::SpawnPtActivate, 0},
+	{"spawnptdeactivate", GameScript::SpawnPtDeactivate, 0},
+	{"spawnptspawn", GameScript::SpawnPtSpawn, 0},
 	{"startcutscene", GameScript::StartCutScene, 0},
 	{"startcutscenemode", GameScript::StartCutSceneMode, 0},
 	{"startdialog", GameScript::StartDialogue,AF_BLOCKING},

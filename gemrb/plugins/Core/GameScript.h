@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.205 2005/07/07 16:09:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.206 2005/07/09 14:58:32 avenger_teambg Exp $
  *
  */
 
@@ -1216,6 +1216,9 @@ public:
 	static void SmallWait(Scriptable* Sender, Action* parameters);
 	static void SmallWaitRandom(Scriptable* Sender, Action* parameters);
 	static void SoundActivate(Scriptable* Sender, Action* parameters);
+	static void SpawnPtActivate(Scriptable* Sender, Action* parameters);
+	static void SpawnPtDeactivate(Scriptable* Sender, Action* parameters);
+	static void SpawnPtSpawn(Scriptable* Sender, Action* parameters);
 	static void StartCutScene(Scriptable* Sender, Action* parameters);
 	static void StartCutSceneMode(Scriptable* Sender, Action* parameters);
 	static void StartDialogue(Scriptable* Sender, Action* parameters);

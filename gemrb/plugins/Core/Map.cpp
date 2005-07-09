@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.175 2005/07/06 23:37:34 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.176 2005/07/09 14:58:32 avenger_teambg Exp $
  *
  */
 
@@ -27,7 +27,6 @@
 #include "../../includes/strrefs.h"
 #include "AmbientMgr.h"
 
-//#include <stdlib.h>
 #ifndef WIN32
 #include <sys/time.h>
 #else
@@ -549,9 +548,9 @@ void Map::DrawMap(Region screen, GameControl* gc)
 	}
 	TMap->DrawOverlay( 0, screen );
 	//Blit the Background Map Animations (before actors)
-	Video* video = core->GetVideoDriver();  
+	Video* video = core->GetVideoDriver();
 	for (i = 0; i < animations.size(); i++) {
-		AreaAnimation *a  = animations[i];
+		AreaAnimation *a = animations[i];
 		int animcount=a->animcount;
 		
 		if (!(a->Flags&A_ANI_BACKGROUND)) continue; //these are drawn after actors
@@ -695,7 +694,7 @@ void Map::DrawMap(Region screen, GameControl* gc)
 
 	//draw normal animations after actors
 	for (i = 0; i < animations.size(); i++) {
-		AreaAnimation *a  = animations[i];
+		AreaAnimation *a = animations[i];
 		int animcount=a->animcount;
 		
 		if (a->Flags&A_ANI_BACKGROUND) continue; //these are drawn before actors
@@ -869,6 +868,21 @@ Actor* Map::GetActor(int index, bool any)
 	}
 	return NULL;
 }
+
+Actor* Map::GetActorByTarget(Actor *target, int AttackType)
+{
+	unsigned int i = actors.size();
+	while (i--) {
+		Actor* actor = actors[i];
+		if (actor->LastTarget == target) {
+			if (!AttackType || AttackType==actor->AStyle) {
+				return actor;
+			}
+		}
+	}
+	return NULL;
+}
+
 Actor* Map::GetActorByDialog(const char *resref)
 {
 	unsigned int i = actors.size();
@@ -1072,8 +1086,8 @@ Spawn *Map::AddSpawn(char* Name, int XPos, int YPos, ieResRef *creatures, unsign
 {
 	Spawn* sp = new Spawn();
 	strnuprcpy(sp->Name, Name, 32);
-	if (count>10) {
-		count=10;
+	if (count>MAX_RESCOUNT) {
+		count=MAX_RESCOUNT;
 	}
 	sp->Pos.x = XPos;
 	sp->Pos.y = YPos;
@@ -1082,6 +1096,7 @@ Spawn *Map::AddSpawn(char* Name, int XPos, int YPos, ieResRef *creatures, unsign
 	for( unsigned int i=0;i<count;i++) {
 		strnuprcpy(sp->Creatures[i],creatures[i],8);
 	}
+	spawns.push_back( sp );
 	return sp;
 }
 
@@ -1448,7 +1463,7 @@ PathNode* Map::GetLine(Point &start, Point &dest, int Steps, int Orientation, in
 				break;
 			case GL_PASS:
 				break;
-			default:  //premature end
+			default: //premature end
 				return Return;
 		}
 	}
@@ -1692,6 +1707,26 @@ void Map::SpawnCreature(Point &pos, char *CreName, int radius)
 	}
 }
 
+void Map::TriggerSpawn(Spawn *spawn)
+{
+	//is it still active
+	if (!spawn->Flags) {
+		return;
+	}
+	//check schedule
+	//check day or night chance
+	if (rand()%100>spawn->DayChance) {
+		return;
+	}
+	//check difficulty
+	//create spawns
+	for(unsigned int i = 0;i<spawn->Count;i++) {
+		SpawnCreature(spawn->Pos, spawn->Creatures[i], 0);
+	}
+	//disable spawnpoint
+	spawn->Flags = 0;
+}
+
 //--------restheader----------------
 bool Map::Rest(Point &pos, int hours)
 {
@@ -1804,6 +1839,10 @@ void Map::UpdateFog()
 		int vis2 = actor->GetStat( IE_VISUALRANGE );
 		if (state&STATE_BLIND) vis2=2; //can see only themselves
 		ExploreMapChunk (actor->Pos, vis2, true);
+		Spawn *sp = GetSpawnRadius(actor->Pos, SPAWN_RANGE); //30 * 12
+		if (sp) {
+			TriggerSpawn(sp);
+		}
 	}	
 }
 

@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.81 2005/07/06 23:37:34 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.82 2005/07/09 14:58:32 avenger_teambg Exp $
  *
  */
 
@@ -46,9 +46,12 @@ class Ambient;
 #define GEM_EXPORT
 #endif
 
+//distance of actors from spawn point
+#define SPAWN_RANGE       400
+
 //area types
-#define AT_EXTENDED_NIGHT  0x40
-#define AT_CAN_REST        0x80
+#define AT_EXTENDED_NIGHT 0x40
+#define AT_CAN_REST       0x80
 
 //area animation flags
 #define A_ANI_ACTIVE          1        //if not set, animation is invisible
@@ -117,10 +120,9 @@ public:
 	unsigned int Count;
 	ieDword appearance;
 	ieWord Difficulty;
-	ieWord Minimum;
-	ieWord Maximum;
 	ieWord DayChance;
 	ieWord NightChance;
+	ieWord Flags;
 	Spawn() { Creatures=NULL;  }
 	~Spawn() { if(Creatures) free(Creatures); } 
 	unsigned int GetCreatureCount() { return Count; }
@@ -204,6 +206,7 @@ public:
 	Actor* GetActor(Point &p, int flags);
 	Actor* GetActor(const char* Name);
 	Actor* GetActor(int i, bool any);
+	Actor* GetActorByTarget(Actor *target);
 	Actor* GetActorByDialog(const char* resref);
 	bool HasActor(Actor *actor);
 	void RemoveActor(Actor* actor);
@@ -290,6 +293,7 @@ public:
 	//conditions as well
 	Spawn *GetSpawnRadius(Point &point, unsigned int radius);
 	unsigned int GetSpawnCount() { return (unsigned int) spawns.size(); }
+	void TriggerSpawn(Spawn *spawn);
 private:
 	void GenerateQueues();
 	Actor* GetRoot(int priority, int &index);

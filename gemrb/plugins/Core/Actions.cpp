@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.18 2005/07/08 14:13:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.19 2005/07/09 14:58:31 avenger_teambg Exp $
  *
  */
 
@@ -3982,3 +3982,38 @@ void GameScript::SetEncounterProbability(Scriptable* /*Sender*/, Action* paramet
 	}
 	link->EncounterChance = parameters->int0Parameter;
 }
+
+void GameScript::SpawnPtActivate(Scriptable* Sender, Action* parameters)
+{
+	if (parameters->objects[1]) {
+		Map *map = Sender->GetCurrentArea();
+		Spawn *spawn = map->GetSpawn(parameters->objects[1]->objectName);
+		if (spawn) { 
+			spawn->Flags = 1;
+		}
+	}
+}
+
+void GameScript::SpawnPtDeactivate(Scriptable* Sender, Action* parameters)
+{
+	if (parameters->objects[1]) {
+		Map *map = Sender->GetCurrentArea();
+		Spawn *spawn = map->GetSpawn(parameters->objects[1]->objectName);
+		if (spawn) { 
+			spawn->Flags = 0;
+		}
+	}
+}
+
+void GameScript::SpawnPtSpawn(Scriptable* Sender, Action* parameters)
+{
+	if (parameters->objects[1]) {
+		Map *map = Sender->GetCurrentArea();
+		Spawn *spawn = map->GetSpawn(parameters->objects[1]->objectName);
+		if (spawn) { 
+			spawn->Flags = 1; //??? maybe use an unconditionality flag
+			map->TriggerSpawn(spawn);
+		}
+	}
+}
+

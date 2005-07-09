@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.122 2005/07/05 17:25:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.123 2005/07/09 14:58:35 avenger_teambg Exp $
  *
  */
 
@@ -292,7 +292,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->ReadWord( &LaunchY );
 		str->ReadResRef( KeyResRef );
 		str->ReadResRef( Script );
-		  //maybe we have to store this
+			//maybe we have to store this
 		str->Seek( 56, GEM_CURRENT_POS );
 		str->ReadResRef( DialogResRef );
 		char* string = core->GetString( StrRef );
@@ -606,12 +606,12 @@ Map* AREImp::GetMap(const char *ResRef)
 	printf( "Loading spawnpoints\n" );
 	//Loading SpawnPoints
 	for (i = 0; i < SpawnCount; i++) {
+		str->Seek( SpawnOffset + (i*0xc8), GEM_STREAM_START );
 		char Name[33];
 		ieWord XPos, YPos;
-		ieWord count, Difficulty;
+		ieWord Count, Difficulty, Flags;
 		ieResRef creatures[MAX_RESCOUNT];
 		ieWord DayChance, NightChance;
-		ieWord Minimum, Maximum;
 		ieDword Schedule;
 		
 		str->Read( Name, 32 );
@@ -621,23 +621,21 @@ Map* AREImp::GetMap(const char *ResRef)
 		for (unsigned int j = 0;j < MAX_RESCOUNT; j++) {
 			str->ReadResRef( creatures[j] );
 		}
-		str->ReadWord( &count);
+		str->ReadWord( &Count);
+		str->Seek( 14, GEM_CURRENT_POS); //skipping unknowns
 		str->ReadWord( &Difficulty);
-		str->Seek( 12, GEM_CURRENT_POS); //skipping unknowns
-		str->ReadWord( &Minimum);
-		str->ReadWord( &Maximum);
+		str->ReadWord( &Flags);
 		str->ReadDword( &Schedule);
 		str->ReadWord( &DayChance);
 		str->ReadWord( &NightChance);
 
-		Spawn *sp = map->AddSpawn(Name, XPos, YPos, creatures, count);
+		Spawn *sp = map->AddSpawn(Name, XPos, YPos, creatures, Count);
 		sp->appearance = Schedule;
 		sp->Difficulty = Difficulty;
-		sp->Minimum = Minimum;
-		sp->Maximum = Maximum;
+		sp->Flags = Flags;
 		sp->DayChance = DayChance;
 		sp->NightChance = NightChance;
-		str->Seek( 56, GEM_CURRENT_POS );
+		//the rest is not read, we seek for every record
 	}
 
 	printf( "Loading actors\n" );
@@ -1432,10 +1430,9 @@ int AREImp::PutSpawns( DataStream *stream, Map *map)
 			stream->Write( filling, 8);
 		}
 		stream->WriteWord( &tmpWord );
+		stream->Write( filling, 14); //these values may actually mean something, but we don't care now
 		stream->WriteWord( &sp->Difficulty);
-		stream->Write( filling, 12); //these values may actually mean something, but we don't care now
-		stream->WriteWord( &sp->Minimum);
-		stream->WriteWord( &sp->Maximum);
+		stream->WriteWord( &sp->Flags);
 		stream->WriteDword( &sp->appearance);
 		stream->WriteWord( &sp->DayChance);
 		stream->WriteWord( &sp->NightChance);
