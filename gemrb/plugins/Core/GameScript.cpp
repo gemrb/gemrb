@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.309 2005/07/10 12:01:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.310 2005/07/10 16:58:26 avenger_teambg Exp $
  *
  */
 
@@ -44,6 +44,7 @@ static TriggerLink triggernames[] = {
 	{"areatype", GameScript::AreaType, 0},
 	{"arearestdisabled", GameScript::AreaRestDisabled, 0},
 	{"atlocation", GameScript::AtLocation, 0},
+	{"attackedby", GameScript::AttackedBy, 0},
 	{"bitcheck", GameScript::BitCheck,TF_MERGESTRINGS},
 	{"bitcheckexact", GameScript::BitCheckExact,TF_MERGESTRINGS},
 	{"bitglobal", GameScript::BitGlobal_Trigger,TF_MERGESTRINGS},
@@ -1765,19 +1766,19 @@ Targets *GameScript::BestAC(Scriptable* /*Sender*/, Targets *parameters)
 	if (!t) {
 		return parameters;
 	}
-	int bestac=t->actor->GetStat(IE_ARMORCLASS);
-	targettype *select = t;
+	Actor *actor=t->actor;
+	int bestac=actor->GetStat(IE_ARMORCLASS);
 	// assignment in while
 	while ( (t = parameters->GetNextTarget(m) ) ) {
 		int ac=t->actor->GetStat(IE_ARMORCLASS);
 		if (bestac<ac) {
 			bestac=ac;
-			select=t;
+			actor=t->actor;
 		}
 	}
 
 	parameters->Clear();
-	parameters->AddTarget(select->actor, 0);
+	parameters->AddTarget(actor, 0);
 	return parameters;
 }
 
@@ -1791,19 +1792,19 @@ Targets *GameScript::StrongestOfMale(Scriptable* /*Sender*/, Targets *parameters
 	}
 	int pos=-1;
 	int worsthp=-1;
-	targettype *select = NULL;
+	Actor *actor = NULL;
 	//assignment intentional
 	while ( (t = parameters->GetNextTarget(m) ) ) {
 		if (t->actor->GetStat(IE_SEX)!=1) continue;
 		int hp=t->actor->GetStat(IE_HITPOINTS);
 		if ((pos==-1) || (worsthp<hp)) {
 			worsthp=hp;
-			select=t;
+			actor=t->actor;
 		}
 	}
 	parameters->Clear();
-	if (select) {
-		parameters->AddTarget(select->actor, 0);
+	if (actor) {
+		parameters->AddTarget(actor, 0);
 	}
 	return parameters;
 }
@@ -1815,18 +1816,18 @@ Targets *GameScript::StrongestOf(Scriptable* /*Sender*/, Targets *parameters)
 	if (!t) {
 		return parameters;
 	}
-	int besthp=t->actor->GetStat(IE_HITPOINTS);
-	targettype *select = t;
+	Actor *actor=t->actor;
+	int besthp=actor->GetStat(IE_HITPOINTS);
 	// assignment in while
 	while ( (t = parameters->GetNextTarget(m) ) ) {
 		int hp=t->actor->GetStat(IE_HITPOINTS);
 		if (besthp<hp) {
 			besthp=hp;
-			select=t;
+			actor=t->actor;
 		}
 	}
 	parameters->Clear();
-	parameters->AddTarget(select->actor, 0);
+	parameters->AddTarget(actor, 0);
 	return parameters;
 }
 
@@ -1837,18 +1838,18 @@ Targets *GameScript::WeakestOf(Scriptable* /*Sender*/, Targets *parameters)
 	if (!t) {
 		return parameters;
 	}
-	int worsthp=t->actor->GetStat(IE_HITPOINTS);
-	targettype *select = t;
+	Actor *actor=t->actor;
+	int worsthp=actor->GetStat(IE_HITPOINTS);
 	// assignment in while
 	while ( (t = parameters->GetNextTarget(m) ) ) {
 		int hp=t->actor->GetStat(IE_HITPOINTS);
 		if (worsthp>hp) {
 			worsthp=hp;
-			select=t;
+			actor=t->actor;
 		}
 	}
 	parameters->Clear();
-	parameters->AddTarget(select->actor, 0);
+	parameters->AddTarget(actor, 0);
 	return parameters;
 }
 
@@ -1859,18 +1860,18 @@ Targets *GameScript::WorstAC(Scriptable* /*Sender*/, Targets *parameters)
 	if (!t) {
 		return parameters;
 	}
-	int worstac=t->actor->GetStat(IE_ARMORCLASS);
-	targettype *select = t;
+	Actor *actor=t->actor;
+	int worstac=actor->GetStat(IE_ARMORCLASS);
 	// assignment in while
 	while ( (t = parameters->GetNextTarget(m) ) ) {
 		int ac=t->actor->GetStat(IE_ARMORCLASS);
 		if (worstac>ac) {
 			worstac=ac;
-			select=t;
+			actor=t->actor;
 		}
 	}
 	parameters->Clear();
-	parameters->AddTarget(select->actor, 0);
+	parameters->AddTarget(actor, 0);
 	return parameters;
 }
 
@@ -1881,18 +1882,18 @@ Targets *GameScript::MostDamagedOf(Scriptable* /*Sender*/, Targets *parameters)
 	if (!t) {
 		return parameters;
 	}
-	int worsthp=t->actor->GetStat(IE_MAXHITPOINTS)-t->actor->GetStat(IE_HITPOINTS);
-	targettype *select = t;
+	Actor *actor=t->actor;
+	int worsthp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetStat(IE_HITPOINTS);
 	// assignment in while
 	while ( (t = parameters->GetNextTarget(m) ) ) {
 		int hp=t->actor->GetStat(IE_MAXHITPOINTS)-t->actor->GetStat(IE_HITPOINTS);
 		if (worsthp>hp) {
 			worsthp=hp;
-			select=t;
+			actor=t->actor;
 		}
 	}
 	parameters->Clear();
-	parameters->AddTarget(select->actor, 0);
+	parameters->AddTarget(actor, 0);
 	return parameters;
 }
 Targets *GameScript::LeastDamagedOf(Scriptable* /*Sender*/, Targets *parameters)
@@ -1902,18 +1903,18 @@ Targets *GameScript::LeastDamagedOf(Scriptable* /*Sender*/, Targets *parameters)
 	if (!t) {
 		return parameters;
 	}
-	int besthp=t->actor->GetStat(IE_MAXHITPOINTS)-t->actor->GetStat(IE_HITPOINTS);
-	targettype *select = t;
+	Actor *actor=t->actor;
+	int besthp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetStat(IE_HITPOINTS);
 	// assignment in while
 	while ( (t = parameters->GetNextTarget(m) ) ) {
 		int hp=t->actor->GetStat(IE_MAXHITPOINTS)-t->actor->GetStat(IE_HITPOINTS);
 		if (besthp<hp) {
 			besthp=hp;
-			select=t;
+			actor=t->actor;
 		}
 	}
 	parameters->Clear();
-	parameters->AddTarget(select->actor, 0);
+	parameters->AddTarget(actor, 0);
 	return parameters;
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.242 2005/07/10 12:01:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.243 2005/07/10 16:58:25 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -596,6 +596,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					char Tmp[40];
 					strncpy(Tmp,"Kill(Myself)",sizeof(Tmp) );
 					lastActor->AddAction( GenerateAction(Tmp) );
+					lastActor=NULL;
 				}
 				break;
 			case 'z': 
