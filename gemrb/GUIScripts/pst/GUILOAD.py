@@ -9,14 +9,14 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUILOAD.py,v 1.8 2005/02/28 22:49:47 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUILOAD.py,v 1.9 2005/07/10 17:03:32 avenger_teambg Exp $
 
 # GUILOAD.py - Load game window from GUILOAD winpack
 
@@ -66,7 +66,7 @@ def OnLoad():
 
 	ScrollBar=GemRB.GetControl(LoadWindow, 13)
 	GemRB.SetEvent(LoadWindow, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "ScrollBarPress")
-	GameCount=GemRB.GetSaveGameCount()   #count of games in save folder?
+	GameCount=GemRB.GetSaveGameCount() #count of games in save folder?
 	if GameCount>3:
 		TopIndex = GameCount-4
 	else:
@@ -134,7 +134,7 @@ def DeleteGameConfirm():
 	GemRB.DeleteSaveGame(Pos)
 	if TopIndex>0:
 		GemRB.SetVar("TopIndex",TopIndex-1)
-	GameCount=GemRB.GetSaveGameCount()   #count of games in save folder?
+	GameCount=GemRB.GetSaveGameCount()
 	GemRB.SetVarAssoc(LoadWindow, ScrollBar, "TopIndex", GameCount)
 	ScrollBarPress()
 	GemRB.UnloadWindow(ConfirmWindow)
@@ -152,9 +152,9 @@ def DeleteGamePress():
 	GemRB.SetVisible(LoadWindow, 0)
 	ConfirmWindow=GemRB.LoadWindow(1)
 	Text=GemRB.GetControl(ConfirmWindow, 0)
-	GemRB.SetText(ConfirmWindow, Text, 15305)
+	GemRB.SetText(ConfirmWindow, Text, 28639)
 	DeleteButton=GemRB.GetControl(ConfirmWindow, 1)
-	GemRB.SetText(ConfirmWindow, DeleteButton, 13957)
+	GemRB.SetText(ConfirmWindow, DeleteButton, 28640)
 	GemRB.SetEvent(ConfirmWindow, DeleteButton, IE_GUI_BUTTON_ON_PRESS, "DeleteGameConfirm")
 	CancelButton=GemRB.GetControl(ConfirmWindow, 2)
 	GemRB.SetText(ConfirmWindow, CancelButton, 4196)
