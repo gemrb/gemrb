@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.12 2005/07/09 14:58:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.13 2005/07/10 12:01:49 avenger_teambg Exp $
  *
  */
 
@@ -202,6 +202,13 @@ int GameScript::IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters)
 	Actor *target = (Actor *) scr;
 	//inparty returns -1 if not in party
 	if (core->GetGame()->InParty( target )<0) {
+		return 0;
+	}
+	//don't accept parties currently in dialog!
+	//this might disturb some modders, but this is the correct behaviour
+	//for example the aaquatah dialog in irenicus dungeon depends on it
+	GameControl *gc = core->GetGameControl();
+	if (scr == gc->target || scr==gc->speaker) {
 		return 0;
 	}
 	return ValidForDialogCore( Sender, target );
@@ -2220,7 +2227,7 @@ int GameScript::HotKey(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor *scr = (Actor *) Sender;
-        // FIXME: this is never going to work on 64 bit archs ...
+				// FIXME: this is never going to work on 64 bit archs ...
 	int ret = (unsigned long) scr->HotKey == (unsigned long) parameters->int0Parameter;
 	//probably we need to implement a trigger mechanism, clear
 	//the hotkey only when the triggerblock was evaluated as true
@@ -2352,12 +2359,25 @@ int GameScript::AttackedBy(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor *scr = (Actor *) Sender;
-	Map *map = scr->GetCurrentArea();
-	Actor *Attacker = map->GetActorByTarget( scr, parameter->int0Parameter );
-	if (Attacker) {
-		return 1;
+	Targets *tgts = GetAllObjects(Sender, parameters->objectParameter);
+	int ret = 0;
+	int AStyle = parameters->int0Parameter;
+	//iterate through targets to get the actor
+	if (tgts) {
+		targetlist::iterator m;
+		targettype *tt = tgts->GetFirstTarget(m);
+		while (tt) {
+			if (tt->actor->LastTarget == scr) {
+				if (!AStyle || (AStyle==tt->actor->GetAttackStyle()) ) {
+					ret = 1;
+					break;
+				}
+			}
+			tt = tgts->GetNextTarget(m);
+		}
 	}
-	return 0;
+	delete tgts;
+	return ret;
 }
 
 int GameScript::TookDamage(Scriptable* Sender, Trigger* /*parameters*/)

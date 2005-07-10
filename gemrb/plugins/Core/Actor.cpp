@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.113 2005/07/06 23:37:33 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.114 2005/07/10 12:01:48 avenger_teambg Exp $
  *
  */
 
@@ -525,7 +525,7 @@ void Actor::DebugDump()
 		}
 		printf( "Script %d: %s\n", i, poi );
 	}
-	printf( "Area:	%.8s\n", Area );
+	printf( "Area:       %.8s\n", Area );
 	printf( "Dialog:     %.8s\n", Dialog );
 	printf( "Script name:%.32s\n", scriptName );
 	printf( "TalkCount:  %d\n", TalkCount );
@@ -855,3 +855,21 @@ void Actor::SetModal(ieDword newstate)
 	ModalState = newstate;
 }
 
+//this is just a stub function for now, attackstyle could be melee/ranged
+//even spells got this attack style
+int Actor::GetAttackStyle()
+{
+	return 1;
+}
+
+void Actor::SetTarget( Scriptable *target)
+{
+	if (target->Type==ST_ACTOR) {
+		LastTarget = (Actor *) target;
+	}
+	//calculate attack style
+	//set stance correctly based on attack style
+	SetOrientation( GetOrient( target->Pos, Pos ),0 );
+	SetStance( IE_ANI_ATTACK);
+	SetWait( 1 );
+}

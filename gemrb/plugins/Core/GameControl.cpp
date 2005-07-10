@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.241 2005/07/04 18:41:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.242 2005/07/10 12:01:48 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -767,7 +767,7 @@ void GameControl::TryToAttack(Actor *source, Actor *tgt)
 	//this won't work atm, target must be honoured by Attack
 	source->ClearPath();
 	source->ClearActions();
-	strncpy(Tmp,"Attack()",sizeof(Tmp) );
+	strncpy(Tmp,"NIDSpecial3()",sizeof(Tmp) );
 	target=tgt; //this is a hack, a deadly one
 	source->AddAction( GenerateAction( Tmp, true ) );
 }
@@ -1519,7 +1519,7 @@ void GameControl::DialogChoose(unsigned int choose)
 				continue;
 			}
 		}
-		core->GetDictionary()->SetAt("ChooseOption",x);
+		core->GetDictionary()->SetAt("DialogOption",x);
 		DialogueFlags |= DF_OPENCONTINUEWINDOW;
 		goto end_of_choose;
 	}
@@ -1533,7 +1533,7 @@ void GameControl::DialogChoose(unsigned int choose)
 		if (ds->transitions[x]->textStrRef == 0xffffffff) {
 			//dialogchoose should be set to x
 			//it isn't important which END option was chosen, as it ends
-			core->GetDictionary()->SetAt("ChooseOption",x);
+			core->GetDictionary()->SetAt("DialogOption",x);
 			DialogueFlags |= DF_OPENENDWINDOW;
 		} else {
 			char *string = ( char * ) malloc( 40 );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.176 2005/07/09 14:58:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.177 2005/07/10 12:01:49 avenger_teambg Exp $
  *
  */
 
@@ -863,20 +863,6 @@ Actor* Map::GetActor(int index, bool any)
 		if (MustSave(ac) ) {
 			if (!index--) {
 				return ac;
-			}
-		}
-	}
-	return NULL;
-}
-
-Actor* Map::GetActorByTarget(Actor *target, int AttackType)
-{
-	unsigned int i = actors.size();
-	while (i--) {
-		Actor* actor = actors[i];
-		if (actor->LastTarget == target) {
-			if (!AttackType || AttackType==actor->AStyle) {
-				return actor;
 			}
 		}
 	}

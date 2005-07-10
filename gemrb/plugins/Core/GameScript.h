@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.206 2005/07/09 14:58:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.207 2005/07/10 12:01:49 avenger_teambg Exp $
  *
  */
 
@@ -87,6 +87,7 @@ public:
 	Targets()
 	{
 	};
+
 	~Targets()
 	{
 		Clear();
@@ -701,6 +702,7 @@ public: //Script Functions
 	static int AreaRestDisabled(Scriptable* Sender, Trigger* parameter);
 	static int AreaType(Scriptable* Sender, Trigger* parameter);
 	static int AtLocation(Scriptable* Sender, Trigger* parameter);
+	static int AttackedBy(Scriptable* Sender, Trigger* parameters);
 	static int BitCheck(Scriptable* Sender, Trigger* parameters);
 	static int BitCheckExact(Scriptable* Sender, Trigger* parameters);
 	static int BitGlobal_Trigger(Scriptable* Sender, Trigger* parameters);

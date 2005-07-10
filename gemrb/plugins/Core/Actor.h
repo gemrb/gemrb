@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.75 2005/06/26 13:57:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.76 2005/07/10 12:01:48 avenger_teambg Exp $
  *
  */
 
@@ -285,8 +285,7 @@ public:
 	void GetNextAnimation();
 	/* debug function */
 	void GetNextStance();
-	/* returns the count of memorizable spells of type at the given level */
-	//int GetMemorizableSpellsCount(ieSpellType Type, int Level);
+	/* learns the given spell, possibly receive XP */
 	int LearnSpell(ieResRef resref, ieDword flags);
 	/* Returns weapon range */
 	int GetWeaponRange();
@@ -295,5 +294,9 @@ public:
 	int GetHPMod();
 	/* Sets the modal state after checks */
 	void SetModal(ieDword newstate);
+	/* returns current attack style */
+	int GetAttackStyle();
+	/* sets target for immediate attack */
+	void SetTarget( Scriptable *actor);
 };
 #endif

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.82 2005/07/09 14:58:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.83 2005/07/10 12:01:49 avenger_teambg Exp $
  *
  */
 
@@ -206,7 +206,6 @@ public:
 	Actor* GetActor(Point &p, int flags);
 	Actor* GetActor(const char* Name);
 	Actor* GetActor(int i, bool any);
-	Actor* GetActorByTarget(Actor *target);
 	Actor* GetActorByDialog(const char* resref);
 	bool HasActor(Actor *actor);
 	void RemoveActor(Actor* actor);

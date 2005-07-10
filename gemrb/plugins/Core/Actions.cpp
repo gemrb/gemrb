@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.19 2005/07/09 14:58:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.20 2005/07/10 12:01:48 avenger_teambg Exp $
  *
  */
 
@@ -1700,8 +1700,8 @@ void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 		actor->SetStance (IE_ANI_CAST);
 	}
 	Point s,d;
-	GetPositionFromScriptable( Sender, s, true );
-	GetPositionFromScriptable( tar, d, true );
+	GetPositionFromScriptable( Sender, s, false );
+	GetPositionFromScriptable( tar, d, false );
 	printf( "ForceSpell from [%d,%d] to [%d,%d]\n", s.x, s.y, d.x, d.y );
 }
 
@@ -3039,7 +3039,7 @@ void GameScript::DropItem(Scriptable *Sender, Action* parameters)
 0, map, parameters->pointParameter);
 	} else {
 		//this should be converted from scripting slot to physical slot
-                scr->inventory.DropItemAtLocation(parameters->int0Parameter, 0,
+		            scr->inventory.DropItemAtLocation(parameters->int0Parameter, 0,
 map, parameters->pointParameter);
 	}
 
@@ -3096,7 +3096,7 @@ void GameScript::Plunder(Scriptable *Sender, Action* parameters)
 		return;
 	}
 	if (Distance(Sender, tar)>MAX_OPERATING_DISTANCE*20 ) {
-		GoNearAndRetry(Sender, tar);
+		GoNearAndRetry(Sender, tar, false);
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -3135,7 +3135,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	Actor *scr = (Actor *) tar;
 	//for PP one must go REALLY close
 	if (Distance(Sender, tar)>10 ) {
-		GoNearAndRetry(Sender, tar);
+		GoNearAndRetry(Sender, tar, true);
 		Sender->CurrentAction = NULL;
 		return;
 	}
@@ -3419,7 +3419,14 @@ void GameScript::Attack( Scriptable* Sender, Action* parameters)
 		Sender->CurrentAction = NULL;
 		return;
 	}
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	//using auto target!
+	Scriptable* tar;
+	if (!parameters->objects[1]) {
+		GameControl *gc = core->GetGameControl();
+		tar = gc->target;
+	} else {
+		tar = GetActorFromObject( Sender, parameters->objects[1] );
+	}
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
 		Sender->CurrentAction = NULL;
 		return;
@@ -3646,7 +3653,7 @@ void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 		Sender->CurrentAction = NULL;
 		return;
 	}
-	GoNearAndRetry(Sender, gc->target);
+	GoNearAndRetry(Sender, gc->target, false);
 	Sender->CurrentAction = NULL;
 }
 

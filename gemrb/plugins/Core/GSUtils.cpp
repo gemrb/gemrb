@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.11 2005/07/07 16:09:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.12 2005/07/10 12:01:48 avenger_teambg Exp $
  *
  */
 
@@ -255,7 +255,7 @@ static Targets* EvaluateObject(Scriptable* Sender, Object* oC)
 			return tgts;
 		}
 		//Ok :) we now have our Object. Let's create a Target struct and add the object to it
-		tgts = new Targets();
+		tgts = new Targets( );
 		tgts->AddTarget( aC, 0 );
 		//return here because object name/IDS targeting are mutually exclusive
 		return tgts;
@@ -304,29 +304,15 @@ static Targets* EvaluateObject(Scriptable* Sender, Object* oC)
 	return tgts;
 }
 
-Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC)
+Targets* GetAllObjects(Scriptable* Sender, Object* oC)
 {
 	if (!oC) {
 		return NULL;
 	}
 	Targets* tgts = EvaluateObject(Sender, oC);
+	//if we couldn't find an endpoint by name or object qualifiers
+	//it is not an Actor, but could still be a Door or Container (scriptable)
 	if (!tgts && oC->objectName[0]) {
-		//It was not an actor... maybe it is a door?
-		Scriptable * aC = Sender->GetCurrentArea()->TMap->GetDoor( oC->objectName );
-		if (aC) {
-			return aC;
-		}
-		//No... it was not a door... maybe an InfoPoint?
-		aC = Sender->GetCurrentArea()->TMap->GetInfoPoint( oC->objectName );
-		if (aC) {
-			return aC;
-		}
-
-		//No... it was not an infopoint... maybe a Container?
-		aC = Sender->GetCurrentArea()->TMap->GetContainer( oC->objectName );
-		if (aC) {
-			return aC;
-		}
 		return NULL;
 	}
 	//now lets do the object filter stuff, we create Targets because
@@ -352,11 +338,38 @@ Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC)
 			return NULL;
 		}
 	}
+	return tgts;
+}
+
+Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC)
+{
+	if (!oC) {
+		return NULL;
+	}
+	Targets *tgts = GetAllObjects(Sender, oC);
 	if (tgts) {
 		Scriptable *object;
 		object= (Scriptable *) tgts->GetTarget(0);
 		delete tgts;
 		return object;
+	}
+	if (oC->objectName[0]) {
+		//It was not an actor... maybe it is a door?
+		Scriptable * aC = Sender->GetCurrentArea()->TMap->GetDoor( oC->objectName );
+		if (aC) {
+			return aC;
+		}
+		//No... it was not a door... maybe an InfoPoint?
+		aC = Sender->GetCurrentArea()->TMap->GetInfoPoint( oC->objectName );
+		if (aC) {
+			return aC;
+		}
+
+		//No... it was not an infopoint... maybe a Container?
+		aC = Sender->GetCurrentArea()->TMap->GetContainer( oC->objectName );
+		if (aC) {
+			return aC;
+		}
 	}
 	return NULL;
 }
@@ -469,15 +482,18 @@ void EscapeAreaCore(Actor* src, const char* resref, Point &enter, Point &exit, i
 	src->AddActionInFront( GenerateAction( Tmp, true ) );
 }
 
-void GetPositionFromScriptable(Scriptable* scr, Point &position, bool trap)
+void GetPositionFromScriptable(Scriptable* scr, Point &position, bool dest)
 {
-	if (!trap) {
+	if (!dest) {
 		position = scr->Pos;
 		return;
 	}
 	switch (scr->Type) {
-		case ST_AREA: case ST_GLOBAL: case ST_ACTOR:
-			position = scr->Pos;
+		case ST_AREA: case ST_GLOBAL:
+			position = scr->Pos; //fake
+			break;
+		case ST_ACTOR:
+			position = ((Actor *)scr)->Destination;
 			break;
 		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
 		case ST_DOOR: case ST_CONTAINER:
@@ -545,7 +561,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	if ((Flags&BD_CHECKDIST) && (Sender->Type==ST_ACTOR) ) {
 		Actor *actor = (Actor *) Sender;
 		if (Distance(Sender, tar)>actor->GetStat(IE_DIALOGRANGE)*20 ) {
-			GoNearAndRetry(Sender, tar);
+			GoNearAndRetry(Sender, tar, true); //this is unsure, the target's path will be cleared
 			Sender->CurrentAction = NULL;
 			return;
 		}
@@ -705,13 +721,15 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 	unsigned int wrange = actor->GetWeaponRange() * 10;
 	if ( wrange == 0) {
 		printMessage("[GameScript]","Zero weapon range!\n",LIGHT_RED);
+		/*
 		if (flags&AC_REEVALUATE) {
 			delete parameters;
 		}
 		return;
+		*/
 	}
 	if ( Distance(Sender, target) > wrange ) {
-		GoNearAndRetry(Sender, target);
+		GoNearAndRetry(Sender, target, true);
 		if (flags&AC_REEVALUATE) {
 			delete parameters;
 		}
@@ -720,8 +738,9 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 	//TODO:
 	//send Attack trigger to attacked
 	//calculate attack/damage
-	actor->SetStance( IE_ANI_ATTACK );
-	actor->SetWait( 1 );
+	actor->SetTarget( target );
+	//actor->SetStance( IE_ANI_ATTACK );
+	//actor->SetWait( 1 );
 	//attackreevaluate
 	if ( (flags&AC_REEVALUATE) && parameters->int0Parameter) {
 		parameters->int0Parameter--;
@@ -764,6 +783,7 @@ bool GameScript::MatchActor(Scriptable *Sender, Actor* actor, Object* oC)
 		while (tt) {
 			if (tt->actor == actor) {
 				ret = true;
+				break;
 			}
 			tt = tgts->GetNextTarget(m);
 		}
@@ -1051,12 +1071,11 @@ Action* GenerateActionCore(const char *src, const char *str, int acIndex, bool a
 	return newAction;
 }
 
-void GoNearAndRetry(Scriptable *Sender, Scriptable *target)
+void GoNearAndRetry(Scriptable *Sender, Scriptable *target, bool flag)
 {
-	Sender->AddActionInFront( Sender->CurrentAction );
-	char Tmp[256];
-	sprintf( Tmp, "MoveToPoint([%hd.%hd])", target->Pos.x, target->Pos.y );
-	Sender->AddActionInFront( GenerateAction( Tmp, true ) );
+	Point p;
+	GetPositionFromScriptable(target,p,flag);
+	GoNearAndRetry(Sender, p);
 }
 
 void GoNearAndRetry(Scriptable *Sender, Point &p)

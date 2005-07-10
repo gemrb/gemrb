@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.308 2005/07/09 14:58:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.309 2005/07/10 12:01:48 avenger_teambg Exp $
  *
  */
 
@@ -511,6 +511,7 @@ static ActionLink actionnames[] = {
 	{"moveviewpoint", GameScript::MoveViewPoint, 0},
 	{"nidspecial1", GameScript::NIDSpecial1,AF_BLOCKING},//we use this for dialogs, hack
 	{"nidspecial2", GameScript::NIDSpecial2,AF_BLOCKING},//we use this for worldmap, another hack
+  {"nidspecial3", GameScript::Attack,AF_BLOCKING},     //this hack is for attacking preset target
 	{"noaction", GameScript::NoAction, 0},
 	{"opendoor", GameScript::OpenDoor,AF_BLOCKING},
 	{"panic", GameScript::Panic, 0},
