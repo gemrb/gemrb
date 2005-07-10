@@ -92,6 +92,7 @@ libgemrb_core_la_SOURCES = \
 	Effect.cpp \
 	EffectQueue.cpp \
 	Cache.cpp \
-	ControlAnimation.cpp
+	ControlAnimation.cpp \
+	EffectMgr.cpp
 
 noinst_HEADERS = *.h

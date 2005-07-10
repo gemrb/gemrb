@@ -15,13 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.15 2005/02/19 19:09:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.16 2005/07/10 17:07:15 edheldil Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "../Core/Interface.h"
 #include "../Core/AnimationMgr.h"
+#include "../Core/EffectMgr.h"
 #include "ITMImp.h"
 
 ITMImp::ITMImp(void)
@@ -214,22 +215,10 @@ void ITMImp::GetExtHeader(Item *s, ITMExtHeader* eh)
 	}
 }
 
-void ITMImp::GetFeature(Effect *f)
+void ITMImp::GetFeature(Effect *fx)
 {
-	str->ReadWord( &f->Opcode );
-	str->Read( &f->Target,1 );
-	str->Read( &f->Power,1 );
-	str->ReadDword( &f->Parameter1 );
-	str->ReadDword( &f->Parameter2 );
-	str->Read( &f->TimingMode,1 );
-	str->Read( &f->Resistance,1 );
-	str->ReadDword( &f->Duration );
-	str->Read( &f->Probability1,1 );
-	str->Read( &f->Probability2,1 );
-	str->ReadResRef( f->Resource );
-	str->ReadDword( &f->DiceThrown );
-	str->ReadDword( &f->DiceSides );
-	str->ReadDword( &f->SavingThrowType );
-	str->ReadDword( &f->SavingThrowBonus );
-	str->ReadDword( &f->unknown );
+	EffectMgr* eM = ( EffectMgr* ) core->GetInterface( IE_EFF_CLASS_ID );
+	eM->Open( str, false );
+	eM->GetEffect( fx );
+	core->FreeInterface( eM );
 }

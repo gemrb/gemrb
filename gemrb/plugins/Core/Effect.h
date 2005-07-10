@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.h,v 1.2 2005/05/17 13:52:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.h,v 1.3 2005/07/10 17:07:29 edheldil Exp $
  *
  */
 
@@ -57,16 +57,16 @@ class Actor;
 
 // the same as ITMFeature and SPLFeature
 typedef struct Effect {
-	ieWord Opcode;
-	ieByte Target;
-	ieByte Power;
+	ieDword Opcode;
+	ieDword Target;
+	ieDword Power;
 	ieDword Parameter1;
 	ieDword Parameter2;
 	ieByte TimingMode;
 	ieByte Resistance;
 	ieDword Duration;
-	ieByte Probability1;
-	ieByte Probability2;
+	ieWord Probability1;
+	ieWord Probability2;
 	//keep these four in one bunch, VariableName will
 	//spread across them
 	ieResRef Resource;
@@ -78,6 +78,15 @@ typedef struct Effect {
 	ieDword SavingThrowType;
 	ieDword SavingThrowBonus;
 	ieDword unknown;
+
+	// EFF V2.0 fields:
+	ieDword PrimaryType;
+	ieDword ResistanceType;
+	ieByte Parameter3;
+	ieResRef VVCResource;
+	ieResRef Source;
+	char Variable[32];
+	ieDword SecondaryType;
 
 	// These are not in the IE files, but are our precomputed values
 	int  random_value;

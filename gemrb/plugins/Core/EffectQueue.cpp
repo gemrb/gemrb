@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.18 2005/07/06 23:37:33 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.19 2005/07/10 17:07:17 edheldil Exp $
  *
  */
 
@@ -250,6 +250,9 @@ void EffectQueue::ApplyEffect(Actor* target, Effect* fx)
 		free( text );
 	}
 
+	if (fx->Opcode >= MAX_EFFECTS) 
+		return;
+
 	EffectFunction  fn = effect_refs[fx->Opcode].Function;
 	if (fn)
 		fn( target, fx );
@@ -264,7 +267,11 @@ void EffectQueue::dump()
 	for (unsigned int i = 0; i < effects.size (); i++ ) {
 		Effect* fx = effects[i];
 		if (fx) {
-			printf( "  %2d:  0x%02x: %s (%d, %d)\n", i, fx->Opcode, effect_refs[fx->Opcode].Name, fx->Parameter1, fx->Parameter2 );
+			char *Name = NULL;
+			if (fx->Opcode < MAX_EFFECTS)
+				Name = (char*) effect_refs[fx->Opcode].Name;
+
+			printf( "  %2d:  0x%02x: %s (%d, %d)\n", i, fx->Opcode, Name, fx->Parameter1, fx->Parameter2 );
 		}
 	}
 }

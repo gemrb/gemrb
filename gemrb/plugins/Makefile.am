@@ -13,6 +13,7 @@ SUBDIRS = \
 	CHUImporter \
 	CREImporter \
 	DLGImporter \
+	EFFImporter \
 	GAMImporter \
 	IDSImporter \
 	INIImporter \
