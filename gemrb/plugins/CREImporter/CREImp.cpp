@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.81 2005/07/10 17:07:29 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.82 2005/07/11 17:53:29 avenger_teambg Exp $
  *
  */
 
@@ -442,11 +442,11 @@ void CREImp::GetActorPST(Actor *act)
 	str->Read( &tmpByte, 1 );
 	//skipping a byte
 	str->ReadDword( &act->BaseStats[IE_KIT] );
-	ReadScript(act, 0);
-	ReadScript(act, 2);
-	ReadScript(act, 3);
-	ReadScript(act, 4);
-	ReadScript(act, 5);
+	ReadScript(act, SCR_OVERRIDE);
+	ReadScript(act, SCR_CLASS);
+	ReadScript(act, SCR_RACE);
+	ReadScript(act, SCR_GENERAL);
+	ReadScript(act, SCR_DEFAULT);
 
 	str->Seek( 44, GEM_CURRENT_POS );
 	str->ReadDword( &act->BaseStats[IE_XP_MAGE] ); // Exp for secondary class
@@ -789,11 +789,11 @@ void CREImp::GetActorBG(Actor *act)
 	str->Read( &tmpByte, 1);
 	//skipping a byte
 	str->ReadDword( &act->BaseStats[IE_KIT] );
-	ReadScript(act, 0);
-	ReadScript(act, 2);
-	ReadScript(act, 3);
-	ReadScript(act, 4);
-	ReadScript(act, 5);
+	ReadScript(act, SCR_OVERRIDE);
+	ReadScript(act, SCR_CLASS);
+	ReadScript(act, SCR_RACE);
+	ReadScript(act, SCR_GENERAL);
+	ReadScript(act, SCR_DEFAULT);
 	 
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_EA]=tmpByte;
@@ -923,8 +923,8 @@ void CREImp::GetActorIWD2(Actor *act)
 	for (i=0;i<64;i++) {
 		str->ReadDword( &act->StrRefs[i] );
 	}
-	ReadScript( act, 1);
-	ReadScript( act, 6);
+	ReadScript( act, SCR_AREA);
+	ReadScript( act, SCR_RESERVED);
 	str->Seek( 4, GEM_CURRENT_POS );
 	str->ReadDword( &act->BaseStats[IE_FEATS1]);
 	str->ReadDword( &act->BaseStats[IE_FEATS2]);
@@ -1003,11 +1003,11 @@ void CREImp::GetActorIWD2(Actor *act)
 	str->Read( &tmpByte, 1 ); 
 	act->BaseStats[IE_MORALERECOVERYTIME]=tmpByte;
 	str->ReadDword( &act->BaseStats[IE_KIT] );
-	ReadScript(act, 0);
-	ReadScript(act, 2);
-	ReadScript(act, 3);
-	ReadScript(act, 4);
-	ReadScript(act, 5);
+	ReadScript(act, SCR_OVERRIDE);
+	ReadScript(act, SCR_CLASS);
+	ReadScript(act, SCR_RACE);
+	ReadScript(act, SCR_GENERAL);
+	ReadScript(act, SCR_DEFAULT);
 
 	str->Seek( 232, GEM_CURRENT_POS );
 	str->Read( &tmpByte, 1);
@@ -1172,11 +1172,11 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	str->Read( &tmpByte, 1 );
 	//skipping a byte
 	str->ReadDword( &act->BaseStats[IE_KIT] );
-	ReadScript(act, 0);
-	ReadScript(act, 2);
-	ReadScript(act, 3);
-	ReadScript(act, 4);
-	ReadScript(act, 5);
+	ReadScript(act, SCR_OVERRIDE);
+	ReadScript(act, SCR_CLASS);
+	ReadScript(act, SCR_RACE);
+	ReadScript(act, SCR_GENERAL);
+	ReadScript(act, SCR_DEFAULT);
 	
 	str->Seek( 46, GEM_CURRENT_POS );
 	char KillVar[33]; //use this as needed
@@ -1483,8 +1483,8 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 		for (i=0;i<64;i++) {
 			stream->WriteDword( &actor->StrRefs[i]);
 		}
-		stream->WriteResRef( actor->Scripts[1]->GetName() );
-		stream->WriteResRef( actor->Scripts[6]->GetName() );
+		stream->WriteResRef( actor->Scripts[SCR_AREA]->GetName() );
+		stream->WriteResRef( actor->Scripts[SCR_RESERVED]->GetName() );
 		//unknowns before feats
 		stream->Write( filling,4);
 		//feats
@@ -1579,11 +1579,11 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 		// unknown byte
 		stream->Write( &Signature,1);
 		stream->WriteDword( &actor->BaseStats[IE_KIT] );
-		stream->WriteResRef( actor->Scripts[0]->GetName() );
-		stream->WriteResRef( actor->Scripts[2]->GetName() );
-		stream->WriteResRef( actor->Scripts[3]->GetName() );
-		stream->WriteResRef( actor->Scripts[4]->GetName() );
-		stream->WriteResRef( actor->Scripts[5]->GetName() );
+		stream->WriteResRef( actor->Scripts[SCR_OVERRIDE]->GetName() );
+		stream->WriteResRef( actor->Scripts[SCR_CLASS]->GetName() );
+		stream->WriteResRef( actor->Scripts[SCR_RACE]->GetName() );
+		stream->WriteResRef( actor->Scripts[SCR_GENERAL]->GetName() );
+		stream->WriteResRef( actor->Scripts[SCR_DEFAULT]->GetName() );
 	} else {
 		for (i=0;i<21;i++) {
 			tmpByte = actor->BaseStats[IE_PROFICIENCYBASTARDSWORD+i];
@@ -1631,11 +1631,11 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 		// unknown byte
 		stream->Write( &Signature,1);
 		stream->WriteDword( &actor->BaseStats[IE_KIT] );
-		stream->WriteResRef( actor->Scripts[0]->GetName() );
-		stream->WriteResRef( actor->Scripts[2]->GetName() );
-		stream->WriteResRef( actor->Scripts[3]->GetName() );
-		stream->WriteResRef( actor->Scripts[4]->GetName() );
-		stream->WriteResRef( actor->Scripts[5]->GetName() );
+		stream->WriteResRef( actor->Scripts[SCR_OVERRIDE]->GetName() );
+		stream->WriteResRef( actor->Scripts[SCR_CLASS]->GetName() );
+		stream->WriteResRef( actor->Scripts[SCR_RACE]->GetName() );
+		stream->WriteResRef( actor->Scripts[SCR_GENERAL]->GetName() );
+		stream->WriteResRef( actor->Scripts[SCR_DEFAULT]->GetName() );
 	}
 	//now follows the fuzzy part in separate putactor... functions
 	return 0;

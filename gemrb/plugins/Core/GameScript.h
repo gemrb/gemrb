@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.207 2005/07/10 12:01:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.208 2005/07/11 17:53:33 avenger_teambg Exp $
  *
  */
 
@@ -1244,6 +1244,7 @@ public:
 	static void Swing(Scriptable* Sender, Action* parameters);
 	static void SwingOnce(Scriptable* Sender, Action* parameters);
 	static void TakeItemList(Scriptable* Sender, Action* parameters);
+	static void TakeItemListParty(Scriptable* Sender, Action* parameters);
 	static void TakeItemReplace(Scriptable* Sender, Action* parameters);
 	static void TakePartyGold(Scriptable* Sender, Action* parameters);
 	static void TakePartyItem(Scriptable* Sender, Action* parameters);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.310 2005/07/10 16:58:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.311 2005/07/11 17:53:32 avenger_teambg Exp $
  *
  */
 
@@ -658,6 +658,7 @@ static ActionLink actionnames[] = {
 	{"swing", GameScript::Swing, 0},
 	{"swingonce", GameScript::SwingOnce, 0},
 	{"takeitemlist", GameScript::TakeItemList, 0},
+	{"takeitemlistparty", GameScript::TakeItemListParty, 0},
 	{"takeitemreplace", GameScript::TakeItemReplace, 0},
 	{"takepartygold", GameScript::TakePartyGold, 0},
 	{"takepartyitem", GameScript::TakePartyItem, 0},

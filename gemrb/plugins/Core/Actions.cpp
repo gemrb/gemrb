@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.20 2005/07/10 12:01:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.21 2005/07/11 17:53:31 avenger_teambg Exp $
  *
  */
 
@@ -3039,8 +3039,7 @@ void GameScript::DropItem(Scriptable *Sender, Action* parameters)
 0, map, parameters->pointParameter);
 	} else {
 		//this should be converted from scripting slot to physical slot
-		            scr->inventory.DropItemAtLocation(parameters->int0Parameter, 0,
-map, parameters->pointParameter);
+		scr->inventory.DropItemAtLocation(parameters->int0Parameter, 0, map, parameters->pointParameter);
 	}
 
 	Sender->CurrentAction = NULL;
@@ -3187,6 +3186,27 @@ void GameScript::TakeItemList(Scriptable * Sender, Action* parameters)
 		int rows = tab->GetRowCount();
 		for (int i=0;i<rows;i++) {
 			MoveItemCore(tar, Sender, tab->QueryField(i,0), 0);
+		}
+	}
+	core->DelTable(table);
+}
+
+void GameScript::TakeItemListParty(Scriptable * Sender, Action* parameters)
+{
+	int table = core->LoadTable(parameters->string0Parameter);
+	if (table<0) {
+		return;
+	}
+	Game *game = core->GetGame();
+	TableMgr *tab=core->GetTable( table );
+	if (tab) {
+		int rows = tab->GetRowCount();
+		for (int i=0;i<rows;i++) {
+			int j = game->GetPartySize(false);
+			while (j--) {
+				Actor *tar = game->GetPC(j, false);
+				MoveItemCore(tar, Sender, tab->QueryField(i,0), 0);
+			}
 		}
 	}
 	core->DelTable(table);
