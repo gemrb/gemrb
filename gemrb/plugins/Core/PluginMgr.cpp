@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.16 2005/05/14 11:18:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.17 2005/07/11 17:50:28 avenger_teambg Exp $
  *
  */
 
@@ -37,7 +37,21 @@
 #endif
 
 typedef char*(* charvoid)(void);
-typedef ClassDesc*(* cdint)(void);
+typedef ClassDesc*(* cdvoid)(void);
+
+#ifdef FUSSY_GCC
+typedef void *(* voidvoid)(void);
+inline voidvoid my_dlsym(void *handle, const char *symbol)
+{
+	void *value = dlsym(handle,symbol);
+	voidvoid ret;
+	assert(sizeof(ret)==sizeof(value) );
+	memcpy(&ret, &value, sizeof(ret) );
+	return ret;
+}
+#else
+#define my_dlsym dlsym
+#endif
 
 PluginMgr::PluginMgr(char* pluginpath)
 {
@@ -80,7 +94,7 @@ PluginMgr::PluginMgr(char* pluginpath)
 #endif
 	charvoid LibVersion;
 	charvoid LibDescription;
-	cdint LibClassDesc;
+	cdvoid LibClassDesc;
 	do {
 		//Iterate through all the available modules to load
 #ifdef WIN32
@@ -103,7 +117,7 @@ PluginMgr::PluginMgr(char* pluginpath)
 		LibVersion = ( charvoid ) GetProcAddress( hMod, "LibVersion" );
 		LibDescription = ( charvoid )
 			GetProcAddress( hMod, "LibDescription" );
-		LibClassDesc = ( cdint ) GetProcAddress( hMod, "LibClassDesc" );
+		LibClassDesc = ( cdvoid ) GetProcAddress( hMod, "LibClassDesc" );
 #else
 		if (fnmatch( "*.so", de->d_name, 0 ) != 0) //If the current file has no ".so" extension, skip it
 			continue;
@@ -127,13 +141,13 @@ PluginMgr::PluginMgr(char* pluginpath)
 		hack to make GemRB run on every version.
 		*/
 #ifdef GCC_OLD
-		LibVersion = ( charvoid ) dlsym( hMod, "LibVersion__Fv" );
-		LibDescription = ( charvoid ) dlsym( hMod, "LibDescription__Fv" );
-		LibClassDesc = ( cdint ) dlsym( hMod, "LibClassDesc__Fv" );
+		LibVersion = ( charvoid ) my_dlsym( hMod, "LibVersion__Fv" );
+		LibDescription = ( charvoid ) my_dlsym( hMod, "LibDescription__Fv" );
+		LibClassDesc = ( cdvoid ) my_dlsym( hMod, "LibClassDesc__Fv" );
 #else
-		LibVersion = ( charvoid ) dlsym( hMod, "_Z10LibVersionv" );
-		LibDescription = ( charvoid ) dlsym( hMod, "_Z14LibDescriptionv" );
-		LibClassDesc = ( cdint ) dlsym( hMod, "_Z12LibClassDescv" );
+		LibVersion = ( charvoid ) my_dlsym( hMod, "_Z10LibVersionv" );
+		LibDescription = ( charvoid ) my_dlsym( hMod, "_Z14LibDescriptionv" );
+		LibClassDesc = ( cdvoid ) my_dlsym( hMod, "_Z12LibClassDescv" );
 #endif
 #endif
 		printMessage( "PluginMgr", "Checking Plugin Version...", WHITE );
