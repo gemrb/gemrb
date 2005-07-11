@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.83 2005/07/10 12:01:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.84 2005/07/11 19:01:38 avenger_teambg Exp $
  *
  */
 
@@ -156,7 +156,6 @@ public:
 	ieWord AreaType;
 	ieWord Rain, Snow, Fog, Lightning;
 	//bool ChangeArea; //set true if movement is allowed between areas
-	//Variables *vars;
 	ieByte* ExploredBitmap;
 	ieByte* VisibleBitmap;
 	int version;
