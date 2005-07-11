@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/EFFImporter/EFFImp.cpp,v 1.1 2005/07/10 17:07:16 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/EFFImporter/EFFImp.cpp,v 1.2 2005/07/11 17:23:14 avenger_teambg Exp $
  *
  */
 
@@ -128,8 +128,9 @@ Effect* EFFImp::GetEffectV20(Effect *fx)
 	str->ReadDword( &fx->PrimaryType );
 	str->Seek( 12, GEM_CURRENT_POS );
 	str->ReadDword( &fx->ResistanceType );
-	str->Read( &fx->Parameter3, 1 );
-	str->Seek( 15, GEM_CURRENT_POS );
+	str->ReadDword( &fx->Parameter3 );
+	str->ReadDword( &fx->Parameter4 );
+	str->Seek( 8, GEM_CURRENT_POS );
 	str->ReadResRef( fx->VVCResource );
 	str->ReadResRef( fx->Resource2 );
 	str->Seek( 20, GEM_CURRENT_POS );

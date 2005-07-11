@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.h,v 1.3 2005/07/10 17:07:29 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.h,v 1.4 2005/07/11 17:23:13 avenger_teambg Exp $
  *
  */
 
@@ -82,7 +82,8 @@ typedef struct Effect {
 	// EFF V2.0 fields:
 	ieDword PrimaryType;
 	ieDword ResistanceType;
-	ieByte Parameter3;
+	ieDword Parameter3;
+	ieDword Parameter4;
 	ieResRef VVCResource;
 	ieResRef Source;
 	char Variable[32];
