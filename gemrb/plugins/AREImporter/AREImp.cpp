@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.123 2005/07/09 14:58:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.124 2005/07/12 17:53:54 avenger_teambg Exp $
  *
  */
 
@@ -668,12 +668,12 @@ Map* AREImp::GetMap(const char *ResRef)
 			str->ReadDword( &TalkCount );
 			str->ReadResRef( Dialog );
 			//TODO: script order			
-			str->ReadResRef( Scripts[0] );
-			str->ReadResRef( Scripts[1] );
-			str->ReadResRef( Scripts[2] );
-			str->ReadResRef( Scripts[3] );
-			str->ReadResRef( Scripts[4] );
-			str->ReadResRef( Scripts[5] );
+			str->ReadResRef( Scripts[SCR_OVERRIDE] );
+			str->ReadResRef( Scripts[SCR_CLASS] );
+			str->ReadResRef( Scripts[SCR_RACE] );
+			str->ReadResRef( Scripts[SCR_GENERAL] );
+			str->ReadResRef( Scripts[SCR_DEFAULT] );
+			str->ReadResRef( Scripts[SCR_SPECIFICS] );
 			str->ReadResRef( CreResRef );
 			DataStream* crefile;
 			Actor *ab;
@@ -681,11 +681,11 @@ Map* AREImp::GetMap(const char *ResRef)
 			str->ReadDword( &CreOffset );
 			str->ReadDword( &CreSize );
 			//TODO: iwd2 script?
-			str->ReadResRef( Scripts[6] );
+			str->ReadResRef( Scripts[SCR_AREA] );
 			str->Seek( 120, GEM_CURRENT_POS );
 			//actually, Flags&1 signs that the creature
-			//is not loaded yet
-			if (CreOffset != 0) {
+			//is not loaded yet, so !(Flags&1) means it is embedded
+			if (CreOffset != 0 && !(Flags&1) ) {
 				CachedFileStream *fs = new CachedFileStream( (CachedFileStream *) str, CreOffset, CreSize, true);
 				crefile = (DataStream *) fs;
 			} else {
