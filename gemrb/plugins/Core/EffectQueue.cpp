@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.19 2005/07/10 17:07:17 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.20 2005/07/12 18:11:16 avenger_teambg Exp $
  *
  */
 
@@ -25,7 +25,6 @@
 #include "Effect.h"
 #include "EffectQueue.h"
 
-#define FX_EXPIRED -1
 #define FX_NOT_APPLIED  0
 #define FX_APPLIED 1
 
@@ -203,8 +202,6 @@ bool EffectQueue::AddEffect(Effect* fx)
 	// pre-roll dice for fx needing them and stow them in the effect
 	new_fx->random_value = core->Roll( fx->DiceThrown, fx->DiceSides, 0 );
 
-	ApplyAllEffects( Owner );
-
 	return true;
 }
 
@@ -218,7 +215,6 @@ bool EffectQueue::RemoveEffect(Effect* fx)
 		if (! memcmp( fx, fx2, invariant_size)) {
 			delete fx2;
 			effects.erase( f );
-			ApplyAllEffects( Owner );
 			return true;
 		}
 	}
@@ -237,12 +233,21 @@ void EffectQueue::ApplyAllEffects(Actor* target)
 	for (std::vector< Effect* >::iterator f = effects.begin(); f != effects.end(); f++ ) {
 		ApplyEffect( target, *f );
 	}
+	for (std::vector< Effect* >::iterator f = effects.begin(); f != effects.end(); f++ ) {
+		if ((*f)->TimingMode==FX_DURATION_JUST_EXPIRED) {
+			delete *f;
+			effects.erase(f);
+			f--;
+		}
+	}
 }
 
 
 void EffectQueue::ApplyEffect(Actor* target, Effect* fx)
 {
 	//printf( "FX 0x%02x: %s(%d, %d)\n", fx->Opcode, effectnames[fx->Opcode].Name, fx->Parameter1, fx->Parameter2 );
+	if (fx->Opcode >= MAX_EFFECTS) 
+		return;
 
 	if ( effect_refs[fx->Opcode].EffText > 0 ) {
 		char *text = core->GetString( effect_refs[fx->Opcode].EffText );
@@ -250,14 +255,16 @@ void EffectQueue::ApplyEffect(Actor* target, Effect* fx)
 		free( text );
 	}
 
-	if (fx->Opcode >= MAX_EFFECTS) 
-		return;
-
 	EffectFunction  fn = effect_refs[fx->Opcode].Function;
-	if (fn)
-		fn( target, fx );
-	//else
-	//	printf( "FX function not found: 0x%02x\n", fx->Opcode );
+	if (fn) {
+		if( fn( target, fx ) == FX_NOT_APPLIED) {
+ 				//pending removal
+				fx->TimingMode=FX_DURATION_JUST_EXPIRED;
+		}
+	} else {
+		//effect not found, it is going to be discarded
+		fx->TimingMode=FX_DURATION_JUST_EXPIRED;
+	}
 		
 }
 
@@ -614,7 +621,8 @@ int fx_local_variable (Actor* target, Effect* fx)
 	//this is a hack, the variable name spreads across the resources
 	if (0) printf( "fx_local_variable (%s=%d)", fx->Resource, fx->Parameter2 );
 	target->locals->SetAt(fx->Resource, fx->Parameter2);
-	return FX_APPLIED;
+	//local variable effects are not applied, they will be resaved though
+	return FX_NOT_APPLIED;
 }
 
 int fx_playsound (Actor* target, Effect* fx)

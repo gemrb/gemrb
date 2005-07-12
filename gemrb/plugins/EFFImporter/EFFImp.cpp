@@ -1,5 +1,5 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2003 The GemRB Project
+ * Copyright (C) 2005 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -8,14 +8,14 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/EFFImporter/EFFImp.cpp,v 1.2 2005/07/11 17:23:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/EFFImporter/EFFImp.cpp,v 1.3 2005/07/12 18:11:17 avenger_teambg Exp $
  *
  */
 
@@ -104,6 +104,8 @@ Effect* EFFImp::GetEffectV1(Effect *fx)
 
 Effect* EFFImp::GetEffectV20(Effect *fx)
 {
+	ieDword IsVariable;
+
 	memset( fx, 0, sizeof( Effect ) );
 
 	// Skip over Signature2
@@ -114,6 +116,7 @@ Effect* EFFImp::GetEffectV20(Effect *fx)
 	str->ReadDword( &fx->Power );
 	str->ReadDword( &fx->Parameter1 );
 	str->ReadDword( &fx->Parameter2 );
+	//timing mode is most likely a dword
 	str->Read( &fx->TimingMode, 1 );
 	str->Seek( 3, GEM_CURRENT_POS );
 	str->ReadDword( &fx->Duration );
@@ -124,19 +127,27 @@ Effect* EFFImp::GetEffectV20(Effect *fx)
 	str->ReadDword( &fx->DiceSides );
 	str->ReadDword( &fx->SavingThrowType );
 	str->ReadDword( &fx->SavingThrowBonus );
-	str->Seek( 4, GEM_CURRENT_POS );
+	str->ReadDword( &IsVariable ); //if this field was set to 1, this is a variable
 	str->ReadDword( &fx->PrimaryType );
 	str->Seek( 12, GEM_CURRENT_POS );
 	str->ReadDword( &fx->ResistanceType );
 	str->ReadDword( &fx->Parameter3 );
 	str->ReadDword( &fx->Parameter4 );
 	str->Seek( 8, GEM_CURRENT_POS );
-	str->ReadResRef( fx->VVCResource );
 	str->ReadResRef( fx->Resource2 );
-	str->Seek( 20, GEM_CURRENT_POS );
+	str->ReadResRef( fx->Resource3 );	
+	str->Seek( 20, GEM_CURRENT_POS );//unsure fields, should be resource4, but also effect center
 	str->ReadResRef( fx->Source );
 	str->Seek( 12, GEM_CURRENT_POS );
-	str->Read( fx->Variable, 32 );
+	//Variable simply overwrites the resource fields (Keep them grouped)
+	if (IsVariable) {
+		str->ReadResRef( fx->Resource );
+		str->ReadResRef( fx->Resource+8 );
+		str->ReadResRef( fx->Resource+16 );
+		str->ReadResRef( fx->Resource+24 );
+	} else {
+		str->Seek( 32, GEM_CURRENT_POS);
+	}
 	str->Seek( 8, GEM_CURRENT_POS );
 	str->ReadDword( &fx->SecondaryType );
 	str->Seek( 60, GEM_CURRENT_POS );

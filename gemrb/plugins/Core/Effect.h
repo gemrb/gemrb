@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.h,v 1.4 2005/07/11 17:23:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.h,v 1.5 2005/07/12 18:11:16 avenger_teambg Exp $
  *
  */
 
@@ -46,6 +46,7 @@ class Actor;
 #define FX_DURATION_AFTER_EXPIRES            7
 #define FX_DURATION_UNKNOWN8                 8
 #define FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES   9
+#define FX_DURATION_JUST_EXPIRED             10
 
 // Effect resistance types
 #define FX_RESIST_NO_DISPELL_BYPASS      0
@@ -70,7 +71,7 @@ typedef struct Effect {
 	//keep these four in one bunch, VariableName will
 	//spread across them
 	ieResRef Resource;
-	ieResRef Resource2;
+	ieResRef Resource2; //vvc in a lot of effects
 	ieResRef Resource3;
 	ieResRef Resource4;
 	ieDword DiceThrown;
@@ -84,9 +85,9 @@ typedef struct Effect {
 	ieDword ResistanceType;
 	ieDword Parameter3;
 	ieDword Parameter4;
-	ieResRef VVCResource;
+	//ieResRef VVCResource; //this is actually Resource2
 	ieResRef Source;
-	char Variable[32];
+	//char Variable[32]; //resources will cover this
 	ieDword SecondaryType;
 
 	// These are not in the IE files, but are our precomputed values
