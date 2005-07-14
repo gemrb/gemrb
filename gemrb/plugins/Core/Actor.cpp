@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.114 2005/07/10 12:01:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.115 2005/07/14 19:48:26 avenger_teambg Exp $
  *
  */
 
@@ -873,3 +873,39 @@ void Actor::SetTarget( Scriptable *target)
 	SetStance( IE_ANI_ATTACK);
 	SetWait( 1 );
 }
+
+//idx could be: 0-6, 16-22, 32-38, 48-54
+//the colors are stored in 7 dwords
+//maybe it would be simpler to store them in 28 bytes (without using stats?)
+void Actor::SetColor( ieDword idx, ieDword grd)
+{
+	ieByte gradient = (ieByte) (grd&255);
+	ieByte index = (ieByte) (idx&15);
+	ieByte shift = idx/16;
+	ieDword value;
+
+	//invalid value, would crash original IE
+	if (index>6) {
+		return;
+	}
+	if (shift == 15) {
+		value = 0;
+		for (index=0;index<4;index++) {
+			value |= gradient<<=8;
+		}
+		for (index=0;index<7;index++) {
+			Modified[IE_COLORS+index] = value;
+		}
+	} else {
+		//invalid value, would crash original IE
+		if (shift>3) {
+			return;
+		}
+		value = gradient << shift;
+		value |= Modified[IE_COLORS+index] & ~(255<<shift);
+		Modified[IE_COLORS+index] = value;
+	}
+
+	anims->SetColors(Modified+IE_COLORS);
+}
+

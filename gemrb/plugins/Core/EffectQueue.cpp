@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.20 2005/07/12 18:11:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.21 2005/07/14 19:48:27 avenger_teambg Exp $
  *
  */
 
@@ -25,7 +25,7 @@
 #include "Effect.h"
 #include "EffectQueue.h"
 
-#define FX_NOT_APPLIED  0
+#define FX_NOT_APPLIED 0
 #define FX_APPLIED 1
 
 int fx_ac_vs_damage_type_modifier (Actor* target, Effect* fx);
@@ -35,6 +35,7 @@ int fx_set_berserk_state (Actor* target, Effect* fx);
 int fx_cure_berserk_state (Actor* target, Effect* fx);
 int fx_set_charmed_state (Actor* target, Effect* fx);
 int fx_charisma_modifier (Actor* target, Effect* fx);
+int fx_set_color_gradient (Actor* target, Effect* fx);
 int fx_constitution_modifier (Actor* target, Effect* fx);
 int fx_wisdom_modifier (Actor* target, Effect* fx);
 int fx_cure_poisoned_state (Actor* target, Effect* fx);
@@ -69,9 +70,10 @@ static EffectRef effect_refs[MAX_EFFECTS];
 //static int efftexts[MAX_EFFECTS]; //from efftext.2da
 
 // FIXME: this list should be dynamic (stl::vector). It should be populated
-//   by fx plugins, so it would be easier to add new effects etc.
+// by fx plugins, so it would be easier to add new effects etc.
 // FIXME: Make this an ordered list, so we could use bsearch!
 static EffectLink effectnames[] = {
+	{ "Color:SetCharacterColorsByPalette", fx_set_color_gradient },
 	{ "Cure:Berserk", fx_cure_berserk_state },
 	{ "Cure:Poison", fx_cure_poisoned_state },
 	{ "Cure:Sleep", fx_cure_sleep_state },
@@ -230,10 +232,11 @@ void EffectQueue::ApplyAllEffects(Actor* target)
 	// FIXME: clear protection_from_opcode array
 	// memset( target->protection_from_fx, 0, MAX_FX_OPCODES * sizeof( char ) );
 
-	for (std::vector< Effect* >::iterator f = effects.begin(); f != effects.end(); f++ ) {
+	std::vector< Effect* >::iterator f;
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		ApplyEffect( target, *f );
 	}
-	for (std::vector< Effect* >::iterator f = effects.begin(); f != effects.end(); f++ ) {
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		if ((*f)->TimingMode==FX_DURATION_JUST_EXPIRED) {
 			delete *f;
 			effects.erase(f);
@@ -255,7 +258,7 @@ void EffectQueue::ApplyEffect(Actor* target, Effect* fx)
 		free( text );
 	}
 
-	EffectFunction  fn = effect_refs[fx->Opcode].Function;
+	EffectFunction fn = effect_refs[fx->Opcode].Function;
 	if (fn) {
 		if( fn( target, fx ) == FX_NOT_APPLIED) {
  				//pending removal
@@ -278,7 +281,7 @@ void EffectQueue::dump()
 			if (fx->Opcode < MAX_EFFECTS)
 				Name = (char*) effect_refs[fx->Opcode].Name;
 
-			printf( "  %2d:  0x%02x: %s (%d, %d)\n", i, fx->Opcode, Name, fx->Parameter1, fx->Parameter2 );
+			printf( " %2d: 0x%02x: %s (%d, %d)\n", i, fx->Opcode, Name, fx->Parameter1, fx->Parameter2 );
 		}
 	}
 }
@@ -286,7 +289,7 @@ void EffectQueue::dump()
 // Helper macros and functions for effect opcodes
 
 #define CHECK_LEVEL() { \
-	int level = target->GetStat( IE_LEVEL ); \
+	int level = target->GetXPLevel( true ); \
 	if ((fx->DiceSides != 0 || fx->DiceThrown != 0) && (level < (int)fx->DiceSides || level > (int)fx->DiceThrown)) \
 		return FX_NOT_APPLIED; \
 	}
@@ -302,7 +305,7 @@ inline int MAX(int a, int b)
 }
 
 // FIXME: Dice roll should be probably done just once, e.g. when equpping 
-//   the item, not each time the fx are applied
+// the item, not each time the fx are applied
 #define DICE_ROLL(max_val)   ((fx->DiceThrown && fx->DiceSides) ? ((max_val >=0) ? (MIN( core->Roll( fx->DiceThrown, fx->DiceSides, 0 ), max_val )) : (MAX( core->Roll( fx->DiceThrown, fx->DiceSides, 0 ), max_val ))) : max_val)
 
 // often used stat modifications, usually Parameter2 types 0, 1 and 2
@@ -320,7 +323,7 @@ inline int MAX(int a, int b)
 // Effect opcodes
 // FIXME: These should be moved into their own plugins
 // NOTE: These opcode numbers are true for PS:T and are meant just for 
-//   better orientation
+// better orientation
 
 // 0x00
 int fx_ac_vs_damage_type_modifier (Actor* target, Effect* fx)
@@ -332,7 +335,7 @@ int fx_ac_vs_damage_type_modifier (Actor* target, Effect* fx)
 	int type = fx->Parameter2;
 	if (type == 0) {
 		// FIXME: this is probably wrong, but it's hack to see
-		//   anything in PST
+		// anything in PST
 		STAT_ADD( IE_ARMORCLASS, fx->Parameter1 );
 		type = 15;
 	}
@@ -396,6 +399,16 @@ int fx_charisma_modifier (Actor* target, Effect* fx)
 	if (0) printf( "fx_charisma_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	target->NewStat( IE_CHR, fx->Parameter1, fx->Parameter2 );
+	return FX_APPLIED;
+}
+
+// 0x07
+// this effect might not work in pst, they don't have separate weapon slots
+int fx_set_color_gradient (Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_charisma_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	target->SetColor( fx->Parameter2, fx->Parameter1 );
 	return FX_APPLIED;
 }
 

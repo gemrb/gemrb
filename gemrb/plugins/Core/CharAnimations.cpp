@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.61 2005/07/05 22:14:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.62 2005/07/14 19:48:26 avenger_teambg Exp $
  *
  */
 
@@ -96,7 +96,7 @@ void CharAnimations::SetupColors(Animation *anim)
 		int size = 32;
 		int dest = 256-Colors[6]*size;
 		for (unsigned int i = 0; i < Colors[6]; i++) {
-			Color* NewPal = core->GetPalette( Colors[i], size );
+			Color* NewPal = core->GetPalette( Colors[i]&255, size );
 			memcpy( &anim->Palette[dest], NewPal, size * sizeof( Color ) );
 			dest +=size;
 			free( NewPal );
@@ -120,13 +120,13 @@ void CharAnimations::SetupColors(Animation *anim)
 		}
 		return;
 	}
-	Color* MetalPal = core->GetPalette( Colors[0], 12 );
-	Color* MinorPal = core->GetPalette( Colors[1], 12 );
-	Color* MajorPal = core->GetPalette( Colors[2], 12 );
-	Color* SkinPal = core->GetPalette( Colors[3], 12 );
-	Color* LeatherPal = core->GetPalette( Colors[4], 12 );
-	Color* ArmorPal = core->GetPalette( Colors[5], 12 );
-	Color* HairPal = core->GetPalette( Colors[6], 12 );
+	Color* MetalPal = core->GetPalette( Colors[0]&255, 12 );
+	Color* MinorPal = core->GetPalette( Colors[1]&255, 12 );
+	Color* MajorPal = core->GetPalette( Colors[2]&255, 12 );
+	Color* SkinPal = core->GetPalette( Colors[3]&255, 12 );
+	Color* LeatherPal = core->GetPalette( Colors[4]&255, 12 );
+	Color* ArmorPal = core->GetPalette( Colors[5]&255, 12 );
+	Color* HairPal = core->GetPalette( Colors[6]&255, 12 );
 	memcpy( &anim->Palette[0x04], MetalPal, 12 * sizeof( Color ) );
 	memcpy( &anim->Palette[0x10], MinorPal, 12 * sizeof( Color ) );
 	memcpy( &anim->Palette[0x1C], MajorPal, 12 * sizeof( Color ) );
