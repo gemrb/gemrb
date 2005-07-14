@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.22 2005/07/14 22:09:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.23 2005/07/14 22:19:44 avenger_teambg Exp $
  *
  */
 
@@ -260,7 +260,7 @@ void EffectQueue::ApplyEffect(Actor* target, Effect* fx)
 
 	EffectFunction fn = effect_refs[fx->Opcode].Function;
 	if (fn) {
-		if( fn( target, fx, Owner ) == FX_NOT_APPLIED) {
+		if( fn( Owner, target, fx ) == FX_NOT_APPLIED) {
  				//pending removal
 				fx->TimingMode=FX_DURATION_JUST_EXPIRED;
 		}
@@ -326,7 +326,7 @@ inline int MAX(int a, int b)
 // better orientation
 
 // 0x00
-int fx_ac_vs_damage_type_modifier (Actor* Owner, Actor* target, Effect* fx)
+int fx_ac_vs_damage_type_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_ac_vs_damage_type_modifier (%2d): AC Modif: %d ; Type: %d ; MinLevel: %d ; MaxLevel: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2, (int) fx->DiceSides, (int) fx->DiceThrown );
 	CHECK_LEVEL();
@@ -353,7 +353,7 @@ int fx_ac_vs_damage_type_modifier (Actor* Owner, Actor* target, Effect* fx)
 }
 
 // 0x01
-int fx_attacks_per_round_modifier (Actor* Owner, Actor* target, Effect* fx)
+int fx_attacks_per_round_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_attacks_per_round_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	target->NewStat( IE_NUMBEROFATTACKS, fx->Parameter1, fx->Parameter2 );
@@ -361,7 +361,7 @@ int fx_attacks_per_round_modifier (Actor* Owner, Actor* target, Effect* fx)
 }
 
 // 0x02
-int fx_cure_sleep_state (Actor* Owner, Actor* target, Effect* fx)
+int fx_cure_sleep_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_sleep_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STATE_CURE( STATE_SLEEP );
@@ -369,7 +369,7 @@ int fx_cure_sleep_state (Actor* Owner, Actor* target, Effect* fx)
 }
 
 // 0x03
-int fx_cure_berserk_state (Actor* Owner, Actor* target, Effect* fx)
+int fx_cure_berserk_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_berserk_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STATE_CURE( STATE_BERSERK );
@@ -377,7 +377,7 @@ int fx_cure_berserk_state (Actor* Owner, Actor* target, Effect* fx)
 }
 
 // 0x04
-int fx_set_berserk_state (Actor* Owner, Actor* target, Effect* fx)
+int fx_set_berserk_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_berserk_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STATE_SET( STATE_BERSERK );
@@ -386,7 +386,7 @@ int fx_set_berserk_state (Actor* Owner, Actor* target, Effect* fx)
 
 // 0x05
 //fixme, this is much more complex, alters IE_EA too
-int fx_set_charmed_state (Actor* Owner, Actor* target, Effect* fx)
+int fx_set_charmed_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_charmed_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STATE_SET( STATE_CHARMED );
@@ -394,7 +394,7 @@ int fx_set_charmed_state (Actor* Owner, Actor* target, Effect* fx)
 }
 
 // 0x06
-int fx_charisma_modifier (Actor* Owner, Actor* target, Effect* fx)
+int fx_charisma_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_charisma_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
@@ -404,7 +404,7 @@ int fx_charisma_modifier (Actor* Owner, Actor* target, Effect* fx)
 
 // 0x07
 // this effect might not work in pst, they don't have separate weapon slots
-int fx_set_color_gradient (Actor* Owner, Actor* target, Effect* fx)
+int fx_set_color_gradient (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_charisma_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
@@ -413,7 +413,7 @@ int fx_set_color_gradient (Actor* Owner, Actor* target, Effect* fx)
 }
 
 // 0x0A
-int fx_constitution_modifier (Actor* Owner, Actor* target, Effect* fx)
+int fx_constitution_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_constitution_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
@@ -422,7 +422,7 @@ int fx_constitution_modifier (Actor* Owner, Actor* target, Effect* fx)
 }
 
 // 0x0B
-int fx_cure_poisoned_state (Actor* Owner, Actor* target, Effect* fx)
+int fx_cure_poisoned_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_poisoned_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STATE_CURE( STATE_POISONED );
@@ -431,13 +431,14 @@ int fx_cure_poisoned_state (Actor* Owner, Actor* target, Effect* fx)
 
 // 0x0C Damage
 // this is a very important effect
-int fx_damage (Actor* Owner, Actor* target, Effect* fx, Actor *Owner)
+int fx_damage (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_damage (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	int damage; //FIXME damage calculation, random damage, etc
 
 	damage = 1;
-	target->Damage(damage, fx->Parameter2, Owner); //FIXME!
+	damage = target->Damage(damage, fx->Parameter2, Owner); //FIXME!
+	//handle invulnerabilities, print damage caused
 	return FX_APPLIED;
 }
 
@@ -445,12 +446,14 @@ int fx_damage (Actor* Owner, Actor* target, Effect* fx, Actor *Owner)
 int fx_death (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_death (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	target->Damage(0, fx->Parameter2, Owner); //hmm?
+	//death has damage type too
 	target->Die(Owner);
 	return FX_APPLIED;
 }
 
 // 0x12
-int fx_maximum_hp_modifier (Actor* Owner, Actor* target, Effect* fx)
+int fx_maximum_hp_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_maximum_hp_modifier (%2d): Stat Modif: %d ; Modif Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
@@ -485,7 +488,7 @@ int fx_maximum_hp_modifier (Actor* Owner, Actor* target, Effect* fx)
 }
 
 // 0x13
-int fx_intelligence_modifier (Actor* Owner, Actor* target, Effect* fx)
+int fx_intelligence_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_intelligence_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
@@ -494,7 +497,7 @@ int fx_intelligence_modifier (Actor* Owner, Actor* target, Effect* fx)
 }
 
 // 0x21
-int fx_save_vs_death_modifier (Actor* Owner, Actor* target, Effect* fx)
+int fx_save_vs_death_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_save_vs_death_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
@@ -503,7 +506,7 @@ int fx_save_vs_death_modifier (Actor* Owner, Actor* target, Effect* fx)
 }
 
 // 0x22
-int fx_save_vs_wands_modifier (Actor* Owner, Actor* target, Effect* fx)
+int fx_save_vs_wands_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_save_vs_wands_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
@@ -512,7 +515,7 @@ int fx_save_vs_wands_modifier (Actor* Owner, Actor* target, Effect* fx)
 }
 
 // 0x23
-int fx_save_vs_poly_modifier (Actor* Owner, Actor* target, Effect* fx)
+int fx_save_vs_poly_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_save_vs_poly_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
@@ -521,7 +524,7 @@ int fx_save_vs_poly_modifier (Actor* Owner, Actor* target, Effect* fx)
 }
 
 // 0x24
-int fx_save_vs_breath_modifier (Actor* Owner, Actor* target, Effect* fx)
+int fx_save_vs_breath_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_save_vs_breath_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
@@ -530,7 +533,7 @@ int fx_save_vs_breath_modifier (Actor* Owner, Actor* target, Effect* fx)
 }
 
 // 0x25
-int fx_save_vs_spell_modifier (Actor* Owner, Actor* target, Effect* fx)
+int fx_save_vs_spell_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_save_vs_spell_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
@@ -539,7 +542,7 @@ int fx_save_vs_spell_modifier (Actor* Owner, Actor* target, Effect* fx)
 }
 
 // 0x27
-int fx_set_sleep_state (Actor* Owner, Actor* target, Effect* fx)
+int fx_set_sleep_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_sleep_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STATE_SET( STATE_SLEEP );
@@ -547,7 +550,7 @@ int fx_set_sleep_state (Actor* Owner, Actor* target, Effect* fx)
 }
 
 // 0x2A
-int fx_bonus_wizard_spells (Actor* Owner, Actor* target, Effect* fx)
+int fx_bonus_wizard_spells (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_bonus_wizard_spells (%2d): Spell Add: %d ; Spell Level: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	
@@ -566,7 +569,7 @@ int fx_bonus_wizard_spells (Actor* Owner, Actor* target, Effect* fx)
 }
 
 // 0x2C
-int fx_strength_modifier (Actor* Owner, Actor* target, Effect* fx)
+int fx_strength_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_strength_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
@@ -575,7 +578,7 @@ int fx_strength_modifier (Actor* Owner, Actor* target, Effect* fx)
 }
 
 // 0x31
-int fx_wisdom_modifier (Actor* Owner, Actor* target, Effect* fx)
+int fx_wisdom_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_wisdom_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
@@ -584,7 +587,7 @@ int fx_wisdom_modifier (Actor* Owner, Actor* target, Effect* fx)
 }
 
 // 0x36
-int fx_to_hit_modifier (Actor* Owner, Actor* target, Effect* fx)
+int fx_to_hit_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_to_hit_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
@@ -593,7 +596,7 @@ int fx_to_hit_modifier (Actor* Owner, Actor* target, Effect* fx)
 }
 
 // 0x3B
-int fx_stealth_bonus (Actor* Owner, Actor* target, Effect* fx)
+int fx_stealth_bonus (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_stealth_bonus (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
@@ -602,7 +605,7 @@ int fx_stealth_bonus (Actor* Owner, Actor* target, Effect* fx)
 }
 
 // 0x49
-int fx_damage_bonus (Actor* Owner, Actor* target, Effect* fx)
+int fx_damage_bonus (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_damage_bonus (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
@@ -611,7 +614,7 @@ int fx_damage_bonus (Actor* Owner, Actor* target, Effect* fx)
 }
 
 // 0x5A
-int fx_open_locks_modifier (Actor* Owner, Actor* target, Effect* fx)
+int fx_open_locks_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_open_locks_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
@@ -620,7 +623,7 @@ int fx_open_locks_modifier (Actor* Owner, Actor* target, Effect* fx)
 }
 
 // 0xA6
-int fx_resistance_to_magic_damage (Actor* Owner, Actor* target, Effect* fx)
+int fx_resistance_to_magic_damage (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_resistance_to_magic_damage (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
@@ -629,7 +632,7 @@ int fx_resistance_to_magic_damage (Actor* Owner, Actor* target, Effect* fx)
 }
 
 // 0xBB
-int fx_local_variable (Actor* Owner, Actor* target, Effect* fx)
+int fx_local_variable (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	//this is a hack, the variable name spreads across the resources
 	if (0) printf( "fx_local_variable (%s=%d)", fx->Resource, fx->Parameter2 );
@@ -638,7 +641,7 @@ int fx_local_variable (Actor* Owner, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-int fx_playsound (Actor* Owner, Actor* target, Effect* fx)
+int fx_playsound (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_playsound (%s)", fx->Resource );
 	//this is probably inaccurate
