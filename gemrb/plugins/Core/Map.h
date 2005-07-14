@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.84 2005/07/11 19:01:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.85 2005/07/14 21:51:34 avenger_teambg Exp $
  *
  */
 
@@ -130,16 +130,26 @@ public:
 
 class GEM_EXPORT AreaAnimation {
 public:
-	char Name[33];
-	Point Pos;
 	Animation **animation;
 	int animcount;
+	//dwords, or stuff combining to a dword
+	Point Pos;
 	ieDword appearance;
 	ieDword Flags;
-	ieResRef BAM; //not only for saving back (StaticSequence depends on this)
+	//these are on one dword
 	ieWord sequence;
 	ieWord frame;
+	//these are on one dword
 	ieWord transparency;
+	ieWord unknown38;
+	//these are on one dword
+	ieWord unknown3c;
+	ieByte skipcycle;
+	ieByte startchance;
+	ieDword unknown48;
+	//string values, not in any particular order
+	char Name[33];
+	ieResRef BAM; //not only for saving back (StaticSequence depends on this)
 	ieResRef Palette;
 	AreaAnimation();
 	~AreaAnimation();

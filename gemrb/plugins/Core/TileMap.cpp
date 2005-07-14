@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.46 2005/06/17 19:33:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.47 2005/07/14 21:51:34 avenger_teambg Exp $
  *
  */
 
@@ -50,6 +50,92 @@ TileMap::~TileMap(void)
 	}
 }
 
+//tiled objects
+TileObject* TileMap::AddTile(const char *ID, const char* Name, unsigned int Flags,
+	unsigned short* openindices, int opencount, unsigned short* closeindices, int closecount)
+{
+	TileObject* tile = new TileObject();
+	tile->Flags=Flags;
+	strnuprcpy(tile->Name, Name, 32);
+	strnuprcpy(tile->Tileset, ID, 8);
+	tile->SetOpenTiles( openindices, opencount );
+	tile->SetClosedTiles( closeindices, closecount );
+	tiles.push_back(tile);
+	return tile;
+}
+
+TileObject* TileMap::GetTile(unsigned int idx)
+{
+	if (idx >= tiles.size()) {
+		return NULL;
+	}
+	return tiles[idx];
+}
+
+//doors
+Door* TileMap::AddDoor(const char *ID, const char* Name, unsigned int Flags,
+	int ClosedIndex, unsigned short* indices, int count,
+	Gem_Polygon* open, Gem_Polygon* closed)
+{
+	Door* door = new Door( overlays[0] );
+	door->Flags = Flags;
+	door->closedIndex = ClosedIndex;
+	door->SetTiles( indices, count );
+	door->SetPolygon( false, open );
+	door->SetPolygon( true, closed );
+	door->SetName( ID );
+	door->SetScriptName( Name );
+	doors.push_back( door );
+	return door;
+}
+
+Door* TileMap::GetDoor(unsigned int idx)
+{
+	if (idx >= doors.size()) {
+		return NULL;
+	}
+	return doors[idx];
+}
+
+Door* TileMap::GetDoor(Point &p)
+{
+	for (size_t i = 0; i < doors.size(); i++) {
+		Gem_Polygon *doorpoly;
+
+		Door* door = doors[i];
+		if (door->Flags&DOOR_OPEN)
+			doorpoly = door->closed;
+		else
+			doorpoly = door->open;
+
+		if (doorpoly->BBox.x > p.x)
+			continue;
+		if (doorpoly->BBox.y > p.y)
+			continue;
+		if (doorpoly->BBox.x + doorpoly->BBox.w < p.x)
+			continue;
+		if (doorpoly->BBox.y + doorpoly->BBox.h < p.y)
+			continue;
+		if (doorpoly->PointIn( p ))
+			return door;
+	}
+	return NULL;
+}
+
+Door* TileMap::GetDoor(const char* Name)
+{
+	if (!Name) {
+		return NULL;
+	}
+	for (size_t i = 0; i < doors.size(); i++) {
+		Door* door = doors[i];
+		if (stricmp( door->GetScriptName(), Name ) == 0)
+			return door;
+	}
+	return NULL;
+}
+
+//overlays
 void TileMap::AddOverlay(TileOverlay* overlay)
 {
 	if (overlay->w > XCellCount) {
@@ -59,22 +145,6 @@ void TileMap::AddOverlay(TileOverlay* overlay)
 		YCellCount = overlay->h;
 	}
 	overlays.push_back( overlay );
-}
-
-Door* TileMap::AddDoor(const char *ID, const char* Name, unsigned int Flags,
-	int ClosedIndex, unsigned short* indexes, int count,
-	Gem_Polygon* open, Gem_Polygon* closed)
-{
-	Door* door = new Door( overlays[0] );
-	door->Flags = Flags;
-	door->closedIndex = ClosedIndex;
-	door->SetTiles( indexes, count );
-	door->SetPolygon( false, open );
-	door->SetPolygon( true, closed );
-	door->SetName( ID );
-	door->SetScriptName( Name );
-	doors.push_back( door );
-	return doors.at( doors.size() - 1 );
 }
 
 void TileMap::DrawOverlay(unsigned int index, Region screen)
@@ -283,52 +353,7 @@ void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region v
 	}
 }
 
-Door* TileMap::GetDoor(unsigned int idx)
-{
-	if (idx >= doors.size()) {
-		return NULL;
-	}
-	return doors[idx];
-}
-
-Door* TileMap::GetDoor(Point &p)
-{
-	for (size_t i = 0; i < doors.size(); i++) {
-		Gem_Polygon *doorpoly;
-
-		Door* door = doors[i];
-		if (door->Flags&DOOR_OPEN)
-			doorpoly = door->closed;
-		else
-			doorpoly = door->open;
-
-		if (doorpoly->BBox.x > p.x)
-			continue;
-		if (doorpoly->BBox.y > p.y)
-			continue;
-		if (doorpoly->BBox.x + doorpoly->BBox.w < p.x)
-			continue;
-		if (doorpoly->BBox.y + doorpoly->BBox.h < p.y)
-			continue;
-		if (doorpoly->PointIn( p ))
-			return door;
-	}
-	return NULL;
-}
-
-Door* TileMap::GetDoor(const char* Name)
-{
-	if (!Name) {
-		return NULL;
-	}
-	for (size_t i = 0; i < doors.size(); i++) {
-		Door* door = doors[i];
-		if (stricmp( door->GetScriptName(), Name ) == 0)
-			return door;
-	}
-	return NULL;
-}
-
+//containers
 void TileMap::AddContainer(Container *c)
 {
 	containers.push_back(c);
@@ -420,7 +445,7 @@ InfoPoint* TileMap::AddInfoPoint(const char* Name, unsigned short Type,
 	ip->outline = outline;
 	ip->Active = true;
 	infoPoints.push_back( ip );
-	return infoPoints.at( infoPoints.size() - 1 );
+	return ip;
 }
 InfoPoint* TileMap::GetInfoPoint(Point &p)
 {

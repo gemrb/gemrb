@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.80 2005/07/11 17:53:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.81 2005/07/14 21:51:34 avenger_teambg Exp $
  *
  */
 
@@ -279,6 +279,26 @@ public:
 	void MoveTo(Point &Des);
 	void ClearPath();
 	void DrawTargetPoint();
+};
+
+//Tiled objects are not used (and maybe not even implemented correctly in IE)
+//they seem to be most closer to a door and probably obsoleted by it
+//are they scriptable?
+class GEM_EXPORT TileObject {
+public:
+	TileObject(void);
+	~TileObject(void);
+	void SetOpenTiles(unsigned short *indices, int count);
+	void SetClosedTiles(unsigned short *indices, int count);
+
+public:
+	char Name[33];
+	ieResRef Tileset; //or wed door ID?
+	ieDword Flags;
+	unsigned short* opentiles;
+	ieDword opencount;
+	unsigned short* closedtiles;
+	ieDword closedcount;
 };
 
 class GEM_EXPORT Door : public Highlightable {

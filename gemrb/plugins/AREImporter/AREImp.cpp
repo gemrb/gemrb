@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.124 2005/07/12 17:53:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.125 2005/07/14 21:51:33 avenger_teambg Exp $
  *
  */
 
@@ -155,7 +155,8 @@ bool AREImp::Open(DataStream* stream, bool autoFree)
 	str->ReadDword( &DoorsOffset );
 	str->ReadDword( &AnimCount );
 	str->ReadDword( &AnimOffset );
-	str->Seek( 8, GEM_CURRENT_POS ); //skipping some
+	str->ReadDword( &TileCount );
+	str->ReadDword( &TileOffset );
 	str->ReadDword( &SongHeader );
 	str->ReadDword( &RestHeader );
 	if (core->HasFeature(GF_AUTOMAP_INI) ) {
@@ -740,13 +741,16 @@ Map* AREImp::GetMap(const char *ResRef)
 			str->ReadWord( &anim->sequence );
 			str->ReadWord( &anim->frame );
 			str->ReadDword( &anim->Flags );
-			ieWord unused2;
-			ieDword unused;
-			str->ReadWord( &unused2 );
+			str->ReadWord( &anim->unknown38 );  //not completely understood, seems like a percentage or speed value
 			str->ReadWord( &anim->transparency );
-			str->ReadDword( &unused );
+			str->ReadWord( &anim->unknown3c ); //not completely understood, if not 0, sequence is started
+			str->Read( &anim->startchance,1 );
+			if (anim->startchance<=0) {
+				anim->startchance=100;      //percentage of starting a cycle
+			}
+			str->Read( &anim->skipcycle,1 ); //how many cycles are skipped	(100% skippage)	
 			str->ReadResRef( anim->Palette );
-			str->ReadDword( &unused );
+			str->ReadDword( &anim->unknown48 );
 			AnimationFactory* af = ( AnimationFactory* )
 			core->GetResourceMgr()->GetFactoryResource( anim->BAM, IE_BAM_CLASS_ID );
 			if (!af) {
@@ -910,6 +914,30 @@ Map* AREImp::GetMap(const char *ResRef)
 		map->AddMapNote( point, color, text );
 	}
 
+	printf( "Loading tiles\n" );
+	//Loading Tiled objects (if any)
+	str->Seek( TileOffset, GEM_STREAM_START );
+	for (i = 0; i < TileCount; i++) {
+		char Name[33];
+		ieResRef ID;
+		ieDword Flags;
+		ieDword OpenIndex, OpenCount;
+		ieDword ClosedIndex, ClosedCount;
+		str->Read( Name, 32 );
+		Name[32] = 0;
+		str->ReadResRef( ID );
+		str->ReadDword( &Flags );
+		str->ReadDword( &OpenIndex );
+		str->ReadDword( &OpenCount );
+		str->ReadDword( &ClosedIndex );
+		str->ReadDword( &ClosedCount );
+		str->Seek( 48, GEM_CURRENT_POS );
+		//absolutely no idea where these 'tile indices' are stored
+		//are they tileset tiles or impeded block tiles
+		map->TMap->AddTile( ID, Name, Flags, NULL,0, NULL, 0 );
+	}
+
+
 	printf( "Loading explored bitmap\n" );
 	i = map->GetExploredMapSize();
 	if (ExploredBitmapSize==i) {
@@ -1036,7 +1064,7 @@ int AREImp::GetStoredFileSize(Map *map)
 	headersize += AnimCount * 0x4c;
 	TileOffset = headersize;
 
-	TileCount = 0;
+	TileCount = (ieDword) map->TMap->GetTileCount();
 	headersize += TileCount * 0x6c;
 	ExploredBitmapOffset = headersize;
 
@@ -1513,7 +1541,6 @@ int AREImp::PutActors( DataStream *stream, Map *map)
 
 int AREImp::PutAnimations( DataStream *stream, Map *map)
 {
-	ieDword tmpDword = 0;
 	ieWord tmpWord;
 
 	for (unsigned int i=0;i<AnimCount;i++) {
@@ -1529,10 +1556,13 @@ int AREImp::PutAnimations( DataStream *stream, Map *map)
 		stream->WriteWord( &an->sequence);
 		stream->WriteWord( &an->frame);
 		stream->WriteDword( &an->Flags);
-		stream->WriteDword( &tmpDword);
-		stream->WriteDword( &tmpDword);
+		stream->WriteWord( &an->unknown38);// speed or percentage
+		stream->WriteWord( &an->transparency);
+		stream->WriteWord( &an->unknown3c); //animation already played?
+		stream->Write( &an->startchance,1);
+		stream->Write( &an->skipcycle,1);
 		stream->WriteResRef( an->Palette);
-		stream->WriteDword( &tmpDword);
+		stream->WriteDword( &an->unknown48);//seems utterly unused
 	}
 	return 0;
 }
@@ -1673,8 +1703,25 @@ int AREImp::PutExplored( DataStream *stream, Map *map)
 	return 0;
 }
 
-int AREImp::PutTiles( DataStream * /*stream*/, Map * /*map*/)
+int AREImp::PutTiles( DataStream * stream, Map * map)
 {
+	char filling[48];
+	ieDword tmpDword = 0;
+
+	memset(filling,0,sizeof(filling) );
+	for (unsigned int i=0;i<TileCount;i++) {
+		TileObject *am = map->TMap->GetTile(i);
+		stream->Write( am->Name, 32 );
+		stream->WriteResRef( am->Tileset );
+		stream->WriteDword( &am->Flags);
+		stream->WriteDword( &am->opencount);
+		//can't write tiles, otherwise now we should write a tile index
+		stream->WriteDword( &tmpDword);
+		stream->WriteDword( &am->closedcount);
+		//can't write tiles otherwise now we should write a tile index
+		stream->WriteDword( &tmpDword);
+		stream->Write( filling, 48);
+	}
 	return 0;
 }
 

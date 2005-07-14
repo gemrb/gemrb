@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.99 2005/06/28 18:15:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.100 2005/07/14 21:51:34 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -511,20 +511,20 @@ void Moveble::MoveTo(Point &Des)
 
 void Moveble::ClearPath()
 {
-	if (StanceID==IE_ANI_WALK) {
+	if (StanceID==IE_ANI_WALK || StanceID==IE_ANI_RUN) {
 		StanceID = IE_ANI_AWAKE;
 	}
+	InternalFlags&=~IF_NORECTICLE;
 	if (!path) {
 		return;
 	}
-	InternalFlags&=~IF_NORECTICLE;
 	PathNode* nextNode = path->Next;
 	PathNode* thisNode = path;
 	while (true) {
 		delete( thisNode );
-		thisNode = nextNode;
-		if (!thisNode)
+		if (!nextNode)
 			break;
+		thisNode = nextNode;
 		nextNode = thisNode->Next;
 	}
 	path = NULL;
@@ -550,6 +550,47 @@ void Moveble::DrawTargetPoint()
 		Destination.y - vp.y, (unsigned short) (size * 10 - step),
 		(unsigned short) ( size * 15 / 2 - step), selectedColor );
 
+}
+
+/**********************
+ * Tiled Object Class *
+ **********************/
+
+TileObject::TileObject()
+{
+	opentiles=NULL;
+	opencount=0;
+	closedtiles=NULL;
+	closedcount=0;
+	Flags = 0;
+}
+
+TileObject::~TileObject()
+{
+	if (opentiles) {
+		free( opentiles );
+	}
+	if (closedtiles) {
+		free( closedtiles );
+	}
+}
+
+void TileObject::SetOpenTiles(unsigned short* Tiles, int cnt)
+{
+	if (opentiles) {
+		free( opentiles );
+	}
+	opentiles = Tiles;
+	opencount = cnt;
+}
+
+void TileObject::SetClosedTiles(unsigned short* Tiles, int cnt)
+{
+	if (closedtiles) {
+		free( closedtiles );
+	}
+	closedtiles = Tiles;
+	closedcount = cnt;
 }
 
 /**************
@@ -667,13 +708,13 @@ void Door::SetName(const char* name)
 	strnuprcpy( ID, name, 8 );
 }
 
-void Door::SetTiles(unsigned short* Tiles, int count)
+void Door::SetTiles(unsigned short* Tiles, int cnt)
 {
 	if (tiles) {
 		free( tiles );
 	}
 	tiles = Tiles;
-	this->count = count;
+	count = cnt;
 }
 
 void Door::SetDoorLocked(bool Locked, bool playsound)

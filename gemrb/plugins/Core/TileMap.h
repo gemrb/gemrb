@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.36 2005/06/28 18:16:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.37 2005/07/14 21:51:34 avenger_teambg Exp $
  *
  */
 
@@ -47,13 +47,14 @@ private:
 	std::vector< Door*> doors;
 	std::vector< Container*> containers;
 	std::vector< InfoPoint*> infoPoints;
+	std::vector< TileObject*> tiles;
 	bool LargeMap;
 public:
 	TileMap(void);
 	~TileMap(void);
 
 	Door* AddDoor(const char* ID, const char* Name, unsigned int Flags,
-		int ClosedIndex, unsigned short* indexes, int count,
+		int ClosedIndex, unsigned short* indices, int count,
 		Gem_Polygon* open, Gem_Polygon* closed);
 	Door* GetDoor(Point &position);
 	Door* GetDoor(unsigned int idx);
@@ -75,6 +76,12 @@ public:
 	InfoPoint* GetInfoPoint(const char* Name);
 	InfoPoint* GetInfoPoint(unsigned int idx);
 	unsigned int GetInfoPointCount() { return infoPoints.size(); }
+
+	TileObject* AddTile(const char* ID, const char* Name, unsigned int Flags, 
+		unsigned short* openindices, int opencount,unsigned short* closeindices, int closecount);
+	TileObject* GetTile(unsigned int idx);
+	TileObject* GetTile(const char* Name);
+	unsigned int GetTileCount() { return tiles.size(); }
 
 	void AddOverlay(TileOverlay* overlay);
 	void DrawOverlay(unsigned int index, Region screen);
