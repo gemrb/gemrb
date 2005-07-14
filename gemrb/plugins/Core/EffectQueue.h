@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.5 2005/07/08 14:03:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.6 2005/07/14 22:09:19 avenger_teambg Exp $
  *
  */
 
@@ -54,7 +54,7 @@ public:
 	void dump();
 };
 
-typedef int (* EffectFunction)(Actor*, Effect*);
+typedef int (* EffectFunction)(Actor*, Actor*, Effect*);
 
 
 struct EffectLink {
