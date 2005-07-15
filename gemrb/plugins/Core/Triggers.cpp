@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.13 2005/07/10 12:01:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.14 2005/07/15 22:40:06 avenger_teambg Exp $
  *
  */
 
@@ -2786,4 +2786,18 @@ int GameScript::IsWeather( Scriptable* /*Sender*/, Trigger* parameters)
 		return 1;
 	}
 	return 0;
+}
+
+int GameScript::Delay( Scriptable* /*Sender*/, Trigger* parameters)
+{
+	unsigned long thisTime;
+	unsigned long delay = parameters->int0Parameter;
+	if (delay<=1) {
+		return 1;
+	}
+	GetTime( thisTime );
+	if ( (thisTime/1000)%delay) {
+		return 0;
+	}
+	return 1;
 }

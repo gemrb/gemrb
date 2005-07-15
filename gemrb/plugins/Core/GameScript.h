@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.208 2005/07/11 17:53:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.209 2005/07/15 22:40:06 avenger_teambg Exp $
  *
  */
 
@@ -730,6 +730,7 @@ public: //Script Functions
 	static int DamageTakenGT(Scriptable* Sender, Trigger* parameters);
 	static int DamageTakenLT(Scriptable* Sender, Trigger* parameters);
 	static int Dead(Scriptable* Sender, Trigger* parameters);
+	static int Delay(Scriptable* Sender, Trigger* parameters);
 	static int Die(Scriptable* Sender, Trigger* parameters);
 	static int Difficulty(Scriptable* Sender, Trigger* parameters);
 	static int DifficultyGT(Scriptable* Sender, Trigger* parameters);
