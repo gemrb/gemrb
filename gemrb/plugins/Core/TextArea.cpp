@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.74 2005/06/05 12:12:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.75 2005/07/16 23:27:11 avenger_teambg Exp $
  *
  */
 
@@ -156,7 +156,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 				pal = palette;
 			ftext->Print( Region( x + XPos, y + YPos +
 				( yl * ftext->size[1].h ), Width,
-				Height - 5 - ( yl * ftext->size[1].h) ),
+				Height - 5 - ( yl * ftext->maxHeight) ),
 				( unsigned char * ) lines[i], pal, IE_FONT_ALIGN_LEFT, true );
 			yl += lrows[i];
 		}
@@ -339,6 +339,11 @@ int TextArea::GetRowCount()
 	return ( int ) lines.size();
 }
 
+int TextArea::GetVisibleRowCount()
+{
+	return (Height-5) / ftext->maxHeight;
+}
+
 /** Returns top index */
 int TextArea::GetTopIndex()
 {
@@ -400,7 +405,7 @@ void TextArea::CalcRowCount()
 /** Mouse Over Event */
 void TextArea::OnMouseOver(unsigned short /*x*/, unsigned short y)
 {
-	int height = ftext->size[1].h;
+	int height = ftext->maxHeight; //size[1].h;
 	int r = y / height;
 	int row = 0;
 
@@ -488,4 +493,19 @@ bool TextArea::SetEvent(int eventType, EventHandler handler)
 	}
 
 	return true;
+}
+
+void TextArea::PadMinRow()
+{
+	int rows = 0;
+	int i=lines.size()-1;
+	while(i>=minrow-1 && i>=0) {
+		rows+=lrows[i];
+		i--;
+	}
+	rows = GetVisibleRowCount()-rows;
+	while(rows>0) {
+		AppendText("",-1);
+		rows--;
+	}
 }

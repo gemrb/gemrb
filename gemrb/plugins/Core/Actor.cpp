@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.116 2005/07/16 21:03:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.117 2005/07/16 23:27:11 avenger_teambg Exp $
  *
  */
 
@@ -637,6 +637,7 @@ void Actor::Die(Scriptable *killer)
 	}
 	//Can't simply set Selected to false, game has its own little list
 	core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
+	ClearPath();
 	InternalFlags|=IF_JUSTDIED;
 	if (!InParty) {
 		Actor *act=NULL;

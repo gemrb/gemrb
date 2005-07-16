@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.23 2005/04/10 19:11:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.24 2005/07/16 23:27:12 avenger_teambg Exp $
  *
  */
 
@@ -62,10 +62,19 @@ public:
 	int AppendText(const char* text, int pos = 0);
 	/** Deletes last `count' lines */ 
 	void PopLines(unsigned int count);
+	/** Deletes last lines up to current 'minrow' */
+	void PopMinRow()
+	{
+        	PopLines(lines.size()-minrow);
+	}
+	/** adds empty lines so minrow will be the uppermost visible row */
+	void PadMinRow();
 	/** Sets the Fonts */
 	void SetFonts(Font* init, Font* text);
 	/** Returns Number of Rows */
 	int GetRowCount();
+	/** Returns Number of Visible Rows */
+	int GetVisibleRowCount();
 	/** Returns Starting Row */
 	int GetTopIndex();
 	/** Set Starting Row */

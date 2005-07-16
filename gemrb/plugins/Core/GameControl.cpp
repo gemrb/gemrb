@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.244 2005/07/16 21:03:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.245 2005/07/16 23:27:11 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1459,7 +1459,7 @@ void GameControl::DialogChoose(unsigned int choose)
 //			JournalChanged = true;
 		}
 
-		ta->PopLines( ds->transitionsCount + 1 );
+		ta->PopMinRow();
 		if (tr->textStrRef != 0xffffffff) {
 			core->DisplayStringName( tr->textStrRef, 0x8080FF, speaker);
 		}
@@ -1468,7 +1468,7 @@ void GameControl::DialogChoose(unsigned int choose)
 			for (unsigned int i = 0; i < tr->action->count; i++) {
 				Action* action = GenerateAction( tr->action->strings[i], true );
 				if (action) {
-						target->AddAction( action );
+					target->AddAction( action );
 				} else {
 					snprintf(Tmp, sizeof(Tmp),
 						"Can't compile action: %s\n",
@@ -1552,7 +1552,8 @@ void GameControl::DialogChoose(unsigned int choose)
 		DialogueFlags |= DF_OPENENDWINDOW;
 	}
 end_of_choose:
-	ta->AppendText( "", -1 );
+	//padding the rows so our text will be at the top
+	ta->PadMinRow();
 	// is this correct?
 	if (DialogueFlags & DF_FREEZE_SCRIPTS) {
 		target->ProcessActions();
