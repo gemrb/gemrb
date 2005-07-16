@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.100 2005/07/14 21:51:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.101 2005/07/16 21:03:46 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -39,8 +39,8 @@ Scriptable::Scriptable(ScriptableType type)
 	textDisplaying = 0;
 	timeStartDisplaying = 0;
 	scriptName[0] = 0;
-	LastTrigger = NULL;
-	LastEntered = NULL;
+	LastTrigger = 0;
+	LastEntered = 0;
 	Active = SCR_ACTIVE;
 	CurrentAction = NULL;
 	startTime = 0;
@@ -260,14 +260,12 @@ void Scriptable::InitTriggers()
 void Scriptable::ClearTriggers()
 {
 	for (TriggerObjects::iterator m = tolist.begin(); m != tolist.end (); m++) {
-		// clearing the trigger object
-		// typecast is to ensure that i'm sane :)
-		*(*m) = (Actor *) NULL;
+		*(*m) = 0;
 	}
 
 }
 
-void Scriptable::AddTrigger(Actor **actorref)
+void Scriptable::AddTrigger(ieDword *actorref)
 {
 	tolist.push_back(actorref);
 }
@@ -479,11 +477,11 @@ void Moveble::AddWayPoint(Point &Des)
 	endNode->Next=path2;
 }
 
-void Moveble::WalkTo(Point &Des)
+void Moveble::WalkTo(Point &Des, int distance)
 {
 	Destination = Des;
 	ClearPath();
-	path = area->FindPath( Pos, Destination );
+	path = area->FindPath( Pos, Destination, distance );
 }
 
 void Moveble::RunAwayFrom(Point &Des, int PathLength, int flags)
@@ -897,8 +895,7 @@ void InfoPoint::Entered(Actor *actor)
 	if (actor->InParty || (Flags&TRAP_NPC) ) {
 		//skill?
 		if (TriggerTrap(0) ) {
-			LastEntered = actor;
-			LastTrigger = actor;
+			LastTrigger = LastEntered = actor->GetID();
 		}
 	}
 }

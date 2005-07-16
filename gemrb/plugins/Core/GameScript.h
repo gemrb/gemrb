@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.209 2005/07/15 22:40:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.210 2005/07/16 21:03:46 avenger_teambg Exp $
  *
  */
 
@@ -649,7 +649,7 @@ private: //Internal Functions
 	static void ParseString(const char*& src, char* tmp);
 private:
 	/* returns true if actor matches the object specs. */
-	static bool MatchActor(Scriptable *Sender, Actor* actor, Object* oC);
+	static bool MatchActor(Scriptable *Sender, ieDword ID, Object* oC);
 	/* returns the number of actors matching the IDS targeting */
 	static int GetObjectCount(Scriptable* Sender, Object* oC);
 	
@@ -1114,6 +1114,7 @@ public:
 	static void MoveToPointNoInterrupt(Scriptable* Sender, Action* parameters);
 	static void MoveToPointNoRecticle(Scriptable* Sender, Action* parameters);
 	static void MoveToObject(Scriptable* Sender, Action* parameters);
+	static void MoveToObjectFollow(Scriptable* Sender, Action* parameters);
 	static void MoveToObjectNoInterrupt(Scriptable* Sender, Action* parameters);
 	static void MoveToOffset(Scriptable* Sender, Action* parameters);
 	static void MoveToSavedLocation(Scriptable* Sender, Action* parameters);

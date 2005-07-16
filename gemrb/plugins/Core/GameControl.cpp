@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.243 2005/07/10 16:58:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.244 2005/07/16 21:03:46 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -795,7 +795,8 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 	actor->ClearPath();
 	actor->ClearActions();
 	strncpy(Tmp,"UseContainer()",sizeof(Tmp) );
-	target=container; //this is another hack, even more deadly
+	//target=container; //this is another hack, even more deadly
+	core->SetCurrentContainer( actor, container);
 	actor->AddAction( GenerateAction( Tmp, true ) );
 }
 
@@ -831,7 +832,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor)
 			//reset trap and deactivated flags
 			if (trap->Scripts[0]) {
 				if (!(trap->Flags&TRAP_DEACTIVATED) ) {
-					trap->LastTrigger = actor;
+					trap->LastTrigger = actor->GetID();
 					trap->Scripts[0]->Update();
 					//if reset trap flag not set, deactivate it
 					//hmm, better not, info triggers don't deactivate themselves on click
@@ -1323,9 +1324,9 @@ void GameControl::ResizeAdd(Window* win, unsigned char type)
 	}
 }
 
-void GameControl::InitDialog(Actor* speaker, Scriptable* target, const char* dlgref)
+void GameControl::InitDialog(Actor* spk, Actor* tgt, const char* dlgref)
 {
-	if ((target->Type == ST_ACTOR) && (((Actor *) target)->InternalFlags&IF_NOINT) ) {
+	if (tgt->InternalFlags&IF_NOINT) {
 		core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
 		return;
 	}
@@ -1346,16 +1347,14 @@ void GameControl::InitDialog(Actor* speaker, Scriptable* target, const char* dlg
 	//target is here because it could be changed when a dialog runs onto
 	//and external link, we need to find the new target (whose dialog was
 	//linked to)
-	this->target = target;
-	if (target->Type == ST_ACTOR) {
-		speaker->LastTalkedTo=(Actor *) target;
-		((Actor *) target)->LastTalkedTo=speaker;
-	}
+	target = tgt;
+	spk->LastTalkedTo=target->GetID();
+	target->LastTalkedTo=spk->GetID();
 	if (DialogueFlags&DF_IN_DIALOG) {
 		return;
 	}
 	UnhideGUI();
-	this->speaker = speaker;
+	speaker = spk;
 	ScreenFlags |= SF_GUIENABLED|SF_DISABLEMOUSE|SF_CENTERONACTOR|SF_LOCKSCROLL;
 	DialogueFlags |= DF_IN_DIALOG;
 	//allow mouse selection from dialog (even though screen is locked)

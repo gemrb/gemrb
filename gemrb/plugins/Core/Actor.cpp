@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.115 2005/07/14 19:48:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.116 2005/07/16 21:03:46 avenger_teambg Exp $
  *
  */
 
@@ -139,16 +139,17 @@ Actor::Actor()
 	LongStrRef = (ieStrRef) -1;
 	ShortStrRef = (ieStrRef) -1;
 
-	LastTarget = NULL;
-	LastTalkedTo = NULL;
-	LastAttacker = NULL;
-	LastHitter = NULL;
-	LastProtected = NULL;
-	LastCommander = NULL;
-	LastHelp = NULL;
-	LastSeen = NULL;
-	LastHeard = NULL;
-	LastSummoner = NULL;
+	Leader = 0;
+	LastTarget = 0;
+	LastTalkedTo = 0;
+	LastAttacker = 0;
+	LastHitter = 0;
+	LastProtected = 0;
+	LastCommander = 0;
+	LastHelp = 0;
+	LastSeen = 0;
+	LastHeard = 0;
+	LastSummoner = 0;
 	PCStats = NULL;
 	LastCommand = 0; //used by order
 	LastShout = 0; //used by heard
@@ -170,8 +171,10 @@ Actor::Actor()
 	for(i=0;i<7;i++) {
 		BaseStats[IE_HATEDRACE2+i]=0xff;
 	}	
-	//this one doesn't seem to get saved
+	//this one is saved only for PC's
 	ModalState = 0;
+	//this one is saved, but not loaded?
+	localID = globalID = 0;
 }
 
 Actor::~Actor(void)
@@ -508,7 +511,7 @@ int Actor::Damage(int damage, int damagetype, Actor *hitter)
 	}
 	LastDamageType=damagetype;
 	LastDamage=damage;
-	LastHitter=hitter;
+	LastHitter=hitter->GetID();
 	Active|=SCR_ACTIVE;
 	return damage;
 }
@@ -552,6 +555,13 @@ void Actor::DebugDump()
 	inventory.dump();
 	spellbook.dump();
 	fxqueue.dump();
+}
+
+void Actor::SetMap(Map *map, ieWord LID, ieWord GID)
+{
+	Scriptable::SetMap(map);
+	localID = LID;
+	globalID = GID;
 }
 
 void Actor::SetPosition(Map *map, Point &position, int jump, int radius)
@@ -865,7 +875,7 @@ int Actor::GetAttackStyle()
 void Actor::SetTarget( Scriptable *target)
 {
 	if (target->Type==ST_ACTOR) {
-		LastTarget = (Actor *) target;
+		LastTarget = ((Actor *) target)->GetID();
 	}
 	//calculate attack style
 	//set stance correctly based on attack style
@@ -907,5 +917,12 @@ void Actor::SetColor( ieDword idx, ieDword grd)
 	}
 
 	anims->SetColors(Modified+IE_COLORS);
+}
+
+void Actor::SetLeader(Actor *actor, int xoffset, int yoffset)
+{
+	Leader = actor->GetID();
+	XF = xoffset;
+	YF = yoffset;
 }
 

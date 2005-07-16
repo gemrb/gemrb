@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.332 2005/07/06 23:37:34 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.333 2005/07/16 21:03:46 avenger_teambg Exp $
  *
  */
 
@@ -90,6 +90,7 @@ Interface::Interface(int iargc, char** iargv)
 	worldmap = NULL;
 	CurrentStore = NULL;
 	CurrentContainer = NULL;
+	UseContainer = false;
 	timer = NULL;
 	evntmgr = NULL;
 	console = NULL;
@@ -2005,7 +2006,7 @@ void Interface::DrawWindows(void)
 		}
 
 		//handling container
-		if (CurrentContainer) {
+		if (CurrentContainer && UseContainer) {
 			if (!(flg & DF_IN_CONTAINER) ) {
 				gc->SetDialogueFlags(DF_IN_CONTAINER, BM_OR);
 				guiscript->RunFunction( "OpenContainerWindow" );
@@ -3241,6 +3242,7 @@ Container *Interface::GetCurrentContainer()
 
 int Interface::CloseCurrentContainer()
 {
+	UseContainer = false;
 	if ( !CurrentContainer) {
 		return -1;
 	}
@@ -3250,7 +3252,7 @@ int Interface::CloseCurrentContainer()
 	return 0;
 }
 
-void Interface::SetCurrentContainer(Actor *actor, Container *arg)
+void Interface::SetCurrentContainer(Actor *actor, Container *arg, bool flag)
 {
 	//abort action if the first selected PC isn't the original actor
 	if (actor!=GetFirstSelectedPC()) {
@@ -3258,6 +3260,7 @@ void Interface::SetCurrentContainer(Actor *actor, Container *arg)
 		return;
 	}
 	CurrentContainer = arg;
+	UseContainer = flag;
 }
 
 Store *Interface::GetCurrentStore()

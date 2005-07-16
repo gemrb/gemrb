@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.21 2005/07/11 17:53:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.22 2005/07/16 21:03:45 avenger_teambg Exp $
  *
  */
 
@@ -837,6 +837,26 @@ void GameScript::MoveToObject(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	actor->WalkTo( target->Pos );
+}
+
+void GameScript::MoveToObjectFollow(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!target) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	//follow leader from a distance of 5
+	//could also follow the leader with a point offset
+	if (target->Type==ST_ACTOR) {
+		actor->SetLeader( (Actor *) target, 5);
+	}
+	actor->WalkTo( target->Pos, 5 );
 }
 
 void GameScript::StorePartyLocation(Scriptable* /*Sender*/, Action* /*parameters*/)
@@ -1918,7 +1938,7 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 	/* i'm not sure this is required here at all */
 	SetBeenInPartyFlags(Sender, parameters);
 	Actor* act = ( Actor* ) Sender;
-	act->SetStat( IE_EA, EA_PC );
+	act->SetBase( IE_EA, EA_PC );
 	if (core->HasFeature( GF_HAS_DPLAYER )) {
 		act->SetScript( "DPLAYER2", SCR_DEFAULT );
 	}
@@ -3393,7 +3413,7 @@ void GameScript::Shout( Scriptable* Sender, Action* parameters)
 	}
 	Map *map=Sender->GetCurrentArea();
 	//max. shouting distance
-	map->Shout(Sender, parameters->int0Parameter, 40);
+	map->Shout(actor, parameters->int0Parameter, 40);
 }
 
 void GameScript::GlobalShout( Scriptable* Sender, Action* parameters)
@@ -3408,7 +3428,7 @@ void GameScript::GlobalShout( Scriptable* Sender, Action* parameters)
 	}
 	Map *map=Sender->GetCurrentArea();
 	// 0 means unlimited shout distance
-	map->Shout(Sender, parameters->int0Parameter, 0);
+	map->Shout(actor, parameters->int0Parameter, 0);
 }
 
 void GameScript::Help( Scriptable* Sender, Action* /*parameters*/)
@@ -3417,7 +3437,7 @@ void GameScript::Help( Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Map *map=Sender->GetCurrentArea();
-	map->Shout(Sender, 0, 40);
+	map->Shout((Actor *) Sender, 0, 40);
 }
 
 void GameScript::AddMapnote( Scriptable* Sender, Action* parameters)
@@ -3576,7 +3596,7 @@ void GameScript::MarkObject(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
-	actor->LastSeen = (Actor *) tar;
+	actor->LastSeen = ((Actor *) tar)->GetID();
 }
 
 void GameScript::SetDialogueRange(Scriptable* Sender, Action* parameters)
@@ -3644,17 +3664,12 @@ void GameScript::RandomFly(Scriptable* Sender, Action* parameters)
 //UseContainer uses the predefined target (like Nidspecial1 dialog hack)
 void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 {
-	GameControl* gc = core->GetGameControl();
-	if (!gc || !gc->target || (gc->target->Type!=ST_CONTAINER) ) {
-		Sender->CurrentAction = NULL;
-		return;
-	}
-	Container *container = (Container *) gc->target;
 	if (Sender->Type != ST_ACTOR) {
 		Sender->CurrentAction = NULL;
 		return;
 	}
-	double distance = Distance(Sender, gc->target);
+	Container *container = core->GetCurrentContainer();
+	double distance = Distance(Sender, container);
 	double needed = MAX_OPERATING_DISTANCE;
 	if (container->Type==IE_CONTAINER_PILE) {
 		needed = 15; // less than a search square (width)
@@ -3669,11 +3684,11 @@ void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 			Sender->CurrentAction = NULL;
 			return;
 		}
-		core->SetCurrentContainer((Actor *) Sender, container);
+		core->SetCurrentContainer((Actor *) Sender, container, true);
 		Sender->CurrentAction = NULL;
 		return;
 	}
-	GoNearAndRetry(Sender, gc->target, false);
+	GoNearAndRetry(Sender, container, false);
 	Sender->CurrentAction = NULL;
 }
 

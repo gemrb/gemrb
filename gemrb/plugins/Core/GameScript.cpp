@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.311 2005/07/11 17:53:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.312 2005/07/16 21:03:46 avenger_teambg Exp $
  *
  */
 
@@ -500,6 +500,7 @@ static ActionLink actionnames[] = {
 	{"transferinventory", GameScript::MoveInventory, 0}, 
 	{"movetocenterofscreen", GameScript::MoveToCenterOfScreen,AF_BLOCKING},
 	{"movetoobject", GameScript::MoveToObject,AF_BLOCKING},
+	{"movetoobjectfollow", GameScript::MoveToObjectFollow,AF_BLOCKING},
 	{"movetoobjectnointerrupt", GameScript::MoveToObjectNoInterrupt,AF_BLOCKING},
 	{"movetooffset", GameScript::MoveToOffset,AF_BLOCKING},
 	{"movetopoint", GameScript::MoveToPoint,AF_BLOCKING},
@@ -1476,9 +1477,9 @@ Targets *GameScript::Gabber(Scriptable* /*Sender*/, Targets *parameters)
 Targets *GameScript::LastTrigger(Scriptable *Sender, Targets *parameters)
 {
 	parameters->Clear();
-	Scriptable *lt = Sender->LastTrigger;
-	if (lt && lt->Type == ST_ACTOR) {
- 		parameters->AddTarget((Actor *) lt, 0);
+	if (Sender->LastTrigger) {
+		Actor *target = Sender->GetCurrentArea()->GetActorByGlobalID(Sender->LastTrigger);
+ 		parameters->AddTarget(target, 0);
 	}
 	return parameters;
 }
@@ -1493,7 +1494,10 @@ Targets *GameScript::LastSeenBy(Scriptable *Sender, Targets *parameters)
 	}
 	parameters->Clear();
 	if (actor) {
-		parameters->AddTarget(actor->LastSeen, 0);
+		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastSeen);
+		if (target) {
+			parameters->AddTarget(target, 0);
+		}
 	}
 	return parameters;
 }
@@ -1508,7 +1512,10 @@ Targets *GameScript::LastHelp(Scriptable *Sender, Targets *parameters)
 	}
 	parameters->Clear();
 	if (actor) {
-		parameters->AddTarget(actor->LastHelp, 0);
+		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastHelp);
+		if (target) {
+			parameters->AddTarget(target, 0);
+		}
 	}
 	return parameters;
 }
@@ -1523,7 +1530,10 @@ Targets *GameScript::LastHeardBy(Scriptable *Sender, Targets *parameters)
 	}
 	parameters->Clear();
 	if (actor) {
-		parameters->AddTarget(actor->LastHeard, 0);
+		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastHeard);
+		if (target) {
+			parameters->AddTarget(target, 0);
+		}
 	}
 	return parameters;
 }
@@ -1539,7 +1549,10 @@ Targets *GameScript::ProtectorOf(Scriptable *Sender, Targets *parameters)
 	}
 	parameters->Clear();
 	if (actor) {
-		parameters->AddTarget(actor->LastProtected, 0);
+		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastProtected);
+		if (target) {
+			parameters->AddTarget(target, 0);
+		}
 	}
 	return parameters;
 }
@@ -1554,7 +1567,10 @@ Targets *GameScript::ProtectedBy(Scriptable *Sender, Targets *parameters)
 	}
 	parameters->Clear();
 	if (actor) {
-		parameters->AddTarget(actor->LastProtected, 0);
+		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastProtected);
+		if (target) {
+			parameters->AddTarget(target, 0);
+		}
 	}
 	return parameters;
 }
@@ -1569,7 +1585,10 @@ Targets *GameScript::LastCommandedBy(Scriptable *Sender, Targets *parameters)
 	}
 	parameters->Clear();
 	if (actor) {
-		parameters->AddTarget(actor->LastCommander, 0);
+		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastCommander);
+		if (target) {
+			parameters->AddTarget(target, 0);
+		}
 	}
 	return parameters;
 }
@@ -1584,7 +1603,10 @@ Targets *GameScript::LastTargetedBy(Scriptable *Sender, Targets *parameters)
 	}
 	parameters->Clear();
 	if (actor) {
-		parameters->AddTarget(actor->LastTarget, 0);
+		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastTarget);
+		if (target) {
+			parameters->AddTarget(target, 0);
+		}
 	}
 	return parameters;
 }
@@ -1598,7 +1620,10 @@ Targets *GameScript::LastAttackerOf(Scriptable *Sender, Targets *parameters)
 	}
 	parameters->Clear();
 	if (actor) {
-		parameters->AddTarget(actor->LastAttacker, 0);
+		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastTarget);
+		if (target) {
+			parameters->AddTarget(target, 0);
+		}
 	}
 	return parameters;
 }
@@ -1613,7 +1638,10 @@ Targets *GameScript::LastHitter(Scriptable *Sender, Targets *parameters)
 	}
 	parameters->Clear();
 	if (actor) {
-		parameters->AddTarget(actor->LastHitter, 0);
+		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastHitter);
+		if (target) {
+			parameters->AddTarget(target, 0);
+		}
 	}
 	return parameters;
 }
@@ -1628,7 +1656,10 @@ Targets *GameScript::LastTalkedToBy(Scriptable *Sender, Targets *parameters)
 	}
 	parameters->Clear();
 	if (actor) {
-		parameters->AddTarget(actor->LastTalkedTo, 0);
+		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastTalkedTo);
+		if (target) {
+			parameters->AddTarget(target, 0);
+		}
 	}
 	return parameters;
 }
@@ -1643,7 +1674,10 @@ Targets *GameScript::LastSummonerOf(Scriptable* Sender, Targets *parameters)
 	}
 	parameters->Clear();
 	if (actor) {
-		parameters->AddTarget(actor->LastSummoner, 0);
+		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastSummoner);
+		if (target) {
+			parameters->AddTarget(target, 0);
+		}
 	}
 	return parameters;
 }

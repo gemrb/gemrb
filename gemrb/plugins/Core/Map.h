@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.85 2005/07/14 21:51:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.86 2005/07/16 21:03:47 avenger_teambg Exp $
  *
  */
 
@@ -170,6 +170,7 @@ public:
 	ieByte* VisibleBitmap;
 	int version;
 	ieResRef WEDResRef;
+	ieWord localActorCounter;
 private:
 	unsigned short* MapSet;
 	std::queue< unsigned int> InternalStack;
@@ -208,10 +209,11 @@ public:
 	AreaAnimation* GetAnimation(int i) { return animations[i]; }
 	int GetAnimationCount() const { return (int) animations.size(); }
 
-	void Shout(Scriptable* Sender, int shoutID, unsigned int radius);
+	void Shout(Actor* actor, int shoutID, unsigned int radius);
 	void AddActor(Actor* actor);
 	void AddWallGroup(WallGroup* wg);
 	int GetBlocked(Point &p);
+	Actor* GetActorByGlobalID(ieDword objectID);
 	Actor* GetActor(Point &p, int flags);
 	Actor* GetActor(const char* Name);
 	Actor* GetActor(int i, bool any);
@@ -266,7 +268,7 @@ public:
 	PathNode* GetLine(Point &start, int Steps, int Orientation, int flags);
 	PathNode* GetLine(Point &start, Point &dest, int flags);
 	/* Finds the path which leads to d */
-	PathNode* FindPath(Point &s, Point &d);
+	PathNode* FindPath(Point &s, Point &d, int MinDistance = 0);
 	/* returns false if point isn't visible on visibility/explored map */
 	bool IsVisible(Point &s, int explored);
 	/* returns false if point d cannot be seen from point d due to searchmap */

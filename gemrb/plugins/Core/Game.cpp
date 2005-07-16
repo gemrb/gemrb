@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.85 2005/06/28 20:08:13 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.86 2005/07/16 21:03:46 avenger_teambg Exp $
  *
  */
 
@@ -281,9 +281,7 @@ void Game::SetHotKey(unsigned long Key)
 		Actor *actor = PCs[i];
 
 		if (actor->IsSelected()) {
-// the hotkey is cleared by the standard trigger handling protocol 
-// we'll never use it as a pointer
-			actor->HotKey = (Actor *) Key;
+			actor->HotKey = (ieDword) Key;
 		}
 	}
 }

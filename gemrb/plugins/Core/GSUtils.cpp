@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.12 2005/07/10 12:01:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.13 2005/07/16 21:03:46 avenger_teambg Exp $
  *
  */
 
@@ -501,20 +501,6 @@ void GetPositionFromScriptable(Scriptable* scr, Point &position, bool dest)
 	}
 }
 
-static const char *GetDialog(Scriptable* scr)
-{
-	switch(scr->Type) {
-		case ST_CONTAINER: case ST_DOOR:
-		case ST_PROXIMITY: case ST_TRAVEL: case ST_TRIGGER:
-			return ((Highlightable *) scr)->GetDialog();
-		case ST_ACTOR:
-			return ((Actor *) scr)->GetDialog(true);
-		case ST_GLOBAL:case ST_AREA:
-			return NULL;
-	}
-	return NULL;
-}
-
 static ieResRef PlayerDialogRes = "PLAYERx\0";
 
 void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
@@ -536,7 +522,13 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		}
 		scr = Sender;
 	}
-	if (!tar) {
+	if (!scr || scr->Type != ST_ACTOR) {
+		printf("[GameScript]: Speaker for dialog couldn't be found (Sender: %s, Type: %d).\n", Sender->GetScriptName(), Sender->Type);
+		Sender->CurrentAction = NULL;
+		return;
+	}
+
+	if (!tar || tar->Type!=ST_ACTOR) {
 		printf("[GameScript]: Target for dialog couldn't be found (Sender: %s, Type: %d).\n", Sender->GetScriptName(), Sender->Type);
 		if (Sender->Type == ST_ACTOR) {
 			((Actor *) Sender)->DebugDump();
@@ -552,15 +544,13 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		return;
 	}
 
-	//target could be other than Actor, we need to handle this too!
-	//if (scr->Type != ST_ACTOR) {
-	//	Sender->CurrentAction = NULL;
-	//	return;
-	//}
+	Actor *speaker, *target;
+
+	speaker = (Actor *) scr;
+	target = (Actor *) tar;
 	//CHECKDIST works only for mobile scriptables
-	if ((Flags&BD_CHECKDIST) && (Sender->Type==ST_ACTOR) ) {
-		Actor *actor = (Actor *) Sender;
-		if (Distance(Sender, tar)>actor->GetStat(IE_DIALOGRANGE)*20 ) {
+	if (Flags&BD_CHECKDIST) {
+		if (Distance(speaker, target)>speaker->GetStat(IE_DIALOGRANGE)*20 ) {
 			GoNearAndRetry(Sender, tar, true); //this is unsure, the target's path will be cleared
 			Sender->CurrentAction = NULL;
 			return;
@@ -568,11 +558,8 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	}
 	//making sure speaker is the protagonist, player, actor
 	bool swap = false;
-	if (scr->Type != ST_ACTOR) swap = true;
-	else if (tar->Type == ST_ACTOR) {
-		if ( ((Actor *) tar)->InParty == 1) swap = true;
-		else if ( (((Actor *) scr)->InParty !=1) && ((Actor *) tar)->InParty) swap = true;
-	}
+	if ( target->InParty == 1) swap = true;
+	else if ( speaker->InParty !=1 && target->InParty) swap = true;
 
 	GameControl* gc = core->GetGameControl();
 	if (!gc) {
@@ -601,18 +588,13 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		case BD_STRING0:
 			Dialog = parameters->string0Parameter;
 			if (Flags & BD_SETDIALOG) {
-				if ( scr->Type == ST_ACTOR) {
-					Actor* actor = ( Actor* ) scr;
-					actor->SetDialog( Dialog );
-				}
+				speaker->SetDialog( Dialog );
 			}
 			break;
 		case BD_SOURCE:
-//			Dialog = GetDialog(scr); //actor->Dialog;
-//			break;
 		case BD_TARGET:
-			if (swap) Dialog = GetDialog(scr);
-			else Dialog = GetDialog(tar);//target->Dialog;
+			if (swap) Dialog = speaker->Dialog;
+			else Dialog = target->Dialog;
 			break;
 		case BD_RESERVED:
 			//what if playerdialog was initiated from Player2?
@@ -620,10 +602,10 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			Dialog = ( const char * ) PlayerDialogRes;
 			break;
 		case BD_INTERACT: //using the source for the dialog
-			if ( scr->Type == ST_ACTOR) {
-				pdtable = core->LoadTable( "interdia" );
-				const char* scriptingname = ((Actor *) scr)->GetScriptName();
-				//Dialog is a borrowed reference, we cannot free pdtable while it is being used
+			pdtable = core->LoadTable( "interdia" );
+			const char* scriptingname = ((Actor *) scr)->GetScriptName();
+			//Dialog is a borrowed reference, we cannot free pdtable while it is being used
+			if (pdtable!=-1) {
 				Dialog = core->GetTable( pdtable )->QueryField( scriptingname, "FILE" );
 			}
 			break;
@@ -638,11 +620,11 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	}
 
 	//we also need to freeze active scripts during a dialog!
-	if (scr!=tar) {
+	if (speaker!=target) {
 		if (swap) {
-			Scriptable *tmp = tar;
-			tar = scr;
-			scr = tmp;
+			Actor *tmp = target;
+			target = speaker;
+			speaker = tmp;
 		}
 		if (Sender!=tar) {
 			if (Flags & BD_INTERRUPT) {
@@ -657,14 +639,8 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		
 	}
 
-	if (scr->Type==ST_ACTOR) {
-		((Actor *)scr)->SetOrientation(GetOrient( tar->Pos, scr->Pos),1);
-		//scr->resetAction = true; //im not sure this is needed
-	}
-	if (tar->Type==ST_ACTOR) {
-		((Actor *)tar)->SetOrientation(GetOrient( scr->Pos, tar->Pos),1);
-		//tar->resetAction = true;//nor this
-	}
+	speaker->SetOrientation(GetOrient( target->Pos, speaker->Pos),1);
+	target->SetOrientation(GetOrient( speaker->Pos, target->Pos),1);
 
 	if (Dialog[0]) {
 		//increasing NumTimesTalkedTo or NumTimesInteracted
@@ -675,7 +651,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		}
 
 		core->GetDictionary()->SetAt("DialogChoose",(ieDword) -1);
-		gc->InitDialog( (Actor *) scr, tar, Dialog);
+		gc->InitDialog( speaker, target, Dialog);
 	}
 //if pdtable was allocated, free it now, it will release Dialog
 end_of_quest:
@@ -748,40 +724,19 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 	}
 }
 
-bool GameScript::MatchActor(Scriptable *Sender, Actor* actor, Object* oC)
+bool GameScript::MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
 {
-	if (!actor || !oC) {
+	if (!Sender || !oC) {
 		return false;
 	}
-	if (oC->objectName[0]) {
-		return (stricmp( actor->GetScriptName(), oC->objectName ) == 0);
-	}
-	Targets *tgts = new Targets();
-	for (int i = 0; i < MaxObjectNesting; i++) {
-		int filterid = oC->objectFilters[i];
-		if (!filterid) {
-			break;
-		}
-		ObjectFunction func = objects[filterid];
-		if (func) {
-			tgts = func( Sender, tgts);
-		}
-		else {
-			printMessage("GameScript", " ", LIGHT_RED);
-			printf("Unknown object filter: %d %s\n",filterid, objectsTable->GetValue(filterid) );
-		}
-		if (!tgts->Count()) {
-			delete tgts;
-			return false;
-		}
-	}
+	Targets *tgts = GetAllObjects(Sender, oC);
 	bool ret = false;
 
 	if (tgts) {
 		targetlist::iterator m;
 		targettype *tt = tgts->GetFirstTarget(m);
 		while (tt) {
-			if (tt->actor == actor) {
+			if (tt->actor->GetID() == actorID) {
 				ret = true;
 				break;
 			}

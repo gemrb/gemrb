@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.177 2005/07/10 12:01:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.178 2005/07/16 21:03:46 avenger_teambg Exp $
  *
  */
 
@@ -50,6 +50,7 @@ static Point **VisibilityMasks=NULL;
 static bool PathFinderInited = false;
 static Variables Spawns;
 int LargeFog;
+static ieWord globalActorCounter;
 
 #define STEP_TIME 150
 
@@ -231,20 +232,18 @@ Map::Map(void)
 		InitPathFinder();
 		InitSpawnGroups();
 		InitExplore();
+		globalActorCounter = 0;
 	}
 	ExploredBitmap = NULL;
 	VisibleBitmap = NULL;
 	version = 0;
+	localActorCounter = 0;
 }
 
 Map::~Map(void)
 {
 	unsigned int i;
-/*
-	if (vars) {
-		delete vars;
-	}
-*/
+
 	if (MapSet) {
 		free( MapSet );
 	}
@@ -394,8 +393,7 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 		actor->AddAction( GenerateAction( Tmp ) );
 	} else {
 		if (ip->Scripts[0]) {
-			ip->LastEntered = actor;
-			ip->LastTrigger = actor;
+			ip->LastTrigger = ip->LastEntered = actor->GetID();
 			ip->ExecuteScript( ip->Scripts[0] );
 			ip->ProcessActions();
 			//this isn't a continuously running script
@@ -770,7 +768,7 @@ void Map::UpdateEffects()
 	}
 }
 
-void Map::Shout(Scriptable* actor, int shoutID, unsigned int radius)
+void Map::Shout(Actor* actor, int shoutID, unsigned int radius)
 {
 	int i=actors.size();
 	while (i--) {
@@ -780,10 +778,10 @@ void Map::Shout(Scriptable* actor, int shoutID, unsigned int radius)
 			}
 		}
 		if (shoutID) {
-			actors[i]->LastHeard = (Actor *) actor;
+			actors[i]->LastHeard = actor->GetID();
 			actors[i]->LastShout = shoutID;
 		} else {
-			actors[i]->LastHelp = (Actor *) actor;
+			actors[i]->LastHelp = actor->GetID();
 		}
 	}
 }
@@ -792,7 +790,7 @@ void Map::AddActor(Actor* actor)
 {
 	//setting the current area for the actor as this one
 	strnuprcpy(actor->Area, scriptName, 8);
-	actor->SetMap(this);
+	actor->SetMap(this, localActorCounter++, globalActorCounter++);
 	actors.push_back( actor );
 }
 
@@ -804,6 +802,21 @@ void Map::DeleteActor(int i)
 	game->DelNPC( game->InStore(actor) );
 	actors.erase( actors.begin()+i );
 	delete (actor);
+}
+
+Actor* Map::GetActorByGlobalID(ieDword objectID)
+{
+	//truncation is intentional
+	ieWord globalID = (ieWord) objectID;
+	unsigned int i = actors.size();
+	while (i--) {
+		Actor* actor = actors[i];
+		
+		if (actor->globalID==globalID) {
+			return actor;
+		}
+	}
+	return NULL;
 }
 
 /** flags:
@@ -1457,7 +1470,7 @@ PathNode* Map::GetLine(Point &start, Point &dest, int Steps, int Orientation, in
 	return Return;
 }
 
-PathNode* Map::FindPath(Point &s, Point &d)
+PathNode* Map::FindPath(Point &s, Point &d, int MinDistance)
 {
 	Point start( s.x/16, s.y/12 );
 	Point goal ( d.x/16, d.y/12 );
@@ -1536,6 +1549,12 @@ PathNode* Map::FindPath(Point &s, Point &d)
 		StartNode->y = n.y;
 		StartNode->orient = GetOrient( n, p );
 		p = n;
+	}
+	//stepping back on the calculated path
+	while (MinDistance-- && StartNode->Parent) {
+		StartNode = StartNode->Parent;
+		delete StartNode->Next;
+		StartNode->Next = NULL;
 	}
 	return Return;
 }

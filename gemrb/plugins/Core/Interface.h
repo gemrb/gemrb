@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.164 2005/07/01 20:39:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.165 2005/07/16 21:03:46 avenger_teambg Exp $
  *
  */
 
@@ -168,6 +168,7 @@ private:
 	Store* CurrentStore;
 	// Index of current container
 	Container* CurrentContainer;
+	bool UseContainer;
 public:
 	int SaveAsOriginal; //if true, saves files in compatible mode
 	int quitflag; // Quit Signal, set it to 0 or 1
@@ -404,7 +405,7 @@ public:
 	ieStrRef GetRumour(const ieResRef resname);
 	Container *GetCurrentContainer();
 	int CloseCurrentContainer();
-	void SetCurrentContainer(Actor *actor, Container *arg);
+	void SetCurrentContainer(Actor *actor, Container *arg, bool flag=false);
 	Store *GetCurrentStore();
 	int CloseCurrentStore();
 	Store *SetCurrentStore(const ieResRef resname);

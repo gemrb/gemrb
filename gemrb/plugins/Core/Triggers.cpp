@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.14 2005/07/15 22:40:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.15 2005/07/16 21:03:47 avenger_teambg Exp $
  *
  */
 
@@ -246,7 +246,7 @@ int GameScript::InPartyAllowDead(Scriptable* Sender, Trigger* parameters)
 int GameScript::InPartySlot(Scriptable* Sender, Trigger* parameters)
 {
 	Actor *actor = core->GetGame()->GetPC(parameters->int0Parameter, false);
-	return MatchActor(Sender, actor, parameters->objectParameter);
+	return MatchActor(Sender, actor->GetID(), parameters->objectParameter);
 }
 
 int GameScript::Exists(Scriptable* Sender, Trigger* parameters)
@@ -1104,9 +1104,11 @@ int GameScript::Clicked(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Scriptable* target = GetActorFromObject( Sender, parameters->objectParameter );
-	if (Sender->LastTrigger == target) {
-		Sender->AddTrigger (&Sender->LastTrigger);
-		return 1;
+	if (target->Type == ST_ACTOR) {
+		if (Sender->LastTrigger == ((Actor *) target)->GetID()) {
+			Sender->AddTrigger (&Sender->LastTrigger);
+			return 1;
+		}
 	}
 	return 0;
 }
@@ -1123,8 +1125,7 @@ int GameScript::Entered(Scriptable* Sender, Trigger* parameters)
 		}
 		return 0;
 	}
-	Scriptable* target = GetActorFromObject( Sender, parameters->objectParameter );
-	if (Sender->LastEntered == target) {
+	if (MatchActor(Sender, Sender->LastEntered, parameters->objectParameter)) {
 		Sender->AddTrigger (&Sender->LastEntered);
 		return 1;
 	}
@@ -1470,7 +1471,7 @@ static int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 		if (Sender->Type==ST_ACTOR && tar->Type==ST_ACTOR) {
 			Actor* snd = ( Actor* ) Sender;
 			//additional checks for invisibility?
-			snd->LastSeen = (Actor *) tar;
+			snd->LastSeen = ((Actor *) tar)->GetID();
 		}
 		return 1;
 	}
@@ -2261,7 +2262,7 @@ int GameScript::TrapTriggered(Scriptable* Sender, Trigger* parameters)
 	if (!tar || tar->Type != ST_ACTOR) {
 		return 0;
 	}
-	if (Sender->LastTrigger == tar) {
+	if (MatchActor(Sender, Sender->LastTrigger, parameters->objectParameter)) {
 		Sender->AddTrigger (&Sender->LastTrigger);
 		return 1;
 	}
@@ -2297,7 +2298,7 @@ int GameScript::LastPersonTalkedTo(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor *scr = (Actor *) Sender;
-	if (scr->LastTalkedTo==(Actor *) tar) {
+	if (MatchActor(Sender, scr->LastTalkedTo, parameters->objectParameter)) {
 		return 1;
 	}
 	return 0;
@@ -2367,7 +2368,7 @@ int GameScript::AttackedBy(Scriptable* Sender, Trigger* parameters)
 		targetlist::iterator m;
 		targettype *tt = tgts->GetFirstTarget(m);
 		while (tt) {
-			if (tt->actor->LastTarget == scr) {
+			if (tt->actor->LastTarget == scr->GetID()) {
 				if (!AStyle || (AStyle==tt->actor->GetAttackStyle()) ) {
 					ret = 1;
 					break;

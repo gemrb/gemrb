@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.77 2005/07/14 19:48:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.78 2005/07/16 21:03:46 avenger_teambg Exp $
  *
  */
 
@@ -145,25 +145,27 @@ public:
 	ieDword InteractCount; //this is accessible in iwd2, probably exists in other games too
 	ieDword appearance;
 	ieDword ModalState;
+	ieWord globalID;
+	ieWord localID;
 public:
-	Actor *LastTarget;
-	Actor *LastTalkedTo;
-	Actor *LastAttacker;
-	Actor *LastHitter;
-	Actor *LastProtected;
-	Actor *LastCommander;
-	Actor *LastHelp;
-	Actor *LastSeen;
-	Actor *LastHeard;
-	Actor *LastSummoner;
-	//this is an ugly ugly hack, the triggers are stored on a pointer
-	//these triggers are not pointers by nature
-	Actor *HotKey; 
+	ieDword Leader;
+	ieDword LastTarget;
+	ieDword LastTalkedTo;
+	ieDword LastAttacker;
+	ieDword LastHitter;
+	ieDword LastProtected;
+	ieDword LastCommander;
+	ieDword LastHelp;
+	ieDword LastSeen;
+	ieDword LastHeard;
+	ieDword LastSummoner;
+	ieDword HotKey; 
 
 	int LastCommand;   //lastcommander
 	int LastShout;     //lastheard
 	int LastDamage;    //lasthitter
 	int LastDamageType;//lasthitter
+	int XF, YF;        //follow leader in this offset
 
 	EffectQueue fxqueue;
 private:
@@ -180,6 +182,8 @@ public:
 	void DebugDump();
 	/* fixes the feet circle */
 	void SetCircleSize();
+	/** places the actor on the map with a unique object ID */
+	void SetMap(Map *map, ieWord LID, ieWord GID);
 	/** sets the actor's position, calculating with the nojump flag*/
 	void SetPosition(Map *map, Point &position, int jump, int radius=0);
 	/* you better use SetStat, this stuff is only for special cases*/
@@ -202,6 +206,11 @@ public:
 	bool SetBase(unsigned int StatIndex, ieDword Value);
 	/** Sets the modified value in different ways, returns difference */
 	int NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword ModifierType);
+	void SetLeader(Actor *actor, int xoffset=0, int yoffset=0);
+	ieDword GetID()
+	{
+		return (localID<<16) | globalID;
+	}
 	/** Sets the Dialog ResRef */
 	void SetDialog(const char* ResRef)
 	{

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.81 2005/07/14 21:51:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.82 2005/07/16 21:03:46 avenger_teambg Exp $
  *
  */
 
@@ -113,7 +113,7 @@ class Door;
 typedef enum ScriptableType { ST_ACTOR = 0, ST_PROXIMITY = 1, ST_TRIGGER = 2,
 ST_TRAVEL = 3, ST_DOOR = 4, ST_CONTAINER = 5, ST_AREA = 6, ST_GLOBAL = 7 } ScriptableType;
 
-typedef std::list<Actor **> TriggerObjects;
+typedef std::list<ieDword *> TriggerObjects;
 
 //#define SEA_RESET		0x00000002
 //#define SEA_PARTY_REQUIRED	0x00000004
@@ -145,8 +145,8 @@ public:
 	//8 = scripting name overwritten with area actor entry label
 	//other flags are in CREAREAFL in iwd2
 	ieDword Active;
-	Actor* LastTrigger;
-	Actor* LastEntered;
+	ieDword LastTrigger;
+	ieDword LastEntered;
 	std::list< Action*> actionQueue;
 	Action* CurrentAction;
 	bool resetAction;
@@ -173,7 +173,7 @@ public:
 	//true condition (whole triggerblock returned true)
 	void InitTriggers();
 	void ClearTriggers();
-	void AddTrigger(Actor **actorref);
+	void AddTrigger(ieDword *actorref);
 };
 
 class GEM_EXPORT Selectable : public Scriptable {
@@ -275,7 +275,7 @@ public:
 	void RunAwayFrom(Point &Des, int PathLength, int flags);
 	void RandomWalk(bool can_stop);
 	void MoveLine(int steps, int Pass);
-	void WalkTo(Point &Des);
+	void WalkTo(Point &Des, int MinDistance = 0);
 	void MoveTo(Point &Des);
 	void ClearPath();
 	void DrawTargetPoint();

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.125 2005/07/14 21:51:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.126 2005/07/16 21:03:44 avenger_teambg Exp $
  *
  */
 
@@ -699,7 +699,7 @@ Map* AREImp::GetMap(const char *ResRef)
 			ab = actmgr->GetActor();
 			if(!ab)
 				continue;
-			ab->SetMap(map);
+			map->AddActor(ab);
 			ab->Pos.x = XPos;
 			ab->Pos.y = YPos;
 			ab->Destination.x = XDes;
@@ -707,8 +707,6 @@ Map* AREImp::GetMap(const char *ResRef)
 			//this is a hack until we find the location
 			//of the active bit (hidecreature!!!)
 			ab->Active=SCR_ACTIVE;
-			//copying the area name into the actor
-			strnuprcpy(ab->Area, map->GetScriptName(),8);
 			//copying the scripting name into the actor
 			//if the CreatureAreaFlag was set to 8
 			if (Flags&AF_NAME_OVERRIDE) {
@@ -717,7 +715,6 @@ Map* AREImp::GetMap(const char *ResRef)
 	
 			ab->SetOrientation( Orientation,0 );
 			ab->TalkCount = TalkCount;
-			map->AddActor( ab );
 		}
 		core->FreeInterface( actmgr );
 	}
