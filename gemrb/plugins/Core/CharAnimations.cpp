@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.62 2005/07/14 19:48:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.63 2005/07/16 17:20:40 avenger_teambg Exp $
  *
  */
 
@@ -668,6 +668,7 @@ void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 	Cycle=SixteenToNine[Orient];
 
 	switch (StanceID) {
+		case IE_ANI_ATTACK: //temporarily
 		case IE_ANI_ATTACK_BACKSLASH:
 			strcat( ResRef, "G21" );
 			break;
@@ -726,7 +727,7 @@ void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 			strcat( ResRef, "G11" );
 			break;
 		default:
-			printf("Unhandled stance: %s %d\n", ResRef, StanceID);
+			printf("VHR2 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
 			abort();
 			break;
 	}
@@ -827,6 +828,11 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 		case IE_ANI_WALK:
 			strcat( ResRef, "G11" );
 			break;
+
+		default:
+			printf("VHR Animation: unhandled stance: %s %d\n", ResRef, StanceID);
+			abort();
+			break;
 	}
 }
 
@@ -882,6 +888,11 @@ void CharAnimations::AddSixSuffix(char* ResRef, unsigned char StanceID,
 			Cycle = 64 + Orient;
 			break;
 
+		default:
+			printf("Six Animation: unhandled stance: %s %d\n", ResRef, StanceID);
+			abort();
+			break;
+
 	}
 	if (Orient>9) {
 		strcat( ResRef, "E" );
@@ -928,6 +939,10 @@ void CharAnimations::AddLR2Suffix(char* ResRef, unsigned char StanceID,
 		case IE_ANI_SLEEP:
 		case IE_ANI_TWITCH:
 			Cycle = 32 + Orient;
+			break;
+		default:
+			printf("LR2 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
+			abort();
 			break;
 	}
 	if (Orient>=4) {
@@ -1029,6 +1044,10 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 			strcat( ResRef, "G1" );
 			Cycle = Orient;
 			break;
+		default:
+			printf("MHR Animation: unhandled stance: %s %d\n", ResRef, StanceID);
+			abort();
+			break;
 	}
 	if (Orient>=5) {
 		strcat( ResRef, "E" );
@@ -1115,6 +1134,10 @@ void CharAnimations::AddLRSuffix( char* ResRef, unsigned char StanceID,
 			strcat( ResRef, "G1" );
 			Cycle = 40 + Orient / 2;
 			break;
+		default:
+			printf("LR Animation: unhandled stance: %s %d\n", ResRef, StanceID);
+			abort();
+			break;
 	}
 	if (Orient > 9) {
 		strcat( ResRef, "E" );
@@ -1171,7 +1194,7 @@ void CharAnimations::AddLR3Suffix( char* ResRef, unsigned char StanceID,
 			Cycle = 24 + Orient / 2;
 			break;
 		default:
-			printf("Unhandled stance: %s %d\n", ResRef, StanceID);
+			printf("LR3 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
 			abort();
 			break;
 	}
@@ -1258,6 +1281,10 @@ void CharAnimations::AddMMRSuffix(char* ResRef, unsigned char StanceID,
 		case IE_ANI_WALK:
 			strcat( ResRef, "WK" );
 			Cycle = ( Orient / 2 );
+			break;
+		default:
+			printf("MMR Animation: unhandled stance: %s %d\n", ResRef, StanceID);
+			abort();
 			break;
 	}
 	if (Orient > 9) {
