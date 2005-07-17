@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.86 2005/07/16 21:03:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.87 2005/07/17 17:49:20 avenger_teambg Exp $
  *
  */
 
@@ -591,10 +591,30 @@ void Game::DeleteJournalGroup(ieByte Group)
 		}
 	}
 }
-
-void Game::AddJournalEntry(ieStrRef strref, int Section, int Group)
+/* returns true if it modified or added a journal entry */
+bool Game::AddJournalEntry(ieStrRef strref, int Section, int Group)
 {
-	GAMJournalEntry *je = new GAMJournalEntry;
+	GAMJournalEntry *je = FindJournalEntry(strref);
+	if (je) {
+		//don't set this entry again in the same section
+		if (je->Section==Section) {
+			return false;
+		}
+		if (Section == IE_GAM_QUEST_DONE && Group) {
+			//removing all of this group and adding a new entry
+			DeleteJournalGroup(Group);
+		} else {
+			//modifying existing entry
+			je->Section = Section;
+			je->Group = Group;
+			ieDword chapter = 0;
+			locals->Lookup("CHAPTER", chapter);
+			je->Chapter = (ieByte) chapter;
+			je->GameTime = GameTime;
+			return true;
+		}
+	}
+	je = new GAMJournalEntry;
 	je->GameTime = GameTime;
 	ieDword chapter = 0;
 	locals->Lookup("CHAPTER", chapter);
@@ -602,7 +622,9 @@ void Game::AddJournalEntry(ieStrRef strref, int Section, int Group)
 	je->Section = Section;
 	je->Group = Group;
 	je->Text = strref;
+
 	Journals.push_back( je );
+	return true;
 }
 
 void Game::AddJournalEntry(GAMJournalEntry* entry)
@@ -613,6 +635,20 @@ void Game::AddJournalEntry(GAMJournalEntry* entry)
 int Game::GetJournalCount() const
 {
 	return Journals.size();
+}
+
+GAMJournalEntry* Game::FindJournalEntry(ieStrRef strref)
+{
+	unsigned int Index = Journals.size();
+	while(Index--) {
+		GAMJournalEntry *ret = Journals[Index];
+
+		if (ret->Text==strref) {
+			return ret;
+		}
+	}
+
+	return NULL;
 }
 
 GAMJournalEntry* Game::GetJournalEntry(unsigned int Index)
@@ -664,7 +700,7 @@ bool Game::EveryoneStopped() const
 }
 
 //canmove=true: if some PC can't move (or hostile), then this returns false 
-bool Game::EveryoneNearPoint(const char *area, Point &p, int flags) const
+bool Game::EveryoneNearPoint(Map *area, Point &p, int flags) const
 {
 	for (unsigned int i=0; i<PCs.size(); i++) {
 		if (flags&ENP_ONLYSELECT) {
@@ -685,7 +721,7 @@ bool Game::EveryoneNearPoint(const char *area, Point &p, int flags) const
 				return false;
 			}
 		}
-		if (stricmp(PCs[i]->Area,area) ) {
+		if (PCs[i]->GetCurrentArea()!=area) {
 			return false;
 		}
 		if (Distance(p,PCs[i])>MAX_TRAVELING_DISTANCE) {
@@ -768,3 +804,10 @@ void Game::AddGold(ieDword add)
 		core->DisplayConstantStringValue( STR_LOSTGOLD, 0xc0c000, old-PartyGold);
 	}
 }
+
+//later this could be more complicated
+void Game::AdvanceTime(ieDword add)
+{
+	GameTime+=add;
+}
+

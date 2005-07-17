@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.60 2005/06/28 20:08:13 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.61 2005/07/17 17:49:19 avenger_teambg Exp $
  *
  */
 
@@ -209,10 +209,12 @@ public:
 	void DeleteJournalGroup(ieByte Group);
 	/* adds a journal entry from dialog data */
 	/* time and chapter are calculated on the fly */
-	void AddJournalEntry(ieStrRef strref, int section, int group);
+	/* returns false if the entry already exists */
+	bool AddJournalEntry(ieStrRef strref, int section, int group);
 	/* adds a journal entry while loading the .gam structure */
 	void AddJournalEntry(GAMJournalEntry* entry);
 	int GetJournalCount() const;
+	GAMJournalEntry* FindJournalEntry(ieStrRef strref);
 	GAMJournalEntry* GetJournalEntry(unsigned int Index);
 
 	char *GetFamiliar(unsigned int Index);
@@ -231,7 +233,7 @@ public:
 	}
 	void ShareXP(int XP, bool divide);
 	bool EveryoneStopped() const;
-	bool EveryoneNearPoint(const char *area, Point &p, int flags) const;
+	bool EveryoneNearPoint(Map *map, Point &p, int flags) const;
 	bool PartyMemberDied() const;
 	/* increments chapter variable and refreshes kill stats */
 	void IncrementChapter();
@@ -243,6 +245,8 @@ public:
 	size_t GetLoadedMapCount() const { return Maps.size(); }
 	/* adds or removes gold */
 	void AddGold(ieDword add);
+	/* adds ticks to game time */
+	void AdvanceTime(ieDword add);
 };
 
 #endif
