@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.245 2005/07/16 23:27:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.246 2005/07/17 17:51:23 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1438,6 +1438,8 @@ void GameControl::DialogChoose(unsigned int choose)
 
 		DialogTransition* tr = ds->transitions[choose];
 
+		ta->PopMinRow();
+
 		if (tr->Flags&IE_DLG_TR_JOURNAL) {
 			int Section = 0;
 			if (tr->Flags&IE_DLG_UNSOLVED) {
@@ -1446,20 +1448,19 @@ void GameControl::DialogChoose(unsigned int choose)
 			if (tr->Flags&IE_DLG_SOLVED) {
 				Section |= 2;
 			}
-			core->GetGame()->AddJournalEntry(tr->journalStrRef, Section, tr->Flags>>16);
-/* is this
-			char *string = core->GetString( tr->journalStrRef );
-			core->DisplayString( string );
-			free( string );
-*/
-/* or this
-			core->DisplayConstantString(STR_JOURNALCHANGE,0xffff00);
-*/
-//			your journal has changed...
-//			JournalChanged = true;
+			if (core->GetGame()->AddJournalEntry(tr->journalStrRef, Section, tr->Flags>>16) ) {
+				core->DisplayConstantString(STR_JOURNALCHANGE,0xffff00);
+				char *string = core->GetString( tr->journalStrRef );
+				//cutting off the strings at the first crlf
+				char *poi = strchr(string,'\n');
+				if (poi) {
+					*poi='\0';
+				}
+				core->DisplayString( string );
+				free( string );
+			}
 		}
 
-		ta->PopMinRow();
 		if (tr->textStrRef != 0xffffffff) {
 			core->DisplayStringName( tr->textStrRef, 0x8080FF, speaker);
 		}
@@ -1501,7 +1502,10 @@ void GameControl::DialogChoose(unsigned int choose)
 		}
 		ds = dlg->GetState( si );
 	}
+	//displaying npc text
 	core->DisplayStringName( ds->StrRef, 0x70FF70, target );
+	//adding a gap between options and npc text
+	ta->AppendText("",-1); 
 	int i;
 	int idx = 0;
 	ta->SetMinRow( true );

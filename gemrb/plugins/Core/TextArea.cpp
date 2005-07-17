@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.75 2005/07/16 23:27:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.76 2005/07/17 17:51:23 avenger_teambg Exp $
  *
  */
 
@@ -499,7 +499,9 @@ void TextArea::PadMinRow()
 {
 	int rows = 0;
 	int i=lines.size()-1;
-	while(i>=minrow-1 && i>=0) {
+	//minrow -1 ->gap
+	//minrow -2 ->npc text
+	while(i>=minrow-2 && i>=0) {
 		rows+=lrows[i];
 		i--;
 	}
