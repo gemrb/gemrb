@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.15 2005/07/16 21:03:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.16 2005/07/17 18:58:26 avenger_teambg Exp $
  *
  */
 
@@ -1184,6 +1184,8 @@ int GameScript::Die(Scriptable* Sender, Trigger* /*parameters*/)
 	}
 	Actor *act=(Actor *) Sender;
 	if (act->InternalFlags&IF_JUSTDIED) {
+		//set trigger to erase
+		act->SetBitTrigger(BT_DIE);
 		return 1;
 	}
 	return 0;
@@ -1191,13 +1193,22 @@ int GameScript::Die(Scriptable* Sender, Trigger* /*parameters*/)
 
 int GameScript::PartyMemberDied(Scriptable* /*Sender*/, Trigger* /*parameters*/)
 {
-	return core->GetGame()->PartyMemberDied();
+	Game *game = core->GetGame();
+	int i = game->PartyMemberDied();
+	if (i==-1) {
+		return 0;
+	}
+	//set trigger to erase
+	game->GetPC(i,false)->SetBitTrigger(BT_DIE);
+	return 1;
 }
 
 int GameScript::NamelessBitTheDust(Scriptable* /*Sender*/, Trigger* /*parameters*/)
 {
 	Actor* actor = core->GetGame()->FindPC(1);
 	if (actor->InternalFlags&IF_JUSTDIED) {
+		//set trigger to clear
+		actor->SetBitTrigger(BT_DIE);
 		return 1;
 	}
 	return 0;

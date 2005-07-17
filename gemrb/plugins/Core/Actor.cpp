@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.117 2005/07/16 23:27:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.118 2005/07/17 18:58:24 avenger_teambg Exp $
  *
  */
 
@@ -353,7 +353,10 @@ void pcf_gold(Actor *actor, ieDword Value)
 
 void pcf_color(Actor *actor, ieDword /*Value*/)
 {
-	actor->GetAnims()->SetColors(actor->Modified+IE_COLORS);
+	CharAnimations *anims = actor->GetAnims();
+	if (anims) {
+		anims->SetColors(actor->Modified+IE_COLORS);
+	}
 }
 
 static int maximum_values[256]={
@@ -463,10 +466,11 @@ bool Actor::SetBase(unsigned int StatIndex, ieDword Value)
 	SetStat (StatIndex, Value);
 	return true;
 }
-/** call this after load, before applying effects */
+/** call this after load, to apply effects */
 void Actor::Init()
 {
 	memcpy( Modified, BaseStats, MAX_STATS * sizeof( *Modified ) );
+	fxqueue.ApplyAllEffects( this );
 }
 /** implements a generic opcode function, modify modifier
 	returns the change
@@ -638,7 +642,7 @@ void Actor::Die(Scriptable *killer)
 	//Can't simply set Selected to false, game has its own little list
 	core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
 	ClearPath();
-	InternalFlags|=IF_JUSTDIED;
+	SetModal( 0 );
 	if (!InParty) {
 		Actor *act=NULL;
 		
@@ -654,7 +658,9 @@ void Actor::Die(Scriptable *killer)
 		}
 	}
 
-	InternalFlags|=IF_REALLYDIED;
+	//JUSTDIED will be removed when the Die() trigger executed
+	//otherwise it is the same as REALLYDIED
+	InternalFlags|=IF_REALLYDIED|IF_JUSTDIED;
 	SetStance( IE_ANI_DIE );
 }
 
@@ -917,7 +923,9 @@ void Actor::SetColor( ieDword idx, ieDword grd)
 		Modified[IE_COLORS+index] = value;
 	}
 
-	anims->SetColors(Modified+IE_COLORS);
+	if (anims) {
+		anims->SetColors(Modified+IE_COLORS);
+	}
 }
 
 void Actor::SetLeader(Actor *actor, int xoffset, int yoffset)
@@ -927,3 +935,16 @@ void Actor::SetLeader(Actor *actor, int xoffset, int yoffset)
 	YF = yoffset;
 }
 
+//if days == 0, it means full healing
+void Actor::Heal(int days)
+{
+	if (days) {
+		NewStat(IE_HITPOINTS, days * 2, MOD_ADDITIVE);
+	} else {
+		SetStat(IE_HITPOINTS, GetStat(IE_MAXHITPOINTS));
+	}
+}
+
+void Actor::RemoveTimedEffects()
+{
+}

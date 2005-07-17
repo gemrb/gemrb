@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.82 2005/07/16 21:03:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.83 2005/07/17 18:58:24 avenger_teambg Exp $
  *
  */
 
@@ -98,6 +98,9 @@ class Door;
 #define CT_SELECTED       4 //not all selected actors are there
 #define CT_MOVE_SELECTED  5 //all selected can move
 
+//bits for binary trigger bitfield
+#define BT_DIE            1
+
 #ifdef WIN32
 
 #ifdef GEM_BUILD_DLL
@@ -124,6 +127,7 @@ public:
 	virtual ~Scriptable(void);
 private:
 	TriggerObjects tolist;
+	ieDword bittriggers;
 	unsigned long startTime;
 	unsigned long interval;
 	unsigned long WaitCounter;
@@ -173,6 +177,7 @@ public:
 	//true condition (whole triggerblock returned true)
 	void InitTriggers();
 	void ClearTriggers();
+	void SetBitTrigger(ieDword bittrigger);
 	void AddTrigger(ieDword *actorref);
 };
 

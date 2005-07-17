@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.325 2005/07/06 23:37:35 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.326 2005/07/17 18:58:26 avenger_teambg Exp $
  *
  */
 
@@ -387,7 +387,7 @@ static PyObject* GemRB_LoadWindowPack(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (!core->LoadWindowPack( string )) {
-		return NULL;
+		return RuntimeError("Can't find resource");
 	}
 
 	CHUWidth = width;
@@ -411,7 +411,9 @@ static PyObject* GemRB_LoadWindow(PyObject * /*self*/, PyObject* args)
 
 	int ret = core->LoadWindow( WindowID );
 	if (ret == -1) {
-		return NULL;
+		char buf[256];
+		snprintf( buf, sizeof( buf ), "Can't find window #%d!", WindowID );
+		return RuntimeError(buf);
 	}
 
 	// If the current winpack windows are placed for screen resolution
@@ -1247,7 +1249,7 @@ static PyObject* GemRB_SetEvent(PyObject * /*self*/, PyObject* args)
 
 	if (! ctrl->SetEvent( event, funcName )) {
 		char buf[256];
-		snprintf( buf, sizeof( buf ), "Can't set event handler!" );
+		snprintf( buf, sizeof( buf ), "Can't set event handler: %s!", funcName );
 		return RuntimeError( buf );
 	}
 

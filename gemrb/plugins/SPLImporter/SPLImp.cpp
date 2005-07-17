@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImp.cpp,v 1.11 2005/07/10 17:07:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImp.cpp,v 1.12 2005/07/17 18:58:27 avenger_teambg Exp $
  *
  */
 
@@ -114,7 +114,7 @@ Spell* SPLImp::GetSpell(Spell *s)
 	str->Seek( s->FeatureBlockOffset + 48*s->CastingFeatureOffset,
 			GEM_STREAM_START );
 	for (i = 0; i < s->CastingFeatureCount; i++) {
-		GetFeature( s->casting_features+i);
+		GetFeature(s, s->casting_features+i);
 	}
 /*
 	DataStream* bamfile = core->GetResourceMgr()->GetResource( s->SpellbookIcon, IE_BAM_CLASS_ID );
@@ -156,14 +156,17 @@ void SPLImp::GetExtHeader(Spell *s, SPLExtHeader* eh)
 	eh->features = core->GetFeatures( eh->FeatureCount );
 	str->Seek( s->FeatureBlockOffset + 48*eh->FeatureOffset, GEM_STREAM_START );
 	for (unsigned int i = 0; i < eh->FeatureCount; i++) {
-		GetFeature(eh->features+i);
+		GetFeature(s, eh->features+i);
 	}
 }
 
-void SPLImp::GetFeature(SPLFeature *fx)
+void SPLImp::GetFeature(Spell *s, Effect *fx)
 {
 	EffectMgr* eM = ( EffectMgr* ) core->GetInterface( IE_EFF_CLASS_ID );
 	eM->Open( str, false );
 	eM->GetEffect( fx );
+	memcpy(fx->Source, s->Name, 9);
+	fx->PrimaryType = s->PrimaryType;
+	fx->SecondaryType = s->SecondaryType;
 	core->FreeInterface( eM );
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.210 2005/07/16 21:03:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.211 2005/07/17 18:58:25 avenger_teambg Exp $
  *
  */
 
@@ -649,9 +649,9 @@ private: //Internal Functions
 	static void ParseString(const char*& src, char* tmp);
 private:
 	/* returns true if actor matches the object specs. */
-	static bool MatchActor(Scriptable *Sender, ieDword ID, Object* oC);
+	//static bool MatchActor(Scriptable *Sender, ieDword ID, Object* oC);
 	/* returns the number of actors matching the IDS targeting */
-	static int GetObjectCount(Scriptable* Sender, Object* oC);
+	//static int GetObjectCount(Scriptable* Sender, Object* oC);
 	
 	static Targets *XthNearestOf(Targets *parameters, int count);
 	static Targets *XthNearestEnemyOf(Targets *parameters, int count);
@@ -948,6 +948,8 @@ public:
 	static void AmbientActivate(Scriptable* Sender, Action* parameters);
 	static void ApplyDamage(Scriptable* Sender, Action* parameters);
 	static void ApplyDamagePercent(Scriptable* Sender, Action* parameters);
+	static void ApplySpell(Scriptable* Sender, Action* parameters);
+	static void ApplySpellPoint(Scriptable* Sender, Action* parameters);
 	static void AttachTransitionToDoor(Scriptable* Sender, Action* parameters);
 	static void Attack(Scriptable* Sender, Action* parameters);
 	static void AttackReevaluate(Scriptable* Sender, Action* parameters);
@@ -972,6 +974,7 @@ public:
 	static void ChangeStoreMarkup(Scriptable* Sender, Action* parameters);
 	static void ClearActions(Scriptable* Sender, Action* parameters);
 	static void ClearAllActions(Scriptable* Sender, Action* parameters);
+	static void ClearPartyEffects(Scriptable* Sender, Action* parameters);
 	static void CloseDoor(Scriptable* Sender, Action* parameters);
 	static void ContainerEnable(Scriptable* Sender, Action* parameters);
 	static void Continue(Scriptable* Sender, Action* parameters);
@@ -993,6 +996,7 @@ public:
 		Action* parameters);
 	static void CutSceneID(Scriptable* Sender, Action* parameters);
 	static void Damage(Scriptable* Sender, Action* parameters);
+	static void DayNight(Scriptable *Sender, Action* parameters);
 	static void Deactivate(Scriptable* Sender, Action* parameters);
 	static void Debug(Scriptable* Sender, Action* parameters);
 	static void DestroyAllDestructableEquipment(Scriptable* Sender, Action* parameters);
@@ -1163,6 +1167,10 @@ public:
 	static void ReputationInc(Scriptable* Sender, Action* parameters);
 	static void ReputationSet(Scriptable* Sender, Action* parameters);
 	static void RestorePartyLocation(Scriptable *Sender, Action* parameters);
+	static void Rest(Scriptable *Sender, Action* parameters);
+	static void RestNoSpells(Scriptable *Sender, Action* parameters);
+	static void RestParty(Scriptable *Sender, Action* parameters);
+	static void RestUntilHealed(Scriptable *Sender, Action* parameters);
 	static void RevealAreaOnMap(Scriptable* Sender, Action* parameters);
 	static void RunAwayFrom(Scriptable* Sender, Action* parameters);
 	static void RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters);

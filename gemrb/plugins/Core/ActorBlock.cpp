@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.101 2005/07/16 21:03:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.102 2005/07/17 18:58:24 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -255,6 +255,7 @@ unsigned long Scriptable::GetWait()
 void Scriptable::InitTriggers()
 {
 	tolist.clear();
+	bittriggers = 0;
 }
 
 void Scriptable::ClearTriggers()
@@ -262,7 +263,14 @@ void Scriptable::ClearTriggers()
 	for (TriggerObjects::iterator m = tolist.begin(); m != tolist.end (); m++) {
 		*(*m) = 0;
 	}
+	if (bittriggers & BT_DIE) {
+		((Actor *) this)->InternalFlags&=~IF_JUSTDIED;
+	}
+}
 
+void Scriptable::SetBitTrigger(ieDword bittrigger)
+{
+	bittriggers |= bittrigger;
 }
 
 void Scriptable::AddTrigger(ieDword *actorref)
@@ -819,14 +827,14 @@ int InfoPoint::CheckTravel(Actor *actor)
 	if (Flags&TRAP_DEACTIVATED) return CT_CANTMOVE;
 	if (!actor->InParty && (Flags&TRAVEL_NONPC) ) return CT_CANTMOVE;
 	if (Flags&TRAVEL_PARTY) {
-		if (core->HasFeature(GF_TEAM_MOVEMENT) || core->GetGame()->EveryoneNearPoint(actor->Area, actor->Pos, ENP_CANMOVE) ) {
+		if (core->HasFeature(GF_TEAM_MOVEMENT) || core->GetGame()->EveryoneNearPoint(actor->GetCurrentArea(), actor->Pos, ENP_CANMOVE) ) {
 			return CT_WHOLE;
 		}
 		return CT_GO_CLOSER;
 	}
 	if(actor->IsSelected() )
 	{
-		if(core->GetGame()->EveryoneNearPoint(actor->Area, actor->Pos, ENP_CANMOVE|ENP_ONLYSELECT) )
+		if(core->GetGame()->EveryoneNearPoint(actor->GetCurrentArea(), actor->Pos, ENP_CANMOVE|ENP_ONLYSELECT) )
 		{
 			return CT_MOVE_SELECTED;
 		}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spell.h,v 1.10 2005/03/03 22:33:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spell.h,v 1.11 2005/07/17 18:58:26 avenger_teambg Exp $
  *
  */
 
@@ -27,6 +27,7 @@
 
 #include "AnimationMgr.h"
 #include "Effect.h"
+#include "EffectQueue.h"
 
 #ifdef WIN32
 
@@ -40,9 +41,16 @@
 #define GEM_EXPORT
 #endif
 
-// FIXME: drop SPLFeature completely and just use Effect
-typedef Effect SPLFeature;
+//values for Spell usability Flags
 
+#define SF_HOSTILE 0x4
+#define SF_NO_LOS  0x8
+#define SF_NOT_INDOORS 0x20
+#define SF_HLA 0x40
+#define SF_TRIGGER 0x80
+//this is a relocated bit (used in iwd2 as 0x40)
+#define SF_NOT_IN_COMBAT 0x100
+#define SF_SIMPLIFIED_DURATION   0x400
 
 class GEM_EXPORT SPLExtHeader {
 public:
@@ -67,7 +75,7 @@ public:
 	ieWord Charges;
 	ieWord ChargeDepletion;
 	ieWord Projectile;
-	SPLFeature* features;
+	Effect* features;
 };
 
 
@@ -77,7 +85,8 @@ public:
 	~Spell();
 
 	SPLExtHeader *ext_headers;
-	SPLFeature* casting_features;
+	Effect* casting_features;
+	ieResRef Name; //the resref of the spell itself!
 
 	ieStrRef SpellName;
 	ieStrRef SpellNameIdentified;
@@ -115,6 +124,10 @@ public:
 	char unknown13[16];
 
 //	AnimationMgr* SpellIconBAM;
+public:
+	//-1 will return the cfb
+	EffectQueue *GetEffectQueue(int index);
+	EffectQueue *GetEffectBlock(int wanted_level);
 };
 
 #endif  // ! SPELL_H

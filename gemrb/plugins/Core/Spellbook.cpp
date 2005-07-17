@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.26 2005/06/29 17:59:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.27 2005/07/17 18:58:26 avenger_teambg Exp $
  *
  */
 
@@ -153,6 +153,9 @@ int sections[]={3,0,1,2,2};
 bool Spellbook::HaveSpell(int spellid, ieDword flags)
 {
 	int type = spellid/1000;
+	if (type>4) {
+		return false;
+	}
 	type = sections[type];
 	spellid = spellid % 1000;
 

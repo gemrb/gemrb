@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/EFFImporter/EFFImp.cpp,v 1.3 2005/07/12 18:11:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/EFFImporter/EFFImp.cpp,v 1.4 2005/07/17 18:58:26 avenger_teambg Exp $
  *
  */
 
@@ -85,8 +85,10 @@ Effect* EFFImp::GetEffectV1(Effect *fx)
 	fx->Power = tmpByte;
 	str->ReadDword( &fx->Parameter1 );
 	str->ReadDword( &fx->Parameter2 );
-	str->Read( &fx->TimingMode,1 );
-	str->Read( &fx->Resistance,1 );
+	str->Read( &tmpByte, 1 );
+	fx->TimingMode = tmpByte;
+	str->Read( &tmpByte, 1 );
+	fx->Resistance = tmpByte;
 	str->ReadDword( &fx->Duration );
 	str->Read( &tmpByte, 1 );
 	fx->Probability1 = tmpByte;
@@ -116,9 +118,7 @@ Effect* EFFImp::GetEffectV20(Effect *fx)
 	str->ReadDword( &fx->Power );
 	str->ReadDword( &fx->Parameter1 );
 	str->ReadDword( &fx->Parameter2 );
-	//timing mode is most likely a dword
-	str->Read( &fx->TimingMode, 1 );
-	str->Seek( 3, GEM_CURRENT_POS );
+	str->ReadDword( &fx->TimingMode );
 	str->ReadDword( &fx->Duration );
 	str->ReadWord( &fx->Probability1 );
 	str->ReadWord( &fx->Probability2 );
@@ -130,7 +130,7 @@ Effect* EFFImp::GetEffectV20(Effect *fx)
 	str->ReadDword( &IsVariable ); //if this field was set to 1, this is a variable
 	str->ReadDword( &fx->PrimaryType );
 	str->Seek( 12, GEM_CURRENT_POS );
-	str->ReadDword( &fx->ResistanceType );
+	str->ReadDword( &fx->Resistance );
 	str->ReadDword( &fx->Parameter3 );
 	str->ReadDword( &fx->Parameter4 );
 	str->Seek( 8, GEM_CURRENT_POS );

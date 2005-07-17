@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.22 2005/07/16 21:03:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.23 2005/07/17 18:58:24 avenger_teambg Exp $
  *
  */
 
@@ -1431,7 +1431,7 @@ void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
-	if (!game->EveryoneNearPoint(actor->Area, actor->Pos, true) ) {
+	if (!game->EveryoneNearPoint(actor->GetCurrentArea(), actor->Pos, true) ) {
 		//we abort the command, everyone should be here
 		Sender->CurrentAction = NULL;
 		return;
@@ -1711,6 +1711,12 @@ void GameScript::MoveBetweenAreas(Scriptable* Sender, Action* parameters)
 
 void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 {
+	ieResRef spellres;
+
+	if (!ResolveSpellName( spellres, parameters) ) {
+		return;
+	}
+
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		return;
@@ -2793,7 +2799,10 @@ void GameScript::FullHeal(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *scr = (Actor *) tar;
-	scr->SetStat(IE_HITPOINTS, scr->GetStat(IE_MAXHITPOINTS) );
+	//0 means full healing
+	//Heal() might contain curing of some conditions
+	//if FullHeal doesn't do that, replace this with a setstat
+	scr->Heal(0);
 }
 
 void GameScript::RemovePaladinHood(Scriptable* Sender, Action* /*parameters*/)
@@ -3580,9 +3589,106 @@ void GameScript::SetScriptName( Scriptable* Sender, Action* parameters)
 	tar->SetScriptName(parameters->string0Parameter);
 }
 
-void GameScript::AdvanceTime( Scriptable* /*Sender*/, Action* parameters)
+//iwd2
+//advance time with a constant
+void GameScript::AdvanceTime(Scriptable* /*Sender*/, Action* parameters)
 {
-	core->GetGame()->GameTime += parameters->int0Parameter;
+	core->GetGame()->AdvanceTime(parameters->int0Parameter);
+}
+
+//advance at least one day, then stop at next day/dusk/night/morning
+void GameScript::DayNight(Scriptable* /*Sender*/, Action* parameters)
+{
+	int padding = core->GetGame()->GameTime%7200;
+	padding = (padding/1800+4-parameters->int0Parameter)%4*1800;
+	core->GetGame()->AdvanceTime(7200+padding);
+}
+
+//implement pst style parameters:
+//suggested dream, hp, renting?
+//if suggested dream is 0, then area flags determine the 'movie'
+void GameScript::RestParty(Scriptable* Sender, Action* parameters)
+{
+	Game *game = core->GetGame();
+
+	if (!game->EveryoneStopped()) {
+		//
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	//there must be someone alive, or we'll have a crash
+	Actor *leader = game->GetPC(0, true);
+	if (!game->EveryoneNearPoint(leader->GetCurrentArea(), leader->Pos, 0)) {
+		//
+		Sender->CurrentAction = NULL;
+		return;
+	}
+
+	game->AdvanceTime(7200);
+	//HP set to 1 means HP will be recovered
+	int i = game->GetPartySize(false);
+	while (i--) {
+		Actor *tar = game->GetPC(i, false);
+		tar->ClearPath();
+		tar->ClearActions();
+		tar->SetModal(0);
+		if (parameters->int1Parameter) {
+			//renting could be 0,1,2,3 (the quality of resting)
+			tar->Heal(parameters->int2Parameter+1);
+		}
+		tar->spellbook.ChargeAllSpells();
+	}
+	Sender->CurrentAction = NULL;
+}
+
+//doesn't advance game time, just refreshes spells of target
+//this is a non-blocking action
+void GameScript::Rest(Scriptable* Sender, Action* /*parameters*/)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+	actor->spellbook.ChargeAllSpells();
+	//check if this should be a full heal
+	actor->Heal(0);
+	actor->RemoveTimedEffects();
+}
+
+//doesn't advance game time (unsure), just refreshes spells of target
+void GameScript::RestNoSpells(Scriptable* Sender, Action* /*parameters*/)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+	//check if this should be a full heal
+	actor->Heal(0);
+	actor->RemoveTimedEffects();
+}
+
+//this is most likely advances time
+void GameScript::RestUntilHealed(Scriptable* Sender, Action* /*parameters*/)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+	actor->Heal(1);
+	//not sure if this should remove timed effects
+	//more like execute them hour by hour :>
+}
+
+//iwd2
+//removes all delayed/duration/semi permanent effects (like a ctrl-r)
+void GameScript::ClearPartyEffects(Scriptable* /*Sender*/, Action* /*parameters*/)
+{
+	Game *game = core->GetGame();
+	int i = game->GetPartySize(false);
+	while (i--) {
+		Actor *tar = game->GetPC(i, false);
+		tar->RemoveTimedEffects();
+	}
 }
 
 //IWD2 special, can mark only actors, hope it is enough
@@ -4059,3 +4165,56 @@ void GameScript::SpawnPtSpawn(Scriptable* Sender, Action* parameters)
 	}
 }
 
+void GameScript::ApplySpell(Scriptable* Sender, Action* parameters)
+{
+	ieResRef spellres;
+
+	if (!ResolveSpellName( spellres, parameters) ) {
+		return;
+	}
+
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		return;
+	}
+	if (tar->Type==ST_ACTOR) {
+		//apply spell on target
+		Actor *owner;
+
+		if (Sender->Type==ST_ACTOR) {
+			owner = (Actor *) Sender;
+		} else {
+			owner = (Actor *) tar;
+		}
+		core->ApplySpell(spellres, (Actor *) tar, owner, parameters->int1Parameter);
+	} else {
+		//no idea about this one
+		Actor *owner;
+
+		if (Sender->Type==ST_ACTOR) {
+			owner = (Actor *) Sender;
+		} else {
+			owner = NULL;
+		}
+		//apply spell on point
+		core->ApplySpellPoint(spellres, tar, tar->Pos, owner, parameters->int1Parameter);
+	}
+}
+
+void GameScript::ApplySpellPoint(Scriptable* Sender, Action* parameters)
+{
+	ieResRef spellres;
+	Actor *owner;
+
+	if (!ResolveSpellName( spellres, parameters) ) {
+		return;
+	}
+
+	if (Sender->Type==ST_ACTOR) {
+		owner = (Actor *) Sender;
+	} else {
+		owner = NULL;
+	}
+	Scriptable *tar = Sender->GetCurrentArea();
+	core->ApplySpellPoint(spellres, tar, parameters->pointParameter, owner, parameters->int1Parameter);
+}

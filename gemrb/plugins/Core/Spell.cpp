@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spell.cpp,v 1.8 2005/06/11 20:18:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spell.cpp,v 1.9 2005/07/17 18:58:26 avenger_teambg Exp $
  *
  */
 
@@ -46,4 +46,44 @@ Spell::~Spell(void)
 		SpellIconBAM = NULL;
 	}
 */
+}
+
+//-1 will return cfb
+//0 will always return first spell block
+//otherwise set to caster level
+EffectQueue *Spell::GetEffectBlock(int level)
+{
+	Effect *features;
+	int count;
+
+	//iwd2 has this hack
+	if (level>=0) {
+		if (Flags & SF_SIMPLIFIED_DURATION) {
+			features = ext_headers[0].features;
+			count = ext_headers[0].FeatureCount;
+		} else {
+			int block_index;
+			for(block_index=0;block_index<ExtHeaderCount-1;block_index++) {
+				if (ext_headers[block_index+1].RequiredLevel>level) {
+					break;
+				}
+			}
+			features = ext_headers[block_index].features;
+			count = ext_headers[block_index].FeatureCount;
+		}
+	} else {
+		features = casting_features;
+		count = CastingFeatureCount;
+	}
+	EffectQueue *fxqueue = new EffectQueue();
+	
+	for (int i=0;i<count;i++) {
+		if (Flags & SF_SIMPLIFIED_DURATION) {
+		//hack the effect according to Level
+		//fxqueue->AddEffect will copy the effect,
+		//so we don't risk any overwriting
+		}
+		fxqueue->AddEffect( features+i );
+	}
+	return fxqueue;
 }

@@ -52,6 +52,7 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int flags);
 void InitScriptTables();
 void HandleBitMod(ieDword &value1, ieDword value2, int opcode);
+bool ResolveSpellName(ieResRef spellres, Action *parameter);
 void DisplayStringCore(Scriptable* Sender, int Strref, int flags);
 void EscapeAreaCore(Actor *src, const char *resref, Point &enter, Point &exit, int flags);
 void GoNearAndRetry(Scriptable *Sender, Scriptable *target, bool destination);
@@ -60,6 +61,10 @@ void FreeSrc(SrcVector *poi, const ieResRef key);
 SrcVector *LoadSrc(const ieResRef resname);
 Action *ParamCopy(Action *parameters);
 Action *ParamCopyNoOverride(Action *parameters);
+/* returns true if actor matches the object specs. */
+bool MatchActor(Scriptable *Sender, ieDword ID, Object* oC);
+/* returns the number of actors matching the IDS targeting */
+int GetObjectCount(Scriptable* Sender, Object* oC);
 void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, ieDword value);
 void SetVariable(Scriptable* Sender, const char* VarName, ieDword value);
 //these are used from other plugins

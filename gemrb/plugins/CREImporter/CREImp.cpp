@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.84 2005/07/16 21:03:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.85 2005/07/17 18:58:23 avenger_teambg Exp $
  *
  */
 
@@ -310,6 +310,9 @@ Actor* CREImp::GetActor()
 	ReadInventory( act, Inventory_Size );
 	act->inventory.AddAllEffects();
 
+	//applying effects
+	act->Init();
+
 	// Setting up derived stats
 	act->SetAnimationID( ( ieWord ) act->BaseStats[IE_ANIMATION_ID] );
 	if (act->BaseStats[IE_STATE_ID] & STATE_DEAD) {
@@ -321,9 +324,6 @@ Actor* CREImp::GetActor()
 	if (IsCharacter) {
 		ReadChrHeader(act);
 	}
-
-	//apply the effects in a single shot
-	act->fxqueue.ApplyAllEffects( act );
 
 	return act;
 }
@@ -645,8 +645,6 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 		}
 	}
 	free(memorized_spells);
-
-	act->Init(); //applies effects, updates Modified
 }
 
 void CREImp::ReadEffects(Actor *act)

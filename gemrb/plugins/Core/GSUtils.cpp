@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.13 2005/07/16 21:03:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.14 2005/07/17 18:58:24 avenger_teambg Exp $
  *
  */
 
@@ -143,6 +143,28 @@ void HandleBitMod(ieDword &value1, ieDword value2, int opcode)
 			value1 = value2;
 			break;
 	}
+}
+
+// SPIT is not in the original engine spec, it is reserved for the
+// enchantable items feature
+//					0      1       2     3      4
+static const char *spell_suffices[]={"SPIT","SPPR","SPWI","SPIN","SPCL"};
+
+//this function handles the polymorphism of Spell[RES] actions
+bool ResolveSpellName(ieResRef spellres, Action *parameters)
+{
+	if (parameters->string0Parameter) {
+		strnuprcpy(spellres, parameters->string0Parameter, 8);
+	} else {
+		//resolve spell
+		int type = parameters->int0Parameter/1000;
+       		int spellid = parameters->int0Parameter%1000;
+		if (type>4) {
+			return false;
+		}
+		sprintf(spellres, "%s%03d", spell_suffices[type], spellid);
+	}
+	return true;
 }
 
 void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
@@ -724,7 +746,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 	}
 }
 
-bool GameScript::MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
+bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
 {
 	if (!Sender || !oC) {
 		return false;
@@ -747,7 +769,7 @@ bool GameScript::MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
 	return ret;
 }
 
-int GameScript::GetObjectCount(Scriptable* Sender, Object* oC)
+int GetObjectCount(Scriptable* Sender, Object* oC)
 {
 	if (!oC) {
 		return 0;

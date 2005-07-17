@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.23 2005/07/14 22:19:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.24 2005/07/17 18:58:24 avenger_teambg Exp $
  *
  */
 
@@ -248,6 +248,9 @@ void EffectQueue::ApplyAllEffects(Actor* target)
 
 void EffectQueue::ApplyEffect(Actor* target, Effect* fx)
 {
+	if (!target) {
+		return;
+	}
 	//printf( "FX 0x%02x: %s(%d, %d)\n", fx->Opcode, effectnames[fx->Opcode].Name, fx->Parameter1, fx->Parameter2 );
 	if (fx->Opcode >= MAX_EFFECTS) 
 		return;
@@ -260,7 +263,8 @@ void EffectQueue::ApplyEffect(Actor* target, Effect* fx)
 
 	EffectFunction fn = effect_refs[fx->Opcode].Function;
 	if (fn) {
-		if( fn( Owner, target, fx ) == FX_NOT_APPLIED) {
+		//if there is no owner, we assume it is the target
+		if( fn( Owner?Owner:target, target, fx ) == FX_NOT_APPLIED) {
  				//pending removal
 				fx->TimingMode=FX_DURATION_JUST_EXPIRED;
 		}

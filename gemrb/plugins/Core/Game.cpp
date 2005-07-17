@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.87 2005/07/17 17:49:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.88 2005/07/17 18:58:24 avenger_teambg Exp $
  *
  */
 
@@ -731,13 +731,14 @@ bool Game::EveryoneNearPoint(Map *area, Point &p, int flags) const
 	return true;
 }
 
-bool Game::PartyMemberDied() const
+int Game::PartyMemberDied() const
 {
 	for (unsigned int i=0; i<PCs.size(); i++) {
-		if (PCs[i]->InternalFlags&IF_JUSTDIED)
-			return true;
+		if (PCs[i]->InternalFlags&IF_JUSTDIED) {
+			return i;
+		}
 	}
-	return false;
+	return -1;
 }
 
 void Game::IncrementChapter()

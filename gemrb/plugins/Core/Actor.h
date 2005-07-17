@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.78 2005/07/16 21:03:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.79 2005/07/17 18:58:24 avenger_teambg Exp $
  *
  */
 
@@ -301,6 +301,8 @@ public:
 	/* Creates player statistics */
 	void CreateStats();
 	int GetHPMod();
+	/* Heals actor by days */
+	void Heal(int days);
 	/* Sets the modal state after checks */
 	void SetModal(ieDword newstate);
 	/* returns current attack style */
@@ -309,5 +311,6 @@ public:
 	void SetTarget( Scriptable *actor);
 	/* sets a colour gradient stat, handles location */
 	void SetColor( ieDword idx, ieDword grd);
+	void RemoveTimedEffects();
 };
 #endif

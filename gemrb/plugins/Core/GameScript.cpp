@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.312 2005/07/16 21:03:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.313 2005/07/17 18:58:24 avenger_teambg Exp $
  *
  */
 
@@ -312,11 +312,13 @@ static ActionLink actionnames[] = {
 	{"addxpobject", GameScript::AddXPObject, 0},
 	{"addxpvar", GameScript::AddXP2DA, 0},
 	{"advancetime", GameScript::AdvanceTime, 0},
-	{"allowarearesting", GameScript::SetAreaRestFlag, 0},
+	{"allowarearesting", GameScript::SetAreaRestFlag, 0},//iwd2
 	{"ally", GameScript::Ally, 0},
 	{"ambientactivate", GameScript::AmbientActivate, 0},
 	{"applydamage", GameScript::ApplyDamage, 0},
 	{"applydamagepercent", GameScript::ApplyDamagePercent, 0},
+	{"applyspell", GameScript::ApplySpell, 0},
+	{"applyspellpoint", GameScript::ApplySpellPoint, 0}, //gemrb extension
 	{"attachtransitiontodoor", GameScript::AttachTransitionToDoor, 0},
 	{"attack", GameScript::Attack,AF_BLOCKING},
 	{"attackreevaluate", GameScript::AttackReevaluate,AF_BLOCKING},
@@ -367,6 +369,7 @@ static ActionLink actionnames[] = {
 	{"createvisualeffectobject", GameScript::CreateVisualEffectObject, 0},
 	{"cutsceneid", GameScript::CutSceneID,AF_INSTANT},
 	{"damage", GameScript::Damage, 0},
+	{"daynight", GameScript::DayNight, 0},
 	{"deactivate", GameScript::Deactivate, 0},
 	{"debug", GameScript::Debug, 0},
 	{"debugoutput", GameScript::Debug, 0},
@@ -513,7 +516,7 @@ static ActionLink actionnames[] = {
 	{"moveviewpoint", GameScript::MoveViewPoint, 0},
 	{"nidspecial1", GameScript::NIDSpecial1,AF_BLOCKING},//we use this for dialogs, hack
 	{"nidspecial2", GameScript::NIDSpecial2,AF_BLOCKING},//we use this for worldmap, another hack
-  {"nidspecial3", GameScript::Attack,AF_BLOCKING},     //this hack is for attacking preset target
+	{"nidspecial3", GameScript::Attack,AF_BLOCKING},     //this hack is for attacking preset target
 	{"noaction", GameScript::NoAction, 0},
 	{"opendoor", GameScript::OpenDoor,AF_BLOCKING},
 	{"panic", GameScript::Panic, 0},
@@ -667,7 +670,7 @@ static ActionLink actionnames[] = {
 	{"takepartyitemnum", GameScript::TakePartyItemNum, 0},
 	{"takepartyitemrange", GameScript::TakePartyItemRange, 0},
 	{"teleportparty", GameScript::TeleportParty, 0}, 
-	{"textscreen", GameScript::TextScreen, 0},
+	{"textscreen", GameScript::TextScreen, AF_BLOCKING},
 	{"tomsstringdisplayer", GameScript::DisplayMessage, 0},
 	{"triggeractivation", GameScript::TriggerActivation, 0},
 	{"turn", GameScript::Turn, 0},

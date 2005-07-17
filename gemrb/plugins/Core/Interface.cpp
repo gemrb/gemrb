@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.333 2005/07/16 21:03:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.334 2005/07/17 18:58:25 avenger_teambg Exp $
  *
  */
 
@@ -43,6 +43,7 @@
 #include "AmbientMgr.h"
 #include "ItemMgr.h"
 #include "SpellMgr.h"
+#include "EffectMgr.h"
 #include "StoreMgr.h"
 #include "DialogMgr.h"
 #include "MapControl.h"
@@ -189,6 +190,11 @@ static void ReleaseSpell(void *poi)
 	delete ((Spell *) poi);
 }
 
+static void ReleaseEffect(void *poi)
+{
+	delete ((Effect *) poi);
+}
+
 Interface::~Interface(void)
 {
 	//destroy the highest objects in the hierarchy first!
@@ -204,6 +210,7 @@ Interface::~Interface(void)
 	}
 	ItemCache.RemoveAll(ReleaseItem);
 	SpellCache.RemoveAll(ReleaseSpell);
+	EffectCache.RemoveAll(ReleaseEffect);
 	if (DefSound) {
 		free( DefSound );
 		DSCount = -1;
@@ -3183,6 +3190,9 @@ Spell* Interface::GetSpell(const ieResRef resname)
 	}
 
 	FreeInterface( sm );
+
+	//this is required for storing the 'source'
+	strnuprcpy(spell->Name, resname, 8);
 	SpellCache.SetAt(resname, (void *) spell);
 	return spell;
 }
@@ -3194,13 +3204,57 @@ void Interface::FreeSpell(Spell *spl, const ieResRef name, bool free)
 	res=SpellCache.DecRef((void *) spl, name, free);
 	if (res<0) {
 		printMessage( "Core", "Corrupted Spell cache encountered (reference count went below zero), ", LIGHT_RED );
-		printf( "Spell name is: %.8s\n", name);
+		printf( "Spell name is: %.8s or %.8s\n", name, spl->Name);
 		abort();
 	}
 	if (res) return;
 	if (free) delete spl;
 }
 
+Effect* Interface::GetEffect(const ieResRef resname)
+{
+	Effect *effect = (Effect *) EffectCache.GetResource(resname);
+	if (effect) {
+		return effect;
+	}
+	DataStream* str = key->GetResource( resname, IE_EFF_CLASS_ID );
+	EffectMgr* em = ( EffectMgr* ) GetInterface( IE_EFF_CLASS_ID );
+	if (em == NULL) {
+		delete ( str );
+		return NULL;
+	}
+	if (!em->Open( str, true )) {
+		FreeInterface( em );
+		return NULL;
+	}
+
+	effect = em->GetEffect(new Effect() );
+	if (effect == NULL) {
+		FreeInterface( em );
+		return NULL;
+	}
+
+	FreeInterface( em );
+
+	EffectCache.SetAt(resname, (void *) effect);
+	return effect;
+}
+
+void Interface::FreeEffect(Effect *eff, const ieResRef name, bool free)
+{
+	int res;
+
+	res=EffectCache.DecRef((void *) eff, name, free);
+	if (res<0) {
+		printMessage( "Core", "Corrupted Effect cache encountered (reference count went below zero), ", LIGHT_RED );
+		printf( "Effect name is: %.8s\n", name);
+		abort();
+	}
+	if (res) return;
+	if (free) delete eff;
+}
+
+//now that we store spell name in spl, i guess, we shouldn't pass 'ieResRef name'
 //these functions are needed because Win32 doesn't allow freeing memory from
 //another dll. So we allocate all commonly used memories from core
 ITMExtHeader *Interface::GetITMExt(int count)
@@ -3456,6 +3510,55 @@ int Interface::CanMoveItem(CREItem *item)
 	return item->Usages[0];
 }
 
+// dealing with applying effects
+void Interface::ApplySpell(const ieResRef resname, Actor *actor, Actor *caster, int level)
+{
+	Spell *spell = GetSpell(resname);
+	if (!spell) {
+		return;
+	}
+	if (!level) {
+		level = 1;
+	}
+	EffectQueue *fxqueue = spell->GetEffectBlock(level);
+	fxqueue->SetOwner( caster );
+	fxqueue->ApplyAllEffects(actor);
+	delete fxqueue;
+}
+
+void Interface::ApplySpellPoint(const ieResRef resname, Scriptable* /*target*/, Point &/*pos*/, Actor *caster, int level)
+{
+	Spell *spell = GetSpell(resname);
+	if (!spell) {
+		return;
+	}
+	if (!level) {
+		level = 1;
+	}
+	EffectQueue *fxqueue = spell->GetEffectBlock(level);
+	fxqueue->SetOwner( caster );
+	//add effect to area???
+	delete fxqueue;
+}
+
+void Interface::ApplyEffect(const ieResRef resname, Actor *actor, Actor *caster, int level)
+{
+	Effect *effect = GetEffect(resname);
+	if (!effect) {
+		return;
+	}
+	if (!level) {
+		level = 1;
+	}
+	EffectQueue *fxqueue = new EffectQueue();
+	fxqueue->SetOwner( caster );
+	fxqueue->AddEffect( effect );
+	delete effect;
+	fxqueue->ApplyAllEffects( actor );
+	delete fxqueue;
+}
+
+// dealing with saved games
 int Interface::SwapoutArea(Map *map)
 {
 	MapMgr* mm = ( MapMgr* ) GetInterface( IE_ARE_CLASS_ID );

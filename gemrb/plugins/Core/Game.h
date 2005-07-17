@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.61 2005/07/17 17:49:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.62 2005/07/17 18:58:24 avenger_teambg Exp $
  *
  */
 
@@ -234,7 +234,7 @@ public:
 	void ShareXP(int XP, bool divide);
 	bool EveryoneStopped() const;
 	bool EveryoneNearPoint(Map *map, Point &p, int flags) const;
-	bool PartyMemberDied() const;
+	int PartyMemberDied() const;
 	/* increments chapter variable and refreshes kill stats */
 	void IncrementChapter();
 	/* sets party reputation */

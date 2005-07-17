@@ -63,18 +63,28 @@ void GlobalTimer::Update()
 			return;
 		}
 		GameControl* gc = core->GetGameControl();
-		if (gc) {
-			if (gc->GetDialogueFlags()&DF_IN_DIALOG)
-				return;
+		if (!gc) {
+			return;
 		}
 		Game* game = core->GetGame();
-		if (game) {
-			Map* map = game->GetCurrentArea();
-			if (map) {
-				map->UpdateFog();
-				map->UpdateEffects();
-			}
+		if (!game) {
+			return;
 		}
+		Map* map = game->GetCurrentArea();
+		if (!map) {
+			return;
+		}
+		//do spell effects expire in dialogs?
+		//if yes, then we should remove this condition
+		if (!(gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
+			map->UpdateFog();
+			map->UpdateEffects();
+			//this measures in-world time (affected by effects, actions, etc)
+			game->AdvanceTime(1);
+		}
+		//this measures time spent in the game (including pauses)
+		game->RealTime++;
+
 		if (CutScene) {
 			if (CutScene->endReached) {
 				delete( CutScene );
@@ -83,7 +93,6 @@ void GlobalTimer::Update()
 			}
 			return;
 		}
-		//Call Scripts Update
 	}
 }
 

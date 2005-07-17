@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.165 2005/07/16 21:03:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.166 2005/07/17 18:58:26 avenger_teambg Exp $
  *
  */
 
@@ -118,6 +118,7 @@ public:
 private:
 	Cache ItemCache;
 	Cache SpellCache;
+	Cache EffectCache;
 	Factory * factory;
 	ImageMgr * pal256;
 	ImageMgr * pal32;
@@ -402,6 +403,8 @@ public:
 	void FreeItem(Item *itm, const ieResRef name, bool free=false);
 	Spell* GetSpell(const ieResRef resname);
 	void FreeSpell(Spell *spl, const ieResRef name, bool free=false);
+	Effect* GetEffect(const ieResRef resname);
+	void FreeEffect(Effect *eff, const ieResRef name, bool free=false);
 	ieStrRef GetRumour(const ieResRef resname);
 	Container *GetCurrentContainer();
 	int CloseCurrentContainer();
@@ -434,6 +437,14 @@ public:
 	/** returns 0 for unmovable, -1 for movable items, otherwise it
 	    returns gold value! */
 	int CanMoveItem(CREItem *item);
+
+	/** applies the spell on the target */
+	void ApplySpell(const ieResRef resname, Actor *target, Actor *caster, int level);
+	/** applies the spell on the area or on a scriptable object */
+	void ApplySpellPoint(const ieResRef resname, Scriptable *target, Point &pos, Actor *caster, int level);
+	/** applies a single effect on the target */
+	void ApplyEffect(const ieResRef resname, Actor *target, Actor *caster, int level);
+
 	/** dumps an area object to the cache */
 	int SwapoutArea(Map *map);
 	/** saves the game object to the destination folder  */

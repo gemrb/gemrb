@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.h,v 1.5 2005/07/12 18:11:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.h,v 1.6 2005/07/17 18:58:24 avenger_teambg Exp $
  *
  */
 
@@ -63,8 +63,8 @@ typedef struct Effect {
 	ieDword Power;
 	ieDword Parameter1;
 	ieDword Parameter2;
-	ieByte TimingMode;
-	ieByte Resistance;
+	ieDword TimingMode;
+	ieDword Resistance;
 	ieDword Duration;
 	ieWord Probability1;
 	ieWord Probability2;
@@ -82,7 +82,6 @@ typedef struct Effect {
 
 	// EFF V2.0 fields:
 	ieDword PrimaryType;
-	ieDword ResistanceType;
 	ieDword Parameter3;
 	ieDword Parameter4;
 	//ieResRef VVCResource; //this is actually Resource2
