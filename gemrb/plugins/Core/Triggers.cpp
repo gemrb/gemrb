@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.16 2005/07/17 18:58:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.17 2005/07/18 16:21:03 avenger_teambg Exp $
  *
  */
 
@@ -228,7 +228,10 @@ int GameScript::InParty(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	//don't allow dead
-	return tar->ValidTarget(GA_NO_DEAD);
+	if (tar->ValidTarget(GA_NO_DEAD)) {
+		return 1;
+	}
+	return 0;
 }
 
 int GameScript::InPartyAllowDead(Scriptable* Sender, Trigger* parameters)
@@ -970,8 +973,7 @@ int GameScript::NumTimesInteractedObjectLT(Scriptable* Sender, Trigger* paramete
 	return actor->InteractCount < (ieDword) parameters->int0Parameter ? 1 : 0; 
 } 
 
-/* this single function works for ActionListEmpty and ObjectActionListEmpty */
-int GameScript::ActionListEmpty(Scriptable* Sender, Trigger* parameters)
+int GameScript::ObjectActionListEmpty(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
@@ -986,7 +988,7 @@ int GameScript::ActionListEmpty(Scriptable* Sender, Trigger* parameters)
 	return 1;
 }
 
-int GameScript::ObjectActionListEmpty(Scriptable* Sender, Trigger* /*parameters*/)
+int GameScript::ActionListEmpty(Scriptable* Sender, Trigger* /*parameters*/)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return 0;
