@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.178 2005/07/16 21:03:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.179 2005/07/19 20:02:32 avenger_teambg Exp $
  *
  */
 
@@ -790,7 +790,8 @@ void Map::AddActor(Actor* actor)
 {
 	//setting the current area for the actor as this one
 	strnuprcpy(actor->Area, scriptName, 8);
-	actor->SetMap(this, localActorCounter++, globalActorCounter++);
+	//IDs start from 1, 0 is reserved for 'null value'
+	actor->SetMap(this, ++localActorCounter, ++globalActorCounter);
 	actors.push_back( actor );
 }
 
@@ -806,6 +807,9 @@ void Map::DeleteActor(int i)
 
 Actor* Map::GetActorByGlobalID(ieDword objectID)
 {
+	if (!objectID) {
+		return NULL;
+	}
 	//truncation is intentional
 	ieWord globalID = (ieWord) objectID;
 	unsigned int i = actors.size();

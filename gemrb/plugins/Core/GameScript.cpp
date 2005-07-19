@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.313 2005/07/17 18:58:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.314 2005/07/19 20:02:14 avenger_teambg Exp $
  *
  */
 
@@ -1623,8 +1623,9 @@ Targets *GameScript::LastAttackerOf(Scriptable *Sender, Targets *parameters)
 	}
 	parameters->Clear();
 	if (actor) {
-		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastTarget);
+		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastHitter);
 		if (target) {
+printf("Lastattecker of %s is %s\n", actor->GetScriptName(), target->GetScriptName());
 			parameters->AddTarget(target, 0);
 		}
 	}

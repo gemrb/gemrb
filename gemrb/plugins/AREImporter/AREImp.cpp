@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.126 2005/07/16 21:03:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.127 2005/07/19 20:02:13 avenger_teambg Exp $
  *
  */
 
@@ -704,9 +704,6 @@ Map* AREImp::GetMap(const char *ResRef)
 			ab->Pos.y = YPos;
 			ab->Destination.x = XDes;
 			ab->Destination.y = YDes;
-			//this is a hack until we find the location
-			//of the active bit (hidecreature!!!)
-			ab->Active=SCR_ACTIVE;
 			//copying the scripting name into the actor
 			//if the CreatureAreaFlag was set to 8
 			if (Flags&AF_NAME_OVERRIDE) {
