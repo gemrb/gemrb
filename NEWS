@@ -1,10 +1,12 @@
-GemRB V0.2.5 (2005-05-29):
+GemRB V0.2.5 (2005-06-29):
   New features:
     - Save game
+    - Effects are now loaded
 
   Improved features:
-    - Last* script triggers fire once and clear the trigger reason correctly
+    - GameScript is now much more reliable: Action override works, triggers fire once and then get cleared
     - fully working Store screen 
+    - fixed padding of message window rows (in dialogs)
 
 GemRB V0.2.4 (2005-05-29):
   New features:

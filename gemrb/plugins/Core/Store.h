@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.16 2005/06/08 20:37:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.17 2005/07/20 21:46:30 avenger_teambg Exp $
  *
  */
 
@@ -129,8 +129,6 @@ public:
 	// IWD2 only
 	char unknown3[80];
 
-	// version for saving stores
-	// so far only version 0 'gemrb compatible' is supported
 	int version;
 
 public: //queries
@@ -143,10 +141,12 @@ public: //queries
 	//add a new item to the store (selling)
 	void AddItem(CREItem* item);
 	void RemoveItem(unsigned int idx);
+	//returns index of item
+	unsigned int FindItem(ieResRef item, bool usetrigger) const;
 private:
   //finds a mergeable item in the stock, if exact is set, it checks for usage counts too
 	STOItem *FindItem(CREItem *item, bool exact);
-	bool IsItemAvailable(unsigned int slot);
+	bool IsItemAvailable(unsigned int slot) const;
 };
 
 #endif // ! STORE_H

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.211 2005/07/17 18:58:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.212 2005/07/20 21:46:30 avenger_teambg Exp $
  *
  */
 
@@ -672,7 +672,6 @@ public:
 	const char *GetName() { return this?Name:"NONE\0\0\0\0"; }
 	static void ExecuteString(Scriptable* Sender, char* String);
 	static int EvaluateString(Scriptable* Sender, char* String);
-	static void AddAction(Scriptable* Sender, Action* aC);
 	static void ExecuteAction(Scriptable* Sender, Action* aC);
 public: //Script Functions
 	static int ID_Alignment(Actor *actor, int parameter);
@@ -906,6 +905,7 @@ public: //Script Functions
 	static int See(Scriptable* Sender, Trigger* parameters);
 	static int Specifics(Scriptable* Sender, Trigger* parameters);
 	static int StateCheck(Scriptable* Sender, Trigger* parameters);
+	static int StoreHasItem(Scriptable* Sender, Trigger* parameters);
 	static int StuffGlobalRandom(Scriptable* Sender, Trigger* parameters);
 	static int SubRace(Scriptable* Sender, Trigger* parameters);
 	static int TargetUnreachable(Scriptable* Sender, Trigger* parameters);

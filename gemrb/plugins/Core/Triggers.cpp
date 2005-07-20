@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.17 2005/07/18 16:21:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.18 2005/07/20 21:46:30 avenger_teambg Exp $
  *
  */
 
@@ -587,7 +587,11 @@ int GameScript::GlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::OnCreation(Scriptable* Sender, Trigger* /*parameters*/)
 {
-	return Sender->OnCreation; //hopefully this is always 1 or 0
+	if (Sender->OnCreation) {
+		Sender->SetBitTrigger(BT_ONCREATION);
+		return 1;
+	}
+	return 0;
 }
 
 int GameScript::NumItemsParty(Scriptable* /*Sender*/, Trigger* parameters)
@@ -674,7 +678,15 @@ int GameScript::Contains(Scriptable* Sender, Trigger* parameters)
 	if (cnt->inventory.HasItem(parameters->string0Parameter, parameters->int0Parameter) ) {
 		return 1;
 	}
+	if (HasItemCore(&cnt->inventory, parameters->string0Parameter) ) {
+		return 1;
+	}
 	return 0;
+}
+
+int GameScript::StoreHasItem(Scriptable* /*Sender*/, Trigger* parameters)
+{
+	return StoreHasItemCore(parameters->string0Parameter, parameters->string1Parameter);
 }
 
 //the int0 parameter is an addition, normally it is 0
@@ -686,6 +698,9 @@ int GameScript::HasItem(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor *actor = (Actor *) scr;
 	if (actor->inventory.HasItem(parameters->string0Parameter, parameters->int0Parameter) ) {
+		return 1;
+	}
+	if (HasItemCore(&actor->inventory, parameters->string0Parameter) ) {
 		return 1;
 	}
 	return 0;
@@ -1156,14 +1171,19 @@ int GameScript::IsOverMe(Scriptable* Sender, Trigger* parameters)
 int GameScript::Dead(Scriptable* Sender, Trigger* parameters)
 {
 	if (parameters->string0Parameter[0]) {
-		char Variable[40];
+		long value;
+		char Variable[33];
+
 		if (core->HasFeature( GF_HAS_KAPUTZ )) {
-			sprintf( Variable, "KAPUTZ%32.32s", parameters->string0Parameter );
+			value = CheckVariable( Sender, parameters->string0Parameter, "KAPUTZ");      
 		} else {
-			sprintf( Variable, "GLOBALSPRITE_IS_DEAD%18.18s",
-				parameters->string0Parameter );
+			snprintf( Variable, 32, "SPRITE_IS_DEAD%s", parameters->string0Parameter );
 		}
-		return CheckVariable( Sender, Variable ) > 0 ? 1 : 0;
+		value = CheckVariable( Sender, Variable, "GLOBAL" );
+		if (value>0) {
+			return 1;
+		}
+		return 0;
 	}
 	Scriptable* target = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!target) {

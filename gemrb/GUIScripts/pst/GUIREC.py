@@ -9,14 +9,14 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.41 2005/07/09 21:09:31 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.42 2005/07/20 21:46:26 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -243,7 +243,7 @@ def UpdateRecordsWindow ():
 
 	# race
 	# FIXME: for some strange reason, Morte's race is 1 (Human)
-	#   in the save files, instead of 45 (Morte)
+	# in the save files, instead of 45 (Morte)
 	RaceTable = GemRB.LoadTable ("RACES")
 	print "species: %d  race: %d" %(GemRB.GetPlayerStat (pc, IE_SPECIES), GemRB.GetPlayerStat (pc, IE_RACE))
 	text = GemRB.GetTableValue (RaceTable, GemRB.GetPlayerStat (pc, IE_RACE) - 1, 0)
@@ -959,6 +959,8 @@ def OpenLevelUpWindow ():
 	global LevelUpWindow
 	global DeaSavThr, WanSavThr, PolSavThr, BreSavThr, SpeSavThr
 	global HPBonus
+	global FinalCurHP
+	global FinalMaxHP
 
 	GemRB.HideGUI ()
 
@@ -997,6 +999,8 @@ def OpenLevelUpWindow ():
 
 	HPGained = 0
 	ConHPBon = 0
+	Thac0Updated = False
+	Thac0 = 0
 
 	# name
 	Label = GemRB.GetControl (Window, 0x10000000)
@@ -1005,6 +1009,10 @@ def OpenLevelUpWindow ():
 	# class
 	Label = GemRB.GetControl (Window, 0x10000001)
 	GemRB.SetText (Window, Label, GemRB.GetTableValue (ClassTable, GemRB.GetPlayerStat (pc, IE_CLASS) - 1, 0))
+
+	# Armor Class
+	Label = GemRB.GetControl (Window, 0x10000023)
+	GemRB.SetText (Window, Label, str (GemRB.GetPlayerStat (pc, IE_ARMORCLASS)))
 
 	# Thief Skills
 	# For now we shall set them to the current levels and disable the increment buttons
@@ -1167,6 +1175,11 @@ def OpenLevelUpWindow ():
 			for i in range (NumOfLevUp):
 				HPGained = HPGained + GetSingleClassHP (Class, avatar_header['PrimLevel'])
 				ConHPBon = ConHPBon + GetConHPBonus (pc)
+			# Thac0
+			Thac0 = GetThac0 (Class, NextLevel)
+			# Is the new thac0 better than old? (The smaller, the better)
+			if Thac0 < GemRB.GetPlayerStat (pc, IE_THAC0):
+				Thac0Updated = True
 
 	else:
 		# avatar is multi class
@@ -1189,15 +1202,29 @@ def OpenLevelUpWindow ():
 	Label = GemRB.GetControl (Window, 0x10000021)
 	GemRB.SetText (Window, Label, str (SpeSavThr))
 
+	# For some reason, Constitution Bonus is not added
+	# to the current HP in the IE version
+	FinalCurHP = GemRB.GetPlayerStat (pc, IE_HITPOINTS) + HPGained
 	HPBonus = ConHPBon + HPGained
+	FinalMaxHP = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS) + HPBonus
+
+	# Current HP
+	Label = GemRB.GetControl (Window, 0x10000025)
+	GemRB.SetText (Window, Label, str (FinalCurHP))
+
+	# Max HP
+	Label = GemRB.GetControl (Window, 0x10000027)
+	GemRB.SetText (Window, Label, str (FinalMaxHP))
 
 	# Displaying level up info
 	overview = ""
-	overview = overview + str (HPGained) + " " + GemRB.GetString (38713) + '\n'
 	overview = overview + str (ConHPBon) + " " + GemRB.GetString (38727) + '\n'
+	overview = overview + str (HPGained) + " " + GemRB.GetString (38713) + '\n'
 
 	if SavThrUpdated:
 		overview = overview + GemRB.GetString (38719) + '\n'
+	if Thac0Updated:
+		overview = overview + GemRB.GetString (38718) + '\n'
 
 	Text = GemRB.GetControl (Window, 3)
 	GemRB.SetText (Window, Text, overview)
@@ -1242,6 +1269,15 @@ def GetConHPBonus (pc):
 		# Mage, Priest or Thief
 		return GemRB.GetTableValue (ConHPBonTable, str (GemRB.GetPlayerStat (pc, IE_CON)), "OTHER")
 
+
+def GetThac0 (Class, Level):
+	Thac0Table = GemRB.LoadTable ("THAC0")
+	# We need to check if Level is larger than 60, since after that point
+	# the table runs out, and the value remains the same.
+	if Level > 60:
+		Level = 60
+
+	return GemRB.GetTableValue (Thac0Table, Class, str (Level))
 
 ###################################################
 # End of file GUIREC.py

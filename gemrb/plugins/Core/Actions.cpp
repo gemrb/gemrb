@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.23 2005/07/17 18:58:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.24 2005/07/20 21:46:28 avenger_teambg Exp $
  *
  */
 
@@ -551,11 +551,14 @@ void GameScript::StartCutScene(Scriptable* Sender, Action* parameters)
 	gs->MySelf = Sender;
 	gs->EvaluateAllBlocks();
 	delete( gs );
+	Sender->Active &= ~SCR_CUTSCENEID;
+	Sender->CutSceneId = NULL;
 }
 
 void GameScript::CutSceneID(Scriptable* Sender, Action* parameters)
 {
 	Sender->CutSceneId = GetActorFromObject( Sender, parameters->objects[1]);
+	Sender->Active|=SCR_CUTSCENEID;
 	if (InDebug&ID_CUTSCENE) {
 		if (!Sender->CutSceneId) {
 			printMessage("GameScript","Failed to set CutSceneID!\n",YELLOW);
@@ -1740,7 +1743,7 @@ void GameScript::Deactivate(Scriptable* Sender, Action* parameters)
 	if (tar->Type != ST_ACTOR) {
 		return;
 	}
-	tar->Active &=~SCR_ACTIVE;
+	tar->Active &=~(SCR_ACTIVE|SCR_VISIBLE);
 }
 
 void GameScript::MakeGlobal(Scriptable* Sender, Action* /*parameters*/)
@@ -1995,9 +1998,9 @@ void GameScript::HideCreature(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if ( parameters->int0Parameter != 0 ) {
-		tar->Active |= SCR_ACTIVE;
+		tar->Active |= SCR_ACTIVE|SCR_VISIBLE;
 	} else {
-		tar->Active &=~SCR_ACTIVE;
+		tar->Active &=~SCR_VISIBLE;
 	}
 }
 
@@ -2007,7 +2010,7 @@ void GameScript::Activate(Scriptable* Sender, Action* parameters)
 	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
-	tar->Active |= SCR_ACTIVE;
+	tar->Active |= SCR_VISIBLE;
 }
 
 void GameScript::ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters)
@@ -3921,7 +3924,7 @@ void GameScript::AttachTransitionToDoor(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Door* door = ( Door* ) tar;
-	strnuprcpy(door->LinkedInfo, parameters->string0Parameter, 32);
+	strnspccpy(door->LinkedInfo, parameters->string0Parameter, 32);
 }
 
 /*getting a handle of a temporary actor resource to copy its selected attributes*/

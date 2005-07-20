@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.118 2005/07/17 18:58:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.119 2005/07/20 21:46:28 avenger_teambg Exp $
  *
  */
 
@@ -699,7 +699,7 @@ bool Actor::CheckOnDeath()
 
 		snprintf(varname, 32, "SPRITE_IS_DEAD%s", scriptName);
 		game->locals->Lookup(varname, value);
-		game->locals->SetAt(KillVar, value+1);
+		game->locals->SetAt(varname, value+1);
 	}
 
 	DropItem("",0);
@@ -819,7 +819,7 @@ int Actor::LearnSpell(ieResRef spellname, ieDword flags)
 		return LSR_INVALID;
 	}
 	if (flags&LS_ADDXP) {
-		NewStat(IE_XP,spl->Level*100,MOD_ADDITIVE);
+		AddExperience(spl->Level*100);		
 	}
 	return LSR_OK;
 }
@@ -945,6 +945,26 @@ void Actor::Heal(int days)
 	}
 }
 
+//this function should handle dual classing and multi classing
+void Actor::AddExperience(int exp)
+{
+	SetBase(IE_XP,GetBase(IE_XP)+exp);
+}
+
 void Actor::RemoveTimedEffects()
 {
+}
+
+bool Actor::Schedule(ieDword gametime)
+{
+	if (!(Active&SCR_VISIBLE) ) {
+		return false;
+	}
+
+	//check for schedule
+	ieDword bit = 1<<(gametime%7200/300);
+	if (appearance & bit) {
+		return true;
+	}
+	return false;
 }

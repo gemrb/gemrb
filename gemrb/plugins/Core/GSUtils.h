@@ -38,6 +38,8 @@ extern int InDebug;
 int GetReaction(Scriptable *Sender);
 int GetHappiness(Scriptable *Sender, int reputation);
 int GetHPPercent(Scriptable *Sender);
+bool StoreHasItemCore(ieResRef storename, ieResRef itemname);
+bool HasItemCore(Inventory *inventory, ieResRef itemname);
 void CreateVisualEffectCore(Scriptable *Sender, Point &position, const char *effect);
 void GetPositionFromScriptable(Scriptable* scr, Point &position, bool trap);
 int CanSee(Scriptable* Sender, Scriptable* target);

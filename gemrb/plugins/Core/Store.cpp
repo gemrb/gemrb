@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.cpp,v 1.13 2005/06/19 22:59:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.cpp,v 1.14 2005/07/20 21:46:30 avenger_teambg Exp $
  *
  */
 
@@ -47,7 +47,7 @@ Store::~Store(void)
 		free( purchased_categories );
 }
 
-bool Store::IsItemAvailable(unsigned int slot)
+bool Store::IsItemAvailable(unsigned int slot) const
 {
 	Game * game = core->GetGame();
 	//0     - not infinite, not conditional
@@ -150,6 +150,22 @@ STOItem *Store::GetItem(unsigned int idx)
 		}
 	}
 	return NULL;
+}
+
+unsigned int Store::FindItem(ieResRef itemname, bool usetrigger) const
+{
+	for (unsigned int i=0;i<ItemsCount;i++) {
+		if (usetrigger) {
+			if (!IsItemAvailable(i) ) {
+				continue;
+			}
+		}
+		STOItem *temp = items[i];
+		if (!strnicmp(itemname, temp->ItemResRef, 8) ) {
+			return i;
+		}
+	}
+	return (unsigned int) -1;
 }
 
 STOItem *Store::FindItem(CREItem *item, bool exact)

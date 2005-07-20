@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.47 2005/07/14 21:51:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.48 2005/07/20 21:46:30 avenger_teambg Exp $
  *
  */
 
@@ -56,7 +56,7 @@ TileObject* TileMap::AddTile(const char *ID, const char* Name, unsigned int Flag
 {
 	TileObject* tile = new TileObject();
 	tile->Flags=Flags;
-	strnuprcpy(tile->Name, Name, 32);
+	strnspccpy(tile->Name, Name, 32);
 	strnuprcpy(tile->Tileset, ID, 8);
 	tile->SetOpenTiles( openindices, opencount );
 	tile->SetClosedTiles( closeindices, closecount );

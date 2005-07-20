@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.35 2005/03/05 21:07:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.36 2005/07/20 21:46:29 avenger_teambg Exp $
  *
  */
 
@@ -58,7 +58,7 @@ BOOL WINAPI DllEntryPoint(HINSTANCE /*hinstDLL*/, DWORD /*fdwReason*/,
 unsigned char pl_uppercase[256];
 unsigned char pl_lowercase[256];
 
-// these 2 functions will copy a string to a zero terminated string with a maximum length
+// these 3 functions will copy a string to a zero terminated string with a maximum length
 void strnlwrcpy(char *dest, const char *source, int count)
 {
 	while(count--) {
@@ -75,6 +75,20 @@ void strnuprcpy(char* dest, const char *source, int count)
 {
 	while(count--) {
 		*dest++ = pl_uppercase[(unsigned char) *source];
+		if(!*source++) {
+			while(count--) *dest++=0;
+			return;
+		}
+	}
+	*dest=0;
+}
+
+// this one also filters spaces
+void strnspccpy(char* dest, const char *source, int count)
+{
+	while(count--) {
+		*dest = pl_uppercase[(unsigned char) *source];
+		if (*dest!=' ') dest++;
 		if(!*source++) {
 			while(count--) *dest++=0;
 			return;

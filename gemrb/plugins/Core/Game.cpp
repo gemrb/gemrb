@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.88 2005/07/17 18:58:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.89 2005/07/20 21:46:29 avenger_teambg Exp $
  *
  */
 
@@ -666,15 +666,19 @@ char *Game::GetFamiliar(unsigned int Index)
 
 void Game::ShareXP(int xp, bool divide)
 {
+  int individual;
+
 	if (divide) {
 		int PartySize = GetPartySize(true); //party size, only alive
 		if (PartySize<1) {
 			return;
 		}
-		xp /= PartySize;
-	}
+		individual = xp / PartySize;
+  } else {
+    individual = xp;
+  }
 
-	if (!xp) {
+	if (!individual) {
 		return;
 	}
 	
@@ -682,7 +686,7 @@ void Game::ShareXP(int xp, bool divide)
 		if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
 			continue;
 		}
-		PCs[i]->NewStat(IE_XP,xp,MOD_ADDITIVE);
+    PCs[i]->AddExperience(individual);
 	}
 	if (xp>0) {
 		core->DisplayConstantStringValue( STR_GOTXP, 0xc0c000, (ieDword) xp); //you have gained ... xp

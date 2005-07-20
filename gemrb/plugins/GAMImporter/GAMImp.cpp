@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.57 2005/06/24 23:20:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.58 2005/07/20 21:46:30 avenger_teambg Exp $
  *
  */
 
@@ -480,7 +480,7 @@ int GAMImp::PutKillVars(DataStream *stream, Game *game)
 	for (unsigned int i=0;i<KillVarsCount;i++) {
 		//global variables are locals for game, that's why the local/global confusion
 		pos=game->kaputz->GetNextAssoc( pos, name, value);
-		strnuprcpy(tmpname,name,32);
+		strnspccpy(tmpname,name,32);
 		stream->Write( tmpname, 32);
 		stream->Write( filling, 8);
 		stream->WriteDword( &value);
@@ -502,7 +502,7 @@ int GAMImp::PutVariables(DataStream *stream, Game *game)
 	for (unsigned int i=0;i<GlobalCount;i++) {
 		//global variables are locals for game, that's why the local/global confusion
 		pos=game->locals->GetNextAssoc( pos, name, value);
-		strnuprcpy(tmpname,name,32);
+		strnspccpy(tmpname,name,32);
 		stream->Write( tmpname, 32);
 		stream->Write( filling, 8);
 		stream->WriteDword( &value);

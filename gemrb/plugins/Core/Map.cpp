@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.179 2005/07/19 20:02:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.180 2005/07/20 21:46:30 avenger_teambg Exp $
  *
  */
 
@@ -396,9 +396,6 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 			ip->LastTrigger = ip->LastEntered = actor->GetID();
 			ip->ExecuteScript( ip->Scripts[0] );
 			ip->ProcessActions();
-			//this isn't a continuously running script
-			//turning oncreation to false on first run
-			ip->OnCreation = false;
 		}
 	}
 }
@@ -408,13 +405,11 @@ void Map::UpdateScripts()
 	//Run the Global Script
 	Game* game = core->GetGame();
 	game->ExecuteScript( game->Scripts[0] );
-	game->OnCreation = false;
 	game->ProcessActions();
 	//Run the Map Script
 	if (Scripts[0]) {
 		ExecuteScript( Scripts[0] );
 	}
-	OnCreation = false;
 	//Execute Pending Actions
 	ProcessActions();
 
@@ -433,7 +428,6 @@ void Map::UpdateScripts()
 		}
 
 		//returns true if actor should be completely removed
-		actor->OnCreation = false;
 		actor->inventory.CalculateWeight();
 		actor->SetStat( IE_ENCUMBRANCE, actor->inventory.GetWeight() );
 		actor->DoStep( );
@@ -458,9 +452,6 @@ void Map::UpdateScripts()
 			if (ip->LastTrigger) {
 				//Run the InfoPoint script
 				ip->ExecuteScript( ip->Scripts[0] );
-				//OnCreation won't trigger the INFO point
-				//If it does, alter the condition above
-				ip->OnCreation = false;
 			}
 			continue;
 		}
@@ -483,7 +474,6 @@ void Map::UpdateScripts()
 				}
 			}
 		}
-		ip->OnCreation = false;
 	}
 }
 
@@ -544,6 +534,8 @@ void Map::DrawMap(Region screen, GameControl* gc)
 	if (!TMap) {
 		return;
 	}
+	ieDword gametime = core->GetGame()->GameTime;
+
 	TMap->DrawOverlay( 0, screen );
 	//Blit the Background Map Animations (before actors)
 	Video* video = core->GetVideoDriver();
@@ -552,7 +544,7 @@ void Map::DrawMap(Region screen, GameControl* gc)
 		int animcount=a->animcount;
 		
 		if (!(a->Flags&A_ANI_BACKGROUND)) continue; //these are drawn after actors
-		if (!(a->Flags&A_ANI_ACTIVE)) continue;
+		if (!a->Schedule(gametime)) continue;
 		
 		if (!IsVisible( a->Pos, !(a->Flags & A_ANI_NOT_IN_FOG)) )
 			continue;
@@ -615,7 +607,9 @@ void Map::DrawMap(Region screen, GameControl* gc)
 				continue;
 			//explored or visibilitymap (bird animations are visible in fog)
 			int explored = actor->Modified[IE_DONOTJUMP]&2;
-			if (!IsVisible( actor->Pos, explored)) {
+			//check the deactivation condition only if needed
+			//this fixes dead actors disappearing from fog of war (they should be permanently visible)
+			if (!IsVisible( actor->Pos, explored) && (actor->Active&SCR_ACTIVE) ) {
 				//finding an excuse why we don't hybernate the actor
 				if (actor->Modified[IE_ENABLEOFFSCREENAI])
 					continue;
@@ -629,8 +623,9 @@ void Map::DrawMap(Region screen, GameControl* gc)
 					continue;
 				//turning actor inactive
 				actor->Active&=~SCR_ACTIVE;
+				//we draw the actor now for the last time
 				//actor->SetStance(IE_ANI_READY);
-				continue;
+				//continue;
 			}
 			//0 means opaque
 			int Trans = actor->Modified[IE_TRANSLUCENT] * 255 / 100;
@@ -696,7 +691,7 @@ void Map::DrawMap(Region screen, GameControl* gc)
 		int animcount=a->animcount;
 		
 		if (a->Flags&A_ANI_BACKGROUND) continue; //these are drawn before actors
-		if (!(a->Flags&A_ANI_ACTIVE)) continue;
+		if (!a->Schedule(gametime)) continue;
 
 		if (!IsVisible( a->Pos, !(a->Flags & A_ANI_NOT_IN_FOG)) )
 			continue;
@@ -790,7 +785,7 @@ void Map::AddActor(Actor* actor)
 {
 	//setting the current area for the actor as this one
 	strnuprcpy(actor->Area, scriptName, 8);
-	//IDs start from 1, 0 is reserved for 'null value'
+	//0 is reserved for 'no actor'
 	actor->SetMap(this, ++localActorCounter, ++globalActorCounter);
 	actors.push_back( actor );
 }
@@ -867,6 +862,39 @@ int Map::GetActorCount(bool any) const
 		}
 	}
 	return ret;
+}
+
+//before writing the area out, perform some cleanups
+void Map::PurgeArea(bool items)
+{
+	//1. remove dead actors without 'keep corpse' flag
+	unsigned int i=actors.size();
+	while(i--) {
+		Actor *ac = actors[i];
+
+		if (ac->GetStat(IE_STATE_ID)&STATE_NOSAVE) {
+			if (ac->GetStat(IE_MC_FLAGS) & MC_KEEP_CORPSE) {
+				continue;
+			}
+			delete ac;
+			actors.erase( actors.begin()+i );
+		}
+	}
+	//2. remove any non critical items
+	if (items) {
+		unsigned int i=TMap->GetContainerCount();
+		while(i--) {
+			Container *c = TMap->GetContainer(i);
+			unsigned int j=c->inventory.GetSlotCount();
+			while(j--) {
+				CREItem *itemslot = c->inventory.GetSlotItem(j);
+				if (itemslot->Flags&IE_INV_ITEM_CRITICAL) {
+					continue;
+				}
+			}
+			TMap->CleanupContainer(c);
+		}
+	}
 }
 
 Actor* Map::GetActor(int index, bool any)
@@ -989,19 +1017,26 @@ void Map::GenerateQueues()
 			continue;
 		}
 
+		ieDword gametime = core->GetGame()->GameTime;
+
 		if (actor->Active&SCR_ACTIVE) {
 			if ((actor->GetStance() == IE_ANI_TWITCH) && !actor->playDeadCounter) {
-				priority = 1;
+				priority = 1; //display
 			} else {
-				priority = 0;
+				priority = 0; //run scripts and display
 			}
 		} else {
-			if (IsVisible(actor->Pos, true) && (actor->GetStance() !=IE_ANI_TWITCH) ) {
-				priority = 0;
-				actor->Active|=SCR_ACTIVE;
-				//here you can flag for autopause if actor->Modified[IE_EA] is enemy, coz we just revealed it!
+			//dead actors are always visible on the map, but run no scripts
+			if (actor->GetStance() == IE_ANI_TWITCH) {
+				priority = 1;
 			} else {
-				priority = 2;
+				if (IsVisible(actor->Pos, true) && actor->Schedule(gametime) ) {
+					priority = 0; //run scripts and display, activated now
+					actor->Active|=SCR_ACTIVE;
+					//here you can flag for autopause if actor->Modified[IE_EA] is enemy, coz we just revealed it!
+				} else {
+					priority = 2;
+				}
 			}
 		}
 
@@ -1088,7 +1123,7 @@ AreaAnimation* Map::GetAnimation(const char* Name)
 Spawn *Map::AddSpawn(char* Name, int XPos, int YPos, ieResRef *creatures, unsigned int count)
 {
 	Spawn* sp = new Spawn();
-	strnuprcpy(sp->Name, Name, 32);
+	strnspccpy(sp->Name, Name, 32);
 	if (count>MAX_RESCOUNT) {
 		count=MAX_RESCOUNT;
 	}
@@ -1157,6 +1192,8 @@ bool Map::CanFree()
 			return false;
 		}
 	}
+	//we expect the area to be swapped out, so we simply remove the corpses now
+	PurgeArea(false);
 	return true;
 }
 
@@ -2002,4 +2039,18 @@ void AreaAnimation::SetPalette(ieResRef Pal)
 		animation[i]->SetPalette( pal, true );
 	}
 	free (pal);
+}
+
+bool AreaAnimation::Schedule(ieDword gametime)
+{
+	if (!(Flags&A_ANI_ACTIVE) ) {
+		return false;
+	}
+
+	//check for schedule
+	ieDword bit = 1<<(gametime%7200/300);
+	if (appearance & bit) {
+		return true;
+	}
+	return false;
 }

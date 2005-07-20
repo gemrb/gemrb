@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.85 2005/07/17 18:58:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.86 2005/07/20 21:46:28 avenger_teambg Exp $
  *
  */
 
@@ -509,7 +509,7 @@ void CREImp::GetActorPST(Actor *act)
 	str->Read( scriptname, 32);
 	scriptname[32]=0;
 	act->SetScriptName(scriptname);
-	strnuprcpy(act->KillVar, KillVar, 32);
+	strnspccpy(act->KillVar, KillVar, 32);
 
 	str->ReadDword( &KnownSpellsOffset );
 	str->ReadDword( &KnownSpellsCount );
@@ -1207,7 +1207,7 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	str->Read( scriptname, 32);
 	scriptname[32]=0;
 	act->SetScriptName(scriptname);
-	strnuprcpy(act->KillVar, KillVar, 32);
+	strnspccpy(act->KillVar, KillVar, 32);
 
 	str->ReadDword( &KnownSpellsOffset );
 	str->ReadDword( &KnownSpellsCount );

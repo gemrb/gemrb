@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.127 2005/07/19 20:02:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.128 2005/07/20 21:46:27 avenger_teambg Exp $
  *
  */
 
@@ -598,7 +598,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		}
 		door->LockDifficulty=LockRemoval;
 		door->OpenStrRef=OpenStrRef;
-		strnuprcpy(door->LinkedInfo, LinkedInfo, 32);
+		strnspccpy(door->LinkedInfo, LinkedInfo, 32);
 		//these 2 fields are not sure
 		door->NameStrRef=NameStrRef;
 		strnuprcpy(door->Dialog, Dialog, 8);
@@ -712,6 +712,9 @@ Map* AREImp::GetMap(const char *ResRef)
 	
 			ab->SetOrientation( Orientation,0 );
 			ab->TalkCount = TalkCount;
+			//maybe there is a flag (deactivate), but 
+			//right now we just set this
+			ab->Active = SCR_VISIBLE;
 		}
 		core->FreeInterface( actmgr );
 	}

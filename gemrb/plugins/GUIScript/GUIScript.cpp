@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.326 2005/07/17 18:58:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.327 2005/07/20 21:46:30 avenger_teambg Exp $
  *
  */
 
@@ -4808,10 +4808,10 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 		ITMExtHeader *eh;
 		Effect *f;
 
-		case ITM_TYPE_POTION:
+		case ITM_TYPE_POTION: //drink
 			function=1;
 			break;
-		case ITM_TYPE_SCROLL:
+		case ITM_TYPE_SCROLL: //write scroll
 			//determining if this is a copyable scroll
 			if (item->ExtHeaderCount<2) {
 				break;
@@ -4826,6 +4826,14 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 			}
 			//maybe further checks for school exclusion?
 			function=2;
+			break;
+		case ITM_TYPE_BAG: //open container
+			//allow the open container flag only if there is
+			//a store file (this fixes pst eye items, which 
+			//got the same item type as bags)
+			if (core->GetResourceMgr()->HasResource( ResRef, IE_STO_CLASS_ID) ) {
+				function=3;
+			}
 			break;
 		default:;
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.314 2005/07/19 20:02:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.315 2005/07/20 21:46:29 avenger_teambg Exp $
  *
  */
 
@@ -2597,13 +2597,21 @@ int GameScript::ExecuteResponse(Scriptable* Sender, Response* rE)
 				ExecuteAction( Sender, aC );
 				break;
 			case AF_NONE:
-				if (Sender->CutSceneId) {
-					Sender->CutSceneId->AddAction( aC );
-					//AddAction( Sender->CutSceneId, aC );
-				}
-				else {
-					//Sender->AddAction( aC );
-					AddAction( Sender, aC );
+				if (Sender->Active&SCR_CUTSCENEID) {
+					if (Sender->CutSceneId) {
+						Sender->CutSceneId->AddAction( aC );
+						//AddAction( Sender->CutSceneId, aC );
+					} else {
+						printf("Did not find cutscene object, action ignored!\n");
+					}
+				} else {
+					if (Sender->CutSceneId) {
+						printf("Stuck with cutscene ID!\n");
+						abort();
+					}
+					//ogres in dltc need this
+					Sender->AddAction( aC );
+					//AddAction( Sender, aC );
 				}
 				break;
 			case AF_CONTINUE:
@@ -2613,22 +2621,6 @@ int GameScript::ExecuteResponse(Scriptable* Sender, Response* rE)
 		}
 	}
 	return ret;
-}
-
-//resolving actionoverride in delayed actions
-void GameScript::AddAction(Scriptable* Sender, Action* aC)
-{
-	if (aC->objects[0]) { //this is an actionoverride
-			Sender = GetActorFromObject( Sender, aC->objects[0]);
-			if (Sender) {
-				Sender->AddAction(ParamCopyNoOverride(aC) );
-			} else {
-				printMessage("GameScript","Actionoverride failed for object: \n",LIGHT_RED);
-				aC->objects[0]->Dump();
-			}
-			return;
-	}
-	Sender->AddAction(aC);
 }
 
 void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)

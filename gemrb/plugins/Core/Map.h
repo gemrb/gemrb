@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.86 2005/07/16 21:03:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.87 2005/07/20 21:46:30 avenger_teambg Exp $
  *
  */
 
@@ -154,6 +154,7 @@ public:
 	AreaAnimation();
 	~AreaAnimation();
 	void SetPalette(ieResRef Palette);
+	bool Schedule(ieDword gametime);
 };
 
 class GEM_EXPORT Map : public Scriptable {
@@ -223,6 +224,8 @@ public:
 	//returns actors in rect (onlyparty could be more sophisticated)
 	int GetActorInRect(Actor**& actors, Region& rgn, bool onlyparty);
 	int GetActorCount(bool any) const;
+	//if items == true, remove noncritical items from ground piles too
+	void PurgeArea(bool items);
 
 	SongHeaderType SongHeader;
 	RestHeaderType RestHeader;

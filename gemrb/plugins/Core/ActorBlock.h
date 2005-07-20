@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.83 2005/07/17 18:58:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.84 2005/07/20 21:46:28 avenger_teambg Exp $
  *
  */
 
@@ -89,6 +89,8 @@ class Door;
 
 //scriptable (actor) flags
 #define SCR_ACTIVE        1
+#define SCR_CUTSCENEID    2
+#define SCR_VISIBLE       4
 
 //CheckTravel return value
 #define CT_CANTMOVE       0 //inactive
@@ -100,6 +102,7 @@ class Door;
 
 //bits for binary trigger bitfield
 #define BT_DIE            1
+#define BT_ONCREATION     2
 
 #ifdef WIN32
 

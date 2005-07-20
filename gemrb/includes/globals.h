@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.76 2005/06/24 23:19:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.77 2005/07/20 21:46:27 avenger_teambg Exp $
  *
  */
 
@@ -129,8 +129,9 @@ class Scriptable;
 extern unsigned char pl_uppercase[256];
 extern unsigned char pl_lowercase[256];
 
-GEM_EXPORT void strnuprcpy(char* d, const char *s, int l);
 GEM_EXPORT void strnlwrcpy(char* d, const char *s, int l);
+GEM_EXPORT void strnuprcpy(char* d, const char *s, int l);
+GEM_EXPORT void strnspccpy(char* d, const char *s, int l);
 GEM_EXPORT unsigned char GetOrient(Point &s, Point &d);
 GEM_EXPORT unsigned int Distance(Point pos, Point pos2);
 GEM_EXPORT unsigned int Distance(Point pos, Scriptable *b);

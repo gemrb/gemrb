@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.14 2005/07/17 18:58:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.15 2005/07/20 21:46:29 avenger_teambg Exp $
  *
  */
 
@@ -158,13 +158,63 @@ bool ResolveSpellName(ieResRef spellres, Action *parameters)
 	} else {
 		//resolve spell
 		int type = parameters->int0Parameter/1000;
-       		int spellid = parameters->int0Parameter%1000;
+		int spellid = parameters->int0Parameter%1000;
 		if (type>4) {
 			return false;
 		}
 		sprintf(spellres, "%s%03d", spell_suffices[type], spellid);
 	}
 	return true;
+}
+
+bool StoreHasItemCore(ieResRef storename, ieResRef itemname)
+{
+	bool has_current=false;
+	ieResRef current;
+	CREItem item;
+
+	Store *store = core->GetCurrentStore();
+	if (!store) {
+		store = core->SetCurrentStore(storename);
+	} else {
+		if (strnicmp(store->Name, storename, 8) ) {
+			//not the current store, we need some dirty hack
+			has_current = true;
+			strnuprcpy(current, store->Name, 8);
+		}
+	}
+	bool ret = false;
+	//don't use triggers (pst style), it would be possible to create infinite loops
+	if (store->FindItem(itemname, false) ) {
+		ret=true;
+	}
+	if (has_current) {
+		//setting back old store (this will save our current store)
+		core->SetCurrentStore(current);
+	}
+	return ret;
+}
+
+//check if an inventory (container or actor) has item (could be recursive ?)
+bool HasItemCore(Inventory *inventory, ieResRef itemname)
+{
+	int i=inventory->GetSlotCount();
+	while (i--) {
+		//maybe we could speed this up if we mark bag items with a flags bit
+		CREItem *itemslot = inventory->GetSlotItem(i);
+		Item *item = core->GetItem(itemslot->ItemResRef);
+		if (item) {
+			if (item->ItemType==ITM_TYPE_BAG) {
+				//the store is the same as the item's name
+				bool ret = StoreHasItemCore(itemslot->ItemResRef, itemname);
+				core->FreeItem(item, itemslot->ItemResRef);
+				if (ret) {
+					return true;
+				}
+			}
+		}
+	}
+	return false;
 }
 
 void DisplayStringCore(Scriptable* Sender, int Strref, int flags)

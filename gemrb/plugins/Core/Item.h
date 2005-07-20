@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.18 2005/06/17 19:33:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.19 2005/07/20 21:46:30 avenger_teambg Exp $
  *
  */
 
@@ -66,6 +66,7 @@
 //special itemtypes
 #define ITM_TYPE_POTION      9
 #define ITM_TYPE_SCROLL      11
+#define ITM_TYPE_BAG         50
 
 class GEM_EXPORT ITMExtHeader {
 public:

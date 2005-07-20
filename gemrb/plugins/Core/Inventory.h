@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.37 2005/07/07 16:09:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.38 2005/07/20 21:46:30 avenger_teambg Exp $
  *
  */
 
@@ -74,7 +74,8 @@ typedef enum ieCREItemFlagBits {
 	IE_INV_ITEM_IDENTIFIED = 1,
 	IE_INV_ITEM_UNSTEALABLE = 2,
 	IE_INV_ITEM_STOLEN = 4,
-	IE_INV_ITEM_UNDROPPABLE =8,
+	//in iwd/iwd2 this flag means 'magical', some hack is needed
+	IE_INV_ITEM_UNDROPPABLE =8,   
 	//just recently acquired
 	IE_INV_ITEM_ACQUIRED = 0x10,	//this is a gemrb extension
 	//is this item destructible normally?
