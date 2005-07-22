@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.80 2005/07/20 21:46:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.81 2005/07/22 15:43:07 avenger_teambg Exp $
  *
  */
 
@@ -303,8 +303,8 @@ public:
 	int GetHPMod();
 	/* Heals actor by days */
 	void Heal(int days);
-  /* Receive experience (handle dual/multi class) */
-  void AddExperience(int exp);
+	/* Receive experience (handle dual/multi class) */
+	void AddExperience(int exp);
 	/* Sets the modal state after checks */
 	void SetModal(ieDword newstate);
 	/* returns current attack style */
@@ -314,6 +314,6 @@ public:
 	/* sets a colour gradient stat, handles location */
 	void SetColor( ieDword idx, ieDword grd);
 	void RemoveTimedEffects();
-  bool Schedule(ieDword gametime);
+	bool Schedule(ieDword gametime);
 };
 #endif

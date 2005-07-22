@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.103 2005/07/20 21:46:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.104 2005/07/22 15:43:17 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -266,9 +266,9 @@ void Scriptable::ClearTriggers()
 	if (bittriggers & BT_DIE) {
 		((Actor *) this)->InternalFlags&=~IF_JUSTDIED;
 	}
-  if (bittriggers & BT_ONCREATION) {
-    OnCreation = false;
-  }
+	if (bittriggers & BT_ONCREATION) {
+		OnCreation = false;
+	}
 }
 
 void Scriptable::SetBitTrigger(ieDword bittrigger)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.84 2005/07/20 21:46:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.85 2005/07/22 15:43:18 avenger_teambg Exp $
  *
  */
 
@@ -48,8 +48,8 @@ class Door;
 #define SCR_OVERRIDE 0
 #define SCR_AREA	 1
 #define SCR_SPECIFICS 2
-#define SCR_CLASS    3
-#define SCR_RESERVED  4
+#define SCR_RESERVED  3
+#define SCR_CLASS    4
 #define SCR_RACE	 5
 #define SCR_GENERAL  6
 #define SCR_DEFAULT  7
