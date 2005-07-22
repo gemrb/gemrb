@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.15 2005/07/20 21:46:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.16 2005/07/22 17:17:27 avenger_teambg Exp $
  *
  */
 
@@ -202,15 +202,17 @@ bool HasItemCore(Inventory *inventory, ieResRef itemname)
 	while (i--) {
 		//maybe we could speed this up if we mark bag items with a flags bit
 		CREItem *itemslot = inventory->GetSlotItem(i);
+		if (!itemslot)
+			continue;
 		Item *item = core->GetItem(itemslot->ItemResRef);
-		if (item) {
-			if (item->ItemType==ITM_TYPE_BAG) {
-				//the store is the same as the item's name
-				bool ret = StoreHasItemCore(itemslot->ItemResRef, itemname);
-				core->FreeItem(item, itemslot->ItemResRef);
-				if (ret) {
-					return true;
-				}
+		if (!item)
+			continue;
+		if (item->ItemType==ITM_TYPE_BAG) {
+			//the store is the same as the item's name
+			bool ret = StoreHasItemCore(itemslot->ItemResRef, itemname);
+			core->FreeItem(item, itemslot->ItemResRef);
+			if (ret) {
+				return true;
 			}
 		}
 	}
