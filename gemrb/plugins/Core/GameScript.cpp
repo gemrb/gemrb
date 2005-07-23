@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.316 2005/07/22 15:43:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.317 2005/07/23 17:09:51 avenger_teambg Exp $
  *
  */
 
@@ -538,6 +538,7 @@ static ActionLink actionnames[] = {
 	{"polymorphcopy", GameScript::PolymorphCopy, 0},
 	{"quitgame", GameScript::QuitGame, 0},
 	{"randomfly", GameScript::RandomFly, AF_BLOCKING},
+	{"randomturn", GameScript::RandomTurn, AF_BLOCKING},
 	{"randomwalk", GameScript::RandomWalk, AF_BLOCKING},
 	{"randomwalkcontinuous", GameScript::RandomWalkContinuous, AF_BLOCKING},
 	{"realsetglobaltimer", GameScript::RealSetGlobalTimer,AF_MERGESTRINGS},

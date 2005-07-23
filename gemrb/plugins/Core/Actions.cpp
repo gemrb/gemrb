@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.24 2005/07/20 21:46:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.25 2005/07/23 17:09:51 avenger_teambg Exp $
  *
  */
 
@@ -1071,7 +1071,7 @@ void GameScript::ForceFacing(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *actor = (Actor *) tar;
-	actor->SetOrientation(parameters->int0Parameter,0 );
+	actor->SetOrientation(parameters->int0Parameter, false);
 }
 
 /* A -1 means random facing? */
@@ -1083,11 +1083,10 @@ void GameScript::Face(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	if (parameters->int0Parameter==-1) {
-		actor->SetOrientation(core->Roll(1,MAX_ORIENT,-1),0 );
+		actor->SetOrientation(core->Roll(1,MAX_ORIENT,-1), false);
 	} else {
-		actor->SetOrientation(parameters->int0Parameter,0);
+		actor->SetOrientation(parameters->int0Parameter, false);
 	}
-	actor->resetAction = true;
 	actor->SetWait( 1 );
 }
 
@@ -1103,8 +1102,7 @@ void GameScript::FaceObject(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->SetOrientation( GetOrient( target->Pos, actor->Pos ),0 );
-	actor->resetAction = true;
+	actor->SetOrientation( GetOrient( target->Pos, actor->Pos ), false);
 	actor->SetWait( 1 );
 }
 
@@ -1122,8 +1120,7 @@ void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 	}
 	value = (ieDword) CheckVariable( target, parameters->string0Parameter );
 	Point p( *(unsigned short *) &value, *(((unsigned short *) &value)+1));
-	actor->SetOrientation ( GetOrient( p, actor->Pos ),0 );
-	actor->resetAction = true;
+	actor->SetOrientation ( GetOrient( p, actor->Pos ), false);
 	actor->SetWait( 1 );
 }
 
@@ -3761,9 +3758,9 @@ void GameScript::RandomFly(Scriptable* Sender, Action* parameters)
 	Actor* actor = ( Actor* ) Sender;
 	int x = rand()&31;
 	if (x<10) {
-		actor->SetOrientation(actor->GetOrientation()-1, 0);
+		actor->SetOrientation(actor->GetOrientation()-1, false);
 	} else if (x>20) {
-		actor->SetOrientation(actor->GetOrientation()+1, 0);
+		actor->SetOrientation(actor->GetOrientation()+1, false);
 	}
 	//fly in this direction for 2 steps
 	actor->MoveLine(2, GL_PASS);
@@ -3909,8 +3906,18 @@ void GameScript::TurnAMT(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
-	actor->SetOrientation(actor->GetOrientation()+parameters->int0Parameter,0);
-	actor->resetAction = true;
+	actor->SetOrientation(actor->GetOrientation()+parameters->int0Parameter, true);
+	actor->SetWait( 1 );
+}
+
+void GameScript::RandomTurn(Scriptable* Sender, Action* /*parameters*/)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+	actor->SetOrientation(rand() % MAX_ORIENT, true);
 	actor->SetWait( 1 );
 }
 
