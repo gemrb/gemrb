@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.215 2005/07/23 19:49:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.216 2005/07/23 22:36:02 avenger_teambg Exp $
  *
  */
 
@@ -574,6 +574,7 @@ struct TriggerLink {
 #define CC_PLAY_ANIM 8          //play animation
 #define CC_STRING1   16         //resref is in second string
 #define CC_CHECK_OVERLAP 32     //other actors
+#define CC_COPY      64         //copy appearance
 
 //begindialog flags
 #define BD_STRING0   0
@@ -708,8 +709,8 @@ public: //Script Functions
 	static int BitGlobal_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int BreakingPoint(Scriptable* Sender, Trigger* parameters);
 	static int CalledByName(Scriptable* Sender, Trigger* parameters);
-	static int CharName(Scriptable* Sender, Trigger* parameters);
 	static int ChargeCount(Scriptable* Sender, Trigger* parameters);
+	static int CharName(Scriptable* Sender, Trigger* parameters);
 	static int CheckDoorFlags(Scriptable* Sender, Trigger* parameters);
 	static int CheckPartyAverageLevel(Scriptable* Sender, Trigger* parameters);
 	static int CheckPartyLevel(Scriptable* Sender, Trigger* parameters);
@@ -726,6 +727,7 @@ public: //Script Functions
 	static int CombatCounterGT(Scriptable* Sender, Trigger* parameters);
 	static int CombatCounterLT(Scriptable* Sender, Trigger* parameters);
 	static int Contains(Scriptable* Sender, Trigger* parameters);
+	static int CurrentAreaIs(Scriptable* Sender, Trigger* parameters);
 	static int DamageTaken(Scriptable* Sender, Trigger* parameters);
 	static int DamageTakenGT(Scriptable* Sender, Trigger* parameters);
 	static int DamageTakenLT(Scriptable* Sender, Trigger* parameters);
@@ -747,6 +749,7 @@ public: //Script Functions
 	static int FallenRanger(Scriptable* Sender, Trigger* parameters);
 	static int False(Scriptable* Sender, Trigger* parameters);
 	static int Frame(Scriptable* Sender, Trigger* parameters);
+	static int TimeOfDay(Scriptable* Sender, Trigger* parameters);
 	static int Gender(Scriptable* Sender, Trigger* parameters);
 	static int General(Scriptable* Sender, Trigger* parameters);
 	static int G_Trigger(Scriptable* Sender, Trigger* parameters);
@@ -984,9 +987,13 @@ public:
 	static void CreateCreature(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureAtLocation(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureAtFeet(Scriptable* Sender, Action* parameters);
+	static void CreateCreatureCopyPoint(Scriptable* Sender, Action* parameters);
+	static void CreateCreatureDoor(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureImpassable(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureImpassableAllowOverlap(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureObject(Scriptable* Sender, Action* parameters);
+	static void CreateCreatureObjectCopy(Scriptable* Sender, Action* parameters);
+	static void CreateCreatureObjectDoor(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureObjectOffset(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureObjectOffScreen(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureOffScreen(Scriptable* Sender, Action* parameters);
@@ -1083,15 +1090,15 @@ public:
 	static void IncInternal(Scriptable* Sender, Action* parameters);
 	static void IncMoraleAI(Scriptable* Sender, Action* parameters);
 	static void IncrementChapter(Scriptable* Sender, Action* parameters);
+	static void IncrementExtraProficiency(Scriptable* Sender, Action* parameters);
 	static void IncrementGlobal(Scriptable* Sender, Action* parameters);
 	static void IncrementGlobalOnce(Scriptable* Sender, Action* parameters);
-	static void IncrementExtraProficiency(Scriptable* Sender, Action* parameters);
 	static void IncrementProficiency(Scriptable* Sender, Action* parameters);
 	static void Interact(Scriptable* Sender, Action* parameters);
 	static void JoinParty(Scriptable* Sender, Action* parameters);
+	static void JumpToObject(Scriptable* Sender, Action* parameters);
 	static void JumpToPoint(Scriptable* Sender, Action* parameters);
 	static void JumpToPointInstant(Scriptable* Sender, Action* parameters);
-	static void JumpToObject(Scriptable* Sender, Action* parameters);
 	static void JumpToSavedLocation(Scriptable* Sender, Action* parameters);
 	static void Kill(Scriptable* Sender, Action* parameters);
 	static void KillFloatMessage(Scriptable* Sender, Action* parameters);
@@ -1103,9 +1110,9 @@ public:
 	static void LeaveParty(Scriptable* Sender, Action* parameters);
 	static void Lock(Scriptable* Sender, Action* parameters);
 	static void LockScroll(Scriptable* Sender, Action* parameters);
-	static void MarkObject(Scriptable* Sender, Action* parameters);
 	static void MakeGlobal(Scriptable* Sender, Action* parameters);
 	static void MakeUnselectable(Scriptable* Sender, Action* parameters);
+	static void MarkObject(Scriptable* Sender, Action* parameters);
 	static void MoraleDec(Scriptable* Sender, Action* parameters);
 	static void MoraleInc(Scriptable* Sender, Action* parameters);
 	static void MoraleSet(Scriptable* Sender, Action* parameters);
@@ -1117,13 +1124,13 @@ public:
 	static void MoveGlobalsTo(Scriptable* Sender, Action* parameters);
 	static void MoveInventory(Scriptable *Sender, Action* parameters);
 	static void MoveToCenterOfScreen(Scriptable* Sender, Action* parameters);
-	static void MoveToPoint(Scriptable* Sender, Action* parameters);
-	static void MoveToPointNoInterrupt(Scriptable* Sender, Action* parameters);
-	static void MoveToPointNoRecticle(Scriptable* Sender, Action* parameters);
 	static void MoveToObject(Scriptable* Sender, Action* parameters);
 	static void MoveToObjectFollow(Scriptable* Sender, Action* parameters);
 	static void MoveToObjectNoInterrupt(Scriptable* Sender, Action* parameters);
 	static void MoveToOffset(Scriptable* Sender, Action* parameters);
+	static void MoveToPoint(Scriptable* Sender, Action* parameters);
+	static void MoveToPointNoInterrupt(Scriptable* Sender, Action* parameters);
+	static void MoveToPointNoRecticle(Scriptable* Sender, Action* parameters);
 	static void MoveToSavedLocation(Scriptable* Sender, Action* parameters);
 	static void MoveToSavedLocationDelete(Scriptable* Sender, Action* parameters);
 	static void MoveViewPoint(Scriptable* Sender, Action* parameters);

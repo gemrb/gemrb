@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.319 2005/07/23 19:49:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.320 2005/07/23 22:36:02 avenger_teambg Exp $
  *
  */
 
@@ -41,10 +41,11 @@ static TriggerLink triggernames[] = {
 	{"areacheck", GameScript::AreaCheck, 0},
 	{"areacheckobject", GameScript::AreaCheckObject, 0},
 	{"areaflag", GameScript::AreaFlag, 0},
-	{"areatype", GameScript::AreaType, 0},
 	{"arearestdisabled", GameScript::AreaRestDisabled, 0},
+	{"areatype", GameScript::AreaType, 0},
 	{"atlocation", GameScript::AtLocation, 0},
 	{"attackedby", GameScript::AttackedBy, 0},
+	{"becamevisible", GameScript::BecameVisible, 0},
 	{"bitcheck", GameScript::BitCheck,TF_MERGESTRINGS},
 	{"bitcheckexact", GameScript::BitCheckExact,TF_MERGESTRINGS},
 	{"bitglobal", GameScript::BitGlobal_Trigger,TF_MERGESTRINGS},
@@ -68,8 +69,8 @@ static TriggerLink triggernames[] = {
 	{"combatcountergt", GameScript::CombatCounterGT, 0},
 	{"combatcounterlt", GameScript::CombatCounterLT, 0},
 	{"contains", GameScript::Contains, 0},
-	{"currentareais", GameScript::AreaCheck, 0},
-	{"creatureinarea", GameScript::AreaCheck, 0}, //cannot check others
+	{"currentareais", GameScript::CurrentAreaIs, 0},//checks object
+	{"creatureinarea", GameScript::AreaCheck, 0}, //pst, checks this object
 	{"damagetaken", GameScript::DamageTaken, 0},
 	{"damagetakengt", GameScript::DamageTakenGT, 0},
 	{"damagetakenlt", GameScript::DamageTakenLT, 0},
@@ -281,6 +282,7 @@ static TriggerLink triggernames[] = {
 	{"time", GameScript::Time, 0},
 	{"timegt", GameScript::TimeGT, 0},
 	{"timelt", GameScript::TimeLT, 0},
+	{"timeofday", GameScript::TimeOfDay, 0},
 	{"tookdamage", GameScript::TookDamage, 0},
 	{"traptriggered", GameScript::TrapTriggered, 0},
 	{"triggerclick", GameScript::Clicked, 0}, //not sure
@@ -355,11 +357,14 @@ static ActionLink actionnames[] = {
 	{"continue", GameScript::Continue,AF_INSTANT | AF_CONTINUE},
 	{"copygroundpilesto", GameScript::CopyGroundPilesTo, 0},
 	{"createcreature", GameScript::CreateCreature, 0}, //point is relative to Sender
+	{"createcreaturecopypoint", GameScript::CreateCreatureCopyPoint, 0}, //point is relative to Sender
+	{"createcreaturedoor", GameScript::CreateCreatureDoor, 0},
 	{"createcreatureatfeet", GameScript::CreateCreatureAtFeet, 0}, 
 	{"createcreatureatlocation", GameScript::CreateCreatureAtLocation, 0},
 	{"createcreatureimpassable", GameScript::CreateCreatureImpassable, 0},
 	{"createcreatureimpassableallowoverlap", GameScript::CreateCreatureImpassableAllowOverlap, 0},
 	{"createcreatureobject", GameScript::CreateCreatureObjectOffset, 0}, //the same
+	{"createcreatureobjectcopy", GameScript::CreateCreatureObjectCopy, 0}, //the same
 	{"createcreatureobjectoffscreen", GameScript::CreateCreatureObjectOffScreen, 0}, //same as createcreature object, but starts looking for a place far away from the player
 	{"createcreatureobjectoffset", GameScript::CreateCreatureObjectOffset, 0}, //the same
 	{"createcreatureoffscreen", GameScript::CreateCreatureOffScreen, 0},
@@ -469,9 +474,9 @@ static ActionLink actionnames[] = {
 	{"incrementinternal", GameScript::IncInternal, 0},//iwd
 	{"incmoraleai", GameScript::IncMoraleAI, 0},
 	{"incrementchapter", GameScript::IncrementChapter, 0},
+	{"incrementextraproficiency", GameScript::IncrementExtraProficiency, 0},
 	{"incrementglobal", GameScript::IncrementGlobal,AF_MERGESTRINGS},
 	{"incrementglobalonce", GameScript::IncrementGlobalOnce,AF_MERGESTRINGS},
-	{"incrementextraproficiency", GameScript::IncrementExtraProficiency, 0},
 	{"incrementproficiency", GameScript::IncrementProficiency, 0},
 	{"interact", GameScript::Interact, 0},
 	{"joinparty", GameScript::JoinParty, 0},
@@ -515,7 +520,7 @@ static ActionLink actionnames[] = {
 	{"movetosavedlocation", GameScript::MoveToSavedLocation,AF_BLOCKING},
 	//take care of the typo in the original bg2 action.ids
 	{"movetosavedlocationn", GameScript::MoveToSavedLocation,AF_BLOCKING},
-	{"moveviewobject", GameScript::MoveViewPoint, 0},
+	{"moveviewobject", GameScript::MoveViewObject, 0},
 	{"moveviewpoint", GameScript::MoveViewPoint, 0},
 	{"nidspecial1", GameScript::NIDSpecial1,AF_BLOCKING},//we use this for dialogs, hack
 	{"nidspecial2", GameScript::NIDSpecial2,AF_BLOCKING},//we use this for worldmap, another hack
@@ -538,7 +543,9 @@ static ActionLink actionnames[] = {
 	{"playsoundnotranged", GameScript::PlaySoundNotRanged, 0},
 	{"playsoundpoint", GameScript::PlaySoundPoint, 0},
 	{"plunder", GameScript::Plunder,AF_BLOCKING},
+	{"polymorph", GameScript::Polymorph, 0},
 	{"polymorphcopy", GameScript::PolymorphCopy, 0},
+	{"polymorphcopybase", GameScript::PolymorphCopyBase, 0},
 	{"quitgame", GameScript::QuitGame, 0},
 	{"randomfly", GameScript::RandomFly, AF_BLOCKING},
 	{"randomturn", GameScript::RandomTurn, AF_BLOCKING},
@@ -558,7 +565,11 @@ static ActionLink actionnames[] = {
 	{"reputationinc", GameScript::ReputationInc, 0},
 	{"reputationset", GameScript::ReputationSet, 0},
 	{"resetfogofwar", GameScript::UndoExplore, 0}, //pst
+	{"rest", GameScript::Rest, 0},
+	{"restnospells", GameScript::RestNoSpells, 0},
 	{"restorepartylocations", GameScript:: RestorePartyLocation, 0},
+	{"restparty", GameScript::RestParty, 0},
+	{"restuntilhealed", GameScript::RestUntilHealed, 0},
 	//this is in iwd2, same as movetosavedlocation, with a default variable
 	{"returntosavedlocation", GameScript::MoveToSavedLocation, AF_BLOCKING},
 	{"returntosavedlocationdelete", GameScript::MoveToSavedLocationDelete, AF_BLOCKING},

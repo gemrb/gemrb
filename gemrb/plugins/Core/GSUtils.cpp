@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.17 2005/07/23 19:49:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.18 2005/07/23 22:36:02 avenger_teambg Exp $
  *
  */
 
@@ -449,16 +449,22 @@ Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC)
 }
 
 /*FIXME: what is 'base'*/
-void PolymorphCopyCore(Actor *src, Actor *tar, bool /*base*/)
+void PolymorphCopyCore(Actor *src, Actor *tar, bool base)
 {
 	tar->SetStat(IE_ANIMATION_ID, src->GetStat(IE_ANIMATION_ID) );
+	if (!base) {
+		tar->SetStat(IE_ARMOR_TYPE, src->GetStat(IE_ARMOR_TYPE) );
+		for (int i=0;i<7;i++) {
+			tar->SetStat(IE_COLORS+i, src->GetStat(IE_COLORS+i) );
+		}
+	}
 	//add more attribute copying
 }
 
 void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 {
-	//ActorMgr* aM = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
 	DataStream* ds;
+	Scriptable *tmp = GetActorFromObject( Sender, parameters->objects[1] );
 
 	if (flags & CC_STRING1) {
 		ds = core->GetResourceMgr()->GetResource( parameters->string1Parameter, IE_CRE_CLASS_ID );
@@ -466,10 +472,6 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 	else {
 		ds = core->GetResourceMgr()->GetResource( parameters->string0Parameter, IE_CRE_CLASS_ID );
 	}
-	//aM->Open( ds, true );
-	//Actor* ab = aM->GetActor();
-	//core->FreeInterface( aM );
-	//GetCreature will close the datastream on its own
 	Actor *ab = core->GetCreature(ds);
 	int radius;
 	Point pnt;
@@ -484,10 +486,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 			}
 			//falling through
 		case CC_OBJECT://use object + offset
-			{
-			Scriptable *tmp = GetActorFromObject( Sender, parameters->objects[1] );
 			if (tmp) Sender=tmp;
-			}
 			//falling through
 		case CC_OFFSET://use sender + offset
 			pnt.x = parameters->pointParameter.x+Sender->Pos.x;
@@ -506,15 +505,23 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 	printf("CreateCreature: %s at [%d.%d] face:%d\n",parameters->string0Parameter, pnt.x,pnt.y,parameters->int0Parameter);
 	Map *map = Sender->GetCurrentArea();
 	ab->SetPosition(map, pnt, flags&CC_CHECK_IMPASSABLE, radius );
-	//i think this isn't needed, the creature's stance should be set in
-	//the creature, GetActor sets it correctly
-	//ab->SetStance( IE_ANI_AWAKE );
 	ab->SetOrientation(parameters->int0Parameter, 0 );
 	map->AddActor( ab );
 
-	//setting the deathvariable if it exists (iwd2)
-	if (parameters->string1Parameter[0]) {
-		ab->SetScriptName(parameters->string1Parameter);
+	//if string1 is animation, then we can't use it for a DV too
+	if (flags & CC_PLAY_ANIM) {
+		CreateVisualEffectCore( ab, ab->Pos, parameters->string1Parameter);
+	} else {
+		//setting the deathvariable if it exists (iwd2)
+		if (parameters->string1Parameter[0]) {
+			ab->SetScriptName(parameters->string1Parameter);
+		}
+	}
+
+	if (flags & CC_COPY) {
+		if (tmp && tmp->Type == ST_ACTOR) {
+			PolymorphCopyCore ( (Actor *) tmp, ab, false);
+		}
 	}
 }
 
@@ -522,8 +529,10 @@ void CreateVisualEffectCore(Scriptable *Sender, Point &position, const char *eff
 {
 //TODO: add engine specific VVC replacement methods
 //stick to object flag, sounds, iterations etc.
-	ScriptedAnimation* vvc = core->GetScriptedAnimation(effect, position);
-	Sender->GetCurrentArea( )->AddVVCCell( vvc );
+	if (effect[0]) {
+		ScriptedAnimation* vvc = core->GetScriptedAnimation(effect, position);
+		Sender->GetCurrentArea( )->AddVVCCell( vvc );
+	}
 }
 
 void ChangeAnimationCore(Actor *src, const char *resref, bool effect)

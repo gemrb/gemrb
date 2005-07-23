@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.19 2005/07/23 19:49:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.20 2005/07/23 22:36:02 avenger_teambg Exp $
  *
  */
 
@@ -541,8 +541,7 @@ int GameScript::RealGlobalTimerExact(Scriptable* Sender, Trigger* parameters)
 {
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
 	if (!value1) return 0;
-	ieDword value2;
-	GetTime(value2);
+	ieDword value2 = core->GetGame()->RealTime;
 	return ( value1 == value2 );
 }
 
@@ -550,8 +549,7 @@ int GameScript::RealGlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
 {
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
 	if (!value1) return 0;
-	ieDword value2;
-	GetTime(value2);
+	ieDword value2 = core->GetGame()->RealTime;
 	return ( value1 < value2 );
 }
 
@@ -559,8 +557,7 @@ int GameScript::RealGlobalTimerNotExpired(Scriptable* Sender, Trigger* parameter
 {
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
 	if (!value1) return 0;
-	ieDword value2;
-	GetTime(value2);
+	ieDword value2 = core->GetGame()->RealTime;
 	return ( value1 > value2 );
 }
 
@@ -1863,7 +1860,10 @@ int GameScript::UnselectableVariableLT(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::AreaCheck(Scriptable* Sender, Trigger* parameters)
 {
-	return strnicmp(Sender->GetCurrentArea()->GetScriptName(), parameters->string0Parameter, 8)==0;
+	if (!strnicmp(Sender->GetCurrentArea()->GetScriptName(), parameters->string0Parameter, 8)) {
+		return 1;
+	}
+	return 0;
 }
 
 int GameScript::AreaCheckObject(Scriptable* Sender, Trigger* parameters)
@@ -1873,7 +1873,26 @@ int GameScript::AreaCheckObject(Scriptable* Sender, Trigger* parameters)
 	if (!tar) {
 		return 0;
 	}
-	return strnicmp(tar->GetCurrentArea()->GetScriptName(), parameters->string0Parameter, 8)==0;
+	if (!strnicmp(tar->GetCurrentArea()->GetScriptName(), parameters->string0Parameter, 8)) {
+		return 1;
+	}
+	return 0;
+}
+
+//lame iwd2 uses a numeric area identifier, this reduces its usability
+int GameScript::CurrentAreaIs(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+
+	if (!tar) {
+		return 0;
+	}
+	ieResRef arearesref;
+	snprintf(arearesref, 8, "AR%04d", parameters->int0Parameter);
+	if (!strnicmp(tar->GetCurrentArea()->GetScriptName(), arearesref, 8)) {
+		return 1;
+	}
+	return 0;
 }
 
 int GameScript::EntirePartyOnMap(Scriptable* /*Sender*/, Trigger* /*parameters*/)
@@ -2853,14 +2872,22 @@ int GameScript::IsWeather( Scriptable* /*Sender*/, Trigger* parameters)
 
 int GameScript::Delay( Scriptable* /*Sender*/, Trigger* parameters)
 {
-	unsigned long thisTime;
-	unsigned long delay = parameters->int0Parameter;
+	ieDword delay = (ieDword) parameters->int0Parameter;
 	if (delay<=1) {
 		return 1;
 	}
-	GetTime( thisTime );
-	if ( (thisTime/1000)%delay) {
+	if ( core->GetGame()->GameTime%delay) {
 		return 0;
 	}
 	return 1;
+}
+
+int GameScript::TimeOfDay(Scriptable* /*Sender*/, Trigger* parameters)
+{
+	ieDword timeofday = core->GetGame()->GameTime%7200/1800;
+
+	if (timeofday==(ieDword) parameters->int0Parameter) {
+		return 1;
+	}
+	return 0;
 }

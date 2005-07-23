@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.27 2005/07/23 19:49:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.28 2005/07/23 22:36:01 avenger_teambg Exp $
  *
  */
 
@@ -153,9 +153,8 @@ void GameScript::SetGlobalTimerOnce(Scriptable* Sender, Action* parameters)
 
 void GameScript::RealSetGlobalTimer(Scriptable* Sender, Action* parameters)
 {
-	ieDword mytime;
+	ieDword mytime=core->GetGame()->RealTime;
 
-	GetTime(mytime); //this is real time
 	SetVariable( Sender, parameters->string0Parameter,
 		parameters->int0Parameter + mytime);
 }
@@ -502,6 +501,22 @@ void GameScript::CreateCreature(Scriptable* Sender, Action* parameters)
 	CreateCreatureCore( Sender, parameters, CC_CHECK_IMPASSABLE|CC_CHECK_OVERLAP );
 }
 
+//another highly redundant action
+void GameScript::CreateCreatureDoor(Scriptable* Sender, Action* parameters)
+{
+	//we hack this to death
+	strcpy(parameters->string1Parameter, "SPDIMNDR");
+	CreateCreatureCore( Sender, parameters, CC_CHECK_IMPASSABLE|CC_CHECK_OVERLAP | CC_PLAY_ANIM );
+}
+
+//another highly redundant action
+void GameScript::CreateCreatureObjectDoor(Scriptable* Sender, Action* parameters)
+{
+	//we hack this to death
+	strcpy(parameters->string1Parameter, "SPDIMNDR");
+	CreateCreatureCore( Sender, parameters, CC_OFFSET | CC_CHECK_IMPASSABLE|CC_CHECK_OVERLAP | CC_PLAY_ANIM );
+}
+
 //don't use offset from Sender
 void GameScript::CreateCreatureImpassable(Scriptable* Sender, Action* parameters)
 {
@@ -524,11 +539,24 @@ void GameScript::CreateCreatureOffScreen(Scriptable* Sender, Action* parameters)
 	CreateCreatureCore( Sender, parameters, CC_OFFSCREEN | CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP );
 }
 
+//creates copy at actor, plays animation
+void GameScript::CreateCreatureObjectCopy(Scriptable* Sender, Action* parameters)
+{
+	CreateCreatureCore( Sender, parameters, CC_OBJECT | CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP | CC_COPY | CC_PLAY_ANIM );
+}
+
+//creates copy at absolute point
+void GameScript::CreateCreatureCopyPoint(Scriptable* Sender, Action* parameters)
+{
+	CreateCreatureCore( Sender, parameters, CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP | CC_COPY | CC_PLAY_ANIM );
+}
+
 //this is the same, object + offset
 //using this for simple createcreatureobject, (0 offsets)
+//createcreatureobjecteffect may have animation
 void GameScript::CreateCreatureObjectOffset(Scriptable* Sender, Action* parameters)
 {
-	CreateCreatureCore( Sender, parameters, CC_OBJECT | CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP );
+	CreateCreatureCore( Sender, parameters, CC_OBJECT | CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP | CC_PLAY_ANIM);
 }
 
 void GameScript::CreateCreatureObjectOffScreen(Scriptable* Sender, Action* parameters)
@@ -1885,7 +1913,7 @@ void GameScript::SetMoraleAI(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* act = ( Actor* ) Sender;
-	act->NewStat(IE_MORALEBREAK, parameters->int0Parameter, MOD_ABSOLUTE);
+	act->NewStat(IE_MORALE, parameters->int0Parameter, MOD_ABSOLUTE);
 }
 
 void GameScript::IncMoraleAI(Scriptable* Sender, Action* parameters)
@@ -1894,7 +1922,7 @@ void GameScript::IncMoraleAI(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* act = ( Actor* ) Sender;
-	act->NewStat(IE_MORALEBREAK, parameters->int0Parameter, MOD_ADDITIVE);
+	act->NewStat(IE_MORALE, parameters->int0Parameter, MOD_ADDITIVE);
 }
 
 void GameScript::MoraleSet(Scriptable* Sender, Action* parameters)
@@ -3598,10 +3626,12 @@ void GameScript::AdvanceTime(Scriptable* /*Sender*/, Action* parameters)
 }
 
 //advance at least one day, then stop at next day/dusk/night/morning
+//oops, not TimeODay is used but Time (this means we got hours)
+//i'm not sure if we should add a whole day either, needs more research
 void GameScript::DayNight(Scriptable* /*Sender*/, Action* parameters)
 {
 	int padding = core->GetGame()->GameTime%7200;
-	padding = (padding/1800+4-parameters->int0Parameter)%4*1800;
+	padding = (padding/300+24-parameters->int0Parameter)%24*300;
 	core->GetGame()->AdvanceTime(7200+padding);
 }
 
