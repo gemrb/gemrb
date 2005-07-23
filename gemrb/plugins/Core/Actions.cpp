@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.25 2005/07/23 17:09:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.26 2005/07/23 17:26:15 avenger_teambg Exp $
  *
  */
 
@@ -4227,4 +4227,20 @@ void GameScript::ApplySpellPoint(Scriptable* Sender, Action* parameters)
 	}
 	Scriptable *tar = Sender->GetCurrentArea();
 	core->ApplySpellPoint(spellres, tar, parameters->pointParameter, owner, parameters->int1Parameter);
+}
+
+//this is a gemrb extension
+//sets a variable to the stat value
+void GameScript::GetStat(Scriptable* Sender, Action* parameters)
+{
+	ieDword value;
+
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		value = 0;
+	} else {
+		Actor* actor = ( Actor* ) tar;
+		value = actor->GetStat( parameters->int0Parameter );
+	}
+	SetVariable( Sender, parameters->string0Parameter, value );
 }

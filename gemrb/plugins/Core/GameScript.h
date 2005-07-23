@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.213 2005/07/23 17:09:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.214 2005/07/23 17:26:15 avenger_teambg Exp $
  *
  */
 
@@ -1047,6 +1047,7 @@ public:
 	static void ForceSpell(Scriptable* Sender, Action* parameters);
 	static void FullHeal(Scriptable* Sender, Action* parameters);
 	static void GetItem(Scriptable* Sender, Action* parameters);
+	static void GetStat(Scriptable* Sender, Action* parameters);
 	static void GiveItem(Scriptable* Sender, Action* parameters);
 	static void GivePartyAllEquipment(Scriptable* Sender, Action* parameters);
 	static void GivePartyGold(Scriptable* Sender, Action* parameters);
