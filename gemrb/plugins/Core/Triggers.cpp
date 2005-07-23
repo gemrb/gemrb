@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.18 2005/07/20 21:46:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.19 2005/07/23 19:49:25 avenger_teambg Exp $
  *
  */
 
@@ -587,7 +587,7 @@ int GameScript::GlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::OnCreation(Scriptable* Sender, Trigger* /*parameters*/)
 {
-	if (Sender->OnCreation) {
+	if (Sender->Active&SCR_ONCREATION) {
 		Sender->SetBitTrigger(BT_ONCREATION);
 		return 1;
 	}
@@ -1199,12 +1199,41 @@ int GameScript::Dead(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
-int GameScript::Die(Scriptable* Sender, Trigger* /*parameters*/)
+int GameScript::BecameVisible(Scriptable* Sender, Trigger* /*parameters*/)
 {
-	if (!Sender || Sender->Type!=ST_ACTOR) {
+	if (Sender->Type!=ST_ACTOR) {
 		return 0;
 	}
 	Actor *act=(Actor *) Sender;
+	if (act->InternalFlags&IF_BECAMEVISIBLE) {
+		//set trigger to erase
+		act->SetBitTrigger(BT_BECAMEVISIBLE);
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::Die(Scriptable* Sender, Trigger* /*parameters*/)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *act=(Actor *) Sender;
+	if (act->InternalFlags&IF_JUSTDIED) {
+		//set trigger to erase
+		act->SetBitTrigger(BT_DIE);
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::Died(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *act=(Actor *) tar;
 	if (act->InternalFlags&IF_JUSTDIED) {
 		//set trigger to erase
 		act->SetBitTrigger(BT_DIE);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.81 2005/07/22 15:43:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.82 2005/07/23 19:49:24 avenger_teambg Exp $
  *
  */
 
@@ -76,6 +76,7 @@ class Map;
 #define IF_NORECTICLE 16    //draw recticle (target mark)
 #define IF_NOINT      32    //cannot interrupt the actions of this actor (save is not possible!)
 #define IF_CLEANUP    64    //actor died chunky death, or other total destruction
+#define IF_BECAMEVISIBLE 128//actor just became visible
 
 /** flags for GetActor */
 //default action

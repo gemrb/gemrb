@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.119 2005/07/20 21:46:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.120 2005/07/23 19:49:24 avenger_teambg Exp $
  *
  */
 
@@ -623,8 +623,8 @@ void Actor::Turn(Scriptable *cleric, int turnlevel)
 
 void Actor::Resurrect()
 {
-	InternalFlags=0;
-	SetStat(IE_STATE_ID,0);
+	InternalFlags = 0;
+	SetStat(IE_STATE_ID, 0);
 	SetStat(IE_HITPOINTS, 255);
 	ClearActions();
 	ClearPath();

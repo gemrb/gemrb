@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.36 2005/07/20 21:46:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.37 2005/07/23 19:49:24 avenger_teambg Exp $
  *
  */
 
@@ -78,7 +78,10 @@
 #define STATE_SLOWED     0x00010000
 #define STATE_INFRA      0x00020000
 #define STATE_BLIND      0x00040000
+//this appears to be a mistake in the original state.ids
+//this flag is the 'deactivate' flag, Activate/Deactivate works on it
 #define STATE_DISEASED   0x00080000
+#define STATE_DEACTIVATED 0x00080000
 #define STATE_FEEBLE     0x00100000
 #define STATE_NONDET     0x00200000
 #define STATE_INVIS2     0x00400000
@@ -92,10 +95,10 @@
 #define STATE_MIRROR     0x40000000
 #define STATE_CONFUSED   0x80000000
 
-#define STATE_CANTMOVE   0x80000fef
-#define STATE_CANTLISTEN 0x80000fef
-#define STATE_CANTSTEAL  0x00000fc0 //can't steal from
-#define STATE_CANTSEE    0x00000fc0 //can't explore (even itself)
+#define STATE_CANTMOVE   0x80080fef
+#define STATE_CANTLISTEN 0x80080fef
+#define STATE_CANTSTEAL  0x00080fc0 //can't steal from
+#define STATE_CANTSEE    0x00080fc0 //can't explore (even itself)
 #define STATE_NOSAVE     0x00000fc0
 
 //Multiclass flags

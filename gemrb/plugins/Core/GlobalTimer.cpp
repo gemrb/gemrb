@@ -6,7 +6,7 @@ extern Interface* core;
 GlobalTimer::GlobalTimer(void)
 {
 	interval = ( 1000 / AI_UPDATE_TIME );
-	CutSceneMode = false;
+	//CutSceneMode = false;
 	Init();
 }
 
@@ -16,7 +16,7 @@ GlobalTimer::~GlobalTimer(void)
 
 void GlobalTimer::Init()
 {
-	CutScene = NULL;
+	//CutScene = NULL;
 	fadeToCounter = 0;
 	fadeFromCounter = 1;
 	fadeFromMax = 0;
@@ -85,6 +85,7 @@ void GlobalTimer::Update()
 		//this measures time spent in the game (including pauses)
 		game->RealTime++;
 
+/*
 		if (CutScene) {
 			if (CutScene->endReached) {
 				delete( CutScene );
@@ -93,6 +94,7 @@ void GlobalTimer::Update()
 			}
 			return;
 		}
+*/
 	}
 }
 
@@ -118,7 +120,7 @@ void GlobalTimer::SetWait(unsigned long Count)
 {
 	waitCounter = Count;
 }
-
+/*
 void GlobalTimer::SetCutScene(GameScript* script)
 {
 	CutScene = script;
@@ -129,7 +131,7 @@ void GlobalTimer::SetCutScene(GameScript* script)
 	}
 	CutSceneMode = false;
 }
-
+*/
 void GlobalTimer::AddAnimation(ControlAnimation* ctlanim, unsigned long time)
 {
 	AnimationRef* anim;

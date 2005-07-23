@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.16 2005/07/22 17:17:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.17 2005/07/23 19:49:25 avenger_teambg Exp $
  *
  */
 
@@ -476,6 +476,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 
 	radius=0;
 	switch (flags & CC_MASK) {
+		//creates creature just off the screen
 		case CC_OFFSCREEN:
 			{
 			Region vp = core->GetVideoDriver()->GetViewport();
@@ -826,7 +827,10 @@ int GetObjectCount(Scriptable* Sender, Object* oC)
 	if (!oC) {
 		return 0;
 	}
-	Targets* tgts = EvaluateObject(Sender, oC);
+	// EvaluateObject will return [PC]
+	// GetAllObjects will also return Myself (evaluates object filters)
+	// i believe we need the latter here
+	Targets* tgts = GetAllObjects(Sender, oC);
 	int count = tgts->Count();
 	delete tgts;
 	return count;

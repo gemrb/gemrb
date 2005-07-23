@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.214 2005/07/23 17:26:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.215 2005/07/23 19:49:25 avenger_teambg Exp $
  *
  */
 
@@ -702,6 +702,7 @@ public: //Script Functions
 	static int AreaType(Scriptable* Sender, Trigger* parameter);
 	static int AtLocation(Scriptable* Sender, Trigger* parameter);
 	static int AttackedBy(Scriptable* Sender, Trigger* parameters);
+	static int BecameVisible(Scriptable* Sender, Trigger* parameters);
 	static int BitCheck(Scriptable* Sender, Trigger* parameters);
 	static int BitCheckExact(Scriptable* Sender, Trigger* parameters);
 	static int BitGlobal_Trigger(Scriptable* Sender, Trigger* parameters);
@@ -731,6 +732,7 @@ public: //Script Functions
 	static int Dead(Scriptable* Sender, Trigger* parameters);
 	static int Delay(Scriptable* Sender, Trigger* parameters);
 	static int Die(Scriptable* Sender, Trigger* parameters);
+	static int Died(Scriptable* Sender, Trigger* parameters);
 	static int Difficulty(Scriptable* Sender, Trigger* parameters);
 	static int DifficultyGT(Scriptable* Sender, Trigger* parameters);
 	static int DifficultyLT(Scriptable* Sender, Trigger* parameters);

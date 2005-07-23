@@ -31,7 +31,7 @@ private:
 	unsigned long startTime;
 	unsigned long interval;
 
-	GameScript* CutScene;
+	//GameScript* CutScene;
 
 	unsigned long fadeToCounter, fadeToMax;
 	unsigned long fadeFromCounter, fadeFromMax;
@@ -50,7 +50,7 @@ public:
 	void SetFadeToColor(unsigned long Count);
 	void SetFadeFromColor(unsigned long Count);
 	void SetWait(unsigned long Count);
-	void SetCutScene(GameScript* script);
+	//void SetCutScene(GameScript* script);
 	void SetScreenShake(unsigned long shakeX, unsigned long shakeY,
 		unsigned long Count);
 	void AddAnimation(ControlAnimation* ctlanim, unsigned long time);
@@ -58,7 +58,7 @@ public:
 	void ClearAnimations();
 	void UpdateAnimations();
 public:
-	bool CutSceneMode;
+	//bool CutSceneMode;
 	Region shakeStartVP;
 };
 

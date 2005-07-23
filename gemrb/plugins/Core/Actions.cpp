@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.26 2005/07/23 17:26:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.27 2005/07/23 19:49:24 avenger_teambg Exp $
  *
  */
 
@@ -431,6 +431,7 @@ void GameScript::TeleportParty(Scriptable* /*Sender*/, Action* parameters)
 	}
 }
 
+//moves pcs and npcs from an area to another area
 void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 {
 	Game *game = core->GetGame();
@@ -520,7 +521,7 @@ void GameScript::CreateCreatureAtFeet(Scriptable* Sender, Action* parameters)
 
 void GameScript::CreateCreatureOffScreen(Scriptable* Sender, Action* parameters)
 {
-	CreateCreatureCore( Sender, parameters, CC_OFFSCREEN | CC_CHECK_OVERLAP ); //don't check impassable?
+	CreateCreatureCore( Sender, parameters, CC_OFFSCREEN | CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP );
 }
 
 //this is the same, object + offset
@@ -532,7 +533,7 @@ void GameScript::CreateCreatureObjectOffset(Scriptable* Sender, Action* paramete
 
 void GameScript::CreateCreatureObjectOffScreen(Scriptable* Sender, Action* parameters)
 {
-	CreateCreatureCore( Sender, parameters, CC_OFFSCREEN | CC_OBJECT | CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP);
+	CreateCreatureCore( Sender, parameters, CC_OFFSCREEN | CC_OBJECT | CC_CHECK_IMPASSABLE | CC_CHECK_OVERLAP );
 }
 
 void GameScript::StartCutSceneMode(Scriptable* /*Sender*/, Action* /*parameters*/)
@@ -3972,7 +3973,7 @@ void GameScript::PolymorphCopy(Scriptable* Sender, Action* parameters)
 	PolymorphCopyCore((Actor *) Sender, (Actor *) tar, false);
 }
 
-/* so far it is the same, probably more stuff to copy*/
+/* according to IESDP this only copies the animation ID */
 void GameScript::PolymorphCopyBase(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
@@ -3982,7 +3983,9 @@ void GameScript::PolymorphCopyBase(Scriptable* Sender, Action* parameters)
 	if (!tar || tar->Type!=ST_ACTOR) {
 		return;
 	}
-	PolymorphCopyCore((Actor *) Sender, (Actor *) tar, true);
+	Actor *act = (Actor *) Sender;
+	Actor *actor = (Actor *) tar;
+	act->SetStat(IE_ANIMATION_ID, actor->GetStat(IE_ANIMATION_ID) );
 }
 
 void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
@@ -4244,3 +4247,4 @@ void GameScript::GetStat(Scriptable* Sender, Action* parameters)
 	}
 	SetVariable( Sender, parameters->string0Parameter, value );
 }
+

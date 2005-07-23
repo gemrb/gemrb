@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.334 2005/07/17 18:58:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.335 2005/07/23 19:49:25 avenger_teambg Exp $
  *
  */
 
@@ -2485,9 +2485,11 @@ bool Interface::LoadINI(const char* filename)
 /** Enables/Disables the Cut Scene Mode */
 void Interface::SetCutSceneMode(bool active)
 {
+/*
 	if (!active) {
 		timer->SetCutScene( NULL );
 	}
+*/
 	GameControl *gc = GetGameControl();
 	if (gc) {
 		gc->SetCutSceneMode( active );
@@ -2506,7 +2508,7 @@ void Interface::SetCutSceneMode(bool active)
 
 bool Interface::InCutSceneMode()
 {
-	return timer->CutSceneMode;
+	return (GetGameControl()->GetScreenFlags()&SF_DISABLEMOUSE)!=0;
 }
 
 void Interface::QuitGame(bool BackToMain)

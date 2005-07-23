@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.318 2005/07/23 17:26:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.319 2005/07/23 19:49:25 avenger_teambg Exp $
  *
  */
 
@@ -74,8 +74,10 @@ static TriggerLink triggernames[] = {
 	{"damagetakengt", GameScript::DamageTakenGT, 0},
 	{"damagetakenlt", GameScript::DamageTakenLT, 0},
 	{"dead", GameScript::Dead, 0},
+	{"delay", GameScript::Delay, 0},
 	{"detect", GameScript::See, 0}, //so far i see no difference
 	{"die", GameScript::Die, 0},
+	{"died", GameScript::Died, 0},
 	{"difficulty", GameScript::Difficulty, 0},
 	{"difficultygt", GameScript::DifficultyGT, 0},
 	{"difficultylt", GameScript::DifficultyLT, 0},
@@ -675,6 +677,7 @@ static ActionLink actionnames[] = {
 	{"textscreen", GameScript::TextScreen, AF_BLOCKING},
 	{"tomsstringdisplayer", GameScript::DisplayMessage, 0},
 	{"triggeractivation", GameScript::TriggerActivation, 0},
+	{"triggerwalkto", GameScript::MoveToObject,AF_BLOCKING}, //something like this
 	{"turn", GameScript::Turn, 0},
 	{"turnamt", GameScript::TurnAMT, AF_BLOCKING}, //relative Face()
 	{"undoexplore", GameScript::UndoExplore, 0},
@@ -1325,13 +1328,28 @@ void GameScript::EvaluateAllBlocks()
 	if (!script) {
 		return;
 	}
+//according to research, cutscenes don't evaluate conditions, and always
+//runs the first response, this is a serious cutback on possible
+//functionality, so i kept the gemrb specific code too.
+#ifdef GEMRB_CUTSCENES
+//this is the logical way of executing a cutscene
 	for (unsigned int a = 0; a < script->responseBlocksCount; a++) {
 		ResponseBlock* rB = script->responseBlocks[a];
-		if (EvaluateCondition( this->MySelf, rB->condition )) {
-			ExecuteResponseSet( this->MySelf, rB->responseSet );
+		if (EvaluateCondition( MySelf, rB->condition )) {
+			ExecuteResponseSet( MySelf, rB->responseSet );
 			endReached = false;
 		}
 	}
+#else
+//this is the apparent IE behaviour
+	for (unsigned int a = 0; a < script->responseBlocksCount; a++) {
+		ResponseBlock* rB = script->responseBlocks[a];
+		ResponseSet * rS = rB->responseSet;
+		if (rS->responsesCount) {
+			ExecuteResponse( MySelf, rS->responses[0] );
+		}
+	}
+#endif
 }
 
 ResponseBlock* GameScript::ReadResponseBlock(DataStream* stream)
@@ -2614,6 +2632,8 @@ int GameScript::ExecuteResponse(Scriptable* Sender, Response* rE)
 					}
 					//ogres in dltc need this
 					Sender->AddAction( aC );
+					//this was a mistake, nothing
+					//requires it, so use the code above
 					//AddAction( Sender, aC );
 				}
 				break;

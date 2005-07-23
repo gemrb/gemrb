@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.85 2005/07/22 15:43:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.86 2005/07/23 19:49:25 avenger_teambg Exp $
  *
  */
 
@@ -87,10 +87,11 @@ class Door;
 #define CONT_RESET       8
 #define CONT_DISABLED    32
 
-//scriptable (actor) flags
+//scriptable flags
 #define SCR_ACTIVE        1
 #define SCR_CUTSCENEID    2
 #define SCR_VISIBLE       4
+#define SCR_ONCREATION    8
 
 //CheckTravel return value
 #define CT_CANTMOVE       0 //inactive
@@ -103,6 +104,7 @@ class Door;
 //bits for binary trigger bitfield
 #define BT_DIE            1
 #define BT_ONCREATION     2
+#define BT_BECAMEVISIBLE  4
 
 #ifdef WIN32
 
@@ -147,17 +149,12 @@ public:
 	char* overHeadText;
 	unsigned char textDisplaying;
 	unsigned long timeStartDisplaying;
-	//actor visibility flags
-	//1 = active
-	//8 = scripting name overwritten with area actor entry label
-	//other flags are in CREAREAFL in iwd2
 	ieDword Active;
 	ieDword LastTrigger;
 	ieDword LastEntered;
 	std::list< Action*> actionQueue;
 	Action* CurrentAction;
 	bool resetAction;
-	bool OnCreation;
 	unsigned long playDeadCounter;
 public:
 	void SetScript(ieResRef aScript, int idx);
@@ -339,6 +336,7 @@ public:
 	ieStrRef OpenStrRef;
 	ieStrRef NameStrRef;
 	ieResRef Dialog;
+	ieDword InternalFlags; //for triggers
 private:
 	void ToggleTiles(int State, bool playsound = false);
 	void UpdateDoor();

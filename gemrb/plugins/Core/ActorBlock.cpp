@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.104 2005/07/22 15:43:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.105 2005/07/23 19:49:24 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -41,7 +41,6 @@ Scriptable::Scriptable(ScriptableType type)
 	scriptName[0] = 0;
 	LastTrigger = 0;
 	LastEntered = 0;
-	Active = SCR_ACTIVE;
 	CurrentAction = NULL;
 	startTime = 0;
 	interval = ( 1000 / AI_UPDATE_TIME );
@@ -49,7 +48,7 @@ Scriptable::Scriptable(ScriptableType type)
 	playDeadCounter = 0;
 	resetAction = false;
 	neverExecuted = true;
-	OnCreation = true;
+	Active = SCR_ACTIVE | SCR_ONCREATION;
 	area = 0;
 	Pos.x = 0;
 	Pos.y = 0;
@@ -267,7 +266,7 @@ void Scriptable::ClearTriggers()
 		((Actor *) this)->InternalFlags&=~IF_JUSTDIED;
 	}
 	if (bittriggers & BT_ONCREATION) {
-		OnCreation = false;
+		Active &= ~SCR_ONCREATION;
 	}
 }
 
@@ -623,8 +622,9 @@ Door::Door(TileOverlay* Overlay)
 	LockSound[0] = 0;
 	UnLockSound[0] = 0;
 	overlay = Overlay;
-	LinkedInfo[0]=0;
-	OpenStrRef=(ieDword) -1;
+	LinkedInfo[0] = 0;
+	OpenStrRef = (ieDword) -1;
+	InternalFlags = 0;
 }
 
 Door::~Door(void)
