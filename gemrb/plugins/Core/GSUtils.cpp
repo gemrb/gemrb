@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.18 2005/07/23 22:36:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.19 2005/07/24 15:52:30 avenger_teambg Exp $
  *
  */
 
@@ -39,6 +39,7 @@ Cache BcsCache; //cache for scripts
 int ObjectIDSCount = 7;
 int MaxObjectNesting = 5;
 bool HasAdditionalRect = false;
+bool HasTriggerPoint = false;
 ieResRef *ObjectIDSTableNames;
 int ObjectFieldsCount = 7;
 int ExtraParametersCount = 0;
@@ -709,8 +710,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			Actor *tmp = target;
 			target = speaker;
 			speaker = tmp;
-		}
-		if (Sender!=tar) {
+		} else {
 			if (Flags & BD_INTERRUPT) {
 				scr->ClearActions();
 			} else {
@@ -1380,7 +1380,7 @@ void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, i
 		}
 		else if (InDebug&ID_VARIABLES) {
 			printMessage("GameScript"," ",YELLOW);
-			printf("Invalid variable %s %s in checkvariable\n",Context, VarName);
+			printf("Invalid variable %s %s in setvariable\n",Context, VarName);
 		}
 	}
 	else {
@@ -1433,7 +1433,7 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName)
 	strncpy( newVarName, VarName, 6 );
 	newVarName[6]=0;
 	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
-		Sender->GetCurrentArea()->locals->SetAt( VarName, value );
+		Sender->GetCurrentArea()->locals->Lookup( &VarName[6], value );
 		if (InDebug&ID_VARIABLES) {
 			printf("CheckVariable %s: %d\n",VarName, value);
 		}
@@ -1481,7 +1481,7 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Conte
 	strncpy(newVarName, Context, 6);
 	newVarName[6]=0;
 	if (strnicmp( newVarName, "MYAREA", 6 ) == 0) {
-		Sender->GetCurrentArea()->locals->SetAt( VarName, value );
+		Sender->GetCurrentArea()->locals->Lookup( VarName, value );
 		if (InDebug&ID_VARIABLES) {
 			printf("CheckVariable %s%s: %d\n",Context, VarName, value);
 		}

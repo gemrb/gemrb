@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.90 2005/07/22 15:43:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.91 2005/07/24 15:52:30 avenger_teambg Exp $
  *
  */
 
@@ -243,7 +243,18 @@ int Game::JoinParty(Actor* actor, bool join)
 	if (slot != -1) {
 		return slot;
 	}
+	// 0 - single player, 1 - tutorial, 2 - multiplayer
 	if (join) {
+		int saindex = core->LoadTable( "STARTPOS" );
+		TableMgr* strta = core->GetTable( saindex );
+		ieDword playmode = 0;
+		if (strta->GetRowCount()==6) {
+			core->GetDictionary()->Lookup( "PlayMode", playmode );
+			playmode *= 2;
+		}
+		actor->Pos.x = actor->Destination.x = atoi( strta->QueryField( playmode, actor->InParty-1 ) );
+		actor->Pos.y = actor->Destination.y = atoi( strta->QueryField( playmode + 1, actor->InParty-1 ) );
+		core->DelTable( saindex );
 		actor->PCStats->JoinDate = GameTime;
 		if (!PCs.size() ) {
 			Reputation = actor->GetStat(IE_REPUTATION);

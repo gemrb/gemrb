@@ -25,6 +25,7 @@ extern Cache BcsCache; //cache for scripts
 extern int ObjectIDSCount;
 extern int MaxObjectNesting;
 extern bool HasAdditionalRect;
+extern bool HasTriggerPoint;
 extern ieResRef *ObjectIDSTableNames;
 extern int ObjectFieldsCount;
 extern int ExtraParametersCount;

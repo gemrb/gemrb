@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.58 2005/07/20 21:46:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.59 2005/07/24 15:52:31 avenger_teambg Exp $
  *
  */
 
@@ -152,11 +152,15 @@ Game* GAMImp::GetGame()
 
 	if (!newGame->CurrentArea[0]) {
 		// 0 - single player, 1 - tutorial, 2 - multiplayer
-		ieDword playmode = 0;
-		core->GetDictionary()->Lookup( "PlayMode", playmode );
-		playmode *= 3;
 		int i = core->LoadTable( "STARTARE" );
 		TableMgr* tm = core->GetTable( i );
+		ieDword playmode = 0;
+		//only bg2 has 9 rows (iwd's have 6 rows - normal+extension)
+		if (tm->GetRowCount()==9) {
+			core->GetDictionary()->Lookup( "PlayMode", playmode );
+			playmode *= 3;
+		}
+
 		char* resref = tm->QueryField( playmode );
 		strnuprcpy( newGame->CurrentArea, resref, 8 );
 	}
@@ -179,6 +183,10 @@ Game* GAMImp::GetGame()
 		newGame->AddNPC( actor );
 	}
 	core->FreeInterface( aM );
+
+	//apparently IWD2 relies on this, if chapter is unset, it is
+	//set to -1, hopefully it won't break anything
+	newGame->locals->SetAt("CHAPTER", (ieDword) -1);
 
 	//Loading Global Variables
 	char Name[33];

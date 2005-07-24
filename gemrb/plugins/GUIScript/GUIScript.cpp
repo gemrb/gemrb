@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.328 2005/07/24 07:45:58 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.329 2005/07/24 15:52:31 avenger_teambg Exp $
  *
  */
 
@@ -3588,17 +3588,7 @@ printf("Value: %d\n", StatID);
 		MyActor->SetStance( atoi( poi ) );
 	}
 	core->DelTable( mastertable );
-	// 0 - single player, 1 - tutorial, 2 - multiplayer
-	ieDword playmode = 0;
-	core->GetDictionary()->Lookup( "PlayMode", playmode );
-	playmode *= 2;
-	int saindex = core->LoadTable( "STARTPOS" );
-	TableMgr* strta = core->GetTable( saindex );
-	MyActor->Pos.x = MyActor->Destination.x = atoi( strta->QueryField( playmode, PlayerSlot ) );
-	MyActor->Pos.y = MyActor->Destination.y = atoi( strta->QueryField( playmode + 1, PlayerSlot ) );
 	MyActor->SetOver( false );
-	//core->GetGame()->SetPC(MyActor);
-	core->DelTable( saindex );
 	Py_INCREF( Py_None );
 	return Py_None;
 }

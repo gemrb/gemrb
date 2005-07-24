@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.105 2005/07/23 19:49:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.106 2005/07/24 15:52:29 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -1030,7 +1030,9 @@ void Container::RefreshGroundIcons()
 	while (i--) {
 		CREItem *slot = inventory.GetSlotItem(i); //borrowed reference
 		Item *itm = core->GetItem( slot->ItemResRef ); //cached reference
-		groundicons[i] = core->GetBAMSprite( itm->GroundIcon, -1, 0 );
+		//well, this is required in PST, needs more work if some other
+		//game is broken by not using -1,0
+		groundicons[i] = core->GetBAMSprite( itm->GroundIcon, 0, 0 );
 		core->FreeItem( itm, slot->ItemResRef ); //decref
 	}
 }
