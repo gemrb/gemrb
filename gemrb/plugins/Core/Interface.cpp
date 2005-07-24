@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.336 2005/07/24 17:29:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.337 2005/07/24 18:09:46 avenger_teambg Exp $
  *
  */
 
@@ -1201,7 +1201,7 @@ bool Interface::LoadConfig(const char* filename)
 			continue;
 		}
 		fseek( config, -1, SEEK_CUR );
-		fscanf( config, "%[^=]=%[^\r\n]%*[\r\n]", name, value );
+		fscanf( config, "%64[^=]=%[^\r\n]%*[\r\n]", name, value );
 		if (stricmp( name, "Width" ) == 0) {
 			Width = atoi( value );
 		} else if (stricmp( name, "Height" ) == 0) {
