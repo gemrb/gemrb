@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.24 2005/07/17 18:58:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.25 2005/07/24 18:38:38 avenger_teambg Exp $
  *
  */
 
@@ -79,19 +79,19 @@ static EffectLink effectnames[] = {
 	{ "Cure:Sleep", fx_cure_sleep_state },
 	{ "HP:MaximumHPModifier", fx_maximum_hp_modifier },
 	{ "PlaySound", fx_playsound },
-	{ "Stat:ACVsDamageTypeModifier", fx_ac_vs_damage_type_modifier },
-	{ "Stat:AttacksPerRoundModifier", fx_attacks_per_round_modifier },
-	{ "Stat:CharismaModifier", fx_charisma_modifier },
-	{ "Stat:ConstitutionModifier", fx_constitution_modifier },
-	{ "Stat:IntelligenceModifier", fx_intelligence_modifier },
-	{ "Stat:SaveVsBreathModifier", fx_save_vs_breath_modifier },
-	{ "Stat:SaveVsDeathModifier", fx_save_vs_death_modifier },
-	{ "Stat:SaveVsPolyModifier", fx_save_vs_poly_modifier },
-	{ "Stat:SaveVsSpellsModifier", fx_save_vs_spell_modifier },
-	{ "Stat:SaveVsWandsModifier", fx_save_vs_wands_modifier },
-	{ "Stat:StrengthModifier", fx_strength_modifier },
-	{ "Stat:WisdomModifier", fx_wisdom_modifier },
-	{ "Stat:THAC0Modifier", fx_to_hit_modifier },
+	{ "ACVsDamageTypeModifier", fx_ac_vs_damage_type_modifier },
+	{ "AttacksPerRoundModifier", fx_attacks_per_round_modifier },
+	{ "CharismaModifier", fx_charisma_modifier },
+	{ "ConstitutionModifier", fx_constitution_modifier },
+	{ "IntelligenceModifier", fx_intelligence_modifier },
+	{ "SaveVsBreathModifier", fx_save_vs_breath_modifier },
+	{ "SaveVsDeathModifier", fx_save_vs_death_modifier },
+	{ "SaveVsPolyModifier", fx_save_vs_poly_modifier },
+	{ "SaveVsSpellsModifier", fx_save_vs_spell_modifier },
+	{ "SaveVsWandsModifier", fx_save_vs_wands_modifier },
+	{ "StrengthModifier", fx_strength_modifier },
+	{ "WisdomModifier", fx_wisdom_modifier },
+	{ "THAC0Modifier", fx_to_hit_modifier },
 	{ "State:Berserk", fx_set_berserk_state },
 	{ "State:Charmed", fx_set_charmed_state },
 	{ "State:Sleep", fx_set_sleep_state },

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.180 2005/07/20 21:46:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.181 2005/07/24 18:38:39 avenger_teambg Exp $
  *
  */
 
@@ -1760,6 +1760,11 @@ void Map::TriggerSpawn(Spawn *spawn)
 		return;
 	}
 	//check schedule
+	ieDword bit = 1<<(core->GetGame()->GameTime%7200/300);
+	if (!(spawn->appearance & bit)) {
+		return;
+	}
+
 	//check day or night chance
 	if (rand()%100>spawn->DayChance) {
 		return;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.246 2005/07/17 17:51:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.247 2005/07/24 18:38:38 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -586,6 +586,11 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				if (lastActor) {
 					lastActor->Resurrect();
 				}
+				break;
+			case 't':
+				// 7200 (one day) /24 (hours) == 300
+				game->GameTime += 300;
+				//refresh gui here once we got it
 				break;
 
 			case 'y': //kills actor
