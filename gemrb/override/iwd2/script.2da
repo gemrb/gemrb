@@ -5,3 +5,4 @@ OBJECT_IDS_COUNT	10	ea	general	race	subrace	specific	gender	alignmnt	class	avcla
 MAX_OBJECT_NESTING	5
 ADDITIONAL_RECT		1
 EXTRA_PARAMETERS_COUNT	2
+TRIGGER_POINT           0

@@ -5,3 +5,4 @@ OBJECT_IDS_COUNT	9	ea	faction	team	general	race	class	specific	gender	align
 MAX_OBJECT_NESTING	5
 ADDITIONAL_RECT		1
 EXTRA_PARAMETERS_COUNT	0
+TRIGGER_POINT           1
