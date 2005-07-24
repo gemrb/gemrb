@@ -1,6 +1,6 @@
 CHEAT AND DEBUG KEYS
 --------------------
-$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/CheatKeys.txt,v 1.5 2005/01/09 14:54:59 edheldil Exp $
+$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/CheatKeys.txt,v 1.6 2005/07/24 18:39:17 avenger_teambg Exp $
 
 
 Following is a list of cheats you can use during development of GemRB.
@@ -39,6 +39,8 @@ Ctrl-P - Draws path from start point marked by Ctrl-O to current mouse
 
 Ctrl-S - Alters the stance (animation state) of the actor. You have to
          hover your mouse over it.
+
+Ctrl-T - Advances time by one hour.
 
 Ctrl-X - Prints (on terminal or DOS window) name of current area script
          and current mouse position converted to game coordinates.
