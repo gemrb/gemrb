@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.28 2005/07/23 22:36:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.29 2005/07/24 11:21:14 avenger_teambg Exp $
  *
  */
 
@@ -32,8 +32,7 @@ void GameScript::SetExtendedNight(Scriptable* Sender, Action* parameters)
 	//sets the 'can rest other' bit
 	if (parameters->int0Parameter) {
 		map->AreaType|=AT_EXTENDED_NIGHT;
-	}
-	else {
+	} else {
 		map->AreaType&=~AT_EXTENDED_NIGHT;
 	}
 }
@@ -44,8 +43,7 @@ void GameScript::SetAreaRestFlag(Scriptable* Sender, Action* parameters)
 	//sets the 'can rest other' bit
 	if (parameters->int0Parameter) {
 		map->AreaType|=AT_CAN_REST;
-	}
-	else {
+	} else {
 		map->AreaType&=~AT_CAN_REST;
 	}
 }
@@ -217,8 +215,7 @@ void GameScript::SetNamelessDisguise(Scriptable* Sender, Action* parameters)
 	SetVariable(Sender, "APPEARANCE", "GLOBAL", parameters->int0Parameter);
 //maybe add a guiscript call here ?
 	if (parameters->int0Parameter) {
-	}
-	else {
+	} else {
 		
 	}
 }
@@ -409,8 +406,7 @@ void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
 	if (tar->Type == ST_ACTOR) {
 		Actor *ac = ( Actor* ) tar;
 		memcpy(Area, ac->Area, 9);
-	}
-	else {
+	} else {
 		Area[0]=0;
 	}
 	if (parameters->string0Parameter[0]) {
@@ -716,8 +712,7 @@ void GameScript::WaitRandom(Scriptable* Sender, Action* parameters)
 	int width = parameters->int1Parameter-parameters->int0Parameter;
 	if (width<2) {
 		width = parameters->int0Parameter;
-	}
-	else {
+	} else {
 		width = rand() % width + parameters->int0Parameter;
 	}
 	Sender->SetWait( width * AI_UPDATE_TIME );
@@ -1238,8 +1233,7 @@ void GameScript::ScreenShake(Scriptable* Sender, Action* parameters)
 	if (parameters->int1Parameter) { //IWD2 has a different profile
 		core->timer->SetScreenShake( parameters->int1Parameter,
 			parameters->int2Parameter, parameters->int0Parameter );
-	}
-	else {
+	} else {
 		core->timer->SetScreenShake( parameters->pointParameter.x,
 			parameters->pointParameter.y, parameters->int0Parameter );
 	}
@@ -1701,8 +1695,7 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 		if (door->Flags&DOOR_LOCKED) {
 			//playsound unsuccessful closing of door
 			core->PlaySound(DS_CLOSE_FAIL);
-		}
-		else {
+		} else {
 			door->SetDoorOpen( false, true );
 		}
 	} else {
@@ -1720,8 +1713,7 @@ void GameScript::ContainerEnable(Scriptable* Sender, Action* parameters)
 	Container *cnt = (Container *) tar;
 	if (parameters->int0Parameter) {
 		cnt->Flags&=~CONT_DISABLED;
-	}
-	else {
+	} else {
 		cnt->Flags|=CONT_DISABLED;
 	}
 }
@@ -1871,8 +1863,7 @@ void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
 	
 	if (core->HasFeature(GF_HAS_EXPTABLE) ) {
 		xptable = core->LoadTable("exptable");
-	}
-	else {
+	} else {
 		xptable = core->LoadTable( "xplist" );
 	}
 	
@@ -1888,8 +1879,7 @@ void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
 	if ( xpvalue[0]=='P' && xpvalue[1]=='_') {
 		//divide party xp
 		core->GetGame()->ShareXP(atoi(xpvalue+2), true );
-	}
-	else {
+	} else {
 		//give xp everyone
 		core->GetGame()->ShareXP(atoi(xpvalue), false );
 	}
@@ -2461,8 +2451,7 @@ void GameScript::TextScreen(Scriptable* /*Sender*/, Action* parameters)
 	if (parameters->string0Parameter[0]) {
 		chapter = core->LoadTable( parameters->string0Parameter );
 		line = 1;
-	}
-	else {//iwd/iwd2 has a single table named chapters
+	} else {//iwd/iwd2 has a single table named chapters
 		chapter = core->LoadTable ( "CHAPTERS" );
 		core->GetGame()->locals->Lookup( "CHAPTER", line );
 		iwd = true;
@@ -2711,8 +2700,11 @@ void GameScript::DestroyPartyItem(Scriptable* /*Sender*/, Action* parameters)
 	Game *game = core->GetGame();
 	int i = game->GetPartySize(false);
 	ieDword count;
-	if (parameters->int0Parameter) count=~0;
-	else count=1;
+	if (parameters->int0Parameter) {
+		count=0;
+	} else {
+		count=1;
+	}
 	while (i--) {
 		Inventory *inv = &(game->GetPC( i,false )->inventory);
 		int res=inv->DestroyItem(parameters->string0Parameter,0,count);
@@ -2804,8 +2796,7 @@ void GameScript::SetGabber(Scriptable* Sender, Action* parameters)
 	GameControl* gc = core->GetGameControl();
 	if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
 		gc->speaker = (Actor *) tar;
-	}
-	else {
+	} else {
 		printMessage("GameScript","Can't set gabber!",YELLOW);
 	}
 }
@@ -2944,8 +2935,7 @@ void CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
 			item->Usages[i]=e?e->Charges:0;
 		}
 		core->FreeItem(origitem, resref, false);
-	}
-	else {
+	} else {
 		item->Usages[0]=(ieWord) a;
 		item->Usages[1]=(ieWord) b;
 		item->Usages[2]=(ieWord) c;
@@ -2962,8 +2952,7 @@ void GameScript::CreateItem(Scriptable *Sender, Action* parameters)
 	Scriptable* tar;
 	if (parameters->objects[1]) {
 		tar = GetActorFromObject( Sender, parameters->objects[1] );
-	}
-	else {
+	} else {
 		tar = Sender;
 	}
 	if (!tar)
@@ -2985,8 +2974,7 @@ void GameScript::CreateItem(Scriptable *Sender, Action* parameters)
 	CreateItemCore(item, parameters->string0Parameter, parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter);
 	if (tar->Type==ST_CONTAINER) {
 		myinv->AddItem(item);
-	}
-	else {
+	} else {
 		if ( 2 != myinv->AddSlotItem(item, -1)) {
 			Map *map=Sender->GetCurrentArea();
 			// drop it at my feet
@@ -3014,8 +3002,7 @@ void GameScript::CreateItemNumGlobal(Scriptable *Sender, Action* parameters)
 	CreateItemCore(item, parameters->string1Parameter, value, 0, 0);
 	if (Sender->Type==ST_CONTAINER) {
 		myinv->AddItem(item);
-	}
-	else {
+	} else {
 		if ( 2 != myinv->AddSlotItem(item, -1)) {
 			Map *map=Sender->GetCurrentArea();
 			// drop it at my feet
@@ -3059,6 +3046,7 @@ void GameScript::XEquipItem(Scriptable *Sender, Action* parameters)
 	}
 }
 
+//iwd2 also has a flag for unequip (it might collide with original!)
 void GameScript::EquipItem(Scriptable *Sender, Action* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
@@ -3071,8 +3059,7 @@ void GameScript::EquipItem(Scriptable *Sender, Action* parameters)
 	}
 	if (parameters->int0Parameter==0) { //unequip
 		//move item to inventory if possible
-	}
-	else { //equip
+	} else { //equip
 		//equip item if possible
 	}
 }
@@ -3211,8 +3198,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 				Sender->CurrentAction=NULL;
 				return;
 		}
-	}
-	else {
+	} else {
 		
 	}
 	//check for success, failure sends an attackedby trigger and a
@@ -3327,8 +3313,7 @@ void GameScript::ApplyDamage(Scriptable* Sender, Action* parameters)
 	damagee = (Actor *) tar;
 	if (Sender->Type==ST_ACTOR) {
 		damager=(Actor *) Sender;
-	}
-	else {
+	} else {
 		damager=damagee;
 	}
 	damagee->Damage(parameters->int0Parameter, parameters->int1Parameter, damager);
@@ -3345,8 +3330,7 @@ void GameScript::ApplyDamagePercent(Scriptable* Sender, Action* parameters)
 	damagee = (Actor *) tar;
 	if (Sender->Type==ST_ACTOR) {
 		damager=(Actor *) Sender;
-	}
-	else {
+	} else {
 		damager=damagee;
 	}
 	damagee->Damage(damagee->GetStat(IE_HITPOINTS)*parameters->int0Parameter/100, parameters->int1Parameter, damager);
@@ -3363,8 +3347,7 @@ void GameScript::Damage(Scriptable* Sender, Action* parameters)
 	damagee = (Actor *) tar;
 	if (Sender->Type==ST_ACTOR) {
 		damager=(Actor *) Sender;
-	}
-	else {
+	} else {
 		damager=damagee;
 	}
 	int damage = core->Roll( (parameters->int1Parameter>>12)&15, (parameters->int1Parameter>>4)&255, parameters->int1Parameter&15 );
@@ -4278,3 +4261,10 @@ void GameScript::GetStat(Scriptable* Sender, Action* parameters)
 	SetVariable( Sender, parameters->string0Parameter, value );
 }
 
+void GameScript::BreakInstants(Scriptable* Sender, Action* /*parameters*/)
+{
+	//don't do anything, apparently the point of this action is to
+	//delay the execution of further actions to the next AI cycle
+	//we should set CurrentAction to zero eventually!
+	Sender->resetAction = true;
+}

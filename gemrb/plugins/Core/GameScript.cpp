@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.320 2005/07/23 22:36:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.321 2005/07/24 11:21:14 avenger_teambg Exp $
  *
  */
 
@@ -172,6 +172,7 @@ static TriggerLink triggernames[] = {
 	{"isscriptname", GameScript::CalledByName, 0}, //seems the same
 	{"isteambiton", GameScript::IsTeamBitOn, 0},
 	{"isvalidforpartydialog", GameScript::IsValidForPartyDialog, 0},
+	{"isvalidforpartydialogue", GameScript::IsValidForPartyDialog, 0},
 	{"isweather", GameScript::IsWeather, 0}, //gemrb extension
 	{"itemisidentified", GameScript::ItemIsIdentified, 0},
 	{"kit", GameScript::Kit, 0},
@@ -197,10 +198,12 @@ static TriggerLink triggernames[] = {
 	{"name", GameScript::CalledByName, 0}, //this is the same too?
 	{"namelessbitthedust", GameScript::NamelessBitTheDust, 0},
 	{"nearbydialog", GameScript::NearbyDialog, 0},
+	{"nearbydialogue", GameScript::NearbyDialog, 0},
 	{"nearlocation", GameScript::NearLocation, 0},
 	{"nearsavedlocation", GameScript::NearSavedLocation, 0},
 	{"notstatecheck", GameScript::NotStateCheck, 0},
 	{"nulldialog", GameScript::NullDialog, 0},
+	{"nulldialogue", GameScript::NullDialog, 0},
 	{"numcreature", GameScript::NumCreatures, 0},
 	{"numcreaturegt", GameScript::NumCreaturesGT, 0},
 	{"numcreaturelt", GameScript::NumCreaturesLT, 0},
@@ -225,7 +228,7 @@ static TriggerLink triggernames[] = {
 	{"numtimesinteracted", GameScript::NumTimesInteracted, 0},
 	{"numtimesinteractedgt", GameScript::NumTimesInteractedGT, 0},
 	{"numtimesinteractedlt", GameScript::NumTimesInteractedLT, 0},
-	{"numtimesinteractedobject", GameScript::NumTimesInteractedObject, 0},    //gemrb
+	{"numtimesinteractedobject", GameScript::NumTimesInteractedObject, 0},//gemrb
 	{"numtimesinteractedobjectgt", GameScript::NumTimesInteractedObjectGT, 0},//gemrb
 	{"numtimesinteractedobjectlt", GameScript::NumTimesInteractedObjectLT, 0},//gemrb
 	{"numtimestalkedto", GameScript::NumTimesTalkedTo, 0},
@@ -325,13 +328,16 @@ static ActionLink actionnames[] = {
 	{"applyspellpoint", GameScript::ApplySpellPoint, 0}, //gemrb extension
 	{"attachtransitiontodoor", GameScript::AttachTransitionToDoor, 0},
 	{"attack", GameScript::Attack,AF_BLOCKING},
+	{"attackoneround", GameScript::Attack,AF_BLOCKING},//need a way to stop
 	{"attackreevaluate", GameScript::AttackReevaluate,AF_BLOCKING},
+	{"backstab", GameScript::Attack,AF_BLOCKING},//actually hide+attack
 	{"bashdoor", GameScript::OpenDoor,AF_BLOCKING}, //the same until we know better
 	{"battlesong", GameScript::BattleSong, 0},
 	{"berserk", GameScript::Berserk, 0}, 
 	{"bitclear", GameScript::BitClear,AF_MERGESTRINGS},
 	{"bitglobal", GameScript::BitGlobal,AF_MERGESTRINGS},
 	{"bitset", GameScript::GlobalBOr,AF_MERGESTRINGS}, //probably the same
+	{"breakinstants", GameScript::BreakInstants, AF_BLOCKING},//delay execution of instants to the next AI cycle???
 	{"calm", GameScript::Calm, 0}, 
 	{"changeaiscript", GameScript::ChangeAIScript, 0},
 	{"changealignment", GameScript::ChangeAlignment, 0},
@@ -364,7 +370,9 @@ static ActionLink actionnames[] = {
 	{"createcreatureimpassable", GameScript::CreateCreatureImpassable, 0},
 	{"createcreatureimpassableallowoverlap", GameScript::CreateCreatureImpassableAllowOverlap, 0},
 	{"createcreatureobject", GameScript::CreateCreatureObjectOffset, 0}, //the same
-	{"createcreatureobjectcopy", GameScript::CreateCreatureObjectCopy, 0}, //the same
+	{"createcreatureobjectcopy", GameScript::CreateCreatureObjectCopy, 0},
+	{"createcreatureobjectcopyeffect", GameScript::CreateCreatureObjectCopy, 0}, //the same
+	{"createcreatureobjectdoor", GameScript::CreateCreatureObjectDoor, 0},//same as createcreatureobject, but with dimension door animation
 	{"createcreatureobjectoffscreen", GameScript::CreateCreatureObjectOffScreen, 0}, //same as createcreature object, but starts looking for a place far away from the player
 	{"createcreatureobjectoffset", GameScript::CreateCreatureObjectOffset, 0}, //the same
 	{"createcreatureoffscreen", GameScript::CreateCreatureOffScreen, 0},
@@ -390,6 +398,8 @@ static ActionLink actionnames[] = {
 	{"destroypartyitem", GameScript::DestroyPartyItem, 0},
 	{"destroyself", GameScript::DestroySelf, 0},
 	{"detectsecretdoor", GameScript::DetectSecretDoor, 0},
+	{"dialog", GameScript::Dialogue,AF_BLOCKING},
+	{"dialogforceinterrupt", GameScript::DialogueForceInterrupt,AF_BLOCKING},
 	{"dialogue", GameScript::Dialogue,AF_BLOCKING},
 	{"dialogueforceinterrupt", GameScript::DialogueForceInterrupt,AF_BLOCKING},
 	{"displaymessage", GameScript::DisplayMessage, 0},
@@ -524,7 +534,7 @@ static ActionLink actionnames[] = {
 	{"moveviewpoint", GameScript::MoveViewPoint, 0},
 	{"nidspecial1", GameScript::NIDSpecial1,AF_BLOCKING},//we use this for dialogs, hack
 	{"nidspecial2", GameScript::NIDSpecial2,AF_BLOCKING},//we use this for worldmap, another hack
-	{"nidspecial3", GameScript::Attack,AF_BLOCKING},     //this hack is for attacking preset target
+	{"nidspecial3", GameScript::Attack,AF_BLOCKING},//this hack is for attacking preset target
 	{"noaction", GameScript::NoAction, 0},
 	{"opendoor", GameScript::OpenDoor,AF_BLOCKING},
 	{"panic", GameScript::Panic, 0},
@@ -596,6 +606,7 @@ static ActionLink actionnames[] = {
 	{"setcorpseenabled", GameScript::AmbientActivate, 0},//another weird name
 	{"setcreatureareaflags", GameScript::SetCreatureAreaFlags, 0},
 	{"setdialog", GameScript::SetDialogue,AF_BLOCKING},
+	{"setdialogrange", GameScript::SetDialogueRange, 0},
 	{"setdialogue", GameScript::SetDialogue,AF_BLOCKING},
 	{"setdialoguerange", GameScript::SetDialogueRange, 0},
 	{"setdoorlocked", GameScript::SetDoorLocked,AF_BLOCKING},
@@ -613,6 +624,7 @@ static ActionLink actionnames[] = {
 	{"sethp", GameScript::SetHP, 0},
 	{"setinternal", GameScript::SetInternal, 0},
 	{"setleavepartydialogfile", GameScript::SetLeavePartyDialogFile, 0},
+	{"setleavepartydialoguefile", GameScript::SetLeavePartyDialogFile, 0},
 	{"setmasterarea", GameScript::SetMasterArea, 0},
 	{"setmazeeasier", GameScript::SetMazeEasier, 0}, //pst specific crap
 	{"setmazeharder", GameScript::SetMazeHarder, 0}, //pst specific crap
@@ -650,17 +662,18 @@ static ActionLink actionnames[] = {
 	{"startcutscene", GameScript::StartCutScene, 0},
 	{"startcutscenemode", GameScript::StartCutSceneMode, 0},
 	{"startdialog", GameScript::StartDialogue,AF_BLOCKING},
-	{"startdialogue", GameScript::StartDialogue,AF_BLOCKING},
 	{"startdialoginterrupt", GameScript::StartDialogueInterrupt,AF_BLOCKING},
+	{"startdialogue", GameScript::StartDialogue,AF_BLOCKING},
 	{"startdialogueinterrupt", GameScript::StartDialogueInterrupt,AF_BLOCKING},
 	{"startdialognoname", GameScript::StartDialogue,AF_BLOCKING},
-	{"startdialoguenoname", GameScript::StartDialogue,AF_BLOCKING},
 	{"startdialognoset", GameScript::StartDialogueNoSet,AF_BLOCKING},
+	{"startdialognosetinterrupt", GameScript::StartDialogueNoSetInterrupt,AF_BLOCKING},
+	{"startdialogoverride", GameScript::StartDialogueOverride,AF_BLOCKING},
+	{"startdialogoverrideinterrupt", GameScript::StartDialogueOverrideInterrupt,AF_BLOCKING},
+	{"startdialoguenoname", GameScript::StartDialogue,AF_BLOCKING},
 	{"startdialoguenoset", GameScript::StartDialogueNoSet,AF_BLOCKING},
 	{"startdialoguenosetinterrupt", GameScript::StartDialogueNoSetInterrupt,AF_BLOCKING},
-	{"startdialogoverride", GameScript::StartDialogueOverride,AF_BLOCKING},
 	{"startdialogueoverride", GameScript::StartDialogueOverride,AF_BLOCKING},
-	{"startdialogoverrideinterrupt", GameScript::StartDialogueOverrideInterrupt,AF_BLOCKING},
 	{"startdialogueoverrideinterrupt", GameScript::StartDialogueOverrideInterrupt,AF_BLOCKING},
 	{"startmovie", GameScript::StartMovie,AF_BLOCKING},
 	{"startmusic", GameScript::StartMusic, 0},
@@ -1022,7 +1035,6 @@ GameScript::GameScript(ieResRef ResRef, unsigned char ScriptType,
 				idtargets[i]=poi->Function;
 			}
 			strnuprcpy(ObjectIDSTableNames[i], idsname, 8 );
-			//ObjectIDSTableNames.push_back( idsname );
 		}
 		MaxObjectNesting = atoi( objNameTable->QueryField( 1 ) );
 		if (MaxObjectNesting<0 || MaxObjectNesting>MAX_NESTING) {
@@ -1049,12 +1061,17 @@ GameScript::GameScript(ieResRef ResRef, unsigned char ScriptType,
 			//maybe we should watch for this bit?
 			//bool triggerflag = i & 0x4000;
 			i &= 0x3fff;
+			TriggerLink* poi = FindTrigger(triggersTable->GetStringIndex( j ) );
 			if (triggers[i]) {
-				printMessage("GameScript"," ", WHITE);
-				printf("%s is a synonym\n", triggersTable->GetStringIndex( j ));
+				if (poi && triggers[i]!=poi->Function) {
+					printMessage("GameScript"," ", YELLOW);
+					printf("%s is in collision with %s\n", triggersTable->GetStringIndex( j ), triggersTable->GetStringIndex(triggersTable->FindValue(triggersTable->GetValueIndex( j )) ));
+				} else {
+					printMessage("GameScript"," ", WHITE);
+					printf("%s is a synonym of %s\n", triggersTable->GetStringIndex( j ), triggersTable->GetStringIndex(triggersTable->FindValue(triggersTable->GetValueIndex( j )) ) );
+				}
 				continue; //we already found an alternative
 			}
-			TriggerLink* poi = FindTrigger(triggersTable->GetStringIndex( j ) );
 			if (poi == NULL) {
 				triggers[i] = NULL;
 				triggerflags[i] = 0;
@@ -1068,29 +1085,40 @@ GameScript::GameScript(ieResRef ResRef, unsigned char ScriptType,
 		j = actionsTable->GetSize();
 		while (j--) {
 			i = actionsTable->GetValueIndex( j );
+			ActionLink* poi = FindAction( actionsTable->GetStringIndex( j ) );
 			if (actions[i]) {
-				printMessage("GameScript"," ", WHITE);
-				printf("%s is a synonym\n", actionsTable->GetStringIndex( j ));
+				if (poi && actions[i]!=poi->Function) {
+					printMessage("GameScript"," ", YELLOW);
+					printf("%s is in collision with %s\n", actionsTable->GetStringIndex( j ), actionsTable->GetStringIndex(actionsTable->FindValue(actionsTable->GetValueIndex( j )) ) );
+				} else {
+					printMessage("GameScript"," ", WHITE);
+					printf("%s is a synonym of %s\n", actionsTable->GetStringIndex( j ), actionsTable->GetStringIndex(actionsTable->FindValue(actionsTable->GetValueIndex( j )) ) );
+				}
 				continue; //we already found an alternative
 			}
-			ActionLink* poi = FindAction( actionsTable->GetStringIndex( j ) );
 			if (poi == NULL) {
 				actions[i] = NULL;
 				actionflags[i] = 0;
-			} else {
-				actions[i] = poi->Function;
-				actionflags[i] = poi->Flags;
+				continue;
 			}
+			actions[i] = poi->Function;
+			actionflags[i] = poi->Flags;
 		}
+
 		j = objectsTable->GetSize();
 		while (j--) {
 			i = objectsTable->GetValueIndex( j );
+			ObjectLink* poi = FindObject( objectsTable->GetStringIndex( j ) );
 			if (objects[i]) {
-				printMessage("GameScript"," ", WHITE);
-				printf("%s is a synonym\n", objectsTable->GetStringIndex( j ));
+				if (poi && objects[i]!=poi->Function) {
+					printMessage("GameScript"," ", YELLOW);
+					printf("%s is in collision with %s\n", objectsTable->GetStringIndex( j ), objectsTable->GetStringIndex(objectsTable->FindValue(objectsTable->GetValueIndex( j )) ) );
+				} else {
+					printMessage("GameScript"," ", WHITE);
+					printf("%s is a synonym of %s\n", objectsTable->GetStringIndex( j ), objectsTable->GetStringIndex(objectsTable->FindValue(objectsTable->GetValueIndex( j )) ) );
+				}
 				continue;
 			}
-			ObjectLink* poi = FindObject( objectsTable->GetStringIndex( j ) );
 			if (poi == NULL) {
 				objects[i] = NULL;
 			} else {
@@ -2665,7 +2693,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 			if (InDebug&ID_ACTIONS) {
 				printMessage("GameScript"," ",YELLOW);
 				printf("Sender: %s-->override: %s\n",Sender->GetScriptName(), scr->GetScriptName() );
-			}      
+			}
 			scr->AddAction(ParamCopyNoOverride(Sender->CurrentAction));
 		} else {
 			printMessage("GameScript","Actionoverride failed for object: \n",LIGHT_RED);

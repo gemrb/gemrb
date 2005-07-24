@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.40 2005/07/18 16:21:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.41 2005/07/24 11:21:14 avenger_teambg Exp $
  *
  */
 
@@ -218,7 +218,7 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char* string,
 		x += size[currChar].w;
 	}
 	if (cursor && ( curpos == len )) {
-		video->BlitSprite( cursor, x - xPos[tmp[len] - 1] + rgn.x,
+		video->BlitSprite( cursor, x + rgn.x,
 			y + rgn.y, true, &rgn );
 	}
 	free( tmp );
@@ -340,7 +340,7 @@ void Font::Print(Region rgn, unsigned char* string, Color* hicolor,
 		x += size[currChar].w;
 	}
 	if (cursor && ( curpos == len )) {
-		video->BlitSprite( cursor, x - xPos[tmp[len] - 1] + rgn.x, y + rgn.y, anchor, &rgn );
+		video->BlitSprite( cursor, x + rgn.x, y + rgn.y, anchor, &rgn );
 	}
 	free( tmp );
 }

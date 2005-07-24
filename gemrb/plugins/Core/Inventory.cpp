@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.57 2005/07/07 16:09:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.58 2005/07/24 11:21:30 avenger_teambg Exp $
  *
  */
 
@@ -259,7 +259,7 @@ unsigned int Inventory::DestroyItem(const char *resref, ieDword flags, ieDword c
 
 		if (item->Flags&IE_INV_ITEM_STACKED) {
 			removed=item->Usages[0];
-			if (removed + destructed > count) {
+			if (count && (removed + destructed > count) ) {
 				removed = count - destructed;
 				item = RemoveItem( slot, removed );
 			}
@@ -273,7 +273,7 @@ unsigned int Inventory::DestroyItem(const char *resref, ieDword flags, ieDword c
 		delete item;
 		Changed = true;
 		destructed+=removed;
-		if ((count!=(unsigned int) ~0) && (destructed==count) ) break;
+		if (count && (destructed>=count) ) break;
 	}
 
 	return destructed;
