@@ -19,7 +19,7 @@ IDS
 0x11	HP:CurrentHPModifier
 0x12	HP:MaximumHPModifier
 0x13	IntelligenceModifier
-0x14	InvisibilityState
+0x14	State:Invisibility
 0x15	LoreModifier
 0x16	Luck
 0x17	Morale
@@ -42,7 +42,7 @@ IDS
 0x28	State:Slow
 0x29	Graphics:Sparkle
 0x2a	Spell:WizardSpellSlotsModifier
-0x2b	Cure:StoneToFlesh
+0x2b	Cure:Petrification
 0x2c	StrengthModifier
 0x2d	State:Stun
 0x2e	Cure:Stun
@@ -92,7 +92,7 @@ IDS
 0x5b	FindTrapsModifier
 0x5c	PickPocketsModifier
 0x5d	FatigueModifier
-0x5e	DrunkennessModifier
+0x5e	IntoxicationModifier
 0x5f	TrackingSkillModifier
 0x60	LevelChange
 0x61	StrengthBonusModifier
@@ -113,7 +113,7 @@ IDS
 0x71	Item:EquipWeapon
 0x72	Graphics:Dither
 0x73	Detect:Alignment
-0x74	State:CureInvisibility
+0x74	Cure:ImprovedInvisibility
 0x75	SpellEffect:Clairvoyance
 0x76	Detect:ShowCreatures
 0x77	MirrorImage

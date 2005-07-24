@@ -42,7 +42,7 @@ IDS
 0x28	State:Slow
 0x29	Graphics:Sparkle
 0x2a	Spell:WizardSpellSlotsModifier
-0x2b	Cure:StoneToFlesh
+0x2b	Cure:Petrification
 0x2c	StrengthModifier
 0x2d	State:Stun
 0x2e	Cure:Stun
