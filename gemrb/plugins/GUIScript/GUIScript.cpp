@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.327 2005/07/20 21:46:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.328 2005/07/24 07:45:58 edheldil Exp $
  *
  */
 
@@ -3621,7 +3621,13 @@ static PyObject* GemRB_SetSpellIcon(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	Spell* spell = core->GetSpell(SpellResRef);
+	if (! SpellResRef[0]) {
+		btn->SetPicture( NULL );
+		Py_INCREF( Py_None );
+		return Py_None;
+	}
+
+	Spell* spell = core->GetSpell( SpellResRef );
 	if (spell == NULL) {
 		return RuntimeError( "Spell not found" );
 	}
@@ -5140,6 +5146,27 @@ static PyObject* GemRB_GetRumour(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( strref );
 }
 
+PyDoc_STRVAR( GemRB_GamePause__doc,
+"GamePause(Pause, Quiet)\n\n"
+"Pause or Unpause the game.\n\n");
+
+static PyObject* GemRB_GamePause(PyObject * /*self*/, PyObject* args)
+{
+	int pause, quiet;
+
+	if (!PyArg_ParseTuple( args, "ii", &pause, &quiet)) {
+		return AttributeError( GemRB_GamePause__doc );
+	}
+
+	core->timer->Freeze ();
+	core->DisplayString( "Paused" );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+
+
 static PyMethodDef GemRBMethods[] = {
 	METHOD(SetInfoTextColor, METH_VARARGS),
 	METHOD(HideGUI, METH_NOARGS),
@@ -5307,6 +5334,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(ChangeStoreItem, METH_VARARGS),
 	METHOD(SetPurchasedAmount, METH_VARARGS),
 	METHOD(ChangeContainerItem, METH_VARARGS),
+	METHOD(GamePause, METH_VARARGS),
 	// terminating entry	
 	{NULL, NULL, 0, NULL}
 };
