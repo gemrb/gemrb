@@ -272,7 +272,7 @@ IDS
 0x123	RenableButton
 0x124	TriggerWildMagic
 0x125	WildSurge
-0x126	SetScriptingState
+0x126	ScriptingState
 0x127	UseEffect
 0x128	MeleeTHAC0
 0x129	MeleeDamage

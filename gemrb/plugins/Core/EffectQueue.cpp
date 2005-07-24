@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.29 2005/07/24 20:41:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.30 2005/07/24 20:54:40 avenger_teambg Exp $
  *
  */
 
@@ -84,6 +84,8 @@ int fx_cure_improved_invisible_state (Actor* Owner, Actor* target, Effect* fx);
 int fx_magic_resistance_modifier (Actor* Owner, Actor* target, Effect* fx);
 int fx_local_variable (Actor* Owner, Actor* target, Effect* fx);
 int fx_playsound (Actor* Owner, Actor* target, Effect* fx);
+int fx_proficiency (Actor* Owner, Actor* target, Effect* fx);
+int fx_scripting_state (Actor* Owner, Actor* target, Effect* fx);
 
 struct EffectRef {
 	const char* Name;
@@ -130,11 +132,13 @@ static EffectLink effectnames[] = {
 	{ "MagicResistanceModifier", fx_magic_resistance_modifier },
 	{ "MoraleModifier", fx_morale_modifier },
 	{ "PlaySound", fx_playsound },
+	{ "Proficiency", fx_proficiency },
 	{ "SaveVsBreathModifier", fx_save_vs_breath_modifier },
 	{ "SaveVsDeathModifier", fx_save_vs_death_modifier },
 	{ "SaveVsPolyModifier", fx_save_vs_poly_modifier },
 	{ "SaveVsSpellsModifier", fx_save_vs_spell_modifier },
 	{ "SaveVsWandsModifier", fx_save_vs_wands_modifier },
+	{ "ScriptingState", fx_scripting_state },
 	{ "StrengthModifier", fx_strength_modifier },
 	{ "State:Berserk", fx_set_berserk_state },
 	{ "State:Charmed", fx_set_charmed_state },
@@ -941,6 +945,31 @@ int fx_playsound (Actor* /*Owner*/, Actor* target, Effect* fx)
 	} else {
 		core->GetSoundMgr()->Play(fx->Resource);
 	}
+	return FX_APPLIED;
+}
+
+// 0xE9
+int fx_proficiency (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_proficiency (%2d): Value: %d, Stat: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	//probably no need to check the boundaries, the original IE
+	//did check it though (without boundaries, it is more useful)
+	target->NewStat( fx->Parameter2, fx->Parameter1, MOD_ABSOLUTE );
+	return FX_APPLIED;
+}
+
+// 0xE9
+int fx_scripting_state (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_proficiency (%2d): Value: %d, Stat: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	//original engine didn't check boundaries, causing crashes
+	//we allow only positive indices
+	if (fx->Parameter2>100) {
+		return FX_NOT_APPLIED;
+	}
+	target->NewStat( IE_SCRIPTINGSTATE1+fx->Parameter2, fx->Parameter1, MOD_ABSOLUTE );
 	return FX_APPLIED;
 }
 
