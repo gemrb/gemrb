@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.27 2005/07/24 19:28:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.28 2005/07/24 19:58:53 avenger_teambg Exp $
  *
  */
 
@@ -50,6 +50,13 @@ int fx_invisibility_state (Actor* Owner, Actor* target, Effect* fx);
 int fx_lore_modifier (Actor* Owner, Actor* target, Effect* fx);
 int fx_luck_modifier (Actor* Owner, Actor* target, Effect* fx);
 int fx_morale_modifier (Actor* Owner, Actor* target, Effect* fx);
+int fx_set_panic_state (Actor* Owner, Actor* target, Effect* fx);
+int fx_acid_resistance_modifier (Actor* Owner, Actor* target, Effect* fx);
+int fx_cold_resistance_modifier (Actor* Owner, Actor* target, Effect* fx);
+int fx_electricity_resistance_modifier (Actor* Owner, Actor* target, Effect* fx);
+int fx_fire_resistance_modifier (Actor* Owner, Actor* target, Effect* fx);
+int fx_magic_damage_resistance_modifier (Actor* Owner, Actor* target, Effect* fx);
+int fx_cure_dead_state (Actor* Owner, Actor* target, Effect* fx);
 int fx_save_vs_death_modifier (Actor* Owner, Actor* target, Effect* fx);
 int fx_save_vs_wands_modifier (Actor* Owner, Actor* target, Effect* fx);
 int fx_save_vs_poly_modifier (Actor* Owner, Actor* target, Effect* fx);
@@ -62,7 +69,7 @@ int fx_to_hit_modifier (Actor* Owner, Actor* target, Effect* fx);
 int fx_stealth_bonus (Actor* Owner, Actor* target, Effect* fx);
 int fx_damage_bonus (Actor* Owner, Actor* target, Effect* fx);
 int fx_open_locks_modifier (Actor* Owner, Actor* target, Effect* fx);
-int fx_resistance_to_magic_damage (Actor* Owner, Actor* target, Effect* fx);
+int fx_magic_resistance_modifier (Actor* Owner, Actor* target, Effect* fx);
 int fx_local_variable (Actor* Owner, Actor* target, Effect* fx);
 int fx_playsound (Actor* Owner, Actor* target, Effect* fx);
 
@@ -80,36 +87,44 @@ static EffectRef effect_refs[MAX_EFFECTS];
 // by fx plugins, so it would be easier to add new effects etc.
 // FIXME: Make this an ordered list, so we could use bsearch!
 static EffectLink effectnames[] = {
-	{ "Color:SetCharacterColorsByPalette", fx_set_color_gradient },
-	{ "Cure:Berserk", fx_cure_berserk_state },
-	{ "Cure:Defrost", fx_cure_frozen_state },
-	{ "Cure:Poison", fx_cure_poisoned_state },
-	{ "Cure:Sleep", fx_cure_sleep_state },
-	{ "HP:CurrentHPModifier", fx_current_hp_modifier },
-	{ "HP:MaximumHPModifier", fx_maximum_hp_modifier },
-	{ "PlaySound", fx_playsound },
+	{ "AcidResistanceModifier", fx_acid_resistance_modifier },
 	{ "ACVsDamageTypeModifier", fx_ac_vs_damage_type_modifier },
 	{ "AttacksPerRoundModifier", fx_attacks_per_round_modifier },
 	{ "CharismaModifier", fx_charisma_modifier },
+	{ "ColdResistanceModifier", fx_cold_resistance_modifier },
+	{ "Color:SetCharacterColorsByPalette", fx_set_color_gradient },
 	{ "ConstitutionModifier", fx_constitution_modifier },
+	{ "Cure:Berserk", fx_cure_berserk_state },
+	{ "Cure:Dead", fx_cure_dead_state },
+	{ "Cure:Defrost", fx_cure_frozen_state },
+	{ "Cure:Poison", fx_cure_poisoned_state },
+	{ "Cure:Sleep", fx_cure_sleep_state },
 	{ "DexterityModifier", fx_dexterity_modifier },
+	{ "ElectricityResistanceModifier", fx_electricity_resistance_modifier },
+	{ "FireResistanceModifier", fx_fire_resistance_modifier },
+	{ "HP:CurrentHPModifier", fx_current_hp_modifier },
+	{ "HP:MaximumHPModifier", fx_maximum_hp_modifier },
 	{ "IntelligenceModifier", fx_intelligence_modifier },
 	{ "InvisibilityState", fx_invisibility_state },
 	{ "LoreModifier", fx_lore_modifier },
 	{ "LuckModifier", fx_luck_modifier },
+	{ "MagicDamageResistanceModifier", fx_magic_damage_resistance_modifier },
+	{ "MagicResistanceModifier", fx_magic_resistance_modifier },
 	{ "MoraleModifier", fx_morale_modifier },
+	{ "PlaySound", fx_playsound },
 	{ "SaveVsBreathModifier", fx_save_vs_breath_modifier },
 	{ "SaveVsDeathModifier", fx_save_vs_death_modifier },
 	{ "SaveVsPolyModifier", fx_save_vs_poly_modifier },
 	{ "SaveVsSpellsModifier", fx_save_vs_spell_modifier },
 	{ "SaveVsWandsModifier", fx_save_vs_wands_modifier },
 	{ "StrengthModifier", fx_strength_modifier },
-	{ "WisdomModifier", fx_wisdom_modifier },
-	{ "THAC0Modifier", fx_to_hit_modifier },
 	{ "State:Berserk", fx_set_berserk_state },
 	{ "State:Charmed", fx_set_charmed_state },
+	{ "State:Panic", fx_set_panic_state },
 	{ "State:Sleep", fx_set_sleep_state },
+	{ "THAC0Modifier", fx_to_hit_modifier },
 	{ "Variable:StoreLocalVariable", fx_local_variable },
+	{ "WisdomModifier", fx_wisdom_modifier },
 	{ NULL, NULL },
 };
 
@@ -478,7 +493,6 @@ int fx_cure_frozen_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-
 // 0x0F
 int fx_dexterity_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -581,6 +595,71 @@ int fx_morale_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_morale_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	target->NewStat( IE_MORALE, fx->Parameter1, fx->Parameter2 );
+	return FX_APPLIED;
+}
+
+// 0x18
+int fx_set_panic_state (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_set_panic_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	//shall we set morale to 0 or just flick the panic flag on
+	//this requires a little research
+	STATE_SET( STATE_PANIC );
+	//target->NewStat( IE_MORALE, 0, fx->Parameter2 );
+	return FX_APPLIED;
+}
+
+// 0x1b
+int fx_acid_resistance_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_acid_resistance_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	target->NewStat( IE_RESISTACID, fx->Parameter1, fx->Parameter2 );
+	return FX_APPLIED;
+}
+
+// 0x1c
+int fx_cold_resistance_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_cold_resistance_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	target->NewStat( IE_RESISTCOLD, fx->Parameter1, fx->Parameter2 );
+	return FX_APPLIED;
+}
+
+// 0x1d
+int fx_electricity_resistance_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_electricity_resistance_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	target->NewStat( IE_RESISTELECTRICITY, fx->Parameter1, fx->Parameter2 );
+	return FX_APPLIED;
+}
+
+// 0x1e
+int fx_fire_resistance_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_fire_resistance_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	target->NewStat( IE_RESISTFIRE, fx->Parameter1, fx->Parameter2 );
+	return FX_APPLIED;
+}
+
+// 0x1f
+int fx_magic_damage_resistance_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_magic_damage_resistance_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	target->NewStat( IE_MAGICDAMAGERESISTANCE, fx->Parameter1, fx->Parameter2 );
+	return FX_APPLIED;
+}
+
+// 0x20
+int fx_cure_dead_state (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_cure_dead_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	//someone should clear the internal flags related to death
+	STATE_CURE( STATE_DEAD );
 	return FX_APPLIED;
 }
 
@@ -711,11 +790,11 @@ int fx_open_locks_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0xA6
-int fx_resistance_to_magic_damage (Actor* /*Owner*/, Actor* target, Effect* fx)
+int fx_magic_resistance_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_resistance_to_magic_damage (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_magic_resistance_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_MAGICDAMAGERESISTANCE, fx->Parameter1, fx->Parameter2 );
+	target->NewStat( IE_RESISTMAGIC, fx->Parameter1, fx->Parameter2 );
 	return FX_APPLIED;
 }
 

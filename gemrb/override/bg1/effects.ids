@@ -158,7 +158,7 @@ IDS
 0xa3	RestoreMovementRate
 0xa4	SlowPoisonDamageRate
 0xa5	PauseTarget
-0xa6	ResistanceToMagicDamage
+0xa6	MagicResistanceModifier
 0xa7	MissileTHAC0Bonus
 0xa8	DestroyTarget
 0xab	Spell:AddInnateAbility

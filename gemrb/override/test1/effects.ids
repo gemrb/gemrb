@@ -23,7 +23,7 @@ IDS
 0x15	LoreModifier
 0x16	Luck
 0x17	Morale
-0x18	State:Horror
+0x18	State:Panic
 0x19	PoisonTarget
 0x1a	RemoveCurse
 0x1b	AcidResistanceModifier
@@ -153,12 +153,12 @@ IDS
 0x9e	Overlay:Grease
 0x9f	MirrorImageRun
 0xa0	DispelSanctuary
-0xa1	RemovePanic
-0xa2	RemoveHelplessness
+0xa1	Cure:Panic
+0xa2	Cure:Helplessness
 0xa3	RestoreMovementRate
 0xa4	SlowPoisonDamageRate
 0xa5	PauseTarget
-0xa6	ResistanceToMagicDamage
+0xa6	MagicResistanceModifier
 0xa7	MissileTHAC0Bonus
 0xa8	DestroyTarget
 0xab	Spell:AddInnateAbility
