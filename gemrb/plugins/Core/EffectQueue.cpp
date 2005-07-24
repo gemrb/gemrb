@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.25 2005/07/24 18:38:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.26 2005/07/24 19:04:42 avenger_teambg Exp $
  *
  */
 
@@ -41,6 +41,9 @@ int fx_wisdom_modifier (Actor* Owner, Actor* target, Effect* fx);
 int fx_cure_poisoned_state (Actor* Owner, Actor* target, Effect* fx);
 int fx_damage (Actor* Owner, Actor* target, Effect* fx);
 int fx_death (Actor* Owner, Actor* target, Effect* fx);
+int fx_cure_frozen_state (Actor* Owner, Actor* target, Effect* fx);
+int fx_dexterity_modifier (Actor* Owner, Actor* target, Effect* fx);
+int fx_current_hp_modifier (Actor* Owner, Actor* target, Effect* fx);
 int fx_maximum_hp_modifier (Actor* Owner, Actor* target, Effect* fx);
 int fx_intelligence_modifier (Actor* Owner, Actor* target, Effect* fx);
 int fx_save_vs_death_modifier (Actor* Owner, Actor* target, Effect* fx);
@@ -75,14 +78,17 @@ static EffectRef effect_refs[MAX_EFFECTS];
 static EffectLink effectnames[] = {
 	{ "Color:SetCharacterColorsByPalette", fx_set_color_gradient },
 	{ "Cure:Berserk", fx_cure_berserk_state },
+	{ "Cure:Defrost", fx_cure_frozen_state },
 	{ "Cure:Poison", fx_cure_poisoned_state },
 	{ "Cure:Sleep", fx_cure_sleep_state },
+	{ "HP:CurrentHPModifier", fx_current_hp_modifier },
 	{ "HP:MaximumHPModifier", fx_maximum_hp_modifier },
 	{ "PlaySound", fx_playsound },
 	{ "ACVsDamageTypeModifier", fx_ac_vs_damage_type_modifier },
 	{ "AttacksPerRoundModifier", fx_attacks_per_round_modifier },
 	{ "CharismaModifier", fx_charisma_modifier },
 	{ "ConstitutionModifier", fx_constitution_modifier },
+	{ "DexterityModifier", fx_dexterity_modifier },
 	{ "IntelligenceModifier", fx_intelligence_modifier },
 	{ "SaveVsBreathModifier", fx_save_vs_breath_modifier },
 	{ "SaveVsDeathModifier", fx_save_vs_death_modifier },
@@ -453,6 +459,33 @@ int fx_death (Actor* Owner, Actor* target, Effect* fx)
 	target->Damage(0, fx->Parameter2, Owner); //hmm?
 	//death has damage type too
 	target->Die(Owner);
+	return FX_APPLIED;
+}
+
+// 0xE
+int fx_cure_frozen_state (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_cure_sleep_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	STATE_CURE( STATE_FROZEN );
+	return FX_APPLIED;
+}
+
+
+// 0x0F
+int fx_dexterity_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_dexterity_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	target->NewStat( IE_DEX, fx->Parameter1, fx->Parameter2 );
+	return FX_APPLIED;
+}
+
+// 0x11
+int fx_current_hp_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_current_hp_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	target->NewStat( IE_HITPOINTS, fx->Parameter1, fx->Parameter2 );
 	return FX_APPLIED;
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.37 2005/07/23 19:49:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.38 2005/07/24 19:04:41 avenger_teambg Exp $
  *
  */
 
@@ -65,8 +65,8 @@
 #define STATE_STUNNED    0x00000008
 #define STATE_INVISIBLE  0x00000010
 #define STATE_HELPLESS   0x00000020
-#define STATE_D1         0x00000040
-#define STATE_D2         0x00000080
+#define STATE_FROZEN     0x00000040
+#define STATE_PETRIFIED  0x00000080
 #define STATE_D3         0x00000100
 #define STATE_D4         0x00000200
 #define STATE_D5         0x00000400
