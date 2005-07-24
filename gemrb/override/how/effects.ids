@@ -14,7 +14,7 @@
 0x0D	Death
 0x0E	Cure:Defrost
 0x0F	DexterityModifier
-0x10	  State:Haste
+0x10	State:Haste
 0x11	HP:CurrentHPModifier
 0x12	HP:MaximumHPModifier
 0x13	IntelligenceModifier
@@ -22,7 +22,7 @@
 0x15	LoreModifier
 0x16	Luck
 0x17	Morale
-0x18	State:Horror
+0x18	State:Panic
 0x19	PoisonTarget
 0x1A	RemoveCurse
 0x1B	AcidResistanceModifier
@@ -38,7 +38,7 @@
 0x25	SaveVsSpellsModifier
 0x26	State:Silence
 0x27	State:Sleep
-0x28	  State:Slow
+0x28	State:Slow
 0x29	Graphics:Sparkle
 0x2A	Spell:WizardSpellSlotsModifier
 0x2B	Cure:StoneToFlesh
@@ -77,8 +77,8 @@
 0x4D	Cure:Feeblemindedness
 0x4E	DiseaseTarget
 0x4F	Cure:Disease
-0x50	  State:Deafness
-0x51	  Cure:Deafness
+0x50	State:Deafness
+0x51	Cure:Deafness
 0x52	SetAIScript
 0x53	ProtectionFromProjectile
 0x54	MagicalFireResistanceModifier
@@ -152,8 +152,8 @@
 0x9E	Overlay:Grease
 0x9F	MirrorImageRun
 0xA0	DispelSanctuary
-0xA1	RemovePanic
-0xA2	RemoveHelplessness
+0xA1	Cure:Panic
+0xA2	Cure:Helplessness
 0xA3	RestoreMovementRate
 0xA4	SlowPoisonDamageRate
 0xA5	PauseTarget

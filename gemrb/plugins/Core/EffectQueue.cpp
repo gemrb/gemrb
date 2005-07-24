@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.26 2005/07/24 19:04:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.27 2005/07/24 19:28:06 avenger_teambg Exp $
  *
  */
 
@@ -46,6 +46,10 @@ int fx_dexterity_modifier (Actor* Owner, Actor* target, Effect* fx);
 int fx_current_hp_modifier (Actor* Owner, Actor* target, Effect* fx);
 int fx_maximum_hp_modifier (Actor* Owner, Actor* target, Effect* fx);
 int fx_intelligence_modifier (Actor* Owner, Actor* target, Effect* fx);
+int fx_invisibility_state (Actor* Owner, Actor* target, Effect* fx);
+int fx_lore_modifier (Actor* Owner, Actor* target, Effect* fx);
+int fx_luck_modifier (Actor* Owner, Actor* target, Effect* fx);
+int fx_morale_modifier (Actor* Owner, Actor* target, Effect* fx);
 int fx_save_vs_death_modifier (Actor* Owner, Actor* target, Effect* fx);
 int fx_save_vs_wands_modifier (Actor* Owner, Actor* target, Effect* fx);
 int fx_save_vs_poly_modifier (Actor* Owner, Actor* target, Effect* fx);
@@ -90,6 +94,10 @@ static EffectLink effectnames[] = {
 	{ "ConstitutionModifier", fx_constitution_modifier },
 	{ "DexterityModifier", fx_dexterity_modifier },
 	{ "IntelligenceModifier", fx_intelligence_modifier },
+	{ "InvisibilityState", fx_invisibility_state },
+	{ "LoreModifier", fx_lore_modifier },
+	{ "LuckModifier", fx_luck_modifier },
+	{ "MoraleModifier", fx_morale_modifier },
 	{ "SaveVsBreathModifier", fx_save_vs_breath_modifier },
 	{ "SaveVsDeathModifier", fx_save_vs_death_modifier },
 	{ "SaveVsPolyModifier", fx_save_vs_poly_modifier },
@@ -530,6 +538,49 @@ int fx_intelligence_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_intelligence_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	target->NewStat( IE_INT, fx->Parameter1, fx->Parameter2 );
+	return FX_APPLIED;
+}
+
+// 0x14
+// this is more complex, there is a half-invisibility state
+// and there is a hidden state
+int fx_invisibility_state (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	switch (fx->Parameter2) {
+		case 1:
+			STATE_SET( STATE_INVISIBLE );
+			break;
+		case 2:
+			STATE_SET( STATE_INVIS2 );
+			break;
+	}
+	return FX_APPLIED;
+}
+
+// 0x15
+int fx_lore_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_lore_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	target->NewStat( IE_LORE, fx->Parameter1, fx->Parameter2 );
+	return FX_APPLIED;
+}
+
+// 0x16
+int fx_luck_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_luck_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	target->NewStat( IE_LUCK, fx->Parameter1, fx->Parameter2 );
+	return FX_APPLIED;
+}
+
+// 0x17
+int fx_morale_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_morale_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	target->NewStat( IE_MORALE, fx->Parameter1, fx->Parameter2 );
 	return FX_APPLIED;
 }
 
