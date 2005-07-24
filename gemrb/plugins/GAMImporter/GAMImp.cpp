@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.59 2005/07/24 15:52:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.60 2005/07/24 17:29:35 avenger_teambg Exp $
  *
  */
 
@@ -170,7 +170,7 @@ Game* GAMImp::GetGame()
 	for (i = 0; i < PCCount; i++) {
 		str->Seek( PCOffset + ( i * PCSize ), GEM_STREAM_START );
 		Actor *actor = GetActor( aM, true );
-		newGame->JoinParty( actor, false );
+		newGame->JoinParty( actor, 0 );
 		if (actor->Selected) {
 			newGame->SelectActor(actor, true, 0);
 		}

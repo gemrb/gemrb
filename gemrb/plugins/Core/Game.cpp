@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.91 2005/07/24 15:52:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.92 2005/07/24 17:29:34 avenger_teambg Exp $
  *
  */
 
@@ -235,7 +235,7 @@ int Game::LeaveParty(Actor* actor)
 	return ( int ) NPCs.size() - 1;
 }
 
-int Game::JoinParty(Actor* actor, bool join)
+int Game::JoinParty(Actor* actor, int join)
 {
 	actor->CreateStats(); //create stats if they didn't exist yet
 	actor->SetBase(IE_EXPLORE, 1);
@@ -243,8 +243,8 @@ int Game::JoinParty(Actor* actor, bool join)
 	if (slot != -1) {
 		return slot;
 	}
-	// 0 - single player, 1 - tutorial, 2 - multiplayer
-	if (join) {
+	if (join&JP_INITPOS) {
+		// 0 - single player, 1 - tutorial, 2 - multiplayer
 		int saindex = core->LoadTable( "STARTPOS" );
 		TableMgr* strta = core->GetTable( saindex );
 		ieDword playmode = 0;
@@ -255,6 +255,8 @@ int Game::JoinParty(Actor* actor, bool join)
 		actor->Pos.x = actor->Destination.x = atoi( strta->QueryField( playmode, actor->InParty-1 ) );
 		actor->Pos.y = actor->Destination.y = atoi( strta->QueryField( playmode + 1, actor->InParty-1 ) );
 		core->DelTable( saindex );
+	}
+	if (join&JP_JOIN) {
 		actor->PCStats->JoinDate = GameTime;
 		if (!PCs.size() ) {
 			Reputation = actor->GetStat(IE_REPUTATION);

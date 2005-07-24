@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.62 2005/07/17 18:58:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.63 2005/07/24 17:29:35 avenger_teambg Exp $
  *
  */
 
@@ -41,6 +41,10 @@ class Game;
 #include "Actor.h"
 #include "Map.h"
 #include "Variables.h"
+
+//joinparty flags
+#define JP_JOIN     1  //refresh join time
+#define JP_INITPOS  2  //init startpos
 
 // Flags bits for SelectActor()
 // !!! Keep these synchronized with GUIDefines.py !!!
@@ -161,7 +165,7 @@ public:
 	/* finds an actor in store by scripting name*/
 	Actor* FindNPC(const char *deathvar);
 	/* joins party */
-	int JoinParty(Actor* pc, bool join=true);
+	int JoinParty(Actor* pc, int join=JP_JOIN);
 	/* return current party size */
 	int GetPartySize(bool onlyalive) const;
 	/* returns the npcs count */
