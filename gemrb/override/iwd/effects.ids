@@ -15,14 +15,14 @@ IDS
 0xd	Death
 0xe	Cure:Defrost
 0xf	DexterityModifier
-0x10	State:Haste
+0x10	State:Hasted
 0x11	HP:CurrentHPModifier
 0x12	HP:MaximumHPModifier
 0x13	IntelligenceModifier
-0x14	State:Invisibility
+0x14	State:Invisible
 0x15	LoreModifier
-0x16	Luck
-0x17	Morale
+0x16	LuckModifier
+0x17	MoraleModifier
 0x18	State:Panic
 0x19	PoisonTarget
 0x1a	RemoveCurse
@@ -37,7 +37,7 @@ IDS
 0x23	SaveVsPolyModifier
 0x24	SaveVsBreathModifier
 0x25	SaveVsSpellsModifier
-0x26	State:Silence
+0x26	State:Silenced
 0x27	State:Sleep
 0x28	State:Slow
 0x29	Graphics:Sparkle
@@ -60,6 +60,7 @@ IDS
 0x3a	Cure:DispellableEffects
 0x3b	StealthModifier
 0x3c	MiscastMagic
+0x3d    AlchemyModifier
 0x3e	Spell:PriestSpellSlotsModifier
 0x3f	State:Infravision
 0x40	State:RemoveInfravision

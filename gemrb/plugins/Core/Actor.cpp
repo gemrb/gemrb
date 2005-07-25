@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.120 2005/07/23 19:49:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.121 2005/07/25 16:46:51 avenger_teambg Exp $
  *
  */
 
@@ -349,6 +349,20 @@ void pcf_gold(Actor *actor, ieDword Value)
 		}
 		actor->Modified[IE_GOLD]=0;
 	}
+	//additionally to party pool, gold changes are permanent
+	actor->BaseStats[IE_GOLD]=actor->Modified[IE_GOLD];
+}
+
+//no separate values (changes are permanent)
+void pcf_fatigue(Actor *actor, ieDword Value)
+{
+	actor->BaseStats[IE_FATIGUE]=Value;
+}
+
+//no separate values (changes are permanent)
+void pcf_intoxication(Actor *actor, ieDword Value)
+{
+	actor->BaseStats[IE_INTOXICATION]=Value;
 }
 
 void pcf_color(Actor *actor, ieDword /*Value*/)
@@ -383,7 +397,7 @@ static PostChangeFunctionType post_change_functions[256]={
 pcf_hitpoint, pcf_maxhitpoint, NULL, NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //0f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //1f
+NULL,NULL,NULL,NULL, NULL, NULL, pcf_fatigue, pcf_intoxication, //1f
 NULL,NULL,NULL,NULL, pcf_stat, NULL, pcf_stat, pcf_stat,
 pcf_stat,pcf_stat,NULL,NULL, NULL, pcf_gold, NULL, NULL, //2f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,

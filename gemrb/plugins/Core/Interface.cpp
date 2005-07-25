@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.337 2005/07/24 18:09:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.338 2005/07/25 16:46:51 avenger_teambg Exp $
  *
  */
 
@@ -3142,7 +3142,10 @@ Item* Interface::GetItem(const ieResRef resname)
 		return NULL;
 	}
 
-	item = sm->GetItem(new Item() );
+	item = new Item();
+	//this is required for storing the 'source'
+	strnuprcpy(item->Name, resname, 8);
+	sm->GetItem( item );
 	if (item == NULL) {
 		FreeInterface( sm );
 		return NULL;
@@ -3185,7 +3188,10 @@ Spell* Interface::GetSpell(const ieResRef resname)
 		return NULL;
 	}
 
-	spell = sm->GetSpell(new Spell() );
+	spell = new Spell();
+	//this is required for storing the 'source'
+	strnuprcpy(spell->Name, resname, 8);
+	sm->GetSpell( spell );
 	if (spell == NULL) {
 		FreeInterface( sm );
 		return NULL;
@@ -3193,8 +3199,6 @@ Spell* Interface::GetSpell(const ieResRef resname)
 
 	FreeInterface( sm );
 
-	//this is required for storing the 'source'
-	strnuprcpy(spell->Name, resname, 8);
 	SpellCache.SetAt(resname, (void *) spell);
 	return spell;
 }
@@ -3524,7 +3528,7 @@ void Interface::ApplySpell(const ieResRef resname, Actor *actor, Actor *caster, 
 	}
 	EffectQueue *fxqueue = spell->GetEffectBlock(level);
 	fxqueue->SetOwner( caster );
-	fxqueue->ApplyAllEffects(actor);
+	fxqueue->AddAllEffects(actor);
 	delete fxqueue;
 }
 
@@ -3556,7 +3560,7 @@ void Interface::ApplyEffect(const ieResRef resname, Actor *actor, Actor *caster,
 	fxqueue->SetOwner( caster );
 	fxqueue->AddEffect( effect );
 	delete effect;
-	fxqueue->ApplyAllEffects( actor );
+	fxqueue->AddAllEffects( actor );
 	delete fxqueue;
 }
 

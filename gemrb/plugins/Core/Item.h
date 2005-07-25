@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.19 2005/07/20 21:46:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.20 2005/07/25 16:46:52 avenger_teambg Exp $
  *
  */
 
@@ -108,6 +108,7 @@ public:
 
 	ITMExtHeader *ext_headers;
 	Effect *equipping_features;
+	ieResRef Name; //the resref of the item itself!
 
 	ieStrRef ItemName;
 	ieStrRef ItemNameIdentified;

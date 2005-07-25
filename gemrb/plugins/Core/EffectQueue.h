@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.6 2005/07/14 22:09:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.7 2005/07/25 16:46:51 avenger_teambg Exp $
  *
  */
 
@@ -30,7 +30,7 @@ class Actor;
 
 //#define MAX_FX_OPCODES  255
 
-#define MAX_EFFECTS 255
+#define MAX_EFFECTS 512
 
 bool Init_EffectQueue();
 
@@ -49,6 +49,7 @@ public:
 	bool AddEffect(Effect* fx);
 	bool RemoveEffect(Effect* fx);
 
+	void AddAllEffects(Actor* target);
 	void ApplyAllEffects(Actor* target);
 	void ApplyEffect(Actor* target, Effect* fx);
 	void dump();
