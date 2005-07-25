@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.21 2005/07/24 11:21:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.22 2005/07/25 20:23:49 avenger_teambg Exp $
  *
  */
 
@@ -216,11 +216,14 @@ int GameScript::IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::InParty(Scriptable* Sender, Trigger* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
-	if (!scr) {
+	Scriptable* scr;
+
+	if (parameters->objectParameter) {
+		scr = GetActorFromObject( Sender, parameters->objectParameter );
+	} else {
 		scr = Sender;
 	}
-	if (scr->Type != ST_ACTOR) {
+	if (!scr || scr->Type != ST_ACTOR) {
 		return 0;
 	}
 	Actor *tar = (Actor *) scr;
@@ -236,11 +239,14 @@ int GameScript::InParty(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::InPartyAllowDead(Scriptable* Sender, Trigger* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
-	if (!scr) {
+	Scriptable* scr;
+
+	if (parameters->objectParameter) {
+		scr = GetActorFromObject( Sender, parameters->objectParameter );
+	} else {
 		scr = Sender;
 	}
-	if (scr->Type != ST_ACTOR) {
+	if (!scr || scr->Type != ST_ACTOR) {
 		return 0;
 	}
 	return core->GetGame()->InParty( ( Actor * ) scr ) >= 0 ? 1 : 0;
@@ -1477,7 +1483,7 @@ int GameScript::CheckStat(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) target;
-	if ((signed) actor->GetStat( parameters->int0Parameter ) == parameters->int1Parameter) {
+	if ((signed) actor->GetStat( parameters->int1Parameter ) == parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -1490,7 +1496,7 @@ int GameScript::CheckStatGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	if ((signed) actor->GetStat( parameters->int0Parameter ) > parameters->int1Parameter) {
+	if ((signed) actor->GetStat( parameters->int1Parameter ) > parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -1503,7 +1509,7 @@ int GameScript::CheckStatLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	if ((signed) actor->GetStat( parameters->int0Parameter ) < parameters->int1Parameter) {
+	if ((signed) actor->GetStat( parameters->int1Parameter ) < parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;

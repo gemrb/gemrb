@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.31 2005/07/25 16:46:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.32 2005/07/25 20:23:49 avenger_teambg Exp $
  *
  */
 
@@ -102,8 +102,8 @@ int fx_cure_nondetection_state (Actor* Owner, Actor* target, Effect* fx);//46
 //47
 //48
 int fx_damage_bonus (Actor* Owner, Actor* target, Effect* fx);//49
-//4a
-//4b
+int fx_set_blind_state (Actor* Owner, Actor* target, Effect* fx);//4a
+int fx_cure_blind_state (Actor* Owner, Actor* target, Effect* fx);//4b
 //4c
 //4d
 //4e
@@ -349,6 +349,7 @@ static EffectLink effectnames[] = {
 	{ "Color:SetCharacterColorsByPalette", fx_set_color_gradient },
 	{ "ConstitutionModifier", fx_constitution_modifier },
 	{ "Cure:Berserk", fx_cure_berserk_state },
+	{ "Cure:Blind", fx_cure_blind_state },
 	{ "Cure:Death", fx_cure_dead_state },
 	{ "Cure:Defrost", fx_cure_frozen_state },
 	{ "Cure:Infravision", fx_cure_infravision_state },
@@ -371,6 +372,8 @@ static EffectLink effectnames[] = {
 	{ "IntoxicationModififier", fx_intoxication_modifier },
 	{ "LoreModifier", fx_lore_modifier },
 	{ "LuckModifier", fx_luck_modifier },
+	{ "MagicalColdResistanceModifier", fx_magical_cold_resistance_modifier },
+	{ "MagicalFireResistanceModifier", fx_magical_fire_resistance_modifier },
 	{ "MagicDamageResistanceModifier", fx_magic_damage_resistance_modifier },
 	{ "MagicResistanceModifier", fx_magic_resistance_modifier },
 	{ "MaximumHPModifier", fx_maximum_hp_modifier },
@@ -387,8 +390,9 @@ static EffectLink effectnames[] = {
 	{ "Spell:PriestSpellSlotsModifier", fx_bonus_priest_spells },
 	{ "Spell:WizardSpellSlotsModifier", fx_bonus_wizard_spells },
 	{ "State:Berserk", fx_set_berserk_state },
+	{ "State:Blind", fx_set_blind_state },
 	{ "State:Charmed", fx_set_charmed_state },
-	{ "State:Haste", fx_set_hasted_state },
+	{ "State:Hasted", fx_set_hasted_state },
 	{ "State:Infravision", fx_set_infravision_state },
 	{ "State:Invisible", fx_set_invisible_state }, //both invis or improved invis
 	{ "State:Panic", fx_set_panic_state },
@@ -639,7 +643,7 @@ inline int MAX(int a, int b)
 #define STAT_MUL(stat, mod)  target->Modified[ stat ] = (ieDword)(target->Modified[ stat ] * (( mod ) / 100.0))
 #define STATE_CURE( mod ) target->Modified[ IE_STATE_ID ] &= ~(ieDword) ( mod )
 #define STATE_SET( mod ) target->Modified[ IE_STATE_ID ] |= (ieDword) ( mod )
-
+#define STAT_MOD( stat ) target->NewStat(stat, fx->Parameter1, fx->Parameter2)
 
 // Effect opcodes
 // FIXME: These should be moved into their own plugins
@@ -677,7 +681,7 @@ int fx_ac_vs_damage_type_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_attacks_per_round_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_attacks_per_round_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	target->NewStat( IE_NUMBEROFATTACKS, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_NUMBEROFATTACKS);
 	return FX_APPLIED;
 }
 
@@ -719,7 +723,7 @@ int fx_charisma_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_charisma_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_CHR, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_CHR );
 	return FX_APPLIED;
 }
 
@@ -738,7 +742,7 @@ int fx_constitution_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_constitution_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_CON, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_CON );
 	return FX_APPLIED;
 }
 
@@ -786,7 +790,7 @@ int fx_dexterity_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_dexterity_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_DEX, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_DEX );
 	return FX_APPLIED;
 }
 
@@ -803,7 +807,7 @@ int fx_current_hp_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_current_hp_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_HITPOINTS, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_HITPOINTS );
 	return FX_APPLIED;
 }
 
@@ -847,7 +851,7 @@ int fx_intelligence_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_intelligence_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_INT, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_INT );
 	return FX_APPLIED;
 }
 
@@ -872,7 +876,7 @@ int fx_lore_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_lore_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_LORE, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_LORE );
 	return FX_APPLIED;
 }
 
@@ -881,7 +885,7 @@ int fx_luck_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_luck_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_LUCK, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_LUCK );
 	return FX_APPLIED;
 }
 
@@ -890,7 +894,7 @@ int fx_morale_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_morale_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_MORALE, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_MORALE );
 	return FX_APPLIED;
 }
 
@@ -910,7 +914,7 @@ int fx_acid_resistance_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_acid_resistance_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_RESISTACID, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_RESISTACID );
 	return FX_APPLIED;
 }
 
@@ -919,7 +923,7 @@ int fx_cold_resistance_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cold_resistance_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_RESISTCOLD, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_RESISTCOLD );
 	return FX_APPLIED;
 }
 
@@ -928,7 +932,7 @@ int fx_electricity_resistance_modifier (Actor* /*Owner*/, Actor* target, Effect*
 {
 	if (0) printf( "fx_electricity_resistance_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_RESISTELECTRICITY, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_RESISTELECTRICITY );
 	return FX_APPLIED;
 }
 
@@ -937,7 +941,7 @@ int fx_fire_resistance_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_fire_resistance_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_RESISTFIRE, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_RESISTFIRE );
 	return FX_APPLIED;
 }
 
@@ -946,7 +950,7 @@ int fx_magic_damage_resistance_modifier (Actor* /*Owner*/, Actor* target, Effect
 {
 	if (0) printf( "fx_magic_damage_resistance_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_MAGICDAMAGERESISTANCE, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_MAGICDAMAGERESISTANCE );
 	return FX_APPLIED;
 }
 
@@ -964,7 +968,7 @@ int fx_save_vs_death_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_save_vs_death_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_SAVEVSDEATH, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_SAVEVSDEATH );
 	return FX_APPLIED;
 }
 
@@ -973,7 +977,7 @@ int fx_save_vs_wands_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_save_vs_wands_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_SAVEVSWANDS, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_SAVEVSWANDS );
 	return FX_APPLIED;
 }
 
@@ -982,7 +986,7 @@ int fx_save_vs_poly_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_save_vs_poly_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_SAVEVSPOLY, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_SAVEVSPOLY );
 	return FX_APPLIED;
 }
 
@@ -991,7 +995,7 @@ int fx_save_vs_breath_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_save_vs_breath_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_SAVEVSBREATH, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_SAVEVSBREATH );
 	return FX_APPLIED;
 }
 
@@ -1000,7 +1004,7 @@ int fx_save_vs_spell_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_save_vs_spell_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_SAVEVSSPELL, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_SAVEVSSPELL );
 	return FX_APPLIED;
 }
 
@@ -1052,7 +1056,7 @@ int fx_strength_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_strength_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_STR, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_STR );
 	return FX_APPLIED;
 }
 
@@ -1093,7 +1097,7 @@ int fx_wisdom_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_wisdom_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_WIS, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_WIS );
 	return FX_APPLIED;
 }
 
@@ -1102,7 +1106,7 @@ int fx_to_hit_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_to_hit_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_THAC0, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_THAC0 );
 	return FX_APPLIED;
 }
 
@@ -1111,7 +1115,7 @@ int fx_stealth_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_stealth_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_STEALTH, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_STEALTH );
 	return FX_APPLIED;
 }
 
@@ -1156,7 +1160,77 @@ int fx_damage_bonus (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_damage_bonus (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_DAMAGEBONUS, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_DAMAGEBONUS );
+	return FX_APPLIED;
+}
+
+// 0x4a
+int fx_set_blind_state (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_set_blind_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	STATE_SET( STATE_BLIND );
+	return FX_APPLIED;
+}
+
+// 0x4b
+int fx_cure_blind_state (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_cure_blind_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	STATE_CURE( STATE_BLIND );
+	return FX_APPLIED;
+}
+
+// 0x54
+int fx_magical_fire_resistance_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_magical_fire_resistance_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	STAT_MOD( IE_RESISTMAGICFIRE );
+	return FX_APPLIED;
+}
+
+// 0x55
+int fx_magical_cold_resistance_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_magical_cold_resistance_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	STAT_MOD( IE_RESISTMAGICCOLD );
+	return FX_APPLIED;
+}
+
+// 0x56
+int fx_slashing_resistance_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_slashing_resistance_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	STAT_MOD( IE_RESISTSLASHING );
+	return FX_APPLIED;
+}
+
+// 0x57
+int fx_crushing_resistance_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_crushing_resistance_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	STAT_MOD( IE_RESISTCRUSHING );
+	return FX_APPLIED;
+}
+
+// 0x58
+int fx_piercing_resistance_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_piercing_resistance_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	STAT_MOD( IE_RESISTPIERCING );
+	return FX_APPLIED;
+}
+
+// 0x59
+int fx_missiles_resistance_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_missiles_resistance_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	STAT_MOD( IE_RESISTMISSILE );
 	return FX_APPLIED;
 }
 
@@ -1165,7 +1239,7 @@ int fx_open_locks_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_open_locks_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_LOCKPICKING, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_LOCKPICKING );
 	return FX_APPLIED;
 }
 
@@ -1174,7 +1248,7 @@ int fx_find_traps_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_find_traps_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_TRAPS, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_TRAPS );
 	return FX_APPLIED;
 }
 
@@ -1183,7 +1257,7 @@ int fx_pick_pockets_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_pick_pockets_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_PICKPOCKET, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_PICKPOCKET );
 	return FX_APPLIED;
 }
 
@@ -1192,7 +1266,7 @@ int fx_fatigue_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_fatigue_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_FATIGUE, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_FATIGUE );
 	return FX_APPLIED;
 }
 
@@ -1201,7 +1275,7 @@ int fx_intoxication_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_intoxication_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_INTOXICATION, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_INTOXICATION );
 	return FX_APPLIED;
 }
 
@@ -1210,7 +1284,7 @@ int fx_tracking_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_tracking_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_TRACKING, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_TRACKING );
 	return FX_APPLIED;
 }
 
@@ -1219,7 +1293,7 @@ int fx_strength_bonus_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_strength_bonus_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_STREXTRA, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_STREXTRA );
 	return FX_APPLIED;
 }
 
@@ -1268,7 +1342,7 @@ int fx_magic_resistance_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_magic_resistance_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_RESISTMAGIC, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_RESISTMAGIC );
 	return FX_APPLIED;
 }
 
@@ -1308,7 +1382,7 @@ int fx_minimum_hp_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_minimum_hp_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->NewStat( IE_MINHITPOINTS, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_MINHITPOINTS );
 	return FX_APPLIED;
 }
 
