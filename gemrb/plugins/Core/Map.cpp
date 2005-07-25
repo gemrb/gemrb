@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.181 2005/07/24 18:38:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.182 2005/07/25 21:36:50 avenger_teambg Exp $
  *
  */
 
@@ -751,15 +751,13 @@ void Map::AddAnimation(AreaAnimation* anim)
 	animations.push_back( anim );
 }
 
+//reapplying all of the effects on the actors of this map
+//this might be unnecessary later
 void Map::UpdateEffects()
 {
 	unsigned int i = actors.size();
 	while (i--) {
-		Actor* actor = actors[i];
-		if (! IsVisible( actor->Pos, true ) )
-			continue;
-
-		actor->fxqueue.ApplyAllEffects( actor );
+		actors[i]->Init();
 	}
 }
 
