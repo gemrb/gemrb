@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/FloatMenuWindow.py,v 1.10 2005/07/24 07:45:59 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/FloatMenuWindow.py,v 1.11 2005/07/25 14:21:32 edheldil Exp $
 
 # FloatMenuWindow.py - display PST's floating menu window from GUIWORLD winpack
 
@@ -37,12 +37,12 @@ MENU_MODE_SPELLS = 4
 MENU_MODE_ABILITIES = 5
 
 float_menu_mode = MENU_MODE_SINGLE
-
+float_menu_index = 0
 
 
 def OpenFloatMenuWindow ():
 	global FloatMenuWindow
-	global float_menu_mode
+	global float_menu_mode, float_menu_index
 	
         GemRB.HideGUI ()
 
@@ -115,11 +115,15 @@ def OpenFloatMenuWindow ():
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_DRAGGABLE, OP_OR)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG, "FloatMenuDrag")
 
-	# Rotate Items left & right
+	# Rotate Items left (to begin)
 	Button = GemRB.GetControl (Window, 13)
 	GemRB.SetTooltip (Window, Button, 8197)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "FloatMenuPreviousItem")
+
+	# Rotate Items right (to end)
 	Button = GemRB.GetControl (Window, 14)
 	GemRB.SetTooltip (Window, Button, 8198)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "FloatMenuNextItem")
 
 	# 6 - 10 - items/spells/other
 	for i in range (6, 11):
@@ -167,6 +171,8 @@ def OpenFloatMenuWindow ():
 		float_menu_mode = MENU_MODE_SINGLE
 	else:
 		float_menu_mode = MENU_MODE_GROUP
+
+	float_menu_index = 0
 
 	SetSelectionChangeMultiHandler (FloatMenuSelectAnotherPC)
 	UpdateFloatMenuWindow ()
@@ -245,9 +251,9 @@ def UpdateFloatMenuGroupAction (i):
 def UpdateFloatMenuItem (pc, i, weapons):
 	Window = FloatMenuWindow
 	if weapons:
-		slot_item = GemRB.GetSlotItem (pc, 9 + i)
+		slot_item = GemRB.GetSlotItem (pc, 9 + i + float_menu_index)
 	else:
-		slot_item = GemRB.GetSlotItem (pc, 20 + i)
+		slot_item = GemRB.GetSlotItem (pc, 20 + i + float_menu_index)
 	Button = GemRB.GetControl (Window, 15 + i)
 	GemRB.SetButtonSprites (Window, Button, 'AMGENS', 0, 0, 1, 2, 3)
 
@@ -290,27 +296,28 @@ def UpdateFloatMenuSpell (pc, i, innate):
 
 	# FIXME: ugly, should be in Spellbook.cpp
 	spell_hash = {}
+	spell_list = []
 	for level in range (1, 10):
 		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level)
 		for j in range (mem_cnt):
 			ms = GemRB.GetMemorizedSpell (pc, type, level, j)
+
+			# Spell was already used up
 			if not ms['Flags']: continue
 			
 			if spell_hash.has_key (ms['SpellResRef']):
 				spell_hash[ms['SpellResRef']] = spell_hash[ms['SpellResRef']] + 1
 			else:
 				spell_hash[ms['SpellResRef']] = 1
+				spell_list.append( ms['SpellResRef'] )
 
-	try:
-		SpellResRef = spell_hash.keys ()[i]
-	except:
-		SpellResRef = None
-		
+
 	Button = GemRB.GetControl (Window, 15 + i)
 	GemRB.SetButtonSprites (Window, Button, 'AMGENS', 0, 0, 1, 2, 3)
 
-	
-	if SpellResRef:
+
+	if i + float_menu_index < len (spell_list):
+		SpellResRef = spell_list[i + float_menu_index]
 		GemRB.SetSpellIcon (Window, Button, '') # clear item sprites
 		GemRB.SetSpellIcon (Window, Button, SpellResRef)
 		GemRB.SetText (Window, Button, "%d" %spell_hash[SpellResRef])
@@ -343,32 +350,50 @@ def FloatMenuSelectNextPC ():
 	# NOTE: it invokes FloatMenuSelectAnotherPC() through selection change handler
 
 def FloatMenuSelectAnotherPC ():
-	global float_menu_mode
+	global float_menu_mode, float_menu_index
 	float_menu_mode = MENU_MODE_SINGLE
+	float_menu_index = 0
 	UpdateFloatMenuWindow ()
 
 
 def FloatMenuSelectWeapons ():
-	global float_menu_mode
+	global float_menu_mode, float_menu_index
 	float_menu_mode = MENU_MODE_WEAPONS
+	float_menu_index = 0
 	# FIXME: Force attack mode
 	UpdateFloatMenuWindow ()
 
 def FloatMenuSelectItems ():
-	global float_menu_mode
+	global float_menu_mode, float_menu_index
 	float_menu_mode = MENU_MODE_ITEMS
+	float_menu_index = 0
 	UpdateFloatMenuWindow ()
 
 def FloatMenuSelectSpells ():
-	global float_menu_mode
+	global float_menu_mode, float_menu_index
 	float_menu_mode = MENU_MODE_SPELLS
+	float_menu_index = 0
 	UpdateFloatMenuWindow ()
 
 def FloatMenuSelectAbilities ():
-	global float_menu_mode
+	global float_menu_mode, float_menu_index
 	float_menu_mode = MENU_MODE_ABILITIES
+	float_menu_index = 0
 	UpdateFloatMenuWindow ()
 
+
+def FloatMenuPreviousItem ():
+	global float_menu_index
+	if float_menu_index > 0:
+		float_menu_index = float_menu_index - 1
+		print "P", float_menu_index
+		UpdateFloatMenuWindow ()
+
+def FloatMenuNextItem ():
+	global float_menu_index
+	float_menu_index = float_menu_index + 1
+	print "N", float_menu_index
+	UpdateFloatMenuWindow ()
 
 
 def FloatMenuDrag ():
