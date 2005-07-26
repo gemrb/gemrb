@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.338 2005/07/25 16:46:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.339 2005/07/26 18:50:54 avenger_teambg Exp $
  *
  */
 
@@ -1449,7 +1449,7 @@ bool Interface::LoadGemRBINI()
 			if (s2) {
 				upperlower(atoi(s), atoi(s2+1) );
 				printMessage("Core"," ",WHITE);
-				printf("Upperlower %d %d\n",atoi(s), atoi(s2+1) );
+				printf("Upperlower %d %d ",atoi(s), atoi(s2+1) );
 				printStatus( "SET", LIGHT_GREEN );
 			}
 		}
