@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.63 2005/07/16 17:20:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.64 2005/07/26 17:34:16 avenger_teambg Exp $
  *
  */
 
@@ -438,6 +438,10 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 
  	AnimationFactory* af = ( AnimationFactory* )
 		core->GetResourceMgr()->GetFactoryResource( NewResRef, IE_BAM_CLASS_ID, IE_NORMAL );
+
+	if (!af) {
+		return NULL;
+	}
 
 	a = af->GetCycle( Cycle );
 

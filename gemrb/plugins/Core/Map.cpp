@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.182 2005/07/25 21:36:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.183 2005/07/26 17:34:17 avenger_teambg Exp $
  *
  */
 
@@ -444,14 +444,14 @@ void Map::UpdateScripts()
 		//If this InfoPoint has no script and it is not a Travel Trigger, skip it
 		if (!ip->Scripts[0] && ( ip->Type != ST_TRAVEL ))
 			continue;
-		//Execute Pending Actions
-		ip->ProcessActions();
 		//If this InfoPoint is a Switch Trigger
 		if (ip->Type == ST_TRIGGER) {
 			//Check if this InfoPoint was activated
 			if (ip->LastTrigger) {
 				//Run the InfoPoint script
 				ip->ExecuteScript( ip->Scripts[0] );
+				//Execute Pending Actions
+				ip->ProcessActions();
 			}
 			continue;
 		}
@@ -464,6 +464,8 @@ void Map::UpdateScripts()
 					ip->Entered(actor);
 				}
 				ip->ExecuteScript( ip->Scripts[0] );
+				//Execute Pending Actions
+				ip->ProcessActions();
 			} else {
 				//ST_TRAVEL
 				//don't move if doing something else
