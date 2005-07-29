@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.33 2005/07/28 19:56:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.34 2005/07/29 21:58:06 avenger_teambg Exp $
  *
  */
 
@@ -551,7 +551,7 @@ void EffectQueue::ApplyAllEffects(Actor* target)
 
 	std::vector< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		ApplyEffect( target, *f );
+		ApplyEffect( target, *f, false );
 	}
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		if ((*f)->TimingMode==FX_DURATION_JUST_EXPIRED) {
@@ -569,7 +569,7 @@ void EffectQueue::AddAllEffects(Actor* target)
 	std::vector< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		//handle resistances and saving throws here
-		target->fxqueue.ApplyEffect( target, *f );
+		target->fxqueue.ApplyEffect( target, *f, true );
 		if ((*f)->TimingMode!=FX_DURATION_JUST_EXPIRED) {
 			target->fxqueue.AddEffect(*f);
 		}
@@ -583,7 +583,7 @@ void EffectQueue::PrepareDuration(Effect* fx)
 }
 
 
-void EffectQueue::ApplyEffect(Actor* target, Effect* fx)
+void EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 {
 	if (!target) {
 		return;
@@ -604,7 +604,9 @@ void EffectQueue::ApplyEffect(Actor* target, Effect* fx)
 		switch( fn( Owner?Owner:target, target, fx ) ) {
 			case FX_APPLIED:
 				//normal effect with duration
-				PrepareDuration(fx);
+				if (first_apply) {
+					PrepareDuration(fx);
+				}
 				break;
 			case FX_NOT_APPLIED:
  				//instant effect, pending removal
@@ -618,7 +620,9 @@ void EffectQueue::ApplyEffect(Actor* target, Effect* fx)
 				break;
 			case FX_CYCLIC:
 				//mark this spell as cyclic (is there a flag?)
-				PrepareDuration(fx);
+				if (first_apply) {
+					PrepareDuration(fx);
+				}
 				break;
 		}
 	} else {
