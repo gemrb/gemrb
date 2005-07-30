@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.28 2005/07/19 20:02:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.29 2005/07/30 11:45:20 edheldil Exp $
  *
  */
 
@@ -403,6 +403,21 @@ bool Spellbook::ChargeSpell(CREMemorizedSpell* spl)
 bool Spellbook::DepleteSpell(CREMemorizedSpell* spl)
 {
 	spl->Flags = 0;
+	return true;
+}
+
+bool Spellbook::CastSpell( ieResRef SpellResRef, Actor* Source, Actor* Target )
+{
+	if (! HaveSpell( SpellResRef, HS_DEPLETE )) {
+		return false;
+	}
+
+	Spell* spl = core->GetSpell( SpellResRef );
+	for (int i = 0; i < spl->CastingFeatureCount; i++) {
+		Effect* fx = &spl->casting_features[i];
+		AddEffect( fx, Source, Target );
+	}
+
 	return true;
 }
 

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.34 2005/07/04 20:40:21 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.35 2005/07/30 11:45:19 edheldil Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -145,21 +145,19 @@ def SetupMenuWindowControls (Window):
 	GemRB.SetTooltip (Window, Button, 41631) # or 41646 Activate ...
 	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenFloatMenuWindow")
 
-	# Can't Reach ???
+	# (Un)Lock view on character
 	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetTooltip (Window, Button, 41647)  # or 41648 Unlock ...
-	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenFormationWindow")
-	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenPartyManageWindow")
-	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenContainerWindow")
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CntReachPress")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OnLockViewPress")
 
 	# Message popup
 	Button = GemRB.GetControl (Window, 10)
 	GemRB.SetTooltip (Window, Button, 41660)  # or 41661 Close ...
 
 
-def CntReachPress ():
-	print "CntReachPress"
+def OnLockViewPress ():
+	GemRB.GameControlSetScreenFlags (SF_CENTERONACTOR | SF_ALWAYSCENTER, OP_OR)
+	print "OnLockViewPress"
 
 def AIPress ():
 	print "AIPress"

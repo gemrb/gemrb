@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.247 2005/07/24 18:38:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.248 2005/07/30 11:45:19 edheldil Exp $
  */
 
 #ifndef WIN32
@@ -92,6 +92,8 @@ GameControl::GameControl(void)
 	AIUpdateCounter = 1;
 	effect = NULL;
 	ieDword tmp=0;
+
+	target_mode = TARGET_MODE_NONE;
 
 	core->GetDictionary()->Lookup("Center",tmp);
 	if (tmp) {
@@ -490,6 +492,15 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				}
 				break;
 
+			case 'c':
+				if (game->selected.size() > 0 && lastActor) {
+					Actor *src = game->selected[0];
+					Actor *tgt = lastActor;
+					bool res = src->spellbook.CastSpell( "SPWI207",  src, tgt );
+					printf( "Cast Spell: %d\n", res );
+				}
+				break;
+
 			case 'p':
 				//path
 				 {
@@ -735,6 +746,8 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		} else {
 			lastActor = actor;
 			lastActor->SetOver( true );
+		}
+		if (actor) {
 			switch (lastActor->Modified[IE_EA]) {
 				case EA_EVILCUTOFF:
 				case EA_GOODCUTOFF:
@@ -755,6 +768,46 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 					break;
 				default:
 					nextCursor = IE_CURSOR_TALK;
+					break;
+			}
+		}
+	}
+
+	if (target_mode) {
+		if (target_mode & TARGET_MODE_TALK) {
+			nextCursor = IE_CURSOR_TALK;
+		} else if (target_mode & TARGET_MODE_ATTACK) {
+			nextCursor = IE_CURSOR_ATTACK;
+		} else if (target_mode & TARGET_MODE_CAST) {
+			nextCursor = IE_CURSOR_CAST;
+		}
+
+		Actor* actor = area->GetActor( p, action);
+		
+		if (actor) {
+			switch (lastActor->Modified[IE_EA]) {
+				case EA_EVILCUTOFF:
+				case EA_GOODCUTOFF:
+					break;
+
+				case EA_PC:
+				case EA_FAMILIAR:
+				case EA_ALLY:
+				case EA_CONTROLLED:
+				case EA_CHARMED:
+				case EA_EVILBUTGREEN:
+					if (target_mode & TARGET_MODE_ALLY) 
+						nextCursor++;
+					break;
+
+				case EA_ENEMY:
+				case EA_GOODBUTRED:
+					if (target_mode & TARGET_MODE_ENEMY) 
+						nextCursor++;
+					break;
+				default:
+					if (target_mode & TARGET_MODE_NEUTRAL) 
+						nextCursor++;
 					break;
 			}
 		}

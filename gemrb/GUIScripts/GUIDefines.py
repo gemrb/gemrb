@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.42 2005/06/22 15:55:21 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.43 2005/07/30 11:45:06 edheldil Exp $
 
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
@@ -120,6 +120,27 @@ GS_DIALOGMASK        = 6
 GS_HIDEGUI           = 16
 GS_OPTIONPANE        = 32
 GS_PORTRAITPANE      = 64
+
+# GameControl screen flags
+# !!! Keep these synchronized with GameControl.h !!!
+SF_DISABLEMOUSE      = 1
+SF_CENTERONACTOR     = 2
+SF_ALWAYSCENTER      = 4
+SF_GUIENABLED        = 8
+SF_LOCKSCROLL        = 16
+
+# GameControltarget modes
+# !!! Keep these synchronized with GameControl.h !!!
+TARGET_MODE_NONE    = 0x00
+TARGET_MODE_TALK    = 0x01
+TARGET_MODE_ATTACK  = 0x02
+TARGET_MODE_CAST    = 0x04
+
+TARGET_MODE_ALLY    = 0x10
+TARGET_MODE_ENEMY   = 0x20
+TARGET_MODE_NEUTRAL = 0x40
+TARGET_MODE_ALL     = TARGET_MODE_ALLY | TARGET_MODE_ENEMY | TARGET_MODE_NEUTRAL
+
 
 # Shadow color for ShowModal()
 # !!! Keep these synchronized with Interface.h !!!

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.77 2005/07/20 21:46:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.78 2005/07/30 11:45:19 edheldil Exp $
  *
  */
 
@@ -73,6 +73,7 @@
 #define IE_STR_STRREFOFF 256
 
 // bitflag operations
+// !!! Keep these synchronized with GUIDefines.py !!!
 #define BM_SET  0 //gemrb extension
 #define BM_AND  1
 #define BM_OR   2

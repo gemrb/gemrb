@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/FloatMenuWindow.py,v 1.11 2005/07/25 14:21:32 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/FloatMenuWindow.py,v 1.12 2005/07/30 11:45:11 edheldil Exp $
 
 # FloatMenuWindow.py - display PST's floating menu window from GUIWORLD winpack
 
@@ -81,7 +81,7 @@ def OpenFloatMenuWindow ():
 
 	# Initiate Dialogue
 	Button = GemRB.GetControl (Window, 1)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "FloatMenuForceDialog")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "FloatMenuSelectDialog")
 	GemRB.SetTooltip (Window, Button, 8191)
 
 	# Attack/Select Weapon
@@ -356,11 +356,16 @@ def FloatMenuSelectAnotherPC ():
 	UpdateFloatMenuWindow ()
 
 
+def FloatMenuSelectDialog ():
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_TALK)
+	UpdateFloatMenuWindow ()
+
 def FloatMenuSelectWeapons ():
 	global float_menu_mode, float_menu_index
 	float_menu_mode = MENU_MODE_WEAPONS
 	float_menu_index = 0
 	# FIXME: Force attack mode
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_ATTACK)
 	UpdateFloatMenuWindow ()
 
 def FloatMenuSelectItems ():
@@ -373,6 +378,7 @@ def FloatMenuSelectSpells ():
 	global float_menu_mode, float_menu_index
 	float_menu_mode = MENU_MODE_SPELLS
 	float_menu_index = 0
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_CAST)
 	UpdateFloatMenuWindow ()
 
 def FloatMenuSelectAbilities ():

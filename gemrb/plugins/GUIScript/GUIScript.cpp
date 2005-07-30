@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.329 2005/07/24 15:52:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.330 2005/07/30 11:45:20 edheldil Exp $
  *
  */
 
@@ -623,9 +623,9 @@ static PyObject* GemRB_SetWindowPos(PyObject * /*self*/, PyObject* args)
 	// FIXME: keep it within gamecontrol
 	if (Flags & WINDOW_BOUNDED) {
 		// FIXME: grrrr, should be < 0!!!
-		if (X > 32767)
+		if (X > 32767 || X < 0)
 			X = 0;
-		if (Y > 32767)
+		if (Y > 32767 || Y < 0)
 			Y = 0;
 
 		if (X + win->Width >= core->Width)
@@ -1946,6 +1946,60 @@ static PyObject* GemRB_GameSetScreenFlags(PyObject * /*self*/, PyObject* args)
 	}
 
 	game->SetControlStatus( Flags, Operation );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_GameControlSetScreenFlags__doc,
+"GameControlSetScreenFlags(Flags, Operation)\n\n"
+"Sets the Display Flags of the main game screen control (centeronactor,...)." );
+
+static PyObject* GemRB_GameControlSetScreenFlags(PyObject * /*self*/, PyObject* args)
+{
+	int Flags, Operation;
+
+	if (!PyArg_ParseTuple( args, "ii", &Flags, &Operation )) {
+		return AttributeError( GemRB_GameControlSetScreenFlags__doc );
+	}
+	if (Operation < BM_SET || Operation > BM_NAND) {
+		printMessage( "GUIScript",
+			"Syntax Error: operation must be 0-4\n", LIGHT_RED );
+		return NULL;
+	}
+
+	GameControl *gc = core->GetGameControl();
+	if (!gc) {
+		printMessage ("GUIScript", "Flag cannot be set!",LIGHT_RED);
+		return NULL;
+	}
+
+	gc->SetScreenFlags( Flags, Operation );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+
+PyDoc_STRVAR( GemRB_GameControlSetTargetMode__doc,
+"GameControlSetTargetMode(Mode)\n\n"
+"Sets the targetting mode of the main game screen control (attack, cast spell,...)." );
+
+static PyObject* GemRB_GameControlSetTargetMode(PyObject * /*self*/, PyObject* args)
+{
+	int Mode;
+
+	if (!PyArg_ParseTuple( args, "i", &Mode )) {
+		return AttributeError( GemRB_GameControlSetTargetMode__doc );
+	}
+
+	GameControl *gc = core->GetGameControl();
+	if (!gc) {
+		printMessage ("GUIScript", "Can't find GameControl!",LIGHT_RED);
+		return NULL;
+	}
+
+	gc->target_mode = Mode;
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -5238,6 +5292,8 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(DeleteControl, METH_VARARGS),
 	METHOD(SetTextAreaFlags, METH_VARARGS),
 	METHOD(GameSetScreenFlags, METH_VARARGS),
+	METHOD(GameControlSetScreenFlags, METH_VARARGS),
+	METHOD(GameControlSetTargetMode, METH_VARARGS),
 	METHOD(SetButtonFlags, METH_VARARGS),
 	METHOD(SetButtonState, METH_VARARGS),
 	METHOD(SetButtonPictureClipping, METH_VARARGS),

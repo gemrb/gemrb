@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.73 2005/07/16 21:03:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.74 2005/07/30 11:45:20 edheldil Exp $
  */
 
 class GameControl;
@@ -55,11 +55,23 @@ class GameControl;
 #define DF_OPENENDWINDOW 128
 
 //screen flags
+// !!! Keep these synchronized with GUIDefines.py !!!
 #define SF_DISABLEMOUSE  1
 #define SF_CENTERONACTOR 2
 #define SF_ALWAYSCENTER  4
 #define SF_GUIENABLED    8
 #define SF_LOCKSCROLL    16
+
+// target modes
+// !!! Keep these synchronized with GUIDefines.py !!!
+#define TARGET_MODE_NONE    0x00
+#define TARGET_MODE_TALK    0x01
+#define TARGET_MODE_ATTACK  0x02
+#define TARGET_MODE_CAST    0x04
+
+#define TARGET_MODE_ALLY    0x10
+#define TARGET_MODE_ENEMY   0x20
+#define TARGET_MODE_NEUTRAL 0x40
 
 //the distance of operating a trigger, container, etc.
 #define MAX_OPERATING_DISTANCE      40 //a search square is 16x12
@@ -91,6 +103,7 @@ public:
 	Door* overDoor;
 	Container* overContainer;
 	InfoPoint* overInfoPoint;
+	int target_mode;
 private:
 	unsigned char lastCursor;
 	short moveX, moveY;
