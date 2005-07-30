@@ -10,5 +10,6 @@ def OnLoad():
 		Button = GemRB.GetControl (Window, i)
 		GemRB.SetText (Window, i, chr(i+start) )
 		#GemRB.SetButtonSprites (Window, i, "NORMAL",i+start,0,0,0,0)
+		#GemRB.SetButtonBAM (Window, i, "NORMAL",i+start,0,0xf)
 		GemRB.SetTooltip (Window, i, str(i+start) )
 	GemRB.SetVisible (Window, 1)

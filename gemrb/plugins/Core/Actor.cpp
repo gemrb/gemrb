@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.121 2005/07/25 16:46:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.122 2005/07/30 13:47:31 avenger_teambg Exp $
  *
  */
 
@@ -337,20 +337,18 @@ void pcf_stat(Actor *actor, ieDword Value)
 	}
 }
 
-void pcf_gold(Actor *actor, ieDword Value)
+void pcf_gold(Actor *actor, ieDword /*Value*/)
 {
 	//this function will make a party member automatically donate their
 	//gold to the party pool, not the same as in the original engine
 	if (actor->InParty) {
 		Game *game = core->GetGame();
-		game->PartyGold += Value;
-		if (game->PartyGold > 0x80000000) {
-			game->PartyGold = 0;
-		}
+		game->AddGold ( actor->Modified[IE_GOLD] );
 		actor->Modified[IE_GOLD]=0;
 	}
 	//additionally to party pool, gold changes are permanent
-	actor->BaseStats[IE_GOLD]=actor->Modified[IE_GOLD];
+	//but this should be enforced by the effect system anyway
+	//actor->BaseStats[IE_GOLD]=actor->Modified[IE_GOLD];
 }
 
 //no separate values (changes are permanent)

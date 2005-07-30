@@ -41,7 +41,7 @@ IDS
 0x27	State:Sleep
 0x28	State:Slow
 0x29	Graphics:Sparkle
-0x2a	Spell:WizardSpellSlotsModifier
+0x2a	WizardSpellSlotsModifier
 0x2b	Cure:Petrification
 0x2c	StrengthModifier
 0x2d	State:Stun
@@ -57,11 +57,11 @@ IDS
 0x37	KillCreatureType
 0x38	Alignment:Invert
 0x39	Alignment:Change
-0x3a	Cure:DispellableEffects
+0x3a	DispelEffects
 0x3b	StealthModifier
 0x3c	MiscastMagic
-0x3d  AlchemyModifier
-0x3e	Spell:PriestSpellSlotsModifier
+0x3d	AlchemyModifier
+0x3e	PriestSpellSlotsModifier
 0x3f	State:Infravision
 0x40	State:RemoveInfravision
 0x41	Overlay:Blur
@@ -72,7 +72,7 @@ IDS
 0x46	Cure:NonDetection
 0x47	SexModifier
 0x48	AIIdentifierModifier
-0x49	BonusDamageBonus
+0x49	DamageBonusModifier
 0x4a	State:Blindness
 0x4b	Cure:Blindness
 0x4c	State:Feeblemindedness
