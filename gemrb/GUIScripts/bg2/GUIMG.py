@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIMG.py,v 1.11 2005/07/18 22:11:04 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIMG.py,v 1.12 2005/07/30 20:42:12 avenger_teambg Exp $
 
 
 # GUIMG.py - scripts to control mage spells windows from GUIMG winpack
@@ -77,8 +77,6 @@ def OpenMageWindow ():
 	#unknown usage
 	Button = GemRB.GetControl (Window, 55)
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
-	#GemRB.SetText (Window, Button, 123)
-	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "xxPress")
 
 	#setup level buttons
 	for i in range (9):
@@ -96,7 +94,6 @@ def OpenMageWindow ():
 		Button = GemRB.GetControl (Window, 3 + i)
 		GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,0,0,0,160,0,1)
 		GemRB.SetButtonSprites (Window, Button, "SPELFRAM",0,0,0,0,0)
-		#GemRB.SetButtonBAM (Window, Button, "SPELFRAM",0,0,0)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 
@@ -104,6 +101,7 @@ def OpenMageWindow ():
 	for i in range (24):
 		Button = GemRB.GetControl (Window, 27 + i)
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 
 	SetSelectionChangeHandler (UpdateMageWindow)
 	UpdateMageWindow ()
@@ -169,7 +167,6 @@ def UpdateMageWindow ():
 		if i < known_cnt:
 			ks = GemRB.GetKnownSpell (pc, type, level, i)
 			GemRB.SetSpellIcon (Window, Button, ks['SpellResRef'])
-			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS,
 "OnMageMemorizeSpell")
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenMageSpellInfoWindow")
@@ -180,7 +177,6 @@ def UpdateMageWindow ():
 i)
 
 		else:
-			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_NAND)
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS,
 "")
