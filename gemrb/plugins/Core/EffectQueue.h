@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.9 2005/07/29 21:58:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.10 2005/07/30 10:46:03 avenger_teambg Exp $
  *
  */
 
@@ -54,6 +54,7 @@ public:
 	void ApplyEffect(Actor* target, Effect* fx, bool first_apply);
 	void PrepareDuration(Effect* fx);
 	void RemoveAllEffects(ieDword opcode);
+	void RemoveLevelEffects(ieDword level, bool dispellable);
 	void dump();
 };
 

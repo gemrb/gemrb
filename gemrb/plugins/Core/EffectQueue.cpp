@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.34 2005/07/29 21:58:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.35 2005/07/30 10:46:03 avenger_teambg Exp $
  *
  */
 
@@ -88,7 +88,7 @@ int fx_to_hit_modifier (Actor* Owner, Actor* target, Effect* fx);//36
 int fx_kill_creature_type (Actor* Owner, Actor* target, Effect* fx);//37
 int fx_alignment_invert (Actor* Owner, Actor* target, Effect* fx);//38
 int fx_alignment_change (Actor* Owner, Actor* target, Effect* fx);//39
-//3a
+int fx_dispel_effects (Actor* Owner, Actor* target, Effect* fx);//3a
 int fx_stealth_modifier (Actor* Owner, Actor* target, Effect* fx);//3b
 int fx_miscast_magic_modifier (Actor* Owner, Actor* target, Effect* fx);//3c
 int fx_alchemy_modifier (Actor* Owner, Actor* target, Effect* fx);//3d
@@ -641,6 +641,22 @@ void EffectQueue::RemoveAllEffects(ieDword opcode)
 			continue;
 		}
 
+		(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;
+	}
+}
+
+
+void EffectQueue::RemoveLevelEffects(ieDword level, bool dispellable)
+{
+	std::vector< Effect* >::iterator f;
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
+		if ( (*f)->Power<=level) {
+			continue;
+		}
+
+		if (dispellable && ((*f)->Resistance&FX_RESIST_DISPELL_NO_BYPASS) ) {
+			continue;
+		}
 		(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;
 	}
 }
@@ -1295,6 +1311,22 @@ int fx_alignment_change (Actor* /*Owner*/, Actor* target, Effect* fx)
 	target->SetStat( IE_ALIGNMENT, fx->Parameter2 );
 	return FX_APPLIED;
 }
+
+//0x3A
+
+int fx_dispell_effects (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_dispell_effects (%2d): Value: %d, IDS: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	ieDword level = fx->Power;
+
+	//this might be different, it could be that removal depends on random
+	if (fx->Parameter2==1) {
+		level = fx->Parameter1;
+	}
+	target->fxqueue.RemoveLevelEffects(level, true);
+	return FX_NOT_APPLIED;
+}
+
 // 0x3B
 int fx_stealth_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
