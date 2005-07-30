@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.36 2005/07/30 12:28:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.37 2005/07/30 12:42:42 avenger_teambg Exp $
  *
  */
 
@@ -108,10 +108,10 @@ int fx_set_blind_state (Actor* Owner, Actor* target, Effect* fx);//4a
 int fx_cure_blind_state (Actor* Owner, Actor* target, Effect* fx);//4b
 int fx_set_feebleminded_state (Actor* Owner, Actor* target, Effect* fx);//4c
 int fx_cure_feebleminded_state (Actor* Owner, Actor* target, Effect* fx);//4d
-//4e
-//4f
-//50
-//51
+int fx_set_diseased_state (Actor* Owner, Actor* target, Effect*fx);//4e
+int fx_cure_diseased_78_state (Actor* Owner, Actor* target, Effect* fx);//4f
+int fx_set_deaf_state (Actor* Owner, Actor* target, Effect* fx); //50
+int fx_cure_deaf_80_state (Actor* Owner, Actor* target, Effect* fx);//51
 //52
 //53
 int fx_magical_fire_resistance_modifier (Actor* Owner, Actor* target, Effect* fx);//54
@@ -1030,7 +1030,7 @@ int fx_set_panic_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_poisoned_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_poisoned_state (%2d): Damage: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	//shall we set morale to 0 or just flick the panic flag on
+	//apparently this bit isn't set, but then why is it here
 	//this requires a little research
 	STATE_SET( STATE_POISONED );
 	//also this effect is executed every update
@@ -1560,6 +1560,25 @@ int fx_cure_feebleminded_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
+//0x4f
+int fx_set_diseased_state (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_set_diseased_state (%2d): Damage: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	//STATE_SET( STATE_DISEASED ); //no this we don't want
+	//also this effect is executed every update
+	return FX_CYCLIC;
+}
+
+
+//apparently this effect removes effect 0x4e (78)
+int fx_cure_diseased_78_state (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_cure_diseased_79_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	//STATE_CURE( STATE_DISEASED ); //the bit flagged as disease is actually the active state. so this is even more unlikely to be used as advertised
+	target->fxqueue.RemoveAllEffects( 78 ); //this is what actually happens in bg2
+	return FX_NOT_APPLIED;
+}
+
 // 0x50
 //this state has no bit???
 int fx_set_deaf_state (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
@@ -1575,6 +1594,14 @@ int fx_cure_deaf_80_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_cure_deaf_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	
 	target->fxqueue.RemoveAllEffects(0x50);
+	return FX_NOT_APPLIED;
+}
+
+//0x52
+int fx_set_ai_script (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_cure_deaf_state (%2d): Resource: %s, Type: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
+	target->SetScript (fx->Resource, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
 
