@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.35 2005/07/30 10:46:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.36 2005/07/30 12:28:18 avenger_teambg Exp $
  *
  */
 
@@ -102,7 +102,7 @@ int fx_summon_creature (Actor* Owner, Actor* target, Effect* fx);//43
 int fx_set_nondetection_state (Actor* Owner, Actor* target, Effect* fx);//45
 int fx_cure_nondetection_state (Actor* Owner, Actor* target, Effect* fx);//46
 int fx_sex_modifier (Actor* Owner, Actor* target, Effect* fx);//47
-//48
+int fx_ids_modifier (Actor* Owner, Actor* target, Effect* fx);//48
 int fx_damage_bonus (Actor* Owner, Actor* target, Effect* fx);//49
 int fx_set_blind_state (Actor* Owner, Actor* target, Effect* fx);//4a
 int fx_cure_blind_state (Actor* Owner, Actor* target, Effect* fx);//4b
@@ -1479,6 +1479,45 @@ int fx_cure_nondetection_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STATE_CURE( STATE_NONDET );
 	return FX_NOT_APPLIED;
 }
+
+//0x47
+int fx_sex_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_sex_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_SEX );
+	return FX_APPLIED;
+}
+
+//0x48
+int fx_ids_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_sex_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	switch (fx->Parameter2) {
+	case 2:
+		STAT_SET(IE_EA, fx->Parameter1);
+		break;
+	case 3:
+		STAT_SET(IE_GENERAL, fx->Parameter1);
+		break;
+	case 4:
+		STAT_SET(IE_RACE, fx->Parameter1);
+		break;
+	case 5:
+		STAT_SET(IE_CLASS, fx->Parameter1);
+		break;
+	case 6:
+		STAT_SET(IE_SPECIFIC, fx->Parameter1);
+		break;
+	case 7:
+		STAT_SET(IE_SEX, fx->Parameter1);
+		break;
+	default:
+		return FX_NOT_APPLIED;
+	}
+	//not sure, need a check
+	return FX_APPLIED;
+}
+
 
 // 0x49
 int fx_damage_bonus (Actor* /*Owner*/, Actor* target, Effect* fx)
