@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.16 2005/06/24 23:20:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.17 2005/07/31 17:09:32 avenger_teambg Exp $
  *
  */
 
@@ -306,7 +306,7 @@ int WMPImp::PutMaps(DataStream *stream, WorldMapArray *wmap)
 	for (i=0;i<WorldMapsCount; i++) {
 		WorldMap *map = wmap->GetWorldMap(i);
 
-		PutLinks( stream, map);
+		ret = PutLinks( stream, map);
 		if (ret) {
 			return ret;
 		}
