@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.h,v 1.17 2005/03/31 10:06:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.h,v 1.18 2005/07/31 17:04:56 avenger_teambg Exp $
  *
  */
 
@@ -66,12 +66,12 @@ public:
 	Sprite2D* GetPaperdollImage(int *Colors, Sprite2D *& Picture2);
 
 	/** Gets a Pixel Index from the Image, unused */
-	unsigned int GetPixelIndex(unsigned int x, unsigned int y)
+	unsigned int GetPixelIndex(unsigned int /*x*/, unsigned int /*y*/)
 	{
 		return 0;
 	}
 	/** Gets a Pixel from the Image, unused */
-	Color GetPixel(unsigned int x, unsigned int y)
+	Color GetPixel(unsigned int /*x*/, unsigned int /*y*/)
 	{
 		Color null = {
 			0x00, 0x00, 0x00, 0x00
