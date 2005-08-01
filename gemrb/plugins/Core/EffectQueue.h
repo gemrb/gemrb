@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.11 2005/07/30 13:47:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.12 2005/08/01 20:52:14 avenger_teambg Exp $
  *
  */
 
@@ -53,6 +53,12 @@ public:
 	void PrepareDuration(Effect* fx);
 	void RemoveAllEffects(ieDword opcode);
 	void RemoveLevelEffects(ieDword level, bool dispellable);
+
+	//locating opcodes
+	Effect *HasOpcodeWithParam(ieDword opcode, ieDword param2);
+	Effect *HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDword param2);
+	Effect *HasOpcodeMatchingCreature(ieDword opcode, Actor *actor);
+	Effect *HasOpcodeWithResource(ieDword opcode, ieResRef resource);
 	void dump();
 };
 
