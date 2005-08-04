@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.183 2005/07/26 17:34:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.184 2005/08/04 17:39:43 avenger_teambg Exp $
  *
  */
 
@@ -1030,7 +1030,10 @@ void Map::GenerateQueues()
 			if (actor->GetStance() == IE_ANI_TWITCH) {
 				priority = 1;
 			} else {
-				if (IsVisible(actor->Pos, true) && actor->Schedule(gametime) ) {
+				//isvisible flag is false (visibilitymap) here,
+				//coz we want to reactivate creatures that
+				//just became visible
+				if (IsVisible(actor->Pos, false) && actor->Schedule(gametime) ) {
 					priority = 0; //run scripts and display, activated now
 					actor->Active|=SCR_ACTIVE;
 					//here you can flag for autopause if actor->Modified[IE_EA] is enemy, coz we just revealed it!

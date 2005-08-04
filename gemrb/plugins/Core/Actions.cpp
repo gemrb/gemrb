@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.30 2005/07/24 17:29:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.31 2005/08/04 17:39:43 avenger_teambg Exp $
  *
  */
 
@@ -2405,6 +2405,7 @@ void GameScript::ClearAllActions(Scriptable* /*Sender*/, Action* /*parameters*/)
 		Actor* act = game->GetPC( i,false );
 		if (act) {
 			act->ClearActions();
+			act->ClearPath();
 		}
 	}
 }
@@ -2412,6 +2413,9 @@ void GameScript::ClearAllActions(Scriptable* /*Sender*/, Action* /*parameters*/)
 void GameScript::ClearActions(Scriptable* Sender, Action* /*parameters*/)
 {
 	Sender->ClearActions();
+	if (Sender->Type==ST_ACTOR) {
+		((Actor *) Sender)->ClearPath();
+	}
 }
 
 void GameScript::SetNumTimesTalkedTo(Scriptable* Sender, Action* parameters)
