@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.58 2005/07/24 11:21:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.59 2005/08/05 15:46:10 avenger_teambg Exp $
  *
  */
 
@@ -123,6 +123,7 @@ void Inventory::AddSlotEffects(CREItem* slot)
 	}
 }
 
+/*
 void Inventory::AddAllEffects()
 {
 	for (size_t i = 0; i < Slots.size(); i++) {
@@ -132,10 +133,14 @@ void Inventory::AddAllEffects()
 		}
 	}
 }
-
+*/
 void Inventory::RemoveSlotEffects(CREItem* slot)
 {
+	if (!slot)
+		return;
 	Item* itm = core->GetItem( slot->ItemResRef );
+	if (!itm)
+		return;
 	for (int i = 0; i < itm->EquippingFeatureCount; i++) {
 		Effect* fx = &itm->equipping_features[i];
 		if (fx->TimingMode == FX_DURATION_INSTANT_WHILE_EQUIPPED) {
@@ -229,6 +234,7 @@ void Inventory::KillSlot(unsigned int index)
 	if (InventoryType==INVENTORY_HEAP) {
 		Slots.erase(Slots.begin()+index);
 	} else {
+		RemoveSlotEffects( GetSlotItem(index) );
 		Slots[index] = NULL;
 	}
 }

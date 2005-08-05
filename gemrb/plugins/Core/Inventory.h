@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.38 2005/07/20 21:46:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.39 2005/08/05 15:46:10 avenger_teambg Exp $
  *
  */
 
@@ -188,7 +188,7 @@ public:
 	void SetEquippedSlot(ieDword slotcode) { Equipped = slotcode; }
 	ieDword GetEquippedSlot() { return Equipped; }
 	void AddSlotEffects( CREItem* slot );
-	void AddAllEffects();
+	//void AddAllEffects();
 	void RemoveSlotEffects( CREItem* slot );
 	// Returns item in specified slot. Does NOT change inventory
 	CREItem* GetSlotItem(unsigned int slot);

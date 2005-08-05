@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.86 2005/07/20 21:46:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.87 2005/08/05 15:46:08 avenger_teambg Exp $
  *
  */
 
@@ -308,7 +308,8 @@ Actor* CREImp::GetActor()
 	}
 	// Reading inventory, spellbook, etc
 	ReadInventory( act, Inventory_Size );
-	act->inventory.AddAllEffects();
+	//no need of this, the items are already equipped
+	//act->inventory.AddAllEffects();
 
 	//applying effects
 	act->Init();
