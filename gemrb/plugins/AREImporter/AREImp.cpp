@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.128 2005/07/20 21:46:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.129 2005/08/06 16:28:39 avenger_teambg Exp $
  *
  */
 
@@ -706,7 +706,7 @@ Map* AREImp::GetMap(const char *ResRef)
 			ab->Destination.y = YDes;
 			//copying the scripting name into the actor
 			//if the CreatureAreaFlag was set to 8
-			if (Flags&AF_NAME_OVERRIDE) {
+			if ((Flags&AF_NAME_OVERRIDE) || (core->HasFeature(GF_IWD2_SCRIPTNAME)) ) {
 				ab->SetScriptName(DefaultName);
 			}
 	

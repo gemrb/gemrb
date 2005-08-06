@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.22 2005/07/25 20:23:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.23 2005/08/06 16:28:39 avenger_teambg Exp $
  *
  */
 
@@ -1051,10 +1051,7 @@ int GameScript::Range(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	int distance = Distance(Sender, scr);
-	if (distance <= ( parameters->int0Parameter * 20 )) {
-		return 1;
-	}
-	return 0;
+	return DiffCore(distance, parameters->int0Parameter*20, parameters->int1Parameter);
 }
 
 int GameScript::AtLocation( Scriptable* Sender, Trigger* parameters)

@@ -60,6 +60,12 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags);
 void EscapeAreaCore(Actor *src, const char *resref, Point &enter, Point &exit, int flags);
 void GoNearAndRetry(Scriptable *Sender, Scriptable *target, bool destination);
 void GoNearAndRetry(Scriptable *Sender, Point &p);
+
+#define LESS_OR_EQUALS 0
+#define LESS_THAN 1
+#define EQUALS 2
+#define GREATER_THAN 3
+int DiffCore(ieDword a, ieDword b, int diffmode);
 void FreeSrc(SrcVector *poi, const ieResRef key);
 SrcVector *LoadSrc(const ieResRef resname);
 Action *ParamCopy(Action *parameters);

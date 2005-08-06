@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.78 2005/07/30 11:45:19 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.79 2005/08/06 16:28:38 avenger_teambg Exp $
  *
  */
 
@@ -85,27 +85,28 @@
 #define GEM_ENCRYPTION_KEY "\x88\xa8\x8f\xba\x8a\xd3\xb9\xf5\xed\xb1\xcf\xea\xaa\xe4\xb5\xfb\xeb\x82\xf9\x90\xca\xc9\xb5\xe7\xdc\x8e\xb7\xac\xee\xf7\xe0\xca\x8e\xea\xca\x80\xce\xc5\xad\xb7\xc4\xd0\x84\x93\xd5\xf0\xeb\xc8\xb4\x9d\xcc\xaf\xa5\x95\xba\x99\x87\xd2\x9d\xe3\x91\xba\x90\xca"
 
 /////feature flags
-#define  GF_HAS_KAPUTZ  			0 //pst
-#define  GF_ALL_STRINGS_TAGGED			1 //bg1, pst, iwd1
-#define  GF_HAS_SONGLIST		2 //bg2
-#define  GF_TEAM_MOVEMENT		3 //pst
-#define  GF_UPPER_BUTTON_TEXT		4 //bg2
-#define  GF_LOWER_LABEL_TEXT		5 //bg2
-#define  GF_HAS_PARTY_INI   			6 //iwd2
-#define  GF_SOUNDFOLDERS			7 //iwd2
-#define  GF_IGNORE_BUTTON_FRAMES		8 // all?
-#define  GF_ONE_BYTE_ANIMID			9 // pst
-#define  GF_HAS_DPLAYER				10 // not pst
-#define  GF_HAS_EXPTABLE			11 // iwd, iwd2
-#define  GF_HAS_BEASTS_INI   			12 //pst; also for quests.ini
-#define  GF_HAS_DESC_ICON   			13 //bg
-#define  GF_HAS_PICK_SOUND   			14 //pst
-#define  GF_IWD_MAP_DIMENSIONS			15 //iwd, iwd2
-#define  GF_AUTOMAP_INI				16 //pst
-#define  GF_SMALL_FOG                           17 //bg1, pst
-#define  GF_REVERSE_DOOR                        18 //pst
-#define  GF_PROTAGONIST_TALKS			19 //pst
-#define  GF_HAS_SPELLLIST             20  //iwd2
+#define  GF_HAS_KAPUTZ           	0 //pst
+#define  GF_ALL_STRINGS_TAGGED   	1 //bg1, pst, iwd1
+#define  GF_HAS_SONGLIST        	2 //bg2
+#define  GF_TEAM_MOVEMENT       	3 //pst
+#define  GF_UPPER_BUTTON_TEXT   	4 //bg2
+#define  GF_LOWER_LABEL_TEXT    	5 //bg2
+#define  GF_HAS_PARTY_INI       	6 //iwd2
+#define  GF_SOUNDFOLDERS        	7 //iwd2
+#define  GF_IGNORE_BUTTON_FRAMES	8 // all?
+#define  GF_ONE_BYTE_ANIMID     	9 // pst
+#define  GF_HAS_DPLAYER         	10 // not pst
+#define  GF_HAS_EXPTABLE        	11 // iwd, iwd2
+#define  GF_HAS_BEASTS_INI      	12 //pst; also for quests.ini
+#define  GF_HAS_DESC_ICON       	13 //bg
+#define  GF_HAS_PICK_SOUND      	14 //pst
+#define  GF_IWD_MAP_DIMENSIONS  	15 //iwd, iwd2
+#define  GF_AUTOMAP_INI         	16 //pst
+#define  GF_SMALL_FOG           	17 //bg1, pst
+#define  GF_REVERSE_DOOR        	18 //pst
+#define  GF_PROTAGONIST_TALKS   	19 //pst
+#define  GF_HAS_SPELLLIST       	20 //iwd2
+#define  GF_IWD2_SCRIPTNAME     	21 //iwd2
 
 /////AI global defines
 #define AI_UPDATE_TIME	30

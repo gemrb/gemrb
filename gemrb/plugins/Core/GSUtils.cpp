@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.19 2005/07/24 15:52:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.20 2005/08/06 16:28:39 avenger_teambg Exp $
  *
  */
 
@@ -1519,3 +1519,31 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Conte
 	}
 	return value;
 }
+
+int DiffCore(ieDword a, ieDword b, int diffmode)
+{
+	switch (diffmode) {
+		case LESS_THAN:
+			if (a<b) {
+				return 1;
+			}
+			break;
+		case EQUALS:
+			if (a==b) {
+				return 1;
+			}
+			break;
+		case GREATER_THAN:
+			if (a>b) {
+				return 1;
+			}
+			break;
+		default: //less than or equals
+			if (a<=b) {
+				return 1;
+			}
+			break;
+	}
+	return 0;
+}
+

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.31 2005/08/04 17:39:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.32 2005/08/06 16:28:39 avenger_teambg Exp $
  *
  */
 
@@ -587,6 +587,7 @@ void GameScript::CutSceneID(Scriptable* Sender, Action* parameters)
 	if (InDebug&ID_CUTSCENE) {
 		if (!Sender->CutSceneId) {
 			printMessage("GameScript","Failed to set CutSceneID!\n",YELLOW);
+			parameters->objects[1]->Dump();
 		}
 	}
 }
