@@ -8,5 +8,5 @@ RowIndex - the numeric index of the row.
 
 Return value: string
 
-See also: LoadTable
+See also: LoadTable, GetTableColumnName
 
