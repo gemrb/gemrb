@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.330 2005/07/30 11:45:20 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.331 2005/08/07 10:14:59 avenger_teambg Exp $
  *
  */
 
@@ -810,6 +810,30 @@ static PyObject* GemRB_GetTableRowName(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("Can't find resource");
 	}
 	const char* str = tm->GetRowName( row );
+	if (str == NULL) {
+		return NULL;
+	}
+
+	return PyString_FromString( str );
+}
+
+PyDoc_STRVAR( GemRB_GetTableColumnName__doc,
+"GetTableColumnName(TableIndex, ColumnIndex) => string\n\n"
+"Returns the Name of a Column in a 2DA Table." );
+
+static PyObject* GemRB_GetTableColumnName(PyObject * /*self*/, PyObject* args)
+{
+	int ti, col;
+
+	if (!PyArg_ParseTuple( args, "ii", &ti, &col )) {
+		return AttributeError( GemRB_GetTableColumnName__doc );
+	}
+
+	TableMgr* tm = core->GetTable( ti );
+	if (tm == NULL) {
+		return RuntimeError("Can't find resource");
+	}
+	const char* str = tm->GetColumnName( col );
 	if (str == NULL) {
 		return NULL;
 	}
@@ -5256,6 +5280,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(FindTableValue, METH_VARARGS),
 	METHOD(GetTableRowIndex, METH_VARARGS),
 	METHOD(GetTableRowName, METH_VARARGS),
+	METHOD(GetTableColumnName, METH_VARARGS),
 	METHOD(GetTableRowCount, METH_VARARGS),
 	METHOD(LoadSymbol, METH_VARARGS),
 	METHOD(UnloadSymbol, METH_VARARGS),
