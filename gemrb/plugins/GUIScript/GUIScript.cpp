@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.331 2005/08/07 10:14:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.332 2005/08/08 21:25:39 avenger_teambg Exp $
  *
  */
 
@@ -5233,7 +5233,78 @@ static PyObject* GemRB_GamePause(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+static bool CheckStat(Actor * actor, const char *stat_name, ieDword value)
+{
+	int symbol = core->LoadSymbol( "stats" );
+	SymbolMgr *sym = core->GetSymbol( symbol );
+	long stat = sym->GetValue( stat_name );
 
+	//some stats should check for exact value
+	return actor->GetBase(stat)>=value;
+}
+
+PyDoc_STRVAR( GemRB_CheckFeatCondition__doc,
+"CheckFeatCondition(partyslot, a_stat, a_value, b_stat, b_value, c_stat, c_value, d_stat, d_value)==> bool\n\n"
+"Checks if actor in partyslot is eligible for a feat, the formula is: (stat[a]>=a or stat[b]>=b) and (stat[c]>=c or stat[d]>=d).\n\n");
+
+static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
+{
+	int slot;
+	char *a_s;
+	char *b_s;
+	char *c_s;
+	char *d_s;
+	int a_v;
+	int b_v;
+	int c_v;
+	int d_v;
+
+	if (!PyArg_ParseTuple( args, "isisisisi", &slot, &a_s, &a_v, &b_s, &b_v, &c_s, &c_v, &d_s, &d_v)) {
+		return AttributeError( GemRB_CheckFeatCondition__doc );
+	}
+
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+
+	Actor *actor = game->GetPC(slot, false);
+	if (!actor) {
+		return RuntimeError( "No actor!" );
+	}
+
+	bool ret = true;
+
+	if (*a_s=='0' && a_v==0)
+		goto endofquest;
+
+	ret = CheckStat(actor, a_s, a_v);
+
+	if (*b_s=='0' && b_v==0)
+		goto endofquest;
+
+	ret |= CheckStat(actor, b_s, b_v);
+
+	if (*c_s=='0' && c_v==0)
+		goto endofquest;
+
+	// no | because the formula is (a|b) & (c|d)
+	ret = CheckStat(actor, c_s, c_v);
+
+	if (*d_s=='0' && d_v==0)
+		goto endofquest;
+
+	ret |= CheckStat(actor, d_s, d_v);
+
+endofquest:
+	if (ret) {
+		Py_INCREF( Py_True );
+		return Py_True;
+	} else {
+		Py_INCREF( Py_False );
+		return Py_False;
+	}
+}
 
 static PyMethodDef GemRBMethods[] = {
 	METHOD(SetInfoTextColor, METH_VARARGS),
@@ -5406,6 +5477,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetPurchasedAmount, METH_VARARGS),
 	METHOD(ChangeContainerItem, METH_VARARGS),
 	METHOD(GamePause, METH_VARARGS),
+	METHOD(CheckFeatCondition, METH_VARARGS),
 	// terminating entry	
 	{NULL, NULL, 0, NULL}
 };
