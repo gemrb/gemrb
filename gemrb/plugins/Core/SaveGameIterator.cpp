@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.28 2005/06/22 21:21:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.29 2005/08/08 21:22:33 avenger_teambg Exp $
  *
  */
 
@@ -329,7 +329,7 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname)
 	}
 	snprintf( Path, _MAX_PATH, "%s%s%s%09d-%s", core->SavePath, PlayMode(), SPathDelimiter, index, slotname );
 	core->DelTree(Path, false); //this is required in case the old slot wasn't recognised but still there
-	mkdir(Path,S_IWRITE|S_IREAD);
+	mkdir(Path,S_IWRITE|S_IREAD|S_IEXEC);
 	//save files here
 
 	Game *game = core->GetGame();

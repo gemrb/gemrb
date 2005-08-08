@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.340 2005/08/06 16:28:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.341 2005/08/08 21:22:33 avenger_teambg Exp $
  *
  */
 
@@ -1257,7 +1257,8 @@ bool Interface::LoadConfig(const char* filename)
 		} else if (stricmp( name, "CachePath" ) == 0) {
 			strncpy( CachePath, value, sizeof(CachePath) );
 			FixPath( CachePath, false );
-			mkdir( CachePath, S_IREAD|S_IWRITE );
+			mkdir( CachePath, S_IREAD|S_IWRITE|S_IEXEC );
+			chmod( CachePath, S_IREAD|S_IWRITE|S_IEXEC );
 			if (! dir_exists( CachePath )) {
 				printf( "Cache folder %s doesn't exist!", CachePath );
 				fclose( config );
