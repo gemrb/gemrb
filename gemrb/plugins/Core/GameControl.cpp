@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.248 2005/07/30 11:45:19 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.249 2005/08/10 16:15:54 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1422,8 +1422,8 @@ void GameControl::InitDialog(Actor* spk, Actor* tgt, const char* dlgref)
 		DialogueFlags |= DF_FREEZE_SCRIPTS;
 	}
 	//opening control size to maximum, enabling dialog window
-	ieDword index = core->GetGame()->ControlStatus&~(CS_DIALOGSIZEMASK|CS_HIDEGUI);
-	core->GetGame()->SetControlStatus(index | CS_LARGE, BM_SET);
+	core->GetGame()->SetControlStatus(CS_HIDEGUI, BM_NAND);
+	core->GetGame()->SetControlStatus(CS_DIALOG, BM_OR);
 }
 
 /*try to break will only try to break it, false means unconditional stop*/
@@ -1448,9 +1448,8 @@ void GameControl::EndDialog(bool try_to_break)
 		delete dlg;
 		dlg = NULL;
 	}
-	//minimizing size
-	ieDword index = core->GetGame()->ControlStatus&~CS_DIALOGSIZEMASK;
-	core->GetGame()->SetControlStatus(index, BM_SET);
+	//restoring original size
+	core->GetGame()->SetControlStatus(CS_DIALOG, BM_OR);
 	ScreenFlags &=~(SF_DISABLEMOUSE|SF_LOCKSCROLL);
 	DialogueFlags = 0;
 }

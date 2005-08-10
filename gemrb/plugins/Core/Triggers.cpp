@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.23 2005/08/06 16:28:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.24 2005/08/10 16:15:54 avenger_teambg Exp $
  *
  */
 
@@ -1668,7 +1668,7 @@ int GameScript::RandomNumGT(Scriptable* /*Sender*/, Trigger* parameters)
 	if (parameters->int1Parameter<0) {
 		return 0;
 	}
-	return parameters->int1Parameter-1 == RandomNumValue%parameters->int0Parameter;
+	return parameters->int1Parameter-1 < RandomNumValue%parameters->int0Parameter;
 }
 
 int GameScript::RandomNumLT(Scriptable* /*Sender*/, Trigger* parameters)
@@ -1679,7 +1679,7 @@ int GameScript::RandomNumLT(Scriptable* /*Sender*/, Trigger* parameters)
 	if (parameters->int1Parameter<0) {
 		return 0;
 	}
-	return parameters->int1Parameter-1 == RandomNumValue%parameters->int0Parameter;
+	return parameters->int1Parameter-1 > RandomNumValue%parameters->int0Parameter;
 }
 
 int GameScript::OpenState(Scriptable* Sender, Trigger* parameters)

@@ -8,15 +8,33 @@ FeatTable = 0
 TopIndex = 0
 Level = 0
 ClassColumn = 0
+KitColumn = 0
+RaceColumn = 0
 PointsLeft = 0
 
-def RedrawFeats():
-	global TopIndex
+def GetBaseValue(feat):
+	Val = GemRB.GetTableValue(FeatTable, feat, ClassColumn)
+	Val += GemRB.GetTableValue(FeatTable, feat, RaceColumn)
+	if KitColumn != 0:
+		Val += GemRB.GetTableValue(FeatTable, feat, KitColumn)
+	return Val
 
-	if PointsLeft == 0:
-		GemRB.SetButtonState(FeatWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
+
+def GetMaxDistributable(feat):
+	return 3
+
+
+def RedrawFeats():
+	global TopIndex, PointsLeft
 
 	SumLabel = GemRB.GetControl(FeatWindow, 0x1000000c)
+	if PointsLeft == 0:
+		GemRB.SetButtonState(FeatWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
+		GemRB.SetLabelTextColor(FeatWindow,SumLabel, 255, 255, 255)
+	else:
+		GemRB.SetButtonState(FeatWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
+		GemRB.SetLabelTextColor(FeatWindow,SumLabel, 255, 255, 0)
+
 	GemRB.SetText(FeatWindow, SumLabel, str(PointsLeft) )
 
 	for i in range(0,10):
@@ -53,9 +71,18 @@ def ScrollBarPress():
 def OnLoad():
 	global FeatWindow, TextAreaControl, DoneButton, TopIndex
 	global FeatTable
-	global KitName, Level, ClassColumn
+	global KitName, Level, PointsLeft
+	global ClassColumn, KitColumn, RaceColumn
 	
 	GemRB.SetVar("Level",1) #for simplicity
+
+	Race = GemRB.GetVar("Race")
+	RaceTable = GemRB.LoadTable("races")
+	RaceColumn = GemRB.FindTableValue(RaceTable, 3, Race)
+	RaceName = GemRB.GetTableRowName(RaceTable, RaceColumn)
+	# could use column ID as well, but they tend to change :)
+	RaceColumn = GemRB.GetTableValue(RaceTable, RaceName, "SKILL_COLUMN")
+
 	Class = GemRB.GetVar("Class") - 1
 	ClassTable = GemRB.LoadTable("classes")
 	KitName = GemRB.GetTableRowName(ClassTable, Class)
@@ -67,14 +94,27 @@ def OnLoad():
 	FeatTable = GemRB.LoadTable("feats")
 	RowCount = GemRB.GetTableRowCount(FeatTable)
 
-	for i in range(0,RowCount):
+	for i in range(RowCount):
 			GemRB.SetVar("Feat "+str(i),0)
 
+	FeatLevelTable = GemRB.LoadTable("featlvl")
 	FeatClassTable = GemRB.LoadTable("featclas")
-	#calculating the number of new feats
-	for l in (1,Level+1):
-		PointsLeft = GemRB.GetTableValue(FeatTable, l, ClassColumn)
-		PointsLeft += GemRB.GetTableValue(FeatClassTable, l, ClassColumn)
+	#calculating the number of new feats for the next level
+	PointsLeft = 0
+	#levels start with 1
+	Level = GemRB.GetVar("Level")-1
+
+	ClassColumn = 3+ ClassColumn
+	#this one exists only for clerics
+	if KitColumn:
+		KitColumn = 3 + KitColumn + 11
+	RaceColumn = RaceColumn
+	#calculated value, 3 - crap columns
+	# 11 is the number of classes, 9 is number of cleric kits
+
+	#Always raise one level at once
+	PointsLeft += GemRB.GetTableValue(FeatLevelTable, Level, 0)
+	PointsLeft += GemRB.GetTableValue(FeatClassTable, Level, ClassColumn)
 	
 	GemRB.SetToken("number",str(PointsLeft) )
 

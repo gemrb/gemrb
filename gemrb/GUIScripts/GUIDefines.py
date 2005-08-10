@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.43 2005/07/30 11:45:06 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.44 2005/08/10 16:15:52 avenger_teambg Exp $
 
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
@@ -117,6 +117,7 @@ GS_SMALLDIALOG       = 0
 GS_MEDIUMDIALOG      = 2
 GS_LARGEDIALOG       = 6
 GS_DIALOGMASK        = 6
+GS_DIALOG            = 8
 GS_HIDEGUI           = 16
 GS_OPTIONPANE        = 32
 GS_PORTRAITPANE      = 64

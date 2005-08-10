@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.63 2005/07/24 17:29:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.64 2005/08/10 16:15:54 avenger_teambg Exp $
  *
  */
 
@@ -61,6 +61,7 @@ class Game;
 #define CS_MEDIUM    2   //medium dialog
 #define CS_LARGE     6   //large dialog, both bits set
 #define CS_DIALOGSIZEMASK 6
+#define CS_DIALOG    8   //dialog is running
 #define CS_HIDEGUI   16  //hide all gui
 #define CS_ACTION    32  //hide action pane
 #define CS_PORTRAIT  64  //hide portrait pane
