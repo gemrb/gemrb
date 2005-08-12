@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.20 2005/08/06 16:28:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.21 2005/08/12 19:14:35 avenger_teambg Exp $
  *
  */
 
@@ -558,11 +558,12 @@ void EscapeAreaCore(Actor* src, const char* resref, Point &enter, Point &exit, i
 	char Tmp[256];
 
 	if (flags &EA_DESTROY) {
-		src->AddActionInFront( GenerateAction("DestroySelf()") );
+		//this must be put into a non-const variable
+		sprintf( Tmp, "DestroySelf()" );
 	} else {
 		sprintf( Tmp, "JumpToPoint(\"%s\",[%hd.%hd])", resref, enter.x, enter.y );
-		src->AddActionInFront( GenerateAction( Tmp, true ) );
 	}
+	src->AddActionInFront( GenerateAction( Tmp, true ) );
 	sprintf( Tmp, "MoveToPoint([%hd.%hd])", exit.x, exit.y );
 	src->AddActionInFront( GenerateAction( Tmp, true ) );
 }
