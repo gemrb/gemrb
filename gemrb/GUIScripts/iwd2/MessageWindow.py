@@ -72,7 +72,12 @@ def UpdateControlStatus():
 	TMessageTA = 0
 	GSFlags = GemRB.GetVar ("MessageWindowSize")
 	Expand = GSFlags&GS_DIALOGMASK
+	Override = GSFlags&GS_DIALOG
 	GSFlags = GSFlags-Expand
+
+	#a dialogue is running, setting messagewindow size to maximum
+	if Override:
+		Expand = GS_LARGEDIALOG
 
 	MessageWindow = GemRB.GetVar ("MessageWindow")
 
