@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.184 2005/08/04 17:39:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.185 2005/08/13 19:20:13 avenger_teambg Exp $
  *
  */
 
@@ -418,7 +418,6 @@ void Map::UpdateScripts()
 
 	while (q--) {
 		Actor* actor = queue[0][q];
-		actor->ProcessActions();
 		for (unsigned int i = 0; i < 8; i++) {
 			if (actor->Scripts[i]) {
 				if (actor->GetNextAction())
@@ -426,6 +425,7 @@ void Map::UpdateScripts()
 				actor->ExecuteScript( actor->Scripts[i] );
 			}
 		}
+		actor->ProcessActions();
 
 		//returns true if actor should be completely removed
 		actor->inventory.CalculateWeight();

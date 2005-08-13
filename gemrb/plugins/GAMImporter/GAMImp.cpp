@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.60 2005/07/24 17:29:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.61 2005/08/13 19:20:13 avenger_teambg Exp $
  *
  */
 
@@ -184,7 +184,7 @@ Game* GAMImp::GetGame()
 	}
 	core->FreeInterface( aM );
 
-	//apparently IWD2 relies on this, if chapter is unset, it is
+	//apparently BG1/IWD2 relies on this, if chapter is unset, it is
 	//set to -1, hopefully it won't break anything
 	newGame->locals->SetAt("CHAPTER", (ieDword) -1);
 
