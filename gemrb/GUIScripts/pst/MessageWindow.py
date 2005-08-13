@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.30 2005/06/25 20:05:45 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.31 2005/08/13 19:27:27 avenger_teambg Exp $
 
 
 # MessageWindow.py - scripts and GUI for main (walk) window
@@ -102,7 +102,7 @@ def OnDecreaseSize():
 def UpdateControlStatus ():
 	global MessageWindow, PortraitWindow, ActionsWindow, OptionsWindow
 
-	Expand = GemRB.GetVar ("MessageWindowSize") & GS_DIALOGMASK
+	Expand = GemRB.GetVar ("MessageWindowSize") & (GS_DIALOGMASK|GS_DIALOG)
 
 	hideflags = GemRB.HideGUI ()
 	if Expand:
