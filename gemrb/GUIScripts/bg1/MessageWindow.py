@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/MessageWindow.py,v 1.14 2005/05/24 17:36:10 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/MessageWindow.py,v 1.15 2005/08/13 10:50:07 avenger_teambg Exp $
 
 import GemRB
 
@@ -44,7 +44,7 @@ def OnLoad():
 	GemRB.LoadWindowPack(GetWindowPack())
 	ActionsWindow = GemRB.LoadWindow(3)
 	OptionsWindow = GemRB.LoadWindow(0)
-	PortraitWindow = OpenPortraitWindow()
+	PortraitWindow = OpenPortraitWindow(1)
 
 	GemRB.SetVar("PortraitWindow", PortraitWindow)
 	GemRB.SetVar("ActionsWindow", ActionsWindow)
@@ -70,7 +70,8 @@ def OnIncreaseSize():
 	GSFlags = GSFlags-Expand
 	if Expand>2:
 		return
-	Expand = (Expand + 1) *2
+	Expand = (Expand + 1)*2
+	print Expand+GSFlags
 	GemRB.GameSetScreenFlags(Expand + GSFlags, OP_SET)
 
 def OnDecreaseSize():
@@ -80,6 +81,7 @@ def OnDecreaseSize():
 	if Expand<2:
 		return
 	Expand = Expand/2 - 1
+	print Expand+GSFlags
 	GemRB.GameSetScreenFlags(Expand + GSFlags, OP_SET)
 
 def UpdateControlStatus():
@@ -89,17 +91,16 @@ def UpdateControlStatus():
 	TMessageTA = 0
 	GSFlags = GemRB.GetVar("MessageWindowSize")
 	Expand = GSFlags&GS_DIALOGMASK
+	Override = GSFlags&GS_DIALOG
 	GSFlags = GSFlags-Expand
+
+	#a dialogue is running, setting messagewindow size to maximum
+	if Override:
+		Expand = GS_LARGEDIALOG
 
 	MessageWindow = GemRB.GetVar("MessageWindow")
 
 	GemRB.LoadWindowPack(GetWindowPack())
-
-	if Expand == GS_SMALLDIALOG:
-		TMessageWindow = GemRB.LoadWindow(4)
-		TMessageTA = GemRB.GetControl(TMessageWindow, 3)
-		ExpandButton = GemRB.GetControl(TMessageWindow, 2)
-		GemRB.SetEvent(TMessageWindow, ExpandButton, IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
 
 	if Expand == GS_MEDIUMDIALOG:
 		TMessageWindow = GemRB.LoadWindow(12)
@@ -109,11 +110,17 @@ def UpdateControlStatus():
 		ContractButton = GemRB.GetControl(TMessageWindow, 3)
 		GemRB.SetEvent(TMessageWindow, ContractButton, IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
 
-	if Expand == GS_LARGEDIALOG:
+	elif Expand == GS_LARGEDIALOG:
 		TMessageWindow = GemRB.LoadWindow(7)
 		TMessageTA = GemRB.GetControl(TMessageWindow, 1)
 		ContractButton = GemRB.GetControl(TMessageWindow, 0)
 		GemRB.SetEvent(TMessageWindow, ContractButton, IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
+
+	else:
+		TMessageWindow = GemRB.LoadWindow(4)
+		TMessageTA = GemRB.GetControl(TMessageWindow, 3)
+		ExpandButton = GemRB.GetControl(TMessageWindow, 2)
+		GemRB.SetEvent(TMessageWindow, ExpandButton, IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
 
 	GemRB.SetTextAreaFlags(TMessageWindow, TMessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.249 2005/08/10 16:15:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.250 2005/08/13 10:50:09 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1449,7 +1449,7 @@ void GameControl::EndDialog(bool try_to_break)
 		dlg = NULL;
 	}
 	//restoring original size
-	core->GetGame()->SetControlStatus(CS_DIALOG, BM_OR);
+	core->GetGame()->SetControlStatus(CS_DIALOG, BM_NAND);
 	ScreenFlags &=~(SF_DISABLEMOUSE|SF_LOCKSCROLL);
 	DialogueFlags = 0;
 }

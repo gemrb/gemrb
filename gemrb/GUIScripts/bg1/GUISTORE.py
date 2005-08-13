@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUISTORE.py,v 1.15 2005/03/28 10:36:18 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUISTORE.py,v 1.16 2005/08/13 10:50:07 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -198,9 +198,9 @@ def OpenStoreShoppingWindow ():
 	GemRB.SetText (Window, Button, 13704)
 
 	# inactive button
-	Button = GemRB.GetControl (Window, 50)
-	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
-	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	#Button = GemRB.GetControl (Window, 50)
+	#GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+	#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	#GemRB.SetText (Window, Button, 13707)
 
 	#backpack
