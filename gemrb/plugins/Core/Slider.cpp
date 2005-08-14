@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Slider.cpp,v 1.27 2004/11/18 23:32:41 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Slider.cpp,v 1.28 2005/08/14 17:52:25 avenger_teambg Exp $
  *
  */
 
@@ -109,7 +109,7 @@ void Slider::SetPosition(unsigned int pos)
 	Changed = true;
 }
 /** Redraws a slider which is associated with VariableName */
-void Slider::RedrawSlider(char* VariableName, int Sum)
+void Slider::RedrawSlider(const char* VariableName, int Sum)
 {
 	if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
 		return;

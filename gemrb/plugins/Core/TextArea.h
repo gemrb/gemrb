@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.24 2005/07/16 23:27:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.25 2005/08/14 17:52:25 avenger_teambg Exp $
  *
  */
 
@@ -28,14 +28,16 @@
 #include "ScrollBar.h"
 
 // Keep these synchronized with GUIDefines.py
-#define IE_GUI_TEXTAREA_ON_CHANGE  0x05000000
+// 0x05 is the control type of TextArea
+#define IE_GUI_TEXTAREA_ON_CHANGE   0x05000000
+#define IE_GUI_TEXTAREA_OUT_OF_TEXT 0x05000001
 
 // TextArea flags, keep these in sync too
 // the control type is intentionally left out
-#define IE_GUI_TEXTAREA_SELECTABLE 1
-#define IE_GUI_TEXTAREA_AUTOSCROLL 2
+#define IE_GUI_TEXTAREA_SELECTABLE   1
+#define IE_GUI_TEXTAREA_AUTOSCROLL   2
 #define IE_GUI_TEXTAREA_SMOOTHSCROLL 4
-
+#define IE_GUI_TEXTAREA_HISTORY      8
 #ifdef WIN32
 
 #ifdef GEM_BUILD_DLL
@@ -58,17 +60,22 @@ public:
 	void SetScrollBar(Control* ptr);
 	/** Sets the Actual Text */
 	int SetText(const char* text, int pos = 0);
+	/** Discards scrolled out lines from the textarea */
+	/** preserving 'keeplines' lines for scroll back history */
+	void DiscardLines();
 	/** Appends a String to the current Text */
 	int AppendText(const char* text, int pos = 0);
-	/** Deletes last `count' lines */ 
-	void PopLines(unsigned int count);
+	/** Deletes `count' lines (either last or top lines)*/ 
+	void PopLines(unsigned int count, bool top = false);
 	/** Deletes last lines up to current 'minrow' */
 	void PopMinRow()
 	{
-        	PopLines(lines.size()-minrow);
+	      	PopLines(lines.size()-minrow);
 	}
 	/** adds empty lines so minrow will be the uppermost visible row */
 	void PadMinRow();
+	/** Sets up scrolling */
+	void SetupScroll();
 	/** Sets the Fonts */
 	void SetFonts(Font* init, Font* text);
 	/** Returns Number of Rows */
@@ -79,6 +86,8 @@ public:
 	int GetTopIndex();
 	/** Set Starting Row */
 	void SetRow(int row);
+	/** Sets preserved lines */
+	void SetPreservedRow(int arg);
 	/** Set Selectable */
 	void SetSelectable(bool val);
 	/** Set Minimum Selectable Row (to the current ceiling) */
@@ -87,16 +96,18 @@ public:
 	void CopyTo(TextArea* ta);
 	/** Returns the selected text */
 	const char* QueryText();
-	/** Redraws the textarea with a new value */
-	void RedrawTextArea(char*, unsigned int);
+	/** Marks textarea for redraw with a new value */
+	void RedrawTextArea(const char* VariableName, unsigned int Sum);
 private: // Private attributes
 	std::vector< char*> lines;
 	std::vector< int> lrows;
 	int seltext;
 	/** minimum selectable row */
 	int minrow;
-	///** Text Buffer */
-	//unsigned char * Buffer;
+	/** lines to be kept even if scrolled out */
+	int keeplines;
+	/** vertical offset for smooth scrolling */
+	unsigned short smooth;
 	/** Number of Text Rows */
 	int rows;
 	/** Starting Row */
@@ -126,6 +137,8 @@ public: //Events
 	bool SetEvent(int eventType, EventHandler handler);
 	/** OnChange Scripted Event Function Name */
 	EventHandler TextAreaOnChange;
+	/** OutOfText Scripted Event Function Name */
+	EventHandler TextAreaOutOfText;
 };
 
 #endif

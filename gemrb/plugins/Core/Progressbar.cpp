@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.cpp,v 1.15 2005/06/22 15:55:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.cpp,v 1.16 2005/08/14 17:52:25 avenger_teambg Exp $
  *
  */
 
@@ -123,7 +123,7 @@ void Progressbar::SetPosition(unsigned int pos)
 	Changed = true;
 }
 
-void Progressbar::RedrawProgressbar(char* VariableName, int Sum)
+void Progressbar::RedrawProgressbar(const char* VariableName, int Sum)
 {
 	if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
 		return;

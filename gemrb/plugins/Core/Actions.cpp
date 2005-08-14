@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.33 2005/08/12 19:14:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.34 2005/08/14 17:52:25 avenger_teambg Exp $
  *
  */
 
@@ -3296,7 +3296,8 @@ void GameScript::ExpansionEndCredits(Scriptable* /*Sender*/, Action* /*parameter
 void GameScript::QuitGame(Scriptable* Sender, Action* parameters)
 {
 	ClearAllActions(Sender, parameters);
-	core->quitflag = 1;
+	//back to start script
+	core->QuitFlag = QF_EXITGAME;
 }
 
 void GameScript::StopMoving(Scriptable* Sender, Action* /*parameters*/)
@@ -3782,8 +3783,8 @@ void GameScript::RandomFly(Scriptable* Sender, Action* parameters)
 	} else if (x>20) {
 		actor->SetOrientation(actor->GetOrientation()+1, false);
 	}
-	//fly in this direction for 2 steps
-	actor->MoveLine(2, GL_PASS);
+	//fly in this direction for 5 steps
+	actor->MoveLine(5, GL_PASS);
 	Sender->AddAction( parameters );
 }
 

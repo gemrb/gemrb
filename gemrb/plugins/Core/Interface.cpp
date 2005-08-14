@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.341 2005/08/08 21:22:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.342 2005/08/14 17:52:25 avenger_teambg Exp $
  *
  */
 
@@ -114,7 +114,7 @@ Interface::Interface(int iargc, char** iargv)
 	ConsolePopped = false;
 	CheatFlag = false;
 	FogOfWar = 1;
-	quitflag = -1;
+	QuitFlag = QF_NORMAL;
 #ifndef WIN32
 	CaseSensitive = true; //this is the default value, so CD1/CD2 will be resolved
 #else
@@ -326,6 +326,72 @@ Interface::~Interface(void)
 	DelTree((const char *) CachePath, true);
 }
 
+GameControl* Interface::StartGameControl()
+{
+	//making sure that our window is the first one
+	if (ConsolePopped) {
+		PopupConsole();
+	}
+	DelWindow(~0); //deleting ALL windows
+	DelTable(~0);  //dropping ALL tables
+	Window* gamewin = new Window( 0xffff, 0, 0, Width, Height );
+	GameControl* gc = new GameControl();
+	gc->XPos = 0;
+	gc->YPos = 0;
+	gc->Width = Width;
+	gc->Height = Height;
+	gc->Owner = gamewin;
+	gc->ControlID = 0x00000000;
+	gc->ControlType = IE_GUI_GAMECONTROL;
+	gamewin->AddControl( gc );
+	AddWindow( gamewin );
+	SetVisible( 0, WINDOW_VISIBLE );
+	//setting the focus to the game control 
+	evntmgr->SetFocused(gamewin, gc);
+	if (guiscript->LoadScript( "MessageWindow" )) {
+		guiscript->RunFunction( "OnLoad" );
+		gc->UnhideGUI();
+	}
+
+	return gc;
+}
+
+/* handle main loop events that might destroy or create windows 
+	 thus cannot be called from DrawWindows directly
+ */
+void Interface::HandleFlags()
+{
+	if (QuitFlag&(QF_QUITGAME|QF_EXITGAME) ) {
+		// when reaching this, quitflag should be 1 or 2
+		// if Exitgame was set, we'll set a new script
+			QuitGame (QuitFlag!=QF_QUITGAME);
+			QuitFlag &= ~(QF_QUITGAME|QF_EXITGAME);
+	}
+	
+	if (QuitFlag&QF_LOADGAME) {
+		QuitFlag &= ~QF_LOADGAME;
+		LoadGame(LoadGameIndex);
+	}
+	
+	if (QuitFlag&QF_ENTERGAME) {
+		QuitFlag &= ~QF_ENTERGAME;
+		if (game) {
+			GameControl* gc = StartGameControl();
+			Actor* actor = game->GetPC (0, false);
+			gc->ChangeMap(actor, true);
+		} else {
+			printMessage("Core", "No game to enter...", LIGHT_RED );
+			QuitFlag = QF_QUITGAME;
+		}
+	}
+	
+	if (QuitFlag&QF_CHANGESCRIPT) {
+		QuitFlag &= ~QF_CHANGESCRIPT;
+		guiscript->LoadScript( NextScript );			
+		guiscript->RunFunction( "OnLoad" );
+	}
+}
+
 /** this is the main loop */
 void Interface::Main()
 {
@@ -341,11 +407,11 @@ void Interface::Main()
 	Color* palette = video->CreatePalette( fpscolor, fpsblack );
 	do {
 		//don't change script when quitting is pending
-		if (ChangeScript && (quitflag==-1) ) {
-			guiscript->LoadScript( NextScript );
-			ChangeScript = false;
-			guiscript->RunFunction( "OnLoad" );
+
+		while (QuitFlag) {
+			HandleFlags();
 		}
+
 		DrawWindows();
 		if (DrawFPS) {
 			frame++;
@@ -640,7 +706,7 @@ int Interface::Init()
 	strcpy( NextScript, "Start" );
 
 	printMessage( "Core", "Setting up the Console...", WHITE );
-	ChangeScript = true;
+	QuitFlag = QF_CHANGESCRIPT;
 	console = new Console();
 	console->XPos = 0;
 	console->YPos = Height - 25;
@@ -1667,12 +1733,16 @@ int Interface::LoadWindow(unsigned short WindowID)
 	unsigned int i;
 
 	for (i = 0; i < windows.size(); i++) {
-		if (windows[i] == NULL)
+		Window *win = windows[i];
+		if (win == NULL)
 			continue;
-		if (windows[i]->WindowID == WindowID && !stricmp( WindowPack,
-													windows[i]->WindowPack )) {
+		if (win->Visible==-1) {
+			continue;
+		}
+		if (win->WindowID == WindowID && 
+			!strnicmp( WindowPack, win->WindowPack, sizeof(WindowPack) )) {
 			SetOnTop( i );
-			windows[i]->Invalidate();
+			win->Invalidate();
 			return i;
 		}
 	}
@@ -1680,7 +1750,7 @@ int Interface::LoadWindow(unsigned short WindowID)
 	if (win == NULL) {
 		return -1;
 	}
-	strcpy( win->WindowPack, WindowPack );
+	memcpy( win->WindowPack, WindowPack, sizeof(WindowPack) );
 
 	int slot = -1;
 	for (i = 0; i < windows.size(); i++) {
@@ -1749,6 +1819,42 @@ int Interface::CreateWindow(unsigned short WindowID, int XPos, int YPos, unsigne
 	}
 	win->Invalidate();
 	return slot;
+}
+
+/** Sets a Window on the Top */
+void Interface::SetOnTop(int Index)
+{
+	std::vector<int>::iterator t;
+	for(t = topwin.begin(); t != topwin.end(); ++t) {
+		if((*t) == Index) {
+			topwin.erase(t);
+			break;
+		}
+	}
+	if(topwin.size() != 0)
+		topwin.insert(topwin.begin(), Index);
+	else
+		topwin.push_back(Index);
+}
+/** Add a window to the Window List */
+void Interface::AddWindow(Window * win)
+{
+	int slot = -1;
+	for(unsigned int i = 0; i < windows.size(); i++) {
+		Window *w = windows[i];
+		
+		if(w==NULL) {
+			slot = i;
+			break;
+		}
+	}
+	if(slot == -1) {
+		windows.push_back(win);
+		slot=(int)windows.size()-1;
+	}
+	else
+		windows[slot] = win;
+	win->Invalidate();
 }
 
 /** Get a Control on a Window */
@@ -1868,7 +1974,7 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 			if (win->WindowID==65535) {
 				video->SetViewport( 0,0,0,0 );
 			}
-			evntmgr->DelWindow( win->WindowID );
+			evntmgr->DelWindow( win->WindowID, win->WindowPack );
 			break;
 
 		case WINDOW_VISIBLE:
@@ -2029,23 +2135,29 @@ void Interface::DrawWindows(void)
 		//end of gui hacks
 	}
 	
-	if (quitflag!=-1) {
-		QuitGame (quitflag!=0);
-		quitflag = -1;
-	}
-
 	//here comes the REAL drawing of windows
 	if (ModalWindow) {
 		ModalWindow->DrawWindow();
 		return;
 	}
 	std::vector< int>::reverse_iterator t = topwin.rbegin();
-	for (unsigned int i = 0; i < topwin.size(); i++) {
+	size_t i = topwin.size();
+	while(i--) {
 		if ( (unsigned int) ( *t ) >=windows.size() )
 			continue;
 		//visible ==1 or 2 will be drawn
-		if (windows[( *t )] != NULL && windows[( *t )]->Visible)
-			windows[( *t )]->DrawWindow();
+		Window* win = windows[(*t)];
+		if (win != NULL) {
+			if (win->Visible == -1) {
+				topwin.erase(topwin.begin()+i);
+				evntmgr->DelWindow( win->WindowID, win->WindowPack );
+				delete win;
+				windows[(*t)]=NULL;
+			}
+			else if (win->Visible) {
+				windows[( *t )]->DrawWindow();
+			}
+		}
 		++t;
 	}
 }
@@ -2099,17 +2211,28 @@ void Interface::DrawTooltip ()
 		IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, true );
 }
 
+//interface for higher level functions, if the window was
+//marked for deletion it is not returned
 Window* Interface::GetWindow(unsigned short WindowIndex)
 {
 	if (WindowIndex < windows.size()) {
-		return windows[WindowIndex];
+		Window *win = windows[WindowIndex];
+		if (win && (win->Visible!=-1) ) {
+			return win;
+		}
 	}
 	return NULL;
 }
 
+//this function won't delete the window, just mark it for deletion
+//it will be deleted in the next DrawWindows cycle
+//regardless, the window deleted is inaccessible for gui scripts and
+//other high level functions from now
 int Interface::DelWindow(unsigned short WindowIndex)
 {
 	if (WindowIndex == 0xffff) {
+		//we clear ALL windows immediately, don't call this
+		//from a guiscript
 		vars->SetAt("MessageWindow", (ieDword) ~0);
 		vars->SetAt("OptionsWindow", (ieDword) ~0);
 		vars->SetAt("PortraitWindow", (ieDword) ~0);
@@ -2120,12 +2243,12 @@ int Interface::DelWindow(unsigned short WindowIndex)
 		for(unsigned int WindowIndex=0; WindowIndex<windows.size();WindowIndex++) {
 			Window* win = windows[WindowIndex];
 			if (win) {
-				evntmgr->DelWindow( win->WindowID );
 				delete( win );
 			}
 		}
 		windows.clear();
 		topwin.clear();
+		evntmgr->Clear();
 		ModalWindow = NULL;
 		return 0;
 	}
@@ -2133,15 +2256,18 @@ int Interface::DelWindow(unsigned short WindowIndex)
 		return -1;
 	}
 	Window* win = windows[WindowIndex];
-	if (win == NULL) {
+	if ((win == NULL) || (win->Visible==-1) ) {
 		printMessage( "Core", "Window deleted again", LIGHT_RED );
 		return -1;
 	}
-	if (win == ModalWindow)
+	if (win == ModalWindow) {
 		ModalWindow = NULL;
-	evntmgr->DelWindow( win->WindowID );
-	delete( win );
-	windows[WindowIndex] = NULL;
+	}
+	evntmgr->DelWindow( win->WindowID, win->WindowPack );
+//	delete( win );
+	win->release();
+//	windows[WindowIndex] = NULL;
+	/*
 	std::vector< int>::iterator t;
 	for (t = topwin.begin(); t != topwin.end(); ++t) {
 		if (( *t ) == WindowIndex) {
@@ -2149,6 +2275,7 @@ int Interface::DelWindow(unsigned short WindowIndex)
 			break;
 		}
 	}
+	*/
 	return 0;
 }
 
@@ -2538,7 +2665,7 @@ void Interface::QuitGame(bool BackToMain)
 	soundmgr->GetAmbientMgr()->deactivate(); 
 	if (BackToMain) {
 		strcpy(NextScript, "Start");
-		ChangeScript = true;
+		QuitFlag |= QF_CHANGESCRIPT;
 	}
 	GSUpdate(true);
 }
@@ -2549,7 +2676,7 @@ void Interface::LoadGame(int index)
 	// as it should swap all the objects or none at all
 	// and the loading can fail for various reasons
 
-	// Yes, it uses goto. Other ways were too awkward for me.
+	// Yes, it uses goto. Other ways seemed too awkward for me.
 
 	tokens->RemoveAll(); //clearing the token dictionary
 	DataStream* gam_str = NULL;

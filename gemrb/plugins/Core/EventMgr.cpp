@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.36 2005/03/31 10:06:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.37 2005/08/14 17:52:25 avenger_teambg Exp $
  *
  */
 
@@ -77,17 +77,14 @@ void EventMgr::AddWindow(Window* win)
 void EventMgr::Clear()
 {
 	topwin.clear();
-	std::vector< Window*>::iterator m;
-	for (m = windows.begin(); m != windows.end(); ++m) {
-		( *m ) = NULL;
-	}
+	windows.clear();
 	lastW = NULL;
 	lastF = NULL;
 	last_ctrl_over = NULL;
 }
 
-/** Remove a Window fro the array */
-void EventMgr::DelWindow(unsigned short WindowID)
+/** Remove a Window from the array */
+void EventMgr::DelWindow(unsigned short WindowID, const char *WindowPack)
 {
 	if (windows.size() == 0) {
 		return;
@@ -98,22 +95,26 @@ void EventMgr::DelWindow(unsigned short WindowID)
 		pos++;
 		if (( *m ) == NULL)
 			continue;
+
+		if (WindowPack && stricmp(WindowPack, (*m)->WindowPack) ) {
+			continue;
+		}
+
 		if (( *m )->WindowID == WindowID) {
-			if (lastW == ( *m ))
+			if (lastW == ( *m )) {
 				lastW = NULL;
+			}
 			( *m ) = NULL;
 			lastF = NULL;
 			last_ctrl_over = NULL;
-			break;
-		}
-	}
-	if (pos != -1) {
-		std::vector< int>::iterator t;
-		for (t = topwin.begin(); t != topwin.end(); ++t) {
-			if (( *t ) == pos) {
-				topwin.erase( t );
-				break;
+			std::vector< int>::iterator t;
+			for (t = topwin.begin(); t != topwin.end(); ++t) {
+				if (( *t ) == pos) {
+					topwin.erase( t );
+					break;
+				}
 			}
+			break;
 		}
 	}
 }
@@ -146,20 +147,16 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 				Control* ctrl = ( *m )->GetControl( x, y );
 				if (ctrl != last_ctrl_over) {
 					if (last_ctrl_over)
-						last_ctrl_over->OnMouseLeave( x - lastW->XPos - last_ctrl_over->XPos,
-									      y - lastW->YPos - last_ctrl_over->YPos );
+						last_ctrl_over->OnMouseLeave( x - lastW->XPos - last_ctrl_over->XPos, y - lastW->YPos - last_ctrl_over->YPos );
 					if (ctrl)
-						ctrl->OnMouseEnter( x - lastW->XPos - ctrl->XPos,
-								    y - lastW->YPos - ctrl->YPos );
+						ctrl->OnMouseEnter( x - lastW->XPos - ctrl->XPos, y - lastW->YPos - ctrl->YPos );
 					last_ctrl_over = ctrl;
 				}
 				if (ctrl != NULL) {
-					ctrl->OnMouseOver( x - lastW->XPos - ctrl->XPos,
-							y - lastW->YPos - ctrl->YPos );
+					ctrl->OnMouseOver( x - lastW->XPos - ctrl->XPos, y - lastW->YPos - ctrl->YPos );
 				}
 				lastW = *m;
-				core->GetVideoDriver()->SetCursor( core->Cursors[( *m )->Cursor],
-											core->Cursors[( ( *m )->Cursor ) + 1] );
+				core->GetVideoDriver()->SetCursor( core->Cursors[( *m )->Cursor], core->Cursors[( ( *m )->Cursor ) + 1] );
 				return;
 			}
 		}
@@ -192,8 +189,7 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y,
 					lastW = ( *m );
 				if (ctrl != NULL) {
 					( *m )->SetFocused( ctrl );
-					ctrl->OnMouseDown( x - lastW->XPos - ctrl->XPos,
-							y - lastW->YPos - ctrl->YPos, Button, Mod );
+					ctrl->OnMouseDown( x - lastW->XPos - ctrl->XPos, y - lastW->YPos - ctrl->YPos, Button, Mod );
 					lastF = ctrl;
 					//printf( "dn lastF: %p\n", lastF );
 				}
@@ -214,8 +210,7 @@ void EventMgr::MouseUp(unsigned short x, unsigned short y,
 	MButtons &= ~Button;
 	//printf( "up lastF: %p\n", lastF );
 	if (lastF != NULL) {
-		lastF->OnMouseUp( x - lastW->XPos - lastF->XPos,
-				y - lastW->YPos - lastF->YPos, Button, Mod );
+		lastF->OnMouseUp( x - lastW->XPos - lastF->XPos, y - lastW->YPos - lastF->YPos, Button, Mod );
 	}
 }
 

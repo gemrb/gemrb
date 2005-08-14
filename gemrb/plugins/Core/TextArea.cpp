@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.76 2005/07/17 17:51:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.77 2005/08/14 17:52:25 avenger_teambg Exp $
  *
  */
 
@@ -27,6 +27,7 @@
 
 TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 {
+	keeplines = 100;
 	rows = 0;
 	startrow = 0;
 	minrow = 0;
@@ -34,6 +35,7 @@ TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 	Value = 0xffffffff;
 	sb = NULL;
 	ResetEventHandler( TextAreaOnChange );
+	ResetEventHandler( TextAreaOutOfText );
 
 	palette = core->GetVideoDriver()->CreatePalette( hitextcolor,
 										lowtextcolor );
@@ -73,6 +75,19 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 	if (lines.size() == 0) {
 		return;
 	}
+
+	int tx=x+XPos;
+	int ty=y+YPos;
+	//smooth vertical scrolling up
+	if (Flags & IE_GUI_TEXTAREA_SMOOTHSCROLL) {
+		ty=ty+smooth;
+	}
+
+	//if textarea is 'selectable' it actually means, it is a listbox
+	//in this case the selected value equals the line number
+	//if it is 'not selectable' it can still have selectable lines
+	//but then it is like the dialog window in the main game screen:
+	//the selected value is encoded into the line
 	if (!(Flags & IE_GUI_TEXTAREA_SELECTABLE) ) {
 		char* Buffer = ( char* ) malloc( 1 );
 		Buffer[0] = 0;
@@ -117,49 +132,49 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			}
 		}
 		ftext->PrintFromLine( startrow,
-			Region( x + XPos, y + YPos, Width, Height - 5 ),
+			Region( tx , ty, Width, Height - 5 ),
 			( unsigned char * ) Buffer, palette,
 			IE_FONT_ALIGN_LEFT, finit, NULL );
 		free( Buffer );
-	} else {
-		int rc = 0;
-		int sr = startrow;
-		unsigned int i;
-		int yl = 0;
-		for (i = 0; i < lines.size(); i++) {
-			if (rc + lrows[i] <= sr) {
-				rc += lrows[i];
-				continue;
-			}
-			sr -= rc;
-			Color* pal = NULL;
-			if (seltext == (int) i)
-				pal = selected;
-			else if (Value == i)
-				pal = lineselpal;
-			else
-				pal = palette;
-			ftext->PrintFromLine( sr,
-				Region( x + XPos, y + YPos, Width, Height - 5 ),
-				( unsigned char * ) lines[i], pal,
-				IE_FONT_ALIGN_LEFT, finit, NULL );
-			yl = lrows[i] - sr;
-			break;
+		return;
+	}
+	// normal scrolling textarea
+	int rc = 0;
+	int sr = startrow;
+	unsigned int i;
+	int yl = 0;
+	for (i = 0; i < lines.size(); i++) {
+		if (rc + lrows[i] <= sr) {
+			rc += lrows[i];
+			continue;
 		}
-		for (i++; i < lines.size(); i++) {
-			Color* pal = NULL;
-			if (seltext == (int) i)
-				pal = selected;
-			else if (Value == i)
-				pal = lineselpal;
-			else
-				pal = palette;
-			ftext->Print( Region( x + XPos, y + YPos +
-				( yl * ftext->size[1].h ), Width,
-				Height - 5 - ( yl * ftext->maxHeight) ),
-				( unsigned char * ) lines[i], pal, IE_FONT_ALIGN_LEFT, true );
-			yl += lrows[i];
-		}
+		sr -= rc;
+		Color* pal = NULL;
+		if (seltext == (int) i)
+			pal = selected;
+		else if (Value == i)
+			pal = lineselpal;
+		else
+			pal = palette;
+		ftext->PrintFromLine( sr,
+			Region( tx, ty, Width, Height - 5 ),
+			( unsigned char * ) lines[i], pal,
+			IE_FONT_ALIGN_LEFT, finit, NULL );
+		yl = lrows[i] - sr;
+		break;
+	}
+	for (i++; i < lines.size(); i++) {
+		Color* pal = NULL;
+		if (seltext == (int) i)
+			pal = selected;
+		else if (Value == i)
+			pal = lineselpal;
+		else
+			pal = palette;
+		ftext->Print( Region( tx, ty + ( yl * ftext->size[1].h ),
+			Width, Height - 5 - ( yl * ftext->maxHeight) ),
+			( unsigned char * ) lines[i], pal, IE_FONT_ALIGN_LEFT, true );
+		yl += lrows[i];
 	}
 }
 /** Sets the Scroll Bar Pointer. If 'ptr' is NULL no Scroll Bar will be linked
@@ -205,6 +220,27 @@ void TextArea::SetMinRow(bool enable)
 	Changed = true;
 }
 
+//drop lines scrolled out at the top.
+//keeplines is the number of lines that should still be
+//preserved (for scrollback history)
+void TextArea::DiscardLines()
+{
+	if (startrow<=keeplines) {
+		return;
+	}
+	int drop = startrow-keeplines;
+	if (minrow && minrow<drop) {
+		return; //can't drop lines because of minrow
+	}
+	startrow -= drop;
+	if (minrow) {
+		if (minrow>drop) {
+			minrow -= drop;
+		}
+	}
+	PopLines(drop, true);
+}
+
 static char inserted_crap[]="[/color][color=ffffff]";
 #define CRAPLENGTH sizeof(inserted_crap)-1
 
@@ -241,21 +277,44 @@ int TextArea::AppendText(const char* text, int pos)
 		memcpy( lines[pos]+mylen, text, newlen + 1 );
 		ret = pos;
 	}
+
+	//if the textarea is not a listbox, then discard scrolled out
+	//lines
+	if (Flags&IE_GUI_TEXTAREA_HISTORY) {
+		DiscardLines();
+	}
+
+	if (Flags&IE_GUI_TEXTAREA_SMOOTHSCROLL) {
+		while (smooth<-ftext->maxHeight) {
+			smooth+=ftext->maxHeight;
+			startrow++;
+		}
+	}
 	UpdateControls();
 	return ret;
 }
 
-/** Deletes last `count' lines */ 
-void TextArea::PopLines(unsigned int count)
+/** Deletes last or first `count' lines */
+/** Probably not too optimal for many lines, but it isn't used */
+/** for many lines */
+void TextArea::PopLines(unsigned int count, bool top)
 {
 	if (count > lines.size()) {
 		count = lines.size();
 	}
 
 	while (count > 0 ) {
-		free(lines.back() );
-		lines.pop_back();
-		lrows.pop_back();
+		if (top) {
+			free(lines.front() );
+			lines.erase(lines.begin());
+			//lines.pop_front();
+			lrows.erase(lrows.begin());
+			//lrows.pop_front();
+		} else {
+			free(lines.back() );
+			lines.pop_back();
+			lrows.pop_back();
+		}
 		count--;
 	}
 	UpdateControls();
@@ -463,7 +522,7 @@ void TextArea::CopyTo(TextArea* ta)
 	}
 }
 
-void TextArea::RedrawTextArea(char* VariableName, unsigned int Sum)
+void TextArea::RedrawTextArea(const char* VariableName, unsigned int Sum)
 {
 	if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
 		return;
@@ -488,6 +547,9 @@ bool TextArea::SetEvent(int eventType, EventHandler handler)
 	case IE_GUI_TEXTAREA_ON_CHANGE:
 		SetEventHandler( TextAreaOnChange, handler );
 		break;
+	case IE_GUI_TEXTAREA_OUT_OF_TEXT:
+		SetEventHandler( TextAreaOutOfText, handler );
+		break;
 	default:
 		return Control::SetEvent( eventType, handler );
 	}
@@ -509,5 +571,28 @@ void TextArea::PadMinRow()
 	while(rows>0) {
 		AppendText("",-1);
 		rows--;
+	}
+}
+
+void TextArea::SetPreservedRow(int arg)
+{
+	keeplines=arg;
+	Flags |= IE_GUI_TEXTAREA_HISTORY;
+}
+
+//setting up the textarea for smooth scrolling, the first
+//TEXTAREA_OUTOFTEXT callback is called automatically
+void TextArea::SetupScroll()
+{
+	SetPreservedRow(0);
+	smooth = Height;
+	startrow = 0;
+	//clearing the textarea
+	SetMinRow(true);
+	PopMinRow();
+	RunEventHandler( TextAreaOutOfText );
+	//turning on smoothscrolling if text was provided
+	if (lines.size()) {
+		Flags |= IE_GUI_TEXTAREA_SMOOTHSCROLL;
 	}
 }

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/MessageWindow.py,v 1.18 2005/05/29 12:59:42 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/MessageWindow.py,v 1.19 2005/08/14 17:52:25 avenger_teambg Exp $
 
 # MessageWindow.py - scripts and GUI for main (walk) window
 
@@ -94,8 +94,12 @@ def UpdateControlStatus():
 	TMessageTA = 0
 	GSFlags = GemRB.GetVar("MessageWindowSize")
 	Expand = GSFlags&GS_DIALOGMASK
+	Override = GSFlags&GS_DIALOG
 	GSFlags = GSFlags-Expand
 	
+	if Override:
+		Expand = GS_LARGEDIALOG
+
 	MessageWindow = GemRB.GetVar("MessageWindow")
 
 	GemRB.LoadWindowPack(GetWindowPack())

@@ -51,7 +51,7 @@ public:
 	MapControl(void);
 	~MapControl(void);
 	/** redraws the control after its associated variable has changed */
-	void RedrawMapControl(char *VariableName, unsigned int Sum);
+	void RedrawMapControl(const char *VariableName, unsigned int Sum);
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short XWin, unsigned short YWin);
 	void DrawFog();

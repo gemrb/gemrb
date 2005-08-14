@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.332 2005/08/08 21:25:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.333 2005/08/14 17:52:26 avenger_teambg Exp $
  *
  */
 
@@ -185,36 +185,6 @@ static PyObject* GemRB_HideGUI(PyObject*, PyObject* /*args*/)
 	return PyInt_FromLong( ret );
 }
 
-GameControl* StartGameControl()
-{
-	//making sure that our window is the first one
-	core->DelWindow(~0); //deleting ALL windows
-	core->DelTable(~0); //dropping ALL tables
-	Window* gamewin = new Window( 0xffff, 0, 0, core->Width, core->Height );
-	GameControl* gc = new GameControl();
-	gc->XPos = 0;
-	gc->YPos = 0;
-	gc->Width = core->Width;
-	gc->Height = core->Height;
-	gc->Owner = gamewin;
-	gc->ControlID = 0x00000000;
-	gc->ControlType = IE_GUI_GAMECONTROL;
-	gamewin->AddControl( gc );
-	core->AddWindow( gamewin );
-	core->SetVisible( 0, WINDOW_VISIBLE );
-	//setting the focus to the game control 
-	core->GetEventMgr()->SetFocused(gamewin, gc); 
-	if (core->GetGUIScriptEngine()->LoadScript( "MessageWindow" )) {
-		core->GetGUIScriptEngine()->RunFunction( "OnLoad" );
-		gc->UnhideGUI();
-	}
-	if (core->ConsolePopped) {
-		core->PopupConsole();
-	}
-
-	return gc;
-}
-
 PyDoc_STRVAR( GemRB_GetGameString__doc,
 "GetGameString(Index)\n\n"
 "Returns various string attributes of the Game object, see the docs.\n");
@@ -254,7 +224,9 @@ static PyObject* GemRB_LoadGame(PyObject*, PyObject* args)
 	if (!PyArg_ParseTuple( args, "i", &GameIndex )) {
 		return AttributeError( GemRB_LoadGame__doc );
 	}
-	core->LoadGame( GameIndex );
+	core->QuitFlag|=QF_LOADGAME;
+	core->LoadGameIndex=GameIndex;
+	//core->LoadGame( GameIndex );
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -265,13 +237,7 @@ PyDoc_STRVAR( GemRB_EnterGame__doc,
 
 static PyObject* GemRB_EnterGame(PyObject*, PyObject* /*args*/)
 {
-	Game* game = core->GetGame();
-	if (!game) {
-		return RuntimeError( "No game loaded!" );
-	}
-	GameControl* gc = StartGameControl();
-	Actor* actor = game->GetPC (0, false);
-	gc->ChangeMap(actor, true);
+	core->QuitFlag|=QF_ENTERGAME;
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -282,7 +248,7 @@ PyDoc_STRVAR( GemRB_QuitGame__doc,
 "Stops the current game.");
 static PyObject* GemRB_QuitGame(PyObject*, PyObject* /*args*/)
 {
-	core->quitflag=0;
+	core->QuitFlag=QF_QUITGAME;
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -311,6 +277,50 @@ static PyObject* GemRB_MoveTAText(PyObject * /*self*/, PyObject* args)
 
 	SrcTA->CopyTo( DstTA );
 
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_RewindTA__doc,
+"RewindTA(Win, Ctrl)\n\n"
+"Sets up a TextArea for scrolling.");
+
+static PyObject* GemRB_RewindTA(PyObject * /*self*/, PyObject* args)
+{
+	int Win, Ctrl;
+
+	if (!PyArg_ParseTuple( args, "ii", &Win, &Ctrl)) {
+		return AttributeError( GemRB_RewindTA__doc );
+	}
+
+	TextArea* ctrl = ( TextArea* ) GetControl( Win, Ctrl, IE_GUI_TEXTAREA);
+	if (!ctrl) {
+		return NULL;
+	}
+
+	ctrl->SetupScroll();
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_SetTAHistory__doc,
+"SetTAHistory(Win, Ctrl, KeepLines)\n\n"
+"Sets up a TextArea to expire scrolled out lines.");
+
+static PyObject* GemRB_SetTAHistory(PyObject * /*self*/, PyObject* args)
+{
+	int Win, Ctrl, Keep;
+
+	if (!PyArg_ParseTuple( args, "iii", &Win, &Ctrl, &Keep)) {
+		return AttributeError( GemRB_SetTAHistory__doc );
+	}
+
+	TextArea* ctrl = ( TextArea* ) GetControl( Win, Ctrl, IE_GUI_TEXTAREA);
+	if (!ctrl) {
+		return NULL;
+	}
+
+	ctrl->SetPreservedRow(Keep);
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -1294,7 +1304,7 @@ static PyObject* GemRB_SetNextScript(PyObject * /*self*/, PyObject* args)
 	}
 
 	strncpy( core->NextScript, funcName, sizeof(core->NextScript) );
-	core->ChangeScript = true;
+	core->QuitFlag |= QF_CHANGESCRIPT;
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -1367,9 +1377,13 @@ static PyObject* GemRB_UnloadWindow(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_UnloadWindow__doc );
 	}
 
-	int ret = core->DelWindow( WindowIndex );
+	unsigned short arg = (unsigned short) WindowIndex;
+	if (arg == 0xffff) {
+		return AttributeError( "Feature unsupported! ");
+	}
+	int ret = core->DelWindow( arg );
 	if (ret == -1) {
-		return NULL;
+		return RuntimeError( GemRB_UnloadWindow__doc );
 	}
 
 	Py_INCREF( Py_None );
@@ -3270,13 +3284,17 @@ static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 	//PlayerSlot is zero based, if not, remove the +1
 	//removed it!
 	Slot = ( PlayerSlot & 0x7fff ); 
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game!");
+	}
 	if (PlayerSlot & 0x8000) {
-		PlayerSlot = core->GetGame()->FindPlayer( Slot );
+		PlayerSlot = game->FindPlayer( Slot );
 		if (PlayerSlot < 0) {
 			PlayerSlot = core->LoadCreature( CreResRef, Slot, Import );
 		}
 	} else {
-		PlayerSlot = core->GetGame()->FindPlayer( PlayerSlot );
+		PlayerSlot = game->FindPlayer( PlayerSlot );
 		if (PlayerSlot >= 0) {
 			printMessage( "GUIScript", "Slot is already filled!\n", LIGHT_RED );
 			return NULL;
@@ -5311,6 +5329,8 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(HideGUI, METH_NOARGS),
 	METHOD(UnhideGUI, METH_NOARGS),
 	METHOD(MoveTAText, METH_VARARGS),
+	METHOD(RewindTA, METH_VARARGS),
+	METHOD(SetTAHistory, METH_VARARGS),
 	METHOD(ExecuteString, METH_VARARGS),
 	METHOD(EvaluateString, METH_VARARGS),
 	METHOD(GetGameString, METH_VARARGS),

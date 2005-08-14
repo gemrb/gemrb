@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.42 2005/06/22 15:55:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.43 2005/08/14 17:52:25 avenger_teambg Exp $
  *
  */
 
@@ -201,7 +201,7 @@ Control* Window::GetDefaultControl()
 
 void Window::release(void)
 {
-	delete this;
+	Visible = -1;
 }
 
 /** Redraw all the Window */
@@ -227,7 +227,7 @@ void Window::Invalidate()
 	Changed = true;
 }
 
-void Window::RedrawControls(char* VarName, unsigned int Sum)
+void Window::RedrawControls(const char* VarName, unsigned int Sum)
 {
 	for (unsigned int i = 0; i < Controls.size(); i++) {
 		switch (Controls[i]->ControlType) {

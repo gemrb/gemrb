@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.h,v 1.7 2005/06/17 19:33:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.h,v 1.8 2005/08/14 17:52:25 avenger_teambg Exp $
  *
  */
 
@@ -63,7 +63,7 @@ public:
 	/** Dummy function */
 	int SetText(const char * string, int pos = 0);
 	/** Redraws a progressbar which is associated with VariableName */
-	void RedrawProgressbar(char *VariableName, int Sum);
+	void RedrawProgressbar(const char *VariableName, int Sum);
 	/** Set handler for specified event */
 	bool SetEvent(int eventType, EventHandler handler);
 

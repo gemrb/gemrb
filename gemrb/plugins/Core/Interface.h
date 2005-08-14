@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.166 2005/07/17 18:58:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.167 2005/08/14 17:52:25 avenger_teambg Exp $
  *
  */
 
@@ -102,9 +102,18 @@ typedef struct SlotType {
 #define MODAL_SHADOW_GRAY	1
 #define MODAL_SHADOW_BLACK	2
 
+#define WINDOW_INVALID   -1
 #define WINDOW_INVISIBLE 0
 #define WINDOW_VISIBLE   1
 #define WINDOW_GRAYED    2
+
+
+#define QF_NORMAL        0
+#define QF_QUITGAME      1
+#define QF_EXITGAME      2
+#define QF_CHANGESCRIPT  4
+#define QF_LOADGAME      8
+#define QF_ENTERGAME     16
 
 class GEM_EXPORT Interface : public InterfaceDesc
 {
@@ -172,7 +181,8 @@ private:
 	bool UseContainer;
 public:
 	int SaveAsOriginal; //if true, saves files in compatible mode
-	int quitflag; // Quit Signal, set it to 0 or 1
+	int QuitFlag;
+	int LoadGameIndex;
 	int SlotTypes; //this is the same as the inventory size
 	ieResRef GlobalScript;
 	ieResRef WorldMapName;
@@ -229,38 +239,9 @@ public:
 #endif
 	int CreateWindow(unsigned short WindowID, int XPos, int YPos, unsigned int Width, unsigned int Height, char* Background);
 	/** Sets a Window on the Top */
-	void SetOnTop(int Index)
-	{
-		std::vector<int>::iterator t;
-		for(t = topwin.begin(); t != topwin.end(); ++t) {
-			if((*t) == Index) {
-				topwin.erase(t);
-				break;
-			}
-		}
-		if(topwin.size() != 0)
-			topwin.insert(topwin.begin(), Index);
-		else
-			topwin.push_back(Index);
-	}
+	void SetOnTop(int Index);
 	/** Add a window to the Window List */
-	void AddWindow(Window * win)
-	{
-		int slot = -1;
-		for(unsigned int i = 0; i < windows.size(); i++) {
-			if(windows[i]==NULL) {
-				slot = i;
-				break;
-			}
-		}
-		if(slot == -1) {
-			windows.push_back(win);
-			slot=(int)windows.size()-1;
-		}
-		else
-			windows[slot] = win;
-		win->Invalidate();
-	}
+	void AddWindow(Window * win);
 	/** Get a Control on a Window */
 	int GetControl(unsigned short WindowIndex, unsigned long ControlID);
 	/** Adjust the scrolling of the control (if applicable) */
@@ -435,7 +416,7 @@ public:
 	/** returns a cursor sprite (not cached) */
 	Sprite2D *GetCursorSprite();
 	/** returns 0 for unmovable, -1 for movable items, otherwise it
-	    returns gold value! */
+	returns gold value! */
 	int CanMoveItem(CREItem *item);
 
 	/** applies the spell on the target */
@@ -462,6 +443,10 @@ private:
 	bool ReadStrrefs();
 	bool ReadRandomItems();
 	bool ReadItemTable(const ieResRef item, const char *Prefix);
+	/** handles the QuitFlag bits (main loop events) */
+	void HandleFlags();
+	/** Creates a game control, closes all other windows */
+	GameControl* StartGameControl();
 
 public:
 	char GameData[12];
@@ -512,8 +497,6 @@ public:
 
 	/** Next Script Name */
 	char NextScript[64];
-	/** Need to Load a new Script */
-	bool ChangeScript;
 	/** Console is on Screen */
 	bool ConsolePopped;
 	/** Cheats enabled? */

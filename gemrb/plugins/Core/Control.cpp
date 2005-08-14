@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.36 2005/05/17 17:13:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.37 2005/08/14 17:52:25 avenger_teambg Exp $
  *
  */
 
@@ -31,6 +31,7 @@ Control::Control()
 {
 	hasFocus = false;
 	Changed = true;
+	InHandler = false;
 	VarName[0] = 0;
 	Value = 0;
 	Flags = 0;
@@ -45,6 +46,9 @@ Control::Control()
 
 Control::~Control()
 {
+	if (InHandler) {
+		printf("[Control] We are currently in an event handler, crash may occur!");
+	}
 	core->DisplayTooltip( 0, 0, NULL );
 	if (Tooltip) {
 		free (Tooltip);
@@ -96,8 +100,17 @@ bool Control::SetEvent(int /*eventType*/, EventHandler /*handler*/)
 
 void Control::RunEventHandler(EventHandler handler)
 {
-	if (handler[0])
+	if (InHandler) {
+		printf("[Control] Nested event handlers are not supported!");
+		return;
+	}
+	if (handler[0]) {
+		InHandler = true;
 		core->GetGUIScriptEngine()->RunFunction( (char*)handler );
+		//we should make sure the event didn't destruct this
+		//object otherwise we overwrite memory
+		InHandler = false;
+	}
 }
 
 /** Key Press Event */

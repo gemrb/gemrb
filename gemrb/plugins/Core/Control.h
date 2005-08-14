@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.30 2005/04/10 19:08:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.31 2005/08/14 17:52:25 avenger_teambg Exp $
  *
  */
 
@@ -43,8 +43,8 @@
 #include "../../includes/ie_types.h"
 #include "../../includes/win32def.h"
 /**This class defines a basic Control Object.
-  *@author GemRB Developement Team
-  */
+	*@author GemRB Developement Team
+	*/
 #include "../../includes/RGBAColor.h"
 
 #include "AnimationMgr.h"
@@ -104,6 +104,8 @@ public: // Public attributes
 	bool hasFocus;
 	/** Changed Flag */
 	bool Changed;
+	/** True if we are currently in an event handler */
+	bool InHandler;
 	/** Owner Window */
 	void* Owner;
 public: //Events

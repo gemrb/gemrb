@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.88 2005/05/14 15:01:29 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.89 2005/08/14 17:52:25 avenger_teambg Exp $
  *
  */
 
@@ -484,7 +484,7 @@ bool Button::SetEvent(int eventType, EventHandler handler)
 }
 
 /** Redraws a button from a given radio button group */
-void Button::RedrawButton(char* VariableName, unsigned int Sum)
+void Button::RedrawButton(const char* VariableName, unsigned int Sum)
 {
 	if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
 		return;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.47 2005/06/08 20:36:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.48 2005/08/14 17:52:25 avenger_teambg Exp $
  *
  */
 
@@ -153,7 +153,7 @@ public: // Public Events
 	EventHandler MouseLeaveButton;
 	EventHandler MouseOverButton;
 	/** Refreshes the button from a radio group */
-	void RedrawButton(char* VariableName, unsigned int Sum);
+	void RedrawButton(const char* VariableName, unsigned int Sum);
 	/** Set palette used for drawing button label in normal state.  */
 	void SetTextColor(Color fore, Color back);
 	/** Sets percent (0-1.0) of width for clipping picture */

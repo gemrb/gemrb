@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.33 2005/06/19 22:59:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.34 2005/08/14 17:52:25 avenger_teambg Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -146,7 +146,7 @@ void MapControl::Realize()
 	if (YCenter < 0) YCenter = 0;
 }
 
-void MapControl::RedrawMapControl(char *VariableName, unsigned int Sum)
+void MapControl::RedrawMapControl(const char *VariableName, unsigned int Sum)
 {
 	if (strnicmp( VarName, VariableName, MAX_VARIABLE_LENGTH )) {
 		return;
