@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.44 2005/08/10 16:15:52 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.45 2005/08/14 14:57:30 avenger_teambg Exp $
 
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
@@ -49,6 +49,7 @@ IE_GUI_BUTTON_PLAYONCE   = 0x00040000   # the button animation won't restart
 IE_GUI_TEXTAREA_SELECTABLE = 0x05000001
 IE_GUI_TEXTAREA_AUTOSCROLL = 0x05000002
 IE_GUI_TEXTAREA_SMOOTHSCROLL = 0x05000004
+IE_GUI_TEXTAREA_HISTORY = 0x05000008
 
 #events
 IE_GUI_BUTTON_ON_PRESS    = 0x00000000
@@ -63,6 +64,7 @@ IE_GUI_PROGRESS_END_REACHED = 0x01000000
 IE_GUI_SLIDER_ON_CHANGE   = 0x02000000
 IE_GUI_EDIT_ON_CHANGE     = 0x03000000
 IE_GUI_TEXTAREA_ON_CHANGE = 0x05000000
+IE_GUI_TEXTAREA_OUT_OF_TEXT = 0x05000001
 IE_GUI_LABEL_ON_PRESS     = 0x06000000
 IE_GUI_SCROLLBAR_ON_CHANGE= 0x07000000
 IE_GUI_MAP_ON_PRESS       = 0x09000000
