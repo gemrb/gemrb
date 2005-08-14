@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.107 2005/08/04 17:39:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.108 2005/08/14 17:29:06 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -410,6 +410,9 @@ Moveble::Moveble(ScriptableType type)
 
 Moveble::~Moveble(void)
 {
+	if (path) {
+		ClearPath();
+	}
 }
 
 void Moveble::SetStance(unsigned int arg)
