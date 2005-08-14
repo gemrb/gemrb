@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.20 2005/06/22 15:55:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.21 2005/08/14 17:00:33 avenger_teambg Exp $
  *
  */
 
@@ -214,6 +214,9 @@ Sprite2D* BMPImp::GetImage()
 /** No descriptions */
 void BMPImp::GetPalette(int index, int colors, Color* pal)
 {
+	if ((unsigned int) index>=Height) {
+		index = 0;
+	}
 	if (BitCount == 24) {
 		unsigned char * p = ( unsigned char * ) pixels;
 		p += PaddedRowLength * index;
