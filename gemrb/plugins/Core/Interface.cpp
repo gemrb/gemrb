@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.342 2005/08/14 17:52:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.343 2005/08/14 19:07:26 avenger_teambg Exp $
  *
  */
 
@@ -1974,7 +1974,8 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 			if (win->WindowID==65535) {
 				video->SetViewport( 0,0,0,0 );
 			}
-			evntmgr->DelWindow( win->WindowID, win->WindowPack );
+			//evntmgr->DelWindow( win->WindowID, win->WindowPack );
+			evntmgr->DelWindow( win );
 			break;
 
 		case WINDOW_VISIBLE:
@@ -2150,7 +2151,8 @@ void Interface::DrawWindows(void)
 		if (win != NULL) {
 			if (win->Visible == -1) {
 				topwin.erase(topwin.begin()+i);
-				evntmgr->DelWindow( win->WindowID, win->WindowPack );
+				//evntmgr->DelWindow( win->WindowID, win->WindowPack );
+				evntmgr->DelWindow( win );
 				delete win;
 				windows[(*t)]=NULL;
 			}
@@ -2263,7 +2265,8 @@ int Interface::DelWindow(unsigned short WindowIndex)
 	if (win == ModalWindow) {
 		ModalWindow = NULL;
 	}
-	evntmgr->DelWindow( win->WindowID, win->WindowPack );
+	//evntmgr->DelWindow( win->WindowID, win->WindowPack );
+	evntmgr->DelWindow( win );
 //	delete( win );
 	win->release();
 //	windows[WindowIndex] = NULL;

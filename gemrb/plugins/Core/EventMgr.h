@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.h,v 1.19 2005/08/14 17:52:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.h,v 1.20 2005/08/14 19:07:26 avenger_teambg Exp $
  *
  */
 
@@ -66,8 +66,9 @@ public:
 	~EventMgr(void);
 	/** Adds a Window to the Event Manager */
 	void AddWindow(Window* win);
-	/** Removes a Window from the Array */
-	void DelWindow(unsigned short WindowID, const char *WindowPack);
+	/** Removes a Window from the Event chain */
+	//void DelWindow(unsigned short WindowID, const char *WindowPack);
+	void DelWindow(Window* win);
 	/** Frees and Removes all the Windows in the Array */
 	void Clear();
 	/** BroadCast Mouse Move Event */

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.37 2005/08/14 17:52:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.38 2005/08/14 19:07:26 avenger_teambg Exp $
  *
  */
 
@@ -84,7 +84,8 @@ void EventMgr::Clear()
 }
 
 /** Remove a Window from the array */
-void EventMgr::DelWindow(unsigned short WindowID, const char *WindowPack)
+void EventMgr::DelWindow(Window *win)
+//unsigned short WindowID, const char *WindowPack)
 {
 	if (windows.size() == 0) {
 		return;
@@ -93,14 +94,22 @@ void EventMgr::DelWindow(unsigned short WindowID, const char *WindowPack)
 	std::vector< Window*>::iterator m;
 	for (m = windows.begin(); m != windows.end(); ++m) {
 		pos++;
+/* if you don't have the window pointer, you might be interested in this
 		if (( *m ) == NULL)
 			continue;
+
+		//refuse to detach visible windows from the event chain
+		if ((*m )->Visible==WINDOW_VISIBLE) {
+			continue;
+		}
 
 		if (WindowPack && stricmp(WindowPack, (*m)->WindowPack) ) {
 			continue;
 		}
 
 		if (( *m )->WindowID == WindowID) {
+*/
+		if ( (*m)==win) {
 			if (lastW == ( *m )) {
 				lastW = NULL;
 			}
@@ -114,7 +123,6 @@ void EventMgr::DelWindow(unsigned short WindowID, const char *WindowPack)
 					break;
 				}
 			}
-			break;
 		}
 	}
 }
