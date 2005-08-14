@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/acinclude.m4,v 1.9 2005/02/06 20:19:08 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/acinclude.m4,v 1.10 2005/08/14 20:15:12 edheldil Exp $
 
 ###################################################
 dnl Configure paths for SDL
@@ -428,6 +428,31 @@ dnl AC_DEFINE(HAVE_CONTAINER_AT)
 $1],
 [AC_MSG_RESULT(no)
 $2])
+])
+
+###################################################
+dnl Test whether the compiler permits casting from pointer-to-object 
+dnl to pointer-to-function (forbidden in GCC v4 and ISO C++).
+dnl If the cast is forbidden, define HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST.
+dnl Syntax: AC_CHECK_OBJECT_TO_FUNCTION_CAST()
+
+AC_DEFUN([AC_CHECK_OBJECT_TO_FUNCTION_CAST],
+[
+AC_MSG_CHECKING(whether compiler permits casting between ptr-to-object and ptr-to-function)
+AC_TRY_COMPILE(
+[
+typedef void *(* voidvoid)(void);
+],
+[
+void *object = 0;
+voidvoid function;
+function = (voidvoid) object;
+],
+[AC_MSG_RESULT(yes)
+],
+[AC_MSG_RESULT(no)
+AC_DEFINE(HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST, 1, [Define to 1 if compiler forbids casting between pointer-to-function and pointer-to-object])
+])
 ])
 
 

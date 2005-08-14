@@ -15,9 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.17 2005/07/11 17:50:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.18 2005/08/14 20:15:12 edheldil Exp $
  *
  */
+
+#include <config.h>
 
 #include "../../includes/win32def.h"
 #include "stdio.h"
@@ -39,7 +41,7 @@
 typedef char*(* charvoid)(void);
 typedef ClassDesc*(* cdvoid)(void);
 
-#ifdef FUSSY_GCC
+#ifdef HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST
 typedef void *(* voidvoid)(void);
 inline voidvoid my_dlsym(void *handle, const char *symbol)
 {

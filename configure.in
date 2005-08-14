@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/configure.in,v 1.51 2005/07/10 17:07:31 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/configure.in,v 1.52 2005/08/14 20:15:12 edheldil Exp $
 
 ###################################################
 
@@ -175,6 +175,10 @@ AC_TYPE_SIZE_T
 CPPFLAGS="$CPPFLAGS -DSYSCONFDIR=\\\"\$(sysconfdir)\\\" -DDATADIR=\\\"\$(moddir)\\\" -DPLUGINDIR=\\\"\$(plugindir)\\\""
 #CXXFLAGS="$CXXFLAGS -Werror -Wall -W -Wpointer-arith -Wcast-qual -Wwrite-strings -Wshadow -Wcast-align -ansi -pedantic -Wbad-function-cast -Winline -Wnested-externs -Wno-format-y2k -Wno-long-long"
 CXXFLAGS="$CXXFLAGS -Werror -Wall -W -Wpointer-arith -Wcast-align -ansi -pedantic -Wno-format-y2k -Wno-long-long"
+
+dnl Check for "ISO C++ forbids casting between pointer-to-function and pointer-to-object" as in GCC4
+AC_CHECK_OBJECT_TO_FUNCTION_CAST
+
 
 AC_SUBST(LIBS)
 
