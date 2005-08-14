@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.29 2005/07/30 11:45:20 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.30 2005/08/14 17:19:09 avenger_teambg Exp $
  *
  */
 
@@ -130,6 +130,7 @@ Spellbook::~Spellbook()
 			}
 		}
 	}
+	delete [] spells;
 }
 
 void Spellbook::FreeSpellPage(CRESpellMemorization *sm)
