@@ -1,0 +1,10 @@
+
+Prototype: RewindTA(Win, Ctrl)
+
+Description: Sets up a textarea control for scrolling text. It clears the textarea, sets TEXTAREA_SMOOTHSCROLL if a call to the TEXTAREA_OUT_OF_TEXT callback was successful.
+
+Parameters: Win, Ctrl - a window index/control index pair of the textarea 
+
+Return value: N/A
+
+See also: SetTAHistory, SetTextAreaFlags, SetEvent
