@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.122 2005/07/30 13:47:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.123 2005/08/15 15:55:39 avenger_teambg Exp $
  *
  */
 
@@ -980,3 +980,12 @@ bool Actor::Schedule(ieDword gametime)
 	}
 	return false;
 }
+
+void Actor::WalkTo(Point &Des, int MinDistance)
+{
+	if (InternalFlags&IF_REALLYDIED) {
+		return;
+	}
+	Moveble::WalkTo(Des, MinDistance);
+}
+

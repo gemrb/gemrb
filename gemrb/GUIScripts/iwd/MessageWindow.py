@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/MessageWindow.py,v 1.16 2005/05/29 12:59:43 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/MessageWindow.py,v 1.17 2005/08/15 15:55:39 avenger_teambg Exp $
 
 # MessageWindow.py - scripts and GUI for main (walk) window
 
@@ -94,8 +94,12 @@ def UpdateControlStatus():
 	TMessageTA = 0
 	GSFlags = GemRB.GetVar("MessageWindowSize")
 	Expand = GSFlags&GS_DIALOGMASK
+	Override = GSFlags&GS_DIALOG
 	GSFlags = GSFlags-Expand
 	
+	if Override:
+		Expand = GS_LARGEDIALOG
+
 	MessageWindow = GemRB.GetVar("MessageWindow")
 
 	GemRB.LoadWindowPack(GetWindowPack())
@@ -120,8 +124,9 @@ def UpdateControlStatus():
 		GemRB.SetEvent(TMessageWindow, ExpandButton, IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
 
 	GemRB.SetTextAreaFlags(TMessageWindow, TMessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
+	GemRB.SetTAHistory(TMessageWindow, TMessageTA, 100)
 
-	GemRB.HideGUI()
+	hideflag = GemRB.HideGUI()
 	MessageTA = GemRB.GetVar("MessageTextArea")
 	if MessageWindow>0 and MessageWindow!=TMessageWindow:
 		GemRB.MoveTAText(MessageWindow, MessageTA, TMessageWindow, TMessageTA)
@@ -130,5 +135,6 @@ def UpdateControlStatus():
 	GemRB.SetVar("MessageWindow", TMessageWindow)
 	GemRB.SetVar("MessageTextArea", TMessageTA)
 
-	GemRB.UnhideGUI()
+	if hideflag:
+		GemRB.UnhideGUI()
 

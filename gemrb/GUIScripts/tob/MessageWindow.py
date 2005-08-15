@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/MessageWindow.py,v 1.25 2005/08/10 16:15:53 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/MessageWindow.py,v 1.26 2005/08/15 15:55:39 avenger_teambg Exp $
 
 # MessageWindow.py - scripts and GUI for main (walk) window
 
@@ -79,24 +79,16 @@ def OnLoad():
 	UpdateControlStatus()
 	
 def MinimizeOptions():
-	print "SetScreenFlags"
 	GemRB.GameSetScreenFlags(GS_OPTIONPANE, OP_OR)
-	print "SetScreenFlags done"
 
 def MaximizeOptions():
-	print "SetScreenFlags"
 	GemRB.GameSetScreenFlags(GS_OPTIONPANE, OP_NAND)
-	print "SetScreenFlags done"
 
 def MinimizePortraits():
-	print "SetScreenFlags"
 	GemRB.GameSetScreenFlags(GS_PORTRAITPANE, OP_OR)
-	print "SetScreenFlags done"
 
 def MaximizePortraits():
-	print "SetScreenFlags"
 	GemRB.GameSetScreenFlags(GS_PORTRAITPANE, OP_NAND)
-	print "SetScreenFlags done"
 
 def TogglePartyAI():
 	GemRB.GameSetScreenFlags(GS_PARTYAI, OP_XOR)
@@ -157,8 +149,8 @@ def UpdateControlStatus():
 		GemRB.SetEvent(TMessageWindow, ExpandButton, IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
 
 	GemRB.SetTextAreaFlags(TMessageWindow, TMessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
-
-	GemRB.HideGUI()
+	GemRB.SetTAHistory(TMessageWindow, TMessageTA, 100)
+	hideflag = GemRB.HideGUI()
 	MessageTA = GemRB.GetVar("MessageTextArea")
 	if MessageWindow>0 and MessageWindow!=TMessageWindow:
 		GemRB.MoveTAText(MessageWindow, MessageTA, TMessageWindow, TMessageTA)
@@ -176,4 +168,5 @@ def UpdateControlStatus():
 	else:
 		GemRB.SetVar("PortraitWindow", PortraitWindow)
 
-	GemRB.UnhideGUI()
+	if hideflag:
+		GemRB.UnhideGUI()

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.25 2005/08/14 17:52:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.26 2005/08/15 15:55:39 avenger_teambg Exp $
  *
  */
 
@@ -60,6 +60,8 @@ public:
 	void SetScrollBar(Control* ptr);
 	/** Sets the Actual Text */
 	int SetText(const char* text, int pos = 0);
+	/** Clears the textarea */
+	void Clear();
 	/** Discards scrolled out lines from the textarea */
 	/** preserving 'keeplines' lines for scroll back history */
 	void DiscardLines();

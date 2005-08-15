@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.77 2005/08/14 17:52:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.78 2005/08/15 15:55:39 avenger_teambg Exp $
  *
  */
 
@@ -225,19 +225,10 @@ void TextArea::SetMinRow(bool enable)
 //preserved (for scrollback history)
 void TextArea::DiscardLines()
 {
-	if (startrow<=keeplines) {
+	if (rows<=keeplines) {
 		return;
 	}
-	int drop = startrow-keeplines;
-	if (minrow && minrow<drop) {
-		return; //can't drop lines because of minrow
-	}
-	startrow -= drop;
-	if (minrow) {
-		if (minrow>drop) {
-			minrow -= drop;
-		}
-	}
+	int drop = rows-keeplines;
 	PopLines(drop, true);
 }
 
@@ -305,11 +296,13 @@ void TextArea::PopLines(unsigned int count, bool top)
 
 	while (count > 0 ) {
 		if (top) {
+			int tmp = lrows.front();
+			if (minrow || (startrow<tmp) )
+				break;
+			startrow -= tmp;
 			free(lines.front() );
 			lines.erase(lines.begin());
-			//lines.pop_front();
 			lrows.erase(lrows.begin());
-			//lrows.pop_front();
 		} else {
 			free(lines.back() );
 			lines.pop_back();
@@ -420,8 +413,8 @@ void TextArea::SetRow(int row)
 
 void TextArea::CalcRowCount()
 {
+	rows = 0;
 	if (lines.size() != 0) {
-		rows = 0;
 		for (size_t i = 0; i < lines.size(); i++) {
 			rows++;
 			int tr = 0;
@@ -517,6 +510,7 @@ void TextArea::OnMouseUp(unsigned short x, unsigned short y,
 /** Copies the current TextArea content to another TextArea control */
 void TextArea::CopyTo(TextArea* ta)
 {
+	ta->Clear();
 	for (size_t i = 0; i < lines.size(); i++) {
 		ta->SetText( lines[i], -1 );
 	}
@@ -559,18 +553,18 @@ bool TextArea::SetEvent(int eventType, EventHandler handler)
 
 void TextArea::PadMinRow()
 {
-	int rows = 0;
+	int row = 0;
 	int i=lines.size()-1;
 	//minrow -1 ->gap
 	//minrow -2 ->npc text
 	while(i>=minrow-2 && i>=0) {
-		rows+=lrows[i];
+		row+=lrows[i];
 		i--;
 	}
-	rows = GetVisibleRowCount()-rows;
-	while(rows>0) {
+	row = GetVisibleRowCount()-row;
+	while(row>0) {
 		AppendText("",-1);
-		rows--;
+		row--;
 	}
 }
 
@@ -578,6 +572,15 @@ void TextArea::SetPreservedRow(int arg)
 {
 	keeplines=arg;
 	Flags |= IE_GUI_TEXTAREA_HISTORY;
+}
+
+void TextArea::Clear()
+{
+	for (size_t i = 0; i < lines.size(); i++) {
+		free( lines[i] );
+	}
+	lines.clear();
+	lrows.clear();
 }
 
 //setting up the textarea for smooth scrolling, the first
@@ -588,8 +591,7 @@ void TextArea::SetupScroll()
 	smooth = Height;
 	startrow = 0;
 	//clearing the textarea
-	SetMinRow(true);
-	PopMinRow();
+	Clear();
 	RunEventHandler( TextAreaOutOfText );
 	//turning on smoothscrolling if text was provided
 	if (lines.size()) {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.34 2005/08/14 17:52:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.35 2005/08/15 15:55:39 avenger_teambg Exp $
  *
  */
 
@@ -3796,6 +3796,12 @@ void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Container *container = core->GetCurrentContainer();
+	if (!container) {
+		printMessage("GameScript","No container selected!", YELLOW);
+		Sender->CurrentAction = NULL;
+		return;
+	}
+
 	double distance = Distance(Sender, container);
 	double needed = MAX_OPERATING_DISTANCE;
 	if (container->Type==IE_CONTAINER_PILE) {

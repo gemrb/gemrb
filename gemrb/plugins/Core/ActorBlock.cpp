@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.108 2005/08/14 17:29:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.109 2005/08/15 15:55:39 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -458,6 +458,9 @@ void Moveble::DoStep()
 	if (!step->Next) {
 		ClearPath();
 		NewOrientation = Orientation;
+		//since clearpath no longer sets currentaction to NULL
+		//we set it here
+		CurrentAction = NULL;
 		return;
 	}
 	if (step->Next->x > step->x)
@@ -540,7 +543,11 @@ void Moveble::ClearPath()
 	}
 	path = NULL;
 	step = NULL;
-	CurrentAction = NULL;
+	//don't do this, certain blocking actions call ClearPath
+	//but they couldn't block if CurrentAction is cleared
+	//if you need to break the current action, do it additionally to
+	//clearpath (most likely you will need ClearActions() anyway)
+	//CurrentAction = NULL;
 }
 
 static unsigned long tp_steps[8]={3,2,1,0,1,2,3,4};

@@ -82,7 +82,7 @@ def UpdateControlStatus():
 	MessageWindow = GemRB.GetVar ("MessageWindow")
 
 	GemRB.LoadWindowPack(GetWindowPack())
-	GemRB.HideGUI()
+	hideflag = GemRB.HideGUI()
 	if Expand == GS_LARGEDIALOG:
 		GemRB.SetVar ("PortraitWindow", -1)
 		TMessageWindow = GemRB.LoadWindow(7)
@@ -94,6 +94,7 @@ def UpdateControlStatus():
 
 
 	GemRB.SetTextAreaFlags(TMessageWindow, TMessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
+	GemRB.SetTAHistory(TMessageWindow, TMessageTA, 100)
 
 	MessageTA = GemRB.GetVar ("MessageTextArea")
 	if MessageWindow>0 and MessageWindow!=TMessageWindow:
@@ -101,6 +102,8 @@ def UpdateControlStatus():
 		GemRB.UnloadWindow(MessageWindow)
 	GemRB.SetVar ("MessageWindow", TMessageWindow)
 	GemRB.SetVar ("MessageTextArea", TMessageTA)
-	GemRB.UnhideGUI()
+
+	if hideflag:
+		GemRB.UnhideGUI()
 	return
 

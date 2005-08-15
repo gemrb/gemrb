@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.82 2005/07/23 19:49:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.83 2005/08/15 15:55:39 avenger_teambg Exp $
  *
  */
 
@@ -316,5 +316,7 @@ public:
 	void SetColor( ieDword idx, ieDword grd);
 	void RemoveTimedEffects();
 	bool Schedule(ieDword gametime);
+	/* overridden method, won't walk if dead */
+	void WalkTo(Point &Des, int MinDistance = 0);
 };
 #endif

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.343 2005/08/14 19:07:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.344 2005/08/15 15:55:39 avenger_teambg Exp $
  *
  */
 
@@ -1691,8 +1691,9 @@ int Interface::SetCreatureStat(unsigned int Slot, unsigned int StatID,
 void Interface::RedrawControls(char *varname, unsigned int value)
 {
 	for (unsigned int i = 0; i < windows.size(); i++) {
-		if (windows[i] != NULL) {
-			windows[i]->RedrawControls(varname, value);
+		Window *win = windows[i];
+		if (win != NULL && win->Visible!=-1) {
+			win->RedrawControls(varname, value);
 		}
 	}
 }
@@ -1700,8 +1701,9 @@ void Interface::RedrawControls(char *varname, unsigned int value)
 void Interface::RedrawAll()
 {
 	for (unsigned int i = 0; i < windows.size(); i++) {
-		if (windows[i] != NULL) {
-			windows[i]->Invalidate();
+		Window *win = windows[i];
+		if (win != NULL && win->Visible!=-1) {
+			win->Invalidate();
 		}
 	}
 }
@@ -2141,26 +2143,25 @@ void Interface::DrawWindows(void)
 		ModalWindow->DrawWindow();
 		return;
 	}
-	std::vector< int>::reverse_iterator t = topwin.rbegin();
 	size_t i = topwin.size();
 	while(i--) {
-		if ( (unsigned int) ( *t ) >=windows.size() )
+		unsigned int t = topwin[i];
+
+		if ( t >=windows.size() )
 			continue;
+
 		//visible ==1 or 2 will be drawn
-		Window* win = windows[(*t)];
+		Window* win = windows[t];
 		if (win != NULL) {
 			if (win->Visible == -1) {
 				topwin.erase(topwin.begin()+i);
-				//evntmgr->DelWindow( win->WindowID, win->WindowPack );
 				evntmgr->DelWindow( win );
 				delete win;
-				windows[(*t)]=NULL;
-			}
-			else if (win->Visible) {
-				windows[( *t )]->DrawWindow();
+				windows[t]=NULL;
+			} else if (win->Visible) {
+				win->DrawWindow();
 			}
 		}
-		++t;
 	}
 }
 
