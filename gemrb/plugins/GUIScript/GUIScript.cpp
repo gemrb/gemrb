@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.333 2005/08/14 17:52:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.334 2005/08/15 20:29:17 avenger_teambg Exp $
  *
  */
 
@@ -282,14 +282,14 @@ static PyObject* GemRB_MoveTAText(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_RewindTA__doc,
-"RewindTA(Win, Ctrl)\n\n"
-"Sets up a TextArea for scrolling.");
+"RewindTA(Win, Ctrl, Ticks)\n\n"
+"Sets up a TextArea for scrolling. Ticks is the delay between the steps in scrolling.\n\n");
 
 static PyObject* GemRB_RewindTA(PyObject * /*self*/, PyObject* args)
 {
-	int Win, Ctrl;
+	int Win, Ctrl, Ticks;
 
-	if (!PyArg_ParseTuple( args, "ii", &Win, &Ctrl)) {
+	if (!PyArg_ParseTuple( args, "iii", &Win, &Ctrl, &Ticks)) {
 		return AttributeError( GemRB_RewindTA__doc );
 	}
 
@@ -298,7 +298,7 @@ static PyObject* GemRB_RewindTA(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	ctrl->SetupScroll();
+	ctrl->SetupScroll(Ticks);
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -353,19 +353,20 @@ static PyObject* GemRB_StatComment(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetString__doc,
-"GetString(strref) => string\n\n"
-"Returns string for given strref." );
+"GetString(strref[,flags]) => string\n\n"
+"Returns string for given strref. " );
 
 static PyObject* GemRB_GetString(PyObject * /*self*/, PyObject* args)
 {
 	ieStrRef strref;
+	int flags = 0;
 	PyObject* ret;
 
-	if (!PyArg_ParseTuple( args, "i", &strref )) {
+	if (!PyArg_ParseTuple( args, "i|i", &strref, &flags )) {
 		return AttributeError( GemRB_GetString__doc );
 	}
 
-	char *text = core->GetString( strref );
+	char *text = core->GetString( strref, flags );
 	ret=PyString_FromString( text );
 	free( text );
 	return ret;
@@ -1107,7 +1108,7 @@ static PyObject* GemRB_TextAreaAppend(PyObject * /*self*/, PyObject* args)
 			ret = ta->AppendText( string, Row );
 		} else {
 			StrRef = PyInt_AsLong( str );
-			char* str = core->GetString( StrRef );
+			char* str = core->GetString( StrRef, IE_STR_SOUND | IE_STR_SPEECH );
 			ret = ta->AppendText( str, Row );
 			free( str );
 		}
@@ -1138,7 +1139,7 @@ static PyObject* GemRB_TextAreaClear(PyObject * /*self*/, PyObject* args)
 		if (!ta) {
 			return NULL;
 		}
-		ta->PopLines( ta->GetRowCount() );
+		ta->Clear();
 	} else {
 		return NULL;
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.78 2005/08/15 15:55:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.79 2005/08/15 20:29:17 avenger_teambg Exp $
  *
  */
 
@@ -65,6 +65,28 @@ TextArea::~TextArea(void)
 
 void TextArea::Draw(unsigned short x, unsigned short y)
 {
+	//this might look better in GlobalTimer
+	//or you might want to change the animated button to work like this
+	if (Flags &IE_GUI_TEXTAREA_SMOOTHSCROLL)
+	{
+		unsigned long thisTime;
+
+		GetTime( thisTime);
+		if (thisTime>starttime) {
+			starttime = thisTime+ticks;
+			smooth--;
+			while (smooth<=0) {
+				smooth+=ftext->maxHeight;
+				if (startrow<rows) {
+					startrow++;
+				}
+			}
+			Changed = true;
+			( ( Window * ) Owner )->Changed = true;
+			( ( Window * ) Owner )->Invalidate();
+		}
+	}
+
 	if (!Changed && !((Window*)Owner)->Floating) {
 		return;
 	}
@@ -275,12 +297,6 @@ int TextArea::AppendText(const char* text, int pos)
 		DiscardLines();
 	}
 
-	if (Flags&IE_GUI_TEXTAREA_SMOOTHSCROLL) {
-		while (smooth<-ftext->maxHeight) {
-			smooth+=ftext->maxHeight;
-			startrow++;
-		}
-	}
 	UpdateControls();
 	return ret;
 }
@@ -585,16 +601,24 @@ void TextArea::Clear()
 
 //setting up the textarea for smooth scrolling, the first
 //TEXTAREA_OUTOFTEXT callback is called automatically
-void TextArea::SetupScroll()
+void TextArea::SetupScroll(unsigned long tck)
 {
 	SetPreservedRow(0);
-	smooth = Height;
+	smooth = ftext->maxHeight;
 	startrow = 0;
+	ticks = tck;
 	//clearing the textarea
 	Clear();
-	RunEventHandler( TextAreaOutOfText );
-	//turning on smoothscrolling if text was provided
-	if (lines.size()) {
-		Flags |= IE_GUI_TEXTAREA_SMOOTHSCROLL;
+	int i = Height/smooth;
+	while(i--) {
+		char *str = (char *) malloc(1);
+		str[0]=0;
+		lines.push_back(str);
+		lrows.push_back(0);
 	}
+	Flags |= IE_GUI_TEXTAREA_SMOOTHSCROLL;
+	GetTime( starttime );
+	RunEventHandler( TextAreaOutOfText );
+	//recalculates rows
+	AppendText("",-1);
 }

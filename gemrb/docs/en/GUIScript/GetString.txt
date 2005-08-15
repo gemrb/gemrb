@@ -1,9 +1,16 @@
 
-Prototype: GemRB.GetString(Strref)
+Prototype: GemRB.GetString(Strref, Flags)
 
 Description: Returns string for given strref. Usually, you don't need to resolve a string before use, you can use SetText with an strref parameter. This command lets you alter the string. For example, if you want to add a level value, you'll need this.
 
 Parameters: Strref - a string index from the dialog.tlk table.
+             Flags - a bitfield
+
+Values for the flags:
+1   - strref on
+2   - play attached sound
+4   - speech (stop previous sound)
+256 - strref off (overrides cfg)
 
 Return value: A string with resolved tokens. To resolve %d's, you must either use StatComment, or do it manually.
 

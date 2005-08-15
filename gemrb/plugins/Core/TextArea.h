@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.26 2005/08/15 15:55:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.27 2005/08/15 20:29:17 avenger_teambg Exp $
  *
  */
 
@@ -72,12 +72,12 @@ public:
 	/** Deletes last lines up to current 'minrow' */
 	void PopMinRow()
 	{
-	      	PopLines(lines.size()-minrow);
+		PopLines(lines.size()-minrow);
 	}
 	/** adds empty lines so minrow will be the uppermost visible row */
 	void PadMinRow();
-	/** Sets up scrolling */
-	void SetupScroll();
+	/** Sets up scrolling, tck is the scrolling speed */
+	void SetupScroll(unsigned long tck);
 	/** Sets the Fonts */
 	void SetFonts(Font* init, Font* text);
 	/** Returns Number of Rows */
@@ -109,7 +109,11 @@ private: // Private attributes
 	/** lines to be kept even if scrolled out */
 	int keeplines;
 	/** vertical offset for smooth scrolling */
-	unsigned short smooth;
+	short smooth;
+	/** timer for scrolling */
+	unsigned long starttime;
+	/** timer ticks for scrolling (speed) */
+	unsigned long ticks;
 	/** Number of Text Rows */
 	int rows;
 	/** Starting Row */
