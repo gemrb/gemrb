@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.62 2005/05/14 11:18:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.63 2005/08/15 20:20:15 avenger_teambg Exp $
  *
  */
 
@@ -53,8 +53,10 @@ static int isWAVC(DataStream* stream)
 	char Signature[4];
 	stream->Read( Signature, 4 );
 	stream->Seek( 0, GEM_STREAM_START );
+#ifdef HAS_VORBIS_SUPPORT
 	if(strnicmp(Signature, "oggs", 4) == 0)
 		return SND_READER_OGG;
+#endif
 	if(strnicmp(Signature, "RIFF", 4) == 0)
 		return SND_READER_WAV; //wav
 	/*
@@ -323,6 +325,11 @@ ALuint ACMImp::LoadSound(const char *ResRef, int *time_length)
 
 	CSoundReader* acm;
 	acm = CreateSoundReader( stream, type, stream->Size(), true );
+	if (!acm) {
+		printMessage( "ACMImp::Play","Can't create sound reader. ", LIGHT_RED );
+		delete( stream );
+		return 0;
+	}
 	int cnt = acm->get_length();
 	int riff_chans = acm->get_channels();	
 	int samplerate = acm->get_samplerate();
