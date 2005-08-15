@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.48 2005/06/19 22:59:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.49 2005/08/15 20:17:50 avenger_teambg Exp $
  *
  */
 
@@ -36,12 +36,12 @@ TLKImp::TLKImp(void)
 		TableMgr * tab;
 
 		int table=core->LoadTable("months");
-		if(table<0) {
+		if (table<0) {
 			monthnamecount=-1;
 			return;
 		}
 		tab = core->GetTable(table);
-		if(!tab) {
+		if (!tab) {
 			monthnamecount=-1;
 			goto end;
 		}
@@ -100,14 +100,14 @@ inline char* mystrncpy(char* dest, const char* source, int maxlength,
 }
 
 /* -1   - GABBER
-    0   - PROTAGONIST
-    1-9 - PLAYERx
+		0   - PROTAGONIST
+		1-9 - PLAYERx
 */
 inline Actor *GetActorFromSlot(int slot)
 {
-	if(slot==-1) {
+	if (slot==-1) {
 		GameControl *gc = core->GetGameControl();
-		if(gc) {
+		if (gc) {
 			return gc->speaker;
 		}
 		return NULL;
@@ -116,7 +116,7 @@ inline Actor *GetActorFromSlot(int slot)
 	if (!game) {
 		return NULL;
 	}
-	if(slot==0) {
+	if (slot==0) {
 		return game->GetPC(0, false); //protagonist
 	}
 	return game->FindPC(slot);
@@ -139,17 +139,17 @@ int TLKImp::RaceStrRef(int slot)
 	int race;
 
 	act=GetActorFromSlot(slot);
-	if(act) {
+	if (act) {
 		race=act->GetStat(IE_RACE);
 	} else {
 		race=0;
 	}
 	int table = core->LoadTable("races");
-	if(table<0) {
+	if (table<0) {
 		return -1;
 	}
 	TableMgr *tab=core->GetTable(table);
-	if(!tab) {
+	if (!tab) {
 		return -1;
 	}
 	//don't unload table because we'll load it again soon anyway
@@ -161,7 +161,7 @@ int TLKImp::GenderStrRef(int slot, int malestrref, int femalestrref)
 	Actor *act;
 
 	act = GetActorFromSlot(slot);
-	if(act && (act->GetStat(IE_SEX)==2) ) {
+	if (act && (act->GetStat(IE_SEX)==2) ) {
 		return femalestrref;
 	}
 	return malestrref;
@@ -172,7 +172,7 @@ void TLKImp::GetMonthName(int dayandmonth)
 	int month=1;
 
 	for(int i=0;i<monthnamecount;i++) {
-		if(dayandmonth<days[i]) {
+		if (dayandmonth<days[i]) {
 			char *tmp;
 			char tmpstr[10];
 			
@@ -189,7 +189,7 @@ void TLKImp::GetMonthName(int dayandmonth)
 		}
 		dayandmonth-=days[i];
 		//ignoring single days (they are not months)
-		if(days[i]!=1) month++;
+		if (days[i]!=1) month++;
 	}
 }
 
@@ -214,7 +214,7 @@ int TLKImp::BuiltinToken(char* Token, char* dest)
 		Decoded = GetString( 10086, 0 );
 		goto exit_function;
 	}
-	if(!strcmp( Token, "GABBER" )) {
+	if (!strcmp( Token, "GABBER" )) {
 		//don't free this!
 		Decoded=core->GetGameControl()->speaker->LongName;
 		freeup = false;
@@ -467,13 +467,18 @@ char* TLKImp::GetString(ieStrRef strref, unsigned int flags)
 		//if flags&IE_STR_SOUND play soundresref
 		if (SoundResRef[0] != 0) {
 			Scriptable *target=core->GetGameControl()->target;
-			if(!target) {
+			if (!target) {
 				target=core->GetGameControl()->speaker;
 			}
-			if(target) {
-				//IE_STR_SPEECH will stop the previous sound source
-				core->GetSoundMgr()->Play( SoundResRef, target->Pos.x, target->Pos.y, flags & IE_STR_SPEECH);
+			int xpos = 0;
+			int ypos = 0;
+			if (target) {
+				xpos = target->Pos.x;
+				ypos = target->Pos.y;
 			}
+			//IE_STR_SPEECH will stop the previous sound source
+			core->GetSoundMgr()->Play( SoundResRef, xpos, ypos, flags & IE_STR_SPEECH);
+			//core->GetSoundMgr()->Play( SoundResRef, target->Pos.x, target->Pos.y, flags & IE_STR_SPEECH);
 		}
 	}
 	if (flags & IE_STR_STRREFON) {
