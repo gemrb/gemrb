@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.322 2005/07/24 15:52:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.323 2005/08/15 15:16:53 avenger_teambg Exp $
  *
  */
 
@@ -2326,15 +2326,18 @@ Targets *GameScript::NearestPC(Scriptable* Sender, Targets *parameters)
 	Actor *ac = NULL;
 	while (i--) {
 		Actor *newactor=game->GetPC(i,true);
+		//NearestPC for PC's will not give themselves as a result
+		//this might be different from the original engine
+		if ((Sender->Type==ST_ACTOR) && (newactor == (Actor *) Sender)) {
+			continue;
+		}
 		if (newactor->GetCurrentArea()!=map) {
 			continue;
 		}
-		int dist = Distance(Sender, ac);
-		if (ac->InParty) {
-			if ( (mindist == -1) || (dist<mindist) ) {
-				ac = newactor;
-				mindist = dist;
-			}
+		int dist = Distance(Sender, newactor);
+		if ( (mindist == -1) || (dist<mindist) ) {
+			ac = newactor;
+			mindist = dist;
 		}
 	}
 	if (ac) {
