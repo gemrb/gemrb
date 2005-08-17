@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.17 2005/04/06 21:43:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/DLGImporter/DLGImp.cpp,v 1.18 2005/08/17 18:29:29 avenger_teambg Exp $
  *
  */
 
@@ -175,6 +175,12 @@ DialogString* DLGImp::GetStateTrigger(unsigned int index)
 	ieDword Offset, Length;
 	str->ReadDword( &Offset );
 	str->ReadDword( &Length );
+	//a zero length trigger counts as no trigger
+	//a // comment counts as true(), so we simply ignore zero
+	//length trigger text like it isn't there
+	if (!Length) {
+		return NULL;
+	}
 	DialogString* ds = new DialogString();
 	str->Seek( Offset, GEM_STREAM_START );
 	char* string = ( char* ) malloc( Length + 1 );
