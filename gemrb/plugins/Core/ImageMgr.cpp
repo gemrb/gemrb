@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ImageMgr.cpp,v 1.5 2005/06/22 21:21:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ImageMgr.cpp,v 1.6 2005/08/20 16:54:56 avenger_teambg Exp $
  *
  */
 
@@ -55,6 +55,7 @@ Color ImageMgr::GetPixelSum(unsigned int xbase, unsigned int ybase, unsigned int
 	sum.r=r/count;
 	sum.g=g/count;
 	sum.b=b/count;
+	sum.a=0;
 	return sum;
 }
 
