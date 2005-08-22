@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIMG.py,v 1.1 2004/12/04 12:33:42 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIMG.py,v 1.2 2005/08/22 11:50:30 avenger_teambg Exp $
 
 
 # GUIMG.py - scripts to control mage spells windows from GUIMG winpack
@@ -84,7 +84,7 @@ def OpenMageWindow ():
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 
 	# Setup book spells buttons
-	for i in range (24):
+	for i in range (20):
 		Button = GemRB.GetControl (Window, 27 + i)
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 
@@ -147,7 +147,7 @@ def UpdateMageWindow ():
 
 
 	known_cnt = GemRB.GetKnownSpellsCount (pc, type, level)
-	for i in range (24):
+	for i in range (20):
 		Button = GemRB.GetControl (Window, 27 + i)
 		if i < known_cnt:
 			ks = GemRB.GetKnownSpell (pc, type, level, i)
