@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.42 2005/07/20 21:46:26 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.43 2005/08/22 10:08:46 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -1218,8 +1218,8 @@ def OpenLevelUpWindow ():
 
 	# Displaying level up info
 	overview = ""
-	overview = overview + str (ConHPBon) + " " + GemRB.GetString (38727) + '\n'
 	overview = overview + str (HPGained) + " " + GemRB.GetString (38713) + '\n'
+	overview = overview + str (ConHPBon) + " " + GemRB.GetString (38727) + '\n'
 
 	if SavThrUpdated:
 		overview = overview + GemRB.GetString (38719) + '\n'
