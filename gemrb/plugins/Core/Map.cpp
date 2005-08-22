@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.185 2005/08/13 19:20:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.186 2005/08/22 21:52:57 avenger_teambg Exp $
  *
  */
 
@@ -630,23 +630,27 @@ void Map::DrawMap(Region screen, GameControl* gc)
 				//continue;
 			}
 			//0 means opaque
-			int Trans = actor->Modified[IE_TRANSLUCENT] * 255 / 100;
-			if (Trans>255) Trans=255;
+			int Trans = actor->Modified[IE_TRANSLUCENT];
+			//int Trans = actor->Modified[IE_TRANSLUCENT] * 255 / 100;
+			if (Trans>255) {
+				 Trans=255;
+			}
 			int State = actor->Modified[IE_STATE_ID];
 			if (State&STATE_INVISIBLE) {
-				//friendlies are half transparent
+				//enemies are fully invisible if invis flag 2 set
+				if (actor->Modified[IE_EA]>128) {
+					if (State&STATE_INVIS2)
+						Trans=256;
+					else
+						Trans=128;
+				} else {
+					Trans=256;
+				}
+			}
+			//friendlies are half transparent at best
+			if (Trans>128) {
 				if (actor->Modified[IE_EA]<6) {
 					Trans=128;
-				} else {
-					//enemies are fully invisible if invis flag 2 set
-					if (actor->Modified[IE_EA]>128) {
-						if (State&STATE_INVIS2)
-							Trans=256;
-						else
-							Trans=128;
-					} else {
-						Trans=256;
-					}
 				}
 			}
 			//no visual feedback
