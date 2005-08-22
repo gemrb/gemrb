@@ -1,8 +1,10 @@
-GemRB V0.2.5 (2005-08-13):
+GemRB V0.2.5 (2005-08-22):
   New features:
     - Save game
     - Effects are now loaded
     - Equipping effects in items
+    - Spawn points in areas
+    - Textscreen (scrolled text between chapters)
 
   Improved features:
     - GameScript is now much more reliable: Action override works, triggers fire once and then get cleared
