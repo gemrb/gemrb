@@ -76,11 +76,12 @@ void decodeFrame16(unsigned char* pFrame, unsigned char* pMap, int mapRemain,
 
 		FramePtr += 7 * g_width;
 	}
-
+/*
 	if (( length - ( pData - pOrig ) ) != 0) {
 		fprintf( stderr, "DEBUG: junk left over: %d,%d,%d\n",
 			( pData - pOrig ), length, ( length - ( pData - pOrig ) ) );
 	}
+*/
 }
 
 static unsigned short GETPIXEL(unsigned char** buf, int off)
