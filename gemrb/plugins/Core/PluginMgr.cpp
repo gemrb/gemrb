@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.18 2005/08/14 20:15:12 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.19 2005/08/22 10:02:33 avenger_teambg Exp $
  *
  */
 
@@ -42,6 +42,7 @@ typedef char*(* charvoid)(void);
 typedef ClassDesc*(* cdvoid)(void);
 
 #ifdef HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST
+#include <assert.h>
 typedef void *(* voidvoid)(void);
 inline voidvoid my_dlsym(void *handle, const char *symbol)
 {
