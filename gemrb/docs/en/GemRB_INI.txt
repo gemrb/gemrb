@@ -1,6 +1,6 @@
 GAME-SPECIFIC CONFIGURATION FILE GEMRB.INI
 ******************************************
-$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/GemRB_INI.txt,v 1.1 2005/05/18 20:00:57 edheldil Exp $
+$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/GemRB_INI.txt,v 1.2 2005/08/22 23:10:17 edheldil Exp $
 
 Contents
 --------
@@ -184,3 +184,21 @@ ReverseDoor = <bool>
 ProtagonistTalks = <bool>
 - - - - - - - - - - - - -
 If set to 1, only protagonist speaks with stranger for the whole party (PST).
+
+
+HasKaputz = <bool>
+- - - - - - - - - -
+
+
+IWDMapDimensions = <bool>
+- - - - - - - - - - - - -
+
+
+IWD2ScriptName = <bool>
+- - - - - - - - - - - -
+
+
+DialogueScrolls = <bool>
+- - - - - - - - - - - - -
+If set to 1, dialogue window behaves as in PS:T - i.e. talk between 
+Nameless One and others is appended into the window as it comes. If set to 0 (default) each new pair of NPC's talk and Nameless One's replies is written from the start of the page, like in BG2.

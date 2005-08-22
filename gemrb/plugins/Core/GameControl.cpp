@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.250 2005/08/13 10:50:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.251 2005/08/22 23:10:17 edheldil Exp $
  */
 
 #ifndef WIN32
@@ -1520,6 +1520,9 @@ void GameControl::DialogChoose(unsigned int choose)
 
 		if (tr->textStrRef != 0xffffffff) {
 			core->DisplayStringName( tr->textStrRef, 0x8080FF, speaker);
+			if (core->HasFeature( GF_DIALOGUE_SCROLLS )) {
+				ta->AppendText( "", -1 );
+			}
 		}
 
 		if (tr->action) {
@@ -1614,7 +1617,12 @@ void GameControl::DialogChoose(unsigned int choose)
 	}
 end_of_choose:
 	//padding the rows so our text will be at the top
-	ta->PadMinRow();
+	if (core->HasFeature( GF_DIALOGUE_SCROLLS )) {
+		ta->AppendText( "", -1 );
+	}
+	else {
+		ta->PadMinRow();
+	}
 	// is this correct?
 	if (DialogueFlags & DF_FREEZE_SCRIPTS) {
 		target->ProcessActions();
