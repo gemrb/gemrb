@@ -1,33 +1,79 @@
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/Release.txt,v 1.2 2005/02/13 20:31:18 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/Release.txt,v 1.3 2005/08/24 00:37:45 edheldil Exp $
 
 
 How to make a release
 *********************
 
-* Make sure that version number in configure.in is correct
-  for the upcoming version. For the time being, set various version
-  numbers in gemrb/include/globals.h as well.
+Preparing and testing CVS
+=========================
 
-* Update ChangeLog with highlights since the last release 
+* Make sure that version numbers in 
+    configure.in
+    gemrb/include/globals.h 
+  are correct for the upcoming version.
 
-* Make sure that GemRB CVS is in compilable and running state
-  i.e. download a clean CVS tree and test it.
+* Update NEWS with highlights since the last release 
 
-  Make distribution .tar.gz  (make dist) and test it as well -
-  - especially make sure all needed files are included.
+* Update ChangeLog with entry about release
+
+* Make sure that GemRB CVS is in compilable and runnable state
+
+  - download a clean CVS tree and test it.
+
+  - Make distribution .tar.gz  (make dist) and test it as well -
+    especially make sure all needed files are included.
 
 * Tag current CVS to version number e.g. GEMRB_0_2_3
+  i.e. in the gemrb root directory do
+    cvs tag GEMRB_0_2_3
 
 * Update from CVS to the tagged version
+
+
+Source release
+==============
 
 * on Unix/Linux: 
   ./autogen.sh
   make dist
 
-* To be defined: Windows binary 
+
+Linux binary release
+====================
+
+  ./autogen.sh
+  ./configure
+  make
+  make install DESTDIR=/tmp/fakeroot
+  cd /tmp/fakeroot/usr/local
+  copy ~/GemRB-binary.cfg over etc/GemRB.cfg, rename to etc/gemrb.cfg
+  strip bin/gemrb lib/* lib/gemrb/*
+  sudo chown -R 0:0 *
+  sudo tar cvzf ../gemrb-0.2.5-linux_i386.tar.gz *
+
+
+Windows binary release
+======================
+
+* FIXME: To be defined....
+
+
+Release and Announcements
+=========================
 
 * Put the tarballs/binaries into Releases on SF
+  Source pkg details:
+    Release name: GemRB 0.2.5 Sources
+    File name: gemrb-0.2.5.tar.gz
+    Processor: platform-independent ; Type: Source .gz
 
-* Announce on homepage & SF
+  Binary pkg details: 
+    Release name: GemRB 0.2.5 Linux/i386
+    File name: gemrb-0.2.5-linux_i386.tar.gz
+    Processor: i386 ; Type:
+
+* Test the downloads from sourceforge.net
+
+* Announce on homepage, SF, #GemRB in channel and title, Gibberlings3
 
 * Possibly announce on Freshmeat/Happypenguin
