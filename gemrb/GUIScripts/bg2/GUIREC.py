@@ -16,29 +16,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.14 2005/06/17 22:08:37 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.15 2005/08/25 10:38:10 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
-
-# GUIREC:
-# 0,1,2 - sommon windows (time, message, menu)
-# 3 - main statistics window
-# 4 - level up win
-# 5 - info - kills, weapons ...
-# 6 - dual class list ???
-# 7 - class panel
-# 8 - skills panel
-# 9 - choose mage spells panel
-# 10 - some small win, 1 button
-# 11 - some small win, 2 buttons
-# 12 - biography?
-# 13 - specialist mage panel
-# 14 - proficiencies
-# 15 - some 2 panel window
-# 16 - some 2 panel window
-# 17 - some 2 panel window
-
 
 ###################################################
 import string
@@ -130,6 +111,7 @@ def OpenRecordsWindow ():
 	GemRB.SetVisible (Window, 1)
 	GemRB.SetVisible (PortraitWindow, 1)
 	return
+
 
 def UpdateRecordsWindow ():
 	global stats_overview, alignment_help
@@ -238,10 +220,14 @@ def UpdateRecordsWindow ():
 	GemRB.SetText (Window, Text, stats_overview)
 	return
 
+
 def GetStatOverview (pc):
-	won = "[color=FFFFFF]"
-	woff = "[/color]"
-	str_None = GemRB.GetString (41275)
+	#dunno if bg2 has colour highlights
+	#won = "[color=FFFFFF]"
+	#woff = "[/color]"
+	won = ""
+	woff = ""
+	str_None = GemRB.GetString (61560)
 	
 	GS = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s)
 
@@ -251,17 +237,46 @@ def GetStatOverview (pc):
 	# Next Level: <NEXTLEVEL>
 
 	Main = GemRB.GetString (16480)
+	stats.append (None)
 
-	# 67049 AC Bonuses
-	stats.append (67049)
-	#   14079 AC vs. Slashing
-	stats.append ((14079, GS (IE_ACSLASHINGMOD), ''))
-	#   14081 AC vs. Piercing
-	stats.append ((14081, GS (IE_ACPIERCINGMOD), ''))
-	#   14080 AC vs. Crushing
-	stats.append ((14080, GS (IE_ACCRUSHINGMOD), ''))
-	#   14082 AC vs. Missile
-	stats.append ((14082, GS (IE_ACMISSILEMOD), ''))
+	stats.append (8442)
+	stats.append ( (61932, GS (IE_THAC0), '') )
+	stats.append ( (9457, GS (IE_THAC0), '') )
+	stats.append ( (9458, GS (IE_NUMBEROFATTACKS), '') )
+	stats.append ( (9459, GS(IE_LORE), '') )
+	reptxt = GetReputation (GemRB.GameGetReputation()/10)
+	stats.append ( (9465, reptxt, '') )
+	stats.append ( (12126, GS(IE_TURNUNDEADLEVEL), '') )
+	stats.append ( (12127, GS(IE_LAYONHANDSAMOUNT), '') )
+	stats.append (2078)
+	stats.append (None)
+
+
+	#   17379 Saving Throws
+	stats.append (17379)
+	#   17380 Death
+	stats.append ( (17380, GS (IE_SAVEVSDEATH), '') )
+	#   17381 
+	stats.append ( (17381, GS (IE_SAVEVSWANDS), '') )
+	#   17382 AC vs. Crushing
+	stats.append ( (17382, GS (IE_SAVEVSPOLY), '') )
+	#   17383 Rod
+	stats.append ( (17383, GS (IE_SAVEVSBREATH), '') )
+	#   17384 Spells
+	stats.append ( (17384, GS (IE_SAVEVSSPELL), '') )
+	stats.append (None)
+
+
+	# 11766 AC Bonuses
+	stats.append (11766)
+	#   11770 AC vs. Crushing
+	stats.append ((11770, GS (IE_ACCRUSHINGMOD), ''))
+	#   11767 AC vs. Missile
+	stats.append ((11767, GS (IE_ACMISSILEMOD), ''))
+	#   11769 AC vs. Piercing
+	stats.append ((11769, GS (IE_ACPIERCINGMOD), ''))
+	#   11768 AC vs. Slashing
+	stats.append ((11768, GS (IE_ACSLASHINGMOD), ''))
 	stats.append (None)
 
 	
@@ -309,30 +324,10 @@ def GetStatOverview (pc):
 	stats.append ((4214, GS (IE_PICKPOCKET), ''))
 	#   4215 Tracking
 	stats.append ((4215, GS (IE_TRACKING), ''))
-	#   4216 Reputation
-	stats.append ((4216, GS (IE_REPUTATION), ''))
-	#   4217 Turn Undead Level
-	stats.append ((4217, GS (IE_TURNUNDEADLEVEL), ''))
-	#   4218 Lay on Hands Amount
-	stats.append ((4218, GS (IE_LAYONHANDSAMOUNT), ''))
 	#   4219 Backstab Damage
 	stats.append ((4219, GS (IE_BACKSTABDAMAGEMULTIPLIER), ''))
 	stats.append (None)
 
-	# 4221 Saving Throws
-	stats.append (4221)
-	#   4222 Paralyze/Poison/Death
-	stats.append ((4222, GS (IE_SAVEVSDEATH), ''))
-	#   4223 Rod/Staff/Wand
-	stats.append ((4223, GS (IE_SAVEVSWANDS), ''))
-	#   4224 Petrify/Polymorph
-	stats.append ((4224, GS (IE_SAVEVSPOLY), ''))
-	#   4225 Breath Weapon
-	stats.append ((4225, GS (IE_SAVEVSBREATH), ''))
-	#   4226 Spells
-	stats.append ((4226, GS (IE_SAVEVSSPELL), ''))
-	stats.append (None)
-	
 	# 4227 Weapon Proficiencies
 	stats.append (4227)
 	#   55011 Unused Slots
@@ -389,7 +384,15 @@ def GetStatOverview (pc):
 				lines = 0
 
 	return Main + string.join (res, "\n")
-	pass
+
+
+def GetReputation (repvalue):
+	table = GemRB.LoadTable ("reptxt")
+	if repvalue>20:
+		repvalue=20
+	txt = GemRB.GetString (GemRB.GetTableValue (table, repvalue, 0) )
+	GemRB.UnloadTable (table)
+	return txt+"("+str(repvalue)+")"
 
 
 def OpenInformationWindow ():
