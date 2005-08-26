@@ -7,9 +7,6 @@ TextAreaControl = 0
 def OnLoad():
 	global CharGenWindow, TextAreaControl
 
-	for i in range(1,32):
-		GemRB.SetVar("Skill "+str(i),0) #skills
-
 	GemRB.LoadWindowPack("GUICG")
 	CharGenWindow = GemRB.LoadWindow(0)
 	PortraitButton = GemRB.GetControl(CharGenWindow, 12)

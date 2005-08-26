@@ -13,16 +13,16 @@ def OnLoad():
 	CharGenWindow = GemRB.LoadWindow(0)
 	PortraitButton = GemRB.GetControl(CharGenWindow, 12)
 	GemRB.SetButtonFlags(CharGenWindow, PortraitButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
-	PortraitTable = GemRB.LoadTable("pictures")
-	PortraitName = GemRB.GetTableRowName(PortraitTable,GemRB.GetVar("PortraitIndex") )
+	PortraitTable = GemRB.LoadTable ("pictures")
+	PortraitName = GemRB.GetTableRowName (PortraitTable,GemRB.GetVar ("PortraitIndex") )
 	GemRB.SetButtonPicture(CharGenWindow,PortraitButton, PortraitName+"L")
-	GemRB.UnloadTable(PortraitTable)
+	GemRB.UnloadTable (PortraitTable)
 
-	RaceTable = GemRB.LoadTable("races")
-	ClassTable = GemRB.LoadTable("classes")
-	KitTable = GemRB.LoadTable("kitlist")
-	AlignmentTable = GemRB.LoadTable("aligns")
-	AbilityTable = GemRB.LoadTable("ability")
+	RaceTable = GemRB.LoadTable ("races")
+	ClassTable = GemRB.LoadTable ("classes")
+	KitTable = GemRB.LoadTable ("kitlist")
+	AlignmentTable = GemRB.LoadTable ("aligns")
+	AbilityTable = GemRB.LoadTable ("ability")
 
 	GenderButton = GemRB.GetControl(CharGenWindow,0)
 	GemRB.SetText(CharGenWindow,GenderButton,11956)
@@ -80,28 +80,28 @@ def OnLoad():
 
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, 12135, -1)
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
-	if GemRB.GetVar("Gender") == 1:
+	if GemRB.GetVar ("Gender") == 1:
 		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, 1050)
 	else:
 		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, 1051)
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,1048,-1) # new line
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(RaceTable,GemRB.GetVar("Race")-1,2))
+	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(RaceTable,GemRB.GetVar ("Race")-1,2))
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,12136, -1)
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
-	KitIndex = GemRB.GetVar("Class Kit")
+	KitIndex = GemRB.GetVar ("Class Kit")
 	if KitIndex == 0:
-		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(ClassTable,GemRB.GetVar("Class")-1,2))
+		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(ClassTable,GemRB.GetVar ("Class")-1,2))
 	else:
 		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, GemRB.GetTableValue(KitTable, KitIndex,2) )
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,1049, -1)
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
-	v = GemRB.FindTableValue(AlignmentTable,3,GemRB.GetVar("Alignment"))
+	v = GemRB.FindTableValue(AlignmentTable,3,GemRB.GetVar ("Alignment"))
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(AlignmentTable,v,2))
 	for i in range(6):
 		v = GemRB.GetTableValue(AbilityTable, i,2)
 		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, v, -1)
-		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": "+str(GemRB.GetVar("Ability "+str(i))))
+		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": "+str(GemRB.GetVar ("Ability "+str(i))))
 
 	GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
@@ -112,67 +112,76 @@ def OnLoad():
 def NextPress():
 	GemRB.UnloadWindow(CharGenWindow)
 	#set my character up
-	MyChar = GemRB.GetVar("Slot")
+	MyChar = GemRB.GetVar ("Slot")
 	GemRB.CreatePlayer("charbase", MyChar ) 
-	GemRB.SetPlayerStat(MyChar, IE_SEX, GemRB.GetVar("Gender") )
-	GemRB.SetPlayerStat(MyChar, IE_RACE, GemRB.GetVar("Race") )
-	Class=GemRB.GetVar("Class")
-	GemRB.SetPlayerStat(MyChar, IE_CLASS, Class)
-	t=GemRB.GetVar("Alignment")
-	GemRB.SetPlayerStat(MyChar, IE_ALIGNMENT, t)
-	TmpTable=GemRB.LoadTable("repstart")
+	GemRB.SetPlayerStat (MyChar, IE_SEX, GemRB.GetVar ("Gender") )
+	GemRB.SetPlayerStat (MyChar, IE_RACE, GemRB.GetVar ("Race") )
+	Class=GemRB.GetVar ("Class")
+	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
+	t=GemRB.GetVar ("Alignment")
+	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, t)
+	TmpTable=GemRB.LoadTable ("repstart")
 	t=GemRB.GetTableValue(TmpTable,t,0)
-	GemRB.SetPlayerStat(MyChar, IE_REPUTATION, t)
-	GemRB.UnloadTable(TmpTable)
+	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, t)
+	GemRB.UnloadTable (TmpTable)
 
-	TmpTable=GemRB.LoadTable("strtgold")
+	TmpTable=GemRB.LoadTable ("strtgold")
 	t=GemRB.Roll(GemRB.GetTableValue(TmpTable,Class,1),GemRB.GetTableValue(TmpTable,Class,0), GemRB.GetTableValue(TmpTable,Class,2) )
-	GemRB.SetPlayerStat(MyChar, IE_GOLD, t*GemRB.GetTableValue(TmpTable,Class,3) )
-	GemRB.UnloadTable(TmpTable)
+	GemRB.SetPlayerStat (MyChar, IE_GOLD, t*GemRB.GetTableValue(TmpTable,Class,3) )
+	GemRB.UnloadTable (TmpTable)
 
-	GemRB.SetPlayerStat(MyChar, IE_HATEDRACE, GemRB.GetVar("HatedRace") )
-	TmpTable=GemRB.LoadTable("ability")
+	GemRB.SetPlayerStat (MyChar, IE_HATEDRACE, GemRB.GetVar ("HatedRace") )
+	TmpTable=GemRB.LoadTable ("ability")
 	AbilityCount = GemRB.GetTableRowCount(TmpTable)
 	for i in range(AbilityCount):
 		StatID=GemRB.GetTableValue(TmpTable, i,4)
-		GemRB.SetPlayerStat(MyChar, StatID, GemRB.GetVar("Ability "+str(i) ) )
-	GemRB.UnloadTable(TmpTable)
+		GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Ability "+str(i) ) )
+	GemRB.UnloadTable (TmpTable)
 
-	TmpTable=GemRB.LoadTable("weapprof")
+	TmpTable=GemRB.LoadTable ("weapprof")
 	ProfCount = GemRB.GetTableRowCount(TmpTable)
 	for i in range(7,ProfCount):
 		StatID=GemRB.GetTableValue(TmpTable, i, 0)
-		GemRB.SetPlayerStat(MyChar, StatID, GemRB.GetVar("Prof "+str(i) ) )
-	GemRB.UnloadTable(TmpTable)
+		GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Prof "+str(i) ) )
+	GemRB.UnloadTable (TmpTable)
 
-	GemRB.SetPlayerStat(MyChar, IE_HAIR_COLOR, GemRB.GetVar("Color1") )
-	GemRB.SetPlayerStat(MyChar, IE_SKIN_COLOR, GemRB.GetVar("Color2") )
-	GemRB.SetPlayerStat(MyChar, IE_MAJOR_COLOR, GemRB.GetVar("Color4") )
-	GemRB.SetPlayerStat(MyChar, IE_MINOR_COLOR, GemRB.GetVar("Color3") )
-	GemRB.SetPlayerStat(MyChar, IE_METAL_COLOR, 0x1B )
-	GemRB.SetPlayerStat(MyChar, IE_LEATHER_COLOR, 0x16 )
-	GemRB.SetPlayerStat(MyChar, IE_ARMOR_COLOR, 0x17 )
-	GemRB.SetPlayerStat(MyChar, IE_EA, 2 )
-	Str=GemRB.GetVar("Ability 1")
-	GemRB.SetPlayerStat(MyChar, IE_STR, Str)
+	GemRB.SetPlayerStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar ("Color1") )
+	GemRB.SetPlayerStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar ("Color2") )
+	GemRB.SetPlayerStat (MyChar, IE_MAJOR_COLOR, GemRB.GetVar ("Color4") )
+	GemRB.SetPlayerStat (MyChar, IE_MINOR_COLOR, GemRB.GetVar ("Color3") )
+	GemRB.SetPlayerStat (MyChar, IE_METAL_COLOR, 0x1B )
+	GemRB.SetPlayerStat (MyChar, IE_LEATHER_COLOR, 0x16 )
+	GemRB.SetPlayerStat (MyChar, IE_ARMOR_COLOR, 0x17 )
+	GemRB.SetPlayerStat (MyChar, IE_EA, 2 )
+	Str=GemRB.GetVar ("Ability 1")
+	GemRB.SetPlayerStat (MyChar, IE_STR, Str)
 	if Str==18:
-		GemRB.SetPlayerStat(MyChar,IE_STREXTRA,GemRB.GetVar("StrExtra"))
+		GemRB.SetPlayerStat (MyChar,IE_STREXTRA,GemRB.GetVar ("StrExtra"))
 	else:
-		GemRB.SetPlayerStat(MyChar, IE_STREXTRA,0)
+		GemRB.SetPlayerStat (MyChar, IE_STREXTRA,0)
 
-	GemRB.SetPlayerStat(MyChar, IE_INT, GemRB.GetVar("Ability 2"))
-	GemRB.SetPlayerStat(MyChar, IE_WIS, GemRB.GetVar("Ability 3"))
-	GemRB.SetPlayerStat(MyChar, IE_DEX, GemRB.GetVar("Ability 4"))
-	GemRB.SetPlayerStat(MyChar, IE_CON, GemRB.GetVar("Ability 5"))
-	GemRB.SetPlayerStat(MyChar, IE_CHR, GemRB.GetVar("Ability 6"))
+	GemRB.SetPlayerStat (MyChar, IE_INT, GemRB.GetVar ("Ability 2"))
+	GemRB.SetPlayerStat (MyChar, IE_WIS, GemRB.GetVar ("Ability 3"))
+	GemRB.SetPlayerStat (MyChar, IE_DEX, GemRB.GetVar ("Ability 4"))
+	GemRB.SetPlayerStat (MyChar, IE_CON, GemRB.GetVar ("Ability 5"))
+	GemRB.SetPlayerStat (MyChar, IE_CHR, GemRB.GetVar ("Ability 6"))
 
-	GemRB.SetPlayerName(MyChar, GemRB.GetToken("CHARNAME"), 0)
+	#setting skills (thieving/ranger)
+	TmpTable = GemRB.LoadTable ("skills")
+	RowCount = GemRB.GetTableRowCount (TmpTable)-2
+
+	for i in range(RowCount):
+		stat = GemRB.GetTableValue (TmpTable, i+2, 2)
+		value = GemRB.GetVar ("Skill "+str(i) )
+		GemRB.SetPlayerStat (MyChar, stat, value )
+	GemRB.UnloadTable (TmpTable)
+
+	GemRB.SetPlayerName (MyChar, GemRB.GetToken("CHARNAME"), 0)
 	#does all the rest
-	GemRB.FillPlayerInfo(MyChar,PortraitName+"L", PortraitName+"S") 
+	GemRB.FillPlayerInfo (MyChar,PortraitName+"L", PortraitName+"S") 
 	#LETS PLAY!!
-	playmode = GemRB.GetVar("PlayMode")
+	playmode = GemRB.GetVar ("PlayMode")
 	if playmode >=0:
-		print "PlayMode: ",playmode
 		GemRB.EnterGame()
 	else:
 		#leaving multi player pregen

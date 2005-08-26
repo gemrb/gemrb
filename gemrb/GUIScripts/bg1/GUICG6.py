@@ -7,6 +7,7 @@ DoneButton = 0
 SkillTable = 0
 TopIndex = 0
 PointsLeft = 0
+RowCount = 0
 
 def RedrawSkills():
 	global TopIndex
@@ -17,7 +18,7 @@ def RedrawSkills():
 	SumLabel = GemRB.GetControl(SkillWindow, 0x10000005)
 	GemRB.SetText(SkillWindow, SumLabel, str(PointsLeft) )
 
-	for i in range(0,4):
+	for i in range(4):
 		Pos=TopIndex+i
 		SkillName = GemRB.GetTableValue(SkillTable, Pos+2,1)
 		Label = GemRB.GetControl(SkillWindow, 0x10000006+i)
@@ -53,9 +54,9 @@ def RedrawSkills():
 
 def OnLoad():
 	global SkillWindow, TextAreaControl, DoneButton, TopIndex
-	global SkillTable, PointsLeft, KitName
+	global SkillTable, PointsLeft, KitName, RowCount
 	
-        SkillTable = GemRB.LoadTable("skills")
+	SkillTable = GemRB.LoadTable("skills")
 	RowCount = GemRB.GetTableRowCount(SkillTable)-2
 
 	Kit = GemRB.GetVar("Class Kit")
@@ -79,7 +80,7 @@ def OnLoad():
 	RaceName = GemRB.GetTableRowName(RaceTable, GemRB.GetVar("Race")-1)
 
 	Ok=0
-	for i in range(0,RowCount):
+	for i in range(RowCount):
 		SkillName = GemRB.GetTableRowName(SkillTable,i+2)
 		if GemRB.GetTableValue(SkillTable,SkillName, KitName)==1:
 			b=GemRB.GetTableValue(SkillRacTable, RaceName, SkillName)
@@ -100,10 +101,10 @@ def OnLoad():
 	GemRB.SetToken("number",str(PointsLeft) )
 
 	GemRB.LoadWindowPack("GUICG")
-        SkillTable = GemRB.LoadTable("skills")
+	SkillTable = GemRB.LoadTable("skills")
 	SkillWindow = GemRB.LoadWindow(6)
 
-	for i in range(0,4):
+	for i in range(4):
 		Button = GemRB.GetControl(SkillWindow, i+21)
 		GemRB.SetVarAssoc(SkillWindow, Button, "Skill",i)
 		GemRB.SetEvent(SkillWindow, Button, IE_GUI_BUTTON_ON_PRESS, "JustPress")
@@ -120,7 +121,7 @@ def OnLoad():
 	GemRB.SetText(SkillWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(SkillWindow,0)
 	GemRB.SetText(SkillWindow,DoneButton,11973)
-        GemRB.SetButtonFlags(SkillWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
+	GemRB.SetButtonFlags(SkillWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	TextAreaControl = GemRB.GetControl(SkillWindow, 19)
 	GemRB.SetText(SkillWindow,TextAreaControl,17248)
@@ -128,7 +129,7 @@ def OnLoad():
 	GemRB.SetVar("TopIndex",0)
 	#ScrollBarControl = GemRB.GetControl(SkillWindow, 26)
 	#GemRB.SetEvent(SkillWindow, ScrollBarControl,IE_GUI_SCROLLBAR_ON_CHANGE,"ScrollBarPress")
-	#GemRB.SetVarAssoc(SkillWindow, ScrollBarControl, "TopIndex",RowCount-4) #decrease it with the number of controls on screen (list size)
+	#GemRB.SetVarAssoc(SkillWindow, ScrollBarControl,"TopIndex",RowCount-3)
 
 	GemRB.SetEvent(SkillWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	GemRB.SetEvent(SkillWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
@@ -175,10 +176,11 @@ def LeftPress():
 def BackPress():
 	GemRB.UnloadWindow(SkillWindow)
 	GemRB.SetNextScript("CharGen6")
-	#scrap skills
+	for i in range(RowCount):
+		GemRB.SetVar("Skill "+str(i), 0)
 	return
 
 def NextPress():
-        GemRB.UnloadWindow(SkillWindow)
+	GemRB.UnloadWindow(SkillWindow)
 	GemRB.SetNextScript("GUICG9") #weapon proficiencies
 	return

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.15 2005/08/25 10:38:10 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.16 2005/08/26 12:02:03 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -243,11 +243,19 @@ def GetStatOverview (pc):
 	stats.append ( (61932, GS (IE_THAC0), '') )
 	stats.append ( (9457, GS (IE_THAC0), '') )
 	stats.append ( (9458, GS (IE_NUMBEROFATTACKS), '') )
-	stats.append ( (9459, GS(IE_LORE), '') )
+	stats.append ( (9459, GS (IE_LORE), '') )
 	reptxt = GetReputation (GemRB.GameGetReputation()/10)
 	stats.append ( (9465, reptxt, '') )
-	stats.append ( (12126, GS(IE_TURNUNDEADLEVEL), '') )
-	stats.append ( (12127, GS(IE_LAYONHANDSAMOUNT), '') )
+	stats.append ( (9460, GS (IE_LOCKPICKING), '') )
+	stats.append ( (9462, GS (IE_TRAPS), '') )
+	stats.append ( (9463, GS (IE_PICKPOCKET), '') )
+	stats.append ( (9461, GS (IE_STEALTH), '') )
+	stats.append ( (34120, GS (IE_HIDEINSHADOWS), '') )
+	stats.append ( (34121, GS (IE_DETECTILLUSIONS), '') )
+	stats.append ( (34122, GS (IE_SETTRAPS), '') )
+	stats.append ( (12128, GS (IE_BACKSTABDAMAGEMULTIPLIER), 'x') )
+	stats.append ( (12126, GS (IE_TURNUNDEADLEVEL), '') )
+	stats.append ( (12127, GS (IE_LAYONHANDSAMOUNT), '') )
 	stats.append (2078)
 	stats.append (None)
 
@@ -280,22 +288,22 @@ def GetStatOverview (pc):
 	stats.append (None)
 
 	
-	# 67208 Resistances
-	stats.append (67208)
-	#   67209 Normal Fire
-	stats.append ((67209, GS (IE_RESISTFIRE), '%'))
-	#   67210 Magic Fire
-	stats.append ((67210, GS (IE_RESISTMAGICFIRE), '%'))
-	#   67211 Normal Cold
-	stats.append ((67211, GS (IE_RESISTCOLD), '%'))
-	#   67212 Magic Cold
-	stats.append ((67212, GS (IE_RESISTMAGICCOLD), '%'))
-	#   67213 Electricity
-	stats.append ((67213, GS (IE_RESISTELECTRICITY), '%'))
-	#   67214 Acid
-	stats.append ((67214, GS (IE_RESISTACID), '%'))
-	#   67215 Magic
-	stats.append ((67215, GS (IE_RESISTMAGIC), '%'))
+	# 32204 Resistances
+	stats.append (32204)
+	#   32213 Normal Fire
+	stats.append ((32213, GS (IE_RESISTFIRE), '%'))
+	#   32222 Magic Fire
+	stats.append ((32222, GS (IE_RESISTMAGICFIRE), '%'))
+	#   32214 Normal Cold
+	stats.append ((32214, GS (IE_RESISTCOLD), '%'))
+	#   32223 Magic Cold
+	stats.append ((32223, GS (IE_RESISTMAGICCOLD), '%'))
+	#   32220 Electricity
+	stats.append ((32220, GS (IE_RESISTELECTRICITY), '%'))
+	#   32221 Acid
+	stats.append ((32221, GS (IE_RESISTACID), '%'))
+	#   32233 Magic Damage
+	stats.append ((32233, GS (IE_RESISTMAGIC), '%'))
 	#   67216 Slashing Attacks
 	stats.append ((67216, GS (IE_RESISTSLASHING), '%'))
 	#   67217 Piercing Attacks
@@ -306,63 +314,6 @@ def GetStatOverview (pc):
 	stats.append ((67219, GS (IE_RESISTMISSILE), '%'))
 	stats.append (None)
 
-	# 4220 Proficiencies
-	stats.append (4220)
-	#   4208 THAC0
-	stats.append ((4208, GS (IE_THAC0), ''))
-	#   4209 Number of Attacks
-	stats.append ((4209, GS (IE_NUMBEROFATTACKS), ''))
-	#   4210 Lore
-	stats.append ((4210, GS (IE_LORE), ''))
-	#   4211 Open Locks
-	stats.append ((4211, GS (IE_LOCKPICKING), ''))
-	#   4212 Stealth
-	stats.append ((4212, GS (IE_STEALTH), ''))
-	#   4213 Find/Remove Traps
-	stats.append ((4213, GS (IE_TRAPS), ''))
-	#   4214 Pick Pockets
-	stats.append ((4214, GS (IE_PICKPOCKET), ''))
-	#   4215 Tracking
-	stats.append ((4215, GS (IE_TRACKING), ''))
-	#   4219 Backstab Damage
-	stats.append ((4219, GS (IE_BACKSTABDAMAGEMULTIPLIER), ''))
-	stats.append (None)
-
-	# 4227 Weapon Proficiencies
-	stats.append (4227)
-	#   55011 Unused Slots
-	#   33642 Fist
-	#   33649 Edged Weapon
-	#   33651 Hammer
-	#   44990 Axe
-	stats.append ((44990, GS (IE_PROFICIENCYAXE), ''))
-	#   33653 Club
-	#   33655 Bow
-	stats.append (None)
-	
-	# 4228 Ability Bonuses
-	stats.append (4228)
-	#   4229 To Hit
-	#   4230 Damage
-	#   4231 Open Doors
-	#   4232 Weight Allowance
-	#   4233 Armor Class Bonus
-	#   4234 Missile Adjustment
-	stats.append ((4234, GS (IE_ACMISSILEMOD), ''))
-	#   4236 CON HP Bonus/Level
-	#   4240 Reaction
-	stats.append (None)
-
-	# 4238 Magical Defense Adjustment
-	stats.append (4238)
-	#   4239 Bonus Priest Spells
-	stats.append ((4239, GS (IE_CASTINGLEVELBONUSCLERIC), ''))
-	stats.append (None)
-	
-	# 4237 Chance to learn spell
-	#SpellLearnChance = won + GemRB.GetString (4237) + woff
-
-	# ??? 4235 Reaction Adjustment
 
 	res = []
 	lines = 0
@@ -371,7 +322,10 @@ def GetStatOverview (pc):
 			strref, val, type = s
 			if val == 0 and type != '0':
 				continue
-			res.append (GemRB.GetString (strref) + ': ' + str (val) + type)
+			if type=='x':
+				res.append (GemRB.GetString (strref)+': x' + str (val) )
+			else:
+				res.append (GemRB.GetString (strref) + ': ' + str (val) + type)
 			lines = 1
 		except:
 			if s != None:
