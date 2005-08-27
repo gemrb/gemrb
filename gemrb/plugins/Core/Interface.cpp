@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.345 2005/08/22 23:10:17 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.346 2005/08/27 10:03:45 avenger_teambg Exp $
  *
  */
 
@@ -2183,17 +2183,19 @@ void Interface::DrawTooltip ()
 		h = TooltipBack[0]->Height;
 		w1 = TooltipBack[1]->Width;
 		w2 = TooltipBack[2]->Width;
-		w += TooltipMargin + w1 + w2;
+		w += TooltipMargin*2;
+		//multiline in case of too much text
+		if (w>TooltipBack[0]->Width)
+			w=TooltipBack[0]->Width;
 	}
-
 
 	int x = tooltip_x - w / 2;
 	int y = tooltip_y - h / 2;
 
 	// Ensure placement within the screen
 	if (x < 0) x = 0;
-	else if (x + w > Width) 
-		x = Width - w;
+	else if (x + w + w1 + w2 > Width) 
+		x = Width - w - w1 - w2;
 	if (y < 0) y = 0;
 	else if (y + h > Height) 
 		y = Height - h;
@@ -2201,18 +2203,16 @@ void Interface::DrawTooltip ()
 
 	// FIXME: add tooltip scroll animation for bg. also, take back[0] from
 	// center, not from left end
+	Region r2 = Region( x, y, w, h );
 	if (TooltipBack) {
-		Region r2 = Region( x + w1, y, w - (w1 + w2), h );
-		video->BlitSprite( TooltipBack[0], x + w1, y, true, &r2 );
+		video->BlitSprite( TooltipBack[0], x + TooltipMargin, y, true, &r2 );
 		video->BlitSprite( TooltipBack[1], x, y, true );
-		video->BlitSprite( TooltipBack[2], x + w - w2, y, true );
+		video->BlitSprite( TooltipBack[2], x + w, y, true );
 	}
 
-//	Color back = {0x00, 0x00, 0x00, 0x00};
-//	Color* palette = video->CreatePalette( TooltipColor, back );
-	
-	fnt->Print( Region( x, y, w, h ), (ieByte *) tooltip_text, NULL,
-		IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE | IE_FONT_SINGLE_LINE, true );
+	r2.x+=TooltipMargin;
+	fnt->Print( r2, (ieByte *) tooltip_text, NULL,
+		IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, true );
 }
 
 //interface for higher level functions, if the window was
