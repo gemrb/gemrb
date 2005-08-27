@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.16 2005/08/26 12:02:03 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.17 2005/08/27 10:40:36 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -136,17 +136,17 @@ def UpdateRecordsWindow ():
 	# armorclass
 	Label = GemRB.GetControl (Window, 0x10000028)
 	GemRB.SetText (Window, Label, str (GemRB.GetPlayerStat (pc, IE_ARMORCLASS)))
-	GemRB.SetTooltip (Window, Label, 4197)
+	GemRB.SetTooltip (Window, Label, 17183)
 
 	# hp now
 	Label = GemRB.GetControl (Window, 0x10000029)
 	GemRB.SetText (Window, Label, str (GemRB.GetPlayerStat (pc, IE_HITPOINTS)))
-	GemRB.SetTooltip (Window, Label, 4198)
+	GemRB.SetTooltip (Window, Label, 17184)
 
 	# hp max
 	Label = GemRB.GetControl (Window, 0x1000002a)
 	GemRB.SetText (Window, Label, str (GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)))
-	GemRB.SetTooltip (Window, Label, 4199)
+	GemRB.SetTooltip (Window, Label, 17378)
 
 	# stats
 
@@ -274,6 +274,17 @@ def GetStatOverview (pc):
 	stats.append ( (17384, GS (IE_SAVEVSSPELL), '') )
 	stats.append (None)
 
+	# 9466 Weapon profs
+	stats.append (9466)
+	table = GemRB.LoadTable("weapprof")
+	RowCount = GemRB.GetTableRowCount (table)
+	# the first 7 profs are foobared
+	for i in range(8,RowCount):
+		text = GemRB.GetTableValue (table, i, 1)
+		stat = GemRB.GetTableValue (table, i, 0)
+		print "stat: ",stat, " value: ",GS(stat)
+		stats.append ( (text, GS(stat), '+') )
+	stats.append (None)
 
 	# 11766 AC Bonuses
 	stats.append (11766)
@@ -314,6 +325,8 @@ def GetStatOverview (pc):
 	stats.append ((67219, GS (IE_RESISTMISSILE), '%'))
 	stats.append (None)
 
+	stats.append (32131)
+	stats.append (10340)
 
 	res = []
 	lines = 0
@@ -322,7 +335,10 @@ def GetStatOverview (pc):
 			strref, val, type = s
 			if val == 0 and type != '0':
 				continue
-			if type=='x':
+			if type == '+':
+				res.append (GemRB.GetString (strref) + ' '+ '+'
+* val)
+			elif type == 'x':
 				res.append (GemRB.GetString (strref)+': x' + str (val) )
 			else:
 				res.append (GemRB.GetString (strref) + ': ' + str (val) + type)

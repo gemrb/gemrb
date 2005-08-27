@@ -19,7 +19,7 @@ def RedrawSkills():
 	SumLabel = GemRB.GetControl(SkillWindow, 0x10000009)
 	GemRB.SetText(SkillWindow, SumLabel, str(PointsLeft) )  #points to distribute
 
-	for i in range(0,8):
+	for i in range(8):
 		Pos=TopIndex+i
 		SkillName = GemRB.GetTableValue(SkillTable, Pos+8, 1) #we add the bg1 skill count offset
 		MaxProf = GemRB.GetTableValue(SkillTable, Pos+8, ProfColumn) #we add the bg1 skill count offset
@@ -47,7 +47,7 @@ def RedrawSkills():
 		GemRB.SetText(SkillWindow, Label, SkillName)
 
 		ActPoint = GemRB.GetVar("Prof "+str(Pos) )
-		for j in range(0,5):  #5 is maximum distributable
+		for j in range(5):  #5 is maximum distributable
 			Star=GemRB.GetControl(SkillWindow, i*5+j+27)
 			if ActPoint >j:
 				GemRB.SetButtonFlags(SkillWindow, Star, IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
@@ -86,7 +86,7 @@ def OnLoad():
 	RowCount = GemRB.GetTableRowCount(SkillTable)-7  #we decrease it with the bg1 skills
 	SkillWindow = GemRB.LoadWindow(9)
 
-	for i in range(0,8):
+	for i in range(8):
 		Button=GemRB.GetControl(SkillWindow, i+69)
 		GemRB.SetVarAssoc(SkillWindow, Button, "Prof", i)
 		GemRB.SetEvent(SkillWindow, Button, IE_GUI_BUTTON_ON_PRESS, "JustPress")
@@ -99,7 +99,7 @@ def OnLoad():
 		GemRB.SetVarAssoc(SkillWindow, Button, "Prof", i)
 		GemRB.SetEvent(SkillWindow, Button, IE_GUI_BUTTON_ON_PRESS, "RightPress")
 
-		for j in range(0,5):
+		for j in range(5):
 			Star=GemRB.GetControl(SkillWindow, i*5+j+27)
 			GemRB.SetButtonState(SkillWindow, Star, IE_GUI_BUTTON_DISABLED)
 

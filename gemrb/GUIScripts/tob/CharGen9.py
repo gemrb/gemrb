@@ -184,7 +184,7 @@ def NextPress():
 	TmpTable=GemRB.LoadTable("weapprof")
 	ProfCount = GemRB.GetTableRowCount(TmpTable)
 	#bg2 weapprof.2da contains the bg1 proficiencies too, skipping those
-	for i in range(7,ProfCount):
+	for i in range(8,ProfCount):
 		StatID=GemRB.GetTableValue(TmpTable, i, 0)
 		GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Prof "+str(i) ) )
 	GemRB.UnloadTable (TmpTable)
