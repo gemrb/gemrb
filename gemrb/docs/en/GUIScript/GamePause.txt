@@ -1,0 +1,12 @@
+
+Prototype: GemRB.GamePause(pause, quiet)
+
+Description: Pauses or unpauses the current game. This affects all ingame events, including: scripts, animations, movement. It doesn't affect the GUI.
+
+Parameters: pause  - bool, true = pause, false = continue
+            quiet  - bool, true = no message, false = game paused/unpaused message
+
+Return value: N/A
+
+See also: 
+
