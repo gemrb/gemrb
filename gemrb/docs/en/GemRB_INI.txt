@@ -1,6 +1,6 @@
 GAME-SPECIFIC CONFIGURATION FILE GEMRB.INI
 ******************************************
-$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/GemRB_INI.txt,v 1.3 2005/08/23 08:33:29 avenger_teambg Exp $
+$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/GemRB_INI.txt,v 1.4 2005/08/28 11:39:01 avenger_teambg Exp $
 
 Contents
 --------
@@ -118,7 +118,7 @@ resource, and always use frames 0, 1, 2, 3 from their associated
 BAM. (PST, ...)
 
 
-AllStringsTagged = 1
+AllStringsTagged = <bool>
 - - - - - - - - - - -
 If set to 1, .tlk tokens are always resolved regardless of the token
 flag in dialog.tlk. Normally only BG2 has token flags (0), all other
@@ -236,3 +236,7 @@ DialogueScrolls = <bool>
 - - - - - - - - - - - - -
 If set to 1, dialogue window behaves as in PS:T - i.e. talk between 
 Nameless One and others is appended into the window as it comes. If set to 0 (default) each new pair of NPC's talk and Nameless One's replies is written from the start of the page, like in BG2.
+
+MaximumAbility = 25|40
+- - - - - - - - - - - - -
+Determines the maximum value of character abilities. Setting it to absurd values might cause problems. Its value should be 40 for IWD2, 25 for all other games.
