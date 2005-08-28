@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.167 2005/08/14 17:52:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.168 2005/08/28 13:20:19 avenger_teambg Exp $
  *
  */
 
@@ -418,6 +418,10 @@ public:
 	/** returns 0 for unmovable, -1 for movable items, otherwise it
 	returns gold value! */
 	int CanMoveItem(CREItem *item);
+	int GetMaximumAbility();
+	int GetStrengthBonus(int column, int value, int ex);
+	int GetIntelligenceBonus(int column, int value);
+	int GetDexterityBonus(int column, int value);
 
 	/** applies the spell on the target */
 	void ApplySpell(const ieResRef resname, Actor *target, Actor *caster, int level);
@@ -443,6 +447,8 @@ private:
 	bool ReadStrrefs();
 	bool ReadRandomItems();
 	bool ReadItemTable(const ieResRef item, const char *Prefix);
+	bool ReadAbilityTables();
+	bool ReadAbilityTable(const ieResRef name, ieWord *mem, int cols, int rows);
 	/** handles the QuitFlag bits (main loop events) */
 	void HandleFlags();
 	/** Creates a game control, closes all other windows */

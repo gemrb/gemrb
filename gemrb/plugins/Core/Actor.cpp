@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.123 2005/08/15 15:55:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.124 2005/08/28 13:20:19 avenger_teambg Exp $
  *
  */
 
@@ -66,35 +66,7 @@ static char **wizardspelltables=NULL;
 static int constitution_normal[26];
 static int constitution_fighter[26];
 
-static void InitActorTables()
-{
-	int i;
-
-	int table = core->LoadTable( "clskills" );
-	TableMgr *tm = core->GetTable( table );
-	classcount = tm->GetRowCount();
-	clericspelltables = (char **) calloc(classcount, sizeof(char*));
-	wizardspelltables = (char **) calloc(classcount, sizeof(char*));
-	for(i = 0; i<classcount; i++) {
-		char *spelltablename = tm->QueryField( i, 1 );
-		if (spelltablename[0]!='*') {
-			clericspelltables[i]=strdup(spelltablename);
-		}
-		spelltablename = tm->QueryField( i, 2 );
-		if (spelltablename[0]!='*') {
-			wizardspelltables[i]=strdup(spelltablename);
-		}
-	}
-	core->DelTable( table );
-
-	table = core->LoadTable( "hpconbon" );
-	tm = core->GetTable( table );
-	for(i=0;i<26;i++) {
-		constitution_normal[i] = atoi(tm->QueryField( i, 1) );
-		constitution_fighter[i] = atoi(tm->QueryField( i, 2) );
-	}
-	core->DelTable( table );
-}
+static void InitActorTables();
 
 PCStatsStruct::PCStatsStruct()
 {
@@ -425,6 +397,44 @@ NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //ef
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL //ff
 };
+
+static void InitActorTables()
+{
+	int i;
+
+	int table = core->LoadTable( "clskills" );
+	TableMgr *tm = core->GetTable( table );
+	classcount = tm->GetRowCount();
+	clericspelltables = (char **) calloc(classcount, sizeof(char*));
+	wizardspelltables = (char **) calloc(classcount, sizeof(char*));
+	for(i = 0; i<classcount; i++) {
+		char *spelltablename = tm->QueryField( i, 1 );
+		if (spelltablename[0]!='*') {
+			clericspelltables[i]=strdup(spelltablename);
+		}
+		spelltablename = tm->QueryField( i, 2 );
+		if (spelltablename[0]!='*') {
+			wizardspelltables[i]=strdup(spelltablename);
+		}
+	}
+	core->DelTable( table );
+
+	//these will be moved to core
+	table = core->LoadTable( "hpconbon" );
+	tm = core->GetTable( table );
+	for(i=0;i<26;i++) {
+		constitution_normal[i] = atoi(tm->QueryField( i, 1) );
+		constitution_fighter[i] = atoi(tm->QueryField( i, 2) );
+	}
+	core->DelTable( table );
+	i = core->GetMaximumAbility();
+	maximum_values[IE_STR]=i;
+	maximum_values[IE_INT]=i;
+	maximum_values[IE_DEX]=i;
+	maximum_values[IE_CON]=i;
+	maximum_values[IE_CHR]=i;
+	maximum_values[IE_WIS]=i;
+}
 
 bool Actor::SetStat(unsigned int StatIndex, ieDword Value)
 {

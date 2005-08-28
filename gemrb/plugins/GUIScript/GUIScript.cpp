@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.334 2005/08/15 20:29:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.335 2005/08/28 13:20:20 avenger_teambg Exp $
  *
  */
 
@@ -5325,6 +5325,34 @@ endofquest:
 	}
 }
 
+PyDoc_STRVAR( GemRB_GetAbilityBonus__doc,
+"GetAbilityBonus(stat, column, value[, ex])\n\n"
+"Returns an ability bonus value based on various .2da files.\n\n");
+
+static PyObject* GemRB_GetAbilityBonus(PyObject * /*self*/, PyObject* args)
+{
+	int stat, column, value, ex;
+	int ret;
+
+	if (!PyArg_ParseTuple( args, "iii|i", &stat, &column, &value, &ex)) {
+		return AttributeError( GemRB_GetAbilityBonus__doc );
+	}
+	switch (stat) {
+		case IE_STR:
+			ret=core->GetStrengthBonus(column, value, ex);
+			break;
+		case IE_INT:
+			ret=core->GetIntelligenceBonus(column, value);
+			break;
+		case IE_DEX:
+			ret=core->GetDexterityBonus(column, value);
+			break;
+		default:
+			return RuntimeError( "Invalid ability!");
+	}
+	return PyInt_FromLong( ret );
+}
+
 static PyMethodDef GemRBMethods[] = {
 	METHOD(SetInfoTextColor, METH_VARARGS),
 	METHOD(HideGUI, METH_NOARGS),
@@ -5499,6 +5527,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(ChangeContainerItem, METH_VARARGS),
 	METHOD(GamePause, METH_VARARGS),
 	METHOD(CheckFeatCondition, METH_VARARGS),
+	METHOD(GetAbilityBonus, METH_VARARGS),
 	// terminating entry	
 	{NULL, NULL, 0, NULL}
 };

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIREC.py,v 1.17 2005/08/27 10:40:36 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIREC.py,v 1.18 2005/08/28 13:20:19 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -282,7 +282,6 @@ def GetStatOverview (pc):
 	for i in range(8,RowCount):
 		text = GemRB.GetTableValue (table, i, 1)
 		stat = GemRB.GetTableValue (table, i, 0)
-		print "stat: ",stat, " value: ",GS(stat)
 		stats.append ( (text, GS(stat), '+') )
 	stats.append (None)
 
@@ -298,7 +297,26 @@ def GetStatOverview (pc):
 	stats.append ((11768, GS (IE_ACSLASHINGMOD), ''))
 	stats.append (None)
 
-	
+	# 10315 Ability bonuses
+	stats.append (10315)
+	value = GemRB.GetPlayerStat (pc, IE_STR)
+	ex = GemRB.GetPlayerStat (pc, IE_STREXTRA)
+	# 10332 to hit
+	stats.append ( (10332, GemRB.GetAbilityBonus(IE_STR,0,value,ex), '') )
+	# 10336 damage
+	stats.append ( (10336, GemRB.GetAbilityBonus(IE_STR,1,value,ex), '') )
+	# 10337 open doors (bend bars lift gates)
+	stats.append ( (10337, GemRB.GetAbilityBonus(IE_STR,2,value,ex), '') )
+	# 10338 weight allowance
+	stats.append ( (10338, GemRB.GetAbilityBonus(IE_STR,3,value,ex), '') )
+	# 10339 AC
+	stats.append ( (10339, GemRB.GetAbilityBonus(IE_DEX,2,value,ex), '') )
+	# 10340 Missile
+	stats.append ( (10340, GemRB.GetAbilityBonus(IE_DEX,1,value,ex), '') )
+	# 10341 Reaction
+	stats.append ( (10341, GemRB.GetAbilityBonus(IE_DEX,0,value,ex), '') )
+	stats.append (0)
+
 	# 32204 Resistances
 	stats.append (32204)
 	#   32213 Normal Fire

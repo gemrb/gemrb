@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.346 2005/08/27 10:03:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.347 2005/08/28 13:20:19 avenger_teambg Exp $
  *
  */
 
@@ -64,6 +64,12 @@ static char dialogtlk[] = "dialog.tlk\0";
 #define STRREFCOUNT 100
 static int strref_table[STRREFCOUNT];
 
+static int MaximumAbility = 25;
+static ieWord *strmod = NULL;
+static ieWord *strmodex = NULL;
+static ieWord *intmod = NULL;
+static ieWord *dexmod = NULL;
+
 Interface::Interface(int iargc, char** iargv)
 {
 	argc = iargc;
@@ -97,6 +103,7 @@ Interface::Interface(int iargc, char** iargv)
 	console = NULL;
 	slottypes = NULL;
 	slotmatrix = NULL;
+
 	ModalWindow = NULL;
 	tooltip_x = 0;
 	tooltip_y = 0;
@@ -390,6 +397,86 @@ void Interface::HandleFlags()
 		guiscript->LoadScript( NextScript );			
 		guiscript->RunFunction( "OnLoad" );
 	}
+}
+
+void FreeAbilityTables()
+{
+	if (strmod) {
+		free(strmod);
+	}
+	if (strmodex) {
+		free(strmodex);
+	}
+	if (intmod) {
+		free(intmod);
+	}
+	if (dexmod) {
+		free(dexmod);
+	}
+}
+
+bool GenerateAbilityTables()
+{
+	FreeAbilityTables();
+
+	//range is: 0 - maximumability
+	int tablesize = MaximumAbility+1;
+	strmod = (ieWord *) malloc (tablesize * 4 * sizeof(ieWord) );
+	if (!strmod)
+		return false;
+	strmodex = (ieWord *) malloc (101 * 4 * sizeof(ieWord) );
+	if (!strmodex)
+		return false;
+	intmod = (ieWord *) malloc (tablesize * 3 * sizeof(ieWord) );
+	if (!intmod)
+		return false;
+	dexmod = (ieWord *) malloc (tablesize * 3 * sizeof(ieWord) );
+	if (!dexmod)
+		return false;
+
+	return true;
+}
+
+bool Interface::ReadAbilityTable(const ieResRef tablename, ieWord *mem, int columns, int rows)
+{
+	TableMgr * tab;
+	int table=LoadTable( tablename );
+
+	if (table<0) {
+		return false;
+	}
+	tab = GetTable( table );
+	if (!tab) {
+		DelTable(table);
+		return false;
+	}
+	for (int j=0;j<columns;j++) {
+		for( int i=0;i<rows;i++) {
+			mem[rows*j+i] = (ieWord) strtol(tab->QueryField(i,j),NULL,0 );
+		}
+	}
+	DelTable(table);
+	return true;
+}
+
+bool Interface::ReadAbilityTables()
+{
+	bool ret = GenerateAbilityTables();
+	if (!ret)
+		return ret;
+	ret = ReadAbilityTable("strmod", strmod, 4, MaximumAbility + 1);
+	if (!ret)
+		return ret;
+	ret = ReadAbilityTable("strmodex", strmodex, 4, 101);
+	//3rd ed doesn't have strmodex, but has a maximum of 40
+	if (!ret && (MaximumAbility<=25) )
+		return ret;
+	ret = ReadAbilityTable("intmod", intmod, 3, MaximumAbility + 1);
+	if (!ret)
+		return ret;
+	ret = ReadAbilityTable("dexmod", dexmod, 3, MaximumAbility + 1);
+
+	return true;
 }
 
 /** this is the main loop */
@@ -941,7 +1028,7 @@ int Interface::Init()
 	}
 	printStatus( "OK", LIGHT_GREEN );
 
-	printMessage( "Core", "Initializing Inventory Management...", WHITE );
+	printMessage( "Core", "Initializing Inventory Management...\n", WHITE );
 	ret = InitItemTypes();
 	if (ret) {
 		printStatus( "OK", LIGHT_GREEN );
@@ -950,7 +1037,7 @@ int Interface::Init()
 		printStatus( "ERROR", LIGHT_RED );
 	}
 
-	printMessage( "Core", "Initializing Spellbook Management...", WHITE );
+	printMessage( "Core", "Initializing Spellbook Management...\n", WHITE );
 	ret = Spellbook::InitializeSpellbook();
 	if (ret) {
 		printStatus( "OK", LIGHT_GREEN );
@@ -959,7 +1046,7 @@ int Interface::Init()
 		printStatus( "ERROR", LIGHT_RED );
 	}
 
-	printMessage( "Core", "Initializing string constants...", WHITE );
+	printMessage( "Core", "Initializing string constants...\n", WHITE );
 	ret = ReadStrrefs();
 	if (ret) {
 		printStatus( "OK", LIGHT_GREEN );
@@ -968,7 +1055,7 @@ int Interface::Init()
 		printStatus( "ERROR", LIGHT_RED );
 	}
 
-	printMessage( "Core", "Initializing random treasure...", WHITE );
+	printMessage( "Core", "Initializing random treasure...\n", WHITE );
 	ret = ReadRandomItems();
 	if (ret) {
 		printStatus( "OK", LIGHT_GREEN );
@@ -976,6 +1063,17 @@ int Interface::Init()
 	else {
 		printStatus( "ERROR", LIGHT_RED );
 	}
+
+
+	printMessage( "Core", "Initializing ability tables...\n", WHITE );
+	ret = ReadAbilityTables();
+	if (ret) {
+		printStatus( "OK", LIGHT_GREEN );
+	}
+	else {
+		printStatus( "ERROR", LIGHT_RED );
+	}
+
 	printMessage( "Core", "Core Initialization Complete!\n", WHITE );
 	ret = GEM_OK;
 end_of_init:
@@ -1521,6 +1619,8 @@ bool Interface::LoadGemRBINI()
 			}
 		}
 	}
+
+	MaximumAbility = ini->GetKeyAsInt ("resources", "MaximumAbility", 25 );
 
 	SetFeature( ini->GetKeyAsInt( "resources", "IWD2ScriptName", 0 ), GF_IWD2_SCRIPTNAME );
 	SetFeature( ini->GetKeyAsInt( "resources", "HasSpellList", 0 ), GF_HAS_SPELLLIST );
@@ -3820,3 +3920,44 @@ int Interface::CompressSave(const char *folder)
 	closedir( dir );
 	return 0;
 }
+
+int Interface::GetMaximumAbility() { return MaximumAbility; }
+
+int Interface::GetStrengthBonus(int column, int value, int ex)
+{
+//to hit, damage, open doors, weight allowance
+	if (column<0 || column>3)
+		return -9999;
+
+	if (value<0)
+		value = 0;
+	else if (value>25)
+		value = 25;
+
+	if (ex<0)
+		ex=0;
+	else if (ex>100)
+		ex=100;
+
+	return strmod[column*MaximumAbility+value]+strmodex[column*101+ex];
+}
+
+//only the first 3 columns are supported
+int Interface::GetIntelligenceBonus(int column, int value)
+{
+//learn spell, max spell level, max spell number on level
+	if (column<0 || column>2)
+		return -9999;
+
+	return intmod[column*MaximumAbility+value];
+}
+
+int Interface::GetDexterityBonus(int column, int value)
+{
+//reaction, missile, ac
+	if (column<0 || column>2)
+		return -9999;
+
+	return dexmod[column*MaximumAbility+value];
+}
+
