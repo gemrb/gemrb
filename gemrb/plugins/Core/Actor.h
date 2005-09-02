@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.83 2005/08/15 15:55:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.84 2005/09/02 21:08:48 avenger_teambg Exp $
  *
  */
 
@@ -301,7 +301,6 @@ public:
 	int GetWeaponRange();
 	/* Creates player statistics */
 	void CreateStats();
-	int GetHPMod();
 	/* Heals actor by days */
 	void Heal(int days);
 	/* Receive experience (handle dual/multi class) */

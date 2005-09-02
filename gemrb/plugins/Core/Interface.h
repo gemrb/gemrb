@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.168 2005/08/28 13:20:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.169 2005/09/02 21:08:48 avenger_teambg Exp $
  *
  */
 
@@ -422,6 +422,8 @@ public:
 	int GetStrengthBonus(int column, int value, int ex);
 	int GetIntelligenceBonus(int column, int value);
 	int GetDexterityBonus(int column, int value);
+	int GetConstitutionBonus(int column, int value);
+	int GetCharismaBonus(int column, int value);
 
 	/** applies the spell on the target */
 	void ApplySpell(const ieResRef resname, Actor *target, Actor *caster, int level);

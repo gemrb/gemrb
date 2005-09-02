@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.124 2005/08/28 13:20:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.125 2005/09/02 21:08:48 avenger_teambg Exp $
  *
  */
 
@@ -63,8 +63,8 @@ static Color cyan_dark = {
 static int classcount=-1;
 static char **clericspelltables=NULL;
 static char **wizardspelltables=NULL;
-static int constitution_normal[26];
-static int constitution_fighter[26];
+//static int constitution_normal[26];
+//static int constitution_fighter[26];
 
 static void InitActorTables();
 
@@ -418,7 +418,7 @@ static void InitActorTables()
 		}
 	}
 	core->DelTable( table );
-
+/*
 	//these will be moved to core
 	table = core->LoadTable( "hpconbon" );
 	tm = core->GetTable( table );
@@ -427,6 +427,7 @@ static void InitActorTables()
 		constitution_fighter[i] = atoi(tm->QueryField( i, 2) );
 	}
 	core->DelTable( table );
+*/
 	i = core->GetMaximumAbility();
 	maximum_values[IE_STR]=i;
 	maximum_values[IE_INT]=i;
@@ -456,12 +457,12 @@ bool Actor::SetStat(unsigned int StatIndex, ieDword Value)
 	if (f) (*f)(this, Value);
 	return true;
 }
-
+/* use core->GetConstitutionBonus(0,0,Modified[IE_CON])
 int Actor::GetHPMod()
 {
 	return constitution_normal[Modified[IE_CON]];
 }
-
+*/
 int Actor::GetMod(unsigned int StatIndex)
 {
 	if (StatIndex >= MAX_STATS) {

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIREC.py,v 1.18 2005/08/28 13:20:19 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIREC.py,v 1.19 2005/09/02 21:08:48 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -310,11 +310,17 @@ def GetStatOverview (pc):
 	# 10338 weight allowance
 	stats.append ( (10338, GemRB.GetAbilityBonus(IE_STR,3,value,ex), '') )
 	# 10339 AC
-	stats.append ( (10339, GemRB.GetAbilityBonus(IE_DEX,2,value,ex), '') )
+	value = GemRB.GetPlayerStat (pc, IE_DEX)
+	stats.append ( (10339, GemRB.GetAbilityBonus(IE_DEX,2,value), '') )
 	# 10340 Missile
-	stats.append ( (10340, GemRB.GetAbilityBonus(IE_DEX,1,value,ex), '') )
+	stats.append ( (10340, GemRB.GetAbilityBonus(IE_DEX,1,value), '') )
 	# 10341 Reaction
-	stats.append ( (10341, GemRB.GetAbilityBonus(IE_DEX,0,value,ex), '') )
+	stats.append ( (10341, GemRB.GetAbilityBonus(IE_DEX,0,value), '') )
+	value = GemRB.GetPlayerStat (pc, IE_CON)
+	# 10342 Hp/Level
+	stats.append ( (10342, GemRB.GetAbilityBonus(IE_CON,0,value), '') )
+	value = GemRB.GetPlayerStat (pc, IE_CHR)
+	stats.append ( (10347, GemRB.GetAbilityBonus(IE_CHR,0,value), '') )
 	stats.append (0)
 
 	# 32204 Resistances

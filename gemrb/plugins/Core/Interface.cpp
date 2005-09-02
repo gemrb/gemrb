@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.347 2005/08/28 13:20:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.348 2005/09/02 21:08:48 avenger_teambg Exp $
  *
  */
 
@@ -69,6 +69,8 @@ static ieWord *strmod = NULL;
 static ieWord *strmodex = NULL;
 static ieWord *intmod = NULL;
 static ieWord *dexmod = NULL;
+static ieWord *conmod = NULL;
+static ieWord *chrmod = NULL;
 
 Interface::Interface(int iargc, char** iargv)
 {
@@ -413,6 +415,12 @@ void FreeAbilityTables()
 	if (dexmod) {
 		free(dexmod);
 	}
+	if (conmod) {
+		free(conmod);
+	}
+	if (chrmod) {
+		free(chrmod);
+	}
 }
 
 bool GenerateAbilityTables()
@@ -433,7 +441,12 @@ bool GenerateAbilityTables()
 	dexmod = (ieWord *) malloc (tablesize * 3 * sizeof(ieWord) );
 	if (!dexmod)
 		return false;
-
+	conmod = (ieWord *) malloc (tablesize * 5 * sizeof(ieWord) );
+	if (!conmod)
+		return false;
+	chrmod = (ieWord *) malloc (tablesize * 1 * sizeof(ieWord) );
+	if (!chrmod)
+		return false;
 	return true;
 }
 
@@ -475,7 +488,14 @@ bool Interface::ReadAbilityTables()
 	if (!ret)
 		return ret;
 	ret = ReadAbilityTable("dexmod", dexmod, 3, MaximumAbility + 1);
-
+	//no dexmod in iwd2???
+	ret = ReadAbilityTable("hpconbon", conmod, 5, MaximumAbility + 1);
+	if (!ret)
+		return ret;
+	//this table is a single row (not a single column)
+	ret = ReadAbilityTable("chrmodst", chrmod, MaximumAbility + 1, 1);
+	if (!ret)
+		return ret;
 	return true;
 }
 
@@ -3959,5 +3979,23 @@ int Interface::GetDexterityBonus(int column, int value)
 		return -9999;
 
 	return dexmod[column*MaximumAbility+value];
+}
+
+int Interface::GetConstitutionBonus(int column, int value)
+{
+//normal, warrior, minimum, regen hp, regen fatigue
+	if (column<0 || column>4)
+		return -9999;
+
+	return conmod[column*MaximumAbility+value];
+}
+
+int Interface::GetCharismaBonus(int column, int value)
+{
+//?reaction
+	if (column<0 || column>0)
+		return -9999;
+
+	return chrmod[column*MaximumAbility+value];
 }
 

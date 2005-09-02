@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.335 2005/08/28 13:20:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.336 2005/09/02 21:08:49 avenger_teambg Exp $
  *
  */
 
@@ -5346,6 +5346,12 @@ static PyObject* GemRB_GetAbilityBonus(PyObject * /*self*/, PyObject* args)
 			break;
 		case IE_DEX:
 			ret=core->GetDexterityBonus(column, value);
+			break;
+		case IE_CON:
+			ret=core->GetConstitutionBonus(column, value);
+			break;
+		case IE_CHR:
+			ret=core->GetCharismaBonus(column, value);
 			break;
 		default:
 			return RuntimeError( "Invalid ability!");
