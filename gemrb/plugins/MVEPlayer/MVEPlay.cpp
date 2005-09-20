@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.cpp,v 1.16 2005/03/25 21:30:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.cpp,v 1.17 2005/09/20 21:34:36 edheldil Exp $
  *
  */
 
@@ -144,8 +144,9 @@ int MVEPlay::doPlay(const DataStream* mve)
 
 	MVE_rmPrepMovie( ( void * ) mve, -1, -1, 1 );
 
+        vSpec.screenWidth = g_screen->w;
+        vSpec.screenHeight = g_screen->h;
 	MVE_getVideoSpec( &vSpec );
-
 	bpp = vSpec.truecolor ? 16 : 8;
 
 	g_truecolor = vSpec.truecolor;
@@ -232,7 +233,6 @@ int MVEPlay::pollEvents()
 		switch (event.type) {
 			case SDL_QUIT:
 			case SDL_MOUSEBUTTONDOWN:
-			case SDL_MOUSEBUTTONUP:
 				return 1;
 			case SDL_KEYDOWN:
 				switch (event.key.keysym.sym) {

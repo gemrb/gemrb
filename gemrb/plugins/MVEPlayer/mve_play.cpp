@@ -1,4 +1,4 @@
-/* $Id: mve_play.cpp,v 1.13 2005/03/25 21:30:39 avenger_teambg Exp $ */
+/* $Id: mve_play.cpp,v 1.14 2005/09/20 21:34:36 edheldil Exp $ */
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -539,9 +539,9 @@ static int display_video_handler(unsigned char /*major*/, unsigned char /*minor*
 }
 
 static int init_video_handler(unsigned char /*major*/, unsigned char /*minor*/,
-	unsigned char* data, int /*len*/)
+	unsigned char* /*data*/, int /*len*/)
 {
-	short width, height;
+//	short width, height;
 
 	if (video_initialized) {
 		return 1;
@@ -550,10 +550,10 @@ static int init_video_handler(unsigned char /*major*/, unsigned char /*minor*/,
 		video_initialized = 1;
 	}
 
-	width = get_short( data );
-	height = get_short( data + 2 );
-	g_screenWidth = width;
-	g_screenHeight = height;
+// 	width = get_short( data );
+// 	height = get_short( data + 2 );
+// 	g_screenWidth = width;
+// 	g_screenHeight = height;
 
 	return 1;
 }
@@ -703,8 +703,8 @@ int MVE_rmPrepMovie(void* src, int x, int y, int /*track*/)
 
 void MVE_getVideoSpec(MVE_videoSpec* vSpec)
 {
-	vSpec->screenWidth = g_screenWidth;
-	vSpec->screenHeight = g_screenHeight;
+	g_screenWidth = vSpec->screenWidth;
+	g_screenHeight = vSpec->screenHeight;
 	vSpec->width = g_width;
 	vSpec->height = g_height;
 	vSpec->truecolor = g_truecolor;
