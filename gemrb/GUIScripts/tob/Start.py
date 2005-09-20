@@ -4,7 +4,7 @@ import GemRB
 StartWindow = 0
 
 def OnLoad():
-	global StartWindow
+	global StartWindow, skip_videos
 
 	GemRB.EnableCheatKeys(1)
 	skip_videos = GemRB.GetVar ("SkipIntroVideos")
@@ -12,7 +12,6 @@ def OnLoad():
 		GemRB.PlayMovie ("BISLOGO")
 		GemRB.PlayMovie ("BWDRAGON")
 		GemRB.PlayMovie ("WOTC")
-		GemRB.PlayMovie ("INTRO15F")
 
 	# Find proper window border for higher resolutions
 	screen_width = GemRB.GetSystemVariable (SV_WIDTH)
@@ -51,6 +50,8 @@ def SoAPress():
 	GemRB.SetVar("oldgame",1)
 	GemRB.UnloadWindow(StartWindow)
 	GemRB.SetNextScript("Start2")
+	if not skip_videos:
+            GemRB.PlayMovie ("INTRO15F")
 	return
 
 def ToBPress():
@@ -58,6 +59,8 @@ def ToBPress():
 	GemRB.SetVar("oldgame",0)
 	GemRB.UnloadWindow(StartWindow)
 	GemRB.SetNextScript("Start2")
+	if not skip_videos:
+            GemRB.PlayMovie ("INTRO")
 	return
 
 def ExitPress():
