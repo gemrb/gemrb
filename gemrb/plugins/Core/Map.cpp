@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.186 2005/08/22 21:52:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.187 2005/09/23 17:37:40 avenger_teambg Exp $
  *
  */
 
@@ -582,32 +582,8 @@ void Map::DrawMap(Region screen, GameControl* gc)
 			Actor* actor = GetRoot( q, index );
 			if (!actor)
 				break;
-			//text feedback
-			if (actor->textDisplaying) {
-				unsigned long time;
-				GetTime( time );
-				if (( time - actor->timeStartDisplaying ) >= 6000) {
-					actor->textDisplaying = 0;
-				}
-				if (actor->textDisplaying == 1) {
-					Font* font = core->GetFont( 1 );
-					Region rgn( actor->Pos.x-100+screen.x,
-						actor->Pos.y - 100 + screen.y,
-						200, 400 );
-					font->Print( rgn, ( unsigned char * ) actor->overHeadText,
-							NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP,
-							false );
-				}
-			}
-
 			int cx = actor->Pos.x;
 			int cy = actor->Pos.y;
-			//actor isn't visible
-			//visual feedback
-			CharAnimations* ca = actor->GetAnims();
-			if (!ca)
-				continue;
-			//explored or visibilitymap (bird animations are visible in fog)
 			int explored = actor->Modified[IE_DONOTJUMP]&2;
 			//check the deactivation condition only if needed
 			//this fixes dead actors disappearing from fog of war (they should be permanently visible)
@@ -625,10 +601,13 @@ void Map::DrawMap(Region screen, GameControl* gc)
 					continue;
 				//turning actor inactive
 				actor->Active&=~SCR_ACTIVE;
-				//we draw the actor now for the last time
-				//actor->SetStance(IE_ANI_READY);
-				//continue;
 			}
+			//visual feedback
+			CharAnimations* ca = actor->GetAnims();
+			if (!ca) {
+				continue;
+			}
+			//explored or visibilitymap (bird animations are visible in fog)
 			//0 means opaque
 			int Trans = actor->Modified[IE_TRANSLUCENT];
 			//int Trans = actor->Modified[IE_TRANSLUCENT] * 255 / 100;
@@ -654,8 +633,9 @@ void Map::DrawMap(Region screen, GameControl* gc)
 				}
 			}
 			//no visual feedback
-			if (Trans>255)
+			if (Trans>255) {
 				continue;
+			}
 			if (( !actor->Modified[IE_NOCIRCLE] ) &&
 					( !( State & STATE_DEAD ) )) {
 				actor->DrawCircle();
@@ -676,11 +656,11 @@ void Map::DrawMap(Region screen, GameControl* gc)
 						actor->lastFrame = nextFrame;
 						actor->SetBBox( newBBox );
 					}
-					if (!actor->BBox.InsideRegion( vp ))
-						continue;
-					Color tint = LightMap->GetPixel( cx / 16, cy / 12);
-					tint.a = 255-Trans;
-					video->BlitSpriteTinted( nextFrame, cx + screen.x, cy + screen.y, tint, anim->Palette, &screen );
+					if (actor->BBox.InsideRegion( vp )) {
+						Color tint = LightMap->GetPixel( cx / 16, cy / 12);
+						tint.a = 255-Trans;
+						video->BlitSpriteTinted( nextFrame, cx + screen.x, cy + screen.y, tint, anim->Palette, &screen );
+					}
 					if (anim->endReached) {
 						if (HandleActorStance(actor, ca, StanceID) ) {
 							anim->endReached = false;
@@ -688,6 +668,25 @@ void Map::DrawMap(Region screen, GameControl* gc)
 					}
 				}
 			}
+
+			//text feedback
+			if (actor->textDisplaying) {
+				unsigned long time;
+				GetTime( time );
+				if (( time - actor->timeStartDisplaying ) >= 6000) {
+					actor->textDisplaying = 0;
+				}
+				if (actor->textDisplaying == 1) {
+					Font* font = core->GetFont( 1 );
+					Region rgn( actor->Pos.x-100+screen.x,
+						actor->Pos.y - 100 + screen.y,
+						200, 400 );
+					font->Print( rgn, ( unsigned char * ) actor->overHeadText,
+							NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP,
+							false );
+				}
+			}
+
 		}
 	}
 
