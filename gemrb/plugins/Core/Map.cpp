@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.188 2005/09/25 09:35:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.189 2005/09/25 14:41:14 avenger_teambg Exp $
  *
  */
 
@@ -638,8 +638,8 @@ void Map::DrawMap(Region screen, GameControl* gc)
 			}
 			if (( !actor->Modified[IE_NOCIRCLE] ) &&
 					( !( State & STATE_DEAD ) )) {
-				actor->DrawCircle(screen);
-				actor->DrawTargetPoint(screen);
+				actor->DrawCircle(vp);
+				actor->DrawTargetPoint(vp);
 			}
 
 			unsigned char StanceID = actor->GetStance();
