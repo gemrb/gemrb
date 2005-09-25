@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.336 2005/09/02 21:08:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.337 2005/09/25 09:35:45 avenger_teambg Exp $
  *
  */
 
@@ -2702,14 +2702,15 @@ PyDoc_STRVAR( GemRB_PlayMovie__doc,
 static PyObject* GemRB_PlayMovie(PyObject * /*self*/, PyObject* args)
 {
 	char* string;
-	int flag;
+	int flag = 0;
 
 	if (!PyArg_ParseTuple( args, "s|i", &string, &flag )) {
 		return AttributeError( GemRB_PlayMovie__doc );
 	}
 
-	ieDword ind = 0;
+	ieDword ind = flag;
 
+	//Lookup will leave the flag untouched if it doesn't exist yet
 	core->GetDictionary()->Lookup(string, ind);
 	if (!ind) {
 		ind = core->PlayMovie( string );

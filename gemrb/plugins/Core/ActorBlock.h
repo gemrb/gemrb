@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.86 2005/07/23 19:49:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.87 2005/09/25 09:35:45 avenger_teambg Exp $
  *
  */
 
@@ -194,7 +194,7 @@ public:
 	int size;
 public:
 	void SetBBox(Region &newBBox);
-	void DrawCircle();
+	void DrawCircle(Region &vp);
 	bool IsOver(Point &Pos);
 	void SetOver(bool over);
 	bool IsSelected();
@@ -283,7 +283,7 @@ public:
 	void WalkTo(Point &Des, int MinDistance = 0);
 	void MoveTo(Point &Des);
 	void ClearPath();
-	void DrawTargetPoint();
+	void DrawTargetPoint(Region &vp);
 };
 
 //Tiled objects are not used (and maybe not even implemented correctly in IE)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.187 2005/09/23 17:37:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.188 2005/09/25 09:35:45 avenger_teambg Exp $
  *
  */
 
@@ -638,8 +638,8 @@ void Map::DrawMap(Region screen, GameControl* gc)
 			}
 			if (( !actor->Modified[IE_NOCIRCLE] ) &&
 					( !( State & STATE_DEAD ) )) {
-				actor->DrawCircle();
-				actor->DrawTargetPoint();
+				actor->DrawCircle(screen);
+				actor->DrawTargetPoint(screen);
 			}
 
 			unsigned char StanceID = actor->GetStance();
@@ -670,23 +670,7 @@ void Map::DrawMap(Region screen, GameControl* gc)
 			}
 
 			//text feedback
-			if (actor->textDisplaying) {
-				unsigned long time;
-				GetTime( time );
-				if (( time - actor->timeStartDisplaying ) >= 6000) {
-					actor->textDisplaying = 0;
-				}
-				if (actor->textDisplaying == 1) {
-					Font* font = core->GetFont( 1 );
-					Region rgn( actor->Pos.x-100+screen.x,
-						actor->Pos.y - 100 + screen.y,
-						200, 400 );
-					font->Print( rgn, ( unsigned char * ) actor->overHeadText,
-							NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP,
-							false );
-				}
-			}
-
+			actor->DrawOverheadText(screen);
 		}
 	}
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.125 2005/09/02 21:08:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.126 2005/09/25 09:35:45 avenger_teambg Exp $
  *
  */
 
@@ -1000,3 +1000,20 @@ void Actor::WalkTo(Point &Des, int MinDistance)
 	Moveble::WalkTo(Des, MinDistance);
 }
 
+void Actor::DrawOverheadText(Region &screen)
+{
+	unsigned long time;
+	GetTime( time );
+
+	if (!textDisplaying)
+		return;
+	if (( time - timeStartDisplaying ) >= 6000) {
+		textDisplaying = 0;
+	}
+
+	Font* font = core->GetFont( 1 );
+	int cs = anims?anims->GetCircleSize():0;
+	Region rgn( Pos.x-100+screen.x, Pos.y - cs * 50 + screen.y, 200, 400 );
+	font->Print( rgn, ( unsigned char * ) overHeadText,
+	NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false );
+}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.109 2005/08/15 15:55:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.110 2005/09/25 09:35:45 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -301,7 +301,7 @@ void Selectable::SetBBox(Region &newBBox)
 	BBox = newBBox;
 }
 
-void Selectable::DrawCircle()
+void Selectable::DrawCircle(Region &vp)
 {
 	if (size<=0) {
 		return;
@@ -314,7 +314,7 @@ void Selectable::DrawCircle()
 	} else {
 		return;
 	}
-	Region vp = core->GetVideoDriver()->GetViewport();
+	//Region vp = core->GetVideoDriver()->GetViewport();
 	core->GetVideoDriver()->DrawEllipse( Pos.x - vp.x, Pos.y - vp.y,
 		 size * 10, ( ( size * 15 ) / 2 ), *col );
 }
@@ -552,7 +552,7 @@ void Moveble::ClearPath()
 
 static unsigned long tp_steps[8]={3,2,1,0,1,2,3,4};
 
-void Moveble::DrawTargetPoint()
+void Moveble::DrawTargetPoint(Region &vp)
 {
 	if (!path || !Selected || (InternalFlags&IF_NORECTICLE) )
 		return;
@@ -563,7 +563,7 @@ void Moveble::DrawTargetPoint()
 	GetTime( step );
 	step = tp_steps [(step >> 6) & 7];
 
-	Region vp = core->GetVideoDriver()->GetViewport();
+	//Region vp = core->GetVideoDriver()->GetViewport();
 	core->GetVideoDriver()->DrawEllipse( Destination.x - vp.x,
 		Destination.y - vp.y, (unsigned short) (size * 10 - step),
 		(unsigned short) ( size * 15 / 2 - step), selectedColor );
