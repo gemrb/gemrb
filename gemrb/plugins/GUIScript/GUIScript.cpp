@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.337 2005/09/25 09:35:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.338 2005/10/16 21:41:41 edheldil Exp $
  *
  */
 
@@ -4454,6 +4454,22 @@ static PyObject* GemRB_ExecuteString(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_RunEventHandler__doc,
+"RunEvent(String)\n\n"
+"Executes a GUIScript event handler function named String" );
+
+static PyObject* GemRB_RunEventHandler(PyObject * /*self*/, PyObject* args)
+{
+	char* String;
+
+	if (!PyArg_ParseTuple( args, "s", &String )) {
+		return AttributeError( GemRB_RunEventHandler__doc );
+	}
+	core->GetGUIScriptEngine()->RunFunction( String );
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_EvaluateString__doc,
 "EvaluateString(String)\n\n"
 "Evaluate an In-Game Script Trigger in the current Area Script Context" );
@@ -5367,6 +5383,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(MoveTAText, METH_VARARGS),
 	METHOD(RewindTA, METH_VARARGS),
 	METHOD(SetTAHistory, METH_VARARGS),
+	METHOD(RunEventHandler, METH_VARARGS),
 	METHOD(ExecuteString, METH_VARARGS),
 	METHOD(EvaluateString, METH_VARARGS),
 	METHOD(GetGameString, METH_VARARGS),
