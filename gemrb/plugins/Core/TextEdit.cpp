@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.cpp,v 1.28 2005/05/26 17:48:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.cpp,v 1.29 2005/10/16 21:36:46 edheldil Exp $
  *
  */
 
@@ -33,6 +33,8 @@ TextEdit::TextEdit(unsigned short maxLength)
 	CurPos = 0;
 	Buffer[0] = 0;
 	ResetEventHandler( EditOnChange );
+	ResetEventHandler( EditOnDone );
+	ResetEventHandler( EditOnCancel );
 	Color white = {0xff, 0xff, 0xff, 0x00}, black = {0x00, 0x00, 0x00, 0x00};
 	palette = core->GetVideoDriver()->CreatePalette( white, black );
 }
@@ -49,10 +51,14 @@ TextEdit::~TextEdit(void)
 /** Draws the Control on the Output Display */
 void TextEdit::Draw(unsigned short x, unsigned short y)
 {
-	if (!Changed) {
+	if (!Changed && !((Window*)Owner)->Floating) {
 		return;
 	}
 	Changed = false;
+	if (Back) {
+		core->GetVideoDriver()->BlitSprite( Back, x + XPos, y + YPos, true );
+
+	}
 	if (!font)
 		return;
 	if (hasFocus) {
@@ -157,6 +163,10 @@ void TextEdit::OnSpecialKeyPress(unsigned char Key)
 				CurPos--;
 			}
 			break;
+		case GEM_RETURN:
+			RunEventHandler( EditOnDone );
+			return;
+
 	}
 	RunEventHandler( EditOnChange );
 }
@@ -195,6 +205,12 @@ bool TextEdit::SetEvent(int eventType, EventHandler handler)
 	switch (eventType) {
 	case IE_GUI_EDIT_ON_CHANGE:
 		SetEventHandler( EditOnChange, handler );
+		break;
+	case IE_GUI_EDIT_ON_DONE:
+		SetEventHandler( EditOnDone, handler );
+		break;
+	case IE_GUI_EDIT_ON_CANCEL:
+		SetEventHandler( EditOnCancel, handler );
 		break;
 	default:
 		return Control::SetEvent( eventType, handler );

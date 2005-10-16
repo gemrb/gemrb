@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.45 2005/08/14 14:57:30 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.46 2005/10/16 21:36:48 edheldil Exp $
 
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
@@ -63,6 +63,8 @@ IE_GUI_BUTTON_ON_DRAG       = 0x00000007
 IE_GUI_PROGRESS_END_REACHED = 0x01000000
 IE_GUI_SLIDER_ON_CHANGE   = 0x02000000
 IE_GUI_EDIT_ON_CHANGE     = 0x03000000
+IE_GUI_EDIT_ON_DONE       = 0x03000001
+IE_GUI_EDIT_ON_CANCEL     = 0x03000002
 IE_GUI_TEXTAREA_ON_CHANGE = 0x05000000
 IE_GUI_TEXTAREA_OUT_OF_TEXT = 0x05000001
 IE_GUI_LABEL_ON_PRESS     = 0x06000000
