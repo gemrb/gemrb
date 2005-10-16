@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.31 2005/08/13 19:27:27 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.32 2005/10/16 21:54:37 edheldil Exp $
 
 
 # MessageWindow.py - scripts and GUI for main (walk) window
@@ -39,7 +39,7 @@ from GUIPR import *
 from GUIREC import *
 from GUISTORE import *
 from GUIWORLD import *
-
+from GUISAVE import *
 
 MessageWindow = 0
 ActionsWindow = 0
@@ -57,7 +57,9 @@ def OnLoad():
 	PortraitWindow = OpenPortraitWindow (1)
 
 	MessageTA = GemRB.GetControl (MessageWindow, 1)
-	GemRB.SetTextAreaFlags (MessageWindow, MessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
+	#GemRB.SetTextAreaFlags (MessageWindow, MessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
+	#GemRB.SetTextAreaFlags (MessageWindow, MessageTA, IE_GUI_TEXTAREA_SMOOTHSCROLL)
+	GemRB.RewindTA (MessageWindow, MessageTA, 100)
 	GemRB.SetVar ("MessageTextArea", MessageTA)
 	GemRB.SetVar ("ActionsWindow", ActionsWindow)
 	GemRB.SetVar ("OptionsWindow", OptionsWindow)

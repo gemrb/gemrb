@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.18 2005/05/31 21:36:46 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.19 2005/10/16 21:54:37 edheldil Exp $
 
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
@@ -39,6 +39,7 @@ from GUIDefines import *
 from GUICommon import CloseOtherWindow
 from GUICommonWindows import EnableAnimatedWindows, DisableAnimatedWindows
 
+from GUISAVE import OpenSaveWindow
 import MessageWindow
 
 ###################################################
@@ -504,14 +505,6 @@ def DisplayHelpEndOfRound ():
 
 
 ###################################################
-###################################################
-
-def OpenSaveWindow ():
-	OpenOptionsWindow ()
-	GemRB.SetNextScript ('GUISAVE')
-	
-
-
 ###################################################
 
 def OpenLoadMsgWindow ():
