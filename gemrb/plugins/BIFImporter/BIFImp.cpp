@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.22 2005/06/22 21:18:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.23 2005/10/16 21:46:06 edheldil Exp $
  *
  */
 
@@ -64,8 +64,7 @@ int BIFImp::DecompressSaveGame(DataStream *compressed)
 		strlwr(fname);
 		compressed->Read( &declen, 4 );
 		compressed->Read( &complen, 4 );
-		strcpy( path, core->CachePath );
-		strcat( path, fname );
+		PathJoin( path, core->CachePath, fname, NULL );
 		printf( "Decompressing %s\n",fname );
 		free( fname );
 		if (!core->IsAvailable( IE_COMPRESSION_CLASS_ID ))
@@ -164,8 +163,7 @@ int BIFImp::OpenArchive(const char* filename)
 		compressed->Read( fname, fnlen );
 		compressed->Read( &declen, 4 );
 		compressed->Read( &complen, 4 );
-		strcpy( path, core->CachePath );
-		strcat( path, fname );
+		PathJoin( path, core->CachePath, fname, NULL );
 		free( fname );
 		in_cache = fopen( path, "rb" );
 		if (in_cache) {
@@ -201,8 +199,7 @@ int BIFImp::OpenArchive(const char* filename)
 
 	if (strncmp( Signature, "BIFCV1.0", 8 ) == 0) {
 		//printf("'BIFCV1.0' Compressed File Found\n");
-		strcpy( path, core->CachePath );
-		strcat( path, compressed->filename );
+		PathJoin( path, core->CachePath, compressed->filename, NULL );
 		in_cache = fopen( path, "rb" );
 		if (in_cache) {
 			//printf("Found in Cache\n");

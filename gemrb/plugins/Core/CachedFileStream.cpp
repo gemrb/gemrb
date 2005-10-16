@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.cpp,v 1.34 2005/06/19 22:59:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.cpp,v 1.35 2005/10/16 21:46:06 edheldil Exp $
  *
  */
 
@@ -31,10 +31,10 @@ CachedFileStream::CachedFileStream(const char* stream, bool autoFree)
 	ExtractFileFromPath( fname, stream );
 
 	char path[_MAX_PATH];
-	strcpy( path, core->CachePath );
-	strcat( path, fname );
+	PathJoin( path, core->CachePath, fname, NULL );
+
 	str = _fopen( path, "rb" );
-	if (str == NULL) {
+	if (str == NULL) {    // File was not found in cache
 		if (core->GameOnCD) {
 			_FILE* src = _fopen( stream, "rb" );
 #ifdef _DEBUG
@@ -59,7 +59,7 @@ CachedFileStream::CachedFileStream(const char* stream, bool autoFree)
 			core->CachedFileStreamPtrCount--;
 #endif
 			str = _fopen( path, "rb" );
-		} else {
+		} else {  // Don't cache files already on hdd
 			str = _fopen( stream, "rb" );
 		}
 	}
@@ -83,8 +83,7 @@ CachedFileStream::CachedFileStream(CachedFileStream* cfs, int startpos,
 	this->startpos = startpos;
 	this->autoFree = autoFree;
 	char cpath[_MAX_PATH];
-	strcpy( cpath, core->CachePath );
-	strcat( cpath, cfs->filename );
+	PathJoin( cpath, core->CachePath, cfs->filename, NULL );
 	str = _fopen( cpath, "rb" );
 	if (str == NULL) {
 		str = _fopen( cfs->originalfile, "rb" );
