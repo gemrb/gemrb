@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.17 2005/06/22 15:55:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.18 2005/10/18 22:43:41 edheldil Exp $
  *
  */
 
@@ -46,7 +46,9 @@ public:
 	BMPImp(void);
 	~BMPImp(void);
 	bool Open(DataStream* stream, bool autoFree = true);
+	bool OpenFromImage(Sprite2D* sprite, bool autoFree = true);
 	Sprite2D* GetImage();
+	void PutImage(DataStream *output, unsigned int ratio);
 	/** No descriptions */
 	void GetPalette(int index, int colors, Color* pal);
 	/** Searchmap only */

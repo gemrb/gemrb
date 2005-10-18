@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.21 2005/08/14 17:00:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.22 2005/10/18 22:43:41 edheldil Exp $
  *
  */
 
@@ -174,6 +174,47 @@ bool BMPImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
+bool BMPImp::OpenFromImage(Sprite2D* sprite, bool autoFree)
+{
+	if (sprite == NULL) {
+		return false;
+	}
+	if (str && this->autoFree) {
+		delete( str );
+	}
+	if (Palette) {
+		free( Palette );
+	}
+
+	// FIXME: we assume 24bit sprite format here!
+
+	Size = 0;
+	Width = sprite->Width;
+	Height = sprite->Height;
+	Planes = 1;
+	BitCount = 24;
+	Compression = 0;
+	ImageSize = 0;
+	NumColors = 0;
+	PaddedRowLength = Width * 3;
+	if (PaddedRowLength & 3) {
+		PaddedRowLength += 4 - ( PaddedRowLength & 3 );
+	}
+
+	Palette = NULL;
+	// left out some other params
+
+	pixels = malloc( Width * Height * 3 );
+	memcpy( pixels, sprite->pixels, Width * Height * 3 );
+
+	// FIXME: free the sprite if autoFree?
+	if (autoFree) {
+		delete sprite;
+	}
+
+	return true;
+}
+
 Sprite2D* BMPImp::GetImage()
 {
 	Sprite2D* spr = NULL;
@@ -232,5 +273,63 @@ void BMPImp::GetPalette(int index, int colors, Color* pal)
 			pal[i].g = Palette[p].g;
 			pal[i].b = Palette[p++].b;
 		}
+	}
+}
+
+
+#define GET_SCANLINE_LENGTH(width, bitsperpixel)  (((width)*(bitsperpixel)+7)/8)
+
+void BMPImp::PutImage(DataStream *output, unsigned int ratio)
+{
+	ieDword tmpDword;
+	ieWord tmpWord;
+
+	if(ratio<1) {
+		ratio=1;
+	}
+	// FIXME
+	ieDword Width = GetWidth()/ratio;
+	ieDword Height = GetHeight()/ratio;
+	char filling[3] = {'B','M'};
+	ieDword PaddedRowLength = GET_SCANLINE_LENGTH(Width,24);
+	int stuff = (4-(PaddedRowLength&3))&3; // rounding it up to 4 bytes boundary
+	PaddedRowLength+=stuff;
+	ieDword fullsize = PaddedRowLength*Height;
+
+	//always save in truecolor (24 bit), no palette
+	output->Write( filling, 2);
+	tmpDword = fullsize+BMP_HEADER_SIZE;  // FileSize
+	output->WriteDword( &tmpDword);
+	tmpDword = 0;
+	output->WriteDword( &tmpDword);       // ??
+	tmpDword = BMP_HEADER_SIZE;           // DataOffset
+	output->WriteDword( &tmpDword);
+	tmpDword = 40;                        // Size
+	output->WriteDword( &tmpDword);
+	output->WriteDword( &Width);
+	output->WriteDword( &Height);
+	tmpWord = 1;                          // Planes
+	output->WriteWord( &tmpWord);
+	tmpWord = 24; //24 bits               // BitCount
+	output->WriteWord( &tmpWord);
+	tmpDword = 0;                         // Compression
+	output->WriteDword( &tmpDword);
+	output->WriteDword( &tmpDword);       // ImageSize
+	output->WriteDword( &tmpDword);
+	output->WriteDword( &tmpDword);
+	output->WriteDword( &tmpDword);
+	output->WriteDword( &tmpDword);
+	
+	memset( filling,0,sizeof(filling) );
+	for (unsigned int y=0;y<Height;y++) {
+		for (unsigned int x=0;x<Width;x++) {
+			Color c = GetPixelSum(x,Height-y-1,ratio);
+			//Color c = GetPixel(x,Height-y-1);
+
+			output->Write( &c.b, 1);
+			output->Write( &c.g, 1);
+			output->Write( &c.r, 1);
+		}
+		output->Write( filling, stuff);
 	}
 }

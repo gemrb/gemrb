@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.37 2005/08/14 17:52:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.38 2005/10/18 22:43:41 edheldil Exp $
  *
  */
 
@@ -47,7 +47,7 @@ Control::Control()
 Control::~Control()
 {
 	if (InHandler) {
-		printf("[Control] We are currently in an event handler, crash may occur!");
+		printf("[Control] Destroying control inside event handler, crash may occur!");
 	}
 	core->DisplayTooltip( 0, 0, NULL );
 	if (Tooltip) {

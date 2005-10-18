@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.74 2005/07/30 11:45:20 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.75 2005/10/18 22:43:41 edheldil Exp $
  */
 
 class GameControl;
@@ -169,6 +169,8 @@ public:
 	Actor *GetLastActor() { return lastActor; }
 	/* changes map to the current PC */
 	void ChangeMap(Actor *pc, bool forced);
+	/* returns current area preview for saving a game */
+	Sprite2D* GetPreview();
 };
 
 #endif

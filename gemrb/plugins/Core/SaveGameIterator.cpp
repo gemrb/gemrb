@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.29 2005/08/08 21:22:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.30 2005/10/18 22:43:41 edheldil Exp $
  *
  */
 
@@ -378,7 +378,17 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname)
 			im->PutImage(&outfile,ratio);
 		}
 	}
-	//area preview
+	core->FreeInterface(im);
+
+	// Area preview
+
+	im = (ImageMgr *) core->GetInterface(IE_BMP_CLASS_ID);
+	Sprite2D* preview = core->GetGameControl()->GetPreview();
+	snprintf( Path, _MAX_PATH, "%s%s%s%09d-%s", core->SavePath, PlayMode(), SPathDelimiter, index, slotname);
+	FileStream outfile;
+	outfile.Create( Path, core->GameNameResRef, IE_BMP_CLASS_ID );
+	im->OpenFromImage( preview, true );
+	im->PutImage( &outfile, 5 );
 
 	core->FreeInterface(im);
 	return 0;

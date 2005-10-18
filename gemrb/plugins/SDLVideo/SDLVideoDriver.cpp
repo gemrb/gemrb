@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.109 2005/06/28 20:04:24 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.110 2005/10/18 22:43:40 edheldil Exp $
  *
  */
 
@@ -635,6 +635,24 @@ void SDLVideoDriver::SetDragCursor(Sprite2D* drag)
 		CursorPos.y -=  mouseAdjustY[CursorIndex];
 		Cursor[2] = NULL;
 	}
+}
+
+Sprite2D* SDLVideoDriver::GetPreview(int /*w*/, int /*h*/)
+{
+	int Width = disp->w;
+	int Height = disp->h;
+
+	//void* pixels = malloc( w * h * 3 );
+	//Sprite2D* preview = CreateSprite( w, h, 24, 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000, pixels, true, 0x0000ff00 );
+
+	SDL_Surface* surf = SDL_CreateRGBSurface( SDL_SWSURFACE, Width, Height, 24,
+				0xFF0000, 0x00FF00, 0x0000FF, 0x000000 );
+	SDL_BlitSurface( backBuf, NULL, surf, NULL);
+	void* pixels = malloc( Width * Height * 3 );
+	memcpy( pixels, surf->pixels, Width * Height * 3 );
+	Sprite2D* preview = CreateSprite( Width, Height, 24, 0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000, pixels, false, 0 );
+
+	return preview;
 }
 
 Region SDLVideoDriver::GetViewport()

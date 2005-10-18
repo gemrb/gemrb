@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.251 2005/08/22 23:10:17 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.252 2005/10/18 22:43:41 edheldil Exp $
  */
 
 #ifndef WIN32
@@ -1709,4 +1709,15 @@ void GameControl::SetDialogueFlags(int value, int mode)
 		case BM_AND: DialogueFlags&=value; break;
 		case BM_XOR: DialogueFlags^=value; break;
 	}
+}
+
+Sprite2D* GameControl::GetPreview()
+{
+	HideGUI ();
+	Draw (0, 0);
+	Sprite2D* preview = core->GetVideoDriver()->GetPreview( 128, 81 );
+	UnhideGUI ();
+	core->DrawWindows ();
+
+	return preview;
 }

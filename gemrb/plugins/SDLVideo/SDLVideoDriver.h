@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.50 2005/06/06 00:20:10 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.51 2005/10/18 22:43:40 edheldil Exp $
  *
  */
 
@@ -70,6 +70,7 @@ public:
 		Color *Palette = NULL, Region* clip = NULL);
 	void SetCursor(Sprite2D* up, Sprite2D* down);
 	void SetDragCursor(Sprite2D* drag);
+	Sprite2D* GetPreview(int w, int h);
 	Region GetViewport(void);
 	void SetViewport(int x, int y, unsigned int w, unsigned int h);
 	void MoveViewportTo(int x, int y, bool center);

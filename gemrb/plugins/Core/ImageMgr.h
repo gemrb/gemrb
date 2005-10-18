@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ImageMgr.h,v 1.11 2005/06/22 21:21:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ImageMgr.h,v 1.12 2005/10/18 22:43:41 edheldil Exp $
  *
  */
 
@@ -45,6 +45,10 @@ public:
 	ImageMgr(void);
 	virtual ~ImageMgr(void);
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
+	// Swallows an image so it can be saved w/ PutImage() etc.
+	// FIXME: should be abstract, but I don't want to implement it for all
+	// image managers right now
+	virtual bool OpenFromImage(Sprite2D* sprite, bool autoFree = true);
 	virtual Sprite2D* GetImage() = 0;
 	/** No descriptions */
 	virtual void GetPalette(int index, int colors, Color* pal) = 0;
@@ -55,9 +59,11 @@ public:
 	virtual unsigned int GetPixelIndex(unsigned int x, unsigned int y) = 0;
 	virtual int GetWidth() = 0;
 	virtual int GetHeight() = 0;
+	// FIXME: should be abstract, but I don't want to implement it for all
+	// image managers right now
+	virtual void PutImage(DataStream *output, unsigned int ratio);
+protected:
 	/** not virtual */
-	void PutImage(DataStream *output, unsigned int ratio);
-private:
 	Color GetPixelSum(unsigned int x, unsigned int y, unsigned int ratio);
 };
 
