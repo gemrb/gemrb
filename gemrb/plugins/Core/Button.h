@@ -15,9 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.48 2005/08/14 17:52:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.49 2005/10/19 21:57:33 edheldil Exp $
  *
  */
+
+/**
+ * @file Button.h
+ * Declares Button widget, for displaying buttons in the GUI
+ * @author GemRB Development Team
+ */
+
 
 #ifndef BUTTON_H
 #define BUTTON_H
@@ -69,10 +76,6 @@
 #define IE_GUI_BUTTON_ON_DRAG        0x00000007
 
 
-/**Button Class. Used also for PixMaps (static images) or for Toggle Buttons.
-  *@author GemRB Development Team
-  */
-
 #ifdef WIN32
 
 #ifdef GEM_BUILD_DLL
@@ -98,6 +101,12 @@ typedef struct ButtonBorder {
 
 #define MAX_NUM_BORDERS 3
 
+
+/**
+ * @class Button
+ * Button widget, used mainly for buttons, but also for PixMaps (static images)
+ * or for Toggle Buttons.
+ */
 
 class GEM_EXPORT Button : public Control {
 public: 

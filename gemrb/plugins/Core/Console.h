@@ -15,8 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Console.h,v 1.4 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Console.h,v 1.5 2005/10/19 21:57:33 edheldil Exp $
  *
+ */
+
+/**
+ * @file Console.h
+ * Declares Console widget, input field for direct poking into GemRB innards.
+ * @author The GemRB Project
  */
 
 #ifndef CONSOLE_H
@@ -24,6 +30,15 @@
 
 #include "Control.h"
 #include "TextArea.h"
+
+/**
+ * @class Console
+ * Widget displaying debugging console, input field for direct poking
+ * into GemRB innards.
+ * The console accepts and executes python statements and has already
+ * GemRB python module loaded, so almost any command
+ * from GUIScripts can be used.
+ */
 
 class Console : public Control {
 public:

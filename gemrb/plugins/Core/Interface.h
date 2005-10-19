@@ -15,8 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.169 2005/09/02 21:08:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.170 2005/10/19 21:57:33 edheldil Exp $
  *
+ */
+
+/**
+ * @file Interface.h
+ * Declaration of Interface class, central interconnect for various GemRB parts
  */
 
 #ifndef INTERFACE_H
@@ -114,6 +119,11 @@ typedef struct SlotType {
 #define QF_CHANGESCRIPT  4
 #define QF_LOADGAME      8
 #define QF_ENTERGAME     16
+
+/**
+ * @class Interface
+ * Central interconnect for all GemRB parts, driving functions and utility functions possibly belonging to a better place
+ */
 
 class GEM_EXPORT Interface : public InterfaceDesc
 {
@@ -486,7 +496,7 @@ public:
 	unsigned int TooltipDelay;
 	unsigned int FogOfWar;
 	bool FullScreen, CaseSensitive, GameOnCD, SkipIntroVideos, DrawFPS;
-	/** The Main Loop */
+	/** The Main program loop */
 	void Main(void);
 	/** Draws the Visible windows in the Windows Array */
 	void DrawWindows(void);

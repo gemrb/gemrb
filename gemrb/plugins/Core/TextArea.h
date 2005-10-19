@@ -15,8 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.27 2005/08/15 20:29:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.28 2005/10/19 21:57:33 edheldil Exp $
  *
+ */
+
+/**
+ * @file TextArea.h
+ * Declares TextArea widget for displaying long paragraphs of text
+ * @author The GemRB Project
  */
 
 #ifndef TEXTAREA_H
@@ -49,6 +55,12 @@
 #else
 #define GEM_EXPORT
 #endif
+
+/**
+ * @class TextArea
+ * Widget capable of displaying long paragraphs of text.
+ * It is usually scrolled with a ScrollBar widget
+ */
 
 class GEM_EXPORT TextArea : public Control {
 public:

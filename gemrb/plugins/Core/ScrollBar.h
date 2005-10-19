@@ -15,8 +15,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.h,v 1.14 2004/11/18 23:32:41 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.h,v 1.15 2005/10/19 21:57:33 edheldil Exp $
  *
+ */
+
+/**
+ * @file ScrollBar.h
+ * Declares ScrollBar widget for paging in long text windows.
+ * This does not include scales and sliders, which are of Slider class.
+ * @author The GemRB Project
  */
 
 #ifndef SCROLLBAR_H
@@ -52,6 +59,11 @@
 #else
 #define GEM_EXPORT
 #endif
+
+/**
+ * @class ScrollBar
+ * Widget displaying scrollbars for paging in long text windows
+ */
 
 class GEM_EXPORT ScrollBar : public Control {
 public:

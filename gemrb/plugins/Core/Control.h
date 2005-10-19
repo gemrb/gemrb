@@ -15,10 +15,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.31 2005/08/14 17:52:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.32 2005/10/19 21:57:33 edheldil Exp $
  *
  */
 
+/**
+ * @file Control.h
+ * Declares Control, root class for all widgets except of windows
+ */
+ 
 #ifndef CONTROL_H
 #define CONTROL_H
 
@@ -42,9 +47,6 @@
 
 #include "../../includes/ie_types.h"
 #include "../../includes/win32def.h"
-/**This class defines a basic Control Object.
-	*@author GemRB Developement Team
-	*/
 #include "../../includes/RGBAColor.h"
 
 #include "AnimationMgr.h"
@@ -61,10 +63,20 @@
 #define GEM_EXPORT
 #endif
 
+/** 
+ * Event handler indicates code to be called when a particular 
+ * (usually GUI) event occurs.
+ * Currently it's a name of a python function.
+ */
 typedef char EventHandler[64];
 
 class ControlAnimation;
 
+/**
+ * @class Control
+ * Basic Control Object, also called widget or GUI element. Parent class for Labels, Buttons, etc.
+ * Every GUI element except of a Window is a descendant of this class.
+ */
 
 class GEM_EXPORT Control {
 public: 
@@ -99,10 +111,13 @@ public: // Public attributes
 	ieWord Height;
 	/** Type of control */
 	ieByte ControlType;
+	/** Text to display as a tooltip when the mouse cursor hovers 
+	 * for some time over the control */
 	char* Tooltip;	
 	/** Focused Control */
 	bool hasFocus;
-	/** Changed Flag */
+	/** If true, control is redrawn during next call to gc->DrawWindows. 
+	 * Then it's set back to false. */
 	bool Changed;
 	/** True if we are currently in an event handler */
 	bool InHandler;

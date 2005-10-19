@@ -24,3 +24,6 @@ install-data-hook:
 	rm -f $(bindir)/plugins/libgemrb_core.so
 	mkdir -p $(bindir)/Cache 2>/dev/null
 	rm -rf $(bindir)/Cache/*
+
+docs:
+	doxygen

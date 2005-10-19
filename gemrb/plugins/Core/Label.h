@@ -15,8 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.h,v 1.14 2004/11/20 10:39:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.h,v 1.15 2005/10/19 21:57:33 edheldil Exp $
  *
+ */
+
+/**
+ * @file Label.h
+ * Declares Label widget for displaying static texts
+ * @author GemRB Developement Team
  */
 
 #ifndef LABEL_H
@@ -29,10 +35,6 @@
 // !!! Keep these synchronized with GUIDefines.py !!!
 #define IE_GUI_LABEL_ON_PRESS      0x06000000
 
-/**Static Text GUI Control
-  *@author GemRB Developement Team
-  */
-
 #ifdef WIN32
 
 #ifdef GEM_BUILD_DLL
@@ -44,6 +46,11 @@
 #else
 #define GEM_EXPORT
 #endif
+
+/**
+ * @class Label
+ * Label widget for displaying static texts in the GUI
+ */
 
 class GEM_EXPORT Label : public Control {
 public: 

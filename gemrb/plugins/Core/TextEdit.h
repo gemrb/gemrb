@@ -15,8 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.h,v 1.14 2005/10/16 21:36:46 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.h,v 1.15 2005/10/19 21:57:33 edheldil Exp $
  *
+ */
+
+/**
+ * @file TextEdit.h
+ * Declares TextEdit widget for displaying single line text input field
+ * @author The GemRB Project
  */
 
 #ifndef TEXTEDIT_H
@@ -45,6 +51,11 @@
 #else
 #define GEM_EXPORT
 #endif
+
+/**
+ * @class TextEdit
+ * Widget displaying single line text input field
+ */
 
 class GEM_EXPORT TextEdit : public Control {
 public:

@@ -1,3 +1,29 @@
+/* GemRB - Infinity Engine Emulator
+ * Copyright (C) 2003 The GemRB Project
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.h,v 1.16 2005/10/19 21:57:33 edheldil Exp $
+ *
+ */
+
+/**
+ * @file MapControl.h
+ * Declares MapControl, widget for displaying current area map
+ */
+
 class MapControl;
 
 #ifndef MAPCONTROL_H
@@ -25,6 +51,12 @@ class MapControl;
 #ifndef _DEBUG
 #define _DEBUG
 #endif
+
+/**
+ * @class MapControl
+ * Widget displaying current area map, with a viewport rectangle
+ * and PCs' ground circles
+ */
 
 class GEM_EXPORT MapControl : public Control {
 public:

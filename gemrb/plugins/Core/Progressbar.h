@@ -15,8 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.h,v 1.8 2005/08/14 17:52:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.h,v 1.9 2005/10/19 21:57:33 edheldil Exp $
  *
+ */
+
+/**
+ * @file Progressbar.h
+ * Declares Progressbar widget for displaying progress of loading and saving games
  */
 
 #ifndef PROGRESSBAR_H
@@ -41,6 +46,11 @@
 #else
 #define GEM_EXPORT
 #endif
+
+/**
+ * @class Progressbar
+ * Widget for displaying progressbars, mainly on loading/saving screens
+ */
 
 class GEM_EXPORT Progressbar : public Control  {
 public: 
@@ -82,7 +92,7 @@ private: // Private attributes
 	/** The most for the progressbar cap (linear progressbar) */
 	Sprite2D *PBarCap;
 public:
-/** EndReached Scripted Event Function Name */
+        /** EndReached Scripted Event Function Name */
 	EventHandler EndReached;
 };
 

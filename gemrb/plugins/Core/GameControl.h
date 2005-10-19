@@ -15,7 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.75 2005/10/18 22:43:41 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.76 2005/10/19 21:57:33 edheldil Exp $
+ */
+
+/**
+ * @file GameControl.h
+ * Declares GameControl widget which is responsible for displaying areas,
+ * interacting with PCs, NPCs and the rest of the game world.
+ * @author The GemRB Project
  */
 
 class GameControl;
@@ -77,6 +84,14 @@ class GameControl;
 #define MAX_OPERATING_DISTANCE      40 //a search square is 16x12
 //the distance between PC's who are about to enter a new area 
 #define MAX_TRAVELING_DISTANCE      400
+
+/**
+ * @class GameControl
+ * Widget displaying areas, where most of the game 'happens'.
+ * It allows for interacting with PCs, NPCs and the rest of the world.
+ * It's also a very core part of GemRB, as some processes are driven from it.
+ * It's always assigned Control index 0.
+ */
 
 class GEM_EXPORT GameControl : public Control {
 public:
