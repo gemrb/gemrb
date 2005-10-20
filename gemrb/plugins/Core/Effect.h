@@ -15,8 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.h,v 1.7 2005/08/01 20:52:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.h,v 1.8 2005/10/20 20:39:14 edheldil Exp $
  *
+ */
+
+/**
+ * @file Effect.h
+ * Declares Effect class implementing spell and spell-like effects 
+ * and related defines
  */
 
 #ifndef EFFECT_H
@@ -54,6 +60,11 @@ class Actor;
 #define FX_CAN_RESIST_NO_DISPEL     2
 #define FX_NO_RESIST_CAN_DISPEL     3
 #define FX_CAN_DISPEL               1
+
+/**
+ * @class Effect
+ * Structure holding information about single spell or spell-like effect.
+ */
 
 // the same as ITMFeature and SPLFeature
 typedef struct Effect {

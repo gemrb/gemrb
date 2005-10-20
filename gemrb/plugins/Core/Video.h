@@ -15,8 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.45 2005/10/18 22:43:41 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.46 2005/10/20 20:39:14 edheldil Exp $
  *
+ */
+
+/**
+ * @file Video.h
+ * Declares Video, base class for video output plugins.
+ * @author The GemRB Project
  */
 
 #ifndef VIDEO_H
@@ -40,17 +46,26 @@
 #define GEM_EXPORT
 #endif
 
+/**
+ * @class Video
+ * Base class for video output plugins.
+ */
+
 class GEM_EXPORT Video : public Plugin {
 public:
 	Video(void);
 	virtual ~Video(void);
 	virtual int Init(void) = 0;
 	virtual int CreateDisplay(int width, int height, int bpp, bool fullscreen) = 0;
+	/** Sets window title of GemRB window */
 	virtual void SetDisplayTitle(char* title, char* icon) = 0;
 	virtual VideoModes GetVideoModes(bool fullscreen = false) = 0;
 	virtual bool TestVideoMode(VideoMode& vm) = 0;
+	/** Toggles GemRB between fullscreen and windowed mode */
 	virtual bool ToggleFullscreenMode() = 0;
+	/** Swaps displayed and back buffers */
 	virtual int SwapBuffers(void) = 0;
+	/** Grabs and releases mouse cursor within GemRB window */
 	virtual bool ToggleGrabInput() = 0;
 	virtual Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask,
 		ieDword gMask, ieDword bMask, ieDword aMask, void* pixels, bool cK = false,
@@ -67,7 +82,10 @@ public:
 	virtual void BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint,
 		Color *palette = NULL, Region* clip = NULL) = 0;
 	virtual void SetCursor(Sprite2D* up, Sprite2D* down) = 0;
+	/** Sets a temporary cursor when dragging an Item from Inventory */
 	virtual void SetDragCursor(Sprite2D* drag) = 0;
+	/** Return GemRB window screenshot.
+	 * It's generated from the momentary back buffer */
 	virtual Sprite2D* GetPreview(int w, int h) = 0;
 	virtual Region GetViewport(void) = 0;
 	virtual void SetViewport(int x, int y, unsigned int w, unsigned int h) = 0;
@@ -79,14 +97,15 @@ public:
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	virtual void DrawRect(Region& rgn, Color& color, bool fill = true, bool clipped = false) = 0;
 	virtual void DrawRectSprite(Region& rgn, Color& color, Sprite2D* sprite) = 0;
-	/** This functions Draws a Circle */
+	/** Draws a circle */
 	virtual void DrawCircle(short cx, short cy, unsigned short r, Color& color) = 0;
-	/** This functions Draws an Ellipse */
+	/** Draws an ellipse */
 	virtual void DrawEllipse(short cx, short cy, unsigned short xr,
 		unsigned short yr, Color& color, bool clipped = true) = 0;
-	/** This function Draws a Polygon on the Screen */
+	/** Draws a polygon on the screen */
 	virtual void DrawPolyline(Gem_Polygon* poly, Color& color,
 		bool fill = false) = 0;
+	/** Draws a line segment */
 	virtual void DrawLine(short x1, short y1, short x2, short y2,
 		Color& color) = 0;
 	/** Frees a Palette */
@@ -126,6 +145,9 @@ public:
 	short xCorr, yCorr;
 public:
 	virtual void* GetVideoSurface() = 0;
+	/** Returns true if a pixel on a given position in the sprite 
+	 * is transparent.
+	 * It is used to mask clicks to non-rectangular shaped controls */
 	virtual bool IsSpritePixelTransparent(Sprite2D* sprite, unsigned short x, unsigned short y) = 0;
 };
 

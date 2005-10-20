@@ -15,9 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectMgr.h,v 1.2 2005/07/12 18:11:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectMgr.h,v 1.3 2005/10/20 20:39:14 edheldil Exp $
  *
  */
+
+/** 
+ * @file EffectMgr.h
+ * Declares EffectMgr class, loader for Effect objects
+ * @author The GemRB Project
+ */
+
 
 #ifndef EFFECTMGR_H
 #define EFFECTMGR_H
@@ -38,13 +45,22 @@
 #define GEM_EXPORT
 #endif
 
+/**
+ * @class EffectMgr
+ * Abstract loader for Effect objects
+ */
+
 class GEM_EXPORT EffectMgr : public Plugin {
 public:
 	EffectMgr(void);
 	virtual ~EffectMgr(void);
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
+
+	/** Fills fx with Effect data loaded from the stream */
 	virtual Effect* GetEffect(Effect *fx) = 0;
+	/** Fills fx with Effect v1 data loaded from the stream*/
 	virtual Effect* GetEffectV1(Effect *fx) = 0;
+	/** Fills fx with Effect v2.0 data loaded from the stream*/
 	virtual Effect* GetEffectV20(Effect *fx) = 0;
 };
 

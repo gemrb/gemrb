@@ -15,11 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.39 2005/08/05 15:46:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.40 2005/10/20 20:39:14 edheldil Exp $
  *
  */
 
-/* Class implementing creatures' and containers' inventory and item management */
+/**
+ * @file Inventory.h
+ * Declares Inventory, class implementing creatures' and containers' 
+ * inventory and item management 
+ * @author The GemRB Project
+ */
 
 #ifndef INVENTORY_H
 #define INVENTORY_H
@@ -64,6 +69,7 @@ class Map;
 #define IW_NO_EQUIPPED  1000
 #define IW_QUIVER        -22   // (-22, -23, -24)
 
+/** Inventory types */
 typedef enum ieInventoryType {
 	INVENTORY_HEAP = 0,
 	INVENTORY_CREATURE = 1
@@ -102,6 +108,13 @@ typedef enum ieCREItemFlagBits {
 	IE_INV_ITEM_PULSATING = 0x100000
 } ieCREItemFlagBits;
 
+/**
+ * @class CREItem
+ * Class holding Item instance specific values and providing link between 
+ * an Inventory and a stack of  Items.
+ * It's keeping info on whether Item was identified, for example.
+ */
+
 class GEM_EXPORT CREItem {
 public:
 	ieResRef ItemResRef;
@@ -109,7 +122,9 @@ public:
 	ieWord Usages[3];
 	ieDword Flags;
 	// 2 cached values from associated item. LEAVE IT SIGNED!
+	/** Weight of items in the stack */
 	int Weight;
+	/** Amount of items in this stack */
 	int StackAmount;
 
 	CREItem()
@@ -119,12 +134,18 @@ public:
 	}
 };
 
+/**
+ * @class Inventory
+ * Class implementing creatures' and containers' inventory and item management
+ */
+
 class GEM_EXPORT Inventory {
 private:
 	std::vector<CREItem*> Slots;
 	Actor* Owner;
 	int InventoryType;
 	int Changed;
+	/** Total weight of all items in Inventory */
 	int Weight;
 
 	ieDword Equipped;
@@ -133,17 +154,17 @@ public:
 	Inventory();
 	virtual ~Inventory();
 	
-	/** removes an item from the inventory, destroys slot
-	    use it only for containers */
+	/** Removes an item from the inventory, destroys slot.
+	 * Use it for containers only */
 	CREItem *GetItem(size_t idx);
 	/** adds an item to the inventory */
 	void AddItem(CREItem *item);
-	/** returns the count items in the inventory */
+	/** Returns number of items in the inventory */
 	int CountItems(const char *resref, bool charges);
 	/** looks for a particular item in a slot */
 	bool HasItemInSlot(const char *resref, int slot);
-	/** looks for a particular item in the inventory */
-	/** flags: see ieCREItemFlagBits */
+	/** Looks for a particular item in the inventory. */
+	/* flags: see ieCREItemFlagBits */
 	bool HasItem(const char *resref, ieDword flags);
 
 	void CalculateWeight(void);
@@ -157,8 +178,8 @@ public:
 	void SetSlotCount(unsigned int size);
 
 
-	/** returns CREItem in specified slot. if count !=0 it
-	** splits the item and returns only requested amount*/
+	/** Returns CREItem in specified slot. 
+	 * If count !=0 it splits the item and returns only requested amount */
 	CREItem* RemoveItem(unsigned int slot, unsigned int count = 0);
 	/** returns slot of removed item, you can delete the removed item */
 	int RemoveItem(const char* resref, unsigned int flags, CREItem **res_item);
@@ -181,7 +202,7 @@ public:
 	int GetWeight() {return Weight;}
 
 	bool ItemsAreCompatible(CREItem* target, CREItem* source);
-	/*finds the first slot of named item, if resref is empty, finds the first filled! slot*/
+	/** Finds the first slot of named item, if resref is empty, finds the first filled! slot */
 	int FindItem(const char *resref, unsigned int flags);
 	void DropItemAtLocation(unsigned int slot, unsigned int flags, Map *map, Point &loc);
 	void DropItemAtLocation(const char *resref, unsigned int flags, Map *map, Point &loc);
@@ -190,16 +211,18 @@ public:
 	void AddSlotEffects( CREItem* slot );
 	//void AddAllEffects();
 	void RemoveSlotEffects( CREItem* slot );
-	// Returns item in specified slot. Does NOT change inventory
+	/** Returns item in specified slot. Does NOT change inventory */
 	CREItem* GetSlotItem(unsigned int slot);
 	bool EquipItem(unsigned int slot);
 	bool UnEquipItem(unsigned int slot, bool removecurse);
-	// Returns equipped weapon
+	/** Returns equipped weapon */
 	CREItem *GetUsedWeapon();
-	// Returns a slot which might be empty, or capable of holding item (or part of it)
+	/** Returns a slot which might be empty, or capable of holding item (or part of it) */
 	int FindCandidateSlot(int slottype, size_t first_slot, const char *resref = NULL);
 
+	/** Lists all items in the Invenory on terminal for debugging */
 	void dump();
+
 private:
 	int FindRanged();
 	void KillSlot(unsigned int index);

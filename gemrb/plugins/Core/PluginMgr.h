@@ -15,8 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.h,v 1.5 2005/05/14 11:18:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.h,v 1.6 2005/10/20 20:39:14 edheldil Exp $
  *
+ */
+
+/**
+ * @file PluginMgr.h
+ * Declares PluginMgr, loader for GemRB plugins
+ * @author The GemRB Project
  */
 
 #ifndef PLUGINMGR_H
@@ -43,6 +49,13 @@ typedef HINSTANCE LibHandle;
 #else
 typedef void *LibHandle;
 #endif
+
+/**
+ * @class PluginMgr
+ * Class for loading GemRB plugins from shared libraries or DLLs.
+ * It goes over all appropriately named files in PluginPath directory
+ * and tries to load them one after another.
+ */
 
 class GEM_EXPORT PluginMgr {
 public:

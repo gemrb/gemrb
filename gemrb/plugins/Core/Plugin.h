@@ -15,8 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Plugin.h,v 1.5 2004/07/18 08:33:40 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Plugin.h,v 1.6 2005/10/20 20:39:14 edheldil Exp $
  *
+ */
+
+/**
+ * @file Plugin.h
+ * Declares Plugin class, base class for all plugins
+ * @author The GemRB Project
  */
 
 #ifndef PLUGIN_H
@@ -33,6 +39,11 @@
 #else
 #define GEM_EXPORT
 #endif
+
+/**
+ * @class Plugin
+ * Base class for all GemRB plugins
+ */
 
 class GEM_EXPORT Plugin {
 public:

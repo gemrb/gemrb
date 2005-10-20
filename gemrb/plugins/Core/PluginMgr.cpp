@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.19 2005/08/22 10:02:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.20 2005/10/20 20:39:14 edheldil Exp $
  *
  */
 
@@ -77,14 +77,14 @@ PluginMgr::PluginMgr(char* pluginpath)
 	printMessage( "PluginMgr", "Searching for plugins in: ", WHITE );
 	printf( "%s\n", path );
 	if (( hFile = ( long ) _findfirst( path, &c_file ) ) == -1L) //If there is no file matching our search
-		#else
+#else
 	{
 		printMessage( "PluginMgr", "Searching for plugins in: ", WHITE );
 	}
 	printf( "%s\n", path );
 	DIR* dir = opendir( path );
 	if (dir == NULL) //If we cannot open the Directory
-		#endif
+#endif
 	{
 		return;
 	} //Simply return
@@ -124,8 +124,7 @@ PluginMgr::PluginMgr(char* pluginpath)
 #else
 		if (fnmatch( "*.so", de->d_name, 0 ) != 0) //If the current file has no ".so" extension, skip it
 			continue;
-		strcpy( path, pluginpath );
-		strcat( path, de->d_name );
+		PathJoin( path, pluginpath, de->d_name, NULL );
 		printBracket( "PluginMgr", LIGHT_WHITE );
 		printf( ": Loading: " );
 		textcolor( LIGHT_WHITE );
