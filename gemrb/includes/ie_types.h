@@ -15,11 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_types.h,v 1.8 2004/11/07 22:40:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_types.h,v 1.9 2005/10/20 23:13:14 edheldil Exp $
  *
  */
 
-// ie_types.h : defines data types used to load IE structures
+/**
+ * @file ie_types.h
+ * Defines data types used to load IE structures
+ * @author The GemRB Project
+ */
+
 
 #ifndef IE_TYPES_H
 #define IE_TYPES_H
@@ -47,7 +52,10 @@ typedef unsigned long int ieDword;
 typedef unsigned long int ieDword;
 #endif
 
+/** string reference into TLK file */
 typedef ieDword ieStrRef; 
+
+/** Resource reference */
 typedef char ieResRef[9];
 
 #endif  //! IE_TYPES_H

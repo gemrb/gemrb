@@ -15,11 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.38 2005/07/24 19:04:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.39 2005/10/20 23:13:14 edheldil Exp $
  *
  */
 
-// ie_stats.h : definitions of creature stats codes
+/**
+ * @file ie_stats.h
+ * Definitions of creature stats codes
+ * @author The GemRB Project
+ */
+
 
 // !!! NOTE: keep this file synchronized with gemrb/GUIScripts/ie_stats.py !!!
 
@@ -397,4 +402,5 @@
 #define IE_SAVEDYPOS             254
 #define IE_SAVEDFACE             255
 // place for more classes
-#endif
+
+#endif  // ! IE_STATS_H

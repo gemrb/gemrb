@@ -15,8 +15,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spell.h,v 1.12 2005/07/25 16:46:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spell.h,v 1.13 2005/10/20 23:13:14 edheldil Exp $
  *
+ */
+
+/**
+ * @file Spell.h
+ * Declares Spell, class for magic incantations, cleric prayers, 
+ * bardic songs and innate abilities
+ * @author The GemRB Project
  */
 
 #ifndef SPELL_H
@@ -52,6 +59,11 @@
 #define SF_NOT_IN_COMBAT 0x100
 #define SF_SIMPLIFIED_DURATION   0x400
 
+/**
+ * @class SPLExtHeader
+ * Header for Spell special effects
+ */
+
 class GEM_EXPORT SPLExtHeader {
 public:
 	SPLExtHeader();
@@ -79,6 +91,11 @@ public:
 	Effect* features;
 };
 
+/**
+ * @class Spell
+ * Class for magic incantations, cleric prayers, 
+ * bardic songs and innate abilities.
+ */
 
 class GEM_EXPORT Spell {
 public:
@@ -87,8 +104,9 @@ public:
 
 	SPLExtHeader *ext_headers;
 	Effect* casting_features;
-	ieResRef Name; //the resref of the spell itself!
 
+	/** Resref of the spell itself */
+	ieResRef Name;
 	ieStrRef SpellName;
 	ieStrRef SpellNameIdentified;
 	ieResRef CompletionSound;

@@ -15,8 +15,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.20 2005/08/14 17:52:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.21 2005/10/20 23:13:14 edheldil Exp $
  *
+ */
+
+/**
+ * @file Window.h
+ * Declares Window, class serving as a container for Control/widget objects 
+ * and displaying windows in GUI
+ * @author The GemRB Project
  */
 
 #ifndef WINDOW_H
@@ -27,10 +34,6 @@
 #include "TextArea.h"
 #include "ScrollBar.h"
 #include <vector>
-
-/**This class defines a Window as an Items Container.
-  *@author GemRB Developement Team
-  */
 
 #ifdef WIN32
 
@@ -83,12 +86,19 @@
 #define IE_CURSOR_STAIR2  50 //PST
 #define IE_CURSOR_EXTRA   52 //PST
 
+/**
+ * @class Window
+ * Class serving as a container for Control/widget objects 
+ * and displaying windows in GUI.
+ */
+
 class GEM_EXPORT Window {
 public: 
 	Window(unsigned short WindowID, unsigned short XPos, unsigned short YPos,
 		unsigned short Width, unsigned short Height);
 	~Window();
-	/** Set the Window's BackGround Image. If 'img' is NULL, no background will be set. If the 'clean' parameter is true (default is false) the old background image will be deleted. */
+	/** Set the Window's BackGround Image. 
+	 * If 'img' is NULL, no background will be set. If the 'clean' parameter is true (default is false) the old background image will be deleted. */
 	void SetBackGround(Sprite2D* img, bool clean = false);
 	/** Add a Control in the Window */
 	void AddControl(Control* ctrl);

@@ -15,9 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.80 2005/08/22 23:10:17 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.81 2005/10/20 23:13:14 edheldil Exp $
  *
  */
+
+/**
+ * @file globals.h
+ * Some global definitions and includes
+ * @author The GemRB Project
+ */
+
 
 #ifndef GLOBALS_H
 #define GLOBALS_H
@@ -168,5 +175,5 @@ char* strlwr(char* string);
 
 struct ActorBlock;
 
-#endif //GLOBALS_H
+#endif //! GLOBALS_H
 

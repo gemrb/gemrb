@@ -15,8 +15,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.20 2005/07/25 16:46:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.21 2005/10/20 23:13:14 edheldil Exp $
  *
+ */
+
+/**
+ * @file Item.h
+ * Declares Item, class for all things your PCs can pick, carry and wear
+ * and many they can't.
+ * @author The GemRB Project
  */
 
 #ifndef ITEM_H
@@ -68,6 +75,11 @@
 #define ITM_TYPE_SCROLL      11
 #define ITM_TYPE_BAG         50
 
+/**
+ * @class ITMExtHeader
+ * Header for special effects and uses of an Item.
+ */
+
 class GEM_EXPORT ITMExtHeader {
 public:
 	ITMExtHeader();
@@ -100,6 +112,11 @@ public:
 	Effect *features;
 };
 
+
+/**
+ * @class Item
+ * Class for all things your PCs can pick, carry and wear and many they can't.
+ */
 
 class GEM_EXPORT Item {
 public:

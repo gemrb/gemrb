@@ -15,8 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.h,v 1.21 2005/03/04 23:27:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.h,v 1.22 2005/10/20 23:13:14 edheldil Exp $
  *
+ */
+
+/**
+ * @file Font.h
+ * Declares Font, class for manipulating images serving as fonts
+ * @author The GemRB Project
  */
 
 #ifndef FONT_H
@@ -55,6 +61,11 @@ typedef struct StringList {
 #define IE_FONT_ALIGN_MIDDLE 0x20 //Only for single line Text
 #define IE_FONT_SINGLE_LINE  0x40
 
+/**
+ * @class Font
+ * Class for using and manipulating images serving as fonts
+ */
+
 class GEM_EXPORT Font {
 private:
 	int count;
@@ -65,9 +76,11 @@ private:
 	short xPos[256];
 	short yPos[256];
 public:
+	/** ResRef of the Font image */
 	ieResRef ResRef;
 	int maxHeight;
 	Region size[256];
+
 public:
 	Font(int w, int h, void* palette, bool cK, int index);
 	~Font(void);
@@ -81,12 +94,13 @@ public:
 		Font* initials = NULL, Sprite2D* cursor = NULL,
 		unsigned int curpos = 0);
 	void* GetPalette();
+	/** Returns width of the string rendered in this font in pixels */
 	int CalcStringWidth(char* string);
-public:
 	void SetupString(char* string, unsigned int width);
-	// Sets ASCII code of the first character in the font
-	//  (it allows remapping numeric fonts from \000 to '0')
+	/** Sets ASCII code of the first character in the font.
+	 * (it allows remapping numeric fonts from \000 to '0') */
 	void SetFirstChar(unsigned char first);
+
 private:
 	int PrintInitial(int x, int y, Region &rgn, unsigned char currChar);
 };

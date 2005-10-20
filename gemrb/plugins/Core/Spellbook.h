@@ -15,11 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.14 2005/07/30 11:45:20 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.15 2005/10/20 23:13:14 edheldil Exp $
  *
  */
 
-/* Class implementing creature's spellbook and (maybe) spell management */
+/**
+ * @file Spellbook.h
+ * Declares Spellbook, class implementing creature's spellbook 
+ * and (maybe) spell management 
+ * @author The GemRB Project
+ */
 
 #ifndef SPELLBOOK_H
 #define SPELLBOOK_H
@@ -102,6 +107,11 @@ typedef struct {
 } CRESpellMemorization;
 
 
+/**
+ * @class Spellbook
+ * Class implementing creature's spellbook and (maybe) spell management 
+ */
+
 class GEM_EXPORT Spellbook {
 private:
 	std::vector<CRESpellMemorization*> *spells;
@@ -113,7 +123,7 @@ public:
 	static void ReleaseMemory();
 
 	void FreeSpellPage(CRESpellMemorization* sm);
-	/* check if the spell exists, optionally deplete it (casting) */
+	/** Check if the spell exists, optionally deplete it (casting) */
 	bool HaveSpell(const char *resref, ieDword flags);
 	bool HaveSpell(int spellid, ieDword flags);
 
@@ -148,7 +158,7 @@ public:
 
 	bool CastSpell( ieResRef SpellResRef, Actor* Source, Actor* Target );
 
-	/** Dumps spellbook to stdout */
+	/** Dumps spellbook to stdout for debugging */
 	void dump();
 };
 

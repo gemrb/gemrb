@@ -15,8 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SpellMgr.h,v 1.4 2005/02/06 11:04:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SpellMgr.h,v 1.5 2005/10/20 23:13:14 edheldil Exp $
  *
+ */
+
+/**
+ * @file SpellMgr.h
+ * Declares SpellMgr class, abstract loader for Spell objects
+ * @author The GemRB Project
  */
 
 #ifndef SPELLMGR_H
@@ -37,6 +43,11 @@
 #else
 #define GEM_EXPORT
 #endif
+
+/**
+ * @class SpellMgr
+ * Abstract loader for Spell objects
+ */
 
 class GEM_EXPORT SpellMgr : public Plugin {
 public:

@@ -15,8 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WindowMgr.h,v 1.4 2004/08/03 22:27:30 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WindowMgr.h,v 1.5 2005/10/20 23:13:14 edheldil Exp $
  *
+ */
+
+/**
+ * @file WindowMgr.h
+ * Declares WindowMgr class, abstract loader for GUI windows and controls
+ * @author The GemRB Project
  */
 
 #ifndef WINDOWMGR_H
@@ -25,10 +31,6 @@
 #include "Plugin.h"
 #include "Window.h"
 #include "DataStream.h"
-
-/**This Class Defines basic Methods for the implementation of a GUI Window Manager.
-  *@author GemRB Developement Team
-  */
 
 #ifdef WIN32
 
@@ -41,6 +43,12 @@
 #else
 #define GEM_EXPORT
 #endif
+
+/**
+ * @class WindowMgr
+ * Abstract loader for GUI windows (and controls with them).
+ * Contrary to its name, it does not work as a window manager
+ */
 
 class GEM_EXPORT WindowMgr : public Plugin {
 public: 

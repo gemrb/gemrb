@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.13 2005/06/05 12:02:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.14 2005/10/20 23:13:14 edheldil Exp $
  *
  */
 
@@ -208,9 +208,9 @@ int _fclose(_FILE* stream)
 
 #endif  // WIN32
 
-/*
- * Appends dir 'dir' to path 'target' and returns 'target'. It takes
- * care of inserting PathDelimiter ('/' or '\\') if needed
+/**
+ * Appends dir 'dir' to path 'target' and returns 'target'.
+ * It takes care of inserting PathDelimiter ('/' or '\\') if needed
  */
 char* PathAppend (char* target, char* dir)
 {
@@ -221,7 +221,7 @@ char* PathAppend (char* target, char* dir)
 	return target;
 }
 
-/*
+/**
  * Joins NULL-terminated list of directories and copies it to 'target'.
  * Previous content of 'target' is NOT part of the list, except 'target' can be
  * safely used as a first var arg. Returns pointer to 'target'.
@@ -259,7 +259,7 @@ char* PathJoin (char* target, ...)
 	return target;
 }
 
-/* Fixes path delimiter character (slash)
+/** Fixes path delimiter character (slash).
  * needslash = true : we add a slash
  * needslash = false: we remove the slash
  */

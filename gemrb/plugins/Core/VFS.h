@@ -15,8 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.h,v 1.11 2005/02/15 16:33:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.h,v 1.12 2005/10/20 23:13:14 edheldil Exp $
  *
+ */
+
+/**
+ * @file VFS.h
+ * Compatibility layer for file and dir access functions on Un*x and MS Win
+ * @author The GemRB Project
  */
 
 #ifndef VFS_H
