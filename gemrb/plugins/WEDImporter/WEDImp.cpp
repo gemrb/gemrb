@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.15 2004/09/13 20:19:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.16 2005/10/22 16:30:54 avenger_teambg Exp $
  *
  */
 
@@ -84,8 +84,7 @@ TileMap* WEDImp::GetTileMap()
 {
 	TileMap* tm = new TileMap();
 	//TODO: Implement Multi Overlay
-	TileOverlay* over = new TileOverlay( overlays[0].Width,
-								overlays[0].Height );
+	TileOverlay* over = new TileOverlay( overlays[0].Width, overlays[0].Height );
 	DataStream* tisfile = core->GetResourceMgr()->GetResource( overlays[0].TilesetResRef, IE_TIS_CLASS_ID );
 	if (!core->IsAvailable( IE_TIS_CLASS_ID )) {
 		printf( "[WEDImporter]: No TileSet Importer Available.\n" );
@@ -247,5 +246,80 @@ ieWord* WEDImp::GetDoorIndices(char* ResRef, int* count, bool& BaseClosed)
 		BaseClosed = false;
 	}
 	return DoorTiles;
+}
+
+typedef struct {
+  ieDword FirstVertex;
+  ieDword CountVertex;
+  ieWord Flags;
+  ieWord MinX, MaxX, MinY, MaxY;
+} wed_polygon;
+
+Wall_Polygon **WEDImp::GetWallGroups()
+{
+	Wall_Polygon **Polygons = (Wall_Polygon **) calloc( WallPolygonsCount, sizeof(Wall_Polygon *) );
+
+	wed_polygon *PolygonHeaders = new wed_polygon[WallPolygonsCount];
+
+	str->Seek (PolygonsOffset, GEM_STREAM_START);
+	
+	for (ieDword i=0;i<WallPolygonsCount;i++) {
+		str->ReadDword ( &PolygonHeaders[i].FirstVertex);
+		str->ReadDword ( &PolygonHeaders[i].CountVertex);
+		str->ReadWord ( &PolygonHeaders[i].Flags);
+		str->ReadWord ( &PolygonHeaders[i].MinX);
+		str->ReadWord ( &PolygonHeaders[i].MaxX);
+		str->ReadWord ( &PolygonHeaders[i].MinY);
+		str->ReadWord ( &PolygonHeaders[i].MaxY);
+	}
+
+	for (ieDword i=0;i<WallPolygonsCount;i++) {
+		str->Seek (PolygonHeaders[i].FirstVertex*4+VerticesOffset, GEM_STREAM_START);
+		//compose polygon
+		ieDword count = PolygonHeaders[i].CountVertex;
+		if (count<3) {
+			//danger, danger
+			continue;
+		}
+		ieDword flags = PolygonHeaders[i].Flags&~(WF_BASELINE|WF_HOVER);
+		Point base0, base1;
+		if (PolygonHeaders[i].Flags&WF_HOVER) {
+			count-=2;
+			ieWord x,y;
+			str->ReadWord (&x);
+			str->ReadWord (&y);
+			base0 = Point(x,y);
+			str->ReadWord (&x);
+			str->ReadWord (&y);
+			base1 = Point(x,y);
+			flags |= WF_BASELINE;
+		}
+		Point *points = new Point[count];
+		str->Read (points, count);
+		if( DataStream::IsEndianSwitch()) {
+			swab( (char*) points, (char*) points, PolygonHeaders[i].CountVertex * 2 * sizeof(ieWord) );
+		}
+
+		if (!(flags&WF_BASELINE) ) {
+			if (PolygonHeaders[i].Flags&WF_BASELINE) {
+				base0 = points[0];
+				base1 = points[1];
+				flags |= WF_BASELINE;
+			}
+		}
+		Region rgn;
+		rgn.x = PolygonHeaders[i].MinX;
+		rgn.y = PolygonHeaders[i].MinY;
+		rgn.w = PolygonHeaders[i].MaxX - PolygonHeaders[i].MinX;
+		rgn.h = PolygonHeaders[i].MaxY - PolygonHeaders[i].MinY;
+		Polygons[i] = new Wall_Polygon(points, count, &rgn);
+		if (flags&WF_BASELINE) {
+			Polygons[i]->SetBaseline(base0, base1);
+		}
+		Polygons[i]->SetPolygonFlag(flags);
+	}
+	delete [] PolygonHeaders;
+
+	return Polygons;
 }
 

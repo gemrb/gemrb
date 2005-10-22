@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.h,v 1.7 2004/09/12 21:58:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.h,v 1.8 2005/10/22 16:30:54 avenger_teambg Exp $
  */
 #ifndef POLYGON_H
 #define POLYGON_H
@@ -49,6 +49,36 @@ public:
 	bool PointIn(Point &p);
 	bool PointIn(int x, int y);
 	void RecalcBBox();
+};
+
+// wall polygons are used to render area wallgroups
+// wall polygons never create a surface
+//ALWAYSCOVER wallpolygon blocks everything that it covers
+//BASELINE means there is a baseline, the loader makes the distinction
+//between first edge is base line/separate baseline
+//DITHER means the polygon only dithers what it covers
+
+#define WF_ALWAYSCOVER  0
+#define WF_BASELINE 1
+#define WF_DITHER 2
+//this is used only externally, but converted to baseline on load time
+#define WF_HOVER 4
+// cover animations
+#define WF_COVERANIMS 8
+
+class GEM_EXPORT Wall_Polygon: public Gem_Polygon {
+public:
+	Wall_Polygon(Point *points,int count,Region *bbox) : Gem_Polygon(points,count,bbox,false,NULL) {};
+	~Wall_Polygon();
+	//is the point above the baseline
+	bool PointCovered(Point &p);
+	bool PointCovered(int x, int y);
+	ieDword GetPolygonFlag() { return wall_flag; }
+	void SetPolygonFlag(ieDword flg) { wall_flag=flg; }
+	void SetBaseline(Point &a, Point &b);
+public:
+	ieDword wall_flag;
+	Point base0, base1;
 };
 
 #endif

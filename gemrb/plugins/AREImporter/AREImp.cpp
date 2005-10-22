@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.129 2005/08/06 16:28:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.130 2005/10/22 16:30:54 avenger_teambg Exp $
  *
  */
 
@@ -951,6 +951,9 @@ Map* AREImp::GetMap(const char *ResRef)
 		map->ExploredBitmap = (ieByte *) calloc(i, 1);
 	}
 	map->VisibleBitmap = (ieByte *) calloc(i, 1);
+
+	printf( "Loading wallgroups\n");
+	map->SetWallGroups( tmm->GetWallPolygonsCount(),tmm->GetWallGroups() );
 
 	core->FreeInterface( tmm );
 	return map;

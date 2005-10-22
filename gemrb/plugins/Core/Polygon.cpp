@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.cpp,v 1.13 2005/05/19 14:56:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.cpp,v 1.14 2005/10/22 16:30:54 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "Polygon.h"
@@ -119,3 +119,44 @@ bool Gem_Polygon::PointIn(int tx, int ty)
 	}
 	return inside_flag;
 }
+
+// wall polygons
+void Wall_Polygon::SetBaseline(Point &a, Point &b)
+{
+	if ((a.x<b.x) || ((a.x==b.x) && (a.y<b.y)) ) {
+		base0=a;
+		base1=b;
+		return;
+	}
+	base0=b;
+	base1=a;
+}
+
+bool Wall_Polygon::PointCovered(Point &p)
+{
+	if(!BBox.PointInside(p) ) return false;
+	return PointCovered(p.x, p.y);
+}
+bool Wall_Polygon::PointCovered(int tx, int ty)
+{
+	register int yflag0 = ( base0.y >= ty );
+	register int yflag1 = ( base1.y >= ty );
+	if (yflag0 && yflag1) {
+		return true;
+	}
+	
+	if (!yflag0 && !yflag1) {
+		return false;
+	}
+
+	register int xflag0 = ( base0.x >= tx );
+	if (xflag0 == ( base1.x >= tx )) {
+		return xflag0;
+	}
+
+	if (( base1.x - ( base1.y - ty ) * ( base0.x - base1.x ) / ( base0.y - base1.y ) ) >= tx) {
+		return true;
+	}
+	return false;
+}
+

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIREC.py,v 1.19 2005/09/02 21:08:48 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIREC.py,v 1.20 2005/10/22 16:30:54 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -323,6 +323,9 @@ def GetStatOverview (pc):
 	stats.append ( (10347, GemRB.GetAbilityBonus(IE_CHR,0,value), '') )
 	stats.append (0)
 
+	stats.append (10344)
+	stats.append (10345)
+
 	# 32204 Resistances
 	stats.append (32204)
 	#   32213 Normal Fire
@@ -350,7 +353,7 @@ def GetStatOverview (pc):
 	stats.append (None)
 
 	stats.append (32131)
-	stats.append (10340)
+	#stats.append (10340)
 
 	res = []
 	lines = 0

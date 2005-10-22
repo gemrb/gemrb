@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.87 2005/07/20 21:46:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.88 2005/10/22 16:30:54 avenger_teambg Exp $
  *
  */
 
@@ -92,10 +92,14 @@ typedef struct RestHeaderType {
 	ieWord NightChance;
 } RestHeaderType;
 
+/* it is better to keep the polygons in a single list and create a sublist
+   (if needed) when the viewport changed. I don't like the pre-created
+   groupings because they don't support different viewport sizes
 typedef struct WallGroup {
 	Gem_Polygon** polys;
 	int polygons;
 } WallGroup;
+*/
 
 typedef struct Entrance {
 	char Name[33];
@@ -178,7 +182,9 @@ private:
 	unsigned int Width, Height;
 	std::vector< AreaAnimation*> animations;
 	std::vector< Actor*> actors;
-	std::vector< WallGroup*> wallGroups;
+	Wall_Polygon **Walls;
+	unsigned int WallCount;
+	//std::vector< WallGroup*> wallGroups;
 	std::vector< ScriptedAnimation*> vvcCells;
 	std::vector< Entrance*> entrances;
 	std::vector< Ambient*> ambients;
@@ -210,9 +216,16 @@ public:
 	AreaAnimation* GetAnimation(int i) { return animations[i]; }
 	int GetAnimationCount() const { return (int) animations.size(); }
 
+	unsigned int GetWallCount() { return WallCount; }
+	Wall_Polygon *GetWallGroup(int i) { return Walls[i]; }
+	void SetWallGroups(unsigned int count, Wall_Polygon **walls)
+	{
+		WallCount = count;
+		Walls = walls;	
+	}
+	//void AddWallGroup(WallGroup* wg);
 	void Shout(Actor* actor, int shoutID, unsigned int radius);
 	void AddActor(Actor* actor);
-	void AddWallGroup(WallGroup* wg);
 	int GetBlocked(Point &p);
 	Actor* GetActorByGlobalID(ieDword objectID);
 	Actor* GetActor(Point &p, int flags);
