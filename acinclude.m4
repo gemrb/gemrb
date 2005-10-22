@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/acinclude.m4,v 1.10 2005/08/14 20:15:12 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/acinclude.m4,v 1.11 2005/10/22 20:56:05 avenger_teambg Exp $
 
 ###################################################
 dnl Configure paths for SDL
@@ -30,6 +30,27 @@ dnl Shamelessly stolen from Owen Taylor
 dnl AM_PATH_SDL([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
 dnl Test for SDL, and define SDL_CFLAGS and SDL_LIBS
 dnl
+
+AC_DEFUN([GEMRB_CHECK_ALUT],[
+	AC_CHECK_LIB(openal, alutInit,
+			     alut_in_openal=yes,
+			     alut_in_openal=no)
+
+	if test x$alut_in_openal = xno; then
+		AC_CHECK_LIB(alut, alutInit,
+				   have_libalut=yes,
+				   have_libalut=no)
+
+		if test x$have_libalut = xyes; then
+			OPENAL_LIBS="-lalut"
+		else
+			AC_MSG_ERROR([*** You need OpenAL (www.openal.org) to compile GemRB])
+		fi
+	else
+		OPENAL_LIBS="-lopenal"
+	fi
+	AC_SUBST(OPENAL_LIBS)
+]);
 
 AC_DEFUN([AM_PATH_SDL],
 [dnl 
