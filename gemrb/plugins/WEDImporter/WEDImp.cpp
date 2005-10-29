@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.16 2005/10/22 16:30:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.17 2005/10/29 19:05:14 avenger_teambg Exp $
  *
  */
 
@@ -295,9 +295,9 @@ Wall_Polygon **WEDImp::GetWallGroups()
 			flags |= WF_BASELINE;
 		}
 		Point *points = new Point[count];
-		str->Read (points, count);
+		str->Read (points, count * sizeof (Point) );
 		if( DataStream::IsEndianSwitch()) {
-			swab( (char*) points, (char*) points, PolygonHeaders[i].CountVertex * 2 * sizeof(ieWord) );
+			swab( (char*) points, (char*) points, count * sizeof (Point) );
 		}
 
 		if (!(flags&WF_BASELINE) ) {
