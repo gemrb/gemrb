@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIOPT.py,v 1.8 2005/06/15 15:40:33 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIOPT.py,v 1.9 2005/11/01 13:35:10 avenger_teambg Exp $
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
 # Ingame options
@@ -80,7 +80,7 @@ def OpenOptionsWindow ():
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = OpenPortraitWindow (0)
 	OptionsWindow = GemRB.LoadWindow (0)
-	SetupMenuWindowControls (OptionsWindow, 0)
+	SetupMenuWindowControls (OptionsWindow, 0, "OpenOptionsWindow")
 	GemRB.SetWindowFrame (OptionsWindow)
 
 	# Return to Game

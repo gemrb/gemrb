@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIPR.py,v 1.15 2005/06/14 17:52:59 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIPR.py,v 1.16 2005/11/01 13:35:10 avenger_teambg Exp $
 
 
 # GUIPR.py - scripts to control priest spells windows from GUIPR winpack
@@ -65,7 +65,7 @@ def OpenPriestWindow ():
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = OpenPortraitWindow (0)
 	OptionsWindow = GemRB.LoadWindow (0)
-	SetupMenuWindowControls (OptionsWindow, 0)
+	SetupMenuWindowControls (OptionsWindow, 0, "OpenPriestWindow")
 	GemRB.SetWindowFrame (OptionsWindow)
 
 	Button = GemRB.GetControl (Window, 1)

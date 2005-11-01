@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.19 2005/05/18 15:37:09 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.20 2005/11/01 13:35:10 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -41,14 +41,17 @@ FRAME_PC_TARGET   = 1
 # 9 REST
 # 10 TXTE
 
-def SetupMenuWindowControls (Window, Gears):
+def ReturnToGame ():
+	print "returntogame"
+
+def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 
 	# Return to Game
 	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetTooltip (Window, Button, 16313)
 	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	GemRB.SetVarAssoc(Window, Button, "SelectedWindow", 0)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "ReturnToGame")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, ReturnToGame)
 
 	# Map
 	Button = GemRB.GetControl (Window, 1)

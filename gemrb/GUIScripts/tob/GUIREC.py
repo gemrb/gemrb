@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIREC.py,v 1.20 2005/10/22 16:30:54 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIREC.py,v 1.21 2005/11/01 13:35:10 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -67,7 +67,7 @@ def OpenRecordsWindow ():
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = OpenPortraitWindow(0)
 	OptionsWindow = GemRB.LoadWindow(0)
-	SetupMenuWindowControls (OptionsWindow, 0)
+	SetupMenuWindowControls (OptionsWindow, 0, "OpenRecordsWindow")
 	GemRB.SetWindowFrame (OptionsWindow)
 
 	# dual class

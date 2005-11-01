@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIJRNL.py,v 1.11 2005/06/14 17:52:55 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIJRNL.py,v 1.12 2005/11/01 13:35:10 avenger_teambg Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -79,7 +79,7 @@ def OpenJournalWindow ():
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = OpenPortraitWindow (0)
 	OptionsWindow = GemRB.LoadWindow (0)
-	SetupMenuWindowControls (OptionsWindow, 0)
+	SetupMenuWindowControls (OptionsWindow, 0, "OpenJournalWindow")
 	GemRB.SetWindowFrame (OptionsWindow)
 
 	# prev. chapter
