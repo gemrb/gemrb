@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/configure.in,v 1.53 2005/10/22 20:56:05 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/configure.in,v 1.54 2005/11/06 16:36:34 edheldil Exp $
 
 ###################################################
 
@@ -124,7 +124,6 @@ AM_PATH_SDL(1.2.0, [], [AC_MSG_ERROR([
 
 dnl Check for OpenAL, fail if not found.
 #AC_CHECK_LIB([alut], [alutInit], [ $(which true) ], [AC_MSG_ERROR([
-
 #*** You need OpenAL (www.openal.org) to compile GemRB
 #])])
 
@@ -218,6 +217,7 @@ gemrb/plugins/CHUImporter/Makefile
 gemrb/plugins/CREImporter/Makefile 
 gemrb/plugins/DLGImporter/Makefile 
 gemrb/plugins/EFFImporter/Makefile 
+gemrb/plugins/FXOpcodes/Makefile 
 gemrb/plugins/GAMImporter/Makefile 
 gemrb/plugins/GUIScript/Makefile 
 gemrb/plugins/IDSImporter/Makefile 
