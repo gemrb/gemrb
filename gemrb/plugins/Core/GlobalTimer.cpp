@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GlobalTimer.cpp,v 1.24 2005/08/14 17:11:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GlobalTimer.cpp,v 1.25 2005/11/06 13:42:28 avenger_teambg Exp $
  *
  */
 
@@ -52,18 +52,28 @@ void GlobalTimer::Init()
 void GlobalTimer::Freeze()
 {
 	unsigned long thisTime;
+	unsigned long advance;
+
 	GetTime( thisTime );
+	advance = thisTime - startTime;
 	startTime = thisTime;
+	Game* game = core->GetGame();
+	if (!game) {
+		return;
+	}
+	game->RealTime+=advance;
 }
 
 void GlobalTimer::Update()
 {
 	unsigned long thisTime;
+	unsigned long advance;
 
 	UpdateAnimations();
 
 	GetTime( thisTime );
-	if (( thisTime - startTime ) >= interval) {
+	advance = thisTime - startTime;
+	if ( advance >= interval) {
 		startTime = thisTime;
 		if (shakeCounter) {
 			int x = shakeStartVP.x;
@@ -103,10 +113,10 @@ void GlobalTimer::Update()
 			map->UpdateFog();
 			map->UpdateEffects();
 			//this measures in-world time (affected by effects, actions, etc)
-			game->AdvanceTime(1);
+			game->AdvanceTime(advance);
 		}
 		//this measures time spent in the game (including pauses)
-		game->RealTime++;
+		game->RealTime+=advance;
 	}
 }
 

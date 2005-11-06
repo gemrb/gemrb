@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.64 2005/08/10 16:15:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.65 2005/11/06 13:42:27 avenger_teambg Exp $
  *
  */
 
@@ -137,6 +137,8 @@ public:
 	int SelectedSingle;
 
 public:
+	ieDword Ticks;
+	ieDword interval;
 	ieDword GameTime;
 	ieDword RealTime;
 	ieWord  WhichFormation;

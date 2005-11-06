@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.92 2005/07/24 17:29:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.93 2005/11/06 13:42:27 avenger_teambg Exp $
  *
  */
 
@@ -56,6 +56,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 		}
 	}
 	core->DelTable(mtab);
+	interval = 1000/AI_UPDATE_TIME;
 }
 
 Game::~Game(void)
@@ -826,6 +827,7 @@ void Game::AddGold(ieDword add)
 //later this could be more complicated
 void Game::AdvanceTime(ieDword add)
 {
-	GameTime+=add;
+	GameTime+=add/interval;
+	Ticks+=add;
 }
 

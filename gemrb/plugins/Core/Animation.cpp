@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.34 2005/07/05 22:14:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.35 2005/11/06 13:42:27 avenger_teambg Exp $
  *
  */
 
@@ -50,6 +50,7 @@ Animation::Animation(int count)
 	endReached = false;
 	//behaviour flags
 	playReversed = false;
+	gameAnimation = false;
 }
 
 Animation::~Animation(void)
@@ -118,7 +119,11 @@ Sprite2D* Animation::NextFrame(void)
 		return NULL;
 	}
 	if (starttime == 0) {
-		GetTime( starttime );
+		if (gameAnimation) {
+			starttime = core->GetGame()->Ticks;
+		} else {
+			GetTime( starttime );
+		}
 	}
 	Sprite2D* ret;
 	if (playReversed) {
@@ -132,7 +137,11 @@ Sprite2D* Animation::NextFrame(void)
 		return ret;
 	}
 	unsigned long time;
-	GetTime(time);
+	if (gameAnimation) {
+		time = core->GetGame()->Ticks;
+	} else {
+		GetTime(time);
+	}
 
 	//it could be that we skip more than one frame in case of slow rendering
 	//large, composite animations (dragons, multi-part area anims) require synchronisation
