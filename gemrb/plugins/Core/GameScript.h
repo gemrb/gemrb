@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.217 2005/07/24 11:21:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.218 2005/11/06 14:17:57 avenger_teambg Exp $
  *
  */
 
@@ -1142,6 +1142,7 @@ public:
 	static void NoActionAtAll(Scriptable* Sender, Action* parameters);
 	static void OpenDoor(Scriptable* Sender, Action* parameters);
 	static void Panic(Scriptable* Sender, Action* parameters);
+	static void PauseGame(Scriptable *Sender, Action* parameters);
 	static void PickLock(Scriptable* Sender, Action* parameters);
 	static void PickPockets(Scriptable* Sender, Action* parameters);
 	static void PickUpItem(Scriptable* Sender, Action* parameters);

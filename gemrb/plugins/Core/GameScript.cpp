@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.324 2005/11/06 13:42:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.325 2005/11/06 14:17:56 avenger_teambg Exp $
  *
  */
 
@@ -539,6 +539,7 @@ static ActionLink actionnames[] = {
 	{"opendoor", GameScript::OpenDoor,AF_BLOCKING},
 	{"panic", GameScript::Panic, 0},
 	{"permanentstatchange", GameScript::ChangeStat, 0}, //probably the same
+	{"pausegame", GameScript::PauseGame, AF_BLOCKING}, //this is almost surely blocking
 	{"picklock", GameScript::PickLock,AF_BLOCKING},
 	{"pickpockets", GameScript::PickPockets, AF_BLOCKING},
 	{"pickupitem", GameScript::PickUpItem, 0}, 
@@ -2796,3 +2797,4 @@ bool Object::ReadyToDie()
 	Release();
 	return true;
 }
+

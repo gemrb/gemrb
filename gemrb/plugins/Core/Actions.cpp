@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.35 2005/08/15 15:55:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.36 2005/11/06 14:17:56 avenger_teambg Exp $
  *
  */
 
@@ -4281,3 +4281,13 @@ void GameScript::BreakInstants(Scriptable* Sender, Action* /*parameters*/)
 	//we should set CurrentAction to zero eventually!
 	Sender->resetAction = true;
 }
+
+//an interesting improvement would be to pause game for a given duration
+void GameScript::PauseGame(Scriptable* /*Sender*/, Action* /*parameters*/)
+{
+	GameControl *gc = core->GetGameControl();
+	if (gc) {
+		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
+	}
+}
+
