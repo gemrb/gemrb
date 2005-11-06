@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.252 2005/10/18 22:43:41 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.253 2005/11/06 13:00:45 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -389,6 +389,11 @@ int GameControl::SetText(const char* /*string*/, int /*pos*/)
 void GameControl::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {
 	core->GetGame()->SetHotKey(toupper(Key));
+	switch (Key) {
+	case ' ':
+		DialogueFlags ^= DF_FREEZE_SCRIPTS;
+		break;
+	}
 }
 
 void GameControl::DeselectAll()
