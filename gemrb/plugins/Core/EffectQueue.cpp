@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.40 2005/11/06 16:06:23 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.41 2005/11/06 16:40:37 wjpalenstijn Exp $
  *
  */
 
@@ -109,9 +109,9 @@ bool Init_EffectQueue()
 void EffectQueue_RegisterOpcodes(int count, EffectRef* opcodes)
 {
 	if (! effectnames) {
-		effectnames = (EffectRef*) malloc( count * sizeof( EffectRef ) );
+		effectnames = (EffectRef*) malloc( (count+1) * sizeof( EffectRef ) );
 	} else {
-		effectnames = (EffectRef*) realloc( effectnames, (opcodes_count + count) * sizeof( EffectRef ) );
+		effectnames = (EffectRef*) realloc( effectnames, (opcodes_count + count + 1) * sizeof( EffectRef ) );
 	}
 
 	memcpy( effectnames + opcodes_count, opcodes, count * sizeof( EffectRef ));
