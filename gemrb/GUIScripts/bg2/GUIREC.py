@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.20 2005/11/01 13:35:10 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.21 2005/11/06 11:38:23 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -399,6 +399,9 @@ def OpenInformationWindow ():
 		if BiographyWindow: OpenBiographyWindow ()
 
 		GemRB.UnloadWindow (InformationWindow)
+		GemRB.SetVisible (OptionsWindow, 3)
+		GemRB.SetVisible (RecordsWindow, 3)
+		GemRB.SetVisible (PortraitWindow, 3)
 		InformationWindow = None
 		
 		return
@@ -407,15 +410,68 @@ def OpenInformationWindow ():
 
 	# Biography
 	Button = GemRB.GetControl (Window, 26)
-	GemRB.SetText (Window, Button, 4247)
+	GemRB.SetText (Window, Button, 18003)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenBiographyWindow")
 
 	# Done
 	Button = GemRB.GetControl (Window, 24)
-	GemRB.SetText (Window, Button, 1403)
+	GemRB.SetText (Window, Button, 11973)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenInformationWindow")
 
-	GemRB.SetVisible (Window, 1)
+	TotalPartyExp = 0
+	TotalPartyKills = 0
+	for i in range (1, GemRB.GetPartySize() + 1):
+		stat = GemRB.GetPCStats(i)
+		TotalPartyExp = TotalPartyExp + stat['KillsChapterXP']
+		TotalPartyKills = TotalPartyKills + stat['KillsChapterCount']
+
+	# These are used to get the stats
+	pc = GemRB.GameGetSelectedPCSingle ()
+	stat = GemRB.GetPCStats (pc)
+
+	Label = GemRB.GetControl (Window, 0x10000000)
+	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc, 1))
+	# class
+	ClassTitle = GetActorClassTitle(pc)
+	Label = GemRB.GetControl (Window, 0x10000018)
+	GemRB.SetText (Window, Label, ClassTitle)
+
+	#most powerful vanquished
+	Label = GemRB.GetControl (Window, 0x10000005)
+	#we need getstring, so -1 will translate to empty string
+	GemRB.SetText (Window, Label, GemRB.GetString (stat['BestKilledName']))
+
+	# NOTE: currentTime is in seconds, joinTime is in seconds * 15
+	#   (script updates???). In each case, there are 60 seconds
+	#   in a minute, 24 hours in a day, but ONLY 5 minutes in an hour!!
+	# Hence currentTime (and joinTime after div by 15) has
+	#   7200 secs a day (60 * 5 * 24)
+	currentTime = GemRB.GetGameTime()
+	joinTime = stat['JoinDate'] - stat['AwayTime']
+
+	party_time = currentTime - (joinTime / 15)
+	days = party_time / 7200
+	hours = (party_time % 7200) / 300
+
+	GemRB.SetToken ('GAMEDAYS', str (days))
+	GemRB.SetToken ('HOUR', str (hours))
+	Label = GemRB.GetControl (Window, 0x10000006)
+	#actually it is 16043 <DURATION>, but duration is translated to
+	#16041, hopefully this won't cause problem with international version
+	GemRB.SetText (Window, Label, 16041)
+
+	#favourite spell
+	Label = GemRB.GetControl (Window, 0x10000007)
+	GemRB.SetText (Window, Label, stat['FavouriteSpell'])
+
+	#favourite weapon
+	Label = GemRB.GetControl (Window, 0x10000008)
+	#actually it is 10479 <WEAPONNAME>, but weaponname is translated to
+	#the real weapon name (which we should set using SetToken)
+	#there are other strings like bow+wname/xbow+wname/sling+wname
+	#are they used?
+	GemRB.SetText (Window, Label, stat['FavouriteWeapon'])
+
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 	return
 

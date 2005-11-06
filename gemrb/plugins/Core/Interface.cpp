@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.350 2005/11/06 09:05:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.351 2005/11/06 11:38:21 avenger_teambg Exp $
  *
  */
 
@@ -2108,9 +2108,11 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 			if (win->WindowID==65535) {
 				video->SetViewport( win->XPos, win->YPos, win->Width, win->Height);
 			}
-			evntmgr->AddWindow( win );
 			//here is a fallthrough
 		case WINDOW_FRONT:
+			if (win->Visible==WINDOW_VISIBLE) {
+				evntmgr->AddWindow( win );
+			}
 			win->Invalidate();
 			SetOnTop( WindowIndex );
 			break;
@@ -2391,21 +2393,10 @@ int Interface::DelWindow(unsigned short WindowIndex)
 	}
 	if (win == ModalWindow) {
 		ModalWindow = NULL;
+		RedrawAll(); //marking windows for redraw
 	}
-	//evntmgr->DelWindow( win->WindowID, win->WindowPack );
 	evntmgr->DelWindow( win );
-//	delete( win );
 	win->release();
-//	windows[WindowIndex] = NULL;
-	/*
-	std::vector< int>::iterator t;
-	for (t = topwin.begin(); t != topwin.end(); ++t) {
-		if (( *t ) == WindowIndex) {
-			topwin.erase( t );
-			break;
-		}
-	}
-	*/
 	return 0;
 }
 
