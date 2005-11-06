@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIPR.py,v 1.17 2005/11/01 13:35:10 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIPR.py,v 1.18 2005/11/06 09:05:30 avenger_teambg Exp $
 
 
 # GUIPR.py - scripts to control priest spells windows from GUIPR winpack
@@ -100,7 +100,8 @@ def OpenPriestWindow ():
 	SetSelectionChangeHandler (UpdatePriestWindow)
 	UpdatePriestWindow ()
 	GemRB.SetVisible (OptionsWindow, 1)
-	GemRB.SetVisible (Window, 1)
+	#bringing window front
+	GemRB.SetVisible (Window, 3)
 	GemRB.SetVisible (PortraitWindow, 1)
 
 

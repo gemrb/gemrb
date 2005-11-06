@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.349 2005/10/25 17:24:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.350 2005/11/06 09:05:23 avenger_teambg Exp $
  *
  */
 
@@ -2088,10 +2088,13 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 	if (win == NULL) {
 		return -1;
 	}
-	win->Visible = visible;
+	if (visible!=WINDOW_FRONT) {
+		win->Visible = visible;
+	}
 	switch (visible) {
 		case WINDOW_GRAYED:
 			win->Invalidate();
+			//here is a fallthrough
 		case WINDOW_INVISIBLE:
 			//hiding the viewport if the gamecontrol window was made invisible
 			if (win->WindowID==65535) {
@@ -2106,6 +2109,8 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 				video->SetViewport( win->XPos, win->YPos, win->Width, win->Height);
 			}
 			evntmgr->AddWindow( win );
+			//here is a fallthrough
+		case WINDOW_FRONT:
 			win->Invalidate();
 			SetOnTop( WindowIndex );
 			break;

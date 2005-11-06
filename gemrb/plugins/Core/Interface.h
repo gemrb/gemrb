@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.170 2005/10/19 21:57:33 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.171 2005/11/06 09:05:23 avenger_teambg Exp $
  *
  */
 
@@ -111,7 +111,7 @@ typedef struct SlotType {
 #define WINDOW_INVISIBLE 0
 #define WINDOW_VISIBLE   1
 #define WINDOW_GRAYED    2
-
+#define WINDOW_FRONT     3
 
 #define QF_NORMAL        0
 #define QF_QUITGAME      1
