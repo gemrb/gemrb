@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.23 2005/08/15 15:55:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.24 2005/11/06 14:03:09 avenger_teambg Exp $
  *
  */
 
@@ -506,7 +506,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 	printf("CreateCreature: %s at [%d.%d] face:%d\n",parameters->string0Parameter, pnt.x,pnt.y,parameters->int0Parameter);
 	Map *map = Sender->GetCurrentArea();
 	ab->SetPosition(map, pnt, flags&CC_CHECK_IMPASSABLE, radius );
-	ab->SetOrientation(parameters->int0Parameter, 0 );
+	ab->SetOrientation(parameters->int0Parameter, false );
 	map->AddActor( ab );
 
 	//if string1 is animation, then we can't use it for a DV too
@@ -543,7 +543,7 @@ void ChangeAnimationCore(Actor *src, const char *resref, bool effect)
 	if (tar) {
 		Map *map = src->GetCurrentArea();
 		tar->SetPosition(map, src->Pos, 1);
-		tar->SetOrientation(src->GetOrientation(), 0 );
+		tar->SetOrientation(src->GetOrientation(), false );
 		map->AddActor( tar );
 
 		src->InternalFlags|=IF_CLEANUP;
@@ -724,8 +724,8 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		
 	}
 
-	speaker->SetOrientation(GetOrient( target->Pos, speaker->Pos),1);
-	target->SetOrientation(GetOrient( speaker->Pos, target->Pos),1);
+	speaker->SetOrientation(GetOrient( target->Pos, speaker->Pos), true);
+	target->SetOrientation(GetOrient( speaker->Pos, target->Pos), true);
 
 	if (Dialog[0]) {
 		//increasing NumTimesTalkedTo or NumTimesInteracted
@@ -768,7 +768,7 @@ void MoveBetweenAreasCore(Actor* actor, const char *area, Point &position, int f
 	}
 	actor->SetPosition(map2, position, adjust);
 	if (face !=-1) {
-		actor->SetOrientation( face,0 );
+		actor->SetOrientation( face, false );
 	}
 	GameControl *gc=core->GetGameControl();
 	gc->SetScreenFlags(SF_CENTERONACTOR,BM_OR);
