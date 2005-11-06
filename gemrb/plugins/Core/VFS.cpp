@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.14 2005/10/20 23:13:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.15 2005/11/06 16:13:33 edheldil Exp $
  *
  */
 
@@ -26,6 +26,8 @@
 
 #include "../../includes/globals.h"
 #include "VFS.h"
+#include "Interface.h"
+
 
 #ifdef WIN32
 
@@ -208,6 +210,19 @@ int _fclose(_FILE* stream)
 
 #endif  // WIN32
 
+
+/** Returns true if path is an existing directory */
+bool dir_exists(const char* path)
+{
+	struct stat buf;
+
+	buf.st_mode = 0;
+	stat( path, &buf );
+	return S_ISDIR( buf.st_mode ) != 0;
+}
+
+
+
 /**
  * Appends dir 'dir' to path 'target' and returns 'target'.
  * It takes care of inserting PathDelimiter ('/' or '\\') if needed
@@ -280,4 +295,83 @@ void FixPath (char *path, bool needslash)
 	}
 	path[i] = 0;
 }
+
+
+#ifndef WIN32
+
+char* FindInDir(char* Dir, char* Filename)
+{
+	char* fn = NULL;
+	DIR* dir = opendir( Dir );
+	if (dir == NULL) {
+		return NULL;
+	}
+
+	// First test if there's a Filename with exactly same name
+	//   and if yes, return it and do not search in the Dir
+	char TempFilePath[_MAX_PATH];
+	PathJoin( TempFilePath, Dir, Filename, NULL );
+
+	if (!access( TempFilePath, F_OK )) {
+		closedir( dir );
+		return strdup( Filename );
+	}
+
+	// Exact match not found, so try to search for Filename
+	//    with different case
+	struct dirent* de = readdir( dir );
+	if (de == NULL) {
+		closedir( dir );
+		return NULL;
+	}
+	do {
+		if (strcasecmp( de->d_name, Filename ) == 0) {
+			fn = ( char * ) malloc( strlen( de->d_name ) + 1 );
+			strcpy( fn, de->d_name );
+			break;
+		}
+	} while (( de = readdir( dir ) ) != NULL);
+	closedir( dir );  //No other files in the directory, close it
+	return fn;
+}
+
+void ResolveFilePath(char* FilePath)
+{
+	char TempFilePath[_MAX_PATH];
+	char TempFileName[_MAX_PATH];
+	int j, pos;
+
+	if (core && !core->CaseSensitive) {
+		return;
+	}
+
+	TempFilePath[0] = FilePath[0];
+	for (pos = 1; FilePath[pos] && FilePath[pos] != '/'; pos++)
+		TempFilePath[pos] = FilePath[pos];
+	TempFilePath[pos] = 0;
+	while (FilePath[pos] == '/') {
+		pos++;
+		for (j = 0; FilePath[pos + j] && FilePath[pos + j] != '/'; j++) {
+			TempFileName[j] = FilePath[pos + j];
+		}
+		TempFileName[j] = 0;
+		pos += j;
+		char* NewName = FindInDir( TempFilePath, TempFileName );
+		if (NewName) {
+			strcat( TempFilePath, SPathDelimiter );
+			strcat( TempFilePath, NewName );
+			free( NewName );
+		} else {
+			if (j)
+				return;
+			else {
+				strcat( TempFilePath, SPathDelimiter );
+			}
+		}
+	}
+	//should work (same size)
+	strcpy( FilePath, TempFilePath );
+}
+
+#endif
 

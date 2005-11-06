@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.h,v 1.12 2005/10/20 23:13:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.h,v 1.13 2005/11/06 16:13:33 edheldil Exp $
  *
  */
 
@@ -48,9 +48,14 @@
 #define _MAX_PATH FILENAME_MAX
 #endif
 
+//#ifndef S_ISDIR
+//#define S_ISDIR(x) ((x) & S_IFDIR)
+//#endif
+
 #ifndef S_ISDIR
-#define S_ISDIR(x) (x & S_IFDIR)
+#define S_ISDIR(mode) (((mode) & S_IFMT) == S_IFDIR)
 #endif
+
 
 #ifdef WIN32
 
@@ -111,6 +116,8 @@ GEM_EXPORT int _fclose(_FILE* stream);
 #define _fclose fclose
 
 #endif  // ! WIN32
+
+GEM_EXPORT bool dir_exists(const char* path);
 
 GEM_EXPORT char* PathAppend (char* target, char* dir);
 GEM_EXPORT char* PathJoin (char* target, ...);

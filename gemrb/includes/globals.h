@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.81 2005/10/20 23:13:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.82 2005/11/06 16:13:33 edheldil Exp $
  *
  */
 
@@ -174,6 +174,17 @@ char* strlwr(char* string);
 #endif
 
 struct ActorBlock;
+
+inline int MIN(int a, int b)
+{
+	return (a > b ? b : a);
+}
+
+inline int MAX(int a, int b)
+{
+	return (a < b ? b : a);
+}
+
 
 #endif //! GLOBALS_H
 

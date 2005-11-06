@@ -15,12 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.36 2005/07/20 21:46:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.37 2005/11/06 16:13:33 edheldil Exp $
  *
  */
 
-// Core.cpp : Defines the entry point for the DLL application.
-//
+/**
+ * @file Core.cpp
+ * Some compatibility and utility functions
+ * @author The GemRB Project
+ */
+
 
 #ifndef WIN32
 #include <ctype.h>
@@ -48,10 +52,6 @@ BOOL WINAPI DllEntryPoint(HINSTANCE /*hinstDLL*/, DWORD /*fdwReason*/,
 
 #include "../../includes/globals.h"
 #include "Interface.h" 
-
-#ifndef S_ISDIR
-#define S_ISDIR(mode) (((mode) & S_IFMT) == S_IFDIR)
-#endif
 
 //// Globally used functions
 
@@ -97,7 +97,6 @@ void strnspccpy(char* dest, const char *source, int count)
 	*dest=0;
 }
 
-// this function calculates the orientation of a character (or projectile) facing a point 
 static unsigned char orientations[25]={
 6,7,8,9,10,
 5,6,8,10,11,
@@ -106,6 +105,7 @@ static unsigned char orientations[25]={
 2,1,0,15,14
 };
 
+/** Calculates the orientation of a character (or projectile) facing a point */
 unsigned char GetOrient(Point &s, Point &d)
 {
 	int deltaX = s.x - d.x;
@@ -118,7 +118,7 @@ unsigned char GetOrient(Point &s, Point &d)
 	return orientations[(aY+2)*5+aX+2];
 }
 
-// these functions calculate distance between 2 points
+/** Calculates distance between 2 points */
 unsigned int Distance(Point p, Point q)
 {
 	long x = ( p.x - q.x );
@@ -126,6 +126,7 @@ unsigned int Distance(Point p, Point q)
 	return (unsigned int) sqrt( ( double ) ( x* x + y* y ) );
 }
 
+/** Calculates distance between 2 points */
 unsigned int Distance(Point p, Scriptable *b)
 {
 	long x = ( p.x - b->Pos.x );
@@ -133,6 +134,7 @@ unsigned int Distance(Point p, Scriptable *b)
 	return (unsigned int) sqrt( ( double ) ( x* x + y* y ) );
 }
 
+/** Calculates distance between 2 points */
 unsigned int Distance(Scriptable *a, Scriptable *b)
 {
 	long x = ( a->Pos.x - b->Pos.x );
@@ -140,17 +142,7 @@ unsigned int Distance(Scriptable *a, Scriptable *b)
 	return (unsigned int) sqrt( ( double ) ( x* x + y* y ) );
 }
 
-//returns true if path is an existing directory
-GEM_EXPORT bool dir_exists(const char* path)
-{
-	struct stat buf;
-
-	buf.st_mode = 0;
-	stat( path, &buf );
-	return S_ISDIR( buf.st_mode ) != 0;
-}
-
-//returns the length of string (up to a delimiter)
+/** Returns the length of string (up to a delimiter) */
 GEM_EXPORT int strlench(const char* string, char ch)
 {
 	int i;
@@ -177,43 +169,6 @@ GEM_EXPORT char* strndup(const char* s, int l)
 #ifdef WIN32
 
 #else
-char* FindInDir(char* Dir, char* Filename)
-{
-	char* fn = NULL;
-	DIR* dir = opendir( Dir );
-	if (dir == NULL) {
-		return NULL;
-	}
-
-	// First test if there's a Filename with exactly same name
-	//   and if yes, return it and do not search in the Dir
-	char TempFilePath[_MAX_PATH];
-	strcpy( TempFilePath, Dir );
-	strcat( TempFilePath, SPathDelimiter );
-	strcat( TempFilePath, Filename );
-
-	if (!access( TempFilePath, F_OK )) {
-		closedir( dir );
-		return strdup( Filename );
-	}
-
-	// Exact match not found, so try to search for Filename
-	//    with different case
-	struct dirent* de = readdir( dir );
-	if (de == NULL) {
-		closedir( dir );
-		return NULL;
-	}
-	do {
-		if (strcasecmp( de->d_name, Filename ) == 0) {
-			fn = ( char * ) malloc( strlen( de->d_name ) + 1 );
-			strcpy( fn, de->d_name );
-			break;
-		}
-	} while (( de = readdir( dir ) ) != NULL);
-	closedir( dir );  //No other files in the directory, close it
-	return fn;
-}
 
 char* strupr(char* string)
 {
@@ -235,43 +190,6 @@ char* strlwr(char* string)
 	return string;
 }
 
-void ResolveFilePath(char* FilePath)
-{
-	char TempFilePath[_MAX_PATH];
-	char TempFileName[_MAX_PATH];
-	int j, pos;
 
-	if (core && !core->CaseSensitive) {
-		return;
-	}
-
-	TempFilePath[0] = FilePath[0];
-	for (pos = 1; FilePath[pos] && FilePath[pos] != '/'; pos++)
-		TempFilePath[pos] = FilePath[pos];
-	TempFilePath[pos] = 0;
-	while (FilePath[pos] == '/') {
-		pos++;
-		for (j = 0; FilePath[pos + j] && FilePath[pos + j] != '/'; j++) {
-			TempFileName[j] = FilePath[pos + j];
-		}
-		TempFileName[j] = 0;
-		pos += j;
-		char* NewName = FindInDir( TempFilePath, TempFileName );
-		if (NewName) {
-			strcat( TempFilePath, SPathDelimiter );
-			strcat( TempFilePath, NewName );
-			free( NewName );
-		} else {
-			if (j)
-				return;
-			else {
-				strcat( TempFilePath, SPathDelimiter );
-			}
-		}
-	}
-	//should work (same size)
-	strcpy( FilePath, TempFilePath );
-}
-
-#endif //WIN32
+#endif // ! WIN32
 
