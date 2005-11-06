@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIJRNL.py,v 1.12 2005/11/01 13:35:10 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIJRNL.py,v 1.13 2005/11/06 12:15:00 avenger_teambg Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -29,8 +29,6 @@ from GUICommonWindows import *
 
 ###################################################
 JournalWindow = None
-LogWindow = None
-QuestsWindow = None
 PortraitWindow = None
 OldPortraitWindow = None
 
@@ -49,8 +47,6 @@ def OpenJournalWindow ():
 	global Chapter
 
 	if CloseOtherWindow (OpenJournalWindow):
-		if LogWindow: OpenLogWindow ()
-		if QuestsWindow: OpenQuestsWindow ()
 		
 		GemRB.UnloadWindow (JournalWindow)
 		GemRB.UnloadWindow (OptionsWindow)

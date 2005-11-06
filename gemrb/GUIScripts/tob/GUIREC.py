@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIREC.py,v 1.22 2005/11/06 11:38:24 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIREC.py,v 1.23 2005/11/06 12:15:01 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -97,7 +97,7 @@ def OpenRecordsWindow ():
 
 	# export
 	Button = GemRB.GetControl (Window, 36)
-	GemRB.SetText (Window, Button, 7175)
+	GemRB.SetText (Window, Button, 13956)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "ExportWindow")
 
 	# kit info
@@ -419,11 +419,15 @@ def OpenInformationWindow ():
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenInformationWindow")
 
 	TotalPartyExp = 0
-	TotalPartyKills = 0
+	ChapterPartyExp = 0
+	TotalCount = 0
+	ChapterCount = 0
 	for i in range (1, GemRB.GetPartySize() + 1):
 		stat = GemRB.GetPCStats(i)
 		TotalPartyExp = TotalPartyExp + stat['KillsChapterXP']
-		TotalPartyKills = TotalPartyKills + stat['KillsChapterCount']
+		ChapterPartyExp = ChapterPartyExp + stat['KillsTotalXP']
+		TotalCount = TotalCount + stat['KillsChapterCount']
+		ChapterCount = ChapterCount + stat['KillsTotalCount']
 
 	# These are used to get the stats
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -471,6 +475,47 @@ def OpenInformationWindow ():
 	#there are other strings like bow+wname/xbow+wname/sling+wname
 	#are they used?
 	GemRB.SetText (Window, Label, stat['FavouriteWeapon'])
+
+	#total xp 
+	Label = GemRB.GetControl (Window, 0x1000000f)
+	if TotalPartyExp != 0:
+		PartyExp = int ((stat['KillsTotalXP'] * 100) / TotalPartyExp)
+		GemRB.SetText (Window, Label, str (PartyExp) + '%')
+	else:
+		GemRB.SetText (Window, Label, "0%")
+
+	Label = GemRB.GetControl (Window, 0x10000013)
+	if ChapterPartyExp != 0:
+		PartyExp = int ((stat['KillsChapterXP'] * 100) / ChapterPartyExp)
+		GemRB.SetText (Window, Label, str (PartyExp) + '%')
+	else:
+		GemRB.SetText (Window, Label, "0%")
+
+	#total xp 
+	Label = GemRB.GetControl (Window, 0x10000010)
+	if TotalCount != 0:
+		PartyExp = int ((stat['KillsTotalCount'] * 100) / TotalCount)
+		GemRB.SetText (Window, Label, str (PartyExp) + '%')
+	else:
+		GemRB.SetText (Window, Label, "0%")
+
+	Label = GemRB.GetControl (Window, 0x10000014)
+	if ChapterCount != 0:
+		PartyExp = int ((stat['KillsChapterCount'] * 100) / ChapterCount)
+		GemRB.SetText (Window, Label, str (PartyExp) + '%')
+	else:
+		GemRB.SetText (Window, Label, "0%")
+
+	Label = GemRB.GetControl (Window, 0x10000011)
+	GemRB.SetText (Window, Label, str (stat['KillsChapterXP']))
+	Label = GemRB.GetControl (Window, 0x10000015)
+	GemRB.SetText (Window, Label, str (stat['KillsTotalXP']))
+
+	#count of kills in chapter/game
+	Label = GemRB.GetControl (Window, 0x10000012)
+	GemRB.SetText (Window, Label, str (stat['KillsChapterCount']))
+	Label = GemRB.GetControl (Window, 0x10000016)
+	GemRB.SetText (Window, Label, str (stat['KillsTotalCount']))
 
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 	return
