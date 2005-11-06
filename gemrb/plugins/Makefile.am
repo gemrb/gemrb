@@ -14,6 +14,7 @@ SUBDIRS = \
 	CREImporter \
 	DLGImporter \
 	EFFImporter \
+	FXOpcodes \
 	GAMImporter \
 	IDSImporter \
 	INIImporter \

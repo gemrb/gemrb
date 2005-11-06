@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.352 2005/11/06 14:03:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.353 2005/11/06 16:06:23 edheldil Exp $
  *
  */
 
@@ -49,6 +49,7 @@
 #include "MapControl.h"
 #include "EffectQueue.h"
 #include "MapMgr.h"
+#include "OpcodeMgr.h"
 
 GEM_EXPORT Interface* core;
 
@@ -1036,6 +1037,17 @@ int Interface::Init()
 	printMessage( "Core", "Bringing up the Global Timer...", WHITE );
 	timer = new GlobalTimer();
 	if (!timer) {
+		printStatus( "ERROR", LIGHT_RED );
+		goto end_of_init;
+	}
+	printStatus( "OK", LIGHT_GREEN );
+
+	OpcodeMgr* opcodemgr;
+
+	printMessage( "Core", "Initializing effect opcodes...", WHITE );
+	// FIXME: this calls single plugin only
+	opcodemgr = ( OpcodeMgr * ) GetInterface( IE_FX_CLASS_ID );
+	if (opcodemgr == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
 		goto end_of_init;
 	}
