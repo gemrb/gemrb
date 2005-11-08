@@ -15,9 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.17 2005/07/20 21:46:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.18 2005/11/08 22:59:05 edheldil Exp $
  *
  */
+
+/**
+ * @file Store.h
+ * Declares Store, class describing shops, temples and pubs, etc.
+ * @author The GemRB Project
+ */
+
 
 #ifndef STORE_H
 #define STORE_H
@@ -60,6 +67,12 @@ STA_CURE=3, STA_DONATE=4, STA_DRINK=5, STA_ROOMRENT=6, STA_OPTIONAL=0x80} StoreA
 #define IE_STORE_QUALITY 0x600  //2 bits
 #define IE_STORE_FENCE   0x2000 //
 
+
+/**
+ * @struct STOItem
+ * Item in a store, together with available amount etc.
+ */
+
 typedef struct STOItem {
 	ieResRef ItemResRef;
 	ieWord PurchasedAmount;
@@ -75,6 +88,12 @@ typedef struct STOItem {
 	char unknown2[56];
 } STOItem;
 
+
+/**
+ * @struct STODrink
+ * Kind of drink in a pub, with its associated rumour and price
+ */
+
 typedef struct STODrink {
 	ieResRef RumourResRef;
 	ieStrRef DrinkName;
@@ -82,11 +101,21 @@ typedef struct STODrink {
 	ieDword Strength;
 } STODrink;
 
+
+/**
+ * @struct STOCure
+ * Kind of cure available in a temple, with its associated price
+ */
+
 typedef struct STOCure {
 	ieResRef CureResRef;
 	ieDword Price;
 } STOCure;
 
+/**
+ * @class Store
+ * Class describing shops, temples, pubs, etc.
+ */
 
 class GEM_EXPORT Store {
 public:
@@ -136,15 +165,15 @@ public: //queries
 	STOCure *GetCure(unsigned int idx) const;
 	STODrink *GetDrink(unsigned int idx) const;
 	STOItem *GetItem(unsigned int idx);
-	//evaluates item availability triggers
+	/** Evaluates item availability triggers */
 	int GetRealStockSize();
-	//add a new item to the store (selling)
+	/** Adds a new item to the store (selling) */
 	void AddItem(CREItem* item);
 	void RemoveItem(unsigned int idx);
-	//returns index of item
+	/** Returns index of item */
 	unsigned int FindItem(ieResRef item, bool usetrigger) const;
 private:
-  //finds a mergeable item in the stock, if exact is set, it checks for usage counts too
+	/** Finds a mergeable item in the stock, if exact is set, it checks for usage counts too */
 	STOItem *FindItem(CREItem *item, bool exact);
 	bool IsItemAvailable(unsigned int slot) const;
 };

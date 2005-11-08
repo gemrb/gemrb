@@ -15,9 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.15 2005/07/01 20:39:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.16 2005/11/08 22:59:05 edheldil Exp $
  *
  */
+
+/**
+ * @file WorldMap.h
+ * Declares WorldMap, class describing a top level map of the world.
+ * @author The GemRB Project
+ */
+
 
 #ifndef WORLDMAP_H
 #define WORLDMAP_H
@@ -40,21 +47,31 @@
 #define GEM_EXPORT
 #endif
 
-
+/** Area is visible on WorldMap */
 #define WMP_ENTRY_VISIBLE    0x1
-#define WMP_ENTRY_ADJACENT   0x2   // visible from adjacent
+/** Area is visible on WorldMap only when party is in adjacent area */
+#define WMP_ENTRY_ADJACENT   0x2
+/** Area can be travelled into from WorldMap */
 #define WMP_ENTRY_ACCESSIBLE 0x4
+/** Area has already been visited by party */
 #define WMP_ENTRY_VISITED    0x8
+/** Area can be travelled into from WorldMap */
 #define WMP_ENTRY_WALKABLE   (WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE)
+/** Area can be passed through when travelling directly to some more distant area on WorldMap */
 #define WMP_ENTRY_PASSABLE   (WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE|WMP_ENTRY_VISITED)
 
-//this is the physical order they appear in WMPAreaEntry
+/** this is the physical order the links appear in WMPAreaEntry */
 typedef enum ieDirectionType {
 	WMP_NORTH=0,
 	WMP_WEST=1,
 	WMP_SOUTH=2, 
 	WMP_EAST=3
 } ieDirectionType;
+
+/**
+ * @class WMPAreaEntry
+ * Holds information about an Area on a WorldMap.
+ */
 
 class GEM_EXPORT WMPAreaEntry {
 public:
@@ -76,6 +93,10 @@ public:
 	Sprite2D* MapIcon;
 };
 
+/**
+ * @struct WMPAreaLink
+ * Defines connection and travelling between WorldMap areas
+ */
 
 typedef struct WMPAreaLink {
 	ieDword AreaIndex;
@@ -85,6 +106,12 @@ typedef struct WMPAreaLink {
 	ieResRef EncounterAreaResRef[5];
 	ieDword EncounterChance;
 } WMPAreaLink;
+
+/**
+ * @class WorldMap
+ * Top level map of the world.
+ * Also defines links between areas, although they are used only when travelling from this map.
+ */
 
 class GEM_EXPORT WorldMap {
 public:
@@ -121,24 +148,24 @@ public:
 	void SetAreaLink(unsigned int index, WMPAreaLink *arealink);
 	void AddAreaEntry(WMPAreaEntry *ae);
 	void AddAreaLink(WMPAreaLink *al);
-	/* calculates the distances from A, call this when first on an area */
+	/** Calculates the distances from A, call this when first on an area */
 	int CalculateDistances(const ieResRef A, int direction);
-	/* returns the precalculated distance to area B */
+	/** Returns the precalculated distance to area B */
 	int GetDistance(const ieResRef A);
-	/* returns the link between area A and area B */
+	/** Returns the link between area A and area B */
 	WMPAreaLink *GetLink(const ieResRef A, const ieResRef B);
-	/* returns the area link we will fall into if we head in B direction */
-	/* if the area name differs it means we are in a random encounter */
+	/** Returns the area link we will fall into if we head in B direction */
+	/** If the area name differs it means we are in a random encounter */
 	WMPAreaLink *GetEncounterLink(const ieResRef B, bool &encounter);
-	/* sets area status */
+	/** Sets area status */
 	void SetAreaStatus(const ieResRef, int Bits, int Op);
-	//internal function to get area pointer and index from area name
-	//also called from WorldMapArray to find the right map	
+	/** internal function to get area pointer and index from area name.
+	 * also called from WorldMapArray to find the right map	*/
 	WMPAreaEntry* GetArea(const ieResRef AreaName, unsigned int &i);
 private:
-	// updates visibility of adjacent areas, called from CalculateDistances
+	/** updates visibility of adjacent areas, called from CalculateDistances */
 	void UpdateAreaVisibility(const ieResRef AreaName, int direction);
-	//internal function to calculate the distances from areaindex
+	/** internal function to calculate the distances from areaindex */
 	void CalculateDistance(int areaindex, int direction);
 	unsigned int WhoseLinkAmI(int link_index);
 };

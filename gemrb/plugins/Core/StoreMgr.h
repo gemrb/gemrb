@@ -15,9 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/StoreMgr.h,v 1.4 2005/06/05 10:54:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/StoreMgr.h,v 1.5 2005/11/08 22:59:05 edheldil Exp $
  *
  */
+
+/**
+ * @file StoreMgr.h
+ * Declares StoreMgr class, loader for Store objects
+ * @author The GemRB Project
+ */
+
 
 #ifndef STOREMGR_H
 #define STOREMGR_H
@@ -37,6 +44,11 @@
 #else
 #define GEM_EXPORT
 #endif
+
+/**
+ * @class StoreMgr
+ * Abstract loader for Store objects
+ */
 
 class GEM_EXPORT StoreMgr : public Plugin {
 public:

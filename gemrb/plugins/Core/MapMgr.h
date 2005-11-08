@@ -15,8 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapMgr.h,v 1.6 2005/06/11 20:18:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapMgr.h,v 1.7 2005/11/08 22:59:05 edheldil Exp $
  *
+ */
+
+/**
+ * @file MapMgr.h
+ * Declares MapMgr class, loader for Map objects
+ * @author The GemRB Project
  */
 
 #ifndef MAPMGR_H
@@ -37,6 +43,11 @@
 #else
 #define GEM_EXPORT
 #endif
+
+/**
+ * @class MapMgr
+ * Abstract loader for Map objects
+ */
 
 class GEM_EXPORT MapMgr : public Plugin {
 public:

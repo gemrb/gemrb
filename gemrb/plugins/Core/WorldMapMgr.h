@@ -15,8 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapMgr.h,v 1.3 2005/06/14 22:29:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapMgr.h,v 1.4 2005/11/08 22:59:04 edheldil Exp $
  *
+ */
+
+/**
+ * @file WorldMapMgr.h
+ * Declares WorldMapMgr class, loader for WorldMap objects
+ * @author The GemRB Project
  */
 
 #ifndef WORLDMAPMGR_H
@@ -37,6 +43,11 @@
 #else
 #define GEM_EXPORT
 #endif
+
+/**
+ * @class WorldMapMgr
+ * Abstract loader for WorldMap objects
+ */
 
 class GEM_EXPORT WorldMapMgr : public Plugin {
 public:

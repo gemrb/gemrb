@@ -15,9 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.h,v 1.15 2005/06/14 22:29:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.h,v 1.16 2005/11/08 22:59:05 edheldil Exp $
  *
  */
+
+/**
+ * @file FileStream.h
+ * Declares FileStream class, stream reading/writing data from/to a file in a filesystem.
+ * @author The GemRB Project
+ */
+
 
 #ifndef FILESTREAM_H
 #define FILESTREAM_H
@@ -35,6 +42,11 @@
 #else
 #define GEM_EXPORT
 #endif
+
+/**
+ * @class FileStream
+ * Reads and writes data from/to files on a filesystem
+ */
 
 class GEM_EXPORT FileStream : public DataStream {
 private:
@@ -54,8 +66,7 @@ public:
 	int Write(const void* src, unsigned int length);
 	int Seek(int pos, int startpos);
 	unsigned long GetStartPos() const;
-	/** No descriptions */
 	int ReadLine(void* buf, unsigned int maxlen);
 };
 
-#endif
+#endif  // ! FILESTREAM_H

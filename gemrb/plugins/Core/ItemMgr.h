@@ -15,9 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ItemMgr.h,v 1.5 2005/01/22 20:36:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ItemMgr.h,v 1.6 2005/11/08 22:59:05 edheldil Exp $
  *
  */
+
+/**
+ * @file ItemMgr.h
+ * Declares ItemMgr class, loader for Item objects
+ * @author The GemRB Project
+ */
+
 
 #ifndef ITEMMGR_H
 #define ITEMMGR_H
@@ -37,6 +44,11 @@
 #else
 #define GEM_EXPORT
 #endif
+
+/**
+ * @class ItemMgr
+ * Abstract loader for Item objects
+ */
 
 class GEM_EXPORT ItemMgr : public Plugin {
 public:

@@ -15,9 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.h,v 1.17 2005/06/14 22:29:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.h,v 1.18 2005/11/08 22:59:05 edheldil Exp $
  *
  */
+
+/**
+ * @file DataStream.h
+ * Declares DataStream, abstract class for reading and writing data.
+ * @author The GemRB Project
+ */
+
 
 #ifndef DATASTREAM_H
 #define DATASTREAM_H
@@ -38,6 +45,11 @@
 #else
 #define GEM_EXPORT
 #endif
+
+/**
+ * @class DataStream
+ * Abstract base for streams, classes for reading and writing data.
+ */
 
 class GEM_EXPORT DataStream {
 protected:
@@ -64,13 +76,11 @@ public:
 	void Rewind();
 	/** Returns true if the stream is encrypted */
 	bool CheckEncrypted();
-	/** No descriptions */
 	void ReadDecrypted(void* buf, unsigned int size);
-	/** No descriptions */
 	virtual int ReadLine(void* buf, unsigned int maxlen) = 0;
-	/** Endian Switch setup*/
+	/** Endian Switch setup */
 	static void SetEndianSwitch(int par);
 	static bool IsEndianSwitch();
 };
 
-#endif
+#endif  // ! DATASTREAM_H

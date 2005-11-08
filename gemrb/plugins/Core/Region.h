@@ -15,9 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Region.h,v 1.11 2005/06/10 21:12:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Region.h,v 1.12 2005/11/08 22:59:05 edheldil Exp $
  *
  */
+
+/**
+ * @file Region.h
+ * Declares Point and Region, 2d-space primitive types
+ * @author The GemRB Project
+ */
+
 
 #ifndef REGION_H
 #define REGION_H
@@ -34,6 +41,11 @@
 #define GEM_EXPORT
 #endif
 
+/**
+ * @class Point
+ * Point in 2d-space: [x, y]
+ */
+
 class GEM_EXPORT Point {
 public:
 	Point(void);
@@ -44,8 +56,15 @@ public:
 	bool operator==(const Point &pnt);
 	bool operator!=(const Point &pnt);
 	Point(short x, short y);
-	bool isempty() const; //if it is [-1.-1]
+	/** if it is [-1.-1] */
+	bool isempty() const;
 };
+
+
+/**
+ * @class Region
+ * Rectangular area in 2d-space [x, y] - [x+w, y+h]
+ */
 
 class GEM_EXPORT Region {
 public:
@@ -67,4 +86,4 @@ public:
 	void Normalize();
 };
 
-#endif
+#endif  // ! REGION_H
