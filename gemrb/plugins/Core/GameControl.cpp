@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.253 2005/11/06 13:00:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.254 2005/11/10 21:10:30 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -392,6 +392,11 @@ void GameControl::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 	switch (Key) {
 	case ' ':
 		DialogueFlags ^= DF_FREEZE_SCRIPTS;
+		if (DialogueFlags&DF_FREEZE_SCRIPTS) {
+			core->DisplayConstantString(STR_PAUSED,0xff0000);
+		} else {
+			core->DisplayConstantString(STR_UNPAUSED,0xff0000);
+		}
 		break;
 	}
 }

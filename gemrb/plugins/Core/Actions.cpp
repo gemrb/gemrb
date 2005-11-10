@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.36 2005/11/06 14:17:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.37 2005/11/10 21:10:30 avenger_teambg Exp $
  *
  */
 
@@ -4288,6 +4288,7 @@ void GameScript::PauseGame(Scriptable* /*Sender*/, Action* /*parameters*/)
 	GameControl *gc = core->GetGameControl();
 	if (gc) {
 		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
+		core->DisplayConstantString(STR_SCRIPTPAUSED,0xff0000);
 	}
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.41 2005/11/06 16:40:37 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.42 2005/11/10 21:10:30 avenger_teambg Exp $
  *
  */
 
@@ -178,7 +178,7 @@ void EffectQueue::ApplyAllEffects(Actor* target)
 
 
 	// FIXME: the condition is here for the time being for effects added when loading a game
-	int time = core->GetGame() ? core->GetGame()->GameTime : 0;
+	//int time = core->GetGame() ? core->GetGame()->GameTime : 0;
 
 	std::vector< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
