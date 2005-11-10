@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/strrefs.h,v 1.10 2005/10/20 23:13:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/strrefs.h,v 1.11 2005/11/10 21:01:26 avenger_teambg Exp $
  *
  */
 
@@ -70,5 +70,13 @@
 #define STR_NOTHINGTOSAY    36
 #define STR_JOURNALCHANGE   37
 #define STR_WORLDMAPCHANGE  38
-
+#define STR_PAUSED          39
+#define STR_UNPAUSED        40
+#define STR_SCRIPTPAUSED    41
+#define STR_AP_UNUSABLE     42
+#define STR_AP_ATTACKED     43
+#define STR_AP_HIT          44
+#define STR_AP_WOUNDED      45
+#define STR_AP_DEAD         46
+#define STR_AP_NOTARGET     47
 #endif //! IE_STRINGS_H
