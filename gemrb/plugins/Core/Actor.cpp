@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.128 2005/11/11 22:00:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.129 2005/11/11 22:05:45 avenger_teambg Exp $
  *
  */
 
@@ -693,6 +693,9 @@ void Actor::Die(Scriptable *killer)
 	//otherwise it is the same as REALLYDIED
 	InternalFlags|=IF_REALLYDIED|IF_JUSTDIED;
 	SetStance( IE_ANI_DIE );
+	if (InParty) {
+		core->Autopause(AP_DEAD);
+	}
 }
 
 bool Actor::CheckOnDeath()
