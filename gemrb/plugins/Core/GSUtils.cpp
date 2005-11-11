@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.24 2005/11/06 14:03:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.25 2005/11/11 22:33:14 avenger_teambg Exp $
  *
  */
 
@@ -276,6 +276,9 @@ int ValidForDialogCore(Scriptable* Sender, Actor *target)
 		return 0;
 	}
 	
+	if (target->InternalFlags&IF_REALLYDIED) {
+		return 0;
+	}
 	//we should rather use STATE_SPEECHLESS_MASK
 	if (target->GetStat(IE_STATE_ID)&STATE_DEAD) {
 		return 0;
@@ -634,6 +637,21 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 	speaker = (Actor *) scr;
 	target = (Actor *) tar;
+	if (!ValidForDialogCore(scr, target) ) {
+		printf("ValidForDialogCore returned false! Speaker and target are:\n");
+		((Actor *) scr)->DebugDump();
+		((Actor *) tar)->DebugDump();
+		Sender->CurrentAction = NULL;
+		return;
+	}
+	if (speaker->GetStat(IE_STATE_ID)&STATE_DEAD) {
+		printf("Speaker is dead, cannot start dialogue. Speaker and target are:\n");
+		((Actor *) scr)->DebugDump();
+		((Actor *) tar)->DebugDump();
+		Sender->CurrentAction = NULL;
+		return;
+	}
+
 	//CHECKDIST works only for mobile scriptables
 	if (Flags&BD_CHECKDIST) {
 		if (Distance(speaker, target)>speaker->GetStat(IE_DIALOGRANGE)*20 ) {
