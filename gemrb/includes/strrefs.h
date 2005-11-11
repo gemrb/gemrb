@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/strrefs.h,v 1.11 2005/11/10 21:01:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/strrefs.h,v 1.12 2005/11/11 21:22:51 avenger_teambg Exp $
  *
  */
 
@@ -79,4 +79,12 @@
 #define STR_AP_WOUNDED      45
 #define STR_AP_DEAD         46
 #define STR_AP_NOTARGET     47
+#define STR_AP_ENDROUND     48
+#define STR_AP_ENEMY        49
+#define STR_AP_TRAP         50
+#define STR_AP_SPELLCAST    51
+#define STR_AP_RESERVED1    52
+#define STR_AP_RESERVED2    53
+#define STR_AP_RESERVED3    54
+#define STR_AP_RESERVED4    55
 #endif //! IE_STRINGS_H

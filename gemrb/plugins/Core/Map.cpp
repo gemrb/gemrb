@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.190 2005/10/22 16:30:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.191 2005/11/11 21:22:53 avenger_teambg Exp $
  *
  */
 
@@ -616,8 +616,8 @@ void Map::DrawMap(Region screen, GameControl* gc)
 			}
 			int State = actor->Modified[IE_STATE_ID];
 			if (State&STATE_INVISIBLE) {
-				//enemies are fully invisible if invis flag 2 set
-				if (actor->Modified[IE_EA]>128) {
+				//enemies/neutrals are fully invisible if invis flag 2 set
+				if (actor->Modified[IE_EA]>EA_GOODCUTOFF) {
 					if (State&STATE_INVIS2)
 						Trans=256;
 					else
@@ -628,7 +628,7 @@ void Map::DrawMap(Region screen, GameControl* gc)
 			}
 			//friendlies are half transparent at best
 			if (Trans>128) {
-				if (actor->Modified[IE_EA]<6) {
+				if (actor->Modified[IE_EA]<=EA_GOODCUTOFF) {
 					Trans=128;
 				}
 			}
@@ -775,6 +775,16 @@ void Map::AddActor(Actor* actor)
 	//0 is reserved for 'no actor'
 	actor->SetMap(this, ++localActorCounter, ++globalActorCounter);
 	actors.push_back( actor );
+	//if a visible aggressive actor was put on the map, it is an autopause reason
+	//guess game is always loaded? if not, then we'll crash
+	ieDword gametime = core->GetGame()->GameTime;
+
+	if (IsVisible(actor->Pos, false) && actor->Schedule(gametime) ) {
+       		if (actor->Modified[IE_EA]>=EA_EVILCUTOFF) {
+printf("AUTOPAUSE b\n");
+			core->Autopause(AP_ENEMY);
+		}
+	}
 }
 
 void Map::DeleteActor(int i)
@@ -1023,6 +1033,10 @@ void Map::GenerateQueues()
 				if (IsVisible(actor->Pos, false) && actor->Schedule(gametime) ) {
 					priority = 0; //run scripts and display, activated now
 					actor->Active|=SCR_ACTIVE;
+					if (actor->Modified[IE_EA]>=EA_EVILCUTOFF) {
+printf("AUTOPAUSE a\n");
+						core->Autopause(AP_ENEMY);
+					}
 					//here you can flag for autopause if actor->Modified[IE_EA] is enemy, coz we just revealed it!
 				} else {
 					priority = 2;
@@ -1594,6 +1608,8 @@ PathNode* Map::FindPath(Point &s, Point &d, int MinDistance)
 //if explored = true then visible in fog
 bool Map::IsVisible(Point &pos, int explored)
 {
+	if (!VisibleBitmap)
+		return false;
 	int sX=pos.x/32;
 	int sY=pos.y/32;
 	if (sX<0) return false;

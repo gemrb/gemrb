@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIMA.py,v 1.23 2005/11/01 13:35:10 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIMA.py,v 1.24 2005/11/11 21:22:50 avenger_teambg Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -45,6 +45,7 @@ def OpenMapWindow ():
 		GemRB.UnloadWindow (PortraitWindow)
 
 		MapWindow = None
+		#this window type should block the game
 		GemRB.SetVar ("OtherWindow", -1)
 		GemRB.SetVisible (0,1)
 		GemRB.UnhideGUI ()
@@ -57,6 +58,7 @@ def OpenMapWindow ():
 
 	GemRB.LoadWindowPack ("GUIMAP", 640, 480)
 	MapWindow = Window = GemRB.LoadWindow (2)
+	#this window type blocks the game normally, but map window doesn't
 	GemRB.SetVar ("OtherWindow", MapWindow)
 	#saving the original portrait window
 	OldPortraitWindow = GUICommonWindows.PortraitWindow

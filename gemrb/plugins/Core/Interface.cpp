@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.353 2005/11/06 16:06:23 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.354 2005/11/11 21:22:53 avenger_teambg Exp $
  *
  */
 
@@ -59,6 +59,7 @@ GEM_EXPORT HANDLE hConsole;
 
 #include "../../includes/win32def.h"
 #include "../../includes/globals.h"
+#include "../../includes/strrefs.h"
 
 //use DialogF.tlk if the protagonist is female, that's why we leave space
 static char dialogtlk[] = "dialog.tlk\0";
@@ -4001,3 +4002,16 @@ int Interface::GetCharismaBonus(int column, int value)
 	return chrmod[column*MaximumAbility+value];
 }
 
+void Interface::Autopause(ieDword flag)
+{
+	ieDword autopause_flags = ~0u; //it is -1 just for testing
+
+	vars->Lookup("Auto Pause State", autopause_flags);
+	if (autopause_flags & flag) {
+		GameControl *gc = GetGameControl();
+		if (gc) {
+			DisplayConstantString(STR_AP_UNUSABLE+flag, 0xff0000);
+			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
+		}
+	}
+}

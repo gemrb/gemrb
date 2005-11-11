@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.171 2005/11/06 09:05:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.172 2005/11/11 21:22:53 avenger_teambg Exp $
  *
  */
 
@@ -119,6 +119,17 @@ typedef struct SlotType {
 #define QF_CHANGESCRIPT  4
 #define QF_LOADGAME      8
 #define QF_ENTERGAME     16
+
+#define AP_UNUSABLE      0
+#define AP_ATTACKED      1
+#define AP_HIT           2
+#define AP_WOUNDED       3
+#define AP_DEAD          4
+#define AP_NOTARGET      5
+#define AP_ENDROUND      6
+#define AP_ENEMY         7
+#define AP_TRAP          8
+#define AP_SPELLCAST     9
 
 /**
  * @class Interface
@@ -450,6 +461,8 @@ public:
 	int WriteWorldMap(const char *folder);
 	/** saves the .are and .sto files to the destination folder */
 	int CompressSave(const char *folder);
+	/** receives an autopause reason */
+	void Autopause(ieDword reason);
 private:
 	bool LoadConfig(void);
 	bool LoadConfig(const char *filename);
