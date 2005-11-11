@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.191 2005/11/11 21:22:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.192 2005/11/11 22:00:44 avenger_teambg Exp $
  *
  */
 
@@ -781,7 +781,6 @@ void Map::AddActor(Actor* actor)
 
 	if (IsVisible(actor->Pos, false) && actor->Schedule(gametime) ) {
        		if (actor->Modified[IE_EA]>=EA_EVILCUTOFF) {
-printf("AUTOPAUSE b\n");
 			core->Autopause(AP_ENEMY);
 		}
 	}
@@ -1034,7 +1033,6 @@ void Map::GenerateQueues()
 					priority = 0; //run scripts and display, activated now
 					actor->Active|=SCR_ACTIVE;
 					if (actor->Modified[IE_EA]>=EA_EVILCUTOFF) {
-printf("AUTOPAUSE a\n");
 						core->Autopause(AP_ENEMY);
 					}
 					//here you can flag for autopause if actor->Modified[IE_EA] is enemy, coz we just revealed it!

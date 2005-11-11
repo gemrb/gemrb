@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.172 2005/11/11 21:22:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.173 2005/11/11 22:00:44 avenger_teambg Exp $
  *
  */
 
@@ -461,8 +461,8 @@ public:
 	int WriteWorldMap(const char *folder);
 	/** saves the .are and .sto files to the destination folder */
 	int CompressSave(const char *folder);
-	/** receives an autopause reason */
-	void Autopause(ieDword reason);
+	/** receives an autopause reason, returns 1 if pause was triggered by this call, -1 if it was already triggered */
+	int Autopause(ieDword reason);
 private:
 	bool LoadConfig(void);
 	bool LoadConfig(const char *filename);

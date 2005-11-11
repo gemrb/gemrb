@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.127 2005/11/06 14:03:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.128 2005/11/11 22:00:44 avenger_teambg Exp $
  *
  */
 
@@ -540,6 +540,14 @@ int Actor::Damage(int damage, int damagetype, Actor *hitter)
 	LastDamage=damage;
 	LastHitter=hitter->GetID();
 	Active|=SCR_ACTIVE;
+	if (InParty) {
+		if (GetStat(IE_HITPOINTS)<GetStat(IE_MAXHITPOINTS)/10) {
+			core->Autopause(AP_WOUNDED);
+		}
+		if (damage>0) {
+			core->Autopause(AP_HIT);
+		}
+	}
 	return damage;
 }
 

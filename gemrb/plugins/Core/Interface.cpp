@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.354 2005/11/11 21:22:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.355 2005/11/11 22:00:44 avenger_teambg Exp $
  *
  */
 
@@ -4002,16 +4002,30 @@ int Interface::GetCharismaBonus(int column, int value)
 	return chrmod[column*MaximumAbility+value];
 }
 
-void Interface::Autopause(ieDword flag)
+//returns: -3, -2 if request is illegal or in cutscene
+//         -1 if pause is already active
+//         0 if pause was not allowed
+//         1 if autopause happened
+
+int Interface::Autopause(ieDword flag)
 {
+	GameControl *gc = GetGameControl();
+	if (!gc) {
+		return -3;
+	}
+	if (InCutSceneMode()) {
+		return -2;
+	}
+	if (gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS) {
+		return -1;
+	}
 	ieDword autopause_flags = ~0u; //it is -1 just for testing
 
-	vars->Lookup("Auto Pause State", autopause_flags);
+	vars->Lookup("AutoPauseState", autopause_flags);
 	if (autopause_flags & flag) {
-		GameControl *gc = GetGameControl();
-		if (gc) {
-			DisplayConstantString(STR_AP_UNUSABLE+flag, 0xff0000);
-			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
-		}
+		DisplayConstantString(STR_AP_UNUSABLE+flag, 0xff0000);
+		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
+		return 1;
 	}
+	return 0;
 }
