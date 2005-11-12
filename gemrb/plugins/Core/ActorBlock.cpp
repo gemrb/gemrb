@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.111 2005/11/06 14:03:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.112 2005/11/12 14:05:16 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -201,6 +201,8 @@ void Scriptable::ClearActions()
 		aC->Release();
 	}
 	actionQueue.clear();
+	WaitCounter = 0;
+	playDeadCounter = 0; // i'm not sure about this
 }
 
 void Scriptable::ProcessActions()

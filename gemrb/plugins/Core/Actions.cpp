@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.37 2005/11/10 21:10:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.38 2005/11/12 14:05:16 avenger_teambg Exp $
  *
  */
 
@@ -3507,16 +3507,23 @@ void GameScript::ForceAttack( Scriptable* Sender, Action* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!scr || scr->Type != ST_ACTOR) {
-		Sender->CurrentAction = NULL;
+		//Sender->CurrentAction = NULL;
 		return;
 	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[2] );
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
-		Sender->CurrentAction = NULL;
+		//Sender->CurrentAction = NULL;
 		return;
 	}
-	AttackCore(scr, tar, NULL, 0);
-	Sender->CurrentAction = NULL;
+	GameControl *gc = core->GetGameControl();
+	if (gc) {
+		gc->target = (Actor *) tar;
+		char Tmp[256];
+		strncpy(Tmp,"NIDSpecial3()",sizeof(Tmp) );
+		scr->AddAction( GenerateAction(Tmp,true) );
+	}
+	//AttackCore(scr, tar, NULL, 0);
+	//Sender->CurrentAction = NULL;
 }
 
 void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)

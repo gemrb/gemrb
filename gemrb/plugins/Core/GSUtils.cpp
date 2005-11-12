@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.25 2005/11/11 22:33:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.26 2005/11/12 14:05:16 avenger_teambg Exp $
  *
  */
 
@@ -723,17 +723,14 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		goto end_of_quest;
 	}
 
-	//we also need to freeze active scripts during a dialog!
 	if (speaker!=target) {
 		if (swap) {
 			Actor *tmp = target;
 			target = speaker;
 			speaker = tmp;
 		} else {
-			if (Flags & BD_INTERRUPT) {
-				scr->ClearActions();
-			} else {
-				if (scr->GetNextAction()) {
+			if (!(Flags & BD_INTERRUPT)) {
+				if (tar->GetNextAction()) {
 					core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
 					goto end_of_quest;
 				}
@@ -742,6 +739,9 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		
 	}
 
+	scr->ClearActions();
+	if (scr!=tar)
+		tar->ClearActions();
 	speaker->SetOrientation(GetOrient( target->Pos, speaker->Pos), true);
 	target->SetOrientation(GetOrient( speaker->Pos, target->Pos), true);
 
@@ -810,18 +810,16 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 		*/
 	}
 	if ( Distance(Sender, target) > wrange ) {
+printf("GoNearAndRetry\n");
 		GoNearAndRetry(Sender, target, true);
 		if (flags&AC_REEVALUATE) {
 			delete parameters;
 		}
 		return;
 	}
-	//TODO:
-	//send Attack trigger to attacked
-	//calculate attack/damage
+printf("Debugdump of target:\n");
+((Actor *) target)->DebugDump();
 	actor->SetTarget( target );
-	//actor->SetStance( IE_ANI_ATTACK );
-	//actor->SetWait( 1 );
 	//attackreevaluate
 	if ( (flags&AC_REEVALUATE) && parameters->int0Parameter) {
 		parameters->int0Parameter--;
@@ -1143,7 +1141,9 @@ void GoNearAndRetry(Scriptable *Sender, Scriptable *target, bool flag)
 
 void GoNearAndRetry(Scriptable *Sender, Point &p)
 {
-	Sender->AddActionInFront( Sender->CurrentAction );
+	if (Sender->CurrentAction) {
+		Sender->AddActionInFront( Sender->CurrentAction );
+	}
 	char Tmp[256];
 	sprintf( Tmp, "MoveToPoint([%hd.%hd])", p.x, p.y );
 	Sender->AddActionInFront( GenerateAction( Tmp, true ) );

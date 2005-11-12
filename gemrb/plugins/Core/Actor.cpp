@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.129 2005/11/11 22:05:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.130 2005/11/12 14:05:16 avenger_teambg Exp $
  *
  */
 
@@ -587,6 +587,7 @@ void Actor::DebugDump()
 	ieDword tmp=0;
 	core->GetGame()->locals->Lookup("APPEARANCE",tmp);
 	printf( "\nDisguise: %d\n", tmp);
+	printf( "WaitCounter: %d\n", (int) GetWait());
 	inventory.dump();
 	spellbook.dump();
 	fxqueue.dump();
@@ -916,7 +917,10 @@ int Actor::GetAttackStyle()
 void Actor::SetTarget( Scriptable *target)
 {
 	if (target->Type==ST_ACTOR) {
-		LastTarget = ((Actor *) target)->GetID();
+		Actor *tar = (Actor *) target;
+		LastTarget = tar->GetID();
+		tar->LastAttacker = GetID();
+printf("%s got lastattacker as %s\n",tar->GetName(-1), GetName(-1));
 	}
 	//calculate attack style
 	//set stance correctly based on attack style
