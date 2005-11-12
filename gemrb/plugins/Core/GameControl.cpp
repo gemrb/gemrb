@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.255 2005/11/12 15:15:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.256 2005/11/12 19:31:51 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1284,7 +1284,7 @@ int GameControl::UnhideGUI()
 		if (index != (ieDword) -1) {
 			Window* fw = core->GetWindow( index );
 			core->SetVisible( index, WINDOW_VISIBLE );
-			fw->Floating = true;
+			fw->Flags |=WF_FLOAT;
 			core->SetOnTop( index );
 		}
 	}

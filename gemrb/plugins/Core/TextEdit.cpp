@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.cpp,v 1.29 2005/10/16 21:36:46 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.cpp,v 1.30 2005/11/12 19:31:51 avenger_teambg Exp $
  *
  */
 
@@ -51,7 +51,7 @@ TextEdit::~TextEdit(void)
 /** Draws the Control on the Output Display */
 void TextEdit::Draw(unsigned short x, unsigned short y)
 {
-	if (!Changed && !((Window*)Owner)->Floating) {
+	if (!Changed && !(((Window*)Owner)->Flags&WF_FLOAT)) {
 		return;
 	}
 	Changed = false;

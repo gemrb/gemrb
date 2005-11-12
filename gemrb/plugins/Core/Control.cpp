@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.38 2005/10/18 22:43:41 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.39 2005/11/12 19:31:51 avenger_teambg Exp $
  *
  */
 
@@ -197,6 +197,6 @@ void Control::SetAnimPicture(Sprite2D* newpic)
 	AnimPicture = newpic;
 	Changed = true;
 	//Flags |= IE_GUI_BUTTON_PICTURE;
-	( ( Window * ) Owner )->Invalidate();
+	//( ( Window * ) Owner )->Invalidate();
 }
 

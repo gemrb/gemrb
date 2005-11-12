@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.79 2005/08/15 20:29:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.80 2005/11/12 19:31:51 avenger_teambg Exp $
  *
  */
 
@@ -82,12 +82,11 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 				}
 			}
 			Changed = true;
-			( ( Window * ) Owner )->Changed = true;
 			( ( Window * ) Owner )->Invalidate();
 		}
 	}
 
-	if (!Changed && !((Window*)Owner)->Floating) {
+	if (!Changed && !(((Window*)Owner)->Flags&WF_FLOAT) ) {
 		return;
 	}
 	Changed = false;

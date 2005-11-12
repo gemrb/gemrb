@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.21 2005/10/20 23:13:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.22 2005/11/12 19:31:51 avenger_teambg Exp $
  *
  */
 
@@ -46,6 +46,12 @@
 #else
 #define GEM_EXPORT
 #endif
+
+// Window Flags
+#define WF_CHANGED  1     //window changed
+#define WF_FRAME    2     //window has frame
+#define WF_FLOAT    4     //floating window
+#define WF_CHILD    8     //if invalidated, it invalidates all windows on top of it
 
 // Window position anchors (actually flags for WindowSetPos())
 // !!! Keep these synchronized with GUIDefines.py !!!
@@ -138,11 +144,12 @@ public: //Public attributes
 	/** Visible */
 	char Visible;  //0,1,2
 	/** Changed Flag */
-	bool Changed;
+	//bool Changed;
 	/** Floating Flag */
-	bool Floating;
+	//bool Floating;
 	/** Window is framed */
-	bool Frame;
+	//bool Frame;
+	int Flags; //all flags Changed, Floating, Frame, Child
 	int Cursor;
 	int DefaultControl;
 private: // Private attributes

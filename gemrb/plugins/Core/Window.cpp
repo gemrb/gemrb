@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.43 2005/08/14 17:52:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.44 2005/11/12 19:31:51 avenger_teambg Exp $
  *
  */
 
@@ -39,12 +39,9 @@ Window::Window(unsigned short WindowID, unsigned short XPos,
 	lastC = NULL;
 	lastFocus = NULL;
 	Visible = WINDOW_INVISIBLE;
-	Changed = true;
-	Floating = false;
+	Flags = WF_CHANGED;
 	Cursor = IE_CURSOR_NORMAL;
 	DefaultControl = -1;
-
-	Frame = false;
 }
 
 Window::~Window()
@@ -93,9 +90,11 @@ void Window::DrawWindow()
 {
 	Video* video = core->GetVideoDriver();
 	Region clip( XPos, YPos, Width, Height );
-	if (Changed && Frame) {
+	//Frame && Changed
+	if ( (Flags & (WF_FRAME|WF_CHANGED) )== (WF_FRAME|WF_CHANGED) ) {
 		Region screen( 0, 0, core->Width, core->Height );
 		video->SetClipRect( NULL );
+		//removed this?
 		Color black = { 0, 0, 0, 255 };
 		video->DrawRect( screen, black );
 		if (core->WindowFrames[0])
@@ -108,27 +107,29 @@ void Window::DrawWindow()
 			video->BlitSprite( core->WindowFrames[3], (core->Width - core->WindowFrames[3]->Width) / 2, core->Height - core->WindowFrames[3]->Height, true );
 	}
 	video->SetClipRect( &clip );
-	if (BackGround && (Changed || Floating)) {
+	//Float || Changed
+	if (BackGround && (Flags & (WF_FLOAT|WF_CHANGED) ) ) {
 		video->BlitSprite( BackGround, XPos, YPos, true );
 	}
 	std::vector< Control*>::iterator m;
 	for (m = Controls.begin(); m != Controls.end(); ++m) {
 		( *m )->Draw( XPos, YPos );
 	}
-	if (Changed && (Visible == WINDOW_GRAYED) ) {
+	if ( (Flags&WF_CHANGED) && (Visible == WINDOW_GRAYED) ) {
 		Color black = { 0, 0, 0, 128 };
 		video->DrawRect(clip, black);
 	}
 	video->SetClipRect( NULL );
-	Changed = false;
+	Flags &= ~WF_CHANGED;
 }
 
 /** Set window frame used to fill screen on higher resolutions*/
 void Window::SetFrame()
 {
-	Frame = (Width < core->Width) || (Height < core->Height);
+	if ( (Width < core->Width) || (Height < core->Height) ) {
+		Flags|=WF_FRAME;
+	}
 	Invalidate();
-
 }
 
 /** Returns the Control at X,Y Coordinates */
@@ -224,7 +225,7 @@ void Window::Invalidate()
 			default: ;
 		}
 	}
-	Changed = true;
+	Flags |= WF_CHANGED;
 }
 
 void Window::RedrawControls(const char* VarName, unsigned int Sum)

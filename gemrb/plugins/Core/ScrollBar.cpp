@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.cpp,v 1.32 2005/02/28 22:49:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.cpp,v 1.33 2005/11/12 19:31:51 avenger_teambg Exp $
  *
  */
 
@@ -71,7 +71,7 @@ void ScrollBar::RedrawScrollBar(const char* Variable, int Sum)
 
 void ScrollBar::Draw(unsigned short x, unsigned short y)
 {
-	if (!Changed && !((Window*)Owner)->Floating) {
+	if (!Changed && !(((Window*)Owner)->Flags&WF_FLOAT) ) {
 		return;
 	}
 	Changed = false;
