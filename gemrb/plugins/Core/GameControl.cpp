@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.254 2005/11/10 21:10:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.255 2005/11/12 15:15:06 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1050,6 +1050,16 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 		type = 0; //party
 	}
 	
+	if (target_mode&TARGET_MODE_ATTACK) {
+		type = 2;
+	} else if (target_mode&TARGET_MODE_TALK) {
+		type = 1;
+	} else if (target_mode&TARGET_MODE_CAST) {
+		type = 3;
+	}
+
+	target_mode = TARGET_MODE_NONE;
+
 	switch (type) {
 		case 0:
 			//clicked on a new party member
@@ -1074,6 +1084,8 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			for(i=0;i<game->selected.size();i++) {
 				TryToAttack(game->selected[i], actor);
 			}
+			break;
+		case 3: //cast on target
 			break;
 	}
 }
