@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.80 2005/11/12 19:31:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.81 2005/11/12 22:37:10 avenger_teambg Exp $
  *
  */
 
@@ -65,6 +65,11 @@ TextArea::~TextArea(void)
 
 void TextArea::Draw(unsigned short x, unsigned short y)
 {
+	int tx=x+XPos;
+	int ty=y+YPos;
+	Region clip( tx, ty, Width, Height );
+	Video *video = core->GetVideoDriver();
+
 	//this might look better in GlobalTimer
 	//or you might want to change the animated button to work like this
 	if (Flags &IE_GUI_TEXTAREA_SMOOTHSCROLL)
@@ -81,6 +86,9 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 					startrow++;
 				}
 			}
+			Color black = { 0, 0, 0, 255 };
+			video->DrawRect( clip, black );
+
 			Changed = true;
 			( ( Window * ) Owner )->Invalidate();
 		}
@@ -97,8 +105,6 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 		return;
 	}
 
-	int tx=x+XPos;
-	int ty=y+YPos;
 	//smooth vertical scrolling up
 	if (Flags & IE_GUI_TEXTAREA_SMOOTHSCROLL) {
 		ty=ty+smooth;
@@ -152,11 +158,13 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 				Buffer[lastlen] = 0;
 			}
 		}
+		video->SetClipRect( &clip );
 		ftext->PrintFromLine( startrow,
 			Region( tx , ty, Width, Height - 5 ),
 			( unsigned char * ) Buffer, palette,
 			IE_FONT_ALIGN_LEFT, finit, NULL );
 		free( Buffer );
+		video->SetClipRect( NULL );
 		return;
 	}
 	// normal scrolling textarea

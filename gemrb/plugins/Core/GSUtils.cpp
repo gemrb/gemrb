@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.26 2005/11/12 14:05:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.27 2005/11/12 22:37:10 avenger_teambg Exp $
  *
  */
 
@@ -810,15 +810,12 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 		*/
 	}
 	if ( Distance(Sender, target) > wrange ) {
-printf("GoNearAndRetry\n");
 		GoNearAndRetry(Sender, target, true);
 		if (flags&AC_REEVALUATE) {
 			delete parameters;
 		}
 		return;
 	}
-printf("Debugdump of target:\n");
-((Actor *) target)->DebugDump();
 	actor->SetTarget( target );
 	//attackreevaluate
 	if ( (flags&AC_REEVALUATE) && parameters->int0Parameter) {
