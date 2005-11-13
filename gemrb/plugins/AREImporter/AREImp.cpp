@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.130 2005/10/22 16:30:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.131 2005/11/13 16:15:25 avenger_teambg Exp $
  *
  */
 
@@ -669,6 +669,8 @@ Map* AREImp::GetMap(const char *ResRef)
 			str->ReadDword( &TalkCount );
 			str->ReadResRef( Dialog );
 			//TODO: script order			
+			memset(Scripts,0,sizeof(Scripts));
+
 			str->ReadResRef( Scripts[SCR_OVERRIDE] );
 			str->ReadResRef( Scripts[SCR_CLASS] );
 			str->ReadResRef( Scripts[SCR_RACE] );
@@ -710,6 +712,11 @@ Map* AREImp::GetMap(const char *ResRef)
 				ab->SetScriptName(DefaultName);
 			}
 	
+			for (int j=0;j<8;j++) {
+				if (Scripts[j][0]) {
+					ab->SetScript(Scripts[j],j);
+				}
+			}
 			ab->SetOrientation( Orientation,0 );
 			ab->TalkCount = TalkCount;
 			//maybe there is a flag (deactivate), but 
