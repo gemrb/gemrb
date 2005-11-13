@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.93 2005/11/06 13:42:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.94 2005/11/13 20:26:21 avenger_teambg Exp $
  *
  */
 
@@ -40,7 +40,6 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	ControlStatus = 0;
 	CombatCounter = 0; //stored here until we know better
 	WeatherBits = 0;
-	//globals = NULL;
 	kaputz = NULL;
 	beasts = NULL;
 	mazedata = NULL;

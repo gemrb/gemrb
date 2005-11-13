@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.357 2005/11/13 11:23:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.358 2005/11/13 20:26:22 avenger_teambg Exp $
  *
  */
 
@@ -49,7 +49,6 @@
 #include "MapControl.h"
 #include "EffectQueue.h"
 #include "MapMgr.h"
-#include "OpcodeMgr.h"
 
 GEM_EXPORT Interface* core;
 
@@ -93,6 +92,7 @@ Interface::Interface(int iargc, char** iargv)
 	RtRows = NULL;
 	music = NULL;
 	soundmgr = NULL;
+	opcodemgr = NULL;
 	sgiterator = NULL;
 	INIparty = NULL;
 	INIbeasts = NULL;
@@ -215,6 +215,11 @@ Interface::~Interface(void)
 	if (worldmap) {
 		delete( worldmap );
 	}
+	//aww, i'm sure this could be implemented better
+	MapMgr* mm = ( MapMgr* ) GetInterface( IE_ARE_CLASS_ID );
+	mm->ReleaseMemory();
+	FreeInterface(mm);
+
 	CharAnimations::ReleaseMemory();
 	if (CurrentStore) {
 		delete CurrentStore;
@@ -227,6 +232,9 @@ Interface::~Interface(void)
 		DSCount = -1;
 	}
 
+	if (opcodemgr) {
+		FreeInterface( opcodemgr );
+	}
 	if (slottypes) {
 		free( slottypes );
 	}
@@ -332,6 +340,7 @@ Interface::~Interface(void)
 		FreeInterface(INIparty);
 	}
 	Map::ReleaseMemory();
+	GameScript::ReleaseMemory();
 	delete( plugin );
 	// Removing all stuff from Cache, except bifs
 	DelTree((const char *) CachePath, true);
@@ -1043,7 +1052,7 @@ int Interface::Init()
 	}
 	printStatus( "OK", LIGHT_GREEN );
 
-	OpcodeMgr* opcodemgr;
+	//OpcodeMgr* opcodemgr;
 
 	printMessage( "Core", "Initializing effect opcodes...", WHITE );
 	// FIXME: this calls single plugin only

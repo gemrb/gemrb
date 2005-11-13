@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.h,v 1.8 2005/10/22 16:30:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.h,v 1.9 2005/11/13 20:26:22 avenger_teambg Exp $
  */
 #ifndef POLYGON_H
 #define POLYGON_H
@@ -69,7 +69,6 @@ public:
 class GEM_EXPORT Wall_Polygon: public Gem_Polygon {
 public:
 	Wall_Polygon(Point *points,int count,Region *bbox) : Gem_Polygon(points,count,bbox,false,NULL) {};
-	~Wall_Polygon();
 	//is the point above the baseline
 	bool PointCovered(Point &p);
 	bool PointCovered(int x, int y);

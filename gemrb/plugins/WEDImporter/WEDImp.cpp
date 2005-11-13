@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.18 2005/11/13 08:33:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.19 2005/11/13 20:26:22 avenger_teambg Exp $
  *
  */
 
@@ -314,6 +314,7 @@ Wall_Polygon **WEDImp::GetWallGroups()
 		rgn.w = PolygonHeaders[i].MaxX - PolygonHeaders[i].MinX;
 		rgn.h = PolygonHeaders[i].MaxY - PolygonHeaders[i].MinY;
 		Polygons[i] = new Wall_Polygon(points, count, &rgn);
+		delete [] points;
 		if (flags&WF_BASELINE) {
 			Polygons[i]->SetBaseline(base0, base1);
 		}

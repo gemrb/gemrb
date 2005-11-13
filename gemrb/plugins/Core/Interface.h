@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.174 2005/11/13 10:18:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.175 2005/11/13 20:26:22 avenger_teambg Exp $
  *
  */
 
@@ -66,6 +66,7 @@
 #include "GlobalTimer.h"
 #include "SaveGameMgr.h"
 #include "Cache.h"
+#include "OpcodeMgr.h"
 
 typedef struct Table {
 	TableMgr * tm;
@@ -160,6 +161,7 @@ private:
 	char WindowPack[10];
 	ScriptEngine * guiscript;
 	SoundMgr * soundmgr;
+	OpcodeMgr * opcodemgr;
 	SaveGameIterator *sgiterator;
 	/** Windows Array */
 	std::vector<Window*> windows;

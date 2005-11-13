@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.326 2005/11/13 10:18:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.327 2005/11/13 20:26:21 avenger_teambg Exp $
  *
  */
 
@@ -1165,6 +1165,14 @@ GameScript::~GameScript(void)
 		}
 		script = NULL;
 	}
+}
+
+/** releasing global memory */
+void GameScript::ReleaseMemory()
+{
+	if (ObjectIDSTableNames)
+		free(ObjectIDSTableNames);
+	initialized = 0;
 }
 
 Script* GameScript::CacheScript(ieResRef ResRef)

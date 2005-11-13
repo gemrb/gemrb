@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapMgr.h,v 1.7 2005/11/08 22:59:05 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapMgr.h,v 1.8 2005/11/13 20:26:22 avenger_teambg Exp $
  *
  */
 
@@ -58,6 +58,8 @@ public:
 
 	virtual int GetStoredFileSize(Map *map) = 0;
 	virtual int PutArea(DataStream* stream, Map *map) = 0;
+	/** this function frees some memory common for all MapMgr */
+	virtual void ReleaseMemory() = 0;
 };
 
 #endif

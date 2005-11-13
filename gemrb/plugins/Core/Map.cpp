@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.192 2005/11/11 22:00:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.193 2005/11/13 20:26:22 avenger_teambg Exp $
  *
  */
 
@@ -219,6 +219,8 @@ Map::Map(void)
 	SearchMap = NULL;
 	SmallMap = NULL;
 	MapSet = NULL;
+	Walls = NULL;
+	WallCount = 0;
 	queue[0] = NULL;
 	queue[1] = NULL;
 	queue[2] = NULL;
@@ -297,6 +299,13 @@ Map::~Map(void)
 	if (VisibleBitmap) {
 		free( VisibleBitmap );
 	}
+	if (Walls) {
+		for(i=0;i<WallCount;i++) {
+			delete(Walls[i]);
+		}
+		free( Walls );
+	}
+	WallCount=0;
 }
 
 void Map::AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm)

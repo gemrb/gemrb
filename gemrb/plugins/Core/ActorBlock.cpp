@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.112 2005/11/12 14:05:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.113 2005/11/13 20:26:21 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -90,7 +90,7 @@ Map* Scriptable::GetCurrentArea()
 void Scriptable::SetMap(Map *map)
 {
 	if (!map) {
-		printf("Null map set!\n");
+		printMessage("Scriptable","Null map set!",LIGHT_RED);
 		abort();
 	}
 	area = map;
@@ -98,10 +98,14 @@ void Scriptable::SetMap(Map *map)
 
 void Scriptable::SetScript(ieResRef aScript, int idx)
 {
+	if (idx >= MAX_SCRIPTS) {
+		printMessage("Scriptable","Invalid script index!",LIGHT_RED);
+		abort();
+	}
 	if (Scripts[idx]) {
 		delete Scripts[idx];
 	}
-	Scripts[idx] = 0;
+	Scripts[idx] = NULL;
 	// NONE is an 'invalid' script name, never used seriously
 	// This hack is to prevent flooding of the console
 	if (aScript[0] && stricmp(aScript, "NONE") ) {
@@ -113,7 +117,11 @@ void Scriptable::SetScript(ieResRef aScript, int idx)
 void Scriptable::SetScript(int index, GameScript* script)
 {
 	if (index >= MAX_SCRIPTS) {
+		printMessage("Scriptable","Invalid script index!",LIGHT_RED);
 		return;
+	}
+	if (Scripts[index] ) {
+		delete Scripts[index];
 	}
 	Scripts[index] = script;
 }
