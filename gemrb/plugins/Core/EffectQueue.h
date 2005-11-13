@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.14 2005/11/06 16:06:23 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.15 2005/11/13 11:23:50 avenger_teambg Exp $
  *
  */
 
@@ -138,12 +138,5 @@ public:
 	/** Lists contents of the queue on a terminal for debugging */
 	void dump();
 };
-
-//struct EffectLink {
-//	const char* Name;
-//	EffectFunction Function;
-//};
-
-
 
 #endif  // ! EFFECTQUEUE_H

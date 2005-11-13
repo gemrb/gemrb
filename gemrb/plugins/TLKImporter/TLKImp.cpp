@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.50 2005/11/13 10:18:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.51 2005/11/13 11:23:51 avenger_teambg Exp $
  *
  */
 
@@ -472,7 +472,8 @@ char* TLKImp::GetString(ieStrRef strref, ieDword flags)
 			}
 			int xpos = 0;
 			int ypos = 0;
-			unsigned int flag = flags&GEM_SND_SPEECH;
+			unsigned int flag = GEM_SND_RELATIVE | (flags&GEM_SND_SPEECH);
+printf("TLK Flag%u\n",flag);
 /* this seems to be useless
 			if (target) {
 				xpos = target->Pos.x;
