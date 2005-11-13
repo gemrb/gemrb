@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.23 2005/10/16 21:46:06 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.24 2005/11/13 22:29:35 avenger_teambg Exp $
  *
  */
 
@@ -142,9 +142,9 @@ int BIFImp::OpenArchive(const char* filename)
 	}
 	char Signature[8];
 	fread( &Signature, 1, 8, in_cache );
+	fclose( in_cache );
 	//normal bif, not in cache
 	if (strncmp( Signature, "BIFFV1  ", 8 ) == 0) {
-		fclose( in_cache );
 		stream = new CachedFileStream( filename );
 		stream->Read( Signature, 8 );
 		strcpy( path, filename );
