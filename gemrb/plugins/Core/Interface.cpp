@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.359 2005/11/13 21:32:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.360 2005/11/13 22:50:44 avenger_teambg Exp $
  *
  */
 
@@ -599,7 +599,7 @@ int Interface::Init()
 		printStatus( "ERROR", LIGHT_RED );
 		printMessage( "Core",
 			"Cannot Load Config File.\nTermination in Progress...\n", WHITE );
-		exit( -1 );
+		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
 	printMessage( "Core", "Starting Plugin Manager...\n", WHITE );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.193 2005/11/13 20:26:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.194 2005/11/13 22:50:44 avenger_teambg Exp $
  *
  */
 
@@ -60,7 +60,10 @@ void Map::ReleaseMemory()
 		for (int i=0;i<MaxVisibility;i++) {
 			free(VisibilityMasks[i]);
 		}
+		free(VisibilityMasks);
+		VisibilityMasks=NULL;
 	}
+	Spawns.RemoveAll();
 }
 
 //returns true if creature must be embedded in the area
