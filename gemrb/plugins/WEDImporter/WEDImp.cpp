@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.17 2005/10/29 19:05:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.18 2005/11/13 08:33:33 avenger_teambg Exp $
  *
  */
 
@@ -263,7 +263,8 @@ Wall_Polygon **WEDImp::GetWallGroups()
 
 	str->Seek (PolygonsOffset, GEM_STREAM_START);
 	
-	for (ieDword i=0;i<WallPolygonsCount;i++) {
+	ieDword i; //msvc6.0 isn't ISO compatible, so this variable cannot be declared in 'for'
+	for (i=0;i<WallPolygonsCount;i++) {
 		str->ReadDword ( &PolygonHeaders[i].FirstVertex);
 		str->ReadDword ( &PolygonHeaders[i].CountVertex);
 		str->ReadWord ( &PolygonHeaders[i].Flags);
@@ -273,7 +274,7 @@ Wall_Polygon **WEDImp::GetWallGroups()
 		str->ReadWord ( &PolygonHeaders[i].MaxY);
 	}
 
-	for (ieDword i=0;i<WallPolygonsCount;i++) {
+	for (i=0;i<WallPolygonsCount;i++) {
 		str->Seek (PolygonHeaders[i].FirstVertex*4+VerticesOffset, GEM_STREAM_START);
 		//compose polygon
 		ieDword count = PolygonHeaders[i].CountVertex;
