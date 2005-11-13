@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.30 2005/03/25 21:30:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.31 2005/11/13 10:18:49 avenger_teambg Exp $
  *
  */
 
@@ -33,12 +33,10 @@ class AmbientMgrAL;
 #ifndef WIN32
 #include <AL/al.h>
 #include <AL/alc.h>
-//#include <AL/alu.h>
 #include <AL/alut.h>
 #else
 #include <al.h>
 #include <alc.h>
-//#include <alu.h>
 #include <alut.h>
 #endif
 
@@ -54,13 +52,13 @@ typedef struct AudioStream {
 	ALuint Source;
 	int Duration;
 	bool free;
-	bool playing;
-	CSoundReader* reader;
+	//bool playing;
+	//CSoundReader* reader;
 } AudioStream;
 
 class ACMImp : public SoundMgr {
 private:
-	void clearstreams(bool free);
+	void clearstreams();
 	static int PlayListManager(void* data);
 public:
 	ACMImp(void);

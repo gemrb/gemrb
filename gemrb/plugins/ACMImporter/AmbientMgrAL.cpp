@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/AmbientMgrAL.cpp,v 1.3 2005/02/23 18:59:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/AmbientMgrAL.cpp,v 1.4 2005/11/13 10:18:49 avenger_teambg Exp $
  *
  */
 
@@ -270,7 +270,8 @@ unsigned int AmbientMgrAL::AmbientSource::tick(unsigned int ticks, Point listene
 /* dequeues already processed buffers */
 void AmbientMgrAL::AmbientSource::dequeProcessed()
 {
-	ALint processed;
+	ALint processed=0; //don't crash when algetsourcei doesn't return anything
+
 	alGetSourcei( source, AL_BUFFERS_PROCESSED, &processed );
 	if (0 == processed) return;
 	ALuint * buffers = (ALuint *) malloc ( processed * sizeof(ALuint) );

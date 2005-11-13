@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.173 2005/11/11 22:00:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.174 2005/11/13 10:18:49 avenger_teambg Exp $
  *
  */
 
@@ -224,7 +224,7 @@ public:
 	const char * TypeExt(SClass_ID type);
 	Video * GetVideoDriver() const;
 	ResourceMgr * GetResourceMgr() const;
-	char * GetString(ieStrRef strref, unsigned long options = 0);
+	char * GetString(ieStrRef strref, ieDword options = 0);
 	void FreeInterface(void * ptr);
 	Factory * GetFactory() const;
 	/** No descriptions */
@@ -463,6 +463,9 @@ public:
 	int CompressSave(const char *folder);
 	/** receives an autopause reason, returns 1 if pause was triggered by this call, -1 if it was already triggered */
 	int Autopause(ieDword reason);
+	/** registers engine opcodes */
+	void RegisterOpcodes(int count, EffectRef *opcodes);
+
 private:
 	bool LoadConfig(void);
 	bool LoadConfig(const char *filename);

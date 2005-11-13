@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.130 2005/11/12 14:05:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.131 2005/11/13 10:18:49 avenger_teambg Exp $
  *
  */
 
@@ -920,7 +920,6 @@ void Actor::SetTarget( Scriptable *target)
 		Actor *tar = (Actor *) target;
 		LastTarget = tar->GetID();
 		tar->LastAttacker = GetID();
-printf("%s got lastattacker as %s\n",tar->GetName(-1), GetName(-1));
 	}
 	//calculate attack style
 	//set stance correctly based on attack style

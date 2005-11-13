@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.49 2005/08/15 20:17:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.50 2005/11/13 10:18:50 avenger_teambg Exp $
  *
  */
 
@@ -414,7 +414,7 @@ bool TLKImp::GetNewStringLength(char* string, int& Length)
 	return lChange;
 }
 
-char* TLKImp::GetString(ieStrRef strref, unsigned int flags)
+char* TLKImp::GetString(ieStrRef strref, ieDword flags)
 {
 	if (strref >= StrRefCount) {
 		char* ret = ( char* ) malloc( 1 );
@@ -472,13 +472,19 @@ char* TLKImp::GetString(ieStrRef strref, unsigned int flags)
 			}
 			int xpos = 0;
 			int ypos = 0;
+			unsigned int flag = flags&GEM_SND_SPEECH;
+/* this seems to be useless
 			if (target) {
 				xpos = target->Pos.x;
 				ypos = target->Pos.y;
+				//if it was speech, then it was spoken by target
+				if (flag) {
+					flag|=GEM_SND_RELATIVE;
+				}
 			}
+*/
 			//IE_STR_SPEECH will stop the previous sound source
-			core->GetSoundMgr()->Play( SoundResRef, xpos, ypos, flags & IE_STR_SPEECH);
-			//core->GetSoundMgr()->Play( SoundResRef, target->Pos.x, target->Pos.y, flags & IE_STR_SPEECH);
+			core->GetSoundMgr()->Play( SoundResRef, xpos, ypos, flag);
 		}
 	}
 	if (flags & IE_STR_STRREFON) {

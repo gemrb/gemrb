@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/OpcodeMgr.h,v 1.2 2005/11/08 22:59:05 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/OpcodeMgr.h,v 1.3 2005/11/13 10:18:49 avenger_teambg Exp $
  *
  */
 
@@ -24,8 +24,6 @@
  * Declares OpcodeMgr, abstract parent for plugins registering new opcodes
  * @author The GemRB Project
  */
-
-#include <config.h>
 
 #include "Plugin.h"
 

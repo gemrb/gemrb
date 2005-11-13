@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.355 2005/11/11 22:00:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.356 2005/11/13 10:18:49 avenger_teambg Exp $
  *
  */
 
@@ -1254,7 +1254,7 @@ const char* Interface::TypeExt(SClass_ID type)
 	return NULL;
 }
 
-char* Interface::GetString(ieStrRef strref, unsigned long options)
+char* Interface::GetString(ieStrRef strref, ieDword options)
 {
 	ieDword flags = 0;
 

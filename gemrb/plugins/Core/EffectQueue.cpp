@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.42 2005/11/10 21:10:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.43 2005/11/13 10:18:49 avenger_teambg Exp $
  *
  */
 
@@ -412,58 +412,3 @@ void EffectQueue::dump()
 		}
 	}
 }
-
-// Helper macros and functions for effect opcodes
-/*
-#define CHECK_LEVEL() { \
-	int level = target->GetXPLevel( true ); \
-	if ((fx->DiceSides != 0 || fx->DiceThrown != 0) && (level < (int)fx->DiceSides || level > (int)fx->DiceThrown)) \
-		return FX_NOT_APPLIED; \
-	}
-*/
-
-bool match_ids(Actor *target, int table, ieDword value)
-{
-	if (value == 0) {
-		return true;
-	}
-
-	int a, stat;
-
-	switch (table) {
-		case 2: //EA
-			stat = IE_EA; break;
-		case 3: //GENERAL
-			stat = IE_GENERAL; break;
-		case 4: //RACE
-			stat = IE_RACE; break;
-		case 5: //CLASS
-			stat = IE_CLASS; break;
-		case 6: //SPECIFIC
-			stat = IE_SPECIFIC; break;
-		case 7: //GENDER
-			stat = IE_SEX; break;
-		case 8: //ALIGNMENT
-			stat = target->GetStat(IE_ALIGNMENT);
-			a = value&15;
-			if (a) {
-				if (a != ( stat & 15 )) {
-					return false;
-				}
-			}
-			a = value & 240;
-			if (a) {
-				if (a != ( stat & 240 )) {
-					return false;
-				}
-			}
-			return true;
-		default:
-			return false;
-	}
-	if (target->GetStat(stat)==value) {
-		return true;
-	}
-	return false;
-}
-

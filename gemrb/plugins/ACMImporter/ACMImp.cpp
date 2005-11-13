@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.63 2005/08/15 20:20:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.64 2005/11/13 10:18:49 avenger_teambg Exp $
  *
  */
 
@@ -92,9 +92,9 @@ static ALenum GetFormatEnum(int channels, int bits)
 	return AL_FORMAT_MONO8;
 }
 
-void ACMImp::clearstreams(bool free)
+void ACMImp::clearstreams()
 {
-	if (musicPlaying && free) {
+	if (musicPlaying) {
 		for (int i = 0; i < MUSICBUFFERS; i++) {
 			if (alIsBuffer( MusicBuffers[i] ))
 				alDeleteBuffers( 1, &MusicBuffers[i] );
@@ -105,9 +105,19 @@ void ACMImp::clearstreams(bool free)
 	}
 	for (int i = 0; i < MAX_STREAMS; i++) {
 		if(!streams[i].free) {
-			delete streams[i].reader;
+			if (alIsSource(streams[i].Source))
+				alDeleteSources( 1, &streams[i].Source );
+			if (alIsBuffer(speech.Buffer))
+				alDeleteBuffers( 1, &streams[i].Buffer );
 			streams[i].free = true;
 		}
+	}
+	if (!speech.free) {
+		if (alIsSource(speech.Source))
+			alDeleteSources( 1, &speech.Source );
+		if (alIsBuffer(speech.Buffer))
+			alDeleteBuffers( 1, &speech.Buffer );
+		speech.free = true;
 	}
 	if(MusicReader) {
 		delete MusicReader;
@@ -207,6 +217,7 @@ ACMImp::ACMImp(void)
 	for (i = 0; i < MAX_STREAMS; i++) {
 		streams[i].free = true;
 	}
+	speech.free = true;
 	MusicReader = NULL;
 	musicPlaying = false;
 	musicMutex = SDL_CreateMutex();
@@ -229,7 +240,7 @@ ACMImp::~ACMImp(void)
 	SDL_mutexV( musicMutex );
 	//the mutex could be removed now too
 	SDL_DestroyMutex( musicMutex );
-	clearstreams( true );
+	clearstreams( );
 	if(MusicReader) {
 		delete MusicReader;
 		MusicReader = NULL;
@@ -261,7 +272,7 @@ bool ACMImp::Init(void)
 	for (i = 0; i < RETRY; i++) {
 		alGenSources( 1, &MusicSource );
 		if (( error = alGetError() ) != AL_NO_ERROR) {
-			DisplayALError( "[ACMImp::Play] alGenSources : ", error );
+			DisplayALError( "[ACMImp::Init] alGenSources : ", error );
 		}
 		if (alIsSource( MusicSource )) {
 			break;
@@ -379,26 +390,30 @@ unsigned int ACMImp::Play(const char* ResRef, int XPos, int YPos, unsigned int f
 	ALenum error;
 	ALint state;
 
-
 	if (flags & GEM_SND_SPEECH) {
-		if (!alIsSource( speech.Source )) {
+		if (speech.free || !alIsSource( speech.Source )) {
 			alGenSources( 1, &speech.Source );
+			if (( error = alGetError() ) != AL_NO_ERROR) {
+				DisplayALError( "[ACMImp::Play] alGenSources : ", error );
+			}
 
 			alSourcef( speech.Source, AL_PITCH, 1.0f );
 			alSourcefv( speech.Source, AL_VELOCITY, SourceVel );
 			alSourcei( speech.Source, AL_LOOPING, 0 );
 			alSourcef( speech.Source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
+			speech.free=false;
+		} else {
+			alSourceStop( speech.Source );
+			if (alIsBuffer( speech.Buffer )) {
+				alDeleteBuffers( 1, &speech.Buffer );
+			}
 		}
-		alSourceStop( speech.Source );	// legal nop if not playing
 		ieDword volume;
 		core->GetDictionary()->Lookup( "Volume Voices", volume );
 		alSourcef( speech.Source, AL_GAIN, 0.01f * volume );
 		alSourcei( speech.Source, AL_SOURCE_RELATIVE, flags & GEM_SND_RELATIVE );
 		alSourcefv( speech.Source, AL_POSITION, SourcePos );
 		alSourcei( speech.Source, AL_BUFFER, Buffer );
-		if (alIsBuffer( speech.Buffer )) {
-			alDeleteBuffers( 1, &speech.Buffer );
-		}
 		speech.Buffer = Buffer;
 		alSourcePlay( speech.Source );
 		return time_length;
@@ -409,16 +424,16 @@ unsigned int ACMImp::Play(const char* ResRef, int XPos, int YPos, unsigned int f
 			return 0;
 		}
 	
-		ieDword volume;
-		core->GetDictionary()->Lookup( "Volume SFX", volume );
-		alSourcei( Source, AL_BUFFER, Buffer );
 		alSourcef( Source, AL_PITCH, 1.0f );
-		alSourcef( Source, AL_GAIN, 0.01f * volume );
 		alSourcefv( Source, AL_VELOCITY, SourceVel );
 		alSourcei( Source, AL_LOOPING, 0 );
 		alSourcef( Source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
+		ieDword volume;
+		core->GetDictionary()->Lookup( "Volume SFX", volume );
+		alSourcef( Source, AL_GAIN, 0.01f * volume );
 		alSourcei( Source, AL_SOURCE_RELATIVE, flags & GEM_SND_RELATIVE );
 		alSourcefv( Source, AL_POSITION, SourcePos );
+		alSourcei( Source, AL_BUFFER, Buffer );
 			
 		if (alGetError() != AL_NO_ERROR) {
 			return 0;
@@ -432,7 +447,6 @@ unsigned int ACMImp::Play(const char* ResRef, int XPos, int YPos, unsigned int f
 					alDeleteSources( 1, &streams[i].Source );
 					streams[i].Buffer = Buffer;
 					streams[i].Source = Source;
-					streams[i].playing = false;
 					alSourcePlay( Source );
 					return time_length;
 				}
@@ -440,7 +454,6 @@ unsigned int ACMImp::Play(const char* ResRef, int XPos, int YPos, unsigned int f
 				streams[i].Buffer = Buffer;
 				streams[i].Source = Source;
 				streams[i].free = false;
-				streams[i].playing = false;
 				alSourcePlay( Source );
 				return time_length;
 			}
@@ -538,7 +551,7 @@ bool ACMImp::CanPlay()
 }
 void ACMImp::ResetMusics()
 {
-	clearstreams( true );
+	clearstreams( );
 }
 
 void ACMImp::UpdateViewportPos(int XPos, int YPos)
