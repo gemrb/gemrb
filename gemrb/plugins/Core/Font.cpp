@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.41 2005/07/24 11:21:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.42 2005/11/13 21:32:25 avenger_teambg Exp $
  *
  */
 
@@ -283,6 +283,8 @@ void Font::Print(Region rgn, unsigned char* string, Color* hicolor,
 	for (size_t i = 0; i < len; i++) {
 		if (( ( unsigned char ) tmp[i] ) == '[') {
 			i++;
+			if (i>=len)
+				break;
 			char tag[256];
 			for (int k = 0; k < 256; k++) {
 				if (tmp[i] == ']') {
@@ -361,6 +363,8 @@ int Font::CalcStringWidth(char* string)
 	for (size_t i = 0; i < len; i++) {
 		if (( ( unsigned char ) string[i] ) == '[') {
 			i++;
+			if (i>=len)
+				break;
 			char tag[256];
 			int k = 0;
 			for (k = 0; k < 256; k++) {
@@ -408,6 +412,8 @@ void Font::SetupString(char* string, unsigned int width)
 		}
 		if (( ( unsigned char ) string[pos] ) == '[') {
 			pos++;
+			if (pos>=len)
+				break;
 			char tag[256];
 			int k = 0;
 			for (k = 0; k < 256; k++) {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.358 2005/11/13 20:26:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.359 2005/11/13 21:32:25 avenger_teambg Exp $
  *
  */
 
@@ -206,8 +206,37 @@ static void ReleaseEffect(void *poi)
 	delete ((Effect *) poi);
 }
 
+void FreeAbilityTables()
+{
+	if (strmod) {
+		free(strmod);
+	}
+	strmod = NULL;
+	if (strmodex) {
+		free(strmodex);
+	}
+	strmodex = NULL;
+	if (intmod) {
+		free(intmod);
+	}
+	intmod = NULL;
+	if (dexmod) {
+		free(dexmod);
+	}
+	dexmod = NULL;
+	if (conmod) {
+		free(conmod);
+	}
+	conmod = NULL;
+	if (chrmod) {
+		free(chrmod);
+	}
+	chrmod = NULL;
+}
+
 Interface::~Interface(void)
 {
+	FreeAbilityTables();
 	//destroy the highest objects in the hierarchy first!
 	if (game) {
 		delete( game );
@@ -341,6 +370,7 @@ Interface::~Interface(void)
 	}
 	Map::ReleaseMemory();
 	GameScript::ReleaseMemory();
+	Actor::ReleaseMemory();
 	delete( plugin );
 	// Removing all stuff from Cache, except bifs
 	DelTree((const char *) CachePath, true);
@@ -409,28 +439,6 @@ void Interface::HandleFlags()
 		QuitFlag &= ~QF_CHANGESCRIPT;
 		guiscript->LoadScript( NextScript );			
 		guiscript->RunFunction( "OnLoad" );
-	}
-}
-
-void FreeAbilityTables()
-{
-	if (strmod) {
-		free(strmod);
-	}
-	if (strmodex) {
-		free(strmodex);
-	}
-	if (intmod) {
-		free(intmod);
-	}
-	if (dexmod) {
-		free(dexmod);
-	}
-	if (conmod) {
-		free(conmod);
-	}
-	if (chrmod) {
-		free(chrmod);
 	}
 }
 

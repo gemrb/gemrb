@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.85 2005/09/25 09:35:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.86 2005/11/13 21:32:25 avenger_teambg Exp $
  *
  */
 
@@ -179,15 +179,17 @@ private:
 public:
 	Actor(void);
 	~Actor(void);
+	/** releases memory */
+	static void ReleaseMemory();
 	/** prints useful information on console */
 	void DebugDump();
-	/* fixes the feet circle */
+	/** fixes the feet circle */
 	void SetCircleSize();
 	/** places the actor on the map with a unique object ID */
 	void SetMap(Map *map, ieWord LID, ieWord GID);
 	/** sets the actor's position, calculating with the nojump flag*/
 	void SetPosition(Map *map, Point &position, int jump, int radius=0);
-	/* you better use SetStat, this stuff is only for special cases*/
+	/** you better use SetStat, this stuff is only for special cases*/
 	void SetAnimationID(unsigned int AnimID);
 	/** returns the animations */
 	CharAnimations* GetAnims();

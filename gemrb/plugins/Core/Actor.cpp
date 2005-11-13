@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.131 2005/11/13 10:18:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.132 2005/11/13 21:32:25 avenger_teambg Exp $
  *
  */
 
@@ -397,6 +397,16 @@ NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //ef
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL //ff
 };
+
+/** call this from ~Interface() */
+void Actor::ReleaseMemory()
+{
+	if (clericspelltables)
+		free(clericspelltables);
+	if (wizardspelltables)
+		free(wizardspelltables);
+	classcount=-1;
+}
 
 static void InitActorTables()
 {
