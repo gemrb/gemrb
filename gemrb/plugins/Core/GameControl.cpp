@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.256 2005/11/12 19:31:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.257 2005/11/14 20:13:21 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -76,7 +76,7 @@ GameControl::GameControl(void)
 	//at this moment we use only this
 	action = GA_DEFAULT | GA_SELECT | GA_NO_DEAD;
 	Changed = true;
-	lastActor = NULL;
+	lastActorID = 0;
 	MouseIsDown = false;
 	DrawSelectionRect = false;
 	overDoor = NULL;
@@ -207,6 +207,8 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	bool update_scripts = !(DialogueFlags & DF_FREEZE_SCRIPTS);
 
 	Game* game = core->GetGame();
+	if (!game)
+		return;
 
 	if (((short) Width) <=0 || ((short) Height) <= 0) {
 		return;
@@ -433,6 +435,9 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 
 	Game* game = core->GetGame();
 
+	if (!game)
+		return;
+
 	switch (Key) {
 		case GEM_ALT:
 			DebugFlags &= ~DEBUG_SHOW_CONTAINERS;
@@ -472,6 +477,11 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 	}
 	if (Mod & 64) //ctrl
 	{
+		Map* area = game->GetCurrentArea( );
+		if (!area)
+			return;
+		Actor *lastActor = area->GetActorByGlobalID(lastActorID);
+		Point p(lastMouseX, lastMouseY);
 		switch (Key) {
 			case 'd': //disarm ?
 				if (overInfoPoint) {
@@ -505,8 +515,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			case 'c':
 				if (game->selected.size() > 0 && lastActor) {
 					Actor *src = game->selected[0];
-					Actor *tgt = lastActor;
-					bool res = src->spellbook.CastSpell( "SPWI207",  src, tgt );
+					bool res = src->spellbook.CastSpell( "SPWI207", src, lastActor );
 					printf( "Cast Spell: %d\n", res );
 				}
 				break;
@@ -540,13 +549,15 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				break;
 			case 'a':
 				//animation
-				if (lastActor)
+				if (lastActor) {
 					lastActor->GetNextAnimation();
+				}
 				break;
 			case 's':
 				//stance
-				if (lastActor)
+				if (lastActor) {
 					lastActor->GetNextStance();
+				}
 				break;
 			case 'j':
 				// jump
@@ -563,35 +574,30 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				// 'm' ? debugdump
 				if (lastActor) {
 					lastActor->DebugDump();
-					return;
+					break;
 				}
 				if (overDoor) {
 					overDoor->DebugDump();
-					return;
+					break;
 				}
 				if (overContainer) {
 					overContainer->DebugDump();
-					return;
+					break;
 				}
 				if (overInfoPoint) {
 					overInfoPoint->DebugDump();
-					return;
+					break;
 				}
 				core->GetGame()->GetCurrentArea()->DebugDump();
 				break;
 			case 'v':
 				// explore map from point
-				 {
-					Map* area = game->GetCurrentArea( );
-					Point p(lastMouseX, lastMouseY);
-					core->GetVideoDriver()->ConvertToGame( p.x, p.y );
-					area->ExploreMapChunk( p, rand()%30, true );
-				}
+				core->GetVideoDriver()->ConvertToGame( p.x, p.y );
+				area->ExploreMapChunk( p, rand()%30, true );
 				break;
 			case 'x':
 				// shows coordinates
 				 {
-					Map* area = game->GetCurrentArea( );
 					short cX = lastMouseX; 
 					short cY = lastMouseY;
 					core->GetVideoDriver()->ConvertToGame( cX, cY );
@@ -600,8 +606,6 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				break;
 			case 'r':
 				if (!lastActor) {
-					Point p(lastMouseX,lastMouseY);
-					Map* area = game->GetCurrentArea( );
 					lastActor = area->GetActor( p, GA_DEFAULT);
 				}
 				if (lastActor) {
@@ -749,16 +753,17 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 
 	if (!DrawSelectionRect) {
 		Actor* actor = area->GetActor( p, action);
+		Actor *lastActor = area->GetActorByGlobalID(lastActorID);
 		if (lastActor)
 			lastActor->SetOver( false );
 		if (!actor) {
-			lastActor = NULL;
+			lastActorID = 0;
 		} else {
-			lastActor = actor;
-			lastActor->SetOver( true );
+			lastActorID = actor->globalID;
+			actor->SetOver( true );
 		}
 		if (actor) {
-			switch (lastActor->Modified[IE_EA]) {
+			switch (actor->Modified[IE_EA]) {
 				case EA_EVILCUTOFF:
 				case EA_GOODCUTOFF:
 					break;
@@ -795,7 +800,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		Actor* actor = area->GetActor( p, action);
 		
 		if (actor) {
-			switch (lastActor->Modified[IE_EA]) {
+			switch (actor->Modified[IE_EA]) {
 				case EA_EVILCUTOFF:
 				case EA_GOODCUTOFF:
 					break;
@@ -1167,14 +1172,15 @@ void GameControl::CalculateSelection(Point &p)
 		}
 		free( ab );
 	} else {
-		Actor* actor = area->GetActor( p, action );
+		Actor* actor = area->GetActor( p, action);
+		Actor *lastActor = area->GetActorByGlobalID(lastActorID);
 		if (lastActor)
 			lastActor->SetOver( false );
 		if (!actor) {
-			lastActor = NULL;
+			lastActorID = 0;
 		} else {
-			lastActor = actor;
-			lastActor->SetOver( true );
+			lastActorID = actor->globalID;
+			actor->SetOver( true );
 		}
 	}
 }
@@ -1742,4 +1748,19 @@ Sprite2D* GameControl::GetPreview()
 	core->DrawWindows ();
 
 	return preview;
+}
+
+Actor *GameControl::GetLastActor()
+{
+	if (!lastActorID)
+		return NULL;
+	Game* game = core->GetGame();
+	if (!game)
+		return NULL;
+
+	Map* area = game->GetCurrentArea( );
+	if (!area)
+		return NULL;
+	return
+		area->GetActorByGlobalID(lastActorID);
 }

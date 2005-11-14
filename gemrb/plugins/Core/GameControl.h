@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.76 2005/10/19 21:57:33 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.77 2005/11/14 20:13:21 avenger_teambg Exp $
  */
 
 /**
@@ -105,7 +105,9 @@ public:
 	/** Sets the InfoTextColor, used in PST */
 	void SetInfoTextColor(Color color);
 private:
-	Actor* lastActor;
+	//Actor* lastActor;
+	//using global ID which is safer
+	ieWord lastActorID;
 	std::vector< Actor*> highlighted;
 	std::vector< Scriptable*> infoTexts;
 	Color* InfoTextPalette;
@@ -181,7 +183,7 @@ public:
 	void DisplayString(Scriptable* target);
 	/* Displays a string on screen */
 	void DisplayString(Point &p, const char *Text);
-	Actor *GetLastActor() { return lastActor; }
+	Actor *GetLastActor();
 	/* changes map to the current PC */
 	void ChangeMap(Actor *pc, bool forced);
 	/* returns current area preview for saving a game */

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.194 2005/11/13 22:50:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.195 2005/11/14 20:13:21 avenger_teambg Exp $
  *
  */
 
@@ -269,6 +269,9 @@ Map::~Map(void)
 
 	for (i = 0; i < entrances.size(); i++) {
 		delete( entrances[i] );
+	}
+	for (i = 0; i < spawns.size(); i++) {
+		delete( spawns[i] );
 	}
 	if (LightMap)
 		core->FreeInterface( LightMap );
