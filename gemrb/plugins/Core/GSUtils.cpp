@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.28 2005/11/13 20:26:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.29 2005/11/14 23:34:49 avenger_teambg Exp $
  *
  */
 
@@ -568,9 +568,9 @@ void EscapeAreaCore(Actor* src, const char* resref, Point &enter, Point &exit, i
 	} else {
 		sprintf( Tmp, "JumpToPoint(\"%s\",[%hd.%hd])", resref, enter.x, enter.y );
 	}
-	src->AddActionInFront( GenerateAction( Tmp, true ) );
+	src->AddActionInFront( GenerateAction( Tmp) );
 	sprintf( Tmp, "MoveToPoint([%hd.%hd])", exit.x, exit.y );
-	src->AddActionInFront( GenerateAction( Tmp, true ) );
+	src->AddActionInFront( GenerateAction( Tmp) );
 }
 
 void GetPositionFromScriptable(Scriptable* scr, Point &position, bool dest)
@@ -948,9 +948,9 @@ static void ParseObject(const char *&str,const char *&src, Object *&object)
 }
 
 /* this function was lifted from GenerateAction, to make it clearer */
-Action* GenerateActionCore(const char *src, const char *str, int acIndex, bool autoFree)
+Action* GenerateActionCore(const char *src, const char *str, int acIndex)
 {
-	Action*newAction = new Action(autoFree);
+	Action *newAction = new Action(true);
 	newAction->actionID = (unsigned short) actionsTable->GetValueIndex( acIndex );
 	//this flag tells us to merge 2 consecutive strings together to get
 	//a variable (context+variablename)
@@ -1041,7 +1041,7 @@ Action* GenerateActionCore(const char *src, const char *str, int acIndex, bool a
 					src++;
 				}
 				action[i] = 0;
-				Action* act = GenerateAction( action, autoFree );
+				Action* act = GenerateAction( action);
 				act->objects[0] = newAction->objects[0];
 				newAction->objects[0] = NULL; //avoid freeing of object
 				delete newAction; //freeing action
@@ -1145,7 +1145,7 @@ void GoNearAndRetry(Scriptable *Sender, Point &p)
 	}
 	char Tmp[256];
 	sprintf( Tmp, "MoveToPoint([%hd.%hd])", p.x, p.y );
-	Sender->AddActionInFront( GenerateAction( Tmp, true ) );
+	Sender->AddActionInFront( GenerateAction( Tmp) );
 }
 
 void FreeSrc(SrcVector *poi, const ieResRef key)

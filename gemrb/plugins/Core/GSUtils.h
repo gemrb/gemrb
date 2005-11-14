@@ -80,7 +80,7 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value);
 GEM_EXPORT void MoveBetweenAreasCore(Actor* actor, const char *area, Point &position, int face, bool adjust);
 GEM_EXPORT ieDword CheckVariable(Scriptable* Sender, const char* VarName);
 GEM_EXPORT ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Context);
-Action* GenerateActionCore(const char *src, const char *str, int acIndex, bool autoFree);
+Action* GenerateActionCore(const char *src, const char *str, int acIndex);
 Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int negate);
 
 #endif

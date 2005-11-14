@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.327 2005/11/13 20:26:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.328 2005/11/14 23:34:49 avenger_teambg Exp $
  *
  */
 
@@ -2741,6 +2741,11 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		Sender->CurrentAction = NULL;
 	}
 	if (actionflags[aC->actionID] & AF_INSTANT) {
+		//this action never entered the action queue, therefore shouldn't be freed
+		if (aC->GetRef()!=1) {
+			printf("Action %d made it into the action queue!\n", aC->actionID);
+			abort();
+		}
 		return;
 	}
 	aC->Release();
@@ -2768,7 +2773,7 @@ Trigger* GenerateTrigger(char* String)
 	return GenerateTriggerCore(src, str, i, negate);
 }
 
-Action* GenerateAction(char* String, bool autoFree)
+Action* GenerateAction(char* String)
 {
 	strlwr( String );
 	if (InDebug&ID_ACTIONS) {
@@ -2784,9 +2789,10 @@ Action* GenerateAction(char* String, bool autoFree)
 	}
 	char *src = String+len;
 	char *str = actionsTable->GetStringIndex( i )+len;
-	return GenerateActionCore( src, str, i, autoFree);
+	return GenerateActionCore( src, str, i);
 }
 
+/** Self-destructing object if it is empty */
 bool Object::ReadyToDie()
 {
 	if (objectName[0]!=0) {

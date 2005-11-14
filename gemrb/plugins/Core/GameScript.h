@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.219 2005/11/13 20:26:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.220 2005/11/14 23:34:49 avenger_teambg Exp $
  *
  */
 
@@ -287,11 +287,11 @@ public:
 		pointParameter.y = 0;
 		int1Parameter = 0;
 		int2Parameter = 0;
-		if(autoFree) {
-			RefCount = 0;
-		}
-		else {
-			RefCount = 1;
+		//changed now
+		if (autoFree) {
+			RefCount = 0; //refcount will be increased by each AddAction
+		} else {
+			RefCount = 1; //one reference hold by the script
 		}
 		canary = (unsigned long) 0xdeadbeef;
 	};
@@ -317,6 +317,9 @@ private:
 	int RefCount;
 	volatile unsigned long canary;
 public:
+	int GetRef() {
+		return RefCount;
+	}
 	void Dump()
 	{
 		int i;
@@ -351,7 +354,7 @@ public:
 	{
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
 		RefCount++;
-		if (RefCount >= 4000) {
+		if (RefCount >= 65536) {
 			printf( "Refcount increased to: %d in action %d\n", RefCount,
 				actionID );
 			abort();
@@ -363,7 +366,6 @@ class GEM_EXPORT Response {
 public:
 	Response()
 	{
-		RefCount = 1;
 		actions = NULL;
 		weight = 0;
 		actionsCount = 0;
@@ -387,31 +389,13 @@ public:
 	unsigned char actionsCount;
 	Action** actions;
 private:
-	int RefCount;
 	volatile unsigned long canary;
 public:
 	void Release()
 	{
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		if (!RefCount) {
-			printf( "WARNING!!! Double Freeing in %s: Line %d\n", __FILE__,
-				__LINE__ );
-			abort();
-		}
-		RefCount--;
-		if (!RefCount) {
-			canary = 0xdddddddd;
-			delete this;
-		}
-	}
-	void IncRef()
-	{
-		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		RefCount++;
-		if (RefCount >= 4000) {
-			printf( "Refcount increased to: %d in response\n", RefCount );
-			abort();
-		}
+		canary = 0xdddddddd;
+		delete this;
 	}
 };
 
@@ -430,7 +414,7 @@ public:
 			return;
 		}
 		for (int b = 0; b < responsesCount; b++) {
-			responses[b] -> Release();
+			responses[b]->Release();
 			responses[b] = NULL;
 		}
 		delete[] responses;
@@ -1385,7 +1369,7 @@ public:
 	static Targets *Player8Fill(Scriptable *Sender, Targets *parameters);
 };
 
-Action* GenerateAction(char* String, bool autoFree=true);
+Action* GenerateAction(char* String);
 Trigger* GenerateTrigger(char* String);
 
 #endif

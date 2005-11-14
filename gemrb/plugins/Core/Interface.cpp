@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.360 2005/11/13 22:50:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.361 2005/11/14 23:34:49 avenger_teambg Exp $
  *
  */
 
@@ -3958,6 +3958,7 @@ int Interface::CompressSave(const char *folder)
 		}
 	} while (( de = readdir( dir ) ) != NULL);
 	closedir( dir );
+	FreeInterface( ai );
 	return 0;
 }
 

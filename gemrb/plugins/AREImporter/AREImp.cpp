@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.132 2005/11/13 20:26:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.133 2005/11/14 23:34:49 avenger_teambg Exp $
  *
  */
 
@@ -1605,8 +1605,11 @@ int AREImp::PutVariables( DataStream *stream, Map *map)
 	memset(filling,0,sizeof(filling) );
 	for (unsigned int i=0;i<VariablesCount;i++) {
 		pos=map->locals->GetNextAssoc( pos, name, value);
-		stream->Write( name, 32);
-		stream->Write( filling, 8);
+		//name isn't necessarily 32 bytes long, so we play safe
+		strncpy(filling, name, 32);
+		stream->Write( filling, 40);
+		//clearing up after the strncpy so we'll write 0's next
+		memset(filling,0,sizeof(filling) );
 		stream->WriteDword( &value);
 		//40 bytes of empty crap
 		stream->Write( filling, 40);

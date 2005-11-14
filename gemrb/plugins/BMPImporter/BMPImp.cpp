@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.22 2005/10/18 22:43:41 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.23 2005/11/14 23:34:49 avenger_teambg Exp $
  *
  */
 
@@ -53,8 +53,14 @@ bool BMPImp::Open(DataStream* stream, bool autoFree)
 	if (str && this->autoFree) {
 		delete( str );
 	}
+	//we release the previous pixel data
+	if (pixels) {
+		free( pixels );
+		pixels = NULL;
+	}
 	if (Palette) {
 		free( Palette );
+		Palette = NULL;
 	}
 	str = stream;
 	this->autoFree = autoFree;
@@ -182,10 +188,19 @@ bool BMPImp::OpenFromImage(Sprite2D* sprite, bool autoFree)
 	if (str && this->autoFree) {
 		delete( str );
 	}
-	if (Palette) {
-		free( Palette );
+
+	if (pixels) {
+		free( pixels );
+		pixels = NULL;
 	}
 
+	if (Palette) {
+		free( Palette );
+		Palette = NULL;
+	}
+
+	// the previous stream was destructed and there won't be next
+	this->autoFree = false;
 	// FIXME: we assume 24bit sprite format here!
 
 	Size = 0;
@@ -209,7 +224,7 @@ bool BMPImp::OpenFromImage(Sprite2D* sprite, bool autoFree)
 
 	// FIXME: free the sprite if autoFree?
 	if (autoFree) {
-		delete sprite;
+		core->GetVideoDriver()->FreeSprite(sprite);
 	}
 
 	return true;

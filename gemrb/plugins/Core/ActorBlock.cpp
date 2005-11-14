@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.113 2005/11/13 20:26:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.114 2005/11/14 23:34:49 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -46,7 +46,7 @@ Scriptable::Scriptable(ScriptableType type)
 	interval = ( 1000 / AI_UPDATE_TIME );
 	WaitCounter = 0;
 	playDeadCounter = 0;
-	resetAction = false;
+	//resetAction = false;
 	neverExecuted = true;
 	Active = SCR_ACTIVE | SCR_VISIBLE | SCR_ONCREATION;
 	area = 0;
@@ -235,15 +235,30 @@ void Scriptable::ProcessActions()
 		}
 		return;
 	}
+/*
 	if (resetAction) {
 		CurrentAction = NULL;
 		resetAction = false;
 	}
+*/
 	while (!CurrentAction) {
 		CurrentAction = PopNextAction();
 		if (!CurrentAction) {
 			if (CutSceneId)
 				CutSceneId = NULL;
+			break;
+		}
+		switch (CurrentAction->GetRef()) {
+		case 0:
+			printf("Warning, action of %s has 0 refcount!\n", GetScriptName());
+			break;
+		case 1:
+			printf("Warning, action of %s will be released!\n", GetScriptName());
+			break;
+		case 2: case 3: case 4:
+			break;
+		default:
+			printf("Warning, action of %s has %d refcount!\n", GetScriptName(), CurrentAction->GetRef());
 			break;
 		}
 		GameScript::ExecuteAction( this, CurrentAction );

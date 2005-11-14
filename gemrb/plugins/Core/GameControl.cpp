@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.257 2005/11/14 20:13:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.258 2005/11/14 23:34:49 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -174,7 +174,7 @@ void GameControl::MoveToPointFormation(Actor *actor, Point p, int Orient)
 		break;
 	}
 	sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
-	actor->AddAction( GenerateAction( Tmp, true ) );
+	actor->AddAction( GenerateAction( Tmp) );
 }
 
 GameControl::~GameControl(void)
@@ -843,7 +843,7 @@ void GameControl::TryToAttack(Actor *source, Actor *tgt)
 	source->ClearActions();
 	strncpy(Tmp,"NIDSpecial3()",sizeof(Tmp) );
 	target=tgt; //this is a hack, a deadly one
-	source->AddAction( GenerateAction( Tmp, true ) );
+	source->AddAction( GenerateAction( Tmp) );
 }
 
 void GameControl::TryToTalk(Actor *source, Actor *tgt)
@@ -858,7 +858,7 @@ void GameControl::TryToTalk(Actor *source, Actor *tgt)
 	source->ClearActions();
 	strncpy(Tmp,"NIDSpecial1()",sizeof(Tmp) );
 	target=tgt; //this is a hack, a deadly one
-	source->AddAction( GenerateAction( Tmp, true ) );
+	source->AddAction( GenerateAction( Tmp) );
 }
 
 void GameControl::HandleContainer(Container *container, Actor *actor)
@@ -870,7 +870,7 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 	strncpy(Tmp,"UseContainer()",sizeof(Tmp) );
 	//target=container; //this is another hack, even more deadly
 	core->SetCurrentContainer( actor, container);
-	actor->AddAction( GenerateAction( Tmp, true ) );
+	actor->AddAction( GenerateAction( Tmp) );
 }
 
 void GameControl::HandleDoor(Door *door, Actor *actor)
@@ -881,12 +881,12 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 		actor->ClearPath();
 		actor->ClearActions();
 		sprintf( Tmp, "CloseDoor(\"%s\")", door->GetScriptName() );
-		actor->AddAction( GenerateAction( Tmp, true ) );
+		actor->AddAction( GenerateAction( Tmp) );
 	} else {
 		actor->ClearPath();
 		actor->ClearActions();
 		sprintf( Tmp, "OpenDoor(\"%s\")", door->GetScriptName() );
-		actor->AddAction( GenerateAction( Tmp, true ) );
+		actor->AddAction( GenerateAction( Tmp) );
 	}
 }
 
@@ -1011,11 +1011,11 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			actor->ClearPath();
 			actor->ClearActions();
 			sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
-			actor->AddAction( GenerateAction( Tmp, true ) );
+			actor->AddAction( GenerateAction( Tmp) );
 			//we clicked over a searchmap travel region
 				if ( ( ( Window * ) Owner )->Cursor == IE_CURSOR_TRAVEL) {
 				sprintf( Tmp, "NIDSpecial2()" );
-				actor->AddAction( GenerateAction( Tmp, true ) );
+				actor->AddAction( GenerateAction( Tmp) );
 			}
 			return;
 		}
@@ -1032,7 +1032,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 		//we clicked over a searchmap travel region
 		if ( ( ( Window * ) Owner )->Cursor == IE_CURSOR_TRAVEL) {
 			sprintf( Tmp, "NIDSpecial2()" );
-			actor->AddAction( GenerateAction( Tmp, true ) );
+			actor->AddAction( GenerateAction( Tmp) );
 		}
 		return;
 	}
@@ -1555,7 +1555,7 @@ void GameControl::DialogChoose(unsigned int choose)
 
 		if (tr->action) {
 			for (unsigned int i = 0; i < tr->action->count; i++) {
-				Action* action = GenerateAction( tr->action->strings[i], true );
+				Action* action = GenerateAction( tr->action->strings[i]);
 				if (action) {
 					target->AddAction( action );
 				} else {

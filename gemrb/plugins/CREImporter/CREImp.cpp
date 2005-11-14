@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.88 2005/11/13 20:26:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.89 2005/11/14 23:34:49 avenger_teambg Exp $
  *
  */
 
@@ -1906,7 +1906,7 @@ int CREImp::PutEffects( DataStream *stream, Actor *actor)
 //add as effect!
 int CREImp::PutVariables( DataStream *stream, Actor *actor)
 {
-	char filling[92];
+	char filling[104];
 	POSITION pos=NULL;
 	const char *name;
 	ieDword tmpDword, value;
@@ -1922,10 +1922,10 @@ int CREImp::PutVariables( DataStream *stream, Actor *actor)
 		stream->WriteDword( &value); //param #1
 		stream->Write( filling, 40); //param #2, timing, duration, chance, resource, dices, saves
 		tmpDword = FAKE_VARIABLE_MARKER;
-		stream->WriteDword( &value); //variable marker
+		stream->WriteDword( &tmpDword); //variable marker
 		stream->Write( filling, 92); //23 * 4
-		stream->Write( name, 32);
-		stream->Write( filling, 72); //18 * 4
+		strncpy(filling, name, 32);
+		stream->Write( filling, 104); //32 + 72
 	}
 	return 0;
 }

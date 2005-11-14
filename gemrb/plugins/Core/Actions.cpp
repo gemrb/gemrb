@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.38 2005/11/12 14:05:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.39 2005/11/14 23:34:49 avenger_teambg Exp $
  *
  */
 
@@ -3507,12 +3507,10 @@ void GameScript::ForceAttack( Scriptable* Sender, Action* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!scr || scr->Type != ST_ACTOR) {
-		//Sender->CurrentAction = NULL;
 		return;
 	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[2] );
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
-		//Sender->CurrentAction = NULL;
 		return;
 	}
 	GameControl *gc = core->GetGameControl();
@@ -3520,10 +3518,8 @@ void GameScript::ForceAttack( Scriptable* Sender, Action* parameters)
 		gc->target = (Actor *) tar;
 		char Tmp[256];
 		strncpy(Tmp,"NIDSpecial3()",sizeof(Tmp) );
-		scr->AddAction( GenerateAction(Tmp,true) );
+		scr->AddAction( GenerateAction(Tmp) );
 	}
-	//AttackCore(scr, tar, NULL, 0);
-	//Sender->CurrentAction = NULL;
 }
 
 void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
@@ -3539,7 +3535,7 @@ void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 	}
 	//pumping parameters back for AttackReevaluate
 	//FIXME: we should make a copy of parameters here
-	Action *newAction = ParamCopy( parameters );
+	Action *newAction = ParamCopyNoOverride( parameters );
 	AttackCore(Sender, tar, newAction, AC_REEVALUATE);
 	Sender->CurrentAction = NULL;
 }
@@ -4286,7 +4282,8 @@ void GameScript::BreakInstants(Scriptable* Sender, Action* /*parameters*/)
 	//don't do anything, apparently the point of this action is to
 	//delay the execution of further actions to the next AI cycle
 	//we should set CurrentAction to zero eventually!
-	Sender->resetAction = true;
+	//Sender->resetAction = true;
+	Sender->CurrentAction = NULL;
 }
 
 //an interesting improvement would be to pause game for a given duration
