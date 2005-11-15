@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.43 2005/08/22 10:08:46 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.44 2005/11/15 19:26:29 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -941,11 +941,11 @@ def AcceptLevelUp():
 	OpenLevelUpWindow()
 	#do level up
 	pc = GemRB.GameGetSelectedPCSingle ()
-	GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH, DeaSavThr)
-	GemRB.SetPlayerStat (pc, IE_SAVEVSWANDS, WanSavThr)
-	GemRB.SetPlayerStat (pc, IE_SAVEVSPOLY, PolSavThr)
-	GemRB.SetPlayerStat (pc, IE_SAVEVSBREATH, BreSavThr)
-	GemRB.SetPlayerStat (pc, IE_SAVEVSSPELL, SpeSavThr)
+	GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH, SavThrows[0])
+	GemRB.SetPlayerStat (pc, IE_SAVEVSWANDS, SavThrows[1])
+	GemRB.SetPlayerStat (pc, IE_SAVEVSPOLY, SavThrows[2])
+	GemRB.SetPlayerStat (pc, IE_SAVEVSBREATH, SavThrows[3])
+	GemRB.SetPlayerStat (pc, IE_SAVEVSSPELL, SavThrows[4])
 	oldhp = GemRB.GetPlayerStat (pc, IE_HITPOINTS)
 	GemRB.SetPlayerStat (pc, IE_HITPOINTS, HPBonus+oldhp)
 	oldhp = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)
@@ -957,7 +957,7 @@ def AcceptLevelUp():
 
 def OpenLevelUpWindow ():
 	global LevelUpWindow
-	global DeaSavThr, WanSavThr, PolSavThr, BreSavThr, SpeSavThr
+	global SavThrows
 	global HPBonus
 	global FinalCurHP
 	global FinalMaxHP
@@ -991,16 +991,20 @@ def OpenLevelUpWindow ():
 
 	# These will be used for saving throws
 	SavThrUpdated = False
-	DeaSavThr = GemRB.GetPlayerStat (pc, IE_SAVEVSDEATH)
-	WanSavThr = GemRB.GetPlayerStat (pc, IE_SAVEVSWANDS)
-	PolSavThr = GemRB.GetPlayerStat (pc, IE_SAVEVSPOLY)
-	BreSavThr = GemRB.GetPlayerStat (pc, IE_SAVEVSBREATH)
-	SpeSavThr = GemRB.GetPlayerStat (pc, IE_SAVEVSSPELL)
+	SavThrows = [0,0,0,0,0]
+	SavThrows[0] = GemRB.GetPlayerStat (pc, IE_SAVEVSDEATH)
+	SavThrows[1] = GemRB.GetPlayerStat (pc, IE_SAVEVSWANDS)
+	SavThrows[2] = GemRB.GetPlayerStat (pc, IE_SAVEVSPOLY)
+	SavThrows[3] = GemRB.GetPlayerStat (pc, IE_SAVEVSBREATH)
+	SavThrows[4] = GemRB.GetPlayerStat (pc, IE_SAVEVSSPELL)
 
 	HPGained = 0
 	ConHPBon = 0
 	Thac0Updated = False
 	Thac0 = 0
+	# What is the avatar's class (Which we can use to lookup XP)
+	ClassRow = GemRB.GetPlayerStat (pc, IE_CLASS)-1
+	Class = GemRB.GetTableRowName (ClassTable, ClassRow)
 
 	# name
 	Label = GemRB.GetControl (Window, 0x10000000)
@@ -1008,7 +1012,7 @@ def OpenLevelUpWindow ():
 
 	# class
 	Label = GemRB.GetControl (Window, 0x10000001)
-	GemRB.SetText (Window, Label, GemRB.GetTableValue (ClassTable, GemRB.GetPlayerStat (pc, IE_CLASS) - 1, 0))
+	GemRB.SetText (Window, Label, GemRB.GetTableValue (ClassTable, ClassRow, 0))
 
 	# Armor Class
 	Label = GemRB.GetControl (Window, 0x10000023)
@@ -1039,8 +1043,6 @@ def OpenLevelUpWindow ():
 	# Is avatar multi-class?
 	if avatar_header['SecoLevel'] == 0:
 		# avatar is single class
-		# What is the avatar's class (Which we can use to lookup XP)
-		Class = GemRB.GetTableRowName (ClassTable, GemRB.GetPlayerStat (pc, IE_CLASS) - 1)
 		# What will be avatar's next level?
 		NextLevel = avatar_header['PrimLevel'] + 1
 		while avatar_header['XP'] >= GetNextLevelExp (NextLevel, Class):
@@ -1072,68 +1074,23 @@ def OpenLevelUpWindow ():
 			# after that point the table runs out, and the throws remain the
 			# same
 			if FighterLevel < 21:
-				# Death
-				if GemRB.GetTableValue (FigSavThrTable, 0, FighterLevel) < DeaSavThr:
-					DeaSavThr = GemRB.GetTableValue (FigSavThrTable, 0, FighterLevel)
-					SavThrUpdated = True
-				# Wand
-				if GemRB.GetTableValue (FigSavThrTable, 1, FighterLevel) < WanSavThr:
-					WanSavThr = GemRB.GetTableValue (FigSavThrTable, 1, FighterLevel)
-					SavThrUpdated = True
-				# Polymorph
-				if GemRB.GetTableValue (FigSavThrTable, 2, FighterLevel) < PolSavThr:
-					PolSavThr = GemRB.GetTableValue (FigSavThrTable, 2, FighterLevel)
-					SavThrUpdated = True
-				# Breath
-				if GemRB.GetTableValue (FigSavThrTable, 3, FighterLevel) < BreSavThr:
-					BreSavThr = GemRB.GetTableValue (FigSavThrTable, 3, FighterLevel)
-					SavThrUpdated = True
-				# Spell
-				if GemRB.GetTableValue (FigSavThrTable, 4, FighterLevel) < SpeSavThr:
-					SpeSavThr = GemRB.GetTableValue (FigSavThrTable, 4, FighterLevel)
-					SavThrUpdated = True
+				for i in range (5):
+					Throw = GemRB.GetTableValue (FigSavThrTable, i, FighterLevel)
+					if Throw < SavThrows[i]:
+						SavThrows[i] = Throw
+						SavThrUpdated = True
 			if MageLevel < 21:
-				# Death
-				if GemRB.GetTableValue (MagSavThrTable, 0, MageLevel) < DeaSavThr:
-					DeaSavThr = GemRB.GetTableValue (MagSavThrTable, 0, MageLevel)
-					SavThrUpdated = True
-				# Wand
-				if GemRB.GetTableValue (MagSavThrTable, 1, MageLevel) < WanSavThr:
-					WanSavThr = GemRB.GetTableValue (MagSavThrTable, 1, MageLevel)
-					SavThrUpdated = True
-				# Polymorph
-				if GemRB.GetTableValue (MagSavThrTable, 2, MageLevel) < PolSavThr:
-					PolSavThr = GemRB.GetTableValue (MagSavThrTable, 2, MageLevel)
-					SavThrUpdated = True
-				# Breath
-				if GemRB.GetTableValue (MagSavThrTable, 3, MageLevel) < BreSavThr:
-					BreSavThr = GemRB.GetTableValue (MagSavThrTable, 3, MageLevel)
-					SavThrUpdated = True
-				# Spell
-				if GemRB.GetTableValue (MagSavThrTable, 4, MageLevel) < SpeSavThr:
-					SpeSavThr = GemRB.GetTableValue (MagSavThrTable, 4, MageLevel)
-					SavThrUpdated = True
+				for i in range (5):
+					Throw = GemRB.GetTableValue (MagSavThrTable, i, MageLevel)
+					if Throw < SavThrows[i]:
+						SavThrows[i] = Throw
+						SavThrUpdated = True
 			if ThiefLevel < 21:
-				# Death
-				if GemRB.GetTableValue (ThiSavThrTable, 0, ThiefLevel) < DeaSavThr:
-					DeaSavThr = GemRB.GetTableValue (ThiSavThrTable, 0, ThiefLevel)
-					SavThrUpdated = True
-				# Wand
-				if GemRB.GetTableValue (ThiSavThrTable, 1, ThiefLevel) < WanSavThr:
-					WanSavThr = GemRB.GetTableValue (ThiSavThrTable, 1, ThiefLevel)
-					SavThrUpdated = True
-				# Polymorph
-				if GemRB.GetTableValue (ThiSavThrTable, 2, ThiefLevel) < PolSavThr:
-					PolSavThr = GemRB.GetTableValue (ThiSavThrTable, 2, ThiefLevel)
-					SavThrUpdated = True
-				# Breath
-				if GemRB.GetTableValue (ThiSavThrTable, 3, ThiefLevel) < BreSavThr:
-					BreSavThr = GemRB.GetTableValue (ThiSavThrTable, 3, ThiefLevel)
-					SavThrUpdated = True
-				# Spell
-				if GemRB.GetTableValue (ThiSavThrTable, 4, ThiefLevel) < SpeSavThr:
-					SpeSavThr = GemRB.GetTableValue (ThiSavThrTable, 4, ThiefLevel)
-					SavThrUpdated = True
+				for i in range (5):
+					Throw = GemRB.GetTableValue (ThiSavThrTable, i, ThiefLevel)
+					if Throw < SavThrows[i]:
+						SavThrows[i] = Throw
+						SavThrUpdated = True
 			# Cleaning up
 			GemRB.UnloadTable (FigSavThrTable)
 			GemRB.UnloadTable (MagSavThrTable)
@@ -1142,32 +1099,17 @@ def OpenLevelUpWindow ():
 			# Saving Throws
 			# Loading the right saving throw table
 			SavThrTable = GemRB.LoadTable (GemRB.GetTableValue (ClassTable, Class, "SAVE"))
-			# Updating the current saving throws. They are changed only if the the
+			# Updating the current saving throws. They are changed only if the
 			# new ones are better than current. The smaller the number, the better.
 			# We need to substract one from the NextLevel, so that we get right values.
 			# We also need to check if NextLevel is larger than 21, since after that point
 			# the table runs out, and the throws remain the same 
 			if NextLevel < 22:
-				# Death
-				if GemRB.GetTableValue (SavThrTable, 0, NextLevel - 1) < DeaSavThr:
-					DeaSavThr = GemRB.GetTableValue (SavThrTable, 0, NextLevel - 1)
-					SavThrUpdated = True
-				# Wand
-				if GemRB.GetTableValue (SavThrTable, 1, NextLevel - 1) < WanSavThr:
-					WanSavThr = GemRB.GetTableValue (SavThrTable, 1, NextLevel - 1)
-					SavThrUpdated = True
-				# Polymorph
-				if GemRB.GetTableValue (SavThrTable, 2, NextLevel - 1) < PolSavThr:
-					PolSavThr = GemRB.GetTableValue (SavThrTable, 2, NextLevel - 1)
-					SavThrUpdated = True
-				# Breath
-				if GemRB.GetTableValue (SavThrTable, 3, NextLevel - 1) < BreSavThr:
-					BreSavThr = GemRB.GetTableValue (SavThrTable, 3, NextLevel - 1)
-					SavThrUpdated = True
-				# Spell
-				if GemRB.GetTableValue (SavThrTable, 4, NextLevel - 1) < SpeSavThr:
-					SpeSavThr = GemRB.GetTableValue (SavThrTable, 4, NextLevel - 1)
-					SavThrUpdated = True
+				for i in range (5):
+					Throw = GemRB.GetTableValue (SavThrTable, i, NextLevel-1)
+					if Throw < SavThrows[i]:
+						SavThrows[i] = Throw
+						SavThrUpdated = True
 			# Cleaning Up
 			GemRB.UnloadTable (SavThrTable)
 
@@ -1183,24 +1125,85 @@ def OpenLevelUpWindow ():
 
 	else:
 		# avatar is multi class
-		print "TODO: implement Multi-Class."
+		PrimNextLevel = 0
+		SecoNextLevel = 0
+		NumOfPrimLevUp = 0
+		NumOfSecoLevUp = 0
+
+		# What will be avatar's next levels?
+		PrimNextLevel = avatar_header['PrimLevel']
+		while avatar_header['XP'] >= GetNextLevelExp (PrimNextLevel, "FIGHTER"):
+			PrimNextLevel = PrimNextLevel + 1
+		# How many primary levels did we go up?
+		NumOfPrimLevUp = PrimNextLevel - avatar_header['PrimLevel']
+
+		# Saving Throws
+		FigSavThrTable = GemRB.LoadTable ("SAVEWAR")
+		if PrimNextLevel < 22:
+			for i in range (5):
+				Throw = GemRB.GetTableValue (FigSavThrTable, i, PrimNextLevel - 1)
+				if Throw < SavThrows[i]:
+					SavThrows[i] = Throw
+					SavThrUpdated = True
+		GemRB.UnloadTable (FigSavThrTable)
+		# Which multi class is it?
+		if GemRB.GetPlayerStat (pc, IE_CLASS) == 7:
+			# avatar is Fighter/Mage (Dak'kon)
+			SecoNextLevel = avatar_header['SecoLevel']
+			while avatar_header['XP'] >= GetNextLevelExp (SecoNextLevel, "MAGE"):
+				SecoNextLevel = SecoNextLevel + 1
+				# How many secondary levels did we go up?
+				NumOfSecoLevUp = SecoNextLevel - avatar_header['SecoLevel']
+				MagSavThrTable = GemRB.LoadTable ("SAVEWIZ")
+				if SecoNextLevel < 22:
+					for i in range (5):
+						Throw = GemRB.GetTableValue (MagSavThrTable, i, SecoNextLevel - 1)
+						if Throw < SavThrows[i]:
+							SavThrows[i] = Throw
+							SavThrUpdated = True
+				GemRB.UnloadTable (MagSavThrTable)
+		else:
+			# avatar is Fighter/Thief (Annah)
+			SecoNextLevel = avatar_header['SecoLevel']
+			while avatar_header['XP'] >= GetNextLevelExp (SecoNextLevel, "THIEF"):
+				SecoNextLevel = SecoNextLevel + 1
+				# How many secondary levels did we go up?
+				NumOfSecoLevUp = SecoNextLevel - avatar_header['SecoLevel']
+				ThiSavThrTable = GemRB.LoadTable ("SAVEROG")
+				if SecoNextLevel < 22:
+					for i in range (5):
+						Throw = GemRB.GetTableValue (ThiSavThrTable, i, SecoNextLevel - 1)
+						if Throw < SavThrows[i]:
+							SavThrows[i] = Throw
+							SavThrUpdated = True
+				GemRB.UnloadTable (ThiSavThrTable)
+		# Hit Points Gained and Hit Points from Constitution Bonus
+		print "TODO: Implement Multi-Class HP generation."
+
+		# Thac0
+		# Multi class use the primary class level to determine Thac0
+		Thac0 = GetThac0 (Class, PrimNextLevel)
+		# Is the new thac0 better than old? (The smaller the better)
+		if Thac0 < GemRB.GetPlayerStat (pc, IE_THAC0):
+		        Thac0Updated = True
+
 
 	# Displaying the saving throws
 	# Death
 	Label = GemRB.GetControl (Window, 0x10000019)
-	GemRB.SetText (Window, Label, str (DeaSavThr))
+	GemRB.SetText (Window, Label, str (SavThrows[0]))
 	# Wand
 	Label = GemRB.GetControl (Window, 0x1000001B)
-	GemRB.SetText (Window, Label, str (WanSavThr))
+	GemRB.SetText (Window, Label, str (SavThrows[1]))
 	# Polymorph
 	Label = GemRB.GetControl (Window, 0x1000001D)
-	GemRB.SetText (Window, Label, str (PolSavThr))
+	GemRB.SetText (Window, Label, str (SavThrows[2]))
 	# Breath
 	Label = GemRB.GetControl (Window, 0x1000001F)
-	GemRB.SetText (Window, Label, str (BreSavThr))
+	GemRB.SetText (Window, Label, str (SavThrows[3]))
 	# Spell
 	Label = GemRB.GetControl (Window, 0x10000021)
-	GemRB.SetText (Window, Label, str (SpeSavThr))
+	GemRB.SetText (Window, Label, str (SavThrows[4]))
 
 	# For some reason, Constitution Bonus is not added
 	# to the current HP in the IE version
