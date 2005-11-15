@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.361 2005/11/14 23:34:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.362 2005/11/15 20:58:12 avenger_teambg Exp $
  *
  */
 
@@ -1843,7 +1843,7 @@ void Interface::RedrawControls(char *varname, unsigned int value)
 {
 	for (unsigned int i = 0; i < windows.size(); i++) {
 		Window *win = windows[i];
-		if (win != NULL && win->Visible!=-1) {
+		if (win != NULL && win->Visible!=WINDOW_INVALID) {
 			win->RedrawControls(varname, value);
 		}
 	}
@@ -1853,7 +1853,7 @@ void Interface::RedrawAll()
 {
 	for (unsigned int i = 0; i < windows.size(); i++) {
 		Window *win = windows[i];
-		if (win != NULL && win->Visible!=-1) {
+		if (win != NULL && win->Visible!=WINDOW_INVALID) {
 			win->Invalidate();
 		}
 	}
@@ -1889,7 +1889,7 @@ int Interface::LoadWindow(unsigned short WindowID)
 		Window *win = windows[i];
 		if (win == NULL)
 			continue;
-		if (win->Visible==-1) {
+		if (win->Visible==WINDOW_INVALID) {
 			continue;
 		}
 		if (win->WindowID == WindowID && 
@@ -2311,7 +2311,7 @@ void Interface::DrawWindows(void)
 		//visible ==1 or 2 will be drawn
 		Window* win = windows[t];
 		if (win != NULL) {
-			if (win->Visible == -1) {
+			if (win->Visible == WINDOW_INVALID) {
 				topwin.erase(topwin.begin()+i);
 				evntmgr->DelWindow( win );
 				delete win;
@@ -2378,7 +2378,7 @@ Window* Interface::GetWindow(unsigned short WindowIndex)
 {
 	if (WindowIndex < windows.size()) {
 		Window *win = windows[WindowIndex];
-		if (win && (win->Visible!=-1) ) {
+		if (win && (win->Visible!=WINDOW_INVALID) ) {
 			return win;
 		}
 	}
@@ -2417,7 +2417,7 @@ int Interface::DelWindow(unsigned short WindowIndex)
 		return -1;
 	}
 	Window* win = windows[WindowIndex];
-	if ((win == NULL) || (win->Visible==-1) ) {
+	if ((win == NULL) || (win->Visible==WINDOW_INVALID) ) {
 		printMessage( "Core", "Window deleted again", LIGHT_RED );
 		return -1;
 	}

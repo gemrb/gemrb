@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.44 2005/11/12 19:31:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.45 2005/11/15 20:58:12 avenger_teambg Exp $
  *
  */
 
@@ -202,7 +202,7 @@ Control* Window::GetDefaultControl()
 
 void Window::release(void)
 {
-	Visible = -1;
+	Visible = WINDOW_INVALID;
 }
 
 /** Redraw all the Window */

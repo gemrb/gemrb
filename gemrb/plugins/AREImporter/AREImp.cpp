@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.133 2005/11/14 23:34:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.134 2005/11/15 20:58:12 avenger_teambg Exp $
  *
  */
 
@@ -38,8 +38,11 @@
 
 #define DOOR_HIDDEN 128
 
+//something non signed, non ascii
+#define UNINITIALIZED_BYTE  0x11
+
 static ieResRef Sounds[DEF_COUNT] = {
-	{-1},
+	{UNINITIALIZED_BYTE},
 };
 
 DataFileMgr *INInote = NULL;
@@ -69,7 +72,7 @@ AREImp::AREImp(void)
 {
 	autoFree = false;
 	str = NULL;
-	if (Sounds[0][0] == -1) {
+	if (Sounds[0][0] == UNINITIALIZED_BYTE) {
 		memset( Sounds, 0, sizeof( Sounds ) );
 		int SoundTable = core->LoadTable( "defsound" );
 		TableMgr* at = core->GetTable( SoundTable );
@@ -90,6 +93,7 @@ AREImp::~AREImp(void)
 	if (autoFree && str) {
 		delete( str );
 	}
+	Sounds[0][0]=UNINITIALIZED_BYTE;
 }
 
 bool AREImp::Open(DataStream* stream, bool autoFree)

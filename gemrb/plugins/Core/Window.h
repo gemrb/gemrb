@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.22 2005/11/12 19:31:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.23 2005/11/15 20:58:12 avenger_teambg Exp $
  *
  */
 
@@ -141,15 +141,10 @@ public: //Public attributes
 	unsigned short Width;
 	/** Height */
 	unsigned short Height;
-	/** Visible */
-	char Visible;  //0,1,2
-	/** Changed Flag */
-	//bool Changed;
-	/** Floating Flag */
-	//bool Floating;
-	/** Window is framed */
-	//bool Frame;
-	int Flags; //all flags Changed, Floating, Frame, Child
+	/** Visible value: deleted, invisible, visible, grayed */
+	signed char Visible;  //-1,0,1,2
+	/** Window flags: Changed, Floating, Framed, Child */
+	int Flags;
 	int Cursor;
 	int DefaultControl;
 private: // Private attributes

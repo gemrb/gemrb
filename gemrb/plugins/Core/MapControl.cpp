@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.34 2005/08/14 17:52:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.35 2005/11/15 20:58:12 avenger_teambg Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -161,7 +161,7 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 	if (!Width || !Height) {
 		return;
 	}
-	if ((( Window* ) Owner)->Visible!=1) {
+	if ((( Window* ) Owner)->Visible!=WINDOW_VISIBLE) {
 		return;
 	}
 
