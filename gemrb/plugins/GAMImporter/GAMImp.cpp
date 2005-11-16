@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.62 2005/11/14 23:34:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.63 2005/11/16 20:05:59 avenger_teambg Exp $
  *
  */
 
@@ -29,6 +29,8 @@
 
 #define MAZE_DATA_SIZE 1720
 #define FAMILIAR_FILL_SIZE 324
+// if your compiler chokes on this, use -1 or 0xff whichever works for you
+#define UNINITIALIZED_CHAR '\xff'
 
 GAMImp::GAMImp(void)
 {
@@ -300,7 +302,8 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 		MemoryStream* ms = new MemoryStream( Buffer, pcInfo.CRESize );
 		aM->Open( ms );
 		actor = aM->GetActor();
-		if(pcInfo.Name[0]!=0 && pcInfo.Name[0]!=-1) { //torment has them as 0 or -1
+ 		//torment has them as 0 or -1
+		if (pcInfo.Name[0]!=0 && pcInfo.Name[0]!=UNINITIALIZED_CHAR) {
 			actor->SetText(pcInfo.Name,0); //setting both names
 		}
 		actor->TalkCount = pcInfo.TalkCount;
