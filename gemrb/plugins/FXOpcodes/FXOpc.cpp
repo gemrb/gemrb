@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.2 2005/11/13 10:18:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.3 2005/11/16 22:01:04 avenger_teambg Exp $
  *
  */
 
@@ -1781,8 +1781,8 @@ int fx_destroy_self (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_local_variable (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	//this is a hack, the variable name spreads across the resources
-	if (0) printf( "fx_local_variable (%2d) %s=%d", fx->Opcode, fx->Resource, fx->Parameter2 );
-	target->locals->SetAt(fx->Resource, fx->Parameter2);
+	if (0) printf( "fx_local_variable (%2d) %s=%d", fx->Opcode, fx->Resource, fx->Parameter1 );
+	target->locals->SetAt(fx->Resource, fx->Parameter1);
 	//local variable effects are not applied, they will be resaved though
 	return FX_NOT_APPLIED;
 }
