@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.24 2005/11/13 22:29:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.25 2005/11/17 22:10:39 avenger_teambg Exp $
  *
  */
 
@@ -161,8 +161,8 @@ int BIFImp::OpenArchive(const char* filename)
 		compressed->Read( &fnlen, 4 );
 		char* fname = ( char* ) malloc( fnlen );
 		compressed->Read( fname, fnlen );
-		compressed->Read( &declen, 4 );
-		compressed->Read( &complen, 4 );
+		compressed->ReadDword( &declen );
+		compressed->ReadDword( &complen );
 		PathJoin( path, core->CachePath, fname, NULL );
 		free( fname );
 		in_cache = fopen( path, "rb" );
@@ -218,12 +218,12 @@ int BIFImp::OpenArchive(const char* filename)
 			return GEM_ERROR;
 		Compressor* comp = ( Compressor* )
 			core->GetInterface( IE_COMPRESSION_CLASS_ID );
-		int unCompBifSize;
-		compressed->Read( &unCompBifSize, 4 );
+		ieDword unCompBifSize;
+		compressed->ReadDword( &unCompBifSize );
 		printf( "\nDecompressing file: [..........]" );
 		fflush(stdout);
 		in_cache = fopen( path, "wb" );
-		int finalsize = 0;
+		ieDword finalsize = 0;
 		int laststep = 0;
 		while (finalsize < unCompBifSize) {
 			compressed->Seek( 8, GEM_CURRENT_POS );
@@ -271,8 +271,8 @@ DataStream* BIFImp::GetStream(unsigned long Resource, unsigned long Type)
 			}
 		}
 	} else {
-		unsigned int srcResLoc = Resource & 0x3FFF;
-		for (unsigned int i = 0; i < fentcount; i++) {
+		ieDword srcResLoc = Resource & 0x3FFF;
+		for (ieDword i = 0; i < fentcount; i++) {
 			if (( fentries[i].resLocator & 0x3FFF ) == srcResLoc) {
 				s = new CachedFileStream( stream, fentries[i].dataOffset,
 							fentries[i].fileSize );
@@ -291,9 +291,9 @@ DataStream* BIFImp::GetStream(unsigned long Resource, unsigned long Type)
 void BIFImp::ReadBIF(void)
 {
 	ieDword foffset;
-	stream->Read( &fentcount, 4 );
-	stream->Read( &tentcount, 4 );
-	stream->Read( &foffset, 4 );
+	stream->ReadDword( &fentcount );
+	stream->ReadDword( &tentcount );
+	stream->ReadDword( &foffset );
 	stream->Seek( foffset, GEM_STREAM_START );
 	fentries = new FileEntry[fentcount];
 	stream->Read( fentries, fentcount * sizeof( FileEntry ) );
