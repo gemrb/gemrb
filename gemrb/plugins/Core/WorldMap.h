@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.16 2005/11/08 22:59:05 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.17 2005/11/17 17:40:32 avenger_teambg Exp $
  *
  */
 
@@ -172,7 +172,7 @@ private:
 
 class GEM_EXPORT WorldMapArray {
 public:
-	WorldMapArray(int count);
+	WorldMapArray(unsigned int count);
 	~WorldMapArray();
 	void SetWorldMap(WorldMap *m, unsigned int index);
 private:
@@ -180,14 +180,14 @@ private:
 	unsigned int MapCount;
 	unsigned int CurrentMap;
 public:
-	int GetMapCount() { return MapCount; }
-	int GetCurrentMapIndex() { return CurrentMap; }
+	unsigned int GetMapCount() { return MapCount; }
+	unsigned int GetCurrentMapIndex() { return CurrentMap; }
 	WorldMap *NewWorldMap(unsigned int index);
 	WorldMap *GetWorldMap(unsigned int index) { return all_maps[index]; }
 	WorldMap *GetCurrentMap() { return all_maps[CurrentMap]; }
 	void SetWorldMap(unsigned int index);
 	void SetCurrentMap(unsigned int index) { CurrentMap = index; }
-	int FindAndSetCurrentMap(const ieResRef area);
+	unsigned int FindAndSetCurrentMap(const ieResRef area);
 };
 
 #endif // ! WORLDMAP_H

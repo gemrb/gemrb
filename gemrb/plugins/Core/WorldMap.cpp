@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.17 2005/07/01 20:39:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.18 2005/11/17 17:40:32 avenger_teambg Exp $
  *
  */
 
@@ -369,7 +369,7 @@ void WorldMap::SetAreaStatus(const ieResRef AreaName, int Bits, int Op)
 }
 
 /****************** WorldMapArray *******************/
-WorldMapArray::WorldMapArray(int count)
+WorldMapArray::WorldMapArray(unsigned int count)
 {
 	CurrentMap = 0;
 	MapCount = count;
@@ -386,7 +386,7 @@ WorldMapArray::~WorldMapArray()
 	free( all_maps );
 }
 
-int WorldMapArray::FindAndSetCurrentMap(const ieResRef area)
+unsigned int WorldMapArray::FindAndSetCurrentMap(const ieResRef area)
 {
 	unsigned int i, idx;
 
@@ -402,7 +402,7 @@ int WorldMapArray::FindAndSetCurrentMap(const ieResRef area)
 			return i;
 		}
 	}
-	return -1;
+	return CurrentMap;
 }
 
 void WorldMapArray::SetWorldMap(WorldMap *m, unsigned int index)
