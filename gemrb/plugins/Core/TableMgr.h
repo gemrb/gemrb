@@ -15,19 +15,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TableMgr.h,v 1.16 2004/11/13 23:16:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TableMgr.h,v 1.17 2005/11/17 21:08:32 edheldil Exp $
  *
  */
+
+/**
+ * @file TableMgr.h
+ * Declares TableMgr class, abstract loader for Table objects (.2DA files)
+ * @author The GemRB Project
+ */
+
 
 #ifndef TABLEMGR_H
 #define TABLEMGR_H
 
 #include "Plugin.h"
 #include "../../includes/globals.h"
-
-/**Abstract class for Table Manager Plugins implementation
-  *@author GemRB Developement Team
-  */
 
 #ifdef WIN32
 
@@ -41,6 +44,11 @@
 #define GEM_EXPORT
 #endif
 
+/**
+ * @class TableMgr
+ * Abstract loader for Table objects (.2DA files)
+ */
+
 class GEM_EXPORT TableMgr : public Plugin {
 public: 
 	TableMgr();
@@ -52,11 +60,11 @@ public:
 	/** Returns the actual number of Columns in a row */
 	virtual int GetColumnCount(unsigned int row = 0) const = 0;
 	/** Returns a pointer to a zero terminated 2da element,
-		 0,0 returns the default value, it may return NULL */
+	 * 0,0 returns the default value, it may return NULL */
 	virtual char* QueryField(unsigned int row = 0, unsigned int column = 0) const = 0;
 	/** Returns a pointer to a zero terminated 2da element,
-		 uses column name and row name to search the field,
-	  may return NULL */
+	 * uses column name and row name to search the field,
+	 * may return NULL */
 	virtual char* QueryField(const char* row, const char* column) const = 0;
 	/** Opens a Table File */
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
@@ -66,4 +74,4 @@ public:
 	virtual char* GetRowName(unsigned int index) const = 0;
 };
 
-#endif
+#endif  // ! TABLEMGR_H

@@ -15,9 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.h,v 1.20 2005/08/14 19:07:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.h,v 1.21 2005/11/17 21:08:32 edheldil Exp $
  *
  */
+
+/**
+ * @file EventMgr.h
+ * Declares EventMgr, class distributing events from input devices to GUI windows
+ * @author The GemRB Project
+ */
+
 
 #ifndef EVENTMGR_H
 #define EVENTMGR_H
@@ -55,6 +62,12 @@
 #else
 #define GEM_EXPORT
 #endif
+
+/**
+ * @class EventMgr
+ * Class distributing events from input devices to GUI windows.
+ * The events are pumped into instance of this class from a Video driver plugin
+ */
 
 class GEM_EXPORT EventMgr {
 private:
@@ -116,4 +129,4 @@ private:
 	}
 };
 
-#endif
+#endif  // ! EVENTMGR_H

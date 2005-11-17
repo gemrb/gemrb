@@ -15,9 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.65 2005/11/06 13:42:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.66 2005/11/17 21:08:32 edheldil Exp $
  *
  */
+
+/**
+ * @file Game.h
+ * Declares Game class, object representing current game state.
+ * @author The GemRB Project
+ */
+
 
 class Game;
 
@@ -74,6 +81,11 @@ class Game;
 #define WB_LIGHTNING 8
 #define WB_START     0x80
 
+/**
+ * @struct PCStruct
+ * Information about party member.
+ */
+
 typedef struct PCStruct {
 	ieWord   Selected;
 	ieWord   PartyOrder;
@@ -103,6 +115,11 @@ typedef struct PCStruct {
 #define IE_GAM_QUEST_DONE  2
 #define IE_GAM_JOURNAL_USER 3
 
+/**
+ * @struct GAMJournalEntry
+ * Single entry in a journal
+ */
+
 typedef struct GAMJournalEntry {
 	ieStrRef Text;
 	ieDword  GameTime; // in game time seconds
@@ -112,6 +129,10 @@ typedef struct GAMJournalEntry {
 	ieByte   Group;   // this is a GemRB extension
 } GAMJournalEntry;
 
+/**
+ * @class Game
+ * Object representing current game state, mostly party.
+ */
 
 class GEM_EXPORT Game : public Scriptable {
 public:
@@ -133,7 +154,7 @@ public:
 	ieResRef Familiars[9];
 	ieDword CombatCounter;
 
-	/** index of PC selected in non-walking environment (shops, inventory...) */
+	/** Index of PC selected in non-walking environment (shops, inventory...) */
 	int SelectedSingle;
 
 public:
@@ -152,60 +173,60 @@ public:
 	ieResRef CurrentArea;
 	ieResRef LoadMos;
 public:
-	/* returns the PC's slot count for partyID*/
+	/** Returns the PC's slot count for partyID */
 	int FindPlayer(unsigned int partyID);
-	/* returns actor by slot */
+	/** Returns actor by slot */
 	Actor* GetPC(unsigned int slot, bool onlyalive);
-	/* finds an actor in party by party ID, returns Actor, if not there, returns NULL*/
+	/** Finds an actor in party by party ID, returns Actor, if not there, returns NULL*/
 	Actor* FindPC(unsigned int partyID);
 	Actor* FindNPC(unsigned int partyID);
-	/* finds an actor in party, returns slot, if not there, returns -1*/
+	/** Finds an actor in party, returns slot, if not there, returns -1*/
 	int InParty(Actor* pc) const;
-	/* finds an actor in store, returns slot, if not there, returns -1*/
+	/** Finds an actor in store, returns slot, if not there, returns -1*/
 	int InStore(Actor* pc) const;
-	/* finds an actor in party by scripting name*/
+	/** Finds an actor in party by scripting name*/
 	Actor* FindPC(const char *deathvar);
-	/* finds an actor in store by scripting name*/
+	/** Finds an actor in store by scripting name*/
 	Actor* FindNPC(const char *deathvar);
-	/* joins party */
+	/** Joins party */
 	int JoinParty(Actor* pc, int join=JP_JOIN);
-	/* return current party size */
+	/** Return current party size */
 	int GetPartySize(bool onlyalive) const;
-	/* returns the npcs count */
+	/** Returns the npcs count */
 	int GetNPCCount() const { return (int)NPCs.size(); }
-	/* sends the hotkey trigger to all selected pcs */
+	/** Sends the hotkey trigger to all selected pcs */
 	void SetHotKey(unsigned long Key);
-	/* select PC for non-walking environment (shops, inventory, ...) */
+	/** Select PC for non-walking environment (shops, inventory, ...) */
 	bool SelectPCSingle(int index);
-	/* get index of selected PC for non-walking env (shops, inventory, ...) */
+	/** Get index of selected PC for non-walking env (shops, inventory, ...) */
 	int GetSelectedPCSingle() const;
-	/* (De)selects actor. */
+	/** (De)selects actor. */
 	bool SelectActor( Actor* actor, bool select, unsigned flags );
 
-	/* return current party level count for xp calculations */
+	/** Return current party level count for xp calculations */
 	int GetPartyLevel(bool onlyalive) const;
-	/* removes actor from party (if in there) */
+	/** Removes actor from party (if in there) */
 	int LeaveParty(Actor* pc);
-	/* returns slot*/
+	/** Returns slot*/
 	int DelPC(unsigned int slot, bool autoFree = false);
 	int DelNPC(unsigned int slot, bool autoFree = false);
-	/* returns map in index */
+	/** Returns map in index */
 	Map* GetMap(unsigned int index) const;
-	/* returns a map from area name, loads it if needed */
-	/* use it for the biggest safety, change = true will change the current map */
+	/** Returns a map from area name, loads it if needed
+	 * use it for the biggest safety, change = true will change the current map */
 	Map* GetMap(const char *areaname, bool change);
-	/* returns slot of the map if found */
+	/** Returns slot of the map if found */
 	int FindMap(const char *ResRef);
 	/* use GetCurrentArea() */
 	//Map * GetCurrentMap();
 	int AddMap(Map* map);
-	/* determine if area is master area*/
+	/** Determine if area is master area*/
 	bool MasterArea(const char *area);
-	/* dynamically adding an area to master areas*/
+	/** Dynamically adding an area to master areas*/
 	void SetMasterArea(const char *area);
-	/* returns slot of the map, if it was already loaded,
-	 	don't load it again, set changepf == true,
-		if you want to change the pathfinder too. */
+	/** Returns slot of the map, if it was already loaded,
+	 * don't load it again, set changepf == true,
+	 * if you want to change the pathfinder too. */
 	int LoadMap(const char* ResRef);
 	int DelMap(unsigned int index, int forced = 0);
 	int AddNPC(Actor* npc);
@@ -214,11 +235,11 @@ public:
 	//journal entries
 	void DeleteJournalEntry(ieStrRef strref);
 	void DeleteJournalGroup(ieByte Group);
-	/* adds a journal entry from dialog data */
-	/* time and chapter are calculated on the fly */
-	/* returns false if the entry already exists */
+	/** Adds a journal entry from dialog data.
+	 * Time and chapter are calculated on the fly
+	 * Returns false if the entry already exists */
 	bool AddJournalEntry(ieStrRef strref, int section, int group);
-	/* adds a journal entry while loading the .gam structure */
+	/** Adds a journal entry while loading the .gam structure */
 	void AddJournalEntry(GAMJournalEntry* entry);
 	int GetJournalCount() const;
 	GAMJournalEntry* FindJournalEntry(ieStrRef strref);
@@ -242,18 +263,18 @@ public:
 	bool EveryoneStopped() const;
 	bool EveryoneNearPoint(Map *map, Point &p, int flags) const;
 	int PartyMemberDied() const;
-	/* increments chapter variable and refreshes kill stats */
+	/** Increments chapter variable and refreshes kill stats */
 	void IncrementChapter();
-	/* sets party reputation */
+	/** Sets party reputation */
 	void SetReputation(ieDword r);
-	/* sets the gamescreen control status (pane states, dialog textarea size) */
+	/** Sets the gamescreen control status (pane states, dialog textarea size) */
 	void SetControlStatus(int value, int operation);
 	void StartRainOrSnow(bool conditional, int weather);
 	size_t GetLoadedMapCount() const { return Maps.size(); }
-	/* adds or removes gold */
+	/** Adds or removes gold */
 	void AddGold(ieDword add);
-	/* adds ticks to game time */
+	/** Adds ticks to game time */
 	void AdvanceTime(ieDword add);
 };
 
-#endif
+#endif  // ! GAME_H

@@ -15,15 +15,27 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/StringMgr.h,v 1.9 2005/02/23 20:59:37 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/StringMgr.h,v 1.10 2005/11/17 21:08:32 edheldil Exp $
  *
  */
+
+/**
+ * @file StringMgr.h
+ * Declares StringMgr class, loader for StringBlock objects (.TLK files)
+ * @author The GemRB Project
+ */
+
 
 #ifndef STRINGMGR_H
 #define STRINGMGR_H
 
 #include "Plugin.h"
 #include "DataStream.h"
+
+/**
+ * @struct StringBlock
+ * Text and its associated sound.
+ */
 
 typedef struct StringBlock {
 	char* text;
@@ -42,6 +54,11 @@ typedef struct StringBlock {
 #define GEM_EXPORT
 #endif
 
+/**
+ * @class StringMgr
+ * Abstract loader for StringBlock objects (strings in .TLK files)
+ */
+
 class GEM_EXPORT StringMgr : public Plugin {
 public:
 	StringMgr(void);
@@ -51,4 +68,4 @@ public:
 	virtual StringBlock GetStringBlock(ieStrRef strref, unsigned int flags = 0) = 0;
 };
 
-#endif
+#endif  // ! STRINGMGR_H

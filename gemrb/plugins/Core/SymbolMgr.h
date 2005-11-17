@@ -1,7 +1,36 @@
+/* GemRB - Infinity Engine Emulator
+ * Copyright (C) 2003 The GemRB Project
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SymbolMgr.h,v 1.9 2005/11/17 21:08:32 edheldil Exp $
+ *
+ */
+
+/**
+ * @file SymbolMgr.h
+ * Declares SymbolMgr class, abstract loader for symbol tables  (.IDS files)
+ * @author The GemRB Project
+ */
+
+
 #ifndef SYMBOLMGR_H
 #define SYMBOLMGR_H
 
-#define SYMBOL_VALUE_NOT_LOCATED -65535 // GetValue returns this if text is not found in arrays
+/** GetValue returns this if text is not found in arrays */
+#define SYMBOL_VALUE_NOT_LOCATED -65535
 
 #include "Plugin.h"
 #include "DataStream.h"
@@ -18,6 +47,11 @@
 #define GEM_EXPORT
 #endif
 
+/**
+ * @class SymbolMgr
+ * Abstract loader for symbol tables (.IDS files)
+ */
+
 class GEM_EXPORT SymbolMgr : public Plugin {
 public:
 	SymbolMgr(void);
@@ -32,4 +66,4 @@ public:
 	virtual int GetSize() = 0;
 };
 
-#endif
+#endif  // ! SYMBOLMGR_H

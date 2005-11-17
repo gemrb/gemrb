@@ -15,9 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataFileMgr.h,v 1.4 2004/03/12 01:53:45 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataFileMgr.h,v 1.5 2005/11/17 21:08:32 edheldil Exp $
  *
  */
+
+/**
+ * @file DataFileMgr.h
+ * Declares DataFileMgr class, abstract loader for .INI files
+ * @author The GemRB Project
+ */
+
 
 #ifndef DATAFILEMGR_H
 #define DATAFILEMGR_H
@@ -36,6 +43,11 @@
 #else
 #define GEM_EXPORT
 #endif
+
+/**
+ * @class DataFileMgr
+ * Abstract loader for .INI files
+ */
 
 class GEM_EXPORT DataFileMgr : public Plugin {
 public:

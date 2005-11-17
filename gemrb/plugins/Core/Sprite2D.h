@@ -15,8 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Sprite2D.h,v 1.5 2005/04/01 18:48:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Sprite2D.h,v 1.6 2005/11/17 21:08:32 edheldil Exp $
  *
+ */
+
+/**
+ * @file Sprite2D.h
+ * Declares Sprite2D, class representing bitmap data
+ * @author The GemRB Project
  */
 
 #ifndef SPRITE2D_H
@@ -36,9 +42,16 @@
 #define GEM_EXPORT
 #endif
 
+/**
+ * @class Sprite2D
+ * Class representing bitmap data.
+ * Objects of this class are usually created by Video driver.
+ */
+
 class GEM_EXPORT Sprite2D {
 public:
-	void* vptr;	//Pointer to the Driver Video Structure
+        /** Pointer to the Driver Video Structure */
+	void* vptr;
 	int RefCount;
 	void* pixels;
 	int XPos, YPos, Width, Height;
@@ -46,4 +59,4 @@ public:
 	~Sprite2D(void);
 };
 
-#endif
+#endif  // ! SPRITE2D_H
