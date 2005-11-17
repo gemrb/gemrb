@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.20 2005/10/20 20:39:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.21 2005/11/17 21:29:44 avenger_teambg Exp $
  *
  */
 
@@ -153,6 +153,16 @@ PluginMgr::PluginMgr(char* pluginpath)
 #endif
 #endif
 		printMessage( "PluginMgr", "Checking Plugin Version...", WHITE );
+		if (LibVersion==NULL) {
+			printStatus( "ERROR", LIGHT_RED );
+			printf( "Invalid Plug-in, Skipping...\n" );
+#ifdef WIN32
+			FreeLibrary(hMod);
+#else
+			dlclose(hMod);
+#endif
+			continue;
+		}
 		if (strcmp(LibVersion(), VERSION_GEMRB) ) {
 			printStatus( "ERROR", LIGHT_RED );
 			printf( "Plug-in Version not valid, Skipping...\n" );
