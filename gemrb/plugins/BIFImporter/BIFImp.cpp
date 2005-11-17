@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.25 2005/11/17 22:10:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.26 2005/11/17 22:12:45 avenger_teambg Exp $
  *
  */
 
@@ -58,12 +58,12 @@ int BIFImp::DecompressSaveGame(DataStream *compressed)
 	if (!All) return GEM_ERROR;
 	do {
 		ieDword fnlen, complen, declen;
-		compressed->Read( &fnlen, 4 );
+		compressed->ReadDword( &fnlen );
 		char* fname = ( char* ) malloc( fnlen );
 		compressed->Read( fname, fnlen );
 		strlwr(fname);
-		compressed->Read( &declen, 4 );
-		compressed->Read( &complen, 4 );
+		compressed->ReadDword( &declen );
+		compressed->ReadDword( &complen );
 		PathJoin( path, core->CachePath, fname, NULL );
 		printf( "Decompressing %s\n",fname );
 		free( fname );
@@ -158,7 +158,7 @@ int BIFImp::OpenArchive(const char* filename)
 	compressed->Read( Signature, 8 );
 	if (strncmp( Signature, "BIF V1.0", 8 ) == 0) {
 		ieDword fnlen, complen, declen;
-		compressed->Read( &fnlen, 4 );
+		compressed->ReadDword( &fnlen );
 		char* fname = ( char* ) malloc( fnlen );
 		compressed->Read( fname, fnlen );
 		compressed->ReadDword( &declen );
