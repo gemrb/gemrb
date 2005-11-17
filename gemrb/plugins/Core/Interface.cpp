@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.362 2005/11/15 20:58:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.363 2005/11/17 23:49:22 edheldil Exp $
  *
  */
 
@@ -4039,7 +4039,7 @@ int Interface::Autopause(ieDword flag)
 	}
 	ieDword autopause_flags = ~0u; //it is -1 just for testing
 
-	vars->Lookup("AutoPauseState", autopause_flags);
+	vars->Lookup("Auto Pause State", autopause_flags);
 	if (autopause_flags & flag) {
 		DisplayConstantString(STR_AP_UNUSABLE+flag, 0xff0000);
 		gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);

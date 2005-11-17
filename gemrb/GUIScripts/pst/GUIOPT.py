@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.19 2005/10/16 21:54:37 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.20 2005/11/17 23:49:22 edheldil Exp $
 
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
@@ -467,16 +467,41 @@ def OpenAutopauseOptionsWindow ():
 	OptDone ('AutopauseOptions', Window, 16)
 	OptCancel ('AutopauseOptions', Window, 17)
 
-	OptCheckbox ('AutopauseOptions', 'CharacterHit', Window, 2, 9, 37598, "")
-	OptCheckbox ('AutopauseOptions', 'CharacterInjured', Window, 3, 10, 37681, "")
-	OptCheckbox ('AutopauseOptions', 'CharacterDead', Window, 4, 11, 37682, "")
-	OptCheckbox ('AutopauseOptions', 'CharacterAttacked', Window, 5, 12, 37683, "")
-	OptCheckbox ('AutopauseOptions', 'WeaponUnusable', Window, 6, 13, 37684, "")
-	OptCheckbox ('AutopauseOptions', 'TargetGone', Window, 7, 14, 37685, "")
-	OptCheckbox ('AutopauseOptions', 'EndOfRound', Window, 8, 15, 37686, "")
+	# Set variable for each checkbox according to a particular bit of
+	#   AutoPauseState
+	state = GemRB.GetVar ("Auto Pause State")
+	GemRB.SetVar("AutoPauseState_Unusable", (state & 0x01) != 0 )
+	GemRB.SetVar("AutoPauseState_Attacked", (state & 0x02) != 0 )
+	GemRB.SetVar("AutoPauseState_Hit", (state & 0x04) != 0 )
+	GemRB.SetVar("AutoPauseState_Wounded", (state & 0x08) != 0 )
+	GemRB.SetVar("AutoPauseState_Dead", (state & 0x10) != 0 )
+	GemRB.SetVar("AutoPauseState_NoTarget", (state & 0x20) != 0 )
+	GemRB.SetVar("AutoPauseState_EndRound", (state & 0x40) != 0 )
+	
+
+	OptCheckbox ('AutopauseOptions', 'CharacterHit', Window, 2, 9, 37598, "AutoPauseState_Hit", "OnAutoPauseClicked")
+	OptCheckbox ('AutopauseOptions', 'CharacterInjured', Window, 3, 10, 37681, "AutoPauseState_Wounded", "OnAutoPauseClicked")
+	OptCheckbox ('AutopauseOptions', 'CharacterDead', Window, 4, 11, 37682, "AutoPauseState_Dead", "OnAutoPauseClicked")
+	OptCheckbox ('AutopauseOptions', 'CharacterAttacked', Window, 5, 12, 37683, "AutoPauseState_Attacked", "OnAutoPauseClicked")
+	OptCheckbox ('AutopauseOptions', 'WeaponUnusable', Window, 6, 13, 37684, "AutoPauseState_Unusable", "OnAutoPauseClicked")
+	OptCheckbox ('AutopauseOptions', 'TargetGone', Window, 7, 14, 37685, "AutoPauseState_NoTarget", "OnAutoPauseClicked")
+	OptCheckbox ('AutopauseOptions', 'EndOfRound', Window, 8, 15, 37686, "AutoPauseState_EndRound", "OnAutoPauseClicked")
 
 	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
+
+
+
+def OnAutoPauseClicked ():
+	state = (0x01 * GemRB.GetVar("AutoPauseState_Unusable") +
+		 0x02 * GemRB.GetVar("AutoPauseState_Attacked") + 
+		 0x04 * GemRB.GetVar("AutoPauseState_Hit") +
+		 0x08 * GemRB.GetVar("AutoPauseState_Wounded") +
+		 0x10 * GemRB.GetVar("AutoPauseState_Dead") +
+		 0x20 * GemRB.GetVar("AutoPauseState_NoTarget") +
+		 0x40 * GemRB.GetVar("AutoPauseState_EndRound"))
+
+	GemRB.SetVar("Auto Pause State", state)
 	
 
 def DisplayHelpAutopauseOptions ():
@@ -841,15 +866,24 @@ def OptSlider (winname, ctlname, window, slider_id, label_id, label_strref, asso
 	return slider
 
 
-def OptCheckbox (winname, ctlname, window, button_id, label_id, label_strref, assoc_var):
+def OptCheckbox (winname, ctlname, window, button_id, label_id, label_strref, assoc_var = None, handler = None):
 	"""Standard checkbox for option windows"""
 
 	button = GemRB.GetControl (window, button_id)
 	GemRB.SetButtonFlags (window, button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	GemRB.SetButtonState (window, button, IE_GUI_BUTTON_SELECTED)
 	GemRB.SetEvent (window, button, IE_GUI_MOUSE_ENTER_BUTTON, "DisplayHelp" + ctlname)
 	GemRB.SetEvent (window, button, IE_GUI_MOUSE_LEAVE_BUTTON, "DisplayHelp" + winname)
-	GemRB.SetVarAssoc (window, button, assoc_var, 1)
+	if assoc_var:
+		GemRB.SetVarAssoc (window, button, assoc_var, 1)
+		if GemRB.GetVar (assoc_var):
+			GemRB.SetButtonState (window, button, IE_GUI_BUTTON_PRESSED)
+		else:
+			GemRB.SetButtonState (window, button, IE_GUI_BUTTON_UNPRESSED)
+	else: 
+		GemRB.SetButtonState (window, button, IE_GUI_BUTTON_UNPRESSED)
+
+	if handler:
+		GemRB.SetEvent (window, button, IE_GUI_BUTTON_ON_PRESS, handler)
 
 	label = GemRB.GetControl (window, label_id)
 	GemRB.SetText (window, label, label_strref)
