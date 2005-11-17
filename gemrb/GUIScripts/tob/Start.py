@@ -55,7 +55,7 @@ def SoAPress():
 	return
 
 def ToBPress():
-	GemRB.SetMasterScript("BALDUR25","WORLDMP25")
+	GemRB.SetMasterScript("BALDUR25","WORLDM25")
 	GemRB.SetVar("oldgame",0)
 	GemRB.UnloadWindow(StartWindow)
 	GemRB.SetNextScript("Start2")
