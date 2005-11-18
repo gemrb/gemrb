@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.26 2005/11/17 22:12:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.27 2005/11/18 21:01:21 avenger_teambg Exp $
  *
  */
 
@@ -296,7 +296,33 @@ void BIFImp::ReadBIF(void)
 	stream->ReadDword( &foffset );
 	stream->Seek( foffset, GEM_STREAM_START );
 	fentries = new FileEntry[fentcount];
-	stream->Read( fentries, fentcount * sizeof( FileEntry ) );
 	tentries = new TileEntry[tentcount];
-	stream->Read( tentries, tentcount * sizeof( TileEntry ) );
+	if (!fentries || !tentries) {
+		if (fentries) {
+			delete fentries;
+			fentries = NULL;
+		}
+		if (tentries) {
+			delete tentries;
+			tentries = NULL;
+		}
+		return;
+	}
+	unsigned int i;
+
+	for (i=0;i<fentcount;i++) {
+		stream->ReadDword( &fentries[i].resLocator);
+		stream->ReadDword( &fentries[i].dataOffset);
+		stream->ReadDword( &fentries[i].fileSize);
+		stream->ReadWord( &fentries[i].type);
+		stream->ReadWord( &fentries[i].u1);
+	}
+	for (i=0;i<tentcount;i++) {
+		stream->ReadDword( &tentries[i].resLocator);
+		stream->ReadDword( &tentries[i].dataOffset);
+		stream->ReadDword( &tentries[i].tilesCount);
+		stream->ReadDword( &tentries[i].tileSize);
+		stream->ReadWord( &tentries[i].type);
+		stream->ReadWord( &tentries[i].u1);
+	}
 }
