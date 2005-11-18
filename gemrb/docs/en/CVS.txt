@@ -1,6 +1,6 @@
 WORKING WITH CVS
 ----------------
-$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/CVS.txt,v 1.1 2004/07/26 09:02:38 edheldil Exp $
+$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/CVS.txt,v 1.2 2005/11/18 17:43:07 avenger_teambg Exp $
 
 
 This document is a short help on using CVS for getting GemRB
@@ -18,12 +18,12 @@ developer, you will need to get GemRB from anonymous CVS. It lags
 some time behind developer CVS, but mostly it's not a problem
 (unless you need some fresh patch quickly :-)):
 
-  export CVSROOT=:pserver:anonymous@cvs.sourceforge.net/cvsroot/gemrb
+  export CVSROOT=:pserver:anonymous@cvs.sourceforge.net:/cvsroot/gemrb
 
 If you are a GemRB developer, specify this CVSROOT instead
 (of course replace `username' with your own username):
 
-  export CVSROOT=:ext:username@cvs.sourceforge.net/cvsroot/gemrb
+  export CVSROOT=:ext:username@cvs.sourceforge.net:/cvsroot/gemrb
 
 Now do initial GemRB checkout:
 
