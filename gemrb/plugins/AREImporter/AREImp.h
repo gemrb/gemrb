@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.h,v 1.28 2005/11/13 20:26:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.h,v 1.29 2005/11/19 23:25:19 avenger_teambg Exp $
  *
  */
 
@@ -73,6 +73,7 @@ private:
 	int PutRegions(DataStream *stream, Map *map, ieDword &VertIndex);
 	int PutVertices(DataStream *stream, Map *map);
 	int PutSpawns(DataStream *stream, Map *map);
+	void PutScript(DataStream *stream, Actor *ac, unsigned int index);
 	int PutActors(DataStream *stream, Map *map);
 	int PutAnimations(DataStream *stream, Map *map);
 	int PutEntrances(DataStream *stream, Map *map);

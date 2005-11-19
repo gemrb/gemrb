@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.134 2005/11/15 20:58:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.135 2005/11/19 23:25:19 avenger_teambg Exp $
  *
  */
 
@@ -1480,6 +1480,19 @@ int AREImp::PutSpawns( DataStream *stream, Map *map)
 	return 0;
 }
 
+void AREImp::PutScript(DataStream *stream, Actor *ac, unsigned int index)
+{
+	char filling[8];
+
+	GameScript *s = ac->Scripts[index];
+	if (s) {
+		stream->WriteResRef( s->GetName() );
+	} else {
+		memset(filling,0,sizeof(filling));
+		stream->Write( filling, 8);
+	}
+}
+
 int AREImp::PutActors( DataStream *stream, Map *map)
 {
 	ieDword tmpDword = 0;
@@ -1515,25 +1528,20 @@ int AREImp::PutActors( DataStream *stream, Map *map)
 		stream->WriteDword( &ac->appearance);
 		stream->WriteDword( &ac->TalkCount);
 		stream->WriteResRef( ac->Dialog);
-		for( int j=0;j<6;j++) {
-			GameScript *s = ac->Scripts[j];
-			if (s) {
-				stream->WriteResRef( s->GetName() );
-			} else {
-				stream->Write( filling, 8);
-			}
-		}
-		stream->Write( filling, 8); //creature reference is empty because we are embedding it
+		PutScript(stream, ac, SCR_OVERRIDE);
+		PutScript(stream, ac, SCR_CLASS);
+		PutScript(stream, ac, SCR_RACE);
+		PutScript(stream, ac, SCR_GENERAL);
+		PutScript(stream, ac, SCR_DEFAULT);
+		PutScript(stream, ac, SCR_SPECIFICS);
+ 		//creature reference is empty because we are embedding it
+		//the original engine used a '*'
+		stream->Write( filling, 8);
 		stream->WriteDword( &CreatureOffset);
 		ieDword CreatureSize = 0;//am->GetStoredFileSize(ac);
 		stream->WriteDword( &CreatureSize);
 		CreatureOffset += CreatureSize;
-		GameScript *s = ac->Scripts[6];
-		if (s) {
-			stream->WriteResRef( s->GetName() );
-		} else {
-			stream->Write( filling, 8);
-		}
+		PutScript(stream, ac, SCR_AREA);
 		stream->Write( filling, 120);
 	}
 
