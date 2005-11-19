@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.339 2005/11/13 10:18:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.340 2005/11/19 16:37:09 avenger_teambg Exp $
  *
  */
 
@@ -2436,11 +2436,14 @@ static PyObject* GemRB_SetAnimation(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
+	//who knows, there might have been lurking an active animation
+	if (ctl->animation) {
+		delete ctl->animation;
+		ctl->animation = NULL;
+	}
+
 	if (ResRef[0] == 0) {
 		ctl->SetAnimPicture( NULL );
-		//who knows, there might have been lurking an active animation
-		core->timer->RemoveAnimation(ctl->animation);
-		ctl->animation = NULL;
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
