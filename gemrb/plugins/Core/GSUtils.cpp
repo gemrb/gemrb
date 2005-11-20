@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.30 2005/11/20 11:01:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.31 2005/11/20 17:44:20 avenger_teambg Exp $
  *
  */
 
@@ -886,7 +886,7 @@ int GetObjectCount(Scriptable* Sender, Object* oC)
 }
 
 //we need this because some special characters like _ or * are also accepted
-bool inline ismysymbol(const char letter)
+inline bool ismysymbol(const char letter)
 {
 	if (letter==')') return false;
 	if (letter=='(') return false;
