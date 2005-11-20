@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.h,v 1.13 2005/11/06 16:13:33 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.h,v 1.14 2005/11/20 17:49:30 edheldil Exp $
  *
  */
 
@@ -102,6 +102,7 @@ GEM_EXPORT long int _ftell(_FILE* stream);
 GEM_EXPORT int _feof(_FILE* stream);
 GEM_EXPORT int _fclose(_FILE* stream);
 #define mkdir(path, rights)  _mkdir(path)
+#define ResolveFilePath(p)
 
 #else  // ! WIN32
 
@@ -114,6 +115,9 @@ GEM_EXPORT int _fclose(_FILE* stream);
 #define _ftell ftell
 #define _feof feof
 #define _fclose fclose
+
+char* FindInDir(char* Dir, char* Filename);
+void ResolveFilePath(char* FilePath);
 
 #endif  // ! WIN32
 

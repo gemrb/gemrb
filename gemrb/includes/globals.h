@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.83 2005/11/07 00:09:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.84 2005/11/20 17:49:29 edheldil Exp $
  *
  */
 
@@ -152,11 +152,7 @@ GEM_EXPORT int strlench(const char* string, char ch);
 GEM_EXPORT char* strndup(const char* s, int l);
 #endif
 
-#ifdef WIN32
-#define ResolveFilePath(p)
-#else
-char* FindInDir(char* Dir, char* Filename);
-void ResolveFilePath(char* FilePath);
+#ifndef WIN32
 char* strupr(char* string);
 char* strlwr(char* string);
 #endif

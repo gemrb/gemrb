@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.56 2005/11/20 11:01:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.57 2005/11/20 17:49:30 edheldil Exp $
  *
  */
 
@@ -171,14 +171,12 @@ bool KeyImp::LoadResFile(const char* resfile)
 #define FindIn(BasePath, Path, ResRef, Type, foundMessage) \
 { \
 	char p[_MAX_PATH], f[_MAX_PATH] = {0}; \
-	strcpy(p, BasePath); \
-	strcat(p, Path); \
-	strcat(p, SPathDelimiter); \
 	strncpy(f, ResRef, 8); \
 	f[8] = 0; \
 	strcat(f, core->TypeExt(Type)); \
 	strlwr(f); \
-	strcat(p, f); \
+        PathJoin( p, BasePath, Path, f, NULL ); \
+	ResolveFilePath(p); \
 	FILE * exist = fopen(p, "rb"); \
 	if(exist) { \
 		fclose(exist); \
@@ -190,14 +188,12 @@ bool KeyImp::LoadResFile(const char* resfile)
 #define SearchIn(BasePath, Path, ResRef, Type, foundMessage) \
 { \
 	char p[_MAX_PATH], f[_MAX_PATH] = {0}; \
-	strcpy(p, BasePath); \
-	strcat(p, Path); \
-	strcat(p, SPathDelimiter); \
 	strncpy(f, ResRef, 8); \
 	f[8] = 0; \
 	strcat(f, core->TypeExt(Type)); \
 	strlwr(f); \
-	strcat(p, f); \
+        PathJoin( p, BasePath, Path, f, NULL ); \
+	ResolveFilePath(p); \
 	FILE * exist = fopen(p, "rb"); \
 	if(exist) { \
 		fclose(exist); \
