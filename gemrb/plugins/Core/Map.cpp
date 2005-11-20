@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.196 2005/11/14 23:34:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.197 2005/11/20 11:01:32 avenger_teambg Exp $
  *
  */
 
@@ -64,6 +64,7 @@ void Map::ReleaseMemory()
 		VisibilityMasks=NULL;
 	}
 	Spawns.RemoveAll();
+	PathFinderInited = false;
 }
 
 //returns true if creature must be embedded in the area
@@ -216,7 +217,6 @@ Map::Map(void)
 	: Scriptable( ST_AREA )
 {
 	area=this;
-	//vars = NULL;
 	TMap = NULL;
 	LightMap = NULL;
 	SearchMap = NULL;
@@ -837,6 +837,8 @@ Actor* Map::GetActor(Point &p, int flags)
 	while (i--) {
 		Actor* actor = actors[i];
 		
+		if (!actor->IsOver( p ))
+			continue;
 		if (!actor->ValidTarget(flags) ) {
 			continue; 
 		}
@@ -1526,7 +1528,7 @@ PathNode* Map::GetLine(Point &start, Point &dest, int Steps, int Orientation, in
 	return Return;
 }
 
-PathNode* Map::FindPath(Point &s, Point &d, int MinDistance)
+PathNode* Map::FindPath(const Point &s, const Point &d, int MinDistance)
 {
 	Point start( s.x/16, s.y/12 );
 	Point goal ( d.x/16, d.y/12 );

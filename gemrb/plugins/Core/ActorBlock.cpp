@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.114 2005/11/14 23:34:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.115 2005/11/20 11:01:32 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -46,8 +46,6 @@ Scriptable::Scriptable(ScriptableType type)
 	interval = ( 1000 / AI_UPDATE_TIME );
 	WaitCounter = 0;
 	playDeadCounter = 0;
-	//resetAction = false;
-	neverExecuted = true;
 	Active = SCR_ACTIVE | SCR_VISIBLE | SCR_ONCREATION;
 	area = 0;
 	Pos.x = 0;
@@ -59,6 +57,9 @@ Scriptable::Scriptable(ScriptableType type)
 
 Scriptable::~Scriptable(void)
 {
+	if (CurrentAction) {
+		ReleaseCurrentAction();
+	}
 	ClearActions();
 	for (int i = 0; i < MAX_SCRIPTS; i++) {
 		if (Scripts[i]) {
@@ -199,10 +200,6 @@ Action* Scriptable::PopNextAction()
 
 void Scriptable::ClearActions()
 {
-	if (CurrentAction) {
-		//CurrentAction->Release();
-		CurrentAction = NULL;
-	}
 	for (unsigned int i = 0; i < actionQueue.size(); i++) {
 		Action* aC = actionQueue.front();
 		actionQueue.pop_front();
@@ -211,6 +208,14 @@ void Scriptable::ClearActions()
 	actionQueue.clear();
 	WaitCounter = 0;
 	playDeadCounter = 0; // i'm not sure about this
+}
+
+void Scriptable::ReleaseCurrentAction()
+{
+	if (CurrentAction) {
+		CurrentAction->Release();
+		CurrentAction = NULL;
+	}
 }
 
 void Scriptable::ProcessActions()
@@ -230,17 +235,21 @@ void Scriptable::ProcessActions()
 	}
 	if (WaitCounter) {
 		WaitCounter--;
-		if (!WaitCounter) {
-			CurrentAction = NULL;
-		}
 		return;
 	}
-/*
-	if (resetAction) {
-		CurrentAction = NULL;
-		resetAction = false;
+
+	//don't do anything while moving?
+	//maybe this should be fixed
+	if (InMove()) {
+		return;
 	}
-*/
+
+	if (CurrentAction) {
+		printf("Released action in processAction: %d\n", CurrentAction->actionID);
+		CurrentAction->Dump();
+		ReleaseCurrentAction();
+	}
+
 	while (!CurrentAction) {
 		CurrentAction = PopNextAction();
 		if (!CurrentAction) {
@@ -248,22 +257,25 @@ void Scriptable::ProcessActions()
 				CutSceneId = NULL;
 			break;
 		}
-		switch (CurrentAction->GetRef()) {
-		case 0:
-			printf("Warning, action of %s has 0 refcount!\n", GetScriptName());
-			break;
-		case 1:
-			printf("Warning, action of %s will be released!\n", GetScriptName());
-			break;
-		case 2: case 3: case 4:
-			break;
-		default:
-			printf("Warning, action of %s has %d refcount!\n", GetScriptName(), CurrentAction->GetRef());
+		GameScript::ExecuteAction( this, CurrentAction );
+		//break execution in case of a Wait flag
+		if (WaitCounter) {
 			break;
 		}
-		GameScript::ExecuteAction( this, CurrentAction );
-		neverExecuted = false;
+		//break execution in case of movement
+		if (InMove()) {
+			break;
+		}
 	}
+}
+
+bool Scriptable::InMove()
+{
+	if (Type!=ST_ACTOR) {
+		return false;
+	}
+	Moveble *me = (Moveble *) this;
+	return me->path!=NULL;
 }
 
 void Scriptable::SetWait(unsigned long time)
@@ -486,7 +498,7 @@ void Moveble::DoStep()
 		NewOrientation = Orientation;
 		//since clearpath no longer sets currentaction to NULL
 		//we set it here
-		CurrentAction = NULL;
+		ReleaseCurrentAction();
 		return;
 	}
 	if (step->Next->x > step->x)
@@ -521,9 +533,13 @@ void Moveble::AddWayPoint(Point &Des)
 
 void Moveble::WalkTo(Point &Des, int distance)
 {
-	Destination = Des;
 	ClearPath();
-	path = area->FindPath( Pos, Destination, distance );
+	path = area->FindPath( Pos, Des, distance );
+	//ClearPath sets destination, so Destination must be set after it
+	//also we should set Destination only if there is a walkable path
+	if (path) {
+		Destination = Des;
+	}
 }
 
 void Moveble::RunAwayFrom(Point &Des, int PathLength, int flags)
@@ -551,6 +567,10 @@ void Moveble::MoveTo(Point &Des)
 
 void Moveble::ClearPath()
 {
+	//this is to make sure attackers come to us
+	//make sure ClearPath doesn't screw Destination (in the rare cases Destination
+	//is set before ClearPath
+	Destination = Pos;
 	if (StanceID==IE_ANI_WALK || StanceID==IE_ANI_RUN) {
 		StanceID = IE_ANI_AWAKE;
 	}
@@ -569,11 +589,7 @@ void Moveble::ClearPath()
 	}
 	path = NULL;
 	step = NULL;
-	//don't do this, certain blocking actions call ClearPath
-	//but they couldn't block if CurrentAction is cleared
-	//if you need to break the current action, do it additionally to
-	//clearpath (most likely you will need ClearActions() anyway)
-	//CurrentAction = NULL;
+	//don't call ReleaseCurrentAction
 }
 
 static unsigned long tp_steps[8]={3,2,1,0,1,2,3,4};

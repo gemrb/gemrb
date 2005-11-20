@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.77 2005/11/14 20:13:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.78 2005/11/20 11:01:32 avenger_teambg Exp $
  */
 
 /**
@@ -151,6 +151,8 @@ public: //Events
 	int GetScreenFlags() { return ScreenFlags; }
 	int GetDialogueFlags() { return DialogueFlags; }
 private:
+	/** this function safely retrieves an Actor by ID */
+	Actor *GetActorByGlobalID(ieWord ID);
 	void CalculateSelection(Point &p);
 	void ResizeDel(Window* win, unsigned char type);
 	void ResizeAdd(Window* win, unsigned char type);
@@ -161,9 +163,13 @@ private:
 	DialogState* ds;
 	Dialog* dlg;
 public:
-	Actor* speaker;
-	Actor* target;
+	//Actor* speaker;
+	//Actor* target;
+	ieWord speakerID;
+	ieWord targetID;
 public:
+	Actor *GetTarget();
+	Actor *GetSpeaker();
 	void DeselectAll();
 	/* Selects one or all PC */
 	void SelectActor(int whom);

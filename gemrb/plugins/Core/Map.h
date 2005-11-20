@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.88 2005/10/22 16:30:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.89 2005/11/20 11:01:32 avenger_teambg Exp $
  *
  */
 
@@ -284,7 +284,7 @@ public:
 	PathNode* GetLine(Point &start, int Steps, int Orientation, int flags);
 	PathNode* GetLine(Point &start, Point &dest, int flags);
 	/* Finds the path which leads to d */
-	PathNode* FindPath(Point &s, Point &d, int MinDistance = 0);
+	PathNode* FindPath(const Point &s, const Point &d, int MinDistance = 0);
 	/* returns false if point isn't visible on visibility/explored map */
 	bool IsVisible(Point &s, int explored);
 	/* returns false if point d cannot be seen from point d due to searchmap */

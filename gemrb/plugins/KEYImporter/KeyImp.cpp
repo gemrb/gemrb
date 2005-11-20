@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.55 2005/04/30 18:59:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.56 2005/11/20 11:01:33 avenger_teambg Exp $
  *
  */
 
@@ -160,11 +160,6 @@ bool KeyImp::LoadResFile(const char* resfile)
 		f->ReadResRef( re.ResRef );
 		f->ReadWord( &re.Type );
 		f->ReadDword( &re.ResLocator );
-	/* removed this part because we store the key in the node itself
-		char* key = (char *) calloc(8, sizeof(char) );
-		for (int j = 0; j < 8; j++)
-			key[j] = toupper( re.ResRef[j] );
-	*/
 		resources.SetAt( re.ResRef, re.Type, re.ResLocator );
 	}
 	printMessage( "KEYImporter", "Resources Loaded...", WHITE );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.88 2005/11/14 23:34:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.89 2005/11/20 11:01:32 avenger_teambg Exp $
  *
  */
 
@@ -136,7 +136,6 @@ private:
 	unsigned long startTime;
 	unsigned long interval;
 	unsigned long WaitCounter;
-	bool neverExecuted;
 protected: //let Actor access this
 	Map *area;
 	char scriptName[33];
@@ -154,7 +153,6 @@ public:
 	ieDword LastEntered;
 	std::list< Action*> actionQueue;
 	Action* CurrentAction;
-	//bool resetAction;
 	unsigned long playDeadCounter;
 public:
 	void SetScript(ieResRef aScript, int idx);
@@ -172,6 +170,8 @@ public:
 	Action* GetNextAction();
 	Action* PopNextAction();
 	void ClearActions();
+	void ReleaseCurrentAction();
+	bool InMove();
 	virtual void ProcessActions();
 	//these functions handle clearing of triggers that resulted a
 	//true condition (whole triggerblock returned true)

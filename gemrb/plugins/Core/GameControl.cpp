@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.258 2005/11/14 23:34:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.259 2005/11/20 11:01:32 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -108,8 +108,8 @@ GameControl::GameControl(void)
 	TopCount = 0;
 	DialogueFlags = 0;
 	dlg = NULL;
-	target = NULL;
-	speaker = NULL;
+	targetID = 0;
+	speakerID = 0;
 }
 
 //actually the savegame contains some formation data too, how to use it?
@@ -482,6 +482,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			return;
 		Actor *lastActor = area->GetActorByGlobalID(lastActorID);
 		Point p(lastMouseX, lastMouseY);
+		core->GetVideoDriver()->ConvertToGame( p.x, p.y );
 		switch (Key) {
 			case 'd': //disarm ?
 				if (overInfoPoint) {
@@ -501,8 +502,8 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			case 'b':
 				if (game->selected.size() > 0) {
 					if (!effect) {
-				AnimationFactory* af = ( AnimationFactory* )
-		 		core->GetResourceMgr()->GetFactoryResource( "S056ICBL", IE_BAM_CLASS_ID );
+						AnimationFactory* af = ( AnimationFactory* )
+		 				core->GetResourceMgr()->GetFactoryResource( "S056ICBL", IE_BAM_CLASS_ID );
 
 						effect = af->GetCycle( 1 );
 					} else {
@@ -522,23 +523,19 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 
 			case 'p':
 				//path
-				 {
-					Point p(lastMouseX, lastMouseY);
-					core->GetVideoDriver()->ConvertToGame( p.x, p.y );
-					if (drawPath) {
-						PathNode* nextNode = drawPath->Next;
-						PathNode* thisNode = drawPath;
-						while (true) {
-							delete( thisNode );
-							thisNode = nextNode;
-							if (!thisNode)
-								break;
-							nextNode = thisNode->Next;
-						}
+				if (drawPath) {
+					PathNode* nextNode = drawPath->Next;
+					PathNode* thisNode = drawPath;
+					while (true) {
+						delete( thisNode );
+						thisNode = nextNode;
+						if (!thisNode)
+							break;
+						nextNode = thisNode->Next;
 					}
-					drawPath = core->GetGame()->GetCurrentArea()->FindPath( pfs, p );
-
 				}
+				drawPath = core->GetGame()->GetCurrentArea()->FindPath( pfs, p );
+
 				break;
 
 			case 'o': 
@@ -563,8 +560,6 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				// jump
 				for (i = 0; i < game->selected.size(); i++) {
 					Actor* actor = game->selected[i];
-					Point p(lastMouseX, lastMouseY);
-					core->GetVideoDriver()->ConvertToGame( p.x, p.y );
 					MoveBetweenAreasCore(actor, core->GetGame()->CurrentArea, p, -1, true);
 					printf( "Teleported to %d, %d\n", p.x, p.y );
 				}
@@ -572,6 +567,9 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 
 			case 'm':
 				// 'm' ? debugdump
+				if (!lastActor) {
+					lastActor = area->GetActor( p, GA_DEFAULT);
+				}
 				if (lastActor) {
 					lastActor->DebugDump();
 					break;
@@ -592,17 +590,11 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				break;
 			case 'v':
 				// explore map from point
-				core->GetVideoDriver()->ConvertToGame( p.x, p.y );
 				area->ExploreMapChunk( p, rand()%30, true );
 				break;
 			case 'x':
 				// shows coordinates
-				 {
-					short cX = lastMouseX; 
-					short cY = lastMouseY;
-					core->GetVideoDriver()->ConvertToGame( cX, cY );
-					printf( "%s [%d.%d]\n", area->GetScriptName(), cX, cY );
-				}
+				printf( "%s [%d.%d]\n", area->GetScriptName(), p.x, p.y );
 				break;
 			case 'r':
 				if (!lastActor) {
@@ -623,10 +615,10 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					//using action so the actor is killed
 					//correctly (synchronisation)
 					lastActor->ClearActions();
+					lastActor->ClearPath();
 					char Tmp[40];
 					strncpy(Tmp,"Kill(Myself)",sizeof(Tmp) );
 					lastActor->AddAction( GenerateAction(Tmp) );
-					lastActor=NULL;
 				}
 				break;
 			case 'z': 
@@ -764,10 +756,6 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		}
 		if (actor) {
 			switch (actor->Modified[IE_EA]) {
-				case EA_EVILCUTOFF:
-				case EA_GOODCUTOFF:
-					break;
-
 				case EA_PC:
 				case EA_FAMILIAR:
 				case EA_ALLY:
@@ -837,13 +825,18 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 void GameControl::TryToAttack(Actor *source, Actor *tgt)
 {
 	char Tmp[40];
+	ieWord tmp;
 
 	//this won't work atm, target must be honoured by Attack
 	source->ClearPath();
 	source->ClearActions();
 	strncpy(Tmp,"NIDSpecial3()",sizeof(Tmp) );
-	target=tgt; //this is a hack, a deadly one
+	tmp = targetID;
+	targetID=tgt->globalID; //this is a hack, not deadly, but a hack
 	source->AddAction( GenerateAction( Tmp) );
+	//we restore the old target ID, because this variable is primarily
+	//to keep track of the target of a dialog, and attacking isn't talking
+	targetID = tmp;
 }
 
 void GameControl::TryToTalk(Actor *source, Actor *tgt)
@@ -857,7 +850,7 @@ void GameControl::TryToTalk(Actor *source, Actor *tgt)
 	source->ClearPath();
 	source->ClearActions();
 	strncpy(Tmp,"NIDSpecial1()",sizeof(Tmp) );
-	target=tgt; //this is a hack, a deadly one
+	targetID=tgt->globalID; //this is a hack, but not so deadly
 	source->AddAction( GenerateAction( Tmp) );
 }
 
@@ -868,7 +861,6 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 	actor->ClearPath();
 	actor->ClearActions();
 	strncpy(Tmp,"UseContainer()",sizeof(Tmp) );
-	//target=container; //this is another hack, even more deadly
 	core->SetCurrentContainer( actor, container);
 	actor->AddAction( GenerateAction( Tmp) );
 }
@@ -1433,14 +1425,14 @@ void GameControl::InitDialog(Actor* spk, Actor* tgt, const char* dlgref)
 	//target is here because it could be changed when a dialog runs onto
 	//and external link, we need to find the new target (whose dialog was
 	//linked to)
-	target = tgt;
-	spk->LastTalkedTo=target->GetID();
-	target->LastTalkedTo=spk->GetID();
+	targetID = tgt->globalID;
+	spk->LastTalkedTo=tgt->GetID();
+	tgt->LastTalkedTo=spk->GetID();
 	if (DialogueFlags&DF_IN_DIALOG) {
 		return;
 	}
 	UnhideGUI();
-	speaker = spk;
+	speakerID = spk->globalID;
 	ScreenFlags |= SF_GUIENABLED|SF_DISABLEMOUSE|SF_CENTERONACTOR|SF_LOCKSCROLL;
 	DialogueFlags |= DF_IN_DIALOG;
 	//allow mouse selection from dialog (even though screen is locked)
@@ -1462,15 +1454,19 @@ void GameControl::EndDialog(bool try_to_break)
 		return;
 	}
 
+	/* I'm not convinced we should call these, but it is possible
+	Actor *target = GetTarget();
+	Actor *speaker = GetSpeaker();
 	if (target) {
-		//this could be wrong
-		target->CurrentAction = NULL;
+		target->ReleaseCurrentAction();
 	}
-	if (speaker) { //this could be wrong
-		speaker->CurrentAction = NULL;
+	if (speaker) {
+		speaker->ReleaseCurrentAction();
 	}
-	speaker = NULL;
-	target = NULL;
+	*/
+
+	speakerID = 0;
+	targetID = 0;
 	ds = NULL;
 	if (dlg) {
 		delete dlg;
@@ -1493,6 +1489,19 @@ void GameControl::DialogChoose(unsigned int choose)
 		return;
 	}
 
+	Actor *speaker = GetSpeaker();
+	if (!speaker) {
+		printMessage("GameControl","Speaker gone???",LIGHT_RED);
+		EndDialog();
+		return;
+	}
+
+	Actor *target = GetTarget();
+	if (!target) {
+		printMessage("GameControl","Target gone???",LIGHT_RED);
+		EndDialog();
+		return;
+	}
 	//get the first state with true triggers!
 	int si;
 	if (choose == (unsigned int) -1) {
@@ -1506,14 +1515,10 @@ void GameControl::DialogChoose(unsigned int choose)
 		//increasing talkcount after top level condition was determined
 		if (DialogueFlags&DF_TALKCOUNT) {
 			DialogueFlags&=~DF_TALKCOUNT; 
-			if (target->Type == ST_ACTOR) {
-				((Actor *) target)->TalkCount++;
-			}
+			target->TalkCount++;
 		} else if (DialogueFlags&DF_INTERACT) {
 			DialogueFlags&=~DF_INTERACT;
-			if (target->Type == ST_ACTOR) {
-				((Actor *) target)->InteractCount++;
-			}
+			target->InteractCount++;
 		}
 		ds = dlg->GetState( si );
 	} else {
@@ -1583,6 +1588,7 @@ void GameControl::DialogChoose(unsigned int choose)
 				EndDialog();
 				return;
 			}
+			targetID = target->globalID;
 			// we have to make a backup, tr->Dialog is freed
 			ieResRef tmpresref;
 			strnuprcpy(tmpresref,tr->Dialog, 8);
@@ -1654,6 +1660,8 @@ end_of_choose:
 	// is this correct?
 	if (DialogueFlags & DF_FREEZE_SCRIPTS) {
 		target->ProcessActions();
+		//clear queued actions that remained stacked?
+		target->ClearActions();
 	}
 }
 
@@ -1750,9 +1758,9 @@ Sprite2D* GameControl::GetPreview()
 	return preview;
 }
 
-Actor *GameControl::GetLastActor()
+Actor *GameControl::GetActorByGlobalID(ieWord ID)
 {
-	if (!lastActorID)
+	if (!ID)
 		return NULL;
 	Game* game = core->GetGame();
 	if (!game)
@@ -1762,5 +1770,20 @@ Actor *GameControl::GetLastActor()
 	if (!area)
 		return NULL;
 	return
-		area->GetActorByGlobalID(lastActorID);
+		area->GetActorByGlobalID(ID);
+}
+
+Actor *GameControl::GetLastActor()
+{
+	return GetActorByGlobalID(lastActorID);
+}
+
+Actor *GameControl::GetTarget()
+{
+	return GetActorByGlobalID(targetID);
+}
+
+Actor *GameControl::GetSpeaker()
+{
+	return GetActorByGlobalID(speakerID);
 }

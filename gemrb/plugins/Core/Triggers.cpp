@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.24 2005/08/10 16:15:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.25 2005/11/20 11:01:32 avenger_teambg Exp $
  *
  */
 
@@ -34,6 +34,10 @@ int GameScript::BreakingPoint(Scriptable* Sender, Trigger* /*parameters*/)
 int GameScript::Reaction(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr) {
+		parameters->Dump();
+		return 0;
+	}
 	int value=GetReaction(scr);
 	return value == parameters->int0Parameter;
 }
@@ -41,6 +45,10 @@ int GameScript::Reaction(Scriptable* Sender, Trigger* parameters)
 int GameScript::ReactionGT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr) {
+		parameters->Dump();
+		return 0;
+	}
 	int value=GetReaction(scr);
 	return value > parameters->int0Parameter;
 }
@@ -48,6 +56,10 @@ int GameScript::ReactionGT(Scriptable* Sender, Trigger* parameters)
 int GameScript::ReactionLT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr) {
+		parameters->Dump();
+		return 0;
+	}
 	int value=GetReaction(scr);
 	return value < parameters->int0Parameter;
 }
@@ -208,7 +220,8 @@ int GameScript::IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters)
 	//this might disturb some modders, but this is the correct behaviour
 	//for example the aaquatah dialog in irenicus dungeon depends on it
 	GameControl *gc = core->GetGameControl();
-	if (scr == gc->target || scr==gc->speaker) {
+	Actor *pc = (Actor *) scr;
+	if (pc->globalID == gc->targetID || pc->globalID==gc->speakerID) {
 		return 0;
 	}
 	return ValidForDialogCore( Sender, target );
@@ -282,7 +295,7 @@ int GameScript::IsGabber(Scriptable* Sender, Trigger* parameters)
 	if (!scr || scr->Type!=ST_ACTOR) {
 		return 0;
 	}
-	if ((Actor *) scr == core->GetGameControl()->speaker)
+	if (((Actor *) scr)->globalID == core->GetGameControl()->speakerID)
 		return 1;
 	return 0;
 }
@@ -2220,7 +2233,7 @@ int GameScript::NullDialog(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor *actor = (Actor *) tar;
 	GameControl *gc = core->GetGameControl();
-	if ( (actor != gc->target) && (actor != gc->speaker) ) {
+	if ( (actor->globalID != gc->targetID) && (actor->globalID != gc->speakerID) ) {
 		return 1;
 	}
 	return 0;
@@ -2359,10 +2372,12 @@ int GameScript::InteractingWith(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	GameControl *gc = core->GetGameControl();
-	if (Sender != gc->target && Sender != gc->speaker) {
+	Actor *pc = (Actor *) Sender;
+	if (pc->globalID != gc->targetID && pc->globalID != gc->speakerID) {
 		return 0;
 	}
-	if (tar != gc->target && tar!=gc->speaker) {
+	pc = (Actor *) tar;
+	if (pc->globalID != gc->targetID && pc->globalID != gc->speakerID) {
 		return 0;
 	}
 	return 1;

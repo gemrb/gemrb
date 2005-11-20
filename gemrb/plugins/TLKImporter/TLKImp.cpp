@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.52 2005/11/14 20:13:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.53 2005/11/20 11:01:33 avenger_teambg Exp $
  *
  */
 
@@ -108,7 +108,7 @@ inline Actor *GetActorFromSlot(int slot)
 	if (slot==-1) {
 		GameControl *gc = core->GetGameControl();
 		if (gc) {
-			return gc->speaker;
+			return gc->GetSpeaker();
 		}
 		return NULL;
 	}
@@ -216,7 +216,7 @@ int TLKImp::BuiltinToken(char* Token, char* dest)
 	}
 	if (!strcmp( Token, "GABBER" )) {
 		//don't free this!
-		Decoded=core->GetGameControl()->speaker->LongName;
+		Decoded=core->GetGameControl()->GetSpeaker()->LongName;
 		freeup = false;
 		goto exit_function;
 	}
@@ -466,10 +466,12 @@ char* TLKImp::GetString(ieStrRef strref, ieDword flags)
 	if (( type & 2 ) && ( flags & IE_STR_SOUND )) {
 		//if flags&IE_STR_SOUND play soundresref
 		if (SoundResRef[0] != 0) {
-			Scriptable *target=core->GetGameControl()->target;
+/* this seems to be needless
+			Scriptable *target=core->GetGameControl()->GetTarget();
 			if (!target) {
-				target=core->GetGameControl()->speaker;
+				target=core->GetGameControl()->GetSpeaker();
 			}
+*/
 			int xpos = 0;
 			int ypos = 0;
 			unsigned int flag = GEM_SND_RELATIVE | (flags&GEM_SND_SPEECH);

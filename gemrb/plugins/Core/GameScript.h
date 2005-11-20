@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.220 2005/11/14 23:34:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.221 2005/11/20 11:01:32 avenger_teambg Exp $
  *
  */
 
@@ -40,6 +40,9 @@ class Action;
 #define DS_CONST   8
 #define DS_NONAME  16
 
+//verbal constant
+#define VB_ATTACK  9
+
 //diffmode (iwd2)
 #define DM_EQUAL   1
 #define DM_LESS    2
@@ -47,6 +50,7 @@ class Action;
 
 //attack core flags
 #define AC_REEVALUATE 1
+#define AC_NO_SOUND   2
 
 //trigger flags stored in triggers in .bcs files
 #define NEGATE_TRIGGER 1
@@ -163,7 +167,6 @@ public:
 	Trigger()
 	{
 		objectParameter = NULL;
-		RefCount = 1;
 		string0Parameter[0] = 0;
 		string1Parameter[0] = 0;
 		int0Parameter = 0;
@@ -190,31 +193,29 @@ public:
 	char string1Parameter[65];
 	Object* objectParameter;
 private:
-	int RefCount;
 	volatile unsigned long canary;
 public:
+	void Dump()
+	{
+		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
+		printf ("Trigger: %d\n", triggerID);
+		printf ("Int parameters: %d %d %d\n", int0Parameter, int1Parameter, int2Parameter);
+		printf ("Point: [%d.%d]\n", pointParameter.x, pointParameter.y);
+		printf ("String0: %s\n", string0Parameter);
+		printf ("String1: %s\n", string1Parameter);
+		if (objectParameter) {
+			objectParameter->Dump();
+		} else {
+			printf("No object\n");
+		}
+		printf("\n");
+	}
+
 	void Release()
 	{
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		if (!RefCount) {
-			printf( "WARNING!!! Double Freeing in %s: Line %d\n", __FILE__,
-				__LINE__ );
-			abort();
-		}
-		RefCount--;
-		if (!RefCount) {
-			canary = 0xdddddddd;
-			delete this;
-		}
-	}
-	void IncRef()
-	{
-		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		RefCount++;
-		if (RefCount >= 4000) {
-			printf( "Refcount increased to: %d in trigger\n", RefCount );
-			abort();
-		}
+		canary = 0xdddddddd;
+		delete this;
 	}
 };
 
@@ -222,7 +223,6 @@ class GEM_EXPORT Condition {
 public:
 	Condition()
 	{
-		RefCount = 1;
 		triggers = NULL;
 		triggersCount = 0;
 		canary = (unsigned long) 0xdeadbeef;
@@ -244,31 +244,13 @@ public:
 	unsigned short triggersCount;
 	Trigger** triggers;
 private:
-	int RefCount;
 	volatile unsigned long canary;
 public:
 	void Release()
 	{
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		if (!RefCount) {
-			printf( "WARNING!!! Double Freeing in %s: Line %d\n", __FILE__,
-				__LINE__ );
-			abort();
-		}
-		RefCount--;
-		if (!RefCount) {
-			canary = 0xdddddddd;
-			delete this;
-		}
-	}
-	void IncRef()
-	{
-		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		RefCount++;
-		if (RefCount >= 4000) {
-			printf( "Refcount increased to: %d in condition\n", RefCount );
-			abort();
-		}
+		canary = 0xdddddddd;
+		delete this;
 	}
 };
 
@@ -334,6 +316,8 @@ public:
 				printf( "%d. Object - NULL\n",i+1);
 			}
 		}
+
+		printf("RefCount: %d\n", RefCount);
 	}
 
 	void Release()
@@ -378,6 +362,9 @@ public:
 		}
 		for (int c = 0; c < actionsCount; c++) {
 			if (actions[c]) {
+				if (actions[c]->GetRef()>2) {
+					printf("Residue action %d with refcount %d\n", actions[c]->actionID, actions[c]->GetRef());
+				}
 				actions[c]->Release();
 				actions[c] = NULL;
 			}
@@ -403,7 +390,6 @@ class GEM_EXPORT ResponseSet {
 public:
 	ResponseSet()
 	{
-		RefCount = 1;
 		responses = NULL;
 		responsesCount = 0;
 		canary = (unsigned long) 0xdeadbeef;
@@ -423,31 +409,13 @@ public:
 	unsigned short responsesCount;
 	Response** responses;
 private:
-	int RefCount;
 	volatile unsigned long canary;
 public:
 	void Release()
 	{
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		if (!RefCount) {
-			printf( "WARNING!!! Double Freeing in %s: Line %d\n", __FILE__,
-				__LINE__ );
-			abort();
-		}
-		RefCount--;
-		if (!RefCount) {
-			canary = 0xdddddddd;
-			delete this;
-		}
-	}
-	void IncRef()
-	{
-		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		RefCount++;
-		if (RefCount >= 4000) {
-			printf( "Refcount increased to: %d\n", RefCount );
-			abort();
-		}
+		canary = 0xdddddddd;
+		delete this;
 	}
 };
 
@@ -942,6 +910,8 @@ public:
 	static void ApplySpellPoint(Scriptable* Sender, Action* parameters);
 	static void AttachTransitionToDoor(Scriptable* Sender, Action* parameters);
 	static void Attack(Scriptable* Sender, Action* parameters);
+	static void AttackNoSound(Scriptable* Sender, Action* parameters);
+	static void AttackOneRound(Scriptable* Sender, Action* parameters);
 	static void AttackReevaluate(Scriptable* Sender, Action* parameters);
 	static void BattleSong(Scriptable* Sender, Action* parameters);
 	static void Berserk(Scriptable* Sender, Action* parameters);

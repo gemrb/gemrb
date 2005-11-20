@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.328 2005/11/14 23:34:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.329 2005/11/20 11:01:32 avenger_teambg Exp $
  *
  */
 
@@ -28,7 +28,8 @@
 // 1 - cache
 // 2 - cutscene ID
 // 4 - globals
-// 8 - script/trigger execution
+// 8 - action execution
+//16 - trigger evaluation
 
 //Make this an ordered list, so we could use bsearch!
 static TriggerLink triggernames[] = {
@@ -328,7 +329,8 @@ static ActionLink actionnames[] = {
 	{"applyspellpoint", GameScript::ApplySpellPoint, 0}, //gemrb extension
 	{"attachtransitiontodoor", GameScript::AttachTransitionToDoor, 0},
 	{"attack", GameScript::Attack,AF_BLOCKING},
-	{"attackoneround", GameScript::Attack,AF_BLOCKING},//need a way to stop
+	{"attacknosound", GameScript::AttackNoSound,AF_BLOCKING}, //no sound yet anyway
+	{"attackoneround", GameScript::AttackOneRound,AF_BLOCKING},
 	{"attackreevaluate", GameScript::AttackReevaluate,AF_BLOCKING},
 	{"backstab", GameScript::Attack,AF_BLOCKING},//actually hide+attack
 	{"bashdoor", GameScript::OpenDoor,AF_BLOCKING}, //the same until we know better
@@ -1457,6 +1459,7 @@ Response* GameScript::ReadResponse(DataStream* stream)
 	rE->weight = (unsigned char)strtoul(line,&poi,10);
 	std::vector< Action*> aCv;
 	if (strncmp(poi,"AC",2)==0) while (true) {
+		//not autofreed, because it is referenced by the Script
 		Action* aC = new Action(false);
 		count = stream->ReadLine( line, 1024 );
 		aC->actionID = (unsigned short)strtoul(line, NULL,10);
@@ -1542,7 +1545,7 @@ Targets *GameScript::Gabber(Scriptable* /*Sender*/, Targets *parameters)
 	parameters->Clear();
 	GameControl* gc = core->GetGameControl();
 	if (gc) {
-		parameters->AddTarget(gc->speaker, 0);
+		parameters->AddTarget(gc->GetSpeaker(), 0);
 	}
 	return parameters;
 }
@@ -2698,8 +2701,15 @@ int GameScript::ExecuteResponse(Scriptable* Sender, Response* rE)
 	return ret;
 }
 
+void PrintAction(int actionID)
+{
+	printf("Action: %d %s\n", actionID , actionsTable->GetValue(actionID) );
+}
+
 void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 {
+	int actionID = aC->actionID;
+
 	if (aC->objects[0]) {
 		Scriptable *scr = GetActorFromObject(Sender, aC->objects[0]);
 		if (scr) {
@@ -2707,20 +2717,20 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 				printMessage("GameScript"," ",YELLOW);
 				printf("Sender: %s-->override: %s\n",Sender->GetScriptName(), scr->GetScriptName() );
 			}
-			scr->AddAction(ParamCopyNoOverride(Sender->CurrentAction));
+			//Sender->CurrentAction
+			scr->AddAction(ParamCopyNoOverride(aC));
 		} else {
 			printMessage("GameScript","Actionoverride failed for object: \n",LIGHT_RED);
 			aC->objects[0]->Dump();
 		}
-		Sender->CurrentAction=NULL;
-		aC->Release();
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 	if (InDebug&ID_ACTIONS) {
 		printMessage("GameScript"," ",YELLOW);
 		printf("Sender: %s\n",Sender->GetScriptName() );
 	}
-	ActionFunction func = actions[aC->actionID];
+	ActionFunction func = actions[actionID];
 	if (func) {
 		//turning off interruptable flag
 		//uninterruptable actions will set it back
@@ -2730,25 +2740,30 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		}
 		func( Sender, aC );
 	} else {
-		actions[aC->actionID] = NoActionAtAll;
-		printMessage("GameScript", " ", YELLOW);
-		printf("Unhandled action code: %d %s\n", aC->actionID , actionsTable->GetValue(aC->actionID) );
-		Sender->CurrentAction = NULL;
-		aC->Release();
+		actions[actionID] = NoActionAtAll;
+		printMessage("GameScript", "Unknown ", YELLOW);
+		PrintAction(actionID);
+		Sender->ReleaseCurrentAction();
 		return;
 	}
-	if (!( actionflags[aC->actionID] & AF_BLOCKING )) {
-		Sender->CurrentAction = NULL;
-	}
-	if (actionflags[aC->actionID] & AF_INSTANT) {
+
+	//don't bother with special flow control actions
+	if (actionflags[actionID] & AF_INSTANT) {
 		//this action never entered the action queue, therefore shouldn't be freed
 		if (aC->GetRef()!=1) {
-			printf("Action %d made it into the action queue!\n", aC->actionID);
+			printf("Instant action got queued!\n");
+			PrintAction(actionID);
 			abort();
 		}
 		return;
 	}
-	aC->Release();
+
+	//Releasing nonblocking actions, blocking actions will release themselves
+	if (!( actionflags[actionID] & AF_BLOCKING )) {
+		Sender->ReleaseCurrentAction();
+		//aC is invalid beyond this point, so we return!
+		return;
+	}
 }
 
 Trigger* GenerateTrigger(char* String)

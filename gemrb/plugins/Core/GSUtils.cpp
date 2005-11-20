@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.29 2005/11/14 23:34:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.30 2005/11/20 11:01:32 avenger_teambg Exp $
  *
  */
 
@@ -606,7 +606,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	} else {
 		if (Flags & BD_NUMERIC) {
 			//the target was already set, this is a crude hack
-			tar = core->GetGameControl()->target;
+			tar = core->GetGameControl()->GetTarget();
 		}
 		else {
 			tar = GetActorFromObject( Sender, parameters->objects[1] );
@@ -615,7 +615,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	}
 	if (!scr || scr->Type != ST_ACTOR) {
 		printf("[GameScript]: Speaker for dialog couldn't be found (Sender: %s, Type: %d).\n", Sender->GetScriptName(), Sender->Type);
-		Sender->CurrentAction = NULL;
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 
@@ -624,14 +624,13 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		if (Sender->Type == ST_ACTOR) {
 			((Actor *) Sender)->DebugDump();
 		}
-		//parameters->Dump();
 		printf ("Target object: ");
 		if (parameters->objects[1]) {
 			parameters->objects[1]->Dump();
 		} else {
 			printf("<NULL>\n");
 		}
-		Sender->CurrentAction = NULL;
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 
@@ -643,14 +642,14 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		printf("ValidForDialogCore returned false! Speaker and target are:\n");
 		((Actor *) scr)->DebugDump();
 		((Actor *) tar)->DebugDump();
-		Sender->CurrentAction = NULL;
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 	if (speaker->GetStat(IE_STATE_ID)&STATE_DEAD) {
 		printf("Speaker is dead, cannot start dialogue. Speaker and target are:\n");
 		((Actor *) scr)->DebugDump();
 		((Actor *) tar)->DebugDump();
-		Sender->CurrentAction = NULL;
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 
@@ -658,7 +657,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	if (Flags&BD_CHECKDIST) {
 		if (Distance(speaker, target)>speaker->GetStat(IE_DIALOGRANGE)*20 ) {
 			GoNearAndRetry(Sender, tar, true); //this is unsure, the target's path will be cleared
-			Sender->CurrentAction = NULL;
+			Sender->ReleaseCurrentAction();
 			return;
 		}
 	}
@@ -670,7 +669,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	GameControl* gc = core->GetGameControl();
 	if (!gc) {
 		printMessage( "GameScript","Dialog cannot be initiated because there is no GameControl.", YELLOW );
-		Sender->CurrentAction = NULL;
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 	//can't initiate dialog, because it is already there
@@ -682,7 +681,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		//check if we could manage to break it, not all dialogs are breakable!
 		if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
 			printMessage( "GameScript","Dialog cannot be initiated because there is already one.", YELLOW );
-			Sender->CurrentAction = NULL;
+			Sender->ReleaseCurrentAction();
 			return;
 		}
 	}
@@ -718,7 +717,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	}
 
 	//maybe we should remove the action queue, but i'm unsure
-	Sender->CurrentAction = NULL;
+	Sender->ReleaseCurrentAction();
 
 	//dialog is not meaningful
 	if (!Dialog || Dialog[0]=='*') {
@@ -741,9 +740,9 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		
 	}
 
-	scr->ClearActions();
-	if (scr!=tar)
-		tar->ClearActions();
+	//don't clear target's actions, because a sequence like this will be broken:
+	//StartDialog([PC]); SetGlobal("Talked","LOCALS",1);
+	speaker->ClearActions();
 	speaker->SetOrientation(GetOrient( target->Pos, speaker->Pos), true);
 	target->SetOrientation(GetOrient( speaker->Pos, target->Pos), true);
 
@@ -799,31 +798,54 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 {
 	//this is a dangerous cast, make sure actor is Actor * !!!
 	Actor *actor = (Actor *) Sender;
+
+	//replace the action for the xth time
+	if (flags&AC_REEVALUATE) {
+		if (!parameters->int0Parameter) {
+			//dropping the action, since it has 0 refcount, we should
+			//delete it instead of release otherwise we trigger a tripwire
+			//if ParamCopy will ever create it with 1 refcount, we could
+			//change this to a Release()
+			delete parameters;
+			return;
+		}
+		parameters->int0Parameter--;
+		Sender->ReleaseCurrentAction();
+		//parameters action was created from the scratch, by adding it, it will
+		//have one RefCount
+		parameters->IncRef();
+		Sender->CurrentAction=parameters;
+		//we call GoNearAndRetry
+		//Sender->AddAction(parameters);
+	}
+
+	//if distance is too much, insert a move action and requeue the action
 	unsigned int wrange = actor->GetWeaponRange() * 10;
 	if ( wrange == 0) {
-		//printMessage("GameScript","Zero weapon range!\n",LIGHT_RED);
-		//actor->SetWait( 5 );
 		wrange = 10;
-		/*
-		if (flags&AC_REEVALUATE) {
-			delete parameters;
-		}
-		return;
-		*/
 	}
+
+	if (!(flags&AC_NO_SOUND) ) {
+		if (target->Type!=ST_ACTOR || actor->LastTarget != ((Actor *) target)->GetID() ) {
+			DisplayStringCore(Sender, VB_ATTACK, DS_CONSOLE|DS_CONST );
+			//play attack sound
+		}
+	}
+
 	if ( Distance(Sender, target) > wrange ) {
+		//we couldn't perform the action right now
+		//so we add it back to the queue with an additional movement
+		//increases refcount of Sender->CurrentAction, by pumping it back
+		//in the action queue
 		GoNearAndRetry(Sender, target, true);
-		if (flags&AC_REEVALUATE) {
-			delete parameters;
-		}
+		Sender->ReleaseCurrentAction();
 		return;
 	}
+	//action performed
 	actor->SetTarget( target );
-	//attackreevaluate
-	if ( (flags&AC_REEVALUATE) && parameters->int0Parameter) {
-		parameters->int0Parameter--;
-		Sender->AddAction( parameters );
-	}
+	//it shouldn't be a problem to call this the secodn time (in case of attackreevaluate)
+	//because ReleaseCurrentAction() allows NULL 
+	Sender->ReleaseCurrentAction();
 }
 
 bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
@@ -863,6 +885,15 @@ int GetObjectCount(Scriptable* Sender, Object* oC)
 	return count;
 }
 
+//we need this because some special characters like _ or * are also accepted
+bool inline ismysymbol(const char letter)
+{
+	if (letter==')') return false;
+	if (letter=='(') return false;
+	if (letter==',') return false;
+	return true;
+}
+
 //this function returns a value, symbol could be a numeric string or
 //a symbol from idsname
 static int GetIdsValue(const char *&symbol, const char *idsname)
@@ -885,7 +916,7 @@ static int GetIdsValue(const char *&symbol, const char *idsname)
 	}
 	char symbolname[64];
 	int x;
-	for (x=0;isalnum(*symbol) && x<(int) sizeof(symbolname)-1;x++) {
+	for (x=0;ismysymbol(*symbol) && x<(int) sizeof(symbolname)-1;x++) {
 		symbolname[x]=*symbol;
 		symbol++;
 	}
@@ -938,6 +969,9 @@ static void ParseObject(const char *&str,const char *&src, Object *&object)
 				break;
 			}
 			src++; //skipping (
+			if (*src==')') {
+				break;
+			}
 			Nesting++;
 		}
 		if (*src=='[') {
@@ -1140,9 +1174,11 @@ void GoNearAndRetry(Scriptable *Sender, Scriptable *target, bool flag)
 
 void GoNearAndRetry(Scriptable *Sender, Point &p)
 {
-	if (Sender->CurrentAction) {
-		Sender->AddActionInFront( Sender->CurrentAction );
+	if (!Sender->CurrentAction) {
+		printMessage("GameScript","NULL action retried???\n",LIGHT_RED);
+		return;
 	}
+	Sender->AddActionInFront( Sender->CurrentAction );
 	char Tmp[256];
 	sprintf( Tmp, "MoveToPoint([%hd.%hd])", p.x, p.y );
 	Sender->AddActionInFront( GenerateAction( Tmp) );

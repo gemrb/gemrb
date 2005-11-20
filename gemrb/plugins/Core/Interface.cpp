@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.363 2005/11/17 23:49:22 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.364 2005/11/20 11:01:32 avenger_teambg Exp $
  *
  */
 
@@ -1138,7 +1138,7 @@ bool Interface::IsAvailable(SClass_ID filetype)
 
 WorldMap *Interface::GetWorldMap(const char *map)
 {
-	unsigned int index = worldmap->FindAndSetCurrentMap(map?map:game->CurrentArea);
+	int index = worldmap->FindAndSetCurrentMap(map?map:game->CurrentArea);
 	return worldmap->GetWorldMap(index);
 }
 
