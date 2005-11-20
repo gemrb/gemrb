@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.24 2005/11/20 21:05:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.25 2005/11/20 21:31:11 avenger_teambg Exp $
  *
  */
 
@@ -35,9 +35,9 @@ BMPImp::BMPImp(void)
 	Palette = NULL;
 	pixels = NULL;
 	if (DataStream::IsEndianSwitch()) {
-		red_mask = 0x0000ff00;
-		green_mask = 0x00ff0000;
-		blue_mask = 0xff000000;
+		red_mask = 0x000000ff;
+		green_mask = 0x0000ff00;
+		blue_mask = 0x00ff0000;
 	}
 }
 

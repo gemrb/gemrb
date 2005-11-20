@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PLTImporter/PLTImp.cpp,v 1.9 2004/12/14 22:37:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PLTImporter/PLTImp.cpp,v 1.10 2005/11/20 21:31:12 avenger_teambg Exp $
  *
  */
 
@@ -27,11 +27,20 @@
 static int initial[8]={20,31,31,7,14,20,0,0};
 static int pperm[8]={2,5,6,0,4,3,1,7};
 
+static ieDword red_mask = 0xff000000;
+static ieDword green_mask = 0x00ff0000;
+static ieDword blue_mask = 0x0000ff00;
+
 PLTImp::PLTImp(void)
 {
 	str = NULL;
 	autoFree = false;
 	pixels = NULL;
+	if (DataStream::IsEndianSwitch()) {
+		red_mask = 0x000000ff;
+		green_mask = 0x0000ff00;
+		blue_mask = 0x00ff0000;
+	}
 }
 
 PLTImp::~PLTImp(void)
@@ -106,8 +115,8 @@ Sprite2D* PLTImp::GetImage()
 		}
 	}
 	Sprite2D* spr = core->GetVideoDriver()->CreateSprite( Width, Height, 32,
-		0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff, p,
-		true, 0x00ff0000 );
+		red_mask, green_mask, blue_mask, 0, p,
+		true, green_mask );
 	spr->XPos = 0;
 	spr->YPos = 0;
 	return spr;

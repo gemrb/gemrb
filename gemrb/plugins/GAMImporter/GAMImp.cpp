@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.63 2005/11/16 20:05:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.64 2005/11/20 21:31:11 avenger_teambg Exp $
  *
  */
 
@@ -153,7 +153,7 @@ Game* GAMImp::GetGame()
 	}
 
 	if (!newGame->CurrentArea[0]) {
-		// 0 - single player, 1 - tutorial, 2 - multiplayer
+		// 0 - normal, 1 - tutorial, 2 - extension
 		int i = core->LoadTable( "STARTARE" );
 		TableMgr* tm = core->GetTable( i );
 		ieDword playmode = 0;

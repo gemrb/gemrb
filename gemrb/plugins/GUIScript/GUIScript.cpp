@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.340 2005/11/19 16:37:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.341 2005/11/20 21:31:12 avenger_teambg Exp $
  *
  */
 
@@ -5263,8 +5263,21 @@ static PyObject* GemRB_GamePause(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GamePause__doc );
 	}
 
-	core->timer->Freeze ();
-	core->DisplayString( "Paused" );
+	GameControl *gc = core->GetGameControl();
+        if (gc) {
+		if (pause) {
+	                gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
+		} else {
+	                gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_NAND);
+		}
+		if (!quiet) {
+			if (gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS) {
+		                core->DisplayConstantString(STR_PAUSED,0xff0000);
+			} else {
+		                core->DisplayConstantString(STR_UNPAUSED,0xff0000);
+			}
+		}
+        }
 
 	Py_INCREF( Py_None );
 	return Py_None;
