@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.23 2005/11/14 23:34:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.24 2005/11/20 21:05:39 avenger_teambg Exp $
  *
  */
 
@@ -24,12 +24,21 @@
 #include "../../includes/RGBAColor.h"
 #include "../Core/Interface.h"
 
+static ieDword red_mask = 0x00ff0000;
+static ieDword green_mask = 0x0000ff00;
+static ieDword blue_mask = 0x000000ff;
+
 BMPImp::BMPImp(void)
 {
 	str = NULL;
 	autoFree = false;
 	Palette = NULL;
 	pixels = NULL;
+	if (DataStream::IsEndianSwitch()) {
+		red_mask = 0x0000ff00;
+		green_mask = 0x00ff0000;
+		blue_mask = 0xff000000;
+	}
 }
 
 BMPImp::~BMPImp(void)
@@ -237,8 +246,8 @@ Sprite2D* BMPImp::GetImage()
 		void* p = malloc( Width * Height * 3 );
 		memcpy( p, pixels, Width * Height * 3 );
 		spr = core->GetVideoDriver()->CreateSprite( Width, Height, 24,
-			0x00ff0000, 0x0000ff00, 0x000000ff, 0x00000000, p,
-			true, 0x0000ff00 );
+			red_mask, green_mask, blue_mask, 0x00000000, p,
+			true, green_mask );
 	} else if (BitCount == 8) {
 		void* p = malloc( Width* Height );
 		memcpy( p, pixels, Width * Height );

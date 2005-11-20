@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MOSImporter/MOSImp.cpp,v 1.12 2005/03/18 20:01:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MOSImporter/MOSImp.cpp,v 1.13 2005/11/20 21:05:40 avenger_teambg Exp $
  *
  */
 
@@ -27,10 +27,19 @@
 #include "../Core/CachedFileStream.h"
 #include "../Core/Interface.h"
 
+static ieDword red_mask = 0xff000000;
+static ieDword green_mask = 0x00ff0000;
+static ieDword blue_mask = 0x0000ff00;
+
 MOSImp::MOSImp(void)
 {
 	str = NULL;
 	autoFree = false;
+	if (DataStream::IsEndianSwitch()) {
+		red_mask = 0x000000ff;
+		green_mask = 0x0000ff00;
+		blue_mask = 0x00ff0000;
+	}
 }
 
 MOSImp::~MOSImp(void)
@@ -148,9 +157,8 @@ Sprite2D* MOSImp::GetImage()
 	}
 	free( blockpixels );
 	Sprite2D* ret = core->GetVideoDriver()->CreateSprite( Width, Height, 32,
-		0xff000000, 0x00ff0000, 0x0000ff00, 0x00000000,
-		pixels, true, 0x00ff0000 );
-	//ret->XPos = ret->YPos = 0;
+		red_mask, green_mask, blue_mask, 0,
+		pixels, true, green_mask );
 	return ret;
 }
 /** No descriptions */
