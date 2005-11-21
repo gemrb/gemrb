@@ -78,8 +78,9 @@ def DonePress():
 		GemRB.UnloadWindow(PartySelectWindow)
 		GemRB.LoadGame(-1)
 		#here we should load the party characters
-		LoadPartyCharacters()
-		GemRB.SetNextScript("SPPartyFormation")
+		#but gemrb engine limitations require us to
+		#return to the main engine (loadscreen)
+		GemRB.SetNextScript("SPParty2")
 	return	
 	
 def CancelPress():
