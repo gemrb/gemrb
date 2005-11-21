@@ -119,14 +119,14 @@ def GetColor():
 
 	ColorPicker=GemRB.LoadWindow(14)
 	GemRB.SetVar("Selected",-1)
-	for i in range(0,34):
+	for i in range(34):
 		Button = GemRB.GetControl(ColorPicker, i)
 		GemRB.SetButtonState(ColorPicker, Button, IE_GUI_BUTTON_LOCKED)
 		GemRB.SetButtonFlags(ColorPicker, Button, IE_GUI_BUTTON_PICTURE,OP_OR)
 		#GemRB.SetButtonFlags(ColorPicker, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 
 	Selected = -1
-	for i in range(0,34):
+	for i in range(34):
 		MyColor = GemRB.GetTableValue(ColorTable, ColorIndex, i)
 		if MyColor == "*":
 			break
