@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/TextScreen.py,v 1.6 2005/08/15 20:29:15 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/TextScreen.py,v 1.7 2005/11/21 21:21:31 avenger_teambg Exp $
 
 # TextScreen.py - display Loading screen
 
@@ -27,7 +27,6 @@ from GUIDefines import *
 
 TextScreen = None
 TextArea = None
-Position = 1
 
 def StartTextScreen ():
 	global TextScreen, TextArea
@@ -67,24 +66,18 @@ def StartTextScreen ():
 
 
 def FeedScroll ():
-	global TextScreen, TextArea, Position
+	global TextScreen, TextArea
 
-	if Position:
-		TableName = GemRB.GetGameString (STR_LOADMOS)
-		print TableName
-		Table = GemRB.LoadTable(TableName)
-		print Table
-		Value = GemRB.GetTableValue (Table, 1, 1)
-		print Value
-		GemRB.UnloadTable (Table)
-		GemRB.TextAreaAppend (TextScreen, TextArea, Value)
-		Position = 0
+	TableName = GemRB.GetGameString (STR_LOADMOS)
+	Table = GemRB.LoadTable(TableName)
+	Value = GemRB.GetTableValue (Table, 1, 1)
+	GemRB.UnloadTable (Table)
+	GemRB.TextAreaAppend (TextScreen, TextArea, Value)
 
 
 def ReplayTextScreen ():
-	global TextScreen, TextArea, Position
+	global TextScreen, TextArea
 
-	Position = 1
 	GemRB.RewindTA (TextScreen, TextArea, 100)
 
 

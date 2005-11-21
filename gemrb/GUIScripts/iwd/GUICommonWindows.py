@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUICommonWindows.py,v 1.8 2005/05/29 12:59:43 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUICommonWindows.py,v 1.9 2005/11/21 21:21:31 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -44,7 +44,7 @@ FRAME_PC_TARGET   = 1
 # 9 REST
 # 10 TXTE
 
-def SetupMenuWindowControls (Window):
+def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	# FIXME: add "(key)" to tooltips!
 
 	# Return to Game
@@ -106,15 +106,17 @@ def SetupMenuWindowControls (Window):
 	GemRB.SetTooltip (Window, Button, 16312)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")
 
+        if Gears:
+                # Gears (time)
+                Button = GemRB.GetControl (Window, 9)
+                GemRB.SetAnimation (Window, Button, "CGEAR")
+                GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
+                GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_LOCKED)
+
 ## 	# Rest
 ## 	Button = GemRB.GetControl (Window, 8)
 ## 	GemRB.SetTooltip (Window, Button, 11942)
 ## 	GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreWindow")
-
-	# AI
-	#Button = GemRB.GetControl (Window, 9)
-	#GemRB.SetTooltip (Window, Button, 41631) # or 41646 Activate ...
-	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenFloatMenuWindow")
 	return
 
 def ReturnToGame ():
@@ -194,11 +196,20 @@ def RunSelectionChangeHandler ():
 def OpenPortraitWindow (needcontrols):
 	global PortraitWindow
 
-	#we use needcontrols to determine which window is the portraitwindow
-	if needcontrols:
-		PortraitWindow = Window = GemRB.LoadWindow(26)
-	else:
-		PortraitWindow = Window = GemRB.LoadWindow(1)
+	PortraitWindow = Window = GemRB.LoadWindow(1)
+        if needcontrols:
+                Button=GemRB.GetControl(PortraitWindow, 8)
+                GemRB.SetEvent(PortraitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "MinimizePortraits")
+
+                # AI
+                Button = GemRB.GetControl (Window, 6)
+                GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
+                GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "AIPress")
+
+                #Select All
+                Button = GemRB.GetControl (Window, 7)
+                GemRB.SetTooltip (Window, Button, 10485)
+                GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
 
 	for i in range (PARTY_SIZE):
 		Button = GemRB.GetControl (Window, i)
