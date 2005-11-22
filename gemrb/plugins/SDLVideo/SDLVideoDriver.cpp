@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.113 2005/11/22 21:51:29 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.114 2005/11/22 23:00:41 avenger_teambg Exp $
  *
  */
 
@@ -416,7 +416,7 @@ Sprite2D* SDLVideoDriver::CreateSpriteRLE8(int w, int h, void* rledata,
 	spr->vptr = data;
 
 	SDL_Color* pal = (SDL_Color*) palette;
-	std::memcpy(data->pal, pal, 256*sizeof(pal[0]));
+	memcpy(data->pal, pal, 256*sizeof(pal[0]));
 	data->transindex = transindex;
 	data->datasize = datasize;
 	data->flip_hor = false;
@@ -1123,7 +1123,7 @@ void SDLVideoDriver::SetPalette(Sprite2D* spr, Color* pal)
 	} else {
 		if (!spr->vptr) return;
 		Sprite2D_RLE_Internal* data = (Sprite2D_RLE_Internal*)spr->vptr;
-		std::memcpy(data->pal, pal, 256*sizeof(data->pal[0]));
+		memcpy(data->pal, pal, 256*sizeof(data->pal[0]));
 	}
 }
 
