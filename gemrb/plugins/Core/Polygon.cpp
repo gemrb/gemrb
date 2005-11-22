@@ -15,13 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.cpp,v 1.14 2005/10/22 16:30:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.cpp,v 1.15 2005/11/22 20:49:39 wjpalenstijn Exp $
  */
 #include "../../includes/win32def.h"
 #include "Polygon.h"
 #include "Interface.h"
 
-Gem_Polygon::Gem_Polygon(Point* points, int cnt, Region *bbox, bool precalculate, Color* color)
+#include <algorithm>
+#include <vector>
+
+Gem_Polygon::Gem_Polygon(Point* points, int cnt, Region *bbox, Color* color)
 {
 	if (cnt) {
 		this->points = ( Point * ) malloc( cnt * sizeof( Point ) );
@@ -32,20 +35,14 @@ Gem_Polygon::Gem_Polygon(Point* points, int cnt, Region *bbox, bool precalculate
 	count = cnt;
 	if(bbox) BBox=*bbox;
 	else RecalcBBox();
-	if (precalculate) {
-		fill = core->GetVideoDriver()->PrecalculatePolygon( this, *color); //points, cnt, *color, BBox );
-	} else {
-		fill = NULL;
-	}
+
+	ComputeTrapezoids();
 }
 
 Gem_Polygon::~Gem_Polygon(void)
 {
 	if (points) {
 		free( points );
-	}
-	if (fill) {
-		core->GetVideoDriver()->FreeSprite( fill );
 	}
 }
 
@@ -120,6 +117,232 @@ bool Gem_Polygon::PointIn(int tx, int ty)
 	return inside_flag;
 }
 
+// returns twice the area of triangle a, b, c.
+// (can also be negative depending on orientation of a,b,c)
+inline int area2(Point& a, Point& b, Point& c)
+{
+	return (b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y);
+}
+
+
+// return (c is to the left of a-b)
+inline bool left(Point& a, Point& b, Point& c)
+{
+	return (area2(a, b, c) > 0);
+}
+
+// { return (c is collinear with a-b)
+inline bool collinear(Point& a, Point& b, Point& c)
+{
+	return (area2(a, b, c) == 0);
+}
+
+// Find the intersection of two segments, if any.
+// If the intersection is one of the endpoints, or the lines are
+// parallel, false is returned.
+// The point returned has the actual intersection coordinates rounded down
+// to integers
+static bool intersectSegments(Point& a, Point& b, Point& c, Point& d, Point& s)
+{
+	if (collinear(a, b, c) || collinear(a, b, d) ||
+		collinear(c, d, a) || collinear(c, d, b))
+		return false;
+
+	if (!((left(a, b, c) != left(a, b, d)) &&
+		  (left(c, d, a) != left(c, d, b))))
+		return false;
+
+	long long A1 = area2(c, d, a);
+	long long A2 = area2(d, c, b);
+
+	s.x = (b.x*A1 + a.x*A2) / (A1 + A2);
+	s.y = (b.y*A1 + a.y*A2) / (A1 + A2);
+
+	return true;
+}
+
+// find the intersection of a segment with a horizontal scanline, if any
+static bool intersectSegmentScanline(Point& a, Point& b, int y, int& x)
+{
+	int y1 = a.y - y;
+	int y2 = b.y - y;
+
+	if (y1 * y2 > 0) return false;
+	if (y1 == 0 && y2 == 0) return false;
+
+	x = a.x + ((b.x - a.x)*y1)/(y1-y2);
+	return true;
+}
+
+
+struct ScanlineInt {
+	int x;
+	int pi;
+	Gem_Polygon* p;
+
+	bool operator<(const ScanlineInt& i2) const
+	{
+		if (x < i2.x)
+			return true;
+
+		if (x > i2.x)
+			return false;
+
+		Point& a = p->points[pi];
+		Point& b = p->points[(pi+1)%(p->count)];
+		Point& c = p->points[i2.pi];
+		Point& d = p->points[(i2.pi+1)%(p->count)];
+
+		int dx1 = a.x - b.x;
+		int dx2 = c.x - d.x;
+		int dy1 = a.y - b.y;
+		int dy2 = c.y - d.y;
+
+		if (dy1 < 0) {
+			dy1 *= -1;
+			dx1 *= -1;
+		}
+
+		if (dy2 < 0) {
+			dy2 *= -1;
+			dx2 *= -1;
+		}
+
+		if (dx1 * dy2 > dx2 * dy1) return true;
+
+		return false;
+	}
+
+};
+
+
+
+void Gem_Polygon::ComputeTrapezoids()
+{
+	if (count < 3) return;
+
+	trapezoids.clear();
+	std::vector<int> ys;
+	ys.reserve(2*count);
+
+	// y coords of vertices
+	for (int i = 0; i < count; ++i)
+		ys.push_back(points[i].y);
+
+	Point p;
+	// y coords of self-intersections
+	for (int i1 = 0; i1 < count; ++i1) {
+		Point& a = points[i1];
+		Point& b = points[(i1+1)%count];
+
+		// intersections with horizontal lines don't matter
+		if (a.y == b.y) continue;
+
+		for (int i2 = i1+2; i2 < count; ++i2) {
+			Point& c = points[i2];
+			Point& d = points[(i2+1)%count];
+			
+			// intersections with horizontal lines don't matter
+			if (c.y == d.y) continue;
+
+			if (intersectSegments(a, b, c, d, p)) {
+				ys.push_back(p.y);
+			}
+		}
+	}
+
+	std::sort(ys.begin(), ys.end());
+
+	std::vector<ScanlineInt> ints;
+	ints.reserve(count);
+
+	Trapezoid t;
+	ScanlineInt is;
+	is.p = this;
+	std::list<Trapezoid>::iterator iter;
+
+	unsigned int yi = 0;
+	int cury = ys[0];
+
+	// TODO: it's possible to keep a set of 'active' edges and only check
+	// scanline intersections of those edges.
+
+
+	while (yi < ys.size() - 1) {
+		while (yi < ys.size() && ys[yi] == cury) ++yi;
+		if (yi == ys.size()) break;
+		int nexty = ys[yi];
+
+		t.y1 = cury;
+		t.y2 = nexty;
+
+		// Determine all scanline intersections at level nexty.
+		// This includes edges which have their lower vertex at nexty,
+		// but excludes edges with their upper vertex at nexty.
+		// (We're taking the intersections along the 'upper' edge of 
+		// the nexty scanline.)
+		ints.clear();
+		for (int i = 0; i < count; ++i) {
+			Point& a = points[i];
+			Point& b = points[(i+1)%count];
+
+			if (a.y == b.y) continue;
+
+			if (a.y == nexty) {
+				if (b.y - nexty < 0) {
+					is.x = a.x;
+					is.pi = i;
+					ints.push_back(is);			
+				}
+			} else if (b.y == nexty) {
+				if (a.y - nexty < 0) {
+					is.x = b.x;
+					is.pi = i;
+					ints.push_back(is);	
+				}
+			} else {
+				int x;
+				if (intersectSegmentScanline(a, b, nexty, x)) {
+					is.x = x;
+					is.pi = i;
+					ints.push_back(is);
+				}
+			}
+		}
+
+		std::sort(ints.begin(), ints.end());
+		unsigned int newtcount = ints.size() / 2;
+
+		for (unsigned int i = 0; i < newtcount; ++i) {
+			t.left_edge = ints[2*i].pi;
+			t.right_edge = ints[2*i+1].pi;
+
+			
+			bool found = false;
+
+			// merge trapezoids with old one if it's just a continuation
+			for (iter = trapezoids.begin(); iter != trapezoids.end(); ++iter) {
+				Trapezoid& oldt = *iter;
+				if (oldt.y2 == cury &&
+					oldt.left_edge == t.left_edge &&
+					oldt.right_edge == t.right_edge)
+				{
+					oldt.y2 = nexty;
+					found = true;
+					break;
+				}
+			}
+
+			if (!found)
+				trapezoids.push_back(t);
+		}
+
+		// Done with this strip
+		cury = nexty;
+	}
+}
+
+
 // wall polygons
 void Wall_Polygon::SetBaseline(Point &a, Point &b)
 {
@@ -134,29 +357,15 @@ void Wall_Polygon::SetBaseline(Point &a, Point &b)
 
 bool Wall_Polygon::PointCovered(Point &p)
 {
-	if(!BBox.PointInside(p) ) return false;
-	return PointCovered(p.x, p.y);
+	if (base0.x > base1.x)
+		return left(base0, base1, p);
+	else
+		return left(base1, base0, p);
 }
+
 bool Wall_Polygon::PointCovered(int tx, int ty)
 {
-	register int yflag0 = ( base0.y >= ty );
-	register int yflag1 = ( base1.y >= ty );
-	if (yflag0 && yflag1) {
-		return true;
-	}
-	
-	if (!yflag0 && !yflag1) {
-		return false;
-	}
-
-	register int xflag0 = ( base0.x >= tx );
-	if (xflag0 == ( base1.x >= tx )) {
-		return xflag0;
-	}
-
-	if (( base1.x - ( base1.y - ty ) * ( base0.x - base1.x ) / ( base0.y - base1.y ) ) >= tx) {
-		return true;
-	}
-	return false;
+	Point p(tx, ty);
+	return PointCovered(p);
 }
 

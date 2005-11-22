@@ -15,11 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.115 2005/11/20 11:01:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.116 2005/11/22 20:49:39 wjpalenstijn Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
 #include "Interface.h"
+#include "SpriteCover.h"
+#include <cassert>
 
 extern Interface* core;
 
@@ -1003,6 +1005,7 @@ Container::Container(void)
 	inventory.SetInventoryType(INVENTORY_HEAP);
 	// NULL should be 0 for this 
 	memset (groundicons, 0, sizeof(groundicons) );
+	groundiconcover = 0;
 }
 
 void Container::FreeGroundIcons()
@@ -1015,6 +1018,8 @@ void Container::FreeGroundIcons()
 			groundicons[i]=NULL;
 		}
 	}
+	delete groundiconcover;
+	groundiconcover = 0;
 }
 
 Container::~Container()
@@ -1027,12 +1032,44 @@ void Container::DrawPile(bool highlight, Region screen, Color tint)
 	Video* video = core->GetVideoDriver();
 	for (int i=0;i<MAX_GROUND_ICON_DRAWN;i++) {
 		if (groundicons[i]) {
+			if (!groundiconcover || !groundiconcover->Covers(Pos.x, Pos.y, groundicons[i]->XPos, groundicons[i]->YPos, groundicons[i]->Width, groundicons[i]->Height)) {
+				// FIXME: somewhat suboptimal...
+				int xpos = 0;
+				int ypos = 0;
+				int width = 0;
+				int height = 0;
+				if (groundiconcover) {
+					xpos = groundiconcover->XPos;
+					ypos = groundiconcover->YPos;
+					width = groundiconcover->Width;
+					height = groundiconcover->Height;
+				}
+				if (xpos < groundicons[i]->XPos) {
+					width += groundicons[i]->XPos - xpos;
+					xpos = groundicons[i]->XPos;
+				}
+				if (ypos < groundicons[i]->YPos) {
+					height += groundicons[i]->YPos - ypos;
+					ypos = groundicons[i]->YPos;
+				}
+				if (width < groundicons[i]->Width) {
+					width = groundicons[i]->Width;
+				}
+				if (height < groundicons[i]->Height) {
+					height = groundicons[i]->Height;
+				}
+				delete groundiconcover;
+				groundiconcover = GetCurrentArea()->BuildSpriteCover(Pos.x, Pos.y,
+												   xpos, ypos, width, height);
+				assert(groundiconcover->Covers(Pos.x, Pos.y, groundicons[i]->XPos, groundicons[i]->YPos, groundicons[i]->Width, groundicons[i]->Height));
+			}
+
 			//draw it with highlight
 			if (highlight) {
-				video->BlitSpriteTinted (groundicons[i], screen.x + Pos.x, screen.y + Pos.y, tint);
+				video->BlitSpriteCovered (groundicons[i], screen.x + Pos.x, screen.y + Pos.y, tint, groundiconcover);
 			} else {
 				//draw with second color transparent too
-				video->BlitSpriteNoShadow (groundicons[i], screen.x + Pos.x, screen.y + Pos.y, tint);
+				video->BlitSpriteNoShadow (groundicons[i], screen.x + Pos.x, screen.y + Pos.y, tint, groundiconcover);
 			}
 		}
 	}

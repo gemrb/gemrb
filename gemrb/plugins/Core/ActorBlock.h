@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.89 2005/11/20 11:01:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.90 2005/11/22 20:49:39 wjpalenstijn Exp $
  *
  */
 
@@ -27,6 +27,7 @@ class Highlightable;
 class Actor;
 class Moveble;
 class Door;
+class SpriteCover;
 
 #ifndef ACTORBLOCK_H
 #define ACTORBLOCK_H
@@ -381,6 +382,7 @@ public:
 	ieStrRef OpenFail;
 	//these are not saved
 	Sprite2D *groundicons[3];
+	SpriteCover *groundiconcover;
 	//keyresref is stored in Highlightable
 };
 

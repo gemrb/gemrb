@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.35 2005/11/06 13:42:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.36 2005/11/22 20:49:39 wjpalenstijn Exp $
  *
  */
 
@@ -89,19 +89,21 @@ void Animation::AddFrame(Sprite2D* frame, unsigned int index)
 
 	int x = -frame->XPos;
 	int y = -frame->YPos;
-	int w = frame->Width - frame->XPos;
-	int h = frame->Height - frame->YPos;
+	int w = frame->Width;
+	int h = frame->Height;
 	if (x < animArea.x) {
+		animArea.w += (animArea.x - x);
 		animArea.x = x;
 	}
 	if (y < animArea.y) {
+		animArea.h += (animArea.y - y);
 		animArea.y = y;
 	}
-	if (w > animArea.w) {
-		animArea.w = w;
+	if (x+w > animArea.x+animArea.w) {
+		animArea.w = x+w-animArea.x;
 	}
-	if (h > animArea.h) {
-		animArea.h = h;
+	if (y+h > animArea.y+animArea.h) {
+		animArea.h = y+h-animArea.y;
 	}
 }
 
@@ -211,6 +213,10 @@ void Animation::MirrorAnimation()
 			video->FreeSprite(tmp);
 		}
 	}
+
+	// flip animArea horizontally as well
+	animArea.x = -animArea.w - animArea.x;
+
 	// This function will create independent sprites we have to free
 	autofree = true;
 }

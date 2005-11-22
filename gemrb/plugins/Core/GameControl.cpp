@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.259 2005/11/20 11:01:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.260 2005/11/22 20:49:39 wjpalenstijn Exp $
  */
 
 #ifndef WIN32
@@ -285,6 +285,26 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		}
 	}
 
+	// Show wallpolygons
+	if (DebugFlags & DEBUG_SHOW_CONTAINERS) {
+
+		unsigned int count = area->GetWallCount();
+		for (unsigned int i = 0; i < count; ++i) {
+			Wall_Polygon* poly = area->GetWallGroup(i);
+			if (!poly) continue;
+
+			// yellow
+			Color c;
+			c.r = 0x7F;
+			c.g = 0x7F;
+			c.b = 0;
+			c.a = 0;
+
+			core->GetVideoDriver()->DrawPolyline( poly, c, true );
+		}
+	}
+
+
 	//Draw spell effect, this must be stored in the actors
 	//not like this
 	if (effect) {
@@ -487,15 +507,11 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			case 'd': //disarm ?
 				if (overInfoPoint) {
 					overInfoPoint->DetectTrap(256);
-					core->GetVideoDriver()->FreeSprite( overInfoPoint->outline->fill );
-					overInfoPoint->outline->fill = NULL;
 				}
 				if (overContainer) {
 					if (overContainer->Trapped &&
 						!( overContainer->TrapDetected )) {
 						overContainer->TrapDetected = 1;
-						core->GetVideoDriver()->FreeSprite( overContainer->outline->fill );
-						overContainer->outline->fill = NULL;
 					}
 				}
 				break;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Sprite2D.h,v 1.6 2005/11/17 21:08:32 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Sprite2D.h,v 1.7 2005/11/22 20:49:39 wjpalenstijn Exp $
  *
  */
 
@@ -52,6 +52,7 @@ class GEM_EXPORT Sprite2D {
 public:
         /** Pointer to the Driver Video Structure */
 	void* vptr;
+	bool RLE;
 	int RefCount;
 	void* pixels;
 	int XPos, YPos, Width, Height;

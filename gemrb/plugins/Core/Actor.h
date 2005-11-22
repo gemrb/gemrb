@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.86 2005/11/13 21:32:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.87 2005/11/22 20:49:39 wjpalenstijn Exp $
  *
  */
 
@@ -34,6 +34,7 @@
 #include "EffectQueue.h"
 
 class Map;
+class SpriteCover;
 
 #ifdef WIN32
 
@@ -172,6 +173,9 @@ public:
 private:
 	//this stuff don't get saved
 	CharAnimations* anims;
+
+	// current SpriteCover for wallgroups
+	SpriteCover* cover;
 
 	/* fixes the palette */
 	void SetupColors();
@@ -321,5 +325,10 @@ public:
 	void WalkTo(Point &Des, int MinDistance = 0);
 	/* re/draws overhead text on the map screen */
 	void DrawOverheadText(Region &screen);
+
+	/* store SpriteCover */
+	void SetSpriteCover(SpriteCover* c) { cover = c; }
+	/* get stored SpriteCover */
+	SpriteCover* GetSpriteCover() const { return cover; }
 };
 #endif

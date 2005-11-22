@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.197 2005/11/20 11:01:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.198 2005/11/22 20:49:39 wjpalenstijn Exp $
  *
  */
 
@@ -26,6 +26,8 @@
 #include "Ambient.h"
 #include "../../includes/strrefs.h"
 #include "AmbientMgr.h"
+#include "SpriteCover.h"
+#include <cassert>
 
 #ifndef WIN32
 #include <sys/time.h>
@@ -672,7 +674,27 @@ void Map::DrawMap(Region screen, GameControl* gc)
 					if (actor->BBox.InsideRegion( vp )) {
 						Color tint = LightMap->GetPixel( cx / 16, cy / 12);
 						tint.a = 255-Trans;
-						video->BlitSpriteTinted( nextFrame, cx + screen.x, cy + screen.y, tint, anim->Palette, &screen );
+						SpriteCover* sc = actor->GetSpriteCover();
+						if (!sc || !sc->Covers(cx, cy, nextFrame->XPos,
+											   nextFrame->YPos,
+											   nextFrame->Width,
+											   nextFrame->Height)) {
+							delete sc;
+							sc = BuildSpriteCover(cx, cy, -anim->animArea.x,
+												  -anim->animArea.y,
+												  anim->animArea.w,
+												  anim->animArea.h);
+							actor->SetSpriteCover(sc);
+
+						}
+						assert(sc->Covers(cx, cy, nextFrame->XPos,
+										  nextFrame->YPos,
+										  nextFrame->Width,
+										  nextFrame->Height));
+
+						video->BlitSpriteCovered( nextFrame, cx + screen.x,
+												  cy + screen.y, tint, sc,
+												  anim->Palette, &screen );
 					}
 					if (anim->endReached) {
 						if (HandleActorStance(actor, ca, StanceID) ) {
@@ -1002,6 +1024,86 @@ void Map::AddWallGroup(WallGroup* wg)
 	wallGroups.push_back( wg );
 }
 */
+
+SpriteCover* Map::BuildSpriteCover(int x, int y, int xpos, int ypos,
+							  int width, int height)
+{
+	SpriteCover* sc = new SpriteCover;
+	sc->worldx = x;
+	sc->worldy = y;
+	sc->XPos = xpos;
+	sc->YPos = ypos;
+	sc->Width = width;
+	sc->Height = height;
+
+	sc->pixels = new unsigned char[width * height];
+	for (int i = 0; i < width*height; ++i)
+		sc->pixels[i] = 0;
+
+	unsigned int wpcount = GetWallCount();
+
+	// TODO: change the cover to use a set of intervals per line
+
+	// WARNING: slow...
+
+	for (unsigned int i = 0; i < wpcount; ++i)
+	{
+		Wall_Polygon* wp = GetWallGroup(i);
+		if (!wp) continue;
+		if (!wp->PointCovered(x, y)) continue;
+
+		int xoff = x - sc->XPos;
+		int yoff = y - sc->YPos;
+
+		std::list<Trapezoid>::iterator iter;
+		for (iter = wp->trapezoids.begin(); iter != wp->trapezoids.end();
+			 ++iter)
+		{
+			int y_top = iter->y1 - yoff; // inclusive
+			int y_bot = iter->y2 - yoff; // exclusive
+
+			if (y_top < 0) y_top = 0;
+			if (y_bot > height) y_bot = height;
+			if (y_top >= y_bot) continue; // clipped
+
+			int ledge = iter->left_edge;
+			int redge = iter->right_edge;
+			Point& a = wp->points[ledge];
+			Point& b = wp->points[(ledge+1)%(wp->count)];
+			Point& c = wp->points[redge];
+			Point& d = wp->points[(redge+1)%(wp->count)];
+
+			unsigned char* line = sc->pixels + (y_top)*width;
+			for (int sy = y_top; sy < y_bot; ++sy) {
+				int py = sy + yoff;
+
+				// TODO: maybe use a 'real' line drawing algorithm to
+				// compute these values faster.
+
+				int lt = (b.x * (py - a.y) + a.x * (b.y - py))/(b.y - a.y);
+				int rt = (d.x * (py - c.y) + c.x * (d.y - py))/(d.y - c.y) + 1;
+
+				lt -= xoff;
+				rt -= xoff;
+
+				if (lt < 0) lt = 0;
+				if (rt > width) rt = width;
+				if (lt >= rt) { line += width; continue; } // clipped
+
+				unsigned char* pix = line + lt;
+				unsigned char* end = line + rt;
+				if ((lt + xoff + sy + yoff) % 2) pix++; // CHECKME: aliasing?
+				for (; pix < end; pix += 2)
+					*pix = 1;
+				line += width;
+			}
+		}
+	}
+
+	return sc;
+}
+
+
 //this function determines actor drawing order
 //it should be extended to wallgroups, animations, effects!
 void Map::GenerateQueues()

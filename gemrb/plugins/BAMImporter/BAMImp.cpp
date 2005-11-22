@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.39 2005/06/14 22:29:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.40 2005/11/22 20:49:40 wjpalenstijn Exp $
  *
  */
 
@@ -172,14 +172,46 @@ Sprite2D* BAMImp::GetFrame(unsigned short findex, unsigned char mode)
 	if (findex >= FramesCount) {
 		findex = cycles[0].FirstFrame;
 	}
-	void* pixels = GetFramePixels(findex);
-	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8(
-		frames[findex].Width, frames[findex].Height, 8,
-		pixels, Palette, true, 0 );
-	//don't free pixels, createsprite stores it
+	Sprite2D* spr = 0;
+	unsigned char* RLEinpix = 0;
+#if 1
+	bool RLECompressed = ( ( frames[findex].FrameData & 0x80000000 ) == 0 );
+	unsigned long RLESize = 0;
+	if (RLECompressed) {
+		// FIXME: get the real size of the RLE data somehow, or cache
+		// the entire BAM in memory consecutively
+		RLESize = ( unsigned long )
+			ceil( frames[findex].Width * frames[findex].Height * 1.5 );
+		//without partial reads, we should be careful
+		str->Seek( ( frames[findex].FrameData & 0x7FFFFFFF ), GEM_STREAM_START );
+		unsigned long remains = str->Remains();
+		if (RLESize > remains) {
+			RLESize = remains;
+		}
+		RLEinpix = (unsigned char*)malloc( RLESize );
+		if (str->Read( RLEinpix, RLESize ) == GEM_ERROR) {
+			free( RLEinpix );
+			return NULL;
+		}
 
-	spr->XPos = frames[findex].XPos;
-	spr->YPos = frames[findex].YPos;
+		spr = core->GetVideoDriver()->CreateSpriteRLE8(frames[findex].Width,
+													   frames[findex].Height,
+													   RLEinpix, RLESize,
+													   Palette,
+													   CompressedColorIndex);
+		//don't free RLEinpix, createsprite stores it if it was successful
+	}
+#endif
+	if (!spr) {
+		void* pixels = GetFramePixels(findex, RLEinpix);
+		spr = core->GetVideoDriver()->CreateSprite8(
+			frames[findex].Width, frames[findex].Height, 8,
+			pixels, Palette, true, 0 );
+		//don't free pixels, createsprite stores it
+	}
+
+	spr->XPos = (ieWordSigned)frames[findex].XPos;
+	spr->YPos = (ieWordSigned)frames[findex].YPos;
 	if (mode == IE_SHADED) {
 		core->GetVideoDriver()->ConvertToVideoFormat( spr );
 		core->GetVideoDriver()->CalculateAlpha( spr );
@@ -187,7 +219,7 @@ Sprite2D* BAMImp::GetFrame(unsigned short findex, unsigned char mode)
 	return spr;
 }
 
-void* BAMImp::GetFramePixels(unsigned short findex)
+void* BAMImp::GetFramePixels(unsigned short findex, unsigned char* RLEinpix)
 {
 	if (findex >= FramesCount) {
 		findex = cycles[0].FirstFrame;
@@ -206,13 +238,16 @@ void* BAMImp::GetFramePixels(unsigned short findex)
 		if (RLESize > remains) {
 			RLESize = remains;
 		}
-		void* inpix = malloc( RLESize );
-		unsigned char * p = ( unsigned char * ) inpix;
-		unsigned char * Buffer = ( unsigned char * ) pixels;
-		if (str->Read( inpix, RLESize ) == GEM_ERROR) {
-			free( inpix );
-			return NULL;
+		unsigned char* inpix = RLEinpix;
+		if (!inpix) {
+			inpix = (unsigned char*)malloc( RLESize );
+			if (str->Read( inpix, RLESize ) == GEM_ERROR) {
+				free( inpix );
+				return NULL;
+			}
 		}
+		unsigned char * p = inpix;
+		unsigned char * Buffer = (unsigned char*)pixels;
 		unsigned int i = 0;
 		while (i < pixelcount) {
 			if (*p == CompressedColorIndex) {

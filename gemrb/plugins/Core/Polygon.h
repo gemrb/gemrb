@@ -15,15 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.h,v 1.9 2005/11/13 20:26:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.h,v 1.10 2005/11/22 20:49:39 wjpalenstijn Exp $
  */
 #ifndef POLYGON_H
 #define POLYGON_H
 
-#include "Sprite2D.h"
 #include "Region.h"
 #include "../../includes/RGBAColor.h"
 #include "../../includes/globals.h"
+
+#include <list>
 
 #ifdef WIN32
 
@@ -37,18 +38,25 @@
 #define GEM_EXPORT
 #endif
 
+class GEM_EXPORT Trapezoid {
+public:
+	int y1, y2;
+	int left_edge, right_edge;
+};
+
 class GEM_EXPORT Gem_Polygon {
 public:
 	Gem_Polygon(Point* points, int count, Region *bbox = NULL,
-		bool precalculate = false, Color* color = NULL);
+				Color* color = NULL);
 	~Gem_Polygon(void);
 	Region BBox;
 	Point* points;
 	int count;
-	Sprite2D* fill;
+	std::list<Trapezoid> trapezoids;
 	bool PointIn(Point &p);
 	bool PointIn(int x, int y);
 	void RecalcBBox();
+	void ComputeTrapezoids();
 };
 
 // wall polygons are used to render area wallgroups
@@ -68,7 +76,7 @@ public:
 
 class GEM_EXPORT Wall_Polygon: public Gem_Polygon {
 public:
-	Wall_Polygon(Point *points,int count,Region *bbox) : Gem_Polygon(points,count,bbox,false,NULL) {};
+	Wall_Polygon(Point *points,int count,Region *bbox) : Gem_Polygon(points,count,bbox,NULL) {};
 	//is the point above the baseline
 	bool PointCovered(Point &p);
 	bool PointCovered(int x, int y);

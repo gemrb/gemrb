@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.46 2005/10/20 20:39:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.47 2005/11/22 20:49:39 wjpalenstijn Exp $
  *
  */
 
@@ -33,6 +33,8 @@
 #include "EventMgr.h"
 #include "Animation.h"
 #include "Polygon.h"
+
+class SpriteCover;
 
 #ifdef WIN32
 
@@ -72,15 +74,21 @@ public:
 		int index = 0) = 0;
 	virtual Sprite2D* CreateSprite8(int w, int h, int bpp, void* pixels,
 		void* palette, bool cK = false, int index = 0) = 0;
+	virtual Sprite2D* CreateSpriteRLE8(int w, int h, void* rledata,
+									   unsigned int datasize,
+									   void* palette, int transindex)
+		{ return 0; }
 	virtual void FreeSprite(Sprite2D* spr) = 0;
 	virtual void BlitSprite(Sprite2D* spr, int x, int y, bool anchor = false,
 		Region* clip = NULL) = 0;
 	virtual void BlitSpriteRegion(Sprite2D* spr, Region& size, int x, int y,
 		bool anchor = true, Region* clip = NULL) = 0;
-	virtual void BlitSpriteNoShadow(Sprite2D* spr, int x, int y, Color tint,
-		Region* clip = NULL) = 0;
 	virtual void BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint,
 		Color *palette = NULL, Region* clip = NULL) = 0;
+	virtual void BlitSpriteCovered(Sprite2D* spr, int x, int y, Color tint,
+		SpriteCover* cover, Color *palette = NULL, Region* clip = NULL) = 0;
+	virtual void BlitSpriteNoShadow(Sprite2D* spr, int x, int y, Color tint,
+		SpriteCover* cover, Region* clip = NULL) = 0;
 	virtual void SetCursor(Sprite2D* up, Sprite2D* down) = 0;
 	/** Sets a temporary cursor when dragging an Item from Inventory */
 	virtual void SetDragCursor(Sprite2D* drag) = 0;
@@ -129,8 +137,6 @@ public:
 
 	/** Convers a Screen Coordinate to a Game Coordinate */
 	virtual void ConvertToGame(short& x, short& y) = 0;
-	/** */
-	virtual Sprite2D* PrecalculatePolygon(Gem_Polygon *poly, Color &color) = 0;//Point* points, int count, Color& color, Region& bbox) = 0;
 	/** Sets the Fading Color */
 	virtual void SetFadeColor(int r, int g, int b) = 0;
 	/** Sets the Fading to Color Percentage */

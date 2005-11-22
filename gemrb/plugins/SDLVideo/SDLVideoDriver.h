@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.51 2005/10/18 22:43:40 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.52 2005/11/22 20:49:40 wjpalenstijn Exp $
  *
  */
 
@@ -34,9 +34,9 @@ private:
 	SDL_Surface* extra;
 	std::vector< Region> upd;	//Regions of the Screen to Update in the next SwapBuffer operation.
 	Region Viewport;
-	SDL_Surface* Cursor[3];
+	Sprite2D* Cursor[3];
 	SDL_Rect CursorPos;
-	short mouseAdjustX[3], mouseAdjustY[3];
+//	short mouseAdjustX[3], mouseAdjustY[3];
 	unsigned short CursorIndex;
 	Color fadeColor;
 	unsigned long lastTime;
@@ -59,15 +59,20 @@ public:
 		bool cK = false, int index = 0);
 	Sprite2D* CreateSprite8(int w, int h, int bpp, void* pixels,
 		void* palette, bool cK = false, int index = 0);
+	Sprite2D* CreateSpriteRLE8(int w, int h, void* rledata,
+							   unsigned int datasize,
+							   void* palette, int transindex);
 	void FreeSprite(Sprite2D* spr);
 	void BlitSprite(Sprite2D* spr, int x, int y, bool anchor = false,
 		Region* clip = NULL);
 	void BlitSpriteRegion(Sprite2D* spr, Region& size, int x, int y,
 		bool anchor = true, Region* clip = NULL);
-	void BlitSpriteNoShadow(Sprite2D* spr, int x, int y, Color tint,
-		Region *clip = NULL);
 	void BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint,
 		Color *Palette = NULL, Region* clip = NULL);
+	void BlitSpriteCovered(Sprite2D* spr, int x, int y, Color tint,
+		SpriteCover* cover,	Color *Palette = NULL, Region* clip = NULL);
+	void BlitSpriteNoShadow(Sprite2D* spr, int x, int y, Color tint,
+		SpriteCover* cover, Region *clip = NULL);
 	void SetCursor(Sprite2D* up, Sprite2D* down);
 	void SetDragCursor(Sprite2D* drag);
 	Sprite2D* GetPreview(int w, int h);
@@ -116,9 +121,6 @@ public:
 		x += Viewport.x;
 		y += Viewport.y;
 	}
-	/** */
-	Sprite2D* PrecalculatePolygon(Gem_Polygon *poly, Color& color);
-//Point* points, int count, Color& color, Region& BBox);
 
 	void SetFadeColor(int r, int g, int b);
 	void SetFadePercent(int percent);

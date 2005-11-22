@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.89 2005/11/20 11:01:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.90 2005/11/22 20:49:39 wjpalenstijn Exp $
  *
  */
 
@@ -33,6 +33,7 @@ class Map;
 #include <queue>
 
 class Ambient;
+class SpriteCover;
 
 #ifdef WIN32
 
@@ -224,6 +225,8 @@ public:
 		Walls = walls;	
 	}
 	//void AddWallGroup(WallGroup* wg);
+	SpriteCover* BuildSpriteCover(int x, int y, int xpos, int ypos,
+								  int width, int height);
 	void Shout(Actor* actor, int shoutID, unsigned int radius);
 	void AddActor(Actor* actor);
 	int GetBlocked(Point &p);
