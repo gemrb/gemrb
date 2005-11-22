@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.cpp,v 1.15 2005/11/22 20:49:39 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.cpp,v 1.16 2005/11/22 22:34:21 wjpalenstijn Exp $
  */
 #include "../../includes/win32def.h"
 #include "Polygon.h"
@@ -24,7 +24,7 @@
 #include <algorithm>
 #include <vector>
 
-Gem_Polygon::Gem_Polygon(Point* points, int cnt, Region *bbox, Color* color)
+Gem_Polygon::Gem_Polygon(Point* points, int cnt, Region *bbox)
 {
 	if (cnt) {
 		this->points = ( Point * ) malloc( cnt * sizeof( Point ) );
