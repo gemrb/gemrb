@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUIINV.py,v 1.3 2004/12/04 17:35:11 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUIINV.py,v 1.4 2005/11/22 18:50:54 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -24,61 +24,81 @@
 ###################################################
 
 import string
-
+import GemRB
+import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
-import GemRB
 from GUICommon import CloseOtherWindow
-from GUICommonWindows import GetActorClassTitle, GetActorPaperDoll
-from GUICommonWindows import SetSelectionChangeHandler
+from GUICommonWindows import *
 
 InventoryWindow = None
 ItemInfoWindow = None
 ItemAmountWindow = None
 ItemIdentifyWindow = None
+PortraitWindow = None
+OldPortraitWindow = None
 
 def OpenInventoryWindow ():
-	global InventoryWindow
+	global InventoryWindow, OptionsWindow, PortraitWindow
+	global OldPortraitWindow
 	
 	if CloseOtherWindow (OpenInventoryWindow):
-		GemRB.HideGUI ()
 		GemRB.UnloadWindow (InventoryWindow)
+		GemRB.UnloadWindow (OptionsWindow)
+		GemRB.UnloadWindow (PortraitWindow)
+
 		InventoryWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		SetSelectionChangeHandler (None)
+		GemRB.SetVisible (0,1)
 		GemRB.UnhideGUI ()
+		GUICommonWindows.PortraitWindow = OldPortraitWindow
+		OldPortraitWindow = None
+		SetSelectionChangeHandler (None)
 		return
 		
 	GemRB.HideGUI ()
-	GemRB.LoadWindowPack ("GUIINV")
+	GemRB.SetVisible (0,0)
+
+	GemRB.LoadWindowPack ("GUIINV", 640, 480)
 	InventoryWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", InventoryWindow)
+	#saving the original portrait window
+	OldPortraitWindow = GUICommonWindows.PortraitWindow
+	PortraitWindow = OpenPortraitWindow (0)
+	OptionsWindow = GemRB.LoadWindow (0)
+	SetupMenuWindowControls (OptionsWindow, 0, "OpenInventoryWindow")
+	GemRB.SetWindowFrame (OptionsWindow)
 
 	# Ground Item
-	for i in range (68, 72):
-		Button = GemRB.GetControl (Window, i)
+	for i in range (5):
+		Button = GemRB.GetControl (Window, i+68)
 		GemRB.SetTooltip (Window, Button, 12011)
+		GemRB.SetVarAssoc (Window, Button, "GroundItemButton", i)
+		GemRB.SetButtonFont (Window, Button, "NUMBER")
 	
+	# ground items scrollbar
+	ScrollBar = GemRB.GetControl (Window, 66)
+	GemRB.SetEvent (Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "RefreshInventoryWindow")
+
 	#major & minor clothing color
 	Button = GemRB.GetControl (Window, 62)
-	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_PICTURE,OP_OR)
-	GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS,"MajorPress")
+	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE,OP_OR)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS,"MajorPress")
 	GemRB.SetTooltip (Window, Button, 12007)
 
 	Button = GemRB.GetControl (Window, 63)
-	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_PICTURE,OP_OR)
-	GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS,"MinorPress")
+	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE,OP_OR)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS,"MinorPress")
 	GemRB.SetTooltip (Window, Button, 12008)
 
 	# portrait
 	Button = GemRB.GetControl (Window, 50)
-	GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_LOCKED)
-	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
+	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
 
 	# encumbrance
-	#Button = GemRB.GetControl (Window, 46)
-	#GemRB.SetButtonFont (Window, Button, "NUMBER")
-	#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	Label = GemRB.CreateLabel (Window, 0x10000043, 5,385,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
+	Label = GemRB.CreateLabel (Window, 0x10000044, 5,455,80,15,"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_TOP)
 
 	# armor class
 	Label = GemRB.GetControl (Window, 0x10000038)
@@ -108,18 +128,20 @@ def OpenInventoryWindow ():
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
 			GemRB.SetVarAssoc (Window, Button, "ItemButton", slot)
 
-	GemRB.UnhideGUI ()
 	UpdateInventoryWindow ()
-
+	GemRB.SetVisible (OptionsWindow, 1)
+	GemRB.SetVisible (Window, 3)
+	GemRB.SetVisible (PortraitWindow, 1)
+ 
 
 def ColorDonePress():
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	GemRB.UnloadWindow(ColorPicker)
-	GemRB.SetVisible(InventoryWindow,1)
-	ColorTable = GemRB.LoadTable("clowncol")
-	PickedColor=GemRB.GetTableValue(ColorTable, ColorIndex, GemRB.GetVar("Selected"))
-	GemRB.UnloadTable(ColorTable)
+	GemRB.SetVisible (InventoryWindow,1)
+	ColorTable = GemRB.LoadTable ("clowncol")
+	PickedColor=GemRB.GetTableValue (ColorTable, ColorIndex, GemRB.GetVar ("Selected"))
+	GemRB.UnloadTable (ColorTable)
 	if ColorIndex==2:
 		GemRB.SetPlayerStat (pc, IE_MAJOR_COLOR, PickedColor)
 		UpdateInventoryWindow()
@@ -149,34 +171,33 @@ def MinorPress():
 def GetColor():
 	global ColorPicker
 
-	ColorTable = GemRB.LoadTable("clowncol")
-	GemRB.SetVisible(InventoryWindow,2) #darken it
+	ColorTable = GemRB.LoadTable ("clowncol")
+	GemRB.SetVisible (InventoryWindow,2) #darken it
 	ColorPicker=GemRB.LoadWindow(3)
-	GemRB.SetVar("Selected",-1)
+	GemRB.SetVar ("Selected",-1)
 	for i in range(0,34):
 		Button = GemRB.GetControl(ColorPicker, i)
-		GemRB.SetButtonState(ColorPicker, Button, IE_GUI_BUTTON_DISABLED)
-		GemRB.SetButtonFlags(ColorPicker, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+		GemRB.SetButtonState (ColorPicker, Button, IE_GUI_BUTTON_DISABLED)
+		GemRB.SetButtonFlags (ColorPicker, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 
 	Selected = -1
 	for i in range(0,34):
-		MyColor = GemRB.GetTableValue(ColorTable, ColorIndex, i)
+		MyColor = GemRB.GetTableValue (ColorTable, ColorIndex, i)
 		if MyColor == "*":
 			break
 		Button = GemRB.GetControl(ColorPicker, i)
-		GemRB.SetButtonBAM(ColorPicker, Button, "COLGRAD", 2, 0, MyColor)
+		GemRB.SetButtonBAM (ColorPicker, Button, "COLGRAD", 2, 0, MyColor)
 		if PickedColor == MyColor:
-			GemRB.SetVar("Selected",i)
+			GemRB.SetVar ("Selected",i)
 			Selected = i
-		GemRB.SetButtonState(ColorPicker, Button, IE_GUI_BUTTON_ENABLED)
-		GemRB.SetVarAssoc(ColorPicker, Button, "Selected",i)
-		GemRB.SetEvent(ColorPicker, Button, IE_GUI_BUTTON_ON_PRESS, "ColorDonePress")
-	GemRB.UnloadTable(ColorTable)
-	GemRB.SetVisible(ColorPicker,1)
+		GemRB.SetButtonState (ColorPicker, Button, IE_GUI_BUTTON_ENABLED)
+		GemRB.SetVarAssoc (ColorPicker, Button, "Selected",i)
+		GemRB.SetEvent (ColorPicker, Button, IE_GUI_BUTTON_ON_PRESS, "ColorDonePress")
+	GemRB.UnloadTable (ColorTable)
+	GemRB.SetVisible (ColorPicker,1)
 
 
 def UpdateInventoryWindow ():
-	GemRB.HideGUI()
 	Window = InventoryWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -194,19 +215,21 @@ def UpdateInventoryWindow ():
 	Color5 = GemRB.GetPlayerStat (pc, IE_LEATHER_COLOR)
 	Color6 = GemRB.GetPlayerStat (pc, IE_METAL_COLOR)
 	Color7 = GemRB.GetPlayerStat (pc, IE_ARMOR_COLOR)
-	GemRB.SetButtonBAM (Window, Button, GetActorPaperDoll (pc), 0, 0, 0)
-	#GemRB.SetButtonPLT (Window, Button, GetActorPaperDoll (pc),
-	#	Color2, Color1, Color3, Color6, Color5, Color4, Color7, 0)
+	#GemRB.SetButtonBAM (Window, Button, GetActorPaperDoll (pc), 0, 0, 0)
+	GemRB.SetButtonPLT (Window, Button, GetActorPaperDoll (pc),
+		Color5, Color4, Color3, Color2, Color6, Color4, Color1, 0)
 
 	# encumbrance
+	SetEncumbranceLabels( Window, 0x10000043, 0x10000044, pc)
+
 	# Loading tables of modifications
-	Table = GemRB.LoadTable("strmod")
-	TableEx = GemRB.LoadTable("strmodex")
+	Table = GemRB.LoadTable ("strmod")
+	TableEx = GemRB.LoadTable ("strmodex")
 	# Getting the character's strength
 	sstr = GemRB.GetPlayerStat (pc, IE_STR)
 	ext_str = GemRB.GetPlayerStat (pc, IE_STREXTRA)
 
-	max_encumb = GemRB.GetTableValue(Table, sstr, 3) + GemRB.GetTableValue(TableEx, ext_str, 3)
+	max_encumb = GemRB.GetTableValue (Table, sstr, 3) + GemRB.GetTableValue(TableEx, ext_str, 3)
 	encumbrance = GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)
 
 	Label = GemRB.GetControl (Window, 0x10000043)
@@ -252,18 +275,18 @@ def UpdateInventoryWindow ():
 
 	Button = GemRB.GetControl (Window, 62)
 	Color = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR)
-	GemRB.SetButtonBAM(Window, Button, "COLGRAD", 1, 0, Color)
+	GemRB.SetButtonBAM (Window, Button, "COLGRAD", 1, 0, Color)
 
 	Button = GemRB.GetControl (Window, 63)
 	Color = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR)
-	GemRB.SetButtonBAM(Window, Button, "COLGRAD", 1, 0, Color)
+	GemRB.SetButtonBAM (Window, Button, "COLGRAD", 1, 0, Color)
 
 	# populate inventory slot controls
 	for i in range (38):
 		UpdateSlot (pc, i)
-
-	GemRB.UnhideGUI()
-
+	#making window visible/shaded depending on the pc's state
+	GemRB.SetVisible (Window, 1)
+	return
 
 def UpdateSlot (pc, slot):
 
@@ -306,7 +329,21 @@ def UpdateSlot (pc, slot):
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
+	return
 
+def OnDragItemGround ():
+	pc = GemRB.GameGetSelectedPCSingle ()
+
+	slot = GemRB.GetVar ("GroundItemButton")
+	if not GemRB.IsDraggingItem ():
+		slot_item = GemRB.GetContainerItem (pc, slot)
+		item = GemRB.GetItem (slot_item["ItemResRef"])
+		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 1) #container
+	else:
+		GemRB.DropDraggedItem (pc, -2) #dropping on ground
+
+	UpdateInventoryWindow ()
+	return
 
 def OnDragItem ():
 	pc = GemRB.GameGetSelectedPCSingle ()
@@ -315,18 +352,19 @@ def OnDragItem ():
 	if not GemRB.IsDraggingItem ():
 		slot_item = GemRB.GetSlotItem (pc, slot)
 		item = GemRB.GetItem (slot_item["ItemResRef"])
-		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 0, 0)
+		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 0)
 	else:
 		GemRB.DropDraggedItem (pc, slot)
-	UpdateInventoryWindow ()
 
+	UpdateInventoryWindow ()
+	return
 
 def OnDropItemToPC ():
 	pc = GemRB.GetVar ("PressedPortrait") + 1
 	print "PC", pc
 	GemRB.DropDraggedItem (pc, -1)
 	UpdateInventoryWindow ()
-
+	return
 
 ###################################################
 # End of file GUIINV.py

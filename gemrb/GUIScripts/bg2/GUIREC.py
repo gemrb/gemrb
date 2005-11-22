@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.22 2005/11/06 12:15:00 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.23 2005/11/22 18:50:54 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -108,7 +108,7 @@ def OpenRecordsWindow ():
 	SetSelectionChangeHandler (UpdateRecordsWindow)
 	UpdateRecordsWindow ()
 	GemRB.SetVisible (OptionsWindow, 1)
-	GemRB.SetVisible (Window, 1)
+	GemRB.SetVisible (Window, 3)
 	GemRB.SetVisible (PortraitWindow, 1)
 	return
 
@@ -218,8 +218,9 @@ def UpdateRecordsWindow ():
 	stats_overview = GetStatOverview (pc)
 	Text = GemRB.GetControl (Window, 45)
 	GemRB.SetText (Window, Text, stats_overview)
+	#making window visible/shaded depending on the pc's state
+	GemRB.SetVisible (Window, 1)
 	return
-
 
 def GetStatOverview (pc):
 	#dunno if bg2 has colour highlights

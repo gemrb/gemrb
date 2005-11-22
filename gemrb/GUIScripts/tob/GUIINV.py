@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.26 2005/11/01 13:35:10 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.27 2005/11/22 18:50:54 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -24,11 +24,10 @@
 ###################################################
 
 import string
-
-from GUIDefines import *
-from ie_stats import *
 import GemRB
 import GUICommonWindows
+from GUIDefines import *
+from ie_stats import *
 from GUICommon import CloseOtherWindow
 from GUICommonWindows import *
 
@@ -74,9 +73,9 @@ def OpenInventoryWindow ():
 	for i in range (5):
 		Button = GemRB.GetControl (Window, i+68)
 		GemRB.SetTooltip (Window, Button, 12011)
-                GemRB.SetVarAssoc (Window, Button, "GroundItemButton", i)
-                GemRB.SetButtonFont (Window, Button, "NUMBER")
-                
+		GemRB.SetVarAssoc (Window, Button, "GroundItemButton", i)
+		GemRB.SetButtonFont (Window, Button, "NUMBER")
+		
 	# ground items scrollbar
 	ScrollBar = GemRB.GetControl (Window, 66)
 	GemRB.SetEvent (Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "RefreshInventoryWindow")
@@ -103,12 +102,15 @@ def OpenInventoryWindow ():
 
 	# armor class
 	Label = GemRB.GetControl (Window, 0x10000038)
+	GemRB.SetTooltip (Window, Label, 4197)
 
 	# hp current
 	Label = GemRB.GetControl (Window, 0x10000039)
+	GemRB.SetTooltip (Window, Label, 4198)
 
 	# hp max
 	Label = GemRB.GetControl (Window, 0x1000003a)
+	GemRB.SetTooltip (Window, Label, 4199)
 
 	#info label, game paused, etc
 	Label = GemRB.GetControl (Window, 0x1000003f)
@@ -126,7 +128,7 @@ def OpenInventoryWindow ():
 	SetSelectionChangeHandler (UpdateInventoryWindow)
 	UpdateInventoryWindow ()
 	GemRB.SetVisible (OptionsWindow, 1)
-	GemRB.SetVisible (Window, 1)
+	GemRB.SetVisible (Window, 3)
 	GemRB.SetVisible (PortraitWindow, 1)
 	return
 
@@ -274,20 +276,23 @@ def RefreshInventoryWindow ():
 			Item = GemRB.GetItem (Slot['ItemResRef'])
 			GemRB.SetItemIcon (Window, Button, Slot['ItemResRef'],0)
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
-                        GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OnDragItemGround")
-        		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenItemInfoGroundWindow")
-        		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "OpenItemAmountGroundWindow")
-                        
+			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OnDragItemGround")
+			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenItemInfoGroundWindow")
+			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "OpenItemAmountGroundWindow")
+
 		else:
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_NAND)
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")
-        		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
-        		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
+			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
+			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
 
 	# populate inventory slot controls
 	for i in range (38):
 		UpdateSlot (pc, i)
 
+	#making window visible/shaded depending on the pc's state
+	GemRB.SetVisible (Window, 1)
+	return
 
 def UpdateSlot (pc, slot):
 
@@ -345,7 +350,6 @@ def OnDragItemGround ():
 
 	UpdateInventoryWindow ()
 	return
-
 
 def OnDragItem ():
 	pc = GemRB.GameGetSelectedPCSingle ()
