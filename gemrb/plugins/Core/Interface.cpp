@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.364 2005/11/20 11:01:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.365 2005/11/22 22:07:13 avenger_teambg Exp $
  *
  */
 
@@ -246,8 +246,10 @@ Interface::~Interface(void)
 	}
 	//aww, i'm sure this could be implemented better
 	MapMgr* mm = ( MapMgr* ) GetInterface( IE_ARE_CLASS_ID );
-	mm->ReleaseMemory();
-	FreeInterface(mm);
+	if (mm!=NULL) {
+		mm->ReleaseMemory();
+		FreeInterface(mm);
+	}
 
 	CharAnimations::ReleaseMemory();
 	if (CurrentStore) {

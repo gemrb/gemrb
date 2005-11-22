@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.21 2005/11/17 21:29:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.22 2005/11/22 22:07:13 avenger_teambg Exp $
  *
  */
 
@@ -246,6 +246,9 @@ bool PluginMgr::IsAvailable(SClass_ID plugintype)
 
 void* PluginMgr::GetPlugin(SClass_ID plugintype)
 {
+	if (!&plugins) {
+		return NULL;
+	}
 	int plugs = plugins.size();
 	while (plugs--) {
 		if (plugins[plugs]->SuperClassID() == plugintype) {
