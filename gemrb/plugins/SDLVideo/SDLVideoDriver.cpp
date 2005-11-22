@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.112 2005/11/22 20:49:40 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.113 2005/11/22 21:51:29 wjpalenstijn Exp $
  *
  */
 
@@ -1188,7 +1188,7 @@ void SDLVideoDriver::CalculateAlpha(Sprite2D* sprite)
 		}
 		SDL_UnlockSurface( surf );
 	} else {
-#warning implementme
+		// FIXME: implementme
 	}
 }
 
@@ -1858,7 +1858,7 @@ void SDLVideoDriver::CreateAlpha( Sprite2D *sprite)
 		surf = SDL_CreateRGBSurfaceFrom( pixels, sprite->Width, sprite->Height, 32, sprite->Width*4, 0xff00, 0xff00, 0xff00, 255 );
 		sprite->vptr = surf;
 	} else {
-#warning implementme
+		// FIXME: implementme
 	}
 }
 
