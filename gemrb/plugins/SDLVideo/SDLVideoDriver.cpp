@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.115 2005/11/23 06:39:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.116 2005/11/23 21:10:21 wjpalenstijn Exp $
  *
  */
 
@@ -25,6 +25,8 @@
 #include <cmath>
 #include <cassert>
 #include "../Core/SpriteCover.h"
+#include "../Core/Console.h"
+#include "../Core/SoundMgr.h"
 
 class GEM_EXPORT Sprite2D_RLE_Internal {
 public:
@@ -1605,7 +1607,7 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, Color& color, bool fill)
 
 				if (lt < 0) lt = 0;
 				if (rt > Viewport.w) rt = Viewport.w;
-				if (lt >= rt) continue; // clipped
+				if (lt >= rt) { line += backBuf->pitch; continue; } // clipped
 
 				
 				// Draw a 50% alpha line from (y,lt) to (y,rt)
