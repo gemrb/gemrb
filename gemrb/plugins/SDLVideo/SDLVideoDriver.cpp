@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.114 2005/11/22 23:00:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.115 2005/11/23 06:39:20 avenger_teambg Exp $
  *
  */
 
@@ -1630,7 +1630,7 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, Color& color, bool fill)
 	}
 
 	short lastX = poly->points[0]. x, lastY = poly->points[0].y;
-	int i;
+	unsigned int i;
 
 	for (i = 1; i < poly->count; i++) {
 		DrawLine( lastX, lastY, poly->points[i].x, poly->points[i].y, color );

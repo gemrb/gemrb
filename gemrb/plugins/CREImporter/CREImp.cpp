@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.89 2005/11/14 23:34:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.90 2005/11/23 06:39:20 avenger_teambg Exp $
  *
  */
 
@@ -267,6 +267,9 @@ Actor* CREImp::GetActor()
 	unsigned int Inventory_Size;
 
 	switch(CREVersion) {
+		case IE_CRE_GEMRB:
+			Inventory_Size = GetActorGemRB(act);
+			break;
 		case IE_CRE_V1_2:
 			Inventory_Size=46;
 			GetActorPST(act);
@@ -285,7 +288,7 @@ Actor* CREImp::GetActor()
 			break;
 		default:
 			Inventory_Size=0;
-			printf("Unknown creature signature!\n");
+			printMessage("CREImp","Unknown creature signature.\n", YELLOW);
 	}
 
 	//Hacking NONE to no error
@@ -670,6 +673,86 @@ void CREImp::GetEffect(Effect *fx)
 
 }
 
+ieDword CREImp::GetActorGemRB(Actor *act)
+{
+	ieByte tmpByte;
+	ieWord tmpWord;
+
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_REPUTATION]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_HIDEINSHADOWS]=tmpByte;
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_ARMORCLASS]=(ieWordSigned) tmpWord;
+	str->ReadWord( &tmpWord );
+	//skipping a word (useful for something)
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_ACCRUSHINGMOD]=(ieWordSigned) tmpWord;
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_ACMISSILEMOD]=(ieWordSigned) tmpWord;
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_ACPIERCINGMOD]=(ieWordSigned) tmpWord;
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_ACSLASHINGMOD]=(ieWordSigned) tmpWord;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_THAC0]=(ieByteSigned) tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_NUMBEROFATTACKS]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_SAVEVSDEATH]=(ieByteSigned) tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_SAVEVSWANDS]=(ieByteSigned) tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_SAVEVSPOLY]=(ieByteSigned) tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_SAVEVSBREATH]=(ieByteSigned) tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_SAVEVSSPELL]=(ieByteSigned) tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTFIRE]=(ieByteSigned) tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTCOLD]=(ieByteSigned) tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTELECTRICITY]=(ieByteSigned) tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTACID]=(ieByteSigned) tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTMAGIC]=(ieByteSigned) tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTMAGICFIRE]=(ieByteSigned) tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTMAGICCOLD]=(ieByteSigned) tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTSLASHING]=(ieByteSigned) tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTCRUSHING]=(ieByteSigned) tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTPIERCING]=(ieByteSigned) tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_RESISTMISSILE]=(ieByteSigned) tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_DETECTILLUSIONS]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_SETTRAPS]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_LORE]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_LOCKPICKING]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_STEALTH]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_TRAPS]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_PICKPOCKET]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_FATIGUE]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_INTOXICATION]=tmpByte;
+	str->Read( &tmpByte, 1 );
+	act->BaseStats[IE_LUCK]=tmpByte;
+	//these could be used to save iwd2 skills
+	return 0;
+}
 
 void CREImp::GetActorBG(Actor *act)
 {
@@ -1645,7 +1728,7 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 	return 0;
 }
 
-int CREImp::PutActorGemRB(DataStream *stream, Actor *actor)
+int CREImp::PutActorGemRB(DataStream *stream, Actor *actor, ieDword InvSize)
 {
 	ieByte tmpByte;
 	char filling[5];
@@ -1667,7 +1750,7 @@ int CREImp::PutActorGemRB(DataStream *stream, Actor *actor)
 	stream->Write( filling, 5); //unknown bytes
 	tmpByte = actor->BaseStats[IE_ALIGNMENT];
 	stream->Write( &tmpByte,1);
-	stream->Write( filling,4); //this is called ID in iwd2, and contains 2 words
+	stream->WriteDword( &InvSize ); //saving the inventory size to this unused part
 	stream->Write( actor->GetScriptName(), 32);
 	return 0;
 }
@@ -1943,13 +2026,13 @@ int CREImp::PutActor(DataStream *stream, Actor *actor)
 		return ret;
 	}
 	//here comes the fuzzy part
-	unsigned int Inventory_Size;
+	ieDword Inventory_Size;
 
 	switch (actor->version) {
 		case IE_CRE_GEMRB:
 			TotSCEFF = 1;
-			Inventory_Size=actor->inventory.GetSlotCount();
-			ret = PutActorGemRB(stream, actor);
+			Inventory_Size=(ieDword) actor->inventory.GetSlotCount();
+			ret = PutActorGemRB(stream, actor, Inventory_Size);
 			break;
 		case IE_CRE_V1_2:
 			TotSCEFF = 0;

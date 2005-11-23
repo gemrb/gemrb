@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.cpp,v 1.16 2005/11/22 22:34:21 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.cpp,v 1.17 2005/11/23 06:39:20 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "Polygon.h"
@@ -24,7 +24,7 @@
 #include <algorithm>
 #include <vector>
 
-Gem_Polygon::Gem_Polygon(Point* points, int cnt, Region *bbox)
+Gem_Polygon::Gem_Polygon(Point* points, unsigned int cnt, Region *bbox)
 {
 	if (cnt) {
 		this->points = ( Point * ) malloc( cnt * sizeof( Point ) );
@@ -56,7 +56,8 @@ void Gem_Polygon::RecalcBBox()
 	BBox.y=points[0].y;
 	BBox.w=points[0].x;
 	BBox.h=points[0].y;
-	for(int i=1; i<count; i++) {
+	unsigned int i;
+	for(i=1; i<count; i++) {
 		if(points[i].x<BBox.x) {
 			BBox.x=points[i].x;
 		}
@@ -226,19 +227,21 @@ void Gem_Polygon::ComputeTrapezoids()
 	ys.reserve(2*count);
 
 	// y coords of vertices
-	for (int i = 0; i < count; ++i)
+	unsigned int i;
+
+	for (i = 0; i < count; ++i)
 		ys.push_back(points[i].y);
 
 	Point p;
 	// y coords of self-intersections
-	for (int i1 = 0; i1 < count; ++i1) {
+	for (unsigned int i1 = 0; i1 < count; ++i1) {
 		Point& a = points[i1];
 		Point& b = points[(i1+1)%count];
 
 		// intersections with horizontal lines don't matter
 		if (a.y == b.y) continue;
 
-		for (int i2 = i1+2; i2 < count; ++i2) {
+		for (unsigned int i2 = i1+2; i2 < count; ++i2) {
 			Point& c = points[i2];
 			Point& d = points[(i2+1)%count];
 			
@@ -282,7 +285,7 @@ void Gem_Polygon::ComputeTrapezoids()
 		// (We're taking the intersections along the 'upper' edge of 
 		// the nexty scanline.)
 		ints.clear();
-		for (int i = 0; i < count; ++i) {
+		for (i = 0; i < count; ++i) {
 			Point& a = points[i];
 			Point& b = points[(i+1)%count];
 
@@ -313,7 +316,7 @@ void Gem_Polygon::ComputeTrapezoids()
 		std::sort(ints.begin(), ints.end());
 		unsigned int newtcount = ints.size() / 2;
 
-		for (unsigned int i = 0; i < newtcount; ++i) {
+		for (i = 0; i < newtcount; ++i) {
 			t.left_edge = ints[2*i].pi;
 			t.right_edge = ints[2*i+1].pi;
 

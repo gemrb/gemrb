@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.h,v 1.16 2005/07/06 23:37:33 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.h,v 1.17 2005/11/23 06:39:20 avenger_teambg Exp $
  *
  */
 
@@ -73,6 +73,7 @@ private:
 	void ReadChrHeader(Actor *actor);
 	bool SeekCreHeader(char *Signature);
 	void GetActorPST(Actor *actor);
+	ieDword GetActorGemRB(Actor *act);
 	void GetActorBG(Actor *actor);
 	void GetActorIWD1(Actor *actor);
 	void GetActorIWD2(Actor *actor);
@@ -86,7 +87,7 @@ private:
 	CREItem* GetItem();
 	void SetupColor(ieDword&);
 
-	int PutActorGemRB(DataStream *stream, Actor *actor);
+	int PutActorGemRB(DataStream *stream, Actor *actor, ieDword InvSize);
 	int PutActorPST(DataStream *stream, Actor *actor);
 	int PutActorBG(DataStream *stream, Actor *actor);
 	int PutActorIWD1(DataStream *stream, Actor *actor);
