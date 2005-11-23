@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.91 2005/11/23 06:28:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.92 2005/11/23 19:30:23 wjpalenstijn Exp $
  *
  */
 
@@ -24,16 +24,19 @@ class Map;
 #ifndef MAP_H
 #define MAP_H
 
-#include "TileMap.h"
-#include "ImageMgr.h"
-#include "Actor.h"
-#include "ScriptedAnimation.h"
-#include "GameControl.h"
-#include "PathFinder.h"
+#include "ActorBlock.h"
+#include "../../includes/globals.h"
 #include <queue>
 
+class Actor;
+class TileMap;
+class ImageMgr;
 class Ambient;
 class SpriteCover;
+class GameControl;
+struct PathNode;
+class ScriptedAnimation;
+class Animation;
 
 #ifdef WIN32
 

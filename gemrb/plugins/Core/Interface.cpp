@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.365 2005/11/22 22:07:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.366 2005/11/23 19:30:23 wjpalenstijn Exp $
  *
  */
 
@@ -49,6 +49,8 @@
 #include "MapControl.h"
 #include "EffectQueue.h"
 #include "MapMgr.h"
+#include "TileMap.h"
+#include "ScriptedAnimation.h"
 
 GEM_EXPORT Interface* core;
 

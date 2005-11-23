@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.342 2005/11/23 06:39:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.343 2005/11/23 19:30:26 wjpalenstijn Exp $
  *
  */
 
@@ -30,6 +30,7 @@
 #include "../Core/MapControl.h"
 #include "../Core/SoundMgr.h"
 #include "../Core/GSUtils.h" //checkvariable
+#include "../Core/TileMap.h"
 
 //this stuff is missing from Python 2.2
 #ifndef PyDoc_VAR

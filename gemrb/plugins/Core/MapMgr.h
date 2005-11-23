@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapMgr.h,v 1.8 2005/11/13 20:26:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapMgr.h,v 1.9 2005/11/23 19:30:23 wjpalenstijn Exp $
  *
  */
 
@@ -30,6 +30,7 @@
 
 #include "Plugin.h"
 #include "DataStream.h"
+#include "ActorBlock.h"
 #include "Map.h"
 
 #ifdef WIN32

@@ -15,12 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.31 2005/11/20 17:44:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.32 2005/11/23 19:30:23 wjpalenstijn Exp $
  *
  */
 
 #include "GSUtils.h"
 #include "Interface.h"
+#include "TileMap.h"
 #include "../../includes/strrefs.h"
 #include "../../includes/defsounds.h"
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.261 2005/11/23 06:28:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.262 2005/11/23 19:30:23 wjpalenstijn Exp $
  */
 
 #ifndef WIN32
@@ -29,6 +29,7 @@
 #include "../../includes/strrefs.h"
 #include "Effect.h"
 #include "GSUtils.h"
+#include "TileMap.h"
 
 #define DEBUG_SHOW_INFOPOINTS   0x01
 #define DEBUG_SHOW_CONTAINERS   0x02
@@ -286,7 +287,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	}
 
 	// Show wallpolygons
-	if (DebugFlags & DEBUG_SHOW_CONTAINERS) {
+	if (DebugFlags & DEBUG_SHOW_INFOPOINTS) {
 
 		unsigned int count = area->GetWallCount();
 		for (unsigned int i = 0; i < count; ++i) {

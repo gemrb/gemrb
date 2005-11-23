@@ -15,12 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.116 2005/11/22 20:49:39 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.117 2005/11/23 19:30:23 wjpalenstijn Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
 #include "Interface.h"
 #include "SpriteCover.h"
+#include "TileMap.h"
 #include <cassert>
 
 extern Interface* core;
