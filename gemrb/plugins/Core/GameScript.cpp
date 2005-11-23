@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.329 2005/11/20 11:01:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.330 2005/11/23 06:28:28 avenger_teambg Exp $
  *
  */
 
@@ -485,7 +485,7 @@ static ActionLink actionnames[] = {
 	{"incinternal", GameScript::IncInternal, 0}, //pst
 	{"incrementinternal", GameScript::IncInternal, 0},//iwd
 	{"incmoraleai", GameScript::IncMoraleAI, 0},
-	{"incrementchapter", GameScript::IncrementChapter, 0},
+	{"incrementchapter", GameScript::IncrementChapter, AF_BLOCKING},
 	{"incrementextraproficiency", GameScript::IncrementExtraProficiency, 0},
 	{"incrementglobal", GameScript::IncrementGlobal,AF_MERGESTRINGS},
 	{"incrementglobalonce", GameScript::IncrementGlobalOnce,AF_MERGESTRINGS},

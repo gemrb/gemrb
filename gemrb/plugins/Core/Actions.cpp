@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.40 2005/11/20 11:01:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.41 2005/11/23 06:28:28 avenger_teambg Exp $
  *
  */
 
@@ -2450,43 +2450,6 @@ void GameScript::SetLeavePartyDialogFile(Scriptable* Sender, Action* /*parameter
 
 void GameScript::TextScreen(Scriptable* /*Sender*/, Action* parameters)
 {
-	/*
-	int chapter;
-	ieDword line;
-	bool iwd=false;
-
-	if (parameters->string0Parameter[0]) {
-		chapter = core->LoadTable( parameters->string0Parameter );
-		line = 1;
-	} else {//iwd/iwd2 has a single table named chapters
-		chapter = core->LoadTable ( "CHAPTERS" );
-		core->GetGame()->locals->Lookup( "CHAPTER", line );
-		iwd = true;
-	}
-
-	if (chapter<0) {
-//add some standard way of notifying the user
-//		MissingResource(parameters->string0Parameter);
-		return;
-	}
-
-	TableMgr *table = core->GetTable(chapter);
-	strnuprcpy(core->GetGame()->LoadMos, table->QueryField((ieDword)-1),8);
-	
-	GameControl *gc=core->GetGameControl();
-	if (gc) {
-		char *strref = table->QueryField(line, 0);
-		char *str=core->GetString( strtol(strref,NULL,0) );
-		core->DisplayString(str);
-		free(str);
-		int cols = table->GetColumnCount(line);
-		strref = table->QueryField(line, 1);
-		str=core->GetString( strtol(strref,NULL,0) );
-		core->DisplayString(str);
-		free(str);
-	}
-	core->DelTable(chapter);
-	*/
 	strnuprcpy(core->GetGame()->LoadMos, parameters->string0Parameter,8);
 	core->GetGUIScriptEngine()->RunFunction( "StartTextScreen" );
 	core->GetVideoDriver()->DisableMouse = false;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.260 2005/11/22 20:49:39 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.261 2005/11/23 06:28:28 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -606,7 +606,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				break;
 			case 'v':
 				// explore map from point
-				area->ExploreMapChunk( p, rand()%30, true );
+				area->ExploreMapChunk( p, rand()%30, 1 );
 				break;
 			case 'x':
 				// shows coordinates

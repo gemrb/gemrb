@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.198 2005/11/22 20:49:39 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.199 2005/11/23 06:28:28 avenger_teambg Exp $
  *
  */
 
@@ -1018,15 +1018,9 @@ int Map::GetBlocked(Point &c)
 	int block = SearchMap->GetPixelIndex( c.x / 16, c.y / 12 );
 	return Passable[block];
 }
-/* i hate vectors, they are slow
-void Map::AddWallGroup(WallGroup* wg)
-{
-	wallGroups.push_back( wg );
-}
-*/
 
 SpriteCover* Map::BuildSpriteCover(int x, int y, int xpos, int ypos,
-							  int width, int height)
+				  unsigned int width, unsigned int height)
 {
 	SpriteCover* sc = new SpriteCover;
 	sc->worldx = x;
@@ -1037,7 +1031,8 @@ SpriteCover* Map::BuildSpriteCover(int x, int y, int xpos, int ypos,
 	sc->Height = height;
 
 	sc->pixels = new unsigned char[width * height];
-	for (int i = 0; i < width*height; ++i)
+	unsigned int i;
+	for (i = 0; i < width*height; ++i)
 		sc->pixels[i] = 0;
 
 	unsigned int wpcount = GetWallCount();
@@ -1046,7 +1041,7 @@ SpriteCover* Map::BuildSpriteCover(int x, int y, int xpos, int ypos,
 
 	// WARNING: slow...
 
-	for (unsigned int i = 0; i < wpcount; ++i)
+	for (i = 0; i < wpcount; ++i)
 	{
 		Wall_Polygon* wp = GetWallGroup(i);
 		if (!wp) continue;
@@ -1063,7 +1058,7 @@ SpriteCover* Map::BuildSpriteCover(int x, int y, int xpos, int ypos,
 			int y_bot = iter->y2 - yoff; // exclusive
 
 			if (y_top < 0) y_top = 0;
-			if (y_bot > height) y_bot = height;
+			if ( (unsigned) y_bot > height) y_bot = height;
 			if (y_top >= y_bot) continue; // clipped
 
 			int ledge = iter->left_edge;
@@ -1087,7 +1082,7 @@ SpriteCover* Map::BuildSpriteCover(int x, int y, int xpos, int ypos,
 				rt -= xoff;
 
 				if (lt < 0) lt = 0;
-				if (rt > width) rt = width;
+				if ((unsigned) rt > width) rt = width;
 				if (lt >= rt) { line += width; continue; } // clipped
 
 				unsigned char* pix = line + lt;
@@ -1960,7 +1955,7 @@ void Map::ExploreTile(Point &pos)
 	VisibleBitmap[by] |= bi;
 }
 
-void Map::ExploreMapChunk(Point &Pos, int range, bool los)
+void Map::ExploreMapChunk(Point &Pos, int range, int los)
 {
 	Point Tile;
 
@@ -2010,7 +2005,7 @@ void Map::UpdateFog()
 		if (state & STATE_CANTSEE) continue;
 		int vis2 = actor->GetStat( IE_VISUALRANGE );
 		if (state&STATE_BLIND) vis2=2; //can see only themselves
-		ExploreMapChunk (actor->Pos, vis2, true);
+		ExploreMapChunk (actor->Pos, vis2, 1);
 		Spawn *sp = GetSpawnRadius(actor->Pos, SPAWN_RANGE); //30 * 12
 		if (sp) {
 			TriggerSpawn(sp);

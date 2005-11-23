@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.90 2005/11/22 20:49:39 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.91 2005/11/23 06:28:28 avenger_teambg Exp $
  *
  */
 
@@ -226,7 +226,7 @@ public:
 	}
 	//void AddWallGroup(WallGroup* wg);
 	SpriteCover* BuildSpriteCover(int x, int y, int xpos, int ypos,
-								  int width, int height);
+				  unsigned int width, unsigned int height);
 	void Shout(Actor* actor, int shoutID, unsigned int radius);
 	void AddActor(Actor* actor);
 	int GetBlocked(Point &p);
@@ -271,7 +271,7 @@ public:
 	/* set one fog tile as visible. x, y are tile coordinates */
 	void ExploreTile(Point &Tile);
 	/* explore map from given point in map coordinates */
-	void ExploreMapChunk(Point &Pos, int range, bool los);
+	void ExploreMapChunk(Point &Pos, int range, int los);
 	/* update VisibleBitmap by resolving vision of all explore actors */
 	void UpdateFog();
 	//PathFinder
