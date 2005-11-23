@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.201 2005/11/23 19:30:23 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.202 2005/11/23 20:49:40 avenger_teambg Exp $
  *
  */
 
@@ -678,26 +678,15 @@ void Map::DrawMap(Region screen, GameControl* gc)
 						Color tint = LightMap->GetPixel( cx / 16, cy / 12);
 						tint.a = 255-Trans;
 						SpriteCover* sc = actor->GetSpriteCover();
-						if (!sc || !sc->Covers(cx, cy, nextFrame->XPos,
-											   nextFrame->YPos,
-											   nextFrame->Width,
-											   nextFrame->Height)) {
+						if (!sc || !sc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height)) {
 							delete sc;
-							sc = BuildSpriteCover(cx, cy, -anim->animArea.x,
-												  -anim->animArea.y,
-												  anim->animArea.w,
-												  anim->animArea.h);
+							sc = BuildSpriteCover(cx, cy, -anim->animArea.x, -anim->animArea.y, anim->animArea.w, anim->animArea.h, actor->WantDither() );
 							actor->SetSpriteCover(sc);
 
 						}
-						assert(sc->Covers(cx, cy, nextFrame->XPos,
-										  nextFrame->YPos,
-										  nextFrame->Width,
-										  nextFrame->Height));
+						assert(sc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height));
 
-						video->BlitSpriteCovered( nextFrame, cx + screen.x,
-												  cy + screen.y, tint, sc,
-												  anim->Palette, &screen );
+						video->BlitSpriteCovered( nextFrame, cx + screen.x, cy + screen.y, tint, sc, anim->Palette, &screen );
 					}
 					if (anim->endReached) {
 						if (HandleActorStance(actor, ca, StanceID) ) {
@@ -1022,8 +1011,12 @@ int Map::GetBlocked(Point &c)
 	return Passable[block];
 }
 
+// flags: 0 - never dither (full cover)
+//        1 - dither if polygon wants it
+//        2 - always dither
+
 SpriteCover* Map::BuildSpriteCover(int x, int y, int xpos, int ypos,
-				  unsigned int width, unsigned int height)
+			  unsigned int width, unsigned int height, int flags)
 {
 	SpriteCover* sc = new SpriteCover;
 	sc->worldx = x;
@@ -1087,12 +1080,25 @@ SpriteCover* Map::BuildSpriteCover(int x, int y, int xpos, int ypos,
 				if (lt < 0) lt = 0;
 				if (rt > (signed) width) rt = (signed) width;
 				if (lt >= rt) { line += width; continue; } // clipped
+				int dither;
 
-				unsigned char* pix = line + lt;
-				unsigned char* end = line + rt;
-				if ((lt + xoff + sy + yoff) % 2) pix++; // CHECKME: aliasing?
-				for (; pix < end; pix += 2)
-					*pix = 1;
+				if (flags == 1) {
+					dither = wp->wall_flag & WF_DITHER;
+				} else {
+					dither = flags;
+				}
+				if (dither) {
+					unsigned char* pix = line + lt;
+					unsigned char* end = line + rt;
+
+					if ((lt + xoff + sy + yoff) % 2) pix++; // CHECKME: aliasing?
+					for (; pix < end; pix += 2)
+						*pix = 1;
+				} else {
+					// we hope memset is faster
+					// condition: lt < rt is true
+					memset (line+lt, 1, rt-lt);
+				}
 				line += width;
 			}
 		}

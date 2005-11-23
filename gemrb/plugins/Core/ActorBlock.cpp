@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.118 2005/11/23 19:55:33 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.119 2005/11/23 20:49:40 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -388,6 +388,20 @@ void Selectable::SetCircle(int circlesize, Color color)
 	overColor.r = color.r >> 1;
 	overColor.g = color.g >> 1;
 	overColor.b = color.b >> 1;
+}
+
+//used for creatures
+int Selectable::WantDither()
+{
+	//if actor is dead, dither it if polygon wants
+	if (Selected&0x80) {
+		return 1;
+	}
+	//if actor is selected dither it
+	if (Selected) {
+		return 2;
+	}
+	return 1;
 }
 
 /***********************
@@ -1080,7 +1094,7 @@ void Container::CreateGroundIconCover()
 		groundiconcover = 0;
 		if (width*height > 0)
 			groundiconcover = GetCurrentArea()->BuildSpriteCover
-				(Pos.x, Pos.y, xpos, ypos, width, height);
+				(Pos.x, Pos.y, xpos, ypos, width, height, WantDither());
 	}
 
 	// TODO: remove this checking code eventually
@@ -1141,6 +1155,17 @@ void Container::RefreshGroundIcons()
 		groundicons[i] = core->GetBAMSprite( itm->GroundIcon, 0, 0 );
 		core->FreeItem( itm, slot->ItemResRef ); //decref
 	}
+}
+
+//used for ground piles
+int Container::WantDither()
+{
+	//if pile is highlighted, always dither it
+	if (Highlight) {
+		return 2; //dither me if you want
+	}
+	//if pile isn't highlighted, dither it if the polygon wants
+	return 1;
 }
 
 void Container::DebugDump()

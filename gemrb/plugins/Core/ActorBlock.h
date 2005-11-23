@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.91 2005/11/23 19:55:33 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.92 2005/11/23 20:49:40 avenger_teambg Exp $
  *
  */
 
@@ -201,6 +201,7 @@ public:
 	bool IsSelected();
 	void Select(int Value);
 	void SetCircle(int size, Color color);
+	int WantDither();
 };
 
 class GEM_EXPORT Highlightable : public Scriptable {
@@ -365,6 +366,8 @@ public:
 	int AddItem(CREItem *item);
 	//draws the ground icons
 	void DrawPile(bool highlight, Region screen, Color tint);
+	//returns dithering option
+	int WantDither();
 private:
 	//updates the ground icons for a pile
 	void RefreshGroundIcons();
