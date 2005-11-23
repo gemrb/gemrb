@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.90 2005/11/22 20:49:39 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.91 2005/11/23 19:55:33 wjpalenstijn Exp $
  *
  */
 
@@ -369,6 +369,7 @@ private:
 	//updates the ground icons for a pile
 	void RefreshGroundIcons();
 	void FreeGroundIcons();
+	void CreateGroundIconCover();
 public:
 	Point toOpen;
 	ieWord Type;
