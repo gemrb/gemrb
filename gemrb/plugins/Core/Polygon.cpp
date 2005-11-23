@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.cpp,v 1.17 2005/11/23 06:39:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.cpp,v 1.18 2005/11/23 16:04:49 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "Polygon.h"
@@ -360,10 +360,13 @@ void Wall_Polygon::SetBaseline(Point &a, Point &b)
 
 bool Wall_Polygon::PointCovered(Point &p)
 {
-	if (base0.x > base1.x)
-		return left(base0, base1, p);
-	else
-		return left(base1, base0, p);
+	if (wall_flag&WF_BASELINE) {
+		if (base0.x > base1.x)
+			return left(base0, base1, p);
+		else
+			return left(base1, base0, p);
+	}
+	return true;
 }
 
 bool Wall_Polygon::PointCovered(int tx, int ty)

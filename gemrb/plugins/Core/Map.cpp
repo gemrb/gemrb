@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.199 2005/11/23 06:28:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.200 2005/11/23 16:04:49 avenger_teambg Exp $
  *
  */
 
@@ -1058,7 +1058,7 @@ SpriteCover* Map::BuildSpriteCover(int x, int y, int xpos, int ypos,
 			int y_bot = iter->y2 - yoff; // exclusive
 
 			if (y_top < 0) y_top = 0;
-			if ( (unsigned) y_bot > height) y_bot = height;
+			if ( y_bot > (signed) height) y_bot = (signed) height;
 			if (y_top >= y_bot) continue; // clipped
 
 			int ledge = iter->left_edge;
@@ -1082,7 +1082,7 @@ SpriteCover* Map::BuildSpriteCover(int x, int y, int xpos, int ypos,
 				rt -= xoff;
 
 				if (lt < 0) lt = 0;
-				if ((unsigned) rt > width) rt = width;
+				if (rt > (signed) width) rt = (signed) width;
 				if (lt >= rt) { line += width; continue; } // clipped
 
 				unsigned char* pix = line + lt;
