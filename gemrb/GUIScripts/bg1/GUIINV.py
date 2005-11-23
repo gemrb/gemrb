@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.4 2005/11/23 21:28:08 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.5 2005/11/23 21:58:05 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -156,13 +156,13 @@ def GetColor():
 	GemRB.SetVisible (InventoryWindow,2) #darken it
 	ColorPicker=GemRB.LoadWindow (3)
 	GemRB.SetVar ("Selected",-1)
-	for i in range(0,34):
+	for i in range(34):
 		Button = GemRB.GetControl (ColorPicker, i)
 		GemRB.SetButtonState (ColorPicker, Button, IE_GUI_BUTTON_DISABLED)
 		GemRB.SetButtonFlags (ColorPicker, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 
 	Selected = -1
-	for i in range(0,34):
+	for i in range(34):
 		MyColor = GemRB.GetTableValue (ColorTable, ColorIndex, i)
 		if MyColor == "*":
 			break
@@ -215,32 +215,7 @@ def RefreshInventoryWindow ():
 		Color5, Color4, Color3, Color2, Color6, Color7, Color1, 0)
 
 	# encumbrance
-	# Loading tables of modifications
-	Table = GemRB.LoadTable ("strmod")
-	TableEx = GemRB.LoadTable ("strmodex")
-	# Getting the character's strength
-	sstr = GemRB.GetPlayerStat (pc, IE_STR)
-	ext_str = GemRB.GetPlayerStat (pc, IE_STREXTRA)
-
-	max_encumb = GemRB.GetTableValue (Table, sstr, 3) + GemRB.GetTableValue (TableEx, ext_str, 3)
-	encumbrance = GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)
-
-	Label = GemRB.GetControl (Window, 0x10000043)
-	GemRB.SetText (Window, Label, str(encumbrance) + ":")
-
-	Label2 = GemRB.GetControl (Window, 0x10000044)
-	GemRB.SetText (Window, Label2, str(max_encumb) + ":")
-
-	ratio = (0.0 + encumbrance) / max_encumb
-	if ratio > 1.0:
-		GemRB.SetLabelTextColor (Window, Label, 255, 0, 0)
-		GemRB.SetLabelTextColor (Window, Label2, 255, 0, 0)
-	elif ratio > 0.8:
-		GemRB.SetLabelTextColor (Window, Label, 255, 255, 0)
-		GemRB.SetLabelTextColor (Window, Label2, 255, 0, 0)
-	else:
-		GemRB.SetLabelTextColor (Window, Label, 255, 255, 255)
-		GemRB.SetLabelTextColor (Window, Label2, 255, 0, 0)
+	SetEncumbranceLabels( Window, 0x10000043, 0x10000044, pc)
 
 	# armor class
 	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)

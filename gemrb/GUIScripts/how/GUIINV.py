@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIINV.py,v 1.3 2004/12/04 17:35:11 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIINV.py,v 1.4 2005/11/23 21:58:06 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -118,7 +118,7 @@ def ColorDonePress():
 	GemRB.UnloadWindow(ColorPicker)
 	GemRB.SetVisible(InventoryWindow,1)
 	ColorTable = GemRB.LoadTable("clowncol")
-	PickedColor=GemRB.GetTableValue(ColorTable, ColorIndex, GemRB.GetVar("Selected"))
+	PickedColor=GemRB.GetTableValue (ColorTable, ColorIndex, GemRB.GetVar("Selected"))
 	GemRB.UnloadTable(ColorTable)
 	if ColorIndex==2:
 		GemRB.SetPlayerStat (pc, IE_MAJOR_COLOR, PickedColor)
@@ -153,14 +153,14 @@ def GetColor():
 	GemRB.SetVisible(InventoryWindow,2) #darken it
 	ColorPicker=GemRB.LoadWindow(3)
 	GemRB.SetVar("Selected",-1)
-	for i in range(0,34):
+	for i in range(34):
 		Button = GemRB.GetControl(ColorPicker, i)
 		GemRB.SetButtonState(ColorPicker, Button, IE_GUI_BUTTON_DISABLED)
 		GemRB.SetButtonFlags(ColorPicker, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 
 	Selected = -1
-	for i in range(0,34):
-		MyColor = GemRB.GetTableValue(ColorTable, ColorIndex, i)
+	for i in range(34):
+		MyColor = GemRB.GetTableValue (ColorTable, ColorIndex, i)
 		if MyColor == "*":
 			break
 		Button = GemRB.GetControl(ColorPicker, i)
@@ -206,7 +206,7 @@ def UpdateInventoryWindow ():
 	sstr = GemRB.GetPlayerStat (pc, IE_STR)
 	ext_str = GemRB.GetPlayerStat (pc, IE_STREXTRA)
 
-	max_encumb = GemRB.GetTableValue(Table, sstr, 3) + GemRB.GetTableValue(TableEx, ext_str, 3)
+	max_encumb = GemRB.GetTableValue (Table, sstr, 3) + GemRB.GetTableValue(TableEx, ext_str, 3)
 	encumbrance = GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)
 
 	Label = GemRB.GetControl (Window, 0x10000043)
