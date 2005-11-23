@@ -4,6 +4,7 @@ Columns: BITS - connects the itemslots to item types (see itemtype.2da). If a bi
        SCRIPT - usually the ControlID of the slot on the inventory screen, but your script may use it differently. (For example PST is a bit different).
        ICON   - usually a bam ResRef of the background image of the slot in the inventory screen. (Your script may use it differently).
        STRREF - usually a tooltip StrRef, but your script may use it differently.
+       EFFECT - whether the slot is an equipping slot (for equipping effects)
 
 Rows: each row represents a creature item slot, even unused or invisible slots must be represented.
 
