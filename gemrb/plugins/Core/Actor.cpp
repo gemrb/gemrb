@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.135 2005/11/24 17:44:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.136 2005/11/24 17:53:27 avenger_teambg Exp $
  *
  */
 
@@ -24,7 +24,6 @@
 #include "Actor.h"
 #include "Interface.h"
 #include "../../includes/strrefs.h"
-#include "SpriteCover.h"
 #include "Item.h"
 #include "Spell.h"
 #include "Game.h"
@@ -111,7 +110,6 @@ Actor::Actor()
 	LargePortrait[0] = 0;
 
 	anims = NULL;
-	cover = NULL;
 
 	LongName = NULL;
 	ShortName = NULL;
@@ -170,8 +168,6 @@ Actor::~Actor(void)
 	if (PCStats) {
 		delete PCStats;
 	}
-
-	delete cover;
 }
 
 void Actor::SetText(char* ptr, unsigned char type)

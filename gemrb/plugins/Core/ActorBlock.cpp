@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.120 2005/11/24 17:44:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.121 2005/11/24 17:53:27 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -336,10 +336,12 @@ Selectable::Selectable(ScriptableType type)
 	Selected = false;
 	Over = false;
 	size = 0;
+	cover = NULL;
 }
 
 Selectable::~Selectable(void)
 {
+	delete cover;
 }
 
 void Selectable::SetBBox(Region &newBBox)
@@ -360,7 +362,6 @@ void Selectable::DrawCircle(Region &vp)
 	} else {
 		return;
 	}
-	//Region vp = core->GetVideoDriver()->GetViewport();
 	core->GetVideoDriver()->DrawEllipse( Pos.x - vp.x, Pos.y - vp.y,
 		 size * 10, ( ( size * 15 ) / 2 ), *col );
 }
@@ -380,11 +381,16 @@ void Selectable::SetOver(bool over)
 	Over = over;
 }
 
+//don't call this function after rendering the cover and before the
+//blitting of the sprite or bad things will happen :)
 void Selectable::Select(int Value)
 {
 	if (Selected!=0x80 || Value!=1) {
 		Selected = Value;
 	}
+	//forcing regeneration of the cover
+	delete cover;
+	cover = NULL;
 }
 
 void Selectable::SetCircle(int circlesize, Color color)
