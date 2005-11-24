@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.202 2005/11/23 20:49:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.203 2005/11/24 17:44:08 wjpalenstijn Exp $
  *
  */
 
@@ -30,6 +30,14 @@
 #include "TileMap.h"
 #include "ScriptedAnimation.h"
 #include "ImageMgr.h"
+#include "Video.h"
+#include "ResourceMgr.h"
+#include "SoundMgr.h"
+#include "MusicMgr.h"
+#include "Game.h"
+#include "WorldMap.h"
+#include "GameControl.h"
+
 #include <cassert>
 
 #ifndef WIN32

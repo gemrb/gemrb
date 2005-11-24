@@ -2,10 +2,9 @@
 #define GLOBALTIMER_H
 
 #include <vector>
+#include "Region.h"
 
-#include "GameScript.h"
-#include "Actor.h"
-#include "ControlAnimation.h"
+class ControlAnimation;
 
 #ifdef WIN32
 

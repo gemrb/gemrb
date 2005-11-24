@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.94 2005/11/13 20:26:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.95 2005/11/24 17:44:08 wjpalenstijn Exp $
  *
  */
 
@@ -24,6 +24,9 @@
 #include "MapMgr.h"
 #include "DataStream.h"
 #include "Interface.h"
+#include "ResourceMgr.h"
+#include "ScriptEngine.h"
+#include "GameControl.h"
 #include "../../includes/strrefs.h"
 
 #define MAX_MAPS_LOADED 2

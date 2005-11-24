@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.60 2005/11/20 11:01:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.61 2005/11/24 17:44:08 wjpalenstijn Exp $
  *
  */
 
@@ -24,6 +24,8 @@
 #include "Interface.h"
 #include "Inventory.h"
 #include "Item.h"
+#include "Actor.h"
+#include "Game.h"
 
 static int SLOT_MAGIC = 12;
 static int SLOT_FIST = 12;

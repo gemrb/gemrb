@@ -15,13 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.48 2005/07/20 21:46:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.49 2005/11/24 17:44:09 wjpalenstijn Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "TileMap.h"
 #include "Interface.h"
+#include "Video.h"
 
 extern Interface* core;
 

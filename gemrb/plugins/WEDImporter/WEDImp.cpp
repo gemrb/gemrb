@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.19 2005/11/13 20:26:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.20 2005/11/24 17:44:10 wjpalenstijn Exp $
  *
  */
 
@@ -23,6 +23,7 @@
 #include "WEDImp.h"
 #include "../Core/TileSetMgr.h"
 #include "../Core/Interface.h"
+#include "../Core/ResourceMgr.h"
 
 WEDImp::WEDImp(void)
 {

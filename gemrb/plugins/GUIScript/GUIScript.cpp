@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.343 2005/11/23 19:30:26 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.344 2005/11/24 17:44:09 wjpalenstijn Exp $
  *
  */
 
@@ -31,6 +31,19 @@
 #include "../Core/SoundMgr.h"
 #include "../Core/GSUtils.h" //checkvariable
 #include "../Core/TileMap.h"
+#include "../Core/ResourceMgr.h"
+#include "../Core/Video.h"
+#include "../Core/TextEdit.h"
+#include "../Core/Button.h"
+#include "../Core/Spell.h"
+#include "../Core/Item.h"
+#include "../Core/MusicMgr.h"
+#include "../Core/SaveGameIterator.h"
+#include "../Core/Game.h"
+#include "../Core/ControlAnimation.h"
+#include "../Core/DataFileMgr.h"
+
+
 
 //this stuff is missing from Python 2.2
 #ifndef PyDoc_VAR

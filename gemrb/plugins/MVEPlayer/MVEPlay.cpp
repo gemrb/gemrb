@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.cpp,v 1.17 2005/09/20 21:34:36 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.cpp,v 1.18 2005/11/24 17:44:10 wjpalenstijn Exp $
  *
  */
 
@@ -23,6 +23,9 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include "../Core/Interface.h"
+#include "../Core/Video.h"
+#include "../Core/SoundMgr.h"
+#include "../Core/Variables.h"
 #include "MVEPlay.h"
 #include "libmve.h"
 #include "../../includes/ie_types.h"

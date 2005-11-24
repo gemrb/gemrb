@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.66 2005/11/20 11:33:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.67 2005/11/24 17:44:08 wjpalenstijn Exp $
  *
  */
 
@@ -23,6 +23,10 @@
 #include "AnimationMgr.h"
 #include "CharAnimations.h"
 #include "Interface.h"
+#include "Video.h"
+#include "ResourceMgr.h"
+#include "ImageMgr.h"
+#include "Map.h"
 
 static int AvatarsCount = 0;
 static AvatarStruct *AvatarTable = NULL;

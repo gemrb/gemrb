@@ -15,13 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.30 2005/10/18 22:43:41 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.31 2005/11/24 17:44:09 wjpalenstijn Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "SaveGameIterator.h"
 #include "Interface.h"
+#include "ResourceMgr.h"
+#include "SaveGameMgr.h"
+#include "GameControl.h"
 
 SaveGame::SaveGame(char* path, char* name, char* prefix, int pCount)
 {

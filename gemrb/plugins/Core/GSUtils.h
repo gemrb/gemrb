@@ -1,6 +1,7 @@
 #ifndef GSUTILS_H
 #define GSUTILS_H
 #include "Interface.h"
+#include "GameScript.h"
 #include "../../includes/strrefs.h"
 #include "../../includes/defsounds.h"
 //indebug flags

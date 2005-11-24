@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.42 2005/11/23 19:30:23 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.43 2005/11/24 17:44:08 wjpalenstijn Exp $
  *
  */
 
@@ -23,6 +23,17 @@
 #include "GameScript.h"
 #include "GSUtils.h"
 #include "TileMap.h"
+#include "Video.h"
+#include "ScriptEngine.h"
+#include "SoundMgr.h"
+#include "MusicMgr.h"
+#include "Item.h"
+#include "SaveGameIterator.h"
+#include "Map.h"
+#include "Game.h"
+#include "GameControl.h"
+#include "WorldMap.h"
+
 //------------------------------------------------------------
 // Action Functions
 //-------------------------------------------------------------

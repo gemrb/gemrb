@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.47 2005/07/31 17:12:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.48 2005/11/24 17:44:08 wjpalenstijn Exp $
  *
  */
 
@@ -30,6 +30,8 @@
 #include "../Core/AnimationMgr.h"
 #include "../Core/TextArea.h"
 #include "../Core/TextEdit.h"
+#include "../Core/ResourceMgr.h"
+#include "../Core/ImageMgr.h"
 #include "../../includes/RGBAColor.h"
 
 CHUImp::CHUImp()

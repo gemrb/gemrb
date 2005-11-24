@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.3 2005/11/16 22:01:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.4 2005/11/24 17:44:09 wjpalenstijn Exp $
  *
  */
 
@@ -23,6 +23,9 @@
 #include "../Core/Actor.h"
 #include "../Core/EffectQueue.h"
 #include "../Core/Interface.h"
+#include "../Core/ResourceMgr.h"
+#include "../Core/SoundMgr.h"
+#include "../Core/Game.h"
 
 #include "FXOpc.h"
 

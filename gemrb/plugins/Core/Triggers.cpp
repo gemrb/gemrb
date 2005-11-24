@@ -15,13 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.25 2005/11/20 11:01:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.26 2005/11/24 17:44:09 wjpalenstijn Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "GameScript.h"
 #include "GSUtils.h"
+#include "Video.h"
+#include "Game.h"
+#include "GameControl.h"
+
 //-------------------------------------------------------------
 // Trigger Functions
 //-------------------------------------------------------------

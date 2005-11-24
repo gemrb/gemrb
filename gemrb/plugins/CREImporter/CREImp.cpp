@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.90 2005/11/23 06:39:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.91 2005/11/24 17:44:08 wjpalenstijn Exp $
  *
  */
 
@@ -23,6 +23,7 @@
 #include "CREImp.h"
 #include "../Core/Interface.h"
 #include "../Core/EffectMgr.h"
+#include "../Core/GameScript.h"
 #include "../../includes/ie_stats.h"
 
 #define MAXCOLOR 12

@@ -15,13 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.36 2005/11/22 20:49:39 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.37 2005/11/24 17:44:08 wjpalenstijn Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "Animation.h"
 #include "Interface.h"
+#include "Video.h"
+#include "Map.h"
+#include "Game.h"
+
 #ifndef WIN32
 #include <sys/time.h>
 #else

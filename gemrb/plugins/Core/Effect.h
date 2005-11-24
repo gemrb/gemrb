@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.h,v 1.8 2005/10/20 20:39:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.h,v 1.9 2005/11/24 17:44:08 wjpalenstijn Exp $
  *
  */
 
@@ -67,7 +67,7 @@ class Actor;
  */
 
 // the same as ITMFeature and SPLFeature
-typedef struct Effect {
+struct Effect {
 	ieDword Opcode;
 	ieDword Target;
 	ieDword Power;
@@ -101,7 +101,7 @@ typedef struct Effect {
 
 	// These are not in the IE files, but are our precomputed values
 	int  random_value;
-} Effect;
+};
 
 // FIXME: what about area spells? They can have map & coordinates as target
 void AddEffect(Effect* fx, Actor* self, Actor* pretarget);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.40 2005/11/22 20:49:40 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.41 2005/11/24 17:44:07 wjpalenstijn Exp $
  *
  */
 
@@ -24,6 +24,7 @@
 #include "../Core/Interface.h"
 #include "../Core/Compressor.h"
 #include "../Core/FileStream.h"
+#include "../Core/Video.h"
 
 BAMImp::BAMImp(void)
 {
@@ -181,7 +182,7 @@ Sprite2D* BAMImp::GetFrame(unsigned short findex, unsigned char mode)
 		// FIXME: get the real size of the RLE data somehow, or cache
 		// the entire BAM in memory consecutively
 		RLESize = ( unsigned long )
-			ceil( frames[findex].Width * frames[findex].Height * 1.5 );
+			( frames[findex].Width * frames[findex].Height * 3 ) / 2 + 1;
 		//without partial reads, we should be careful
 		str->Seek( ( frames[findex].FrameData & 0x7FFFFFFF ), GEM_STREAM_START );
 		unsigned long remains = str->Remains();
@@ -232,7 +233,7 @@ void* BAMImp::GetFramePixels(unsigned short findex, unsigned char* RLEinpix)
 		//if RLE Compressed
 		unsigned long RLESize;
 		RLESize = ( unsigned long )
-			ceil( frames[findex].Width * frames[findex].Height * 1.5 );
+			( frames[findex].Width * frames[findex].Height * 3 ) / 2 + 1;
 		//without partial reads, we should be careful
 		unsigned long remains = str->Remains();
 		if (RLESize > remains) {

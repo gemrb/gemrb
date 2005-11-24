@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.h,v 1.9 2005/10/20 20:39:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.h,v 1.10 2005/11/24 17:44:09 wjpalenstijn Exp $
  *
  */
 
@@ -25,6 +25,7 @@
  */
 
 class WorldMapControl;
+class WMPAreaEntry;
 
 #ifndef WORLDMAPCONTROL_H
 #define WORLDMAPCONTROL_H
@@ -32,6 +33,7 @@ class WorldMapControl;
 #include "Control.h"
 #include "Interface.h"
 #include "Dialog.h"
+
 
 #ifdef WIN32
 
@@ -43,10 +45,6 @@ class WorldMapControl;
 
 #else
 #define GEM_EXPORT
-#endif
-
-#ifndef _DEBUG
-#define _DEBUG
 #endif
 
 /**

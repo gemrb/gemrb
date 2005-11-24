@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.15 2005/10/20 23:13:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.16 2005/11/24 17:44:09 wjpalenstijn Exp $
  *
  */
 
@@ -32,6 +32,8 @@
 #include <vector>
 #include "../../includes/win32def.h"
 #include "../../includes/ie_types.h"
+
+class Actor;
 
 #ifdef WIN32
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PLTImporter/PLTImp.cpp,v 1.10 2005/11/20 21:31:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PLTImporter/PLTImp.cpp,v 1.11 2005/11/24 17:44:10 wjpalenstijn Exp $
  *
  */
 
@@ -23,6 +23,7 @@
 #include "PLTImp.h"
 #include "../../includes/RGBAColor.h"
 #include "../Core/Interface.h"
+#include "../Core/Video.h"
 
 static int initial[8]={20,31,31,7,14,20,0,0};
 static int pperm[8]={2,5,6,0,4,3,1,7};

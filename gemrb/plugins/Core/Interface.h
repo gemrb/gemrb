@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.175 2005/11/13 20:26:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.176 2005/11/24 17:44:08 wjpalenstijn Exp $
  *
  */
 
@@ -27,46 +27,50 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
 
-#include "Compressor.h"
 #include "InterfaceDesc.h"
-#include "PluginMgr.h"
-#include "Video.h"
-#include "ResourceMgr.h"
 #include "../../includes/SClassID.h"
-#include "StringMgr.h"
-#include "ActorBlock.h"
-#include "Factory.h"
-#include "ImageMgr.h"
-#include "ActorMgr.h"
-#include "Font.h"
-#include "EventMgr.h"
-#include "WindowMgr.h"
-#include "ScriptEngine.h"
-#include "Button.h"
-#include "Label.h"
-#include "Slider.h"
-#include "Progressbar.h"
-#include "TextEdit.h"
-#include "Console.h"
-#include "SoundMgr.h"
-#include "SaveGameIterator.h"
-#include "Variables.h"
-#include "Item.h"
-#include "Spell.h"
-#include "MusicMgr.h"
-#include "TableMgr.h"
-#include "SymbolMgr.h"
-#include "MoviePlayer.h"
-#include "DataFileMgr.h"
-#include "GameScript.h"
-#include "Game.h"
-#include "WorldMap.h"
-#include "GameControl.h"
-#include "WorldMapControl.h"
-#include "GlobalTimer.h"
-#include "SaveGameMgr.h"
 #include "Cache.h"
-#include "OpcodeMgr.h"
+#include "GlobalTimer.h"
+
+
+class PluginMgr;
+class Video;
+class ResourceMgr;
+class StringMgr;
+class Container;
+class Factory;
+class ImageMgr;
+class Font;
+class EventMgr;
+class WindowMgr;
+class ScriptEngine;
+class Console;
+class SoundMgr;
+class TextArea;
+class SaveGameIterator;
+class Variables;
+class Item;
+class Spell;
+class MusicMgr;
+class TableMgr;
+class SymbolMgr;
+class ITMExtHeader;
+class SPLExtHeader;
+class DataFileMgr;
+class Game;
+class WorldMap;
+class WorldMapArray;
+class GameControl;
+class OpcodeMgr;
+class Window;
+class CREItem;
+class Store;
+class Actor;
+struct Effect;
+class EffectRef;
+class Map;
+class ScriptedAnimation;
+class Control;
 
 typedef struct Table {
 	TableMgr * tm;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.h,v 1.16 2005/10/19 21:57:33 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.h,v 1.17 2005/11/24 17:44:09 wjpalenstijn Exp $
  *
  */
 
@@ -48,9 +48,6 @@ class MapControl;
 #define GEM_EXPORT
 #endif
 
-#ifndef _DEBUG
-#define _DEBUG
-#endif
 
 /**
  * @class MapControl

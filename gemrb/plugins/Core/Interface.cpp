@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.366 2005/11/23 19:30:23 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.367 2005/11/24 17:44:08 wjpalenstijn Exp $
  *
  */
 
@@ -51,6 +51,24 @@
 #include "MapMgr.h"
 #include "TileMap.h"
 #include "ScriptedAnimation.h"
+#include "Video.h"
+#include "ResourceMgr.h"
+#include "PluginMgr.h"
+#include "StringMgr.h"
+#include "ScriptEngine.h"
+#include "ActorMgr.h"
+#include "Factory.h"
+#include "Console.h"
+#include "Button.h"
+#include "SoundMgr.h"
+#include "SaveGameIterator.h"
+#include "MusicMgr.h"
+#include "MoviePlayer.h"
+#include "GameControl.h"
+#include "Game.h"
+#include "DataFileMgr.h"
+#include "SaveGameMgr.h"
+#include "WorldMapControl.h"
 
 GEM_EXPORT Interface* core;
 

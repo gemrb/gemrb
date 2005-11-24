@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.25 2005/11/20 21:31:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.26 2005/11/24 17:44:08 wjpalenstijn Exp $
  *
  */
 
@@ -23,6 +23,7 @@
 #include "BMPImp.h"
 #include "../../includes/RGBAColor.h"
 #include "../Core/Interface.h"
+#include "../Core/Video.h"
 
 static ieDword red_mask = 0x00ff0000;
 static ieDword green_mask = 0x0000ff00;

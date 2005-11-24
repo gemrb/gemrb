@@ -15,12 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GlobalTimer.cpp,v 1.25 2005/11/06 13:42:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GlobalTimer.cpp,v 1.26 2005/11/24 17:44:08 wjpalenstijn Exp $
  *
  */
 
 #include "GlobalTimer.h"
 #include "Interface.h"
+#include "Video.h"
+#include "Game.h"
+#include "GameControl.h"
+#include "ControlAnimation.h"
 
 extern Interface* core;
 

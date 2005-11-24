@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.262 2005/11/23 19:30:23 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.263 2005/11/24 17:44:08 wjpalenstijn Exp $
  */
 
 #ifndef WIN32
@@ -30,6 +30,11 @@
 #include "Effect.h"
 #include "GSUtils.h"
 #include "TileMap.h"
+#include "Video.h"
+#include "ResourceMgr.h"
+#include "ScriptEngine.h"
+#include "Item.h"
+#include "Game.h"
 
 #define DEBUG_SHOW_INFOPOINTS   0x01
 #define DEBUG_SHOW_CONTAINERS   0x02

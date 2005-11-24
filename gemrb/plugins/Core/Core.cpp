@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.37 2005/11/06 16:13:33 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.38 2005/11/24 17:44:08 wjpalenstijn Exp $
  *
  */
 
@@ -25,7 +25,7 @@
  * @author The GemRB Project
  */
 
-
+#include <cmath>
 #ifndef WIN32
 #include <ctype.h>
 #include <sys/time.h>
@@ -51,7 +51,8 @@ BOOL WINAPI DllEntryPoint(HINSTANCE /*hinstDLL*/, DWORD /*fdwReason*/,
 #endif
 
 #include "../../includes/globals.h"
-#include "Interface.h" 
+#include "Interface.h"
+#include "ActorBlock.h"
 
 //// Globally used functions
 
