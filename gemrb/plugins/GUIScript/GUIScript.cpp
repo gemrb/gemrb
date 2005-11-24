@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.344 2005/11/24 17:44:09 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.345 2005/11/24 21:32:05 avenger_teambg Exp $
  *
  */
 
@@ -2079,7 +2079,7 @@ static PyObject* GemRB_SetButtonFlags(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	if( btn->SetFlags( Flags, Operation ) ) {
+	if (btn->SetFlags( Flags, Operation ) ) {
 		printMessage ("GUIScript", "Flag cannot be set!",LIGHT_RED);
 		return NULL;
 	}
@@ -4926,6 +4926,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "StackAmount", PyInt_FromLong (item->StackAmount));
 	PyDict_SetItemString(dict, "Dialog", PyString_FromResRef (item->Dialog));
 	PyDict_SetItemString(dict, "Price", PyInt_FromLong (item->Price));
+	PyDict_SetItemString(dict, "Type", PyInt_FromLong (item->ItemType));
 
 	int function=0;
 	switch( item->ItemType ) {
@@ -5066,9 +5067,24 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		}
 		res = cc->AddItem(core->GetDraggedItem());
 	} else {
-		res = actor->inventory.AddSlotItem( core->GetDraggedItem(), Slot );
-		if (Slot >= 0 && core->QuerySlotEffects( Slot )) {
-			actor->inventory.EquipItem( Slot );
+		int Slottype = core->QuerySlotType( Slot );
+		CREItem * slotitem = core->GetDraggedItem();
+		Item *item = core->GetItem( slotitem->ItemResRef );
+		if (!item) {
+			return PyInt_FromLong( -1 );
+		}
+		int Itemtype = item->ItemType;
+		int Use1 = item->UsabilityBitmask;
+		int Use2 = item->KitUsability;
+		core->FreeItem( item, slotitem->ItemResRef, false );
+		//CanUseItemType will check actor's class bits too
+		if (core->CanUseItemType (Itemtype, Slottype, Use1, Use2, actor) ) {
+			res = actor->inventory.AddSlotItem( slotitem, Slot );
+			if (Slot >= 0 && core->QuerySlotEffects( Slot ) ) {
+				actor->inventory.EquipItem( Slot );
+			}
+		} else {
+			res = 0;
 		}
 	}
 

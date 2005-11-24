@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.28 2005/11/23 21:58:06 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.29 2005/11/24 21:32:05 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -353,6 +353,7 @@ def OnDragItemGround ():
 
 def OnDragItem ():
 	pc = GemRB.GameGetSelectedPCSingle ()
+	print "PC", pc
 
 	slot = GemRB.GetVar ("ItemButton")
 	if not GemRB.IsDraggingItem ():

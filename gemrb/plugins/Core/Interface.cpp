@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.367 2005/11/24 17:44:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.368 2005/11/24 21:32:05 avenger_teambg Exp $
  *
  */
 
@@ -3036,7 +3036,11 @@ bool Interface::InitItemTypes()
 
 int Interface::QuerySlotType(int idx) const
 {
-	if (idx>=SlotTypes) {
+	//default slottype: -1
+	if (idx==-1) {
+		return -1;
+	}
+	if (idx<0 || idx>=SlotTypes) {
 		return 0;
 	}
 	return slottypes[idx].slottype;
@@ -3074,8 +3078,14 @@ const char *Interface::QuerySlotResRef(int idx) const
 	return slottypes[idx].slotresref;
 }
 
-int Interface::CanUseItemType(int itype, int slottype) const
+// checks the itemtype vs. slottype, and also checks the usability flags
+// vs. Actor's stats (alignment, class, race, kit etc.)
+int Interface::CanUseItemType(int itype, int slottype, ieDword /*use1*/, ieDword /*use2*/, Actor *actor) const
 {
+	// check if actor may use the item
+	if (actor) {
+		//
+	}
 	if ( !slottype ) { 
 		//inventory slot, can hold any item, including invalid
 		return 1;
