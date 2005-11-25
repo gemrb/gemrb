@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.82 2005/11/24 17:44:09 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.83 2005/11/25 23:22:35 avenger_teambg Exp $
  *
  */
 
@@ -25,6 +25,7 @@
 #include "Video.h"
 #include "Variables.h"
 #include "GameControl.h"
+#include "SoundMgr.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -105,7 +106,8 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 	if (XPos == 65535) {
 		return;
 	}
-	if (lines.size() == 0) {
+	unsigned int linesize = lines.size();
+	if (linesize == 0) {
 		return;
 	}
 
@@ -124,7 +126,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 		Buffer[0] = 0;
 		int len = 0;
 		int lastlen = 0;
-		for (size_t i = 0; i < lines.size(); i++) {
+		for (size_t i = 0; i < linesize; i++) {
 			if (strnicmp( "[s=", lines[i], 3 ) == 0) {
 				int tlen;
 				unsigned long idx, acolor, bcolor;
@@ -157,7 +159,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 				memcpy( &Buffer[lastlen], lines[i], len - lastlen );
 			}
 			lastlen = len;
-			if (i != lines.size() - 1) {
+			if (i != linesize - 1) {
 				Buffer[lastlen - 1] = '\n';
 				Buffer[lastlen] = 0;
 			}
@@ -169,6 +171,23 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			IE_FONT_ALIGN_LEFT, finit, NULL );
 		free( Buffer );
 		video->SetClipRect( NULL );
+		//streaming text
+		if (linesize>50) {
+			//the buffer is filled enough
+			return;
+		}
+		if (core->GetSoundMgr()->IsSpeaking() ) {
+			//the narrator is still talking
+			return;
+		}
+		if (RunEventHandler( TextAreaOutOfText )) {
+			return;
+		}
+		if (linesize==lines.size()) {
+			ResetEventHandler( TextAreaOutOfText );
+			return;
+		}
+		AppendText("\n",-1);
 		return;
 	}
 	// normal scrolling textarea
@@ -176,7 +195,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 	int sr = startrow;
 	unsigned int i;
 	int yl = 0;
-	for (i = 0; i < lines.size(); i++) {
+	for (i = 0; i < linesize; i++) {
 		if (rc + lrows[i] <= sr) {
 			rc += lrows[i];
 			continue;
@@ -196,7 +215,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 		yl = lrows[i] - sr;
 		break;
 	}
-	for (i++; i < lines.size(); i++) {
+	for (i++; i < linesize; i++) {
 		Color* pal = NULL;
 		if (seltext == (int) i)
 			pal = selected;
@@ -280,7 +299,7 @@ int TextArea::AppendText(const char* text, int pos)
 	if (pos == -1) {
 		char *note = strstr(text,"\r\n\r\nNOTE:");
 		char *str;
-		if(NULL == note) {
+		if (NULL == note) {
 			str = ( char* ) malloc( newlen +1 );
 			memcpy(str,text, newlen+1);
 		}
@@ -365,7 +384,7 @@ void TextArea::SetFonts(Font* init, Font* text)
 	ieDword initials = 1;
 	//Drop Capitals means initials on!
 	core->GetDictionary()->Lookup("Drop Capitals", initials);
-	if(initials) {
+	if (initials) {
 		finit = init;
 	}
 	else {
@@ -385,17 +404,17 @@ void TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 	if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
 		Changed = true;
 		seltext=minrow-1;
-		if((unsigned int) seltext>=lines.size()) {
+		if ((unsigned int) seltext>=lines.size()) {
 			return;
 		}
 		for(int i=0;i<Key-'0';i++) {
 			do {
 				seltext++;
-				if((unsigned int) seltext>=lines.size()) {
+				if ((unsigned int) seltext>=lines.size()) {
 					return;
 				}
 			}
-			while(strnicmp( lines[seltext], "[s=", 3 ) != 0 );
+			while (strnicmp( lines[seltext], "[s=", 3 ) != 0 );
 		}
 		int idx=-1;
 		sscanf( lines[seltext], "[s=%d,", &idx);
@@ -554,7 +573,7 @@ void TextArea::RedrawTextArea(const char* VariableName, unsigned int Sum)
 
 const char* TextArea::QueryText()
 {
-	if( Value<lines.size() ) {
+	if ( Value<lines.size() ) {
 		return ( const char * ) lines[Value];
 	}
 	return ( const char *) "";
@@ -584,12 +603,12 @@ void TextArea::PadMinRow()
 	int i=lines.size()-1;
 	//minrow -1 ->gap
 	//minrow -2 ->npc text
-	while(i>=minrow-2 && i>=0) {
+	while (i>=minrow-2 && i>=0) {
 		row+=lrows[i];
 		i--;
 	}
 	row = GetVisibleRowCount()-row;
-	while(row>0) {
+	while (row>0) {
 		AppendText("",-1);
 		row--;
 	}
@@ -620,16 +639,24 @@ void TextArea::SetupScroll(unsigned long tck)
 	ticks = tck;
 	//clearing the textarea
 	Clear();
-	int i = Height/smooth;
-	while(i--) {
+	unsigned int i = (unsigned int) (Height/smooth);
+	while (i--) {
 		char *str = (char *) malloc(1);
 		str[0]=0;
 		lines.push_back(str);
 		lrows.push_back(0);
 	}
+	i = lines.size();
 	Flags |= IE_GUI_TEXTAREA_SMOOTHSCROLL;
 	GetTime( starttime );
-	RunEventHandler( TextAreaOutOfText );
+	if (RunEventHandler( TextAreaOutOfText )) {
+		//event handler destructed this object?
+		return;
+	}
+	if (i==lines.size()) {
+		ResetEventHandler( TextAreaOutOfText );
+		return;
+	}
 	//recalculates rows
-	AppendText("",-1);
+	AppendText("\n",-1);
 }

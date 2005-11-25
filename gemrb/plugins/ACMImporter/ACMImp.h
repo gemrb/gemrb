@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.31 2005/11/13 10:18:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.h,v 1.32 2005/11/25 23:22:35 avenger_teambg Exp $
  *
  */
 
@@ -69,6 +69,7 @@ public:
 	bool Play();
 	bool Stop();
 	bool CanPlay();
+	bool IsSpeaking();
 	void ResetMusics();
 	void UpdateViewportPos(int XPos, int YPos);
 	void UpdateVolume( unsigned int which = GEM_SND_VOL_MUSIC | GEM_SND_VOL_AMBIENTS );

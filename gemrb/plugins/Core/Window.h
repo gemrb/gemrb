@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.23 2005/11/15 20:58:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.24 2005/11/25 23:22:35 avenger_teambg Exp $
  *
  */
 
@@ -116,6 +116,8 @@ public:
 	Control* GetControl(unsigned short x, unsigned short y);
 	/** Returns the Control by Index */
 	Control* GetControl(unsigned short i);
+	/** Returns true if ctrl is valid and ctrl->ControlID is ID */
+	bool IsValidControl(unsigned short ID, Control *ctrl);
 	/** Deletes the xth. Control */
 	void DelControl(unsigned short i);
 	/** Returns the Default Control which is a button atm */

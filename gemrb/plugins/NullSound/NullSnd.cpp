@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/NullSound/NullSnd.cpp,v 1.9 2005/03/25 21:30:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/NullSound/NullSnd.cpp,v 1.10 2005/11/25 23:22:36 avenger_teambg Exp $
  *
  */
 
@@ -63,6 +63,11 @@ void NullSnd::ResetMusics()
 }
 
 bool NullSnd::CanPlay()
+{
+	return false;
+}
+
+bool NullSnd::IsSpeaking()
 {
 	return false;
 }

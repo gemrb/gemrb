@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.368 2005/11/24 21:32:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.369 2005/11/25 23:22:35 avenger_teambg Exp $
  *
  */
 
@@ -2405,6 +2405,19 @@ Window* Interface::GetWindow(unsigned short WindowIndex)
 		}
 	}
 	return NULL;
+}
+
+// this function will determine if wnd is a valid window pointer
+// by checking if its WindowID is the same as the reference
+bool Interface::IsValidWindow(unsigned short WindowID, Window *wnd)
+{
+	unsigned int WindowIndex = windows.size();
+	while (WindowIndex--) {
+		if (windows[WindowIndex] == wnd) {
+			return wnd->WindowID == WindowID;
+		}
+	}
+	return false;
 }
 
 //this function won't delete the window, just mark it for deletion

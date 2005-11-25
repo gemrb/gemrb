@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.177 2005/11/24 21:32:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.178 2005/11/25 23:22:35 avenger_teambg Exp $
  *
  */
 
@@ -303,6 +303,8 @@ public:
 	int SetControlStatus(unsigned short WindowIndex, unsigned short ControlIndex, unsigned long Status);
 	/** Get a Window from the Loaded Window List */
 	Window * GetWindow(unsigned short WindowIndex);
+	/** Returns true if wnd is a valid window with WindowIndex */
+	bool IsValidWindow(unsigned short WindowID, Window *wnd);
 	/** Removes a Loaded Window */
 	int DelWindow(unsigned short WindowIndex);
 	/** Redraws all window */

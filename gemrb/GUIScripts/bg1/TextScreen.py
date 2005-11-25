@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/TextScreen.py,v 1.5 2005/11/21 16:42:56 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/TextScreen.py,v 1.6 2005/11/25 23:22:36 avenger_teambg Exp $
 
 # TextScreen.py - display Loading screen
 
@@ -69,7 +69,7 @@ def StartTextScreen ():
 	GemRB.HideGUI ()
 	GemRB.SetVisible (0, 0) #removing the gamecontrol screen
 	GemRB.SetVisible (TextScreen, 1)
-	GemRB.RewindTA(TextScreen, TextArea, 100)
+	GemRB.RewindTA(TextScreen, TextArea, 300)
 	GemRB.GamePause(1, 1)
 
 
@@ -80,17 +80,20 @@ def FeedScroll ():
 	Table = GemRB.LoadTable(TableName)
 	Value = GemRB.GetTableValue (Table, 2, Position)
 	GemRB.UnloadTable (Table)
-	if Value ==-1:
+	if Value == 'NONE':
 		Position = 1
 	else:
-		GemRB.TextAreaAppend (TextScreen, TextArea, Value)
+		GemRB.TextAreaAppend (TextScreen, TextArea, Value, -1)
 		Position = Position + 1
+
 
 def ReplayTextScreen ():
 	global TextScreen, TextArea, Position
 
 	Position = 1
-	GemRB.RewindTA(TextScreen, TextArea, 100)
+	GemRB.RewindTA(TextScreen, TextArea, 300)
+	GemRB.SetEvent (TextScreen, TextArea, IE_GUI_TEXTAREA_OUT_OF_TEXT, "FeedScroll")
+
 
 def EndTextScreen ():
 	global TextScreen

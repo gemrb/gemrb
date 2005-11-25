@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.91 2005/11/24 17:44:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.92 2005/11/25 23:22:35 avenger_teambg Exp $
  *
  */
 
@@ -389,8 +389,11 @@ void Button::OnMouseOver(unsigned short x, unsigned short y)
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
 	}
-
-	RunEventHandler( MouseOverButton );
+	
+	if ( RunEventHandler( MouseOverButton )) {
+		//event handler destructed this object
+		return;
+	}
 
 	if (State == IE_GUI_BUTTON_LOCKED) {
 		return;

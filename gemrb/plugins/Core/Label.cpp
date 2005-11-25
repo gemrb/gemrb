@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.cpp,v 1.34 2005/11/24 17:44:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.cpp,v 1.35 2005/11/25 23:22:35 avenger_teambg Exp $
  *
  */
 
@@ -115,7 +115,7 @@ void Label::OnMouseUp(unsigned short x, unsigned short y,
 		if (VarName[0] != 0) {
 			core->GetDictionary()->SetAt( VarName, Value );
 		}
-		if(LabelOnPress[0]) {
+		if (LabelOnPress[0]) {
 			RunEventHandler( LabelOnPress );
 		}
 	}

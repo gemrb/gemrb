@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SoundMgr.h,v 1.19 2005/03/25 21:30:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SoundMgr.h,v 1.20 2005/11/25 23:22:35 avenger_teambg Exp $
  *
  */
 
@@ -52,6 +52,7 @@ public:
 	virtual bool Stop() = 0;
 	virtual bool Play() = 0;
 	virtual bool CanPlay() = 0;
+	virtual bool IsSpeaking() = 0;
 	virtual void ResetMusics() = 0;
 	virtual void UpdateViewportPos(int XPos, int YPos) = 0;
 	// update volumes (possibly on-the-fly)

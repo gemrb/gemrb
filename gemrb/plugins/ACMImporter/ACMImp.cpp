@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.65 2005/11/24 17:44:07 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.66 2005/11/25 23:22:35 avenger_teambg Exp $
  *
  */
 
@@ -553,6 +553,21 @@ bool ACMImp::CanPlay()
 {
 	return true;
 }
+
+bool ACMImp::IsSpeaking()
+{
+	if (speech.free) {
+		return false;
+	}
+	if (!alIsSource( speech.Source )) {
+		return false;
+	}
+	ALint state;
+
+	alGetSourcei( speech.Source, AL_SOURCE_STATE, &state );
+	return (state == AL_PLAYING);
+}
+
 void ACMImp::ResetMusics()
 {
 	clearstreams( );

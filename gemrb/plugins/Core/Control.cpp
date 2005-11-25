@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.40 2005/11/24 17:44:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.41 2005/11/25 23:22:35 avenger_teambg Exp $
  *
  */
 
@@ -49,7 +49,7 @@ Control::Control()
 Control::~Control()
 {
 	if (InHandler) {
-		printf("[Control] Destroying control inside event handler, crash may occur!");
+		printMessage("Control","Destroying control inside event handler, crash may occur!", LIGHT_RED);
 	}
 	core->DisplayTooltip( 0, 0, NULL );
 	if (Tooltip) {
@@ -100,19 +100,32 @@ bool Control::SetEvent(int /*eventType*/, EventHandler /*handler*/)
 	return false;
 }
 
-void Control::RunEventHandler(EventHandler handler)
+int Control::RunEventHandler(EventHandler handler)
 {
 	if (InHandler) {
 		printf("[Control] Nested event handlers are not supported!");
-		return;
+		return -1;
 	}
 	if (handler[0]) {
+		Window *wnd = (Window *) Owner;
+		if (!wnd) {
+			return -1;
+		}
+		unsigned short WID = wnd->WindowID;
+		unsigned short ID = ControlID;
 		InHandler = true;
 		core->GetGUIScriptEngine()->RunFunction( (char*)handler );
-		//we should make sure the event didn't destruct this
-		//object otherwise we overwrite memory
+		if (!core->IsValidWindow(WID,wnd) ) {
+			printMessage ("Control","Owner window destructed!\n", LIGHT_RED);
+			return -1;
+		}
+		if (!wnd->IsValidControl(ID,this) ) {
+			printMessage ("Control","Control destructed!\n", LIGHT_RED);
+			return -1;
+		}
 		InHandler = false;
 	}
+	return 0;
 }
 
 /** Key Press Event */

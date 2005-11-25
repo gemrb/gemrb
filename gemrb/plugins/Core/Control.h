@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.32 2005/10/19 21:57:33 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.33 2005/11/25 23:22:35 avenger_teambg Exp $
  *
  */
 
@@ -132,8 +132,8 @@ public: //Events
 	int SetFlags(int arg_flags, int opcode);
 	/** Set handler for specified event. Override in child classes */
 	virtual bool SetEvent(int eventType, EventHandler handler);
-	/** Run specified handler */
-	void RunEventHandler(EventHandler handler);
+	/** Run specified handler, it may return error code */
+	int RunEventHandler(EventHandler handler);
 	/** Key Press Event */
 	virtual void OnKeyPress(unsigned char Key, unsigned short Mod);
 	/** Key Release Event */
