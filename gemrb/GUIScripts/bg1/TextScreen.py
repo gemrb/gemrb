@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/TextScreen.py,v 1.6 2005/11/25 23:22:36 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/TextScreen.py,v 1.7 2005/11/26 10:49:36 avenger_teambg Exp $
 
 # TextScreen.py - display Loading screen
 
@@ -91,8 +91,8 @@ def ReplayTextScreen ():
 	global TextScreen, TextArea, Position
 
 	Position = 1
-	GemRB.RewindTA(TextScreen, TextArea, 300)
 	GemRB.SetEvent (TextScreen, TextArea, IE_GUI_TEXTAREA_OUT_OF_TEXT, "FeedScroll")
+	GemRB.RewindTA(TextScreen, TextArea, 300)
 
 
 def EndTextScreen ():

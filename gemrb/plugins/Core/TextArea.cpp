@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.83 2005/11/25 23:22:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.84 2005/11/26 10:49:35 avenger_teambg Exp $
  *
  */
 
@@ -54,6 +54,7 @@ TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 	tmp.g = 152;
 	tmp.b = 102;
 	lineselpal = core->GetVideoDriver()->CreatePalette( tmp, lowtextcolor );
+	BiteMyTail = false;
 }
 
 TextArea::~TextArea(void)
@@ -70,6 +71,10 @@ TextArea::~TextArea(void)
 
 void TextArea::Draw(unsigned short x, unsigned short y)
 {
+	/** Don't come back recursively */
+	if (BiteMyTail) {
+		return;
+	}
 	int tx=x+XPos;
 	int ty=y+YPos;
 	Region clip( tx, ty, Width, Height );
@@ -91,11 +96,16 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 					startrow++;
 				}
 			}
+			/* this wasn't the best
 			Color black = { 0, 0, 0, 255 };
 			video->DrawRect( clip, black );
 
-			Changed = true;
+			*/
+			/** Forcing redraw of whole screen before drawing text*/
 			( ( Window * ) Owner )->Invalidate();
+			BiteMyTail = true;
+			( ( Window * ) Owner )->DrawWindow();
+			BiteMyTail = false;
 		}
 	}
 
@@ -103,6 +113,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 		return;
 	}
 	Changed = false;
+
 	if (XPos == 65535) {
 		return;
 	}

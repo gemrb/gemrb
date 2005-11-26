@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/TextScreen.py,v 1.3 2005/11/21 21:21:31 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/TextScreen.py,v 1.4 2005/11/26 10:49:36 avenger_teambg Exp $
 
 # TextScreen.py - display Loading screen
 
@@ -28,6 +28,7 @@ from GUIDefines import *
 TextScreen = None
 TextArea = None
 Chapter = 0
+Position = 1
 
 def StartTextScreen ():
 	global TextScreen, TextArea, Chapter
@@ -48,6 +49,7 @@ def StartTextScreen ():
 
 	TextArea = GemRB.GetControl (TextScreen, 2)
 	GemRB.SetTextAreaFlags (TextScreen, TextArea, IE_GUI_TEXTAREA_SMOOTHSCROLL)
+	GemRB.SetEvent (TextScreen, TextArea, IE_GUI_TEXTAREA_OUT_OF_TEXT, "FeedScroll")
 
 	#caption
 	Table = GemRB.LoadTable("chapters")
@@ -69,27 +71,28 @@ def StartTextScreen ():
 	GemRB.HideGUI ()
 	GemRB.SetVisible (0, 0) #removing the gamecontrol screen
 	GemRB.SetVisible (TextScreen, 1)
-	GemRB.RewindTA(TextScreen, TextArea, 100)
+	GemRB.RewindTA(TextScreen, TextArea, 200)
 	GemRB.GamePause(1, 1)
 
 
 def FeedScroll ():
-        global TextScreen, TextArea, Position
+	global TextScreen, TextArea, Position
 
-        TableName = GemRB.GetGameString ("chapters")
-        Table = GemRB.LoadTable(TableName)
-        Value = GemRB.GetTableValue (Table, Chapter, Position)
-        GemRB.UnloadTable (Table)
-        if Value ==-1:
-                Position = 1
-        else:
-                GemRB.TextAreaAppend (TextScreen, TextArea, Value)
-                Position = Position + 1
+	Table = GemRB.LoadTable("chapters")
+	Value = GemRB.GetTableValue (Table, Chapter, Position)
+	GemRB.UnloadTable (Table)
+	if Value == 'NONE':
+		Position = 1
+	else:
+		GemRB.TextAreaAppend (TextScreen, TextArea, Value, -1)
+		Position = Position + 1
 
 def ReplayTextScreen ():
-	global TextScreen, TextArea
+	global TextScreen, TextArea, Position
 
-	GemRB.RewindTA(TextScreen, TextArea, 100)
+	Position = 1
+	GemRB.SetEvent (TextScreen, TextArea, IE_GUI_TEXTAREA_OUT_OF_TEXT, "FeedScroll")
+	GemRB.RewindTA(TextScreen, TextArea, 200)
 
 def EndTextScreen ():
 	global TextScreen
