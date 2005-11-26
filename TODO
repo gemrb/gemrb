@@ -6,25 +6,26 @@ Area scripts are queued, master areas get on the head of the queue, non-master a
 
 3. (DONE) TLK tags
 
-4. fix loading/saving of local variables of creatures (needs effect framework)
+4. (DONE) fix loading/saving of local variables of creatures (needs effect framework)
 
 Items:
 1. (DONE) Loading containers/items in areas
 2. (DONE) Dropping of items (first create an opcode)
-2a. Render dropped items in area (ground icon) (DONE)
-3. Picking up an item (create opcode too) (piles DONE)
-4. Equipping items
+2a. (DONE) Render dropped items in area (ground icon)
+3. (DONE) Picking up an item (create opcode too)
+4. (DONE) Equipping items
 5. Equipped weapon range (create triggers)
 6. Break swords and stuff
 
 Effects:
-1. Create base system for effect blocks (ED)
+1. Create base system for effect blocks (Edheldil)
 2. Implement effects
 
 Area:
-1. Implement cover (wallgroups)
+1. (DONE) Implement cover (wallgroups) (wjp)
 2. Don't load scripts for pile items? (research when a script is unused)
 3. Create real streaming ambients (do not preload them, just use them when needed)
+4. in pathfinder, calculate with the actor's feet circle size
 
 Store:
 1. (DONE) Save stores, handle containers
@@ -35,19 +36,21 @@ Animation:
 3. Use animation factory instead of local caching in CharAnimations (some way of rendering bitmaps with different palettes, but do it efficiently)
 
 Actor:
-1. Fix reputation
+1. (DONE) Fix reputation
 
 Window/Widget management:
 - implement grabbing mouse pointer by a control to fix dragging of Float menu window
 
 Game GUI:
-1. fix TextScreen/IncrementChapter
+1. (DONE) fix TextScreen/IncrementChapter
 2. implement class based (but customisable) action button bar. Generally port the IWD2 system to all engines
 
 Known Bugs:
 1. problem: stanceID is still fuzzy. Fix it. (FIXED?)
 
 2. problem: valgrind reports invalid memory access due to Unqueueing buffers and using them in another thread (openal weirdness?)
+
+3. problem: sounds get sometimes distorted, might be connected to problem #2
 
 Ideas:
 1. Use the character sheet (Actor.cpp) itself to store attributes of the character during character generation.
