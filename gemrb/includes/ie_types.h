@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_types.h,v 1.9 2005/10/20 23:13:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_types.h,v 1.10 2005/11/26 15:12:27 avenger_teambg Exp $
  *
  */
 
@@ -37,6 +37,11 @@
 #ifdef WIN32
 #define SIZEOF_INT 4
 #define SIZEOF_LONG_INT 4
+#endif
+
+//well msvc likes __int64, and me too
+#ifndef WIN32
+#define __int64 long long
 #endif
 
 typedef unsigned char ieByte;
