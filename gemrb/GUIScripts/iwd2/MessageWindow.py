@@ -30,6 +30,7 @@ from GUIPR import *
 from GUIREC import *
 from GUISTORE import *
 from GUIWORLD import *
+from TextScreen import *
 
 MessageWindow = 0
 PortraitWindow = 0

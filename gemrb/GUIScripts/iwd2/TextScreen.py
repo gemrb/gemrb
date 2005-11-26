@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/TextScreen.py,v 1.6 2005/11/26 11:10:51 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/TextScreen.py,v 1.1 2005/11/26 11:10:51 avenger_teambg Exp $
 
 # TextScreen.py - display Loading screen
 
@@ -32,7 +32,7 @@ Chapter = 0
 def StartTextScreen ():
 	global TextScreen, TextArea, Chapter
 
-	GemRB.LoadWindowPack ("GUICHAP", 640, 480)
+	GemRB.LoadWindowPack ("GUICHAP", 800, 600)
 	LoadPic = GemRB.GetGameString (STR_LOADMOS)
 	#if there is no preset loadpic, try to determine it from the chapter
 	ID = GemRB.GetVar("CHAPTER")
