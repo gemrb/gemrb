@@ -1,3 +1,19 @@
+GemRB V0.2.6 (2005-11-26):
+  New features:
+    - Effects are in a different plugin
+    - DoxyGen docs
+    - Wallgroup covers
+    - Door triggers
+    - changing default action to talk/fight (only in pst)
+
+  Improved features:
+    - Textscreen graphic fixed
+    - script workflow
+    - compilation and running on different systems (MacOSX, PPC Linux)
+    - various leaks/instabilities fixed
+    - Saving games
+    - inventory screens in many games
+
 GemRB V0.2.5 (2005-08-22):
   New features:
     - Save game
