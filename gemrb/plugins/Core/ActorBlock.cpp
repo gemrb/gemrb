@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.122 2005/11/26 14:21:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.123 2005/11/26 17:55:16 wjpalenstijn Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -1091,11 +1091,11 @@ void Container::CreateGroundIconCover()
 				height += spr.YPos - ypos;
 				ypos = spr.YPos;
 			}
-			if (width < spr.Width) {
-				width = spr.Width;
+			if (width-xpos < spr.Width-spr.XPos) {
+				width = spr.Width-spr.XPos+xpos;
 			}
-			if (height < spr.Height) {
-				height = spr.Height;
+			if (height-ypos < spr.Height-spr.YPos) {
+				height = spr.Height-spr.YPos+ypos;
 			}
 		}
 	}
