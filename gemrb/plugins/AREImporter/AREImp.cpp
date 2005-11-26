@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.137 2005/11/24 18:03:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.138 2005/11/26 20:33:48 avenger_teambg Exp $
  *
  */
 
@@ -213,7 +213,11 @@ Map* AREImp::GetMap(const char *ResRef)
 		return false;
 	}
 
-	map->Scripts[0] = new GameScript( Script, ST_AREA );
+	if (Script[0]) {
+		map->Scripts[0] = new GameScript( Script, ST_AREA );
+	} else {
+		map->Scripts[0] = NULL;
+	}
 	if (map->Scripts[0]) {
 		map->Scripts[0]->MySelf = map;
 	}
@@ -333,11 +337,14 @@ Map* AREImp::GetMap(const char *ResRef)
 		memcpy( ip->EntranceName, Entrance, sizeof(Entrance) );
 		memcpy( ip->KeyResRef, KeyResRef, sizeof(KeyResRef) );
 		memcpy( ip->DialogResRef, DialogResRef, sizeof(DialogResRef) );
-		if (Script[0] != 0) {
+		if (Script[0]) {
 			ip->Scripts[0] = new GameScript( Script, ST_TRIGGER );
-			ip->Scripts[0]->MySelf = ip;
-		} else
+		} else {
 			ip->Scripts[0] = NULL;
+		}
+		if (ip->Scripts[0]) {
+			ip->Scripts[0]->MySelf = ip;
+		}
 	}
 
 	printf( "Loading containers\n" );
@@ -418,11 +425,14 @@ Map* AREImp::GetMap(const char *ResRef)
 			//cannot add directly to inventory (ground piles)
 			c->AddItem( core->ReadItem(str));
 		}
-		if (Script[0] != 0) {
+		if (Script[0]) {
 			c->Scripts[0] = new GameScript( Script, ST_CONTAINER );
-			c->Scripts[0]->MySelf = c;
-		} else
+		} else {
 			c->Scripts[0] = NULL;
+		}
+		if (c->Scripts[0]) {
+			c->Scripts[0]->MySelf = c;
+		}
 		strnuprcpy(c->KeyResRef, KeyResRef, 8);
 		c->OpenFail = OpenFail;
 	}
@@ -569,7 +579,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		door->closed_ib = points;
 		door->cibcount = ClosedImpededCount;
 		door->SetMap(map);
-		door->SetDoorOpen(door->IsOpen(), false);
+		door->SetDoorOpen(door->IsOpen(), false, 0);
 
 		door->TrapDetectionDiff = TrapDetect;
 		door->TrapRemovalDiff = TrapRemoval;
@@ -579,11 +589,15 @@ Map* AREImp::GetMap(const char *ResRef)
 
 		door->Cursor = cursor;
 		memcpy( door->KeyResRef, KeyResRef, sizeof(KeyResRef) );
-		if (Script[0] != 0) {
+		if (Script[0]) {
 			door->Scripts[0] = new GameScript( Script, ST_DOOR );
-			door->Scripts[0]->MySelf = door;
-		} else
+		} else {
 			door->Scripts[0] = NULL;
+		}
+
+		if (door->Scripts[0]) {
+			door->Scripts[0]->MySelf = door;
+		}
 
 		door->toOpen[0] = toOpen[0];
 		door->toOpen[1] = toOpen[1];

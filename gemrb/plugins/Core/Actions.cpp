@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.43 2005/11/24 17:44:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.44 2005/11/26 20:33:48 avenger_teambg Exp $
  *
  */
 
@@ -1643,7 +1643,7 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 	}
 	if (Sender->Type != ST_ACTOR) {
 		//if not an actor opens, it don't play sound
-		door->SetDoorOpen( true, false );		
+		door->SetDoorOpen( true, false, 0 );
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -1651,14 +1651,15 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 	Point &p = FindNearPoint( Sender, door->toOpen[0], door->toOpen[1],
 				distance );
 	if (distance <= MAX_OPERATING_DISTANCE) {
+		Actor *actor = (Actor *) Sender;
+
 		if (door->Flags&DOOR_LOCKED) {
 			const char *Key = door->GetKey();
-			Actor *actor = (Actor *) Sender;
 			if (!Key || !actor->inventory.HasItem(Key,0) ) {
 				//playsound unsuccessful opening of door
 				core->PlaySound(DS_OPEN_FAIL);
 				Sender->ReleaseCurrentAction();
-				return;
+				return; //don't open door
 			}
 
 			//remove the key
@@ -1671,7 +1672,7 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 				}
 			}
 		}
-		door->SetDoorOpen( true, true );
+		door->SetDoorOpen( true, true, actor->GetID() );
 	} else {
 		GoNearAndRetry(Sender, p);
 	}
@@ -1697,7 +1698,7 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 	}
 	if (Sender->Type != ST_ACTOR) {
 		//if not an actor opens, it don't play sound
-		door->SetDoorOpen( false, false );
+		door->SetDoorOpen( false, false, 0 );
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -1712,7 +1713,8 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 			//playsound unsuccessful closing of door
 			core->PlaySound(DS_CLOSE_FAIL);
 		} else {
-			door->SetDoorOpen( false, true );
+			Actor *actor = (Actor *) Sender;
+			door->SetDoorOpen( false, true, actor->GetID() );
 		}
 	} else {
 		GoNearAndRetry(Sender, p);

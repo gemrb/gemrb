@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.94 2005/11/24 17:53:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.95 2005/11/26 20:33:48 avenger_teambg Exp $
  *
  */
 
@@ -353,8 +353,8 @@ private:
 public:
 	void SetName(const char* Name); // sets door ID
 	void SetTiles(unsigned short* Tiles, int count);
-	void SetDoorLocked(bool Locked, bool playsound = false);
-	void SetDoorOpen(bool Open, bool playsound = false);
+	void SetDoorLocked(bool Locked, bool playsound);
+	void SetDoorOpen(bool Open, bool playsound, ieDword ID);
 	void SetPolygon(bool Open, Gem_Polygon* poly);
 	bool IsOpen() const;
 	void TryPickLock(Actor *actor);

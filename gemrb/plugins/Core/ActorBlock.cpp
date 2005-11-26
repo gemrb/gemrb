@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.123 2005/11/26 17:55:16 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.124 2005/11/26 20:33:48 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -254,8 +254,6 @@ void Scriptable::ProcessActions()
 	}
 
 	if (CurrentAction) {
-		printf("Released action in processAction: %d\n", CurrentAction->actionID);
-		CurrentAction->Dump();
 		ReleaseCurrentAction();
 	}
 
@@ -828,9 +826,14 @@ bool Door::IsOpen() const
 	return (Flags&DOOR_OPEN) == !core->HasFeature(GF_REVERSE_DOOR);
 }
 
-void Door::SetDoorOpen(bool Open, bool playsound)
+void Door::SetDoorOpen(bool Open, bool playsound, ieDword ID)
 {
-	if (Open) SetDoorLocked(false,playsound);
+	if (Open){
+		LastEntered = ID; //used as lastOpener
+		SetDoorLocked (false,playsound);
+	} else {
+		LastTrigger = ID; //used as lastCloser
+	}
 	ToggleTiles (Open, playsound);
 	UpdateDoor ();
 	area->FixAllPositions();
@@ -877,7 +880,11 @@ void Door::DebugDump()
 	printf( "Trap Detectable: %s\n", YESNO(Flags&DOOR_DETECTABLE) );
 	printf( "Secret door: %s (Found: %s)\n", YESNO(Flags&DOOR_SECRET),YESNO(Flags&DOOR_FOUND));
 	const char *Key = GetKey();
-	printf( "Key (%s) removed: %s\n", Key?Key:"NONE", YESNO(Flags&DOOR_KEY) );
+	const char *name = "NONE";
+	if (Scripts[0]) {
+		name = Scripts[0]->GetName();
+	}
+	printf( "Script: %s, Key (%s) removed: %s\n", name, Key?Key:"NONE", YESNO(Flags&DOOR_KEY) );
 }
 
 /*******************
@@ -978,7 +985,9 @@ bool InfoPoint::TriggerTrap(int skill)
 	if (Flags&TRAP_RESET) {
 		return true;
 	}
-	Flags|=TRAP_DEACTIVATED;
+	if (Trapped) {
+		Flags|=TRAP_DEACTIVATED;
+	}
 	return true;
 }
 
@@ -1008,10 +1017,14 @@ void InfoPoint::DebugDump()
 			printf( "Debugdump of Unsupported Region %s:\n", GetScriptName() );
 			break;
 	}
-	printf( "TrapDetected: %d, Trapped: %s\n", TrapDetected, YESNO(Scripts[0]));
+	printf( "TrapDetected: %d, Trapped: %s\n", TrapDetected, YESNO(Trapped));
 	printf( "Trap detection: %d, Trap removal: %d\n", TrapDetectionDiff,
 		TrapRemovalDiff );
-	printf( "Key: %s, Dialog: %s\n", KeyResRef, DialogResRef );
+	const char *name = "NONE";
+	if (Scripts[0]) {
+		name = Scripts[0]->GetName();
+	}
+	printf( "Script: %s, Key: %s, Dialog: %s\n", name, KeyResRef, DialogResRef );
 	printf( "Active: %s\n", YESNO(Active));
 }
 
@@ -1188,4 +1201,9 @@ void Container::DebugDump()
 	printf( "Flags: %d, Trapped: %d\n", Flags, Trapped );
 	printf( "Trap detection: %d, Trap removal: %d\n", TrapDetectionDiff,
 		TrapRemovalDiff );
+	const char *name = "NONE";
+	if (Scripts[0]) {
+		name = Scripts[0]->GetName();
+	}
+	printf( "Script: %s, Key: %s\n", name, KeyResRef );
 }

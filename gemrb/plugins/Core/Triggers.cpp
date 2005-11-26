@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.26 2005/11/24 17:44:09 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.27 2005/11/26 20:33:48 avenger_teambg Exp $
  *
  */
 
@@ -1143,6 +1143,46 @@ int GameScript::Clicked(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+//opened for doors (using lastEntered)
+int GameScript::Opened(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type != ST_DOOR) {
+		return 0;
+	}
+	if (parameters->objectParameter == NULL) {
+		if (Sender->LastEntered) {
+			Sender->AddTrigger (&Sender->LastEntered);
+			return 1;
+		}
+		return 0;
+	}
+	if (MatchActor(Sender, Sender->LastEntered, parameters->objectParameter)) {
+		Sender->AddTrigger (&Sender->LastEntered);
+		return 1;
+	}
+	return 0;
+}
+
+//closed for doors (using lastTrigger)
+int GameScript::Closed(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type != ST_DOOR) {
+		return 0;
+	}
+	if (parameters->objectParameter == NULL) {
+		if (Sender->LastTrigger) {
+			Sender->AddTrigger (&Sender->LastTrigger);
+			return 1;
+		}
+		return 0;
+	}
+	if (MatchActor(Sender, Sender->LastTrigger, parameters->objectParameter)) {
+		Sender->AddTrigger (&Sender->LastTrigger);
+		return 1;
+	}
+	return 0;
+}
+
 int GameScript::Entered(Scriptable* Sender, Trigger* parameters)
 {
 	if (Sender->Type != ST_PROXIMITY) {
@@ -1164,7 +1204,7 @@ int GameScript::Entered(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::IsOverMe(Scriptable* Sender, Trigger* parameters)
 {
-	if (Sender->Type != ST_PROXIMITY || Sender->Type != ST_TRAVEL) {
+	if (Sender->Type != ST_PROXIMITY && Sender->Type != ST_TRAVEL) {
 		return 0;
 	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );

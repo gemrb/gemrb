@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.136 2005/11/24 17:53:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.137 2005/11/26 20:33:48 avenger_teambg Exp $
  *
  */
 
@@ -745,25 +745,30 @@ bool Actor::CheckOnDeath()
 		//handle reputation here
 		//
 	}
-	if (KillVar[0]) {
-		if (core->HasFeature(GF_HAS_KAPUTZ) ) {
-			ieDword value = 0;
 
+	if (KillVar[0]) {
+		ieDword value = 0;
+		if (core->HasFeature(GF_HAS_KAPUTZ) ) {
 			game->kaputz->Lookup(KillVar, value);
 			game->kaputz->SetAt(KillVar, value+1);
 		} else {
-			ieDword value = 0;
-
 			game->locals->Lookup(KillVar, value);
 			game->locals->SetAt(KillVar, value+1);
 		}
-	} else {
+	}
+	if (scriptName[0]) {
 		char varname[33];
 		ieDword value = 0;
 
-		snprintf(varname, 32, "SPRITE_IS_DEAD%s", scriptName);
-		game->locals->Lookup(varname, value);
-		game->locals->SetAt(varname, value+1);
+		if (core->HasFeature(GF_HAS_KAPUTZ) ) {
+			snprintf(varname, 32, "%s_DEAD", scriptName);
+			game->kaputz->Lookup(varname, value);
+			game->kaputz->SetAt(varname, value+1);
+		} else {
+			snprintf(varname, 32, "SPRITE_IS_DEAD%s", scriptName);
+			game->locals->Lookup(varname, value);
+			game->locals->SetAt(varname, value+1);
+		}
 	}
 
 	DropItem("",0);

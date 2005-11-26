@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.331 2005/11/24 17:44:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.332 2005/11/26 20:33:48 avenger_teambg Exp $
  *
  */
 
@@ -69,6 +69,7 @@ static TriggerLink triggernames[] = {
 	{"classlevelgt", GameScript::ClassLevelGT, 0},
 	{"classlevellt", GameScript::ClassLevelLT, 0},
 	{"clicked", GameScript::Clicked, 0},
+	{"closed", GameScript::Closed, 0}, 
 	{"combatcounter", GameScript::CombatCounter, 0},
 	{"combatcountergt", GameScript::CombatCounterGT, 0},
 	{"combatcounterlt", GameScript::CombatCounterLT, 0},
@@ -123,7 +124,8 @@ static TriggerLink triggernames[] = {
 	{"happiness", GameScript::Happiness, 0},
 	{"happinessgt", GameScript::HappinessGT, 0},
 	{"happinesslt", GameScript::HappinessLT, 0},
-	{"harmlessentered", GameScript::IsOverMe, 0}, //pst, not sure
+	{"harmlessentered", GameScript::Entered, 0}, //pst, not sure
+	{"harmlessopened", GameScript::Opened, 0}, //pst, not sure
 	{"hasinnateability", GameScript::HaveSpell, 0}, //these must be the same
 	{"hasitem", GameScript::HasItem, 0},
 	{"hasitemequiped", GameScript::HasItemEquipped, 0}, //typo in bg2
@@ -244,6 +246,7 @@ static TriggerLink triggernames[] = {
 	{"objitemcountlt", GameScript::NumItemsLT, 0},
 	{"oncreation", GameScript::OnCreation, 0},
 	{"onscreen", GameScript::OnScreen, 0},
+	{"opened", GameScript::Opened, 0}, 
 	{"openstate", GameScript::OpenState, 0},
 	{"or", GameScript::Or, 0},
 	{"ownsfloatermessage", GameScript::OwnsFloaterMessage, 0},

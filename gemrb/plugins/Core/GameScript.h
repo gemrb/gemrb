@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.221 2005/11/20 11:01:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.222 2005/11/26 20:33:48 avenger_teambg Exp $
  *
  */
 
@@ -676,6 +676,7 @@ public: //Script Functions
 	static int ClassLevelGT(Scriptable* Sender, Trigger* parameters);
 	static int ClassLevelLT(Scriptable* Sender, Trigger* parameters);
 	static int Clicked(Scriptable* Sender, Trigger* parameters);
+	static int Closed(Scriptable* Sender, Trigger* parameters);
 	static int CombatCounter(Scriptable* Sender, Trigger* parameters);
 	static int CombatCounterGT(Scriptable* Sender, Trigger* parameters);
 	static int CombatCounterLT(Scriptable* Sender, Trigger* parameters);
@@ -825,6 +826,7 @@ public: //Script Functions
 	static int ObjectActionListEmpty(Scriptable* Sender, Trigger* parameters);
 	static int OnCreation(Scriptable* Sender, Trigger* parameters);
 	static int OnScreen(Scriptable* Sender, Trigger* parameters);
+	static int Opened(Scriptable* Sender, Trigger* parameters);
 	static int OpenState(Scriptable* Sender, Trigger* parameters);
 	static int Or(Scriptable* Sender, Trigger* parameters);
 	static int OwnsFloaterMessage(Scriptable* Sender, Trigger* parameters);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.204 2005/11/24 17:50:21 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.205 2005/11/26 20:33:48 avenger_teambg Exp $
  *
  */
 
@@ -461,7 +461,21 @@ void Map::UpdateScripts()
 		actor->SetStat( IE_ENCUMBRANCE, actor->inventory.GetWeight() );
 		actor->DoStep( );
 	}
-	//Check if we need to start some trigger scripts
+
+	//Check if we need to start some door scripts
+	int doorCount = 0;
+	while (true) {
+		Door* door = TMap->GetDoor( doorCount++ );
+		if (!door)
+			break;
+		if (!door->Scripts[0])
+			continue;
+		door->ExecuteScript( door->Scripts[0] );
+		//Execute Pending Actions
+		door->ProcessActions();
+	}
+
+	//Check if we need to start some trap scripts
 	int ipCount = 0;
 	while (true) {
 		//For each InfoPoint in the map
