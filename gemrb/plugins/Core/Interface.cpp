@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.369 2005/11/25 23:22:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.370 2005/11/26 14:21:49 avenger_teambg Exp $
  *
  */
 
@@ -1458,6 +1458,8 @@ bool Interface::LoadConfig(const char* filename)
 			DataStream::SetEndianSwitch(atoi(value) );
 		} else if (stricmp( name, "CaseSensitive" ) == 0) {
 			CaseSensitive = ( atoi( value ) == 0 ) ? false : true;
+		} else if (stricmp( name, "TranslucentShadows" ) == 0) {
+			vars->SetAt( "Translucent Shadows", atoi( value ) );
 		} else if (stricmp( name, "VolumeAmbients" ) == 0) {
 			vars->SetAt( "Volume Ambients", atoi( value ) );
 		} else if (stricmp( name, "VolumeMovie" ) == 0) {

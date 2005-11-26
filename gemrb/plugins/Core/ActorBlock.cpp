@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.121 2005/11/24 17:53:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.122 2005/11/26 14:21:49 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -1079,7 +1079,8 @@ void Container::CreateGroundIconCover()
 	int width = 0;
 	int height = 0;	
 
-	for (int i=0;i<MAX_GROUND_ICON_DRAWN;i++) {
+	int i; //msvc6.0
+	for (i=0;i<MAX_GROUND_ICON_DRAWN;i++) {
 		if (groundicons[i]) {
 			Sprite2D& spr = *groundicons[i];
 			if (xpos < spr.XPos) {
@@ -1110,7 +1111,7 @@ void Container::CreateGroundIconCover()
 	}
 
 	// TODO: remove this checking code eventually
-	for (int i=0;i<MAX_GROUND_ICON_DRAWN;i++) {
+	for (i=0;i<MAX_GROUND_ICON_DRAWN;i++) {
 		if (groundicons[i]) {
 			Sprite2D& spr = *groundicons[i];
 			assert(groundiconcover->Covers(Pos.x, Pos.y, spr.XPos, spr.YPos, spr.Width, spr.Height));

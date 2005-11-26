@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.15 2005/11/06 16:13:33 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.16 2005/11/26 14:21:49 avenger_teambg Exp $
  *
  */
 
@@ -23,7 +23,7 @@
 //  		 and POSIX-like compatibility layer for win
 
 #include <stdarg.h>
-
+#include <sys/stat.h>
 #include "../../includes/globals.h"
 #include "VFS.h"
 #include "Interface.h"

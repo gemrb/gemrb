@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.cpp,v 1.18 2005/11/23 16:04:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.cpp,v 1.19 2005/11/26 14:21:49 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "Polygon.h"
@@ -153,8 +153,8 @@ static bool intersectSegments(Point& a, Point& b, Point& c, Point& d, Point& s)
 		  (left(c, d, a) != left(c, d, b))))
 		return false;
 
-	long long A1 = area2(c, d, a);
-	long long A2 = area2(d, c, b);
+	__int64 A1 = area2(c, d, a);
+	__int64 A2 = area2(d, c, b);
 
 	s.x = (b.x*A1 + a.x*A2) / (A1 + A2);
 	s.y = (b.y*A1 + a.y*A2) / (A1 + A2);
