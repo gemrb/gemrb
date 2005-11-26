@@ -15,43 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/OpcodeMgr.h,v 1.4 2005/11/26 14:45:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/OpcodeMgr.cpp,v 1.1 2005/11/26 14:45:35 avenger_teambg Exp $
  *
  */
 
-/**
- * @file OpcodeMgr.h
- * Declares OpcodeMgr, abstract parent for plugins registering new opcodes
- * @author The GemRB Project
- */
+#include "../../includes/win32def.h"
+#include "OpcodeMgr.h"
 
-#include "Plugin.h"
+OpcodeMgr::OpcodeMgr(void)
+{
+}
 
-#ifndef OPCODEMGR_H
-#define OPCODEMGR_H
-
-#ifdef WIN32
-
-#ifdef GEM_BUILD_DLL
-#define GEM_EXPORT __declspec(dllexport)
-#else
-#define GEM_EXPORT __declspec(dllimport)
-#endif
-
-#else
-#define GEM_EXPORT
-#endif
-
-/**
- * @class OpcodeMgr
- * Abstract parent for plugins registering new opcodes
- */
-
-class GEM_EXPORT OpcodeMgr : public Plugin {
-public:
-	OpcodeMgr(void);
-	virtual ~OpcodeMgr(void);
-	virtual bool Init(void) = 0;
-};
-
-#endif  // !OPCODEMGR_H
+OpcodeMgr::~OpcodeMgr(void)
+{
+}
