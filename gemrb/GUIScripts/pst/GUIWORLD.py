@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIWORLD.py,v 1.8 2005/07/04 22:21:06 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIWORLD.py,v 1.9 2005/11/27 12:18:44 avenger_teambg Exp $
 
 
 # GUIWORLD.py - scripts to control some windows from GUIWORLD winpack
@@ -218,7 +218,6 @@ def CloseContainerWindow ():
 #doing this way it will inform the core system too, which in turn will call
 #CloseContainerWindow ()
 def LeaveContainer ():
-	print "LeaveContainer"
 	GemRB.LeaveContainer()
 
 def DropItemContainer ():

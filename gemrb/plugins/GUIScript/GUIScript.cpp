@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.346 2005/11/27 10:51:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.347 2005/11/27 12:18:45 avenger_teambg Exp $
  *
  */
 
@@ -224,7 +224,7 @@ static PyObject* GemRB_GetGameString(PyObject*, PyObject* args)
 		}
 	}
 
-	return NULL;
+	return AttributeError( GemRB_GetGameString__doc );
 }
 
 PyDoc_STRVAR( GemRB_LoadGame__doc,
@@ -1974,6 +1974,29 @@ static PyObject* GemRB_SetLabelUseRGB(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_GameSetProtagonistMode__doc,
+"GameSetProtagonistMode(PM)\n\n"
+"Sets the protagonist mode, 0-no check, 1-protagonist, 2-team." );
+
+static PyObject* GemRB_GameSetProtagonistMode(PyObject * /*self*/, PyObject* args)
+{
+	int Flags;
+
+	if (!PyArg_ParseTuple( args, "i", &Flags )) {
+		return AttributeError( GemRB_GameSetProtagonistMode__doc );
+	}
+
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+
+	game->SetProtagonistMode( Flags );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_GameSetScreenFlags__doc,
 "GameSetScreenFlags(Flags, Operation)\n\n"
 "Sets the Display Flags of the main game screen (pane status, dialog textarea size)." );
@@ -1993,8 +2016,7 @@ static PyObject* GemRB_GameSetScreenFlags(PyObject * /*self*/, PyObject* args)
 
 	Game *game = core->GetGame();
 	if (!game) {
-		printMessage ("GUIScript", "Flag cannot be set!",LIGHT_RED);
-		return NULL;
+		return RuntimeError( "No game loaded!" );
 	}
 
 	game->SetControlStatus( Flags, Operation );
@@ -3093,7 +3115,7 @@ static PyObject* GemRB_GameGetPartyGold(PyObject * /*self*/, PyObject* /*args*/)
 {
 	Game *game = core->GetGame();
 	if (!game) {
-		return RuntimeError( GemRB_GameGetPartyGold__doc );
+		return RuntimeError( "No game loaded!" );
 	}
 	int Gold = game->PartyGold;
 	return PyInt_FromLong( Gold );
@@ -3112,7 +3134,7 @@ static PyObject* GemRB_GameSetPartyGold(PyObject * /*self*/, PyObject* args)
 	}
 	Game *game = core->GetGame();
 	if (!game) {
-		return RuntimeError( GemRB_GameSetPartyGold__doc );
+		return RuntimeError( "No game loaded!" );
 	}
 	if (flag) {
 		game->AddGold((ieDword) Gold);
@@ -3304,7 +3326,7 @@ static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 	Slot = ( PlayerSlot & 0x7fff ); 
 	Game *game = core->GetGame();
 	if (!game) {
-		return RuntimeError( "No game!");
+		return RuntimeError( "No game loaded!" );
 	}
 	if (PlayerSlot & 0x8000) {
 		PlayerSlot = game->FindPlayer( Slot );
@@ -3865,7 +3887,7 @@ static PyObject* GemRB_GetContainer(PyObject * /*self*/, PyObject* args)
 
 	Game *game = core->GetGame();
 	if (!game) {
-		return RuntimeError("No current game!");
+		return RuntimeError( "No game loaded!" );
 	}
 	if (PartyID) {
 		actor = game->FindPC( PartyID );
@@ -5503,6 +5525,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetControlSize, METH_VARARGS),
 	METHOD(DeleteControl, METH_VARARGS),
 	METHOD(SetTextAreaFlags, METH_VARARGS),
+	METHOD(GameSetProtagonistMode, METH_VARARGS),
 	METHOD(GameSetScreenFlags, METH_VARARGS),
 	METHOD(GameControlSetScreenFlags, METH_VARARGS),
 	METHOD(GameControlSetTargetMode, METH_VARARGS),

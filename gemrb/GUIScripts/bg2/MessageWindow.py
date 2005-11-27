@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/MessageWindow.py,v 1.35 2005/11/01 13:35:10 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/MessageWindow.py,v 1.36 2005/11/27 12:18:43 avenger_teambg Exp $
 
 # MessageWindow.py - scripts and GUI for main (walk) window
 
@@ -46,6 +46,7 @@ ContractButton = 0
 def OnLoad():
 	global PortraitWindow, OptionsWindow
 
+	GemRB.GameSetProtagonistMode(1)
 	GemRB.LoadWindowPack(GetWindowPack())
 	ActionsWindow = GemRB.LoadWindow(3)
 	OptionsWindow = GemRB.LoadWindow(0)

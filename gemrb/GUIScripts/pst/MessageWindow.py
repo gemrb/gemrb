@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.33 2005/11/12 11:59:52 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.34 2005/11/27 12:18:44 avenger_teambg Exp $
 
 
 # MessageWindow.py - scripts and GUI for main (walk) window
@@ -49,6 +49,7 @@ OptionsWindow = 0
 def OnLoad():
 	global MessageWindow, ActionsWindow, PortraitWindow, OptionsWindow
 
+	GemRB.GameSetProtagonistMode(0)
 	GemRB.LoadWindowPack ("GUIWORLD")
 	GemRB.SetInfoTextColor(0,255,0,255)
 	ActionsWindow = GemRB.LoadWindow(0)

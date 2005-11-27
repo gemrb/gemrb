@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/Start.py,v 1.10 2004/11/21 21:28:22 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/Start.py,v 1.11 2005/11/27 12:18:44 avenger_teambg Exp $
 
 
 # Start.py - intro and main menu screens
@@ -85,8 +85,6 @@ def ResumeLifePress():
 	#to make difference between ingame load and initial load
 	GemRB.SetVar("PlayMode",0)
 	GemRB.SetNextScript("GUILOAD")
-	#GemRB.SetNextScript("GUISAVE")
-	#GemRB.SetNextScript("pok")
 	return
 
 def ExitPress():

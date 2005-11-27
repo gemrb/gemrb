@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIWORLD.py,v 1.15 2005/07/04 18:40:59 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIWORLD.py,v 1.16 2005/11/27 12:18:44 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -403,6 +403,48 @@ def SelectFormation ():
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SELECTED)
 
 	last_formation = formation
+	return
+
+def DeathWindow() :
+	#playing death movie before continuing
+	GemRB.PlayMovie("deathand")
+
+	GemRB.LoadWindowPack (GetWindowPack())
+	Window = GemRB.LoadWindow (17)
+
+	#reason for death
+	Label = GemRB.GetControl (Window, 0x0fffffff)
+	GemRB.SetText (Window, Label, 16498)
+
+	#load
+	Button = GemRB.GetControl (Window, 1)
+	GemRB.SetText (Window, Button, 15590)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "LoadPress")
+
+	#quit
+	Button = GemRB.GetControl (Window, 2)
+	GemRB.SetText (Window, Button, 15417)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "QuitPress")
+
+	GemRB.HideGUI()
+	GemRB.SetVar("OptionsWindow", -1)
+	GemRB.SetVar("PortraitWindow", -1)
+	GemRB.SetVar("MessageWindow", -1)
+	GemRB.SetVar("ActionsWindow", Window)
+	GemRB.UnhideGUI()
+	#making the playing field gray
+	GemRB.SetVisible(0,2)
+	#destructing the game object
+	return
+
+def QuitPress():
+	GemRB.QuitGame()
+	GemRB.SetNextScript("Start")
+	return
+
+def LoadPress():
+	GemRB.QuitGame()
+	GemRB.SetNextScript("GUILOAD")
 	return
 
 def GetWindowPack():

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.96 2005/11/27 10:51:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.97 2005/11/27 12:18:44 avenger_teambg Exp $
  *
  */
 
@@ -33,6 +33,7 @@
 
 Game::Game(void) : Scriptable( ST_GLOBAL )
 {
+	protagonist = PM_YES; //set it to 2 for iwd/iwd2 and 0 for pst
 	version = 0;
 	LoadMos[0] = 0;
 	SelectedSingle = 1; //the PC we are looking at (inventory, shop)
@@ -833,6 +834,32 @@ void Game::AdvanceTime(ieDword add)
 	Ticks+=add;
 }
 
+//returns true if the protagonist (or the whole party died)
+bool Game::EveryoneDead() const
+{
+	if (protagonist==PM_NO) {
+		return false;
+	}
+	//if there are no PCs, then we assume everyone dead
+	if (!PCs.size() ) {
+		return true;
+	}
+	// if protagonist died
+	if (protagonist==PM_YES) {
+		if (PCs[0]->GetStat(IE_STATE_ID)&STATE_NOSAVE) {
+			return true;
+		}
+		return false;
+	}
+	//protagonist == 2
+	for (unsigned int i=0; i<PCs.size(); i++) {
+		if (!(PCs[i]->GetStat(IE_STATE_ID)&STATE_NOSAVE) ) {
+			return false;
+		}
+	}
+	return true;
+}
+
 //runs all area scripts
 void Game::UpdateScripts()
 {
@@ -842,4 +869,16 @@ void Game::UpdateScripts()
 	while(idx--) {
 		Maps[idx]->UpdateScripts();
 	}
+	if (GameTime & 0x10) {
+		if (EveryoneDead()) {
+			//don't check it any more
+			protagonist = PM_NO;
+			core->GetGUIScriptEngine()->RunFunction("DeathWindow");
+		}
+	}
+}
+
+void Game::SetProtagonistMode(int mode)
+{
+	protagonist = mode;
 }

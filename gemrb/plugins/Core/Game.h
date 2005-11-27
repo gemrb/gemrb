@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.67 2005/11/27 10:51:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.68 2005/11/27 12:18:44 avenger_teambg Exp $
  *
  */
 
@@ -52,6 +52,11 @@ class Game;
 //joinparty flags
 #define JP_JOIN     1  //refresh join time
 #define JP_INITPOS  2  //init startpos
+
+//protagonist mode
+#define PM_NO       0  //no death checks
+#define PM_YES      1  //if protagonist dies, game over
+#define PM_TEAM     2  //if team dies, game over
 
 // Flags bits for SelectActor()
 // !!! Keep these synchronized with GUIDefines.py !!!
@@ -156,7 +161,10 @@ public:
 
 	/** Index of PC selected in non-walking environment (shops, inventory...) */
 	int SelectedSingle;
-
+	/** 0 if the protagonist's death doesn't cause game over */
+	/** 1 if the protagonist's death causes game over */
+	/** 2 if no check is needed (pst) */
+	int protagonist;
 public:
 	ieDword Ticks;
 	ieDword interval;
@@ -168,7 +176,7 @@ public:
 	ieDword WeatherBits;
 	ieDword Unknown48;
 	ieDword Reputation;
-	ieDword ControlStatus;    // used in bg2, iwd (where you can switch panes off)
+	ieDword ControlStatus;// used in bg2, iwd (where you can switch panes off)
 	ieResRef AnotherArea;
 	ieResRef CurrentArea;
 	ieResRef LoadMos;
@@ -260,8 +268,12 @@ public:
 		beasts[Index] = 1;
 	}
 	void ShareXP(int XP, bool divide);
+	/** returns true if the party death condition is true */
+	bool EveryoneDead() const;
+	/** returns true if no one moves */
 	bool EveryoneStopped() const;
 	bool EveryoneNearPoint(Map *map, Point &p, int flags) const;
+	/** returns true if a PC just died */
 	int PartyMemberDied() const;
 	/** Increments chapter variable and refreshes kill stats */
 	void IncrementChapter();
@@ -269,6 +281,8 @@ public:
 	void SetReputation(ieDword r);
 	/** Sets the gamescreen control status (pane states, dialog textarea size) */
 	void SetControlStatus(int value, int operation);
+	/** Sets protagonist mode to 0-none,1-protagonist,2-team */
+	void SetProtagonistMode(int value);
 	void StartRainOrSnow(bool conditional, int weather);
 	size_t GetLoadedMapCount() const { return Maps.size(); }
 	/** Adds or removes gold */
