@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.264 2005/11/27 10:51:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.265 2005/11/27 23:21:16 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -494,10 +494,13 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			if (Mod & 64)
 				core->GetVideoDriver()->ToggleFullscreenMode();
 			break;
+		/** why is this good, i don't know, anyway ctrl-g shows
+                    loaded areas in original bg2, so it will do that
 		case 'g':
 			if (Mod & 64)
 				core->GetVideoDriver()->ToggleGrabInput();
 			break;
+		*/
 		default:
 			break;
 	}
@@ -620,6 +623,9 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			case 'x':
 				// shows coordinates
 				printf( "%s [%d.%d]\n", area->GetScriptName(), p.x, p.y );
+				break;
+			case 'g':
+				game->DebugDump();
 				break;
 			case 'r':
 				if (!lastActor) {

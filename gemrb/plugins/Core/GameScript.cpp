@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.332 2005/11/26 20:33:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.333 2005/11/27 23:21:16 avenger_teambg Exp $
  *
  */
 
@@ -438,6 +438,7 @@ static ActionLink actionnames[] = {
 	{"facesavedlocation", GameScript::FaceSavedLocation, AF_BLOCKING},
 	{"fadefromblack", GameScript::FadeFromColor, 0}, //probably the same
 	{"fadefromcolor", GameScript::FadeFromColor, 0},
+	{"fadetoandfromcolor", GameScript::FadeToAndFromColor, 0},
 	{"fadetoblack", GameScript::FadeToColor, 0}, //probably the same
 	{"fadetocolor", GameScript::FadeToColor, 0},
 	{"findtraps", GameScript::FindTraps, 0},
@@ -1514,11 +1515,7 @@ void GameScript::ExecuteString(Scriptable* Sender, char* String)
 	if (!act) {
 		return;
 	}
-	if (Sender->CurrentAction) {
-		Sender->CurrentAction->Release();
-	}
-	Sender->CurrentAction = act;
-	ExecuteAction( Sender, act );
+	Sender->AddActionInFront(act);
 }
 
 //-------------------------------------------------------------
@@ -2558,9 +2555,12 @@ int GameScript::EvaluateString(Scriptable* Sender, char* String)
 		return 0;
 	}
 	Trigger* tri = GenerateTrigger( String );
-	int ret = EvaluateTrigger( Sender, tri );
-	tri->Release();
-	return ret;
+	if (tri) {
+		int ret = EvaluateTrigger( Sender, tri );
+		tri->Release();
+		return ret;
+	}
+	return 0;
 }
 
 bool GameScript::EvaluateCondition(Scriptable* Sender, Condition* condition)

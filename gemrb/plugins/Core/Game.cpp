@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.97 2005/11/27 12:18:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.98 2005/11/27 23:21:16 avenger_teambg Exp $
  *
  */
 
@@ -34,6 +34,7 @@
 Game::Game(void) : Scriptable( ST_GLOBAL )
 {
 	protagonist = PM_YES; //set it to 2 for iwd/iwd2 and 0 for pst
+	partysize = 6;
 	version = 0;
 	LoadMos[0] = 0;
 	SelectedSingle = 1; //the PC we are looking at (inventory, shop)
@@ -865,8 +866,7 @@ void Game::UpdateScripts()
 {
 	ExecuteScript( Scripts[0] );
 	ProcessActions();
-	size_t idx=Maps.size();
-	while(idx--) {
+	for (size_t idx=0;idx<Maps.size();idx++) {
 		Maps[idx]->UpdateScripts();
 	}
 	if (GameTime & 0x10) {
@@ -874,6 +874,11 @@ void Game::UpdateScripts()
 			//don't check it any more
 			protagonist = PM_NO;
 			core->GetGUIScriptEngine()->RunFunction("DeathWindow");
+			return;
+		}
+		if (PCs.size()>partysize) {
+			core->GetGUIScriptEngine()->RunFunction("ReformPartyWindow");
+			return;
 		}
 	}
 }
@@ -881,4 +886,22 @@ void Game::UpdateScripts()
 void Game::SetProtagonistMode(int mode)
 {
 	protagonist = mode;
+}
+
+void Game::SetPartySize(int size)
+{
+	if (size<1) {
+		return;
+	}
+	partysize = (size_t) size;
+}
+
+void Game::DebugDump()
+{
+	printf("Currently loaded areas:\n");
+	for(size_t idx=0;idx<Maps.size();idx++) {
+		Map *map = Maps[idx];
+
+		printf("%s\n",map->GetScriptName());
+	}
 }

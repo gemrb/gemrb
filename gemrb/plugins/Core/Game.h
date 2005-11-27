@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.68 2005/11/27 12:18:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.69 2005/11/27 23:21:16 avenger_teambg Exp $
  *
  */
 
@@ -165,6 +165,8 @@ public:
 	/** 1 if the protagonist's death causes game over */
 	/** 2 if no check is needed (pst) */
 	int protagonist;
+	/** if party size exceeds this amount, a callback will be called */
+	size_t partysize;
 public:
 	ieDword Ticks;
 	ieDword interval;
@@ -281,6 +283,8 @@ public:
 	void SetReputation(ieDword r);
 	/** Sets the gamescreen control status (pane states, dialog textarea size) */
 	void SetControlStatus(int value, int operation);
+	/** Sets party size (1-32000) */
+	void SetPartySize(int value);
 	/** Sets protagonist mode to 0-none,1-protagonist,2-team */
 	void SetProtagonistMode(int value);
 	void StartRainOrSnow(bool conditional, int weather);
@@ -292,6 +296,8 @@ public:
 	/** Runs the script engine on the global script and the area scripts 
             areas run scripts on door, infopoint, container, actors too */
 	void UpdateScripts();
+	/** Dumps information about the object */
+	void DebugDump();
 };
 
 #endif  // ! GAME_H

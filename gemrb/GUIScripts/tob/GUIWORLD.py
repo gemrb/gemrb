@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIWORLD.py,v 1.17 2005/11/27 13:26:23 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIWORLD.py,v 1.18 2005/11/27 23:21:21 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -403,6 +403,11 @@ def SelectFormation ():
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SELECTED)
 
 	last_formation = formation
+	return
+
+def PartyReformWindow() :
+	GemRB.LoadWindowPack (GetWindowPack())
+	Window = GemRB.LoadWindow (24)
 	return
 
 def DeathWindow() :

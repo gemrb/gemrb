@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.44 2005/11/26 20:33:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.45 2005/11/27 23:21:16 avenger_teambg Exp $
  *
  */
 
@@ -357,6 +357,12 @@ void GameScript::FadeToColor(Scriptable* /*Sender*/, Action* parameters)
 
 void GameScript::FadeFromColor(Scriptable* /*Sender*/, Action* parameters)
 {
+	core->timer->SetFadeFromColor( parameters->pointParameter.x );
+}
+
+void GameScript::FadeToAndFromColor(Scriptable* /*Sender*/, Action* parameters)
+{
+	core->timer->SetFadeToColor( parameters->pointParameter.x );
 	core->timer->SetFadeFromColor( parameters->pointParameter.x );
 }
 

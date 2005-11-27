@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.207 2005/11/27 20:45:33 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.208 2005/11/27 23:21:17 avenger_teambg Exp $
  *
  */
 
@@ -257,6 +257,7 @@ Map::Map(void)
 	VisibleBitmap = NULL;
 	version = 0;
 	localActorCounter = 0;
+	MasterArea = core->GetGame()->MasterArea(scriptName);
 }
 
 Map::~Map(void)
@@ -431,6 +432,11 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 
 void Map::UpdateScripts()
 {
+	// if masterarea, then we allow 'any' actors
+	// if not masterarea, we allow only players
+	if (!GetActorCount(MasterArea) )
+		return;
+
 	//Run the Map Script
 	if (Scripts[0]) {
 		ExecuteScript( Scripts[0] );

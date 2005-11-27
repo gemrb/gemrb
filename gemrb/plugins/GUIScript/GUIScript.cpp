@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.348 2005/11/27 13:27:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.349 2005/11/27 23:21:20 avenger_teambg Exp $
  *
  */
 
@@ -1969,6 +1969,29 @@ static PyObject* GemRB_SetLabelUseRGB(PyObject * /*self*/, PyObject* args)
 	}
 
 	lab->useRGB = ( status != 0 );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_GameSetPartySize__doc,
+"GameSetPartySize(size)\n\n"
+"Sets the maximum party size." );
+
+static PyObject* GemRB_GameSetPartySize(PyObject * /*self*/, PyObject* args)
+{
+	int Flags;
+
+	if (!PyArg_ParseTuple( args, "i", &Flags )) {
+		return AttributeError( GemRB_GameSetPartySize__doc );
+	}
+
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+
+	game->SetPartySize( Flags );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -5527,6 +5550,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetControlSize, METH_VARARGS),
 	METHOD(DeleteControl, METH_VARARGS),
 	METHOD(SetTextAreaFlags, METH_VARARGS),
+	METHOD(GameSetPartySize, METH_VARARGS),
 	METHOD(GameSetProtagonistMode, METH_VARARGS),
 	METHOD(GameSetScreenFlags, METH_VARARGS),
 	METHOD(GameControlSetScreenFlags, METH_VARARGS),
