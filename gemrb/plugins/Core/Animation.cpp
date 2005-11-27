@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.37 2005/11/24 17:44:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.38 2005/11/27 20:45:32 wjpalenstijn Exp $
  *
  */
 
@@ -223,4 +223,13 @@ void Animation::MirrorAnimation()
 
 	// This function will create independent sprites we have to free
 	autofree = true;
+}
+
+void Animation::BlendAnimation()
+{
+	Video *video = core->GetVideoDriver();
+
+	for (size_t i = 0; i < indicesCount; i++) {
+		video->CalculateAlpha(frames[i]);
+	}
 }

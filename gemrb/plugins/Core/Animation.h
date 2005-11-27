@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.22 2005/11/06 13:42:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.23 2005/11/27 20:45:33 wjpalenstijn Exp $
  *
  */
 
@@ -68,6 +68,8 @@ public:
 	void SetPalette(Color* Palette, bool local);
 	/** Mirrors all the frames vertically */
 	void MirrorAnimation();
+	/** Calls CalculateAlpha on all frames */
+	void BlendAnimation();
 	/** sets frame index */
 	void SetPos(unsigned int index);
 	/** Sets ScriptName for area animation */

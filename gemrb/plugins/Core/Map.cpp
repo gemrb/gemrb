@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.206 2005/11/27 10:51:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.207 2005/11/27 20:45:33 wjpalenstijn Exp $
  *
  */
 
@@ -592,11 +592,6 @@ void Map::DrawMap(Region screen, GameControl* gc)
 		if ((a->Flags&A_ANI_NO_SHADOW)) {
 			tint = LightMap->GetPixel( a->Pos.x / 16, a->Pos.y / 12);
 		}
-		if (a->Flags&A_ANI_BLEND) {
-			tint.a = 0xa0;
-		} else {
-			tint.a = 255;
-		}
 		while (animcount--) {
 			Animation *anim = a->animation[animcount];
 			video->BlitSpriteTinted( anim->NextFrame(),
@@ -733,11 +728,6 @@ void Map::DrawMap(Region screen, GameControl* gc)
 		Color tint = {255,255,255,(ieByte) a->transparency};
 		if ((a->Flags&A_ANI_NO_SHADOW)) {
 			tint = LightMap->GetPixel( a->Pos.x / 16, a->Pos.y / 12);
-		}
-		if (a->Flags&A_ANI_BLEND) {
-			tint.a = 0xa0;
-		} else {
-			tint.a = 255;
 		}
 		while (animcount--) {
 			Animation *anim = a->animation[animcount];
