@@ -42,5 +42,5 @@ def Done2Press():
 
 def CancelPress():
 	GemRB.UnloadWindow(ImportWindow)
-	GemRB.SetNextScript("GUICG24")
+	GemRB.SetNextScript("CharGen")
 	return

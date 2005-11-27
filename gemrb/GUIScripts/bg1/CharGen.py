@@ -93,6 +93,6 @@ def CancelPress():
 
 def ImportPress():
         GemRB.UnloadWindow(CharGenWindow)
-	GemRB.SetNextScript("GUICG24") #import
+	GemRB.SetNextScript("ImportFile") #import
 	return
 
