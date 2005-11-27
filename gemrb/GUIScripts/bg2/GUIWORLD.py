@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIWORLD.py,v 1.16 2005/11/27 12:18:43 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIWORLD.py,v 1.17 2005/11/27 13:26:23 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -407,7 +407,8 @@ def SelectFormation ():
 
 def DeathWindow() :
 	#playing death movie before continuing
-	GemRB.PlayMovie("deathand")
+	GemRB.PlayMovie("deathand",1)
+	GemRB.GamePause(1,1)
 
 	GemRB.LoadWindowPack (GetWindowPack())
 	Window = GemRB.LoadWindow (17)

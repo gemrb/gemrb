@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIWORLD.py,v 1.3 2005/06/22 15:55:23 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIWORLD.py,v 1.4 2005/11/27 13:26:23 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -220,7 +220,8 @@ def OpenContainerWindow ():
 	Container = GemRB.GetContainer(0)
 
 	# Gears (time) when options pane is down
-	Button = GemRB.GetControl (Window, 62)
+	//62?
+	Button = GemRB.GetControl (Window, 50)
 	GemRB.SetAnimation (Window, Button, "CGEAR")
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
 	GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_LOCKED)
@@ -402,6 +403,51 @@ def SelectFormation ():
 
 	last_formation = formation
 	return
+
+def DeathWindow() :
+	#no death movie, but music is changed
+	GemRB.LoadMusicPL("Theme.mus",1)
+	GemRB.GamePause(1,1)
+
+	GemRB.LoadWindowPack (GetWindowPack())
+	Window = GemRB.LoadWindow (17)
+
+	#reason for death
+	Label = GemRB.GetControl (Window, 0x0fffffff)
+	GemRB.SetText (Window, Label, 16498)
+
+	#load
+	Button = GemRB.GetControl (Window, 1)
+	GemRB.SetText (Window, Button, 15590)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "LoadPress")
+
+	#quit
+	Button = GemRB.GetControl (Window, 2)
+	GemRB.SetText (Window, Button, 15417)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "QuitPress")
+
+	GemRB.HideGUI()
+	GemRB.SetVar ("MessageWindow", -1)
+	GemRB.SetVar ("ActionsWindow", Window)
+	GemRB.UnhideGUI()
+	#making the playing field gray
+	GemRB.SetVisible (0,2)
+	Window = GemRB.GetVar ("PortraitWindow")
+	GemRB.SetVisible (Window,2)
+	Window = GemRB.GetVar ("OptionsWindow")
+	GemRB.SetVisible (Window,2)
+	return
+
+def QuitPress():
+	GemRB.QuitGame()
+	GemRB.SetNextScript("Start")
+	return
+
+def LoadPress():
+	GemRB.QuitGame()
+	GemRB.SetNextScript("GUILOAD")
+	return
+
 
 def GetWindowPack():
 	width = GemRB.GetSystemVariable (SV_WIDTH)

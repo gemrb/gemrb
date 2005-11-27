@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/Start.py,v 1.12 2005/05/29 12:59:42 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/Start.py,v 1.13 2005/11/27 13:26:23 avenger_teambg Exp $
 
 
 # Start.py - intro and main menu screens
@@ -89,7 +89,7 @@ def OnLoad():
 	GemRB.SetEvent(StartWindow, LoadGameButton, IE_GUI_BUTTON_ON_PRESS, "LoadPress")
 	GemRB.SetEvent(StartWindow, CreateGameButton, IE_GUI_BUTTON_ON_PRESS, "CreatePress")
 	GemRB.SetVisible(StartWindow, 1)
-	GemRB.LoadMusicPL("Theme.mus")
+	GemRB.LoadMusicPL("Theme.mus",1)
 	return
 
 def ProtocolPress():
