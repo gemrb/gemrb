@@ -1,12 +1,15 @@
 Scripts:
 1. (DONE) Run All creature scripts when the creatures are 'activated'. 
 
-2. (?) Run All area scripts not just the active areas.
-Area scripts are queued, master areas get on the head of the queue, non-master areas get in the tail of the queue. See also: SetMasterArea action/mastarea.2da
+2. (DONE) Run All area scripts not just the active areas. (now Game runs them all)
 
 3. (DONE) TLK tags
 
 4. (DONE) fix loading/saving of local variables of creatures (needs effect framework)
+
+5. (DONE) Handle the protagonist/party death event
+
+6. Handle the party limit exceeded event
 
 Items:
 1. (DONE) Loading containers/items in areas
@@ -51,6 +54,8 @@ Known Bugs:
 2. problem: valgrind reports invalid memory access due to Unqueueing buffers and using them in another thread (openal weirdness?)
 
 3. problem: sounds get sometimes distorted, might be connected to problem #2
+
+4. problem: valgrind reports a big heap of unreleased python objects
 
 Ideas:
 1. Use the character sheet (Actor.cpp) itself to store attributes of the character during character generation.

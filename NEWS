@@ -5,6 +5,7 @@ GemRB V0.2.6 (2005-11-26):
     - Wallgroup covers
     - Door triggers
     - changing default action to talk/fight (only in pst)
+    - party/protagonist death handled
 
   Improved features:
     - Textscreen graphic fixed
