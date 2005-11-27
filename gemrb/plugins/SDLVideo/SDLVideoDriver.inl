@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.inl,v 1.1 2005/11/22 20:49:40 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.inl,v 1.2 2005/11/27 19:32:29 wjpalenstijn Exp $
  *
  */
 
@@ -45,16 +45,80 @@
 #define PTYPE Uint32
 #endif
 
-// TODO: preconvert palette to surface-specific color values
+#ifdef PALETTE_ALPHA
+#define ALPHA
+#ifdef TINT_ALPHA
+#define ALPHAVALUE (((PAL)[p].a * tint.a)>>8)
+#else
+#define ALPHAVALUE (PAL)[p].a
+#endif
+
+#else
+
+#ifdef TINT_ALPHA
+#define ALPHA
+#define ALPHAVALUE tint.a
+#else
+#undef ALPHA
+#define ALPHAVALUE 0
+#endif
+
+#endif
+
+// TODO: preconvert palette to surface-specific color values, where possible
+
+#ifdef ALPHA
 
 #ifdef TINT
-#define BLENDPIXEL(cr,cg,cb) (PTYPE)( ((tint.r*(cr)) >> (rloss+8)) << rshift  \
+#define BLENDPIXEL(target,cr,cg,cb,ca,curval) \
+do { \
+	if ((ca) != 0) { \
+		dR = (((curval)>>rshift)<<rloss)&0xFF; \
+		dG = (((curval)>>gshift)<<gloss)&0xFF; \
+		dB = (((curval)>>bshift)<<bloss)&0xFF; \
+		dR = 1 + (ca)*((tint.r*(cr)) >> 8) + (dR * (255-(ca))); \
+ 		dR = (dR + (dR >> 8)) >> 8; \
+		dG = 1 + (ca)*((tint.g*(cg)) >> 8) + (dG * (255-(ca))); \
+ 		dG = (dG + (dG >> 8)) >> 8; \
+		dB = 1 + (ca)*((tint.b*(cb)) >> 8) + (dB * (255-(ca))); \
+ 		dB = (dB + (dB >> 8)) >> 8; \
+		target = (PTYPE) ( ((dR) >> rloss) << rshift \
+						   | ((dG) >> gloss) << gshift \
+						   | ((dB) >> bloss) << bshift); \
+	} \
+} while (0)
+#else
+#define BLENDPIXEL(target,cr,cg,cb,ca,curval) \
+do { \
+	if ((ca) != 0) { \
+		dR = (((curval)>>rshift)<<rloss)&0xFF; \
+		dG = (((curval)>>gshift)<<gloss)&0xFF; \
+		dB = (((curval)>>bshift)<<bloss)&0xFF; \
+		dR = 1 + (ca)*(cr) + (dR * (255-(ca))); \
+ 		dR = (dR + (dR >> 8)) >> 8; \
+		dG = 1 + (ca)*(cg) + (dG * (255-(ca))); \
+ 		dG = (dG + (dG >> 8)) >> 8; \
+		dB = 1 + (ca)*(cb) + (dB * (255-(ca))); \
+ 		dB = (dB + (dB >> 8)) >> 8; \
+		target = (PTYPE) ( ((dR) >> rloss) << rshift \
+						   | ((dG) >> gloss) << gshift \
+						   | ((dB) >> bloss) << bshift); \
+	} \
+} while (0)
+#endif
+
+#else
+
+#ifdef TINT
+#define BLENDPIXEL(target,cr,cg,cb,ca,curval) target = (PTYPE)( ((tint.r*(cr)) >> (rloss+8)) << rshift  \
 								   | ((tint.g*(cg)) >> (gloss+8)) << gshift \
 								   | ((tint.b*(cb)) >> (bloss+8)) << bshift) 
 #else
-#define BLENDPIXEL(cr,cg,cb) (PTYPE)( ((cr) >> rloss) << rshift  \
+#define BLENDPIXEL(target,cr,cg,cb,ca,curval) target = (PTYPE)( ((cr) >> rloss) << rshift  \
 								   | ((cg) >> gloss) << gshift \
 								   | ((cb) >> bloss) << bshift)
+#endif
+
 #endif
 
 {
@@ -72,6 +136,12 @@
 	const int rshift = (TARGET)->format->Rshift;
 	const int gshift = (TARGET)->format->Gshift;
 	const int bshift = (TARGET)->format->Bshift;
+
+#ifdef ALPHA
+	unsigned int dR;
+	unsigned int dG;
+	unsigned int dB;
+#endif
 
 	PTYPE* line = (PTYPE*)(TARGET)->pixels +
 		(ty - yneg*((HEIGHT)-1))*(TARGET)->pitch/(PITCHMULT);
@@ -126,7 +196,7 @@
 #endif
 					{
 						SPECIALPIXEL {
-							*pix = BLENDPIXEL((PAL)[p].r, (PAL)[p].g, (PAL)[p].b);
+							BLENDPIXEL(*pix, (PAL)[p].r, (PAL)[p].g, (PAL)[p].b, (ALPHAVALUE), *pix);
 						}
 					}
 				}
@@ -153,3 +223,5 @@
 #undef TARGET
 #undef WIDTH
 #undef HEIGHT
+#undef ALPHA
+#undef ALPHAVALUE

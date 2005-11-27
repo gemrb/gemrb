@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.116 2005/11/23 21:10:21 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.117 2005/11/27 19:32:29 wjpalenstijn Exp $
  *
  */
 
@@ -35,6 +35,7 @@ public:
 	int transindex;
 	bool flip_hor;
 	bool flip_ver;
+	bool alpha_pal;
 };
 
 //actually it won't be transparent :(
@@ -423,6 +424,7 @@ Sprite2D* SDLVideoDriver::CreateSpriteRLE8(int w, int h, void* rledata,
 	data->datasize = datasize;
 	data->flip_hor = false;
 	data->flip_ver = false;
+	data->alpha_pal = false;
 
 	spr->pixels = rledata;
 	spr->Width = w;
@@ -588,19 +590,39 @@ void SDLVideoDriver::BlitSpriteRegion(Sprite2D* spr, Region& size, int x,
 #define FLIP 
 #define HFLIP_CONDITIONAL data->flip_hor
 #define VFLIP_CONDITIONAL data->flip_ver
-#define PAL data->pal
+#define PAL (Color*)data->pal
 #undef COVER
 #undef TINT
 
 		if (backBuf->format->BytesPerPixel == 4) {
 
 #undef BPP16
+			if (data->alpha_pal) {
+
+#define PALETTE_ALPHA
 #include "SDLVideoDriver.inl"
+
+			} else {
+
+#undef PALETTE_ALPHA
+#include "SDLVideoDriver.inl"
+
+			}
 
 		} else {
 
 #define BPP16
+			if (data->alpha_pal) {
+
+#define PALETTE_ALPHA
 #include "SDLVideoDriver.inl"
+
+			} else {
+
+#undef PALETTE_ALPHA
+#include "SDLVideoDriver.inl"
+
+			}
 
 		}
 
@@ -732,19 +754,39 @@ void SDLVideoDriver::BlitSprite(Sprite2D* spr, int x, int y, bool anchor,
 #define FLIP 
 #define HFLIP_CONDITIONAL data->flip_hor
 #define VFLIP_CONDITIONAL data->flip_ver
-#define PAL data->pal
+#define PAL (Color*)data->pal
 #undef COVER
 #undef TINT
 
 		if (backBuf->format->BytesPerPixel == 4) {
 
 #undef BPP16
+			if (data->alpha_pal) {
+
+#define PALETTE_ALPHA
 #include "SDLVideoDriver.inl"
+
+			} else {
+
+#undef PALETTE_ALPHA
+#include "SDLVideoDriver.inl"
+
+			}
 
 		} else {
 
 #define BPP16
+			if (data->alpha_pal) {
+
+#define PALETTE_ALPHA
 #include "SDLVideoDriver.inl"
+
+			} else {
+
+#undef PALETTE_ALPHA
+#include "SDLVideoDriver.inl"
+
+			}
 
 		}
 
@@ -754,6 +796,7 @@ void SDLVideoDriver::BlitSprite(Sprite2D* spr, int x, int y, bool anchor,
 #undef VFLIP_CONDITIONAL
 #undef PAL
 #undef SPECIALPIXEL
+#undef PALETTE_ALPHA
 
 		SDL_UnlockSurface(backBuf);
 	}
@@ -825,7 +868,7 @@ void SDLVideoDriver::BlitSpriteNoShadow(Sprite2D* spr, int x, int y,
 #define FLIP 
 #define HFLIP_CONDITIONAL data->flip_hor
 #define VFLIP_CONDITIONAL data->flip_ver
-#define PAL data->pal
+#define PAL (Color*)data->pal
 #define COVER
 #define COVERX (cover->XPos - spr->XPos)
 #define COVERY (cover->YPos - spr->YPos)
@@ -934,12 +977,60 @@ void SDLVideoDriver::BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint,
 		if (backBuf->format->BytesPerPixel == 4) {
 
 #undef BPP16
+
+			if (tint.a != 255) {
+
+#define TINT_ALPHA
+
+				if (data->alpha_pal) {
+#define PALETTE_ALPHA
 #include "SDLVideoDriver.inl"
+				} else {
+#undef PALETTE_ALPHA
+#include "SDLVideoDriver.inl"
+				}
+
+			} else {
+
+#undef TINT_ALPHA
+				if (data->alpha_pal) {
+#define PALETTE_ALPHA
+#include "SDLVideoDriver.inl"
+				} else {
+#undef PALETTE_ALPHA
+#include "SDLVideoDriver.inl"
+				}
+
+			}
 
 		} else {
 
 #define BPP16
+			if (tint.a != 255) {
+
+#define TINT_ALPHA
+
+				if (data->alpha_pal) {
+#define PALETTE_ALPHA
 #include "SDLVideoDriver.inl"
+				} else {
+#undef PALETTE_ALPHA
+#include "SDLVideoDriver.inl"
+				}
+
+			} else {
+
+#undef TINT_ALPHA
+				if (data->alpha_pal) {
+#define PALETTE_ALPHA
+#include "SDLVideoDriver.inl"
+				} else {
+#undef PALETTE_ALPHA
+#include "SDLVideoDriver.inl"
+				}
+
+			}
+
 
 		}
 
@@ -949,6 +1040,8 @@ void SDLVideoDriver::BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint,
 #undef PAL
 #undef TINT
 #undef SPECIALPIXEL
+#undef TINT_ALPHA
+#undef PALETTE_ALPHA
 
 		SDL_UnlockSurface(backBuf);	
 	}
@@ -1015,12 +1108,60 @@ void SDLVideoDriver::BlitSpriteCovered(Sprite2D* spr, int x, int y,
 		if (backBuf->format->BytesPerPixel == 4) {
 
 #undef BPP16
+
+			if (tint.a != 255) {
+
+#define TINT_ALPHA
+
+				if (data->alpha_pal) {
+#define PALETTE_ALPHA
 #include "SDLVideoDriver.inl"
+				} else {
+#undef PALETTE_ALPHA
+#include "SDLVideoDriver.inl"
+				}
+
+			} else {
+
+#undef TINT_ALPHA
+				if (data->alpha_pal) {
+#define PALETTE_ALPHA
+#include "SDLVideoDriver.inl"
+				} else {
+#undef PALETTE_ALPHA
+#include "SDLVideoDriver.inl"
+				}
+
+			}
 
 		} else {
 
 #define BPP16
+			if (tint.a != 255) {
+
+#define TINT_ALPHA
+
+				if (data->alpha_pal) {
+#define PALETTE_ALPHA
 #include "SDLVideoDriver.inl"
+				} else {
+#undef PALETTE_ALPHA
+#include "SDLVideoDriver.inl"
+				}
+
+			} else {
+
+#undef TINT_ALPHA
+				if (data->alpha_pal) {
+#define PALETTE_ALPHA
+#include "SDLVideoDriver.inl"
+				} else {
+#undef PALETTE_ALPHA
+#include "SDLVideoDriver.inl"
+				}
+
+			}
+
 
 		}
 
@@ -1033,6 +1174,8 @@ void SDLVideoDriver::BlitSpriteCovered(Sprite2D* spr, int x, int y,
 #undef COVERY
 #undef TINT
 #undef SPECIALPIXEL
+#undef TINT_ALPHA
+#undef PALETTE_ALPHA
 
 		SDL_UnlockSurface(backBuf);
 
@@ -1190,7 +1333,21 @@ void SDLVideoDriver::CalculateAlpha(Sprite2D* sprite)
 		}
 		SDL_UnlockSurface( surf );
 	} else {
-		// FIXME: implementme
+		Sprite2D_RLE_Internal* data = (Sprite2D_RLE_Internal*)sprite->vptr;
+		for (int i = 0; i < 256; ++i) {
+			unsigned int r = data->pal[i].r;
+			unsigned int g = data->pal[i].g;
+			unsigned int b = data->pal[i].b;
+			unsigned int m = (r + g + b) / 3;
+			if (m > MINCOL)
+				if (( r == 0 ) && ( g == 0xff ) && ( b == 0 ))
+					data->pal[i].unused = 0xff;
+				else
+					data->pal[i].unused = ( m * MUL > 0xff ) ? 0xff : m * MUL;
+			else
+				data->pal[i].unused = 0;
+		}
+		data->alpha_pal = true;
 	}
 }
 
@@ -1310,8 +1467,14 @@ bool SDLVideoDriver::IsSpritePixelTransparent(Sprite2D* sprite, unsigned short x
 
 		return val == 0;
 	} else {
-		int skipcount = y * sprite->Width + x;
 		Sprite2D_RLE_Internal* data = (Sprite2D_RLE_Internal*)sprite->vptr;
+
+		if (data->flip_ver)
+			y = sprite->Height - y - 1;
+		if (data->flip_hor)
+			x = sprite->Width - x - 1;
+
+		int skipcount = y * sprite->Width + x;
 
 		Uint8* rle = (Uint8*)sprite->pixels;
 		while (skipcount > 0) {
@@ -1325,26 +1488,6 @@ bool SDLVideoDriver::IsSpritePixelTransparent(Sprite2D* sprite, unsigned short x
 		else
 			return false;
 	}
-}
-
-static void CountTransparency(SDL_Surface *surf, unsigned short x, unsigned short y, int &sum, int &cnt)
-{
-	if (x>=surf->w) {
-		return;
-	}
-	if (y>=surf->h) {
-		return;
-	}
-	SDL_LockSurface( surf );
-	unsigned char * pixels = ( ( unsigned char * ) surf->pixels ) +
-		( ( y * surf->w + x) * surf->format->BytesPerPixel );
-	long val = 0;
-	memcpy( &val, pixels, surf->format->BytesPerPixel );
-	SDL_UnlockSurface( surf );
-	if(!val) {
-		sum++;
-	}
-	cnt++;
 }
 
 /*
@@ -1830,38 +1973,44 @@ Sprite2D *SDLVideoDriver::MirrorSpriteHorizontal(Sprite2D* sprite, bool MirrorAn
 
 void SDLVideoDriver::CreateAlpha( Sprite2D *sprite)
 {
+	// Note: we convert RLE sprites back to non-RLE (SDL_Surface) sprites
+	// for per-pixel non-indexed alpha.
+
 	if (!sprite || !sprite->vptr)
 		return;
 
-	if (!sprite->RLE) {
-		SDL_Surface * surf = (SDL_Surface *) sprite->vptr;
-		SDL_LockSurface(surf);
-		unsigned int *pixels = (unsigned int *) malloc (sprite->Width * sprite->Height * 4);
-		int i=0;
-		for (int y = 0; y < sprite->Height; y++) {
-			for (int x = 0; x < sprite->Width; x++) {
-				int sum = 0;
-				int cnt = 0;
-				for (int xx=x-2;xx<x+2;xx++) {
-					for(int yy=y-2;yy<y+2;yy++) {
-						CountTransparency(surf,xx,yy,sum,cnt);
-					}
+	unsigned int *pixels = (unsigned int *) malloc (sprite->Width * sprite->Height * 4);
+	int i=0;
+	for (int y = 0; y < sprite->Height; y++) {
+		for (int x = 0; x < sprite->Width; x++) {
+			int sum = 0;
+			int cnt = 0;
+			for (int xx=x-2;xx<x+2;xx++) {
+				for(int yy=y-2;yy<y+2;yy++) {
+					if (xx < 0 || xx >= sprite->Width) continue;
+					if (yy < 0 || yy >= sprite->Height) continue;
+					cnt++;
+					if (IsSpritePixelTransparent(sprite, xx, yy))
+						sum++;
 				}
-				int tmp=255 - (sum * 255 / cnt);
-				pixels[i++]=tmp;
 			}
+			int tmp=255 - (sum * 255 / cnt);
+			pixels[i++]=tmp;
 		}
-		if ( sprite->pixels ) {
-			free (sprite->pixels);
-		}
-		sprite->pixels = pixels;
-		SDL_UnlockSurface (surf);
-		SDL_FreeSurface (surf);
-		surf = SDL_CreateRGBSurfaceFrom( pixels, sprite->Width, sprite->Height, 32, sprite->Width*4, 0xff00, 0xff00, 0xff00, 255 );
-		sprite->vptr = surf;
-	} else {
-		// FIXME: implementme
 	}
+	if ( sprite->pixels ) {
+		free (sprite->pixels);
+	}
+	if (sprite->RLE) {
+		Sprite2D_RLE_Internal* data = (Sprite2D_RLE_Internal*)sprite->vptr;
+		delete data;
+		sprite->RLE = false;
+	} else {
+		SDL_FreeSurface ((SDL_Surface*)sprite->vptr);
+	}
+	sprite->pixels = pixels;
+	SDL_Surface* surf = SDL_CreateRGBSurfaceFrom( pixels, sprite->Width, sprite->Height, 32, sprite->Width*4, 0xff00, 0xff00, 0xff00, 255 );
+	sprite->vptr = surf;
 }
 
 void SDLVideoDriver::SetFadeColor(int r, int g, int b)
@@ -1932,4 +2081,3 @@ void SDLVideoDriver::MouseMovement(int x, int y)
 	if (Evnt)
 		Evnt->MouseMove(x, y);
 }
-
