@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.138 2005/11/26 20:33:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.139 2005/11/27 21:03:18 wjpalenstijn Exp $
  *
  */
 
@@ -1015,6 +1015,9 @@ Animation *AREImp::GetAnimationPiece(AnimationFactory *af, int animCycle, AreaAn
 		}
 		anim->SetPalette( Palette, true );
 		free (Palette);
+	}
+	if (anim->Flags&A_ANI_BLEND) {
+		anim->BlendAnimation();
 	}
 	return anim;
 }
