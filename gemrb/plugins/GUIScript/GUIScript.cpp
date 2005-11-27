@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.347 2005/11/27 12:18:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.348 2005/11/27 13:27:32 avenger_teambg Exp $
  *
  */
 
@@ -2556,7 +2556,7 @@ static PyObject* GemRB_Quit(PyObject * /*self*/, PyObject * /*args*/)
 }
 
 PyDoc_STRVAR( GemRB_LoadMusicPL__doc,
-"LoadMusicPL(MusicPlayListResource)\n\n"
+"LoadMusicPL(MusicPlayListResource, HardEnd)\n\n"
 "Loads and starts a Music PlayList." );
 
 static PyObject* GemRB_LoadMusicPL(PyObject * /*self*/, PyObject* args)
@@ -2746,10 +2746,12 @@ static PyObject* GemRB_PlayMovie(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_PlayMovie__doc );
 	}
 
-	ieDword ind = flag;
+	ieDword ind = 0;
 
 	//Lookup will leave the flag untouched if it doesn't exist yet
 	core->GetDictionary()->Lookup(string, ind);
+	if (flag)
+		ind = 0;
 	if (!ind) {
 		ind = core->PlayMovie( string );
 	}
