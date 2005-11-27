@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.370 2005/11/26 14:21:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.371 2005/11/27 10:51:56 avenger_teambg Exp $
  *
  */
 
@@ -435,8 +435,8 @@ void Interface::HandleFlags()
 {
 	if (QuitFlag&(QF_QUITGAME|QF_EXITGAME) ) {
 		// when reaching this, quitflag should be 1 or 2
-		// if Exitgame was set, we'll set a new script
-			QuitGame (QuitFlag!=QF_QUITGAME);
+		// if Exitgame was set, we'll set Start.py too
+			QuitGame (QuitFlag&QF_EXITGAME);
 			QuitFlag &= ~(QF_QUITGAME|QF_EXITGAME);
 	}
 	

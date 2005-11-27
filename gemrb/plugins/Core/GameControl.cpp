@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.263 2005/11/24 17:44:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.264 2005/11/27 10:51:56 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -234,11 +234,14 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		return;
 	}
 	core->GetVideoDriver()->DrawRect( screen, black, true );
-	//shall we stop globaltimer?
-	//core->GSUpdate(update_scripts);
 	area->DrawMap( screen, this );
-	if (update_scripts) 
-		area->UpdateScripts();
+
+	//in multi player (if we ever get to it), only the server must call this
+	if (update_scripts) {
+		// the game object will run the area scripts as well
+		game->UpdateScripts();
+	}
+
 	if (ScreenFlags & SF_DISABLEMOUSE)
 		return;
 	Point p(lastMouseX, lastMouseY);

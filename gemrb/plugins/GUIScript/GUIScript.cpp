@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.345 2005/11/24 21:32:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.346 2005/11/27 10:51:57 avenger_teambg Exp $
  *
  */
 
@@ -4469,7 +4469,7 @@ static PyObject* GemRB_ExecuteString(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_RunEventHandler__doc,
-"RunEvent(String)\n\n"
+"RunEventHandler(String)\n\n"
 "Executes a GUIScript event handler function named String" );
 
 static PyObject* GemRB_RunEventHandler(PyObject * /*self*/, PyObject* args)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.205 2005/11/26 20:33:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.206 2005/11/27 10:51:56 avenger_teambg Exp $
  *
  */
 
@@ -431,10 +431,6 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 
 void Map::UpdateScripts()
 {
-	//Run the Global Script
-	Game* game = core->GetGame();
-	game->ExecuteScript( game->Scripts[0] );
-	game->ProcessActions();
 	//Run the Map Script
 	if (Scripts[0]) {
 		ExecuteScript( Scripts[0] );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.66 2005/11/17 21:08:32 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.67 2005/11/27 10:51:56 avenger_teambg Exp $
  *
  */
 
@@ -275,6 +275,9 @@ public:
 	void AddGold(ieDword add);
 	/** Adds ticks to game time */
 	void AdvanceTime(ieDword add);
+	/** Runs the script engine on the global script and the area scripts 
+            areas run scripts on door, infopoint, container, actors too */
+	void UpdateScripts();
 };
 
 #endif  // ! GAME_H
