@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.45 2005/11/27 23:21:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.46 2005/11/28 18:44:38 avenger_teambg Exp $
  *
  */
 
@@ -339,14 +339,15 @@ void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 	} else {
 		ip = Sender->GetCurrentArea()->TMap->GetInfoPoint(parameters->objects[1]->objectName);
 	}
-	if (!ip) {
+	if (!ip || (ip->Type!=ST_TRIGGER && ip->Type!=ST_TRAVEL && ip->Type!=ST_PROXIMITY)) {
 		printf("Script error: No Trigger Named \"%s\"\n", parameters->objects[1]->objectName);
 		return;
 	}
+	InfoPoint *trigger = (InfoPoint *) ip;
 	if ( parameters->int0Parameter != 0 ) {
-		ip->Active |= SCR_ACTIVE;
+		trigger->Flags &= ~TRAP_DEACTIVATED;
 	} else {
-		ip->Active &=~SCR_ACTIVE;
+		trigger->Flags |= TRAP_DEACTIVATED;
 	}
 }
 
