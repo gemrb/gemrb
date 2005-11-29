@@ -37,6 +37,7 @@ PortraitWindow = 0
 def OnLoad():
 	global MessageWindow, PortraitWindow
 
+	GemRB.GameSetPartySize(PARTY_SIZE)
 	GemRB.GameSetProtagonistMode(2)
 	GemRB.LoadWindowPack(GetWindowPack())
 	OptionsWindow = MessageWindow = GemRB.LoadWindow(0)

@@ -16,11 +16,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICommonWindows.py,v 1.4 2005/08/13 10:50:07 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICommonWindows.py,v 1.5 2005/11/29 22:40:36 avenger_teambg Exp $
 
 
-# GUICommonWindows.py - functions to open common windows in lower part of the screen
-
+# GUICommonWindows.py - functions to open common
+# windows in lower part of the screen
 ###################################################
 
 import GemRB
@@ -160,8 +160,8 @@ def GetActorClassTitle (actor):
 		#else:
 		#	ClassTitle=GemRB.GetTableValue(KitTable, KitIndex, 2)
 
-	GemRB.UnloadTable (ClassTable)
-	#GemRB.UnloadTable (KitTable)
+	if ClassTitle == "*":
+		return 0
 	return ClassTitle
 
 def GetActorPaperDoll (actor):
@@ -228,7 +228,7 @@ def UpdatePortraitWindow ():
 			continue
 		
 		sel = GemRB.GameGetSelectedPCSingle () == i + 1
-		GemRB.SetButtonPicture(Window, Button, pic)
+		GemRB.SetButtonPicture(Window, Button, pic, "NOPORTSM")
 		
 		GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
 		GemRB.SetButtonFont (Window, Button, 'TOOLFONT')
