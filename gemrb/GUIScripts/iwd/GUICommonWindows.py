@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUICommonWindows.py,v 1.9 2005/11/21 21:21:31 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUICommonWindows.py,v 1.10 2005/11/29 22:50:10 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -237,7 +237,7 @@ def UpdatePortraitWindow ():
 			continue
 		
 		sel = GemRB.GameGetSelectedPCSingle () == i + 1
-		GemRB.SetButtonPicture(Window, Button, pic)
+		GemRB.SetButtonPicture(Window, Button, pic, "NOPORTSM")
 		
 		GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
 		GemRB.SetButtonFont (Window, Button, 'NUMFONT')

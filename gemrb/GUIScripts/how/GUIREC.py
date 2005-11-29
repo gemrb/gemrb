@@ -16,38 +16,19 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIREC.py,v 1.2 2004/12/09 22:08:06 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIREC.py,v 1.3 2005/11/29 22:50:10 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
-
-# GUIREC:
-# 0,1,2 - sommon windows (time, message, menu)
-# 3 - main statistics window
-# 4 - level up win
-# 5 - info - kills, weapons ...
-# 6 - dual class list ???
-# 7 - class panel
-# 8 - skills panel
-# 9 - choose mage spells panel
-# 10 - some small win, 1 button
-# 11 - some small win, 2 buttons
-# 12 - biography?
-# 13 - specialist mage panel
-# 14 - proficiencies
-# 15 - some 2 panel window
-# 16 - some 2 panel window
-# 17 - some 2 panel window
-
-
 ###################################################
 import string
 import GemRB
+import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
 from GUICommon import CloseOtherWindow
-from GUICommonWindows import SetSelectionChangeHandler
-from GUICommonWindows import GetActorClassTitle
+from GUICommonWindows import *
+from GUIWORLD import OpenReformPartyWindow
 
 ###################################################
 RecordsWindow = None
@@ -134,7 +115,7 @@ def UpdateRecordsWindow ():
 	Button = GemRB.GetControl (Window, 2)
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
-	GemRB.SetButtonPicture (Window, Button, GemRB.GetPlayerPortrait (pc,0))
+	GemRB.SetButtonPicture (Window, Button, GemRB.GetPlayerPortrait (pc,0), "NOPORTMD")
 
 	# armorclass
 	Label = GemRB.GetControl (Window, 0x10000028)
