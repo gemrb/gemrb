@@ -7,5 +7,5 @@ Parameters: N/A
 
 Return value: numeric (should be 0-8)
 
-See also: LoadGame, QuitGame
+See also: LoadGame, QuitGame, GameSetPartySize
 
