@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.349 2005/11/27 23:21:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.350 2005/11/29 20:03:36 avenger_teambg Exp $
  *
  */
 
@@ -2213,15 +2213,16 @@ static PyObject* GemRB_SetButtonPictureClipping(PyObject * /*self*/, PyObject* a
 }
 
 PyDoc_STRVAR( GemRB_SetButtonPicture__doc,
-"SetButtonPicture(WindowIndex, ControlIndex, PictureResRef)\n\n"
-"Sets the Picture of a Button Control from a BMP file." );
+"SetButtonPicture(WindowIndex, ControlIndex, PictureResRef, DefaultResRef)\n\n"
+"Sets the Picture of a Button Control from a BMP file. You can also supply a default picture." );
 
 static PyObject* GemRB_SetButtonPicture(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
 	char* ResRef;
+	char* DefResRef = NULL;
 
-	if (!PyArg_ParseTuple( args, "iis", &WindowIndex, &ControlIndex, &ResRef )) {
+	if (!PyArg_ParseTuple( args, "iis|s", &WindowIndex, &ControlIndex, &ResRef, &DefResRef )) {
 		return AttributeError( GemRB_SetButtonPicture__doc );
 	}
 
@@ -2237,6 +2238,10 @@ static PyObject* GemRB_SetButtonPicture(PyObject * /*self*/, PyObject* args)
 	}
 
 	DataStream* str = core->GetResourceMgr()->GetResource( ResRef, IE_BMP_CLASS_ID );
+	//default portrait
+	if (str == NULL && DefResRef) {
+		str = core->GetResourceMgr()->GetResource( DefResRef, IE_BMP_CLASS_ID );
+	}
 	if (str == NULL) {
 		return NULL;
 	}
@@ -4500,17 +4505,28 @@ static PyObject* GemRB_GetStoreCure(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_ExecuteString__doc,
-"ExecuteString(String)\n\n"
-"Executes an In-Game Script Action in the current Area Script Context" );
+"ExecuteString(String[,PC])\n\n"
+"Executes an In-Game Script Action in the current Area Script Context."
+"If a number was given, it will execute the action in the numbered actor's context." );
 
 static PyObject* GemRB_ExecuteString(PyObject * /*self*/, PyObject* args)
 {
 	char* String;
+	int actornum=0;
 
-	if (!PyArg_ParseTuple( args, "s", &String )) {
+	if (!PyArg_ParseTuple( args, "s|i", &String, &actornum )) {
 		return AttributeError( GemRB_ExecuteString__doc );
 	}
-	GameScript::ExecuteString( core->GetGame()->GetCurrentArea( ), String );
+	if (actornum) {
+		Actor *pc = core->GetGame()->GetPC(actornum, false);
+		if (pc) {
+			GameScript::ExecuteString( pc, String );
+		} else {
+			printf("Player not found!\n");
+		}
+	} else {
+		GameScript::ExecuteString( core->GetGame()->GetCurrentArea( ), String );
+	}
 	Py_INCREF( Py_None );
 	return Py_None;
 }
