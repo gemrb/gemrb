@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/acinclude.m4,v 1.12 2005/10/27 18:32:30 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/acinclude.m4,v 1.13 2005/11/30 18:37:53 avenger_teambg Exp $
 
 ###################################################
 dnl Configure paths for SDL
@@ -41,10 +41,10 @@ AC_DEFUN([GEMRB_CHECK_ALUT],[
 		AC_CHECK_LIB(alut, alutInit,
 				   have_libalut=yes,
 				   have_libalut=no,
-				   $LIBPTHREAD)
+				   $LIBPTHREAD -lopenal)
 
 		if test x$have_libalut = xyes; then
-			OPENAL_LIBS="-lalut"
+			OPENAL_LIBS="-lopenal -lalut"
 		else
 			AC_MSG_ERROR([*** You need OpenAL (www.openal.org) to compile GemRB])
 		fi
