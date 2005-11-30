@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.98 2005/11/27 23:21:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.99 2005/11/30 19:47:02 avenger_teambg Exp $
  *
  */
 
@@ -835,6 +835,22 @@ void Game::AdvanceTime(ieDword add)
 	Ticks+=add;
 }
 
+//returns true if there are excess players in the team
+bool Game::PartyOverflow()
+{
+	GameControl *gc = core->GetGameControl();
+	if (!gc) {
+		return false;
+	}
+	//don't start this screen when the gui is busy
+	if (gc->GetDialogueFlags() & (DF_IN_DIALOG|DF_IN_CONTAINER|DF_FREEZE_SCRIPTS) ) {
+		return false;
+	}
+	if (!partysize) {
+		return false;
+	}
+	return (PCs.size()>partysize);
+}
 //returns true if the protagonist (or the whole party died)
 bool Game::EveryoneDead() const
 {
@@ -876,8 +892,9 @@ void Game::UpdateScripts()
 			core->GetGUIScriptEngine()->RunFunction("DeathWindow");
 			return;
 		}
-		if (PCs.size()>partysize) {
-			core->GetGUIScriptEngine()->RunFunction("ReformPartyWindow");
+		if (PartyOverflow()) {
+			partysize = 0;
+			core->GetGUIScriptEngine()->RunFunction("OpenReformPartyWindow");
 			return;
 		}
 	}
@@ -890,7 +907,8 @@ void Game::SetProtagonistMode(int mode)
 
 void Game::SetPartySize(int size)
 {
-	if (size<1) {
+	// 0 size means no party size control
+	if (size<0) {
 		return;
 	}
 	partysize = (size_t) size;

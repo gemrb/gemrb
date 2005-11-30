@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.223 2005/11/27 23:21:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.224 2005/11/30 19:47:02 avenger_teambg Exp $
  *
  */
 
@@ -40,8 +40,9 @@ class Action;
 #define DS_CONST   8
 #define DS_NONAME  16
 
-//verbal constant
+//verbal constant (bg2), we need a lookup table for other games
 #define VB_ATTACK  9
+#define VB_DIE     19
 
 //diffmode (iwd2)
 #define DM_EQUAL   1

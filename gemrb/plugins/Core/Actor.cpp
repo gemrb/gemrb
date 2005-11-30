@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.137 2005/11/26 20:33:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.138 2005/11/30 19:47:02 avenger_teambg Exp $
  *
  */
 
@@ -28,7 +28,7 @@
 #include "Spell.h"
 #include "Game.h"
 #include "GameScript.h"
-
+#include "GSUtils.h"    //needed for DisplayStringCore
 
 extern Interface* core;
 #ifdef WIN32
@@ -704,6 +704,7 @@ void Actor::Die(Scriptable *killer)
 	core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
 	ClearPath();
 	SetModal( 0 );
+	DisplayStringCore(this, VB_DIE, DS_CONSOLE|DS_CONST );
 	if (!InParty) {
 		Actor *act=NULL;
 		
@@ -1064,4 +1065,33 @@ void Actor::DrawOverheadText(Region &screen)
 	Region rgn( Pos.x-100+screen.x, Pos.y - cs * 50 + screen.y, 200, 400 );
 	font->Print( rgn, ( unsigned char * ) overHeadText,
 	NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false );
+}
+
+void Actor::ResolveStringConstant(ieResRef Sound, unsigned int index)
+{
+	TableMgr * tab;
+
+	Sound[0]=0;
+	int table=core->LoadTable( anims->ResRef );
+
+	if (table<0) {
+	        return;
+	}
+	tab = core->GetTable( table );
+	if (!tab) {
+	        goto end;
+	}
+
+	switch (index) {
+		case VB_ATTACK:
+			index = 0;
+			break;
+		case VB_DIE:
+			index = 10;
+			break;
+	}
+	strnuprcpy(Sound, tab->QueryField (index, 0), 8);
+end:
+	core->DelTable( table );
+
 }

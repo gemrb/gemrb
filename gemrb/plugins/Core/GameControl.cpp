@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.265 2005/11/27 23:21:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.266 2005/11/30 19:47:02 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -641,6 +641,15 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				//refresh gui here once we got it
 				break;
 
+			case 'q': //joins actor
+				if (lastActor && !lastActor->InParty) {
+					lastActor->ClearActions();
+					lastActor->ClearPath();
+					char Tmp[40];
+					strncpy(Tmp,"JoinParty()",sizeof(Tmp) );
+					lastActor->AddAction( GenerateAction(Tmp) );
+				}
+				break;
 			case 'y': //kills actor
 				if (lastActor) {
 					//using action so the actor is killed

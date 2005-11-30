@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.91 2005/11/24 17:44:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.92 2005/11/30 19:47:02 avenger_teambg Exp $
  *
  */
 
@@ -263,7 +263,13 @@ Actor* CREImp::GetActor()
 
 	str->Read( &TotSCEFF, 1 );
 	str->ReadResRef( act->SmallPortrait );
+	if (act->SmallPortrait[0]==0) {
+		memcpy(act->SmallPortrait, "NONE\0\0\0\0", 8);
+	}
 	str->ReadResRef( act->LargePortrait );
+	if (act->LargePortrait[0]==0) {
+		memcpy(act->LargePortrait, "NONE\0\0\0\0", 8);
+	}
 
 	unsigned int Inventory_Size;
 

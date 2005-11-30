@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.33 2005/11/24 17:44:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.34 2005/11/30 19:47:02 avenger_teambg Exp $
  *
  */
 
@@ -234,17 +234,25 @@ bool HasItemCore(Inventory *inventory, ieResRef itemname)
 
 void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 {
+	StringBlock sb;
+
 	printf( "Displaying string on: %s\n", Sender->GetScriptName() );
-	if (flags & DS_CONST ) {
+	if ((flags & DS_CONST) && (Sender->Type==ST_ACTOR) ) {
 		Actor* actor = ( Actor* ) Sender;
-		Strref=actor->StrRefs[Strref];
+		int tmp=actor->StrRefs[Strref];
+		if (tmp == -1) {
+			actor->ResolveStringConstant( sb.Sound, (unsigned int) Strref);
+		}
+		Strref = tmp;
 	}
-	StringBlock sb = core->strings->GetStringBlock( Strref );
-	if (flags & DS_HEAD) {
-		Sender->DisplayHeadText( sb.text );
-	}
-	if (flags & DS_CONSOLE) {
-			core->DisplayString( sb.text );
+	if (Strref != -1) {
+		sb = core->strings->GetStringBlock( Strref );
+		if (flags & DS_HEAD) {
+			Sender->DisplayHeadText( sb.text );
+		}
+		if (flags & DS_CONSOLE) {
+				core->DisplayString( sb.text );
+		}
 	}
 	if (sb.Sound[0] ) {
 		ieDword len = core->GetSoundMgr()->Play( sb.Sound );
