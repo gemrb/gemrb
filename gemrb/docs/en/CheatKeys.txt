@@ -1,6 +1,6 @@
 CHEAT AND DEBUG KEYS
 --------------------
-$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/CheatKeys.txt,v 1.6 2005/07/24 18:39:17 avenger_teambg Exp $
+$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/CheatKeys.txt,v 1.7 2005/12/01 20:21:26 avenger_teambg Exp $
 
 
 Following is a list of cheats you can use during development of GemRB.
@@ -26,6 +26,8 @@ Ctrl-B - Inserts/Removes spell effect S056ICBL on selected actor.
 
 Ctrl-D - Trap or trapped container pointed w/ mouse is disarmed.
 
+Ctrl-G - Dumps the global (game) object. Currently shows only loaded areas.
+
 Ctrl-J - Teleports (jumps) selected actors to current mouse position.
 
 Ctrl-M - Prints (on terminal or DOS window) useful info on pointed actor, door
@@ -37,10 +39,18 @@ Ctrl-O - Marks current mouse position as start point (origin) for path drawn
 Ctrl-P - Draws path from start point marked by Ctrl-O to current mouse 
          position.
 
+Ctrl-Q - The pointed actor will join the party.
+
+Ctrl-R - Resurrects pointed actor.
+
 Ctrl-S - Alters the stance (animation state) of the actor. You have to
          hover your mouse over it.
 
 Ctrl-T - Advances time by one hour.
+
+Ctrl-V - Explores a small, random part of the pointed area.
+
+Ctrl-W - The pointed actor will leave the party.
 
 Ctrl-X - Prints (on terminal or DOS window) name of current area script
          and current mouse position converted to game coordinates.
@@ -51,7 +61,7 @@ Ctrl-Z - Swaps original (not personalized) and current palettes on
          pointed actor. Also prints some color-related info on the actor.
 
 Ctrl-4 - Toggles debug flag DEBUG_SHOW_INFOPOINTS (show all
-         traps and infopoints)
+         traps, infopoints and wallgroups)
 
 Ctrl-5 - Toggles debug flag DEBUG_SHOW_SEARCHMAP (show the searchmap)
 
