@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.48 2005/11/24 17:44:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.49 2005/12/01 21:59:15 avenger_teambg Exp $
  *
  */
 
@@ -464,17 +464,17 @@ endalign:
 				DataStream *ds = core->GetResourceMgr()->GetResource( BAMResRef, IE_BAM_CLASS_ID);
 				bam->Open( ds, true );
 				sbar->SetImage( IE_GUI_SCROLLBAR_UP_UNPRESSED,
-					bam->GetFrameFromCycle( 0, UpUnPressed ) );
+					bam->GetFrameFromCycle( Cycle, UpUnPressed ) );
 				sbar->SetImage( IE_GUI_SCROLLBAR_UP_PRESSED,
-					bam->GetFrameFromCycle( 0, UpPressed ) );
+					bam->GetFrameFromCycle( Cycle, UpPressed ) );
 				sbar->SetImage( IE_GUI_SCROLLBAR_DOWN_UNPRESSED,
-					bam->GetFrameFromCycle( 0, DownUnPressed ) );
+					bam->GetFrameFromCycle( Cycle, DownUnPressed ) );
 				sbar->SetImage( IE_GUI_SCROLLBAR_DOWN_PRESSED,
-					bam->GetFrameFromCycle( 0, DownPressed ) );
+					bam->GetFrameFromCycle( Cycle, DownPressed ) );
 				sbar->SetImage( IE_GUI_SCROLLBAR_TROUGH,
-					bam->GetFrameFromCycle( 0, Trough ) );
+					bam->GetFrameFromCycle( Cycle, Trough ) );
 				sbar->SetImage( IE_GUI_SCROLLBAR_SLIDER,
-					bam->GetFrameFromCycle( 0, Slider ) );
+					bam->GetFrameFromCycle( Cycle, Slider ) );
 				core->FreeInterface( bam );
 				win->AddControl( sbar );
 				if (TAID != 0xffff)

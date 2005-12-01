@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.138 2005/11/30 19:47:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.139 2005/12/01 21:59:16 avenger_teambg Exp $
  *
  */
 
@@ -362,7 +362,7 @@ static int maximum_values[256]={
 255,255,255,255,255,255,20,255,255,1,20,255,999999999,999999999,1,1,//af
 999999999,999999999,0,0,0,0,0,0,0,0,0,0,0,0,0,0,//bf
 0,0,0,0,0,0,0,25,25,255,255,255,255,255,65535,-1,//cf
-200,200,200,200,200,200,200,-1,-1,255,65535,4,255,255,255,255,//df
+200,200,200,200,200,200,200,-1,-1,255,65535,3,255,255,255,255,//df
 20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,//ef
 255,255,255,255, 255,255,255,255, 255,255,255,255, 255,255,255,255//ff
 };

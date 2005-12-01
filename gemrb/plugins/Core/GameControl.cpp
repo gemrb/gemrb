@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.267 2005/12/01 20:15:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.268 2005/12/01 21:59:16 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -624,10 +624,10 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				// shows coordinates
 				printf( "%s [%d.%d]\n", area->GetScriptName(), p.x, p.y );
 				break;
-			case 'g':
+			case 'g'://shows loaded areas
 				game->DebugDump();
 				break;
-			case 'r':
+			case 'r'://resurrects actor
 				if (!lastActor) {
 					lastActor = area->GetActor( p, GA_DEFAULT);
 				}
@@ -635,7 +635,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					lastActor->Resurrect();
 				}
 				break;
-			case 't':
+			case 't'://advances time
 				// 7200 (one day) /24 (hours) == 300
 				game->GameTime += 300;
 				//refresh gui here once we got it
@@ -688,6 +688,12 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					}
 				}
 				lastActor->fxqueue.ApplyAllEffects( lastActor );
+				break;
+			case '1':
+				//change paperdoll armour level
+				if (! lastActor)
+					break;
+				lastActor->NewStat(IE_ARMOR_TYPE,1,MOD_ADDITIVE);
 				break;
 			case '4':
 				//show all traps and infopoints
