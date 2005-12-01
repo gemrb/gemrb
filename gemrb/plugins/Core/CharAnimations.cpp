@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.67 2005/11/24 17:44:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.68 2005/12/01 20:15:46 avenger_teambg Exp $
  *
  */
 
@@ -627,6 +627,7 @@ void CharAnimations::AddPSTSuffix(char* ResRef, unsigned char StanceID,
 			Cycle=SixteenToFive[Orient];
 			Prefix="HIT"; break;
 		case IE_ANI_GET_UP:
+		case IE_ANI_EMERGE:
 			Cycle=SixteenToFive[Orient];
 			Prefix="GUP"; break;
 		case IE_ANI_AWAKE:
@@ -719,6 +720,8 @@ void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		case IE_ANI_DIE:
+		case IE_ANI_EMERGE:
+		case IE_ANI_GET_UP:
 			strcat( ResRef, "G14" );
 			Cycle+=36;
 			break;
@@ -889,6 +892,7 @@ void CharAnimations::AddSixSuffix(char* ResRef, unsigned char StanceID,
 
 		case IE_ANI_DIE:
 		case IE_ANI_GET_UP:
+		case IE_ANI_EMERGE:
 			strcat( ResRef, "G2" );
 			Cycle = 48 + Orient;
 			break;
@@ -1079,6 +1083,7 @@ void CharAnimations::AddTwoFileSuffix( char* ResRef, unsigned char StanceID,
 			Cycle = 40 + Orient / 2;
 			break;
 		case IE_ANI_GET_UP:
+		case IE_ANI_EMERGE:
 		case IE_ANI_DIE:
 			Cycle = 32 + Orient / 2;
 			break;
@@ -1202,6 +1207,8 @@ void CharAnimations::AddLR3Suffix( char* ResRef, unsigned char StanceID,
 			Cycle = 8 + Orient / 2;
 			break;
 		case IE_ANI_DIE:
+		case IE_ANI_GET_UP:
+		case IE_ANI_EMERGE:
 			strcat( ResRef, "G3" );
 			Cycle = 16 + Orient / 2;
 			break;

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.22 2005/11/29 22:40:37 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.23 2005/12/01 20:15:48 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -240,6 +240,8 @@ def UpdatePortraitWindow ():
 		pic = GemRB.GetPlayerPortrait (i+1,1)
 		if not pic:
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+			GemRB.SetText (Window, Button, "")
+			GemRB.SetTooltip (Window, Button, "")
 			continue
 
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)

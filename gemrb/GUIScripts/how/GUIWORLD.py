@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIWORLD.py,v 1.6 2005/12/01 17:20:28 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIWORLD.py,v 1.7 2005/12/01 20:15:47 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -380,7 +380,7 @@ def RemovePlayerConfirm ():
 	ReformPartyWindow = None
 	if hideflag:
 		GemRB.UnhideGUI ()
-	GemRB.ExecuteString ("LeaveParty()", GemRB.GetVar("Selected") )
+	GemRB.LeaveParty (GemRB.GetVar("Selected") )
 	OpenReformPartyWindow ()
 	return
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.99 2005/11/30 19:47:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.100 2005/12/01 20:15:46 avenger_teambg Exp $
  *
  */
 
@@ -224,7 +224,7 @@ int Game::DelNPC(unsigned int slot, bool autoFree)
 	return 0;
 }
 
-int Game::LeaveParty(Actor* actor)
+int Game::LeaveParty (Actor* actor)
 {
 	actor->CreateStats(); //create or update stats for leaving
 	actor->SetBase(IE_EXPLORE, 0);
@@ -235,8 +235,21 @@ int Game::LeaveParty(Actor* actor)
 	std::vector< Actor*>::iterator m = PCs.begin() + slot;
 	PCs.erase( m );
 	NPCs.push_back( actor );
+	
+	for ( m = PCs.begin(); m != PCs.end(); ++m) {
+		if ( (*m)->InParty>actor->InParty) {
+			(*m)->InParty--;
+		}
+	}
+	//removing from party, but actor remains in 'game'
+	actor->InParty = 0;
+	actor->InternalFlags|=IF_FROMGAME;
 	//actors leaving team are not selectable anymore
 	SelectActor (actor, false, SELECT_NORMAL);
+        if (core->HasFeature( GF_HAS_DPLAYER )) {
+                actor->SetScript( "", SCR_DEFAULT );
+        }
+	actor->SetStat( IE_EA, EA_NEUTRAL );
 	return ( int ) NPCs.size() - 1;
 }
 

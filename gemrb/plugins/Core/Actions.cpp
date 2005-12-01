@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.46 2005/11/28 18:44:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.47 2005/12/01 20:15:46 avenger_teambg Exp $
  *
  */
 
@@ -2014,11 +2014,7 @@ void GameScript::LeaveParty(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor* act = ( Actor* ) Sender;
-	act->SetStat( IE_EA, EA_NEUTRAL );
 	core->GetGame()->LeaveParty( act );
-	if (core->HasFeature( GF_HAS_DPLAYER )) {
-		act->SetScript( "", SCR_DEFAULT );
-	}
 /* apparently this is handled by script in dplayer3 (or2)
 	if (core->HasFeature( GF_HAS_PDIALOG )) {
 		int pdtable = core->LoadTable( "pdialog" );

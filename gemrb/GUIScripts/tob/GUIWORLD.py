@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIWORLD.py,v 1.19 2005/11/29 22:40:38 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIWORLD.py,v 1.20 2005/12/01 20:15:48 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -26,7 +26,7 @@
 import GemRB
 from GUIDefines import *
 from GUICommon import CloseOtherWindow
-from GUICommonWindows import SetEncumbranceLabels
+from GUICommonWindows import *
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
@@ -350,6 +350,7 @@ def UpdateReformWindow ():
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
 		GemRB.SetButtonPicture (Window, Button, pic, "NOPORTSM")
+	UpdatePortraitWindow ()
 	return
 
 def RemovePlayer ():
@@ -393,7 +394,7 @@ def RemovePlayerConfirm ():
 	ReformPartyWindow = None
 	if hideflag:
 		GemRB.UnhideGUI ()
-	GemRB.ExecuteString ("LeaveParty()", GemRB.GetVar("Selected") )
+	GemRB.LeaveParty( GemRB.GetVar("Selected") )
 	OpenReformPartyWindow ()
 	return
 
@@ -410,17 +411,21 @@ def RemovePlayerCancel ():
 	return
 
 def OpenReformPartyWindow ():
-	global ReformPartyWindow
+	global ReformPartyWindow, OldActionsWindow
 
 	GemRB.SetVar ("Selected", 0)
 	hideflag = GemRB.HideGUI ()
 
 	if ReformPartyWindow:
 		GemRB.UnloadWindow (ReformPartyWindow)
-		ReformPartyWindow = None
 
+		GemRB.SetVar ("ActionsWindow", OldActionsWindow)
+		GemRB.SetVar ("MessageWindow", OldMessageWindow)
 		GemRB.SetVar ("OtherWindow", -1)
-		#GemRB.LoadWindowPack ("GUIREC")
+
+		OldActionsWindow = None
+		OldMessageWindow = None
+		ReformPartyWindow = None
 		if hideflag:
 			GemRB.UnhideGUI ()
 		#re-enabling party size control
@@ -452,7 +457,10 @@ def OpenReformPartyWindow ():
 	GemRB.SetText (Window, Button, 11973)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenReformPartyWindow")
 
+	OldActionsWindow = GemRB.GetVar ("ActionsWindow")
+	OldMessageWindow = GemRB.GetVar ("MessageWindow")
 	GemRB.SetVar ("ActionsWindow", -1)
+	GemRB.SetVar ("MessageWindow", -1)
 	UpdateReformWindow ()
 	if hideflag:
 		GemRB.UnhideGUI ()
@@ -527,7 +535,7 @@ def SelectFormation ():
 	last_formation = formation
 	return
 
-def DeathWindow() :
+def DeathWindow () :
 	#playing death movie before continuing
 	GemRB.PlayMovie ("deathand",1)
 	GemRB.GamePause (1,1)

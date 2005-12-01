@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.266 2005/11/30 19:47:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.267 2005/12/01 20:15:46 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -647,6 +647,15 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					lastActor->ClearPath();
 					char Tmp[40];
 					strncpy(Tmp,"JoinParty()",sizeof(Tmp) );
+					lastActor->AddAction( GenerateAction(Tmp) );
+				}
+				break;
+			case 'w': //removes actor
+				if (lastActor && lastActor->InParty) {
+					lastActor->ClearActions();
+					lastActor->ClearPath();
+					char Tmp[40];
+					strncpy(Tmp,"LeaveParty()",sizeof(Tmp) );
 					lastActor->AddAction( GenerateAction(Tmp) );
 				}
 				break;

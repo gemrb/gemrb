@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.350 2005/11/29 20:03:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.351 2005/12/01 20:15:47 avenger_teambg Exp $
  *
  */
 
@@ -3396,7 +3396,7 @@ static PyObject* GemRB_GetPlayerName(PyObject * /*self*/, PyObject* args)
 	}
 	Actor* MyActor = game->FindPC( PartyID );
 	if (!MyActor) {
-		return PyString_FromString( "???");
+		return RuntimeError( "Actor not found" );
 	}
 	return PyString_FromString( MyActor->GetName(Which) );
 }
@@ -3925,7 +3925,7 @@ static PyObject* GemRB_GetContainer(PyObject * /*self*/, PyObject* args)
 		actor = core->GetFirstSelectedPC();
 	}
 	if (!actor) {
-		return RuntimeError("No selected actor!");
+		return RuntimeError( "Actor not found" );
 	}
 	Container *container = NULL;
 	if (autoselect) { //autoselect works only with piles
@@ -5482,6 +5482,31 @@ static PyObject* GemRB_GetAbilityBonus(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( ret );
 }
 
+PyDoc_STRVAR( GemRB_LeaveParty__doc,
+"LeaveParty(Slot)\n\n"
+"Makes player in Slot leave party." );
+
+static PyObject* GemRB_LeaveParty(PyObject * /*self*/, PyObject* args)
+{
+	int PlayerSlot;
+
+	if (!PyArg_ParseTuple( args, "i", &PlayerSlot )) {
+		return AttributeError( GemRB_LeaveParty__doc );
+	}
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor *actor = game->FindPC(PlayerSlot);
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
+	}
+	game->LeaveParty (actor);
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 static PyMethodDef GemRBMethods[] = {
 	METHOD(SetInfoTextColor, METH_VARARGS),
 	METHOD(HideGUI, METH_NOARGS),
@@ -5660,6 +5685,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GamePause, METH_VARARGS),
 	METHOD(CheckFeatCondition, METH_VARARGS),
 	METHOD(GetAbilityBonus, METH_VARARGS),
+	METHOD(LeaveParty, METH_VARARGS),
 	// terminating entry	
 	{NULL, NULL, 0, NULL}
 };
