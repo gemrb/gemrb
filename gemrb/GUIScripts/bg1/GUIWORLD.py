@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIWORLD.py,v 1.7 2005/11/29 22:40:36 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIWORLD.py,v 1.8 2005/12/01 17:20:23 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -283,7 +283,7 @@ def DropItemContainer ():
 	RightIndex = GemRB.GetVar ("RightIndex")
 	if RightIndex<0:
 		return
-	
+
 	#we need to get the right slot number
 	pc = GemRB.GameGetFirstSelectedPC ()
 	inventory_slots = GemRB.GetSlots (pc, 0x8000)
@@ -297,7 +297,7 @@ def TakeItemContainer ():
 	LeftIndex = GemRB.GetVar ("LeftIndex")
 	if LeftIndex<0:
 		return
-	
+
 	if LeftIndex >= Container['ItemCount']:
 		return
 	GemRB.ChangeContainerItem (0, LeftIndex, 1)
@@ -445,7 +445,6 @@ def OpenReformPartyWindow ():
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 	return
 
-
 last_formation = None
 
 def OpenFormationWindow ():
@@ -462,7 +461,6 @@ def OpenFormationWindow ():
 			GemRB.UnhideGUI ()
 		return
 
-	hideflag = GemRB.HideGUI ()
 	GemRB.LoadWindowPack (GetWindowPack())
 	FormationWindow = Window = GemRB.LoadWindow (27)
 	GemRB.SetVar ("OtherWindow", Window)
