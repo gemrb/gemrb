@@ -63,8 +63,9 @@ void GoNearAndRetry(Scriptable *Sender, Scriptable *target, bool destination);
 void GoNearAndRetry(Scriptable *Sender, Point &p);
 
 #define LESS_OR_EQUALS 0
-#define LESS_THAN 1
-#define EQUALS 2
+//iwd2 diffmode
+#define EQUALS 1
+#define LESS_THAN 2
 #define GREATER_THAN 3
 int DiffCore(ieDword a, ieDword b, int diffmode);
 void FreeSrc(SrcVector *poi, const ieResRef key);
