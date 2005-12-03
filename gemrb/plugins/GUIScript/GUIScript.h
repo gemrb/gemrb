@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.h,v 1.13 2004/10/09 15:27:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.h,v 1.14 2005/12/03 23:49:33 avenger_teambg Exp $
  *
  */
 
@@ -53,7 +53,7 @@ public:
 	/** Run Function */
 	bool RunFunction(const char* fname);
 	/** Exec a single String */
-	char* ExecString(const char* string);
+	void ExecString(const char* string);
 public:
 	void release(void)
 	{

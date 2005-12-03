@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.351 2005/12/01 20:15:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.352 2005/12/03 23:49:33 avenger_teambg Exp $
  *
  */
 
@@ -5864,7 +5864,7 @@ bool GUIScript::RunFunction(const char* fname)
 }
 
 /** Exec a single String */
-char* GUIScript::ExecString(const char* string)
+void GUIScript::ExecString(const char* string)
 {
 	if (PyRun_SimpleString( (char *) string ) == -1) {
 		if(PyErr_Occurred()) {
@@ -5881,5 +5881,4 @@ char* GUIScript::ExecString(const char* string)
 		}
 		free( newstr );
 	}
-	return NULL;
 }
