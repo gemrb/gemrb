@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.48 2005/12/03 11:20:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.49 2005/12/03 11:56:28 avenger_teambg Exp $
  *
  */
 
@@ -3492,6 +3492,29 @@ void GameScript::AttackOneRound( Scriptable* Sender, Action* parameters)
 	AttackCore(Sender, tar, NULL, 0);
 }
 
+void GameScript::RunningAttackNoSound( Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	//using auto target!
+	Scriptable* tar;
+	if (!parameters->objects[1]) {
+		GameControl *gc = core->GetGameControl();
+		tar = gc->GetTarget();
+	} else {
+		tar = GetActorFromObject( Sender, parameters->objects[1] );
+	}
+	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	//feed Attack back to the queue
+	Sender->AddAction(parameters);
+	AttackCore(Sender, tar, NULL, AC_NO_SOUND|AC_RUNNING);
+}
+
 void GameScript::AttackNoSound( Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
@@ -3513,6 +3536,29 @@ void GameScript::AttackNoSound( Scriptable* Sender, Action* parameters)
 	//feed Attack back to the queue
 	Sender->AddAction(parameters);
 	AttackCore(Sender, tar, NULL, AC_NO_SOUND);
+}
+
+void GameScript::RunningAttack( Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	//using auto target!
+	Scriptable* tar;
+	if (!parameters->objects[1]) {
+		GameControl *gc = core->GetGameControl();
+		tar = gc->GetTarget();
+	} else {
+		tar = GetActorFromObject( Sender, parameters->objects[1] );
+	}
+	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	//feed Attack back to the queue
+	Sender->AddAction(parameters);
+	AttackCore(Sender, tar, NULL, AC_RUNNING);
 }
 
 void GameScript::Attack( Scriptable* Sender, Action* parameters)
@@ -4353,4 +4399,27 @@ void GameScript::SetNoOneOnTrigger(Scriptable* Sender, Action* parameters)
 	}
 	ip->LastEntered = 0;
 	ip->LastTrigger = 0;
+}
+
+void GameScript::UseDoor(Scriptable* Sender, Action* parameters)
+{
+        GameControl *gc = core->GetGameControl();
+        if (!gc) {
+                return;
+        }
+
+        gc->target_mode = TARGET_MODE_NONE;
+	OpenDoor(Sender, parameters);
+}
+
+//this will force bashing the door
+void GameScript::BashDoor(Scriptable* Sender, Action* parameters)
+{
+        GameControl *gc = core->GetGameControl();
+        if (!gc) {
+                return;
+        }
+
+        gc->target_mode = TARGET_MODE_ATTACK; //for bashing doors too
+	OpenDoor(Sender, parameters);
 }

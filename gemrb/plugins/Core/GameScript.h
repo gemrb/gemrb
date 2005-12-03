@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.226 2005/12/03 11:20:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.227 2005/12/03 11:56:28 avenger_teambg Exp $
  *
  */
 
@@ -52,6 +52,7 @@ class Action;
 //attack core flags
 #define AC_REEVALUATE 1
 #define AC_NO_SOUND   2
+#define AC_RUNNING    4
 
 //trigger flags stored in triggers in .bcs files
 #define NEGATE_TRIGGER 1
@@ -916,6 +917,7 @@ public:
 	static void AttackNoSound(Scriptable* Sender, Action* parameters);
 	static void AttackOneRound(Scriptable* Sender, Action* parameters);
 	static void AttackReevaluate(Scriptable* Sender, Action* parameters);
+	static void BashDoor(Scriptable* Sender, Action* parameters);
 	static void BattleSong(Scriptable* Sender, Action* parameters);
 	static void Berserk(Scriptable* Sender, Action* parameters);
 	static void BitClear(Scriptable* Sender, Action* parameters);
@@ -1146,6 +1148,8 @@ public:
 	static void RevealAreaOnMap(Scriptable* Sender, Action* parameters);
 	static void RunAwayFrom(Scriptable* Sender, Action* parameters);
 	static void RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters);
+	static void RunningAttack(Scriptable* Sender, Action* parameters);
+	static void RunningAttackNoSound(Scriptable* Sender, Action* parameters);
 	static void SaveGame(Scriptable* Sender, Action* parameters);
 	static void SaveLocation(Scriptable* Sender, Action* parameters);
 	static void SaveObjectLocation(Scriptable* Sender, Action* parameters);
@@ -1243,6 +1247,7 @@ public:
 	static void UnhideGUI(Scriptable* Sender, Action* parameters);
 	static void Unlock(Scriptable* Sender, Action* parameters);
 	static void UnlockScroll(Scriptable* Sender, Action* parameters);
+	static void UseDoor(Scriptable* Sender, Action* parameters);
 	static void UseContainer(Scriptable* Sender, Action* parameters);
 	static void VerbalConstant(Scriptable* Sender, Action* parameters);
 	static void VerbalConstantHead(Scriptable* Sender, Action* parameters);

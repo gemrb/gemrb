@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.335 2005/12/03 11:20:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.336 2005/12/03 11:56:28 avenger_teambg Exp $
  *
  */
 
@@ -339,7 +339,7 @@ static ActionLink actionnames[] = {
 	{"attackoneround", GameScript::AttackOneRound,AF_BLOCKING},
 	{"attackreevaluate", GameScript::AttackReevaluate,AF_BLOCKING},
 	{"backstab", GameScript::Attack,AF_BLOCKING},//actually hide+attack
-	{"bashdoor", GameScript::OpenDoor,AF_BLOCKING}, //the same until we know better
+	{"bashdoor", GameScript::BashDoor,AF_BLOCKING}, //the same until we know better
 	{"battlesong", GameScript::BattleSong, 0},
 	{"berserk", GameScript::Berserk, 0}, 
 	{"bitclear", GameScript::BitClear,AF_MERGESTRINGS},
@@ -359,10 +359,12 @@ static ActionLink actionnames[] = {
 	{"changegender", GameScript::ChangeGender, 0},
 	{"changegeneral", GameScript::ChangeGeneral, 0},
 	{"changeenemyally", GameScript::ChangeAllegiance, 0}, //this is the same
+	{"changefaction", GameScript::SetFaction, 0}, //pst
 	{"changerace", GameScript::ChangeRace, 0},
 	{"changespecifics", GameScript::ChangeSpecifics, 0},
 	{"changestat", GameScript::ChangeStat, 0},
 	{"changestoremarkup", GameScript::ChangeStoreMarkup, 0},//iwd2
+	{"changeteam", GameScript::SetTeam, 0}, //pst
 	{"chunkcreature", GameScript::Kill, 0}, //should be more graphical
 	{"clearactions", GameScript::ClearActions, 0},
 	{"clearallactions", GameScript::ClearAllActions, 0},
@@ -441,6 +443,7 @@ static ActionLink actionnames[] = {
 	{"fadetoandfromcolor", GameScript::FadeToAndFromColor, 0},
 	{"fadetoblack", GameScript::FadeToColor, 0}, //probably the same
 	{"fadetocolor", GameScript::FadeToColor, 0},
+	{"finalsave", GameScript::SaveGame, 0}, //synonym
 	{"findtraps", GameScript::FindTraps, 0},
 	{"floatmessage", GameScript::DisplayStringHead, 0},
 	{"floatmessagefixed", GameScript::FloatMessageFixed, 0},
@@ -568,6 +571,7 @@ static ActionLink actionnames[] = {
 	{"polymorphcopybase", GameScript::PolymorphCopyBase, 0},
 	{"quitgame", GameScript::QuitGame, 0},
 	{"randomfly", GameScript::RandomFly, AF_BLOCKING},
+	{"randomrun", GameScript::RandomWalk, AF_BLOCKING},//no running yet
 	{"randomturn", GameScript::RandomTurn, AF_BLOCKING},
 	{"randomwalk", GameScript::RandomWalk, AF_BLOCKING},
 	{"randomwalkcontinuous", GameScript::RandomWalkContinuous, AF_BLOCKING},
@@ -598,6 +602,8 @@ static ActionLink actionnames[] = {
 	{"runawayfrom", GameScript::RunAwayFrom,AF_BLOCKING},
 	{"runawayfromnointerrupt", GameScript::RunAwayFromNoInterrupt,AF_BLOCKING},
 	{"runawayfrompoint", GameScript::RunAwayFromPoint,AF_BLOCKING},
+	{"runningattack", GameScript::RunningAttack,AF_BLOCKING},//no run yet
+	{"runningattacknosound", GameScript::RunningAttackNoSound,AF_BLOCKING}, //no running yet anyway
 	{"runtoobject", GameScript::MoveToObject,AF_BLOCKING}, //until we know better
 	{"runtopoint", GameScript::MoveToPoint,AF_BLOCKING}, //until we know better
 	{"runtopointnorecticle", GameScript::MoveToPoint,AF_BLOCKING},//until we know better
@@ -723,6 +729,7 @@ static ActionLink actionnames[] = {
 	{"unlockscroll", GameScript::UnlockScroll, 0},
 	{"unmakeglobal", GameScript::UnMakeGlobal, 0}, //this is a GemRB extension
 	{"usecontainer", GameScript::UseContainer,AF_BLOCKING},
+	{"usedoor", GameScript::UseDoor,AF_BLOCKING},
 	{"vequip",GameScript::SetArmourLevel, 0},
 	{"verbalconstant", GameScript::VerbalConstant, 0},
 	{"verbalconstanthead", GameScript::VerbalConstantHead, 0},
