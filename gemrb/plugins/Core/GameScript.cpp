@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.334 2005/12/03 11:05:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.335 2005/12/03 11:20:08 avenger_teambg Exp $
  *
  */
 
@@ -643,6 +643,7 @@ static ActionLink actionnames[] = {
 	{"setname", GameScript::SetApparentName, 0},
 	{"setnamelessclass", GameScript::SetNamelessClass, 0},
 	{"setnamelessdisguise", GameScript::SetNamelessDisguise, 0},
+	{"setnooneontrigger", GameScript::SetNoOneOnTrigger, 0},
 	{"setnumtimestalkedto", GameScript::SetNumTimesTalkedTo, 0},
 	{"setplayersound", GameScript::SetPlayerSound, 0},
 	{"setquestdone", GameScript::SetQuestDone, 0},
@@ -709,6 +710,7 @@ static ActionLink actionnames[] = {
 	{"takepartyitemrange", GameScript::TakePartyItemRange, 0},
 	{"teleportparty", GameScript::TeleportParty, 0}, 
 	{"textscreen", GameScript::TextScreen, AF_BLOCKING},
+	{"timedmovetopoint", GameScript::MoveToPoint,AF_BLOCKING},//no timing yet
 	{"tomsstringdisplayer", GameScript::DisplayMessage, 0},
 	{"triggeractivation", GameScript::TriggerActivation, 0},
 	{"triggerwalkto", GameScript::MoveToObject,AF_BLOCKING}, //something like this

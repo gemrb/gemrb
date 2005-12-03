@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.47 2005/12/01 20:15:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.48 2005/12/03 11:20:08 avenger_teambg Exp $
  *
  */
 
@@ -334,7 +334,7 @@ void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* ip;
 
-	if (!parameters->objects[1]->objectName[0]) {
+	if (!parameters->objects[1]) {
 		ip=Sender;
 	} else {
 		ip = Sender->GetCurrentArea()->TMap->GetInfoPoint(parameters->objects[1]->objectName);
@@ -4338,3 +4338,19 @@ void GameScript::PauseGame(Scriptable* /*Sender*/, Action* /*parameters*/)
 	}
 }
 
+void GameScript::SetNoOneOnTrigger(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* ip;
+
+	if (!parameters->objects[1]) {
+		ip=Sender;
+	} else {
+		ip = Sender->GetCurrentArea()->TMap->GetInfoPoint(parameters->objects[1]->objectName);
+	}
+	if (!ip || (ip->Type!=ST_TRIGGER && ip->Type!=ST_TRAVEL && ip->Type!=ST_PROXIMITY)) {
+		printf("Script error: No Trigger Named \"%s\"\n", parameters->objects[1]->objectName);
+		return;
+	}
+	ip->LastEntered = 0;
+	ip->LastTrigger = 0;
+}

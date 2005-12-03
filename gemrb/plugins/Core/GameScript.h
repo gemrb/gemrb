@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.225 2005/12/03 11:05:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.226 2005/12/03 11:20:08 avenger_teambg Exp $
  *
  */
 
@@ -1181,6 +1181,7 @@ public:
 	static void SetMusic(Scriptable* Sender, Action* parameters);
 	static void SetNamelessClass(Scriptable* Sender, Action* parameters);
 	static void SetNamelessDisguise(Scriptable* Sender, Action* parameters);
+	static void SetNoOneOnTrigger(Scriptable* Sender, Action* parameters);
 	static void SetNumTimesTalkedTo(Scriptable* Sender, Action* parameters);
 	static void SetPlayerSound(Scriptable* Sender, Action* parameters);
 	static void SetQuestDone(Scriptable* Sender, Action* parameters);
