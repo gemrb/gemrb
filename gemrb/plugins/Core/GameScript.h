@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.227 2005/12/03 11:56:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.228 2005/12/03 20:48:44 avenger_teambg Exp $
  *
  */
 
@@ -48,6 +48,11 @@ class Action;
 #define DM_EQUAL   1
 #define DM_LESS    2
 #define DM_GREATER 3
+
+//delta (pst)
+#define DM_LOWER   1
+#define DM_RAISE   2
+#define DM_SET     3
 
 //attack core flags
 #define AC_REEVALUATE 1
@@ -854,6 +859,7 @@ public: //Script Functions
 	static int RandomNum(Scriptable* Sender, Trigger* parameters);
 	static int RandomNumGT(Scriptable* Sender, Trigger* parameters);
 	static int RandomNumLT(Scriptable* Sender, Trigger* parameters);
+	static int RandomStatCheck(Scriptable* Sender, Trigger* parameters);
 	static int Range(Scriptable* Sender, Trigger* parameters);
 	static int Reaction(Scriptable* Sender, Trigger* parameters);
 	static int ReactionLT(Scriptable* Sender, Trigger* parameters);

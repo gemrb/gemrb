@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.336 2005/12/03 11:56:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.337 2005/12/03 20:48:44 avenger_teambg Exp $
  *
  */
 
@@ -272,6 +272,7 @@ static TriggerLink triggernames[] = {
 	{"randomnum", GameScript::RandomNum, 0},
 	{"randomnumgt", GameScript::RandomNumGT, 0},
 	{"randomnumlt", GameScript::RandomNumLT, 0},
+	{"randomstatcheck", GameScript::RandomStatCheck, 0},
 	{"range", GameScript::Range, 0},
 	{"reaction", GameScript::Reaction, 0},
 	{"reactiongt", GameScript::ReactionGT, 0},

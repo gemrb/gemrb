@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.28 2005/12/03 11:05:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.29 2005/12/03 20:48:44 avenger_teambg Exp $
  *
  */
 
@@ -2974,6 +2974,34 @@ int GameScript::TimeOfDay(Scriptable* /*Sender*/, Trigger* parameters)
 
 	if (timeofday==(ieDword) parameters->int0Parameter) {
 		return 1;
+	}
+	return 0;
+}
+
+//this is a PST action, it's using delta, not diffmode
+int GameScript::RandomStatCheck(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+
+	ieDword stat = actor->GetStat(parameters->int0Parameter);
+	ieDword value = Bones(parameters->int2Parameter);
+	switch(parameters->int1Parameter) {
+		case DM_SET:
+			if (stat==value)
+				return 1;
+			break;
+		case DM_LOWER:
+			if (stat<value)
+				return 1;
+			break;
+		case DM_RAISE:
+			if (stat>value)
+				return 1;
+			break;
 	}
 	return 0;
 }

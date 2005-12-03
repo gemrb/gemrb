@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Console.cpp,v 1.22 2005/11/24 17:44:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Console.cpp,v 1.23 2005/12/03 20:48:44 avenger_teambg Exp $
  *
  */
 
@@ -25,22 +25,29 @@
 #include "Video.h"
 #include "ScriptEngine.h"
 
-
 Console::Console(void)
 {
-	ta = NULL;
 	Cursor = NULL;
 	Back = NULL;
 	max = 128;
 	Buffer = ( unsigned char * ) malloc( max );
 	Buffer[0] = 0;
+	for(size_t i=0;i<HISTORY_SIZE;i++) {
+		History[i] = ( unsigned char * ) malloc( max );
+		History[i][0] = 0;
+	}
 	CurPos = 0;
+	HistPos = 0;
+	HistMax = 0;
 	palette = NULL;
 }
 
 Console::~Console(void)
 {
 	free( Buffer );
+	for (size_t i=0;i<HISTORY_SIZE;i++) {
+		free( History[i] );
+	}
 	Video *video = core->GetVideoDriver();
 
 	video->FreePalette( palette );
@@ -50,9 +57,6 @@ Console::~Console(void)
 /** Draws the Console on the Output Display */
 void Console::Draw(unsigned short x, unsigned short y)
 {
-	if (ta) {
-		ta->Draw( x, y - ta->Height );
-	}
 	if (Back) {
 		core->GetVideoDriver()->BlitSprite( Back, 0, y, true );
 	}
@@ -63,7 +67,7 @@ void Console::Draw(unsigned short x, unsigned short y)
 	core->GetVideoDriver()->DrawRect( r, black );
 	font->Print( r, Buffer, palette,
 			IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true, NULL,
-			Cursor, CurPos );
+			Cursor, CurPos, true );
 }
 /** Set Font */
 void Console::SetFont(Font* f)
@@ -113,7 +117,7 @@ void Console::OnSpecialKeyPress(unsigned char Key)
 	switch (Key) {
 		case GEM_BACKSP:
 			if (CurPos != 0) {
-				size_t len = strlen( ( char* ) Buffer );
+				size_t len = strlen( ( const char * ) Buffer );
 				for (size_t i = CurPos; i < len; i++) {
 					Buffer[i - 1] = Buffer[i];
 				}
@@ -125,20 +129,26 @@ void Console::OnSpecialKeyPress(unsigned char Key)
 			CurPos = 0;
 			break;
 		case GEM_END:
-			CurPos = strlen( (char * ) Buffer);
+			CurPos = strlen( (const char * ) Buffer);
+			break;
+		case GEM_UP:
+			HistoryBack();
+			break;
+		case GEM_DOWN:
+			HistoryForward();
 			break;
 		case GEM_LEFT:
 			if (CurPos > 0)
 				CurPos--;
 			break;
 		case GEM_RIGHT:
-			len = strlen( ( char * ) Buffer );
+			len = strlen( ( const char * ) Buffer );
 			if (CurPos < len) {
 				CurPos++;
 			}
 			break;
 		case GEM_DELETE:
-			len = strlen( ( char * ) Buffer );
+			len = strlen( ( const char * ) Buffer );
 			if (CurPos < len) {
 				for (size_t i = CurPos; i < len; i++) {
 					Buffer[i] = Buffer[i + 1];
@@ -146,14 +156,56 @@ void Console::OnSpecialKeyPress(unsigned char Key)
 			}
 			break;			
 		case GEM_RETURN:
-			char* msg = core->GetGUIScriptEngine()->ExecString( ( char* )
-														Buffer );
-			if (ta)
-				ta->SetText( msg );
-			free( msg );
+			core->GetGUIScriptEngine()->ExecString( ( char* ) Buffer );
+			HistoryAdd(false);
 			Buffer[0] = 0;
 			CurPos = 0;
+			HistPos = 0;
 			Changed = true;
 			break;
+	}
+}
+
+//ctrl-up
+void Console::HistoryBack()
+{
+	if (HistPos >= HistMax-1)
+		return;
+	if (HistPos == 0) {
+		HistoryAdd(true);
+	}
+	HistPos++;
+	memcpy(Buffer, History[HistPos], max);
+	CurPos = strlen ((const char *) Buffer);
+}
+
+//ctrl-down
+void Console::HistoryForward()
+{
+	if (HistPos == 0)
+		return;
+	HistPos--;
+	memcpy(Buffer, History[HistPos], max);
+	CurPos = strlen ((const char *) Buffer);
+}
+
+void Console::HistoryAdd(bool force)
+{
+	int i;
+
+	if (!force && !Buffer[0])
+		return;
+	for (i=0;i<HistMax;i++) {
+		if (!strnicmp((const char *) History[i],(const char *) Buffer,max) )
+			return;
+	}
+	if (History[0][0]) {
+		for (i=HISTORY_SIZE-1; i>0; i--) {
+			memcpy(History[i], History[i-1], max);
+		}
+	}
+	memcpy(History[0], Buffer, max);
+	if (HistMax<HISTORY_SIZE) {
+		HistMax++;
 	}
 }

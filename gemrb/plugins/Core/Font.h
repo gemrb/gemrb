@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.h,v 1.22 2005/10/20 23:13:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.h,v 1.23 2005/12/03 20:48:44 avenger_teambg Exp $
  *
  */
 
@@ -80,7 +80,6 @@ public:
 	ieResRef ResRef;
 	int maxHeight;
 	Region size[256];
-
 public:
 	Font(int w, int h, void* palette, bool cK, int index);
 	~Font(void);
@@ -88,15 +87,15 @@ public:
 	void Print(Region rgn, unsigned char* string, Color* color,
 		unsigned char Alignment, bool anchor = false,
 		Font* initials = NULL, Sprite2D* cursor = NULL,
-		unsigned int curpos = 0);
+		unsigned int curpos = 0, bool NoColor = false);
 	void PrintFromLine(int startrow, Region rgn, unsigned char* string,
 		Color* color, unsigned char Alignment,
 		Font* initials = NULL, Sprite2D* cursor = NULL,
-		unsigned int curpos = 0);
+		unsigned int curpos = 0, bool NoColor = false);
 	void* GetPalette();
 	/** Returns width of the string rendered in this font in pixels */
-	int CalcStringWidth(char* string);
-	void SetupString(char* string, unsigned int width);
+	int CalcStringWidth(char* string, bool NoColor = false);
+	void SetupString(char* string, unsigned int width, bool NoColor = false);
 	/** Sets ASCII code of the first character in the font.
 	 * (it allows remapping numeric fonts from \000 to '0') */
 	void SetFirstChar(unsigned char first);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.139 2005/12/01 21:59:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.140 2005/12/03 20:48:44 avenger_teambg Exp $
  *
  */
 
@@ -349,7 +349,7 @@ void pcf_color(Actor *actor, ieDword /*Value*/)
 }
 
 static int maximum_values[256]={
-255,255,20,100,100,100,100,25,5,25,25,25,25,25,100,100,//0f
+32767,32767,20,100,100,100,100,25,5,25,25,25,25,25,100,100,//0f
 100,100,100,100,100,100,100,100,100,200,200,200,200,200,100,100,//1f
 200,200,50,255,25,100,25,25,25,25,25,999999999,999999999,999999999,25,25,//2f
 200,255,200,100,100,200,200,25,5,100,1,1,100,1,1,1,//3f

@@ -86,4 +86,9 @@ GEM_EXPORT ieDword CheckVariable(Scriptable* Sender, const char* VarName, const 
 Action* GenerateActionCore(const char *src, const char *str, int acIndex);
 Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int negate);
 
+inline int Bones(ieDword value)
+{
+        return core->Roll((value&0xf000)>>12, (value&0xff0)>>8, value&15);
+}
+
 #endif

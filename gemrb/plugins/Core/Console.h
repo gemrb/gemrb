@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Console.h,v 1.5 2005/10/19 21:57:33 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Console.h,v 1.6 2005/12/03 20:48:44 avenger_teambg Exp $
  *
  */
 
@@ -40,6 +40,9 @@
  * from GUIScripts can be used.
  */
 
+/** the number of remembered lines in the cheat console*/
+#define HISTORY_SIZE 5
+
 class Console : public Control {
 public:
 	Console(void);
@@ -54,8 +57,6 @@ public:
 	void SetBackGround(Sprite2D* back);
 	/** Sets the Text of the current control */
 	int SetText(const char* string, int pos = 0);
-	/** Output for Script Messages */
-	TextArea* ta;
 private:
 	/** Text Editing Cursor Sprite */
 	Sprite2D* Cursor;
@@ -67,8 +68,12 @@ private:
 	unsigned short max;
 	/** Text Buffer */
 	unsigned char* Buffer;
+	/** History Buffer */
+	unsigned char* History[HISTORY_SIZE];
 	/** Cursor Position */
 	unsigned short CurPos;
+	/** History Position and size */
+	unsigned short HistPos, HistMax;
 	/** Color Palette */
 	Color* palette;
 
@@ -77,6 +82,10 @@ public: //Events
 	void OnKeyPress(unsigned char Key, unsigned short Mod);
 	/** Special Key Press */
 	void OnSpecialKeyPress(unsigned char Key);
+private:
+	void HistoryBack();
+	void HistoryForward();
+	void HistoryAdd(bool force);
 };
 
 #endif
