@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.27 2005/11/26 20:33:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.28 2005/12/03 11:05:38 avenger_teambg Exp $
  *
  */
 
@@ -1188,6 +1188,11 @@ int GameScript::Entered(Scriptable* Sender, Trigger* parameters)
 	if (Sender->Type != ST_PROXIMITY) {
 		return 0;
 	}
+	InfoPoint *ip = (InfoPoint *) Sender;
+	if (!ip->Trapped) {
+		return 0;
+	}
+
 	if (parameters->objectParameter == NULL) {
 		if (Sender->LastEntered) {
 			Sender->AddTrigger (&Sender->LastEntered);
@@ -1202,6 +1207,28 @@ int GameScript::Entered(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+/* Same as entered, except that 'Trapped' isn't checked */
+int GameScript::IsOverMe(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type != ST_PROXIMITY) {
+		return 0;
+	}
+
+	if (parameters->objectParameter == NULL) {
+		if (Sender->LastEntered) {
+			Sender->AddTrigger (&Sender->LastEntered);
+			return 1;
+		}
+		return 0;
+	}
+	if (MatchActor(Sender, Sender->LastEntered, parameters->objectParameter)) {
+		Sender->AddTrigger (&Sender->LastEntered);
+		return 1;
+	}
+	return 0;
+}
+
+/*
 int GameScript::IsOverMe(Scriptable* Sender, Trigger* parameters)
 {
 	if (Sender->Type != ST_PROXIMITY && Sender->Type != ST_TRAVEL) {
@@ -1217,6 +1244,7 @@ int GameScript::IsOverMe(Scriptable* Sender, Trigger* parameters)
 	}
 	return 0;
 }
+*/
 
 //this function is different in every engines, if you use a string0parameter
 //then it will be considered as a variable check

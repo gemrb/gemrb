@@ -68,6 +68,7 @@ void GoNearAndRetry(Scriptable *Sender, Point &p);
 #define LESS_THAN 2
 #define GREATER_THAN 3
 int DiffCore(ieDword a, ieDword b, int diffmode);
+Targets *GetMyTarget(Scriptable *Sender, Actor *actor, Targets *parameters);
 void FreeSrc(SrcVector *poi, const ieResRef key);
 SrcVector *LoadSrc(const ieResRef resname);
 Action *ParamCopy(Action *parameters);

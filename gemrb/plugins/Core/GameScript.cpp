@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.333 2005/11/27 23:21:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.334 2005/12/03 11:05:38 avenger_teambg Exp $
  *
  */
 
@@ -124,7 +124,7 @@ static TriggerLink triggernames[] = {
 	{"happiness", GameScript::Happiness, 0},
 	{"happinessgt", GameScript::HappinessGT, 0},
 	{"happinesslt", GameScript::HappinessLT, 0},
-	{"harmlessentered", GameScript::Entered, 0}, //pst, not sure
+	{"harmlessentered", GameScript::IsOverMe, 0}, //pst, not sure
 	{"harmlessopened", GameScript::Opened, 0}, //pst, not sure
 	{"hasinnateability", GameScript::HaveSpell, 0}, //these must be the same
 	{"hasitem", GameScript::HasItem, 0},
@@ -765,6 +765,7 @@ static ObjectLink objectnames[] = {
 	{"leastdamagedof", GameScript::LeastDamagedOf},
 	{"mostdamagedof", GameScript::MostDamagedOf},
 	{"myself", GameScript::Myself},
+	{"mytarget", GameScript::MyTarget},//see lasttargetedby(myself)
 	{"nearest", GameScript::Nearest}, //actually this seems broken in IE and resolve as Myself
 	{"nearestenemyof", GameScript::NearestEnemyOf},
 	{"nearestenemyoftype", GameScript::NearestEnemyOfType},
@@ -1672,9 +1673,22 @@ Targets *GameScript::LastCommandedBy(Scriptable *Sender, Targets *parameters)
 	return parameters;
 }
 
+// this is essentially a LastTargetedBy(0) - or MySelf
+// but IWD2 defines it
+Targets *GameScript::MyTarget(Scriptable *Sender, Targets *parameters)
+{
+	return GetMyTarget(Sender, NULL, parameters);
+}
+
 Targets *GameScript::LastTargetedBy(Scriptable *Sender, Targets *parameters)
 {
 	Actor *actor = parameters->GetTarget(0);
+	return GetMyTarget(Sender, actor, parameters);
+}
+
+/*
+Targets *GetMyTarget(Actor *actor, Targets *parameters)
+{
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
 			actor = (Actor *) Sender;
@@ -1689,6 +1703,7 @@ Targets *GameScript::LastTargetedBy(Scriptable *Sender, Targets *parameters)
 	}
 	return parameters;
 }
+*/
 Targets *GameScript::LastAttackerOf(Scriptable *Sender, Targets *parameters)
 {
 	Actor *actor = parameters->GetTarget(0);

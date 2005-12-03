@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.34 2005/11/30 19:47:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.35 2005/12/03 11:05:38 avenger_teambg Exp $
  *
  */
 
@@ -1619,5 +1619,22 @@ int DiffCore(ieDword a, ieDword b, int diffmode)
 			break;
 	}
 	return 0;
+}
+
+Targets *GetMyTarget(Scriptable *Sender, Actor *actor, Targets *parameters)
+{
+        if (!actor) {
+                if (Sender->Type==ST_ACTOR) {
+                        actor = (Actor *) Sender;
+                }
+        }
+        parameters->Clear();
+        if (actor) {
+                Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastTarget);
+                if (target) {
+                        parameters->AddTarget(target, 0);
+                }
+        }
+        return parameters;
 }
 
