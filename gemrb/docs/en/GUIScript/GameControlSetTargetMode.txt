@@ -1,0 +1,14 @@
+
+Prototype: GemRB.GameControlSetTargetMode(Mode)
+
+Description: Sets action made by the player. It could be: talk, attack, spellcast.
+
+Parameters:
+ Mode - 0 none
+        1 talk
+        2 attack
+
+Return value: N/A
+
+See also: GameControlSetScreenFlags
+
