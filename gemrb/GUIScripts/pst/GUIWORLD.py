@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIWORLD.py,v 1.9 2005/11/27 12:18:44 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIWORLD.py,v 1.10 2005/12/04 21:09:33 avenger_teambg Exp $
 
 
 # GUIWORLD.py - scripts to control some windows from GUIWORLD winpack
@@ -290,7 +290,7 @@ def OpenFormationWindow ():
 		GemRB.UnloadWindow (FormationWindow)
 		FormationWindow = None
 
-		GemRB.GameSetFormation (last_formation)
+		GemRB.GameSetFormation (last_formation, 0)
 		EnableAnimatedWindows ()
 		GemRB.SetVar ("OtherWindow", -1)
 		GemRB.UnhideGUI ()
@@ -329,7 +329,7 @@ def OpenFormationWindow ():
 		GemRB.SetTooltip (Window, Button, tooltips[i])
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectFormation")
 
-	GemRB.SetVar ("SelectedFormation", GemRB.GameGetFormation ())
+	GemRB.SetVar ("SelectedFormation", GemRB.GameGetFormation (0))
 	SelectFormation ()
 
 	GemRB.UnhideGUI ()

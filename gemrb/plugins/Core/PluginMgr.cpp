@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.22 2005/11/22 22:07:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.23 2005/12/04 21:09:32 avenger_teambg Exp $
  *
  */
 
@@ -228,7 +228,7 @@ PluginMgr::~PluginMgr(void)
 #ifdef WIN32
 		FreeLibrary(libs[i]);
 #else
-		dlclose(libs[i]);
+	//	dlclose(libs[i]);
 #endif
 	}
 #endif

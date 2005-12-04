@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.337 2005/12/03 20:48:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.338 2005/12/04 21:09:31 avenger_teambg Exp $
  *
  */
 
@@ -312,6 +312,7 @@ static TriggerLink triggernames[] = {
 static ActionLink actionnames[] = {
 	{"actionoverride",NULL, AF_INVALID}, //will this function ever be reached
 	{"activate", GameScript::Activate, 0},
+	{"activateportalcursor", GameScript::ActivatePortalCursor, 0},
 	{"addareaflag", GameScript::AddAreaFlag, 0},
 	{"addareatype", GameScript::AddAreaType, 0},
 	{"addexperienceparty", GameScript::AddExperienceParty, 0},
@@ -424,6 +425,7 @@ static ActionLink actionnames[] = {
 	{"dropinventory", GameScript::DropInventory, 0},
 	{"dropinventoryex", GameScript::DropInventoryEX, 0},
 	{"dropitem", GameScript::DropItem, AF_BLOCKING},
+	{"enableportaltravel", GameScript::EnablePortalTravel, 0},
 	{"endcredits", GameScript::EndCredits, 0},//movie
 	{"endcutscenemode", GameScript::EndCutSceneMode, 0},
 	{"enemy", GameScript::Enemy, 0},

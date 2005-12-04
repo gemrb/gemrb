@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.49 2005/12/03 11:56:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.50 2005/12/04 21:09:31 avenger_teambg Exp $
  *
  */
 
@@ -2041,6 +2041,7 @@ void GameScript::HideCreature(Scriptable* Sender, Action* parameters)
 	}
 }
 
+//this isn't sure
 void GameScript::Activate(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
@@ -4422,4 +4423,52 @@ void GameScript::BashDoor(Scriptable* Sender, Action* parameters)
 
         gc->target_mode = TARGET_MODE_ATTACK; //for bashing doors too
 	OpenDoor(Sender, parameters);
+}
+
+//pst action
+void GameScript::ActivatePortalCursor(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* ip;
+
+	if (!parameters->objects[1]) {
+		ip=Sender;
+	} else {
+		ip = Sender->GetCurrentArea()->TMap->GetInfoPoint(parameters->objects[1]->objectName);
+	}
+	if (!ip) {
+		return;
+	}
+	if (ip->Type!=ST_PROXIMITY && ip->Type!=ST_TRAVEL) {
+		return;
+	}
+	InfoPoint *tar = (InfoPoint *) ip;
+	if (parameters->int0Parameter) {
+		tar->Trapped|=1;
+	} else {
+		tar->Trapped&=~1;
+	}
+}
+
+//pst action
+void GameScript::EnablePortalTravel(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* ip;
+
+	if (!parameters->objects[1]) {
+		ip=Sender;
+	} else {
+		ip = Sender->GetCurrentArea()->TMap->GetInfoPoint(parameters->objects[1]->objectName);
+	}
+	if (!ip) {
+		return;
+	}
+	if (ip->Type!=ST_PROXIMITY && ip->Type!=ST_TRAVEL) {
+		return;
+	}
+	InfoPoint *tar = (InfoPoint *) ip;
+	if (parameters->int0Parameter) {
+		tar->Trapped|=2;
+	} else {
+		tar->Trapped&=~2;
+	}
 }

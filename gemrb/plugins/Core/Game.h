@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.70 2005/11/30 19:47:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.71 2005/12/04 21:09:31 avenger_teambg Exp $
  *
  */
 
@@ -263,12 +263,19 @@ public:
 		}
 		return beasts[Index] != 0;
 	}
-	void SetBeastKnown(unsigned int Index) const {
+	void SetBeastKnown(unsigned int Index) {
 		if (!beasts) {
 			return;
 		}
 		beasts[Index] = 1;
 	}
+	ieWord GetFormation() const {
+		if (WhichFormation>4) {
+			return 0;
+		}
+		return Formations[WhichFormation];
+	}
+
 	void ShareXP(int XP, bool divide);
 	/** returns true if we should start the party overflow window */
 	bool PartyOverflow();

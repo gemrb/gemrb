@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.352 2005/12/03 23:49:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.353 2005/12/04 21:09:32 avenger_teambg Exp $
  *
  */
 
@@ -75,6 +75,9 @@ static SpellDescType *StoreSpells = NULL;
 
 static int ReputationIncrease[20]={0xcccccccc};
 static int ReputationDonation[20]={0xcccccccc};
+//4 action button indices are packed on a single ieDword, there are 32 max.
+static ieDword GUIAction[32]={0xcccccccc};
+static ieDword GUITooltip[32];
 
 // Natural screen size of currently loaded winpack
 static int CHUWidth = 0;
@@ -3177,27 +3180,47 @@ static PyObject* GemRB_GameSetPartyGold(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GameGetFormation__doc,
-"GameGetFormation() => int\n\n"
-"Returns current party formation." );
+"GameGetFormation([Which]) => int\n\n"
+"Returns current party formation. If Which was supplied, it returns one of the preset formations." );
 
-static PyObject* GemRB_GameGetFormation(PyObject * /*self*/, PyObject* /*args*/)
+static PyObject* GemRB_GameGetFormation(PyObject * /*self*/, PyObject* args)
 {
-	int Formation = core->GetGame()->WhichFormation;
+	int Which = -1;
+	int Formation;
+
+	if (!PyArg_ParseTuple( args, "|i", &Which )) {
+		return AttributeError( GemRB_GameGetFormation__doc );
+	}
+	if (Which<0) {
+		Formation = core->GetGame()->WhichFormation;
+	} else {
+		if (Which>4) {
+			return AttributeError( GemRB_GameGetFormation__doc );
+		}
+		Formation = core->GetGame()->Formations[Which];
+	}
 	return PyInt_FromLong( Formation );
 }
 
 PyDoc_STRVAR( GemRB_GameSetFormation__doc,
-"GameSetFormation(Formation)\n\n"
-"Sets party formation." );
+"GameSetFormation(Formation[, Which])\n\n"
+"Sets party formation. If Which was supplied, it sets one of the preset formations." );
 
 static PyObject* GemRB_GameSetFormation(PyObject * /*self*/, PyObject* args)
 {
-	int Formation;
+	int Formation, Which=-1;
 
-	if (!PyArg_ParseTuple( args, "i", &Formation )) {
+	if (!PyArg_ParseTuple( args, "i|i", &Formation, &Which )) {
 		return AttributeError( GemRB_GameSetFormation__doc );
 	}
-	core->GetGame()->WhichFormation = Formation;
+	if (Which<0) {
+		core->GetGame()->WhichFormation = Formation;
+	} else {
+		if (Which>4) {
+			return AttributeError( GemRB_GameSetFormation__doc );
+		}
+		core->GetGame()->Formations[Which] = Formation;
+	}
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -5506,6 +5529,102 @@ static PyObject* GemRB_LeaveParty(PyObject * /*self*/, PyObject* args)
 	Py_INCREF( Py_None );
 	return Py_None;
 }
+ 
+typedef union pack {
+	ieDword data;
+	ieByte bytes[4];
+} packtype;
+
+static void ReadActionButtons()
+{
+	memset(GUIAction, -1, sizeof(GUIAction));
+	memset(GUITooltip, -1, sizeof(GUITooltip));
+        int table = core->LoadTable( "guibtact" );
+        if (table<0) {
+                return;
+        }
+        TableMgr *tab = core->GetTable( table );
+        for (int i = 0; i < 32; i++) {
+		packtype row;
+
+                row.bytes[0] = (ieByte) atoi( tab->QueryField(i,0) );
+                row.bytes[1] = (ieByte) atoi( tab->QueryField(i,1) );
+                row.bytes[2] = (ieByte) atoi( tab->QueryField(i,2) );
+                row.bytes[3] = (ieByte) atoi( tab->QueryField(i,3) );
+		GUIAction[i] = row.data;
+		GUITooltip[i] = atoi( tab->QueryField(i,4) );
+        }
+        core->DelTable( table );
+
+}
+
+PyDoc_STRVAR( GemRB_SetActionIcon__doc,
+"SetActionIcon(Window, Button, ActionIndex)\n\n"
+"Sets up an action button. The ActionIndex should be less than 32." );
+
+static PyObject* GemRB_SetActionIcon(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex, Index;
+
+	if (!PyArg_ParseTuple( args, "iii", &WindowIndex, &ControlIndex, &Index )) {
+		return AttributeError( GemRB_SetActionIcon__doc );
+	}
+
+	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
+	if (!btn) {
+		return NULL;
+	}
+
+	if (Index<0) {
+		btn->SetImage( IE_GUI_BUTTON_UNPRESSED, 0 );
+		btn->SetImage( IE_GUI_BUTTON_PRESSED, 0 );
+		btn->SetImage( IE_GUI_BUTTON_SELECTED, 0 );
+		btn->SetImage( IE_GUI_BUTTON_DISABLED, 0 );
+		btn->SetFlags( IE_GUI_BUTTON_NO_IMAGE, BM_SET );
+		core->SetTooltip( WindowIndex, ControlIndex, "" );
+		Py_INCREF( Py_None );
+		return Py_None;
+	}
+
+	if (Index>32) {
+		return AttributeError( GemRB_SetActionIcon__doc );
+	}
+	if (GUIAction[0]==0xcccccccc) {
+		ReadActionButtons();
+	}
+	AnimationMgr* bam = ( AnimationMgr* )
+		core->GetInterface( IE_BAM_CLASS_ID );
+	//FIXME: this is a hardcoded resource (pst has no such one)
+	DataStream *str = core->GetResourceMgr()->GetResource( "GUIBTACT", IE_BAM_CLASS_ID );
+	if (!bam->Open(str, true) ) {
+		return RuntimeError( "BAM not found" );
+	}
+	packtype row;
+
+	row.data = GUIAction[Index];
+	Sprite2D *tspr = bam->GetFrameFromCycle( 0, row.bytes[0]);
+	btn->SetImage( IE_GUI_BUTTON_UNPRESSED, tspr );
+	tspr = bam->GetFrameFromCycle( 0, row.bytes[1]);
+	btn->SetImage( IE_GUI_BUTTON_PRESSED, tspr );
+	tspr = bam->GetFrameFromCycle( 0, row.bytes[2]);
+	btn->SetImage( IE_GUI_BUTTON_SELECTED, tspr );
+	tspr = bam->GetFrameFromCycle( 0, row.bytes[3]);
+	btn->SetImage( IE_GUI_BUTTON_DISABLED, tspr );
+	core->FreeInterface( bam );
+	btn->SetFlags( IE_GUI_BUTTON_NORMAL, BM_SET );
+	char *txt = core->GetString( GUITooltip[Index] );
+	if (txt) {
+		char *txt2 = (char *) malloc(strlen(txt)+6);
+		sprintf(txt2,"F%1.1d - %s",ControlIndex+1,txt);
+		free(txt);
+		core->SetTooltip(WindowIndex, ControlIndex, txt2);
+		free (txt2);
+	} else {
+		core->SetTooltip(WindowIndex, ControlIndex, "");
+	}
+	Py_INCREF( Py_None );
+	return Py_None;
+}
 
 static PyMethodDef GemRBMethods[] = {
 	METHOD(SetInfoTextColor, METH_VARARGS),
@@ -5532,7 +5651,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(IncreaseReputation, METH_VARARGS),
 	METHOD(GameGetPartyGold, METH_NOARGS),
 	METHOD(GameSetPartyGold, METH_VARARGS),
-	METHOD(GameGetFormation, METH_NOARGS),
+	METHOD(GameGetFormation, METH_VARARGS),
 	METHOD(GameSetFormation, METH_VARARGS),
 	METHOD(GetJournalSize, METH_VARARGS),
 	METHOD(GetJournalEntry, METH_VARARGS),
@@ -5686,13 +5805,14 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(CheckFeatCondition, METH_VARARGS),
 	METHOD(GetAbilityBonus, METH_VARARGS),
 	METHOD(LeaveParty, METH_VARARGS),
+	METHOD(SetActionIcon, METH_VARARGS),
 	// terminating entry	
 	{NULL, NULL, 0, NULL}
 };
 
 void initGemRB()
 {
-	/*PyObject * m =*/ Py_InitModule( "GemRB", GemRBMethods );
+	Py_InitModule( "GemRB", GemRBMethods );
 }
 
 GUIScript::GUIScript(void)
@@ -5715,6 +5835,9 @@ GUIScript::~GUIScript(void)
 		StoreSpells=NULL;
 	}
 	StoreSpellsCount=-1;
+	ReputationIncrease[0]=0xcccccccc;
+	ReputationDonation[0]=0xcccccccc;
+	GUIAction[0]=0xcccccccc;
 }
 
 PyDoc_STRVAR( GemRB__doc,
@@ -5791,6 +5914,7 @@ bool GUIScript::Init(void)
 	/* pMainMod is a borrowed reference */
 	pMainDic = PyModule_GetDict( pMainMod );
 	/* pMainDic is a borrowed reference */
+
 	return true;
 }
 

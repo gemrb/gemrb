@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.65 2005/11/24 17:44:09 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.66 2005/12/04 21:09:32 avenger_teambg Exp $
  *
  */
 
@@ -109,6 +109,11 @@ Game* GAMImp::GetGame()
 	str->ReadWord( &newGame->WhichFormation );
 	for (i = 0; i < 5; i++) {
 		str->ReadWord( &newGame->Formations[i] );
+	}
+	//hack for PST
+	if (version==GAM_VER_PST) {
+		newGame->Formations[0] = newGame->WhichFormation;
+		newGame->WhichFormation = 0;
 	}
 	str->ReadDword( &newGame->PartyGold );
 	str->ReadDword( &newGame->WeatherBits ); 
@@ -528,12 +533,12 @@ int GAMImp::PutVariables(DataStream *stream, Game *game)
 int GAMImp::PutHeader(DataStream *stream, Game *game)
 {
 	int i;
-	char Signature[8];
+	char Signature[10];
 	ieDword tmpDword = 0;
 
 	memcpy( Signature, "GAMEV0.0", 8);
 	Signature[5]+=game->version/10;
-	if (game->version==12) { //pst version
+	if (game->version==GAM_VER_PST) { //pst version
 		Signature[7]+=1;
 	}
 	else {
@@ -543,9 +548,15 @@ int GAMImp::PutHeader(DataStream *stream, Game *game)
 	//using Signature for padding
 	memset(Signature, 0, sizeof(Signature));
 	stream->WriteDword( &game->GameTime );
-	stream->WriteWord( &game->WhichFormation );
-	for(i=0;i<5;i++) {
-		stream->WriteWord( &game->Formations[i]);
+	//pst has a single preset of formations
+	if (game->version==GAM_VER_PST) {
+		stream->WriteWord( &game->Formations[0]);
+		stream->Write( Signature, 10);
+	} else {
+		stream->WriteWord( &game->WhichFormation );
+		for(i=0;i<5;i++) {
+			stream->WriteWord( &game->Formations[i]);
+		}
 	}
 	stream->WriteDword( &game->PartyGold );
 	stream->WriteDword( &game->WeatherBits );

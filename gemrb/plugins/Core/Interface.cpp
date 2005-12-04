@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.371 2005/11/27 10:51:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.372 2005/12/04 21:09:31 avenger_teambg Exp $
  *
  */
 
@@ -393,7 +393,9 @@ Interface::~Interface(void)
 	Map::ReleaseMemory();
 	GameScript::ReleaseMemory();
 	Actor::ReleaseMemory();
-	delete( plugin );
+	if(plugin) {
+		delete( plugin );
+	}
 	// Removing all stuff from Cache, except bifs
 	DelTree((const char *) CachePath, true);
 }
@@ -626,8 +628,14 @@ int Interface::Init()
 	printStatus( "OK", LIGHT_GREEN );
 	printMessage( "Core", "Starting Plugin Manager...\n", WHITE );
 	plugin = new PluginMgr( PluginsPath );
-	printMessage( "Core", "Plugin Loading Complete...", WHITE );
-	printStatus( "OK", LIGHT_GREEN );
+	if (plugin && plugin->GetPluginCount()) {		
+		printMessage( "Core", "Plugin Loading Complete...", WHITE );
+		printStatus( "OK", LIGHT_GREEN );
+	} else {
+		printMessage( "Core", "Plugin Loading Failed, check path...", YELLOW);
+		printStatus( "ERROR", LIGHT_RED );
+		return GEM_ERROR;
+	}
 	printMessage( "Core", "Creating Object Factory...", WHITE );
 	factory = new Factory();
 	printStatus( "OK", LIGHT_GREEN );

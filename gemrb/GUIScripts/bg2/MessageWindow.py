@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/MessageWindow.py,v 1.37 2005/11/29 22:40:37 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/MessageWindow.py,v 1.38 2005/12/04 21:09:33 avenger_teambg Exp $
 
 # MessageWindow.py - scripts and GUI for main (walk) window
 
@@ -75,7 +75,7 @@ def OnLoad():
 	GemRB.SetVar("OtherPosition", 5) #Inactivating
 	GemRB.SetVar("TopPosition", 5) #Inactivating
 	
-	SetupActionsWindowControls (ActionsWindow)
+	OpenActionsWindowControls (ActionsWindow)
 	SetupMenuWindowControls (OptionsWindow, 1, "ReturnToGame")
 
 	UpdateControlStatus()

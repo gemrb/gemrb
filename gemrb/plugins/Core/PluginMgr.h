@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.h,v 1.6 2005/10/20 20:39:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.h,v 1.7 2005/12/04 21:09:32 avenger_teambg Exp $
  *
  */
 
@@ -68,6 +68,7 @@ public:
 	bool IsAvailable(SClass_ID plugintype);
 	void* GetPlugin(SClass_ID plugintype);
 	void FreePlugin(void* ptr);
+	int GetPluginCount() { return plugins.size(); }
 };
 
 #endif

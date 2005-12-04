@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.228 2005/12/03 20:48:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.229 2005/12/04 21:09:31 avenger_teambg Exp $
  *
  */
 
@@ -899,6 +899,7 @@ public: //Script Functions
 public:
 	//Actions
 	static void Activate(Scriptable* Sender, Action* parameters);
+	static void ActivatePortalCursor(Scriptable* Sender, Action* parameters);
 	static void AddAreaFlag(Scriptable* Sender, Action* parameters);
 	static void AddAreaType(Scriptable* Sender, Action* parameters);
 	static void AddExperienceParty(Scriptable *Sender, Action* parameters);
@@ -996,6 +997,7 @@ public:
 	static void DropInventory(Scriptable* Sender, Action* parameters);
 	static void DropInventoryEX(Scriptable* Sender, Action* parameters);
 	static void DropItem(Scriptable* Sender, Action* parameters);
+	static void EnablePortalTravel(Scriptable* Sender, Action* parameters);
 	static void EndCredits(Scriptable* Sender, Action* parameters);
 	static void EndCutSceneMode(Scriptable* Sender, Action* parameters);
 	static void Enemy(Scriptable* Sender, Action* parameters);
