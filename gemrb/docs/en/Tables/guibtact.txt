@@ -1,0 +1,4 @@
+Description: This file describes the action button icons and associated tooltips. 
+
+Columns: 1-4:     The button BAM Frame numbers for the four button sprites.
+         TOOLTIP: The tooltip strref for the action. 
