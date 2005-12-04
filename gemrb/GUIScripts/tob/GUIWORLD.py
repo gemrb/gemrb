@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIWORLD.py,v 1.21 2005/12/04 21:09:33 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIWORLD.py,v 1.22 2005/12/04 23:12:42 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -288,7 +288,7 @@ def DropItemContainer ():
 	RightIndex = GemRB.GetVar ("RightIndex")
 	if RightIndex<0:
 		return
-	
+
 	#we need to get the right slot number
 	pc = GemRB.GameGetFirstSelectedPC ()
 	inventory_slots = GemRB.GetSlots (pc, 0x8000)
@@ -302,7 +302,7 @@ def TakeItemContainer ():
 	LeftIndex = GemRB.GetVar ("LeftIndex")
 	if LeftIndex<0:
 		return
-	
+
 	if LeftIndex >= Container['ItemCount']:
 		return
 	GemRB.ChangeContainerItem (0, LeftIndex, 1)
@@ -393,7 +393,7 @@ def RemovePlayerConfirm ():
 	ReformPartyWindow = None
 	if hideflag:
 		GemRB.UnhideGUI ()
-	GemRB.LeaveParty( GemRB.GetVar("Selected") )
+	GemRB.LeaveParty (GemRB.GetVar("Selected") )
 	OpenReformPartyWindow ()
 	return
 

@@ -1,0 +1,20 @@
+2DA V1.0
+-1
+           1          2          3          4         TOOLTIP
+STEALTH    30         31         32         33         
+THIEVING   26         27         28         29         
+SPSELECT   12         13         52         53         
+SPELL1     -1         -1         -1         -1         
+SPELL2     -1         -1         -1         -1         
+SPELL3     -1         -1         -1         -1         
+TURN        8          9         10         11         
+TALK        4          5          6          7         4933
+USEITEM    18         19         56         57 
+QUICK1     -1         -1         -1         -1         
+QUICK2     -1         -1         -1         -1         
+QUICK3     -1         -1         -1         -1         
+INNATE     38         39         54         55         
+DEFEND     0         1         2        3
+ATTACK     14         15         16         17         4666
+BARDSONG   22         23         24         25
+STOP       58         59         60         61         15924

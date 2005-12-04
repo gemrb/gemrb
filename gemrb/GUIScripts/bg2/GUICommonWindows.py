@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.24 2005/12/04 21:09:33 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.25 2005/12/04 23:12:42 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -139,9 +139,7 @@ def EmptyControls ():
 	return
 
 def SelectFormationPreset ():
-	print GemRB.GetVar("Value")
-	print GemRB.GetVar("Formation")
-	GemRB.GameSetFormation ( GemRB.GetVar("Value"), GemRB.GetVar("Formation") )
+	GemRB.GameSetFormation (GemRB.GetVar ("Value"), GemRB.GetVar ("Formation") )
 	GroupControls ()
 	return
 
@@ -159,9 +157,8 @@ def SetupFormation ():
 	return
 
 def SelectFormation ():
-	GemRB.GameSetFormation ( GemRB.GetVar("Formation") )
-	print "SelectFormation",GemRB.GetVar("Formation")
-	#GroupControls ()
+	GemRB.GameSetFormation ( GemRB.GetVar ("Formation") )
+	return
 
 def GroupControls ():
 	global ActionsWindow
@@ -191,6 +188,8 @@ def GroupControls ():
 		GemRB.SetVarAssoc (Window, Button, "Formation", i)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectFormation")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "SetupFormation")
+		str = GemRB.GetString (4935)
+		GemRB.SetTooltip (Window, Button, "F%d - %s"%(8+i,str) )
 	return
 
 def SetupControls (pc):
@@ -221,7 +220,6 @@ def UpdateActionsWindow ():
 				pc = -1
 				break
 
-	print "PC selected: ", pc
 	if pc == 0:
 		EmptyControls ()
 		return

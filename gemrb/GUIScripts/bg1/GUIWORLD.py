@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIWORLD.py,v 1.9 2005/12/01 20:15:47 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIWORLD.py,v 1.10 2005/12/04 23:12:41 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -26,14 +26,13 @@
 import GemRB
 from GUIDefines import *
 from GUICommon import CloseOtherWindow
-from GUICommonWindows import SetEncumbranceLabels
+from GUICommonWindows import *
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
 
 ContainerWindow = None
 ContinueWindow = None
-FormationWindow = None
 ReformPartyWindow = None
 OldActionsWindow = None
 OldMessageWindow = None
@@ -344,6 +343,7 @@ def UpdateReformWindow ():
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
 		GemRB.SetButtonPicture (Window, Button, pic, "NOPORTSM")
+	UpdatePortraitWindow ()
 	return
 
 def RemovePlayer ():
@@ -443,74 +443,6 @@ def OpenReformPartyWindow ():
 	if hideflag:
 		GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
-	return
-
-last_formation = None
-
-def OpenFormationWindow ():
-	global FormationWindow
-
-	hideflag = GemRB.HideGUI ()
-	if CloseOtherWindow (OpenFormationWindow):
-		GemRB.UnloadWindow (FormationWindow)
-		FormationWindow = None
-
-		GemRB.GameSetFormation (last_formation)
-		GemRB.SetVar ("OtherWindow", -1)
-		if hideflag:
-			GemRB.UnhideGUI ()
-		return
-
-	GemRB.LoadWindowPack (GetWindowPack())
-	FormationWindow = Window = GemRB.LoadWindow (27)
-	GemRB.SetVar ("OtherWindow", Window)
-
-	# Done
-	Button = GemRB.GetControl (Window, 13)
-	GemRB.SetText (Window, Button, 1403)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenFormationWindow")
-
-	tooltips = (
-		44957,  # Follow
-		44958,  # T
-		44959,  # Gather
-		44960,  # 4 and 2
-		44961,  # 3 by 2
-		44962,  # Protect
-		48152,  # 2 by 3
-		44964,  # Rank
-		44965,  # V
-		44966,  # Wedge
-		44967,  # S
-		44968,  # Line
-		44969,  # None
-	)
-
-	for i in range (13):
-		Button = GemRB.GetControl (Window, i)
-		GemRB.SetVarAssoc (Window, Button, "SelectedFormation", i)
-		GemRB.SetTooltip (Window, Button, tooltips[i])
-		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectFormation")
-
-	GemRB.SetVar ("SelectedFormation", GemRB.GameGetFormation ())
-	SelectFormation ()
-
-	if hideflag:
-		GemRB.UnhideGUI ()
-
-def SelectFormation ():
-	global last_formation
-	Window = FormationWindow
-	
-	formation = GemRB.GetVar ("SelectedFormation")
-	if last_formation != None and last_formation != formation:
-		Button = GemRB.GetControl (Window, last_formation)
-		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_UNPRESSED)
-
-	Button = GemRB.GetControl (Window, formation)
-	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SELECTED)
-
-	last_formation = formation
 	return
 
 def DeathWindow() :
