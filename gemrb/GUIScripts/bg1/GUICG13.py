@@ -89,8 +89,8 @@ def OnLoad():
 
 def DonePress():
 	global HairColor, SkinColor, MinorColor, MajorColor
+
 	GemRB.UnloadWindow(ColorPicker)
-	ColorWindow=GemRB.LoadWindow(13)
 	GemRB.SetVisible(ColorWindow,1)
 	PickedColor=GemRB.GetTableValue(ColorTable, ColorIndex, GemRB.GetVar("Selected"))
 	if ColorIndex==0:

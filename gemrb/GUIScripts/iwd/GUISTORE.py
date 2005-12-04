@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUISTORE.py,v 1.14 2005/11/24 18:21:58 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUISTORE.py,v 1.15 2005/12/04 00:04:27 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -416,10 +416,11 @@ def OpenStoreRumourWindow ():
 	TextArea = GemRB.GetControl (Window, 11)
 	GemRB.SetText (Window, TextArea, 14144)
 
-	BAM = "TVRNQUL%d"% ((Store['StoreFlags']>>9)&3)
-	Button = GemRB.GetControl (Window, 12)
-	GemRB.SetButtonSprites (Window, Button, BAM, 0, 0, 0, 0, 0)
-	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+	#the quality isn't displayed in iwd
+	#BAM = "TVRNQUL%d"% ((Store['StoreFlags']>>9)&3)
+	#Button = GemRB.GetControl (Window, 12)
+	#GemRB.SetButtonSprites (Window, Button, BAM, 0, 0, 0, 0, 0)
+	#GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 
 	ScrollBar = GemRB.GetControl (Window, 5)
 	GemRB.SetEvent (Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "UpdateStoreRumourWindow")

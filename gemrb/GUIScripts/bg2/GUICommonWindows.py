@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.22 2005/12/01 20:15:47 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.23 2005/12/04 00:04:26 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -110,7 +110,7 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 		Button = GemRB.GetControl (Window, 9)
 		GemRB.SetAnimation (Window, Button, "CGEAR")
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
-		GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_LOCKED)
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 		rb = 11
 	else:
 		rb = 9
@@ -128,24 +128,56 @@ def RestPress ():
 	print "RestPress"
 	return
 
-def SetupActionsWindowControls (Window):
+def EmptyControls ():
+	global ActionsWindow
+
+	for i in range(12):
+		Button = GemRB.GetControl (ActionsWindow, i)
+		GemRB.SetButtonFlags (ActionsWindow, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	return
+
+groupcontrolids = ()
+
+def GroupControls ():
+	global ActionsWindow
+
+	for i in range(12):
+		Button = GemRB.GetControl (ActionsWindow, i)
+		GemRB.SetButtonFlags (ActionsWindow, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+	return
+
+def OpenActionsWindowControls (Window):
+	global ActionsWindow
+
+	ActionsWindow = Window
 	# Gears (time) when options pane is down
 	Button = GemRB.GetControl (Window, 62)
 	GemRB.SetAnimation (Window, Button, "CGEAR")
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
-	GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_LOCKED)
+	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+	UpdateActionsWindow ()
+	return
 
-	# Select all characters
-	Button = GemRB.GetControl (Window, 1)
-	GemRB.SetTooltip (Window, Button, 41659)
+def UpdateActionsWindow ():
+	global ActionsWindow
 
-	# Abort current action
-	Button = GemRB.GetControl (Window, 3)
-	GemRB.SetTooltip (Window, Button, 41655)
+	pc = 0
+	for i in range(PARTY_SIZE):
+		if GemRB.GameIsPCSelected(i+1):
+			if pc == 0:
+				pc = i+1
+			else:
+				pc = -1
+				break
 
-	# Formations
-	Button = GemRB.GetControl (Window, 4)
-	GemRB.SetTooltip (Window, Button, 44945)
+	print "PC selected: ", PC
+	if pc == 0:
+		EmptyControls()
+		return
+	if pc == -1:
+		GroupControls()
+		return
+	#GemRB.SetupControls (ActionsWindow, pc)
 	return
 
 def GetActorClassTitle (actor):
@@ -203,8 +235,8 @@ def OpenPortraitWindow (needcontrols):
 	PortraitWindow = Window = GemRB.LoadWindow(1)
 
 	if needcontrols:
-		Button=GemRB.GetControl(PortraitWindow, 8)
-		GemRB.SetEvent(PortraitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "MinimizePortraits")
+		Button=GemRB.GetControl(Window, 8)
+		GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "MinimizePortraits")
 
 		# AI
 		Button = GemRB.GetControl (Window, 6)
@@ -283,10 +315,11 @@ def SelectAllOnPress ():
 
 # Run by Game class when selection was changed
 def SelectionChanged ():
-	global PortraitWindow
+	global PortraitWindow, ActionsWindow
 
-	# FIXME: hack. If defined, display single selection
 	if (not SelectionChangeHandler):
+		if (ActionsWindow!=-1):
+			UpdateActionsWindow ()
 		for i in range (PARTY_SIZE):
 			Button = GemRB.GetControl (PortraitWindow, i)
 			GemRB.EnableButtonBorder (PortraitWindow, Button, FRAME_PC_SELECTED, GemRB.GameIsPCSelected (i + 1))

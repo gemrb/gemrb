@@ -89,8 +89,8 @@ def OnLoad():
 
 def DonePress():
 	global HairColor, SkinColor, MajorColor, MinorColor
+
 	GemRB.UnloadWindow(ColorPicker)
-	ColorWindow=GemRB.LoadWindow(13)
 	GemRB.SetVisible(ColorWindow,1)
 	PickedColor=GemRB.GetTableValue(ColorTable, ColorIndex, GemRB.GetVar("Selected"))
 	if ColorIndex==0:
@@ -119,13 +119,13 @@ def GetColor():
 
 	ColorPicker=GemRB.LoadWindow(14)
 	GemRB.SetVar("Selected",-1)
-	for i in range(0,32):
+	for i in range(34):
 		Button = GemRB.GetControl(ColorPicker, i)
 		GemRB.SetButtonState(ColorPicker, Button, IE_GUI_BUTTON_DISABLED)
 		GemRB.SetButtonFlags(ColorPicker, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 
 	Selected = -1
-	for i in range(0,32):
+	for i in range(34):
 		MyColor = GemRB.GetTableValue(ColorTable, ColorIndex, i)
 		if MyColor == "*":
 			break
