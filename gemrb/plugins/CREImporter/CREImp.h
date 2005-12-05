@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.h,v 1.18 2005/12/05 20:21:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.h,v 1.19 2005/12/05 21:46:09 avenger_teambg Exp $
  *
  */
 
@@ -25,7 +25,8 @@
 #include "../Core/ActorMgr.h"
 
 #define IE_CRE_GEMRB            0
-#define IE_CRE_V1_0		10
+#define IE_CRE_V1_0		10  //bg1
+#define IE_CRE_V1_1		11  //bg2 (still V1.0)
 #define IE_CRE_V1_2		12
 #define IE_CRE_V2_2		22
 #define IE_CRE_V9_0		90

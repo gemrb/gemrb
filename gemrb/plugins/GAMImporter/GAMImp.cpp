@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.67 2005/12/05 20:21:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.68 2005/12/05 21:46:11 avenger_teambg Exp $
  *
  */
 
@@ -362,6 +362,7 @@ PCStatsStruct* GAMImp::GetPCStats ()
 	for (i = 0; i <= 3; i++)
 		str->ReadWord( &ps->FavouriteWeaponsCount[i] );
 
+	str->ReadResRef( &ps->SoundSet);
 	return ps;
 }
 
@@ -659,9 +660,13 @@ int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CRE
 	stream->WriteWord( &tmpWord);
 	stream->WriteWord( &tmpWord);
 
-	char *tmpstr = core->GetString(ac->LongStrRef, IE_STR_STRREFOFF);
-	strncpy(filling, tmpstr, 32);
-	free( tmpstr );
+	if (ac->LongStrRef==0xffffffff) {
+		strncpy(filling, ac->LongName, 32);
+	} else {
+		char *tmpstr = core->GetString(ac->LongStrRef, IE_STR_STRREFOFF);
+		strncpy(filling, tmpstr, 32);
+		free( tmpstr );
+	}
 	stream->Write( filling, 32);
 	stream->WriteDword( &ac->TalkCount);
 	stream->WriteDword( &ac->PCStats->BestKilledName);
@@ -685,7 +690,7 @@ int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CRE
 	for (i=0;i<4;i++) {
 		stream->WriteWord( &ac->PCStats->FavouriteWeaponsCount[i]);
 	}
-	stream->Write( filling, 8); //soundset
+	stream->Write( ac->PCStats->SoundSet, 8); //soundset
 	return 0;
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.93 2005/12/05 20:21:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.94 2005/12/05 21:46:09 avenger_teambg Exp $
  *
  */
 
@@ -44,6 +44,7 @@ CREImp::CREImp(void)
 {
 	str = NULL;
 	autoFree = false;
+	TotSCEFF = 0xff;
 }
 
 CREImp::~CREImp(void)
@@ -228,11 +229,6 @@ Actor* CREImp::GetActor()
 	Actor* act = new Actor();
 	if (!act)
 		return NULL;
-	// saving in original version requires the original version
-	// otherwise it is set to 0 at construction time
-	if (core->SaveAsOriginal) {
-		act->version = CREVersion;
-	}
 	act->InParty = 0;
 	str->ReadDword( &act->LongStrRef );
 	char* poi = core->GetString( act->LongStrRef );
@@ -263,6 +259,14 @@ Actor* CREImp::GetActor()
 	}
 
 	str->Read( &TotSCEFF, 1 );
+	if (CREVersion==IE_CRE_V1_0 && TotSCEFF) {
+		CREVersion = IE_CRE_V1_1;
+	}
+	// saving in original version requires the original version
+	// otherwise it is set to 0 at construction time
+	if (core->SaveAsOriginal) {
+		act->version = CREVersion;
+	}
 	str->ReadResRef( act->SmallPortrait );
 	if (act->SmallPortrait[0]==0) {
 		memcpy(act->SmallPortrait, "NONE\0\0\0\0", 8);
@@ -282,6 +286,7 @@ Actor* CREImp::GetActor()
 			Inventory_Size=46;
 			GetActorPST(act);
 			break;
+		case IE_CRE_V1_1: //bg2 (fake version)
 		case IE_CRE_V1_0: //bg1 too
 			Inventory_Size=38;
 			GetActorBG(act);
@@ -660,7 +665,6 @@ void CREImp::ReadEffects(Actor *act)
 	str->Seek( EffectsOffset, GEM_STREAM_START );
 
 	for (i = 0; i < EffectsCount; i++) {
-		//str->Seek( EffectsOffset + i * (TotSCEFF ? 264 : 48), GEM_STREAM_START );
 		Effect fx;
 		GetEffect( &fx );
 		// NOTE: AddEffect() allocates a new effect
@@ -1322,22 +1326,33 @@ int CREImp::GetStoredFileSize(Actor *actor)
 		case IE_CRE_GEMRB:
 			headersize = 0x2d4;
 			Inventory_Size=actor->inventory.GetSlotCount();
+			TotSCEFF = 1;
 			break;
-		case IE_CRE_V1_0://bg1/bg2
+		case IE_CRE_V1_1://totsc/bg2/tob (still V1.0, but large effects)
+		case IE_CRE_V1_0://bg1
 			headersize = 0x2d4;
 			Inventory_Size=38;
+			//we should know it is bg1
+			if (actor->version == IE_CRE_V1_1) {
+				TotSCEFF = 1;
+			} else {
+				TotSCEFF = 0;
+			}
 			break;
 		case IE_CRE_V1_2: //pst
 			headersize = 0x378;
 			Inventory_Size=46;
+			TotSCEFF = 0;
 			break;
 		case IE_CRE_V2_2://iwd2
 			headersize = 0x33c; //?
 			Inventory_Size=50; 
+			TotSCEFF = 1;
 			break;
 		case IE_CRE_V9_0://iwd
 			headersize = 0x33c;
 			Inventory_Size=38; 
+			TotSCEFF = 1;
 			break;
 		default:
 			return -1;
@@ -1426,7 +1441,9 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 	memset(filling,0,sizeof(filling));
 	memcpy( Signature, "CRE V0.0", 8);
 	Signature[5]+=actor->version/10;
-	Signature[7]+=actor->version%10;
+	if (actor->version!=IE_CRE_V1_1) {
+		Signature[7]+=actor->version%10;
+	}
 	stream->Write( Signature, 8);
 	stream->WriteDword( &actor->ShortStrRef);
 	stream->WriteDword( &actor->LongStrRef);
@@ -1443,12 +1460,8 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 	for (i=0;i<7;i++) {
 		Signature[i] = (char) actor->BaseStats[IE_METAL_COLOR+i];
 	}
-	//old effect type (additional check needed for bg1)
-	if (actor->version==IE_CRE_V1_2) { //pst effect
-		Signature[7] = 0;
-	} else {
-		Signature[7] = 1;
-	}
+	//old effect type 
+	Signature[7] = TotSCEFF;
 	stream->Write( Signature, 8);
 	stream->WriteResRef( actor->SmallPortrait);
 	stream->WriteResRef( actor->LargePortrait);
@@ -1945,13 +1958,13 @@ int CREImp::PutSpellPages( DataStream *stream, Actor *actor)
 	for (int i=0;i<type;i++) {
 		unsigned int level = actor->spellbook.GetSpellLevelCount(i);
 		for (unsigned int j=0;j<level;j++) {
-			tmpWord = j+1;
+			tmpWord = j; //+1
 			stream->WriteWord( &tmpWord);
 			tmpWord = actor->spellbook.GetMemorizableSpellsCount(i,j,false);
 			stream->WriteWord( &tmpWord);
 			tmpWord = actor->spellbook.GetMemorizableSpellsCount(i,j,true);
 			stream->WriteWord( &tmpWord);
-			tmpWord = type;
+			tmpWord = i;
 			stream->WriteWord( &tmpWord);
 			stream->WriteDword( &SpellIndex);
 			tmpDword = actor->spellbook.GetMemorizedSpellsCount(i,j);
@@ -2079,6 +2092,7 @@ int CREImp::PutVariables( DataStream *stream, Actor *actor)
 	return 0;
 }
 
+/* this function expects GetStoredFileSize to be called before */
 int CREImp::PutActor(DataStream *stream, Actor *actor)
 {
 	ieDword tmpDword;
@@ -2087,6 +2101,8 @@ int CREImp::PutActor(DataStream *stream, Actor *actor)
 	if (!stream || !actor) {
 		return -1;
 	}
+
+	assert(TotSCEFF==0 || TotSCEFF==1);
 
 	ret = PutHeader( stream, actor);
 	if (ret) {
@@ -2097,28 +2113,23 @@ int CREImp::PutActor(DataStream *stream, Actor *actor)
 
 	switch (actor->version) {
 		case IE_CRE_GEMRB:
-			TotSCEFF = 1;
 			Inventory_Size=(ieDword) actor->inventory.GetSlotCount();
 			ret = PutActorGemRB(stream, actor, Inventory_Size);
 			break;
 		case IE_CRE_V1_2:
-			TotSCEFF = 0;
 			Inventory_Size=46;
 			ret = PutActorPST(stream, actor);
 			break;
+		case IE_CRE_V1_1:
 		case IE_CRE_V1_0: //bg1/bg2
-			// somehow we have to know if it is bg1
-			TotSCEFF = 1;
 			Inventory_Size=38;
 			ret = PutActorBG(stream, actor);
 			break;
 		case IE_CRE_V2_2:
-			TotSCEFF = 1;
 			Inventory_Size=50;
 			ret = PutActorIWD2(stream, actor);
 			break;
 		case IE_CRE_V9_0:
-			TotSCEFF = 1;
 			Inventory_Size=38;
 			ret = PutActorIWD1(stream, actor);
 			break;

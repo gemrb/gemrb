@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.31 2005/11/24 17:44:09 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.32 2005/12/05 21:46:11 avenger_teambg Exp $
  *
  */
 
@@ -101,6 +101,7 @@ bool Spellbook::InitializeSpellbook()
 			innatelist = GetSpellTable("listinnt",0);
 			songlist = GetSpellTable("listsong",0);
 			shapelist = GetSpellTable("listshap",0);
+			NUM_SPELL_TYPES=10; //iwd spell types
 		}
 		return true;
 	}
@@ -296,6 +297,9 @@ CREMemorizedSpell* Spellbook::GetMemorizedSpell(int type, unsigned int level, un
 
 bool Spellbook::AddSpellMemorization(CRESpellMemorization* sm)
 {
+	if (sm->Type>=NUM_SPELL_TYPES) {
+		return false;
+	}
 	std::vector<CRESpellMemorization*>* s = &spells[sm->Type];
 	//when loading, level starts on 0
 	unsigned int level = sm->Level;
