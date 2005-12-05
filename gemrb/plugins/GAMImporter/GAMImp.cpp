@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.68 2005/12/05 21:46:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.69 2005/12/05 22:41:10 wjpalenstijn Exp $
  *
  */
 
@@ -362,7 +362,7 @@ PCStatsStruct* GAMImp::GetPCStats ()
 	for (i = 0; i <= 3; i++)
 		str->ReadWord( &ps->FavouriteWeaponsCount[i] );
 
-	str->ReadResRef( &ps->SoundSet);
+	str->ReadResRef( ps->SoundSet );
 	return ps;
 }
 
