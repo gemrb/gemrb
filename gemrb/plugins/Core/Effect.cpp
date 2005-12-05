@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.cpp,v 1.5 2005/11/24 17:44:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.cpp,v 1.6 2005/12/05 20:21:26 avenger_teambg Exp $
  *
  */
 
@@ -23,6 +23,27 @@
 #include "Actor.h"
 #include "Effect.h"
 #include "Game.h"
+
+bool Persistent(Effect* fx)
+{
+	//we save this as variable
+	if (fx->Opcode==FAKE_VARIABLE_OPCODE) {
+		return false;
+	}
+
+	switch (fx->TimingMode) {
+		//normal equipping fx of items
+		case FX_DURATION_INSTANT_WHILE_EQUIPPED:
+		//delayed effect not saved
+		case FX_DURATION_DELAY_UNSAVED:
+		//permanent effect not saved
+		case FX_DURATION_PERMANENT_UNSAVED:
+		//just expired effect
+		case FX_DURATION_JUST_EXPIRED:
+			return false;
+	}
+	return true;
+}
 
 // FIXME: what about area spells? They can have map & coordinates as target
 void AddEffect(Effect* fx, Actor* self, Actor* pretarget)

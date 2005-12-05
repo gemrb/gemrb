@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.h,v 1.17 2005/11/23 06:39:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.h,v 1.18 2005/12/05 20:21:25 avenger_teambg Exp $
  *
  */
 
@@ -29,10 +29,6 @@
 #define IE_CRE_V1_2		12
 #define IE_CRE_V2_2		22
 #define IE_CRE_V9_0		90
-
-//local variables in creatures are stored in fake opcodes
-#define FAKE_VARIABLE_OPCODE 187
-#define FAKE_VARIABLE_MARKER 1
 
 class CREImp : public ActorMgr {
 private:
@@ -54,6 +50,7 @@ private:
 	ieDword EffectsCount;
 	ieByte TotSCEFF;
 	ieByte IsCharacter;
+	ieDword VariablesCount;
 public:
 	CREImp(void);
 	~CREImp(void);

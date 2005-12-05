@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.h,v 1.9 2005/11/24 17:44:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.h,v 1.10 2005/12/05 20:21:26 avenger_teambg Exp $
  *
  */
 
@@ -32,6 +32,9 @@
 #include "../../includes/ie_types.h"
 class Actor;
 
+//local variables in creatures are stored in fake opcodes
+#define FAKE_VARIABLE_OPCODE 187
+#define FAKE_VARIABLE_MARKER 1
 
 // Effect target types
 #define FX_TARGET_UNKNOWN    0
@@ -47,10 +50,10 @@ class Actor;
 #define FX_DURATION_INSTANT_WHILE_EQUIPPED   2
 #define FX_DURATION_DELAY_LIMITED            3 //this contains a relative onset time (delay) also used as duration, transforms to 6 when applied
 #define FX_DURATION_DELAY_PERMANENT          4 //this transforms to 9 (i guess)
-#define FX_DURATION_UNKNOWN5                 5 //this transforms to 8, but unknown
+#define FX_DURATION_DELAY_UNSAVED            5 //this transforms to 8
 #define FX_DURATION_DELAY_LIMITED_PENDING    6 //this contains an absolute onset time and a duration
 #define FX_DURATION_AFTER_EXPIRES            7
-#define FX_DURATION_UNKNOWN8                 8
+#define FX_DURATION_PERMANENT_UNSAVED        8
 #define FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES   9//this is a special permanent
 #define FX_DURATION_JUST_EXPIRED             10
 
@@ -105,6 +108,6 @@ struct Effect {
 
 // FIXME: what about area spells? They can have map & coordinates as target
 void AddEffect(Effect* fx, Actor* self, Actor* pretarget);
-
+bool Persistent(Effect* fx);
 
 #endif  // ! EFFECT_H

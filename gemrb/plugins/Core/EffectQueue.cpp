@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.46 2005/11/24 17:44:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.47 2005/12/05 20:21:26 avenger_teambg Exp $
  *
  */
 
@@ -413,4 +413,35 @@ void EffectQueue::dump()
 			printf( " %2d: 0x%02x: %s (%d, %d)\n", i, fx->Opcode, Name, fx->Parameter1, fx->Parameter2 );
 		}
 	}
+}
+
+Effect *EffectQueue::GetEffect(ieDword idx)
+{
+	if (effects.size()<=idx) {
+		return NULL;
+	}
+	return effects[idx];
+}
+
+Effect *EffectQueue::GetNextSavedEffect(ieDword &idx)
+{
+	while(effects.size()>idx) {
+		Effect *effect = effects[idx++];
+		if (Persistent(effect)) {
+			return effect;
+		}
+	}
+	return NULL;
+}
+
+ieDword EffectQueue::GetSavedEffectsCount()
+{
+	ieDword cnt = 0;
+
+	for (unsigned int i = 0; i < effects.size (); i++ ) {
+		Effect* fx = effects[i];
+		if (Persistent(fx))
+			cnt++;
+	}
+	return cnt;
 }

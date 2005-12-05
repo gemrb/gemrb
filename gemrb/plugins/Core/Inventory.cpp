@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.61 2005/11/24 17:44:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.62 2005/12/05 20:21:26 avenger_teambg Exp $
  *
  */
 
@@ -120,22 +120,15 @@ void Inventory::CalculateWeight()
 void Inventory::AddSlotEffects(CREItem* slot)
 {
 	Item* itm = core->GetItem( slot->ItemResRef );
+	if (!itm) {
+		printMessage("Inventory","Invalid item equipped...\n",LIGHT_RED);
+		return;
+	}
 	for (int i = 0; i < itm->EquippingFeatureCount; i++) {
 		Owner->fxqueue.AddEffect( &itm->equipping_features[i] );
 	}
 }
 
-/*
-void Inventory::AddAllEffects()
-{
-	for (size_t i = 0; i < Slots.size(); i++) {
-		CREItem *slot = Slots[i];
-		if (slot && core->QuerySlotEffects( i )) {
-			AddSlotEffects( slot );
-		}
-	}
-}
-*/
 void Inventory::RemoveSlotEffects(CREItem* slot)
 {
 	if (!slot)

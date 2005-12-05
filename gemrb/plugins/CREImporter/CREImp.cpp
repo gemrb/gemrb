@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.92 2005/11/30 19:47:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.93 2005/12/05 20:21:25 avenger_teambg Exp $
  *
  */
 
@@ -94,7 +94,8 @@ bool CREImp::Open(DataStream* stream, bool aF)
 		return true;
 	}
 
-	printf( "[CREImporter]: Not a CRE File or File Version not supported: %8.8s\n", Signature );
+	printMessage( "CREImporter"," ",LIGHT_RED);
+	printf("Not a CRE File or File Version not supported: %8.8s\n", Signature );
 	return false;
 }
 
@@ -427,6 +428,7 @@ void CREImp::GetActorPST(Actor *act)
 	act->BaseStats[IE_LEVEL2]=tmpByte;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_LEVEL3]=tmpByte;
+	//this is rumoured to be IE_SEX, but we use the gender field for this
 	str->Read( &tmpByte, 1 );
 	//skipping a byte
 	str->Read( &tmpByte, 1 );
@@ -526,7 +528,7 @@ void CREImp::GetActorPST(Actor *act)
 	str->ReadDword( &ItemsOffset );
 	str->ReadDword( &ItemsCount );
 	str->ReadDword( &EffectsOffset );
-	str->ReadDword( &EffectsCount );
+	str->ReadDword( &EffectsCount ); //also variables
 
 	str->ReadResRef( act->Dialog );
 }
@@ -856,6 +858,7 @@ void CREImp::GetActorBG(Actor *act)
 	act->BaseStats[IE_LEVEL2]=tmpByte;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_LEVEL3]=tmpByte;
+	//this is rumoured to be IE_SEX, but we use the gender field for this
 	str->Read( &tmpByte, 1);
 	//skipping a byte
 	str->Read( &tmpByte, 1);
@@ -1240,7 +1243,7 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	act->BaseStats[IE_LEVEL3]=tmpByte;
 	//this is rumoured to be IE_SEX, but we use the gender field for this
 	str->Read( &tmpByte, 1 ); 
-	//skipping a byte
+	//skipping a byte 
 	str->Read( &tmpByte, 1 ); 
 	act->BaseStats[IE_STR]=tmpByte;
 	str->Read( &tmpByte, 1 ); 
@@ -1356,11 +1359,12 @@ int CREImp::GetStoredFileSize(Actor *actor)
 	EffectsOffset = headersize;
 
 	//adding effects
-	EffectsCount = actor->locals->GetCount();
+	EffectsCount = actor->fxqueue.GetSavedEffectsCount();
+	VariablesCount = actor->locals->GetCount();
 	if (TotSCEFF) {
-		headersize += EffectsCount * 264;
+		headersize += (VariablesCount + EffectsCount) * 264;
 	} else {
-		headersize += EffectsCount * 48;
+		headersize += (VariablesCount + EffectsCount) * 48;
 	}
 	ItemsOffset = headersize;
 
@@ -1685,10 +1689,7 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 		}
 		tmpByte = actor->BaseStats[IE_TRACKING];
 		stream->Write( &tmpByte,1);
-		for (i=0;i<4;i++)
-		{
-			stream->Write( Signature, 8);
-		}
+		stream->Write( filling, 32);
 		for (i=0;i<100;i++) {
 			stream->WriteDword( &actor->StrRefs[i]);
 		}
@@ -1980,14 +1981,73 @@ int CREImp::PutMemorizedSpells(DataStream *stream, Actor *actor)
 }
 int CREImp::PutEffects( DataStream *stream, Actor *actor)
 {
-	char filling[0x268];
+	ieDword index = 0;
+	ieWord tmpWord;
+	ieByte tmpByte;
+	char filling[60];
 
 	memset(filling,0,sizeof(filling) );
-	for(unsigned int i=0;i<EffectsCount-actor->locals->GetCount();i++) {
+	for(unsigned int i=0;i<EffectsCount;i++) {
+		//just for now
+		assert(index<actor->fxqueue.GetEffectsCount() );
+
+		Effect *fx = actor->fxqueue.GetNextSavedEffect(index);
+
 		if (TotSCEFF) {
-			stream->Write( filling, 264);
+			stream->Write( filling,8 ); //signature
+			stream->WriteDword( &fx->Opcode);
+			stream->WriteDword( &fx->Target);
+			stream->WriteDword( &fx->Power);
+			stream->WriteDword( &fx->Parameter1);
+			stream->WriteDword( &fx->Parameter2);
+			stream->WriteDword( &fx->TimingMode);
+			stream->WriteDword( &fx->Duration);
+			stream->WriteWord( &fx->Probability1);
+			stream->WriteWord( &fx->Probability2);
+			stream->Write(fx->Resource, 8);
+			stream->WriteDword( &fx->DiceThrown );
+			stream->WriteDword( &fx->DiceSides );
+			stream->WriteDword( &fx->SavingThrowType );
+			stream->WriteDword( &fx->SavingThrowBonus );
+			//isvariable
+			stream->Write( filling,4 );
+			stream->WriteDword( &fx->PrimaryType );
+			stream->Write( filling,12 );
+			stream->WriteDword( &fx->Resistance );
+			stream->WriteDword( &fx->Parameter3 );
+			stream->WriteDword( &fx->Parameter4 );
+			stream->Write( filling,8 );
+			stream->Write(fx->Resource2, 8);
+			stream->Write(fx->Resource3, 8);
+			stream->Write( filling,20 );
+			stream->Write(fx->Source, 8);
+			stream->Write( filling,52 ); //12+32+8
+			stream->WriteDword( &fx->SecondaryType );
+			stream->Write( filling,60 );
 		} else {
-			stream->Write( filling, 48);
+			tmpWord = (ieWord) fx->Opcode;
+			stream->WriteWord( &tmpWord);
+			tmpByte = (ieByte) fx->Target;
+			stream->Write(&tmpByte,1);
+			tmpByte = (ieByte) fx->Power;
+			stream->Write(&tmpByte,1);
+			stream->WriteDword( &fx->Parameter1);
+			stream->WriteDword( &fx->Parameter2);
+			tmpByte = (ieByte) fx->TimingMode;
+			stream->Write(&tmpByte,1);
+			tmpByte = (ieByte) fx->Resistance;
+			stream->Write(&tmpByte,1);
+			stream->WriteDword( &fx->Duration);
+			tmpByte = (ieByte) fx->Probability1;
+			stream->Write(&tmpByte,1);
+			tmpByte = (ieByte) fx->Probability2;
+			stream->Write(&tmpByte,1);
+			stream->Write(fx->Resource, 8);
+			stream->WriteDword( &fx->DiceThrown );
+			stream->WriteDword( &fx->DiceSides );
+			stream->WriteDword( &fx->SavingThrowType );
+			stream->WriteDword( &fx->SavingThrowBonus );
+			stream->WriteDword( &fx->unknown );
 		}
 	}
 	return 0;
@@ -2001,10 +2061,9 @@ int CREImp::PutVariables( DataStream *stream, Actor *actor)
 	const char *name;
 	ieDword tmpDword, value;
 
-	memset(filling,0,sizeof(filling) );
-	unsigned int VariablesCount = actor->locals->GetCount();
 	for (unsigned int i=0;i<VariablesCount;i++) {
-		actor->locals->GetNextAssoc( pos, name, value);
+		memset(filling,0,sizeof(filling) );
+		pos = actor->locals->GetNextAssoc( pos, name, value);
 		stream->Write(filling,8);
 		tmpDword = FAKE_VARIABLE_OPCODE;
 		stream->WriteDword( &tmpDword);
@@ -2014,7 +2073,7 @@ int CREImp::PutVariables( DataStream *stream, Actor *actor)
 		tmpDword = FAKE_VARIABLE_MARKER;
 		stream->WriteDword( &tmpDword); //variable marker
 		stream->Write( filling, 92); //23 * 4
-		strncpy(filling, name, 32);
+		strnspccpy(filling, name, 32);
 		stream->Write( filling, 104); //32 + 72
 	}
 	return 0;
@@ -2022,6 +2081,7 @@ int CREImp::PutVariables( DataStream *stream, Actor *actor)
 
 int CREImp::PutActor(DataStream *stream, Actor *actor)
 {
+	ieDword tmpDword;
 	int ret;
 
 	if (!stream || !actor) {
@@ -2084,8 +2144,9 @@ int CREImp::PutActor(DataStream *stream, Actor *actor)
 	stream->WriteDword( &ItemsOffset );
 	stream->WriteDword( &ItemsCount );
 	stream->WriteDword( &EffectsOffset );
-	stream->WriteDword( &EffectsCount );
-	stream->WriteResRef( actor->Dialog);
+	tmpDword = EffectsCount+VariablesCount;
+	stream->WriteDword( &tmpDword );
+	stream->WriteResRef( actor->Dialog );
 	//spells, spellbook etc
 
 	ret = PutKnownSpells( stream, actor);

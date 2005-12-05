@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.66 2005/12/04 21:09:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.67 2005/12/05 20:21:26 avenger_teambg Exp $
  *
  */
 
@@ -428,7 +428,6 @@ int GAMImp::GetStoredFileSize(Game *game)
 		headersize +=am->GetStoredFileSize(ac);
 	}
 	NPCOffset = headersize;
-
 
 	NPCCount = game->GetNPCCount();
 	headersize += NPCCount * PCSize;
