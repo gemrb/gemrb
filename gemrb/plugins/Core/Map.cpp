@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.208 2005/11/27 23:21:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.209 2005/12/06 19:53:33 avenger_teambg Exp $
  *
  */
 
@@ -862,6 +862,7 @@ Actor* Map::GetActorByGlobalID(ieDword objectID)
 */
 Actor* Map::GetActor(Point &p, int flags)
 {
+	ieDword gametime = core->GetGame()->GameTime;
 	unsigned int i = actors.size();
 	while (i--) {
 		Actor* actor = actors[i];
@@ -871,8 +872,10 @@ Actor* Map::GetActor(Point &p, int flags)
 		if (!actor->ValidTarget(flags) ) {
 			continue; 
 		}
-		if (actor->IsOver( p ))
-			return actor;
+		if (!actor->Schedule(gametime) ) {
+			continue;
+		}
+		return actor;
 	}
 	return NULL;
 }
@@ -2146,6 +2149,21 @@ Container* Map::AddContainer(const char* Name, unsigned short Type,
 	c->SetMap(this);
 	TMap->AddContainer( c );
 	return c;
+}
+
+int Map::GetCursor( Point &p)
+{
+	if (!IsVisible( p, true ) ) {
+		return IE_CURSOR_BLOCKED;
+	}
+	switch (GetBlocked( p ) & (PATH_MAP_PASSABLE|PATH_MAP_TRAVEL)) {
+		case 0:
+			return IE_CURSOR_BLOCKED;
+		case PATH_MAP_PASSABLE:
+			return IE_CURSOR_WALK;
+		default:
+			return IE_CURSOR_TRAVEL;
+	}
 }
 
 ////////////////////AreaAnimation//////////////////

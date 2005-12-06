@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.269 2005/12/04 21:09:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.270 2005/12/06 19:53:33 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -727,7 +727,6 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	if (ScreenFlags & SF_DISABLEMOUSE) {
 		return;
 	}
-	int nextCursor = IE_CURSOR_NORMAL;
 
 	lastMouseX = x;
 	lastMouseY = y;
@@ -741,20 +740,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	Game* game = core->GetGame();
 	Map* area = game->GetCurrentArea( );
 
-	switch (area->GetBlocked( p ) & (PATH_MAP_PASSABLE|PATH_MAP_TRAVEL)) {
-		case 0:
-			nextCursor = IE_CURSOR_BLOCKED;
-			break;
-
-		case PATH_MAP_PASSABLE:
-			nextCursor = IE_CURSOR_WALK;
-			break;
-
-		case PATH_MAP_TRAVEL:
-		case PATH_MAP_PASSABLE|PATH_MAP_TRAVEL:
-			nextCursor = IE_CURSOR_TRAVEL;
-			break;
-	}
+	int nextCursor = area->GetCursor( p );
 
 	overInfoPoint = area->TMap->GetInfoPoint( p );
 	if (overInfoPoint) {
