@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.271 2005/12/07 20:26:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.272 2005/12/07 20:55:59 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1060,7 +1060,6 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 	ieDword type;
 
 	type = actor->GetStat(IE_EA);
-printf("Type of clicked: %d\n", type);
 	if ( type >= EA_EVILCUTOFF ) {
 		type = 2; //hostile
 	} else if ( type > EA_CHARMED ) {

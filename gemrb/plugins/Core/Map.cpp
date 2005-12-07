@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.210 2005/12/07 20:26:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.211 2005/12/07 20:55:59 avenger_teambg Exp $
  *
  */
 
@@ -594,9 +594,10 @@ void Map::DrawMap(Region screen, GameControl* gc)
 		if (!IsVisible( a->Pos, !(a->Flags & A_ANI_NOT_IN_FOG)) )
 			continue;
 		//maybe we should divide only by 128, so brightening is possible too? In that case use 128,128,128 here
-		Color tint = {255,255,255,(ieByte) a->transparency};
+		Color tint = {255,255,255,255-(ieByte) a->transparency};
 		if ((a->Flags&A_ANI_NO_SHADOW)) {
 			tint = LightMap->GetPixel( a->Pos.x / 16, a->Pos.y / 12);
+			tint.a = 255-(ieByte) a->transparency;
 		}
 		while (animcount--) {
 			Animation *anim = a->animation[animcount];
@@ -731,9 +732,10 @@ void Map::DrawMap(Region screen, GameControl* gc)
 
 		if (!IsVisible( a->Pos, !(a->Flags & A_ANI_NOT_IN_FOG)) )
 			continue;
-		Color tint = {255,255,255,(ieByte) a->transparency};
+		Color tint = {255,255,255,255-(ieByte) a->transparency};
 		if ((a->Flags&A_ANI_NO_SHADOW)) {
 			tint = LightMap->GetPixel( a->Pos.x / 16, a->Pos.y / 12);
+			tint.a = 255-(ieByte) a->transparency;
 		}
 		while (animcount--) {
 			Animation *anim = a->animation[animcount];
