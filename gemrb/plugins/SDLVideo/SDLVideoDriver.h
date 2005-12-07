@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.52 2005/11/22 20:49:40 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.53 2005/12/07 20:27:03 avenger_teambg Exp $
  *
  */
 
@@ -54,6 +54,7 @@ public:
 	int SwapBuffers(void);
 	bool ToggleGrabInput();
 	void MouseMovement(int x, int y);
+	void MoveMouse(unsigned int x, unsigned int y);
 	Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask,
 		ieDword gMask, ieDword bMask, ieDword aMask, void* pixels,
 		bool cK = false, int index = 0);

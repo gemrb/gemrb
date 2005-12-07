@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.50 2005/12/04 21:09:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.51 2005/12/07 20:26:58 avenger_teambg Exp $
  *
  */
 
@@ -179,7 +179,7 @@ void GameScript::ChangeAllegiance(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) scr;
-	actor->SetStat( IE_EA, parameters->int0Parameter );
+	actor->SetBase( IE_EA, parameters->int0Parameter );
 }
 
 void GameScript::ChangeGeneral(Scriptable* Sender, Action* parameters)
@@ -192,7 +192,7 @@ void GameScript::ChangeGeneral(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) scr;
-	actor->SetStat( IE_GENERAL, parameters->int0Parameter );
+	actor->SetBase( IE_GENERAL, parameters->int0Parameter );
 }
 
 void GameScript::ChangeRace(Scriptable* Sender, Action* parameters)
@@ -202,7 +202,7 @@ void GameScript::ChangeRace(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) scr;
-	actor->SetStat( IE_RACE, parameters->int0Parameter );
+	actor->SetBase( IE_RACE, parameters->int0Parameter );
 }
 
 void GameScript::ChangeClass(Scriptable* Sender, Action* parameters)
@@ -212,14 +212,14 @@ void GameScript::ChangeClass(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) scr;
-	actor->SetStat( IE_CLASS, parameters->int0Parameter );
+	actor->SetBase( IE_CLASS, parameters->int0Parameter );
 }
 
 void GameScript::SetNamelessClass(Scriptable* /*Sender*/, Action* parameters)
 {
 	//same as Protagonist
 	Actor* actor = core->GetGame()->FindPC(1);
-	actor->SetStat( IE_CLASS, parameters->int0Parameter );
+	actor->SetBase( IE_CLASS, parameters->int0Parameter );
 }
 
 void GameScript::SetNamelessDisguise(Scriptable* Sender, Action* parameters)
@@ -239,7 +239,7 @@ void GameScript::ChangeSpecifics(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) scr;
-	actor->SetStat( IE_SPECIFIC, parameters->int0Parameter );
+	actor->SetBase( IE_SPECIFIC, parameters->int0Parameter );
 }
 
 void GameScript::ChangeStat(Scriptable* Sender, Action* parameters)
@@ -263,7 +263,7 @@ void GameScript::ChangeGender(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) scr;
-	actor->SetStat( IE_SEX, parameters->int0Parameter );
+	actor->SetBase( IE_SEX, parameters->int0Parameter );
 }
 
 void GameScript::ChangeAlignment(Scriptable* Sender, Action* parameters)
@@ -273,7 +273,7 @@ void GameScript::ChangeAlignment(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) scr;
-	actor->SetStat( IE_ALIGNMENT, parameters->int0Parameter );
+	actor->SetBase( IE_ALIGNMENT, parameters->int0Parameter );
 }
 
 void GameScript::SetFaction(Scriptable* Sender, Action* parameters)
@@ -283,7 +283,7 @@ void GameScript::SetFaction(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) scr;
-	actor->SetStat( IE_FACTION, parameters->int0Parameter );
+	actor->SetBase( IE_FACTION, parameters->int0Parameter );
 }
 
 void GameScript::SetHP(Scriptable* Sender, Action* parameters)
@@ -293,7 +293,7 @@ void GameScript::SetHP(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) scr;
-	actor->SetStat( IE_HITPOINTS, parameters->int0Parameter );
+	actor->SetBase( IE_HITPOINTS, parameters->int0Parameter );
 }
 
 void GameScript::AddHP(Scriptable* Sender, Action* parameters)
@@ -303,7 +303,7 @@ void GameScript::AddHP(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) scr;
-	actor->NewStat( IE_HITPOINTS, parameters->int0Parameter,MOD_ADDITIVE );
+	actor->NewStat( IE_HITPOINTS, parameters->int0Parameter, MOD_ADDITIVE );
 }
 
 void GameScript::SetTeam(Scriptable* Sender, Action* parameters)
@@ -313,7 +313,7 @@ void GameScript::SetTeam(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) scr;
-	actor->SetStat( IE_TEAM, parameters->int0Parameter );
+	actor->SetBase( IE_TEAM, parameters->int0Parameter );
 }
 
 void GameScript::SetTeamBit(Scriptable* Sender, Action* parameters)
@@ -324,9 +324,9 @@ void GameScript::SetTeamBit(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) scr;
 	if (parameters->int0Parameter) {
-		actor->SetStat( IE_TEAM, actor->GetStat(IE_TEAM) | parameters->int0Parameter );
+		actor->SetBase( IE_TEAM, actor->GetStat(IE_TEAM) | parameters->int0Parameter );
 	} else {
-		actor->SetStat( IE_TEAM, actor->GetStat(IE_TEAM) & ~parameters->int0Parameter );
+		actor->SetBase( IE_TEAM, actor->GetStat(IE_TEAM) & ~parameters->int0Parameter );
 	}
 }
 
@@ -617,7 +617,7 @@ void GameScript::Enemy(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->SetStat( IE_EA, EA_ENEMY );
+	actor->SetBase( IE_EA, EA_ENEMY );
 }
 
 void GameScript::Ally(Scriptable* Sender, Action* /*parameters*/)
@@ -626,7 +626,7 @@ void GameScript::Ally(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->SetStat( IE_EA, EA_ALLY );
+	actor->SetBase( IE_EA, EA_ALLY );
 }
 
 /** GemRB extension: you can replace baldur.bcs */
@@ -2015,15 +2015,6 @@ void GameScript::LeaveParty(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor* act = ( Actor* ) Sender;
 	core->GetGame()->LeaveParty( act );
-/* apparently this is handled by script in dplayer3 (or2)
-	if (core->HasFeature( GF_HAS_PDIALOG )) {
-		int pdtable = core->LoadTable( "pdialog" );
-		char* scriptingname = act->GetScriptName();
-		act->SetDialog( core->GetTable( pdtable )->QueryField( scriptingname,
-				"POST_DIALOG_FILE" ) );
-		core->DelTable( pdtable );
-	}
-*/
 	core->GetGUIScriptEngine()->RunFunction( "UpdatePortraitWindow" );
 }
 
@@ -2486,7 +2477,7 @@ void GameScript::SetBeenInPartyFlags(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	//it is bit 15 of the multi-class flags (confirmed)
-	actor->SetStat(IE_MC_FLAGS,actor->GetStat(IE_MC_FLAGS)|MC_BEENINPARTY);
+	actor->SetBase(IE_MC_FLAGS,actor->GetBase(IE_MC_FLAGS)|MC_BEENINPARTY);
 }
 
 /*iwd2 sets the high MC bits this way*/
@@ -2499,7 +2490,7 @@ void GameScript::SetCreatureAreaFlags(Scriptable* Sender, Action* parameters)
 	//confirmed with the invulnerability flag (0x20000)
 	ieDword value=actor->GetStat(IE_MC_FLAGS);
 	HandleBitMod(value, parameters->int0Parameter, parameters->int1Parameter);
-	actor->SetStat(IE_MC_FLAGS,value);
+	actor->SetBase(IE_MC_FLAGS,value);
 }
 
 void GameScript::SetTextColor(Scriptable* /*Sender*/, Action* parameters)
@@ -2534,7 +2525,7 @@ void GameScript::SetVisualRange(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->SetStat(IE_VISUALRANGE,parameters->int0Parameter);
+	actor->SetBase(IE_VISUALRANGE,parameters->int0Parameter);
 }
 
 void GameScript::MakeUnselectable(Scriptable* Sender, Action* parameters)
@@ -2543,7 +2534,7 @@ void GameScript::MakeUnselectable(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->SetStat(IE_UNSELECTABLE,parameters->int0Parameter);
+	actor->SetBase(IE_UNSELECTABLE,parameters->int0Parameter);
 }
 
 void GameScript::Debug(Scriptable* /*Sender*/, Action* parameters)
@@ -2773,7 +2764,7 @@ void GameScript::Kill(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* target = ( Actor* ) tar;
-	target->SetStat(IE_HITPOINTS,0); //probably this is the proper way
+	target->SetBase(IE_HITPOINTS,0); //probably this is the proper way
 }
 
 void GameScript::SetGabber(Scriptable* Sender, Action* parameters)
@@ -2820,7 +2811,7 @@ void GameScript::RemovePaladinHood(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *act = (Actor *) Sender;
-	act->SetStat(IE_MC_FLAGS, act->GetStat(IE_MC_FLAGS) | MC_FALLEN_PALADIN);
+	act->SetBase(IE_MC_FLAGS, act->GetStat(IE_MC_FLAGS) | MC_FALLEN_PALADIN);
 }
 
 void GameScript::RemoveRangerHood(Scriptable* Sender, Action* /*parameters*/)
@@ -2829,7 +2820,7 @@ void GameScript::RemoveRangerHood(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *act = (Actor *) Sender;
-	act->SetStat(IE_MC_FLAGS, act->GetStat(IE_MC_FLAGS) | MC_FALLEN_RANGER);
+	act->SetBase(IE_MC_FLAGS, act->GetStat(IE_MC_FLAGS) | MC_FALLEN_RANGER);
 }
 
 void GameScript::RegainPaladinHood(Scriptable* Sender, Action* /*parameters*/)
@@ -2838,7 +2829,7 @@ void GameScript::RegainPaladinHood(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *act = (Actor *) Sender;
-	act->SetStat(IE_MC_FLAGS, act->GetStat(IE_MC_FLAGS) & ~MC_FALLEN_PALADIN);
+	act->SetBase(IE_MC_FLAGS, act->GetBase(IE_MC_FLAGS) & ~MC_FALLEN_PALADIN);
 }
 
 void GameScript::RegainRangerHood(Scriptable* Sender, Action* /*parameters*/)
@@ -2847,7 +2838,7 @@ void GameScript::RegainRangerHood(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *act = (Actor *) Sender;
-	act->SetStat(IE_MC_FLAGS, act->GetStat(IE_MC_FLAGS) & ~MC_FALLEN_RANGER);
+	act->SetBase(IE_MC_FLAGS, act->GetBase(IE_MC_FLAGS) & ~MC_FALLEN_RANGER);
 }
 
 //transfering item from Sender to target, target must be an actor
@@ -3820,7 +3811,7 @@ void GameScript::SetDialogueRange(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
-	actor->SetStat( IE_DIALOGRANGE, parameters->int0Parameter );
+	actor->SetBase( IE_DIALOGRANGE, parameters->int0Parameter );
 }
 
 void GameScript::SetGlobalTint(Scriptable* /*Sender*/, Action* parameters)
@@ -4077,7 +4068,7 @@ void GameScript::Polymorph(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *act = (Actor *) Sender;
-	act->SetStat(IE_ANIMATION_ID, parameters->int0Parameter);
+	act->SetBase(IE_ANIMATION_ID, parameters->int0Parameter);
 }
 
 void GameScript::PolymorphCopy(Scriptable* Sender, Action* parameters)
@@ -4104,7 +4095,7 @@ void GameScript::PolymorphCopyBase(Scriptable* Sender, Action* parameters)
 	}
 	Actor *act = (Actor *) Sender;
 	Actor *actor = (Actor *) tar;
-	act->SetStat(IE_ANIMATION_ID, actor->GetStat(IE_ANIMATION_ID) );
+	act->SetBase(IE_ANIMATION_ID, actor->GetBase(IE_ANIMATION_ID) );
 }
 
 void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
@@ -4471,4 +4462,9 @@ void GameScript::EnablePortalTravel(Scriptable* Sender, Action* parameters)
 	} else {
 		tar->Trapped&=~2;
 	}
+}
+
+void GameScript::MoveCursorPoint(Scriptable* /*Sender*/, Action* parameters)
+{
+	core->GetVideoDriver()->MoveMouse(parameters->pointParameter.x, parameters->pointParameter.y);
 }

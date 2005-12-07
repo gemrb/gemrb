@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.100 2005/12/01 20:15:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.101 2005/12/07 20:26:58 avenger_teambg Exp $
  *
  */
 
@@ -228,6 +228,7 @@ int Game::LeaveParty (Actor* actor)
 {
 	actor->CreateStats(); //create or update stats for leaving
 	actor->SetBase(IE_EXPLORE, 0);
+	SelectActor(actor, false, SELECT_NORMAL);
 	int slot = InParty( actor );
 	if (slot < 0) {
 		return slot;
@@ -244,12 +245,10 @@ int Game::LeaveParty (Actor* actor)
 	//removing from party, but actor remains in 'game'
 	actor->InParty = 0;
 	actor->InternalFlags|=IF_FROMGAME;
-	//actors leaving team are not selectable anymore
-	SelectActor (actor, false, SELECT_NORMAL);
         if (core->HasFeature( GF_HAS_DPLAYER )) {
                 actor->SetScript( "", SCR_DEFAULT );
         }
-	actor->SetStat( IE_EA, EA_NEUTRAL );
+	actor->SetBase( IE_EA, EA_NEUTRAL );
 	return ( int ) NPCs.size() - 1;
 }
 
@@ -339,8 +338,8 @@ int Game::GetSelectedPCSingle() const
  * actor - either specific actor, or NULL for all
  * select - whether actor(s) should be selected or deselected
  * flags:
- * SELECT_ONE   - if true, deselect all other actors when selecting one
- * SELECT_QUIET - do not run handler if selection was changed. Used for
+ * SELECT_REPLACE - if true, deselect all other actors when selecting one
+ * SELECT_QUIET   - do not run handler if selection was changed. Used for
  * nested calls to SelectActor()
  */
 
@@ -350,22 +349,19 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 
 	// actor was not specified, which means all PCs should be (de)selected
 	if (! actor) {
+		for ( m = selected.begin(); m != selected.end(); ++m) {
+			(*m)->Select( false );
+			(*m)->SetOver( false );
+		}
+
+		selected.clear();
 		if (select) {
-			SelectActor( NULL, false, SELECT_QUIET );
 			for ( m = PCs.begin(); m != PCs.end(); ++m) {
 				if (! *m) {
 					continue;
 				}
 				SelectActor( *m, true, SELECT_QUIET );
 			}
-		}
-		else {
-			for ( m = selected.begin(); m != selected.end(); ++m) {
-				(*m)->Select( false );
-				(*m)->SetOver( false );
-			}
-
-			selected.clear();
 		}
 
 		if (! (flags & SELECT_QUIET)) { 
@@ -800,7 +796,7 @@ void Game::SetReputation(ieDword r)
 	}
 	Reputation = r;
 	for (unsigned int i=0; i<PCs.size(); i++) {
-		PCs[i]->SetStat(IE_REPUTATION, Reputation);
+		PCs[i]->SetBase(IE_REPUTATION, Reputation);
 	}
 }
 

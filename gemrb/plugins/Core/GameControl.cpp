@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.270 2005/12/06 19:53:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.271 2005/12/07 20:26:58 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -789,35 +789,21 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		Actor *lastActor = area->GetActorByGlobalID(lastActorID);
 		if (lastActor)
 			lastActor->SetOver( false );
-		if (!actor) {
-			lastActorID = 0;
-		} else {
+		if (actor) {
 			lastActorID = actor->globalID;
 			actor->SetOver( true );
-		}
-		if (actor) {
-			switch (actor->Modified[IE_EA]) {
-				case EA_PC:
-				case EA_FAMILIAR:
-				case EA_ALLY:
-				case EA_CONTROLLED:
-				case EA_CHARMED:
-				case EA_EVILBUTGREEN:
-					nextCursor = IE_CURSOR_NORMAL;
-					break;
-
-				case EA_ENEMY:
-				case EA_GOODBUTRED:
-					nextCursor = IE_CURSOR_ATTACK;
-					break;
-				default:
-					nextCursor = IE_CURSOR_TALK;
-					break;
+			ieDword type = actor->GetStat(IE_EA);
+			if (type >= EA_EVILCUTOFF) {
+				nextCursor = IE_CURSOR_ATTACK;
+			} else if ( type > EA_CHARMED ) {
+				nextCursor = IE_CURSOR_TALK;
+			} else {
+				nextCursor = IE_CURSOR_NORMAL;
 			}
+		} else {
+			lastActorID = 0;
 		}
-	}
 
-	if (target_mode) {
 		if (target_mode & TARGET_MODE_TALK) {
 			nextCursor = IE_CURSOR_TALK;
 		} else if (target_mode & TARGET_MODE_ATTACK) {
@@ -826,10 +812,9 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			nextCursor = IE_CURSOR_CAST;
 		}
 
-		Actor* actor = area->GetActor( p, action);
 		
 		if (actor) {
-			switch (actor->Modified[IE_EA]) {
+			switch (actor->GetStat(IE_EA)) {
 				case EA_EVILCUTOFF:
 				case EA_GOODCUTOFF:
 					break;
@@ -856,7 +841,6 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			}
 		}
 	}
-
 	if (lastCursor != nextCursor) {
 		( ( Window * ) Owner )->Cursor = nextCursor;
 		lastCursor = nextCursor;
@@ -1073,18 +1057,15 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 	//we got an actor past this point
 
 	//determining the type of the clicked actor
-	int type;
+	ieDword type;
 
 	type = actor->GetStat(IE_EA);
+printf("Type of clicked: %d\n", type);
 	if ( type >= EA_EVILCUTOFF ) {
 		type = 2; //hostile
-	}
-	//can't control GOODBUTBLUE, so: CHARMED
-	//else if ( type > EA_GOODCUTOFF ) {
-	else if ( type > EA_CHARMED ) {
+	} else if ( type > EA_CHARMED ) {
 		type = 1; //neutral
-	}
-	else {
+	} else {
 		type = 0; //party
 	}
 	
@@ -1467,13 +1448,15 @@ void GameControl::InitDialog(Actor* spk, Actor* tgt, const char* dlgref)
 	//and external link, we need to find the new target (whose dialog was
 	//linked to)
 	targetID = tgt->globalID;
-	spk->LastTalkedTo=tgt->GetID();
-	tgt->LastTalkedTo=spk->GetID();
+	spk->LastTalkedTo=targetID;
+	speakerID = spk->globalID;
+	tgt->LastTalkedTo=speakerID;
+
+	//check if we are already in dialog
 	if (DialogueFlags&DF_IN_DIALOG) {
 		return;
 	}
 	UnhideGUI();
-	speakerID = spk->globalID;
 	ScreenFlags |= SF_GUIENABLED|SF_DISABLEMOUSE|SF_CENTERONACTOR|SF_LOCKSCROLL;
 	DialogueFlags |= DF_IN_DIALOG;
 	//allow mouse selection from dialog (even though screen is locked)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.36 2005/12/03 20:48:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.37 2005/12/07 20:26:58 avenger_teambg Exp $
  *
  */
 
@@ -209,8 +209,11 @@ bool StoreHasItemCore(ieResRef storename, ieResRef itemname)
 }
 
 //check if an inventory (container or actor) has item (could be recursive ?)
-bool HasItemCore(Inventory *inventory, ieResRef itemname)
+bool HasItemCore(Inventory *inventory, ieResRef itemname, ieDword flags)
 {
+	if (inventory->HasItem(itemname, flags)) {
+		return true;
+	}
 	int i=inventory->GetSlotCount();
 	while (i--) {
 		//maybe we could speed this up if we mark bag items with a flags bit
@@ -220,13 +223,14 @@ bool HasItemCore(Inventory *inventory, ieResRef itemname)
 		Item *item = core->GetItem(itemslot->ItemResRef);
 		if (!item)
 			continue;
+		bool ret = false;
 		if (item->ItemType==ITM_TYPE_BAG) {
 			//the store is the same as the item's name
-			bool ret = StoreHasItemCore(itemslot->ItemResRef, itemname);
-			core->FreeItem(item, itemslot->ItemResRef);
-			if (ret) {
-				return true;
-			}
+			ret = StoreHasItemCore(itemslot->ItemResRef, itemname);
+		}
+		core->FreeItem(item, itemslot->ItemResRef);
+		if (ret) {
+			return true;
 		}
 	}
 	return false;

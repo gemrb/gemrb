@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.48 2005/11/22 21:21:50 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.49 2005/12/07 20:26:58 avenger_teambg Exp $
  *
  */
 
@@ -142,8 +142,10 @@ public:
 	virtual void SetFadeColor(int r, int g, int b) = 0;
 	/** Sets the Fading to Color Percentage */
 	virtual void SetFadePercent(int percent) = 0;
-	/** Set Clip Rect */
+	/** Set Clip Rectangle */
 	virtual void SetClipRect(Region* clip) = 0;
+	/** move the mouse forcibly */
+	virtual void MoveMouse(unsigned int x, unsigned int y) = 0;
 public:
 	/** Event Manager Pointer */
 	EventMgr* Evnt;

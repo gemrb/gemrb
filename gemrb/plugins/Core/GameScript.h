@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.229 2005/12/04 21:09:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.230 2005/12/07 20:26:58 avenger_teambg Exp $
  *
  */
 
@@ -1088,6 +1088,7 @@ public:
 	static void MoraleSet(Scriptable* Sender, Action* parameters);
 	static void MoveBetweenAreas(Scriptable* Sender, Action* parameters);
 	static void MoveBetweenAreasEffect(Scriptable* Sender, Action* parameters);
+	static void MoveCursorPoint(Scriptable* Sender, Action* parameters);
 	static void MoveGlobal(Scriptable* Sender, Action* parameters);
 	static void MoveGlobalObject(Scriptable* Sender, Action* parameters);
 	static void MoveGlobalObjectOffScreen(Scriptable* Sender, Action* parameters);

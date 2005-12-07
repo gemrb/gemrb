@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.117 2005/11/27 19:32:29 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.118 2005/12/07 20:27:03 avenger_teambg Exp $
  *
  */
 
@@ -2080,4 +2080,10 @@ void SDLVideoDriver::MouseMovement(int x, int y)
 	}
 	if (Evnt)
 		Evnt->MouseMove(x, y);
+}
+
+/* no idea how elaborate this should be*/
+void SDLVideoDriver::MoveMouse(unsigned int x, unsigned int y)
+{
+	SDL_WarpMouse(x,y);
 }

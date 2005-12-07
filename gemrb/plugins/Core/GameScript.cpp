@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.338 2005/12/04 21:09:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.339 2005/12/07 20:26:58 avenger_teambg Exp $
  *
  */
 
@@ -529,6 +529,7 @@ static ActionLink actionnames[] = {
 	{"moraleset", GameScript::MoraleSet, 0},
 	{"movebetweenareas", GameScript::MoveBetweenAreas, 0},
 	{"movebetweenareaseffect", GameScript::MoveBetweenAreas, 0},
+	{"movecursorpoint", GameScript::MoveCursorPoint, 0},//immediate move
 	{"moveglobal", GameScript::MoveGlobal, 0}, 
 	{"moveglobalobject", GameScript::MoveGlobalObject, 0}, 
 	{"moveglobalobjectoffscreen", GameScript::MoveGlobalObjectOffScreen, 0},

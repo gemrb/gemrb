@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.140 2005/12/03 20:48:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.141 2005/12/07 20:26:58 avenger_teambg Exp $
  *
  */
 
@@ -277,8 +277,9 @@ void Actor::SetCircleSize()
 	SetCircle( anims->GetCircleSize(), *color );
 }
 
-void pcf_ea(Actor *actor, ieDword /*Value*/)
+void pcf_ea(Actor *actor, ieDword Value)
 {
+printf("EA changed to %d\n", Value);
 	actor->SetCircleSize();
 }
 
@@ -592,10 +593,11 @@ void Actor::DebugDump()
 		}
 		printf( "Script %d: %s\n", i, poi );
 	}
-	printf( "Area:       %.8s\n", Area );
+	printf( "Area:       %.8s   ", Area );
 	printf( "Dialog:     %.8s\n", Dialog );
+	printf( "Global ID:  %d   Local ID:  %d\n", globalID, localID);
 	printf( "Script name:%.32s\n", scriptName );
-	printf( "TalkCount:  %d\n", TalkCount );
+	printf( "TalkCount:  %d   ", TalkCount );
 	printf( "PartySlot:  %d\n", InParty );
 	printf( "Allegiance: %d   current allegiance:%d\n", BaseStats[IE_EA], Modified[IE_EA] );
 	printf( "Morale:     %d   current morale:%d\n", BaseStats[IE_MORALE], Modified[IE_MORALE] );
@@ -617,9 +619,20 @@ void Actor::DebugDump()
 	core->GetGame()->locals->Lookup("APPEARANCE",tmp);
 	printf( "\nDisguise: %d\n", tmp);
 	printf( "WaitCounter: %d\n", (int) GetWait());
+	printf( "LastTarget: %d %s\n", LastTarget, GetActorNameByID(LastTarget));
+	printf( "LastTalked: %d %s\n", LastTalkedTo, GetActorNameByID(LastTarget));
 	inventory.dump();
 	spellbook.dump();
 	fxqueue.dump();
+}
+
+const char* Actor::GetActorNameByID(ieWord ID)
+{
+	Actor *actor = GetCurrentArea()->GetActorByGlobalID(ID);
+	if (!actor) {
+		return "<NULL>";
+	}
+	return actor->GetScriptName();
 }
 
 void Actor::SetMap(Map *map, ieWord LID, ieWord GID)
@@ -685,8 +698,8 @@ void Actor::Turn(Scriptable *cleric, int turnlevel)
 void Actor::Resurrect()
 {
 	InternalFlags = 0;
-	SetStat(IE_STATE_ID, 0);
-	SetStat(IE_HITPOINTS, 255);
+	SetBase(IE_STATE_ID, 0);
+	SetBase(IE_HITPOINTS, 255);
 	ClearActions();
 	ClearPath();
 	SetStance(IE_ANI_EMERGE);

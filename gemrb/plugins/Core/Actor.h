@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.90 2005/12/05 21:46:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.91 2005/12/07 20:26:58 avenger_teambg Exp $
  *
  */
 
@@ -175,9 +175,10 @@ private:
 	//this stuff don't get saved
 	CharAnimations* anims;
 
-	/* fixes the palette */
+	/** fixes the palette */
 	void SetupColors();
-
+	/** debugging function, gets the scripting name of an actor referenced by a global ID */
+	const char* GetActorNameByID(ieWord ID);
 public:
 	Actor(void);
 	~Actor(void);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.29 2005/12/03 20:48:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.30 2005/12/07 20:26:58 avenger_teambg Exp $
  *
  */
 
@@ -692,10 +692,7 @@ int GameScript::Contains(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Container *cnt = (Container *) tar;
-	if (cnt->inventory.HasItem(parameters->string0Parameter, parameters->int0Parameter) ) {
-		return 1;
-	}
-	if (HasItemCore(&cnt->inventory, parameters->string0Parameter) ) {
+	if (HasItemCore(&cnt->inventory, parameters->string0Parameter, parameters->int0Parameter) ) {
 		return 1;
 	}
 	return 0;
@@ -713,11 +710,19 @@ int GameScript::HasItem(Scriptable* Sender, Trigger* parameters)
 	if ( !scr || scr->Type!=ST_ACTOR) {
 		return 0;
 	}
-	Actor *actor = (Actor *) scr;
-	if (actor->inventory.HasItem(parameters->string0Parameter, parameters->int0Parameter) ) {
-		return 1;
+	Inventory *inventory;
+	switch (scr->Type) {
+		case ST_ACTOR:
+			inventory = &( (Actor *) scr)->inventory;
+			break;
+		case ST_CONTAINER:
+			inventory = &( (Container *) scr)->inventory;
+			break;
+		default:
+			inventory = NULL;
+			break;
 	}
-	if (HasItemCore(&actor->inventory, parameters->string0Parameter) ) {
+	if (HasItemCore(inventory, parameters->string0Parameter, parameters->int0Parameter) ) {
 		return 1;
 	}
 	return 0;
