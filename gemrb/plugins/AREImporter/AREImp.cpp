@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.140 2005/12/12 18:39:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.141 2005/12/12 23:15:09 avenger_teambg Exp $
  *
  */
 
@@ -1232,18 +1232,18 @@ int AREImp::PutDoors( DataStream *stream, Map *map, ieDword &VertIndex)
 		stream->WriteWord( &tmpWord);
 		tmpWord = (ieWord) d->open->BBox.y;
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) d->open->BBox.w;
+		tmpWord = (ieWord) (d->open->BBox.x+d->open->BBox.w);
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) d->open->BBox.h;
+		tmpWord = (ieWord) (d->open->BBox.y+d->open->BBox.h);
 		stream->WriteWord( &tmpWord);
 		//closed bounding box
 		tmpWord = (ieWord) d->closed->BBox.x;
 		stream->WriteWord( &tmpWord);
 		tmpWord = (ieWord) d->closed->BBox.y;
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) d->closed->BBox.w;
+		tmpWord = (ieWord) (d->closed->BBox.x+d->closed->BBox.w);
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) d->closed->BBox.h;
+		tmpWord = (ieWord) (d->closed->BBox.y+d->closed->BBox.h);
 		stream->WriteWord( &tmpWord);
 		//open and closed impeded blocks
 		stream->WriteDword( &VertIndex);
@@ -1386,7 +1386,7 @@ int AREImp::PutContainers( DataStream *stream, Map *map, ieDword &VertIndex)
 		stream->WriteWord( &tmpWord);
 		tmpWord = (ieWord) (c->outline->BBox.x + c->outline->BBox.w);
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) (c->outline->BBox.h + c->outline->BBox.h);
+		tmpWord = (ieWord) (c->outline->BBox.y + c->outline->BBox.h);
 		stream->WriteWord( &tmpWord);
 		//item index and offset
 		tmpDword = c->inventory.GetSlotCount();
@@ -1436,7 +1436,7 @@ int AREImp::PutRegions( DataStream *stream, Map *map, ieDword &VertIndex)
 		stream->WriteWord( &tmpWord);
 		tmpWord = (ieWord) (ip->outline->BBox.x + ip->outline->BBox.w);
 		stream->WriteWord( &tmpWord);
-		tmpWord = (ieWord) (ip->outline->BBox.h + ip->outline->BBox.h);
+		tmpWord = (ieWord) (ip->outline->BBox.y + ip->outline->BBox.h);
 		stream->WriteWord( &tmpWord);
 		tmpWord = (ieWord) ip->outline->count;
 		stream->WriteWord( &tmpWord);
@@ -1561,7 +1561,7 @@ int AREImp::PutActors( DataStream *stream, Map *map)
 		//the original engine used a '*'
 		stream->Write( filling, 8);
 		stream->WriteDword( &CreatureOffset);
-		ieDword CreatureSize = 0;//am->GetStoredFileSize(ac);
+		ieDword CreatureSize = am->GetStoredFileSize(ac);
 		stream->WriteDword( &CreatureSize);
 		CreatureOffset += CreatureSize;
 		PutScript(stream, ac, SCR_AREA);

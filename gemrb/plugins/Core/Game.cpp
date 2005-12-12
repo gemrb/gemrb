@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.102 2005/12/12 18:39:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.103 2005/12/12 23:15:14 avenger_teambg Exp $
  *
  */
 
@@ -29,7 +29,7 @@
 #include "GameControl.h"
 #include "../../includes/strrefs.h"
 
-#define MAX_MAPS_LOADED 2
+#define MAX_MAPS_LOADED 1
 
 Game::Game(void) : Scriptable( ST_GLOBAL )
 {
@@ -245,9 +245,9 @@ int Game::LeaveParty (Actor* actor)
 	actor->SetPersistent(0);
 	NPCs.push_back( actor );
 
-        if (core->HasFeature( GF_HAS_DPLAYER )) {
-                actor->SetScript( "", SCR_DEFAULT );
-        }
+	if (core->HasFeature( GF_HAS_DPLAYER )) {
+		actor->SetScript( "", SCR_DEFAULT );
+	}
 	actor->SetBase( IE_EA, EA_NEUTRAL );
 	return ( int ) NPCs.size() - 1;
 }
@@ -892,9 +892,19 @@ void Game::UpdateScripts()
 {
 	ExecuteScript( Scripts[0] );
 	ProcessActions();
-	for (size_t idx=0;idx<Maps.size();idx++) {
+	size_t idx;
+
+	for (idx=0;idx<Maps.size();idx++) {
 		Maps[idx]->UpdateScripts();
+		DelMap(idx,0);
 	}
+	if (Maps.size()>MAX_MAPS_LOADED) {
+		idx = Maps.size();
+		while (idx--) {
+			DelMap( idx, false );
+		}
+	}
+
 	if (GameTime & 0x10) {
 		if (EveryoneDead()) {
 			//don't check it any more
