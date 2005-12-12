@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.39 2005/12/12 21:12:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.40 2005/12/12 22:03:18 avenger_teambg Exp $
  *
  */
 
@@ -738,13 +738,15 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			break;
 	}
 
-	//maybe we should remove the action queue, but i'm unsure
-	Sender->ReleaseCurrentAction();
 
 	//dialog is not meaningful
 	if (!Dialog || Dialog[0]=='*') {
+		Sender->ReleaseCurrentAction();
 		goto end_of_quest;
 	}
+	//maybe we should remove the action queue, but i'm unsure
+	//no, we shouldn't even call this!
+	//Sender->ReleaseCurrentAction();
 
 	if (speaker!=target) {
 		if (swap) {
@@ -755,6 +757,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			if (!(Flags & BD_INTERRUPT)) {
 				if (tar->GetNextAction()) {
 					core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
+					Sender->ReleaseCurrentAction();
 					goto end_of_quest;
 				}
 			}
