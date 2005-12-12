@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.212 2005/12/12 18:39:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.213 2005/12/12 21:12:50 avenger_teambg Exp $
  *
  */
 
@@ -814,11 +814,9 @@ void Map::AddActor(Actor* actor)
 {
 	//setting the current area for the actor as this one
 	strnuprcpy(actor->Area, scriptName, 8);
-	//0 is reserved for 'no actor'
-	if (!actor->globalID) {
-		++globalActorCounter;
-	}
-	actor->SetMap(this, ++localActorCounter, globalActorCounter);
+	//if actor->globalID was already set, don't change it
+	actor->SetMap(this, ++localActorCounter,
+		actor->globalID?actor->globalID:++globalActorCounter);
 	actors.push_back( actor );
 	//if a visible aggressive actor was put on the map, it is an autopause reason
 	//guess game is always loaded? if not, then we'll crash
