@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/strrefs.h,v 1.12 2005/11/11 21:22:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/strrefs.h,v 1.13 2005/12/12 18:39:57 avenger_teambg Exp $
  *
  */
 
@@ -31,60 +31,61 @@
 #ifndef IE_STRINGS_H
 #define IE_STRINGS_H
 
-#define STR_WHOLEPARTY     0
-#define STR_DOORLOCKED     1
-#define STR_MAGICTRAP      2
-#define STR_NORMALTRAP     3
-#define STR_TRAP           4
-#define STR_CANNOTGO       5
-#define STR_TRAPREMOVED    6
-#define STR_OVERSTOCKED    7
-#define STR_SLEEP          8
-#define STR_AMBUSH         9
-#define STR_CONTLOCKED     10
-#define STR_NOMONEY        11
-#define STR_CURSED         12
-#define STR_SPELLDISRUPT   13
-#define STR_DIED           14
-#define STR_MAYNOTREST     15
-#define STR_CANTRESTMONS   16
-#define STR_CANTSAVEMONS   17
-#define STR_CANTSAVE       18
-#define STR_NODIALOG       19
-#define STR_CANTSAVEDIALOG 20
-#define STR_CANTSAVEDIALOG2 21
-#define STR_CANTSAVEMOVIE   22
-#define STR_TARGETBUSY      23
-#define STR_CANTTALKTRANS   24
-#define STR_GOTGOLD         25
-#define STR_LOSTGOLD        26
-#define STR_GOTXP           27
-#define STR_LOSTXP          28
-#define STR_GOTITEM         29
-#define STR_LOSTITEM        30
-#define STR_GOTREP          31
-#define STR_LOSTREP         32
-#define STR_GOTABILITY      33
-#define STR_GOTSPELL        34
-#define STR_GOTSONG         35
-#define STR_NOTHINGTOSAY    36
-#define STR_JOURNALCHANGE   37
-#define STR_WORLDMAPCHANGE  38
-#define STR_PAUSED          39
-#define STR_UNPAUSED        40
-#define STR_SCRIPTPAUSED    41
-#define STR_AP_UNUSABLE     42
-#define STR_AP_ATTACKED     43
-#define STR_AP_HIT          44
-#define STR_AP_WOUNDED      45
-#define STR_AP_DEAD         46
-#define STR_AP_NOTARGET     47
-#define STR_AP_ENDROUND     48
-#define STR_AP_ENEMY        49
-#define STR_AP_TRAP         50
-#define STR_AP_SPELLCAST    51
-#define STR_AP_RESERVED1    52
-#define STR_AP_RESERVED2    53
-#define STR_AP_RESERVED3    54
-#define STR_AP_RESERVED4    55
+#define STR_SCATTERED      0
+#define STR_WHOLEPARTY     1
+#define STR_DOORLOCKED     2
+#define STR_MAGICTRAP      3
+#define STR_NORMALTRAP     4
+#define STR_TRAP           5
+#define STR_CANNOTGO       6
+#define STR_TRAPREMOVED    7
+#define STR_OVERSTOCKED    8
+#define STR_SLEEP          9
+#define STR_AMBUSH         10
+#define STR_CONTLOCKED     11
+#define STR_NOMONEY        12
+#define STR_CURSED         13
+#define STR_SPELLDISRUPT   14
+#define STR_DIED           15
+#define STR_MAYNOTREST     16
+#define STR_CANTRESTMONS   17
+#define STR_CANTSAVEMONS   18
+#define STR_CANTSAVE       19
+#define STR_NODIALOG       20
+#define STR_CANTSAVEDIALOG 21
+#define STR_CANTSAVEDIALOG2 22
+#define STR_CANTSAVEMOVIE   23
+#define STR_TARGETBUSY      24
+#define STR_CANTTALKTRANS   25
+#define STR_GOTGOLD         26
+#define STR_LOSTGOLD        27
+#define STR_GOTXP           28
+#define STR_LOSTXP          29
+#define STR_GOTITEM         30
+#define STR_LOSTITEM        31
+#define STR_GOTREP          32
+#define STR_LOSTREP         33
+#define STR_GOTABILITY      34
+#define STR_GOTSPELL        35
+#define STR_GOTSONG         36
+#define STR_NOTHINGTOSAY    37
+#define STR_JOURNALCHANGE   38
+#define STR_WORLDMAPCHANGE  39
+#define STR_PAUSED          40
+#define STR_UNPAUSED        41
+#define STR_SCRIPTPAUSED    42
+#define STR_AP_UNUSABLE     43
+#define STR_AP_ATTACKED     44
+#define STR_AP_HIT          45
+#define STR_AP_WOUNDED      46
+#define STR_AP_DEAD         47
+#define STR_AP_NOTARGET     48
+#define STR_AP_ENDROUND     49
+#define STR_AP_ENEMY        50
+#define STR_AP_TRAP         51
+#define STR_AP_SPELLCAST    52
+#define STR_AP_RESERVED1    53
+#define STR_AP_RESERVED2    54
+#define STR_AP_RESERVED3    55
+#define STR_AP_RESERVED4    56
 #endif //! IE_STRINGS_H

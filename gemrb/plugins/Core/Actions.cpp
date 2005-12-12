@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.51 2005/12/07 20:26:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.52 2005/12/12 18:39:54 avenger_teambg Exp $
  *
  */
 
@@ -595,16 +595,22 @@ void GameScript::StartCutScene(Scriptable* Sender, Action* parameters)
 	gs->MySelf = Sender;
 	gs->EvaluateAllBlocks();
 	delete( gs );
+	Sender->SetCutsceneID(NULL);
+/*
 	Sender->Active &= ~SCR_CUTSCENEID;
 	Sender->CutSceneId = NULL;
+*/
 }
 
 void GameScript::CutSceneID(Scriptable* Sender, Action* parameters)
 {
+/*
 	Sender->CutSceneId = GetActorFromObject( Sender, parameters->objects[1]);
 	Sender->Active|=SCR_CUTSCENEID;
+*/
+	Sender->SetCutsceneID( GetActorFromObject( Sender, parameters->objects[1] ) );
 	if (InDebug&ID_CUTSCENE) {
-		if (!Sender->CutSceneId) {
+		if (!Sender->GetCutsceneID()) {
 			printMessage("GameScript","Failed to set CutSceneID!\n",YELLOW);
 			parameters->objects[1]->Dump();
 		}
@@ -787,8 +793,7 @@ void GameScript::MoveToPointNoRecticle(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->InternalFlags|=IF_NORECTICLE;
-	actor->WalkTo( parameters->pointParameter );
+	actor->WalkTo( parameters->pointParameter, IF_NORECTICLE, 0 );
 	Sender->ReleaseCurrentAction();
 }
 
@@ -799,8 +804,29 @@ void GameScript::MoveToPointNoInterrupt(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->InternalFlags|=IF_NOINT;
-	actor->WalkTo( parameters->pointParameter );
+	actor->WalkTo( parameters->pointParameter, IF_NOINT, 0 );
+	Sender->ReleaseCurrentAction();
+}
+
+void GameScript::RunToPointNoRecticle(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	actor->WalkTo( parameters->pointParameter, IF_NORECTICLE|IF_RUNNING, 0 );
+	Sender->ReleaseCurrentAction();
+}
+
+void GameScript::RunToPoint(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	actor->WalkTo( parameters->pointParameter, IF_RUNNING, 0 );
 	Sender->ReleaseCurrentAction();
 }
 
@@ -811,7 +837,7 @@ void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->WalkTo( parameters->pointParameter );
+	actor->WalkTo( parameters->pointParameter, 0 );
 	Sender->ReleaseCurrentAction();
 }
 /** this function extends bg2: movetosavedlocationn (sic), */
@@ -834,7 +860,28 @@ void GameScript::MoveToSavedLocation(Scriptable* Sender, Action* parameters)
 	parameters->pointParameter.x = *(unsigned short *) &value;
 	parameters->pointParameter.y = *(((unsigned short *) &value)+1);
 	Actor* actor = ( Actor* ) tar;
-	actor->WalkTo( parameters->pointParameter );
+	actor->WalkTo( parameters->pointParameter, 0, 0 );
+}
+
+//PST
+void GameScript::RunToSavedLocation(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		tar = Sender;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return;
+	}
+	
+	if (!parameters->string0Parameter[0]) {
+		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
+	}
+	ieDword value = (ieDword) CheckVariable( Sender, parameters->string0Parameter );
+	parameters->pointParameter.x = *(unsigned short *) &value;
+	parameters->pointParameter.y = *(((unsigned short *) &value)+1);
+	Actor* actor = ( Actor* ) tar;
+	actor->WalkTo( parameters->pointParameter, IF_RUNNING, 0 );
 }
 
 void GameScript::MoveToSavedLocationDelete(Scriptable* Sender, Action* parameters)
@@ -855,38 +902,22 @@ void GameScript::MoveToSavedLocationDelete(Scriptable* Sender, Action* parameter
 	parameters->pointParameter.x = *(unsigned short *) &value;
 	parameters->pointParameter.y = *(((unsigned short *) &value)+1);
 	Actor* actor = ( Actor* ) tar;
-	actor->WalkTo( parameters->pointParameter );
+	actor->WalkTo( parameters->pointParameter, 0, 0 );
 }
 
 void GameScript::MoveToObjectNoInterrupt(Scriptable* Sender, Action* parameters)
 {
-	if (Sender->Type != ST_ACTOR) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!target) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-	Actor* actor = ( Actor* ) Sender;
-	actor->InternalFlags|=IF_NOINT;
-	actor->WalkTo( target->Pos );
+	MoveToObjectCore(Sender, parameters, IF_NOINT);
+}
+
+void GameScript::RunToObject(Scriptable* Sender, Action* parameters)
+{
+	MoveToObjectCore(Sender, parameters, IF_RUNNING);
 }
 
 void GameScript::MoveToObject(Scriptable* Sender, Action* parameters)
 {
-	if (Sender->Type != ST_ACTOR) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!target) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-	Actor* actor = ( Actor* ) Sender;
-	actor->WalkTo( target->Pos );
+	MoveToObjectCore(Sender, parameters, 0);
 }
 
 void GameScript::MoveToObjectFollow(Scriptable* Sender, Action* parameters)
@@ -906,7 +937,7 @@ void GameScript::MoveToObjectFollow(Scriptable* Sender, Action* parameters)
 	if (target->Type==ST_ACTOR) {
 		actor->SetLeader( (Actor *) target, 5);
 	}
-	actor->WalkTo( target->Pos, 5 );
+	actor->WalkTo( target->Pos, 0, 5 );
 }
 
 void GameScript::StorePartyLocation(Scriptable* /*Sender*/, Action* /*parameters*/)
@@ -950,7 +981,7 @@ void GameScript::MoveToCenterOfScreen(Scriptable* Sender, Action* /*parameters*/
 	Region vp = core->GetVideoDriver()->GetViewport();
 	Actor* actor = ( Actor* ) Sender;
 	Point p(vp.x+vp.w/2, vp.y+vp.h/2);
-	actor->WalkTo( p );
+	actor->WalkTo( p, IF_NOINT, 0 );
 }
 
 void GameScript::MoveToOffset(Scriptable* Sender, Action* parameters)
@@ -961,7 +992,7 @@ void GameScript::MoveToOffset(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	Point p(Sender->Pos.x+parameters->pointParameter.x, Sender->Pos.y+parameters->pointParameter.y);
-	actor->WalkTo( p );
+	actor->WalkTo( p, 0, 0 );
 }
 
 void GameScript::RunAwayFrom(Scriptable* Sender, Action* parameters)
@@ -991,7 +1022,8 @@ void GameScript::RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	actor->InternalFlags|=IF_NOINT;
+	//actor->InternalFlags|=IF_NOINT;
+	actor->NoInterrupt();
 	actor->RunAwayFrom( tar->Pos, parameters->int0Parameter, false);
 }
 
@@ -1248,7 +1280,8 @@ void GameScript::DestroySelf(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Sender->ClearActions();
 	Actor* actor = ( Actor* ) Sender;
-	actor->InternalFlags |= IF_CLEANUP;
+	actor->DestroySelf();
+	//actor->InternalFlags |= IF_CLEANUP;
 }
 
 void GameScript::ScreenShake(Scriptable* Sender, Action* parameters)
@@ -1786,7 +1819,8 @@ void GameScript::Deactivate(Scriptable* Sender, Action* parameters)
 	if (tar->Type != ST_ACTOR) {
 		return;
 	}
-	tar->Active &=~(SCR_ACTIVE|SCR_VISIBLE);
+	tar->Hide();
+	//tar->Active &=~(SCR_ACTIVE|SCR_VISIBLE);
 }
 
 void GameScript::MakeGlobal(Scriptable* Sender, Action* /*parameters*/)
@@ -2026,9 +2060,9 @@ void GameScript::HideCreature(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if ( parameters->int0Parameter != 0 ) {
-		tar->Active |= SCR_ACTIVE|SCR_VISIBLE;
+		tar->Unhide();
 	} else {
-		tar->Active &=~SCR_VISIBLE;
+		tar->Hide();
 	}
 }
 
@@ -2039,7 +2073,8 @@ void GameScript::Activate(Scriptable* Sender, Action* parameters)
 	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
-	tar->Active |= SCR_VISIBLE;
+	tar->Activate();
+	//tar->Active |= SCR_VISIBLE;
 }
 
 void GameScript::ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters)
@@ -2142,7 +2177,8 @@ void GameScript::PlayDead(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	actor->SetStance( IE_ANI_DIE );
-	actor->InternalFlags|=IF_NOINT;
+	actor->NoInterrupt();
+	//actor->InternalFlags|=IF_NOINT;
 	actor->playDeadCounter = parameters->int0Parameter;
 	actor->SetWait( parameters->int0Parameter );
 }
@@ -3724,7 +3760,7 @@ void GameScript::RestParty(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	game->AdvanceTime(7200);
+	game->AdvanceTime(2400); //8 hours
 	//HP set to 1 means HP will be recovered
 	int i = game->GetPartySize(false);
 	while (i--) {

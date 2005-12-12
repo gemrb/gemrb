@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.91 2005/12/07 20:26:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.92 2005/12/12 18:39:54 avenger_teambg Exp $
  *
  */
 
@@ -69,16 +69,6 @@ class SpriteCover;
 #define MOD_ABSOLUTE  1
 #define MOD_PERCENT   2
 
-//internal actor flags
-#define IF_GIVEXP     1     //give xp for this death
-#define IF_JUSTDIED   2     //Died() will return true
-#define IF_FROMGAME   4     //this is an NPC or PC
-#define IF_REALLYDIED 8     //real death happened, actor will be set to dead
-#define IF_NORECTICLE 16    //draw recticle (target mark)
-#define IF_NOINT      32    //cannot interrupt the actions of this actor (save is not possible!)
-#define IF_CLEANUP    64    //actor died chunky death, or other total destruction
-#define IF_BECAMEVISIBLE 128//actor just became visible
-
 /** flags for GetActor */
 //default action
 #define GA_DEFAULT  0
@@ -129,7 +119,7 @@ public:
 	ieResRef SmallPortrait;
 	ieResRef LargePortrait;
 	/** 0: NPC, 1-8 party slot */
-	unsigned char InParty;
+	ieByte InParty;
 	char* LongName, * ShortName;
 	ieStrRef ShortStrRef, LongStrRef;
 	ieStrRef StrRefs[100];
@@ -292,8 +282,12 @@ public:
 	void DropItem(ieResRef resref, unsigned int flags);
 	/* returns true if the actor is PC/joinable*/
 	bool Persistent();
+	/* assigns actor to party slot, 0 = NPC, areas won't remove it */
+	void SetPersistent(int partyslot);
 	/* resurrects actor */
 	void Resurrect();
+	/* removes actor in the next update cycle */
+	void DestroySelf();
 	/* schedules actor to die */
 	void Die(Scriptable *killer);
 	/* debug function */
@@ -321,7 +315,7 @@ public:
 	void RemoveTimedEffects();
 	bool Schedule(ieDword gametime);
 	/* overridden method, won't walk if dead */
-	void WalkTo(Point &Des, int MinDistance = 0);
+	void WalkTo(Point &Des, ieDword flags, int MinDistance = 0);
 	/* re/draws overhead text on the map screen */
 	void DrawOverheadText(Region &screen);
 	/* resolve string constant */

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.71 2005/12/04 21:09:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.72 2005/12/12 18:39:54 avenger_teambg Exp $
  *
  */
 
@@ -48,6 +48,9 @@ class Game;
 #include "Actor.h"
 #include "Map.h"
 #include "Variables.h"
+
+//for global triggers
+#define IF_PARTYRESTED 1
 
 //joinparty flags
 #define JP_JOIN     1  //refresh join time
@@ -305,6 +308,8 @@ public:
 	/** Runs the script engine on the global script and the area scripts 
             areas run scripts on door, infopoint, container, actors too */
 	void UpdateScripts();
+	/** runs area functionality, sets partyrested trigger */
+	void RestParty(bool noareacheck);
 	/** Dumps information about the object */
 	void DebugDump();
 };

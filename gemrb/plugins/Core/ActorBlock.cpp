@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.124 2005/11/26 20:33:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.125 2005/12/12 18:39:54 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -55,7 +55,7 @@ Scriptable::Scriptable(ScriptableType type)
 	interval = ( 1000 / AI_UPDATE_TIME );
 	WaitCounter = 0;
 	playDeadCounter = 0;
-	Active = SCR_ACTIVE | SCR_VISIBLE | SCR_ONCREATION;
+	InternalFlags = IF_ACTIVE | IF_VISIBLE | IF_ONCREATION;
 	area = 0;
 	Pos.x = 0;
 	Pos.y = 0;
@@ -173,7 +173,7 @@ void Scriptable::AddAction(Action* aC)
 		printf( "[GameScript]: NULL action encountered for %s!\n",scriptName );
 		return;
 	}
-	Active|=SCR_ACTIVE;
+	InternalFlags|=IF_ACTIVE;
 	actionQueue.push_back( aC );
 	aC->IncRef();
 }
@@ -184,7 +184,7 @@ void Scriptable::AddActionInFront(Action* aC)
 		printf( "[GameScript]: NULL action encountered for %s!\n",scriptName );
 		return;
 	}
-	Active|=SCR_ACTIVE;
+	InternalFlags|=IF_ACTIVE;
 	actionQueue.push_front( aC );
 	aC->IncRef();
 }
@@ -295,6 +295,53 @@ unsigned long Scriptable::GetWait()
 	return WaitCounter;
 }
 
+Scriptable *Scriptable::GetCutsceneID()
+{
+	return CutSceneId;
+}
+
+void Scriptable::SetCutsceneID(Scriptable *csid)
+{
+	CutSceneId=csid;
+	if (csid) {
+		InternalFlags &= IF_CUTSCENEID;
+	} else {
+		InternalFlags |= IF_CUTSCENEID;
+	}
+}
+
+void Scriptable::Deactivate()
+{
+	InternalFlags &=~IF_ACTIVE;
+}
+
+void Scriptable::Hide()
+{
+	InternalFlags &=~(IF_ACTIVE|IF_VISIBLE);
+}
+
+void Scriptable::Unhide()
+{
+	InternalFlags |= IF_ACTIVE|IF_VISIBLE;
+}
+
+void Scriptable::NoInterrupt()
+{
+	InternalFlags |= IF_NOINT;
+}
+
+//turning off the not interruptable flag, actions should reenable it themselves
+void Scriptable::Activate()
+{
+	InternalFlags |= IF_ACTIVE;
+	InternalFlags &= ~IF_NOINT;
+}
+
+ieDword Scriptable::GetInternalFlag()
+{
+	return InternalFlags;
+}
+
 void Scriptable::InitTriggers()
 {
 	tolist.clear();
@@ -307,10 +354,16 @@ void Scriptable::ClearTriggers()
 		*(*m) = 0;
 	}
 	if (bittriggers & BT_DIE) {
-		((Actor *) this)->InternalFlags&=~IF_JUSTDIED;
+		InternalFlags&=~IF_JUSTDIED;
 	}
 	if (bittriggers & BT_ONCREATION) {
-		Active &= ~SCR_ONCREATION;
+		 InternalFlags &= ~IF_ONCREATION;
+	}
+	if (bittriggers & BT_BECAMEVISIBLE) {
+		 InternalFlags &= ~IF_BECAMEVISIBLE;
+	}
+	if (bittriggers & BT_PARTYRESTED) {
+		 InternalFlags &= ~IF_PARTYRESTED;
 	}
 }
 
@@ -703,7 +756,6 @@ Door::Door(TileOverlay* Overlay)
 	overlay = Overlay;
 	LinkedInfo[0] = 0;
 	OpenStrRef = (ieDword) -1;
-	InternalFlags = 0;
 }
 
 Door::~Door(void)
@@ -1025,7 +1077,7 @@ void InfoPoint::DebugDump()
 		name = Scripts[0]->GetName();
 	}
 	printf( "Script: %s, Key: %s, Dialog: %s\n", name, KeyResRef, DialogResRef );
-	printf( "Active: %s\n", YESNO(Active));
+	printf( "Active: %s\n", YESNO(InternalFlags&IF_ACTIVE));
 }
 
 /*******************

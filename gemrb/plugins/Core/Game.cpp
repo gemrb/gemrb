@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.101 2005/12/07 20:26:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.102 2005/12/12 18:39:54 avenger_teambg Exp $
  *
  */
 
@@ -235,7 +235,6 @@ int Game::LeaveParty (Actor* actor)
 	}
 	std::vector< Actor*>::iterator m = PCs.begin() + slot;
 	PCs.erase( m );
-	NPCs.push_back( actor );
 	
 	for ( m = PCs.begin(); m != PCs.end(); ++m) {
 		if ( (*m)->InParty>actor->InParty) {
@@ -243,8 +242,9 @@ int Game::LeaveParty (Actor* actor)
 		}
 	}
 	//removing from party, but actor remains in 'game'
-	actor->InParty = 0;
-	actor->InternalFlags|=IF_FROMGAME;
+	actor->SetPersistent(0);
+	NPCs.push_back( actor );
+
         if (core->HasFeature( GF_HAS_DPLAYER )) {
                 actor->SetScript( "", SCR_DEFAULT );
         }
@@ -584,8 +584,9 @@ int Game::AddNPC(Actor* npc)
 	if (slot != -1) {
 		return -1;
 	} //can't add as npc already in party
-	npc->InternalFlags|=IF_FROMGAME;
+	npc->SetPersistent(0);
 	NPCs.push_back( npc );
+
 	return NPCs.size() - 1;
 }
 
@@ -765,7 +766,7 @@ bool Game::EveryoneNearPoint(Map *area, Point &p, int flags) const
 int Game::PartyMemberDied() const
 {
 	for (unsigned int i=0; i<PCs.size(); i++) {
-		if (PCs[i]->InternalFlags&IF_JUSTDIED) {
+		if (PCs[i]->GetInternalFlag()&IF_JUSTDIED) {
 			return i;
 		}
 	}
@@ -921,6 +922,24 @@ void Game::SetPartySize(int size)
 		return;
 	}
 	partysize = (size_t) size;
+}
+
+//noareacheck = no random encounters
+void Game::RestParty(bool noareacheck)
+{
+	Point p = GetPC(0,false)->Pos;
+	Map *area = GetCurrentArea();
+	//we let them rest if someone is paralyzed, but the others gather around
+	if (!EveryoneNearPoint( area, p, 0 ) ) {
+		//party too scattered
+		core->DisplayConstantString( STR_SCATTERED, 0xff0000 );
+		return;
+	}
+	//rest check, if PartyRested should be set, area should return true
+	//area should advance gametime too (so partial rest is possible)
+	if (noareacheck || area->Rest( p, 8, GameTime%7200/3600) ) {
+		InternalFlags |= IF_PARTYRESTED;
+	}
 }
 
 void Game::DebugDump()

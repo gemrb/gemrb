@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.37 2005/12/07 20:26:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.38 2005/12/12 18:39:54 avenger_teambg Exp $
  *
  */
 
@@ -300,7 +300,7 @@ int ValidForDialogCore(Scriptable* Sender, Actor *target)
 		return 0;
 	}
 	
-	if (target->InternalFlags&IF_REALLYDIED) {
+	if (target->GetInternalFlag()&IF_REALLYDIED) {
 		return 0;
 	}
 	//we should rather use STATE_SPEECHLESS_MASK
@@ -479,11 +479,11 @@ Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC)
 /*FIXME: what is 'base'*/
 void PolymorphCopyCore(Actor *src, Actor *tar, bool base)
 {
-	tar->SetStat(IE_ANIMATION_ID, src->GetStat(IE_ANIMATION_ID) );
+	tar->SetBase(IE_ANIMATION_ID, src->GetStat(IE_ANIMATION_ID) );
 	if (!base) {
-		tar->SetStat(IE_ARMOR_TYPE, src->GetStat(IE_ARMOR_TYPE) );
+		tar->SetBase(IE_ARMOR_TYPE, src->GetStat(IE_ARMOR_TYPE) );
 		for (int i=0;i<7;i++) {
-			tar->SetStat(IE_COLORS+i, src->GetStat(IE_COLORS+i) );
+			tar->SetBase(IE_COLORS+i, src->GetStat(IE_COLORS+i) );
 		}
 	}
 	//add more attribute copying
@@ -563,6 +563,7 @@ void CreateVisualEffectCore(Scriptable *Sender, Point &position, const char *eff
 	}
 }
 
+//this destroys the current actor and replaces it with another
 void ChangeAnimationCore(Actor *src, const char *resref, bool effect)
 {
 	DataStream* ds = core->GetResourceMgr()->GetResource( resref, IE_CRE_CLASS_ID );
@@ -572,8 +573,7 @@ void ChangeAnimationCore(Actor *src, const char *resref, bool effect)
 		tar->SetPosition(map, src->Pos, 1);
 		tar->SetOrientation(src->GetOrientation(), false );
 		map->AddActor( tar );
-
-		src->InternalFlags|=IF_CLEANUP;
+		src->DestroySelf();
 		if (effect) {
 			CreateVisualEffectCore(tar, tar->Pos,"smokepuffeffect");
 		}
@@ -813,6 +813,21 @@ void MoveBetweenAreasCore(Actor* actor, const char *area, Point &position, int f
 	}
 	GameControl *gc=core->GetGameControl();
 	gc->SetScreenFlags(SF_CENTERONACTOR,BM_OR);
+}
+
+void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags)
+{
+	if (Sender->Type != ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!target) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	actor->WalkTo( target->Pos, flags, 0 );
 }
 
 //It is possible to attack CONTAINERS/DOORS as well!!!
@@ -1627,17 +1642,17 @@ int DiffCore(ieDword a, ieDword b, int diffmode)
 
 Targets *GetMyTarget(Scriptable *Sender, Actor *actor, Targets *parameters)
 {
-        if (!actor) {
-                if (Sender->Type==ST_ACTOR) {
-                        actor = (Actor *) Sender;
-                }
-        }
-        parameters->Clear();
-        if (actor) {
-                Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastTarget);
-                if (target) {
-                        parameters->AddTarget(target, 0);
-                }
-        }
-        return parameters;
+	if (!actor) {
+		if (Sender->Type==ST_ACTOR) {
+			actor = (Actor *) Sender;
+		}
+	}
+	parameters->Clear();
+	if (actor) {
+		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastTarget);
+		if (target) {
+			parameters->AddTarget(target, 0);
+		}
+	}
+	return parameters;
 }

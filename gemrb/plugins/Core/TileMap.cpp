@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.49 2005/11/24 17:44:09 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.50 2005/12/12 18:39:55 avenger_teambg Exp $
  *
  */
 
@@ -444,7 +444,7 @@ InfoPoint* TileMap::AddInfoPoint(const char* Name, unsigned short Type,
 			break;
 	}
 	ip->outline = outline;
-	ip->Active = true;
+	//ip->Active = true; //set active on creation
 	infoPoints.push_back( ip );
 	return ip;
 }
@@ -457,7 +457,7 @@ InfoPoint* TileMap::GetInfoPoint(Point &p)
 		if (ip->Flags&(INFO_DOOR|TRAP_DEACTIVATED) )
 			continue;
 
-		if (!ip->Active)
+		if (!(ip->GetInternalFlag()&IF_ACTIVE))
 			continue;
 		if (ip->outline->BBox.x > p.x)
 			continue;

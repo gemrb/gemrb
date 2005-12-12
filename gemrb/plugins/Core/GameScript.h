@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.230 2005/12/07 20:26:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.231 2005/12/12 18:39:54 avenger_teambg Exp $
  *
  */
 
@@ -1159,6 +1159,10 @@ public:
 	static void RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters);
 	static void RunningAttack(Scriptable* Sender, Action* parameters);
 	static void RunningAttackNoSound(Scriptable* Sender, Action* parameters);
+	static void RunToObject(Scriptable* Sender, Action* parameters);
+	static void RunToPoint(Scriptable* Sender, Action* parameters);
+	static void RunToPointNoRecticle(Scriptable* Sender, Action* parameters);
+	static void RunToSavedLocation(Scriptable* Sender, Action* parameters);
 	static void SaveGame(Scriptable* Sender, Action* parameters);
 	static void SaveLocation(Scriptable* Sender, Action* parameters);
 	static void SaveObjectLocation(Scriptable* Sender, Action* parameters);

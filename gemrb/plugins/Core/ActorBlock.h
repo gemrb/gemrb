@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.95 2005/11/26 20:33:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.96 2005/12/12 18:39:54 avenger_teambg Exp $
  *
  */
 
@@ -88,11 +88,23 @@ class Gem_Polygon;
 #define CONT_RESET       8
 #define CONT_DISABLED    32
 
+//internal actor flags
+#define IF_GIVEXP     1     //give xp for this death
+#define IF_JUSTDIED   2     //Died() will return true
+#define IF_FROMGAME   4     //this is an NPC or PC
+#define IF_REALLYDIED 8     //real death happened, actor will be set to dead
+#define IF_NORECTICLE 16    //draw recticle (target mark)
+#define IF_NOINT      32    //cannot interrupt the actions of this actor (save is not possible!)
+#define IF_CLEANUP    64    //actor died chunky death, or other total destruction
+#define IF_RUNNING    128   //actor is running
+//these bits could be set by a WalkTo
+#define IF_RUNFLAGS   (IF_RUNNING|IF_NORECTICLE|IF_NOINT)
+#define IF_BECAMEVISIBLE 0x100//actor just became visible
 //scriptable flags
-#define SCR_ACTIVE        1
-#define SCR_CUTSCENEID    2
-#define SCR_VISIBLE       4
-#define SCR_ONCREATION    8
+#define IF_ACTIVE        0x1000
+#define IF_CUTSCENEID    0x2000
+#define IF_VISIBLE       0x4000
+#define IF_ONCREATION    0x8000
 
 //CheckTravel return value
 #define CT_CANTMOVE       0 //inactive
@@ -106,6 +118,9 @@ class Gem_Polygon;
 #define BT_DIE            1
 #define BT_ONCREATION     2
 #define BT_BECAMEVISIBLE  4
+
+//global bittriggers (set in game)
+#define BT_PARTYRESTED    0x10000
 
 #ifdef WIN32
 
@@ -140,16 +155,16 @@ private:
 protected: //let Actor access this
 	Map *area;
 	char scriptName[33];
+	ieDword InternalFlags; //for triggers
+	Scriptable* CutSceneId;
 public:
 	Variables* locals;
 	ScriptableType Type;
 	Point Pos;
-	Scriptable* CutSceneId;
 	GameScript* Scripts[MAX_SCRIPTS];
 	char* overHeadText;
 	unsigned char textDisplaying;
 	unsigned long timeStartDisplaying;
-	ieDword Active;
 	ieDword LastTrigger;
 	ieDword LastEntered;
 	std::list< Action*> actionQueue;
@@ -159,6 +174,14 @@ public:
 	void SetScript(ieResRef aScript, int idx);
 	void SetWait(unsigned long time);
 	unsigned long GetWait();
+	Scriptable *GetCutsceneID();
+	void SetCutsceneID(Scriptable *csid);
+	void NoInterrupt();
+	void Hide();
+	void Unhide();
+	void Activate();
+	void Deactivate();
+	ieDword GetInternalFlag();
 	char* GetScriptName();
 	Map* GetCurrentArea();
 	void SetMap(Map *map);
@@ -252,7 +275,6 @@ public:
 	PathNode* step;
 	unsigned long timeStartStep;
 	Sprite2D* lastFrame;
-	int InternalFlags;
 	ieResRef Area;
 public:
 //inliners to protect data consistency
@@ -346,7 +368,6 @@ public:
 	ieStrRef OpenStrRef;
 	ieStrRef NameStrRef;
 	ieResRef Dialog;
-	ieDword InternalFlags; //for triggers
 private:
 	void ToggleTiles(int State, bool playsound = false);
 	void UpdateDoor();

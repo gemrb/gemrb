@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.139 2005/11/27 21:03:18 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.140 2005/12/12 18:39:53 avenger_teambg Exp $
  *
  */
 
@@ -743,7 +743,9 @@ Map* AREImp::GetMap(const char *ResRef)
 			ab->TalkCount = TalkCount;
 			//maybe there is a flag (deactivate), but 
 			//right now we just set this
-			ab->Active = SCR_VISIBLE;
+			//it is automatically enabled, we should disable it
+			//if required
+			//ab->Active = SCR_VISIBLE;
 		}
 		core->FreeInterface( actmgr );
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.272 2005/12/07 20:55:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.273 2005/12/12 18:39:54 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -356,7 +356,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			infoTexts[i]->textDisplaying = 0;
 			std::vector< Scriptable*>::iterator m;
 			m = infoTexts.begin() + i;
-			( *m )->CutSceneId->textDisplaying = 0;
+			( *m )->GetCutsceneID()->textDisplaying = 0;
 			delete( *m );
 			infoTexts.erase( m );
 			i--;
@@ -1425,7 +1425,7 @@ void GameControl::ResizeAdd(Window* win, unsigned char type)
 
 void GameControl::InitDialog(Actor* spk, Actor* tgt, const char* dlgref)
 {
-	if (tgt->InternalFlags&IF_NOINT) {
+	if (tgt->GetInternalFlag()&IF_NOINT) {
 		core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
 		return;
 	}
@@ -1695,7 +1695,7 @@ void GameControl::DisplayString(Point &p, const char *Text)
 	scr->textDisplaying = 1;
 	scr->timeStartDisplaying = 0;
 	scr->Pos = p;
-	scr->CutSceneId = NULL;
+	scr->SetCutsceneID( NULL );
 	infoTexts.push_back( scr );
 }
 
@@ -1708,7 +1708,7 @@ void GameControl::DisplayString(Scriptable* target)
 	scr->textDisplaying = 1;
 	scr->timeStartDisplaying = target->timeStartDisplaying;
 	scr->Pos = target->Pos;
-	scr->CutSceneId = target;
+	scr->SetCutsceneID( target );
 	infoTexts.push_back( scr );
 }
 
@@ -1733,10 +1733,15 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 		}
 		Map *map = game->GetMap( areaname, true );
 		map->SetupAmbients();
-		//night or day?
-		//if in combat, play battlesong (or don't stop song here)
-		//if night, play night song
-		map->PlayAreaSong( 0 );
+		int Song;
+		if (game->CombatCounter) {
+			//battlesong
+			Song = 3;
+		} else {
+			//night or day
+			Song = game->GameTime%7200/3600;
+		}
+		map->PlayAreaSong( Song );
 
 		ScreenFlags|=SF_CENTERONACTOR;
 	}

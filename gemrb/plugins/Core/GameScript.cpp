@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.339 2005/12/07 20:26:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.340 2005/12/12 18:39:54 avenger_teambg Exp $
  *
  */
 
@@ -606,12 +606,12 @@ static ActionLink actionnames[] = {
 	{"runawayfrom", GameScript::RunAwayFrom,AF_BLOCKING},
 	{"runawayfromnointerrupt", GameScript::RunAwayFromNoInterrupt,AF_BLOCKING},
 	{"runawayfrompoint", GameScript::RunAwayFromPoint,AF_BLOCKING},
-	{"runningattack", GameScript::RunningAttack,AF_BLOCKING},//no run yet
-	{"runningattacknosound", GameScript::RunningAttackNoSound,AF_BLOCKING}, //no running yet anyway
-	{"runtoobject", GameScript::MoveToObject,AF_BLOCKING}, //until we know better
-	{"runtopoint", GameScript::MoveToPoint,AF_BLOCKING}, //until we know better
-	{"runtopointnorecticle", GameScript::MoveToPoint,AF_BLOCKING},//until we know better
-	{"runtosavedlocation", GameScript::MoveToSavedLocation,AF_BLOCKING},//
+	{"runningattack", GameScript::RunningAttack,AF_BLOCKING},
+	{"runningattacknosound", GameScript::RunningAttackNoSound,AF_BLOCKING},
+	{"runtoobject", GameScript::RunToObject,AF_BLOCKING},
+	{"runtopoint", GameScript::RunToPoint,AF_BLOCKING},
+	{"runtopointnorecticle", GameScript::RunToPointNoRecticle,AF_BLOCKING},
+	{"runtosavedlocation", GameScript::RunToSavedLocation,AF_BLOCKING},
 	{"savegame", GameScript::SaveGame, 0},
 	{"savelocation", GameScript::SaveLocation, 0},
 	{"saveplace", GameScript::SaveLocation, 0},
@@ -1358,7 +1358,7 @@ static Condition* ReadCondition(DataStream* stream)
 
 void GameScript::Update()
 {
-	if (!MySelf || !(MySelf->Active&SCR_ACTIVE) ) {
+	if (!MySelf || !(MySelf->GetInternalFlag()&IF_ACTIVE) ) {
 		return;
 	}
 	ieDword thisTime = core->GetGame()->Ticks;
@@ -1389,7 +1389,7 @@ void GameScript::Update()
 
 void GameScript::EvaluateAllBlocks()
 {
-	if (!MySelf || !(MySelf->Active&SCR_ACTIVE) ) {
+	if (!MySelf || !(MySelf->GetInternalFlag()&IF_ACTIVE) ) {
 		return;
 	}
 	ieDword thisTime;
@@ -2707,15 +2707,15 @@ int GameScript::ExecuteResponse(Scriptable* Sender, Response* rE)
 				ExecuteAction( Sender, aC );
 				break;
 			case AF_NONE:
-				if (Sender->Active&SCR_CUTSCENEID) {
-					if (Sender->CutSceneId) {
-						Sender->CutSceneId->AddAction( aC );
-						//AddAction( Sender->CutSceneId, aC );
+				if (Sender->GetInternalFlag()&IF_CUTSCENEID) {
+					Scriptable *cs = Sender->GetCutsceneID();
+					if (cs) {
+						cs->AddAction( aC );
 					} else {
 						printf("Did not find cutscene object, action ignored!\n");
 					}
 				} else {
-					if (Sender->CutSceneId) {
+					if (Sender->GetCutsceneID()) {
 						printf("Stuck with cutscene ID!\n");
 						abort();
 					}
@@ -2769,8 +2769,7 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		//turning off interruptable flag
 		//uninterruptable actions will set it back
 		if (Sender->Type==ST_ACTOR) {
-			Sender->Active|=SCR_ACTIVE;
-			((Actor *)Sender)->InternalFlags&=~IF_NOINT;
+			Sender->Activate();
 		}
 		func( Sender, aC );
 	} else {

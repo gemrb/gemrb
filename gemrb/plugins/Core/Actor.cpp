@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.141 2005/12/07 20:26:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.142 2005/12/12 18:39:54 avenger_teambg Exp $
  *
  */
 
@@ -133,7 +133,6 @@ Actor::Actor()
 	LastDamage = 0;
 	LastDamageType = 0;
 
-	InternalFlags = 0;
 	inventory.SetInventoryType(INVENTORY_CREATURE);
 	fxqueue.SetOwner( this );
 	inventory.SetOwner( this );
@@ -290,12 +289,16 @@ void pcf_animid(Actor *actor, ieDword Value)
 
 void pcf_hitpoint(Actor *actor, ieDword Value)
 {
+	if ((signed) Value>(signed) actor->Modified[IE_MAXHITPOINTS]) {
+		Value=actor->Modified[IE_MAXHITPOINTS];
+	}
+	if ((signed) Value<(signed) actor->Modified[IE_MINHITPOINTS]) {
+		Value=actor->Modified[IE_MINHITPOINTS];
+	}
 	if ((signed) Value<=0) {
 		actor->Die(NULL);
 	}
-	if ((signed) Value>(signed) actor->Modified[IE_MAXHITPOINTS]) {
-		actor->Modified[IE_HITPOINTS]=actor->Modified[IE_MAXHITPOINTS];
-	}
+	actor->Modified[IE_MINHITPOINTS]=Value;
 }
 
 void pcf_maxhitpoint(Actor *actor, ieDword Value)
@@ -304,7 +307,14 @@ void pcf_maxhitpoint(Actor *actor, ieDword Value)
 		actor->Die(NULL);
 	}
 	if ((signed) Value<(signed) actor->Modified[IE_HITPOINTS]) {
-		actor->Modified[IE_HITPOINTS]=actor->Modified[IE_MAXHITPOINTS];
+		actor->Modified[IE_HITPOINTS]=Value;
+	}
+}
+
+void pcf_minhitpoint(Actor *actor, ieDword Value)
+{
+	if ((signed) Value>(signed) actor->Modified[IE_HITPOINTS]) {
+		actor->Modified[IE_HITPOINTS]=Value;
 	}
 }
 
@@ -380,7 +390,7 @@ NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //3f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //4f
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
+NULL,NULL,NULL,pcf_minhitpoint, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //5f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //6f
@@ -551,8 +561,8 @@ int Actor::NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 
 void Actor::Panic()
 {
-	SetStat(IE_MORALE,0);
-	SetStat(IE_STATE_ID,GetStat(IE_STATE_ID)|STATE_PANIC);
+	SetBase(IE_MORALE,0);
+	SetBase(IE_STATE_ID,GetStat(IE_STATE_ID)|STATE_PANIC);
 }
 
 //returns actual damage
@@ -569,7 +579,7 @@ int Actor::Damage(int damage, int damagetype, Actor *hitter)
 	LastDamageType=damagetype;
 	LastDamage=damage;
 	LastHitter=hitter->GetID();
-	Active|=SCR_ACTIVE;
+	InternalFlags|=IF_ACTIVE;
 	if (InParty) {
 		if (GetStat(IE_HITPOINTS)<GetStat(IE_MAXHITPOINTS)/10) {
 			core->Autopause(AP_WOUNDED);
@@ -697,7 +707,8 @@ void Actor::Turn(Scriptable *cleric, int turnlevel)
 
 void Actor::Resurrect()
 {
-	InternalFlags = 0;
+	InternalFlags&=IF_FROMGAME;           //keep these flags
+	InternalFlags|=IF_ACTIVE|IF_VISIBLE;  //set these flags
 	SetBase(IE_STATE_ID, 0);
 	SetBase(IE_HITPOINTS, 255);
 	ClearActions();
@@ -740,6 +751,17 @@ void Actor::Die(Scriptable *killer)
 	if (InParty) {
 		core->Autopause(AP_DEAD);
 	}
+}
+
+void Actor::SetPersistent(int partyslot)
+{
+	InParty = (ieByte) partyslot;
+	InternalFlags|=IF_FROMGAME;
+}
+
+void Actor::DestroySelf()
+{
+	InternalFlags|=IF_CLEANUP;
 }
 
 bool Actor::CheckOnDeath()
@@ -1042,7 +1064,7 @@ void Actor::RemoveTimedEffects()
 
 bool Actor::Schedule(ieDword gametime)
 {
-	if (!(Active&SCR_VISIBLE) ) {
+	if (!(InternalFlags&IF_VISIBLE) ) {
 		return false;
 	}
 
@@ -1054,11 +1076,13 @@ bool Actor::Schedule(ieDword gametime)
 	return false;
 }
 
-void Actor::WalkTo(Point &Des, int MinDistance)
+void Actor::WalkTo(Point &Des, ieDword flags, int MinDistance)
 {
 	if (InternalFlags&IF_REALLYDIED) {
 		return;
 	}
+	InternalFlags &= ~IF_RUNFLAGS;
+	InternalFlags |= (flags & IF_RUNFLAGS);
 	Moveble::WalkTo(Des, MinDistance);
 }
 

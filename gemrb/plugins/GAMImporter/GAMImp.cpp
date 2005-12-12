@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.69 2005/12/05 22:41:10 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.70 2005/12/12 18:39:56 avenger_teambg Exp $
  *
  */
 
@@ -327,8 +327,7 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 	actor->SetOrientation( pcInfo.Orientation,0 );
 	actor->TalkCount = pcInfo.TalkCount;
 
-	actor->InParty = is_in_party ? (pcInfo.PartyOrder + 1) : 0;
-	actor->InternalFlags |= IF_FROMGAME;
+	actor->SetPersistent( is_in_party ? (pcInfo.PartyOrder + 1) : 0);
 
 	actor->PCStats = ps;
 	actor->Selected = pcInfo.Selected;
@@ -619,7 +618,7 @@ int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CRE
 		tmpWord=0;
 	}
 	stream->WriteWord( &tmpWord);
-	tmpWord = ac->InParty;
+	tmpWord = ac->InParty-1;
 	stream->WriteWord( &tmpWord);
 
 	stream->WriteDword( &CREOffset);

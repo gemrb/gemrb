@@ -53,6 +53,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags);
 Targets* GetAllObjects(Scriptable* Sender, Object* oC);
 Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC);
 int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int flags);
+void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags);
 void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int flags);
 void InitScriptTables();
 void HandleBitMod(ieDword &value1, ieDword value2, int opcode);

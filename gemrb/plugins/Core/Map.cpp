@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.211 2005/12/07 20:55:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.212 2005/12/12 18:39:54 avenger_teambg Exp $
  *
  */
 
@@ -484,8 +484,6 @@ void Map::UpdateScripts()
 		InfoPoint* ip = TMap->GetInfoPoint( ipCount++ );
 		if (!ip)
 			break;
-		if (!(ip->Active&SCR_ACTIVE) )
-			continue;
 		//If this InfoPoint has no script and it is not a Travel Trigger, skip it
 		if (!ip->Scripts[0] && ( ip->Type != ST_TRAVEL ))
 			continue;
@@ -626,7 +624,7 @@ void Map::DrawMap(Region screen, GameControl* gc)
 			int explored = actor->Modified[IE_DONOTJUMP]&2;
 			//check the deactivation condition only if needed
 			//this fixes dead actors disappearing from fog of war (they should be permanently visible)
-			if (!IsVisible( actor->Pos, explored) && (actor->Active&SCR_ACTIVE) ) {
+			if (!IsVisible( actor->Pos, explored) && (actor->GetInternalFlag()&IF_ACTIVE) ) {
 				//finding an excuse why we don't hybernate the actor
 				if (actor->Modified[IE_ENABLEOFFSCREENAI])
 					continue;
@@ -639,7 +637,7 @@ void Map::DrawMap(Region screen, GameControl* gc)
 				if (actor->GetWait()) //would never stop waiting
 					continue;
 				//turning actor inactive
-				actor->Active&=~SCR_ACTIVE;
+				actor->Deactivate();//&=~SCR_ACTIVE;
 			}
 			//visual feedback
 			CharAnimations* ca = actor->GetAnims();
@@ -1159,7 +1157,7 @@ void Map::GenerateQueues()
 
 		ieDword gametime = core->GetGame()->GameTime;
 
-		if (actor->Active&SCR_ACTIVE) {
+		if (actor->GetInternalFlag()&IF_ACTIVE) {
 			if ((actor->GetStance() == IE_ANI_TWITCH) && !actor->playDeadCounter) {
 				priority = 1; //display
 			} else {
@@ -1175,7 +1173,7 @@ void Map::GenerateQueues()
 				//just became visible
 				if (IsVisible(actor->Pos, false) && actor->Schedule(gametime) ) {
 					priority = 0; //run scripts and display, activated now
-					actor->Active|=SCR_ACTIVE;
+					actor->Unhide();
 					if (actor->GetStat(IE_EA)>=EA_EVILCUTOFF) {
 						core->Autopause(AP_ENEMY);
 					}
@@ -1927,9 +1925,10 @@ void Map::TriggerSpawn(Spawn *spawn)
 }
 
 //--------restheader----------------
-bool Map::Rest(Point &pos, int hours)
+bool Map::Rest(Point &pos, int hours, bool day)
 {
-	int chance=RestHeader.DayChance; //based on ingame timer
+	//based on ingame timer
+	int chance=day?RestHeader.DayChance:RestHeader.NightChance;
 	if ( !RestHeader.CreatureNum) return false;
 	for (int i=0;i<hours;i++) {
 		if ( rand()%100<chance ) {

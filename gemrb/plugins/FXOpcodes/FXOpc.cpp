@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.4 2005/11/24 17:44:09 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.5 2005/12/12 18:39:55 avenger_teambg Exp $
  *
  */
 
@@ -1284,7 +1284,8 @@ int fx_unsummon_creature (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_unsummon_creature (%2d)\n", fx->Opcode );
 
 	if (target->LastSummoner) {
-		target->InternalFlags|=IF_CLEANUP;
+		//animation
+		target->DestroySelf();
 	}
 	return FX_NOT_APPLIED;
 }
@@ -1776,7 +1777,7 @@ int fx_hold_creature (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_destroy_self (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_destroy_self (%2d)", fx->Opcode );
-	target->InternalFlags|=IF_CLEANUP;
+	target->DestroySelf();
 	return FX_APPLIED;
 }
 
