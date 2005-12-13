@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.125 2005/12/12 18:39:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.126 2005/12/13 18:13:57 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -304,9 +304,9 @@ void Scriptable::SetCutsceneID(Scriptable *csid)
 {
 	CutSceneId=csid;
 	if (csid) {
-		InternalFlags &= IF_CUTSCENEID;
-	} else {
 		InternalFlags |= IF_CUTSCENEID;
+	} else {
+		InternalFlags &= ~IF_CUTSCENEID;
 	}
 }
 
