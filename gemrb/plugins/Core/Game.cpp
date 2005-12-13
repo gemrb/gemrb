@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.103 2005/12/12 23:15:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.104 2005/12/13 19:42:06 avenger_teambg Exp $
  *
  */
 
@@ -537,13 +537,6 @@ int Game::LoadMap(const char* ResRef)
 	if (index>=0) {
 		return index;
 	}
-	//check if any other areas could be removed (cached)
-	//areas cannot be removed with PCs
-	//master areas cannot be removed with active actors (pathlength!=0 or combat)
-	index = Maps.size();
-	while (index--) {
-		DelMap( index, false );
-	}
 
 	MapMgr* mM = ( MapMgr* ) core->GetInterface( IE_ARE_CLASS_ID );
 	DataStream* ds = core->GetResourceMgr()->GetResource( ResRef, IE_ARE_CLASS_ID );
@@ -896,7 +889,6 @@ void Game::UpdateScripts()
 
 	for (idx=0;idx<Maps.size();idx++) {
 		Maps[idx]->UpdateScripts();
-		DelMap(idx,0);
 	}
 	if (Maps.size()>MAX_MAPS_LOADED) {
 		idx = Maps.size();

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.141 2005/12/12 23:15:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.142 2005/12/13 19:42:06 avenger_teambg Exp $
  *
  */
 
@@ -1120,7 +1120,7 @@ int AREImp::GetStoredFileSize(Map *map)
 
 int AREImp::PutHeader(DataStream *stream, Map *map)
 {
-	char Signature[8];
+	char Signature[80];
 	ieDword tmpDword = 0;
 	ieWord tmpWord = 0;
 	int pst = core->HasFeature( GF_AUTOMAP_INI );
@@ -1193,15 +1193,18 @@ int AREImp::PutHeader(DataStream *stream, Map *map)
 	stream->WriteDword( &SongHeader);
 	stream->WriteDword( &RestHeader);
 	//an empty dword for pst
+	int i;
 	if (pst) {
+		tmpDword = 0xffffffff;
 		stream->WriteDword( &tmpDword);
+		i=76;
+	} else {
+		i=80;
 	}
 	stream->WriteDword( &NoteOffset );
 	stream->WriteDword( &NoteCount );
-	//8*10 bytes of crap
-	for (int i=0;i<10;i++) {
-		stream->Write( Signature, 8);
-	}
+	//usually 80 empty bytes (but pst used up 4 elsewhere)
+	stream->Write( Signature, i);
 	return 0;
 }
 
@@ -1217,7 +1220,6 @@ int AREImp::PutDoors( DataStream *stream, Map *map, ieDword &VertIndex)
 
 		stream->Write( d->GetScriptName(), 32);
 		stream->WriteResRef( d->ID);
-		stream->WriteDword( &tmpDword);
 		stream->WriteDword( &d->Flags);
 		stream->WriteDword( &VertIndex);
 		tmpWord = (ieWord) d->open->count;
@@ -1248,8 +1250,10 @@ int AREImp::PutDoors( DataStream *stream, Map *map, ieDword &VertIndex)
 		//open and closed impeded blocks
 		stream->WriteDword( &VertIndex);
 		tmpWord = (ieWord) d->oibcount;
+		stream->WriteWord( &tmpWord);
 		VertIndex += tmpWord;
 		tmpWord = (ieWord) d->cibcount;
+		stream->WriteWord( &tmpWord);
 		stream->WriteDword( &VertIndex);
 		VertIndex += tmpWord;
 		//unknown54
@@ -1791,7 +1795,7 @@ int AREImp::PutSongHeader( DataStream *stream, Map *map)
 	//song flag
 	stream->WriteDword( &tmpDword);
 	//lots of empty crap
-	for(i=0;i<15;i++) {
+	for(i=0;i<23;i++) {
 		stream->WriteDword( &tmpDword);
 	}
 	return 0;
