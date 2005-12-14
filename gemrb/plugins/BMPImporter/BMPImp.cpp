@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.26 2005/11/24 17:44:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.27 2005/12/14 18:33:34 avenger_teambg Exp $
  *
  */
 
@@ -55,7 +55,7 @@ BMPImp::~BMPImp(void)
 	}
 }
 
-bool BMPImp::Open(DataStream* stream, bool autoFree)
+bool BMPImp::Open(DataStream* stream, bool autoFree, bool convert)
 {
 	if (stream == NULL) {
 		return false;
@@ -175,19 +175,63 @@ bool BMPImp::Open(DataStream* stream, bool autoFree)
 			src += PaddedRowLength;
 		}
 	} else if (BitCount == 4) {
-		int size = PaddedRowLength * Height;
-		pixels = malloc( size );
-		unsigned char * dest = ( unsigned char * ) pixels;
-		dest += size;
-		unsigned char * src = ( unsigned char * ) rpixels;
-		for (int i = Height; i; i--) {
-			dest -= PaddedRowLength;
-			memcpy( dest, src, PaddedRowLength );
-			src += PaddedRowLength;
+		if (convert) {
+			Read4To8(rpixels);
+		} else {
+			Read4To4(rpixels);
 		}
 	}
 	free( rpixels );
 	return true;
+}
+
+void BMPImp::Read8To8(void *rpixels)
+{
+	pixels = malloc( Width * Height );
+	unsigned char * dest = ( unsigned char * ) pixels;
+	dest += Height * Width;
+	unsigned char * src = ( unsigned char * ) rpixels;
+	for (int i = Height; i; i--) {
+		dest -= Width;
+		memcpy( dest, src, Width );
+		src += PaddedRowLength;
+	}
+}
+
+void BMPImp::Read4To8(void *rpixels)
+{
+	//converting it up to 8 bits, because we'll use it as
+	//whole byte (searchmap)
+	BitCount = 8;
+	pixels = malloc( Width * Height );
+	unsigned char * dest = ( unsigned char * ) pixels;
+	dest += Height * Width;
+	unsigned char * src = ( unsigned char * ) rpixels;
+	for (int i = Height; i; i--) {
+		dest -= Width;
+		for (unsigned int j=0;j<Width;j++) {
+			if (j) {
+				dest[j] = ((unsigned) src[j/2])>>4;
+			} else {
+				dest[j] = src[j/2]&15;
+			}
+		}
+		src += PaddedRowLength;
+	}
+}
+
+void BMPImp::Read4To4(void *rpixels)
+{
+	int size = PaddedRowLength * Height;
+	pixels = malloc( size );
+	unsigned char * dest = ( unsigned char * ) pixels;
+	dest += size;
+	unsigned char * src = ( unsigned char * ) rpixels;
+	for (int i = Height; i; i--) {
+		dest -= PaddedRowLength;
+		memcpy( dest, src, PaddedRowLength );
+		src += PaddedRowLength;
+	}
 }
 
 bool BMPImp::OpenFromImage(Sprite2D* sprite, bool autoFree)
@@ -252,7 +296,7 @@ Sprite2D* BMPImp::GetImage()
 	} else if (BitCount == 8) {
 		void* p = malloc( Width* Height );
 		memcpy( p, pixels, Width * Height );
-		spr = core->GetVideoDriver()->CreateSprite8( Width, Height, 8,
+		spr = core->GetVideoDriver()->CreateSprite8( Width, Height, NumColors==16?4:8,
 			p, Palette, true, 0 );
 	} else if (BitCount == 4) {
 		void* p = malloc( Width* Height );

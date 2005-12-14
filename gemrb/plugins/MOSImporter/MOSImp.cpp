@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MOSImporter/MOSImp.cpp,v 1.14 2005/11/24 17:44:09 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MOSImporter/MOSImp.cpp,v 1.15 2005/12/14 18:33:35 avenger_teambg Exp $
  *
  */
 
@@ -50,7 +50,7 @@ MOSImp::~MOSImp(void)
 	}
 }
 
-bool MOSImp::Open(DataStream* stream, bool autoFree)
+bool MOSImp::Open(DataStream* stream, bool autoFree, bool /*convert*/)
 {
 	if (stream == NULL) {
 		return false;

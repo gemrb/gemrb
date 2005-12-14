@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ImageMgr.h,v 1.12 2005/10/18 22:43:41 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ImageMgr.h,v 1.13 2005/12/14 18:33:34 avenger_teambg Exp $
  *
  */
 
@@ -44,7 +44,7 @@ class GEM_EXPORT ImageMgr : public Plugin {
 public:
 	ImageMgr(void);
 	virtual ~ImageMgr(void);
-	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
+	virtual bool Open(DataStream* stream, bool autoFree = true, bool convert = false) = 0;
 	// Swallows an image so it can be saved w/ PutImage() etc.
 	// FIXME: should be abstract, but I don't want to implement it for all
 	// image managers right now

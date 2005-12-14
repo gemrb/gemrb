@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.18 2005/10/18 22:43:41 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.19 2005/12/14 18:33:34 avenger_teambg Exp $
  *
  */
 
@@ -42,10 +42,13 @@ private:
 
 	//OTHER
 	unsigned int PaddedRowLength;
+
+	//Conversion to 8 bits per pixel?
+	bool Convert;
 public:
 	BMPImp(void);
 	~BMPImp(void);
-	bool Open(DataStream* stream, bool autoFree = true);
+	bool Open(DataStream* stream, bool autoFree = true, bool convert = false);
 	bool OpenFromImage(Sprite2D* sprite, bool autoFree = true);
 	Sprite2D* GetImage();
 	void PutImage(DataStream *output, unsigned int ratio);
@@ -136,6 +139,10 @@ public:
 	}
 	int GetWidth() { return (int) Width; }
 	int GetHeight() { return (int) Height; }
+private:
+	void Read8To8(void *rpixels);
+	void Read4To8(void *rpixels);
+	void Read4To4(void *rpixels);
 public:
 	void release(void)
 	{

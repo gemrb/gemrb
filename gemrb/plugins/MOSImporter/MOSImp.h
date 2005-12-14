@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MOSImporter/MOSImp.h,v 1.12 2005/06/22 15:55:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MOSImporter/MOSImp.h,v 1.13 2005/12/14 18:33:35 avenger_teambg Exp $
  *
  */
 
@@ -33,7 +33,7 @@ private:
 public:
 	MOSImp(void);
 	~MOSImp(void);
-	bool Open(DataStream* stream, bool autoFree = true);
+	bool Open(DataStream* stream, bool autoFree = true, bool convert = false);
 	Sprite2D* GetImage();
 	/** No descriptions */
 	void GetPalette(int index, int colors, Color* pal);
