@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.340 2005/12/12 18:39:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.341 2005/12/14 17:57:30 avenger_teambg Exp $
  *
  */
 
@@ -60,6 +60,9 @@ static TriggerLink triggernames[] = {
 	{"checkdoorflags", GameScript::CheckDoorFlags, 0},
 	{"checkpartyaveragelevel", GameScript::CheckPartyAverageLevel, 0},
 	{"checkpartylevel", GameScript::CheckPartyLevel, 0},
+	{"checkskill", GameScript::CheckSkill, 0},
+	{"checkskillgt", GameScript::CheckSkillGT, 0},
+	{"checkskilllt", GameScript::CheckSkillLT, 0},
 	{"checkstat", GameScript::CheckStat, 0},
 	{"checkstatgt", GameScript::CheckStatGT, 0},
 	{"checkstatlt", GameScript::CheckStatLT, 0},
@@ -1193,8 +1196,12 @@ GameScript::~GameScript(void)
 /** releasing global memory */
 void GameScript::ReleaseMemory()
 {
+	if (SkillStats)
+		free(SkillStats);
+	SkillStats = NULL;
 	if (ObjectIDSTableNames)
 		free(ObjectIDSTableNames);
+	ObjectIDSTableNames = NULL;
 	initialized = 0;
 }
 

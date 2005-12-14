@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.231 2005/12/12 18:39:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.232 2005/12/14 17:57:31 avenger_teambg Exp $
  *
  */
 
@@ -674,6 +674,9 @@ public: //Script Functions
 	static int CheckDoorFlags(Scriptable* Sender, Trigger* parameters);
 	static int CheckPartyAverageLevel(Scriptable* Sender, Trigger* parameters);
 	static int CheckPartyLevel(Scriptable* Sender, Trigger* parameters);
+	static int CheckSkill(Scriptable* Sender, Trigger* parameters);
+	static int CheckSkillGT(Scriptable* Sender, Trigger* parameters);
+	static int CheckSkillLT(Scriptable* Sender, Trigger* parameters);
 	static int CheckStat(Scriptable* Sender, Trigger* parameters);
 	static int CheckStatGT(Scriptable* Sender, Trigger* parameters);
 	static int CheckStatLT(Scriptable* Sender, Trigger* parameters);

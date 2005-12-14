@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.40 2005/12/12 22:03:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.41 2005/12/14 17:57:30 avenger_teambg Exp $
  *
  */
 
@@ -60,9 +60,24 @@ int happiness[3][20];
 int rmodrep[20];
 int rmodchr[25];
 int RandomNumValue;
+int *SkillStats=NULL;
+int SkillCount=-1;
 
 void InitScriptTables()
 {
+	//initializing the skill->stats conversion table
+	{
+	int table = core->LoadTable( "skillsta" );
+	TableMgr *tab = core->GetTable( table );
+	int rowcount = tab->GetRowCount();
+	SkillCount = rowcount;
+	if (rowcount) {
+		SkillStats = (int *) malloc(rowcount * sizeof(int) );
+		while(rowcount--) {
+			SkillStats[rowcount]=strtol(tab->QueryField(rowcount,0), NULL, 0);
+		}
+	}
+	}
 	//initializing the happiness table
 	{
 	int table = core->LoadTable( "happy" );

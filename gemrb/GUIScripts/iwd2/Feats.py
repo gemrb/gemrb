@@ -188,7 +188,7 @@ def LeftPress():
 	if PointsLeft < 1:
 		return
 	ActPoint = GemRB.GetVar("Feat "+str(Pos) )
-	if ActPoint >= Level:
+	if ActPoint > Level: #Level is 0 for level 1
 		return
 	GemRB.SetVar("Feat "+str(Pos), ActPoint+1)
 	PointsLeft = PointsLeft - 1 

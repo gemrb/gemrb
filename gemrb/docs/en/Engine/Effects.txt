@@ -36,10 +36,10 @@ Offset Size (data type) Description
  2 - while equipped (source of effect)
  3 - delayed duration (after delay duration)
  4 - delayed (after delay it is permanent)
- 5 - special, delayed
+ 5 - special, delayed, unsaved
  6 - special, duration
  7 - special, ?
- 8 - ?
+ 8 - permanent, unsaved
  9 - permanent after death
  10 - trigger (just expired)
 

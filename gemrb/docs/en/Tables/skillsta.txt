@@ -1,0 +1,1 @@
+Description: This table is used by the CheckSkill gamescript trigger to translate skills to stats. The guiscript for character generation in IWD2 also uses it.

@@ -31,6 +31,8 @@ extern ieResRef *ObjectIDSTableNames;
 extern int ObjectFieldsCount;
 extern int ExtraParametersCount;
 extern int InDebug;
+extern int *SkillStats;
+extern int SkillCount;
 
 #define MIC_INVALID -2
 #define MIC_FULL -1

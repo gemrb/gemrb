@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.31 2005/12/12 18:39:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.32 2005/12/14 17:57:31 avenger_teambg Exp $
  *
  */
 
@@ -1560,6 +1560,24 @@ int GameScript::XPLT(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+int GameScript::CheckSkill(Scriptable* Sender, Trigger* parameters)
+{
+	if (parameters->int1Parameter>=SkillCount) {
+		return 0;
+	}
+	Scriptable* target = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!target) {
+		return 0;
+	}
+	if (target->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) target;
+	if ((signed) actor->GetStat( SkillStats[parameters->int1Parameter] ) == parameters->int0Parameter) {
+		return 1;
+	}
+	return 0;
+}
 int GameScript::CheckStat(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* target = GetActorFromObject( Sender, parameters->objectParameter );
@@ -1576,6 +1594,22 @@ int GameScript::CheckStat(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+int GameScript::CheckSkillGT(Scriptable* Sender, Trigger* parameters)
+{
+	if (parameters->int1Parameter>=SkillCount) {
+		return 0;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	if ((signed) actor->GetStat( SkillStats[parameters->int1Parameter] ) > parameters->int0Parameter) {
+		return 1;
+	}
+	return 0;
+}
+
 int GameScript::CheckStatGT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
@@ -1584,6 +1618,22 @@ int GameScript::CheckStatGT(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor* actor = ( Actor* ) tar;
 	if ((signed) actor->GetStat( parameters->int1Parameter ) > parameters->int0Parameter) {
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::CheckSkillLT(Scriptable* Sender, Trigger* parameters)
+{
+	if (parameters->int1Parameter>=SkillCount) {
+		return 0;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	if ((signed) actor->GetStat( SkillStats[parameters->int1Parameter] ) < parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;

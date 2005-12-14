@@ -190,7 +190,7 @@ def NextPress():
 	t = GemRB.Roll(a,b,c)*d+e
 	GemRB.SetPlayerStat (MyChar, IE_GOLD, t)
 	GemRB.SetPlayerStat (MyChar, IE_HATEDRACE, GemRB.GetVar ("HatedRace") )
-	TmpTable=GemRB.LoadTable ("ability")
+	TmpTable = GemRB.LoadTable ("ability")
 	AbilityCount = GemRB.GetTableRowCount (TmpTable)
 	for i in range (AbilityCount):
 		StatID=GemRB.GetTableValue (TmpTable, i,4)
@@ -223,6 +223,14 @@ def NextPress():
 	GemRB.SetPlayerStat (MyChar, IE_CON, GemRB.GetVar ("Ability 5"))
 	GemRB.SetPlayerStat (MyChar, IE_CHR, GemRB.GetVar ("Ability 6"))
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
+
+	#setting skills
+	TmpTable = GemRB.LoadTable ("skillsta")
+	SkillCount = GemRB.GetTableRowCount (TmpTable)
+	for i in range (SkillCount):
+		StatID=GemRB.GetTableValue (TmpTable, i,0)
+		GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Skill "+str(i) ) )
+	GemRB.UnloadTable (TmpTable);
 
 	#does all the rest
 	GemRB.FillPlayerInfo (MyChar,PortraitName+"L", PortraitName+"S")
