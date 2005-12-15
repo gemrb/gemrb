@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.354 2005/12/15 18:16:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.355 2005/12/15 19:13:17 avenger_teambg Exp $
  *
  */
 
@@ -5164,6 +5164,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		int Use2 = item->KitUsability;
 		core->FreeItem( item, slotitem->ItemResRef, false );
 		//CanUseItemType will check actor's class bits too
+printf("%d %d\n",Itemtype, Slottype);
 		if (core->CanUseItemType (Itemtype, Slottype, Use1, Use2, actor) ) {
 			res = actor->inventory.AddSlotItem( slotitem, Slot );
 			if (Slot >= 0 && core->QuerySlotEffects( Slot ) ) {

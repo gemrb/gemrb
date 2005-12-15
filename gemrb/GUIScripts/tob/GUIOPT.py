@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIOPT.py,v 1.9 2005/11/01 13:35:10 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIOPT.py,v 1.10 2005/12/15 19:13:15 avenger_teambg Exp $
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
 # Ingame options
@@ -186,51 +186,41 @@ def OpenAudioOptionsWindow ():
 		return
 
 	
-	AudioOptionsWindow = Window = GemRB.LoadWindow (5)
+	AudioOptionsWindow = Window = GemRB.LoadWindow (7)
 
-	AudioHelpText = OptHelpText ('AudioOptions', Window, 9, 31210)
+	AudioHelpText = OptHelpText ('AudioOptions', Window, 14, 18040)
 
-	OptDone ('AudioOptions', Window, 7)
-	OptCancel ('AudioOptions', Window, 8)
+	OptDone ('AudioOptions', Window, 24)
+	OptCancel ('AudioOptions', Window, 25)
 
-	OptSlider ('AmbientVolume', Window, 1, 10, 31460)
-	OptSlider ('SoundFXVolume', Window, 2, 11, 31466)
-	OptSlider ('VoiceVolume', Window, 3, 12, 31467)
-	OptSlider ('MusicVolume', Window, 4, 13, 31468)
-	OptSlider ('MovieVolume', Window, 5, 14, 31469)
+	OptSlider ('AmbientVolume', Window, 1, 16, 0)
+	OptSlider ('SoundFXVolume', Window, 2, 17, 0)
+	OptSlider ('VoiceVolume', Window, 3, 18, 0)
+	OptSlider ('MusicVolume', Window, 4, 19, 0)
+	OptSlider ('MovieVolume', Window, 22, 20, 0)
 	
-	OptCheckbox ('CreativeEAX', Window, 6, 15, 30900)
-	OptCheckbox ('SoundProcessing', Window, 16, 17, 63242)
-	OptCheckbox ('MusicProcessing', Window, 18, 19, 63243)
-
+	OptCheckbox ('CreativeEAX', Window, 26, 28, 0)
 
 	GemRB.SetVisible (AudioOptionsWindow, 1)
 	
 
 def DisplayHelpAmbientVolume ():
-	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 31227)
+	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 18008)
 	
 def DisplayHelpSoundFXVolume ():
-	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 31228)
+	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 18009)
 
 def DisplayHelpVoiceVolume ():
-	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 31226)
+	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 18010)
 
 def DisplayHelpMusicVolume ():
-	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 31225)
+	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 18011)
 
 def DisplayHelpMovieVolume ():
-	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 31229)
+	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 18012)
 
 def DisplayHelpCreativeEAX ():
-	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 31224)
-
-def DisplayHelpSoundProcessing ():
-	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 63244)
-	
-def DisplayHelpMusicProcessing ():
-	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 63247)
-
+	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 18022)
 
 
 ###################################################
