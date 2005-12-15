@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.92 2005/11/25 23:22:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.93 2005/12/15 18:41:41 avenger_teambg Exp $
  *
  */
 
@@ -307,7 +307,7 @@ void Button::OnSpecialKeyPress(unsigned char Key)
 void Button::OnMouseDown(unsigned short x, unsigned short y,
 	unsigned char Button, unsigned short /*Mod*/)
 {
-	if (State == IE_GUI_BUTTON_DISABLED || State == IE_GUI_BUTTON_LOCKED) {
+	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
 	}
 
@@ -316,22 +316,26 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 
 	//Button == 1 means Left Mouse Button
 	if (Button == 1) {
+		// We use absolute screen position here, so drag_start
+		//   remains valid even after window/control is moved
+		drag_start.x = ((Window*)Owner)->XPos + XPos + x;
+		drag_start.y = ((Window*)Owner)->YPos + YPos + y;
+
+ 		if (State == IE_GUI_BUTTON_LOCKED) {
+			return;
+		}
 		State = IE_GUI_BUTTON_PRESSED;
 		Changed = true;
 		if (Flags & IE_GUI_BUTTON_SOUND) {
 			core->PlaySound( DS_BUTTON_PRESSED );
 		}
-		// We use absolute screen position here, so drag_start
-		//   remains valid even after window/control is moved
-		drag_start.x = ((Window*)Owner)->XPos + XPos + x;
-		drag_start.y = ((Window*)Owner)->YPos + YPos + y;
 	}
 }
 /** Mouse Button Up */
 void Button::OnMouseUp(unsigned short x, unsigned short y,
 	unsigned char Button, unsigned short Mod)
 {
-	if (State == IE_GUI_BUTTON_DISABLED || State == IE_GUI_BUTTON_LOCKED) {
+	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
 	}
 	if (core->GetDraggedItem () && !ButtonOnDragDrop[0])
@@ -344,43 +348,52 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 			SetState( IE_GUI_BUTTON_UNPRESSED );
 		}
 	}
-	if (( x <= Width ) && ( y <= Height )) {
-		if (Flags & IE_GUI_BUTTON_CHECKBOX) {
-			//checkbox
-			ToggleState = !ToggleState;
-			if (ToggleState)
-				SetState( IE_GUI_BUTTON_SELECTED );
-			else
-				SetState( IE_GUI_BUTTON_UNPRESSED );
-			if (VarName[0] != 0) {
-				ieDword tmp = 0;
-				core->GetDictionary()->Lookup( VarName, tmp );
-				tmp ^= Value;
-				core->GetDictionary()->SetAt( VarName, tmp );
-				( ( Window * ) Owner )->RedrawControls( VarName, tmp );
-			}
-		} else {
-			if (Flags & IE_GUI_BUTTON_RADIOBUTTON) {
-				//radio button
-				ToggleState = true;
-				SetState( IE_GUI_BUTTON_SELECTED );
-			}
-			if (VarName[0] != 0) {
-				core->GetDictionary()->SetAt( VarName, Value );
-				( ( Window * ) Owner )->RedrawControls( VarName, Value );
-			}
+	if (( x >= Width ) || ( y >= Height )) {
+		return;
+	}
+	if (Flags & IE_GUI_BUTTON_CHECKBOX) {
+		//checkbox
+		ToggleState = !ToggleState;
+		if (ToggleState)
+			SetState( IE_GUI_BUTTON_SELECTED );
+		else
+			SetState( IE_GUI_BUTTON_UNPRESSED );
+		if (VarName[0] != 0) {
+			ieDword tmp = 0;
+			core->GetDictionary()->Lookup( VarName, tmp );
+			tmp ^= Value;
+			core->GetDictionary()->SetAt( VarName, tmp );
+			( ( Window * ) Owner )->RedrawControls( VarName, tmp );
 		}
+	} else {
+		if (Flags & IE_GUI_BUTTON_RADIOBUTTON) {
+			//radio button
+			ToggleState = true;
+			SetState( IE_GUI_BUTTON_SELECTED );
+		}
+		if (VarName[0] != 0) {
+			core->GetDictionary()->SetAt( VarName, Value );
+			( ( Window * ) Owner )->RedrawControls( VarName, Value );
+		}
+	}
 
-		if (core->GetDraggedItem()) {
-			RunEventHandler( ButtonOnDragDrop );
-		} else if (Button == GEM_MB_ACTION) {
-			if ((Mod == 1) && ButtonOnShiftPress[0])
-				RunEventHandler( ButtonOnShiftPress );
-			else 
-				RunEventHandler( ButtonOnPress );
-		} else if (Button == GEM_MB_MENU && ButtonOnRightPress[0]) 
-			RunEventHandler( ButtonOnRightPress );
+	if (core->GetDraggedItem()) {
+		RunEventHandler( ButtonOnDragDrop );
+		return;
+	}
 		
+	if (State == IE_GUI_BUTTON_LOCKED) {
+		return;
+	}
+
+	if (Button == GEM_MB_ACTION) {
+		if ((Mod == 1) && ButtonOnShiftPress[0])
+			RunEventHandler( ButtonOnShiftPress );
+		else 
+			RunEventHandler( ButtonOnPress );
+	} else {
+		if (Button == GEM_MB_MENU && ButtonOnRightPress[0]) 
+			RunEventHandler( ButtonOnRightPress );
 	}
 }
 
