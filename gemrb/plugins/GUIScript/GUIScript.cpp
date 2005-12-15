@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.353 2005/12/04 21:09:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.354 2005/12/15 18:16:40 avenger_teambg Exp $
  *
  */
 
@@ -5201,7 +5201,7 @@ static PyObject* GemRB_GetSystemVariable(PyObject * /*self*/, PyObject* args)
 	int Variable, value;
 
 	if (!PyArg_ParseTuple( args, "i", &Variable)) {
-		return AttributeError( GemRB_DropDraggedItem__doc );
+		return AttributeError( GemRB_GetSystemVariable__doc );
 	}
 	switch(Variable) {
 		case SV_BPP: value = core->Bpp; break;
