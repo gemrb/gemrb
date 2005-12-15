@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.41 2005/12/14 17:57:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.42 2005/12/15 18:01:26 avenger_teambg Exp $
  *
  */
 
@@ -68,46 +68,54 @@ void InitScriptTables()
 	//initializing the skill->stats conversion table
 	{
 	int table = core->LoadTable( "skillsta" );
-	TableMgr *tab = core->GetTable( table );
-	int rowcount = tab->GetRowCount();
-	SkillCount = rowcount;
-	if (rowcount) {
-		SkillStats = (int *) malloc(rowcount * sizeof(int) );
-		while(rowcount--) {
-			SkillStats[rowcount]=strtol(tab->QueryField(rowcount,0), NULL, 0);
+	if (table!=-1) {
+		TableMgr *tab = core->GetTable( table );
+		int rowcount = tab->GetRowCount();
+		SkillCount = rowcount;
+		if (rowcount) {
+			SkillStats = (int *) malloc(rowcount * sizeof(int) );
+			while(rowcount--) {
+				SkillStats[rowcount]=strtol(tab->QueryField(rowcount,0), NULL, 0);
+			}
 		}
 	}
 	}
 	//initializing the happiness table
 	{
 	int table = core->LoadTable( "happy" );
-	TableMgr *tab = core->GetTable( table );
-	for (int alignment=0;alignment<3;alignment++) {
-		for (int reputation=0;reputation<20;reputation++) {
-			happiness[alignment][reputation]=strtol(tab->QueryField(reputation,alignment), NULL, 0);
+	if (table!=-1) {
+		TableMgr *tab = core->GetTable( table );
+		for (int alignment=0;alignment<3;alignment++) {
+			for (int reputation=0;reputation<20;reputation++) {
+				happiness[alignment][reputation]=strtol(tab->QueryField(reputation,alignment), NULL, 0);
+			}
 		}
+		core->DelTable( table );
 	}
-	core->DelTable( table );
 	}
 
 	//initializing the reaction mod. reputation table
 	{
 	int table = core->LoadTable( "rmodrep" );
-	TableMgr *tab = core->GetTable( table );
-	for (int reputation=0;reputation<20;reputation++) {
-		rmodrep[reputation]=strtol(tab->QueryField(0,reputation), NULL, 0);
+	if (table!=-1) {
+		TableMgr *tab = core->GetTable( table );
+		for (int reputation=0;reputation<20;reputation++) {
+			rmodrep[reputation]=strtol(tab->QueryField(0,reputation), NULL, 0);
+		}
+		core->DelTable( table );
 	}
-	core->DelTable( table );
 	}
 
 	//initializing the reaction mod. charisma table
 	{
 	int table = core->LoadTable( "rmodchr" );
-	TableMgr *tab = core->GetTable( table );
-	for (int charisma=0;charisma<25;charisma++) {
-		rmodchr[charisma]=strtol(tab->QueryField(0,charisma), NULL, 0);
+	if (table!=-1) {
+		TableMgr *tab = core->GetTable( table );
+		for (int charisma=0;charisma<25;charisma++) {
+			rmodchr[charisma]=strtol(tab->QueryField(0,charisma), NULL, 0);
+		}
+		core->DelTable( table );
 	}
-	core->DelTable( table );
 	}
 }
 
