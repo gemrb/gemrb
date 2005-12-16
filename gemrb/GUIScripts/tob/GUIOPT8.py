@@ -75,7 +75,7 @@ def OnLoad():
 	GemRB.SetVarAssoc(GamePlayWindow, WeatherButtonB, "Weather",1)
 
 	GemRB.SetEvent(GamePlayWindow, HealButton, IE_GUI_BUTTON_ON_PRESS, "HealPress")
-	GemRB.SetEvent(GamePlayWindow, HealButtonB, IE_GUI_BUTTON_ON_PRESS, "HealPressB")
+	GemRB.SetEvent(GamePlayWindow, HealButtonB, IE_GUI_BUTTON_ON_PRESS, "HealPress")
 	GemRB.SetButtonFlags(GamePlayWindow, HealButtonB, IE_GUI_BUTTON_CHECKBOX,OP_OR)
 	GemRB.SetVarAssoc(GamePlayWindow, HealButtonB, "Heal Party on Rest",1)
 
