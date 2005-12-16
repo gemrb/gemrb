@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.355 2005/12/15 19:13:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.356 2005/12/16 15:55:41 avenger_teambg Exp $
  *
  */
 
@@ -420,6 +420,12 @@ static PyObject* GemRB_LoadWindowPack(PyObject * /*self*/, PyObject* args)
 	CHUWidth = width;
 	CHUHeight = height;
 
+	if ( (width && (width>core->Width)) ||
+	     (height && (height>core->Height)) ) {
+		printMessage("GUIScript","Screen is too small!\n",LIGHT_RED);
+		printf("This window requires %d x %d resolution.\n",width,height);
+		return RuntimeError("Please change your settings.");
+	}
 	Py_INCREF( Py_None );
 	return Py_None;
 }
