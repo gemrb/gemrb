@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.356 2005/12/16 15:55:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.357 2005/12/16 21:36:51 avenger_teambg Exp $
  *
  */
 
@@ -109,6 +109,7 @@ inline PyObject* RuntimeError(char* msg)
 {
 	printMessage( "GUIScript", "Runtime Error:\n", LIGHT_RED );
 	PyErr_SetString( PyExc_RuntimeError, msg );
+	core->Quit();
 	return NULL;
 }
 
@@ -120,7 +121,8 @@ inline PyObject* RuntimeError(char* msg)
 inline PyObject* AttributeError(char* doc_string)
 {
 	printMessage( "GUIScript", "Syntax Error:\n", LIGHT_RED );
-	printf( "%s\n\n", doc_string );
+	PyErr_SetString(PyExc_AttributeError, doc_string);
+	core->Quit();
 	return NULL;
 }
 
@@ -1406,7 +1408,7 @@ static PyObject* GemRB_UnloadWindow(PyObject * /*self*/, PyObject* args)
 	}
 	int ret = core->DelWindow( arg );
 	if (ret == -1) {
-		return RuntimeError( GemRB_UnloadWindow__doc );
+		return RuntimeError( "Can't unload window!" );
 	}
 
 	Py_INCREF( Py_None );
@@ -5170,7 +5172,6 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		int Use2 = item->KitUsability;
 		core->FreeItem( item, slotitem->ItemResRef, false );
 		//CanUseItemType will check actor's class bits too
-printf("%d %d\n",Itemtype, Slottype);
 		if (core->CanUseItemType (Itemtype, Slottype, Use1, Use2, actor) ) {
 			res = actor->inventory.AddSlotItem( slotitem, Slot );
 			if (Slot >= 0 && core->QuerySlotEffects( Slot ) ) {
