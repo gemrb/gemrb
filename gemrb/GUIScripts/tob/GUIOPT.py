@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIOPT.py,v 1.12 2005/12/16 21:35:59 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIOPT.py,v 1.13 2005/12/17 10:23:07 avenger_teambg Exp $
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
 # Ingame options
@@ -661,13 +661,12 @@ def OptRadio (name, window, button_id, label_id, variable, value):
 
 	button = GemRB.GetControl (window, button_id)
 	GemRB.SetButtonFlags (window, button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	GemRB.SetEvent (window, button, IE_GUI_MOUSE_ENTER_BUTTON, "DisplayHelp" + name)
+	GemRB.SetEvent (window, button, IE_GUI_BUTTON_ON_PRESS, "DisplayHelp" + name)
 	GemRB.SetVarAssoc (window, button, variable, value)
 
 	label = GemRB.GetControl (window, label_id)
 	GemRB.SetButtonFlags (window, label, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	GemRB.SetButtonState (window, label, IE_GUI_BUTTON_LOCKED)
-	GemRB.SetEvent (window, label, IE_GUI_MOUSE_ENTER_BUTTON, "DisplayHelp" + name)
 
 	return button
 
@@ -676,13 +675,12 @@ def OptCheckbox (name, window, button_id, label_id, variable, value):
 
 	button = GemRB.GetControl (window, button_id)
 	GemRB.SetButtonFlags (window, button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
-	GemRB.SetEvent (window, button, IE_GUI_MOUSE_ENTER_BUTTON, "DisplayHelp" + name)
+	GemRB.SetEvent (window, button, IE_GUI_BUTTON_ON_PRESS, "DisplayHelp" + name)
 	GemRB.SetVarAssoc (window, button, variable, value)
 
 	label = GemRB.GetControl (window, label_id)
 	GemRB.SetButtonFlags (window, label, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	GemRB.SetButtonState (window, label, IE_GUI_BUTTON_LOCKED)
-	GemRB.SetEvent (window, label, IE_GUI_MOUSE_ENTER_BUTTON, "DisplayHelp" + name)
 
 	return button
 
@@ -690,7 +688,6 @@ def OptButton (name, window, button_id, label_strref):
 	"""Standard subwindow button for option windows"""
 	button = GemRB.GetControl (window, button_id)
 	GemRB.SetEvent (window, button, IE_GUI_BUTTON_ON_PRESS, "Open%sWindow" %name)	
-	GemRB.SetEvent (window, button, IE_GUI_MOUSE_ENTER_BUTTON, "DisplayHelp" + name)
 	GemRB.SetText (window, button, label_strref)
 
 def OptDone (name, window, button_id):
