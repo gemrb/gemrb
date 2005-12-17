@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.358 2005/12/17 10:04:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.359 2005/12/17 15:05:49 avenger_teambg Exp $
  *
  */
 
@@ -2538,27 +2538,12 @@ PyDoc_STRVAR( GemRB_PlaySound__doc,
 static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 {
 	char* ResRef;
-	int XPos, YPos;
-	unsigned int flags;
 
 	if (!PyArg_ParseTuple( args, "s", &ResRef )) {
 		return AttributeError( GemRB_PlaySound__doc );
 	}
 
-	//this could be less hardcoded, but would do for a test
-	XPos=YPos=0;
-	flags=0;
-	Game *game=core->GetGame();
-	if (game) {
-		Scriptable *pc=game->GetPC(game->GetSelectedPCSingle(), false);
-		if (pc) {
-			XPos=pc->Pos.x;
-			YPos=pc->Pos.y;
-			flags |= GEM_SND_SPEECH;
-		}
-	}
-	
-	int ret = core->GetSoundMgr()->Play( ResRef, XPos, YPos, flags );
+	int ret = core->GetSoundMgr()->Play( ResRef );
 	if (!ret) {
 		return NULL;
 	}
