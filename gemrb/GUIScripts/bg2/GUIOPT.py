@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIOPT.py,v 1.14 2005/12/17 14:37:10 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIOPT.py,v 1.15 2005/12/17 14:59:13 avenger_teambg Exp $
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
 # Ingame options
@@ -548,20 +548,34 @@ def CloseLoadMsgWindow ():
 	return
 
 def LoadGamePress ():
+	global LoadMsgWindow
+
+	GemRB.UnloadWindow (LoadMsgWindow)
+	LoadMsgWindow = None
 	GemRB.QuitGame ()
+	OpenOptionsWindow()
 	GemRB.SetNextScript ("GUILOAD")
 	return
 
 #save game AND quit
 def SaveGamePress():
-	#CloseOptionsWindow ()
+	global QuitMsgWindow
+
+	GemRB.UnloadWindow (QuitMsgWindow)
+	QuitMsgWindow = None
 	#we need to set a state: quit after save
 	GemRB.SetVar("QuitAfterSave",1)
+	OpenOptionsWindow()
 	OpenSaveWindow ()	
 	return
 
 def QuitGamePress():
+	global QuitMsgWindow
+
+	GemRB.UnloadWindow (QuitMsgWindow)
+	QuitMsgWindow = None
 	GemRB.QuitGame ()
+	OpenOptionsWindow()
 	GemRB.SetNextScript ("Start")
 	return
 
