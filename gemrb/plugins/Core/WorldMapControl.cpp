@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.17 2005/11/24 17:44:09 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.18 2005/12/17 17:27:00 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -114,11 +114,11 @@ void WorldMapControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 {
 	switch (Key) {
 		case 'f':
-			if (Mod & 64)
+			if (Mod & GEM_MOD_CTRL)
 				core->GetVideoDriver()->ToggleFullscreenMode();
 			break;
 		case 'g':
-			if (Mod & 64)
+			if (Mod & GEM_MOD_CTRL)
 				core->GetVideoDriver()->ToggleGrabInput();
 			break;
 		default:

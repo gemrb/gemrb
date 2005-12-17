@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.79 2005/11/24 17:44:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.80 2005/12/17 17:27:00 avenger_teambg Exp $
  */
 
 /**
@@ -167,9 +167,8 @@ public:
 public:
 	Actor *GetTarget();
 	Actor *GetSpeaker();
-	void DeselectAll();
 	/* Selects one or all PC */
-	void SelectActor(int whom);
+	void SelectActor(int whom, int type = -1);
 	void SetCutSceneMode(bool active);
 	int HideGUI();
 	int UnhideGUI();

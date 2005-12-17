@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.118 2005/12/07 20:27:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.119 2005/12/17 17:27:01 avenger_teambg Exp $
  *
  */
 
@@ -190,6 +190,16 @@ bool SDLVideoDriver::ToggleFullscreenMode()
 	return SDL_WM_ToggleFullScreen(disp) != 0;
 }
 
+inline int GetModState()
+{
+	int value = 0;
+	int tmp = SDL_GetModState();
+	if (tmp&KMOD_SHIFT) value |= GEM_MOD_SHIFT;
+	if (tmp&KMOD_CTRL) value |= GEM_MOD_CTRL;
+	if (tmp&KMOD_ALT) value |= GEM_MOD_ALT;
+	return value;
+}
+
 int SDLVideoDriver::SwapBuffers(void)
 {
 	int ret = GEM_OK;
@@ -294,7 +304,7 @@ int SDLVideoDriver::SwapBuffers(void)
 			CursorPos.x = event.button.x; // - mouseAdjustX[CursorIndex];
 			CursorPos.y = event.button.y; // - mouseAdjustY[CursorIndex];
 			if (Evnt && !ConsolePopped)
-				Evnt->MouseDown( event.button.x, event.button.y, 1 << ( event.button.button - 1 ), SDL_GetModState() );
+				Evnt->MouseDown( event.button.x, event.button.y, 1 << ( event.button.button - 1 ), GetModState() );
 
 			break;
 
@@ -306,7 +316,7 @@ int SDLVideoDriver::SwapBuffers(void)
 			CursorPos.x = event.button.x;
 			CursorPos.y = event.button.y;
 			if (Evnt && !ConsolePopped)
-				Evnt->MouseUp( event.button.x, event.button.y, 1 << ( event.button.button - 1 ), SDL_GetModState() );
+				Evnt->MouseUp( event.button.x, event.button.y, 1 << ( event.button.button - 1 ), GetModState() );
 
 			break;
 		 case SDL_ACTIVEEVENT:

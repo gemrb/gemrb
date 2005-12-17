@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.273 2005/12/12 18:39:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.274 2005/12/17 17:27:00 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -432,12 +432,7 @@ void GameControl::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 	}
 }
 
-void GameControl::DeselectAll()
-{
-	core->GetGame()->SelectActor( NULL, false, SELECT_NORMAL );
-}
-
-void GameControl::SelectActor(int whom)
+void GameControl::SelectActor(int whom, int type)
 {
 	Game* game = core->GetGame();
 	if (whom==-1) {
@@ -449,6 +444,15 @@ void GameControl::SelectActor(int whom)
 	Actor* actor = game->GetPC( whom,false );
 	if (!actor) 
 		return;
+
+	if (type==0) {
+		game->SelectActor( actor, false, SELECT_NORMAL );
+		return;
+	}
+	if (type==1) {
+		game->SelectActor( actor, true, SELECT_NORMAL );
+		return;
+	}
 
 	bool was_selected = actor->IsSelected();
 	if (game->SelectActor( actor, true, SELECT_REPLACE ))
@@ -471,6 +475,20 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 		case GEM_ALT:
 			DebugFlags &= ~DEBUG_SHOW_CONTAINERS;
 			break;
+		case '0':
+			game->SelectActor( NULL, false, SELECT_NORMAL );
+			i = game->GetPartySize(false)/2;
+			while(i--) {
+				SelectActor(i, true);
+			}
+			break;
+		case '-':
+			game->SelectActor( NULL, true, SELECT_NORMAL );
+			i = game->GetPartySize(false)/2;
+			while(i--) {
+				SelectActor(i, false);
+			}
+			break;
 		case '=':
 			SelectActor(-1);
 			break;
@@ -490,24 +508,13 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			DebugFlags &= ~DEBUG_XXX;
 			printf( "TAB released\n" );
 			return;
-		case 'f':
-			if (Mod & 64)
-				core->GetVideoDriver()->ToggleFullscreenMode();
-			break;
-		/** why is this good, i don't know, anyway ctrl-g shows
-                    loaded areas in original bg2, so it will do that
-		case 'g':
-			if (Mod & 64)
-				core->GetVideoDriver()->ToggleGrabInput();
-			break;
-		*/
 		default:
 			break;
 	}
 	if (!core->CheatEnabled()) {
 		return;
 	}
-	if (Mod & 64) //ctrl
+	if (Mod & GEM_MOD_CTRL) //ctrl
 	{
 		Map* area = game->GetCurrentArea( );
 		if (!area)
@@ -516,6 +523,9 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 		Point p(lastMouseX, lastMouseY);
 		core->GetVideoDriver()->ConvertToGame( p.x, p.y );
 		switch (Key) {
+			case 'f':
+				core->GetVideoDriver()->ToggleFullscreenMode();
+				break;
 			case 'd': //disarm ?
 				if (overInfoPoint) {
 					overInfoPoint->DetectTrap(256);
@@ -994,7 +1004,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 		for (i = 0; i < highlighted.size(); i++)
 			highlighted[i]->SetOver( false );
 		highlighted.clear();
-		DeselectAll();
+		game->SelectActor( NULL, false, SELECT_NORMAL );
 		if (count != 0) {
 			for (i = 0; i < count; i++) {
 				// FIXME: should call handler only once
@@ -1082,7 +1092,8 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 		case 0:
 			//clicked on a new party member
 			// FIXME: call GameControl::SelectActor() instead
-			game->SelectActor( actor, true, SELECT_REPLACE );
+			//game->SelectActor( actor, true, SELECT_REPLACE );
+			SelectActor( game->InParty(actor) );
 			break;
 		case 1:
 			//talk (first selected talks)

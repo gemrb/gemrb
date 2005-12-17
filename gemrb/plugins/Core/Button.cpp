@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.93 2005/12/15 18:41:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.94 2005/12/17 17:27:00 avenger_teambg Exp $
  *
  */
 
@@ -387,7 +387,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 	}
 
 	if (Button == GEM_MB_ACTION) {
-		if ((Mod == 1) && ButtonOnShiftPress[0])
+		if ((Mod & GEM_MOD_SHIFT) && ButtonOnShiftPress[0])
 			RunEventHandler( ButtonOnShiftPress );
 		else 
 			RunEventHandler( ButtonOnPress );
