@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.357 2005/12/16 21:36:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.358 2005/12/17 10:04:39 avenger_teambg Exp $
  *
  */
 
@@ -5634,6 +5634,27 @@ static PyObject* GemRB_SetActionIcon(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_HasResource__doc,
+"HasResource(ResRef, ResType)\n\n"
+"Returns true if resource is accessible." );
+
+static PyObject* GemRB_HasResource(PyObject * /*self*/, PyObject* args)
+{
+	char *ResRef;
+	int ResType;
+
+	if (!PyArg_ParseTuple( args, "si", &ResRef, &ResType )) {
+		return AttributeError( GemRB_HasResource__doc );
+	}
+	if (core->Exists(ResRef, ResType)) {
+		Py_INCREF( Py_True );
+		return Py_True;
+	} else {
+		Py_INCREF( Py_False );
+		return Py_False;
+	}
+}
+
 static PyMethodDef GemRBMethods[] = {
 	METHOD(SetInfoTextColor, METH_VARARGS),
 	METHOD(HideGUI, METH_NOARGS),
@@ -5814,6 +5835,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetAbilityBonus, METH_VARARGS),
 	METHOD(LeaveParty, METH_VARARGS),
 	METHOD(SetActionIcon, METH_VARARGS),
+	METHOD(HasResource, METH_VARARGS),
 	// terminating entry	
 	{NULL, NULL, 0, NULL}
 };
