@@ -3,6 +3,9 @@ import GemRB
 
 StartWindow = 0
 
+#the worldmap resource indicator
+IE_WMP_CLASS_ID = 0x000003F7
+
 def OnLoad():
 	global StartWindow, skip_videos
 
@@ -20,6 +23,15 @@ def OnLoad():
 		GemRB.LoadWindowFrame("STON08L", "STON08R", "STON08T", "STON08B")
 	elif screen_width == 1024:
 		GemRB.LoadWindowFrame("STON10L", "STON10R", "STON10T", "STON10B")
+
+	#if not detected tob, we go right to the main menu
+	if not GemRB.HasResource("worldm25",IE_WMP_CLASS_ID):
+		GemRB.SetMasterScript("BALDUR","WORLDMAP")
+		GemRB.SetVar("oldgame",1)
+		GemRB.SetNextScript("Start2")
+		if not skip_videos:
+			GemRB.PlayMovie ("INTRO15F")
+		return
 
 	GemRB.LoadWindowPack("START", 640, 480)
 	StartWindow = GemRB.LoadWindow(7)
@@ -46,12 +58,12 @@ def OnLoad():
 	return
 	
 def SoAPress():
+	GemRB.UnloadWindow(StartWindow)
 	GemRB.SetMasterScript("BALDUR","WORLDMAP")
 	GemRB.SetVar("oldgame",1)
-	GemRB.UnloadWindow(StartWindow)
 	GemRB.SetNextScript("Start2")
 	if not skip_videos:
-            GemRB.PlayMovie ("INTRO15F")
+		GemRB.PlayMovie ("INTRO15F")
 	return
 
 def ToBPress():
@@ -60,7 +72,7 @@ def ToBPress():
 	GemRB.UnloadWindow(StartWindow)
 	GemRB.SetNextScript("Start2")
 	if not skip_videos:
-            GemRB.PlayMovie ("INTRO")
+		GemRB.PlayMovie ("INTRO")
 	return
 
 def ExitPress():
