@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIPR.py,v 1.19 2005/11/22 18:50:54 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIPR.py,v 1.20 2005/12/17 21:02:50 avenger_teambg Exp $
 
 
 # GUIPR.py - scripts to control priest spells windows from GUIPR winpack
@@ -35,11 +35,13 @@ PriestSpellInfoWindow = None
 PriestSpellLevel = 0
 PriestSpellUnmemorizeWindow = None
 PortraitWindow = None
+OptionsWindow = None
 OldPortraitWindow = None
+OldOptionsWindow = None
 
 def OpenPriestWindow ():
 	global PriestWindow, OptionsWindow, PortraitWindow
-	global OldPortraitWindow
+	global OldPortraitWindow, OldOptionsWindow
 
 	if CloseOtherWindow (OpenPriestWindow):
 		GemRB.UnloadWindow (PriestWindow)
@@ -52,6 +54,8 @@ def OpenPriestWindow ():
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
+		GUICommonWindows.OptionsWindow = OldOptionsWindow
+		OldOptionsWindow = None
 		SetSelectionChangeHandler (None)
 		return
 
@@ -62,11 +66,12 @@ def OpenPriestWindow ():
 	PriestWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", PriestWindow)
 	#saving the original portrait window
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = OpenPortraitWindow (0)
+	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenPriestWindow")
 	GemRB.SetWindowFrame (OptionsWindow)
+	OldPortraitWindow = GUICommonWindows.PortraitWindow
+	PortraitWindow = OpenPortraitWindow (0)
 
 	Button = GemRB.GetControl (Window, 1)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PriestPrevLevelPress")

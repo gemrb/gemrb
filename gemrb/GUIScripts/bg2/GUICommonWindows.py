@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.26 2005/12/17 14:37:10 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.27 2005/12/17 21:02:45 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -43,11 +43,17 @@ FRAME_PC_TARGET   = 1
 # 9 REST
 # 10 TXTE
 
+PortraitWindow = None
+OptionsWindow = None
+ActionsWindow = None
+
 def ReturnToGame ():
 	print "returntogame"
 
 def SetupMenuWindowControls (Window, Gears, ReturnToGame):
+	global OptionsWindow
 
+	OptionsWindow = Window
 	# Return to Game
 	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetTooltip (Window, Button, 16313)
@@ -139,7 +145,7 @@ def EmptyControls ():
 	return
 
 def SelectFormationPreset ():
-	GemRB.GameSetFormation ( GemRB.GetVar ("Value"), GemRB.GetVar("Formation") )
+	GemRB.GameSetFormation ( GemRB.GetVar ("Value"), GemRB.GetVar ("Formation") )
 	GroupControls ()
 	return
 
@@ -209,7 +215,22 @@ def OpenActionsWindowControls (Window):
 	return
 
 def UpdateActionsWindow ():
-	global ActionsWindow
+	global ActionsWindow, PortraitWindow, OptionsWindow
+
+	if ActionsWindow == -1:
+		return
+
+	if ActionsWindow == None:
+		return
+
+	if GemRB.GetVar ("OtherWindow") != -1:
+		return
+
+	#fully redraw the portrait window to cover the actions window
+	if PortraitWindow:
+		GemRB.InvalidateWindow (PortraitWindow)
+	if OptionsWindow:
+		GemRB.InvalidateWindow (OptionsWindow)
 
 	pc = 0
 	for i in range (PARTY_SIZE):
@@ -281,10 +302,10 @@ def RunSelectionChangeHandler ():
 def OpenPortraitWindow (needcontrols):
 	global PortraitWindow
 
-	PortraitWindow = Window = GemRB.LoadWindow(1)
+	PortraitWindow = Window = GemRB.LoadWindow (1)
 
 	if needcontrols:
-		Button=GemRB.GetControl(Window, 8)
+		Button=GemRB.GetControl (Window, 8)
 		GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "MinimizePortraits")
 
 		# AI
@@ -364,12 +385,15 @@ def SelectAllOnPress ():
 	return
 
 # Run by Game class when selection was changed
+def ActionsWindowExists():
+	if (ActionsWindow!=-1 and ActionsWindow!=None):
+		return false
+
 def SelectionChanged ():
-	global PortraitWindow, ActionsWindow
+	global PortraitWindow
 
 	if (not SelectionChangeHandler):
-		if (ActionsWindow!=-1):
-			UpdateActionsWindow ()
+		UpdateActionsWindow ()
 		for i in range (PARTY_SIZE):
 			Button = GemRB.GetControl (PortraitWindow, i)
 			GemRB.EnableButtonBorder (PortraitWindow, Button, FRAME_PC_SELECTED, GemRB.GameIsPCSelected (i + 1))

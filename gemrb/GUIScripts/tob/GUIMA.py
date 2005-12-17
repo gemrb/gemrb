@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIMA.py,v 1.25 2005/12/17 14:37:18 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIMA.py,v 1.26 2005/12/17 21:02:50 avenger_teambg Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -33,11 +33,13 @@ MapWindow = None
 NoteWindow = None
 WorldMapWindow = None
 WorldMapControl = None
+OldPortraitWindow = None
+OldOptionsWindow = None
 
 ###################################################
 def OpenMapWindow ():
 	global MapWindow, OptionsWindow, PortraitWindow
-	global OldPortraitWindow
+	global OldPortraitWindow, OldOptionsWindow
 
 	if CloseOtherWindow (OpenMapWindow):
 		GemRB.UnloadWindow (MapWindow)
@@ -51,6 +53,8 @@ def OpenMapWindow ():
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
+		GUICommonWindows.OptionsWindow = OldOptionsWindow
+		OldOptionsWindow = None
 		return
 
 	GemRB.HideGUI ()
@@ -61,10 +65,11 @@ def OpenMapWindow ():
 	#this window type blocks the game normally, but map window doesn't
 	GemRB.SetVar ("OtherWindow", MapWindow)
 	#saving the original portrait window
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = OpenPortraitWindow (0)
+	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenMapWindow")
+	OldPortraitWindow = GUICommonWindows.PortraitWindow
+	PortraitWindow = OpenPortraitWindow (0)
 	GemRB.SetWindowFrame (OptionsWindow)
 
 	# World Map

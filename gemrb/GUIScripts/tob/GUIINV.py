@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.32 2005/12/16 19:00:17 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.33 2005/12/17 21:02:49 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -36,11 +36,13 @@ ItemInfoWindow = None
 ItemAmountWindow = None
 ItemIdentifyWindow = None
 PortraitWindow = None
+OptionsWindow = None
 OldPortraitWindow = None
+OldOptionsWindow = None
 
 def OpenInventoryWindow ():
 	global InventoryWindow, OptionsWindow, PortraitWindow
-	global OldPortraitWindow
+	global OldPortraitWindow, OldOptionsWindow
 	
 	if CloseOtherWindow (OpenInventoryWindow):
 		GemRB.UnloadWindow (InventoryWindow)
@@ -53,6 +55,8 @@ def OpenInventoryWindow ():
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
+		GUICommonWindows.OptionsWindow = OldOptionsWindow
+		OldOptionsWindow = None
 		SetSelectionChangeHandler (None)
 		return
 
@@ -63,11 +67,12 @@ def OpenInventoryWindow ():
 	InventoryWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", InventoryWindow)
 	#saving the original portrait window
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = OpenPortraitWindow (0)
+	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenInventoryWindow")
 	GemRB.SetWindowFrame (OptionsWindow)
+	OldPortraitWindow = GUICommonWindows.PortraitWindow
+	PortraitWindow = OpenPortraitWindow (0)
 
 	# Ground Item
 	for i in range (5):

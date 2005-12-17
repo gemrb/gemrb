@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIMG.py,v 1.16 2005/11/22 18:50:54 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIMG.py,v 1.17 2005/12/17 21:02:50 avenger_teambg Exp $
 
 
 # GUIMG.py - scripts to control mage spells windows from GUIMG winpack
@@ -35,11 +35,13 @@ MageSpellInfoWindow = None
 MageSpellLevel = 0
 MageSpellUnmemorizeWindow = None
 PortraitWindow = None
+OptionsWindow = None
 OldPortraitWindow = None
+OldOptionsWindow = None
 
 def OpenMageWindow ():
 	global MageWindow, OptionsWindow, PortraitWindow
-	global OldPortraitWindow
+	global OldPortraitWindow, OldOptionsWindow
 
 	if CloseOtherWindow (OpenMageWindow):
 		GemRB.UnloadWindow (MageWindow)
@@ -52,6 +54,8 @@ def OpenMageWindow ():
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
+		GUICommonWindows.OptionsWindow = OldOptionsWindow
+		OldOptionsWindow = None
 		SetSelectionChangeHandler (None)
 		return
 
@@ -62,11 +66,12 @@ def OpenMageWindow ():
 	MageWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", MageWindow)
 	#saving the original portrait window
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = OpenPortraitWindow (0)
+	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenMageWindow")
 	GemRB.SetWindowFrame (OptionsWindow)
+	OldPortraitWindow = GUICommonWindows.PortraitWindow
+	PortraitWindow = OpenPortraitWindow (0)
 
 	Button = GemRB.GetControl (Window, 1)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MagePrevLevelPress")

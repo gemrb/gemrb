@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIOPT.py,v 1.15 2005/12/17 14:59:13 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIOPT.py,v 1.16 2005/12/17 21:02:45 avenger_teambg Exp $
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
 # Ingame options
@@ -33,6 +33,8 @@ from GUICommonWindows import *
 GameOptionsWindow = None
 PortraitWindow = None
 OldPortraitWindow = None
+OptionsWindow = None
+OldOptionsWindow = None
 HelpTextArea = None
 
 LoadMsgWindow = None
@@ -41,7 +43,7 @@ QuitMsgWindow = None
 ###################################################
 def CloseOptionsWindow ():
 	global GameOptionsWindow, OptionsWindow, PortraitWindow
-	global OldPortraitWindow
+	global OldPortraitWindow, OldOptionsWindow
 	
 	if GameOptionsWindow == None:
 		return
@@ -54,6 +56,8 @@ def CloseOptionsWindow ():
 	GemRB.SetVar ("OtherWindow", -1)
 	GemRB.SetVisible (0,1)
 	GemRB.UnhideGUI ()
+	GUICommonWindows.OptionsWindow = OldOptionsWindow
+	OldOptionsWindow = None
 	GUICommonWindows.PortraitWindow = OldPortraitWindow
 	OldPortraitWindow = None
 	return
@@ -61,7 +65,7 @@ def CloseOptionsWindow ():
 ###################################################
 def OpenOptionsWindow ():
 	global GameOptionsWindow, OptionsWindow, PortraitWindow
-	global OldPortraitWindow
+	global OldPortraitWindow, OldOptionsWindow
 
 	if CloseOtherWindow(OpenOptionsWindow):
 		CloseOptionsWindow()
@@ -75,12 +79,12 @@ def OpenOptionsWindow ():
 	GemRB.SetVar ("OtherWindow", GameOptionsWindow)
 	#saving the original portrait window
 	if OldPortraitWindow == None:
+		OldOptionsWindow = GUICommonWindows.OptionsWindow
+		OptionsWindow = GemRB.LoadWindow (0)
+		SetupMenuWindowControls (OptionsWindow, 0, "OpenOptionsWindow")
+		GemRB.SetWindowFrame (OptionsWindow)
 		OldPortraitWindow = GUICommonWindows.PortraitWindow
 		PortraitWindow = OpenPortraitWindow (0)
-		OptionsWindow = GemRB.LoadWindow (0)
-
-	SetupMenuWindowControls (OptionsWindow, 0, "OpenOptionsWindow")
-	GemRB.SetWindowFrame (OptionsWindow)
 
 	# Return to Game
 	Button = GemRB.GetControl (Window, 11)

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.24 2005/11/29 22:40:37 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.25 2005/12/17 21:02:45 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -35,11 +35,15 @@ from GUIWORLD import OpenReformPartyWindow
 RecordsWindow = None
 InformationWindow = None
 BiographyWindow = None
+PortraitWindow = None
+OptionsWindow = None
+OldPortraitWindow = None
+OldOptionsWindow = None
 
 ###################################################
 def OpenRecordsWindow ():
 	global RecordsWindow, OptionsWindow, PortraitWindow
-	global OldPortraitWindow
+	global OldPortraitWindow, OldOptionsWindow
 
 	if CloseOtherWindow (OpenRecordsWindow):
 		if InformationWindow: OpenInformationWindow ()
@@ -54,6 +58,8 @@ def OpenRecordsWindow ():
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
+		GUICommonWindows.OptionsWindow = OldOptionsWindow
+		OldOptionsWindow = None
 		SetSelectionChangeHandler (None)
 		return	
 
@@ -64,11 +70,12 @@ def OpenRecordsWindow ():
 	RecordsWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", RecordsWindow)
 	#saving the original portrait window
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = OpenPortraitWindow(0)
+	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow(0)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenRecordsWindow")
 	GemRB.SetWindowFrame (OptionsWindow)
+	OldPortraitWindow = GUICommonWindows.PortraitWindow
+	PortraitWindow = OpenPortraitWindow(0)
 
 	# dual class
 	Button = GemRB.GetControl (Window, 0)

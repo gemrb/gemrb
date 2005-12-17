@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIJRNL.py,v 1.13 2005/11/06 12:15:00 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIJRNL.py,v 1.14 2005/12/17 21:02:45 avenger_teambg Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -31,6 +31,7 @@ from GUICommonWindows import *
 JournalWindow = None
 PortraitWindow = None
 OldPortraitWindow = None
+OldOptionsWindow = None
 
 global Section
 Section = 1
@@ -42,7 +43,7 @@ StartYear = 0
 ###################################################
 def OpenJournalWindow ():
 	global JournalWindow, OptionsWindow, PortraitWindow
-	global OldPortraitWindow
+	global OldPortraitWindow, OldOptionsWindow
 	global StartTime, StartYear
 	global Chapter
 
@@ -58,6 +59,8 @@ def OpenJournalWindow ():
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
+		GUICommonWindows.OptionsWindow = OldOptionsWindow
+		OldOptionsWindow = None
 		return
 		
 	Table = GemRB.LoadTable("YEARS")
@@ -72,11 +75,12 @@ def OpenJournalWindow ():
 	JournalWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", JournalWindow)
 	#saving the original portrait window
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = OpenPortraitWindow (0)
+	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenJournalWindow")
 	GemRB.SetWindowFrame (OptionsWindow)
+	OldPortraitWindow = GUICommonWindows.PortraitWindow
+	PortraitWindow = OpenPortraitWindow (0)
 
 	# prev. chapter
 	Button = GemRB.GetControl (JournalWindow, 3)
