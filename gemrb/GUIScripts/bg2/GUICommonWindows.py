@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.25 2005/12/04 23:12:42 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.26 2005/12/17 14:37:10 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -139,7 +139,7 @@ def EmptyControls ():
 	return
 
 def SelectFormationPreset ():
-	GemRB.GameSetFormation (GemRB.GetVar ("Value"), GemRB.GetVar ("Formation") )
+	GemRB.GameSetFormation ( GemRB.GetVar ("Value"), GemRB.GetVar("Formation") )
 	GroupControls ()
 	return
 
@@ -311,6 +311,7 @@ def OpenPortraitWindow (needcontrols):
 		GemRB.SetButtonFont (Window, Button, "NORMAL")
 
 	UpdatePortraitWindow ()
+	SelectionChanged ()
 	return Window
 
 def UpdatePortraitWindow ():

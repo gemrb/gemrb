@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/MessageWindow.py,v 1.31 2005/12/04 00:04:27 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/MessageWindow.py,v 1.32 2005/12/17 14:37:18 avenger_teambg Exp $
 
 # MessageWindow.py - scripts and GUI for main (walk) window
 
@@ -50,6 +50,7 @@ def OnLoad():
 	GemRB.GameSetProtagonistMode(1)
 	GemRB.LoadWindowPack(GetWindowPack())
 	ActionsWindow = GemRB.LoadWindow(3)
+	OpenActionsWindowControls (ActionsWindow)
 	OptionsWindow = GemRB.LoadWindow(0)
 	PortraitWindow = OpenPortraitWindow(1)
 
@@ -75,7 +76,6 @@ def OnLoad():
 	GemRB.SetVar("OtherPosition", 5) #Inactivating
 	GemRB.SetVar("TopPosition", 5) #Inactivating
 	
-	OpenActionsWindowControls (ActionsWindow)
 	SetupMenuWindowControls (OptionsWindow, 1, "ReturnToGame")
 
 	UpdateControlStatus()

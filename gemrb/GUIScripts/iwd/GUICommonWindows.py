@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUICommonWindows.py,v 1.10 2005/11/29 22:50:10 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUICommonWindows.py,v 1.11 2005/12/17 14:37:17 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -113,10 +113,7 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
                 GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
                 GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_LOCKED)
 
-## 	# Rest
-## 	Button = GemRB.GetControl (Window, 8)
-## 	GemRB.SetTooltip (Window, Button, 11942)
-## 	GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreWindow")
+	SelectionChanged()
 	return
 
 def ReturnToGame ():
@@ -133,6 +130,8 @@ def RestPress ():
 
 def SetupActionsWindowControls (Window):
 	# 41627 - Return to the Game World
+
+	ActionsWindow = Window
 
 	# Select all characters
 	Button = GemRB.GetControl (Window, 1)
