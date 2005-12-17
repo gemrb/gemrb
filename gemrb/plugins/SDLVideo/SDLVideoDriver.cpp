@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.119 2005/12/17 17:27:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.120 2005/12/17 17:37:10 avenger_teambg Exp $
  *
  */
 
@@ -190,13 +190,12 @@ bool SDLVideoDriver::ToggleFullscreenMode()
 	return SDL_WM_ToggleFullScreen(disp) != 0;
 }
 
-inline int GetModState()
+inline int GetModState(int modstate)
 {
 	int value = 0;
-	int tmp = SDL_GetModState();
-	if (tmp&KMOD_SHIFT) value |= GEM_MOD_SHIFT;
-	if (tmp&KMOD_CTRL) value |= GEM_MOD_CTRL;
-	if (tmp&KMOD_ALT) value |= GEM_MOD_ALT;
+	if (modstate&KMOD_SHIFT) value |= GEM_MOD_SHIFT;
+	if (modstate&KMOD_CTRL) value |= GEM_MOD_CTRL;
+	if (modstate&KMOD_ALT) value |= GEM_MOD_ALT;
 	return value;
 }
 
@@ -237,7 +236,7 @@ int SDLVideoDriver::SwapBuffers(void)
                                         break;
 			}
 			if (!ConsolePopped && Evnt && ( key != 0 ))
-				Evnt->KeyRelease( key, event.key.keysym.mod );
+				Evnt->KeyRelease( key, GetModState(event.key.keysym.mod) );
 			break;
 
 		case SDL_KEYDOWN:
@@ -288,9 +287,9 @@ int SDLVideoDriver::SwapBuffers(void)
 					Evnt->OnSpecialKeyPress( key );
 			} else if (( key != 0 )) {
 				if (ConsolePopped)
-					core->console->OnKeyPress( key, event.key.keysym.mod );
+					core->console->OnKeyPress( key, GetModState(event.key.keysym.mod) );
 				else if (Evnt)
-					Evnt->KeyPress( key, event.key.keysym.mod );
+					Evnt->KeyPress( key, GetModState(event.key.keysym.mod) );
 			}
 			break;
 		case SDL_MOUSEMOTION:
@@ -304,7 +303,7 @@ int SDLVideoDriver::SwapBuffers(void)
 			CursorPos.x = event.button.x; // - mouseAdjustX[CursorIndex];
 			CursorPos.y = event.button.y; // - mouseAdjustY[CursorIndex];
 			if (Evnt && !ConsolePopped)
-				Evnt->MouseDown( event.button.x, event.button.y, 1 << ( event.button.button - 1 ), GetModState() );
+				Evnt->MouseDown( event.button.x, event.button.y, 1 << ( event.button.button - 1 ), GetModState(SDL_GetModState()) );
 
 			break;
 
@@ -316,7 +315,7 @@ int SDLVideoDriver::SwapBuffers(void)
 			CursorPos.x = event.button.x;
 			CursorPos.y = event.button.y;
 			if (Evnt && !ConsolePopped)
-				Evnt->MouseUp( event.button.x, event.button.y, 1 << ( event.button.button - 1 ), GetModState() );
+				Evnt->MouseUp( event.button.x, event.button.y, 1 << ( event.button.button - 1 ), GetModState(SDL_GetModState()) );
 
 			break;
 		 case SDL_ACTIVEEVENT:
