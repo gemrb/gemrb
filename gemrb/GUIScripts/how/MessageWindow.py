@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/MessageWindow.py,v 1.23 2005/12/17 14:37:16 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/MessageWindow.py,v 1.24 2005/12/18 19:37:20 avenger_teambg Exp $
 
 # MessageWindow.py - scripts and GUI for main (walk) window
 
@@ -50,7 +50,8 @@ def OnLoad():
 	GemRB.GameSetProtagonistMode(2)
 	GemRB.LoadWindowPack(GetWindowPack())
 	ActionsWindow = GemRB.LoadWindow(3)
-	OptionsWindow = GemRB.LoadWindow(0)
+	#this is different in IWD and HoW
+	OptionsWindow = GemRB.LoadWindow(25)
 	SetupActionsWindowControls (ActionsWindow)
 	PortraitWindow = OpenPortraitWindow(1)
 

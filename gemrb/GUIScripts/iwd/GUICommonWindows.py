@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUICommonWindows.py,v 1.11 2005/12/17 14:37:17 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUICommonWindows.py,v 1.12 2005/12/18 19:37:21 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -106,12 +106,12 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	GemRB.SetTooltip (Window, Button, 16312)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")
 
-        if Gears:
-                # Gears (time)
-                Button = GemRB.GetControl (Window, 9)
-                GemRB.SetAnimation (Window, Button, "CGEAR")
-                GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
-                GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_LOCKED)
+	if Gears:
+		# Gears (time)
+		Button = GemRB.GetControl (Window, 9)
+		GemRB.SetAnimation (Window, Button, "CGEAR")
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
+		GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_LOCKED)
 
 	SelectionChanged()
 	return
@@ -121,8 +121,12 @@ def ReturnToGame ():
 	CloseOtherWindow (None)
 
 def AIPress ():
-	print "AIPress"
-
+	Button = GemRB.GetControl (PortraitWindow, 6)
+	AI = GemRB.GetVar("MessageWindowSize") & GS_PARTYAI
+	if AI:
+		GemRB.SetTooltip (PortraitWindow, Button, 15917)
+	else:
+		GemRB.SetTooltip (PortraitWindow, Button, 15918)
 
 def RestPress ():
 	print "RestPress"
@@ -196,19 +200,24 @@ def OpenPortraitWindow (needcontrols):
 	global PortraitWindow
 
 	PortraitWindow = Window = GemRB.LoadWindow(1)
-        if needcontrols:
-                Button=GemRB.GetControl(PortraitWindow, 8)
-                GemRB.SetEvent(PortraitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "MinimizePortraits")
+	if needcontrols:
+		# AI
+		Button = GemRB.GetControl (Window, 6)
 
-                # AI
-                Button = GemRB.GetControl (Window, 6)
-                GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
-                GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "AIPress")
+		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "AIPress")
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
+		GemRB.SetVarAssoc (Window, Button, "MessageWindowSize", 1)
+		GemRB.SetButtonSprites (Window, Button, "GUIBTACT",0,46,47,48,49)
+		AIPress()
 
-                #Select All
-                Button = GemRB.GetControl (Window, 7)
-                GemRB.SetTooltip (Window, Button, 10485)
-                GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
+		#Select All
+		Button = GemRB.GetControl (Window, 7)
+		GemRB.SetTooltip (Window, Button, 10485)
+		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
+		#Rest
+		Button=GemRB.GetControl(PortraitWindow, 8)
+		GemRB.SetTooltip (Window, Button, 11942)
+		GemRB.SetEvent(PortraitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "RestParty")
 
 	for i in range (PARTY_SIZE):
 		Button = GemRB.GetControl (Window, i)

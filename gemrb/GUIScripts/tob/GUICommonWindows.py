@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.28 2005/12/17 21:02:49 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.29 2005/12/18 19:37:21 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -198,10 +198,6 @@ def GroupControls ():
 		GemRB.SetTooltip (Window, Button, "F%d - %s"%(8+i,str) )
 	return
 
-def SetupControls (pc):
-	EmptyControls()
-	return
-
 def OpenActionsWindowControls (Window):
 	global ActionsWindow
 
@@ -224,7 +220,6 @@ def UpdateActionsWindow ():
 		return
 
 	if GemRB.GetVar ("OtherWindow") != -1:
-		return
 
 	#fully redraw the portrait window to cover the actions window
 	if PortraitWindow:
@@ -247,7 +242,8 @@ def UpdateActionsWindow ():
 	if pc == -1:
 		GroupControls ()
 		return
-	SetupControls (pc)
+	#this is based on class
+	GemRB.SetupControls (ActionsWindow, pc)
 	return
 
 def GetActorClassTitle (actor):
