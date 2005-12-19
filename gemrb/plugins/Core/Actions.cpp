@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.52 2005/12/12 18:39:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.53 2005/12/19 23:10:50 avenger_teambg Exp $
  *
  */
 
@@ -2033,7 +2033,7 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 		TableMgr *tab=core->GetTable( pdtable );
 		//set dialog only if we got a row
 		if (tab->GetRowIndex( scriptname ) != -1) {
-			strnuprcpy(resref, tab->QueryField( scriptname, "JOIN_DIALOG_FILE"),8);
+			strnlwrcpy(resref, tab->QueryField( scriptname, "JOIN_DIALOG_FILE"),8);
 			act->SetDialog( resref );
 		}
 		core->DelTable( pdtable );
@@ -2495,7 +2495,7 @@ void GameScript::SetLeavePartyDialogFile(Scriptable* Sender, Action* /*parameter
 
 void GameScript::TextScreen(Scriptable* /*Sender*/, Action* parameters)
 {
-	strnuprcpy(core->GetGame()->LoadMos, parameters->string0Parameter,8);
+	strnlwrcpy(core->GetGame()->LoadMos, parameters->string0Parameter,8);
 	core->GetGUIScriptEngine()->RunFunction( "StartTextScreen" );
 	core->GetVideoDriver()->DisableMouse = false;
 }
@@ -4263,7 +4263,7 @@ void GameScript::ChangeStoreMarkup(Scriptable* /*Sender*/, Action* parameters)
 		if (strnicmp(store->Name, parameters->string0Parameter, 8) ) {
 			//not the current store, we need some dirty hack
 			has_current = true;
-			strnuprcpy(current, store->Name, 8);
+			strnlwrcpy(current, store->Name, 8);
 		}
 	}
 	store->BuyMarkup = parameters->int0Parameter;

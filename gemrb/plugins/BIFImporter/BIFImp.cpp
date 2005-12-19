@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.27 2005/11/18 21:01:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BIFImporter/BIFImp.cpp,v 1.28 2005/12/19 23:10:50 avenger_teambg Exp $
  *
  */
 
@@ -161,6 +161,7 @@ int BIFImp::OpenArchive(const char* filename)
 		compressed->ReadDword( &fnlen );
 		char* fname = ( char* ) malloc( fnlen );
 		compressed->Read( fname, fnlen );
+		strlwr(fname);
 		compressed->ReadDword( &declen );
 		compressed->ReadDword( &complen );
 		PathJoin( path, core->CachePath, fname, NULL );

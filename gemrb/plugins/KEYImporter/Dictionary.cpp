@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/Dictionary.cpp,v 1.16 2005/03/05 10:13:58 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/Dictionary.cpp,v 1.17 2005/12/19 23:10:56 avenger_teambg Exp $
  *
  */
 
@@ -32,7 +32,7 @@ inline unsigned int Dictionary::MyHashKey(const char* key, unsigned int type) co
 {
 	unsigned int nHash = type;
 	for (int i = 0; i < KEYSIZE && key[i]; i++) {
-		nHash = ( nHash << 5 ) + nHash + toupper( key[i] );
+		nHash = ( nHash << 5 ) + nHash + tolower( key[i] );
 	}
 	return nHash;
 }
@@ -216,7 +216,7 @@ void Dictionary::SetAt(const ieResRef key, unsigned int type, unsigned int value
 		m_pHashTable[nHash] = pAssoc;
 	}
 	for(i=0;i<KEYSIZE && key[i];i++) {
-		pAssoc->key[i]=toupper(key[i]);
+		pAssoc->key[i]=tolower(key[i]);
 	}
 	for(;i<KEYSIZE;i++) {
 		pAssoc->key[i]=0;

@@ -1,20 +1,25 @@
 2DA V1.0
 -1
            1          2          3          4         TOOLTIP
-STEALTH    30         31         32         33         
-THIEVING   26         27         28         29         
-SPSELECT   12         13         52         53         
-SPELL1     -1         -1         -1         -1         
-SPELL2     -1         -1         -1         -1         
-SPELL3     -1         -1         -1         -1         
-TURN        8          9         10         11         
+STEALTH    30         31         32         33         4968
+THIEVING   26         27         28         29         4971
+SPSELECT   12         13         52         53         4688
+SPELL1     -1         -1         -1         -1         4938
+SPELL2     -1         -1         -1         -1         4938
+SPELL3     -1         -1         -1         -1         4938
+TURN        8          9         10         11         4974
 TALK        4          5          6          7         4933
-USEITEM    18         19         56         57 
-QUICK1     -1         -1         -1         -1         
-QUICK2     -1         -1         -1         -1         
-QUICK3     -1         -1         -1         -1         
-INNATE     38         39         54         55         
-DEFEND     0         1         2        3
+USEITEM    18         19         56         57 	       4978
+QUICK1     -1         -1         -1         -1         4937
+QUICK4     -1         -1         -1         -1         4937
+QUICK2     -1         -1         -1         -1         4937
+QUICK3     -1         -1         -1         -1         4937
+INNATE     38         39         54         55         4954
+DEFEND     0         1         2        3              15925
 ATTACK     14         15         16         17         4666
-BARDSONG   22         23         24         25
+WEAPON1    -1         -1         -1         -1         4950
+WEAPON2    -1         -1         -1         -1         4950
+WEAPON3    -1         -1         -1         -1         4950
+WEAPON4    -1         -1         -1         -1         4950
+BARDSONG   22         23         24         25         11798
 STOP       58         59         60         61         15924

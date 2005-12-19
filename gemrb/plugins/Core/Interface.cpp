@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.373 2005/12/15 19:13:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.374 2005/12/19 23:10:52 avenger_teambg Exp $
  *
  */
 
@@ -771,7 +771,7 @@ int Interface::Init()
 			DSCount = tm->GetRowCount();
 			DefSound = (ieResRef *) calloc( DSCount, sizeof(ieResRef) );
 			for (int i = 0; i < DSCount; i++) {
-				strnuprcpy( DefSound[i], tm->QueryField( i, 0 ), 8 );
+				strnlwrcpy( DefSound[i], tm->QueryField( i, 0 ), 8 );
 			}
 			DelTable( table );
 		}
@@ -1191,112 +1191,112 @@ const char* Interface::TypeExt(SClass_ID type)
 {
 	switch (type) {
 		case IE_2DA_CLASS_ID:
-			return ".2DA";
+			return ".2da";
 
 		case IE_ACM_CLASS_ID:
-			return ".ACM";
+			return ".acm";
 
 		case IE_ARE_CLASS_ID:
-			return ".ARE";
+			return ".are";
 
 		case IE_BAM_CLASS_ID:
-			return ".BAM";
+			return ".bam";
 
 		case IE_BCS_CLASS_ID:
-			return ".BCS";
+			return ".bcs";
 
 		case IE_BIF_CLASS_ID:
-			return ".BIF";
+			return ".bif";
 
 		case IE_BMP_CLASS_ID:
-			return ".BMP";
+			return ".bmp";
 
 		case IE_CHR_CLASS_ID:
-			return ".CHR";
+			return ".chr";
 
 		case IE_CHU_CLASS_ID:
-			return ".CHU";
+			return ".chu";
 
 		case IE_CRE_CLASS_ID:
-			return ".CRE";
+			return ".cre";
 
 		case IE_DLG_CLASS_ID:
-			return ".DLG";
+			return ".dlg";
 
 		case IE_EFF_CLASS_ID:
-			return ".EFF";
+			return ".eff";
 
 		case IE_GAM_CLASS_ID:
-			return ".GAM";
+			return ".gam";
 
 		case IE_IDS_CLASS_ID:
-			return ".IDS";
+			return ".ids";
 
 		case IE_INI_CLASS_ID:
-			return ".INI";
+			return ".ini";
 
 		case IE_ITM_CLASS_ID:
-			return ".ITM";
+			return ".itm";
 
 		case IE_KEY_CLASS_ID:
-			return ".KEY";
+			return ".key";
 
 		case IE_MOS_CLASS_ID:
-			return ".MOS";
+			return ".mos";
 
 		case IE_MUS_CLASS_ID:
-			return ".MUS";
+			return ".mus";
 
 		case IE_MVE_CLASS_ID:
-			return ".MVE";
+			return ".mve";
 
 		case IE_PLT_CLASS_ID:
-			return ".PLT";
+			return ".plt";
 
 		case IE_PRO_CLASS_ID:
-			return ".PRO";
+			return ".pro";
 
 		case IE_SAV_CLASS_ID:
-			return ".SAV";
+			return ".sav";
 
 		case IE_SPL_CLASS_ID:
-			return ".SPL";
+			return ".spl";
 
 		case IE_SRC_CLASS_ID:
-			return ".SRC";
+			return ".src";
 
 		case IE_STO_CLASS_ID:
-			return ".STO";
+			return ".sto";
 
 		case IE_TIS_CLASS_ID:
-			return ".TIS";
+			return ".tis";
 
 		case IE_TLK_CLASS_ID:
-			return ".TLK";
+			return ".tlk";
 
 		case IE_TOH_CLASS_ID:
-			return ".TOH";
+			return ".toh";
 
 		case IE_TOT_CLASS_ID:
-			return ".TOT";
+			return ".tot";
 
 		case IE_VAR_CLASS_ID:
-			return ".VAR";
+			return ".var";
 
 		case IE_VVC_CLASS_ID:
-			return ".VVC";
+			return ".vvc";
 
 		case IE_WAV_CLASS_ID:
-			return ".WAV";
+			return ".wav";
 
 		case IE_WED_CLASS_ID:
-			return ".WED";
+			return ".wed";
 
 		case IE_WFX_CLASS_ID:
-			return ".WFX";
+			return ".wfx";
 
 		case IE_WMP_CLASS_ID:
-			return ".WMP";
+			return ".wmp";
 	}
 	return NULL;
 }
@@ -3048,9 +3048,9 @@ bool Interface::InitItemTypes()
 			/*
 			strncpy(slottypes[i].slotresref, st->QueryField(i,2), 8 );
 			slottypes[i].slotresref[8]=0;
-			strupr(slottypes[i].slotresref);
+			strlwr(slottypes[i].slotresref);
 			*/
-			strnuprcpy( slottypes[i].slotresref, st->QueryField(i,2), 8 );
+			strnlwrcpy( slottypes[i].slotresref, st->QueryField(i,2), 8 );
 		}
 		DelTable( SlotTypeTable );
 	}
@@ -3245,12 +3245,13 @@ bool Interface::SavedExtension(const char *filename)
 	return false;
 }
 
-void Interface::RemoveFromCache(const ieResRef resref)
+void Interface::RemoveFromCache(const ieResRef resref, SClass_ID ClassID)
 {
 	char filename[_MAX_PATH];
 
 	strcpy( filename, CachePath );
 	strcat( filename, resref );
+	strcat( filename, TypeExt( ClassID ) );
 	unlink ( filename);
 }
 
@@ -3333,7 +3334,7 @@ bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)
 			strncpy(itemlist[k],tab->QueryField(j,k),sizeof(ieResRef) );
 		}
 		ItemName[8]=0;
-		strupr(ItemName);
+		strlwr(ItemName);
 		RtRows->SetAt(ItemName, (const char *) itemlist);
 	}
 end:
@@ -3438,9 +3439,9 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 			k=1;
 		}
 		j=strtol(NewItem,&endptr,10);
-		if (*endptr) strnuprcpy(itm->ItemResRef,NewItem,sizeof(ieResRef) );
+		if (*endptr) strnlwrcpy(itm->ItemResRef,NewItem,sizeof(ieResRef) );
 		else {
-			strnuprcpy(itm->ItemResRef, GoldResRef, sizeof(ieResRef) );
+			strnlwrcpy(itm->ItemResRef, GoldResRef, sizeof(ieResRef) );
 			itm->Usages[0]=Roll(j,k,0);
 		}
 		if ( !memcmp( itm->ItemResRef,"NO_DROP",8 ) ) {
@@ -3472,7 +3473,7 @@ Item* Interface::GetItem(const ieResRef resname)
 
 	item = new Item();
 	//this is required for storing the 'source'
-	strnuprcpy(item->Name, resname, 8);
+	strnlwrcpy(item->Name, resname, 8);
 	sm->GetItem( item );
 	if (item == NULL) {
 		FreeInterface( sm );
@@ -3518,7 +3519,7 @@ Spell* Interface::GetSpell(const ieResRef resname)
 
 	spell = new Spell();
 	//this is required for storing the 'source'
-	strnuprcpy(spell->Name, resname, 8);
+	strnlwrcpy(spell->Name, resname, 8);
 	sm->GetSpell( spell );
 	if (spell == NULL) {
 		FreeInterface( sm );
@@ -3676,12 +3677,12 @@ int Interface::CloseCurrentStore()
 		if (ret <0) {
 			printMessage("Core"," ", YELLOW);
 			printf("Store removed: %s\n", CurrentStore->Name);
-			RemoveFromCache(CurrentStore->Name);
+			RemoveFromCache(CurrentStore->Name, IE_STO_CLASS_ID);
 		}
 	} else {
 		printMessage("Core"," ", YELLOW);
 		printf("Store removed: %s\n", CurrentStore->Name);
-		RemoveFromCache(CurrentStore->Name);
+		RemoveFromCache(CurrentStore->Name, IE_STO_CLASS_ID);
 	}
 	//make sure the stream isn't connected to sm, or it will be double freed
 	FreeInterface( sm );
@@ -3722,7 +3723,7 @@ Store *Interface::SetCurrentStore(const ieResRef resname )
 		return NULL;
 	}
 	FreeInterface( sm );
-	strnuprcpy(CurrentStore->Name, resname, 8);
+	strnlwrcpy(CurrentStore->Name, resname, 8);
 
 	return CurrentStore;
 }
@@ -3910,12 +3911,12 @@ int Interface::SwapoutArea(Map *map)
 		if (ret <0) {
 			printMessage("Core"," ", YELLOW);
 			printf("Area removed: %s\n", map->GetScriptName());
-			RemoveFromCache(map->GetScriptName());
+			RemoveFromCache(map->GetScriptName(), IE_ARE_CLASS_ID);
 		}
 	} else {
 		printMessage("Core"," ", YELLOW);
 		printf("Area removed: %s\n", map->GetScriptName());
-		RemoveFromCache(map->GetScriptName());
+		RemoveFromCache(map->GetScriptName(), IE_ARE_CLASS_ID);
 	}
 	//make sure the stream isn't connected to sm, or it will be double freed
 	FreeInterface( mm );

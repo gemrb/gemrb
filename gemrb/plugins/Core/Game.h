@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.72 2005/12/12 18:39:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.73 2005/12/19 23:10:50 avenger_teambg Exp $
  *
  */
 
@@ -116,6 +116,7 @@ typedef struct PCStruct {
 	unsigned char UnknownBA[6];
 	char Name[32];
 	ieDword  TalkCount;
+	unsigned char QSlots[9];
 } PCStruct;
 
 #define IE_GAM_JOURNAL 0

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/SClassID.h,v 1.7 2005/11/06 16:06:24 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/SClassID.h,v 1.8 2005/12/19 23:11:03 avenger_teambg Exp $
  *
  */
 
@@ -66,7 +66,7 @@ typedef unsigned long SClass_ID;
 #define IE_VVC_CLASS_ID			0x000003FB
 #define IE_WAV_CLASS_ID			0x00000004
 #define IE_WED_CLASS_ID			0x000003E9
-#define IE_WFX_CLASS_ID			0x000A0000
+#define IE_WFX_CLASS_ID			0x00000005
 #define IE_WMP_CLASS_ID			0x000003F7
 #define IE_VIDEO_CLASS_ID		0x000B0000
 #define IE_AUDIO_CLASS_ID		0x000C0000

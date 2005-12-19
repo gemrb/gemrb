@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.42 2005/12/15 18:01:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.43 2005/12/19 23:10:50 avenger_teambg Exp $
  *
  */
 
@@ -190,7 +190,7 @@ static const char *spell_suffices[]={"SPIT","SPPR","SPWI","SPIN","SPCL"};
 bool ResolveSpellName(ieResRef spellres, Action *parameters)
 {
 	if (parameters->string0Parameter) {
-		strnuprcpy(spellres, parameters->string0Parameter, 8);
+		strnlwrcpy(spellres, parameters->string0Parameter, 8);
 	} else {
 		//resolve spell
 		int type = parameters->int0Parameter/1000;
@@ -216,7 +216,7 @@ bool StoreHasItemCore(ieResRef storename, ieResRef itemname)
 		if (strnicmp(store->Name, storename, 8) ) {
 			//not the current store, we need some dirty hack
 			has_current = true;
-			strnuprcpy(current, store->Name, 8);
+			strnlwrcpy(current, store->Name, 8);
 		}
 	}
 	bool ret = false;
@@ -1186,7 +1186,7 @@ Action* GenerateActionCore(const char *src, const char *str, int acIndex)
 				while (*src != '"') {
 					//sizeof(context+name) = 40
 					if (i<40) {
-						*dst++ = toupper(*src);
+						*dst++ = tolower(*src);
 						i++;
 					}
 					src++;
@@ -1214,7 +1214,7 @@ Action* GenerateActionCore(const char *src, const char *str, int acIndex)
 					i=0;
 					while (*src != '"') {
 						if (i++<6) {
-							*dst++ = toupper(*src);
+							*dst++ = tolower(*src);
 						}
 						src++;
 					}
@@ -1426,7 +1426,7 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 				while (*src != '"') {
 					//sizeof(context+name) = 40
 					if (i<40) {
-						*dst++ = toupper(*src);
+						*dst++ = tolower(*src);
 						i++;
 					}
 					src++;
@@ -1454,7 +1454,7 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 					i=0;
 					while (*src != '"') {
 						if (i++<6) {
-							*dst++ = toupper(*src);
+							*dst++ = tolower(*src);
 						}
 						src++;
 					}

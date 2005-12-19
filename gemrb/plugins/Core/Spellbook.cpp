@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.32 2005/12/05 21:46:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.33 2005/12/19 23:10:52 avenger_teambg Exp $
  *
  */
 
@@ -75,7 +75,7 @@ static ieResRef *GetSpellTable(const ieResRef tableresref, int column)
 	int count = tab->GetRowCount();
 	ieResRef *reslist = (ieResRef *) malloc (sizeof(ieResRef) * count);
 	for(int i = 0; i<count;i++) {
-		strnuprcpy(reslist[i], tab->QueryField(i, column), 8);
+		strnlwrcpy(reslist[i], tab->QueryField(i, column), 8);
 	}
 	core->DelTable((unsigned int) table);
 	return reslist;

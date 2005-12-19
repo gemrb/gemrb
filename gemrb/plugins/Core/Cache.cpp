@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.cpp,v 1.9 2005/06/14 22:29:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.cpp,v 1.10 2005/12/19 23:10:50 avenger_teambg Exp $
  *
  */
 
@@ -230,7 +230,7 @@ bool Cache::SetAt(const ieResRef key, void *rValue)
 	// it doesn't exist, add a new Association
 	pAssoc = NewAssoc();
 	for (i=0;i<KEYSIZE && key[i];i++) {
-		pAssoc->key[i]=toupper(key[i]);
+		pAssoc->key[i]=tolower(key[i]);
 	}
 	for (;i<KEYSIZE;i++) {
 		pAssoc->key[i]=0;

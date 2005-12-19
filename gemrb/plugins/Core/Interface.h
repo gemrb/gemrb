@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.179 2005/11/26 14:45:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.180 2005/12/19 23:10:52 avenger_teambg Exp $
  *
  */
 
@@ -397,7 +397,7 @@ public:
 	/*returns true if an itemtype is acceptable for a slottype, also checks the usability flags */
 	int CanUseItemType(int itype, int slottype, ieDword use1, ieDword use2, Actor *actor) const;
 	/*removes single file from cache*/
-	void RemoveFromCache(const ieResRef resref);
+	void RemoveFromCache(const ieResRef resref, SClass_ID SClassID);
 	/*removes all files from directory*/
 	void DelTree(const char *path, bool onlysaved);
 	/*returns true if the file should be saved */

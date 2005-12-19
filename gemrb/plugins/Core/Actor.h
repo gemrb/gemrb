@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.92 2005/12/12 18:39:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.93 2005/12/19 23:10:50 avenger_teambg Exp $
  *
  */
 
@@ -88,6 +88,10 @@ class SpriteCover;
 //dead actor may not be selected
 #define GA_NO_DEAD  32
 
+#define GUIBT_COUNT  12
+
+typedef ieByte ActionButtonRow[GUIBT_COUNT];
+
 class GEM_EXPORT PCStatsStruct {
 public:
 	ieStrRef  BestKilledName;
@@ -104,6 +108,8 @@ public:
 	ieResRef  FavouriteWeapons[4];
 	ieWord    FavouriteWeaponsCount[4];
 	ieResRef  SoundSet;
+	char      SoundFolder[33];
+	ieByte    QSlots[9];          //iwd2 specific
 public:
 	PCStatsStruct();
 	void IncrementChapter();
@@ -320,5 +326,7 @@ public:
 	void DrawOverheadText(Region &screen);
 	/* resolve string constant */
 	void ResolveStringConstant(ieResRef sound, unsigned int index);
+	/* updates the quick slots */
+	void GetActionButtonRow(ActionButtonRow &qs);
 };
 #endif

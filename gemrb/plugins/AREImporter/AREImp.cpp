@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.143 2005/12/14 18:33:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.144 2005/12/19 23:10:48 avenger_teambg Exp $
  *
  */
 
@@ -241,7 +241,7 @@ Map* AREImp::GetMap(const char *ResRef)
 	sm->Open( smstr, true );
 
 	map->AddTileMap( tm, lm, sr, sm );
-	strnuprcpy( map->WEDResRef, WEDResRef, 8);
+	strnlwrcpy( map->WEDResRef, WEDResRef, 8);
 
 	str->Seek( SongHeader, GEM_STREAM_START );
 	//5 is the number of song indices
@@ -433,7 +433,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		if (c->Scripts[0]) {
 			c->Scripts[0]->MySelf = c;
 		}
-		strnuprcpy(c->KeyResRef, KeyResRef, 8);
+		strnlwrcpy(c->KeyResRef, KeyResRef, 8);
 		c->OpenFail = OpenFail;
 	}
 
@@ -623,7 +623,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		strnspccpy(door->LinkedInfo, LinkedInfo, 32);
 		//these 2 fields are not sure
 		door->NameStrRef=NameStrRef;
-		strnuprcpy(door->Dialog, Dialog, 8);
+		strnlwrcpy(door->Dialog, Dialog, 8);
 	}
 
 	printf( "Loading spawnpoints\n" );

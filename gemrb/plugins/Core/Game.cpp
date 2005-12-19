@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.104 2005/12/13 19:42:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.105 2005/12/19 23:10:50 avenger_teambg Exp $
  *
  */
 
@@ -470,7 +470,7 @@ void Game::SetMasterArea(const char *area)
 {
 	if (MasterArea(area) ) return;
 	char *tmp = (char *) malloc(9);
-	strnuprcpy (tmp,area,8);
+	strnlwrcpy (tmp,area,8);
 	mastarea.push_back(tmp);
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.70 2005/12/12 18:39:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.71 2005/12/19 23:10:55 avenger_teambg Exp $
  *
  */
 
@@ -171,7 +171,7 @@ Game* GAMImp::GetGame()
 		}
 
 		char* resref = tm->QueryField( playmode );
-		strnuprcpy( newGame->CurrentArea, resref, 8 );
+		strnlwrcpy( newGame->CurrentArea, resref, 8 );
 	}
 
 	//Loading PCs
@@ -264,6 +264,7 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 {
 	unsigned int i;
 	PCStruct pcInfo;
+	ieDword tmpDword;
 	Actor* actor;
 
 	str->ReadWord( &pcInfo.Selected );
@@ -291,8 +292,14 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 		str->ReadWord( &pcInfo.QuickItemSlot[i] );
 	}
 	str->Read( &pcInfo.UnknownBA, 6 );
-	if (version==GAM_VER_IWD2) { //skipping some bytes for iwd2
-		str->Seek( 254, GEM_CURRENT_POS);
+	//QuickSlots are customisable in iwd2 and GemRB
+	//thus we adopt the iwd2 style actor info
+	if (version==GAM_VER_GEMRB || version==GAM_VER_IWD2) {
+		str->Seek( 218, GEM_CURRENT_POS);
+		for (i=0;i<9;i++) {
+			str->ReadDword( &tmpDword );
+			pcInfo.QSlots[i] = (ieByte) tmpDword;
+		}
 	}
 	str->Read( &pcInfo.Name, 32 );
 	if (version==GAM_VER_PST) { //Torment
@@ -321,6 +328,7 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 		actor = aM->GetActor();
 	}
 
+	memcpy(ps->QSlots, pcInfo.QSlots, sizeof(pcInfo.QSlots) );
 	actor->Destination.x = actor->Pos.x = pcInfo.XPos;
 	actor->Destination.y = actor->Pos.y = pcInfo.YPos;
 	strcpy( actor->Area, pcInfo.Area );
@@ -362,6 +370,10 @@ PCStatsStruct* GAMImp::GetPCStats ()
 		str->ReadWord( &ps->FavouriteWeaponsCount[i] );
 
 	str->ReadResRef( ps->SoundSet );
+
+	if (core->HasFeature(GF_SOUNDFOLDERS) ) {
+		str->Read( ps->SoundFolder, 32);
+	}
 	return ps;
 }
 
@@ -604,12 +616,12 @@ int GAMImp::PutHeader(DataStream *stream, Game *game)
 	return 0;
 }
 
-int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CREOffset)
+int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CREOffset, ieDword version)
 {
 	int i;
 	ieDword tmpDword;
 	ieWord tmpWord;
-	char filling[50];
+	char filling[218];
 
 	memset(filling,0,sizeof(filling) );
 	if (ac->Selected) {
@@ -659,6 +671,13 @@ int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CRE
 	stream->WriteWord( &tmpWord);
 	stream->WriteWord( &tmpWord);
 
+	if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
+		stream->Write( filling, 218);
+		for (i=0;i<9;i++) {
+			tmpDword = ac->PCStats->QSlots[i];
+			stream->WriteDword( &tmpDword);
+		}
+	}
 	if (ac->LongStrRef==0xffffffff) {
 		strncpy(filling, ac->LongName, 32);
 	} else {
@@ -667,6 +686,10 @@ int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CRE
 		free( tmpstr );
 	}
 	stream->Write( filling, 32);
+	memset(filling,0,32);
+	if (version==GAM_VER_PST) { //Torment
+		stream->Write( filling, 8);
+	}
 	stream->WriteDword( &ac->TalkCount);
 	stream->WriteDword( &ac->PCStats->BestKilledName);
 	stream->WriteDword( &ac->PCStats->BestKilledXP);
@@ -690,6 +713,9 @@ int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CRE
 		stream->WriteWord( &ac->PCStats->FavouriteWeaponsCount[i]);
 	}
 	stream->Write( ac->PCStats->SoundSet, 8); //soundset
+	if (core->HasFeature(GF_SOUNDFOLDERS) ) {
+		stream->Write(ac->PCStats->SoundFolder, 32);
+	}
 	return 0;
 }
 
@@ -702,7 +728,7 @@ int GAMImp::PutPCs(DataStream *stream, Game *game)
 	for(i=0;i<PCCount;i++) {
 		Actor *ac = game->GetPC(i, false);
 		ieDword CRESize = am->GetStoredFileSize(ac);
-		PutActor(stream, ac, CRESize, CREOffset);
+		PutActor(stream, ac, CRESize, CREOffset, game->version);
 		CREOffset += CRESize;
 	}
 
@@ -725,7 +751,7 @@ int GAMImp::PutNPCs(DataStream *stream, Game *game)
 	for(i=0;i<NPCCount;i++) {
 		Actor *ac = game->GetNPC(i);
 		ieDword CRESize = am->GetStoredFileSize(ac);
-		PutActor(stream, ac, CRESize, CREOffset);
+		PutActor(stream, ac, CRESize, CREOffset, game->version);
 		CREOffset += CRESize;
 	}
 	for(i=0;i<NPCCount;i++) {

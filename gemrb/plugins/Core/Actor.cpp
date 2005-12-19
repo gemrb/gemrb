@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.142 2005/12/12 18:39:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.143 2005/12/19 23:10:50 avenger_teambg Exp $
  *
  */
 
@@ -88,6 +88,9 @@ PCStatsStruct::PCStatsStruct()
 	memset( FavouriteSpellsCount, 0, sizeof(FavouriteSpellsCount) );
 	memset( FavouriteWeapons, 0, sizeof(FavouriteWeapons) );
 	memset( FavouriteWeaponsCount, 0, sizeof(FavouriteWeaponsCount) );
+	SoundSet[0]=0;
+	SoundFolder[0]=0;
+	QSlots[0]=0xff;
 }
 
 void PCStatsStruct::IncrementChapter()
@@ -1127,8 +1130,22 @@ void Actor::ResolveStringConstant(ieResRef Sound, unsigned int index)
 			index = 10;
 			break;
 	}
-	strnuprcpy(Sound, tab->QueryField (index, 0), 8);
+	strnlwrcpy(Sound, tab->QueryField (index, 0), 8);
 end:
 	core->DelTable( table );
 
+}
+
+//the first 3 buttons are always talk, defend, attack
+void Actor::GetActionButtonRow(ActionButtonRow &ar)
+{
+	if (PCStats->QSlots[0]==0xff) {
+		for(int i=0;i<GUIBT_COUNT-3;i++) {
+			PCStats->QSlots[i]=ar[i+3];
+		}
+		return;
+	}
+	for(int i=0;i<GUIBT_COUNT-3;i++) {
+		ar[i+3]=PCStats->QSlots[i];
+	}
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.213 2005/12/12 21:12:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.214 2005/12/19 23:10:52 avenger_teambg Exp $
  *
  */
 
@@ -123,9 +123,9 @@ void InitSpawnGroups()
 			//difficulty
 			*(((ieDword *) creatures)+1) = (ieDword) atoi( tab->QueryField(i,0) );
 			for (;j;j--) {
-				strnuprcpy( creatures[j], tab->QueryField(j,i), sizeof( ieResRef ) );
+				strnlwrcpy( creatures[j], tab->QueryField(j,i), sizeof( ieResRef ) );
 			}
-			strnuprcpy( GroupName, tab->GetColumnName( i ), 8);
+			strnlwrcpy( GroupName, tab->GetColumnName( i ), 8);
 			Spawns.SetAt( GroupName, (const char *) creatures );
 		}
 	}
@@ -813,7 +813,7 @@ void Map::Shout(Actor* actor, int shoutID, unsigned int radius)
 void Map::AddActor(Actor* actor)
 {
 	//setting the current area for the actor as this one
-	strnuprcpy(actor->Area, scriptName, 8);
+	strnlwrcpy(actor->Area, scriptName, 8);
 	//if actor->globalID was already set, don't change it
 	actor->SetMap(this, ++localActorCounter,
 		actor->globalID?actor->globalID:++globalActorCounter);
@@ -1274,7 +1274,7 @@ Spawn *Map::AddSpawn(char* Name, int XPos, int YPos, ieResRef *creatures, unsign
 	sp->Count = count;
 	sp->Creatures = (ieResRef *) calloc( count, sizeof(ieResRef) );
 	for( unsigned int i=0;i<count;i++) {
-		strnuprcpy(sp->Creatures[i],creatures[i],8);
+		strnlwrcpy(sp->Creatures[i],creatures[i],8);
 	}
 	spawns.push_back( sp );
 	return sp;
@@ -2190,7 +2190,7 @@ AreaAnimation::~AreaAnimation()
 void AreaAnimation::SetPalette(ieResRef Pal)
 {
 	Flags |= A_ANI_PALETTE;
-	strnuprcpy(Palette, Pal, 8);
+	strnlwrcpy(Palette, Pal, 8);
 	ImageMgr *bmp = (ImageMgr *) core->GetInterface( IE_BMP_CLASS_ID);
 	if (!bmp) {
 		return;

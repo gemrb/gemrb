@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.341 2005/12/14 17:57:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.342 2005/12/19 23:10:50 avenger_teambg Exp $
  *
  */
 
@@ -1061,7 +1061,7 @@ GameScript::GameScript(ieResRef ResRef, unsigned char ScriptType,
 			else {
 				idtargets[i]=poi->Function;
 			}
-			strnuprcpy(ObjectIDSTableNames[i], idsname, 8 );
+			strnlwrcpy(ObjectIDSTableNames[i], idsname, 8 );
 		}
 		MaxObjectNesting = atoi( objNameTable->QueryField( 1 ) );
 		if (MaxObjectNesting<0 || MaxObjectNesting>MAX_NESTING) {
@@ -1329,8 +1329,8 @@ static Trigger* ReadTrigger(DataStream* stream)
 			&tR->int1Parameter, &tR->int2Parameter, tR->string0Parameter,
 			tR->string1Parameter );
 	}
-	strupr(tR->string0Parameter);
-	strupr(tR->string1Parameter);
+	strlwr(tR->string0Parameter);
+	strlwr(tR->string1Parameter);
 	tR->triggerID &= 0x3fff;
 	stream->ReadLine( line, 1024 );
 	tR->objectParameter = DecodeObject( line );
@@ -1503,8 +1503,8 @@ Response* GameScript::ReadResponse(DataStream* stream)
 			&aC->int0Parameter, &aC->pointParameter.x, &aC->pointParameter.y,
 			&aC->int1Parameter, &aC->int2Parameter, aC->string0Parameter,
 			aC->string1Parameter );
-		strupr(aC->string0Parameter);
-		strupr(aC->string1Parameter);
+		strlwr(aC->string0Parameter);
+		strlwr(aC->string1Parameter);
 		if (aC->actionID>=MAX_ACTIONS) {
 			aC->actionID=0;
 			printMessage("GameScript","Invalid script action ID!",LIGHT_RED);

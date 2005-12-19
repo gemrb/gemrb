@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.29 2005/12/18 19:37:21 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.30 2005/12/19 23:11:00 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -173,9 +173,9 @@ def GroupControls ():
 	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetActionIcon (Window, Button, 7)
 	Button = GemRB.GetControl (Window, 1)
-	GemRB.SetActionIcon (Window, Button, 14)
+	GemRB.SetActionIcon (Window, Button, 15)
 	Button = GemRB.GetControl (Window, 2)
-	GemRB.SetActionIcon (Window, Button, 16)
+	GemRB.SetActionIcon (Window, Button, 21)
 	Button = GemRB.GetControl (Window, 3)
 	GemRB.SetActionIcon (Window, Button, -1)
 	Button = GemRB.GetControl (Window, 4)
@@ -219,13 +219,13 @@ def UpdateActionsWindow ():
 	if ActionsWindow == None:
 		return
 
+	#fully redraw the side panes to cover the actions window
+	#do this only when there is no 'otherwindow'
 	if GemRB.GetVar ("OtherWindow") != -1:
-
-	#fully redraw the portrait window to cover the actions window
-	if PortraitWindow:
-		GemRB.InvalidateWindow (PortraitWindow)
-	if OptionsWindow:
-		GemRB.InvalidateWindow (OptionsWindow)
+		if PortraitWindow:
+			GemRB.InvalidateWindow (PortraitWindow)
+		if OptionsWindow:
+			GemRB.InvalidateWindow (OptionsWindow)
 
 	pc = 0
 	for i in range (PARTY_SIZE):

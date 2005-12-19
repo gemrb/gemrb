@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.359 2005/12/17 15:05:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.360 2005/12/19 23:10:56 avenger_teambg Exp $
  *
  */
 
@@ -71,13 +71,46 @@ typedef struct SpellDescType {
 	ieStrRef value;
 } SpellDescType;
 
+#define UNINIT_IEDWORD 0xcccccccc
+
 static SpellDescType *StoreSpells = NULL;
 
-static int ReputationIncrease[20]={0xcccccccc};
-static int ReputationDonation[20]={0xcccccccc};
+static int ReputationIncrease[20]={(int) UNINIT_IEDWORD};
+static int ReputationDonation[20]={(int) UNINIT_IEDWORD};
 //4 action button indices are packed on a single ieDword, there are 32 max.
-static ieDword GUIAction[32]={0xcccccccc};
-static ieDword GUITooltip[32];
+static ieDword GUIAction[32]={UNINIT_IEDWORD};
+static ieDword GUITooltip[32]={UNINIT_IEDWORD};
+
+//the order of these buttons are based on opcode #144 
+#define ACT_NONE 100  //iwd2's maximum is 99
+#define ACT_STEALTH 0
+#define ACT_THIEVING 1
+#define ACT_CAST 2
+#define ACT_QSPELL1 3
+#define ACT_QSPELL2 4
+#define ACT_QSPELL3 5
+#define ACT_TURN 6
+#define ACT_TALK 7
+#define ACT_USE 8
+#define ACT_QSLOT1 9
+#define ACT_QSLOT4 10 //this seems to be intentionally so
+#define ACT_QSLOT2 11
+#define ACT_QSLOT3 12
+#define ACT_INNATE 13
+#define ACT_DEFEND 14 //these are gemrb specific
+#define ACT_ATTACK 15 
+#define ACT_WEAPON1 16
+#define ACT_WEAPON2 17
+#define ACT_WEAPON3 18
+#define ACT_WEAPON4 19
+#define ACT_BARDSONG 20
+#define ACT_STOP 21
+
+static unsigned int ClassCount = 0;
+static ActionButtonRow *GUIBTDefaults = NULL; //qslots row count
+ActionButtonRow DefaultButtons = {ACT_TALK, ACT_DEFEND, ACT_WEAPON1,
+ ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE,
+ ACT_NONE, ACT_NONE};
 
 // Natural screen size of currently loaded winpack
 static int CHUWidth = 0;
@@ -1258,8 +1291,8 @@ PyObject* GemRB_SetMasterScript(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "ss", &script, &worldmap )) {
 		return AttributeError( GemRB_SetMasterScript__doc );
 	}
-	strnuprcpy( core->GlobalScript, script, 8 );
-	strnuprcpy( core->WorldMapName, worldmap, 8 );
+	strnlwrcpy( core->GlobalScript, script, 8 );
+	strnlwrcpy( core->WorldMapName, worldmap, 8 );
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -1377,7 +1410,7 @@ static PyObject* GemRB_SetVarAssoc(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	strnuprcpy( ctrl->VarName, VarName, MAX_VARIABLE_LENGTH );
+	strnlwrcpy( ctrl->VarName, VarName, MAX_VARIABLE_LENGTH );
 	ctrl->Value = Value;
 	/** setting the correct state for this control */
 	/** it is possible to set up a default value, if Lookup returns false, use it */
@@ -3120,7 +3153,7 @@ static PyObject* GemRB_IncreaseReputation(PyObject * /*self*/, PyObject* args)
 	if (Row>19) {
 		Row = 19;
 	}
-	if (ReputationDonation[0]==(int) 0xcccccccc) {
+	if (ReputationDonation[0]==(int) UNINIT_IEDWORD) {
 		ReadReputation();
 	}
 	int Limit = ReputationDonation[Row];
@@ -4469,7 +4502,7 @@ static ieStrRef GetSpellDesc(ieResRef CureResRef)
 			StoreSpellsCount = tab->GetRowCount();
 			StoreSpells = (SpellDescType *) malloc( sizeof(SpellDescType) * StoreSpellsCount);
 			for (i=0;i<StoreSpellsCount;i++) {
-				strnuprcpy(StoreSpells[i].resref, tab->GetRowName(i),8 );
+				strnlwrcpy(StoreSpells[i].resref, tab->GetRowName(i),8 );
 				StoreSpells[i].value = atoi(tab->QueryField(i,0) );
 			}
 table_loaded:
@@ -5230,7 +5263,7 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	TmpItem = new CREItem();
-	strnuprcpy(TmpItem->ItemResRef, ItemResRef, 8);
+	strnlwrcpy(TmpItem->ItemResRef, ItemResRef, 8);
 	TmpItem->PurchasedAmount=0;
 	TmpItem->Usages[0]=Charge0;
 	TmpItem->Usages[1]=Charge1;
@@ -5428,7 +5461,7 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 
 	Actor *actor = game->GetPC(slot, false);
 	if (!actor) {
-		return RuntimeError( "No actor!" );
+		return RuntimeError( "Actor not found" );
 	}
 
 	bool ret = true;
@@ -5530,6 +5563,8 @@ typedef union pack {
 
 static void ReadActionButtons()
 {
+	unsigned int i;
+
 	memset(GUIAction, -1, sizeof(GUIAction));
 	memset(GUITooltip, -1, sizeof(GUITooltip));
         int table = core->LoadTable( "guibtact" );
@@ -5537,7 +5572,7 @@ static void ReadActionButtons()
                 return;
         }
         TableMgr *tab = core->GetTable( table );
-        for (int i = 0; i < 32; i++) {
+        for (i = 0; i < 32; i++) {
 		packtype row;
 
                 row.bytes[0] = (ieByte) atoi( tab->QueryField(i,0) );
@@ -5549,20 +5584,51 @@ static void ReadActionButtons()
         }
         core->DelTable( table );
 
+	table = core->LoadTable( "qslots");
+        if (table<0) {
+                return;
+        }
+        tab = core->GetTable( table );
+	ClassCount = tab->GetRowCount();
+	GUIBTDefaults = new ActionButtonRow[ClassCount];
+
+	for (i = 0; i < ClassCount; i++) {
+		memcpy(GUIBTDefaults+i, &DefaultButtons, sizeof(ActionButtonRow));
+		for (int j=0;j<9;j++) {
+			GUIBTDefaults[i][j+3]=atoi( tab->QueryField(i,j) );
+		}
+	}
+}
+
+static PyObject* SetQuickWeaponIcon(int WindowIndex, int ControlIndex, int /*Index*/)
+{
+	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
+	if (!btn) {
+		return NULL;
+	}
+
+	btn->SetImage( IE_GUI_BUTTON_UNPRESSED, 0 );
+	btn->SetImage( IE_GUI_BUTTON_PRESSED, 0 );
+	btn->SetImage( IE_GUI_BUTTON_SELECTED, 0 );
+	btn->SetImage( IE_GUI_BUTTON_DISABLED, 0 );
+	btn->SetFlags( IE_GUI_BUTTON_NO_IMAGE, BM_SET );
+	core->SetTooltip( WindowIndex, ControlIndex, "" );
+	//no incref
+	return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_SetActionIcon__doc,
 "SetActionIcon(Window, Button, ActionIndex)\n\n"
-"Sets up an action button. The ActionIndex should be less than 32." );
+"Sets up an action button. The ActionIndex should be less than 31." );
 
-static PyObject* GemRB_SetActionIcon(PyObject * /*self*/, PyObject* args)
+static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, int Index)
 {
-	int WindowIndex, ControlIndex, Index;
-
-	if (!PyArg_ParseTuple( args, "iii", &WindowIndex, &ControlIndex, &Index )) {
+	if (ControlIndex>99) {
 		return AttributeError( GemRB_SetActionIcon__doc );
 	}
-
+	if (Index>31) {
+		return AttributeError( GemRB_SetActionIcon__doc );
+	}
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
 	if (!btn) {
 		return NULL;
@@ -5575,13 +5641,10 @@ static PyObject* GemRB_SetActionIcon(PyObject * /*self*/, PyObject* args)
 		btn->SetImage( IE_GUI_BUTTON_DISABLED, 0 );
 		btn->SetFlags( IE_GUI_BUTTON_NO_IMAGE, BM_SET );
 		core->SetTooltip( WindowIndex, ControlIndex, "" );
-		Py_INCREF( Py_None );
+		//no incref
 		return Py_None;
 	}
 
-	if (Index>32) {
-		return AttributeError( GemRB_SetActionIcon__doc );
-	}
 	if (GUIAction[0]==0xcccccccc) {
 		ReadActionButtons();
 	}
@@ -5607,16 +5670,29 @@ static PyObject* GemRB_SetActionIcon(PyObject * /*self*/, PyObject* args)
 	btn->SetFlags( IE_GUI_BUTTON_NORMAL, BM_SET );
 	char *txt = core->GetString( GUITooltip[Index] );
 	if (txt) {
-		char *txt2 = (char *) malloc(strlen(txt)+6);
-		sprintf(txt2,"F%1.1d - %s",ControlIndex+1,txt);
+		char *txt2 = (char *) malloc(strlen(txt)+10);
+		sprintf(txt2,"F%d - %s",ControlIndex+1,txt);
 		free(txt);
 		core->SetTooltip(WindowIndex, ControlIndex, txt2);
 		free (txt2);
 	} else {
 		core->SetTooltip(WindowIndex, ControlIndex, "");
 	}
-	Py_INCREF( Py_None );
+	//no incref
 	return Py_None;
+}
+
+static PyObject* GemRB_SetActionIcon(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex, Index;
+
+	if (!PyArg_ParseTuple( args, "iii", &WindowIndex, &ControlIndex, &Index )) {
+		return AttributeError( GemRB_SetActionIcon__doc );
+	}
+
+	PyObject* ret = SetActionIcon(WindowIndex, ControlIndex, Index);
+	Py_INCREF(ret);
+	return ret;
 }
 
 PyDoc_STRVAR( GemRB_HasResource__doc,
@@ -5638,6 +5714,76 @@ static PyObject* GemRB_HasResource(PyObject * /*self*/, PyObject* args)
 		Py_INCREF( Py_False );
 		return Py_False;
 	}
+}
+
+PyDoc_STRVAR( GemRB_SetupControls__doc,
+"SetupControls(WindowIndex, slot)\n\n"
+"Automagically sets up the controls of the action window for a PC indexed by slot." );
+
+static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
+{
+	int wi, slot;
+
+	if (!PyArg_ParseTuple( args, "ii", &wi, &slot )) {
+		return AttributeError( GemRB_SetupControls__doc );
+	}
+
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor* actor = game->FindPC( slot );
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
+	}
+	ActionButtonRow myrow;
+	unsigned int cls = (int) actor->GetStat(IE_CLASS);
+	if (cls >= ClassCount) {
+		memcpy(&myrow, &DefaultButtons, sizeof(ActionButtonRow));
+	} else {
+		memcpy(&myrow, GUIBTDefaults+cls, sizeof(ActionButtonRow));
+	}
+printf("Class: %d\n", cls);
+printf("%d %d %d %d %d %d %d %d %d %d %d %d\n",myrow[0],myrow[1],myrow[2],myrow[3],myrow[4],myrow[5],myrow[6],myrow[7],myrow[8],myrow[9],myrow[10],myrow[11]);
+	//this function either initializes the actor's settings, or modifies myrow
+	actor->GetActionButtonRow(myrow);
+	for (int i=0;i<GUIBT_COUNT;i++) {
+		int tmp = myrow[i];
+		if (tmp==100) {
+			tmp = -1;
+		} else {
+			tmp&=31;
+		}
+		PyObject *ret = NULL;
+
+		switch (tmp) {
+		case ACT_WEAPON1:
+		case ACT_WEAPON2:
+		case ACT_WEAPON3:
+		case ACT_WEAPON4:
+			ret = SetQuickWeaponIcon(wi, i, tmp-ACT_WEAPON1);
+			break;
+		case ACT_QSPELL1:
+		case ACT_QSPELL2:
+		case ACT_QSPELL3:
+			ret = SetQuickWeaponIcon(wi, i, tmp-ACT_QSPELL1);
+			break;
+		case ACT_QSLOT1:
+		case ACT_QSLOT2:
+		case ACT_QSLOT3:
+			ret = SetQuickWeaponIcon(wi, i, tmp-ACT_QSLOT1);
+			break;
+		default:
+			ret = SetActionIcon(wi, i, tmp);
+			printf("%d\n",tmp);
+			break;
+		}
+		if (!ret) {
+			return NULL;
+		}
+	}
+	Py_INCREF( Py_None );
+	return Py_None;
 }
 
 static PyMethodDef GemRBMethods[] = {
@@ -5821,6 +5967,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(LeaveParty, METH_VARARGS),
 	METHOD(SetActionIcon, METH_VARARGS),
 	METHOD(HasResource, METH_VARARGS),
+	METHOD(SetupControls, METH_VARARGS),
 	// terminating entry	
 	{NULL, NULL, 0, NULL}
 };
@@ -5849,10 +5996,14 @@ GUIScript::~GUIScript(void)
 		free(StoreSpells);
 		StoreSpells=NULL;
 	}
+	if (GUIBTDefaults) {
+		delete [] GUIBTDefaults;
+		GUIBTDefaults=NULL;
+	}
 	StoreSpellsCount=-1;
-	ReputationIncrease[0]=0xcccccccc;
-	ReputationDonation[0]=0xcccccccc;
-	GUIAction[0]=0xcccccccc;
+	ReputationIncrease[0]=(int) UNINIT_IEDWORD;
+	ReputationDonation[0]=(int) UNINIT_IEDWORD;
+	GUIAction[0]=UNINIT_IEDWORD;
 }
 
 PyDoc_STRVAR( GemRB__doc,

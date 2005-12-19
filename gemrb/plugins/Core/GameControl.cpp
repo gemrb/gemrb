@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.274 2005/12/17 17:27:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.275 2005/12/19 23:10:50 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1453,7 +1453,7 @@ void GameControl::InitDialog(Actor* spk, Actor* tgt, const char* dlgref)
 		printf( "[GameControl]: Cannot start dialog: %s\n", dlgref );
 		return;
 	}
-	strnuprcpy(dlg->ResRef, dlgref, 8); //this isn't handled by GetDialog???
+	strnlwrcpy(dlg->ResRef, dlgref, 8); //this isn't handled by GetDialog???
 	//target is here because it could be changed when a dialog runs onto
 	//and external link, we need to find the new target (whose dialog was
 	//linked to)
@@ -1625,7 +1625,7 @@ void GameControl::DialogChoose(unsigned int choose)
 			targetID = target->globalID;
 			// we have to make a backup, tr->Dialog is freed
 			ieResRef tmpresref;
-			strnuprcpy(tmpresref,tr->Dialog, 8);
+			strnlwrcpy(tmpresref,tr->Dialog, 8);
 			InitDialog( speaker, target, tmpresref );
 		}
 		ds = dlg->GetState( si );

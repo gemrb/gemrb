@@ -67,7 +67,7 @@ private:
 	GAMJournalEntry* GetJournalEntry();
 
 	int PutHeader(DataStream *stream, Game *game);
-	int PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CREOffset);
+	int PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CREOffset, ieDword version);
 	int PutPCs(DataStream *stream, Game *game);
 	int PutNPCs(DataStream *stream, Game *game);
 	int PutJournals(DataStream *stream, Game *game);

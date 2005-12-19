@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.cpp,v 1.28 2005/02/10 22:41:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.cpp,v 1.29 2005/12/19 23:10:52 avenger_teambg Exp $
  *
  */
 
@@ -54,7 +54,7 @@ inline bool Variables::MyCopyKey(char*& dest, const char* key) const
 	}
 	for (i = 0,j = 0; key[i] && j < MAX_VARIABLE_LENGTH - 1; i++) {
 		if (key[i] != ' ') {
-			dest[j++] = toupper( key[i] );
+			dest[j++] = tolower( key[i] );
 		}
 	}
 	dest[j] = 0;
@@ -67,7 +67,7 @@ inline unsigned int Variables::MyHashKey(const char* key) const
 	for (int i = 0; i < key[i] && i < MAX_VARIABLE_LENGTH; i++) {
 		//the original engine ignores spaces in variable names
 		if (key[i] != ' ')
-			nHash = ( nHash << 5 ) + nHash + toupper( key[i] );
+			nHash = ( nHash << 5 ) + nHash + tolower( key[i] );
 	}
 	return nHash;
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FactoryObject.cpp,v 1.5 2005/02/24 16:45:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FactoryObject.cpp,v 1.6 2005/12/19 23:10:50 avenger_teambg Exp $
  *
  */
 
@@ -24,7 +24,7 @@
 
 FactoryObject::FactoryObject(const char* name, SClass_ID SuperClassID)
 {
-	strnuprcpy( ResRef, name, 8 );
+	strnlwrcpy( ResRef, name, 8 );
 	this->SuperClassID = SuperClassID;
 }
 
