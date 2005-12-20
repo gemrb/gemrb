@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.144 2005/12/20 20:14:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.145 2005/12/20 23:20:52 avenger_teambg Exp $
  *
  */
 
@@ -280,9 +280,8 @@ void Actor::SetCircleSize()
 	SetCircle( anims->GetCircleSize(), *color );
 }
 
-void pcf_ea(Actor *actor, ieDword Value)
+void pcf_ea(Actor *actor, ieDword /*Value*/)
 {
-printf("EA changed to %d\n", Value);
 	actor->SetCircleSize();
 }
 
@@ -634,7 +633,7 @@ void Actor::DebugDump()
 	printf( "\nDisguise: %d\n", tmp);
 	printf( "WaitCounter: %d\n", (int) GetWait());
 	printf( "LastTarget: %d %s\n", LastTarget, GetActorNameByID(LastTarget));
-	printf( "LastTalked: %d %s\n", LastTalkedTo, GetActorNameByID(LastTarget));
+	printf( "LastTalked: %d %s\n", LastTalkedTo, GetActorNameByID(LastTalkedTo));
 	inventory.dump();
 	spellbook.dump();
 	fxqueue.dump();

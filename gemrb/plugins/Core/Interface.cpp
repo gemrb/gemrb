@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.375 2005/12/20 20:14:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.376 2005/12/20 23:20:52 avenger_teambg Exp $
  *
  */
 
@@ -450,9 +450,17 @@ void Interface::HandleFlags()
 	if (QuitFlag&QF_ENTERGAME) {
 		QuitFlag &= ~QF_ENTERGAME;
 		if (game) {
+			//rearrange party slots
+			game->ConsolidateParty();
 			GameControl* gc = StartGameControl();
-			Actor* actor = game->GetPC (0, false);
-			gc->ChangeMap(actor, true);
+			//switch map to protagonist
+			Actor* actor = game->FindPC (1);
+			if (!actor) {
+				actor = game->GetPC (0, false);
+			}
+			if (actor) {
+				gc->ChangeMap(actor, true);
+			}
 		} else {
 			printMessage("Core", "No game to enter...", LIGHT_RED );
 			QuitFlag = QF_QUITGAME;

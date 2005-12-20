@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/CharGen.py,v 1.31 2005/12/20 20:14:02 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/CharGen.py,v 1.32 2005/12/20 23:20:53 avenger_teambg Exp $
 
 
 #Character Generation
@@ -1000,7 +1000,7 @@ def AbilitiesPress():
 	AbilitiesClassReqTable = GemRB.LoadTable ("ABCLASRQ")
 
 	PointsLeftLabel = GemRB.GetControl (AbilitiesWindow, 0x10000002)
-	GemRB.SetLabelUseRGB(AbilitiesWindow, PointsLeftLabel, 1)
+	GemRB.SetLabelUseRGB (AbilitiesWindow, PointsLeftLabel, 1)
 	
 	for i in range (6):
 		AbilitiesLabelButton = GemRB.GetControl (AbilitiesWindow, 30 + i)
@@ -1019,7 +1019,7 @@ def AbilitiesPress():
 		GemRB.SetVarAssoc (AbilitiesWindow, AbilitiesMinusButton, "AbilityIndex", i + 1)
 
 		AbilityLabel = GemRB.GetControl (AbilitiesWindow, 0x10000003 + i)
-		GemRB.SetLabelUseRGB(AbilitiesWindow, AbilityLabel, 1)
+		GemRB.SetLabelUseRGB (AbilitiesWindow, AbilityLabel, 1)
 
 	AbilitiesRerollPress()
 
@@ -1272,7 +1272,7 @@ def SkillsSelect():
 
 	SkillsPointsLeft = 30
 	SkillsPointsLeftLabel = GemRB.GetControl (SkillsWindow, 0x10000005)
-	GemRB.SetLabelUseRGB(SkillsWindow, SkillsPointsLeftLabel, 1)
+	GemRB.SetLabelUseRGB (SkillsWindow, SkillsPointsLeftLabel, 1)
 	GemRB.SetText (SkillsWindow, SkillsPointsLeftLabel, str(SkillsPointsLeft))
 
 	for i in range (4):
@@ -1297,7 +1297,7 @@ def SkillsSelect():
 		GemRB.SetVar ("Skill" + str(i), SkillValue)
 		GemRB.SetVar ("SkillBase" + str(i), SkillValue)
 		SkillLabel = GemRB.GetControl (SkillsWindow, 0x10000001 + i)
-		GemRB.SetLabelUseRGB(SkillsWindow, SkillLabel, 1)
+		GemRB.SetLabelUseRGB (SkillsWindow, SkillLabel, 1)
 		GemRB.SetText (SkillsWindow, SkillLabel, str(SkillValue))
 
 	GemRB.SetToken ("number", str(SkillsPointsLeft) )
@@ -1461,7 +1461,7 @@ def ProficienciesSelect():
 	Class = GemRB.GetTableRowIndex(ProfsTable, ClassName)
 	ProficienciesPointsLeft = GemRB.GetTableValue (ProfsTable, Class, 0)
 	PointsLeftLabel = GemRB.GetControl (ProficienciesWindow, 0x10000009)
-	GemRB.SetLabelUseRGB(ProficienciesWindow, PointsLeftLabel, 1)
+	GemRB.SetLabelUseRGB (ProficienciesWindow, PointsLeftLabel, 1)
 	GemRB.SetText (ProficienciesWindow, PointsLeftLabel, str(ProficienciesPointsLeft))
 
 	for i in range (8):
@@ -1643,7 +1643,7 @@ def MageSpellsSelect(SpellTable, Level, SpellLevel):
 	else:
 		MageSpellsSelectPointsLeft = 2
 	PointsLeftLabel = GemRB.GetControl (MageSpellsWindow, 0x1000001b)
-	GemRB.SetLabelUseRGB(MageSpellsWindow, PointsLeftLabel, 1)
+	GemRB.SetLabelUseRGB (MageSpellsWindow, PointsLeftLabel, 1)
 	GemRB.SetText (MageSpellsWindow, PointsLeftLabel, str(MageSpellsSelectPointsLeft))
 
 	for i in range (24):
@@ -1872,7 +1872,7 @@ def PriestSpellsMemorize(SpellTable, Level, SpellLevel):
 		return
 
 	PointsLeftLabel = GemRB.GetControl (PriestMemorizeWindow, 0x1000001b)
-	GemRB.SetLabelUseRGB(PriestMemorizeWindow, PointsLeftLabel, 1)
+	GemRB.SetLabelUseRGB (PriestMemorizeWindow, PointsLeftLabel, 1)
 	GemRB.SetText (PriestMemorizeWindow, PointsLeftLabel, str(PriestMemorizePointsLeft))
 
 	for i in range (12):

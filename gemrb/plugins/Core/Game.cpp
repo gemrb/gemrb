@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.106 2005/12/20 20:14:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.107 2005/12/20 23:20:52 avenger_teambg Exp $
  *
  */
 
@@ -224,6 +224,22 @@ int Game::DelNPC(unsigned int slot, bool autoFree)
 	return 0;
 }
 
+//i'm sure this could be faster
+void Game::ConsolidateParty()
+{
+	int max = PCs.size();
+	for (int i=1;i<=max;) {
+		if (FindPlayer(i)==-1) {
+			std::vector< Actor*>::iterator m;
+			for ( m = PCs.begin(); m != PCs.end(); ++m) {
+				if ( (*m)->InParty>i) {
+					(*m)->InParty--;
+				}
+			}
+		} else i++;
+	}
+}
+
 int Game::LeaveParty (Actor* actor)
 {
 	actor->CreateStats(); //create or update stats for leaving
@@ -285,7 +301,9 @@ int Game::JoinParty(Actor* actor, int join)
 		NPCs.erase( m );
 	}
 	PCs.push_back( actor );
-	actor->InParty = PCs.size();
+	if (!actor->InParty) {
+		actor->InParty = PCs.size();
+	}
 	return ( int ) PCs.size() - 1;
 }
 

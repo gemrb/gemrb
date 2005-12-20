@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.361 2005/12/20 20:14:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.362 2005/12/20 23:20:53 avenger_teambg Exp $
  *
  */
 
@@ -3751,7 +3751,7 @@ static PyObject* GemRB_SetPlayerStat(PyObject * /*self*/, PyObject* args)
 	}
 	//Setting the creature's base stat, which gets saved (0)
 	if (!core->SetCreatureStat( PlayerSlot, StatID, StatValue, 0 )) {
-		return NULL;
+		return RuntimeError("Cannot find actor!\n");
 	}
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -5806,7 +5806,6 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 		{
 			SetButtonBAM(wi, i, "stonitem",0,0,-1);
 			int slot = -1;//actor->PCStats->QuickItemSlots[tmp-ACT_QSLOT1];
-printf("Slot: %d\n", slot);
 			if (slot>=0) {
 				CREItem *item = actor->inventory.GetSlotItem(slot);
 				ret = SetItemIcon(wi, i, item->ItemResRef,1);

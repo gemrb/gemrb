@@ -130,7 +130,6 @@ def OnLoad():
 	return
 	
 def SetRaceResistances(MyChar, racetitle):
-	print "Setting up resistance:", racetitle
 	resistances = GemRB.LoadTable ("racersmd")
 	GemRB.SetPlayerStat (MyChar, IE_RESISTFIRE, GemRB.GetTableValue ( resistances, racetitle, "FIRE") )
 	GemRB.SetPlayerStat (MyChar, IE_RESISTCOLD, GemRB.GetTableValue ( resistances, racetitle, "COLD") )
