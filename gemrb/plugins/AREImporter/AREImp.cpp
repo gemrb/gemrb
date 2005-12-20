@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.144 2005/12/19 23:10:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.145 2005/12/20 08:25:44 avenger_teambg Exp $
  *
  */
 
@@ -999,6 +999,9 @@ Animation *AREImp::GetAnimationPiece(AnimationFactory *af, int animCycle, AreaAn
 		printf("Cannot load animation: %s\n", a->BAM);
 		return NULL;
 	}
+ 	//this will make the animation stop when the game is stopped
+	//a possible gemrb feature to have this flag settable in .are
+	anim->gameAnimation = true;
 	anim->pos = a->frame;
 	anim->Flags = a->Flags;
 	anim->x = a->Pos.x;
