@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.30 2005/12/19 23:11:00 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.31 2005/12/20 20:14:05 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -30,25 +30,9 @@ from ie_stats import *
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
 
-# Buttons:
-# 0 CNTREACH
-# 1 INVNT
-# 2 MAP
-# 3 MAGE
-# 4 AI
-# 5 STATS
-# 6 JRNL
-# 7 PRIEST
-# 8 OPTION
-# 9 REST
-# 10 TXTE
-
 PortraitWindow = None
 OptionsWindow = None
 ActionsWindow = None
-
-def ReturnToGame ():
-	print "returntogame"
 
 def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	global OptionsWindow
@@ -380,11 +364,6 @@ def SelectAllOnPress ():
 	GemRB.GameSelectPC (0, 1)
 	return
 
-# Run by Game class when selection was changed
-def ActionsWindowExists():
-	if (ActionsWindow!=-1 and ActionsWindow!=None):
-		return false
-
 def SelectionChanged ():
 	global PortraitWindow
 
@@ -447,7 +426,7 @@ def SetEncumbranceLabels (Window, Label, Label2, pc):
 	sstr = GemRB.GetPlayerStat (pc, IE_STR)
 	ext_str = GemRB.GetPlayerStat (pc, IE_STREXTRA)
 
-	max_encumb = GemRB.GetTableValue (Table, sstr, 3) + GemRB.GetTableValue(TableEx, ext_str, 3)
+	max_encumb = GemRB.GetTableValue (Table, sstr, 3) + GemRB.GetTableValue (TableEx, ext_str, 3)
 	encumbrance = GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)
 
 	Label = GemRB.GetControl (Window, 0x10000043)

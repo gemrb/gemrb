@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.342 2005/12/19 23:10:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.343 2005/12/20 20:14:07 avenger_teambg Exp $
  *
  */
 
@@ -1023,10 +1023,10 @@ GameScript::GameScript(ieResRef ResRef, unsigned char ScriptType,
 	if (!initialized) {
 		initialized = 1;
 		InitScriptTables();
-		int tT = core->LoadSymbol( "TRIGGER" );
-		int aT = core->LoadSymbol( "ACTION" );
-		int oT = core->LoadSymbol( "OBJECT" );
-		int iT = core->LoadTable( "SCRIPT" );
+		int tT = core->LoadSymbol( "trigger" );
+		int aT = core->LoadSymbol( "action" );
+		int oT = core->LoadSymbol( "object" );
+		int iT = core->LoadTable( "script" );
 		if (tT < 0 || aT < 0 || oT < 0 || iT < 0) {
 			printMessage( "GameScript","A critical scripting file is missing!\n",LIGHT_RED );
 			abort();
@@ -1156,13 +1156,13 @@ GameScript::GameScript(ieResRef ResRef, unsigned char ScriptType,
 		initialized = 2;
 	}
 	continueExecution = false;
-	script = CacheScript( ResRef );
+	strnlwrcpy( Name, ResRef, 8 );
+	script = CacheScript( Name );
 	MySelf = NULL;
 	scriptRunDelay = 1000;
 	scriptType = ScriptType;
 	lastRunTime = 0;
 	endReached = false;
-	strcpy( Name, ResRef );
 }
 
 GameScript::~GameScript(void)

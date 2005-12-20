@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.36 2005/03/20 21:28:25 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.37 2005/12/20 20:14:03 avenger_teambg Exp $
 
 
 #Character Generation
@@ -1695,19 +1695,22 @@ def MageSpellsSelectPress():
 
 	if SpellMask < MageSpellBook:
 		MageSpellsSelectPointsLeft = MageSpellsSelectPointsLeft + 1
-		for i in range (len(Learnable)):
-			SpellButton = GemRB.GetControl (MageSpellsWindow, i + 2)
-			if ((1 << i) & SpellMask) == 0:
-				GemRB.SetButtonState (MageSpellsWindow, SpellButton, IE_GUI_BUTTON_ENABLED)
-		GemRB.SetButtonState (MageSpellsWindow, MageSpellsDoneButton, IE_GUI_BUTTON_DISABLED)
 	else:
-		MageSpellsSelectPointsLeft = MageSpellsSelectPointsLeft - 1
-		if MageSpellsSelectPointsLeft == 0:
-			for i in range (len(Learnable)):
-				SpellButton = GemRB.GetControl (MageSpellsWindow, i + 2)
-				if ((1 << i) & SpellMask) == 0:
-					GemRB.SetButtonState (MageSpellsWindow, SpellButton, IE_GUI_BUTTON_LOCKED)
-			GemRB.SetButtonState (MageSpellsWindow, MageSpellsDoneButton, IE_GUI_BUTTON_ENABLED)
+		if MageSpellsSelectPointsLeft==0:
+			print SpellMask, MageSpellBook
+			SpellMask = MageSpellBook
+		else:
+			MageSpellsSelectPointsLeft = MageSpellsSelectPointsLeft - 1
+
+	if MageSpellsSelectPointsLeft == 0:
+		GemRB.SetButtonState (MageSpellsWindow, MageSpellsDoneButton, IE_GUI_BUTTON_ENABLED)
+	else:
+		GemRB.SetButtonState (MageSpellsWindow, MageSpellsDoneButton, IE_GUI_BUTTON_DISABLED)
+
+	for i in range (len(Learnable)):
+		SpellButton = GemRB.GetControl (MageSpellsWindow, i + 2)
+		if ((1 << i) & SpellMask) == 0:
+			GemRB.SetButtonState (MageSpellsWindow, SpellButton, IE_GUI_BUTTON_LOCKED)
 
 	PointsLeftLabel = GemRB.GetControl (MageSpellsWindow, 0x1000001b)
 	GemRB.SetText (MageSpellsWindow, PointsLeftLabel, str(MageSpellsSelectPointsLeft))

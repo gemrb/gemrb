@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.49 2005/12/01 21:59:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.50 2005/12/20 20:14:06 avenger_teambg Exp $
  *
  */
 
@@ -161,7 +161,7 @@ Window* CHUImp::GetWindow(unsigned int wid)
 					btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, BM_OR);
 				}
 				btn->SetFlags( Cycle&0xff00, BM_OR );
-				if (strncmp( BAMFile, "GUICTRL\0", 8 ) == 0) {
+				if (strnicmp( BAMFile, "guictrl\0", 8 ) == 0) {
 					if (UnpressedIndex == 0) {
 						printf( "Special Button Control, Skipping Image Loading\n" );
 						win->AddControl( btn );

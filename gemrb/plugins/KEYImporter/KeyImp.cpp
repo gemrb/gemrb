@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.58 2005/11/24 17:44:09 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.59 2005/12/20 20:14:08 avenger_teambg Exp $
  *
  */
 
@@ -336,8 +336,7 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
 		DataStream* ret = ai->GetStream( ResLocator, type );
 		core->FreeInterface( ai );
 		if (ret) {
-			strncpy( ret->filename, resname, 8 );
-			ret->filename[8] = 0;
+			strnlwrcpy( ret->filename, resname, 8 );
 			strcat( ret->filename, core->TypeExt( type ) );
 		}
 		return ret;

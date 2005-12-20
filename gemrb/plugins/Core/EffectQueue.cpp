@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.47 2005/12/05 20:21:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.48 2005/12/20 20:14:07 avenger_teambg Exp $
  *
  */
 
@@ -65,10 +65,10 @@ bool Init_EffectQueue()
 
 		initialized = 1;
 
-		int effT = core->LoadTable( "EFFTEXT" );
+		int effT = core->LoadTable( "efftext" );
 		efftextTable = core->GetTable( effT );
 		
-		int eT = core->LoadSymbol( "EFFECTS" );
+		int eT = core->LoadSymbol( "effects" );
 		if (eT < 0) {
 			printMessage( "EffectQueue","A critical scripting file is missing!\n",LIGHT_RED );
 			return false;

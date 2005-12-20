@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.374 2005/12/19 23:10:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.375 2005/12/20 20:14:07 avenger_teambg Exp $
  *
  */
 
@@ -878,14 +878,7 @@ int Interface::Init()
 			printStatus( "ERROR", LIGHT_GREEN );
 		}
 	}
-/*
-	str = key->GetResource( CursorBam, IE_BAM_CLASS_ID );
-	if (anim->Open(str, true) ) {
-		console->SetCursor( anim->GetFrameFromCycle( 0,0 ) );
-	}
-	else {
-	}
-*/
+
 	printMessage( "Core", "Starting up the Sound Manager...", WHITE );
 	soundmgr = ( SoundMgr * ) GetInterface( IE_WAV_CLASS_ID );
 	if (soundmgr == NULL) {
@@ -990,7 +983,7 @@ int Interface::Init()
 	game = NULL;//new Game();
 	printMessage( "Core", "Loading Cursors...", WHITE );
 
-	str = key->GetResource( "CURSORS", IE_BAM_CLASS_ID );
+	str = key->GetResource( "cursors", IE_BAM_CLASS_ID );
 	if (anim->Open( str, true ))
 	{
 		CursorCount = anim->GetCycleCount();
@@ -1009,7 +1002,7 @@ int Interface::Init()
 	printStatus( "OK", LIGHT_GREEN );
 
 	// Load fog-of-war bitmaps
-	str = key->GetResource( "FOGOWAR", IE_BAM_CLASS_ID );
+	str = key->GetResource( "fogowar", IE_BAM_CLASS_ID );
 	printMessage( "Core", "Loading Fog-Of-War bitmaps...", WHITE );
 	anim->Open( str, true );
 	if (anim->GetCycleSize( 0 ) != 8) {
@@ -1074,7 +1067,7 @@ int Interface::Init()
 
 	{
 		ieDword i = 0;
-		vars->Lookup("Translucent Shadows", i);
+		vars->Lookup("3D Acceleration", i);
 		if (i) {
 			for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
 				video->CreateAlpha( FogSprites[i] );
@@ -1466,8 +1459,8 @@ bool Interface::LoadConfig(const char* filename)
 			DataStream::SetEndianSwitch(atoi(value) );
 		} else if (stricmp( name, "CaseSensitive" ) == 0) {
 			CaseSensitive = ( atoi( value ) == 0 ) ? false : true;
-		} else if (stricmp( name, "TranslucentShadows" ) == 0) {
-			vars->SetAt( "Translucent Shadows", atoi( value ) );
+		} else if (stricmp( name, "SmoothFog" ) == 0) {
+			vars->SetAt( "3D Acceleration", atoi( value ) );
 		} else if (stricmp( name, "VolumeAmbients" ) == 0) {
 			vars->SetAt( "Volume Ambients", atoi( value ) );
 		} else if (stricmp( name, "VolumeMovie" ) == 0) {

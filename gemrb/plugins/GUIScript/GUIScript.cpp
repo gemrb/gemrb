@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.360 2005/12/19 23:10:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.361 2005/12/20 20:14:08 avenger_teambg Exp $
  *
  */
 
@@ -80,6 +80,7 @@ static int ReputationDonation[20]={(int) UNINIT_IEDWORD};
 //4 action button indices are packed on a single ieDword, there are 32 max.
 static ieDword GUIAction[32]={UNINIT_IEDWORD};
 static ieDword GUITooltip[32]={UNINIT_IEDWORD};
+static ieResRef GUIResRef[32];
 
 //the order of these buttons are based on opcode #144 
 #define ACT_NONE 100  //iwd2's maximum is 99
@@ -108,9 +109,9 @@ static ieDword GUITooltip[32]={UNINIT_IEDWORD};
 
 static unsigned int ClassCount = 0;
 static ActionButtonRow *GUIBTDefaults = NULL; //qslots row count
-ActionButtonRow DefaultButtons = {ACT_TALK, ACT_DEFEND, ACT_WEAPON1,
+ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
  ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE,
- ACT_NONE, ACT_NONE};
+ ACT_NONE, ACT_INNATE};
 
 // Natural screen size of currently loaded winpack
 static int CHUWidth = 0;
@@ -1085,39 +1086,42 @@ static PyObject* GemRB_SetText(PyObject * /*self*/, PyObject* args)
 	char* string;
 	int ret;
 
-	if (PyArg_UnpackTuple( args, "ref", 3, 3, &wi, &ci, &str )) {
-		if (!PyObject_TypeCheck( wi, &PyInt_Type ) ||
-			!PyObject_TypeCheck( ci, &PyInt_Type ) ||
-			( !PyObject_TypeCheck( str, &PyString_Type ) &&
-			!PyObject_TypeCheck( str, &PyInt_Type ) )) {
-			return AttributeError( GemRB_SetText__doc );
-		}
+	if (!PyArg_UnpackTuple( args, "ref", 3, 3, &wi, &ci, &str )) {
+		return AttributeError( GemRB_SetText__doc );
+	}
 
-		WindowIndex = PyInt_AsLong( wi );
-		ControlIndex = PyInt_AsLong( ci );
-		if (PyObject_TypeCheck( str, &PyString_Type )) {
-			string = PyString_AsString( str );
-			if (string == NULL)
-				return NULL;
-			ret = core->SetText( WindowIndex, ControlIndex, string );
-			if (ret == -1)
-				return NULL;
-		} else {
-			StrRef = PyInt_AsLong( str );
-			char* str = NULL;
-			if (StrRef == -1) {
-				str = strdup( GEMRB_STRING );
-			} else
-				str = core->GetString( StrRef );
-			ret = core->SetText( WindowIndex, ControlIndex, str );
-			if (ret == -1) {
-				free( str );
-				return NULL;
-			}
-			free( str );
+	if (!PyObject_TypeCheck( wi, &PyInt_Type ) ||
+		!PyObject_TypeCheck( ci, &PyInt_Type ) ||
+		( !PyObject_TypeCheck( str, &PyString_Type ) &&
+		!PyObject_TypeCheck( str, &PyInt_Type ) )) {
+		return AttributeError( GemRB_SetText__doc );
+	}
+
+	WindowIndex = PyInt_AsLong( wi );
+	ControlIndex = PyInt_AsLong( ci );
+	if (PyObject_TypeCheck( str, &PyString_Type )) {
+		string = PyString_AsString( str );
+		if (string == NULL) {
+			return RuntimeError("Null string received");
+		}
+		ret = core->SetText( WindowIndex, ControlIndex, string );
+		if (ret == -1) {
+			return RuntimeError("Cannot set text");
 		}
 	} else {
-		return NULL;
+		StrRef = PyInt_AsLong( str );
+		char* str = NULL;
+		if (StrRef == -1) {
+			str = strdup( GEMRB_STRING );
+		} else {
+			str = core->GetString( StrRef );
+		}
+		ret = core->SetText( WindowIndex, ControlIndex, str );
+		if (ret == -1) {
+			free( str );
+			return RuntimeError("Cannot set text");
+		}
+		free( str );
 	}
 	return PyInt_FromLong( ret );
 }
@@ -2111,7 +2115,7 @@ static PyObject* GemRB_GameControlSetScreenFlags(PyObject * /*self*/, PyObject* 
 
 	GameControl *gc = core->GetGameControl();
 	if (!gc) {
-		printMessage ("GUIScript", "Flag cannot be set!",LIGHT_RED);
+		printMessage ("GUIScript", "Flag cannot be set!\n",LIGHT_RED);
 		return NULL;
 	}
 
@@ -2169,7 +2173,7 @@ static PyObject* GemRB_SetButtonFlags(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (btn->SetFlags( Flags, Operation ) ) {
-		printMessage ("GUIScript", "Flag cannot be set!",LIGHT_RED);
+		printMessage ("GUIScript", "Flag cannot be set!\n",LIGHT_RED);
 		return NULL;
 	}
 
@@ -2201,7 +2205,7 @@ static PyObject* GemRB_SetTextAreaFlags(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (ta->SetFlags( Flags, Operation )) {
-		printMessage ("GUIScript", "Flag cannot be set!",LIGHT_RED);
+		printMessage ("GUIScript", "Flag cannot be set!\n",LIGHT_RED);
 		return NULL;
 	}
 
@@ -2465,16 +2469,8 @@ PyDoc_STRVAR( GemRB_SetButtonBAM__doc,
 "SetButtonBAM(WindowIndex, ControlIndex, BAMResRef, CycleIndex, FrameIndex, col1)\n\n"
 "Sets the Picture of a Button Control from a BAM file. If col1 is >= 0, changes palette picture's palette to one specified by col1. Since it uses 12 colors palette, it has issues in PST." );
 
-static PyObject* GemRB_SetButtonBAM(PyObject * /*self*/, PyObject* args)
+static PyObject* SetButtonBAM(int wi, int ci, const char *ResRef, int CycleIndex, int FrameIndex, int col1)
 {
-	int wi, ci, CycleIndex, FrameIndex, col1;
-	char* ResRef;
-
-	if (!PyArg_ParseTuple( args, "iisiii", &wi, &ci,
-			&ResRef, &CycleIndex, &FrameIndex, &col1 )) {
-		return AttributeError( GemRB_SetButtonBAM__doc );
-	}
-
 	Button* btn = ( Button* ) GetControl(wi, ci, IE_GUI_BUTTON);
 	if (!btn) {
 		return NULL;
@@ -2482,7 +2478,7 @@ static PyObject* GemRB_SetButtonBAM(PyObject * /*self*/, PyObject* args)
 
 	if (ResRef[0] == 0) {
 		btn->SetPicture( NULL );
-		Py_INCREF( Py_None );
+		//no incref!
 		return Py_None;
 	}
 
@@ -2521,8 +2517,25 @@ static PyObject* GemRB_SetButtonBAM(PyObject * /*self*/, PyObject* args)
 
 	core->FreeInterface( am );
 
-	Py_INCREF( Py_None );
+	//no incref!
 	return Py_None;
+}
+
+static PyObject* GemRB_SetButtonBAM(PyObject * /*self*/, PyObject* args)
+{
+	int wi, ci, CycleIndex, FrameIndex, col1;
+	char* ResRef;
+
+	if (!PyArg_ParseTuple( args, "iisiii", &wi, &ci,
+			&ResRef, &CycleIndex, &FrameIndex, &col1 )) {
+		return AttributeError( GemRB_SetButtonBAM__doc );
+	}
+
+	PyObject *ret = SetButtonBAM(wi,ci, ResRef, CycleIndex, FrameIndex,col1);
+	if (ret) {
+		Py_INCREF(ret);
+	}
+	return ret;
 }
 
 PyDoc_STRVAR( GemRB_SetAnimation__doc,
@@ -3793,7 +3806,6 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 		AnimID += strtoul( poi, NULL, 0 );
 		core->DelTable( table );
 	}
-	printf( "Set animation complete: 0x%0x\n", AnimID );
 	MyActor->SetBase(IE_ANIMATION_ID, AnimID);
 	//setting PST's starting stance to 18
 	poi = mtm->QueryField( 0, 1 );
@@ -3810,15 +3822,8 @@ PyDoc_STRVAR( GemRB_SetSpellIcon__doc,
 "SetSpellIcon(WindowIndex, ControlIndex, SPLResRef[, type])\n\n"
 "Sets Spell icon image on a button. Type is the icon's type." );
 
-static PyObject* GemRB_SetSpellIcon(PyObject * /*self*/, PyObject* args)
+PyObject *SetSpellIcon(int wi, int ci, ieResRef SpellResRef, int type)
 {
-	int wi, ci;
-	char* SpellResRef;
-	int type=0;
-
-	if (!PyArg_ParseTuple( args, "iis|i", &wi, &ci, &SpellResRef, &type )) {
-		return AttributeError( GemRB_SetSpellIcon__doc );
-	}
 	Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
 	if (!btn) {
 		return NULL;
@@ -3826,13 +3831,17 @@ static PyObject* GemRB_SetSpellIcon(PyObject * /*self*/, PyObject* args)
 
 	if (! SpellResRef[0]) {
 		btn->SetPicture( NULL );
-		Py_INCREF( Py_None );
+		//no incref here!
 		return Py_None;
 	}
 
 	Spell* spell = core->GetSpell( SpellResRef );
 	if (spell == NULL) {
-		return RuntimeError( "Spell not found" );
+		btn->SetPicture( NULL );
+		printMessage( "GUIScript", " ", LIGHT_RED);
+		printf("Spell not found :%.8s", SpellResRef );
+		//no incref here!
+		return Py_None;
 	}
 
 	AnimationMgr* bam = ( AnimationMgr* ) core->GetInterface( IE_BAM_CLASS_ID );
@@ -3859,24 +3868,32 @@ static PyObject* GemRB_SetSpellIcon(PyObject * /*self*/, PyObject* args)
 	}
 	core->FreeInterface( bam );
 	core->FreeSpell( spell, SpellResRef, false );
-
-	Py_INCREF( Py_None );
+	//no incref here!
 	return Py_None;
+}
+
+static PyObject* GemRB_SetSpellIcon(PyObject * /*self*/, PyObject* args)
+{
+	int wi, ci;
+	char* SpellResRef;
+	int type=0;
+
+	if (!PyArg_ParseTuple( args, "iis|i", &wi, &ci, &SpellResRef, &type )) {
+		return AttributeError( GemRB_SetSpellIcon__doc );
+	}
+	PyObject *ret = SetSpellIcon(wi, ci, SpellResRef, type);
+	if (ret) {
+		Py_INCREF(ret);
+	}
+	return ret;
 }
 
 PyDoc_STRVAR( GemRB_SetItemIcon__doc,
 "SetItemIcon(WindowIndex, ControlIndex, ITMResRef[, type])\n\n"
 "Sets Item icon image on a button." );
 
-static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
+PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which)
 {
-	int wi, ci, Which = 0;
-	char* ItemResRef;
-
-	if (!PyArg_ParseTuple( args, "iis|i", &wi, &ci, &ItemResRef, &Which )) {
-		return AttributeError( GemRB_SetItemIcon__doc );
-	}
-
 	Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
 	if (!btn) {
 		return NULL;
@@ -3886,7 +3903,7 @@ static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
 		Item* item = core->GetItem(ItemResRef);
 		if (item == NULL) {
 			btn->SetPicture(NULL);
-			Py_INCREF( Py_None );
+			//no incref here!
 			return Py_None;
 		}
 
@@ -3904,8 +3921,25 @@ static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
 	} else {
 		btn->SetPicture( NULL );
 	}
-	Py_INCREF( Py_None );
+	//no incref here!
 	return Py_None;
+}
+
+static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
+{
+	int wi, ci, Which = 0;
+	char* ItemResRef;
+
+	if (!PyArg_ParseTuple( args, "iis|i", &wi, &ci, &ItemResRef, &Which )) {
+		return AttributeError( GemRB_SetItemIcon__doc );
+	}
+
+	
+	PyObject *ret = SetItemIcon(wi, ci, ItemResRef, Which);
+	if (ret) {
+		Py_INCREF(ret);
+	}
+	return ret;
 }
 
 PyDoc_STRVAR( GemRB_EnterStore__doc,
@@ -4384,7 +4418,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 	{
 		//store/bag is at full capacity
 		if (store->Capacity && (store->Capacity >= store->GetRealStockSize()) ) {
-			printMessage("GUIScript", "Store is full", GREEN);
+			printMessage("GUIScript", "Store is full.\n", GREEN);
 			Py_INCREF( Py_None );
 			return Py_None;
 		}
@@ -4495,7 +4529,7 @@ static ieStrRef GetSpellDesc(ieResRef CureResRef)
 
 	if (StoreSpellsCount==-1) {
 		StoreSpellsCount = 0;
-		int table = core->LoadTable("SPELDESC");
+		int table = core->LoadTable("speldesc");
 		if (table>=0) {
 			TableMgr *tab = core->GetTable(table);
 			if(!tab) goto table_loaded;
@@ -4571,7 +4605,7 @@ static PyObject* GemRB_ExecuteString(PyObject * /*self*/, PyObject* args)
 		if (pc) {
 			GameScript::ExecuteString( pc, String );
 		} else {
-			printf("Player not found!\n");
+			printMessage("GUIScript","Player not found!\n", YELLOW);
 		}
 	} else {
 		GameScript::ExecuteString( core->GetGame()->GetCurrentArea( ), String );
@@ -5272,7 +5306,7 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 	core->ResolveRandomItem(TmpItem);
 	int res = actor->inventory.AddSlotItem( TmpItem, SlotID );
 	if (res!=2) {
-		printf("[GUIScript] Inventory is full\n");
+		printMessage("GUIScript","Inventory is full\n", YELLOW);
 		delete TmpItem; //removal of residue
 	}
 	Py_INCREF( Py_None );
@@ -5567,6 +5601,7 @@ static void ReadActionButtons()
 
 	memset(GUIAction, -1, sizeof(GUIAction));
 	memset(GUITooltip, -1, sizeof(GUITooltip));
+	memset(GUIResRef,0, sizeof(GUIResRef));
         int table = core->LoadTable( "guibtact" );
         if (table<0) {
                 return;
@@ -5581,6 +5616,7 @@ static void ReadActionButtons()
                 row.bytes[3] = (ieByte) atoi( tab->QueryField(i,3) );
 		GUIAction[i] = row.data;
 		GUITooltip[i] = atoi( tab->QueryField(i,4) );
+		strnlwrcpy(GUIResRef[i], tab->QueryField(i,5), 8);
         }
         core->DelTable( table );
 
@@ -5598,23 +5634,6 @@ static void ReadActionButtons()
 			GUIBTDefaults[i][j+3]=atoi( tab->QueryField(i,j) );
 		}
 	}
-}
-
-static PyObject* SetQuickWeaponIcon(int WindowIndex, int ControlIndex, int /*Index*/)
-{
-	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
-	if (!btn) {
-		return NULL;
-	}
-
-	btn->SetImage( IE_GUI_BUTTON_UNPRESSED, 0 );
-	btn->SetImage( IE_GUI_BUTTON_PRESSED, 0 );
-	btn->SetImage( IE_GUI_BUTTON_SELECTED, 0 );
-	btn->SetImage( IE_GUI_BUTTON_DISABLED, 0 );
-	btn->SetFlags( IE_GUI_BUTTON_NO_IMAGE, BM_SET );
-	core->SetTooltip( WindowIndex, ControlIndex, "" );
-	//no incref
-	return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_SetActionIcon__doc,
@@ -5651,7 +5670,7 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, int Index)
 	AnimationMgr* bam = ( AnimationMgr* )
 		core->GetInterface( IE_BAM_CLASS_ID );
 	//FIXME: this is a hardcoded resource (pst has no such one)
-	DataStream *str = core->GetResourceMgr()->GetResource( "GUIBTACT", IE_BAM_CLASS_ID );
+	DataStream *str = core->GetResourceMgr()->GetResource( GUIResRef[Index], IE_BAM_CLASS_ID );
 	if (!bam->Open(str, true) ) {
 		return RuntimeError( "BAM not found" );
 	}
@@ -5691,7 +5710,9 @@ static PyObject* GemRB_SetActionIcon(PyObject * /*self*/, PyObject* args)
 	}
 
 	PyObject* ret = SetActionIcon(WindowIndex, ControlIndex, Index);
-	Py_INCREF(ret);
+	if (ret) {
+		Py_INCREF(ret);
+	}
 	return ret;
 }
 
@@ -5743,8 +5764,6 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 	} else {
 		memcpy(&myrow, GUIBTDefaults+cls, sizeof(ActionButtonRow));
 	}
-printf("Class: %d\n", cls);
-printf("%d %d %d %d %d %d %d %d %d %d %d %d\n",myrow[0],myrow[1],myrow[2],myrow[3],myrow[4],myrow[5],myrow[6],myrow[7],myrow[8],myrow[9],myrow[10],myrow[11]);
 	//this function either initializes the actor's settings, or modifies myrow
 	actor->GetActionButtonRow(myrow);
 	for (int i=0;i<GUIBT_COUNT;i++) {
@@ -5754,32 +5773,53 @@ printf("%d %d %d %d %d %d %d %d %d %d %d %d\n",myrow[0],myrow[1],myrow[2],myrow[
 		} else {
 			tmp&=31;
 		}
-		PyObject *ret = NULL;
+		PyObject *ret = SetActionIcon(wi,i,tmp);
 
 		switch (tmp) {
 		case ACT_WEAPON1:
 		case ACT_WEAPON2:
 		case ACT_WEAPON3:
 		case ACT_WEAPON4:
-			ret = SetQuickWeaponIcon(wi, i, tmp-ACT_WEAPON1);
+		{
+			SetButtonBAM(wi, i, "stonweap",0,0,-1);
+			int slot = -1;//actor->PCStats->QuickWeaponSlots[tmp-ACT_WEAPON1];
+			if (slot>=0) {
+				CREItem *item = actor->inventory.GetSlotItem(slot);
+				SetItemIcon(wi, i, item->ItemResRef,1);
+			}
+		}
 			break;
 		case ACT_QSPELL1:
 		case ACT_QSPELL2:
 		case ACT_QSPELL3:
-			ret = SetQuickWeaponIcon(wi, i, tmp-ACT_QSPELL1);
+		{
+			SetButtonBAM(wi, i, "stonspel",0,0,-1);
+			ieResRef *poi = &actor->PCStats->QuickSpells[tmp-ACT_QSPELL1];
+			if (poi[0]) {
+				ret = SetSpellIcon(wi, i, *poi, 1);
+			}
+		}
 			break;
 		case ACT_QSLOT1:
 		case ACT_QSLOT2:
 		case ACT_QSLOT3:
-			ret = SetQuickWeaponIcon(wi, i, tmp-ACT_QSLOT1);
+		{
+			SetButtonBAM(wi, i, "stonitem",0,0,-1);
+			int slot = -1;//actor->PCStats->QuickItemSlots[tmp-ACT_QSLOT1];
+printf("Slot: %d\n", slot);
+			if (slot>=0) {
+				CREItem *item = actor->inventory.GetSlotItem(slot);
+				ret = SetItemIcon(wi, i, item->ItemResRef,1);
+			}
+		}
 			break;
 		default:
-			ret = SetActionIcon(wi, i, tmp);
-			printf("%d\n",tmp);
 			break;
 		}
 		if (!ret) {
-			return NULL;
+			printf("ControlIndex: %d\n", i);
+			printf("Action: %d\n", tmp);
+			return RuntimeError("Cannot set action button!\n");
 		}
 	}
 	Py_INCREF( Py_None );

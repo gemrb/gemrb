@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.27 2005/12/17 21:02:45 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.28 2005/12/20 20:14:01 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -30,25 +30,9 @@ from ie_stats import *
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
 
-# Buttons:
-# 0 CNTREACH
-# 1 INVNT
-# 2 MAP
-# 3 MAGE
-# 4 AI
-# 5 STATS
-# 6 JRNL
-# 7 PRIEST
-# 8 OPTION
-# 9 REST
-# 10 TXTE
-
 PortraitWindow = None
 OptionsWindow = None
 ActionsWindow = None
-
-def ReturnToGame ():
-	print "returntogame"
 
 def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	global OptionsWindow
@@ -173,9 +157,9 @@ def GroupControls ():
 	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetActionIcon (Window, Button, 7)
 	Button = GemRB.GetControl (Window, 1)
-	GemRB.SetActionIcon (Window, Button, 14)
+	GemRB.SetActionIcon (Window, Button, 15)
 	Button = GemRB.GetControl (Window, 2)
-	GemRB.SetActionIcon (Window, Button, 16)
+	GemRB.SetActionIcon (Window, Button, 21)
 	Button = GemRB.GetControl (Window, 3)
 	GemRB.SetActionIcon (Window, Button, -1)
 	Button = GemRB.GetControl (Window, 4)
@@ -196,10 +180,6 @@ def GroupControls ():
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "SetupFormation")
 		str = GemRB.GetString (4935)
 		GemRB.SetTooltip (Window, Button, "F%d - %s"%(8+i,str) )
-	return
-
-def SetupControls (pc):
-	EmptyControls()
 	return
 
 def OpenActionsWindowControls (Window):
@@ -223,14 +203,13 @@ def UpdateActionsWindow ():
 	if ActionsWindow == None:
 		return
 
+	#fully redraw the side panes to cover the actions window
+	#do this only when there is no 'otherwindow'
 	if GemRB.GetVar ("OtherWindow") != -1:
-		return
-
-	#fully redraw the portrait window to cover the actions window
-	if PortraitWindow:
-		GemRB.InvalidateWindow (PortraitWindow)
-	if OptionsWindow:
-		GemRB.InvalidateWindow (OptionsWindow)
+		if PortraitWindow:
+			GemRB.InvalidateWindow (PortraitWindow)
+		if OptionsWindow:
+			GemRB.InvalidateWindow (OptionsWindow)
 
 	pc = 0
 	for i in range (PARTY_SIZE):
@@ -247,7 +226,8 @@ def UpdateActionsWindow ():
 	if pc == -1:
 		GroupControls ()
 		return
-	SetupControls (pc)
+	#this is based on class
+	GemRB.SetupControls (ActionsWindow, pc)
 	return
 
 def GetActorClassTitle (actor):
@@ -384,11 +364,6 @@ def SelectAllOnPress ():
 	GemRB.GameSelectPC (0, 1)
 	return
 
-# Run by Game class when selection was changed
-def ActionsWindowExists():
-	if (ActionsWindow!=-1 and ActionsWindow!=None):
-		return false
-
 def SelectionChanged ():
 	global PortraitWindow
 
@@ -451,7 +426,7 @@ def SetEncumbranceLabels (Window, Label, Label2, pc):
 	sstr = GemRB.GetPlayerStat (pc, IE_STR)
 	ext_str = GemRB.GetPlayerStat (pc, IE_STREXTRA)
 
-	max_encumb = GemRB.GetTableValue (Table, sstr, 3) + GemRB.GetTableValue(TableEx, ext_str, 3)
+	max_encumb = GemRB.GetTableValue (Table, sstr, 3) + GemRB.GetTableValue (TableEx, ext_str, 3)
 	encumbrance = GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)
 
 	Label = GemRB.GetControl (Window, 0x10000043)

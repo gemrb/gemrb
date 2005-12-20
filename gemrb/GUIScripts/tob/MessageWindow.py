@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/MessageWindow.py,v 1.33 2005/12/17 21:02:50 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/MessageWindow.py,v 1.34 2005/12/20 20:14:05 avenger_teambg Exp $
 
 # MessageWindow.py - scripts and GUI for main (walk) window
 
@@ -55,6 +55,7 @@ def OnLoad():
 	GUICommonWindows.OptionsWindow = None
 
 	OptionsWindow = GemRB.LoadWindow(0)
+	SetupMenuWindowControls (OptionsWindow, 1, "ReturnToGame")
 	PortraitWindow = OpenPortraitWindow(1)
 
 	Button=GemRB.GetControl(OptionsWindow, 10)
@@ -62,7 +63,6 @@ def OnLoad():
 	Button=GemRB.GetControl(PortraitWindow, 8)
 	GemRB.SetEvent(PortraitWindow, Button, IE_GUI_BUTTON_ON_PRESS, "MinimizePortraits")
 
-	SetupMenuWindowControls (OptionsWindow, 1, "ReturnToGame")
 	ActionsWindow = GemRB.LoadWindow(3)
 	OpenActionsWindowControls (ActionsWindow)
 	Button=GemRB.GetControl(ActionsWindow, 60)

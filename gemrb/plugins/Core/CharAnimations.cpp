@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.69 2005/12/19 23:10:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.70 2005/12/20 20:14:07 avenger_teambg Exp $
  *
  */
 
@@ -114,7 +114,8 @@ void CharAnimations::SetupColors(Animation *anim)
 		if (PType==1) 
 			return;
 		ieResRef PaletteResRef;
-		sprintf(PaletteResRef, "%.4s_%-.2s",ResRef, (char *) &PType);
+		snprintf(PaletteResRef,8,"%.4s_%-.2s",ResRef, (char *) &PType);
+		strlwr(PaletteResRef);
 		ImageMgr *bmp = (ImageMgr *) core->GetInterface( IE_BMP_CLASS_ID);
 		if (bmp) {
 			DataStream* s = core->GetResourceMgr()->GetResource( PaletteResRef, IE_BMP_CLASS_ID );
@@ -269,8 +270,8 @@ IE_ANI_ONE_FILE:	The whole animation is in one file, no mirroring needed.
 
 IE_ANI_TWO_FILES:	The whole animation is in 2 files. The East and West part are in 2 BAM Files.
 			Example:
-			ACHKG1
-			ACHKG1E
+			ACHKg1
+			ACHKg1E
 
 			Each BAM File contains many animation groups, each animation group
 			stores 5 Orientations, the missing 3 are stored in East BAM Files.
@@ -282,21 +283,21 @@ IE_ANI_FOUR_FILES:	The Animation is coded in Four Files. Probably it is an old T
 IE_ANI_TWENTYTWO:	This Animation Type stores the Animation in the following format
 			[NAME][ACTIONCODE][/E]
 			ACTIONCODE=A1-6, CA, SX, SA (sling is A1)
-			The G1 file contains several animation states. See MHR
+			The g1 file contains several animation states. See MHR
 			Probably it could use A7-9 files too, bringing the file numbers to 28.
 			This is the original bg1 format.
 
 IE_ANI_SIX_FILES:	The layout for these files is:
-			[NAME][G1-3][/E]
+			[NAME][g1-3][/E]
 			Each state contains 16 Orientations, but the last 6 are stored in the East file.
-			G1 contains only the walking animation.
+			g1 contains only the walking animation.
 			G2 contains stand, ready, get hit, die and twitch.
-			G3 contains 3 attacks.
+			g3 contains 3 attacks.
 
 IE_ANI_SIX_FILES_2:     Similar to SIX_FILES, but the orientation numbers are reduced like in FOUR_FILES. Only one animation uses it: MOGR 
 
 IE_ANI_TWO_FILES_2:	Animations using this type are stored using the following template:
-			[NAME]G1[/E]
+			[NAME]g1[/E]
 			Each state contains 8 Orientations, but the second 4 are stored in the East file.
 			From the standard animations, only AHRS and ACOW belong to this type.
 
@@ -622,53 +623,53 @@ void CharAnimations::AddPSTSuffix(char* ResRef, unsigned char StanceID,
 	switch (StanceID) {
 		case IE_ANI_ATTACK:
 			Cycle=SixteenToFive[Orient];
-			Prefix="AT1"; break;
+			Prefix="at1"; break;
 		case IE_ANI_DAMAGE:
 			Cycle=SixteenToFive[Orient];
-			Prefix="HIT"; break;
+			Prefix="hit"; break;
 		case IE_ANI_GET_UP:
 		case IE_ANI_EMERGE:
 			Cycle=SixteenToFive[Orient];
-			Prefix="GUP"; break;
+			Prefix="gup"; break;
 		case IE_ANI_AWAKE:
 			Cycle=SixteenToFive[Orient];
-			Prefix="STD"; break;
+			Prefix="std"; break;
 		case IE_ANI_READY:
 			Cycle=SixteenToFive[Orient];
-			Prefix="STC"; break;
+			Prefix="stc"; break;
 		case IE_ANI_DIE:
 		case IE_ANI_SLEEP:
 		case IE_ANI_TWITCH:
 			Cycle=SixteenToFive[Orient];
-			Prefix="DFB"; break;
+			Prefix="dfb"; break;
 		case IE_ANI_RUN:
 			Cycle=SixteenToNine[Orient];
-			Prefix="RUN"; break;
+			Prefix="run"; break;
 		case IE_ANI_WALK:
 			Cycle=SixteenToNine[Orient];
-			Prefix="WLK"; break;
+			Prefix="wlk"; break;
 		case IE_ANI_HEAD_TURN:
 			Cycle=SixteenToFive[Orient];
 			if (rand()&1) {
-				Prefix="SF2";
+				Prefix="sf2";
 				sprintf(ResRef,"%c%3s%4s",this->ResRef[0], Prefix, this->ResRef+1);
 				if (core->Exists(ResRef, IE_BAM_CLASS_ID) ) {
 					return;
 				}
 			}
-			Prefix="SF1";
+			Prefix="sf1";
 			sprintf(ResRef,"%c%3s%4s",this->ResRef[0], Prefix, this->ResRef+1);
 			if (core->Exists(ResRef, IE_BAM_CLASS_ID) ) {
 				return;
 			}
-			Prefix = "STC";
+			Prefix = "stc";
 			break;
 		case IE_ANI_PST_START:
 			Cycle=0;
-			Prefix="MS1"; break;
+			Prefix="ms1"; break;
 		default: //just in case
 			Cycle=SixteenToFive[Orient];
-			Prefix="STC"; break;
+			Prefix="stc"; break;
 	}
 	sprintf(ResRef,"%c%3s%4s",this->ResRef[0], Prefix, this->ResRef+1);
 }
@@ -681,63 +682,63 @@ void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 	switch (StanceID) {
 		case IE_ANI_ATTACK: //temporarily
 		case IE_ANI_ATTACK_BACKSLASH:
-			strcat( ResRef, "G21" );
+			strcat( ResRef, "g21" );
 			break;
 
 		case IE_ANI_ATTACK_SLASH:
-			strcat( ResRef, "G2" );
+			strcat( ResRef, "g2" );
 			break;
 
 		case IE_ANI_ATTACK_JAB:
-			strcat( ResRef, "G26" );
+			strcat( ResRef, "g26" );
 			Cycle+=45;
 			break;
 
 		case IE_ANI_CAST:
-			strcat( ResRef, "G25" );
+			strcat( ResRef, "g25" );
 			Cycle+=45;
 			break;
 
 		case IE_ANI_CONJURE:
-			strcat( ResRef, "G26" );
+			strcat( ResRef, "g26" );
 			Cycle+=54;
 			break;
 
 		case IE_ANI_HEAD_TURN:
 		case IE_ANI_AWAKE:
-			strcat( ResRef, "G12" );
+			strcat( ResRef, "g12" );
 			Cycle+=18;
 			break;
 
 		case IE_ANI_SLEEP:
-			strcat( ResRef, "G15" );
+			strcat( ResRef, "g15" );
 			Cycle+=45;
 			break;
 
 		case IE_ANI_TWITCH:
-			strcat( ResRef, "G14" );
+			strcat( ResRef, "g14" );
 			Cycle+=45;
 			break;
 
 		case IE_ANI_DIE:
 		case IE_ANI_EMERGE:
 		case IE_ANI_GET_UP:
-			strcat( ResRef, "G14" );
+			strcat( ResRef, "g14" );
 			Cycle+=36;
 			break;
 
 		case IE_ANI_DAMAGE:
-			strcat( ResRef, "G13" );
+			strcat( ResRef, "g13" );
 			Cycle+=27;
 			break;
 
 		case IE_ANI_READY:
-			strcat( ResRef, "G1" );
+			strcat( ResRef, "g1" );
 			Cycle+=9;
 			break;
 
 		case IE_ANI_WALK:
-			strcat( ResRef, "G11" );
+			strcat( ResRef, "g11" );
 			break;
 		default:
 			printf("VHR2 Animation: unhandled stance: %s %d\n", ResRef, StanceID);
@@ -748,11 +749,11 @@ void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 
 //Attack
 //h1, h2, w2
-static char *SlashPrefix[]={"A1","A4","A7"};
-static char *BackPrefix[]={"A2","A5","A8"};
-static char *JabPrefix[]={"A3","A6","A9"};
-static char *RangedPrefix[]={"SA","SX","SS"};
-static char *RangedPrefixOld[]={"SA","SX","A1"};
+static char *SlashPrefix[]={"a1","a4","a7"};
+static char *BackPrefix[]={"a2","a5","a8"};
+static char *JabPrefix[]={"a3","a6","a9"};
+static char *RangedPrefix[]={"sa","sx","ss"};
+static char *RangedPrefixOld[]={"sa","sx","a1"};
 
 void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 	unsigned char& Cycle, unsigned char Orient)
@@ -775,42 +776,42 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		case IE_ANI_AWAKE:
-			strcat( ResRef, "G17" );
+			strcat( ResRef, "g17" );
 			Cycle += 63;
 			break;
 
 		case IE_ANI_CAST:
-			strcat( ResRef, "CA" );
+			strcat( ResRef, "ca" );
 			Cycle += 9;
 			break;
 
 		case IE_ANI_CONJURE:
-			strcat( ResRef, "CA" );
+			strcat( ResRef, "ca" );
 			break;
 
 		case IE_ANI_DAMAGE:
-			strcat( ResRef, "G14" );
+			strcat( ResRef, "g14" );
 			Cycle += 36;
 			break;
 
 		case IE_ANI_DIE:
-			strcat( ResRef, "G15" );
+			strcat( ResRef, "g15" );
 			Cycle += 45;
 			break;
 			//I cannot find an emerge animation...
 			//Maybe is Die reversed
 		case IE_ANI_GET_UP:
 		case IE_ANI_EMERGE:
-			strcat( ResRef, "G19" );
+			strcat( ResRef, "g19" );
 			Cycle += 81;
 			break;
 
 		case IE_ANI_HEAD_TURN:
 			if (rand()&1) {
-				strcat( ResRef, "G12" );
+				strcat( ResRef, "g12" );
 				Cycle += 18;
 			} else {
-				strcat( ResRef, "G18" );
+				strcat( ResRef, "g18" );
 				Cycle += 72;
 			}
 			break;
@@ -820,7 +821,7 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		case IE_ANI_READY:
-			strcat( ResRef, "G13" ); //two handed
+			strcat( ResRef, "g13" ); //two handed
 			Cycle += 27;
 			break;
 			//This depends on the ranged weapon equipped
@@ -829,17 +830,17 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		case IE_ANI_SLEEP:
-			strcat( ResRef, "G16" );
+			strcat( ResRef, "g16" );
 			Cycle += 54;
 			break;
 
 		case IE_ANI_TWITCH:
-			strcat( ResRef, "G16" );
+			strcat( ResRef, "g16" );
 			Cycle += 54;
 			break;
 
 		case IE_ANI_WALK:
-			strcat( ResRef, "G11" );
+			strcat( ResRef, "g11" );
 			break;
 
 		default:
@@ -855,50 +856,50 @@ void CharAnimations::AddSixSuffix(char* ResRef, unsigned char StanceID,
 {
 	switch (StanceID) {
 		case IE_ANI_WALK:
-			strcat( ResRef, "G1" );
+			strcat( ResRef, "g1" );
 			Cycle = Orient;
 			break;
 
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
-			strcat( ResRef, "G3" );
+			strcat( ResRef, "g3" );
 			Cycle = Orient;
 			break;
 
 		case IE_ANI_ATTACK_BACKSLASH:
-			strcat( ResRef, "G3" );
+			strcat( ResRef, "g3" );
 			Cycle = 16 + Orient;
 			break;
 
 		case IE_ANI_ATTACK_JAB:
-			strcat( ResRef, "G3" );
+			strcat( ResRef, "g3" );
 			Cycle = 32 + Orient;
 			break;
 
 		case IE_ANI_AWAKE:
-			strcat( ResRef, "G2" );
+			strcat( ResRef, "g2" );
 			Cycle = 0 + Orient;
 			break;
 
 		case IE_ANI_READY:
-			strcat( ResRef, "G2" );
+			strcat( ResRef, "g2" );
 			Cycle = 16 + Orient;
 			break;
 
 		case IE_ANI_DAMAGE:
-			strcat( ResRef, "G2" );
+			strcat( ResRef, "g2" );
 			Cycle = 32 + Orient;
 			break;
 
 		case IE_ANI_DIE:
 		case IE_ANI_GET_UP:
 		case IE_ANI_EMERGE:
-			strcat( ResRef, "G2" );
+			strcat( ResRef, "g2" );
 			Cycle = 48 + Orient;
 			break;
 
 		case IE_ANI_TWITCH:
-			strcat( ResRef, "G2" );
+			strcat( ResRef, "g2" );
 			Cycle = 64 + Orient;
 			break;
 
@@ -909,7 +910,7 @@ void CharAnimations::AddSixSuffix(char* ResRef, unsigned char StanceID,
 
 	}
 	if (Orient>9) {
-		strcat( ResRef, "E" );
+		strcat( ResRef, "e" );
 	}
 }
 
@@ -960,9 +961,9 @@ void CharAnimations::AddLR2Suffix(char* ResRef, unsigned char StanceID,
 			break;
 	}
 	if (Orient>=4) {
-		strcat( ResRef, "G1E" );
+		strcat( ResRef, "g1e" );
 	} else {
-		strcat( ResRef, "G1" );
+		strcat( ResRef, "g1" );
 	}
 }
 
@@ -992,40 +993,40 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		case IE_ANI_READY:
-			strcat( ResRef, "G1" );
+			strcat( ResRef, "g1" );
 			Cycle = 8 + Orient;
 			break;
 
 		case IE_ANI_CAST:
-			strcat( ResRef, "CA" );
+			strcat( ResRef, "ca" );
 			Cycle = 8 + Orient;
 			break;
 
 		case IE_ANI_CONJURE:
-			strcat( ResRef, "CA" );
+			strcat( ResRef, "ca" );
 			Cycle = Orient;
 			break;
 
 		case IE_ANI_DAMAGE:
-			strcat( ResRef, "G1" );
+			strcat( ResRef, "g1" );
 			Cycle = 40 + Orient;
 			break;
 
 		case IE_ANI_DIE:
 		case IE_ANI_GET_UP:
-			strcat( ResRef, "G1" );
+			strcat( ResRef, "g1" );
 			Cycle = 48 + Orient;
 			break;
 
 			//I cannot find an emerge animation...
 			//Maybe is Die reversed
 		case IE_ANI_EMERGE:
-			strcat( ResRef, "G1" );
+			strcat( ResRef, "g1" );
 			Cycle = 48 + Orient;
 			break;
 
 		case IE_ANI_HEAD_TURN:
-			strcat( ResRef, "G1" );
+			strcat( ResRef, "g1" );
 			Cycle = 16 + Orient;
 			break;
 
@@ -1034,7 +1035,7 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		case IE_ANI_AWAKE:
-			strcat( ResRef, "G1" );
+			strcat( ResRef, "g1" );
 			Cycle = 24 + Orient;
 			break;
 
@@ -1045,17 +1046,17 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		case IE_ANI_SLEEP:
-			strcat( ResRef, "G1" );
+			strcat( ResRef, "g1" );
 			Cycle = 64 + Orient;
 			break;
 
 		case IE_ANI_TWITCH:
-			strcat( ResRef, "G1" );
+			strcat( ResRef, "g1" );
 			Cycle = 56 + Orient;
 			break;
 
 		case IE_ANI_WALK:
-			strcat( ResRef, "G1" );
+			strcat( ResRef, "g1" );
 			Cycle = Orient;
 			break;
 		default:
@@ -1064,7 +1065,7 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 			break;
 	}
 	if (Orient>=5) {
-		strcat( ResRef, "E" );
+		strcat( ResRef, "e" );
 	}
 }
 
@@ -1094,9 +1095,9 @@ void CharAnimations::AddTwoFileSuffix( char* ResRef, unsigned char StanceID,
 			Cycle = 8 + Orient / 2;
 			break;
 	}
-	strcat( ResRef, "G1" );
+	strcat( ResRef, "g1" );
 	if (Orient > 9) {
-		strcat( ResRef, "E" );
+		strcat( ResRef, "e" );
 	}
 }
 
@@ -1106,53 +1107,53 @@ void CharAnimations::AddLRSuffix( char* ResRef, unsigned char StanceID,
 	switch (StanceID) {
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_BACKSLASH:
-			strcat( ResRef, "G2" );
+			strcat( ResRef, "g2" );
 			Cycle = Orient / 2;
 			break;
 		case IE_ANI_ATTACK_SLASH:
-			strcat( ResRef, "G2" );
+			strcat( ResRef, "g2" );
 			Cycle = 8 + Orient / 2;
 			break;
 		case IE_ANI_ATTACK_JAB:
-			strcat( ResRef, "G2" );
+			strcat( ResRef, "g2" );
 			Cycle = 16 + Orient / 2;
 			break;
 		case IE_ANI_CAST:
 		case IE_ANI_CONJURE:
 		case IE_ANI_SHOOT:
 			//these animations are missing
-			strcat( ResRef, "G2" );
+			strcat( ResRef, "g2" );
 			Cycle = Orient / 2;
 			break;
 		case IE_ANI_WALK:
-			strcat( ResRef, "G1" );
+			strcat( ResRef, "g1" );
 			Cycle = Orient / 2;
 			break;
 		case IE_ANI_READY:
-			strcat( ResRef, "G1" );
+			strcat( ResRef, "g1" );
 			Cycle = 8 + Orient / 2;
 			break;
 		case IE_ANI_HEAD_TURN: //could be wrong
 		case IE_ANI_AWAKE:
-			strcat( ResRef, "G1" );
+			strcat( ResRef, "g1" );
 			Cycle = 16 + Orient / 2;
 			break;
 		case IE_ANI_DAMAGE:
-			strcat( ResRef, "G1" );
+			strcat( ResRef, "g1" );
 			Cycle = 24 + Orient / 2;
 			break;
 		case IE_ANI_GET_UP:
 		case IE_ANI_EMERGE:
-			strcat( ResRef, "G1" );
+			strcat( ResRef, "g1" );
 			Cycle = 32 + Orient / 2;
 			break;
 			break;
 		case IE_ANI_DIE:
-			strcat( ResRef, "G1" );
+			strcat( ResRef, "g1" );
 			Cycle = 32 + Orient / 2;
 			break;
 		case IE_ANI_TWITCH:
-			strcat( ResRef, "G1" );
+			strcat( ResRef, "g1" );
 			Cycle = 40 + Orient / 2;
 			break;
 		default:
@@ -1161,7 +1162,7 @@ void CharAnimations::AddLRSuffix( char* ResRef, unsigned char StanceID,
 			break;
 	}
 	if (Orient > 9) {
-		strcat( ResRef, "E" );
+		strcat( ResRef, "e" );
 	}
 }
 
@@ -1172,48 +1173,48 @@ void CharAnimations::AddLR3Suffix( char* ResRef, unsigned char StanceID,
 	switch (StanceID) {
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_BACKSLASH:
-			strcat( ResRef, "G2" );
+			strcat( ResRef, "g2" );
 			Cycle = Orient / 2;
 			break;
 		case IE_ANI_ATTACK_SLASH:
-			strcat( ResRef, "G2" );
+			strcat( ResRef, "g2" );
 			Cycle = 8 + Orient / 2;
 			break;
 		case IE_ANI_ATTACK_JAB:
-			strcat( ResRef, "G2" );
+			strcat( ResRef, "g2" );
 			Cycle = 16 + Orient / 2;
 			break;
 		case IE_ANI_CAST:
 		case IE_ANI_CONJURE:
 		case IE_ANI_SHOOT:
-			strcat( ResRef, "G3" );
+			strcat( ResRef, "g3" );
 			Cycle = Orient / 2;
 			break;
 		case IE_ANI_WALK:
-			strcat( ResRef, "G1" );
+			strcat( ResRef, "g1" );
 			Cycle = 16 + Orient / 2;
 			break;
 		case IE_ANI_READY:
-			strcat( ResRef, "G1" );
+			strcat( ResRef, "g1" );
 			Cycle = 8 + Orient / 2;
 			break;
 		case IE_ANI_HEAD_TURN: //could be wrong
 		case IE_ANI_AWAKE:
-			strcat( ResRef, "G1" );
+			strcat( ResRef, "g1" );
 			Cycle = Orient / 2;
 			break;
 		case IE_ANI_DAMAGE:
-			strcat( ResRef, "G3" );
+			strcat( ResRef, "g3" );
 			Cycle = 8 + Orient / 2;
 			break;
 		case IE_ANI_DIE:
 		case IE_ANI_GET_UP:
 		case IE_ANI_EMERGE:
-			strcat( ResRef, "G3" );
+			strcat( ResRef, "g3" );
 			Cycle = 16 + Orient / 2;
 			break;
 		case IE_ANI_TWITCH:
-			strcat( ResRef, "G3" );
+			strcat( ResRef, "g3" );
 			Cycle = 24 + Orient / 2;
 			break;
 		default:
@@ -1222,7 +1223,7 @@ void CharAnimations::AddLR3Suffix( char* ResRef, unsigned char StanceID,
 			break;
 	}
 	if (Orient > 9) {
-		strcat( ResRef, "E" );
+		strcat( ResRef, "e" );
 	}
 }
 
@@ -1236,54 +1237,54 @@ void CharAnimations::AddMMRSuffix(char* ResRef, unsigned char StanceID,
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
 		case IE_ANI_ATTACK_BACKSLASH:
-			strcat( ResRef, "A1" );
+			strcat( ResRef, "a1" );
 			Cycle = ( Orient / 2 );
 			break;
 
 		case IE_ANI_SHOOT:
-			strcat( ResRef, "A4" );
+			strcat( ResRef, "a4" );
 			Cycle = ( Orient / 2 );
 			break;
 
 		case IE_ANI_ATTACK_JAB:
-			strcat( ResRef, "A2" );
+			strcat( ResRef, "a2" );
 			Cycle = ( Orient / 2 );
 			break;
 
 		case IE_ANI_AWAKE:
 		case IE_ANI_READY:
-			strcat( ResRef, "SD" );
+			strcat( ResRef, "sd" );
 			Cycle = ( Orient / 2 );
 			break;
 
 		case IE_ANI_CONJURE:
-			strcat( ResRef, "CA" );
+			strcat( ResRef, "ca" );
 			Cycle = ( Orient / 2 );
 			break;
 
 		case IE_ANI_CAST:
-			strcat( ResRef, "SP" );
+			strcat( ResRef, "sp" );
 			Cycle = ( Orient / 2 );
 			break;
 
 		case IE_ANI_HEAD_TURN:
-			strcat( ResRef, "SC" );
+			strcat( ResRef, "sc" );
 			Cycle = ( Orient / 2 );
 			break;
 
 		case IE_ANI_DAMAGE:
-			strcat( ResRef, "GH" );
+			strcat( ResRef, "gh" );
 			Cycle = ( Orient / 2 );
 			break;
 
 		case IE_ANI_DIE:
-			strcat( ResRef, "DE" );
+			strcat( ResRef, "de" );
 			Cycle = ( Orient / 2 );
 			break;
 
 		case IE_ANI_GET_UP:
 		case IE_ANI_EMERGE:
-			strcat( ResRef, "GU" );
+			strcat( ResRef, "gu" );
 			Cycle = ( Orient / 2 );
 			break;
 
@@ -1292,17 +1293,17 @@ void CharAnimations::AddMMRSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		case IE_ANI_SLEEP:
-			strcat( ResRef, "SL" );
+			strcat( ResRef, "sl" );
 			Cycle = ( Orient / 2 );
 			break;
 
 		case IE_ANI_TWITCH:
-			strcat( ResRef, "TW" );
+			strcat( ResRef, "tw" );
 			Cycle = ( Orient / 2 );
 			break;
 
 		case IE_ANI_WALK:
-			strcat( ResRef, "WK" );
+			strcat( ResRef, "wk" );
 			Cycle = ( Orient / 2 );
 			break;
 		default:
@@ -1311,6 +1312,6 @@ void CharAnimations::AddMMRSuffix(char* ResRef, unsigned char StanceID,
 			break;
 	}
 	if (Orient > 9) {
-		strcat( ResRef, "E" );
+		strcat( ResRef, "e" );
 	}
 }

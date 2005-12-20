@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.27 2005/12/14 18:33:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.28 2005/12/20 20:14:06 avenger_teambg Exp $
  *
  */
 
@@ -90,17 +90,24 @@ bool BMPImp::Open(DataStream* stream, bool autoFree, bool convert)
 	//BITMAPINFOHEADER
 
 	str->ReadDword( &Size );
+	//some IE palettes are of a different format (OS/2 BMP)!
+	if (Size < 24) {
+		printf( "[BMPImporter]: OS/2 Bitmap Not Supported." );
+		return false;
+	}
 	str->ReadDword( &Width );
 	str->ReadDword( &Height );
 	str->ReadWord( &Planes );
 	str->ReadWord( &BitCount );
 	str->ReadDword( &Compression );
 	str->ReadDword( &ImageSize );
-	str->Seek( 16, GEM_CURRENT_POS );
-	//str->Read(&Hres, 4);
-	//str->Read(&Vres, 4);
-	//str->Read(&ColorsUsed, 4);
-	//str->Read(&ColorsImportant, 4);
+	//24 = the already read bytes 3x4+2x2+2x4
+	//this is normally 16
+	str->Seek( Size-24, GEM_CURRENT_POS );
+	//str->ReadDword(&Hres );
+	//str->ReadDword(&Vres );
+	//str->ReadDword(&ColorsUsed );
+	//str->ReadDword(&ColorsImportant );
 	if (Compression != 0) {
 		printf( "[BMPImporter]: Compressed %d-bits Image, Not Supported.",
 			BitCount );
@@ -114,7 +121,6 @@ bool BMPImp::Open(DataStream* stream, bool autoFree, bool convert)
 		else
 			NumColors = 16;
 		Palette = ( Color * ) malloc( 4 * NumColors );
-		//no idea if we have to swap this or not
 		for (unsigned int i = 0; i < NumColors; i++) {
 			str->Read( &Palette[i].b, 1 );
 			str->Read( &Palette[i].g, 1 );

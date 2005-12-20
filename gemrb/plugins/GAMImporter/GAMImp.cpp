@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.71 2005/12/19 23:10:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.72 2005/12/20 20:14:07 avenger_teambg Exp $
  *
  */
 
@@ -288,10 +288,10 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 	for (i = 0; i < 3; i++) {
 		str->Read( &pcInfo.QuickSpellResRef[i], 8 );
 	}
-	for (i = 0; i < 3; i++) {
+	for (i = 0; i < 4; i++) {
 		str->ReadWord( &pcInfo.QuickItemSlot[i] );
 	}
-	str->Read( &pcInfo.UnknownBA, 6 );
+	str->Read( &pcInfo.UnknownBA, 4 );
 	//QuickSlots are customisable in iwd2 and GemRB
 	//thus we adopt the iwd2 style actor info
 	if (version==GAM_VER_GEMRB || version==GAM_VER_IWD2) {
@@ -329,6 +329,9 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 	}
 
 	memcpy(ps->QSlots, pcInfo.QSlots, sizeof(pcInfo.QSlots) );
+	memcpy(ps->QuickSpells, pcInfo.QuickSpellResRef, 3*sizeof(ieResRef) );
+	memcpy(ps->QuickWeaponSlots, pcInfo.QuickWeaponSlot, 4*sizeof(ieWord) );
+	memcpy(ps->QuickItemSlots, pcInfo.QuickItemSlot, 4*sizeof(ieWord) );
 	actor->Destination.x = actor->Pos.x = pcInfo.XPos;
 	actor->Destination.y = actor->Pos.y = pcInfo.YPos;
 	strcpy( actor->Area, pcInfo.Area );

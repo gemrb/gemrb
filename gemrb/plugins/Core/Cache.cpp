@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.cpp,v 1.10 2005/12/19 23:10:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.cpp,v 1.11 2005/12/20 20:14:07 avenger_teambg Exp $
  *
  */
 
@@ -24,9 +24,9 @@
 // private inlines
 inline unsigned int Cache::MyHashKey(const char* key) const
 {
-	int nHash = key[0];
+	int nHash = tolower(key[0]);
 	for (int i=1;(i<KEYSIZE) && key[i];i++) {
-		nHash = (nHash << 5) ^ key[i];
+		nHash = (nHash << 5) ^ tolower(key[i]);
 	}
 	return nHash % m_nHashTableSize;
 }

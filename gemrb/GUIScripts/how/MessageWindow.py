@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/MessageWindow.py,v 1.24 2005/12/18 19:37:20 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/MessageWindow.py,v 1.25 2005/12/20 20:14:02 avenger_teambg Exp $
 
 # MessageWindow.py - scripts and GUI for main (walk) window
 
@@ -49,11 +49,18 @@ def OnLoad():
 	GemRB.GameSetPartySize(PARTY_SIZE)
 	GemRB.GameSetProtagonistMode(2)
 	GemRB.LoadWindowPack(GetWindowPack())
-	ActionsWindow = GemRB.LoadWindow(3)
+
+	GUICommonWindows.PortraitWindow = None
+	GUICommonWindows.ActionsWindow = None
+	GUICommonWindows.OptionsWindow = None
+
 	#this is different in IWD and HoW
 	OptionsWindow = GemRB.LoadWindow(25)
-	SetupActionsWindowControls (ActionsWindow)
+	SetupMenuWindowControls (OptionsWindow, 1, "ReturnToGame")
 	PortraitWindow = OpenPortraitWindow(1)
+
+	ActionsWindow = GemRB.LoadWindow(3)
+	OpenActionsWindowControls (ActionsWindow)
 
 	GemRB.SetVar("PortraitWindow", PortraitWindow)
 	GemRB.SetVar("ActionsWindow", ActionsWindow)
@@ -67,8 +74,6 @@ def OnLoad():
 	GemRB.SetVar("MessagePosition", 4) #BottomAdded
 	GemRB.SetVar("OtherPosition", 5) #Inactivating
 	GemRB.SetVar("TopPosition", 5) #Inactivating
-	
-	SetupMenuWindowControls (OptionsWindow, 1, "ReturnToGame")
 	
 	UpdateControlStatus()
 
@@ -110,10 +115,10 @@ def UpdateControlStatus():
 	if Expand == GS_MEDIUMDIALOG:
 		TMessageWindow = GemRB.LoadWindow(12)
 		TMessageTA = GemRB.GetControl(TMessageWindow, 1)
-                ExpandButton = GemRB.GetControl(TMessageWindow, 0)
-                GemRB.SetEvent(TMessageWindow, ExpandButton, IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
-                ContractButton = GemRB.GetControl(TMessageWindow, 3)
-                GemRB.SetEvent(TMessageWindow, ContractButton, IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
+		ExpandButton = GemRB.GetControl(TMessageWindow, 0)
+		GemRB.SetEvent(TMessageWindow, ExpandButton, IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
+		ContractButton = GemRB.GetControl(TMessageWindow, 3)
+		GemRB.SetEvent(TMessageWindow, ContractButton, IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
 
 	elif Expand == GS_LARGEDIALOG:
 		TMessageWindow = GemRB.LoadWindow(7)
