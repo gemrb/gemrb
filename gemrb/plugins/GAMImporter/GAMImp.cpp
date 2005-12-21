@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.72 2005/12/20 20:14:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.73 2005/12/21 10:39:56 avenger_teambg Exp $
  *
  */
 
@@ -300,6 +300,8 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 			str->ReadDword( &tmpDword );
 			pcInfo.QSlots[i] = (ieByte) tmpDword;
 		}
+	} else {
+		pcInfo.QSlots[0] = 0xff; //(invalid, will be regenerated)
 	}
 	str->Read( &pcInfo.Name, 32 );
 	if (version==GAM_VER_PST) { //Torment

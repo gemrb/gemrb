@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.362 2005/12/20 23:20:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.363 2005/12/21 10:39:57 avenger_teambg Exp $
  *
  */
 
@@ -182,6 +182,23 @@ inline Control *GetControl( int wi, int ci, int ct)
 		return NULL;
 	}
 	return ctrl;
+}
+
+//sets tooltip with Fx key prepended
+static inline void SetFunctionTooltip(int WindowIndex, int ControlIndex, char *txt)
+{
+	if (txt) {
+		if (txt[0]) {
+			char *txt2 = (char *) malloc(strlen(txt)+10);
+			sprintf(txt2,"F%d - %s",ControlIndex+1,txt);
+			free(txt);
+			core->SetTooltip(WindowIndex, ControlIndex, txt2);
+			free (txt2);
+			return;
+		}
+		free(txt);
+	}
+	core->SetTooltip(WindowIndex, ControlIndex, "");
 }
 
 PyDoc_STRVAR( GemRB_SetInfoTextColor__doc, 
@@ -3819,10 +3836,10 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetSpellIcon__doc,
-"SetSpellIcon(WindowIndex, ControlIndex, SPLResRef[, type])\n\n"
+"SetSpellIcon(WindowIndex, ControlIndex, SPLResRef[, type, tooltip])\n\n"
 "Sets Spell icon image on a button. Type is the icon's type." );
 
-PyObject *SetSpellIcon(int wi, int ci, ieResRef SpellResRef, int type)
+PyObject *SetSpellIcon(int wi, int ci, ieResRef SpellResRef, int type, int tooltip)
 {
 	Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
 	if (!btn) {
@@ -3866,6 +3883,10 @@ PyObject *SetSpellIcon(int wi, int ci, ieResRef SpellResRef, int type)
 		btn->SetImage( IE_GUI_BUTTON_SELECTED, bam->GetFrameFromCycle(0, 2));
 		btn->SetImage( IE_GUI_BUTTON_DISABLED, bam->GetFrameFromCycle(0, 3));
 	}
+	if (tooltip) {
+		char *str = core->GetString(spell->SpellName,0);
+		SetFunctionTooltip(wi, ci, str); //will free str
+	}
 	core->FreeInterface( bam );
 	core->FreeSpell( spell, SpellResRef, false );
 	//no incref here!
@@ -3877,11 +3898,12 @@ static PyObject* GemRB_SetSpellIcon(PyObject * /*self*/, PyObject* args)
 	int wi, ci;
 	char* SpellResRef;
 	int type=0;
+	int tooltip=0;
 
-	if (!PyArg_ParseTuple( args, "iis|i", &wi, &ci, &SpellResRef, &type )) {
+	if (!PyArg_ParseTuple( args, "iis|ii", &wi, &ci, &SpellResRef, &type, &tooltip )) {
 		return AttributeError( GemRB_SetSpellIcon__doc );
 	}
-	PyObject *ret = SetSpellIcon(wi, ci, SpellResRef, type);
+	PyObject *ret = SetSpellIcon(wi, ci, SpellResRef, type, tooltip);
 	if (ret) {
 		Py_INCREF(ret);
 	}
@@ -3892,7 +3914,7 @@ PyDoc_STRVAR( GemRB_SetItemIcon__doc,
 "SetItemIcon(WindowIndex, ControlIndex, ITMResRef[, type])\n\n"
 "Sets Item icon image on a button." );
 
-PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which)
+PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int tooltip)
 {
 	Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
 	if (!btn) {
@@ -3917,6 +3939,12 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which)
 		if (!Picture)
 			return RuntimeError( "BAM not found");
 		btn->SetPicture( Picture );
+		if (tooltip) {
+			//later getitemname could also return tooltip stuff
+			char *str = core->GetString(item->GetItemName(false),0);
+			SetFunctionTooltip(wi, ci, str); //will free str
+		}
+
 		core->FreeItem( item, ItemResRef, false );
 	} else {
 		btn->SetPicture( NULL );
@@ -3927,15 +3955,17 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which)
 
 static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
 {
-	int wi, ci, Which = 0;
+	int wi, ci;
 	char* ItemResRef;
+	int Which = 0;
+	int tooltip = 0;
 
-	if (!PyArg_ParseTuple( args, "iis|i", &wi, &ci, &ItemResRef, &Which )) {
+	if (!PyArg_ParseTuple( args, "iis|ii", &wi, &ci, &ItemResRef, &Which, &tooltip )) {
 		return AttributeError( GemRB_SetItemIcon__doc );
 	}
 
 	
-	PyObject *ret = SetItemIcon(wi, ci, ItemResRef, Which);
+	PyObject *ret = SetItemIcon(wi, ci, ItemResRef, Which, tooltip);
 	if (ret) {
 		Py_INCREF(ret);
 	}
@@ -5439,20 +5469,20 @@ static PyObject* GemRB_GamePause(PyObject * /*self*/, PyObject* args)
 	}
 
 	GameControl *gc = core->GetGameControl();
-        if (gc) {
+	if (gc) {
 		if (pause) {
-	                gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
+			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
 		} else {
-	                gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_NAND);
+			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_NAND);
 		}
 		if (!quiet) {
 			if (gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS) {
-		                core->DisplayConstantString(STR_PAUSED,0xff0000);
+				core->DisplayConstantString(STR_PAUSED,0xff0000);
 			} else {
-		                core->DisplayConstantString(STR_UNPAUSED,0xff0000);
+				core->DisplayConstantString(STR_UNPAUSED,0xff0000);
 			}
 		}
-        }
+	}
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -5602,29 +5632,29 @@ static void ReadActionButtons()
 	memset(GUIAction, -1, sizeof(GUIAction));
 	memset(GUITooltip, -1, sizeof(GUITooltip));
 	memset(GUIResRef,0, sizeof(GUIResRef));
-        int table = core->LoadTable( "guibtact" );
-        if (table<0) {
-                return;
-        }
-        TableMgr *tab = core->GetTable( table );
-        for (i = 0; i < 32; i++) {
+	int table = core->LoadTable( "guibtact" );
+	if (table<0) {
+		return;
+	}
+	TableMgr *tab = core->GetTable( table );
+	for (i = 0; i < 32; i++) {
 		packtype row;
 
-                row.bytes[0] = (ieByte) atoi( tab->QueryField(i,0) );
-                row.bytes[1] = (ieByte) atoi( tab->QueryField(i,1) );
-                row.bytes[2] = (ieByte) atoi( tab->QueryField(i,2) );
-                row.bytes[3] = (ieByte) atoi( tab->QueryField(i,3) );
+		row.bytes[0] = (ieByte) atoi( tab->QueryField(i,0) );
+		row.bytes[1] = (ieByte) atoi( tab->QueryField(i,1) );
+		row.bytes[2] = (ieByte) atoi( tab->QueryField(i,2) );
+		row.bytes[3] = (ieByte) atoi( tab->QueryField(i,3) );
 		GUIAction[i] = row.data;
 		GUITooltip[i] = atoi( tab->QueryField(i,4) );
 		strnlwrcpy(GUIResRef[i], tab->QueryField(i,5), 8);
-        }
-        core->DelTable( table );
+	}
+	core->DelTable( table );
 
 	table = core->LoadTable( "qslots");
-        if (table<0) {
-                return;
-        }
-        tab = core->GetTable( table );
+	if (table<0) {
+		return;
+	}
+	tab = core->GetTable( table );
 	ClassCount = tab->GetRowCount();
 	GUIBTDefaults = new ActionButtonRow[ClassCount];
 
@@ -5688,15 +5718,7 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, int Index)
 	core->FreeInterface( bam );
 	btn->SetFlags( IE_GUI_BUTTON_NORMAL, BM_SET );
 	char *txt = core->GetString( GUITooltip[Index] );
-	if (txt) {
-		char *txt2 = (char *) malloc(strlen(txt)+10);
-		sprintf(txt2,"F%d - %s",ControlIndex+1,txt);
-		free(txt);
-		core->SetTooltip(WindowIndex, ControlIndex, txt2);
-		free (txt2);
-	} else {
-		core->SetTooltip(WindowIndex, ControlIndex, "");
-	}
+	SetFunctionTooltip(WindowIndex, ControlIndex, txt);//will free txt
 	//no incref
 	return Py_None;
 }
@@ -5759,6 +5781,10 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 	}
 	ActionButtonRow myrow;
 	unsigned int cls = (int) actor->GetStat(IE_CLASS);
+	if (GUIAction[0]==0xcccccccc) {
+		ReadActionButtons();
+	}
+
 	if (cls >= ClassCount) {
 		memcpy(&myrow, &DefaultButtons, sizeof(ActionButtonRow));
 	} else {
@@ -5785,7 +5811,7 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 			int slot = -1;//actor->PCStats->QuickWeaponSlots[tmp-ACT_WEAPON1];
 			if (slot>=0) {
 				CREItem *item = actor->inventory.GetSlotItem(slot);
-				SetItemIcon(wi, i, item->ItemResRef,1);
+				SetItemIcon(wi, i, item->ItemResRef,1,1);
 			}
 		}
 			break;
@@ -5795,8 +5821,8 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 		{
 			SetButtonBAM(wi, i, "stonspel",0,0,-1);
 			ieResRef *poi = &actor->PCStats->QuickSpells[tmp-ACT_QSPELL1];
-			if (poi[0]) {
-				ret = SetSpellIcon(wi, i, *poi, 1);
+			if ((*poi)[0]) {
+				ret = SetSpellIcon(wi, i, *poi, 1, 1);
 			}
 		}
 			break;
@@ -5808,7 +5834,7 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 			int slot = -1;//actor->PCStats->QuickItemSlots[tmp-ACT_QSLOT1];
 			if (slot>=0) {
 				CREItem *item = actor->inventory.GetSlotItem(slot);
-				ret = SetItemIcon(wi, i, item->ItemResRef,1);
+				ret = SetItemIcon(wi, i, item->ItemResRef,1,1);
 			}
 		}
 			break;
