@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.363 2005/12/21 10:39:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.364 2005/12/21 16:53:52 avenger_teambg Exp $
  *
  */
 
@@ -71,6 +71,8 @@ typedef struct SpellDescType {
 	ieStrRef value;
 } SpellDescType;
 
+typedef char EventNameType[17];
+
 #define UNINIT_IEDWORD 0xcccccccc
 
 static SpellDescType *StoreSpells = NULL;
@@ -81,6 +83,7 @@ static int ReputationDonation[20]={(int) UNINIT_IEDWORD};
 static ieDword GUIAction[32]={UNINIT_IEDWORD};
 static ieDword GUITooltip[32]={UNINIT_IEDWORD};
 static ieResRef GUIResRef[32];
+static EventNameType GUIEvent[32];
 
 //the order of these buttons are based on opcode #144 
 #define ACT_NONE 100  //iwd2's maximum is 99
@@ -808,7 +811,7 @@ static PyObject* GemRB_GetTableValue(PyObject * /*self*/, PyObject* args)
 		if (!tm) {
 			return RuntimeError("Can't find resource");
 		}
-		char* ret;
+		const char* ret;
 		if (PyObject_TypeCheck( row, &PyString_Type )) {
 			char* rows = PyString_AsString( row );
 			char* cols = PyString_AsString( col );
@@ -849,7 +852,7 @@ static PyObject* GemRB_FindTableValue(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("Can't find resource");
 	}
 	for (row = 0; row < tm->GetRowCount(); row++) {
-		char* ret = tm->QueryField( row, col );
+		const char* ret = tm->QueryField( row, col );
 		long val;
 		if (valid_number( ret, val ) && (Value == val) )
 			return PyInt_FromLong( row );
@@ -3811,7 +3814,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 		printMessage( "GUIScript", "Table is invalid.\n", LIGHT_RED );
 		return NULL;
 	}
-	char *poi = mtm->QueryField( 0 );
+	const char *poi = mtm->QueryField( 0 );
 	int AnimID = strtoul( poi, NULL, 0 );
 	for (int i = 1; i < count; i++) {
 		poi = mtm->QueryField( i );
@@ -5631,7 +5634,8 @@ static void ReadActionButtons()
 
 	memset(GUIAction, -1, sizeof(GUIAction));
 	memset(GUITooltip, -1, sizeof(GUITooltip));
-	memset(GUIResRef,0, sizeof(GUIResRef));
+	memset(GUIResRef, 0, sizeof(GUIResRef));
+	memset(GUIEvent, 0, sizeof(GUIEvent));
 	int table = core->LoadTable( "guibtact" );
 	if (table<0) {
 		return;
@@ -5647,6 +5651,7 @@ static void ReadActionButtons()
 		GUIAction[i] = row.data;
 		GUITooltip[i] = atoi( tab->QueryField(i,4) );
 		strnlwrcpy(GUIResRef[i], tab->QueryField(i,5), 8);
+		strncpy(GUIEvent[i], tab->GetRowName(i), 16);
 	}
 	core->DelTable( table );
 
@@ -5689,6 +5694,7 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, int Index)
 		btn->SetImage( IE_GUI_BUTTON_SELECTED, 0 );
 		btn->SetImage( IE_GUI_BUTTON_DISABLED, 0 );
 		btn->SetFlags( IE_GUI_BUTTON_NO_IMAGE, BM_SET );
+		btn->SetEvent( IE_GUI_BUTTON_ON_PRESS, "" );
 		core->SetTooltip( WindowIndex, ControlIndex, "" );
 		//no incref
 		return Py_None;
@@ -5717,6 +5723,9 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, int Index)
 	btn->SetImage( IE_GUI_BUTTON_DISABLED, tspr );
 	core->FreeInterface( bam );
 	btn->SetFlags( IE_GUI_BUTTON_NORMAL, BM_SET );
+	char Event[33];
+	snprintf(Event,32, "Action%sPressed", GUIEvent[Index]);
+	btn->SetEvent( IE_GUI_BUTTON_ON_PRESS, Event );
 	char *txt = core->GetString( GUITooltip[Index] );
 	SetFunctionTooltip(WindowIndex, ControlIndex, txt);//will free txt
 	//no incref

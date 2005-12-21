@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.48 2005/12/20 20:14:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.49 2005/12/21 16:53:52 avenger_teambg Exp $
  *
  */
 
@@ -80,11 +80,11 @@ bool Init_EffectQueue()
 		}
 
 		for (int i = 0; i < MAX_EFFECTS; i++) {
-			char* effectname = effectsTable->GetValue( i );
+			const char* effectname = effectsTable->GetValue( i );
 			if (efftextTable) {
 				int row = efftextTable->GetRowCount();
 				while (row--) {
-					char* ret = efftextTable->GetRowName( row );
+					const char* ret = efftextTable->GetRowName( row );
 					long val;
 					if (valid_number( ret, val ) && (i == val) ) {
 						effect_refs[i].EffText = atoi( efftextTable->QueryField( row, 1 ) );

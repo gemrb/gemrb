@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.214 2005/12/19 23:10:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.215 2005/12/21 16:53:52 avenger_teambg Exp $
  *
  */
 
@@ -63,7 +63,7 @@ static Point **VisibilityMasks=NULL;
 
 static bool PathFinderInited = false;
 static Variables Spawns;
-int LargeFog;
+static int LargeFog;
 static ieWord globalActorCounter;
 
 #define STEP_TIME 150
@@ -113,7 +113,7 @@ void InitSpawnGroups()
 	while (i--) {
 		int j=tab->GetRowCount();
 		while (j--) {
-			char *crename = tab->QueryField( j,i );
+			const char *crename = tab->QueryField( j,i );
 			if (crename[0] != '*') break;
 		}
 		if (j>0) {
@@ -140,7 +140,7 @@ void InitPathFinder()
 	if (passabletable >= 0) {
 		TableMgr* tm = core->GetTable( passabletable );
 		if (tm) {
-			char* poi;
+			const char* poi;
 
 			for (int i = 0; i < 16; i++) {
 				poi = tm->QueryField( 0, i );
@@ -1020,7 +1020,7 @@ void Map::PlayAreaSong(int SongType)
 		core->DelTable( songlist );
 		return;
 	}
-	char* poi = tm->QueryField( SongHeader.SongList[SongType], column );
+	const char* poi = tm->QueryField( SongHeader.SongList[SongType], column );
 	core->GetMusicMgr()->SwitchPlayList( poi, true );
 }
 

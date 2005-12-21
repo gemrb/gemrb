@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.70 2005/12/20 20:14:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.71 2005/12/21 16:53:52 avenger_teambg Exp $
  *
  */
 
@@ -181,7 +181,7 @@ void CharAnimations::InitAvatarsTable()
 		strnlwrcpy(AvatarTable[i].Prefixes[3],Avatars->QueryField(i,AV_PREFIX4),8);
 		AvatarTable[i].AnimationType=atoi(Avatars->QueryField(i,AV_ANIMTYPE) );
 		AvatarTable[i].CircleSize=atoi(Avatars->QueryField(i,AV_CIRCLESIZE) );
-		char *tmp = Avatars->QueryField(i,AV_USE_PALETTE);
+		const char *tmp = Avatars->QueryField(i,AV_USE_PALETTE);
 		//QueryField will always return a zero terminated string
 		//so tmp[0] must exist
 		if ( isalpha (tmp[0]) ) {

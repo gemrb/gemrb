@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.343 2005/12/20 20:14:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.344 2005/12/21 16:53:52 avenger_teambg Exp $
  *
  */
 
@@ -78,6 +78,7 @@ static TriggerLink triggernames[] = {
 	{"combatcounterlt", GameScript::CombatCounterLT, 0},
 	{"contains", GameScript::Contains, 0},
 	{"currentareais", GameScript::CurrentAreaIs, 0},//checks object
+	{"creaturehidden", GameScript::CreatureHidden, 0},//this is the engine level hiding feature, not the skill
 	{"creatureinarea", GameScript::AreaCheck, 0}, //pst, checks this object
 	{"damagetaken", GameScript::DamageTaken, 0},
 	{"damagetakengt", GameScript::DamageTakenGT, 0},
@@ -1052,7 +1053,7 @@ GameScript::GameScript(ieResRef ResRef, unsigned char ScriptType,
 		
 		ObjectIDSTableNames = (ieResRef *) malloc( sizeof(ieResRef) * ObjectIDSCount );
 		for (i = 0; i < ObjectIDSCount; i++) {
-			char *idsname;
+			const char *idsname;
 			idsname=objNameTable->QueryField( 0, i + 1 );
 			IDSLink *poi=FindIdentifier( idsname );
 			if (poi==NULL) {

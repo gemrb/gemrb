@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/2DAImporter/2DAImp.h,v 1.20 2004/11/13 23:16:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/2DAImporter/2DAImp.h,v 1.21 2005/12/21 16:53:51 avenger_teambg Exp $
  *
  */
 
@@ -61,7 +61,7 @@ public:
 	}
 	/** Returns a pointer to a zero terminated 2da element,
 		if it cannot return a value, it returns the default */
-	inline char* QueryField(unsigned int row = 0, unsigned int column = 0) const
+	inline const char* QueryField(unsigned int row = 0, unsigned int column = 0) const
 	{
 		if (rows.size() <= row) {
 			return ( char * ) defVal;
@@ -72,9 +72,8 @@ public:
 		return rows[row][column];
 	};
 	/** Returns a pointer to a zero terminated 2da element,
-		 uses column name and row name to search the field,
-	  may return NULL */
-	inline char* QueryField(const char* row, const char* column) const
+		 uses column name and row name to search the field */
+	inline const char* QueryField(const char* row, const char* column) const
 	{
 		unsigned int i;
 
@@ -113,20 +112,20 @@ public:
 		return -1;
 	};
 
-	inline char* GetColumnName(unsigned int index) const
+	inline const char* GetColumnName(unsigned int index) const
 	{
 		if (index < colNames.size()) {
 			return colNames[index];
 		}
-		return NULL;
+		return "";
 	};
 
-	inline char* GetRowName(unsigned int index) const
+	inline const char* GetRowName(unsigned int index) const
 	{
 		if (index < rowNames.size()) {
 			return rowNames[index];
 		}
-		return NULL;
+		return "";
 	};
 public:
 	void release(void)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.53 2005/12/19 23:10:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.54 2005/12/21 16:53:52 avenger_teambg Exp $
  *
  */
 
@@ -604,10 +604,6 @@ void GameScript::StartCutScene(Scriptable* Sender, Action* parameters)
 
 void GameScript::CutSceneID(Scriptable* Sender, Action* parameters)
 {
-/*
-	Sender->CutSceneId = GetActorFromObject( Sender, parameters->objects[1]);
-	Sender->Active|=SCR_CUTSCENEID;
-*/
 	Sender->SetCutsceneID( GetActorFromObject( Sender, parameters->objects[1] ) );
 	if (InDebug&ID_CUTSCENE) {
 		if (!Sender->GetCutsceneID()) {
@@ -1211,7 +1207,7 @@ void GameScript::StartSong(Scriptable* /*Sender*/, Action* parameters)
 	int MusicTable = core->LoadTable( "music" );
 	if (MusicTable >= 0) {
 		TableMgr* music = core->GetTable( MusicTable );
-		char* string = music->QueryField( parameters->int0Parameter, 0 );
+		const char* string = music->QueryField( parameters->int0Parameter, 0 );
 		if (string[0] == '*') {
 			core->GetMusicMgr()->HardEnd();
 		} else {
@@ -1933,7 +1929,7 @@ void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
 		printMessage("GameScript","Can't perform ADDXP2DA",LIGHT_RED);
 		return;
 	}
-	char * xpvalue = core->GetTable( xptable )->QueryField( parameters->string0Parameter, "0" ); //level is unused
+	const char * xpvalue = core->GetTable( xptable )->QueryField( parameters->string0Parameter, "0" ); //level is unused
 	
 	if ( xpvalue[0]=='P' && xpvalue[1]=='_') {
 		//divide party xp
@@ -4138,7 +4134,7 @@ void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 {
 	int type;
 	char FolderName[_MAX_PATH];
-	char *folder = "";
+	const char *folder = "";
 
 	int SlotTable = core->LoadTable( "savegame" );
 	if (SlotTable >= 0) {

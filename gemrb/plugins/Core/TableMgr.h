@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TableMgr.h,v 1.17 2005/11/17 21:08:32 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TableMgr.h,v 1.18 2005/12/21 16:53:52 avenger_teambg Exp $
  *
  */
 
@@ -61,17 +61,17 @@ public:
 	virtual int GetColumnCount(unsigned int row = 0) const = 0;
 	/** Returns a pointer to a zero terminated 2da element,
 	 * 0,0 returns the default value, it may return NULL */
-	virtual char* QueryField(unsigned int row = 0, unsigned int column = 0) const = 0;
+	virtual const char* QueryField(unsigned int row = 0, unsigned int column = 0) const = 0;
 	/** Returns a pointer to a zero terminated 2da element,
 	 * uses column name and row name to search the field,
 	 * may return NULL */
-	virtual char* QueryField(const char* row, const char* column) const = 0;
+	virtual const char* QueryField(const char* row, const char* column) const = 0;
 	/** Opens a Table File */
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
 	/** Returns a Row Name, returns NULL on error */
 	virtual int GetRowIndex(const char* rowname) const = 0;
-	virtual char* GetColumnName(unsigned int index) const = 0;
-	virtual char* GetRowName(unsigned int index) const = 0;
+	virtual const char* GetColumnName(unsigned int index) const = 0;
+	virtual const char* GetRowName(unsigned int index) const = 0;
 };
 
 #endif  // ! TABLEMGR_H

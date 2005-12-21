@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.32 2005/12/14 17:57:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.33 2005/12/21 16:53:52 avenger_teambg Exp $
  *
  */
 
@@ -1285,6 +1285,17 @@ int GameScript::Dead(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+int GameScript::CreatureHidden(Scriptable* Sender, Trigger* /*parameters*/)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *act=(Actor *) Sender;
+	if (act->GetInternalFlag()&IF_VISIBLE) {
+		return 0;
+	}
+	return 1;
+}
 int GameScript::BecameVisible(Scriptable* Sender, Trigger* /*parameters*/)
 {
 	if (Sender->Type!=ST_ACTOR) {

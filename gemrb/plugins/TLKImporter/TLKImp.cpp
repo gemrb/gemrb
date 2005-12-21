@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.54 2005/11/24 17:44:10 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.55 2005/12/21 16:53:52 avenger_teambg Exp $
  *
  */
 
@@ -322,7 +322,7 @@ int TLKImp::BuiltinToken(char* Token, char* dest)
 		int ind = core->LoadTable( "magesch" );
 		TableMgr* tm = core->GetTable( ind );
 		if (tm) {
-			char* value = tm->QueryField( row, 2 );
+			const char* value = tm->QueryField( row, 2 );
 			Decoded = GetString( atoi( value ), 0 );
 			goto exit_function;
 		}

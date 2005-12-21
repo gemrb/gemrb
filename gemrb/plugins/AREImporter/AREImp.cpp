@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.145 2005/12/20 08:25:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.146 2005/12/21 16:53:52 avenger_teambg Exp $
  *
  */
 
@@ -248,7 +248,7 @@ Map* AREImp::GetMap(const char *ResRef)
 	for (i = 0; i < MAX_RESCOUNT; i++) {
 		str->ReadDword( map->SongHeader.SongList + i );
 	}
-	str->Seek( RestHeader, GEM_STREAM_START );
+	str->Seek( RestHeader + 32, GEM_STREAM_START );
 	for (i = 0; i < MAX_RESCOUNT; i++) {
 		str->ReadDword( map->RestHeader.Strref + i );
 	}
@@ -969,9 +969,9 @@ Map* AREImp::GetMap(const char *ResRef)
 	printf( "Loading explored bitmap\n" );
 	i = map->GetExploredMapSize();
 	if (ExploredBitmapSize==i) {
-		map->ExploredBitmap = (ieByte *) malloc(ExploredBitmapSize);
+		map->ExploredBitmap = (ieByte *) malloc(i);
 		str->Seek( ExploredBitmapOffset, GEM_STREAM_START );
-		str->Read( map->ExploredBitmap, ExploredBitmapSize );
+		str->Read( map->ExploredBitmap, i );
 	}
 	else {
 		if( ExploredBitmapSize ) {
@@ -1112,12 +1112,12 @@ int AREImp::GetStoredFileSize(Map *map)
 	int pst = core->HasFeature( GF_AUTOMAP_INI );
 	NoteCount = (ieDword) map->GetMapNoteCount();
 	headersize += NoteCount * (pst?0x214: 0x22);
-	RestHeader = headersize;
-
-	headersize += 0xe4;
 	SongHeader = headersize;
 
 	headersize += 0x90;
+	RestHeader = headersize;
+
+	headersize += 0xe4;
 	return headersize;
 }
 
@@ -1434,7 +1434,10 @@ int AREImp::PutRegions( DataStream *stream, Map *map, ieDword &VertIndex)
 		InfoPoint *ip = map->TMap->GetInfoPoint(i);
 
 		stream->Write( ip->GetScriptName(), 32);
-		tmpWord = (ieWord) ip->Type;
+		//this is a hack, we abuse a coincidence
+		//ST_PROXIMITY = 1, ST_TRIGGER = 2, ST_TRAVEL = 3
+		//translates to trap = 0, info = 1, travel = 2
+		tmpWord = ((ieWord) ip->Type) - 1;
 		stream->WriteWord( &tmpWord);
 		//outline bounding box
 		tmpWord = (ieWord) ip->outline->BBox.x;
@@ -1785,7 +1788,7 @@ int AREImp::PutSongHeader( DataStream *stream, Map *map)
 
 	memset(filling,0,sizeof(filling) );
 	for(i=0;i<MAX_RESCOUNT;i++) {
-		stream->WriteDword( map->SongHeader.SongList);
+		stream->WriteDword( &map->SongHeader.SongList[i]);
 	}
 	//day
 	stream->Write( filling,8);
@@ -1797,8 +1800,8 @@ int AREImp::PutSongHeader( DataStream *stream, Map *map)
 	stream->WriteDword( &tmpDword);
 	//song flag
 	stream->WriteDword( &tmpDword);
-	//lots of empty crap
-	for(i=0;i<23;i++) {
+	//lots of empty crap (15x4)
+	for(i=0;i<15;i++) {
 		stream->WriteDword( &tmpDword);
 	}
 	return 0;
@@ -1810,6 +1813,9 @@ int AREImp::PutRestHeader( DataStream *stream, Map *map)
 	ieDword tmpDword = 0;
 	ieWord tmpWord = 0;
 
+	char filling[32];
+	memset(filling,0,sizeof(filling) );
+	stream->Write( filling, 32); //empty label
 	for(i=0;i<MAX_RESCOUNT;i++) {
 		stream->WriteDword( &map->RestHeader.Strref[i]);
 	}
@@ -1915,12 +1921,12 @@ int AREImp::PutArea(DataStream *stream, Map *map)
 		return ret;
 	}
 
-	ret = PutRestHeader( stream, map);
+	ret = PutSongHeader( stream, map);
 	if (ret) {
 		return ret;
 	}
 
-	ret = PutSongHeader( stream, map);
+	ret = PutRestHeader( stream, map);
 
 	return ret;
 }

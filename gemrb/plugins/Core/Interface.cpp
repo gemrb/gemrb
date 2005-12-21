@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.376 2005/12/20 23:20:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.377 2005/12/21 16:53:52 avenger_teambg Exp $
  *
  */
 
@@ -795,7 +795,7 @@ int Interface::Init()
 		TableMgr* tab = GetTable( table );
 		int count = tab->GetRowCount();
 		for (int i = 0; i < count; i++) {
-			char* ResRef = tab->QueryField( i, 0 );
+			const char* ResRef = tab->QueryField( i, 0 );
 			int needpalette = atoi( tab->QueryField( i, 1 ) );
 			int first_char = atoi( tab->QueryField( i, 2 ) );
 			str = key->GetResource( ResRef, IE_BAM_CLASS_ID );

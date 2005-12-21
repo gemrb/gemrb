@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.96 2005/12/12 18:39:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.97 2005/12/21 16:53:52 avenger_teambg Exp $
  *
  */
 
@@ -1111,8 +1111,24 @@ void CREImp::GetActorIWD2(Actor *act)
 	ReadScript(act, SCR_RACE);
 	ReadScript(act, SCR_GENERAL);
 	ReadScript(act, SCR_DEFAULT);
-
-	str->Seek( 232, GEM_CURRENT_POS );
+	str->Seek( 4, GEM_CURRENT_POS );
+	for (i = 0; i<5; i++) {
+		str->ReadWord( &tmpWord );
+		act->BaseStats[IE_INTERNAL_0+i]=tmpWord;
+	}
+	char KillVar[33];
+	str->Read(KillVar,32); //use these as needed
+	KillVar[32]=0;
+	str->Read(KillVar,32); 
+	KillVar[32]=0;
+	str->Seek( 2, GEM_CURRENT_POS);
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_SAVEDXPOS] = tmpWord;
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_SAVEDYPOS] = tmpWord;
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_SAVEDFACE] = tmpWord;
+	str->Seek( 146, GEM_CURRENT_POS );
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_EA]=tmpByte;
 	str->Read( &tmpByte, 1);
@@ -1133,7 +1149,7 @@ void CREImp::GetActorIWD2(Actor *act)
 	str->Read( scriptname, 32);
 	scriptname[32]=0;
 	act->SetScriptName(scriptname);
-	act->KillVar[0]=0;
+	strnspccpy(act->KillVar, KillVar, 32);
 
 	KnownSpellsOffset = 0;
 	KnownSpellsCount = 0;
@@ -1280,21 +1296,39 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	ReadScript(act, SCR_RACE);
 	ReadScript(act, SCR_GENERAL);
 	ReadScript(act, SCR_DEFAULT);
-	
-	str->Seek( 46, GEM_CURRENT_POS );
-	char KillVar[33]; //use this as needed
-	str->Read(KillVar,32);
+	str->Seek( 4, GEM_CURRENT_POS );
+	for (i = 0; i<5; i++) {
+		str->ReadWord( &tmpWord );
+		act->BaseStats[IE_INTERNAL_0+i]=tmpWord;
+	}
+	char KillVar[33];
+	str->Read(KillVar,32); //use these as needed
 	KillVar[32]=0;
-	str->Seek( 26, GEM_CURRENT_POS );
- 
-	str->Read( &act->BaseStats[IE_EA], 1 );
-	str->Read( &act->BaseStats[IE_GENERAL], 1 );
-	str->Read( &act->BaseStats[IE_RACE], 1 );
-	str->Read( &act->BaseStats[IE_CLASS], 1 );
-	str->Read( &act->BaseStats[IE_SPECIFIC], 1 );
-	str->Read( &act->BaseStats[IE_SEX], 1 );
+	str->Read(KillVar,32); 
+	KillVar[32]=0;
+	str->Seek( 2, GEM_CURRENT_POS);
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_SAVEDXPOS] = tmpWord;
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_SAVEDYPOS] = tmpWord;
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_SAVEDFACE] = tmpWord;
+	str->Seek( 18, GEM_CURRENT_POS );
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_EA] = tmpByte;
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_GENERAL] = tmpByte;
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_RACE] = tmpByte;
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_CLASS] = tmpByte;
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_SPECIFIC] = tmpByte;
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_SEX] = tmpByte;
 	str->Seek( 5, GEM_CURRENT_POS );
-	str->Read( &act->BaseStats[IE_ALIGNMENT], 1 );
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_ALIGNMENT]=tmpByte;
 	str->Seek( 4, GEM_CURRENT_POS );
 	char scriptname[33];
 	str->Read( scriptname, 32);
@@ -1690,7 +1724,7 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 		tmpByte = actor->BaseStats[IE_MORALERECOVERYTIME];
 		stream->Write( &tmpByte,1);
 		// unknown byte
-		stream->Write( &Signature,1);
+		stream->Write( &filling,1);
 		stream->WriteDword( &actor->BaseStats[IE_KIT] );
 		stream->WriteResRef( actor->Scripts[SCR_OVERRIDE]->GetName() );
 		stream->WriteResRef( actor->Scripts[SCR_CLASS]->GetName() );
@@ -1862,13 +1896,26 @@ int CREImp::PutActorPST(DataStream *stream, Actor *actor)
 int CREImp::PutActorIWD1(DataStream *stream, Actor *actor)
 {
 	ieByte tmpByte;
+	ieWord tmpWord;
+	int i;
 	char filling[52];
 
 	memset(filling,0,sizeof(filling));
-	stream->Write(filling, 28); //7*4 totally unknown
-	stream->Write(actor->KillVar, 32); //some variable names in iwd
-	stream->Write(actor->KillVar, 32); //some variable names in iwd
-	stream->Write(filling, 52); //13*4 totally unknown
+	stream->Write( filling, 4); //4 unknown
+	for (i=0;i<5;i++) {
+		tmpWord = actor->BaseStats[IE_INTERNAL_0+i];
+		stream->WriteWord( &tmpWord);
+	}
+	stream->Write( actor->KillVar, 32); //some variable names in iwd
+	stream->Write( actor->KillVar, 32); //some variable names in iwd
+	stream->Write( filling, 2); 
+	tmpWord = actor->BaseStats[IE_SAVEDXPOS];
+	stream->WriteWord( &tmpWord);
+	tmpWord = actor->BaseStats[IE_SAVEDYPOS];
+	stream->WriteWord( &tmpWord);
+	tmpWord = actor->BaseStats[IE_SAVEDFACE];
+	stream->WriteWord( &tmpWord);
+	stream->Write( filling, 18);
 	//similar in all engines
 	tmpByte = actor->BaseStats[IE_EA];
 	stream->Write( &tmpByte,1);
@@ -1898,12 +1945,14 @@ int CREImp::PutActorIWD2(DataStream *stream, Actor *actor)
 	char filling[146];
 
 	memset(filling,0,sizeof(filling));
-	stream->Write( filling,4);
+	stream->Write( filling, 4); //4 unknown
 	for (i=0;i<5;i++) {
 		tmpWord = actor->BaseStats[IE_INTERNAL_0+i];
-		stream->WriteWord ( &tmpWord);
+		stream->WriteWord( &tmpWord);
 	}
-	stream->Write( filling, 66);
+	stream->Write( actor->KillVar, 32); //some variable names in iwd
+	stream->Write( actor->KillVar, 32); //some variable names in iwd
+	stream->Write( filling, 2);
 	tmpWord = actor->BaseStats[IE_SAVEDXPOS];
 	stream->WriteWord( &tmpWord);
 	tmpWord = actor->BaseStats[IE_SAVEDYPOS];

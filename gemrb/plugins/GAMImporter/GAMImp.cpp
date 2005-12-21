@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.73 2005/12/21 10:39:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.74 2005/12/21 16:53:52 avenger_teambg Exp $
  *
  */
 
@@ -170,7 +170,7 @@ Game* GAMImp::GetGame()
 			playmode *= 3;
 		}
 
-		char* resref = tm->QueryField( playmode );
+		const char* resref = tm->QueryField( playmode );
 		strnlwrcpy( newGame->CurrentArea, resref, 8 );
 	}
 
