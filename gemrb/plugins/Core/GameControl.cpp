@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.275 2005/12/19 23:10:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.276 2005/12/21 22:58:25 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -836,17 +836,17 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 				case EA_CHARMED:
 				case EA_EVILBUTGREEN:
 					if (target_mode & TARGET_MODE_ALLY) 
-						nextCursor++;
+						nextCursor^=1;
 					break;
 
 				case EA_ENEMY:
 				case EA_GOODBUTRED:
 					if (target_mode & TARGET_MODE_ENEMY) 
-						nextCursor++;
+						nextCursor^=1;
 					break;
 				default:
 					if (target_mode & TARGET_MODE_NEUTRAL) 
-						nextCursor++;
+						nextCursor^=1;
 					break;
 			}
 		}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.364 2005/12/21 16:53:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.365 2005/12/21 22:58:25 avenger_teambg Exp $
  *
  */
 
@@ -5135,7 +5135,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 			//allow the open container flag only if there is
 			//a store file (this fixes pst eye items, which 
 			//got the same item type as bags)
-			if (core->GetResourceMgr()->HasResource( ResRef, IE_STO_CLASS_ID) ) {
+			if (core->Exists( ResRef, IE_STO_CLASS_ID) ) {
 				function=3;
 			}
 			break;
@@ -5851,11 +5851,45 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 			break;
 		}
 		if (!ret) {
-			printf("ControlIndex: %d\n", i);
-			printf("Action: %d\n", tmp);
 			return RuntimeError("Cannot set action button!\n");
 		}
 	}
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_ClearAction__doc,
+"ClearAction(slot)\n\n"
+"Stops an action for a PC indexed by slot." );
+
+static PyObject* GemRB_ClearAction(PyObject * /*self*/, PyObject* args)
+{
+        int slot;
+
+        if (!PyArg_ParseTuple( args, "i", &slot )) {
+                return AttributeError( GemRB_ClearAction__doc );
+        }
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor* actor = game->FindPC( slot );
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
+	}
+	if (actor->GetInternalFlag()&IF_NOINT) {
+		printMessage( "GuiScript","Cannot break action", GREEN);
+		Py_INCREF( Py_None );
+		return Py_None;
+	}
+	if ((actor->path == NULL) && !actor->ModalState) {
+		printMessage( "GuiScript","No breakable action", GREEN);
+		Py_INCREF( Py_None );
+		return Py_None;
+	}
+	actor->ClearPath();         //stop walking
+	actor->ClearActions();      //stop pending action involved walking
+	actor->SetModal(MS_NONE);   //stop modal actions
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -6042,6 +6076,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetActionIcon, METH_VARARGS),
 	METHOD(HasResource, METH_VARARGS),
 	METHOD(SetupControls, METH_VARARGS),
+	METHOD(ClearAction, METH_VARARGS),
 	// terminating entry	
 	{NULL, NULL, 0, NULL}
 };

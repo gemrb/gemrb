@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUICommonWindows.py,v 1.13 2005/12/20 20:14:03 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUICommonWindows.py,v 1.14 2005/12/21 22:58:24 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -209,10 +209,10 @@ def UpdateActionsWindow ():
 	for i in range (PARTY_SIZE):
 		if GemRB.GameIsPCSelected (i+1):
 			if pc == 0:
-			        pc = i+1
+				pc = i+1
 			else:
-			        pc = -1
-			        break
+				pc = -1
+				break
 
 	if pc == 0:
 		EmptyControls ()
@@ -222,6 +222,18 @@ def UpdateActionsWindow ():
 		return
 	#this is based on class
 	GemRB.SetupControls (ActionsWindow, pc)
+	return
+
+def ActionTalkPressed ():
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_TALK)
+
+def ActionAttackPressed ():
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_ATTACK)
+
+def ActionStopPressed ():
+	for i in range (PARTY_SIZE):
+		if GemRB.GameIsPCSelected(i + 1):
+			GemRB.ClearAction(i + 1)
 	return
 
 def GetActorClassTitle (actor):

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.34 2005/12/21 17:34:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.35 2005/12/21 22:58:25 avenger_teambg Exp $
  *
  */
 
@@ -1673,7 +1673,7 @@ static int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 		return 0;
 	}
 	//both are actors
-	if (CanSee(Sender, tar) ) {
+	if (CanSee(Sender, tar, true) ) {
 		if (justlos) {
 			return 1;
 		}

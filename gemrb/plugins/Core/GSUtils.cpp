@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.43 2005/12/19 23:10:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.44 2005/12/21 22:58:25 avenger_teambg Exp $
  *
  */
 
@@ -289,37 +289,35 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 	}
 }
 
-int CanSee(Scriptable* Sender, Scriptable* target)
+int CanSee(Scriptable* Sender, Scriptable* target, bool range)
 {
 	Map *map;
-	unsigned int range;
+	unsigned int dist;
 
-	if (Sender->Type == ST_ACTOR) {
-		Actor* snd = ( Actor* ) Sender;
-		range = snd->Modified[IE_VISUALRANGE] * 20;
-		map = Sender->GetCurrentArea();
-		//huh, lets hope it won't crash often
-		if (!map) {
-			abort();
+	map = target->GetCurrentArea();
+	if ( map!=Sender->GetCurrentArea() ) {
+		return 0;
+	}
+
+	if (range) {
+		if (Sender->Type == ST_ACTOR) {
+			Actor* snd = ( Actor* ) Sender;
+			dist = snd->Modified[IE_VISUALRANGE];
+		} else { 
+			dist = 30;
+		}
+	
+		if (Distance(target->Pos, Sender->Pos) > dist * 20) {
+			return 0;
 		}
 	}
-	else { 
-		map = Sender->GetCurrentArea();
-		range = 20 * 20;
-	}
-	if ( target->GetCurrentArea()!=map ) {
-		return 0;
-	}
 
-	if (Distance(target->Pos, Sender->Pos) > range) {
-		return 0;
-	}
 	return map->IsVisible(target->Pos, Sender->Pos);
 }
 
 int ValidForDialogCore(Scriptable* Sender, Actor *target)
 {
-	if (!CanSee(Sender, target) ) {
+	if (!CanSee(Sender, target, false) ) {
 		return 0;
 	}
 	

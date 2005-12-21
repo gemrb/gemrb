@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICommonWindows.py,v 1.6 2005/12/04 23:12:41 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICommonWindows.py,v 1.7 2005/12/21 22:58:22 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -227,6 +227,18 @@ def UpdateActionsWindow ():
 		GroupControls ()
 		return
 	SetupControls (pc)
+	return
+
+def ActionTalkPressed ():
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_TALK)
+
+def ActionAttackPressed ():
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_ATTACK)
+
+def ActionStopPressed ():
+	for i in range (PARTY_SIZE):
+		if GemRB.GameIsPCSelected(i + 1):
+			GemRB.ClearAction(i + 1)
 	return
 
 def GetActorClassTitle (actor):

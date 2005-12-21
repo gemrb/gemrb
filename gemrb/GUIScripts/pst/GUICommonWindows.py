@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.35 2005/07/30 11:45:19 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.36 2005/12/21 22:58:25 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -354,6 +354,11 @@ def PortraitButtonHPOnPress ():
 	GemRB.SetButtonFlags (Window, ButtonHP, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_TEXT, op)
 
 
+def StopAllOnPress ():
+	for i in range (PARTY_SIZE):
+		if GemRB.GameIsPCSelected(i + 1):
+			GemRB.ClearAction(i + 1)
+	return
 
 def SelectAllOnPress ():
 	GemRB.GameSelectPC (0, 1)
@@ -362,7 +367,7 @@ def SelectAllOnPress ():
 def SelectionChanged ():
 	# FIXME: hack. If defined, display single selection
 	if (not SelectionChangeHandler):
-		for i in range (0, PARTY_SIZE):
+		for i in range (PARTY_SIZE):
 			Button = GemRB.GetControl (PortraitWindow, i)
 			GemRB.EnableButtonBorder (PortraitWindow, Button, FRAME_PC_SELECTED, GemRB.GameIsPCSelected (i + 1))
 		if SelectionChangeMultiHandler:

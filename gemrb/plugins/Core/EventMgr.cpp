@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.40 2005/11/24 17:44:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.41 2005/12/21 22:58:25 avenger_teambg Exp $
  *
  */
 
@@ -151,7 +151,7 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 					ctrl->OnMouseOver( x - lastW->XPos - ctrl->XPos, y - lastW->YPos - ctrl->YPos );
 				}
 				lastW = *m;
-				core->GetVideoDriver()->SetCursor( core->Cursors[( *m )->Cursor], core->Cursors[( ( *m )->Cursor ) + 1] );
+				core->GetVideoDriver()->SetCursor( core->Cursors[( *m )->Cursor], core->Cursors[( ( *m )->Cursor ) ^ 1] );
 				return;
 			}
 		}

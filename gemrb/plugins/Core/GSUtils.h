@@ -46,7 +46,7 @@ bool StoreHasItemCore(ieResRef storename, ieResRef itemname);
 bool HasItemCore(Inventory *inventory, ieResRef itemname, ieDword flags);
 void CreateVisualEffectCore(Scriptable *Sender, Point &position, const char *effect);
 void GetPositionFromScriptable(Scriptable* scr, Point &position, bool trap);
-int CanSee(Scriptable* Sender, Scriptable* target);
+int CanSee(Scriptable* Sender, Scriptable* target, bool range);
 int ValidForDialogCore(Scriptable* Sender, Actor *target);
 void BeginDialog(Scriptable* Sender, Action* parameters, int flags);
 void ChangeAnimationCore(Actor *src, const char *resref, bool effect);
