@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.33 2005/12/21 16:53:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.34 2005/12/21 17:34:20 avenger_teambg Exp $
  *
  */
 
@@ -2711,6 +2711,40 @@ int GameScript::LastMarkedObject_Trigger(Scriptable* Sender, Trigger* parameters
 	Actor* actor = ( Actor* ) Sender;
 	if (MatchActor(Sender, actor->LastSeen, parameters->objectParameter)) {
 		Sender->AddTrigger(&actor->LastSeen);
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::HelpEX(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	int stat;
+	switch (parameters->int0Parameter) {
+		case 1: stat = IE_EA; break;
+		case 2: stat = IE_GENERAL; break;
+		case 3: stat = IE_RACE; break;
+		case 4: stat = IE_CLASS; break;
+		case 5: stat = IE_SPECIFIC; break;
+		case 6: stat = IE_SEX; break;
+		case 7: stat = IE_ALIGNMENT; break;
+		default: return 0;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (tar->Type!=ST_ACTOR) {
+		//a non actor checking for help?
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	Actor* help = Sender->GetCurrentArea()->GetActorByGlobalID(actor->LastHelp);
+	if (!help) {
+		//no help required
+		return 0;
+	}
+	if (actor->GetStat(stat)==help->GetStat(stat) ) {
+		Sender->AddTrigger(&actor->LastHelp);
 		return 1;
 	}
 	return 0;

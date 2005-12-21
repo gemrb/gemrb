@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.344 2005/12/21 16:53:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.345 2005/12/21 17:34:20 avenger_teambg Exp $
  *
  */
 
@@ -143,6 +143,7 @@ static TriggerLink triggernames[] = {
 	{"havespellres", GameScript::HaveSpell, 0}, //they share the same ID
 	{"heard", GameScript::Heard, 0},
 	{"help", GameScript::Help_Trigger, 0},
+	{"helpex", GameScript::HelpEX, 0},
 	{"hitby", GameScript::HitBy, 0},
 	{"hotkey", GameScript::HotKey, 0},
 	{"hp", GameScript::HP, 0},
