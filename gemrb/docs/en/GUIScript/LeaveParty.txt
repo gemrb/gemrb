@@ -1,0 +1,11 @@
+
+Prototype: GemRB.LeaveParty(Slot)
+
+Description: Removes the player character from the party.
+
+Parameters: Slot  - actor index in game structure
+
+Return value: N/A
+
+See also: GameGetPartySize
+

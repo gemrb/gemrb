@@ -1,0 +1,9 @@
+
+Prototype: GemRB.HasResource(ResRef, ResType)
+
+Description: Returns true if the resource exists.
+
+Parameters: ResRef  - the resource reference (8 characters filename)
+            ResType - the class ID of the resource 
+
+Return value: boolean

@@ -1,0 +1,12 @@
+
+Prototype: GemRB.SetupControls(WindowIndex, Slot)
+
+Description: Sets up all 12 buttons for a player character, based on preset preferences and the character's class.
+
+Parameters:
+WindowIndex       - the buttons' window index
+Slot              - the player character's index in the party
+
+Return value: N/A
+
+See also: SetActionIcon
