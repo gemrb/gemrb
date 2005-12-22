@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.180 2005/12/19 23:10:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.181 2005/12/22 23:29:41 avenger_teambg Exp $
  *
  */
 
@@ -85,6 +85,7 @@ typedef struct Symbol {
 } Symbol;
 
 typedef struct SlotType {
+	ieDword slot;
 	ieDword slottype;
 	ieDword slottip;
 	ieDword slotid;
@@ -210,7 +211,7 @@ public:
 	int SaveAsOriginal; //if true, saves files in compatible mode
 	int QuitFlag;
 	int LoadGameIndex;
-	int SlotTypes; //this is the same as the inventory size
+	unsigned int SlotTypes; //this is the same as the inventory size
 	ieResRef GlobalScript;
 	ieResRef WorldMapName;
 	Sprite2D **Cursors;
@@ -389,11 +390,13 @@ public:
 	void LoadGame(int index);
 	/*reads the filenames of the sounds folder into a list */
 	int GetCharSounds(TextArea *ta);
-	int QuerySlotType(int idx) const;
-	int QuerySlottip(int idx) const;
-	int QuerySlotID(int idx) const;
-	int QuerySlotEffects(int idx) const;
-	const char * QuerySlotResRef(int idx) const;
+	unsigned int GetInventorySize() const { return SlotTypes-1; }
+	int QuerySlot(unsigned int idx) const;
+	int QuerySlotType(unsigned int idx) const;
+	int QuerySlottip(unsigned int idx) const;
+	int QuerySlotID(unsigned int idx) const;
+	int QuerySlotEffects(unsigned int idx) const;
+	const char * QuerySlotResRef(unsigned int idx) const;
 	/*returns true if an itemtype is acceptable for a slottype, also checks the usability flags */
 	int CanUseItemType(int itype, int slottype, ieDword use1, ieDword use2, Actor *actor) const;
 	/*removes single file from cache*/
@@ -463,9 +466,9 @@ public:
 
 	/** dumps an area object to the cache */
 	int SwapoutArea(Map *map);
-	/** saves the game object to the destination folder  */
+	/** saves the game object to the destination folder */
 	int WriteGame(const char *folder);
-	/** saves the worldmap object to the destination folder  */
+	/** saves the worldmap object to the destination folder */
 	int WriteWorldMap(const char *folder);
 	/** saves the .are and .sto files to the destination folder */
 	int CompressSave(const char *folder);

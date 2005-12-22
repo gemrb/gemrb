@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.365 2005/12/21 22:58:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.366 2005/12/22 23:29:42 avenger_teambg Exp $
  *
  */
 
@@ -84,6 +84,7 @@ static ieDword GUIAction[32]={UNINIT_IEDWORD};
 static ieDword GUITooltip[32]={UNINIT_IEDWORD};
 static ieResRef GUIResRef[32];
 static EventNameType GUIEvent[32];
+static bool QuitOnError = false;
 
 //the order of these buttons are based on opcode #144 
 #define ACT_NONE 100  //iwd2's maximum is 99
@@ -109,6 +110,7 @@ static EventNameType GUIEvent[32];
 #define ACT_WEAPON4 19
 #define ACT_BARDSONG 20
 #define ACT_STOP 21
+#define ACT_SEARCH 22
 
 static unsigned int ClassCount = 0;
 static ActionButtonRow *GUIBTDefaults = NULL; //qslots row count
@@ -146,7 +148,9 @@ inline PyObject* RuntimeError(char* msg)
 {
 	printMessage( "GUIScript", "Runtime Error:\n", LIGHT_RED );
 	PyErr_SetString( PyExc_RuntimeError, msg );
-	core->Quit();
+  if (QuitOnError) {
+	  core->Quit();
+  }
 	return NULL;
 }
 
@@ -159,7 +163,9 @@ inline PyObject* AttributeError(char* doc_string)
 {
 	printMessage( "GUIScript", "Syntax Error:\n", LIGHT_RED );
 	PyErr_SetString(PyExc_AttributeError, doc_string);
-	core->Quit();
+  if (QuitOnError) {
+	  core->Quit();
+  }
 	return NULL;
 }
 
@@ -477,7 +483,7 @@ static PyObject* GemRB_LoadWindowPack(PyObject * /*self*/, PyObject* args)
 	CHUHeight = height;
 
 	if ( (width && (width>core->Width)) ||
-	     (height && (height>core->Height)) ) {
+	    (height && (height>core->Height)) ) {
 		printMessage("GUIScript","Screen is too small!\n",LIGHT_RED);
 		printf("This window requires %d x %d resolution.\n",width,height);
 		return RuntimeError("Please change your settings.");
@@ -3523,6 +3529,11 @@ static PyObject* GemRB_GetSlotType(PyObject * /*self*/, PyObject* args)
 	}
 
 	PyObject* dict = PyDict_New();
+	if (idx==-1) {
+		PyDict_SetItemString(dict, "Count", PyInt_FromLong(core->GetInventorySize()));
+		return dict;
+	}
+	PyDict_SetItemString(dict, "Slot", PyInt_FromLong(core->QuerySlot(idx)));
 	PyDict_SetItemString(dict, "Type", PyInt_FromLong(core->QuerySlotType(idx)));
 	PyDict_SetItemString(dict, "ID", PyInt_FromLong(core->QuerySlotID(idx)));
 	PyDict_SetItemString(dict, "Tip", PyInt_FromLong(core->QuerySlottip(idx)));
@@ -3914,8 +3925,8 @@ static PyObject* GemRB_SetSpellIcon(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetItemIcon__doc,
-"SetItemIcon(WindowIndex, ControlIndex, ITMResRef[, type])\n\n"
-"Sets Item icon image on a button." );
+"SetItemIcon(WindowIndex, ControlIndex, ITMResRef[, type, tooltip])\n\n"
+"Sets Item icon image on a button. 0/1 - Inventory Icons, 2 - Description Icon, 3 - No icon" );
 
 PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int tooltip)
 {
@@ -3934,17 +3945,21 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 
 		btn->SetFlags( IE_GUI_BUTTON_PICTURE, BM_OR );
 		Sprite2D* Picture;
-		if (Which==2) {
-			Picture = core->GetBAMSprite(item->CarriedIcon, -1, 0);
-		} else {
+		switch (Which) {
+		case 0: case 1:
 			Picture = core->GetBAMSprite(item->ItemIcon, -1, Which);
+			break;
+		case 2:
+			Picture = core->GetBAMSprite(item->CarriedIcon, -1, 0);
+			break;
+		default:
+			Picture = NULL;
 		}
-		if (!Picture)
-			return RuntimeError( "BAM not found");
+
 		btn->SetPicture( Picture );
 		if (tooltip) {
 			//later getitemname could also return tooltip stuff
-			char *str = core->GetString(item->GetItemName(false),0);
+			char *str = core->GetString(item->GetItemName(tooltip==2),0);
 			SetFunctionTooltip(wi, ci, str); //will free str
 		}
 
@@ -4173,14 +4188,14 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 			container->AddItem(item);
 		}
 	} else { //put stuff in container, simple!
-		res = core->CanMoveItem(actor->inventory.GetSlotItem(Slot) );
+		res = core->CanMoveItem(actor->inventory.GetSlotItem(core->QuerySlot(Slot) ) );
 		if (!res) { //cannot move
 			printMessage("GUIScript","Cannot move item, it is undroppable!\n", GREEN);
 			Py_INCREF( Py_None );
 			return Py_None;
 		}
 
-		item = actor->inventory.RemoveItem(Slot);
+		item = actor->inventory.RemoveItem(core->QuerySlot(Slot));
 		if (!item) {
 			printMessage("GUIScript","Cannot move item, there is something weird!\n", YELLOW);
 			Py_INCREF( Py_None );
@@ -4315,7 +4330,7 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 		ItemResRef = si->ItemResRef;
 		Flags = si->Flags;
 	} else {
-		CREItem* si = actor->inventory.GetSlotItem( Slot );
+		CREItem* si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );
 		if (!si) {
 			return NULL;
 		}
@@ -4400,7 +4415,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			return NULL;
 		}
 		//the amount of items is stored in si->PurchasedAmount
-		actor->inventory.AddSlotItem(si, action);
+		actor->inventory.AddStoreItem(si, action);
 		if ((si->InfiniteSupply==(ieDword) -1) || si->AmountInStock) {
 			si->Flags &= ~IE_INV_ITEM_SELECTED;
 			si->PurchasedAmount=0;
@@ -4411,7 +4426,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 	}
 	case IE_STORE_ID:
 	{
-		CREItem* si = actor->inventory.GetSlotItem( Slot );
+		CREItem* si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );
 		if (!si) {
 			return NULL;
 		}
@@ -4435,7 +4450,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 
 	case IE_STORE_SELECT|IE_STORE_SELL:
 	{
-		CREItem* si = actor->inventory.GetSlotItem( Slot );
+		CREItem* si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );
 		if (!si) {
 			return NULL;
 		}
@@ -4455,7 +4470,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			Py_INCREF( Py_None );
 			return Py_None;
 		}
-		CREItem* si = actor->inventory.GetSlotItem( Slot );
+		CREItem* si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );
 		if (!si) {
 			return NULL;
 		}
@@ -5015,7 +5030,7 @@ static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Actor not found" );
 	}
 
-	CREItem* si = actor->inventory.GetSlotItem( Slot );
+	CREItem* si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );
 	if (! si) {
 		Py_INCREF( Py_None );
 		return Py_None;
@@ -5056,7 +5071,7 @@ static PyObject* GemRB_GetSlots(PyObject * /*self*/, PyObject* args)
 		if ((core->QuerySlotType( i ) & SlotType) != SlotType) {
 			continue;
 		}
-		CREItem *slot = actor->inventory.GetSlotItem( i );
+		CREItem *slot = actor->inventory.GetSlotItem( core->QuerySlot(i) );
 		if (!slot) {
 			continue;
 		}
@@ -5069,7 +5084,7 @@ static PyObject* GemRB_GetSlots(PyObject * /*self*/, PyObject* args)
 		if ((core->QuerySlotType( i ) & SlotType) != SlotType) {
 			continue;
 		}
-		CREItem *slot = actor->inventory.GetSlotItem( i );
+		CREItem *slot = actor->inventory.GetSlotItem( core->QuerySlot(i) );
 		if (slot) {
 			PyTuple_SetItem( tuple, Count++, PyInt_FromLong( i ) );
 		}
@@ -5173,6 +5188,9 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Actor not found" );
 	}
 
+	if ((unsigned int) Slot>core->GetInventorySize()) {
+		return AttributeError( "Invalid slot" );
+	}
 	CREItem* si;
 	if (Type) {
 		Map *map = actor->GetCurrentArea();
@@ -5182,15 +5200,15 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		}
 		si = cc->RemoveItem(Slot, Count);
 	} else {
-		if (Slot >= 0 && core->QuerySlotEffects( Slot )) {
+		if (core->QuerySlotEffects( Slot )) {
 			// Item is worn
-			if (! actor->inventory.UnEquipItem( Slot, false )) {
+			if (! actor->inventory.UnEquipItem( core->QuerySlot(Slot), false )) {
 				// Item is currently undroppable/cursed
 				Py_INCREF( Py_None );
 				return Py_None;
 			}
 		}
-		si = actor->inventory.RemoveItem( Slot, Count );
+		si = actor->inventory.RemoveItem( core->QuerySlot(Slot), Count );
 	}
 	if (! si) {
 		Py_INCREF( Py_None );
@@ -5246,7 +5264,12 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		}
 		res = cc->AddItem(core->GetDraggedItem());
 	} else {
-		int Slottype = core->QuerySlotType( Slot );
+		int Slottype;
+		if (Slot==-1) {
+			Slottype = -1;
+		} else {
+			Slottype = core->QuerySlotType( Slot );
+		}
 		CREItem * slotitem = core->GetDraggedItem();
 		Item *item = core->GetItem( slotitem->ItemResRef );
 		if (!item) {
@@ -5258,9 +5281,9 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		core->FreeItem( item, slotitem->ItemResRef, false );
 		//CanUseItemType will check actor's class bits too
 		if (core->CanUseItemType (Itemtype, Slottype, Use1, Use2, actor) ) {
-			res = actor->inventory.AddSlotItem( slotitem, Slot );
+			res = actor->inventory.AddSlotItem( slotitem, core->QuerySlot(Slot) );
 			if (Slot >= 0 && core->QuerySlotEffects( Slot ) ) {
-				actor->inventory.EquipItem( Slot );
+				actor->inventory.EquipItem( core->QuerySlot(Slot) );
 			}
 		} else {
 			res = 0;
@@ -5314,7 +5337,6 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 	int PartyID;
 	int SlotID=-1;
 	int Charge0=1,Charge1=0,Charge2=0;
-	CREItem *TmpItem;
 	char *ItemResRef;
 
 	if (!PyArg_ParseTuple( args, "is|iiii", &PartyID, &ItemResRef, &SlotID, &Charge0, &Charge1, &Charge2)) {
@@ -5329,19 +5351,7 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Actor not found" );
 	}
 
-	TmpItem = new CREItem();
-	strnlwrcpy(TmpItem->ItemResRef, ItemResRef, 8);
-	TmpItem->PurchasedAmount=0;
-	TmpItem->Usages[0]=Charge0;
-	TmpItem->Usages[1]=Charge1;
-	TmpItem->Usages[2]=Charge2;
-	TmpItem->Flags=IE_INV_ITEM_ACQUIRED;
-	core->ResolveRandomItem(TmpItem);
-	int res = actor->inventory.AddSlotItem( TmpItem, SlotID );
-	if (res!=2) {
-		printMessage("GUIScript","Inventory is full\n", YELLOW);
-		delete TmpItem; //removal of residue
-	}
+	actor->inventory.SetSlotItemRes( ItemResRef, core->QuerySlot(SlotID), Charge0, Charge1, Charge2 );
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -5801,6 +5811,13 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 	}
 	//this function either initializes the actor's settings, or modifies myrow
 	actor->GetActionButtonRow(myrow);
+	bool fistdrawn = true;
+	int magicweapon = actor->inventory.GetMagicSlot();
+	if (actor->inventory.HasItemInSlot("",magicweapon) ) {
+		magicweapon = -1;
+	}
+	int fistweapon = actor->inventory.GetFistSlot();
+	int usedslot = actor->inventory.GetEquippedSlot();
 	for (int i=0;i<GUIBT_COUNT;i++) {
 		int tmp = myrow[i];
 		if (tmp==100) {
@@ -5809,18 +5826,64 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 			tmp&=31;
 		}
 		PyObject *ret = SetActionIcon(wi,i,tmp);
+		Button * btn = (Button *) GetControl(wi,i,IE_GUI_BUTTON);
+		if (!btn) {
+			return NULL;
+		}
 
+		int state = IE_GUI_BUTTON_UNPRESSED;
+		ieDword modalstate = actor->ModalState;
 		switch (tmp) {
+		case ACT_BARDSONG:
+			if (modalstate==MS_BATTLESONG) {
+				state = IE_GUI_BUTTON_SELECTED;
+			}
+			break;
+		case ACT_TURN:
+			if (modalstate==MS_TURNUNDEAD) {
+				state = IE_GUI_BUTTON_SELECTED;
+			}
+			break;
+		case ACT_STEALTH:
+			if (modalstate==MS_STEALTH) {
+				state = IE_GUI_BUTTON_SELECTED;
+			}
+			break;
+		case ACT_SEARCH:
+			if (modalstate==MS_DETECTTRAPS) {
+				state = IE_GUI_BUTTON_SELECTED;
+			}
+			break;
 		case ACT_WEAPON1:
 		case ACT_WEAPON2:
 		case ACT_WEAPON3:
 		case ACT_WEAPON4:
 		{
 			SetButtonBAM(wi, i, "stonweap",0,0,-1);
-			int slot = -1;//actor->PCStats->QuickWeaponSlots[tmp-ACT_WEAPON1];
+			int slot;
+			if (magicweapon>=0) {
+				slot = magicweapon;
+			}
+			else {
+				slot = actor->PCStats->QuickWeaponSlots[tmp-ACT_WEAPON1];
+			}
 			if (slot>=0) {
+				//no slot translation required
 				CREItem *item = actor->inventory.GetSlotItem(slot);
-				SetItemIcon(wi, i, item->ItemResRef,1,1);
+				if (item) {
+					int mode = 0;
+					if (slot == fistweapon) {
+						if (fistdrawn) {
+							fistdrawn = false;
+						} else {
+							mode = 3;
+						}
+					}
+					SetItemIcon(wi, i, item->ItemResRef,mode,(item->Flags&IE_INV_ITEM_IDENTIFIED)?2:1);
+					if (usedslot == slot) {
+						state = IE_GUI_BUTTON_SELECTED;
+					}
+				}
 			}
 		}
 			break;
@@ -5840,10 +5903,13 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 		case ACT_QSLOT3:
 		{
 			SetButtonBAM(wi, i, "stonitem",0,0,-1);
-			int slot = -1;//actor->PCStats->QuickItemSlots[tmp-ACT_QSLOT1];
-			if (slot>=0) {
+			int slot = actor->PCStats->QuickItemSlots[tmp-ACT_QSLOT1];
+			if (slot!=0xffff) {
+				//no slot translation required
 				CREItem *item = actor->inventory.GetSlotItem(slot);
-				ret = SetItemIcon(wi, i, item->ItemResRef,1,1);
+				if (item) {
+					ret = SetItemIcon(wi, i, item->ItemResRef,0,(item->Flags&IE_INV_ITEM_IDENTIFIED)?2:1);
+				}
 			}
 		}
 			break;
@@ -5853,6 +5919,7 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 		if (!ret) {
 			return RuntimeError("Cannot set action button!\n");
 		}
+		btn->SetState(state);
 	}
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -5864,11 +5931,11 @@ PyDoc_STRVAR( GemRB_ClearAction__doc,
 
 static PyObject* GemRB_ClearAction(PyObject * /*self*/, PyObject* args)
 {
-        int slot;
+	int slot;
 
-        if (!PyArg_ParseTuple( args, "i", &slot )) {
-                return AttributeError( GemRB_ClearAction__doc );
-        }
+	if (!PyArg_ParseTuple( args, "i", &slot )) {
+		return AttributeError( GemRB_ClearAction__doc );
+	}
 	Game *game = core->GetGame();
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
@@ -5887,9 +5954,9 @@ static PyObject* GemRB_ClearAction(PyObject * /*self*/, PyObject* args)
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
-	actor->ClearPath();         //stop walking
-	actor->ClearActions();      //stop pending action involved walking
-	actor->SetModal(MS_NONE);   //stop modal actions
+	actor->ClearPath();      //stop walking
+	actor->ClearActions();   //stop pending action involved walking
+	actor->SetModal(MS_NONE);//stop modal actions
 	Py_INCREF( Py_None );
 	return Py_None;
 }

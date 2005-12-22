@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUICommonWindows.py,v 1.14 2005/12/21 22:58:22 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUICommonWindows.py,v 1.15 2005/12/22 23:29:43 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -288,8 +288,8 @@ def OpenPortraitWindow (needcontrols):
 	global PortraitWindow
 
 	#take care, this window is different in how/iwd
-	PortraitWindow = Window = GemRB.LoadWindow(26)
 	if needcontrols:
+		PortraitWindow = Window = GemRB.LoadWindow(26)
 		# Rest
 		pos = GemRB.GetSystemVariable (SV_HEIGHT) - 37
 		GemRB.CreateButton (Window, 8, 6, pos, 55, 37)
@@ -313,6 +313,8 @@ def OpenPortraitWindow (needcontrols):
 		GemRB.SetButtonSprites (Window, Button, "GUIBTACT", 0,50,51,50,51)
 		GemRB.SetTooltip (Window, Button, 10485)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
+	else:
+		PortraitWindow = Window = GemRB.LoadWindow(1)
 
 	for i in range (PARTY_SIZE):
 		Button = GemRB.GetControl (Window, i)

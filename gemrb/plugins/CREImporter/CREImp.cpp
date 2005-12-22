@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.97 2005/12/21 16:53:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.98 2005/12/22 23:29:41 avenger_teambg Exp $
  *
  */
 
@@ -29,9 +29,15 @@
 
 #define MAXCOLOR 12
 typedef unsigned char ColorSet[MAXCOLOR];
+#define MAXLEVEL 30
+typedef ieResRef FistResType[MAXLEVEL+1];
+
 static int RandColor=-1;
-static int RandRows;
+static int RandRows=-1;
 static ColorSet* randcolors=NULL;
+static int FistRows=-1;
+static FistResType *fistres=NULL;
+static ieResRef DefaultFist={"FIST"};
 
 void ReleaseMemoryCRE()
 {
@@ -39,6 +45,12 @@ void ReleaseMemoryCRE()
 		delete [] randcolors;
 		randcolors = NULL;
 	}
+	RandColor = -1;
+	if (fistres) {
+		delete [] fistres;
+		fistres = NULL;
+	}
+	FistRows = -1;
 }
 
 CREImp::CREImp(void)
@@ -46,6 +58,40 @@ CREImp::CREImp(void)
 	str = NULL;
 	autoFree = false;
 	TotSCEFF = 0xff;
+}
+
+void SetupFist(Inventory &inventory, int slot, int row, int col)
+{
+	if (FistRows<0) {
+		FistRows=0;
+		int table = core->LoadTable( "fistweap" );
+		TableMgr *fist = core->GetTable( table );
+		if (fist) {
+			//default value
+			strnlwrcpy( DefaultFist, fist->QueryField( (unsigned int) -1), 8);
+			FistRows = fist->GetRowCount();
+			fistres = new FistResType[FistRows];
+			for (int cols = 1;cols<=MAXLEVEL;cols++) {
+				for (int i=0;i<FistRows;i++) {
+					strnlwrcpy( fistres[i][cols], fist->QueryField( i, cols ), 8);
+				}
+			}
+			for (int i=0;i<FistRows;i++) {
+				*(int *) fistres[i] = atoi(fist->QueryField( i,0));
+			}
+		}
+		core->DelTable( table );
+	}
+	if (col>MAXLEVEL) col=MAXLEVEL;
+	if (col<1) col=1;
+
+	const char *ItemResRef = DefaultFist;
+	for (int i = 0;i<FistRows;i++) {
+		if (*(int *) fistres[i] == row) {
+			ItemResRef = fistres[i][col];
+		}
+	}
+	inventory.SetSlotItemRes(ItemResRef, slot);
 }
 
 CREImp::~CREImp(void)
@@ -178,12 +224,13 @@ CRESpellMemorization* CREImp::GetSpellMemorization()
 void CREImp::SetupColor(ieDword &stat)
 {
 	if (RandColor==-1) {
-		RandColor = 0;
-		int table = core->LoadTable( "RANDCOLR" );
+		RandColor=0;
+		RandRows=0;
+		int table = core->LoadTable( "randcolr" );
 		TableMgr *rndcol = core->GetTable( table );
 		if (rndcol) {
-			RandColor=rndcol->GetColumnCount();
-			RandRows=rndcol->GetRowCount();
+			RandColor = rndcol->GetColumnCount();
+			RandRows = rndcol->GetRowCount();
 			if (RandRows>MAXCOLOR) RandRows=MAXCOLOR;
 		}
 		if (RandRows>1 && RandColor>0) {
@@ -551,11 +598,16 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	for (i = 0; i < ItemsCount; i++) {
 		items[i] = core->ReadItem(str); //could be NULL item
 	}
-	act->inventory.SetSlotCount(Inventory_Size);
+	act->inventory.SetSlotCount(core->GetInventorySize()+1);
 
 	str->Seek( ItemSlotsOffset, GEM_STREAM_START );
-	for (i = 0; i < Inventory_Size; i++) {
+	for (i = 0; i <= Inventory_Size; i++) {
 		ieWord index;
+		int Slot = core->QuerySlot( i );
+		if (core->QuerySlotEffects(i)==2) {
+			SetupFist(act->inventory, Slot, act->GetBase(IE_CLASS), act->GetXPLevel(false) );
+			continue;
+		}
 		str->Read( &index, 2 );
 
 		if (index != 0xFFFF) {
@@ -564,11 +616,11 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 				continue;
 			}
 			if (items[index]) {
-				act->inventory.SetSlotItem( items[index], i );
+				act->inventory.SetSlotItem( items[index], Slot );
 				printf( "SLOT %d %s\n", i, items[index]->ItemResRef);
 				if (core->QuerySlotEffects( i )) {
 					printf( "EQUIP 0x%04x\n", items[index]->Flags );
-					if ( act->inventory.EquipItem( i ) ) {
+					if ( act->inventory.EquipItem( Slot ) ) {
 						printf( "EQUIP2 0x%04x\n", items[index]->Flags );
 					}
 
@@ -595,7 +647,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	// weird values - quiver
 	ieDword Equipped;
 	str->ReadDword( &Equipped );
-	act->inventory.SetEquippedSlot( Equipped );
+	act->inventory.SetEquippedSlot( ((short)Equipped));
 	// Reading spellbook
 
 	CREKnownSpell **known_spells=(CREKnownSpell **) calloc(KnownSpellsCount, sizeof(CREKnownSpell *) );
@@ -1444,8 +1496,14 @@ int CREImp::PutInventory(DataStream *stream, Actor *actor, unsigned int size)
 	for (i=0;i<size;i++) {
 		indices[i]=(ieWord) -1;
 	}
-	for (i=0;i<size;i++) {
-		CREItem *it = actor->inventory.GetSlotItem(i);
+
+	for (i=0;i<core->GetInventorySize();i++) {
+		//ignore first element, getinventorysize makes space for fist
+		unsigned int j = core->QuerySlot(i+1);
+		if (j>size) {
+			continue;
+		}
+		CREItem *it = actor->inventory.GetSlotItem( j );
 		if (!it) {
 			continue;
 		}

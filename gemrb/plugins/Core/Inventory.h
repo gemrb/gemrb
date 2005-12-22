@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.40 2005/10/20 20:39:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.41 2005/12/22 23:29:41 avenger_teambg Exp $
  *
  */
 
@@ -67,7 +67,6 @@ class Map;
 
 //weapon slot types (1000==not equipped)
 #define IW_NO_EQUIPPED  1000
-#define IW_QUIVER        -22   // (-22, -23, -24)
 
 /** Inventory types */
 typedef enum ieInventoryType {
@@ -81,7 +80,7 @@ typedef enum ieCREItemFlagBits {
 	IE_INV_ITEM_UNSTEALABLE = 2,
 	IE_INV_ITEM_STOLEN = 4,
 	//in iwd/iwd2 this flag means 'magical', some hack is needed
-	IE_INV_ITEM_UNDROPPABLE =8,   
+	IE_INV_ITEM_UNDROPPABLE =8,
 	//just recently acquired
 	IE_INV_ITEM_ACQUIRED = 0x10,	//this is a gemrb extension
 	//is this item destructible normally?
@@ -111,7 +110,7 @@ typedef enum ieCREItemFlagBits {
 /**
  * @class CREItem
  * Class holding Item instance specific values and providing link between 
- * an Inventory and a stack of  Items.
+ * an Inventory and a stack of Items.
  * It's keeping info on whether Item was identified, for example.
  */
 
@@ -148,7 +147,7 @@ private:
 	/** Total weight of all items in Inventory */
 	int Weight;
 
-	ieDword Equipped;
+	int Equipped;
 
 public: 
 	Inventory();
@@ -162,7 +161,7 @@ public:
 	/** Returns number of items in the inventory */
 	int CountItems(const char *resref, bool charges);
 	/** looks for a particular item in a slot */
-	bool HasItemInSlot(const char *resref, int slot);
+	bool HasItemInSlot(const char *resref, unsigned int slot);
 	/** Looks for a particular item in the inventory. */
 	/* flags: see ieCREItemFlagBits */
 	bool HasItem(const char *resref, ieDword flags);
@@ -190,7 +189,7 @@ public:
 	int AddSlotItem(CREItem* item, int slot);
 	/** Adds STOItem to the inventory, it is never wielded, action might be STA_STEAL or STA_BUY */
 	/** The amount of items is stored in PurchasedAmount */
-	int AddSlotItem(STOItem* item, int action);
+	int AddStoreItem(STOItem* item, int action);
 
 	/** flags: see ieCREItemFlagBits */
 	/** count == ~0 means to destroy all */
@@ -206,23 +205,31 @@ public:
 	int FindItem(const char *resref, unsigned int flags);
 	void DropItemAtLocation(unsigned int slot, unsigned int flags, Map *map, Point &loc);
 	void DropItemAtLocation(const char *resref, unsigned int flags, Map *map, Point &loc);
-	void SetEquippedSlot(ieDword slotcode) { Equipped = slotcode; }
-	ieDword GetEquippedSlot() { return Equipped; }
+	void SetEquippedSlot(int slotcode);
+	int GetEquippedSlot();
 	void AddSlotEffects( CREItem* slot );
 	//void AddAllEffects();
 	void RemoveSlotEffects( CREItem* slot );
 	/** Returns item in specified slot. Does NOT change inventory */
 	CREItem* GetSlotItem(unsigned int slot);
-	bool EquipItem(unsigned int slot);
+	bool EquipItem(unsigned int slot, bool weapon=false);
 	bool UnEquipItem(unsigned int slot, bool removecurse);
 	/** Returns equipped weapon */
 	CREItem *GetUsedWeapon();
 	/** Returns a slot which might be empty, or capable of holding item (or part of it) */
 	int FindCandidateSlot(int slottype, size_t first_slot, const char *resref = NULL);
-
-	/** Lists all items in the Invenory on terminal for debugging */
+	/** Creates an item in the slot*/
+	void SetSlotItemRes(const ieResRef ItemResRef, int Slot, int Charge0=1, int Charge1=0, int Charge2=0);
+	/** Lists all items in the Inventory on terminal for debugging */
 	void dump();
 
+	//setting important constants
+	static void SetFistSlot(int arg);
+	static void SetMagicSlot(int arg);
+	static void SetWeaponSlot(int arg);
+	static int GetFistSlot();
+	static int GetMagicSlot();
+	static int GetWeaponSlot();
 private:
 	int FindRanged();
 	void KillSlot(unsigned int index);

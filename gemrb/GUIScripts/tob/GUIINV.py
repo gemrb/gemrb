@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.33 2005/12/17 21:02:49 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.34 2005/12/22 23:29:43 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -122,12 +122,13 @@ def OpenInventoryWindow ():
 	Label = GemRB.GetControl (Window, 0x1000003f)
 	GemRB.SetText (Window, Label, "")
 
-	for slot in range(38):
-		SlotType = GemRB.GetSlotType (slot)
-		if SlotType["Type"]:
+	SlotCount = GemRB.GetSlotType (-1)["Count"]
+	for slot in range(SlotCount):
+		SlotType = GemRB.GetSlotType (slot+1)
+		if SlotType["ID"]:
 			Button = GemRB.GetControl (Window, SlotType["ID"])
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
-			GemRB.SetVarAssoc (Window, Button, "ItemButton", slot)
+			GemRB.SetVarAssoc (Window, Button, "ItemButton", slot+1)
 			GemRB.SetButtonFont (Window, Button, "NUMBER")
 	
 	GemRB.SetVar ("TopIndex", 0)
@@ -293,7 +294,8 @@ def RefreshInventoryWindow ():
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
 
 	# populate inventory slot controls
-	for i in range (38):
+	SlotCount = GemRB.GetSlotType (-1)["Count"]
+	for i in range (SlotCount):
 		UpdateSlot (pc, i)
 
 	#making window visible/shaded depending on the pc's state
@@ -303,12 +305,13 @@ def RefreshInventoryWindow ():
 def UpdateSlot (pc, slot):
 
 	Window = InventoryWindow
-	SlotType = GemRB.GetSlotType (slot)
-	if not SlotType["Type"]:
+	SlotType = GemRB.GetSlotType (slot+1)
+
+	if not SlotType["ID"]:
 		return
 
 	Button = GemRB.GetControl (Window, SlotType["ID"])
-	slot_item = GemRB.GetSlotItem (pc, slot)
+	slot_item = GemRB.GetSlotItem (pc, slot+1)
 
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnDragItem")
 	if slot_item:
@@ -363,8 +366,8 @@ def OnAutoEquip ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	#don't try to put stuff in the inventory
-	for i in range (21):
-		GemRB.DropDraggedItem (pc, i)
+	for i in range (21):		
+		GemRB.DropDraggedItem (pc, i+1)
 		if not GemRB.IsDraggingItem ():
 			break
 

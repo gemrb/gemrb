@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.62 2005/12/05 20:21:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.63 2005/12/22 23:29:41 avenger_teambg Exp $
  *
  */
 
@@ -27,9 +27,9 @@
 #include "Actor.h"
 #include "Game.h"
 
-static int SLOT_MAGIC = 12;
-static int SLOT_FIST = 12;
-static int SLOT_MELEE = 12;
+static int SLOT_MAGIC = -1;
+static int SLOT_FIST = -1;
+static int SLOT_MELEE = -1;
 
 Inventory::Inventory()
 {
@@ -162,8 +162,11 @@ void Inventory::SetSlotCount(unsigned int size)
 }
 
 /** if you supply a "" string, then it checks if the slot is empty */
-bool Inventory::HasItemInSlot(const char *resref, int slot)
+bool Inventory::HasItemInSlot(const char *resref, unsigned int slot)
 {
+	if (slot>=Slots.size()) {
+		return false;
+	}
 	CREItem *item = Slots[slot];
 	if (!item) {
 		if (resref[0]) {
@@ -286,7 +289,7 @@ CREItem *Inventory::RemoveItem(unsigned int slot, unsigned int count)
 	CREItem *item;
 
 	if (slot>=Slots.size() ) {
-		printf("[Inventory] Invalid slot!\n");
+		printMessage("Inventory","Invalid slot!\n",LIGHT_RED);
 		abort();
 	}
 	Changed = true;
@@ -330,7 +333,7 @@ int Inventory::RemoveItem(const char *resref, unsigned int flags, CREItem **res_
 void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
 {
 	if (slot>=Slots.size() ) {
-		printf("[Inventory] Invalid slot!\n");
+		printMessage("Inventory","Invalid slot!\n",LIGHT_RED);
 		abort();
 	}
 	Changed = true;
@@ -344,7 +347,7 @@ int Inventory::AddSlotItem(CREItem* item, int slot)
 {
 	if (slot >= 0) {
 		if ((unsigned)slot >= Slots.size()) {
-			printf("[Inventory] Wrong slot number: %d\n", slot);
+			printMessage("Inventory","Invalid slot!\n",LIGHT_RED);
 			abort();
 		}
 
@@ -355,7 +358,7 @@ int Inventory::AddSlotItem(CREItem* item, int slot)
 			return 2;
 		}
 
-		CREItem *myslot  = Slots[slot];
+		CREItem *myslot = Slots[slot];
 		if (ItemsAreCompatible( myslot, item )) {			
  			//calculate with the max movable stock
 			int chunk = item->Usages[0];
@@ -396,14 +399,14 @@ int Inventory::AddSlotItem(CREItem* item, int slot)
 	return res;
 }
 
-int Inventory::AddSlotItem(STOItem* item, int action)
+int Inventory::AddStoreItem(STOItem* item, int action)
 {
 	CREItem *temp;
 	int ret = -1;
 
-	// FIXME:  Why the loop? Copy whole amount in single step.
-	// Because: count is the number of items bought (you can still add
-	// grouped objects in a single step, just set up STOItem)
+	// item->PurchasedAmount is the number of items bought
+	// (you can still add grouped objects in a single step,
+	// just set up STOItem)
 	for (int i = 0; i < item->PurchasedAmount; i++) {
 		if (item->InfiniteSupply==(ieDword) -1) {
 			if (!item->AmountInStock) {
@@ -513,7 +516,7 @@ void Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 CREItem *Inventory::GetSlotItem(unsigned int slot)
 {
 	if (slot>=Slots.size() ) {
-		printf("Invalid slot!\n");
+		printMessage("Inventory","Invalid slot!\n",LIGHT_RED);
 		abort();
 	}
 	return Slots[slot];
@@ -521,19 +524,23 @@ CREItem *Inventory::GetSlotItem(unsigned int slot)
 
 //this is the low level equipping
 //all checks have been made previously
-bool Inventory::EquipItem(unsigned int slot)
+//if weapon is set, then equipitem is equipping a weapon too
+bool Inventory::EquipItem(unsigned int slot, bool weapon)
 {
 	CREItem *item = GetSlotItem(slot);
 	if (!item) {
 		return false;
 	}
-	item->Flags|=IE_INV_ITEM_EQUIPPED;
-	if (item->Flags & IE_INV_ITEM_CURSED) {
-		item->Flags|=IE_INV_ITEM_UNDROPPABLE;
-	}
 	// add effects of an item just being equipped to actor's effect queue
-	if (core->QuerySlotEffects( slot )) {
-		AddSlotEffects( item );
+	int effect = core->QuerySlotEffects( slot );
+	if (effect) {
+		if ((effect==1) || weapon) {
+			item->Flags|=IE_INV_ITEM_EQUIPPED;
+			if (item->Flags & IE_INV_ITEM_CURSED) {
+				item->Flags|=IE_INV_ITEM_UNDROPPABLE;
+			}
+			AddSlotEffects( item );
+		}
 	}
 	return true;
 }
@@ -570,6 +577,45 @@ int Inventory::FindRanged()
 	return SLOT_MELEE;
 }
 
+void Inventory::SetFistSlot(int arg) { SLOT_FIST=arg; }
+void Inventory::SetMagicSlot(int arg) { SLOT_MAGIC=arg; }
+void Inventory::SetWeaponSlot(int arg)
+{
+	if (SLOT_MELEE==-1) {
+		SLOT_MELEE=arg;
+	}
+}
+
+int Inventory::GetFistSlot()
+{
+	return SLOT_FIST;
+}
+
+int Inventory::GetMagicSlot()
+{
+	return SLOT_MAGIC;
+}
+
+int Inventory::GetWeaponSlot()
+{
+	return SLOT_MELEE;
+}
+
+int Inventory::GetEquippedSlot()
+{
+	if (Equipped==IW_NO_EQUIPPED) return SLOT_FIST;
+	return Equipped+SLOT_MELEE;
+}
+
+void Inventory::SetEquippedSlot(int slotcode)
+{
+	if (slotcode == SLOT_FIST || HasItemInSlot("",slotcode+SLOT_WEAPON)) {
+		Equipped = 1000;
+	} else {
+		Equipped = slotcode;
+	}
+}
+
 CREItem *Inventory::GetUsedWeapon()
 {
 	CREItem *ret;
@@ -579,16 +625,12 @@ CREItem *Inventory::GetUsedWeapon()
 	if (ret && ret->ItemResRef[0]) {
 		return ret;
 	}
-	if (Equipped == IW_NO_EQUIPPED) slot = SLOT_FIST;
-	else if (Equipped > IW_NO_EQUIPPED) {
-		slot = FindRanged();
-	}
-	else slot = SLOT_MELEE+Equipped;
+	slot = GetEquippedSlot();
 	return GetSlotItem(slot);
 }
 
 // Returns index of first empty slot or slot with the same
-//    item and not full stack. On fail returns -1
+// item and not full stack. On fail returns -1
 // Can be used to check for full inventory
 int Inventory::FindCandidateSlot(int slottype, size_t first_slot, const char *resref)
 {
@@ -623,6 +665,19 @@ int Inventory::FindCandidateSlot(int slottype, size_t first_slot, const char *re
 	return -1;
 }
 
+void Inventory::SetSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge0, int Charge1, int Charge2)
+{
+	CREItem *TmpItem = new CREItem();
+	strnlwrcpy(TmpItem->ItemResRef, ItemResRef, 8);
+	TmpItem->PurchasedAmount=0;
+	TmpItem->Usages[0]=Charge0;
+	TmpItem->Usages[1]=Charge1;
+	TmpItem->Usages[2]=Charge2;
+	TmpItem->Flags=IE_INV_ITEM_ACQUIRED;
+	core->ResolveRandomItem(TmpItem);
+	AddSlotItem( TmpItem, SlotID );
+}
+
 void Inventory::dump()
 {
 	printf( "INVENTORY:\n" );
@@ -633,7 +688,7 @@ void Inventory::dump()
 			continue;
 		}
 
-		printf ( "%2u: %8.8s   (%d %d %d) %x Wt: %d x %dLb\n", i, itm->ItemResRef, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags, itm->StackAmount, itm->Weight );
+		printf ( "%2u: %8.8s - (%d %d %d) %x Wt: %d x %dLb\n", i, itm->ItemResRef, itm->Usages[0], itm->Usages[1], itm->Usages[2], itm->Flags, itm->StackAmount, itm->Weight );
 	}
 
 	printf( "Equipped: %d\n", Equipped );

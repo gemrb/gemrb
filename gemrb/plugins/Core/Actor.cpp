@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.146 2005/12/21 16:53:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.147 2005/12/22 23:29:41 avenger_teambg Exp $
  *
  */
 
@@ -50,26 +50,10 @@ static Color cyan = {
 static Color magenta = {
 	0xff, 0x00, 0xff, 0xff
 };
-/*
-static Color green_dark = {
-	0x00, 0x80, 0x00, 0xff
-};
-static Color red_dark = {
-	0x80, 0x00, 0x00, 0xff
-};
-static Color yellow_dark = {
-	0x80, 0x80, 0x00, 0xff
-};
-static Color cyan_dark = {
-	0x00, 0x80, 0x80, 0xff
-};
-*/
 
 static int classcount=-1;
 static char **clericspelltables=NULL;
 static char **wizardspelltables=NULL;
-//static int constitution_normal[26];
-//static int constitution_fighter[26];
 
 static void InitActorTables();
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.377 2005/12/21 16:53:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.378 2005/12/22 23:29:41 avenger_teambg Exp $
  *
  */
 
@@ -406,8 +406,8 @@ GameControl* Interface::StartGameControl()
 	if (ConsolePopped) {
 		PopupConsole();
 	}
-	DelWindow(~0); //deleting ALL windows
-	DelTable(~0);  //dropping ALL tables
+	DelWindow(~0);//deleting ALL windows
+	DelTable(~0); //dropping ALL tables
 	Window* gamewin = new Window( 0xffff, 0, 0, Width, Height );
 	GameControl* gc = new GameControl();
 	gc->XPos = 0;
@@ -3040,37 +3040,46 @@ bool Interface::InitItemTypes()
 		SlotTypes = st->GetRowCount();
 		//make sure unsigned int is 32 bits
 		slottypes = (SlotType *) malloc(SlotTypes * sizeof(SlotType) );
-		for (int i = 0; i < SlotTypes; i++) {
+		for (unsigned int i = 0; i < SlotTypes; i++) {
+			slottypes[i].slot = (ieDword) strtol(st->GetRowName(i),NULL,0 );
 			slottypes[i].slottype = (ieDword) strtol(st->QueryField(i,0),NULL,0 );
 			slottypes[i].slotid = (ieDword) strtol(st->QueryField(i,1),NULL,0 );
 			slottypes[i].slottip = (ieDword) strtol(st->QueryField(i,3),NULL,0 );
 			slottypes[i].sloteffects = (ieDword) strtol(st->QueryField(i,4),NULL,0 );
-			//make a macro for this?
-			/*
-			strncpy(slottypes[i].slotresref, st->QueryField(i,2), 8 );
-			slottypes[i].slotresref[8]=0;
-			strlwr(slottypes[i].slotresref);
-			*/
 			strnlwrcpy( slottypes[i].slotresref, st->QueryField(i,2), 8 );
+			//setting special slots
+			switch (slottypes[i].sloteffects) {
+				//fist slot, not saved, default weapon
+				case 2: Inventory::SetFistSlot(slottypes[i].slot); break;
+				//magic weapon slot, overrides all weapons
+				case 3: Inventory::SetMagicSlot(slottypes[i].slot); break;
+				//weapon slot, Equipping marker is relative to it
+				case 4: Inventory::SetWeaponSlot(slottypes[i].slot); break;
+				default:;
+			}
 		}
 		DelTable( SlotTypeTable );
 	}
 	return (it && st);
 }
 
-int Interface::QuerySlotType(int idx) const
+int Interface::QuerySlot(unsigned int idx) const
 {
-	//default slottype: -1
-	if (idx==-1) {
-		return -1;
+	if (idx>=SlotTypes) {
+		return 0;
 	}
-	if (idx<0 || idx>=SlotTypes) {
+	return slottypes[idx].slot;
+}
+
+int Interface::QuerySlotType(unsigned int idx) const
+{
+	if (idx>=SlotTypes) {
 		return 0;
 	}
 	return slottypes[idx].slottype;
 }
 
-int Interface::QuerySlotID(int idx) const
+int Interface::QuerySlotID(unsigned int idx) const
 {
 	if (idx>=SlotTypes) {
 		return 0;
@@ -3078,7 +3087,7 @@ int Interface::QuerySlotID(int idx) const
 	return slottypes[idx].slotid;
 }
 
-int Interface::QuerySlottip(int idx) const
+int Interface::QuerySlottip(unsigned int idx) const
 {
 	if (idx>=SlotTypes) {
 		return 0;
@@ -3086,7 +3095,7 @@ int Interface::QuerySlottip(int idx) const
 	return slottypes[idx].slottip;
 }
 
-int Interface::QuerySlotEffects(int idx) const
+int Interface::QuerySlotEffects(unsigned int idx) const
 {
 	if (idx>=SlotTypes) {
 		return 0;
@@ -3094,7 +3103,7 @@ int Interface::QuerySlotEffects(int idx) const
 	return slottypes[idx].sloteffects;
 }
 
-const char *Interface::QuerySlotResRef(int idx) const
+const char *Interface::QuerySlotResRef(unsigned int idx) const
 {
 	if (idx>=SlotTypes) {
 		return "";
@@ -4076,10 +4085,10 @@ int Interface::GetCharismaBonus(int column, int value)
 	return chrmod[column*MaximumAbility+value];
 }
 
-//returns: -3, -2 if request is illegal or in cutscene
-//         -1 if pause is already active
-//         0 if pause was not allowed
-//         1 if autopause happened
+// -3, -2 if request is illegal or in cutscene
+// -1 if pause is already active
+// 0 if pause was not allowed
+// 1 if autopause happened
 
 int Interface::Autopause(ieDword flag)
 {

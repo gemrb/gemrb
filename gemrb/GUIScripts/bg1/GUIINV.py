@@ -16,8 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.5 2005/11/23 21:58:05 avenger_teambg Exp $
-
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.6 2005/12/22 23:29:42 avenger_teambg Exp $
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
 
@@ -80,6 +79,7 @@ def OpenInventoryWindow ():
 	Button = GemRB.GetControl (Window, 50)
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnAutoEquip")
 
 	# encumbrance
 	Label = GemRB.CreateLabel (Window, 0x10000043, 5,385,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
@@ -102,11 +102,11 @@ def OpenInventoryWindow ():
 	GemRB.SetText (Window, Label, "")
 	
 	for slot in range(38):
-		SlotType = GemRB.GetSlotType (slot)
-		if SlotType["Type"]:
-			Button = GemRB.GetControl (Window, SlotType["ID"]) 
+		SlotType = GemRB.GetSlotType (slot+1)
+		if SlotType["ID"]:
+			Button = GemRB.GetControl (Window, SlotType["ID"])
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
-			GemRB.SetVarAssoc (Window, Button, "ItemButton", slot)
+			GemRB.SetVarAssoc (Window, Button, "ItemButton", slot+1)
 			GemRB.SetButtonFont (Window, Button, "NUMBER")
 
 	GemRB.UnhideGUI()
@@ -282,12 +282,12 @@ def RefreshInventoryWindow ():
 def UpdateSlot (pc, slot):
 
 	Window = InventoryWindow
-	SlotType = GemRB.GetSlotType (slot)
-	if not SlotType["Type"]:
+	SlotType = GemRB.GetSlotType (slot+1)
+	if not SlotType["ID"]:
 		return
 
 	Button = GemRB.GetControl (Window, SlotType["ID"])
-	slot_item = GemRB.GetSlotItem (pc, slot)
+	slot_item = GemRB.GetSlotItem (pc, slot+1)
 
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnDragItem")
 	if slot_item:
@@ -336,6 +336,23 @@ def OnDragItemGround ():
 	UpdateInventoryWindow ()
 	return
 
+def OnAutoEquip ():
+	if not GemRB.IsDraggingItem ():
+		return
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	#don't try to put stuff in the inventory
+	for i in range (21):
+		GemRB.DropDraggedItem (pc, i+1)
+		if not GemRB.IsDraggingItem ():
+			break
+
+	if GemRB.IsDraggingItem ():
+		GemRB.PlaySound("GAM_47")  #failed equip
+
+	UpdateInventoryWindow ()
+	return
+
 def OnDragItem ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 
@@ -346,14 +363,18 @@ def OnDragItem ():
 		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 0)
 	else:
 		GemRB.DropDraggedItem (pc, slot)
+		if GemRB.IsDraggingItem ():
+			GemRB.PlaySound("GAM_47")  #failed equip
 
 	UpdateInventoryWindow ()
 	return
 
 def OnDropItemToPC ():
 	pc = GemRB.GetVar ("PressedPortrait") + 1
-	print "PC", pc
+
 	GemRB.DropDraggedItem (pc, -1)
+	if GemRB.IsDraggingItem ():
+		GemRB.PlaySound("GAM_47")  #failed equip
 	UpdateInventoryWindow ()
 	return
 
