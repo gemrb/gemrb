@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.146 2005/12/21 16:53:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.147 2005/12/23 16:08:32 avenger_teambg Exp $
  *
  */
 
@@ -1111,7 +1111,7 @@ int AREImp::GetStoredFileSize(Map *map)
 
 	int pst = core->HasFeature( GF_AUTOMAP_INI );
 	NoteCount = (ieDword) map->GetMapNoteCount();
-	headersize += NoteCount * (pst?0x214: 0x22);
+	headersize += NoteCount * (pst?0x214: 0x34);
 	SongHeader = headersize;
 
 	headersize += 0x90;
