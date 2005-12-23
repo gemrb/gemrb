@@ -18,6 +18,8 @@
 0x4100     SSIMC      SSIMC      SSIMC      SSIMC      1          2          0 
 0x4101     SSIMS      SSIMS      SSIMS      SSIMS      1          2          0 
 0x4102     SSIMM      SSIMM      SSIMM      SSIMM      1          2          0 
+0x4110     SSIWC      SSIWC      SSIWC      SSIWC      1          2          0
+0x4112     SSIWM      SSIWM      SSIWM      SSIWM      1          2          0
 0x4200     SHMCM      SHMCM      SHMCM      SHMCM      1          2          0 
 0x4300     MSPLG1     MSPLG1     MSPLG1     MSPLG1     1          2          1 
 0x4400     LHMC       LHMC       LHMC       LHMC       1          2          0 

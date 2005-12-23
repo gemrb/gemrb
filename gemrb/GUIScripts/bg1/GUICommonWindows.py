@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICommonWindows.py,v 1.7 2005/12/21 22:58:22 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICommonWindows.py,v 1.8 2005/12/23 08:55:28 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -167,9 +167,9 @@ def GroupControls ():
 	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetActionIcon (Window, Button, 7)
 	Button = GemRB.GetControl (Window, 1)
-	GemRB.SetActionIcon (Window, Button, 14)
+	GemRB.SetActionIcon (Window, Button, 15)
 	Button = GemRB.GetControl (Window, 2)
-	GemRB.SetActionIcon (Window, Button, 16)
+	GemRB.SetActionIcon (Window, Button, 21)
 	Button = GemRB.GetControl (Window, 3)
 	GemRB.SetActionIcon (Window, Button, -1)
 	Button = GemRB.GetControl (Window, 4)

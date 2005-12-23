@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.71 2005/12/21 16:53:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.72 2005/12/23 08:55:37 avenger_teambg Exp $
  *
  */
 
@@ -225,9 +225,8 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 		}
 	}
 	ResRef[0]=0;
-	char tmp[256];
-	sprintf(tmp, "Invalid or nonexistent avatar entry:%04X\n", AnimID);
-	printMessage("CharAnimations",tmp, LIGHT_RED);
+	printMessage("CharAnimations", " ", LIGHT_RED);
+	printf("Invalid or nonexistent avatar entry:%04X\n", AnimID);
 }
 
 //freeing the bitmaps only once, but using an intelligent algorithm

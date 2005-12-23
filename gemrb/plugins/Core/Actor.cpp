@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.147 2005/12/22 23:29:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.148 2005/12/23 08:55:37 avenger_teambg Exp $
  *
  */
 
@@ -212,7 +212,8 @@ void Actor::SetAnimationID(unsigned int AnimID)
 		SetCircleSize();
 		anims->SetColors(BaseStats+IE_COLORS);
 	} else {
-		printf("[Actor] Missing animation for %s\n",LongName);
+		printMessage("Actor", " ",LIGHT_RED);
+		printf("Missing animation for %s\n",LongName);
 	}
 }
 
