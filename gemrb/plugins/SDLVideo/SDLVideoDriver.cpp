@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.120 2005/12/17 17:37:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.121 2005/12/25 12:52:20 wjpalenstijn Exp $
  *
  */
 
@@ -728,36 +728,6 @@ void SDLVideoDriver::BlitSprite(Sprite2D* spr, int x, int y, bool anchor,
 
 		SDL_LockSurface(backBuf);
 
-		int clipx, clipy, clipw, cliph;
-		if (clip) {
-			clipx = clip->x;
-			clipy = clip->y;
-			clipw = clip->w;
-			cliph = clip->h;
-		} else {
-			clipx = 0;
-			clipy = 0;
-			clipw = backBuf->w;
-			cliph = backBuf->h;
-		}
-
-		SDL_Rect cliprect;
-		SDL_GetClipRect(backBuf, &cliprect);
-		if (cliprect.x > clipx) {
-			clipw -= (cliprect.x - clipx);
-			clipx = cliprect.x;
-		}
-		if (cliprect.y > clipy) {
-			cliph -= (cliprect.y - clipy);
-			clipy = cliprect.y;
-		}
-		if (clipx+clipw > cliprect.x+cliprect.w) {
-			clipw = cliprect.x+cliprect.w-clipx;
-		}
-		if (clipy+cliph > cliprect.y+cliprect.h) {
-			cliph = cliprect.y+cliprect.h-clipy;
-		}
-									
 #define SPECIALPIXEL
 #undef BPP16
 #define FLIP 
@@ -811,105 +781,6 @@ void SDLVideoDriver::BlitSprite(Sprite2D* spr, int x, int y, bool anchor,
 	}
 }
 
-//tint is always employed without anchor (only rendering ingame objects)
-void SDLVideoDriver::BlitSpriteNoShadow(Sprite2D* spr, int x, int y,
-										Color tint, SpriteCover* cover,
-										Region *clip)
-{
-	if (!spr->vptr) return;
-
-	if (!spr->RLE) {
-		SDL_Surface* tmp = ( SDL_Surface* ) spr->vptr;
-		SDL_LockSurface( tmp );
-		SDL_Color* pal = tmp->format->palette->colors;
-		SDL_Color oldPal[256];
-		memcpy( oldPal, pal, 256 * sizeof( SDL_Color ) );
-		for (int i = 2; i < 256; i++) {
-			pal[i].r = ( tint.r * pal[i].r ) >> 8;
-			pal[i].g = ( tint.g * pal[i].g ) >> 8;
-			pal[i].b = ( tint.b * pal[i].b ) >> 8;
-		}
-		//SDL_Color backup=pal[1];
-		pal[1] = TRANSPARENT_BLACK;
-		SDL_UnlockSurface( tmp );
-		SDL_SetAlpha( tmp, SDL_SRCALPHA, tint.a);
-		BlitSprite( spr, x, y, false, clip );
-		//copying back the original palette
-		SDL_SetPalette( tmp, SDL_LOGPAL, ( SDL_Color * ) oldPal, 0, 256 );
-	} else {
-		Sprite2D_RLE_Internal* data = (Sprite2D_RLE_Internal*)spr->vptr;
-
-		Uint8* rle = (Uint8*)spr->pixels;
-		int clipx, clipy, clipw, cliph;
-		if (clip) {
-			clipx = clip->x;
-			clipy = clip->y;
-			clipw = clip->w;
-			cliph = clip->h;
-		} else {
-			clipx = 0;
-			clipy = 0;
-			clipw = backBuf->w;
-			cliph = backBuf->h;
-		}
-		SDL_Rect cliprect;
-		SDL_GetClipRect(backBuf, &cliprect);
-		if (cliprect.x > clipx) {
-			clipw -= (cliprect.x - clipx);
-			clipx = cliprect.x;
-		}
-		if (cliprect.y > clipy) {
-			cliph -= (cliprect.y - clipy);
-			clipy = cliprect.y;
-		}
-		if (clipx+clipw > cliprect.x+cliprect.w) {
-			clipw = cliprect.x+cliprect.w-clipx;
-		}
-		if (clipy+cliph > cliprect.y+cliprect.h) {
-			cliph = cliprect.y+cliprect.h-clipy;
-		}
-		int tx = x - spr->XPos - Viewport.x;
-		int ty = y - spr->YPos - Viewport.y;
-		if (tx > backBuf->w) return;
-		if (tx+spr->Width <= 0) return;
-		SDL_LockSurface(backBuf);
-
-#define FLIP 
-#define HFLIP_CONDITIONAL data->flip_hor
-#define VFLIP_CONDITIONAL data->flip_ver
-#define PAL (Color*)data->pal
-#define COVER
-#define COVERX (cover->XPos - spr->XPos)
-#define COVERY (cover->YPos - spr->YPos)
-#define TINT
-#define SPECIALPIXEL if (p != 1)
-
-		if (backBuf->format->BytesPerPixel == 4) {
-
-#undef BPP16
-#include "SDLVideoDriver.inl"
-
-		} else {
-
-#define BPP16
-#include "SDLVideoDriver.inl"
-
-		}
-
-#undef FLIP
-#undef HFLIP_CONDITIONAL
-#undef VFLIP_CONDITIONAL
-#undef PAL
-#undef COVER
-#undef COVERX
-#undef COVERY
-#undef TINT
-#undef SPECIALPIXEL
-
-		SDL_UnlockSurface(backBuf);
-
-	}
-}
 
 void SDLVideoDriver::BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint, 
 	Color *Palette, Region* clip)
@@ -934,39 +805,9 @@ void SDLVideoDriver::BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint,
 		//copying back the original palette
 		SDL_SetPalette( tmp, SDL_LOGPAL, ( SDL_Color * ) oldPal, 0, 256 );
 	} else {
-		// TODO: implemented alpha tints
-
 		Sprite2D_RLE_Internal* data = (Sprite2D_RLE_Internal*)spr->vptr;
 
 		Uint8* rle = (Uint8*)spr->pixels;
-		int clipx, clipy, clipw, cliph;
-		if (clip) {
-			clipx = clip->x;
-			clipy = clip->y;
-			clipw = clip->w;
-			cliph = clip->h;
-		} else {
-			clipx = 0;
-			clipy = 0;
-			clipw = backBuf->w;
-			cliph = backBuf->h;
-		}
-		SDL_Rect cliprect;
-		SDL_GetClipRect(backBuf, &cliprect);
-		if (cliprect.x > clipx) {
-			clipw -= (cliprect.x - clipx);
-			clipx = cliprect.x;
-		}
-		if (cliprect.y > clipy) {
-			cliph -= (cliprect.y - clipy);
-			clipy = cliprect.y;
-		}
-		if (clipx+clipw > cliprect.x+cliprect.w) {
-			clipw = cliprect.x+cliprect.w-clipx;
-		}
-		if (clipy+cliph > cliprect.y+cliprect.h) {
-			cliph = cliprect.y+cliprect.h-clipy;
-		}
 		int tx = x - spr->XPos - Viewport.x;
 		int ty = y - spr->YPos - Viewport.y;
 		if (tx > backBuf->w) return;
@@ -1056,6 +897,7 @@ void SDLVideoDriver::BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint,
 	}
 }
 
+
 void SDLVideoDriver::BlitSpriteCovered(Sprite2D* spr, int x, int y,
 									   Color tint, SpriteCover* cover,
 									   Color *Palette, Region* clip)
@@ -1068,41 +910,13 @@ void SDLVideoDriver::BlitSpriteCovered(Sprite2D* spr, int x, int y,
 		Sprite2D_RLE_Internal* data = (Sprite2D_RLE_Internal*)spr->vptr;
 
 		Uint8* rle = (Uint8*)spr->pixels;
-		int clipx, clipy, clipw, cliph;
-		if (clip) {
-			clipx = clip->x;
-			clipy = clip->y;
-			clipw = clip->w;
-			cliph = clip->h;
-		} else {
-			clipx = 0;
-			clipy = 0;
-			clipw = backBuf->w;
-			cliph = backBuf->h;
-		}
-		SDL_Rect cliprect;
-		SDL_GetClipRect(backBuf, &cliprect);
-		if (cliprect.x > clipx) {
-			clipw -= (cliprect.x - clipx);
-			clipx = cliprect.x;
-		}
-		if (cliprect.y > clipy) {
-			cliph -= (cliprect.y - clipy);
-			clipy = cliprect.y;
-		}
-		if (clipx+clipw > cliprect.x+cliprect.w) {
-			clipw = cliprect.x+cliprect.w-clipx;
-		}
-		if (clipy+cliph > cliprect.y+cliprect.h) {
-			cliph = cliprect.y+cliprect.h-clipy;
-		}
 		int tx = x - spr->XPos - Viewport.x;
 		int ty = y - spr->YPos - Viewport.y;
 		if (tx > backBuf->w) return;
 		if (tx+spr->Width <= 0) return;
 		SDL_LockSurface(backBuf);
 		if (!Palette)
-			Palette = (Color *) data->pal; //this is the original palette
+			Palette = (Color *) data->pal;
 
 #define SPECIALPIXEL
 #define FLIP 
@@ -1190,6 +1004,156 @@ void SDLVideoDriver::BlitSpriteCovered(Sprite2D* spr, int x, int y,
 
 	}
 }
+
+
+void SDLVideoDriver::BlitSpriteNoShadow(Sprite2D* spr, int x, int y,
+										Color tint, SpriteCover* cover,
+										Color *Palette, Region *clip)
+{
+	if (!spr->vptr) return;
+
+	if (!spr->RLE) {
+		// not fully supported
+		SDL_Surface* tmp = ( SDL_Surface* ) spr->vptr;
+		SDL_LockSurface( tmp );
+		SDL_Color* pal = tmp->format->palette->colors;
+		SDL_Color oldPal[256];
+		memcpy( oldPal, pal, 256 * sizeof( SDL_Color ) );
+		for (int i = 2; i < 256; i++) {
+			pal[i].r = ( tint.r * pal[i].r ) >> 8;
+			pal[i].g = ( tint.g * pal[i].g ) >> 8;
+			pal[i].b = ( tint.b * pal[i].b ) >> 8;
+		}
+		//SDL_Color backup=pal[1];
+		pal[1] = TRANSPARENT_BLACK;
+		SDL_UnlockSurface( tmp );
+		SDL_SetAlpha( tmp, SDL_SRCALPHA, tint.a);
+		BlitSprite( spr, x, y, false, clip );
+		//copying back the original palette
+		SDL_SetPalette( tmp, SDL_LOGPAL, ( SDL_Color * ) oldPal, 0, 256 );
+	} else {
+		Sprite2D_RLE_Internal* data = (Sprite2D_RLE_Internal*)spr->vptr;
+
+		Uint8* rle = (Uint8*)spr->pixels;
+		int tx = x - spr->XPos - Viewport.x;
+		int ty = y - spr->YPos - Viewport.y;
+		if (tx > backBuf->w) return;
+		if (tx+spr->Width <= 0) return;
+		if (!Palette)
+			Palette = (Color *) data->pal;
+		SDL_LockSurface(backBuf);
+
+#define FLIP 
+#define HFLIP_CONDITIONAL data->flip_hor
+#define VFLIP_CONDITIONAL data->flip_ver
+#define PAL Palette
+#define COVER
+#define COVERX (cover->XPos - spr->XPos)
+#define COVERY (cover->YPos - spr->YPos)
+#define TINT
+#define SPECIALPIXEL if (p != 1)
+
+		if (backBuf->format->BytesPerPixel == 4) {
+
+#undef BPP16
+#include "SDLVideoDriver.inl"
+
+		} else {
+
+#define BPP16
+#include "SDLVideoDriver.inl"
+
+		}
+
+#undef FLIP
+#undef HFLIP_CONDITIONAL
+#undef VFLIP_CONDITIONAL
+#undef PAL
+#undef COVER
+#undef COVERX
+#undef COVERY
+#undef TINT
+#undef SPECIALPIXEL
+
+		SDL_UnlockSurface(backBuf);
+
+	}
+}
+
+
+void SDLVideoDriver::BlitSpriteTransShadow(Sprite2D* spr, int x, int y,
+										   Color tint, SpriteCover* cover,
+										   Color *Palette, Region *clip)
+{
+	if (!spr->vptr) return;
+
+	if (!spr->RLE) {
+		// not supported
+		BlitSpriteCovered(spr, x, y, tint, cover, Palette, clip);
+	} else {
+		Sprite2D_RLE_Internal* data = (Sprite2D_RLE_Internal*)spr->vptr;
+
+		Uint8* rle = (Uint8*)spr->pixels;
+		int tx = x - spr->XPos - Viewport.x;
+		int ty = y - spr->YPos - Viewport.y;
+		if (tx > backBuf->w) return;
+		if (tx+spr->Width <= 0) return;
+
+		if (!Palette)
+			Palette = (Color *) data->pal;
+
+		Uint32 shadowcol32 = SDL_MapRGBA(backBuf->format, Palette[1].r/2, Palette[1].g/2, Palette[1].b/2, 0);
+		Uint16 shadowcol16 = (Uint16)shadowcol32;
+
+		Uint32 mask32 = (backBuf->format->Rmask >> 1) & backBuf->format->Rmask;
+		mask32 |= (backBuf->format->Gmask >> 1) & backBuf->format->Gmask;
+		mask32 |= (backBuf->format->Bmask >> 1) & backBuf->format->Bmask;
+		Uint16 mask16 = (Uint16)mask32;
+
+		SDL_LockSurface(backBuf);
+
+
+
+#define FLIP 
+#define HFLIP_CONDITIONAL data->flip_hor
+#define VFLIP_CONDITIONAL data->flip_ver
+#define PAL Palette
+#define COVER
+#define COVERX (cover->XPos - spr->XPos)
+#define COVERY (cover->YPos - spr->YPos)
+#define TINT
+
+		if (backBuf->format->BytesPerPixel == 4) {
+
+#undef BPP16
+#define SPECIALPIXEL if (p == 1) { *pix = ((*pix >> 1)&mask32) + shadowcol32; } else
+#include "SDLVideoDriver.inl"
+
+		} else {
+
+#define BPP16
+#undef SPECIALPIXEL
+#define SPECIALPIXEL if (p == 1) { *pix = ((*pix >> 1)&mask16) + shadowcol16; } else
+#include "SDLVideoDriver.inl"
+
+		}
+
+#undef FLIP
+#undef HFLIP_CONDITIONAL
+#undef VFLIP_CONDITIONAL
+#undef PAL
+#undef COVER
+#undef COVERX
+#undef COVERY
+#undef TINT
+#undef SPECIALPIXEL
+
+		SDL_UnlockSurface(backBuf);
+
+	}
+}
+
+
 
 void SDLVideoDriver::SetCursor(Sprite2D* up, Sprite2D* down)
 {

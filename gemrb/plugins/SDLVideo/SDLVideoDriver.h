@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.53 2005/12/07 20:27:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.54 2005/12/25 12:52:20 wjpalenstijn Exp $
  *
  */
 
@@ -73,7 +73,9 @@ public:
 	void BlitSpriteCovered(Sprite2D* spr, int x, int y, Color tint,
 		SpriteCover* cover,	Color *Palette = NULL, Region* clip = NULL);
 	void BlitSpriteNoShadow(Sprite2D* spr, int x, int y, Color tint,
-		SpriteCover* cover, Region *clip = NULL);
+		SpriteCover* cover, Color *Palette = NULL, Region *clip = NULL);
+	void BlitSpriteTransShadow(Sprite2D* spr, int x, int y, Color tint,
+		SpriteCover* cover, Color *Palette = NULL, Region *clip = NULL);
 	void SetCursor(Sprite2D* up, Sprite2D* down);
 	void SetDragCursor(Sprite2D* drag);
 	Sprite2D* GetPreview(int w, int h);

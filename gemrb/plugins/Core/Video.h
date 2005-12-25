@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.49 2005/12/07 20:26:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.50 2005/12/25 12:52:19 wjpalenstijn Exp $
  *
  */
 
@@ -89,7 +89,9 @@ public:
 	virtual void BlitSpriteCovered(Sprite2D* spr, int x, int y, Color tint,
 		SpriteCover* cover, Color *palette = NULL, Region* clip = NULL) = 0;
 	virtual void BlitSpriteNoShadow(Sprite2D* spr, int x, int y, Color tint,
-		SpriteCover* cover, Region* clip = NULL) = 0;
+		SpriteCover* cover, Color *palette = NULL, Region* clip = NULL) = 0;
+	virtual void BlitSpriteTransShadow(Sprite2D* spr, int x, int y, Color tint,
+		SpriteCover* cover, Color *palette = NULL, Region* clip = NULL) = 0;
 	virtual void SetCursor(Sprite2D* up, Sprite2D* down) = 0;
 	/** Sets a temporary cursor when dragging an Item from Inventory */
 	virtual void SetDragCursor(Sprite2D* drag) = 0;

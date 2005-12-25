@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.inl,v 1.2 2005/11/27 19:32:29 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.inl,v 1.3 2005/12/25 12:52:20 wjpalenstijn Exp $
  *
  */
 
@@ -121,7 +121,7 @@ do { \
 
 #endif
 
-{
+do {
 #ifdef FLIP
 	const int xneg = (HFLIP_CONDITIONAL)?-1:0;
 	const int yneg = (VFLIP_CONDITIONAL)?-1:0;
@@ -142,6 +142,36 @@ do { \
 	unsigned int dG;
 	unsigned int dB;
 #endif
+
+	int clipx, clipy, clipw, cliph;
+	if (clip) {
+		clipx = clip->x;
+		clipy = clip->y;
+		clipw = clip->w;
+		cliph = clip->h;
+	} else {
+		clipx = 0;
+		clipy = 0;
+		clipw = (TARGET)->w;
+		cliph = (TARGET)->h;
+	}
+	SDL_Rect cliprect;
+	SDL_GetClipRect((TARGET), &cliprect);
+	if (cliprect.x > clipx) {
+		clipw -= (cliprect.x - clipx);
+		clipx = cliprect.x;
+	}
+	if (cliprect.y > clipy) {
+		cliph -= (cliprect.y - clipy);
+		clipy = cliprect.y;
+	}
+	if (clipx+clipw > cliprect.x+cliprect.w) {
+		clipw = cliprect.x+cliprect.w-clipx;
+	}
+	if (clipy+cliph > cliprect.y+cliprect.h) {
+		cliph = cliprect.y+cliprect.h-clipy;
+	}
+
 
 	PTYPE* line = (PTYPE*)(TARGET)->pixels +
 		(ty - yneg*((HEIGHT)-1))*(TARGET)->pitch/(PITCHMULT);
@@ -211,7 +241,7 @@ do { \
 		coverline += YNEG(cover->Width);
 #endif
 	}
-}
+} while(0);
 
 
 
