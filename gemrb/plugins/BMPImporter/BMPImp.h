@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.19 2005/12/14 18:33:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.20 2005/12/25 10:31:36 avenger_teambg Exp $
  *
  */
 
@@ -60,18 +60,22 @@ public:
 		if(x>=Width || y>=Height) {
 			return;
 		}
-		if (BitCount != 4) {
-			return;
-		}
 		unsigned char * p = ( unsigned char * ) pixels;
-		p += ( PaddedRowLength * y ) + ( x >> 1 );
-		if (x&1) {
-			*p &= ~15;
-			*p |= (unsigned char) (idx&15);
-		}
-		else {
-			*p &= 15;
-			*p |= (unsigned char) (idx<<4);
+		switch (BitCount) {
+		case 4:
+			p += ( PaddedRowLength * y ) + ( x >> 1 );
+			if (x&1) {
+				*p &= ~15;
+				*p |= (unsigned char) (idx&15);
+			}
+			else {
+				*p &= 15;
+				*p |= (unsigned char) (idx<<4);
+			}
+			break;
+		case 8:
+			p[Width*y+x] = idx;
+			break;
 		}
 	}
 	unsigned int GetPixelIndex(unsigned int x, unsigned int y)

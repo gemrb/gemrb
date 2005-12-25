@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.35 2005/12/21 22:58:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.36 2005/12/25 10:31:39 avenger_teambg Exp $
  *
  */
 
@@ -311,6 +311,22 @@ int GameScript::IsActive(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	if (scr->GetInternalFlag()&IF_ACTIVE) {
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::School(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr || scr->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = (Actor *) scr;
+	//only the low 2 bytes count
+	//the School values start from 1 to 9 and the first school value is 0x40
+	//so this mild hack will do
+	if ( (ieWord) actor->GetStat(IE_KIT) == (ieWord) (0x20<<parameters->int0Parameter)) {
 		return 1;
 	}
 	return 0;
@@ -1130,7 +1146,6 @@ int GameScript::Clicked(Scriptable* Sender, Trigger* parameters)
 {
 	//now objects suicide themselves if they are empty objects
 	//so checking an empty object is easier
-	//if (parameters->objectParameter->objectFields[0] == 0) {
 	if (parameters->objectParameter == NULL) {
 		if (Sender->LastTrigger) {
 			Sender->AddTrigger (&Sender->LastTrigger);
@@ -1138,12 +1153,9 @@ int GameScript::Clicked(Scriptable* Sender, Trigger* parameters)
 		}
 		return 0;
 	}
-	Scriptable* target = GetActorFromObject( Sender, parameters->objectParameter );
-	if (target->Type == ST_ACTOR) {
-		if (Sender->LastTrigger == ((Actor *) target)->GetID()) {
-			Sender->AddTrigger (&Sender->LastTrigger);
-			return 1;
-		}
+	if (MatchActor(Sender, Sender->LastTrigger, parameters->objectParameter)) {
+		Sender->AddTrigger (&Sender->LastTrigger);
+		return 1;
 	}
 	return 0;
 }
@@ -1837,8 +1849,9 @@ int GameScript::OpenState(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!tar) {
-		printMessage("[GameScript]"," ",LIGHT_RED);
-		printf("couldn't find door/container:%s\n", parameters->objectParameter? parameters->objectParameter->objectName:"<NULL>");
+		printMessage("GameScript"," ",LIGHT_RED);
+		printf("Couldn't find door/container:%s\n", parameters->objectParameter? parameters->objectParameter->objectName:"<NULL>");
+		printf("Sender: %s\n", Sender->GetScriptName() );
 		return 0;
 	}
 	switch(tar->Type) {
@@ -1854,7 +1867,7 @@ int GameScript::OpenState(Scriptable* Sender, Trigger* parameters)
 		}
 		default:; //to remove a warning
 	}
-	printMessage("[GameScript]"," ",LIGHT_RED);	
+	printMessage("GameScript"," ",LIGHT_RED);	
 	printf("Not a door/container:%s\n", tar->GetScriptName());
 	return 0;
 }
@@ -1863,8 +1876,9 @@ int GameScript::IsLocked(Scriptable * Sender, Trigger *parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!tar) {
-		printMessage("[GameScript]"," ",LIGHT_RED);
-		printf("couldn't find door/container:%s\n", parameters->objectParameter? parameters->objectParameter->objectName:"<NULL>");
+		printMessage("GameScript"," ",LIGHT_RED);
+		printf("Couldn't find door/container:%s\n", parameters->objectParameter? parameters->objectParameter->objectName:"<NULL>");
+		printf("Sender: %s\n", Sender->GetScriptName() );
 		return 0;
 	}
 	switch(tar->Type) {
@@ -1880,7 +1894,7 @@ int GameScript::IsLocked(Scriptable * Sender, Trigger *parameters)
 		}
 		default:; //to remove a warning
 	}
-	printMessage("[GameScript]"," ",LIGHT_RED);	
+	printMessage("GameScript"," ",LIGHT_RED);	
 	printf("Not a door/container:%s\n", tar->GetScriptName());
 	return 0;
 }
@@ -2599,15 +2613,16 @@ int GameScript::AttackedBy(Scriptable* Sender, Trigger* parameters)
 	//iterate through targets to get the actor
 	if (tgts) {
 		targetlist::iterator m;
-		targettype *tt = tgts->GetFirstTarget(m);
+		const targettype *tt = tgts->GetFirstTarget(m, ST_ACTOR);
 		while (tt) {
-			if (tt->actor->LastTarget == scr->GetID()) {
-				if (!AStyle || (AStyle==tt->actor->GetAttackStyle()) ) {
+			Actor *actor = (Actor *) tt->actor;
+			if (actor->LastTarget == scr->GetID()) {
+				if (!AStyle || (AStyle==actor->GetAttackStyle()) ) {
 					ret = 1;
 					break;
 				}
 			}
-			tt = tgts->GetNextTarget(m);
+			tt = tgts->GetNextTarget(m, ST_ACTOR);
 		}
 	}
 	delete tgts;

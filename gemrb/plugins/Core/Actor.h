@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.94 2005/12/20 20:14:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.95 2005/12/25 10:31:39 avenger_teambg Exp $
  *
  */
 
@@ -111,7 +111,7 @@ public:
 	char      SoundFolder[33];
 	ieByte    QSlots[9];          //iwd2 specific
 	ieResRef  QuickSpells[3];
-	ieWord	  QuickWeaponSlots[4];
+	ieWord	  QuickWeaponSlots[8];//iwd2 uses 8, others use only 4
 	ieWord	  QuickItemSlots[4];
 public:
 	PCStatsStruct();

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.41 2005/12/22 23:29:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.42 2005/12/25 10:31:39 avenger_teambg Exp $
  *
  */
 
@@ -61,7 +61,10 @@ class Map;
 #define SLOT_QUIVER    512
 #define SLOT_CLOAK     1024
 #define SLOT_ITEM      2048  //quick item
-//
+#define SLOT_SCROLL    4096
+#define SLOT_BAG       8192
+#define SLOT_POTION    16384
+
 #define SLOT_INVENTORY 0x8000
 #define SLOT_ANY       -1
 
@@ -206,6 +209,7 @@ public:
 	void DropItemAtLocation(unsigned int slot, unsigned int flags, Map *map, Point &loc);
 	void DropItemAtLocation(const char *resref, unsigned int flags, Map *map, Point &loc);
 	void SetEquippedSlot(int slotcode);
+	int GetEquipped();
 	int GetEquippedSlot();
 	void AddSlotEffects( CREItem* slot );
 	//void AddAllEffects();

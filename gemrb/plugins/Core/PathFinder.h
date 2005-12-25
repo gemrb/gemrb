@@ -15,10 +15,13 @@
 
 //searchmap conversion bits
 
+#define PATH_MAP_IMPASSABLE 0
 #define PATH_MAP_PASSABLE 1   
 #define PATH_MAP_TRAVEL   2
 #define PATH_MAP_NO_SEE   4
 #define PATH_MAP_SIDEWALL 8
+#define PATH_MAP_DOOR_OPAQUE 16
+#define PATH_MAP_DOOR_TRANSPARENT 32
 
 struct PathNode {
 	PathNode* Parent;

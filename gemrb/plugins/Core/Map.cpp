@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.215 2005/12/21 16:53:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.216 2005/12/25 10:31:39 avenger_teambg Exp $
  *
  */
 
@@ -350,16 +350,16 @@ void Map::CreateMovement(char *command, const char *area, const char *entrance)
 	Game* game = core->GetGame();
 	Map* map = game->GetMap(area, false);
 	if (!map) {
-		printf("[Map] Invalid map: %s\n",area);
+		printMessage("Map", " ", LIGHT_RED);
+		printf("Invalid map: %s\n",area);
 		command[0]=0;
 		return;
 	}
 	Entrance* ent = map->GetEntrance( entrance );
 	int X,Y, face;
 	if (!ent) {
-		textcolor( YELLOW );
-		printf( "[Map] WARNING!!! %s EntryPoint does not Exists\n", entrance );
-		textcolor( WHITE );
+		printMessage("Map", " ", YELLOW);
+		printf( "WARNING!!! %s EntryPoint does not exists\n", entrance );
 		X = map->TMap->XCellCount * 64;
 		Y = map->TMap->YCellCount * 64;
 		face = -1;
@@ -1024,10 +1024,21 @@ void Map::PlayAreaSong(int SongType)
 	core->GetMusicMgr()->SwitchPlayList( poi, true );
 }
 
+int Map::GetBlocked(unsigned int x, unsigned int y)
+{
+	int block = SearchMap->GetPixelIndex( x, y );
+	if (block&PATH_MAP_DOOR_OPAQUE) {
+		return PATH_MAP_NO_SEE;
+	}
+	if (block&PATH_MAP_DOOR_TRANSPARENT) {
+		return PATH_MAP_IMPASSABLE;
+	}
+	return Passable[block&15];
+}
+
 int Map::GetBlocked(Point &c)
 {
-	int block = SearchMap->GetPixelIndex( c.x / 16, c.y / 12 );
-	return Passable[block];
+	return GetBlocked(c.x/16, c.y/12);
 }
 
 // flags: 0 - never dither (full cover)
@@ -1383,7 +1394,7 @@ void Map::SetupNode(unsigned int x, unsigned int y, unsigned int Cost)
 	if (MapSet[pos]) {
 		return;
 	}
-	if (!( Passable[SearchMap->GetPixelIndex( x, y )] & PATH_MAP_PASSABLE)) {
+	if (!( GetBlocked(x,y) & PATH_MAP_PASSABLE)) {
 		MapSet[pos] = 65535;
 		return;
 	}
@@ -1413,14 +1424,14 @@ void Map::AdjustPosition(Point &goal, unsigned int radius)
 
 		for (unsigned int scanx = minx; scanx < maxx; scanx++) {
 			if ((unsigned int) goal.y >= radius) {
-				if (Passable[SearchMap->GetPixelIndex( scanx, goal.y - radius )] & PATH_MAP_PASSABLE) {
+				if (GetBlocked( scanx, goal.y - radius ) & PATH_MAP_PASSABLE) {
 					goal.x = scanx;
 					goal.y -= radius;
 					return;
 				}
 			}
 			if (goal.y + radius < Height) {
-				if (Passable[SearchMap->GetPixelIndex( scanx, goal.y + radius )] & PATH_MAP_PASSABLE) {
+				if (GetBlocked( scanx, goal.y + radius ) & PATH_MAP_PASSABLE) {
 					goal.x = scanx;
 					goal.y += radius;
 					return;
@@ -1435,14 +1446,14 @@ void Map::AdjustPosition(Point &goal, unsigned int radius)
 			maxy = Height;
 		for (unsigned int scany = miny; scany < maxy; scany++) {
 			if ((unsigned int) goal.x >= radius) {
-				if (Passable[SearchMap->GetPixelIndex( goal.x - radius, scany )] & PATH_MAP_PASSABLE) {
+				if (GetBlocked( goal.x - radius, scany ) & PATH_MAP_PASSABLE) {
 					goal.x -= radius;
 					goal.y = scany;
 					return;
 				}
 			}
 			if (goal.x + radius < Width) {
-				if (Passable[SearchMap->GetPixelIndex( goal.x - radius, scany )] & PATH_MAP_PASSABLE) {
+				if (GetBlocked( goal.x - radius, scany ) & PATH_MAP_PASSABLE) {
 					goal.x += radius;
 					goal.y = scany;
 					return;
@@ -1476,7 +1487,7 @@ PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, int flags)
 	while (InternalStack.size())
 		InternalStack.pop();
 
-	if (!( Passable[SearchMap->GetPixelIndex( start.x, start.y )] & PATH_MAP_PASSABLE )) {
+	if (!( GetBlocked( start.x, start.y) & PATH_MAP_PASSABLE )) {
 		AdjustPosition( start );
 	}
 	unsigned int pos = ( start.x << 16 ) | start.y;
@@ -1567,10 +1578,10 @@ bool Map::TargetUnreachable(Point &s, Point &d)
 	while (InternalStack.size())
 		InternalStack.pop();
 
-	if (!( Passable[SearchMap->GetPixelIndex( goal.x, goal.y )] & PATH_MAP_PASSABLE )) {
+	if (!( GetBlocked( goal.x, goal.y ) & PATH_MAP_PASSABLE )) {
 		return true;
 	}
-	if (!( Passable[SearchMap->GetPixelIndex( start.x, start.y )] & PATH_MAP_PASSABLE )) {
+	if (!( GetBlocked( start.x, start.y ) & PATH_MAP_PASSABLE )) {
 		return true;
 	}
 
@@ -1638,7 +1649,7 @@ PathNode* Map::GetLine(Point &start, Point &dest, int Steps, int Orientation, in
 		StartNode->x = x;
 		StartNode->y = y;
 		StartNode->orient = Orientation;
-		bool wall = (!( Passable[SearchMap->GetPixelIndex( x, y )] & PATH_MAP_PASSABLE ));
+		bool wall = !( GetBlocked( x, y ) & PATH_MAP_PASSABLE );
 		if (wall) switch (flags) {
 			case GL_REBOUND:
 				Orientation = (Orientation + 8) &15;
@@ -1661,7 +1672,7 @@ PathNode* Map::FindPath(const Point &s, const Point &d, int MinDistance)
 	while (InternalStack.size())
 		InternalStack.pop();
 
-	if (!( Passable[SearchMap->GetPixelIndex( goal.x, goal.y )] & PATH_MAP_PASSABLE )) {
+	if (!( GetBlocked( goal.x, goal.y ) & PATH_MAP_PASSABLE )) {
 		AdjustPosition( goal );
 	}
 	unsigned int pos = ( goal.x << 16 ) | goal.y;
@@ -1778,12 +1789,12 @@ bool Map::IsVisible(Point &s, Point &d)
 		double elevationy = fabs((double)diffx ) / diffy;
 		if (sX > dX) {
 			for (int startx = sX; startx > dX; startx--) {
-				if (Passable[SearchMap->GetPixelIndex( startx, sY - ( int ) ( ( sX - startx ) / elevationy ) )] & PATH_MAP_NO_SEE)
+				if (GetBlocked( startx, sY - ( int ) ( ( sX - startx ) / elevationy ) ) & PATH_MAP_NO_SEE)
 					return false;
 			}
 		} else {
 			for (int startx = sX; startx < dX; startx++) {
-				if (Passable[SearchMap->GetPixelIndex( startx, sY + ( int ) ( ( sX - startx ) / elevationy ) )] & PATH_MAP_NO_SEE)
+				if (GetBlocked( startx, sY + ( int ) ( ( sX - startx ) / elevationy ) ) & PATH_MAP_NO_SEE)
 					return false;
 			}
 		}
@@ -1791,12 +1802,12 @@ bool Map::IsVisible(Point &s, Point &d)
 		double elevationx = fabs((double)diffy ) / diffx;
 		if (sY > dY) {
 			for (int starty = sY; starty > dY; starty--) {
-				if (Passable[SearchMap->GetPixelIndex( sX - ( int ) ( ( sY - starty ) / elevationx ), starty )] & PATH_MAP_NO_SEE)
+				if (GetBlocked( sX - ( int ) ( ( sY - starty ) / elevationx ), starty ) & PATH_MAP_NO_SEE)
 					return false;
 			}
 		} else {
 			for (int starty = sY; starty < dY; starty++) {
-				if (Passable[SearchMap->GetPixelIndex( sX + ( int ) ( ( sY - starty ) / elevationx ), starty )] & PATH_MAP_NO_SEE)
+				if (GetBlocked( sX + ( int ) ( ( sY - starty ) / elevationx ), starty ) & PATH_MAP_NO_SEE)
 					return false;
 			}
 		}
@@ -1809,8 +1820,9 @@ int Map::WhichEdge(Point &s)
 {
 	unsigned int sX=s.x/16;
 	unsigned int sY=s.y/12;
-	if (!(Passable[SearchMap->GetPixelIndex( sX, sY )]&PATH_MAP_TRAVEL)) {
-		printf("[Map] This isn't a travel region [%d.%d]?\n",sX, sY);
+	if (!(GetBlocked( sX, sY )&PATH_MAP_TRAVEL)) {
+		printMessage("Map"," ",YELLOW);
+		printf("This isn't a travel region [%d.%d]?\n",sX, sY);
 		return -1;
 	}
 	sX*=Height;
@@ -2111,8 +2123,8 @@ Container *Map::GetPile(Point &position)
 	char heapname[32];
 
 	//converting to search square
-	position.x/=16;
-	position.y/=12;
+	position.x=position.x/16;
+	position.y=position.y/12;
 	sprintf(heapname,"heap_%hd.%hd",position.x,position.y);
 	//pixel position is centered on search square
 	position.x=position.x*16+8;

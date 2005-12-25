@@ -55,8 +55,7 @@ def OnLoad():
 	GemRB.SetVar ("OtherPosition", 5) #Inactivating
 	GemRB.SetVar ("TopPosition", 5) #Inactivating
 
-	SetupActionsWindowControls (ActionsWindow)
-	SetupMenuWindowControls (OptionsWindow)
+	SetupMenuWindowControls (OptionsWindow, 1, "ReturnToGame")
 
 	GemRB.SetVisible(MessageWindow, 1)
 	GemRB.SetVisible(PortraitWindow, 1)

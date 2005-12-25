@@ -1,77 +1,77 @@
 2DA V1.0
 0
-           HELMET  ARMOR  SHIELD  GLOVES  RING  AMULET   BELT BOOTS  WEAPON  QUIVER  CLOAK  QUICK
-MISC       0       0      0       0       0     0        0    0      0       0       0      0
-AMULET     0       0      0       0       0     1        0    0      0       0       0      0
-ARMOR      0       1      0       0       0     0        0    0      0       0       0      0
-BELT       0       0      0       0       0     0        1    0      0       0       0      0
-BOOT       0       0      0       0       0     0        0    1      0       0       0      0
-ARROW      0       0      0       0       0     0        0    0      0       1       0      0
-BRACER     0       0      0       1       0     0        0    0      0       0       0      0
-HELMET     1       0      0       0       0     0        0    0      0       0       0      0
-KEY        0       0      0       0       0     0        0    0      0       0       0      0
-POTION     0       0      0       0       0     0        0    0      0       0       0      1
-RING       0       0      0       0       1     0        0    0      0       0       0      0
-SCROLL     0       0      0       0       0     0        0    0      0       0       0      1
-SHIELD     0       0      1       0       0     0        0    0      0       0       0      0
-FOOD       0       0      0       0       0     0        0    0      0       0       0      1
-BULLET     0       0      0       0       0     0        0    0      0       1       0      0
-BOW        0       0      0       0       0     0        0    0      1       0       0      0
-DAGGER     0       0      0       0       0     0        0    0      1       0       0      0
-MACE       0       0      0       0       0     0        0    0      1       0       0      0
-SLING      0       0      0       0       0     0        0    0      1       0       0      0
-SMSWORD    0       0      0       0       0     0        0    0      1       0       0      0
-BGSWORD    0       0      0       0       0     0        0    0      1       0       0      0
-HAMMER     0       0      0       0       0     0        0    0      1       0       0      0
-MSTAR      0       0      0       0       0     0        0    0      1       0       0      0
-FLAIL      0       0      0       0       0     0        0    0      1       0       0      0
-DART       0       0      0       0       0     0        0    0      1       0       0      0
-AXE        0       0      0       0       0     0        0    0      1       0       0      0
-STAFF      0       0      0       0       0     0        0    0      1       0       0      0
-XBOW       0       0      0       0       0     0        0    0      1       0       0      0
-FIST       0       0      0       0       0     0        0    0      1       0       0      0
-SPEAR      0       0      0       0       0     0        0    0      1       0       0      0
-POLEARM    0       0      0       0       0     0        0    0      1       0       0      0
-BOLT       0       0      0       0       0     0        0    0      1       0       0      0
-CLOAK      0       0      0       0       0     0        0    0      0       0       1      0
-COIN       0       0      0       0       0     0        0    0      0       0       0      0
-GEM        0       0      0       0       0     0        0    0      0       0       0      1
-WAND       0       0      0       0       0     0        0    0      0       0       0      1
-BROKEN1    0       0      0       0       0     0        0    0      0       0       0      0
-BROKEN2    0       0      0       0       0     0        0    0      0       0       0      0
-BROKEN3    0       0      0       0       0     0        0    0      0       0       0      0
-UNUSED1    0       0      0       0       0     0        0    0      0       0       0      0
-UNUSED2    0       0      0       0       0     0        0    0      0       0       0      0
-BUCKLER    0       0      0       0       0     0        0    0      0       0       0      0
-CANDLE     0       0      0       0       0     0        0    0      0       0       0      0
-UNUSED3    0       0      0       0       0     0        0    0      0       0       0      0
-CLUB       0       0      0       0       0     0        0    0      1       0       0      0
-UNUSED4    0       0      0       0       0     0        0    0      0       0       0      0
-UNUSED5    0       0      0       0       0     0        0    0      0       0       0      0
-LSHIELD    0       0      1       0       0     0        0    0      0       0       0      0
-UNUSED6    0       0      0       0       0     0        0    0      0       0       0      0
-MSHIELD    0       0      1       0       0     0        0    0      0       0       0      0
-NOTES      0       0      0       0       0     0        0    0      0       0       0      0
-UNUSED7    0       0      0       0       0     0        0    0      0       0       0      0
-UNUSED8    0       0      0       0       0     0        0    0      0       0       0      0
-SSHIELD    0       0      1       0       0     0        0    0      0       0       0      0
-UNUSED9    0       0      0       0       0     0        0    0      0       0       0      0
-TELESCOPE  0       0      0       0       0     0        0    0      0       0       0      0
-DRINK      0       0      0       0       0     0        0    0      0       0       0      1
-GTSWORD    0       0      0       0       0     0        0    0      1       0       0      0
-BAG        0       0      0       0       0     0        0    0      0       0       0      0
-FUR        0       0      0       0       0     0        0    0      0       0       0      0
-LARMOR     0       1      0       0       0     0        0    0      0       0       0      0
-SLARMOR    0       1      0       0       0     0        0    0      0       0       0      0
-CHARMOR    0       1      0       0       0     0        0    0      0       0       0      0
-SPARMOR    0       1      0       0       0     0        0    0      0       0       0      0
-HPARMOR    0       1      0       0       0     0        0    0      0       0       0      0
-FPARMOR    0       1      0       0       0     0        0    0      0       0       0      0
-HARMOR     0       1      0       0       0     0        0    0      0       0       0      0
-ROBE       0       1      0       0       0     0        0    0      0       0       0      0
-UNUSED10   0       0      0       0       0     0        0    0      0       0       0      0
-BTSWORD    0       0      0       0       0     0        0    0      1       0       0      0
-SCARF      1       0      0       0       0     0        0    0      0       0       0      0
-FOOD2      0       0      0       0       0     0        0    0      0       0       0      1
-HAT        1       0      0       0       0     0        0    0      0       0       0      0
-GAUNTLET   0       0      0       1       0     0        0    0      0       0       0      0
+           HELMET     ARMOR      SHIELD     GLOVES     RING       AMULET     BELT       BOOTS      WEAPON     QUIVER     CLOAK      QUICK      SCROLL     BAG        POTION     
+MISC       0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          
+AMULET     0          0          0          0          0          1          0          0          0          0          0          0          0          0          0          
+ARMOR      0          1          0          0          0          0          0          0          0          0          0          0          0          0          0          
+BELT       0          0          0          0          0          0          1          0          0          0          0          0          0          0          0          
+BOOT       0          0          0          0          0          0          0          1          0          0          0          0          0          0          0          
+ARROW      0          0          0          0          0          0          0          0          0          1          0          0          0          0          0          
+BRACER     0          0          0          1          0          0          0          0          0          0          0          0          0          0          0          
+HELMET     1          0          0          0          0          0          0          0          0          0          0          0          0          0          0          
+KEY        0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          
+POTION     0          0          0          0          0          0          0          0          0          0          0          1          0          0          1          
+RING       0          0          0          0          1          0          0          0          0          0          0          0          0          0          0          
+SCROLL     0          0          0          0          0          0          0          0          0          0          0          1          1          0          0          
+SHIELD     0          0          1          0          0          0          0          0          0          0          0          0          0          0          0          
+FOOD       0          0          0          0          0          0          0          0          0          0          0          1          0          0          0          
+BULLET     0          0          0          0          0          0          0          0          0          1          0          0          0          0          0          
+BOW        0          0          0          0          0          0          0          0          1          0          0          0          0          0          0          
+DAGGER     0          0          0          0          0          0          0          0          1          0          0          0          0          0          0          
+MACE       0          0          0          0          0          0          0          0          1          0          0          0          0          0          0          
+SLING      0          0          0          0          0          0          0          0          1          0          0          0          0          0          0          
+SMSWORD    0          0          0          0          0          0          0          0          1          0          0          0          0          0          0          
+BGSWORD    0          0          0          0          0          0          0          0          1          0          0          0          0          0          0          
+HAMMER     0          0          0          0          0          0          0          0          1          0          0          0          0          0          0          
+MSTAR      0          0          0          0          0          0          0          0          1          0          0          0          0          0          0          
+FLAIL      0          0          0          0          0          0          0          0          1          0          0          0          0          0          0          
+DART       0          0          0          0          0          0          0          0          1          0          0          0          0          0          0          
+AXE        0          0          0          0          0          0          0          0          1          0          0          0          0          0          0          
+STAFF      0          0          0          0          0          0          0          0          1          0          0          0          0          0          0          
+XBOW       0          0          0          0          0          0          0          0          1          0          0          0          0          0          0          
+FIST       0          0          0          0          0          0          0          0          1          0          0          0          0          0          0          
+SPEAR      0          0          0          0          0          0          0          0          1          0          0          0          0          0          0          
+POLEARM    0          0          0          0          0          0          0          0          1          0          0          0          0          0          0          
+BOLT       0          0          0          0          0          0          0          0          1          0          0          0          0          0          0          
+CLOAK      0          0          0          0          0          0          0          0          0          0          1          0          0          0          0          
+COIN       0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          
+GEM        0          0          0          0          0          0          0          0          0          0          0          1          0          0          0          
+WAND       0          0          0          0          0          0          0          0          0          0          0          1          0          0          0          
+BROKEN1    0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          
+BROKEN2    0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          
+BROKEN3    0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          
+UNUSED1    0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          
+UNUSED2    0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          
+BUCKLER    0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          
+CANDLE     0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          
+UNUSED3    0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          
+CLUB       0          0          0          0          0          0          0          0          1          0          0          0          0          0          0          
+UNUSED4    0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          
+UNUSED5    0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          
+LSHIELD    0          0          1          0          0          0          0          0          0          0          0          0          0          0          0          
+UNUSED6    0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          
+MSHIELD    0          0          1          0          0          0          0          0          0          0          0          0          0          0          0          
+NOTES      0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          
+UNUSED7    0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          
+UNUSED8    0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          
+SSHIELD    0          0          1          0          0          0          0          0          0          0          0          0          0          0          0          
+UNUSED9    0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          
+TELESCOPE  0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          
+DRINK      0          0          0          0          0          0          0          0          0          0          0          1          0          0          1          
+GTSWORD    0          0          0          0          0          0          0          0          1          0          0          0          0          0          0          
+BAG        0          0          0          0          0          0          0          0          0          0          0          0          0          1          0          
+FUR        0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          
+LARMOR     0          1          0          0          0          0          0          0          0          0          0          0          0          0          0          
+SLARMOR    0          1          0          0          0          0          0          0          0          0          0          0          0          0          0          
+CHARMOR    0          1          0          0          0          0          0          0          0          0          0          0          0          0          0          
+SPARMOR    0          1          0          0          0          0          0          0          0          0          0          0          0          0          0          
+HPARMOR    0          1          0          0          0          0          0          0          0          0          0          0          0          0          0          
+FPARMOR    0          1          0          0          0          0          0          0          0          0          0          0          0          0          0          
+HARMOR     0          1          0          0          0          0          0          0          0          0          0          0          0          0          0          
+ROBE       0          1          0          0          0          0          0          0          0          0          0          0          0          0          0          
+UNUSED10   0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          
+BTSWORD    0          0          0          0          0          0          0          0          1          0          0          0          0          0          0          
+SCARF      1          0          0          0          0          0          0          0          0          0          0          0          0          0          0          
+FOOD2      0          0          0          0          0          0          0          0          0          0          0          1          0          0          0          
+HAT        1          0          0          0          0          0          0          0          0          0          0          0          0          0          0          
+GAUNTLET   0          0          0          1          0          0          0          0          0          0          0          0          0          0          0          

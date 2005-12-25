@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.44 2005/12/21 22:58:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.45 2005/12/25 10:31:39 avenger_teambg Exp $
  *
  */
 
@@ -247,7 +247,7 @@ bool HasItemCore(Inventory *inventory, ieResRef itemname, ieDword flags)
 		if (!item)
 			continue;
 		bool ret = false;
-		if (item->ItemType==ITM_TYPE_BAG) {
+		if (core->CanUseItemType(item->ItemType,SLOT_BAG,0,0,NULL) ) {
 			//the store is the same as the item's name
 			ret = StoreHasItemCore(itemslot->ItemResRef, itemname);
 		}
@@ -401,13 +401,17 @@ static Targets* EvaluateObject(Scriptable* Sender, Object* oC)
 				break; //leaving the loop
 			}
 			targetlist::iterator m;
-			targettype *t = tgts->GetFirstTarget(m);
+			const targettype *t = tgts->GetFirstTarget(m, -1);
 			while (t) {
-				if (!func(t->actor, oC->objectFields[j] ) ) {
+				if (t->actor->Type!=ST_ACTOR) {
 					t = tgts->RemoveTargetAt(m);
-				} else {
-					t = tgts->GetNextTarget(m);
+					continue;
 				}
+				if (!func( (Actor *) (t->actor), oC->objectFields[j] ) ) {
+					t = tgts->RemoveTargetAt(m);
+					continue;
+				}
+				t = tgts->GetNextTarget(m, -1);
 			}
 		}
 		else {
@@ -419,7 +423,7 @@ static Targets* EvaluateObject(Scriptable* Sender, Object* oC)
 				Actor *ac=map->GetActor(i,true);
 				int dist = Distance(Sender->Pos, ac->Pos);
 				if (ac && func(ac, oC->objectFields[j]) ) {
-					tgts->AddTarget(ac, dist);
+					tgts->AddTarget((Scriptable *) ac, dist);
 				}
 			}
 		}
@@ -454,7 +458,8 @@ Targets* GetAllObjects(Scriptable* Sender, Object* oC)
 			tgts = func( Sender, tgts);
 		}
 		else {
-			printf("[GameScript]: Unknown object filter: %d %s\n",filterid, objectsTable->GetValue(filterid) );
+			printMessage("GameScript"," ", YELLOW);
+			printf("Unknown object filter: %d %s\n",filterid, objectsTable->GetValue(filterid) );
 		}
 		if (!tgts->Count()) {
 			delete tgts;
@@ -471,23 +476,23 @@ Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC)
 	}
 	Targets *tgts = GetAllObjects(Sender, oC);
 	if (tgts) {
-		Scriptable *object;
-		object= (Scriptable *) tgts->GetTarget(0);
+		//now this could return other than actor objects
+		Scriptable *object = tgts->GetTarget(0,-1);
 		delete tgts;
 		return object;
 	}
+
 	if (oC->objectName[0]) {
-		//It was not an actor... maybe it is a door?
 		Scriptable * aC = Sender->GetCurrentArea()->TMap->GetDoor( oC->objectName );
 		if (aC) {
 			return aC;
 		}
+
 		//No... it was not a door... maybe an InfoPoint?
 		aC = Sender->GetCurrentArea()->TMap->GetInfoPoint( oC->objectName );
 		if (aC) {
 			return aC;
 		}
-
 		//No... it was not an infopoint... maybe a Container?
 		aC = Sender->GetCurrentArea()->TMap->GetContainer( oC->objectName );
 		if (aC) {
@@ -919,13 +924,14 @@ bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
 
 	if (tgts) {
 		targetlist::iterator m;
-		targettype *tt = tgts->GetFirstTarget(m);
+		const targettype *tt = tgts->GetFirstTarget(m, ST_ACTOR);
 		while (tt) {
-			if (tt->actor->GetID() == actorID) {
+			Actor *actor = (Actor *) tt->actor;
+			if (actor->GetID() == actorID) {
 				ret = true;
 				break;
 			}
-			tt = tgts->GetNextTarget(m);
+			tt = tgts->GetNextTarget(m, ST_ACTOR);
 		}
 	}
 	delete tgts;
@@ -1682,4 +1688,187 @@ Targets *GetMyTarget(Scriptable *Sender, Actor *actor, Targets *parameters)
 		}
 	}
 	return parameters;
+}
+
+Targets *XthNearestDoor(Targets *parameters, unsigned int count)
+{
+	//get the origin
+	Scriptable *origin = parameters->GetTarget(0, -1);
+	parameters->Clear();
+	if (!origin) {
+		return parameters;
+	}
+	//get the doors based on it
+	Map *map = origin->GetCurrentArea();
+	unsigned int i = map->TMap->GetDoorCount();
+	if (count>i) {
+		return parameters;
+	}
+	while (i--) {
+		Door *door = map->TMap->GetDoor(i);
+		unsigned int dist = Distance(origin->Pos, door->Pos);
+		parameters->AddTarget(door, dist);
+	}
+
+	//now get the xth door
+	origin = parameters->GetTarget(count, ST_DOOR);
+	parameters->Clear();
+	if (!origin) {
+		return parameters;
+	}
+	parameters->AddTarget(origin, 0);
+	return parameters;
+}
+
+Targets *XthNearestOf(Targets *parameters, int count)
+{
+	Scriptable *origin;
+
+	if (count<0) {
+		const targettype *t = parameters->GetLastTarget(ST_ACTOR);
+		origin = t->actor;
+	} else {
+		origin = parameters->GetTarget(count, ST_ACTOR);
+	}
+	parameters->Clear();
+	if (!origin) {
+		return parameters;
+	}
+	parameters->AddTarget(origin, 0);
+	return parameters;
+}
+
+Targets *XthNearestMyGroupOfType(Scriptable *origin, Targets *parameters, unsigned int count)
+{
+	if (origin->Type != ST_ACTOR) {
+		parameters->Clear();
+		return parameters;
+	}
+
+	targetlist::iterator m;
+	const targettype *t = parameters->GetFirstTarget(m, ST_ACTOR);
+	if (!t) {
+		return parameters;
+	}
+	Actor *actor = (Actor *) origin;
+	//determining the allegiance of the origin
+	int type = 2; //neutral, has no enemies
+	if (actor->GetStat(IE_EA) <= EA_GOODCUTOFF) {
+		type = 0; //PC
+	}
+	if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+		type = 1;
+	}
+	if (type==2) {
+		parameters->Clear();
+		return parameters;
+	}
+
+	while ( t ) {
+		if (t->actor->Type!=ST_ACTOR) {
+			t=parameters->RemoveTargetAt(m);
+			continue;
+		}
+		Actor *actor = (Actor *) (t->actor);
+		if (type) { //origin is enemy, so we remove PC groups
+			if (actor->GetStat(IE_EA) <= EA_GOODCUTOFF) {
+				t=parameters->RemoveTargetAt(m);
+				continue;
+			}
+		}
+		else {
+			if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+				t=parameters->RemoveTargetAt(m);
+				continue;
+			}
+		}
+		t = parameters->GetNextTarget(m, ST_ACTOR);
+	}
+	return XthNearestOf(parameters,count);
+}
+
+Targets *XthNearestEnemyOfType(Scriptable *origin, Targets *parameters, unsigned int count)
+{
+	if (origin->Type != ST_ACTOR) {
+		parameters->Clear();
+		return parameters;
+	}
+
+	targetlist::iterator m;
+	const targettype *t = parameters->GetFirstTarget(m, ST_ACTOR);
+	if (!t) {
+		return parameters;
+	}
+	Actor *actor = (Actor *) origin;
+	//determining the allegiance of the origin
+	int type = 2; //neutral, has no enemies
+	if (actor->GetStat(IE_EA) <= EA_GOODCUTOFF) {
+		type = 1; //PC
+	}
+	if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+		type = 0;
+	}
+	if (type==2) {
+		parameters->Clear();
+		return parameters;
+	}
+
+	while ( t ) {
+		if (t->actor->Type!=ST_ACTOR) {
+			t=parameters->RemoveTargetAt(m);
+			continue;
+		}
+		Actor *actor = (Actor *) (t->actor);
+		if (type) { //origin is PC
+			if (actor->GetStat(IE_EA) <= EA_GOODCUTOFF) {
+				t=parameters->RemoveTargetAt(m);
+				continue;
+			}
+		} else {
+			if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+				t=parameters->RemoveTargetAt(m);
+				continue;
+			}
+		}
+		t = parameters->GetNextTarget(m, ST_ACTOR);
+	}
+	return XthNearestOf(parameters,count);
+}
+
+Targets *XthNearestEnemyOf(Targets *parameters, int count)
+{
+	Actor *origin = (Actor *) parameters->GetTarget(0, ST_ACTOR);
+	parameters->Clear();
+	if (!origin) {
+		return parameters;
+	}
+	//determining the allegiance of the origin
+	int type = 2; //neutral, has no enemies
+	if (origin->GetStat(IE_EA) <= EA_GOODCUTOFF) {
+		type = 1; //PC
+	}
+	if (origin->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+		type = 0;
+	}
+	if (type==2) {
+		return parameters;
+	}
+	Map *map = origin->GetCurrentArea();
+	int i = map->GetActorCount(true);
+	Actor *ac;
+	while (i--) {
+		ac=map->GetActor(i,true);
+		int distance = Distance(ac, origin);
+		if (type) { //origin is PC
+			if (ac->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+				parameters->AddTarget(ac, distance);
+			}
+		}
+		else {
+			if (ac->GetStat(IE_EA) <= EA_GOODCUTOFF) {
+				parameters->AddTarget(ac, distance);
+			}
+		}
+	}
+	return XthNearestOf(parameters,count);
 }

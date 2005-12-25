@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.345 2005/12/21 17:34:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.346 2005/12/25 10:31:39 avenger_teambg Exp $
  *
  */
 
@@ -288,6 +288,7 @@ static TriggerLink triggernames[] = {
 	{"reputation", GameScript::Reputation, 0},
 	{"reputationgt", GameScript::ReputationGT, 0},
 	{"reputationlt", GameScript::ReputationLT, 0},
+	{"school", GameScript::Kit, 0}, //is this the same?
 	{"see", GameScript::See, 0},
 	{"specifics", GameScript::Specifics, 0},
 	{"statecheck", GameScript::StateCheck, 0},
@@ -310,7 +311,8 @@ static TriggerLink triggernames[] = {
 	{"xor", GameScript::Xor,TF_MERGESTRINGS},
 	{"xp", GameScript::XP, 0},
 	{"xpgt", GameScript::XPGT, 0},
-	{"xplt", GameScript::XPLT, 0}, { NULL,NULL,0},
+	{"xplt", GameScript::XPLT, 0},
+	{ NULL,NULL,0}
 };
 
 //Make this an ordered list, so we could use bsearch!
@@ -743,17 +745,18 @@ static ActionLink actionnames[] = {
 	{"verbalconstant", GameScript::VerbalConstant, 0},
 	{"verbalconstanthead", GameScript::VerbalConstantHead, 0},
 	{"wait", GameScript::Wait, AF_BLOCKING},
-	{"waitanimation", GameScript::PlaySequenceTimed,AF_BLOCKING},//iwd2
+	{"waitanimation", GameScript::WaitAnimation,AF_BLOCKING},//iwd2
 	{"waitrandom", GameScript::WaitRandom, AF_BLOCKING},
 	{"weather", GameScript::Weather, 0},
 	{"xequipitem", GameScript::XEquipItem, 0},
- 	{ NULL,NULL, 0},
+ 	{ NULL,NULL, 0}
 };
 
 //Make this an ordered list, so we could use bsearch!
 static ObjectLink objectnames[] = {
 	{"bestac", GameScript::BestAC},
 	{"eighthnearest", GameScript::EighthNearest},
+	{"eighthnearestdoor", GameScript::EighthNearestDoor},
 	{"eighthnearestenemyof", GameScript::EighthNearestEnemyOf},
 	{"eighthnearestenemyoftype", GameScript::EighthNearestEnemyOfType},
 	{"eighthnearestmygroupoftype", GameScript::EighthNearestEnemyOfType},
@@ -761,11 +764,14 @@ static ObjectLink objectnames[] = {
 	{"eigthnearestenemyoftype", GameScript::EighthNearestEnemyOfType}, //bg2
 	{"eigthnearestmygroupoftype", GameScript::EighthNearestEnemyOfType},//bg2
 	{"farthest", GameScript::Farthest},
+	{"farthestenemyof", GameScript::FarthestEnemyOf},
 	{"fifthnearest", GameScript::FifthNearest},
+	{"fifthnearestdoor", GameScript::FifthNearestDoor},
 	{"fifthnearestenemyof", GameScript::FifthNearestEnemyOf},
 	{"fifthnearestenemyoftype", GameScript::FifthNearestEnemyOfType},
 	{"fifthnearestmygroupoftype", GameScript::FifthNearestEnemyOfType},
 	{"fourthnearest", GameScript::FourthNearest},
+	{"fourthnearestdoor", GameScript::FourthNearestDoor},
 	{"fourthnearestenemyof", GameScript::FourthNearestEnemyOf},
 	{"fourthnearestenemyoftype", GameScript::FourthNearestEnemyOfType},
 	{"fourthnearestmygroupoftype", GameScript::FourthNearestEnemyOfType},
@@ -785,11 +791,13 @@ static ObjectLink objectnames[] = {
 	{"myself", GameScript::Myself},
 	{"mytarget", GameScript::MyTarget},//see lasttargetedby(myself)
 	{"nearest", GameScript::Nearest}, //actually this seems broken in IE and resolve as Myself
+	{"nearestdoor", GameScript::NearestDoor},
 	{"nearestenemyof", GameScript::NearestEnemyOf},
 	{"nearestenemyoftype", GameScript::NearestEnemyOfType},
 	{"nearestmygroupoftype", GameScript::NearestMyGroupOfType},
 	{"nearestpc", GameScript::NearestPC},
 	{"ninthnearest", GameScript::NinthNearest},
+	{"ninthnearestdoor", GameScript::NinthNearestDoor},
 	{"ninthnearestenemyof", GameScript::NinthNearestEnemyOf},
 	{"ninthnearestenemyoftype", GameScript::NinthNearestEnemyOfType},
 	{"ninthnearestmygroupoftype", GameScript::NinthNearestMyGroupOfType},
@@ -813,31 +821,36 @@ static ObjectLink objectnames[] = {
 	{"protectedby", GameScript::ProtectedBy},
 	{"protagonist", GameScript::Protagonist},
 	{"secondnearest", GameScript::SecondNearest},
+	{"secondnearestdoor", GameScript::SecondNearestDoor},
 	{"secondnearestenemyof", GameScript::SecondNearestEnemyOf},
 	{"secondnearestenemyoftype", GameScript::SecondNearestEnemyOfType},
 	{"secondnearestmygroupoftype", GameScript::SecondNearestMyGroupOfType},
 	{"selectedcharacter", GameScript::SelectedCharacter},
 	{"seventhnearest", GameScript::SeventhNearest},
+	{"seventhnearestdoor", GameScript::SeventhNearestDoor},
 	{"seventhnearestenemyof", GameScript::SeventhNearestEnemyOf},
 	{"seventhnearestenemyoftype", GameScript::SeventhNearestEnemyOfType},
 	{"seventhnearestmygroupoftype", GameScript::SeventhNearestMyGroupOfType},
 	{"sixthnearest", GameScript::SixthNearest},
+	{"sixthnearestdoor", GameScript::SixthNearestDoor},
 	{"sixthnearestenemyof", GameScript::SixthNearestEnemyOf},
 	{"sixthnearestenemyoftype", GameScript::SixthNearestEnemyOfType},
 	{"sixthnearestmygroupoftype", GameScript::SixthNearestMyGroupOfType},
 	{"strongestof", GameScript::StrongestOf},
 	{"strongestofmale", GameScript::StrongestOfMale},
 	{"tenthnearest", GameScript::TenthNearest},
+	{"tenthnearestdoor", GameScript::TenthNearestDoor},
 	{"tenthnearestenemyof", GameScript::TenthNearestEnemyOf},
 	{"tenthnearestenemyoftype", GameScript::TenthNearestEnemyOfType},
 	{"tenthnearestmygroupoftype", GameScript::TenthNearestMyGroupOfType},
 	{"thirdnearest", GameScript::ThirdNearest},
+	{"thirdnearestdoor", GameScript::ThirdNearestDoor},
 	{"thirdnearestenemyof", GameScript::ThirdNearestEnemyOf},
 	{"thirdnearestenemyoftype", GameScript::ThirdNearestEnemyOfType},
 	{"thirdnearestmygroupoftype", GameScript::ThirdNearestMyGroupOfType},
 	{"weakestof", GameScript::WeakestOf},
 	{"worstac", GameScript::WorstAC},
-	{ NULL,NULL},
+	{ NULL,NULL}
 };
 
 static IDSLink idsnames[] = {
@@ -855,7 +868,7 @@ static IDSLink idsnames[] = {
 	{"specific", GameScript::ID_Specific},
 	{"subrace", GameScript::ID_Subrace},
 	{"team", GameScript::ID_Team},
-	{ NULL,NULL},
+	{ NULL,NULL}
 };
 
 static TriggerLink* FindTrigger(const char* triggername)
@@ -947,60 +960,79 @@ targettype *Targets::RemoveTargetAt(targetlist::iterator &m)
 	return NULL;
 }
 
-targettype *Targets::GetNextTarget(targetlist::iterator &m)
-{
-	m++;
-	if (m!=objects.end() ) {
-		return &(*m);
-	}
-	return NULL;
-}
-
-targettype *Targets::GetLastTarget()
+const targettype *Targets::GetLastTarget(int Type)
 {
 	targetlist::const_iterator m = objects.end();
-	if (m!=objects.begin() ) {
-		return (targettype *) &(*(--m));
+	while (m--!=objects.begin() ) {
+		if ( (Type==-1) || ((*m).actor->Type==Type) ) {
+			return &(*(m));
+		}
 	}
 	return NULL;
 }
 
-targettype *Targets::GetFirstTarget(targetlist::iterator &m)
+const targettype *Targets::GetFirstTarget(targetlist::iterator &m, int Type)
 {
-	m = objects.begin();
-	if (m!=objects.end() ) {
-		return &(*m);
+	m=objects.begin();
+	return GetNextTarget(m,Type);
+}
+
+const targettype *Targets::GetNextTarget(targetlist::iterator &m, int Type)
+{
+	while (m!=objects.end() ) {
+		if ( (Type==-1) || ((*m).actor->Type==Type) ) {
+			return &(*m++);
+		}
+		m++;
 	}
 	return NULL;
 }
 
-Actor *Targets::GetTarget(unsigned int index)
+Scriptable *Targets::GetTarget(unsigned int index, int Type)
 {
 	targetlist::iterator m = objects.begin();
 	while(m!=objects.end() ) {
-		if (!index) {
-			return (*m).actor;
+		if ( (Type==-1) || ((*m).actor->Type==Type)) {
+			if (!index) {
+				return (*m).actor;
+			}
+			index--;
 		}
-		index--;
+		m++;
 	}
 	return NULL;
 }
 
-void Targets::AddTarget(Actor* actor, unsigned int distance)
+//this stuff should be refined, dead actors are sometimes targetable by script?
+void Targets::AddTarget(Scriptable* target, unsigned int distance)
 {
-	//i don't know if unselectable actors are targetable by script
-	//if yes, then remove GA_SELECT
-	if (actor && actor->ValidTarget(GA_SELECT|GA_NO_DEAD) ) {
-		targettype Target = {actor, distance};
-		targetlist::iterator m;
-		for (m = objects.begin(); m != objects.end(); ++m) {
-			if ( (*m).distance>distance) {
-				objects.insert( m, Target);
-				return;
-			}
-		}
-		objects.push_back( Target );
+	if (!target) {
+		return;
 	}
+
+	switch (target->Type) {
+	case ST_ACTOR:
+		//i don't know if unselectable actors are targetable by script
+		//if yes, then remove GA_SELECT
+		if (!((Actor *) target)->ValidTarget(GA_SELECT|GA_NO_DEAD) ) {
+			return;
+		}
+	case ST_CONTAINER:
+		break;
+	case ST_DOOR:
+		break;
+	default:
+		return;
+	}
+	targettype Target = {target, distance};
+	targetlist::iterator m;
+	for (m = objects.begin(); m != objects.end(); ++m) {
+		if ( (*m).distance>distance) {
+			objects.insert( m, Target);
+			return;
+		}
+	}
+	objects.push_back( Target );
 }
 
 void Targets::Clear()
@@ -1557,6 +1589,56 @@ Targets *GameScript::Myself(Scriptable* Sender, Targets* parameters)
 	return parameters;
 }
 
+Targets *GameScript::NearestDoor(Scriptable* /*Sender*/, Targets *parameters)
+{
+	return XthNearestDoor(parameters, 0);
+}
+
+Targets *GameScript::SecondNearestDoor(Scriptable* /*Sender*/, Targets *parameters)
+{
+	return XthNearestDoor(parameters, 1);
+}
+
+Targets *GameScript::ThirdNearestDoor(Scriptable* /*Sender*/, Targets *parameters)
+{
+	return XthNearestDoor(parameters, 2);
+}
+
+Targets *GameScript::FourthNearestDoor(Scriptable* /*Sender*/, Targets *parameters)
+{
+	return XthNearestDoor(parameters, 3);
+}
+
+Targets *GameScript::FifthNearestDoor(Scriptable* /*Sender*/, Targets *parameters)
+{
+	return XthNearestDoor(parameters, 4);
+}
+
+Targets *GameScript::SixthNearestDoor(Scriptable* /*Sender*/, Targets *parameters)
+{
+	return XthNearestDoor(parameters, 5);
+}
+
+Targets *GameScript::SeventhNearestDoor(Scriptable* /*Sender*/, Targets *parameters)
+{
+	return XthNearestDoor(parameters, 6);
+}
+
+Targets *GameScript::EighthNearestDoor(Scriptable* /*Sender*/, Targets *parameters)
+{
+	return XthNearestDoor(parameters, 7);
+}
+
+Targets *GameScript::NinthNearestDoor(Scriptable* /*Sender*/, Targets *parameters)
+{
+	return XthNearestDoor(parameters, 8);
+}
+
+Targets *GameScript::TenthNearestDoor(Scriptable* /*Sender*/, Targets *parameters)
+{
+	return XthNearestDoor(parameters, 9);
+}
+
 //same as player1 so far
 Targets *GameScript::Protagonist(Scriptable* /*Sender*/, Targets *parameters)
 {
@@ -1588,7 +1670,7 @@ Targets *GameScript::LastTrigger(Scriptable *Sender, Targets *parameters)
 
 Targets *GameScript::LastSeenBy(Scriptable *Sender, Targets *parameters)
 {
-	Actor *actor = parameters->GetTarget(0);
+	Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
 			actor = (Actor *) Sender;
@@ -1606,7 +1688,7 @@ Targets *GameScript::LastSeenBy(Scriptable *Sender, Targets *parameters)
 
 Targets *GameScript::LastHelp(Scriptable *Sender, Targets *parameters)
 {
-	Actor *actor = parameters->GetTarget(0);
+	Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
 			actor = (Actor *) Sender;
@@ -1624,7 +1706,7 @@ Targets *GameScript::LastHelp(Scriptable *Sender, Targets *parameters)
 
 Targets *GameScript::LastHeardBy(Scriptable *Sender, Targets *parameters)
 {
-	Actor *actor = parameters->GetTarget(0);
+	Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
 			actor = (Actor *) Sender;
@@ -1643,7 +1725,7 @@ Targets *GameScript::LastHeardBy(Scriptable *Sender, Targets *parameters)
 /*this one is tough*/
 Targets *GameScript::ProtectorOf(Scriptable *Sender, Targets *parameters)
 {
-	Actor *actor = parameters->GetTarget(0);
+	Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
 			actor = (Actor *) Sender;
@@ -1661,7 +1743,7 @@ Targets *GameScript::ProtectorOf(Scriptable *Sender, Targets *parameters)
 
 Targets *GameScript::ProtectedBy(Scriptable *Sender, Targets *parameters)
 {
-	Actor *actor = parameters->GetTarget(0);
+	Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
 			actor = (Actor *) Sender;
@@ -1679,7 +1761,7 @@ Targets *GameScript::ProtectedBy(Scriptable *Sender, Targets *parameters)
 
 Targets *GameScript::LastCommandedBy(Scriptable *Sender, Targets *parameters)
 {
-	Actor *actor = parameters->GetTarget(0);
+	Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
 			actor = (Actor *) Sender;
@@ -1704,7 +1786,7 @@ Targets *GameScript::MyTarget(Scriptable *Sender, Targets *parameters)
 
 Targets *GameScript::LastTargetedBy(Scriptable *Sender, Targets *parameters)
 {
-	Actor *actor = parameters->GetTarget(0);
+	Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	return GetMyTarget(Sender, actor, parameters);
 }
 
@@ -1728,7 +1810,7 @@ Targets *GetMyTarget(Actor *actor, Targets *parameters)
 */
 Targets *GameScript::LastAttackerOf(Scriptable *Sender, Targets *parameters)
 {
-	Actor *actor = parameters->GetTarget(0);
+	Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
 			actor = (Actor *) Sender;
@@ -1746,7 +1828,7 @@ Targets *GameScript::LastAttackerOf(Scriptable *Sender, Targets *parameters)
 
 Targets *GameScript::LastHitter(Scriptable *Sender, Targets *parameters)
 {
-	Actor *actor = parameters->GetTarget(0);
+	Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
 			actor = (Actor *) Sender;
@@ -1764,7 +1846,7 @@ Targets *GameScript::LastHitter(Scriptable *Sender, Targets *parameters)
 
 Targets *GameScript::LastTalkedToBy(Scriptable *Sender, Targets *parameters)
 {
-	Actor *actor = parameters->GetTarget(0);
+	Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
 			actor = (Actor *) Sender;
@@ -1782,7 +1864,7 @@ Targets *GameScript::LastTalkedToBy(Scriptable *Sender, Targets *parameters)
 
 Targets *GameScript::LastSummonerOf(Scriptable* Sender, Targets *parameters)
 {
-	Actor *actor = parameters->GetTarget(0);
+	Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
 			actor = (Actor *) Sender;
@@ -1913,23 +1995,25 @@ Targets *GameScript::Player8Fill(Scriptable* /*Sender*/, Targets *parameters)
 Targets *GameScript::BestAC(Scriptable* /*Sender*/, Targets *parameters)
 {
 	targetlist::iterator m;
-	targettype *t = parameters->GetFirstTarget(m);
+	const targettype *t = parameters->GetFirstTarget(m, ST_ACTOR);
 	if (!t) {
 		return parameters;
 	}
-	Actor *actor=t->actor;
+	Scriptable *scr=t->actor;
+	Actor *actor=(Actor *) scr;
 	int bestac=actor->GetStat(IE_ARMORCLASS);
 	// assignment in while
-	while ( (t = parameters->GetNextTarget(m) ) ) {
-		int ac=t->actor->GetStat(IE_ARMORCLASS);
+	while ( (t = parameters->GetNextTarget(m, ST_ACTOR) ) ) {
+		actor = (Actor *) t->actor;
+		int ac=actor->GetStat(IE_ARMORCLASS);
 		if (bestac<ac) {
 			bestac=ac;
-			actor=t->actor;
+			scr=t->actor;
 		}
 	}
 
 	parameters->Clear();
-	parameters->AddTarget(actor, 0);
+	parameters->AddTarget(scr, 0);
 	return parameters;
 }
 
@@ -1937,25 +2021,26 @@ Targets *GameScript::BestAC(Scriptable* /*Sender*/, Targets *parameters)
 Targets *GameScript::StrongestOfMale(Scriptable* /*Sender*/, Targets *parameters)
 {
 	targetlist::iterator m;
-	targettype *t = parameters->GetFirstTarget(m);
+	const targettype *t = parameters->GetFirstTarget(m, ST_ACTOR);
 	if (!t) {
 		return parameters;
 	}
 	int pos=-1;
 	int worsthp=-1;
-	Actor *actor = NULL;
+	Scriptable *scr = NULL;
 	//assignment intentional
-	while ( (t = parameters->GetNextTarget(m) ) ) {
-		if (t->actor->GetStat(IE_SEX)!=1) continue;
-		int hp=t->actor->GetStat(IE_HITPOINTS);
+	while ( (t = parameters->GetNextTarget(m, ST_ACTOR) ) ) {
+		Actor *actor = (Actor *) t->actor;
+		if (actor->GetStat(IE_SEX)!=1) continue;
+		int hp=actor->GetStat(IE_HITPOINTS);
 		if ((pos==-1) || (worsthp<hp)) {
 			worsthp=hp;
-			actor=t->actor;
+			scr=t->actor;
 		}
 	}
 	parameters->Clear();
-	if (actor) {
-		parameters->AddTarget(actor, 0);
+	if (scr) {
+		parameters->AddTarget(scr, 0);
 	}
 	return parameters;
 }
@@ -1963,257 +2048,135 @@ Targets *GameScript::StrongestOfMale(Scriptable* /*Sender*/, Targets *parameters
 Targets *GameScript::StrongestOf(Scriptable* /*Sender*/, Targets *parameters)
 {
 	targetlist::iterator m;
-	targettype *t = parameters->GetFirstTarget(m);
+	const targettype *t = parameters->GetFirstTarget(m, ST_ACTOR);
 	if (!t) {
 		return parameters;
 	}
-	Actor *actor=t->actor;
+	Scriptable *scr=t->actor;
+	Actor *actor=(Actor *) scr;
 	int besthp=actor->GetStat(IE_HITPOINTS);
 	// assignment in while
-	while ( (t = parameters->GetNextTarget(m) ) ) {
-		int hp=t->actor->GetStat(IE_HITPOINTS);
+	while ( (t = parameters->GetNextTarget(m, ST_ACTOR) ) ) {
+		actor = (Actor *) t->actor;
+		int hp=actor->GetStat(IE_HITPOINTS);
 		if (besthp<hp) {
 			besthp=hp;
-			actor=t->actor;
+			scr=t->actor;
 		}
 	}
 	parameters->Clear();
-	parameters->AddTarget(actor, 0);
+	parameters->AddTarget(scr, 0);
 	return parameters;
 }
 
 Targets *GameScript::WeakestOf(Scriptable* /*Sender*/, Targets *parameters)
 {
 	targetlist::iterator m;
-	targettype *t = parameters->GetFirstTarget(m);
+	const targettype *t = parameters->GetFirstTarget(m, ST_ACTOR);
 	if (!t) {
 		return parameters;
 	}
-	Actor *actor=t->actor;
+	Scriptable *scr=t->actor;
+	Actor *actor=(Actor *) scr;
 	int worsthp=actor->GetStat(IE_HITPOINTS);
 	// assignment in while
-	while ( (t = parameters->GetNextTarget(m) ) ) {
-		int hp=t->actor->GetStat(IE_HITPOINTS);
+	while ( (t = parameters->GetNextTarget(m, ST_ACTOR) ) ) {
+		actor = (Actor *) t->actor;
+		int hp=actor->GetStat(IE_HITPOINTS);
 		if (worsthp>hp) {
 			worsthp=hp;
-			actor=t->actor;
+			scr=t->actor;
 		}
 	}
 	parameters->Clear();
-	parameters->AddTarget(actor, 0);
+	parameters->AddTarget(scr, 0);
 	return parameters;
 }
 
 Targets *GameScript::WorstAC(Scriptable* /*Sender*/, Targets *parameters)
 {
 	targetlist::iterator m;
-	targettype *t = parameters->GetFirstTarget(m);
+	const targettype *t = parameters->GetFirstTarget(m, ST_ACTOR);
 	if (!t) {
 		return parameters;
 	}
-	Actor *actor=t->actor;
+	Scriptable *scr=t->actor;
+	Actor *actor=(Actor *) scr;
 	int worstac=actor->GetStat(IE_ARMORCLASS);
 	// assignment in while
-	while ( (t = parameters->GetNextTarget(m) ) ) {
-		int ac=t->actor->GetStat(IE_ARMORCLASS);
+	while ( (t = parameters->GetNextTarget(m, ST_ACTOR) ) ) {
+		actor = (Actor *) t->actor;
+		int ac=actor->GetStat(IE_ARMORCLASS);
 		if (worstac>ac) {
 			worstac=ac;
-			actor=t->actor;
+			scr=t->actor;
 		}
 	}
 	parameters->Clear();
-	parameters->AddTarget(actor, 0);
+	parameters->AddTarget(scr, 0);
 	return parameters;
 }
 
 Targets *GameScript::MostDamagedOf(Scriptable* /*Sender*/, Targets *parameters)
 {
 	targetlist::iterator m;
-	targettype *t = parameters->GetFirstTarget(m);
+	const targettype *t = parameters->GetFirstTarget(m, ST_ACTOR);
 	if (!t) {
 		return parameters;
 	}
-	Actor *actor=t->actor;
+	Scriptable *scr = t->actor;
+	Actor *actor=(Actor *) scr;
 	int worsthp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetStat(IE_HITPOINTS);
 	// assignment in while
-	while ( (t = parameters->GetNextTarget(m) ) ) {
-		int hp=t->actor->GetStat(IE_MAXHITPOINTS)-t->actor->GetStat(IE_HITPOINTS);
+	while ( (t = parameters->GetNextTarget(m, ST_ACTOR) ) ) {
+		actor = (Actor *) t->actor;
+		int hp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetStat(IE_HITPOINTS);
 		if (worsthp>hp) {
 			worsthp=hp;
-			actor=t->actor;
+			scr=t->actor;
 		}
 	}
 	parameters->Clear();
-	parameters->AddTarget(actor, 0);
+	parameters->AddTarget(scr, 0);
 	return parameters;
 }
 Targets *GameScript::LeastDamagedOf(Scriptable* /*Sender*/, Targets *parameters)
 {
 	targetlist::iterator m;
-	targettype *t = parameters->GetFirstTarget(m);
+	const targettype *t = parameters->GetFirstTarget(m, ST_ACTOR);
 	if (!t) {
 		return parameters;
 	}
-	Actor *actor=t->actor;
+	Scriptable *scr = t->actor;
+	Actor *actor = (Actor *) scr;
 	int besthp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetStat(IE_HITPOINTS);
 	// assignment in while
-	while ( (t = parameters->GetNextTarget(m) ) ) {
-		int hp=t->actor->GetStat(IE_MAXHITPOINTS)-t->actor->GetStat(IE_HITPOINTS);
+	while ( (t = parameters->GetNextTarget(m, ST_ACTOR) ) ) {
+		actor = (Actor *) t->actor;
+		int hp=actor->GetStat(IE_MAXHITPOINTS)-actor->GetStat(IE_HITPOINTS);
 		if (besthp<hp) {
 			besthp=hp;
-			actor=t->actor;
+			scr=t->actor;
 		}
 	}
 	parameters->Clear();
-	parameters->AddTarget(actor, 0);
+	parameters->AddTarget(scr, 0);
 	return parameters;
-}
-
-Targets *GameScript::XthNearestOf(Targets *parameters, int count)
-{
-	Actor *origin = parameters->GetTarget(count);
-	parameters->Clear();
-	if (!origin) {
-		return parameters;
-	}
-	parameters->AddTarget(origin, 0);
-	return parameters;
-}
-
-Targets *GameScript::XthNearestMyGroupOfType(Scriptable *origin, Targets *parameters, int count)
-{
-	if (origin->Type != ST_ACTOR) {
-		parameters->Clear();
-		return parameters;
-	}
-
-	targetlist::iterator m;
-	targettype *t = parameters->GetFirstTarget(m);
-	if (!t) {
-		return parameters;
-	}
-	Actor *actor = (Actor *) origin;
-	//determining the allegiance of the origin
-	int type = 2; //neutral, has no enemies
-	if (actor->GetStat(IE_EA) <= EA_GOODCUTOFF) {
-		type = 0; //PC
-	}
-	if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
-		type = 1;
-	}
-	if (type==2) {
-		parameters->Clear();
-		return parameters;
-	}
-
-	while ( t ) {
-		if (type) { //origin is enemy, so we remove PC groups
-			if (t->actor->GetStat(IE_EA) <= EA_GOODCUTOFF) {
-				t=parameters->RemoveTargetAt(m);
-				continue;
-			}
-		}
-		else {
-			if (t->actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
-				t=parameters->RemoveTargetAt(m);
-				continue;
-			}
-		}
-		t = parameters->GetNextTarget(m);
-	}
-	return XthNearestOf(parameters,count);
-}
-
-Targets *GameScript::XthNearestEnemyOfType(Scriptable *origin, Targets *parameters, int count)
-{
-	if (origin->Type != ST_ACTOR) {
-		parameters->Clear();
-		return parameters;
-	}
-
-	targetlist::iterator m;
-	targettype *t = parameters->GetFirstTarget(m);
-	if (!t) {
-		return parameters;
-	}
-	Actor *actor = (Actor *) origin;
-	//determining the allegiance of the origin
-	int type = 2; //neutral, has no enemies
-	if (actor->GetStat(IE_EA) <= EA_GOODCUTOFF) {
-		type = 1; //PC
-	}
-	if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
-		type = 0;
-	}
-	if (type==2) {
-		parameters->Clear();
-		return parameters;
-	}
-
-	while ( t ) {
-		if (type) { //origin is PC
-			if (t->actor->GetStat(IE_EA) <= EA_GOODCUTOFF) {
-				t=parameters->RemoveTargetAt(m);
-				continue;
-			}
-		}
-		else {
-			if (t->actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
-				t=parameters->RemoveTargetAt(m);
-				continue;
-			}
-		}
-		t = parameters->GetNextTarget(m);
-	}
-	return XthNearestOf(parameters,count);
-}
-
-Targets *GameScript::XthNearestEnemyOf(Targets *parameters, int count)
-{
-	Actor *origin = parameters->GetTarget(0);
-	parameters->Clear();
-	if (!origin) {
-		return parameters;
-	}
-	//determining the allegiance of the origin
-	int type = 2; //neutral, has no enemies
-	if (origin->GetStat(IE_EA) <= EA_GOODCUTOFF) {
-		type = 1; //PC
-	}
-	if (origin->GetStat(IE_EA) >= EA_EVILCUTOFF) {
-		type = 0;
-	}
-	if (type==2) {
-		return parameters;
-	}
-	Map *map = origin->GetCurrentArea();
-	int i = map->GetActorCount(true);
-	Actor *ac;
-	while (i--) {
-		ac=map->GetActor(i,true);
-		int distance = Distance(ac, origin);
-		if (type) { //origin is PC
-			if (ac->GetStat(IE_EA) >= EA_EVILCUTOFF) {
-				parameters->AddTarget(ac, distance);
-			}
-		}
-		else {
-			if (ac->GetStat(IE_EA) <= EA_GOODCUTOFF) {
-				parameters->AddTarget(ac, distance);
-			}
-		}
-	}
-	return XthNearestOf(parameters,count);
 }
 
 Targets *GameScript::Farthest(Scriptable* /*Sender*/, Targets *parameters)
 {
-	targettype *t = parameters->GetLastTarget();
+	const targettype *t = parameters->GetLastTarget(ST_ACTOR);
 	parameters->Clear();
 	if (t) {
 		parameters->AddTarget(t->actor, 0);
 	}
 	return parameters;
+}
+
+Targets *GameScript::FarthestEnemyOf(Scriptable* /*Sender*/, Targets *parameters)
+{
+	return XthNearestEnemyOf(parameters, -1);
 }
 
 Targets *GameScript::NearestEnemyOf(Scriptable* /*Sender*/, Targets *parameters)

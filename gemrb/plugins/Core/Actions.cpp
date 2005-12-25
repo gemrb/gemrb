@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.54 2005/12/21 16:53:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.55 2005/12/25 10:31:39 avenger_teambg Exp $
  *
  */
 
@@ -1396,7 +1396,6 @@ void GameScript::StaticPalette(Scriptable* Sender, Action* parameters)
 }
 
 //this is a special case of PlaySequence (with wait time, not for area anims)
-//waitanimation of iwd2 also uses it
 void GameScript::PlaySequenceTimed(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar;
@@ -1412,6 +1411,22 @@ void GameScript::PlaySequenceTimed(Scriptable* Sender, Action* parameters)
 	actor->SetStance( parameters->int0Parameter );
 	int delay = parameters->int1Parameter || 1;
 	actor->SetWait( delay );
+}
+
+//waitanimation: waiting while animation of target is of a certain type
+void GameScript::WaitAnimation(Scriptable* Sender, Action* parameters)
+{
+	Scriptable *tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (tar->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) tar;
+	if (actor->GetStance()!=parameters->int0Parameter) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	Sender->AddActionInFront( Sender->CurrentAction );
+	Sender->ReleaseCurrentAction();
 }
 
 // PlaySequence without object parameter defaults to Sender

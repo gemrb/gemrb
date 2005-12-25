@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.21 2005/10/20 23:13:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.22 2005/12/25 10:31:39 avenger_teambg Exp $
  *
  */
 
@@ -69,11 +69,6 @@
 #define IE_ITEM_RECHARGE     0x800
 #define IE_ITEM_IGNORESHIELD 0x10000
 #define IE_ITEM_KEEN	 0x20000
-
-//special itemtypes
-#define ITM_TYPE_POTION      9
-#define ITM_TYPE_SCROLL      11
-#define ITM_TYPE_BAG         50
 
 /**
  * @class ITMExtHeader
@@ -197,9 +192,9 @@ public:
 		return ItemDescIdentified;
 	}
 
-	ITMExtHeader *GetExtHeader(int which)
+	ITMExtHeader *GetExtHeader(unsigned int which)
 	{
-		if(ExtHeaderCount>=which) {
+		if(ExtHeaderCount<=which) {
 			return NULL;
 		}
 		return ext_headers+which;

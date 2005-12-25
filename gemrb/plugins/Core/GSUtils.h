@@ -72,6 +72,12 @@ void GoNearAndRetry(Scriptable *Sender, Point &p);
 #define GREATER_THAN 3
 int DiffCore(ieDword a, ieDword b, int diffmode);
 Targets *GetMyTarget(Scriptable *Sender, Actor *actor, Targets *parameters);
+Targets *XthNearestOf(Targets *parameters, int count);
+Targets *XthNearestDoor(Targets *parameters, unsigned int count);
+Targets *XthNearestEnemyOf(Targets *parameters, int count);
+Targets *XthNearestEnemyOfType(Scriptable *origin, Targets *parameters, unsigned int count);
+Targets *XthNearestMyGroupOfType(Scriptable *origin, Targets *parameters, unsigned int count);
+
 void FreeSrc(SrcVector *poi, const ieResRef key);
 SrcVector *LoadSrc(const ieResRef resname);
 Action *ParamCopy(Action *parameters);
@@ -91,7 +97,7 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 
 inline int Bones(ieDword value)
 {
-        return core->Roll((value&0xf000)>>12, (value&0xff0)>>8, value&15);
+	return core->Roll((value&0xf000)>>12, (value&0xff0)>>8, value&15);
 }
 
 #endif

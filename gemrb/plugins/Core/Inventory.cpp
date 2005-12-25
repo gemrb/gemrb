@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.63 2005/12/22 23:29:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.64 2005/12/25 10:31:39 avenger_teambg Exp $
  *
  */
 
@@ -601,19 +601,30 @@ int Inventory::GetWeaponSlot()
 	return SLOT_MELEE;
 }
 
+int Inventory::GetEquipped()
+{
+	return Equipped;
+}
+
 int Inventory::GetEquippedSlot()
 {
-	if (Equipped==IW_NO_EQUIPPED) return SLOT_FIST;
+	if (Equipped==IW_NO_EQUIPPED) {
+		return SLOT_FIST;
+	}
 	return Equipped+SLOT_MELEE;
 }
 
 void Inventory::SetEquippedSlot(int slotcode)
 {
-	if (slotcode == SLOT_FIST || HasItemInSlot("",slotcode+SLOT_WEAPON)) {
-		Equipped = 1000;
-	} else {
-		Equipped = slotcode;
+	if (slotcode == IW_NO_EQUIPPED) {
+		Equipped = IW_NO_EQUIPPED;
+		return;
 	}
+	if (HasItemInSlot("",slotcode+SLOT_MELEE)) {
+		Equipped = IW_NO_EQUIPPED;
+		return;
+	}
+	Equipped = slotcode;
 }
 
 CREItem *Inventory::GetUsedWeapon()
@@ -621,9 +632,11 @@ CREItem *Inventory::GetUsedWeapon()
 	CREItem *ret;
 	int slot;
 
-	ret = GetSlotItem(SLOT_MAGIC);
-	if (ret && ret->ItemResRef[0]) {
-		return ret;
+	if (SLOT_MAGIC!=-1) {
+		ret = GetSlotItem(SLOT_MAGIC);
+		if (ret && ret->ItemResRef[0]) {
+			return ret;
+		}
 	}
 	slot = GetEquippedSlot();
 	return GetSlotItem(slot);

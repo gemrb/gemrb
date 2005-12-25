@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.97 2005/12/12 18:39:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.98 2005/12/25 10:31:39 avenger_teambg Exp $
  *
  */
 
@@ -60,8 +60,8 @@ class Wall_Polygon;
 
 //area animation flags
 #define A_ANI_ACTIVE          1        //if not set, animation is invisible
-#define A_ANI_NO_SHADOW       2        //lightmap doesn't affect it
-#define A_ANI_BLEND           4        //blend
+#define A_ANI_BLEND           2        //blend
+#define A_ANI_NO_SHADOW       4        //lightmap doesn't affect it
 #define A_ANI_PLAYONCE        8        //stop after endframe
 #define A_ANI_SYNC            16       //synchronised draw (skip frames if needed)
 #define A_ANI_32              32
@@ -234,6 +234,7 @@ public:
 			  unsigned int width, unsigned int height, int flag);
 	void Shout(Actor* actor, int shoutID, unsigned int radius);
 	void AddActor(Actor* actor);
+	int GetBlocked(unsigned int x, unsigned int y);
 	int GetBlocked(Point &p);
 	Actor* GetActorByGlobalID(ieDword objectID);
 	Actor* GetActor(Point &p, int flags);

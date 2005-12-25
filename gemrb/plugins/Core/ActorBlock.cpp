@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.127 2005/12/19 23:10:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.128 2005/12/25 10:31:39 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -792,12 +792,12 @@ void Door::UpdateDoor()
 	int oidx, cidx;
 	int oval, cval;
 
-	oval = 1; //passable searchmap entry
+	oval = PATH_MAP_IMPASSABLE; 
 	if (Flags & DOOR_TRANSPARENT) {
-		cval = 8; //transparent door searchmap entry
+		cval = PATH_MAP_DOOR_TRANSPARENT;
 	}
 	else {
-		cval = 0; //opaque door searchmap entry
+		cval = PATH_MAP_DOOR_OPAQUE;
 	}
 	if (Flags &DOOR_OPEN) {
 		oidx=cval;
@@ -809,10 +809,12 @@ void Door::UpdateDoor()
 	}
 
 	for(i=0;i<oibcount;i++) {
-		area->SearchMap->SetPixelIndex( open_ib[i].x, open_ib[i].y, oidx );
+		ieByte tmp = area->SearchMap->GetPixelIndex( open_ib[i].x, open_ib[i].y ) & 15;
+		area->SearchMap->SetPixelIndex( open_ib[i].x, open_ib[i].y, tmp|oidx );
 	}
 	for(i=0;i<cibcount;i++) {
-		area->SearchMap->SetPixelIndex( closed_ib[i].x, closed_ib[i].y, cidx );
+		ieByte tmp = area->SearchMap->GetPixelIndex( closed_ib[i].x, closed_ib[i].y ) & 15;
+		area->SearchMap->SetPixelIndex( closed_ib[i].x, closed_ib[i].y, tmp|cidx );
 	}
 	InfoPoint *ip=area->TMap->GetInfoPoint(LinkedInfo);
 	if (ip) {
