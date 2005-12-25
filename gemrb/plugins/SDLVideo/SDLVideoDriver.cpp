@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.121 2005/12/25 12:52:20 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.122 2005/12/25 13:22:19 wjpalenstijn Exp $
  *
  */
 
@@ -1080,7 +1080,7 @@ void SDLVideoDriver::BlitSpriteNoShadow(Sprite2D* spr, int x, int y,
 	}
 }
 
-
+// TODO: properly mix translucent shadow and alpha tint/palette
 void SDLVideoDriver::BlitSpriteTransShadow(Sprite2D* spr, int x, int y,
 										   Color tint, SpriteCover* cover,
 										   Color *Palette, Region *clip)
@@ -1098,7 +1098,6 @@ void SDLVideoDriver::BlitSpriteTransShadow(Sprite2D* spr, int x, int y,
 		int ty = y - spr->YPos - Viewport.y;
 		if (tx > backBuf->w) return;
 		if (tx+spr->Width <= 0) return;
-
 		if (!Palette)
 			Palette = (Color *) data->pal;
 
@@ -1111,8 +1110,6 @@ void SDLVideoDriver::BlitSpriteTransShadow(Sprite2D* spr, int x, int y,
 		Uint16 mask16 = (Uint16)mask32;
 
 		SDL_LockSurface(backBuf);
-
-
 
 #define FLIP 
 #define HFLIP_CONDITIONAL data->flip_hor
@@ -1127,14 +1124,63 @@ void SDLVideoDriver::BlitSpriteTransShadow(Sprite2D* spr, int x, int y,
 
 #undef BPP16
 #define SPECIALPIXEL if (p == 1) { *pix = ((*pix >> 1)&mask32) + shadowcol32; } else
+
+			if (tint.a != 255) {
+
+#define TINT_ALPHA
+
+				if (data->alpha_pal) {
+#define PALETTE_ALPHA
 #include "SDLVideoDriver.inl"
+				} else {
+#undef PALETTE_ALPHA
+#include "SDLVideoDriver.inl"
+				}
+
+			} else {
+
+#undef TINT_ALPHA
+				if (data->alpha_pal) {
+#define PALETTE_ALPHA
+#include "SDLVideoDriver.inl"
+				} else {
+#undef PALETTE_ALPHA
+#include "SDLVideoDriver.inl"
+				}
+
+			}
 
 		} else {
 
 #define BPP16
 #undef SPECIALPIXEL
 #define SPECIALPIXEL if (p == 1) { *pix = ((*pix >> 1)&mask16) + shadowcol16; } else
+
+			if (tint.a != 255) {
+
+#define TINT_ALPHA
+
+				if (data->alpha_pal) {
+#define PALETTE_ALPHA
 #include "SDLVideoDriver.inl"
+				} else {
+#undef PALETTE_ALPHA
+#include "SDLVideoDriver.inl"
+				}
+
+			} else {
+
+#undef TINT_ALPHA
+				if (data->alpha_pal) {
+#define PALETTE_ALPHA
+#include "SDLVideoDriver.inl"
+				} else {
+#undef PALETTE_ALPHA
+#include "SDLVideoDriver.inl"
+				}
+
+			}
+
 
 		}
 
@@ -1147,6 +1193,8 @@ void SDLVideoDriver::BlitSpriteTransShadow(Sprite2D* spr, int x, int y,
 #undef COVERY
 #undef TINT
 #undef SPECIALPIXEL
+#undef TINT_ALPHA
+#undef PALETTE_ALPHA
 
 		SDL_UnlockSurface(backBuf);
 
