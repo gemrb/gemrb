@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.28 2005/12/20 20:14:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.29 2005/12/28 19:59:49 avenger_teambg Exp $
  *
  */
 
@@ -80,7 +80,7 @@ bool BMPImp::Open(DataStream* stream, bool autoFree, bool convert)
 
 	str->Read( Signature, 2 );
 	if (strncmp( Signature, "BM", 2 ) != 0) {
-		printf( "[BMPImporter]: Not a valid BMP File.\n" );
+		printMessage( "BMPImporter","Not a valid BMP File.\n",LIGHT_RED);
 		return false;
 	}
 	str->ReadDword( &FileSize );
@@ -92,7 +92,7 @@ bool BMPImp::Open(DataStream* stream, bool autoFree, bool convert)
 	str->ReadDword( &Size );
 	//some IE palettes are of a different format (OS/2 BMP)!
 	if (Size < 24) {
-		printf( "[BMPImporter]: OS/2 Bitmap Not Supported." );
+		printMessage( "BMPImporter","OS/2 Bitmap, not supported.\n", LIGHT_RED);
 		return false;
 	}
 	str->ReadDword( &Width );
@@ -109,8 +109,8 @@ bool BMPImp::Open(DataStream* stream, bool autoFree, bool convert)
 	//str->ReadDword(&ColorsUsed );
 	//str->ReadDword(&ColorsImportant );
 	if (Compression != 0) {
-		printf( "[BMPImporter]: Compressed %d-bits Image, Not Supported.",
-			BitCount );
+		printMessage( "BMPImporter"," ", LIGHT_RED);
+		printf( "Compressed %d-bits Image, not supported.\n", BitCount );
 		return false;
 	}
 	//COLORTABLE
@@ -148,7 +148,8 @@ bool BMPImp::Open(DataStream* stream, bool autoFree, bool convert)
 			PaddedRowLength = ( Width >> 1 );
 			break;
 		default:
-			printf( "[BMPImporter]: BitCount not supported.\n" );
+			printMessage( "BMPImporter"," ", LIGHT_RED);
+			printf( "BitCount %d is not supported.\n", BitCount );
 			return false;
 	}
 	//if(BitCount!=4)
