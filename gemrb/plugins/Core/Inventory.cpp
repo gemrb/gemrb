@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.64 2005/12/25 10:31:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.65 2005/12/29 17:46:46 avenger_teambg Exp $
  *
  */
 
@@ -30,6 +30,13 @@
 static int SLOT_MAGIC = -1;
 static int SLOT_FIST = -1;
 static int SLOT_MELEE = -1;
+
+void InvalidSlot(int slot)
+{
+	printMessage("Inventory"," ",LIGHT_RED);
+	printf("Invalid slot: %d!\n",slot);
+	abort();
+}
 
 Inventory::Inventory()
 {
@@ -50,10 +57,13 @@ Inventory::~Inventory()
 	}
 }
 
-CREItem *Inventory::GetItem(size_t idx)
+CREItem *Inventory::GetItem(size_t slot)
 {
-	CREItem *item = Slots[idx];
-	Slots.erase(Slots.begin()+idx);
+	if (slot>=Slots.size() ) {
+		InvalidSlot(slot);
+	}
+	CREItem *item = Slots[slot];
+	Slots.erase(Slots.begin()+slot);
 	return item;
 }
 
@@ -143,7 +153,6 @@ void Inventory::RemoveSlotEffects(CREItem* slot)
 		}
 	}
 }
-
 
 void Inventory::SetInventoryType(int arg)
 {
@@ -289,7 +298,7 @@ CREItem *Inventory::RemoveItem(unsigned int slot, unsigned int count)
 	CREItem *item;
 
 	if (slot>=Slots.size() ) {
-		printMessage("Inventory","Invalid slot!\n",LIGHT_RED);
+		InvalidSlot(slot);
 		abort();
 	}
 	Changed = true;
@@ -333,8 +342,7 @@ int Inventory::RemoveItem(const char *resref, unsigned int flags, CREItem **res_
 void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
 {
 	if (slot>=Slots.size() ) {
-		printMessage("Inventory","Invalid slot!\n",LIGHT_RED);
-		abort();
+		InvalidSlot(slot);
 	}
 	Changed = true;
 	if (Slots[slot]) {
@@ -347,8 +355,7 @@ int Inventory::AddSlotItem(CREItem* item, int slot)
 {
 	if (slot >= 0) {
 		if ((unsigned)slot >= Slots.size()) {
-			printMessage("Inventory","Invalid slot!\n",LIGHT_RED);
-			abort();
+			InvalidSlot(slot);
 		}
 
 		if (!Slots[slot]) {
@@ -516,8 +523,7 @@ void Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 CREItem *Inventory::GetSlotItem(unsigned int slot)
 {
 	if (slot>=Slots.size() ) {
-		printMessage("Inventory","Invalid slot!\n",LIGHT_RED);
-		abort();
+		InvalidSlot(slot);
 	}
 	return Slots[slot];
 }

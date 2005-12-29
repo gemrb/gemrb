@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.367 2005/12/25 10:31:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.368 2005/12/29 17:46:47 avenger_teambg Exp $
  *
  */
 
@@ -42,7 +42,6 @@
 #include "../Core/Game.h"
 #include "../Core/ControlAnimation.h"
 #include "../Core/DataFileMgr.h"
-
 
 
 //this stuff is missing from Python 2.2
@@ -111,6 +110,10 @@ static bool QuitOnError = false;
 #define ACT_BARDSONG 20
 #define ACT_STOP 21
 #define ACT_SEARCH 22
+#define ACT_SHAPE  23
+#define ACT_TAMING 24
+#define ACT_SKILLS 25
+#define ACT_WILDERNESS 26
 
 static unsigned int ClassCount = 0;
 static ActionButtonRow *GUIBTDefaults = NULL; //qslots row count
@@ -121,6 +124,7 @@ ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
 // Natural screen size of currently loaded winpack
 static int CHUWidth = 0;
 static int CHUHeight = 0;
+static int QslotTranslation = false;
 
 inline bool valid_number(const char* string, long& val)
 {
@@ -5821,7 +5825,7 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 		memcpy(&myrow, GUIBTDefaults+cls, sizeof(ActionButtonRow));
 	}
 	//this function either initializes the actor's settings, or modifies myrow
-	actor->GetActionButtonRow(myrow);
+	actor->GetActionButtonRow(myrow, QslotTranslation);
 	bool fistdrawn = true;
 	ieDword magicweapon = actor->inventory.GetMagicSlot();
 	if (actor->inventory.HasItemInSlot("",magicweapon) ) {
@@ -5902,6 +5906,7 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 		case ACT_QSPELL1:
 		case ACT_QSPELL2:
 		case ACT_QSPELL3:
+		//fixme iwd2 has 9
 		{
 			SetButtonBAM(wi, ci, "stonspel",0,0,-1);
 			ieResRef *poi = &actor->PCStats->QuickSpells[tmp-ACT_QSPELL1];
@@ -5913,6 +5918,7 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 		case ACT_QSLOT1:
 		case ACT_QSLOT2:
 		case ACT_QSLOT3:
+		case ACT_QSLOT4://fixme pst has 5
 		{
 			SetButtonBAM(wi, ci, "stonitem",0,0,-1);
 			ieDword slot = actor->PCStats->QuickItemSlots[tmp-ACT_QSLOT1];
@@ -5969,6 +5975,28 @@ static PyObject* GemRB_ClearAction(PyObject * /*self*/, PyObject* args)
 	actor->ClearPath();      //stop walking
 	actor->ClearActions();   //stop pending action involved walking
 	actor->SetModal(MS_NONE);//stop modal actions
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+
+PyDoc_STRVAR( GemRB_SetDefaultActions__doc,
+"SetDefaultActions(qslot, slot1, slot2, slot3)\n\n"
+"Sets whether qslots need an additional translation like in iwd2. "
+"Also sets up the first three default action types." );
+
+static PyObject* GemRB_SetDefaultActions(PyObject * /*self*/, PyObject* args)
+{
+	int qslot;
+	int slot1, slot2, slot3;
+
+	if (!PyArg_ParseTuple( args, "iiii", &qslot, &slot1, &slot2, &slot3 )) {
+		return AttributeError( GemRB_SetDefaultActions__doc );
+	}
+	QslotTranslation=qslot;
+	DefaultButtons[0]=slot1;
+	DefaultButtons[1]=slot2;
+	DefaultButtons[2]=slot3;
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -6156,6 +6184,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(HasResource, METH_VARARGS),
 	METHOD(SetupControls, METH_VARARGS),
 	METHOD(ClearAction, METH_VARARGS),
+	METHOD(SetDefaultActions, METH_VARARGS),
 	// terminating entry	
 	{NULL, NULL, 0, NULL}
 };

@@ -39,6 +39,7 @@ def OnLoad():
 
 	GemRB.GameSetPartySize(PARTY_SIZE)
 	GemRB.GameSetProtagonistMode(2)
+	GemRB.SetDefaultActions(1,14,16,17)
 	GemRB.LoadWindowPack(GetWindowPack())
 	OptionsWindow = MessageWindow = GemRB.LoadWindow(0)
 	ActionsWindow = PortraitWindow = OpenPortraitWindow(1)

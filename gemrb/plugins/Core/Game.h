@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.74 2005/12/20 23:20:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.75 2005/12/29 17:46:46 avenger_teambg Exp $
  *
  */
 
@@ -109,14 +109,14 @@ typedef struct PCStruct {
 	ieWord   ModalState;
 	ieWord   Happiness;
 	unsigned char Unknown2c[96];
-	ieWord   QuickWeaponSlot[4];
-	unsigned char Unknown94[8];
-	ieResRef QuickSpellResRef[3];
+	ieWord   QuickWeaponSlot[8];  //iwd2 has 8 slots, others got only 4
+	ieResRef QuickSpellResRef[9]; //iwd2 has 9 slots, others got only 3
 	ieWord   QuickItemSlot[3];
 	unsigned char UnknownBA[6];
 	char Name[32];
 	ieDword  TalkCount;
-	unsigned char QSlots[9];
+	ieByte QSlots[9];
+	ieByte QuickSpellClass[9];
 } PCStruct;
 
 #define IE_GAM_JOURNAL 0

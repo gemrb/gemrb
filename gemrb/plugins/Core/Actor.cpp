@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.148 2005/12/23 08:55:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.149 2005/12/29 17:46:46 avenger_teambg Exp $
  *
  */
 
@@ -54,6 +54,19 @@ static Color magenta = {
 static int classcount=-1;
 static char **clericspelltables=NULL;
 static char **wizardspelltables=NULL;
+
+static char iwd2gemrb[32]={
+  0,0,20,2,22,25,0,14,
+  15,23,13,0,1,24,8,21,
+  0,0,0,0,0,0,0,0,
+  0,0,0,0,0,0,0,0
+};
+static char gemrb2iwd[32]={
+  11,12,3,71,72,73,0,0,  //0
+  14,80,83,82,81,10,7,8,  //8
+  0,0,0,0,2,15,4,9,  //16
+  13,5,0,0,0,0,0,0   //24
+};
 
 static void InitActorTables();
 
@@ -1121,16 +1134,34 @@ end:
 
 }
 
-//the first 3 buttons are always talk, defend, attack
-void Actor::GetActionButtonRow(ActionButtonRow &ar)
+//the first 3 buttons are untouched by this function
+void Actor::GetActionButtonRow(ActionButtonRow &ar, int translation)
 {
 	if (PCStats->QSlots[0]==0xff) {
 		for(int i=0;i<GUIBT_COUNT-3;i++) {
-			PCStats->QSlots[i]=ar[i+3];
+			ieByte tmp = ar[i+3];
+			if (translation) {
+				tmp=gemrb2iwd[tmp];
+			}
+			PCStats->QSlots[i]=tmp;
+printf("%d<--%d\n", ar[i+3], tmp);
 		}
 		return;
 	}
 	for(int i=0;i<GUIBT_COUNT-3;i++) {
-		ar[i+3]=PCStats->QSlots[i];
+		ieByte tmp=PCStats->QSlots[i];
+		if (translation) {
+			if (tmp>=90) { //quick weapons
+				tmp=16+tmp%10;
+			} else if (tmp>=80) { //quick items
+				tmp=9+tmp%10;
+			} else if (tmp>=70) { //quick spells
+				tmp=3+tmp%10;
+			} else {
+				tmp=iwd2gemrb[tmp];
+			}
+		}
+		ar[i+3]=tmp;
+printf("%d-->%d\n", PCStats->QSlots[i], tmp);
 	}
 }

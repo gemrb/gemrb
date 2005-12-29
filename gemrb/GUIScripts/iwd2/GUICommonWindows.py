@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUICommonWindows.py,v 1.12 2005/12/25 10:31:45 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUICommonWindows.py,v 1.13 2005/12/29 17:46:45 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -182,11 +182,11 @@ def UpdateActionsWindow ():
 	if PortraitWindow == None:
 		return
 
+	pc = 0
 	#do this only when there is no 'otherwindow'
 	if GemRB.GetVar ("OtherWindow") != -1:
-		if OptionsWindow:
-			GemRB.InvalidateWindow (OptionsWindow)
-	pc = 0
+		return
+
 	for i in range (PARTY_SIZE):
 		if GemRB.GameIsPCSelected (i+1):
 			if pc == 0:

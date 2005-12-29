@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUIINV.py,v 1.5 2005/12/25 10:31:45 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUIINV.py,v 1.6 2005/12/29 17:46:45 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -370,6 +370,8 @@ def RefreshInventoryWindow ():
 	for i in range (SlotCount):
 		UpdateSlot (pc, i)
 
+	#if actor is uncontrollable, make this grayed
+	GemRB.SetVisible (Window, 1)
 	return
 
 def UpdateSlot (pc, slot):
