@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.216 2005/12/25 10:31:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.217 2005/12/29 18:01:46 avenger_teambg Exp $
  *
  */
 
@@ -64,6 +64,7 @@ static Point **VisibilityMasks=NULL;
 static bool PathFinderInited = false;
 static Variables Spawns;
 static int LargeFog;
+static ieDword TranslucentShadows;
 static ieWord globalActorCounter;
 
 #define STEP_TIME 150
@@ -175,6 +176,8 @@ void AddLOS(int destx, int desty, int slot)
 void InitExplore()
 {
 	LargeFog = !core->HasFeature(GF_SMALL_FOG);
+	TranslucentShadows = 0;
+	core->GetDictionary()->Lookup("Translucent Shadows", TranslucentShadows);
 
 	//circle perimeter size for MaxVisibility
 	int x = MaxVisibility;
@@ -705,7 +708,11 @@ void Map::DrawMap(Region screen, GameControl* gc)
 						}
 						assert(sc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height));
 
-						video->BlitSpriteCovered( nextFrame, cx + screen.x, cy + screen.y, tint, sc, anim->Palette, &screen );
+						if (TranslucentShadows) {
+							video->BlitSpriteTransShadow( nextFrame, cx + screen.x, cy + screen.y, tint, sc, anim->Palette, &screen );
+						} else {
+							video->BlitSpriteCovered( nextFrame, cx + screen.x, cy + screen.y, tint, sc, anim->Palette, &screen );
+						}
 					}
 					if (anim->endReached) {
 						if (HandleActorStance(actor, ca, StanceID) ) {
