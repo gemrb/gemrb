@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.149 2005/12/29 17:46:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.150 2005/12/30 19:02:21 avenger_teambg Exp $
  *
  */
 
@@ -89,6 +89,9 @@ PCStatsStruct::PCStatsStruct()
 	SoundFolder[0]=0;
 	QSlots[0]=0xff;
 	memset( QuickSpells, 0, sizeof(QuickSpells) );
+	memset( QuickSpellClass, 0xff, sizeof(QuickSpellClass) );
+	memset( QuickItemSlots, 0, sizeof(QuickItemSlots) );
+	memset( QuickWeaponSlots, 0, sizeof(QuickWeaponSlots) );
 }
 
 void PCStatsStruct::IncrementChapter()

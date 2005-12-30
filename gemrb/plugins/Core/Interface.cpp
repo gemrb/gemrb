@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.378 2005/12/22 23:29:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.379 2005/12/30 19:02:21 avenger_teambg Exp $
  *
  */
 
@@ -1469,6 +1469,8 @@ bool Interface::LoadConfig(const char* filename)
 			CaseSensitive = ( atoi( value ) == 0 ) ? false : true;
 		} else if (stricmp( name, "SmoothFog" ) == 0) {
 			vars->SetAt( "3D Acceleration", atoi( value ) );
+		} else if (stricmp( name, "MultipleQuickSaves" ) == 0) {
+			GameControl::MultipleQuickSaves(atoi(value));
 		} else if (stricmp( name, "VolumeAmbients" ) == 0) {
 			vars->SetAt( "Volume Ambients", atoi( value ) );
 		} else if (stricmp( name, "VolumeMovie" ) == 0) {

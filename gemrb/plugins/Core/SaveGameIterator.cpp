@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.31 2005/11/24 17:44:09 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.32 2005/12/30 19:02:21 avenger_teambg Exp $
  *
  */
 
@@ -25,6 +25,7 @@
 #include "ResourceMgr.h"
 #include "SaveGameMgr.h"
 #include "GameControl.h"
+#include <vector>
 
 SaveGame::SaveGame(char* path, char* name, char* prefix, int pCount)
 {
@@ -120,10 +121,6 @@ SaveGameIterator::~SaveGameIterator(void)
 	for (charlist::iterator i = save_slots.begin();i!=save_slots.end();i++) {
 		free (*i);
 	}
-//	unsigned int i = save_slots.size();
-//	while (i--) {
-//		free( save_slots[i] );
-//	}
 }
 
 static const char* PlayMode()
@@ -137,6 +134,41 @@ static const char* PlayMode()
 	return "save";
 }
 
+#define FormatQuickSavePath(destination, i) \
+	 snprintf(destination,sizeof(destination),"%s%s%s%09d-%s", \
+		core->SavePath,PlayMode(), SPathDelimiter,i,folder);
+
+/*
+ * Returns the first 0 bit position of an integer
+ */
+static int GetHole(int n)
+{
+	int mask = 1;
+	int value = 0;
+	while(n&mask) {
+		mask<<=1;
+		value++;
+	}
+	return value;
+}
+
+/*
+ * Returns the age of a quickslot entry. Returns 0 if it isn't a quickslot
+ */
+static int IsQuickSaveSlot(const char* match, const char* slotname)
+{
+	char savegameName[_MAX_PATH];
+	int savegameNumber = 0;
+	int cnt = sscanf( slotname, SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName );
+	if (cnt != 2) {
+		return 0;
+	}
+	if (stricmp(savegameName, match) )
+	{
+		return 0;
+	}
+	return savegameNumber;
+}
 /*
  * Return true if directory Path/slotname is a potential save game
  * slot, otherwise return false.
@@ -153,14 +185,12 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 	if (cnt != 2) { 
 		//The matcher didn't match: either this is not a valid dir
 		//or the SAVEGAME_DIRECTORY_MATCHER needs updating.
+		printMessage( "SaveGameIterator", " ", LIGHT_RED );
 		printf( "Invalid savegame directory '%s' in %s.\n", slotname, Path );
 		return false;
 	}
 
 	//The matcher got matched correctly.
-	printf( "[Number = %d, Name = %s]\n", savegameNumber, savegameName );
-
-
 	char dtmp[_MAX_PATH];
 	snprintf( dtmp, _MAX_PATH, "%s%s%s", Path, SPathDelimiter, slotname );
 
@@ -257,7 +287,6 @@ SaveGame* SaveGameIterator::GetSaveGame(int index)
 		printf( "Invalid savegame directory '%s' in %s.\n", slotname, Path );
 		return false;
 	}
-	printf( "[Number = %d, Name = %s]\n", savegameNumber, savegameName );
 
 	DIR* ndir = opendir( Path );
 	//If we cannot open the Directory
@@ -295,7 +324,48 @@ int SaveGameIterator::ExistingSlotName(int index)
 	return -1;
 }
 
-int SaveGameIterator::CreateSaveGame(int index, const char *slotname)
+void SaveGameIterator::PruneQuickSave(const char *folder)
+{
+	char from[_MAX_PATH];
+	char to[_MAX_PATH];
+
+	//storing the quicksave ages in an array
+	std::vector<int> myslots;
+	for (charlist::iterator i = save_slots.begin();i!=save_slots.end();i++) {
+		int tmp = IsQuickSaveSlot(folder, (*i) );
+		if (tmp) {
+			int pos = myslots.size();
+			while(pos-- && myslots[pos]>tmp);
+			myslots.insert(myslots.begin()+pos+1,tmp);
+		}
+	}
+	//now we got an integer array in myslots
+	if (!myslots.size()) {
+		return;
+	}
+
+	int size = myslots.size();
+	int n=myslots[size-1];
+	int hole = GetHole(n);
+	int i;
+	if (hole<size) {
+		//prune second path
+		FormatQuickSavePath(from, myslots[hole]);
+		myslots.erase(myslots.begin()+hole);
+		printf("RMDIR: %s\n", from);
+		core->DelTree(from, false);
+		rmdir(from);
+	}
+	//shift paths, always do this, because they are aging
+	size = myslots.size();
+	for(i=size;i--;) {
+		FormatQuickSavePath(from, myslots[i]);
+		FormatQuickSavePath(to, myslots[i]+1);
+		rename(from,to);
+	}
+}
+
+int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 {
 	char Path[_MAX_PATH];
 	char FName[12];
@@ -307,6 +377,12 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname)
 	GameControl *gc = core->GetGameControl();
 	if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
 		return 2; //can't save while in dialog?
+	}
+
+	GetSaveGameCount(); //forcing reload
+	if (mqs) {
+		assert(index==1);
+		PruneQuickSave(slotname);
 	}
 
 	//if index is not an existing savegame, we create a unique slotname
@@ -324,12 +400,11 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname)
 	} else {
 		int oldindex = ExistingSlotName(index);
 		if (oldindex>=0) {
-			char *oldslotname = GetSaveName(oldindex);
-			snprintf( Path, _MAX_PATH, "%s%s%s%s", core->SavePath, PlayMode(), SPathDelimiter, oldslotname );
-			core->DelTree(Path, false);
-			rmdir(Path);
+			DeleteSaveGame(oldindex);
 		}
 	}
+	snprintf( Path, _MAX_PATH, "%09d-%s", index, slotname );
+	save_slots.insert( save_slots.end(), strdup( Path ) );
 	snprintf( Path, _MAX_PATH, "%s%s%s%09d-%s", core->SavePath, PlayMode(), SPathDelimiter, index, slotname );
 	core->DelTree(Path, false); //this is required in case the old slot wasn't recognised but still there
 	mkdir(Path,S_IWRITE|S_IREAD|S_IEXEC);
@@ -394,6 +469,7 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname)
 	im->PutImage( &outfile, 5 );
 
 	core->FreeInterface(im);
+	loaded = false;
 	return 0;
 }
 
@@ -416,6 +492,4 @@ void SaveGameIterator::DeleteSaveGame(int index)
 
 	free( (*i));
 	save_slots.erase(i);
-
-//	loaded = false;
 }

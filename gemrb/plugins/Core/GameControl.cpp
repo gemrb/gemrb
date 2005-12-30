@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.276 2005/12/21 22:58:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.277 2005/12/30 19:02:21 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -35,6 +35,7 @@
 #include "ScriptEngine.h"
 #include "Item.h"
 #include "Game.h"
+#include "SaveGameIterator.h"
 
 #define DEBUG_SHOW_INFOPOINTS   0x01
 #define DEBUG_SHOW_CONTAINERS   0x02
@@ -69,9 +70,14 @@ Animation* effect;
 
 #define FORMATIONSIZE 10
 typedef Point formation_type[FORMATIONSIZE];
-
 int formationcount;
 static formation_type *formations=NULL;
+static bool mqs = false;
+
+void GameControl::MultipleQuickSaves(int arg)
+{
+	mqs=arg==1;
+}
 
 GameControl::GameControl(void)
 {
@@ -197,6 +203,21 @@ GameControl::~GameControl(void)
 	}
 	if (dlg) {
 		delete dlg;
+	}
+}
+
+void GameControl::QuickSave()
+{
+	const char *folder;
+
+	int SlotTable = core->LoadTable( "savegame" );
+	if (SlotTable >= 0) {
+	        TableMgr* tab = core->GetTable( SlotTable );
+                folder = tab->QueryField(1);
+		core->GetSaveGameIterator()->CreateSaveGame(1, folder, mqs == 1);
+		if (SlotTable >= 0) {
+		        core->DelTable(SlotTable);
+		}
 	}
 }
 
@@ -472,6 +493,9 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 		return;
 
 	switch (Key) {
+		case 'q':
+			QuickSave();
+			break;
 		case GEM_ALT:
 			DebugFlags &= ~DEBUG_SHOW_CONTAINERS;
 			break;

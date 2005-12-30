@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.80 2005/12/17 17:27:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.81 2005/12/30 19:02:21 avenger_teambg Exp $
  */
 
 /**
@@ -101,6 +101,8 @@ public:
 	int SetText(const char* string, int pos = 0);
 	/** Sets the InfoTextColor, used in PST */
 	void SetInfoTextColor(Color color);
+	/** Sets multiple quicksaves flag*/
+	static void MultipleQuickSaves(int arg);
 private:
 	//Actor* lastActor;
 	//using global ID which is safer
@@ -148,6 +150,8 @@ public: //Events
 	int GetScreenFlags() { return ScreenFlags; }
 	int GetDialogueFlags() { return DialogueFlags; }
 private:
+	/** this function is called when the user presses 'q' (or equivalent) */
+	void QuickSave();
 	/** this function safely retrieves an Actor by ID */
 	Actor *GetActorByGlobalID(ieWord ID);
 	void CalculateSelection(Point &p);

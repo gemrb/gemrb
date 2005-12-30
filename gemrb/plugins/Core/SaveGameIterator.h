@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.h,v 1.19 2005/06/28 18:16:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.h,v 1.20 2005/12/30 19:02:21 avenger_teambg Exp $
  *
  */
 
@@ -94,9 +94,10 @@ public:
 	SaveGame* GetSaveGame(int index);
 	void DeleteSaveGame(int index);
 	int ExistingSlotName(int index);
-	int CreateSaveGame(int index, const char *slotname);
+	int CreateSaveGame(int index, const char *slotname, bool mqs = false);
 private:
 	char *GetSaveName(int index);
+	void PruneQuickSave(const char *folder);
 };
 
 #endif
