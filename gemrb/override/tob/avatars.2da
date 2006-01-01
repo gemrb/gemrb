@@ -201,6 +201,7 @@
 0x7F28     MKUL       MKUL       MKUL       MKUL       4          3          1 
 0x7F29     MFDR       MFDR       MFDR       MFDR       4          2          1 
 0x7F2A     NSAI       NSAI       NSAI       NSAI       4          2          1 
+0x7F2B     MMAX       MMAX       MMAX       MMAX       4          2          1 
 0x7F2C     NSOL       NSOL       NSOL       NSOL       4          2          1 
 0x7F2D     MWFM       MWFM       MWFM       MWFM       4          2          1 
 0x7F2E     MRAV       MRAV       MRAV       MRAV       4          3          1 
@@ -208,6 +209,8 @@
 0x7F30     NBOH       NBOH       NBOH       NBOH       4          2          1 
 0x7F31     NELL       NELL       NELL       NELL       4          2          1 
 0x7F32     MSLY       MSLY       MSLY       MSLY       4          2          1 
+0x7F33     MKUR       MKUR       MKUR       MKUR       4          2          1 
+0x7F34     MDOC       MDOC       MDOC       MDOC       4          2          1 
 0x7F35     MMIS       MMIS       MMIS       MMIS       4          3          1 
 0x7F36     NSHD       NSHD       NSHD       NSHD       4          2          1 
 0x7F37     NIRE       NIRE       NIRE       NIRE       4          2          1 
