@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.75 2005/12/29 17:46:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.76 2006/01/01 16:58:00 avenger_teambg Exp $
  *
  */
 
@@ -330,7 +330,7 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 		//str->Seek( 6, GEM_CURRENT_POS); //enabler fields, redundant
 		//QuickSlots are customisable in iwd2 and GemRB
 		//thus we adopt the iwd2 style actor info
-		str->Seek( 218, GEM_CURRENT_POS);
+		str->Seek( 72, GEM_CURRENT_POS);
 		for (i=0;i<9;i++) {
 			str->ReadDword( &tmpDword );
 			pcInfo.QSlots[i] = (ieByte) tmpDword;
