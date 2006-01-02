@@ -16,7 +16,10 @@ Columns: AT_1 - first armour level animation prefix
 7 - Bird animations, one file, only movement with orientations.
 8 - Six files contain the whole animation. Scheme is:[NAME][G1-3][/E]
 9 - IWD style animation. Scheme is:[NAME][ACTIONTYPE][/E]. The main difference from 6 is that instead of G1, it has separate bams for many actions. (9 orientations).
-10-15 reserved for non pst anims
+10 - The whole animation is in two files [NAME][G1][/E]. Used for some low res static BG1 animations like the horse and cow. It lacks the walking animations of type 3.
+11 - large 2x2 animations (wyvern and balor)
+12 - huge 3x3 dragon animations
+13 - 15 reserved for non pst anims
 16 - full PST style animation. Scheme is:[C/D][ACTIONTYPE][NAME][B]
 17 - stand still animation (no orientations)
 18 - stand still animation with orientations
