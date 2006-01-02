@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.55 2005/12/25 10:31:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.56 2006/01/02 10:14:48 avenger_teambg Exp $
  *
  */
 
@@ -1804,11 +1804,13 @@ void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 	ieResRef spellres;
 
 	if (!ResolveSpellName( spellres, parameters) ) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 	if (Sender->Type == ST_ACTOR) {
@@ -1819,6 +1821,8 @@ void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 	GetPositionFromScriptable( Sender, s, false );
 	GetPositionFromScriptable( tar, d, false );
 	printf( "ForceSpell from [%d,%d] to [%d,%d]\n", s.x, s.y, d.x, d.y );
+	//this might be bad
+	Sender->ReleaseCurrentAction();
 }
 
 void GameScript::Deactivate(Scriptable* Sender, Action* parameters)

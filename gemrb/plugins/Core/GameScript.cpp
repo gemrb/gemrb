@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.346 2005/12/25 10:31:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.347 2006/01/02 10:14:48 avenger_teambg Exp $
  *
  */
 
@@ -463,7 +463,7 @@ static ActionLink actionnames[] = {
 	{"forceattack", GameScript::ForceAttack, 0},
 	{"forcefacing", GameScript::ForceFacing, 0},
 	{"forceleavearealua", GameScript::ForceLeaveAreaLUA, 0},
-	{"forcespell", GameScript::ForceSpell, 0},
+	{"forcespell", GameScript::ForceSpell, AF_BLOCKING},
 	{"fullheal", GameScript::FullHeal, 0},
 	{"getstat", GameScript::GetStat, 0}, //gemrb specific
 	{"getitem", GameScript::GetItem, 0},

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.36 2005/05/28 09:32:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.37 2006/01/02 10:14:48 avenger_teambg Exp $
  *
  */
 
@@ -83,6 +83,8 @@
 #define IE_ANI_SIX_FILES		8    //MCAR/MWYV
 #define IE_ANI_TWO_FILES_3		9    //iwd animations
 #define IE_ANI_TWO_FILES_2		10   //low res bg1 anim
+#define IE_ANI_FOUR_FRAMES		11   //wyvern anims
+#define IE_ANI_NINE_FRAMES		12   //dragon anims
 
 //PST animation types
 #define IE_ANI_PST_ANIMATION_1		16   //full animation
@@ -142,6 +144,10 @@ public: //attribute functions
 private:
 	void InitAvatarsTable();
 	void AddPSTSuffix(char* ResRef, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient);
+	void AddFFSuffix(char* ResRef, unsigned char AnimID,
+		unsigned char& Cycle, unsigned char Orient);
+	void AddNFSuffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void AddVHR2Suffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);

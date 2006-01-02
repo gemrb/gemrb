@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.72 2005/12/23 08:55:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.73 2006/01/02 10:14:48 avenger_teambg Exp $
  *
  */
 
@@ -312,6 +312,12 @@ IE_ANI_TWO_FILES_3:	Animations using this type are stored using the following te
 			This is the standard IWD animation, but BG2 also has it.
 			See MMR
 
+IE_ANI_FOUR_FRAMES:	These animations are large, four bams make a frame.
+
+
+IE_ANI_NINE_FRAMES:     These animations are huge, nine bams make a frame.
+
+
 IE_ANI_PST_ANIMATION_1:
 IE_ANI_PST_ANIMATION_2:
 IE_ANI_PST_ANIMATION_3:
@@ -473,6 +479,18 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 			break;
 	}
 	switch (GetAnimType()) {
+		case IE_ANI_NINE_FRAMES: //dragon animations
+			if (Orient > 8) {
+				a->MirrorAnimation( );
+			}
+			Anims[StanceID][Orient] = a;
+			break;
+		case IE_ANI_FOUR_FRAMES: //wyvern animations
+			if (Orient > 8) {
+				a->MirrorAnimation( );
+			}
+			Anims[StanceID][Orient] = a;
+			break;
 		case IE_ANI_CODE_MIRROR_3: //bird animations
 			if (Orient > 8) {
 				a->MirrorAnimation( );
@@ -550,6 +568,14 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID, unsigned char Orient,
 
 	Orient &= 15;
 	switch (GetAnimType()) {
+		case IE_ANI_FOUR_FRAMES:
+			AddFFSuffix( ResRef, StanceID, Cycle, Orient );
+			break;
+
+		case IE_ANI_NINE_FRAMES:
+			AddNFSuffix( ResRef, StanceID, Cycle, Orient );
+			break;
+
 		case IE_ANI_CODE_MIRROR:
 			AddVHRSuffix( ResRef, StanceID, Cycle, Orient );
 			break;
@@ -744,6 +770,34 @@ void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 			abort();
 			break;
 	}
+}
+//                            0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
+static char *StancePrefix[]={"3","2","5","5","4","4","2","2","5","4","1","3","3","3","4","1","4","4","4"};
+static char *CyclePrefix[]= {"0","0","1","1","1","1","0","0","1","1","1","1","1","1","1","1","1","1","1"};
+static int CycleOffset[] = {0,  0,  0,  0,  0,  9,  0,  0,  0, 18,  0,  0,  9,  18,  0,  0,  0,  0,  0};
+
+//returning only the 3rd frame (no multiple frames support yet)
+void CharAnimations::AddFFSuffix(char* ResRef, unsigned char StanceID,
+	unsigned char& Cycle, unsigned char Orient)
+{
+	char prefix[10];
+
+	Cycle = SixteenToNine[Orient];
+	snprintf(prefix, 9, "%s%s3%s%d",ResRef, StancePrefix[StanceID],CyclePrefix[StanceID],Cycle);
+	strnlwrcpy(ResRef,prefix,8);
+	Cycle+=CycleOffset[StanceID];
+}
+
+//returning only the 5th frame (no multiple frames support yet)
+void CharAnimations::AddNFSuffix(char* ResRef, unsigned char StanceID,
+	unsigned char& Cycle, unsigned char Orient)
+{
+	char prefix[10];
+
+	Cycle = SixteenToNine[Orient];
+	snprintf(prefix, 9, "%s%s5%s%d",ResRef, StancePrefix[StanceID],CyclePrefix[StanceID],Cycle);
+	strnlwrcpy(ResRef,prefix,8);
+	Cycle+=CycleOffset[StanceID];
 }
 
 //Attack

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.150 2005/12/30 19:02:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.151 2006/01/02 10:14:48 avenger_teambg Exp $
  *
  */
 
@@ -631,7 +631,10 @@ void Actor::DebugDump()
 	}
 	ieDword tmp=0;
 	core->GetGame()->locals->Lookup("APPEARANCE",tmp);
+/* not too important right now
 	printf( "\nDisguise: %d\n", tmp);
+*/
+	printf ("\nAnimate ID: %x\n", Modified[IE_ANIMATION_ID]);
 	printf( "WaitCounter: %d\n", (int) GetWait());
 	printf( "LastTarget: %d %s\n", LastTarget, GetActorNameByID(LastTarget));
 	printf( "LastTalked: %d %s\n", LastTalkedTo, GetActorNameByID(LastTalkedTo));
