@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.32 2005/12/30 19:02:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.33 2006/01/02 11:12:44 avenger_teambg Exp $
  *
  */
 
@@ -90,7 +90,7 @@ DataStream* SaveGame::GetGame()
 DataStream* SaveGame::GetWmap()
 {
 		char nPath[_MAX_PATH];
-		sprintf( nPath, "%s%s%s.wmp", Path, SPathDelimiter, "worldmap" );
+		sprintf( nPath, "%s%s%s.wmp", Path, SPathDelimiter, core->WorldMapName );
 #ifndef WIN32
 		ResolveFilePath( nPath );
 #endif
