@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUIWORLD.py,v 1.5 2005/12/25 10:31:45 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUIWORLD.py,v 1.6 2006/01/02 09:40:09 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -27,17 +27,20 @@
 import GemRB
 from GUIDefines import *
 from GUICommon import CloseOtherWindow
-from GUICommonWindows import SetEncumbranceLabels
+from GUICommonWindows import *
+
+FRAME_PC_SELECTED = 0
+FRAME_PC_TARGET   = 1
 
 ContainerWindow = None
 ContinueWindow = None
 ReformPartyWindow = None
-OldPortraitWindow = None
+OldActionsWindow = None
 OldMessageWindow = None
 Container = None
 
 def CloseContinueWindow ():
-	global ContinueWindow, OldPortraitWindow
+	global ContinueWindow, OldActionsWindow
 
 	if ContinueWindow == None:
 		return
@@ -45,36 +48,36 @@ def CloseContinueWindow ():
 	hideflag = GemRB.HideGUI ()
 
 	GemRB.UnloadWindow (ContinueWindow)
-	GemRB.SetVar ("PortraitWindow", OldPortraitWindow)
+	GemRB.SetVar ("PortraitWindow", OldActionsWindow)
+	GemRB.SetVar ("DialogChoose", GemRB.GetVar ("DialogOption"))
 	ContinueWindow = None
-	OldPortraitWindow = None
+	OldActionsWindow = None
 	if hideflag:
 		GemRB.UnhideGUI ()
 
 
 def OpenEndMessageWindow ():
-	global ContinueWindow, OldPortraitWindow
-
-	hideflag = GemRB.HideGUI ()
+	global ContinueWindow, OldActionsWindow
 
 	if ContinueWindow:
 		return
 
+	hideflag = GemRB.HideGUI ()
+
 	GemRB.LoadWindowPack (GetWindowPack())
 	ContinueWindow = Window = GemRB.LoadWindow (9)
-	OldPortraitWindow = GemRB.GetVar ("PortraitWindow")
+	OldActionsWindow = GemRB.GetVar ("PortraitWindow")
 	GemRB.SetVar ("PortraitWindow", Window)
 
 	#end dialog
 	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, Button, 9371)
-	GemRB.SetVarAssoc (Window, Button, "DialogChoose", -1)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
 	if hideflag:
 		GemRB.UnhideGUI ()
 
 def OpenContinueMessageWindow ():
-	global ContinueWindow, OldPortraitWindow
+	global ContinueWindow, OldActionsWindow
 
 	if ContinueWindow:
 		return
@@ -83,13 +86,12 @@ def OpenContinueMessageWindow ():
 
 	GemRB.LoadWindowPack (GetWindowPack())
 	ContinueWindow = Window = GemRB.LoadWindow (9)
-	OldPortraitWindow = GemRB.GetVar ("PortraitWindow")
+	OldActionsWindow = GemRB.GetVar ("PortraitWindow")
 	GemRB.SetVar ("PortraitWindow", Window)
 
 	#continue
 	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, Button, 9372)
-	GemRB.SetVarAssoc (Window, Button, "DialogChoose", 0)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
 	
 	if hideflag:
@@ -97,7 +99,7 @@ def OpenContinueMessageWindow ():
 
 
 def CloseContainerWindow ():
-	global OldPortraitWindow, OldMessageWindow, ContainerWindow
+	global OldActionsWindow, OldMessageWindow, ContainerWindow
 
 	if ContainerWindow == None:
 		return
@@ -106,7 +108,7 @@ def CloseContainerWindow ():
 
 	GemRB.UnloadWindow (ContainerWindow)
 	ContainerWindow = None
-	GemRB.SetVar ("PortraitWindow", OldPortraitWindow)
+	GemRB.SetVar ("PortraitWindow", OldActionsWindow)
 	GemRB.SetVar ("MessageWindow", OldMessageWindow)
 	Table = GemRB.LoadTable ("containr")
 	row = Container['Type']
@@ -164,7 +166,7 @@ def RedrawContainerWindow ():
 	inventory_slots = GemRB.GetSlots (pc, 0x8000)
 	RightCount = len(inventory_slots)
 
-	for i in range(6):
+	for i in range (6):
 		#this is an autoselected container, but we could use PC too
 		Slot = GemRB.GetContainerItem (0, i+LeftTopIndex)
 		Button = GemRB.GetControl (Window, i)
@@ -180,7 +182,7 @@ def RedrawContainerWindow ():
 			GemRB.SetTooltip (Window, Button, "")
 
 
-	for i in range(4):
+	for i in range (4):
 		if i+RightTopIndex<RightCount:
 			Slot = GemRB.GetSlotItem (pc, inventory_slots[i+RightTopIndex])
 		else:
@@ -201,17 +203,17 @@ def RedrawContainerWindow ():
 
 
 def OpenContainerWindow ():
-	global OldPortraitWindow, OldMessageWindow
+	global OldActionsWindow, OldMessageWindow
 	global ContainerWindow, Container
 
 	if ContainerWindow:
 		return
 
-	GemRB.HideGUI ()
+	hideflag = GemRB.HideGUI ()
 
 	GemRB.LoadWindowPack (GetWindowPack())
 	ContainerWindow = Window = GemRB.LoadWindow (8)
-	OldPortraitWindow = GemRB.GetVar ("PortraitWindow")
+	OldActionsWindow = GemRB.GetVar ("PortraitWindow")
 	OldMessageWindow = GemRB.GetVar ("MessageWindow")
 	GemRB.SetVar ("PortraitWindow", Window)
 	GemRB.SetVar ("MessageWindow", -1)
@@ -225,13 +227,13 @@ def OpenContainerWindow ():
 	# 52, 53 scroller ground, scroller personal
 	# 54 - encumbrance
 
-	for i in range(10):
+	for i in range (10):
 		Button = GemRB.GetControl (Window, i)
 		GemRB.SetVarAssoc (Window, Button, "LeftIndex", i)
 		#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "TakeItemContainer")
 
-	for i in range(4):
+	for i in range (4):
 		Button = GemRB.GetControl (Window, i+10)
 		GemRB.SetVarAssoc (Window, Button, "RightIndex", i)
 		#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
@@ -267,7 +269,8 @@ def OpenContainerWindow ():
 	GemRB.SetVar ("LeftTopIndex", 0)
 	GemRB.SetVar ("RightTopIndex", 0)
 	UpdateContainerWindow ()
-	GemRB.UnhideGUI ()
+	if hideflag:
+		GemRB.UnhideGUI ()
 
 
 #doing this way it will inform the core system too, which in turn will call
@@ -307,7 +310,7 @@ def TakeItemContainer ():
 def OpenReformPartyWindow ():
 	global ReformPartyWindow
 
-	GemRB.HideGUI ()
+	hideflag = GemRB.HideGUI ()
 
 	if ReformPartyWindow:
 		GemRB.UnloadWindow (ReformPartyWindow)
@@ -315,7 +318,8 @@ def OpenReformPartyWindow ():
 
 		GemRB.SetVar ("OtherWindow", -1)
 		GemRB.LoadWindowPack ("GUIREC")
-		GemRB.UnhideGUI ()
+		if hideflag:
+			GemRB.UnhideGUI ()
 		return
 
 	GemRB.LoadWindowPack (GetWindowPack())
@@ -331,8 +335,8 @@ def OpenReformPartyWindow ():
 	Button = GemRB.GetControl (Window, 8)
 	GemRB.SetText (Window, Button, 1403)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenReformPartyWindow")
-
-	GemRB.UnhideGUI ()
+	if hideflag:
+		GemRB.UnhideGUI ()
 
 def DeathWindow() :
 	#no death movie, but music is changed
