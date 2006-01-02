@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.18 2005/11/24 17:44:10 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.19 2006/01/02 23:26:55 avenger_teambg Exp $
  *
  */
 
@@ -52,7 +52,8 @@ bool WMPImp::Open(DataStream* stream, bool autoFree)
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "WMAPV1.0", 8 ) != 0) {
-		printf( "[WMPImporter]: This file is not a valid WMP File\n" );
+		printMessage( "WMPImporter","This file is not a valid WMP File\n", LIGHT_RED);
+		printf( "-->%s<--\n", stream->filename);
 		return false;
 	}
 	str->ReadDword( &WorldMapsCount );

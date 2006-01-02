@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.18 2005/12/17 17:27:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.19 2006/01/02 23:26:54 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -183,13 +183,39 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 			nextCursor = IE_CURSOR_NORMAL;
 			if(Area!=ae) {
 				Area=ae;
-				printf("A: %s, Distance: %d\n", Area->AreaName, worldmap->GetDistance(Area->AreaName) );
+				DisplayTooltip();
 				break;
 			}
 		}
 	}
 
 	( ( Window * ) Owner )->Cursor = nextCursor;
+}
+
+/** Sets the tooltip to be displayed on the screen now */
+void WorldMapControl::DisplayTooltip()
+{
+	int distance;
+	if (Area) {
+		WorldMap* worldmap = core->GetWorldMap();
+		distance = worldmap->GetDistance(Area->AreaName);
+	} else {
+		distance = -1;
+	}
+	if (distance <= 0) {
+		core->DisplayTooltip( 0, 0, NULL );
+		SetTooltip(NULL);
+		return;
+	}
+
+	char hours[10];
+	sprintf(hours,"%d\n", distance);
+	core->GetTokenDictionary()->SetAtCopy("HOUR", hours);
+	char *tmp = core->GetString(10700);
+	SetTooltip(tmp);
+	free(tmp);
+	//core->DisplayTooltip( (( Window* )Owner)->XPos + lastMouseX, (( Window* )Owner)->YPos + lastMouseY, this );
+	core->DisplayTooltip( lastMouseX, lastMouseY, this );
 }
 
 /** Mouse Leave Event */

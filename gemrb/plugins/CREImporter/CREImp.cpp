@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.100 2005/12/25 10:31:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.101 2006/01/02 23:26:54 avenger_teambg Exp $
  *
  */
 
@@ -1202,15 +1202,48 @@ void CREImp::GetActorIWD2(Actor *act)
 	scriptname[32]=0;
 	act->SetScriptName(scriptname);
 	strnspccpy(act->KillVar, KillVar, 32);
-
+	
 	KnownSpellsOffset = 0;
 	KnownSpellsCount = 0;
 	SpellMemorizationOffset = 0;
 	SpellMemorizationCount = 0;
 	MemorizedSpellsOffset = 0;
 	MemorizedSpellsCount = 0;
+	//6 bytes unknown, 600 bytes spellbook offsets
 	//skipping spellbook offsets
-	str->Seek( 606, GEM_CURRENT_POS);
+	ieWord tmp1, tmp2, tmp3;
+	str->ReadWord( &tmp1);
+	str->ReadWord( &tmp2);
+	str->ReadWord( &tmp3);
+	ieDword ClassSpellOffsets[8*9];
+
+	//spellbook spells
+	for (i=0;i<7*9;i++) {
+		str->ReadDword(ClassSpellOffsets+i);
+	}
+	ieDword ClassSpellCounts[8*9];
+	for (i=0;i<7*9;i++) {
+		str->ReadDword(ClassSpellCounts+i);
+	}
+
+	//domain spells	
+	for (i=7*9;i<8*9;i++) {
+		str->ReadDword(ClassSpellOffsets+i);
+	}
+	for (i=7*9;i<8*9;i++) {
+		str->ReadDword(ClassSpellCounts+i);
+	}
+
+	ieDword InnateOffset, InnateCount;
+	ieDword SongOffset, SongCount;
+	ieDword ShapeOffset, ShapeCount;
+	str->ReadDword( &InnateOffset );
+	str->ReadDword( &InnateCount );
+	str->ReadDword( &SongOffset );
+	str->ReadDword( &SongCount );
+	str->ReadDword( &ShapeOffset );
+	str->ReadDword( &ShapeCount );
+	//str->Seek( 606, GEM_CURRENT_POS);
 
 	str->ReadDword( &ItemSlotsOffset );
 	str->ReadDword( &ItemsOffset );
@@ -1433,7 +1466,7 @@ int CREImp::GetStoredFileSize(Actor *actor)
 			TotSCEFF = 0;
 			break;
 		case IE_CRE_V2_2://iwd2
-			headersize = 0x33c; //?
+			headersize = 0x62e; //with offsets
 			Inventory_Size=50; 
 			TotSCEFF = 1;
 			break;
@@ -1447,18 +1480,24 @@ int CREImp::GetStoredFileSize(Actor *actor)
 	}
 	KnownSpellsOffset = headersize;
 
-	//adding known spells
-	KnownSpellsCount = actor->spellbook.GetTotalKnownSpellsCount();
-	headersize += KnownSpellsCount * 12;
-	SpellMemorizationOffset = headersize;
+	if (actor->version==IE_CRE_V2_2) { //iwd2
+		//adding spellbook header sizes
+		//class spells, domains, (shapes,songs,innates)
+		headersize += 7*9*8 + 9*8 + 3*8;
+	} else {//others
+		//adding known spells
+		KnownSpellsCount = actor->spellbook.GetTotalKnownSpellsCount();
+		headersize += KnownSpellsCount * 12;
+		SpellMemorizationOffset = headersize;
 
-	//adding spell pages
-	SpellMemorizationCount = actor->spellbook.GetTotalPageCount();
-	headersize += SpellMemorizationCount * 16;
-	MemorizedSpellsOffset = headersize;
+		//adding spell pages
+		SpellMemorizationCount = actor->spellbook.GetTotalPageCount();
+		headersize += SpellMemorizationCount * 16;
+		MemorizedSpellsOffset = headersize;
 
-	MemorizedSpellsCount = actor->spellbook.GetTotalMemorizedSpellsCount();
-	headersize += MemorizedSpellsCount * 12;
+		MemorizedSpellsCount = actor->spellbook.GetTotalMemorizedSpellsCount();
+		headersize += MemorizedSpellsCount * 12;
+	}
 	EffectsOffset = headersize;
 
 	//adding effects
@@ -2040,6 +2079,10 @@ int CREImp::PutActorIWD2(DataStream *stream, Actor *actor)
 	stream->Write( &tmpByte,1);
 	stream->Write( filling,4); //this is called ID in iwd2, and contains 2 words
 	stream->Write( actor->GetScriptName(), 32);
+	//3 unknown words
+	stream->WriteWord( &tmpWord);
+	stream->WriteWord( &tmpWord);
+	stream->WriteWord( &tmpWord);
 	return 0;
 }
 
@@ -2208,7 +2251,7 @@ int CREImp::PutVariables( DataStream *stream, Actor *actor)
 /* this function expects GetStoredFileSize to be called before */
 int CREImp::PutActor(DataStream *stream, Actor *actor)
 {
-	ieDword tmpDword;
+	ieDword tmpDword=0;
 	int ret;
 
 	if (!stream || !actor) {
@@ -2256,7 +2299,30 @@ int CREImp::PutActor(DataStream *stream, Actor *actor)
 
 	//writing offsets
 	if (actor->version==IE_CRE_V2_2) {
-		//
+		int i;
+
+		//class spells
+		for (i=0;i<7*9;i++) {
+			stream->WriteDword(&KnownSpellsOffset);
+			KnownSpellsOffset+=8;
+		}
+		for (i=0;i<7*9;i++) {
+			stream->WriteDword(&tmpDword);
+		}
+		//domain spells
+		for (i=0;i<9;i++) {
+			stream->WriteDword(&KnownSpellsOffset);
+			KnownSpellsOffset+=8;
+		}
+		for (i=0;i<9;i++) {
+			stream->WriteDword(&tmpDword);
+		}
+		//innates, shapes, songs
+		for (i=0;i<3;i++) {
+			stream->WriteDword(&KnownSpellsOffset);
+			KnownSpellsOffset+=8;
+			stream->WriteDword(&tmpDword);
+		}
 	} else {
 		stream->WriteDword( &KnownSpellsOffset);
 		stream->WriteDword( &KnownSpellsCount);
@@ -2274,17 +2340,37 @@ int CREImp::PutActor(DataStream *stream, Actor *actor)
 	stream->WriteResRef( actor->Dialog );
 	//spells, spellbook etc
 
-	ret = PutKnownSpells( stream, actor);
-	if (ret) {
-		return ret;
-	}
-	ret = PutSpellPages(stream, actor);
-	if (ret) {
-		return ret;
-	}
-	ret = PutMemorizedSpells(stream, actor);
-	if (ret) {
-		return ret;
+	if (actor->version==IE_CRE_V2_2) {
+		int i;
+
+		//putting out book headers
+		for (i=0;i<7*9;i++) {
+			stream->WriteDword(&tmpDword);
+			stream->WriteDword(&tmpDword);
+		}
+		//domain headers
+		for (i=0;i<9;i++) {
+			stream->WriteDword(&tmpDword);
+			stream->WriteDword(&tmpDword);
+		}
+		//innates, shapes, songs
+		for (i=0;i<3;i++) {
+			stream->WriteDword(&tmpDword);
+			stream->WriteDword(&tmpDword);
+		}
+	} else {
+		ret = PutKnownSpells( stream, actor);
+		if (ret) {
+			return ret;
+		}
+		ret = PutSpellPages( stream, actor);
+		if (ret) {
+			return ret;
+		}
+		ret = PutMemorizedSpells( stream, actor);
+		if (ret) {
+			return ret;
+		}
 	}
 	ret = PutEffects(stream, actor);
 	if (ret) {

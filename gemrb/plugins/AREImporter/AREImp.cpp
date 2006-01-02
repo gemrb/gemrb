@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.147 2005/12/23 16:08:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.148 2006/01/02 23:26:54 avenger_teambg Exp $
  *
  */
 
@@ -271,6 +271,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		ieDword FirstVertex, Cursor, Flags;
 		ieWord TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
 		ieWord LaunchX, LaunchY;
+		ieWord PosX, PosY;
 		char Name[33], Entrance[33];
 		ieResRef Script, DialogResRef, KeyResRef, Destination;
 		str->Read( Name, 32 );
@@ -305,8 +306,10 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->ReadWord( &LaunchY );
 		str->ReadResRef( KeyResRef );
 		str->ReadResRef( Script );
-			//maybe we have to store this
-		str->Seek( 56, GEM_CURRENT_POS );
+		str->ReadWord( &PosX);
+		str->ReadWord( &PosY);
+		//maybe we have to store this
+		str->Seek( 52, GEM_CURRENT_POS );
 		str->ReadResRef( DialogResRef );
 		char* string = core->GetString( StrRef );
 		str->Seek( VerticesOffset + ( FirstVertex * 4 ), GEM_STREAM_START );
@@ -330,8 +333,14 @@ Map* AREImp::GetMap(const char *ResRef)
 		ip->textDisplaying = 0;
 		ip->timeStartDisplaying = 0;
 		ip->SetMap(map);
-		ip->Pos.x = bbox.x + ( bbox.w / 2 );
-		ip->Pos.y = bbox.y + ( bbox.h / 2 );
+		//FIXME: PST doesn't use this field
+		if (ip->Flags&TRAP_USEPOINT) {
+			ip->Pos.x=PosX;
+			ip->Pos.y=PosY;
+		} else {
+			ip->Pos.x = bbox.x + ( bbox.w / 2 );
+			ip->Pos.y = bbox.y + ( bbox.h / 2 );
+		}
 		ip->Flags = Flags;
 		memcpy( ip->Destination, Destination, sizeof(Destination) );
 		memcpy( ip->EntranceName, Entrance, sizeof(Entrance) );
@@ -1473,7 +1482,11 @@ int AREImp::PutRegions( DataStream *stream, Map *map, ieDword &VertIndex)
 		} else {
 			stream->Write( filling, 8);
 		}
-		stream->Write( filling, 56); //unknown, including some points
+		tmpWord = (ieWord) ip->Pos.x;
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) ip->Pos.y;
+		stream->WriteWord( &tmpWord);
+		stream->Write( filling, 52); //unknown, including some points
 		stream->WriteResRef( ip->DialogResRef);
 	}
 	return 0;

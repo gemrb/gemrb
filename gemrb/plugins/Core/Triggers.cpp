@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.36 2005/12/25 10:31:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.37 2006/01/02 23:26:54 avenger_teambg Exp $
  *
  */
 
@@ -1140,6 +1140,28 @@ int GameScript::NearSavedLocation(Scriptable* Sender, Trigger* parameters)
 int GameScript::Or(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	return parameters->int0Parameter;
+}
+
+int GameScript::WalkedToTrigger(Scriptable* Sender, Trigger* parameters)
+{
+	Actor *target = Sender->GetCurrentArea()->GetActorByGlobalID(Sender->LastTrigger);
+	if (!target) {
+		return 0;
+	}
+	if (Distance(target, Sender) > MAX_OPERATING_DISTANCE ) {
+		return 0;
+	}
+	//now objects suicide themselves if they are empty objects
+	//so checking an empty object is easier
+	if (parameters->objectParameter == NULL) {
+		Sender->AddTrigger (&Sender->LastTrigger);
+		return 1;
+	}
+	if (MatchActor(Sender, Sender->LastTrigger, parameters->objectParameter)) {
+		Sender->AddTrigger (&Sender->LastTrigger);
+		return 1;
+	}
+	return 0;
 }
 
 int GameScript::Clicked(Scriptable* Sender, Trigger* parameters)
@@ -2503,10 +2525,12 @@ int GameScript::TrapTriggered(Scriptable* Sender, Trigger* parameters)
 	if (Sender->Type != ST_TRIGGER) {
 		return 0;
 	}
+/* matchactor would do this, hmm
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!tar || tar->Type != ST_ACTOR) {
 		return 0;
 	}
+*/
 	if (MatchActor(Sender, Sender->LastTrigger, parameters->objectParameter)) {
 		Sender->AddTrigger (&Sender->LastTrigger);
 		return 1;

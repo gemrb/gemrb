@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.96 2005/12/12 18:39:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.97 2006/01/02 23:26:54 avenger_teambg Exp $
  *
  */
 
@@ -66,7 +66,7 @@ class Gem_Polygon;
 //#define TRAP_128	128
 #define TRAP_DEACTIVATED  256
 #define TRAVEL_NONPC      512
-//#define TRAP_1024       1024 //override?
+#define TRAP_USEPOINT       1024 //override usage point of travel regions
 #define INFO_DOOR	 2048 //info trigger blocked by door
 
 //door flags
@@ -430,8 +430,8 @@ public:
 	bool VisibleTrap(bool only_detected);
 	//returns true if trap has been triggered, tumble skill???
 	bool TriggerTrap(int skill);
-	//call this when some actor entered the trigger zone
-	void Entered(Actor *actor);
+	//call this to check if an actor entered the trigger zone
+	bool Entered(Actor *actor);
 	//checks if the actor may use this travel trigger
 	int CheckTravel(Actor *actor);
 	void DebugDump();
@@ -445,7 +445,8 @@ public:
 	ieWord Trapped;
 	ieWord TrapDetected;
 	//overheadtext contains the string, but we have to save this
-	ieStrRef StrRef; 
+	ieStrRef StrRef;
+	Point UsePoint;
 };
 
 #endif

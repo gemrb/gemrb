@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.347 2006/01/02 10:14:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.348 2006/01/02 23:26:54 avenger_teambg Exp $
  *
  */
 
@@ -308,6 +308,7 @@ static TriggerLink triggernames[] = {
 	{"unselectablevariablegt", GameScript::UnselectableVariableGT, 0},
 	{"unselectablevariablelt", GameScript::UnselectableVariableLT, 0},
 	{"vacant",GameScript::Vacant, 0},
+	{"walkedtotrigger", GameScript::WalkedToTrigger, 0},
 	{"xor", GameScript::Xor,TF_MERGESTRINGS},
 	{"xp", GameScript::XP, 0},
 	{"xpgt", GameScript::XPGT, 0},
@@ -974,16 +975,25 @@ const targettype *Targets::GetLastTarget(int Type)
 const targettype *Targets::GetFirstTarget(targetlist::iterator &m, int Type)
 {
 	m=objects.begin();
-	return GetNextTarget(m,Type);
+	while (m!=objects.end() ) {
+		if ( (Type!=-1) && ( (*m).actor->Type!=Type)) {
+			m++;
+			continue;
+		}
+		return &(*m);
+	}
+	return NULL;
 }
 
 const targettype *Targets::GetNextTarget(targetlist::iterator &m, int Type)
 {
+	m++;
 	while (m!=objects.end() ) {
-		if ( (Type==-1) || ((*m).actor->Type==Type) ) {
-			return &(*m++);
+		if ( (Type!=-1) && ( (*m).actor->Type!=Type)) {
+			m++;
+			continue;
 		}
-		m++;
+		return &(*m);
 	}
 	return NULL;
 }

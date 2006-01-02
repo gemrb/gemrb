@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.217 2005/12/29 18:01:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.218 2006/01/02 23:26:54 avenger_teambg Exp $
  *
  */
 
@@ -505,19 +505,18 @@ void Map::UpdateScripts()
 		q=Qcount[0];
 		while (q--) {
 			Actor* actor = queue[0][q];
-			if ((ip->Type == ST_PROXIMITY) && !(ip->Flags&TRAP_DEACTIVATED) ) {
-				if (ip->outline->PointIn( actor->Pos )) {
-					ip->Entered(actor);
+			if (ip->Type == ST_PROXIMITY) {
+				if (ip->Entered(actor)) {
+					ip->ExecuteScript( ip->Scripts[0] );
+					//Execute Pending Actions
+					ip->ProcessActions();
 				}
-				ip->ExecuteScript( ip->Scripts[0] );
-				//Execute Pending Actions
-				ip->ProcessActions();
 			} else {
 				//ST_TRAVEL
 				//don't move if doing something else
 				if (actor->GetNextAction())
 					continue;
-				if (ip->outline->PointIn( actor->Pos )) {
+				if (ip->Entered(actor)) {
 					UseExit(actor, ip);
 				}
 			}

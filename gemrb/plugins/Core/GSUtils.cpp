@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.45 2005/12/25 10:31:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.46 2006/01/02 23:26:54 avenger_teambg Exp $
  *
  */
 
@@ -404,6 +404,8 @@ static Targets* EvaluateObject(Scriptable* Sender, Object* oC)
 			const targettype *t = tgts->GetFirstTarget(m, -1);
 			while (t) {
 				if (t->actor->Type!=ST_ACTOR) {
+//we should never stumble here
+abort();
 					t = tgts->RemoveTargetAt(m);
 					continue;
 				}

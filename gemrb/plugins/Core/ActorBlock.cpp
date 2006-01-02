@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.128 2005/12/25 10:31:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.129 2006/01/02 23:26:54 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -1019,7 +1019,7 @@ bool InfoPoint::VisibleTrap(bool see_all)
 bool InfoPoint::TriggerTrap(int skill)
 {
 	if (Type!=ST_PROXIMITY) {
-		return false;
+		return true;
 	}
 	//actually this could be script name[0]
 	if (!Scripts[0]) {
@@ -1045,14 +1045,26 @@ bool InfoPoint::TriggerTrap(int skill)
 	return true;
 }
 
-void InfoPoint::Entered(Actor *actor)
+bool InfoPoint::Entered(Actor *actor)
 {
+	if (outline->PointIn( actor->Pos ) ) {
+		goto check;
+	}
+	if (Flags&TRAP_USEPOINT) {
+		if (Distance(UsePoint, actor->Pos)<14) {
+			goto check;
+		}
+	}
+	return false;
+check:
 	if (actor->InParty || (Flags&TRAP_NPC) ) {
 		//skill?
 		if (TriggerTrap(0) ) {
 			LastTrigger = LastEntered = actor->GetID();
+			return true;
 		}
 	}
+	return false;
 }
 
 void InfoPoint::DebugDump()

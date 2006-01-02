@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.277 2005/12/30 19:02:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.278 2006/01/02 23:26:54 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -941,7 +941,7 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 	}
 }
 
-bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor)
+bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 {
 	switch(trap->Type) {
 		case ST_TRAVEL:
@@ -972,6 +972,11 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor)
 						DisplayString( trap );
 					}
 				}
+			}
+			if (trap->Flags&TRAP_USEPOINT) {
+				//overriding the target point
+				p = trap->Pos;
+				return false;
 			}
 			return true;
 		default:;
@@ -1047,7 +1052,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			return;
 		}
 		if (overInfoPoint) {
-			if (HandleActiveRegion(overInfoPoint, core->GetFirstSelectedPC())) {
+			if (HandleActiveRegion(overInfoPoint, core->GetFirstSelectedPC(), p)) {
 				return;
 			}
 		}

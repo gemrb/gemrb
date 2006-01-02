@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.235 2005/12/25 10:31:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.236 2006/01/02 23:26:54 avenger_teambg Exp $
  *
  */
 
@@ -886,6 +886,7 @@ public: //Script Functions
 	static int UnselectableVariableGT(Scriptable* Sender, Trigger* parameters);
 	static int UnselectableVariableLT(Scriptable* Sender, Trigger* parameters);
 	static int Vacant(Scriptable* Sender, Trigger* parameters);
+	static int WalkedToTrigger(Scriptable* Sender, Trigger* parameters);
 	static int IsWeather(Scriptable* Sender, Trigger* parameters);
 	static int Xor(Scriptable* Sender, Trigger* parameters);
 	static int XP(Scriptable* Sender, Trigger* parameters);
