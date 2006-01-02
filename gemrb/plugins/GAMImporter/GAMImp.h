@@ -29,6 +29,7 @@
 #define GAM_VER_IWD 11  
 #define GAM_VER_PST 12 
 #define GAM_VER_BG2 20 
+#define GAM_VER_TOB 21 
 #define GAM_VER_IWD2 22
 
 class GAMImp : public SaveGameMgr {

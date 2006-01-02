@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.76 2006/01/01 16:58:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.77 2006/01/02 10:57:51 avenger_teambg Exp $
  *
  */
 
@@ -63,8 +63,12 @@ bool GAMImp::Open(DataStream* stream, bool autoFree)
 		version = GAM_VER_GEMRB;
 		PCSize = 0x160;
 	} else if (strncmp( Signature, "GAMEV2.0", 8 ) == 0) {
-		//soa, tob
+		//soa (soa part of tob)
 		version = GAM_VER_BG2;
+		PCSize = 0x160;
+	} else if (strncmp( Signature, "GAMEV2.1", 8 ) == 0) {
+		//tob
+		version = GAM_VER_TOB;
 		PCSize = 0x160;
 	} else if (strncmp( Signature, "GAMEV1.0", 8 ) == 0) {
 		//bg1?
@@ -88,7 +92,7 @@ bool GAMImp::Open(DataStream* stream, bool autoFree)
 			version=GAM_VER_BG;
 		}
 	} else {
-		printf( "[GAMImporter]: This file is not a valid GAM File\n" );
+		printMessage( "GAMImporter","This file is not a valid GAM File\n", LIGHT_RED );
 		return false;
 	}
 
@@ -484,6 +488,7 @@ int GAMImp::GetStoredFileSize(Game *game)
 		break;
 	case GAM_VER_BG:
 	case GAM_VER_BG2:
+	case GAM_VER_TOB:
 		headersize = 0xb4;
 		PCSize = 0x160;
 		break;
@@ -658,6 +663,7 @@ int GAMImp::PutHeader(DataStream *stream, Game *game)
 	case GAM_VER_BG:
 	case GAM_VER_IWD:
 	case GAM_VER_BG2:
+	case GAM_VER_TOB:
 	case GAM_VER_IWD2:
 		stream->WriteDword( &game->Reputation );
 		stream->WriteResRef( game->CurrentArea );
