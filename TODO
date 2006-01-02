@@ -9,14 +9,15 @@ Scripts:
 
 5. (DONE) Handle the protagonist/party death event
 
-6. Handle the party limit exceeded event
+6. (DONE) Handle the party limit exceeded event
+
 
 Items:
 1. (DONE) Loading containers/items in areas
 2. (DONE) Dropping of items (first create an opcode)
 2a. (DONE) Render dropped items in area (ground icon)
 3. (DONE) Picking up an item (create opcode too)
-4. (DONE) Equipping items
+4. (PARTLY) Equipping items, weapons are special
 5. Equipped weapon range (create triggers)
 6. Break swords and stuff
 
@@ -29,14 +30,16 @@ Area:
 2. Don't load scripts for pile items? (research when a script is unused)
 3. Create real streaming ambients (do not preload them, just use them when needed)
 4. in pathfinder, calculate with the actor's feet circle size
+5. fix door wallgroups
 
 Store:
 1. (DONE) Save stores, handle containers
 
 Animation:
-1. (PARTLY) fix char animation sequences
+1. (PARTLY) fix char animation sequences (fixed?)
 2. (DONE) animationfactory->one single palette
 3. Use animation factory instead of local caching in CharAnimations (some way of rendering bitmaps with different palettes, but do it efficiently)
+4. Handle large animations (2x2, 3x3), either implement animation group or merge several frames into a large one. (they were originally split up for memory saving) Merging them may take time, but would be simpler to handle. 
 
 Actor:
 1. (DONE) Fix reputation
@@ -46,7 +49,7 @@ Window/Widget management:
 
 Game GUI:
 1. (DONE) fix TextScreen/IncrementChapter
-2. implement class based (but customisable) action button bar. Generally port the IWD2 system to all engines
+2. (PARTLY) implement class based (but customisable) action button bar. Generally port the IWD2 system to all engines
 
 Known Bugs:
 1. problem: stanceID is still fuzzy. Fix it. (FIXED?)
