@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.379 2005/12/30 19:02:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.380 2006/01/02 20:44:30 avenger_teambg Exp $
  *
  */
 
@@ -462,7 +462,7 @@ void Interface::HandleFlags()
 				gc->ChangeMap(actor, true);
 			}
 		} else {
-			printMessage("Core", "No game to enter...", LIGHT_RED );
+			printMessage("Core", "No game to enter...\n", LIGHT_RED);
 			QuitFlag = QF_QUITGAME;
 		}
 	}
@@ -1175,6 +1175,9 @@ WorldMap *Interface::GetWorldMap(const char *map)
 
 void* Interface::GetInterface(SClass_ID filetype)
 {
+	if (!plugin) {
+		return NULL;
+	}
 	return plugin->GetPlugin( filetype );
 }
 
@@ -1508,8 +1511,9 @@ bool Interface::LoadConfig(const char* filename)
 			FixPath( CachePath, false );
 			mkdir( CachePath, S_IREAD|S_IWRITE|S_IEXEC );
 			chmod( CachePath, S_IREAD|S_IWRITE|S_IEXEC );
-			if (! dir_exists( CachePath )) {
-				printf( "Cache folder %s doesn't exist!", CachePath );
+			if ( StupidityDetector( CachePath )) {
+				printMessage("Core"," ",LIGHT_RED);
+				printf( "Cache folder %s doesn't exist, invalid or contains executable files!\n", CachePath );
 				fclose( config );
 				return false;
 			}
@@ -3257,6 +3261,21 @@ bool Interface::SavedExtension(const char *filename)
 	return false;
 }
 
+static char *protected_extensions[]={".exe",".dll",".so",0};
+
+//returns true if file should be saved
+bool Interface::ProtectedExtension(const char *filename)
+{
+	char *str=strchr(filename,'.');
+	if (!str) return false;
+	int i=0;
+	while(protected_extensions[i]) {
+		if (!stricmp(protected_extensions[i], str) ) return true;
+		i++;
+	}
+	return false;
+}
+
 void Interface::RemoveFromCache(const ieResRef resref, SClass_ID ClassID)
 {
 	char filename[_MAX_PATH];
@@ -3265,6 +3284,43 @@ void Interface::RemoveFromCache(const ieResRef resref, SClass_ID ClassID)
 	strcat( filename, resref );
 	strcat( filename, TypeExt( ClassID ) );
 	unlink ( filename);
+}
+
+//this function checks if the path is eligible as a cache
+//if it contains a directory, or suspicious file extensions
+//we bail out
+bool Interface::StupidityDetector(const char* Pt)
+{
+	char Path[_MAX_PATH];
+	strcpy( Path, Pt );
+	DIR* dir = opendir( Path );
+	if (dir == NULL) {
+		return true; //no directory?
+	}
+	struct dirent* de = readdir( dir ); //Lookup the first entry in the Directory
+	if (de == NULL) {
+		closedir( dir );
+		return true; //cannot read it?
+	}
+	do {
+		char dtmp[_MAX_PATH];
+		struct stat fst;
+		snprintf( dtmp, _MAX_PATH, "%s%s%s", Path, SPathDelimiter, de->d_name );
+		stat( dtmp, &fst );
+		if (S_ISDIR( fst.st_mode )) {
+			if (de->d_name[0] == '.')
+				continue;
+			closedir( dir );
+			return true; //a directory in there???
+		}
+		if (ProtectedExtension(de->d_name) ) {
+			closedir( dir );
+			return true; //a directory in there???
+		}
+	} while (( de = readdir( dir ) ) != NULL);
+	closedir( dir );
+	//ok, we got a good conscience
+	return false;
 }
 
 void Interface::DelTree(const char* Pt, bool onlysave)
@@ -3748,7 +3804,8 @@ ieStrRef Interface::GetRumour(const ieResRef dlgref)
 	FreeInterface( dm );
 
 	if (!dlg) {
-		printf( "[Interface]: Cannot load dialog: %s\n", dlgref );
+		printMessage("Interface"," ", LIGHT_RED);
+		printf( "Cannot load dialog: %s\n", dlgref );
 		return (ieStrRef) -1;
 	}
 	Scriptable *pc=game->GetPC( game->GetSelectedPCSingle(), false );
