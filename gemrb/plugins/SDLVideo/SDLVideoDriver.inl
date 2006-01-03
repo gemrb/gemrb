@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.inl,v 1.3 2005/12/25 12:52:20 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.inl,v 1.4 2006/01/03 22:02:43 wjpalenstijn Exp $
  *
  */
 
@@ -143,6 +143,7 @@ do {
 	unsigned int dB;
 #endif
 
+#ifndef ALREADYCLIPPED
 	int clipx, clipy, clipw, cliph;
 	if (clip) {
 		clipx = clip->x;
@@ -171,6 +172,7 @@ do {
 	if (clipy+cliph > cliprect.y+cliprect.h) {
 		cliph = cliprect.y+cliprect.h-clipy;
 	}
+#endif
 
 
 	PTYPE* line = (PTYPE*)(TARGET)->pixels +
