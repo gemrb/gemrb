@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.17 2005/06/05 12:12:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.18 2006/01/03 19:36:28 wjpalenstijn Exp $
  *
  */
 
@@ -50,40 +50,38 @@ void TileOverlay::AddTile(Tile* tile)
 
 void TileOverlay::Draw(Region viewport)
 {
+	// if the video's viewport is partially outside of the map, bump it back
 	bool bump = false;
 	Video* vid = core->GetVideoDriver();
 	Region vp = vid->GetViewport();
-	vp.x += viewport.x;
-	vp.y += viewport.y;
 	vp.w = viewport.w;
 	vp.h = viewport.h;
 	if (( vp.x + vp.w ) > w * 64) {
 		vp.x = ( w * 64 - vp.w );
 		bump = true;
 	}
-	if (vp.x < viewport.x) {
-		vp.x = viewport.x;
+	if (vp.x < 0) {
+		vp.x = 0;
 		bump = true;
 	}
 	if (( vp.y + vp.h ) > h * 64) {
 		vp.y = ( h * 64 - vp.h );
 		bump = true;
 	}
-	if (vp.y < viewport.y) {
-		vp.y = viewport.y;
+	if (vp.y < 0) {
+		vp.y = 0;
 		bump = true;
 	}
 	if( bump ) {
-		core->MoveViewportTo( vp.x - viewport.x, vp.y - viewport.y, false );
+		core->MoveViewportTo( vp.x, vp.y, false );
 	}
-	int sx = ( vp.x - viewport.x ) / 64;
-	int sy = ( vp.y - viewport.y ) / 64;
+
+	// determine which tiles are visible
+	int sx = vp.x / 64;
+	int sy = vp.y / 64;
 	int dx = ( vp.x + vp.w + 63 ) / 64;
 	int dy = ( vp.y + vp.h + 63 ) / 64;
-	vp.x = viewport.x;
-	vp.y = viewport.y;
-	vp.w = viewport.w;
-	vp.h = viewport.h;
+
 	for (int y = sy; y < dy && y < h; y++) {
 		for (int x = sx; x < dx && x < w; x++) {
 			Tile* tile = tiles[( y* w ) + x];
@@ -94,7 +92,7 @@ void TileOverlay::Draw(Region viewport)
 			if (tile->anim[tile->tileIndex]) {
 				vid->BlitSprite( tile->anim[tile->tileIndex]->NextFrame(),
 						viewport.x + ( x * 64 ), viewport.y + ( y * 64 ),
-						false, &vp );
+						false, &viewport );
 			}
 		}
 	}
