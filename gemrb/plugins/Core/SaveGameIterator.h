@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.h,v 1.20 2005/12/30 19:02:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.h,v 1.21 2006/01/03 19:45:53 avenger_teambg Exp $
  *
  */
 
@@ -43,11 +43,15 @@
 
 class GEM_EXPORT SaveGame {
 public:
-	SaveGame(char* path, char* name, char* prefix, int pCount);
+	SaveGame(char* path, char* name, char* prefix, int pCount, int saveID);
 	~SaveGame();
 	int GetPortraitCount()
 	{
 		return PortraitCount;
+	};
+	int GetSaveID()
+	{
+		return SaveID;
 	};
 	const char* GetName()
 	{
@@ -77,6 +81,7 @@ private:
 	char Name[_MAX_PATH];
 	char Date[_MAX_PATH];
 	int PortraitCount;
+	int SaveID;
 };
 
 typedef std::list<char *> charlist;

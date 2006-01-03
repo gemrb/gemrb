@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.35 2006/01/03 17:16:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.36 2006/01/03 19:45:53 avenger_teambg Exp $
  *
  */
 
@@ -28,12 +28,13 @@
 #include <vector>
 #include <cassert>
 
-SaveGame::SaveGame(char* path, char* name, char* prefix, int pCount)
+SaveGame::SaveGame(char* path, char* name, char* prefix, int pCount, int saveID)
 {
 	strncpy( Prefix, prefix, sizeof( Prefix ) );
 	strncpy( Path, path, sizeof( Path ) );
 	strncpy( Name, name, sizeof( Name ) );
 	PortraitCount = pCount;
+	SaveID = saveID;
 	char nPath[_MAX_PATH];
 	struct stat my_stat;
 	sprintf( nPath, "%s%s%s.bmp", Path, SPathDelimiter, Prefix );
@@ -306,7 +307,7 @@ SaveGame* SaveGameIterator::GetSaveGame(int index)
 	} while (( de2 = readdir( ndir ) ) != NULL);
 	closedir( ndir ); //No other files in the directory, close it
 
-	SaveGame* sg = new SaveGame( Path, savegameName, core->GameNameResRef, prtrt );
+	SaveGame* sg = new SaveGame( Path, savegameName, core->GameNameResRef, prtrt, savegameNumber );
 	return sg;
 }
 

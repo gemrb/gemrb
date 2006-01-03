@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.380 2006/01/02 20:44:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.381 2006/01/03 19:45:52 avenger_teambg Exp $
  *
  */
 
@@ -1734,6 +1734,7 @@ bool Interface::LoadGemRBINI()
 	SetFeature( ini->GetKeyAsInt( "resources", "SmallFog", 1 ), GF_SMALL_FOG );
 	SetFeature( ini->GetKeyAsInt( "resources", "ReverseDoor", 0 ), GF_REVERSE_DOOR );
 	SetFeature( ini->GetKeyAsInt( "resources", "DialogueScrolls", 0 ), GF_DIALOGUE_SCROLLS );
+	SetFeature( ini->GetKeyAsInt( "resources", "KnowWorld", 0 ), GF_KNOW_WORLD );
 	ForceStereo = ini->GetKeyAsInt( "resources", "ForceStereo", 0 );
 
 	FreeInterface( ini );

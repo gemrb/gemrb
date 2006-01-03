@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.17 2005/11/17 17:40:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.18 2006/01/03 19:45:53 avenger_teambg Exp $
  *
  */
 
@@ -77,6 +77,8 @@ class GEM_EXPORT WMPAreaEntry {
 public:
 	WMPAreaEntry();
 	~WMPAreaEntry();
+	ieDword GetAreaStatus();
+public:
 	ieResRef AreaName;
 	ieResRef AreaResRef;
 	char AreaLongName[32];

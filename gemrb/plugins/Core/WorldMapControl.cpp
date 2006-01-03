@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.20 2006/01/03 17:16:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.21 2006/01/03 19:45:53 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -78,7 +78,7 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 	unsigned int ec = worldmap->GetEntryCount();
 	for(i=0;i<ec;i++) {
 		WMPAreaEntry *m = worldmap->GetEntry(i);
-		if (! (m->AreaStatus & WMP_ENTRY_VISIBLE)) continue;
+		if (! (m->GetAreaStatus() & WMP_ENTRY_VISIBLE)) continue;
 
 		short xOffs = MAP_TO_SCREENX(m->X);
 		short yOffs = MAP_TO_SCREENY(m->Y);
@@ -97,7 +97,7 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 	}
 	for(i=0;i<ec;i++) {
 		WMPAreaEntry *m = worldmap->GetEntry(i);
-		if (! (m->AreaStatus & WMP_ENTRY_VISIBLE)) continue;
+		if (! (m->GetAreaStatus() & WMP_ENTRY_VISIBLE)) continue;
 		Sprite2D *icon=m->MapIcon;
 		int h=0,w=0;
 		if (icon) {
@@ -120,7 +120,7 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 			fore.b = 0x80;
 			fore.g = 0x80;
 		} else {
-			if (! (m->AreaStatus & WMP_ENTRY_VISITED)) {
+			if (! (m->GetAreaStatus() & WMP_ENTRY_VISITED)) {
 				//if not visited, make it pale blue
 				fore.r=0x80;
 				fore.g=0x80;
@@ -195,7 +195,7 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 		for (i=0;i<ec;i++) {
 			WMPAreaEntry *ae = worldmap->GetEntry(i);
 
-			if ((ae->AreaStatus & WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE)!= (WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE) ) {
+			if ( (ae->GetAreaStatus() & WMP_ENTRY_WALKABLE)!=WMP_ENTRY_WALKABLE) {
 				continue; //invisible or inaccessible
 			}
 			if (!strnicmp(ae->AreaResRef, ca, 8) ) {

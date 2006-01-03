@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.20 2006/01/03 17:16:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.21 2006/01/03 19:45:53 avenger_teambg Exp $
  *
  */
 
@@ -34,6 +34,15 @@ WMPAreaEntry::~WMPAreaEntry()
 	if (MapIcon) {
 		core->GetVideoDriver()->FreeSprite(MapIcon);
 	}
+}
+
+ieDword WMPAreaEntry::GetAreaStatus()
+{
+	ieDword tmp = AreaStatus;
+	if (core->HasFeature(GF_KNOW_WORLD) ) {
+		tmp |=WMP_ENTRY_VISITED;
+	}
+	return tmp;
 }
 
 WorldMap::WorldMap(void)
