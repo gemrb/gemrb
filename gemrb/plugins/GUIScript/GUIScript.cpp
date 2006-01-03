@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.369 2006/01/03 17:16:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.370 2006/01/03 18:37:06 avenger_teambg Exp $
  *
  */
 
@@ -1903,11 +1903,15 @@ static PyObject* GemRB_GetDestinationArea(PyObject * /*self*/, PyObject* args)
 		return Py_None;
 	}
 	WorldMap *wm = core->GetWorldMap();
-	bool encounter;
-	WMPAreaLink *wal = wm->GetEncounterLink(wmc->Area->AreaName, encounter);
 	PyObject* dict = PyDict_New();
 	//the area the user clicked on
 	PyDict_SetItemString(dict, "Target", PyString_FromString (wmc->Area->AreaName) );
+	bool encounter;
+	WMPAreaLink *wal = wm->GetEncounterLink(wmc->Area->AreaName, encounter);
+	if (!wal) {
+		PyDict_SetItemString(dict, "Distance", PyInt_FromLong (-1) );
+		return dict;
+	}
 	PyDict_SetItemString(dict, "Destination", PyString_FromString (wmc->Area->AreaName) );
 	PyDict_SetItemString(dict, "Entrance", PyString_FromString (wal->DestEntryPoint) );
 	//the area the user will fall on
@@ -3014,7 +3018,7 @@ static PyObject *GetGameDate(DataStream *ds)
 
 PyDoc_STRVAR( GemRB_GetSaveGameAttrib__doc,
 "GetSaveGameAttrib(Type, SaveSlotCount) => string\n\n"
-"Returns the name, path or prefix of the saved game." );
+"Returns the name, path, prefix, date or ingame date of the saved game." );
 
 static PyObject* GemRB_GetSaveGameAttrib(PyObject * /*self*/, PyObject* args)
 {
@@ -3040,6 +3044,8 @@ static PyObject* GemRB_GetSaveGameAttrib(PyObject * /*self*/, PyObject* args)
 			tmp = PyString_FromString( sg->GetDate() ); break;
 		case 4: //ingame date
 			tmp = GetGameDate(sg->GetGame()); break;
+		case 5:
+			tmp = PyInt_FromLong( sg->GetSaveID() ); break;
 		default:
 			printMessage( "GUIScript",
 				"Syntax Error: GetSaveGameAttrib(Type, SlotCount)\n",
