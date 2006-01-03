@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.370 2006/01/03 18:37:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.371 2006/01/03 22:03:43 avenger_teambg Exp $
  *
  */
 
@@ -2248,8 +2248,7 @@ static PyObject* GemRB_GameControlSetTargetMode(PyObject * /*self*/, PyObject* a
 
 	GameControl *gc = core->GetGameControl();
 	if (!gc) {
-		printMessage ("GUIScript", "Can't find GameControl!",LIGHT_RED);
-		return NULL;
+		return RuntimeError("Can't find GameControl!");
 	}
 
 	gc->target_mode = Mode;
@@ -2873,8 +2872,7 @@ static PyObject* GemRB_CheckVar(PyObject * /*self*/, PyObject* args)
 	}
 	GameControl *gc = core->GetGameControl();
 	if (!gc) {
-		printMessage("GUIScript","No Game!\n", LIGHT_RED);
-		return NULL;
+		return RuntimeError("Can't find GameControl!");
 	}
 	Scriptable *Sender = (Scriptable *) gc->GetLastActor();
 	if (!Sender) {
@@ -3790,12 +3788,33 @@ static PyObject* GemRB_GameSelectPCSingle(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GameGetSelectedPCSingle__doc,
-"GameGetSelectedPCSingle() => int\n\n"
-"Returns index of the selected PC in non-walk environment (i.e. in shops, inventory,...). Index should be greater than zero." );
+"GameGetSelectedPCSingle(flag) => int\n\n"
+"Returns index of the selected PC in non-walk environment (i.e. in shops, inventory,...). Index should be greater than zero. If flag is set, then this function will return the PC currently talking." );
 
-static PyObject* GemRB_GameGetSelectedPCSingle(PyObject * /*self*/, PyObject* /*args*/)
+static PyObject* GemRB_GameGetSelectedPCSingle(PyObject * /*self*/, PyObject* args)
 {
-	return PyInt_FromLong( core->GetGame()->GetSelectedPCSingle() );
+	int flag = 0;
+
+	if (!PyArg_ParseTuple( args, "|i", &flag )) {
+		return AttributeError( GemRB_GameGetSelectedPCSingle__doc );
+	}
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	if (flag) {
+		GameControl *gc = core->GetGameControl();
+		if (!gc) {
+			return RuntimeError("Can't find GameControl!");
+		}
+		Actor *ac = gc->GetSpeaker();
+		int ret = 0;
+		if (ac) {
+			ret = ac->InParty;
+		}
+		return PyInt_FromLong( ret );
+	}
+	return PyInt_FromLong( game->GetSelectedPCSingle() );
 }
 
 PyDoc_STRVAR( GemRB_GameGetFirstSelectedPC__doc,
@@ -6201,7 +6220,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GameSelectPC, METH_VARARGS),
 	METHOD(GameIsPCSelected, METH_VARARGS),
 	METHOD(GameSelectPCSingle, METH_VARARGS),
-	METHOD(GameGetSelectedPCSingle, METH_NOARGS),
+	METHOD(GameGetSelectedPCSingle, METH_VARARGS),
 	METHOD(GameGetFirstSelectedPC, METH_NOARGS),
 	METHOD(GetPlayerPortrait, METH_VARARGS),
 	METHOD(GetPlayerName, METH_VARARGS),

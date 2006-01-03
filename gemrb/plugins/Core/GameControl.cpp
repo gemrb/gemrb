@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.278 2006/01/02 23:26:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.279 2006/01/03 22:03:42 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1479,7 +1479,8 @@ void GameControl::InitDialog(Actor* spk, Actor* tgt, const char* dlgref)
 	core->FreeInterface( dm );
 
 	if (!dlg) {
-		printf( "[GameControl]: Cannot start dialog: %s\n", dlgref );
+		printMessage("GameControl", " ", LIGHT_RED);
+		printf( "Cannot start dialog: %s\n", dlgref );
 		return;
 	}
 	strnlwrcpy(dlg->ResRef, dlgref, 8); //this isn't handled by GetDialog???
@@ -1512,8 +1513,7 @@ void GameControl::InitDialog(Actor* spk, Actor* tgt, const char* dlgref)
 /*try to break will only try to break it, false means unconditional stop*/
 void GameControl::EndDialog(bool try_to_break)
 {
-	if (try_to_break && (DialogueFlags&DF_UNBREAKABLE) )
-	{
+	if (try_to_break && (DialogueFlags&DF_UNBREAKABLE) ) {
 		return;
 	}
 
@@ -1646,7 +1646,7 @@ void GameControl::DialogChoose(unsigned int choose)
 			//target should be recalculated!
 			target = target->GetCurrentArea()->GetActorByDialog(tr->Dialog);
 			if (!target) {
-				printMessage("Dialog","Can't redirect dialog",YELLOW);
+				printMessage("Dialog","Can't redirect dialog\n",YELLOW);
 				ta->SetMinRow( false );
 				EndDialog();
 				return;
@@ -1709,7 +1709,7 @@ void GameControl::DialogChoose(unsigned int choose)
 	}
 	// this happens if a trigger isn't implemented or the dialog is wrong
 	if (!idx) {
-		printMessage("Dialog", "There were no valid dialog options!", YELLOW);
+		printMessage("Dialog", "There were no valid dialog options!\n", YELLOW);
 		DialogueFlags |= DF_OPENENDWINDOW;
 	}
 end_of_choose:

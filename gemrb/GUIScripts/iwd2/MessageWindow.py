@@ -106,6 +106,20 @@ def UpdateControlStatus():
 	GemRB.SetVar ("MessageWindow", TMessageWindow)
 	GemRB.SetVar ("MessageTextArea", TMessageTA)
 
+	if Override:
+		#gets PC currently talking
+		pc = GemRB.GameGetSelectedPCSingle (1)
+		if pc:
+			Portrait = GemRB.GetPlayerPortrait(PC-1,1)
+		else:
+			Portrait = None
+		Button = GemRB.GetControl(TMessageWindow, 11)
+		GemRB.SetButtonState (TMessageWindow, Button, IE_GUI_BUTTON_LOCKED)
+		if not Portrait:
+			GemRB.SetButtonFlags(TMessageWindow, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+		else:
+			GemRB.SetButtonPicture(TMessageWindow, Button, Portrait, "NOPORTSM")
+		
 	if hideflag:
 		GemRB.UnhideGUI()
 	return
