@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.34 2006/01/02 17:45:14 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.35 2006/01/03 17:16:04 avenger_teambg Exp $
  *
  */
 
@@ -229,8 +229,7 @@ bool SaveGameIterator::RescanSaveGames()
 	snprintf( Path, _MAX_PATH, "%s%s", core->SavePath, PlayMode() );
 
 	DIR* dir = opendir( Path );
-	if (dir == NULL) //If we cannot open the Directory
-	{
+	if (dir == NULL) { //If we cannot open the Directory
 		return false;
 	}
 	struct dirent* de = readdir( dir ); //Lookup the first entry in the Directory
@@ -276,15 +275,16 @@ SaveGame* SaveGameIterator::GetSaveGame(int index)
 
 	int prtrt = 0;
 	char Path[_MAX_PATH];
+	//lets leave space for the filenames
 	snprintf( Path, _MAX_PATH, "%s%s%s%s", core->SavePath, PlayMode(),
 		 SPathDelimiter, slotname );
-
 
 	char savegameName[_MAX_PATH]={0};
 	int savegameNumber = 0;
 
 	int cnt = sscanf( slotname, SAVEGAME_DIRECTORY_MATCHER, &savegameNumber, savegameName );
-	if (cnt != 2) {
+	//maximum pathlength == 240, without 8+3 filenames
+	if ( (cnt != 2) || (strlen(Path)>240) ) {
 		printf( "Invalid savegame directory '%s' in %s.\n", slotname, Path );
 		return false;
 	}
@@ -353,7 +353,6 @@ void SaveGameIterator::PruneQuickSave(const char *folder)
 		//prune second path
 		FormatQuickSavePath(from, myslots[hole]);
 		myslots.erase(myslots.begin()+hole);
-		printf("RMDIR: %s\n", from);
 		core->DelTree(from, false);
 		rmdir(from);
 	}

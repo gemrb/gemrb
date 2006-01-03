@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.218 2006/01/02 23:26:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.219 2006/01/03 17:16:04 avenger_teambg Exp $
  *
  */
 
@@ -344,12 +344,14 @@ void Map::AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm)
 	MapSet = (unsigned short *) malloc(sizeof(unsigned short) * Width * Height);
 }
 
-/* this command will load the target area and set the coordinates according to the entrance string*/
-void Map::CreateMovement(char *command, const char *area, const char *entrance)
+void Map::MoveToNewArea(const char *area, const char *entrance, int EveryOne, Actor *actor)
 {
-//change loader MOS image here
-//check worldmap entry, if that doesn't contain anything,
-//make a random pick
+	char command[256];
+
+	//change loader MOS image here
+	//check worldmap entry, if that doesn't contain anything,
+	//make a random pick
+
 	Game* game = core->GetGame();
 	Map* map = game->GetMap(area, false);
 	if (!map) {
@@ -362,7 +364,7 @@ void Map::CreateMovement(char *command, const char *area, const char *entrance)
 	int X,Y, face;
 	if (!ent) {
 		printMessage("Map", " ", YELLOW);
-		printf( "WARNING!!! %s EntryPoint does not exists\n", entrance );
+		printf( "WARNING!!! %s EntryPoint does not exist\n", entrance );
 		X = map->TMap->XCellCount * 64;
 		Y = map->TMap->YCellCount * 64;
 		face = -1;
@@ -373,11 +375,42 @@ void Map::CreateMovement(char *command, const char *area, const char *entrance)
 	}
 	//LeaveArea is the same in ALL engine versions
 	sprintf(command, "LeaveArea(\"%s\",[%d.%d],%d)", area, X, Y, face);
+
+	if (EveryOne&CT_GO_CLOSER) {
+		int i=game->GetPartySize(false);
+		while (i--) {
+			Actor *pc = game->GetPC(i,false);
+			if (pc->GetCurrentArea()==this) {
+				pc->ClearPath();
+				pc->ClearActions();
+				pc->AddAction( GenerateAction( command ) );
+			}
+		}
+		return;
+	}
+	if (EveryOne&CT_SELECTED) {
+		int i=game->GetPartySize(false);
+		while (i--) {
+			Actor *pc = game->GetPC(i,false);
+			
+			if (!pc->IsSelected()) {
+				continue;
+			}
+			if (pc->GetCurrentArea()==this) {
+				pc->ClearPath();
+				pc->ClearActions();
+				pc->AddAction( GenerateAction( command ) );
+			}
+		}
+	}
+	
+	actor->ClearPath();
+	actor->ClearActions();
+	actor->AddAction( GenerateAction( command ) );
 }
 
 void Map::UseExit(Actor *actor, InfoPoint *ip)
 {
-	char Tmp[256];
 	Game *game=core->GetGame();
 
 	int EveryOne = ip->CheckTravel(actor);
@@ -397,39 +430,13 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 
 	ip->Flags&=~TRAP_RESET; //exit triggered
 	if (ip->Destination[0] != 0) {
-		CreateMovement(Tmp, ip->Destination, ip->EntranceName);
-		if (EveryOne&CT_GO_CLOSER) {
-			int i=game->GetPartySize(false);
-			while (i--) {
-				Actor *pc = game->GetPC(i,false);
-
-				pc->ClearPath();
-				pc->ClearActions();
-				pc->AddAction( GenerateAction( Tmp ) );
-			}
-			return;
-		}
-		if (EveryOne&CT_SELECTED) {
-			int i=game->GetPartySize(false);
-			while (i--) {
-				Actor *pc = game->GetPC(i,false);
-				
-				if (!pc->IsSelected()) continue;
-				pc->ClearPath();
-				pc->ClearActions();
-				pc->AddAction( GenerateAction( Tmp ) );
-			}
-		}
-
-		actor->ClearPath();
-		actor->ClearActions();
-		actor->AddAction( GenerateAction( Tmp ) );
-	} else {
-		if (ip->Scripts[0]) {
-			ip->LastTrigger = ip->LastEntered = actor->GetID();
-			ip->ExecuteScript( ip->Scripts[0] );
-			ip->ProcessActions();
-		}
+		MoveToNewArea(ip->Destination, ip->EntranceName, EveryOne, actor);
+		return;
+	}
+	if (ip->Scripts[0]) {
+		ip->LastTrigger = ip->LastEntered = actor->GetID();
+		ip->ExecuteScript( ip->Scripts[0] );
+		ip->ProcessActions();
 	}
 }
 
@@ -829,7 +836,7 @@ void Map::AddActor(Actor* actor)
 	ieDword gametime = core->GetGame()->GameTime;
 
 	if (IsVisible(actor->Pos, false) && actor->Schedule(gametime) ) {
-       		if (actor->GetStat(IE_EA)>=EA_EVILCUTOFF) {
+		if (actor->GetStat(IE_EA)>=EA_EVILCUTOFF) {
 			core->Autopause(AP_ENEMY);
 		}
 	}
@@ -1052,7 +1059,7 @@ int Map::GetBlocked(Point &c)
 //        2 - always dither
 
 SpriteCover* Map::BuildSpriteCover(int x, int y, int xpos, int ypos,
-			  unsigned int width, unsigned int height, int flags)
+	unsigned int width, unsigned int height, int flags)
 {
 	SpriteCover* sc = new SpriteCover;
 	sc->worldx = x;
@@ -1833,17 +1840,17 @@ int Map::WhichEdge(Point &s)
 	}
 	sX*=Height;
 	sY*=Width;
-	if (sX<sY) { //north or west
-		if (Width*Height<sX+sY) { //
+	if (sX>sY) { //north or east
+		if (Width*Height>sX+sY) { //
 			return WMP_NORTH;
 		}
-		return WMP_WEST;
+		return WMP_EAST;
 	}
-	//south or east
+	//south or west
 	if (Width*Height<sX+sY) { //
 		return WMP_SOUTH; 
 	}
-	return WMP_EAST;
+	return WMP_WEST;
 }
 
 //--------ambients----------------

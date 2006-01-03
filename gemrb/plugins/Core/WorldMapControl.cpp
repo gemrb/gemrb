@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.19 2006/01/02 23:26:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.20 2006/01/03 17:16:04 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -31,29 +31,33 @@
 #define MAP_TO_SCREENX(x) XWin + XPos - ScrollX + (x)
 #define MAP_TO_SCREENY(y) YWin + YPos - ScrollY + (y)
 
-WorldMapControl::WorldMapControl(void)
+WorldMapControl::WorldMapControl(const char *font, int direction)
 {
 	ScrollX = 0;
 	ScrollY = 0;
 	MouseIsDown = false;
 	Changed = true;
 	Area = NULL;
+	Value = direction;
 	if (Value!=(ieDword) -1) {
 		Game* game = core->GetGame();
 		WorldMap* worldmap = core->GetWorldMap();
 		worldmap->CalculateDistances(game->CurrentArea, Value);
+		strncpy(ca, game->CurrentArea, 8);
 	}
+	
 	// alpha bit is unfortunately ignored
-	Color fore = {0x00, 0x00, 0x00, 0xff};
-	Color back = {0x00, 0x00, 0x00, 0x00};
-	text_pal = core->GetVideoDriver()->CreatePalette( fore, back );
+	if (font[0]) {
+		ftext = core->GetFont(font);
+	} else {
+		ftext = NULL;
+	}
+	ResetEventHandler( WorldMapControlOnPress );
+	ResetEventHandler( WorldMapControlOnEnter );
 }
 
 WorldMapControl::~WorldMapControl(void)
 {
-	if(text_pal) {
-		core->GetVideoDriver()->FreePalette(text_pal);
-	}
 }
 
 /** Draws the Control on the Output Display */
@@ -76,16 +80,21 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 		WMPAreaEntry *m = worldmap->GetEntry(i);
 		if (! (m->AreaStatus & WMP_ENTRY_VISIBLE)) continue;
 
+		short xOffs = MAP_TO_SCREENX(m->X);
+		short yOffs = MAP_TO_SCREENY(m->Y);
 		if( m->MapIcon) {
-			video->BlitSprite( m->MapIcon, MAP_TO_SCREENX(m->X), MAP_TO_SCREENY(m->Y), true, &r );
+			video->BlitSprite( m->MapIcon, xOffs, yOffs, true, &r );
 		}
 
-		// wmpty.bam
+		if (AnimPicture && !strnicmp(m->AreaResRef, ca, 8) ) {
+			core->GetVideoDriver()->BlitSprite( AnimPicture, xOffs, yOffs, true, &r );
+		}
 	}
 
-	Font* fnt = core->GetButtonFont();
-
 	// Draw WMP entry labels
+	if (ftext==NULL) {
+		return;
+	}
 	for(i=0;i<ec;i++) {
 		WMPAreaEntry *m = worldmap->GetEntry(i);
 		if (! (m->AreaStatus & WMP_ENTRY_VISIBLE)) continue;
@@ -100,12 +109,30 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 		if (r2.y+r2.h<r.y) continue;
 
 		char *text = core->GetString( m->LocCaptionName );
-		int tw = fnt->CalcStringWidth( text ) + 5;
-		int th = fnt->maxHeight;
+		int tw = ftext->CalcStringWidth( text ) + 5;
+		int th = ftext->maxHeight;
+		
+		Color fore = {0xf0, 0xf0, 0xf0, 0xff};
+		Color back = {0x00, 0x00, 0x00, 0x00};
+		
+		if (Area == m) {
+			//if mouse is over it, then make it pale red
+			fore.b = 0x80;
+			fore.g = 0x80;
+		} else {
+			if (! (m->AreaStatus & WMP_ENTRY_VISITED)) {
+				//if not visited, make it pale blue
+				fore.r=0x80;
+				fore.g=0x80;
+			}
+		} //otherwise leave it white
 
-		fnt->Print( Region( r2.x + (r2.w - tw)/2, r2.y + r2.h, tw, th ),
+		Color *text_pal = video->CreatePalette( fore, back );
+
+		ftext->Print( Region( r2.x + (r2.w - tw)/2, r2.y + r2.h, tw, th ),
 				( unsigned char * ) text, text_pal, 0, true );
 		free(text);
+		video->FreePalette(text_pal);
 	}
 }
 
@@ -147,7 +174,7 @@ void WorldMapControl::AdjustScrolling(short x, short y)
 void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 {
 	WorldMap* worldmap = core->GetWorldMap();
-	int nextCursor = IE_CURSOR_GRAB;
+	lastCursor = IE_CURSOR_GRAB;
 
 	if (MouseIsDown) {
 		AdjustScrolling(lastMouseX-x, lastMouseY-y);
@@ -160,11 +187,20 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 		x += ScrollX;
 		y += ScrollY;
 
+		WMPAreaEntry *oldArea = Area;
+		Area = NULL;
+
 		unsigned int i;
 		unsigned int ec = worldmap->GetEntryCount();
 		for (i=0;i<ec;i++) {
 			WMPAreaEntry *ae = worldmap->GetEntry(i);
-			if (! (ae->AreaStatus & WMP_ENTRY_VISIBLE)) continue;
+
+			if ((ae->AreaStatus & WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE)!= (WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE) ) {
+				continue; //invisible or inaccessible
+			}
+			if (!strnicmp(ae->AreaResRef, ca, 8) ) {
+				continue; //current area
+			}
 
 			Sprite2D *icon=ae->MapIcon;
 			int h=0,w=0;
@@ -172,50 +208,41 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 				h=icon->Height;
 				w=icon->Width;
 			}
-			if(h<48)
-				h=48;
-			if(w<48)
-				w=48;
+			if (ftext) {
+				char *text = core->GetString( ae->LocCaptionName );
+				int tw = ftext->CalcStringWidth( text ) + 5;
+				int th = ftext->maxHeight;
+				if(h<th)
+					h=th;        
+				if(w<tw)
+					w=tw;
+			}
 			if (ae->X > x) continue;
 			if (ae->X + w < x) continue;
 			if (ae->Y > y) continue;
 			if (ae->Y + h < y) continue;
-			nextCursor = IE_CURSOR_NORMAL;
-			if(Area!=ae) {
-				Area=ae;
-				DisplayTooltip();
-				break;
+			lastCursor = IE_CURSOR_NORMAL;
+			Area=ae;
+			if(oldArea!=ae) {
+				RunEventHandler(WorldMapControlOnEnter);
 			}
+			break;
 		}
 	}
 
-	( ( Window * ) Owner )->Cursor = nextCursor;
+	( ( Window * ) Owner )->Cursor = lastCursor;
 }
 
 /** Sets the tooltip to be displayed on the screen now */
 void WorldMapControl::DisplayTooltip()
 {
-	int distance;
 	if (Area) {
-		WorldMap* worldmap = core->GetWorldMap();
-		distance = worldmap->GetDistance(Area->AreaName);
+		int x = ((Window*) Owner)->XPos+XPos+lastMouseX;
+		int y = ((Window*) Owner)->YPos+YPos+lastMouseY-50;
+		core->DisplayTooltip( x, y, this );
 	} else {
-		distance = -1;
-	}
-	if (distance <= 0) {
 		core->DisplayTooltip( 0, 0, NULL );
-		SetTooltip(NULL);
-		return;
 	}
-
-	char hours[10];
-	sprintf(hours,"%d\n", distance);
-	core->GetTokenDictionary()->SetAtCopy("HOUR", hours);
-	char *tmp = core->GetString(10700);
-	SetTooltip(tmp);
-	free(tmp);
-	//core->DisplayTooltip( (( Window* )Owner)->XPos + lastMouseX, (( Window* )Owner)->YPos + lastMouseY, this );
-	core->DisplayTooltip( lastMouseX, lastMouseY, this );
 }
 
 /** Mouse Leave Event */
@@ -243,7 +270,9 @@ void WorldMapControl::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 	if (Button != GEM_MB_ACTION) {
 		return;
 	}
-
+	if (lastCursor==IE_CURSOR_NORMAL) {
+		RunEventHandler( WorldMapControlOnPress );
+	}
 	MouseIsDown = false;
 }
 
@@ -283,3 +312,20 @@ void WorldMapControl::OnSpecialKeyPress(unsigned char Key)
 		ScrollY = 0;
 }
 
+bool WorldMapControl::SetEvent(int eventType, EventHandler handler)
+{
+	Changed = true;
+
+	switch (eventType) {
+	case IE_GUI_WORLDMAP_ON_PRESS:
+		SetEventHandler( WorldMapControlOnPress, handler );
+		break;
+	case IE_GUI_MOUSE_ENTER_WORLDMAP:
+		SetEventHandler( WorldMapControlOnEnter, handler );
+		break;
+	default:
+		return Control::SetEvent( eventType, handler );
+	}
+
+	return true;
+}

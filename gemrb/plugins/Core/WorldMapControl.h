@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.h,v 1.11 2006/01/02 23:26:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.h,v 1.12 2006/01/03 17:16:04 avenger_teambg Exp $
  *
  */
 
@@ -53,9 +53,12 @@ class WMPAreaEntry;
  * allowing travelling between areas.
  */
 
+#define IE_GUI_WORLDMAP_ON_PRESS   0x08000000
+#define IE_GUI_MOUSE_ENTER_WORLDMAP  0x08000002
+
 class GEM_EXPORT WorldMapControl : public Control {
 public:
-	WorldMapControl(void);
+	WorldMapControl(const char *fontname, int direction);
 	~WorldMapControl(void);
 public:
 	/** Allows modification of the scrolling factor from outside */
@@ -69,12 +72,20 @@ public:
 	int ScrollX, ScrollY;
 	unsigned short lastMouseX, lastMouseY;
 	bool MouseIsDown;
-	/** the palette for drawing the area titles */
-	Color *text_pal;
 	/** pointer to last pointed area */
 	WMPAreaEntry *Area;
+	/** guiscript Event when button pressed */
+	EventHandler WorldMapControlOnPress;
+	/** guiscript Event when mouse is over a reachable area */
+	EventHandler WorldMapControlOnEnter;
 private:
+	//font for printing area names
+	Font* ftext;
+	//mouse cursor
 	unsigned char lastCursor;
+	//current area
+	ieResRef ca;
+private:
 	/** Mouse Over Event */
 	void OnMouseOver(unsigned short x, unsigned short y);
 	/** Mouse Leave Event */
@@ -91,6 +102,8 @@ private:
 	void OnSpecialKeyPress(unsigned char Key);
 	/** DisplayTooltip */
 	void DisplayTooltip();
+	/** Set handler for specified event */
+	bool SetEvent(int eventType, EventHandler handler);
 };
 
 #endif

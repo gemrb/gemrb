@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.98 2005/12/25 10:31:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.99 2006/01/03 17:16:04 avenger_teambg Exp $
  *
  */
 
@@ -96,15 +96,6 @@ typedef struct RestHeaderType {
 	ieWord DayChance;
 	ieWord NightChance;
 } RestHeaderType;
-
-/* it is better to keep the polygons in a single list and create a sublist
-   (if needed) when the viewport changed. I don't like the pre-created
-   groupings because they don't support different viewport sizes
-typedef struct WallGroup {
-	Gem_Polygon** polys;
-	int polygons;
-} WallGroup;
-*/
 
 typedef struct Entrance {
 	char Name[33];
@@ -207,7 +198,6 @@ public:
 	/** prints useful information on console */
 	void DebugDump();
 	void AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm);
-	void CreateMovement(char *command, const char *area, const char *entrance);
 	void UpdateScripts();
 	void UpdateEffects();
 	/* removes empty heaps and returns total itemcount */
@@ -330,6 +320,8 @@ public:
 	Spawn *GetSpawnRadius(Point &point, unsigned int radius);
 	unsigned int GetSpawnCount() { return (unsigned int) spawns.size(); }
 	void TriggerSpawn(Spawn *spawn);
+	//move some or all players to a new area
+	void MoveToNewArea(const char *area, const char *entrance, int EveryOne, Actor *actor);
 private:
 	void GenerateQueues();
 	Actor* GetRoot(int priority, int &index);
@@ -337,7 +329,7 @@ private:
 	void Leveldown(unsigned int px, unsigned int py, unsigned int& level,
 		Point &p, unsigned int& diff);
 	void SetupNode(unsigned int x, unsigned int y, unsigned int Cost);
-	//maybe this is unneeded and orientation could be calculated on the fly
+	//actor uses travel region
 	void UseExit(Actor *pc, InfoPoint *ip);
 	bool HandleActorStance(Actor *actor, CharAnimations *ca, int StanceID);
 	PathNode* GetLine(Point &start, Point &dest, int Steps, int Orientation, int flags);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.cpp,v 1.19 2005/11/26 14:21:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.cpp,v 1.20 2006/01/03 17:16:04 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "Polygon.h"
@@ -150,7 +150,7 @@ static bool intersectSegments(Point& a, Point& b, Point& c, Point& d, Point& s)
 		return false;
 
 	if (!((left(a, b, c) != left(a, b, d)) &&
-		  (left(c, d, a) != left(c, d, b))))
+		(left(c, d, a) != left(c, d, b))))
 		return false;
 
 	__int64 A1 = area2(c, d, a);
@@ -217,10 +217,15 @@ struct ScanlineInt {
 };
 
 
-
 void Gem_Polygon::ComputeTrapezoids()
 {
 	if (count < 3) return;
+	//the loader never should load such a large polygon, 
+	//because the polygon count is supposed to be a 16 bit value
+	if (count > 65535) {
+		printMessage("Polygon", "Invalid Polygon!\n", LIGHT_RED);
+		abort();
+	}
 
 	trapezoids.clear();
 	std::vector<int> ys;

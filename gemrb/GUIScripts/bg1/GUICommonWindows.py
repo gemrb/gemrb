@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICommonWindows.py,v 1.8 2005/12/23 08:55:28 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICommonWindows.py,v 1.9 2006/01/03 17:16:04 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -43,10 +43,15 @@ FRAME_PC_TARGET   = 1
 # 9 REST
 # 10 TXTE
 
+OptionsWindow = None
+
 def ReturnToGame ():
 	print "returntogame"
 
 def SetupMenuWindowControls (Window, Gears, ReturnToGame):
+	global OptionsWindow
+
+	OptionsWindow = Window
 	# FIXME: add "(key)" to tooltips!
 
 	# Return to Game
@@ -54,7 +59,7 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	GemRB.SetTooltip (Window, Button, 16313)
 	#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	GemRB.SetVarAssoc (Window, Button, "SelectedWindow", 0)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "ReturnToGame")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, ReturnToGame)
 
 	# Map
 	Button = GemRB.GetControl (Window, 1)

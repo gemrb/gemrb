@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.34 2006/01/02 23:26:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.35 2006/01/03 17:16:04 avenger_teambg Exp $
  *
  */
 
@@ -42,6 +42,7 @@
 #define IE_GUI_WORLDMAP         8 // gemrb extension
 #define IE_GUI_MAP              9 // gemrb extension
 #define IE_GUI_GAMECONTROL	128
+#define IE_GUI_INVALID          255
 
 #define IE_GUI_CONTROL_FOCUSED  0x80
 
@@ -87,8 +88,9 @@ public:
 	/** Sets the Text of the current control */
 	virtual int SetText(const char* string, int pos = 0) = 0;
 	/** Sets the Tooltip text of the current control */
-	virtual int SetTooltip(const char* string);
-	void DisplayTooltip();
+	int SetTooltip(const char* string);
+	/** Displays the tooltip text, Worldmap handles this differently */
+	virtual void DisplayTooltip();
 	/** Variables */
 	char VarName[MAX_VARIABLE_LENGTH];
 	/** the value of the control to add to the variable */

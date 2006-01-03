@@ -15,14 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.368 2005/12/29 17:46:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.369 2006/01/03 17:16:04 avenger_teambg Exp $
  *
  */
 
 #include "GUIScript.h"
 #include "../Core/Interface.h"
 #include "../Core/Map.h"
-
 #include "../Core/Label.h"
 #include "../Core/AnimationMgr.h"
 #include "../Core/GameControl.h"
@@ -42,7 +41,7 @@
 #include "../Core/Game.h"
 #include "../Core/ControlAnimation.h"
 #include "../Core/DataFileMgr.h"
-
+#include "../Core/WorldMap.h"
 
 //this stuff is missing from Python 2.2
 #ifndef PyDoc_VAR
@@ -86,7 +85,7 @@ static EventNameType GUIEvent[32];
 static bool QuitOnError = false;
 
 //the order of these buttons are based on opcode #144 
-#define ACT_NONE 100  //iwd2's maximum is 99
+#define ACT_NONE 100 //iwd2's maximum is 99
 #define ACT_STEALTH 0
 #define ACT_THIEVING 1
 #define ACT_CAST 2
@@ -110,7 +109,7 @@ static bool QuitOnError = false;
 #define ACT_BARDSONG 20
 #define ACT_STOP 21
 #define ACT_SEARCH 22
-#define ACT_SHAPE  23
+#define ACT_SHAPE 23
 #define ACT_TAMING 24
 #define ACT_SKILLS 25
 #define ACT_WILDERNESS 26
@@ -152,9 +151,9 @@ inline PyObject* RuntimeError(char* msg)
 {
 	printMessage( "GUIScript", "Runtime Error:\n", LIGHT_RED );
 	PyErr_SetString( PyExc_RuntimeError, msg );
-  if (QuitOnError) {
-	  core->Quit();
-  }
+	if (QuitOnError) {
+		core->Quit();
+	}
 	return NULL;
 }
 
@@ -167,9 +166,9 @@ inline PyObject* AttributeError(char* doc_string)
 {
 	printMessage( "GUIScript", "Syntax Error:\n", LIGHT_RED );
 	PyErr_SetString(PyExc_AttributeError, doc_string);
-  if (QuitOnError) {
-	  core->Quit();
-  }
+	if (QuitOnError) {
+		core->Quit();
+	}
 	return NULL;
 }
 
@@ -491,7 +490,7 @@ static PyObject* GemRB_LoadWindowPack(PyObject * /*self*/, PyObject* args)
 	CHUHeight = height;
 
 	if ( (width && (width>core->Width)) ||
-	    (height && (height>core->Height)) ) {
+			(height && (height>core->Height)) ) {
 		printMessage("GUIScript","Screen is too small!\n",LIGHT_RED);
 		printf("This window requires %d x %d resolution.\n",width,height);
 		return RuntimeError("Please change your settings.");
@@ -1858,16 +1857,88 @@ static PyObject* GemRB_AdjustScrolling(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_CreateMovement__doc,
+"CreateMovement(Area, Entrance)\n\n"
+"Moves actors to a new area." );
+
+static PyObject* GemRB_CreateMovement(PyObject * /*self*/, PyObject* args)
+{
+	int everyone;
+	char *area;
+	char *entrance;
+
+	if (!PyArg_ParseTuple( args, "ss", &area, &entrance)) {
+		return AttributeError( GemRB_CreateMovement__doc );
+	}
+	if (core->HasFeature(GF_TEAM_MOVEMENT) ) {
+		everyone = CT_WHOLE;
+	} else {
+		everyone = CT_GO_CLOSER;
+	}
+	Game *game = core->GetGame();
+	game->GetCurrentArea()->MoveToNewArea(area, entrance, everyone, NULL);
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_GetDestinationArea__doc,
+"GetDestinationArea(WindowIndex, ControlID)\n\n"
+"Returns the last area pointed on the worldmap." );
+
+static PyObject* GemRB_GetDestinationArea(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex;
+
+	if (!PyArg_ParseTuple( args, "ii", &WindowIndex, &ControlIndex)) {
+		return AttributeError( GemRB_GetDestinationArea__doc );
+	}
+
+	WorldMapControl* wmc = (WorldMapControl *) GetControl(WindowIndex, ControlIndex, IE_GUI_WORLDMAP);
+	if (!wmc) {
+		return NULL;
+	}
+	//no area was pointed on
+	if (!wmc->Area) {
+		Py_INCREF( Py_None );
+		return Py_None;
+	}
+	WorldMap *wm = core->GetWorldMap();
+	bool encounter;
+	WMPAreaLink *wal = wm->GetEncounterLink(wmc->Area->AreaName, encounter);
+	PyObject* dict = PyDict_New();
+	//the area the user clicked on
+	PyDict_SetItemString(dict, "Target", PyString_FromString (wmc->Area->AreaName) );
+	PyDict_SetItemString(dict, "Destination", PyString_FromString (wmc->Area->AreaName) );
+	PyDict_SetItemString(dict, "Entrance", PyString_FromString (wal->DestEntryPoint) );
+	//the area the user will fall on
+	if (encounter) {
+		int i=rand()%5;
+
+		for(int j=0;j<5;j++) {
+			if (wal->EncounterAreaResRef[(i+j)%5][0]) {
+				PyDict_SetItemString(dict, "Destination", PyString_FromString (wal->EncounterAreaResRef[(i+j)%5]) );
+				PyDict_SetItemString(dict, "Entrance", PyString_FromString ("") );
+				break;
+			}
+		}
+	}
+	
+	//the entrance the user will fall on
+	PyDict_SetItemString(dict, "Distance", PyInt_FromLong (wm->GetDistance(wmc->Area->AreaName)) );
+	return dict;
+}
+
 PyDoc_STRVAR( GemRB_CreateWorldMapControl__doc,
-"CreateWorldMapControl(WindowIndex, ControlID, x, y, w, h, flags)\n\n"
+"CreateWorldMapControl(WindowIndex, ControlID, x, y, w, h, direction[, font])\n\n"
 "Creates and adds a new WorldMap control to a Window." );
 
 static PyObject* GemRB_CreateWorldMapControl(PyObject * /*self*/, PyObject* args)
 {
-	int WindowIndex, ControlID, x, y, w, h, flags;
+	int WindowIndex, ControlID, x, y, w, h, direction;
+	char *font="";
 
-	if (!PyArg_ParseTuple( args, "iiiiiii", &WindowIndex, &ControlID, &x,
-			&y, &w, &h, &flags )) {
+	if (!PyArg_ParseTuple( args, "iiiiiii|s", &WindowIndex, &ControlID, &x,
+			&y, &w, &h, &direction, &font )) {
 		return AttributeError( GemRB_CreateWorldMapControl__doc );
 	}
 
@@ -1885,7 +1956,7 @@ static PyObject* GemRB_CreateWorldMapControl(PyObject * /*self*/, PyObject* args
 		//flags = ctrl->Value;
 		win->DelControl( CtrlIndex );
 	}
-	WorldMapControl* wmap = new WorldMapControl( );
+	WorldMapControl* wmap = new WorldMapControl( font, direction );
 	wmap->XPos = x;
 	wmap->YPos = y;
 	wmap->Width = w;
@@ -1893,7 +1964,6 @@ static PyObject* GemRB_CreateWorldMapControl(PyObject * /*self*/, PyObject* args
 	wmap->ControlID = ControlID;
 	wmap->ControlType = IE_GUI_WORLDMAP;
 	wmap->Owner = win;
-	wmap->Value = flags;
 	win->AddControl( wmap );
 
 	Py_INCREF( Py_None );
@@ -5881,7 +5951,7 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 				slot = magicweapon;
 			}
 			else {
-				slot =  actor->PCStats->QuickWeaponSlots[tmp-ACT_WEAPON1];
+				slot = actor->PCStats->QuickWeaponSlots[tmp-ACT_WEAPON1];
 			}
 			if (slot!=0xffff) {
 				//no slot translation required
@@ -6185,6 +6255,8 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetupControls, METH_VARARGS),
 	METHOD(ClearAction, METH_VARARGS),
 	METHOD(SetDefaultActions, METH_VARARGS),
+	METHOD(GetDestinationArea, METH_VARARGS),
+	METHOD(CreateMovement, METH_VARARGS),
 	// terminating entry	
 	{NULL, NULL, 0, NULL}
 };

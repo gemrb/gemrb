@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.6 2005/12/22 23:29:42 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.7 2006/01/03 17:16:04 avenger_teambg Exp $
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
 
@@ -24,7 +24,7 @@
 
 import string
 import GemRB
-
+import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
 from GUICommon import CloseOtherWindow
@@ -52,6 +52,7 @@ def OpenInventoryWindow ():
 	GemRB.LoadWindowPack ("GUIINV")
 	InventoryWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", InventoryWindow)
+	SetupMenuWindowControls (GUICommonWindows.OptionsWindow, 0, "OpenInventoryWindow")
 
 	# Ground Item
 	for i in range (5):

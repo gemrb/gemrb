@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIMA.py,v 1.26 2005/12/17 21:02:45 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIMA.py,v 1.27 2006/01/03 17:16:04 avenger_teambg Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -166,15 +166,44 @@ def OpenWorldMapWindow ():
 	WorldMapWindowCommon (GemRB.GetVar ("Travel"))
 	return
 
+def MoveToNewArea ():
+	global WorldMapWindow, WorldMapControl
+
+	tmp = GemRB.GetDestinationArea (WorldMapWindow, WorldMapControl)
+	print tmp
+	CloseWorldMapWindow ()
+	GemRB.CreateMovement (tmp["Destination"], tmp["Entrance"])
+	return
+
+def ChangeTooltip ():
+	global WorldMapWindow, WorldMapControl
+	global str
+
+	tmp = GemRB.GetDestinationArea (WorldMapWindow, WorldMapControl)
+	print tmp
+	if (tmp):
+		str = "%s: %d"%(GemRB.GetString(23084),tmp["Distance"])
+	else:
+		str=""
+			
+	GemRB.SetTooltip (WorldMapWindow, WorldMapControl, str)
+	return
+
+def CloseWorldMapWindow():
+	global WorldMapWindow, WorldMapControl
+
+	GemRB.UnloadWindow (WorldMapWindow)
+	WorldMapWindow = None
+	WorldMapControl = None
+	GemRB.SetVisible (0,1)
+	GemRB.UnhideGUI ()
+	return
+
 def WorldMapWindowCommon(Travel):
 	global WorldMapWindow, WorldMapControl
 
 	if WorldMapWindow:
-		GemRB.UnloadWindow (WorldMapWindow)
-
-		WorldMapWindow = None
-		GemRB.SetVisible (0,1)
-		GemRB.UnhideGUI ()
+		CloseWorldMapWindow()
 		return
 
 	GemRB.HideGUI ()
@@ -185,8 +214,11 @@ def WorldMapWindowCommon(Travel):
 	#saving the original portrait window
 	GemRB.SetWindowFrame (Window)
 
-	GemRB.CreateWorldMapControl (Window, 4, 0, 62, 640, 418, Travel)
+	GemRB.CreateWorldMapControl (Window, 4, 0, 62, 640, 418, Travel, "floattxt")
 	WorldMapControl = GemRB.GetControl (Window, 4)
+	GemRB.SetAnimation (Window, WorldMapControl, "WMDAG")
+	GemRB.SetEvent (Window, WorldMapControl, IE_GUI_WORLDMAP_ON_PRESS, "MoveToNewArea")
+	GemRB.SetEvent (Window, WorldMapControl, IE_GUI_MOUSE_ENTER_WORLDMAP, "ChangeTooltip")
 
 	#north
 	Button = GemRB.GetControl (Window, 1)
@@ -226,7 +258,7 @@ def WorldMapWindowCommon(Travel):
 
 	# Done
 	Button = GemRB.GetControl (Window, 0)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenWorldMapWindow")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseWorldMapWindow")
 	GemRB.SetVisible (Window, 1)
 	return
 

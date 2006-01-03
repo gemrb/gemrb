@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.19 2005/11/24 17:44:09 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.20 2006/01/03 17:16:04 avenger_teambg Exp $
  *
  */
 
@@ -198,27 +198,29 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 
 	std::list<int> pending;
 	pending.push_back(i);
-	while(pending.size())
-	{
+	while(pending.size()) {
 		i=pending.front();
 		pending.pop_front();
 		WMPAreaEntry* ae=area_entries[i];
-		int j=ae->AreaLinksIndex[direction];
-		int k=j+ae->AreaLinksCount[direction];
-		for(;j<k;j++) {
-			WMPAreaLink* al = area_links[j];
-			WMPAreaEntry* ae2 = area_entries[al->AreaIndex];
-			unsigned int mydistance = (unsigned int) Distances[i];
-			if ( ( (ae->AreaStatus & WMP_ENTRY_PASSABLE) == WMP_ENTRY_PASSABLE) &&
-			( (ae2->AreaStatus & WMP_ENTRY_WALKABLE) == WMP_ENTRY_WALKABLE)
-			) {
-				// al->Flags is the entry direction
-				mydistance += al->DistanceScale * 4;
-				//nonexisting distance is the biggest!
-				if ((unsigned) Distances[al->AreaIndex] > mydistance) {
-					Distances[al->AreaIndex] = mydistance;
-					GotHereFrom[al->AreaIndex] = j;
-					pending.push_back(al->AreaIndex);
+		//all directions should be used
+		for(int d=0;d<4;d++) {
+			int j=ae->AreaLinksIndex[d];
+			int k=j+ae->AreaLinksCount[d];
+			for(;j<k;j++) {
+				WMPAreaLink* al = area_links[j];
+				WMPAreaEntry* ae2 = area_entries[al->AreaIndex];
+				unsigned int mydistance = (unsigned int) Distances[i];
+				if ( ( (ae->AreaStatus & WMP_ENTRY_PASSABLE) == WMP_ENTRY_PASSABLE) &&
+				( (ae2->AreaStatus & WMP_ENTRY_WALKABLE) == WMP_ENTRY_WALKABLE)
+				) {
+					// al->Flags is the entry direction
+					mydistance += al->DistanceScale * 4;
+					//nonexisting distance is the biggest!
+					if ((unsigned) Distances[al->AreaIndex] > mydistance) {
+						Distances[al->AreaIndex] = mydistance;
+						GotHereFrom[al->AreaIndex] = j;
+						pending.push_back(al->AreaIndex);
+					}
 				}
 			}
 		}
