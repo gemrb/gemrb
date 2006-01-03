@@ -1,11 +1,11 @@
 2DA V1.0
 *
            AT_1       AT_2       AT_3       AT_4       TYPE       SPACE      PALETTE
-0x1000     MWYV       MWYV       MWYV       MWYV       3          5          1
-0x1100     MTAN       MTAN       MTAN       MTAN       3          5          1
-0x1200     MDR1       MDR1       MDR1       MDR1       4          5          1
-0x1201     MDR2       MDR2       MDR2       MDR2       4          5          1
-0x1202     MDR3       MDR3       MDR3       MDR3       4          5          1
+0x1000     MWYV       MWYV       MWYV       MWYV       11         5          1
+0x1100     MTAN       MTAN       MTAN       MTAN       11         5          1
+0x1200     MDR1       MDR1       MDR1       MDR1       12         5          1
+0x1201     MDR2       MDR2       MDR2       MDR2       12         5          1
+0x1202     MDR3       MDR3       MDR3       MDR3       12         5          1
 0x2000     MSIR       MSIR       MSIR       MSIR       2          2          0
 0x2100     UVOL       UVOL       UVOL       UVOL       2          2          1
 0x2200     MOGM       MOGM       MOGM       MOGM       2          2          0

@@ -1,11 +1,13 @@
 import GemRB
+from LoadScreen import *
 
 StartWindow = 0
 ProtocolWindow = 0
 QuitWindow = 0
+QuickLoadSlot = 0
 
 def OnLoad():
-	global StartWindow
+	global StartWindow, QuickLoadSlot
 
 	screen_width = GemRB.GetSystemVariable (SV_WIDTH)
 	screen_height = GemRB.GetSystemVariable (SV_HEIGHT)
@@ -28,7 +30,21 @@ def OnLoad():
 	GemRB.SetControlStatus(StartWindow, ProtocolButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetControlStatus(StartWindow, NewGameButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetControlStatus(StartWindow, LoadGameButton, IE_GUI_BUTTON_ENABLED)
-	GemRB.SetControlStatus(StartWindow, QuickLoadButton, IE_GUI_BUTTON_ENABLED)
+
+	GemRB.SetVar("PlayMode",2)
+	GameCount=GemRB.GetSaveGameCount()
+
+	#looking for the quicksave
+	EnableQuickLoad = IE_GUI_BUTTON_DISABLED
+	for ActPos in range(GameCount):
+		Slotname = GemRB.GetSaveGameAttrib(5,ActPos)
+		# quick save is 2
+		if Slotname == 2:
+			EnableQuickLoad = IE_GUI_BUTTON_ENABLED
+			QuickLoadSlot = ActPos
+			break
+
+	GemRB.SetControlStatus(StartWindow, QuickLoadButton, EnableQuickLoad)
 	GemRB.SetControlStatus(StartWindow, JoinGameButton, IE_GUI_BUTTON_DISABLED)
 	GemRB.SetControlStatus(StartWindow, OptionsButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetControlStatus(StartWindow, QuitGameButton, IE_GUI_BUTTON_ENABLED)
@@ -50,6 +66,7 @@ def OnLoad():
 	GemRB.SetEvent(StartWindow, ProtocolButton, IE_GUI_BUTTON_ON_PRESS, "ProtocolPress")
 	GemRB.SetEvent(StartWindow, OptionsButton, IE_GUI_BUTTON_ON_PRESS, "OptionsPress")
 	GemRB.SetEvent(StartWindow, LoadGameButton, IE_GUI_BUTTON_ON_PRESS, "LoadPress")
+	GemRB.SetEvent(StartWindow, QuickLoadButton, IE_GUI_BUTTON_ON_PRESS, "QuickLoadPress")
 	GemRB.SetVisible(StartWindow, 1)
 	GemRB.LoadMusicPL("Theme.mus")
 	return
@@ -119,6 +136,14 @@ def LoadPress():
 
 	GemRB.UnloadWindow(StartWindow)
 	GemRB.SetNextScript("GUILOAD")
+	return
+
+def QuickLoadPress():
+	global StartWindow, QuickLoadSlot
+
+        StartLoadScreen()
+        GemRB.LoadGame(QuickLoadSlot) # load & start game
+        GemRB.EnterGame()
 	return
 
 def OptionsPress():

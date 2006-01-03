@@ -1,11 +1,11 @@
 2DA V1.0
 *
            AT_1       AT_2       AT_3       AT_4       TYPE       SPACE      PALETTE    
-0x1000     MWYV       MWYV       MWYV       MWYV       2          5          1 
-0x1100     MTAN       MTAN       MTAN       MTAN       2          5          1 
-0x1200     MDR1       MDR1       MDR1       MDR1       4          5          1 
-0x1201     MDR2       MDR2       MDR2       MDR2       4          5          1 
-0x1202     MDR3       MDR3       MDR3       MDR3       4          5          1 
+0x1000     MWYV       MWYV       MWYV       MWYV       11         5          1 
+0x1100     MTAN       MTAN       MTAN       MTAN       11         5          1 
+0x1200     MDR1       MDR1       MDR1       MDR1       12         5          1 
+0x1201     MDR2       MDR2       MDR2       MDR2       12         5          1 
+0x1202     MDR3       MDR3       MDR3       MDR3       12         5          1 
 0x2000     MSIR       MSIR       MSIR       MSIR       2          2          0 
 0x2100     UVOL       UVOL       UVOL       UVOL       2          2          1 
 0x2200     MOGM       MOGM       MOGM       MOGM       2          2          0 
@@ -214,6 +214,13 @@
 0x7F35     MMIS       MMIS       MMIS       MMIS       4          3          1 
 0x7F36     NSHD       NSHD       NSHD       NSHD       4          2          1 
 0x7F37     NIRE       NIRE       NIRE       NIRE       4          2          1 
+0x7F38     MEYE       MEYE       MEYE       MEYE       2          1          1
+0x7F39     MMST       MMST       MMST       MMST       4          2          1
+0x7F3A     NIRO       NIRO       NIRO       NIRO       4          2          1
+0x7F3B     MSOL       MSOL       MSOL       MSOL       4          2          1
+0x7F3C     MASL       MASL       MASL       MASL       4          2          1
+0x7F3D     MMEL       MMEL       MMEL       MMEL       4          2          1
+0x7F3E     MFIG       MFIG       MFIG       MFIG       4          3          1
 0x8000     MGNL       MGNL       MGNL       MGNL       2          2          0 
 0x8100     MHOB       MHOB       MHOB       MHOB       2          2          0 
 0x8200     MKOB       MKOB       MKOB       MKOB       2          2          0 
