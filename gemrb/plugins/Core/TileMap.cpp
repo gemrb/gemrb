@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.51 2005/12/19 23:10:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.52 2006/01/03 19:59:56 wjpalenstijn Exp $
  *
  */
 
@@ -184,21 +184,19 @@ void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region v
 	Video* vid = core->GetVideoDriver();
 	Region vp = vid->GetViewport();
 
-	vp.x -= viewport.x;
-	vp.y -= viewport.y;
 	vp.w = viewport.w;
 	vp.h = viewport.h;
 	if (( vp.x + vp.w ) > w * CELL_SIZE) {
 		vp.x = ( w * CELL_SIZE - vp.w );
 	}
-	if (vp.x < viewport.x) {
-		vp.x = viewport.x;
+	if (vp.x < 0) {
+		vp.x = 0;
 	}
 	if (( vp.y + vp.h ) > h * CELL_SIZE) {
 		vp.y = ( h * CELL_SIZE - vp.h );
 	}
-	if (vp.y < viewport.y) {
-		vp.y = viewport.y;
+	if (vp.y < 0) {
+		vp.y = 0;
 	}
 	int sx = ( vp.x ) / CELL_SIZE;
 	int sy = ( vp.y ) / CELL_SIZE;
