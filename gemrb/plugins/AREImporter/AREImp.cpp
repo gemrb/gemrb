@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.148 2006/01/02 23:26:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.149 2006/01/03 16:32:16 avenger_teambg Exp $
  *
  */
 
@@ -396,9 +396,13 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->ReadDword( &ItemIndex );
 		str->ReadDword( &ItemCount );
 		str->ReadResRef( Script );
-		ieDword firstIndex, vertCount;
+		ieDword firstIndex;
+		ieWord vertCount, unknown;
 		str->ReadDword( &firstIndex );
-		str->ReadDword( &vertCount );
+		//the vertex count is only 16 bits, there is a weird flag
+		//after it, which is usually 0, but sometimes set to 1
+		str->ReadWord( &vertCount );
+		str->ReadWord( &unknown );
 		//str->Read( Name, 32 );
 		str->Seek( 32, GEM_CURRENT_POS);
 		str->ReadResRef( KeyResRef);
@@ -778,12 +782,12 @@ Map* AREImp::GetMap(const char *ResRef)
 			str->ReadWord( &anim->sequence );
 			str->ReadWord( &anim->frame );
 			str->ReadDword( &anim->Flags );
-			str->ReadWord( &anim->unknown38 );  //not completely understood, seems like a percentage or speed value
+			str->ReadWord( &anim->unknown38 ); //not completely understood, seems like a percentage or speed value
 			str->ReadWord( &anim->transparency );
 			str->ReadWord( &anim->unknown3c ); //not completely understood, if not 0, sequence is started
 			str->Read( &anim->startchance,1 );
 			if (anim->startchance<=0) {
-				anim->startchance=100;      //percentage of starting a cycle
+				anim->startchance=100; //percentage of starting a cycle
 			}
 			str->Read( &anim->skipcycle,1 ); //how many cycles are skipped	(100% skippage)	
 			str->ReadResRef( anim->Palette );
