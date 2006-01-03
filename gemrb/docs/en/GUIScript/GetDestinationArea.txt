@@ -1,0 +1,17 @@
+
+Prototype: GemRB.GetDestinationArea(WindowIndex, ControlIndex)
+
+Description: Returns a dictionary of the selected area by the worldmap control.
+If the route is blocked, then Distance will return a negative value and Destination/Entrance won't be set.
+
+Parameters: WindowIndex, ControlIndex - designate a worldmap control
+
+Return value: Dictionary
+Target      - The target area selected by the player
+Distance    - The traveling distance, if it is negative, the way is blocked
+Destination - The area resource reference where the player arrives (if there was a random encounter, it differs from Target)
+Entrance    - The area entrance in the Destination area, it could be empty, in this casethe player should appear in middle of the area
+
+See also: CreateWorldMapControl, CreateMovement, accessing_gui_controls
+
+MD5: b19700ed972c915b0910b40a746a87ee

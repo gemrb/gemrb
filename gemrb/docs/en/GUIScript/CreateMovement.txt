@@ -1,0 +1,13 @@
+
+Prototype: GemRB.CreateMovement(Area, Entrance)
+
+Description: Moves some or all actors of the current area to the destination area.
+
+Parameters: Area - The area resource reference where the player(s) should arrive.
+        Entrance - The area entrance in the Destination area.
+
+Return value: N/A
+
+See also: GetDestinationArea
+
+MD5: b19700ed972c915b0910b40a746a87ee

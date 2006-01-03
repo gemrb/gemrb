@@ -17,5 +17,5 @@ Example:
         GemRB.CreateWorldMapControl (Window, 4, 0, 62, 640, 418, Travel)
         WorldMapControl = GemRB.GetControl (Window, 4)
 
-See also:
+See also: GetDestinationArea, CreateMovement
 
