@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.348 2006/01/02 23:26:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.349 2006/01/04 16:34:06 avenger_teambg Exp $
  *
  */
 
@@ -606,10 +606,10 @@ static ActionLink actionnames[] = {
 	{"restorepartylocations", GameScript:: RestorePartyLocation, 0},
 	{"restparty", GameScript::RestParty, 0},
 	{"restuntilhealed", GameScript::RestUntilHealed, 0},
-	//this is in iwd2, same as movetosavedlocation, with a default variable
-	{"returntosavedlocation", GameScript::MoveToSavedLocation, AF_BLOCKING},
-	{"returntosavedlocationdelete", GameScript::MoveToSavedLocationDelete, AF_BLOCKING},
-	{"returntosavedplace", GameScript::MoveToSavedLocation, AF_BLOCKING},
+	//this is in iwd2, same as movetosavedlocation, but with stats
+	{"returntosavedlocation", GameScript::ReturnToSavedLocation, AF_BLOCKING},
+	{"returntosavedlocationdelete", GameScript::ReturnToSavedLocationDelete, AF_BLOCKING},
+	{"returntosavedplace", GameScript::ReturnToSavedLocation, AF_BLOCKING},
 	{"revealareaonmap", GameScript::RevealAreaOnMap, 0},
 	{"runawayfrom", GameScript::RunAwayFrom,AF_BLOCKING},
 	{"runawayfromnointerrupt", GameScript::RunAwayFromNoInterrupt,AF_BLOCKING},
@@ -648,7 +648,7 @@ static ActionLink actionnames[] = {
 	{"setglobaltimeronce", GameScript::SetGlobalTimerOnce,AF_MERGESTRINGS},
 	{"setglobaltimerrandom", GameScript::SetGlobalTimerRandom,AF_MERGESTRINGS},
 	{"setglobaltint", GameScript::SetGlobalTint, 0},
-	{"sethomelocation", GameScript::SetHomeLocation, 0},
+	{"sethomelocation", GameScript::SetSavedLocation, 0}, //bg2
 	{"sethp", GameScript::SetHP, 0},
 	{"setinternal", GameScript::SetInternal, 0},
 	{"setleavepartydialogfile", GameScript::SetLeavePartyDialogFile, 0},
@@ -669,10 +669,11 @@ static ActionLink actionnames[] = {
 	{"setrestencounterchance", GameScript::SetRestEncounterChance, 0},
 	{"setrestencounterprobabilityday", GameScript::SetRestEncounterProbabilityDay, 0},
 	{"setrestencounterprobabilitynight", GameScript::SetRestEncounterProbabilityNight, 0},
-	{"setsavedlocation", GameScript::SaveObjectLocation, 0},
-	{"setsavedlocationpoint", GameScript::SaveLocation, 0},
+	{"setsavedlocation", GameScript::SetSavedLocation, 0},
+	{"setsavedlocationpoint", GameScript::SetSavedLocationPoint, 0},
 	{"setscriptname", GameScript::SetScriptName, 0},
 	{"setsequence", GameScript::PlaySequence, 0}, //bg2 (only own)
+	{"setstartpos", GameScript::SetStartPos, 0},
 	{"setteam", GameScript::SetTeam, 0},
 	{"setteambit", GameScript::SetTeamBit, 0},
 	{"settextcolor", GameScript::SetTextColor, 0},

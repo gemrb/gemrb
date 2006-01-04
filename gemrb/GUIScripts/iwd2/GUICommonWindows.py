@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUICommonWindows.py,v 1.13 2005/12/29 17:46:45 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUICommonWindows.py,v 1.14 2006/01/04 16:34:05 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -84,20 +84,20 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 
-	# Select All
-	Button = GemRB.GetControl (Window, 11)
-	GemRB.SetTooltip (Window, Button, 10485)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
-	# Rest
-	Button = GemRB.GetControl (Window, 12)
-	GemRB.SetTooltip (Window, Button, 11942)
-	GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreWindow")
+	if Gears:
+		# Select All
+		Button = GemRB.GetControl (Window, 11)
+		GemRB.SetTooltip (Window, Button, 10485)
+		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
+		# Rest
+		Button = GemRB.GetControl (Window, 12)
+		GemRB.SetTooltip (Window, Button, 11942)
+		GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "RestPressed")
 
-	# Character Arbitration
-	Button = GemRB.GetControl (Window, 13)
-	GemRB.SetTooltip (Window, Button, 16312)
-	GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "CharacterWindow")
-
+		# Character Arbitration
+		Button = GemRB.GetControl (Window, 13)
+		GemRB.SetTooltip (Window, Button, 16312)
+		GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "CharacterWindow")
 	return
 
 def AIPress ():
@@ -234,15 +234,19 @@ def GetActorClassTitle (actor):
 	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
 	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
 	ClassTable = GemRB.LoadTable ("classes")
+	print "Kit:",Kit
 	if Kit==0x4000 or Kit==0: #pure class
 		ClassIndex = Class
 	else: #bad, because kit clashes with classid
-		ClassIndex = GemRB.FindTableValue (ClassTable, Kit, 2)
+		ClassIndex = GemRB.FindTableValue (ClassTable, 2, Kit)
+		print "ClassIndex",ClassIndex
 
 	if ClassTitle==0:
 		ClassTitle=GemRB.GetTableValue (ClassTable, ClassIndex, 0)
+		print "ClassTitle",ClassTitle
 
 	GemRB.UnloadTable (ClassTable)
+	print "ClassTitle", ClassTitle
 	return ClassTitle
 
 def GetActorPaperDoll (actor):
@@ -277,21 +281,11 @@ def RunSelectionChangeHandler ():
 	if SelectionChangeHandler:
 		SelectionChangeHandler ()
 
-def OpenPortraitWindow (needcontrols):
+def OpenPortraitWindow ():
 	global PortraitWindow
 
 	PortraitWindow = Window = GemRB.LoadWindow(1)
 
-	if needcontrols:
-		# AI
-		Button = GemRB.GetControl (Window, 6)
-		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
-		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "AIPress")
-
-		#Select All
-		Button = GemRB.GetControl (Window, 7)
-		GemRB.SetTooltip (Window, Button, 10485)
-		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
 	for i in range (PARTY_SIZE):
 		Button = GemRB.GetControl (Window, i)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")

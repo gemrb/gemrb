@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.151 2006/01/02 10:14:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.152 2006/01/04 16:34:06 avenger_teambg Exp $
  *
  */
 
@@ -1090,7 +1090,13 @@ void Actor::WalkTo(Point &Des, ieDword flags, int MinDistance)
 	}
 	InternalFlags &= ~IF_RUNFLAGS;
 	InternalFlags |= (flags & IF_RUNFLAGS);
-	Moveble::WalkTo(Des, MinDistance);
+	// is this true???
+	if (Des.x==-2 && Des.y==-2) {
+		Point p(GetStat(IE_SAVEDXPOS), GetStat(IE_SAVEDYPOS) );
+		Moveble::WalkTo(p, MinDistance);
+	} else {
+		Moveble::WalkTo(Des, MinDistance);
+	}
 }
 
 void Actor::DrawOverheadText(Region &screen)

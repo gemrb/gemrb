@@ -21,12 +21,11 @@ import GemRB
 
 from GUICommonWindows import *
 import GUICommonWindows
+from GUIINV import *
 from GUIJRNL import *
 from GUIMA import *
-from GUIMG import *
-from GUIINV import *
 from GUIOPT import *
-from GUIPR import *
+from GUISPL import *
 from GUIREC import *
 from GUISTORE import *
 from GUIWORLD import *
@@ -42,7 +41,7 @@ def OnLoad():
 	GemRB.SetDefaultActions(1,14,16,17)
 	GemRB.LoadWindowPack(GetWindowPack())
 	OptionsWindow = MessageWindow = GemRB.LoadWindow(0)
-	ActionsWindow = PortraitWindow = OpenPortraitWindow(1)
+	ActionsWindow = PortraitWindow = OpenPortraitWindow()
 
 	GemRB.SetVar ("MessageWindow", MessageWindow)
 	GemRB.SetVar ("PortraitWindow", PortraitWindow)

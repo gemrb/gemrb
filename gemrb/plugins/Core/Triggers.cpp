@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.37 2006/01/02 23:26:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.38 2006/01/04 16:34:06 avenger_teambg Exp $
  *
  */
 
@@ -1092,6 +1092,7 @@ int GameScript::Range(Scriptable* Sender, Trigger* parameters)
 	return DiffCore(distance, parameters->int0Parameter*20, parameters->int1Parameter);
 }
 
+//PST
 int GameScript::AtLocation( Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
@@ -1105,10 +1106,20 @@ int GameScript::AtLocation( Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+//in pst this is a point
+//in iwd2 this is not a point
 int GameScript::NearLocation(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!scr) {
+		return 0;
+	}
+	if (parameters->pointParameter.isnull()) {
+		Point p(parameters->int0Parameter, parameters->int1Parameter);
+		int distance = Distance(p, scr);
+		if (distance <= ( parameters->int2Parameter * 20 )) {
+			return 1;
+		}
 		return 0;
 	}
 	int distance = Distance(parameters->pointParameter, scr);
@@ -1120,17 +1131,12 @@ int GameScript::NearLocation(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::NearSavedLocation(Scriptable* Sender, Trigger* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
-	if (!scr) {
+	if (Sender->Type!=ST_ACTOR) {
 		return 0;
 	}
-	ieDword value;
-	if (!parameters->string0Parameter[0]) {
-		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
-	}
-	value = (ieDword) CheckVariable( scr, parameters->string0Parameter );
-	Point p( *(unsigned short *) &value, *(((unsigned short *) &value)+1));
-	int distance = Distance(p, scr);
+	Actor *actor = (Actor *) Sender;
+	Point p( actor->GetStat(IE_SAVEDXPOS),actor->GetStat(IE_SAVEDYPOS) );
+	int distance = Distance(p, Sender);
 	if (distance <= ( parameters->int0Parameter * 20 )) {
 		return 1;
 	}
@@ -2597,13 +2603,7 @@ int GameScript::IsFacingSavedRotation(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	ieDword value;
-	if (!parameters->string0Parameter[0]) {
-		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
-	}
-	value = (ieDword) CheckVariable( tar, parameters->string0Parameter );
-	Point p(*(unsigned short *) &value, *(((unsigned short *) &value)+1));
-	if (actor->GetOrientation() == GetOrient( p, actor->Pos ) ) {
+	if (actor->GetOrientation() == actor->GetStat(IE_SAVEDFACE) ) {
 		return 1;
 	}
 	return 0;

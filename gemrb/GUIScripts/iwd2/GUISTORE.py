@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUISTORE.py,v 1.13 2005/03/28 10:36:20 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUISTORE.py,v 1.14 2006/01/04 16:34:05 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -119,7 +119,7 @@ def OpenStoreWindow ():
 	StoreWindow = Window = GemRB.LoadWindow (3)
 	#saving the original portrait window
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = OpenPortraitWindow(0)
+	PortraitWindow = OpenPortraitWindow()
 	ActionWindow = GemRB.LoadWindow(0)
 	#this window is static and grey, but good to stick the frame onto
 	GemRB.SetWindowFrame (ActionWindow)

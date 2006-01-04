@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/MessageWindow.py,v 1.34 2005/12/20 20:14:05 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/MessageWindow.py,v 1.35 2006/01/04 16:34:06 avenger_teambg Exp $
 
 # MessageWindow.py - scripts and GUI for main (walk) window
 
@@ -155,7 +155,7 @@ def UpdateControlStatus():
 		ExpandButton = GemRB.GetControl(TMessageWindow, 2)
 		GemRB.SetEvent(TMessageWindow, ExpandButton, IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
 
-	GemRB.SetTextAreaFlags(TMessageWindow, TMessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
+	GemRB.SetTextAreaFlags(TMessageWindow, TMessageTA, IE_GUI_TEXTAREA_AUTOSCROLL|IE_GUI_TEXTAREA_SPEAKER)
 	GemRB.SetTAHistory(TMessageWindow, TMessageTA, 100)
 	hideflag = GemRB.HideGUI()
 	MessageTA = GemRB.GetVar("MessageTextArea")

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.236 2006/01/02 23:26:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.237 2006/01/04 16:34:06 avenger_teambg Exp $
  *
  */
 
@@ -1099,7 +1099,6 @@ public:
 	static void MoveToPointNoInterrupt(Scriptable* Sender, Action* parameters);
 	static void MoveToPointNoRecticle(Scriptable* Sender, Action* parameters);
 	static void MoveToSavedLocation(Scriptable* Sender, Action* parameters);
-	static void MoveToSavedLocationDelete(Scriptable* Sender, Action* parameters);
 	static void MoveViewPoint(Scriptable* Sender, Action* parameters);
 	static void MoveViewObject(Scriptable* Sender, Action* parameters);
 	static void NIDSpecial1(Scriptable* Sender, Action* parameters);
@@ -1150,6 +1149,8 @@ public:
 	static void RestNoSpells(Scriptable *Sender, Action* parameters);
 	static void RestParty(Scriptable *Sender, Action* parameters);
 	static void RestUntilHealed(Scriptable *Sender, Action* parameters);
+	static void ReturnToSavedLocation(Scriptable* Sender, Action* parameters);
+	static void ReturnToSavedLocationDelete(Scriptable* Sender, Action* parameters);
 	static void RevealAreaOnMap(Scriptable* Sender, Action* parameters);
 	static void RunAwayFrom(Scriptable* Sender, Action* parameters);
 	static void RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters);
@@ -1183,7 +1184,6 @@ public:
 	static void SetGlobalTimerOnce(Scriptable* Sender, Action* parameters);
 	static void SetGlobalTimerRandom(Scriptable* Sender, Action* parameters);
 	static void SetGlobalTint(Scriptable* Sender, Action* parameters);
-	static void SetHomeLocation(Scriptable* Sender, Action* parameters);
 	static void SetHP(Scriptable* Sender, Action* parameters);
 	static void SetInternal(Scriptable* Sender, Action* parameters);
 	static void SetLeavePartyDialogFile(Scriptable* Sender, Action* parameters);
@@ -1202,7 +1202,10 @@ public:
 	static void SetRestEncounterChance(Scriptable* Sender, Action* parameters);
 	static void SetRestEncounterProbabilityDay(Scriptable* Sender, Action* parameters);
 	static void SetRestEncounterProbabilityNight(Scriptable* Sender, Action* parameters);
+	static void SetSavedLocation(Scriptable* Sender, Action* parameters);
+	static void SetSavedLocationPoint(Scriptable* Sender, Action* parameters);
 	static void SetScriptName(Scriptable* Sender, Action* parameters);
+	static void SetStartPos(Scriptable* Sender, Action* parameters);
 	static void SetTeam(Scriptable* Sender, Action* parameters);
 	static void SetTeamBit(Scriptable* Sender, Action* parameters);
 	static void SetTextColor(Scriptable* Sender, Action* parameters);

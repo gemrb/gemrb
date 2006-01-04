@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Region.h,v 1.12 2005/11/08 22:59:05 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Region.h,v 1.13 2006/01/04 16:34:06 avenger_teambg Exp $
  *
  */
 
@@ -58,6 +58,8 @@ public:
 	Point(short x, short y);
 	/** if it is [-1.-1] */
 	bool isempty() const;
+	/** if it is [0.0] */
+	bool isnull() const;
 };
 
 

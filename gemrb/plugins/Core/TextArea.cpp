@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.84 2005/11/26 10:49:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.85 2006/01/04 16:34:06 avenger_teambg Exp $
  *
  */
 
@@ -26,6 +26,8 @@
 #include "Variables.h"
 #include "GameControl.h"
 #include "SoundMgr.h"
+#include "Actor.h"
+#include "ResourceMgr.h"  //for loading bmp image
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,7 +43,7 @@ TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 	sb = NULL;
 	ResetEventHandler( TextAreaOnChange );
 	ResetEventHandler( TextAreaOutOfText );
-
+	PortraitResRef[0]=0;
 	palette = core->GetVideoDriver()->CreatePalette( hitextcolor,
 										lowtextcolor );
 	initpalette = core->GetVideoDriver()->CreatePalette( initcolor,
@@ -69,6 +71,39 @@ TextArea::~TextArea(void)
 	}
 }
 
+void TextArea::RefreshSprite(const char *portrait)
+{
+	Video *video = core->GetVideoDriver();
+	if (AnimPicture) {
+		if (!strnicmp(PortraitResRef, portrait, 8) ) {
+			return;
+		}
+		video->FreeSprite(AnimPicture);
+		SetAnimPicture(NULL);
+	}
+	strnlwrcpy(PortraitResRef, portrait, 8);
+	if (!strnicmp(PortraitResRef, "none", 8) ) {
+		return;
+	}
+	DataStream* str = core->GetResourceMgr()->GetResource( PortraitResRef, IE_BMP_CLASS_ID );
+	if (str==NULL) {
+		return;
+	}
+	ImageMgr* im = ( ImageMgr* ) core->GetInterface( IE_BMP_CLASS_ID );
+	if (im == NULL) {
+	        delete ( str );
+	        return;
+	}
+
+	if (!im->Open( str, true )) {
+	        core->FreeInterface( im );
+	        return;
+	}
+
+	SetAnimPicture ( im->GetImage() );
+	core->FreeInterface( im );
+}
+
 void TextArea::Draw(unsigned short x, unsigned short y)
 {
 	/** Don't come back recursively */
@@ -79,6 +114,14 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 	int ty=y+YPos;
 	Region clip( tx, ty, Width, Height );
 	Video *video = core->GetVideoDriver();
+
+	if (Flags&IE_GUI_TEXTAREA_SPEAKER) {
+		if (AnimPicture) {
+			video->BlitSprite(AnimPicture, tx,ty, true, &clip);
+			clip.x+=AnimPicture->Width;
+			clip.w-=AnimPicture->Width;
+		}
+	}
 
 	//this might look better in GlobalTimer
 	//or you might want to change the animated button to work like this
@@ -96,11 +139,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 					startrow++;
 				}
 			}
-			/* this wasn't the best
-			Color black = { 0, 0, 0, 255 };
-			video->DrawRect( clip, black );
 
-			*/
 			/** Forcing redraw of whole screen before drawing text*/
 			( ( Window * ) Owner )->Invalidate();
 			BiteMyTail = true;
@@ -124,7 +163,8 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 
 	//smooth vertical scrolling up
 	if (Flags & IE_GUI_TEXTAREA_SMOOTHSCROLL) {
-		ty=ty+smooth;
+		clip.y+=smooth;
+		clip.h-=smooth;
 	}
 
 	//if textarea is 'selectable' it actually means, it is a listbox
@@ -176,8 +216,8 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			}
 		}
 		video->SetClipRect( &clip );
-		ftext->PrintFromLine( startrow,
-			Region( tx , ty, Width, Height - 5 ),
+		ftext->PrintFromLine( startrow, clip,
+			//Region( tx , ty, Width, Height - 5 ),
 			( unsigned char * ) Buffer, palette,
 			IE_FONT_ALIGN_LEFT, finit, NULL );
 		free( Buffer );
@@ -219,8 +259,8 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			pal = lineselpal;
 		else
 			pal = palette;
-		ftext->PrintFromLine( sr,
-			Region( tx, ty, Width, Height - 5 ),
+		ftext->PrintFromLine( sr, clip,
+			//Region( tx, ty, Width, Height - 5 ),
 			( unsigned char * ) lines[i], pal,
 			IE_FONT_ALIGN_LEFT, finit, NULL );
 		yl = lrows[i] - sr;
@@ -234,9 +274,15 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			pal = lineselpal;
 		else
 			pal = palette;
+		clip.y+=ftext->size[1].h;
+		clip.h-=ftext->size[1].h;
+		ftext->Print( clip, ( unsigned char * ) lines[i], pal,
+			IE_FONT_ALIGN_LEFT, true );
+/*
 		ftext->Print( Region( tx, ty + ( yl * ftext->size[1].h ),
 			Width, Height - 5 - ( yl * ftext->maxHeight) ),
 			( unsigned char * ) lines[i], pal, IE_FONT_ALIGN_LEFT, true );
+*/
 		yl += lrows[i];
 	}
 }
@@ -470,6 +516,26 @@ void TextArea::SetRow(int row)
 
 void TextArea::CalcRowCount()
 {
+	int w = Width;
+
+        if (Flags&IE_GUI_TEXTAREA_SPEAKER) {
+                const char *portrait = NULL;
+                Actor *actor = NULL;
+                GameControl *gc = core->GetGameControl();
+                if (gc) {
+                        actor = gc->GetTarget();
+                }
+                if (actor) {
+                        portrait = actor->GetPortrait(1);
+                }
+                if (portrait) {
+                        RefreshSprite(portrait);
+                }
+		if (AnimPicture) {
+			w-=AnimPicture->Width;
+		}
+	}
+
 	rows = 0;
 	if (lines.size() != 0) {
 		for (size_t i = 0; i < lines.size(); i++) {
@@ -478,7 +544,7 @@ void TextArea::CalcRowCount()
 			int len = ( int ) strlen( lines[i] );
 			char* tmp = ( char* ) malloc( len + 1 );
 			memcpy( tmp, lines[i], len + 1 );
-			ftext->SetupString( tmp, Width );
+			ftext->SetupString( tmp, w );
 			for (int p = 0; p <= len; p++) {
 				if (( ( unsigned char ) tmp[p] ) == '[') {
 					p++;

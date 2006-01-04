@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.47 2006/01/03 17:16:03 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.48 2006/01/04 16:34:05 avenger_teambg Exp $
 
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
@@ -50,6 +50,7 @@ IE_GUI_TEXTAREA_SELECTABLE = 0x05000001
 IE_GUI_TEXTAREA_AUTOSCROLL = 0x05000002
 IE_GUI_TEXTAREA_SMOOTHSCROLL = 0x05000004
 IE_GUI_TEXTAREA_HISTORY = 0x05000008
+IE_GUI_TEXTAREA_SPEAKER = 0x05000010
 
 #events
 IE_GUI_BUTTON_ON_PRESS      = 0x00000000

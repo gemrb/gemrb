@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.29 2005/11/26 10:49:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.30 2006/01/04 16:34:06 avenger_teambg Exp $
  *
  */
 
@@ -44,6 +44,8 @@
 #define IE_GUI_TEXTAREA_AUTOSCROLL   2
 #define IE_GUI_TEXTAREA_SMOOTHSCROLL 4
 #define IE_GUI_TEXTAREA_HISTORY      8
+#define IE_GUI_TEXTAREA_SPEAKER      16
+
 #ifdef WIN32
 
 #ifdef GEM_BUILD_DLL
@@ -141,8 +143,10 @@ private: // Private attributes
 	bool BiteMyTail;
 	/** Fonts */
 	Font* finit, * ftext;
+	ieResRef PortraitResRef;
 	void CalcRowCount();
 	void UpdateControls();
+	void RefreshSprite(const char *portrait);
 public: //Events
 	/** Key Press Event */
 	void OnKeyPress(unsigned char Key, unsigned short Mod);

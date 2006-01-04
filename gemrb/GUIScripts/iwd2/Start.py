@@ -141,9 +141,9 @@ def LoadPress():
 def QuickLoadPress():
 	global StartWindow, QuickLoadSlot
 
-        StartLoadScreen()
-        GemRB.LoadGame(QuickLoadSlot) # load & start game
-        GemRB.EnterGame()
+	StartLoadScreen()
+	GemRB.LoadGame(QuickLoadSlot) # load & start game
+	GemRB.EnterGame()
 	return
 
 def OptionsPress():

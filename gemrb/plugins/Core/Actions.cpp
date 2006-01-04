@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.56 2006/01/02 10:14:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.57 2006/01/04 16:34:06 avenger_teambg Exp $
  *
  */
 
@@ -388,7 +388,7 @@ void GameScript::JumpToPointInstant(Scriptable* Sender, Action* parameters)
 	ab->SetPosition( map, parameters->pointParameter, true );
 }
 
-/** instant jump to location saved in variable, default: savedlocation */
+/** instant jump to location saved in stats */
 /** default subject is the current actor */
 void GameScript::JumpToSavedLocation(Scriptable* Sender, Action* parameters)
 {
@@ -399,15 +399,11 @@ void GameScript::JumpToSavedLocation(Scriptable* Sender, Action* parameters)
 	if (tar->Type != ST_ACTOR) {
 		return;
 	}
-	if (!parameters->string0Parameter[0]) {
-		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
-	}
-	ieDword value = (ieDword) CheckVariable( Sender, parameters->string0Parameter );
-	parameters->pointParameter.x = *(unsigned short *) &value;
-	parameters->pointParameter.y = *(((unsigned short *) &value)+1);
-	Actor* ab = ( Actor* ) tar;
+	Actor *actor = (Actor *) tar;
+	Point p(actor->GetStat(IE_SAVEDXPOS), actor->GetStat(IE_SAVEDYPOS) );
 	Map *map = Sender->GetCurrentArea();
-	ab->SetPosition( map, parameters->pointParameter, true );
+	actor->SetPosition( map, p, true );
+	actor->SetOrientation( actor->GetStat(IE_SAVEDFACE), false );
 }
 
 void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
@@ -684,7 +680,7 @@ void GameScript::VerbalConstant(Scriptable* Sender, Action* parameters)
 	DisplayStringCore( tar, parameters->int0Parameter, DS_CONSOLE|DS_CONST);
 }
 
-/** in IWD2 this has no string parameter, saves the location into a local */
+//bg2 - variable
 void GameScript::SaveLocation(Scriptable* Sender, Action* parameters)
 {
 	unsigned int value;
@@ -698,7 +694,48 @@ void GameScript::SaveLocation(Scriptable* Sender, Action* parameters)
 	SetVariable(Sender, parameters->string0Parameter, value);
 }
 
-/** in IWD2 this has no string parameter, saves the location into a local */
+//PST:has parameters, IWD2: no params
+void GameScript::SetSavedLocation(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+	//iwd2
+	if (parameters->pointParameter.isnull()) {
+		actor->SetStat(IE_SAVEDXPOS, actor->Pos.x);
+		actor->SetStat(IE_SAVEDYPOS, actor->Pos.y);
+		actor->SetStat(IE_SAVEDFACE, actor->GetOrientation());
+		return;
+	}
+	//pst
+	actor->SetStat(IE_SAVEDXPOS, parameters->pointParameter.x);
+	actor->SetStat(IE_SAVEDYPOS, parameters->pointParameter.y);
+	actor->SetStat(IE_SAVEDFACE, parameters->int0Parameter);
+}
+//IWD2, sets the homepoint int0,int1,int2
+void GameScript::SetSavedLocationPoint(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+	actor->SetStat(IE_SAVEDXPOS, parameters->int0Parameter);
+	actor->SetStat(IE_SAVEDYPOS, parameters->int1Parameter);
+	actor->SetStat(IE_SAVEDFACE, parameters->int2Parameter);
+}
+//IWD2, sets the homepoint P
+void GameScript::SetStartPos(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+	actor->SetStat(IE_SAVEDXPOS, parameters->pointParameter.x);
+	actor->SetStat(IE_SAVEDYPOS, parameters->pointParameter.y);
+	actor->SetStat(IE_SAVEDFACE, parameters->int0Parameter);
+}
+
 void GameScript::SaveObjectLocation(Scriptable* Sender, Action* parameters)
 {
 	unsigned int value;
@@ -836,9 +873,8 @@ void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
 	actor->WalkTo( parameters->pointParameter, 0 );
 	Sender->ReleaseCurrentAction();
 }
-/** this function extends bg2: movetosavedlocationn (sic), */
-/** iwd2 returntosavedlocation (with default variable) */
-/** use Sender as default subject */
+
+//bg2, jumps to saved location in variable
 void GameScript::MoveToSavedLocation(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
@@ -848,15 +884,31 @@ void GameScript::MoveToSavedLocation(Scriptable* Sender, Action* parameters)
 	if (tar->Type != ST_ACTOR) {
 		return;
 	}
-	
-	if (!parameters->string0Parameter[0]) {
-		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
-	}
-	ieDword value = (ieDword) CheckVariable( Sender, parameters->string0Parameter );
-	parameters->pointParameter.x = *(unsigned short *) &value;
-	parameters->pointParameter.y = *(((unsigned short *) &value)+1);
+
+	Point p;
 	Actor* actor = ( Actor* ) tar;
-	actor->WalkTo( parameters->pointParameter, 0, 0 );
+	ieDword value = (ieDword) CheckVariable( Sender, parameters->string0Parameter );
+	p.x = *(unsigned short *) &value;
+	p.y = *(((unsigned short *) &value)+1);
+	Map *map = Sender->GetCurrentArea();
+	actor->SetPosition( map, p, true );
+}
+/** iwd2 returntosavedlocation (with stats) */
+/** pst returntosavedplace */
+/** use Sender as default subject */
+void GameScript::ReturnToSavedLocation(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		tar = Sender;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return;
+	}
+
+	Actor* actor = ( Actor* ) tar;
+	Point p(actor->GetStat(IE_SAVEDXPOS),actor->GetStat(IE_SAVEDYPOS) );
+	actor->WalkTo( p, 0, 0 );
 }
 
 //PST
@@ -869,18 +921,14 @@ void GameScript::RunToSavedLocation(Scriptable* Sender, Action* parameters)
 	if (tar->Type != ST_ACTOR) {
 		return;
 	}
-	
-	if (!parameters->string0Parameter[0]) {
-		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
-	}
-	ieDword value = (ieDword) CheckVariable( Sender, parameters->string0Parameter );
-	parameters->pointParameter.x = *(unsigned short *) &value;
-	parameters->pointParameter.y = *(((unsigned short *) &value)+1);
+
 	Actor* actor = ( Actor* ) tar;
+	Point p(actor->GetStat(IE_SAVEDXPOS),actor->GetStat(IE_SAVEDYPOS) );
 	actor->WalkTo( parameters->pointParameter, IF_RUNNING, 0 );
 }
 
-void GameScript::MoveToSavedLocationDelete(Scriptable* Sender, Action* parameters)
+//iwd2
+void GameScript::ReturnToSavedLocationDelete(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
@@ -889,16 +937,11 @@ void GameScript::MoveToSavedLocationDelete(Scriptable* Sender, Action* parameter
 	if (tar->Type != ST_ACTOR) {
 		return;
 	}
-	
-	if (!parameters->string0Parameter[0]) {
-		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
-	}
-	ieDword value = (ieDword) CheckVariable( Sender, parameters->string0Parameter );
-	SetVariable( Sender, parameters->string0Parameter, 0);
-	parameters->pointParameter.x = *(unsigned short *) &value;
-	parameters->pointParameter.y = *(((unsigned short *) &value)+1);
+
 	Actor* actor = ( Actor* ) tar;
+	Point p(actor->GetStat(IE_SAVEDXPOS),actor->GetStat(IE_SAVEDYPOS) );
 	actor->WalkTo( parameters->pointParameter, 0, 0 );
+	//what else?
 }
 
 void GameScript::MoveToObjectNoInterrupt(Scriptable* Sender, Action* parameters)
@@ -3397,7 +3440,7 @@ void GameScript::Damage(Scriptable* Sender, Action* parameters)
 	}
 	damagee->Damage( damage, type, damager );
 }
-
+/*
 void GameScript::SetHomeLocation(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
@@ -3408,6 +3451,7 @@ void GameScript::SetHomeLocation(Scriptable* Sender, Action* parameters)
 	movable->Destination = parameters->pointParameter;
 	//no movement should be started here, i think
 }
+*/
 
 void GameScript::SetMasterArea(Scriptable* /*Sender*/, Action* parameters)
 {

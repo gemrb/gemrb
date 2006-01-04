@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.21 2006/01/03 19:45:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.22 2006/01/04 16:34:06 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -99,13 +99,15 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 		WMPAreaEntry *m = worldmap->GetEntry(i);
 		if (! (m->GetAreaStatus() & WMP_ENTRY_VISIBLE)) continue;
 		Sprite2D *icon=m->MapIcon;
-		int h=0,w=0;
+		int h=0,w=0,xpos=0,ypos=0;
 		if (icon) {
 			h=icon->Height;
 			w=icon->Width;
+			xpos=icon->XPos;
+			ypos=icon->YPos;
 		}
 
-		Region r2 = Region( MAP_TO_SCREENX(m->X), MAP_TO_SCREENY(m->Y), w, h );
+		Region r2 = Region( MAP_TO_SCREENX(m->X-xpos), MAP_TO_SCREENY(m->Y-ypos), w, h );
 		if (r2.y+r2.h<r.y) continue;
 
 		char *text = core->GetString( m->LocCaptionName );

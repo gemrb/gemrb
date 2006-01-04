@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUIINV.py,v 1.6 2005/12/29 17:46:45 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUIINV.py,v 1.7 2006/01/04 16:34:05 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -67,12 +67,13 @@ def OpenInventoryWindow ():
 	InventoryWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", InventoryWindow)
 	#saving the original portrait window
+	OldPortraitWindow = GUICommonWindows.PortraitWindow
+	PortraitWindow = OpenPortraitWindow ()
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
+	OptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenInventoryWindow")
-	GemRB.SetWindowFrame (OptionsWindow)
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = OpenPortraitWindow (0)
+	GemRB.SetWindowFrame (Window)
 
 	# Ground Items (6)
 	for i in range (5):
@@ -150,11 +151,10 @@ def OpenInventoryWindow ():
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
 
 	GemRB.SetVar ("TopIndex", 0)
+
 	SetSelectionChangeHandler (UpdateInventoryWindow)
+
 	UpdateInventoryWindow ()
-	GemRB.SetVisible (OptionsWindow, 1)
-	GemRB.SetVisible (Window, 3)
-	GemRB.SetVisible (PortraitWindow, 1)
 	return
 
 def CancelColor():
@@ -166,7 +166,6 @@ def ColorDonePress():
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	GemRB.UnloadWindow (ColorPicker)
-	GemRB.SetVisible (InventoryWindow,1)
 	ColorTable = GemRB.LoadTable ("clowncol")
 	PickedColor=GemRB.GetTableValue (ColorTable, ColorIndex, GemRB.GetVar ("Selected"))
 	GemRB.UnloadTable (ColorTable)
@@ -372,6 +371,8 @@ def RefreshInventoryWindow ():
 
 	#if actor is uncontrollable, make this grayed
 	GemRB.SetVisible (Window, 1)
+	GemRB.SetVisible (PortraitWindow, 1)
+	GemRB.SetVisible (OptionsWindow, 1)
 	return
 
 def UpdateSlot (pc, slot):
