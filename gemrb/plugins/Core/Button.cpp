@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.94 2005/12/17 17:27:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.95 2006/01/04 22:23:07 avenger_teambg Exp $
  *
  */
 
@@ -137,7 +137,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 		return;
 	}
 	Changed = false;
-	if (XPos == 65535) {
+	if (XPos == 65535 || Width == 0) {
 		return;
 	}
 
