@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.152 2006/01/04 16:34:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.153 2006/01/04 22:18:10 wjpalenstijn Exp $
  *
  */
 
@@ -29,6 +29,9 @@
 #include "Game.h"
 #include "GameScript.h"
 #include "GSUtils.h"    //needed for DisplayStringCore
+#include "Video.h"
+#include "SpriteCover.h"
+#include <cassert>
 
 extern Interface* core;
 #ifdef WIN32
@@ -69,6 +72,8 @@ static char gemrb2iwd[32]={
 };
 
 static void InitActorTables();
+
+static ieDword TranslucentShadows;
 
 PCStatsStruct::PCStatsStruct()
 {
@@ -142,6 +147,10 @@ Actor::Actor()
 	inventory.SetOwner( this );
 	if (classcount<0) {
 		InitActorTables();
+
+		TranslucentShadows = 0;
+		core->GetDictionary()->Lookup("Translucent Shadows",
+									  TranslucentShadows);
 	}
 	TalkCount = 0;
 	InteractCount = 0; //numtimesinteracted depends on this
@@ -1098,6 +1107,140 @@ void Actor::WalkTo(Point &Des, ieDword flags, int MinDistance)
 		Moveble::WalkTo(Des, MinDistance);
 	}
 }
+
+void Actor::Draw(Region &screen)
+{
+	Map* area = GetCurrentArea();
+
+	int cx = Pos.x;
+	int cy = Pos.y;
+	int explored = Modified[IE_DONOTJUMP]&2;
+	//check the deactivation condition only if needed
+	//this fixes dead actors disappearing from fog of war (they should be permanently visible)
+	if (!area->IsVisible( Pos, explored) &&	(GetInternalFlag()&IF_ACTIVE) ) {
+		//finding an excuse why we don't hybernate the actor
+		if (Modified[IE_ENABLEOFFSCREENAI])
+			return;
+		if (CurrentAction)
+			return;
+		if (path)
+			return;
+		if (GetNextAction())
+			return;
+		if (GetWait()) //would never stop waiting
+			return;
+		//turning actor inactive
+		Deactivate();//&=~SCR_ACTIVE;
+	}
+	//visual feedback
+	CharAnimations* ca = GetAnims();
+	if (!ca)
+		return;
+
+	//explored or visibilitymap (bird animations are visible in fog)
+	//0 means opaque
+	int Trans = Modified[IE_TRANSLUCENT];
+	//int Trans = Modified[IE_TRANSLUCENT] * 255 / 100;
+	if (Trans>255) {
+		Trans=255;
+	}
+	int State = Modified[IE_STATE_ID];
+	if (State&STATE_INVISIBLE) {
+		//enemies/neutrals are fully invisible if invis flag 2 set
+		if (GetStat(IE_EA)>EA_GOODCUTOFF) {
+			if (State&STATE_INVIS2)
+				Trans=256;
+			else
+				Trans=128;
+		} else {
+			Trans=256;
+		}
+	}
+	//friendlies are half transparent at best
+	if (Trans>128) {
+		if (GetStat(IE_EA)<=EA_GOODCUTOFF) {
+			Trans=128;
+		}
+	}
+	//no visual feedback
+	if (Trans>255) {
+		return;
+	}
+
+	Video* video = core->GetVideoDriver();
+	Region vp = video->GetViewport();
+
+	if (( !Modified[IE_NOCIRCLE] ) && ( !( State & STATE_DEAD ) )) {
+		DrawCircle(vp);
+		DrawTargetPoint(vp);
+	}
+	
+	unsigned char StanceID = GetStance();
+	Animation* anim = ca->GetAnimation( StanceID, GetNextFace() );
+	if (anim) {
+		Sprite2D* nextFrame = anim->NextFrame();
+		if (nextFrame) {
+			if (lastFrame != nextFrame) {
+				Region newBBox;
+				newBBox.x = cx - nextFrame->XPos;
+				newBBox.w = nextFrame->Width;
+				newBBox.y = cy - nextFrame->YPos;
+				newBBox.h = nextFrame->Height;
+				lastFrame = nextFrame;
+				SetBBox( newBBox );
+			}
+			if (BBox.InsideRegion( vp )) {
+				Color tint = area->LightMap->GetPixel( cx / 16, cy / 12);
+				tint.a = 255-Trans;
+				SpriteCover* sc = GetSpriteCover();
+				if (!sc || !sc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height)) {
+					delete sc;
+					sc = area->BuildSpriteCover(cx, cy, -anim->animArea.x, -anim->animArea.y, anim->animArea.w, anim->animArea.h, WantDither() );
+					SetSpriteCover(sc);
+					
+				}
+				assert(sc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height));
+				
+				if (TranslucentShadows) {
+					video->BlitSpriteTransShadow( nextFrame, cx + screen.x, cy + screen.y, tint, sc, anim->Palette, &screen );
+				} else {
+					video->BlitSpriteCovered( nextFrame, cx + screen.x, cy + screen.y, tint, sc, anim->Palette, &screen );
+				}
+			}
+			if (anim->endReached) {
+				if (HandleActorStance() ) {
+					anim->endReached = false;
+				}
+			}
+		}
+	}
+	
+	//text feedback
+	DrawOverheadText(screen);
+}
+
+/* Handling automatic stance changes */
+bool Actor::HandleActorStance()
+{
+	CharAnimations* ca = GetAnims();
+	int StanceID = GetStance();
+
+	int x = rand()%1000;
+	if (ca->autoSwitchOnEnd) {
+		SetStance( ca->nextStanceID );
+		return true;
+	}
+	if ((StanceID==IE_ANI_AWAKE) && !x ) {
+		SetStance( IE_ANI_HEAD_TURN );
+		return true;
+	}
+	if ((StanceID==IE_ANI_READY) && !GetNextAction()) {
+		SetStance( IE_ANI_AWAKE );
+		return true;
+	}
+	return false;
+}
+
 
 void Actor::DrawOverheadText(Region &screen)
 {

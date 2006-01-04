@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.219 2006/01/03 17:16:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.220 2006/01/04 22:18:10 wjpalenstijn Exp $
  *
  */
 
@@ -64,7 +64,6 @@ static Point **VisibilityMasks=NULL;
 static bool PathFinderInited = false;
 static Variables Spawns;
 static int LargeFog;
-static ieDword TranslucentShadows;
 static ieWord globalActorCounter;
 
 #define STEP_TIME 150
@@ -176,8 +175,6 @@ void AddLOS(int destx, int desty, int slot)
 void InitExplore()
 {
 	LargeFog = !core->HasFeature(GF_SMALL_FOG);
-	TranslucentShadows = 0;
-	core->GetDictionary()->Lookup("Translucent Shadows", TranslucentShadows);
 
 	//circle perimeter size for MaxVisibility
 	int x = MaxVisibility;
@@ -531,24 +528,6 @@ void Map::UpdateScripts()
 	}
 }
 
-/* Handling automatic stance changes */
-bool Map::HandleActorStance(Actor *actor, CharAnimations *ca, int StanceID)
-{
-	int x = rand()%1000;
-	if (ca->autoSwitchOnEnd) {
-		actor->SetStance( ca->nextStanceID );
-		return true;
-	}
-	if ((StanceID==IE_ANI_AWAKE) && !x ) {
-		actor->SetStance( IE_ANI_HEAD_TURN );
-		return true;
-	}
-	if ((StanceID==IE_ANI_READY) && !actor->GetNextAction()) {
-		actor->SetStance( IE_ANI_AWAKE );
-		return true;
-	}
-	return false;
-}
 
 void Map::DrawContainers( Region screen, Container *overContainer)
 {
@@ -628,108 +607,7 @@ void Map::DrawMap(Region screen, GameControl* gc)
 			Actor* actor = GetRoot( q, index );
 			if (!actor)
 				break;
-			int cx = actor->Pos.x;
-			int cy = actor->Pos.y;
-			int explored = actor->Modified[IE_DONOTJUMP]&2;
-			//check the deactivation condition only if needed
-			//this fixes dead actors disappearing from fog of war (they should be permanently visible)
-			if (!IsVisible( actor->Pos, explored) && (actor->GetInternalFlag()&IF_ACTIVE) ) {
-				//finding an excuse why we don't hybernate the actor
-				if (actor->Modified[IE_ENABLEOFFSCREENAI])
-					continue;
-				if (actor->CurrentAction)
-					continue;
-				if (actor->path)
-					continue;
-				if (actor->GetNextAction())
-					continue;
-				if (actor->GetWait()) //would never stop waiting
-					continue;
-				//turning actor inactive
-				actor->Deactivate();//&=~SCR_ACTIVE;
-			}
-			//visual feedback
-			CharAnimations* ca = actor->GetAnims();
-			if (!ca) {
-				continue;
-			}
-			//explored or visibilitymap (bird animations are visible in fog)
-			//0 means opaque
-			int Trans = actor->Modified[IE_TRANSLUCENT];
-			//int Trans = actor->Modified[IE_TRANSLUCENT] * 255 / 100;
-			if (Trans>255) {
-				 Trans=255;
-			}
-			int State = actor->Modified[IE_STATE_ID];
-			if (State&STATE_INVISIBLE) {
-				//enemies/neutrals are fully invisible if invis flag 2 set
-				if (actor->GetStat(IE_EA)>EA_GOODCUTOFF) {
-					if (State&STATE_INVIS2)
-						Trans=256;
-					else
-						Trans=128;
-				} else {
-					Trans=256;
-				}
-			}
-			//friendlies are half transparent at best
-			if (Trans>128) {
-				if (actor->GetStat(IE_EA)<=EA_GOODCUTOFF) {
-					Trans=128;
-				}
-			}
-			//no visual feedback
-			if (Trans>255) {
-				continue;
-			}
-			if (( !actor->Modified[IE_NOCIRCLE] ) &&
-					( !( State & STATE_DEAD ) )) {
-				actor->DrawCircle(vp);
-				actor->DrawTargetPoint(vp);
-			}
-
-			unsigned char StanceID = actor->GetStance();
-			Animation* anim = ca->GetAnimation( StanceID, actor->GetNextFace() );
-			if (anim) {
-				Sprite2D* nextFrame = anim->NextFrame();
-				if (nextFrame) {
-					if (actor->lastFrame != nextFrame) {
-						Region newBBox;
-						newBBox.x = cx - nextFrame->XPos;
-						newBBox.w = nextFrame->Width;
-						newBBox.y = cy - nextFrame->YPos;
-						newBBox.h = nextFrame->Height;
-						actor->lastFrame = nextFrame;
-						actor->SetBBox( newBBox );
-					}
-					if (actor->BBox.InsideRegion( vp )) {
-						Color tint = LightMap->GetPixel( cx / 16, cy / 12);
-						tint.a = 255-Trans;
-						SpriteCover* sc = actor->GetSpriteCover();
-						if (!sc || !sc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height)) {
-							delete sc;
-							sc = BuildSpriteCover(cx, cy, -anim->animArea.x, -anim->animArea.y, anim->animArea.w, anim->animArea.h, actor->WantDither() );
-							actor->SetSpriteCover(sc);
-
-						}
-						assert(sc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height));
-
-						if (TranslucentShadows) {
-							video->BlitSpriteTransShadow( nextFrame, cx + screen.x, cy + screen.y, tint, sc, anim->Palette, &screen );
-						} else {
-							video->BlitSpriteCovered( nextFrame, cx + screen.x, cy + screen.y, tint, sc, anim->Palette, &screen );
-						}
-					}
-					if (anim->endReached) {
-						if (HandleActorStance(actor, ca, StanceID) ) {
-							anim->endReached = false;
-						}
-					}
-				}
-			}
-
-			//text feedback
-			actor->DrawOverheadText(screen);
+			actor->Draw( screen );
 		}
 	}
 

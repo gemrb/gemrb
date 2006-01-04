@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.99 2006/01/03 17:16:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.100 2006/01/04 22:18:10 wjpalenstijn Exp $
  *
  */
 
@@ -331,7 +331,6 @@ private:
 	void SetupNode(unsigned int x, unsigned int y, unsigned int Cost);
 	//actor uses travel region
 	void UseExit(Actor *pc, InfoPoint *ip);
-	bool HandleActorStance(Actor *actor, CharAnimations *ca, int StanceID);
 	PathNode* GetLine(Point &start, Point &dest, int Steps, int Orientation, int flags);
 };
 

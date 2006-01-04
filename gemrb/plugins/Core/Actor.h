@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.96 2005/12/29 17:46:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.97 2006/01/04 22:18:10 wjpalenstijn Exp $
  *
  */
 
@@ -326,11 +326,19 @@ public:
 	bool Schedule(ieDword gametime);
 	/* overridden method, won't walk if dead */
 	void WalkTo(Point &Des, ieDword flags, int MinDistance = 0);
-	/* re/draws overhead text on the map screen */
-	void DrawOverheadText(Region &screen);
 	/* resolve string constant */
 	void ResolveStringConstant(ieResRef sound, unsigned int index);
 	/* updates the quick slots */
 	void GetActionButtonRow(ActionButtonRow &qs, int translation);
+
+	/* Handling automatic stance changes */
+	bool HandleActorStance();
+
+	/* if necessary, advance animation and draw actor */
+	void Draw(Region &screen);
+
+private:
+	/* re/draws overhead text on the map screen */
+	void DrawOverheadText(Region &screen);
 };
 #endif
