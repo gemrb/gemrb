@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.cpp,v 1.35 2005/11/25 23:22:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.cpp,v 1.36 2006/01/04 23:21:07 avenger_teambg Exp $
  *
  */
 
@@ -32,7 +32,7 @@ Label::Label(Font* font)
 	useRGB = false;
 	ResetEventHandler( LabelOnPress );
 
-	Alignment = IE_FONT_ALIGN_CENTER;
+	Alignment = IE_FONT_ALIGN_CENTER|IE_FONT_ALIGN_MIDDLE;
 	palette = NULL;
 }
 Label::~Label()
@@ -55,8 +55,7 @@ void Label::Draw(unsigned short x, unsigned short y)
 	if (font && Buffer) {
 		font->Print( Region( this->XPos + x, this->YPos + y,
 			this->Width, this->Height ), ( unsigned char * ) Buffer,
-			useRGB?palette:NULL, Alignment | IE_FONT_ALIGN_MIDDLE |
-			IE_FONT_SINGLE_LINE, true );
+			useRGB?palette:NULL, Alignment | IE_FONT_SINGLE_LINE, true );
 	}
 }
 /** This function sets the actual Label Text */
@@ -95,9 +94,6 @@ void Label::SetColor(Color col, Color bac)
 
 void Label::SetAlignment(unsigned char Alignment)
 {
-	if (Alignment > IE_FONT_ALIGN_RIGHT) {
-		return;
-	}
 	this->Alignment = Alignment;
 	if (Alignment == IE_FONT_ALIGN_CENTER) {
 		if (core->HasFeature( GF_LOWER_LABEL_TEXT )) {

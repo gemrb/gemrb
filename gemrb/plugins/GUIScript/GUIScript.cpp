@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.371 2006/01/03 22:03:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.372 2006/01/04 23:21:08 avenger_teambg Exp $
  *
  */
 
@@ -177,7 +177,7 @@ inline Control *GetControl( int wi, int ci, int ct)
 	char errorbuffer[256];
 
 	Window* win = core->GetWindow( wi );
-	if (!win) {
+	if (win == NULL) {
 		snprintf(errorbuffer, sizeof(errorbuffer), "Cannot find window #%d", wi);
 		RuntimeError(errorbuffer);
 		return NULL;
@@ -542,8 +542,8 @@ static PyObject* GemRB_SetWindowSize(PyObject * /*self*/, PyObject* args)
 	}
 
 	Window* win = core->GetWindow( WindowIndex );
-	if (!win) {
-		return NULL;
+	if (win == NULL) {
+		return RuntimeError("Cannot find window!\n");
 	}
 
 	win->Width = Width;
@@ -567,8 +567,8 @@ static PyObject* GemRB_SetWindowFrame(PyObject * /*self*/, PyObject* args)
 	}
 
 	Window* win = core->GetWindow( WindowIndex );
-	if (!win) {
-		return NULL;
+	if (win == NULL) {
+		return RuntimeError("Cannot find window!\n");
 	}
 
 	win->SetFrame();
@@ -661,8 +661,8 @@ static PyObject* GemRB_SetWindowPicture(PyObject * /*self*/, PyObject* args)
 	}
 
 	Window* win = core->GetWindow( WindowIndex );
-	if (!win) {
-		return NULL;
+	if (win == NULL) {
+		return RuntimeError("Cannot find window!\n");
 	}
 
 	DataStream* bkgr = core->GetResourceMgr()->GetResource( MosResRef, IE_MOS_CLASS_ID );
@@ -700,8 +700,8 @@ static PyObject* GemRB_SetWindowPos(PyObject * /*self*/, PyObject* args)
 	}
 
 	Window* win = core->GetWindow( WindowIndex );
-	if (!win) {
-		return NULL;
+	if (win == NULL) {
+		return RuntimeError("Cannot find window!\n");
 	}
 
 	if (Flags & WINDOW_CENTER) {
@@ -1498,8 +1498,8 @@ static PyObject* GemRB_InvalidateWindow(PyObject * /*self*/, PyObject* args)
 	}
 
 	Window* win = core->GetWindow( WindowIndex );
-	if (!win) {
-		return NULL;
+	if (win == NULL) {
+		return RuntimeError("Cannot find window!");
 	}
 	win->Invalidate();
 
@@ -1528,6 +1528,43 @@ static PyObject* GemRB_CreateWindow(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( WindowIndex );
 }
 
+PyDoc_STRVAR( GemRB_CreateLabelOnButton__doc,
+"CreateLabel(WindowIndex, ControlIndex, NewControlID, font, text, align)"
+"Creates a label on top of a button, copying the button's size and position." );
+
+static PyObject* GemRB_CreateLabelOnButton(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex, ControlID, align;
+	char *font;
+
+        if (!PyArg_ParseTuple( args, "iiisi", &WindowIndex, &ControlIndex,
+			&ControlID, &font, &align )) {
+                return AttributeError( GemRB_CreateLabelOnButton__doc );
+        }
+
+	Window* win = core->GetWindow( WindowIndex );
+	if (win == NULL) {
+		return RuntimeError("Cannot find window!");
+	}
+	Control *btn = GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
+	if (!btn) {
+		return NULL;
+	}
+	Label* lbl = new Label( core->GetFont( font ) );
+	lbl->XPos = btn->XPos;
+	lbl->YPos = btn->YPos;
+	lbl->Width = btn->Width;
+	lbl->Height = btn->Height;
+	lbl->ControlID = ControlID;
+	lbl->ControlType = IE_GUI_LABEL;
+	lbl->Owner = win;
+	lbl->SetAlignment( align );
+	win->AddControl( lbl );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_CreateLabel__doc,
 "CreateLabel(WindowIndex, ControlID, x, y, w, h, font, text, align) => ControlIndex\n\n"
 "Creates and adds a new Label to a Window." );
@@ -1544,7 +1581,7 @@ static PyObject* GemRB_CreateLabel(PyObject * /*self*/, PyObject* args)
 
 	Window* win = core->GetWindow( WindowIndex );
 	if (win == NULL) {
-		return NULL;
+		return RuntimeError("Cannot find window!");
 	}
 	Label* lbl = new Label( core->GetFont( font ) );
 	lbl->XPos = x;
@@ -1603,7 +1640,7 @@ static PyObject* GemRB_CreateTextEdit(PyObject * /*self*/, PyObject* args)
 
 	Window* win = core->GetWindow( WindowIndex );
 	if (win == NULL) {
-		return NULL;
+		return RuntimeError("Cannot find window!");
 	}
 	TextEdit* edit = new TextEdit( 500 );
 	edit->SetFont( core->GetFont( font ) );
@@ -1643,7 +1680,7 @@ static PyObject* GemRB_CreateButton(PyObject * /*self*/, PyObject* args)
 
 	Window* win = core->GetWindow( WindowIndex );
 	if (win == NULL) {
-		return NULL;
+		return RuntimeError("Cannot find window!");
 	}
 
 	Button* btn = new Button( false );
@@ -1828,7 +1865,7 @@ static PyObject* GemRB_DeleteControl(PyObject * /*self*/, PyObject* args)
 
 	Window* win = core->GetWindow( WindowIndex );
 	if (win == NULL) {
-		return NULL;
+		return RuntimeError("Cannot find window!");
 	}
 	int CtrlIndex = core->GetControl( WindowIndex, ControlID );
 	if (CtrlIndex == -1) {
@@ -1948,7 +1985,7 @@ static PyObject* GemRB_CreateWorldMapControl(PyObject * /*self*/, PyObject* args
 
 	Window* win = core->GetWindow( WindowIndex );
 	if (win == NULL) {
-		return NULL;
+		return RuntimeError("Cannot find window!");
 	}
 	int CtrlIndex = core->GetControl( WindowIndex, ControlID );
 	if (CtrlIndex != -1) {
@@ -2000,7 +2037,7 @@ static PyObject* GemRB_CreateMapControl(PyObject * /*self*/, PyObject* args)
 	}
 	Window* win = core->GetWindow( WindowIndex );
 	if (win == NULL) {
-		return NULL;
+		return RuntimeError("Cannot find window!");
 	}
 	int CtrlIndex = core->GetControl( WindowIndex, ControlID );
 	if (CtrlIndex != -1) {
@@ -6165,6 +6202,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetVarAssoc, METH_VARARGS),
 	METHOD(UnloadWindow, METH_VARARGS),
 	METHOD(CreateLabel, METH_VARARGS),
+	METHOD(CreateLabelOnButton, METH_VARARGS),
 	METHOD(SetLabelTextColor, METH_VARARGS),
 	METHOD(CreateTextEdit, METH_VARARGS),
 	METHOD(CreateButton, METH_VARARGS),

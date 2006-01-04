@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.38 2006/01/04 16:34:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.39 2006/01/04 23:21:07 avenger_teambg Exp $
  *
  */
 
@@ -2772,7 +2772,7 @@ int GameScript::HelpEX(Scriptable* Sender, Trigger* parameters)
 		default: return 0;
 	}
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
-	if (tar->Type!=ST_ACTOR) {
+	if (!tar || tar->Type!=ST_ACTOR) {
 		//a non actor checking for help?
 		return 0;
 	}

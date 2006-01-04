@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.44 2005/12/03 20:48:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.45 2006/01/04 23:21:07 avenger_teambg Exp $
  *
  */
 
@@ -260,6 +260,7 @@ void Font::Print(Region rgn, unsigned char* string, Color* hicolor,
 		int w = CalcStringWidth( tmp, NoColor );
 		x = ( rgn.w - w );
 	}
+
 	if (Alignment & IE_FONT_ALIGN_MIDDLE) {
 		int h = 0;
 		for (size_t i = 0; i <= len; i++) {
