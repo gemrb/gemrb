@@ -7,6 +7,9 @@ Description: Sets Window to have a frame used to fill screen on higher
   how much space is there, the LoadWindowPack() function should be called
   with size parameters.
 
+  Make sure to set the frame only for the window on the bottom, because the
+  frames will erase the whole screen before drawing.
+
 Parameters:
   WindowIndex   - the index returned by LoadWindow()
 

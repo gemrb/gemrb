@@ -11,5 +11,5 @@ Parameters: WindowIndex - the index returned by LoadWindow()
 
 Return value: N/A
 
-See also: ShowModal
+See also: ShowModal, SetWindowFrame
 
