@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIINV.py,v 1.5 2005/12/22 23:29:43 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIINV.py,v 1.6 2006/01/04 23:22:05 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -80,6 +80,7 @@ def OpenInventoryWindow ():
 		GemRB.SetTooltip (Window, Button, 12011)
 		GemRB.SetVarAssoc (Window, Button, "GroundItemButton", i)
 		GemRB.SetButtonFont (Window, Button, "NUMBER")
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
 
 	# ground items scrollbar
 	ScrollBar = GemRB.GetControl (Window, 66)
@@ -127,9 +128,9 @@ def OpenInventoryWindow ():
 		SlotType = GemRB.GetSlotType (slot+1)
 		if SlotType["ID"]:
 			Button = GemRB.GetControl (Window, SlotType["ID"])
-			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
 			GemRB.SetVarAssoc (Window, Button, "ItemButton", slot+1)
 			GemRB.SetButtonFont (Window, Button, "NUMBER")
+			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
 
 	GemRB.SetVar ("TopIndex", 0)
 	SetSelectionChangeHandler (UpdateInventoryWindow)
@@ -214,6 +215,10 @@ def UpdateInventoryWindow ():
 		Count=1
 	GemRB.SetVarAssoc (Window, ScrollBar, "TopIndex", Count)
 	RefreshInventoryWindow ()
+	# populate inventory slot controls
+	SlotCount = GemRB.GetSlotType (-1)["Count"]
+	for i in range (SlotCount):
+		UpdateSlot (pc, i)
 	return
 
 #partial update without altering TopIndex
@@ -293,10 +298,6 @@ def RefreshInventoryWindow ():
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
 
-	# populate inventory slot controls
-	SlotCount = GemRB.GetSlotType (-1)["Count"]
-	for i in range (SlotCount):
-		UpdateSlot (pc, i)
 	#making window visible/shaded depending on the pc's state
 	GemRB.SetVisible (Window, 1)
 	return

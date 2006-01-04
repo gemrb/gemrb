@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUIWORLD.py,v 1.7 2006/01/03 22:03:44 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUIWORLD.py,v 1.8 2006/01/04 23:22:06 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -263,7 +263,7 @@ def OpenContainerWindow ():
 
 	# Done
 	Button = GemRB.GetControl (Window, 51)
-	GemRB.SetText (Window, Button, 1403)
+	#no caption on this button
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "LeaveContainer")
 
 	GemRB.SetVar ("LeftTopIndex", 0)

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUIINV.py,v 1.7 2006/01/04 16:34:05 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUIINV.py,v 1.8 2006/01/04 23:22:06 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -266,6 +266,11 @@ def UpdateInventoryWindow ():
 		Count=1
 	GemRB.SetVarAssoc (Window, ScrollBar, "TopIndex", Count)
 	RefreshInventoryWindow ()
+	# populate inventory slot controls
+	SlotCount = GemRB.GetSlotType (-1)["Count"]
+	for i in range (SlotCount):
+		UpdateSlot (pc, i)
+	return
 
 def RefreshInventoryWindow ():
 	Window = InventoryWindow
@@ -363,11 +368,6 @@ def RefreshInventoryWindow ():
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
-
-	# populate inventory slot controls
-	SlotCount = GemRB.GetSlotType (-1)["Count"]
-	for i in range (SlotCount):
-		UpdateSlot (pc, i)
 
 	#if actor is uncontrollable, make this grayed
 	GemRB.SetVisible (Window, 1)

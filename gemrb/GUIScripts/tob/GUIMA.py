@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIMA.py,v 1.27 2006/01/03 17:16:04 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIMA.py,v 1.28 2006/01/04 23:22:07 avenger_teambg Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -100,7 +100,7 @@ def LeftDoublePressMap ():
 	return
 
 def CloseNoteWindow ():
-	GemRB.SetVisible (NoteWindow, 0)
+	GemRB.UnloadWindow (NoteWindow)
 	GemRB.SetVisible (MapWindow, 1)
 	return
 
@@ -121,21 +121,25 @@ def SetMapNote ():
 	CloseNoteWindow ()
 	return
 
+def SetFocusBack ():
+	GemRB.SetControlStatus (NoteWindow, NoteLabel, IE_GUI_CONTROL_FOCUSED)
+	return
+
 def AddNoteWindow ():
-	global NoteWindow
+	global NoteWindow, NoteLabel
 
 	Label = GemRB.GetControl (MapWindow, 0x10000003)
 	Text = GemRB.QueryText (MapWindow, Label)
 	NoteWindow = GemRB.LoadWindow (5)
-	Label = GemRB.GetControl (NoteWindow, 1)
-	GemRB.SetText (NoteWindow, Label, Text)
-	GemRB.SetControlStatus (NoteWindow, Label, IE_GUI_CONTROL_FOCUSED)
+	NoteLabel = GemRB.GetControl (NoteWindow, 1)
+	GemRB.SetText (NoteWindow, NoteLabel, Text)
 	for i in range(8):
 		Label = GemRB.GetControl (NoteWindow, 4+i)
 		#the .chu is crappy, we have to reset the flags
 		GemRB.SetButtonSprites (NoteWindow, Label, "FLAG1", i,0,1,2,0)
 		GemRB.SetButtonFlags (NoteWindow, Label, IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 		GemRB.SetVarAssoc (NoteWindow, Label, "Color", i)
+		GemRB.SetEvent (NoteWindow, Label, IE_GUI_BUTTON_ON_PRESS, "SetFocusBack")
 
 	#set
 	Label = GemRB.GetControl (NoteWindow, 0)
@@ -153,8 +157,8 @@ def AddNoteWindow ():
 	GemRB.SetEvent (NoteWindow, Label, IE_GUI_BUTTON_ON_PRESS,"RemoveMapNote")
 	GemRB.SetText (NoteWindow, Label, 13957)
 
-	GemRB.SetVisible (MapWindow, 2)
-	GemRB.SetVisible (NoteWindow, 1)
+	GemRB.ShowModal (NoteWindow, MODAL_SHADOW_GRAY)
+	GemRB.SetControlStatus (NoteWindow, NoteLabel, IE_GUI_CONTROL_FOCUSED)
 	return
 
 def OpenWorldMapWindowInside ():

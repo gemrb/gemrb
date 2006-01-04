@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.7 2006/01/03 17:16:04 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.8 2006/01/04 23:22:04 avenger_teambg Exp $
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
 
@@ -102,7 +102,8 @@ def OpenInventoryWindow ():
 	Label = GemRB.GetControl (Window, 0x1000003f)
 	GemRB.SetText (Window, Label, "")
 	
-	for slot in range(38):
+	SlotCount = GemRB.GetSlotType (-1)["Count"]
+	for slot in range(SlotCount):
 		SlotType = GemRB.GetSlotType (slot+1)
 		if SlotType["ID"]:
 			Button = GemRB.GetControl (Window, SlotType["ID"])
@@ -191,6 +192,10 @@ def UpdateInventoryWindow ():
 		Count=1
 	GemRB.SetVarAssoc (Window, ScrollBar, "TopIndex", Count)
 	RefreshInventoryWindow ()
+	# populate inventory slot controls
+	SlotCount = GemRB.GetSlotType (-1)["Count"]
+	for i in range (SlotCount):
+		UpdateSlot (pc, i)
 	return
 
 def RefreshInventoryWindow ():
@@ -271,11 +276,6 @@ def RefreshInventoryWindow ():
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
-
-
-	# populate inventory slot controls
-	for i in range (38):
-		UpdateSlot (pc, i)
 
 	GemRB.UnhideGUI()
 	return

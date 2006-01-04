@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIREC.py,v 1.3 2005/11/29 22:50:10 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIREC.py,v 1.4 2006/01/04 23:22:05 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -34,27 +34,46 @@ from GUIWORLD import OpenReformPartyWindow
 RecordsWindow = None
 InformationWindow = None
 BiographyWindow = None
+PortraitWindow = None
+OptionsWindow = None
+OldPortraitWindow = None
+OldOptionsWindow = None
 
 ###################################################
 def OpenRecordsWindow ():
-	global RecordsWindow
+	global RecordsWindow, PortraitWindow, OptionsWindow
+	global OldPortraitWindow, OldOptionsWindow
 
 	if CloseOtherWindow (OpenRecordsWindow):
 		if InformationWindow: OpenInformationWindow ()
 		
-		GemRB.HideGUI ()
 		GemRB.UnloadWindow (RecordsWindow)
+		GemRB.UnloadWindow (OptionsWindow)
+		GemRB.UnloadWindow (PortraitWindow)
 		RecordsWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		SetSelectionChangeHandler (None)
-		
+		GemRB.SetVisible (0,1)
 		GemRB.UnhideGUI ()
-		return	
+		GUICommonWindows.PortraitWindow = OldPortraitWindow
+		OldPortraitWindow = None
+		GUICommonWindows.OptionsWindow = OldOptionsWindow
+		OldOptionsWindow = None
+		SetSelectionChangeHandler (None)
+		return
 
 	GemRB.HideGUI ()
-	GemRB.LoadWindowPack ("GUIREC")
+	GemRB.SetVisible (0,0)
+
+	GemRB.LoadWindowPack ("GUIREC", 640, 480)
 	RecordsWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", RecordsWindow)
+	#saving the original portrait window
+	OldOptionsWindow = GUICommonWindows.OptionsWindow
+	OptionsWindow = GemRB.LoadWindow (0)
+	SetupMenuWindowControls (OptionsWindow, 0, "OpenRecordsWindow")
+	GemRB.SetWindowFrame (OptionsWindow)
+	OldPortraitWindow = GUICommonWindows.PortraitWindow
+	PortraitWindow = OpenPortraitWindow (0)
 
 	# dual class
 	Button = GemRB.GetControl (Window, 0)
@@ -93,8 +112,9 @@ def OpenRecordsWindow ():
 
 	SetSelectionChangeHandler (UpdateRecordsWindow)
 	UpdateRecordsWindow ()
-
-	GemRB.UnhideGUI ()
+	GemRB.SetVisible (OptionsWindow, 1)
+	GemRB.SetVisible (Window, 3)
+	GemRB.SetVisible (PortraitWindow, 1)
 
 
 def UpdateRecordsWindow ():
@@ -202,6 +222,8 @@ def UpdateRecordsWindow ():
 	stats_overview = GetStatOverview (pc)
 	Text = GemRB.GetControl (Window, 45)
 	GemRB.SetText (Window, Text, stats_overview)
+	#if player is inaccessible make this grey
+	GemRB.SetVisible (Window, 1)
 
 
 def GetStatOverview (pc):

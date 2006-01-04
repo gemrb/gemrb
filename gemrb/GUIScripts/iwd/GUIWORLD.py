@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUIWORLD.py,v 1.9 2005/12/20 20:14:03 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUIWORLD.py,v 1.10 2006/01/04 23:22:06 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -230,14 +230,16 @@ def OpenContainerWindow ():
 	for i in range (6):
 		Button = GemRB.GetControl (Window, i)
 		GemRB.SetVarAssoc (Window, Button, "LeftIndex", i)
-		#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "TakeItemContainer")
+		GemRB.SetButtonFont (Window, Button, "NUMBER")
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
 
 	for i in range (4):
 		Button = GemRB.GetControl (Window, i+10)
 		GemRB.SetVarAssoc (Window, Button, "RightIndex", i)
-		#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "DropItemContainer")
+		GemRB.SetButtonFont (Window, Button, "NUMBER")
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
 
 	# left scrollbar
 	ScrollBar = GemRB.GetControl (Window, 52)
@@ -247,8 +249,10 @@ def OpenContainerWindow ():
 	ScrollBar = GemRB.GetControl (Window, 53)
 	GemRB.SetEvent (Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawContainerWindow")
 
-	Label = GemRB.CreateLabel (Window, 0x10000043, 323,14,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
-	Label = GemRB.CreateLabel (Window, 0x10000044, 323,20,80,15,"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_TOP)
+	Button = GemRB.GetControl (Window, 54)
+	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+	GemRB.CreateLabelOnButton (Window, Button, 0x10000043, "NUMBER", IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
+	GemRB.CreateLabelOnButton (Window, Button, 0x10000044, "NUMBER", IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_BOTTOM)
 
 	Button = GemRB.GetControl (Window, 50)
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
@@ -263,7 +267,7 @@ def OpenContainerWindow ():
 
 	# Done
 	Button = GemRB.GetControl (Window, 51)
-	GemRB.SetText (Window, Button, 1403)
+	#no text
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "LeaveContainer")
 
 	GemRB.SetVar ("LeftTopIndex", 0)
