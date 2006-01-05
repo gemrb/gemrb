@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/TextScreen.py,v 1.8 2005/11/26 10:56:21 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/TextScreen.py,v 1.9 2006/01/05 18:04:30 avenger_teambg Exp $
 
 # TextScreen.py - display Loading screen
 
@@ -27,9 +27,10 @@ from GUIDefines import *
 
 TextScreen = None
 TextArea = None
+Chapter = 0
 
 def StartTextScreen ():
-	global TextScreen, TextArea
+	global TextScreen, TextArea, Chapter
 
 	GemRB.LoadWindowPack ("GUICHAP", 640, 480)
 	LoadPic = GemRB.GetGameString (STR_LOADMOS)
@@ -63,14 +64,22 @@ def StartTextScreen ():
 
 	GemRB.SetVisible (TextScreen, 1)
 	GemRB.RewindTA (TextScreen, TextArea, 300)
+	GemRB.GamePause(1, 1)
 
 
 def FeedScroll ():
-	global TextScreen, TextArea
+	global TextScreen, TextArea, Chapter
 
 	TableName = GemRB.GetGameString (STR_LOADMOS)
-	Table = GemRB.LoadTable(TableName)
-	Value = GemRB.GetTableValue (Table, 1, 1)
+	if TableName == "":
+		#incrementchapter
+		TableName = "CHPTXT"+str(Chapter)
+		Table = GemRB.LoadTable(TableName)
+		Value = GemRB.GetTableValue (Table, 1, 1)
+	else:
+		#textscreen
+		Table = GemRB.LoadTable(TableName)
+		Value = GemRB.GetTableValue (Table, 2, 1)
 	GemRB.UnloadTable (Table)
 	GemRB.TextAreaAppend (TextScreen, TextArea, Value)
 
@@ -89,4 +98,4 @@ def EndTextScreen ():
 	GemRB.UnloadWindow (TextScreen)
 	GemRB.SetVisible (0, 1) #enabling gamecontrol screen
 	GemRB.UnhideGUI ()
-
+	GemRB.GamePause(0, 1)
