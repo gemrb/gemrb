@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.153 2006/01/04 22:18:10 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.154 2006/01/05 14:14:01 avenger_teambg Exp $
  *
  */
 
@@ -572,10 +572,33 @@ int Actor::NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 	return Modified[StatIndex] - oldmod;
 }
 
+void Actor::ReactToDeath(const char * /*deadname*/)
+{
+	// lookup value based on died's scriptingname and ours
+	// if value is 0 - use reactdeath
+	// if value is 1 - use reactspecial
+        // if value is string - use playsound instead (pst)
+	
+	DisplayStringCore(this, VB_REACT, DS_CONSOLE|DS_CONST );
+}
+
 void Actor::Panic()
 {
 	SetBase(IE_MORALE,0);
 	SetBase(IE_STATE_ID,GetStat(IE_STATE_ID)|STATE_PANIC);
+	DisplayStringCore(this, VB_PANIC, DS_CONSOLE|DS_CONST );
+}
+
+void Actor::DialogInterrupt()
+{
+	//if dialoginterrupt was set, no verbal constant
+	if( GetStat(IE_MC_FLAGS)&MC_NO_TALK)
+		return;
+	if (GetStat(IE_EA)>=EA_EVILCUTOFF) {
+		DisplayStringCore(this, VB_HOSTILE, DS_CONSOLE|DS_CONST );
+	} else {
+		DisplayStringCore(this, VB_DIALOG, DS_CONSOLE|DS_CONST );
+	}
 }
 
 //returns actual damage
@@ -593,6 +616,7 @@ int Actor::Damage(int damage, int damagetype, Actor *hitter)
 	LastDamage=damage;
 	LastHitter=hitter->GetID();
 	InternalFlags|=IF_ACTIVE;
+	DisplayStringCore(this, VB_DAMAGE, DS_CONSOLE|DS_CONST );
 	if (InParty) {
 		if (GetStat(IE_HITPOINTS)<GetStat(IE_MAXHITPOINTS)/10) {
 			core->Autopause(AP_WOUNDED);
@@ -745,7 +769,17 @@ void Actor::Die(Scriptable *killer)
 	ClearPath();
 	SetModal( 0 );
 	DisplayStringCore(this, VB_DIE, DS_CONSOLE|DS_CONST );
-	if (!InParty) {
+
+	//JUSTDIED will be removed when the Die() trigger executed
+	//otherwise it is the same as REALLYDIED
+	InternalFlags|=IF_REALLYDIED|IF_JUSTDIED;
+	SetStance( IE_ANI_DIE );
+
+	Game *game = core->GetGame();
+	if (InParty) {
+		game->PartyMemberDied(this);
+		core->Autopause(AP_DEAD);
+	} else {
 		Actor *act=NULL;
 		
 		if (killer) {
@@ -758,14 +792,6 @@ void Actor::Die(Scriptable *killer)
 			//game->KillStat(this, killer);
 			InternalFlags|=IF_GIVEXP;
 		}
-	}
-
-	//JUSTDIED will be removed when the Die() trigger executed
-	//otherwise it is the same as REALLYDIED
-	InternalFlags|=IF_REALLYDIED|IF_JUSTDIED;
-	SetStance( IE_ANI_DIE );
-	if (InParty) {
-		core->Autopause(AP_DEAD);
 	}
 }
 
@@ -1279,8 +1305,14 @@ void Actor::ResolveStringConstant(ieResRef Sound, unsigned int index)
 		case VB_ATTACK:
 			index = 0;
 			break;
+		case VB_DAMAGE:
+			index = 8;
+			break;
 		case VB_DIE:
 			index = 10;
+			break;
+		case VB_SELECT:
+			index = 36;
 			break;
 	}
 	strnlwrcpy(Sound, tab->QueryField (index, 0), 8);

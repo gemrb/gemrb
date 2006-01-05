@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.237 2006/01/04 16:34:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.238 2006/01/05 14:14:02 avenger_teambg Exp $
  *
  */
 
@@ -41,8 +41,17 @@ class Action;
 #define DS_NONAME  16
 
 //verbal constant (bg2), we need a lookup table for other games
+#define VB_PANIC   1
+#define VB_TIRED   7
+#define VB_BORED   8
 #define VB_ATTACK  9
+#define VB_DAMAGE  18
 #define VB_DIE     19
+#define VB_SELECT  26
+#define VB_REACT   53
+#define VB_REACT_S 54
+#define VB_HOSTILE 59
+#define VB_DIALOG  60
 
 //diffmode (iwd2)
 #define DM_EQUAL   1
@@ -983,6 +992,7 @@ public:
 	static void DetectSecretDoor(Scriptable* Sender, Action* parameters);
 	static void Dialogue(Scriptable* Sender, Action* parameters);
 	static void DialogueForceInterrupt(Scriptable* Sender, Action* parameters);
+	static void DialogueInterrupt(Scriptable* Sender, Action* parameters);
 	static void DisplayMessage(Scriptable* Sender, Action* parameters);
 	static void DisplayString(Scriptable* Sender, Action* parameters);
 	static void DisplayStringHead(Scriptable* Sender, Action* parameters);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.18 2006/01/03 19:45:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.19 2006/01/05 14:14:02 avenger_teambg Exp $
  *
  */
 
@@ -33,7 +33,7 @@
 #include "../../includes/ie_types.h"
 
 #include "Sprite2D.h"
-
+#include "AnimationFactory.h"
 
 #ifdef WIN32
 
@@ -78,11 +78,15 @@ public:
 	WMPAreaEntry();
 	~WMPAreaEntry();
 	ieDword GetAreaStatus();
+	void SetAreaStatus(ieDword status, int op);
+	Sprite2D *GetMapIcon(AnimationFactory *bam);
+private:
+	ieDword AreaStatus;
+	Sprite2D *MapIcon;
 public:
 	ieResRef AreaName;
 	ieResRef AreaResRef;
 	char AreaLongName[32];
-	ieDword AreaStatus;
 	ieDword IconSeq;
 	ieDword X;
 	ieDword Y;
@@ -91,8 +95,6 @@ public:
 	ieResRef LoadScreenResRef;
 	ieDword AreaLinksIndex[4];
 	ieDword AreaLinksCount[4];
-
-	Sprite2D* MapIcon;
 };
 
 /**
@@ -133,6 +135,7 @@ public: //struct members
 	ieDword AreaLinksCount;
 	ieResRef MapIconResRef;
 
+	AnimationFactory *bam;
 private: //non-struct members
 	Sprite2D* MapMOS;
 	std::vector< WMPAreaEntry*> area_entries;
@@ -140,12 +143,14 @@ private: //non-struct members
 	int *Distances;
 	int *GotHereFrom;
 public:
+	void SetMapIcons(AnimationFactory *bam);
 	Sprite2D* GetMapMOS() { return MapMOS; }
 	void SetMapMOS(Sprite2D *newmos);
 	int GetEntryCount() { return area_entries.size(); }
 	WMPAreaEntry *GetEntry(unsigned int index) { return area_entries[index]; }
 	int GetLinkCount() { return area_links.size(); }
 	WMPAreaLink *GetLink(unsigned int index) { return area_links[index]; }
+	WMPAreaEntry *GetNewAreaEntry();
 	void SetAreaEntry(unsigned int index, WMPAreaEntry *areaentry);
 	void SetAreaLink(unsigned int index, WMPAreaLink *arealink);
 	void AddAreaEntry(WMPAreaEntry *ae);

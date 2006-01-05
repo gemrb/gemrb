@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.57 2006/01/04 16:34:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.58 2006/01/05 14:14:01 avenger_teambg Exp $
  *
  */
 
@@ -4562,4 +4562,18 @@ void GameScript::EnablePortalTravel(Scriptable* Sender, Action* parameters)
 void GameScript::MoveCursorPoint(Scriptable* /*Sender*/, Action* parameters)
 {
 	core->GetVideoDriver()->MoveMouse(parameters->pointParameter.x, parameters->pointParameter.y);
+}
+
+//false means, no talk
+void GameScript::DialogueInterrupt(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	ieDword tmp = actor->GetBase( IE_MC_FLAGS ) & ~MC_NO_TALK;
+	if (!parameters->int0Parameter) {
+		tmp |= MC_NO_TALK;
+	}
+	actor->SetBase( IE_MC_FLAGS, tmp);
 }

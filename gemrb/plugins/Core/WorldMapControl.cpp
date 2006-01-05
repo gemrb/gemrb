@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.22 2006/01/04 16:34:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.23 2006/01/05 14:14:02 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -82,8 +82,9 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 
 		short xOffs = MAP_TO_SCREENX(m->X);
 		short yOffs = MAP_TO_SCREENY(m->Y);
-		if( m->MapIcon) {
-			video->BlitSprite( m->MapIcon, xOffs, yOffs, true, &r );
+		Sprite2D* icon = m->GetMapIcon(worldmap->bam);
+		if( icon ) {
+			video->BlitSprite( icon, xOffs, yOffs, true, &r );
 		}
 
 		if (AnimPicture && !strnicmp(m->AreaResRef, ca, 8) ) {
@@ -98,7 +99,7 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 	for(i=0;i<ec;i++) {
 		WMPAreaEntry *m = worldmap->GetEntry(i);
 		if (! (m->GetAreaStatus() & WMP_ENTRY_VISIBLE)) continue;
-		Sprite2D *icon=m->MapIcon;
+		Sprite2D *icon=m->GetMapIcon(worldmap->bam);
 		int h=0,w=0,xpos=0,ypos=0;
 		if (icon) {
 			h=icon->Height;
@@ -204,7 +205,7 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 				continue; //current area
 			}
 
-			Sprite2D *icon=ae->MapIcon;
+			Sprite2D *icon=ae->GetMapIcon(worldmap->bam);
 			int h=0,w=0;
 			if (icon) {
 				h=icon->Height;

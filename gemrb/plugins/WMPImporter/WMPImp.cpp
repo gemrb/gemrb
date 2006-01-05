@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.19 2006/01/02 23:26:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.20 2006/01/05 14:14:03 avenger_teambg Exp $
  *
  */
 
@@ -91,19 +91,6 @@ void WMPImp::GetWorldMap(WorldMap *m, unsigned int index)
 	str->ReadDword( &m->AreaLinksCount );
 	str->ReadResRef( m->MapIconResRef );
 
-	str->Seek( m->AreaEntriesOffset, GEM_STREAM_START );
-
-	WMPAreaLink al;
-	WMPAreaEntry ae;
-	for (i = 0; i < m->AreaEntriesCount; i++) {
-		m->SetAreaEntry(i,GetAreaEntry(&ae));
-	}
-
-	str->Seek( m->AreaLinksOffset, GEM_STREAM_START );
-	for (i = 0; i < m->AreaLinksCount; i++) {
-		m->SetAreaLink(i,GetAreaLink(&al));
-	}
-
 	// Load map bitmap
 	if (!core->IsAvailable( IE_MOS_CLASS_ID )) {
 		printMessage( "WMPImporter","No MOS Importer Available.\n", LIGHT_RED );
@@ -115,21 +102,33 @@ void WMPImp::GetWorldMap(WorldMap *m, unsigned int index)
 		core->FreeInterface( mos );
 	}
 
-	// Load location icon
+	// Load location icon bam
 	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
 		printMessage( "WMPImporter","No BAM Importer Available.\n", LIGHT_RED );
-		return;
+	} else {
+		AnimationMgr* icon = ( AnimationMgr* ) core->GetInterface( IE_BAM_CLASS_ID );
+		DataStream* iconfile = core->GetResourceMgr()->GetResource( m->MapIconResRef, IE_BAM_CLASS_ID );
+		if (icon->Open( iconfile, true )) {
+			m->SetMapIcons( icon->GetAnimationFactory( m->MapIconResRef, 0 ) );
+		}
+		core->FreeInterface( icon );
 	}
-	AnimationMgr* icon = ( AnimationMgr* ) core->GetInterface( IE_BAM_CLASS_ID );
-	DataStream* iconfile = core->GetResourceMgr()->GetResource( m->MapIconResRef, IE_BAM_CLASS_ID );
-	icon->Open( iconfile, true ); //autofree
 
-	for(i=0;i<m->AreaEntriesCount;i++) {
-		WMPAreaEntry *ae = m->GetEntry(i);
+	str->Seek( m->AreaEntriesOffset, GEM_STREAM_START );
 
-		ae->MapIcon = icon->GetFrameFromCycle( ae->IconSeq, 0 );
+
+	WMPAreaLink al;
+	for (i = 0; i < m->AreaEntriesCount; i++) {
+		//this weird stuff is requires so we don't create
+		//data here, all data is created in the core
+		m->SetAreaEntry(i,GetAreaEntry(m->GetNewAreaEntry()));
 	}
-	core->FreeInterface( icon );
+
+	str->Seek( m->AreaLinksOffset, GEM_STREAM_START );
+	for (i = 0; i < m->AreaLinksCount; i++) {
+		m->SetAreaLink(i,GetAreaLink(&al));
+	}
+
 }
 
 WMPAreaEntry* WMPImp::GetAreaEntry(WMPAreaEntry* ae)
@@ -137,8 +136,11 @@ WMPAreaEntry* WMPImp::GetAreaEntry(WMPAreaEntry* ae)
 	str->ReadResRef( ae->AreaName );
 	str->ReadResRef( ae->AreaResRef );
 	str->Read( ae->AreaLongName, 32 );
-	str->ReadDword( &ae->AreaStatus );
+	ieDword tmpDword;
+	str->ReadDword( &tmpDword );
 	str->ReadDword( &ae->IconSeq );
+	//this should be set after iconseq is known
+	ae->SetAreaStatus( tmpDword, BM_SET );
 	str->ReadDword( &ae->X );
 	str->ReadDword( &ae->Y );
 	str->ReadDword( &ae->LocCaptionName );
@@ -228,6 +230,7 @@ int WMPImp::PutLinks(DataStream *stream, WorldMap *wmap)
 int WMPImp::PutAreas(DataStream *stream, WorldMap *wmap)
 {
 	char filling[128];
+	ieDword tmpDword;
 
 	memset (filling,0,sizeof(filling));
 	for(unsigned i=0;i<wmap->AreaEntriesCount;i++) {
@@ -236,7 +239,8 @@ int WMPImp::PutAreas(DataStream *stream, WorldMap *wmap)
 		stream->WriteResRef( ae->AreaName );
 		stream->WriteResRef( ae->AreaResRef );
 		stream->Write( ae->AreaLongName, 32 );
-		stream->WriteDword( &ae->AreaStatus );
+		tmpDword = ae->GetAreaStatus();
+		stream->WriteDword( &tmpDword );
 		stream->WriteDword( &ae->IconSeq );
 		stream->WriteDword( &ae->X );
 		stream->WriteDword( &ae->Y );

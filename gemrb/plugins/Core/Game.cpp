@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.107 2005/12/20 23:20:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.108 2006/01/05 14:14:01 avenger_teambg Exp $
  *
  */
 
@@ -774,6 +774,26 @@ bool Game::EveryoneNearPoint(Map *area, Point &p, int flags) const
 	return true;
 }
 
+//called when someone died
+void Game::PartyMemberDied(Actor *actor)
+{
+	Map *area = actor->GetCurrentArea();
+
+	for (unsigned int i=0; i<PCs.size(); i++) {
+		if (PCs[i]==actor) {
+			continue;
+		}
+		if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
+			continue;
+		}
+		if (PCs[i]->GetCurrentArea()!=area) {
+			continue;
+		}
+		PCs[i]->ReactToDeath(actor->GetScriptName());
+	}
+}
+
+//reports if someone died
 int Game::PartyMemberDied() const
 {
 	for (unsigned int i=0; i<PCs.size(); i++) {

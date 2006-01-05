@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.279 2006/01/03 22:03:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.280 2006/01/05 14:14:01 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1499,6 +1499,9 @@ void GameControl::InitDialog(Actor* spk, Actor* tgt, const char* dlgref)
 	UnhideGUI();
 	ScreenFlags |= SF_GUIENABLED|SF_DISABLEMOUSE|SF_CENTERONACTOR|SF_LOCKSCROLL;
 	DialogueFlags |= DF_IN_DIALOG;
+
+	tgt->DialogInterrupt();
+
 	//allow mouse selection from dialog (even though screen is locked)
 	core->GetVideoDriver()->DisableMouse = false;
 	//there are 3 bits, if they are all unset, the dialog freezes scripts

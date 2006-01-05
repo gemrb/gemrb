@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.75 2005/12/29 17:46:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.76 2006/01/05 14:14:01 avenger_teambg Exp $
  *
  */
 
@@ -292,6 +292,8 @@ public:
 	bool EveryoneNearPoint(Map *map, Point &p, int flags) const;
 	/** returns true if a PC just died */
 	int PartyMemberDied() const;
+	/** a party member just died now */
+	void PartyMemberDied(Actor *);
 	/** Increments chapter variable and refreshes kill stats */
 	void IncrementChapter();
 	/** Sets party reputation */

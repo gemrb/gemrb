@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.21 2006/01/03 19:45:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.22 2006/01/05 14:14:02 avenger_teambg Exp $
  *
  */
 
@@ -27,13 +27,46 @@
 
 WMPAreaEntry::WMPAreaEntry()
 {
-	MapIcon=NULL;
+	MapIcon = NULL;
 }
+
 WMPAreaEntry::~WMPAreaEntry()
 {
-	if (MapIcon) {
-		core->GetVideoDriver()->FreeSprite(MapIcon);
+//as long as mapicon comes from a factory, no need to free it
+}
+
+void WMPAreaEntry::SetAreaStatus(ieDword arg, int op)
+{
+	switch (op) {
+	case BM_SET: AreaStatus = arg; break;
+	case BM_OR: AreaStatus |= arg; break;
+	case BM_NAND: AreaStatus &= ~arg; break;
+	case BM_XOR: AreaStatus ^= arg; break;
+	case BM_AND: AreaStatus &= arg; break;
 	}
+	//invalidating MapIcon, no need to free it, it is from a factory
+	MapIcon = NULL;
+}
+
+Sprite2D *WMPAreaEntry::GetMapIcon(AnimationFactory *bam)
+{
+	if (!bam) {
+		return NULL;
+	}
+	if (!MapIcon) {
+		int frame = 0;
+		if (bam->GetCycleSize(IconSeq)>5) {
+			switch (AreaStatus&(WMP_ENTRY_ACCESSIBLE|WMP_ENTRY_VISITED))
+			{
+			case WMP_ENTRY_ACCESSIBLE: frame = 0; break;
+			case WMP_ENTRY_VISITED: frame = 4; break;
+			case WMP_ENTRY_ACCESSIBLE|WMP_ENTRY_VISITED: frame = 1; break;
+			case 0: frame = 2; break;
+			}
+		}
+		MapIcon = bam->GetFrame(frame, IconSeq);
+	}
+	return MapIcon;
 }
 
 ieDword WMPAreaEntry::GetAreaStatus()
@@ -50,6 +83,7 @@ WorldMap::WorldMap(void)
 	MapMOS = NULL;
 	Distances = NULL;
 	GotHereFrom = NULL;
+	bam = NULL;
 }
 
 //Allocate AE and AL only in Core, otherwise Win32 will
@@ -64,18 +98,13 @@ void WorldMap::AddAreaLink(WMPAreaLink *al)
 	area_links.push_back(al);
 }
 
-//Win32 friendly interface
-void WorldMap::SetAreaEntry(unsigned int x, WMPAreaEntry *areaentry)
+WMPAreaEntry *WorldMap::GetNewAreaEntry()
 {
-	WMPAreaEntry *ae =new WMPAreaEntry();
+	return new WMPAreaEntry();
+}
 
-	//copying the struct part of the class
-	memcpy( ae->AreaName, areaentry->AreaName, 
-		(char *) (&ae->MapIcon)-(char *) (&ae->AreaName[0]) );
-	//areaentry will be freed, we have to steal the sprite!
-	ae->MapIcon=areaentry->MapIcon;
-	areaentry->MapIcon=NULL;
-
+void WorldMap::SetAreaEntry(unsigned int x, WMPAreaEntry *ae)
+{
 	//if index is too large, we break
 	if (x>area_entries.size()) {
 		abort();
@@ -134,9 +163,18 @@ WorldMap::~WorldMap(void)
 	if (GotHereFrom) {
 		free(GotHereFrom);
 	}
+	if (bam) delete bam;
 }
 
-void WorldMap::SetMapMOS(Sprite2D *newmos) {
+void WorldMap::SetMapIcons(AnimationFactory *newicons)
+{
+	if (bam) {
+		delete bam;
+	}
+	bam = newicons;
+}
+void WorldMap::SetMapMOS(Sprite2D *newmos)
+{
 	if (MapMOS) {
 		core->GetVideoDriver()->FreeSprite(MapMOS);
 	}
@@ -219,8 +257,8 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 				WMPAreaLink* al = area_links[j];
 				WMPAreaEntry* ae2 = area_entries[al->AreaIndex];
 				unsigned int mydistance = (unsigned int) Distances[i];
-				if ( ( (ae->AreaStatus & WMP_ENTRY_PASSABLE) == WMP_ENTRY_PASSABLE) &&
-				( (ae2->AreaStatus & WMP_ENTRY_WALKABLE) == WMP_ENTRY_WALKABLE)
+				if ( ( (ae->GetAreaStatus() & WMP_ENTRY_PASSABLE) == WMP_ENTRY_PASSABLE) &&
+				( (ae2->GetAreaStatus() & WMP_ENTRY_WALKABLE) == WMP_ENTRY_WALKABLE)
 				) {
 					// al->Flags is the entry direction
 					mydistance += al->DistanceScale * 4;
@@ -344,13 +382,14 @@ void WorldMap::UpdateAreaVisibility(const ieResRef AreaName, int direction)
 	WMPAreaEntry* ae=GetArea(AreaName,i);
 	if (!ae)
 		return;
-	ae->AreaStatus|=WMP_ENTRY_VISITED|WMP_ENTRY_VISIBLE; //we are here, so we visited and it is visible too (i guess)
+	//we are here, so we visited and it is visible too (i guess)
+	ae->SetAreaStatus(WMP_ENTRY_VISITED|WMP_ENTRY_VISIBLE, BM_OR);
 	i=ae->AreaLinksCount[direction];
 	while (i--) {
 		WMPAreaLink* al = area_links[ae->AreaLinksIndex[direction]+i];
 		WMPAreaEntry* ae2 = area_entries[al->AreaIndex];
-		if (ae2->AreaStatus&WMP_ENTRY_ADJACENT) {
-			ae2->AreaStatus|=WMP_ENTRY_VISIBLE;
+		if (ae2->GetAreaStatus()&WMP_ENTRY_ADJACENT) {
+			ae2->SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE, BM_OR);
 		}
 	}
 }
@@ -361,23 +400,7 @@ void WorldMap::SetAreaStatus(const ieResRef AreaName, int Bits, int Op)
 	WMPAreaEntry* ae=GetArea(AreaName,i);
 	if (!ae)
 		return;
-	switch (Op) {
-		case BM_SET:
-			ae->AreaStatus=Bits;
-			break;
-		case BM_AND:
-			ae->AreaStatus&=Bits;
-			break;
-		case BM_OR:
-			ae->AreaStatus|=Bits;
-			break;
-		case BM_XOR:
-			ae->AreaStatus^=Bits;
-			break;
-		case BM_NAND:
-			ae->AreaStatus&=~Bits;
-			break;
-	}
+	ae->SetAreaStatus(Bits, Op);
 }
 
 /****************** WorldMapArray *******************/
