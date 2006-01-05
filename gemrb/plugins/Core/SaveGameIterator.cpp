@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.37 2006/01/05 10:48:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.38 2006/01/05 17:29:14 avenger_teambg Exp $
  *
  */
 
@@ -347,8 +347,8 @@ void SaveGameIterator::PruneQuickSave(const char *folder)
 
 	//storing the quicksave ages in an array
 	std::vector<int> myslots;
-	for (charlist::iterator i = save_slots.begin();i!=save_slots.end();i++) {
-		int tmp = IsQuickSaveSlot(folder, (*i) );
+	for (charlist::iterator m = save_slots.begin();m!=save_slots.end();m++) {
+		int tmp = IsQuickSaveSlot(folder, (*m) );
 		if (tmp) {
 			int pos = myslots.size();
 			while(pos-- && myslots[pos]>tmp);

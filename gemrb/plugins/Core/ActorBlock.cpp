@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.129 2006/01/02 23:26:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.130 2006/01/05 17:29:14 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -62,6 +62,7 @@ Scriptable::Scriptable(ScriptableType type)
 
 	locals = new Variables();
 	locals->SetType( GEM_VARIABLES_INT );
+	locals->ParseKey( 1 );
 }
 
 Scriptable::~Scriptable(void)
@@ -419,6 +420,10 @@ void Selectable::DrawCircle(Region &vp)
 
 bool Selectable::IsOver(Point &Pos)
 {
+	//actually, i'm not sure if bbox should be used or just the feet circle
+	if ((signed) Distance(Pos, this->Pos)<size*10) {
+		return true;
+	}
 	return BBox.PointInside( Pos );
 }
 
@@ -890,7 +895,8 @@ void Door::SetDoorOpen(bool Open, bool playsound, ieDword ID)
 	}
 	ToggleTiles (Open, playsound);
 	UpdateDoor ();
-	area->FixAllPositions();
+	//i forgot why is this here, and surely wrong
+	//area->FixAllPositions();
 }
 
 void Door::SetPolygon(bool Open, Gem_Polygon* poly)

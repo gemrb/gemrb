@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.154 2006/01/05 14:14:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.155 2006/01/05 17:29:14 avenger_teambg Exp $
  *
  */
 
@@ -761,7 +761,7 @@ void Actor::Die(Scriptable *killer)
 {
 	int minhp=Modified[IE_MINHITPOINTS];
 	if (minhp) { //can't die
-		SetStat(IE_HITPOINTS, minhp);
+		SetBase(IE_HITPOINTS, minhp);
 		return;
 	}
 	//Can't simply set Selected to false, game has its own little list
@@ -852,7 +852,7 @@ bool Actor::CheckOnDeath()
 	DropItem("",0);
 	//remove all effects that are not 'permanent after death' here
 	//permanent after death type is 9
-	Modified[IE_STATE_ID] |= STATE_DEAD;
+	BaseStats[IE_STATE_ID] |= STATE_DEAD;
 	if (Modified[IE_MC_FLAGS]&MC_REMOVE_CORPSE) return true;
 	if (Modified[IE_MC_FLAGS]&MC_KEEP_CORPSE) return false;
 	//if chunked death, then return true
