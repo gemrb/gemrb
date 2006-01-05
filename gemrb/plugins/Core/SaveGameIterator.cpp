@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.36 2006/01/03 19:45:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.37 2006/01/05 10:48:27 avenger_teambg Exp $
  *
  */
 
@@ -210,8 +210,22 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 #ifndef WIN32
 	ResolveFilePath( ftmp );
 #endif
-	if (access( ftmp, R_OK ))
+	if (access( ftmp, R_OK )) {
+		printMessage("SaveGameIterator"," ",YELLOW);
+		printf("Ignoring slot %s because of no appropriate preview!\n", dtmp);
 		return false;
+	}
+
+	snprintf( ftmp, _MAX_PATH, "%s%s%s.wmp", dtmp, SPathDelimiter,
+		 core->WorldMapName );
+#ifndef WIN32
+	ResolveFilePath( ftmp );
+#endif
+	if (access( ftmp, R_OK )) {
+		printMessage("SaveGameIterator"," ",YELLOW);
+		printf("Ignoring slot %s because of no appropriate worldmap!\n", dtmp);
+		return false;
+	}
 
 	return true;
 }
