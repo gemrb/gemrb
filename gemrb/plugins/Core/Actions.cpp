@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.58 2006/01/05 14:14:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.59 2006/01/06 23:09:56 avenger_teambg Exp $
  *
  */
 
@@ -703,15 +703,15 @@ void GameScript::SetSavedLocation(Scriptable* Sender, Action* parameters)
 	Actor *actor = (Actor *) Sender;
 	//iwd2
 	if (parameters->pointParameter.isnull()) {
-		actor->SetStat(IE_SAVEDXPOS, actor->Pos.x);
-		actor->SetStat(IE_SAVEDYPOS, actor->Pos.y);
-		actor->SetStat(IE_SAVEDFACE, actor->GetOrientation());
+		actor->SetBase(IE_SAVEDXPOS, actor->Pos.x);
+		actor->SetBase(IE_SAVEDYPOS, actor->Pos.y);
+		actor->SetBase(IE_SAVEDFACE, actor->GetOrientation());
 		return;
 	}
 	//pst
-	actor->SetStat(IE_SAVEDXPOS, parameters->pointParameter.x);
-	actor->SetStat(IE_SAVEDYPOS, parameters->pointParameter.y);
-	actor->SetStat(IE_SAVEDFACE, parameters->int0Parameter);
+	actor->SetBase(IE_SAVEDXPOS, parameters->pointParameter.x);
+	actor->SetBase(IE_SAVEDYPOS, parameters->pointParameter.y);
+	actor->SetBase(IE_SAVEDFACE, parameters->int0Parameter);
 }
 //IWD2, sets the homepoint int0,int1,int2
 void GameScript::SetSavedLocationPoint(Scriptable* Sender, Action* parameters)
@@ -720,9 +720,9 @@ void GameScript::SetSavedLocationPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
-	actor->SetStat(IE_SAVEDXPOS, parameters->int0Parameter);
-	actor->SetStat(IE_SAVEDYPOS, parameters->int1Parameter);
-	actor->SetStat(IE_SAVEDFACE, parameters->int2Parameter);
+	actor->SetBase(IE_SAVEDXPOS, parameters->int0Parameter);
+	actor->SetBase(IE_SAVEDYPOS, parameters->int1Parameter);
+	actor->SetBase(IE_SAVEDFACE, parameters->int2Parameter);
 }
 //IWD2, sets the homepoint P
 void GameScript::SetStartPos(Scriptable* Sender, Action* parameters)
@@ -731,9 +731,9 @@ void GameScript::SetStartPos(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
-	actor->SetStat(IE_SAVEDXPOS, parameters->pointParameter.x);
-	actor->SetStat(IE_SAVEDYPOS, parameters->pointParameter.y);
-	actor->SetStat(IE_SAVEDFACE, parameters->int0Parameter);
+	actor->SetBase(IE_SAVEDXPOS, parameters->pointParameter.x);
+	actor->SetBase(IE_SAVEDYPOS, parameters->pointParameter.y);
+	actor->SetBase(IE_SAVEDFACE, parameters->int0Parameter);
 }
 
 void GameScript::SaveObjectLocation(Scriptable* Sender, Action* parameters)
@@ -1171,9 +1171,18 @@ void GameScript::FloatMessageRnd(Scriptable* Sender, Action* parameters)
 	FreeSrc(rndstr, parameters->string0Parameter);
 }
 
+//displays string over sender, but on console it displays target's name
+//it is silent in the 2. place for 2 reasons:
+//1. to avoid echo effect
+//2. to not set wait timer in the innocent target
 void GameScript::DisplayString(Scriptable* Sender, Action* parameters)
 {
-	DisplayStringCore( Sender, parameters->int0Parameter, DS_CONSOLE);
+	DisplayStringCore( Sender, parameters->int0Parameter, DS_HEAD);
+	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1]);
+	if (!target) {
+		target=Sender;
+	}
+	DisplayStringCore( target, parameters->int0Parameter, DS_CONSOLE|DS_SILENT);
 }
 
 void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
@@ -2587,15 +2596,12 @@ void GameScript::SetCreatureAreaFlags(Scriptable* Sender, Action* parameters)
 	actor->SetBase(IE_MC_FLAGS,value);
 }
 
+//this will be a global change, fixme if it should be local
 void GameScript::SetTextColor(Scriptable* /*Sender*/, Action* parameters)
 {
-	GameControl *gc=core->GetGameControl();
-	if (gc) {
-		Color color;
-
-		memcpy(&color,&parameters->int0Parameter,4);
-		gc->SetInfoTextColor( color );
-	}
+	Color c;
+	memcpy(&c,&parameters->int0Parameter,4);
+	core->SetInfoTextColor(c);
 }
 
 void GameScript::BitGlobal(Scriptable* Sender, Action* parameters)
@@ -4490,24 +4496,24 @@ void GameScript::SetNoOneOnTrigger(Scriptable* Sender, Action* parameters)
 
 void GameScript::UseDoor(Scriptable* Sender, Action* parameters)
 {
-        GameControl *gc = core->GetGameControl();
-        if (!gc) {
-                return;
-        }
+	GameControl *gc = core->GetGameControl();
+	if (!gc) {
+		return;
+	}
 
-        gc->target_mode = TARGET_MODE_NONE;
+	gc->target_mode = TARGET_MODE_NONE;
 	OpenDoor(Sender, parameters);
 }
 
 //this will force bashing the door
 void GameScript::BashDoor(Scriptable* Sender, Action* parameters)
 {
-        GameControl *gc = core->GetGameControl();
-        if (!gc) {
-                return;
-        }
+	GameControl *gc = core->GetGameControl();
+	if (!gc) {
+		return;
+	}
 
-        gc->target_mode = TARGET_MODE_ATTACK; //for bashing doors too
+	gc->target_mode = TARGET_MODE_ATTACK; //for bashing doors too
 	OpenDoor(Sender, parameters);
 }
 

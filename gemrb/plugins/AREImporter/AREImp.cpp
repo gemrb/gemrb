@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.149 2006/01/03 16:32:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.150 2006/01/06 23:09:53 avenger_teambg Exp $
  *
  */
 
@@ -721,6 +721,10 @@ Map* AREImp::GetMap(const char *ResRef)
 			//TODO: iwd2 script?
 			str->ReadResRef( Scripts[SCR_AREA] );
 			str->Seek( 120, GEM_CURRENT_POS );
+			//not iwd2, this field is garbage
+			if (!core->HasFeature(GF_IWD2_SCRIPTNAME)) {
+				Scripts[SCR_AREA][0]=0;
+			}
 			//actually, Flags&1 signs that the creature
 			//is not loaded yet, so !(Flags&1) means it is embedded
 			if (CreOffset != 0 && !(Flags&1) ) {

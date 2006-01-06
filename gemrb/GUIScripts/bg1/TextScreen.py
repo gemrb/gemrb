@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/TextScreen.py,v 1.7 2005/11/26 10:49:36 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/TextScreen.py,v 1.8 2006/01/06 23:09:59 avenger_teambg Exp $
 
 # TextScreen.py - display Loading screen
 
@@ -33,23 +33,21 @@ def StartTextScreen ():
 	global TextScreen, TextArea
 
 	GemRB.LoadWindowPack ("GUICHAP", 640, 480)
-	LoadPic = GemRB.GetGameString (STR_LOADMOS)
-	#if there is no preset loadpic, try to determine it from the chapter
-	if LoadPic[:6] == "CHPTXT":
-		Chapter = GemRB.GetVar("CHAPTER")
-		#set ID according to the Chapter?
-		ID = Chapter
+	TableName = GemRB.GetGameString (STR_LOADMOS)
+	#if there is no preset loadpic, try to determine it from the chapter	
+	if TableName[:6] == "chptxt":
 		GemRB.LoadMusicPL("chapter.mus")
-	else:
-		ID = 62
+
+	Chapter = GemRB.GetGameVar("CHAPTER")
+	#set ID according to the Chapter?
+	ID = Chapter+1
 	TextScreen = GemRB.LoadWindow (ID)
 	GemRB.SetWindowFrame (TextScreen)
 	TextArea = GemRB.GetControl (TextScreen, 2)
 	GemRB.SetTextAreaFlags (TextScreen, TextArea, IE_GUI_TEXTAREA_SMOOTHSCROLL)
 	GemRB.SetEvent (TextScreen, TextArea, IE_GUI_TEXTAREA_OUT_OF_TEXT, "FeedScroll")
 
-	#caption
-	TableName = GemRB.GetGameString (STR_LOADMOS)
+	#caption	
 	Table = GemRB.LoadTable(TableName)
 	Value = GemRB.GetTableValue (Table, 2, 0)
 	GemRB.UnloadTable (Table)

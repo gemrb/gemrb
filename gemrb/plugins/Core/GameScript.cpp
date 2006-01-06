@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.350 2006/01/05 14:14:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.351 2006/01/06 23:09:56 avenger_teambg Exp $
  *
  */
 
@@ -85,7 +85,7 @@ static TriggerLink triggernames[] = {
 	{"damagetakenlt", GameScript::DamageTakenLT, 0},
 	{"dead", GameScript::Dead, 0},
 	{"delay", GameScript::Delay, 0},
-	{"detect", GameScript::See, 0}, //so far i see no difference
+	{"detect", GameScript::Detect, 0}, //so far i see no difference
 	{"die", GameScript::Die, 0},
 	{"died", GameScript::Died, 0},
 	{"difficulty", GameScript::Difficulty, 0},
@@ -1410,6 +1410,13 @@ static Condition* ReadCondition(DataStream* stream)
 	return cO;
 }
 
+//call this whenever a script was triggered by an event
+//(death, trap entered)
+void GameScript::RunNow()
+{
+	lastRunTime = 0;
+}
+
 void GameScript::Update()
 {
 	if (!MySelf || !(MySelf->GetInternalFlag()&IF_ACTIVE) ) {
@@ -1446,8 +1453,8 @@ void GameScript::EvaluateAllBlocks()
 	if (!MySelf || !(MySelf->GetInternalFlag()&IF_ACTIVE) ) {
 		return;
 	}
-	ieDword thisTime;
-	GetTime( thisTime ); //this should be gametime too, pause holds it
+	ieDword thisTime = core->GetGame()->Ticks;
+	//GetTime( thisTime ); //this should be gametime too, pause holds it
 	if (( thisTime - lastRunTime ) < scriptRunDelay) {
 		return;
 	}

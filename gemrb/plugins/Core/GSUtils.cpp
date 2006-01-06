@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.46 2006/01/02 23:26:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.47 2006/01/06 23:09:56 avenger_teambg Exp $
  *
  */
 
@@ -278,10 +278,14 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 			Sender->DisplayHeadText( sb.text );
 		}
 		if (flags & DS_CONSOLE) {
+			if(flags&DS_NONAME) {
 				core->DisplayString( sb.text );
+			} else {
+				core->DisplayStringName( Strref,0x8080ff,Sender);
+			}
 		}
 	}
-	if (sb.Sound[0] ) {
+	if (sb.Sound[0] && !(flags&DS_SILENT) ) {
 		ieDword len = core->GetSoundMgr()->Play( sb.Sound );
 		ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
 		if ((counter != 0) && (flags &DS_WAIT) )

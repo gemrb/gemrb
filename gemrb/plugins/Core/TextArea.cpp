@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.85 2006/01/04 16:34:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.86 2006/01/06 23:09:57 avenger_teambg Exp $
  *
  */
 
@@ -91,13 +91,13 @@ void TextArea::RefreshSprite(const char *portrait)
 	}
 	ImageMgr* im = ( ImageMgr* ) core->GetInterface( IE_BMP_CLASS_ID );
 	if (im == NULL) {
-	        delete ( str );
-	        return;
+		delete ( str );
+		return;
 	}
 
 	if (!im->Open( str, true )) {
-	        core->FreeInterface( im );
-	        return;
+		core->FreeInterface( im );
+		return;
 	}
 
 	SetAnimPicture ( im->GetImage() );
@@ -518,19 +518,19 @@ void TextArea::CalcRowCount()
 {
 	int w = Width;
 
-        if (Flags&IE_GUI_TEXTAREA_SPEAKER) {
-                const char *portrait = NULL;
-                Actor *actor = NULL;
-                GameControl *gc = core->GetGameControl();
-                if (gc) {
-                        actor = gc->GetTarget();
-                }
-                if (actor) {
-                        portrait = actor->GetPortrait(1);
-                }
-                if (portrait) {
-                        RefreshSprite(portrait);
-                }
+	if (Flags&IE_GUI_TEXTAREA_SPEAKER) {
+		const char *portrait = NULL;
+		Actor *actor = NULL;
+		GameControl *gc = core->GetGameControl();
+		if (gc) {
+			actor = gc->GetTarget();
+		}
+		if (actor) {
+			portrait = actor->GetPortrait(1);
+		}
+		if (portrait) {
+			RefreshSprite(portrait);
+		}
 		if (AnimPicture) {
 			w-=AnimPicture->Width;
 		}

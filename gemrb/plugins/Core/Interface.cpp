@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.381 2006/01/03 19:45:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.382 2006/01/06 23:09:57 avenger_teambg Exp $
  *
  */
 
@@ -180,6 +180,7 @@ Interface::Interface(int iargc, char** iargv)
 	TooltipColor.b = 0;
 	TooltipColor.a = 255;
 	TooltipMargin = 10;
+
 	TooltipBack = NULL;
 	DraggedItem = NULL;
 	DefSound = NULL;
@@ -669,6 +670,9 @@ int Interface::Init()
 		printf( "Cannot Initialize Video Driver.\nTermination in Progress...\n" );
 		return GEM_ERROR;
 	}
+	Color defcolor={255,255,255,200};
+	SetInfoTextColor(defcolor);
+
 	printStatus( "OK", LIGHT_GREEN );
 	printMessage( "Core", "Searching for KEY Importer...", WHITE );
 	if (!IsAvailable( IE_KEY_CLASS_ID )) {
@@ -1865,17 +1869,13 @@ int Interface::GetCreatureStat(unsigned int Slot, unsigned int StatID, int Mod)
 }
 
 int Interface::SetCreatureStat(unsigned int Slot, unsigned int StatID,
-	int StatValue, int Mod)
+	int StatValue)
 {
 	Actor * actor = game->FindPC(Slot);
 	if (!actor) {
 		return 0;
 	}
-	if (Mod) {
-		actor->SetStat( StatID, StatValue );
-	} else {
-		actor->SetBase( StatID, StatValue );
-	}
+	actor->SetBase( StatID, StatValue );
 	return 1;
 }
 
@@ -4176,4 +4176,13 @@ int Interface::Autopause(ieDword flag)
 void Interface::RegisterOpcodes(int count, EffectRef *opcodes)
 {
 	EffectQueue_RegisterOpcodes(count, opcodes);
+}
+
+void Interface::SetInfoTextColor(Color &color)
+{
+	Color black = {0x00,0x00,0x00,0xff};
+	if (InfoTextPalette) {
+		video->FreePalette(InfoTextPalette);
+	}
+	InfoTextPalette = video->CreatePalette(color,black);
 }

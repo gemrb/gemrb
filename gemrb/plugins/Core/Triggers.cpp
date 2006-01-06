@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.39 2006/01/04 23:21:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.40 2006/01/06 23:09:57 avenger_teambg Exp $
  *
  */
 
@@ -1066,12 +1066,12 @@ int GameScript::PersonalSpaceDistance(Scriptable* Sender, Trigger* parameters)
 	int range = parameters->int0Parameter;
 	if (Sender->Type==ST_ACTOR) {
 		Actor *tmp = (Actor *) Sender;
-		range -= tmp->GetAnims()->GetCircleSize();
+		range -= tmp->size;
 	}
 
 	if (scr->Type==ST_ACTOR) {
 		Actor *tmp = (Actor *) scr;
-		range -= tmp->GetAnims()->GetCircleSize();
+		range -= tmp->size;
 	}
 
 	
@@ -1728,6 +1728,12 @@ static int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 }
 
 int GameScript::See(Scriptable* Sender, Trigger* parameters)
+{
+	return SeeCore(Sender, parameters, 0);
+}
+
+//unsure if this should be different from see, we'll see :)
+int GameScript::Detect(Scriptable* Sender, Trigger* parameters)
 {
 	return SeeCore(Sender, parameters, 0);
 }

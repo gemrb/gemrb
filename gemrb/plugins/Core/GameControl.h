@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.82 2006/01/02 23:26:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.83 2006/01/06 23:09:56 avenger_teambg Exp $
  */
 
 /**
@@ -99,8 +99,6 @@ public:
 	void Draw(unsigned short x, unsigned short y);
 	/** Sets the Text of the current control */
 	int SetText(const char* string, int pos = 0);
-	/** Sets the InfoTextColor, used in PST */
-	void SetInfoTextColor(Color color);
 	/** Sets multiple quicksaves flag*/
 	static void MultipleQuickSaves(int arg);
 private:
@@ -108,7 +106,7 @@ private:
 	//using global ID which is safer
 	ieWord lastActorID;
 	std::vector< Actor*> highlighted;
-	std::vector< Scriptable*> infoTexts;
+	//std::vector< Scriptable*> infoTexts;
 	Color* InfoTextPalette;
 	bool DrawSelectionRect;
 	bool MouseIsDown;

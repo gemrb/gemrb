@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.373 2006/01/06 00:50:48 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.374 2006/01/06 23:09:58 avenger_teambg Exp $
  *
  */
 
@@ -225,16 +225,11 @@ static PyObject* GemRB_SetInfoTextColor(PyObject*, PyObject* args)
 {
 	int r,g,b,a;
 
-	a=255;
 	if (!PyArg_ParseTuple( args, "iii|i", &r, &g, &b, &a)) {
 		return AttributeError( GemRB_SetInfoTextColor__doc );
 	}
-	GameControl* gc = (GameControl *) GetControl( 0, 0, IE_GUI_GAMECONTROL);
-	if (!gc) {
-		return NULL;
-	}
-	Color c={r,g,b,a};
-	gc->SetInfoTextColor( c );
+	Color c = {r,g,b,a};
+	core->SetInfoTextColor( c );
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -3945,8 +3940,8 @@ static PyObject* GemRB_SetPlayerStat(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "iii", &PlayerSlot, &StatID, &StatValue )) {
 		return AttributeError( GemRB_SetPlayerStat__doc );
 	}
-	//Setting the creature's base stat, which gets saved (0)
-	if (!core->SetCreatureStat( PlayerSlot, StatID, StatValue, 0 )) {
+	//Setting the creature's base stat
+	if (!core->SetCreatureStat( PlayerSlot, StatID, StatValue)) {
 		return RuntimeError("Cannot find actor!\n");
 	}
 	Py_INCREF( Py_None );

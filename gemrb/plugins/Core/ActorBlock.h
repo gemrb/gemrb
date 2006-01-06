@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.97 2006/01/02 23:26:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.98 2006/01/06 23:09:56 avenger_teambg Exp $
  *
  */
 
@@ -42,7 +42,6 @@ class Gem_Polygon;
 #include "ImageMgr.h"
 #include <list>
 
-#define STEP_TIME		150
 #define MAX_SCRIPTS		8
 #define MAX_GROUND_ICON_DRAWN   3
 
@@ -105,6 +104,7 @@ class Gem_Polygon;
 #define IF_CUTSCENEID    0x2000
 #define IF_VISIBLE       0x4000
 #define IF_ONCREATION    0x8000
+#define IF_IDLE          0x10000
 
 //CheckTravel return value
 #define CT_CANTMOVE       0 //inactive
@@ -188,6 +188,8 @@ public:
 	void SetScript(int index, GameScript* script);
 	void DisplayHeadText(const char* text);
 	void SetScriptName(const char* text);
+	//call this to enable script running as soon as possible
+	void ImmediateEvent();
 	void ExecuteScript(GameScript* Script);
 	void AddAction(Action* aC);
 	void AddActionInFront(Action* aC);
@@ -203,6 +205,8 @@ public:
 	void ClearTriggers();
 	void SetBitTrigger(ieDword bittrigger);
 	void AddTrigger(ieDword *actorref);
+	/* re/draws overhead text on the map screen */
+	void DrawOverheadText(Region &screen);
 };
 
 class GEM_EXPORT Selectable : public Scriptable {
@@ -273,7 +277,7 @@ public:
 	Point Destination;
 	PathNode* path;
 	PathNode* step;
-	unsigned long timeStartStep;
+	ieDword timeStartStep;
 	Sprite2D* lastFrame;
 	ieResRef Area;
 public:
@@ -307,11 +311,12 @@ public:
 	}
 
 	void SetStance(unsigned int arg);
-	void DoStep();
+	void DoStep(unsigned int walk_speed);
 	void AddWayPoint(Point &Des);
 	void RunAwayFrom(Point &Des, int PathLength, int flags);
 	void RandomWalk(bool can_stop);
 	void MoveLine(int steps, int Pass);
+	void FixPosition();
 	void WalkTo(Point &Des, int MinDistance = 0);
 	void MoveTo(Point &Des);
 	void ClearPath();
@@ -370,7 +375,9 @@ public:
 	ieResRef Dialog;
 private:
 	void ToggleTiles(int State, bool playsound = false);
+  void ImpedeBlocks(int count, Point *points, unsigned int value);
 	void UpdateDoor();
+  bool BlockedOpen(bool Open, bool ForceOpen);
 public:
 	void SetName(const char* Name); // sets door ID
 	void SetTiles(unsigned short* Tiles, int count);

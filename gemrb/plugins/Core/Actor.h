@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.98 2006/01/05 14:14:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.99 2006/01/06 23:09:56 avenger_teambg Exp $
  *
  */
 
@@ -68,6 +68,12 @@ class SpriteCover;
 #define MOD_ADDITIVE  0
 #define MOD_ABSOLUTE  1
 #define MOD_PERCENT   2
+
+//'do not jump' flags
+#define DNJ_FIT        1
+#define DNJ_UNHINDERED 2
+#define DNJ_JUMP       4
+#define DNJ_BIRD       (DNJ_FIT|DNJ_UNHINDERED)
 
 /** flags for GetActor */
 //default action
@@ -284,6 +290,8 @@ public:
 	bool CheckOnDeath();
 	/* receives undead turning message */
 	void Turn(Scriptable *cleric, int turnlevel);
+	/* call this on gui selects */
+	void SelectActor();
 	/* sets the actor in panic (turn/morale break) */
 	void Panic();
 	/* called when someone died in the party */
@@ -341,8 +349,5 @@ public:
 	/* if necessary, advance animation and draw actor */
 	void Draw(Region &screen);
 
-private:
-	/* re/draws overhead text on the map screen */
-	void DrawOverheadText(Region &screen);
 };
 #endif

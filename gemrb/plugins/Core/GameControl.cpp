@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.280 2006/01/05 14:14:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.281 2006/01/06 23:09:56 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -197,10 +197,6 @@ GameControl::~GameControl(void)
 		free( formations );
 		formations = NULL;
 	}
-	free( InfoTextPalette );
-	for (unsigned int i = 0; i < infoTexts.size(); i++) {
-		delete( infoTexts[i] );
-	}
 	if (dlg) {
 		delete dlg;
 	}
@@ -219,13 +215,6 @@ void GameControl::QuickSave()
 		        core->DelTable(SlotTable);
 		}
 	}
-}
-
-/* changes the textcolor */
-void GameControl::SetInfoTextColor(Color color)
-{
-	free( InfoTextPalette ); //it always exists, see constructor
-	InfoTextPalette = core->GetVideoDriver()->CreatePalette( color, black );
 }
 
 /** Draws the Control on the Output Display */
@@ -255,8 +244,9 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		return;
 	}
 	core->GetVideoDriver()->DrawRect( screen, black, true );
-	area->DrawMap( screen, this );
 
+	//drawmap should be here so it updates fog of war
+	area->DrawMap( screen, this );
 	//in multi player (if we ever get to it), only the server must call this
 	if (update_scripts) {
 		// the game object will run the area scripts as well
@@ -366,34 +356,6 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				i->outlineColor = red; //traps
 				i->DrawOutline();
 			}
-		}
-	}
-
-	// Draw infopoint texts for some time
-	for (size_t i = 0; i < infoTexts.size(); i++) {
-		unsigned long time;
-		GetTime( time );
-		if (( time - infoTexts[i]->timeStartDisplaying ) >= 10000) {
-			infoTexts[i]->textDisplaying = 0;
-			std::vector< Scriptable*>::iterator m;
-			m = infoTexts.begin() + i;
-			( *m )->GetCutsceneID()->textDisplaying = 0;
-			delete( *m );
-			infoTexts.erase( m );
-			i--;
-			continue;
-		}
-		if (infoTexts[i]->textDisplaying == 1) {
-			Font* font = core->GetFont( 1 );
-			Region rgn( infoTexts[i]->Pos.x - 200,
-				infoTexts[i]->Pos.y - 100, 400, 400 );
-			//printf("Printing InfoText at [%d,%d,%d,%d]\n", rgn.x, rgn.y, rgn.w, rgn.h);
-			rgn.x += video->xCorr;
-			rgn.y += video->yCorr;
-			font->Print( rgn,
-					( unsigned char * ) infoTexts[i]->overHeadText,
-					InfoTextPalette,
-					IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false );
 		}
 	}
 
@@ -749,6 +711,11 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				core->FogOfWar ^= 1;
 				printf("Show Fog-Of-War: %s\n", core->FogOfWar & 1 ? "ON" : "OFF");
 				break;
+			case '8':
+				//show searchmap on area
+				core->FogOfWar ^= 2;
+				printf("Show searchmap %s\n", core->FogOfWar & 2 ? "ON" : "OFF");
+				break;
 			default:
 				printf( "KeyRelease:%d - %d\n", Key, Mod );
 				break;
@@ -957,7 +924,10 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 			if (trap->Scripts[0]) {
 				if (!(trap->Flags&TRAP_DEACTIVATED) ) {
 					trap->LastTrigger = actor->GetID();
+					trap->ImmediateEvent();
+					//directly feeding the event, even if there are actions in the queue
 					trap->Scripts[0]->Update();
+					trap->ProcessActions();
 					//if reset trap flag not set, deactivate it
 					//hmm, better not, info triggers don't deactivate themselves on click
 					//if (!(trap->Flags&TRAP_RESET)) {
@@ -968,7 +938,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 				if (trap->overHeadText) {
 					if (trap->textDisplaying != 1) {
 						trap->textDisplaying = 1;
-						GetTime( trap->timeStartDisplaying );
+						trap->timeStartDisplaying = core->GetGame()->Ticks;
 						DisplayString( trap );
 					}
 				}
@@ -1214,10 +1184,10 @@ void GameControl::CalculateSelection(Point &p)
 		}
 		Actor** ab;
 		unsigned int count = area->GetActorInRect( ab, SelectionRect,true );
+		for (i = 0; i < highlighted.size(); i++)
+			highlighted[i]->SetOver( false );
+		highlighted.clear();
 		if (count != 0) {
-			for (i = 0; i < highlighted.size(); i++)
-				highlighted[i]->SetOver( false );
-			highlighted.clear();
 			for (i = 0; i < count; i++) {
 				ab[i]->SetOver( true );
 				highlighted.push_back( ab[i] );
@@ -1497,13 +1467,14 @@ void GameControl::InitDialog(Actor* spk, Actor* tgt, const char* dlgref)
 		return;
 	}
 	UnhideGUI();
-	ScreenFlags |= SF_GUIENABLED|SF_DISABLEMOUSE|SF_CENTERONACTOR|SF_LOCKSCROLL;
+	ScreenFlags |= SF_GUIENABLED|SF_DISABLEMOUSE|SF_LOCKSCROLL;
 	DialogueFlags |= DF_IN_DIALOG;
 
 	tgt->DialogInterrupt();
 
 	//allow mouse selection from dialog (even though screen is locked)
 	core->GetVideoDriver()->DisableMouse = false;
+	core->MoveViewportTo( tgt->Pos.x, tgt->Pos.y, true );
 	//there are 3 bits, if they are all unset, the dialog freezes scripts
 	if (!(dlg->Flags&7) ) {
 		DialogueFlags |= DF_FREEZE_SCRIPTS;
@@ -1739,7 +1710,7 @@ void GameControl::DisplayString(Point &p, const char *Text)
 	scr->timeStartDisplaying = 0;
 	scr->Pos = p;
 	scr->SetCutsceneID( NULL );
-	infoTexts.push_back( scr );
+	//infoTexts.push_back( scr );
 }
 
 void GameControl::DisplayString(Scriptable* target)
@@ -1752,7 +1723,7 @@ void GameControl::DisplayString(Scriptable* target)
 	scr->timeStartDisplaying = target->timeStartDisplaying;
 	scr->Pos = target->Pos;
 	scr->SetCutsceneID( target );
-	infoTexts.push_back( scr );
+	//infoTexts.push_back( scr );
 }
 
 /** changes displayed map to the currently selected PC */
@@ -1765,10 +1736,6 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 		overInfoPoint = NULL;
 		overContainer = NULL;
 		overDoor = NULL;
-		for (unsigned int i = 0; i < infoTexts.size(); i++) {
-			delete( infoTexts[i] );
-		}
-		infoTexts.clear();
 		/*this is loadmap, because we need the index, not the pointer*/
 		char *areaname = game->CurrentArea;
 		if (pc) {

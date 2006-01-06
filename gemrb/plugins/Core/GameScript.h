@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.238 2006/01/05 14:14:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.239 2006/01/06 23:09:57 avenger_teambg Exp $
  *
  */
 
@@ -39,6 +39,7 @@ class Action;
 #define DS_CONSOLE 4
 #define DS_CONST   8
 #define DS_NONAME  16
+#define DS_SILENT  32
 
 //verbal constant (bg2), we need a lookup table for other games
 #define VB_PANIC   1
@@ -602,6 +603,7 @@ public:
 	unsigned long scriptRunDelay;
 	bool endReached;
 	int scriptlevel;
+	void RunNow();
 	void Update();
 	void EvaluateAllBlocks();
 private: //Internal Functions
@@ -696,6 +698,7 @@ public: //Script Functions
 	static int DamageTakenLT(Scriptable* Sender, Trigger* parameters);
 	static int Dead(Scriptable* Sender, Trigger* parameters);
 	static int Delay(Scriptable* Sender, Trigger* parameters);
+	static int Detect(Scriptable* Sender, Trigger* parameters);
 	static int Die(Scriptable* Sender, Trigger* parameters);
 	static int Died(Scriptable* Sender, Trigger* parameters);
 	static int Difficulty(Scriptable* Sender, Trigger* parameters);

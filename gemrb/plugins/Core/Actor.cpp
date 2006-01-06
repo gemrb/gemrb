@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.156 2006/01/06 18:06:25 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.157 2006/01/06 23:09:56 avenger_teambg Exp $
  *
  */
 
@@ -377,7 +377,7 @@ static int maximum_values[256]={
 100,100,100,100,100,100,100,100,100,200,200,200,200,200,100,100,//1f
 200,200,50,255,25,100,25,25,25,25,25,999999999,999999999,999999999,25,25,//2f
 200,255,200,100,100,200,200,25,5,100,1,1,100,1,1,1,//3f
-1,1,1,1,50,50,1,9999,25,100,100,1,1,20,20,25,//4f
+1,1,1,1,50,50,1,9999,25,100,100,255,1,20,20,25,//4f
 25,1,1,255,25,25,255,255,25,5,5,5,5,5,5,5,//5f
 5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,//6f
 5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,//7f
@@ -582,6 +582,12 @@ void Actor::ReactToDeath(const char * /*deadname*/)
 	DisplayStringCore(this, VB_REACT, DS_CONSOLE|DS_CONST );
 }
 
+//call this only from gui selects
+void Actor::SelectActor()
+{
+	DisplayStringCore(this, VB_SELECT, DS_CONSOLE|DS_CONST );
+}
+
 void Actor::Panic()
 {
 	SetBase(IE_MORALE,0);
@@ -698,7 +704,7 @@ void Actor::SetPosition(Map *map, Point &position, int jump, int radius)
 	Point p;
 	p.x = position.x/16;
 	p.y = position.y/12;
-	if (jump && !(GetStat( IE_DONOTJUMP )&1) && anims->GetCircleSize() ) {
+	if (jump && !(GetStat( IE_DONOTJUMP )&DNJ_FIT) && size ) {
 		map->AdjustPosition( p, radius );
 	}
 	area = map;
@@ -748,9 +754,9 @@ void Actor::Turn(Scriptable *cleric, int turnlevel)
 void Actor::Resurrect()
 {
 	InternalFlags&=IF_FROMGAME;           //keep these flags
-	InternalFlags|=IF_ACTIVE|IF_VISIBLE;  //set these flags
+	InternalFlags|=IF_ACTIVE|IF_VISIBLE;  //set these flags  
 	SetBase(IE_STATE_ID, 0);
-	SetBase(IE_HITPOINTS, 255);
+	SetBase(IE_HITPOINTS, GetBase(IE_MAXHITPOINTS));
 	ClearActions();
 	ClearPath();
 	SetStance(IE_ANI_EMERGE);
@@ -759,6 +765,10 @@ void Actor::Resurrect()
 
 void Actor::Die(Scriptable *killer)
 {
+	if (InternalFlags&IF_REALLYDIED) {
+		return; //can die only once
+	}
+
 	int minhp=Modified[IE_MINHITPOINTS];
 	if (minhp) { //can't die
 		SetBase(IE_HITPOINTS, minhp);
@@ -793,6 +803,8 @@ void Actor::Die(Scriptable *killer)
 			InternalFlags|=IF_GIVEXP;
 		}
 	}
+	//ensure that the scripts of the actor will run as soon as possible
+	ImmediateEvent();
 }
 
 void Actor::SetPersistent(int partyslot)
@@ -1088,9 +1100,9 @@ void Actor::SetLeader(Actor *actor, int xoffset, int yoffset)
 void Actor::Heal(int days)
 {
 	if (days) {
-		NewStat(IE_HITPOINTS, days * 2, MOD_ADDITIVE);
+		SetBase(IE_HITPOINTS, GetBase(IE_HITPOINTS)+days*2);
 	} else {
-		SetStat(IE_HITPOINTS, GetStat(IE_MAXHITPOINTS));
+		SetBase(IE_HITPOINTS, GetStat(IE_MAXHITPOINTS));
 	}
 }
 
@@ -1143,7 +1155,7 @@ void Actor::Draw(Region &screen)
 	int explored = Modified[IE_DONOTJUMP]&2;
 	//check the deactivation condition only if needed
 	//this fixes dead actors disappearing from fog of war (they should be permanently visible)
-	if (!area->IsVisible( Pos, explored) &&	(GetInternalFlag()&IF_ACTIVE) ) {
+	if ((!area->IsVisible( Pos, explored) || (InternalFlags&IF_JUSTDIED) ) &&	(InternalFlags&IF_ACTIVE) ) {
 		//finding an excuse why we don't hybernate the actor
 		if (Modified[IE_ENABLEOFFSCREENAI])
 			return;
@@ -1155,9 +1167,10 @@ void Actor::Draw(Region &screen)
 			return;
 		if (GetWait()) //would never stop waiting
 			return;
-		//turning actor inactive
-		Deactivate();//&=~SCR_ACTIVE;
+		//turning actor inactive if there is no action next turn
+		InternalFlags|=IF_IDLE;
 	}
+
 	//visual feedback
 	CharAnimations* ca = GetAnims();
 	if (!ca)
@@ -1288,25 +1301,6 @@ bool Actor::HandleActorStance()
 	return false;
 }
 
-
-void Actor::DrawOverheadText(Region &screen)
-{
-	unsigned long time;
-	GetTime( time );
-
-	if (!textDisplaying)
-		return;
-	if (( time - timeStartDisplaying ) >= 6000) {
-		textDisplaying = 0;
-	}
-
-	Font* font = core->GetFont( 1 );
-	int cs = anims?anims->GetCircleSize():0;
-	Region rgn( Pos.x-100+screen.x, Pos.y - cs * 50 + screen.y, 200, 400 );
-	font->Print( rgn, ( unsigned char * ) overHeadText,
-	NULL, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false );
-}
-
 void Actor::ResolveStringConstant(ieResRef Sound, unsigned int index)
 {
 	TableMgr * tab;
@@ -1333,7 +1327,7 @@ void Actor::ResolveStringConstant(ieResRef Sound, unsigned int index)
 			index = 10;
 			break;
 		case VB_SELECT:
-			index = 36;
+			index = 36+rand()%4;
 			break;
 	}
 	strnlwrcpy(Sound, tab->QueryField (index, 0), 8);

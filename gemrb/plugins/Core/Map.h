@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.100 2006/01/04 22:18:10 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.101 2006/01/06 23:09:57 avenger_teambg Exp $
  *
  */
 
@@ -236,6 +236,8 @@ public:
 	//returns actors in rect (onlyparty could be more sophisticated)
 	int GetActorInRect(Actor**& actors, Region& rgn, bool onlyparty);
 	int GetActorCount(bool any) const;
+	//fix actors position if required
+	void JumpActors(bool jump);
 	//if items == true, remove noncritical items from ground piles too
 	void PurgeArea(bool items);
 
@@ -269,13 +271,13 @@ public:
 	void ExploreTile(Point &Tile);
 	/* explore map from given point in map coordinates */
 	void ExploreMapChunk(Point &Pos, int range, int los);
+	/* block or unblock searchmap with value */
+	void BlockSearchMap(Point &Pos, int size, unsigned int value);
 	/* update VisibleBitmap by resolving vision of all explore actors */
 	void UpdateFog();
 	//PathFinder
 	/* Finds the nearest passable point */
 	void AdjustPosition(Point &goal, unsigned int radius=0);
-	/* Jumps actors out of impassable areas, call this after a searchmap change */
-	void FixAllPositions();
 	/* Finds the path which leads the farthest from d */
 	PathNode* RunAway(Point &s, Point &d, unsigned int PathLen, int flags);
 	/* Returns true if there is no path to d */
@@ -323,6 +325,7 @@ public:
 	//move some or all players to a new area
 	void MoveToNewArea(const char *area, const char *entrance, int EveryOne, Actor *actor);
 private:
+	void DrawSearchMap(Region &screen);
 	void GenerateQueues();
 	Actor* GetRoot(int priority, int &index);
 	void DeleteActor(int i);

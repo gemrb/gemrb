@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ImageMgr.h,v 1.13 2005/12/14 18:33:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ImageMgr.h,v 1.14 2006/01/06 23:09:57 avenger_teambg Exp $
  *
  */
 
@@ -53,7 +53,7 @@ public:
 	/** No descriptions */
 	virtual void GetPalette(int index, int colors, Color* pal) = 0;
 	/** Sets a Pixel in the image, only for searchmaps */
-	virtual void SetPixelIndex(unsigned int x, unsigned int y, int idx) = 0;
+	virtual void SetPixelIndex(unsigned int x, unsigned int y, unsigned int idx) = 0;
 	/** Gets a Pixel from the Image */
 	virtual Color GetPixel(unsigned int x, unsigned int y) = 0;
 	virtual unsigned int GetPixelIndex(unsigned int x, unsigned int y) = 0;

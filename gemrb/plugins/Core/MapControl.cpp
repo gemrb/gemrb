@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.37 2005/12/17 17:27:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.38 2006/01/06 23:09:57 avenger_teambg Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -88,7 +88,7 @@ MapControl::MapControl(void)
 
 	MyMap = core->GetGame()->GetCurrentArea();
 	MapMOS = MyMap->SmallMap->GetImage();
-	if (core->FogOfWar)
+	if (core->FogOfWar&1)
 		DrawFog();
 }
 

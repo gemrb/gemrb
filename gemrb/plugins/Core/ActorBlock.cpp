@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.130 2006/01/05 17:29:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.131 2006/01/06 23:09:56 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -55,7 +55,11 @@ Scriptable::Scriptable(ScriptableType type)
 	interval = ( 1000 / AI_UPDATE_TIME );
 	WaitCounter = 0;
 	playDeadCounter = 0;
-	InternalFlags = IF_ACTIVE | IF_VISIBLE | IF_ONCREATION;
+	if (Type==ST_ACTOR) {
+		InternalFlags = IF_VISIBLE | IF_ONCREATION;
+	} else {
+		InternalFlags = IF_ACTIVE | IF_VISIBLE | IF_ONCREATION;
+	}
 	area = 0;
 	Pos.x = 0;
 	Pos.y = 0;
@@ -82,6 +86,11 @@ Scriptable::~Scriptable(void)
 	if (locals) {
 		delete( locals );
 	}
+}
+
+void Scriptable::SetScriptName(const char* text)
+{
+	strnspccpy( scriptName, text, 32 );
 }
 
 /** Gets the DeathVariable */
@@ -144,7 +153,7 @@ void Scriptable::DisplayHeadText(const char* text)
 	}
 	overHeadText = (char *) text;
 	if (text) {
-		GetTime( timeStartDisplaying );
+		timeStartDisplaying=core->GetGame()->Ticks;
 		textDisplaying = 1;
 	}
 	else {
@@ -153,9 +162,54 @@ void Scriptable::DisplayHeadText(const char* text)
 	}
 }
 
-void Scriptable::SetScriptName(const char* text)
+#define MAX_DELAY  6000
+
+void Scriptable::DrawOverheadText(Region &screen)
 {
-	strnspccpy( scriptName, text, 32 );
+	unsigned long time = core->GetGame()->Ticks;
+	Color *palette = NULL;
+
+	if (!textDisplaying)
+		return;
+
+	time -= timeStartDisplaying;
+
+	Font* font = core->GetFont( 1 );
+	if (time >= MAX_DELAY) {
+		textDisplaying = 0;
+	} else {
+		time = MAX_DELAY-time;
+		if (time<256) {
+			Color black={0,0,0,0};
+			Color overHeadColor;
+			overHeadColor.a=time;
+			overHeadColor.b=time;
+			overHeadColor.r=time;
+			overHeadColor.g=time;
+			palette = core->GetVideoDriver()->CreatePalette(overHeadColor,black);
+		}
+	}
+
+	int cs = 100;
+	if (Type==ST_ACTOR) {
+		cs = ((Selectable *) this)->size*50;
+	}
+	
+	Region rgn( Pos.x-100+screen.x, Pos.y - cs + screen.y, 200, 400 );
+	font->Print( rgn, ( unsigned char * ) overHeadText,
+		palette?palette:core->InfoTextPalette, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false );
+	if (palette) {
+		core->GetVideoDriver()->FreePalette(palette);
+	}
+}
+
+void Scriptable::ImmediateEvent()
+{
+	for(int i=0;i<MAX_SCRIPTS;i++) {
+		if (Scripts[i]) {
+			Scripts[i]->RunNow();
+		}
+	}
 }
 
 void Scriptable::ExecuteScript(GameScript* Script)
@@ -230,8 +284,8 @@ void Scriptable::ReleaseCurrentAction()
 
 void Scriptable::ProcessActions()
 {
-	unsigned long thisTime;
-	GetTime( thisTime );
+	unsigned long thisTime = core->GetGame()->Ticks;
+	//GetTime( thisTime );
 	if (( thisTime - startTime ) < interval) {
 		return;
 	}
@@ -275,6 +329,10 @@ void Scriptable::ProcessActions()
 			break;
 		}
 	}
+	if (InternalFlags&IF_IDLE) {
+printf("Deactivated idle scriptable: %s\n", scriptName);
+		Deactivate();
+	}
 }
 
 bool Scriptable::InMove()
@@ -311,9 +369,10 @@ void Scriptable::SetCutsceneID(Scriptable *csid)
 	}
 }
 
+//also turning off the idle flag so it won't run continuously
 void Scriptable::Deactivate()
 {
-	InternalFlags &=~IF_ACTIVE;
+	InternalFlags &=~(IF_ACTIVE|IF_IDLE);
 }
 
 void Scriptable::Hide()
@@ -332,10 +391,11 @@ void Scriptable::NoInterrupt()
 }
 
 //turning off the not interruptable flag, actions should reenable it themselves
+//also turning off the idle flag
 void Scriptable::Activate()
 {
 	InternalFlags |= IF_ACTIVE;
-	InternalFlags &= ~IF_NOINT;
+	InternalFlags &= ~(IF_NOINT|IF_IDLE);
 }
 
 ieDword Scriptable::GetInternalFlag()
@@ -557,23 +617,22 @@ void Moveble::MoveLine(int steps, int Pass)
 	path = area->GetLine( Pos, steps, Orientation, Pass );
 }
 
-void Moveble::DoStep()
+void Moveble::DoStep(unsigned int walk_speed)
 {
 	if (!path) {
 		return;
 	}
-	unsigned long time;
-	GetTime( time );
+	ieDword time = core->GetGame()->Ticks;
 	if (!step) {
 		step = path;
 		timeStartStep = time;
 	}
-	if (( time - timeStartStep ) >= STEP_TIME) {
+	if (( time - timeStartStep ) >= walk_speed) {
 		//printf("[New Step] : Orientation = %d\n", step->orient);
 		step = step->Next;
 		timeStartStep = time;
 	}
-	//Orientation = step->orient;
+	
 	SetOrientation (step->orient, false);
 	StanceID = IE_ANI_WALK;
 	Pos.x = ( step->x * 16 ) + 8;
@@ -588,16 +647,16 @@ void Moveble::DoStep()
 	}
 	if (step->Next->x > step->x)
 		Pos.x += ( unsigned short )
-			( ( ( ( ( step->Next->x * 16 ) + 8 ) - Pos.x ) * ( time - timeStartStep ) ) / STEP_TIME );
+			( ( ( ( ( step->Next->x * 16 ) + 8 ) - Pos.x ) * ( time - timeStartStep ) ) / walk_speed );
 	else
 		Pos.x -= ( unsigned short )
-			( ( ( Pos.x - ( ( step->Next->x * 16 ) + 8 ) ) * ( time - timeStartStep ) ) / STEP_TIME );
+			( ( ( Pos.x - ( ( step->Next->x * 16 ) + 8 ) ) * ( time - timeStartStep ) ) / walk_speed );
 	if (step->Next->y > step->y)
 		Pos.y += ( unsigned short )
-			( ( ( ( ( step->Next->y * 12 ) + 6 ) - Pos.y ) * ( time - timeStartStep ) ) / STEP_TIME );
+			( ( ( ( ( step->Next->y * 12 ) + 6 ) - Pos.y ) * ( time - timeStartStep ) ) / walk_speed );
 	else
 		Pos.y -= ( unsigned short )
-			( ( ( Pos.y - ( ( step->Next->y * 12 ) + 6 ) ) * ( time - timeStartStep ) ) / STEP_TIME );
+			( ( ( Pos.y - ( ( step->Next->y * 12 ) + 6 ) ) * ( time - timeStartStep ) ) / walk_speed );
 }
 
 void Moveble::AddWayPoint(Point &Des)
@@ -612,13 +671,32 @@ void Moveble::AddWayPoint(Point &Des)
 		endNode=endNode->Next;
 	}
 	Point p(endNode->x, endNode->y);
+	area->BlockSearchMap( Pos, size, 0);
 	PathNode *path2 = area->FindPath( p, Des );
 	endNode->Next=path2;
+}
+
+void Moveble::FixPosition()
+{
+	if (Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *) this;
+	if (actor->GetStat(IE_DONOTJUMP)&DNJ_BIRD ) {
+		return;
+	}
+	Pos.x/=16;
+	Pos.y/=12;
+	GetCurrentArea()->AdjustPosition(Pos);
+	Pos.x*=16;
+	Pos.y*=12;
 }
 
 void Moveble::WalkTo(Point &Des, int distance)
 {
 	ClearPath();
+	area->BlockSearchMap( Pos, size, 0);
+	FixPosition();
 	path = area->FindPath( Pos, Des, distance );
 	//ClearPath sets destination, so Destination must be set after it
 	//also we should set Destination only if there is a walkable path
@@ -630,6 +708,7 @@ void Moveble::WalkTo(Point &Des, int distance)
 void Moveble::RunAwayFrom(Point &Des, int PathLength, int flags)
 {
 	ClearPath();
+	area->BlockSearchMap( Pos, size, 0);
 	path = area->RunAway( Pos, Des, PathLength, flags );
 }
 
@@ -641,6 +720,7 @@ void Moveble::RandomWalk(bool can_stop)
 		SetWait(10);
 		return;
 	}
+	area->BlockSearchMap( Pos, size, 0);
 	path = area->RunAway( Pos, Pos, 10, 0 );
 }
 
@@ -648,6 +728,7 @@ void Moveble::MoveTo(Point &Des)
 {
 	Pos = Des;
 	Destination = Des;
+	area->BlockSearchMap( Pos, size, PATH_MAP_PC);
 }
 
 void Moveble::ClearPath()
@@ -785,6 +866,14 @@ Door::~Door(void)
 	}
 }
 
+void Door::ImpedeBlocks(int count, Point *points, unsigned int value)
+{
+	for(int i=0;i<count;i++) {
+		ieByte tmp = area->SearchMap->GetPixelIndex( points[i].x, points[i].y ) & PATH_MAP_NOTDOOR;
+		area->SearchMap->SetPixelIndex( points[i].x, points[i].y, tmp|value );
+	}
+}
+
 void Door::UpdateDoor()
 {
 	if (Flags&DOOR_OPEN) {
@@ -792,10 +881,7 @@ void Door::UpdateDoor()
 	} else {
 		outline = open;
 	}
-	int i;
-
-	int oidx, cidx;
-	int oval, cval;
+	unsigned int oval, cval;
 
 	oval = PATH_MAP_IMPASSABLE; 
 	if (Flags & DOOR_TRANSPARENT) {
@@ -805,22 +891,14 @@ void Door::UpdateDoor()
 		cval = PATH_MAP_DOOR_OPAQUE;
 	}
 	if (Flags &DOOR_OPEN) {
-		oidx=cval;
-		cidx=oval;
+		ImpedeBlocks(cibcount, closed_ib, 0);
+		ImpedeBlocks(oibcount, open_ib, cval);
 	}
 	else {
-		cidx=cval;
-		oidx=oval;
+		ImpedeBlocks(oibcount, open_ib, 0);
+		ImpedeBlocks(cibcount, closed_ib, cval);
 	}
 
-	for(i=0;i<oibcount;i++) {
-		ieByte tmp = area->SearchMap->GetPixelIndex( open_ib[i].x, open_ib[i].y ) & 15;
-		area->SearchMap->SetPixelIndex( open_ib[i].x, open_ib[i].y, tmp|oidx );
-	}
-	for(i=0;i<cibcount;i++) {
-		ieByte tmp = area->SearchMap->GetPixelIndex( closed_ib[i].x, closed_ib[i].y ) & 15;
-		area->SearchMap->SetPixelIndex( closed_ib[i].x, closed_ib[i].y, tmp|cidx );
-	}
 	InfoPoint *ip=area->TMap->GetInfoPoint(LinkedInfo);
 	if (ip) {
 		if (Flags&DOOR_OPEN) ip->Flags&=~INFO_DOOR;
@@ -885,9 +963,61 @@ bool Door::IsOpen() const
 	return (Flags&DOOR_OPEN) == !core->HasFeature(GF_REVERSE_DOOR);
 }
 
+//also mark actors to fix position
+bool Door::BlockedOpen(bool Open, bool ForceOpen)
+{
+	bool blocked;
+	int count;
+	Point *points;
+
+	blocked = false;
+	if (Open) {
+		count=oibcount;
+		points=open_ib;
+	} else {
+		count=cibcount;
+		points=closed_ib;
+	}
+	//getting all impeded actors flagged for jump
+	Region rgn;
+	rgn.w=16;
+	rgn.h=12;
+	for(int i=0;i<count;i++) {
+		Actor** ab;
+		rgn.x=points[i].x*16;
+		rgn.y=points[i].y*12;
+		ieByte tmp = area->SearchMap->GetPixelIndex( points[i].x, points[i].y ) & PATH_MAP_ACTOR;
+		if (tmp) {
+			int ac = area->GetActorInRect(ab, rgn, false);
+			while(ac--) {
+				if (ab[ac]->GetBase(IE_DONOTJUMP)) {
+					continue;
+				}
+				ab[ac]->SetBase(IE_DONOTJUMP, DNJ_JUMP);
+				blocked = true;
+			}
+			if (ab) {
+				free(ab);
+			}
+		}
+	}
+
+	if ((Flags&DOOR_SLIDE) || ForceOpen) {
+		return false;
+	}
+	return blocked;
+}
+
 void Door::SetDoorOpen(bool Open, bool playsound, ieDword ID)
 {
-	if (Open){
+	if (playsound) {
+		if (BlockedOpen(Open,0)) {
+			area->JumpActors(false);
+			return;
+		}
+		area->JumpActors(true);
+	}
+	if (Open) {
 		LastEntered = ID; //used as lastOpener
 		SetDoorLocked (false,playsound);
 	} else {
@@ -895,8 +1025,6 @@ void Door::SetDoorOpen(bool Open, bool playsound, ieDword ID)
 	}
 	ToggleTiles (Open, playsound);
 	UpdateDoor ();
-	//i forgot why is this here, and surely wrong
-	//area->FixAllPositions();
 }
 
 void Door::SetPolygon(bool Open, Gem_Polygon* poly)
@@ -1042,6 +1170,7 @@ bool InfoPoint::TriggerTrap(int skill)
 			return false;
 		}
 	}
+	ImmediateEvent();
 	if (Flags&TRAP_RESET) {
 		return true;
 	}

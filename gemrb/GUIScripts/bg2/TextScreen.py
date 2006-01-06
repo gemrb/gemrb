@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/TextScreen.py,v 1.9 2006/01/05 18:04:30 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/TextScreen.py,v 1.10 2006/01/06 23:09:59 avenger_teambg Exp $
 
 # TextScreen.py - display Loading screen
 
@@ -28,20 +28,25 @@ from GUIDefines import *
 TextScreen = None
 TextArea = None
 Chapter = 0
+TableName = ""
 
 def StartTextScreen ():
-	global TextScreen, TextArea, Chapter
+	global TextScreen, TextArea, Chapter, TableName
 
 	GemRB.LoadWindowPack ("GUICHAP", 640, 480)
-	LoadPic = GemRB.GetGameString (STR_LOADMOS)
+	TableName = GemRB.GetGameString (STR_LOADMOS)
+
 	#if there is no preset loadpic, try to determine it from the chapter
-	if LoadPic == "":
-		Chapter = GemRB.GetVar("CHAPTER")
+	if TableName == "":
+		Chapter = GemRB.GetGameVar("CHAPTER")
+		TableName = "CHPTXT"+str(Chapter)
 		#set ID according to the Chapter?
-		ID = Chapter
-	else:
-		ID = 62
-	TextScreen = GemRB.LoadWindow (ID)
+
+	print "TableName:", TableName
+	Table = GemRB.LoadTable(TableName)
+	LoadPic = GemRB.GetTableValue(Table, -1, -1)
+	print "Loadpic:", LoadPic
+	TextScreen = GemRB.LoadWindow (62)
 	GemRB.SetWindowFrame (TextScreen)
 	if LoadPic != "":
 		GemRB.SetWindowPicture (TextScreen, LoadPic)
@@ -68,18 +73,18 @@ def StartTextScreen ():
 
 
 def FeedScroll ():
-	global TextScreen, TextArea, Chapter
+	global TextScreen, TextArea, Chapter, TableName
 
-	TableName = GemRB.GetGameString (STR_LOADMOS)
-	if TableName == "":
-		#incrementchapter
-		TableName = "CHPTXT"+str(Chapter)
-		Table = GemRB.LoadTable(TableName)
-		Value = GemRB.GetTableValue (Table, 1, 1)
+	#this is a rather primitive selection but works for the games
+	Table = GemRB.LoadTable(TableName)
+	Value = GemRB.GetTableValue (Table, 0, 1)
+	print "Value", Value
+	if Value == "REPUTATION":
+		line = 2
 	else:
-		#textscreen
-		Table = GemRB.LoadTable(TableName)
-		Value = GemRB.GetTableValue (Table, 2, 1)
+		line = 1
+	Value = GemRB.GetTableValue (Table, line, 1)
+
 	GemRB.UnloadTable (Table)
 	GemRB.TextAreaAppend (TextScreen, TextArea, Value)
 

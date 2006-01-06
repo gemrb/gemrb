@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.220 2006/01/04 22:18:10 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.221 2006/01/06 23:09:57 avenger_teambg Exp $
  *
  */
 
@@ -52,21 +52,22 @@ extern Interface* core;
 extern HANDLE hConsole;
 #endif
 
+static int MAX_CIRCLESIZE = 8;
+static int PersonalPerimeter;
 static int MaxVisibility = 30;
-static int Perimeter; //calculated from MaxVisibility
+static int VisibilityPerimeter; //calculated from MaxVisibility
 static int NormalCost = 10;
 static int AdditionalCost = 4;
 static int Passable[16] = {
 	4, 1, 1, 1, 1, 1, 1, 1, 0, 1, 8, 0, 0, 0, 3, 1
 };
 static Point **VisibilityMasks=NULL;
+static Point **PersonalSpaces=NULL;
 
 static bool PathFinderInited = false;
 static Variables Spawns;
 static int LargeFog;
 static ieWord globalActorCounter;
-
-#define STEP_TIME 150
 
 void Map::ReleaseMemory()
 {
@@ -77,6 +78,15 @@ void Map::ReleaseMemory()
 		free(VisibilityMasks);
 		VisibilityMasks=NULL;
 	}
+
+	if (PersonalSpaces) {
+		for (int i=0;i<MAX_CIRCLESIZE;i++) {
+			free(PersonalSpaces[i]);
+		}
+		free(PersonalSpaces);
+		PersonalSpaces=NULL;
+	}
+
 	Spawns.RemoveAll();
 	PathFinderInited = false;
 }
@@ -172,6 +182,16 @@ void AddLOS(int destx, int desty, int slot)
 	}
 }
 
+void AddSpace(int destx, int desty, int slot)
+{
+	for (int i=0;i<MAX_CIRCLESIZE;i++) {
+		int x=(destx*i+MAX_CIRCLESIZE/2)/MAX_CIRCLESIZE*16;
+		int y=(desty*i+MAX_CIRCLESIZE/2)/MAX_CIRCLESIZE*12;
+		PersonalSpaces[i][slot].x=x;
+		PersonalSpaces[i][slot].y=y;
+	}
+}
+
 void InitExplore()
 {
 	LargeFog = !core->HasFeature(GF_SMALL_FOG);
@@ -182,9 +202,9 @@ void InitExplore()
 	int xc = 1 - ( 2 * MaxVisibility );
 	int yc = 1;
 	int re = 0;
-	Perimeter = 0;
+	VisibilityPerimeter = 0;
 	while (x>=y) {
-		Perimeter+=8;
+		VisibilityPerimeter+=8;
 		y++;
 		re += yc;
 		yc += 2;
@@ -198,7 +218,7 @@ void InitExplore()
 	int i;
 	VisibilityMasks = (Point **) malloc(MaxVisibility * sizeof(Point *) );
 	for (i=0;i<MaxVisibility;i++) {
-		VisibilityMasks[i] = (Point *) malloc(Perimeter*sizeof(Point) );
+		VisibilityMasks[i] = (Point *) malloc(VisibilityPerimeter*sizeof(Point) );
 	}
 
 	x = MaxVisibility;
@@ -206,16 +226,64 @@ void InitExplore()
 	xc = 1 - ( 2 * MaxVisibility );
 	yc = 1;
 	re = 0;
-	Perimeter = 0;
+	VisibilityPerimeter = 0;
 	while (x>=y) {
-		AddLOS (x, y, Perimeter++);
-		AddLOS (-x, y, Perimeter++);
-		AddLOS (-x, -y, Perimeter++);
-		AddLOS (x, -y, Perimeter++);
-		AddLOS (y, x, Perimeter++);
-		AddLOS (-y, x, Perimeter++);
-		AddLOS (-y, -x, Perimeter++);
-		AddLOS (y, -x, Perimeter++);
+		AddLOS (x, y, VisibilityPerimeter++);
+		AddLOS (-x, y, VisibilityPerimeter++);
+		AddLOS (-x, -y, VisibilityPerimeter++);
+		AddLOS (x, -y, VisibilityPerimeter++);
+		AddLOS (y, x, VisibilityPerimeter++);
+		AddLOS (-y, x, VisibilityPerimeter++);
+		AddLOS (-y, -x, VisibilityPerimeter++);
+		AddLOS (y, -x, VisibilityPerimeter++);
+		y++;
+		re += yc;
+		yc += 2;
+		if (( ( 2 * re ) + xc ) > 0) {
+			x--;
+			re += xc;
+			xc += 2;
+		}
+	}
+
+	//circle perimeter size for MaxCirclesize
+	x = MAX_CIRCLESIZE;
+	y = 0;
+	xc = 1 - ( 2 * MAX_CIRCLESIZE );
+	yc = 1;
+	re = 0;
+	PersonalPerimeter = 0;
+	while (x>=y) {
+		PersonalPerimeter+=8;
+		y++;
+		re += yc;
+		yc += 2;
+		if (( ( 2 * re ) + xc ) > 0) {
+			x--;
+			re += xc;
+			xc += 2;
+		}
+	}
+
+	PersonalSpaces = (Point **) malloc(MAX_CIRCLESIZE * sizeof(Point *) );
+	for(i=0;i<MAX_CIRCLESIZE;i++) {
+		PersonalSpaces[i] = (Point *) malloc(PersonalPerimeter*sizeof(Point) );
+	}
+	x = MAX_CIRCLESIZE;
+	y = 0;
+	xc = 1 - ( 2 * MAX_CIRCLESIZE );
+	yc = 1;
+	re = 0;
+	PersonalPerimeter = 0;
+	while (x>=y) {
+		AddSpace (x, y, PersonalPerimeter++);
+		AddSpace (-x, y, PersonalPerimeter++);
+		AddSpace (-x, -y, PersonalPerimeter++);
+		AddSpace (x, -y, PersonalPerimeter++);
+		AddSpace (y, x, PersonalPerimeter++);
+		AddSpace (-y, x, PersonalPerimeter++);
+		AddSpace (-y, -x, PersonalPerimeter++);
+		AddSpace (y, -x, PersonalPerimeter++);
 		y++;
 		re += yc;
 		yc += 2;
@@ -456,7 +524,7 @@ void Map::UpdateScripts()
 
 	while (q--) {
 		Actor* actor = queue[0][q];
-		for (unsigned int i = 0; i < 8; i++) {
+		for (unsigned int i = 0; i < MAX_SCRIPTS; i++) {
 			if (actor->Scripts[i]) {
 				if (actor->GetNextAction())
 					break;
@@ -468,7 +536,20 @@ void Map::UpdateScripts()
 		//returns true if actor should be completely removed
 		actor->inventory.CalculateWeight();
 		actor->SetBase( IE_ENCUMBRANCE, actor->inventory.GetWeight() );
-		actor->DoStep( );
+		//TODO:calculate actor speed!
+		int speed = 150;
+		BlockSearchMap( actor->Pos, actor->size, 0);
+		if (actor->path && actor->path->Next) {
+			//we should actually wait for a short time and check then
+			if(!(GetBlocked(actor->path->Next->x,actor->path->Next->y)&PATH_MAP_PASSABLE)) {
+				actor->ClearPath();
+				actor->path = FindPath( actor->Pos, actor->Destination, actor->size );
+			}
+		}
+		if (!(actor->GetBase(IE_STATE_ID)&STATE_DEAD) ) {
+			actor->DoStep( speed );
+			BlockSearchMap( actor->Pos, actor->size, PATH_MAP_PC);
+		}
 	}
 
 	//Check if we need to start some door scripts
@@ -492,8 +573,13 @@ void Map::UpdateScripts()
 		if (!ip)
 			break;
 		//If this InfoPoint has no script and it is not a Travel Trigger, skip it
-		if (!ip->Scripts[0] && ( ip->Type != ST_TRAVEL ))
+		if (!ip->Scripts[0] && ( ip->Type != ST_TRAVEL )) {
 			continue;
+		}
+		//it was turned off
+		if (ip->Flags&TRAP_DEACTIVATED) {
+			continue;
+		}
 		//If this InfoPoint is a Switch Trigger
 		if (ip->Type == ST_TRIGGER) {
 			//Check if this InfoPoint was activated
@@ -510,11 +596,7 @@ void Map::UpdateScripts()
 		while (q--) {
 			Actor* actor = queue[0][q];
 			if (ip->Type == ST_PROXIMITY) {
-				if (ip->Entered(actor)) {
-					ip->ExecuteScript( ip->Scripts[0] );
-					//Execute Pending Actions
-					ip->ProcessActions();
-				}
+				ip->Entered(actor);
 			} else {
 				//ST_TRAVEL
 				//don't move if doing something else
@@ -524,6 +606,12 @@ void Map::UpdateScripts()
 					UseExit(actor, ip);
 				}
 			}
+		}
+
+		if (ip->Type==ST_PROXIMITY) {
+			ip->ExecuteScript( ip->Scripts[0] );
+			//Execute Pending Actions
+			ip->ProcessActions();
 		}
 	}
 }
@@ -663,8 +751,43 @@ void Map::DrawMap(Region screen, GameControl* gc)
 		}
 	}
 
-	if (core->FogOfWar && TMap) {
-		TMap->DrawFogOfWar( ExploredBitmap, VisibleBitmap, screen );
+	if ((core->FogOfWar&2) && SearchMap) {
+		DrawSearchMap(screen);
+	} else {
+		if ((core->FogOfWar&1) && TMap) {
+			TMap->DrawFogOfWar( ExploredBitmap, VisibleBitmap, screen );
+		}
+	}
+	int ipCount = 0;
+	while (true) {
+		//For each InfoPoint in the map
+		InfoPoint* ip = TMap->GetInfoPoint( ipCount++ );
+		if (!ip)
+			break;
+		ip->DrawOverheadText(screen);
+	}
+}
+
+void Map::DrawSearchMap(Region &screen)
+{
+	Color inaccessible = { 128, 128, 128, 128 };
+	Video *vid=core->GetVideoDriver();
+	Region rgn=vid->GetViewport();
+	Region block;
+
+	block.w=16;
+	block.h=12;
+	int w = screen.w/16;
+	int h = screen.h/12;
+
+	for(int x=0;x<w;x++) {
+		for(int y=0;y<h;y++) {
+			if (!(GetBlocked( x+rgn.x/16, y+rgn.y/12) & PATH_MAP_PASSABLE) ) {
+				block.x=screen.x+x*16;
+				block.y=screen.y+y*12;
+				vid->DrawRect(block,inaccessible);
+			}
+		}
 	}
 }
 
@@ -799,6 +922,20 @@ int Map::GetActorCount(bool any) const
 	return ret;
 }
 
+void Map::JumpActors(bool jump)
+{
+	unsigned int i = actors.size();
+	while (i--) {
+		Actor* actor = actors[i];
+		if (actor->GetStat(IE_DONOTJUMP)&DNJ_JUMP) {
+			if (jump) {
+				actor->FixPosition();
+			}
+			actor->SetBase(IE_DONOTJUMP,0);
+		}
+	}
+}
+
 //before writing the area out, perform some cleanups
 void Map::PurgeArea(bool items)
 {
@@ -873,11 +1010,17 @@ int Map::GetActorInRect(Actor**& actorlist, Region& rgn, bool onlyparty)
 			continue;
 		if (!actor->ValidTarget(GA_SELECT|GA_NO_DEAD) )
 			continue;
+		/*
 		if (( actor->BBox.x > ( rgn.x + rgn.w ) ) ||
 			( actor->BBox.y > ( rgn.y + rgn.h ) ))
 			continue;
 		if (( ( actor->BBox.x + actor->BBox.w ) < rgn.x ) ||
 			( ( actor->BBox.y + actor->BBox.h ) < rgn.y ))
+			continue;
+			*/
+		if ((actor->Pos.x<rgn.x) || (actor->Pos.y<rgn.y))
+			continue;
+		if ((actor->Pos.x>rgn.x+rgn.w) || (actor->Pos.y>rgn.y+rgn.h) )
 			continue;
 		actorlist[count++] = actor;
 	}
@@ -921,10 +1064,10 @@ int Map::GetBlocked(unsigned int x, unsigned int y)
 	if (block&PATH_MAP_DOOR_OPAQUE) {
 		return PATH_MAP_NO_SEE;
 	}
-	if (block&PATH_MAP_DOOR_TRANSPARENT) {
+	if (block&(PATH_MAP_DOOR_TRANSPARENT|PATH_MAP_ACTOR)) {
 		return PATH_MAP_IMPASSABLE;
 	}
-	return Passable[block&15];
+	return Passable[block&PATH_MAP_AREAMASK];
 }
 
 int Map::GetBlocked(Point &c)
@@ -1058,7 +1201,7 @@ void Map::GenerateQueues()
 		ieDword gametime = core->GetGame()->GameTime;
 
 		if (actor->GetInternalFlag()&IF_ACTIVE) {
-			if ((actor->GetStance() == IE_ANI_TWITCH) && !actor->playDeadCounter) {
+			if ((actor->GetStance() == IE_ANI_TWITCH) && (actor->GetInternalFlag()&IF_IDLE) ) {
 				priority = 1; //display
 			} else {
 				priority = 0; //run scripts and display
@@ -1221,6 +1364,7 @@ void Map::RemoveActor(Actor* actor)
 	unsigned int i=actors.size();
 	while (i--) {
 		if (actors[i] == actor) {
+			BlockSearchMap(actor->Pos, actor->size,0);
 			actors.erase( actors.begin()+i );
 			return;
 		}
@@ -1354,19 +1498,6 @@ void Map::AdjustPosition(Point &goal, unsigned int radius)
 	}
 }
 
-void Map::FixAllPositions()
-{
-	for (unsigned int e = 0; e<actors.size(); e++) {
-		Actor *actor = actors[e];
-		if (actor->GetStat( IE_DONOTJUMP ) ) continue;
-		Point p;
-		p.x=actor->Pos.x/16;
-		p.y=actor->Pos.y/12;
-		AdjustPosition(p);
-		actor->Pos.x=p.x*16+8;
-		actor->Pos.y=p.y*12+6;
-	}
-}
 //run away from dX, dY (ie.: find the best path of limited length that brings us the farthest from dX, dY)
 PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, int flags)
 {
@@ -1894,7 +2025,7 @@ void Map::ExploreMapChunk(Point &Pos, int range, int los)
 	if (range>MaxVisibility) {
 		range=MaxVisibility;
 	}
-	int p=Perimeter;
+	int p=VisibilityPerimeter;
 	while (p--) {
 		int Pass = 2;
 		bool block = false;
@@ -1924,7 +2055,7 @@ void Map::ExploreMapChunk(Point &Pos, int range, int los)
 
 void Map::UpdateFog()
 {
-	if (!core->FogOfWar) {
+	if (!(core->FogOfWar&1) ) {
 		SetMapVisibility( -1 );
 		return;
 	}
@@ -1943,6 +2074,24 @@ void Map::UpdateFog()
 			TriggerSpawn(sp);
 		}
 	}	
+}
+
+//Valid values are - PATH_MAP_FREE, PATH_MAP_PC, PATH_MAP_NPC
+void Map::BlockSearchMap(Point &Pos, int size, unsigned int value)
+{
+	if (size>MAX_CIRCLESIZE) {
+		size=MAX_CIRCLESIZE;
+	}
+	int p=PersonalPerimeter;
+	while (p--) {
+		for (int i=0;i<size;i++) {
+			unsigned int x = (Pos.x+PersonalSpaces[i][p].x)/16;
+			unsigned int y = (Pos.y+PersonalSpaces[i][p].y)/12;
+			
+			unsigned int tmp=SearchMap->GetPixelIndex(x,y)&PATH_MAP_NOTACTOR;//keep door flags too
+			SearchMap->SetPixelIndex(x,y,tmp|value);
+		}
+	}
 }
 
 Spawn* Map::GetSpawn(const char* Name)

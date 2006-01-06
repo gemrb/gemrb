@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.182 2006/01/02 23:26:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.183 2006/01/06 23:09:57 avenger_teambg Exp $
  *
  */
 
@@ -208,6 +208,7 @@ private:
 	Container* CurrentContainer;
 	bool UseContainer;
 public:
+	Color *InfoTextPalette;
 	int SaveAsOriginal; //if true, saves files in compatible mode
 	int QuitFlag;
 	int LoadGameIndex;
@@ -234,7 +235,9 @@ public:
 	char * GetString(ieStrRef strref, ieDword options = 0);
 	void FreeInterface(void * ptr);
 	Factory * GetFactory() const;
-	/** No descriptions */
+	/* sets the floattext color */
+	void SetInfoTextColor(Color &color);
+	/** returns a gradient set */
 	Color * GetPalette(int index, int colors);
 	/** Returns a preloaded Font */
 	Font * GetFont(const char *) const;
@@ -252,7 +255,7 @@ public:
 	/** Returns a PC index, by loading a creature */
 	int LoadCreature(char *ResRef, int InParty, bool character=false);
 	/** Sets a stat for the creature in actor index Slot */
-	int SetCreatureStat(unsigned int Slot, unsigned int StatID, int StatValue, int Mod);
+	int SetCreatureStat(unsigned int Slot, unsigned int StatID, int StatValue);
 	/** returns the stat of a creature (mod:1-modified, 0-base) */
 	int GetCreatureStat(unsigned int Slot, unsigned int StatID, int Mod);
 	/** Loads a WindowPack (CHUI file) in the Window Manager */
