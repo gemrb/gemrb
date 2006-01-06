@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.372 2006/01/04 23:21:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.373 2006/01/06 00:50:48 edheldil Exp $
  *
  */
 
@@ -2006,6 +2006,31 @@ static PyObject* GemRB_CreateWorldMapControl(PyObject * /*self*/, PyObject* args
 	wmap->ControlType = IE_GUI_WORLDMAP;
 	wmap->Owner = win;
 	win->AddControl( wmap );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_SetWorldMapTextColor__doc,
+"SetWorldMapTextColor(WindowIndex, ControlIndex, which, red, green, blue)\n\n"
+"Sets the label colors of a WorldMap Control. WHICH selects color affected"
+"and is one of IE_GUI_WMAP_COLOR_(NORMAL|SELECTED|NOTVISITED)." );
+
+static PyObject* GemRB_SetWorldMapTextColor(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex, which, r, g, b, a;
+
+	if (!PyArg_ParseTuple( args, "iiiiiii", &WindowIndex, &ControlIndex, &which, &r, &g, &b, &a )) {
+		return AttributeError( GemRB_SetWorldMapTextColor__doc );
+	}
+
+	WorldMapControl* wmap = ( WorldMapControl* ) GetControl( WindowIndex, ControlIndex, IE_GUI_WORLDMAP);
+	if (!wmap) {
+		return NULL;
+	}
+
+	Color color = {r, g, b, a};
+	wmap->SetColor( which, color );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -6213,6 +6238,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetButtonTextColor, METH_VARARGS),
 	METHOD(AdjustScrolling, METH_VARARGS),
 	METHOD(CreateWorldMapControl, METH_VARARGS),
+	METHOD(SetWorldMapTextColor, METH_VARARGS),
 	METHOD(CreateMapControl, METH_VARARGS),
 	METHOD(SetControlPos, METH_VARARGS),
 	METHOD(SetControlSize, METH_VARARGS),

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.48 2006/01/04 16:34:05 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.49 2006/01/06 00:50:42 edheldil Exp $
 
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
@@ -93,6 +93,12 @@ IE_GUI_EDIT_NUMBER    =  0x030000001
 IE_GUI_MAP_NO_NOTES   =  0
 IE_GUI_MAP_VIEW_NOTES =  1
 IE_GUI_MAP_SET_NOTE   =  2
+
+# !!! Keep these synchronized with WorldMapControl.h !!!
+# WorldMap label colors
+IE_GUI_WMAP_COLOR_NORMAL     = 0
+IE_GUI_WMAP_COLOR_SELECTED   = 1
+IE_GUI_WMAP_COLOR_NOTVISITED = 2
 
 # !!! Keep these synchronized with Font.h !!!
 IE_FONT_ALIGN_LEFT       = 0x00

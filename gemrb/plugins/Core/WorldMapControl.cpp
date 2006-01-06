@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.23 2006/01/05 14:14:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.24 2006/01/06 00:50:47 edheldil Exp $
  */
 
 #ifndef WIN32
@@ -33,6 +33,8 @@
 
 WorldMapControl::WorldMapControl(const char *font, int direction)
 {
+	Video *video = core->GetVideoDriver();
+
 	ScrollX = 0;
 	ScrollY = 0;
 	MouseIsDown = false;
@@ -52,12 +54,29 @@ WorldMapControl::WorldMapControl(const char *font, int direction)
 	} else {
 		ftext = NULL;
 	}
+
+	// initialize label colors
+	Color normal = { 0xf0, 0xf0, 0xf0, 0xff };
+	Color selected = { 0xf0, 0x80, 0x80, 0xff };
+	Color notvisited = { 0x80, 0x80, 0xf0, 0xff };
+	Color black = { 0x00, 0x00, 0x00, 0x00 };
+
+	pal_normal = video->CreatePalette ( normal, black );
+	pal_selected = video->CreatePalette ( selected, black );
+	pal_notvisited = video->CreatePalette ( notvisited, black );
+
+
 	ResetEventHandler( WorldMapControlOnPress );
 	ResetEventHandler( WorldMapControlOnEnter );
 }
 
 WorldMapControl::~WorldMapControl(void)
 {
+	Video *video = core->GetVideoDriver();
+
+	video->FreePalette( pal_normal );
+	video->FreePalette( pal_selected );
+	video->FreePalette( pal_notvisited );
 }
 
 /** Draws the Control on the Output Display */
@@ -115,27 +134,19 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 		int tw = ftext->CalcStringWidth( text ) + 5;
 		int th = ftext->maxHeight;
 		
-		Color fore = {0xf0, 0xf0, 0xf0, 0xff};
-		Color back = {0x00, 0x00, 0x00, 0x00};
+		Color* text_pal = pal_normal;
 		
 		if (Area == m) {
-			//if mouse is over it, then make it pale red
-			fore.b = 0x80;
-			fore.g = 0x80;
+			text_pal = pal_selected;
 		} else {
 			if (! (m->GetAreaStatus() & WMP_ENTRY_VISITED)) {
-				//if not visited, make it pale blue
-				fore.r=0x80;
-				fore.g=0x80;
+				text_pal = pal_notvisited;
 			}
-		} //otherwise leave it white
-
-		Color *text_pal = video->CreatePalette( fore, back );
+		}
 
 		ftext->Print( Region( r2.x + (r2.w - tw)/2, r2.y + r2.h, tw, th ),
 				( unsigned char * ) text, text_pal, 0, true );
 		free(text);
-		video->FreePalette(text_pal);
 	}
 }
 
@@ -331,4 +342,29 @@ bool WorldMapControl::SetEvent(int eventType, EventHandler handler)
 	}
 
 	return true;
+}
+
+void WorldMapControl::SetColor(int which, Color color)
+{
+	Color black = { 0x00, 0x00, 0x00, 0x00 };
+	Video *video = core->GetVideoDriver();
+
+	switch (which) {
+	case IE_GUI_WMAP_COLOR_NORMAL:
+		video->FreePalette( pal_normal );
+		pal_normal = video->CreatePalette( color, black );
+		break;
+	case IE_GUI_WMAP_COLOR_SELECTED:
+		video->FreePalette( pal_selected );
+		pal_selected = video->CreatePalette( color, black );
+		break;
+	case IE_GUI_WMAP_COLOR_NOTVISITED:
+		video->FreePalette( pal_notvisited );
+		pal_notvisited = video->CreatePalette( color, black );
+		break;
+	default:
+		break;
+	}
+
+	Changed = true;
 }

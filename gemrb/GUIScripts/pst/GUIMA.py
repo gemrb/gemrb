@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIMA.py,v 1.18 2005/02/25 15:12:20 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIMA.py,v 1.19 2006/01/06 00:50:46 edheldil Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -26,6 +26,7 @@
 import GemRB
 from GUIDefines import *
 from GUICommon import CloseOtherWindow
+from GUICommonWindows import EnableAnimatedWindows, DisableAnimatedWindows
 
 MapWindow = None
 WorldMapWindow = None
@@ -62,8 +63,12 @@ def OpenMapWindow ():
 	GemRB.SetText (Window, Button, 4182)
 	GemRB.SetVarAssoc (Window, Button, "x", IE_GUI_MAP_SET_NOTE)
 
+	# Note text
 	Text = GemRB.GetControl (Window, 4)
 	GemRB.SetText (Window, Text, "")
+
+	Edit = GemRB.CreateTextEdit (Window, 6, 0, 0, 200, 100, "FONTDLG", "pokus...")
+	#GemRB.SetControlPos (65535, 65535)
 
 	# Map Control
 	# ronote and usernote are the pins for the notes
@@ -94,15 +99,15 @@ def OpenMapWindow ():
 	GemRB.UnhideGUI ()
 
 def NoteChanged ():
-	Label = GemRB.GetControl (MapWindow, 4)
+	Label = GemRB.GetControl (MapWindow, 6)
 	Text = GemRB.QueryText (MapWindow, Label)
-	GemRB.SetMapNote (PosX, PosY, 0, Text)
+	GemRB.SetMapnote (PosX, PosY, 0, Text)
 	return
 	
 def SetMapNote ():
 	global PosX, PosY
 
-	Label = GemRB.GetControl (MapWindow, 4)
+	Label = GemRB.GetControl (MapWindow, 6)
 	GemRB.SetEvent (MapWindow, Label, IE_GUI_EDIT_ON_CHANGE, "NoteChanged")
 	PosX = GemRB.GetVar("MapControlX")
 	PosY = GemRB.GetVar("MapControlY")
@@ -129,16 +134,22 @@ def WorldMapWindowCommon (Travel):
 		GemRB.UnloadWindow (WorldMapWindow)
 		WorldMapWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
+		EnableAnimatedWindows ()
 		GemRB.UnhideGUI ()
 		return
 
+	DisableAnimatedWindows ()
 	GemRB.LoadWindowPack ("GUIWMAP")
 	WorldMapWindow = Window = GemRB.LoadWindow (0)
 	MapWindow = None
 	GemRB.SetVar ("OtherWindow", WorldMapWindow)
 
-	GemRB.CreateWorldMapControl (Window, 4, 0, 62, 640, 418, Travel)
-	GemRB.GetControl (Window, 4)
+	GemRB.CreateWorldMapControl (Window, 4, 0, 62, 640, 418, Travel, "FONTDLG")
+	WMap = GemRB.GetControl (Window, 4)
+	GemRB.SetWorldMapTextColor (Window, WMap, IE_GUI_WMAP_COLOR_NORMAL, 0x20, 0x20, 0x00, 0xff)
+	GemRB.SetWorldMapTextColor (Window, WMap, IE_GUI_WMAP_COLOR_SELECTED, 0x20, 0x20, 0x00, 0xff)
+	GemRB.SetWorldMapTextColor (Window, WMap, IE_GUI_WMAP_COLOR_NOTVISITED, 0x20, 0x20, 0x00, 0xa0)
+	GemRB.SetAnimation (Window, WMap, "WMPTY")
 	
 	# Done
 	Button = GemRB.GetControl (Window, 0)

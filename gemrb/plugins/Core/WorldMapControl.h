@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.h,v 1.12 2006/01/03 17:16:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.h,v 1.13 2006/01/06 00:50:47 edheldil Exp $
  *
  */
 
@@ -47,6 +47,13 @@ class WMPAreaEntry;
 #define GEM_EXPORT
 #endif
 
+// !!! Keep these synchronized with GUIDefines.py !!!
+/** Which label color is set with SetColor() */
+#define IE_GUI_WMAP_COLOR_NORMAL      0
+#define IE_GUI_WMAP_COLOR_SELECTED    1
+#define IE_GUI_WMAP_COLOR_NOTVISITED  2
+
+
 /**
  * @class WorldMapControl
  * Widget displaying "world" map, with particular locations and possibly
@@ -60,7 +67,7 @@ class GEM_EXPORT WorldMapControl : public Control {
 public:
 	WorldMapControl(const char *fontname, int direction);
 	~WorldMapControl(void);
-public:
+
 	/** Allows modification of the scrolling factor from outside */
 	void AdjustScrolling(short x, short y);
 	/** Draws the Control on the Output Display */
@@ -69,15 +76,15 @@ public:
 	void SetDirection(int direction);
 	/** Sets the Text of the current control */
 	int SetText(const char* /*string*/, int /*pos*/) { return 0; };  
+	/** Set color for one type of area labels */
+	void SetColor(int which, Color color);
 	int ScrollX, ScrollY;
 	unsigned short lastMouseX, lastMouseY;
 	bool MouseIsDown;
 	/** pointer to last pointed area */
 	WMPAreaEntry *Area;
-	/** guiscript Event when button pressed */
-	EventHandler WorldMapControlOnPress;
-	/** guiscript Event when mouse is over a reachable area */
-	EventHandler WorldMapControlOnEnter;
+	/** Set handler for specified event */
+	bool SetEvent(int eventType, EventHandler handler);
 private:
 	//font for printing area names
 	Font* ftext;
@@ -85,7 +92,17 @@ private:
 	unsigned char lastCursor;
 	//current area
 	ieResRef ca;
-private:
+	/** Label color of a visited area */
+	Color *pal_normal;
+	/** Label color of a currently selected area */
+	Color *pal_selected;
+	/** Label color of a not yet visited area */
+	Color *pal_notvisited;
+	/** guiscript Event when button pressed */
+	EventHandler WorldMapControlOnPress;
+	/** guiscript Event when mouse is over a reachable area */
+	EventHandler WorldMapControlOnEnter;
+
 	/** Mouse Over Event */
 	void OnMouseOver(unsigned short x, unsigned short y);
 	/** Mouse Leave Event */
@@ -102,8 +119,6 @@ private:
 	void OnSpecialKeyPress(unsigned char Key);
 	/** DisplayTooltip */
 	void DisplayTooltip();
-	/** Set handler for specified event */
-	bool SetEvent(int eventType, EventHandler handler);
 };
 
 #endif
