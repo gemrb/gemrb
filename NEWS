@@ -1,10 +1,23 @@
-GemRB V0.2.6 (2005-11-26):
+GemRB V0.2.7 (2005-02-01):
+  New features:
+    - large animations
+    - worldmap travel
+    - dialogue portraits
+    - translucent shadows option
+    - personal space of actors
+
+  Improved features:
+    - Script fixes
+    - Action menus
+    - TextScreen
+ 
+GemRB V0.2.6 (2005-12-06):
   New features:
     - Effects are in a different plugin
     - DoxyGen docs
     - Wallgroup covers
     - Door triggers
-    - changing default action to talk/fight (only in pst)
+    - Action menus (talk/attack)
     - party/protagonist death handled
 
   Improved features:
