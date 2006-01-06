@@ -1,6 +1,6 @@
 CHEAT AND DEBUG KEYS
 --------------------
-$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/CheatKeys.txt,v 1.7 2005/12/01 20:21:26 avenger_teambg Exp $
+$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/CheatKeys.txt,v 1.8 2006/01/06 23:11:42 avenger_teambg Exp $
 
 
 Following is a list of cheats you can use during development of GemRB.
@@ -70,6 +70,8 @@ Ctrl-6 - Toggles debug flag DEBUG_SHOW_PALETTES (show original and current
 
 Ctrl-7 - Toggle drawing of Fog-Of-War (actually explored bitmap atm.)
          in GameControl.
+
+Ctrl-8 - Toggle drawing of searchmap over the area in GameControl.
 
 ALT    - Toggles debug flag DEBUG_SHOW_CONTAINERS (show all containers
           and doors)
