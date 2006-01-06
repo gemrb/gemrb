@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.73 2006/01/02 10:14:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.74 2006/01/06 18:06:25 wjpalenstijn Exp $
  *
  */
 
@@ -66,6 +66,18 @@ int CharAnimations::GetAnimType() const
 	if (AvatarsRowNum==~0u) return -1;
 	return AvatarTable[AvatarsRowNum].AnimationType;
 }
+int CharAnimations::GetPartCount() const
+{
+	if (AvatarsRowNum==~0u) return -1;
+	switch (AvatarTable[AvatarsRowNum].AnimationType) {
+	case IE_ANI_NINE_FRAMES: //dragon animations
+		return 9;
+	case IE_ANI_FOUR_FRAMES: //wyvern animations
+		return 4;
+	default:
+		return 1;
+	}
+}
 
 void CharAnimations::SetArmourLevel(int ArmourLevel)
 {
@@ -77,10 +89,13 @@ void CharAnimations::SetArmourLevel(int ArmourLevel)
 void CharAnimations::SetColors(ieDword *arg)
 {
 	Colors = arg;
+	int partCount = GetPartCount();
 	for (int StanceID = 0; StanceID < MAX_ANIMS; StanceID++) {
 		for (int Orient = 0; Orient < MAX_ORIENT; Orient++) {
 			if (Anims[StanceID][Orient]) {
-				SetupColors(Anims[StanceID][Orient]);
+				for (int Part = 0; Part < partCount; Part++) {
+					SetupColors(Anims[StanceID][Orient][Part]);
+				}
 			}
 		}
 	}
@@ -232,17 +247,21 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 //freeing the bitmaps only once, but using an intelligent algorithm
 CharAnimations::~CharAnimations(void)
 {
-	void *tmppoi;
-
+	Animation** tmppoi;
+	int partCount = GetPartCount();
 	for (int StanceID = 0; StanceID < MAX_ANIMS; StanceID++) {
 		for (int i = 0; i < MAX_ORIENT; i++) {
 			if (Anims[StanceID][i]) {
 				tmppoi = Anims[StanceID][i];
-				delete( Anims[StanceID][i] );
+				for (int j = 0; j < partCount; j++)
+					delete Anims[StanceID][i][j];
+				delete[] tmppoi;
+
+				// anims can only be duplicated at the Animation** level
 				for (int IDb=StanceID;IDb < MAX_ANIMS; IDb++) {
-					for (int j = i; j<MAX_ORIENT; j++) {
-						if (Anims[IDb][j]==tmppoi) {
-							Anims[IDb][j]=NULL;
+					for (int i2 = 0; i2<MAX_ORIENT; i2++) {
+						if (Anims[IDb][i2] == tmppoi) {
+							Anims[IDb][i2] = 0;
 						}
 					}
 				}
@@ -358,7 +377,8 @@ WSW 003      |      013 ESE
 
 */
 
-Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Orient)
+Animation** CharAnimations::GetAnimation(unsigned char StanceID,
+										 unsigned char Orient)
 {
 	if (StanceID>=MAX_ANIMS) {
 		printf("Illegal stance ID\n");
@@ -434,89 +454,118 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 			printf ("Invalid Stance: %d\n", StanceID);
 			break;
 	}
-	Animation *a = Anims[StanceID][Orient];
+	Animation** anims = Anims[StanceID][Orient];
 
-	if (a) {
-		return a;
-	}
-	//newresref is based on the prefix (ResRef) and various other things
-	char NewResRef[12]; //this is longer than expected so it won't overflow
-	strncpy( NewResRef, ResRef, 8 ); //we need this long for special anims
-	unsigned char Cycle;
-	GetAnimResRef( StanceID, Orient, NewResRef, Cycle );
-	NewResRef[8]=0; //cutting right to size
-
- 	AnimationFactory* af = ( AnimationFactory* )
-		core->GetResourceMgr()->GetFactoryResource( NewResRef, IE_BAM_CLASS_ID, IE_NORMAL );
-
-	if (!af) {
-		return NULL;
+	if (anims) {
+		return anims;
 	}
 
-	a = af->GetCycle( Cycle );
+	int partCount = GetPartCount();
+	if (partCount < 0) return 0;
+	anims = new Animation*[partCount];
 
-	if (!a) {
-		return NULL;
-	}
+	for (int part = 0; part < partCount; ++part)
+	{
+		//newresref is based on the prefix (ResRef) and various other things
+		char NewResRef[12]; //this is longer than expected so it won't overflow
+		strncpy( NewResRef, ResRef, 8 ); //we need this long for special anims
+		unsigned char Cycle;
+		GetAnimResRef( StanceID, Orient, NewResRef, Cycle, part+1 );
+		NewResRef[8]=0; //cutting right to size
+
+		AnimationFactory* af = ( AnimationFactory* )
+			core->GetResourceMgr()->GetFactoryResource( NewResRef,
+														IE_BAM_CLASS_ID,
+														IE_NORMAL );
+
+		if (!af) {
+			char warnbuf[200];
+			snprintf(warnbuf, 200, "Couldn't create animationfactory: %s\n",
+					 NewResRef);
+			printMessage("CharAnimations",warnbuf,LIGHT_RED);
+			for (int i = 0; i < part; ++i)
+				delete anims[i];
+			delete[] anims;
+			return 0;
+		}
+
+		Animation* a = af->GetCycle( Cycle );
+		anims[part] = a;
+
+		if (!a) {
+			char warnbuf[200];
+			snprintf(warnbuf, 200, "Couldn't load animation: %s, cycle %d\n",
+					 NewResRef, Cycle);
+			printMessage("CharAnimations",warnbuf,LIGHT_RED);
+			for (int i = 0; i < part; ++i)
+				delete anims[i];
+			delete[] anims;
+			return 0;
+		}
 	
-	//animation is affected by game flags
-	a->gameAnimation = true;
-	a->SetPos( 0 );
-	SetupColors( a );
+		//animation is affected by game flags
+		a->gameAnimation = true;
+		a->SetPos( 0 );
+		SetupColors( a );
 
-	//setting up the sequencing of animation cycles
-	autoSwitchOnEnd = false;
-	switch (StanceID) {
-		case IE_ANI_SLEEP:
-		case IE_ANI_DIE:
-		case IE_ANI_TWITCH:
-			a->Flags |= A_ANI_PLAYONCE;
-			break;
-		case IE_ANI_EMERGE:
-		case IE_ANI_GET_UP:
-			a->playReversed = true;
-			a->Flags |= A_ANI_PLAYONCE;
-			break;
+		//setting up the sequencing of animation cycles
+		autoSwitchOnEnd = false;
+		switch (StanceID) {
+			case IE_ANI_SLEEP:
+			case IE_ANI_DIE:
+			case IE_ANI_TWITCH:
+				a->Flags |= A_ANI_PLAYONCE;
+				break;
+			case IE_ANI_EMERGE:
+			case IE_ANI_GET_UP:
+				a->playReversed = true;
+				a->Flags |= A_ANI_PLAYONCE;
+				break;
+		}
+		switch (GetAnimType()) {
+			case IE_ANI_NINE_FRAMES: //dragon animations
+			case IE_ANI_FOUR_FRAMES: //wyvern animations
+			case IE_ANI_BIRD:
+			case IE_ANI_CODE_MIRROR:
+			case IE_ANI_CODE_MIRROR_2: //9 orientations
+			case IE_ANI_PST_ANIMATION_3:  //no stc just std
+			case IE_ANI_PST_ANIMATION_2:  //no std just stc
+			case IE_ANI_PST_ANIMATION_1:
+				if (Orient > 8) {
+					a->MirrorAnimation( );
+				}
+				break;
+			default:
+				break;
+		}
+
+		// make animarea of part 0 encompass the animarea of the other parts
+		if (part > 0)
+			anims[0]->AddAnimArea(a);
+
 	}
+
 	switch (GetAnimType()) {
 		case IE_ANI_NINE_FRAMES: //dragon animations
-			if (Orient > 8) {
-				a->MirrorAnimation( );
-			}
-			Anims[StanceID][Orient] = a;
+			Anims[StanceID][Orient] = anims;
 			break;
 		case IE_ANI_FOUR_FRAMES: //wyvern animations
-			if (Orient > 8) {
-				a->MirrorAnimation( );
-			}
-			Anims[StanceID][Orient] = a;
+			Anims[StanceID][Orient] = anims;
 			break;
-		case IE_ANI_CODE_MIRROR_3: //bird animations
-			if (Orient > 8) {
-				a->MirrorAnimation( );
-			}
-			Anims[StanceID][Orient] = a;
+		case IE_ANI_BIRD:
+			Anims[StanceID][Orient] = anims;
 			break;
-
 		case IE_ANI_CODE_MIRROR:
-			if (Orient > 8) {
-				a->MirrorAnimation( );
-			}
-			Anims[StanceID][Orient] = a;
+			Anims[StanceID][Orient] = anims;
 			break;
-
+			
 		case IE_ANI_SIX_FILES: //16 anims some are stored elsewhere
 		case IE_ANI_ONE_FILE: //16 orientations
-			Anims[StanceID][Orient] = a;
+			Anims[StanceID][Orient] = anims;
 			break;
-
 		case IE_ANI_CODE_MIRROR_2: //9 orientations
-			if (Orient > 8) {
-				a->MirrorAnimation( );
-			}
-			Anims[StanceID][Orient] = a;
+			Anims[StanceID][Orient] = anims;
 			break;
-
 		case IE_ANI_TWO_FILES:
 		case IE_ANI_TWENTYTWO:
 		case IE_ANI_TWO_FILES_2:
@@ -524,26 +573,23 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 		case IE_ANI_FOUR_FILES:
 		case IE_ANI_SIX_FILES_2:
 			Orient&=~1;
-			Anims[StanceID][Orient] = a;
-			Anims[StanceID][Orient + 1] = a;
+			Anims[StanceID][Orient] = anims;
+			Anims[StanceID][Orient + 1] = anims;
 			break;
 
 		case IE_ANI_PST_ANIMATION_3:  //no stc just std
 		case IE_ANI_PST_ANIMATION_2:  //no std just stc
 		case IE_ANI_PST_ANIMATION_1:
-			if (Orient > 8) {
-				a->MirrorAnimation( );
-			}
 			switch (StanceID) {
 				case IE_ANI_WALK:
 				case IE_ANI_RUN:
 				case IE_ANI_PST_START:
-					Anims[StanceID][Orient] = a;
+					Anims[StanceID][Orient] = anims;
 					break;
 				default:
 					Orient &=~1;
-					Anims[StanceID][Orient] = a;
-					Anims[StanceID][Orient + 1] = a;
+					Anims[StanceID][Orient] = anims;
+					Anims[StanceID][Orient + 1] = anims;
 					break;
 			}
 			break;
@@ -551,37 +597,40 @@ Animation* CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Or
 		case IE_ANI_PST_STAND:
 		case IE_ANI_PST_GHOST:
 			Orient &=~1;
-			Anims[StanceID][Orient] = a;
-			Anims[StanceID][Orient+1] = a;
+			Anims[StanceID][Orient] = anims;
+			Anims[StanceID][Orient+1] = anims;
 			break;
 		default:
 			printMessage("CharAnimations","Unknown animation type\n",LIGHT_RED);
 			abort();
 	}
+
 	return Anims[StanceID][Orient];
 }
 
-void CharAnimations::GetAnimResRef(unsigned char StanceID, unsigned char Orient,
-	char* ResRef, unsigned char& Cycle)
+void CharAnimations::GetAnimResRef(unsigned char StanceID,
+								   unsigned char Orient,
+								   char* ResRef, unsigned char& Cycle,
+								   int Part)
 {
 	char tmp[256];
 
 	Orient &= 15;
 	switch (GetAnimType()) {
 		case IE_ANI_FOUR_FRAMES:
-			AddFFSuffix( ResRef, StanceID, Cycle, Orient );
+			AddFFSuffix( ResRef, StanceID, Cycle, Orient, Part );
 			break;
 
 		case IE_ANI_NINE_FRAMES:
-			AddNFSuffix( ResRef, StanceID, Cycle, Orient );
+			AddNFSuffix( ResRef, StanceID, Cycle, Orient, Part );
 			break;
 
 		case IE_ANI_CODE_MIRROR:
 			AddVHRSuffix( ResRef, StanceID, Cycle, Orient );
 			break;
 
-		case IE_ANI_CODE_MIRROR_3:
-			Cycle = StanceID * 9 + SixteenToNine[Orient];
+		case IE_ANI_BIRD:
+			Cycle = (StanceID&1) * 9 + SixteenToNine[Orient];
 			break;
 
 		case IE_ANI_ONE_FILE:
@@ -776,26 +825,29 @@ static char *StancePrefix[]={"3","2","5","5","4","4","2","2","5","4","1","3","3"
 static char *CyclePrefix[]= {"0","0","1","1","1","1","0","0","1","1","1","1","1","1","1","1","1","1","1"};
 static int CycleOffset[] = {0,  0,  0,  0,  0,  9,  0,  0,  0, 18,  0,  0,  9,  18,  0,  0,  0,  0,  0};
 
-//returning only the 3rd frame (no multiple frames support yet)
+
+// Note: broken
 void CharAnimations::AddFFSuffix(char* ResRef, unsigned char StanceID,
-	unsigned char& Cycle, unsigned char Orient)
+	unsigned char& Cycle, unsigned char Orient, int Part)
 {
 	char prefix[10];
 
 	Cycle = SixteenToNine[Orient];
-	snprintf(prefix, 9, "%s%s3%s%d",ResRef, StancePrefix[StanceID],CyclePrefix[StanceID],Cycle);
+	snprintf(prefix, 9, "%s%s%d%s%d", ResRef, StancePrefix[StanceID], Part,
+			 CyclePrefix[StanceID], Cycle);
 	strnlwrcpy(ResRef,prefix,8);
 	Cycle+=CycleOffset[StanceID];
 }
 
-//returning only the 5th frame (no multiple frames support yet)
+
 void CharAnimations::AddNFSuffix(char* ResRef, unsigned char StanceID,
-	unsigned char& Cycle, unsigned char Orient)
+	unsigned char& Cycle, unsigned char Orient, int Part)
 {
 	char prefix[10];
 
 	Cycle = SixteenToNine[Orient];
-	snprintf(prefix, 9, "%s%s5%s%d",ResRef, StancePrefix[StanceID],CyclePrefix[StanceID],Cycle);
+	snprintf(prefix, 9, "%s%s%d%s%d", ResRef, StancePrefix[StanceID], Part,
+			 CyclePrefix[StanceID], Cycle);
 	strnlwrcpy(ResRef,prefix,8);
 	Cycle+=CycleOffset[StanceID];
 }

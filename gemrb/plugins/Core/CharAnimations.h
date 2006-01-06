@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.37 2006/01/02 10:14:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.38 2006/01/06 18:06:25 wjpalenstijn Exp $
  *
  */
 
@@ -79,7 +79,7 @@
 #define IE_ANI_CODE_MIRROR_2		4
 #define IE_ANI_SIX_FILES_2		5    //MOGR
 #define IE_ANI_TWENTYTWO		6
-#define IE_ANI_CODE_MIRROR_3		7
+#define IE_ANI_BIRD				7
 #define IE_ANI_SIX_FILES		8    //MCAR/MWYV
 #define IE_ANI_TWO_FILES_3		9    //iwd animations
 #define IE_ANI_TWO_FILES_2		10   //low res bg1 anim
@@ -117,7 +117,7 @@ typedef struct AvatarStruct {
 
 class GEM_EXPORT CharAnimations {
 private:
-	Animation* Anims[MAX_ANIMS][MAX_ORIENT];
+	Animation** Anims[MAX_ANIMS][MAX_ORIENT];
 public:
 	ieDword *Colors;  //these are the custom color indices
 	unsigned int AvatarsRowNum;
@@ -129,26 +129,29 @@ public:
 	CharAnimations(unsigned int AnimID, ieDword ArmourLevel);
 	~CharAnimations(void);
 	static void ReleaseMemory();
-
-	Animation* GetAnimation(unsigned char Stance, unsigned char Orient);
 	void SetArmourLevel(int ArmourLevel);
 	void SetupColors(Animation *anim);
 	void SetColors(ieDword *Colors);
+
+	// returns an array of animations of size GetPartCount()
+	Animation** GetAnimation(unsigned char Stance, unsigned char Orient);
+
 public: //attribute functions
 	static int GetAvatarsCount();
 	static AvatarStruct *GetAvatarStruct(int RowNum);
 	int GetCircleSize() const;
 	int NoPalette() const;
 	int GetAnimType() const;
+	int GetPartCount() const;
 
 private:
 	void InitAvatarsTable();
 	void AddPSTSuffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void AddFFSuffix(char* ResRef, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient);
+		unsigned char& Cycle, unsigned char Orient, int Part);
 	void AddNFSuffix(char* ResRef, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient);
+		unsigned char& Cycle, unsigned char Orient, int Part);
 	void AddVHR2Suffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void AddVHRSuffix(char* ResRef, unsigned char AnimID,
@@ -168,7 +171,7 @@ private:
 	void AddLR3Suffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void GetAnimResRef(unsigned char AnimID, unsigned char Orient,
-		char* ResRef, unsigned char& Cycle);
+		char* ResRef, unsigned char& Cycle, int Part);
 };
 
 #endif

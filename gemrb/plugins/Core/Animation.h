@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.23 2005/11/27 20:45:33 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.24 2006/01/06 18:06:25 wjpalenstijn Exp $
  *
  */
 
@@ -61,6 +61,7 @@ public:
 	~Animation(void);
 	void AddFrame(Sprite2D* frame, unsigned int index);
 	Sprite2D* NextFrame(void);
+	Sprite2D* GetSyncedNextFrame(Animation* master);
 	void release(void);
 	/** Gets the i-th frame */
 	Sprite2D* GetFrame(unsigned int i);
@@ -78,6 +79,8 @@ public:
 	unsigned int GetFrameCount() { return indicesCount; }
 	/** returns the current frame's index */
 	int GetCurrentFrame();
+	/** add other animation's animarea to self */
+	void AddAnimArea(Animation* slave);
 };
 
 #endif

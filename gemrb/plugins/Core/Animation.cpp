@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.38 2005/11/27 20:45:32 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.39 2006/01/06 18:06:25 wjpalenstijn Exp $
  *
  */
 
@@ -132,16 +132,14 @@ Sprite2D* Animation::NextFrame(void)
 		}
 	}
 	Sprite2D* ret;
-	if (playReversed) {
+	if (playReversed)
 		ret = frames[indicesCount-pos-1];
-	}
-	else {
+	else
 		ret = frames[pos];
-	}
 
-	if (endReached && (Flags&A_ANI_PLAYONCE) ) {
+	if (endReached && (Flags&A_ANI_PLAYONCE) )
 		return ret;
-	}
+
 	unsigned long time;
 	if (gameAnimation) {
 		time = core->GetGame()->Ticks;
@@ -155,7 +153,7 @@ Sprite2D* Animation::NextFrame(void)
 		int inc = (time-starttime)*fps/1000;
 		pos += inc;
 		starttime += inc*1000/fps;
-	}	
+	}
 	if (pos >= indicesCount ) {
 		if (indicesCount) {
 			if (Flags&A_ANI_PLAYONCE) {
@@ -169,6 +167,25 @@ Sprite2D* Animation::NextFrame(void)
 		endReached = true;
 		starttime = 0;
 	}
+	return ret;
+}
+
+Sprite2D* Animation::GetSyncedNextFrame(Animation* master)
+{
+	if (!Flags&A_ANI_ACTIVE) {
+		printf("Frame fetched while animation is inactive!\n");
+		return NULL;
+	}
+	Sprite2D* ret;
+	if (playReversed)
+		ret = frames[indicesCount-pos-1];
+	else
+		ret = frames[pos];
+
+	starttime = master->starttime;
+	pos = master->pos;
+	endReached = master->endReached;
+
 	return ret;
 }
 
@@ -231,5 +248,27 @@ void Animation::BlendAnimation()
 
 	for (size_t i = 0; i < indicesCount; i++) {
 		video->CalculateAlpha(frames[i]);
+	}
+}
+
+void Animation::AddAnimArea(Animation* slave)
+{
+	int x = slave->animArea.x;
+	int y = slave->animArea.y;
+	int w = slave->animArea.w;
+	int h = slave->animArea.h;
+	if (x < animArea.x) {
+		animArea.w += (animArea.x - x);
+		animArea.x = x;
+	}
+	if (y < animArea.y) {
+		animArea.h += (animArea.y - y);
+		animArea.y = y;
+	}
+	if (x+w > animArea.x+animArea.w) {
+		animArea.w = x+w-animArea.x;
+	}
+	if (y+h > animArea.y+animArea.h) {
+		animArea.h = y+h-animArea.y;
 	}
 }

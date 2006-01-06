@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.155 2006/01/05 17:29:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.156 2006/01/06 18:06:25 wjpalenstijn Exp $
  *
  */
 
@@ -227,9 +227,9 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	anims = new CharAnimations( AnimID, BaseStats[IE_ARMOR_TYPE]);
 	if (anims) {
 		//bird animations are not hindered by searchmap
-		//only animtype==7 (mirror3) uses this feature
+		//only animtype==7 (bird) uses this feature
 		//this is a hardcoded hack, but works for all engine type
-		if (anims->GetAnimType()!=IE_ANI_CODE_MIRROR_3) {
+		if (anims->GetAnimType()!=IE_ANI_BIRD) {
 			BaseStats[IE_DONOTJUMP]=0;
 		} else {
 			BaseStats[IE_DONOTJUMP]=3;
@@ -1202,45 +1202,66 @@ void Actor::Draw(Region &screen)
 	}
 	
 	unsigned char StanceID = GetStance();
-	Animation* anim = ca->GetAnimation( StanceID, GetNextFace() );
-	if (anim) {
-		Sprite2D* nextFrame = anim->NextFrame();
-		if (nextFrame) {
-			if (lastFrame != nextFrame) {
-				Region newBBox;
-				newBBox.x = cx - nextFrame->XPos;
-				newBBox.w = nextFrame->Width;
-				newBBox.y = cy - nextFrame->YPos;
-				newBBox.h = nextFrame->Height;
-				lastFrame = nextFrame;
-				SetBBox( newBBox );
+	Animation** anims = ca->GetAnimation( StanceID, GetNextFace() );
+	if (anims) {
+		int PartCount = ca->GetPartCount();
+		Animation* masteranim = anims[0];
+		for (int part = 0; part < PartCount; ++part) {
+			Animation* anim = anims[part];
+			Sprite2D* nextFrame;
+			if (part == 0) {
+				nextFrame = anim->NextFrame();
+				if (nextFrame && lastFrame != nextFrame) {
+					Region newBBox;
+					if (PartCount == 1) {
+						newBBox.x = cx - nextFrame->XPos;
+						newBBox.w = nextFrame->Width;
+						newBBox.y = cy - nextFrame->YPos;
+						newBBox.h = nextFrame->Height;
+					} else {
+						// FIXME: currently using the animarea instead
+						// of the real bounding box of this frame.
+						// Shouldn't matter much, though. (wjp)
+						newBBox.x = cx + masteranim->animArea.x;
+						newBBox.y = cy + masteranim->animArea.y;
+						newBBox.w = masteranim->animArea.w;
+						newBBox.h = masteranim->animArea.h;
+					}
+					lastFrame = nextFrame;
+					SetBBox( newBBox );
+				}
+			} else {
+				nextFrame = anim->GetSyncedNextFrame(masteranim);
 			}
-			if (BBox.InsideRegion( vp )) {
+			if (nextFrame && BBox.InsideRegion( vp ) ) {
 				Color tint = area->LightMap->GetPixel( cx / 16, cy / 12);
 				tint.a = 255-Trans;
+
 				SpriteCover* sc = GetSpriteCover();
 				if (!sc || !sc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height)) {
 					delete sc;
-					sc = area->BuildSpriteCover(cx, cy, -anim->animArea.x, -anim->animArea.y, anim->animArea.w, anim->animArea.h, WantDither() );
+					// the masteranim contains the animarea for
+					// the entire multi-part animation
+					sc = area->BuildSpriteCover(cx, cy, -masteranim->animArea.x, -masteranim->animArea.y, masteranim->animArea.w, masteranim->animArea.h, WantDither() );
 					SetSpriteCover(sc);
-					
+
 				}
 				assert(sc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height));
-				
+
 				if (TranslucentShadows) {
 					video->BlitSpriteTransShadow( nextFrame, cx + screen.x, cy + screen.y, tint, sc, anim->Palette, &screen );
 				} else {
 					video->BlitSpriteCovered( nextFrame, cx + screen.x, cy + screen.y, tint, sc, anim->Palette, &screen );
 				}
 			}
-			if (anim->endReached) {
-				if (HandleActorStance() ) {
-					anim->endReached = false;
-				}
+		}
+		if (masteranim->endReached) {
+			if (HandleActorStance() ) {
+				masteranim->endReached = false;
 			}
 		}
 	}
-	
+		
 	//text feedback
 	DrawOverheadText(screen);
 }
