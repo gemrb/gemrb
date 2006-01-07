@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.123 2006/01/03 22:02:42 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.124 2006/01/07 14:37:37 wjpalenstijn Exp $
  *
  */
 
@@ -47,6 +47,8 @@ SDLVideoDriver::SDLVideoDriver(void)
 	Cursor[0] = NULL;
 	Cursor[1] = NULL;
 	Cursor[2] = NULL;
+	CursorPos.x = 0;
+	CursorPos.y = 0;
 	moveX = 0;
 	moveY = 0;
 	DisableMouse = false;
