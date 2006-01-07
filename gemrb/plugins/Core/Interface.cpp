@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.382 2006/01/06 23:09:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.383 2006/01/07 14:28:17 wjpalenstijn Exp $
  *
  */
 
@@ -122,6 +122,7 @@ Interface::Interface(int iargc, char** iargv)
 	CurrentStore = NULL;
 	CurrentContainer = NULL;
 	UseContainer = false;
+	InfoTextPalette = NULL;
 	timer = NULL;
 	evntmgr = NULL;
 	console = NULL;
