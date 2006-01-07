@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.108 2006/01/05 14:14:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.109 2006/01/07 15:04:40 wjpalenstijn Exp $
  *
  */
 
@@ -35,6 +35,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 {
 	protagonist = PM_YES; //set it to 2 for iwd/iwd2 and 0 for pst
 	partysize = 6;
+	Ticks = 0;
 	version = 0;
 	LoadMos[0] = 0;
 	SelectedSingle = 1; //the PC we are looking at (inventory, shop)
