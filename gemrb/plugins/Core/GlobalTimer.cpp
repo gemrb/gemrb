@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GlobalTimer.cpp,v 1.26 2005/11/24 17:44:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GlobalTimer.cpp,v 1.27 2006/01/07 18:34:33 avenger_teambg Exp $
  *
  */
 
@@ -37,7 +37,7 @@ GlobalTimer::GlobalTimer(void)
 GlobalTimer::~GlobalTimer(void)
 {
 	std::vector<AnimationRef *>::iterator i;
-        for(i = animations.begin(); i != animations.end(); ++i) {
+	for(i = animations.begin(); i != animations.end(); ++i) {
 		delete (*i);
 	}
 }
@@ -45,11 +45,12 @@ GlobalTimer::~GlobalTimer(void)
 void GlobalTimer::Init()
 {
 	fadeToCounter = 0;
-	fadeFromCounter = 1;
+	fadeFromCounter = 0;
 	fadeFromMax = 0;
+	fadeToMax = 0;
 	waitCounter = 0;
 	shakeCounter = 0;
-	startTime = 0;  //forcing an update
+	startTime = 0; //forcing an update
 	ClearAnimations();
 }
 
@@ -92,13 +93,20 @@ void GlobalTimer::Update()
 		if (fadeToCounter) {
 			core->GetVideoDriver()->SetFadePercent( ( ( fadeToMax - fadeToCounter ) * 100 ) / fadeToMax );
 			fadeToCounter--;
-			return;
+			goto do_the_rest;
 		}
-		if (fadeFromCounter != ( fadeFromMax + 1 )) {
-			core->GetVideoDriver()->SetFadePercent( ( ( fadeFromMax - fadeFromCounter ) * 100 ) / fadeFromMax );
-			fadeFromCounter++;
-			return;
+		if (fadeFromCounter!=fadeFromMax) {
+			if (fadeFromCounter>fadeFromMax) {
+				fadeFromCounter--;
+			} else {
+				core->GetVideoDriver()->SetFadePercent( ( ( fadeFromMax - fadeFromCounter ) * 100 ) / fadeFromMax );
+				fadeFromCounter++;
+			}
+			if (fadeFromCounter==fadeFromMax) {
+				core->GetVideoDriver()->SetFadePercent( 0 );
+			}
 		}
+do_the_rest:
 		GameControl* gc = core->GetGameControl();
 		if (!gc) {
 			return;
@@ -126,20 +134,23 @@ void GlobalTimer::Update()
 
 void GlobalTimer::SetFadeToColor(unsigned long Count)
 {
+	if(!Count) {
+		Count = 100;
+	}
 	fadeToCounter = Count;
 	fadeToMax = fadeToCounter;
-	if (fadeToMax == 0) {
-		core->GetVideoDriver()->SetFadePercent( 100 );
-	}
+	//stay black for a while
+	fadeFromCounter = 100;
+	fadeFromMax = 0;
 }
 
 void GlobalTimer::SetFadeFromColor(unsigned long Count)
 {
-	fadeFromCounter = 1;
-	fadeFromMax = Count;
-	if (fadeFromMax == 0) {
-		core->GetVideoDriver()->SetFadePercent( 0 );
+	if(!Count) {
+		Count = 100;
 	}
+	fadeFromCounter = 0;
+	fadeFromMax = Count;
 }
 
 void GlobalTimer::SetWait(unsigned long Count)
@@ -156,7 +167,7 @@ void GlobalTimer::AddAnimation(ControlAnimation* ctlanim, unsigned long time)
 	time += thisTime;
 
 	// if there are no free animation reference objects,
-	//   alloc one, else take the first free one
+	// alloc one, else take the first free one
 	if (first_animation == 0)
 		anim = new AnimationRef;
 	else {
@@ -185,8 +196,8 @@ void GlobalTimer::AddAnimation(ControlAnimation* ctlanim, unsigned long time)
 void GlobalTimer::RemoveAnimation(ControlAnimation* ctlanim)
 {
 	// Animation refs for given control are not physically removed, 
-	//   but just marked by erasing ptr to the control. They will be
-	//   collected when they get to the front of the vector
+	// but just marked by erasing ptr to the control. They will be
+	// collected when they get to the front of the vector
 	for (std::vector<AnimationRef*>::iterator it = animations.begin() + first_animation; it != animations.end (); it++) {
 		if ((*it)->ctlanim == ctlanim) {
 			(*it)->ctlanim = NULL;

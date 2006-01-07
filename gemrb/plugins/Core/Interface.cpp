@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.383 2006/01/07 14:28:17 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.384 2006/01/07 18:34:33 avenger_teambg Exp $
  *
  */
 
@@ -1444,7 +1444,8 @@ bool Interface::LoadConfig(const char* filename)
 	}
 	char name[65], value[_MAX_PATH + 3];
 
-	SaveAsOriginal = 0;
+	//one GemRB own format is working well, this might be set to 0
+	SaveAsOriginal = 1;
 
 	while (!feof( config )) {
 		char rem;
