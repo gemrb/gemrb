@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.351 2006/01/06 23:09:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.352 2006/01/07 22:47:41 avenger_teambg Exp $
  *
  */
 
@@ -1334,7 +1334,8 @@ static Object* DecodeObject(const char* line)
 	for (i = 0; i < MaxObjectNesting; i++) {
 		oB->objectFilters[i] = ParseInt( line );
 	}
-	if (HasAdditionalRect) {
+	//iwd tolerates the missing rectangle, so we do so too
+	if (HasAdditionalRect && (*line=='[') ) {
 		line++; //Skip [
 		for (i = 0; i < 4; i++) {
 			oB->objectRect[i] = ParseInt( line );
