@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.124 2006/01/07 14:37:37 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.125 2006/01/07 22:50:31 avenger_teambg Exp $
  *
  */
 
@@ -228,13 +228,17 @@ int SDLVideoDriver::SwapBuffers(void)
 			break;
 
 		case SDL_KEYUP:
-			key = (unsigned char) event.key.keysym.sym;
 			switch(event.key.keysym.sym) {
 				case SDLK_LALT:
 				case SDLK_RALT:
 					key = GEM_ALT;
 					break;
                                 default:
+					if (event.key.keysym.sym>=256) {
+						key=0;
+					} else {
+						key=(unsigned char) event.key.keysym.sym;
+					}
                                         break;
 			}
 			if (!ConsolePopped && Evnt && ( key != 0 ))
