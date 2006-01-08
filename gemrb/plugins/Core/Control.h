@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.35 2006/01/03 17:16:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.36 2006/01/08 12:28:55 avenger_teambg Exp $
  *
  */
 
@@ -45,6 +45,9 @@
 #define IE_GUI_INVALID          255
 
 #define IE_GUI_CONTROL_FOCUSED  0x80
+
+//this is in the control ID
+#define IGNORE_CONTROL 0x10000000
 
 #include "../../includes/ie_types.h"
 #include "../../includes/win32def.h"

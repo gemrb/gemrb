@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.24 2005/11/25 23:22:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.25 2006/01/08 12:28:55 avenger_teambg Exp $
  *
  */
 
@@ -113,7 +113,7 @@ public:
 	/** Set window frame used to fill screen on higher resolutions*/
 	void SetFrame();
 	/** Returns the Control at X,Y Coordinates */
-	Control* GetControl(unsigned short x, unsigned short y);
+	Control* GetControl(unsigned short x, unsigned short y, bool ignore=0);
 	/** Returns the Control by Index */
 	Control* GetControl(unsigned short i);
 	/** Returns true if ctrl is valid and ctrl->ControlID is ID */

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.41 2005/12/21 22:58:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.42 2006/01/08 12:28:55 avenger_teambg Exp $
  *
  */
 
@@ -139,7 +139,10 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 				( ( *m )->YPos + ( *m )->Height >= y )) {
 				//Yes, we are on the Window
 				//Let's check if we have a Control under the Mouse Pointer
-				Control* ctrl = ( *m )->GetControl( x, y );
+				Control* ctrl = ( *m )->GetControl( x, y, true );
+				if (!ctrl) {
+					ctrl = ( *m )->GetControl( x, y, false);
+				}
 				if (ctrl != last_ctrl_over) {
 					if (last_ctrl_over)
 						last_ctrl_over->OnMouseLeave( x - lastW->XPos - last_ctrl_over->XPos, y - lastW->YPos - last_ctrl_over->YPos );
@@ -178,7 +181,10 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y,
 				( ( *m )->YPos + ( *m )->Height >= y )) {
 				//Yes, we are on the Window
 				//Let's check if we have a Control under the Mouse Pointer
-				Control* ctrl = ( *m )->GetControl( x, y );
+				Control* ctrl = ( *m )->GetControl( x, y, true );
+				if (!ctrl) {
+					ctrl = ( *m )->GetControl( x, y, false);
+				}
 				//printf( "dn: ctrl: %p\n", ctrl );
 				if (lastW == NULL)
 					lastW = ( *m );

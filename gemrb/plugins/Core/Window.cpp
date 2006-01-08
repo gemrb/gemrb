@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.47 2005/11/25 23:22:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.48 2006/01/08 12:28:55 avenger_teambg Exp $
  *
  */
 
@@ -138,7 +138,7 @@ void Window::SetFrame()
 }
 
 /** Returns the Control at X,Y Coordinates */
-Control* Window::GetControl(unsigned short x, unsigned short y)
+Control* Window::GetControl(unsigned short x, unsigned short y, bool ignore)
 {
 	Control* ctrl = NULL;
 
@@ -155,6 +155,9 @@ Control* Window::GetControl(unsigned short x, unsigned short y)
 	}
 	std::vector< Control*>::iterator m;
 	for (m = Controls.begin(); m != Controls.end(); m++) {
+		if (ignore && (*m)->ControlID&IGNORE_CONTROL) {
+			continue;
+		}
 		if (( XPos + ( *m )->XPos <= x ) 
 		    && ( YPos + ( *m )->YPos <= y )
 		    && ( XPos + ( *m )->XPos + ( *m )->Width >= x ) 
