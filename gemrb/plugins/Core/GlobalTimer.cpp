@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GlobalTimer.cpp,v 1.27 2006/01/07 18:34:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GlobalTimer.cpp,v 1.28 2006/01/08 22:07:44 avenger_teambg Exp $
  *
  */
 
@@ -83,30 +83,43 @@ void GlobalTimer::Update()
 		if (shakeCounter) {
 			int x = shakeStartVP.x;
 			int y = shakeStartVP.y;
-			if (shakeCounter != 1) {
+			shakeCounter-=advance/interval;
+			if (shakeCounter<0) {
+				shakeCounter=0;
+			}
+			if (shakeCounter) {
 				x += (rand()%shakeX) - (shakeX>>1);
 				y += (rand()%shakeY) - (shakeY>>1);
 			}
 			core->GetVideoDriver()->MoveViewportTo(x,y,false);
-			shakeCounter--;
 		}
 		if (fadeToCounter) {
+			fadeToCounter-=advance/interval;
+			if (fadeToCounter<0) {
+				fadeToCounter=0;
+			}
 			core->GetVideoDriver()->SetFadePercent( ( ( fadeToMax - fadeToCounter ) * 100 ) / fadeToMax );
-			fadeToCounter--;
-			goto do_the_rest;
+			return; //hmm, freeze gametime
 		}
 		if (fadeFromCounter!=fadeFromMax) {
 			if (fadeFromCounter>fadeFromMax) {
-				fadeFromCounter--;
+				fadeFromCounter-=advance/interval;
+				if (fadeFromCounter<fadeFromMax) {
+					fadeFromCounter=fadeFromMax;
+				}
+				//don't freeze gametime when already dark
 			} else {
+				fadeFromCounter+=advance/interval;
+				if (fadeToCounter>fadeFromMax) {
+					fadeToCounter=fadeFromMax;
+				}
 				core->GetVideoDriver()->SetFadePercent( ( ( fadeFromMax - fadeFromCounter ) * 100 ) / fadeFromMax );
-				fadeFromCounter++;
+				return; //freeze gametime
 			}
 			if (fadeFromCounter==fadeFromMax) {
 				core->GetVideoDriver()->SetFadePercent( 0 );
 			}
 		}
-do_the_rest:
 		GameControl* gc = core->GetGameControl();
 		if (!gc) {
 			return;
@@ -135,19 +148,19 @@ do_the_rest:
 void GlobalTimer::SetFadeToColor(unsigned long Count)
 {
 	if(!Count) {
-		Count = 100;
+		Count = 64;
 	}
 	fadeToCounter = Count;
 	fadeToMax = fadeToCounter;
 	//stay black for a while
-	fadeFromCounter = 100;
+	fadeFromCounter = 128;
 	fadeFromMax = 0;
 }
 
 void GlobalTimer::SetFadeFromColor(unsigned long Count)
 {
 	if(!Count) {
-		Count = 100;
+		Count = 64;
 	}
 	fadeFromCounter = 0;
 	fadeFromMax = Count;

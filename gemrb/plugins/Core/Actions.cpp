@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.59 2006/01/06 23:09:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.60 2006/01/08 22:07:40 avenger_teambg Exp $
  *
  */
 
@@ -2224,7 +2224,8 @@ void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 void GameScript::SetToken(Scriptable* /*Sender*/, Action* parameters)
 {
 	//SetAt takes a newly created reference (no need of free/copy)
-	core->GetTokenDictionary()->SetAt( parameters->string1Parameter, core->GetString( parameters->int0Parameter) );
+	char * str = core->GetString( parameters->int0Parameter);
+	core->GetTokenDictionary()->SetAt( parameters->string1Parameter, str);
 }
 
 void GameScript::SetTokenGlobal(Scriptable* Sender, Action* parameters)
@@ -4210,8 +4211,9 @@ void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 		TableMgr* tab = core->GetTable( SlotTable );
 		type = atoi(tab->QueryField((unsigned int) -1));
 		if (type) {
-			snprintf (FolderName, sizeof(FolderName), "%s - %s", tab->QueryField(0), 
-				core->GetString( parameters->int0Parameter, IE_STR_STRREFOFF) );
+			char * str = core->GetString( parameters->int0Parameter, IE_STR_STRREFOFF);
+			snprintf (FolderName, sizeof(FolderName), "%s - %s", tab->QueryField(0), str);
+			core->FreeString( str );
 			folder = FolderName;
 		} else {
 			folder = tab->QueryField(parameters->int0Parameter);

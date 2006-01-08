@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.47 2006/01/06 23:09:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.48 2006/01/08 22:07:40 avenger_teambg Exp $
  *
  */
 
@@ -263,6 +263,7 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 {
 	StringBlock sb;
 
+	sb.text = NULL;
 	printf( "Displaying string on: %s\n", Sender->GetScriptName() );
 	if ((flags & DS_CONST) && (Sender->Type==ST_ACTOR) ) {
 		Actor* actor = ( Actor* ) Sender;
@@ -274,15 +275,18 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 	}
 	if (Strref != -1) {
 		sb = core->strings->GetStringBlock( Strref );
-		if (flags & DS_HEAD) {
-			Sender->DisplayHeadText( sb.text );
-		}
 		if (flags & DS_CONSOLE) {
 			if(flags&DS_NONAME) {
 				core->DisplayString( sb.text );
 			} else {
 				core->DisplayStringName( Strref,0x8080ff,Sender);
 			}
+		}
+		if (flags & DS_HEAD) {
+			Sender->DisplayHeadText( sb.text );
+			//don't free sb.text, it is residing in Sender
+		} else {
+			core->FreeString( sb.text );
 		}
 	}
 	if (sb.Sound[0] && !(flags&DS_SILENT) ) {

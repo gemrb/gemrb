@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.131 2006/01/06 23:09:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.132 2006/01/08 22:07:40 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -81,7 +81,7 @@ Scriptable::~Scriptable(void)
 		}
 	}
 	if (overHeadText) {
-		free( overHeadText );
+		core->FreeString( overHeadText );
 	}
 	if (locals) {
 		delete( locals );
@@ -149,7 +149,7 @@ void Scriptable::SetScript(int index, GameScript* script)
 void Scriptable::DisplayHeadText(const char* text)
 {
 	if (overHeadText) {
-		free( overHeadText );
+		core->FreeString( overHeadText );
 	}
 	overHeadText = (char *) text;
 	if (text) {

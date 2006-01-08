@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.52 2006/01/08 18:15:47 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.53 2006/01/08 22:07:44 avenger_teambg Exp $
  *
  */
 
@@ -151,6 +151,19 @@ public:
 	virtual void SetClipRect(Region* clip) = 0;
 	/** move the mouse forcibly */
 	virtual void MoveMouse(unsigned int x, unsigned int y) = 0;
+	/** initialize the screen for movie */
+	virtual void InitMovieScreen(int &w, int &h) = 0;
+	/** set the font and color of the movie subtitles */
+	virtual void SetMovieFont(Font *stfont, Color *pal) = 0;
+	/** draw a movie frame */
+	virtual void showFrame(unsigned char* buf, unsigned int bufw,
+		unsigned int bufh, unsigned int sx, unsigned int sy,
+		unsigned int w, unsigned int h, unsigned int dstx,
+		unsigned int dsty, int truecolor, unsigned char *palette) = 0;
+	/** handle events during movie */
+	virtual int PollMovieEvents() = 0;
+	/** draw a subtitle string on bottom of the screen*/
+	virtual void DrawMovieSubtitle(ieDword strRef) = 0;
 public:
 	/** Event Manager Pointer */
 	EventMgr* Evnt;

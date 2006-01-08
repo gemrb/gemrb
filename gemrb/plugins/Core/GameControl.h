@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.83 2006/01/06 23:09:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.84 2006/01/08 22:07:44 avenger_teambg Exp $
  */
 
 /**
@@ -106,8 +106,6 @@ private:
 	//using global ID which is safer
 	ieWord lastActorID;
 	std::vector< Actor*> highlighted;
-	//std::vector< Scriptable*> infoTexts;
-	Color* InfoTextPalette;
 	bool DrawSelectionRect;
 	bool MouseIsDown;
 	Region SelectionRect;

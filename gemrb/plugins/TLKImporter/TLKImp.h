@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.h,v 1.19 2005/11/13 10:18:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.h,v 1.20 2006/01/08 22:07:47 avenger_teambg Exp $
  *
  */
 
@@ -37,6 +37,7 @@ public:
 	bool Open(DataStream* stream, bool autoFree = true);
 	char* GetString(ieStrRef strref, ieDword flags = 0);
 	StringBlock GetStringBlock(ieStrRef strref, unsigned int flags = 0);
+	void FreeString(char *str);
 private:
 	/** resolves day and monthname tokens */
 	void GetMonthName(int dayandmonth);

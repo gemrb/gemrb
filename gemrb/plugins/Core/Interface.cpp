@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.384 2006/01/07 18:34:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.385 2006/01/08 22:07:44 avenger_teambg Exp $
  *
  */
 
@@ -169,6 +169,7 @@ Interface::Interface(int iargc, char** iargv)
 	strncpy( INIConfig, "baldur.ini", sizeof(INIConfig) );
 	strncpy( ButtonFont, "STONESML", sizeof(ButtonFont) );
 	strncpy( TooltipFont, "STONESML", sizeof(TooltipFont) );
+	strncpy( MovieFont, "STONESML", sizeof(MovieFont) );
 	strncpy( CursorBam, "CAROT", sizeof(CursorBam) );
 	strncpy( GlobalScript, "BALDUR", sizeof(GlobalScript) );
 	strncpy( WorldMapName, "WORLDMAP", sizeof(WorldMapName) );
@@ -323,9 +324,6 @@ Interface::~Interface(void)
 	if (key) {
 		FreeInterface( key );
 	}	
-	if (strings) {
-		FreeInterface( strings );
-	}
 	if (pal256) {
 		FreeInterface( pal256 );
 	}
@@ -362,6 +360,9 @@ Interface::~Interface(void)
 			}
 			delete[] TooltipBack;
 		}
+		if (InfoTextPalette) {
+			video->FreePalette(InfoTextPalette);
+		}
 		FreeInterface( video );
 	}
 
@@ -395,6 +396,11 @@ Interface::~Interface(void)
 	Map::ReleaseMemory();
 	GameScript::ReleaseMemory();
 	Actor::ReleaseMemory();
+
+	if (strings) {
+		FreeInterface( strings );
+	}
+
 	if(plugin) {
 		delete( plugin );
 	}
@@ -1310,6 +1316,14 @@ const char* Interface::TypeExt(SClass_ID type)
 	return NULL;
 }
 
+void Interface::FreeString(char *&str)
+{
+	if (str) {
+		strings->FreeString(str);
+	}
+	str = NULL;
+}
+
 char* Interface::GetString(ieStrRef strref, ieDword options)
 {
 	ieDword flags = 0;
@@ -1657,6 +1671,10 @@ bool Interface::LoadGemRBINI()
 	s = ini->GetKeyAsString( "resources", "TooltipFont", NULL );
 	if (s)
 		strcpy( TooltipFont, s );
+
+	s = ini->GetKeyAsString( "resources", "MovieFont", NULL );
+	if (s)
+		strcpy( MovieFont, s );
 
 	s = ini->GetKeyAsString( "resources", "TooltipBack", NULL );
 	if (s)
@@ -2682,7 +2700,7 @@ bool Interface::DelSymbol(unsigned int index)
 	return true;
 }
 /** Plays a Movie */
-int Interface::PlayMovie(char* ResRef)
+int Interface::PlayMovie(const char* ResRef)
 {
 	MoviePlayer* mp = ( MoviePlayer* ) GetInterface( IE_MVE_CLASS_ID );
 	if (!mp) {
@@ -2699,18 +2717,66 @@ int Interface::PlayMovie(char* ResRef)
 	//	delete( str );
 		return -1;
 	}
+
+	ieDword subtitles = 0;
+	Font *SubtitleFont = NULL;
+	Color *palette = NULL;
+	ieDword *frames = NULL;
+	ieDword *strrefs = NULL;
+	int cnt = 0;
+	vars->Lookup("Display Movie Subtitles", subtitles);
+	if (subtitles) {
+		int table = LoadTable(ResRef);
+		TableMgr *sttable = GetTable(table);
+		if (sttable) {
+			cnt = sttable->GetRowCount()-3;
+			if (cnt>0) {
+				frames = (ieDword *) malloc(cnt * sizeof(ieDword) );
+				strrefs = (ieDword *) malloc(cnt * sizeof(ieDword) );
+			} else {
+				cnt = 0;
+			}
+			if (frames && strrefs) {
+				for (int i=0;i<cnt;i++) {
+					frames[i] = atoi (sttable->QueryField(i+3, 0) );
+					strrefs[i] = atoi (sttable->QueryField(i+3, 1) );
+				}
+			}
+			int r = atoi(sttable->QueryField("red", "frame"));
+			int g = atoi(sttable->QueryField("green", "frame"));
+			int b = atoi(sttable->QueryField("blue", "frame"));
+			SubtitleFont = GetFont (MovieFont); //will change
+			DelTable(table);
+			if (SubtitleFont) {
+				Color fore = {r,g,b, 0x00};
+				Color back = {0x00, 0x00, 0x00, 0x00};
+				palette = video->CreatePalette( fore, back );
+			}
+		}
+	}
+
 	//shutting down music and ambients before movie
-	if (music) music->HardEnd();
+	if (music)
+		music->HardEnd();
 	soundmgr->GetAmbientMgr()->deactivate();
+	video->SetMovieFont(SubtitleFont, palette);
+	mp->CallBackAtFrames(cnt, frames, strrefs);
 	mp->Play();
+	FreeInterface( mp );
+	if (palette)
+		video->FreePalette( palette );
+	if (frames)
+		free(frames);
+	if (strrefs)
+		free(strrefs);
 	//restarting music
-	if (music) music->Start();
+	if (music)
+		music->Start();
 	soundmgr->GetAmbientMgr()->activate();
 	//this will fix redraw all windows as they looked like
 	//before the movie
 	RedrawAll();
 
-	FreeInterface( mp );
 	//Setting the movie name to 1
 	vars->SetAt( ResRef, 1 );
 	return 0;
@@ -3173,7 +3239,7 @@ void Interface::DisplayConstantString(int stridx, unsigned int color)
 	int newlen = (int)(strlen( DisplayFormat ) + strlen( text ) + 12);
 	char* newstr = ( char* ) malloc( newlen );
 	snprintf( newstr, newlen, DisplayFormat, color, text );
-	free( text );
+	FreeString( text );
 	DisplayString( newstr );
 	free( newstr );
 }
@@ -3184,7 +3250,7 @@ void Interface::DisplayConstantStringValue(int stridx, unsigned int color, ieDwo
 	int newlen = (int)(strlen( DisplayFormat ) + strlen( text ) + 28);
 	char* newstr = ( char* ) malloc( newlen );
 	snprintf( newstr, newlen, DisplayFormatValue, color, text, (int) value );
-	free( text );
+	FreeString( text );
 	DisplayString( newstr );
 	free( newstr );
 }
@@ -3214,7 +3280,7 @@ void Interface::DisplayConstantStringName(int stridx, unsigned int color, Script
 	char* newstr = ( char* ) malloc( newlen );
 	sprintf( newstr, DisplayFormatName, speaker_color, name, color,
 		text );
-	free( text );
+	FreeString( text );
 	DisplayString( newstr );
 	free( newstr );
 }
@@ -3244,7 +3310,7 @@ void Interface::DisplayStringName(int stridx, unsigned int color, Scriptable *sp
 	char* newstr = ( char* ) malloc( newlen );
 	sprintf( newstr, DisplayFormatName, speaker_color, name, color,
 		text );
-	free( text );
+	FreeString( text );
 	DisplayString( newstr );
 	free( newstr );
 }
@@ -4188,3 +4254,4 @@ void Interface::SetInfoTextColor(Color &color)
 	}
 	InfoTextPalette = video->CreatePalette(color,black);
 }
+

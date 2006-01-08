@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/StringMgr.h,v 1.10 2005/11/17 21:08:32 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/StringMgr.h,v 1.11 2006/01/08 22:07:44 avenger_teambg Exp $
  *
  */
 
@@ -66,6 +66,7 @@ public:
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
 	virtual char* GetString(ieStrRef strref, unsigned int flags = 0) = 0;
 	virtual StringBlock GetStringBlock(ieStrRef strref, unsigned int flags = 0) = 0;
+	virtual void FreeString(char *str) = 0;
 };
 
 #endif  // ! STRINGMGR_H

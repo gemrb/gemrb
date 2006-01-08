@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.22 2006/01/05 14:14:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.23 2006/01/08 22:07:44 avenger_teambg Exp $
  *
  */
 
@@ -28,11 +28,19 @@
 WMPAreaEntry::WMPAreaEntry()
 {
 	MapIcon = NULL;
+	StrCaption = NULL;
+	StrTooltip = NULL;
 }
 
 WMPAreaEntry::~WMPAreaEntry()
 {
-//as long as mapicon comes from a factory, no need to free it
+	if (StrCaption) {
+		core->FreeString(StrCaption);
+	}
+	if (StrTooltip) {
+		core->FreeString(StrTooltip);
+	}
+	//as long as mapicon comes from a factory, no need to free it here
 }
 
 void WMPAreaEntry::SetAreaStatus(ieDword arg, int op)
@@ -46,6 +54,12 @@ void WMPAreaEntry::SetAreaStatus(ieDword arg, int op)
 	}
 	//invalidating MapIcon, no need to free it, it is from a factory
 	MapIcon = NULL;
+	if (!StrCaption) {
+		StrCaption = core->GetString(LocCaptionName);
+	}
+	if (!StrTooltip) {
+		StrTooltip = core->GetString(LocTooltipName);
+	}
 }
 
 Sprite2D *WMPAreaEntry::GetMapIcon(AnimationFactory *bam)

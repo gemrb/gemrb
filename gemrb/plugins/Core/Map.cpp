@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.221 2006/01/06 23:09:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.222 2006/01/08 22:07:44 avenger_teambg Exp $
  *
  */
 
@@ -1199,16 +1199,18 @@ void Map::GenerateQueues()
 		}
 
 		ieDword gametime = core->GetGame()->GameTime;
+		ieDword stance = actor->GetStance();
+		ieDword internalFlag = actor->GetInternalFlag();
 
-		if (actor->GetInternalFlag()&IF_ACTIVE) {
-			if ((actor->GetStance() == IE_ANI_TWITCH) && (actor->GetInternalFlag()&IF_IDLE) ) {
+		if (internalFlag&IF_ACTIVE) {
+			if ((stance == IE_ANI_TWITCH) && (internalFlag&IF_IDLE) ) {
 				priority = 1; //display
 			} else {
 				priority = 0; //run scripts and display
 			}
 		} else {
 			//dead actors are always visible on the map, but run no scripts
-			if (actor->GetStance() == IE_ANI_TWITCH) {
+			if (stance == IE_ANI_TWITCH || stance == IE_ANI_DIE) {
 				priority = 1;
 			} else {
 				//isvisible flag is false (visibilitymap) here,
@@ -1220,7 +1222,6 @@ void Map::GenerateQueues()
 					if (actor->GetStat(IE_EA)>=EA_EVILCUTOFF) {
 						core->Autopause(AP_ENEMY);
 					}
-					//here you can flag for autopause if actor->Modified[IE_EA] is enemy, coz we just revealed it!
 				} else {
 					priority = 2;
 				}
@@ -1965,9 +1966,7 @@ bool Map::Rest(Point &pos, int hours, bool day)
 	for (int i=0;i<hours;i++) {
 		if ( rand()%100<chance ) {
 			int idx = rand()%RestHeader.CreatureNum;
-			char *str=core->GetString( RestHeader.Strref[idx] );
-			core->DisplayString( str );
-			free(str);
+			core->DisplayConstantString( RestHeader.Strref[idx], 0x00404000 );
 			SpawnCreature(pos, RestHeader.CreResRef[idx], 20 );
 			return true;
 		}

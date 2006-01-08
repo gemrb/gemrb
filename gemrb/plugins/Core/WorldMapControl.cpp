@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.24 2006/01/06 00:50:47 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.25 2006/01/08 22:07:44 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -128,10 +128,12 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 		}
 
 		Region r2 = Region( MAP_TO_SCREENX(m->X-xpos), MAP_TO_SCREENY(m->Y-ypos), w, h );
-		if (r2.y+r2.h<r.y) continue;
+		if (r2.y+r2.h<r.y)
+			 continue;
+		if (!m->StrCaption)
+			continue;
 
-		char *text = core->GetString( m->LocCaptionName );
-		int tw = ftext->CalcStringWidth( text ) + 5;
+		int tw = ftext->CalcStringWidth( m->StrCaption ) + 5;
 		int th = ftext->maxHeight;
 		
 		Color* text_pal = pal_normal;
@@ -145,8 +147,7 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 		}
 
 		ftext->Print( Region( r2.x + (r2.w - tw)/2, r2.y + r2.h, tw, th ),
-				( unsigned char * ) text, text_pal, 0, true );
-		free(text);
+				( unsigned char * ) m->StrCaption, text_pal, 0, true );
 	}
 }
 
@@ -222,9 +223,8 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 				h=icon->Height;
 				w=icon->Width;
 			}
-			if (ftext) {
-				char *text = core->GetString( ae->LocCaptionName );
-				int tw = ftext->CalcStringWidth( text ) + 5;
+			if (ftext && ae->StrCaption) {
+				int tw = ftext->CalcStringWidth( ae->StrCaption ) + 5;
 				int th = ftext->maxHeight;
 				if(h<th)
 					h=th;        

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.55 2005/12/21 16:53:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.56 2006/01/08 22:07:47 avenger_teambg Exp $
  *
  */
 
@@ -517,3 +517,9 @@ StringBlock TLKImp::GetStringBlock(ieStrRef strref, unsigned int flags)
 	str->ReadResRef( sb.Sound );
 	return sb;
 }
+
+void TLKImp::FreeString(char *str)
+{
+        free(str);
+}
+

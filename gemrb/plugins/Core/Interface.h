@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.183 2006/01/06 23:09:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.184 2006/01/08 22:07:44 avenger_teambg Exp $
  *
  */
 
@@ -186,6 +186,7 @@ private:
 	ieResRef CursorBam;
 	ieResRef TooltipFont;
 	ieResRef TooltipBackResRef;
+	ieResRef MovieFont;
 	ieResRef *DefSound; //default sounds 
 	int DSCount;
 	Color TooltipColor;
@@ -232,7 +233,10 @@ public:
 	const char * TypeExt(SClass_ID type);
 	Video * GetVideoDriver() const;
 	ResourceMgr * GetResourceMgr() const;
+	/* returns a newly created string */
 	char * GetString(ieStrRef strref, ieDword options = 0);
+	/* makes sure the string is freed in TLKImp */
+	void FreeString(char *&str);
 	void FreeInterface(void * ptr);
 	Factory * GetFactory() const;
 	/* sets the floattext color */
@@ -346,7 +350,7 @@ public:
 	/** Frees a Loaded Symbol Table, returns false on error, true on success */
 	bool DelSymbol(unsigned int index);
 	/** Plays a Movie */
-	int PlayMovie(char * ResRef);
+	int PlayMovie(const char * ResRef);
 	/** Generates traditional random number xdy+z */
 	int Roll(int dice, int size, int add);
 	/** Returns true on successful saving throw */
@@ -483,7 +487,6 @@ public:
 	int Autopause(ieDword reason);
 	/** registers engine opcodes */
 	void RegisterOpcodes(int count, EffectRef *opcodes);
-
 private:
 	bool LoadConfig(void);
 	bool LoadConfig(const char *filename);

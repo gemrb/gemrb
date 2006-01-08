@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MoviePlayer.h,v 1.5 2005/11/17 21:08:32 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MoviePlayer.h,v 1.6 2006/01/08 22:07:44 avenger_teambg Exp $
  *
  */
 
@@ -58,6 +58,7 @@ public:
 	virtual ~MoviePlayer(void);
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
 	virtual int Play() = 0;
+	virtual void CallBackAtFrames(ieDword cnt, ieDword *frames, ieDword *strrefs) = 0;
 };
 
 #endif

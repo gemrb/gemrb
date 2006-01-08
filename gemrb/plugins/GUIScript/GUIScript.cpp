@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.374 2006/01/06 23:09:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.375 2006/01/08 22:07:45 avenger_teambg Exp $
  *
  */
 
@@ -426,7 +426,7 @@ static PyObject* GemRB_StatComment(PyObject * /*self*/, PyObject* args)
 	char* newtext = ( char* ) malloc( bufflen );
 	//this could be DANGEROUS, not anymore (snprintf is your friend)
 	snprintf( newtext, bufflen, text, X, Y );
-	free( text );
+	core->FreeString( text );
 	ret = PyString_FromString( newtext );
 	free( newtext );
 	return ret;
@@ -448,7 +448,7 @@ static PyObject* GemRB_GetString(PyObject * /*self*/, PyObject* args)
 
 	char *text = core->GetString( strref, flags );
 	ret=PyString_FromString( text );
-	free( text );
+	core->FreeString( text );
 	return ret;
 }
 
@@ -1138,18 +1138,16 @@ static PyObject* GemRB_SetText(PyObject * /*self*/, PyObject* args)
 		}
 	} else {
 		StrRef = PyInt_AsLong( str );
-		char* str = NULL;
 		if (StrRef == -1) {
-			str = strdup( GEMRB_STRING );
+			ret = core->SetText( WindowIndex, ControlIndex, GEMRB_STRING );
 		} else {
-			str = core->GetString( StrRef );
+			char *str = core->GetString( StrRef );
+			ret = core->SetText( WindowIndex, ControlIndex, str );
+			core->FreeString( str );
 		}
-		ret = core->SetText( WindowIndex, ControlIndex, str );
 		if (ret == -1) {
-			free( str );
 			return RuntimeError("Cannot set text");
 		}
-		free( str );
 	}
 	return PyInt_FromLong( ret );
 }
@@ -1199,7 +1197,7 @@ static PyObject* GemRB_TextAreaAppend(PyObject * /*self*/, PyObject* args)
 			StrRef = PyInt_AsLong( str );
 			char* str = core->GetString( StrRef, IE_STR_SOUND | IE_STR_SPEECH );
 			ret = ta->AppendText( str, Row );
-			free( str );
+			core->FreeString( str );
 		}
 	} else {
 		return NULL;
@@ -1262,24 +1260,25 @@ static PyObject* GemRB_SetTooltip(PyObject * /*self*/, PyObject* args)
 		ControlIndex = PyInt_AsLong( ci );
 		if (PyObject_TypeCheck( str, &PyString_Type )) {
 			string = PyString_AsString( str );
-			if (string == NULL)
-				return NULL;
-			ret = core->SetTooltip( WindowIndex, ControlIndex, string );
-			if (ret == -1)
-				return NULL;
-		} else {
-			StrRef = PyInt_AsLong( str );
-			char* str = NULL;
-			if (StrRef == -1) {
-				str = strdup ( GEMRB_STRING );
-			} else
-				str = core->GetString( StrRef );
-			ret = core->SetTooltip( WindowIndex, ControlIndex, str );
-			if (ret == -1) {
-				free( str );
+			if (string == NULL) {
 				return NULL;
 			}
-			free( str );
+			ret = core->SetTooltip( WindowIndex, ControlIndex, string );
+			if (ret == -1) {
+				return NULL;
+			}
+		} else {
+			StrRef = PyInt_AsLong( str );
+			if (StrRef == -1) {
+				ret = core->SetTooltip( WindowIndex, ControlIndex, GEMRB_STRING );
+			} else {
+				char* str = core->GetString( StrRef );
+				ret = core->SetTooltip( WindowIndex, ControlIndex, str );
+				core->FreeString( str );
+			}
+			if (ret == -1) {
+				return NULL;
+			}
 		}
 	} else {
 		return NULL;
@@ -1678,7 +1677,7 @@ static PyObject* GemRB_CreateButton(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("Cannot find window!");
 	}
 
-	Button* btn = new Button( false );
+	Button* btn = new Button( true );
 	btn->XPos = x;
 	btn->YPos = y;
 	btn->Width = w;

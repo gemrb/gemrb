@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.126 2006/01/08 18:15:48 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.127 2006/01/08 22:07:47 avenger_teambg Exp $
  *
  */
 
@@ -60,10 +60,13 @@ SDLVideoDriver::SDLVideoDriver(void)
 	GetTime( lastMouseTime );
 	backBuf=NULL;
 	extra=NULL;
+	subtitlestrref = 0;
+	subtitletext = NULL;
 }
 
 SDLVideoDriver::~SDLVideoDriver(void)
 {
+	core->FreeString(subtitletext); //may be NULL
 	if(backBuf) SDL_FreeSurface( backBuf );
 	if(extra) SDL_FreeSurface( extra );
 	SDL_Quit();
@@ -234,13 +237,13 @@ int SDLVideoDriver::SwapBuffers(void)
 				case SDLK_RALT:
 					key = GEM_ALT;
 					break;
-                                default:
+		                default:
 					if (event.key.keysym.sym>=256) {
 						key=0;
 					} else {
 						key=(unsigned char) event.key.keysym.sym;
 					}
-                                        break;
+		                        break;
 			}
 			if (!ConsolePopped && Evnt && ( key != 0 ))
 				Evnt->KeyRelease( key, GetModState(event.key.keysym.mod) );
@@ -2105,4 +2108,108 @@ void SDLVideoDriver::MouseMovement(int x, int y)
 void SDLVideoDriver::MoveMouse(unsigned int x, unsigned int y)
 {
 	SDL_WarpMouse(x,y);
+}
+
+void SDLVideoDriver::InitMovieScreen(int &w, int &h)
+{
+	SDL_LockSurface( disp );
+	memset( disp->pixels, 0,
+		disp->w * disp->h * disp->format->BytesPerPixel );
+	SDL_UnlockSurface( disp );
+	SDL_Flip( disp );
+	w = disp->w;
+	h = disp->h;
+	//setting the subtitle region to the bottom 1/10th of the screen
+	subtitleregion.w = w;
+	subtitleregion.h = h/10;
+	subtitleregion.x = 0;
+	subtitleregion.y = h-h/10;
+}
+
+void SDLVideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
+	unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,
+	unsigned int h, unsigned int dstx, unsigned int dsty, 
+	int g_truecolor, unsigned char *pal)
+{
+	int i;
+	SDL_Surface* sprite;
+	SDL_Rect srcRect, destRect;
+
+	assert( bufw == w && bufh == h );
+
+	if (g_truecolor) {
+		sprite = SDL_CreateRGBSurfaceFrom( buf, bufw, bufh, 16, 2 * bufw,
+		                        0x7C00, 0x03E0, 0x001F, 0 );
+	} else {
+		sprite = SDL_CreateRGBSurfaceFrom( buf, bufw, bufh, 8, bufw, 0x7C00,
+		                        0x03E0, 0x001F, 0 );
+
+		for (i = 0; i < 256; i++) {
+		        sprite->format->palette->colors[i].r = ( *pal++ ) << 2;
+		        sprite->format->palette->colors[i].g = ( *pal++ ) << 2;
+		        sprite->format->palette->colors[i].b = ( *pal++ ) << 2;
+		        sprite->format->palette->colors[i].unused = 0;
+		}
+	}
+
+	srcRect.x = sx;
+	srcRect.y = sy;
+	srcRect.w = w;
+	srcRect.h = h;
+	destRect.x = dstx;
+	destRect.y = dsty;
+	destRect.w = w;
+	destRect.h = h;
+
+	SDL_BlitSurface( sprite, &srcRect, disp, &destRect );
+	SDL_Flip( disp );
+	SDL_FreeSurface( sprite );
+}
+
+int SDLVideoDriver::PollMovieEvents()
+{
+        SDL_Event event;
+
+        while (SDL_PollEvent( &event )) {
+                switch (event.type) {
+                        case SDL_QUIT:
+                        case SDL_MOUSEBUTTONDOWN:
+                                return 1;
+                        case SDL_KEYDOWN:
+                                switch (event.key.keysym.sym) {
+                                        case SDLK_ESCAPE:
+                                        case SDLK_q:
+                                                return 1;
+                                        case SDLK_f:
+                                                SDL_WM_ToggleFullScreen( disp );
+                                                break;
+                                        default:
+                                                break;
+                                }
+                                break;
+                        default:
+                                break;
+                }
+        }
+
+        return 0;
+}
+
+void SDLVideoDriver::SetMovieFont(Font *stfont, Color *pal)
+{
+	subtitlefont = stfont;
+	subtitlepal = pal;
+}
+
+void SDLVideoDriver::DrawMovieSubtitle(ieDword strRef)
+{
+	if (strRef!=subtitlestrref) {
+		core->FreeString(subtitletext);
+		subtitletext = core->GetString(strRef);
+		subtitlestrref = strRef;
+	}
+	if (subtitlefont) {
+		subtitlefont->Print(subtitleregion, (unsigned char *) subtitletext, subtitlepal, IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_BOTTOM);
+	}
+	SDL_Flip( disp );
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.55 2006/01/08 18:15:48 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.56 2006/01/08 22:07:47 avenger_teambg Exp $
  *
  */
 
@@ -32,16 +32,21 @@ private:
 	SDL_Surface* disp;
 	SDL_Surface* backBuf;
 	SDL_Surface* extra;
-	std::vector< Region> upd;	//Regions of the Screen to Update in the next SwapBuffer operation.
+	std::vector< Region> upd;//Regions of the Screen to Update in the next SwapBuffer operation.
 	Region Viewport;
 	Sprite2D* Cursor[3];
 	SDL_Rect CursorPos;
-//	short mouseAdjustX[3], mouseAdjustY[3];
 	unsigned short CursorIndex;
 	Color fadeColor;
 	unsigned long lastTime;
 	unsigned long lastMouseTime;
 	SDL_Event event; /* Event structure */
+	//subtitle specific variables
+	Font *subtitlefont;
+	Color *subtitlepal;
+	Region subtitleregion;
+	char *subtitletext;
+	ieDword subtitlestrref;
 public:
 	SDLVideoDriver(void);
 	~SDLVideoDriver(void);
@@ -132,6 +137,14 @@ public:
 	{
 		return disp;
 	}
+	void InitMovieScreen(int &w, int &h);
+	void SetMovieFont(Font *stfont, Color *pal);
+	void showFrame(unsigned char* buf, unsigned int bufw,
+	unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,
+	unsigned int h, unsigned int dstx, unsigned int dsty, int truecolor,
+	unsigned char *palette);
+	int PollMovieEvents();
+	void DrawMovieSubtitle(ieDword strRef);
 private:
 	inline void SetPixel(short x, short y, Color& color, bool clipped = true);
 	inline void GetPixel(short x, short y, Color* color);

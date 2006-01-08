@@ -30,12 +30,10 @@ private:
 	unsigned long startTime;
 	unsigned long interval;
 
-	//GameScript* CutScene;
-
-	unsigned long fadeToCounter, fadeToMax;
-	unsigned long fadeFromCounter, fadeFromMax;
+	int fadeToCounter, fadeToMax;
+	int fadeFromCounter, fadeFromMax;
 	unsigned long waitCounter;
-	unsigned long shakeCounter;
+	int shakeCounter;
 	unsigned long shakeX, shakeY;
 	int first_animation;
 	std::vector<AnimationRef*>  animations;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.281 2006/01/06 23:09:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.282 2006/01/08 22:07:40 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -56,9 +56,11 @@ static Color magenta = {
 static Color green = {
 	0x00, 0xff, 0x00, 0xff
 };
+/*
 static Color white = {
 	0xff, 0xff, 0xff, 0xff
 };
+*/
 static Color black = {
 	0x00, 0x00, 0x00, 0xff
 };
@@ -97,7 +99,6 @@ GameControl::GameControl(void)
 	drawPath = NULL;
 	pfs.x = 0;
 	pfs.y = 0;
-	InfoTextPalette = core->GetVideoDriver()->CreatePalette( white, black );
 	lastCursor = IE_CURSOR_NORMAL;
 	moveX = moveY = 0;
 	DebugFlags = 0;

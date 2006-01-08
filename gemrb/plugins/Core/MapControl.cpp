@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.38 2006/01/06 23:09:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.39 2006/01/08 22:07:44 avenger_teambg Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -219,12 +219,6 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 			else {
 				video->DrawEllipse( vp.x, vp.y, 6, 5, colors[mn->color&7], false );
 			}
-/*i think none of the games print the notes directly
-			vp.x = mn->Pos.x;
-			vp.y = mn->Pos.y;
-			Font *font = core->GetFont( 1 );
-			font->Print(vp, (unsigned char *) mn->text, colors+(mn->color&7), IE_FONT_ALIGN_TOP, true);
-*/
 		}
 	}
 }

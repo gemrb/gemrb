@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.cpp,v 1.18 2005/11/24 17:44:10 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.cpp,v 1.19 2006/01/08 22:07:46 avenger_teambg Exp $
  *
  */
 
@@ -33,14 +33,20 @@
 static const char MVESignature[] = "Interplay MVE File\x1A";
 static const int MVE_SIGNATURE_LEN = 19;
 
-static SDL_Surface* g_screen = NULL;
+static Video *video = NULL;
 static unsigned char g_palette[768];
 static int g_truecolor;
+static ieDword maxRow = 0;
+static ieDword rowCount = 0;
+static ieDword frameCount = 0;
+static ieDword *cbAtFrame = NULL;
+static ieDword *strRef = NULL;
 
 MVEPlay::MVEPlay(void)
 {
 	str = NULL;
 	autoFree = false;
+	video = core->GetVideoDriver();
 }
 
 MVEPlay::~MVEPlay(void)
@@ -111,12 +117,22 @@ bool MVEPlay::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
+void MVEPlay::CallBackAtFrames(ieDword cnt, ieDword *arg, ieDword *arg2 )
+{
+	maxRow = cnt;
+	frameCount = 0;
+	rowCount = 0;
+	cbAtFrame = arg;
+	strRef = arg2;
+}
+
 int MVEPlay::Play()
 {
 	if (!validVideo) {
 		return 0;
 	}
 	//Start Movie Playback
+	frameCount = 0;
 	doPlay( str );
 	return 0;
 }
@@ -138,24 +154,21 @@ int MVEPlay::doPlay(const DataStream* mve)
 	MVE_sfCallbacks( showFrame );
 	MVE_palCallbacks( setPalette );
 
-	g_screen = ( SDL_Surface * ) core->GetVideoDriver()->GetVideoSurface();
-	SDL_LockSurface( g_screen );
-	memset( g_screen->pixels, 0,
-		g_screen->w * g_screen->h * g_screen->format->BytesPerPixel );
-	SDL_UnlockSurface( g_screen );
-	SDL_Flip( g_screen );
+	int w,h;
 
+	video->InitMovieScreen(w,h);
 	MVE_rmPrepMovie( ( void * ) mve, -1, -1, 1 );
 
-        vSpec.screenWidth = g_screen->w;
-        vSpec.screenHeight = g_screen->h;
+        vSpec.screenWidth = w;
+        vSpec.screenHeight = h;
+
 	MVE_getVideoSpec( &vSpec );
 	bpp = vSpec.truecolor ? 16 : 8;
 
 	g_truecolor = vSpec.truecolor;
 
 	while (!done && ( result = MVE_rmStepMovie() ) == 0) {
-		done = pollEvents();
+		done = video->PollMovieEvents();
 	}
 
 	MVE_rmEndMovie();
@@ -175,45 +188,17 @@ void MVEPlay::showFrame(unsigned char* buf, unsigned int bufw,
 	unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,
 	unsigned int h, unsigned int dstx, unsigned int dsty)
 {
-	int i;
-	unsigned char * pal;
-	SDL_Surface* sprite;
-	SDL_Rect srcRect, destRect;
-
-	assert( bufw == w && bufh == h );
-
-	if (g_truecolor) {
-		sprite = SDL_CreateRGBSurfaceFrom( buf, bufw, bufh, 16, 2 * bufw,
-					0x7C00, 0x03E0, 0x001F, 0 );
-	} else {
-		sprite = SDL_CreateRGBSurfaceFrom( buf, bufw, bufh, 8, bufw, 0x7C00,
-					0x03E0, 0x001F, 0 );
-
-		pal = g_palette;
-		for (i = 0; i < 256; i++) {
-			sprite->format->palette->colors[i].r = ( *pal++ ) << 2;
-			sprite->format->palette->colors[i].g = ( *pal++ ) << 2;
-			sprite->format->palette->colors[i].b = ( *pal++ ) << 2;
-			sprite->format->palette->colors[i].unused = 0;
+	video->showFrame(buf,bufw,bufh,sx,sy,w,h,dstx,dsty, g_truecolor, g_palette);
+	if (cbAtFrame && strRef) {
+		frameCount ++;
+		if ((rowCount<maxRow) && (frameCount >= cbAtFrame[rowCount]) ) {
+			rowCount++;
+		}
+		//draw subtitle here
+		if (rowCount) {
+			video->DrawMovieSubtitle(strRef[rowCount-1]);
 		}
 	}
-
-	srcRect.x = sx;
-	srcRect.y = sy;
-	srcRect.w = w;
-	srcRect.h = h;
-	destRect.x = dstx;
-	destRect.y = dsty;
-	destRect.w = w;
-	destRect.h = h;
-
-	SDL_BlitSurface( sprite, &srcRect, g_screen, &destRect );
-	if (( g_screen->flags & SDL_DOUBLEBUF ) == SDL_DOUBLEBUF) {
-		SDL_Flip( g_screen );
-	} else {
-		SDL_UpdateRects( g_screen, 1, &destRect );
-	}
-	SDL_FreeSurface( sprite );
 }
 
 void MVEPlay::setPalette(unsigned char* p, unsigned start, unsigned count)
@@ -226,33 +211,4 @@ void MVEPlay::setPalette(unsigned char* p, unsigned start, unsigned count)
 
 	//movie libs palette into our array
 	memcpy( g_palette + start * 3, p + start * 3, count * 3 );
-}
-
-int MVEPlay::pollEvents()
-{
-	SDL_Event event;
-
-	while (SDL_PollEvent( &event )) {
-		switch (event.type) {
-			case SDL_QUIT:
-			case SDL_MOUSEBUTTONDOWN:
-				return 1;
-			case SDL_KEYDOWN:
-				switch (event.key.keysym.sym) {
-					case SDLK_ESCAPE:
-					case SDLK_q:
-						return 1;
-					case SDLK_f:
-						SDL_WM_ToggleFullScreen( g_screen );
-						break;
-					default:
-						break;
-				}
-				break;
-			default:
-				break;
-		}
-	}
-
-	return 0;
 }

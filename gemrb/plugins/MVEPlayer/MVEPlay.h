@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.h,v 1.21 2004/04/04 17:08:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.h,v 1.22 2006/01/08 22:07:46 avenger_teambg Exp $
  *
  */
 
@@ -27,9 +27,6 @@
 #include "../Core/MoviePlayer.h"
 #include "../Core/Interface.h"
 
-#include <SDL.h>
-#include <SDL_thread.h>
-
 class MVEPlay : public MoviePlayer {
 private:
 	DataStream* str;
@@ -38,14 +35,16 @@ private:
 	static int doPlay(const DataStream* mve);
 	static unsigned int fileRead(void* handle, void* buf, unsigned int count);
 	static void showFrame(unsigned char* buf, unsigned int bufw,
-		unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,
-		unsigned int h, unsigned int dstx, unsigned int dsty);
+		unsigned int bufh, unsigned int sx, unsigned int sy,
+		unsigned int w, unsigned int h, unsigned int dstx,
+		unsigned int dsty);
 	static void setPalette(unsigned char* p, unsigned start, unsigned count);
 	static int pollEvents();
 public:
 	MVEPlay(void);
 	~MVEPlay(void);
 	bool Open(DataStream* stream, bool autoFree = true);
+	void CallBackAtFrames(ieDword cnt, ieDword *arg, ieDword *arg2);
 	int Play();
 	/** this function uses an external player to play BIK animations */
 	bool PlayBik(DataStream *stream);
