@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.51 2006/01/03 22:02:36 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.52 2006/01/08 18:15:47 wjpalenstijn Exp $
  *
  */
 
@@ -74,8 +74,8 @@ public:
 		int index = 0) = 0;
 	virtual Sprite2D* CreateSprite8(int w, int h, int bpp, void* pixels,
 		void* palette, bool cK = false, int index = 0) = 0;
-	virtual Sprite2D* CreateSpriteRLE8(int /*w*/, int /*h*/,
-									   void* /*rledata*/,
+	virtual Sprite2D* CreateSpriteBAM8(int /*w*/, int /*h*/, bool /* RLE */,
+									   void* /*pixeldata*/,
 									   unsigned int /*datasize*/,
 									   void* /*palette*/,
 									   int /*transindex*/) { return 0; }

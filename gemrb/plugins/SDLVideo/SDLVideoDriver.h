@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.54 2005/12/25 12:52:20 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.55 2006/01/08 18:15:48 wjpalenstijn Exp $
  *
  */
 
@@ -60,7 +60,7 @@ public:
 		bool cK = false, int index = 0);
 	Sprite2D* CreateSprite8(int w, int h, int bpp, void* pixels,
 		void* palette, bool cK = false, int index = 0);
-	Sprite2D* CreateSpriteRLE8(int w, int h, void* rledata,
+	Sprite2D* CreateSpriteBAM8(int w, int h, bool RLE, void* pixeldata,
 							   unsigned int datasize,
 							   void* palette, int transindex);
 	void FreeSprite(Sprite2D* spr);

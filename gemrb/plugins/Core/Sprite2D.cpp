@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Sprite2D.cpp,v 1.8 2005/11/22 20:49:39 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Sprite2D.cpp,v 1.9 2006/01/08 18:15:47 wjpalenstijn Exp $
  *
  */
 
@@ -24,7 +24,7 @@
 
 Sprite2D::Sprite2D()
 {
-	RLE = false;
+	BAM = false;
 	vptr = NULL;
 	pixels = NULL;
 	XPos = 0;

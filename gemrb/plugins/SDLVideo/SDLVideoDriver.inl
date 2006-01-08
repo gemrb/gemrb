@@ -1,5 +1,5 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2005 The GemRB Project
+ * Copyright (C) 2005-2006 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,10 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.inl,v 1.4 2006/01/03 22:02:43 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.inl,v 1.5 2006/01/08 18:15:48 wjpalenstijn Exp $
  *
  */
 
+//#define HIGHLIGHTCOVER
 
 #define TARGET backBuf
 #define WIDTH spr->Width
@@ -174,55 +175,155 @@ do {
 	}
 #endif
 
+	if (RLE) {
 
-	PTYPE* line = (PTYPE*)(TARGET)->pixels +
-		(ty - yneg*((HEIGHT)-1))*(TARGET)->pitch/(PITCHMULT);
-	PTYPE* end = line + YNEG(HEIGHT)*(TARGET)->pitch/(PITCHMULT);
-	PTYPE* clipstartline = (PTYPE*)(TARGET)->pixels
-		+ clipy*((TARGET)->pitch)/PITCHMULT;
-	PTYPE* clipendline = clipstartline + cliph*((TARGET)->pitch)/PITCHMULT;
+		PTYPE* line = (PTYPE*)(TARGET)->pixels +
+			(ty - yneg*((HEIGHT)-1))*(TARGET)->pitch/(PITCHMULT);
+		PTYPE* end = line + YNEG(HEIGHT)*(TARGET)->pitch/(PITCHMULT);
+		PTYPE* clipstartline = (PTYPE*)(TARGET)->pixels
+			+ clipy*((TARGET)->pitch)/PITCHMULT;
+		PTYPE* clipendline = clipstartline + cliph*((TARGET)->pitch)/PITCHMULT;
 #ifdef COVER
-	Uint8* coverline = (Uint8*)cover->pixels + (COVERY)*cover->Width -
-		yneg*((HEIGHT)-1);
+		Uint8* coverline = (Uint8*)cover->pixels + ((COVERY) - yneg*((HEIGHT)-1))*cover->Width;
 #endif
-
-#ifdef FLIP
-	if (VFLIP_CONDITIONAL) {
-		if (end < clipstartline)
-			end = clipstartline - ((TARGET)->pitch)/PITCHMULT;
-	} else
-#endif
-	{
-		if (end > clipendline)
-			end = clipendline;
-	}
-
-	int translength = 0;
-	for (; YNEG((int)(end - line)) > 0; line += YNEG((TARGET)->pitch/(PITCHMULT)))
-	{
-		PTYPE* pix = line + tx + translength - xneg*((WIDTH)-1);
-		PTYPE* endpix = line + tx - xneg*((WIDTH)-1) + XNEG(WIDTH);
-		PTYPE* clipstartpix = line + clipx;
-		PTYPE* clipendpix = clipstartpix + clipw;
-#ifdef COVER
-		Uint8* coverpix = coverline +(COVERX) + translength - xneg*((WIDTH)-1);
-#endif
+		
 		if (yneg) {
-			if (line >= clipendline) clipstartpix = clipendpix;
+			if (end < clipstartline)
+				end = clipstartline - ((TARGET)->pitch)/PITCHMULT;
 		} else {
-			if (line < clipstartline) clipstartpix = clipendpix;
+			if (end > clipendline)
+				end = clipendline;
 		}
-		while (XNEG((int)(endpix - pix)) > 0)
+		
+		int translength = 0;
+		for (; YNEG((int)(end - line)) > 0; line += YNEG((TARGET)->pitch/(PITCHMULT)))
 		{
-			Uint8 p = *rle++;
-			if (p == (Uint8)data->transindex) {
-				int count = XNEG((*rle++) + 1);
-				pix += count;
+			PTYPE* pix = line + tx + translength - xneg*((WIDTH)-1);
+			PTYPE* endpix = line + tx - xneg*((WIDTH)-1) + XNEG(WIDTH);
+			PTYPE* clipstartpix = line + clipx;
+			PTYPE* clipendpix = clipstartpix + clipw;
 #ifdef COVER
-				coverpix += count;
+			Uint8* coverpix = coverline + (COVERX) + translength - xneg*((WIDTH)-1);
 #endif
+			if (yneg) {
+				if (line >= clipendline) clipstartpix = clipendpix;
 			} else {
-				if (pix >= clipstartpix && pix < clipendpix) {
+				if (line < clipstartline) clipstartpix = clipendpix;
+			}
+			while (XNEG((int)(endpix - pix)) > 0)
+			{
+				Uint8 p = *rle++;
+				if (p == (Uint8)data->transindex) {
+					int count = XNEG((*rle++) + 1);
+					pix += count;
+#ifdef COVER
+					coverpix += count;
+#endif
+				} else {
+					if (pix >= clipstartpix && pix < clipendpix) {
+#ifdef COVER
+						if (!*coverpix)
+#endif
+						{
+							SPECIALPIXEL {
+								BLENDPIXEL(*pix, (PAL)[p].r, (PAL)[p].g, (PAL)[p].b, (ALPHAVALUE), *pix);
+							}
+						}
+#if defined(COVER) && defined(HIGHLIGHTCOVER)
+						else {
+							BLENDPIXEL(*pix, 255, 255, 255, 255, *pix);
+						}
+#endif
+					}
+					pix += XNEG(1);
+#ifdef COVER
+					coverpix += XNEG(1);
+#endif
+				}
+			}
+			translength = pix - endpix;
+#ifdef COVER
+			coverline += YNEG(cover->Width);
+#endif
+		}
+	} else {
+#ifdef COVER
+		Uint8* coverline = (Uint8*)cover->pixels + ((COVERY) - yneg*((HEIGHT)-1))*cover->Width;
+#endif
+		int starty, endy;
+
+		if (!yneg) {
+			starty = ty;
+			if (clipy > starty) starty = clipy;
+			endy = ty + (HEIGHT);
+			if (clipy+cliph < endy) endy = clipy+cliph;
+
+			if (starty >= endy) break;
+
+			// skip clipped lines at start
+			rle += (starty - ty) * (WIDTH);
+#ifdef COVER
+			coverline += (starty - ty) * cover->Width;
+#endif
+		} else {
+			starty = ty + (HEIGHT) - 1;
+			if (clipy+cliph <= starty) starty = clipy+cliph-1;
+			endy = ty - 1;
+			if (clipy-1 > endy) endy = clipy-1;
+
+			if (starty <= endy) break;
+
+			// skip clipped lines at start
+			rle += (ty + (HEIGHT) - 1 - starty) * (WIDTH);
+#ifdef COVER
+			coverline -= (ty + (HEIGHT) - 1 - starty) * cover->Width;
+#endif
+		}
+
+		int startx, endx;
+		int prelineskip = 0;
+		int postlineskip = 0;
+
+		if (!xneg) {
+			startx = tx;
+			if (clipx > startx) startx = clipx;
+			endx = tx + (WIDTH);
+			if (clipx+clipw < endx) endx = clipx+cliph;
+
+			if (startx >= endx) break;
+
+			prelineskip = startx - tx;
+			postlineskip = tx + (WIDTH) - endx;
+		} else {
+			startx = tx + (WIDTH) - 1;
+			if (clipx+clipw <= startx) startx = clipx+clipw-1;
+			endx = tx - 1;
+			if (clipx-1 > endx) endx = clipx-1;
+
+			if (startx <= endx) break;
+
+			prelineskip = (tx + (WIDTH) - 1) - startx;
+			postlineskip = endx - (tx-1);
+		}
+
+
+		PTYPE* line = (PTYPE*)(TARGET)->pixels +
+			starty*(TARGET)->pitch/(PITCHMULT);
+		PTYPE* endline = (PTYPE*)(TARGET)->pixels +
+			endy*(TARGET)->pitch/(PITCHMULT);
+
+		while (line != endline) {
+			PTYPE* pix = line + startx;
+			PTYPE* endpix = line + endx;
+#ifdef COVER
+			Uint8* coverpix = coverline + (COVERX) + XNEG(prelineskip) - xneg*((WIDTH)-1);
+#endif
+			rle += prelineskip;
+
+			while (pix != endpix)
+			{
+				Uint8 p = *rle++;
+				if (p != (Uint8)data->transindex) {
 #ifdef COVER
 					if (!*coverpix)
 #endif
@@ -231,18 +332,27 @@ do {
 							BLENDPIXEL(*pix, (PAL)[p].r, (PAL)[p].g, (PAL)[p].b, (ALPHAVALUE), *pix);
 						}
 					}
+#if defined(COVER) && defined(HIGHLIGHTCOVER)
+					else {
+						BLENDPIXEL(*pix, 255, 255, 255, 255, *pix);
+					}
+#endif
 				}
 				pix += XNEG(1);
 #ifdef COVER
 				coverpix += XNEG(1);
 #endif
 			}
-		}
-		translength = pix - endpix;
+
+			rle += postlineskip;
+
+			line += YNEG((TARGET)->pitch/(PITCHMULT));
 #ifdef COVER
-		coverline += YNEG(cover->Width);
-#endif
+			coverline += YNEG(cover->Width);
+#endif			
+		}
 	}
+
 } while(0);
 
 
@@ -257,3 +367,4 @@ do {
 #undef HEIGHT
 #undef ALPHA
 #undef ALPHAVALUE
+#undef HIGHLIGHTCOVER

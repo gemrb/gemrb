@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.41 2005/11/24 17:44:07 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.42 2006/01/08 18:15:45 wjpalenstijn Exp $
  *
  */
 
@@ -175,6 +175,7 @@ Sprite2D* BAMImp::GetFrame(unsigned short findex, unsigned char mode)
 	}
 	Sprite2D* spr = 0;
 	unsigned char* RLEinpix = 0;
+	void* pixels = 0;
 #if 1
 	bool RLECompressed = ( ( frames[findex].FrameData & 0x80000000 ) == 0 );
 	unsigned long RLESize = 0;
@@ -195,16 +196,24 @@ Sprite2D* BAMImp::GetFrame(unsigned short findex, unsigned char mode)
 			return NULL;
 		}
 
-		spr = core->GetVideoDriver()->CreateSpriteRLE8(frames[findex].Width,
+		spr = core->GetVideoDriver()->CreateSpriteBAM8(frames[findex].Width,
 													   frames[findex].Height,
+													   true,
 													   RLEinpix, RLESize,
 													   Palette,
 													   CompressedColorIndex);
 		//don't free RLEinpix, createsprite stores it if it was successful
+	} else {
+		void* pixels = GetFramePixels(findex);
+		spr = core->GetVideoDriver()->CreateSpriteBAM8(
+			frames[findex].Width, frames[findex].Height, false,
+			pixels, frames[findex].Width*frames[findex].Height, 
+			Palette, CompressedColorIndex );
 	}
 #endif
 	if (!spr) {
-		void* pixels = GetFramePixels(findex, RLEinpix);
+		if (!pixels)
+			pixels = GetFramePixels(findex, RLEinpix);
 		spr = core->GetVideoDriver()->CreateSprite8(
 			frames[findex].Width, frames[findex].Height, 8,
 			pixels, Palette, true, 0 );

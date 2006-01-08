@@ -1,5 +1,5 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2003 The GemRB Project
+ * Copyright (C) 2003-2006 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.125 2006/01/07 22:50:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.126 2006/01/08 18:15:48 wjpalenstijn Exp $
  *
  */
 
@@ -28,10 +28,11 @@
 #include "../Core/Console.h"
 #include "../Core/SoundMgr.h"
 
-class GEM_EXPORT Sprite2D_RLE_Internal {
+class GEM_EXPORT Sprite2D_BAM_Internal {
 public:
 	SDL_Color pal[256];
 	unsigned int datasize;
+	bool RLE;
 	int transindex;
 	bool flip_hor;
 	bool flip_ver;
@@ -424,13 +425,14 @@ Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, int bpp, void* pixels,
 	return spr;
 }
 
-Sprite2D* SDLVideoDriver::CreateSpriteRLE8(int w, int h, void* rledata,
+Sprite2D* SDLVideoDriver::CreateSpriteBAM8(int w, int h, bool rle,
+										   void* pixeldata,
 										   unsigned int datasize,
 										   void* palette, int transindex)
 {
 	Sprite2D* spr = new Sprite2D();
-	spr->RLE = true;
-	Sprite2D_RLE_Internal* data = new Sprite2D_RLE_Internal;
+	spr->BAM = true;
+	Sprite2D_BAM_Internal* data = new Sprite2D_BAM_Internal;
 	spr->vptr = data;
 
 	SDL_Color* pal = (SDL_Color*) palette;
@@ -440,23 +442,23 @@ Sprite2D* SDLVideoDriver::CreateSpriteRLE8(int w, int h, void* rledata,
 	data->flip_hor = false;
 	data->flip_ver = false;
 	data->alpha_pal = false;
+	data->RLE = rle;
 
-	spr->pixels = rledata;
+	spr->pixels = pixeldata;
 	spr->Width = w;
 	spr->Height = h;
 
 	return spr;
 }
 
-
 void SDLVideoDriver::FreeSprite(Sprite2D* spr)
 {
 	if(!spr)
 		return;
 
-	if (spr->RLE) {
+	if (spr->BAM) {
 		if (spr->vptr) {
-			Sprite2D_RLE_Internal* tmp = (Sprite2D_RLE_Internal*)spr->vptr;
+			Sprite2D_BAM_Internal* tmp = (Sprite2D_BAM_Internal*)spr->vptr;
 			delete tmp;
 		}
 	} else {
@@ -476,7 +478,7 @@ void SDLVideoDriver::BlitSpriteRegion(Sprite2D* spr, Region& size, int x,
 {
 	if (!spr->vptr) return;
 
-	if (!spr->RLE) {
+	if (!spr->BAM) {
 		//TODO: Add the destination surface and rect to the Blit Pipeline
 		SDL_Rect drect;
 		SDL_Rect t = {
@@ -533,7 +535,7 @@ void SDLVideoDriver::BlitSpriteRegion(Sprite2D* spr, Region& size, int x,
 		}
 		SDL_BlitSurface( ( SDL_Surface * ) spr->vptr, &t, backBuf, &drect );
 	} else {
-		Sprite2D_RLE_Internal* data = (Sprite2D_RLE_Internal*)spr->vptr;
+		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)spr->vptr;
 
 		Uint8* rle = (Uint8*)spr->pixels;
 		int tx, ty;
@@ -599,6 +601,7 @@ void SDLVideoDriver::BlitSpriteRegion(Sprite2D* spr, Region& size, int x,
 #define FLIP 
 #define HFLIP_CONDITIONAL data->flip_hor
 #define VFLIP_CONDITIONAL data->flip_ver
+#define RLE data->RLE
 #define PAL (Color*)data->pal
 #undef COVER
 #undef TINT
@@ -641,6 +644,7 @@ void SDLVideoDriver::BlitSpriteRegion(Sprite2D* spr, Region& size, int x,
 #undef FLIP
 #undef HFLIP_CONDITIONAL
 #undef VFLIP_CONDITIONAL
+#undef RLE
 #undef PAL
 
 		SDL_UnlockSurface(backBuf);
@@ -653,7 +657,7 @@ void SDLVideoDriver::BlitSprite(Sprite2D* spr, int x, int y, bool anchor,
 {
 	if (!spr->vptr) return;
 
-	if (!spr->RLE) {
+	if (!spr->BAM) {
 		//TODO: Add the destination surface and rect to the Blit Pipeline
 		SDL_Rect drect;
 		SDL_Rect t;
@@ -703,7 +707,7 @@ void SDLVideoDriver::BlitSprite(Sprite2D* spr, int x, int y, bool anchor,
 		}
 		SDL_BlitSurface( ( SDL_Surface * ) spr->vptr, srect, backBuf, &drect );
 	} else {
-		Sprite2D_RLE_Internal* data = (Sprite2D_RLE_Internal*)spr->vptr;
+		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)spr->vptr;
 
 		Uint8* rle = (Uint8*)spr->pixels;
 		int tx, ty;
@@ -724,6 +728,7 @@ void SDLVideoDriver::BlitSprite(Sprite2D* spr, int x, int y, bool anchor,
 #define FLIP 
 #define HFLIP_CONDITIONAL data->flip_hor
 #define VFLIP_CONDITIONAL data->flip_ver
+#define RLE data->RLE
 #define PAL (Color*)data->pal
 #undef COVER
 #undef TINT
@@ -764,6 +769,7 @@ void SDLVideoDriver::BlitSprite(Sprite2D* spr, int x, int y, bool anchor,
 #undef FLIP
 #undef HFLIP_CONDITIONAL
 #undef VFLIP_CONDITIONAL
+#undef RLE
 #undef PAL
 #undef SPECIALPIXEL
 #undef PALETTE_ALPHA
@@ -778,7 +784,7 @@ void SDLVideoDriver::BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint,
 {
 	if (!spr->vptr) return;
 
-	if (!spr->RLE) {
+	if (!spr->BAM) {
 		SDL_Surface* tmp = ( SDL_Surface* ) spr->vptr;
 		SDL_Color* pal = tmp->format->palette->colors;
 		SDL_Color oldPal[256];
@@ -796,7 +802,7 @@ void SDLVideoDriver::BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint,
 		//copying back the original palette
 		SDL_SetPalette( tmp, SDL_LOGPAL, ( SDL_Color * ) oldPal, 0, 256 );
 	} else {
-		Sprite2D_RLE_Internal* data = (Sprite2D_RLE_Internal*)spr->vptr;
+		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)spr->vptr;
 
 		Uint8* rle = (Uint8*)spr->pixels;
 		int tx = x - spr->XPos - Viewport.x;
@@ -811,6 +817,7 @@ void SDLVideoDriver::BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint,
 #define FLIP 
 #define HFLIP_CONDITIONAL data->flip_hor
 #define VFLIP_CONDITIONAL data->flip_ver
+#define RLE data->RLE
 #define PAL Palette
 #undef COVER
 #define TINT
@@ -878,6 +885,7 @@ void SDLVideoDriver::BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint,
 #undef FLIP
 #undef HFLIP_CONDITIONAL
 #undef VFLIP_CONDITIONAL
+#undef RLE
 #undef PAL
 #undef TINT
 #undef SPECIALPIXEL
@@ -895,10 +903,11 @@ void SDLVideoDriver::BlitSpriteCovered(Sprite2D* spr, int x, int y,
 {
 	if (!spr->vptr) return;
 
-	if (!spr->RLE) {
+	if (!spr->BAM) {
+		printMessage( "SDLVideo", "Covered blit not supported for this sprite\n", LIGHT_RED );
 		BlitSpriteTinted(spr, x, y, tint, Palette, clip);
 	} else {
-		Sprite2D_RLE_Internal* data = (Sprite2D_RLE_Internal*)spr->vptr;
+		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)spr->vptr;
 
 		Uint8* rle = (Uint8*)spr->pixels;
 		int tx = x - spr->XPos - Viewport.x;
@@ -913,6 +922,7 @@ void SDLVideoDriver::BlitSpriteCovered(Sprite2D* spr, int x, int y,
 #define FLIP 
 #define HFLIP_CONDITIONAL data->flip_hor
 #define VFLIP_CONDITIONAL data->flip_ver
+#define RLE data->RLE
 #define PAL Palette
 #define COVER
 #define COVERX (cover->XPos - spr->XPos)
@@ -982,6 +992,7 @@ void SDLVideoDriver::BlitSpriteCovered(Sprite2D* spr, int x, int y,
 #undef FLIP
 #undef HFLIP_CONDITIONAL
 #undef VFLIP_CONDITIONAL
+#undef RLE
 #undef PAL
 #undef COVER
 #undef COVERX
@@ -1003,27 +1014,11 @@ void SDLVideoDriver::BlitSpriteNoShadow(Sprite2D* spr, int x, int y,
 {
 	if (!spr->vptr) return;
 
-	if (!spr->RLE) {
-		// not fully supported
-		SDL_Surface* tmp = ( SDL_Surface* ) spr->vptr;
-		SDL_LockSurface( tmp );
-		SDL_Color* pal = tmp->format->palette->colors;
-		SDL_Color oldPal[256];
-		memcpy( oldPal, pal, 256 * sizeof( SDL_Color ) );
-		for (int i = 2; i < 256; i++) {
-			pal[i].r = ( tint.r * pal[i].r ) >> 8;
-			pal[i].g = ( tint.g * pal[i].g ) >> 8;
-			pal[i].b = ( tint.b * pal[i].b ) >> 8;
-		}
-		//SDL_Color backup=pal[1];
-		pal[1] = TRANSPARENT_BLACK;
-		SDL_UnlockSurface( tmp );
-		SDL_SetAlpha( tmp, SDL_SRCALPHA, tint.a);
-		BlitSprite( spr, x, y, false, clip );
-		//copying back the original palette
-		SDL_SetPalette( tmp, SDL_LOGPAL, ( SDL_Color * ) oldPal, 0, 256 );
+	if (!spr->BAM) {
+		printMessage( "SDLVideo", "Covered blit not supported for this sprite\n", LIGHT_RED );
+		BlitSpriteTinted(spr, x, y, tint, Palette, clip);
 	} else {
-		Sprite2D_RLE_Internal* data = (Sprite2D_RLE_Internal*)spr->vptr;
+		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)spr->vptr;
 
 		Uint8* rle = (Uint8*)spr->pixels;
 		int tx = x - spr->XPos - Viewport.x;
@@ -1037,6 +1032,7 @@ void SDLVideoDriver::BlitSpriteNoShadow(Sprite2D* spr, int x, int y,
 #define FLIP 
 #define HFLIP_CONDITIONAL data->flip_hor
 #define VFLIP_CONDITIONAL data->flip_ver
+#define RLE data->RLE
 #define PAL Palette
 #define COVER
 #define COVERX (cover->XPos - spr->XPos)
@@ -1059,6 +1055,7 @@ void SDLVideoDriver::BlitSpriteNoShadow(Sprite2D* spr, int x, int y,
 #undef FLIP
 #undef HFLIP_CONDITIONAL
 #undef VFLIP_CONDITIONAL
+#undef RLE
 #undef PAL
 #undef COVER
 #undef COVERX
@@ -1078,11 +1075,11 @@ void SDLVideoDriver::BlitSpriteTransShadow(Sprite2D* spr, int x, int y,
 {
 	if (!spr->vptr) return;
 
-	if (!spr->RLE) {
-		// not supported
-		BlitSpriteCovered(spr, x, y, tint, cover, Palette, clip);
+	if (!spr->BAM) {
+		printMessage( "SDLVideo", "Covered blit not supported for this sprite\n", LIGHT_RED );
+		BlitSpriteTinted(spr, x, y, tint, Palette, clip);
 	} else {
-		Sprite2D_RLE_Internal* data = (Sprite2D_RLE_Internal*)spr->vptr;
+		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)spr->vptr;
 
 		Uint8* rle = (Uint8*)spr->pixels;
 		int tx = x - spr->XPos - Viewport.x;
@@ -1105,6 +1102,7 @@ void SDLVideoDriver::BlitSpriteTransShadow(Sprite2D* spr, int x, int y,
 #define FLIP 
 #define HFLIP_CONDITIONAL data->flip_hor
 #define VFLIP_CONDITIONAL data->flip_ver
+#define RLE data->RLE
 #define PAL Palette
 #define COVER
 #define COVERX (cover->XPos - spr->XPos)
@@ -1178,6 +1176,7 @@ void SDLVideoDriver::BlitSpriteTransShadow(Sprite2D* spr, int x, int y,
 #undef FLIP
 #undef HFLIP_CONDITIONAL
 #undef VFLIP_CONDITIONAL
+#undef RLE
 #undef PAL
 #undef COVER
 #undef COVERX
@@ -1274,19 +1273,19 @@ void SDLVideoDriver::MoveViewportTo(int x, int y, bool center)
 /** No descriptions */
 void SDLVideoDriver::SetPalette(Sprite2D* spr, Color* pal)
 {
-	if (!spr->RLE) {
+	if (!spr->BAM) {
 		SDL_Surface* sur = ( SDL_Surface* ) spr->vptr;
 		SDL_SetPalette( sur, SDL_LOGPAL, ( SDL_Color * ) pal, 0, 256 );
 	} else {
 		if (!spr->vptr) return;
-		Sprite2D_RLE_Internal* data = (Sprite2D_RLE_Internal*)spr->vptr;
+		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)spr->vptr;
 		memcpy(data->pal, pal, 256*sizeof(data->pal[0]));
 	}
 }
 
 void SDLVideoDriver::ConvertToVideoFormat(Sprite2D* sprite)
 {
-	if (!sprite->RLE) {
+	if (!sprite->BAM) {
 		SDL_Surface* ss = ( SDL_Surface* ) sprite->vptr;
 		if (ss->format->Amask != 0) //Surface already converted
 		{
@@ -1310,7 +1309,7 @@ void SDLVideoDriver::ConvertToVideoFormat(Sprite2D* sprite)
 
 void SDLVideoDriver::CalculateAlpha(Sprite2D* sprite)
 {
-	if (!sprite->RLE) {
+	if (!sprite->BAM) {
 		// FIXME: 32 bit RGBA only currently
 		SDL_Surface* surf = ( SDL_Surface* ) sprite->vptr;
 		if (surf->format->BytesPerPixel != 4) return;
@@ -1345,7 +1344,7 @@ void SDLVideoDriver::CalculateAlpha(Sprite2D* sprite)
 		}
 		SDL_UnlockSurface( surf );
 	} else {
-		Sprite2D_RLE_Internal* data = (Sprite2D_RLE_Internal*)sprite->vptr;
+		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)sprite->vptr;
 		for (int i = 0; i < 256; ++i) {
 			unsigned int r = data->pal[i].r;
 			unsigned int g = data->pal[i].g;
@@ -1467,7 +1466,7 @@ bool SDLVideoDriver::IsSpritePixelTransparent(Sprite2D* sprite, unsigned short x
 {
 	if (x >= sprite->Width || y >= sprite->Height) return true;
 
-	if (!sprite->RLE) {
+	if (!sprite->BAM) {
 		SDL_Surface *surf = (SDL_Surface*)(sprite->vptr);
 
 		SDL_LockSurface( surf );
@@ -1479,7 +1478,7 @@ bool SDLVideoDriver::IsSpritePixelTransparent(Sprite2D* sprite, unsigned short x
 
 		return val == 0;
 	} else {
-		Sprite2D_RLE_Internal* data = (Sprite2D_RLE_Internal*)sprite->vptr;
+		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)sprite->vptr;
 
 		if (data->flip_ver)
 			y = sprite->Height - y - 1;
@@ -1489,11 +1488,17 @@ bool SDLVideoDriver::IsSpritePixelTransparent(Sprite2D* sprite, unsigned short x
 		int skipcount = y * sprite->Width + x;
 
 		Uint8* rle = (Uint8*)sprite->pixels;
-		while (skipcount > 0) {
-			if (*rle++ == data->transindex)
-				skipcount -= (*rle++)+1;
-			else
-				skipcount--;
+		if (data->RLE) {
+			while (skipcount > 0) {
+				if (*rle++ == data->transindex)
+					skipcount -= (*rle++)+1;
+				else
+					skipcount--;
+			}
+		} else {
+			// uncompressed
+			rle += skipcount;
+			skipcount = 0;
 		}
 		if (skipcount < 0 || *rle == data->transindex)
 			return true;
@@ -1856,7 +1861,7 @@ bool SDLVideoDriver::Quit()
 /** Get the Palette of a Sprite */
 Color* SDLVideoDriver::GetPalette(Sprite2D* spr)
 {
-	if (!spr->RLE) {
+	if (!spr->BAM) {
 		SDL_Surface* s = ( SDL_Surface* ) spr->vptr;
 		if (s->format->BitsPerPixel != 8) {
 			return NULL;
@@ -1869,7 +1874,7 @@ Color* SDLVideoDriver::GetPalette(Sprite2D* spr)
 		}
 		return pal;
 	} else {
-		Sprite2D_RLE_Internal* data = (Sprite2D_RLE_Internal*)spr->vptr;
+		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)spr->vptr;
 		Color* pal = ( Color* ) malloc( 256 * sizeof( Color ) );
 		for (int i = 0; i < 256; i++) {
 			pal[i].r = data->pal[i].r;
@@ -1892,7 +1897,7 @@ Sprite2D *SDLVideoDriver::MirrorSpriteVertical(Sprite2D* sprite, bool MirrorAnch
 	Sprite2D* dest = 0;
 
 
-	if (!sprite->RLE) {
+	if (!sprite->BAM) {
 		SDL_Surface* tmp = ( SDL_Surface* ) sprite->vptr;
 		unsigned char *newpixels = (unsigned char*) malloc( sprite->Width*sprite->Height );
 
@@ -1915,12 +1920,13 @@ Sprite2D *SDLVideoDriver::MirrorSpriteVertical(Sprite2D* sprite, bool MirrorAnch
 		SDL_UnlockSurface( tmp );
 	} else {
 		// TODO: use refcounting on the data to avoid copying it
-		Sprite2D_RLE_Internal* data = (Sprite2D_RLE_Internal*)sprite->vptr;
+		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)sprite->vptr;
 		Uint8* rledata = (Uint8*)malloc(data->datasize);
 		memcpy(rledata, sprite->pixels, data->datasize);
-		dest = CreateSpriteRLE8(sprite->Width, sprite->Height, rledata,
-								data->datasize, data->pal, data->transindex);
-		Sprite2D_RLE_Internal* destdata = (Sprite2D_RLE_Internal*)dest->vptr;
+		dest = CreateSpriteBAM8(sprite->Width, sprite->Height, data->RLE,
+								rledata, data->datasize, data->pal,
+								data->transindex);
+		Sprite2D_BAM_Internal* destdata = (Sprite2D_BAM_Internal*)dest->vptr;
 		destdata->flip_ver = !data->flip_ver;
 		destdata->flip_hor = data->flip_hor;
 	}
@@ -1943,7 +1949,7 @@ Sprite2D *SDLVideoDriver::MirrorSpriteHorizontal(Sprite2D* sprite, bool MirrorAn
 
 	Sprite2D* dest = 0;
 
-	if (!sprite->RLE) {
+	if (!sprite->BAM) {
 		SDL_Surface* tmp = ( SDL_Surface* ) sprite->vptr;
 		unsigned char *newpixels = (unsigned char*) malloc( sprite->Width*sprite->Height );
 
@@ -1964,12 +1970,13 @@ Sprite2D *SDLVideoDriver::MirrorSpriteHorizontal(Sprite2D* sprite, bool MirrorAn
 		SDL_UnlockSurface( tmp );
 	} else {
 		// TODO: use refcounting on the data to avoid copying it
-		Sprite2D_RLE_Internal* data = (Sprite2D_RLE_Internal*)sprite->vptr;
+		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)sprite->vptr;
 		Uint8* rledata = (Uint8*)malloc(data->datasize);
 		memcpy(rledata, sprite->pixels, data->datasize);
-		dest = CreateSpriteRLE8(sprite->Width, sprite->Height, rledata,
-								data->datasize, data->pal, data->transindex);
-		Sprite2D_RLE_Internal* destdata = (Sprite2D_RLE_Internal*)dest->vptr;
+		dest = CreateSpriteBAM8(sprite->Width, sprite->Height, data->RLE,
+								rledata, data->datasize, data->pal,
+								data->transindex);
+		Sprite2D_BAM_Internal* destdata = (Sprite2D_BAM_Internal*)dest->vptr;
 		destdata->flip_ver = data->flip_ver;
 		destdata->flip_hor = !data->flip_hor;
 	}
@@ -1985,7 +1992,7 @@ Sprite2D *SDLVideoDriver::MirrorSpriteHorizontal(Sprite2D* sprite, bool MirrorAn
 
 void SDLVideoDriver::CreateAlpha( Sprite2D *sprite)
 {
-	// Note: we convert RLE sprites back to non-RLE (SDL_Surface) sprites
+	// Note: we convert BAM sprites back to non-BAM (SDL_Surface) sprites
 	// for per-pixel non-indexed alpha.
 
 	if (!sprite || !sprite->vptr)
@@ -2013,10 +2020,10 @@ void SDLVideoDriver::CreateAlpha( Sprite2D *sprite)
 	if ( sprite->pixels ) {
 		free (sprite->pixels);
 	}
-	if (sprite->RLE) {
-		Sprite2D_RLE_Internal* data = (Sprite2D_RLE_Internal*)sprite->vptr;
+	if (sprite->BAM) {
+		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)sprite->vptr;
 		delete data;
-		sprite->RLE = false;
+		sprite->BAM = false;
 	} else {
 		SDL_FreeSurface ((SDL_Surface*)sprite->vptr);
 	}
