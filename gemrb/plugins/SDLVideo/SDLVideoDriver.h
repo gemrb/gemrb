@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.56 2006/01/08 22:07:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.57 2006/01/08 22:31:42 avenger_teambg Exp $
  *
  */
 
@@ -142,12 +142,12 @@ public:
 	void showFrame(unsigned char* buf, unsigned int bufw,
 	unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,
 	unsigned int h, unsigned int dstx, unsigned int dsty, int truecolor,
-	unsigned char *palette);
+	unsigned char *palette, ieDword strRef);
 	int PollMovieEvents();
-	void DrawMovieSubtitle(ieDword strRef);
 private:
 	inline void SetPixel(short x, short y, Color& color, bool clipped = true);
 	inline void GetPixel(short x, short y, Color* color);
+	void DrawMovieSubtitle(ieDword strRef);
 
 public:
 	bool IsSpritePixelTransparent (Sprite2D* sprite, unsigned short x, unsigned short y);

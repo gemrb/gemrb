@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.127 2006/01/08 22:07:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.128 2006/01/08 22:31:42 avenger_teambg Exp $
  *
  */
 
@@ -2129,7 +2129,7 @@ void SDLVideoDriver::InitMovieScreen(int &w, int &h)
 void SDLVideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 	unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,
 	unsigned int h, unsigned int dstx, unsigned int dsty, 
-	int g_truecolor, unsigned char *pal)
+	int g_truecolor, unsigned char *pal, ieDword titleref)
 {
 	int i;
 	SDL_Surface* sprite;
@@ -2162,6 +2162,8 @@ void SDLVideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 	destRect.h = h;
 
 	SDL_BlitSurface( sprite, &srcRect, disp, &destRect );
+	if (titleref>0)
+		DrawMovieSubtitle( titleref );
 	SDL_Flip( disp );
 	SDL_FreeSurface( sprite );
 }
@@ -2207,9 +2209,9 @@ void SDLVideoDriver::DrawMovieSubtitle(ieDword strRef)
 		core->FreeString(subtitletext);
 		subtitletext = core->GetString(strRef);
 		subtitlestrref = strRef;
+		printf("Fetched subtitle %s\n", subtitletext);
 	}
 	if (subtitlefont) {
-		subtitlefont->Print(subtitleregion, (unsigned char *) subtitletext, subtitlepal, IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_BOTTOM);
+		subtitlefont->Print(subtitleregion, (unsigned char *) subtitletext, subtitlepal, IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_BOTTOM, true);
 	}
-	SDL_Flip( disp );
 }

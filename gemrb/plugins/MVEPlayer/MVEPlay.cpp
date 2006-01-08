@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.cpp,v 1.19 2006/01/08 22:07:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/MVEPlayer/MVEPlay.cpp,v 1.20 2006/01/08 22:31:42 avenger_teambg Exp $
  *
  */
 
@@ -188,7 +188,8 @@ void MVEPlay::showFrame(unsigned char* buf, unsigned int bufw,
 	unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,
 	unsigned int h, unsigned int dstx, unsigned int dsty)
 {
-	video->showFrame(buf,bufw,bufh,sx,sy,w,h,dstx,dsty, g_truecolor, g_palette);
+	ieDword titleref = 0;
+
 	if (cbAtFrame && strRef) {
 		frameCount ++;
 		if ((rowCount<maxRow) && (frameCount >= cbAtFrame[rowCount]) ) {
@@ -196,9 +197,10 @@ void MVEPlay::showFrame(unsigned char* buf, unsigned int bufw,
 		}
 		//draw subtitle here
 		if (rowCount) {
-			video->DrawMovieSubtitle(strRef[rowCount-1]);
+			titleref = strRef[rowCount-1];
 		}
 	}
+	video->showFrame(buf,bufw,bufh,sx,sy,w,h,dstx,dsty, g_truecolor, g_palette, titleref);
 }
 
 void MVEPlay::setPalette(unsigned char* p, unsigned start, unsigned count)

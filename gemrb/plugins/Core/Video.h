@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.53 2006/01/08 22:07:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.54 2006/01/08 22:31:40 avenger_teambg Exp $
  *
  */
 
@@ -159,11 +159,10 @@ public:
 	virtual void showFrame(unsigned char* buf, unsigned int bufw,
 		unsigned int bufh, unsigned int sx, unsigned int sy,
 		unsigned int w, unsigned int h, unsigned int dstx,
-		unsigned int dsty, int truecolor, unsigned char *palette) = 0;
+		unsigned int dsty, int truecolor, unsigned char *palette,
+		ieDword titleref) = 0;
 	/** handle events during movie */
 	virtual int PollMovieEvents() = 0;
-	/** draw a subtitle string on bottom of the screen*/
-	virtual void DrawMovieSubtitle(ieDword strRef) = 0;
 public:
 	/** Event Manager Pointer */
 	EventMgr* Evnt;
