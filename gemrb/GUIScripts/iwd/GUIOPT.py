@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUIOPT.py,v 1.3 2005/03/20 21:28:26 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUIOPT.py,v 1.4 2006/01/08 12:27:05 avenger_teambg Exp $
 
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
@@ -215,7 +215,7 @@ def OpenAudioOptionsWindow ():
 	OptSlider ('MusicVolume', Window, 4, 19)
 	OptSlider ('MovieVolume', Window, 22, 20)
 
-	OptButton ('TalkOptions', Window, 13)
+	OptButton ('TalkOptions', Window, 13,17778)
 
 	OptCheckbox ('CreativeEAX', Window, 26, 28)
 
@@ -318,8 +318,8 @@ def OpenGameplayOptionsWindow ():
 ##	OptCheckbox ('DitherAlways', Window, 5, 17)
 ##	OptCheckbox ('Gore', Window, 6, 18)
 
-	OptButton ('FeedbackOptions', Window, 5)
-	OptButton ('AutopauseOptions', Window, 6)
+	OptButton ('FeedbackOptions', Window, 5, 17163)
+	OptButton ('AutopauseOptions', Window, 6, 17166)
 
 	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
@@ -847,10 +847,11 @@ def OptCheckbox (name, window, button_id, label_id):
 
 	return button
 
-def OptButton (name, window, button_id):
+def OptButton (name, window, button_id, label_strref):
 	"""Standard subwindow button for option windows"""
 	button = GemRB.GetControl (window, button_id)
 	GemRB.SetEvent (window, button, IE_GUI_BUTTON_ON_PRESS, "Open%sWindow" %name)	
+	GemRB.SetText (window, button, label_strref)
 
 def OptDone (name, window, button_id):
 	"""Standard `Done' button for option windows"""

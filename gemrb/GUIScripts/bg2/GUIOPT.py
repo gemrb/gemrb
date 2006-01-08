@@ -16,16 +16,16 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIOPT.py,v 1.16 2005/12/17 21:02:45 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIOPT.py,v 1.17 2006/01/08 12:26:59 avenger_teambg Exp $
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
 # Ingame options
 
 ###################################################
 import GemRB
+import GUICommonWindows
 from GUIDefines import *
 from GUICommon import CloseOtherWindow
-import GUICommonWindows
 from GUISAVE import *
 from GUICommonWindows import *
 
@@ -406,16 +406,16 @@ def OpenAutopauseOptionsWindow ():
 	OptDone ('AutopauseOptions', Window, 11)
 	OptCancel ('AutopauseOptions', Window, 14)
 
-	OptCheckbox ('CharacterHit', Window, 1, 17, 'Auto Pause Status', 1)
-	OptCheckbox ('CharacterInjured', Window, 2, 18, 'Auto Pause Status', 2)
-	OptCheckbox ('CharacterDead', Window, 3, 19, 'Auto Pause Status', 4)
-	OptCheckbox ('CharacterAttacked', Window, 4, 20, 'Auto Pause Status', 8)
-	OptCheckbox ('WeaponUnusable', Window, 5, 21, 'Auto Pause Status', 16)
-	OptCheckbox ('TargetGone', Window, 13, 22, 'Auto Pause Status', 32)
-	OptCheckbox ('EndOfRound', Window, 25, 24, 'Auto Pause Status', 64)
-	OptCheckbox ('EnemySighted', Window, 26, 27, 'Auto Pause Status', 128)
-	OptCheckbox ('SpellCast', Window, 34, 30, 'Auto Pause Status', 256)
-	OptCheckbox ('TrapFound', Window, 31, 33, 'Auto Pause Status', 512)
+	OptCheckbox ('CharacterHit', Window, 1, 17, 'Auto Pause State', 1)
+	OptCheckbox ('CharacterInjured', Window, 2, 18, 'Auto Pause State', 2)
+	OptCheckbox ('CharacterDead', Window, 3, 19, 'Auto Pause State', 4)
+	OptCheckbox ('CharacterAttacked', Window, 4, 20, 'Auto Pause State', 8)
+	OptCheckbox ('WeaponUnusable', Window, 5, 21, 'Auto Pause State', 16)
+	OptCheckbox ('TargetGone', Window, 13, 22, 'Auto Pause State', 32)
+	OptCheckbox ('EndOfRound', Window, 25, 24, 'Auto Pause State', 64)
+	OptCheckbox ('EnemySighted', Window, 26, 27, 'Auto Pause State', 128)
+	OptCheckbox ('SpellCast', Window, 34, 30, 'Auto Pause State', 256)
+	OptCheckbox ('TrapFound', Window, 31, 33, 'Auto Pause State', 512)
 	OptCheckbox ('CenterOnActor', Window, 31, 33, 'Auto Pause Center', 1)
 
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
@@ -476,8 +476,8 @@ def OpenCharacterSoundsWindow ():
 
 	HelpTextArea = OptHelpText ('CharacterSounds', Window, 16, 18041)
 
-	OptDone ('AutopauseOptions', Window, 24)
-	OptCancel ('AutopauseOptions', Window, 25)
+	OptDone ('CharacterSounds', Window, 24)
+	OptCancel ('CharacterSounds', Window, 25)
 
 	OptCheckbox ('Subtitles', Window, 5, 20, 'Subtitles', 1)
 	OptCheckbox ('AttackSounds', Window, 6, 18, 'Attack Sounds', 1)
@@ -519,7 +519,7 @@ def OpenSaveMsgWindow ():
 def OpenLoadMsgWindow ():
 	global LoadMsgWindow
 
-	if LoadMsgWindow:		
+	if LoadMsgWindow:
 		return
 		
 	LoadMsgWindow = Window = GemRB.LoadWindow (4)
@@ -570,7 +570,7 @@ def SaveGamePress():
 	#we need to set a state: quit after save
 	GemRB.SetVar("QuitAfterSave",1)
 	OpenOptionsWindow()
-	OpenSaveWindow ()	
+	OpenSaveWindow ()
 	return
 
 def QuitGamePress():
@@ -588,7 +588,7 @@ def QuitGamePress():
 def OpenQuitMsgWindow ():
 	global QuitMsgWindow
 
-	if QuitMsgWindow:		
+	if QuitMsgWindow:
 		return
 		
 	QuitMsgWindow = Window = GemRB.LoadWindow (5)
@@ -626,24 +626,6 @@ def CloseQuitMsgWindow ():
 	return
 
 ###################################################
-
-key_list = [
-	('GemRB', None),
-	('Grab pointer', '^G'),
-	('Toggle fullscreen', '^F'),
-	('Enable cheats', '^T'),
-	('', None),
-	
-	('IE', None),
-	('Open Inventory', 'I'),
-	('Open Priest Spells', 'P'),
-	('Open Mage Spells', 'S'),
-	('Pause Game', 'SPC'),
-	('Select Weapon', ''),
-	('', None),
-	]
-
-###################################################
 ###################################################
 
 # These functions help to setup controls found
@@ -661,9 +643,8 @@ def OptSlider (name, window, slider_id, variable, value):
 	GemRB.SetEvent (window, slider, IE_GUI_SLIDER_ON_CHANGE, "DisplayHelp" + name)
 	return slider
 
-
 def OptRadio (name, window, button_id, label_id, variable, value):
-	"""Standard checkbox for option windows"""
+	"""Standard radio button for option windows"""
 
 	button = GemRB.GetControl (window, button_id)
 	GemRB.SetButtonFlags (window, button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
@@ -693,7 +674,7 @@ def OptCheckbox (name, window, button_id, label_id, variable, value):
 def OptButton (name, window, button_id, label_strref):
 	"""Standard subwindow button for option windows"""
 	button = GemRB.GetControl (window, button_id)
-	GemRB.SetEvent (window, button, IE_GUI_BUTTON_ON_PRESS, "Open%sWindow" %name)	
+	GemRB.SetEvent (window, button, IE_GUI_BUTTON_ON_PRESS, "Open%sWindow" %name)
 	GemRB.SetText (window, button, label_strref)
 
 def OptDone (name, window, button_id):

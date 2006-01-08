@@ -97,16 +97,16 @@ def OnLoad():
 
 	GemRB.SetVarAssoc(AutoPauseWindow, AutopauseCenterB, "Auto Pause Center",1)
 
-	GemRB.SetVarAssoc(AutoPauseWindow, ChHitButtonB, "Auto Pause Status",1)
-	GemRB.SetVarAssoc(AutoPauseWindow, ChInjuredB, "Auto Pause Status",2)
-	GemRB.SetVarAssoc(AutoPauseWindow, ChDeathB, "Auto Pause Status",4)
-	GemRB.SetVarAssoc(AutoPauseWindow, ChAttackedB, "Auto Pause Status",8)
-	GemRB.SetVarAssoc(AutoPauseWindow, WeaponUnusableB, "Auto Pause Status",16)
-	GemRB.SetVarAssoc(AutoPauseWindow, TargetDestroyedB, "Auto Pause Status",32)
-	GemRB.SetVarAssoc(AutoPauseWindow, EndOfRoundB, "Auto Pause Status",64)
-	GemRB.SetVarAssoc(AutoPauseWindow, EnemySightedB, "Auto Pause Status",128)
-	GemRB.SetVarAssoc(AutoPauseWindow, SpellCastB, "Auto Pause Status",256)
-	GemRB.SetVarAssoc(AutoPauseWindow, TrapFoundB, "Auto Pause Status",512)
+	GemRB.SetVarAssoc(AutoPauseWindow, ChHitButtonB, "Auto Pause State",1)
+	GemRB.SetVarAssoc(AutoPauseWindow, ChInjuredB, "Auto Pause State",2)
+	GemRB.SetVarAssoc(AutoPauseWindow, ChDeathB, "Auto Pause State",4)
+	GemRB.SetVarAssoc(AutoPauseWindow, ChAttackedB, "Auto Pause State",8)
+	GemRB.SetVarAssoc(AutoPauseWindow, WeaponUnusableB, "Auto Pause State",16)
+	GemRB.SetVarAssoc(AutoPauseWindow, TargetDestroyedB, "Auto Pause State",32)
+	GemRB.SetVarAssoc(AutoPauseWindow, EndOfRoundB, "Auto Pause State",64)
+	GemRB.SetVarAssoc(AutoPauseWindow, EnemySightedB, "Auto Pause State",128)
+	GemRB.SetVarAssoc(AutoPauseWindow, SpellCastB, "Auto Pause State",256)
+	GemRB.SetVarAssoc(AutoPauseWindow, TrapFoundB, "Auto Pause State",512)
 
 	GemRB.SetVisible(AutoPauseWindow,1)
 	return
