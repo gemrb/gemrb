@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIMOVIE.py,v 1.6 2005/03/20 21:28:24 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIMOVIE.py,v 1.7 2006/01/08 22:50:13 avenger_teambg Exp $
 
 
 # GUIMOVIE.py - Play Movies window
@@ -64,7 +64,7 @@ def PlayPress():
 			if s==0:
 				s = GemRB.GetTableRowName(MoviesTable, i)
 				GemRB.SetVisible (MovieWindow, 0)
-				GemRB.PlayMovie(s)
+				GemRB.PlayMovie(s, 1)
 				GemRB.SetVisible (MovieWindow, 1)
 				return
 
@@ -73,7 +73,7 @@ def PlayPress():
 
 def CreditsPress():
 	GemRB.SetVisible (MovieWindow, 0)
-	GemRB.PlayMovie("CREDITS")
+	GemRB.PlayMovie("CREDITS", 1)
 	GemRB.SetVisible (MovieWindow, 1)
 
 
