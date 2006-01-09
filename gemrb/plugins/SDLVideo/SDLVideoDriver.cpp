@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.129 2006/01/09 20:49:54 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.130 2006/01/09 23:07:33 avenger_teambg Exp $
  *
  */
 
@@ -2119,11 +2119,11 @@ void SDLVideoDriver::InitMovieScreen(int &w, int &h)
 	SDL_Flip( disp );
 	w = disp->w;
 	h = disp->h;
-	//setting the subtitle region to the bottom 1/10th of the screen
+	//setting the subtitle region to the bottom 1/4th of the screen
 	subtitleregion.w = w;
-	subtitleregion.h = h/10;
+	subtitleregion.h = h/4;
 	subtitleregion.x = 0;
-	subtitleregion.y = h-h/10;
+	subtitleregion.y = h-h/4;
 }
 
 void SDLVideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
