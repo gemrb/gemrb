@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.128 2006/01/08 22:31:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.129 2006/01/09 20:49:54 wjpalenstijn Exp $
  *
  */
 
@@ -2212,6 +2212,10 @@ void SDLVideoDriver::DrawMovieSubtitle(ieDword strRef)
 		printf("Fetched subtitle %s\n", subtitletext);
 	}
 	if (subtitlefont) {
+		// FIXME: ugly hack!
+		SDL_Surface* temp = backBuf;
+		backBuf = disp;
 		subtitlefont->Print(subtitleregion, (unsigned char *) subtitletext, subtitlepal, IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_BOTTOM, true);
+		backBuf = temp;
 	}
 }
