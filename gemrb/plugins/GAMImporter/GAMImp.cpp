@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.78 2006/01/08 22:07:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.79 2006/01/10 22:10:33 avenger_teambg Exp $
  *
  */
 
@@ -83,8 +83,9 @@ bool GAMImp::Open(DataStream* stream, bool autoFree)
 		if (core->HasFeature(GF_HAS_KAPUTZ) ) { //pst
 			PCSize = 0x168;
 			version = GAM_VER_PST;
-		} else if ( (stricmp( core->GameType, "iwd" ) == 0) 
-			|| (stricmp( core->GameType, "how" ) == 0) ) {
+		//sound folder name takes up this space,
+		//so it is handy to make this check
+                } else if ( core->HasFeature(GF_SOUNDFOLDERS) ) {
 			PCSize = 0x180;
 			version = GAM_VER_IWD;
 		} else {
