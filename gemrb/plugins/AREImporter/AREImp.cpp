@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.150 2006/01/06 23:09:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.151 2006/01/11 17:28:05 avenger_teambg Exp $
  *
  */
 
@@ -786,7 +786,7 @@ Map* AREImp::GetMap(const char *ResRef)
 			str->ReadWord( &anim->sequence );
 			str->ReadWord( &anim->frame );
 			str->ReadDword( &anim->Flags );
-			str->ReadWord( &anim->unknown38 ); //not completely understood, seems like a percentage or speed value
+			str->ReadWord( (ieWord *) &anim->height );
 			str->ReadWord( &anim->transparency );
 			str->ReadWord( &anim->unknown3c ); //not completely understood, if not 0, sequence is started
 			str->Read( &anim->startchance,1 );
@@ -1629,7 +1629,7 @@ int AREImp::PutAnimations( DataStream *stream, Map *map)
 		stream->WriteWord( &an->sequence);
 		stream->WriteWord( &an->frame);
 		stream->WriteDword( &an->Flags);
-		stream->WriteWord( &an->unknown38);// speed or percentage
+		stream->WriteWord( (ieWord *) &an->height);
 		stream->WriteWord( &an->transparency);
 		stream->WriteWord( &an->unknown3c); //animation already played?
 		stream->Write( &an->startchance,1);

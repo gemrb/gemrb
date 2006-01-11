@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.222 2006/01/08 22:07:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.223 2006/01/11 17:28:07 avenger_teambg Exp $
  *
  */
 
@@ -541,7 +541,7 @@ void Map::UpdateScripts()
 		BlockSearchMap( actor->Pos, actor->size, 0);
 		if (actor->path && actor->path->Next) {
 			//we should actually wait for a short time and check then
-			if(!(GetBlocked(actor->path->Next->x,actor->path->Next->y)&PATH_MAP_PASSABLE)) {
+			if (!(GetBlocked(actor->path->Next->x,actor->path->Next->y)&PATH_MAP_PASSABLE)) {
 				actor->ClearPath();
 				actor->path = FindPath( actor->Pos, actor->Destination, actor->size );
 			}
@@ -645,9 +645,48 @@ void Map::DrawContainers( Region screen, Container *overContainer)
 	}
 }
 
+Actor *Map::GetNextActor(int &q, int &index)
+{
+	Actor *actor;
+retry:
+	switch(q) {
+		case 0:
+			actor = GetRoot( q, index );
+			if (actor)
+				return actor;
+			q--;
+			return NULL;
+		case 1:
+			actor = GetRoot( q, index );
+			if (actor)
+				return actor;
+			q--;
+			index = Qcount[q];
+			goto retry;
+		default:
+			return NULL;
+	}
+}
+
+AreaAnimation *Map::GetNextAreaAnimation(int &aniidx, ieDword gametime)
+{
+retry:
+	if (aniidx>=GetAnimationCount()) {
+		return NULL;
+	}
+	AreaAnimation *a = GetAnimation(aniidx++);
+	if (!a->Schedule(gametime) ) {
+		goto retry;
+	}
+	if (!IsVisible( a->Pos, !(a->Flags & A_ANI_NOT_IN_FOG)) ) {
+		goto retry;
+	}
+	return a;
+}
+
 void Map::DrawMap(Region screen, GameControl* gc)
 {
-	unsigned int i;
+	//unsigned int i;
 	//Draw the Map
 
 	if (!TMap) {
@@ -658,72 +697,50 @@ void Map::DrawMap(Region screen, GameControl* gc)
 	TMap->DrawOverlay( 0, screen );
 	//Blit the Background Map Animations (before actors)
 	Video* video = core->GetVideoDriver();
-	for (i = 0; i < animations.size(); i++) {
-		AreaAnimation *a = animations[i];
-		int animcount=a->animcount;
-		
-		if (!(a->Flags&A_ANI_BACKGROUND)) continue; //these are drawn after actors
-		if (!a->Schedule(gametime)) continue;
-		
-		if (!IsVisible( a->Pos, !(a->Flags & A_ANI_NOT_IN_FOG)) )
-			continue;
-		//maybe we should divide only by 128, so brightening is possible too? In that case use 128,128,128 here
-		Color tint = {255,255,255,255-(ieByte) a->transparency};
-		if ((a->Flags&A_ANI_NO_SHADOW)) {
-			tint = LightMap->GetPixel( a->Pos.x / 16, a->Pos.y / 12);
-			tint.a = 255-(ieByte) a->transparency;
-		}
-		while (animcount--) {
-			Animation *anim = a->animation[animcount];
-			video->BlitSpriteTinted( anim->NextFrame(),
-				a->Pos.x + screen.x, a->Pos.y + screen.y,
-				tint, anim->Palette, &screen );		
-		}
-	}
+
 	//Draw Selected Door Outline
 	if (gc->overDoor) {
 		gc->overDoor->DrawOutline();
 	}
 	DrawContainers( screen, gc->overContainer );
 	Region vp = video->GetViewport();
-	// starting with lowest priority (so they are drawn over)
 	GenerateQueues();
-	int q = 2; //skip inactive actors, don't even sort them
-	while (q--) {
-		int index = Qcount[q];
-		while (true) {
-			Actor* actor = GetRoot( q, index );
-			if (!actor)
+	//drawing queues 1 and 0
+	//starting with lower priority (so they are drawn over)
+	int q = 1;
+	int index = Qcount[q];
+	Actor* actor = GetNextActor(q, index);
+	int aniidx = 0;
+	AreaAnimation *a = GetNextAreaAnimation(aniidx, gametime);
+	while (true) {		
+		if (!a || (actor && (actor->Pos.y<a->Pos.y+a->height)) ) {
+			if (!actor) {
 				break;
+			}
 			actor->Draw( screen );
+			actor = GetNextActor(q, index);
+		} else {
+			//draw animation
+			int animcount=a->animcount;
+
+			Color tint = {255,255,255,255-(ieByte) a->transparency};
+			if ((a->Flags&A_ANI_NO_SHADOW)) {
+				tint = LightMap->GetPixel( a->Pos.x / 16, a->Pos.y / 12);
+				tint.a = 255-(ieByte) a->transparency;
+			}
+			while (animcount--) {
+				Animation *anim = a->animation[animcount];
+				video->BlitSpriteTinted( anim->NextFrame(),
+					a->Pos.x + screen.x, a->Pos.y + screen.y,
+					tint, anim->Palette, &screen );
+			}
+			a = GetNextAreaAnimation(aniidx,gametime);
 		}
 	}
 
-	//draw normal animations after actors
-	for (i = 0; i < animations.size(); i++) {
-		AreaAnimation *a = animations[i];
-		int animcount=a->animcount;
-		
-		if (a->Flags&A_ANI_BACKGROUND) continue; //these are drawn before actors
-		if (!a->Schedule(gametime)) continue;
-
-		if (!IsVisible( a->Pos, !(a->Flags & A_ANI_NOT_IN_FOG)) )
-			continue;
-		Color tint = {255,255,255,255-(ieByte) a->transparency};
-		if ((a->Flags&A_ANI_NO_SHADOW)) {
-			tint = LightMap->GetPixel( a->Pos.x / 16, a->Pos.y / 12);
-			tint.a = 255-(ieByte) a->transparency;
-		}
-		while (animcount--) {
-			Animation *anim = a->animation[animcount];
-			video->BlitSpriteTinted( anim->NextFrame(),
-				a->Pos.x + screen.x, a->Pos.y + screen.y,
-				tint, anim->Palette, &screen );
-		}
-	}
-
-	for (i = 0; i < vvcCells.size(); i++) {
-		ScriptedAnimation* vvc = vvcCells.at( i );
+	//actually these should go with the big list as well!
+	for (unsigned int i = 0; i < vvcCells.size(); i++) {
+		ScriptedAnimation* vvc = vvcCells[i];
 		if (!vvc)
 			continue;
 		if (!vvc->anims[0])
@@ -791,9 +808,18 @@ void Map::DrawSearchMap(Region &screen)
 	}
 }
 
+//adding animation in order, based on its height parameter
 void Map::AddAnimation(AreaAnimation* anim)
 {
-	animations.push_back( anim );
+	int i;
+
+	//this hack is to make sure animations flagged with background
+	//are always drawn first (-9999 seems sufficiently small)
+	if (anim->Flags&A_ANI_BACKGROUND) {
+		anim->height=-9999;
+	}
+	for(i=animations.size();i && animations[i-1]->height>anim->height; i--);
+	animations.insert(animations.begin()+i, anim);
 }
 
 //reapplying all of the effects on the actors of this map
@@ -914,7 +940,7 @@ int Map::GetActorCount(bool any) const
 	}
 	int ret = 0;
 	unsigned int i=actors.size();
-	while(i--) {
+	while (i--) {
 		if (MustSave(actors[i])) {
 			ret++;
 		}
@@ -941,7 +967,7 @@ void Map::PurgeArea(bool items)
 {
 	//1. remove dead actors without 'keep corpse' flag
 	unsigned int i=actors.size();
-	while(i--) {
+	while (i--) {
 		Actor *ac = actors[i];
 
 		if (ac->GetStat(IE_STATE_ID)&STATE_NOSAVE) {
@@ -955,10 +981,10 @@ void Map::PurgeArea(bool items)
 	//2. remove any non critical items
 	if (items) {
 		unsigned int i=TMap->GetContainerCount();
-		while(i--) {
+		while (i--) {
 			Container *c = TMap->GetContainer(i);
 			unsigned int j=c->inventory.GetSlotCount();
-			while(j--) {
+			while (j--) {
 				CREItem *itemslot = c->inventory.GetSlotItem(j);
 				if (itemslot->Flags&IE_INV_ITEM_CRITICAL) {
 					continue;
@@ -971,11 +997,11 @@ void Map::PurgeArea(bool items)
 
 Actor* Map::GetActor(int index, bool any)
 {
-	if(any) {
+	if (any) {
 		return actors[index];
 	}
 	unsigned int i=0;
-	while(i<actors.size() ) {
+	while (i<actors.size() ) {
 		Actor *ac = actors[i++];
 		if (MustSave(ac) ) {
 			if (!index--) {
@@ -1660,7 +1686,7 @@ PathNode* Map::GetLine(Point &start, Point &dest, int Steps, int Orientation, in
 	StartNode->orient = Orientation;
 
 	int Max = Steps;
-	while(Steps--) {
+	while (Steps--) {
 		int x,y;
 
 		StartNode->Next = new PathNode;

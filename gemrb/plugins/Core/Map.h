@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.101 2006/01/06 23:09:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.102 2006/01/11 17:28:07 avenger_teambg Exp $
  *
  */
 
@@ -141,7 +141,7 @@ public:
 	ieWord frame;
 	//these are on one dword
 	ieWord transparency;
-	ieWord unknown38;
+	ieWordSigned height;
 	//these are on one dword
 	ieWord unknown3c;
 	ieByte skipcycle;
@@ -325,6 +325,8 @@ public:
 	//move some or all players to a new area
 	void MoveToNewArea(const char *area, const char *entrance, int EveryOne, Actor *actor);
 private:
+	AreaAnimation *GetNextAreaAnimation(int &aniidx, ieDword gametime);
+	Actor *GetNextActor(int &q, int &index);
 	void DrawSearchMap(Region &screen);
 	void GenerateQueues();
 	Actor* GetRoot(int priority, int &index);
