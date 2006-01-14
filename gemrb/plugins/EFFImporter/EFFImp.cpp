@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/EFFImporter/EFFImp.cpp,v 1.4 2005/07/17 18:58:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/EFFImporter/EFFImp.cpp,v 1.5 2006/01/14 19:55:10 avenger_teambg Exp $
  *
  */
 
@@ -65,6 +65,8 @@ Effect* EFFImp::GetEffect(Effect *fx)
 		return GetEffectV1( fx );
 	}
 	else {
+		// Skip over Signature2
+		str->Seek( 8, GEM_CURRENT_POS );
 		return GetEffectV20( fx );
 	}
 }
@@ -110,9 +112,6 @@ Effect* EFFImp::GetEffectV20(Effect *fx)
 
 	memset( fx, 0, sizeof( Effect ) );
 
-	// Skip over Signature2
-	str->Seek( 8, GEM_CURRENT_POS );
-	
 	str->ReadDword( &fx->Opcode );
 	str->ReadDword( &fx->Target );
 	str->ReadDword( &fx->Power );

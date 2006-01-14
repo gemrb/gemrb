@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.353 2006/01/14 19:47:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.354 2006/01/14 19:55:09 avenger_teambg Exp $
  *
  */
 
@@ -267,6 +267,7 @@ static TriggerLink triggernames[] = {
 	{"partyitemcountgt", GameScript::NumItemsPartyGT, 0},
 	{"partyitemcountlt", GameScript::NumItemsPartyLT, 0},
 	{"partymemberdied", GameScript::PartyMemberDied, 0},
+	{"partyrested", GameScript::PartyRested, 0},
 	{"pccanseepoint", GameScript::PCCanSeePoint, 0},
 	{"pcinstore", GameScript::PCInStore, 0},
 	{"personalspacedistance", GameScript::PersonalSpaceDistance, 0},
