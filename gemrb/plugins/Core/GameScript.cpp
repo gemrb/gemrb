@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.352 2006/01/07 22:47:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.353 2006/01/14 19:47:23 avenger_teambg Exp $
  *
  */
 
@@ -1604,9 +1604,7 @@ void GameScript::ExecuteString(Scriptable* Sender, char* String)
 Targets *GameScript::Myself(Scriptable* Sender, Targets* parameters)
 {
 	parameters->Clear();
-	if (Sender->Type==ST_ACTOR) {
-		parameters->AddTarget((Actor *) Sender, 0);
-	}
+	parameters->AddTarget(Sender, 0);
 	return parameters;
 }
 
