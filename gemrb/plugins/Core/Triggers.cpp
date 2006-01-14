@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.40 2006/01/06 23:09:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.41 2006/01/14 17:16:42 avenger_teambg Exp $
  *
  */
 
@@ -3147,6 +3147,15 @@ int GameScript::RandomStatCheck(Scriptable* Sender, Trigger* parameters)
 			if (stat>value)
 				return 1;
 			break;
+	}
+	return 0;
+}
+
+int GameScript::PartyRested(Scriptable * /*Sender*/, Trigger * /*parameters*/)
+{
+	Game *game = core->GetGame();
+	if (game->GetInternalFlag()&IF_PARTYRESTED) {
+		return 1;
 	}
 	return 0;
 }

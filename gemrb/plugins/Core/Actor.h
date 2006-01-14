@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.99 2006/01/06 23:09:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.100 2006/01/14 17:16:42 avenger_teambg Exp $
  *
  */
 
@@ -255,6 +255,7 @@ public:
 			LargePortrait[i] = 'M';
 		}
 	}
+	void SetSoundFolder(const char *soundset);
 	/** Gets the Character Long Name/Short Name */
 	char* GetName(int which) const
 	{

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.h,v 1.14 2005/11/20 17:49:30 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.h,v 1.15 2006/01/14 17:16:42 avenger_teambg Exp $
  *
  */
 
@@ -116,11 +116,11 @@ GEM_EXPORT int _fclose(_FILE* stream);
 #define _feof feof
 #define _fclose fclose
 
-char* FindInDir(char* Dir, char* Filename);
 void ResolveFilePath(char* FilePath);
 
 #endif  // ! WIN32
 
+GEM_EXPORT char* FindInDir(const char* Dir, const char* Filename, bool wildcard=false);
 GEM_EXPORT bool dir_exists(const char* path);
 
 GEM_EXPORT char* PathAppend (char* target, char* dir);

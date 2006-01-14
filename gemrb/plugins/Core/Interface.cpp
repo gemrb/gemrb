@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.385 2006/01/08 22:07:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.386 2006/01/14 17:16:42 avenger_teambg Exp $
  *
  */
 
@@ -2834,6 +2834,12 @@ int Interface::GetCharSounds(TextArea* ta)
 		stat( dtmp, &fst );
 		if (hasfolders == !S_ISDIR( fst.st_mode ))
 			continue;
+		if (!hasfolders) {
+			strupr(de->d_name);
+			char *pos = strstr(de->d_name,"A.WAV");
+			if (!pos) continue;
+			*pos=0;
+		}
 		count++;
 		ta->AppendText( de->d_name, -1 );
 	} while (( de = readdir( dir ) ) != NULL);

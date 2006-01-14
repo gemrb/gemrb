@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.375 2006/01/08 22:07:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.376 2006/01/14 17:16:42 avenger_teambg Exp $
  *
  */
 
@@ -3654,6 +3654,32 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetPlayerSound__doc,
+"SetPlayerSound(Slot, SoundFolder)\n\n"
+"Sets the player name." );
+
+static PyObject* GemRB_SetPlayerSound(PyObject * /*self*/, PyObject* args)
+{
+	char *Sound=NULL;
+	int PlayerSlot;
+
+	if (!PyArg_ParseTuple( args, "is", &PlayerSlot, &Sound )) {
+		return AttributeError( GemRB_SetPlayerSound__doc );
+	}
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	PlayerSlot = game->FindPlayer( PlayerSlot );
+	Actor* MyActor = core->GetGame()->GetPC( PlayerSlot, false );
+	if (!MyActor) {
+		return NULL;
+	}
+	MyActor->SetSoundFolder(Sound);
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_GetSlotType__doc,
 "GetSlotType(idx) => dict\n\n"
 "Returns dictionary of an itemslot type (slottype.2da).");
@@ -6283,6 +6309,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetPlayerPortrait, METH_VARARGS),
 	METHOD(GetPlayerName, METH_VARARGS),
 	METHOD(SetPlayerName, METH_VARARGS),
+	METHOD(SetPlayerSound, METH_VARARGS),
 	METHOD(GetSlotType, METH_VARARGS),
 	METHOD(GetPCStats, METH_VARARGS),
 	METHOD(FillPlayerInfo, METH_VARARGS),

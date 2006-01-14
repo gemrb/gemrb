@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.159 2006/01/08 22:07:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.160 2006/01/14 17:16:41 avenger_teambg Exp $
  *
  */
 
@@ -1343,7 +1343,6 @@ void Actor::GetActionButtonRow(ActionButtonRow &ar, int translation)
 				tmp=gemrb2iwd[tmp];
 			}
 			PCStats->QSlots[i]=tmp;
-printf("%d<--%d\n", ar[i+3], tmp);
 		}
 		return;
 	}
@@ -1361,6 +1360,31 @@ printf("%d<--%d\n", ar[i+3], tmp);
 			}
 		}
 		ar[i+3]=tmp;
-printf("%d-->%d\n", PCStats->QSlots[i], tmp);
+	}
+}
+
+void Actor::SetSoundFolder(const char *soundset)
+{
+	if (core->HasFeature(GF_SOUNDFOLDERS)) {
+		char path[_MAX_PATH];
+
+		strnlwrcpy(PCStats->SoundFolder, soundset, 32);
+		snprintf(path, _MAX_PATH, "%ssounds\\%s", core->GamePath,PCStats->SoundFolder);
+		char *fp = FindInDir(path, "?????01");
+		if (fp) {
+			fp[5] = 0;
+		} else {
+			fp = FindInDir(path, "????01");
+			if (fp) {
+				fp[4] = 0;
+			}
+		}
+		if (fp) {
+			strnlwrcpy(PCStats->SoundSet, fp, 6);
+			free(fp);
+		}
+	} else {
+		strnlwrcpy(PCStats->SoundSet, soundset, 6);
+		PCStats->SoundFolder[0]=0;
 	}
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.16 2005/11/26 14:21:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.17 2006/01/14 17:16:42 avenger_teambg Exp $
  *
  */
 
@@ -296,10 +296,21 @@ void FixPath (char *path, bool needslash)
 	path[i] = 0;
 }
 
+int strmatch(const char *string, const char *mask)
+{
+	while(*mask) {
+		if (*mask!='?') {
+			if (tolower(*mask)!=tolower(*string)) {
+				return 1;
+			}
+		}
+		mask++;
+		string++;
+	}
+	return 0;
+}
 
-#ifndef WIN32
-
-char* FindInDir(char* Dir, char* Filename)
+char* FindInDir(const char* Dir, const char* Filename, bool wildcards)
 {
 	char* fn = NULL;
 	DIR* dir = opendir( Dir );
@@ -312,7 +323,7 @@ char* FindInDir(char* Dir, char* Filename)
 	char TempFilePath[_MAX_PATH];
 	PathJoin( TempFilePath, Dir, Filename, NULL );
 
-	if (!access( TempFilePath, F_OK )) {
+	if (!access( TempFilePath, R_OK )) {
 		closedir( dir );
 		return strdup( Filename );
 	}
@@ -325,7 +336,13 @@ char* FindInDir(char* Dir, char* Filename)
 		return NULL;
 	}
 	do {
-		if (strcasecmp( de->d_name, Filename ) == 0) {
+		int match;
+		if (wildcards) {
+			match = strmatch( de->d_name, Filename );
+		} else {
+			match = stricmp( de->d_name, Filename );
+		}
+		if (match == 0) {
 			fn = ( char * ) malloc( strlen( de->d_name ) + 1 );
 			strcpy( fn, de->d_name );
 			break;
@@ -334,6 +351,8 @@ char* FindInDir(char* Dir, char* Filename)
 	closedir( dir );  //No other files in the directory, close it
 	return fn;
 }
+
+#ifndef WIN32
 
 void ResolveFilePath(char* FilePath)
 {
@@ -356,7 +375,7 @@ void ResolveFilePath(char* FilePath)
 		}
 		TempFileName[j] = 0;
 		pos += j;
-		char* NewName = FindInDir( TempFilePath, TempFileName );
+		char* NewName = FindInDir( TempFilePath, TempFileName, false );
 		if (NewName) {
 			strcat( TempFilePath, SPathDelimiter );
 			strcat( TempFilePath, NewName );
