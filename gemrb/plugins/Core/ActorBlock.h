@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.98 2006/01/06 23:09:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.99 2006/01/14 21:14:05 avenger_teambg Exp $
  *
  */
 
@@ -167,6 +167,8 @@ public:
 	unsigned long timeStartDisplaying;
 	ieDword LastTrigger;
 	ieDword LastEntered;
+	ieDword LastDisarmed;
+	ieDword LastDisarmFailed;
 	std::list< Action*> actionQueue;
 	Action* CurrentAction;
 	unsigned long playDeadCounter;

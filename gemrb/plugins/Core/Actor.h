@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.100 2006/01/14 17:16:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.101 2006/01/14 21:14:05 avenger_teambg Exp $
  *
  */
 
@@ -158,16 +158,20 @@ public:
 	ieWord localID;
 public:
 	ieDword Leader;
-	ieDword LastTarget;
+	#define LastTarget LastDisarmFailed
+	//ieDword LastTarget; use lastdisarmfailed
+	#define LastAttacker LastDisarmed
+	//ieDword LastAttacker; use lastdisarmed
+	#define LastHitter LastEntered
+	//ieDword LastHitter; use lastentered
+	#define LastSummoner LastTrigger
+	//ieDword LastSummoner; use lasttrigger
 	ieDword LastTalkedTo;
-	ieDword LastAttacker;
-	ieDword LastHitter;
 	ieDword LastProtected;
 	ieDword LastCommander;
 	ieDword LastHelp;
 	ieDword LastSeen;
 	ieDword LastHeard;
-	ieDword LastSummoner;
 	ieDword HotKey; 
 
 	int LastCommand;   //lastcommander

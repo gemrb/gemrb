@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.223 2006/01/11 17:28:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.224 2006/01/14 21:14:05 avenger_teambg Exp $
  *
  */
 
@@ -539,9 +539,9 @@ void Map::UpdateScripts()
 		//TODO:calculate actor speed!
 		int speed = 150;
 		BlockSearchMap( actor->Pos, actor->size, 0);
-		if (actor->path && actor->path->Next) {
+		if (actor->path) {
 			//we should actually wait for a short time and check then
-			if (!(GetBlocked(actor->path->Next->x,actor->path->Next->y)&PATH_MAP_PASSABLE)) {
+			if (!(GetBlocked(actor->path->x,actor->path->y)&PATH_MAP_PASSABLE)) {
 				actor->ClearPath();
 				actor->path = FindPath( actor->Pos, actor->Destination, actor->size );
 			}
