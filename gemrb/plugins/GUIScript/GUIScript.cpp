@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.376 2006/01/14 17:16:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.377 2006/01/15 11:11:56 avenger_teambg Exp $
  *
  */
 
@@ -1531,10 +1531,10 @@ static PyObject* GemRB_CreateLabelOnButton(PyObject * /*self*/, PyObject* args)
 	int WindowIndex, ControlIndex, ControlID, align;
 	char *font;
 
-        if (!PyArg_ParseTuple( args, "iiisi", &WindowIndex, &ControlIndex,
+	if (!PyArg_ParseTuple( args, "iiisi", &WindowIndex, &ControlIndex,
 			&ControlID, &font, &align )) {
-                return AttributeError( GemRB_CreateLabelOnButton__doc );
-        }
+		return AttributeError( GemRB_CreateLabelOnButton__doc );
+	}
 
 	Window* win = core->GetWindow( WindowIndex );
 	if (win == NULL) {
@@ -3656,7 +3656,7 @@ static PyObject* GemRB_SetPlayerName(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_SetPlayerSound__doc,
 "SetPlayerSound(Slot, SoundFolder)\n\n"
-"Sets the player name." );
+"Sets the player character's sound set." );
 
 static PyObject* GemRB_SetPlayerSound(PyObject * /*self*/, PyObject* args)
 {

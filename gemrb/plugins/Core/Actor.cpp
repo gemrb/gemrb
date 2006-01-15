@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.160 2006/01/14 17:16:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.161 2006/01/15 11:11:54 avenger_teambg Exp $
  *
  */
 
@@ -1369,12 +1369,12 @@ void Actor::SetSoundFolder(const char *soundset)
 		char path[_MAX_PATH];
 
 		strnlwrcpy(PCStats->SoundFolder, soundset, 32);
-		snprintf(path, _MAX_PATH, "%ssounds\\%s", core->GamePath,PCStats->SoundFolder);
-		char *fp = FindInDir(path, "?????01");
+		PathJoin(path,core->GamePath,"sounds",PCStats->SoundFolder,0);
+		char *fp = FindInDir(path, "?????01", true);
 		if (fp) {
 			fp[5] = 0;
 		} else {
-			fp = FindInDir(path, "????01");
+			fp = FindInDir(path, "????01", true);
 			if (fp) {
 				fp[4] = 0;
 			}
