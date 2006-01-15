@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.65 2005/12/29 17:46:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.66 2006/01/15 17:00:47 avenger_teambg Exp $
  *
  */
 
@@ -481,6 +481,11 @@ void Inventory::DropItemAtLocation(unsigned int slot, unsigned int flags, Map *m
 	if (slot>Slots.size()) {
 		return;
 	}
+	//these slots will never 'drop' the item
+	if ((slot==(unsigned int) SLOT_FIST) || (slot==(unsigned int) SLOT_MAGIC)) {
+		return;
+	}
+
 	CREItem *item = Slots[slot];
 	if (!item) {
 		return;
@@ -499,6 +504,10 @@ void Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 {
 	//this loop is going from start
 	for (size_t i = 0; i < Slots.size(); i++) {
+		//these slots will never 'drop' the item
+		if ((i==(unsigned int) SLOT_FIST) || (i==(unsigned int) SLOT_MAGIC)) {
+			continue;
+		}
 		CREItem *item = Slots[i];
 		if (!item) {
 			continue;
