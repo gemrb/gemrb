@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.161 2006/01/15 11:11:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.162 2006/01/15 23:07:10 avenger_teambg Exp $
  *
  */
 
@@ -590,6 +590,19 @@ void Actor::Panic()
 	SetBase(IE_MORALE,0);
 	SetBase(IE_STATE_ID,GetStat(IE_STATE_ID)|STATE_PANIC);
 	DisplayStringCore(this, VB_PANIC, DS_CONSOLE|DS_CONST );
+}
+
+void Actor::SetMCFlag(ieDword arg, int op)
+{
+	ieDword tmp = GetBase(IE_MC_FLAGS);
+        switch (op) {
+        case BM_SET: tmp = arg; break;
+        case BM_OR: tmp |= arg; break;
+        case BM_NAND: tmp &= ~arg; break;
+        case BM_XOR: tmp ^= arg; break;
+        case BM_AND: tmp &= arg; break;
+        }
+	SetBase(IE_MC_FLAGS, tmp);
 }
 
 void Actor::DialogInterrupt()

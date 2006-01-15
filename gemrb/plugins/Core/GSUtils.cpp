@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.48 2006/01/08 22:07:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.49 2006/01/15 23:07:11 avenger_teambg Exp $
  *
  */
 
@@ -1795,6 +1795,55 @@ Targets *XthNearestMyGroupOfType(Scriptable *origin, Targets *parameters, unsign
 		t = parameters->GetNextTarget(m, ST_ACTOR);
 	}
 	return XthNearestOf(parameters,count);
+}
+
+Targets *NearestEnemySummoned(Scriptable *origin, Targets *parameters)
+{
+	if (origin->Type != ST_ACTOR) {
+		parameters->Clear();
+		return parameters;
+	}
+
+	targetlist::iterator m;
+	const targettype *t = parameters->GetFirstTarget(m, ST_ACTOR);
+	if (!t) {
+		return parameters;
+	}
+	Actor *actor = (Actor *) origin;
+	//determining the allegiance of the origin
+	int type = 2; //neutral, has no enemies
+	if (actor->GetStat(IE_EA) <= EA_GOODCUTOFF) {
+		type = 1; //PC
+	}
+	if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+		type = 0;
+	}
+	if (type==2) {
+		parameters->Clear();
+		return parameters;
+	}
+
+	actor = NULL;
+	while ( t ) {
+		Actor *tmp = (Actor *) (t->actor);
+		if (tmp->GetStat(IE_SEX) != SEX_SUMMON) {
+			continue;
+		}
+		if (type) { //origin is PC
+			if (tmp->GetStat(IE_EA) <= EA_GOODCUTOFF) {
+				continue;
+			}
+		} else {
+			if (tmp->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+				continue;
+			}
+		}
+		actor = tmp;
+		t = parameters->GetNextTarget(m, ST_ACTOR);
+	}
+	parameters->Clear();
+	parameters->AddTarget(actor, 0);
+	return parameters;
 }
 
 Targets *XthNearestEnemyOfType(Scriptable *origin, Targets *parameters, unsigned int count)

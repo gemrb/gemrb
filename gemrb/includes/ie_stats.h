@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.41 2006/01/05 21:46:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.42 2006/01/15 23:07:19 avenger_teambg Exp $
  *
  */
 
@@ -58,6 +58,11 @@
 #define GEN_GIANT     5  //???
 #define GEN_FROZEN    6  //???
 #define GEN_MONSTER   255
+
+//GENDER values
+#define SEX_MALE      1
+#define SEX_FEMALE    2
+#define SEX_SUMMON    6
 
 //alignment values
 #define AL_GNE_MASK  3  //good neutral evil
@@ -119,6 +124,7 @@
 #define MC_FALLEN_RANGER	0x0400
 
 #define MC_BEENINPARTY          0x8000
+#define MC_HIDDEN               0x10000
 
 #define MC_NO_TALK              0x80000    //ignore dialoginterrupt
 

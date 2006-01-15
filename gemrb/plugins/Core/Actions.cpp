@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.60 2006/01/08 22:07:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.61 2006/01/15 23:07:09 avenger_teambg Exp $
  *
  */
 
@@ -2119,17 +2119,21 @@ void GameScript::LeaveParty(Scriptable* Sender, Action* /*parameters*/)
 	core->GetGUIScriptEngine()->RunFunction( "UpdatePortraitWindow" );
 }
 
-//no idea why we would need this if we have activate/deactivate
+//HideCreature hides only the visuals of a creature
+//(feet circle and avatar)
+//the scripts of the creature are still running
+//iwd2 stores this flag in the MC field
 void GameScript::HideCreature(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
+	Actor* actor = ( Actor* ) tar;
 	if ( parameters->int0Parameter != 0 ) {
-		tar->Unhide();
+		actor->SetMCFlag(MC_HIDDEN, BM_OR);
 	} else {
-		tar->Hide();
+		actor->SetMCFlag(MC_HIDDEN, BM_NAND);
 	}
 }
 
@@ -2581,7 +2585,7 @@ void GameScript::SetBeenInPartyFlags(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	//it is bit 15 of the multi-class flags (confirmed)
-	actor->SetBase(IE_MC_FLAGS,actor->GetBase(IE_MC_FLAGS)|MC_BEENINPARTY);
+	actor->SetMCFlag(MC_BEENINPARTY, BM_OR);
 }
 
 /*iwd2 sets the high MC bits this way*/
@@ -2591,10 +2595,7 @@ void GameScript::SetCreatureAreaFlags(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	//confirmed with the invulnerability flag (0x20000)
-	ieDword value=actor->GetStat(IE_MC_FLAGS);
-	HandleBitMod(value, parameters->int0Parameter, parameters->int1Parameter);
-	actor->SetBase(IE_MC_FLAGS,value);
+	actor->SetMCFlag(parameters->int0Parameter, parameters->int1Parameter);
 }
 
 //this will be a global change, fixme if it should be local
@@ -2912,7 +2913,7 @@ void GameScript::RemovePaladinHood(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *act = (Actor *) Sender;
-	act->SetBase(IE_MC_FLAGS, act->GetStat(IE_MC_FLAGS) | MC_FALLEN_PALADIN);
+	act->SetMCFlag(MC_FALLEN_PALADIN, BM_OR);
 }
 
 void GameScript::RemoveRangerHood(Scriptable* Sender, Action* /*parameters*/)
@@ -2921,7 +2922,7 @@ void GameScript::RemoveRangerHood(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *act = (Actor *) Sender;
-	act->SetBase(IE_MC_FLAGS, act->GetStat(IE_MC_FLAGS) | MC_FALLEN_RANGER);
+	act->SetMCFlag(MC_FALLEN_RANGER, BM_OR);
 }
 
 void GameScript::RegainPaladinHood(Scriptable* Sender, Action* /*parameters*/)
@@ -2930,7 +2931,7 @@ void GameScript::RegainPaladinHood(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *act = (Actor *) Sender;
-	act->SetBase(IE_MC_FLAGS, act->GetBase(IE_MC_FLAGS) & ~MC_FALLEN_PALADIN);
+	act->SetMCFlag(MC_FALLEN_PALADIN, BM_NAND);
 }
 
 void GameScript::RegainRangerHood(Scriptable* Sender, Action* /*parameters*/)
@@ -2939,7 +2940,7 @@ void GameScript::RegainRangerHood(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *act = (Actor *) Sender;
-	act->SetBase(IE_MC_FLAGS, act->GetBase(IE_MC_FLAGS) & ~MC_FALLEN_RANGER);
+	act->SetMCFlag(MC_FALLEN_RANGER, BM_NAND);
 }
 
 //transfering item from Sender to target, target must be an actor
@@ -4579,9 +4580,9 @@ void GameScript::DialogueInterrupt(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	ieDword tmp = actor->GetBase( IE_MC_FLAGS ) & ~MC_NO_TALK;
-	if (!parameters->int0Parameter) {
-		tmp |= MC_NO_TALK;
+	if ( parameters->int0Parameter != 0 ) {
+		actor->SetMCFlag(MC_NO_TALK, BM_NAND);
+	} else {
+		actor->SetMCFlag(MC_NO_TALK, BM_OR);
 	}
-	actor->SetBase( IE_MC_FLAGS, tmp);
 }

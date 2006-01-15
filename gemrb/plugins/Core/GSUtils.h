@@ -75,6 +75,7 @@ Targets *GetMyTarget(Scriptable *Sender, Actor *actor, Targets *parameters);
 Targets *XthNearestOf(Targets *parameters, int count);
 Targets *XthNearestDoor(Targets *parameters, unsigned int count);
 Targets *XthNearestEnemyOf(Targets *parameters, int count);
+Targets *NearestEnemySummoned(Scriptable *origin, Targets *parameters);
 Targets *XthNearestEnemyOfType(Scriptable *origin, Targets *parameters, unsigned int count);
 Targets *XthNearestMyGroupOfType(Scriptable *origin, Targets *parameters, unsigned int count);
 

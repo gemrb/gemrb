@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.355 2006/01/14 21:14:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.356 2006/01/15 23:07:11 avenger_teambg Exp $
  *
  */
 
@@ -92,6 +92,7 @@ static TriggerLink triggernames[] = {
 	{"difficultygt", GameScript::DifficultyGT, 0},
 	{"difficultylt", GameScript::DifficultyLT, 0},
 	{"disarmed", GameScript::Disarmed, 0},
+	{"disarmfailed", GameScript::DisarmFailed, 0},
 	{"entered", GameScript::Entered, 0},
 	{"entirepartyonmap", GameScript::EntirePartyOnMap, 0},
 	{"exists", GameScript::Exists, 0},
@@ -800,6 +801,7 @@ static ObjectLink objectnames[] = {
 	{"nearestdoor", GameScript::NearestDoor},
 	{"nearestenemyof", GameScript::NearestEnemyOf},
 	{"nearestenemyoftype", GameScript::NearestEnemyOfType},
+	{"nearestenemysummoned", GameScript::NearestEnemySummoned},
 	{"nearestmygroupoftype", GameScript::NearestMyGroupOfType},
 	{"nearestpc", GameScript::NearestPC},
 	{"ninthnearest", GameScript::NinthNearest},
@@ -2248,6 +2250,11 @@ Targets *GameScript::NinthNearestEnemyOf(Scriptable* /*Sender*/, Targets *parame
 Targets *GameScript::TenthNearestEnemyOf(Scriptable* /*Sender*/, Targets *parameters)
 {
 	return XthNearestEnemyOf(parameters, 9);
+}
+
+Targets *GameScript::NearestEnemySummoned(Scriptable* Sender, Targets *parameters)
+{
+	return XthNearestEnemyOfType(Sender, parameters, 0);
 }
 
 Targets *GameScript::NearestEnemyOfType(Scriptable* Sender, Targets *parameters)
