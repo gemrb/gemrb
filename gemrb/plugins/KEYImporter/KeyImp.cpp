@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.59 2005/12/20 20:14:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.60 2006/01/24 17:30:52 avenger_teambg Exp $
  *
  */
 
@@ -124,7 +124,8 @@ bool KeyImp::LoadResFile(const char* resfile)
 		f->Read( be.name, ASCIIZLen );
 #ifndef WIN32
 		for (int p = 0; p < ASCIIZLen; p++) {
-			if (be.name[p] == '\\')
+			//some MAC versions use : as delimiter
+			if (be.name[p] == '\\' || be.name[p] == ':')
 				be.name[p] = PathDelimiter;
 		}
 		if (core->CaseSensitive) {
