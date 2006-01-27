@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.131 2006/01/27 17:31:01 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.132 2006/01/27 22:20:19 wjpalenstijn Exp $
  *
  */
 
@@ -1296,7 +1296,7 @@ void SDLVideoDriver::SetPalette(Sprite2D* spr, Color* pal)
 	} else {
 		if (!spr->vptr) return;
 		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)spr->vptr;
-		memcpy(data->pal, pal, 256*sizeof(data->pal[0]));
+		memcpy(data->pal->col, pal, 256*sizeof(data->pal->col[0]));
 	}
 }
 
@@ -1942,7 +1942,7 @@ Sprite2D *SDLVideoDriver::MirrorSpriteVertical(Sprite2D* sprite, bool MirrorAnch
 		Uint8* rledata = (Uint8*)malloc(data->datasize);
 		memcpy(rledata, sprite->pixels, data->datasize);
 		dest = CreateSpriteBAM8(sprite->Width, sprite->Height, data->RLE,
-								rledata, data->datasize, data->pal,
+								rledata, data->datasize, data->pal->col,
 								data->transindex);
 		Sprite2D_BAM_Internal* destdata = (Sprite2D_BAM_Internal*)dest->vptr;
 		destdata->flip_ver = !data->flip_ver;
@@ -1992,7 +1992,7 @@ Sprite2D *SDLVideoDriver::MirrorSpriteHorizontal(Sprite2D* sprite, bool MirrorAn
 		Uint8* rledata = (Uint8*)malloc(data->datasize);
 		memcpy(rledata, sprite->pixels, data->datasize);
 		dest = CreateSpriteBAM8(sprite->Width, sprite->Height, data->RLE,
-								rledata, data->datasize, data->pal,
+								rledata, data->datasize, data->pal->col,
 								data->transindex);
 		Sprite2D_BAM_Internal* destdata = (Sprite2D_BAM_Internal*)dest->vptr;
 		destdata->flip_ver = data->flip_ver;
