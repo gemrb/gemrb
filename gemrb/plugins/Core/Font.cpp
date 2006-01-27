@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.45 2006/01/04 23:21:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.46 2006/01/27 18:07:02 wjpalenstijn Exp $
  *
  */
 
@@ -96,7 +96,7 @@ void Font::AddChar(void* spr, int w, int h, short xPos, short yPos)
 	lastX += w;
 }
 
-void Font::PrintFromLine(int startrow, Region rgn, unsigned char* string,
+void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 	Color* hicolor, unsigned char Alignment, Font* initials,
 	Sprite2D* cursor, unsigned int curpos, bool NoColor)
 {
@@ -223,7 +223,7 @@ void Font::PrintFromLine(int startrow, Region rgn, unsigned char* string,
 	free( tmp );
 }
 
-void Font::Print(Region rgn, unsigned char* string, Color* hicolor,
+void Font::Print(Region rgn, const unsigned char* string, Color* hicolor,
 	unsigned char Alignment, bool anchor, Font* initials,
 	Sprite2D* cursor, unsigned int curpos, bool NoColor)
 {
@@ -356,7 +356,7 @@ int Font::PrintInitial(int x, int y, Region &rgn, unsigned char currChar)
 	return x;
 }
 
-int Font::CalcStringWidth(char* string, bool NoColor)
+int Font::CalcStringWidth(const char* string, bool NoColor)
 {
 	size_t ret = 0, len = strlen( string );
 	for (size_t i = 0; i < len; i++) {
