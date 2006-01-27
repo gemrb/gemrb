@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.inl,v 1.5 2006/01/08 18:15:48 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.inl,v 1.6 2006/01/27 17:31:01 wjpalenstijn Exp $
  *
  */
 
@@ -49,9 +49,9 @@
 #ifdef PALETTE_ALPHA
 #define ALPHA
 #ifdef TINT_ALPHA
-#define ALPHAVALUE (((PAL)[p].a * tint.a)>>8)
+#define ALPHAVALUE ((col[p].a * tint.a)>>8)
 #else
-#define ALPHAVALUE (PAL)[p].a
+#define ALPHAVALUE col[p].a
 #endif
 
 #else
@@ -61,7 +61,7 @@
 #define ALPHAVALUE tint.a
 #else
 #undef ALPHA
-#define ALPHAVALUE 0
+#define ALPHAVALUE 255
 #endif
 
 #endif
@@ -137,6 +137,7 @@ do {
 	const int rshift = (TARGET)->format->Rshift;
 	const int gshift = (TARGET)->format->Gshift;
 	const int bshift = (TARGET)->format->Bshift;
+	const Color* const col = (PAL)->col;
 
 #ifdef ALPHA
 	unsigned int dR;
@@ -226,7 +227,7 @@ do {
 #endif
 						{
 							SPECIALPIXEL {
-								BLENDPIXEL(*pix, (PAL)[p].r, (PAL)[p].g, (PAL)[p].b, (ALPHAVALUE), *pix);
+								BLENDPIXEL(*pix, col[p].r, col[p].g, col[p].b, (ALPHAVALUE), *pix);
 							}
 						}
 #if defined(COVER) && defined(HIGHLIGHTCOVER)
@@ -329,7 +330,7 @@ do {
 #endif
 					{
 						SPECIALPIXEL {
-							BLENDPIXEL(*pix, (PAL)[p].r, (PAL)[p].g, (PAL)[p].b, (ALPHAVALUE), *pix);
+							BLENDPIXEL(*pix, col[p].r, col[p].g, col[p].b, (ALPHAVALUE), *pix);
 						}
 					}
 #if defined(COVER) && defined(HIGHLIGHTCOVER)

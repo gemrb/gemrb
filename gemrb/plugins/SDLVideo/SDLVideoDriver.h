@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.57 2006/01/08 22:31:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.58 2006/01/27 17:31:01 wjpalenstijn Exp $
  *
  */
 
@@ -74,13 +74,13 @@ public:
 	void BlitSpriteRegion(Sprite2D* spr, Region& size, int x, int y,
 		bool anchor = true, Region* clip = NULL);
 	void BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint,
-		Color *Palette = NULL, Region* clip = NULL);
+		Color *Pal = NULL, Region* clip = NULL);
 	void BlitSpriteCovered(Sprite2D* spr, int x, int y, Color tint,
-		SpriteCover* cover,	Color *Palette = NULL, Region* clip = NULL);
+		SpriteCover* cover,	Color *palette = NULL, Region* clip = NULL);
 	void BlitSpriteNoShadow(Sprite2D* spr, int x, int y, Color tint,
-		SpriteCover* cover, Color *Palette = NULL, Region *clip = NULL);
+		SpriteCover* cover, Color *palette = NULL, Region *clip = NULL);
 	void BlitSpriteTransShadow(Sprite2D* spr, int x, int y, Color tint,
-		SpriteCover* cover, Color *Palette = NULL, Region *clip = NULL);
+		SpriteCover* cover, Color *palette = NULL, Region *clip = NULL);
 	void SetCursor(Sprite2D* up, Sprite2D* down);
 	void SetDragCursor(Sprite2D* drag);
 	Sprite2D* GetPreview(int w, int h);
