@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.20 2006/01/08 22:07:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.21 2006/01/27 18:09:12 wjpalenstijn Exp $
  *
  */
 
@@ -80,9 +80,13 @@ public:
 	ieDword GetAreaStatus();
 	void SetAreaStatus(ieDword status, int op);
 	Sprite2D *GetMapIcon(AnimationFactory *bam);
+	const char* GetCaption();
+	const char* GetTooltip();
 private:
 	ieDword AreaStatus;
 	Sprite2D *MapIcon;
+	char *StrCaption;
+	char *StrTooltip;
 public:
 	ieResRef AreaName;
 	ieResRef AreaResRef;
@@ -95,8 +99,6 @@ public:
 	ieResRef LoadScreenResRef;
 	ieDword AreaLinksIndex[4];
 	ieDword AreaLinksCount[4];
-	char *StrCaption;
-	char *StrTooltip;
 };
 
 /**

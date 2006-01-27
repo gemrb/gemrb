@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.23 2006/01/08 22:07:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.24 2006/01/27 18:09:12 wjpalenstijn Exp $
  *
  */
 
@@ -54,13 +54,25 @@ void WMPAreaEntry::SetAreaStatus(ieDword arg, int op)
 	}
 	//invalidating MapIcon, no need to free it, it is from a factory
 	MapIcon = NULL;
+}
+
+const char* WMPAreaEntry::GetCaption()
+{
 	if (!StrCaption) {
 		StrCaption = core->GetString(LocCaptionName);
 	}
+	return StrCaption;
+}
+
+const char* WMPAreaEntry::GetTooltip()
+{
 	if (!StrTooltip) {
 		StrTooltip = core->GetString(LocTooltipName);
 	}
+	return StrTooltip;
 }
+
+
 
 Sprite2D *WMPAreaEntry::GetMapIcon(AnimationFactory *bam)
 {
