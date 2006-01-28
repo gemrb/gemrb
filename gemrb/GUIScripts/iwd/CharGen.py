@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.39 2006/01/28 23:04:29 wjpalenstijn Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.40 2006/01/28 23:17:46 wjpalenstijn Exp $
 
 
 #Character Generation
@@ -361,6 +361,9 @@ def AcceptPress():
 	GemRB.SetPlayerStat(MyChar, IE_HAIR_COLOR, GemRB.GetVar("HairColor"))
 	GemRB.SetPlayerStat(MyChar, IE_MAJOR_COLOR, GemRB.GetVar("MinorColor"))
 	GemRB.SetPlayerStat(MyChar, IE_MINOR_COLOR, GemRB.GetVar("MajorColor"))
+	GemRB.SetPlayerStat (MyChar, IE_METAL_COLOR, 0x1B )
+	GemRB.SetPlayerStat (MyChar, IE_LEATHER_COLOR, 0x16 )
+	GemRB.SetPlayerStat (MyChar, IE_ARMOR_COLOR, 0x17 )
 
 	GemRB.FillPlayerInfo(MyChar, PortraitName+"L", PortraitName+"S")
 	GemRB.UnloadWindow (CharGenWindow)
