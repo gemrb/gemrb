@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.38 2005/12/20 23:20:53 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.39 2006/01/28 23:04:29 wjpalenstijn Exp $
 
 
 #Character Generation
@@ -356,6 +356,11 @@ def AcceptPress():
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
 	TmpTable = GemRB.LoadTable ("clskills")
 	GemRB.SetPlayerStat(MyChar, IE_XP, GemRB.GetTableValue (TmpTable, Class, 3) )  #this will also set the level (automatically)
+
+	GemRB.SetPlayerStat(MyChar, IE_SKIN_COLOR, GemRB.GetVar("SkinColor"))
+	GemRB.SetPlayerStat(MyChar, IE_HAIR_COLOR, GemRB.GetVar("HairColor"))
+	GemRB.SetPlayerStat(MyChar, IE_MAJOR_COLOR, GemRB.GetVar("MinorColor"))
+	GemRB.SetPlayerStat(MyChar, IE_MINOR_COLOR, GemRB.GetVar("MajorColor"))
 
 	GemRB.FillPlayerInfo(MyChar, PortraitName+"L", PortraitName+"S")
 	GemRB.UnloadWindow (CharGenWindow)
@@ -2064,7 +2069,7 @@ def AppearanceColorChoice (CurrentColor):
 	global AppearanceWindow, AppearanceColorWindow
 	GemRB.SetVisible (AppearanceWindow, 0)
 	AppearanceColorWindow = GemRB.LoadWindow (14)
-	AppearanceColorTable = GemRB.LoadTable ("AVCOLORS")
+	AppearanceColorTable = GemRB.LoadTable ("clowncol")
 	ColorType = GemRB.GetVar ("ColorType")
 	GemRB.SetVar ("SelectedColor", CurrentColor)
 
