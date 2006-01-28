@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/TextScreen.py,v 1.6 2006/01/06 23:10:00 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/TextScreen.py,v 1.7 2006/01/28 08:25:36 avenger_teambg Exp $
 
 # TextScreen.py - display Loading screen
 
@@ -28,16 +28,25 @@ from GUIDefines import *
 TextScreen = None
 TextArea = None
 Chapter = 0
+Feed = 0
 
 def StartTextScreen ():
 	global TextScreen, TextArea, Chapter
 
 	GemRB.LoadWindowPack ("GUICHAP", 640, 480)
 	LoadPic = GemRB.GetGameString (STR_LOADMOS)
+	print "LoadPic", LoadPic
 	#if there is no preset loadpic, try to determine it from the chapter
-	ID = GemRB.GetGameVar("CHAPTER")
+	#fixme: we always assume there isn't
+	ID = GemRB.GetGameVar("CHAPTER") + 1
 	#set ID according to the Chapter?
 	Chapter = ID + 1
+
+	#this is also a guess
+	if LoadPic == "":
+		GemRB.LoadMusicPL ("chap0.mus")
+	else:
+		GemRB.LoadMusicPL ("chap1.mus")
 
 	TextScreen = GemRB.LoadWindow (ID)
 	GemRB.SetWindowFrame (TextScreen)
@@ -46,6 +55,8 @@ def StartTextScreen ():
 	GemRB.SetTextAreaFlags (TextScreen, TextArea, IE_GUI_TEXTAREA_SMOOTHSCROLL)
 	GemRB.SetEvent (TextScreen, TextArea, IE_GUI_TEXTAREA_OUT_OF_TEXT, "FeedScroll")
 
+	#fixme: this works only for chapter text, if there is other textscreen
+	#then we should check LoadPic
 	#caption
 	Table = GemRB.LoadTable("chapters")
 	Value = GemRB.GetTableValue (Table, Chapter, 0)
@@ -71,8 +82,13 @@ def StartTextScreen ():
 
 
 def FeedScroll ():
-	global TextScreen, TextArea
+	global TextScreen, TextArea, Feed
 
+	if Feed:
+		Feed = 0
+		return
+
+	Feed = 1
 	Table = GemRB.LoadTable("chapters")
 	Value = GemRB.GetTableValue (Table, Chapter, 1)
 	GemRB.UnloadTable (Table)
@@ -82,6 +98,7 @@ def ReplayTextScreen ():
 	global TextScreen, TextArea
 
 	GemRB.SetEvent (TextScreen, TextArea, IE_GUI_TEXTAREA_OUT_OF_TEXT, "FeedScroll")
+	Feed = 0
 	GemRB.RewindTA(TextScreen, TextArea, 200)
 
 def EndTextScreen ():
