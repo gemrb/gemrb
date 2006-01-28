@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.162 2006/01/15 23:07:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.163 2006/01/28 19:56:33 wjpalenstijn Exp $
  *
  */
 
@@ -1272,9 +1272,9 @@ void Actor::Draw(Region &screen)
 				assert(sc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height));
 
 				if (TranslucentShadows) {
-					video->BlitSpriteTransShadow( nextFrame, cx + screen.x, cy + screen.y, tint, sc, anim->Palette, &screen );
+					video->BlitSpriteTransShadow( nextFrame, cx + screen.x, cy + screen.y, tint, sc, anim->palette, &screen );
 				} else {
-					video->BlitSpriteCovered( nextFrame, cx + screen.x, cy + screen.y, tint, sc, anim->Palette, &screen );
+					video->BlitSpriteCovered( nextFrame, cx + screen.x, cy + screen.y, tint, sc, anim->palette, &screen );
 				}
 			}
 		}

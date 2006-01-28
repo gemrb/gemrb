@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.224 2006/01/14 21:14:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.225 2006/01/28 19:56:34 wjpalenstijn Exp $
  *
  */
 
@@ -37,6 +37,7 @@
 #include "Game.h"
 #include "WorldMap.h"
 #include "GameControl.h"
+#include "Palette.h"
 
 #include <cmath>
 #include <cassert>
@@ -732,7 +733,7 @@ void Map::DrawMap(Region screen, GameControl* gc)
 				Animation *anim = a->animation[animcount];
 				video->BlitSpriteTinted( anim->NextFrame(),
 					a->Pos.x + screen.x, a->Pos.y + screen.y,
-					tint, anim->Palette, &screen );
+					tint, anim->palette, &screen );
 			}
 			a = GetNextAreaAnimation(aniidx,gametime);
 		}
@@ -2267,20 +2268,20 @@ AreaAnimation::~AreaAnimation()
 void AreaAnimation::SetPalette(ieResRef Pal)
 {
 	Flags |= A_ANI_PALETTE;
-	strnlwrcpy(Palette, Pal, 8);
+	strnlwrcpy(PaletteRef, Pal, 8);
 	ImageMgr *bmp = (ImageMgr *) core->GetInterface( IE_BMP_CLASS_ID);
 	if (!bmp) {
 		return;
 	}
 	DataStream* s = core->GetResourceMgr()->GetResource( Pal, IE_BMP_CLASS_ID );
 	bmp->Open( s, true );
-	Color *pal = (Color *) malloc( sizeof(Color) * 256 );
-	bmp->GetPalette( 0, 256, pal );
+	Palette* pal = new Palette();
+	bmp->GetPalette( 0, 256, pal->col );
 	core->FreeInterface( bmp );
 	for (int i=0;i<animcount;i++) {
 		animation[i]->SetPalette( pal, true );
 	}
-	free (pal);
+	pal->Release();
 }
 
 bool AreaAnimation::Schedule(ieDword gametime)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.58 2006/01/27 17:31:01 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.59 2006/01/28 19:56:40 wjpalenstijn Exp $
  *
  */
 
@@ -43,7 +43,7 @@ private:
 	SDL_Event event; /* Event structure */
 	//subtitle specific variables
 	Font *subtitlefont;
-	Color *subtitlepal;
+	Palette *subtitlepal;
 	Region subtitleregion;
 	char *subtitletext;
 	ieDword subtitlestrref;
@@ -67,20 +67,20 @@ public:
 		void* palette, bool cK = false, int index = 0);
 	Sprite2D* CreateSpriteBAM8(int w, int h, bool RLE, void* pixeldata,
 							   unsigned int datasize,
-							   void* palette, int transindex);
+							   Palette* palette, int transindex);
 	void FreeSprite(Sprite2D* spr);
 	void BlitSprite(Sprite2D* spr, int x, int y, bool anchor = false,
 		Region* clip = NULL);
 	void BlitSpriteRegion(Sprite2D* spr, Region& size, int x, int y,
 		bool anchor = true, Region* clip = NULL);
 	void BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint,
-		Color *Pal = NULL, Region* clip = NULL);
+		Palette *palette = NULL, Region* clip = NULL);
 	void BlitSpriteCovered(Sprite2D* spr, int x, int y, Color tint,
-		SpriteCover* cover,	Color *palette = NULL, Region* clip = NULL);
+		SpriteCover* cover,	Palette *palette = NULL, Region* clip = NULL);
 	void BlitSpriteNoShadow(Sprite2D* spr, int x, int y, Color tint,
-		SpriteCover* cover, Color *palette = NULL, Region *clip = NULL);
+		SpriteCover* cover, Palette *palette = NULL, Region *clip = NULL);
 	void BlitSpriteTransShadow(Sprite2D* spr, int x, int y, Color tint,
-		SpriteCover* cover, Color *palette = NULL, Region *clip = NULL);
+		SpriteCover* cover, Palette *palette = NULL, Region *clip = NULL);
 	void SetCursor(Sprite2D* up, Sprite2D* down);
 	void SetDragCursor(Sprite2D* drag);
 	Sprite2D* GetPreview(int w, int h);
@@ -88,9 +88,8 @@ public:
 	void SetViewport(int x, int y, unsigned int w, unsigned int h);
 	void MoveViewportTo(int x, int y, bool center);
 	void ConvertToVideoFormat(Sprite2D* sprite);
-	void CalculateAlpha(Sprite2D* sprite);
 	/** No descriptions */
-	void SetPalette(Sprite2D* spr, Color* pal);
+	void SetPalette(Sprite2D* spr, Palette* pal);
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	void DrawRect(Region& rgn, Color& color, bool fill = true, bool clipped = false);
 	void DrawRectSprite(Region& rgn, Color& color, Sprite2D* sprite);
@@ -104,16 +103,12 @@ public:
 	inline void DrawHLine(short x1, short y, short x2, Color& color, bool clipped = false);
 	inline void DrawVLine(short x, short y1, short y2, Color& color, bool clipped = false);
 	inline void DrawLine(short x1, short y1, short x2, short y2, Color& color);
-	/** Frees a Palette */
-	void FreePalette(Color *&palette);
-	/** Creates a Palette from Color */
-	Color* CreatePalette(Color color, Color back);
 	/** Blits a Sprite filling the Region */
 	void BlitTiled(Region rgn, Sprite2D* img, bool anchor = false);
 	/** Send a Quit Signal to the Event Queue */
 	bool Quit();
 	/** Get the Palette of a Sprite */
-	Color* GetPalette(Sprite2D* spr);
+	Palette* GetPalette(Sprite2D* spr);
 	/** Flips sprite vertically */
 	Sprite2D *MirrorSpriteVertical(Sprite2D *sprite, bool MirrorAnchor);
 	/** Flips sprite horizontally */
@@ -138,7 +133,7 @@ public:
 		return disp;
 	}
 	void InitMovieScreen(int &w, int &h);
-	void SetMovieFont(Font *stfont, Color *pal);
+	void SetMovieFont(Font *stfont, Palette *pal);
 	void showFrame(unsigned char* buf, unsigned int bufw,
 	unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,
 	unsigned int h, unsigned int dstx, unsigned int dsty, int truecolor,

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.h,v 1.19 2005/11/22 20:49:40 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.h,v 1.20 2006/01/28 19:56:38 wjpalenstijn Exp $
  *
  */
 
@@ -34,6 +34,8 @@ typedef struct FrameEntry {
 	ieDword FrameData;
 } FrameEntry;
 
+class Palette;
+
 class BAMImp : public AnimationMgr {
 private:
 	DataStream* str;
@@ -42,7 +44,7 @@ private:
 	CycleEntry* cycles;
 	ieWord FramesCount;
 	ieByte CyclesCount;
-	Color Palette[256];
+	Palette* palette;
 	ieByte CompressedColorIndex;
 	ieDword FramesOffset, PaletteOffset, FLTOffset;
 private:

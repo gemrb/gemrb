@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Console.cpp,v 1.23 2005/12/03 20:48:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Console.cpp,v 1.24 2006/01/28 19:56:34 wjpalenstijn Exp $
  *
  */
 
@@ -23,6 +23,7 @@
 #include "Interface.h"
 #include "Console.h"
 #include "Video.h"
+#include "Palette.h"
 #include "ScriptEngine.h"
 
 Console::Console(void)

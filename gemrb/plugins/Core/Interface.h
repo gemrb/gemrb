@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.184 2006/01/08 22:07:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.185 2006/01/28 19:56:34 wjpalenstijn Exp $
  *
  */
 
@@ -71,6 +71,7 @@ struct EffectRef;
 class Map;
 class ScriptedAnimation;
 class Control;
+class Palette;
 
 typedef struct Table {
 	TableMgr * tm;
@@ -209,7 +210,7 @@ private:
 	Container* CurrentContainer;
 	bool UseContainer;
 public:
-	Color *InfoTextPalette;
+	Palette *InfoTextPalette;
 	int SaveAsOriginal; //if true, saves files in compatible mode
 	int QuitFlag;
 	int LoadGameIndex;

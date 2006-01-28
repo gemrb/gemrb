@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.377 2006/01/15 11:11:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.378 2006/01/28 19:56:39 wjpalenstijn Exp $
  *
  */
 
@@ -32,6 +32,7 @@
 #include "../Core/TileMap.h"
 #include "../Core/ResourceMgr.h"
 #include "../Core/Video.h"
+#include "../Core/Palette.h"
 #include "../Core/TextEdit.h"
 #include "../Core/Button.h"
 #include "../Core/Spell.h"
@@ -2669,11 +2670,13 @@ static PyObject* SetButtonBAM(int wi, int ci, const char *ResRef, int CycleIndex
 
 	if (col1 >= 0) {
 		Color* pal = core->GetPalette( col1, 12 );
-		Color* orgpal = core->GetVideoDriver()->GetPalette( Picture );
-		memcpy( &orgpal[4], pal, 12 * sizeof( Color ) );
-		core->GetVideoDriver()->SetPalette( Picture, orgpal );
+		Palette* orgpal = core->GetVideoDriver()->GetPalette( Picture );
+		Palette* newpal = orgpal->Copy();
+		orgpal->Release();
+		memcpy( &newpal->col[4], pal, 12 * sizeof( Color ) );
+		core->GetVideoDriver()->SetPalette( Picture, newpal );
 		free( pal );
-		free( orgpal );
+		core->GetVideoDriver()->FreePalette( newpal );
 	}
 
 	btn->SetPicture( Picture );

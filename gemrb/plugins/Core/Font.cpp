@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.46 2006/01/27 18:07:02 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.47 2006/01/28 19:56:34 wjpalenstijn Exp $
  *
  */
 
@@ -23,6 +23,8 @@
 #include "Font.h"
 #include "Interface.h"
 #include "Video.h"
+#include "Palette.h"
+#include <cassert>
 
 unsigned int lastX = 0;
 
@@ -46,7 +48,7 @@ inline size_t mystrlen(const char* string)
 	return count;
 }
 
-Font::Font(int w, int h, void* palette, bool cK, int index)
+Font::Font(int w, int h, Palette* pal, bool cK, int index)
 {
 	lastX = 0;
 	count = 0;
@@ -54,8 +56,9 @@ Font::Font(int w, int h, void* palette, bool cK, int index)
 	void* pixels = malloc( w* h );
 	memset( xPos, 0, sizeof( xPos) );
 	memset( yPos, 0, sizeof( yPos) );
-	sprBuffer = core->GetVideoDriver()->CreateSprite8( w, h, 8, pixels, palette, cK, index );
-	this->palette = core->GetVideoDriver()->GetPalette( sprBuffer );
+	sprBuffer = core->GetVideoDriver()->CreateSprite8( w, h, 8, pixels, pal ? pal->col : 0, cK, index );
+	pal->IncRef();
+	palette = pal;
 	maxHeight = h;
 }
 
@@ -97,11 +100,11 @@ void Font::AddChar(void* spr, int w, int h, short xPos, short yPos)
 }
 
 void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
-	Color* hicolor, unsigned char Alignment, Font* initials,
+	Palette* hicolor, unsigned char Alignment, Font* initials,
 	Sprite2D* cursor, unsigned int curpos, bool NoColor)
 {
 	unsigned int psx = PARAGRAPH_START_X;
-	Color *pal = hicolor;
+	Palette *pal = hicolor;
 	if (!pal) {
 		pal = palette;
 	}
@@ -167,9 +170,9 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 				if (sscanf( tag, "color=%02X%02X%02X", &r, &g, &b ) != 3)
 					continue;
 				Color c = {r,g, b, 0}, back = {0, 0, 0, 0};
-				Color* newPal = video->CreatePalette( c, back );
+				Palette* newPal = video->CreatePalette( c, back );
 				video->SetPalette( sprBuffer, newPal );
-				free( newPal );
+				video->FreePalette(newPal);
 			} else {
 				if (stricmp( tag, "/color" ) == 0) {
 					video->SetPalette( sprBuffer, pal );
@@ -223,12 +226,12 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 	free( tmp );
 }
 
-void Font::Print(Region rgn, const unsigned char* string, Color* hicolor,
+void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 	unsigned char Alignment, bool anchor, Font* initials,
 	Sprite2D* cursor, unsigned int curpos, bool NoColor)
 {
 	unsigned int psx = PARAGRAPH_START_X;
-	Color* pal = hicolor;
+	Palette* pal = hicolor;
 	if (!pal) {
 		pal = palette;
 	}
@@ -298,9 +301,9 @@ void Font::Print(Region rgn, const unsigned char* string, Color* hicolor,
 				if (sscanf( tag, "color=%02X%02X%02X", &r, &g, &b ) != 3)
 					continue;
 				Color c = {r,g, b, 0}, back = {0, 0, 0, 0};
-				Color* newPal = video->CreatePalette( c, back );
+				Palette* newPal = video->CreatePalette( c, back );
 				video->SetPalette( sprBuffer, newPal );
-				free( newPal );
+				video->FreePalette( newPal );
 			} else {
 				if (stricmp( tag, "/color" ) == 0) {
 					video->SetPalette( sprBuffer, pal );
@@ -445,9 +448,18 @@ void Font::SetupString(char* string, unsigned int width, bool NoColor)
 	}
 }
 
-void* Font::GetPalette()
+Palette* Font::GetPalette()
 {
+	assert(palette);
+	palette->IncRef();
 	return palette;
+}
+
+void Font::SetPalette(Palette* pal)
+{
+	if (palette) palette->Release();
+	pal->IncRef();
+	palette = pal;
 }
 
 void Font::SetFirstChar( unsigned char first)

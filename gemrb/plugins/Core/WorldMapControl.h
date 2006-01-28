@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.h,v 1.13 2006/01/06 00:50:47 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.h,v 1.14 2006/01/28 19:56:34 wjpalenstijn Exp $
  *
  */
 
@@ -26,6 +26,7 @@
 
 class WorldMapControl;
 class WMPAreaEntry;
+class Palette;
 
 #ifndef WORLDMAPCONTROL_H
 #define WORLDMAPCONTROL_H
@@ -33,7 +34,6 @@ class WMPAreaEntry;
 #include "Control.h"
 #include "Interface.h"
 #include "Dialog.h"
-
 
 #ifdef WIN32
 
@@ -93,11 +93,11 @@ private:
 	//current area
 	ieResRef ca;
 	/** Label color of a visited area */
-	Color *pal_normal;
+	Palette *pal_normal;
 	/** Label color of a currently selected area */
-	Color *pal_selected;
+	Palette *pal_selected;
 	/** Label color of a not yet visited area */
-	Color *pal_notvisited;
+	Palette *pal_notvisited;
 	/** guiscript Event when button pressed */
 	EventHandler WorldMapControlOnPress;
 	/** guiscript Event when mouse is over a reachable area */

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.26 2006/01/27 18:09:12 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.27 2006/01/28 19:56:34 wjpalenstijn Exp $
  */
 
 #ifndef WIN32
@@ -136,7 +136,7 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 		int tw = ftext->CalcStringWidth( m->GetCaption() ) + 5;
 		int th = ftext->maxHeight;
 		
-		Color* text_pal = pal_normal;
+		Palette* text_pal = pal_normal;
 		
 		if (Area == m) {
 			text_pal = pal_selected;
@@ -147,7 +147,7 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 		}
 
 		ftext->Print( Region( r2.x + (r2.w - tw)/2, r2.y + r2.h, tw, th ),
-				( unsigned char * ) m->GetCaption(), text_pal, 0, true );
+				( const unsigned char * ) m->GetCaption(), text_pal, 0, true );
 	}
 }
 

@@ -95,6 +95,7 @@ libgemrb_core_la_SOURCES = \
 	ControlAnimation.cpp \
 	EffectMgr.cpp \
 	OpcodeMgr.cpp \
-	SpriteCover.cpp
+	SpriteCover.cpp \
+	Palette.cpp
 
 noinst_HEADERS = *.h

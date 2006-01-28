@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.86 2006/01/06 23:09:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.87 2006/01/28 19:56:34 wjpalenstijn Exp $
  *
  */
 
@@ -23,6 +23,7 @@
 #include "TextArea.h"
 #include "Interface.h"
 #include "Video.h"
+#include "Palette.h"
 #include "Variables.h"
 #include "GameControl.h"
 #include "SoundMgr.h"
@@ -252,7 +253,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			continue;
 		}
 		sr -= rc;
-		Color* pal = NULL;
+		Palette* pal = NULL;
 		if (seltext == (int) i)
 			pal = selected;
 		else if (Value == i)
@@ -267,7 +268,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 		break;
 	}
 	for (i++; i < linesize; i++) {
-		Color* pal = NULL;
+		Palette* pal = NULL;
 		if (seltext == (int) i)
 			pal = selected;
 		else if (Value == i)

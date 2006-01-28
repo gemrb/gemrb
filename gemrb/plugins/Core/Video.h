@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.54 2006/01/08 22:31:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.55 2006/01/28 19:56:34 wjpalenstijn Exp $
  *
  */
 
@@ -35,6 +35,7 @@
 #include "Polygon.h"
 
 class SpriteCover;
+class Palette;
 
 #ifdef WIN32
 
@@ -77,7 +78,7 @@ public:
 	virtual Sprite2D* CreateSpriteBAM8(int /*w*/, int /*h*/, bool /* RLE */,
 									   void* /*pixeldata*/,
 									   unsigned int /*datasize*/,
-									   void* /*palette*/,
+									   Palette* /*palette*/,
 									   int /*transindex*/) { return 0; }
 	virtual void FreeSprite(Sprite2D* spr) = 0;
 	virtual void BlitSprite(Sprite2D* spr, int x, int y, bool anchor = false,
@@ -88,13 +89,13 @@ public:
 	virtual void BlitSpriteRegion(Sprite2D* spr, Region& size, int x, int y,
 		bool anchor = true, Region* clip = NULL) = 0;
 	virtual void BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint,
-		Color *palette = NULL, Region* clip = NULL) = 0;
+		Palette *palette = NULL, Region* clip = NULL) = 0;
 	virtual void BlitSpriteCovered(Sprite2D* spr, int x, int y, Color tint,
-		SpriteCover* cover, Color *palette = NULL, Region* clip = NULL) = 0;
+		SpriteCover* cover, Palette *palette = NULL, Region* clip = NULL) = 0;
 	virtual void BlitSpriteNoShadow(Sprite2D* spr, int x, int y, Color tint,
-		SpriteCover* cover, Color *palette = NULL, Region* clip = NULL) = 0;
+		SpriteCover* cover, Palette *palette = NULL, Region* clip = NULL) = 0;
 	virtual void BlitSpriteTransShadow(Sprite2D* spr, int x, int y, Color tint,
-		SpriteCover* cover, Color *palette = NULL, Region* clip = NULL) = 0;
+		SpriteCover* cover, Palette *palette = NULL, Region* clip = NULL) = 0;
 	virtual void SetCursor(Sprite2D* up, Sprite2D* down) = 0;
 	/** Sets a temporary cursor when dragging an Item from Inventory */
 	virtual void SetDragCursor(Sprite2D* drag) = 0;
@@ -105,9 +106,8 @@ public:
 	virtual void SetViewport(int x, int y, unsigned int w, unsigned int h) = 0;
 	virtual void MoveViewportTo(int x, int y, bool center) = 0;
 	virtual void ConvertToVideoFormat(Sprite2D* sprite) = 0;
-	virtual void CalculateAlpha(Sprite2D* sprite) = 0;
 	/** No descriptions */
-	virtual void SetPalette(Sprite2D* spr, Color* pal) = 0;
+	virtual void SetPalette(Sprite2D* spr, Palette* pal) = 0;
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	virtual void DrawRect(Region& rgn, Color& color, bool fill = true, bool clipped = false) = 0;
 	virtual void DrawRectSprite(Region& rgn, Color& color, Sprite2D* sprite) = 0;
@@ -123,9 +123,9 @@ public:
 	virtual void DrawLine(short x1, short y1, short x2, short y2,
 		Color& color) = 0;
 	/** Frees a Palette */
-	virtual void FreePalette(Color *&palette) = 0;
+	virtual void FreePalette(Palette *&palette);
 	/** Creates a Palette from Color */
-	virtual Color* CreatePalette(Color color, Color back) = 0;
+	virtual Palette* CreatePalette(Color color, Color back);
 	/** Blits a Sprite filling the Region */
 	virtual void BlitTiled(Region rgn, Sprite2D* img, bool anchor = false) = 0;
 	/** Set Event Manager */
@@ -133,7 +133,7 @@ public:
 	/** Send a Quit Signal to the Event Queue */
 	virtual bool Quit(void) = 0;
 	/** Get the Palette of a Sprite */
-	virtual Color* GetPalette(Sprite2D* spr) = 0;
+	virtual Palette* GetPalette(Sprite2D* spr) = 0;
 	/** Flips sprite vertically, returns new sprite */
 	virtual Sprite2D *MirrorSpriteVertical(Sprite2D *sprite, bool MirrorAnchor) = 0;
 	/** Flips sprite horizontally, returns new sprite */
@@ -154,7 +154,7 @@ public:
 	/** initialize the screen for movie */
 	virtual void InitMovieScreen(int &w, int &h) = 0;
 	/** set the font and color of the movie subtitles */
-	virtual void SetMovieFont(Font *stfont, Color *pal) = 0;
+	virtual void SetMovieFont(Font *stfont, Palette *pal) = 0;
 	/** draw a movie frame */
 	virtual void showFrame(unsigned char* buf, unsigned int bufw,
 		unsigned int bufh, unsigned int sx, unsigned int sy,

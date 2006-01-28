@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.151 2006/01/11 17:28:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.152 2006/01/28 19:56:38 wjpalenstijn Exp $
  *
  */
 
@@ -31,6 +31,8 @@
 #include "../Core/ResourceMgr.h"
 #include "../Core/DataFileMgr.h"
 #include "../Core/Game.h"
+#include "../Core/Video.h"
+#include "../Core/Palette.h"
 
 
 #define DEF_OPEN   0
@@ -794,7 +796,7 @@ Map* AREImp::GetMap(const char *ResRef)
 				anim->startchance=100; //percentage of starting a cycle
 			}
 			str->Read( &anim->skipcycle,1 ); //how many cycles are skipped	(100% skippage)	
-			str->ReadResRef( anim->Palette );
+			str->ReadResRef( anim->PaletteRef );
 			str->ReadDword( &anim->unknown48 );
 			AnimationFactory* af = ( AnimationFactory* )
 			core->GetResourceMgr()->GetFactoryResource( anim->BAM, IE_BAM_CLASS_ID );
@@ -814,7 +816,7 @@ Map* AREImp::GetMap(const char *ResRef)
 				anim->animation[0]=GetAnimationPiece(af, anim->sequence, anim);
 			}
 			if (anim->Flags & A_ANI_PALETTE) {
-				anim->SetPalette(anim->Palette);
+				anim->SetPalette(anim->PaletteRef);
 			}
 
 			map->AddAnimation( anim );
@@ -1027,16 +1029,16 @@ Animation *AREImp::GetAnimationPiece(AnimationFactory *af, int animCycle, AreaAn
 		anim->MirrorAnimation();
 	}
 	if (anim->Flags&A_ANI_PALETTE) {
-		Color *Palette = (Color *) malloc(sizeof(Color) * 256);
+		Palette* palette = new Palette();
 		ImageMgr *bmp = (ImageMgr *) core->GetInterface( IE_BMP_CLASS_ID);
 		if (bmp) {
-			DataStream* s = core->GetResourceMgr()->GetResource( a->Palette, IE_BMP_CLASS_ID );
+			DataStream* s = core->GetResourceMgr()->GetResource( a->PaletteRef, IE_BMP_CLASS_ID );
 			bmp->Open( s, true);
-			bmp->GetPalette(0, 256, Palette);
+			bmp->GetPalette(0, 256, palette->col);
 			core->FreeInterface( bmp );
 		}
-		anim->SetPalette( Palette, true );
-		free (Palette);
+		anim->SetPalette( palette, true );
+		core->GetVideoDriver()->FreePalette(palette);
 	}
 	if (anim->Flags&A_ANI_BLEND) {
 		anim->BlendAnimation();
@@ -1634,7 +1636,7 @@ int AREImp::PutAnimations( DataStream *stream, Map *map)
 		stream->WriteWord( &an->unknown3c); //animation already played?
 		stream->Write( &an->startchance,1);
 		stream->Write( &an->skipcycle,1);
-		stream->WriteResRef( an->Palette);
+		stream->WriteResRef( an->PaletteRef);
 		stream->WriteDword( &an->unknown48);//seems utterly unused
 	}
 	return 0;

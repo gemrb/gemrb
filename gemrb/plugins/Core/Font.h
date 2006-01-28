@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.h,v 1.24 2006/01/27 18:07:02 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.h,v 1.25 2006/01/28 19:56:34 wjpalenstijn Exp $
  *
  */
 
@@ -30,6 +30,8 @@
 
 #include "../../includes/globals.h"
 #include <vector>
+
+class Palette;
 
 typedef struct StringList {
 	Sprite2D*** strings;
@@ -69,7 +71,7 @@ typedef struct StringList {
 class GEM_EXPORT Font {
 private:
 	int count;
-	Color* palette;
+	Palette* palette;
 	Sprite2D* sprBuffer;
 	unsigned char FirstChar;
 
@@ -81,18 +83,19 @@ public:
 	int maxHeight;
 	Region size[256];
 public:
-	Font(int w, int h, void* palette, bool cK, int index);
+	Font(int w, int h, Palette* palette, bool cK, int index);
 	~Font(void);
 	void AddChar(void* spr, int w, int h, short xPos, short yPos);
-	void Print(Region rgn, const unsigned char* string, Color* color,
+	void Print(Region rgn, const unsigned char* string, Palette* color,
 		unsigned char Alignment, bool anchor = false,
 		Font* initials = NULL, Sprite2D* cursor = NULL,
 		unsigned int curpos = 0, bool NoColor = false);
 	void PrintFromLine(int startrow, Region rgn, const unsigned char* string,
-		Color* color, unsigned char Alignment,
+		Palette* color, unsigned char Alignment,
 		Font* initials = NULL, Sprite2D* cursor = NULL,
 		unsigned int curpos = 0, bool NoColor = false);
-	void* GetPalette();
+	Palette* GetPalette();
+	void SetPalette(Palette* pal);
 	/** Returns width of the string rendered in this font in pixels */
 	int CalcStringWidth(const char* string, bool NoColor = false);
 	void SetupString(char* string, unsigned int width, bool NoColor = false);

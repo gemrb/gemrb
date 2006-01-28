@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.386 2006/01/14 17:16:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.387 2006/01/28 19:56:34 wjpalenstijn Exp $
  *
  */
 
@@ -69,6 +69,7 @@
 #include "DataFileMgr.h"
 #include "SaveGameMgr.h"
 #include "WorldMapControl.h"
+#include "Palette.h"
 
 GEM_EXPORT Interface* core;
 
@@ -570,7 +571,7 @@ void Interface::Main()
 	GetTime(timebase);
 	double frames = 0.0;
 	Region bg( 0, 0, 100, 30 );
-	Color* palette = video->CreatePalette( fpscolor, fpsblack );
+	Palette* palette = video->CreatePalette( fpscolor, fpsblack );
 	do {
 		//don't change script when quitting is pending
 
@@ -826,8 +827,8 @@ int Interface::Init()
 				if (!strnicmp( TooltipFont, ResRef, 8) ) {
 					fore = TooltipColor;
 				}
-				Color* pal = video->CreatePalette( fore, back );
-				memcpy( fnt->GetPalette(), pal, 256 * sizeof( Color ) );
+				Palette* pal = video->CreatePalette( fore, back );
+				fnt->SetPalette(pal);
 				video->FreePalette( pal );
 			}
 			fnt->SetFirstChar( first_char );
@@ -2720,7 +2721,7 @@ int Interface::PlayMovie(const char* ResRef)
 
 	ieDword subtitles = 0;
 	Font *SubtitleFont = NULL;
-	Color *palette = NULL;
+	Palette *palette = NULL;
 	ieDword *frames = NULL;
 	ieDword *strrefs = NULL;
 	int cnt = 0;
@@ -2759,12 +2760,11 @@ int Interface::PlayMovie(const char* ResRef)
 	if (music)
 		music->HardEnd();
 	soundmgr->GetAmbientMgr()->deactivate();
-	video->SetMovieFont(SubtitleFont, palette);
+	video->SetMovieFont(SubtitleFont, palette );
 	mp->CallBackAtFrames(cnt, frames, strrefs);
 	mp->Play();
 	FreeInterface( mp );
-	if (palette)
-		video->FreePalette( palette );
+	video->FreePalette( palette );
 	if (frames)
 		free(frames);
 	if (strrefs)

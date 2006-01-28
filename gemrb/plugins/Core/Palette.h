@@ -15,12 +15,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Palette.h,v 1.1 2006/01/27 17:30:59 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Palette.h,v 1.2 2006/01/28 19:56:34 wjpalenstijn Exp $
  */
 
 #ifndef PALETTE_H
 #define PALETTE_H
 
+#include <cassert>
+
+#include "../../includes/RGBAColor.h"
 
 #ifdef WIN32
 
@@ -43,6 +46,10 @@ public:
 		alpha = alpha_;
 		refcount = 1;
 	}
+	Palette() {
+		alpha = false;
+		refcount = 1;
+	}
 	~Palette() { }
 
 	Color col[256]; //< RGB or RGBA 8 bit palette
@@ -62,6 +69,10 @@ public:
 	bool IsShared() const {
 		return (refcount > 1);
 	}
+
+	void CreateShadedAlphaChannel();
+
+	Palette* Copy();
 
 private:
 	unsigned int refcount;

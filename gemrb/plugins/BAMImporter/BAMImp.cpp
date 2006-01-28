@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.42 2006/01/08 18:15:45 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.43 2006/01/28 19:56:38 wjpalenstijn Exp $
  *
  */
 
@@ -25,6 +25,7 @@
 #include "../Core/Compressor.h"
 #include "../Core/FileStream.h"
 #include "../Core/Video.h"
+#include "../Core/Palette.h"
 
 BAMImp::BAMImp(void)
 {
@@ -32,6 +33,7 @@ BAMImp::BAMImp(void)
 	autoFree = false;
 	frames = NULL;
 	cycles = NULL;
+	palette = NULL;
 	FramesCount = 0;
 	CyclesCount = 0;
 }
@@ -41,11 +43,11 @@ BAMImp::~BAMImp(void)
 	if (str && autoFree) {
 		delete( str );
 	}
-	if (frames) {
-		delete[] frames;
-	}
-	if (cycles) {
-		delete[] cycles;
+	delete[] frames;
+	delete[] cycles;
+	if (palette) {
+		palette->Release();
+		palette = 0;
 	}
 }
 
@@ -131,14 +133,15 @@ bool BAMImp::Open(DataStream* stream, bool autoFree)
 		str->ReadWord( &cycles[i].FirstFrame );
 	}
 	str->Seek( PaletteOffset, GEM_STREAM_START );
+	palette = new Palette();
 	//no idea if we have to switch this
 	for (i = 0; i < 256; i++) {
 		RevColor rc;
 		str->Read( &rc, 4 );
-		Palette[i].r = rc.r;
-		Palette[i].g = rc.g;
-		Palette[i].b = rc.b;
-		Palette[i].a = rc.a;
+		palette->col[i].r = rc.r;
+		palette->col[i].g = rc.g;
+		palette->col[i].b = rc.b;
+		palette->col[i].a = rc.a;
 	}
 	return true;
 }
@@ -200,7 +203,7 @@ Sprite2D* BAMImp::GetFrame(unsigned short findex, unsigned char mode)
 													   frames[findex].Height,
 													   true,
 													   RLEinpix, RLESize,
-													   Palette,
+													   palette,
 													   CompressedColorIndex);
 		//don't free RLEinpix, createsprite stores it if it was successful
 	} else {
@@ -208,7 +211,7 @@ Sprite2D* BAMImp::GetFrame(unsigned short findex, unsigned char mode)
 		spr = core->GetVideoDriver()->CreateSpriteBAM8(
 			frames[findex].Width, frames[findex].Height, false,
 			pixels, frames[findex].Width*frames[findex].Height, 
-			Palette, CompressedColorIndex );
+			palette, CompressedColorIndex );
 	}
 #endif
 	if (!spr) {
@@ -216,15 +219,18 @@ Sprite2D* BAMImp::GetFrame(unsigned short findex, unsigned char mode)
 			pixels = GetFramePixels(findex, RLEinpix);
 		spr = core->GetVideoDriver()->CreateSprite8(
 			frames[findex].Width, frames[findex].Height, 8,
-			pixels, Palette, true, 0 );
+			pixels, palette->col, true, 0 );
 		//don't free pixels, createsprite stores it
 	}
 
 	spr->XPos = (ieWordSigned)frames[findex].XPos;
 	spr->YPos = (ieWordSigned)frames[findex].YPos;
 	if (mode == IE_SHADED) {
-		core->GetVideoDriver()->ConvertToVideoFormat( spr );
-		core->GetVideoDriver()->CalculateAlpha( spr );
+		// CHECKME: is this ever used? Should we modify the sprite's palette
+		// without creating a local copy for this sprite?
+		Palette* pal = core->GetVideoDriver()->GetPalette(spr);
+		pal->CreateShadedAlphaChannel();
+		pal->Release();
 	}
 	return spr;
 }
@@ -386,7 +392,7 @@ Font* BAMImp::GetFont()
 			h = frames[index].Height;
 	}
 
-	Font* fnt = new Font( w, h, Palette, true, 0 );
+	Font* fnt = new Font( w, h, palette, true, 0 );
 	for (i = 0; i < Count; i++) {
 		unsigned int index;
 		if (CyclesCount > 1) {
@@ -422,7 +428,7 @@ Sprite2D* BAMImp::GetPalette()
 	for (int i = 0; i < 256; i++) {
 		*p++ = ( unsigned char ) i;
 	}
-	return core->GetVideoDriver()->CreateSprite8( 16, 16, 8, pixels, Palette, false );
+	return core->GetVideoDriver()->CreateSprite8( 16, 16, 8, pixels, palette->col, false );
 }
 
 void BAMImp::SetupColors(int *Colors)
@@ -434,28 +440,28 @@ void BAMImp::SetupColors(int *Colors)
 	Color* LeatherPal = core->GetPalette( Colors[4], 12 );
 	Color* ArmorPal = core->GetPalette( Colors[5], 12 );
 	Color* HairPal = core->GetPalette( Colors[6], 12 );
-	memcpy( &Palette[0x04], MetalPal, 12 * sizeof( Color ) );
-	memcpy( &Palette[0x10], MinorPal, 12 * sizeof( Color ) );
-	memcpy( &Palette[0x1C], MajorPal, 12 * sizeof( Color ) );
-	memcpy( &Palette[0x28], SkinPal, 12 * sizeof( Color ) );
-	memcpy( &Palette[0x34], LeatherPal, 12 * sizeof( Color ) );
-	memcpy( &Palette[0x40], ArmorPal, 12 * sizeof( Color ) );
-	memcpy( &Palette[0x4C], HairPal, 12 * sizeof( Color ) );
-	memcpy( &Palette[0x58], &MinorPal[1], 8 * sizeof( Color ) );
-	memcpy( &Palette[0x60], &MajorPal[1], 8 * sizeof( Color ) );
-	memcpy( &Palette[0x68], &MinorPal[1], 8 * sizeof( Color ) );
-	memcpy( &Palette[0x70], &MetalPal[1], 8 * sizeof( Color ) );
-	memcpy( &Palette[0x78], &LeatherPal[1], 8 * sizeof( Color ) );
-	memcpy( &Palette[0x80], &LeatherPal[1], 8 * sizeof( Color ) );
-	memcpy( &Palette[0x88], &MinorPal[1], 8 * sizeof( Color ) );
+	memcpy( &palette->col[0x04], MetalPal, 12 * sizeof( Color ) );
+	memcpy( &palette->col[0x10], MinorPal, 12 * sizeof( Color ) );
+	memcpy( &palette->col[0x1C], MajorPal, 12 * sizeof( Color ) );
+	memcpy( &palette->col[0x28], SkinPal, 12 * sizeof( Color ) );
+	memcpy( &palette->col[0x34], LeatherPal, 12 * sizeof( Color ) );
+	memcpy( &palette->col[0x40], ArmorPal, 12 * sizeof( Color ) );
+	memcpy( &palette->col[0x4C], HairPal, 12 * sizeof( Color ) );
+	memcpy( &palette->col[0x58], &MinorPal[1], 8 * sizeof( Color ) );
+	memcpy( &palette->col[0x60], &MajorPal[1], 8 * sizeof( Color ) );
+	memcpy( &palette->col[0x68], &MinorPal[1], 8 * sizeof( Color ) );
+	memcpy( &palette->col[0x70], &MetalPal[1], 8 * sizeof( Color ) );
+	memcpy( &palette->col[0x78], &LeatherPal[1], 8 * sizeof( Color ) );
+	memcpy( &palette->col[0x80], &LeatherPal[1], 8 * sizeof( Color ) );
+	memcpy( &palette->col[0x88], &MinorPal[1], 8 * sizeof( Color ) );
 
 	int i; //moved here to be compatible with msvc6.0
 
 	for (i = 0x90; i < 0xA8; i += 0x08)
-		memcpy( &Palette[i], &LeatherPal[1], 8 * sizeof( Color ) );
-	memcpy( &Palette[0xB0], &SkinPal[1], 8 * sizeof( Color ) );
+		memcpy( &palette->col[i], &LeatherPal[1], 8 * sizeof( Color ) );
+	memcpy( &palette->col[0xB0], &SkinPal[1], 8 * sizeof( Color ) );
 	for (i = 0xB8; i < 0xFF; i += 0x08)
-		memcpy( &Palette[i], &LeatherPal[1], 8 * sizeof( Color ) );
+		memcpy( &palette->col[i], &LeatherPal[1], 8 * sizeof( Color ) );
 
 	free( MetalPal );
 	free( MinorPal );
@@ -476,7 +482,7 @@ Sprite2D* BAMImp::GetPaperdollImage(int *Colors, Sprite2D *&Picture2)
 	}
 
 	void *pixels = GetFramePixels(1);
-	Picture2 = core->GetVideoDriver()->CreateSprite8(frames[1].Width, frames[1].Height, 8, pixels, Palette, true, 0 );
+	Picture2 = core->GetVideoDriver()->CreateSprite8(frames[1].Width, frames[1].Height, 8, pixels, palette->col, true, 0 );
 	//this is the only value we still need for a hack, the relative position
 	//of the lower half (picture2) to the upper half
 	Picture2->XPos = frames[1].XPos-frames[0].XPos;
@@ -484,7 +490,7 @@ Sprite2D* BAMImp::GetPaperdollImage(int *Colors, Sprite2D *&Picture2)
 	//Picture2->YPos = frames[1].YPos;
 
 	pixels = GetFramePixels(0);
-	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8(frames[0].Width, frames[0].Height, 8, pixels, Palette, true, 0 );
+	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8(frames[0].Width, frames[0].Height, 8, pixels, palette->col, true, 0 );
 	/* actually this gets zeroed out later, so why bother
 	spr->XPos = frames[0].XPos;
 	spr->YPos = frames[0].YPos;

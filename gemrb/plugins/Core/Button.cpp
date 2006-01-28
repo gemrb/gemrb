@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.95 2006/01/04 22:23:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.96 2006/01/28 19:56:34 wjpalenstijn Exp $
  *
  */
 
@@ -23,6 +23,7 @@
 #include "Button.h"
 #include "Interface.h"
 #include "Video.h"
+#include "Palette.h"
 #include "Variables.h"
 #include "../../includes/defsounds.h"
 
@@ -42,12 +43,13 @@ Button::Button(bool Clear)
 	hasText = false;
 	font = core->GetButtonFont();
 	normal_palette = NULL;
-	disabled_palette = ( Color * ) malloc( 256 * sizeof( Color ) );
-	memcpy( disabled_palette, font->GetPalette(), 256 * sizeof( Color ) );
+	Palette* fontpal = font->GetPalette();
+	disabled_palette = fontpal->Copy();
+	fontpal->Release();
 	for (int i = 0; i < 256; i++) {
-		disabled_palette[i].r = ( disabled_palette[i].r * 2 ) / 3;
-		disabled_palette[i].g = ( disabled_palette[i].g * 2 ) / 3;
-		disabled_palette[i].b = ( disabled_palette[i].b * 2 ) / 3;
+		disabled_palette->col[i].r = ( disabled_palette->col[i].r * 2 ) / 3;
+		disabled_palette->col[i].g = ( disabled_palette->col[i].g * 2 ) / 3;
+		disabled_palette->col[i].b = ( disabled_palette->col[i].b * 2 ) / 3;
 	}
 	Flags = IE_GUI_BUTTON_NORMAL;
 	ToggleState = false;
@@ -82,8 +84,7 @@ Button::~Button()
 	if (Text) {
 		free( Text );
 	}
-	if (normal_palette)
-		video->FreePalette( normal_palette );
+	video->FreePalette( normal_palette );
 	video->FreePalette( disabled_palette );
 }
 /** Sets the 'type' Image of the Button to 'img'.
@@ -211,7 +212,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 
 	// Button label
 	if (hasText && ! ( Flags & IE_GUI_BUTTON_NO_TEXT )) {
-		Color* ppoi = normal_palette;
+		Palette* ppoi = normal_palette;
 		int align = 0;
 
 		if (State == IE_GUI_BUTTON_DISABLED)
@@ -570,9 +571,7 @@ bool Button::IsPixelTransparent(unsigned short x, unsigned short y)
 // Set palette used for drawing button label in normal state
 void Button::SetTextColor(Color fore, Color back)
 {
-
-	if (normal_palette)
-		core->GetVideoDriver()->FreePalette( normal_palette );
+	core->GetVideoDriver()->FreePalette( normal_palette );
 
 	normal_palette = core->GetVideoDriver()->CreatePalette( fore, back );
 

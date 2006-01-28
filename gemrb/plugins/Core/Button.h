@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.49 2005/10/19 21:57:33 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.50 2006/01/28 19:56:34 wjpalenstijn Exp $
  *
  */
 
@@ -32,6 +32,8 @@
 #include "Control.h"
 #include "Sprite2D.h"
 #include "Font.h"
+
+class Palette;
 
 // NOTE: keep these synchronized with GUIDefines.py!!!
 #define IE_GUI_BUTTON_UNPRESSED 0
@@ -173,8 +175,8 @@ private: // Private attributes
 	bool hasText;
 	Font* font;
 	bool ToggleState;
-	Color* normal_palette;
-	Color* disabled_palette;
+	Palette* normal_palette;
+	Palette* disabled_palette;
 	/** Button Unpressed Image */
 	Sprite2D* Unpressed;
 	/** Button Pressed Image */

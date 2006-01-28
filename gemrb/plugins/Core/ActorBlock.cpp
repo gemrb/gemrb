@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.133 2006/01/14 21:14:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.134 2006/01/28 19:56:33 wjpalenstijn Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -169,7 +169,7 @@ void Scriptable::DisplayHeadText(const char* text)
 void Scriptable::DrawOverheadText(Region &screen)
 {
 	unsigned long time = core->GetGame()->Ticks;
-	Color *palette = NULL;
+	Palette *palette = NULL;
 
 	if (!textDisplaying)
 		return;
@@ -200,9 +200,7 @@ void Scriptable::DrawOverheadText(Region &screen)
 	Region rgn( Pos.x-100+screen.x, Pos.y - cs + screen.y, 200, 400 );
 	font->Print( rgn, ( unsigned char * ) overHeadText,
 		palette?palette:core->InfoTextPalette, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false );
-	if (palette) {
-		core->GetVideoDriver()->FreePalette(palette);
-	}
+	core->GetVideoDriver()->FreePalette(palette);
 }
 
 void Scriptable::ImmediateEvent()

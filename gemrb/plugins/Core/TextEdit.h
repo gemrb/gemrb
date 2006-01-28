@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.h,v 1.15 2005/10/19 21:57:33 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.h,v 1.16 2006/01/28 19:56:34 wjpalenstijn Exp $
  *
  */
 
@@ -31,6 +31,8 @@
 #include "Control.h"
 #include "../../includes/RGBAColor.h"
 #include "Font.h"
+
+class Palette;
 
 // !!! Keep these synchronized with GUIDefines.py
 #define IE_GUI_EDIT_ON_CHANGE      0x03000000
@@ -89,7 +91,7 @@ private:
 	/** Cursor Position */
 	unsigned short CurPos;
 	/** Color Palette */
-	Color* palette;
+	Palette* palette;
 public: //Events
 	/** Key Press Event */
 	void OnKeyPress(unsigned char Key, unsigned short Mod);
