@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.103 2006/01/28 19:56:34 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.104 2006/01/29 13:40:19 wjpalenstijn Exp $
  *
  */
 
@@ -151,9 +151,11 @@ public:
 	char Name[33];
 	ieResRef BAM; //not only for saving back (StaticSequence depends on this)
 	ieResRef PaletteRef;
+	Palette* palette;
 	AreaAnimation();
 	~AreaAnimation();
 	void SetPalette(ieResRef PaletteRef);
+	void BlendAnimation();
 	bool Schedule(ieDword gametime);
 };
 

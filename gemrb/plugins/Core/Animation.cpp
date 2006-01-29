@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.40 2006/01/28 19:56:34 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.41 2006/01/29 13:40:19 wjpalenstijn Exp $
  *
  */
 
@@ -23,7 +23,6 @@
 #include "Animation.h"
 #include "Interface.h"
 #include "Video.h"
-#include "Palette.h"
 #include "Map.h"
 #include "Game.h"
 
@@ -49,7 +48,6 @@ Animation::Animation(int count)
 	x = 0;
 	y = 0;
 	autofree = false;
-	palette = NULL;
 	Flags = A_ANI_ACTIVE;
 	fps = 15;
 	endReached = false;
@@ -68,7 +66,6 @@ Animation::~Animation(void)
 		}
 	}
 	free(frames);
-	video->FreePalette(palette);
 }
 
 void Animation::SetPos(unsigned int index)
@@ -204,29 +201,6 @@ Sprite2D* Animation::GetFrame(unsigned int i)
 	return frames[i];
 }
 
-void Animation::SetPalette(Palette* pal, bool local)
-{
-	Video *video = core->GetVideoDriver();
-	if (local) {
-		if (pal) {
-			video->FreePalette(palette);
-			pal->IncRef();
-			palette = pal;
-		} else {
-			// if pal == NULL, copy palette from first frame
-			if (!palette) {
-				palette = video->GetPalette( frames[0] );
-				// palette's refcount has been increased by GetPalette
-			}
-		}
-	} else {
-		//no idea if this part will ever be used
-		for (size_t i = 0; i < indicesCount; i++) {
-			video->SetPalette( frames[i], pal );
-		}
-	}
-}
-
 void Animation::MirrorAnimation()
 {
 	Video *video = core->GetVideoDriver();
@@ -245,21 +219,6 @@ void Animation::MirrorAnimation()
 
 	// This function will create independent sprites we have to free
 	autofree = true;
-}
-
-void Animation::BlendAnimation()
-{
-	// CHECKME: this means that if this Animation doesn't yet have a palette,
-	// it will set the palette of the first frame for the entire animation.
-	// Is this allowed?
-	// If not: do we need to make local copies of the palettes for all frames?
-	// (Palette might then need a flag 'blended' to make sure we don't make
-	//  too many copies.)
-
-	// make sure we have a palette (see CHECKME)
-	SetPalette(0, true);
-
-	palette->CreateShadedAlphaChannel();
 }
 
 void Animation::AddAnimArea(Animation* slave)

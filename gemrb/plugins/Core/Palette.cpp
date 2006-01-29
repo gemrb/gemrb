@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Palette.cpp,v 1.1 2006/01/28 19:56:33 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Palette.cpp,v 1.2 2006/01/29 13:40:19 wjpalenstijn Exp $
  *
  */
 
@@ -45,5 +45,6 @@ void Palette::CreateShadedAlphaChannel()
 Palette* Palette::Copy()
 {
 	Palette* pal = new Palette(col, alpha);
+	Release();
 	return pal;
 }

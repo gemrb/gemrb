@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.378 2006/01/28 19:56:39 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.379 2006/01/29 13:40:19 wjpalenstijn Exp $
  *
  */
 
@@ -2670,9 +2670,7 @@ static PyObject* SetButtonBAM(int wi, int ci, const char *ResRef, int CycleIndex
 
 	if (col1 >= 0) {
 		Color* pal = core->GetPalette( col1, 12 );
-		Palette* orgpal = core->GetVideoDriver()->GetPalette( Picture );
-		Palette* newpal = orgpal->Copy();
-		orgpal->Release();
+		Palette* newpal = core->GetVideoDriver()->GetPalette(Picture)->Copy();
 		memcpy( &newpal->col[4], pal, 12 * sizeof( Color ) );
 		core->GetVideoDriver()->SetPalette( Picture, newpal );
 		free( pal );

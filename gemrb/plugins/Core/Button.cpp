@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.96 2006/01/28 19:56:34 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.97 2006/01/29 13:40:19 wjpalenstijn Exp $
  *
  */
 
@@ -43,9 +43,7 @@ Button::Button(bool Clear)
 	hasText = false;
 	font = core->GetButtonFont();
 	normal_palette = NULL;
-	Palette* fontpal = font->GetPalette();
-	disabled_palette = fontpal->Copy();
-	fontpal->Release();
+	disabled_palette = font->GetPalette()->Copy();
 	for (int i = 0; i < 256; i++) {
 		disabled_palette->col[i].r = ( disabled_palette->col[i].r * 2 ) / 3;
 		disabled_palette->col[i].g = ( disabled_palette->col[i].g * 2 ) / 3;

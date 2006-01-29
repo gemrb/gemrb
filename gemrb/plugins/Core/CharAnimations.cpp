@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.75 2006/01/28 19:56:34 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.76 2006/01/29 13:40:19 wjpalenstijn Exp $
  *
  */
 
@@ -90,30 +90,13 @@ void CharAnimations::SetArmourLevel(int ArmourLevel)
 void CharAnimations::SetColors(ieDword *arg)
 {
 	Colors = arg;
-	int partCount = GetPartCount();
-	for (int StanceID = 0; StanceID < MAX_ANIMS; StanceID++) {
-		for (int Orient = 0; Orient < MAX_ORIENT; Orient++) {
-			if (Anims[StanceID][Orient]) {
-				for (int Part = 0; Part < partCount; Part++) {
-					SetupColors(Anims[StanceID][Orient][Part]);
-				}
-			}
-		}
-	}
+	SetupColors();
 }
 
-void CharAnimations::SetupColors(Animation *anim)
+void CharAnimations::SetupColors()
 {
-	if (!anim->palette) {
-		//this palette must be freed using videodriver
-		anim->palette=core->GetVideoDriver()->GetPalette(anim->GetFrame(0));
-	}
-
-	// CHECKME: currently creating a new palette for every animation,
-	// while it might be possible to share a palette between animations
-	Palette* pal = anim->palette->Copy();
-	anim->SetPalette(pal, true);
-	pal->Release();
+	if (!palette)
+		return;
 
 	if (!Colors) {
 		return;
@@ -124,7 +107,7 @@ void CharAnimations::SetupColors(Animation *anim)
 		int dest = 256-Colors[6]*size;
 		for (unsigned int i = 0; i < Colors[6]; i++) {
 			Color* NewPal = core->GetPalette( Colors[i]&255, size );
-			memcpy( &anim->palette->col[dest], NewPal, size*sizeof( Color ) );
+			memcpy( &palette->col[dest], NewPal, size*sizeof( Color ) );
 			dest +=size;
 			free( NewPal );
 		}
@@ -143,7 +126,7 @@ void CharAnimations::SetupColors(Animation *anim)
 		if (bmp) {
 			DataStream* s = core->GetResourceMgr()->GetResource( PaletteResRef, IE_BMP_CLASS_ID );
 			bmp->Open( s, true);
-			bmp->GetPalette(0, 256, anim->palette->col);
+			bmp->GetPalette(0, 256, palette->col);
 			core->FreeInterface( bmp );
 		}
 		return;
@@ -155,28 +138,28 @@ void CharAnimations::SetupColors(Animation *anim)
 	Color* LeatherPal = core->GetPalette( Colors[4]&255, 12 );
 	Color* ArmorPal = core->GetPalette( Colors[5]&255, 12 );
 	Color* HairPal = core->GetPalette( Colors[6]&255, 12 );
-	memcpy( &anim->palette->col[0x04], MetalPal, 12 * sizeof( Color ) );
-	memcpy( &anim->palette->col[0x10], MinorPal, 12 * sizeof( Color ) );
-	memcpy( &anim->palette->col[0x1C], MajorPal, 12 * sizeof( Color ) );
-	memcpy( &anim->palette->col[0x28], SkinPal, 12 * sizeof( Color ) );
-	memcpy( &anim->palette->col[0x34], LeatherPal, 12 * sizeof( Color ) );
-	memcpy( &anim->palette->col[0x40], ArmorPal, 12 * sizeof( Color ) );
-	memcpy( &anim->palette->col[0x4C], HairPal, 12 * sizeof( Color ) );
-	memcpy( &anim->palette->col[0x58], &MinorPal[1], 8 * sizeof( Color ) );
-	memcpy( &anim->palette->col[0x60], &MajorPal[1], 8 * sizeof( Color ) );
-	memcpy( &anim->palette->col[0x68], &MinorPal[1], 8 * sizeof( Color ) );
-	memcpy( &anim->palette->col[0x70], &MetalPal[1], 8 * sizeof( Color ) );
-	memcpy( &anim->palette->col[0x78], &LeatherPal[1], 8 * sizeof( Color ) );
-	memcpy( &anim->palette->col[0x80], &LeatherPal[1], 8 * sizeof( Color ) );
-	memcpy( &anim->palette->col[0x88], &MinorPal[1], 8 * sizeof( Color ) );
+	memcpy( &palette->col[0x04], MetalPal, 12 * sizeof( Color ) );
+	memcpy( &palette->col[0x10], MinorPal, 12 * sizeof( Color ) );
+	memcpy( &palette->col[0x1C], MajorPal, 12 * sizeof( Color ) );
+	memcpy( &palette->col[0x28], SkinPal, 12 * sizeof( Color ) );
+	memcpy( &palette->col[0x34], LeatherPal, 12 * sizeof( Color ) );
+	memcpy( &palette->col[0x40], ArmorPal, 12 * sizeof( Color ) );
+	memcpy( &palette->col[0x4C], HairPal, 12 * sizeof( Color ) );
+	memcpy( &palette->col[0x58], &MinorPal[1], 8 * sizeof( Color ) );
+	memcpy( &palette->col[0x60], &MajorPal[1], 8 * sizeof( Color ) );
+	memcpy( &palette->col[0x68], &MinorPal[1], 8 * sizeof( Color ) );
+	memcpy( &palette->col[0x70], &MetalPal[1], 8 * sizeof( Color ) );
+	memcpy( &palette->col[0x78], &LeatherPal[1], 8 * sizeof( Color ) );
+	memcpy( &palette->col[0x80], &LeatherPal[1], 8 * sizeof( Color ) );
+	memcpy( &palette->col[0x88], &MinorPal[1], 8 * sizeof( Color ) );
 
 	int i; //moved here to be compatible with msvc6.0
 
 	for (i = 0x90; i < 0xA8; i += 0x08)
-		memcpy( &anim->palette->col[i], &LeatherPal[1], 8 * sizeof( Color ) );
-	memcpy( &anim->palette->col[0xB0], &SkinPal[1], 8 * sizeof( Color ) );
+		memcpy( &palette->col[i], &LeatherPal[1], 8 * sizeof( Color ) );
+	memcpy( &palette->col[0xB0], &SkinPal[1], 8 * sizeof( Color ) );
 	for (i = 0xB8; i < 0xFF; i += 0x08)
-		memcpy( &anim->palette->col[i], &LeatherPal[1], 8 * sizeof( Color ) );
+		memcpy( &palette->col[i], &LeatherPal[1], 8 * sizeof( Color ) );
 	free( MetalPal );
 	free( MinorPal );
 	free( MajorPal );
@@ -222,6 +205,7 @@ void CharAnimations::InitAvatarsTable()
 CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 {
 	Colors = NULL;
+	palette = NULL;
 	nextStanceID = 0;
 	autoSwitchOnEnd = false;
 	if (!AvatarsCount) {
@@ -510,11 +494,20 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID,
 			delete[] anims;
 			return 0;
 		}
+
+		if (!palette) {
+			// This is the first time we're loading an Animation.
+			// We copy the palette of its first frame into our own palette
+			palette=core->GetVideoDriver()->GetPalette(a->GetFrame(0))->Copy();
+
+			// ...and setup the colours properly
+			SetupColors();
+		}
+
 	
 		//animation is affected by game flags
 		a->gameAnimation = true;
 		a->SetPos( 0 );
-		SetupColors( a );
 
 		//setting up the sequencing of animation cycles
 		autoSwitchOnEnd = false;

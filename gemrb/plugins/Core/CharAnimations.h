@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.38 2006/01/06 18:06:25 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.39 2006/01/29 13:40:19 wjpalenstijn Exp $
  *
  */
 
@@ -26,6 +26,8 @@
 #include "../../includes/RGBAColor.h"
 #include "TableMgr.h"
 #include <vector>
+
+class Palette;
 
 #ifdef WIN32
 
@@ -120,6 +122,7 @@ private:
 	Animation** Anims[MAX_ANIMS][MAX_ORIENT];
 public:
 	ieDword *Colors;  //these are the custom color indices
+	Palette* palette;
 	unsigned int AvatarsRowNum;
 	unsigned char ArmorType, WeaponType, RangedType;
 	ieResRef ResRef;
@@ -130,7 +133,7 @@ public:
 	~CharAnimations(void);
 	static void ReleaseMemory();
 	void SetArmourLevel(int ArmourLevel);
-	void SetupColors(Animation *anim);
+	void SetupColors();
 	void SetColors(ieDword *Colors);
 
 	// returns an array of animations of size GetPartCount()

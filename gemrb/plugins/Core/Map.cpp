@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.225 2006/01/28 19:56:34 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.226 2006/01/29 13:40:19 wjpalenstijn Exp $
  *
  */
 
@@ -733,7 +733,7 @@ void Map::DrawMap(Region screen, GameControl* gc)
 				Animation *anim = a->animation[animcount];
 				video->BlitSpriteTinted( anim->NextFrame(),
 					a->Pos.x + screen.x, a->Pos.y + screen.y,
-					tint, anim->palette, &screen );
+					tint, a->palette, &screen );
 			}
 			a = GetNextAreaAnimation(aniidx,gametime);
 		}
@@ -2253,6 +2253,7 @@ AreaAnimation::AreaAnimation()
 {
 	animation=NULL;
 	animcount=0;
+	palette=NULL;
 }
 
 AreaAnimation::~AreaAnimation()
@@ -2263,6 +2264,7 @@ AreaAnimation::~AreaAnimation()
 		}
 	}
 	free(animation);
+	core->GetVideoDriver()->FreePalette(palette);
 }
 
 void AreaAnimation::SetPalette(ieResRef Pal)
@@ -2275,13 +2277,25 @@ void AreaAnimation::SetPalette(ieResRef Pal)
 	}
 	DataStream* s = core->GetResourceMgr()->GetResource( Pal, IE_BMP_CLASS_ID );
 	bmp->Open( s, true );
-	Palette* pal = new Palette();
-	bmp->GetPalette( 0, 256, pal->col );
+	core->GetVideoDriver()->FreePalette(palette);
+	palette = new Palette();
+	bmp->GetPalette( 0, 256, palette->col );
 	core->FreeInterface( bmp );
-	for (int i=0;i<animcount;i++) {
-		animation[i]->SetPalette( pal, true );
+}
+
+void AreaAnimation::BlendAnimation()
+{
+	if (!palette) {
+		// CHECKME: what should we do here? Currently copying palette
+		// from first frame of first animation
+
+		if (animcount == 0 || !animation[0]) return;
+		Sprite2D* spr = animation[0]->GetFrame(0);
+		if (!spr) return;
+		palette = core->GetVideoDriver()->GetPalette(spr)->Copy();
 	}
-	pal->Release();
+
+	palette->CreateShadedAlphaChannel();
 }
 
 bool AreaAnimation::Schedule(ieDword gametime)

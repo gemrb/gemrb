@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.152 2006/01/28 19:56:38 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.153 2006/01/29 13:40:18 wjpalenstijn Exp $
  *
  */
 
@@ -818,6 +818,9 @@ Map* AREImp::GetMap(const char *ResRef)
 			if (anim->Flags & A_ANI_PALETTE) {
 				anim->SetPalette(anim->PaletteRef);
 			}
+			if (anim->Flags&A_ANI_BLEND) {
+				anim->BlendAnimation();
+			}
 
 			map->AddAnimation( anim );
 		}
@@ -1027,21 +1030,6 @@ Animation *AREImp::GetAnimationPiece(AnimationFactory *af, int animCycle, AreaAn
 	anim->y = a->Pos.y;
 	if (anim->Flags&A_ANI_MIRROR) {
 		anim->MirrorAnimation();
-	}
-	if (anim->Flags&A_ANI_PALETTE) {
-		Palette* palette = new Palette();
-		ImageMgr *bmp = (ImageMgr *) core->GetInterface( IE_BMP_CLASS_ID);
-		if (bmp) {
-			DataStream* s = core->GetResourceMgr()->GetResource( a->PaletteRef, IE_BMP_CLASS_ID );
-			bmp->Open( s, true);
-			bmp->GetPalette(0, 256, palette->col);
-			core->FreeInterface( bmp );
-		}
-		anim->SetPalette( palette, true );
-		core->GetVideoDriver()->FreePalette(palette);
-	}
-	if (anim->Flags&A_ANI_BLEND) {
-		anim->BlendAnimation();
 	}
 	return anim;
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.25 2006/01/28 19:56:34 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.26 2006/01/29 13:40:19 wjpalenstijn Exp $
  *
  */
 
@@ -27,8 +27,6 @@
 #include "Sprite2D.h"
 #include "Region.h"
 #include <vector>
-
-class Palette;
 
 #ifdef WIN32
 
@@ -58,7 +56,6 @@ public:
 	bool gameAnimation;
 	Region animArea;
 	ieDword Flags;
-	Palette *palette;
 	Animation(int count);
 	~Animation(void);
 	void AddFrame(Sprite2D* frame, unsigned int index);
@@ -67,12 +64,8 @@ public:
 	void release(void);
 	/** Gets the i-th frame */
 	Sprite2D* GetFrame(unsigned int i);
-	/** Sets the Animation Palette */
-	void SetPalette(Palette* pal, bool local);
 	/** Mirrors all the frames vertically */
 	void MirrorAnimation();
-	/** Calls CalculateAlpha on all frames */
-	void BlendAnimation();
 	/** sets frame index */
 	void SetPos(unsigned int index);
 	/** Sets ScriptName for area animation */
