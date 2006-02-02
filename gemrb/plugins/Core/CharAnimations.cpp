@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.76 2006/01/29 13:40:19 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.77 2006/02/02 22:13:08 wjpalenstijn Exp $
  *
  */
 
@@ -101,10 +101,15 @@ void CharAnimations::SetupColors()
 	if (!Colors) {
 		return;
 	}
+
 	if (GetAnimType() >= IE_ANI_PST_ANIMATION_1) {
 		// Avatars in PS:T
 		int size = 32;
 		int dest = 256-Colors[6]*size;
+		if (Colors[6] == 0) {
+			core->GetVideoDriver()->FreePalette(palette);
+			return;
+		}
 		for (unsigned int i = 0; i < Colors[6]; i++) {
 			Color* NewPal = core->GetPalette( Colors[i]&255, size );
 			memcpy( &palette->col[dest], NewPal, size*sizeof( Color ) );
@@ -117,8 +122,10 @@ void CharAnimations::SetupColors()
 	int PType = NoPalette();
 	if ( PType) {
 		//handling special palettes like MBER_BL (black bear)
-		if (PType==1) 
+		if (PType==1) {
+			core->GetVideoDriver()->FreePalette(palette);
 			return;
+		}
 		ieResRef PaletteResRef;
 		snprintf(PaletteResRef,8,"%.4s_%-.2s",ResRef, (char *) &PType);
 		strlwr(PaletteResRef);
@@ -131,6 +138,7 @@ void CharAnimations::SetupColors()
 		}
 		return;
 	}
+
 	Color* MetalPal = core->GetPalette( Colors[0]&255, 12 );
 	Color* MinorPal = core->GetPalette( Colors[1]&255, 12 );
 	Color* MajorPal = core->GetPalette( Colors[2]&255, 12 );
