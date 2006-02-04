@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.78 2006/02/04 12:31:47 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.79 2006/02/04 13:22:13 avenger_teambg Exp $
  *
  */
 
@@ -991,6 +991,7 @@ void CharAnimations::AddSixSuffix(char* ResRef, unsigned char StanceID,
 			Cycle = 32 + Orient;
 			break;
 
+		case IE_ANI_HEAD_TURN: //could be wrong
 		case IE_ANI_AWAKE:
 			strcat( ResRef, "g2" );
 			Cycle = 0 + Orient;
