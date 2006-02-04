@@ -38,7 +38,7 @@ Store:
 Animation:
 1. (PARTLY) fix char animation sequences (fixed?)
 2. (DONE) animationfactory->one single palette
-3. Use animation factory instead of local caching in CharAnimations (some way of rendering bitmaps with different palettes, but do it efficiently)
+3. (DONE) Use animationfactory in CharAnimations, and allow different palettes
 4. (DONE) Handle large multipart animations (2x2, 3x3)
 
 Actor:
