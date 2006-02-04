@@ -39,7 +39,7 @@ Animation:
 1. (PARTLY) fix char animation sequences (fixed?)
 2. (DONE) animationfactory->one single palette
 3. Use animation factory instead of local caching in CharAnimations (some way of rendering bitmaps with different palettes, but do it efficiently)
-4. Handle large animations (2x2, 3x3), either implement animation group or merge several frames into a large one. (they were originally split up for memory saving) Merging them may take time, but would be simpler to handle.  (wjp)
+4. (DONE) Handle large multipart animations (2x2, 3x3)
 
 Actor:
 1. (DONE) Fix reputation
