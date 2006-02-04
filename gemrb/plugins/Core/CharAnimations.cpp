@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.79 2006/02/04 13:22:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.80 2006/02/04 13:59:20 avenger_teambg Exp $
  *
  */
 
@@ -836,19 +836,69 @@ static char *CyclePrefix[]= {"0","0","1","1","1","1","0","0","1","1","1","1","1"
 static int CycleOffset[] = {0,  0,  0,  0,  0,  9,  0,  0,  0, 18,  0,  0,  9,  18,  0,  0,  0,  0,  0};
 
 
-// Note: broken
+// Note: almost like SixSuffix
 void CharAnimations::AddFFSuffix(char* ResRef, unsigned char StanceID,
 	unsigned char& Cycle, unsigned char Orient, int Part)
 {
-	char prefix[10];
+	switch (StanceID) {
+		case IE_ANI_WALK:
+			strcat( ResRef, "g1" );
+			Cycle = Orient;
+			break;
 
-	Cycle = SixteenToNine[Orient];
-	snprintf(prefix, 9, "%s%s%d%s%d", ResRef, StancePrefix[StanceID], Part,
-			 CyclePrefix[StanceID], Cycle);
-	strnlwrcpy(ResRef,prefix,8);
-	Cycle+=CycleOffset[StanceID];
+		case IE_ANI_ATTACK:
+		case IE_ANI_ATTACK_SLASH:
+			strcat( ResRef, "g3" );
+			Cycle = Orient;
+			break;
+
+		case IE_ANI_ATTACK_BACKSLASH:
+			strcat( ResRef, "g3" );
+			Cycle = 16 + Orient;
+			break;
+
+		case IE_ANI_ATTACK_JAB:
+			strcat( ResRef, "g3" );
+			Cycle = 32 + Orient;
+			break;
+
+		case IE_ANI_HEAD_TURN: //could be wrong
+		case IE_ANI_AWAKE:
+			strcat( ResRef, "g2" );
+			Cycle = 0 + Orient;
+			break;
+
+		case IE_ANI_READY:
+			strcat( ResRef, "g2" );
+			Cycle = 16 + Orient;
+			break;
+
+		case IE_ANI_DAMAGE:
+			strcat( ResRef, "g2" );
+			Cycle = 32 + Orient;
+			break;
+
+		case IE_ANI_DIE:
+		case IE_ANI_GET_UP:
+		case IE_ANI_EMERGE:
+			strcat( ResRef, "g2" );
+			Cycle = 48 + Orient;
+			break;
+
+		case IE_ANI_TWITCH:
+			strcat( ResRef, "g2" );
+			Cycle = 64 + Orient;
+			break;
+
+		default:
+			printf("Six Animation: unhandled stance: %s %d\n", ResRef, StanceID);
+			abort();
+			break;
+
+	}
+	ResRef[6]=Part+'0';
+	ResRef[7]=0;
 }
-
 
 void CharAnimations::AddNFSuffix(char* ResRef, unsigned char StanceID,
 	unsigned char& Cycle, unsigned char Orient, int Part)
