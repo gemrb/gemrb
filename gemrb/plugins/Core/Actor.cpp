@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.164 2006/01/29 13:40:19 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.165 2006/02/09 22:46:11 edheldil Exp $
  *
  */
 
@@ -256,12 +256,17 @@ ieDword Actor::GetStat(unsigned int StatIndex) const
 void Actor::SetCircleSize()
 {
 	Color* color;
+	int color_index;
+
 	if (Modified[IE_UNSELECTABLE]) {
 		color = &magenta;
+		color_index = 4;
 	} else if (GetMod(IE_MORALE)<0) {//if current morale < the max morale ?
 		color = &yellow;
+		color_index = 5;
 	} else if (Modified[IE_STATE_ID] & STATE_PANIC) {
 		color = &yellow;
+		color_index = 5;
 	} else {
 		switch (Modified[IE_EA]) {
 			case EA_PC:
@@ -272,19 +277,28 @@ void Actor::SetCircleSize()
 			case EA_EVILBUTGREEN:
 			case EA_GOODCUTOFF:
 				color = &green;
+				color_index = 0;
 				break;
 
 			case EA_ENEMY:
 			case EA_GOODBUTRED:
 			case EA_EVILCUTOFF:
 				color = &red;
+				color_index = 1;
 				break;
 			default:
 				color = &cyan;
+				color_index = 2;
 				break;
 		}
 	}
-	SetCircle( anims->GetCircleSize(), *color );
+
+
+	int csize = anims->GetCircleSize() - 1;
+	if (csize >= MAX_CIRCLE_SIZE) 
+		csize = MAX_CIRCLE_SIZE - 1;
+
+	SetCircle( anims->GetCircleSize(), *color, core->GroundCircles[csize][color_index], core->GroundCircles[csize][(color_index == 0) ? 3 : color_index] );
 }
 
 void pcf_ea(Actor *actor, ieDword /*Value*/)

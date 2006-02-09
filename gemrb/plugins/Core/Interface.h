@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.185 2006/01/28 19:56:34 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.186 2006/02/09 22:46:11 edheldil Exp $
  *
  */
 
@@ -138,6 +138,10 @@ typedef struct SlotType {
 #define AP_TRAP          8
 #define AP_SPELLCAST     9
 
+/** Max size of actor's ground circle */
+#define MAX_CIRCLE_SIZE  3
+
+
 /**
  * @class Interface
  * Central interconnect for all GemRB parts, driving functions and utility functions possibly belonging to a better place
@@ -185,6 +189,8 @@ private:
 	int GameFeatures;
 	ieResRef ButtonFont;
 	ieResRef CursorBam;
+	ieResRef GroundCircleBam[MAX_CIRCLE_SIZE];
+	int GroundCircleScale[MAX_CIRCLE_SIZE];
 	ieResRef TooltipFont;
 	ieResRef TooltipBackResRef;
 	ieResRef MovieFont;
@@ -217,11 +223,13 @@ public:
 	unsigned int SlotTypes; //this is the same as the inventory size
 	ieResRef GlobalScript;
 	ieResRef WorldMapName;
+	TableMgr* AreaAliasTable;
 	Sprite2D **Cursors;
 	int CursorCount;
 	Sprite2D *FogSprites[32];
 	Sprite2D **TooltipBack;
 	Sprite2D *WindowFrames[4];
+	Sprite2D *GroundCircles[MAX_CIRCLE_SIZE][6];
 public:
 	Interface(int iargc, char **iargv);
 	~Interface(void);
@@ -499,6 +507,8 @@ private:
 	bool ReadItemTable(const ieResRef item, const char *Prefix);
 	bool ReadAbilityTables();
 	bool ReadAbilityTable(const ieResRef name, ieWord *mem, int cols, int rows);
+	/** Reads table of area name mappings for WorldMap (PST only) */
+	bool ReadAreaAliasTable(const ieResRef name);
 	/** handles the QuitFlag bits (main loop events) */
 	void HandleFlags();
 	/** Creates a game control, closes all other windows */

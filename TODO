@@ -79,3 +79,6 @@ Compile scripts:
 
 - employ ccache?
 
+
+- use scaling in Video::SpriteScaleDown() instead of in Video::GetPreview() and in BMPImporter
+- move SDLVideoDriver sprite functions to their own file, rename them to SpriteIsPixelTransparent etc.

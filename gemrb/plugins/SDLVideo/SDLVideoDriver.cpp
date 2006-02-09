@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.133 2006/01/28 19:56:40 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.134 2006/02/09 22:46:10 edheldil Exp $
  *
  */
 
@@ -1443,6 +1443,59 @@ void SDLVideoDriver::GetPixel(short x, short y, Color* color)
 	SDL_GetRGBA( val, backBuf->format, &color->r, &color->g, &color->b, &color->a );
 }
 
+Color SDLVideoDriver::SpriteGetPixel(Sprite2D* sprite, unsigned short x, unsigned short y, int& res)
+{
+	Color c = { 0, 0, 0, 0 };
+	res = 0;
+
+	if (x >= sprite->Width || y >= sprite->Height) return c;
+
+	if (!sprite->BAM) {
+		SDL_Surface *surf = (SDL_Surface*)(sprite->vptr);
+
+		SDL_LockSurface( surf );
+		unsigned char * pixels = ( ( unsigned char * ) surf->pixels ) +
+			( ( y * surf->w + x) * surf->format->BytesPerPixel );
+		SDL_GetRGBA( *(Uint32*)pixels, surf->format, &c.r, &c.g, &c.b, &c.a );
+		SDL_UnlockSurface( surf );
+
+		res = 1;
+	} else {
+		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)sprite->vptr;
+
+		if (data->flip_ver)
+			y = sprite->Height - y - 1;
+		if (data->flip_hor)
+			x = sprite->Width - x - 1;
+
+		int skipcount = y * sprite->Width + x;
+
+		Uint8* rle = (Uint8*)sprite->pixels;
+		if (data->RLE) {
+			while (skipcount > 0) {
+				if (*rle++ == data->transindex)
+					skipcount -= (*rle++)+1;
+				else
+					skipcount--;
+			}
+		} else {
+			// uncompressed
+			rle += skipcount;
+			skipcount = 0;
+		}
+
+		if (skipcount >= 0 && *rle != data->transindex) {
+			c = data->pal->col[*rle];
+			//c.r = data->pal->col[*rle].r;
+			//c.g = data->pal->col[*rle].g;
+			//c.b = data->pal->col[*rle].b;
+			c.a = 0xff;
+			res = 2;
+		}
+	}
+	return c;
+}
+
 // (x,y) is _not_ relative to sprite's (xpos,ypos)
 bool SDLVideoDriver::IsSpritePixelTransparent(Sprite2D* sprite, unsigned short x, unsigned short y)
 {
@@ -1851,8 +1904,8 @@ Sprite2D *SDLVideoDriver::MirrorSpriteVertical(Sprite2D* sprite, bool MirrorAnch
 		unsigned char *newpixels = (unsigned char*) malloc( sprite->Width*sprite->Height );
 
 		SDL_LockSurface( tmp );
-		memcpy(newpixels, sprite->pixels, sprite->Width*sprite->Height);
-		dest = CreateSprite8(sprite->Width, sprite->Height, 8,
+		memcpy(newpixels, sprite->pixels, sprite->Width*sprite->Height);	
+	dest = CreateSprite8(sprite->Width, sprite->Height, 8,
 							 newpixels, tmp->format->palette->colors, true, 0);
 		
 		for (int x = 0; x < dest->Width; x++) {
@@ -1937,6 +1990,58 @@ Sprite2D *SDLVideoDriver::MirrorSpriteHorizontal(Sprite2D* sprite, bool MirrorAn
 	dest->YPos = sprite->YPos;
 	
 	return dest;
+}
+
+Color SDLVideoDriver::SpriteGetPixelSum(Sprite2D* sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio)
+{
+	Color sum;
+	unsigned int count = ratio*ratio;
+	unsigned int r=0, g=0, b=0, a=0;
+
+	for (unsigned int x = 0; x < ratio; x++) {
+		for (unsigned int y = 0; y < ratio; y++) {
+			int res;
+			Color c = SpriteGetPixel( sprite, xbase*ratio+x, ybase*ratio+y, res );
+			r += c.r;
+			g += c.g;
+			b += c.b;
+			a += c.a;
+		}
+	}
+
+	sum.r = r / count;
+	sum.g = g / count;
+	sum.b = b / count;
+	sum.a = a / count;
+
+	return sum;
+}
+
+Sprite2D* SDLVideoDriver::SpriteScaleDown( Sprite2D* sprite, unsigned int ratio )
+{
+	unsigned int Width = sprite->Width / ratio;
+	unsigned int Height = sprite->Height / ratio;
+
+	void* pixels = malloc( Width * Height * 4 );
+	int i = 0;
+
+	for (unsigned int y = 0; y < Height; y++) {
+		for (unsigned int x = 0; x < Width; x++) {
+			Color c = SpriteGetPixelSum( sprite, x, y, ratio );
+
+			*((char*)pixels + i++) = c.r;
+			*((char*)pixels + i++) = c.g;
+			*((char*)pixels + i++) = c.b;
+			*((char*)pixels + i++) = c.a;
+		}
+	}
+
+	Sprite2D* small = CreateSprite( Width, Height, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000, pixels, false, 0 );
+
+	small->XPos = sprite->XPos / ratio;
+	small->YPos = sprite->YPos / ratio;
+
+	return small;
 }
 
 void SDLVideoDriver::CreateAlpha( Sprite2D *sprite)

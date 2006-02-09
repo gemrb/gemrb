@@ -1,6 +1,6 @@
 GAME-SPECIFIC CONFIGURATION FILE GEMRB.INI
 ******************************************
-$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/GemRB_INI.txt,v 1.4 2005/08/28 11:39:01 avenger_teambg Exp $
+$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/GemRB_INI.txt,v 1.5 2006/02/09 22:46:11 edheldil Exp $
 
 Contents
 --------
@@ -94,6 +94,20 @@ Tooltip text color. Default is #ffffffff, i.e. opaque white.
 TooltipMargin = <number>
 - - - - - - - - - - - - -
 Space between tooltip text and sides of TooltipBack (x2)
+
+
+GroundCircleBAM1 = <resref>
+GroundCircleBAM2 = <resref>
+GroundCircleBAM3 = <resref>/<int>
+- - - - - - - - - - - - - - - - -
+Sprites displayed as a ground circle under actors (PST only).
+Actually, there should be this directive for each ground circle
+size, from 1 to 3 (sizes in PST).
+
+If the ResRef is immediately followed by a slash and a number, 
+the bitmap is scaled down by this factor. That's used in PST, 
+where resources exist for circle sizes 2 and 3 only.
+(e.g. GroundCircleBAM1 = wmpickl/3)
 
 
 INIConfig = <filename>

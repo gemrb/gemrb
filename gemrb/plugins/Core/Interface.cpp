@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.387 2006/01/28 19:56:34 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.388 2006/02/09 22:46:11 edheldil Exp $
  *
  */
 
@@ -178,6 +178,10 @@ Interface::Interface(int iargc, char** iargv)
 	strncpy( Palette32, "PAL32", sizeof(Palette32) );
 	strncpy( Palette256, "MPAL256", sizeof(Palette256) );
 	strcpy( TooltipBackResRef, "\0" );
+	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
+		strcpy( GroundCircleBam[size], "\0" );
+		GroundCircleScale[size] = 0;
+	}
 	TooltipColor.r = 0;
 	TooltipColor.g = 255;
 	TooltipColor.b = 0;
@@ -191,6 +195,8 @@ Interface::Interface(int iargc, char** iargv)
 	for(unsigned int i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) FogSprites[i]=NULL;
 	GameFeatures = 0;
 	memset( WindowFrames, 0, sizeof( WindowFrames ));
+	memset( GroundCircles, 0, sizeof( GroundCircles ));
+	AreaAliasTable = NULL;
 }
 
 #define FreeInterfaceVector(type, variable, member) \
@@ -558,6 +564,23 @@ bool Interface::ReadAbilityTables()
 		return ret;
 	return true;
 }
+
+bool Interface::ReadAreaAliasTable(const ieResRef tablename)
+{
+	int table = LoadTable( tablename );
+
+	if (table < 0) {
+		return false;
+	}
+	AreaAliasTable = GetTable( table );
+	if (!AreaAliasTable) {
+		DelTable( table );
+		return false;
+	}
+	printf("XXX: %s\n", AreaAliasTable->QueryField( "AR0306a", "MAP_AREA" ));
+	return true;
+}
+
 
 /** this is the main loop */
 void Interface::Main()
@@ -1083,8 +1106,6 @@ int Interface::Init()
 	video->FreeSprite( tmpsprite );
 	}
 
-	printStatus( "OK", LIGHT_GREEN );
-
 	{
 		ieDword i = 0;
 		vars->Lookup("3D Acceleration", i);
@@ -1094,6 +1115,35 @@ int Interface::Init()
 			}
 		}
 	}
+
+	printStatus( "OK", LIGHT_GREEN );
+
+	// Load ground circle bitmaps (PST only)
+	printMessage( "Core", "Loading Ground circle bitmaps...", WHITE );
+	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
+		if (GroundCircleBam[size][0]) {
+			str = key->GetResource( GroundCircleBam[size], IE_BAM_CLASS_ID );
+			anim->Open( str, true );
+			if (anim->GetCycleCount() != 6) {
+				// unknown type of circle anim
+				printStatus( "ERROR", LIGHT_RED );
+				goto end_of_init;
+			}
+
+			for (int i = 0; i < 6; i++) {
+				Sprite2D* sprite = anim->GetFrameFromCycle( i, 0 );
+				if (GroundCircleScale[size]) {
+					GroundCircles[size][i] = video->SpriteScaleDown( sprite, GroundCircleScale[size] );
+					video->FreeSprite( sprite );
+				}
+				else 
+					GroundCircles[size][i] = sprite;
+			}
+		}
+	}
+
+	printStatus( "OK", LIGHT_GREEN );
+
 
 	printMessage( "Core", "Bringing up the Global Timer...", WHITE );
 	timer = new GlobalTimer();
@@ -1160,6 +1210,15 @@ int Interface::Init()
 
 	printMessage( "Core", "Initializing ability tables...\n", WHITE );
 	ret = ReadAbilityTables();
+	if (ret) {
+		printStatus( "OK", LIGHT_GREEN );
+	}
+	else {
+		printStatus( "ERROR", LIGHT_RED );
+	}
+
+	printMessage( "Core", "Initializing area aliases...\n", WHITE );
+	ret = ReadAreaAliasTable( "WMAPLAY" );
 	if (ret) {
 		printStatus( "OK", LIGHT_GREEN );
 	}
@@ -1694,6 +1753,25 @@ bool Interface::LoadGemRBINI()
 	}
 
 	TooltipMargin = ini->GetKeyAsInt( "resources", "TooltipMargin", TooltipMargin );
+
+	// The format of GroundCircle can be:
+	//   GroundCircleBAM1 = wmpickl/3
+	//   to denote that the bitmap should be scaled down 3x
+	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
+		char name[30];
+		sprintf( name, "GroundCircleBAM%d", size+1 );
+		s = ini->GetKeyAsString( "resources", name, NULL );
+		if (s) {
+			char *pos = strchr( s, '/' );
+			if (pos) {
+				GroundCircleScale[size] = atoi( pos+1 );
+				strncpy( GroundCircleBam[size], s, pos - s );
+				GroundCircleBam[size][pos - s] = '\0';
+			} else {
+				strcpy( GroundCircleBam[size], s );
+			}
+		}
+	}
 
 	s = ini->GetKeyAsString( "resources", "INIConfig", NULL );
 	if (s)

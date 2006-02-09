@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.134 2006/01/28 19:56:33 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.135 2006/02/09 22:46:11 edheldil Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -449,6 +449,8 @@ Selectable::Selectable(ScriptableType type)
 	Over = false;
 	size = 0;
 	cover = NULL;
+	circleBitmap[0] = NULL;
+	circleBitmap[1] = NULL;
 }
 
 Selectable::~Selectable(void)
@@ -467,15 +469,24 @@ void Selectable::DrawCircle(Region &vp)
 		return;
 	}
 	Color* col = NULL;
+	Sprite2D* sprite = circleBitmap[0];
+
 	if (Selected) {
 		col = &selectedColor;
+		sprite = circleBitmap[1];
 	} else if (Over) {
 		col = &overColor;
 	} else {
 		return;
 	}
-	core->GetVideoDriver()->DrawEllipse( Pos.x - vp.x, Pos.y - vp.y,
-		 size * 10, ( ( size * 15 ) / 2 ), *col );
+
+	if (sprite) {
+	  core->GetVideoDriver()->BlitSprite( sprite, Pos.x - vp.x, Pos.y - vp.y, true );
+	}
+	else {
+	  core->GetVideoDriver()->DrawEllipse( Pos.x - vp.x, Pos.y - vp.y,
+		size * 10, ( ( size * 15 ) / 2 ), *col );
+	}
 }
 
 bool Selectable::IsOver(Point &Pos)
@@ -509,13 +520,15 @@ void Selectable::Select(int Value)
 	cover = NULL;
 }
 
-void Selectable::SetCircle(int circlesize, Color color)
+void Selectable::SetCircle(int circlesize, Color color, Sprite2D* normal_circle, Sprite2D* selected_circle)
 {
 	size = circlesize;
 	selectedColor = color;
 	overColor.r = color.r >> 1;
 	overColor.g = color.g >> 1;
 	overColor.b = color.b >> 1;
+	circleBitmap[0] = normal_circle;
+	circleBitmap[1] = selected_circle;
 }
 
 //used for creatures

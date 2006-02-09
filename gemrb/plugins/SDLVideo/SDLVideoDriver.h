@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.59 2006/01/28 19:56:40 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.60 2006/02/09 22:46:10 edheldil Exp $
  *
  */
 
@@ -145,7 +145,10 @@ private:
 	void DrawMovieSubtitle(ieDword strRef);
 
 public:
+	Color SpriteGetPixel (Sprite2D* sprite, unsigned short x, unsigned short y, int& res);
+	Color SpriteGetPixelSum (Sprite2D* sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio);
 	bool IsSpritePixelTransparent (Sprite2D* sprite, unsigned short x, unsigned short y);
+	Sprite2D* SpriteScaleDown( Sprite2D* sprite, unsigned int ratio );
 	void release(void)
 	{
 		delete this;

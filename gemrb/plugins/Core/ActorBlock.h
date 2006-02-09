@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.99 2006/01/14 21:14:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.100 2006/02/09 22:46:11 edheldil Exp $
  *
  */
 
@@ -221,6 +221,7 @@ public:
 	bool Over;
 	Color selectedColor;
 	Color overColor;
+	Sprite2D *circleBitmap[2];
 	int size;
         // current SpriteCover for wallgroups
         SpriteCover* cover;
@@ -231,7 +232,7 @@ public:
 	void SetOver(bool over);
 	bool IsSelected();
 	void Select(int Value);
-	void SetCircle(int size, Color color);
+	void SetCircle(int size, Color color, Sprite2D* normal_circle, Sprite2D* selected_circle);
 
         /* store SpriteCover */
         void SetSpriteCover(SpriteCover* c) { cover = c; }
