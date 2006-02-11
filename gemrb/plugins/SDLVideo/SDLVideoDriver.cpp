@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.134 2006/02/09 22:46:10 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.135 2006/02/11 08:25:25 avenger_teambg Exp $
  *
  */
 
@@ -29,7 +29,7 @@
 #include "../Core/SoundMgr.h"
 #include "../Core/Palette.h"
 
-class GEM_EXPORT Sprite2D_BAM_Internal {
+class Sprite2D_BAM_Internal {
 public:
 	Sprite2D_BAM_Internal() { pal = 0; }
 	~Sprite2D_BAM_Internal() { if (pal) { pal->Release(); pal = 0; } }
