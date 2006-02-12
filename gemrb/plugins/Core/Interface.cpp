@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.388 2006/02/09 22:46:11 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.389 2006/02/12 16:05:05 avenger_teambg Exp $
  *
  */
 
@@ -1120,6 +1120,8 @@ int Interface::Init()
 
 	// Load ground circle bitmaps (PST only)
 	printMessage( "Core", "Loading Ground circle bitmaps...", WHITE );
+	//block required due to msvc6.0 incompatibility
+	{
 	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
 		if (GroundCircleBam[size][0]) {
 			str = key->GetResource( GroundCircleBam[size], IE_BAM_CLASS_ID );
@@ -1140,6 +1142,7 @@ int Interface::Init()
 					GroundCircles[size][i] = sprite;
 			}
 		}
+	}
 	}
 
 	printStatus( "OK", LIGHT_GREEN );
