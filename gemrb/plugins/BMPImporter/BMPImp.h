@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.21 2006/01/06 23:09:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.22 2006/02/17 20:20:00 edheldil Exp $
  *
  */
 
@@ -51,7 +51,7 @@ public:
 	bool Open(DataStream* stream, bool autoFree = true, bool convert = false);
 	bool OpenFromImage(Sprite2D* sprite, bool autoFree = true);
 	Sprite2D* GetImage();
-	void PutImage(DataStream *output, unsigned int ratio);
+	void PutImage(DataStream *output);
 	/** No descriptions */
 	void GetPalette(int index, int colors, Color* pal);
 	/** Searchmap only */
@@ -123,6 +123,11 @@ public:
 			ret.g = *p++;
 			ret.r = *p++;
 			ret.a = 0xff;
+		} else if (BitCount == 32) {
+			ret.r = *p++;
+			ret.g = *p++;
+			ret.b = *p++;
+			ret.a = *p++;
 		} else if (BitCount == 8) {
 			ret.r = Palette[*p].r;
 			ret.g = Palette[*p].g;

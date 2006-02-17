@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.29 2005/12/28 19:59:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.30 2006/02/17 20:20:00 edheldil Exp $
  *
  */
 
@@ -268,7 +268,7 @@ bool BMPImp::OpenFromImage(Sprite2D* sprite, bool autoFree)
 	Width = sprite->Width;
 	Height = sprite->Height;
 	Planes = 1;
-	BitCount = 24;
+	BitCount = sprite->Bpp;
 	Compression = 0;
 	ImageSize = 0;
 	NumColors = 0;
@@ -280,8 +280,8 @@ bool BMPImp::OpenFromImage(Sprite2D* sprite, bool autoFree)
 	Palette = NULL;
 	// left out some other params
 
-	pixels = malloc( Width * Height * 3 );
-	memcpy( pixels, sprite->pixels, Width * Height * 3 );
+	pixels = malloc( Width * Height * (BitCount / 8) );
+	memcpy( pixels, sprite->pixels, Width * Height * (BitCount / 8) );
 
 	// FIXME: free the sprite if autoFree?
 	if (autoFree) {
@@ -355,17 +355,14 @@ void BMPImp::GetPalette(int index, int colors, Color* pal)
 
 #define GET_SCANLINE_LENGTH(width, bitsperpixel)  (((width)*(bitsperpixel)+7)/8)
 
-void BMPImp::PutImage(DataStream *output, unsigned int ratio)
+void BMPImp::PutImage(DataStream *output)
 {
 	ieDword tmpDword;
 	ieWord tmpWord;
 
-	if(ratio<1) {
-		ratio=1;
-	}
 	// FIXME
-	ieDword Width = GetWidth()/ratio;
-	ieDword Height = GetHeight()/ratio;
+	ieDword Width = GetWidth();
+	ieDword Height = GetHeight();
 	char filling[3] = {'B','M'};
 	ieDword PaddedRowLength = GET_SCANLINE_LENGTH(Width,24);
 	int stuff = (4-(PaddedRowLength&3))&3; // rounding it up to 4 bytes boundary
@@ -399,8 +396,7 @@ void BMPImp::PutImage(DataStream *output, unsigned int ratio)
 	memset( filling,0,sizeof(filling) );
 	for (unsigned int y=0;y<Height;y++) {
 		for (unsigned int x=0;x<Width;x++) {
-			Color c = GetPixelSum(x,Height-y-1,ratio);
-			//Color c = GetPixel(x,Height-y-1);
+			Color c = GetPixel(x,Height-y-1);
 
 			output->Write( &c.b, 1);
 			output->Write( &c.g, 1);

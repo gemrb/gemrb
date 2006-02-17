@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.56 2006/02/09 22:46:11 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.57 2006/02/17 20:20:00 edheldil Exp $
  *
  */
 
@@ -70,6 +70,8 @@ public:
 	virtual int SwapBuffers(void) = 0;
 	/** Grabs and releases mouse cursor within GemRB window */
 	virtual bool ToggleGrabInput() = 0;
+	virtual short GetWidth() = 0;
+	virtual short GetHeight() = 0;
 	virtual Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask,
 		ieDword gMask, ieDword bMask, ieDword aMask, void* pixels, bool cK = false,
 		int index = 0) = 0;
@@ -101,7 +103,7 @@ public:
 	virtual void SetDragCursor(Sprite2D* drag) = 0;
 	/** Return GemRB window screenshot.
 	 * It's generated from the momentary back buffer */
-	virtual Sprite2D* GetPreview(int w, int h) = 0;
+	virtual Sprite2D* GetScreenshot( Region r ) = 0;
 	virtual Region GetViewport(void) = 0;
 	virtual void SetViewport(int x, int y, unsigned int w, unsigned int h) = 0;
 	virtual void MoveViewportTo(int x, int y, bool center) = 0;

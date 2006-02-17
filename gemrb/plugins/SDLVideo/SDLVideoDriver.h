@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.60 2006/02/09 22:46:10 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.61 2006/02/17 20:19:56 edheldil Exp $
  *
  */
 
@@ -58,6 +58,8 @@ public:
 	bool ToggleFullscreenMode();
 	int SwapBuffers(void);
 	bool ToggleGrabInput();
+	short GetWidth() { return ( disp ? disp->w : 0 ); };
+	short GetHeight() { return ( disp ? disp->h : 0 ); };
 	void MouseMovement(int x, int y);
 	void MoveMouse(unsigned int x, unsigned int y);
 	Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask,
@@ -83,7 +85,7 @@ public:
 		SpriteCover* cover, Palette *palette = NULL, Region *clip = NULL);
 	void SetCursor(Sprite2D* up, Sprite2D* down);
 	void SetDragCursor(Sprite2D* drag);
-	Sprite2D* GetPreview(int w, int h);
+	Sprite2D* GetScreenshot( Region r );
 	Region GetViewport(void);
 	void SetViewport(int x, int y, unsigned int w, unsigned int h);
 	void MoveViewportTo(int x, int y, bool center);

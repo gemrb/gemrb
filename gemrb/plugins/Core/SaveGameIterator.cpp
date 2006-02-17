@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.38 2006/01/05 17:29:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.39 2006/02/17 20:20:00 edheldil Exp $
  *
  */
 
@@ -25,6 +25,7 @@
 #include "ResourceMgr.h"
 #include "SaveGameMgr.h"
 #include "GameControl.h"
+#include "Video.h"
 #include <vector>
 #include <cassert>
 
@@ -459,16 +460,22 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 		ratio=1; //pst doesn't shrink the portrait icons any further
 	}
 	ImageMgr *im = (ImageMgr *) core->GetInterface(IE_BMP_CLASS_ID);
+	Video *video = core->GetVideoDriver();
+
 	for (int i=0;i<game->GetPartySize(false); i++) {
 		Actor *actor = game->GetPC(i, false);
 		DataStream *str = core->GetResourceMgr()->GetResource(actor->GetPortrait(true), IE_BMP_CLASS_ID);
 		if (str) {
+			im->Open( str, true );
+			Sprite2D* img = im->GetImage();
+			Sprite2D* imgsc = video->SpriteScaleDown( img, ratio );
+			video->FreeSprite( img );
 			snprintf( Path, _MAX_PATH, "%s%s%s%09d-%s", core->SavePath, PlayMode(), SPathDelimiter, index, slotname);
 			snprintf( FName, sizeof(FName), "PORTRT%d", i );
 			FileStream outfile;
 			outfile.Create(Path, FName, IE_BMP_CLASS_ID);
-			im->Open( str, true);
-			im->PutImage(&outfile,ratio);
+			im->OpenFromImage( imgsc, true );
+			im->PutImage( &outfile );
 		}
 	}
 	core->FreeInterface(im);
@@ -481,7 +488,7 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 	FileStream outfile;
 	outfile.Create( Path, core->GameNameResRef, IE_BMP_CLASS_ID );
 	im->OpenFromImage( preview, true );
-	im->PutImage( &outfile, 5 );
+	im->PutImage( &outfile );
 
 	core->FreeInterface(im);
 	loaded = false;

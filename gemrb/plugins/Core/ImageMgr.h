@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ImageMgr.h,v 1.14 2006/01/06 23:09:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ImageMgr.h,v 1.15 2006/02/17 20:20:00 edheldil Exp $
  *
  */
 
@@ -61,7 +61,7 @@ public:
 	virtual int GetHeight() = 0;
 	// FIXME: should be abstract, but I don't want to implement it for all
 	// image managers right now
-	virtual void PutImage(DataStream *output, unsigned int ratio);
+	virtual void PutImage(DataStream *output);
 protected:
 	/** not virtual */
 	Color GetPixelSum(unsigned int x, unsigned int y, unsigned int ratio);

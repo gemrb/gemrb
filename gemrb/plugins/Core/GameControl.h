@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.84 2006/01/08 22:07:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.85 2006/02/17 20:20:00 edheldil Exp $
  */
 
 /**
@@ -188,7 +188,9 @@ public:
 	Actor *GetLastActor();
 	/* changes map to the current PC */
 	void ChangeMap(Actor *pc, bool forced);
-	/* returns current area preview for saving a game */
+	/* Returns game screenshot, with or without GUI controls */
+	Sprite2D* GetScreenshot( bool show_gui = 0 );
+	/* Returns current area preview for saving a game */
 	Sprite2D* GetPreview();
 };
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.282 2006/01/08 22:07:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.283 2006/02/17 20:20:00 edheldil Exp $
  */
 
 #ifndef WIN32
@@ -1786,16 +1786,61 @@ void GameControl::SetDialogueFlags(int value, int mode)
 	}
 }
 
+Sprite2D* GameControl::GetScreenshot(bool show_gui)
+{
+	Sprite2D* screenshot;
+	if (show_gui) {
+		screenshot = core->GetVideoDriver()->GetScreenshot( Region( 0, 0, 0, 0) );
+	} else {
+		HideGUI ();
+		Draw (0, 0);
+		screenshot = core->GetVideoDriver()->GetScreenshot( Region( 0, 0, 0, 0 ) );
+		UnhideGUI ();
+		core->DrawWindows ();
+	}
+
+	return screenshot;
+}
+
+
 Sprite2D* GameControl::GetPreview()
 {
+	// We get preview by first taking a screenshot of size 640x405,
+	//   centered in the display. This is to get a decent picture for
+	//   higher screen resolutions. 
+	// FIXME: how do orig games solve that?
+	Video* video = core->GetVideoDriver();
+	int w = video->GetWidth();
+	int h = video->GetHeight();
+	int x = (w - 640) / 2;
+	int y = (h - 405) / 2;
+	
+	if (x < 0) {
+		x = 0;
+	} else {
+		w = 640;
+	}
+
+	if (y < 0) {
+		y = 0;
+	} else {
+		h = 405;
+	}
+
+	if (!x) 
+		y = 0;
+
 	HideGUI ();
 	Draw (0, 0);
-	Sprite2D* preview = core->GetVideoDriver()->GetPreview( 128, 81 );
+	Sprite2D *screenshot = video->GetScreenshot( Region(x, y, w, h) );
 	UnhideGUI ();
-	core->DrawWindows ();
+	core->DrawWindows();
 
+	Sprite2D* preview = video->SpriteScaleDown ( screenshot, 5 );
+	video->FreeSprite( screenshot );
 	return preview;
 }
+
 
 Actor *GameControl::GetActorByGlobalID(ieWord ID)
 {

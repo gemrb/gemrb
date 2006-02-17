@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Sprite2D.h,v 1.8 2006/01/08 18:15:47 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Sprite2D.h,v 1.9 2006/02/17 20:20:00 edheldil Exp $
  *
  */
 
@@ -55,7 +55,7 @@ public:
 	bool BAM;
 	int RefCount;
 	void* pixels;
-	int XPos, YPos, Width, Height;
+	int XPos, YPos, Width, Height, Bpp;
 	Sprite2D(void);
 	~Sprite2D(void);
 };
