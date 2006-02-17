@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.cpp,v 1.35 2005/10/16 21:46:06 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.cpp,v 1.36 2006/02/17 17:17:18 avenger_teambg Exp $
  *
  */
 
@@ -27,20 +27,17 @@ extern Interface* core;
 
 CachedFileStream::CachedFileStream(const char* stream, bool autoFree)
 {
-	char fname[_MAX_PATH];
-	ExtractFileFromPath( fname, stream );
+	ExtractFileFromPath( filename, stream );
+	PathJoin( originalfile, core->CachePath, filename, NULL );
 
-	char path[_MAX_PATH];
-	PathJoin( path, core->CachePath, fname, NULL );
-
-	str = _fopen( path, "rb" );
+	str = _fopen( originalfile, "rb" );
 	if (str == NULL) {    // File was not found in cache
 		if (core->GameOnCD) {
 			_FILE* src = _fopen( stream, "rb" );
 #ifdef _DEBUG
 			core->CachedFileStreamPtrCount++;
 #endif
-			_FILE* dest = _fopen( path, "wb" );
+			_FILE* dest = _fopen( originalfile, "wb" );
 #ifdef _DEBUG
 			core->CachedFileStreamPtrCount++;
 #endif
@@ -58,10 +55,10 @@ CachedFileStream::CachedFileStream(const char* stream, bool autoFree)
 #ifdef _DEBUG
 			core->CachedFileStreamPtrCount--;
 #endif
-			str = _fopen( path, "rb" );
 		} else {  // Don't cache files already on hdd
-			str = _fopen( stream, "rb" );
+			strncpy(originalfile, stream, _MAX_PATH);
 		}
+		str = _fopen( originalfile, "rb" );
 	}
 #ifdef _DEBUG
 	core->CachedFileStreamPtrCount++;
@@ -70,8 +67,6 @@ CachedFileStream::CachedFileStream(const char* stream, bool autoFree)
 	_fseek( str, 0, SEEK_END ); 
 	size = _ftell( str );
 	_fseek( str, 0, SEEK_SET );
-	strcpy( filename, fname );
-	strcpy( originalfile, stream );
 	Pos = 0;
 	this->autoFree = autoFree;
 }
@@ -91,11 +86,18 @@ CachedFileStream::CachedFileStream(CachedFileStream* cfs, int startpos,
 			printf( "Can't open stream (maybe leaking?)\n" );
 			return;
 		}
+		strncpy( originalfile, cfs->originalfile, sizeof(originalfile) );
+		strncpy( filename, cfs->filename, sizeof(filename) );
+	} else {
+		strncpy( originalfile, cpath, sizeof(originalfile) );
+		strncpy( filename, cfs->filename, sizeof(filename) );
 	}
 #ifdef _DEBUG
 	core->CachedFileStreamPtrCount++;
 #endif
 	_fseek( str, startpos, SEEK_SET );
+	
+	
 	Pos = 0;
 }
 
@@ -115,7 +117,7 @@ int CachedFileStream::Read(void* dest, unsigned int length)
 {
 	//we don't allow partial reads anyway, so it isn't a problem that
 	//i don't adjust length here (partial reads are evil)
-	if(Pos+length>size ) {
+	if (Pos+length>size ) {
 		return GEM_ERROR;
 	}
 
@@ -163,7 +165,7 @@ int CachedFileStream::Seek(int newpos, int type)
 			return GEM_ERROR;
 	}
 	//we went past the buffer
-	if(Pos>size) {
+	if (Pos>size) {
 		printf("[Streams]: Invalid seek position: %ld (limit: %ld)\n",Pos, size);
 		return GEM_ERROR;
 	}
@@ -173,7 +175,7 @@ int CachedFileStream::Seek(int newpos, int type)
 /** No descriptions */
 int CachedFileStream::ReadLine(void* buf, unsigned int maxlen)
 {
-	if(!maxlen) {
+	if (!maxlen) {
 		return 0;
 	}
 	unsigned char * p = ( unsigned char * ) buf;

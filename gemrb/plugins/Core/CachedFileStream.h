@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.h,v 1.17 2005/06/19 22:59:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.h,v 1.18 2006/02/17 17:17:18 avenger_teambg Exp $
  *
  */
 
@@ -42,7 +42,6 @@ private:
 	bool autoFree;
 	unsigned long startpos;
 	_FILE* str;
-	char originalfile[_MAX_PATH];
 public:
 	CachedFileStream(const char* stream, bool autoFree = true);
 	CachedFileStream(CachedFileStream* cfs, int startpos, int size,

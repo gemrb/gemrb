@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.40 2005/06/22 21:21:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/FileStream.cpp,v 1.41 2006/02/17 17:17:18 avenger_teambg Exp $
  *
  */
 
@@ -63,10 +63,12 @@ bool FileStream::Open(const char* fname, bool aF)
 	startpos = 0;
 	opened = true;
 	created = false;
+	//FIXME: this is a very lame way to tell the file length
 	_fseek( str, 0, SEEK_END );
 	size = _ftell( str );
 	_fseek( str, 0, SEEK_SET );
 	ExtractFileFromPath( filename, fname );
+	strncpy( originalfile, fname, _MAX_PATH);
 	Pos = 0;
 	return true;
 }
@@ -90,8 +92,9 @@ bool FileStream::Open(_FILE* stream, int spos, int maxsize, bool aF)
 	startpos = spos;
 	opened = true;
 	created = false;
-	size = maxsize;
-	strcpy( filename, "" );
+	size = maxsize;	
+	filename[0]=0;
+	originalfile[0]=0;
 	_fseek( str, spos, SEEK_SET );
 	Pos = 0;
 	return true;
@@ -107,8 +110,6 @@ bool FileStream::Create(const char* fname, SClass_ID ClassID)
 //Creating file outside of the cache
 bool FileStream::Create(const char *folder, const char* fname, SClass_ID ClassID)
 {
-	char path[_MAX_PATH];
-
 	if (str && autoFree) {
 #ifdef _DEBUG
 		core->FileStreamPtrCount--;
@@ -117,11 +118,11 @@ bool FileStream::Create(const char *folder, const char* fname, SClass_ID ClassID
 	}
 	autoFree = true;
 	ExtractFileFromPath( filename, fname );
-	strcpy( path, folder );
-	strcat( path, SPathDelimiter);
-	strcat( path, filename );
-	strcat( path, core->TypeExt( ClassID ) );
-	str = _fopen( path, "wb" );
+	strcpy( originalfile, folder );
+	strcat( originalfile, SPathDelimiter);
+	strcat( originalfile, filename );
+	strcat( originalfile, core->TypeExt( ClassID ) );
+	str = _fopen( originalfile, "wb" );
 	if (str == NULL) {
 		return false;
 	}

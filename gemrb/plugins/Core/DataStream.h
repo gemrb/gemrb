@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.h,v 1.18 2005/11/08 22:59:05 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.h,v 1.19 2006/02/17 17:17:18 avenger_teambg Exp $
  *
  */
 
@@ -56,8 +56,9 @@ protected:
 	unsigned long Pos;
 	unsigned long size;
 	bool Encrypted;
-public: //FIXME: this is a bit ugly
-	char filename[_MAX_PATH];
+public:
+	char filename[16]; //8+1+3+1 padded to dword
+	char originalfile[_MAX_PATH];
 public:
 	DataStream(void);
 	virtual ~DataStream(void);
