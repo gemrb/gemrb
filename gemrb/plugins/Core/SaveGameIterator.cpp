@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.39 2006/02/17 20:20:00 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.40 2006/02/17 23:33:38 edheldil Exp $
  *
  */
 
@@ -452,39 +452,22 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 		return -1;
 	}
 
-	//Create portraits
-	int ratio=2; //portrait shrink ratio
-	//this is just a random PST specific trait
-	//you can make it less random with a new feature bit
-	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
-		ratio=1; //pst doesn't shrink the portrait icons any further
-	}
-	ImageMgr *im = (ImageMgr *) core->GetInterface(IE_BMP_CLASS_ID);
-	Video *video = core->GetVideoDriver();
+	ImageMgr *im = (ImageMgr *) core->GetInterface( IE_BMP_CLASS_ID );
 
-	for (int i=0;i<game->GetPartySize(false); i++) {
-		Actor *actor = game->GetPC(i, false);
-		DataStream *str = core->GetResourceMgr()->GetResource(actor->GetPortrait(true), IE_BMP_CLASS_ID);
-		if (str) {
-			im->Open( str, true );
-			Sprite2D* img = im->GetImage();
-			Sprite2D* imgsc = video->SpriteScaleDown( img, ratio );
-			video->FreeSprite( img );
-			snprintf( Path, _MAX_PATH, "%s%s%s%09d-%s", core->SavePath, PlayMode(), SPathDelimiter, index, slotname);
+	//Create portraits
+	for (int i = 0; i < game->GetPartySize( false ); i++) {
+		Sprite2D* portrait = core->GetGameControl()->GetPortraitPreview( i );
+		if (portrait) {
 			snprintf( FName, sizeof(FName), "PORTRT%d", i );
 			FileStream outfile;
-			outfile.Create(Path, FName, IE_BMP_CLASS_ID);
-			im->OpenFromImage( imgsc, true );
+			outfile.Create( Path, FName, IE_BMP_CLASS_ID );
+			im->OpenFromImage( portrait, true );
 			im->PutImage( &outfile );
 		}
 	}
-	core->FreeInterface(im);
 
-	// Area preview
-
-	im = (ImageMgr *) core->GetInterface(IE_BMP_CLASS_ID);
+	// Create area preview
 	Sprite2D* preview = core->GetGameControl()->GetPreview();
-	snprintf( Path, _MAX_PATH, "%s%s%s%09d-%s", core->SavePath, PlayMode(), SPathDelimiter, index, slotname);
 	FileStream outfile;
 	outfile.Create( Path, core->GameNameResRef, IE_BMP_CLASS_ID );
 	im->OpenFromImage( preview, true );

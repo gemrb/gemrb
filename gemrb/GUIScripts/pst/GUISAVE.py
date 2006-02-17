@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUISAVE.py,v 1.3 2005/10/16 21:54:37 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUISAVE.py,v 1.4 2006/02/17 23:33:39 edheldil Exp $
 
 
 # GUISAVE.py - Save game screen from GUISAVE winpack
@@ -245,18 +245,12 @@ def OpenSaveDetailWindow ():
 
 	# Areapreview
 	Button = GemRB.GetControl (Window, 0)
-	if Pos < GameCount - 1:
-		GemRB.SetSaveGamePreview (Window, Button, Pos)
-	else:
-		GemRB.SetButtonPicture (Window, Button, "")
+	GemRB.SetGamePreview (Window, Button)
 
 	# PC portraits
 	for j in range (PARTY_SIZE):
 		Button = GemRB.GetControl (Window, 6 + j)
-		if Pos < GameCount - 1:
-			GemRB.SetSaveGamePortrait (Window, Button, Pos, j)
-		else:
-			GemRB.SetButtonPicture (Window, Button, "")
+		GemRB.SetGamePortraitPreview (Window, Button, j)
 
 
 	CheckSaveName ()

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.283 2006/02/17 20:20:00 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.284 2006/02/17 23:33:38 edheldil Exp $
  */
 
 #ifndef WIN32
@@ -1841,6 +1841,38 @@ Sprite2D* GameControl::GetPreview()
 	return preview;
 }
 
+
+/**
+ * Returns PC portrait for a currently running game
+ */
+Sprite2D* GameControl::GetPortraitPreview(int pcslot)
+{
+	/** Portrait shrink ratio */
+	// FIXME: this is just a random PST specific trait
+	//   you can make it less random with a new feature bit
+	int ratio = (core->HasFeature( GF_ONE_BYTE_ANIMID )) ? 1 : 2;
+
+	Video *video = core->GetVideoDriver();
+
+	Actor *actor = core->GetGame()->GetPC( pcslot, false );
+	DataStream *str = core->GetResourceMgr()->GetResource( actor->GetPortrait( true ), IE_BMP_CLASS_ID );
+	if (! str) {
+		return NULL;
+	}
+
+	ImageMgr *im = (ImageMgr *) core->GetInterface( IE_BMP_CLASS_ID );
+	im->Open( str, true );
+	Sprite2D* img = im->GetImage();
+	core->FreeInterface(im);
+
+	if (ratio == 1) 
+		return img;
+
+	Sprite2D* img_scaled = video->SpriteScaleDown( img, ratio );
+	video->FreeSprite( img );
+
+	return img_scaled;
+}
 
 Actor *GameControl::GetActorByGlobalID(ieWord ID)
 {

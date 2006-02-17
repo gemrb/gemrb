@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.85 2006/02/17 20:20:00 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.86 2006/02/17 23:33:38 edheldil Exp $
  */
 
 /**
@@ -77,9 +77,9 @@ class Window;
 #define TARGET_MODE_ENEMY   0x20
 #define TARGET_MODE_NEUTRAL 0x40
 
-//the distance of operating a trigger, container, etc.
+/** The distance of operating a trigger, container, etc. */
 #define MAX_OPERATING_DISTANCE      40 //a search square is 16x12
-//the distance between PC's who are about to enter a new area 
+/** The distance between PC's who are about to enter a new area */
 #define MAX_TRAVELING_DISTANCE      400
 
 /**
@@ -167,7 +167,7 @@ public:
 public:
 	Actor *GetTarget();
 	Actor *GetSpeaker();
-	/* Selects one or all PC */
+	/** Selects one or all PC */
 	void SelectActor(int whom, int type = -1);
 	void SetCutSceneMode(bool active);
 	int HideGUI();
@@ -181,17 +181,19 @@ public:
 	void InitDialog(Actor* speaker, Actor* target, const char* dlgref);
 	void EndDialog(bool try_to_break=false);
 	void DialogChoose(unsigned int choose);
-	/* Displays a string over an object */
+	/** Displays a string over an object */
 	void DisplayString(Scriptable* target);
-	/* Displays a string on screen */
+	/** Displays a string on screen */
 	void DisplayString(Point &p, const char *Text);
 	Actor *GetLastActor();
-	/* changes map to the current PC */
+	/** changes map to the current PC */
 	void ChangeMap(Actor *pc, bool forced);
-	/* Returns game screenshot, with or without GUI controls */
+	/** Returns game screenshot, with or without GUI controls */
 	Sprite2D* GetScreenshot( bool show_gui = 0 );
-	/* Returns current area preview for saving a game */
+	/** Returns current area preview for saving a game */
 	Sprite2D* GetPreview();
+	/** Returns PC portrait for a currently running game */
+	Sprite2D* GetPortraitPreview(int pcslot);
 };
 
 #endif

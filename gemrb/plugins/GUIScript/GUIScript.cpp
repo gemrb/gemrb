@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.379 2006/01/29 13:40:19 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.380 2006/02/17 23:33:33 edheldil Exp $
  *
  */
 
@@ -3212,6 +3212,50 @@ static PyObject* GemRB_SetSaveGamePreview(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetGamePreview__doc,
+"SetGamePreview(WindowIndex, ControlIndex)\n\n"
+"Sets current game area preview bmp onto a button as picture." );
+
+static PyObject* GemRB_SetGamePreview(PyObject * /*self*/, PyObject* args)
+{
+	int wi, ci;
+
+	if (!PyArg_ParseTuple( args, "ii", &wi, &ci )) {
+		return AttributeError( GemRB_SetGamePreview__doc );
+	}
+	Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
+	if (!btn) {
+		return NULL;
+	}
+
+	btn->SetPicture (core->GetGameControl()->GetPreview() );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_SetGamePortraitPreview__doc,
+"SetGamePortraitPreview(WindowIndex, ControlIndex, PCSlotCount)\n\n"
+"Sets a current game PC portrait preview bmp onto a button as picture." );
+
+static PyObject* GemRB_SetGamePortraitPreview(PyObject * /*self*/, PyObject* args)
+{
+	int wi, ci, PCSlotCount;
+
+	if (!PyArg_ParseTuple( args, "iii", &wi, &ci, &PCSlotCount )) {
+		return AttributeError( GemRB_SetGamePreview__doc );
+	}
+	Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
+	if (!btn) {
+		return NULL;
+	}
+
+	btn->SetPicture (core->GetGameControl()->GetPortraitPreview( PCSlotCount ) );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_Roll__doc,
 "Roll(Dice, Size, Add) => int\n\n"
 "Calls traditional dice roll." );
@@ -6298,6 +6342,8 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(DeleteSaveGame, METH_VARARGS),
 	METHOD(GetSaveGameAttrib, METH_VARARGS),
 	METHOD(SetSaveGamePreview, METH_VARARGS),
+	METHOD(SetGamePreview, METH_VARARGS),
+	METHOD(SetGamePortraitPreview, METH_VARARGS),
 	METHOD(SetSaveGamePortrait, METH_VARARGS),
 	METHOD(CreatePlayer, METH_VARARGS),
 	METHOD(SetPlayerStat, METH_VARARGS),
