@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.52 2006/01/03 19:59:56 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.53 2006/02/22 18:38:20 avenger_teambg Exp $
  *
  */
 
@@ -136,23 +136,23 @@ Door* TileMap::GetDoor(const char* Name)
 	return NULL;
 }
 
-//overlays
+//overlays, allow pushing of NULL
 void TileMap::AddOverlay(TileOverlay* overlay)
 {
-	if (overlay->w > XCellCount) {
-		XCellCount = overlay->w;
-	}
-	if (overlay->h > YCellCount) {
-		YCellCount = overlay->h;
+	if (overlay) {
+		if (overlay->w > XCellCount) {
+			XCellCount = overlay->w;
+		}
+		if (overlay->h > YCellCount) {
+			YCellCount = overlay->h;
+		}
 	}
 	overlays.push_back( overlay );
 }
 
-void TileMap::DrawOverlay(unsigned int index, Region screen)
+void TileMap::DrawOverlays(Region screen)
 {
-	if (index < overlays.size()) {
-		overlays[index]->Draw( screen );
-	}
+	overlays[0]->Draw( screen, overlays );
 }
 
 // Size of Fog-Of-War shadow tile (and bitmap)

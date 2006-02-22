@@ -8,14 +8,14 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.18 2006/01/03 19:36:28 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.19 2006/02/22 18:38:20 avenger_teambg Exp $
  *
  */
 
@@ -48,7 +48,7 @@ void TileOverlay::AddTile(Tile* tile)
 	tiles[count++] = tile;
 }
 
-void TileOverlay::Draw(Region viewport)
+void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays)
 {
 	// if the video's viewport is partially outside of the map, bump it back
 	bool bump = false;
@@ -85,14 +85,31 @@ void TileOverlay::Draw(Region viewport)
 	for (int y = sy; y < dy && y < h; y++) {
 		for (int x = sx; x < dx && x < w; x++) {
 			Tile* tile = tiles[( y* w ) + x];
-			//this hack is for alternate tiles with a value of -1
-			if (!tile->anim[tile->tileIndex]) {
-				tile->tileIndex=0;
+			//draw base tile
+			vid->BlitSprite( tile->anim[0]->NextFrame(),
+				viewport.x + ( x * 64 ), viewport.y + ( y * 64 ),
+				false, &viewport );
+
+			//draw overlay tiles
+			int mask = 2;
+			for (int z = 1;z<5;z++) {
+				TileOverlay * ov = overlays[z];
+				if(ov) {
+					Tile *ovtile = ov->tiles[0]; //allow only 1x1 tiles now
+					if (tile->om & mask) {
+						vid->BlitSprite( ovtile->anim[0]->NextFrame(),
+							viewport.x + ( x * 64 ), viewport.y + ( y * 64 ),
+							false, &viewport );
+					}
+				}
+				mask<<=1;
 			}
-			if (tile->anim[tile->tileIndex]) {
-				vid->BlitSprite( tile->anim[tile->tileIndex]->NextFrame(),
-						viewport.x + ( x * 64 ), viewport.y + ( y * 64 ),
-						false, &viewport );
+
+			//this should be drawn semi transparent
+			if (tile->anim[1]) {
+				vid->BlitSprite( tile->anim[1]->NextFrame(),
+					viewport.x + ( x * 64 ), viewport.y + ( y * 64 ),
+					false, &viewport );
 			}
 		}
 	}

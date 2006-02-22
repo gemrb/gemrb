@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TISImporter/TISImp.cpp,v 1.13 2005/11/24 17:44:10 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TISImporter/TISImp.cpp,v 1.14 2006/02/22 18:38:24 avenger_teambg Exp $
  *
  */
 
@@ -73,8 +73,10 @@ Tile* TISImp::GetTile(unsigned short* indexes, int count,
 	ani->x = ani->y = 0;
 	//not coming from factory
 	ani->autofree = true;
+	//pause key stops animation
+	ani->gameAnimation = true;
 	for (int i = 0; i < count; i++) {
-		ani->AddFrame( GetTile( indexes[i] ), i );
+		ani->AddFrame( GetTile( indexes[i], false ), i );
 	}
 	if (secondary) {
 		Animation* sec = new Animation( count );
@@ -82,13 +84,14 @@ Tile* TISImp::GetTile(unsigned short* indexes, int count,
 		//not coming from factory
 		sec->autofree = true;
 		for (int i = 0; i < count; i++) {
-			sec->AddFrame( GetTile( secondary[i] ), i );
+			sec->AddFrame( GetTile( secondary[i], true ), i );
 		}
 		return new Tile( ani, sec );
 	}
 	return new Tile( ani );
 }
-Sprite2D* TISImp::GetTile(int index)
+
+Sprite2D* TISImp::GetTile(int index, bool halftrans)
 {
 	RevColor RevCol[256];
 	Color Palette[256];
@@ -106,10 +109,18 @@ Sprite2D* TISImp::GetTile(int index)
 		Palette[i].r = RevCol[i].r;
 		Palette[i].g = RevCol[i].g;
 		Palette[i].b = RevCol[i].b;
-		Palette[i].a = RevCol[i].a;
+		//FIXME:this seems useless, if palette is ignored
+		//it should be drawn as half-transparent in blitsprite
+		if (halftrans) {
+			Palette[i].a = 255;
+		} else {
+			Palette[i].a = RevCol[i].a;
+		}
 	}
 	str->Read( pixels, 4096 );
-	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8( 64, 64, 8, pixels, Palette );
+	bool transparent;
+	transparent = (Palette[0].g==255 && !Palette[0].r && !Palette[0].b);
+	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8( 64, 64, 8, pixels, Palette, transparent, 0 );
 	spr->XPos = spr->YPos = 0;
 	return spr;
 }

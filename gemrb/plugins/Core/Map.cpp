@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.226 2006/01/29 13:40:19 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.227 2006/02/22 18:38:20 avenger_teambg Exp $
  *
  */
 
@@ -695,7 +695,7 @@ void Map::DrawMap(Region screen, GameControl* gc)
 	}
 	ieDword gametime = core->GetGame()->GameTime;
 
-	TMap->DrawOverlay( 0, screen );
+	TMap->DrawOverlays( screen );
 	//Blit the Background Map Animations (before actors)
 	Video* video = core->GetVideoDriver();
 

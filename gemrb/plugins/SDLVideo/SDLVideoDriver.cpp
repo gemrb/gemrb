@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.136 2006/02/17 20:19:56 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.137 2006/02/22 18:38:20 avenger_teambg Exp $
  *
  */
 
@@ -41,9 +41,6 @@ public:
 	bool flip_hor;
 	bool flip_ver;
 };
-
-//actually it won't be transparent :(
-SDL_Color TRANSPARENT_BLACK={0,0,0,SDL_ALPHA_TRANSPARENT};
 
 SDLVideoDriver::SDLVideoDriver(void)
 {

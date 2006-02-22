@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.37 2005/07/14 21:51:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.38 2006/02/22 18:38:20 avenger_teambg Exp $
  *
  */
 
@@ -84,7 +84,7 @@ public:
 	unsigned int GetTileCount() { return tiles.size(); }
 
 	void AddOverlay(TileOverlay* overlay);
-	void DrawOverlay(unsigned int index, Region screen);
+	void DrawOverlays(Region screen);
 	void DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region viewport);
 public:
 	int XCellCount, YCellCount;

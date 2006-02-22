@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.20 2005/11/24 17:44:10 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.21 2006/02/22 18:38:27 avenger_teambg Exp $
  *
  */
 
@@ -83,6 +83,8 @@ bool WEDImp::Open(DataStream* stream, bool autoFree)
 
 TileMap* WEDImp::GetTileMap()
 {
+	int usedoverlays = 0;
+
 	TileMap* tm = new TileMap();
 	//TODO: Implement Multi Overlay
 	TileOverlay* over = new TileOverlay( overlays[0].Width, overlays[0].Height );
@@ -122,11 +124,63 @@ TileMap* WEDImp::GetTileMap()
 				tile = tis->GetTile( indexes, 1, &secondary );
 			}
 			tile->om = overlaymask;
+			//getting used overlays
+			usedoverlays |= overlaymask;
 			over->AddTile( tile );
 			free( indexes );
 		}
 	}
 	tm->AddOverlay( over );
+
+	//reading additional overlays
+	int mask=2;
+	for(ieDword i=1;i<OverlaysCount;i++) {
+		//skipping unused overlays
+		if (!(mask&usedoverlays)) {
+			tm->AddOverlay( NULL );
+			mask<<=1;
+			continue;
+		}
+		mask<<=1;
+		TileOverlay* over = new TileOverlay( overlays[i].Width, overlays[i].Height );
+		DataStream* tisfile = core->GetResourceMgr()->GetResource( overlays[i].TilesetResRef, IE_TIS_CLASS_ID );
+		TileSetMgr* tis = ( TileSetMgr* ) core->GetInterface( IE_TIS_CLASS_ID );
+		tis->Open( tisfile );
+		for (int y = 0; y < overlays[i].Height; y++) {
+			for (int x = 0; x < overlays[i].Width; x++) {
+				str->Seek( overlays[i].TilemapOffset +
+				( y * overlays[i].Width * 10 ) + ( x * 10 ),
+				GEM_STREAM_START );
+				ieWord startindex, count, secondary;
+				ieByte overlaymask;
+				str->ReadWord( &startindex );
+				str->ReadWord( &count );
+				//should be always 0xffff
+				str->ReadWord( &secondary );
+				//should be always 0
+				str->Read( &overlaymask, 1 );
+				str->Seek( overlays[i].TILOffset + ( startindex * 2 ),
+					GEM_STREAM_START );
+				ieWord* indexes = ( ieWord* ) calloc( count, sizeof(ieWord) );
+				str->Read( indexes, count * sizeof(ieWord) );
+				if( DataStream::IsEndianSwitch()) {
+					swab( (char*) indexes, (char*) indexes, count * sizeof(ieWord) );
+				}
+				Tile* tile;
+				if (secondary == 0xffff) {
+					tile = tis->GetTile( indexes, count );
+				} else {
+					tile = tis->GetTile( indexes, 1, &secondary );
+				}
+				tile->om = overlaymask;
+				over->AddTile( tile );
+				free( indexes );
+			}
+		}
+
+		tm->AddOverlay( over );
+	}
+
 	//Clipping Polygons
 	/*
 	for(int d = 0; d < DoorsCount; d++) {
