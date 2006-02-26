@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.h,v 1.7 2006/02/22 18:38:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.h,v 1.8 2006/02/26 14:57:33 avenger_teambg Exp $
  *
  */
 
@@ -36,6 +36,8 @@
 #else
 #define GEM_EXPORT
 #endif
+
+extern bool RedrawTile;
 
 class GEM_EXPORT TileOverlay {
 public:

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.21 2006/02/26 13:34:42 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.22 2006/02/26 14:57:33 avenger_teambg Exp $
  *
  */
 
@@ -26,6 +26,7 @@
 #include <math.h>
 
 extern Interface* core;
+bool RedrawTile = false;
 
 TileOverlay::TileOverlay(int Width, int Height)
 {
@@ -99,10 +100,15 @@ void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays)
 				if (ov) {
 					Tile *ovtile = ov->tiles[0]; //allow only 1x1 tiles now
 					if (tile->om & mask) {
-						vid->BlitSpriteHalfTrans( ovtile->anim[0]->NextFrame(),
-												  viewport.x + ( x * 64 ),
-												  viewport.y + ( y * 64 ),
-												  false, &viewport );
+						if (RedrawTile) {
+							vid->BlitSprite( ovtile->anim[0]->NextFrame(),
+							    viewport.x + ( x * 64 ), viewport.y + ( y * 64 ),
+							    false, &viewport );
+						} else {
+							vid->BlitSpriteHalfTrans( ovtile->anim[0]->NextFrame(),
+							    viewport.x + ( x * 64 ), viewport.y + ( y * 64 ),
+							    false, &viewport );
+						}
 					}
 				}
 				mask<<=1;
@@ -113,7 +119,7 @@ void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays)
 				vid->BlitSprite( tile->anim[1]->NextFrame(),
 					viewport.x + ( x * 64 ), viewport.y + ( y * 64 ),
 					false, &viewport );
-			} else {
+			} else if (RedrawTile) {
 				//bg1 redraws the original frame
 				vid->BlitSprite( tile->anim[0]->NextFrame(),
 					viewport.x + ( x * 64 ), viewport.y + ( y * 64 ),
