@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.137 2006/02/22 18:38:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.138 2006/02/26 13:34:43 wjpalenstijn Exp $
  *
  */
 
@@ -781,6 +781,22 @@ void SDLVideoDriver::BlitSprite(Sprite2D* spr, int x, int y, bool anchor,
 #undef PALETTE_ALPHA
 
 		SDL_UnlockSurface(backBuf);
+	}
+}
+
+void SDLVideoDriver::BlitSpriteHalfTrans(Sprite2D* spr, int x, int y,
+										 bool anchor, Region* clip)
+{
+	if (!spr->vptr) return;
+
+	if (!spr->BAM) {
+		SDL_Surface* surf = ( SDL_Surface * ) spr->vptr;
+		SDL_SetAlpha(surf, SDL_SRCALPHA | SDL_RLEACCEL, 128);
+		BlitSprite(spr, x, y, anchor, clip);
+		SDL_SetAlpha(surf, SDL_RLEACCEL, 0);
+	} else {
+		printMessage( "SDLVideo", "HalfTrans blit not supported for this sprite\n", LIGHT_RED );
+
 	}
 }
 

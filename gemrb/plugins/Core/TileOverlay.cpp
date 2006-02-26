@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.20 2006/02/26 12:30:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.21 2006/02/26 13:34:42 wjpalenstijn Exp $
  *
  */
 
@@ -50,8 +50,6 @@ void TileOverlay::AddTile(Tile* tile)
 
 void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays)
 {
-	//half transparency
-	Color tint = {255,255,255,0};
 	// if the video's viewport is partially outside of the map, bump it back
 	bool bump = false;
 	Video* vid = core->GetVideoDriver();
@@ -101,9 +99,10 @@ void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays)
 				if (ov) {
 					Tile *ovtile = ov->tiles[0]; //allow only 1x1 tiles now
 					if (tile->om & mask) {
-						vid->BlitSpriteTinted( ovtile->anim[0]->NextFrame(),
-							viewport.x + ( x * 64 ), viewport.y + ( y * 64 ),
-							tint, NULL, &viewport );
+						vid->BlitSpriteHalfTrans( ovtile->anim[0]->NextFrame(),
+												  viewport.x + ( x * 64 ),
+												  viewport.y + ( y * 64 ),
+												  false, &viewport );
 					}
 				}
 				mask<<=1;
@@ -111,14 +110,14 @@ void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays)
 
 			//original frame should be drawn over it
 			if (tile->anim[1]) {
-				vid->BlitSpriteTinted( tile->anim[1]->NextFrame(),
+				vid->BlitSprite( tile->anim[1]->NextFrame(),
 					viewport.x + ( x * 64 ), viewport.y + ( y * 64 ),
-					tint, NULL, &viewport );
+					false, &viewport );
 			} else {
 				//bg1 redraws the original frame
-				vid->BlitSpriteTinted( tile->anim[0]->NextFrame(),
+				vid->BlitSprite( tile->anim[0]->NextFrame(),
 					viewport.x + ( x * 64 ), viewport.y + ( y * 64 ),
-					tint, NULL, &viewport );
+					false, &viewport );
 			}
 		}
 	}

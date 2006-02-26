@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.57 2006/02/17 20:20:00 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.58 2006/02/26 13:34:42 wjpalenstijn Exp $
  *
  */
 
@@ -85,6 +85,9 @@ public:
 	virtual void FreeSprite(Sprite2D* spr) = 0;
 	virtual void BlitSprite(Sprite2D* spr, int x, int y, bool anchor = false,
 		Region* clip = NULL) = 0;
+	virtual void BlitSpriteHalfTrans(Sprite2D* spr, int x, int y,
+									 bool anchor = false,
+									 Region* clip = NULL) = 0;
 
 	// Note: BlitSpriteRegion's clip region is shifted by Viewport.x/y if
 	// anchor is false. This is different from the other BlitSprite functions.
