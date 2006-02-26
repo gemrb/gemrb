@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.19 2006/02/22 18:38:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.20 2006/02/26 12:30:58 avenger_teambg Exp $
  *
  */
 
@@ -50,6 +50,8 @@ void TileOverlay::AddTile(Tile* tile)
 
 void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays)
 {
+	//half transparency
+	Color tint = {255,255,255,0};
 	// if the video's viewport is partially outside of the map, bump it back
 	bool bump = false;
 	Video* vid = core->GetVideoDriver();
@@ -85,31 +87,38 @@ void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays)
 	for (int y = sy; y < dy && y < h; y++) {
 		for (int x = sx; x < dx && x < w; x++) {
 			Tile* tile = tiles[( y* w ) + x];
-			//draw base tile
 			vid->BlitSprite( tile->anim[0]->NextFrame(),
 				viewport.x + ( x * 64 ), viewport.y + ( y * 64 ),
 				false, &viewport );
+			if (!tile->om) {
+				continue;
+			}
 
-			//draw overlay tiles
+			//draw overlay tiles, they should be half transparent
 			int mask = 2;
 			for (int z = 1;z<5;z++) {
 				TileOverlay * ov = overlays[z];
-				if(ov) {
+				if (ov) {
 					Tile *ovtile = ov->tiles[0]; //allow only 1x1 tiles now
 					if (tile->om & mask) {
-						vid->BlitSprite( ovtile->anim[0]->NextFrame(),
+						vid->BlitSpriteTinted( ovtile->anim[0]->NextFrame(),
 							viewport.x + ( x * 64 ), viewport.y + ( y * 64 ),
-							false, &viewport );
+							tint, NULL, &viewport );
 					}
 				}
 				mask<<=1;
 			}
 
-			//this should be drawn semi transparent
+			//original frame should be drawn over it
 			if (tile->anim[1]) {
-				vid->BlitSprite( tile->anim[1]->NextFrame(),
+				vid->BlitSpriteTinted( tile->anim[1]->NextFrame(),
 					viewport.x + ( x * 64 ), viewport.y + ( y * 64 ),
-					false, &viewport );
+					tint, NULL, &viewport );
+			} else {
+				//bg1 redraws the original frame
+				vid->BlitSpriteTinted( tile->anim[0]->NextFrame(),
+					viewport.x + ( x * 64 ), viewport.y + ( y * 64 ),
+					tint, NULL, &viewport );
 			}
 		}
 	}
