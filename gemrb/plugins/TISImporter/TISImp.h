@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TISImporter/TISImp.h,v 1.7 2006/02/22 18:38:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TISImporter/TISImp.h,v 1.8 2006/02/26 14:11:26 wjpalenstijn Exp $
  *
  */
 
@@ -36,7 +36,7 @@ public:
 	bool Open(DataStream* stream, bool autoFree = true);
 	Tile* GetTile(unsigned short* indexes, int count,
 		unsigned short* secondary = NULL);
-	Sprite2D* GetTile(int index, bool halftrans);
+	Sprite2D* GetTile(int index);
 public:
 	void release(void)
 	{
