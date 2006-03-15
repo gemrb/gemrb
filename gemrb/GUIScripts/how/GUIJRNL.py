@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIJRNL.py,v 1.5 2006/01/06 23:10:00 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIJRNL.py,v 1.6 2006/03/15 21:56:17 edheldil Exp $
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack
@@ -119,7 +119,7 @@ def UpdateJournalWindow ():
 		GemRB.SetToken("HOUR",str(hours%24 ) )
 		GemRB.SetVar("DAYANDMONTH",dayandmonth)
 		GemRB.SetToken("YEAR",year)
-		GemRB.TextAreaAppend (Window, Text, "[color=FFFF00]"+GemRB.GetString(15980)+"[/color]", 3*i)
+		GemRB.TextAreaAppend (Window, Text, GemRB.GetString(15980), 3*i)
 
 		GemRB.TextAreaAppend (Window, Text, je['Text'], 3*i + 1)
 		GemRB.TextAreaAppend (Window, Text, "", 3*i + 2)
