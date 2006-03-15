@@ -1,4 +1,4 @@
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/Release.txt,v 1.3 2005/08/24 00:37:45 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/Release.txt,v 1.4 2006/03/15 20:55:33 edheldil Exp $
 
 
 How to make a release
@@ -9,7 +9,7 @@ Preparing and testing CVS
 
 * Make sure that version numbers in 
     configure.in
-    gemrb/include/globals.h 
+    gemrb/includes/globals.h 
   are correct for the upcoming version.
 
 * Update NEWS with highlights since the last release 
@@ -42,7 +42,7 @@ Linux binary release
 ====================
 
   ./autogen.sh
-  ./configure
+  ./configure --prefix=/usr/local
   make
   make install DESTDIR=/tmp/fakeroot
   cd /tmp/fakeroot/usr/local

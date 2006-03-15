@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.380 2006/02/17 23:33:33 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.381 2006/03/15 20:55:26 edheldil Exp $
  *
  */
 
@@ -1561,7 +1561,7 @@ static PyObject* GemRB_CreateLabelOnButton(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_CreateLabel__doc,
-"CreateLabel(WindowIndex, ControlID, x, y, w, h, font, text, align) => ControlIndex\n\n"
+"CreateLabel(WindowIndex, ControlID, x, y, w, h, font, text, align)\n\n"
 "Creates and adds a new Label to a Window." );
 
 static PyObject* GemRB_CreateLabel(PyObject * /*self*/, PyObject* args)
@@ -2917,7 +2917,7 @@ static PyObject* GemRB_GetVar(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_CheckVar__doc,
 "CheckVar(VariableName, Context) => long\n\n"
-"Display (and return) the value of a Game Variable." );
+"Return (and output on terminal) the value of a Game Variable." );
 
 static PyObject* GemRB_CheckVar(PyObject * /*self*/, PyObject* args)
 {
@@ -4358,8 +4358,8 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_ChangeContainerItem__doc,
-"ChangeContainerItem(pc, idx, action) => int\n\n"
-"Takes an item from a container, or puts it there. If PC is 0 then it uses the first selected PC and the current container, if it is not 0 then it autoselects the container.\n\n");
+"ChangeContainerItem(PartyID, slot, action)\n\n"
+"Takes an item from a container, or puts it there. If PC is 0 then it uses the first selected PC and the current container, if it is not 0 then it autoselects the container. action=0: move item from PC to container. action=1: move item from container to PC.\n\n");
 
 static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 {
@@ -4443,9 +4443,11 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 
 	Py_INCREF( Py_None );
 	return Py_None;
+
 item_is_gold: //we take gold!
 	core->GetGame()->PartyGold += res;
 	delete item;
+
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -4618,8 +4620,8 @@ static PyObject* GemRB_SetPurchasedAmount(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_ChangeStoreItem__doc,
-"ChangeStoreItem(pc, idx, action) => int\n\n"
-"Performs an action of buying, selling, identifying or stealing. It can also toggle the selection of an item.\n\n" );
+"ChangeStoreItem(PartyID, Slot, action)\n\n"
+"Performs an action of buying, selling, identifying or stealing in a store. It can also toggle the selection of an item.\n\n" );
 
 static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 {

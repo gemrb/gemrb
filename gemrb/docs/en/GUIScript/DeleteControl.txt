@@ -10,3 +10,5 @@ Return value: N/A
 
 See also: GetControl
 
+
+MD5: dfbf18fa1830fccf5eb61cf2b39b5147

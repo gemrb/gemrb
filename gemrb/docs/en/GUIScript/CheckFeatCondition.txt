@@ -11,3 +11,5 @@ Return value: bool
 
 See also: GetPlayerStat, SetPlayerStat
 
+
+MD5: b237a66b3abbb49ede75897d3d1ee0da

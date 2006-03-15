@@ -10,3 +10,5 @@ Return value: N/A
 
 See also: SetLabelUseRGB
 
+
+MD5: aa639bfaf8d66d2eefba1f96c9a5b6a2

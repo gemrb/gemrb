@@ -11,3 +11,5 @@ Return value: N/A
 
 See also: SetLabelTextColor
 
+
+MD5: 1e4a2ea507466dd58981d8a898254e61

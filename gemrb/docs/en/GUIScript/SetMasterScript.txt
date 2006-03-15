@@ -11,3 +11,5 @@ Return value: N/A
 
 See also: LoadGame
 
+
+MD5: 35143c4d12005fd3162c08cf6851ccfb

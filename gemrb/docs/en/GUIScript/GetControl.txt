@@ -10,3 +10,5 @@ Return value: a control index
 
 See also: LoadWindowPack, LoadWindow
 
+
+MD5: eccbc1af698fd8d4e5eec5004433e515

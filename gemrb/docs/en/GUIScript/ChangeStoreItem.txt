@@ -17,3 +17,5 @@ Return value: None
 
 See also: EnterStore, GetSlotItem, GetStoreItem, IsValidStoreItem
 
+
+MD5: 07c89de8dbd0236f8c206b06abe4b3dc

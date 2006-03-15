@@ -10,3 +10,5 @@ Return value: N/A
 
 See also: SetControlSize, accessing_gui_controls
 
+
+MD5: fdec6fc5feaa586ba735e4b36c086989

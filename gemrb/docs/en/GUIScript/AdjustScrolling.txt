@@ -20,3 +20,5 @@ The above lines set up a button event. When the button is pressed the worldmap w
 
 See also: CreateWorldMapControl
 
+
+MD5: 500775c70886362ce1ebc9353505027f

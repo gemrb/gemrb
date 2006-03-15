@@ -21,3 +21,5 @@ The above lines add the GemRB version string to the PST main screen.
 
 See also: CreateButton, SetText
 
+
+MD5: aaeaa42947bb1bc3cde0719ad5e08b51
