@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.60 2006/01/24 17:30:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.61 2006/03/17 22:36:13 avenger_teambg Exp $
  *
  */
 
@@ -156,7 +156,7 @@ bool KeyImp::LoadResFile(const char* resfile)
 		biffiles.push_back( be );
 	}
 	f->Seek( ResOffset, GEM_STREAM_START );
-	resources.InitHashTable( ResCount );
+	resources.InitHashTable( ResCount < 17 ? 17 : ResCount );
 	for (i = 0; i < ResCount; i++) {
 		RESEntry re;
 		f->ReadResRef( re.ResRef );
