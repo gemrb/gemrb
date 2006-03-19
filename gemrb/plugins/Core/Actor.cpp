@@ -15,12 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.165 2006/02/09 22:46:11 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.166 2006/03/19 09:17:14 avenger_teambg Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "TableMgr.h"
+#include "ResourceMgr.h"
+#include "SoundMgr.h"
 #include "Actor.h"
 #include "Interface.h"
 #include "../../includes/strrefs.h"
@@ -32,6 +34,7 @@
 #include "Video.h"
 #include "SpriteCover.h"
 #include <cassert>
+#include "damages.h"
 
 extern Interface* core;
 #ifdef WIN32
@@ -74,6 +77,15 @@ static char gemrb2iwd[32]={
 static void InitActorTables();
 
 static ieDword TranslucentShadows;
+
+static ieResRef blood[4]={"BLOODS","BLOODM","BLOODL","BLOODCR"};
+static AnimationFactory* blood_af[4]={NULL,NULL,NULL,NULL};
+static ieResRef fire[2]={"SPBURN","SPFIRIMP"};
+static AnimationFactory* fire_af[2]={NULL,NULL};
+static ieResRef elec[2]={"SPSPARKS","SPSHKIMP"};
+static AnimationFactory* spark_af[2]={NULL,NULL};
+static ieResRef ice[2]={"","SPFIRIMP"}; //same as fire, but different palette
+static AnimationFactory* ice_af[2]={NULL,NULL};
 
 PCStatsStruct::PCStatsStruct()
 {
@@ -169,6 +181,8 @@ Actor::Actor()
 
 Actor::~Actor(void)
 {
+	unsigned int i;
+
 	if (anims) {
 		delete( anims );
 	}
@@ -176,6 +190,18 @@ Actor::~Actor(void)
 	core->FreeString( ShortName );
 	if (PCStats) {
 		delete PCStats;
+	}
+	for (i = 0; i < vvcOverlays.size(); i++) {
+		if (vvcOverlays[i]) {
+			delete vvcOverlays[i];
+			vvcOverlays[i] = NULL;
+		}
+	}
+	for (i = 0; i < vvcShields.size(); i++) {
+		if (vvcShields[i]) {
+			delete vvcShields[i];
+			vvcShields[i] = NULL;
+		}
 	}
 }
 
@@ -292,7 +318,6 @@ void Actor::SetCircleSize()
 				break;
 		}
 	}
-
 
 	int csize = anims->GetCircleSize() - 1;
 	if (csize >= MAX_CIRCLE_SIZE) 
@@ -441,9 +466,11 @@ NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL //ff
 /** call this from ~Interface() */
 void Actor::ReleaseMemory()
 {
+	int i;
+
 	if (classcount>=0) {
 		if (clericspelltables) {
-			for (int i=0;i<classcount;i++) {
+			for (i=0;i<classcount;i++) {
 				if (clericspelltables[i]) {
 					free (clericspelltables[i]);
 				}
@@ -451,7 +478,7 @@ void Actor::ReleaseMemory()
 			free(clericspelltables);
 		}
 		if (wizardspelltables) {
-			for (int i=0;i<classcount;i++) {
+			for (i=0;i<classcount;i++) {
 				if (wizardspelltables[i]) {
 					free(wizardspelltables[i]);
 				}
@@ -460,6 +487,28 @@ void Actor::ReleaseMemory()
 		}
 	}
 	classcount=-1;
+	/*
+	for(i=0;i<4;i++) {
+		if (blood_af[i]) {
+			delete blood_af[i];
+			blood_af[i]=NULL;
+		}
+	}
+	for(i=0;i<2;i++) {
+		if (fire_af[i]) {
+			delete fire_af[i];
+			fire_af[i]=NULL;
+		}
+		if (spark_af[i]) {
+			delete spark_af[i];
+			spark_af[i]=NULL;
+		}
+		if (ice_af[i]) {
+			delete ice_af[i];
+			ice_af[i]=NULL;
+		}
+	}
+	*/
 }
 
 static void InitActorTables()
@@ -482,16 +531,7 @@ static void InitActorTables()
 		}
 	}
 	core->DelTable( table );
-/*
-	//these will be moved to core
-	table = core->LoadTable( "hpconbon" );
-	tm = core->GetTable( table );
-	for(i=0;i<26;i++) {
-		constitution_normal[i] = atoi(tm->QueryField( i, 1) );
-		constitution_fighter[i] = atoi(tm->QueryField( i, 2) );
-	}
-	core->DelTable( table );
-*/
+
 	i = core->GetMaximumAbility();
 	maximum_values[IE_STR]=i;
 	maximum_values[IE_INT]=i;
@@ -499,6 +539,64 @@ static void InitActorTables()
 	maximum_values[IE_CON]=i;
 	maximum_values[IE_CHR]=i;
 	maximum_values[IE_WIS]=i;
+
+	for(i=0;i<4;i++) {
+		blood_af[i] = ( AnimationFactory* )
+			core->GetResourceMgr()->GetFactoryResource( blood[i], IE_BAM_CLASS_ID );
+	}
+	for(i=0;i<2;i++) {
+		fire_af[i] = ( AnimationFactory* )
+			core->GetResourceMgr()->GetFactoryResource( fire[i], IE_BAM_CLASS_ID );
+		spark_af[i] = ( AnimationFactory* )
+			core->GetResourceMgr()->GetFactoryResource( elec[i], IE_BAM_CLASS_ID );
+		ice_af[i] = ( AnimationFactory* )
+			core->GetResourceMgr()->GetFactoryResource( ice[i], IE_BAM_CLASS_ID );
+	}
+}
+//TODO: every actor must have an own vvcell list
+//the area's vvc's are the stationary effects
+//the actor's vvc's are moving with the actor
+//this method adds a vvc to the actor
+void Actor::add_animation(AnimationFactory * /*af*/, Point & /*offset*/, int gradient)
+{
+	if (gradient!=-1) {
+		//palette
+	}
+}
+
+#define BLOOD_GRADIENT 19
+#define FIRE_GRADIENT 19
+#define ICE_GRADIENT 71
+
+void Actor::PlayDamageAnimation(int type)
+{
+	int i;
+	Point p(0,0);
+
+	switch(type) {
+		case 0: case 1: case 2: case 3: //blood
+			add_animation(blood_af[type], p, BLOOD_GRADIENT);
+			break;
+		case 4: case 5: case 7: //fire
+			add_animation(fire_af[0], p, FIRE_GRADIENT);
+			for(i=3;i<type;i++) {
+				add_animation(fire_af[1], p, FIRE_GRADIENT);
+			}
+			break;
+		case 8: case 9: case 10: //electricity
+			add_animation(spark_af[0], p, -1);
+			for(i=7;i<type;i++) {
+				add_animation(spark_af[1], p, FIRE_GRADIENT);
+			}
+			break;
+		case 11: case 12: case 13://cold
+			add_animation(ice_af[0], p, ICE_GRADIENT);
+			break;
+		case 14: case 15: case 16://acid
+			break;
+		case 17: case 18: case 19://disintegrate
+			break;
+	}
 }
 
 bool Actor::SetStat(unsigned int StatIndex, ieDword Value)
@@ -588,7 +686,7 @@ void Actor::ReactToDeath(const char * /*deadname*/)
 	// lookup value based on died's scriptingname and ours
 	// if value is 0 - use reactdeath
 	// if value is 1 - use reactspecial
-        // if value is string - use playsound instead (pst)
+	// if value is string - use playsound instead (pst)
 	
 	DisplayStringCore(this, VB_REACT, DS_CONSOLE|DS_CONST );
 }
@@ -609,13 +707,13 @@ void Actor::Panic()
 void Actor::SetMCFlag(ieDword arg, int op)
 {
 	ieDword tmp = GetBase(IE_MC_FLAGS);
-        switch (op) {
-        case BM_SET: tmp = arg; break;
-        case BM_OR: tmp |= arg; break;
-        case BM_NAND: tmp &= ~arg; break;
-        case BM_XOR: tmp ^= arg; break;
-        case BM_AND: tmp &= arg; break;
-        }
+	switch (op) {
+	case BM_SET: tmp = arg; break;
+	case BM_OR: tmp |= arg; break;
+	case BM_NAND: tmp &= ~arg; break;
+	case BM_XOR: tmp ^= arg; break;
+	case BM_AND: tmp &= arg; break;
+	}
 	SetBase(IE_MC_FLAGS, tmp);
 }
 
@@ -646,6 +744,32 @@ int Actor::Damage(int damage, int damagetype, Actor *hitter)
 	LastDamage=damage;
 	LastHitter=hitter->GetID();
 	InternalFlags|=IF_ACTIVE;
+	int damagelevel = 2;
+	if (damage<5) {
+		damagelevel = 0;
+	} else if (damage<10) {
+		damagelevel = 1;
+	} else {
+		if (((signed) GetStat(IE_HITPOINTS))<-10) {
+			damagelevel=3; //chunky death
+		}
+		else {
+			damagelevel = 2;
+		}
+	}
+	if (damagetype & (DAMAGE_FIRE|DAMAGE_MAGICFIRE) ) {
+		PlayDamageAnimation(DL_FIRE+damagelevel);
+	} else if (damagetype & (DAMAGE_COLD|DAMAGE_MAGICCOLD) ) {
+		PlayDamageAnimation(DL_COLD+damagelevel);
+	} else if (damagetype & (DAMAGE_ELECTRICITY) ) {
+		PlayDamageAnimation(DL_ELECTRICITY+damagelevel);
+	} else if (damagetype & (DAMAGE_ACID) ) {
+		PlayDamageAnimation(DL_ACID+damagelevel);
+	} else if (damagetype & (DAMAGE_MAGIC) ) {
+		PlayDamageAnimation(DL_DISINTEGRATE+damagelevel);
+	} else {
+		PlayDamageAnimation(damagelevel);
+	}
 	DisplayStringCore(this, VB_DAMAGE, DS_CONSOLE|DS_CONST );
 	if (InParty) {
 		if (GetStat(IE_HITPOINTS)<GetStat(IE_MAXHITPOINTS)/10) {
@@ -692,9 +816,9 @@ void Actor::DebugDump()
 			printf("   %d", Modified[IE_COLORS+i]);
 		}
 	}
+/* not too important right now
 	ieDword tmp=0;
 	core->GetGame()->locals->Lookup("APPEARANCE",tmp);
-/* not too important right now
 	printf( "\nDisguise: %d\n", tmp);
 */
 	printf ("\nAnimate ID: %x\n", Modified[IE_ANIMATION_ID]);
@@ -777,7 +901,7 @@ void Actor::Turn(Scriptable *cleric, int turnlevel)
 
 void Actor::Resurrect()
 {
-	InternalFlags&=IF_FROMGAME;           //keep these flags
+	InternalFlags&=IF_FROMGAME;	   //keep these flags
 	InternalFlags|=IF_ACTIVE|IF_VISIBLE;  //set these flags  
 	SetBase(IE_STATE_ID, 0);
 	SetBase(IE_HITPOINTS, GetBase(IE_MAXHITPOINTS));
@@ -1170,6 +1294,42 @@ void Actor::WalkTo(Point &Des, ieDword flags, int MinDistance)
 	}
 }
 
+//there is a similar function in Map for stationary vvcs
+void Actor::DrawVideocells(Region &screen, vvcVector &vvcCells)
+{
+	Video* video = core->GetVideoDriver();
+
+	for (unsigned int i = 0; i < vvcCells.size(); i++) {
+		ScriptedAnimation* vvc = vvcCells[i];
+		if (!vvc)
+			continue;
+		if (!vvc->anims[0])
+			continue;
+		if (vvc->anims[0]->endReached) {
+			vvcCells[i] = NULL;
+			delete( vvc );
+			continue;
+		}
+		if (vvc->justCreated) {
+			vvc->justCreated = false;
+			if (vvc->Sounds[0][0] != 0) {
+				core->GetSoundMgr()->Play( vvc->Sounds[0] );
+			}
+		}
+		Sprite2D* frame = vvc->anims[0]->NextFrame();
+		if (!frame)
+			continue;
+		if (vvc->Transparency & IE_VVC_BRIGHTEST) {
+			video->BlitSprite( frame, Pos.x + vvc->XPos + screen.x,
+					Pos.y + vvc->YPos + screen.y, false, &screen );
+		} else {
+			video->BlitSprite( frame, Pos.x + vvc->XPos + screen.x,
+					Pos.y + vvc->YPos + screen.y, false, &screen );
+		}
+	}
+}
+
+
 void Actor::Draw(Region &screen)
 {
 	Map* area = GetCurrentArea();
@@ -1194,6 +1354,9 @@ void Actor::Draw(Region &screen)
 		//turning actor inactive if there is no action next turn
 		InternalFlags|=IF_IDLE;
 	}
+
+	//draw videocells under the actor
+	DrawVideocells(screen, vvcShields);
 
 	//visual feedback
 	CharAnimations* ca = GetAnims();
@@ -1299,6 +1462,9 @@ void Actor::Draw(Region &screen)
 		}
 	}
 		
+	//draw videocells over the actor
+	DrawVideocells(screen, vvcOverlays);
+
 	//text feedback
 	DrawOverheadText(screen);
 }
@@ -1333,11 +1499,11 @@ void Actor::ResolveStringConstant(ieResRef Sound, unsigned int index)
 	int table=core->LoadTable( anims->ResRef );
 
 	if (table<0) {
-	        return;
+		return;
 	}
 	tab = core->GetTable( table );
 	if (!tab) {
-	        goto end;
+		goto end;
 	}
 
 	switch (index) {
@@ -1415,3 +1581,45 @@ void Actor::SetSoundFolder(const char *soundset)
 		PCStats->SoundFolder[0]=0;
 	}
 }
+
+void Actor::RemoveVVCell(ieResRef resource, bool background)
+{
+	vvcVector *vvcCells;
+
+	if (background) {
+		vvcCells=&vvcShields;
+	} else {
+		vvcCells=&vvcOverlays;
+	}
+	unsigned int i=vvcCells->size();
+	while (i--) {
+		ScriptedAnimation *vvc = (*vvcCells)[i];
+		if (vvc == NULL) {
+			continue;
+		}
+		if ( strncmp(vvc->ResName, resource, 8) == 0) {
+			delete vvc;
+			(*vvcCells)[i]=NULL;
+		}
+	}
+}
+
+void Actor::AddVVCell(ScriptedAnimation* vvc, bool background)
+{
+	vvcVector *vvcCells;
+
+	if (background) {
+		vvcCells=&vvcShields;
+	} else {
+		vvcCells=&vvcOverlays;
+	}
+	unsigned int i=vvcCells->size();
+	while (i--) {
+		if ((*vvcCells)[i] == NULL) {
+			(*vvcCells)[i] = vvc;
+			return;
+		}
+	}
+	vvcCells->push_back( vvc );
+}
+

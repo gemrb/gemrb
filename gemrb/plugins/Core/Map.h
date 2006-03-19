@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.104 2006/01/29 13:40:19 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.105 2006/03/19 09:17:14 avenger_teambg Exp $
  *
  */
 
@@ -206,6 +206,8 @@ public:
 	int ConsolidateContainers();
 	/* transfers all piles (loose items) to another map */
 	void CopyGroundPiles(Map *othermap, Point &Pos);
+	/* draws stationary vvc graphics */
+	void DrawVideocells(Region screen);
 	void DrawContainers(Region screen, Container *overContainer);
 	void DrawMap(Region screen, GameControl* gc);
 	void PlayAreaSong(int);

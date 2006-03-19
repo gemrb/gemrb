@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.102 2006/01/15 23:07:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.103 2006/03/19 09:17:14 avenger_teambg Exp $
  *
  */
 
@@ -30,11 +30,13 @@
 #include "../../includes/ie_types.h"
 #include "Animation.h"
 #include "CharAnimations.h"
+#include "ScriptedAnimation.h"
 #include "ActorBlock.h"
 #include "EffectQueue.h"
 
 class Map;
 class SpriteCover;
+class ScriptedAnimation;
 
 #ifdef WIN32
 
@@ -125,6 +127,8 @@ public:
 	void IncrementChapter();
 };
 
+typedef std::vector< ScriptedAnimation*> vvcVector;
+
 class GEM_EXPORT Actor : public Moveble {
 public:
 	//CRE DATA FIELDS
@@ -181,6 +185,8 @@ public:
 	int XF, YF;        //follow leader in this offset
 
 	EffectQueue fxqueue;
+	vvcVector vvcOverlays;
+	vvcVector vvcShields;
 private:
 	//this stuff don't get saved
 	CharAnimations* anims;
@@ -356,5 +362,15 @@ public:
 	/* if necessary, advance animation and draw actor */
 	void Draw(Region &screen);
 
+	/* add mobile vvc (spell effects) to actor's list */
+	void AddVVCell(ScriptedAnimation* vvc, bool background);
+	/* remove a vvc from the list */
+	void RemoveVVCell(ieResRef vvcname, bool background);
+
+	/* draw videocells */
+	void DrawVideocells(Region &screen, vvcVector &vvcCells);
+
+	void add_animation(AnimationFactory *af, Point &offset, int gradient);
+	void PlayDamageAnimation(int x);
 };
 #endif

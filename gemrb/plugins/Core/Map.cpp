@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.227 2006/02/22 18:38:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.228 2006/03/19 09:17:14 avenger_teambg Exp $
  *
  */
 
@@ -617,6 +617,41 @@ void Map::UpdateScripts()
 	}
 }
 
+//there is a similar function in Actors for mobile vvcs
+void Map::DrawVideocells(Region screen)
+{
+	Video* video = core->GetVideoDriver();
+
+	for (unsigned int i = 0; i < vvcCells.size(); i++) {
+		ScriptedAnimation* vvc = vvcCells[i];
+		if (!vvc)
+			continue;
+		if (!vvc->anims[0])
+			continue;
+		if (vvc->anims[0]->endReached) {
+			vvcCells[i] = NULL;
+			delete( vvc );
+			continue;
+		}
+		if (vvc->justCreated) {
+			vvc->justCreated = false;
+			if (vvc->Sounds[0][0] != 0) {
+				core->GetSoundMgr()->Play( vvc->Sounds[0] );
+			}
+		}
+		Sprite2D* frame = vvc->anims[0]->NextFrame();
+		if (!frame)
+			continue;
+		if (vvc->Transparency & IE_VVC_BRIGHTEST) {
+			video->BlitSprite( frame, vvc->XPos + screen.x,
+					vvc->YPos + screen.y, false, &screen );
+		} else {
+			video->BlitSprite( frame, vvc->XPos + screen.x,
+					vvc->YPos + screen.y, false, &screen );
+		}
+	}
+}
+
 
 void Map::DrawContainers( Region screen, Container *overContainer)
 {
@@ -739,35 +774,7 @@ void Map::DrawMap(Region screen, GameControl* gc)
 		}
 	}
 
-	//actually these should go with the big list as well!
-	for (unsigned int i = 0; i < vvcCells.size(); i++) {
-		ScriptedAnimation* vvc = vvcCells[i];
-		if (!vvc)
-			continue;
-		if (!vvc->anims[0])
-			continue;
-		if (vvc->anims[0]->endReached) {
-			vvcCells[i] = NULL;
-			delete( vvc );
-			continue;
-		}
-		if (vvc->justCreated) {
-			vvc->justCreated = false;
-			if (vvc->Sounds[0][0] != 0) {
-				core->GetSoundMgr()->Play( vvc->Sounds[0] );
-			}
-		}
-		Sprite2D* frame = vvc->anims[0]->NextFrame();
-		if (!frame)
-			continue;
-		if (vvc->Transparency & IE_VVC_BRIGHTEST) {
-			video->BlitSprite( frame, vvc->XPos + screen.x,
-					vvc->YPos + screen.y, false, &screen );
-		} else {
-			video->BlitSprite( frame, vvc->XPos + screen.x,
-					vvc->YPos + screen.y, false, &screen );
-		}
-	}
+	DrawVideocells(screen);
 
 	if ((core->FogOfWar&2) && SearchMap) {
 		DrawSearchMap(screen);
