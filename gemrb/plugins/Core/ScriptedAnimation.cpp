@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.17 2005/11/24 17:44:09 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.18 2006/03/19 09:14:24 avenger_teambg Exp $
  *
  */
 
@@ -40,6 +40,7 @@ ScriptedAnimation::ScriptedAnimation(AnimationFactory *af, Point &p)
 	XPos += p.x;
 	YPos += p.y;
 	justCreated = true;
+	memcpy(ResName, af->ResRef, 8);
 }
 
 /* Creating animation from VVC */
@@ -103,6 +104,14 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, Point &p, bool autoFree
 		anims[0]->pos = 0;
 	}
 	justCreated = true;
+
+	//copying resource name to the object, so it could be referenced by it
+	//used by immunity/remove specific animation
+	memcpy(ResName, stream->filename, 8);
+	for(int i=0;i<8;i++) {
+		if (ResName[i]=='.') ResName[i]=0;
+	}
+
 	if (autoFree) {
 		delete( stream );
 	}

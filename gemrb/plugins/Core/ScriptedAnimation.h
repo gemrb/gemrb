@@ -38,6 +38,7 @@ public:
 	ieResRef Sounds[2];
 	bool justCreated;
 	bool autoSwitchOnEnd;
+	ieResRef ResName;
 };
 
 #endif
