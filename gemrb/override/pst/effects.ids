@@ -94,7 +94,7 @@ IDS
 0x5c	PickPocketsModifier
 0x5d	FatigueModifier
 0x5e	IntoxicationModifier
-0x5f	TrackingSkillModifier
+0x5f	TrackingModifier
 0x60	LevelChange
 0x61	StrengthBonusModifier
 0x62	Regeneration
@@ -149,8 +149,8 @@ IDS
 0x99	Overlay:Sanctuary
 0x9a	Overlay:Entangle
 0x9b	Overlay:MinorGlobe
-0x9c	Overlay:ProtectionFromProjectile
-0x9d	State:WebEffect
+0x9c	Overlay:ShieldGlobe
+0x9d	Overlay:Web
 0x9e	Overlay:Grease
 0x9f	MirrorImageRun
 0xa0	DispelSanctuary
