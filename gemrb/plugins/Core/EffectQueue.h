@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.17 2006/03/24 14:44:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.18 2006/03/24 17:29:24 avenger_teambg Exp $
  *
  */
 
@@ -61,7 +61,7 @@ class Actor;
 #define STAT_GET(stat) (target->Modified[ stat ])
 #define STAT_ADD(stat, mod) target->SetStat( stat, STAT_GET( stat ) + ( mod ) )
 #define STAT_SET(stat, mod) target->SetStat( stat,  ( mod ) )
-#define STAT_MUL(stat, mod) target->SetStat( stat, STAT_GET(stat) * (( mod ) / 100.0))
+#define STAT_MUL(stat, mod) target->SetStat( stat, STAT_GET(stat) * (( mod ) / 100))
 #define STATE_CURE( mod ) target->Modified[ IE_STATE_ID ] &= ~(ieDword) ( mod )
 #define STATE_SET( mod ) target->Modified[ IE_STATE_ID ] |= (ieDword) ( mod )
 #define STATE_GET( mod ) (target->Modified[ IE_STATE_ID ] & (ieDword) ( mod ) )
