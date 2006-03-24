@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.49 2005/12/21 16:53:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.50 2006/03/24 14:44:04 avenger_teambg Exp $
  *
  */
 
@@ -259,31 +259,31 @@ void EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 		switch( fn( Owner?Owner:target, target, fx ) ) {
 			case FX_APPLIED:
 				//normal effect with duration
-				if (first_apply) {
-					PrepareDuration(fx);
-				}
 				break;
 			case FX_NOT_APPLIED:
  				//instant effect, pending removal
+				//for example, a damage effect
 				fx->TimingMode=FX_DURATION_JUST_EXPIRED;
 				break;
 			case FX_PERMANENT:
 				//don't stick around if it was permanent
-				if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
+				//for example, a strength modifier effect
+				if ((fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) ) {
 					fx->TimingMode=FX_DURATION_JUST_EXPIRED;
-				}
+        } 
 				break;
 			case FX_CYCLIC:
-				//mark this spell as cyclic (is there a flag?)
-				if (first_apply) {
-					PrepareDuration(fx);
-				}
+				//the effect will be reapplied instead of removed
+				//mark this somehow
 				break;
 		}
 	} else {
 		//effect not found, it is going to be discarded
 		fx->TimingMode=FX_DURATION_JUST_EXPIRED;
-	}		
+	}
+	if ((fx->TimingMode!=FX_DURATION_JUST_EXPIRED) && first_apply) {
+		PrepareDuration(fx);
+  }
 }
 
 //call this from an applied effect, after it returns, these effects

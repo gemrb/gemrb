@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.16 2005/12/05 20:21:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.17 2006/03/24 14:44:04 avenger_teambg Exp $
  *
  */
 
@@ -57,21 +57,17 @@ class Actor;
 #define DICE_ROLL(max_val) ((fx->DiceThrown && fx->DiceSides) ? ((max_val >=0) ? (MIN( core->Roll( fx->DiceThrown, fx->DiceSides, 0 ), max_val )) : (MAX( core->Roll( fx->DiceThrown, fx->DiceSides, 0 ), max_val ))) : max_val)
 
 // often used stat modifications, usually Parameter2 types 0, 1 and 2
-//#define STAT_ADD(stat, mod) target->SetStat( ( stat ), (ieDword)(target->GetStat( stat ) + ( mod )))
-//#define STAT_SET(stat, mod) target->SetStat( ( stat ), (ieDword)( mod ))
-//#define STAT_MUL(stat, mod) target->SetStat( ( stat ), (ieDword)(target->GetStat( stat ) * (( mod ) / 100.0)))
-
 //these macros should work differently in permanent mode (modify base too)
 #define STAT_GET(stat) (target->Modified[ stat ])
-#define STAT_ADD(stat, mod) target->Modified[ stat ] = (ieDword)(target->Modified[ stat ] + ( mod ))
-#define STAT_SET(stat, mod) target->Modified[ stat ] = (ieDword)( mod )
-#define STAT_MUL(stat, mod) target->Modified[ stat ] = (ieDword)(target->Modified[ stat ] * (( mod ) / 100.0))
+#define STAT_ADD(stat, mod) target->SetStat( stat, STAT_GET( stat ) + ( mod ) )
+#define STAT_SET(stat, mod) target->SetStat( stat,  ( mod ) )
+#define STAT_MUL(stat, mod) target->SetStat( stat, STAT_GET(stat) * (( mod ) / 100.0))
 #define STATE_CURE( mod ) target->Modified[ IE_STATE_ID ] &= ~(ieDword) ( mod )
 #define STATE_SET( mod ) target->Modified[ IE_STATE_ID ] |= (ieDword) ( mod )
 #define STATE_GET( mod ) (target->Modified[ IE_STATE_ID ] & (ieDword) ( mod ) )
 #define STAT_MOD( stat ) target->NewStat(stat, fx->Parameter1, fx->Parameter2)
-
-
+#define BASE_SET(stat, mod) target->SetBase( stat,  ( mod ) )
+#define BASE_MOD(stat) target->NewBase( stat, fx->Parameter1, fx->Parameter2)
 
 /** Prototype of a function implementing a particular Effect opcode */
 typedef int (* EffectFunction)(Actor*, Actor*, Effect*);

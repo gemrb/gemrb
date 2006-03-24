@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.103 2006/03/19 09:17:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.104 2006/03/24 14:44:04 avenger_teambg Exp $
  *
  */
 
@@ -228,6 +228,8 @@ public:
 	bool SetBase(unsigned int StatIndex, ieDword Value);
 	/** Sets the modified value in different ways, returns difference */
 	int NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword ModifierType);
+	/** Modifies the base stat value in different ways, returns difference */
+	int NewBase(unsigned int StatIndex, ieDword ModifierValue, ieDword ModifierType);
 	void SetLeader(Actor *actor, int xoffset=0, int yoffset=0);
 	ieDword GetID()
 	{
@@ -366,11 +368,12 @@ public:
 	void AddVVCell(ScriptedAnimation* vvc, bool background);
 	/* remove a vvc from the list */
 	void RemoveVVCell(ieResRef vvcname, bool background);
-
+	/* returns true if actor already has the overlay */
+	bool HasVVCCell(ieResRef resource, bool background);
 	/* draw videocells */
 	void DrawVideocells(Region &screen, vvcVector &vvcCells);
 
-	void add_animation(AnimationFactory *af, Point &offset, int gradient);
+	void add_animation(AnimationFactory *af, Point &offset, int gradient, bool background);
 	void PlayDamageAnimation(int x);
 };
 #endif

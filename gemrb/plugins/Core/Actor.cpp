@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.166 2006/03/19 09:17:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.167 2006/03/24 14:44:04 avenger_teambg Exp $
  *
  */
 
@@ -62,16 +62,16 @@ static char **clericspelltables=NULL;
 static char **wizardspelltables=NULL;
 
 static char iwd2gemrb[32]={
-  0,0,20,2,22,25,0,14,
-  15,23,13,0,1,24,8,21,
-  0,0,0,0,0,0,0,0,
-  0,0,0,0,0,0,0,0
+	0,0,20,2,22,25,0,14,
+	15,23,13,0,1,24,8,21,
+	0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0
 };
 static char gemrb2iwd[32]={
-  11,12,3,71,72,73,0,0,  //0
-  14,80,83,82,81,10,7,8,  //8
-  0,0,0,0,2,15,4,9,  //16
-  13,5,0,0,0,0,0,0   //24
+	11,12,3,71,72,73,0,0,  //0
+	14,80,83,82,81,10,7,8,  //8
+	0,0,0,0,2,15,4,9,  //16
+	13,5,0,0,0,0,0,0   //24
 };
 
 static void InitActorTables();
@@ -86,6 +86,16 @@ static ieResRef elec[2]={"SPSPARKS","SPSHKIMP"};
 static AnimationFactory* spark_af[2]={NULL,NULL};
 static ieResRef ice[2]={"","SPFIRIMP"}; //same as fire, but different palette
 static AnimationFactory* ice_af[2]={NULL,NULL};
+//the possible hardcoded overlays (they got separate stats)
+#define OVERLAY_COUNT  6
+#define OV_ENTANGLE    0
+#define OV_SANCTUARY   1
+#define OV_MINORGLOBE  2
+#define OV_SHIELDGLOBE 3
+#define OV_GREASE      4
+#define OV_WEB         5
+static ieResRef overlay[OVERLAY_COUNT]={"SPENTACI","SANCTRY","MINORGLB","SPSHIELD","GREASED","WEBENTD"};
+static AnimationFactory* overlay_af[OVERLAY_COUNT]={NULL,NULL,NULL,NULL,NULL,NULL};
 
 PCStatsStruct::PCStatsStruct()
 {
@@ -163,7 +173,7 @@ Actor::Actor()
 
 		TranslucentShadows = 0;
 		core->GetDictionary()->Lookup("Translucent Shadows",
-									  TranslucentShadows);
+										TranslucentShadows);
 	}
 	TalkCount = 0;
 	InteractCount = 0; //numtimesinteracted depends on this
@@ -388,6 +398,81 @@ void pcf_gold(Actor *actor, ieDword /*Value*/)
 	//actor->BaseStats[IE_GOLD]=actor->Modified[IE_GOLD];
 }
 
+//this should be fixed one day
+static Point dummypoint;
+
+//de/activates the entangle overlay
+void pcf_entangle(Actor *actor, ieDword Value)
+{
+	if (Value) {
+		if (actor->HasVVCCell(overlay[OV_ENTANGLE], false))
+			return;
+		actor->add_animation(overlay_af[OV_ENTANGLE], dummypoint, 0, false);
+	} else {
+		actor->RemoveVVCell(overlay[OV_ENTANGLE], false);
+	}
+}
+
+//de/activates the sanctuary overlay
+void pcf_sanctuary(Actor *actor, ieDword Value)
+{
+	if (Value) {
+		if (actor->HasVVCCell(overlay[OV_SANCTUARY], false))
+			return;
+		actor->add_animation(overlay_af[OV_SANCTUARY], dummypoint, 0, false);
+	} else {
+		actor->RemoveVVCell(overlay[OV_SANCTUARY], false);
+	}
+}
+
+//de/activates the prot from missiles background
+void pcf_shieldglobe(Actor *actor, ieDword Value)
+{
+	if (Value) {
+		if (actor->HasVVCCell(overlay[OV_SHIELDGLOBE], true))
+			return;
+		actor->add_animation(overlay_af[OV_SHIELDGLOBE], dummypoint, 0, true);
+	} else {
+		actor->RemoveVVCell(overlay[OV_SHIELDGLOBE], true);
+	}
+}
+
+//de/activates the globe of invul. overlay
+void pcf_minorglobe(Actor *actor, ieDword Value)
+{
+	if (Value) {
+		if (actor->HasVVCCell(overlay[OV_MINORGLOBE], false))
+			return;
+		actor->add_animation(overlay_af[OV_MINORGLOBE], dummypoint, 0, false);
+	} else {
+		actor->RemoveVVCell(overlay[OV_MINORGLOBE], false);
+	}
+}
+
+//de/activates the grease background
+void pcf_grease(Actor *actor, ieDword Value)
+{
+	if (Value) {
+		if (actor->HasVVCCell(overlay[OV_GREASE], true))
+			return;
+		actor->add_animation(overlay_af[OV_GREASE], dummypoint, 0, true);
+	} else {
+		actor->RemoveVVCell(overlay[OV_GREASE], true);
+	}
+}
+
+//de/activates the web overlay
+void pcf_web(Actor *actor, ieDword Value)
+{
+	if (Value) {
+		if (actor->HasVVCCell(overlay[OV_WEB], false))
+			return;
+		actor->add_animation(overlay_af[OV_WEB], dummypoint, 0, false);
+	} else {
+		actor->RemoveVVCell(overlay[OV_WEB], false);
+	}
+}
+
 //no separate values (changes are permanent)
 void pcf_fatigue(Actor *actor, ieDword Value)
 {
@@ -436,8 +521,8 @@ NULL,NULL,NULL,NULL, NULL, NULL, pcf_fatigue, pcf_intoxication, //1f
 NULL,NULL,NULL,NULL, pcf_stat, NULL, pcf_stat, pcf_stat,
 pcf_stat,pcf_stat,NULL,NULL, NULL, pcf_gold, NULL, NULL, //2f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //3f
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
+NULL,NULL,NULL,NULL, NULL, NULL, pcf_entangle, pcf_sanctuary, //3f
+pcf_minorglobe, pcf_shieldglobe, pcf_grease, pcf_web, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //4f
 NULL,NULL,NULL,pcf_minhitpoint, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //5f
@@ -487,28 +572,6 @@ void Actor::ReleaseMemory()
 		}
 	}
 	classcount=-1;
-	/*
-	for(i=0;i<4;i++) {
-		if (blood_af[i]) {
-			delete blood_af[i];
-			blood_af[i]=NULL;
-		}
-	}
-	for(i=0;i<2;i++) {
-		if (fire_af[i]) {
-			delete fire_af[i];
-			fire_af[i]=NULL;
-		}
-		if (spark_af[i]) {
-			delete spark_af[i];
-			spark_af[i]=NULL;
-		}
-		if (ice_af[i]) {
-			delete ice_af[i];
-			ice_af[i]=NULL;
-		}
-	}
-	*/
 }
 
 static void InitActorTables()
@@ -552,16 +615,22 @@ static void InitActorTables()
 		ice_af[i] = ( AnimationFactory* )
 			core->GetResourceMgr()->GetFactoryResource( ice[i], IE_BAM_CLASS_ID );
 	}
+	for(i=0;i<OVERLAY_COUNT;i++) {
+		overlay_af[i] = ( AnimationFactory* )
+			core->GetResourceMgr()->GetFactoryResource( overlay[i], IE_BAM_CLASS_ID );
+	}
 }
 //TODO: every actor must have an own vvcell list
 //the area's vvc's are the stationary effects
 //the actor's vvc's are moving with the actor
 //this method adds a vvc to the actor
-void Actor::add_animation(AnimationFactory * /*af*/, Point & /*offset*/, int gradient)
+void Actor::add_animation(AnimationFactory *af, Point &offset, int gradient, bool background)
 {
 	if (gradient!=-1) {
 		//palette
 	}
+	ScriptedAnimation *sca = new ScriptedAnimation(af, offset);
+	AddVVCell(sca, background);
 }
 
 #define BLOOD_GRADIENT 19
@@ -575,22 +644,22 @@ void Actor::PlayDamageAnimation(int type)
 
 	switch(type) {
 		case 0: case 1: case 2: case 3: //blood
-			add_animation(blood_af[type], p, BLOOD_GRADIENT);
+			add_animation(blood_af[type], p, BLOOD_GRADIENT, false);
 			break;
 		case 4: case 5: case 7: //fire
-			add_animation(fire_af[0], p, FIRE_GRADIENT);
+			add_animation(fire_af[0], p, FIRE_GRADIENT, false);
 			for(i=3;i<type;i++) {
-				add_animation(fire_af[1], p, FIRE_GRADIENT);
+				add_animation(fire_af[1], p, FIRE_GRADIENT, false);
 			}
 			break;
 		case 8: case 9: case 10: //electricity
-			add_animation(spark_af[0], p, -1);
+			add_animation(spark_af[0], p, -1, false);
 			for(i=7;i<type;i++) {
-				add_animation(spark_af[1], p, FIRE_GRADIENT);
+				add_animation(spark_af[1], p, FIRE_GRADIENT, false);
 			}
 			break;
 		case 11: case 12: case 13://cold
-			add_animation(ice_af[0], p, ICE_GRADIENT);
+			add_animation(ice_af[0], p, ICE_GRADIENT, false);
 			break;
 		case 14: case 15: case 16://acid
 			break;
@@ -614,9 +683,13 @@ bool Actor::SetStat(unsigned int StatIndex, ieDword Value)
 			}
 		}
 	}
-	Modified[StatIndex] = Value;
-	PostChangeFunctionType f = post_change_functions[StatIndex];
-	if (f) (*f)(this, Value);
+
+	if (Modified[StatIndex]!=Value) {
+		Modified[StatIndex] = Value;
+		PostChangeFunctionType f = post_change_functions[StatIndex];
+		if (f) (*f)(this, Value);
+	}
+
 	return true;
 }
 /* use core->GetConstitutionBonus(0,0,Modified[IE_CON])
@@ -679,6 +752,27 @@ int Actor::NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 			break;
 	}
 	return Modified[StatIndex] - oldmod;
+}
+
+int Actor::NewBase(unsigned int StatIndex, ieDword ModifierValue, ieDword ModifierType)
+{
+	int oldmod = BaseStats[StatIndex];
+
+	switch (ModifierType) {
+		case MOD_ADDITIVE:
+			//flat point modifier
+			SetBase(StatIndex, BaseStats[StatIndex]+ModifierValue);
+			break;
+		case MOD_ABSOLUTE:
+			//straight stat change
+			SetBase(StatIndex, ModifierValue);
+			break;
+		case MOD_PERCENT:
+			//percentile
+			SetBase(StatIndex, BaseStats[StatIndex] * 100 / ModifierValue);
+			break;
+	}
+	return BaseStats[StatIndex] - oldmod;
 }
 
 void Actor::ReactToDeath(const char * /*deadname*/)
@@ -901,7 +995,7 @@ void Actor::Turn(Scriptable *cleric, int turnlevel)
 
 void Actor::Resurrect()
 {
-	InternalFlags&=IF_FROMGAME;	   //keep these flags
+	InternalFlags&=IF_FROMGAME;		 //keep these flags
 	InternalFlags|=IF_ACTIVE|IF_VISIBLE;  //set these flags  
 	SetBase(IE_STATE_ID, 0);
 	SetBase(IE_HITPOINTS, GetBase(IE_MAXHITPOINTS));
@@ -1582,6 +1676,28 @@ void Actor::SetSoundFolder(const char *soundset)
 	}
 }
 
+bool Actor::HasVVCCell(ieResRef resource, bool background)
+{
+	vvcVector *vvcCells;
+
+	if (background) {
+		vvcCells=&vvcShields;
+	} else {
+		vvcCells=&vvcOverlays;
+	}
+	unsigned int i=vvcCells->size();
+	while (i--) {
+		ScriptedAnimation *vvc = (*vvcCells)[i];
+		if (vvc == NULL) {
+			continue;
+		}
+		if ( strnicmp(vvc->ResName, resource, 8) == 0) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void Actor::RemoveVVCell(ieResRef resource, bool background)
 {
 	vvcVector *vvcCells;
@@ -1597,7 +1713,7 @@ void Actor::RemoveVVCell(ieResRef resource, bool background)
 		if (vvc == NULL) {
 			continue;
 		}
-		if ( strncmp(vvc->ResName, resource, 8) == 0) {
+		if ( strnicmp(vvc->ResName, resource, 8) == 0) {
 			delete vvc;
 			(*vvcCells)[i]=NULL;
 		}
