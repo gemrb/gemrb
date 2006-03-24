@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.5 2005/12/12 18:39:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.6 2006/03/24 17:48:21 avenger_teambg Exp $
  *
  */
 
@@ -183,11 +183,11 @@ int fx_learn_spell (Actor* Owner, Actor* target, Effect *fx);//93
 //97
 int fx_play_movie (Actor* Owner, Actor* target, Effect* fx);//98
 int fx_set_sanctuary_state (Actor* Owner, Actor* target, Effect* fx);//99
-//9a
-//9b
-//9c
-//9d
-//9e
+int fx_set_entangle_state (Actor* Owner, Actor* target, Effect* fx);//9a
+int fx_set_minorglobe_state (Actor* Owner, Actor* target, Effect* fx);//9b
+int fx_set_shieldglobe_state (Actor* Owner, Actor* target, Effect* fx);//9c
+int fx_set_web_state (Actor* Owner, Actor* target, Effect* fx);//9d
+int fx_set_grease_state (Actor* Owner, Actor* target, Effect* fx);//9e
 //9f
 int fx_cure_sanctuary_state (Actor* Owner, Actor* target, Effect* fx);//a0
 int fx_cure_panic_state (Actor* Owner, Actor* target, Effect* fx);//a1
@@ -398,6 +398,12 @@ static EffectRef effectnames[] = {
 	{ "MissilesResistanceModifier", fx_missiles_resistance_modifier, 0 },
 	{ "MoraleBreakModifier", fx_morale_break_modifier, 0 },
 	{ "OpenLocksModifier", fx_open_locks_modifier, 0 },
+	{ "Overlay:Entangle", fx_set_entangle_state, 0 },
+	{ "Overlay:Grease", fx_set_grease_state, 0 },
+	{ "Overlay:MinorGlobe", fx_set_minorglobe_state, 0 },
+	{ "Overlay:Sanctuary", fx_set_sanctuary_state, 0 },
+	{ "Overlay:ShieldGlobe", fx_set_shieldglobe_state, 0 },
+	{ "Overlay:Web", fx_set_web_state, 0 },
 	{ "MoraleModifier", fx_morale_modifier, 0 },
 	{ "PauseTarget", fx_pause_target, 0 }, //also known as casterhold
 	{ "PickPocketsModifier", fx_pick_pockets_modifier, 0 },
@@ -435,7 +441,6 @@ static EffectRef effectnames[] = {
 	{ "State:Panic", fx_set_panic_state, 0 },
 	{ "State:Petrification", fx_set_petrified_state, 0 },
 	{ "State:Poisoned", fx_set_poisoned_state, 0 },
-	{ "State:Sanctuary", fx_set_sanctuary_state, 0 },
 	{ "State:Silenced", fx_set_silenced_state, 0 },
 	{ "State:Helpless", fx_set_unconscious_state, 0 },
 	{ "State:Slowed", fx_set_slowed_state, 0 },
@@ -636,7 +641,11 @@ int fx_charisma_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_charisma_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	STAT_MOD( IE_CHR );
+	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
+		BASE_MOD( IE_CHR );
+	} else {
+		STAT_MOD( IE_CHR );
+	}
 	return FX_PERMANENT;
 }
 
@@ -655,7 +664,11 @@ int fx_constitution_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_constitution_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	STAT_MOD( IE_CON );
+	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
+		BASE_MOD( IE_CON );
+	} else {
+		STAT_MOD( IE_CON );
+	}
 	return FX_PERMANENT;
 }
 
@@ -706,7 +719,11 @@ int fx_dexterity_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_dexterity_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	STAT_MOD( IE_DEX );
+	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
+		BASE_MOD( IE_DEX );
+	} else {
+		STAT_MOD( IE_DEX );
+	}
 	return FX_PERMANENT;
 }
 
@@ -786,7 +803,11 @@ int fx_intelligence_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_intelligence_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	STAT_MOD( IE_INT );
+	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
+		BASE_MOD( IE_INT );
+	} else {
+		STAT_MOD( IE_INT );
+	}
 	return FX_PERMANENT;
 }
 
@@ -1040,7 +1061,11 @@ int fx_strength_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_strength_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	STAT_MOD( IE_STR );
+	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
+		BASE_MOD( IE_STR );
+	} else {
+		STAT_MOD( IE_STR );
+	}
 	return FX_PERMANENT;
 }
 
@@ -1081,7 +1106,11 @@ int fx_wisdom_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_wisdom_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	STAT_MOD( IE_WIS );
+	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
+		BASE_MOD( IE_WIS );
+	} else {
+		STAT_MOD( IE_WIS );
+	}
 	return FX_PERMANENT;
 }
 
@@ -1692,8 +1721,58 @@ int fx_set_sanctuary_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_sanctuary_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET( IE_SANCTUARY, 1);
+	return FX_APPLIED; //is this correct?
+}
+
+// 0x9a
+int fx_set_entangle_state (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_set_entangle_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	STAT_SET( IE_ENTANGLE, 1);
+	return FX_APPLIED; //is this correct?
+}
+
+// 0x9b
+int fx_set_minorglobe_state (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_set_minorglobe_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	STAT_SET( IE_MINORGLOBE, 1);
+	return FX_APPLIED; //is this correct?
+}
+
+// 0x9c
+int fx_set_shieldglobe_state (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_set_shieldglobe_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	STAT_SET( IE_SHIELDGLOBE, 1);
+	return FX_APPLIED; //is this correct?
+}
+
+// 0x9d
+int fx_set_web_state (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_set_web_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	STAT_SET( IE_WEB, 1);
+	return FX_APPLIED; //is this correct?
+}
+
+// 0x9e
+int fx_set_grease_state (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_set_grease_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	STAT_SET( IE_GREASE, 1);
+	return FX_APPLIED; //is this correct?
+}
+
+// 0x9f
+#if 0
+int fx_set_mirrorimages (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_set_grease_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	STAT_MOD( IE_MIRRORIMAGE, 1);
 	return FX_PERMANENT; //is this correct?
 }
+#endif
 
 // 0xa0
 int fx_cure_sanctuary_state (Actor* /*Owner*/, Actor* target, Effect* fx)
