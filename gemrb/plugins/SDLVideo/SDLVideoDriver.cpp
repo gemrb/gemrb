@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.139 2006/03/25 21:58:27 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.140 2006/03/25 23:35:39 wjpalenstijn Exp $
  *
  */
 
@@ -840,6 +840,8 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 	// (hopefully) most video overlays:
 	// BLIT_HALFTRANS
 	// covered, BLIT_HALFTRANS
+	// covered
+	// none
 
 	// other combinations use general case
 
@@ -990,7 +992,35 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 #undef COVER
 #undef SPECIALPIXEL
 
-	} else {
+	} else if (remflags == blit_COVERED) {
+
+#define COVER
+#define SPECIALPIXEL
+
+		if (backBuf->format->BytesPerPixel == 4) {
+#undef BPP16
+#include "SDLVideoDriver.inl"
+		} else {
+#define BPP16
+#include "SDLVideoDriver.inl"
+		}
+
+#undef COVER
+#undef SPECIALPIXEL
+
+	}/* else if (remflags == 0) {
+
+#define SPECIALPIXEL
+		if (backBuf->format->BytesPerPixel == 4) {
+#undef BPP16
+#include "SDLVideoDriver.inl"
+		} else {
+#define BPP16
+#include "SDLVideoDriver.inl"
+		}
+#undef SPECIALPIXEL
+
+}*/ else {
 		// handling the following effects with conditionals:
 		// halftrans
 		// noshadow
@@ -1014,7 +1044,7 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 #define GVALUE(r,g,b) (g)
 #define BVALUE(r,g,b) (b)
 #define AVALUE(r,g,b,a) (a)>>ia
-#define CUSTOMBLEND(r,g,b,depth) do { if (remflags & BLIT_GREY) { unsigned int t = (r)+(g)+(b); t /= 3; (r)=t; (g)=t; (b)=t; } if (remflags & BLIT_RED) { (g)=0;(b)=0; } } while(0)
+#define CUSTOMBLEND(r,g,b) do { if (remflags & BLIT_GREY) { unsigned int t = (r)+(g)+(b); t /= 3; (r)=t; (g)=t; (b)=t; } if (remflags & BLIT_RED) { (g)=0;(b)=0; } } while(0)
 
 #define TINT_ALPHA
 

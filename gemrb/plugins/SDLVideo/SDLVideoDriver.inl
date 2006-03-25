@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.inl,v 1.7 2006/03/25 21:58:27 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.inl,v 1.8 2006/03/25 23:35:39 wjpalenstijn Exp $
  *
  */
 
@@ -78,7 +78,7 @@ assert(cover);
 #define GVALUE(r,g,b) (g)
 #define BVALUE(r,g,b) (b)
 #define AVALUE(r,g,b,a) (a)
-#define CUSTOMBLEND(r,g,b,depth)
+#define CUSTOMBLEND(r,g,b)
 #endif
 
 
@@ -90,15 +90,15 @@ assert(cover);
 #define BLENDPIXEL(target,cr,cg,cb,ca,curval) \
 do { \
 	if ((ca) != 0) { \
-		dR = (ca)*((tint.r*(cr)) >> 8); \
-		dG = (ca)*((tint.g*(cg)) >> 8); \
-		dB = (ca)*((tint.b*(cb)) >> 8); \
-		CUSTOMBLEND(dR,dG,dB,16); \
-		dR = 1 + dR + ((((curval)>>rshift)<<rloss)&0xFF)*(255-(ca)); \
+		dR = ((tint.r*(cr)) >> 8); \
+		dG = ((tint.g*(cg)) >> 8); \
+		dB = ((tint.b*(cb)) >> 8); \
+		CUSTOMBLEND(dR,dG,dB); \
+		dR = 1 + (ca)*dR + ((((curval)>>rshift)<<rloss)&0xFF)*(255-(ca)); \
  		dR = (dR + (dR >> 8)) >> 8; \
-		dG = 1 + dG + ((((curval)>>gshift)<<gloss)&0xFF)*(255-(ca)); \
+		dG = 1 + (ca)*dG + ((((curval)>>gshift)<<gloss)&0xFF)*(255-(ca)); \
  		dG = (dG + (dG >> 8)) >> 8; \
-		dB = 1 + dB + ((((curval)>>bshift)<<bloss)&0xFF)*(255-(ca)); \
+		dB = 1 + (ca)*dB + ((((curval)>>bshift)<<bloss)&0xFF)*(255-(ca)); \
 		dB = (dB + (dB >> 8)) >> 8; \
 		target = (PTYPE) ( ((dR) >> rloss) << rshift \
 						   | ((dG) >> gloss) << gshift \
@@ -109,15 +109,15 @@ do { \
 #define BLENDPIXEL(target,cr,cg,cb,ca,curval) \
 do { \
 	if ((ca) != 0) { \
-		dR = (ca)*(cr); \
-		dG = (ca)*(cg); \
-		dB = (ca)*(cg); \
-		CUSTOMBLEND(dR,dG,dB,16); \
-		dR = 1 + dR + ((((curval)>>rshift)<<rloss)&0xFF)*(255-(ca)); \
+		dR = (cr); \
+		dG = (cg); \
+		dB = (cb); \
+		CUSTOMBLEND(dR,dG,dB); \
+		dR = 1 + (ca)*dR + ((((curval)>>rshift)<<rloss)&0xFF)*(255-(ca)); \
  		dR = (dR + (dR >> 8)) >> 8; \
-		dG = 1 + dG + ((((curval)>>gshift)<<gloss)&0xFF)*(255-(ca)); \
+		dG = 1 + (ca)*dG + ((((curval)>>gshift)<<gloss)&0xFF)*(255-(ca)); \
  		dG = (dG + (dG >> 8)) >> 8; \
-		dB = 1 + dB + ((((curval)>>bshift)<<bloss)&0xFF)*(255-(ca)); \
+		dB = 1 + (ca)*dB + ((((curval)>>bshift)<<bloss)&0xFF)*(255-(ca)); \
 		dB = (dB + (dB >> 8)) >> 8; \
 		target = (PTYPE) ( ((dR) >> rloss) << rshift \
 						   | ((dG) >> gloss) << gshift \
@@ -156,7 +156,7 @@ do { \
 	dR = ((tint.r*(cr)) >> 8); \
 	dG = ((tint.g*(cg)) >> 8); \
 	dB = ((tint.b*(cb)) >> 8); \
-	CUSTOMBLEND(dR,dG,dB,8); \
+	CUSTOMBLEND(dR,dG,dB); \
 	target = (PTYPE) ( ((dR) >> rloss) << rshift \
 					   | ((dG) >> gloss) << gshift \
 					   | ((dB) >> bloss) << bshift); \
@@ -167,7 +167,7 @@ do { \
 	dR = (cr); \
 	dG = (cg); \
 	dB = (cb); \
-	CUSTOMBLEND(dR,dG,dB,8); \
+	CUSTOMBLEND(dR,dG,dB); \
 	target = (PTYPE) ( ((dR) >> rloss) << rshift \
 					   | ((dG) >> gloss) << gshift \
 					   | ((dB) >> bloss) << bshift); \
