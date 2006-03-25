@@ -37,8 +37,13 @@ public:
 	ieDword FaceTarget;
 	ieResRef Sounds[2];
 	bool justCreated;
-	bool autoSwitchOnEnd;
 	ieResRef ResName;
+	int Phase;
+public:
+	//draws the next frame of the videocell
+	bool Draw(Region &screen, Point &Pos);
+	//ends the videocell
+	void EndPhase();
 };
 
 #endif

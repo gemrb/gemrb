@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.18 2006/03/19 09:14:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.19 2006/03/25 15:21:49 avenger_teambg Exp $
  *
  */
 
@@ -24,6 +24,8 @@
 #include "AnimationMgr.h"
 #include "Interface.h"
 #include "ResourceMgr.h"
+#include "SoundMgr.h"
+#include "Video.h"
 
 /* Creating animation from BAM */
 ScriptedAnimation::ScriptedAnimation(AnimationFactory *af, Point &p)
@@ -41,6 +43,7 @@ ScriptedAnimation::ScriptedAnimation(AnimationFactory *af, Point &p)
 	YPos += p.y;
 	justCreated = true;
 	memcpy(ResName, af->ResRef, 8);
+	Phase = 0;
 }
 
 /* Creating animation from VVC */
@@ -95,13 +98,11 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, Point &p, bool autoFree
 	anims[1] = af->GetCycle( ( unsigned char ) seq2 );
 	XPos += p.x;
 	YPos += p.y;
-	if (anims[1]) {
-		autoSwitchOnEnd = true;
-	} else {
-		autoSwitchOnEnd = false;
-	}
-	if(anims[0]) {
+	if (anims[0]) {
 		anims[0]->pos = 0;
+		if (!(SequenceFlags&IE_VVC_LOOP) ) {
+			anims[0]->Flags |= 8; //A_ANI_PLAYONCE;
+		}
 	}
 	justCreated = true;
 
@@ -111,6 +112,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, Point &p, bool autoFree
 	for(int i=0;i<8;i++) {
 		if (ResName[i]=='.') ResName[i]=0;
 	}
+	Phase = 0;
 
 	if (autoFree) {
 		delete( stream );
@@ -125,4 +127,50 @@ ScriptedAnimation::~ScriptedAnimation(void)
 	if (anims[1]) {
 		delete( anims[1] );
 	}
+}
+
+void ScriptedAnimation::EndPhase()
+{
+	Phase = 1;
+}
+
+bool ScriptedAnimation::Draw(Region &screen, Point &Pos)
+{
+	Video *video = core->GetVideoDriver();
+
+	if (justCreated) {
+		justCreated = false;
+		if (!anims[0]) {
+			Phase = 1;
+		}
+retry:
+		if (Sounds[Phase][0] != 0) {
+			core->GetSoundMgr()->Play( Sounds[Phase] );
+		}
+	}
+
+	if (!anims[Phase]) {
+		return true;
+	}
+	Sprite2D* frame = anims[Phase]->NextFrame();
+	if (!frame) {
+		if (Phase) {
+			return true;
+		}
+		Phase = 1;
+		goto retry;
+	}
+	if (Transparency & IE_VVC_TRANSPARENT) {
+		video->BlitSpriteHalfTrans( frame, Pos.x + XPos + screen.x,
+			Pos.y + YPos + screen.y, false, &screen );
+		return false;
+	}
+	if (Transparency & IE_VVC_BRIGHTEST) {
+		video->BlitSprite( frame, Pos.x + XPos + screen.x,
+			Pos.y + YPos + screen.y, false, &screen );
+	} else {
+		video->BlitSprite( frame, Pos.x + XPos + screen.x,
+			Pos.y + YPos + screen.y, false, &screen );
+	}
+	return false;
 }

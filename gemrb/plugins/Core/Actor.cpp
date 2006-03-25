@@ -15,14 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.167 2006/03/24 14:44:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.168 2006/03/25 15:21:49 avenger_teambg Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "TableMgr.h"
 #include "ResourceMgr.h"
-#include "SoundMgr.h"
 #include "Actor.h"
 #include "Interface.h"
 #include "../../includes/strrefs.h"
@@ -79,13 +78,9 @@ static void InitActorTables();
 static ieDword TranslucentShadows;
 
 static ieResRef blood[4]={"BLOODS","BLOODM","BLOODL","BLOODCR"};
-static AnimationFactory* blood_af[4]={NULL,NULL,NULL,NULL};
 static ieResRef fire[2]={"SPBURN","SPFIRIMP"};
-static AnimationFactory* fire_af[2]={NULL,NULL};
-static ieResRef elec[2]={"SPSPARKS","SPSHKIMP"};
-static AnimationFactory* spark_af[2]={NULL,NULL};
+static ieResRef spark[2]={"SPSPARKS","SPSHKIMP"};
 static ieResRef ice[2]={"","SPFIRIMP"}; //same as fire, but different palette
-static AnimationFactory* ice_af[2]={NULL,NULL};
 //the possible hardcoded overlays (they got separate stats)
 #define OVERLAY_COUNT  6
 #define OV_ENTANGLE    0
@@ -95,7 +90,6 @@ static AnimationFactory* ice_af[2]={NULL,NULL};
 #define OV_GREASE      4
 #define OV_WEB         5
 static ieResRef overlay[OVERLAY_COUNT]={"SPENTACI","SANCTRY","MINORGLB","SPSHIELD","GREASED","WEBENTD"};
-static AnimationFactory* overlay_af[OVERLAY_COUNT]={NULL,NULL,NULL,NULL,NULL,NULL};
 
 PCStatsStruct::PCStatsStruct()
 {
@@ -407,21 +401,24 @@ void pcf_entangle(Actor *actor, ieDword Value)
 	if (Value) {
 		if (actor->HasVVCCell(overlay[OV_ENTANGLE], false))
 			return;
-		actor->add_animation(overlay_af[OV_ENTANGLE], dummypoint, 0, false);
+		actor->add_animation(overlay[OV_ENTANGLE], dummypoint, 0, false);
 	} else {
-		actor->RemoveVVCell(overlay[OV_ENTANGLE], false);
+		actor->RemoveVVCell(overlay[OV_ENTANGLE], false, true);
 	}
 }
 
 //de/activates the sanctuary overlay
+//the sanctuary effect draws the globe half transparent
 void pcf_sanctuary(Actor *actor, ieDword Value)
 {
 	if (Value) {
 		if (actor->HasVVCCell(overlay[OV_SANCTUARY], false))
 			return;
-		actor->add_animation(overlay_af[OV_SANCTUARY], dummypoint, 0, false);
+		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_SANCTUARY], dummypoint);
+		sca->Transparency|=IE_VVC_TRANSPARENT;
+		actor->AddVVCell(sca, false);		
 	} else {
-		actor->RemoveVVCell(overlay[OV_SANCTUARY], false);
+		actor->RemoveVVCell(overlay[OV_SANCTUARY], false, true);
 	}
 }
 
@@ -431,9 +428,9 @@ void pcf_shieldglobe(Actor *actor, ieDword Value)
 	if (Value) {
 		if (actor->HasVVCCell(overlay[OV_SHIELDGLOBE], true))
 			return;
-		actor->add_animation(overlay_af[OV_SHIELDGLOBE], dummypoint, 0, true);
+		actor->add_animation(overlay[OV_SHIELDGLOBE], dummypoint, 0, true);
 	} else {
-		actor->RemoveVVCell(overlay[OV_SHIELDGLOBE], true);
+		actor->RemoveVVCell(overlay[OV_SHIELDGLOBE], true, true);
 	}
 }
 
@@ -443,9 +440,11 @@ void pcf_minorglobe(Actor *actor, ieDword Value)
 	if (Value) {
 		if (actor->HasVVCCell(overlay[OV_MINORGLOBE], false))
 			return;
-		actor->add_animation(overlay_af[OV_MINORGLOBE], dummypoint, 0, false);
+		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_MINORGLOBE], dummypoint);
+		sca->Transparency|=IE_VVC_TRANSPARENT;
+		actor->AddVVCell(sca, false);		
 	} else {
-		actor->RemoveVVCell(overlay[OV_MINORGLOBE], false);
+		actor->RemoveVVCell(overlay[OV_MINORGLOBE], false, true);
 	}
 }
 
@@ -455,9 +454,9 @@ void pcf_grease(Actor *actor, ieDword Value)
 	if (Value) {
 		if (actor->HasVVCCell(overlay[OV_GREASE], true))
 			return;
-		actor->add_animation(overlay_af[OV_GREASE], dummypoint, 0, true);
+		actor->add_animation(overlay[OV_GREASE], dummypoint, 0, true);
 	} else {
-		actor->RemoveVVCell(overlay[OV_GREASE], true);
+		actor->RemoveVVCell(overlay[OV_GREASE], true, true);
 	}
 }
 
@@ -467,9 +466,9 @@ void pcf_web(Actor *actor, ieDword Value)
 	if (Value) {
 		if (actor->HasVVCCell(overlay[OV_WEB], false))
 			return;
-		actor->add_animation(overlay_af[OV_WEB], dummypoint, 0, false);
+		actor->add_animation(overlay[OV_WEB], dummypoint, 0, false);
 	} else {
-		actor->RemoveVVCell(overlay[OV_WEB], false);
+		actor->RemoveVVCell(overlay[OV_WEB], false, true);
 	}
 }
 
@@ -602,34 +601,17 @@ static void InitActorTables()
 	maximum_values[IE_CON]=i;
 	maximum_values[IE_CHR]=i;
 	maximum_values[IE_WIS]=i;
-
-	for(i=0;i<4;i++) {
-		blood_af[i] = ( AnimationFactory* )
-			core->GetResourceMgr()->GetFactoryResource( blood[i], IE_BAM_CLASS_ID );
-	}
-	for(i=0;i<2;i++) {
-		fire_af[i] = ( AnimationFactory* )
-			core->GetResourceMgr()->GetFactoryResource( fire[i], IE_BAM_CLASS_ID );
-		spark_af[i] = ( AnimationFactory* )
-			core->GetResourceMgr()->GetFactoryResource( elec[i], IE_BAM_CLASS_ID );
-		ice_af[i] = ( AnimationFactory* )
-			core->GetResourceMgr()->GetFactoryResource( ice[i], IE_BAM_CLASS_ID );
-	}
-	for(i=0;i<OVERLAY_COUNT;i++) {
-		overlay_af[i] = ( AnimationFactory* )
-			core->GetResourceMgr()->GetFactoryResource( overlay[i], IE_BAM_CLASS_ID );
-	}
 }
 //TODO: every actor must have an own vvcell list
 //the area's vvc's are the stationary effects
 //the actor's vvc's are moving with the actor
 //this method adds a vvc to the actor
-void Actor::add_animation(AnimationFactory *af, Point &offset, int gradient, bool background)
+void Actor::add_animation(ieResRef resource, Point &offset, int gradient, bool background)
 {
 	if (gradient!=-1) {
 		//palette
 	}
-	ScriptedAnimation *sca = new ScriptedAnimation(af, offset);
+	ScriptedAnimation *sca = core->GetScriptedAnimation(resource, offset);
 	AddVVCell(sca, background);
 }
 
@@ -644,22 +626,22 @@ void Actor::PlayDamageAnimation(int type)
 
 	switch(type) {
 		case 0: case 1: case 2: case 3: //blood
-			add_animation(blood_af[type], p, BLOOD_GRADIENT, false);
+			add_animation(blood[type], p, BLOOD_GRADIENT, false);
 			break;
 		case 4: case 5: case 7: //fire
-			add_animation(fire_af[0], p, FIRE_GRADIENT, false);
+			add_animation(fire[0], p, FIRE_GRADIENT, false);
 			for(i=3;i<type;i++) {
-				add_animation(fire_af[1], p, FIRE_GRADIENT, false);
+				add_animation(fire[1], p, FIRE_GRADIENT, false);
 			}
 			break;
 		case 8: case 9: case 10: //electricity
-			add_animation(spark_af[0], p, -1, false);
+			add_animation(spark[0], p, -1, false);
 			for(i=7;i<type;i++) {
-				add_animation(spark_af[1], p, FIRE_GRADIENT, false);
+				add_animation(spark[1], p, FIRE_GRADIENT, false);
 			}
 			break;
 		case 11: case 12: case 13://cold
-			add_animation(ice_af[0], p, ICE_GRADIENT, false);
+			add_animation(ice[0], p, ICE_GRADIENT, false);
 			break;
 		case 14: case 15: case 16://acid
 			break;
@@ -1391,34 +1373,16 @@ void Actor::WalkTo(Point &Des, ieDword flags, int MinDistance)
 //there is a similar function in Map for stationary vvcs
 void Actor::DrawVideocells(Region &screen, vvcVector &vvcCells)
 {
-	Video* video = core->GetVideoDriver();
-
 	for (unsigned int i = 0; i < vvcCells.size(); i++) {
 		ScriptedAnimation* vvc = vvcCells[i];
 		if (!vvc)
 			continue;
-		if (!vvc->anims[0])
-			continue;
-		if (vvc->anims[0]->endReached) {
+		// actually this is better be drawn by the vvc
+		bool endReached = vvc->Draw(screen, Pos);
+		if (endReached) {
 			vvcCells[i] = NULL;
 			delete( vvc );
 			continue;
-		}
-		if (vvc->justCreated) {
-			vvc->justCreated = false;
-			if (vvc->Sounds[0][0] != 0) {
-				core->GetSoundMgr()->Play( vvc->Sounds[0] );
-			}
-		}
-		Sprite2D* frame = vvc->anims[0]->NextFrame();
-		if (!frame)
-			continue;
-		if (vvc->Transparency & IE_VVC_BRIGHTEST) {
-			video->BlitSprite( frame, Pos.x + vvc->XPos + screen.x,
-					Pos.y + vvc->YPos + screen.y, false, &screen );
-		} else {
-			video->BlitSprite( frame, Pos.x + vvc->XPos + screen.x,
-					Pos.y + vvc->YPos + screen.y, false, &screen );
 		}
 	}
 }
@@ -1698,7 +1662,7 @@ bool Actor::HasVVCCell(ieResRef resource, bool background)
 	return false;
 }
 
-void Actor::RemoveVVCell(ieResRef resource, bool background)
+void Actor::RemoveVVCell(ieResRef resource, bool background, bool graceful)
 {
 	vvcVector *vvcCells;
 
@@ -1714,8 +1678,12 @@ void Actor::RemoveVVCell(ieResRef resource, bool background)
 			continue;
 		}
 		if ( strnicmp(vvc->ResName, resource, 8) == 0) {
-			delete vvc;
-			(*vvcCells)[i]=NULL;
+			if (graceful) {
+				vvc->EndPhase();
+			} else {
+				delete vvc;
+				(*vvcCells)[i]=NULL;
+			}
 		}
 	}
 }
