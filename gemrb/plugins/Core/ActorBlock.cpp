@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.135 2006/02/09 22:46:11 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.136 2006/03/25 21:58:27 wjpalenstijn Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -1288,12 +1288,10 @@ void Container::DrawPile(bool highlight, Region screen, Color tint)
 	for (int i=0;i<MAX_GROUND_ICON_DRAWN;i++) {
 		if (groundicons[i]) {
 			//draw it with highlight
-			if (highlight) {
-				video->BlitSpriteCovered (groundicons[i], screen.x + Pos.x, screen.y + Pos.y, tint, groundiconcover);
-			} else {
-				//draw with second color transparent too
-				video->BlitSpriteNoShadow (groundicons[i], screen.x + Pos.x, screen.y + Pos.y, tint, groundiconcover);
-			}
+			video->BlitGameSprite(groundicons[i],
+								  screen.x + Pos.x, screen.y + Pos.y,
+								  BLIT_TINTED | (highlight ? 0:BLIT_NOSHADOW),
+								  tint, groundiconcover);
 		}
 	}
 }

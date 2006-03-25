@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.inl,v 1.6 2006/01/27 17:31:01 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.inl,v 1.7 2006/03/25 21:58:27 wjpalenstijn Exp $
  *
  */
 
@@ -41,9 +41,11 @@
 #ifdef BPP16
 #define PTYPE Uint16
 #define PITCHMULT 2
+#define MASK mask16
 #else
 #define PITCHMULT 4
 #define PTYPE Uint32
+#define MASK mask32
 #endif
 
 #ifdef PALETTE_ALPHA
@@ -66,6 +68,20 @@
 
 #endif
 
+#ifdef COVER
+assert(cover);
+#endif
+
+
+#ifndef CUSTOMBLENDING
+#define RVALUE(r,g,b) (r)
+#define GVALUE(r,g,b) (g)
+#define BVALUE(r,g,b) (b)
+#define AVALUE(r,g,b,a) (a)
+#define CUSTOMBLEND(r,g,b,depth)
+#endif
+
+
 // TODO: preconvert palette to surface-specific color values, where possible
 
 #ifdef ALPHA
@@ -74,15 +90,16 @@
 #define BLENDPIXEL(target,cr,cg,cb,ca,curval) \
 do { \
 	if ((ca) != 0) { \
-		dR = (((curval)>>rshift)<<rloss)&0xFF; \
-		dG = (((curval)>>gshift)<<gloss)&0xFF; \
-		dB = (((curval)>>bshift)<<bloss)&0xFF; \
-		dR = 1 + (ca)*((tint.r*(cr)) >> 8) + (dR * (255-(ca))); \
+		dR = (ca)*((tint.r*(cr)) >> 8); \
+		dG = (ca)*((tint.g*(cg)) >> 8); \
+		dB = (ca)*((tint.b*(cb)) >> 8); \
+		CUSTOMBLEND(dR,dG,dB,16); \
+		dR = 1 + dR + ((((curval)>>rshift)<<rloss)&0xFF)*(255-(ca)); \
  		dR = (dR + (dR >> 8)) >> 8; \
-		dG = 1 + (ca)*((tint.g*(cg)) >> 8) + (dG * (255-(ca))); \
+		dG = 1 + dG + ((((curval)>>gshift)<<gloss)&0xFF)*(255-(ca)); \
  		dG = (dG + (dG >> 8)) >> 8; \
-		dB = 1 + (ca)*((tint.b*(cb)) >> 8) + (dB * (255-(ca))); \
- 		dB = (dB + (dB >> 8)) >> 8; \
+		dB = 1 + dB + ((((curval)>>bshift)<<bloss)&0xFF)*(255-(ca)); \
+		dB = (dB + (dB >> 8)) >> 8; \
 		target = (PTYPE) ( ((dR) >> rloss) << rshift \
 						   | ((dG) >> gloss) << gshift \
 						   | ((dB) >> bloss) << bshift); \
@@ -92,20 +109,69 @@ do { \
 #define BLENDPIXEL(target,cr,cg,cb,ca,curval) \
 do { \
 	if ((ca) != 0) { \
-		dR = (((curval)>>rshift)<<rloss)&0xFF; \
-		dG = (((curval)>>gshift)<<gloss)&0xFF; \
-		dB = (((curval)>>bshift)<<bloss)&0xFF; \
-		dR = 1 + (ca)*(cr) + (dR * (255-(ca))); \
+		dR = (ca)*(cr); \
+		dG = (ca)*(cg); \
+		dB = (ca)*(cg); \
+		CUSTOMBLEND(dR,dG,dB,16); \
+		dR = 1 + dR + ((((curval)>>rshift)<<rloss)&0xFF)*(255-(ca)); \
  		dR = (dR + (dR >> 8)) >> 8; \
-		dG = 1 + (ca)*(cg) + (dG * (255-(ca))); \
+		dG = 1 + dG + ((((curval)>>gshift)<<gloss)&0xFF)*(255-(ca)); \
  		dG = (dG + (dG >> 8)) >> 8; \
-		dB = 1 + (ca)*(cb) + (dB * (255-(ca))); \
- 		dB = (dB + (dB >> 8)) >> 8; \
+		dB = 1 + dB + ((((curval)>>bshift)<<bloss)&0xFF)*(255-(ca)); \
+		dB = (dB + (dB >> 8)) >> 8; \
 		target = (PTYPE) ( ((dR) >> rloss) << rshift \
 						   | ((dG) >> gloss) << gshift \
 						   | ((dB) >> bloss) << bshift); \
 	} \
 } while (0)
+#endif
+
+#else
+
+#ifdef HALFALPHA
+
+#ifdef TINT
+
+#define BLENDPIXEL(target,cr,cg,cb,ca,curval) target = ((curval >> 1)&MASK) + \
+					(((PTYPE)( ((tint.r*(cr)) >> (rloss+8)) << rshift  \
+						| ((tint.g*(cg)) >> (gloss+8)) << gshift \
+						| ((tint.b*(cb)) >> (bloss+8)) << bshift)) >> 1)
+
+#else
+
+#define BLENDPIXEL(target,cr,cg,cb,ca,curval) target = ((curval >> 1)&MASK) + \
+					((((PTYPE)( ((cr) >> rloss) << rshift  \
+						| ((cg) >> gloss) << gshift \
+						| ((cb) >> bloss) << bshift)) >> 1)&MASK)
+
+#endif
+
+#else
+
+#ifdef CUSTOMBLENDING
+
+#ifdef TINT
+#define BLENDPIXEL(target,cr,cg,cb,ca,curval) \
+do { \
+	dR = ((tint.r*(cr)) >> 8); \
+	dG = ((tint.g*(cg)) >> 8); \
+	dB = ((tint.b*(cb)) >> 8); \
+	CUSTOMBLEND(dR,dG,dB,8); \
+	target = (PTYPE) ( ((dR) >> rloss) << rshift \
+					   | ((dG) >> gloss) << gshift \
+					   | ((dB) >> bloss) << bshift); \
+} while(0)
+#else
+#define BLENDPIXEL(target,cr,cg,cb,ca,curval) \
+do { \
+	dR = (cr); \
+	dG = (cg); \
+	dB = (cb); \
+	CUSTOMBLEND(dR,dG,dB,8); \
+	target = (PTYPE) ( ((dR) >> rloss) << rshift \
+					   | ((dG) >> gloss) << gshift \
+					   | ((dB) >> bloss) << bshift); \
+} while(0)
 #endif
 
 #else
@@ -119,7 +185,8 @@ do { \
 								   | ((cg) >> gloss) << gshift \
 								   | ((cb) >> bloss) << bshift)
 #endif
-
+#endif
+#endif
 #endif
 
 do {
@@ -139,7 +206,7 @@ do {
 	const int bshift = (TARGET)->format->Bshift;
 	const Color* const col = (PAL)->col;
 
-#ifdef ALPHA
+#if (defined(ALPHA) || defined(CUSTOMBLENDING))
 	unsigned int dR;
 	unsigned int dG;
 	unsigned int dB;
@@ -227,7 +294,7 @@ do {
 #endif
 						{
 							SPECIALPIXEL {
-								BLENDPIXEL(*pix, col[p].r, col[p].g, col[p].b, (ALPHAVALUE), *pix);
+								BLENDPIXEL(*pix, (RVALUE(col[p].r, col[p].g, col[p].b)), (GVALUE(col[p].r, col[p].g, col[p].b)), (BVALUE(col[p].r, col[p].g, col[p].b)), (AVALUE(col[p].r, col[p].g, col[p].b, (ALPHAVALUE))), *pix);
 							}
 						}
 #if defined(COVER) && defined(HIGHLIGHTCOVER)
@@ -330,7 +397,7 @@ do {
 #endif
 					{
 						SPECIALPIXEL {
-							BLENDPIXEL(*pix, col[p].r, col[p].g, col[p].b, (ALPHAVALUE), *pix);
+							BLENDPIXEL(*pix, (RVALUE(col[p].r, col[p].g, col[p].b)), (GVALUE(col[p].r, col[p].g, col[p].b)), (BVALUE(col[p].r, col[p].g, col[p].b)), (AVALUE(col[p].r, col[p].g, col[p].b, (ALPHAVALUE))), *pix);
 						}
 					}
 #if defined(COVER) && defined(HIGHLIGHTCOVER)
@@ -369,3 +436,12 @@ do {
 #undef ALPHA
 #undef ALPHAVALUE
 #undef HIGHLIGHTCOVER
+#undef MASK
+
+#ifndef CUSTOMBLENDING
+#undef RVALUE
+#undef GVALUE
+#undef BVALUE
+#undef AVALUE
+#undef CUSTOMBLEND
+#endif

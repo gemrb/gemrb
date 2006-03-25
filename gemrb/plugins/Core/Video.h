@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.58 2006/02/26 13:34:42 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.59 2006/03/25 21:58:27 wjpalenstijn Exp $
  *
  */
 
@@ -48,6 +48,22 @@ class Palette;
 #else
 #define GEM_EXPORT
 #endif
+
+// Note: not all these flags make sense together. Specifically:
+// NOSHADOW overrides TRANSSHADOW
+enum SpriteBlitFlags {
+	BLIT_TINTED = 1,
+	BLIT_NOSHADOW = 2,
+	BLIT_TRANSSHADOW = 4,
+	BLIT_HALFTRANS = 8,
+	BLIT_GREY = 16,
+	BLIT_RED = 32,
+	BLIT_GLOW = 64, // not implemented in SDLVideo yet
+	BLIT_MIRRORX = 128,
+	BLIT_MIRRORY = 256,
+	BLIT_BLENDED = 512 // not implemented in SDLVideo yet
+	// Note: 8192, 16384, 32768 are used in SDLVideo internally
+};
 
 /**
  * @class Video
@@ -93,14 +109,11 @@ public:
 	// anchor is false. This is different from the other BlitSprite functions.
 	virtual void BlitSpriteRegion(Sprite2D* spr, Region& size, int x, int y,
 		bool anchor = true, Region* clip = NULL) = 0;
-	virtual void BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint,
-		Palette *palette = NULL, Region* clip = NULL) = 0;
-	virtual void BlitSpriteCovered(Sprite2D* spr, int x, int y, Color tint,
-		SpriteCover* cover, Palette *palette = NULL, Region* clip = NULL) = 0;
-	virtual void BlitSpriteNoShadow(Sprite2D* spr, int x, int y, Color tint,
-		SpriteCover* cover, Palette *palette = NULL, Region* clip = NULL) = 0;
-	virtual void BlitSpriteTransShadow(Sprite2D* spr, int x, int y, Color tint,
-		SpriteCover* cover, Palette *palette = NULL, Region* clip = NULL) = 0;
+
+	virtual void BlitGameSprite(Sprite2D* spr, int x, int y,
+								unsigned int flags, Color tint,
+								SpriteCover* cover, Palette *palette = NULL,
+								Region* clip = NULL) = 0;
 	virtual void SetCursor(Sprite2D* up, Sprite2D* down) = 0;
 	/** Sets a temporary cursor when dragging an Item from Inventory */
 	virtual void SetDragCursor(Sprite2D* drag) = 0;

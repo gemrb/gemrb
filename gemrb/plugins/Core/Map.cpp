@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.228 2006/03/19 09:17:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.229 2006/03/25 21:58:27 wjpalenstijn Exp $
  *
  */
 
@@ -766,9 +766,9 @@ void Map::DrawMap(Region screen, GameControl* gc)
 			}
 			while (animcount--) {
 				Animation *anim = a->animation[animcount];
-				video->BlitSpriteTinted( anim->NextFrame(),
+				video->BlitGameSprite( anim->NextFrame(),
 					a->Pos.x + screen.x, a->Pos.y + screen.y,
-					tint, a->palette, &screen );
+					BLIT_TINTED, tint, 0, a->palette, &screen );
 			}
 			a = GetNextAreaAnimation(aniidx,gametime);
 		}

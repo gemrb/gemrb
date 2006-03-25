@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.138 2006/02/26 13:34:43 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.139 2006/03/25 21:58:27 wjpalenstijn Exp $
  *
  */
 
@@ -800,450 +800,342 @@ void SDLVideoDriver::BlitSpriteHalfTrans(Sprite2D* spr, int x, int y,
 	}
 }
 
-
-void SDLVideoDriver::BlitSpriteTinted(Sprite2D* spr, int x, int y, Color tint, 
-									  Palette *palette, Region* clip)
+void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
+									unsigned int flags, Color tint,
+									SpriteCover* cover, Palette *palette,
+									Region* clip)
 {
 	if (!spr->vptr) return;
-
 	if (!spr->BAM) {
-		printMessage( "SDLVideo", "Tinted blit not supported for this sprite\n", LIGHT_RED );
+		printMessage( "SDLVideo", "BlitGameSprite not supported for this sprite\n", LIGHT_RED );
 		BlitSprite(spr, x, y, false, clip);
-	} else {
-		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)spr->vptr;
+		return;
+	}
 
-		Uint8* rle = (Uint8*)spr->pixels;
-		int tx = x - spr->XPos - Viewport.x;
-		int ty = y - spr->YPos - Viewport.y;
-		if (tx > backBuf->w) return;
-		if (tx+spr->Width <= 0) return;
-		SDL_LockSurface(backBuf);
-		if (!palette)
-			palette = data->pal;
+	Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)spr->vptr;
 
-#define SPECIALPIXEL
+	if (!palette)
+		palette = data->pal;
+
+	// implicit flags:
+	const unsigned int blit_COVERED = 8192;
+	const unsigned int blit_TINTALPHA = 16384;
+	const unsigned int blit_PALETTEALPHA = 32768;
+
+	if (cover) flags |= blit_COVERED;
+	if ((flags & BLIT_TINTED) && tint.a != 255) flags |= blit_TINTALPHA;
+	if (palette->alpha) flags |= blit_PALETTEALPHA;
+
+	// flag combinations which are often used:
+	// (ignoring MIRRORX/Y since those are handled conditionally)
+
+	// most game sprites:
+	// covered, BLIT_TINTED
+	// covered, BLIT_TINTED | BLIT_TRANSSHADOW
+	// covered, BLIT_TINTED | BLIT_NOSHADOW
+
+	// area-animations?
+	// BLIT_TINTED
+
+	// (hopefully) most video overlays:
+	// BLIT_HALFTRANS
+	// covered, BLIT_HALFTRANS
+
+	// other combinations use general case
+
+
+	Uint8* rle = (Uint8*)spr->pixels;
+	int tx = x - spr->XPos - Viewport.x;
+	int ty = y - spr->YPos - Viewport.y;
+	if (tx > backBuf->w) return;
+	if (tx+spr->Width <= 0) return;
+	SDL_LockSurface(backBuf);
+
+	bool hflip = data->flip_hor;
+	bool vflip = data->flip_ver;
+	if (flags & BLIT_MIRRORX) hflip = !hflip;
+	if (flags & BLIT_MIRRORY) vflip = !vflip;
+
+	Uint32 shadowcol32 = 0, mask32;
+	Uint16 shadowcol16 = 0, mask16;
+
+	if (flags & BLIT_TRANSSHADOW) {
+		shadowcol32 = SDL_MapRGBA(backBuf->format, palette->col[1].r/2,
+								  palette->col[1].g/2, palette->col[1].b/2, 0);
+		shadowcol16 = (Uint16)shadowcol32;
+	}
+
+	mask32 = (backBuf->format->Rmask >> 1) & backBuf->format->Rmask;
+	mask32 |= (backBuf->format->Gmask >> 1) & backBuf->format->Gmask;
+	mask32 |= (backBuf->format->Bmask >> 1) & backBuf->format->Bmask;
+	mask16 = (Uint16)mask32;
+
+	unsigned int remflags = flags & ~(BLIT_MIRRORX | BLIT_MIRRORY);
+	if (remflags & BLIT_NOSHADOW) remflags &= ~BLIT_TRANSSHADOW;
+
 #define FLIP 
-#define HFLIP_CONDITIONAL data->flip_hor
-#define VFLIP_CONDITIONAL data->flip_ver
+#define HFLIP_CONDITIONAL hflip
+#define VFLIP_CONDITIONAL vflip
 #define RLE data->RLE
 #define PAL palette
-#undef COVER
+#define COVERX (cover->XPos - spr->XPos)
+#define COVERY (cover->YPos - spr->YPos)
+#undef TINT_ALPHA
+#undef PALETTE_ALPHA
+
+	if (remflags == (blit_COVERED | BLIT_TINTED)) {
+
+#define COVER
+#define SPECIALPIXEL
 #define TINT
 
 		if (backBuf->format->BytesPerPixel == 4) {
-
 #undef BPP16
-
-			if (tint.a != 255) {
-
-#define TINT_ALPHA
-
-				if (palette->alpha) {
-#define PALETTE_ALPHA
 #include "SDLVideoDriver.inl"
-				} else {
-#undef PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-				}
-
-			} else {
-
-#undef TINT_ALPHA
-				if (palette->alpha) {
-#define PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-				} else {
-#undef PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-				}
-
-			}
-
 		} else {
-
 #define BPP16
-			if (tint.a != 255) {
-
-#define TINT_ALPHA
-
-				if (palette->alpha) {
-#define PALETTE_ALPHA
 #include "SDLVideoDriver.inl"
-				} else {
-#undef PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-				}
-
-			} else {
-
-#undef TINT_ALPHA
-				if (palette->alpha) {
-#define PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-				} else {
-#undef PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-				}
-
-			}
-
-
 		}
 
-#undef FLIP
-#undef HFLIP_CONDITIONAL
-#undef VFLIP_CONDITIONAL
-#undef RLE
-#undef PAL
+#undef COVER
 #undef TINT
 #undef SPECIALPIXEL
-#undef TINT_ALPHA
-#undef PALETTE_ALPHA
 
-		SDL_UnlockSurface(backBuf);	
-	}
-}
+	} else if (remflags == (blit_COVERED | BLIT_TINTED | BLIT_TRANSSHADOW)) {
 
-
-void SDLVideoDriver::BlitSpriteCovered(Sprite2D* spr, int x, int y,
-									   Color tint, SpriteCover* cover,
-									   Palette *palette, Region* clip)
-{
-	if (!spr->vptr) return;
-
-	if (!spr->BAM) {
-		BlitSpriteTinted(spr, x, y, tint, palette, clip);
-	} else {
-		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)spr->vptr;
-
-		Uint8* rle = (Uint8*)spr->pixels;
-		int tx = x - spr->XPos - Viewport.x;
-		int ty = y - spr->YPos - Viewport.y;
-		if (tx > backBuf->w) return;
-		if (tx+spr->Width <= 0) return;
-		SDL_LockSurface(backBuf);
-		if (!palette)
-			palette = data->pal;
-
-#define SPECIALPIXEL
-#define FLIP 
-#define HFLIP_CONDITIONAL data->flip_hor
-#define VFLIP_CONDITIONAL data->flip_ver
-#define RLE data->RLE
-#define PAL palette
 #define COVER
-#define COVERX (cover->XPos - spr->XPos)
-#define COVERY (cover->YPos - spr->YPos)
 #define TINT
 
 		if (backBuf->format->BytesPerPixel == 4) {
-
 #undef BPP16
-
-			if (tint.a != 255) {
-
-#define TINT_ALPHA
-
-				if (palette->alpha) {
-#define PALETTE_ALPHA
+#define SPECIALPIXEL if (p == 1) { *pix = ((*pix >> 1)&mask32) + shadowcol32; } else
 #include "SDLVideoDriver.inl"
-				} else {
-#undef PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-				}
-
-			} else {
-
-#undef TINT_ALPHA
-				if (palette->alpha) {
-#define PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-				} else {
-#undef PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-				}
-
-			}
-
+#undef SPECIALPIXEL
 		} else {
-
 #define BPP16
-			if (tint.a != 255) {
-
-#define TINT_ALPHA
-
-				if (palette->alpha) {
-#define PALETTE_ALPHA
+#define SPECIALPIXEL if (p == 1) { *pix = ((*pix >> 1)&mask16) + shadowcol16; } else
 #include "SDLVideoDriver.inl"
-				} else {
-#undef PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-				}
-
-			} else {
-
-#undef TINT_ALPHA
-				if (palette->alpha) {
-#define PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-				} else {
-#undef PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-				}
-
-			}
-
-
+#undef SPECIALPIXEL
 		}
 
-#undef FLIP
-#undef HFLIP_CONDITIONAL
-#undef VFLIP_CONDITIONAL
-#undef RLE
-#undef PAL
 #undef COVER
-#undef COVERX
-#undef COVERY
 #undef TINT
-#undef SPECIALPIXEL
-#undef TINT_ALPHA
-#undef PALETTE_ALPHA
 
-		SDL_UnlockSurface(backBuf);
+	} else if (remflags == (blit_COVERED | BLIT_TINTED | BLIT_NOSHADOW)) {
 
-	}
-}
-
-
-// TODO: alpha tints/palettes
-void SDLVideoDriver::BlitSpriteNoShadow(Sprite2D* spr, int x, int y,
-										Color tint, SpriteCover* cover,
-										Palette *palette, Region *clip)
-{
-	if (!spr->vptr) return;
-
-	if (!spr->BAM) {
-		BlitSpriteTinted(spr, x, y, tint, palette, clip);
-	} else {
-		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)spr->vptr;
-
-		Uint8* rle = (Uint8*)spr->pixels;
-		int tx = x - spr->XPos - Viewport.x;
-		int ty = y - spr->YPos - Viewport.y;
-		if (tx > backBuf->w) return;
-		if (tx+spr->Width <= 0) return;
-		if (!palette)
-			palette = data->pal;
-		SDL_LockSurface(backBuf);
-
-#define FLIP 
-#define HFLIP_CONDITIONAL data->flip_hor
-#define VFLIP_CONDITIONAL data->flip_ver
-#define RLE data->RLE
-#define PAL palette
 #define COVER
-#define COVERX (cover->XPos - spr->XPos)
-#define COVERY (cover->YPos - spr->YPos)
 #define TINT
 #define SPECIALPIXEL if (p != 1)
 
 		if (backBuf->format->BytesPerPixel == 4) {
-
 #undef BPP16
-
-			if (tint.a != 255) {
-
-#define TINT_ALPHA
-
-				if (palette->alpha) {
-#define PALETTE_ALPHA
 #include "SDLVideoDriver.inl"
-				} else {
-#undef PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-				}
-
-			} else {
-
-#undef TINT_ALPHA
-				if (palette->alpha) {
-#define PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-				} else {
-#undef PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-				}
-
-			}
-
 		} else {
-
 #define BPP16
-			if (tint.a != 255) {
-
-#define TINT_ALPHA
-
-				if (palette->alpha) {
-#define PALETTE_ALPHA
 #include "SDLVideoDriver.inl"
-				} else {
-#undef PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-				}
-
-			} else {
-
-#undef TINT_ALPHA
-				if (palette->alpha) {
-#define PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-				} else {
-#undef PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-				}
-
-			}
-
-
 		}
 
-#undef FLIP
-#undef HFLIP_CONDITIONAL
-#undef VFLIP_CONDITIONAL
-#undef RLE
-#undef PAL
-#undef COVER
-#undef COVERX
-#undef COVERY
-#undef TINT
 #undef SPECIALPIXEL
+#undef COVER
+#undef TINT
 
-		SDL_UnlockSurface(backBuf);
 
-	}
-}
+	} else if (remflags == BLIT_TINTED) {
 
-// TODO: properly mix translucent shadow and alpha tint/palette
-void SDLVideoDriver::BlitSpriteTransShadow(Sprite2D* spr, int x, int y,
-										   Color tint, SpriteCover* cover,
-										   Palette *palette, Region *clip)
-{
-	if (!spr->vptr) return;
-
-	if (!spr->BAM) {
-		BlitSpriteTinted(spr, x, y, tint, palette, clip);
-	} else {
-		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)spr->vptr;
-
-		Uint8* rle = (Uint8*)spr->pixels;
-		int tx = x - spr->XPos - Viewport.x;
-		int ty = y - spr->YPos - Viewport.y;
-		if (tx > backBuf->w) return;
-		if (tx+spr->Width <= 0) return;
-		if (!palette)
-			palette = data->pal;
-
-		Uint32 shadowcol32 = SDL_MapRGBA(backBuf->format, palette->col[1].r/2, palette->col[1].g/2, palette->col[1].b/2, 0);
-		Uint16 shadowcol16 = (Uint16)shadowcol32;
-
-		Uint32 mask32 = (backBuf->format->Rmask >> 1) & backBuf->format->Rmask;
-		mask32 |= (backBuf->format->Gmask >> 1) & backBuf->format->Gmask;
-		mask32 |= (backBuf->format->Bmask >> 1) & backBuf->format->Bmask;
-		Uint16 mask16 = (Uint16)mask32;
-
-		SDL_LockSurface(backBuf);
-
-#define FLIP 
-#define HFLIP_CONDITIONAL data->flip_hor
-#define VFLIP_CONDITIONAL data->flip_ver
-#define RLE data->RLE
-#define PAL palette
-#define COVER
-#define COVERX (cover->XPos - spr->XPos)
-#define COVERY (cover->YPos - spr->YPos)
+#define SPECIALPIXEL
 #define TINT
 
 		if (backBuf->format->BytesPerPixel == 4) {
-
 #undef BPP16
-#define SPECIALPIXEL if (p == 1) { *pix = ((*pix >> 1)&mask32) + shadowcol32; } else
-
-			if (tint.a != 255) {
-
-#define TINT_ALPHA
-
-				if (palette->alpha) {
-#define PALETTE_ALPHA
 #include "SDLVideoDriver.inl"
-				} else {
-#undef PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-				}
-
-			} else {
-
-#undef TINT_ALPHA
-				if (palette->alpha) {
-#define PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-				} else {
-#undef PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-				}
-
-			}
-
 		} else {
-
 #define BPP16
-#undef SPECIALPIXEL
-#define SPECIALPIXEL if (p == 1) { *pix = ((*pix >> 1)&mask16) + shadowcol16; } else
+#include "SDLVideoDriver.inl"
+		}
 
-			if (tint.a != 255) {
+#undef TINT
+#undef SPECIALPIXEL
+
+	} else if (remflags == BLIT_HALFTRANS) {
+
+#define HALFALPHA
+#define SPECIALPIXEL
+
+		if (backBuf->format->BytesPerPixel == 4) {
+#undef BPP16
+#include "SDLVideoDriver.inl"
+		} else {
+#define BPP16
+#include "SDLVideoDriver.inl"
+		}
+
+#undef HALFALPHA
+#undef SPECIALPIXEL
+
+	} else if (remflags == (blit_COVERED | BLIT_HALFTRANS)) {
+
+#define HALFALPHA
+#define COVER
+#define SPECIALPIXEL
+
+		if (backBuf->format->BytesPerPixel == 4) {
+#undef BPP16
+#include "SDLVideoDriver.inl"
+		} else {
+#define BPP16
+#include "SDLVideoDriver.inl"
+		}
+
+#undef HALFALPHA
+#undef COVER
+#undef SPECIALPIXEL
+
+	} else {
+		// handling the following effects with conditionals:
+		// halftrans
+		// noshadow
+		// transshadow
+		// grey
+		// red
+		// glow (not yet)
+		// blended (not yet)
+
+		// handling the following effects by repeated inclusion:
+		// palettealpha
+		// tinted
+		// covered
+
+//		printf("Unoptimized blit: %04X\n", flags);
+
+#define SPECIALPIXEL   int ia=0; if ((remflags & BLIT_HALFTRANS) || (p == 1 && (remflags & BLIT_TRANSSHADOW))) ia = 1; if (p == 1 && (remflags & BLIT_NOSHADOW)) { } else 
+
+#define CUSTOMBLENDING
+#define RVALUE(r,g,b) (r)
+#define GVALUE(r,g,b) (g)
+#define BVALUE(r,g,b) (b)
+#define AVALUE(r,g,b,a) (a)>>ia
+#define CUSTOMBLEND(r,g,b,depth) do { if (remflags & BLIT_GREY) { unsigned int t = (r)+(g)+(b); t /= 3; (r)=t; (g)=t; (b)=t; } if (remflags & BLIT_RED) { (g)=0;(b)=0; } } while(0)
 
 #define TINT_ALPHA
 
-				if (palette->alpha) {
-#define PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-				} else {
-#undef PALETTE_ALPHA
-#include "SDLVideoDriver.inl"
-				}
+		if (!(remflags & BLIT_TINTED)) tint.a = 255;
 
+		if (remflags & blit_PALETTEALPHA) {
+#define PALETTE_ALPHA
+			if (remflags & blit_COVERED) {
+#define COVER
+				if (remflags & BLIT_TINTED) {
+#define TINT
+					if (backBuf->format->BytesPerPixel == 4) {
+#undef BPP16
+#include "SDLVideoDriver.inl"
+					} else {
+#define BPP16
+#include "SDLVideoDriver.inl"
+					}
+#undef TINT
+				} else {
+					if (backBuf->format->BytesPerPixel == 4) {
+#undef BPP16
+#include "SDLVideoDriver.inl"
+					} else {
+#define BPP16
+#include "SDLVideoDriver.inl"
+					}
+				}
+#undef COVER
 			} else {
-
-#undef TINT_ALPHA
-				if (palette->alpha) {
-#define PALETTE_ALPHA
+				if (remflags & BLIT_TINTED) {
+#define TINT
+					if (backBuf->format->BytesPerPixel == 4) {
+#undef BPP16
 #include "SDLVideoDriver.inl"
+					} else {
+#define BPP16
+#include "SDLVideoDriver.inl"
+					}
+#undef TINT
 				} else {
-#undef PALETTE_ALPHA
+					if (backBuf->format->BytesPerPixel == 4) {
+#undef BPP16
 #include "SDLVideoDriver.inl"
-				}
-
+					} else {
+#define BPP16
+#include "SDLVideoDriver.inl"
+					}
+				} 
 			}
-
-
+#undef PALETTE_ALPHA
+		} else {
+			if (remflags & blit_COVERED) {
+#define COVER
+				if (remflags & BLIT_TINTED) {
+#define TINT
+					if (backBuf->format->BytesPerPixel == 4) {
+#undef BPP16
+#include "SDLVideoDriver.inl"
+					} else {
+#define BPP16
+#include "SDLVideoDriver.inl"
+					}
+#undef TINT
+				} else {
+					if (backBuf->format->BytesPerPixel == 4) {
+#undef BPP16
+#include "SDLVideoDriver.inl"
+					} else {
+#define BPP16
+#include "SDLVideoDriver.inl"
+					}
+				}
+#undef COVER
+			} else {
+				if (remflags & BLIT_TINTED) {
+#define TINT
+					if (backBuf->format->BytesPerPixel == 4) {
+#undef BPP16
+#include "SDLVideoDriver.inl"
+					} else {
+#define BPP16
+#include "SDLVideoDriver.inl"
+					}
+#undef TINT
+				} else {
+					if (backBuf->format->BytesPerPixel == 4) {
+#undef BPP16
+#include "SDLVideoDriver.inl"
+					} else {
+#define BPP16
+#include "SDLVideoDriver.inl"
+					}
+				} 
+			}
 		}
+
+#undef SPECIALPIXEL
+#undef CUSTOMBLENDING
+#undef RVALUE
+#undef GVALUE
+#undef BVALUE
+#undef AVALUE
+#undef CUSTOMBLEND
+#undef TINT_ALPHA
+
+	}
 
 #undef FLIP
 #undef HFLIP_CONDITIONAL
 #undef VFLIP_CONDITIONAL
 #undef RLE
 #undef PAL
-#undef COVER
 #undef COVERX
 #undef COVERY
-#undef TINT
-#undef SPECIALPIXEL
-#undef TINT_ALPHA
-#undef PALETTE_ALPHA
 
-		SDL_UnlockSurface(backBuf);
+	SDL_UnlockSurface(backBuf);
 
-	}
 }
+
+
 
 
 
