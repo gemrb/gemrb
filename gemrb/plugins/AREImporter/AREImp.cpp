@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.153 2006/01/29 13:40:18 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.154 2006/03/25 22:53:16 avenger_teambg Exp $
  *
  */
 
@@ -799,7 +799,7 @@ Map* AREImp::GetMap(const char *ResRef)
 			str->ReadResRef( anim->PaletteRef );
 			str->ReadDword( &anim->unknown48 );
 			AnimationFactory* af = ( AnimationFactory* )
-			core->GetResourceMgr()->GetFactoryResource( anim->BAM, IE_BAM_CLASS_ID );
+				core->GetResourceMgr()->GetFactoryResource( anim->BAM, IE_BAM_CLASS_ID );
 			if (!af) {
 				printf("Cannot load animation: %s\n", anim->BAM);
 				continue;

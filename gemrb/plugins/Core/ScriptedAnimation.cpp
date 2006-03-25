@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.20 2006/03/25 21:58:27 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.21 2006/03/25 22:53:17 avenger_teambg Exp $
  *
  */
 
@@ -160,21 +160,16 @@ retry:
 		Phase = 1;
 		goto retry;
 	}
+	ieDword flag = 0;
 	if (Transparency & IE_VVC_TRANSPARENT) {
-		video->BlitGameSprite( frame, Pos.x + XPos + screen.x,
-							   Pos.y + YPos + screen.y,
-							   BLIT_HALFTRANS,
-							   Color(), 0, 0, &screen);
-//		video->BlitSpriteHalfTrans( frame, Pos.x + XPos + screen.x,
-//			Pos.y + YPos + screen.y, false, &screen );
-		return false;
+		flag |= BLIT_HALFTRANS;
 	}
 	if (Transparency & IE_VVC_BRIGHTEST) {
-		video->BlitSprite( frame, Pos.x + XPos + screen.x,
-			Pos.y + YPos + screen.y, false, &screen );
-	} else {
-		video->BlitSprite( frame, Pos.x + XPos + screen.x,
-			Pos.y + YPos + screen.y, false, &screen );
+		flag |= BLIT_TINTED;
 	}
+
+	video->BlitGameSprite( frame, Pos.x + XPos + screen.x,
+			   Pos.y + YPos + screen.y, flag,
+			   Color(), 0, 0, &screen);
 	return false;
 }

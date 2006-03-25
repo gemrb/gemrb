@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.229 2006/03/25 21:58:27 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.230 2006/03/25 22:53:17 avenger_teambg Exp $
  *
  */
 
@@ -620,35 +620,20 @@ void Map::UpdateScripts()
 //there is a similar function in Actors for mobile vvcs
 void Map::DrawVideocells(Region screen)
 {
-	Video* video = core->GetVideoDriver();
-
 	for (unsigned int i = 0; i < vvcCells.size(); i++) {
 		ScriptedAnimation* vvc = vvcCells[i];
 		if (!vvc)
 			continue;
-		if (!vvc->anims[0])
-			continue;
-		if (vvc->anims[0]->endReached) {
-			vvcCells[i] = NULL;
-			delete( vvc );
-			continue;
-		}
-		if (vvc->justCreated) {
-			vvc->justCreated = false;
-			if (vvc->Sounds[0][0] != 0) {
-				core->GetSoundMgr()->Play( vvc->Sounds[0] );
-			}
-		}
-		Sprite2D* frame = vvc->anims[0]->NextFrame();
-		if (!frame)
-			continue;
-		if (vvc->Transparency & IE_VVC_BRIGHTEST) {
-			video->BlitSprite( frame, vvc->XPos + screen.x,
-					vvc->YPos + screen.y, false, &screen );
-		} else {
-			video->BlitSprite( frame, vvc->XPos + screen.x,
-					vvc->YPos + screen.y, false, &screen );
-		}
+
+		Point Pos(0,0); //this is unsure
+
+                // actually this is better be drawn by the vvc
+                bool endReached = vvc->Draw(screen, Pos);
+                if (endReached) {
+                        vvcCells[i] = NULL;
+                        delete( vvc );
+                        continue;
+                }
 	}
 }
 
