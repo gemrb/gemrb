@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.41 2006/01/29 13:40:19 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.42 2006/03/26 12:39:17 avenger_teambg Exp $
  *
  */
 
@@ -156,13 +156,15 @@ Sprite2D* Animation::NextFrame(void)
 		if (indicesCount) {
 			if (Flags&A_ANI_PLAYONCE) {
 				pos = indicesCount-1;
+				endReached = true;
 			} else {
 				pos = pos%indicesCount;
+				endReached = false; //looping, there is no end
 			}
 		} else {
 			pos = 0;
+			endReached = true;
 		}
-		endReached = true;
 		starttime = 0;
 	}
 	return ret;

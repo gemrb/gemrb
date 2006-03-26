@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.105 2006/03/25 15:21:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.106 2006/03/26 12:39:17 avenger_teambg Exp $
  *
  */
 
@@ -316,7 +316,7 @@ public:
 	/* deals damage to this actor */
 	int Damage(int damage, int damagetype, Actor *hitter);
 	/* drops items from inventory to current spot */
-	void DropItem(ieResRef resref, unsigned int flags);
+	void DropItem(const ieResRef resref, unsigned int flags);
 	/* returns true if the actor is PC/joinable*/
 	bool Persistent();
 	/* assigns actor to party slot, 0 = NPC, areas won't remove it */
@@ -332,7 +332,7 @@ public:
 	/* debug function */
 	void GetNextStance();
 	/* learns the given spell, possibly receive XP */
-	int LearnSpell(ieResRef resref, ieDword flags);
+	int LearnSpell(const ieResRef resref, ieDword flags);
 	/* Returns weapon range */
 	int GetWeaponRange();
 	/* Creates player statistics */
@@ -353,7 +353,7 @@ public:
 	bool Schedule(ieDword gametime);
 	/* overridden method, won't walk if dead */
 	void WalkTo(Point &Des, ieDword flags, int MinDistance = 0);
-	/* resolve string constant */
+	/* resolve string constant (sound will be altered) */
 	void ResolveStringConstant(ieResRef sound, unsigned int index);
 	/* updates the quick slots */
 	void GetActionButtonRow(ActionButtonRow &qs, int translation);
@@ -367,13 +367,13 @@ public:
 	/* add mobile vvc (spell effects) to actor's list */
 	void AddVVCell(ScriptedAnimation* vvc, bool background);
 	/* remove a vvc from the list, graceful means animated removal */
-	void RemoveVVCell(ieResRef vvcname, bool background, bool graceful);
+	void RemoveVVCell(const ieResRef vvcname, bool background, bool graceful);
 	/* returns true if actor already has the overlay */
-	bool HasVVCCell(ieResRef resource, bool background);
+	bool HasVVCCell(const ieResRef resource, bool background);
 	/* draw videocells */
-	void DrawVideocells(Region &screen, vvcVector &vvcCells);
+	void DrawVideocells(Region &screen, vvcVector &vvcCells, Color &tint);
 
-	void add_animation(ieResRef resource, Point &offset, int gradient, bool background);
+	void add_animation(const ieResRef resource, Point &offset, int gradient, bool background);
 	void PlayDamageAnimation(int x);
 };
 #endif

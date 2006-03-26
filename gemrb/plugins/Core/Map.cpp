@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.230 2006/03/25 22:53:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.231 2006/03/26 12:39:17 avenger_teambg Exp $
  *
  */
 
@@ -618,6 +618,7 @@ void Map::UpdateScripts()
 }
 
 //there is a similar function in Actors for mobile vvcs
+//this probably needs an additional container object which stores position, duration etc
 void Map::DrawVideocells(Region screen)
 {
 	for (unsigned int i = 0; i < vvcCells.size(); i++) {
@@ -625,15 +626,17 @@ void Map::DrawVideocells(Region screen)
 		if (!vvc)
 			continue;
 
-		Point Pos(0,0); //this is unsure
+		Point Pos(0,0); //we need the position of the vvc on the area
 
-                // actually this is better be drawn by the vvc
-                bool endReached = vvc->Draw(screen, Pos);
-                if (endReached) {
-                        vvcCells[i] = NULL;
-                        delete( vvc );
-                        continue;
-                }
+		Color tint = LightMap->GetPixel( Pos.x / 16, Pos.y / 12);
+		tint.a = 255;
+		
+		bool endReached = vvc->Draw(screen, Pos, tint);
+		if (endReached) {
+			vvcCells[i] = NULL;
+			delete( vvc );
+			continue;
+		}
 	}
 }
 

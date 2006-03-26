@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.21 2006/03/25 22:53:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.22 2006/03/26 12:39:17 avenger_teambg Exp $
  *
  */
 
@@ -30,20 +30,37 @@
 /* Creating animation from BAM */
 ScriptedAnimation::ScriptedAnimation(AnimationFactory *af, Point &p)
 {
-	anims[0] = af->GetCycle( 0 );
-	anims[1] = NULL;
+	//getcycle returns NULL if there is no such cycle
+	for(unsigned int i=0;i<3;i++) {
+		anims[i] = af->GetCycle( i );
+		palettes[i] = NULL;
+		sounds[i][0] = 0;
+		if (anims[i]) {
+			anims[i]->pos=0;
+			anims[i]->gameAnimation=true;
+		}
+	}
+	//if there is no hold anim, move the onset anim there
+	if (!anims[P_HOLD]) {
+		anims[P_HOLD]=anims[P_ONSET];
+		anims[P_ONSET]=NULL;
+	}
+	//onset and release phases are to be played only once
+	if (anims[P_ONSET])
+		anims[P_ONSET]->Flags |= S_ANI_PLAYONCE;
+	if (anims[P_RELEASE])
+		anims[P_RELEASE]->Flags |= S_ANI_PLAYONCE;
+
 	Transparency = 0;
 	SequenceFlags = 0;
 	XPos = YPos = ZPos = 0;
 	FrameRate = 15;
 	FaceTarget = 0;
-	Sounds[0][0] = 0;
-	Sounds[1][0] = 0;
 	XPos += p.x;
 	YPos += p.y;
 	justCreated = true;
 	memcpy(ResName, af->ResRef, 8);
-	Phase = 0;
+	Phase = P_ONSET;
 }
 
 /* Creating animation from VVC */
@@ -51,13 +68,19 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, Point &p, bool autoFree
 {
 	anims[0] = NULL;
 	anims[1] = NULL;
+	anims[2] = NULL;
+	palettes[0] = NULL;
+	palettes[1] = NULL;
+	palettes[2] = NULL;
+	sounds[0][0] = 0;
+	sounds[1][0] = 0;
+	sounds[2][0] = 0;
+
 	Transparency = 0;
 	SequenceFlags = 0;
 	XPos = YPos = ZPos = 0;
 	FrameRate = 15;
 	FaceTarget = 0;
-	Sounds[0][0] = 0;
-	Sounds[1][0] = 0;
 	if (!stream) {
 		return;
 	}
@@ -71,10 +94,12 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, Point &p, bool autoFree
 			delete( stream );
 		return;
 	}
-	ieResRef Anim1ResRef, Anim2ResRef;
+	ieResRef Anim1ResRef;  
 	ieDword seq1, seq2;
 	stream->ReadResRef( Anim1ResRef );
-	stream->ReadResRef( Anim2ResRef );
+	//there is no proof it is a second resref
+	//stream->ReadResRef( Anim2ResRef );
+	stream->Seek( 8, GEM_CURRENT_POS );
 	stream->ReadDword( &Transparency );
 	stream->Seek( 4, GEM_CURRENT_POS );
 	stream->ReadDword( &SequenceFlags );
@@ -90,20 +115,32 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, Point &p, bool autoFree
 	stream->ReadDword( &seq1 );
 	stream->ReadDword( &seq2 );
 	stream->Seek( 8, GEM_CURRENT_POS );
-	stream->ReadResRef( Sounds[0] );
-	stream->ReadResRef( Sounds[1] );
+	stream->ReadResRef( sounds[P_ONSET] );
+	stream->ReadResRef( sounds[P_HOLD] );
+
 	AnimationFactory* af = ( AnimationFactory* )
 		core->GetResourceMgr()->GetFactoryResource( Anim1ResRef, IE_BAM_CLASS_ID );
-	anims[0] = af->GetCycle( ( unsigned char ) seq1 );
-	anims[1] = af->GetCycle( ( unsigned char ) seq2 );
-	XPos += p.x;
-	YPos += p.y;
-	if (anims[0]) {
-		anims[0]->pos = 0;
+	//no idea about vvc phases, i think they got no endphase?
+	//they certainly got onset and hold phases
+	anims[P_ONSET] = af->GetCycle( ( unsigned char ) seq1 );
+	if (anims[P_ONSET]) {
+		//creature anims may start at random position, vvcs always start on 0
+		anims[P_ONSET]->pos=0;
+		//vvcs are always paused
+		anims[P_ONSET]->gameAnimation=true;
+	}
+
+	anims[P_HOLD] = af->GetCycle( ( unsigned char ) seq2 );  
+	if (anims[P_HOLD]) {
+		anims[P_HOLD]->pos=0;
+		anims[P_HOLD]->gameAnimation=true;
 		if (!(SequenceFlags&IE_VVC_LOOP) ) {
-			anims[0]->Flags |= 8; //A_ANI_PLAYONCE;
+			anims[P_HOLD]->Flags |= S_ANI_PLAYONCE;
 		}
 	}
+
+	XPos += p.x;
+	YPos += p.y;
 	justCreated = true;
 
 	//copying resource name to the object, so it could be referenced by it
@@ -112,7 +149,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, Point &p, bool autoFree
 	for(int i=0;i<8;i++) {
 		if (ResName[i]=='.') ResName[i]=0;
 	}
-	Phase = 0;
+	Phase = P_ONSET;
 
 	if (autoFree) {
 		delete( stream );
@@ -121,31 +158,66 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, Point &p, bool autoFree
 
 ScriptedAnimation::~ScriptedAnimation(void)
 {
-	if (anims[0]) {
-		delete( anims[0] );
-	}
-	if (anims[1]) {
-		delete( anims[1] );
+	Video *video = core->GetVideoDriver();
+
+	for(unsigned int i=0;i<3;i++) {
+		if (anims[i]) {
+			delete( anims[i] );
+		}
+		video->FreePalette(palettes[i]);
 	}
 }
 
-void ScriptedAnimation::EndPhase()
+void ScriptedAnimation::SetPhase(int arg)
 {
-	Phase = 1;
+	if (arg>=0 && arg<=2)
+		Phase = arg;
 }
 
-bool ScriptedAnimation::Draw(Region &screen, Point &Pos)
+void ScriptedAnimation::SetSound(int arg, const ieResRef sound)
+{
+	if (arg>=0 && arg<=2)
+		memcpy(sounds[arg],sound,sizeof(sound));
+}
+
+void ScriptedAnimation::SetPalette(int gradient, int start)
+{
+	unsigned int i;
+
+	for(i=0;i<3;i++) {
+		if (!palettes[i] && anims[i]) {
+			// We copy the palette of its first frame into our own palette
+			palettes[i]=core->GetVideoDriver()->GetPalette(anims[i]->GetFrame(0))->Copy();
+		}
+	}
+
+	//default start
+	if (start==-1) {
+		start=4;
+	}
+	unsigned int size = 12;
+	Color* NewPal = core->GetPalette( gradient&255, size );
+
+	for(i=0;i<3;i++) {
+		if (palettes[i]) {
+			memcpy( &palettes[i]->col[start], NewPal, size*sizeof( Color ) );
+		}
+	}
+	free( NewPal );
+}
+
+bool ScriptedAnimation::Draw(Region &screen, Point &Pos, Color &tint)
 {
 	Video *video = core->GetVideoDriver();
 
 	if (justCreated) {
 		justCreated = false;
-		if (!anims[0]) {
-			Phase = 1;
+		if (!anims[P_ONSET]) {
+			Phase = P_HOLD;
 		}
 retry:
-		if (Sounds[Phase][0] != 0) {
-			core->GetSoundMgr()->Play( Sounds[Phase] );
+		if (sounds[Phase][0] != 0) {
+			core->GetSoundMgr()->Play( sounds[Phase] );
 		}
 	}
 
@@ -153,23 +225,25 @@ retry:
 		return true;
 	}
 	Sprite2D* frame = anims[Phase]->NextFrame();
-	if (!frame) {
+	//automatically slip from onset to hold
+	if (!frame || anims[Phase]->endReached) {
 		if (Phase) {
 			return true;
 		}
-		Phase = 1;
+		Phase = P_HOLD;
 		goto retry;
 	}
 	ieDword flag = 0;
 	if (Transparency & IE_VVC_TRANSPARENT) {
 		flag |= BLIT_HALFTRANS;
 	}
+
 	if (Transparency & IE_VVC_BRIGHTEST) {
 		flag |= BLIT_TINTED;
 	}
 
 	video->BlitGameSprite( frame, Pos.x + XPos + screen.x,
-			   Pos.y + YPos + screen.y, flag,
-			   Color(), 0, 0, &screen);
+		 Pos.y + YPos + screen.y, flag,
+		 tint, 0, palettes[Phase], &screen);
 	return false;
 }

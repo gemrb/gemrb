@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.169 2006/03/25 21:58:27 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.170 2006/03/26 12:39:17 avenger_teambg Exp $
  *
  */
 
@@ -401,7 +401,8 @@ void pcf_entangle(Actor *actor, ieDword Value)
 	if (Value) {
 		if (actor->HasVVCCell(overlay[OV_ENTANGLE], false))
 			return;
-		actor->add_animation(overlay[OV_ENTANGLE], dummypoint, 0, false);
+		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_ENTANGLE], dummypoint);
+		actor->AddVVCell(sca, false);
 	} else {
 		actor->RemoveVVCell(overlay[OV_ENTANGLE], false, true);
 	}
@@ -422,15 +423,17 @@ void pcf_sanctuary(Actor *actor, ieDword Value)
 	}
 }
 
-//de/activates the prot from missiles background
+//de/activates the prot from missiles overlay
 void pcf_shieldglobe(Actor *actor, ieDword Value)
 {
 	if (Value) {
-		if (actor->HasVVCCell(overlay[OV_SHIELDGLOBE], true))
+		if (actor->HasVVCCell(overlay[OV_SHIELDGLOBE], false))
 			return;
-		actor->add_animation(overlay[OV_SHIELDGLOBE], dummypoint, 0, true);
+		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_SHIELDGLOBE], dummypoint);
+		sca->Transparency|=IE_VVC_TRANSPARENT;
+		actor->AddVVCell(sca, false);		
 	} else {
-		actor->RemoveVVCell(overlay[OV_SHIELDGLOBE], true, true);
+		actor->RemoveVVCell(overlay[OV_SHIELDGLOBE], false, true);
 	}
 }
 
@@ -461,6 +464,7 @@ void pcf_grease(Actor *actor, ieDword Value)
 }
 
 //de/activates the web overlay
+//the web effect also immobilizes the actor!
 void pcf_web(Actor *actor, ieDword Value)
 {
 	if (Value) {
@@ -606,7 +610,7 @@ static void InitActorTables()
 //the area's vvc's are the stationary effects
 //the actor's vvc's are moving with the actor
 //this method adds a vvc to the actor
-void Actor::add_animation(ieResRef resource, Point &offset, int gradient, bool background)
+void Actor::add_animation(const ieResRef resource, Point &offset, int gradient, bool background)
 {
 	if (gradient!=-1) {
 		//palette
@@ -1096,7 +1100,7 @@ bool Actor::CheckOnDeath()
 }
 
 /* this will create a heap at location, and transfer the item(s) */
-void Actor::DropItem(ieResRef resref, unsigned int flags)
+void Actor::DropItem(const ieResRef resref, unsigned int flags)
 {
 	inventory.DropItemAtLocation( resref, flags, area, Pos );
 }
@@ -1177,7 +1181,7 @@ void Actor::GetNextStance()
 	SetStance( Stance );
 }
 
-int Actor::LearnSpell(ieResRef spellname, ieDword flags)
+int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 {
 	if (spellbook.HaveSpell(spellname, 0) ) {
 		return LSR_KNOWN;
@@ -1371,14 +1375,14 @@ void Actor::WalkTo(Point &Des, ieDword flags, int MinDistance)
 }
 
 //there is a similar function in Map for stationary vvcs
-void Actor::DrawVideocells(Region &screen, vvcVector &vvcCells)
+void Actor::DrawVideocells(Region &screen, vvcVector &vvcCells, Color &tint)
 {
 	for (unsigned int i = 0; i < vvcCells.size(); i++) {
 		ScriptedAnimation* vvc = vvcCells[i];
 		if (!vvc)
 			continue;
 		// actually this is better be drawn by the vvc
-		bool endReached = vvc->Draw(screen, Pos);
+		bool endReached = vvc->Draw(screen, Pos, tint);
 		if (endReached) {
 			vvcCells[i] = NULL;
 			delete( vvc );
@@ -1412,9 +1416,6 @@ void Actor::Draw(Region &screen)
 		//turning actor inactive if there is no action next turn
 		InternalFlags|=IF_IDLE;
 	}
-
-	//draw videocells under the actor
-	DrawVideocells(screen, vvcShields);
 
 	//visual feedback
 	CharAnimations* ca = GetAnims();
@@ -1450,6 +1451,12 @@ void Actor::Draw(Region &screen)
 	if (Trans>255) {
 		return;
 	}
+
+	Color tint = area->LightMap->GetPixel( cx / 16, cy / 12);
+	tint.a = 255-Trans;
+
+	//draw videocells under the actor
+	DrawVideocells(screen, vvcShields, tint);
 
 	Video* video = core->GetVideoDriver();
 	Region vp = video->GetViewport();
@@ -1492,9 +1499,6 @@ void Actor::Draw(Region &screen)
 				nextFrame = anim->GetSyncedNextFrame(masteranim);
 			}
 			if (nextFrame && BBox.InsideRegion( vp ) ) {
-				Color tint = area->LightMap->GetPixel( cx / 16, cy / 12);
-				tint.a = 255-Trans;
-
 				SpriteCover* sc = GetSpriteCover();
 				if (!sc || !sc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height)) {
 					delete sc;
@@ -1519,7 +1523,7 @@ void Actor::Draw(Region &screen)
 	}
 		
 	//draw videocells over the actor
-	DrawVideocells(screen, vvcOverlays);
+	DrawVideocells(screen, vvcOverlays, tint);
 
 	//text feedback
 	DrawOverheadText(screen);
@@ -1638,7 +1642,7 @@ void Actor::SetSoundFolder(const char *soundset)
 	}
 }
 
-bool Actor::HasVVCCell(ieResRef resource, bool background)
+bool Actor::HasVVCCell(const ieResRef resource, bool background)
 {
 	vvcVector *vvcCells;
 
@@ -1660,7 +1664,7 @@ bool Actor::HasVVCCell(ieResRef resource, bool background)
 	return false;
 }
 
-void Actor::RemoveVVCell(ieResRef resource, bool background, bool graceful)
+void Actor::RemoveVVCell(const ieResRef resource, bool background, bool graceful)
 {
 	vvcVector *vvcCells;
 
@@ -1677,7 +1681,7 @@ void Actor::RemoveVVCell(ieResRef resource, bool background, bool graceful)
 		}
 		if ( strnicmp(vvc->ResName, resource, 8) == 0) {
 			if (graceful) {
-				vvc->EndPhase();
+				vvc->SetPhase(P_RELEASE);
 			} else {
 				delete vvc;
 				(*vvcCells)[i]=NULL;
