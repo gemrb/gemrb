@@ -4,6 +4,8 @@
 #include "DataStream.h"
 #include "AnimationFactory.h"
 #include "Palette.h"
+#include "SpriteCover.h"
+#include "Map.h"
 
 #ifdef WIN32
 
@@ -21,12 +23,14 @@
 #define S_ANI_PLAYONCE        8        //(same as area animation)
 
 #define IE_VVC_TRANSPARENT	0x00000002
-#define IE_VVC_BRIGHTEST	0x00000008
-#define IE_VVC_GREYSCALE	0x00080000
-#define IE_VVC_GLOWING  	0x00200000
-#define IE_VVC_RED_TINT		0x02000000
+#define IE_VVC_BRIGHTEST	  0x00000008
+#define IE_VVC_GREYSCALE	  0x00080000
+#define IE_VVC_GLOWING  	  0x00200000
+#define IE_VVC_RED_TINT		  0x02000000
 
 #define IE_VVC_LOOP			0x00000001
+#define IE_VVC_BAM      0x00000008
+#define IE_VVC_NOCOVER  0x00000040
 
 //phases
 #define P_ONSET   0
@@ -51,15 +55,20 @@ public:
 	bool justCreated;
 	ieResRef ResName;
 	int Phase;
+	SpriteCover* cover;
 public:
 	//draws the next frame of the videocell
-	bool Draw(Region &screen, Point &Pos, Color &tint);
+	bool Draw(Region &screen, Point &Pos, Color &tint, Map *area, int dither);
 	//sets phase (0-2)
 	void SetPhase(int arg);
 	//sets sound for phase (p_onset, p_hold, p_release)
 	void SetSound(int arg, const ieResRef sound);
 	//sets gradient colour slot to gradient
 	void SetPalette(int gradient, int start=-1);
+	//sets spritecover
+	void SetSpriteCover(SpriteCover* c) { delete cover; cover = c; }
+	/* get stored SpriteCover */
+	SpriteCover* GetSpriteCover() const { return cover; }
 };
 
 #endif

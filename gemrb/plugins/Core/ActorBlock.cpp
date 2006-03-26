@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.136 2006/03/25 21:58:27 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.137 2006/03/26 16:06:25 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -453,6 +453,12 @@ Selectable::Selectable(ScriptableType type)
 	circleBitmap[1] = NULL;
 }
 
+void Selectable::SetSpriteCover(SpriteCover* c)
+{
+	delete cover;
+	cover = c;
+}
+
 Selectable::~Selectable(void)
 {
 	delete cover;
@@ -516,8 +522,7 @@ void Selectable::Select(int Value)
 		Selected = Value;
 	}
 	//forcing regeneration of the cover
-	delete cover;
-	cover = NULL;
+	SetSpriteCover(NULL);
 }
 
 void Selectable::SetCircle(int circlesize, Color color, Sprite2D* normal_circle, Sprite2D* selected_circle)
@@ -1289,9 +1294,9 @@ void Container::DrawPile(bool highlight, Region screen, Color tint)
 		if (groundicons[i]) {
 			//draw it with highlight
 			video->BlitGameSprite(groundicons[i],
-								  screen.x + Pos.x, screen.y + Pos.y,
-								  BLIT_TINTED | (highlight ? 0:BLIT_NOSHADOW),
-								  tint, groundiconcover);
+				screen.x + Pos.x, screen.y + Pos.y,
+				BLIT_TINTED | (highlight ? 0:BLIT_NOSHADOW),
+				tint, groundiconcover);
 		}
 	}
 }
@@ -1330,9 +1335,10 @@ void Container::CreateGroundIconCover()
 	{
 		delete groundiconcover;
 		groundiconcover = 0;
-		if (width*height > 0)
+		if (width*height > 0) {
 			groundiconcover = GetCurrentArea()->BuildSpriteCover
 				(Pos.x, Pos.y, xpos, ypos, width, height, WantDither());
+		}
 	}
 
 	// TODO: remove this checking code eventually

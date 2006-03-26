@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.22 2006/03/26 12:39:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.23 2006/03/26 16:06:25 avenger_teambg Exp $
  *
  */
 
@@ -30,6 +30,7 @@
 /* Creating animation from BAM */
 ScriptedAnimation::ScriptedAnimation(AnimationFactory *af, Point &p)
 {
+	cover = NULL;
 	//getcycle returns NULL if there is no such cycle
 	for(unsigned int i=0;i<3;i++) {
 		anims[i] = af->GetCycle( i );
@@ -60,12 +61,13 @@ ScriptedAnimation::ScriptedAnimation(AnimationFactory *af, Point &p)
 	YPos += p.y;
 	justCreated = true;
 	memcpy(ResName, af->ResRef, 8);
-	Phase = P_ONSET;
+	SetPhase(P_ONSET);
 }
 
 /* Creating animation from VVC */
 ScriptedAnimation::ScriptedAnimation(DataStream* stream, Point &p, bool autoFree)
 {
+	cover = NULL;
 	anims[0] = NULL;
 	anims[1] = NULL;
 	anims[2] = NULL;
@@ -118,24 +120,26 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, Point &p, bool autoFree
 	stream->ReadResRef( sounds[P_ONSET] );
 	stream->ReadResRef( sounds[P_HOLD] );
 
-	AnimationFactory* af = ( AnimationFactory* )
-		core->GetResourceMgr()->GetFactoryResource( Anim1ResRef, IE_BAM_CLASS_ID );
-	//no idea about vvc phases, i think they got no endphase?
-	//they certainly got onset and hold phases
-	anims[P_ONSET] = af->GetCycle( ( unsigned char ) seq1 );
-	if (anims[P_ONSET]) {
-		//creature anims may start at random position, vvcs always start on 0
-		anims[P_ONSET]->pos=0;
-		//vvcs are always paused
-		anims[P_ONSET]->gameAnimation=true;
-	}
+	if (SequenceFlags&IE_VVC_BAM) {
+		AnimationFactory* af = ( AnimationFactory* )
+			core->GetResourceMgr()->GetFactoryResource( Anim1ResRef, IE_BAM_CLASS_ID );
+		//no idea about vvc phases, i think they got no endphase?
+		//they certainly got onset and hold phases
+		anims[P_ONSET] = af->GetCycle( ( unsigned char ) seq1 );
+		if (anims[P_ONSET]) {
+			//creature anims may start at random position, vvcs always start on 0
+			anims[P_ONSET]->pos=0;
+			//vvcs are always paused
+			anims[P_ONSET]->gameAnimation=true;
+		}
 
-	anims[P_HOLD] = af->GetCycle( ( unsigned char ) seq2 );  
-	if (anims[P_HOLD]) {
-		anims[P_HOLD]->pos=0;
-		anims[P_HOLD]->gameAnimation=true;
-		if (!(SequenceFlags&IE_VVC_LOOP) ) {
-			anims[P_HOLD]->Flags |= S_ANI_PLAYONCE;
+		anims[P_HOLD] = af->GetCycle( ( unsigned char ) seq2 );  
+		if (anims[P_HOLD]) {
+			anims[P_HOLD]->pos=0;
+			anims[P_HOLD]->gameAnimation=true;
+			if (!(SequenceFlags&IE_VVC_LOOP) ) {
+				anims[P_HOLD]->Flags |= S_ANI_PLAYONCE;
+		  }
 		}
 	}
 
@@ -149,7 +153,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, Point &p, bool autoFree
 	for(int i=0;i<8;i++) {
 		if (ResName[i]=='.') ResName[i]=0;
 	}
-	Phase = P_ONSET;
+	SetPhase(P_ONSET);
 
 	if (autoFree) {
 		delete( stream );
@@ -172,6 +176,7 @@ void ScriptedAnimation::SetPhase(int arg)
 {
 	if (arg>=0 && arg<=2)
 		Phase = arg;
+	SetSpriteCover(NULL);
 }
 
 void ScriptedAnimation::SetSound(int arg, const ieResRef sound)
@@ -206,7 +211,7 @@ void ScriptedAnimation::SetPalette(int gradient, int start)
 	free( NewPal );
 }
 
-bool ScriptedAnimation::Draw(Region &screen, Point &Pos, Color &tint)
+bool ScriptedAnimation::Draw(Region &screen, Point &Pos, Color &tint, Map *area, int dither)
 {
 	Video *video = core->GetVideoDriver();
 
@@ -242,8 +247,18 @@ retry:
 		flag |= BLIT_TINTED;
 	}
 
-	video->BlitGameSprite( frame, Pos.x + XPos + screen.x,
-		 Pos.y + YPos + screen.y, flag,
-		 tint, 0, palettes[Phase], &screen);
+	int cx = Pos.x + XPos;
+	int cy = Pos.y + YPos;
+	if (cover && ( (SequenceFlags&IE_VVC_NOCOVER) || 
+		(!cover->Covers(cx, cy, frame->XPos, frame->YPos, frame->Width, frame->Height))) ) {
+		SetSpriteCover(NULL);
+	}
+	if (!(cover || (SequenceFlags&IE_VVC_NOCOVER)) ) {    
+		cover = area->BuildSpriteCover(cx, cy, -anims[Phase]->animArea.x, 
+			-anims[Phase]->animArea.y, anims[Phase]->animArea.w, anims[Phase]->animArea.h, dither);
+		assert(cover->Covers(cx, cy, frame->XPos, frame->YPos, frame->Width, frame->Height));
+	}
+
+	video->BlitGameSprite( frame, cx + screen.x, cy + screen.y, flag, tint, cover, palettes[Phase], &screen);
 	return false;
 }

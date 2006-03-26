@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.50 2006/03/24 14:44:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.51 2006/03/26 16:06:25 avenger_teambg Exp $
  *
  */
 
@@ -371,19 +371,26 @@ Effect *EffectQueue::HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDw
 //this function does IDS targeting for effects (extra damage/thac0 against creature)
 static int ids_stats[7]={IE_EA, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, IE_SEX, IE_ALIGNMENT};
 
-Effect *EffectQueue::HasOpcodeMatchingCreature(ieDword opcode, Actor *actor)
+int EffectQueue::BonusAgainstCreature(ieDword opcode, Actor *actor)
 {
-	for (ieDword ids=0; ids<7;ids++) {
-		Effect *tmp = HasOpcodeWithParamPair(opcode, ids+2, 0);
-		if (tmp) {
-			return tmp;
+	int sum = 0;
+	std::vector< Effect* >::iterator f;
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
+		MATCH_OPCODE();
+		MATCH_LIVE_FX();
+		ieDword ids = (*f)->Parameter2;
+		if (ids<2 || ids>9) {
+			ids=2;
 		}
-		tmp = HasOpcodeWithParamPair(opcode, ids+2, actor->GetStat(ids_stats[ids]) );
-		if (tmp) {
-			return tmp;
+		ieDword param1 = actor->GetStat(ids_stats[ids-2]);
+		if ( (*f)->Parameter1) {
+			MATCH_PARAM1();
 		}
+		int val = (int) (*f)->Parameter3;
+		if (!val) val = 2;
+		sum += val;
 	}
-	return NULL;
+	return sum;
 }
 
 //useful for immunity vs spell, can't use item, etc.

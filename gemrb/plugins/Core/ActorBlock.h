@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.100 2006/02/09 22:46:11 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.101 2006/03/26 16:06:25 avenger_teambg Exp $
  *
  */
 
@@ -223,8 +223,9 @@ public:
 	Color overColor;
 	Sprite2D *circleBitmap[2];
 	int size;
-        // current SpriteCover for wallgroups
-        SpriteCover* cover;
+private:
+	// current SpriteCover for wallgroups
+	SpriteCover* cover;
 public:
 	void SetBBox(Region &newBBox);
 	void DrawCircle(Region &vp);
@@ -234,10 +235,10 @@ public:
 	void Select(int Value);
 	void SetCircle(int size, Color color, Sprite2D* normal_circle, Sprite2D* selected_circle);
 
-        /* store SpriteCover */
-        void SetSpriteCover(SpriteCover* c) { cover = c; }
-        /* get stored SpriteCover */
-        SpriteCover* GetSpriteCover() const { return cover; }
+	/* store SpriteCover */
+	void SetSpriteCover(SpriteCover* c);
+	/* get stored SpriteCover */
+	SpriteCover* GetSpriteCover() const { return cover; }
 	/* want dithered SpriteCover */
 	int WantDither();
 };
@@ -378,9 +379,9 @@ public:
 	ieResRef Dialog;
 private:
 	void ToggleTiles(int State, bool playsound = false);
-  void ImpedeBlocks(int count, Point *points, unsigned int value);
+	void ImpedeBlocks(int count, Point *points, unsigned int value);
 	void UpdateDoor();
-  bool BlockedOpen(bool Open, bool ForceOpen);
+	bool BlockedOpen(bool Open, bool ForceOpen);
 public:
 	void SetName(const char* Name); // sets door ID
 	void SetTiles(unsigned short* Tiles, int count);

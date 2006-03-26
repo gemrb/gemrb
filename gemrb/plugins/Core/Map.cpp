@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.231 2006/03/26 12:39:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.232 2006/03/26 16:06:25 avenger_teambg Exp $
  *
  */
 
@@ -631,7 +631,7 @@ void Map::DrawVideocells(Region screen)
 		Color tint = LightMap->GetPixel( Pos.x / 16, Pos.y / 12);
 		tint.a = 255;
 		
-		bool endReached = vvc->Draw(screen, Pos, tint);
+		bool endReached = vvc->Draw(screen, Pos, tint, this, false);
 		if (endReached) {
 			vvcCells[i] = NULL;
 			delete( vvc );
@@ -824,7 +824,7 @@ void Map::UpdateEffects()
 {
 	unsigned int i = actors.size();
 	while (i--) {
-		actors[i]->Init();
+		actors[i]->Init(false);
 	}
 }
 

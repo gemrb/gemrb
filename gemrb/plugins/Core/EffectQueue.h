@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.18 2006/03/24 17:29:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.19 2006/03/26 16:06:25 avenger_teambg Exp $
  *
  */
 
@@ -59,9 +59,9 @@ class Actor;
 // often used stat modifications, usually Parameter2 types 0, 1 and 2
 //these macros should work differently in permanent mode (modify base too)
 #define STAT_GET(stat) (target->Modified[ stat ])
-#define STAT_ADD(stat, mod) target->SetStat( stat, STAT_GET( stat ) + ( mod ) )
-#define STAT_SET(stat, mod) target->SetStat( stat,  ( mod ) )
-#define STAT_MUL(stat, mod) target->SetStat( stat, STAT_GET(stat) * (( mod ) / 100))
+#define STAT_ADD(stat, mod) target->SetStat( stat, STAT_GET( stat ) + ( mod ), false )
+#define STAT_SET(stat, mod) target->SetStat( stat,  ( mod ), false )
+#define STAT_MUL(stat, mod) target->SetStat( stat, STAT_GET(stat) * (( mod ) / 100), false)
 #define STATE_CURE( mod ) target->Modified[ IE_STATE_ID ] &= ~(ieDword) ( mod )
 #define STATE_SET( mod ) target->Modified[ IE_STATE_ID ] |= (ieDword) ( mod )
 #define STATE_GET( mod ) (target->Modified[ IE_STATE_ID ] & (ieDword) ( mod ) )
@@ -134,8 +134,10 @@ public:
 	//locating opcodes
 	Effect *HasOpcodeWithParam(ieDword opcode, ieDword param2);
 	Effect *HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDword param2);
-	Effect *HasOpcodeMatchingCreature(ieDword opcode, Actor *actor);
 	Effect *HasOpcodeWithResource(ieDword opcode, ieResRef resource);
+
+	//getting summarised effects
+	int BonusAgainstCreature(ieDword opcode, Actor *actor);
 
 	/** Lists contents of the queue on a terminal for debugging */
 	void dump();

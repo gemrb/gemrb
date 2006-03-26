@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.6 2006/03/24 17:48:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.7 2006/03/26 16:06:25 avenger_teambg Exp $
  *
  */
 
@@ -1152,7 +1152,7 @@ int fx_alignment_invert (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_alignment_invert (%2d)\n", fx->Opcode );
 	ieDword newalign = target->GetStat( IE_ALIGNMENT );
 	newalign = (newalign & AL_LNC_MASK) + gne_toggle[newalign & AL_GNE_MASK];
-	target->SetStat( IE_ALIGNMENT, newalign );
+	target->SetStat( IE_ALIGNMENT, newalign, false );
 	return FX_APPLIED;
 }
 
@@ -1160,7 +1160,7 @@ int fx_alignment_invert (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_alignment_change (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_alignment_change (%2d): Value: %d, IDS: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	target->SetStat( IE_ALIGNMENT, fx->Parameter2 );
+	target->SetStat( IE_ALIGNMENT, fx->Parameter2, false );
 	return FX_APPLIED;
 }
 
@@ -1285,10 +1285,10 @@ int fx_summon_creature (Actor* Owner, Actor* target, Effect* fx)
 
 	switch (fx->Parameter2) {
 		case 0: case 1: case 3:
-			ab->SetStat(IE_EA, EA_ALLY); //is this the summoned EA
+			ab->SetBase(IE_EA, EA_ALLY); //is this the summoned EA?
 			break;
 		case 5:
-			ab->SetStat(IE_EA, EA_ENEMY);
+			ab->SetBase(IE_EA, EA_ENEMY);
 			break;
 		default:
 			break;

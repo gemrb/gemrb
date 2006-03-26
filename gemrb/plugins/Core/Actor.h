@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.106 2006/03/26 12:39:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.107 2006/03/26 16:06:25 avenger_teambg Exp $
  *
  */
 
@@ -212,14 +212,14 @@ public:
 	void SetAnimationID(unsigned int AnimID);
 	/** returns the animations */
 	CharAnimations* GetAnims();
-	/** Inits the Modified vector */
-	void Init();
+	/** Re/Inits the Modified vector */
+	void Init(bool reinit);
 	/** Returns true if the actor is targetable */
 	bool ValidTarget(int ga_flags);
 	/** Returns a Stat value */
 	ieDword GetStat(unsigned int StatIndex) const;
 	/** Sets a Stat Value (unsaved) */
-	bool SetStat(unsigned int StatIndex, ieDword Value);
+	bool SetStat(unsigned int StatIndex, ieDword Value, bool pcf);
 	/** Returns the difference */
 	int GetMod(unsigned int StatIndex);
 	/** Returns a Stat Base Value */

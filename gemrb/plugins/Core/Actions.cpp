@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.61 2006/01/15 23:07:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.62 2006/03/26 16:06:25 avenger_teambg Exp $
  *
  */
 
@@ -2866,7 +2866,7 @@ void GameScript::Kill(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* target = ( Actor* ) tar;
-	target->SetBase(IE_HITPOINTS,0); //probably this is the proper way
+	target->SetBase(IE_HITPOINTS,(ieDword) -100);
 }
 
 void GameScript::SetGabber(Scriptable* Sender, Action* parameters)

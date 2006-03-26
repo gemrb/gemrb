@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.170 2006/03/26 12:39:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.171 2006/03/26 16:06:25 avenger_teambg Exp $
  *
  */
 
@@ -167,7 +167,7 @@ Actor::Actor()
 
 		TranslucentShadows = 0;
 		core->GetDictionary()->Lookup("Translucent Shadows",
-										TranslucentShadows);
+			TranslucentShadows);
 	}
 	TalkCount = 0;
 	InteractCount = 0; //numtimesinteracted depends on this
@@ -323,6 +323,8 @@ void Actor::SetCircleSize()
 		}
 	}
 
+	if (!anims)
+		return;
 	int csize = anims->GetCircleSize() - 1;
 	if (csize >= MAX_CIRCLE_SIZE) 
 		csize = MAX_CIRCLE_SIZE - 1;
@@ -612,10 +614,10 @@ static void InitActorTables()
 //this method adds a vvc to the actor
 void Actor::add_animation(const ieResRef resource, Point &offset, int gradient, bool background)
 {
-	if (gradient!=-1) {
-		//palette
-	}
 	ScriptedAnimation *sca = core->GetScriptedAnimation(resource, offset);
+	if (gradient!=-1) {
+		sca->SetPalette(gradient, 4);
+	}
 	AddVVCell(sca, background);
 }
 
@@ -654,7 +656,7 @@ void Actor::PlayDamageAnimation(int type)
 	}
 }
 
-bool Actor::SetStat(unsigned int StatIndex, ieDword Value)
+bool Actor::SetStat(unsigned int StatIndex, ieDword Value, bool pcf)
 {
 	if (StatIndex >= MAX_STATS) {
 		return false;
@@ -670,12 +672,13 @@ bool Actor::SetStat(unsigned int StatIndex, ieDword Value)
 		}
 	}
 
-	if (Modified[StatIndex]!=Value) {
+	if (pcf && Modified[StatIndex]!=Value) {
 		Modified[StatIndex] = Value;
 		PostChangeFunctionType f = post_change_functions[StatIndex];
 		if (f) (*f)(this, Value);
+	} else {
+		Modified[StatIndex] = Value;
 	}
-
 	return true;
 }
 /* use core->GetConstitutionBonus(0,0,Modified[IE_CON])
@@ -707,15 +710,29 @@ bool Actor::SetBase(unsigned int StatIndex, ieDword Value)
 		return false;
 	}
 	BaseStats[StatIndex] = Value;
-	SetStat (StatIndex, Value);
+	SetStat (StatIndex, Value, true);
 	return true;
 }
 /** call this after load, to apply effects */
-void Actor::Init()
+void Actor::Init(bool first)
 {
+	ieDword previous[MAX_STATS];
+
+	if (!first) {
+		memcpy( previous, Modified, MAX_STATS * sizeof( *Modified ) );
+	}
 	memcpy( Modified, BaseStats, MAX_STATS * sizeof( *Modified ) );
 	fxqueue.ApplyAllEffects( this );
+	for (unsigned int i=0;i<MAX_STATS;i++) {
+		if (first || Modified[i]!=previous[i]) {
+			PostChangeFunctionType f = post_change_functions[i];
+			if (f) {
+				(*f)(this, Modified[i]);
+			}
+		}
+	}
 }
+
 /** implements a generic opcode function, modify modifier
 	returns the change
 */
@@ -726,15 +743,15 @@ int Actor::NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 	switch (ModifierType) {
 		case MOD_ADDITIVE:
 			//flat point modifier
-			SetStat(StatIndex, Modified[StatIndex]+ModifierValue);
+			SetStat(StatIndex, Modified[StatIndex]+ModifierValue, false);
 			break;
 		case MOD_ABSOLUTE:
 			//straight stat change
-			SetStat(StatIndex, ModifierValue);
+			SetStat(StatIndex, ModifierValue, false);
 			break;
 		case MOD_PERCENT:
 			//percentile
-			SetStat(StatIndex, BaseStats[StatIndex] * 100 / ModifierValue);
+			SetStat(StatIndex, BaseStats[StatIndex] * 100 / ModifierValue, false);
 			break;
 	}
 	return Modified[StatIndex] - oldmod;
@@ -1377,12 +1394,15 @@ void Actor::WalkTo(Point &Des, ieDword flags, int MinDistance)
 //there is a similar function in Map for stationary vvcs
 void Actor::DrawVideocells(Region &screen, vvcVector &vvcCells, Color &tint)
 {
+	Map* area = GetCurrentArea();
+
 	for (unsigned int i = 0; i < vvcCells.size(); i++) {
 		ScriptedAnimation* vvc = vvcCells[i];
 		if (!vvc)
 			continue;
+
 		// actually this is better be drawn by the vvc
-		bool endReached = vvc->Draw(screen, Pos, tint);
+		bool endReached = vvc->Draw(screen, Pos, tint, area, WantDither());
 		if (endReached) {
 			vvcCells[i] = NULL;
 			delete( vvc );
@@ -1501,18 +1521,18 @@ void Actor::Draw(Region &screen)
 			if (nextFrame && BBox.InsideRegion( vp ) ) {
 				SpriteCover* sc = GetSpriteCover();
 				if (!sc || !sc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height)) {
-					delete sc;
 					// the masteranim contains the animarea for
 					// the entire multi-part animation
 					sc = area->BuildSpriteCover(cx, cy, -masteranim->animArea.x, -masteranim->animArea.y, masteranim->animArea.w, masteranim->animArea.h, WantDither() );
+					//this will delete previous spritecover
 					SetSpriteCover(sc);
 
 				}
 				assert(sc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height));
 
 				video->BlitGameSprite( nextFrame, cx + screen.x, cy + screen.y,
-									   BLIT_TINTED | (TranslucentShadows ? BLIT_TRANSSHADOW : 0),
-									   tint, sc, ca->palette, &screen);
+					 BLIT_TINTED | (TranslucentShadows ? BLIT_TRANSSHADOW : 0),
+					 tint, sc, ca->palette, &screen);
 			}
 		}
 		if (masteranim->endReached) {
