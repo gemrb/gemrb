@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.42 2006/01/15 23:07:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.43 2006/03/26 19:50:22 avenger_teambg Exp $
  *
  */
 
@@ -339,6 +339,7 @@
 #define IE_DIALOGRANGE          178 // iwd2
 #define IE_MOVEMENTRATE         179
 #define IE_MORALE               180 // this has no place
+#define IE_BOUNCE               181 // has projectile bouncing effect
 //
 #define IE_ENABLEOFFSCREENAI    184 // bg2 has this on this spot
 //temporarily here for iwd2
