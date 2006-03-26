@@ -23,14 +23,14 @@
 #define S_ANI_PLAYONCE        8        //(same as area animation)
 
 #define IE_VVC_TRANSPARENT	0x00000002
-#define IE_VVC_BRIGHTEST	  0x00000008
-#define IE_VVC_GREYSCALE	  0x00080000
-#define IE_VVC_GLOWING  	  0x00200000
-#define IE_VVC_RED_TINT		  0x02000000
+#define IE_VVC_BLENDED		0x00000008
+#define IE_VVC_GREYSCALE	0x00080000
+#define IE_VVC_GLOWING  	0x00200000
+#define IE_VVC_RED_TINT		0x02000000
 
-#define IE_VVC_LOOP			0x00000001
-#define IE_VVC_BAM      0x00000008
-#define IE_VVC_NOCOVER  0x00000040
+#define IE_VVC_LOOP		0x00000001
+#define IE_VVC_BAM		0x00000008
+#define IE_VVC_NOCOVER		0x00000040
 
 //phases
 #define P_ONSET   0
@@ -39,8 +39,8 @@
 
 class GEM_EXPORT ScriptedAnimation {
 public:
-	ScriptedAnimation(AnimationFactory *af, Point &position);
-	ScriptedAnimation(DataStream* stream, Point &position, bool autoFree = true);
+	ScriptedAnimation(AnimationFactory *af, Point &position, int height);
+	ScriptedAnimation(DataStream* stream, bool autoFree = true);
 	~ScriptedAnimation(void);
 	//there are 3 phases: start, hold, release
 	//it will usually cycle in the 2. phase
@@ -49,7 +49,8 @@ public:
 	ieResRef sounds[3];
 	ieDword Transparency;
 	ieDword SequenceFlags;
-	ieDword XPos, YPos, ZPos;
+	//these are signed
+	int XPos, YPos, ZPos;
 	ieDword FrameRate;
 	ieDword FaceTarget;
 	bool justCreated;

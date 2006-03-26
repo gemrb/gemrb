@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.171 2006/03/26 16:06:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.172 2006/03/26 19:49:44 avenger_teambg Exp $
  *
  */
 
@@ -82,14 +82,17 @@ static ieResRef fire[2]={"SPBURN","SPFIRIMP"};
 static ieResRef spark[2]={"SPSPARKS","SPSHKIMP"};
 static ieResRef ice[2]={"","SPFIRIMP"}; //same as fire, but different palette
 //the possible hardcoded overlays (they got separate stats)
-#define OVERLAY_COUNT  6
+#define OVERLAY_COUNT  8
 #define OV_ENTANGLE    0
 #define OV_SANCTUARY   1
 #define OV_MINORGLOBE  2
 #define OV_SHIELDGLOBE 3
 #define OV_GREASE      4
 #define OV_WEB         5
-static ieResRef overlay[OVERLAY_COUNT]={"SPENTACI","SANCTRY","MINORGLB","SPSHIELD","GREASED","WEBENTD"};
+#define OV_BOUNCE      6  //bouncing
+#define OV_BOUNCE2     7  //bouncing activated
+static ieResRef overlay[OVERLAY_COUNT]={"SPENTACI","SANCTRY","MINORGLB","SPSHIELD",
+"GREASED","WEBENTD","SPTURNI2","SPTURNI"};
 
 PCStatsStruct::PCStatsStruct()
 {
@@ -401,12 +404,12 @@ static Point dummypoint;
 void pcf_entangle(Actor *actor, ieDword Value)
 {
 	if (Value) {
-		if (actor->HasVVCCell(overlay[OV_ENTANGLE], false))
+		if (actor->HasVVCCell(overlay[OV_ENTANGLE]))
 			return;
-		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_ENTANGLE], dummypoint);
-		actor->AddVVCell(sca, false);
+		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_ENTANGLE], dummypoint,0);
+		actor->AddVVCell(sca);
 	} else {
-		actor->RemoveVVCell(overlay[OV_ENTANGLE], false, true);
+		actor->RemoveVVCell(overlay[OV_ENTANGLE], true);
 	}
 }
 
@@ -415,13 +418,13 @@ void pcf_entangle(Actor *actor, ieDword Value)
 void pcf_sanctuary(Actor *actor, ieDword Value)
 {
 	if (Value) {
-		if (actor->HasVVCCell(overlay[OV_SANCTUARY], false))
+		if (actor->HasVVCCell(overlay[OV_SANCTUARY]))
 			return;
-		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_SANCTUARY], dummypoint);
+		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_SANCTUARY], dummypoint,0);
 		sca->Transparency|=IE_VVC_TRANSPARENT;
-		actor->AddVVCell(sca, false);		
+		actor->AddVVCell(sca);
 	} else {
-		actor->RemoveVVCell(overlay[OV_SANCTUARY], false, true);
+		actor->RemoveVVCell(overlay[OV_SANCTUARY], true);
 	}
 }
 
@@ -429,13 +432,13 @@ void pcf_sanctuary(Actor *actor, ieDword Value)
 void pcf_shieldglobe(Actor *actor, ieDword Value)
 {
 	if (Value) {
-		if (actor->HasVVCCell(overlay[OV_SHIELDGLOBE], false))
+		if (actor->HasVVCCell(overlay[OV_SHIELDGLOBE]))
 			return;
-		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_SHIELDGLOBE], dummypoint);
+		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_SHIELDGLOBE], dummypoint,0);
 		sca->Transparency|=IE_VVC_TRANSPARENT;
-		actor->AddVVCell(sca, false);		
+		actor->AddVVCell(sca);
 	} else {
-		actor->RemoveVVCell(overlay[OV_SHIELDGLOBE], false, true);
+		actor->RemoveVVCell(overlay[OV_SHIELDGLOBE], true);
 	}
 }
 
@@ -443,13 +446,13 @@ void pcf_shieldglobe(Actor *actor, ieDword Value)
 void pcf_minorglobe(Actor *actor, ieDword Value)
 {
 	if (Value) {
-		if (actor->HasVVCCell(overlay[OV_MINORGLOBE], false))
+		if (actor->HasVVCCell(overlay[OV_MINORGLOBE]))
 			return;
-		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_MINORGLOBE], dummypoint);
+		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_MINORGLOBE], dummypoint,0);
 		sca->Transparency|=IE_VVC_TRANSPARENT;
-		actor->AddVVCell(sca, false);		
+		actor->AddVVCell(sca);
 	} else {
-		actor->RemoveVVCell(overlay[OV_MINORGLOBE], false, true);
+		actor->RemoveVVCell(overlay[OV_MINORGLOBE], true);
 	}
 }
 
@@ -457,11 +460,11 @@ void pcf_minorglobe(Actor *actor, ieDword Value)
 void pcf_grease(Actor *actor, ieDword Value)
 {
 	if (Value) {
-		if (actor->HasVVCCell(overlay[OV_GREASE], true))
+		if (actor->HasVVCCell(overlay[OV_GREASE]))
 			return;
-		actor->add_animation(overlay[OV_GREASE], dummypoint, 0, true);
+		actor->add_animation(overlay[OV_GREASE], dummypoint, -1, -1);
 	} else {
-		actor->RemoveVVCell(overlay[OV_GREASE], true, true);
+		actor->RemoveVVCell(overlay[OV_GREASE], true);
 	}
 }
 
@@ -470,11 +473,30 @@ void pcf_grease(Actor *actor, ieDword Value)
 void pcf_web(Actor *actor, ieDword Value)
 {
 	if (Value) {
-		if (actor->HasVVCCell(overlay[OV_WEB], false))
+		if (actor->HasVVCCell(overlay[OV_WEB]))
 			return;
-		actor->add_animation(overlay[OV_WEB], dummypoint, 0, false);
+		actor->add_animation(overlay[OV_WEB], dummypoint, -1, 0);
 	} else {
-		actor->RemoveVVCell(overlay[OV_WEB], false, true);
+		actor->RemoveVVCell(overlay[OV_WEB], true);
+	}
+}
+
+//de/activates the grease background
+void pcf_bounce(Actor *actor, ieDword Value)
+{
+	switch(Value) {
+	case 1: //bounce passive
+		if (actor->HasVVCCell(overlay[OV_BOUNCE]))
+			return;
+		actor->add_animation(overlay[OV_BOUNCE], dummypoint, -1, 0);
+		break;
+	case 2: //activated bounce
+		if (actor->HasVVCCell(overlay[OV_BOUNCE2]))
+			return;
+		actor->add_animation(overlay[OV_BOUNCE2], dummypoint, -1, 0);
+		break;
+	default:
+		actor->RemoveVVCell(overlay[OV_BOUNCE], true);
 	}
 }
 
@@ -541,7 +563,7 @@ NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //9f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //af
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, 
+NULL,NULL,NULL,NULL, NULL, pcf_bounce, NULL, NULL, 
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //bf
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, pcf_ea, NULL, pcf_animid, NULL, //cf
@@ -612,13 +634,13 @@ static void InitActorTables()
 //the area's vvc's are the stationary effects
 //the actor's vvc's are moving with the actor
 //this method adds a vvc to the actor
-void Actor::add_animation(const ieResRef resource, Point &offset, int gradient, bool background)
+void Actor::add_animation(const ieResRef resource, Point &offset, int gradient, int height)
 {
-	ScriptedAnimation *sca = core->GetScriptedAnimation(resource, offset);
+	ScriptedAnimation *sca = core->GetScriptedAnimation(resource, offset, height);
 	if (gradient!=-1) {
 		sca->SetPalette(gradient, 4);
 	}
-	AddVVCell(sca, background);
+	AddVVCell(sca);
 }
 
 #define BLOOD_GRADIENT 19
@@ -632,22 +654,22 @@ void Actor::PlayDamageAnimation(int type)
 
 	switch(type) {
 		case 0: case 1: case 2: case 3: //blood
-			add_animation(blood[type], p, BLOOD_GRADIENT, false);
+			add_animation(blood[type], p, BLOOD_GRADIENT, 0);
 			break;
 		case 4: case 5: case 7: //fire
-			add_animation(fire[0], p, FIRE_GRADIENT, false);
+			add_animation(fire[0], p, FIRE_GRADIENT, 0);
 			for(i=3;i<type;i++) {
-				add_animation(fire[1], p, FIRE_GRADIENT, false);
+				add_animation(fire[1], p, FIRE_GRADIENT, 0);
 			}
 			break;
 		case 8: case 9: case 10: //electricity
-			add_animation(spark[0], p, -1, false);
+			add_animation(spark[0], p, -1, 0);
 			for(i=7;i<type;i++) {
-				add_animation(spark[1], p, FIRE_GRADIENT, false);
+				add_animation(spark[1], p, FIRE_GRADIENT, 0);
 			}
 			break;
 		case 11: case 12: case 13://cold
-			add_animation(ice[0], p, ICE_GRADIENT, false);
+			add_animation(ice[0], p, ICE_GRADIENT, 0);
 			break;
 		case 14: case 15: case 16://acid
 			break;
@@ -1662,15 +1684,11 @@ void Actor::SetSoundFolder(const char *soundset)
 	}
 }
 
-bool Actor::HasVVCCell(const ieResRef resource, bool background)
+bool Actor::HasVVCCell(const ieResRef resource)
 {
-	vvcVector *vvcCells;
-
-	if (background) {
-		vvcCells=&vvcShields;
-	} else {
-		vvcCells=&vvcOverlays;
-	}
+	int j = true;
+	vvcVector *vvcCells=&vvcShields;
+retry:
 	unsigned int i=vvcCells->size();
 	while (i--) {
 		ScriptedAnimation *vvc = (*vvcCells)[i];
@@ -1681,18 +1699,16 @@ bool Actor::HasVVCCell(const ieResRef resource, bool background)
 			return true;
 		}
 	}
+	vvcCells=&vvcOverlays;
+	if (j) { j = false; goto retry; }
 	return false;
 }
 
-void Actor::RemoveVVCell(const ieResRef resource, bool background, bool graceful)
+void Actor::RemoveVVCell(const ieResRef resource, bool graceful)
 {
-	vvcVector *vvcCells;
-
-	if (background) {
-		vvcCells=&vvcShields;
-	} else {
-		vvcCells=&vvcOverlays;
-	}
+	int j = true;
+	vvcVector *vvcCells=&vvcShields;
+retry:
 	unsigned int i=vvcCells->size();
 	while (i--) {
 		ScriptedAnimation *vvc = (*vvcCells)[i];
@@ -1708,13 +1724,15 @@ void Actor::RemoveVVCell(const ieResRef resource, bool background, bool graceful
 			}
 		}
 	}
+	vvcCells=&vvcOverlays;
+	if (j) { j = false; goto retry; }
 }
 
-void Actor::AddVVCell(ScriptedAnimation* vvc, bool background)
+void Actor::AddVVCell(ScriptedAnimation* vvc)
 {
 	vvcVector *vvcCells;
 
-	if (background) {
+	if (vvc->ZPos<0) {
 		vvcCells=&vvcShields;
 	} else {
 		vvcCells=&vvcOverlays;

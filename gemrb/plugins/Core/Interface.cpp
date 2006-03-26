@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.390 2006/02/26 14:57:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.391 2006/03/26 19:49:44 avenger_teambg Exp $
  *
  */
 
@@ -4010,15 +4010,15 @@ bool Interface::Exists(const char *ResRef, SClass_ID type)
 	return key->HasResource( ResRef, type );
 }
 
-ScriptedAnimation* Interface::GetScriptedAnimation( const char *effect, Point &position )
+ScriptedAnimation* Interface::GetScriptedAnimation( const char *effect, Point &position, int height)
 {
 	if (Exists( effect, IE_VVC_CLASS_ID ) ) {
 		DataStream *ds = key->GetResource( effect, IE_VVC_CLASS_ID );
-		return new ScriptedAnimation( ds, position, true);
+		return new ScriptedAnimation( ds, true);
 	}
 	AnimationFactory *af = (AnimationFactory *)
 		key->GetFactoryResource( effect, IE_BAM_CLASS_ID, IE_NORMAL );
-	return new ScriptedAnimation( af, position);
+	return new ScriptedAnimation( af, position, height);
 }
 
 Actor *Interface::GetFirstSelectedPC()

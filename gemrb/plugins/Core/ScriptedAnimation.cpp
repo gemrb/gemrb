@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.23 2006/03/26 16:06:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.24 2006/03/26 19:49:44 avenger_teambg Exp $
  *
  */
 
@@ -28,7 +28,7 @@
 #include "Video.h"
 
 /* Creating animation from BAM */
-ScriptedAnimation::ScriptedAnimation(AnimationFactory *af, Point &p)
+ScriptedAnimation::ScriptedAnimation(AnimationFactory *af, Point &p, int height)
 {
 	cover = NULL;
 	//getcycle returns NULL if there is no such cycle
@@ -54,18 +54,18 @@ ScriptedAnimation::ScriptedAnimation(AnimationFactory *af, Point &p)
 
 	Transparency = 0;
 	SequenceFlags = 0;
-	XPos = YPos = ZPos = 0;
 	FrameRate = 15;
 	FaceTarget = 0;
-	XPos += p.x;
-	YPos += p.y;
+	XPos = p.x;
+	YPos = height;
+	ZPos = p.y;
 	justCreated = true;
 	memcpy(ResName, af->ResRef, 8);
 	SetPhase(P_ONSET);
 }
 
 /* Creating animation from VVC */
-ScriptedAnimation::ScriptedAnimation(DataStream* stream, Point &p, bool autoFree)
+ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 {
 	cover = NULL;
 	anims[0] = NULL;
@@ -106,13 +106,17 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, Point &p, bool autoFree
 	stream->Seek( 4, GEM_CURRENT_POS );
 	stream->ReadDword( &SequenceFlags );
 	stream->Seek( 4, GEM_CURRENT_POS );
-	stream->ReadDword( &XPos );
-	stream->ReadDword( &YPos );
+	ieDword tmp;
+	stream->ReadDword( &tmp );
+	XPos = (signed) tmp;
+	stream->ReadDword( &tmp );  //this affects visibility
+	ZPos = (signed) tmp;
 	stream->Seek( 4, GEM_CURRENT_POS );
 	stream->ReadDword( &FrameRate );
 	stream->ReadDword( &FaceTarget );
 	stream->Seek( 16, GEM_CURRENT_POS );
-	stream->ReadDword( &ZPos );
+	stream->ReadDword( &tmp );  //this doesn't affect visibility
+	YPos = (signed) tmp;
 	stream->Seek( 24, GEM_CURRENT_POS );
 	stream->ReadDword( &seq1 );
 	stream->ReadDword( &seq2 );
@@ -139,12 +143,10 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, Point &p, bool autoFree
 			anims[P_HOLD]->gameAnimation=true;
 			if (!(SequenceFlags&IE_VVC_LOOP) ) {
 				anims[P_HOLD]->Flags |= S_ANI_PLAYONCE;
-		  }
+			}
 		}
 	}
 
-	XPos += p.x;
-	YPos += p.y;
 	justCreated = true;
 
 	//copying resource name to the object, so it could be referenced by it
@@ -243,12 +245,12 @@ retry:
 		flag |= BLIT_HALFTRANS;
 	}
 
-	if (Transparency & IE_VVC_BRIGHTEST) {
-		flag |= BLIT_TINTED;
+	if (Transparency & IE_VVC_BLENDED) {
+		flag |= BLIT_BLENDED;
 	}
 
 	int cx = Pos.x + XPos;
-	int cy = Pos.y + YPos;
+	int cy = Pos.y + ZPos + YPos;
 	if (cover && ( (SequenceFlags&IE_VVC_NOCOVER) || 
 		(!cover->Covers(cx, cy, frame->XPos, frame->YPos, frame->Width, frame->Height))) ) {
 		SetSpriteCover(NULL);

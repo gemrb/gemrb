@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.107 2006/03/26 16:06:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.108 2006/03/26 19:49:44 avenger_teambg Exp $
  *
  */
 
@@ -365,15 +365,15 @@ public:
 	void Draw(Region &screen);
 
 	/* add mobile vvc (spell effects) to actor's list */
-	void AddVVCell(ScriptedAnimation* vvc, bool background);
+	void AddVVCell(ScriptedAnimation* vvc);
 	/* remove a vvc from the list, graceful means animated removal */
-	void RemoveVVCell(const ieResRef vvcname, bool background, bool graceful);
+	void RemoveVVCell(const ieResRef vvcname, bool graceful);
 	/* returns true if actor already has the overlay */
-	bool HasVVCCell(const ieResRef resource, bool background);
+	bool HasVVCCell(const ieResRef resource);
 	/* draw videocells */
 	void DrawVideocells(Region &screen, vvcVector &vvcCells, Color &tint);
 
-	void add_animation(const ieResRef resource, Point &offset, int gradient, bool background);
+	void add_animation(const ieResRef resource, Point &offset, int gradient, int height);
 	void PlayDamageAnimation(int x);
 };
 #endif
