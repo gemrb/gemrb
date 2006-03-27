@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.24 2006/03/26 19:49:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.25 2006/03/27 16:55:28 avenger_teambg Exp $
  *
  */
 
@@ -97,7 +97,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 		return;
 	}
 	ieResRef Anim1ResRef;  
-	ieDword seq1, seq2;
+	ieDword seq1, seq2, seq3;
 	stream->ReadResRef( Anim1ResRef );
 	//there is no proof it is a second resref
 	//stream->ReadResRef( Anim2ResRef );
@@ -123,6 +123,9 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 	stream->Seek( 8, GEM_CURRENT_POS );
 	stream->ReadResRef( sounds[P_ONSET] );
 	stream->ReadResRef( sounds[P_HOLD] );
+	stream->Seek( 8, GEM_CURRENT_POS );
+	stream->ReadDword( &seq3 );
+	stream->ReadResRef( sounds[P_RELEASE] );
 
 	if (SequenceFlags&IE_VVC_BAM) {
 		AnimationFactory* af = ( AnimationFactory* )
@@ -135,6 +138,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 			anims[P_ONSET]->pos=0;
 			//vvcs are always paused
 			anims[P_ONSET]->gameAnimation=true;
+			anims[P_ONSET]->Flags |= S_ANI_PLAYONCE;
 		}
 
 		anims[P_HOLD] = af->GetCycle( ( unsigned char ) seq2 );  
@@ -144,6 +148,13 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 			if (!(SequenceFlags&IE_VVC_LOOP) ) {
 				anims[P_HOLD]->Flags |= S_ANI_PLAYONCE;
 			}
+		}
+
+		anims[P_RELEASE] = af->GetCycle( ( unsigned char ) seq3 );  
+		if (anims[P_RELEASE]) {
+			anims[P_RELEASE]->pos=0;
+			anims[P_RELEASE]->gameAnimation=true;
+			anims[P_RELEASE]->Flags |= S_ANI_PLAYONCE;
 		}
 	}
 
