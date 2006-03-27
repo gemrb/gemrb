@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.25 2006/03/27 16:55:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.26 2006/03/27 21:50:13 avenger_teambg Exp $
  *
  */
 
@@ -26,6 +26,7 @@
 #include "ResourceMgr.h"
 #include "SoundMgr.h"
 #include "Video.h"
+#include "Game.h"
 
 /* Creating animation from BAM */
 ScriptedAnimation::ScriptedAnimation(AnimationFactory *af, Point &p, int height)
@@ -56,6 +57,7 @@ ScriptedAnimation::ScriptedAnimation(AnimationFactory *af, Point &p, int height)
 	SequenceFlags = 0;
 	FrameRate = 15;
 	FaceTarget = 0;
+	Duration = 0xffffffff;
 	XPos = p.x;
 	YPos = height;
 	ZPos = p.y;
@@ -96,7 +98,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 			delete( stream );
 		return;
 	}
-	ieResRef Anim1ResRef;  
+	ieResRef Anim1ResRef;
 	ieDword seq1, seq2, seq3;
 	stream->ReadResRef( Anim1ResRef );
 	//there is no proof it is a second resref
@@ -109,15 +111,17 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 	ieDword tmp;
 	stream->ReadDword( &tmp );
 	XPos = (signed) tmp;
-	stream->ReadDword( &tmp );  //this affects visibility
+	stream->ReadDword( &tmp ); //this affects visibility
 	ZPos = (signed) tmp;
 	stream->Seek( 4, GEM_CURRENT_POS );
 	stream->ReadDword( &FrameRate );
 	stream->ReadDword( &FaceTarget );
 	stream->Seek( 16, GEM_CURRENT_POS );
-	stream->ReadDword( &tmp );  //this doesn't affect visibility
+	stream->ReadDword( &tmp ); //this doesn't affect visibility
 	YPos = (signed) tmp;
-	stream->Seek( 24, GEM_CURRENT_POS );
+	stream->Seek( 12, GEM_CURRENT_POS );
+	stream->ReadDword( &Duration );
+	stream->Seek( 8, GEM_CURRENT_POS );
 	stream->ReadDword( &seq1 );
 	stream->ReadDword( &seq2 );
 	stream->Seek( 8, GEM_CURRENT_POS );
@@ -141,7 +145,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 			anims[P_ONSET]->Flags |= S_ANI_PLAYONCE;
 		}
 
-		anims[P_HOLD] = af->GetCycle( ( unsigned char ) seq2 );  
+		anims[P_HOLD] = af->GetCycle( ( unsigned char ) seq2 );
 		if (anims[P_HOLD]) {
 			anims[P_HOLD]->pos=0;
 			anims[P_HOLD]->gameAnimation=true;
@@ -150,7 +154,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 			}
 		}
 
-		anims[P_RELEASE] = af->GetCycle( ( unsigned char ) seq3 );  
+		anims[P_RELEASE] = af->GetCycle( ( unsigned char ) seq3 );
 		if (anims[P_RELEASE]) {
 			anims[P_RELEASE]->pos=0;
 			anims[P_RELEASE]->gameAnimation=true;
@@ -224,12 +228,16 @@ void ScriptedAnimation::SetPalette(int gradient, int start)
 	free( NewPal );
 }
 
+//it is not sure if we need tint at all
 bool ScriptedAnimation::Draw(Region &screen, Point &Pos, Color &tint, Map *area, int dither)
 {
 	Video *video = core->GetVideoDriver();
 
 	if (justCreated) {
 		justCreated = false;
+		if (Duration!=0xffffffff) {
+			Duration += core->GetGame()->Ticks;
+		}
 		if (!anims[P_ONSET]) {
 			Phase = P_HOLD;
 		}
@@ -240,15 +248,24 @@ retry:
 	}
 
 	if (!anims[Phase]) {
-		return true;
-	}
-	Sprite2D* frame = anims[Phase]->NextFrame();
-	//automatically slip from onset to hold
-	if (!frame || anims[Phase]->endReached) {
-		if (Phase) {
+		if (Phase>=P_RELEASE) {
 			return true;
 		}
-		Phase = P_HOLD;
+		Phase++;
+		goto retry;
+	}
+	Sprite2D* frame = anims[Phase]->NextFrame();
+
+	//explicit duration
+	if (core->GetGame()->Ticks>Duration) {
+		return true;
+	}
+	//automatically slip from onset to hold to release
+	if (!frame || anims[Phase]->endReached) {
+		if (Phase>=P_RELEASE) {
+			return true;
+		}
+		Phase++;
 		goto retry;
 	}
 	ieDword flag = 0;
@@ -260,13 +277,17 @@ retry:
 		flag |= BLIT_BLENDED;
 	}
 
+	if ((Transparency & IE_VVC_TINT)==IE_VVC_TINT) {
+		flag |= BLIT_TINTED;
+	}
+
 	int cx = Pos.x + XPos;
 	int cy = Pos.y + ZPos + YPos;
 	if (cover && ( (SequenceFlags&IE_VVC_NOCOVER) || 
 		(!cover->Covers(cx, cy, frame->XPos, frame->YPos, frame->Width, frame->Height))) ) {
 		SetSpriteCover(NULL);
 	}
-	if (!(cover || (SequenceFlags&IE_VVC_NOCOVER)) ) {    
+	if (!(cover || (SequenceFlags&IE_VVC_NOCOVER)) ) {
 		cover = area->BuildSpriteCover(cx, cy, -anims[Phase]->animArea.x, 
 			-anims[Phase]->animArea.y, anims[Phase]->animArea.w, anims[Phase]->animArea.h, dither);
 		assert(cover->Covers(cx, cy, frame->XPos, frame->YPos, frame->Width, frame->Height));

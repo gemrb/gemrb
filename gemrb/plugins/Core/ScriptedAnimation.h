@@ -24,6 +24,7 @@
 
 #define IE_VVC_TRANSPARENT	0x00000002
 #define IE_VVC_BLENDED		0x00000008
+#define IE_VVC_TINT     	0x00030000   //2 bits need to be set for tint
 #define IE_VVC_GREYSCALE	0x00080000
 #define IE_VVC_GLOWING  	0x00200000
 #define IE_VVC_RED_TINT		0x02000000
@@ -53,6 +54,7 @@ public:
 	int XPos, YPos, ZPos;
 	ieDword FrameRate;
 	ieDword FaceTarget;
+	ieDword Duration;
 	bool justCreated;
 	ieResRef ResName;
 	int Phase;
