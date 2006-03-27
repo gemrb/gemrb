@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.7 2006/03/26 16:06:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.8 2006/03/27 18:15:08 avenger_teambg Exp $
  *
  */
 
@@ -226,7 +226,7 @@ int fx_local_variable (Actor* Owner, Actor* target, Effect* fx);//bb
 //c2
 //c3
 //c4
-//c5
+int fx_bounce_projectile (Actor* Owner, Actor* target, Effect* fx);//c5
 //c6
 //c7
 //c8
@@ -342,6 +342,7 @@ static EffectRef effectnames[] = {
 	{ "Alignment:Invert", fx_alignment_invert, 0 },
 	{ "AnimationIDModifier", fx_animation_id_modifier, 0 },
 	{ "AttacksPerRoundModifier", fx_attacks_per_round_modifier, 0 },
+	{ "BounceProjectile", fx_bounce_projectile, 0 },
 	{ "ChangeName", fx_change_name, 0 },
 	{ "CharismaModifier", fx_charisma_modifier, 0 },
 	{ "ColdResistanceModifier", fx_cold_resistance_modifier, 0 },
@@ -1301,7 +1302,8 @@ int fx_summon_creature (Actor* Owner, Actor* target, Effect* fx)
 	Map *map = target->GetCurrentArea();
 	ab->SetPosition(map, position, true, 0);
 	if (fx->Resource2[0]) {
-		ScriptedAnimation* vvc = core->GetScriptedAnimation(fx->Resource2, ab->Pos);
+		Point p(0,0);
+		ScriptedAnimation* vvc = core->GetScriptedAnimation(fx->Resource2, p, 0);
 		map->AddVVCCell( vvc );
 	}
 
@@ -1870,6 +1872,14 @@ int fx_local_variable (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
+// 0xc5
+int fx_bounce_projectile (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_bounce_projectile (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	STAT_SET( IE_BOUNCE, 1 );
+	return FX_APPLIED;
+}
+
 // 0xd0
 int fx_minimum_hp_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1884,7 +1894,8 @@ int fx_play_visual_effect (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_play_visual_effect (%2d): Resource: %s\n", fx->Opcode, fx->Resource );
 	if (fx->Resource[0]) {
-		ScriptedAnimation* vvc = core->GetScriptedAnimation(fx->Resource, target->Pos);
+		Point p(0,0);
+		ScriptedAnimation* vvc = core->GetScriptedAnimation(fx->Resource, p, 0);
 		target->GetCurrentArea( )->AddVVCCell( vvc );
 	}
 	return FX_APPLIED;
