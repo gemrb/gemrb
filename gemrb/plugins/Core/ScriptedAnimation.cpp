@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.26 2006/03/27 21:50:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.27 2006/03/29 17:42:44 avenger_teambg Exp $
  *
  */
 
@@ -98,7 +98,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 			delete( stream );
 		return;
 	}
-	ieResRef Anim1ResRef;
+	ieResRef Anim1ResRef;  
 	ieDword seq1, seq2, seq3;
 	stream->ReadResRef( Anim1ResRef );
 	//there is no proof it is a second resref
@@ -111,13 +111,13 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 	ieDword tmp;
 	stream->ReadDword( &tmp );
 	XPos = (signed) tmp;
-	stream->ReadDword( &tmp ); //this affects visibility
+	stream->ReadDword( &tmp );  //this affects visibility
 	ZPos = (signed) tmp;
 	stream->Seek( 4, GEM_CURRENT_POS );
 	stream->ReadDword( &FrameRate );
 	stream->ReadDword( &FaceTarget );
 	stream->Seek( 16, GEM_CURRENT_POS );
-	stream->ReadDword( &tmp ); //this doesn't affect visibility
+	stream->ReadDword( &tmp );  //this doesn't affect visibility
 	YPos = (signed) tmp;
 	stream->Seek( 12, GEM_CURRENT_POS );
 	stream->ReadDword( &Duration );
@@ -138,6 +138,14 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 		//they certainly got onset and hold phases
 		anims[P_ONSET] = af->GetCycle( ( unsigned char ) seq1 );
 		if (anims[P_ONSET]) {
+			if (Transparency&IE_VVC_MIRRORX) {
+				anims[P_ONSET]->MirrorAnimation();
+
+			}
+			if (Transparency&IE_VVC_MIRRORY) {
+				anims[P_ONSET]->MirrorAnimationVert();
+			}
+
 			//creature anims may start at random position, vvcs always start on 0
 			anims[P_ONSET]->pos=0;
 			//vvcs are always paused
@@ -145,8 +153,15 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 			anims[P_ONSET]->Flags |= S_ANI_PLAYONCE;
 		}
 
-		anims[P_HOLD] = af->GetCycle( ( unsigned char ) seq2 );
+		anims[P_HOLD] = af->GetCycle( ( unsigned char ) seq2 );  
 		if (anims[P_HOLD]) {
+		 	if (Transparency&IE_VVC_MIRRORX) {
+					anims[P_HOLD]->MirrorAnimation();
+			}
+		 	if (Transparency&IE_VVC_MIRRORY) {
+					anims[P_HOLD]->MirrorAnimationVert();
+			}
+
 			anims[P_HOLD]->pos=0;
 			anims[P_HOLD]->gameAnimation=true;
 			if (!(SequenceFlags&IE_VVC_LOOP) ) {
@@ -154,8 +169,15 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 			}
 		}
 
-		anims[P_RELEASE] = af->GetCycle( ( unsigned char ) seq3 );
+		anims[P_RELEASE] = af->GetCycle( ( unsigned char ) seq3 );  
 		if (anims[P_RELEASE]) {
+		 	if (Transparency&IE_VVC_MIRRORX) {
+					anims[P_RELEASE]->MirrorAnimation();
+			}
+		 	if (Transparency&IE_VVC_MIRRORY) {
+					anims[P_RELEASE]->MirrorAnimationVert();
+			}
+
 			anims[P_RELEASE]->pos=0;
 			anims[P_RELEASE]->gameAnimation=true;
 			anims[P_RELEASE]->Flags |= S_ANI_PLAYONCE;
@@ -287,7 +309,7 @@ retry:
 		(!cover->Covers(cx, cy, frame->XPos, frame->YPos, frame->Width, frame->Height))) ) {
 		SetSpriteCover(NULL);
 	}
-	if (!(cover || (SequenceFlags&IE_VVC_NOCOVER)) ) {
+	if (!(cover || (SequenceFlags&IE_VVC_NOCOVER)) ) {    
 		cover = area->BuildSpriteCover(cx, cy, -anims[Phase]->animArea.x, 
 			-anims[Phase]->animArea.y, anims[Phase]->animArea.w, anims[Phase]->animArea.h, dither);
 		assert(cover->Covers(cx, cy, frame->XPos, frame->YPos, frame->Width, frame->Height));

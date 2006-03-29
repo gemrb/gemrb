@@ -24,6 +24,8 @@
 
 #define IE_VVC_TRANSPARENT	0x00000002
 #define IE_VVC_BLENDED		0x00000008
+#define IE_VVC_MIRRORX    	0x00000010
+#define IE_VVC_MIRRORY   	0x00000020
 #define IE_VVC_TINT     	0x00030000   //2 bits need to be set for tint
 #define IE_VVC_GREYSCALE	0x00080000
 #define IE_VVC_GLOWING  	0x00200000
