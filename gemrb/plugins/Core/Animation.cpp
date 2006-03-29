@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.42 2006/03/26 12:39:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.43 2006/03/29 17:37:34 avenger_teambg Exp $
  *
  */
 
@@ -218,6 +218,26 @@ void Animation::MirrorAnimation()
 
 	// flip animArea horizontally as well
 	animArea.x = -animArea.w - animArea.x;
+
+	// This function will create independent sprites we have to free
+	autofree = true;
+}
+
+void Animation::MirrorAnimationVert()
+{
+	Video *video = core->GetVideoDriver();
+
+	for (size_t i = 0; i < indicesCount; i++) {
+		Sprite2D * tmp = frames[i];
+		frames[i] = video->MirrorSpriteVertical( tmp, true );
+		// we free the original sprite if it was referenced only by us
+		if (autofree) {
+			video->FreeSprite(tmp);
+		}
+	}
+
+	// flip animArea vertically as well
+//	animArea.y = -animArea.h - animArea.y;
 
 	// This function will create independent sprites we have to free
 	autofree = true;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.26 2006/01/29 13:40:19 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.27 2006/03/29 17:37:34 avenger_teambg Exp $
  *
  */
 
@@ -65,6 +65,8 @@ public:
 	/** Gets the i-th frame */
 	Sprite2D* GetFrame(unsigned int i);
 	/** Mirrors all the frames vertically */
+	void MirrorAnimationVert();
+	/** Mirrors all the frames horizontally */
 	void MirrorAnimation();
 	/** sets frame index */
 	void SetPos(unsigned int index);
