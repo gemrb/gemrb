@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationFactory.h,v 1.5 2005/03/31 10:06:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationFactory.h,v 1.6 2006/03/29 17:58:54 avenger_teambg Exp $
  *
  */
 
@@ -52,8 +52,8 @@ public:
 	Animation* GetCycle(unsigned char cycle);
 	/** No descriptions */
 	Sprite2D* GetFrame(unsigned short index, unsigned char cycle=0);
-	int GetCycleCount() { return cycles.size(); }
-	int GetFrameCount() { return frames.size(); }
+	size_t GetCycleCount() { return cycles.size(); }
+	size_t GetFrameCount() { return frames.size(); }
 	int GetCycleSize(int idx) { return cycles[idx].FramesCount; }
 };
 

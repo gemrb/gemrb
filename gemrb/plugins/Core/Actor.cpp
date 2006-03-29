@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.172 2006/03/26 19:49:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.173 2006/03/29 17:58:54 avenger_teambg Exp $
  *
  */
 
@@ -77,10 +77,30 @@ static void InitActorTables();
 
 static ieDword TranslucentShadows;
 
-static ieResRef blood[4]={"BLOODS","BLOODM","BLOODL","BLOODCR"};
-static ieResRef fire[2]={"SPBURN","SPFIRIMP"};
-static ieResRef spark[2]={"SPSPARKS","SPSHKIMP"};
-static ieResRef ice[2]={"","SPFIRIMP"}; //same as fire, but different palette
+#define DAMAGE_LEVELS 13
+static ieResRef d_main[DAMAGE_LEVELS]={
+	"BLOODS","BLOODM","BLOODL","BLOODCR", //blood
+	"SPFIRIMP","SPFIRIMP","SPFIRIMP",     //fire
+	"SPSHKIMP","SPSHKIMP","SPSHKIMP",     //spark
+	"SPFIRIMP","SPFIRIMP","SPFIRIMP",     //ice
+};
+static ieResRef d_splash[DAMAGE_LEVELS]={
+	"","","","",
+	"SPBURN","SPBURN","SPBURN",   //flames
+	"SPSPARKS","SPSPARKS","SPSPARKS", //sparks
+	"","","",
+};
+
+#define BLOOD_GRADIENT 19
+#define FIRE_GRADIENT 19
+#define ICE_GRADIENT 71
+
+static int d_gradient[DAMAGE_LEVELS]={
+	BLOOD_GRADIENT,BLOOD_GRADIENT,BLOOD_GRADIENT,BLOOD_GRADIENT,
+	FIRE_GRADIENT,FIRE_GRADIENT,FIRE_GRADIENT,
+	-1,-1,-1,
+	ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,
+};
 //the possible hardcoded overlays (they got separate stats)
 #define OVERLAY_COUNT  8
 #define OV_ENTANGLE    0
@@ -601,13 +621,30 @@ void Actor::ReleaseMemory()
 	classcount=-1;
 }
 
+#define COL_HATERACE      0   //ranger type racial enemy
+#define COL_CLERIC_SPELL  1   //cleric spells
+#define COL_MAGE_SPELL    2   //mage spells
+#define COL_STARTXP       3   //starting xp
+#define COL_BARD_SKILL    4   //bard skills
+#define COL_THIEF_SKILL   5   //thief skills
+
+#define COL_MAIN       0
+#define COL_SPARKS     1
+#define COL_GRADIENT   2
+
 static void InitActorTables()
 {
 	int i;
 
+	//this table lists skill groups assigned to classes
+	//it is theoretically possible to create hybrid classes
 	int table = core->LoadTable( "clskills" );
 	TableMgr *tm = core->GetTable( table );
-	classcount = tm->GetRowCount();
+	if (tm) {
+		classcount = tm->GetRowCount();
+	} else {
+		classcount = 0; //well
+	}
 	clericspelltables = (char **) calloc(classcount, sizeof(char*));
 	wizardspelltables = (char **) calloc(classcount, sizeof(char*));
 	for(i = 0; i<classcount; i++) {
@@ -629,6 +666,37 @@ static void InitActorTables()
 	maximum_values[IE_CON]=i;
 	maximum_values[IE_CHR]=i;
 	maximum_values[IE_WIS]=i;
+
+	//initializing the vvc resource references
+	table = core->LoadTable( "damage" );
+	tm = core->GetTable( table );
+	if (tm) {
+		for (i=0;i<DAMAGE_LEVELS;i++) {
+			const char *tmp = tm->QueryField( i, COL_MAIN );
+			strnlwrcpy(d_main[i], tmp, 8);
+			if (d_main[i][0]=='*') {
+				d_main[i][0]=0;
+			}
+			tmp = tm->QueryField( i, COL_SPARKS );
+			strnlwrcpy(d_splash[i], tmp, 8);
+			if (d_splash[i][0]=='*') {
+				d_splash[i][0]=0;
+			}
+			tmp = tm->QueryField( i, COL_GRADIENT );
+			d_gradient[i]=atoi(tmp);
+		}
+		core->DelTable( table );
+	}
+
+	table = core->LoadTable( "overlay" );
+	tm = core->GetTable( table );
+	if (tm) {
+		for (i=0;i<OVERLAY_COUNT;i++) {
+			const char *tmp = tm->QueryField( i, 0 );
+			strnlwrcpy(overlay[i], tmp, 8);
+		}
+		core->DelTable( table );
+	}
 }
 //TODO: every actor must have an own vvcell list
 //the area's vvc's are the stationary effects
@@ -643,10 +711,6 @@ void Actor::add_animation(const ieResRef resource, Point &offset, int gradient, 
 	AddVVCell(sca);
 }
 
-#define BLOOD_GRADIENT 19
-#define FIRE_GRADIENT 19
-#define ICE_GRADIENT 71
-
 void Actor::PlayDamageAnimation(int type)
 {
 	int i;
@@ -654,26 +718,28 @@ void Actor::PlayDamageAnimation(int type)
 
 	switch(type) {
 		case 0: case 1: case 2: case 3: //blood
-			add_animation(blood[type], p, BLOOD_GRADIENT, 0);
+			add_animation(d_main[type], p, d_gradient[type], 0);
 			break;
 		case 4: case 5: case 7: //fire
-			add_animation(fire[0], p, FIRE_GRADIENT, 0);
-			for(i=3;i<type;i++) {
-				add_animation(fire[1], p, FIRE_GRADIENT, 0);
+			add_animation(d_main[type], p, d_gradient[type], 0);
+			for(i=DL_FIRE;i<=type;i++) {
+				add_animation(d_splash[i], p, d_gradient[i], 0);
 			}
 			break;
 		case 8: case 9: case 10: //electricity
-			add_animation(spark[0], p, -1, 0);
-			for(i=7;i<type;i++) {
-				add_animation(spark[1], p, FIRE_GRADIENT, 0);
+			add_animation(d_main[type], p, d_gradient[type], 0);
+			for(i=DL_ELECTRICITY;i<=type;i++) {
+				add_animation(d_splash[i], p, d_gradient[i], 0);
 			}
 			break;
 		case 11: case 12: case 13://cold
-			add_animation(ice[0], p, ICE_GRADIENT, 0);
+			add_animation(d_main[type], p, d_gradient[type], 0);
 			break;
 		case 14: case 15: case 16://acid
+			add_animation(d_main[type], p, d_gradient[type], 0);
 			break;
 		case 17: case 18: case 19://disintegrate
+			add_animation(d_main[type], p, d_gradient[type], 0);
 			break;
 	}
 }
@@ -949,6 +1015,7 @@ void Actor::DebugDump()
 	fxqueue.dump();
 }
 
+//Last* ids should all be made ieWord?
 const char* Actor::GetActorNameByID(ieWord ID)
 {
 	Actor *actor = GetCurrentArea()->GetActorByGlobalID(ID);
@@ -1326,7 +1393,7 @@ void Actor::SetColor( ieDword idx, ieDword grd)
 {
 	ieByte gradient = (ieByte) (grd&255);
 	ieByte index = (ieByte) (idx&15);
-	ieByte shift = idx/16;
+	ieByte shift = (ieByte) (idx/16);
 	ieDword value;
 
 	//invalid value, would crash original IE
