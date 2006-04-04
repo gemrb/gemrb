@@ -97,8 +97,8 @@ IDS
 0x5f	TrackingModifier
 0x60	LevelChange
 0x61	StrengthBonusModifier
-0x62	Regeneration
-0x63	DurationModifier
+0x62	State:Regeneration
+0x63	SpellDurationModifier
 0x64	ProtectionFromCreatureType
 0x65	Protection:FromOpcode
 0x66	Protection:FromSpellLevels
@@ -119,7 +119,7 @@ IDS
 0x76	ShowCreatures
 0x77	MirrorImage
 0x78	Protection:FromMeleeWeapons
-0x79	Graphics:VisualAnimationEffect
+0x79	VisualAnimationEffect-unknown
 0x7a	CreateInventoryItem
 0x7b	RemoveInventoryItem
 0x7c	TeleportToGivenPoint
@@ -153,10 +153,10 @@ IDS
 0x9d	Overlay:Web
 0x9e	Overlay:Grease
 0x9f	MirrorImageRun
-0xa0	DispelSanctuary
+0xa0	Cure:Sanctuary
 0xa1	Cure:Panic
-0xa2	Cure:Helplessness
-0xa3	RestoreMovementRate
+0xa2	Cure:Helpless
+0xa3	Cure:Slowed
 0xa4	SlowPoisonDamageRate
 0xa5	PauseTarget
 0xa6	MagicResistanceModifier

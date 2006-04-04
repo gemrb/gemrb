@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.43 2006/03/26 19:50:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.44 2006/04/04 22:06:58 avenger_teambg Exp $
  *
  */
 
@@ -136,7 +136,7 @@
 #define IE_ACMISSILEMOD		4
 #define IE_ACPIERCINGMOD	5
 #define IE_ACSLASHINGMOD	6
-#define IE_THAC0		7
+#define IE_TOHIT		7
 #define IE_NUMBEROFATTACKS	8
 #define IE_SAVEVSDEATH		9
 #define IE_SAVEVSWANDS		10
@@ -207,7 +207,7 @@
 #define IE_LEVELTHIEF    69 //pst, iwd2
 #define IE_CASTERHOLD	70
 #define IE_ENCUMBRANCE    71
-#define IE_MISSILETHAC0BONUS	  72  
+#define IE_MISSILEHITBONUS	  72  
 #define IE_MAGICDAMAGERESISTANCE  73
 #define IE_RESISTPOISON 	 74
 #define IE_DONOTJUMP		  75
@@ -219,8 +219,8 @@
 #define IE_SEEINVISIBLE 			81
 #define IE_IGNOREDIALOGPAUSE		82
 #define IE_MINHITPOINTS		 83
-#define IE_THAC0BONUSRIGHT  		84
-#define IE_THAC0BONUSLEFT   		85
+#define IE_HITBONUSRIGHT  		84
+#define IE_HITBONUSLEFT   		85
 #define IE_DAMAGEBONUSRIGHT 		86
 #define IE_DAMAGEBONUSLEFT  		87
 #define IE_STONESKINS  			88
@@ -324,24 +324,39 @@
 #define IE_SCRIPTINGSTATE8  	163
 #define IE_SCRIPTINGSTATE9  	164
 #define IE_SCRIPTINGSTATE10 	165
-#define IE_MELEETHAC0		166
+//these are genuine bg2 stats found by research
+#define IE_MELEEHIT		166
 #define IE_MELEEDAMAGE		167
 #define IE_MISSILEDAMAGE	168
 #define IE_NOCIRCLE		169
-#define IE_FISTTHAC0		170
+#define IE_FISTHIT		170
 #define IE_FISTDAMAGE		171
 #define IE_TITLE1		172
 #define IE_TITLE2		173
 #define IE_DISABLEOVERLAY	174
 #define IE_DISABLEBACKSTAB	175
+#define IE_ENABLEOFFSCREENAI    183 // bg2 has this on this spot
+#define IE_SOUNDMN              184 // a special unknown effect uses this
+#define IE_DISABLECHUNKING      186 // not sure
+#define IE_NONINTERRUPTABLE     187 
+#define IE_CHAOSSHIELD          189 // defense against wild surge
+#define IE_CANUSEANYITEM        191
+#define IE_ALWAYSBACKSTAB       192
+#define IE_EFFECT308            195 // another special unknown effect
+#define IE_DISABLETIMESTOP      197
+#define IE_STONESKINSGOLEM	199
+#define IE_LEVELDRAIN		200
+#define IE_AVATARREMOVAL        201
+
+//GemRB Specific Defines
+//these are temporary only
 #define IE_XP_MAGE              176 // XP2 
 #define IE_XP_THIEF             177 // XP3
 #define IE_DIALOGRANGE          178 // iwd2
 #define IE_MOVEMENTRATE         179
 #define IE_MORALE               180 // this has no place
 #define IE_BOUNCE               181 // has projectile bouncing effect
-//
-#define IE_ENABLEOFFSCREENAI    184 // bg2 has this on this spot
+#define IE_MIRRORIMAGES         182 
 //temporarily here for iwd2
 #define IE_HATEDRACE2       192
 #define IE_HATEDRACE3       193
@@ -351,9 +366,6 @@
 #define IE_HATEDRACE7       197
 #define IE_HATEDRACE8       198
 //
-#define IE_STONESKINSGOLEM	199
-#define IE_LEVELDRAIN		200
-//GemRB Specific Defines
 #define IE_RACE			201
 #define IE_CLASS		202
 #define IE_GENERAL		203
