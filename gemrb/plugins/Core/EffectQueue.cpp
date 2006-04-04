@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.52 2006/04/04 21:59:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.53 2006/04/04 22:08:18 wjpalenstijn Exp $
  *
  */
 
@@ -56,7 +56,7 @@ static EffectRef* FindEffect(const char* effectname)
 	return NULL;
 }
 
-static void inline ResolveEffectRef(EffectRef &effect_reference)
+static inline void ResolveEffectRef(EffectRef &effect_reference)
 {
 	if (effect_reference.EffText==-1) {
 		EffectRef* ref = FindEffect(effect_reference.Name);
