@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.9 2006/04/04 21:59:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.10 2006/04/04 22:12:25 wjpalenstijn Exp $
  *
  */
 
@@ -1655,7 +1655,7 @@ int fx_strength_bonus_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x62
-int fx_state_regeneration (Actor* Owner, Actor* target, Effect* fx)
+int fx_state_regeneration (Actor* /*Owner*/, Actor* /*target*/, Effect* /*fx*/)
 {
 	//STATE_SET( STATE_POISONED );
 	return FX_CYCLIC;
