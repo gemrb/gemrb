@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.102 2006/03/26 16:06:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.103 2006/04/04 21:59:39 avenger_teambg Exp $
  *
  */
 
@@ -410,7 +410,7 @@ void CREImp::GetActorPST(Actor *act)
 	str->ReadWord( &tmpWord );
 	act->BaseStats[IE_ACSLASHINGMOD]=(ieWordSigned) tmpWord;
 	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_THAC0]=(ieByteSigned) tmpByte;
+	act->BaseStats[IE_TOHIT]=(ieByteSigned) tmpByte;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_NUMBEROFATTACKS]=tmpByte;
 	str->Read( &tmpByte, 1 );
@@ -762,7 +762,7 @@ ieDword CREImp::GetActorGemRB(Actor *act)
 	str->ReadWord( &tmpWord );
 	act->BaseStats[IE_ACSLASHINGMOD]=(ieWordSigned) tmpWord;
 	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_THAC0]=(ieByteSigned) tmpByte;
+	act->BaseStats[IE_TOHIT]=(ieByteSigned) tmpByte;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_NUMBEROFATTACKS]=tmpByte;
 	str->Read( &tmpByte, 1 );
@@ -844,7 +844,7 @@ void CREImp::GetActorBG(Actor *act)
 	str->ReadWord( &tmpWord );
 	act->BaseStats[IE_ACSLASHINGMOD]=(ieWordSigned) tmpWord;
 	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_THAC0]=(ieByteSigned) tmpByte;
+	act->BaseStats[IE_TOHIT]=(ieByteSigned) tmpByte;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_NUMBEROFATTACKS]=tmpByte;
 	str->Read( &tmpByte, 1 );
@@ -1009,7 +1009,7 @@ void CREImp::GetActorIWD2(Actor *act)
 	str->ReadWord( &tmpWord );
 	act->BaseStats[IE_ACSLASHINGMOD]=(ieWordSigned) tmpWord;
 	str->Read( &tmpByte, 1 );
-	act->BaseStats[IE_THAC0]=(ieByteSigned) tmpByte;//Unknown in CRE V2.2
+	act->BaseStats[IE_TOHIT]=(ieByteSigned) tmpByte;//Unknown in CRE V2.2
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_NUMBEROFATTACKS]=tmpByte;//Unknown in CRE V2.2
 	str->Read( &tmpByte, 1 );
@@ -1277,7 +1277,7 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	str->ReadWord( &tmpWord ); 
 	act->BaseStats[IE_ACSLASHINGMOD]=(ieWordSigned) tmpWord;
 	str->Read( &tmpByte, 1 ); 
-	act->BaseStats[IE_THAC0]=(ieByteSigned) tmpByte;
+	act->BaseStats[IE_TOHIT]=(ieByteSigned) tmpByte;
 	str->Read( &tmpByte, 1 ); 
 	act->BaseStats[IE_NUMBEROFATTACKS]=tmpByte;
 	str->Read( &tmpByte, 1 ); 
@@ -1622,7 +1622,7 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 	stream->WriteWord( &tmpWord);
 	tmpWord = actor->BaseStats[IE_ACSLASHINGMOD];
 	stream->WriteWord( &tmpWord);
-	tmpByte = actor->BaseStats[IE_THAC0];
+	tmpByte = actor->BaseStats[IE_TOHIT];
 	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_NUMBEROFATTACKS];
 	stream->Write( &tmpByte, 1);

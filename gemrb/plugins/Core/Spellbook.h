@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.16 2005/11/24 17:44:09 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.17 2006/04/04 21:59:43 avenger_teambg Exp $
  *
  */
 
@@ -149,6 +149,9 @@ public:
 
 	/** Removes memorized spell */
 	bool UnmemorizeSpell(CREMemorizedSpell* spl);
+
+	/** finds the first spell needing to rememorize */
+	CREMemorizedSpell* FindUnchargedSpell(int type, int level=0);
 
 	/** Sets index'th spell from memorized as 'not-yet-cast' */
 	bool ChargeSpell(CREMemorizedSpell* spl);

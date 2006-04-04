@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.62 2006/03/26 16:06:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.63 2006/04/04 21:59:42 avenger_teambg Exp $
  *
  */
 
@@ -3839,7 +3839,8 @@ void GameScript::RestParty(Scriptable* Sender, Action* parameters)
 			//renting could be 0,1,2,3 (the quality of resting)
 			tar->Heal(parameters->int2Parameter+1);
 		}
-		tar->spellbook.ChargeAllSpells();
+		//removes fatigue, recharges spells
+		tar->Rest(0);
 	}
 	Sender->ReleaseCurrentAction();
 }

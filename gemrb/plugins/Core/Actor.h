@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.108 2006/03/26 19:49:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.109 2006/04/04 21:59:42 avenger_teambg Exp $
  *
  */
 
@@ -317,6 +317,7 @@ public:
 	int Damage(int damage, int damagetype, Actor *hitter);
 	/* drops items from inventory to current spot */
 	void DropItem(const ieResRef resref, unsigned int flags);
+	void DropItem(int slot, unsigned int flags);
 	/* returns true if the actor is PC/joinable*/
 	bool Persistent();
 	/* assigns actor to party slot, 0 = NPC, areas won't remove it */
@@ -375,5 +376,9 @@ public:
 
 	void add_animation(const ieResRef resource, Point &offset, int gradient, int height);
 	void PlayDamageAnimation(int x);
+	/* restores a spell of maximum maxlevel level, type is a mask of disabled spells */
+	int RestoreSpellLevel(ieDword maxlevel, ieDword typemask);
+	/* rememorizes spells, cures fatigue, etc */
+	void Rest(int hours);
 };
 #endif

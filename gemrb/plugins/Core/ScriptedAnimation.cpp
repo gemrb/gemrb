@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.27 2006/03/29 17:42:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.28 2006/04/04 21:59:42 avenger_teambg Exp $
  *
  */
 
@@ -27,6 +27,27 @@
 #include "SoundMgr.h"
 #include "Video.h"
 #include "Game.h"
+
+//prepare the animation before doing anything
+static void PrepareAnimation(Animation *anim, Palette *&palette, ieDword Transparency)
+{
+	if (Transparency&IE_VVC_MIRRORX) {
+		anim->MirrorAnimation();
+	}
+	if (Transparency&IE_VVC_MIRRORY) {
+		anim->MirrorAnimationVert();
+	}
+
+	//make this the last if possible, because of the return
+	if (Transparency&IE_VVC_BLENDED) {
+		if (!palette) {
+			Sprite2D* spr = anim->GetFrame(0);
+			if (!spr) return;
+			palette = core->GetVideoDriver()->GetPalette(spr)->Copy();
+		}
+		palette->CreateShadedAlphaChannel();
+	}
+}
 
 /* Creating animation from BAM */
 ScriptedAnimation::ScriptedAnimation(AnimationFactory *af, Point &p, int height)
@@ -59,8 +80,8 @@ ScriptedAnimation::ScriptedAnimation(AnimationFactory *af, Point &p, int height)
 	FaceTarget = 0;
 	Duration = 0xffffffff;
 	XPos = p.x;
-	YPos = height;
-	ZPos = p.y;
+	YPos = p.y;
+	ZPos = height;
 	justCreated = true;
 	memcpy(ResName, af->ResRef, 8);
 	SetPhase(P_ONSET);
@@ -138,14 +159,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 		//they certainly got onset and hold phases
 		anims[P_ONSET] = af->GetCycle( ( unsigned char ) seq1 );
 		if (anims[P_ONSET]) {
-			if (Transparency&IE_VVC_MIRRORX) {
-				anims[P_ONSET]->MirrorAnimation();
-
-			}
-			if (Transparency&IE_VVC_MIRRORY) {
-				anims[P_ONSET]->MirrorAnimationVert();
-			}
-
+			PrepareAnimation(anims[P_ONSET], palettes[P_ONSET], Transparency);
 			//creature anims may start at random position, vvcs always start on 0
 			anims[P_ONSET]->pos=0;
 			//vvcs are always paused
@@ -155,12 +169,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 
 		anims[P_HOLD] = af->GetCycle( ( unsigned char ) seq2 );  
 		if (anims[P_HOLD]) {
-		 	if (Transparency&IE_VVC_MIRRORX) {
-					anims[P_HOLD]->MirrorAnimation();
-			}
-		 	if (Transparency&IE_VVC_MIRRORY) {
-					anims[P_HOLD]->MirrorAnimationVert();
-			}
+			PrepareAnimation(anims[P_HOLD], palettes[P_HOLD], Transparency);
 
 			anims[P_HOLD]->pos=0;
 			anims[P_HOLD]->gameAnimation=true;
@@ -171,12 +180,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 
 		anims[P_RELEASE] = af->GetCycle( ( unsigned char ) seq3 );  
 		if (anims[P_RELEASE]) {
-		 	if (Transparency&IE_VVC_MIRRORX) {
-					anims[P_RELEASE]->MirrorAnimation();
-			}
-		 	if (Transparency&IE_VVC_MIRRORY) {
-					anims[P_RELEASE]->MirrorAnimationVert();
-			}
+			PrepareAnimation(anims[P_RELEASE], palettes[P_RELEASE], Transparency);
 
 			anims[P_RELEASE]->pos=0;
 			anims[P_RELEASE]->gameAnimation=true;

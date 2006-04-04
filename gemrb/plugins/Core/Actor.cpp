@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.173 2006/03/29 17:58:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.174 2006/04/04 21:59:42 avenger_teambg Exp $
  *
  */
 
@@ -373,7 +373,7 @@ void pcf_hitpoint(Actor *actor, ieDword Value)
 	if ((signed) Value<(signed) actor->Modified[IE_MINHITPOINTS]) {
 		Value=actor->Modified[IE_MINHITPOINTS];
 	}
-	if ((signed) Value<=0) {
+	if ((signed) Value+core->GetConstitutionBonus(0,actor->Modified[IE_CON])<=0) {
 		actor->Die(NULL);
 	}
 	actor->Modified[IE_MINHITPOINTS]=Value;
@@ -381,11 +381,9 @@ void pcf_hitpoint(Actor *actor, ieDword Value)
 
 void pcf_maxhitpoint(Actor *actor, ieDword Value)
 {
-	if ((signed) Value<=0) {
-		actor->Die(NULL);
-	}
 	if ((signed) Value<(signed) actor->Modified[IE_HITPOINTS]) {
 		actor->Modified[IE_HITPOINTS]=Value;
+		pcf_hitpoint(actor,Value);
 	}
 }
 
@@ -393,7 +391,16 @@ void pcf_minhitpoint(Actor *actor, ieDword Value)
 {
 	if ((signed) Value>(signed) actor->Modified[IE_HITPOINTS]) {
 		actor->Modified[IE_HITPOINTS]=Value;
+		pcf_hitpoint(actor,Value);
 	}
+}
+
+void pcf_con(Actor *actor, ieDword Value)
+{
+	if ((signed) Value<=0) {
+		actor->Die(NULL);
+	}
+	pcf_hitpoint(actor, actor->Modified[IE_HITPOINTS]);
 }
 
 void pcf_stat(Actor *actor, ieDword Value)
@@ -566,7 +573,7 @@ NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //0f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, pcf_fatigue, pcf_intoxication, //1f
 NULL,NULL,NULL,NULL, pcf_stat, NULL, pcf_stat, pcf_stat,
-pcf_stat,pcf_stat,NULL,NULL, NULL, pcf_gold, NULL, NULL, //2f
+pcf_stat,pcf_con,NULL,NULL, NULL, pcf_gold, NULL, NULL, //2f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, pcf_entangle, pcf_sanctuary, //3f
 pcf_minorglobe, pcf_shieldglobe, pcf_grease, pcf_web, NULL, NULL, NULL, NULL,
@@ -769,12 +776,7 @@ bool Actor::SetStat(unsigned int StatIndex, ieDword Value, bool pcf)
 	}
 	return true;
 }
-/* use core->GetConstitutionBonus(0,0,Modified[IE_CON])
-int Actor::GetHPMod()
-{
-	return constitution_normal[Modified[IE_CON]];
-}
-*/
+
 int Actor::GetMod(unsigned int StatIndex)
 {
 	if (StatIndex >= MAX_STATS) {
@@ -1211,6 +1213,10 @@ void Actor::DropItem(const ieResRef resref, unsigned int flags)
 	inventory.DropItemAtLocation( resref, flags, area, Pos );
 }
 
+void Actor::DropItem(int slot , unsigned int flags)
+{
+	inventory.DropItemAtLocation( slot, flags, area, Pos );
+}
 bool Actor::ValidTarget(int ga_flags)
 {
 	switch(ga_flags&GA_ACTION) {
@@ -1814,3 +1820,51 @@ void Actor::AddVVCell(ScriptedAnimation* vvc)
 	vvcCells->push_back( vvc );
 }
 
+//returns restored spell level
+int Actor::RestoreSpellLevel(ieDword maxlevel, ieDword type)
+{
+	int typemask;
+
+	switch (type) {
+		case 0: //allow only mage
+			typemask = ~1;
+			break;
+		case 1: //allow only cleric
+			typemask = ~2;
+			break;
+		default:
+			typemask = 0;
+	}
+	for (int i=maxlevel;i>0;i--) {
+		CREMemorizedSpell *cms = spellbook.FindUnchargedSpell(typemask, maxlevel);
+		if (cms) {
+			spellbook.ChargeSpell(cms);
+			return i;
+		}
+	}
+	return 0;
+}
+
+//replenishes spells, cures fatigue
+void Actor::Rest(int hours)
+{
+	if (hours) {
+		//do remove effects
+		int remaining = hours*10;
+		//removes hours*10 fatigue points
+		NewStat (IE_FATIGUE, -remaining, MOD_ADDITIVE);
+		//restore hours*10 spell levels
+		//rememorization starts with the lower spell levels?
+		for (int level = 1; level<16; level++) {
+			if (level<remaining) {
+				break;
+			}
+			while (remaining>0) {
+				remaining -= RestoreSpellLevel(level,0);
+			}
+		}
+	} else {
+		SetBase (IE_FATIGUE, 0);
+		spellbook.ChargeAllSpells ();
+	}
+}

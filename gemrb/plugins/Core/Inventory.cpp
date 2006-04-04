@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.66 2006/01/15 17:00:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.67 2006/04/04 21:59:42 avenger_teambg Exp $
  *
  */
 
@@ -495,6 +495,9 @@ void Inventory::DropItemAtLocation(unsigned int slot, unsigned int flags, Map *m
 	if ( ((flags^IE_INV_ITEM_UNDROPPABLE)&item->Flags)!=flags) {
 		return;
 	}
+	if (core->QuerySlotEffects( slot )) {
+		RemoveSlotEffects( item );
+	}
 	map->AddItemToLocation(loc, item);
 	Changed = true;
 	Slots[slot]=NULL;
@@ -519,6 +522,9 @@ void Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 		}
 		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
 			continue;
+		}
+		if (core->QuerySlotEffects( i )) {
+			RemoveSlotEffects( item );
 		}
 		map->AddItemToLocation(loc, item);
 		Changed = true;

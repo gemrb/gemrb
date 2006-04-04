@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.51 2006/03/26 16:06:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.52 2006/04/04 21:59:42 avenger_teambg Exp $
  *
  */
 
@@ -54,6 +54,16 @@ static EffectRef* FindEffect(const char* effectname)
 	}
 	printf( "Warning: Couldn't assign effect: %s\n", effectname );
 	return NULL;
+}
+
+static void inline ResolveEffectRef(EffectRef &effect_reference)
+{
+	if (effect_reference.EffText==-1) {
+		EffectRef* ref = FindEffect(effect_reference.Name);
+		if (ref) {
+			effect_reference.EffText = ref->EffText;
+		}
+	}
 }
 
 bool Init_EffectQueue()
@@ -96,6 +106,14 @@ bool Init_EffectQueue()
 			if (poi != NULL) {
 				effect_refs[i].Function = poi->Function;
 				effect_refs[i].Name = poi->Name;
+				//reverse linking opcode number
+				//using this unused field
+				if (poi->EffText) {
+					printf("Classhing classhh\n");
+			printf("-------- FN: %d, %s\n", i, effectname);
+					abort();
+				}
+				poi->EffText = i;
 			}
 			//printf("-------- FN: %d, %s\n", i, effectname);
 		}
@@ -170,7 +188,6 @@ bool EffectQueue::RemoveEffect(Effect* fx)
 		}
 	}
 	return false;
-	
 }
 
 //this is where we reapply all effects when loading a saved game
@@ -270,7 +287,7 @@ void EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 				//for example, a strength modifier effect
 				if ((fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) ) {
 					fx->TimingMode=FX_DURATION_JUST_EXPIRED;
-        } 
+				} 
 				break;
 			case FX_CYCLIC:
 				//the effect will be reapplied instead of removed
@@ -283,7 +300,7 @@ void EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 	}
 	if ((fx->TimingMode!=FX_DURATION_JUST_EXPIRED) && first_apply) {
 		PrepareDuration(fx);
-  }
+	}
 }
 
 //call this from an applied effect, after it returns, these effects
@@ -300,6 +317,16 @@ void EffectQueue::RemoveAllEffects(ieDword opcode)
 	}
 }
 
+//this will modify effect reference
+void EffectQueue::RemoveAllEffects(EffectRef &effect_reference)
+{
+	ResolveEffectRef(effect_reference);
+	if (effect_reference.EffText==-1) {
+		//
+		return;
+	}
+	RemoveAllEffects(effect_reference.EffText);
+}
 
 void EffectQueue::RemoveLevelEffects(ieDword level, bool dispellable)
 {
@@ -325,9 +352,9 @@ void EffectQueue::RemoveLevelEffects(ieDword level, bool dispellable)
 
 #define MATCH_LIVE_FX() {ieDword tmp=(*f)->TimingMode; \
 		if (tmp!=FX_DURATION_INSTANT_LIMITED && \
-		    tmp!=FX_DURATION_INSTANT_PERMANENT && \
-		    tmp!=FX_DURATION_INSTANT_WHILE_EQUIPPED && \
-		    tmp!=FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES) { \
+			tmp!=FX_DURATION_INSTANT_PERMANENT && \
+			tmp!=FX_DURATION_INSTANT_WHILE_EQUIPPED && \
+			tmp!=FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES) { \
 			continue; \
 		}}
 
@@ -335,9 +362,30 @@ void EffectQueue::RemoveLevelEffects(ieDword level, bool dispellable)
 #define MATCH_PARAM2() if((*f)->Parameter2!=param2) { continue; }
 #define MATCH_RESOURCE() if( strnicmp( (*f)->Resource, resource, 8) ) { continue; }
 
-Effect *EffectQueue::HasOpcodeWithParam(ieDword opcode, ieDword param2)
+Effect *EffectQueue::HasOpcode(ieDword opcode) const
 {
-	std::vector< Effect* >::iterator f;
+	std::vector< Effect* >::const_iterator f;
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
+		MATCH_OPCODE();
+		MATCH_LIVE_FX();
+
+		return (*f);
+	}
+	return NULL;
+}
+
+Effect *EffectQueue::HasEffect(EffectRef &effect_reference)
+{
+	ResolveEffectRef(effect_reference);
+	if (effect_reference.EffText==-1) {
+		return NULL;
+	}
+	return HasOpcode(effect_reference.EffText);
+}
+
+Effect *EffectQueue::HasOpcodeWithParam(ieDword opcode, ieDword param2) const
+{
+	std::vector< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_OPCODE();
 		MATCH_LIVE_FX();
@@ -348,12 +396,21 @@ Effect *EffectQueue::HasOpcodeWithParam(ieDword opcode, ieDword param2)
 	return NULL;
 }
 
+Effect *EffectQueue::HasEffectWithParam(EffectRef &effect_reference, ieDword param2)
+{
+	ResolveEffectRef(effect_reference);
+	if (effect_reference.EffText==-1) {
+		return NULL;
+	}
+	return HasOpcodeWithParam(effect_reference.EffText, param2);
+}
+
 //looks for opcode with pairs of parameters (useful for protection against creature, extra damage or extra thac0 against creature)
 //generally an IDS targeting
 
-Effect *EffectQueue::HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDword param2)
+Effect *EffectQueue::HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDword param2) const
 {
-	std::vector< Effect* >::iterator f;
+	std::vector< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_OPCODE();
 		MATCH_LIVE_FX();
@@ -368,13 +425,22 @@ Effect *EffectQueue::HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDw
 	return NULL;
 }
 
+Effect *EffectQueue::HasEffectWithParamPair(EffectRef &effect_reference, ieDword param1, ieDword param2)
+{
+	ResolveEffectRef(effect_reference);
+	if (effect_reference.EffText==-1) {
+		return NULL;
+	}
+	return HasOpcodeWithParamPair(effect_reference.EffText, param1, param2);
+}
+
 //this function does IDS targeting for effects (extra damage/thac0 against creature)
 static int ids_stats[7]={IE_EA, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, IE_SEX, IE_ALIGNMENT};
 
-int EffectQueue::BonusAgainstCreature(ieDword opcode, Actor *actor)
+int EffectQueue::BonusAgainstCreature(ieDword opcode, Actor *actor) const
 {
 	int sum = 0;
-	std::vector< Effect* >::iterator f;
+	std::vector< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_OPCODE();
 		MATCH_LIVE_FX();
@@ -393,10 +459,16 @@ int EffectQueue::BonusAgainstCreature(ieDword opcode, Actor *actor)
 	return sum;
 }
 
-//useful for immunity vs spell, can't use item, etc.
-Effect *EffectQueue::HasOpcodeWithResource(ieDword opcode, ieResRef resource)
+int EffectQueue::BonusAgainstCreature(EffectRef &effect_reference, Actor *actor)
 {
-	std::vector< Effect* >::iterator f;
+	ResolveEffectRef(effect_reference);
+	return BonusAgainstCreature(effect_reference.EffText, actor);
+}
+
+//useful for immunity vs spell, can't use item, etc.
+Effect *EffectQueue::HasOpcodeWithResource(ieDword opcode, ieResRef resource) const
+{
+	std::vector< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_OPCODE();
 		MATCH_LIVE_FX();
@@ -405,6 +477,12 @@ Effect *EffectQueue::HasOpcodeWithResource(ieDword opcode, ieResRef resource)
 		return (*f);
 	}
 	return NULL;
+}
+
+Effect *EffectQueue::HasEffectWithResource(EffectRef &effect_reference, ieResRef resource)
+{
+	ResolveEffectRef(effect_reference);
+	return HasOpcodeWithResource(effect_reference.EffText, resource);
 }
 
 void EffectQueue::dump()
@@ -422,7 +500,7 @@ void EffectQueue::dump()
 	}
 }
 
-Effect *EffectQueue::GetEffect(ieDword idx)
+Effect *EffectQueue::GetEffect(ieDword idx) const
 {
 	if (effects.size()<=idx) {
 		return NULL;
@@ -430,7 +508,7 @@ Effect *EffectQueue::GetEffect(ieDword idx)
 	return effects[idx];
 }
 
-Effect *EffectQueue::GetNextSavedEffect(ieDword &idx)
+Effect *EffectQueue::GetNextSavedEffect(ieDword &idx) const
 {
 	while(effects.size()>idx) {
 		Effect *effect = effects[idx++];
@@ -441,7 +519,7 @@ Effect *EffectQueue::GetNextSavedEffect(ieDword &idx)
 	return NULL;
 }
 
-ieDword EffectQueue::GetSavedEffectsCount()
+ieDword EffectQueue::GetSavedEffectsCount() const
 {
 	ieDword cnt = 0;
 
@@ -451,4 +529,10 @@ ieDword EffectQueue::GetSavedEffectsCount()
 			cnt++;
 	}
 	return cnt;
+}
+
+int EffectQueue::ResolveEffect(EffectRef &effect_reference)
+{
+	ResolveEffectRef(effect_reference);
+	return effect_reference.EffText;
 }

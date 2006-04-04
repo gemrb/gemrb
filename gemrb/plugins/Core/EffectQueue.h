@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.19 2006/03/26 16:06:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.20 2006/04/04 21:59:42 avenger_teambg Exp $
  *
  */
 
@@ -77,7 +77,7 @@ typedef int (* EffectFunction)(Actor*, Actor*, Effect*);
 struct EffectRef {
 	const char* Name;
 	EffectFunction Function;
-	int EffText;
+	int EffText; //also opcode in another context
 };
 
 /** Initializes table of available spell Effects used by all the queues */
@@ -122,25 +122,36 @@ public:
 	void ApplyAllEffects(Actor* target);
 	void ApplyEffect(Actor* target, Effect* fx, bool first_apply);
 	void PrepareDuration(Effect* fx);
-	void RemoveAllEffects(ieDword opcode);
+	void RemoveAllEffects(EffectRef &effect_reference);
 	void RemoveLevelEffects(ieDword level, bool dispellable);
-	Effect *GetEffect(ieDword idx);
+	Effect *GetEffect(ieDword idx) const;
 	/* returns next saved effect, increases index */
-	Effect *GetNextSavedEffect(ieDword &idx);
+	Effect *GetNextSavedEffect(ieDword &idx) const;
 	/* returns the number of saved effects */
-	ieDword GetSavedEffectsCount();
-	size_t GetEffectsCount() { return effects.size(); }
+	ieDword GetSavedEffectsCount() const;
+	size_t GetEffectsCount() const { return effects.size(); }
 
 	//locating opcodes
-	Effect *HasOpcodeWithParam(ieDword opcode, ieDword param2);
-	Effect *HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDword param2);
-	Effect *HasOpcodeWithResource(ieDword opcode, ieResRef resource);
+	Effect *HasEffect(EffectRef &effect_reference);
+	Effect *HasEffectWithParam(EffectRef &effect_reference, ieDword param2);
+	Effect *HasEffectWithParamPair(EffectRef &effect_reference, ieDword param1, ieDword param2);
+	Effect *HasEffectWithResource(EffectRef &effect_reference, ieResRef resource);
 
 	//getting summarised effects
-	int BonusAgainstCreature(ieDword opcode, Actor *actor);
+	int BonusAgainstCreature(EffectRef &effect_reference, Actor *actor);
 
 	/** Lists contents of the queue on a terminal for debugging */
 	void dump();
+	//resolve effect
+	static int ResolveEffect(EffectRef &effect_reference);
+private:
+	//use the effect reference style calls from outside
+	void RemoveAllEffects(ieDword opcode);
+	Effect *HasOpcode(ieDword opcode) const;
+	Effect *HasOpcodeWithParam(ieDword opcode, ieDword param2) const;
+	Effect *HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDword param2) const;
+	Effect *HasOpcodeWithResource(ieDword opcode, ieResRef resource) const;
+	int BonusAgainstCreature(ieDword opcode, Actor *actor) const;
 };
 
 #endif  // ! EFFECTQUEUE_H

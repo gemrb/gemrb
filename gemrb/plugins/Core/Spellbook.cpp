@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.33 2005/12/19 23:10:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.34 2006/04/04 21:59:42 avenger_teambg Exp $
  *
  */
 
@@ -389,6 +389,35 @@ bool Spellbook::UnmemorizeSpell(CREMemorizedSpell* spell)
 	}
 
 	return false;
+}
+
+//bitfield disabling type: 1 - mage, 2 - cleric etc
+//level: if set, then finds that level only
+CREMemorizedSpell* Spellbook::FindUnchargedSpell(int type, int level)
+{
+	int mask=1;
+
+	for (int i = 0; i < NUM_SPELL_TYPES; i++) {
+		if (type&mask) {
+			mask<<=1;
+			continue;
+		}
+		mask<<=1;
+		for (unsigned int j = 0; j<spells[i].size(); j++) {
+			CRESpellMemorization* sm = spells[i][j];
+			if (level && (sm->Level!=level)) {
+				continue;
+			}
+
+			for (unsigned int k = 0; k < sm->memorized_spells.size(); k++) {
+				CREMemorizedSpell *ret = sm->memorized_spells[k];
+				if (ret->Flags==0) {
+					return ret;
+				}
+			}
+		}
+	}
+	return NULL;
 }
 
 void Spellbook::ChargeAllSpells()
