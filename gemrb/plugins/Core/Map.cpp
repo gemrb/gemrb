@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.232 2006/03/26 16:06:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.233 2006/04/05 16:34:29 avenger_teambg Exp $
  *
  */
 
@@ -2239,6 +2239,14 @@ int Map::GetCursor( Point &p)
 		default:
 			return IE_CURSOR_TRAVEL;
 	}
+}
+
+#define SPARKLE_PUFF   1
+#define SPARKLE_SHOWER 3
+
+void Map::Sparkle(ieDword color, ieDword type)
+{
+	printf("sparkle: %d %d\n", color, type);
 }
 
 ////////////////////AreaAnimation//////////////////

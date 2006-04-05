@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.h,v 1.11 2006/04/04 21:59:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.h,v 1.12 2006/04/05 16:34:29 avenger_teambg Exp $
  *
  */
 
@@ -91,7 +91,7 @@ struct Effect {
 	ieDword DiceSides;
 	ieDword SavingThrowType;
 	ieDword SavingThrowBonus;
-	ieDword unknown;
+	ieDword IsVariable;
 
 	// EFF V2.0 fields:
 	ieDword PrimaryType;

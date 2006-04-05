@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.44 2006/04/04 22:06:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.45 2006/04/05 16:34:32 avenger_teambg Exp $
  *
  */
 
@@ -357,14 +357,6 @@
 #define IE_MORALE               180 // this has no place
 #define IE_BOUNCE               181 // has projectile bouncing effect
 #define IE_MIRRORIMAGES         182 
-//temporarily here for iwd2
-#define IE_HATEDRACE2       192
-#define IE_HATEDRACE3       193
-#define IE_HATEDRACE4       194
-#define IE_HATEDRACE5       195
-#define IE_HATEDRACE6       196
-#define IE_HATEDRACE7       197
-#define IE_HATEDRACE8       198
 //
 #define IE_RACE			201
 #define IE_CLASS		202
@@ -392,23 +384,14 @@
 #define IE_FACTION		221
 #define IE_SUBRACE		222
 #define IE_SPECIES              223
-//probably these should be stored in the spellbook structure
-#define IE_PRIESTBONUS1         224
-#define IE_PRIESTBONUS2         225
-#define IE_PRIESTBONUS3         226
-#define IE_PRIESTBONUS4         227
-#define IE_PRIESTBONUS5         228
-#define IE_PRIESTBONUS6         229
-#define IE_PRIESTBONUS7         230
-#define IE_WIZARDBONUS1         231
-#define IE_WIZARDBONUS2         232
-#define IE_WIZARDBONUS3         233
-#define IE_WIZARDBONUS4         234
-#define IE_WIZARDBONUS5         235
-#define IE_WIZARDBONUS6         236
-#define IE_WIZARDBONUS7         237
-#define IE_WIZARDBONUS8         238
-#define IE_WIZARDBONUS9         239
+//temporarily here for iwd2
+#define IE_HATEDRACE2       224
+#define IE_HATEDRACE3       225
+#define IE_HATEDRACE4       226
+#define IE_HATEDRACE5       227
+#define IE_HATEDRACE6       228
+#define IE_HATEDRACE7       229
+#define IE_HATEDRACE8       230
 //These are in IWD2, but in a different place
 #define IE_LEVELBARBARIAN        240 //iwd2 class levels (fighter, mage, thief are already stored)
 #define IE_LEVELBARD             241 

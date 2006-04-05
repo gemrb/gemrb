@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.53 2006/04/04 22:08:18 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.54 2006/04/05 16:34:29 avenger_teambg Exp $
  *
  */
 
@@ -56,7 +56,7 @@ static EffectRef* FindEffect(const char* effectname)
 	return NULL;
 }
 
-static inline void ResolveEffectRef(EffectRef &effect_reference)
+inline static void ResolveEffectRef(EffectRef &effect_reference)
 {
 	if (effect_reference.EffText==-1) {
 		EffectRef* ref = FindEffect(effect_reference.Name);
@@ -289,10 +289,12 @@ void EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 					fx->TimingMode=FX_DURATION_JUST_EXPIRED;
 				} 
 				break;
+				/* not needed
 			case FX_CYCLIC:
 				//the effect will be reapplied instead of removed
 				//mark this somehow
 				break;
+				*/
 		}
 	} else {
 		//effect not found, it is going to be discarded
@@ -303,15 +305,31 @@ void EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 	}
 }
 
+// looks for opcode with param2
+// useful for: immunity vs projectile
+
+#define MATCH_OPCODE() if((*f)->Opcode!=opcode) { continue; }
+
+#define MATCH_LIVE_FX() {ieDword tmp=(*f)->TimingMode; \
+		if (tmp!=FX_DURATION_INSTANT_LIMITED && \
+			tmp!=FX_DURATION_INSTANT_PERMANENT && \
+			tmp!=FX_DURATION_INSTANT_WHILE_EQUIPPED && \
+			tmp!=FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES) { \
+			continue; \
+		}}
+
+#define MATCH_PARAM1() if((*f)->Parameter1!=param1) { continue; }
+#define MATCH_PARAM2() if((*f)->Parameter2!=param2) { continue; }
+#define MATCH_RESOURCE() if( strnicmp( (*f)->Resource, resource, 8) ) { continue; }
+
 //call this from an applied effect, after it returns, these effects
 //will be killed along with it
 void EffectQueue::RemoveAllEffects(ieDword opcode)
 {
 	std::vector< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		if ( (*f)->Opcode!=opcode) {
-			continue;
-		}
+		MATCH_OPCODE();
+		MATCH_LIVE_FX();
 
 		(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;
 	}
@@ -326,6 +344,29 @@ void EffectQueue::RemoveAllEffects(EffectRef &effect_reference)
 		return;
 	}
 	RemoveAllEffects(effect_reference.EffText);
+}
+
+void EffectQueue::RemoveAllEffectsWithParam(ieDword opcode, ieDword param2)
+{
+	std::vector< Effect* >::iterator f;
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
+		MATCH_OPCODE();
+		MATCH_LIVE_FX();
+		MATCH_PARAM2();
+
+		(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;
+	}
+}
+
+//this will modify effect reference
+void EffectQueue::RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword param2)
+{
+	ResolveEffectRef(effect_reference);
+	if (effect_reference.EffText==-1) {
+		//
+		return;
+	}
+	RemoveAllEffectsWithParam(effect_reference.EffText, param2);
 }
 
 void EffectQueue::RemoveLevelEffects(ieDword level, bool dispellable)
@@ -344,23 +385,6 @@ void EffectQueue::RemoveLevelEffects(ieDword level, bool dispellable)
 	}
 }
 
-
-// looks for opcode with param2
-// useful for: immunity vs projectile
-
-#define MATCH_OPCODE() if((*f)->Opcode!=opcode) { continue; }
-
-#define MATCH_LIVE_FX() {ieDword tmp=(*f)->TimingMode; \
-		if (tmp!=FX_DURATION_INSTANT_LIMITED && \
-			tmp!=FX_DURATION_INSTANT_PERMANENT && \
-			tmp!=FX_DURATION_INSTANT_WHILE_EQUIPPED && \
-			tmp!=FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES) { \
-			continue; \
-		}}
-
-#define MATCH_PARAM1() if((*f)->Parameter1!=param1) { continue; }
-#define MATCH_PARAM2() if((*f)->Parameter2!=param2) { continue; }
-#define MATCH_RESOURCE() if( strnicmp( (*f)->Resource, resource, 8) ) { continue; }
 
 Effect *EffectQueue::HasOpcode(ieDword opcode) const
 {

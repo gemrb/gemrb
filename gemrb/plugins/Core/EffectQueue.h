@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.20 2006/04/04 21:59:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.21 2006/04/05 16:34:29 avenger_teambg Exp $
  *
  */
 
@@ -46,8 +46,9 @@ class Actor;
 /** these effects don't stick around if used as permanent, 
  * in that case they modify a base stat like charisma modifier */
 #define FX_PERMANENT 2
-/** these effects stick and also repeatedly trigger like poison */
-#define FX_CYCLIC    3
+///** these effects stick and also repeatedly trigger like poison */
+//apparently these won't be required
+//#define FX_CYCLIC    3
 
 
 // FIXME: Dice roll should be probably done just once, e.g. when equipping 
@@ -123,6 +124,7 @@ public:
 	void ApplyEffect(Actor* target, Effect* fx, bool first_apply);
 	void PrepareDuration(Effect* fx);
 	void RemoveAllEffects(EffectRef &effect_reference);
+	void RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword param2);
 	void RemoveLevelEffects(ieDword level, bool dispellable);
 	Effect *GetEffect(ieDword idx) const;
 	/* returns next saved effect, increases index */
@@ -147,6 +149,7 @@ public:
 private:
 	//use the effect reference style calls from outside
 	void RemoveAllEffects(ieDword opcode);
+	void RemoveAllEffectsWithParam(ieDword opcode, ieDword param2);
 	Effect *HasOpcode(ieDword opcode) const;
 	Effect *HasOpcodeWithParam(ieDword opcode, ieDword param2) const;
 	Effect *HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDword param2) const;

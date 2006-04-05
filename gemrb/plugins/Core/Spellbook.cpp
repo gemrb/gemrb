@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.34 2006/04/04 21:59:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.35 2006/04/05 16:34:29 avenger_teambg Exp $
  *
  */
 
@@ -318,6 +318,10 @@ bool Spellbook::AddSpellMemorization(CRESpellMemorization* sm)
 	return true;
 }
 
+//if bonus is not set, then sets the base value (adjusts bonus too)
+//if bonus is set, then sets only the bonus
+//  if the bonus value is 0, then the bonus is double base value
+//  bonus is cummulative, but not saved
 void Spellbook::SetMemorizableSpellsCount(int Value, int type, unsigned int level, bool bonus)
 {
 	int diff;
@@ -337,7 +341,10 @@ void Spellbook::SetMemorizableSpellsCount(int Value, int type, unsigned int leve
 	}
 	CRESpellMemorization* sm = spells[type][level];
 	if (bonus) {
-		sm->Number2=Value;
+		if (!Value) {
+			Value=sm->Number;
+		}
+		sm->Number2+=Value;
 	}
 	else {
 		diff=sm->Number2-sm->Number;

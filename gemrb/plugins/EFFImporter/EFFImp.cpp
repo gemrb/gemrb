@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/EFFImporter/EFFImp.cpp,v 1.6 2006/01/14 20:41:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/EFFImporter/EFFImp.cpp,v 1.7 2006/04/05 16:34:30 avenger_teambg Exp $
  *
  */
 
@@ -99,15 +99,13 @@ Effect* EFFImp::GetEffectV1(Effect *fx)
 	str->ReadDword( &fx->DiceSides );
 	str->ReadDword( &fx->SavingThrowType );
 	str->ReadDword( &fx->SavingThrowBonus );
-	str->ReadDword( &fx->unknown );
+	str->ReadDword( &fx->IsVariable );
 
 	return fx;
 }
 
 Effect* EFFImp::GetEffectV20(Effect *fx)
 {
-	ieDword IsVariable;
-
 	memset( fx, 0, sizeof( Effect ) );
 
 	str->Seek(8, GEM_CURRENT_POS);
@@ -125,7 +123,7 @@ Effect* EFFImp::GetEffectV20(Effect *fx)
 	str->ReadDword( &fx->DiceSides );
 	str->ReadDword( &fx->SavingThrowType );
 	str->ReadDword( &fx->SavingThrowBonus );
-	str->ReadDword( &IsVariable ); //if this field was set to 1, this is a variable
+	str->ReadDword( &fx->IsVariable ); //if this field was set to 1, this is a variable	
 	str->ReadDword( &fx->PrimaryType );
 	str->Seek( 12, GEM_CURRENT_POS );
 	str->ReadDword( &fx->Resistance );
@@ -138,7 +136,7 @@ Effect* EFFImp::GetEffectV20(Effect *fx)
 	str->ReadResRef( fx->Source );
 	str->Seek( 12, GEM_CURRENT_POS );
 	//Variable simply overwrites the resource fields (Keep them grouped)
-	if (IsVariable) {
+	if (fx->IsVariable) {
 		str->ReadResRef( fx->Resource );
 		str->ReadResRef( fx->Resource+8 );
 		str->ReadResRef( fx->Resource+16 );

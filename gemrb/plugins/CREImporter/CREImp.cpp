@@ -8,14 +8,14 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.103 2006/04/04 21:59:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.104 2006/04/05 16:34:26 avenger_teambg Exp $
  *
  */
 
@@ -2186,8 +2186,13 @@ int CREImp::PutEffects( DataStream *stream, Actor *actor)
 			stream->WriteDword( &fx->Parameter3 );
 			stream->WriteDword( &fx->Parameter4 );
 			stream->Write( filling,8 );
-			stream->Write(fx->Resource2, 8);
-			stream->Write(fx->Resource3, 8);
+			if (fx->IsVariable) {
+				stream->Write(fx->Resource+8, 8);
+				stream->Write(fx->Resource+16, 8);
+			} else {
+				stream->Write(fx->Resource2, 8);
+				stream->Write(fx->Resource3, 8);
+			}
 			stream->Write( filling,20 );
 			stream->Write(fx->Source, 8);
 			stream->Write( filling,52 ); //12+32+8
@@ -2216,7 +2221,8 @@ int CREImp::PutEffects( DataStream *stream, Actor *actor)
 			stream->WriteDword( &fx->DiceSides );
 			stream->WriteDword( &fx->SavingThrowType );
 			stream->WriteDword( &fx->SavingThrowBonus );
-			stream->WriteDword( &fx->unknown );
+			//isvariable
+			stream->Write( filling,4 );
 		}
 	}
 	return 0;

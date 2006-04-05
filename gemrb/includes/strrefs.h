@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/strrefs.h,v 1.13 2005/12/12 18:39:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/strrefs.h,v 1.14 2006/04/05 16:34:32 avenger_teambg Exp $
  *
  */
 
@@ -88,4 +88,7 @@
 #define STR_AP_RESERVED2    54
 #define STR_AP_RESERVED3    55
 #define STR_AP_RESERVED4    56
+#define STR_CHARMED         57
+#define STR_DIRECHARMED     58
+#define STR_CONTROLLED      59
 #endif //! IE_STRINGS_H
