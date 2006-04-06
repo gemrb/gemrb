@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.59 2006/03/25 21:58:27 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.60 2006/04/06 21:03:25 avenger_teambg Exp $
  *
  */
 
@@ -188,7 +188,6 @@ public:
 	bool DisableMouse, DisableScroll;
 	short xCorr, yCorr;
 public:
-	virtual void* GetVideoSurface() = 0;
 	/** Returns true if a pixel on a given position in the sprite 
 	 * is transparent.
 	 * It is used to mask clicks to non-rectangular shaped controls */

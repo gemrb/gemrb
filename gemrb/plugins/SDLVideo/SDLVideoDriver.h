@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.63 2006/03/25 21:58:27 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.64 2006/04/06 21:03:30 avenger_teambg Exp $
  *
  */
 
@@ -127,11 +127,6 @@ public:
 
 	void SetFadeColor(int r, int g, int b);
 	void SetFadePercent(int percent);
-
-	void* GetVideoSurface()
-	{
-		return disp;
-	}
 	void InitMovieScreen(int &w, int &h);
 	void SetMovieFont(Font *stfont, Palette *pal);
 	void showFrame(unsigned char* buf, unsigned int bufw,
