@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.63 2006/04/04 21:59:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.64 2006/04/06 21:14:36 avenger_teambg Exp $
  *
  */
 
@@ -3721,12 +3721,12 @@ void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 
 void GameScript::Explore( Scriptable* Sender, Action* /*parameters*/)
 {
-	Sender->GetCurrentArea( )->Explore(0);
+	Sender->GetCurrentArea( )->Explore(-1);
 }
 
 void GameScript::UndoExplore( Scriptable* Sender, Action* /*parameters*/)
 {
-	Sender->GetCurrentArea( )->Explore(-1);
+	Sender->GetCurrentArea( )->Explore(0);
 }
 
 void GameScript::ExploreMapChunk( Scriptable* Sender, Action* parameters)
@@ -3970,7 +3970,7 @@ void GameScript::RandomFly(Scriptable* Sender, Action* parameters)
 		actor->SetOrientation(actor->GetOrientation()+1, false);
 	}
 	//fly in this direction for 5 steps
-	actor->MoveLine(5, GL_PASS);
+	actor->MoveLine(5, GL_PASS, actor->GetOrientation() );
 	//readding the action to the end of the queue
 	Sender->AddAction( parameters );
 	Sender->ReleaseCurrentAction();

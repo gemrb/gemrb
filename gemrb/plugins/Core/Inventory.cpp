@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.67 2006/04/04 21:59:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.68 2006/04/06 21:14:37 avenger_teambg Exp $
  *
  */
 
@@ -259,7 +259,7 @@ unsigned int Inventory::DestroyItem(const char *resref, ieDword flags, ieDword c
 			continue;
 		}
 		// here you can simply destroy all items of a specific type
-		if ( (flags&item->Flags)!=flags) {
+		if ( ( flags&( item->Flags^(IE_INV_ITEM_UNDROPPABLE|IE_INV_ITEM_EQUIPPED)))!=flags) {
 				continue;
 		}
 		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
@@ -326,7 +326,7 @@ int Inventory::RemoveItem(const char *resref, unsigned int flags, CREItem **res_
 		if (!item) {
 			continue;
 		}
-		if ( ((flags^IE_INV_ITEM_UNDROPPABLE)&item->Flags)!=flags) {
+		if ( (flags&(item->Flags^(IE_INV_ITEM_UNDROPPABLE|IE_INV_ITEM_EQUIPPED) ) )!=flags) {
 				continue;
 		}
 		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {

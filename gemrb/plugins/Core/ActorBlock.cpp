@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.137 2006/03/26 16:06:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.138 2006/04/06 21:14:37 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -626,13 +626,13 @@ void Moveble::SetStance(unsigned int arg)
 }
 
 //this could be used for WingBuffet as well
-void Moveble::MoveLine(int steps, int Pass)
+void Moveble::MoveLine(int steps, int Pass, ieDword orient)
 {
 	//remove previous path
 	ClearPath();
 	if (!steps)
 		return;
-	path = area->GetLine( Pos, steps, Orientation, Pass );
+	path = area->GetLine( Pos, steps, orient, Pass );
 }
 
 void Moveble::DoStep(unsigned int walk_speed)
@@ -1347,6 +1347,15 @@ void Container::CreateGroundIconCover()
 			Sprite2D& spr = *groundicons[i];
 			assert(groundiconcover->Covers(Pos.x, Pos.y, spr.XPos, spr.YPos, spr.Width, spr.Height));
 		}
+	}
+}
+
+void Container::SetContainerLocked(bool lock)
+{
+	if (lock) {
+		Flags|=CONT_LOCKED;
+	} else {
+		Flags&=~CONT_LOCKED;
 	}
 }
 

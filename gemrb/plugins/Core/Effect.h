@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.h,v 1.12 2006/04/05 16:34:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.h,v 1.13 2006/04/06 21:14:37 avenger_teambg Exp $
  *
  */
 
@@ -97,13 +97,11 @@ struct Effect {
 	ieDword PrimaryType;
 	ieDword Parameter3;
 	ieDword Parameter4;
-	//ieResRef VVCResource; //this is actually Resource2
 	ieResRef Source;
-	//char Variable[32]; //resources will cover this
 	ieDword SecondaryType;
-
 	// These are not in the IE files, but are our precomputed values
 	int  random_value;
+	ieDword PosX, PosY;
 };
 
 // FIXME: what about area spells? They can have map & coordinates as target

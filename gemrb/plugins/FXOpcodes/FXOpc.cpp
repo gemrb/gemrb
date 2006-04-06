@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.11 2006/04/05 16:34:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.12 2006/04/06 21:14:39 avenger_teambg Exp $
  *
  */
 
@@ -28,6 +28,7 @@
 #include "../Core/SoundMgr.h"
 #include "../Core/Game.h"
 #include "../Core/damages.h"
+#include "../Core/TileMap.h"  //needs for knock!
 #include "FXOpc.h"
 
 
@@ -39,8 +40,8 @@ int fx_cure_berserk_state (Actor* Owner, Actor* target, Effect* fx);//04
 int fx_set_charmed_state (Actor* Owner, Actor* target, Effect* fx);//05
 int fx_charisma_modifier (Actor* Owner, Actor* target, Effect* fx);//06
 int fx_set_color_gradient (Actor* Owner, Actor* target, Effect* fx);//07
-//08
-//09
+int fx_set_color_rgb (Actor* Owner, Actor* target, Effect* fx);//08
+int fx_set_color_pulse_rgb (Actor* Owner, Actor* target, Effect* fx);//09
 int fx_constitution_modifier (Actor* Owner, Actor* target, Effect* fx);//0a
 int fx_cure_poisoned_state (Actor* Owner, Actor* target, Effect* fx);//0b
 int fx_damage (Actor* Owner, Actor* target, Effect* fx);//0c
@@ -148,20 +149,20 @@ int fx_equip_item (Actor* Owner, Actor* target, Effect* fx);//71
 int fx_dither (Actor* Owner, Actor* target, Effect* fx);//72
 int fx_detect_alignment (Actor* Owner, Actor* target, Effect* fx);//73
 int fx_cure_improved_invisible_state (Actor* Owner, Actor* target, Effect* fx);//74
-//75
+int fx_reveal_area (Actor* Owner, Actor* target, Effect* fx);//75
 //76
 //77
 //78
 //79
-//7a
-//7b
-//7c
-//7d
+int fx_create_inventory_item (Actor* Owner, Actor* target, Effect* fx);//7a
+int fx_remove_inventory_item (Actor* Owner, Actor* target, Effect* fx);//7b
+int fx_dimension_door (Actor* Owner, Actor* target, Effect* fx);//7c
+int fx_knock (Actor* Owner, Actor* target, Effect* fx);//7d
 int fx_movement_modifier (Actor* Owner, Actor* target, Effect* fx);//7e
 //7f
 int fx_set_confused_state (Actor* Owner, Actor* target, Effect* fx);//80
-//81
-//82
+int fx_set_aid_state (Actor* Owner, Actor* target, Effect* fx);//81
+int fx_set_bless_state (Actor* Owner, Actor* target, Effect* fx);//82
 //83
 //84
 //85
@@ -173,7 +174,8 @@ int fx_set_petrified_state (Actor* Owner, Actor* target, Effect* fx);//86
 int fx_display_string (Actor* Owner, Actor* target, Effect* fx);//8b
 //8c
 //8d
-//8f
+int fx_display_portrait_icon (Actor* Owner, Actor* target, Effect* fx);//8e
+int fx_create_item_in_slot (Actor* Owner, Actor* target, Effect* fx);//8f
 int fx_disable_button (Actor* Owner, Actor* target, Effect* fx);//90
 int fx_disable_spellcasting (Actor* Owner, Actor* target, Effect* fx);//91
 //92
@@ -197,9 +199,9 @@ int fx_cure_slow_state (Actor* Owner, Actor* target, Effect* fx);//a3
 //a4
 int fx_pause_target (Actor* Owner, Actor* target, Effect* fx);//a5
 int fx_magic_resistance_modifier (Actor* Owner, Actor* target, Effect* fx);//a6
-//a7
-//a8
-//a9
+int fx_missile_to_hit_modifier (Actor* Owner, Actor* target, Effect* fx);//a7
+int fx_remove_creature (Actor* Owner, Actor* target, Effect* fx);//a8
+int fx_disable_portrait_icon (Actor* Owner, Actor* target, Effect* fx);//a9
 //aa
 //ab
 //ac
@@ -264,13 +266,13 @@ int fx_stoneskin_modifier (Actor* Owner, Actor* target, Effect* fx); //da
 //e7
 //e8
 int fx_proficiency (Actor* Owner, Actor* target, Effect* fx);//e9
-//ea
-//eb
-//ec
-//ed
-//ee
-//ef
-//f0
+int fx_create_contingency (Actor* Owner, Actor* /*target*/, Effect* fx);//ea
+int fx_wing_buffet (Actor* Owner, Actor* target, Effect* fx);//eb
+int fx_puppet_master (Actor* Owner, Actor* target, Effect* fx);//ec
+int fx_puppet (Actor* Owner, Actor* target, Effect* fx);//ed
+int fx_disintegrate (Actor* Owner, Actor* target, Effect* fx);//ee
+int fx_farsee (Actor* Owner, Actor* target, Effect* fx);//ef
+int fx_remove_portrait_icon (Actor* Owner, Actor* target, Effect* fx);//f0
 //f1
 int fx_cure_confused_state (Actor* Owner, Actor* target, Effect* fx);//f2
 //f3
@@ -285,16 +287,16 @@ int fx_cure_confused_state (Actor* Owner, Actor* target, Effect* fx);//f2
 //fc
 //fd
 //fe
-//ff
-int fx_store_spell_sequencer(Actor* Owner, Actor* target, Effect* fx);//0x100
-int fx_create_spell_sequencer(Actor* Owner, Actor* target, Effect* fx);//101
-int fx_activate_spell_sequencer(Actor* Owner, Actor* target, Effect* fx);//102
-int fx_spelltrap(Actor* Owner, Actor* target, Effect* fx);//103
+int fx_create_item_days (Actor* Owner, Actor* target, Effect* fx);//ff
+int fx_store_spell_sequencer (Actor* Owner, Actor* target, Effect* fx);//0x100
+int fx_create_spell_sequencer (Actor* Owner, Actor* target, Effect* fx);//101
+int fx_activate_spell_sequencer (Actor* Owner, Actor* target, Effect* fx);//102
+int fx_spelltrap (Actor* Owner, Actor* target, Effect* fx);//103
 //104 //crashes so far
-int fx_restore_spell_level(Actor* Owner, Actor* target, Effect* fx);//105
-int fx_visual_range_modifier(Actor* Owner, Actor* target, Effect* fx);//106
-int fx_backstab_modifier(Actor* Owner, Actor* target, Effect* fx);//107
-int fx_drop_weapon(Actor* Owner, Actor* target, Effect* fx);//108
+int fx_restore_spell_level (Actor* Owner, Actor* target, Effect* fx);//105
+int fx_visual_range_modifier (Actor* Owner, Actor* target, Effect* fx);//106
+int fx_backstab_modifier (Actor* Owner, Actor* target, Effect* fx);//107
+int fx_drop_weapon (Actor* Owner, Actor* target, Effect* fx);//108
 int fx_modify_global_variable (Actor* Owner, Actor* target, Effect* fx);//109
 //10a unknown
 int fx_protection_from_string (Actor* Owner, Actor* target, Effect* fx);//10b
@@ -367,6 +369,7 @@ static EffectRef effectnames[] = {
 	{ "CharismaModifier", fx_charisma_modifier, 0 },
 	{ "ColdResistanceModifier", fx_cold_resistance_modifier, 0 },
 	{ "Color:SetCharacterColorsByPalette", fx_set_color_gradient, 0 },
+	{ "Color:SetCharacterColorsByRGB", fx_set_color_rgb, 0 },
 	{ "ConstitutionModifier", fx_constitution_modifier, 0 },
 	{ "CriticalHitModifier", fx_critical_hit_modifier, 0 },
 	{ "CrushingResistanceModifier", fx_crushing_resistance_modifier, 0 },
@@ -408,9 +411,18 @@ static EffectRef effectnames[] = {
 	{ "FistHitModifier", fx_fist_to_hit_modifier, 0 },
 	{ "ForceSurgeModifier", fx_force_surge_modifier, 0 },
 	{ "GoldModifier", fx_gold_modifier, 0 },
+	{ "Icon:Disable", fx_disable_portrait_icon, 0 },
+	{ "Icon:Display", fx_display_portrait_icon, 0 },
+	{ "Icon:Remove", fx_remove_portrait_icon, 0 },
 	{ "ImprovedHaste", fx_improved_haste_state, 0 },
 	{ "IntelligenceModifier", fx_intelligence_modifier, 0 },
 	{ "IntoxicationModifier", fx_intoxication_modifier, 0 },
+	{ "Item:CreateDays", fx_create_item_days, 0 },
+	{ "Item:CreateInSlot", fx_create_item_in_slot, 0 },
+	{ "Item:CreateInventory", fx_create_inventory_item, 0 },
+	{ "Item:CreateMagic", fx_create_magic_item, 0 },
+	{ "Item:Remove", fx_remove_item, 0 },
+	{ "Item:RemoveInventory", fx_remove_inventory_item, 0 },
 	{ "KillCreatureType", fx_kill_creature_type, 0 },
 	{ "LearnSpell", fx_learn_spell, 0 },
 	{ "LevelModifier", fx_level_modifier, 0 },
@@ -426,6 +438,7 @@ static EffectRef effectnames[] = {
 	{ "MinimumHPModifier", fx_minimum_hp_modifier, 0 },
 	{ "MiscastMagicModifier", fx_miscast_magic_modifier, 0 },
 	{ "MissileDamageModifier", fx_missile_damage_modifier, 0 },
+	{ "MissileHitModifier", fx_missile_to_hit_modifier, 0 },
 	{ "MissilesResistanceModifier", fx_missiles_resistance_modifier, 0 },
 	{ "MoraleBreakModifier", fx_morale_break_modifier, 0 },
 	{ "NoCircleState", fx_no_circle_state, 0 },
@@ -727,6 +740,14 @@ int fx_set_color_gradient (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_set_color_gradient (%2d): Gradient: %d, Location: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	target->SetColor( fx->Parameter2, fx->Parameter1 );
+	return FX_APPLIED;
+}
+
+int fx_set_color_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_set_color_rgb (%2d): RGB: %x, Location: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	target->SetColor( fx->Parameter2, fx->Parameter1 | 0xff000000 );
 	return FX_APPLIED;
 }
 
@@ -1869,12 +1890,12 @@ int fx_reputation_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 //retreat_from (unknown)
 //0x6f
 
-EffectRef fx_remove_item_ref={"RemoveItem",NULL,-1};
+EffectRef fx_remove_item_ref={"Item:Remove",NULL,-1};
 
 int fx_create_magic_item (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	//charge count is incorrect
-	target->inventory.SetSlotItemRes(fx->Resource, target->inventory.GetMagicSlot(),1,0,0);
+	target->inventory.SetSlotItemRes(fx->Resource, target->inventory.GetMagicSlot(),fx->Parameter1,fx->Parameter3,fx->Parameter4);
 	if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
 //if this effect has expiration, then it will remain as a remove_item
 //on the effect queue, inheriting all the parameters
@@ -1924,11 +1945,135 @@ int fx_cure_improved_invisible_state (Actor* /*Owner*/, Actor* target, Effect* f
 	return FX_NOT_APPLIED;
 }
 
+// 0x75
+int fx_reveal_area (Actor* /*Owner*/, Actor* target, Effect* /*fx*/)
+{
+	//reveals whole area
+	target->GetCurrentArea()->Explore(-1);
+	return FX_NOT_APPLIED;
+}
+// 0x76
+
+// 0x77
+EffectRef fx_mirror_image_modifier_ref={"MirrorImageModifier",NULL,-1};
+
+int fx_mirror_image (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	fx->Opcode = EffectQueue::ResolveEffect(fx_mirror_image_modifier_ref);
+	fx->Parameter1 = core->Roll(1, fx->Parameter1, 0);
+	Effect *fx2 = target->fxqueue.HasEffect(fx_mirror_image_modifier_ref);
+	if (fx2) {
+		//update old effect with our numbers if our numbers are more
+		if (fx2->Parameter1<fx->Parameter1) {
+			fx2->Parameter1=fx->Parameter1;
+		}
+		if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
+			fx2->TimingMode = FX_DURATION_INSTANT_PERMANENT;
+		}
+		return FX_NOT_APPLIED;
+	}
+	return FX_APPLIED;
+}
+// 0x78
+// 0x79
+// 0x7a
+EffectRef fx_remove_inventory_item_ref={"Item:RemoveInventory",NULL,-1};
+
+int fx_create_inventory_item (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_create_inventory_item (%2d)\n", fx->Opcode );
+	target->inventory.SetSlotItemRes( fx->Resource, -1, fx->Parameter1, fx->Parameter3, fx->Parameter4 );
+        if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
+//if this effect has expiration, then it will remain as a remove_item
+//on the effect queue, inheriting all the parameters
+                fx->Opcode=EffectQueue::ResolveEffect(fx_remove_inventory_item_ref);
+                fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
+                return FX_APPLIED;
+        }
+	return FX_NOT_APPLIED;
+}
+// 0x7b
+int fx_remove_inventory_item (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_remove_inventory_item (%2d)\n", fx->Opcode );
+	target->inventory.DestroyItem(fx->Resource,IE_INV_ITEM_EQUIPPED,1);
+	return FX_NOT_APPLIED;
+}
+
+// 0x7c
+int fx_dimension_door (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_dimension_door (%2d)\n", fx->Opcode );
+	Point p(fx->PosX, fx->PosY);
+	target->SetPosition(target->GetCurrentArea(), p, true, 0 );
+	return FX_NOT_APPLIED;
+}
+// 0x7d
+int fx_knock (Actor* Owner, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_knock (%2d)\n", fx->Opcode );
+	Map *map = Owner->GetCurrentArea();
+	Point p(fx->PosX, fx->PosY);
+	Door *door = map->TMap->GetDoor(p);
+	if (door) {
+		door->SetDoorLocked(false, true);
+		return FX_NOT_APPLIED;
+	}
+	Container *container = map->TMap->GetContainer(p);
+	if (container) {
+		container->SetContainerLocked(false);
+		return FX_NOT_APPLIED;
+	}
+	return FX_NOT_APPLIED;
+}
 // 0x7e
 int fx_movement_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_slow_factor (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_MOD(IE_MOVEMENTRATE);
+	return FX_APPLIED;
+}
+
+// 0x7f
+int fx_summon_monster (Actor* Owner, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_summon_monster (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	//check the summoning limit?
+
+	ieResRef monster;
+
+	//get monster resref from 2da determined by fx->Resource 
+	DataStream* ds = core->GetResourceMgr()->GetResource( monster, IE_CRE_CLASS_ID );
+	Actor *ab = core->GetCreature(ds);
+	if (!ab) {
+		return FX_NOT_APPLIED;
+	}
+
+	ab->LastSummoner = Owner->GetID();
+
+	switch (fx->Parameter2) {
+		case 0: case 1: case 3:
+			ab->SetBase(IE_EA, EA_ALLY); //is this the summoned EA?
+			break;
+		case 5:
+			ab->SetBase(IE_EA, EA_ENEMY);
+			break;
+		default:
+			break;
+	}
+
+	//probably we should use the position in fx (and set it earlier)
+	Point position = target->Pos;
+	//
+	//
+	Map *map = target->GetCurrentArea();
+	ab->SetPosition(map, position, true, 0);
+	if (fx->Resource2[0]) {
+		Point p(0,0);
+		ScriptedAnimation* vvc = core->GetScriptedAnimation(fx->Resource2, p, 0);
+		map->AddVVCCell( vvc );
+	}
+
 	return FX_APPLIED;
 }
 
@@ -1940,13 +2085,16 @@ int fx_set_confused_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
+// 0x81
 int fx_set_aid_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_aid_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STATE_SET( STATE_AID );
 	if (!fx->Parameter2) {
 		fx->Parameter2=core->Roll(fx->Parameter1,8,0);
 	}
+	if (STATE_GET (STATE_AID) ) //aid is non cummulative
+		return FX_NOT_APPLIED;
+	STATE_SET( STATE_AID );
 	STAT_ADD( IE_MAXHITPOINTS, fx->Parameter2);
 	STAT_ADD( IE_SAVEVSDEATH, fx->Parameter1);
 	STAT_ADD( IE_SAVEVSWANDS, fx->Parameter1);
@@ -1954,7 +2102,65 @@ int fx_set_aid_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD( IE_SAVEVSBREATH, fx->Parameter1);
 	STAT_ADD( IE_SAVEVSSPELL, fx->Parameter1);
 	STAT_ADD( IE_HITBONUS, fx->Parameter1);
-	return FX_NOT_APPLIED;
+	return FX_APPLIED;
+}
+
+// 0x82
+int fx_set_bless_state (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_set_bless_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	if (STATE_GET (STATE_BLESS) ) //bless is non cummulative
+		return FX_NOT_APPLIED;
+	STATE_SET( STATE_BLESS );
+	STAT_ADD( IE_SAVEVSDEATH, fx->Parameter1);
+	STAT_ADD( IE_SAVEVSWANDS, fx->Parameter1);
+	STAT_ADD( IE_SAVEVSPOLY, fx->Parameter1);
+	STAT_ADD( IE_SAVEVSBREATH, fx->Parameter1);
+	STAT_ADD( IE_SAVEVSSPELL, fx->Parameter1);
+	return FX_APPLIED;
+}
+// 0x83
+int fx_set_chant_state (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_set_chant_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	if (STATE_GET (STATE_CHANT) ) //chant is non cummulative
+		return FX_NOT_APPLIED;
+	STATE_SET( STATE_CHANT );
+	STAT_ADD( IE_SAVEVSDEATH, fx->Parameter1);
+	STAT_ADD( IE_SAVEVSWANDS, fx->Parameter1);
+	STAT_ADD( IE_SAVEVSPOLY, fx->Parameter1);
+	STAT_ADD( IE_SAVEVSBREATH, fx->Parameter1);
+	STAT_ADD( IE_SAVEVSSPELL, fx->Parameter1);
+	return FX_APPLIED;
+}
+
+// 0x84
+int fx_set_holy_state (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_set_holy_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	if (STATE_GET (STATE_HOLY) ) //holy power is non cummulative
+		return FX_NOT_APPLIED;
+	STATE_SET( STATE_HOLY );
+	STAT_ADD( IE_STR, fx->Parameter1);
+	STAT_ADD( IE_CON, fx->Parameter1);
+	STAT_ADD( IE_DEX, fx->Parameter1);
+	return FX_APPLIED;
+}
+
+// 0x85
+int fx_set_luck (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_set_luck (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	if (STATE_GET (STATE_LUCK) ) //this luck is non cummulative
+		return FX_NOT_APPLIED;
+	if (0) printf( "fx_set_luck_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	STATE_SET( STATE_LUCK );
+	STAT_SET( IE_LUCK, fx->Parameter1 );
+	return FX_APPLIED;
 }
 
 // 0x86
@@ -1965,6 +2171,14 @@ int fx_set_petrified_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
+// 0x87
+
+// 0x88
+
+// 0x89
+
+// 0x8A
+
 // 0x8B
 // gemrb extension: rgb colour for displaystring
 int fx_display_string (Actor* /*Owner*/, Actor* target, Effect* fx)
@@ -1974,6 +2188,20 @@ int fx_display_string (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
+//0x8f
+int fx_create_item_in_slot (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_create_item_in_slot (%2d): Button: %d\n", fx->Opcode, fx->Parameter2 );
+	//create item and set it in target's slot
+	target->inventory.SetSlotItemRes( fx->Resource, core->QuerySlot(fx->Parameter2), fx->Parameter1, fx->Parameter3, fx->Parameter4 );
+	if (fx->TimingMode!=FX_DURATION_INSTANT_LIMITED) {
+		//convert it to a destroy item
+		fx->Opcode=EffectQueue::ResolveEffect(fx_remove_item_ref);
+		fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
+		return FX_APPLIED;
+	}
+	return FX_NOT_APPLIED;
+}
 // 0x90
 int fx_disable_button (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
@@ -2055,18 +2283,16 @@ int fx_set_grease_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x9f
-#if 0
 int fx_set_mirrorimages (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_mirrorimages (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STAT_MOD( IE_MIRRORIMAGE, fx->Parameter2);
-	return FX_PERMANENT; //is this correct?
+	STAT_SET( IE_MIRRORIMAGES, fx->Parameter2);
+	return FX_APPLIED;
 }
-#endif
-
-EffectRef fx_sanctuary_state_ref={"Overlay:Sanctuary",NULL,-1};
 
 // 0xa0
+EffectRef fx_sanctuary_state_ref={"Overlay:Sanctuary",NULL,-1};
+
 int fx_cure_sanctuary_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_sanctuary_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -2076,10 +2302,13 @@ int fx_cure_sanctuary_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0xa1
+EffectRef fx_set_panic_state_ref={"State:Panic",NULL,-1};
+
 int fx_cure_panic_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_panic_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STATE_CURE( STATE_PANIC );
+	target->fxqueue.RemoveAllEffects(fx_set_panic_state_ref);
 	return FX_NOT_APPLIED;
 }
 
@@ -2122,6 +2351,15 @@ int fx_magic_resistance_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_magic_resistance_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	STAT_MOD( IE_RESISTMAGIC );
+	return FX_APPLIED;
+}
+
+// 0xA7
+int fx_missile_to_hit_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_missile_to_hit_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	STAT_MOD( IE_MISSILEHITBONUS );
 	return FX_APPLIED;
 }
 
@@ -2268,10 +2506,100 @@ int fx_proficiency (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_proficiency (%2d): Value: %d, Stat: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	//probably no need to check the boundaries, the original IE
-	//did check it though (without boundaries, it is more useful)
-	target->NewStat( fx->Parameter2, fx->Parameter1, MOD_ABSOLUTE );
+	//did check it (though without boundaries, it is more useful)
+	STAT_SET (fx->Parameter2, fx->Parameter1);
 	return FX_APPLIED;
 }
+
+// 0xea
+int fx_create_contingency (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_create_contingency (%2d): Value: %d, Stat: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	return FX_NOT_APPLIED;
+}
+
+#define WB_AWAY 0
+#define WB_TOWARDS 1
+#define WB_FIXDIR 2
+#define WB_OWNDIR 3
+#define WB_AWAYOWNDIR 4
+
+// 0xeb
+int fx_wing_buffet (Actor* Owner, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_wing_buffet (%2d): Value: %d, Stat: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	//create movement in actor
+
+	ieDword dir;
+	switch(fx->Parameter2) {
+		case WB_AWAY:
+		default:
+			dir = GetOrient(Owner->Pos, target->Pos);
+			break;
+		case WB_TOWARDS:
+			dir = GetOrient(target->Pos, Owner->Pos);
+			break;
+		case WB_FIXDIR:
+			dir = fx->Parameter3;
+			break;
+		case WB_OWNDIR:
+			dir = target->GetOrientation();
+			break;
+		case WB_AWAYOWNDIR:
+			dir = target->GetOrientation()^8;
+			break;
+	}
+	//could be GL_REBOUND too :)
+	//add effect to alter target's stance
+	target->MoveLine( fx->Parameter1, GL_NORMAL, dir );
+	return FX_APPLIED;
+}
+
+// 0xec
+int fx_puppet_master (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+        if (0) printf( "fx_puppet_master (%2d): Value: %d, Stat: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	STAT_SET (IE_PUPPETMASTERTYPE, fx->Parameter1);
+	return FX_APPLIED;
+}
+// 0xed
+int fx_puppet (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+        if (0) printf( "fx_puppet (%2d): Value: %d, Stat: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	STAT_SET (IE_PUPPETTYPE, fx->Parameter1);
+	return FX_APPLIED;
+}
+
+// 0xee
+int fx_disintegrate (Actor* Owner, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_disintegrate (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+ 	if (match_ids( target, fx->Parameter1, fx->Parameter2) ) {
+		target->Damage(0, fx->Parameter2, Owner); //hmm?
+		//death has damage type too
+		target->Die(Owner);
+	}
+	return FX_NOT_APPLIED;
+}
+// 0xef
+int fx_farsee (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_farsee (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	//invoke farsee guiscript
+	return FX_NOT_APPLIED;
+}
+
+// 0xf0
+EffectRef fx_display_portrait_icon_ref={"Icon:Display",NULL,-1};
+
+int fx_remove_portrait_icon (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_remove_portrait_icon (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	target->fxqueue.RemoveAllEffectsWithParam( fx_display_portrait_icon_ref, fx->Parameter2 );
+	return FX_NOT_APPLIED;
+}
+// 0xf1
 
 // 0xF2
 int fx_cure_confused_state (Actor* /*Owner*/, Actor* target, Effect* fx)
@@ -2280,7 +2608,24 @@ int fx_cure_confused_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STATE_CURE( STATE_CONFUSED );
 	return FX_NOT_APPLIED;
 }
-
+// 0xff
+int fx_create_item_days (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+        if (0) printf( "fx_create_inventory_item (%2d)\n", fx->Opcode );
+        target->inventory.SetSlotItemRes( fx->Resource, -1, fx->Parameter1, fx->Parameter3, fx->Parameter4 );
+        if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
+//if this effect has expiration, then it will remain as a remove_item
+//on the effect queue, inheriting all the parameters
+		//duration needs a hack (recalculate it for days)
+		//no idea if this multiplier is ok
+		fx->Duration+=(fx->Duration-core->GetGame()->GameTime)*2400;
+                fx->Opcode=EffectQueue::ResolveEffect(fx_remove_inventory_item_ref
+);
+                fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
+                return FX_APPLIED;
+        }
+        return FX_NOT_APPLIED;
+}
 // 0x100
 int fx_store_spell_sequencer(Actor* /*Owner*/, Actor* /*target*/, Effect* /*fx*/)
 {

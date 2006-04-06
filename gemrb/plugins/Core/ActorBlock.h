@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.101 2006/03/26 16:06:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.102 2006/04/06 21:14:37 avenger_teambg Exp $
  *
  */
 
@@ -319,7 +319,7 @@ public:
 	void AddWayPoint(Point &Des);
 	void RunAwayFrom(Point &Des, int PathLength, int flags);
 	void RandomWalk(bool can_stop);
-	void MoveLine(int steps, int Pass);
+	void MoveLine(int steps, int Pass, ieDword Orient);
 	void FixPosition();
 	void WalkTo(Point &Des, int MinDistance = 0);
 	void MoveTo(Point &Des);
@@ -398,6 +398,7 @@ public:
 	Container(void);
 	~Container(void);
 	void DebugDump();
+	void SetContainerLocked(bool lock);
 	//turns the container to a pile
 	void DestroyContainer();
 	//removes an item from the container's inventory
