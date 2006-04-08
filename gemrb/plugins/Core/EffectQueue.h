@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.21 2006/04/05 16:34:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.22 2006/04/08 18:40:15 avenger_teambg Exp $
  *
  */
 
@@ -49,6 +49,12 @@ class Actor;
 ///** these effects stick and also repeatedly trigger like poison */
 //apparently these won't be required
 //#define FX_CYCLIC    3
+
+//remove level effects flags
+#define RL_DISPELLABLE  1  //only dispellables
+#define RL_MATCHSCHOOL  2  //match school
+#define RL_MATCHSECTYPE 4  //match secondary type
+#define RL_REMOVEFIRST  8  //remove only one spell (could be more effects)
 
 
 // FIXME: Dice roll should be probably done just once, e.g. when equipping 
@@ -123,9 +129,11 @@ public:
 	void ApplyAllEffects(Actor* target);
 	void ApplyEffect(Actor* target, Effect* fx, bool first_apply);
 	void PrepareDuration(Effect* fx);
+	//remove all effects of a given spell
+	void RemoveAllEffects(ieResRef Removed);
 	void RemoveAllEffects(EffectRef &effect_reference);
 	void RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword param2);
-	void RemoveLevelEffects(ieDword level, bool dispellable);
+	void RemoveLevelEffects(ieDword level, ieDword flags, ieDword match);
 	Effect *GetEffect(ieDword idx) const;
 	/* returns next saved effect, increases index */
 	Effect *GetNextSavedEffect(ieDword &idx) const;
@@ -138,6 +146,7 @@ public:
 	Effect *HasEffectWithParam(EffectRef &effect_reference, ieDword param2);
 	Effect *HasEffectWithParamPair(EffectRef &effect_reference, ieDword param1, ieDword param2);
 	Effect *HasEffectWithResource(EffectRef &effect_reference, ieResRef resource);
+	bool HasAnyDispellableEffect() const;
 
 	//getting summarised effects
 	int BonusAgainstCreature(EffectRef &effect_reference, Actor *actor);

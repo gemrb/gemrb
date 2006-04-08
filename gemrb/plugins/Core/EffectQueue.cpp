@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.54 2006/04/05 16:34:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.55 2006/04/08 18:40:15 avenger_teambg Exp $
  *
  */
 
@@ -321,6 +321,7 @@ void EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 #define MATCH_PARAM1() if((*f)->Parameter1!=param1) { continue; }
 #define MATCH_PARAM2() if((*f)->Parameter2!=param2) { continue; }
 #define MATCH_RESOURCE() if( strnicmp( (*f)->Resource, resource, 8) ) { continue; }
+#define MATCH_SOURCE() if( strnicmp( (*f)->Source, Removed, 8) ) { continue; }
 
 //call this from an applied effect, after it returns, these effects
 //will be killed along with it
@@ -330,6 +331,18 @@ void EffectQueue::RemoveAllEffects(ieDword opcode)
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_OPCODE();
 		MATCH_LIVE_FX();
+
+		(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;
+	}
+}
+
+//remove effects belonging to a given spell
+void EffectQueue::RemoveAllEffects(ieResRef Removed)
+{
+	std::vector< Effect* >::iterator f;
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
+		MATCH_LIVE_FX();
+		MATCH_SOURCE();
 
 		(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;
 	}
@@ -369,18 +382,40 @@ void EffectQueue::RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword
 	RemoveAllEffectsWithParam(effect_reference.EffText, param2);
 }
 
-void EffectQueue::RemoveLevelEffects(ieDword level, bool dispellable)
+void EffectQueue::RemoveLevelEffects(ieDword level, ieDword Flags, ieDword match)
 {
+	ieResRef Removed;
+
+	Removed[0]=0;
 	std::vector< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		if ( (*f)->Power<=level) {
 			continue;
 		}
 
+		if (Removed[0]) {
+			MATCH_SOURCE();
+		}
+		if (Flags&RL_MATCHSCHOOL) {
+			if ((*f)->PrimaryType!=match) {
+				continue;
+			}
+		}
+		if (Flags&RL_MATCHSECTYPE) {
+			if ((*f)->SecondaryType!=match) {
+				continue;
+			}
+		}
 		//if dispellable was not set, or the effect is dispellable
 		//then remove it
-		if (!dispellable || ((*f)->Resistance&FX_CAN_DISPEL) ) {
-			(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;
+		if (Flags&RL_DISPELLABLE) {
+			if (!(*f)->Resistance&FX_CAN_DISPEL) {
+				continue;
+			}
+		}
+		(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;
+		if (Flags&RL_REMOVEFIRST) {
+			memcpy(Removed,(*f)->Source, sizeof(Removed));
 		}
 	}
 }
@@ -507,6 +542,17 @@ Effect *EffectQueue::HasEffectWithResource(EffectRef &effect_reference, ieResRef
 {
 	ResolveEffectRef(effect_reference);
 	return HasOpcodeWithResource(effect_reference.EffText, resource);
+}
+
+bool EffectQueue::HasAnyDispellableEffect() const
+{
+	std::vector< Effect* >::const_iterator f;
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
+		if ((*f)->Resistance&FX_CAN_DISPEL) {
+			return true;
+		}
+	}
+	return false;
 }
 
 void EffectQueue::dump()

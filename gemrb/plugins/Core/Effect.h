@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.h,v 1.13 2006/04/06 21:14:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.h,v 1.14 2006/04/08 18:40:15 avenger_teambg Exp $
  *
  */
 
@@ -94,7 +94,7 @@ struct Effect {
 	ieDword IsVariable;
 
 	// EFF V2.0 fields:
-	ieDword PrimaryType;
+	ieDword PrimaryType; //school
 	ieDword Parameter3;
 	ieDword Parameter4;
 	ieResRef Source;

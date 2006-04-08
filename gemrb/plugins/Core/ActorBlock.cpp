@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.138 2006/04/06 21:14:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.139 2006/04/08 18:40:15 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -1060,10 +1060,12 @@ void Door::SetPolygon(bool Open, Gem_Polygon* poly)
 
 void Door::TryPickLock(Actor *actor)
 {
-	if (TrapFlags) {
+	if (Trapped) {
+		TrapDetected = 1;
 		//trap fired
 		if (!(Flags & DOOR_RESET) ) {
 			//trap removed
+			Trapped = 0;
 		}
 		return;
 	}
@@ -1082,8 +1084,10 @@ void Door::DebugDump()
 	printf( "Debugdump of Door %s:\n", GetScriptName() );
 	printf( "Door Open: %s\n", YESNO(IsOpen()));
 	printf( "Door Locked: %s\n", YESNO(Flags&DOOR_LOCKED));
-	printf( "Door Trapped: %s (permanent:%s)\n", YESNO(TrapFlags), YESNO(Flags&DOOR_RESET));
-	printf( "Trap Detectable: %s\n", YESNO(Flags&DOOR_DETECTABLE) );
+	printf( "Door Trapped: %s\n", YESNO(Trapped));
+	if (Trapped) {
+		printf( "Trap Permanent: %s Detectable: %s\n", YESNO(Flags&DOOR_RESET), YESNO(Flags&DOOR_DETECTABLE) );
+	}
 	printf( "Secret door: %s (Found: %s)\n", YESNO(Flags&DOOR_SECRET),YESNO(Flags&DOOR_FOUND));
 	const char *Key = GetKey();
 	const char *name = "NONE";

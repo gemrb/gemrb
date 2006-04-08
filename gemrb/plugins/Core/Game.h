@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.76 2006/01/05 14:14:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.77 2006/04/08 18:40:15 avenger_teambg Exp $
  *
  */
 
@@ -186,6 +186,8 @@ public:
 	ieResRef AnotherArea;
 	ieResRef CurrentArea;
 	ieResRef LoadMos;
+	Actor *timestop_owner;
+	ieDword timestop_end;
 public:
 	/** Returns the PC's slot count for partyID */
 	int FindPlayer(unsigned int partyID);
@@ -315,6 +317,11 @@ public:
 	void UpdateScripts();
 	/** runs area functionality, sets partyrested trigger */
 	void RestParty(bool noareacheck);
+	/** timestop effect initiated by actor */
+	void TimeStop(Actor *actor, ieDword end);
+	/** gets the colour which should be applied over the game area,
+	    may return NULL */
+	Color *GetGlobalTint();
 	/** Dumps information about the object */
 	void DebugDump();
 };

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.35 2006/04/05 16:34:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.36 2006/04/08 18:40:15 avenger_teambg Exp $
  *
  */
 
@@ -255,6 +255,35 @@ unsigned int Spellbook::GetKnownSpellsCount(int type, unsigned int level) const
 	return spells[type][level]->known_spells.size();
 }
 
+//removes spell from both memorized/book
+void Spellbook::RemoveSpell(ieResRef ResRef)
+{
+	for(int type =0; type<NUM_SPELL_TYPES; type++) {
+		std::vector< CRESpellMemorization* >::iterator sm;
+		for (sm = spells[type].begin(); sm != spells[type].end(); sm++) {
+			std::vector< CREKnownSpell* >::iterator ks;
+
+			for (ks = (*sm)->known_spells.begin(); ks != (*sm)->known_spells.end(); ks++) {
+				if (strnicmp(ResRef, (*ks)->SpellResRef, sizeof(ResRef) ) ) {
+					continue;
+				}
+				delete *ks;
+				(*sm)->known_spells.erase(ks);
+			}
+
+			std::vector< CREMemorizedSpell* >::iterator ms;
+
+			for (ms = (*sm)->memorized_spells.begin(); ms != (*sm)->memorized_spells.end(); ms++) {
+				if (strnicmp(ResRef, (*ms)->SpellResRef, sizeof(ResRef) ) ) {
+					continue;
+				}
+				delete *ms;
+				(*sm)->memorized_spells.erase(ms);
+			}
+		}
+	}
+}
+
 bool Spellbook::AddKnownSpell(int type, unsigned int level, CREKnownSpell *spl)
 {
 	if (type >= NUM_SPELL_TYPES) {
@@ -386,7 +415,6 @@ bool Spellbook::UnmemorizeSpell(CREMemorizedSpell* spell)
 			std::vector< CREMemorizedSpell* >::iterator s;
 			for (s = (*sm)->memorized_spells.begin(); s != (*sm)->memorized_spells.end(); s++) {
 				if (*s == spell) {
-
 					delete *s;
 					(*sm)->memorized_spells.erase( s );
 					return true;
@@ -439,6 +467,26 @@ void Spellbook::ChargeAllSpells()
 	}
 }
 
+//unmemorizes the highest level spell possible
+//returns true if successful
+bool Spellbook::DepleteSpell(int type)
+{
+	if (type>=NUM_SPELL_TYPES) {
+		return false;
+	}
+	unsigned int j = spells[type].size();
+	while(j--) {
+		CRESpellMemorization* sm = spells[type][j];
+
+		for (unsigned int k = 0; k < sm->memorized_spells.size(); k++) {
+			if (DepleteSpell( sm->memorized_spells[k] )) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 bool Spellbook::ChargeSpell(CREMemorizedSpell* spl)
 {
 	spl->Flags = 1;
@@ -447,8 +495,11 @@ bool Spellbook::ChargeSpell(CREMemorizedSpell* spl)
 
 bool Spellbook::DepleteSpell(CREMemorizedSpell* spl)
 {
-	spl->Flags = 0;
-	return true;
+	if (spl->Flags) {
+		spl->Flags = 0;
+		return true;
+	}
+	return false;
 }
 
 bool Spellbook::CastSpell( ieResRef SpellResRef, Actor* Source, Actor* Target )

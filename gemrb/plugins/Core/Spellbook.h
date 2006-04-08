@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.17 2006/04/04 21:59:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.18 2006/04/08 18:40:15 avenger_teambg Exp $
  *
  */
 
@@ -101,8 +101,6 @@ typedef struct {
 	ieWord  Number;
 	ieWord  Number2;
 	ieWord  Type;
-//	ieDword MemorizedIndex;
-//	ieDword MemorizedCount;
 
 	std::vector<CREKnownSpell*> known_spells;
 	std::vector<CREMemorizedSpell*> memorized_spells;
@@ -136,6 +134,9 @@ public:
 	unsigned int GetTotalKnownSpellsCount() const;
 	unsigned int GetTotalMemorizedSpellsCount() const;
 	unsigned int GetKnownSpellsCount(int type, unsigned int level) const;
+	/** removes a spell from memory/book */
+	void RemoveSpell(ieResRef ResRef);
+	/** adds a spell to the book */
 	bool AddKnownSpell(int type, unsigned int level, CREKnownSpell *spl);
 	CREKnownSpell* GetKnownSpell(int type, unsigned int level, unsigned int index);
 	unsigned int GetMemorizedSpellsCount(int type, unsigned int level) const;
@@ -153,12 +154,16 @@ public:
 	/** finds the first spell needing to rememorize */
 	CREMemorizedSpell* FindUnchargedSpell(int type, int level=0);
 
-	/** Sets index'th spell from memorized as 'not-yet-cast' */
+	/** Sets spell from memorized as 'not-yet-cast' */
 	bool ChargeSpell(CREMemorizedSpell* spl);
 
-	/** Sets index'th spell from memorized as 'already-cast' */
+	/** Sets spell from memorized as 'already-cast' */
 	bool DepleteSpell(CREMemorizedSpell* spl);
 
+	/** picks the highest spell of type and makes it 'already cast' */
+	bool DepleteSpell(int type);
+
+	/** recharges all spells */
 	void ChargeAllSpells();
 
 	bool CastSpell( ieResRef SpellResRef, Actor* Source, Actor* Target );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.284 2006/02/17 23:33:38 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.285 2006/04/08 18:40:15 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -272,7 +272,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		for (unsigned int idx = 0;
 			(d = area->TMap->GetDoor( idx ));
 			idx++) {
-			if (d->TrapFlags) {
+			if (d->TrapDetected) {
 				d->outlineColor = red;
 			} else {
 				if (d->Flags &DOOR_SECRET) {

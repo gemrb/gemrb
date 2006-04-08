@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.109 2006/01/07 15:04:40 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.110 2006/04/08 18:40:15 avenger_teambg Exp $
  *
  */
 
@@ -981,6 +981,54 @@ void Game::RestParty(bool noareacheck)
 	if (noareacheck || area->Rest( p, 8, GameTime%7200/3600) ) {
 		InternalFlags |= IF_PARTYRESTED;
 	}
+}
+
+//timestop effect
+void Game::TimeStop(Actor* owner, ieDword end)
+{
+	timestop_owner=owner;
+	timestop_end=end;
+}
+
+//returns the colour which should be applied onto the whole game area viewport
+//this is based on timestop, dream area, weather, daytime
+
+static Color TimeStopTint={0xe0,0xe0,0xe0,0x20}; //greyscale
+static Color DreamTint={0xf0,0xe0,0xd0,0x10};    //light brown scale
+static Color NightTint={0x80,0x80,0xe0,0x40};    //dark, bluish
+static Color DuskTint={0xe0,0x80,0x80,0x40};     //dark, reddish
+static Color FogTint={0xff,0xff,0xff,0x40};      //whitish
+static Color DarkTint={0x80,0x80,0xe0,0x10};     //slightly dark bluish
+
+Color *Game::GetGlobalTint()
+{
+	if (timestop_end>GameTime) {
+		return &TimeStopTint;
+	}
+	Map *map = GetCurrentArea();
+	if (map->AreaFlags&AF_DREAM) {
+		return &DreamTint;
+	}
+	if ((map->AreaType&(AT_OUTDOOR|AT_WEATHER)) == (AT_OUTDOOR|AT_WEATHER)) {
+		//get weather tint
+		if (WeatherBits&WB_RAIN) {
+			return &DarkTint;
+		}
+		if (WeatherBits&WB_FOG) {
+			return &FogTint;
+		}
+	}
+	if ((map->AreaType&(AT_OUTDOOR|AT_DAYNIGHT|AT_EXTENDED_NIGHT)) == (AT_OUTDOOR|AT_DAYNIGHT) ) {
+		//get daytime colour
+		ieDword daynight = (GameTime%7200/300);
+		if (daynight<2 || daynight>11) {
+			return &NightTint;
+		}
+		if (daynight>9 || daynight<4) {
+			return &DuskTint;
+		}
+	}
+	return NULL;
 }
 
 void Game::DebugDump()

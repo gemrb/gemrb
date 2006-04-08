@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.109 2006/04/04 21:59:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.110 2006/04/08 18:40:15 avenger_teambg Exp $
  *
  */
 
@@ -58,6 +58,7 @@ class ScriptedAnimation;
 #include "Spellbook.h"
 
 #define MAX_STATS 256
+#define MAX_PORTRAIT_ICONS 12
 
 //modal states
 #define MS_NONE        0
@@ -122,6 +123,7 @@ public:
 	ieWord	  QuickItemSlots[5];  //pst has 5, others use only 3
 	ieByte    QSlots[9];          //iwd2 specific
 	ieByte    QuickSpellClass[9];
+	ieWord    PortraitIcons[MAX_PORTRAIT_ICONS];
 public:
 	PCStatsStruct();
 	void IncrementChapter();
@@ -380,5 +382,9 @@ public:
 	int RestoreSpellLevel(ieDword maxlevel, ieDword typemask);
 	/* rememorizes spells, cures fatigue, etc */
 	void Rest(int hours);
+	/* adds a state icon to the list */
+	void AddPortraitIcon(ieByte icon);
+	/* disables a state icon in the list, doesn't remove it! */
+	void DisablePortraitIcon(ieByte icon);
 };
 #endif

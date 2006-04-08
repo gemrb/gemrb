@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.106 2006/04/05 16:34:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.107 2006/04/08 18:40:15 avenger_teambg Exp $
  *
  */
 
@@ -54,7 +54,19 @@ class Wall_Polygon;
 //distance of actors from spawn point
 #define SPAWN_RANGE       400
 
+//area flags
+#define AF_SAVE           1
+#define AF_TUTORIAL       2
+#define AF_DEADMAGIC      4
+#define AF_DREAM          8
+
 //area types
+#define AT_OUTDOOR        1
+#define AT_DAYNIGHT       2
+#define AT_WEATHER        4
+#define AT_CITY           8
+#define AT_FOREST         0x10
+#define AT_DUNGEON        0x20
 #define AT_EXTENDED_NIGHT 0x40
 #define AT_CAN_REST       0x80
 
@@ -235,6 +247,7 @@ public:
 	Actor* GetActor(const char* Name);
 	Actor* GetActor(int i, bool any);
 	Actor* GetActorByDialog(const char* resref);
+	Actor* GetActorByResource(const char* resref);
 	bool HasActor(Actor *actor);
 	void RemoveActor(Actor* actor);
 	//returns actors in rect (onlyparty could be more sophisticated)

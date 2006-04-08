@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.42 2005/12/25 10:31:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.43 2006/04/08 18:40:15 avenger_teambg Exp $
  *
  */
 
@@ -204,6 +204,8 @@ public:
 	int GetWeight() {return Weight;}
 
 	bool ItemsAreCompatible(CREItem* target, CREItem* source);
+	//depletes charged items
+	int DepleteItem(ieDword flags);
 	/** Finds the first slot of named item, if resref is empty, finds the first filled! slot */
 	int FindItem(const char *resref, unsigned int flags);
 	void DropItemAtLocation(unsigned int slot, unsigned int flags, Map *map, Point &loc);
@@ -224,6 +226,10 @@ public:
 	int FindCandidateSlot(int slottype, size_t first_slot, const char *resref = NULL);
 	/** Creates an item in the slot*/
 	void SetSlotItemRes(const ieResRef ItemResRef, int Slot, int Charge0=1, int Charge1=0, int Charge2=0);
+	/** Adds item to slot*/
+	void AddSlotItemRes(const ieResRef ItemResRef, int Slot, int Charge0=1, int Charge1=0, int Charge2=0);
+	/** breaks the item (weapon) in slot */
+	void BreakItemSlot(ieDword slot);
 	/** Lists all items in the Inventory on terminal for debugging */
 	void dump();
 

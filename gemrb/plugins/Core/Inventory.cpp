@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.68 2006/04/06 21:14:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.69 2006/04/08 18:40:15 avenger_teambg Exp $
  *
  */
 
@@ -137,6 +137,7 @@ void Inventory::AddSlotEffects(CREItem* slot)
 	for (int i = 0; i < itm->EquippingFeatureCount; i++) {
 		Owner->fxqueue.AddEffect( &itm->equipping_features[i] );
 	}
+	core->FreeItem( itm, slot->ItemResRef, false );
 }
 
 void Inventory::RemoveSlotEffects(CREItem* slot)
@@ -152,6 +153,7 @@ void Inventory::RemoveSlotEffects(CREItem* slot)
 			Owner->fxqueue.RemoveEffect( fx );
 		}
 	}
+	core->FreeItem( itm, slot->ItemResRef, false );
 }
 
 void Inventory::SetInventoryType(int arg)
@@ -458,6 +460,37 @@ bool Inventory::ItemsAreCompatible(CREItem* target, CREItem* source)
 	return false;
 }
 
+//depletes a magical item
+//if flags==0 then magical weapons are not harmed
+int Inventory::DepleteItem(ieDword flags)
+{
+	for (size_t i = 0; i < Slots.size(); i++) {
+		CREItem *item = Slots[i];
+		if (!item) {
+			continue;
+		}
+		if ( !(item->Flags&IE_INV_ITEM_MAGICAL) ) {
+				continue;
+		}
+		//if flags = 0 then weapons are not depleted
+		if (!flags) {
+			Item *itm = core->GetItem( item->ItemResRef );
+			if (!itm)
+				continue;
+			//if the item is usable in weapon slot, then it is weapon
+			bool weapon = core->CanUseItemType(itm->ItemType, SLOT_WEAPON);
+			core->FreeItem( itm, item->ItemResRef, false );
+			if (weapon)
+				continue;
+		}	
+		//deplete item
+		item->Usages[0]=0;
+		item->Usages[1]=0;
+		item->Usages[2]=0;
+	}
+	return -1;
+}
+
 int Inventory::FindItem(const char *resref, unsigned int flags)
 {
 	for (size_t i = 0; i < Slots.size(); i++) {
@@ -699,7 +732,7 @@ int Inventory::FindCandidateSlot(int slottype, size_t first_slot, const char *re
 	return -1;
 }
 
-void Inventory::SetSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge0, int Charge1, int Charge2)
+void Inventory::AddSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge0, int Charge1, int Charge2)
 {
 	CREItem *TmpItem = new CREItem();
 	strnlwrcpy(TmpItem->ItemResRef, ItemResRef, 8);
@@ -710,6 +743,31 @@ void Inventory::SetSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 	TmpItem->Flags=IE_INV_ITEM_ACQUIRED;
 	core->ResolveRandomItem(TmpItem);
 	AddSlotItem( TmpItem, SlotID );
+}
+
+void Inventory::SetSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge0, int Charge1, int Charge2)
+{
+	CREItem *TmpItem = new CREItem();
+	strnlwrcpy(TmpItem->ItemResRef, ItemResRef, 8);
+	TmpItem->PurchasedAmount=0;
+	TmpItem->Usages[0]=Charge0;
+	TmpItem->Usages[1]=Charge1;
+	TmpItem->Usages[2]=Charge2;
+	TmpItem->Flags=IE_INV_ITEM_ACQUIRED;
+	core->ResolveRandomItem(TmpItem);
+	SetSlotItem( TmpItem, SlotID );
+}
+
+void Inventory::BreakItemSlot(ieDword slot)
+{
+	ieResRef newItem;
+
+	CREItem *item = Slots[slot];
+	Item *itm = core->GetItem( item->ItemResRef );
+	memcpy(newItem, itm->ReplacementItem,sizeof(newItem) );
+	core->FreeItem( itm, item->ItemResRef, false );
+	//this depends on setslotitemres using setslotitem
+	SetSlotItemRes(newItem, slot, 0,0,0);
 }
 
 void Inventory::dump()

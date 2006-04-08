@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.154 2006/03/25 22:53:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.155 2006/04/08 18:40:15 avenger_teambg Exp $
  *
  */
 
@@ -469,8 +469,9 @@ Map* AREImp::GetMap(const char *ResRef)
 		ieDword cursor;
 		ieResRef KeyResRef, Script;
 		ieWord TrapDetect, TrapRemoval;
+		ieWord Trapped, TrapDetected;
 		ieWord LaunchX, LaunchY;
-		ieDword TrapFlags, Locked, LockRemoval;
+		ieDword Locked, LockRemoval;
 		Region BBClosed, BBOpen;
 		ieStrRef OpenStrRef;
 		ieStrRef NameStrRef;
@@ -511,7 +512,8 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->ReadDword( &cursor );
 		str->ReadWord( &TrapDetect );
 		str->ReadWord( &TrapRemoval );
-		str->ReadDword( &TrapFlags );
+		str->ReadWord( &Trapped );
+		str->ReadWord( &TrapDetected );
 		str->ReadWord( &LaunchX );
 		str->ReadWord( &LaunchY );
 		str->ReadResRef( KeyResRef );
@@ -598,7 +600,8 @@ Map* AREImp::GetMap(const char *ResRef)
 
 		door->TrapDetectionDiff = TrapDetect;
 		door->TrapRemovalDiff = TrapRemoval;
-		door->TrapFlags = TrapFlags;
+		door->Trapped = Trapped;
+		door->TrapDetected = TrapDetected;
 		door->TrapLaunch.x = LaunchX;
 		door->TrapLaunch.y = LaunchY;
 
@@ -1273,7 +1276,8 @@ int AREImp::PutDoors( DataStream *stream, Map *map, ieDword &VertIndex)
 		stream->WriteDword( &d->Cursor);
 		stream->WriteWord( &d->TrapDetectionDiff);
 		stream->WriteWord( &d->TrapRemovalDiff);
-		stream->WriteDword( &d->TrapFlags);
+		stream->WriteWord( &d->Trapped);
+		stream->WriteWord( &d->TrapDetected);
 		tmpWord = (ieWord) d->TrapLaunch.x;
 		stream->WriteWord( &tmpWord);
 		tmpWord = (ieWord) d->TrapLaunch.y;

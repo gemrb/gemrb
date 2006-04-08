@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.174 2006/04/04 21:59:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.175 2006/04/08 18:40:15 avenger_teambg Exp $
  *
  */
 
@@ -136,6 +136,7 @@ PCStatsStruct::PCStatsStruct()
 	memset( QuickSpellClass, 0xff, sizeof(QuickSpellClass) );
 	memset( QuickItemSlots, 0, sizeof(QuickItemSlots) );
 	memset( QuickWeaponSlots, 0, sizeof(QuickWeaponSlots) );
+	memset( PortraitIcons, -1, sizeof(PortraitIcons) );
 }
 
 void PCStatsStruct::IncrementChapter()
@@ -803,11 +804,49 @@ bool Actor::SetBase(unsigned int StatIndex, ieDword Value)
 	SetStat (StatIndex, Value, true);
 	return true;
 }
+void Actor::AddPortraitIcon(ieByte icon)
+{
+	if (!PCStats) {
+		return;
+	}
+	ieWord *Icons = PCStats->PortraitIcons;
+
+	int i;
+
+	for(i=0;i<MAX_PORTRAIT_ICONS;i++) {
+		if (icon == Icons[i]&0xff) {
+			return;
+		}
+	}
+	if (i<MAX_PORTRAIT_ICONS) {
+		Icons[i]=icon;
+	}
+}
+
+void Actor::DisablePortraitIcon(ieByte icon)
+{
+	if (!PCStats) {
+		return;
+	}
+	ieWord *Icons = PCStats->PortraitIcons;
+	int i;
+
+	for(i=0;i<MAX_PORTRAIT_ICONS;i++) {
+		if (icon == Icons[i]&0xff) {
+			Icons[i]=0xff00|icon;
+			return;
+		}
+	}
+}
+
 /** call this after load, to apply effects */
 void Actor::Init(bool first)
 {
 	ieDword previous[MAX_STATS];
 
+	if (PCStats) {
+		memset( PCStats->PortraitIcons, -1, sizeof(PCStats->PortraitIcons) );
+	}
 	if (!first) {
 		memcpy( previous, Modified, MAX_STATS * sizeof( *Modified ) );
 	}

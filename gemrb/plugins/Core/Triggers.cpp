@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.42 2006/01/14 21:14:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.43 2006/04/08 18:40:15 avenger_teambg Exp $
  *
  */
 
@@ -2531,18 +2531,22 @@ int GameScript::AnimState(Scriptable* Sender, Trigger* parameters)
 	return actor->GetStance() == parameters->int0Parameter;
 }
 
+//this trigger uses hours
 int GameScript::Time(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->GameTime == (ieDword) parameters->int0Parameter;
+	return core->GetGame()->GameTime%7200/300 == (ieDword) parameters->int0Parameter;
 }
 
+//this trigger uses hours
 int GameScript::TimeGT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->GameTime > (ieDword) parameters->int0Parameter;
+	return core->GetGame()->GameTime%7200/300 > (ieDword) parameters->int0Parameter;
 }
+
+//this trigger uses hours
 int GameScript::TimeLT(Scriptable* /*Sender*/, Trigger* parameters)
 {
-	return core->GetGame()->GameTime < (ieDword) parameters->int0Parameter;
+	return core->GetGame()->GameTime%7200/300 < (ieDword) parameters->int0Parameter;
 }
 
 int GameScript::HotKey(Scriptable* Sender, Trigger* parameters)

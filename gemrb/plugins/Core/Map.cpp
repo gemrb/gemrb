@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.233 2006/04/05 16:34:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.234 2006/04/08 18:40:15 avenger_teambg Exp $
  *
  */
 
@@ -523,8 +523,15 @@ void Map::UpdateScripts()
 	//Run actor scripts (only for 0 priority)
 	int q=Qcount[0];
 
+	Game *game = core->GetGame();
+	Actor *timestop_owner = game->timestop_owner;
+	bool timestop = game->timestop_end>game->GameTime;
+
 	while (q--) {
 		Actor* actor = queue[0][q];
+		if (timestop && actor!=timestop_owner && actor->GetStat(IE_DISABLETIMESTOP) ) {
+			continue;
+		}
 		for (unsigned int i = 0; i < MAX_SCRIPTS; i++) {
 			if (actor->Scripts[i]) {
 				if (actor->GetNextAction())
@@ -534,7 +541,6 @@ void Map::UpdateScripts()
 		}
 		actor->ProcessActions();
 
-		//returns true if actor should be completely removed
 		actor->inventory.CalculateWeight();
 		actor->SetBase( IE_ENCUMBRANCE, actor->inventory.GetWeight() );
 		//TODO:calculate actor speed!
@@ -1014,6 +1020,19 @@ Actor* Map::GetActorByDialog(const char *resref)
 	while (i--) {
 		Actor* actor = actors[i];
 		if (strnicmp( actor->Dialog, resref, 8 ) == 0) {
+			return actor;
+		}
+	}
+	return NULL;
+}
+
+//this function finds an actor by its original resref (not correct yet)
+Actor* Map::GetActorByResource(const char *resref)
+{
+	unsigned int i = actors.size();
+	while (i--) {
+		Actor* actor = actors[i];
+		if (strnicmp( actor->GetScriptName(), resref, 8 ) == 0) { //temporarily!
 			return actor;
 		}
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.102 2006/04/06 21:14:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.103 2006/04/08 18:40:15 avenger_teambg Exp $
  *
  */
 
@@ -373,7 +373,8 @@ public:
 	ieDword LockDifficulty; //this is a dword?
 	ieWord TrapDetectionDiff;
 	ieWord TrapRemovalDiff;
-	ieDword TrapFlags;
+	ieWord Trapped;
+	ieWord TrapDetected;
 	ieStrRef OpenStrRef;
 	ieStrRef NameStrRef;
 	ieResRef Dialog;
