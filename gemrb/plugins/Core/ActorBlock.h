@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.103 2006/04/08 18:40:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.104 2006/04/09 15:22:29 avenger_teambg Exp $
  *
  */
 
@@ -99,6 +99,9 @@ class Gem_Polygon;
 //these bits could be set by a WalkTo
 #define IF_RUNFLAGS   (IF_RUNNING|IF_NORECTICLE|IF_NOINT)
 #define IF_BECAMEVISIBLE 0x100//actor just became visible
+#define IF_INITIALIZED  0x200
+#define IF_USEDSAVE     0x400
+
 //scriptable flags
 #define IF_ACTIVE        0x1000
 #define IF_CUTSCENEID    0x2000

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.175 2006/04/08 18:40:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.176 2006/04/09 15:22:29 avenger_teambg Exp $
  *
  */
 
@@ -374,7 +374,7 @@ void pcf_hitpoint(Actor *actor, ieDword Value)
 	if ((signed) Value<(signed) actor->Modified[IE_MINHITPOINTS]) {
 		Value=actor->Modified[IE_MINHITPOINTS];
 	}
-	if ((signed) Value+core->GetConstitutionBonus(0,actor->Modified[IE_CON])<=0) {
+	if ((signed) Value<=0) {
 		actor->Die(NULL);
 	}
 	actor->Modified[IE_MINHITPOINTS]=Value;
@@ -752,7 +752,7 @@ void Actor::PlayDamageAnimation(int type)
 	}
 }
 
-bool Actor::SetStat(unsigned int StatIndex, ieDword Value, bool pcf)
+bool Actor::SetStat(unsigned int StatIndex, ieDword Value, int pcf)
 {
 	if (StatIndex >= MAX_STATS) {
 		return false;
@@ -795,13 +795,18 @@ ieDword Actor::GetBase(unsigned int StatIndex)
 }
 
 /** Sets a Stat Base Value */
+/** If required, modify the modified value and run the pcf function */
 bool Actor::SetBase(unsigned int StatIndex, ieDword Value)
 {
 	if (StatIndex >= MAX_STATS) {
 		return false;
 	}
+	ieDword diff = Modified[StatIndex]-BaseStats[StatIndex];
+
 	BaseStats[StatIndex] = Value;
-	SetStat (StatIndex, Value, true);
+	//if already initialized, then the modified stats
+	//need to run the post change function (stat change can kill actor)
+	SetStat (StatIndex, Value+diff, InternalFlags&IF_INITIALIZED);
 	return true;
 }
 void Actor::AddPortraitIcon(ieByte icon)
@@ -814,7 +819,7 @@ void Actor::AddPortraitIcon(ieByte icon)
 	int i;
 
 	for(i=0;i<MAX_PORTRAIT_ICONS;i++) {
-		if (icon == Icons[i]&0xff) {
+		if (icon == (Icons[i]&0xff)) {
 			return;
 		}
 	}
@@ -832,7 +837,7 @@ void Actor::DisablePortraitIcon(ieByte icon)
 	int i;
 
 	for(i=0;i<MAX_PORTRAIT_ICONS;i++) {
-		if (icon == Icons[i]&0xff) {
+		if (icon == (Icons[i]&0xff)) {
 			Icons[i]=0xff00|icon;
 			return;
 		}
@@ -840,18 +845,37 @@ void Actor::DisablePortraitIcon(ieByte icon)
 }
 
 /** call this after load, to apply effects */
-void Actor::Init(bool first)
+void Actor::Init()
 {
 	ieDword previous[MAX_STATS];
+
+	bool first = !(InternalFlags&IF_INITIALIZED);
 
 	if (PCStats) {
 		memset( PCStats->PortraitIcons, -1, sizeof(PCStats->PortraitIcons) );
 	}
-	if (!first) {
+	if (first) {
+		InternalFlags|=IF_INITIALIZED;
+	} else {	
 		memcpy( previous, Modified, MAX_STATS * sizeof( *Modified ) );
 	}
 	memcpy( Modified, BaseStats, MAX_STATS * sizeof( *Modified ) );
 	fxqueue.ApplyAllEffects( this );
+
+	//calculate hp bonus
+	int bonus;
+
+	//fighter or not (still very primitive model, we need multiclass)
+	if(Modified[IE_CLASS]==0) {
+		bonus = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR,Modified[IE_CON]);
+	} else {
+		bonus = core->GetConstitutionBonus(STAT_CON_HP_NORMAL,Modified[IE_CON]);
+	}
+	bonus *= Modified[IE_LEVEL];
+
+	Modified[IE_MAXHITPOINTS]+=bonus;
+	Modified[IE_HITPOINTS]+=bonus;
+
 	for (unsigned int i=0;i<MAX_STATS;i++) {
 		if (first || Modified[i]!=previous[i]) {
 			PostChangeFunctionType f = post_change_functions[i];
@@ -862,8 +886,27 @@ void Actor::Init(bool first)
 	}
 }
 
-/** implements a generic opcode function, modify modifier
-	returns the change
+void Actor::RollSaves()
+{
+	if (InternalFlags&IF_USEDSAVE) {
+		SavingThrow[0]=core->Roll(1,20,0);
+		SavingThrow[1]=core->Roll(1,20,0);
+		SavingThrow[2]=core->Roll(1,20,0);
+		SavingThrow[3]=core->Roll(1,20,0);
+		SavingThrow[4]=core->Roll(1,20,0);
+		InternalFlags&=~IF_USEDSAVE;
+	}
+}
+
+int Actor::GetSavingThrow(ieDword type)
+{
+	assert(type<5);
+	InternalFlags|=IF_USEDSAVE;
+	return SavingThrow[type];
+}
+
+/** implements a generic opcode function, modify modified stats
+    returns the change
 */
 int Actor::NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword ModifierType)
 {
@@ -872,15 +915,15 @@ int Actor::NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 	switch (ModifierType) {
 		case MOD_ADDITIVE:
 			//flat point modifier
-			SetStat(StatIndex, Modified[StatIndex]+ModifierValue, false);
+			SetStat(StatIndex, Modified[StatIndex]+ModifierValue, 0);
 			break;
 		case MOD_ABSOLUTE:
 			//straight stat change
-			SetStat(StatIndex, ModifierValue, false);
+			SetStat(StatIndex, ModifierValue, 0);
 			break;
 		case MOD_PERCENT:
 			//percentile
-			SetStat(StatIndex, BaseStats[StatIndex] * 100 / ModifierValue, false);
+			SetStat(StatIndex, BaseStats[StatIndex] * 100 / ModifierValue, 0);
 			break;
 	}
 	return Modified[StatIndex] - oldmod;
@@ -960,8 +1003,8 @@ int Actor::Damage(int damage, int damagetype, Actor *hitter)
 {
 	//recalculate damage based on resistances and difficulty level
 	//the lower 2 bits are actually modifier types
-	NewStat(IE_HITPOINTS, (ieDword) -damage, damagetype&3);
-	NewStat(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
+	NewBase(IE_HITPOINTS, (ieDword) -damage, damagetype&3);
+	NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
 	//this is just a guess, probably morale is much more complex
 	if(GetStat(IE_MORALE)<GetStat(IE_MORALEBREAK) ) {
 		Panic();
@@ -1544,7 +1587,6 @@ void Actor::DrawVideocells(Region &screen, vvcVector &vvcCells, Color &tint)
 		}
 	}
 }
-
 
 void Actor::Draw(Region &screen)
 {

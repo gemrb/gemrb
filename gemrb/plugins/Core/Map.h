@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.107 2006/04/08 18:40:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.108 2006/04/09 15:22:29 avenger_teambg Exp $
  *
  */
 
@@ -326,7 +326,7 @@ public:
 	unsigned int GetMapNoteCount() { return (unsigned int) mapnotes.size(); }
 	//restheader
 	/* May spawn creature(s), returns true in case of an interrupted rest */
-	bool Rest(Point &pos, int hours, bool day);
+	bool Rest(Point &pos, int hours, int day);
 	/* Spawns creature(s) in radius of position */
 	void SpawnCreature(Point &pos, char *CreName, int radius = 0);
 

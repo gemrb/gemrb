@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.110 2006/04/08 18:40:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.111 2006/04/09 15:22:29 avenger_teambg Exp $
  *
  */
 
@@ -192,6 +192,7 @@ public:
 private:
 	//this stuff don't get saved
 	CharAnimations* anims;
+	ieByte SavingThrow[5];
 
 	/** fixes the palette */
 	void SetupColors();
@@ -215,13 +216,17 @@ public:
 	/** returns the animations */
 	CharAnimations* GetAnims();
 	/** Re/Inits the Modified vector */
-	void Init(bool reinit);
+	void Init();
+	/** gets saving throws */
+	void RollSaves();
+	/** returns a saving throw */
+	int GetSavingThrow(ieDword type);
 	/** Returns true if the actor is targetable */
 	bool ValidTarget(int ga_flags);
 	/** Returns a Stat value */
 	ieDword GetStat(unsigned int StatIndex) const;
 	/** Sets a Stat Value (unsaved) */
-	bool SetStat(unsigned int StatIndex, ieDword Value, bool pcf);
+	bool SetStat(unsigned int StatIndex, ieDword Value, int pcf);
 	/** Returns the difference */
 	int GetMod(unsigned int StatIndex);
 	/** Returns a Stat Base Value */

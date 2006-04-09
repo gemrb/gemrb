@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.55 2006/04/08 18:40:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.56 2006/04/09 15:22:29 avenger_teambg Exp $
  *
  */
 
@@ -33,6 +33,56 @@ static EffectRef *effectnames = NULL;
 static EffectRef effect_refs[MAX_EFFECTS];
 
 static int opcodes_count = 0;
+
+#define FX_DURATION_INSTANT_LIMITED          0
+#define FX_DURATION_INSTANT_PERMANENT        1
+#define FX_DURATION_INSTANT_WHILE_EQUIPPED   2
+#define FX_DURATION_DELAY_LIMITED            3 //this contains a relative onset time (delay) also used as duration, transforms to 6 when applied
+#define FX_DURATION_DELAY_PERMANENT          4 //this transforms to 9 (i guess)
+#define FX_DURATION_DELAY_UNSAVED            5 //this transforms to 8
+#define FX_DURATION_DELAY_LIMITED_PENDING    6 //this contains an absolute onset time and a duration
+#define FX_DURATION_AFTER_EXPIRES            7 //this is a delayed non permanent effect (resolves to JUST_EXPIRED)
+#define FX_DURATION_PERMANENT_UNSAVED        8
+#define FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES   9//this is a special permanent
+#define FX_DURATION_JUST_EXPIRED             10
+
+#define MAX_TIMING_MODE 11
+
+static bool fx_instant[MAX_TIMING_MODE]={true,true,true,false,false,false,false,false,true,true,true};
+
+inline bool IsInstant(ieByte timingmode)
+{
+	if (timingmode>=MAX_TIMING_MODE) return false;
+	return fx_instant[timingmode];
+}
+
+static bool fx_relative[MAX_TIMING_MODE]={true,false,false,true,true,true,false,false,false,false,false};
+
+inline bool NeedPrepare(ieByte timingmode)
+{
+	if (timingmode>=MAX_TIMING_MODE) return false;
+	return fx_relative[timingmode];
+}
+
+static bool fx_absolute[MAX_TIMING_MODE]={false,false,false,false,false,false,true,true,false,false,false};
+
+inline bool IsPrepared(ieByte timingmode)
+{
+	if (timingmode>=MAX_TIMING_MODE) return false;
+	return fx_absolute[timingmode];
+}
+
+static ieByte fx_triggered[MAX_TIMING_MODE]={FX_DURATION_JUST_EXPIRED,FX_DURATION_INSTANT_PERMANENT,//0,1
+FX_DURATION_INSTANT_WHILE_EQUIPPED,FX_DURATION_DELAY_LIMITED_PENDING,//2,3
+FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES,FX_DURATION_PERMANENT_UNSAVED, //4,5
+FX_DURATION_INSTANT_LIMITED,FX_DURATION_JUST_EXPIRED,FX_DURATION_PERMANENT_UNSAVED,//6,8
+FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES,FX_DURATION_JUST_EXPIRED};//9,10
+
+inline ieByte TriggeredEffect(ieByte timingmode)
+{
+	if (timingmode>=MAX_TIMING_MODE) return false;
+	return fx_triggered[timingmode];
+}
 
 inline bool valid_number(const char* string, long& val)
 {
@@ -65,6 +115,8 @@ inline static void ResolveEffectRef(EffectRef &effect_reference)
 		}
 	}
 }
+
+#define	PrepareDuration(fx) fx->Duration = fx->Duration*6 + GameTime
 
 bool Init_EffectQueue()
 {
@@ -156,20 +208,9 @@ EffectQueue::~EffectQueue()
 
 bool EffectQueue::AddEffect(Effect* fx)
 {
-	// Check probability of the effect occuring
-	if (fx->Probability1 < core->Roll( 1, 100, 0 ))
-		return false;
-
-	// FIXME: roll saving throws and resistance
-	//if (core->SavingThrow( target->Modified[fx->SavingThrowType], fx->SavingThrowBonus )) {
-	//}
-
 	Effect* new_fx = new Effect;
 	memcpy( new_fx, fx, sizeof( Effect ) );
 	effects.push_back( new_fx );
-
-	// pre-roll dice for fx needing them and stow them in the effect
-	new_fx->random_value = core->Roll( fx->DiceThrown, fx->DiceSides, 0 );
 
 	return true;
 }
@@ -194,11 +235,11 @@ bool EffectQueue::RemoveEffect(Effect* fx)
 //The effects are already in the fxqueue of the target
 void EffectQueue::ApplyAllEffects(Actor* target)
 {
-	// FIXME: clear protection_from_opcode array
-	// memset( target->protection_from_fx, 0, MAX_FX_OPCODES * sizeof( char ) );
+	ieDword random_value = core->Roll( 1, 100, 0 );
 
 	std::vector< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
+		(*f)->random_value = random_value;
 		ApplyEffect( target, *f, false );
 	}
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
@@ -216,22 +257,19 @@ void EffectQueue::ApplyAllEffects(Actor* target)
 //will get copied (hence the fxqueue.AddEffect call)
 void EffectQueue::AddAllEffects(Actor* target)
 {
-	std::vector< Effect* >::iterator f;
+	// pre-roll dice for fx needing them and stow them in the effect
+	ieDword random_value = core->Roll( 1, 100, 0 );
+
+	std::vector< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		//handle resistances and saving throws here
+		(*f)->random_value = random_value;
 		target->fxqueue.ApplyEffect( target, *f, true );
 		if ((*f)->TimingMode!=FX_DURATION_JUST_EXPIRED) {
 			target->fxqueue.AddEffect(*f);
 		}
 	}
 }
-
-
-void EffectQueue::PrepareDuration(Effect* fx)
-{
-	fx->Duration = fx->Duration*6 + core->GetGame()->GameTime;
-}
-
 
 //resisted effect based on level
 inline bool check_level(Actor *target, Effect *fx)
@@ -249,31 +287,101 @@ inline bool check_level(Actor *target, Effect *fx)
 	return false;
 }
 
+inline bool check_probability(Effect* fx)
+{
+	//watch for this, probability1 is the high number
+	//probability2 is the low number
+	if (fx->random_value<fx->Probability2 || fx->random_value>fx->Probability1) {
+		return false;
+	}
+	return true;
+}
+
+inline bool check_resistance(Actor* actor, Effect* fx)
+{
+	ieDword val = actor->GetStat(IE_RESISTMAGIC);
+	if (fx->random_value < val) {
+		return false;
+	}
+	//saving throws
+	return true;
+}
+
+
+//this function is called two different way
+// when first_apply is set, then the effect isn't stuck on the target
+// this happens when a new effect comes in contact with the target.
+// if the effect returns FX_DURATION_JUST_EXPIRED then it won't stick
+// when first_apply is unset, the effect is already on the target
+// this happens on load time too!
+
 void EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 {
 	if (!target) {
+		fx->TimingMode=FX_DURATION_JUST_EXPIRED;
 		return;
 	}
 	//printf( "FX 0x%02x: %s(%d, %d)\n", fx->Opcode, effectnames[fx->Opcode].Name, fx->Parameter1, fx->Parameter2 );
-	if (fx->Opcode >= MAX_EFFECTS) 
+	if (fx->Opcode >= MAX_EFFECTS) {
+		fx->TimingMode=FX_DURATION_JUST_EXPIRED;
 		return;
+	}
 
-	EffectFunction fn = effect_refs[fx->Opcode].Function;
-	if (fn) {
-		if (first_apply) {
-			if (check_level(target, fx) ) {
+	ieDword GameTime = core->GetGame()->GameTime;
+
+	if (first_apply) {
+		//the effect didn't pass the probability check
+		if (!check_probability(fx) ) {
+			fx->TimingMode=FX_DURATION_JUST_EXPIRED;
+			return;
+		}
+
+		//the effect didn't pass the target level check
+		if (check_level(target, fx) ) {
+			fx->TimingMode=FX_DURATION_JUST_EXPIRED;
+			return;
+		}
+
+		//the effect didn't pass the resistance check
+		if(fx->Resistance == FX_CAN_RESIST_CAN_DISPEL ||
+			fx->Resistance == FX_CAN_RESIST_NO_DISPEL) {
+			if (check_resistance(target, fx) ) {
 				fx->TimingMode=FX_DURATION_JUST_EXPIRED;
 				return;
 			}
 		}
+
+		//the effect is delayed and needs duration setting
+		//if (NeedPrepare(fx->TimingMode) ) {
+		//  PrepareDuration(fx);
+		//  return;
+		//}
+	} else {
+		if (IsPrepared(fx->TimingMode) ) {
+			if (fx->Duration<=GameTime) {
+				fx->TimingMode=TriggeredEffect(fx->TimingMode);
+				//if i set up the TriggeredEffect function correctly, then
+				//timingmode just slipped into a NeedPrepare state
+				assert(NeedPrepare(fx->TimingMode) );
+				//prepare for delayed duration effects
+				fx->Duration=fx->SecondaryDelay;
+				PrepareDuration(fx);
+			}
+		}
+	}
+	
+	EffectFunction fn = effect_refs[fx->Opcode].Function;
+	if (fn) {		
 		if ( effect_refs[fx->Opcode].EffText > 0 ) {
 			char *text = core->GetString( effect_refs[fx->Opcode].EffText );
 			core->DisplayString( text );
 			free( text );
 		}
-		
+
+		int res=fn( Owner?Owner:target, target, fx );
+
 		//if there is no owner, we assume it is the target
-		switch( fn( Owner?Owner:target, target, fx ) ) {
+		switch( res ) {
 			case FX_APPLIED:
 				//normal effect with duration
 				break;
@@ -289,18 +397,15 @@ void EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 					fx->TimingMode=FX_DURATION_JUST_EXPIRED;
 				} 
 				break;
-				/* not needed
-			case FX_CYCLIC:
-				//the effect will be reapplied instead of removed
-				//mark this somehow
-				break;
-				*/
+			default:
+				abort();
 		}
 	} else {
 		//effect not found, it is going to be discarded
 		fx->TimingMode=FX_DURATION_JUST_EXPIRED;
 	}
-	if ((fx->TimingMode!=FX_DURATION_JUST_EXPIRED) && first_apply) {
+
+	if (NeedPrepare(fx->TimingMode) && first_apply) {
 		PrepareDuration(fx);
 	}
 }

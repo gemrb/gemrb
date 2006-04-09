@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.391 2006/03/26 19:49:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.392 2006/04/09 15:22:29 avenger_teambg Exp $
  *
  */
 
@@ -4078,6 +4078,9 @@ void Interface::ApplySpell(const ieResRef resname, Actor *actor, Actor *caster, 
 	if (!spell) {
 		return;
 	}
+
+	actor->RollSaves();
+
 	if (!level) {
 		level = 1;
 	}

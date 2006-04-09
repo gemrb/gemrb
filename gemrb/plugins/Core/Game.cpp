@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.110 2006/04/08 18:40:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.111 2006/04/09 15:22:29 avenger_teambg Exp $
  *
  */
 
@@ -229,15 +229,19 @@ int Game::DelNPC(unsigned int slot, bool autoFree)
 void Game::ConsolidateParty()
 {
 	int max = PCs.size();
+	std::vector< Actor*>::const_iterator m;
 	for (int i=1;i<=max;) {
 		if (FindPlayer(i)==-1) {
-			std::vector< Actor*>::iterator m;
+			
 			for ( m = PCs.begin(); m != PCs.end(); ++m) {
 				if ( (*m)->InParty>i) {
 					(*m)->InParty--;
 				}
 			}
 		} else i++;
+	}
+	for ( m = PCs.begin(); m != PCs.end(); ++m) {
+		(*m)->Init();
 	}
 }
 
@@ -301,11 +305,17 @@ int Game::JoinParty(Actor* actor, int join)
 		std::vector< Actor*>::iterator m = NPCs.begin() + slot;
 		NPCs.erase( m );
 	}
+	size_t size = PCs.size();
+
 	PCs.push_back( actor );
 	if (!actor->InParty) {
-		actor->InParty = PCs.size();
+		actor->InParty = (ieByte) (size+1);
 	}
-	return ( int ) PCs.size() - 1;
+	//automagically select first actor added to team
+	if (!size) {
+		SelectActor(actor,true,SELECT_NORMAL);
+	}
+	return ( int ) size;
 }
 
 int Game::GetPartySize(bool onlyalive) const
@@ -407,8 +417,7 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 
 		actor->Select( true );
 		selected.push_back( actor );
-	}
-	else {
+	} else {
 		for ( m = selected.begin(); m != selected.end(); ++m) {
 			if ((*m) == actor) {
 				selected.erase( m );

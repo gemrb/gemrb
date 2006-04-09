@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.188 2006/04/08 18:40:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.189 2006/04/09 15:22:29 avenger_teambg Exp $
  *
  */
 
@@ -120,6 +120,7 @@ typedef struct SlotType {
 #define WINDOW_GRAYED    2
 #define WINDOW_FRONT     3
 
+//quitflags
 #define QF_NORMAL        0
 #define QF_QUITGAME      1
 #define QF_EXITGAME      2
@@ -127,6 +128,7 @@ typedef struct SlotType {
 #define QF_LOADGAME      8
 #define QF_ENTERGAME     16
 
+//autopause
 #define AP_UNUSABLE      0
 #define AP_ATTACKED      1
 #define AP_HIT           2
@@ -138,9 +140,23 @@ typedef struct SlotType {
 #define AP_TRAP          8
 #define AP_SPELLCAST     9
 
-/** Max size of actor's ground circle */
+/** Max size of actor's ground circle (PST) */
 #define MAX_CIRCLE_SIZE  3
 
+//
+#define STAT_CON_HP_NORMAL   0
+#define STAT_CON_HP_WARRIOR  1
+#define STAT_CON_HP_MIN      2
+#define STAT_CON_HP_REGEN    3
+#define STAT_CON_FATIGUE     4
+
+#define STAT_DEX_REACTION    0
+#define STAT_DEX_MISSILE     1
+#define STAT_DEX_AC          2
+
+#define STAT_INT_LEARN       0
+#define STAT_INT_MAXLEVEL    1
+#define STAT_INT_MAXNUMBER   2
 
 /**
  * @class Interface

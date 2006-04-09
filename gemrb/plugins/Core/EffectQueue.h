@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.22 2006/04/08 18:40:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.23 2006/04/09 15:22:29 avenger_teambg Exp $
  *
  */
 
@@ -46,9 +46,8 @@ class Actor;
 /** these effects don't stick around if used as permanent, 
  * in that case they modify a base stat like charisma modifier */
 #define FX_PERMANENT 2
-///** these effects stick and also repeatedly trigger like poison */
-//apparently these won't be required
-//#define FX_CYCLIC    3
+///** these effects stick but didn't trigger yet */
+#define FX_PENDING    3
 
 //remove level effects flags
 #define RL_DISPELLABLE  1  //only dispellables
@@ -66,9 +65,9 @@ class Actor;
 // often used stat modifications, usually Parameter2 types 0, 1 and 2
 //these macros should work differently in permanent mode (modify base too)
 #define STAT_GET(stat) (target->Modified[ stat ])
-#define STAT_ADD(stat, mod) target->SetStat( stat, STAT_GET( stat ) + ( mod ), false )
-#define STAT_SET(stat, mod) target->SetStat( stat,  ( mod ), false )
-#define STAT_MUL(stat, mod) target->SetStat( stat, STAT_GET(stat) * (( mod ) / 100), false)
+#define STAT_ADD(stat, mod) target->SetStat( stat, STAT_GET( stat ) + ( mod ), 0 )
+#define STAT_SET(stat, mod) target->SetStat( stat,  ( mod ), 0 )
+#define STAT_MUL(stat, mod) target->SetStat( stat, STAT_GET(stat) * (( mod ) / 100), 0 )
 #define STATE_CURE( mod ) target->Modified[ IE_STATE_ID ] &= ~(ieDword) ( mod )
 #define STATE_SET( mod ) target->Modified[ IE_STATE_ID ] |= (ieDword) ( mod )
 #define STATE_GET( mod ) (target->Modified[ IE_STATE_ID ] & (ieDword) ( mod ) )
@@ -128,7 +127,6 @@ public:
 	void AddAllEffects(Actor* target);
 	void ApplyAllEffects(Actor* target);
 	void ApplyEffect(Actor* target, Effect* fx, bool first_apply);
-	void PrepareDuration(Effect* fx);
 	//remove all effects of a given spell
 	void RemoveAllEffects(ieResRef Removed);
 	void RemoveAllEffects(EffectRef &effect_reference);

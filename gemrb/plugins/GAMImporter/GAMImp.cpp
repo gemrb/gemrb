@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.79 2006/01/10 22:10:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.80 2006/04/09 15:22:30 avenger_teambg Exp $
  *
  */
 
@@ -83,9 +83,9 @@ bool GAMImp::Open(DataStream* stream, bool autoFree)
 		if (core->HasFeature(GF_HAS_KAPUTZ) ) { //pst
 			PCSize = 0x168;
 			version = GAM_VER_PST;
-		//sound folder name takes up this space,
-		//so it is handy to make this check
-                } else if ( core->HasFeature(GF_SOUNDFOLDERS) ) {
+			//sound folder name takes up this space,
+			//so it is handy to make this check
+		} else if ( core->HasFeature(GF_SOUNDFOLDERS) ) {
 			PCSize = 0x180;
 			version = GAM_VER_IWD;
 		} else {
@@ -110,7 +110,11 @@ Game* GAMImp::GetGame()
 	if (core->SaveAsOriginal) {
 		newGame->version=version;
 	}
-	str->ReadDword( &newGame->GameTime );
+
+	ieDword GameTime;
+	str->ReadDword( &GameTime );
+	newGame->GameTime = GameTime*15;
+
 	str->ReadWord( &newGame->WhichFormation );
 	for (i = 0; i < 5; i++) {
 		str->ReadWord( &newGame->Formations[i] );
@@ -619,7 +623,7 @@ int GAMImp::PutHeader(DataStream *stream, Game *game)
 {
 	int i;
 	char Signature[10];
-	ieDword tmpDword = 0;
+	ieDword tmpDword;
 
 	memcpy( Signature, "GAMEV0.0", 8);
 	Signature[5]+=game->version/10;
@@ -632,7 +636,8 @@ int GAMImp::PutHeader(DataStream *stream, Game *game)
 	stream->Write( Signature, 8);
 	//using Signature for padding
 	memset(Signature, 0, sizeof(Signature));
-	stream->WriteDword( &game->GameTime );
+	tmpDword = game->GameTime/15;
+	stream->WriteDword( &tmpDword );
 	//pst has a single preset of formations
 	if (game->version==GAM_VER_PST) {
 		stream->WriteWord( &game->Formations[0]);
@@ -648,6 +653,7 @@ int GAMImp::PutHeader(DataStream *stream, Game *game)
 	stream->WriteDword( &PCOffset );
 	stream->WriteDword( &PCCount );
 	//these fields are zeroed in any original savegame
+	tmpDword = 0;
 	stream->WriteDword( &tmpDword );
 	stream->WriteDword( &tmpDword );
 	stream->WriteDword( &NPCOffset );
