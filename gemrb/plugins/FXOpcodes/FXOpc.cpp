@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.13 2006/04/08 18:40:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.14 2006/04/10 15:57:41 avenger_teambg Exp $
  *
  */
 
@@ -873,7 +873,7 @@ int fx_damage (Actor* Owner, Actor* target, Effect* fx)
 	if (0) printf( "fx_damage (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	int damage; //FIXME damage calculation, random damage, etc
 
-	damage = 1;
+	damage = core->Roll(fx->DiceSides, fx->DiceThrown, fx->Parameter1);
 	damage = target->Damage(damage, fx->Parameter2, Owner); //FIXME!
 	//handle invulnerabilities, print damage caused
 	//this effect doesn't stick
@@ -2387,11 +2387,11 @@ int fx_find_traps (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 	TileMap *TMap = target->GetCurrentArea()->TMap;
 
-        int Count = 0;
-        while (true) {
-                Door* door = TMap->GetDoor( Count++ );
-                if (!door)
-                        break;
+	int Count = 0;
+	while (true) {
+		Door* door = TMap->GetDoor( Count++ );
+		if (!door)
+			break;
 		//not trapped
 		if (!door->Scripts[0]) {
 			continue;

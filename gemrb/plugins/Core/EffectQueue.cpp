@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.56 2006/04/09 15:22:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.57 2006/04/10 15:57:41 avenger_teambg Exp $
  *
  */
 
@@ -106,6 +106,11 @@ static EffectRef* FindEffect(const char* effectname)
 	return NULL;
 }
 
+//special effects without level check
+static EffectRef fx_damage_ref={"Damage",NULL,-1};
+static EffectRef fx_hp_modifier_ref={"HPModifier",NULL,-1};
+static EffectRef fx_maximum_hp_modifier_ref={"MaximumHPModifier",NULL,-1};
+
 inline static void ResolveEffectRef(EffectRef &effect_reference)
 {
 	if (effect_reference.EffText==-1) {
@@ -162,7 +167,7 @@ bool Init_EffectQueue()
 				//using this unused field
 				if (poi->EffText) {
 					printf("Classhing classhh\n");
-			printf("-------- FN: %d, %s\n", i, effectname);
+					printf("-------- FN: %d vs. %d, %s\n", i, poi->EffText, effectname);
 					abort();
 				}
 				poi->EffText = i;
@@ -171,6 +176,11 @@ bool Init_EffectQueue()
 		}
 		core->DelSymbol( eT );
 		if ( efftextTable ) core->DelTable( effT );
+
+		//additional initialisations
+		ResolveEffectRef(fx_damage_ref);
+		ResolveEffectRef(fx_hp_modifier_ref);
+		ResolveEffectRef(fx_maximum_hp_modifier_ref);
 	}
 	return true;
 }
@@ -274,12 +284,17 @@ void EffectQueue::AddAllEffects(Actor* target)
 //resisted effect based on level
 inline bool check_level(Actor *target, Effect *fx)
 {
+	if ((ieDword) fx_damage_ref.EffText==fx->Opcode) return false;
+	if ((ieDword) fx_hp_modifier_ref.EffText==fx->Opcode) return false;
+	if ((ieDword) fx_maximum_hp_modifier_ref.EffText==fx->Opcode) return false;
+	/*
 	switch (fx->Opcode) {
 	case 12: //damage
 	case 17: //hp modifier
 	case 18: //max hp modifier
 		return false;
 	}
+	*/
 	int level = target->GetXPLevel( true );
 	if ((fx->DiceSides != 0 || fx->DiceThrown != 0) && (level < (int)fx->DiceSides || level > (int)fx->DiceThrown)) {
 		return true;

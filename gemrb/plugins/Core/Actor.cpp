@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.176 2006/04/09 15:22:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.177 2006/04/10 15:57:41 avenger_teambg Exp $
  *
  */
 
@@ -871,7 +871,7 @@ void Actor::Init()
 	} else {
 		bonus = core->GetConstitutionBonus(STAT_CON_HP_NORMAL,Modified[IE_CON]);
 	}
-	bonus *= Modified[IE_LEVEL];
+	bonus *= GetXPLevel( true );
 
 	Modified[IE_MAXHITPOINTS]+=bonus;
 	Modified[IE_HITPOINTS]+=bonus;
@@ -906,7 +906,7 @@ int Actor::GetSavingThrow(ieDword type)
 }
 
 /** implements a generic opcode function, modify modified stats
-    returns the change
+ returns the change
 */
 int Actor::NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword ModifierType)
 {
