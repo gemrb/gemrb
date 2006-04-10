@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.23 2006/04/09 15:22:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.24 2006/04/10 18:18:13 avenger_teambg Exp $
  *
  */
 
@@ -55,6 +55,18 @@ class Actor;
 #define RL_MATCHSECTYPE 4  //match secondary type
 #define RL_REMOVEFIRST  8  //remove only one spell (could be more effects)
 
+#define BNC_PROJECTILE  1
+#define BNC_OPCODE      2
+#define BNC_LEVEL       4
+#define BNC_SCHOOL      8
+#define BNC_SECTYPE     0x10
+#define BNC_RESOURCE    0x20
+#define BNC_PROJECTILE_DEC 0x100
+#define BNC_OPCODE_DEC  0x200
+#define BNC_LEVEL_DEC   0x400
+#define BNC_SCHOOL_DEC  0x800
+#define BNC_SECTYPE_DEC 0x1000
+#define BNC_RESOURCE_DEC 0x2000
 
 // FIXME: Dice roll should be probably done just once, e.g. when equipping 
 // the item, not each time the fx are applied
@@ -66,6 +78,7 @@ class Actor;
 //these macros should work differently in permanent mode (modify base too)
 #define STAT_GET(stat) (target->Modified[ stat ])
 #define STAT_ADD(stat, mod) target->SetStat( stat, STAT_GET( stat ) + ( mod ), 0 )
+#define STAT_BIT_OR(stat, mod) target->SetStat( stat, STAT_GET( stat ) | ( mod ), 0 )
 #define STAT_SET(stat, mod) target->SetStat( stat,  ( mod ), 0 )
 #define STAT_MUL(stat, mod) target->SetStat( stat, STAT_GET(stat) * (( mod ) / 100), 0 )
 #define STATE_CURE( mod ) target->Modified[ IE_STATE_ID ] &= ~(ieDword) ( mod )
@@ -149,6 +162,8 @@ public:
 	//getting summarised effects
 	int BonusAgainstCreature(EffectRef &effect_reference, Actor *actor);
 
+	// returns -1 if bounced, 0 if resisted, 1 if accepted spell
+	int CheckImmunity(Actor *target);
 	/** Lists contents of the queue on a terminal for debugging */
 	void dump();
 	//resolve effect

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.14 2006/04/10 15:57:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.15 2006/04/10 18:18:13 avenger_teambg Exp $
  *
  */
 
@@ -238,8 +238,8 @@ int fx_bounce_opcode (Actor* Owner, Actor* target, Effect* fx);//c6
 //cb
 //cc
 //cd
-//ce
-//cf
+//ce int fx_resist_spell (Actor* Owner, Actor* target, Effect* fx);//ce
+int fx_bounce_spell (Actor* Owner, Actor* target, Effect* fx);//cf
 int fx_minimum_hp_modifier (Actor* Owner, Actor* target, Effect* fx);//d0
 int fx_power_word_kill (Actor* Owner, Actor* target, Effect* fx);//d1
 int fx_power_word_stun (Actor* Owner, Actor* target, Effect* fx);//d2
@@ -364,6 +364,7 @@ static EffectRef effectnames[] = {
 	{ "AttacksPerRoundModifier", fx_attacks_per_round_modifier, 0 },
 	{ "BackstabModifier", fx_backstab_modifier, 0 },
 	{ "BlessNonCumulative", fx_set_bless_state, 0 },
+	{ "BounceSpell", fx_bounce_spell, 0 },
 	{ "BounceProjectile", fx_bounce_projectile, 0 },
 	{ "ChangeName", fx_change_name, 0 },
 	{ "ChantNonCumulative", fx_set_chant_state, 0 },
@@ -1421,15 +1422,26 @@ int fx_alignment_change (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0x3A
-
 int fx_dispel_effects (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_dispel_effects (%2d): Value: %d, IDS: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	ieDword level = fx->Power;
+	ieDword level;
 
-	//this might be different, it could be that removal depends on random
-	if (fx->Parameter2==1) {
-		level = fx->Parameter1;
+	switch (fx->Parameter2) {
+		case 0:
+		default:
+			level = 0xffffffff;
+			break;
+		case 1:
+			//same level: 50% success, each diff modifies it by 5%
+			level = core->Roll(1,20,fx->Power-10);
+			if (level>0x80000000) level = 0;
+			break;
+		case 2:
+			//same level: 50% success, each diff modifies it by 5%
+			level = core->Roll(1,20,fx->Parameter1-10);
+			if (level>0x80000000) level = 0;
+			break;
 	}
 	target->fxqueue.RemoveLevelEffects(level, RL_DISPELLABLE, 0);
 	return FX_NOT_APPLIED;
@@ -1715,7 +1727,7 @@ int fx_set_ai_script (Actor* /*Owner*/, Actor* target, Effect* fx)
 //0x53
 int fx_protection_from_projectile (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_bounce_projectile (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	if (0) printf( "fx_protection_from_projectile (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
 	STAT_SET( IE_SHIELDGLOBE, 1 );
 	return FX_APPLIED;
 }
@@ -2778,7 +2790,59 @@ int fx_familiar_marker (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 int fx_bounce_projectile (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_bounce_projectile (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
-	STAT_SET( IE_BOUNCE, 1 );
+	STAT_BIT_OR( IE_BOUNCE, BNC_PROJECTILE );
+	return FX_APPLIED;
+}
+
+// 0xc6 //bounce opcode
+int fx_bounce_opcode (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_bounce_opcode (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	STAT_BIT_OR( IE_BOUNCE, BNC_OPCODE );
+	return FX_APPLIED;
+}
+
+// 0xc7 //bounce spell level
+int fx_bounce_spelllevel (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_bounce_spellevel (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	STAT_BIT_OR( IE_BOUNCE, BNC_LEVEL );
+	return FX_APPLIED;
+}
+
+// 0xc8 //decrementing bounce spell
+int fx_bounce_spelllevel_dec (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_bounce_spellevel_dec (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	STAT_BIT_OR( IE_BOUNCE, BNC_LEVEL_DEC );
+	return FX_APPLIED;
+}
+
+// 0xc9 //decrementing spell immunity
+// 0xca //bounce school
+int fx_bounce_school (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_bounce_school (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	STAT_BIT_OR( IE_BOUNCE, BNC_SCHOOL );
+	return FX_APPLIED;
+}
+
+// 0xcb //bounce sectype
+int fx_bounce_secondary_type (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_bounce_secondary_type (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	STAT_BIT_OR( IE_BOUNCE, BNC_SECTYPE );
+	return FX_APPLIED;
+}
+
+// 0xcc //resist school
+// 0xcd //resist sectype
+// 0xce //resist spell
+// 0xcf //bounce spell
+int fx_bounce_spell (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_bounce_spell (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	STAT_BIT_OR( IE_BOUNCE, BNC_RESOURCE );
 	return FX_APPLIED;
 }
 

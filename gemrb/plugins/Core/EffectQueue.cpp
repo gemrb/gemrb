@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.57 2006/04/10 15:57:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.58 2006/04/10 18:18:13 avenger_teambg Exp $
  *
  */
 
@@ -108,7 +108,7 @@ static EffectRef* FindEffect(const char* effectname)
 
 //special effects without level check
 static EffectRef fx_damage_ref={"Damage",NULL,-1};
-static EffectRef fx_hp_modifier_ref={"HPModifier",NULL,-1};
+static EffectRef fx_hp_modifier_ref={"CurrentHPModifier",NULL,-1};
 static EffectRef fx_maximum_hp_modifier_ref={"MaximumHPModifier",NULL,-1};
 
 inline static void ResolveEffectRef(EffectRef &effect_reference)
@@ -310,6 +310,55 @@ inline bool check_probability(Effect* fx)
 		return false;
 	}
 	return true;
+}
+
+static EffectRef fx_spell_immunity_ref={"ResistSpell",NULL,-1};
+static EffectRef fx_school_immunity_ref={"ResistSchool",NULL,-1};
+static EffectRef fx_secondary_type_immunity_ref={"ResistSecondaryType",NULL,-1};
+
+static EffectRef fx_spell_bounce_ref={"BounceSpell",NULL,-1};
+static EffectRef fx_school_bounce_ref={"BounceSchool",NULL,-1};
+static EffectRef fx_secondary_type_bounce_ref={"BounceSecondaryType",NULL,-1};
+
+inline int check_type(Actor* actor, Effect* fx)
+{
+	ieDword bounce = actor->GetStat(IE_BOUNCE);
+
+	//immunity checks
+	if (actor->fxqueue.HasEffectWithResource(fx_spell_immunity_ref, fx->Source) ) {
+		return 0;
+	}
+	if (fx->PrimaryType) {
+		if (actor->fxqueue.HasEffectWithParam(fx_school_immunity_ref, fx->PrimaryType)) {
+			return 0;
+		}
+	}
+
+	if (fx->SecondaryType) {
+		if (actor->fxqueue.HasEffectWithParam(fx_secondary_type_immunity_ref, fx->SecondaryType)) {
+			return 0;
+		}
+	}
+
+	//bounce checks
+	if ((bounce&BNC_RESOURCE) && actor->fxqueue.HasEffectWithResource(fx_spell_bounce_ref, fx->Source) ) {
+		return -1;
+	}
+
+	if (fx->PrimaryType && (bounce&BNC_SCHOOL) ) {
+		if (actor->fxqueue.HasEffectWithParam(fx_school_bounce_ref, fx->PrimaryType)) {
+			return -1;
+		}
+	}
+
+	if (fx->SecondaryType && (bounce&BNC_SECTYPE) ) {
+		if (actor->fxqueue.HasEffectWithParam(fx_secondary_type_bounce_ref, fx->SecondaryType)) {
+			return -1;
+		}
+	}
+
+	//decrementing bounce checks
+	return 1;
 }
 
 inline bool check_resistance(Actor* actor, Effect* fx)
@@ -726,3 +775,19 @@ int EffectQueue::ResolveEffect(EffectRef &effect_reference)
 	ResolveEffectRef(effect_reference);
 	return effect_reference.EffText;
 }
+
+//returns 1 if effect block applicable
+//returns 0 if effect block disabled
+//returns -1 if effect block bounced
+int EffectQueue::CheckImmunity(Actor *target)
+{
+	if (effects.size() ) {
+		Effect* fx = effects[0];
+
+		//check specific spell immunity
+		//check school/sectype immunity
+		return check_type(target, fx);
+	}
+	return 0;
+}
+

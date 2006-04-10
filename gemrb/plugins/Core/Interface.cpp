@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.392 2006/04/09 15:22:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.393 2006/04/10 18:18:13 avenger_teambg Exp $
  *
  */
 
@@ -4085,8 +4085,16 @@ void Interface::ApplySpell(const ieResRef resname, Actor *actor, Actor *caster, 
 		level = 1;
 	}
 	EffectQueue *fxqueue = spell->GetEffectBlock(level);
-	fxqueue->SetOwner( caster );
-	fxqueue->AddAllEffects(actor);
+
+	//check effect immunities
+	int res = fxqueue->CheckImmunity ( actor );
+	if (res) {
+		if (res == -1 ) {
+			actor = caster;
+		}
+		fxqueue->SetOwner( caster );
+		fxqueue->AddAllEffects(actor);
+	}
 	delete fxqueue;
 }
 
@@ -4115,10 +4123,17 @@ void Interface::ApplyEffect(const ieResRef resname, Actor *actor, Actor *caster,
 		level = 1;
 	}
 	EffectQueue *fxqueue = new EffectQueue();
-	fxqueue->SetOwner( caster );
 	fxqueue->AddEffect( effect );
 	delete effect;
-	fxqueue->AddAllEffects( actor );
+
+	int res = fxqueue->CheckImmunity ( actor );
+	if (res) {
+		if (res == -1 ) {
+			actor = caster;
+		}
+		fxqueue->SetOwner( caster );
+		fxqueue->AddAllEffects( actor );
+	}
 	delete fxqueue;
 }
 
