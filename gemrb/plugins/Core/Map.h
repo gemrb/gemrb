@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.108 2006/04/09 15:22:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.109 2006/04/11 16:32:35 avenger_teambg Exp $
  *
  */
 
@@ -263,7 +263,7 @@ public:
 	void AddVVCCell(ScriptedAnimation* vvc);
 	bool CanFree();
 	int GetCursor( Point &p);
-	void Sparkle(ieDword color, ieDword type);
+	void Sparkle(ieDword color, ieDword type, Point &pos);
 
 	//entrances
 	void AddEntrance(char* Name, int XPos, int YPos, short Face);

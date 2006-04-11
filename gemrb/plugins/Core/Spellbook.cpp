@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.36 2006/04/08 18:40:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.37 2006/04/11 16:32:35 avenger_teambg Exp $
  *
  */
 
@@ -324,6 +324,7 @@ CREMemorizedSpell* Spellbook::GetMemorizedSpell(int type, unsigned int level, un
 	return spells[type][level]->memorized_spells[index];
 }
 
+//creates a spellbook level
 bool Spellbook::AddSpellMemorization(CRESpellMemorization* sm)
 {
 	if (sm->Type>=NUM_SPELL_TYPES) {
@@ -332,7 +333,7 @@ bool Spellbook::AddSpellMemorization(CRESpellMemorization* sm)
 	std::vector<CRESpellMemorization*>* s = &spells[sm->Type];
 	//when loading, level starts on 0
 	unsigned int level = sm->Level;
-	if (level > 8 ) {
+	if (level > MAX_SPELL_LEVEL ) {
 		return false;
 	}
 

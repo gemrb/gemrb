@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.18 2006/04/08 18:40:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.19 2006/04/11 16:32:35 avenger_teambg Exp $
  *
  */
 
@@ -46,6 +46,8 @@ class Actor;
 #else
 #define GEM_EXPORT
 #endif
+
+#define MAX_SPELL_LEVEL 16
 
 //HaveSpell flags
 #define HS_DEPLETE 1
