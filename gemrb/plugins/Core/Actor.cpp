@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.178 2006/04/11 16:32:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.179 2006/04/12 20:32:10 avenger_teambg Exp $
  *
  */
 
@@ -809,6 +809,27 @@ bool Actor::SetBase(unsigned int StatIndex, ieDword Value)
 	SetStat (StatIndex, Value+diff, InternalFlags&IF_INITIALIZED);
 	return true;
 }
+
+bool Actor::SetBaseBit(unsigned int StatIndex, ieDword Value, bool setreset)
+{
+	if (StatIndex >= MAX_STATS) {
+		return false;
+	}
+	if (setreset) {
+		BaseStats[StatIndex] |= Value;
+	} else {
+		BaseStats[StatIndex] &= ~Value;
+	}
+	//if already initialized, then the modified stats
+	//need to run the post change function (stat change can kill actor)
+	if (setreset) {
+		SetStat (StatIndex, Modified[StatIndex]|Value, InternalFlags&IF_INITIALIZED);
+	} else {
+		SetStat (StatIndex, Modified[StatIndex]&~Value, InternalFlags&IF_INITIALIZED);
+	}
+	return true;
+}
+
 void Actor::AddPortraitIcon(ieByte icon)
 {
 	if (!PCStats) {
@@ -923,7 +944,7 @@ int Actor::NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 			break;
 		case MOD_PERCENT:
 			//percentile
-			SetStat(StatIndex, BaseStats[StatIndex] * 100 / ModifierValue, 0);
+			SetStat(StatIndex, BaseStats[StatIndex] * ModifierValue / 100, 0);
 			break;
 	}
 	return Modified[StatIndex] - oldmod;
@@ -944,7 +965,7 @@ int Actor::NewBase(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 			break;
 		case MOD_PERCENT:
 			//percentile
-			SetBase(StatIndex, BaseStats[StatIndex] * 100 / ModifierValue);
+			SetBase(StatIndex, BaseStats[StatIndex] * ModifierValue / 100);
 			break;
 	}
 	return BaseStats[StatIndex] - oldmod;

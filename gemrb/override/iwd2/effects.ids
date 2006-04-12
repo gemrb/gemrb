@@ -125,9 +125,9 @@ IDS
 0x7b	Item:RemoveInventory
 0x7c	TeleportToPoint
 0x7d	Unlock
-0x7e	WalkRunDistanceModifier
-0x7f	Summon:MonsterSummoning
-0x80	State:Confusion
+0x7e	MovementRateModifier
+0x7f	MonsterSummoning
+0x80	State:Confused
 0x81	AidNonCumulative
 0x82	BlessNonCumulative
 0x83    ChantNonCumulative
@@ -150,7 +150,7 @@ IDS
 0x94	Spell:CastAsScroll
 0x95	Identify
 0x96	FindTraps
-0x97	CreatureSummoningReplace
+0x97	ReplaceCreature
 0x98	PlayMovie
 0x99	Overlay:Sanctuary
 0x9a	Overlay:Entangle

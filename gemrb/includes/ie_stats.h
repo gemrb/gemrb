@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.45 2006/04/05 16:34:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.46 2006/04/12 20:32:10 avenger_teambg Exp $
  *
  */
 
@@ -65,8 +65,11 @@
 #define SEX_SUMMON    6
 
 //alignment values
-#define AL_GNE_MASK  3  //good neutral evil
-#define AL_LNC_MASK  0x30 //lawful neutral evil
+#define AL_GNE_MASK    3  //good neutral evil
+#define AL_GOOD        1
+#define AL_GNE_NEUTRAL 2
+#define AL_EVIL        3
+#define AL_LNC_MASK    0x30 //lawful neutral evil
 
 //state bits (IE_STATE)
 #define STATE_SLEEP      0x00000001

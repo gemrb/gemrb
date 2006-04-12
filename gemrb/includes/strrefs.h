@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/strrefs.h,v 1.14 2006/04/05 16:34:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/strrefs.h,v 1.15 2006/04/12 20:32:10 avenger_teambg Exp $
  *
  */
 
@@ -91,4 +91,11 @@
 #define STR_CHARMED         57
 #define STR_DIRECHARMED     58
 #define STR_CONTROLLED      59
+#define STR_EVIL            60
+#define STR_GNE_NEUTRAL     61
+#define STR_GOOD            62
+#define STR_LAWFUL          63
+#define STR_LNC_NEUTRAL     64
+#define STR_CHAOTIC         65
+
 #endif //! IE_STRINGS_H

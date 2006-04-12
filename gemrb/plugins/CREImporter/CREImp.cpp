@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.105 2006/04/09 15:21:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.106 2006/04/12 20:32:10 avenger_teambg Exp $
  *
  */
 
@@ -393,9 +393,9 @@ void CREImp::GetActorPST(Actor *act)
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_HIDEINSHADOWS]=tmpByte;
 	str->ReadWord( &tmpWord );
-	act->BaseStats[IE_ARMORCLASS]=(ieWordSigned) tmpWord;
-	str->ReadWord( &tmpWord );
 	//skipping a word
+	str->ReadWord( &tmpWord );
+	act->BaseStats[IE_ARMORCLASS]=(ieWordSigned) tmpWord;
 	str->ReadWord( &tmpWord );
 	act->BaseStats[IE_ACCRUSHINGMOD]=(ieWordSigned) tmpWord;
 	str->ReadWord( &tmpWord );
@@ -407,6 +407,8 @@ void CREImp::GetActorPST(Actor *act)
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_TOHIT]=(ieByteSigned) tmpByte;
 	str->Read( &tmpByte, 1 );
+	tmpByte = tmpByte * 2;
+	if (tmpByte>10) tmpByte-=11;
 	act->BaseStats[IE_NUMBEROFATTACKS]=tmpByte;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_SAVEVSDEATH]=(ieByteSigned) tmpByte;
@@ -744,10 +746,10 @@ ieDword CREImp::GetActorGemRB(Actor *act)
 	act->BaseStats[IE_REPUTATION]=tmpByte;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_HIDEINSHADOWS]=tmpByte;
+	//skipping a word (useful for something)
+	str->ReadWord( &tmpWord );
 	str->ReadWord( &tmpWord );
 	act->BaseStats[IE_ARMORCLASS]=(ieWordSigned) tmpWord;
-	str->ReadWord( &tmpWord );
-	//skipping a word (useful for something)
 	str->ReadWord( &tmpWord );
 	act->BaseStats[IE_ACCRUSHINGMOD]=(ieWordSigned) tmpWord;
 	str->ReadWord( &tmpWord );
@@ -827,9 +829,9 @@ void CREImp::GetActorBG(Actor *act)
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_HIDEINSHADOWS]=tmpByte;
 	str->ReadWord( &tmpWord );
-	act->BaseStats[IE_ARMORCLASS]=(ieWordSigned) tmpWord;
+	//skipping a word (useful for something)
 	str->ReadWord( &tmpWord );
-	//skipping a word
+	act->BaseStats[IE_ARMORCLASS]=(ieWordSigned) tmpWord;
 	str->ReadWord( &tmpWord );
 	act->BaseStats[IE_ACCRUSHINGMOD]=(ieWordSigned) tmpWord;
 	str->ReadWord( &tmpWord );
@@ -841,6 +843,8 @@ void CREImp::GetActorBG(Actor *act)
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_TOHIT]=(ieByteSigned) tmpByte;
 	str->Read( &tmpByte, 1 );
+	tmpByte = tmpByte * 2;
+	if (tmpByte>10) tmpByte-=11;
 	act->BaseStats[IE_NUMBEROFATTACKS]=tmpByte;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_SAVEVSDEATH]=(ieByteSigned) tmpByte;
@@ -1260,9 +1264,9 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	str->Read( &tmpByte, 1 ); 
 	act->BaseStats[IE_HIDEINSHADOWS]=tmpByte;
 	str->ReadWord( &tmpWord ); 
-	act->BaseStats[IE_ARMORCLASS]=(ieWordSigned) tmpWord;
-	str->ReadWord( &tmpWord ); 
 	//skipping a word
+	str->ReadWord( &tmpWord ); 
+	act->BaseStats[IE_ARMORCLASS]=(ieWordSigned) tmpWord;
 	str->ReadWord( &tmpWord ); 
 	act->BaseStats[IE_ACCRUSHINGMOD]=(ieWordSigned) tmpWord;
 	str->ReadWord( &tmpWord ); 
@@ -1274,6 +1278,8 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	str->Read( &tmpByte, 1 ); 
 	act->BaseStats[IE_TOHIT]=(ieByteSigned) tmpByte;
 	str->Read( &tmpByte, 1 ); 
+	tmpByte = tmpByte * 2;
+	if (tmpByte>10) tmpByte-=11;
 	act->BaseStats[IE_NUMBEROFATTACKS]=tmpByte;
 	str->Read( &tmpByte, 1 ); 
 	act->BaseStats[IE_SAVEVSDEATH]=(ieByteSigned) tmpByte;
@@ -1604,9 +1610,10 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 	//from here it differs, slightly
 	tmpWord = actor->BaseStats[IE_ARMORCLASS];
 	stream->WriteWord( &tmpWord);
-	//iwd2 doesn't store this, probably we shouldn't either?
+	//iwd2 doesn't store this a second time,
+	//probably gemrb format shouldn't either?
 	if (actor->version != IE_CRE_V2_2) {
-		tmpWord = actor->Modified[IE_ARMORCLASS];
+		tmpWord = actor->BaseStats[IE_ARMORCLASS];
 		stream->WriteWord( &tmpWord);
 	}
 	tmpWord = actor->BaseStats[IE_ACCRUSHINGMOD];
@@ -1620,8 +1627,8 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 	tmpByte = actor->BaseStats[IE_TOHIT];
 	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_NUMBEROFATTACKS];
-	stream->Write( &tmpByte, 1);
 	if (actor->version == IE_CRE_V2_2) {
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_SAVEFORTITUDE];
 		stream->Write( &tmpByte,1);
 		tmpByte = actor->BaseStats[IE_SAVEREFLEX];
@@ -1629,6 +1636,11 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 		tmpByte = actor->BaseStats[IE_SAVEWILL];
 		stream->Write( &tmpByte,1);
 	} else {
+		if (actor->version!=IE_CRE_GEMRB) {
+			if (tmpByte&1) tmpByte = tmpByte/2+6;
+			else tmpByte /=2;
+		}
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_SAVEVSDEATH];
 		stream->Write( &tmpByte,1);
 		tmpByte = actor->BaseStats[IE_SAVEVSWANDS];

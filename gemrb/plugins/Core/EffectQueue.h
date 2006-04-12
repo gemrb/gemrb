@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.25 2006/04/11 16:32:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.26 2006/04/12 20:32:10 avenger_teambg Exp $
  *
  */
 
@@ -81,15 +81,23 @@ class Actor;
 #define STAT_BIT_OR(stat, mod) target->SetStat( stat, STAT_GET( stat ) | ( mod ), 0 )
 #define STAT_SET(stat, mod) target->SetStat( stat,  ( mod ), 0 )
 #define STAT_MUL(stat, mod) target->SetStat( stat, STAT_GET(stat) * ( mod ) / 100, 0 )
+//if an effect sticks around
 #define STATE_CURE( mod ) target->Modified[ IE_STATE_ID ] &= ~(ieDword) ( mod )
 #define STATE_SET( mod ) target->Modified[ IE_STATE_ID ] |= (ieDword) ( mod )
 #define STATE_GET( mod ) (target->Modified[ IE_STATE_ID ] & (ieDword) ( mod ) )
 #define STAT_MOD( stat ) target->NewStat(stat, fx->Parameter1, fx->Parameter2)
+#define STAT_MOD_VAR( stat, mod ) target->NewStat(stat, ( mod ) , fx->Parameter2 )
 #define BASE_GET(stat) (target->BaseStats[ stat ])
 #define BASE_SET(stat, mod) target->SetBase( stat,  ( mod ) )
 #define BASE_ADD(stat, mod) target->SetBase( stat,  BASE_GET(stat)+ ( mod ) )
 #define BASE_MUL(stat, mod) target->SetBase( stat,  BASE_GET(stat)* ( mod ) / 100 )
 #define BASE_MOD(stat) target->NewBase( stat, fx->Parameter1, fx->Parameter2)
+#define BASE_MOD_VAR(stat, mod) target->NewBase( stat, (mod), fx->Parameter2 )
+//if an effect doesn't stick (and has permanent until cured effect) then
+//it has to modify the base stat (which is saved)
+//also use this one if the effect starts a cure effect automatically
+#define BASE_STATE_SET( mod ) target->SetBaseBit( IE_STATE_ID,  ( mod ), true )
+#define BASE_STATE_CURE( mod ) target->SetBaseBit( IE_STATE_ID,  ( mod ), false )
 
 /** Prototype of a function implementing a particular Effect opcode */
 typedef int (* EffectFunction)(Actor*, Actor*, Effect*);

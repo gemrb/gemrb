@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.111 2006/04/09 15:22:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.112 2006/04/12 20:32:10 avenger_teambg Exp $
  *
  */
 
@@ -231,8 +231,10 @@ public:
 	int GetMod(unsigned int StatIndex);
 	/** Returns a Stat Base Value */
 	ieDword GetBase(unsigned int StatIndex);
-	/** Sets a Stat Base Value */
+	/** Sets a Base Stat Value */
 	bool SetBase(unsigned int StatIndex, ieDword Value);
+	/** set/resets a Base Stat bit */
+	bool SetBaseBit(unsigned int StatIndex, ieDword Value, bool setreset);
 	/** Sets the modified value in different ways, returns difference */
 	int NewStat(unsigned int StatIndex, ieDword ModifierValue, ieDword ModifierType);
 	/** Modifies the base stat value in different ways, returns difference */
