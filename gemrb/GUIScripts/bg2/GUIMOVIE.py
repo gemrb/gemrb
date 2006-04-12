@@ -38,7 +38,7 @@ def PlayPress():
 		if GemRB.GetVar(t)==1:
 			if s==0:
 				s = GemRB.GetTableRowName(MoviesTable, i)
-				GemRB.PlayMovie(s)
+				GemRB.PlayMovie(s, 1)
 				GemRB.InvalidateWindow(MovieWindow)
 				return
 			s = s - 1
@@ -51,5 +51,5 @@ def CreditsPress():
 
 def DonePress():
 	GemRB.UnloadWindow(MovieWindow)
-	GemRB.SetNextScript("Start")
+	GemRB.SetNextScript("Start2")
 	return

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIREC.py,v 1.4 2005/11/29 22:40:36 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIREC.py,v 1.5 2006/04/12 20:25:00 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -193,11 +193,11 @@ def UpdateRecordsWindow ():
 		GemRB.SetText (Window, Label, 7199)
 
 	#collecting tokens for stat overview
-        ClassTitle = GemRB.GetString (GetActorClassTitle (pc) )
+	ClassTitle = GemRB.GetString (GetActorClassTitle (pc) )
 
-        GemRB.SetToken("CLASS", ClassTitle)
-        GemRB.SetToken("LEVEL", str (GemRB.GetPlayerStat (pc, IE_LEVEL) ) )
-        GemRB.SetToken("EXPERIENCE", str (GemRB.GetPlayerStat (pc, IE_XP) ) )
+	GemRB.SetToken("CLASS", ClassTitle)
+	GemRB.SetToken("LEVEL", str (GemRB.GetPlayerStat (pc, IE_LEVEL) ) )
+	GemRB.SetToken("EXPERIENCE", str (GemRB.GetPlayerStat (pc, IE_XP) ) )
 
 	# help, info textarea
 	stats_overview = GetStatOverview (pc)
@@ -266,7 +266,12 @@ def GetStatOverview (pc):
 	#   4208 THAC0
 	stats.append ((4208, GS (IE_THAC0), ''))
 	#   4209 Number of Attacks
-	stats.append ((4209, GS (IE_NUMBEROFATTACKS), ''))
+	tmp = GS (IE_NUMBEROFATTACKS)
+	if (tmp&1):
+		tmp2 = str(tmp) + "/2"
+	else:
+		tmp2 = str(tmp/2)
+	stats.append ((4209, tmp2, ''))
 	#   4210 Lore
 	stats.append ((4210, GS (IE_LORE), ''))
 	#   4211 Open Locks

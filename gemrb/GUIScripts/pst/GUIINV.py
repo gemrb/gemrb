@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.25 2005/07/06 23:37:31 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.26 2006/04/12 20:25:01 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -59,14 +59,11 @@ ItemHash = {}
 # 0x10000000 + 63 - class
 
 
-# Maps from ControlID to inventory Slot number
-ControlToSlotMap = [6, 19, 5, 3, 7, 0, 1, 4, 8, 2,   9, 10, 11, 12,   20, 21, 22, 23, 24,   13, 14, 15, 16, 17,   25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44]
-
 def OpenInventoryWindow ():
 	global AvSlotsTable
 	global InventoryWindow
 	
-	AvSlotsTable  = GemRB.LoadTable ('AVSLOTS')
+	AvSlotsTable  = GemRB.LoadTable ('avslots')
 
 	if CloseOtherWindow (OpenInventoryWindow):
 		GemRB.HideGUI ()
@@ -184,25 +181,25 @@ def UpdateInventoryWindow ():
 	ItemHash = {}
 
 	# get a list which maps slot number to slot type/icon/toolti
-	anim_id = GemRB.GetPlayerStat (pc, ie_stats.IE_ANIMATION_ID) & 255
-	row = "0x%02X" %anim_id
-	slot_list = map (int, string.split (GemRB.GetTableValue (AvSlotsTable, row, 'SLOTS'), ',')[1:])
+	row = GemRB.GetPlayerStat (pc, ie_stats.IE_SPECIFIC)
+	usability = GemRB.GetTableValue (AvSlotsTable, row, 0)
+	slot_list = map (int, string.split (GemRB.GetTableValue (AvSlotsTable, row, 1), ',')[1:])
 	
 	# populate inventory slot controls
 	for i in range (44):
-		UpdateSlot (pc, i)
+		UpdateSlot (pc, slot_list[i])
 
 
-def UpdateSlot (pc, ControlID):
+def UpdateSlot (pc, slot):
 	Window = InventoryWindow
-	Button = GemRB.GetControl (Window, ControlID)
-	slot = ControlToSlotMap[ControlID]
-	slot_item = GemRB.GetSlotItem (pc, slot)
+	SlotType = GemRB.GetSlotType (slot+1)
+        if not SlotType["ID"]:
+                return
 
-	slottype = slot_list[slot]
+	slot_item = GemRB.GetSlotItem (pc, slot+1)
+
 	slotdict = GemRB.GetSlotType (slottype)
-
-	#print "SLOT", slot, "CTL:", ControlID, "TYPE:", slottype, "DICT:", slotdict, "ITEM", slot_item
+	Button = GemRB.GetControl (Window, SlotType["ID"])
 
 	# NOTE: there are invisible items (e.g. MORTEP) in inaccessible slots
 	#   used to assign powers and protections

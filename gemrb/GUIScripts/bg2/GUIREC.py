@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.25 2005/12/17 21:02:45 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.26 2006/04/12 20:25:00 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -250,7 +250,13 @@ def GetStatOverview (pc):
 	stats.append (8442)
 	stats.append ( (61932, GS (IE_THAC0), '') )
 	stats.append ( (9457, GS (IE_THAC0), '') )
-	stats.append ( (9458, GS (IE_NUMBEROFATTACKS), '') )
+	tmp = GS (IE_NUMBEROFATTACKS)
+	if (tmp&1):
+		tmp2 = str(tmp) + "/2"
+	else:
+		tmp2 = str(tmp/2)
+
+	stats.append ( (9458, tmp2, '') )
 	stats.append ( (9459, GS (IE_LORE), '') )
 	reptxt = GetReputation (GemRB.GameGetReputation()/10)
 	stats.append ( (9465, reptxt, '') )
