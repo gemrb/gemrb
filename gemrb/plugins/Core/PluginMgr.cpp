@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.23 2005/12/04 21:09:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.24 2006/04/13 18:40:25 avenger_teambg Exp $
  *
  */
 
@@ -193,7 +193,8 @@ PluginMgr::PluginMgr(char* pluginpath)
 					error = true;
 					break;
 				}
-				if (plugins[x]->SuperClassID() == plug->SuperClassID()) {
+
+				if (plugins[x]->SuperClassID() == plug->SubClassID()) {
 					printStatus( "SKIPPING", YELLOW );
 					printf( "Duplicate Plug-in\n" );
 					error = true;
@@ -249,13 +250,30 @@ void* PluginMgr::GetPlugin(SClass_ID plugintype)
 	if (!&plugins) {
 		return NULL;
 	}
-	int plugs = plugins.size();
+	size_t plugs = plugins.size();
 	while (plugs--) {
 		if (plugins[plugs]->SuperClassID() == plugintype) {
 			return ( plugins[plugs] )->Create();
 		}
 	}
 	return NULL;
+}
+
+std::vector<InterfaceElement> *PluginMgr::GetAllPlugin(SClass_ID plugintype)
+{
+	if (!&plugins) {
+		return NULL;
+	}
+	std::vector<InterfaceElement> *ret = new std::vector<InterfaceElement>;
+
+	size_t plugs = plugins.size();
+	while (plugs--) {
+		if (plugins[plugs]->SubClassID() == plugintype) {
+			InterfaceElement tmp={( plugins[plugs] )->Create(), tmp.mgr==NULL};
+			ret->push_back( tmp );
+		}
+	}
+	return ret;
 }
 
 void PluginMgr::FreePlugin(void* ptr)

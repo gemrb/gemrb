@@ -1,4 +1,5 @@
 //damage types
+#define DAMAGE_CRUSHING 0
 #define DAMAGE_ACID     1
 #define DAMAGE_COLD     2
 #define DAMAGE_ELECTRICITY 4

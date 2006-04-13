@@ -15,37 +15,25 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ClassDesc.cpp,v 1.4 2006/04/13 18:40:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.h,v 1.1 2006/04/13 18:40:27 avenger_teambg Exp $
  *
  */
 
-#include "../../includes/win32def.h"
-#include "ClassDesc.h"
+#ifndef IWDOPC_H
+#define IWDOPC_H
 
-ClassDesc::ClassDesc(void)
-{
-}
+#include "../Core/OpcodeMgr.h"
 
-ClassDesc::~ClassDesc(void)
-{
-}
+class IWDOpc : public OpcodeMgr {
+public:
+	IWDOpc(void);
+	~IWDOpc(void);
+	bool Init(void);
 
-int ClassDesc::BeginCreate()
-{
-	return 0;
-}
+	void release(void)
+	{
+		delete this;
+	}
+};
 
-int ClassDesc::EndCreate()
-{
-	return 0;
-}
-
-SClass_ID ClassDesc::SubClassID(void)
-{
-	return SuperClassID()&CLASS_ID_MASK;
-}
-
-const char* ClassDesc::InternalName(void)
-{
-	return 0;
-}
+#endif

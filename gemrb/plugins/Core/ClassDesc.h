@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ClassDesc.h,v 1.3 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ClassDesc.h,v 1.4 2006/04/13 18:40:25 avenger_teambg Exp $
  *
  */
 
@@ -37,6 +37,9 @@
 #define GEM_EXPORT
 #endif
 
+#define CLASS_ID_MASK     0x0fffffff
+#define ALLOW_CONCURRENT  0x80000000
+
 class GEM_EXPORT ClassDesc {
 public:
 	ClassDesc(void);
@@ -47,9 +50,8 @@ public:
 	virtual const char* ClassName(void) = 0;
 	virtual SClass_ID SuperClassID(void) = 0;
 	virtual Class_ID ClassID(void) = 0;
-	virtual Class_ID SubClassID(void);
+	virtual SClass_ID SubClassID(void);
 	virtual const char* InternalName(void);
-	//TODO: Add Functions for Function Parameter Handling (GemScript)
 };
 
 #endif

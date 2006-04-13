@@ -15,37 +15,42 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ClassDesc.cpp,v 1.4 2006/04/13 18:40:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpcodesCD.cpp,v 1.1 2006/04/13 18:40:27 avenger_teambg Exp $
  *
  */
 
-#include "../../includes/win32def.h"
-#include "ClassDesc.h"
+#include "IWDOpcodesCD.h"
+#include "IWDOpc.h"
 
-ClassDesc::ClassDesc(void)
+IWDOpcodesCD::IWDOpcodesCD(void)
 {
 }
 
-ClassDesc::~ClassDesc(void)
+IWDOpcodesCD::~IWDOpcodesCD(void)
 {
 }
 
-int ClassDesc::BeginCreate()
+void* IWDOpcodesCD::Create(void)
 {
-	return 0;
+	return new IWDOpc();
 }
 
-int ClassDesc::EndCreate()
+const char* IWDOpcodesCD::ClassName(void)
 {
-	return 0;
+	return "IWDOpcodes";
 }
 
-SClass_ID ClassDesc::SubClassID(void)
+SClass_ID IWDOpcodesCD::SuperClassID(void)
 {
-	return SuperClassID()&CLASS_ID_MASK;
+	return IE_FX_CLASS_ID|ALLOW_CONCURRENT;
 }
 
-const char* ClassDesc::InternalName(void)
+Class_ID IWDOpcodesCD::ClassID(void)
 {
-	return 0;
+	return Class_ID( 0x00300000, 0x00000001 );
+}
+
+const char* IWDOpcodesCD::InternalName(void)
+{
+	return "IWDOpc";
 }

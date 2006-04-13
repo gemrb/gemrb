@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpcodesCD.cpp,v 1.1 2005/11/06 16:06:23 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpcodesCD.cpp,v 1.2 2006/04/13 18:40:26 avenger_teambg Exp $
  *
  */
 
@@ -42,12 +42,12 @@ const char* FXOpcodesCD::ClassName(void)
 
 SClass_ID FXOpcodesCD::SuperClassID(void)
 {
-	return IE_FX_CLASS_ID;
+	return IE_FX_CLASS_ID|ALLOW_CONCURRENT;
 }
 
 Class_ID FXOpcodesCD::ClassID(void)
 {
-	return Class_ID( 0x00300000, 0x00000001 );
+	return Class_ID( 0x00300000, 0x00000002 );
 }
 
 const char* FXOpcodesCD::InternalName(void)

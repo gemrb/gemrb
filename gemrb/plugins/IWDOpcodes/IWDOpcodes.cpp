@@ -15,37 +15,47 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ClassDesc.cpp,v 1.4 2006/04/13 18:40:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpcodes.cpp,v 1.1 2006/04/13 18:40:27 avenger_teambg Exp $
  *
  */
 
-#include "../../includes/win32def.h"
-#include "ClassDesc.h"
+/**
+ * @file IWDOpcodes.cpp
+ * Defines the entry point for the DLL application.
+ * @author The GemRB Project
+ */
 
-ClassDesc::ClassDesc(void)
+#include "../../includes/globals.h"
+#include "IWDOpcodesCD.h"
+
+#ifdef WIN32
+#define GEM_EXPORT_DLL __declspec(dllexport)
+#else
+#define GEM_EXPORT_DLL
+#endif
+
+#ifdef WIN32
+#include <windows.h>
+
+BOOL APIENTRY DllMain(HANDLE hModule, DWORD  ul_reason_for_call,
+	LPVOID lpReserved)
 {
+	return TRUE;
 }
 
-ClassDesc::~ClassDesc(void)
+#endif
+
+GEM_EXPORT_DLL ClassDesc* LibClassDesc()
 {
+	return &IWDOpcodesCD;
 }
 
-int ClassDesc::BeginCreate()
+GEM_EXPORT_DLL const char* LibDescription()
 {
-	return 0;
+	return "Effect opcodes for the icewind branch of the games";
 }
 
-int ClassDesc::EndCreate()
+GEM_EXPORT_DLL const char* LibVersion()
 {
-	return 0;
-}
-
-SClass_ID ClassDesc::SubClassID(void)
-{
-	return SuperClassID()&CLASS_ID_MASK;
-}
-
-const char* ClassDesc::InternalName(void)
-{
-	return 0;
+	return VERSION_GEMRB;
 }

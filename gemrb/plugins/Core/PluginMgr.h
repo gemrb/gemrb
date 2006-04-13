@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.h,v 1.7 2005/12/04 21:09:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.h,v 1.8 2006/04/13 18:40:25 avenger_teambg Exp $
  *
  */
 
@@ -57,6 +57,11 @@ typedef void *LibHandle;
  * and tries to load them one after another.
  */
 
+typedef struct InterfaceElement {
+        void *mgr;
+        bool free;
+} InterfaceElement;
+
 class GEM_EXPORT PluginMgr {
 public:
 	PluginMgr(char* pluginpath);
@@ -67,8 +72,9 @@ private:
 public:
 	bool IsAvailable(SClass_ID plugintype);
 	void* GetPlugin(SClass_ID plugintype);
+	std::vector<InterfaceElement> *GetAllPlugin(SClass_ID plugintype);	
 	void FreePlugin(void* ptr);
-	int GetPluginCount() { return plugins.size(); }
+	size_t GetPluginCount() { return plugins.size(); }
 };
 
 #endif

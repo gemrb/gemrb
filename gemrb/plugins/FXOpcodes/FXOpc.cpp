@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.17 2006/04/12 20:32:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.18 2006/04/13 18:40:25 avenger_teambg Exp $
  *
  */
 
@@ -93,9 +93,9 @@ int fx_cure_stun_state (Actor* Owner, Actor* target, Effect* fx);//2e
 int fx_cure_invisible_state (Actor* Owner, Actor* target, Effect* fx);//2f
 int fx_cure_silenced_state (Actor* Owner, Actor* target, Effect* fx);//30
 int fx_wisdom_modifier (Actor* Owner, Actor* target, Effect* fx);//31
-int fx_rgb_pulsate (Actor* Owner, Actor* target, Effect* fx);//32
-int fx_rgb_darken (Actor* Owner, Actor* target, Effect* fx);//33
-int fx_rgb_glow (Actor* Owner, Actor* target, Effect* fx);//34
+int fx_brief_rgb (Actor* Owner, Actor* target, Effect* fx);//32
+int fx_darken_rgb (Actor* Owner, Actor* target, Effect* fx);//33
+int fx_glow_rgb (Actor* Owner, Actor* target, Effect* fx);//34
 int fx_animation_id_modifier (Actor* Owner, Actor* target, Effect* fx);//35
 int fx_to_hit_modifier (Actor* Owner, Actor* target, Effect* fx);//36
 int fx_kill_creature_type (Actor* Owner, Actor* target, Effect* fx);//37
@@ -244,7 +244,7 @@ int fx_bounce_projectile (Actor* Owner, Actor* target, Effect* fx);//c5
 int fx_bounce_opcode (Actor* Owner, Actor* target, Effect* fx);//c6
 int fx_bounce_spelllevel (Actor* Owner, Actor* target, Effect* fx);//c7
 int fx_bounce_spelllevel_dec (Actor* Owner, Actor* target, Effect* fx);//c8
-//c9 decrementing spell immunity
+int fx_generic_decrement_effect (Actor* Owner, Actor* target, Effect* fx);//c9
 int fx_bounce_school (Actor* Owner, Actor* target, Effect* fx);//ca
 int fx_bounce_secondary_type (Actor* Owner, Actor* target, Effect* fx);//cb
 //cc resist school
@@ -266,21 +266,21 @@ int fx_stoneskin_modifier (Actor* Owner, Actor* target, Effect* fx);//da
 int fx_dispel_school (Actor* Owner, Actor* target, Effect* fx);//dc
 int fx_dispel_secondary_type (Actor* Owner, Actor* target, Effect* fx);//dd
 int fx_teleport_field (Actor* Owner, Actor* target, Effect* fx);//de
-//df decrementing school immunity (general)
+//df decrementing school immunity (fx_generic_decrement_effect)
 int fx_cure_leveldrain (Actor* Owner, Actor* target, Effect* fx);//e0
 int fx_reveal_magic (Actor* Owner, Actor* target, Effect* fx);//e1
-//e2 decrementing secondary type immunity (general)
-//e3 decrementing school bounce (general)
-//e4 decrementing secondary type bounce (general)
+//e2 decrementing secondary type immunity (fx_generic_decrement_effect)
+int fx_bounce_school_dec (Actor* Owner, Actor* target, Effect* fx);//e3
+int fx_bounce_secondary_type_dec (Actor* Owner, Actor* target, Effect* fx);//e4
 int fx_dispel_school_one (Actor* Owner, Actor* target, Effect* fx);//e5 
 int fx_dispel_secondary_type_one (Actor* Owner, Actor* target, Effect* fx);//e6
 int fx_timestop (Actor* Owner, Actor* target, Effect* fx);//e7
 int fx_cast_spell_on_condition (Actor* Owner, Actor* target, Effect* fx);//e8
 int fx_proficiency (Actor* Owner, Actor* target, Effect* fx);//e9
-int fx_create_contingency (Actor* Owner, Actor* /*target*/, Effect* fx);//ea
+int fx_create_contingency (Actor* Owner, Actor* target, Effect* fx);//ea
 int fx_wing_buffet (Actor* Owner, Actor* target, Effect* fx);//eb
 int fx_puppet_master (Actor* Owner, Actor* target, Effect* fx);//ec
-int fx_puppet (Actor* Owner, Actor* target, Effect* fx);//ed
+int fx_puppet_marker (Actor* Owner, Actor* target, Effect* fx);//ed
 int fx_disintegrate (Actor* Owner, Actor* target, Effect* fx);//ee
 int fx_farsee (Actor* Owner, Actor* target, Effect* fx);//ef
 int fx_remove_portrait_icon (Actor* Owner, Actor* target, Effect* fx);//f0
@@ -294,9 +294,9 @@ int fx_berserkstage2_modifier (Actor* Owner, Actor* target, Effect* fx);//f7
 //f8 melee effect (general effect?)
 //f9 ranged effect (general effect?)
 int fx_damageluck_modifier (Actor* Owner, Actor* target, Effect* fx);//fa
-int fx_bardsong (Actor* Owner, Actor* target, Effect* fx);//fb
+int fx_change_bardsong (Actor* Owner, Actor* target, Effect* fx);//fb
 int fx_set_area_effect (Actor* Owner, Actor* target, Effect* fx);//fc (set trap)
-int fx_set_map_marker (Actor* Owner, Actor* target, Effect* fx);//fd
+int fx_set_map_marker_name (Actor* Owner, Actor* target, Effect* fx);//fd
 int fx_set_map_marker_position (Actor* Owner, Actor* target, Effect* fx);//fe
 int fx_create_item_days (Actor* Owner, Actor* target, Effect* fx);//ff
 int fx_store_spell_sequencer (Actor* Owner, Actor* target, Effect* fx);//0x100
@@ -354,9 +354,9 @@ int fx_reveal_tracks (Actor* Owner, Actor* target, Effect* fx);//133
 int fx_stat195_modifier (Actor* Owner, Actor* target, Effect* fx);//134
 int fx_modify_local_variable (Actor* Owner, Actor* target, Effect* fx);//135
 int fx_timeless_modifier (Actor* Owner, Actor* target, Effect* fx);//136
-//137
-//138
-//139
+int fx_generate_wish (Actor* Owner, Actor* target, Effect* fx);//137
+//138 crash
+//139 HLA generic effect
 int fx_golem_stoneskin_modifier (Actor* Owner, Actor* target, Effect* fx);//13a
 int fx_avatar_removal_modifier (Actor* Owner, Actor* target, Effect* fx);//13b
 int fx_magical_rest (Actor* Owner, Actor* target, Effect* fx);//13c
@@ -365,6 +365,7 @@ int fx_improved_haste_state (Actor* Owner, Actor* target, Effect* fx);//13d
 // FIXME: Make this an ordered list, so we could use bsearch!
 static EffectRef effectnames[] = {
 	{ "AcidResistanceModifier", fx_acid_resistance_modifier, 0 },
+	{ "ACVsCreatureType", fx_generic_effect, 0 }, //0xdb
 	{ "ACVsDamageTypeModifier", fx_ac_vs_damage_type_modifier, 0 },
 	{ "AidNonCumulative", fx_set_aid_state, 0 },
 	{ "AIIdentifierModifier", fx_ids_modifier, 0 },
@@ -373,19 +374,25 @@ static EffectRef effectnames[] = {
 	{ "Alignment:Invert", fx_alignment_invert, 0 },
 	{ "AlwaysBackstab", fx_always_backstab_modifier, 0 },
 	{ "AnimationIDModifier", fx_animation_id_modifier, 0 },
+	{ "AnimationStateChange", fx_animation_stance, 0 },
 	{ "ApplyEffect", fx_apply_effect, 0 },
 	{ "ApplyEffectItemType", fx_generic_effect, 0 }, //apply effect when itemtype is equipped
 	{ "ApplyEffectNoSave", fx_apply_effect_no_save, 0 },
 	{ "ApplyEffectRepeat", fx_apply_effect_repeat, 0 },
+	{ "AreaSwitch", fx_area_switch, 0 },
+	{ "AttackSpeedModifier", fx_attackspeed_modifier, 0 },
 	{ "AttacksPerRoundModifier", fx_attacks_per_round_modifier, 0 },
-	{ "AuraCleansing",  fx_auracleansing_modifier, 0 },
+	{ "AuraCleansingModifier",  fx_auracleansing_modifier, 0 },
+	{ "AvatarRemoval", fx_avatar_removal, 0 }, //unknown
 	{ "AvatarRemovalModifier", fx_avatar_removal_modifier, 0 },
 	{ "BackstabModifier", fx_backstab_modifier, 0 },
 	{ "BerserkStage1Modifier", fx_berserkstage1_modifier, 0},
 	{ "BerserkStage2Modifier", fx_berserkstage2_modifier, 0},
 	{ "BlessNonCumulative", fx_set_bless_state, 0 },
 	{ "Bounce:School", fx_bounce_school, 0 },
+	{ "Bounce:SchoolDecrement", fx_bounce_school_dec, 0 },
 	{ "Bounce:SecondaryType", fx_bounce_secondary_type, 0 },
+	{ "Bounce:SecondaryTypeDecrement", fx_bounce_secondary_type_dec, 0 },
 	{ "Bounce:Spell", fx_bounce_spell, 0 },
 	{ "Bounce:SpellLevel", fx_bounce_spelllevel, 0},
 	{ "Bounce:SpellLevelDecrement", fx_bounce_spelllevel_dec, 0},
@@ -398,12 +405,17 @@ static EffectRef effectnames[] = {
 	{ "CastingLevelModifier", fx_castinglevel_modifier, 0 },
 	{ "CastingSpeedModifier", fx_castingspeed_modifier, 0 },
 	{ "CastSpellOnCondition", fx_cast_spell_on_condition, 0 },
+	{ "ChangeBardSong", fx_generic_effect, 0 },
 	{ "ChangeName", fx_change_name, 0 },
+	{ "ChantBadNonCumulative", fx_set_chantbad_state, 0 },
 	{ "ChantNonCumulative", fx_set_chant_state, 0 },
 	{ "ChaosShieldModifier", fx_chaos_shield_modifier, 0 },
 	{ "CharismaModifier", fx_charisma_modifier, 0 },
 	{ "CheckForBerserkModifier", fx_checkforberserk_modifier, 0},
 	{ "ColdResistanceModifier", fx_cold_resistance_modifier, 0 },
+	{ "Color:BriefRGB", fx_brief_rgb, 0},
+	{ "Color:GlowRGB", fx_glow_rgb, 0},
+	{ "Color:DarkenRGB", fx_darken_rgb, 0},
 	{ "Color:SetPalette", fx_set_color_gradient, 0 },
 	{ "Color:SetRGB", fx_set_color_rgb, 0 },
 	{ "Color:PulseRGB", fx_set_color_pulse_rgb, 0 }, //8
@@ -414,6 +426,7 @@ static EffectRef effectnames[] = {
 	{ "CrushingResistanceModifier", fx_crushing_resistance_modifier, 0 },
 	{ "Cure:Berserk", fx_cure_berserk_state, 0 },
 	{ "Cure:Blind", fx_cure_blind_state, 0 },
+	{ "Cure:CasterHold", fx_unpause_caster, 0 },
 	{ "Cure:Confusion", fx_cure_confused_state, 0 },
 	{ "Cure:Deafness", fx_cure_deaf_state, 0 },
 	{ "Cure:Death", fx_cure_dead_state, 0 },
@@ -421,6 +434,7 @@ static EffectRef effectnames[] = {
 	{ "Cure:Disease", fx_cure_diseased_state, 0 },
 	{ "Cure:Feeblemind", fx_cure_feebleminded_state, 0 },
 	{ "Cure:Hold", fx_cure_hold_state, 0 },
+	{ "Cure:Imprisonment", fx_freedom, 0 },
 	{ "Cure:Infravision", fx_cure_infravision_state, 0 },
 	{ "Cure:Invisible", fx_cure_invisible_state, 0 },
 	{ "Cure:ImprovedInvisible", fx_cure_improved_invisible_state, 0 },
@@ -437,25 +451,35 @@ static EffectRef effectnames[] = {
 	{ "Damage", fx_damage, 0 },
 	{ "DamageAnimation", fx_damage_animation, 0 },
 	{ "DamageBonusModifier", fx_damage_bonus_modifier, 0 },
-	{ "DamageBonusVsCreature", fx_generic_effect, 0 },
+	{ "DamageLuckModifier", fx_damageluck_modifier, 0 },
+	{ "DamageVsCreature", fx_generic_effect, 0 },
+	{ "DeactivateDeadModifier", fx_deactivate_dead_modifier, 0 },
 	{ "Death", fx_death, 0 },
 	{ "DetectAlignment", fx_detect_alignment, 0 },
+	{ "DetectIllusionsModifier", fx_detect_illusion_modifier, 0 },
 	{ "DestroySelf", fx_destroy_self, 0 },
 	{ "DexterityModifier", fx_dexterity_modifier, 0 },
 	{ "DimensionDoor", fx_dimension_door, 0 },
 	{ "DisableButton", fx_disable_button, 0 },  //sets disable button flag
+	{ "DisableChunk", fx_disable_chunk_modifier, 0 },
 	{ "DisableOverlay", fx_disable_overlay_modifier, 0 },
-	{ "DisableSpellCasting", fx_disable_spellcasting, 0 },
+	{ "DisableCasting", fx_disable_spellcasting, 0 },
 	{ "Disintegrate", fx_disintegrate, 0 },
 	{ "DispelEffects", fx_dispel_effects, 0 },
+	{ "DispelSchool", fx_dispel_school, 0 },
+	{ "DispelSchoolOne", fx_dispel_school_one, 0 },
+	{ "DispelSecondaryType", fx_dispel_secondary_type, 0 },
+	{ "DispelSecondaryTypeOne", fx_dispel_secondary_type_one, 0 },
 	{ "DisplayString", fx_display_string, 0 },
 	{ "Dither", fx_dither, 0 },
 	{ "DontJumpModifier", fx_dontjump_modifier, 0 },
-	{ "DrainItems", fx_drain_items, 0},
-	{ "DrainSpells", fx_drain_spells, 0},
+	{ "DrainItems", fx_drain_items, 0 },
+	{ "DrainSpells", fx_drain_spells, 0 },
+	{ "DropWeapon", fx_drop_weapon, 0 },
 	{ "ElectricityResistanceModifier", fx_electricity_resistance_modifier, 0 },
 	{ "ExperienceModifier", fx_experience_modifier, 0 },
-	{ "FamiliarConstitutionLoss", fx_familiar_constitution_loss, 0 },
+	{ "ExploreModifier", fx_explore_modifier, 0 },
+	{ "FamiliarBond", fx_familiar_constitution_loss, 0 },
 	{ "FamiliarMarker", fx_familiar_marker, 0},
 	{ "Farsee", fx_farsee, 0},
 	{ "FatigueModifier", fx_fatigue_modifier, 0 },
@@ -468,15 +492,16 @@ static EffectRef effectnames[] = {
 	{ "ForceSurgeModifier", fx_force_surge_modifier, 0 },
 	{ "ForceVisible", fx_force_visible, 0 }, //not invisible but improved invisible
 	{ "FreeAction", fx_cure_slow_state, 0},
-	{ "Freedom", fx_freedom, 0 },
+	{ "GenerateWish", fx_generate_wish, 0},
 	{ "GoldModifier", fx_gold_modifier, 0 },
+	{ "HideInShadowsModifier", fx_hide_in_shadows_modifier, 0},
+	{ "HLA", fx_generic_effect, 0},
 	{ "HolyNonCumulative", fx_set_holy_state, 0 },
 	{ "Icon:Disable", fx_disable_portrait_icon, 0 },
 	{ "Icon:Display", fx_display_portrait_icon, 0 },
 	{ "Icon:Remove", fx_remove_portrait_icon, 0 },
 	{ "Identify", fx_identify, 0 },
 	{ "IgnoreDialogPause", fx_ignore_dialogpause_modifier, 0 },
-	{ "Imprisonment", fx_imprisonment, 0 },
 	{ "ImprovedHaste", fx_improved_haste_state, 0 },
 	{ "IntelligenceModifier", fx_intelligence_modifier, 0 },
 	{ "IntoxicationModifier", fx_intoxication_modifier, 0 },
@@ -509,14 +534,18 @@ static EffectRef effectnames[] = {
 	{ "MissileDamageModifier", fx_missile_damage_modifier, 0 },
 	{ "MissileHitModifier", fx_missile_to_hit_modifier, 0 },
 	{ "MissilesResistanceModifier", fx_missiles_resistance_modifier, 0 },
-	{ "MirrorImageEffect", fx_mirror_image, 0 },
+	{ "MirrorImage", fx_mirror_image, 0 },
 	{ "MirrorImageModifier", fx_mirror_image_modifier, 0 },
+	{ "ModifyGlobalVariable", fx_modify_global_variable, 0 },
+	{ "ModifyLocalVariable", fx_modify_local_variable, 0 },
 	{ "MonsterSummoning", fx_monster_summoning, 0 },
 	{ "MoraleBreakModifier", fx_morale_break_modifier, 0 },
 	{ "MoraleModifier", fx_morale_modifier, 0 },
 	{ "MovementRateModifier", fx_movement_modifier, 0 },    //fast (7e)
 	{ "MovementModifier", fx_movement_modifier, 0 },//slow (b0)
 	{ "NoCircleState", fx_no_circle_state, 0 },
+	{ "NonInterruptableModifier",fx_non_interruptible_modifier, 0},
+	{ "OffscreenAIModifier", fx_offscreenai_modifier, 0 },
 	{ "OffhandHitModifier", fx_left_to_hit_modifier, 0 },
 	{ "OpenLocksModifier", fx_open_locks_modifier, 0 },
 	{ "Overlay:Entangle", fx_set_entangle_state, 0 },
@@ -526,7 +555,6 @@ static EffectRef effectnames[] = {
 	{ "Overlay:ShieldGlobe", fx_set_shieldglobe_state, 0 },
 	{ "Overlay:Web", fx_set_web_state, 0 },
 	{ "PauseTarget", fx_pause_target, 0 }, //also known as casterhold
-	{ "PhysicalSpeedModifier", fx_attackspeed_modifier, 0 },
 	{ "PickPocketsModifier", fx_pick_pockets_modifier, 0 },
 	{ "PiercingResistanceModifier", fx_piercing_resistance_modifier, 0 },
 	{ "PlayMovie", fx_play_movie, 0 },
@@ -540,20 +568,29 @@ static EffectRef effectnames[] = {
 	{ "PowerWordStun", fx_power_word_stun, 0 },
 	{ "PriestSpellSlotsModifier", fx_bonus_priest_spells, 0 },
 	{ "Proficiency", fx_proficiency, 0 },
+	{ "Protection:Animation", fx_generic_effect, 0 },
+	{ "Protection:Backstab", fx_no_backstab_modifier, 0 },
 	{ "Protection:Creature", fx_generic_effect, 0 },
 	{ "Protection:Weapons", fx_generic_effect, 0 },
 	{ "Protection:Opcode", fx_generic_effect, 0 },
 	{ "Protection:Projectile",fx_protection_from_projectile, 0},
+	{ "Protection:School",fx_generic_effect,0},//overlay?
+	{ "Protection:SchoolDecrement",fx_generic_decrement_effect,0},//overlay?
+	{ "Protection:SecondaryType",fx_generic_effect,0},//overlay?
+	{ "Protection:SecondaryTypeDecrement",fx_generic_decrement_effect,0},//overlay?
+	{ "Protection:Spell",fx_generic_effect,0},//overlay?
 	{ "Protection:SpellLevel",fx_generic_effect,0},//overlay?
+	{ "Protection:SpellLevelDecrement",fx_generic_decrement_effect,0},//overlay?
 	{ "Protection:String", fx_generic_effect, 0 },
-	{ "Puppet", fx_puppet, 0},
-	{ "PuppetMaster", fx_puppet_master, 0},
+	{ "PuppetMarker", fx_puppet_marker, 0},
+	{ "ProjectImage", fx_puppet_master, 0},
 	{ "RetreatFrom", fx_retreat_from, 0 },
 	{ "Reveal:Area", fx_reveal_area, 0 },
 	{ "Reveal:Creatures", fx_reveal_creatures, 0 },
 	{ "Reveal:Magic", fx_reveal_magic, 0 },
 	{ "Reveal:Tracks", fx_reveal_tracks, 0 },
 	{ "RemoveCurse", fx_remove_curse, 0 },
+	{ "RemoveProjectile", fx_remove_area_effect, 0 },
 	{ "RenableButton", fx_renable_button, 0 },  //removes disable button flag
 	{ "RemoveCreature", fx_remove_creature, 0 },
 	{ "ReplaceCreature", fx_replace_creature, 0 },
@@ -566,14 +603,21 @@ static EffectRef effectnames[] = {
 	{ "SaveVsWandsModifier", fx_save_vs_wands_modifier, 0 },
 	{ "ScreenShake", fx_screenshake, 0 },
 	{ "ScriptingState", fx_scripting_state, 0 },
-	{ "SelectSpell", fx_select_spell, 0 },
+	{ "CastFromList", fx_select_spell, 0 },
 	{ "Sequencer:Activate", fx_activate_spell_sequencer, 0 },
 	{ "Sequencer:Create", fx_create_spell_sequencer, 0 },
 	{ "Sequencer:Store", fx_store_spell_sequencer, 0 },
 	{ "SetAIScript", fx_set_ai_script, 0 },
+	{ "SetMapMarkerName", fx_set_map_marker_name, 0 },
+	{ "SetMapMarkerPosition", fx_set_map_marker_position, 0 },
+	{ "SetMeleeEffect", fx_generic_effect, 0 },
+	{ "SetRangedEffect", fx_generic_effect, 0 },
+	{ "SetTrap", fx_set_area_effect, 0 },
+	{ "SetTrapsModifier", fx_set_traps_modifier, 0 },
 	{ "SexModifier", fx_sex_modifier, 0 },
 	{ "SlashingResistanceModifier", fx_slashing_resistance_modifier, 0 },
 	{ "SlowPoisonDamageRate", fx_generic_effect, 0 }, //slow poison effect
+	{ "SoundMNModifier", fx_soundmn_modifier , 0 }, //unknown
 	{ "Sparkle", fx_sparkle, 0 },
 	{ "SpellDurationModifier", fx_spell_duration_modifier, 0 },
 	{ "Spell:Add", fx_add_innate, 0 },
@@ -581,6 +625,8 @@ static EffectRef effectnames[] = {
 	{ "Spell:CastAsScroll", fx_cast_scroll, 0 },
 	{ "Spell:Learn", fx_learn_spell, 0 },
 	{ "Spell:Remove", fx_remove_spell, 0 },
+	{ "Spelltrap",fx_spelltrap , 0 },
+	{ "Stat195Modifier", fx_stat195_modifier, 0 },
 	{ "State:Berserk", fx_set_berserk_state, 0 },
 	{ "State:Blind", fx_set_blind_state, 0 },
 	{ "State:Blur", fx_set_blur_state, 0 },
@@ -593,6 +639,7 @@ static EffectRef effectnames[] = {
 	{ "State:Hold", fx_hold_creature, 0 }, //175
 	{ "State:Hold2", fx_hold_creature, 0 },//185
 	{ "State:Hold3", fx_hold_creature_no_icon, 0 }, //109
+	{ "State:Imprisonment", fx_imprisonment, 0 },
 	{ "State:Infravision", fx_set_infravision_state, 0 },
 	{ "State:Invisible", fx_set_invisible_state, 0 }, //both invis or improved invis
 	{ "State:Nondetection", fx_set_nondetection_state, 0 },
@@ -610,13 +657,14 @@ static EffectRef effectnames[] = {
 	{ "StrengthModifier", fx_strength_modifier, 0 },
 	{ "StrengthBonusModifier", fx_strength_bonus_modifier, 0 },
 	{ "SummonCreature", fx_summon_creature, 0 },
-	{ "TeleportField", fx_teleport_field, 0 },
+	{ "RandomTeleport", fx_teleport_field, 0 },
+	{ "TeleportToTarget", fx_teleport_to_target, 0 },
 	{ "TimelessState", fx_timeless_modifier, 0 },
 	{ "Timestop", fx_timestop, 0},
 	{ "TitleModifier", fx_title_modifier, 0 },
 	{ "ToHitModifier", fx_to_hit_modifier, 0 },
 	{ "ToHitBonusModifier", fx_to_hit_bonus_modifier, 0 },
-	{ "ToHitBonusVsCreature", fx_generic_effect, 0 },
+	{ "ToHitVsCreature", fx_generic_effect, 0 },
 	{ "TrackingModifier", fx_tracking_modifier, 0 },
 	{ "TransparencyModifier", fx_transparency_modifier, 0 },
 	{ "Unlock", fx_knock, 0 }, //open doors/containers
@@ -624,6 +672,7 @@ static EffectRef effectnames[] = {
 	{ "Variable:StoreLocalVariable", fx_local_variable, 0 },
 	{ "VisualAnimationEffect", fx_visual_animation_effect, 0 }, //unknown
 	{ "VisualRangeModifier", fx_visual_range_modifier, 0 },
+	{ "VisualSpellHit", fx_visual_spell_hit, 0 },
 	{ "WildSurgeModifier", fx_wild_surge_modifier, 0 },
 	{ "WingBuffet", fx_wing_buffet, 0 },
 	{ "WisdomModifier", fx_wisdom_modifier, 0 },
@@ -891,37 +940,37 @@ int fx_set_berserk_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_charmed_state (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_charmed_state (%2d): General: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	if (STAT_GET(IE_GENERAL)!=fx->Parameter1) {
+	if (fx->Parameter1 && (STAT_GET(IE_GENERAL)!=fx->Parameter1)) {
 		return FX_NOT_APPLIED;
 	}
-	bool enemyally = Owner->GetStat(IE_EA)>EA_GOODCUTOFF;
+	bool enemyally = Owner->GetStat(IE_EA)>EA_GOODCUTOFF; //or evilcutoff?
 
 	switch (fx->Parameter2) {
 	case 0: //charmed (target neutral after charm)
-		core->DisplayConstantStringName(STR_CHARMED, 0xff0000, target);
+		core->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
 	case 1000:
 		break;
 	case 1: //charmed (target hostile after charm)
-		core->DisplayConstantStringName(STR_CHARMED, 0xff0000, target);
+		core->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
 	case 1001:
 		target->SetBase(IE_EA, EA_ENEMY);
 		break;
 	case 2: //dire charmed (target neutral after charm)
-		core->DisplayConstantStringName(STR_DIRECHARMED, 0xff0000, target);
+		core->DisplayConstantStringName(STR_DIRECHARMED, 0xf0f0f0, target);
 	case 1002:
 		break;
 	case 3: //dire charmed (target hostile after charm)
-		core->DisplayConstantStringName(STR_DIRECHARMED, 0xff0000, target);
+		core->DisplayConstantStringName(STR_DIRECHARMED, 0xf0f0f0, target);
 	case 1003:
 		target->SetBase(IE_EA, EA_ENEMY);
 		break;
 	case 4: //controlled by cleric
-		core->DisplayConstantStringName(STR_CONTROLLED, 0xff0000, target);
+		core->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
 	case 1004:
 		target->SetBase(IE_EA, EA_ENEMY);
 		break;
 	case 5: //thrullcharm?
-		core->DisplayConstantStringName(STR_CHARMED, 0xff0000, target);
+		core->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
 	case 1005:
 		STAT_SET(IE_EA, EA_ENEMY );
 		return FX_PERMANENT;
@@ -1526,24 +1575,24 @@ int fx_wisdom_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_PERMANENT;
 }
 
-// 0x32
-int fx_rgb_pulsate (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+// 0x32 Color:BriefRGB
+int fx_brief_rgb (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	if (0) printf( "fx_rgb_pulsate (%2d): RGB: %d, Location and speed: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_brief_rgb (%2d): RGB: %d, Location and speed: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	return FX_NOT_APPLIED;
+}
+// 0x33 Color:DarkenRGB
+int fx_darken_rgb (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_darken_rgb (%2d): RGB: %d, Location and speed: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	return FX_APPLIED;
 }
-// 0x33
-int fx_rgb_darken (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+// 0x34 Color:GlowRGB
+int fx_glow_rgb (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	if (0) printf( "fx_rgb_darken (%2d): RGB: %d, Location and speed: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-
-	return FX_APPLIED;
-}
-// 0x34
-int fx_rgb_glow (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
-{
-	if (0) printf( "fx_rgb_glow (%2d): RGB: %d, Location and speed: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_glow_rgb (%2d): RGB: %d, Location and speed: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	return FX_APPLIED;
 }
@@ -1561,7 +1610,8 @@ int fx_animation_id_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 		return FX_APPLIED;
 	case 1: //remove any non permanent change
 		target->fxqueue.RemoveAllEffects(fx_animation_id_modifier_ref);
-		return FX_NOT_APPLIED;
+		//return FX_NOT_APPLIED;
+		//intentionally passing through (perma change removes previous changes)
 	case 2: //permanent animation id change
 		target->SetBase(IE_ANIMATION_ID, fx->Parameter1);
 		return FX_NOT_APPLIED;
@@ -2318,7 +2368,7 @@ int fx_reveal_creatures (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-// 0x77 MirrorImageEffect
+// 0x77 MirrorImage
 EffectRef fx_mirror_image_modifier_ref={"MirrorImageModifier",NULL,-1};
 
 int fx_mirror_image (Actor* Owner, Actor* target, Effect* fx)
@@ -2530,7 +2580,7 @@ int fx_force_visible (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STATE_CURE(STATE_INVISIBLE);
 	return FX_NOT_APPLIED;
 }
-// 0x89
+// 0x89 ChantBadNonCumulative
 int fx_set_chantbad_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_chantbad_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -2545,7 +2595,7 @@ int fx_set_chantbad_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD( IE_SAVEVSSPELL, -fx->Parameter1);
 	return FX_APPLIED;
 }
-// 0x8A
+// 0x8A AnimationStateChange
 int fx_animation_stance (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_animation_stance (%2d): Stance: %d\n", fx->Opcode, fx->Parameter2 );
@@ -2565,14 +2615,14 @@ int fx_display_string (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_casting_glow (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_casting_glow (%2d): StrRef: %d\n", fx->Opcode, fx->Parameter1 );
-	return FX_APPLIED;
+	return FX_NOT_APPLIED;
 }
 
-//0x8d
-int fx_spell_hit (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+//0x8d VisualSpellHit
+int fx_visual_spell_hit (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	if (0) printf( "fx_spell_hit (%2d): StrRef: %d\n", fx->Opcode, fx->Parameter1 );
-	return FX_APPLIED;
+	if (0) printf( "fx_visual_spell_hit (%2d): StrRef: %d\n", fx->Opcode, fx->Parameter1 );
+	return FX_NOT_APPLIED;
 }
 
 //0x8e Icon:Display
@@ -2717,7 +2767,7 @@ int fx_set_sanctuary_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_sanctuary_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET( IE_SANCTUARY, 1);
-	return FX_APPLIED; //is this correct?
+	return FX_APPLIED; 
 }
 
 // 0x9a Overlay:Entangle
@@ -2725,7 +2775,8 @@ int fx_set_entangle_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_entangle_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET( IE_ENTANGLE, 1);
-	return FX_APPLIED; //is this correct?
+	//STAT_SET(IE_MOVEMENTRATE, 0); //
+	return FX_APPLIED; 
 }
 
 // 0x9b Overlay:MinorGlobe
@@ -2733,7 +2784,7 @@ int fx_set_minorglobe_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_minorglobe_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET( IE_MINORGLOBE, 1);
-	return FX_APPLIED; //is this correct?
+	return FX_APPLIED; 
 }
 
 // 0x9c Overlay:ShieldGlobe
@@ -2741,7 +2792,7 @@ int fx_set_shieldglobe_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_shieldglobe_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET( IE_SHIELDGLOBE, 1);
-	return FX_APPLIED; //is this correct?
+	return FX_APPLIED; 
 }
 
 // 0x9d Overlay:Web
@@ -2749,7 +2800,8 @@ int fx_set_web_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_web_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET( IE_WEB, 1);
-	return FX_APPLIED; //is this correct?
+	STAT_SET(IE_MOVEMENTRATE, 0); //
+	return FX_APPLIED; 
 }
 
 // 0x9e Overlay:Grease
@@ -2757,7 +2809,8 @@ int fx_set_grease_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_grease_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET( IE_GREASE, 1);
-	return FX_APPLIED; //is this correct?
+	STAT_SET(IE_MOVEMENTRATE, 3); //
+	return FX_APPLIED; 
 }
 
 // 0x9f MirrorImageModifier
@@ -2941,12 +2994,12 @@ int fx_apply_effect (Actor* Owner, Actor* target, Effect* fx)
 	//if the ids don't match, the effect still sticks?
 	return FX_APPLIED;
 }
-// b2 hitbonus generic effect ToHitBonusVsCreature
-// b3 damagebonus generic effect DamageBonusVsCreature
+// b2 hitbonus generic effect ToHitVsCreature
+// b3 damagebonus generic effect DamageVsCreature
 // b4 can't use item (resource) generic effect CantUseItem
 // b5 can't use itemtype (resource) generic effect  CantUseItemType
 // b6
-// b7
+// b7 generic effect ApplyEffectItemType
 // b8 DontJumpModifier
 int fx_dontjump_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -2975,7 +3028,7 @@ int fx_local_variable (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-// 0xBC AuraCleansing
+// 0xBC AuraCleansingModifier
 int fx_auracleansing_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_auracleansing_modifier (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
@@ -3059,7 +3112,7 @@ int fx_ignore_dialogpause_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-//0xc3 FamiliarConstitutionLoss
+//0xc3 FamiliarBond
 int fx_familiar_constitution_loss (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_familiar_constitution_loss (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
@@ -3072,7 +3125,7 @@ int fx_familiar_marker (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 	if (0) printf( "fx_familiar_marker (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
 	return FX_APPLIED;
 }
-// 0xc5 BounceProjectile
+// 0xc5 Bounce:Projectile
 int fx_bounce_projectile (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_bounce_projectile (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
@@ -3104,7 +3157,18 @@ int fx_bounce_spelllevel_dec (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-// 0xc9 //decrementing spell immunity
+//0xc9 //Protection:SpellLevelDecrement
+//0xDF //Protection:SchoolDecrement
+//0xe2 //Protection:SecondaryTypeDecrement
+int fx_generic_decrement_effect (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_generic_decrement_effect (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	if (fx->Parameter1) {
+		return FX_APPLIED;
+	}
+	return FX_NOT_APPLIED;
+}
+
 // 0xca Bounce:School
 int fx_bounce_school (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -3177,14 +3241,14 @@ int fx_power_word_stun (Actor* Owner, Actor* target, Effect* fx)
 	return fx_set_stun_state(Owner,target,fx);
 }
 
-//0xd3 Imprisonment (avatar removal plus portrait icon)
+//0xd3 State:Imprisonment (avatar removal plus portrait icon)
 int fx_imprisonment (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_inprisonment (%2d)\n", fx->Opcode );
 	return FX_APPLIED;
 }
 
-//0xd4 Freedom
+//0xd4 Cure:Imprisonment
 
 EffectRef fx_imprisonment_ref={"Imprisonment",NULL,-1};
 
@@ -3200,7 +3264,7 @@ int fx_maze (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 	if (0) printf( "fx_maze (%2d)\n", fx->Opcode );
 	return FX_APPLIED;
 }
-//0xd6 SelectSpell
+//0xd6 CastFromList
 int fx_select_spell (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_select_spell (%2d) %d\n", fx->Opcode, fx->Parameter2 );
@@ -3258,14 +3322,14 @@ int fx_stoneskin_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 //0xDB ac vs creature type (general effect)
-//0xDC
+//0xDC DispelSchool
 int fx_dispel_school (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_dispel_school (%2d): Mod: %d\n", fx->Opcode, fx->Parameter1 );
 	target->fxqueue.RemoveLevelEffects(fx->Parameter1, RL_MATCHSCHOOL, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
-//0xDD
+//0xDD DispelSecondaryType
 int fx_dispel_secondary_type (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_dispel_secondary_type (%2d): Mod: %d\n", fx->Opcode, fx->Parameter1 );
@@ -3273,7 +3337,7 @@ int fx_dispel_secondary_type (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-//0xDE TeleportField
+//0xDE RandomTeleport
 int fx_teleport_field (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_teleport_field (%2d): Mod: %d\n", fx->Opcode, fx->Parameter1 );
@@ -3304,16 +3368,30 @@ int fx_reveal_magic (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 //e2 decrementing secondary type immunity (general)
-//e3 decrementing school bounce (general)
-//e4 decrementing secondary type bounce (general)
-//0xE5
+//e3 Bounce:SchoolDecrement
+int fx_bounce_school_dec (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_bounce_school_dec (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	STAT_BIT_OR( IE_BOUNCE, BNC_SCHOOL_DEC );
+	return FX_APPLIED;
+}
+
+//e4 Bounce:SecondaryTypeDecrement
+int fx_bounce_secondary_type_dec (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_bounce_secondary_type_dec (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	STAT_BIT_OR( IE_BOUNCE, BNC_SECTYPE_DEC );
+	return FX_APPLIED;
+}
+
+//0xE5 DispelSchoolOne
 int fx_dispel_school_one (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_dispel_school_one (%2d): Level: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	target->fxqueue.RemoveLevelEffects(fx->Parameter1, RL_MATCHSCHOOL|RL_REMOVEFIRST, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
-//0xE6
+//0xE6 DispelSecondaryTypeOne
 int fx_dispel_secondary_type_one (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_dispel_secondary_type_one (%2d): Level: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -3450,17 +3528,17 @@ int fx_wing_buffet (Actor* Owner, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-// 0xec PuppetMaster
+// 0xec ProjectImage
 int fx_puppet_master (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_puppet_master (%2d): Value: %d, Stat: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET (IE_PUPPETMASTERTYPE, fx->Parameter1);
 	return FX_APPLIED;
 }
-// 0xed Puppet
-int fx_puppet (Actor* /*Owner*/, Actor* target, Effect* fx)
+// 0xed PuppetMarker
+int fx_puppet_marker (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_puppet (%2d): Value: %d, Stat: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_puppet_marker (%2d): Value: %d, Stat: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET (IE_PUPPETTYPE, fx->Parameter1);
 	return FX_APPLIED;
 }
@@ -3534,14 +3612,14 @@ int fx_checkforberserk_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_SET( IE_CHECKFORBERSERK, fx->Parameter2 );
 	return FX_APPLIED;
 }
-// 0xf6
+// 0xf6 BerserkStage1Modifier
 int fx_berserkstage1_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_berserkstage1_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET( IE_BERSERKSTAGE1, fx->Parameter2 );
 	return FX_APPLIED;
 }
-// 0xf7
+// 0xf7 BerserkStage2Modifier
 int fx_berserkstage2_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_berserkstage2_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -3550,7 +3628,7 @@ int fx_berserkstage2_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 // 0xf8 set melee effect generic effect?
 // 0xf9 set missile effect generic effect?
-// 0xfa
+// 0xfa DamageLuckModifier
 int fx_damageluck_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_damageluck_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -3558,14 +3636,31 @@ int fx_damageluck_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-// 0xfb
-// 0xfc
-// 0xfd
-// 0xfe
-// 0xff
+// 0xfb bardsong (generic effect)
+// 0xfc SetTrap
+int fx_set_area_effect (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_set_trap (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	return FX_NOT_APPLIED;
+}
+
+// 0xfd SetMapMarkerName
+int fx_set_map_marker_name (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_set_map_marker_name (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	return FX_NOT_APPLIED;
+}
+// 0xfe SetMapMarkerPosition
+int fx_set_map_marker_position (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_set_map_marker_position (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	return FX_NOT_APPLIED;
+}
+
+// 0xff Item:CreateDays
 int fx_create_item_days (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_create_inventory_item (%2d)\n", fx->Opcode );
+	if (0) printf( "fx_create_item_days (%2d)\n", fx->Opcode );
 	target->inventory.SetSlotItemRes( fx->Resource, -1, fx->Parameter1, fx->Parameter3, fx->Parameter4 );
 	if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
 //if this effect has expiration, then it will remain as a remove_item
@@ -3580,20 +3675,22 @@ int fx_create_item_days (Actor* /*Owner*/, Actor* target, Effect* fx)
 	}
 	return FX_NOT_APPLIED;
 }
-// 0x100
-int fx_store_spell_sequencer(Actor* /*Owner*/, Actor* /*target*/, Effect* /*fx*/)
+// 0x100 Sequencer:Store
+int fx_store_spell_sequencer(Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
+	if (0) printf( "fx_store_spell_sequencer (%2d)\n", fx->Opcode );
 	//just display the spell sequencer portrait icon
 	return FX_APPLIED;
 }
-// 0x101
-int fx_create_spell_sequencer(Actor* /*Owner*/, Actor* /*target*/, Effect* /*fx*/)
+// 0x101 Sequencer:Create
+int fx_create_spell_sequencer(Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
+	if (0) printf( "fx_create_spell_sequencer (%2d)\n", fx->Opcode );
 	//just a call to activate the spell sequencer creation gui
 	return FX_NOT_APPLIED;
 }
 
-// 0x102
+// 0x102 Sequencer:Activate
 EffectRef fx_spell_sequencer_active_ref={"Sequencer:Store",NULL,-1};
 
 int fx_activate_spell_sequencer(Actor* Owner, Actor* target, Effect* fx)
@@ -3611,7 +3708,7 @@ int fx_activate_spell_sequencer(Actor* Owner, Actor* target, Effect* fx)
 	}  
 	return FX_NOT_APPLIED;
 }
-// 0x103
+// 0x103  SpellTrap (Protection:SpellLevelDecrement + recall spells)
 int fx_spelltrap(Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_spelltrap (%2d): Count: %d, Level: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -3630,7 +3727,7 @@ int fx_restore_spell_level(Actor* /*Owner*/, Actor* target, Effect* fx)
 	target->RestoreSpellLevel(fx->Parameter1, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
-// 0x106
+// 0x106 VisualRangeModifier
 int fx_visual_range_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_visual_range_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -3638,7 +3735,7 @@ int fx_visual_range_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-// 0x107
+// 0x107 BackstabModifier
 int fx_backstab_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_visual_range_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -3646,7 +3743,7 @@ int fx_backstab_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-// 0x108
+// 0x108 DropWeapon
 int fx_drop_weapon (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (fx->Resource[0]) {
@@ -3666,7 +3763,7 @@ int fx_drop_weapon (Actor* /*Owner*/, Actor* target, Effect* fx)
 	}
 	return FX_NOT_APPLIED;
 }
-// 0x109
+// 0x109 ModifyGlobalVariable
 int fx_modify_global_variable (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	Game *game = core->GetGame();
@@ -3677,7 +3774,7 @@ int fx_modify_global_variable (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 		memmove(fx->Resource+24, fx->Resource4,8);
 		fx->IsVariable=1;
 	}
-	if (0) printf( "fx_modify_local_variable (%2d): Variable: %s Value: %d Type: %d\n", fx->Opcode, fx->Resource, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_modify_global_variable (%2d): Variable: %s Value: %d Type: %d\n", fx->Opcode, fx->Resource, fx->Parameter1, fx->Parameter2 );
 	if (fx->Parameter2) {
 		ieDword var = 0;
 		//use resource memory area as variable name
@@ -3690,14 +3787,19 @@ int fx_modify_global_variable (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 }
 // 0x10a unknown
 // 0x10b protection from display string is a generic effect
-// 0x10c
+// 0x10c ExploreModifier
 int fx_explore_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_explore_modifier (%2d)\n", fx->Opcode );
-	STAT_SET (IE_EXPLORE, 1);
+	if (fx->Parameter2) {
+		//gemrb modifier
+		STAT_SET (IE_EXPLORE, fx->Parameter1);
+	} else {
+		STAT_SET (IE_EXPLORE, 1);
+	}
 	return FX_APPLIED;
 }
-// 0x10d
+// 0x10d ScreenShake
 int fx_screenshake (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_screenshake (%2d): Strength: %d\n", fx->Opcode, fx->Parameter1 );
@@ -3705,7 +3807,7 @@ int fx_screenshake (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 	return FX_APPLIED;
 }
 
-// 0x10e
+// 0x10e Cure:CasterHold
 EffectRef fx_pause_caster_modifier_ref={"PauseTarget",NULL,-1};
 
 int fx_unpause_caster (Actor* /*Owner*/, Actor* target, Effect* fx)
@@ -3717,7 +3819,7 @@ int fx_unpause_caster (Actor* /*Owner*/, Actor* target, Effect* fx)
 	}
 	return FX_NOT_APPLIED;
 }
-// 0x10f
+// 0x10f AvatarRemoval
 int fx_avatar_removal (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_avatar_removal (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -3754,7 +3856,7 @@ int fx_apply_effect_repeat (Actor* Owner, Actor* target, Effect* fx)
 	}
 	return FX_APPLIED;
 }
-// 0x111
+// 0x111 RemoveProjectile
 int fx_remove_area_effect (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	//instant effect
@@ -3762,7 +3864,7 @@ int fx_remove_area_effect (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-// 0x112
+// 0x112 TeleportToTarget
 int fx_teleport_to_target (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_teleport_to_target (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -3775,28 +3877,28 @@ int fx_teleport_to_target (Actor* /*Owner*/, Actor* target, Effect* fx)
 	}
 	return FX_APPLIED;
 }
-// 0x113
+// 0x113 HideInShadowsModifier
 int fx_hide_in_shadows_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_hide_in_shadows_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_MOD( IE_HIDEINSHADOWS );
 	return FX_APPLIED;
 }
-// 0x114
+// 0x114 DetectIllusionsModifier
 int fx_detect_illusion_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_detect_illusion_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_MOD( IE_DETECTILLUSIONS );
 	return FX_APPLIED;
 }
-// 0x115
+// 0x115 SetTrapsModifier
 int fx_set_traps_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_traps_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_MOD( IE_SETTRAPS );
 	return FX_APPLIED;
 }
-// 0x116
+// 0x116 ToHitBonusModifier
 int fx_to_hit_bonus_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_to_hit_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -3804,7 +3906,7 @@ int fx_to_hit_bonus_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-// 0x117
+// 0x117 RenableButton
 EffectRef fx_disable_button_ref={"DisableButton",NULL,-1};
 
 int fx_renable_button (Actor* /*Owner*/, Actor* target, Effect* fx)
@@ -3814,7 +3916,7 @@ int fx_renable_button (Actor* /*Owner*/, Actor* target, Effect* fx)
 	target->fxqueue.RemoveAllEffectsWithParam( fx_disable_button_ref, fx->Parameter2 );
 	return FX_NOT_APPLIED;
 }
-// 0x118
+// 0x118 ForceSurgeModifier
 int fx_force_surge_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_force_surge_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -3822,7 +3924,7 @@ int fx_force_surge_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-// 0x119
+// 0x119 WildSurgeModifier
 int fx_wild_surge_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_wild_surge_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -3918,35 +4020,35 @@ int fx_disable_overlay_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_SET( IE_DISABLEOVERLAY, fx->Parameter1 );
 	return FX_APPLIED;
 }
-//0x124
-int fx_disable_backstab_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
+//0x124 Protection:Backstab
+int fx_no_backstab_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_disable_backstab_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_no_backstab_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET( IE_DISABLEBACKSTAB, fx->Parameter1 );
 	return FX_APPLIED;
 }
-//0x125
+//0x125 OffscreenAIModifier
 int fx_offscreenai_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_offscreenai_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET( IE_ENABLEOFFSCREENAI, fx->Parameter1 );
 	return FX_APPLIED;
 }
-//0x126
+//0x126 SoundMNModifier
 int fx_soundmn_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_soundmn_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET( IE_SOUNDMN, fx->Parameter1 );
 	return FX_APPLIED;
 }
-//0x127
+//0x127 DisableChunk
 int fx_disable_chunk_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_disable_chunk_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET( IE_DISABLECHUNKING, fx->Parameter1 );
 	return FX_APPLIED;
 }
-//0x128
+//0x128 Protection:Animation
 int fx_protection_from_animation (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_protection_from_animation (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -3954,19 +4056,21 @@ int fx_protection_from_animation (Actor* /*Owner*/, Actor* target, Effect* fx)
 	target->RemoveVVCell(fx->Resource, false);
 	return FX_APPLIED;
 }
-//0x129
+//0x129 NonInterruptableModifier
 int fx_non_interruptible_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_non_interruptible_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET( IE_NONINTERRUPTABLE, fx->Parameter1 );
 	return FX_APPLIED;
 }
-//0x12a weird effect (pocket plane)
+//0x12a AreaSwitch
+//weird effect (pocket plane)
 int fx_area_switch (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	//unknown
 	//makes cutscenemode
 	if (0) printf( "fx_area_switch (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	core->SetCutSceneMode(true);
 	return FX_NOT_APPLIED;
 }
 //0x12b ChaosShieldModifier
@@ -3976,7 +4080,7 @@ int fx_chaos_shield_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_MOD( IE_CHAOSSHIELD );
 	return FX_APPLIED;
 }
-//0x12c
+//0x12c DeactivateDeadModifier
 int fx_deactivate_dead_modifier (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	//unknown
@@ -4041,7 +4145,7 @@ int fx_reveal_tracks (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 	//highlight all creatures
 	return FX_NOT_APPLIED; //this is an instant effect
 }
-// 0x134
+// 0x134 Stat195Modifier
 int fx_stat195_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_stat195_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -4049,7 +4153,7 @@ int fx_stat195_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_MOD( IE_EFFECT308 ); //highlight creature???
 	return FX_APPLIED;
 }
-// 0x135
+// 0x135 ModifyLocalVariable
 int fx_modify_local_variable (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	//convert it to internal variable format
@@ -4079,7 +4183,12 @@ int fx_timeless_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-//0x137 //wish object creation
+//0x137 GenerateWish
+int fx_generate_wish (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_generate_wish (%2d): Mod: %d\n", fx->Opcode, fx->Parameter2 );
+	return FX_NOT_APPLIED;
+}
 //0x138 //crash
 //0x139 //HLA generic effect
 //0x13a StoneSkin2Modifier

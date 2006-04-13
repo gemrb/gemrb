@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.58 2006/04/10 18:18:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.59 2006/04/13 18:40:25 avenger_teambg Exp $
  *
  */
 
@@ -92,18 +92,33 @@ inline bool valid_number(const char* string, long& val)
 	return ( const char * ) endpr != string;
 }
 
+int compare_effects(const void *a, const void *b)
+{
+	return stricmp(((EffectRef *) a)->Name,((EffectRef *) b)->Name);
+}
+
+int find_effect(const void *a, const void *b)
+{
+	return stricmp((const char *) a,((const EffectRef *) b)->Name);
+}
+
 static EffectRef* FindEffect(const char* effectname)
 {
 	if (!effectname || !effectnames) {
 		return NULL;
 	}
+	void *tmp = bsearch(effectname, effectnames, opcodes_count, sizeof(EffectRef), find_effect);
+	/*
 	for (int i = 0; effectnames[i].Name; i++) {
 		if (!stricmp( effectnames[i].Name, effectname )) {
 			return effectnames + i;
 		}
 	}
-	printf( "Warning: Couldn't assign effect: %s\n", effectname );
-	return NULL;
+	*/
+	if (!tmp) {
+		printf( "Warning: Couldn't assign effect: %s\n", effectname );
+	}
+	return (EffectRef *) tmp;
 }
 
 //special effects without level check
@@ -196,6 +211,10 @@ void EffectQueue_RegisterOpcodes(int count, EffectRef* opcodes)
 	memcpy( effectnames + opcodes_count, opcodes, count * sizeof( EffectRef ));
 	opcodes_count += count;
 	effectnames[opcodes_count].Name = NULL;
+	//if we merge two effect lists, then we need to sort their effect tables
+	//actually, we might always want to sort this list, so there is no 
+	//need to do it manually (sorted table is needed if we use bsearch)
+	qsort(effectnames, opcodes_count, sizeof(EffectRef), compare_effects);
 }
 
 EffectQueue::EffectQueue()

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.189 2006/04/09 15:22:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.190 2006/04/13 18:40:25 avenger_teambg Exp $
  *
  */
 
@@ -31,9 +31,8 @@
 #include "../../includes/SClassID.h"
 #include "Cache.h"
 #include "GlobalTimer.h"
+#include "PluginMgr.h"
 
-
-class PluginMgr;
 class Video;
 class ResourceMgr;
 class StringMgr;
@@ -187,7 +186,8 @@ private:
 	char WindowPack[10];
 	ScriptEngine * guiscript;
 	SoundMgr * soundmgr;
-	OpcodeMgr * opcodemgr;
+	//OpcodeMgr * opcodemgr;
+	std::vector<InterfaceElement> *opcodemgrs;
 	SaveGameIterator *sgiterator;
 	/** Windows Array */
 	std::vector<Window*> windows;
@@ -255,6 +255,7 @@ public:
 	int HasFeature(int position) const;
 	bool IsAvailable(SClass_ID filetype);
 	void * GetInterface(SClass_ID filetype);
+	std::vector<InterfaceElement>* GetInterfaceVector(SClass_ID filetype);
 	const char * TypeExt(SClass_ID type);
 	Video * GetVideoDriver() const;
 	ResourceMgr * GetResourceMgr() const;

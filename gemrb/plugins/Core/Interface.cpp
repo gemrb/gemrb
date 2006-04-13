@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.393 2006/04/10 18:18:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.394 2006/04/13 18:40:25 avenger_teambg Exp $
  *
  */
 
@@ -113,7 +113,7 @@ Interface::Interface(int iargc, char** iargv)
 	RtRows = NULL;
 	music = NULL;
 	soundmgr = NULL;
-	opcodemgr = NULL;
+	//opcodemgr = NULL;
 	sgiterator = NULL;
 	INIparty = NULL;
 	INIbeasts = NULL;
@@ -202,7 +202,7 @@ Interface::Interface(int iargc, char** iargv)
 #define FreeInterfaceVector(type, variable, member) \
 { \
 	std::vector<type>::iterator i; \
-	for(i = variable.begin(); i != variable.end(); ++i) { \
+	for(i = (variable).begin(); i != (variable).end(); ++i) { \
 	if (!(*i).free) { \
 		FreeInterface((*i).member); \
 		(*i).free = true; \
@@ -293,9 +293,6 @@ Interface::~Interface(void)
 		DSCount = -1;
 	}
 
-	if (opcodemgr) {
-		FreeInterface( opcodemgr );
-	}
 	if (slottypes) {
 		free( slottypes );
 	}
@@ -390,6 +387,11 @@ Interface::~Interface(void)
 	}
 	FreeInterfaceVector( Table, tables, tm );
 	FreeInterfaceVector( Symbol, symbols, sm );
+	if (opcodemgrs) {
+		FreeInterfaceVector( InterfaceElement, *opcodemgrs, mgr );
+		delete opcodemgrs;
+		opcodemgrs=NULL;
+	}
 
 	if (INIquests) {
 		FreeInterface(INIquests);
@@ -1156,15 +1158,21 @@ int Interface::Init()
 	}
 	printStatus( "OK", LIGHT_GREEN );
 
-	//OpcodeMgr* opcodemgr;
-
 	printMessage( "Core", "Initializing effect opcodes...", WHITE );
+	opcodemgrs = GetInterfaceVector(IE_FX_CLASS_ID);
+	if (!opcodemgrs || !opcodemgrs->size()) {
+		printStatus( "ERROR", LIGHT_RED );
+		goto end_of_init;
+	}
 	// FIXME: this calls single plugin only
+	/*
 	opcodemgr = ( OpcodeMgr * ) GetInterface( IE_FX_CLASS_ID );
 	if (opcodemgr == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
 		goto end_of_init;
 	}
+	*/
+	printf("Loaded %d opcode blocks\n", opcodemgrs->size());
 	printStatus( "OK", LIGHT_GREEN );
 
 	printMessage( "Core", "Initializing effects...", WHITE );
@@ -1253,6 +1261,14 @@ void* Interface::GetInterface(SClass_ID filetype)
 		return NULL;
 	}
 	return plugin->GetPlugin( filetype );
+}
+
+std::vector<InterfaceElement>* Interface::GetInterfaceVector(SClass_ID filetype)
+{
+	if (!plugin) {
+		return NULL;
+	}
+	return plugin->GetAllPlugin( filetype );
 }
 
 Video* Interface::GetVideoDriver() const
