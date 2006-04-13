@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.cpp,v 1.1 2006/04/13 18:40:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.cpp,v 1.2 2006/04/13 18:48:01 avenger_teambg Exp $
  *
  */
 
@@ -38,11 +38,11 @@ int fx_crushing_damage (Actor* Owner, Actor* target, Effect* fx);//ed
 // FIXME: Make this an ordered list, so we could use bsearch!
 static EffectRef effectnames[] = {
 	{ "Color:FadeRGB", fx_fade_rgb, 0 }, //e8
-	{ "IWDVisualSpellHit", fx_iwd_visual_spell_hit}, //e9
-	{ "ColdDamage", fx_cold_damage}, //ea
-	{ "IWDCastingGlow", fx_iwd_casting_glow}, //eb
-	{ "TurnUndead", fx_turn_undead}, //ec
-	{ "CrushingDamage", fx_crushing_damage}, //ed
+	{ "IWDVisualSpellHit", fx_iwd_visual_spell_hit, 0}, //e9
+	{ "ColdDamage", fx_cold_damage, 0}, //ea
+	{ "IWDCastingGlow", fx_iwd_casting_glow, 0}, //eb
+	{ "TurnUndead", fx_turn_undead, 0}, //ec
+	{ "CrushingDamage", fx_crushing_damage, 0}, //ed
 	{ NULL, NULL, 0 },
 };
 
@@ -62,7 +62,7 @@ bool IWDOpc::Init(void)
 }
 
 // 0xe8 Colour:FadeRGB
-int fx_fade_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
+int fx_fade_rgb (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_fade_rgb (%2d): \n", fx->Opcode  );
 	return FX_NOT_APPLIED;
