@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GlobalTimer.cpp,v 1.28 2006/01/08 22:07:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GlobalTimer.cpp,v 1.29 2006/04/14 19:58:20 wjpalenstijn Exp $
  *
  */
 
@@ -116,9 +116,9 @@ void GlobalTimer::Update()
 				core->GetVideoDriver()->SetFadePercent( ( ( fadeFromMax - fadeFromCounter ) * 100 ) / fadeFromMax );
 				return; //freeze gametime
 			}
-			if (fadeFromCounter==fadeFromMax) {
-				core->GetVideoDriver()->SetFadePercent( 0 );
-			}
+		}
+		if (fadeFromCounter==fadeFromMax) {
+			core->GetVideoDriver()->SetFadePercent( 0 );
 		}
 		GameControl* gc = core->GetGameControl();
 		if (!gc) {
