@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.356 2006/01/15 23:07:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.357 2006/04/14 20:24:19 avenger_teambg Exp $
  *
  */
 
@@ -127,6 +127,7 @@ static TriggerLink triggernames[] = {
 	{"globaltimerexact", GameScript::GlobalTimerExact, 0},
 	{"globaltimerexpired", GameScript::GlobalTimerExpired, 0},
 	{"globaltimernotexpired", GameScript::GlobalTimerNotExpired, 0},
+	{"globaltimerstarted", GameScript::GlobalTimerStarted, 0},
 	{"happiness", GameScript::Happiness, 0},
 	{"happinessgt", GameScript::HappinessGT, 0},
 	{"happinesslt", GameScript::HappinessLT, 0},
@@ -186,6 +187,7 @@ static TriggerLink triggernames[] = {
 	{"isteambiton", GameScript::IsTeamBitOn, 0},
 	{"isvalidforpartydialog", GameScript::IsValidForPartyDialog, 0},
 	{"isvalidforpartydialogue", GameScript::IsValidForPartyDialog, 0},
+	{"isweaponranged", GameScript::IsWeaponRanged, 0},
 	{"isweather", GameScript::IsWeather, 0}, //gemrb extension
 	{"itemisidentified", GameScript::ItemIsIdentified, 0},
 	{"kit", GameScript::Kit, 0},
@@ -220,6 +222,9 @@ static TriggerLink triggernames[] = {
 	{"numcreature", GameScript::NumCreatures, 0},
 	{"numcreaturegt", GameScript::NumCreaturesGT, 0},
 	{"numcreaturelt", GameScript::NumCreaturesLT, 0},
+	{"numcreaturesatmylevel", GameScript::NumCreaturesAtMyLevel, 0},
+	{"numcreaturegtmylevel", GameScript::NumCreaturesGTMyLevel, 0},
+	{"numcreatureltmylevel", GameScript::NumCreaturesLTMyLevel, 0},
 	{"numcreaturevsparty", GameScript::NumCreatureVsParty, 0},
 	{"numcreaturevspartygt", GameScript::NumCreatureVsPartyGT, 0},
 	{"numcreaturevspartylt", GameScript::NumCreatureVsPartyLT, 0},
@@ -304,6 +309,9 @@ static TriggerLink triggernames[] = {
 	{"timelt", GameScript::TimeLT, 0},
 	{"timeofday", GameScript::TimeOfDay, 0},
 	{"tookdamage", GameScript::TookDamage, 0},
+	{"totalitem", GameScript::TotalItemCnt, 0},
+	{"totalitemgt", GameScript::TotalItemCntGT, 0},
+	{"totalitemlt", GameScript::TotalItemCntLT, 0},
 	{"traptriggered", GameScript::TrapTriggered, 0},
 	{"triggerclick", GameScript::Clicked, 0}, //not sure
 	{"true", GameScript::True, 0},
@@ -1545,7 +1553,8 @@ Response* GameScript::ReadResponse(DataStream* stream)
 	char *poi;
 	rE->weight = (unsigned char)strtoul(line,&poi,10);
 	std::vector< Action*> aCv;
-	if (strncmp(poi,"AC",2)==0) while (true) {
+	if (strncmp(poi,"AC",2)==0)
+	while (true) {
 		//not autofreed, because it is referenced by the Script
 		Action* aC = new Action(false);
 		count = stream->ReadLine( line, 1024 );

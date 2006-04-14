@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.242 2006/01/15 23:07:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.243 2006/04/14 20:24:22 avenger_teambg Exp $
  *
  */
 
@@ -737,6 +737,7 @@ public: //Script Functions
 	static int GlobalTimerExact(Scriptable* Sender, Trigger* parameters);
 	static int GlobalTimerExpired(Scriptable* Sender, Trigger* parameters);
 	static int GlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters);
+	static int GlobalTimerStarted(Scriptable* Sender, Trigger* parameters);
 	static int GGT_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int GLT_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int Happiness(Scriptable* Sender, Trigger* parameters);
@@ -790,6 +791,8 @@ public: //Script Functions
 	static int IsRotation(Scriptable* Sender, Trigger* parameters);
 	static int IsTeamBitOn(Scriptable* Sender, Trigger* parameters);
 	static int IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters);
+	static int IsWeaponRanged(Scriptable* Sender, Trigger* parameters);
+	static int IsWeather(Scriptable* Sender, Trigger* parameters);
 	static int ItemIsIdentified(Scriptable* Sender, Trigger* parameters);
 	static int Kit(Scriptable* Sender, Trigger* parameters);
 	static int LastMarkedObject_Trigger(Scriptable* Sender, Trigger* parameters);
@@ -815,8 +818,11 @@ public: //Script Functions
 	static int NotStateCheck(Scriptable* Sender, Trigger* parameters);
 	static int NullDialog(Scriptable* Sender, Trigger* parameters);
 	static int NumCreatures(Scriptable* Sender, Trigger* parameters);
+	static int NumCreaturesAtMyLevel(Scriptable* Sender, Trigger* parameters);
 	static int NumCreaturesGT(Scriptable* Sender, Trigger* parameters);
+	static int NumCreaturesGTMyLevel(Scriptable* Sender, Trigger* parameters);
 	static int NumCreaturesLT(Scriptable* Sender, Trigger* parameters);
+	static int NumCreaturesLTMyLevel(Scriptable* Sender, Trigger* parameters);
 	static int NumCreatureVsParty(Scriptable* Sender, Trigger* parameters);
 	static int NumCreatureVsPartyGT(Scriptable* Sender, Trigger* parameters);
 	static int NumCreatureVsPartyLT(Scriptable* Sender, Trigger* parameters);
@@ -902,7 +908,6 @@ public: //Script Functions
 	static int UnselectableVariableLT(Scriptable* Sender, Trigger* parameters);
 	static int Vacant(Scriptable* Sender, Trigger* parameters);
 	static int WalkedToTrigger(Scriptable* Sender, Trigger* parameters);
-	static int IsWeather(Scriptable* Sender, Trigger* parameters);
 	static int Xor(Scriptable* Sender, Trigger* parameters);
 	static int XP(Scriptable* Sender, Trigger* parameters);
 	static int XPGT(Scriptable* Sender, Trigger* parameters);

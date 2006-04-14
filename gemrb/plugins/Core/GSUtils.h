@@ -87,6 +87,7 @@ Action *ParamCopyNoOverride(Action *parameters);
 bool MatchActor(Scriptable *Sender, ieDword ID, Object* oC);
 /* returns the number of actors matching the IDS targeting */
 int GetObjectCount(Scriptable* Sender, Object* oC);
+int GetObjectLevelCount(Scriptable* Sender, Object* oC);
 void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, ieDword value);
 void SetVariable(Scriptable* Sender, const char* VarName, ieDword value);
 //these are used from other plugins

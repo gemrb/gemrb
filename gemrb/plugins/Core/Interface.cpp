@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.394 2006/04/13 18:40:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.395 2006/04/14 20:24:22 avenger_teambg Exp $
  *
  */
 
@@ -3209,6 +3209,7 @@ bool Interface::InitItemTypes()
 	}
 
 	//slottype describes the inventory structure
+	Inventory::Init();
 	int SlotTypeTable = LoadTable( "slottype" );
 	TableMgr *st = GetTable(SlotTypeTable);
 	if (slottypes) {
@@ -3234,6 +3235,8 @@ bool Interface::InitItemTypes()
 				case 3: Inventory::SetMagicSlot(slottypes[i].slot); break;
 				//weapon slot, Equipping marker is relative to it
 				case 4: Inventory::SetWeaponSlot(slottypes[i].slot); break;
+				//ranged slot
+				case 5: Inventory::SetRangedSlot(slottypes[i].slot); break;
 				default:;
 			}
 		}

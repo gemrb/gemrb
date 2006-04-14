@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.43 2006/04/08 18:40:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.44 2006/04/14 20:24:22 avenger_teambg Exp $
  *
  */
 
@@ -109,6 +109,11 @@ typedef enum ieCREItemFlagBits {
 	IE_INV_ITEM_CONVERSIBLE = 0x80000,
 	IE_INV_ITEM_PULSATING = 0x100000
 } ieCREItemFlagBits;
+
+//equip flags
+#define EQUIP_ANY   0
+#define EQUIP_MELEE 1
+#define EQUIP_RANGED 2
 
 /**
  * @class CREItem
@@ -232,14 +237,19 @@ public:
 	void BreakItemSlot(ieDword slot);
 	/** Lists all items in the Inventory on terminal for debugging */
 	void dump();
+	/** Equips best weapon */
+	void EquipBestWeapon(int flags);
 
 	//setting important constants
+	static void Init();
 	static void SetFistSlot(int arg);
 	static void SetMagicSlot(int arg);
 	static void SetWeaponSlot(int arg);
+	static void SetRangedSlot(int arg);
 	static int GetFistSlot();
 	static int GetMagicSlot();
 	static int GetWeaponSlot();
+	static int GetRangedSlot();
 private:
 	int FindRanged();
 	void KillSlot(unsigned int index);

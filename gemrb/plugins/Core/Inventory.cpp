@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.69 2006/04/08 18:40:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.70 2006/04/14 20:24:22 avenger_teambg Exp $
  *
  */
 
@@ -30,12 +30,25 @@
 static int SLOT_MAGIC = -1;
 static int SLOT_FIST = -1;
 static int SLOT_MELEE = -1;
+static int LAST_MELEE = -1;
+static int SLOT_RANGED = -1;
+static int LAST_RANGED = -1;
 
 void InvalidSlot(int slot)
 {
 	printMessage("Inventory"," ",LIGHT_RED);
 	printf("Invalid slot: %d!\n",slot);
 	abort();
+}
+
+void Inventory::Init()
+{
+	SLOT_MAGIC=-1;
+	SLOT_FIST=-1;
+	SLOT_MELEE=-1;
+	LAST_MELEE=-1;
+	SLOT_RANGED=-1;
+	LAST_RANGED=-1;
 }
 
 Inventory::Inventory()
@@ -628,6 +641,8 @@ bool Inventory::UnEquipItem(unsigned int slot, bool removecurse)
 // find which bow is attached to the projectile marked by 'Equipped'
 int Inventory::FindRanged()
 {
+	for(int i=SLOT_RANGED;i<=LAST_RANGED;i++) {
+	}
 	return SLOT_MELEE;
 }
 
@@ -638,6 +653,15 @@ void Inventory::SetWeaponSlot(int arg)
 	if (SLOT_MELEE==-1) {
 		SLOT_MELEE=arg;
 	}
+	LAST_MELEE=arg;
+}
+
+void Inventory::SetRangedSlot(int arg)
+{
+	if (SLOT_RANGED==-1) {
+		SLOT_RANGED=arg;
+	}
+	LAST_RANGED=arg;
 }
 
 int Inventory::GetFistSlot()
@@ -670,6 +694,12 @@ int Inventory::GetEquippedSlot()
 
 void Inventory::SetEquippedSlot(int slotcode)
 {
+	//doesn't work if magic slot is used
+	if (HasItemInSlot("",SLOT_MAGIC)) {
+		Equipped = SLOT_MAGIC-SLOT_MELEE;
+		return;
+	}
+
 	if (slotcode == IW_NO_EQUIPPED) {
 		Equipped = IW_NO_EQUIPPED;
 		return;
@@ -787,4 +817,15 @@ void Inventory::dump()
 	Changed = true;
 	CalculateWeight();
 	printf( "Total weight: %d\n", Weight );
+}
+
+void Inventory::EquipBestWeapon(int flags)
+{
+	switch(flags) {
+		case EQUIP_RANGED:
+			break;
+		case EQUIP_MELEE:
+			break;
+		default:;
+	}
 }

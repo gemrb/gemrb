@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.50 2006/03/26 19:49:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.51 2006/04/14 20:24:19 avenger_teambg Exp $
  *
  */
 
@@ -958,6 +958,35 @@ int GetObjectCount(Scriptable* Sender, Object* oC)
 	// i believe we need the latter here
 	Targets* tgts = GetAllObjects(Sender, oC);
 	int count = tgts->Count();
+	delete tgts;
+	return count;
+}
+
+//TODO:
+//check numcreaturesatmylevel(myself, 1)
+//when the actor is alone
+//it should (obviously) return true if the trigger
+//evaluates object filters
+//also check numcreaturesgtmylevel(myself,0) with
+//actor having at high level
+int GetObjectLevelCount(Scriptable* Sender, Object* oC)
+{
+	if (!oC) {
+		return 0;
+	}
+	// EvaluateObject will return [PC]
+	// GetAllObjects will also return Myself (evaluates object filters)
+	// i believe we need the latter here
+	Targets* tgts = GetAllObjects(Sender, oC);
+	int count = 0;
+	if (tgts) {
+		targetlist::iterator m;
+		const targettype *tt = tgts->GetFirstTarget(m, ST_ACTOR);
+		while (tt) {
+			count += ((Actor *) tt->actor)->GetXPLevel(true);
+			tt = tgts->GetNextTarget(m, ST_ACTOR);
+		}
+	}
 	delete tgts;
 	return count;
 }

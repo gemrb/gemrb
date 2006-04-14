@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.43 2006/04/08 18:40:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.44 2006/04/14 20:24:22 avenger_teambg Exp $
  *
  */
 
@@ -611,7 +611,17 @@ int GameScript::GlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
 	return ( value1 < core->GetGame()->GameTime );
 }
 
+//globaltimernotexpired returns false if the timer doesn't exist
 int GameScript::GlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters)
+{
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
+	if (!value1) return 0;
+	return ( value1 > core->GetGame()->GameTime );
+}
+
+//globaltimerstarted returns false if the timer doesn't exist
+//is it the same as globaltimernotexpired?
+int GameScript::GlobalTimerStarted(Scriptable* Sender, Trigger* parameters)
 {
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
 	if (!value1) return 0;
@@ -677,6 +687,17 @@ int GameScript::NumItems(Scriptable* Sender, Trigger* parameters)
 	return cnt==parameters->int0Parameter;
 }
 
+int GameScript::TotalItemCnt(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if ( !tar || tar->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+	int cnt = actor->inventory.CountItems("",1); //shall we count heaps or not?
+	return cnt==parameters->int0Parameter;
+}
+
 int GameScript::NumItemsGT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
@@ -688,6 +709,17 @@ int GameScript::NumItemsGT(Scriptable* Sender, Trigger* parameters)
 	return cnt>parameters->int0Parameter;
 }
 
+int GameScript::TotalItemCntGT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if ( !tar || tar->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+	int cnt = actor->inventory.CountItems("",1); //shall we count heaps or not?
+	return cnt>parameters->int0Parameter;
+}
+
 int GameScript::NumItemsLT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
@@ -696,6 +728,17 @@ int GameScript::NumItemsLT(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor *actor = (Actor *) tar;
 	int cnt = actor->inventory.CountItems(parameters->string0Parameter,1);
+	return cnt<parameters->int0Parameter;
+}
+
+int GameScript::TotalItemCntLT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if ( !tar || tar->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+	int cnt = actor->inventory.CountItems("",1); //shall we count heaps or not?
 	return cnt<parameters->int0Parameter;
 }
 
@@ -1797,16 +1840,64 @@ int GameScript::NumCreatures(Scriptable* Sender, Trigger* parameters)
 	return value == parameters->int0Parameter;
 }
 
+int GameScript::NumCreaturesAtMyLevel(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return 0;
+	}
+	int level = ((Actor *) Sender)->GetXPLevel(true);
+	int value;
+
+	if (parameters->int0Parameter) {
+		value = GetObjectLevelCount(Sender, parameters->objectParameter);
+	} else {
+		value = GetObjectCount(Sender, parameters->objectParameter);
+	}
+	return value == level;
+}
+
 int GameScript::NumCreaturesLT(Scriptable* Sender, Trigger* parameters)
 {
 	int value = GetObjectCount(Sender, parameters->objectParameter);
 	return value < parameters->int0Parameter;
 }
 
+int GameScript::NumCreaturesLTMyLevel(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return 0;
+	}
+	int level = ((Actor *) Sender)->GetXPLevel(true);
+	int value;
+
+	if (parameters->int0Parameter) {
+		value = GetObjectLevelCount(Sender, parameters->objectParameter);
+	} else {
+		value = GetObjectCount(Sender, parameters->objectParameter);
+	}
+	return value < level;
+}
+
 int GameScript::NumCreaturesGT(Scriptable* Sender, Trigger* parameters)
 {
 	int value = GetObjectCount(Sender, parameters->objectParameter);
 	return value > parameters->int0Parameter;
+}
+
+int GameScript::NumCreaturesGTMyLevel(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return 0;
+	}
+	int level = ((Actor *) Sender)->GetXPLevel(true);
+	int value;
+
+	if (parameters->int0Parameter) {
+		value = GetObjectLevelCount(Sender, parameters->objectParameter);
+	} else {
+		value = GetObjectCount(Sender, parameters->objectParameter);
+	}
+	return value > level;
 }
 
 int GameScript::NumCreatureVsParty(Scriptable* Sender, Trigger* parameters)
@@ -3199,10 +3290,23 @@ int GameScript::RandomStatCheck(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
-int GameScript::PartyRested(Scriptable * /*Sender*/, Trigger * /*parameters*/)
+int GameScript::PartyRested(Scriptable* /*Sender*/, Trigger* /*parameters*/)
 {
 	Game *game = core->GetGame();
 	if (game->GetInternalFlag()&IF_PARTYRESTED) {
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::IsWeaponRanged(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	if (actor->inventory.GetEquipped()<0) {
 		return 1;
 	}
 	return 0;
