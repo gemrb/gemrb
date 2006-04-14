@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.18 2006/04/13 18:40:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.19 2006/04/14 20:23:24 avenger_teambg Exp $
  *
  */
 
@@ -349,7 +349,7 @@ int fx_can_use_any_item_modifier (Actor* Owner, Actor* target, Effect* fx);//12e
 int fx_always_backstab_modifier (Actor* Owner, Actor* target, Effect* fx);//12f
 int fx_mass_raise_dead (Actor* Owner, Actor* target, Effect* fx);//130
 int fx_left_to_hit_modifier (Actor* Owner, Actor* target, Effect* fx);//131
-//132 unknown effect
+int fx_right_to_hit_modifier (Actor* Owner, Actor* target, Effect* fx);//132
 int fx_reveal_tracks (Actor* Owner, Actor* target, Effect* fx);//133
 int fx_stat195_modifier (Actor* Owner, Actor* target, Effect* fx);//134
 int fx_modify_local_variable (Actor* Owner, Actor* target, Effect* fx);//135
@@ -596,6 +596,7 @@ static EffectRef effectnames[] = {
 	{ "ReplaceCreature", fx_replace_creature, 0 },
 	{ "ReputationModifier", fx_reputation_modifier, 0 },
 	{ "RestoreSpells", fx_restore_spell_level, 0 },
+	{ "RightHitModifier", fx_right_to_hit_modifier, 0 },
 	{ "SaveVsBreathModifier", fx_save_vs_breath_modifier, 0 },
 	{ "SaveVsDeathModifier", fx_save_vs_death_modifier, 0 },
 	{ "SaveVsPolyModifier", fx_save_vs_poly_modifier, 0 },
@@ -4130,13 +4131,21 @@ int fx_mass_raise_dead (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 // 0x131 OffhandHitModifier
 int fx_left_to_hit_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_to_hit_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_left_to_hit_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	STAT_MOD( IE_HITBONUSLEFT );
 	return FX_APPLIED;
 }
 
-// 0x132 unknown effect
+// 0x132 RightHitModifier
+int fx_right_to_hit_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_right_to_hit_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	STAT_MOD( IE_HITBONUSRIGHT );
+	return FX_APPLIED;
+}
+
 // 0x133 Reveal:Tracks
 int fx_reveal_tracks (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
