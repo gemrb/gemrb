@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.44 2006/04/14 20:24:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.45 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -34,6 +34,7 @@
 #include "../../includes/ie_types.h"
 
 #include "Store.h"
+#include "Item.h"  //needs item for itmextheader
 class Map;
 
 #ifdef WIN32
@@ -114,6 +115,39 @@ typedef enum ieCREItemFlagBits {
 #define EQUIP_ANY   0
 #define EQUIP_MELEE 1
 #define EQUIP_RANGED 2
+
+struct ItemExtHeader {
+	ieDword slot;
+	ieDword headerindex;
+	//from itmextheader
+	ieByte AttackType;
+	ieByte IDReq;
+	ieByte Location;
+	ieByte unknown1;
+	ieResRef UseIcon;
+	ieByte Target;
+	ieByte TargetNumber;
+	ieWord Range;
+	ieWord ProjectileType;
+	ieWord Speed;
+	ieWord THAC0Bonus;
+	ieWord DiceSides;
+	ieWord DiceThrown;
+	ieWord DamageBonus;
+	ieWord DamageType;
+	ieWord FeatureCount;
+	ieWord FeatureOffset;
+	ieWord Charges;
+	ieWord ChargeDepletion;
+	ieDword RechargeFlags; //this is a bitfield with many bits
+	ieWord ProjectileAnimation;
+	ieWord MeleeAnimation[3];
+	ieWord BowArrowQualifier;
+	ieWord CrossbowBoltQualifier;
+	ieWord MiscProjectileQualifier;
+	//other data
+	ieResRef itemname;
+};
 
 /**
  * @class CREItem
@@ -213,8 +247,8 @@ public:
 	int DepleteItem(ieDword flags);
 	/** Finds the first slot of named item, if resref is empty, finds the first filled! slot */
 	int FindItem(const char *resref, unsigned int flags);
-	void DropItemAtLocation(unsigned int slot, unsigned int flags, Map *map, Point &loc);
-	void DropItemAtLocation(const char *resref, unsigned int flags, Map *map, Point &loc);
+	bool DropItemAtLocation(unsigned int slot, unsigned int flags, Map *map, Point &loc);
+	bool DropItemAtLocation(const char *resref, unsigned int flags, Map *map, Point &loc);
 	void SetEquippedSlot(int slotcode);
 	int GetEquipped();
 	int GetEquippedSlot();
@@ -223,7 +257,7 @@ public:
 	void RemoveSlotEffects( CREItem* slot );
 	/** Returns item in specified slot. Does NOT change inventory */
 	CREItem* GetSlotItem(unsigned int slot);
-	bool EquipItem(unsigned int slot, bool weapon=false);
+	bool EquipItem(unsigned int slot);
 	bool UnEquipItem(unsigned int slot, bool removecurse);
 	/** Returns equipped weapon */
 	CREItem *GetUsedWeapon();
@@ -239,20 +273,27 @@ public:
 	void dump();
 	/** Equips best weapon */
 	void EquipBestWeapon(int flags);
-
+	/** returns the struct of the usable items, returns true if there are more */
+	bool GetEquipmentInfo(ItemExtHeader *array, int startindex, int count);
+	/** uses the item in the given slot */
+	bool UseItem(unsigned int slotindex, unsigned int headerindex, Actor *target);
 	//setting important constants
 	static void Init();
 	static void SetFistSlot(int arg);
 	static void SetMagicSlot(int arg);
 	static void SetWeaponSlot(int arg);
 	static void SetRangedSlot(int arg);
+	static void SetQuickSlot(int arg);
 	static int GetFistSlot();
 	static int GetMagicSlot();
 	static int GetWeaponSlot();
 	static int GetRangedSlot();
+	static int GetQuickSlot();
 private:
-	int FindRanged();
+	int FindRangedProjectile(int type);
+	int FindRangedWeapon(); //returns slot
 	void KillSlot(unsigned int index);
+	inline Item *GetItemPointer(ieDword slot, CREItem *&Slot);
 };
 
 #endif

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.47 2006/01/28 19:56:34 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.48 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -65,7 +65,7 @@ Font::Font(int w, int h, Palette* pal, bool cK, int index)
 Font::~Font(void)
 {
 	Video *video = core->GetVideoDriver();
-	video->FreePalette( palette );
+	core->FreePalette( palette );
 	video->FreeSprite( sprBuffer );
 }
 
@@ -170,9 +170,9 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 				if (sscanf( tag, "color=%02X%02X%02X", &r, &g, &b ) != 3)
 					continue;
 				Color c = {r,g, b, 0}, back = {0, 0, 0, 0};
-				Palette* newPal = video->CreatePalette( c, back );
+				Palette* newPal = core->CreatePalette( c, back );
 				video->SetPalette( sprBuffer, newPal );
-				video->FreePalette(newPal);
+				core->FreePalette( newPal );
 			} else {
 				if (stricmp( tag, "/color" ) == 0) {
 					video->SetPalette( sprBuffer, pal );
@@ -301,9 +301,9 @@ void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 				if (sscanf( tag, "color=%02X%02X%02X", &r, &g, &b ) != 3)
 					continue;
 				Color c = {r,g, b, 0}, back = {0, 0, 0, 0};
-				Palette* newPal = video->CreatePalette( c, back );
+				Palette* newPal = core->CreatePalette( c, back );
 				video->SetPalette( sprBuffer, newPal );
-				video->FreePalette( newPal );
+				core->FreePalette( newPal );
 			} else {
 				if (stricmp( tag, "/color" ) == 0) {
 					video->SetPalette( sprBuffer, pal );

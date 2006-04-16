@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.179 2006/04/12 20:32:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.180 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -113,37 +113,6 @@ static int d_gradient[DAMAGE_LEVELS]={
 #define OV_BOUNCE2     7  //bouncing activated
 static ieResRef overlay[OVERLAY_COUNT]={"SPENTACI","SANCTRY","MINORGLB","SPSHIELD",
 "GREASED","WEBENTD","SPTURNI2","SPTURNI"};
-
-PCStatsStruct::PCStatsStruct()
-{
-	BestKilledName = 0xffffffff;
-	BestKilledXP = 0;
-	AwayTime = 0;
-	JoinDate = 0;
-	unknown10 = 0;
-	KillsChapterXP = 0;
-	KillsChapterCount = 0;
-	KillsTotalXP = 0;
-	KillsTotalCount = 0;
-	memset( FavouriteSpells, 0, sizeof(FavouriteSpells) );
-	memset( FavouriteSpellsCount, 0, sizeof(FavouriteSpellsCount) );
-	memset( FavouriteWeapons, 0, sizeof(FavouriteWeapons) );
-	memset( FavouriteWeaponsCount, 0, sizeof(FavouriteWeaponsCount) );
-	SoundSet[0]=0;
-	SoundFolder[0]=0;
-	QSlots[0]=0xff;
-	memset( QuickSpells, 0, sizeof(QuickSpells) );
-	memset( QuickSpellClass, 0xff, sizeof(QuickSpellClass) );
-	memset( QuickItemSlots, 0, sizeof(QuickItemSlots) );
-	memset( QuickWeaponSlots, 0, sizeof(QuickWeaponSlots) );
-	memset( PortraitIcons, -1, sizeof(PortraitIcons) );
-}
-
-void PCStatsStruct::IncrementChapter()
-{
-	KillsChapterXP = 0;
-	KillsChapterCount = 0;
-}
 
 Actor::Actor()
 	: Moveble( ST_ACTOR )
@@ -283,7 +252,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 		if (anims->GetAnimType()!=IE_ANI_BIRD) {
 			BaseStats[IE_DONOTJUMP]=0;
 		} else {
-			BaseStats[IE_DONOTJUMP]=3;
+			BaseStats[IE_DONOTJUMP]=DNJ_BIRD;
 		}
 		SetCircleSize();
 		anims->SetColors(BaseStats+IE_COLORS);
@@ -425,8 +394,7 @@ void pcf_gold(Actor *actor, ieDword /*Value*/)
 	//actor->BaseStats[IE_GOLD]=actor->Modified[IE_GOLD];
 }
 
-//this should be fixed one day
-static Point dummypoint;
+ScriptedAnimation default_anim;
 
 //de/activates the entangle overlay
 void pcf_entangle(Actor *actor, ieDword Value)
@@ -434,7 +402,7 @@ void pcf_entangle(Actor *actor, ieDword Value)
 	if (Value) {
 		if (actor->HasVVCCell(overlay[OV_ENTANGLE]))
 			return;
-		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_ENTANGLE], dummypoint,0);
+		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_ENTANGLE], &default_anim);
 		actor->AddVVCell(sca);
 	} else {
 		actor->RemoveVVCell(overlay[OV_ENTANGLE], true);
@@ -448,8 +416,9 @@ void pcf_sanctuary(Actor *actor, ieDword Value)
 	if (Value) {
 		if (actor->HasVVCCell(overlay[OV_SANCTUARY]))
 			return;
-		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_SANCTUARY], dummypoint,0);
-		sca->Transparency|=IE_VVC_TRANSPARENT;
+		default_anim.ZPos=0;
+		default_anim.Transparency=IE_VVC_TRANSPARENT;
+		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_SANCTUARY], &default_anim);
 		actor->AddVVCell(sca);
 	} else {
 		actor->RemoveVVCell(overlay[OV_SANCTUARY], true);
@@ -462,8 +431,9 @@ void pcf_shieldglobe(Actor *actor, ieDword Value)
 	if (Value) {
 		if (actor->HasVVCCell(overlay[OV_SHIELDGLOBE]))
 			return;
-		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_SHIELDGLOBE], dummypoint,0);
-		sca->Transparency|=IE_VVC_TRANSPARENT;
+		default_anim.ZPos=0;
+		default_anim.Transparency=IE_VVC_TRANSPARENT;
+		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_SHIELDGLOBE], &default_anim);
 		actor->AddVVCell(sca);
 	} else {
 		actor->RemoveVVCell(overlay[OV_SHIELDGLOBE], true);
@@ -476,8 +446,9 @@ void pcf_minorglobe(Actor *actor, ieDword Value)
 	if (Value) {
 		if (actor->HasVVCCell(overlay[OV_MINORGLOBE]))
 			return;
-		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_MINORGLOBE], dummypoint,0);
-		sca->Transparency|=IE_VVC_TRANSPARENT;
+		default_anim.ZPos=0;
+		default_anim.Transparency=IE_VVC_TRANSPARENT;
+		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_MINORGLOBE], &default_anim);
 		actor->AddVVCell(sca);
 	} else {
 		actor->RemoveVVCell(overlay[OV_MINORGLOBE], true);
@@ -490,7 +461,7 @@ void pcf_grease(Actor *actor, ieDword Value)
 	if (Value) {
 		if (actor->HasVVCCell(overlay[OV_GREASE]))
 			return;
-		actor->add_animation(overlay[OV_GREASE], dummypoint, -1, -1);
+		actor->add_animation(overlay[OV_GREASE], -1, -1);
 	} else {
 		actor->RemoveVVCell(overlay[OV_GREASE], true);
 	}
@@ -503,7 +474,7 @@ void pcf_web(Actor *actor, ieDword Value)
 	if (Value) {
 		if (actor->HasVVCCell(overlay[OV_WEB]))
 			return;
-		actor->add_animation(overlay[OV_WEB], dummypoint, -1, 0);
+		actor->add_animation(overlay[OV_WEB], -1, 0);
 	} else {
 		actor->RemoveVVCell(overlay[OV_WEB], true);
 	}
@@ -516,12 +487,12 @@ void pcf_bounce(Actor *actor, ieDword Value)
 	case 1: //bounce passive
 		if (actor->HasVVCCell(overlay[OV_BOUNCE]))
 			return;
-		actor->add_animation(overlay[OV_BOUNCE], dummypoint, -1, 0);
+		actor->add_animation(overlay[OV_BOUNCE], -1, 0);
 		break;
 	case 2: //activated bounce
 		if (actor->HasVVCCell(overlay[OV_BOUNCE2]))
 			return;
-		actor->add_animation(overlay[OV_BOUNCE2], dummypoint, -1, 0);
+		actor->add_animation(overlay[OV_BOUNCE2], -1, 0);
 		break;
 	default:
 		actor->RemoveVVCell(overlay[OV_BOUNCE], true);
@@ -710,9 +681,11 @@ static void InitActorTables()
 //the area's vvc's are the stationary effects
 //the actor's vvc's are moving with the actor
 //this method adds a vvc to the actor
-void Actor::add_animation(const ieResRef resource, Point &offset, int gradient, int height)
+void Actor::add_animation(const ieResRef resource, int gradient, int height)
 {
-	ScriptedAnimation *sca = core->GetScriptedAnimation(resource, offset, height);
+	default_anim.ZPos=height;
+	default_anim.Transparency=0;
+	ScriptedAnimation *sca = core->GetScriptedAnimation(resource, &default_anim);
 	if (gradient!=-1) {
 		sca->SetPalette(gradient, 4);
 	}
@@ -722,32 +695,31 @@ void Actor::add_animation(const ieResRef resource, Point &offset, int gradient, 
 void Actor::PlayDamageAnimation(int type)
 {
 	int i;
-	Point p(0,0);
 
 	switch(type) {
 		case 0: case 1: case 2: case 3: //blood
-			add_animation(d_main[type], p, d_gradient[type], 0);
+			add_animation(d_main[type], d_gradient[type], 0);
 			break;
 		case 4: case 5: case 7: //fire
-			add_animation(d_main[type], p, d_gradient[type], 0);
+			add_animation(d_main[type], d_gradient[type], 0);
 			for(i=DL_FIRE;i<=type;i++) {
-				add_animation(d_splash[i], p, d_gradient[i], 0);
+				add_animation(d_splash[i], d_gradient[i], 0);
 			}
 			break;
 		case 8: case 9: case 10: //electricity
-			add_animation(d_main[type], p, d_gradient[type], 0);
+			add_animation(d_main[type], d_gradient[type], 0);
 			for(i=DL_ELECTRICITY;i<=type;i++) {
-				add_animation(d_splash[i], p, d_gradient[i], 0);
+				add_animation(d_splash[i], d_gradient[i], 0);
 			}
 			break;
 		case 11: case 12: case 13://cold
-			add_animation(d_main[type], p, d_gradient[type], 0);
+			add_animation(d_main[type], d_gradient[type], 0);
 			break;
 		case 14: case 15: case 16://acid
-			add_animation(d_main[type], p, d_gradient[type], 0);
+			add_animation(d_main[type], d_gradient[type], 0);
 			break;
 		case 17: case 18: case 19://disintegrate
-			add_animation(d_main[type], p, d_gradient[type], 0);
+			add_animation(d_main[type], d_gradient[type], 0);
 			break;
 	}
 }
@@ -1316,13 +1288,58 @@ bool Actor::CheckOnDeath()
 /* this will create a heap at location, and transfer the item(s) */
 void Actor::DropItem(const ieResRef resref, unsigned int flags)
 {
-	inventory.DropItemAtLocation( resref, flags, area, Pos );
+	if (inventory.DropItemAtLocation( resref, flags, area, Pos )) {
+		ReinitQuickSlots();
+	}
 }
 
 void Actor::DropItem(int slot , unsigned int flags)
 {
-	inventory.DropItemAtLocation( slot, flags, area, Pos );
+	if (inventory.DropItemAtLocation( slot, flags, area, Pos )) {
+		ReinitQuickSlots();
+	}
 }
+
+void Actor::ReinitQuickSlots()
+{
+	if (PCStats) {
+		int i=sizeof(PCStats->QSlots);
+		while (i-->=-2) {
+			int slot;
+			int which;
+			if (i<0) which = ACT_WEAPON1+i+2;
+			else which = PCStats->QSlots[i];
+			switch (which) {
+			case ACT_WEAPON1:
+			case ACT_WEAPON2:
+			case ACT_WEAPON3:
+			case ACT_WEAPON4:
+				slot = inventory.GetWeaponSlot()+(which-ACT_WEAPON1);
+				break;
+			case ACT_QSLOT1: slot = inventory.GetQuickSlot(); break;
+			case ACT_QSLOT2: slot = inventory.GetQuickSlot()+1; break;
+			case ACT_QSLOT3: slot = inventory.GetQuickSlot()+2; break;
+			case ACT_QSLOT4: slot = inventory.GetQuickSlot()+3; break;
+			case ACT_QSLOT5: slot = inventory.GetQuickSlot()+4; break;
+			default:;
+				slot = 0;
+			}
+			if (!slot) continue;
+			//if magic items are equipped the equipping info doesn't change
+			//(afaik)
+			if (!inventory.HasItemInSlot("", slot)) {
+				
+				if (core->QuerySlotEffects(slot)==SLOT_EFFECT_MELEE) {
+					slot = inventory.GetFistSlot();
+				} else {
+					slot = 0xffff;
+				}
+			}
+			PCStats->InitQuickSlot(which, slot);
+		}
+	}
+}
+
 bool Actor::ValidTarget(int ga_flags)
 {
 	switch(ga_flags&GA_ACTION) {
@@ -1618,7 +1635,7 @@ void Actor::Draw(Region &screen)
 
 	int cx = Pos.x;
 	int cy = Pos.y;
-	int explored = Modified[IE_DONOTJUMP]&2;
+	int explored = Modified[IE_DONOTJUMP]&DNJ_UNHINDERED;
 	//check the deactivation condition only if needed
 	//this fixes dead actors disappearing from fog of war (they should be permanently visible)
 	if ((!area->IsVisible( Pos, explored) || (InternalFlags&IF_JUSTDIED) ) &&	(InternalFlags&IF_ACTIVE) ) {
@@ -1817,6 +1834,7 @@ void Actor::GetActionButtonRow(ActionButtonRow &ar, int translation)
 			}
 			PCStats->QSlots[i]=tmp;
 		}
+		ReinitQuickSlots();
 		return;
 	}
 	for(int i=0;i<GUIBT_COUNT-3;i++) {
@@ -1839,15 +1857,15 @@ void Actor::GetActionButtonRow(ActionButtonRow &ar, int translation)
 void Actor::SetSoundFolder(const char *soundset)
 {
 	if (core->HasFeature(GF_SOUNDFOLDERS)) {
-		char path[_MAX_PATH];
+		char filepath[_MAX_PATH];
 
 		strnlwrcpy(PCStats->SoundFolder, soundset, 32);
-		PathJoin(path,core->GamePath,"sounds",PCStats->SoundFolder,0);
-		char *fp = FindInDir(path, "?????01", true);
+		PathJoin(filepath,core->GamePath,"sounds",PCStats->SoundFolder,0);
+		char *fp = FindInDir(filepath, "?????01", true);
 		if (fp) {
 			fp[5] = 0;
 		} else {
-			fp = FindInDir(path, "????01", true);
+			fp = FindInDir(filepath, "????01", true);
 			if (fp) {
 				fp[4] = 0;
 			}
@@ -1973,3 +1991,4 @@ void Actor::Rest(int hours)
 		spellbook.ChargeAllSpells ();
 	}
 }
+

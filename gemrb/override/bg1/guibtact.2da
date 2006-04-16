@@ -24,3 +24,14 @@ QWeapon4    0          1          2          3         4950	guibtbut
 BardSong   22         23         24         25         11798	guibtact
 Stop       58         59         60         61         15924	guibtact
 Search     34         35         36         37		4927	guibtact
+23         *          *          *          *          *          *
+24         *          *          *          *          *          *
+25         *          *          *          *          *          *
+26         *          *          *          *          *          *
+27         *          *          *          *          *          *
+28         *          *          *          *          *          *
+29         *          *          *          *          *          *
+30         *          *          *          *          *          *
+31         *          *          *          *          *          *
+Left       44         45         -1         -1         -1         guibtact
+Right      43         44         -1         -1         -1         guibtact

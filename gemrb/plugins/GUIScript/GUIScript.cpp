@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.381 2006/03/15 20:55:26 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.382 2006/04/16 23:57:04 avenger_teambg Exp $
  *
  */
 
@@ -75,6 +75,8 @@ typedef char EventNameType[17];
 #define UNINIT_IEDWORD 0xcccccccc
 
 static SpellDescType *StoreSpells = NULL;
+ItemExtHeader *ItemArray;
+//SpellExtHeader *SpellArray;
 
 static int ReputationIncrease[20]={(int) UNINIT_IEDWORD};
 static int ReputationDonation[20]={(int) UNINIT_IEDWORD};
@@ -84,36 +86,6 @@ static ieDword GUITooltip[32]={UNINIT_IEDWORD};
 static ieResRef GUIResRef[32];
 static EventNameType GUIEvent[32];
 static bool QuitOnError = false;
-
-//the order of these buttons are based on opcode #144 
-#define ACT_NONE 100 //iwd2's maximum is 99
-#define ACT_STEALTH 0
-#define ACT_THIEVING 1
-#define ACT_CAST 2
-#define ACT_QSPELL1 3
-#define ACT_QSPELL2 4
-#define ACT_QSPELL3 5
-#define ACT_TURN 6
-#define ACT_TALK 7
-#define ACT_USE 8
-#define ACT_QSLOT1 9
-#define ACT_QSLOT4 10 //this seems to be intentionally so
-#define ACT_QSLOT2 11
-#define ACT_QSLOT3 12
-#define ACT_INNATE 13
-#define ACT_DEFEND 14 //these are gemrb specific
-#define ACT_ATTACK 15 
-#define ACT_WEAPON1 16
-#define ACT_WEAPON2 17
-#define ACT_WEAPON3 18
-#define ACT_WEAPON4 19
-#define ACT_BARDSONG 20
-#define ACT_STOP 21
-#define ACT_SEARCH 22
-#define ACT_SHAPE 23
-#define ACT_TAMING 24
-#define ACT_SKILLS 25
-#define ACT_WILDERNESS 26
 
 static unsigned int ClassCount = 0;
 static ActionButtonRow *GUIBTDefaults = NULL; //qslots row count
@@ -125,6 +97,8 @@ ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
 static int CHUWidth = 0;
 static int CHUHeight = 0;
 static int QslotTranslation = false;
+
+EffectRef learn_spell_ref={"Spell:Learn",NULL,-1};
 
 inline bool valid_number(const char* string, long& val)
 {
@@ -2674,7 +2648,7 @@ static PyObject* SetButtonBAM(int wi, int ci, const char *ResRef, int CycleIndex
 		memcpy( &newpal->col[4], pal, 12 * sizeof( Color ) );
 		core->GetVideoDriver()->SetPalette( Picture, newpal );
 		free( pal );
-		core->GetVideoDriver()->FreePalette( newpal );
+		//core->GetVideoDriver()->FreePalette( newpal );
 	}
 
 	btn->SetPicture( Picture );
@@ -3742,7 +3716,8 @@ static PyObject* GemRB_GetSlotType(PyObject * /*self*/, PyObject* args)
 		PyDict_SetItemString(dict, "Count", PyInt_FromLong(core->GetInventorySize()));
 		return dict;
 	}
-	PyDict_SetItemString(dict, "Slot", PyInt_FromLong(core->QuerySlot(idx)));
+	idx = core->QuerySlot(idx);
+	PyDict_SetItemString(dict, "Slot", PyInt_FromLong(idx));
 	PyDict_SetItemString(dict, "Type", PyInt_FromLong(core->QuerySlotType(idx)));
 	PyDict_SetItemString(dict, "ID", PyInt_FromLong(core->QuerySlotID(idx)));
 	PyDict_SetItemString(dict, "Tip", PyInt_FromLong(core->QuerySlottip(idx)));
@@ -4433,6 +4408,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 			Py_INCREF( Py_None );
 			return Py_None;
 		}
+		actor->ReinitQuickSlots();
 
 		if (res!=-1) { //it is gold!
 			goto item_is_gold;
@@ -5372,7 +5348,10 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 			goto not_a_scroll;
 		}
 		f = eh->features; //+0
-		if (f->Opcode!=147) {
+		
+		//normally the learn spell opcode is 147
+		EffectQueue::ResolveEffect(learn_spell_ref);
+		if (f->Opcode!=(ieDword) learn_spell_ref.EffText) {
 			goto not_a_scroll;
 		}
 		//maybe further checks for school exclusion?
@@ -5442,6 +5421,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 			}
 		}
 		si = actor->inventory.RemoveItem( core->QuerySlot(Slot), Count );
+		actor->ReinitQuickSlots();
 	}
 	if (! si) {
 		Py_INCREF( Py_None );
@@ -5502,9 +5482,9 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 			Slottype = -1;
 			Effect = 0;
 		} else {
+			Slot = core->QuerySlot(Slot);
 			Slottype = core->QuerySlotType( Slot );
 			Effect = core->QuerySlotEffects( Slot );
-			Slot = core->QuerySlot(Slot);
 		}
 		CREItem * slotitem = core->GetDraggedItem();
 		Item *item = core->GetItem( slotitem->ItemResRef );
@@ -5521,6 +5501,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 			if ( Effect ) {
 				actor->inventory.EquipItem( Slot );
 			}
+			actor->ReinitQuickSlots();
 		} else {
 			res = 0;
 		}
@@ -6015,6 +5996,70 @@ static PyObject* GemRB_HasResource(PyObject * /*self*/, PyObject* args)
 	}
 }
 
+PyDoc_STRVAR( GemRB_SetupEquipmentIcons__doc,
+"SetupControls(WindowIndex, slot[, Start])\n\n"
+"Automagically sets up the controls of the equipment list window for a PC indexed by slot.");
+
+static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
+{
+	int wi, slot;
+	int Start = 0;
+
+	if (!PyArg_ParseTuple( args, "ii|i", &wi, &slot, &Start )) {
+		return AttributeError( GemRB_SetupEquipmentIcons__doc );
+	}
+
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor* actor = game->FindPC( slot );
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
+	}
+
+	//-2 because of the left/right scroll icons
+	if (!ItemArray) {
+		ItemArray = (ItemExtHeader *) malloc((GUIBT_COUNT-2) * sizeof (ItemExtHeader) );
+	}
+	bool more = actor->inventory.GetEquipmentInfo(ItemArray, Start, GUIBT_COUNT-2);
+	int i;
+	if (Start) {
+		PyObject *ret = SetActionIcon(wi,core->GetControl(wi, 0),ACT_LEFT,0);
+		if (!ret) {
+			return RuntimeError("Cannot set action button!\n");
+		}
+	}
+	for (i=0;i<GUIBT_COUNT-2;i++) {
+		int ci = core->GetControl(wi, i+1);
+		Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
+		ItemExtHeader *item = ItemArray+i;
+
+		Sprite2D *Picture = core->GetBAMSprite(item->UseIcon, 0, 0);
+		btn->SetPicture( Picture );
+		btn->SetState(IE_GUI_BUTTON_UNPRESSED);
+
+		char usagestr[10];
+
+		if (item->Charges || item->ChargeDepletion) {
+			sprintf(usagestr,"%d", item->Charges);
+			btn->SetText( usagestr );
+			if (!item->Charges && item->ChargeDepletion) {
+				btn->SetState(IE_GUI_BUTTON_DISABLED);
+			}
+		}    
+	}
+	if (more) {
+		PyObject *ret = SetActionIcon(wi,core->GetControl(wi, i+1),ACT_RIGHT,i+1);
+		if (!ret) {
+			return RuntimeError("Cannot set action button!\n");
+		}
+	}
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_SetupControls__doc,
 "SetupControls(WindowIndex, slot[, Start])\n\n"
 "Automagically sets up the controls of the action window for a PC indexed by slot." );
@@ -6052,7 +6097,7 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 	actor->GetActionButtonRow(myrow, QslotTranslation);
 	bool fistdrawn = true;
 	ieDword magicweapon = actor->inventory.GetMagicSlot();
-	if (actor->inventory.HasItemInSlot("",magicweapon) ) {
+	if (!actor->inventory.HasItemInSlot("",magicweapon) ) {
 		magicweapon = 0xffff;
 	}
 	ieDword fistweapon = actor->inventory.GetFistSlot();
@@ -6140,12 +6185,23 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 		}
 			break;
 		case ACT_QSLOT1:
+			tmp=0;
+			goto jump_label;
 		case ACT_QSLOT2:
+			tmp=1;
+			goto jump_label;
 		case ACT_QSLOT3:
-		case ACT_QSLOT4://fixme pst has 5
+			tmp=2;
+			goto jump_label;
+		case ACT_QSLOT4:
+			tmp=3;
+			goto jump_label;
+		case ACT_QSLOT5:
+			tmp=4;
+jump_label:
 		{
 			SetButtonBAM(wi, ci, "stonitem",0,0,-1);
-			ieDword slot = actor->PCStats->QuickItemSlots[tmp-ACT_QSLOT1];
+			ieDword slot = actor->PCStats->QuickItemSlots[tmp];
 			if (slot!=0xffff) {
 				//no slot translation required
 				CREItem *item = actor->inventory.GetSlotItem(slot);
@@ -6412,6 +6468,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetActionIcon, METH_VARARGS),
 	METHOD(HasResource, METH_VARARGS),
 	METHOD(SetupControls, METH_VARARGS),
+	METHOD(SetupEquipmentIcons, METH_VARARGS),
 	METHOD(ClearAction, METH_VARARGS),
 	METHOD(SetDefaultActions, METH_VARARGS),
 	METHOD(GetDestinationArea, METH_VARARGS),
@@ -6439,6 +6496,10 @@ GUIScript::~GUIScript(void)
 			Py_DECREF( pModule );
 		}
 		Py_Finalize();
+	}
+	if (ItemArray) {
+		free(ItemArray);
+		ItemArray=NULL;
 	}
 	if (StoreSpells) {
 		free(StoreSpells);

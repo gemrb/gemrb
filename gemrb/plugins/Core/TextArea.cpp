@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.87 2006/01/28 19:56:34 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.88 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -45,28 +45,25 @@ TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 	ResetEventHandler( TextAreaOnChange );
 	ResetEventHandler( TextAreaOutOfText );
 	PortraitResRef[0]=0;
-	palette = core->GetVideoDriver()->CreatePalette( hitextcolor,
-										lowtextcolor );
-	initpalette = core->GetVideoDriver()->CreatePalette( initcolor,
-											lowtextcolor );
+	palette = core->CreatePalette( hitextcolor, lowtextcolor );
+	initpalette = core->CreatePalette( initcolor, lowtextcolor );
 	Color tmp = {
 		hitextcolor.b, hitextcolor.g, hitextcolor.r, 0
 	};
-	selected = core->GetVideoDriver()->CreatePalette( tmp, lowtextcolor );
+	selected = core->CreatePalette( tmp, lowtextcolor );
 	tmp.r = 255;
 	tmp.g = 152;
 	tmp.b = 102;
-	lineselpal = core->GetVideoDriver()->CreatePalette( tmp, lowtextcolor );
+	lineselpal = core->CreatePalette( tmp, lowtextcolor );
 	BiteMyTail = false;
 }
 
 TextArea::~TextArea(void)
 {
-	Video *video = core->GetVideoDriver();
-	video->FreePalette( palette );
-	video->FreePalette( initpalette );
-	video->FreePalette( selected );
-	video->FreePalette( lineselpal );
+	core->FreePalette( palette );
+	core->FreePalette( initpalette );
+	core->FreePalette( selected );
+	core->FreePalette( lineselpal );
 	for (size_t i = 0; i < lines.size(); i++) {
 		free( lines[i] );
 	}

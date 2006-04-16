@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.111 2006/04/09 15:22:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.112 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -311,10 +311,7 @@ int Game::JoinParty(Actor* actor, int join)
 	if (!actor->InParty) {
 		actor->InParty = (ieByte) (size+1);
 	}
-	//automagically select first actor added to team
-	if (!size) {
-		SelectActor(actor,true,SELECT_NORMAL);
-	}
+
 	return ( int ) size;
 }
 
@@ -541,8 +538,20 @@ int Game::DelMap(unsigned int index, int forced)
 		}
 		return 1;
 	}
+
 	if (forced || ((Maps.size()>MAX_MAPS_LOADED) && map->CanFree() ) )
 	{
+		//keep at least one master
+		const char *name = map->GetScriptName();
+		if (MasterArea(name)) {
+			if(!AnotherArea[0]) {
+				memcpy(AnotherArea, name, sizeof(AnotherArea));
+				if (!forced) {
+					return -1;
+				}
+			}
+		}
+		//remove map from memory
 		core->SwapoutArea(Maps[index]);
 		delete( Maps[index] );
 		Maps.erase( Maps.begin()+index);
@@ -882,8 +891,8 @@ void Game::AddGold(ieDword add)
 //later this could be more complicated
 void Game::AdvanceTime(ieDword add)
 {
-	GameTime+=add/interval;
-	Ticks+=add;
+	GameTime+=add;
+	Ticks+=add*interval;
 }
 
 //returns true if there are excess players in the team
@@ -932,7 +941,7 @@ bool Game::EveryoneDead() const
 void Game::UpdateScripts()
 {
 	ExecuteScript( Scripts[0] );
-	ProcessActions();
+	ProcessActions(false);
 	size_t idx;
 
 	for (idx=0;idx<Maps.size();idx++) {
@@ -940,6 +949,8 @@ void Game::UpdateScripts()
 	}
 	if (Maps.size()>MAX_MAPS_LOADED) {
 		idx = Maps.size();
+		AnotherArea[0]=0;
+
 		while (idx--) {
 			DelMap( idx, false );
 		}

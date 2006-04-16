@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.64 2006/04/06 21:14:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.65 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -4585,5 +4585,43 @@ void GameScript::DialogueInterrupt(Scriptable* Sender, Action* parameters)
 		actor->SetMCFlag(MC_NO_TALK, BM_NAND);
 	} else {
 		actor->SetMCFlag(MC_NO_TALK, BM_OR);
+	}
+}
+
+void GameScript::EquipMostDamagingMelee(Scriptable* Sender, Action* /*parameters*/)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	actor->inventory.EquipBestWeapon(EQUIP_MELEE);
+}
+
+void GameScript::EquipRanged(Scriptable* Sender, Action* /*parameters*/)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	actor->inventory.EquipBestWeapon(EQUIP_RANGED);
+}
+
+void GameScript::SetBestWeapon(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+
+	Actor *target = (Actor *) tar;
+	if (Distance(actor,target)>(unsigned int) parameters->int0Parameter) {
+		actor->inventory.EquipBestWeapon(EQUIP_RANGED);
+	} else {
+		actor->inventory.EquipBestWeapon(EQUIP_MELEE);
 	}
 }

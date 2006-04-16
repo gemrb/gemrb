@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.104 2006/04/09 15:22:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.105 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -44,6 +44,11 @@ class Gem_Polygon;
 
 #define MAX_SCRIPTS		8
 #define MAX_GROUND_ICON_DRAWN   3
+
+/** The distance of operating a trigger, container, etc. */
+#define MAX_OPERATING_DISTANCE      40 //a search square is 16x12
+/** The distance between PC's who are about to enter a new area */
+#define MAX_TRAVELING_DISTANCE      400
 
 #define SCR_OVERRIDE 0
 #define SCR_AREA	 1
@@ -203,7 +208,7 @@ public:
 	void ClearActions();
 	void ReleaseCurrentAction();
 	bool InMove();
-	virtual void ProcessActions();
+	void ProcessActions(bool force);
 	//these functions handle clearing of triggers that resulted a
 	//true condition (whole triggerblock returned true)
 	void InitTriggers();

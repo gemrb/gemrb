@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIREC.py,v 1.27 2006/04/12 20:25:02 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIREC.py,v 1.28 2006/04/16 23:57:07 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -252,7 +252,7 @@ def GetStatOverview (pc):
 	stats.append ( (9457, GS (IE_THAC0), '') )
 	tmp = GS (IE_NUMBEROFATTACKS)
 	if (tmp&1):
-		tmp2 = str(tmp) + "/2"
+		tmp2 = str(tmp/2) + chr(188)
 	else:
 		tmp2 = str(tmp/2)
 	stats.append ( (9458, tmp2, '') )

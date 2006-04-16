@@ -42,14 +42,18 @@
 
 class GEM_EXPORT ScriptedAnimation {
 public:
-	ScriptedAnimation(AnimationFactory *af, Point &position, int height);
-	ScriptedAnimation(DataStream* stream, bool autoFree = true);
+	ScriptedAnimation();
 	~ScriptedAnimation(void);
+	ScriptedAnimation(DataStream* stream, ScriptedAnimation *templ, bool autoFree = true);
+	void Init();
+	void LoadAnimationFactory(AnimationFactory *af);
+	void Override(ScriptedAnimation *templ);
 	//there are 3 phases: start, hold, release
 	//it will usually cycle in the 2. phase
 	Animation* anims[3];
 	Palette *palettes[3];
 	ieResRef sounds[3];
+	ieResRef PaletteName;
 	ieDword Transparency;
 	ieDword SequenceFlags;
 	//these are signed
@@ -70,10 +74,20 @@ public:
 	void SetSound(int arg, const ieResRef sound);
 	//sets gradient colour slot to gradient
 	void SetPalette(int gradient, int start=-1);
+	//sets complete palette to ResRef
+	void SetFullPalette(const ieResRef PaletteResRef);
+	//sets complete palette to own name+index
+	void SetFullPalette(int idx);
 	//sets spritecover
 	void SetSpriteCover(SpriteCover* c) { delete cover; cover = c; }
 	/* get stored SpriteCover */
 	SpriteCover* GetSpriteCover() const { return cover; }
+	/* sets default duration if it wasn't set yet */
+	void SetDefaultDuration(unsigned int duration);
+	/* transforms vvc to blended */
+	void SetBlend();
+private:
+	void PrepareAnimation(Animation *anim, Palette *&palette, ieDword Transparency);
 };
 
 #endif

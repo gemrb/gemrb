@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.cpp,v 1.9 2005/06/11 20:18:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.cpp,v 1.10 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -39,4 +39,48 @@ Item::Item(void)
 Item::~Item(void)
 {
 	core->FreeITMExt( ext_headers, equipping_features );
+}
+
+//-1 will return equipping feature block
+//otherwise returns the n'th feature block
+EffectQueue *Item::GetEffectBlock(int usage)
+{
+	Effect *features;
+	int count;
+
+	if (usage>=ExtHeaderCount) {
+		return NULL;
+	}
+	if (usage>=0) {
+		features = ext_headers[usage].features;
+		count = ext_headers[usage].FeatureCount;
+	} else {
+		features = equipping_features;
+		count = EquippingFeatureCount;
+	}
+	EffectQueue *fxqueue = new EffectQueue();
+	
+	for (int i=0;i<count;i++) {
+		fxqueue->AddEffect( features+i );
+	}
+	return fxqueue;
+}
+
+/** returns the average damage this weapon would cause */
+int Item::GetDamagePotential(int header, bool ranged)
+{
+	ITMExtHeader *ext_header = GetExtHeader(header);
+	if (!ext_header) return 0;
+	if (ext_header->Location!=ITEM_LOC_WEAPON) return 0;
+	unsigned char AType = ext_header->AttackType;
+	if (ranged) {
+		if (AType!=ITEM_AT_PROJECTILE) {
+			return 0;
+		}
+	} else {
+		if (AType!=ITEM_AT_MELEE) {
+			return 0;
+		}
+	}
+	return ext_header->DiceThrown*(ext_header->DiceSides+1)/2+ext_header->DamageBonus;
 }

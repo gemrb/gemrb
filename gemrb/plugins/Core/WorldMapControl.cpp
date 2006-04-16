@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.27 2006/01/28 19:56:34 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.28 2006/04/16 23:57:02 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -33,8 +33,6 @@
 
 WorldMapControl::WorldMapControl(const char *font, int direction)
 {
-	Video *video = core->GetVideoDriver();
-
 	ScrollX = 0;
 	ScrollY = 0;
 	MouseIsDown = false;
@@ -61,9 +59,9 @@ WorldMapControl::WorldMapControl(const char *font, int direction)
 	Color notvisited = { 0x80, 0x80, 0xf0, 0xff };
 	Color black = { 0x00, 0x00, 0x00, 0x00 };
 
-	pal_normal = video->CreatePalette ( normal, black );
-	pal_selected = video->CreatePalette ( selected, black );
-	pal_notvisited = video->CreatePalette ( notvisited, black );
+	pal_normal = core->CreatePalette ( normal, black );
+	pal_selected = core->CreatePalette ( selected, black );
+	pal_notvisited = core->CreatePalette ( notvisited, black );
 
 
 	ResetEventHandler( WorldMapControlOnPress );
@@ -72,11 +70,11 @@ WorldMapControl::WorldMapControl(const char *font, int direction)
 
 WorldMapControl::~WorldMapControl(void)
 {
-	Video *video = core->GetVideoDriver();
+	//Video *video = core->GetVideoDriver();
 
-	video->FreePalette( pal_normal );
-	video->FreePalette( pal_selected );
-	video->FreePalette( pal_notvisited );
+	core->FreePalette( pal_normal );
+	core->FreePalette( pal_selected );
+	core->FreePalette( pal_notvisited );
 }
 
 /** Draws the Control on the Output Display */
@@ -347,20 +345,18 @@ bool WorldMapControl::SetEvent(int eventType, EventHandler handler)
 void WorldMapControl::SetColor(int which, Color color)
 {
 	Color black = { 0x00, 0x00, 0x00, 0x00 };
-	Video *video = core->GetVideoDriver();
-
 	switch (which) {
 	case IE_GUI_WMAP_COLOR_NORMAL:
-		video->FreePalette( pal_normal );
-		pal_normal = video->CreatePalette( color, black );
+		core->FreePalette( pal_normal );
+		pal_normal = core->CreatePalette( color, black );
 		break;
 	case IE_GUI_WMAP_COLOR_SELECTED:
-		video->FreePalette( pal_selected );
-		pal_selected = video->CreatePalette( color, black );
+		core->FreePalette( pal_selected );
+		pal_selected = core->CreatePalette( color, black );
 		break;
 	case IE_GUI_WMAP_COLOR_NOTVISITED:
-		video->FreePalette( pal_notvisited );
-		pal_notvisited = video->CreatePalette( color, black );
+		core->FreePalette( pal_notvisited );
+		pal_notvisited = core->CreatePalette( color, black );
 		break;
 	default:
 		break;

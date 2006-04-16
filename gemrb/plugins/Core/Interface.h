@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.190 2006/04/13 18:40:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.191 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -157,6 +157,14 @@ typedef struct SlotType {
 #define STAT_INT_MAXLEVEL    1
 #define STAT_INT_MAXNUMBER   2
 
+//sloteffects (querysloteffect returns it)
+#define SLOT_EFFECT_NONE     0
+#define SLOT_EFFECT_ITEM     1
+#define SLOT_EFFECT_FIST     2
+#define SLOT_EFFECT_MAGIC    3
+#define SLOT_EFFECT_MELEE    4
+#define SLOT_EFFECT_MISSILE  5
+
 /**
  * @class Interface
  * Central interconnect for all GemRB parts, driving functions and utility functions possibly belonging to a better place
@@ -175,6 +183,7 @@ private:
 	Cache ItemCache;
 	Cache SpellCache;
 	Cache EffectCache;
+	Cache PaletteCache;
 	Factory * factory;
 	ImageMgr * pal256;
 	ImageMgr * pal32;
@@ -425,6 +434,7 @@ public:
 	int GetCharSounds(TextArea *ta);
 	unsigned int GetInventorySize() const { return SlotTypes-1; }
 	int QuerySlot(unsigned int idx) const;
+	//int QuerySlotLookup(unsigned int idx) const;
 	int QuerySlotType(unsigned int idx) const;
 	int QuerySlottip(unsigned int idx) const;
 	int QuerySlotID(unsigned int idx) const;
@@ -444,6 +454,10 @@ public:
 	bool StupidityDetector(const char* Pt);
 	/*handles the load screen*/
 	void LoadProgress(int percent);
+
+	Palette* GetPalette(const ieResRef resname);
+	Palette* CreatePalette(Color color, Color back);
+	void FreePalette(Palette *&pal, const ieResRef name=NULL);  
 
 	void DragItem(CREItem* item);
 	CREItem* GetDraggedItem() { return DraggedItem; }
@@ -477,7 +491,7 @@ public:
 	/** returns true if resource exists */
 	bool Exists(const char *ResRef, SClass_ID type);
 	/** creates a vvc/bam animation object at point */
-	ScriptedAnimation* GetScriptedAnimation( const char *ResRef, Point &p, int height);
+	ScriptedAnimation* GetScriptedAnimation( const char *ResRef, ScriptedAnimation *templ);
 	/** returns the first selected PC */
 	Actor *GetFirstSelectedPC();
 	/** returns a single sprite (not cached) from a BAM resource */
@@ -513,6 +527,10 @@ public:
 	int Autopause(ieDword reason);
 	/** registers engine opcodes */
 	void RegisterOpcodes(int count, EffectRef *opcodes);
+	/** reads a list of resrefs into an array, returns array size */
+	int ReadResRefTable(const ieResRef tablename, ieResRef *&data);
+	/** frees the data */
+	void FreeResRefTable(ieResRef *&table, int &count);
 private:
 	bool LoadConfig(void);
 	bool LoadConfig(const char *filename);

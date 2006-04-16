@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.357 2006/04/14 20:24:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.358 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -298,6 +298,7 @@ static TriggerLink triggernames[] = {
 	{"reputationlt", GameScript::ReputationLT, 0},
 	{"school", GameScript::Kit, 0}, //is this the same?
 	{"see", GameScript::See, 0},
+	{"sequence", GameScript::Sequence, 0},
 	{"specifics", GameScript::Specifics, 0},
 	{"statecheck", GameScript::StateCheck, 0},
 	{"stuffglobalrandom", GameScript::StuffGlobalRandom, 0},//hm, this is a trigger
@@ -450,7 +451,9 @@ static ActionLink actionnames[] = {
 	{"endcredits", GameScript::EndCredits, 0},//movie
 	{"endcutscenemode", GameScript::EndCutSceneMode, 0},
 	{"enemy", GameScript::Enemy, 0},
-	{"equipitem", GameScript::EquipItem, AF_BLOCKING},
+	{"equipitem", GameScript::EquipItem, AF_BLOCKING}, //why blocking???
+	{"equipmostdamagingmelee",GameScript::EquipMostDamagingMelee,0},
+	{"equipranged", GameScript::EquipRanged,0},
 	{"erasejournalentry", GameScript::RemoveJournalEntry, 0},
 	{"escapearea", GameScript::EscapeArea, 0},
 	{"escapeareadestroy", GameScript::EscapeAreaDestroy, 0},
@@ -638,12 +641,12 @@ static ActionLink actionnames[] = {
 	{"saveplace", GameScript::SaveLocation, 0},
 	{"saveobjectlocation", GameScript::SaveObjectLocation, 0},
 	{"screenshake", GameScript::ScreenShake,AF_BLOCKING},
-	//{"sequence", GameScript::PlaySequence, 0}, //which engine has this
 	{"setanimstate", GameScript::PlaySequence, 0},//pst
 	{"setapparentnamestrref", GameScript::SetApparentName, 0},
 	{"setareaflags", GameScript::SetAreaFlags, 0},
 	{"setarearestflag", GameScript::SetAreaRestFlag, 0},
 	{"setbeeninpartyflags", GameScript::SetBeenInPartyFlags, 0},
+	{"setbestweapon", GameScript::SetBestWeapon, 0},
 	{"setcorpseenabled", GameScript::AmbientActivate, 0},//another weird name
 	{"setcreatureareaflags", GameScript::SetCreatureAreaFlags, 0},
 	{"setdialog", GameScript::SetDialogue,AF_BLOCKING},

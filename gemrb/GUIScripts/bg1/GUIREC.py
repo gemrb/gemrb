@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIREC.py,v 1.5 2006/04/12 20:25:00 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIREC.py,v 1.6 2006/04/16 23:57:04 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -268,7 +268,7 @@ def GetStatOverview (pc):
 	#   4209 Number of Attacks
 	tmp = GS (IE_NUMBEROFATTACKS)
 	if (tmp&1):
-		tmp2 = str(tmp) + "/2"
+		tmp2 = str(tmp/2) + chr(188)
 	else:
 		tmp2 = str(tmp/2)
 	stats.append ((4209, tmp2, ''))

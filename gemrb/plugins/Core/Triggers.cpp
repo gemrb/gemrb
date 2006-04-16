@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.44 2006/04/14 20:24:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.45 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -811,9 +811,9 @@ int GameScript::HasItemSlot(Scriptable* Sender, Trigger* parameters)
 	Actor *actor = (Actor *) scr;
 	//this might require a conversion of the slots
 	if (actor->inventory.HasItemInSlot(parameters->string0Parameter, parameters->int0Parameter) ) {
-		return !parameters->string0Parameter;
+		return 1;
 	}
-	return !!parameters->string0Parameter;
+	return 0;
 }
 
 int GameScript::HasItemEquipped(Scriptable * Sender, Trigger* parameters)
@@ -1388,7 +1388,7 @@ int GameScript::Dead(Scriptable* Sender, Trigger* parameters)
 		char Variable[33];
 
 		if (core->HasFeature( GF_HAS_KAPUTZ )) {
-			value = CheckVariable( Sender, parameters->string0Parameter, "KAPUTZ");      
+			value = CheckVariable( Sender, parameters->string0Parameter, "KAPUTZ");
 		} else {
 			snprintf( Variable, 32, "SPRITE_IS_DEAD%s", parameters->string0Parameter );
 		}
@@ -3307,6 +3307,19 @@ int GameScript::IsWeaponRanged(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor* actor = ( Actor* ) tar;
 	if (actor->inventory.GetEquipped()<0) {
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::Sequence(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable *tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	if (actor->GetStance()==parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;

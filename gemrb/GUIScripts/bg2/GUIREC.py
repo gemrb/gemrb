@@ -9,14 +9,14 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.26 2006/04/12 20:25:00 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.27 2006/04/16 23:57:05 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -209,7 +209,7 @@ def UpdateRecordsWindow ():
 	GemRB.SetText (Window, Label, text)
 
 	Label = GemRB.GetControl (Window, 0x10000011)
-	if GemRB.GetPlayerStat (pc, IE_SEX) ==  1:
+	if GemRB.GetPlayerStat (pc, IE_SEX) == 1:
 		GemRB.SetText (Window, Label, 7198)
 	else:
 		GemRB.SetText (Window, Label, 7199)
@@ -252,10 +252,9 @@ def GetStatOverview (pc):
 	stats.append ( (9457, GS (IE_THAC0), '') )
 	tmp = GS (IE_NUMBEROFATTACKS)
 	if (tmp&1):
-		tmp2 = str(tmp) + "/2"
+		tmp2 = str(tmp/2) + chr(188)
 	else:
 		tmp2 = str(tmp/2)
-
 	stats.append ( (9458, tmp2, '') )
 	stats.append ( (9459, GS (IE_LORE), '') )
 	reptxt = GetReputation (GemRB.GameGetReputation()/10)
@@ -367,7 +366,6 @@ def GetStatOverview (pc):
 	stats.append (None)
 
 	stats.append (32131)
-	#stats.append (10340)
 
 	res = []
 	lines = 0
@@ -377,8 +375,7 @@ def GetStatOverview (pc):
 			if val == 0 and type != '0':
 				continue
 			if type == '+':
-				res.append (GemRB.GetString (strref) + ' '+ '+'
-* val)
+				res.append (GemRB.GetString (strref) + ' '+ '+' * val)
 			elif type == 'x':
 				res.append (GemRB.GetString (strref)+': x' + str (val) )
 			else:

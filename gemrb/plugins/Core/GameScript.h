@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.243 2006/04/14 20:24:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.244 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -887,6 +887,7 @@ public: //Script Functions
 	static int ReputationLT(Scriptable* Sender, Trigger* parameters);
 	static int School(Scriptable* Sender, Trigger* parameters);
 	static int See(Scriptable* Sender, Trigger* parameters);
+	static int Sequence(Scriptable* Sender, Trigger* parameters);
 	static int Specifics(Scriptable* Sender, Trigger* parameters);
 	static int StateCheck(Scriptable* Sender, Trigger* parameters);
 	static int StoreHasItem(Scriptable* Sender, Trigger* parameters);
@@ -1023,6 +1024,8 @@ public:
 	static void EscapeAreaObject(Scriptable* Sender, Action* parameters);
 	static void EscapeAreaObjectNoSee(Scriptable* Sender, Action* parameters);
 	static void EquipItem(Scriptable *Sender, Action *parameters);
+	static void EquipMostDamagingMelee(Scriptable *Sender, Action *parameters);
+	static void EquipRanged(Scriptable *Sender, Action *parameters);
 	static void ExpansionEndCredits(Scriptable* Sender, Action* parameters);
 	static void Explore(Scriptable *Sender, Action *parameters);
 	static void ExploreMapChunk(Scriptable *Sender, Action *parameters);
@@ -1191,6 +1194,7 @@ public:
 	static void SetAreaRestFlag(Scriptable* Sender, Action* parameters);
 	static void SetArmourLevel(Scriptable* Sender, Action* parameters);
 	static void SetBeenInPartyFlags(Scriptable* Sender, Action* parameters);
+	static void SetBestWeapon(Scriptable *Sender, Action *parameters);
 	static void SetCreatureAreaFlags(Scriptable* Sender, Action* parameters);
 	static void SetDialogue(Scriptable* Sender, Action* parameters);
 	static void SetDialogueRange(Scriptable* Sender, Action* parameters);

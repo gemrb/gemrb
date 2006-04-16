@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.cpp,v 1.37 2006/01/28 19:56:34 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.cpp,v 1.38 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -38,7 +38,7 @@ Label::Label(Font* font)
 }
 Label::~Label()
 {
-	core->GetVideoDriver()->FreePalette( palette );
+	core->FreePalette( palette );
 	if (Buffer) {
 		free( Buffer );
 	}
@@ -89,8 +89,8 @@ int Label::SetText(const char* string, int /*pos*/)
 /** Sets the Foreground Font Color */
 void Label::SetColor(Color col, Color bac)
 {
-	core->GetVideoDriver()->FreePalette( palette );
-	palette = core->GetVideoDriver()->CreatePalette( col, bac );
+	core->FreePalette( palette );
+	palette = core->CreatePalette( col, bac );
 	Changed = true;
 }
 

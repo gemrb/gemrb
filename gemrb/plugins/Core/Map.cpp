@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.236 2006/04/11 16:32:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.237 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -450,6 +450,7 @@ void Map::MoveToNewArea(const char *area, const char *entrance, int EveryOne, Ac
 				pc->ClearPath();
 				pc->ClearActions();
 				pc->AddAction( GenerateAction( command ) );
+				pc->ProcessActions(true);
 			}
 		}
 		return;
@@ -466,13 +467,16 @@ void Map::MoveToNewArea(const char *area, const char *entrance, int EveryOne, Ac
 				pc->ClearPath();
 				pc->ClearActions();
 				pc->AddAction( GenerateAction( command ) );
+				pc->ProcessActions(true);
 			}
 		}
+		return;
 	}
 	
 	actor->ClearPath();
 	actor->ClearActions();
 	actor->AddAction( GenerateAction( command ) );
+	actor->ProcessActions(true);
 }
 
 void Map::UseExit(Actor *actor, InfoPoint *ip)
@@ -502,7 +506,7 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 	if (ip->Scripts[0]) {
 		ip->LastTrigger = ip->LastEntered = actor->GetID();
 		ip->ExecuteScript( ip->Scripts[0] );
-		ip->ProcessActions();
+		ip->ProcessActions(true);
 	}
 }
 
@@ -518,7 +522,8 @@ void Map::UpdateScripts()
 		ExecuteScript( Scripts[0] );
 	}
 	//Execute Pending Actions
-	ProcessActions();
+	GenerateQueues();
+	ProcessActions(false);
 
 	//Run actor scripts (only for 0 priority)
 	int q=Qcount[0];
@@ -539,23 +544,25 @@ void Map::UpdateScripts()
 				actor->ExecuteScript( actor->Scripts[i] );
 			}
 		}
-		actor->ProcessActions();
+		actor->ProcessActions(false);
 
 		actor->inventory.CalculateWeight();
 		actor->SetBase( IE_ENCUMBRANCE, actor->inventory.GetWeight() );
 		//TODO:calculate actor speed!
 		int speed = 150;
-		BlockSearchMap( actor->Pos, actor->size, 0);
-		if (actor->path) {
-			//we should actually wait for a short time and check then
-			if (!(GetBlocked(actor->path->x,actor->path->y)&PATH_MAP_PASSABLE)) {
-				actor->ClearPath();
-				actor->path = FindPath( actor->Pos, actor->Destination, actor->size );
+		if (actor->GetStat(IE_DONOTJUMP)<2) {
+			BlockSearchMap( actor->Pos, actor->size, 0);
+			if (actor->path) {
+				//we should actually wait for a short time and check then
+				if (!(GetBlocked(actor->path->x,actor->path->y)&PATH_MAP_PASSABLE)) {
+					actor->ClearPath();
+					actor->path = FindPath( actor->Pos, actor->Destination, actor->size );
+				}
 			}
 		}
 		if (!(actor->GetBase(IE_STATE_ID)&STATE_DEAD) ) {
 			actor->DoStep( speed );
-			BlockSearchMap( actor->Pos, actor->size, PATH_MAP_PC);
+			BlockSearchMap( actor->Pos, actor->size, actor->InParty?PATH_MAP_PC:PATH_MAP_NPC);
 		}
 	}
 
@@ -569,7 +576,7 @@ void Map::UpdateScripts()
 			continue;
 		door->ExecuteScript( door->Scripts[0] );
 		//Execute Pending Actions
-		door->ProcessActions();
+		door->ProcessActions(false);
 	}
 
 	//Check if we need to start some trap scripts
@@ -594,7 +601,7 @@ void Map::UpdateScripts()
 				//Run the InfoPoint script
 				ip->ExecuteScript( ip->Scripts[0] );
 				//Execute Pending Actions
-				ip->ProcessActions();
+				ip->ProcessActions(false);
 			}
 			continue;
 		}
@@ -618,7 +625,7 @@ void Map::UpdateScripts()
 		if (ip->Type==ST_PROXIMITY) {
 			ip->ExecuteScript( ip->Scripts[0] );
 			//Execute Pending Actions
-			ip->ProcessActions();
+			ip->ProcessActions(false);
 		}
 	}
 }
@@ -734,7 +741,7 @@ void Map::DrawMap(Region screen, GameControl* gc)
 	}
 	DrawContainers( screen, gc->overContainer );
 	Region vp = video->GetViewport();
-	GenerateQueues();
+	//GenerateQueues();
 	//drawing queues 1 and 0
 	//starting with lower priority (so they are drawn over)
 	int q = 1;
@@ -1102,13 +1109,14 @@ void Map::PlayAreaSong(int SongType)
 int Map::GetBlocked(unsigned int x, unsigned int y)
 {
 	int block = SearchMap->GetPixelIndex( x, y );
+	int ret = Passable[block&PATH_MAP_AREAMASK];
 	if (block&PATH_MAP_DOOR_OPAQUE) {
-		return PATH_MAP_NO_SEE;
+		ret|=PATH_MAP_NO_SEE;
 	}
 	if (block&(PATH_MAP_DOOR_TRANSPARENT|PATH_MAP_ACTOR)) {
-		return PATH_MAP_IMPASSABLE;
+		ret|=PATH_MAP_IMPASSABLE;
 	}
-	return Passable[block&PATH_MAP_AREAMASK];
+	return ret;
 }
 
 int Map::GetBlocked(Point &c)
@@ -2107,7 +2115,7 @@ void Map::UpdateFog()
 		int state = actor->GetStat( IE_STATE_ID );
 		if (state & STATE_CANTSEE) continue;
 		int vis2 = actor->GetStat( IE_VISUALRANGE );
-		if (state&STATE_BLIND) vis2=2; //can see only themselves
+		if ((state&STATE_BLIND) || (vis2<2)) vis2=2; //can see only themselves
 		ExploreMapChunk (actor->Pos, vis2, 1);
 		Spawn *sp = GetSpawnRadius(actor->Pos, SPAWN_RANGE); //30 * 12
 		if (sp) {
@@ -2287,27 +2295,24 @@ AreaAnimation::~AreaAnimation()
 		}
 	}
 	free(animation);
-	core->GetVideoDriver()->FreePalette(palette);
+	core->FreePalette(palette, PaletteRef);
 }
 
 void AreaAnimation::SetPalette(ieResRef Pal)
 {
 	Flags |= A_ANI_PALETTE;
+	core->FreePalette(palette, PaletteRef);
 	strnlwrcpy(PaletteRef, Pal, 8);
-	ImageMgr *bmp = (ImageMgr *) core->GetInterface( IE_BMP_CLASS_ID);
-	if (!bmp) {
-		return;
+	palette = core->GetPalette(PaletteRef);
+	if (Flags&A_ANI_BLEND) {
+		//re-blending after palette change
+		BlendAnimation();
 	}
-	DataStream* s = core->GetResourceMgr()->GetResource( Pal, IE_BMP_CLASS_ID );
-	bmp->Open( s, true );
-	core->GetVideoDriver()->FreePalette(palette);
-	palette = new Palette();
-	bmp->GetPalette( 0, 256, palette->col );
-	core->FreeInterface( bmp );
 }
 
 void AreaAnimation::BlendAnimation()
 {
+	//Warning! This function will modify a shared palette
 	if (!palette) {
 		// CHECKME: what should we do here? Currently copying palette
 		// from first frame of first animation
@@ -2317,7 +2322,6 @@ void AreaAnimation::BlendAnimation()
 		if (!spr) return;
 		palette = core->GetVideoDriver()->GetPalette(spr)->Copy();
 	}
-
 	palette->CreateShadedAlphaChannel();
 }
 

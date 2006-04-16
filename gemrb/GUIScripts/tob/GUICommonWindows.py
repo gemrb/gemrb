@@ -9,14 +9,14 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.32 2005/12/21 22:58:25 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.33 2006/04/16 23:57:07 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -242,6 +242,19 @@ def ActionStopPressed ():
 			GemRB.ClearAction(i + 1)
 	return
 
+def RefreshUseItemWindow ():
+	pc = GemRB.GameGetFirstSelectedPC()
+	print "setting up useitem window topindex:",TopIndex
+	GemRB.SetupEquipmentIcons(ActionsWindow, pc, TopIndex)
+	return
+
+def ActionUseItemPressed ():
+	global TopIndex
+
+	TopIndex = 0
+	RefreshUseItemWindow()
+	return
+
 def GetActorClassTitle (actor):
 	ClassTitle = GemRB.GetPlayerStat (actor, IE_TITLE1)
 	KitIndex = GemRB.GetPlayerStat (actor, IE_KIT) & 0xfff
@@ -274,8 +287,8 @@ def SetSelectionChangeHandler (handler):
 	global SelectionChangeHandler
 
 	# Switching from walking to non-walking environment:
-	#   set the first selected PC in walking env as a selected
-	#   in nonwalking env
+	# set the first selected PC in walking env as a selected
+	# in nonwalking env
 	if (not SelectionChangeHandler) and handler:
 		sel = GemRB.GameGetFirstSelectedPC ()
 		if not sel:
@@ -416,7 +429,7 @@ def SetupSavingThrows (pc):
 			#fighter/thief
 			Class = GemRB.FindTableValue (ClassTable, 5, 4)
 		SaveName2 = GemRB.GetTableValue (ClassTable, Class, 3)
-		Class = 0  #fighter
+		Class = 0 #fighter
 
 	SaveName1 = GemRB.GetTableValue (ClassTable, Class, 3)
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.80 2006/02/04 13:59:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.81 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -107,7 +107,8 @@ void CharAnimations::SetupColors()
 		int size = 32;
 		int dest = 256-Colors[6]*size;
 		if (Colors[6] == 0) {
-			core->GetVideoDriver()->FreePalette(palette);
+			core->FreePalette(palette, PaletteResRef);
+			PaletteResRef[0]=0;
 			return;
 		}
 		for (unsigned int i = 0; i < Colors[6]; i++) {
@@ -121,20 +122,18 @@ void CharAnimations::SetupColors()
 
 	int PType = NoPalette();
 	if ( PType) {
+		core->FreePalette(palette, PaletteResRef);
+		PaletteResRef[0]=0;
 		//handling special palettes like MBER_BL (black bear)
 		if (PType==1) {
-			core->GetVideoDriver()->FreePalette(palette);
 			return;
 		}
-		ieResRef PaletteResRef;
 		snprintf(PaletteResRef,8,"%.4s_%-.2s",ResRef, (char *) &PType);
 		strlwr(PaletteResRef);
-		ImageMgr *bmp = (ImageMgr *) core->GetInterface( IE_BMP_CLASS_ID);
-		if (bmp) {
-			DataStream* s = core->GetResourceMgr()->GetResource( PaletteResRef, IE_BMP_CLASS_ID );
-			bmp->Open( s, true);
-			bmp->GetPalette(0, 256, palette->col);
-			core->FreeInterface( bmp );
+		palette = core->GetPalette(PaletteResRef);
+		//invalid palette, rolling back
+		if (!palette) {
+			PaletteResRef[0]=0;
 		}
 		return;
 	}
@@ -228,6 +227,8 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 	ArmorType = 0;
 	RangedType = 0;
 	WeaponType = 0;
+	PaletteResRef[0]=0;
+
 	AvatarsRowNum=AvatarsCount;
 	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
 		AnimID&=0xff;
@@ -268,7 +269,7 @@ CharAnimations::~CharAnimations(void)
 			}
 		}
 	}
-	core->GetVideoDriver()->FreePalette(palette);
+	core->FreePalette(palette, PaletteResRef);
 }
 /*
 This is a simple Idea of how the animation are coded
@@ -504,7 +505,7 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID,
 			return 0;
 		}
 
-		if (!palette) {
+		if (!palette && (NoPalette()!=1) ) {
 			// This is the first time we're loading an Animation.
 			// We copy the palette of its first frame into our own palette
 			palette=core->GetVideoDriver()->GetPalette(a->GetFrame(0))->Copy();
@@ -512,7 +513,6 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID,
 			// ...and setup the colours properly
 			SetupColors();
 		}
-
 	
 		//animation is affected by game flags
 		a->gameAnimation = true;

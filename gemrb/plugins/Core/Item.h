@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.22 2005/12/25 10:31:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.23 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -33,7 +33,7 @@
 #include "../../includes/ie_types.h"
 
 #include "AnimationMgr.h"
-#include "Effect.h"
+#include "EffectQueue.h"
 
 #ifdef WIN32
 
@@ -69,6 +69,17 @@
 #define IE_ITEM_RECHARGE     0x800
 #define IE_ITEM_IGNORESHIELD 0x10000
 #define IE_ITEM_KEEN	 0x20000
+
+//item use locations (weapons are not listed in equipment list)
+#define ITEM_LOC_WEAPON    1   //this is a weapon slot (uses thac0 etc)
+#define ITEM_LOC_EQUIPMENT 3   //this slot appears on equipment list
+//other item locations appear useless
+
+//attack types
+#define ITEM_AT_MELEE      1
+#define ITEM_AT_PROJECTILE 2
+#define ITEM_AT_BOW        3
+#define ITEM_AT_MAGIC      4
 
 /**
  * @class ITMExtHeader
@@ -199,6 +210,11 @@ public:
 		}
 		return ext_headers+which;
 	}
+public:
+	//-1 will return the equipping feature block
+	EffectQueue *GetEffectBlock(int usage);
+	//returns the average damage of the weapon (doesn't check for special effects)
+	int GetDamagePotential(int header, bool ranged);
 };
 
 #endif  // ! ITEM_H

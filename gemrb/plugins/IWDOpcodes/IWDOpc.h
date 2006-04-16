@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.h,v 1.1 2006/04/13 18:40:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.h,v 1.2 2006/04/16 23:57:04 avenger_teambg Exp $
  *
  */
 
@@ -28,7 +28,6 @@ class IWDOpc : public OpcodeMgr {
 public:
 	IWDOpc(void);
 	~IWDOpc(void);
-	bool Init(void);
 
 	void release(void)
 	{

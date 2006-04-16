@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.97 2006/01/29 13:40:19 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.98 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -82,8 +82,8 @@ Button::~Button()
 	if (Text) {
 		free( Text );
 	}
-	video->FreePalette( normal_palette );
-	video->FreePalette( disabled_palette );
+	core->FreePalette( normal_palette);
+	core->FreePalette( disabled_palette);
 }
 /** Sets the 'type' Image of the Button to 'img'.
 'type' may assume the following values:
@@ -569,10 +569,8 @@ bool Button::IsPixelTransparent(unsigned short x, unsigned short y)
 // Set palette used for drawing button label in normal state
 void Button::SetTextColor(Color fore, Color back)
 {
-	core->GetVideoDriver()->FreePalette( normal_palette );
-
-	normal_palette = core->GetVideoDriver()->CreatePalette( fore, back );
-
+	core->FreePalette( normal_palette );
+	normal_palette = core->CreatePalette( fore, back );
 	Changed = true;
 }
 

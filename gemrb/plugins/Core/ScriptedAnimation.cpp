@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.28 2006/04/04 21:59:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.29 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -28,8 +28,57 @@
 #include "Video.h"
 #include "Game.h"
 
+ScriptedAnimation::ScriptedAnimation()
+{
+	Init();
+}
+
+void ScriptedAnimation::Init()
+{
+	cover = NULL;
+	anims[0] = NULL;
+	anims[1] = NULL;
+	anims[2] = NULL;
+	palettes[0] = NULL;
+	palettes[1] = NULL;
+	palettes[2] = NULL;
+	sounds[0][0] = 0;
+	sounds[1][0] = 0;
+	sounds[2][0] = 0;
+
+	Transparency = 0;
+	SequenceFlags = 0;
+	XPos = YPos = ZPos = 0;
+	FrameRate = 15;
+	FaceTarget = 0;
+	Duration = 0xffffffff;
+	justCreated = true;
+	PaletteName[0]=0;
+	SetPhase(P_ONSET);
+}
+
+void ScriptedAnimation::Override(ScriptedAnimation *templ)
+{
+	Transparency = templ->Transparency;
+	SequenceFlags = templ->SequenceFlags;
+	XPos = templ->XPos;
+	YPos = templ->YPos;
+	ZPos = templ->ZPos;
+	FrameRate = templ->FrameRate;
+	FaceTarget = templ->FaceTarget;
+	for (unsigned int i=0;i<3;i++) {
+		memcpy(sounds[i],templ->sounds[i],sizeof(ieResRef));
+	}
+	if (templ->Duration!=0xffffffff) {
+		SetDefaultDuration(templ->Duration);
+	}
+	if (templ->PaletteName[0]) {
+		SetFullPalette(templ->PaletteName);
+	}
+}
+
 //prepare the animation before doing anything
-static void PrepareAnimation(Animation *anim, Palette *&palette, ieDword Transparency)
+void ScriptedAnimation::PrepareAnimation(Animation *anim, Palette *&palette, ieDword Transparency)
 {
 	if (Transparency&IE_VVC_MIRRORX) {
 		anim->MirrorAnimation();
@@ -50,9 +99,8 @@ static void PrepareAnimation(Animation *anim, Palette *&palette, ieDword Transpa
 }
 
 /* Creating animation from BAM */
-ScriptedAnimation::ScriptedAnimation(AnimationFactory *af, Point &p, int height)
+void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af)
 {
-	cover = NULL;
 	//getcycle returns NULL if there is no such cycle
 	for(unsigned int i=0;i<3;i++) {
 		anims[i] = af->GetCycle( i );
@@ -74,38 +122,13 @@ ScriptedAnimation::ScriptedAnimation(AnimationFactory *af, Point &p, int height)
 	if (anims[P_RELEASE])
 		anims[P_RELEASE]->Flags |= S_ANI_PLAYONCE;
 
-	Transparency = 0;
-	SequenceFlags = 0;
-	FrameRate = 15;
-	FaceTarget = 0;
-	Duration = 0xffffffff;
-	XPos = p.x;
-	YPos = p.y;
-	ZPos = height;
-	justCreated = true;
 	memcpy(ResName, af->ResRef, 8);
-	SetPhase(P_ONSET);
 }
 
 /* Creating animation from VVC */
-ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
+ScriptedAnimation::ScriptedAnimation(DataStream* stream, ScriptedAnimation *templ, bool autoFree)
 {
-	cover = NULL;
-	anims[0] = NULL;
-	anims[1] = NULL;
-	anims[2] = NULL;
-	palettes[0] = NULL;
-	palettes[1] = NULL;
-	palettes[2] = NULL;
-	sounds[0][0] = 0;
-	sounds[1][0] = 0;
-	sounds[2][0] = 0;
-
-	Transparency = 0;
-	SequenceFlags = 0;
-	XPos = YPos = ZPos = 0;
-	FrameRate = 15;
-	FaceTarget = 0;
+	Init();
 	if (!stream) {
 		return;
 	}
@@ -131,7 +154,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 	stream->Seek( 4, GEM_CURRENT_POS );
 	ieDword tmp;
 	stream->ReadDword( &tmp );
-	XPos = (signed) tmp;
+	XPos = templ->XPos+(signed) tmp;
 	stream->ReadDword( &tmp );  //this affects visibility
 	ZPos = (signed) tmp;
 	stream->Seek( 4, GEM_CURRENT_POS );
@@ -139,11 +162,12 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 	stream->ReadDword( &FaceTarget );
 	stream->Seek( 16, GEM_CURRENT_POS );
 	stream->ReadDword( &tmp );  //this doesn't affect visibility
-	YPos = (signed) tmp;
+	YPos = templ->YPos+(signed) tmp;
 	stream->Seek( 12, GEM_CURRENT_POS );
 	stream->ReadDword( &Duration );
 	stream->Seek( 8, GEM_CURRENT_POS );
 	stream->ReadDword( &seq1 );
+	if (seq1>0) seq1--; //hack but apparently it works this way
 	stream->ReadDword( &seq2 );
 	stream->Seek( 8, GEM_CURRENT_POS );
 	stream->ReadResRef( sounds[P_ONSET] );
@@ -152,6 +176,12 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 	stream->ReadDword( &seq3 );
 	stream->ReadResRef( sounds[P_RELEASE] );
 
+	if (templ->SequenceFlags&IE_VVC_BAM) {
+		seq1=0;
+		seq2=1;
+		seq3=2;
+		SequenceFlags|=IE_VVC_BAM;
+	}
 	if (SequenceFlags&IE_VVC_BAM) {
 		AnimationFactory* af = ( AnimationFactory* )
 			core->GetResourceMgr()->GetFactoryResource( Anim1ResRef, IE_BAM_CLASS_ID );
@@ -188,8 +218,6 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 		}
 	}
 
-	justCreated = true;
-
 	//copying resource name to the object, so it could be referenced by it
 	//used by immunity/remove specific animation
 	memcpy(ResName, stream->filename, 8);
@@ -197,6 +225,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 		if (ResName[i]=='.') ResName[i]=0;
 	}
 	SetPhase(P_ONSET);
+	PaletteName[0]=0;
 
 	if (autoFree) {
 		delete( stream );
@@ -205,13 +234,11 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 
 ScriptedAnimation::~ScriptedAnimation(void)
 {
-	Video *video = core->GetVideoDriver();
-
 	for(unsigned int i=0;i<3;i++) {
 		if (anims[i]) {
 			delete( anims[i] );
 		}
-		video->FreePalette(palettes[i]);
+		core->FreePalette(palettes[i], PaletteName);
 	}
 }
 
@@ -226,6 +253,33 @@ void ScriptedAnimation::SetSound(int arg, const ieResRef sound)
 {
 	if (arg>=0 && arg<=2)
 		memcpy(sounds[arg],sound,sizeof(sound));
+}
+
+void ScriptedAnimation::SetFullPalette(const ieResRef PaletteResRef)
+{
+	unsigned int i;
+
+	for(i=0;i<3;i++) {
+		if (!anims[i]) {
+			continue;
+		}
+		if (palettes[i]) {
+			core->FreePalette(palettes[i], PaletteName);
+		}
+		
+		palettes[i]=core->GetPalette(PaletteResRef);
+	}
+	memcpy(PaletteName, PaletteResRef, sizeof(PaletteName) );
+}
+
+void ScriptedAnimation::SetFullPalette(int idx)
+{
+	ieResRef PaletteResRef;
+
+	snprintf(PaletteResRef,8,"%.7s%d",ResName, idx);
+	strlwr(PaletteResRef);
+
+	SetFullPalette(PaletteResRef);
 }
 
 void ScriptedAnimation::SetPalette(int gradient, int start)
@@ -252,6 +306,13 @@ void ScriptedAnimation::SetPalette(int gradient, int start)
 		}
 	}
 	free( NewPal );
+}
+
+void ScriptedAnimation::SetDefaultDuration(ieDword duration)
+{
+	if (Duration==0xffffffff) {
+		Duration = duration;
+	}
 }
 
 //it is not sure if we need tint at all
@@ -321,4 +382,15 @@ retry:
 
 	video->BlitGameSprite( frame, cx + screen.x, cy + screen.y, flag, tint, cover, palettes[Phase], &screen);
 	return false;
+}
+
+void ScriptedAnimation::SetBlend()
+{
+	Transparency |= IE_VVC_BLENDED;
+
+	for(unsigned int i=0;i<3;i++) {
+		if (anims[i]) {
+			PrepareAnimation(anims[i], palettes[i], IE_VVC_BLENDED);
+		}
+	}
 }

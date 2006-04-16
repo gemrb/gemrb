@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.39 2006/01/29 13:40:19 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.40 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -126,6 +126,7 @@ public:
 	unsigned int AvatarsRowNum;
 	unsigned char ArmorType, WeaponType, RangedType;
 	ieResRef ResRef;
+	ieResRef PaletteResRef;
 	unsigned char nextStanceID;
 	bool autoSwitchOnEnd;
 public:

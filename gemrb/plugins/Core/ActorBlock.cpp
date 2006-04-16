@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.139 2006/04/08 18:40:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.140 2006/04/16 23:57:02 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -103,10 +103,11 @@ char* Scriptable::GetScriptName(void)
 
 Map* Scriptable::GetCurrentArea()
 {
-	if (area)
-		return area;
-	printMessage("Map","Scriptable object has no area!!!\n", LIGHT_RED);
-	abort();
+	//removed currentarea abort (casting glow/spell hit are delayed based on this)
+	if (!area) {
+		printMessage("Scriptable","No current area", YELLOW);
+	}
+	return area;
 }
 
 void Scriptable::SetMap(Map *map)
@@ -188,7 +189,7 @@ void Scriptable::DrawOverheadText(Region &screen)
 			overHeadColor.b=time;
 			overHeadColor.r=time;
 			overHeadColor.g=time;
-			palette = core->GetVideoDriver()->CreatePalette(overHeadColor,black);
+			palette = core->CreatePalette(overHeadColor,black);
 		}
 	}
 
@@ -200,7 +201,8 @@ void Scriptable::DrawOverheadText(Region &screen)
 	Region rgn( Pos.x-100+screen.x, Pos.y - cs + screen.y, 200, 400 );
 	font->Print( rgn, ( unsigned char * ) overHeadText,
 		palette?palette:core->InfoTextPalette, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false );
-	core->GetVideoDriver()->FreePalette(palette);
+	//core->GetVideoDriver()->FreePalette(palette);
+	core->FreePalette(palette);
 }
 
 void Scriptable::ImmediateEvent()
@@ -282,11 +284,11 @@ void Scriptable::ReleaseCurrentAction()
 	}
 }
 
-void Scriptable::ProcessActions()
+void Scriptable::ProcessActions(bool force)
 {
 	unsigned long thisTime = core->GetGame()->Ticks;
 	//GetTime( thisTime );
-	if (( thisTime - startTime ) < interval) {
+	if (!force && (( thisTime - startTime ) < interval)) {
 		return;
 	}
 	startTime = thisTime;
@@ -487,10 +489,10 @@ void Selectable::DrawCircle(Region &vp)
 	}
 
 	if (sprite) {
-	  core->GetVideoDriver()->BlitSprite( sprite, Pos.x - vp.x, Pos.y - vp.y, true );
+		core->GetVideoDriver()->BlitSprite( sprite, Pos.x - vp.x, Pos.y - vp.y, true );
 	}
 	else {
-	  core->GetVideoDriver()->DrawEllipse( Pos.x - vp.x, Pos.y - vp.y,
+		core->GetVideoDriver()->DrawEllipse( Pos.x - vp.x, Pos.y - vp.y,
 		size * 10, ( ( size * 15 ) / 2 ), *col );
 	}
 }
@@ -1207,8 +1209,11 @@ bool InfoPoint::Entered(Actor *actor)
 	if (outline->PointIn( actor->Pos ) ) {
 		goto check;
 	}
+	if (Distance(Pos, actor->Pos)<MAX_OPERATING_DISTANCE) {
+		goto check;
+	}
 	if (Flags&TRAP_USEPOINT) {
-		if (Distance(UsePoint, actor->Pos)<14) {
+		if (Distance(UsePoint, actor->Pos)<MAX_OPERATING_DISTANCE) {
 			goto check;
 		}
 	}

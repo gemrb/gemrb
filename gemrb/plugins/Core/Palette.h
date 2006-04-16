@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Palette.h,v 1.2 2006/01/28 19:56:34 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Palette.h,v 1.3 2006/04/16 23:57:02 avenger_teambg Exp $
  */
 
 #ifndef PALETTE_H
@@ -45,16 +45,18 @@ public:
 		}
 		alpha = alpha_;
 		refcount = 1;
+		named = false;
 	}
 	Palette() {
 		alpha = false;
 		refcount = 1;
+		named = false;
 	}
 	~Palette() { }
 
 	Color col[256]; //< RGB or RGBA 8 bit palette
-//	Uint32 syscol[256]; //< palette converted to display format
 	bool alpha; //< true if this is a RGBA palette
+	bool named; //< true if the palette comes from a bmp and cached
 
 	void IncRef() {
 		refcount++;

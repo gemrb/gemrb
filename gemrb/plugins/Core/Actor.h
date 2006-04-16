@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.112 2006/04/12 20:32:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.113 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -33,6 +33,7 @@
 #include "ScriptedAnimation.h"
 #include "ActorBlock.h"
 #include "EffectQueue.h"
+#include "PCStatStruct.h"
 
 class Map;
 class SpriteCover;
@@ -52,13 +53,11 @@ class ScriptedAnimation;
 
 /** USING DEFINITIONS AS DESCRIBED IN STATS.IDS */
 #include "../../includes/ie_stats.h"
-#include "../../includes/ie_types.h"
 
 #include "Inventory.h"
 #include "Spellbook.h"
 
 #define MAX_STATS 256
-#define MAX_PORTRAIT_ICONS 12
 
 //modal states
 #define MS_NONE        0
@@ -100,34 +99,6 @@ class ScriptedAnimation;
 #define GUIBT_COUNT  12
 
 typedef ieByte ActionButtonRow[GUIBT_COUNT];
-
-class GEM_EXPORT PCStatsStruct {
-public:
-	ieStrRef  BestKilledName;
-	ieDword   BestKilledXP;
-	ieDword   AwayTime;
-	ieDword   JoinDate;
-	ieDword   unknown10;
-	ieDword   KillsChapterXP;
-	ieDword   KillsChapterCount;
-	ieDword   KillsTotalXP;
-	ieDword   KillsTotalCount;
-	ieResRef  FavouriteSpells[4];
-	ieWord    FavouriteSpellsCount[4];
-	ieResRef  FavouriteWeapons[4];
-	ieWord    FavouriteWeaponsCount[4];
-	ieResRef  SoundSet;
-	char      SoundFolder[33];
-	ieResRef  QuickSpells[9];     //iwd2 uses 9, others use only 3
-	ieWord	  QuickWeaponSlots[8];//iwd2 uses 8, others use only 4
-	ieWord	  QuickItemSlots[5];  //pst has 5, others use only 3
-	ieByte    QSlots[9];          //iwd2 specific
-	ieByte    QuickSpellClass[9];
-	ieWord    PortraitIcons[MAX_PORTRAIT_ICONS];
-public:
-	PCStatsStruct();
-	void IncrementChapter();
-};
 
 typedef std::vector< ScriptedAnimation*> vvcVector;
 
@@ -327,6 +298,8 @@ public:
 	/* drops items from inventory to current spot */
 	void DropItem(const ieResRef resref, unsigned int flags);
 	void DropItem(int slot, unsigned int flags);
+	/* updates quickslots */
+	void ReinitQuickSlots();
 	/* returns true if the actor is PC/joinable*/
 	bool Persistent();
 	/* assigns actor to party slot, 0 = NPC, areas won't remove it */
@@ -383,7 +356,7 @@ public:
 	/* draw videocells */
 	void DrawVideocells(Region &screen, vvcVector &vvcCells, Color &tint);
 
-	void add_animation(const ieResRef resource, Point &offset, int gradient, int height);
+	void add_animation(const ieResRef resource, int gradient, int height);
 	void PlayDamageAnimation(int x);
 	/* restores a spell of maximum maxlevel level, type is a mask of disabled spells */
 	int RestoreSpellLevel(ieDword maxlevel, ieDword typemask);

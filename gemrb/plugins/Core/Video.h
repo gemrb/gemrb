@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.60 2006/04/06 21:03:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.61 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -140,10 +140,6 @@ public:
 	/** Draws a line segment */
 	virtual void DrawLine(short x1, short y1, short x2, short y2,
 		Color& color) = 0;
-	/** Frees a Palette */
-	virtual void FreePalette(Palette *&palette);
-	/** Creates a Palette from Color */
-	virtual Palette* CreatePalette(Color color, Color back);
 	/** Blits a Sprite filling the Region */
 	virtual void BlitTiled(Region rgn, Sprite2D* img, bool anchor = false) = 0;
 	/** Set Event Manager */

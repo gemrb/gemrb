@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.395 2006/04/14 20:24:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.396 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -236,6 +236,14 @@ static void ReleaseEffect(void *poi)
 	delete ((Effect *) poi);
 }
 
+static void ReleasePalette(void *poi)
+{
+	//we allow nulls, but we shouldn't release them
+	if (!poi) return;
+	//as long as palette has its own refcount, this should be Release
+	((Palette *) poi)->Release();
+}
+
 void FreeAbilityTables()
 {
 	if (strmod) {
@@ -264,6 +272,14 @@ void FreeAbilityTables()
 	chrmod = NULL;
 }
 
+void Interface::FreeResRefTable(ieResRef *&table, int &count)
+{
+	if (table) {
+		free( table );
+		count = -1;
+	}
+}
+
 Interface::~Interface(void)
 {
 	FreeAbilityTables();
@@ -288,10 +304,14 @@ Interface::~Interface(void)
 	ItemCache.RemoveAll(ReleaseItem);
 	SpellCache.RemoveAll(ReleaseSpell);
 	EffectCache.RemoveAll(ReleaseEffect);
+	PaletteCache.RemoveAll(ReleasePalette);
+
+	FreeResRefTable(DefSound, DSCount);
+	/*
 	if (DefSound) {
 		free( DefSound );
 		DSCount = -1;
-	}
+	}*/
 
 	if (slottypes) {
 		free( slottypes );
@@ -365,7 +385,7 @@ Interface::~Interface(void)
 			delete[] TooltipBack;
 		}
 		if (InfoTextPalette) {
-			video->FreePalette(InfoTextPalette);
+			FreePalette(InfoTextPalette);
 		}
 		FreeInterface( video );
 	}
@@ -596,7 +616,7 @@ void Interface::Main()
 	GetTime(timebase);
 	double frames = 0.0;
 	Region bg( 0, 0, 100, 30 );
-	Palette* palette = video->CreatePalette( fpscolor, fpsblack );
+	Palette* palette = CreatePalette( fpscolor, fpsblack );
 	do {
 		//don't change script when quitting is pending
 
@@ -620,7 +640,7 @@ void Interface::Main()
 						IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true );
 		}
 	} while (video->SwapBuffers() == GEM_OK);
-	video->FreePalette( palette );
+	FreePalette( palette );
 }
 
 bool Interface::ReadStrrefs()
@@ -642,6 +662,32 @@ bool Interface::ReadStrrefs()
 end:
 	DelTable(table);
 	return true;
+}
+
+int Interface::ReadResRefTable(const ieResRef tablename, ieResRef *&data)
+{
+	int count = 0;
+
+	if (data) {
+		free(data);
+		data = NULL;
+	}
+	int table = LoadTable( tablename );
+	if (table < 0) {
+		printStatus( "ERROR", LIGHT_RED );
+		printf( "Cannot find %s.2da.\n",tablename );
+		return 0;
+	}
+	TableMgr* tm = GetTable( table );
+	if (tm) {
+		count = tm->GetRowCount();
+		data = (ieResRef *) calloc( count, sizeof(ieResRef) );
+		for (int i = 0; i < count; i++) {
+			strnlwrcpy( data[i], tm->QueryField( i, 0 ), 8 );
+		}
+		DelTable( table );
+	}
+	return count;
 }
 
 int Interface::Init()
@@ -805,21 +851,11 @@ int Interface::Init()
 	}
 
 	printMessage( "Core", "Initializing stock sounds...", WHITE );
-	table = LoadTable( "defsound" );
-	if (table < 0) {
+	ReadResRefTable ("defsound", DefSound);
+	if (DSCount == 0) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "Cannot find defsound.2da.\nTermination in Progress...\n" );
 		goto end_of_init;
-	} else {
-		TableMgr* tm = GetTable( table );
-		if (tm) {
-			DSCount = tm->GetRowCount();
-			DefSound = (ieResRef *) calloc( DSCount, sizeof(ieResRef) );
-			for (int i = 0; i < DSCount; i++) {
-				strnlwrcpy( DefSound[i], tm->QueryField( i, 0 ), 8 );
-			}
-			DelTable( table );
-		}
 	}
 
 	printMessage( "Core", "Loading Fonts...\n", WHITE );
@@ -852,9 +888,9 @@ int Interface::Init()
 				if (!strnicmp( TooltipFont, ResRef, 8) ) {
 					fore = TooltipColor;
 				}
-				Palette* pal = video->CreatePalette( fore, back );
+				Palette* pal = CreatePalette( fore, back );
 				fnt->SetPalette(pal);
-				video->FreePalette( pal );
+				FreePalette( pal );
 			}
 			fnt->SetFirstChar( first_char );
 			fonts.push_back( fnt );
@@ -1864,6 +1900,88 @@ bool Interface::LoadGemRBINI()
 	return true;
 }
 
+Palette *Interface::GetPalette(const ieResRef resname)
+{
+	Palette *palette = (Palette *) PaletteCache.GetResource(resname);
+	if (palette) {
+		return palette;
+	}
+	//additional hack for allowing NULL's
+	if (PaletteCache.RefCount(resname)!=-1) {
+		return NULL;
+	}
+	DataStream* str = key->GetResource( resname, IE_BMP_CLASS_ID );
+	ImageMgr* im = ( ImageMgr* ) GetInterface( IE_BMP_CLASS_ID );
+	if (im == NULL) {
+		delete ( str );
+		return NULL;
+	}
+	if (!im->Open( str, true )) {
+		PaletteCache.SetAt(resname, NULL);
+		FreeInterface( im );
+		return NULL;
+	}
+
+	palette = new Palette();
+	im->GetPalette(0,256,palette->col);
+	FreeInterface( im );
+	palette->named=true;
+	PaletteCache.SetAt(resname, (void *) palette);
+	return palette;
+}
+
+Palette* Interface::CreatePalette(Color color, Color back)
+{
+	Palette* pal = new Palette();
+	pal->col[0].r = 0;
+	pal->col[0].g = 0xff;
+	pal->col[0].b = 0;
+	pal->col[0].a = 0;
+	for (int i = 1; i < 256; i++) {
+		pal->col[i].r = back.r +
+			( unsigned char ) ( ( ( color.r - back.r ) * ( i ) ) / 255.0 );
+		pal->col[i].g = back.g +
+			( unsigned char ) ( ( ( color.g - back.g ) * ( i ) ) / 255.0 );
+		pal->col[i].b = back.b +
+			( unsigned char ) ( ( ( color.b - back.b ) * ( i ) ) / 255.0 );
+		pal->col[i].a = 0;
+	}
+	return pal;
+}
+
+void Interface::FreePalette(Palette *&pal, const ieResRef name)
+{
+	int res;
+
+	if (!pal) {
+		return;
+	}
+	if (!name || !name[0]) {
+		if(pal->named) {
+			printf("Palette is supposed to be named, but got no name!\n");
+			abort();
+		} else {
+			pal->Release();
+			pal=NULL;
+		}
+		return;
+	}
+	if (!pal->named) {
+		printf("Unnamed palette, it should be %s!\n", name);
+		abort();
+	}
+	res=PaletteCache.DecRef((void *) pal, name, true);
+	if (res<0) {
+		printMessage( "Core", "Corrupted Palette cache encountered (reference count went below zero), ", LIGHT_RED );
+		printf( "Palette name is: %.8s\n", name);
+		abort();
+	}
+	if (!res) {
+		pal->Release();
+	}
+	pal = NULL;
+}
+
 /** No descriptions */
 Color* Interface::GetPalette(int index, int colors)
 {
@@ -2849,7 +2967,7 @@ int Interface::PlayMovie(const char* ResRef)
 			if (SubtitleFont) {
 				Color fore = {r,g,b, 0x00};
 				Color back = {0x00, 0x00, 0x00, 0x00};
-				palette = video->CreatePalette( fore, back );
+				palette = CreatePalette( fore, back );
 			}
 		}
 	}
@@ -2862,7 +2980,7 @@ int Interface::PlayMovie(const char* ResRef)
 	mp->CallBackAtFrames(cnt, frames, strrefs);
 	mp->Play();
 	FreeInterface( mp );
-	video->FreePalette( palette );
+	core->FreePalette( palette );
 	if (frames)
 		free(frames);
 	if (strrefs)
@@ -3020,6 +3138,11 @@ void Interface::QuitGame(bool BackToMain)
 
 	DelWindow(0xffff); //delete all windows, including GameControl
 
+	//shutting down ingame music 
+	//(do it before deleting the game)
+	if (music) music->HardEnd();
+	// stop any ambients which are still enqueued
+	soundmgr->GetAmbientMgr()->deactivate(); 
 	//delete game, worldmap
 	if (game) {
 		delete game;
@@ -3029,10 +3152,6 @@ void Interface::QuitGame(bool BackToMain)
 		delete worldmap;
 		worldmap=NULL;
 	}
-	//shutting down ingame music
-	if (music) music->HardEnd();
-	// stop any ambients which are still enqueued
-	soundmgr->GetAmbientMgr()->deactivate(); 
 	if (BackToMain) {
 		strcpy(NextScript, "Start");
 		QuitFlag |= QF_CHANGESCRIPT;
@@ -3220,23 +3339,28 @@ bool Interface::InitItemTypes()
 		SlotTypes = st->GetRowCount();
 		//make sure unsigned int is 32 bits
 		slottypes = (SlotType *) malloc(SlotTypes * sizeof(SlotType) );
-		for (unsigned int i = 0; i < SlotTypes; i++) {
-			slottypes[i].slot = (ieDword) strtol(st->GetRowName(i),NULL,0 );
-			slottypes[i].slottype = (ieDword) strtol(st->QueryField(i,0),NULL,0 );
-			slottypes[i].slotid = (ieDword) strtol(st->QueryField(i,1),NULL,0 );
-			slottypes[i].slottip = (ieDword) strtol(st->QueryField(i,3),NULL,0 );
-			slottypes[i].sloteffects = (ieDword) strtol(st->QueryField(i,4),NULL,0 );
-			strnlwrcpy( slottypes[i].slotresref, st->QueryField(i,2), 8 );
+		for (unsigned int row = 0; row < SlotTypes; row++) {
+			unsigned int i = (ieDword) strtol(st->GetRowName(row),NULL,0 );
+			if (i>=SlotTypes) continue;
+			slottypes[row].slot = i;
+			slottypes[i].slottype = (ieDword) strtol(st->QueryField(row,0),NULL,0 );
+			slottypes[i].slotid = (ieDword) strtol(st->QueryField(row,1),NULL,0 );
+			slottypes[i].slottip = (ieDword) strtol(st->QueryField(row,3),NULL,0 );
+			slottypes[i].sloteffects = (ieDword) strtol(st->QueryField(row,4),NULL,0 );
+			strnlwrcpy( slottypes[i].slotresref, st->QueryField(row,2), 8 );
 			//setting special slots
+			if (slottypes[i].slottype&SLOT_ITEM) {
+				Inventory::SetQuickSlot(i);
+			}
 			switch (slottypes[i].sloteffects) {
 				//fist slot, not saved, default weapon
-				case 2: Inventory::SetFistSlot(slottypes[i].slot); break;
+				case SLOT_EFFECT_FIST: Inventory::SetFistSlot(i); break;
 				//magic weapon slot, overrides all weapons
-				case 3: Inventory::SetMagicSlot(slottypes[i].slot); break;
+				case SLOT_EFFECT_MAGIC: Inventory::SetMagicSlot(i); break;
 				//weapon slot, Equipping marker is relative to it
-				case 4: Inventory::SetWeaponSlot(slottypes[i].slot); break;
+				case SLOT_EFFECT_MELEE: Inventory::SetWeaponSlot(i); break;
 				//ranged slot
-				case 5: Inventory::SetRangedSlot(slottypes[i].slot); break;
+				case SLOT_EFFECT_MISSILE: Inventory::SetRangedSlot(i); break;
 				default:;
 			}
 		}
@@ -3244,6 +3368,15 @@ bool Interface::InitItemTypes()
 	}
 	return (it && st);
 }
+/*
+int Interface::QuerySlotLookup(unsigned int idx) const
+{
+	if (idx>=SlotTypes) {
+		return 0;
+	}
+	return slottypes[idx].lookup;
+}
+*/
 
 int Interface::QuerySlot(unsigned int idx) const
 {
@@ -4029,15 +4162,21 @@ bool Interface::Exists(const char *ResRef, SClass_ID type)
 	return key->HasResource( ResRef, type );
 }
 
-ScriptedAnimation* Interface::GetScriptedAnimation( const char *effect, Point &position, int height)
+ScriptedAnimation* Interface::GetScriptedAnimation( const char *effect, ScriptedAnimation *templ)
 {
 	if (Exists( effect, IE_VVC_CLASS_ID ) ) {
 		DataStream *ds = key->GetResource( effect, IE_VVC_CLASS_ID );
-		return new ScriptedAnimation( ds, true);
+		return new ScriptedAnimation(ds, templ, true);    
 	}
 	AnimationFactory *af = (AnimationFactory *)
 		key->GetFactoryResource( effect, IE_BAM_CLASS_ID, IE_NORMAL );
-	return new ScriptedAnimation( af, position, height);
+	if (af) {
+		ScriptedAnimation *ret=new ScriptedAnimation();
+		if (templ) ret->Override(templ);
+		ret->LoadAnimationFactory( af);
+		return ret;
+	}
+	return NULL;
 }
 
 Actor *Interface::GetFirstSelectedPC()
@@ -4373,10 +4512,10 @@ void Interface::RegisterOpcodes(int count, EffectRef *opcodes)
 
 void Interface::SetInfoTextColor(Color &color)
 {
-	Color black = {0x00,0x00,0x00,0xff};
+	static Color black = {0x00,0x00,0x00,0xff};
 	if (InfoTextPalette) {
-		video->FreePalette(InfoTextPalette);
+		FreePalette(InfoTextPalette);
 	}
-	InfoTextPalette = video->CreatePalette(color,black);
+	InfoTextPalette = CreatePalette(color,black);
 }
 

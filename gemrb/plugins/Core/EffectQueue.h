@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.26 2006/04/12 20:32:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.27 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -155,6 +155,7 @@ public:
 	void RemoveAllEffects(ieResRef Removed);
 	void RemoveAllEffects(EffectRef &effect_reference);
 	void RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword param2);
+	void RemoveAllEffectsWithResource(EffectRef &effect_reference, const ieResRef resource);
 	void RemoveLevelEffects(ieDword level, ieDword flags, ieDword match);
 	Effect *GetEffect(ieDword idx) const;
 	/* returns next saved effect, increases index */
@@ -167,7 +168,7 @@ public:
 	Effect *HasEffect(EffectRef &effect_reference);
 	Effect *HasEffectWithParam(EffectRef &effect_reference, ieDword param2);
 	Effect *HasEffectWithParamPair(EffectRef &effect_reference, ieDword param1, ieDword param2);
-	Effect *HasEffectWithResource(EffectRef &effect_reference, ieResRef resource);
+	Effect *HasEffectWithResource(EffectRef &effect_reference, const ieResRef resource);
 	bool HasAnyDispellableEffect() const;
 
 	//getting summarised effects
@@ -182,11 +183,12 @@ public:
 private:
 	//use the effect reference style calls from outside
 	void RemoveAllEffects(ieDword opcode);
+	void RemoveAllEffectsWithResource(ieDword opcode, const ieResRef resource);
 	void RemoveAllEffectsWithParam(ieDword opcode, ieDword param2);
 	Effect *HasOpcode(ieDword opcode) const;
 	Effect *HasOpcodeWithParam(ieDword opcode, ieDword param2) const;
 	Effect *HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDword param2) const;
-	Effect *HasOpcodeWithResource(ieDword opcode, ieResRef resource) const;
+	Effect *HasOpcodeWithResource(ieDword opcode, const ieResRef resource) const;
 	int BonusAgainstCreature(ieDword opcode, Actor *actor) const;
 };
 

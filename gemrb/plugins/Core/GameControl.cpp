@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.285 2006/04/08 18:40:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.286 2006/04/16 23:57:02 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -209,11 +209,11 @@ void GameControl::QuickSave()
 
 	int SlotTable = core->LoadTable( "savegame" );
 	if (SlotTable >= 0) {
-	        TableMgr* tab = core->GetTable( SlotTable );
-                folder = tab->QueryField(1);
+		TableMgr* tab = core->GetTable( SlotTable );
+		folder = tab->QueryField(1);
 		core->GetSaveGameIterator()->CreateSaveGame(1, folder, mqs == 1);
 		if (SlotTable >= 0) {
-		        core->DelTable(SlotTable);
+			core->DelTable(SlotTable);
 		}
 	}
 }
@@ -928,7 +928,7 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 					trap->ImmediateEvent();
 					//directly feeding the event, even if there are actions in the queue
 					trap->Scripts[0]->Update();
-					trap->ProcessActions();
+					trap->ProcessActions(true);
 					//if reset trap flag not set, deactivate it
 					//hmm, better not, info triggers don't deactivate themselves on click
 					//if (!(trap->Flags&TRAP_RESET)) {
@@ -1697,7 +1697,7 @@ end_of_choose:
 	}
 	// is this correct?
 	if (DialogueFlags & DF_FREEZE_SCRIPTS) {
-		target->ProcessActions();
+		target->ProcessActions(true);
 		//clear queued actions that remained stacked?
 		target->ClearActions();
 	}
@@ -1806,8 +1806,8 @@ Sprite2D* GameControl::GetScreenshot(bool show_gui)
 Sprite2D* GameControl::GetPreview()
 {
 	// We get preview by first taking a screenshot of size 640x405,
-	//   centered in the display. This is to get a decent picture for
-	//   higher screen resolutions. 
+	// centered in the display. This is to get a decent picture for
+	// higher screen resolutions. 
 	// FIXME: how do orig games solve that?
 	Video* video = core->GetVideoDriver();
 	int w = video->GetWidth();
@@ -1849,7 +1849,7 @@ Sprite2D* GameControl::GetPortraitPreview(int pcslot)
 {
 	/** Portrait shrink ratio */
 	// FIXME: this is just a random PST specific trait
-	//   you can make it less random with a new feature bit
+	// you can make it less random with a new feature bit
 	int ratio = (core->HasFeature( GF_ONE_BYTE_ANIMID )) ? 1 : 2;
 
 	Video *video = core->GetVideoDriver();

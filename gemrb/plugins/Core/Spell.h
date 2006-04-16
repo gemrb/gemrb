@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spell.h,v 1.13 2005/10/20 23:13:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spell.h,v 1.14 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -33,7 +33,6 @@
 #include "../../includes/ie_types.h"
 
 #include "AnimationMgr.h"
-#include "Effect.h"
 #include "EffectQueue.h"
 
 #ifdef WIN32
@@ -142,10 +141,8 @@ public:
 	// IWD2 only
 	char unknown13[16];
 
-//	AnimationMgr* SpellIconBAM;
 public:
 	//-1 will return the cfb
-	EffectQueue *GetEffectQueue(int index);
 	EffectQueue *GetEffectBlock(int wanted_level);
 };
 

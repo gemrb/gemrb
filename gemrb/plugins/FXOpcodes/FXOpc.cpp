@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.19 2006/04/14 20:23:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.20 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -42,6 +42,13 @@
 #define COND_ATTACKED 7
 #define COND_HIT 8
 #define COND_ALWAYS 9
+
+static ieResRef *casting_glows = NULL;
+static int cgcount = -1;
+static ieResRef *spell_hits = NULL;
+static int shcount = -1;
+//static Color sparkle_rgb[12][5];
+static ScriptedAnimation default_spell_hit;
 
 int fx_ac_vs_damage_type_modifier (Actor* Owner, Actor* target, Effect* fx);//00
 int fx_attacks_per_round_modifier (Actor* Owner, Actor* target, Effect* fx);//01
@@ -303,13 +310,13 @@ int fx_store_spell_sequencer (Actor* Owner, Actor* target, Effect* fx);//0x100
 int fx_create_spell_sequencer (Actor* Owner, Actor* target, Effect* fx);//101
 int fx_activate_spell_sequencer (Actor* Owner, Actor* target, Effect* fx);//102
 int fx_spelltrap (Actor* Owner, Actor* target, Effect* fx);//103
-//104 //crashes so far
+int fx_crash (Actor* Owner, Actor* target, Effect* fx);//104, disabled
 int fx_restore_spell_level (Actor* Owner, Actor* target, Effect* fx);//105
 int fx_visual_range_modifier (Actor* Owner, Actor* target, Effect* fx);//106
 int fx_backstab_modifier (Actor* Owner, Actor* target, Effect* fx);//107
 int fx_drop_weapon (Actor* Owner, Actor* target, Effect* fx);//108
 int fx_modify_global_variable (Actor* Owner, Actor* target, Effect* fx);//109
-//10a unknown
+int fx_remove_immunity (Actor* Owner, Actor* target, Effect* fx);//10a
 int fx_protection_from_string (Actor* Owner, Actor* target, Effect* fx);//10b
 int fx_explore_modifier (Actor* Owner, Actor* target, Effect* fx);//10c
 int fx_screenshake (Actor* Owner, Actor* target, Effect* fx);//10d
@@ -355,7 +362,7 @@ int fx_stat195_modifier (Actor* Owner, Actor* target, Effect* fx);//134
 int fx_modify_local_variable (Actor* Owner, Actor* target, Effect* fx);//135
 int fx_timeless_modifier (Actor* Owner, Actor* target, Effect* fx);//136
 int fx_generate_wish (Actor* Owner, Actor* target, Effect* fx);//137
-//138 crash
+//138 see fx_crash
 //139 HLA generic effect
 int fx_golem_stoneskin_modifier (Actor* Owner, Actor* target, Effect* fx);//13a
 int fx_avatar_removal_modifier (Actor* Owner, Actor* target, Effect* fx);//13b
@@ -364,6 +371,7 @@ int fx_improved_haste_state (Actor* Owner, Actor* target, Effect* fx);//13d
 
 // FIXME: Make this an ordered list, so we could use bsearch!
 static EffectRef effectnames[] = {
+	{ "*Crash*", fx_crash, 0 },
 	{ "AcidResistanceModifier", fx_acid_resistance_modifier, 0 },
 	{ "ACVsCreatureType", fx_generic_effect, 0 }, //0xdb
 	{ "ACVsDamageTypeModifier", fx_ac_vs_damage_type_modifier, 0 },
@@ -590,6 +598,7 @@ static EffectRef effectnames[] = {
 	{ "Reveal:Magic", fx_reveal_magic, 0 },
 	{ "Reveal:Tracks", fx_reveal_tracks, 0 },
 	{ "RemoveCurse", fx_remove_curse, 0 },
+	{ "RemoveImmunity", fx_remove_immunity, 0 },
 	{ "RemoveProjectile", fx_remove_area_effect, 0 },
 	{ "RenableButton", fx_renable_button, 0 },  //removes disable button flag
 	{ "RemoveCreature", fx_remove_creature, 0 },
@@ -685,15 +694,13 @@ static EffectRef effectnames[] = {
 FXOpc::FXOpc(void)
 {
 	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectRef ) - 1, effectnames );
+	default_spell_hit.SequenceFlags|=IE_VVC_BAM;
 }
 
 FXOpc::~FXOpc(void)
 {
-}
-
-bool FXOpc::Init(void)
-{
-	return true;
+	core->FreeResRefTable(casting_glows, cgcount);
+	core->FreeResRefTable(spell_hits, shcount);
 }
 
 // Helper macros and functions for effect opcodes
@@ -799,8 +806,7 @@ bool SummonCreature(ieResRef resource, ieResRef vvcres, Actor *Owner, Actor *tar
 
 	ab->SetPosition(map, position, true, 0);
 	if (vvcres[0]) {
-		Point p(0,0);
-		ScriptedAnimation* vvc = core->GetScriptedAnimation(vvcres, p, 0);
+		ScriptedAnimation* vvc = core->GetScriptedAnimation(vvcres, NULL);
 		map->AddVVCCell( vvc );
 	}
 	return true;
@@ -1329,7 +1335,9 @@ int fx_remove_curse (Actor* /*Owner*/, Actor* target, Effect* fx)
 			if (fx->Resource[0] && strnicmp(target->inventory.GetSlotItem(i)->ItemResRef, fx->Resource,8) ) {
 				continue;
 			}
-			target->inventory.UnEquipItem(i,true);
+			if (target->inventory.UnEquipItem(i,true)) {
+				//
+			}
 		}
 	}
 	//this could also be done, but not implemented yet
@@ -2301,14 +2309,19 @@ int fx_create_magic_item (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_remove_item (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	//will destroy the first item
-	target->inventory.DestroyItem(fx->Resource,0,1);
+	if (target->inventory.DestroyItem(fx->Resource,0,1)) {
+		target->ReinitQuickSlots();
+	}
 	return FX_NOT_APPLIED;
 }
 
 //0x71 Item:Equip
 int fx_equip_item (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	target->inventory.EquipItem(fx->Parameter2, true);
+	if (core->QuerySlotEffects( fx->Parameter2 )) {
+		target->inventory.EquipItem(fx->Parameter2);
+	}
+	target->ReinitQuickSlots();
 	return FX_NOT_APPLIED;
 }
 //0x72 Dither
@@ -2608,21 +2621,72 @@ int fx_animation_stance (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_display_string (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_display_string (%2d): StrRef: %d\n", fx->Opcode, fx->Parameter1 );
-	core->DisplayConstantStringName(fx->Parameter1, fx->Parameter2?fx->Parameter2:0xffffff, target);
+	core->DisplayStringName(fx->Parameter1, fx->Parameter2?fx->Parameter2:0xffffff, target);
 	return FX_NOT_APPLIED;
 }
 
 //0x8c CastingGlow
-int fx_casting_glow (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_casting_glow (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_casting_glow (%2d): StrRef: %d\n", fx->Opcode, fx->Parameter1 );
+	if (0) printf( "fx_casting_glow (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	if (cgcount<0) {
+		cgcount = core->ReadResRefTable("cgtable",casting_glows);
+	}
+	//delay apply until map is loaded
+	Map *map = target->GetCurrentArea();
+	if (!map) {
+		return FX_APPLIED;
+	}
+
+	if (fx->Parameter2<(ieDword) cgcount) {
+		ScriptedAnimation *sca = core->GetScriptedAnimation(casting_glows[fx->Parameter2], 0);
+		if (!sca) {
+			return FX_NOT_APPLIED;
+		}
+		ieDword Duration = fx->Duration;
+		if (!Duration) {
+			Duration = 1000;
+		}
+		sca->SetDefaultDuration (Duration);
+		sca->SetBlend();
+		map->AddVVCCell(sca);
+	}
 	return FX_NOT_APPLIED;
 }
 
 //0x8d VisualSpellHit
-int fx_visual_spell_hit (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_visual_spell_hit (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_visual_spell_hit (%2d): StrRef: %d\n", fx->Opcode, fx->Parameter1 );
+	if (0) printf( "fx_visual_spell_hit (%2d): Target: %d Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (shcount<0) {
+		shcount = core->ReadResRefTable("shtable",spell_hits);
+	}
+	//delay apply until map is loaded
+	Map *map = target->GetCurrentArea();
+	if (!map) {
+		return FX_APPLIED;
+	}
+	if (fx->Parameter1) {
+		default_spell_hit.XPos=target->Pos.x;
+		default_spell_hit.YPos=target->Pos.y;
+	} else {
+		default_spell_hit.XPos=fx->PosX;
+		default_spell_hit.YPos=fx->PosY;
+	}
+	if (fx->Parameter2<(ieDword) shcount) {
+		ScriptedAnimation *sca = core->GetScriptedAnimation(spell_hits[fx->Parameter2], &default_spell_hit);
+		if (!sca) {
+			return FX_NOT_APPLIED;
+		}
+		if (fx->Parameter2<32) {
+			int tmp = fx->Parameter2>>2;
+			if (tmp) {
+				sca->SetFullPalette(tmp);
+			}
+		}
+		sca->SetBlend();
+		map->AddVVCCell(sca);
+	}
 	return FX_NOT_APPLIED;
 }
 
@@ -3278,8 +3342,7 @@ int fx_play_visual_effect (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_play_visual_effect (%2d): Resource: %s\n", fx->Opcode, fx->Resource );
 	if (fx->Resource[0]) {
-		Point p(0,0);
-		ScriptedAnimation* vvc = core->GetScriptedAnimation(fx->Resource, p, 0);
+		ScriptedAnimation* vvc = core->GetScriptedAnimation(fx->Resource, NULL);
 		target->GetCurrentArea( )->AddVVCCell( vvc );
 	}
 	return FX_APPLIED;
@@ -3720,8 +3783,15 @@ int fx_spelltrap(Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 	//it has some portrait icon i think
 	return FX_APPLIED;
 }
-// 0x104 //crashes
-// 0x105
+//0x104 Crash104
+//0x138 Crash138
+int fx_crash (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_crash (%2d): Param1: %d, Param2: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	return FX_NOT_APPLIED;
+}
+
+// 0x105 RestoreSpells
 int fx_restore_spell_level(Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_restore_spell_level (%2d): Level: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -3786,7 +3856,16 @@ int fx_modify_global_variable (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 	}
 	return FX_NOT_APPLIED;
 }
-// 0x10a unknown
+// 0x10a RemoveImmunity
+EffectRef immunity_effect_ref={"Protection:Spell",NULL,-1};
+
+int fx_remove_immunity(Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_remove_immunity (%2d): %s\n", fx->Opcode, fx->Resource );
+	target->fxqueue.RemoveAllEffectsWithResource(immunity_effect_ref, fx->Resource);
+	return FX_NOT_APPLIED;
+}
+
 // 0x10b protection from display string is a generic effect
 // 0x10c ExploreModifier
 int fx_explore_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
@@ -4198,7 +4277,7 @@ int fx_generate_wish (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 	if (0) printf( "fx_generate_wish (%2d): Mod: %d\n", fx->Opcode, fx->Parameter2 );
 	return FX_NOT_APPLIED;
 }
-//0x138 //crash
+//0x138 //see fx_crash
 //0x139 //HLA generic effect
 //0x13a StoneSkin2Modifier
 int fx_golem_stoneskin_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)

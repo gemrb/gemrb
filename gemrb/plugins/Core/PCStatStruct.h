@@ -1,0 +1,111 @@
+/* GemRB - Infinity Engine Emulator
+ * Copyright (C) 2003 The GemRB Project
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PCStatStruct.h,v 1.1 2006/04/16 23:57:02 avenger_teambg Exp $
+ *
+ */
+
+#ifndef PCSTATSTRUCT_H
+#define PCSTATSTRUCT_H
+
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+#include "../../includes/ie_types.h"
+
+#ifdef WIN32
+
+#ifdef GEM_BUILD_DLL
+#define GEM_EXPORT __declspec(dllexport)
+#else
+#define GEM_EXPORT __declspec(dllimport)
+#endif
+
+#else
+#define GEM_EXPORT
+#endif
+
+#define MAX_QSLOTS         9
+#define MAX_PORTRAIT_ICONS 12
+#define MAX_FAVOURITES     4
+#define SOUNDFOLDERSIZE    32+1
+
+//action buttons
+//the order of these buttons are based on opcode #144 
+#define ACT_NONE 100 //iwd2's maximum is 99
+#define ACT_STEALTH 0
+#define ACT_THIEVING 1
+#define ACT_CAST 2
+#define ACT_QSPELL1 3
+#define ACT_QSPELL2 4
+#define ACT_QSPELL3 5
+#define ACT_TURN 6
+#define ACT_TALK 7
+#define ACT_USE 8
+#define ACT_QSLOT1 9
+#define ACT_QSLOT4 10 //this seems to be intentionally so
+#define ACT_QSLOT2 11
+#define ACT_QSLOT3 12
+#define ACT_QSLOT5 31 //this is intentional too
+#define ACT_INNATE 13
+#define ACT_DEFEND 14 //these are gemrb specific
+#define ACT_ATTACK 15 
+#define ACT_WEAPON1 16
+#define ACT_WEAPON2 17
+#define ACT_WEAPON3 18
+#define ACT_WEAPON4 19
+#define ACT_BARDSONG 20
+#define ACT_STOP 21
+#define ACT_SEARCH 22
+#define ACT_SHAPE 23
+#define ACT_TAMING 24
+#define ACT_SKILLS 25
+#define ACT_WILDERNESS 26
+//gui navigation (scrolling button rows left or right)
+#define ACT_LEFT 32
+#define ACT_RIGHT 33
+
+class GEM_EXPORT PCStatsStruct {
+public:
+	ieStrRef  BestKilledName;
+	ieDword   BestKilledXP;
+	ieDword   AwayTime;
+	ieDword   JoinDate;
+	ieDword   unknown10;
+	ieDword   KillsChapterXP;
+	ieDword   KillsChapterCount;
+	ieDword   KillsTotalXP;
+	ieDword   KillsTotalCount;
+	ieResRef  FavouriteSpells[MAX_FAVOURITES];
+	ieWord    FavouriteSpellsCount[MAX_FAVOURITES];
+	ieResRef  FavouriteWeapons[MAX_FAVOURITES];
+	ieWord    FavouriteWeaponsCount[MAX_FAVOURITES];
+	ieResRef  SoundSet;
+	char      SoundFolder[SOUNDFOLDERSIZE];
+	ieResRef  QuickSpells[MAX_QSLOTS];     //iwd2 uses 9, others use only 3
+	ieWord    QuickWeaponSlots[8];         //iwd2 uses 8, others use only 4
+	ieWord    QuickItemSlots[5];           //pst has 5, others use only 3
+	ieByte    QSlots[MAX_QSLOTS];          //iwd2 specific
+	ieByte    QuickSpellClass[MAX_QSLOTS];
+	ieWord    PortraitIcons[MAX_PORTRAIT_ICONS];
+public:
+	PCStatsStruct();
+	void IncrementChapter();
+	void InitQuickSlot(unsigned int slot, unsigned int state);
+};
+#endif

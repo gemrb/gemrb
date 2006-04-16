@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GlobalTimer.cpp,v 1.29 2006/04/14 19:58:20 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GlobalTimer.cpp,v 1.30 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -138,7 +138,7 @@ void GlobalTimer::Update()
 			map->UpdateFog();
 			map->UpdateEffects();
 			//this measures in-world time (affected by effects, actions, etc)
-			game->AdvanceTime(advance);
+			game->AdvanceTime(advance/interval);
 		}
 		//this measures time spent in the game (including pauses)
 		game->RealTime+=advance;

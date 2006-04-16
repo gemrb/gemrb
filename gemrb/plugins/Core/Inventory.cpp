@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.70 2006/04/14 20:24:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.71 2006/04/16 23:57:02 avenger_teambg Exp $
  *
  */
 
@@ -33,13 +33,25 @@ static int SLOT_MELEE = -1;
 static int LAST_MELEE = -1;
 static int SLOT_RANGED = -1;
 static int LAST_RANGED = -1;
+static int SLOT_QUICK = -1;
+static int LAST_QUICK = -1;
 
-void InvalidSlot(int slot)
+static void InvalidSlot(int slot)
 {
 	printMessage("Inventory"," ",LIGHT_RED);
 	printf("Invalid slot: %d!\n",slot);
 	abort();
 }
+
+inline Item *Inventory::GetItemPointer(ieDword slot, CREItem *&item)
+{
+	item = GetSlotItem(slot);
+	if (!item) return NULL;
+	if (!item->ItemResRef[0]) return NULL;
+	return core->GetItem(item->ItemResRef);
+}
+
+#define addr(s,m)   (size_t)&(((s->m)
 
 void Inventory::Init()
 {
@@ -49,6 +61,8 @@ void Inventory::Init()
 	LAST_MELEE=-1;
 	SLOT_RANGED=-1;
 	LAST_RANGED=-1;
+	SLOT_QUICK=-1;
+	LAST_QUICK=-1;
 }
 
 Inventory::Inventory()
@@ -147,9 +161,18 @@ void Inventory::AddSlotEffects(CREItem* slot)
 		printMessage("Inventory","Invalid item equipped...\n",LIGHT_RED);
 		return;
 	}
+	//get the equipping effects
+	//EffectQueue *fxqueue = itm->GetEffectBlock(-1);
+	//fxqueue->SetOwner(Owner); //the equipped items owner is the equipping character
+	//fxqueue->ApplyAllEffects(Owner);
+
 	for (int i = 0; i < itm->EquippingFeatureCount; i++) {
-		Owner->fxqueue.AddEffect( &itm->equipping_features[i] );
+		Effect *fx = itm->equipping_features+i;
+		fx->PosX = Owner->Pos.x;
+		fx->PosY = Owner->Pos.y;
+		Owner->fxqueue.AddEffect( fx );
 	}
+
 	core->FreeItem( itm, slot->ItemResRef, false );
 }
 
@@ -193,10 +216,10 @@ bool Inventory::HasItemInSlot(const char *resref, unsigned int slot)
 	}
 	CREItem *item = Slots[slot];
 	if (!item) {
-		if (resref[0]) {
-			return false;
-		}
-		return true;
+		return false;
+	}
+	if (!resref[0]) {
+			return true;
 	}
 	if (strnicmp( item->ItemResRef, resref, 8 )==0) {
 		return true;
@@ -491,7 +514,7 @@ int Inventory::DepleteItem(ieDword flags)
 			if (!itm)
 				continue;
 			//if the item is usable in weapon slot, then it is weapon
-			bool weapon = core->CanUseItemType(itm->ItemType, SLOT_WEAPON);
+			int weapon = core->CanUseItemType(itm->ItemType, SLOT_WEAPON);
 			core->FreeItem( itm, item->ItemResRef, false );
 			if (weapon)
 				continue;
@@ -522,24 +545,24 @@ int Inventory::FindItem(const char *resref, unsigned int flags)
 	return -1;
 }
 
-void Inventory::DropItemAtLocation(unsigned int slot, unsigned int flags, Map *map, Point &loc)
+bool Inventory::DropItemAtLocation(unsigned int slot, unsigned int flags, Map *map, Point &loc)
 {
 	if (slot>Slots.size()) {
-		return;
+		return false;
 	}
 	//these slots will never 'drop' the item
 	if ((slot==(unsigned int) SLOT_FIST) || (slot==(unsigned int) SLOT_MAGIC)) {
-		return;
+		return false;
 	}
 
 	CREItem *item = Slots[slot];
 	if (!item) {
-		return;
+		return false;
 	}
 	//if you want to drop undoppable items, simply set IE_INV_UNDROPPABLE
 	//by default, it won't drop them
 	if ( ((flags^IE_INV_ITEM_UNDROPPABLE)&item->Flags)!=flags) {
-		return;
+		return false;
 	}
 	if (core->QuerySlotEffects( slot )) {
 		RemoveSlotEffects( item );
@@ -547,10 +570,13 @@ void Inventory::DropItemAtLocation(unsigned int slot, unsigned int flags, Map *m
 	map->AddItemToLocation(loc, item);
 	Changed = true;
 	Slots[slot]=NULL;
+	return true;
 }
 
-void Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *map, Point &loc)
+bool Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *map, Point &loc)
 {
+	bool dropped = false;
+
 	//this loop is going from start
 	for (size_t i = 0; i < Slots.size(); i++) {
 		//these slots will never 'drop' the item
@@ -574,11 +600,13 @@ void Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 		}
 		map->AddItemToLocation(loc, item);
 		Changed = true;
+		dropped = true;
 		Slots[i]=NULL;
 		//if it isn't all items then we stop here
 		if (resref[0])
 			break;
 	}
+	return dropped;
 }
 
 CREItem *Inventory::GetSlotItem(unsigned int slot)
@@ -591,8 +619,7 @@ CREItem *Inventory::GetSlotItem(unsigned int slot)
 
 //this is the low level equipping
 //all checks have been made previously
-//if weapon is set, then equipitem is equipping a weapon too
-bool Inventory::EquipItem(unsigned int slot, bool weapon)
+bool Inventory::EquipItem(unsigned int slot)
 {
 	CREItem *item = GetSlotItem(slot);
 	if (!item) {
@@ -600,14 +627,21 @@ bool Inventory::EquipItem(unsigned int slot, bool weapon)
 	}
 	// add effects of an item just being equipped to actor's effect queue
 	int effect = core->QuerySlotEffects( slot );
-	if (effect) {
-		if ((effect==1) || weapon) {
-			item->Flags|=IE_INV_ITEM_EQUIPPED;
-			if (item->Flags & IE_INV_ITEM_CURSED) {
-				item->Flags|=IE_INV_ITEM_UNDROPPABLE;
-			}
-			AddSlotEffects( item );
+	if (effect==SLOT_EFFECT_MELEE) {
+		//if weapon is ranged, then find quarrel for it and equip that
+		if(item->Flags&IE_INV_ITEM_BOW) {
+			slot = FindRangedProjectile(slot);
 		}
+		SetEquippedSlot(slot-SLOT_MELEE);
+	} else if (effect==SLOT_RANGED) {
+		SetEquippedSlot(slot);
+	}
+	if (effect) {
+		item->Flags|=IE_INV_ITEM_EQUIPPED;
+		if (item->Flags & IE_INV_ITEM_CURSED) {
+			item->Flags|=IE_INV_ITEM_UNDROPPABLE;
+		}
+		AddSlotEffects( item );
 	}
 	return true;
 }
@@ -638,12 +672,67 @@ bool Inventory::UnEquipItem(unsigned int slot, bool removecurse)
 	return true;
 }
 
-// find which bow is attached to the projectile marked by 'Equipped'
-int Inventory::FindRanged()
+// find the projectile
+// type = 1 - bow
+//        2 - xbow
+//        4 - sling
+//returns equipped code
+int Inventory::FindRangedProjectile(int type)
 {
 	for(int i=SLOT_RANGED;i<=LAST_RANGED;i++) {
+		CREItem *Slot;
+
+		Item *item = GetItemPointer(i, Slot);
+		if (!item) continue;
+		ITMExtHeader *ext_header = item->GetExtHeader(0);
+		int weapontype = 0;
+		if (ext_header) {
+			weapontype = ext_header->BowArrowQualifier;
+		}
+		core->FreeItem(item, Slot->ItemResRef, false);
+		if (weapontype & type) {
+			return i-SLOT_MELEE;
+		}
 	}
-	return SLOT_MELEE;
+	return IW_NO_EQUIPPED;
+}
+
+// find which bow is attached to the projectile marked by 'Equipped'
+// returns slotcode
+int Inventory::FindRangedWeapon()
+{
+	if (Equipped>=0) return SLOT_FIST;
+	unsigned int slot = Equipped+SLOT_MELEE;
+
+	CREItem *Slot;   
+	Item *item = GetItemPointer(slot, Slot);
+	if (!item) return SLOT_FIST;
+
+	ITMExtHeader *ext_header = item->GetExtHeader(0);
+	int type = 0;
+	if (ext_header) {
+		type = ext_header->BowArrowQualifier;
+	} 
+	core->FreeItem(item, Slot->ItemResRef, false);
+	if (!type) {
+		return SLOT_FIST;
+	}
+	for(int i=SLOT_MELEE;i<=LAST_MELEE;i++) {
+		CREItem *Slot;
+
+		Item *item = GetItemPointer(i, Slot);
+		if (!item) continue;
+		ITMExtHeader *ext_header = item->GetExtHeader(0);
+		int weapontype = 0;
+		if (ext_header) {
+			weapontype = ext_header->BowArrowQualifier;
+		}
+		core->FreeItem(item, Slot->ItemResRef, false);
+		if (weapontype & type) {
+			return i-SLOT_MELEE;
+		}
+	}
+	return SLOT_FIST;
 }
 
 void Inventory::SetFistSlot(int arg) { SLOT_FIST=arg; }
@@ -664,6 +753,14 @@ void Inventory::SetRangedSlot(int arg)
 	LAST_RANGED=arg;
 }
 
+void Inventory::SetQuickSlot(int arg)
+{
+	if (SLOT_QUICK==-1) {
+		SLOT_QUICK=arg;
+	}
+	LAST_QUICK=arg;
+}
+
 int Inventory::GetFistSlot()
 {
 	return SLOT_FIST;
@@ -677,6 +774,11 @@ int Inventory::GetMagicSlot()
 int Inventory::GetWeaponSlot()
 {
 	return SLOT_MELEE;
+}
+
+int Inventory::GetQuickSlot()
+{
+	return SLOT_QUICK;
 }
 
 int Inventory::GetEquipped()
@@ -704,7 +806,7 @@ void Inventory::SetEquippedSlot(int slotcode)
 		Equipped = IW_NO_EQUIPPED;
 		return;
 	}
-	if (HasItemInSlot("",slotcode+SLOT_MELEE)) {
+	if (!HasItemInSlot("",slotcode+SLOT_MELEE)) {
 		Equipped = IW_NO_EQUIPPED;
 		return;
 	}
@@ -735,11 +837,11 @@ int Inventory::FindCandidateSlot(int slottype, size_t first_slot, const char *re
 		return -1;
 
 	for (size_t i = first_slot; i < Slots.size(); i++) {
-		CREItem *item = Slots[i];
-
 		if (!(core->QuerySlotType(i)&slottype) ) {
 			continue;
 		}
+
+		CREItem *item = Slots[i];
 
 		if (!item) {
 			return i; //this is a good empty slot
@@ -791,11 +893,12 @@ void Inventory::SetSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 void Inventory::BreakItemSlot(ieDword slot)
 {
 	ieResRef newItem;
+	CREItem *Slot;
 
-	CREItem *item = Slots[slot];
-	Item *itm = core->GetItem( item->ItemResRef );
-	memcpy(newItem, itm->ReplacementItem,sizeof(newItem) );
-	core->FreeItem( itm, item->ItemResRef, false );
+	Item *item = GetItemPointer(slot, Slot);
+	if (!item) return;
+	memcpy(newItem, item->ReplacementItem,sizeof(newItem) );
+	core->FreeItem( item, Slot->ItemResRef, true );
 	//this depends on setslotitemres using setslotitem
 	SetSlotItemRes(newItem, slot, 0,0,0);
 }
@@ -821,11 +924,135 @@ void Inventory::dump()
 
 void Inventory::EquipBestWeapon(int flags)
 {
-	switch(flags) {
-		case EQUIP_RANGED:
-			break;
-		case EQUIP_MELEE:
-			break;
-		default:;
+	int i;
+	int damage = 0;
+	ieDword best_slot = SLOT_FIST;
+	int best_header = 0;
+	CREItem *Slot;
+
+	if (flags&EQUIP_RANGED) {
+		for(i=SLOT_RANGED;i<LAST_RANGED;i++) {
+			Item *item = GetItemPointer(i, Slot);
+			if (!item) continue;
+			int ehc = item->ExtHeaderCount;
+			while (ehc--) {
+				int tmp = item->GetDamagePotential(ehc,true); //best ranged
+				if (tmp>damage) {
+					damage = tmp;
+					best_slot = i;
+					best_header = ehc;
+				}
+			}
+		}
+
+		//ranged melee weapons like throwing daggers (not bows!)
+		for(i=SLOT_MELEE;i<LAST_MELEE;i++) {
+			Item *item = GetItemPointer(i, Slot);
+			if (!item) continue;
+			int ehc = item->ExtHeaderCount;
+			while (ehc--) {
+				int tmp = item->GetDamagePotential(ehc,true); //best ranged
+				if (tmp>damage) {
+					damage = tmp;
+					best_slot = i;
+					best_header = ehc;
+				}
+			}
+		}
 	}
+
+	if (flags&EQUIP_MELEE) {
+		for(i=SLOT_MELEE;i<LAST_MELEE;i++) {
+			Item *item = GetItemPointer(i, Slot);
+			if (!item) continue;
+			if (item->Flags&IE_INV_ITEM_BOW) continue;
+			int ehc = item->ExtHeaderCount;
+			while(ehc--) {
+				int tmp = item->GetDamagePotential(ehc,false);//best melee
+				if (tmp>damage) {
+					damage = tmp;
+					best_slot = i;
+					best_header = ehc;
+				}
+			}
+		}
+	}
+
+	SetEquippedSlot(best_slot);
+}
+
+/* returns true if there are more item usages not fitting in given array */
+bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count)
+{
+	int pos = 0;
+	int actual = 0;
+	memset(array, count * sizeof(ItemExtHeader),0 );
+	for(unsigned int idx=0;idx<Slots.size();idx++) {
+		if (!core->QuerySlotEffects(idx)) {
+			continue;
+		}    
+		CREItem *slot;
+		
+		Item *item = GetItemPointer(idx, slot);
+		if (!item) {
+			continue;
+		}
+		for(int ehc=0;count && ehc<item->ExtHeaderCount;ehc++) {
+			ITMExtHeader *ext_header = item->ext_headers+ehc;
+			if (ext_header->Location!=ITEM_LOC_EQUIPMENT) {
+				continue;
+			}
+			actual++;
+			if (actual>startindex) {
+
+				//store the item, return if we can't store more
+				if (!count) {
+					core->FreeItem(item, slot->ItemResRef, false);
+					return true;
+				}
+				count--;
+				memcpy(array[pos].itemname, slot->ItemResRef, sizeof(ieResRef) );
+				array[pos].headerindex = ehc;
+				memcpy(&(array[pos].AttackType), &(ext_header->AttackType),
+ ((char *) &(array[pos].itemname)) -((char *) &(array[pos].AttackType)) );
+				//StoreItemInfo(array+pos, ext_header, ehc);
+				if (ehc>2) {
+					array[pos].Charges=0;
+				} else {
+					array[pos].Charges=slot->Usages[ehc];
+				}
+				pos++;
+			}
+		}
+		core->FreeItem(item, slot->ItemResRef, false);
+	}
+
+	return false;
+}
+
+bool Inventory::UseItem(unsigned int slotindex, unsigned int headerindex, Actor *target)
+{
+	if (slotindex>=Slots.size())
+		return false;
+	CREItem *slot = Slots[slotindex];
+
+	if (!slot || !slot->ItemResRef[0]) {
+		return false;
+	}
+	unsigned short usagecount;
+
+	if (headerindex>2) {
+		usagecount=0;
+	} else {
+		usagecount = slot->Usages[headerindex];
+	}
+	Item *item = core->GetItem(slot->ItemResRef);
+	if (!item) {
+		return false;
+	}
+	
+	EffectQueue *fxqueue = item->GetEffectBlock(headerindex);
+	core->FreeItem(item, slot->ItemResRef, false);
+	fxqueue->ApplyAllEffects(target);
+	return true;
 }

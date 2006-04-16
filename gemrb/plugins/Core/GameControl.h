@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.86 2006/02/17 23:33:38 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.87 2006/04/16 23:57:02 avenger_teambg Exp $
  */
 
 /**
@@ -76,11 +76,6 @@ class Window;
 #define TARGET_MODE_ALLY    0x10
 #define TARGET_MODE_ENEMY   0x20
 #define TARGET_MODE_NEUTRAL 0x40
-
-/** The distance of operating a trigger, container, etc. */
-#define MAX_OPERATING_DISTANCE      40 //a search square is 16x12
-/** The distance between PC's who are about to enter a new area */
-#define MAX_TRAVELING_DISTANCE      400
 
 /**
  * @class GameControl
