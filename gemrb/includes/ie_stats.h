@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.46 2006/04/12 20:32:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.47 2006/04/17 12:07:08 avenger_teambg Exp $
  *
  */
 
@@ -345,7 +345,9 @@
 #define IE_CHAOSSHIELD          189 // defense against wild surge
 #define IE_CANUSEANYITEM        191
 #define IE_ALWAYSBACKSTAB       192
+#define IE_SPELLFAILUREINNATE   194
 #define IE_EFFECT308            195 // another special unknown effect
+#define IE_DEADMAGIC            196
 #define IE_DISABLETIMESTOP      197
 #define IE_STONESKINSGOLEM	199
 #define IE_LEVELDRAIN		200

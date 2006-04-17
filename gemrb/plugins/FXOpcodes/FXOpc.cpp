@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.20 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.21 2006/04/17 12:07:08 avenger_teambg Exp $
  *
  */
 
@@ -1709,11 +1709,20 @@ int fx_miscast_magic_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_miscast_magic_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	switch (fx->Parameter2) {
+		case 3:
+			STAT_SET( IE_DEADMAGIC, 1);
 		case 0:
-			target->NewStat( IE_SPELLFAILUREMAGE, fx->Parameter1, MOD_ABSOLUTE);
+			STAT_SET( IE_SPELLFAILUREMAGE, fx->Parameter1);
 			break;
+		case 4:
+			STAT_SET( IE_DEADMAGIC, 1);
 		case 1:
-			target->NewStat( IE_SPELLFAILUREPRIEST, fx->Parameter1, MOD_ABSOLUTE);
+			STAT_SET( IE_SPELLFAILUREPRIEST, fx->Parameter1);
+			break;
+		case 5:
+			STAT_SET( IE_DEADMAGIC, 1);
+		case 2:
+			STAT_SET( IE_SPELLFAILUREINNATE, fx->Parameter1);
 			break;
 		default:
 			return FX_NOT_APPLIED;
@@ -1992,10 +2001,18 @@ int fx_cure_diseased_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x50 State:Deafness
-//this state has no bit???
-int fx_set_deaf_state (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+// gemrb extension: modifiable amount
+int fx_set_deaf_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_deaf_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (!fx->Parameter1) {
+		fx->Parameter1 = 50;
+	}
+	STAT_ADD(IE_SPELLFAILUREMAGE, fx->Parameter1);
+	if (!fx->Parameter2) {
+		fx->Parameter2 = 50;
+	}
+	STAT_ADD(IE_SPELLFAILUREPRIEST, fx->Parameter2);
 	return FX_APPLIED;
 }
 
