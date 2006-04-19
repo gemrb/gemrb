@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.140 2006/03/25 23:35:39 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.141 2006/04/19 20:25:08 wjpalenstijn Exp $
  *
  */
 
@@ -1044,7 +1044,7 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 #define GVALUE(r,g,b) (g)
 #define BVALUE(r,g,b) (b)
 #define AVALUE(r,g,b,a) (a)>>ia
-#define CUSTOMBLEND(r,g,b) do { if (remflags & BLIT_GREY) { unsigned int t = (r)+(g)+(b); t /= 3; (r)=t; (g)=t; (b)=t; } if (remflags & BLIT_RED) { (g)=0;(b)=0; } } while(0)
+#define CUSTOMBLEND(r,g,b) do { if (remflags & BLIT_GREY) { unsigned int t = (r)+(g)+(b); t /= 3; (r)=t; (g)=t; (b)=t; } if (remflags & BLIT_RED) { (g) /= 2; (b) /= 2; } } while(0)
 
 #define TINT_ALPHA
 
@@ -1318,6 +1318,11 @@ void SDLVideoDriver::DrawRect(Region& rgn, Color& color, bool fill, bool clipped
 /** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 void SDLVideoDriver::DrawRectSprite(Region& rgn, Color& color, Sprite2D* sprite)
 {
+	if (sprite->BAM) {
+		printMessage( "SDLVideo", "DrawRectSprite not supported for this sprite\n", LIGHT_RED );
+		return;
+	}
+
 	SDL_Surface* surf = ( SDL_Surface* ) sprite->vptr;
 	SDL_Rect drect = {
 		rgn.x, rgn.y, rgn.w, rgn.h
