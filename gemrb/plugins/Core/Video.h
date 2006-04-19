@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.62 2006/04/19 20:34:05 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.63 2006/04/19 20:49:02 wjpalenstijn Exp $
  *
  */
 
@@ -33,6 +33,7 @@
 #include "EventMgr.h"
 #include "Animation.h"
 #include "Polygon.h"
+#include "ScriptedAnimation.h"
 
 class SpriteCover;
 class Palette;
@@ -52,16 +53,17 @@ class Palette;
 // Note: not all these flags make sense together. Specifically:
 // NOSHADOW overrides TRANSSHADOW
 enum SpriteBlitFlags {
-	BLIT_TINTED = 1,
-	BLIT_NOSHADOW = 2,
-	BLIT_TRANSSHADOW = 4,
-	BLIT_HALFTRANS = 8,
-	BLIT_GREY = 16,
-	BLIT_RED = 32,
-	BLIT_GLOW = 64, // not implemented in SDLVideo yet
-	BLIT_MIRRORX = 128,
-	BLIT_MIRRORY = 256,
-	BLIT_BLENDED = 512 // not implemented in SDLVideo yet
+	BLIT_HALFTRANS = IE_VVC_TRANSPARENT, // 2
+	BLIT_BLENDED = IE_VVC_BLENDED, // 8; not implemented in SDLVideo yet
+	BLIT_MIRRORX = IE_VVC_MIRRORX, // 0x10
+	BLIT_MIRRORY = IE_VVC_MIRRORY, // 0x20
+	BLIT_NOSHADOW = 0x1000,
+	BLIT_TRANSSHADOW = 0x2000,
+	BLIT_TINTED = 0x00010000, // IE_VVC_TINT = 0x00030000
+	BLIT_GREY = IE_VVC_GREYSCALE, // 0x80000
+	BLIT_RED = IE_VVC_RED_TINT, // 0x02000000
+	BLIT_DARK = IE_VVC_DARKEN, // 0x00100000; not implemented in SDLVideo yet
+	BLIT_GLOW = IE_VVC_GLOWING // 0x00200000; not implemented in SDLVideo yet
 	// Note: bits 29,30,31 are used by SDLVideo internally
 };
 
