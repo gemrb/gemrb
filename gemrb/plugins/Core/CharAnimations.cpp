@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.81 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.82 2006/04/19 20:09:32 avenger_teambg Exp $
  *
  */
 
@@ -95,10 +95,15 @@ void CharAnimations::SetColors(ieDword *arg)
 
 void CharAnimations::SetupColors()
 {
-	if (!palette)
+	if (!palette) {
 		return;
+	}
 
 	if (!Colors) {
+		return;
+	}
+
+	if (lockPalette) {
 		return;
 	}
 
@@ -215,6 +220,7 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 	palette = NULL;
 	nextStanceID = 0;
 	autoSwitchOnEnd = false;
+	lockPalette = false;
 	if (!AvatarsCount) {
 		InitAvatarsTable();
 	}

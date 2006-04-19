@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.80 2006/04/09 15:22:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.81 2006/04/19 20:09:33 avenger_teambg Exp $
  *
  */
 
@@ -100,10 +100,10 @@ bool GAMImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-Game* GAMImp::GetGame()
+Game* GAMImp::LoadGame(Game *newGame)
 {
 	unsigned int i;
-	Game* newGame = new Game();
+	//Game* newGame = new Game();
 
 	// saving in original version requires the original version
 	// otherwise it is set to 0 at construction time
@@ -182,7 +182,7 @@ Game* GAMImp::GetGame()
 		const char* resref = tm->QueryField( playmode );
 		strnlwrcpy( newGame->CurrentArea, resref, 8 );
 	}
-
+	
 	//Loading PCs
 	ActorMgr* aM = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
 	for (i = 0; i < PCCount; i++) {
@@ -284,7 +284,6 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 	PCStruct pcInfo;
 	ieDword tmpDword;
 	ieWord tmpWord;
-	Actor* actor;
 
 	memset( &pcInfo,0,sizeof(pcInfo) );
 	str->ReadWord( &pcInfo.Selected );
@@ -301,6 +300,7 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 	str->ReadWord( &pcInfo.ModalState ); //see Modal.ids
 	str->ReadWord( &pcInfo.Happiness );
 	str->Read( &pcInfo.Unknown2c, 96 );
+
 	if (version==GAM_VER_GEMRB || version==GAM_VER_IWD2) {
 		ieResRef tmp;
 
@@ -380,15 +380,23 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 	str->Read( &pcInfo.Name, 32 );
 	str->ReadDword( &pcInfo.TalkCount );
 
-	PCStatsStruct* ps = GetPCStats();
+	ieDword pos = str->GetPos();
+
+	Actor* actor = NULL;
 
 	if (pcInfo.OffsetToCRE) {
 		str->Seek( pcInfo.OffsetToCRE, GEM_STREAM_START );
 		void* Buffer = malloc( pcInfo.CRESize );
 		str->Read( Buffer, pcInfo.CRESize );
-		MemoryStream* ms = new MemoryStream( Buffer, pcInfo.CRESize );
-		aM->Open( ms );
-		actor = aM->GetActor();
+		//somehow autofree MemoryStream doesn't work on msvc 7.0
+		//separate heap for dll's?
+		MemoryStream* ms = new MemoryStream( Buffer, pcInfo.CRESize, false );
+		if (ms) {
+			aM->Open( ms, true );
+			actor = aM->GetActor();
+		}
+		free (Buffer);
+
  		//torment has them as 0 or -1
 		if (pcInfo.Name[0]!=0 && pcInfo.Name[0]!=UNINITIALIZED_CHAR) {
 			actor->SetText(pcInfo.Name,0); //setting both names
@@ -397,10 +405,23 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 	} else {
 		DataStream* ds = core->GetResourceMgr()->GetResource(
 				pcInfo.CREResRef, IE_CRE_CLASS_ID );
-		aM->Open( ds );
-		actor = aM->GetActor();
+		//another plugin cannot free memory stream from this plugin
+		//so auto free is a no-no
+		if (ds) {
+			aM->Open( ds, true );
+			actor = aM->GetActor();
+		}
+	}
+	if (!actor) {
+		return actor;
 	}
 
+	//
+	str->Seek(pos, GEM_STREAM_START);
+	//
+	actor->CreateStats();
+	PCStatsStruct *ps = actor->PCStats;
+	GetPCStats(ps);
 	memcpy(ps->QSlots, pcInfo.QSlots, sizeof(pcInfo.QSlots) );
 	memcpy(ps->QuickSpells, pcInfo.QuickSpellResRef, 9*sizeof(ieResRef) );
 	memcpy(ps->QuickSpellClass, pcInfo.QuickSpellClass, 9 );
@@ -414,15 +435,13 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 
 	actor->SetPersistent( is_in_party ? (pcInfo.PartyOrder + 1) : 0);
 
-	actor->PCStats = ps;
 	actor->Selected = pcInfo.Selected;
 
 	return actor;
 }
 
-PCStatsStruct* GAMImp::GetPCStats ()
+void GAMImp::GetPCStats (PCStatsStruct *ps)
 {
-	PCStatsStruct* ps = new PCStatsStruct();
 	int i;
 
 	str->ReadDword( &ps->BestKilledName );
@@ -451,7 +470,6 @@ PCStatsStruct* GAMImp::GetPCStats ()
 	if (core->HasFeature(GF_SOUNDFOLDERS) ) {
 		str->Read( ps->SoundFolder, 32);
 	}
-	return ps;
 }
 
 GAMJournalEntry* GAMImp::GetJournalEntry()
@@ -526,14 +544,14 @@ int GAMImp::GetStoredFileSize(Game *game)
 		headersize +=am->GetStoredFileSize(ac);
 	}
 	core->FreeInterface( am );
-	JournalOffset = headersize;
-
-	JournalCount = game->GetJournalCount();
-	headersize += JournalCount * 12;
 	GlobalOffset = headersize;
 
 	GlobalCount = game->locals->GetCount();
 	headersize += GlobalCount * 84;
+	JournalOffset = headersize;
+
+	JournalCount = game->GetJournalCount();
+	headersize += JournalCount * 12;
 
 	if (core->HasFeature(GF_HAS_KAPUTZ) ) {
 		KillVarsOffset = headersize;
@@ -900,12 +918,12 @@ int GAMImp::PutGame(DataStream *stream, Game *game)
 		return ret;
 	}
 
-	ret = PutJournals( stream, game);
+	ret = PutVariables( stream, game);
 	if (ret) {
 		return ret;
 	}
 
-	ret = PutVariables( stream, game);
+	ret = PutJournals( stream, game);
 	if (ret) {
 		return ret;
 	}

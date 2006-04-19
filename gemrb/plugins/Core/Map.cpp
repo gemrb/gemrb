@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.237 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.238 2006/04/19 20:09:32 avenger_teambg Exp $
  *
  */
 
@@ -307,15 +307,18 @@ Map::Map(void)
 	MapSet = NULL;
 	Walls = NULL;
 	WallCount = 0;
-	queue[0] = NULL;
-	queue[1] = NULL;
-	queue[2] = NULL;
-	Qcount[0] = 0;
-	Qcount[1] = 0;
-	Qcount[2] = 0;
-	lastActorCount[0] = 0;
-	lastActorCount[1] = 0;
-	lastActorCount[2] = 0;
+	queue[PR_SCRIPT] = NULL;
+	queue[PR_DISPLAY] = NULL;
+	//no one needs this queue
+	//queue[PR_IGNORE] = NULL;
+	Qcount[PR_SCRIPT] = 0;
+	Qcount[PR_DISPLAY] = 0;
+	//no one needs this queue
+	//Qcount[PR_IGNORE] = 0;
+	lastActorCount[PR_SCRIPT] = 0;
+	lastActorCount[PR_DISPLAY] = 0;
+	//no one needs this
+	//lastActorCount[PR_IGNORE] = 0;
 	if (!PathFinderInited) {
 		InitPathFinder();
 		InitSpawnGroups();
@@ -363,7 +366,7 @@ Map::~Map(void)
 		core->FreeInterface( SearchMap );
 	if (SmallMap)
 		core->FreeInterface( SmallMap );
-	for (i = 0; i < 3; i++) {
+	for (i = 0; i < QUEUE_COUNT; i++) {
 		if (queue[i]) {
 			free(queue[i]);
 			queue[i] = NULL;
@@ -522,19 +525,23 @@ void Map::UpdateScripts()
 		ExecuteScript( Scripts[0] );
 	}
 	//Execute Pending Actions
-	GenerateQueues();
+	//if it is only here, then the drawing will fail
 	ProcessActions(false);
 
 	//Run actor scripts (only for 0 priority)
-	int q=Qcount[0];
+	int q=Qcount[PR_SCRIPT];
 
 	Game *game = core->GetGame();
 	Actor *timestop_owner = game->timestop_owner;
 	bool timestop = game->timestop_end>game->GameTime;
 
 	while (q--) {
-		Actor* actor = queue[0][q];
-		if (timestop && actor!=timestop_owner && actor->GetStat(IE_DISABLETIMESTOP) ) {
+		Actor* actor = queue[PR_SCRIPT][q];
+		//actor just moved away, don't run its script from this side
+		if (actor->GetCurrentArea()!=this) {
+			continue;
+		}
+		if (timestop && actor!=timestop_owner && actor->Modified[IE_DISABLETIMESTOP] ) {
 			continue;
 		}
 		for (unsigned int i = 0; i < MAX_SCRIPTS; i++) {
@@ -550,7 +557,7 @@ void Map::UpdateScripts()
 		actor->SetBase( IE_ENCUMBRANCE, actor->inventory.GetWeight() );
 		//TODO:calculate actor speed!
 		int speed = 150;
-		if (actor->GetStat(IE_DONOTJUMP)<2) {
+		if (actor->Modified[IE_DONOTJUMP]<2) {
 			BlockSearchMap( actor->Pos, actor->size, 0);
 			if (actor->path) {
 				//we should actually wait for a short time and check then
@@ -606,9 +613,9 @@ void Map::UpdateScripts()
 			continue;
 		}
 		
-		q=Qcount[0];
+		q=Qcount[PR_SCRIPT];
 		while (q--) {
-			Actor* actor = queue[0][q];
+			Actor* actor = queue[PR_SCRIPT][q];
 			if (ip->Type == ST_PROXIMITY) {
 				ip->Entered(actor);
 			} else {
@@ -682,21 +689,43 @@ void Map::DrawContainers( Region screen, Container *overContainer)
 	}
 }
 
+/*
 Actor *Map::GetNextActor(int &q, int &index)
 {
 	Actor *actor;
 retry:
 	switch(q) {
-		case 0:
+		case PR_SCRIPT:
 			actor = GetRoot( q, index );
 			if (actor)
 				return actor;
 			q--;
 			return NULL;
-		case 1:
+		case PR_DISPLAY:
 			actor = GetRoot( q, index );
 			if (actor)
 				return actor;
+			q--;
+			index = Qcount[q];
+			goto retry;
+		default:
+			return NULL;
+	}
+}
+*/
+
+Actor *Map::GetNextActor(int &q, int &index)
+{
+retry:
+	switch(q) {
+		case PR_SCRIPT:
+			if (index--)
+				return queue[q][index];
+			q--;
+			return NULL;
+		case PR_DISPLAY:
+			if (index--)
+				return queue[q][index];
 			q--;
 			index = Qcount[q];
 			goto retry;
@@ -741,10 +770,13 @@ void Map::DrawMap(Region screen, GameControl* gc)
 	}
 	DrawContainers( screen, gc->overContainer );
 	Region vp = video->GetViewport();
-	//GenerateQueues();
+	//if it is only here, then the scripting will fail?
+	GenerateQueues();
+	SortQueues();
 	//drawing queues 1 and 0
-	//starting with lower priority (so they are drawn over)
-	int q = 1;
+	//starting with lower priority
+	//so displayed, but inactive actors (dead) will be drawn over
+	int q = PR_DISPLAY;
 	int index = Qcount[q];
 	Actor* actor = GetNextActor(q, index);
 	int aniidx = 0;
@@ -760,6 +792,8 @@ void Map::DrawMap(Region screen, GameControl* gc)
 			//draw animation
 			int animcount=a->animcount;
 
+			//always draw the animation tinted because tint is also used for
+			//transparency
 			Color tint = {255,255,255,255-(ieByte) a->transparency};
 			if ((a->Flags&A_ANI_NO_SHADOW)) {
 				tint = LightMap->GetPixel( a->Pos.x / 16, a->Pos.y / 12);
@@ -872,7 +906,7 @@ void Map::AddActor(Actor* actor)
 	ieDword gametime = core->GetGame()->GameTime;
 
 	if (IsVisible(actor->Pos, false) && actor->Schedule(gametime) ) {
-		if (actor->GetStat(IE_EA)>=EA_EVILCUTOFF) {
+		if (actor->Modified[IE_EA]>=EA_EVILCUTOFF) {
 			core->Autopause(AP_ENEMY);
 		}
 	}
@@ -962,7 +996,7 @@ void Map::JumpActors(bool jump)
 	unsigned int i = actors.size();
 	while (i--) {
 		Actor* actor = actors[i];
-		if (actor->GetStat(IE_DONOTJUMP)&DNJ_JUMP) {
+		if (actor->Modified[IE_DONOTJUMP]&DNJ_JUMP) {
 			if (jump) {
 				actor->FixPosition();
 			}
@@ -979,8 +1013,8 @@ void Map::PurgeArea(bool items)
 	while (i--) {
 		Actor *ac = actors[i];
 
-		if (ac->GetStat(IE_STATE_ID)&STATE_NOSAVE) {
-			if (ac->GetStat(IE_MC_FLAGS) & MC_KEEP_CORPSE) {
+		if (ac->Modified[IE_STATE_ID]&STATE_NOSAVE) {
+			if (ac->Modified[IE_MC_FLAGS] & MC_KEEP_CORPSE) {
 				continue;
 			}
 			delete ac;
@@ -1111,10 +1145,10 @@ int Map::GetBlocked(unsigned int x, unsigned int y)
 	int block = SearchMap->GetPixelIndex( x, y );
 	int ret = Passable[block&PATH_MAP_AREAMASK];
 	if (block&PATH_MAP_DOOR_OPAQUE) {
-		ret|=PATH_MAP_NO_SEE;
+		ret=PATH_MAP_NO_SEE;
 	}
 	if (block&(PATH_MAP_DOOR_TRANSPARENT|PATH_MAP_ACTOR)) {
-		ret|=PATH_MAP_IMPASSABLE;
+		ret&=~PATH_MAP_PASSABLE;
 	}
 	return ret;
 }
@@ -1227,18 +1261,20 @@ void Map::GenerateQueues()
 {
 	int priority;
 
-	for (priority=0;priority<3;priority++) {
-		if (lastActorCount[priority] != actors.size()) {
+	unsigned int i=actors.size();
+	for (priority=0;priority<QUEUE_COUNT;priority++) {
+		if (lastActorCount[priority] != i) {
 			if (queue[priority]) {
 				free(queue[priority]);
 				queue[priority] = NULL;
 			}
-			queue[priority] = (Actor **) calloc( actors.size(), sizeof(Actor *) );
-			lastActorCount[priority] = ( int ) actors.size();
+			queue[priority] = (Actor **) calloc( i, sizeof(Actor *) );
+			lastActorCount[priority] = i;
 		}
 		Qcount[priority] = 0;
 	}
-	unsigned int i=actors.size();
+
+	ieDword gametime = core->GetGame()->GameTime;
 	while (i--) {
 		Actor* actor = actors[i];
 
@@ -1247,74 +1283,105 @@ void Map::GenerateQueues()
 			continue;
 		}
 
-		ieDword gametime = core->GetGame()->GameTime;
 		ieDword stance = actor->GetStance();
 		ieDword internalFlag = actor->GetInternalFlag();
 
 		if (internalFlag&IF_ACTIVE) {
 			if ((stance == IE_ANI_TWITCH) && (internalFlag&IF_IDLE) ) {
-				priority = 1; //display
+				priority = PR_DISPLAY; //display
 			} else {
-				priority = 0; //run scripts and display
+				priority = PR_SCRIPT; //run scripts and display
 			}
 		} else {
 			//dead actors are always visible on the map, but run no scripts
 			if (stance == IE_ANI_TWITCH || stance == IE_ANI_DIE) {
-				priority = 1;
+				priority = PR_DISPLAY;
 			} else {
 				//isvisible flag is false (visibilitymap) here,
 				//coz we want to reactivate creatures that
 				//just became visible
 				if (IsVisible(actor->Pos, false) && actor->Schedule(gametime) ) {
-					priority = 0; //run scripts and display, activated now
+					priority = PR_SCRIPT; //run scripts and display, activated now
 					actor->Unhide();
-					if (actor->GetStat(IE_EA)>=EA_EVILCUTOFF) {
+					if (actor->Modified[IE_EA]>=EA_EVILCUTOFF) {
 						core->Autopause(AP_ENEMY);
 					}
 				} else {
-					priority = 2;
+					priority = PR_IGNORE;
 				}
 			}
 		}
 
+		//we ignore priority 2
+		if (priority>=PR_IGNORE) continue;
+
 		queue[priority][Qcount[priority]] = actor;
 		Qcount[priority]++;
-		int lastPos = Qcount[priority];
-		while (lastPos != 1) {
-			int parentPos = ( lastPos / 2 ) - 1;
-			Actor* parent = queue[priority][parentPos];
-			if (actor->Pos.y < parent->Pos.y) {
-				queue[priority][parentPos] = actor;
-				queue[priority][lastPos - 1] = parent;
-				lastPos = parentPos + 1;
-			} else
-				break;
-		}
 	}
 }
 
+//the original qsort implementation was flawed
+void Map::SortQueues()
+{
+	for (int q=0;q<QUEUE_COUNT;q++) {
+		Actor **baseline=queue[q];
+		int n = Qcount[q];
+		int i = n/2;
+		int parent, child;
+		Actor * tmp;
+
+		for (;;) {
+			if (i>0) {
+				i--;
+				tmp = baseline[i];
+			} else {
+				n--;
+				if (n<=0) break; //breaking loop
+				tmp = baseline[n];
+				baseline[n] = baseline[0];
+			}
+			parent = i;
+			child = i*2+1;
+			while(child<n) {
+				int chp = child+1;
+				if (chp<n && baseline[chp]->Pos.y < baseline[child]->Pos.y) {
+					child=chp;
+				}
+				if (baseline[child]->Pos.y<tmp->Pos.y) {
+					baseline[parent] = baseline[child];
+					parent = child;
+					child = parent*2+1;
+				} else 
+					break;
+			}
+			baseline[parent]=tmp;
+		}
+	}
+}
+/*
 Actor* Map::GetRoot(int priority, int &index)
 {
 	if (index == 0) {
 		return NULL;
 	}
 
-	Actor* ret = queue[priority][Qcount[priority]-index];
+	Actor **baseline=queue[priority]+(Qcount[priority]-index);
+	Actor* ret = baseline[0];
 	index--;
 	if (index == 0) {
 		return ret;
 	}
-	Actor **baseline=queue[priority]+(Qcount[priority]-index);
+	Actor* node = baseline[1];
+
 	int lastPos = 1;
-	Actor* node = baseline[0];
 	while (true) {
-		int leftChildPos = ( lastPos*2 ) - 1;
-		int rightChildPos = lastPos*2;
-		if (leftChildPos >= index)
+		int leftChildPos = lastPos * 2;
+		int rightChildPos = lastPos * 2 + 1;
+		if (leftChildPos > index)
 			break;
 		Actor* child = baseline[leftChildPos];
 		int childPos = leftChildPos;
-		if (rightChildPos < index) {
+		if (rightChildPos <= index) {
 			//If both Child Exist
 			Actor* rightChild = baseline[rightChildPos];
 			if (rightChild->Pos.y < child->Pos.y) {
@@ -1323,14 +1390,15 @@ Actor* Map::GetRoot(int priority, int &index)
 			}
 		}
 		if (node->Pos.y > child->Pos.y) {
-			baseline[lastPos-1] = child;
+			baseline[lastPos] = child;
 			baseline[childPos] = node;
-			lastPos = childPos + 1;
+			lastPos = childPos;
 		} else
 			break;
 	}
 	return ret;
 }
+*/
 
 void Map::AddVVCCell(ScriptedAnimation* vvc)
 {
@@ -2111,10 +2179,10 @@ void Map::UpdateFog()
 	SetMapVisibility( 0 );
 	for (unsigned int e = 0; e<actors.size(); e++) {
 		Actor *actor = actors[e];
-		if (!actor->GetStat( IE_EXPLORE ) ) continue;
-		int state = actor->GetStat( IE_STATE_ID );
+		if (!actor->Modified[ IE_EXPLORE ] ) continue;
+		int state = actor->Modified[IE_STATE_ID];
 		if (state & STATE_CANTSEE) continue;
-		int vis2 = actor->GetStat( IE_VISUALRANGE );
+		int vis2 = actor->Modified[IE_VISUALRANGE];
 		if ((state&STATE_BLIND) || (vis2<2)) vis2=2; //can see only themselves
 		ExploreMapChunk (actor->Pos, vis2, 1);
 		Spawn *sp = GetSpawnRadius(actor->Pos, SPAWN_RANGE); //30 * 12

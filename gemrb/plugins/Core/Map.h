@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.109 2006/04/11 16:32:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.110 2006/04/19 20:09:33 avenger_teambg Exp $
  *
  */
 
@@ -171,6 +171,14 @@ public:
 	bool Schedule(ieDword gametime);
 };
 
+//i believe we need only the active actors/visible inactive actors queues
+#define QUEUE_COUNT 2
+
+//priorities when handling actors, we really ignore the third one
+#define PR_SCRIPT  0
+#define PR_DISPLAY 1
+#define PR_IGNORE  2
+
 class GEM_EXPORT Map : public Scriptable {
 public:
 	TileMap* TMap;
@@ -201,9 +209,9 @@ private:
 	std::vector< Ambient*> ambients;
 	std::vector< MapNote*> mapnotes;
 	std::vector< Spawn*> spawns;
-	Actor** queue[3];
-	int Qcount[3];
-	unsigned int lastActorCount[3];
+	Actor** queue[QUEUE_COUNT];
+	int Qcount[QUEUE_COUNT];
+	unsigned int lastActorCount[QUEUE_COUNT];
 public:
 	Map(void);
 	~Map(void);
@@ -347,7 +355,8 @@ private:
 	Actor *GetNextActor(int &q, int &index);
 	void DrawSearchMap(Region &screen);
 	void GenerateQueues();
-	Actor* GetRoot(int priority, int &index);
+	void SortQueues();
+	//Actor* GetRoot(int priority, int &index);
 	void DeleteActor(int i);
 	void Leveldown(unsigned int px, unsigned int py, unsigned int& level,
 		Point &p, unsigned int& diff);

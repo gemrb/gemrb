@@ -52,7 +52,7 @@ public:
 	GAMImp(void);
 	~GAMImp(void);
 	bool Open(DataStream* stream, bool autoFree = true);
-	Game* GetGame();
+	Game* LoadGame(Game *newGame);
 
 	int GetStoredFileSize(Game *game);
 	/* stores a gane in the savegame folder */
@@ -64,7 +64,7 @@ public:
 	}
 private:
 	Actor* GetActor( ActorMgr* aM, bool is_in_party );
-	PCStatsStruct* GetPCStats();
+	void GetPCStats(PCStatsStruct* ps);
 	GAMJournalEntry* GetJournalEntry();
 
 	int PutHeader(DataStream *stream, Game *game);

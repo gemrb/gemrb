@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.180 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.181 2006/04/19 20:09:32 avenger_teambg Exp $
  *
  */
 
@@ -231,7 +231,17 @@ void Actor::SetText(int strref, unsigned char type)
 
 void Actor::SetAnimationID(unsigned int AnimID)
 {
+	//if the palette is locked, then it will be transferred to the new animation
+	Palette *recover = NULL;
+
 	if (anims) {
+		if (anims->lockPalette) {
+			recover = anims->palette;
+		}
+		//increase refcount hack so the palette won't get sunk
+		if (recover) {
+			recover->IncRef();
+		}
 		delete( anims );
 	}
 	//hacking PST no palette
@@ -246,6 +256,11 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	}
 	anims = new CharAnimations( AnimID, BaseStats[IE_ARMOR_TYPE]);
 	if (anims) {
+		//if we have a recovery palette, then set it back
+		anims->palette=recover;
+		if (recover) {
+			anims->lockPalette = true;
+		}
 		//bird animations are not hindered by searchmap
 		//only animtype==7 (bird) uses this feature
 		//this is a hardcoded hack, but works for all engine type
@@ -394,15 +409,13 @@ void pcf_gold(Actor *actor, ieDword /*Value*/)
 	//actor->BaseStats[IE_GOLD]=actor->Modified[IE_GOLD];
 }
 
-ScriptedAnimation default_anim;
-
 //de/activates the entangle overlay
 void pcf_entangle(Actor *actor, ieDword Value)
 {
 	if (Value) {
 		if (actor->HasVVCCell(overlay[OV_ENTANGLE]))
 			return;
-		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_ENTANGLE], &default_anim);
+		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_ENTANGLE]);
 		actor->AddVVCell(sca);
 	} else {
 		actor->RemoveVVCell(overlay[OV_ENTANGLE], true);
@@ -411,17 +424,31 @@ void pcf_entangle(Actor *actor, ieDword Value)
 
 //de/activates the sanctuary overlay
 //the sanctuary effect draws the globe half transparent
+ieDword fullwhite[7]={ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT};
+
 void pcf_sanctuary(Actor *actor, ieDword Value)
 {
 	if (Value) {
-		if (actor->HasVVCCell(overlay[OV_SANCTUARY]))
-			return;
-		default_anim.ZPos=0;
-		default_anim.Transparency=IE_VVC_TRANSPARENT;
-		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_SANCTUARY], &default_anim);
-		actor->AddVVCell(sca);
+		if (!actor->HasVVCCell(overlay[OV_SANCTUARY])) {
+			ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_SANCTUARY]);
+			actor->AddVVCell(sca);
+		}
+		CharAnimations *anims = actor->GetAnims();
+		if (!anims) return; //cannot apply it (yet)
+		if (anims->lockPalette) return;
+		//force initialisation of animation
+		anims->SetColors( fullwhite );
+		anims->GetAnimation(0,0);
+		if (anims->palette) {
+			anims->lockPalette=true;
+		}
 	} else {
 		actor->RemoveVVCell(overlay[OV_SANCTUARY], true);
+		CharAnimations *anims = actor->GetAnims();
+		if (anims) {
+			anims->lockPalette=false;
+			anims->SetColors(actor->Modified+IE_COLORS);
+		}
 	}
 }
 
@@ -431,9 +458,7 @@ void pcf_shieldglobe(Actor *actor, ieDword Value)
 	if (Value) {
 		if (actor->HasVVCCell(overlay[OV_SHIELDGLOBE]))
 			return;
-		default_anim.ZPos=0;
-		default_anim.Transparency=IE_VVC_TRANSPARENT;
-		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_SHIELDGLOBE], &default_anim);
+		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_SHIELDGLOBE]);
 		actor->AddVVCell(sca);
 	} else {
 		actor->RemoveVVCell(overlay[OV_SHIELDGLOBE], true);
@@ -446,9 +471,7 @@ void pcf_minorglobe(Actor *actor, ieDword Value)
 	if (Value) {
 		if (actor->HasVVCCell(overlay[OV_MINORGLOBE]))
 			return;
-		default_anim.ZPos=0;
-		default_anim.Transparency=IE_VVC_TRANSPARENT;
-		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_MINORGLOBE], &default_anim);
+		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_MINORGLOBE]);
 		actor->AddVVCell(sca);
 	} else {
 		actor->RemoveVVCell(overlay[OV_MINORGLOBE], true);
@@ -683,9 +706,8 @@ static void InitActorTables()
 //this method adds a vvc to the actor
 void Actor::add_animation(const ieResRef resource, int gradient, int height)
 {
-	default_anim.ZPos=height;
-	default_anim.Transparency=0;
-	ScriptedAnimation *sca = core->GetScriptedAnimation(resource, &default_anim);
+	ScriptedAnimation *sca = core->GetScriptedAnimation(resource);
+	sca->ZPos=height;
 	if (gradient!=-1) {
 		sca->SetPalette(gradient, 4);
 	}
@@ -962,13 +984,13 @@ void Actor::SelectActor()
 void Actor::Panic()
 {
 	SetBase(IE_MORALE,0);
-	SetBase(IE_STATE_ID,GetStat(IE_STATE_ID)|STATE_PANIC);
+	SetBaseBit(IE_STATE_ID, STATE_PANIC, true);
 	DisplayStringCore(this, VB_PANIC, DS_CONSOLE|DS_CONST );
 }
 
 void Actor::SetMCFlag(ieDword arg, int op)
 {
-	ieDword tmp = GetBase(IE_MC_FLAGS);
+	ieDword tmp = BaseStats[IE_MC_FLAGS];
 	switch (op) {
 	case BM_SET: tmp = arg; break;
 	case BM_OR: tmp |= arg; break;
@@ -982,9 +1004,9 @@ void Actor::SetMCFlag(ieDword arg, int op)
 void Actor::DialogInterrupt()
 {
 	//if dialoginterrupt was set, no verbal constant
-	if( GetStat(IE_MC_FLAGS)&MC_NO_TALK)
+	if( Modified[IE_MC_FLAGS]&MC_NO_TALK)
 		return;
-	if (GetStat(IE_EA)>=EA_EVILCUTOFF) {
+	if (Modified[IE_EA]>=EA_EVILCUTOFF) {
 		DisplayStringCore(this, VB_HOSTILE, DS_CONSOLE|DS_CONST );
 	} else {
 		DisplayStringCore(this, VB_DIALOG, DS_CONSOLE|DS_CONST );
@@ -999,20 +1021,21 @@ int Actor::Damage(int damage, int damagetype, Actor *hitter)
 	NewBase(IE_HITPOINTS, (ieDword) -damage, damagetype&3);
 	NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
 	//this is just a guess, probably morale is much more complex
-	if(GetStat(IE_MORALE)<GetStat(IE_MORALEBREAK) ) {
+	if(Modified[IE_MORALE]<Modified[IE_MORALEBREAK] ) {
 		Panic();
 	}
 	LastDamageType=damagetype;
 	LastDamage=damage;
 	LastHitter=hitter->GetID();
 	InternalFlags|=IF_ACTIVE;
+	int chp = (signed) Modified[IE_HITPOINTS];
 	int damagelevel = 2;
 	if (damage<5) {
 		damagelevel = 0;
 	} else if (damage<10) {
 		damagelevel = 1;
 	} else {
-		if (((signed) GetStat(IE_HITPOINTS))<-10) {
+		if (chp<-10) {
 			damagelevel=3; //chunky death
 		}
 		else {
@@ -1034,7 +1057,7 @@ int Actor::Damage(int damage, int damagetype, Actor *hitter)
 	}
 	DisplayStringCore(this, VB_DAMAGE, DS_CONSOLE|DS_CONST );
 	if (InParty) {
-		if (GetStat(IE_HITPOINTS)<GetStat(IE_MAXHITPOINTS)/10) {
+		if (chp<(signed) Modified[IE_MAXHITPOINTS]/10) {
 			core->Autopause(AP_WOUNDED);
 		}
 		if (damage>0) {
@@ -1115,7 +1138,7 @@ void Actor::SetPosition(Map *map, Point &position, int jump, int radius)
 	Point p;
 	p.x = position.x/16;
 	p.y = position.y/12;
-	if (jump && !(GetStat( IE_DONOTJUMP )&DNJ_FIT) && size ) {
+	if (jump && !(Modified[IE_DONOTJUMP] & DNJ_FIT) && size ) {
 		map->AdjustPosition( p, radius );
 	}
 	area = map;
@@ -1146,7 +1169,7 @@ int Actor::GetEncumbrance()
 void Actor::Turn(Scriptable *cleric, int turnlevel)
 {
 	//this is safely hardcoded i guess
-	if (GetStat(IE_GENERAL)!=GEN_UNDEAD) {
+	if (Modified[IE_GENERAL]!=GEN_UNDEAD) {
 		return;
 	}
 	//determine if we see the cleric (distance)
@@ -1164,13 +1187,13 @@ void Actor::Turn(Scriptable *cleric, int turnlevel)
 
 void Actor::Resurrect()
 {
-	if (!(GetStat( IE_STATE_ID ) & STATE_DEAD)) {
+	if (!(Modified[IE_STATE_ID ] & STATE_DEAD)) {
 		return;
 	}
 	InternalFlags&=IF_FROMGAME;		 //keep these flags (what about IF_INITIALIZED)
 	InternalFlags|=IF_ACTIVE|IF_VISIBLE;  //set these flags  
 	SetBase(IE_STATE_ID, 0);
-	SetBase(IE_HITPOINTS, GetBase(IE_MAXHITPOINTS));
+	SetBase(IE_HITPOINTS, BaseStats[IE_MAXHITPOINTS]);
 	ClearActions();
 	ClearPath();
 	SetStance(IE_ANI_EMERGE);
@@ -1245,7 +1268,7 @@ bool Actor::CheckOnDeath()
 	Game *game = core->GetGame();
 	if (InternalFlags&IF_GIVEXP) {
 		//give experience to party
-		game->ShareXP(GetStat(IE_XPVALUE), true );
+		game->ShareXP(Modified[IE_XPVALUE], true );
 		//handle reputation here
 		//
 	}
@@ -1278,10 +1301,15 @@ bool Actor::CheckOnDeath()
 	DropItem("",0);
 	//remove all effects that are not 'permanent after death' here
 	//permanent after death type is 9
-	BaseStats[IE_STATE_ID] |= STATE_DEAD;
+	SetBaseBit(IE_STATE_ID, STATE_DEAD, true);
 	if (Modified[IE_MC_FLAGS]&MC_REMOVE_CORPSE) return true;
 	if (Modified[IE_MC_FLAGS]&MC_KEEP_CORPSE) return false;
 	//if chunked death, then return true
+	if(LastDamage>10) {
+		//play chunky animation
+		//chunks are projectiles
+		return true;
+	}
 	return false;
 }
 
@@ -1451,7 +1479,7 @@ const char *Actor::GetDialog(bool checks) const
 	if (!checks) {
 		return Dialog;
 	}
-	if (GetStat(IE_EA)>=EA_EVILCUTOFF) {
+	if (Modified[IE_EA]>=EA_EVILCUTOFF) {
 		return NULL;
 	}
 
@@ -1546,10 +1574,11 @@ void Actor::SetColor( ieDword idx, ieDword grd)
 		value |= Modified[IE_COLORS+index] & ~(255<<shift);
 		Modified[IE_COLORS+index] = value;
 	}
-
+/*
 	if (anims) {
 		anims->SetColors(Modified+IE_COLORS);
 	}
+*/
 }
 
 void Actor::SetLeader(Actor *actor, int xoffset, int yoffset)
@@ -1563,16 +1592,16 @@ void Actor::SetLeader(Actor *actor, int xoffset, int yoffset)
 void Actor::Heal(int days)
 {
 	if (days) {
-		SetBase(IE_HITPOINTS, GetBase(IE_HITPOINTS)+days*2);
+		SetBase(IE_HITPOINTS, BaseStats[IE_HITPOINTS]+days*2);
 	} else {
-		SetBase(IE_HITPOINTS, GetStat(IE_MAXHITPOINTS));
+		SetBase(IE_HITPOINTS, BaseStats[IE_MAXHITPOINTS]);
 	}
 }
 
 //this function should handle dual classing and multi classing
 void Actor::AddExperience(int exp)
 {
-	SetBase(IE_XP,GetBase(IE_XP)+exp);
+	SetBase(IE_XP,BaseStats[IE_XP]+exp);
 }
 
 void Actor::RemoveTimedEffects()
@@ -1602,7 +1631,7 @@ void Actor::WalkTo(Point &Des, ieDword flags, int MinDistance)
 	InternalFlags |= (flags & IF_RUNFLAGS);
 	// is this true???
 	if (Des.x==-2 && Des.y==-2) {
-		Point p(GetStat(IE_SAVEDXPOS), GetStat(IE_SAVEDYPOS) );
+		Point p(Modified[IE_SAVEDXPOS], Modified[IE_SAVEDYPOS] );
 		Moveble::WalkTo(p, MinDistance);
 	} else {
 		Moveble::WalkTo(Des, MinDistance);
@@ -1669,7 +1698,7 @@ void Actor::Draw(Region &screen)
 	int State = Modified[IE_STATE_ID];
 	if (State&STATE_INVISIBLE) {
 		//enemies/neutrals are fully invisible if invis flag 2 set
-		if (GetStat(IE_EA)>EA_GOODCUTOFF) {
+		if (Modified[IE_EA]>EA_GOODCUTOFF) {
 			if (State&STATE_INVIS2)
 				Trans=256;
 			else
@@ -1680,7 +1709,7 @@ void Actor::Draw(Region &screen)
 	}
 	//friendlies are half transparent at best
 	if (Trans>128) {
-		if (GetStat(IE_EA)<=EA_GOODCUTOFF) {
+		if (Modified[IE_EA]<=EA_GOODCUTOFF) {
 			Trans=128;
 		}
 	}
@@ -1747,9 +1776,11 @@ void Actor::Draw(Region &screen)
 				}
 				assert(sc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height));
 
+				unsigned int flags = TranslucentShadows ? BLIT_TRANSSHADOW : 0;
+				if (!ca->lockPalette) flags|=BLIT_TINTED;
+
 				video->BlitGameSprite( nextFrame, cx + screen.x, cy + screen.y,
-					 BLIT_TINTED | (TranslucentShadows ? BLIT_TRANSSHADOW : 0),
-					 tint, sc, ca->palette, &screen);
+					 flags, tint, sc, ca->palette, &screen);
 			}
 		}
 		if (masteranim->endReached) {
@@ -1902,7 +1933,7 @@ retry:
 
 void Actor::RemoveVVCell(const ieResRef resource, bool graceful)
 {
-	int j = true;
+	bool j = true;
 	vvcVector *vvcCells=&vvcShields;
 retry:
 	unsigned int i=vvcCells->size();

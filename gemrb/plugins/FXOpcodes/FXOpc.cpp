@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.21 2006/04/17 12:07:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.22 2006/04/19 20:09:33 avenger_teambg Exp $
  *
  */
 
@@ -798,15 +798,13 @@ bool SummonCreature(ieResRef resource, ieResRef vvcres, Actor *Owner, Actor *tar
 			break;
 	}
 
-	//probably we should use the position in fx (and set it earlier)
-//	Point position = target->Pos;
-	//
-	//
 	Map *map = target->GetCurrentArea();
 
 	ab->SetPosition(map, position, true, 0);
 	if (vvcres[0]) {
-		ScriptedAnimation* vvc = core->GetScriptedAnimation(vvcres, NULL);
+		ScriptedAnimation* vvc = core->GetScriptedAnimation(vvcres);
+		vvc->XPos=position.x;
+		vvc->YPos=position.y;
 		map->AddVVCCell( vvc );
 	}
 	return true;
@@ -1789,8 +1787,15 @@ int fx_cure_infravision_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_blur_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_blur_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STATE_SET( STATE_BLUR );
-	return FX_APPLIED;
+	if (STATE_GET( STATE_DEAD) ) {
+		return FX_NOT_APPLIED;
+	}
+	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
+		BASE_STATE_SET( STATE_BLUR );
+	} else {
+		STATE_SET( STATE_BLUR );
+	}
+	return FX_PERMANENT;
 }
 
 // 0x42 TransparencyModifier
@@ -2619,11 +2624,12 @@ int fx_set_chantbad_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (STATE_GET (STATE_CHANTBAD) ) //chant is non cummulative
 		return FX_NOT_APPLIED;
 	STATE_SET( STATE_CHANTBAD );
-	STAT_ADD( IE_SAVEVSDEATH, -fx->Parameter1);
-	STAT_ADD( IE_SAVEVSWANDS, -fx->Parameter1);
-	STAT_ADD( IE_SAVEVSPOLY, -fx->Parameter1);
-	STAT_ADD( IE_SAVEVSBREATH, -fx->Parameter1);
-	STAT_ADD( IE_SAVEVSSPELL, -fx->Parameter1);
+	int tmp = -(int) fx->Parameter1;
+	STAT_ADD( IE_SAVEVSDEATH, tmp);
+	STAT_ADD( IE_SAVEVSWANDS, tmp);
+	STAT_ADD( IE_SAVEVSPOLY, tmp);
+	STAT_ADD( IE_SAVEVSBREATH, tmp);
+	STAT_ADD( IE_SAVEVSSPELL, tmp);
 	return FX_APPLIED;
 }
 // 0x8A AnimationStateChange
@@ -2656,7 +2662,7 @@ int fx_casting_glow (Actor* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	if (fx->Parameter2<(ieDword) cgcount) {
-		ScriptedAnimation *sca = core->GetScriptedAnimation(casting_glows[fx->Parameter2], 0);
+		ScriptedAnimation *sca = core->GetScriptedAnimation(casting_glows[fx->Parameter2]);
 		if (!sca) {
 			return FX_NOT_APPLIED;
 		}
@@ -2683,17 +2689,17 @@ int fx_visual_spell_hit (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (!map) {
 		return FX_APPLIED;
 	}
-	if (fx->Parameter1) {
-		default_spell_hit.XPos=target->Pos.x;
-		default_spell_hit.YPos=target->Pos.y;
-	} else {
-		default_spell_hit.XPos=fx->PosX;
-		default_spell_hit.YPos=fx->PosY;
-	}
 	if (fx->Parameter2<(ieDword) shcount) {
-		ScriptedAnimation *sca = core->GetScriptedAnimation(spell_hits[fx->Parameter2], &default_spell_hit);
+		ScriptedAnimation *sca = core->GetScriptedAnimation(spell_hits[fx->Parameter2]);
 		if (!sca) {
 			return FX_NOT_APPLIED;
+		}
+		if (fx->Parameter1) {
+			sca->XPos+=target->Pos.x;
+			sca->YPos+=target->Pos.y;
+		} else {
+			sca->XPos+=fx->PosX;
+			sca->XPos+=fx->PosY;
 		}
 		if (fx->Parameter2<32) {
 			int tmp = fx->Parameter2>>2;
@@ -2899,6 +2905,14 @@ int fx_set_grease_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_mirror_image_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_mirror_image_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (STATE_GET(STATE_DEAD) ) {
+		return FX_NOT_APPLIED;
+	}
+	if (!fx->Parameter2) {
+		return FX_NOT_APPLIED;
+	}
+	STATE_SET( STATE_MIRROR );
+	//actually, there is no such state in the original IE
 	STAT_SET( IE_MIRRORIMAGES, fx->Parameter2);
 	return FX_APPLIED;
 }
@@ -3359,7 +3373,7 @@ int fx_play_visual_effect (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_play_visual_effect (%2d): Resource: %s\n", fx->Opcode, fx->Resource );
 	if (fx->Resource[0]) {
-		ScriptedAnimation* vvc = core->GetScriptedAnimation(fx->Resource, NULL);
+		ScriptedAnimation* vvc = core->GetScriptedAnimation(fx->Resource);
 		target->GetCurrentArea( )->AddVVCCell( vvc );
 	}
 	return FX_APPLIED;

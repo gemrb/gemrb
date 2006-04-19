@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.191 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.192 2006/04/19 20:09:32 avenger_teambg Exp $
  *
  */
 
@@ -491,7 +491,7 @@ public:
 	/** returns true if resource exists */
 	bool Exists(const char *ResRef, SClass_ID type);
 	/** creates a vvc/bam animation object at point */
-	ScriptedAnimation* GetScriptedAnimation( const char *ResRef, ScriptedAnimation *templ);
+	ScriptedAnimation* GetScriptedAnimation( const char *ResRef);
 	/** returns the first selected PC */
 	Actor *GetFirstSelectedPC();
 	/** returns a single sprite (not cached) from a BAM resource */

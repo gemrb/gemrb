@@ -28,6 +28,7 @@
 #define IE_VVC_MIRRORY   	0x00000020
 #define IE_VVC_TINT     	0x00030000   //2 bits need to be set for tint
 #define IE_VVC_GREYSCALE	0x00080000
+#define IE_VVC_DARKEN     0x00100000
 #define IE_VVC_GLOWING  	0x00200000
 #define IE_VVC_RED_TINT		0x02000000
 
@@ -44,7 +45,7 @@ class GEM_EXPORT ScriptedAnimation {
 public:
 	ScriptedAnimation();
 	~ScriptedAnimation(void);
-	ScriptedAnimation(DataStream* stream, ScriptedAnimation *templ, bool autoFree = true);
+	ScriptedAnimation(DataStream* stream, bool autoFree = true);
 	void Init();
 	void LoadAnimationFactory(AnimationFactory *af);
 	void Override(ScriptedAnimation *templ);
@@ -56,6 +57,7 @@ public:
 	ieResRef PaletteName;
 	ieDword Transparency;
 	ieDword SequenceFlags;
+	int dither;
 	//these are signed
 	int XPos, YPos, ZPos;
 	ieDword FrameRate;

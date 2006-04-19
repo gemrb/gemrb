@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.29 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.30 2006/04/19 20:09:33 avenger_teambg Exp $
  *
  */
 
@@ -126,7 +126,7 @@ void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af)
 }
 
 /* Creating animation from VVC */
-ScriptedAnimation::ScriptedAnimation(DataStream* stream, ScriptedAnimation *templ, bool autoFree)
+ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 {
 	Init();
 	if (!stream) {
@@ -154,7 +154,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, ScriptedAnimation *temp
 	stream->Seek( 4, GEM_CURRENT_POS );
 	ieDword tmp;
 	stream->ReadDword( &tmp );
-	XPos = templ->XPos+(signed) tmp;
+	XPos = (signed) tmp;
 	stream->ReadDword( &tmp );  //this affects visibility
 	ZPos = (signed) tmp;
 	stream->Seek( 4, GEM_CURRENT_POS );
@@ -162,7 +162,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, ScriptedAnimation *temp
 	stream->ReadDword( &FaceTarget );
 	stream->Seek( 16, GEM_CURRENT_POS );
 	stream->ReadDword( &tmp );  //this doesn't affect visibility
-	YPos = templ->YPos+(signed) tmp;
+	YPos = (signed) tmp;
 	stream->Seek( 12, GEM_CURRENT_POS );
 	stream->ReadDword( &Duration );
 	stream->Seek( 8, GEM_CURRENT_POS );
@@ -176,12 +176,6 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, ScriptedAnimation *temp
 	stream->ReadDword( &seq3 );
 	stream->ReadResRef( sounds[P_RELEASE] );
 
-	if (templ->SequenceFlags&IE_VVC_BAM) {
-		seq1=0;
-		seq2=1;
-		seq3=2;
-		SequenceFlags|=IE_VVC_BAM;
-	}
 	if (SequenceFlags&IE_VVC_BAM) {
 		AnimationFactory* af = ( AnimationFactory* )
 			core->GetResourceMgr()->GetFactoryResource( Anim1ResRef, IE_BAM_CLASS_ID );
@@ -316,7 +310,7 @@ void ScriptedAnimation::SetDefaultDuration(ieDword duration)
 }
 
 //it is not sure if we need tint at all
-bool ScriptedAnimation::Draw(Region &screen, Point &Pos, Color &tint, Map *area, int dither)
+bool ScriptedAnimation::Draw(Region &screen, Point &Pos, Color &p_tint, Map *area, int p_dither)
 {
 	Video *video = core->GetVideoDriver();
 
@@ -356,6 +350,8 @@ retry:
 		goto retry;
 	}
 	ieDword flag = 0;
+	//transferring flags to SDLdriver, this will have to be consolidated later
+
 	if (Transparency & IE_VVC_TRANSPARENT) {
 		flag |= BLIT_HALFTRANS;
 	}
@@ -363,20 +359,38 @@ retry:
 	if (Transparency & IE_VVC_BLENDED) {
 		flag |= BLIT_BLENDED;
 	}
+	
+	Color tint = {128,128,128,255};
+
+	//darken, greyscale, red tint are probably not needed if the global tint works
+	//these are used in the original engine to implement weather/daylight effects
+	//on the other hand
+	if (Transparency & IE_VVC_DARKEN) {
+		flag |= BLIT_TINTED;
+	}
+	if (Transparency & IE_VVC_GREYSCALE) {
+		flag |= BLIT_GREY;
+	}
+	if (Transparency & IE_VVC_RED_TINT) {
+		flag |= BLIT_RED;
+	}
 
 	if ((Transparency & IE_VVC_TINT)==IE_VVC_TINT) {
 		flag |= BLIT_TINTED;
+		tint = p_tint;
 	}
 
 	int cx = Pos.x + XPos;
 	int cy = Pos.y + ZPos + YPos;
-	if (cover && ( (SequenceFlags&IE_VVC_NOCOVER) || 
-		(!cover->Covers(cx, cy, frame->XPos, frame->YPos, frame->Width, frame->Height))) ) {
-		SetSpriteCover(NULL);
-	}
-	if (!(cover || (SequenceFlags&IE_VVC_NOCOVER)) ) {    
-		cover = area->BuildSpriteCover(cx, cy, -anims[Phase]->animArea.x, 
-			-anims[Phase]->animArea.y, anims[Phase]->animArea.w, anims[Phase]->animArea.h, dither);
+
+	if( SequenceFlags&IE_VVC_NOCOVER) {
+		if (cover) SetSpriteCover(NULL);
+	} else {
+		if (!cover || (dither!=p_dither) || (!cover->Covers(cx, cy, frame->XPos, frame->YPos, frame->Width, frame->Height)) ) {
+			dither = p_dither;
+			SetSpriteCover(area->BuildSpriteCover(cx, cy, -anims[Phase]->animArea.x, 
+			-anims[Phase]->animArea.y, anims[Phase]->animArea.w, anims[Phase]->animArea.h, p_dither) );
+		}
 		assert(cover->Covers(cx, cy, frame->XPos, frame->YPos, frame->Width, frame->Height));
 	}
 
