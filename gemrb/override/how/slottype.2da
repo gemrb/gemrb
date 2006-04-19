@@ -15,10 +15,10 @@
 36         256        2          STONWEAP   12010      4
 37         256        3          STONWEAP   12010      4
 38         256        4          STONWEAP   12010      4
-11         512        15         STONQUIV   12009      0
-12         512        16         STONQUIV   12009      0
-13         512        17         STONQUIV   12009      0
-14         512        0          STONQUIV   12009      0
+11         512        15         STONQUIV   12009      5
+12         512        16         STONQUIV   12009      5
+13         512        17         STONQUIV   12009      5
+14         512        0          STONQUIV   12009      5
 4          1024       24         STONCLOK   12004      1
 15         2048       5          STONITEM   12012      0
 16         2048       6          STONITEM   12012      0
