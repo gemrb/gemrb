@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.141 2006/04/19 20:25:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.142 2006/04/19 20:34:08 wjpalenstijn Exp $
  *
  */
 
@@ -818,9 +818,9 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 		palette = data->pal;
 
 	// implicit flags:
-	const unsigned int blit_COVERED = 8192;
-	const unsigned int blit_TINTALPHA = 16384;
-	const unsigned int blit_PALETTEALPHA = 32768;
+	const unsigned int blit_COVERED =      0x20000000U;
+	const unsigned int blit_TINTALPHA =    0x40000000U;
+	const unsigned int blit_PALETTEALPHA = 0x80000000U;
 
 	if (cover) flags |= blit_COVERED;
 	if ((flags & BLIT_TINTED) && tint.a != 255) flags |= blit_TINTALPHA;
