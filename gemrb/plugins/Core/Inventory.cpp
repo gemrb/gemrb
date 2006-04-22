@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.71 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.72 2006/04/22 19:40:39 avenger_teambg Exp $
  *
  */
 
@@ -134,7 +134,17 @@ void Inventory::CalculateWeight()
 				if (slot->Flags & IE_INV_ITEM_STOLEN2) {
 					slot->Flags |= IE_INV_ITEM_STOLEN;
 				}
-				
+
+				//auto identify basic items
+				if (!itm->LoreToID) {
+					slot->Flags |= IE_INV_ITEM_IDENTIFIED;
+				}
+
+				//if item is stacked mark it as so
+				if (itm->StackAmount) {
+					slot->Flags |= IE_INV_ITEM_STACKED;
+				}
+
 				slot->Weight = itm->Weight;
 				slot->StackAmount = itm->StackAmount;
 				core->FreeItem( itm, slot->ItemResRef, false );
@@ -658,7 +668,7 @@ bool Inventory::UnEquipItem(unsigned int slot, bool removecurse)
 		if (item->Flags & IE_INV_ITEM_MOVABLE) {
 			item->Flags&=~IE_INV_ITEM_UNDROPPABLE;
 		}
-		if (FindCandidateSlot(-1,0,item->ItemResRef)<0) {
+		if (FindCandidateSlot(SLOT_INVENTORY,0,item->ItemResRef)<0) {
 			return false;
 		}
 	}
