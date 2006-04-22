@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.111 2006/04/22 13:30:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.112 2006/04/22 17:46:16 avenger_teambg Exp $
  *
  */
 
@@ -236,8 +236,15 @@ public:
 	void DrawMap(Region screen, GameControl* gc);
 	void PlayAreaSong(int);
 	void AddAnimation(AreaAnimation* anim);
-	AreaAnimation* GetAnimation(const char* Name);
 	aniIterator GetFirstAnimation() { return animations.begin(); }
+	AreaAnimation* GetNextAnimation(aniIterator &iter)
+	{
+		if (iter == animations.end()) {
+			return NULL;
+		}
+		return *iter++;
+	}
+	AreaAnimation* GetAnimation(const char* Name);
 	size_t GetAnimationCount() const { return animations.size(); }
 
 	unsigned int GetWallCount() { return WallCount; }

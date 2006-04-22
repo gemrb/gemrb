@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.31 2006/04/22 13:30:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.32 2006/04/22 17:46:16 avenger_teambg Exp $
  *
  */
 
@@ -239,12 +239,16 @@ ScriptedAnimation::~ScriptedAnimation(void)
 		}
 		core->FreePalette(palettes[i], PaletteName);
 	}
+	if (cover) {
+		SetSpriteCover(NULL);
+	}
 }
 
 void ScriptedAnimation::SetPhase(int arg)
 {
-	if (arg>=0 && arg<=2)
+	if (arg>=0 && arg<=2) {
 		Phase = arg;
+	}
 	SetSpriteCover(NULL);
 }
 
