@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.382 2006/04/16 23:57:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.383 2006/04/22 19:42:06 avenger_teambg Exp $
  *
  */
 
@@ -5568,7 +5568,12 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Actor not found" );
 	}
 
-	actor->inventory.SetSlotItemRes( ItemResRef, core->QuerySlot(SlotID), Charge0, Charge1, Charge2 );
+  if (SlotID==-1) {
+    SlotID=actor->inventory.FindCandidateSlot(SLOT_INVENTORY,0);
+  }
+  if (SlotID!=-1) {
+	  actor->inventory.SetSlotItemRes( ItemResRef, SlotID, Charge0, Charge1, Charge2 );
+  }
 	Py_INCREF( Py_None );
 	return Py_None;
 }
