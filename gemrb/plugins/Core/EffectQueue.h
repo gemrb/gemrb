@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.27 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.28 2006/04/22 13:30:18 avenger_teambg Exp $
  *
  */
 
@@ -110,12 +110,15 @@ struct EffectRef {
 	int EffText; //also opcode in another context
 };
 
-/** Initializes table of available spell Effects used by all the queues */
+/** Initializes table of available spell Effects used by all the queues. */
+/** The available effects should already be registered by the effect plugins */
 bool Init_EffectQueue();
 
-/** Registers opcodes implemented by a plugin */
+/** Registers opcodes implemented by an effect plugin */
 void EffectQueue_RegisterOpcodes(int count, EffectRef *opcodes);
 
+/** release effect list when Interface is destroyed */
+void EffectQueue_ReleaseMemory();
 
 bool match_ids(Actor *target, int table, ieDword value);
 

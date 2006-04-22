@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.60 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.61 2006/04/22 13:30:18 avenger_teambg Exp $
  *
  */
 
@@ -108,13 +108,6 @@ static EffectRef* FindEffect(const char* effectname)
 		return NULL;
 	}
 	void *tmp = bsearch(effectname, effectnames, opcodes_count, sizeof(EffectRef), find_effect);
-	/*
-	for (int i = 0; effectnames[i].Name; i++) {
-		if (!stricmp( effectnames[i].Name, effectname )) {
-			return effectnames + i;
-		}
-	}
-	*/
 	if (!tmp) {
 		printf( "Warning: Couldn't assign effect: %s\n", effectname );
 	}
@@ -201,6 +194,15 @@ bool Init_EffectQueue()
 	return true;
 }
 
+void EffectQueue_ReleaseMemory()
+{
+	if (effectnames) {
+		free (effectnames);
+	}
+	opcodes_count = 0;
+	effectnames = NULL;
+}
+
 void EffectQueue_RegisterOpcodes(int count, EffectRef* opcodes)
 {
 	if (! effectnames) {
@@ -221,7 +223,7 @@ void EffectQueue_RegisterOpcodes(int count, EffectRef* opcodes)
 EffectQueue::EffectQueue()
 {
 	Owner = NULL;
-	opcodes_count = 0;
+//	opcodes_count = 0;
 }
 
 EffectQueue::~EffectQueue()
@@ -229,11 +231,6 @@ EffectQueue::~EffectQueue()
 	for (unsigned i = 0; i < effects.size(); i++) {
 		delete( effects[i] );
 	}
-	if (effectnames) {
-		free (effectnames);
-	}
-	opcodes_count = 0;
-	effectnames = NULL;
 }
 
 bool EffectQueue::AddEffect(Effect* fx)
@@ -265,11 +262,12 @@ bool EffectQueue::RemoveEffect(Effect* fx)
 //The effects are already in the fxqueue of the target
 void EffectQueue::ApplyAllEffects(Actor* target)
 {
-	ieDword random_value = core->Roll( 1, 100, 0 );
+	//nah, we already been through this
+	//ieDword random_value = core->Roll( 1, 100, 0 );
 
 	std::vector< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		(*f)->random_value = random_value;
+		//(*f)->random_value = random_value;
 		ApplyEffect( target, *f, false );
 	}
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
@@ -328,7 +326,8 @@ inline bool check_probability(Effect* fx)
 {
 	//watch for this, probability1 is the high number
 	//probability2 is the low number
-	if (fx->random_value<fx->Probability2 || fx->random_value>fx->Probability1) {
+	//random value is 1-100
+	if (fx->random_value<=fx->Probability2 || fx->random_value>fx->Probability1) {
 		return false;
 	}
 	return true;
@@ -810,6 +809,8 @@ int EffectQueue::ResolveEffect(EffectRef &effect_reference)
 	ResolveEffectRef(effect_reference);
 	return effect_reference.EffText;
 }
+
+// this is a complete level check
 
 //returns 1 if effect block applicable
 //returns 0 if effect block disabled

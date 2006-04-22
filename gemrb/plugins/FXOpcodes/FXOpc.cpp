@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.22 2006/04/19 20:09:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.23 2006/04/22 13:30:20 avenger_teambg Exp $
  *
  */
 
@@ -2045,6 +2045,7 @@ int fx_set_ai_script (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_protection_from_projectile (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_protection_from_projectile (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	//this is unsure
 	STAT_SET( IE_SHIELDGLOBE, 1 );
 	return FX_APPLIED;
 }
@@ -2648,6 +2649,8 @@ int fx_display_string (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
+int ypos_by_direction[16]={10,10,10,0,-10,-10,-10,-10,-10,-10,-10,-10,0,10,10,10};
+int xpos_by_direction[16]={0,-2,-4,-6,-8,-6,-4,-2,0,2,4,6,8,6,4,2};
 //0x8c CastingGlow
 int fx_casting_glow (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -2666,12 +2669,18 @@ int fx_casting_glow (Actor* /*Owner*/, Actor* target, Effect* fx)
 		if (!sca) {
 			return FX_NOT_APPLIED;
 		}
-		ieDword Duration = fx->Duration;
-		if (!Duration) {
-			Duration = 1000;
-		}
-		sca->SetDefaultDuration (Duration);
+		//12 is just an approximate value to set the height of the casting glow
+		//based on the avatar's size
+		int heightmod = target->GetAnims()->GetCircleSize()*12;
+		sca->XPos+=fx->PosX+xpos_by_direction[target->GetOrientation()];
+		sca->YPos+=fx->PosY+ypos_by_direction[target->GetOrientation()];
+		sca->ZPos+=heightmod;
 		sca->SetBlend();
+		if (fx->Duration) {
+			sca->SetDefaultDuration(fx->Duration-core->GetGame()->Ticks);
+		} else {
+			sca->SetDefaultDuration(10000);
+		}
 		map->AddVVCCell(sca);
 	}
 	return FX_NOT_APPLIED;
@@ -2699,7 +2708,7 @@ int fx_visual_spell_hit (Actor* /*Owner*/, Actor* target, Effect* fx)
 			sca->YPos+=target->Pos.y;
 		} else {
 			sca->XPos+=fx->PosX;
-			sca->XPos+=fx->PosY;
+			sca->YPos+=fx->PosY;
 		}
 		if (fx->Parameter2<32) {
 			int tmp = fx->Parameter2>>2;

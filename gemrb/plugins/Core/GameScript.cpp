@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.358 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.359 2006/04/22 13:30:18 avenger_teambg Exp $
  *
  */
 
@@ -604,6 +604,8 @@ static ActionLink actionnames[] = {
 	{"randomwalk", GameScript::RandomWalk, AF_BLOCKING},
 	{"randomwalkcontinuous", GameScript::RandomWalkContinuous, AF_BLOCKING},
 	{"realsetglobaltimer", GameScript::RealSetGlobalTimer,AF_MERGESTRINGS},
+	{"reallyforcespell", GameScript::ReallyForceSpell, AF_BLOCKING},
+	{"reallyforcespelldead", GameScript::ReallyForceSpellDead, AF_BLOCKING},
 	{"recoil", GameScript::Recoil, 0},
 	{"regainpaladinhood", GameScript::RegainPaladinHood, 0},
 	{"regainrangerhood", GameScript::RegainRangerHood, 0},

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.238 2006/04/19 20:09:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.239 2006/04/22 13:30:19 avenger_teambg Exp $
  *
  */
 
@@ -92,8 +92,39 @@ void Map::ReleaseMemory()
 	PathFinderInited = false;
 }
 
+inline static AnimationObjectType SelectObject(Actor *actor, AreaAnimation *a, ScriptedAnimation *sca)
+{
+	int actorh;
+	if (actor) {
+		actorh = actor->Pos.y;
+	} else {
+		actorh = 0x7fffffff;
+	}
+
+	int aah;
+	if (a) {
+		aah = a->Pos.y;//+a->height;
+	} else {
+		aah = 0x7fffffff;
+	}
+
+	int scah;
+	if (sca) {
+		scah = sca->YPos;//+sca->ZPos;
+	} else {
+		scah = 0x7fffffff;
+	}
+
+	if (actorh<aah) {
+		if (actorh<scah) return AOT_ACTOR;
+		return AOT_SCRIPTED;
+	}
+	if (aah<scah) return AOT_AREA;
+	return AOT_SCRIPTED;
+}
+
 //returns true if creature must be embedded in the area
-static bool MustSave(Actor *actor)
+inline static bool MustSave(Actor *actor)
 {
 	if (actor->InParty) {
 		return false;
@@ -342,8 +373,9 @@ Map::~Map(void)
 	if (TMap) {
 		delete TMap;
 	}
-	for (i = 0; i < animations.size(); i++) {
-		delete animations[i];
+	aniIterator aniidx;
+	for (aniidx = animations.begin(); aniidx != animations.end(); aniidx++) {
+		delete (*aniidx);
 	}
 
 	for (i = 0; i < actors.size(); i++) {
@@ -372,11 +404,10 @@ Map::~Map(void)
 			queue[i] = NULL;
 		}
 	}
-	for (i = 0; i < vvcCells.size(); i++) {
-		if (vvcCells[i]) {
-			delete vvcCells[i];
-			vvcCells[i] = NULL;
-		}
+	scaIterator iter;
+
+	for (iter = vvcCells.begin(); iter != vvcCells.end(); iter++) {
+		delete (*iter);
 	}
 	for (i = 0; i < ambients.size(); i++) {
 		delete ambients[i];
@@ -639,12 +670,11 @@ void Map::UpdateScripts()
 
 //there is a similar function in Actors for mobile vvcs
 //this probably needs an additional container object which stores position, duration etc
+/*
 void Map::DrawVideocells(Region screen)
 {
 	for (unsigned int i = 0; i < vvcCells.size(); i++) {
 		ScriptedAnimation* vvc = vvcCells[i];
-		if (!vvc)
-			continue;
 
 		Point Pos(0,0); //we need the position of the vvc on the area
 
@@ -653,13 +683,13 @@ void Map::DrawVideocells(Region screen)
 		
 		bool endReached = vvc->Draw(screen, Pos, tint, this, false);
 		if (endReached) {
-			vvcCells[i] = NULL;
 			delete( vvc );
+			vvcCells.erase(vvcCells.begin()+i);
 			continue;
 		}
 	}
 }
-
+*/
 
 void Map::DrawContainers( Region screen, Container *overContainer)
 {
@@ -734,13 +764,13 @@ retry:
 	}
 }
 
-AreaAnimation *Map::GetNextAreaAnimation(int &aniidx, ieDword gametime)
+AreaAnimation *Map::GetNextAreaAnimation(aniIterator &iter, ieDword gametime)
 {
 retry:
-	if (aniidx>=GetAnimationCount()) {
+	if (iter==animations.end()) {
 		return NULL;
 	}
-	AreaAnimation *a = GetAnimation(aniidx++);
+	AreaAnimation *a = *(iter++);
 	if (!a->Schedule(gametime) ) {
 		goto retry;
 	}
@@ -748,6 +778,15 @@ retry:
 		goto retry;
 	}
 	return a;
+}
+
+//doesn't increase iterator, because we might need to erase it from the list
+ScriptedAnimation *Map::GetNextScriptedAnimation(scaIterator &iter)
+{
+	if (iter==vvcCells.end()) {
+		return NULL;
+	}
+	return *iter;
 }
 
 void Map::DrawMap(Region screen, GameControl* gc)
@@ -779,37 +818,58 @@ void Map::DrawMap(Region screen, GameControl* gc)
 	int q = PR_DISPLAY;
 	int index = Qcount[q];
 	Actor* actor = GetNextActor(q, index);
-	int aniidx = 0;
+	aniIterator aniidx = animations.begin();
+	scaIterator scaidx = vvcCells.begin();
 	AreaAnimation *a = GetNextAreaAnimation(aniidx, gametime);
-	while (true) {		
-		if (!a || (actor && (actor->Pos.y<a->Pos.y+a->height)) ) {
-			if (!actor) {
-				break;
-			}
+	ScriptedAnimation *sca = GetNextScriptedAnimation(scaidx);
+
+	while (actor || a || sca) {
+		switch(SelectObject(actor,a,sca)) {
+		case AOT_ACTOR:
 			actor->Draw( screen );
 			actor = GetNextActor(q, index);
-		} else {
+			break;
+		case AOT_AREA:
 			//draw animation
-			int animcount=a->animcount;
+			{
+				int animcount=a->animcount;
 
-			//always draw the animation tinted because tint is also used for
-			//transparency
-			Color tint = {255,255,255,255-(ieByte) a->transparency};
-			if ((a->Flags&A_ANI_NO_SHADOW)) {
-				tint = LightMap->GetPixel( a->Pos.x / 16, a->Pos.y / 12);
-				tint.a = 255-(ieByte) a->transparency;
-			}
-			while (animcount--) {
-				Animation *anim = a->animation[animcount];
-				video->BlitGameSprite( anim->NextFrame(),
-					a->Pos.x + screen.x, a->Pos.y + screen.y,
-					BLIT_TINTED, tint, 0, a->palette, &screen );
+				//always draw the animation tinted because tint is also used for
+				//transparency
+				Color tint = {255,255,255,255-(ieByte) a->transparency};
+				if ((a->Flags&A_ANI_NO_SHADOW)) {
+					tint = LightMap->GetPixel( a->Pos.x / 16, a->Pos.y / 12);
+					tint.a = 255-(ieByte) a->transparency;
+				}
+				while (animcount--) {
+					Animation *anim = a->animation[animcount];
+					video->BlitGameSprite( anim->NextFrame(),
+						a->Pos.x + screen.x, a->Pos.y + screen.y,
+						BLIT_TINTED, tint, 0, a->palette, &screen );
+				}
 			}
 			a = GetNextAreaAnimation(aniidx,gametime);
+			break;
+		case AOT_SCRIPTED:
+			{
+				Point Pos(0,0);
+
+				Color tint = LightMap->GetPixel( sca->XPos / 16, sca->YPos / 12);
+				tint.a = 255;
+				bool endReached = sca->Draw(screen, Pos, tint, this, 0);
+				if (endReached) {
+					delete( sca );
+					scaidx=vvcCells.erase(scaidx);
+				} else {
+					scaidx++;
+				}
+			}
+			sca = GetNextScriptedAnimation(scaidx);
+			break;
+		default:
+			abort();
 		}
 	}
-
-	DrawVideocells(screen);
 
 	if ((core->FogOfWar&2) && SearchMap) {
 		DrawSearchMap(screen);
@@ -854,15 +914,15 @@ void Map::DrawSearchMap(Region &screen)
 //adding animation in order, based on its height parameter
 void Map::AddAnimation(AreaAnimation* anim)
 {
-	int i;
-
 	//this hack is to make sure animations flagged with background
 	//are always drawn first (-9999 seems sufficiently small)
 	if (anim->Flags&A_ANI_BACKGROUND) {
 		anim->height=-9999;
 	}
-	for(i=animations.size();i && animations[i-1]->height>anim->height; i--);
-	animations.insert(animations.begin()+i, anim);
+
+	aniIterator iter;
+	for(iter=animations.begin(); (iter!=animations.end()) && ((*iter)->height<anim->height); iter++);
+	animations.insert(iter, anim);
 }
 
 //reapplying all of the effects on the actors of this map
@@ -1358,65 +1418,22 @@ void Map::SortQueues()
 		}
 	}
 }
-/*
-Actor* Map::GetRoot(int priority, int &index)
-{
-	if (index == 0) {
-		return NULL;
-	}
 
-	Actor **baseline=queue[priority]+(Qcount[priority]-index);
-	Actor* ret = baseline[0];
-	index--;
-	if (index == 0) {
-		return ret;
-	}
-	Actor* node = baseline[1];
-
-	int lastPos = 1;
-	while (true) {
-		int leftChildPos = lastPos * 2;
-		int rightChildPos = lastPos * 2 + 1;
-		if (leftChildPos > index)
-			break;
-		Actor* child = baseline[leftChildPos];
-		int childPos = leftChildPos;
-		if (rightChildPos <= index) {
-			//If both Child Exist
-			Actor* rightChild = baseline[rightChildPos];
-			if (rightChild->Pos.y < child->Pos.y) {
-				childPos = rightChildPos;
-				child = rightChild;
-			}
-		}
-		if (node->Pos.y > child->Pos.y) {
-			baseline[lastPos] = child;
-			baseline[childPos] = node;
-			lastPos = childPos;
-		} else
-			break;
-	}
-	return ret;
-}
-*/
-
+//adding videocell in order, based on its height parameter
 void Map::AddVVCCell(ScriptedAnimation* vvc)
 {
-	unsigned int i=vvcCells.size();
-	while (i--) {
-		if (vvcCells[i] == NULL) {
-			vvcCells[i] = vvc;
-			return;
-		}
-	}
-	vvcCells.push_back( vvc );
+	scaIterator iter;
+
+	for(iter=vvcCells.begin();iter!=vvcCells.end() && (*iter)->ZPos>vvc->ZPos; iter++);
+	vvcCells.insert(iter, vvc);
 }
 
 AreaAnimation* Map::GetAnimation(const char* Name)
 {
-	unsigned int i=animations.size();
-	while (i--) {
-		AreaAnimation *anim = animations[i];
+	aniIterator iter;
+
+	for(iter=animations.begin();iter!=animations.end();iter++) {
+		AreaAnimation *anim = *iter;
 
 		if (anim->Name && (strnicmp( anim->Name, Name, 32 ) == 0)) {
 			return anim;

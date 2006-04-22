@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.98 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.99 2006/04/22 13:30:18 avenger_teambg Exp $
  *
  */
 
@@ -170,8 +170,8 @@ void Button::Draw(unsigned short x, unsigned short y)
 		}
 		if (Image) {
 			// FIXME: maybe it's useless...
-			short xOffs = ( Width / 2 ) - ( Image->Width / 2 );
-			short yOffs = ( Height / 2 ) - ( Image->Height / 2 );
+			int xOffs = ( Width / 2 ) - ( Image->Width / 2 );
+			int yOffs = ( Height / 2 ) - ( Image->Height / 2 );
 
 			core->GetVideoDriver()->BlitSprite( Image, x + XPos + xOffs, y + YPos + yOffs, true );
 		}
@@ -189,8 +189,8 @@ void Button::Draw(unsigned short x, unsigned short y)
 		if (Picture2) {
 			h += Picture2->Height;
 		}
-		short xOffs = ( Width / 2 ) - ( Picture->Width / 2 );
-		short yOffs = ( Height / 2 ) - ( h / 2 );
+		int xOffs = ( Width / 2 ) - ( Picture->Width / 2 );
+		int yOffs = ( Height / 2 ) - ( h / 2 );
 		Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(Picture->Width * Clipping), h );
 		core->GetVideoDriver()->BlitSprite( Picture, x + XPos + xOffs, y + YPos + yOffs, true, &r );
 		if (Picture2) {
@@ -200,8 +200,8 @@ void Button::Draw(unsigned short x, unsigned short y)
 
 	// Button picture
 	if (AnimPicture) {
-		short xOffs = ( Width / 2 ) - ( AnimPicture->Width / 2 );
-		short yOffs = ( Height / 2 ) - ( AnimPicture->Height / 2 );
+		int xOffs = ( Width / 2 ) - ( AnimPicture->Width / 2 );
+		int yOffs = ( Height / 2 ) - ( AnimPicture->Height / 2 );
 		Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(AnimPicture->Width * Clipping), AnimPicture->Height );
 		core->GetVideoDriver()->BlitSprite( AnimPicture, x + XPos + xOffs, y + YPos + yOffs, true, &r );
 	}

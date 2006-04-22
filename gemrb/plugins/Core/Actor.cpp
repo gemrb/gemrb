@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.181 2006/04/19 20:09:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.182 2006/04/22 13:30:18 avenger_teambg Exp $
  *
  */
 
@@ -1645,14 +1645,16 @@ void Actor::DrawVideocells(Region &screen, vvcVector &vvcCells, Color &tint)
 
 	for (unsigned int i = 0; i < vvcCells.size(); i++) {
 		ScriptedAnimation* vvc = vvcCells[i];
+/* we don't allow holes anymore
 		if (!vvc)
 			continue;
+*/
 
 		// actually this is better be drawn by the vvc
 		bool endReached = vvc->Draw(screen, Pos, tint, area, WantDither());
 		if (endReached) {
-			vvcCells[i] = NULL;
-			delete( vvc );
+			delete vvc;
+			vvcCells.erase(vvcCells.begin()+i);
 			continue;
 		}
 	}
@@ -1947,7 +1949,7 @@ retry:
 				vvc->SetPhase(P_RELEASE);
 			} else {
 				delete vvc;
-				(*vvcCells)[i]=NULL;
+				vvcCells->erase(vvcCells->begin()+i);
 			}
 		}
 	}

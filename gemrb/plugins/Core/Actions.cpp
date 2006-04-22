@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.66 2006/04/19 20:09:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.67 2006/04/22 13:30:18 avenger_teambg Exp $
  *
  */
 
@@ -1851,6 +1851,7 @@ void GameScript::MoveBetweenAreas(Scriptable* Sender, Action* parameters)
 		parameters->pointParameter, parameters->int0Parameter, true);
 }
 
+//it is unsure how the ForceSpell actions differ
 void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 {
 	ieResRef spellres;
@@ -1873,6 +1874,61 @@ void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 	GetPositionFromScriptable( Sender, s, false );
 	GetPositionFromScriptable( tar, d, false );
 	printf( "ForceSpell from [%d,%d] to [%d,%d]\n", s.x, s.y, d.x, d.y );
+	//this might be bad
+	Sender->ReleaseCurrentAction();
+}
+
+void GameScript::ReallyForceSpell(Scriptable* Sender, Action* parameters)
+{
+	ieResRef spellres;
+
+	if (!ResolveSpellName( spellres, parameters) ) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	if (Sender->Type == ST_ACTOR) {
+		Actor *actor = (Actor *) Sender;
+		actor->SetStance (IE_ANI_CAST);
+	}
+	Point s,d;
+	GetPositionFromScriptable( Sender, s, false );
+	GetPositionFromScriptable( tar, d, false );
+	printf( "ReallyForceSpell from [%d,%d] to [%d,%d]\n", s.x, s.y, d.x, d.y );
+	//this might be bad
+	Sender->ReleaseCurrentAction();
+}
+
+// this differs from ReallyForceSpell that this one allows dead Sender casting
+void GameScript::ReallyForceSpellDead(Scriptable* Sender, Action* parameters)
+{
+	ieResRef spellres;
+
+	if (!ResolveSpellName( spellres, parameters) ) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+/* if dead, then do not move
+	if (Sender->Type == ST_ACTOR) {
+		Actor *actor = (Actor *) Sender;
+		actor->SetStance (IE_ANI_CAST);
+	}
+*/
+	Point s,d;
+	GetPositionFromScriptable( Sender, s, false );
+	GetPositionFromScriptable( tar, d, false );
+	printf( "ReallyForceSpellDead from [%d,%d] to [%d,%d]\n", s.x, s.y, d.x, d.y );
 	//this might be bad
 	Sender->ReleaseCurrentAction();
 }

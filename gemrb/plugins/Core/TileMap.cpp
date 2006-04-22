@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.53 2006/02/22 18:38:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.54 2006/04/22 13:30:19 avenger_teambg Exp $
  *
  */
 
@@ -376,6 +376,9 @@ Container* TileMap::GetContainer(const char* Name)
 	return NULL;
 }
 
+//look for a container at position
+//use type = IE_CONTAINER_PILE if you want to find ground piles only
+//in this case, empty piles won't be found!
 Container* TileMap::GetContainer(Point &position, int type)
 {
 	for (size_t i = 0; i < containers.size(); i++) {
@@ -395,8 +398,14 @@ Container* TileMap::GetContainer(Point &position, int type)
 			continue;
 	
 		//IE piles don't have polygons, the bounding box is enough for them
-		if (c->Type==IE_CONTAINER_PILE)
+		if (c->Type == IE_CONTAINER_PILE) {
+			//don't find empty piles if we look for any container
+			//if we looked only for piles, then we still return them
+			if ((type==-1) && !c->inventory.GetSlotCount()) {
+				continue;
+			}
 			return c;
+		}
 		if (c->outline->PointIn( position ))
 			return c;
 	}

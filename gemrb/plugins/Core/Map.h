@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.110 2006/04/19 20:09:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.111 2006/04/22 13:30:19 avenger_teambg Exp $
  *
  */
 
@@ -171,6 +171,8 @@ public:
 	bool Schedule(ieDword gametime);
 };
 
+enum AnimationObjectType {AOT_AREA, AOT_SCRIPTED, AOT_ACTOR};
+
 //i believe we need only the active actors/visible inactive actors queues
 #define QUEUE_COUNT 2
 
@@ -178,6 +180,9 @@ public:
 #define PR_SCRIPT  0
 #define PR_DISPLAY 1
 #define PR_IGNORE  2
+
+typedef std::list<AreaAnimation*>::iterator aniIterator;
+typedef std::list<ScriptedAnimation*>::iterator scaIterator;
 
 class GEM_EXPORT Map : public Scriptable {
 public:
@@ -199,12 +204,11 @@ private:
 	unsigned short* MapSet;
 	std::queue< unsigned int> InternalStack;
 	unsigned int Width, Height;
-	std::vector< AreaAnimation*> animations;
+	std::list< AreaAnimation*> animations;
 	std::vector< Actor*> actors;
 	Wall_Polygon **Walls;
 	unsigned int WallCount;
-	//std::vector< WallGroup*> wallGroups;
-	std::vector< ScriptedAnimation*> vvcCells;
+	std::list< ScriptedAnimation*> vvcCells;
 	std::vector< Entrance*> entrances;
 	std::vector< Ambient*> ambients;
 	std::vector< MapNote*> mapnotes;
@@ -227,14 +231,14 @@ public:
 	/* transfers all piles (loose items) to another map */
 	void CopyGroundPiles(Map *othermap, Point &Pos);
 	/* draws stationary vvc graphics */
-	void DrawVideocells(Region screen);
+	//void DrawVideocells(Region screen);
 	void DrawContainers(Region screen, Container *overContainer);
 	void DrawMap(Region screen, GameControl* gc);
 	void PlayAreaSong(int);
 	void AddAnimation(AreaAnimation* anim);
 	AreaAnimation* GetAnimation(const char* Name);
-	AreaAnimation* GetAnimation(int i) { return animations[i]; }
-	int GetAnimationCount() const { return (int) animations.size(); }
+	aniIterator GetFirstAnimation() { return animations.begin(); }
+	size_t GetAnimationCount() const { return animations.size(); }
 
 	unsigned int GetWallCount() { return WallCount; }
 	Wall_Polygon *GetWallGroup(int i) { return Walls[i]; }
@@ -351,7 +355,8 @@ public:
 	//move some or all players to a new area
 	void MoveToNewArea(const char *area, const char *entrance, int EveryOne, Actor *actor);
 private:
-	AreaAnimation *GetNextAreaAnimation(int &aniidx, ieDword gametime);
+	AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime);
+	ScriptedAnimation *GetNextScriptedAnimation(scaIterator &iter);
 	Actor *GetNextActor(int &q, int &index);
 	void DrawSearchMap(Region &screen);
 	void GenerateQueues();

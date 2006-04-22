@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.244 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.245 2006/04/22 13:30:19 avenger_teambg Exp $
  *
  */
 
@@ -1156,6 +1156,8 @@ public:
 	static void RandomWalk(Scriptable* Sender, Action* parameters);
 	static void RandomWalkContinuous(Scriptable* Sender, Action* parameters);
 	static void RealSetGlobalTimer(Scriptable* Sender, Action* parameters);
+	static void ReallyForceSpell(Scriptable* Sender, Action* parameters);
+	static void ReallyForceSpellDead(Scriptable* Sender, Action* parameters);
 	static void Recoil(Scriptable* Sender, Action* parameters);
 	static void RegainPaladinHood(Scriptable* Sender, Action* parameters);
 	static void RegainRangerHood(Scriptable* Sender, Action* parameters);

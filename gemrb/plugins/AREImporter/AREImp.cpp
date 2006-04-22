@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.155 2006/04/08 18:40:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.156 2006/04/22 13:30:14 avenger_teambg Exp $
  *
  */
 
@@ -1610,8 +1610,9 @@ int AREImp::PutAnimations( DataStream *stream, Map *map)
 {
 	ieWord tmpWord;
 
-	for (unsigned int i=0;i<AnimCount;i++) {
-		AreaAnimation *an = map->GetAnimation(i);
+	aniIterator iter = map->GetFirstAnimation();
+	while(*iter) {
+		AreaAnimation *an = *iter++;
 
 		stream->Write( an->Name, 32);
 		tmpWord = (ieWord) an->Pos.x;

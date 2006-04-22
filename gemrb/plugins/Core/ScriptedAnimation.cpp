@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.30 2006/04/19 20:09:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.31 2006/04/22 13:30:19 avenger_teambg Exp $
  *
  */
 
@@ -51,6 +51,7 @@ void ScriptedAnimation::Init()
 	XPos = YPos = ZPos = 0;
 	FrameRate = 15;
 	FaceTarget = 0;
+	dither = 0;
 	Duration = 0xffffffff;
 	justCreated = true;
 	PaletteName[0]=0;
@@ -122,7 +123,7 @@ void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af)
 	if (anims[P_RELEASE])
 		anims[P_RELEASE]->Flags |= S_ANI_PLAYONCE;
 
-	memcpy(ResName, af->ResRef, 8);
+	memcpy(ResName, af->ResRef, sizeof(ResName) );
 }
 
 /* Creating animation from VVC */
@@ -214,10 +215,14 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 
 	//copying resource name to the object, so it could be referenced by it
 	//used by immunity/remove specific animation
+	//this is better done in Interface::GetScriptedAnimation
+	//where the original resref is more readily available
+	/*
 	memcpy(ResName, stream->filename, 8);
 	for(int i=0;i<8;i++) {
 		if (ResName[i]=='.') ResName[i]=0;
 	}
+	*/
 	SetPhase(P_ONSET);
 	PaletteName[0]=0;
 
@@ -338,8 +343,11 @@ retry:
 	Sprite2D* frame = anims[Phase]->NextFrame();
 
 	//explicit duration
-	if (core->GetGame()->Ticks>Duration) {
-		return true;
+	if (Phase==P_HOLD) {
+		if (core->GetGame()->Ticks>Duration) {
+			Phase++;
+			goto retry;
+		}
 	}
 	//automatically slip from onset to hold to release
 	if (!frame || anims[Phase]->endReached) {
@@ -381,7 +389,7 @@ retry:
 	}
 
 	int cx = Pos.x + XPos;
-	int cy = Pos.y + ZPos + YPos;
+	int cy = Pos.y - ZPos + YPos;
 
 	if( SequenceFlags&IE_VVC_NOCOVER) {
 		if (cover) SetSpriteCover(NULL);

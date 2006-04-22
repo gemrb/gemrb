@@ -28,13 +28,15 @@
 #define IE_VVC_MIRRORY   	0x00000020
 #define IE_VVC_TINT     	0x00030000   //2 bits need to be set for tint
 #define IE_VVC_GREYSCALE	0x00080000
-#define IE_VVC_DARKEN     0x00100000
+#define IE_VVC_DARKEN           0x00100000   //this is unsure
 #define IE_VVC_GLOWING  	0x00200000
 #define IE_VVC_RED_TINT		0x02000000
 
 #define IE_VVC_LOOP		0x00000001
 #define IE_VVC_BAM		0x00000008
 #define IE_VVC_NOCOVER		0x00000040
+
+#define IE_VVC_UNUSED           0xe0000000U
 
 //phases
 #define P_ONSET   0
