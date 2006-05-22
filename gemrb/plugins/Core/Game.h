@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.77 2006/04/08 18:40:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.78 2006/05/22 16:25:32 avenger_teambg Exp $
  *
  */
 
@@ -80,6 +80,7 @@ class Game;
 #define CS_HIDEGUI   16  //hide all gui
 #define CS_ACTION    32  //hide action pane
 #define CS_PORTRAIT  64  //hide portrait pane
+#define CS_MAPNOTES  128 //hide mapnotes
 
 //Weather bits
 #define WB_NORMAL    0
