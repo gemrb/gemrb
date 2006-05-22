@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.16 2005/07/10 17:07:15 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.17 2006/05/22 16:39:26 avenger_teambg Exp $
  *
  */
 
@@ -147,31 +147,6 @@ Item* ITMImp::GetItem(Item *s)
 		printf( "[ITMImporter]: No BAM Importer Available.\n" );
 		return NULL;
 	}
-/*
-	DataStream* bamfile;
-	AnimationMgr* bam;
-
-	if (s->ItemIcon[0]) {
-		bamfile = core->GetResourceMgr()->GetResource( s->ItemIcon, IE_BAM_CLASS_ID );
-		bam = ( AnimationMgr * ) core->GetInterface( IE_BAM_CLASS_ID );
-		bam->Open( bamfile );
-		s->ItemIconBAM = bam;
-	}
-
-	if (s->GroundIcon[0]) {
-		bamfile = core->GetResourceMgr()->GetResource( s->GroundIcon, IE_BAM_CLASS_ID );
-		bam = ( AnimationMgr * ) core->GetInterface( IE_BAM_CLASS_ID );
-		bam->Open( bamfile );
-		s->GroundIconBAM = bam;
-	}
-
-	if (s->CarriedIcon[0] && core->HasFeature(GF_HAS_DESC_ICON) ) {
-		bamfile = core->GetResourceMgr()->GetResource( s->CarriedIcon, IE_BAM_CLASS_ID );
-		bam = ( AnimationMgr * ) core->GetInterface( IE_BAM_CLASS_ID );
-		bam->Open( bamfile );
-		s->CarriedIconBAM = bam;
-	}
-*/
 	return s;
 }
 
@@ -203,9 +178,16 @@ void ITMImp::GetExtHeader(Item *s, ITMExtHeader* eh)
 	for (i = 0; i < 3; i++) {
 		str->ReadWord( &eh->MeleeAnimation[i] );
 	}
-	str->ReadWord( &eh->BowArrowQualifier );
-	str->ReadWord( &eh->CrossbowBoltQualifier );
-	str->ReadWord( &eh->MiscProjectileQualifier );
+	ieWord tmp;
+
+	i = 0;
+	str->ReadWord( &tmp ); //arrow
+	if (tmp) i|=PROJ_ARROW;
+	str->ReadWord( &tmp ); //xbow
+	if (tmp) i|=PROJ_BOLT;
+	str->ReadWord( &tmp ); //bullet
+	if (tmp) i|=PROJ_BULLET;
+	eh->ProjectileQualifier=i;
 
 	//48 is the size of the feature block
 	eh->features = core->GetFeatures(eh->FeatureCount);

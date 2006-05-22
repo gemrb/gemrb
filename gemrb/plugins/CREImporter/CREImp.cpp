@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.108 2006/04/19 20:09:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.109 2006/05/22 16:39:24 avenger_teambg Exp $
  *
  */
 
@@ -514,7 +514,11 @@ void CREImp::GetActorPST(Actor *act)
 	ReadScript(act, SCR_GENERAL);
 	ReadScript(act, SCR_DEFAULT);
 
-	str->Seek( 44, GEM_CURRENT_POS );
+	str->Seek( 36, GEM_CURRENT_POS );
+	//the overlays are not fully decoded yet
+	//they are a kind of effect block (like our vvclist)
+	str->ReadDword( &OverlayOffset );
+	str->ReadDword( &OverlayMemorySize );
 	str->ReadDword( &act->BaseStats[IE_XP_MAGE] ); // Exp for secondary class
 	str->ReadDword( &act->BaseStats[IE_XP_THIEF] ); // Exp for tertiary class
 	for (i = 0; i<10; i++) {

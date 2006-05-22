@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.h,v 1.19 2005/12/05 21:46:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.h,v 1.20 2006/05/22 16:39:24 avenger_teambg Exp $
  *
  */
 
@@ -52,6 +52,8 @@ private:
 	ieByte TotSCEFF;
 	ieByte IsCharacter;
 	ieDword VariablesCount;
+	ieDword OverlayOffset;
+	ieDword OverlayMemorySize;
 public:
 	CREImp(void);
 	~CREImp(void);

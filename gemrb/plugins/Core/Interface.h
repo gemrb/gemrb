@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.192 2006/04/19 20:09:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.193 2006/05/22 16:39:25 avenger_teambg Exp $
  *
  */
 
@@ -159,11 +159,12 @@ typedef struct SlotType {
 
 //sloteffects (querysloteffect returns it)
 #define SLOT_EFFECT_NONE     0
-#define SLOT_EFFECT_ITEM     1
-#define SLOT_EFFECT_FIST     2
-#define SLOT_EFFECT_MAGIC    3
-#define SLOT_EFFECT_MELEE    4
-#define SLOT_EFFECT_MISSILE  5
+#define SLOT_EFFECT_ITEM     1 //normal equipped item
+#define SLOT_EFFECT_FIST     2 //fist slot
+#define SLOT_EFFECT_MAGIC    3 //magic weapon slot
+#define SLOT_EFFECT_MELEE    4 //normal weapon slot
+#define SLOT_EFFECT_MISSILE  5 //quiver slots
+#define SLOT_EFFECT_LEFT     6 //shield (left hand) slot
 
 /**
  * @class Interface
@@ -433,12 +434,11 @@ public:
 	/*reads the filenames of the sounds folder into a list */
 	int GetCharSounds(TextArea *ta);
 	unsigned int GetInventorySize() const { return SlotTypes-1; }
-	int QuerySlot(unsigned int idx) const;
-	//int QuerySlotLookup(unsigned int idx) const;
-	int QuerySlotType(unsigned int idx) const;
-	int QuerySlottip(unsigned int idx) const;
-	int QuerySlotID(unsigned int idx) const;
-	int QuerySlotEffects(unsigned int idx) const;
+	ieDword QuerySlot(unsigned int idx) const;
+	ieDword QuerySlotType(unsigned int idx) const;
+	ieDword QuerySlottip(unsigned int idx) const;
+	ieDword QuerySlotID(unsigned int idx) const;
+	ieDword QuerySlotEffects(unsigned int idx) const;
 	const char * QuerySlotResRef(unsigned int idx) const;
 	/*returns true if an itemtype is acceptable for a slottype, also checks the usability flags */
 	int CanUseItemType(int itype, int slottype, ieDword use1=0, ieDword use2=0, Actor *actor=NULL) const;

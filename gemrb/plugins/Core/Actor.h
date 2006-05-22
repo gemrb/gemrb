@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.113 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.114 2006/05/22 16:39:25 avenger_teambg Exp $
  *
  */
 
@@ -164,6 +164,7 @@ private:
 	//this stuff don't get saved
 	CharAnimations* anims;
 	ieByte SavingThrow[5];
+	int attackcount;
 
 	/** fixes the palette */
 	void SetupColors();
@@ -316,8 +317,11 @@ public:
 	void GetNextStance();
 	/* learns the given spell, possibly receive XP */
 	int LearnSpell(const ieResRef resref, ieDword flags);
-	/* Returns weapon range */
-	int GetWeaponRange();
+	/* returns the ranged weapon header associated with the projectile in slot */
+	int GetRangedWeapon(ITMExtHeader *&which, int slot);
+	/* Returns current weapon range and extended header
+	   if range is nonzero, then which is valid */
+	unsigned int GetWeapon(ITMExtHeader *&which, bool leftorright=false);
 	/* Creates player statistics */
 	void CreateStats();
 	/* Heals actor by days */
@@ -330,6 +334,14 @@ public:
 	int GetAttackStyle();
 	/* sets target for immediate attack */
 	void SetTarget( Scriptable *actor);
+	/* starts combat round, possibly one more attacks in every second round*/
+	void InitRound(bool secondround);
+	/* gets the to hit value */
+	int GetToHit(int bonus, ieDword Flags);
+	/* performs attack against target */
+	void PerformAttack();
+	/* deal damage to target */
+	void DealDamage(Actor *target, int damage,int damagetype, bool critical);
 	/* sets a colour gradient stat, handles location */
 	void SetColor( ieDword idx, ieDword grd);
 	void RemoveTimedEffects();

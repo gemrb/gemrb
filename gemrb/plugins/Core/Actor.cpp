@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.182 2006/04/22 13:30:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.183 2006/05/22 16:39:25 avenger_teambg Exp $
  *
  */
 
@@ -78,6 +78,10 @@ static void InitActorTables();
 static ieDword TranslucentShadows;
 
 #define DAMAGE_LEVELS 13
+#define ATTACKROLL    20
+#define SAVEROLL      20
+#define DEFAULTAC     10
+
 static ieResRef d_main[DAMAGE_LEVELS]={
 	"BLOODS","BLOODM","BLOODL","BLOODCR", //blood
 	"SPFIRIMP","SPFIRIMP","SPFIRIMP",     //fire
@@ -113,6 +117,17 @@ static int d_gradient[DAMAGE_LEVELS]={
 #define OV_BOUNCE2     7  //bouncing activated
 static ieResRef overlay[OVERLAY_COUNT]={"SPENTACI","SANCTRY","MINORGLB","SPSHIELD",
 "GREASED","WEBENTD","SPTURNI2","SPTURNI"};
+
+//for every game except IWD2 we need to reverse TOHIT
+static bool REVERSE_TOHIT=true;
+
+//internal flags for calculating to hit
+#define WEAPON_FIST        0
+#define WEAPON_MELEE       1
+#define WEAPON_RANGED      2
+#define WEAPON_STYLEMASK   15
+#define WEAPON_LEFTHAND    16
+#define WEAPON_USESTRENGTH 32
 
 Actor::Actor()
 	: Moveble( ST_ACTOR )
@@ -904,11 +919,11 @@ void Actor::Init()
 void Actor::RollSaves()
 {
 	if (InternalFlags&IF_USEDSAVE) {
-		SavingThrow[0]=core->Roll(1,20,0);
-		SavingThrow[1]=core->Roll(1,20,0);
-		SavingThrow[2]=core->Roll(1,20,0);
-		SavingThrow[3]=core->Roll(1,20,0);
-		SavingThrow[4]=core->Roll(1,20,0);
+		SavingThrow[0]=core->Roll(1,SAVEROLL,0);
+		SavingThrow[1]=core->Roll(1,SAVEROLL,0);
+		SavingThrow[2]=core->Roll(1,SAVEROLL,0);
+		SavingThrow[3]=core->Roll(1,SAVEROLL,0);
+		SavingThrow[4]=core->Roll(1,SAVEROLL,0);
 		InternalFlags&=~IF_USEDSAVE;
 	}
 }
@@ -1415,23 +1430,47 @@ void Actor::GetNextAnimation()
 	SetAnimationID ( NewAnimID );
 }
 
-int Actor::GetWeaponRange()
+//slot is the projectile slot
+int Actor::GetRangedWeapon(ITMExtHeader *&which, int slot)
 {
-	CREItem *wield = inventory.GetUsedWeapon();
-	if ( !wield) {
-		//should return FIST if not wielding anything
+	slot = inventory.FindRangedWeapon();
+	CREItem *wield = inventory.GetSlotItem(slot);
+	if (!wield) {
 		return 0;
 	}
 	Item *item = core->GetItem(wield->ItemResRef);
 	if (!item) {
 		return 0;
 	}
-	ITMExtHeader * which = item->GetExtHeader(0);
-	if (!which) {
-		core->FreeItem(item, wield->ItemResRef, false);
+	which = item->GetWeaponHeader(true);
+	core->FreeItem(item, wield->ItemResRef, false);
+	return 0;
+}
+
+//returns weapon header currently used
+//if range is nonzero, then the returned header is valid
+unsigned int Actor::GetWeapon(ITMExtHeader *&which, bool leftorright)
+{
+	CREItem *wield = inventory.GetUsedWeapon(leftorright);
+	if (!wield) {
 		return 0;
 	}
-	core->FreeItem(item, wield ->ItemResRef, false);
+	Item *item = core->GetItem(wield->ItemResRef);
+	if (!item) {
+		return 0;
+	}
+
+	//select first weapon header
+	which = item->GetWeaponHeader(false);
+	//make sure we use 'false' in this freeitem
+	//so 'which' won't point into invalid memory
+	core->FreeItem(item, wield->ItemResRef, false);
+	if (!which) {	
+		return 0;
+	}
+	if (which->Location!=ITEM_LOC_WEAPON) {
+		return 0;
+	}
 	return which->Range;
 }
 
@@ -1526,7 +1565,7 @@ void Actor::SetModal(ieDword newstate)
 //even spells got this attack style
 int Actor::GetAttackStyle()
 {
-	return 1;
+	return WEAPON_MELEE;
 }
 
 void Actor::SetTarget( Scriptable *target)
@@ -1541,6 +1580,165 @@ void Actor::SetTarget( Scriptable *target)
 	SetOrientation( GetOrient( target->Pos, Pos ), false );
 	SetStance( IE_ANI_ATTACK);
 	SetWait( 1 );
+}
+
+//calculate how many attacks will be performed
+//in the next round
+void Actor::InitRound(bool secondround)
+{
+	attackcount = 0;
+	if (!LastTarget) {
+		return;
+	}
+	//if held or disabled, etc, then attackcount = 0
+	unsigned int stance = GetStance();
+	//probably there are more subtypes (twohand attacks)
+	if (stance!=IE_ANI_ATTACK && stance!=IE_ANI_SHOOT && stance!=IE_ANI_ATTACK_SLASH && stance!=IE_ANI_ATTACK_BACKSLASH && stance !=IE_ANI_ATTACK_JAB) {
+		return;
+	}
+	if (GetStat(IE_STATE_ID)&STATE_CANTMOVE) {
+		return;
+	}
+	if (GetStat(IE_CASTERHOLD)) {		
+		return;
+	}
+	if (GetStat(IE_HELD)) {		
+		return;
+	}
+	//last chance to disable attacking
+	//
+	attackcount = GetStat(IE_NUMBEROFATTACKS);
+	if (secondround) {
+		attackcount++;
+	}
+	attackcount/=2;
+}
+
+int Actor::GetToHit(int bonus, ieDword Flags)
+{
+	int tohit = GetStat(IE_TOHIT);
+	if (REVERSE_TOHIT) {
+		tohit = ATTACKROLL-tohit;
+	}
+	tohit += bonus;
+
+	if (Flags&WEAPON_LEFTHAND) {
+		tohit += GetStat(IE_HITBONUSLEFT);
+	} else {
+		tohit += GetStat(IE_HITBONUSRIGHT);
+	}
+	//get attack style (melee or ranged)
+	switch(Flags&WEAPON_STYLEMASK) {
+		case WEAPON_MELEE:
+			tohit += GetStat(IE_MELEEHIT);
+			break;
+		case WEAPON_FIST:
+			tohit += GetStat(IE_FISTHIT);
+			break;
+		case WEAPON_RANGED:
+			tohit += GetStat(IE_MISSILEHITBONUS);
+			//add dexterity bonus
+			break;
+	}
+	//add strength bonus if we need
+	if (Flags&WEAPON_USESTRENGTH) {
+		tohit += core->GetStrengthBonus(0,GetStat(IE_STR), GetStat(IE_STREXTRA) );
+	}
+	return tohit;
+}
+
+void Actor::PerformAttack()
+{
+	if (!attackcount) {
+		return;
+	}
+	attackcount--;
+	if (!LastTarget) {
+		return;
+	}
+	//get target
+	Actor *target = area->GetActorByGlobalID(LastTarget);
+	if (!target) {
+		LastTarget = 0;
+		InternalFlags|=IF_TARGETGONE; //this is for the trigger!
+		core->Autopause(AP_NOTARGET);
+	}
+	//which hand is used
+	bool leftorright = attackcount&1;
+	ITMExtHeader *header;
+	//can't reach target
+	if (GetWeapon(header,leftorright)<Distance(Pos, target)) {
+		return;
+	}
+	ieDword Flags;
+	ITMExtHeader *rangedheader = NULL;
+	switch(header->AttackType)
+	{
+	case 1:
+		Flags = WEAPON_MELEE;		
+		break;
+	case 2: //throwing weapon
+		Flags = WEAPON_RANGED;
+		break;
+	case 4:
+		if (GetRangedWeapon(rangedheader, inventory.GetEquippedSlot())) {
+		//out of ammo event
+		} else {
+			return;
+		}
+		return;
+	default:
+		//item is unsuitable for fight
+		return;
+	}//melee or ranged
+	if (leftorright) Flags|=WEAPON_LEFTHAND;
+	if (header->RechargeFlags&IE_ITEM_USESTRENGTH) Flags|=WEAPON_USESTRENGTH;
+
+	//second parameter is left or right hand flag
+	int tohit = GetToHit(header->THAC0Bonus, Flags);
+
+	int roll = core->Roll(1,ATTACKROLL,0);
+	if (roll==1) {
+		//critical failure
+		return;
+	}
+	//damage type is?
+	//modify defense with damage type
+	ieDword damagetype = header->DamageType;
+	int damage = core->Roll(header->DiceThrown, header->DiceSides, header->DamageBonus);
+	int damageluck = (int) GetStat(IE_DAMAGELUCK);
+	if (damage<damageluck) {
+		damage = damageluck;
+	}
+
+	if (roll>=ATTACKROLL-(int) GetStat(IE_CRITICALHITBONUS) ) {
+		//critical success
+		DealDamage (target, damage, damagetype, true);
+		return;
+	}
+	tohit += roll;
+
+	//get target's defense against attack
+	int defense = target->GetStat(IE_ARMORCLASS);
+	if (REVERSE_TOHIT) {
+		defense = DEFAULTAC - defense;
+	}
+
+	if (tohit<defense) {
+		//hit failed
+		return;
+	}
+	DealDamage (target, damage, damagetype, false);
+}
+
+void Actor::DealDamage(Actor *target, int damage, int damagetype, bool critical)
+{
+	if (damage<0) damage = 0;
+	if (critical) {
+		damage <<=1; //critical damage is always double?
+		//check if critical hit is averted by helmet
+	}
+	target->Damage(damage, damagetype, this);
 }
 
 //idx could be: 0-6, 16-22, 32-38, 48-54
@@ -2024,4 +2222,3 @@ void Actor::Rest(int hours)
 		spellbook.ChargeAllSpells ();
 	}
 }
-

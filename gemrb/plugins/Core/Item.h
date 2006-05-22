@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.23 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.24 2006/05/22 16:39:25 avenger_teambg Exp $
  *
  */
 
@@ -81,6 +81,10 @@
 #define ITEM_AT_BOW        3
 #define ITEM_AT_MAGIC      4
 
+#define PROJ_ARROW  1
+#define PROJ_BOLT   2
+#define PROJ_BULLET 4
+
 /**
  * @class ITMExtHeader
  * Header for special effects and uses of an Item.
@@ -98,7 +102,7 @@ public:
 	ieByte Target;
 	ieByte TargetNumber;
 	ieWord Range;
-	ieWord ProjectileType;
+	ieWord ProjectileType; //it is not sure where this value is used
 	ieWord Speed;
 	ieWord THAC0Bonus;
 	ieWord DiceSides;
@@ -112,9 +116,13 @@ public:
 	ieDword RechargeFlags; //this is a bitfield with many bits
 	ieWord ProjectileAnimation;
 	ieWord MeleeAnimation[3];
+	/*
 	ieWord BowArrowQualifier;
 	ieWord CrossbowBoltQualifier;
 	ieWord MiscProjectileQualifier;
+	*/
+	//this value is set in projectiles and launchers too
+	int ProjectileQualifier; //this is a derived value determined on load time
 	Effect *features;
 };
 
@@ -203,6 +211,7 @@ public:
 		return ItemDescIdentified;
 	}
 
+	//returns the requested extended header
 	ITMExtHeader *GetExtHeader(unsigned int which)
 	{
 		if(ExtHeaderCount<=which) {
@@ -210,11 +219,12 @@ public:
 		}
 		return ext_headers+which;
 	}
-public:
 	//-1 will return the equipping feature block
 	EffectQueue *GetEffectBlock(int usage);
 	//returns the average damage of the weapon (doesn't check for special effects)
-	int GetDamagePotential(int header, bool ranged);
+	int GetDamagePotential(bool ranged);
+	//returns the weapon header
+	ITMExtHeader *GetWeaponHeader(bool ranged);
 };
 
 #endif  // ! ITEM_H

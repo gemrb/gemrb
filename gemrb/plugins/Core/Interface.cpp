@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.398 2006/04/22 13:30:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.399 2006/05/22 16:39:25 avenger_teambg Exp $
  *
  */
 
@@ -126,6 +126,7 @@ Interface::Interface(int iargc, char** iargv)
 	InfoTextPalette = NULL;
 	timer = NULL;
 	evntmgr = NULL;
+	opcodemgrs = NULL;
 	console = NULL;
 	slottypes = NULL;
 	slotmatrix = NULL;
@@ -282,7 +283,13 @@ void Interface::FreeResRefTable(ieResRef *&table, int &count)
 
 Interface::~Interface(void)
 {
-	FreeAbilityTables();
+	if (music) {
+		music->HardEnd();
+	}
+	// stop any ambients which are still enqueued
+	if (soundmgr) {
+		soundmgr->GetAmbientMgr()->deactivate(); 
+	}
 	//destroy the highest objects in the hierarchy first!
 	if (game) {
 		delete( game );
@@ -290,6 +297,7 @@ Interface::~Interface(void)
 	if (worldmap) {
 		delete( worldmap );
 	}
+	FreeAbilityTables();
 	//aww, i'm sure this could be implemented better
 	MapMgr* mm = ( MapMgr* ) GetInterface( IE_ARE_CLASS_ID );
 	if (mm!=NULL) {
@@ -2408,7 +2416,6 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 			if (win->WindowID==65535) {
 				video->SetViewport( 0,0,0,0 );
 			}
-			//evntmgr->DelWindow( win->WindowID, win->WindowPack );
 			evntmgr->DelWindow( win );
 			break;
 
@@ -3103,11 +3110,6 @@ bool Interface::LoadINI(const char* filename)
 /** Enables/Disables the Cut Scene Mode */
 void Interface::SetCutSceneMode(bool active)
 {
-/*
-	if (!active) {
-		timer->SetCutScene( NULL );
-	}
-*/
 	GameControl *gc = GetGameControl();
 	if (gc) {
 		gc->SetCutSceneMode( active );
@@ -3131,19 +3133,25 @@ bool Interface::InCutSceneMode()
 
 void Interface::QuitGame(bool BackToMain)
 {
-	//clear cutscenes
 	SetCutSceneMode(false);
-	//clear fade/screenshake effects
-	timer->Init();
-	timer->SetFadeFromColor(0);
+	if (timer) {
+		//clear cutscenes
+		//clear fade/screenshake effects
+		timer->Init();
+		timer->SetFadeFromColor(0);
+	}
 
 	DelWindow(0xffff); //delete all windows, including GameControl
 
 	//shutting down ingame music 
 	//(do it before deleting the game)
-	if (music) music->HardEnd();
+	if (music) {
+		music->HardEnd();
+	}
 	// stop any ambients which are still enqueued
-	soundmgr->GetAmbientMgr()->deactivate(); 
+	if (soundmgr) {
+		soundmgr->GetAmbientMgr()->deactivate(); 
+	}
 	//delete game, worldmap
 	if (game) {
 		delete game;
@@ -3339,18 +3347,35 @@ bool Interface::InitItemTypes()
 		SlotTypes = st->GetRowCount();
 		//make sure unsigned int is 32 bits
 		slottypes = (SlotType *) malloc(SlotTypes * sizeof(SlotType) );
+		memset(slottypes, -1, SlotTypes * sizeof(SlotType) );
 		for (unsigned int row = 0; row < SlotTypes; row++) {
+			bool alias;
 			unsigned int i = (ieDword) strtol(st->GetRowName(row),NULL,0 );
 			if (i>=SlotTypes) continue;
-			slottypes[row].slot = i;
+			if (slottypes[i].sloteffects!=0xffffffffu) {
+				slottypes[row].slot = i;
+				i=row;
+				alias = true;
+			} else {
+				slottypes[row].slot = i;
+				alias = false;
+			}
 			slottypes[i].slottype = (ieDword) strtol(st->QueryField(row,0),NULL,0 );
 			slottypes[i].slotid = (ieDword) strtol(st->QueryField(row,1),NULL,0 );
-			slottypes[i].slottip = (ieDword) strtol(st->QueryField(row,3),NULL,0 );
-			slottypes[i].sloteffects = (ieDword) strtol(st->QueryField(row,4),NULL,0 );
 			strnlwrcpy( slottypes[i].slotresref, st->QueryField(row,2), 8 );
+			slottypes[i].slottip = (ieDword) strtol(st->QueryField(row,3),NULL,0 );
+			//don't fill sloteffects for aliased slots (pst)
+			if (alias) {
+				continue;
+			}
+			slottypes[i].sloteffects = (ieDword) strtol(st->QueryField(row,4),NULL,0 );
 			//setting special slots
 			if (slottypes[i].slottype&SLOT_ITEM) {
-				Inventory::SetQuickSlot(i);
+				if (slottypes[i].slottype&SLOT_INVENTORY) {
+					Inventory::SetInventorySlot(i);
+				} else {
+					Inventory::SetQuickSlot(i);
+				}
 			}
 			switch (slottypes[i].sloteffects) {
 				//fist slot, not saved, default weapon
@@ -3361,6 +3386,8 @@ bool Interface::InitItemTypes()
 				case SLOT_EFFECT_MELEE: Inventory::SetWeaponSlot(i); break;
 				//ranged slot
 				case SLOT_EFFECT_MISSILE: Inventory::SetRangedSlot(i); break;
+			  //right hand
+				case SLOT_EFFECT_LEFT: Inventory::SetShieldSlot(i); break;
 				default:;
 			}
 		}
@@ -3368,17 +3395,8 @@ bool Interface::InitItemTypes()
 	}
 	return (it && st);
 }
-/*
-int Interface::QuerySlotLookup(unsigned int idx) const
-{
-	if (idx>=SlotTypes) {
-		return 0;
-	}
-	return slottypes[idx].lookup;
-}
-*/
 
-int Interface::QuerySlot(unsigned int idx) const
+ieDword Interface::QuerySlot(unsigned int idx) const
 {
 	if (idx>=SlotTypes) {
 		return 0;
@@ -3386,7 +3404,7 @@ int Interface::QuerySlot(unsigned int idx) const
 	return slottypes[idx].slot;
 }
 
-int Interface::QuerySlotType(unsigned int idx) const
+ieDword Interface::QuerySlotType(unsigned int idx) const
 {
 	if (idx>=SlotTypes) {
 		return 0;
@@ -3394,7 +3412,7 @@ int Interface::QuerySlotType(unsigned int idx) const
 	return slottypes[idx].slottype;
 }
 
-int Interface::QuerySlotID(unsigned int idx) const
+ieDword Interface::QuerySlotID(unsigned int idx) const
 {
 	if (idx>=SlotTypes) {
 		return 0;
@@ -3402,7 +3420,7 @@ int Interface::QuerySlotID(unsigned int idx) const
 	return slottypes[idx].slotid;
 }
 
-int Interface::QuerySlottip(unsigned int idx) const
+ieDword Interface::QuerySlottip(unsigned int idx) const
 {
 	if (idx>=SlotTypes) {
 		return 0;
@@ -3410,7 +3428,7 @@ int Interface::QuerySlottip(unsigned int idx) const
 	return slottypes[idx].slottip;
 }
 
-int Interface::QuerySlotEffects(unsigned int idx) const
+ieDword Interface::QuerySlotEffects(unsigned int idx) const
 {
 	if (idx>=SlotTypes) {
 		return 0;

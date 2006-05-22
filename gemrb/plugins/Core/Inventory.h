@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.45 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.46 2006/05/22 16:39:25 avenger_teambg Exp $
  *
  */
 
@@ -142,9 +142,12 @@ struct ItemExtHeader {
 	ieDword RechargeFlags; //this is a bitfield with many bits
 	ieWord ProjectileAnimation;
 	ieWord MeleeAnimation[3];
+	/*
 	ieWord BowArrowQualifier;
 	ieWord CrossbowBoltQualifier;
 	ieWord MiscProjectileQualifier;
+	*/
+	int ProjectileQualifier; //this is a derived value determined on load time
 	//other data
 	ieResRef itemname;
 };
@@ -251,7 +254,10 @@ public:
 	bool DropItemAtLocation(const char *resref, unsigned int flags, Map *map, Point &loc);
 	void SetEquippedSlot(int slotcode);
 	int GetEquipped();
+	//right hand
 	int GetEquippedSlot();
+	//left hand
+	int GetShieldSlot();
 	void AddSlotEffects( CREItem* slot );
 	//void AddAllEffects();
 	void RemoveSlotEffects( CREItem* slot );
@@ -260,7 +266,9 @@ public:
 	bool EquipItem(unsigned int slot);
 	bool UnEquipItem(unsigned int slot, bool removecurse);
 	/** Returns equipped weapon */
-	CREItem *GetUsedWeapon();
+	CREItem *GetUsedWeapon(bool leftorright);
+	/** returns slot of launcher weapon currently equipped */
+	int FindRangedWeapon(); 
 	/** Returns a slot which might be empty, or capable of holding item (or part of it) */
 	int FindCandidateSlot(int slottype, size_t first_slot, const char *resref = NULL);
 	/** Creates an item in the slot*/
@@ -284,14 +292,16 @@ public:
 	static void SetWeaponSlot(int arg);
 	static void SetRangedSlot(int arg);
 	static void SetQuickSlot(int arg);
+	static void SetInventorySlot(int arg);
+	static void SetShieldSlot(int arg);
 	static int GetFistSlot();
 	static int GetMagicSlot();
 	static int GetWeaponSlot();
 	static int GetRangedSlot();
 	static int GetQuickSlot();
+	static int GetInventorySlot();
 private:
-	int FindRangedProjectile(int type);
-	int FindRangedWeapon(); //returns slot
+	int FindRangedProjectile(unsigned int type);
 	void KillSlot(unsigned int index);
 	inline Item *GetItemPointer(ieDword slot, CREItem *&Slot);
 };

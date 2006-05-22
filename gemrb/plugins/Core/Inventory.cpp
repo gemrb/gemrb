@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.72 2006/04/22 19:40:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.73 2006/05/22 16:39:25 avenger_teambg Exp $
  *
  */
 
@@ -35,6 +35,12 @@ static int SLOT_RANGED = -1;
 static int LAST_RANGED = -1;
 static int SLOT_QUICK = -1;
 static int LAST_QUICK = -1;
+static int SLOT_INV = -1;
+static int LAST_INV = -1;
+static int SLOT_LEFT = -1;
+
+//IWD2 style slots
+static bool IWD2 = false;
 
 static void InvalidSlot(int slot)
 {
@@ -63,6 +69,9 @@ void Inventory::Init()
 	LAST_RANGED=-1;
 	SLOT_QUICK=-1;
 	LAST_QUICK=-1;
+	SLOT_LEFT=-1;
+	//TODO: set this correctly
+	IWD2 = false;
 }
 
 Inventory::Inventory()
@@ -441,11 +450,7 @@ int Inventory::AddSlotItem(CREItem* item, int slot)
 	}
 
 	int res = 0;
-	for (size_t i = 0; i<Slots.size(); i++) {
-		//looking for default inventory slot (-1)
-		if (core->QuerySlotType(i) != -1) {
-			continue;
-		}
+	for (int i = SLOT_INV; i<=LAST_INV; i++) {
 		int part_res = AddSlotItem (item, i);
 		if (part_res == 2) return 2;
 		else if (part_res == 1) res = 1;
@@ -640,7 +645,15 @@ bool Inventory::EquipItem(unsigned int slot)
 	if (effect==SLOT_EFFECT_MELEE) {
 		//if weapon is ranged, then find quarrel for it and equip that
 		if(item->Flags&IE_INV_ITEM_BOW) {
-			slot = FindRangedProjectile(slot);
+			//get the bow item
+			Item *itm = core->GetItem(item->ItemResRef);
+			//get its extended header
+			ITMExtHeader *header = itm->GetExtHeader(0);
+			if (header) {
+				//find the ranged projectile associated with it
+				slot = FindRangedProjectile(header->ProjectileType);
+			}
+			core->FreeItem(itm, item->ItemResRef, false);
 		}
 		SetEquippedSlot(slot-SLOT_MELEE);
 	} else if (effect==SLOT_RANGED) {
@@ -687,7 +700,7 @@ bool Inventory::UnEquipItem(unsigned int slot, bool removecurse)
 //        2 - xbow
 //        4 - sling
 //returns equipped code
-int Inventory::FindRangedProjectile(int type)
+int Inventory::FindRangedProjectile(unsigned int type)
 {
 	for(int i=SLOT_RANGED;i<=LAST_RANGED;i++) {
 		CREItem *Slot;
@@ -695,9 +708,9 @@ int Inventory::FindRangedProjectile(int type)
 		Item *item = GetItemPointer(i, Slot);
 		if (!item) continue;
 		ITMExtHeader *ext_header = item->GetExtHeader(0);
-		int weapontype = 0;
+		unsigned int weapontype = 0;
 		if (ext_header) {
-			weapontype = ext_header->BowArrowQualifier;
+			weapontype = ext_header->ProjectileType;
 		}
 		core->FreeItem(item, Slot->ItemResRef, false);
 		if (weapontype & type) {
@@ -721,7 +734,7 @@ int Inventory::FindRangedWeapon()
 	ITMExtHeader *ext_header = item->GetExtHeader(0);
 	int type = 0;
 	if (ext_header) {
-		type = ext_header->BowArrowQualifier;
+		type = ext_header->ProjectileQualifier;
 	} 
 	core->FreeItem(item, Slot->ItemResRef, false);
 	if (!type) {
@@ -735,7 +748,7 @@ int Inventory::FindRangedWeapon()
 		ITMExtHeader *ext_header = item->GetExtHeader(0);
 		int weapontype = 0;
 		if (ext_header) {
-			weapontype = ext_header->BowArrowQualifier;
+			weapontype = ext_header->ProjectileQualifier;
 		}
 		core->FreeItem(item, Slot->ItemResRef, false);
 		if (weapontype & type) {
@@ -755,8 +768,10 @@ void Inventory::SetWeaponSlot(int arg)
 	LAST_MELEE=arg;
 }
 
+//ranged slots should be before MELEE slots
 void Inventory::SetRangedSlot(int arg)
 {
+	assert(SLOT_MELEE!=-1);
 	if (SLOT_RANGED==-1) {
 		SLOT_RANGED=arg;
 	}
@@ -769,6 +784,26 @@ void Inventory::SetQuickSlot(int arg)
 		SLOT_QUICK=arg;
 	}
 	LAST_QUICK=arg;
+}
+
+void Inventory::SetInventorySlot(int arg)
+{
+	if (SLOT_INV==-1) {
+		SLOT_INV=arg;
+	}
+	LAST_INV=arg;
+}
+
+//multiple shield slots are allowed
+//but in this case they should be interspersed with melee slots
+void Inventory::SetShieldSlot(int arg)
+{
+	if (SLOT_LEFT!=-1) {
+		assert(SLOT_MELEE+1==SLOT_LEFT);
+		IWD2=true;
+		return;
+	}
+	SLOT_LEFT=arg;
 }
 
 int Inventory::GetFistSlot()
@@ -791,15 +826,32 @@ int Inventory::GetQuickSlot()
 	return SLOT_QUICK;
 }
 
+int Inventory::GetInventorySlot()
+{
+	return SLOT_INV;
+}
+
 int Inventory::GetEquipped()
 {
 	return Equipped;
+}
+
+//if shield slot is empty, call again for fist slot!
+int Inventory::GetShieldSlot()
+{	
+	if (IWD2 && Equipped>=0) {
+		return Equipped*2+SLOT_MELEE+1;
+	}
+	return SLOT_SHIELD;
 }
 
 int Inventory::GetEquippedSlot()
 {
 	if (Equipped==IW_NO_EQUIPPED) {
 		return SLOT_FIST;
+	}
+	if (IWD2 && Equipped>=0) {
+		return Equipped*2+SLOT_MELEE;
 	}
 	return Equipped+SLOT_MELEE;
 }
@@ -823,7 +875,8 @@ void Inventory::SetEquippedSlot(int slotcode)
 	Equipped = slotcode;
 }
 
-CREItem *Inventory::GetUsedWeapon()
+//returns the fist weapon if there is nothing else
+CREItem *Inventory::GetUsedWeapon(bool leftorright)
 {
 	CREItem *ret;
 	int slot;
@@ -834,8 +887,18 @@ CREItem *Inventory::GetUsedWeapon()
 			return ret;
 		}
 	}
-	slot = GetEquippedSlot();
-	return GetSlotItem(slot);
+	if (leftorright) {
+		slot = GetShieldSlot();
+		ret = GetSlotItem(slot);
+	} else {
+		slot = GetEquippedSlot();
+		ret = GetSlotItem(slot);
+	}
+	if (!ret) {
+		//return fist weapon
+		ret = GetSlotItem(GetFistSlot());
+	}
+	return ret;
 }
 
 // Returns index of first empty slot or slot with the same
@@ -937,13 +1000,14 @@ void Inventory::EquipBestWeapon(int flags)
 	int i;
 	int damage = 0;
 	ieDword best_slot = SLOT_FIST;
-	int best_header = 0;
+	//int best_header = 0;
 	CREItem *Slot;
 
 	if (flags&EQUIP_RANGED) {
 		for(i=SLOT_RANGED;i<LAST_RANGED;i++) {
 			Item *item = GetItemPointer(i, Slot);
 			if (!item) continue;
+			/*
 			int ehc = item->ExtHeaderCount;
 			while (ehc--) {
 				int tmp = item->GetDamagePotential(ehc,true); //best ranged
@@ -953,12 +1017,19 @@ void Inventory::EquipBestWeapon(int flags)
 					best_header = ehc;
 				}
 			}
+			*/
+			int tmp = item->GetDamagePotential(true); //best ranged
+			if (tmp>damage) {
+				best_slot = i;
+				damage = tmp;
+			}
 		}
 
 		//ranged melee weapons like throwing daggers (not bows!)
 		for(i=SLOT_MELEE;i<LAST_MELEE;i++) {
 			Item *item = GetItemPointer(i, Slot);
 			if (!item) continue;
+			/*
 			int ehc = item->ExtHeaderCount;
 			while (ehc--) {
 				int tmp = item->GetDamagePotential(ehc,true); //best ranged
@@ -967,6 +1038,12 @@ void Inventory::EquipBestWeapon(int flags)
 					best_slot = i;
 					best_header = ehc;
 				}
+			}
+			*/
+			int tmp = item->GetDamagePotential(true); //best ranged
+			if (tmp>damage) {
+				best_slot = i;
+				damage = tmp;
 			}
 		}
 	}
@@ -976,6 +1053,7 @@ void Inventory::EquipBestWeapon(int flags)
 			Item *item = GetItemPointer(i, Slot);
 			if (!item) continue;
 			if (item->Flags&IE_INV_ITEM_BOW) continue;
+			/*
 			int ehc = item->ExtHeaderCount;
 			while(ehc--) {
 				int tmp = item->GetDamagePotential(ehc,false);//best melee
@@ -984,6 +1062,12 @@ void Inventory::EquipBestWeapon(int flags)
 					best_slot = i;
 					best_header = ehc;
 				}
+			}
+			*/
+			int tmp = item->GetDamagePotential(false); //best melee
+			if (tmp>damage) {
+				best_slot = i;
+				damage = tmp;
 			}
 		}
 	}

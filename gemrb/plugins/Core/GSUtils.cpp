@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.53 2006/04/19 20:09:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.54 2006/05/22 16:39:25 avenger_teambg Exp $
  *
  */
 
@@ -898,7 +898,8 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 	}
 
 	//if distance is too much, insert a move action and requeue the action
-	unsigned int wrange = actor->GetWeaponRange() * 10;
+	ITMExtHeader *header;
+	unsigned int wrange = actor->GetWeapon(header) * 10;
 	if ( wrange == 0) {
 		wrange = 10;
 	}

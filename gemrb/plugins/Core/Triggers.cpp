@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.45 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.46 2006/05/22 16:39:25 avenger_teambg Exp $
  *
  */
 
@@ -2999,6 +2999,7 @@ int GameScript::Vacant(Scriptable* Sender, Trigger* /*parameters*/)
 	return 0;
 }
 
+//this trigger always checks the right hand weapon?
 int GameScript::InWeaponRange(Scriptable* Sender, Trigger* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
@@ -3009,7 +3010,8 @@ int GameScript::InWeaponRange(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor *actor = (Actor *) Sender;
-	unsigned int wrange = actor->GetWeaponRange() * 10;
+	ITMExtHeader *header;
+	unsigned int wrange = actor->GetWeapon(header) * 10;
 	if ( Distance( Sender, tar ) <= wrange ) {
 		return 1;
 	}
