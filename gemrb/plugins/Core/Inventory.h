@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.46 2006/05/22 16:39:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.47 2006/05/26 18:44:23 avenger_teambg Exp $
  *
  */
 
@@ -263,6 +263,7 @@ public:
 	void RemoveSlotEffects( CREItem* slot );
 	/** Returns item in specified slot. Does NOT change inventory */
 	CREItem* GetSlotItem(unsigned int slot);
+	bool ChangeItemFlag(unsigned int slot, ieDword value, int mode);
 	bool EquipItem(unsigned int slot);
 	bool UnEquipItem(unsigned int slot, bool removecurse);
 	/** Returns equipped weapon */

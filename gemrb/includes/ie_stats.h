@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.47 2006/04/17 12:07:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.48 2006/05/26 18:44:26 avenger_teambg Exp $
  *
  */
 
@@ -339,14 +339,14 @@
 #define IE_DISABLEOVERLAY	174
 #define IE_DISABLEBACKSTAB	175
 #define IE_ENABLEOFFSCREENAI    183 // bg2 has this on this spot
-#define IE_SOUNDMN              184 // a special unknown effect uses this
-#define IE_DISABLECHUNKING      186 // not sure
-#define IE_NONINTERRUPTABLE     187 
+#define IE_EXISTANCEDELAY       184 // (sound2mn)
+#define IE_DISABLECHUNKING      186 //
+#define IE_NOTURNABLE           187 // immune to turn
 #define IE_CHAOSSHIELD          189 // defense against wild surge
 #define IE_CANUSEANYITEM        191
 #define IE_ALWAYSBACKSTAB       192
 #define IE_SPELLFAILUREINNATE   194
-#define IE_EFFECT308            195 // another special unknown effect
+#define IE_NOTRACKING           195 // tracking doesn't detect this
 #define IE_DEADMAGIC            196
 #define IE_DISABLETIMESTOP      197
 #define IE_STONESKINSGOLEM	199

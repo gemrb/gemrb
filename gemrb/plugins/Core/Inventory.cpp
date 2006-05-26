@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.73 2006/05/22 16:39:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.74 2006/05/26 18:44:23 avenger_teambg Exp $
  *
  */
 
@@ -630,6 +630,22 @@ CREItem *Inventory::GetSlotItem(unsigned int slot)
 		InvalidSlot(slot);
 	}
 	return Slots[slot];
+}
+
+bool Inventory::ChangeItemFlag(unsigned int slot, ieDword arg, int op)
+{
+	CREItem *item = GetSlotItem(slot);
+	if (!item) {
+		return false;
+	}
+	switch (op) {
+	case BM_SET: item->Flags = arg; break;
+	case BM_OR: item->Flags |= arg; break;
+	case BM_NAND: item->Flags &= ~arg; break;
+	case BM_XOR: item->Flags ^= arg; break;
+	case BM_AND: item->Flags &= arg; break;
+	}
+	return true;
 }
 
 //this is the low level equipping
