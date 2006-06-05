@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.26 2006/04/12 20:25:01 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.27 2006/06/05 12:29:29 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -83,17 +83,21 @@ def OpenInventoryWindow ():
 	# inventory slots
 	for i in range (44):
 		Button = GemRB.GetControl (Window, i)
-		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
-		#GemRB.SetButtonFont (Window, Button, 'NUMBER')
-		GemRB.SetVarAssoc (Window, Button, 'ItemButton', i)
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT , OP_OR)
+		GemRB.SetButtonFont (Window, Button, "NUMBER2")
+		GemRB.SetVarAssoc (Window, Button, "ItemButton", i)
+		GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,128,128,255,64,0,1)
 
 	# Ground Item
 	for i in range (47, 57):
 		Button = GemRB.GetControl (Window, i)
-		GemRB.SetTooltip (Window, Button, 4273)
-		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
-		#GemRB.SetButtonFont (Window, Button, 'NUMBER')
-	
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT , OP_OR)
+		GemRB.SetButtonFont (Window, Button, "NUMBER2")
+		GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,128,128,255,64,0,1)
+
+	ScrollBar = GemRB.GetControl (Window, 45)
+	GemRB.SetEvent (Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "RefreshInventoryWindow")
+ 
 	for i in range (57, 64):
 		Label = GemRB.GetControl (Window, 0x10000000 + i)
 		GemRB.SetText (Window, Label, str (i))
@@ -103,7 +107,8 @@ def OpenInventoryWindow ():
 	Button = GemRB.GetControl (Window, 44)
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
-
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnAutoEquip")
+ 
 	# encumbrance
 	Button = GemRB.GetControl (Window, 46)
 	GemRB.SetButtonFont (Window, Button, "NUMBER")
@@ -128,13 +133,36 @@ def OpenInventoryWindow ():
 	GemRB.UnhideGUI()
 
 
-
 def UpdateInventoryWindow ():
 	global ItemHash
 	global slot_list
 
 	Window = InventoryWindow
 
+	pc = GemRB.GameGetSelectedPCSingle ()
+
+	Container = GemRB.GetContainer (pc, 1)
+	ScrollBar = GemRB.GetControl (Window, 45)
+	Count = Container['ItemCount']
+	if Count<1:
+		Count=1
+	GemRB.SetVarAssoc (Window, ScrollBar, "TopIndex", Count) 
+	RefreshInventoryWindow ()
+	# And now for the items ....
+
+	ItemHash = {}
+
+	# get a list which maps slot number to slot type/icon/tooltip
+	row = GemRB.GetPlayerStat (pc, ie_stats.IE_SPECIFIC)
+	usability = GemRB.GetTableValue (AvSlotsTable, row, 0)
+	slot_list = map (int, string.split (GemRB.GetTableValue (AvSlotsTable, row, 1, 0), ','))
+	
+	# populate inventory slot controls
+	for i in range (46):
+		UpdateSlot (pc, i)
+
+def RefreshInventoryWindow ():
+	Window = InventoryWindow
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	# name
@@ -175,40 +203,64 @@ def UpdateInventoryWindow ():
 	Label = GemRB.GetControl (Window, 0x1000003f)
 	GemRB.SetText (Window, Label, text)
 
+	# update ground inventory slots
+	Container = GemRB.GetContainer(pc, 1)
+	TopIndex = GemRB.GetVar ("TopIndex")
+	for i in range (10):
+		Button = GemRB.GetControl (Window, i+47)
+		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnDragItemGround")
+		Slot = GemRB.GetContainerItem (pc, i+TopIndex)
+		if Slot != None:
+			Item = GemRB.GetItem (Slot['ItemResRef'])
+			identified = Slot["Flags"] & IE_INV_ITEM_IDENTIFIED
+			GemRB.SetItemIcon (Window, Button, Slot['ItemResRef'],0)
+			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
+			if not identified or Item["ItemNameIdentified"] == -1:
+				GemRB.SetTooltip (Window, Button, Item["ItemName"])
+				GemRB.EnableButtonBorder (Window, Button, 0, 1)
+			else:
+				GemRB.SetTooltip (Window, Button, Item["ItemNameIdentified"])
+				GemRB.EnableButtonBorder (Window, Button, 0, 0)
+			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OnDragItemGround")
+			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenItemInfoGroundWindow")
+			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "OpenItemAmountGroundWindow")
 
-	# And now for the items ....
+		else:
+			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_NAND)
+			GemRB.SetTooltip (Window, Button, 4273)
+			GemRB.EnableButtonBorder (Window, Button, 0, 0)
+			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")
+			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
+			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
+ 	return
 
-	ItemHash = {}
-
-	# get a list which maps slot number to slot type/icon/toolti
-	row = GemRB.GetPlayerStat (pc, ie_stats.IE_SPECIFIC)
-	usability = GemRB.GetTableValue (AvSlotsTable, row, 0)
-	slot_list = map (int, string.split (GemRB.GetTableValue (AvSlotsTable, row, 1), ',')[1:])
-	
-	# populate inventory slot controls
-	for i in range (44):
-		UpdateSlot (pc, slot_list[i])
-
-
-def UpdateSlot (pc, slot):
+def UpdateSlot (pc, i):
 	Window = InventoryWindow
-	SlotType = GemRB.GetSlotType (slot+1)
-        if not SlotType["ID"]:
-                return
-
-	slot_item = GemRB.GetSlotItem (pc, slot+1)
-
-	slotdict = GemRB.GetSlotType (slottype)
-	Button = GemRB.GetControl (Window, SlotType["ID"])
 
 	# NOTE: there are invisible items (e.g. MORTEP) in inaccessible slots
 	#   used to assign powers and protections
-	if slot_item and slottype >= 0:
+
+	if slot_list[i]<0:
+		slot = i+1
+		SlotType = GemRB.GetSlotType (slot)
+		slot_item = 0
+	else:
+		slot = slot_list[i]+1
+		SlotType = GemRB.GetSlotType (slot)
+		slot_item = GemRB.GetSlotItem (pc, slot)
+
+	ControlID = SlotType["ID"]
+	if ControlID<0:
+		return
+
+	print i,":",slot,":",SlotType["ResRef"]
+	Button = GemRB.GetControl (Window, ControlID)
+	ItemHash[ControlID] = [slot, slot_item]
+	GemRB.SetButtonSprites (Window, Button, 'IVSLOT', 0,  0, 0, 0, 0)
+	if slot_item:
 		item = GemRB.GetItem (slot_item['ItemResRef'])
 		identified = slot_item['Flags'] & IE_INV_ITEM_IDENTIFIED
-		ItemHash[ControlID] = [slot, slot_item, item]
 			
-		GemRB.SetButtonSprites (Window, Button, 'IVSLOT', 0,  0, 0, 0, 0)
 		GemRB.SetItemIcon (Window, Button, slot_item['ItemResRef'])
 		if item['StackAmount'] > 1:
 			GemRB.SetText (Window, Button, str (slot_item['Usages0']))
@@ -216,44 +268,75 @@ def UpdateSlot (pc, slot):
 			GemRB.SetText (Window, Button, '')
 		if not identified or item['ItemNameIdentified'] == -1:
 			GemRB.SetTooltip (Window, Button, item['ItemName'])
+			GemRB.EnableButtonBorder (Window, Button, 0, 1)
 		else:
 			GemRB.SetTooltip (Window, Button, item['ItemNameIdentified'])
+			GemRB.EnableButtonBorder (Window, Button, 0, 0)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OnDragItem")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenItemInfoWindow")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "OpenItemAmountWindow")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnDragItem")
 	else:
-
 		GemRB.SetItemIcon (Window, Button, '')
 		GemRB.SetText (Window, Button, '')
 		
-		if slottype >= 0:
-			GemRB.SetButtonSprites (Window, Button, slotdict['ResRef'], 0,  0, 0, 0, 0)
-			GemRB.SetTooltip (Window, Button, slotdict['Tip'])
+		if slot_list[i]>=0:
+			GemRB.SetButtonSprites (Window, Button, SlotType["ResRef"], 0, 0, 0, 0, 0)
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnDragItem")
+			GemRB.SetTooltip (Window, Button, SlotType["Tip"])
 		else:
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-			GemRB.SetTooltip (Window, Button, '')
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, '')
-
+			GemRB.SetTooltip (Window, Button, '')
+			
+		GemRB.EnableButtonBorder (Window, Button, 0, 0)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
+	return
 
+def OnDragItemGround ():
+	pc = GemRB.GameGetSelectedPCSingle ()
 
+	slot = GemRB.GetVar ("GroundItemButton")
+	if not GemRB.IsDraggingItem ():
+		slot_item = GemRB.GetContainerItem (pc, slot)
+		item = GemRB.GetItem (slot_item["ItemResRef"])
+		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 1) #container
+	else:
+		GemRB.DropDraggedItem (pc, -2) #dropping on ground
+
+	UpdateInventoryWindow ()
+	return
+
+def OnAutoEquip ():
+	if not GemRB.IsDraggingItem ():
+		return
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	#don't try to put stuff in the inventory
+	for i in range (21):
+		GemRB.DropDraggedItem (pc, i+1)
+		if not GemRB.IsDraggingItem ():
+			break
+
+	UpdateInventoryWindow ()
+	return
 
 def OnDragItem ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 
+	slot, slot_item = ItemHash[GemRB.GetVar ('ItemButton')]
+	
 	if not GemRB.IsDraggingItem ():
-		slot, slot_item, item = ItemHash[GemRB.GetVar ('ItemButton')]
-		GemRB.DragItem (pc, slot, item['ItemIcon'], 0, 0)
+		ResRef = slot_item['ItemResRef']
+		item = GemRB.GetItem (ResRef)
+		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 0)
 	else:
-		slot = ControlToSlotMap[GemRB.GetVar ('ItemButton')]
 		GemRB.DropDraggedItem (pc, slot)
-
+ 
 	UpdateInventoryWindow ()
 
 def OnDropItemToPC ():
@@ -278,11 +361,11 @@ def OpenItemInfoWindow ():
 	ItemInfoWindow = Window = GemRB.LoadWindow (5)
         GemRB.SetVar ("FloatWindow", ItemInfoWindow)
 
-	slot, slot_item, item = ItemHash[GemRB.GetVar ('ItemButton')]
-	ResRef = slot_item['ItemResRef']
+	slot, slot_item = ItemHash[GemRB.GetVar ('ItemButton')]
 
 	identified = slot_item['Flags'] & IE_INV_ITEM_IDENTIFIED
 
+	ResRef = slot_item['ItemResRef']
 	item = GemRB.GetItem (ResRef)
 
 	# Done
@@ -370,9 +453,9 @@ def OpenItemAmountWindow ():
 		return
 		
 	ItemAmountWindow = Window = GemRB.LoadWindow (4)
-        GemRB.SetVar ("FloatWindow", ItemAmountWindow)
+	GemRB.SetVar ("FloatWindow", ItemAmountWindow)
 
-	ResRef = 'AEGIS'
+	ResRef = slot_item['ItemResRef']
 	item = GemRB.GetItem (ResRef)
 
 	# item icon
