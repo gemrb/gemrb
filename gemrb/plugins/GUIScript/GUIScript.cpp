@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.384 2006/05/22 16:39:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.385 2006/06/05 12:30:15 avenger_teambg Exp $
  *
  */
 
@@ -756,14 +756,23 @@ static PyObject* GemRB_UnloadTable(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetTableValue__doc,
-"GetTableValue(TableIndex, RowIndex/RowString, ColIndex/ColString) => value\n\n"
-"Returns a field of a 2DA Table." );
+"GetTableValue(TableIndex, RowIndex/RowString, ColIndex/ColString, type) => value\n\n"
+"Returns a field of a 2DA Table. If Type is omitted the return type is the autodetected, otherwise 1 means integer, 0 means string." );
 
 static PyObject* GemRB_GetTableValue(PyObject * /*self*/, PyObject* args)
 {
 	PyObject* ti, * row, * col;
+	PyObject* type = NULL;
+	int which = -1;
 
-	if (PyArg_UnpackTuple( args, "ref", 3, 3, &ti, &row, &col )) {
+	if (PyArg_UnpackTuple( args, "ref", 3, 4, &ti, &row, &col, &type )) {
+		if (type!=NULL) {
+			if (!PyObject_TypeCheck( type, &PyInt_Type )) {
+				return AttributeError( GemRB_GetTableValue__doc );
+			}
+			which = PyInt_AsLong( type );
+		}
+
 		if (!PyObject_TypeCheck( ti, &PyInt_Type )) {
 			return AttributeError( GemRB_GetTableValue__doc );
 		}
@@ -808,7 +817,13 @@ static PyObject* GemRB_GetTableValue(PyObject * /*self*/, PyObject* args)
 			return NULL;
 
 		long val;
-		if (valid_number( ret, val )) {
+		//if which = 0, then return string
+		if (!which) {
+			return PyString_FromString( ret );
+		}
+		//if which = 1 then return number
+		//if which = -1 (omitted) then return the best format
+		if (valid_number( ret, val ) || (which==1) ) {
 			return PyInt_FromLong( val );
 		}
 		return PyString_FromString( ret );
@@ -3716,13 +3731,17 @@ static PyObject* GemRB_GetSlotType(PyObject * /*self*/, PyObject* args)
 		PyDict_SetItemString(dict, "Count", PyInt_FromLong(core->GetInventorySize()));
 		return dict;
 	}
-	idx = core->QuerySlot(idx);
-	PyDict_SetItemString(dict, "Slot", PyInt_FromLong(idx));
-	PyDict_SetItemString(dict, "Type", PyInt_FromLong(core->QuerySlotType(idx)));
-	PyDict_SetItemString(dict, "ID", PyInt_FromLong(core->QuerySlotID(idx)));
-	PyDict_SetItemString(dict, "Tip", PyInt_FromLong(core->QuerySlottip(idx)));
-	PyDict_SetItemString(dict, "ResRef", PyString_FromString (core->QuerySlotResRef(idx)));
-	PyDict_SetItemString(dict, "Effects", PyInt_FromLong (core->QuerySlotEffects(idx)));
+	int tmp = core->QuerySlot(idx);
+	if (core->QuerySlotEffects(idx)==0xffffffffu) {
+		tmp=idx;
+	}
+
+	PyDict_SetItemString(dict, "Slot", PyInt_FromLong(tmp));
+	PyDict_SetItemString(dict, "Type", PyInt_FromLong(core->QuerySlotType(tmp)));
+	PyDict_SetItemString(dict, "ID", PyInt_FromLong(core->QuerySlotID(tmp)));
+	PyDict_SetItemString(dict, "Tip", PyInt_FromLong(core->QuerySlottip(tmp)));
+	PyDict_SetItemString(dict, "ResRef", PyString_FromString (core->QuerySlotResRef(tmp)));
+	PyDict_SetItemString(dict, "Effects", PyInt_FromLong (core->QuerySlotEffects(tmp)));
 	return dict;
 }
 
@@ -5278,7 +5297,7 @@ static PyObject* GemRB_GetSlots(PyObject * /*self*/, PyObject* args)
 	int i;
 	Count = 0;
 	for (i=0;i<MaxCount;i++) {
-		if ((core->QuerySlotType( i ) & SlotType) != (ieDword) SlotType) {
+		if ((core->QuerySlotType( i ) & (ieDword) SlotType) != (ieDword) SlotType) {
 			continue;
 		}
 		CREItem *slot = actor->inventory.GetSlotItem( core->QuerySlot(i) );
@@ -5291,7 +5310,7 @@ static PyObject* GemRB_GetSlots(PyObject * /*self*/, PyObject* args)
 	PyObject* tuple = PyTuple_New( Count );
 	Count = 0;
 	for (i=0;i<MaxCount;i++) {
-		if ((core->QuerySlotType( i ) & SlotType) != (ieDword) SlotType) {
+		if ((core->QuerySlotType( i ) & (ieDword) SlotType) != (ieDword) SlotType) {
 			continue;
 		}
 		CREItem *slot = actor->inventory.GetSlotItem( core->QuerySlot(i) );
@@ -5568,12 +5587,12 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Actor not found" );
 	}
 
-  if (SlotID==-1) {
-    SlotID=actor->inventory.FindCandidateSlot(SLOT_INVENTORY,0);
-  }
-  if (SlotID!=-1) {
-	  actor->inventory.SetSlotItemRes( ItemResRef, SlotID, Charge0, Charge1, Charge2 );
-  }
+	if (SlotID==-1) {
+		SlotID=actor->inventory.FindCandidateSlot(SLOT_INVENTORY,0);
+	}
+	if (SlotID!=-1) {
+		actor->inventory.SetSlotItemRes( ItemResRef, SlotID, Charge0, Charge1, Charge2 );
+	}
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -6052,7 +6071,7 @@ static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 			if (!item->Charges && item->ChargeDepletion) {
 				btn->SetState(IE_GUI_BUTTON_DISABLED);
 			}
-		}    
+		}
 	}
 	if (more) {
 		PyObject *ret = SetActionIcon(wi,core->GetControl(wi, i+1),ACT_RIGHT,i+1);
