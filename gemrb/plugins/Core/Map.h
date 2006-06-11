@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.112 2006/04/22 17:46:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.113 2006/06/11 16:01:50 avenger_teambg Exp $
  *
  */
 
@@ -139,6 +139,23 @@ public:
 	~Spawn() { if(Creatures) free(Creatures); } 
 	unsigned int GetCreatureCount() { return Count; }
 } Spawn;
+
+typedef class SpawnGroup {
+public:
+	ieResRef *ResRefs;
+	unsigned int Count;
+	unsigned int Level;
+
+	SpawnGroup(unsigned int size) {
+		ResRefs = (ieResRef *) calloc(size, sizeof(ieResRef) );
+		Count = size;
+	}
+	~SpawnGroup() {
+		if (ResRefs) {
+			free(ResRefs);
+		}
+	}
+} SpawnGroup;
 
 class GEM_EXPORT AreaAnimation {
 public:

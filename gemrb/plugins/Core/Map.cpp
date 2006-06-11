@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.239 2006/04/22 13:30:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.240 2006/06/11 16:01:50 avenger_teambg Exp $
  *
  */
 
@@ -159,13 +159,19 @@ void InitSpawnGroups()
 			if (crename[0] != '*') break;
 		}
 		if (j>0) {
+			SpawnGroup *creatures = new SpawnGroup(j);
+/*
 			ieResRef *creatures = (ieResRef *) malloc( sizeof(ieResRef)*(j+1) );
 			//count of creatures
 			*(ieDword *) creatures = (ieDword) j;
+*/
+			creatures->Level = (ieDword) atoi( tab->QueryField(i,0) );
 			//difficulty
+/*
 			*(((ieDword *) creatures)+1) = (ieDword) atoi( tab->QueryField(i,0) );
+*/
 			for (;j;j--) {
-				strnlwrcpy( creatures[j], tab->QueryField(j,i), sizeof( ieResRef ) );
+				strnlwrcpy( creatures->ResRefs[j-1], tab->QueryField(j,i), sizeof( ieResRef ) );
 			}
 			strnlwrcpy( GroupName, tab->GetColumnName( i ), 8);
 			Spawns.SetAt( GroupName, (const char *) creatures );
@@ -2042,9 +2048,9 @@ MapNote *Map::GetMapNote(Point &point)
 //--------spawning------------------
 void Map::SpawnCreature(Point &pos, char *CreName, int radius)
 {
-	char *Spawngroup=NULL;
+	SpawnGroup *sg=NULL;
 	Actor *creature;
-	if ( !Spawns.Lookup( CreName, Spawngroup) ) {
+	if ( !Spawns.Lookup( CreName, (char *&) sg) ) {
 		DataStream *stream = core->GetResourceMgr()->GetResource( CreName, IE_CRE_CLASS_ID );
 		creature = core->GetCreature(stream); 
 		if ( creature ) {
@@ -2054,10 +2060,10 @@ void Map::SpawnCreature(Point &pos, char *CreName, int radius)
 		return;
 	}
 	//adjust this with difflev too
-	int count = *(ieDword *) Spawngroup;
-	//int difficulty = *(((ieDword *) Spawngroup)+1);
+	unsigned int count = sg->Count;
+	//unsigned int difficulty = sg->Level;
 	while ( count-- ) {
-		DataStream *stream = core->GetResourceMgr()->GetResource( ((ieResRef *) Spawngroup)[count+1], IE_CRE_CLASS_ID );
+		DataStream *stream = core->GetResourceMgr()->GetResource( sg->ResRefs[count], IE_CRE_CLASS_ID );
 		creature = core->GetCreature(stream); 
 		if ( creature ) {
 			creature->SetPosition( this, pos, true, radius );
