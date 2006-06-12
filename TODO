@@ -22,8 +22,8 @@ Items:
 6. Break swords and stuff
 
 Effects:
-1. Create base system for effect blocks (Edheldil)
-2. Implement effects
+1. (PARTLY) Create base system for effect blocks (Edheldil)
+2. (PARTLY) Implement effects
 
 Area:
 1. (DONE) Implement cover (wallgroups) (wjp)
@@ -40,6 +40,7 @@ Animation:
 2. (DONE) animationfactory->one single palette
 3. (DONE) Use animationfactory in CharAnimations, and allow different palettes
 4. (DONE) Handle large multipart animations (2x2, 3x3)
+5. Handle equipment animations (armourlevel, weapons)
 
 Actor:
 1. (DONE) Fix reputation
@@ -50,6 +51,9 @@ Window/Widget management:
 Game GUI:
 1. (DONE) fix TextScreen/IncrementChapter
 2. (PARTLY) implement class based (but customisable) action button bar. Generally port the IWD2 system to all engines
+
+General:
+The Cache and Variables classes could be rewritten to incorporate the release function more smoothly (use templates?)
 
 Known Bugs:
 1. problem: stanceID is still fuzzy. Fix it. (FIXED?)
