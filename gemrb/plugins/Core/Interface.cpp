@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.399 2006/05/22 16:39:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.400 2006/06/12 18:05:32 avenger_teambg Exp $
  *
  */
 
@@ -245,6 +245,11 @@ static void ReleasePalette(void *poi)
 	((Palette *) poi)->Release();
 }
 
+static void ReleaseItemList(void *poi)
+{
+	delete ((ItemList *) poi);
+}
+
 void FreeAbilityTables()
 {
 	if (strmod) {
@@ -412,6 +417,7 @@ Interface::~Interface(void)
 		delete( tokens );
 	}
 	if (RtRows) {
+		RtRows->RemoveAll(ReleaseItemList);
 		delete( RtRows );
 	}
 	FreeInterfaceVector( Table, tables, tm );
@@ -3176,7 +3182,7 @@ void Interface::LoadGame(int index)
 
 	// Yes, it uses goto. Other ways seemed too awkward for me.
 
-	tokens->RemoveAll(); //clearing the token dictionary
+	tokens->RemoveAll(NULL); //clearing the token dictionary
 	DataStream* gam_str = NULL;
 	DataStream* sav_str = NULL;
 	DataStream* wmp_str = NULL;
@@ -3700,7 +3706,6 @@ bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)
 {
 	ieResRef ItemName;
 	TableMgr * tab;
-	ieResRef *itemlist;
 	int i,j;
 
 	int table=LoadTable(TableName);
@@ -3719,14 +3724,16 @@ bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)
 			strncpy(ItemName,tab->GetRowName(j),sizeof(ieResRef) );
 		}
 		//Variable elements are free'd, so we have to use malloc
+		//well, not anymore, we can use ReleaseFunction
 		int l=tab->GetColumnCount(j);
 		if (l<1) continue;
 		//we just allocate one more ieResRef for the item count
-		itemlist = (ieResRef *) malloc( sizeof(ieResRef) * (l+1) );
+		//itemlist = (ieResRef *) malloc( sizeof(ieResRef) * (l+1) );
+		ItemList *itemlist = new ItemList(l);
 		//ieResRef (9 bytes) is bigger than int (on any platform)
-		*(int *) itemlist=l;
-		for(int k=1;k<=l;k++) {
-			strncpy(itemlist[k],tab->QueryField(j,k),sizeof(ieResRef) );
+		//*(int *) itemlist=l;
+		for(int k=0;k<l;k++) {
+			strncpy(itemlist->ResRefs[k],tab->QueryField(j,k+1),sizeof(ieResRef) );
 		}
 		ItemName[8]=0;
 		strlwr(ItemName);
@@ -3747,7 +3754,7 @@ bool Interface::ReadRandomItems()
 	int difflev=0; //rt norm or rt fury
 
 	if (RtRows) {
-		RtRows->RemoveAll();
+		RtRows->RemoveAll(ReleaseItemList);
 	}
 	else {
 		RtRows=new Variables(10, 17); //block size, hash table size

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.240 2006/06/11 16:01:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.241 2006/06/12 18:05:32 avenger_teambg Exp $
  *
  */
 
@@ -70,6 +70,10 @@ static Variables Spawns;
 static int LargeFog;
 static ieWord globalActorCounter;
 
+void ReleaseSpawnGroup(void *poi)
+{
+	delete (SpawnGroup *) poi;
+}
 void Map::ReleaseMemory()
 {
 	if (VisibilityMasks) {
@@ -88,7 +92,7 @@ void Map::ReleaseMemory()
 		PersonalSpaces=NULL;
 	}
 
-	Spawns.RemoveAll();
+	Spawns.RemoveAll(ReleaseSpawnGroup);
 	PathFinderInited = false;
 }
 
@@ -141,7 +145,7 @@ void InitSpawnGroups()
 
 	int table=core->LoadTable( "spawngrp" );
 
-	Spawns.RemoveAll();
+	Spawns.RemoveAll(NULL);
 	Spawns.SetType( GEM_VARIABLES_STRING );
 	
 	if (table<0) {

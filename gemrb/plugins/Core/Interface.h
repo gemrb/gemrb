@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.193 2006/05/22 16:39:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.194 2006/06/12 18:05:32 avenger_teambg Exp $
  *
  */
 
@@ -92,6 +92,22 @@ typedef struct SlotType {
 	ieDword sloteffects;
 	ieResRef slotresref;
 } SlotType;
+
+typedef class ItemList {
+public:
+        ieResRef *ResRefs;
+        unsigned int Count;
+
+        ItemList(unsigned int size) {
+                ResRefs = (ieResRef *) calloc(size, sizeof(ieResRef) );
+                Count = size;
+        }
+        ~ItemList() {
+                if (ResRefs) {
+                        free(ResRefs);
+                }
+        }
+} ItemList;
 
 #ifdef WIN32
 

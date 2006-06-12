@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.h,v 1.8 2005/06/14 22:29:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Cache.h,v 1.9 2006/06/12 18:05:32 avenger_teambg Exp $
  *
  */
 
@@ -30,7 +30,9 @@
 
 #define KEYSIZE 8
 
+#ifndef ReleaseFun
 typedef void (*ReleaseFun)(void *);
+#endif
 
 class Cache
 {

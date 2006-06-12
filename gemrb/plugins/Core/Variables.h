@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.h,v 1.23 2005/06/22 15:55:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.h,v 1.24 2006/06/12 18:05:32 avenger_teambg Exp $
  *
  */
 
@@ -29,6 +29,10 @@
 
 /////////////////////////////////////////////////////////////////////////////
 // Variables<ieDword, VALUE>
+
+#ifndef ReleaseFun
+typedef void (*ReleaseFun)(void *);
+#endif
 
 #define GEM_VARIABLES_INT      0
 #define GEM_VARIABLES_STRING   1
@@ -97,7 +101,7 @@ public:
 	void SetAtCopy(const char* key, const char* newValue);
 	void SetAt(const char* key, const char* newValue);
 	void SetAt(const char* key, ieDword newValue);
-	void RemoveAll();
+	void RemoveAll(ReleaseFun fun);
 	void InitHashTable(unsigned int hashSize, bool bAllocNow = true);
 
 	POSITION GetNextAssoc(POSITION rNextPosition, const char*& rKey,

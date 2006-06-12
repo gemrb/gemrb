@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.cpp,v 1.29 2005/12/19 23:10:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.cpp,v 1.30 2006/06/12 18:05:32 avenger_teambg Exp $
  *
  */
 
@@ -139,7 +139,7 @@ void Variables::InitHashTable(unsigned int nHashSize, bool bAllocNow)
 	m_nHashTableSize = nHashSize;
 }
 
-void Variables::RemoveAll()
+void Variables::RemoveAll(ReleaseFun fun)
 {
 	if (m_pHashTable != NULL) {
 		// destroy elements (values and keys)
@@ -148,7 +148,10 @@ void Variables::RemoveAll()
 			for (pAssoc = m_pHashTable[nHash];
 				pAssoc != NULL;
 				pAssoc = pAssoc->pNext) {
-				if (m_type == GEM_VARIABLES_STRING) {
+				if (fun) {
+					fun((void *) pAssoc->Value.sValue);
+				}
+				else if (m_type == GEM_VARIABLES_STRING) {
 					if (pAssoc->Value.sValue) {
 						free( pAssoc->Value.sValue );
 						pAssoc->Value.sValue = NULL;
@@ -179,7 +182,7 @@ void Variables::RemoveAll()
 
 Variables::~Variables()
 {
-	RemoveAll();
+	RemoveAll(NULL);
 }
 
 Variables::MyAssoc* Variables::NewAssoc(const char* key)
@@ -234,7 +237,7 @@ void Variables::FreeAssoc(Variables::MyAssoc* pAssoc)
 
 	// if no more elements, cleanup completely
 	if (m_nCount == 0) {
-		RemoveAll();
+		RemoveAll(NULL);
 	}
 }
 
