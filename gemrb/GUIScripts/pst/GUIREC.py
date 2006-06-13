@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.47 2006/06/12 17:07:44 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.48 2006/06/13 15:23:52 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -499,12 +499,10 @@ def GetCharacterHeader (pc):
 
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS) - 1
 	Multi = GemRB.GetTableValue (ClassTable, Class, 4)
-	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID) & 255
-	#using one byte animid
-	row = "0x%02X" %anim_id
+	Specific = "%d"%GemRB.GetPlayerStat (pc, IE_SPECIFIC)
 
 	# Nameless is a special case (dual class)
-	if GemRB.GetTableValue (BioTable, row, "PC") == "NAMELESS_ONE":
+	if GemRB.GetTableValue (BioTable, Specific, "PC") == "NAMELESS_ONE":
 		avatar_header['PrimClass'] = GemRB.GetTableRowName (ClassTable, Class)
 		avatar_header['SecoClass'] = "*"
 
@@ -925,9 +923,8 @@ def OpenBiographyWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	BioTable = GemRB.LoadTable ("bios")
-	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID) & 255
-	row = "0x%02X" %anim_id
-	BioText = int (GemRB.GetTableValue (BioTable, row, 'BIO'))
+	Specific = "%d"%GemRB.GetPlayerStat (pc, IE_SPECIFIC)
+	BioText = int (GemRB.GetTableValue (BioTable, Specific, 'BIO'))
 	GemRB.UnloadTable (BioTable)
 
 	TextArea = GemRB.GetControl (Window, 0)
@@ -991,9 +988,7 @@ def OpenLevelUpWindow ():
 
 	# These are used to identify Nameless One
 	BioTable = GemRB.LoadTable ("bios")
-	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID) & 255
-	#using one byte animid
-	row = "0x%02X" %anim_id
+	Specific = "%d"%GemRB.GetPlayerStat (pc, IE_SPECIFIC)
 
 	# These will be used for saving throws
 	SavThrUpdated = False
@@ -1055,7 +1050,7 @@ def OpenLevelUpWindow ():
 			NextLevel = NextLevel + 1
 		NumOfLevUp = NextLevel - avatar_header['PrimLevel'] # How many levels did we go up?
 		# Is avatar Nameless One?
-		if GemRB.GetTableValue (BioTable, row, "PC") == "NAMELESS_ONE":
+		if GemRB.GetTableValue (BioTable, Specific, "PC") == "NAMELESS_ONE":
 			# Saving Throws
 			# Nameless One gets the best possible throws from all the classes except Priest
 			FigSavThrTable = GemRB.LoadTable ("SAVEWAR")

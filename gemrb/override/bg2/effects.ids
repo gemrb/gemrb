@@ -293,10 +293,10 @@ IDS
 0x123	DisableOverlay
 0x124	Protection:Backstab
 0x125	OffscreenAIModifier
-0x126	SoundMNModifier
-0x127	DisableChunk
+0x126	ExistanceDelayModifier
+0x127	DisablePermanentDeath
 0x128	Protection:Animation
-0x129	NonInterruptableModifier
+0x129	Protection:Turn
 0x12a	AreaSwitch
 0x12b	ChaosShieldModifier
 0x12c	DeactivateDeadModifier
@@ -307,7 +307,7 @@ IDS
 0x131	OffhandHitModifier
 0x132	RightHitModifier
 0x133	Reveal:Tracks
-0x134	Stat195Modifier
+0x134	Protection:Tracking
 0x135	ModifyLocalVariable
 0x136	TimelessState
 0x137	GenerateWish
