@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.359 2006/04/22 13:30:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.360 2006/06/13 15:46:27 avenger_teambg Exp $
  *
  */
 
@@ -385,6 +385,7 @@ static ActionLink actionnames[] = {
 	{"changerace", GameScript::ChangeRace, 0},
 	{"changespecifics", GameScript::ChangeSpecifics, 0},
 	{"changestat", GameScript::ChangeStat, 0},
+	{"changestatglobal", GameScript::ChangeStatGlobal, 0},
 	{"changestoremarkup", GameScript::ChangeStoreMarkup, 0},//iwd2
 	{"changeteam", GameScript::SetTeam, 0}, //pst
 	{"chunkcreature", GameScript::Kill, 0}, //should be more graphical
@@ -482,8 +483,8 @@ static ActionLink actionnames[] = {
 	{"forceleavearealua", GameScript::ForceLeaveAreaLUA, 0},
 	{"forcespell", GameScript::ForceSpell, AF_BLOCKING},
 	{"fullheal", GameScript::FullHeal, 0},
-	{"getstat", GameScript::GetStat, 0}, //gemrb specific
 	{"getitem", GameScript::GetItem, 0},
+	{"getstat", GameScript::GetStat, 0}, //gemrb specific
 	{"giveexperience", GameScript::AddXPObject, 0},
 	{"givegoldforce", GameScript::CreatePartyGold, 0}, //this is the same
 	{"giveitem", GameScript::GiveItem, 0},

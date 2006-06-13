@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.67 2006/04/22 13:30:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.68 2006/06/13 15:46:27 avenger_teambg Exp $
  *
  */
 
@@ -254,6 +254,21 @@ void GameScript::ChangeStat(Scriptable* Sender, Action* parameters)
 	Actor* actor = ( Actor* ) tar;
 	actor->NewStat( parameters->int0Parameter, parameters->int1Parameter,
 			parameters->int2Parameter );
+}
+
+void GameScript::ChangeStatGlobal(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		return;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return;
+	}
+	ieDword value = (ieDword) CheckVariable( Sender, parameters->string0Parameter, parameters->string1Parameter );
+	Actor* actor = ( Actor* ) tar;
+	actor->NewStat( parameters->int0Parameter, value,
+		parameters->int1Parameter);
 }
 
 void GameScript::ChangeGender(Scriptable* Sender, Action* parameters)
