@@ -1,0 +1,9 @@
+2DA V1.0
+           ID      NAME_REF    DESC_REF    NAMELESS  ANNAH MORTE NORDOM  DAKKON  GRACE  IGNUS  VHAILOR
+FIST        0      64190       *           1         1     1     0       0       1      1      0
+DAGGER      1      64187       *           1         0     0     0       1       0      0      0
+HAMMER      2      *           *           1         0     0     0       0       0      0      0
+AXE         3      64623       *           1         0     0     0       0       0      0      1
+CLUB        4      *           *           1         0     0     0       0       0      0      0
+BOW         5      64180       *           0         0     0     1       0       0      0      0
+

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.48 2006/06/13 15:23:52 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.49 2006/06/17 12:07:19 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -288,7 +288,6 @@ def UpdateRecordsWindow ():
 
 	# faction
 	faction = GemRB.GetPlayerStat (pc, IE_FACTION)
-	print "FACTION:", faction
 	FactionTable = GemRB.LoadTable ("FACTIONS")
 	faction_help = GemRB.GetString (GemRB.GetTableValue (FactionTable, faction, 0))
 	frame = GemRB.GetTableValue (FactionTable, faction, 1)
@@ -490,7 +489,6 @@ def OnRecordsHelpCharisma ():
 	GemRB.TextAreaAppend(Window, TextArea, "\n\n"+GemRB.StatComment(GemRB.GetTableValue(StatTable,Cha,5),0,0) )
 	return
 
-
 def GetCharacterHeader (pc):
 	global avatar_header
 
@@ -501,8 +499,11 @@ def GetCharacterHeader (pc):
 	Multi = GemRB.GetTableValue (ClassTable, Class, 4)
 	Specific = "%d"%GemRB.GetPlayerStat (pc, IE_SPECIFIC)
 
+	#Nameless is Specific == 1
+	avatar_header['Specific'] = Specific
+
 	# Nameless is a special case (dual class)
-	if GemRB.GetTableValue (BioTable, Specific, "PC") == "NAMELESS_ONE":
+	if Specific == 1:
 		avatar_header['PrimClass'] = GemRB.GetTableRowName (ClassTable, Class)
 		avatar_header['SecoClass'] = "*"
 
@@ -559,7 +560,7 @@ def GetCharacterHeader (pc):
 def GetNextLevelExp (Level, Class):
 	NextLevelTable = GemRB.LoadTable ("XPLEVEL")
 
-	if (Level < 21):
+	if (Level < 20):
 		NextLevel = GemRB.GetTableValue (NextLevelTable, Class, str (Level + 1))
 	else:
 		After21ExpTable = GemRB.LoadTable ("LVL21PLS")
@@ -950,20 +951,30 @@ def AcceptLevelUp():
 	GemRB.SetPlayerStat (pc, IE_SAVEVSBREATH, SavThrows[3])
 	GemRB.SetPlayerStat (pc, IE_SAVEVSSPELL, SavThrows[4])
 	oldhp = GemRB.GetPlayerStat (pc, IE_HITPOINTS)
-	GemRB.SetPlayerStat (pc, IE_HITPOINTS, HPBonus+oldhp)
+	GemRB.SetPlayerStat (pc, IE_HITPOINTS, HPGained+oldhp)
 	oldhp = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)
-	GemRB.SetPlayerStat (pc, IE_MAXHITPOINTS, HPBonus+oldhp)
-	#this is not good in case of the nameless one, who is dual classed
-	GemRB.SetPlayerStat (pc, IE_LEVEL, GemRB.GetPlayerStat (pc, IE_LEVEL)+1)
+	GemRB.SetPlayerStat (pc, IE_MAXHITPOINTS, HPGained+oldhp)
+	#increase weapon proficiency if needed
+	if WeapProfType!=-1:
+		GemRB.SetPlayerStat (pc, WeapProfType, CurrWeapProf + WeapProfGained );
+	Specific = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
+	if Specific == 1:
+		#TODO:
+		#the nameless one is dual classed
+		#so we have to determine which level to increase
+		GemRB.SetPlayerStat (pc, IE_LEVEL, GemRB.GetPlayerStat (pc, IE_LEVEL)+NumOfPrimLevUp)
+	else:
+		GemRB.SetPlayerStat (pc, IE_LEVEL, GemRB.GetPlayerStat (pc, IE_LEVEL)+NumOfPrimLevUp)
+		GemRB.SetPlayerStat (pc, IE_LEVEL2, GemRB.GetPlayerStat (pc, IE_LEVEL2)+NumOfSecoLevUp)
 	UpdateRecordsWindow ()
 
 
 def OpenLevelUpWindow ():
 	global LevelUpWindow
 	global SavThrows
-	global HPBonus
-	global FinalCurHP
-	global FinalMaxHP
+	global HPGained
+	global WeapProfType, CurrWeapProf, WeapProfGained
+	global NumOfPrimLevUp, NumOfSecoLevUp
 
 	GemRB.HideGUI ()
 
@@ -989,6 +1000,7 @@ def OpenLevelUpWindow ():
 	# These are used to identify Nameless One
 	BioTable = GemRB.LoadTable ("bios")
 	Specific = "%d"%GemRB.GetPlayerStat (pc, IE_SPECIFIC)
+	AvatarName = GemRB.GetTableValue (BioTable, Specific, "PC")
 
 	# These will be used for saving throws
 	SavThrUpdated = False
@@ -1003,6 +1015,27 @@ def OpenLevelUpWindow ():
 	ConHPBon = 0
 	Thac0Updated = False
 	Thac0 = 0
+	WeapProfGained = 0
+
+	ClasWeapTable = GemRB.LoadTable ("weapprof")
+	WeapProfType = -1
+	CurrWeapProf = -1
+	#This does not apply to Nameless since he uses unused slots system
+	#Nameless is Specific == 1
+	if Specific != "1":
+		# Searching for the column name where value is 1
+		for i in range (5):
+			WeapProfName = GemRB.GetTableRowName (ClasWeapTable, i)
+			value = GemRB.GetTableValue (ClasWeapTable, AvatarName, WeapProfName)
+			if value == 1:
+				WeapProfType = i
+				break
+
+	if WeapProfType!=-1:
+		CurrWeapProf = GemRB.GetPlayerStat (pc, IE_WEAPPROF+WeapProfType)
+
+	# Recording this avatar's current proficiency level
+	# Since Nameless one is not covered, hammer and club can't occur
 	# What is the avatar's class (Which we can use to lookup XP)
 	ClassRow = GemRB.GetPlayerStat (pc, IE_CLASS)-1
 	Class = GemRB.GetTableRowName (ClassTable, ClassRow)
@@ -1048,9 +1081,10 @@ def OpenLevelUpWindow ():
 		NextLevel = avatar_header['PrimLevel'] + 1
 		while avatar_header['XP'] >= GetNextLevelExp (NextLevel, Class):
 			NextLevel = NextLevel + 1
-		NumOfLevUp = NextLevel - avatar_header['PrimLevel'] # How many levels did we go up?
+		NumOfPrimLevUp = NextLevel - avatar_header['PrimLevel'] # How many levels did we go up?
+
 		# Is avatar Nameless One?
-		if GemRB.GetTableValue (BioTable, Specific, "PC") == "NAMELESS_ONE":
+		if Specific == "1":
 			# Saving Throws
 			# Nameless One gets the best possible throws from all the classes except Priest
 			FigSavThrTable = GemRB.LoadTable ("SAVEWAR")
@@ -1062,13 +1096,19 @@ def OpenLevelUpWindow ():
 			FighterLevel = GemRB.GetPlayerStat (pc, IE_LEVEL) - 1
 			MageLevel = GemRB.GetPlayerStat (pc, IE_LEVEL2) - 1
 			ThiefLevel = GemRB.GetPlayerStat (pc, IE_LEVEL3) - 1
+			# this is the constitution bonus type for this level
+			CONType = 1
 			# We are leveling up one of those levels. Therefore, one of them has to be updated.
 			if avatar_header['PrimClass'] == "Fighter":
 				FighterLevel = NextLevel - 1
+				CONType = 0
 			elif avatar_header['PrimClass'] == "Mage":
 				MageLevel = NextLevel - 1
 			else:
 				ThiefLevel = NextLevel - 1
+
+			ConHPBon = GetConHPBonus (pc, NumOfPrimLevUp, CONType)
+
 			# Now we need to update the saving throws with the best values from those tables.
 			# The smaller the number, the better saving throw it is.
 			# We also need to check if any of the levels are larger than 21, since
@@ -1097,6 +1137,11 @@ def OpenLevelUpWindow ():
 			GemRB.UnloadTable (MagSavThrTable)
 			GemRB.UnloadTable (ThiSavThrTable)
 		else:
+			#How many weapon procifiencies we get
+			for i in range (NumOfPrimLevUp):
+				if HasGainedWeapProf (pc, CurrWeapProf + WeapProfGained, avatar_header['PrimLevel'] + i, avatar_header['PrimClass']):
+					WeapProfGained += 1
+
 			# Saving Throws
 			# Loading the right saving throw table
 			SavThrTable = GemRB.LoadTable (GemRB.GetTableValue (ClassTable, Class, "SAVE"))
@@ -1115,9 +1160,11 @@ def OpenLevelUpWindow ():
 			GemRB.UnloadTable (SavThrTable)
 
 			# Hit Points Gained and Hit Points from Constitution Bonus
-			for i in range (NumOfLevUp):
+			for i in range (NumOfPrimLevUp):
 				HPGained = HPGained + GetSingleClassHP (Class, avatar_header['PrimLevel'])
-				ConHPBon = ConHPBon + GetConHPBonus (pc)
+
+			ConHPBon = GetConHPBonus (pc, NumOfPrimLevUp, 0)
+
 			# Thac0
 			Thac0 = GetThac0 (Class, NextLevel)
 			# Is the new thac0 better than old? (The smaller, the better)
@@ -1126,6 +1173,8 @@ def OpenLevelUpWindow ():
 
 	else:
 		# avatar is multi class
+		# we have only fighter/X multiclasses, so this
+		# part is a bit hardcoded
 		PrimNextLevel = 0
 		SecoNextLevel = 0
 		NumOfPrimLevUp = 0
@@ -1137,6 +1186,10 @@ def OpenLevelUpWindow ():
 			PrimNextLevel = PrimNextLevel + 1
 		# How many primary levels did we go up?
 		NumOfPrimLevUp = PrimNextLevel - avatar_header['PrimLevel']
+
+		for i in range (NumOfPrimLevUp):
+			if HasGainedWeapProf (pc, CurrWeapProf + WeapProfGained, avatar_header['PrimLevel'] + i, avatar_header['PrimClass']):
+				WeapProfGained += 1
 
 		# Saving Throws
 		FigSavThrTable = GemRB.LoadTable ("SAVEWAR")
@@ -1150,36 +1203,33 @@ def OpenLevelUpWindow ():
 		# Which multi class is it?
 		if GemRB.GetPlayerStat (pc, IE_CLASS) == 7:
 			# avatar is Fighter/Mage (Dak'kon)
-			SecoNextLevel = avatar_header['SecoLevel']
-			while avatar_header['XP'] >= GetNextLevelExp (SecoNextLevel, "MAGE"):
-				SecoNextLevel = SecoNextLevel + 1
-				# How many secondary levels did we go up?
-				NumOfSecoLevUp = SecoNextLevel - avatar_header['SecoLevel']
-				MagSavThrTable = GemRB.LoadTable ("SAVEWIZ")
-				if SecoNextLevel < 22:
-					for i in range (5):
-						Throw = GemRB.GetTableValue (MagSavThrTable, i, SecoNextLevel - 1)
-						if Throw < SavThrows[i]:
-							SavThrows[i] = Throw
-							SavThrUpdated = True
-				GemRB.UnloadTable (MagSavThrTable)
+			Class = "MAGE"
+			SavThrTable = GemRB.LoadTable ("SAVEWIZ")
 		else:
 			# avatar is Fighter/Thief (Annah)
-			SecoNextLevel = avatar_header['SecoLevel']
-			while avatar_header['XP'] >= GetNextLevelExp (SecoNextLevel, "THIEF"):
-				SecoNextLevel = SecoNextLevel + 1
-				# How many secondary levels did we go up?
-				NumOfSecoLevUp = SecoNextLevel - avatar_header['SecoLevel']
-				ThiSavThrTable = GemRB.LoadTable ("SAVEROG")
-				if SecoNextLevel < 22:
-					for i in range (5):
-						Throw = GemRB.GetTableValue (ThiSavThrTable, i, SecoNextLevel - 1)
-						if Throw < SavThrows[i]:
-							SavThrows[i] = Throw
-							SavThrUpdated = True
-				GemRB.UnloadTable (ThiSavThrTable)
-		# Hit Points Gained and Hit Points from Constitution Bonus
-		print "TODO: Implement Multi-Class HP generation."
+			Class = "THIEF"
+			SavThrTable = GemRB.LoadTable ("SAVEROG")
+		
+		SecoNextLevel = avatar_header['SecoLevel']
+		while avatar_header['XP'] >= GetNextLevelExp (SecoNextLevel, Class):
+			SecoNextLevel = SecoNextLevel + 1
+		# How many secondary levels did we go up?
+		NumOfSecoLevUp = SecoNextLevel - avatar_header['SecoLevel']
+		if SecoNextLevel < 22:
+			for i in range (5):
+				Throw = GemRB.GetTableValue (SavThrTable, i, SecoNextLevel - 1)
+				if Throw < SavThrows[i]:
+					SavThrows[i] = Throw
+					SavThrUpdated = True
+		GemRB.UnloadTable (SavThrTable)
+
+		# Hit Points Gained and Hit Points from Constitution Bonus (multiclass)
+		for i in range (NumOfPrimLevUp):
+			HPGained = HPGained + GetSingleClassHP ("FIGHTER", avatar_header['PrimLevel'])/2
+
+		for i in range (NumOfSecoLevUp):
+			HPGained = HPGained + GetSingleClassHP (Class, avatar_header['SecoLevel'])/2
+		ConHPBon = GetConHPBonus (pc, NumOfPrimLevUp, NumOfSecoLevUp, 2)
 
 		# Thac0
 		# Multi class use the primary class level to determine Thac0
@@ -1206,11 +1256,8 @@ def OpenLevelUpWindow ():
 	Label = GemRB.GetControl (Window, 0x10000021)
 	GemRB.SetText (Window, Label, str (SavThrows[4]))
 
-	# For some reason, Constitution Bonus is not added
-	# to the current HP in the IE version
 	FinalCurHP = GemRB.GetPlayerStat (pc, IE_HITPOINTS) + HPGained
-	HPBonus = ConHPBon + HPGained
-	FinalMaxHP = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS) + HPBonus
+	FinalMaxHP = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS) + HPGained
 
 	# Current HP
 	Label = GemRB.GetControl (Window, 0x10000025)
@@ -1222,6 +1269,9 @@ def OpenLevelUpWindow ():
 
 	# Displaying level up info
 	overview = ""
+	if CurrWeapProf!=-1 and WeapProfGained>0:
+		overview = overview + '+' + str (WeapProfGained) + ' ' + GemRB.GetString (WeapProfDispStr) + '\n'
+
 	overview = overview + str (HPGained) + " " + GemRB.GetString (38713) + '\n'
 	overview = overview + str (ConHPBon) + " " + GemRB.GetString (38727) + '\n'
 
@@ -1245,7 +1295,7 @@ def GetSingleClassHP (Class, Level):
 	if Level > 20:
 		Level = 20
 
-	# We need the Level as a string, so that we can use the collumn names
+	# We need the Level as a string, so that we can use the column names
 	Level = str (Level)
 
 	Sides = GemRB.GetTableValue (HPTable, Level, "SIDES")
@@ -1256,23 +1306,17 @@ def GetSingleClassHP (Class, Level):
 
 	return GemRB.Roll (Rolls, Sides, Modif)
 
-def GetConHPBonus (pc):
+def GetConHPBonus (pc, fighterlevels, otherlevels, type):
 	ConHPBonTable = GemRB.LoadTable ("HPCONBON")
-	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 
-	if Class == 2:
-		# Fighter
-		return GemRB.GetTableValue (ConHPBonTable, str (GemRB.GetPlayerStat (pc, IE_CON)), "WARRIOR")
-	elif (Class == 7) or (Class == 9):
-		# Fighter/Mage or Fighter/Thief
-		# Just like HP, multi-class'es CON bonus is divided by the number of classes. In
-		# case of Planescape, it is always two. Also since Annah and Dak'kon are Fighters,
-		# Warrior collumn is used.
-		return GemRB.GetTableValue (ConHPBonTable, str (GemRB.GetPlayerStat (pc, IE_CON)), "WARRIOR") / 2
-	else:
+	con = str (GemRB.GetPlayerStat (pc, IE_CON))
+	if type == 0:
+		# Pure fighter
+		return GemRB.GetTableValue (ConHPBonTable, con, "WARRIOR") * fighterlevels
+	if type == 1:
 		# Mage, Priest or Thief
-		return GemRB.GetTableValue (ConHPBonTable, str (GemRB.GetPlayerStat (pc, IE_CON)), "OTHER")
-
+		return GemRB.GetTableValue (ConHPBonTable, con, "OTHER") * otherlevels
+	return GemRB.GetTableValue (ConHPBonTable, con, "WARRIOR") * fighterlevels / 2 + GemRB.GetTableValue (ConHPBonTable, con, "OTHER") * otherlevels / 2
 
 def GetThac0 (Class, Level):
 	Thac0Table = GemRB.LoadTable ("THAC0")
@@ -1282,6 +1326,18 @@ def GetThac0 (Class, Level):
 		Level = 60
 
 	return GemRB.GetTableValue (Thac0Table, Class, str (Level))
+
+#apparently the original code doesn't follow profsmax/profs tables
+def HasGainedWeapProf (pc, currProf, currLevel, Class):
+	#only fighters gain weapon proficiencies
+	if Class!="FIGHTER":
+		return False
+	#hardcoded limit is 4
+	if currProf>3:
+		return False
+	if CurrProf>(currLevel-1)/3:
+		return False
+	return True
 
 ###################################################
 # End of file GUIREC.py
