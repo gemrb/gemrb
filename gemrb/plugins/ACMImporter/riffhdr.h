@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/riffhdr.h,v 1.5 2004/08/10 19:11:29 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/riffhdr.h,v 1.6 2006/06/17 07:51:44 avenger_teambg Exp $
  *
  */
 
@@ -45,7 +45,7 @@ typedef struct {
 	short channels;
 	short bits;
 	short samplespersec;
-	short unknown;
+	unsigned short unknown;
 } WAVC_HEADER;
 
 void write_riff_header(void* memory, int samples, int channels,
