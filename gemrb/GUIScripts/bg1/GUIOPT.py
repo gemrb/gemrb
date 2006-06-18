@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIOPT.py,v 1.2 2005/03/20 21:28:23 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIOPT.py,v 1.3 2006/06/18 19:48:39 avenger_teambg Exp $
 
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
@@ -37,6 +37,7 @@
 import GemRB
 from GUIDefines import *
 from GUICommon import CloseOtherWindow
+from GUISAVE import *
 import MessageWindow
 
 ###################################################
@@ -91,7 +92,7 @@ def OpenOptionsWindow ():
 	# Save Game
 	Button = GemRB.GetControl (Window, 6)
 	GemRB.SetText (Window, Button, 13730)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenSaveWindow")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenSaveMsgWindow")
 
 	# Quit Game
 	Button = GemRB.GetControl (Window, 10)
@@ -492,13 +493,12 @@ def DisplayHelpEndOfRound ():
 
 
 ###################################################
-###################################################
 
-def OpenSaveWindow ():
-	OpenOptionsWindow ()
-	GemRB.SetNextScript ('GUISAVE')
-	
-
+def OpenSaveMsgWindow ():
+        GemRB.SetVar("QuitAfterSave",0)
+        OpenSaveWindow ()
+        #save the game without quitting
+        return
 
 ###################################################
 
