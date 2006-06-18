@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.106 2006/05/22 16:39:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.107 2006/06/18 22:53:18 avenger_teambg Exp $
  *
  */
 
@@ -194,7 +194,7 @@ public:
 	void Deactivate();
 	ieDword GetInternalFlag();
 	char* GetScriptName();
-	Map* GetCurrentArea();
+	Map* GetCurrentArea() const;
 	void SetMap(Map *map);
 	void SetScript(int index, GameScript* script);
 	void DisplayHeadText(const char* text);

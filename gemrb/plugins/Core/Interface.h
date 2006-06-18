@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.194 2006/06/12 18:05:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.195 2006/06/18 22:53:18 avenger_teambg Exp $
  *
  */
 
@@ -265,7 +265,7 @@ public:
 	unsigned int SlotTypes; //this is the same as the inventory size
 	ieResRef GlobalScript;
 	ieResRef WorldMapName;
-	TableMgr* AreaAliasTable;
+	Variables * AreaAliasTable;
 	Sprite2D **Cursors;
 	int CursorCount;
 	Sprite2D *FogSprites[32];
@@ -547,6 +547,8 @@ public:
 	int ReadResRefTable(const ieResRef tablename, ieResRef *&data);
 	/** frees the data */
 	void FreeResRefTable(ieResRef *&table, int &count);
+	/** Returns the virtual worldmap entry of a sub-area */
+	int GetAreaAlias(ieResRef areaname);
 private:
 	bool LoadConfig(void);
 	bool LoadConfig(const char *filename);

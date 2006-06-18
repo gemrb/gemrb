@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.74 2006/05/26 18:44:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.75 2006/06/18 22:53:18 avenger_teambg Exp $
  *
  */
 
@@ -906,10 +906,12 @@ CREItem *Inventory::GetUsedWeapon(bool leftorright)
 	if (leftorright) {
 		slot = GetShieldSlot();
 		ret = GetSlotItem(slot);
-	} else {
-		slot = GetEquippedSlot();
-		ret = GetSlotItem(slot);
+		if (ret) {
+			return ret;
+		}
 	}
+	slot = GetEquippedSlot();
+	ret = GetSlotItem(slot);
 	if (!ret) {
 		//return fist weapon
 		ret = GetSlotItem(GetFistSlot());

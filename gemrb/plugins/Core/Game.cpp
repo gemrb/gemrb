@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.113 2006/04/19 20:09:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.114 2006/06/18 22:53:18 avenger_teambg Exp $
  *
  */
 
@@ -898,7 +898,7 @@ void Game::AdvanceTime(ieDword add)
 }
 
 //returns true if there are excess players in the team
-bool Game::PartyOverflow()
+bool Game::PartyOverflow() const
 {
 	GameControl *gc = core->GetGameControl();
 	if (!gc) {
@@ -942,12 +942,23 @@ bool Game::EveryoneDead() const
 //runs all area scripts
 void Game::UpdateScripts()
 {
+	size_t acnt=Attackers.size();
+	if (acnt) {
+		CombatCounter++;
+	}
 	ExecuteScript( Scripts[0] );
 	ProcessActions(false);
 	size_t idx;
 
 	for (idx=0;idx<Maps.size();idx++) {
 		Maps[idx]->UpdateScripts();
+		size_t acnt=Attackers.size();
+		while(acnt--) {
+			Actor *actor = Maps[idx]->GetActorByGlobalID(Attackers[acnt]);
+			if (actor) {
+				actor->InitRound(!(CombatCounter&1) );
+			}
+		}
 	}
 	if (Maps.size()>MAX_MAPS_LOADED) {
 		idx = Maps.size();
@@ -1015,14 +1026,14 @@ void Game::TimeStop(Actor* owner, ieDword end)
 //returns the colour which should be applied onto the whole game area viewport
 //this is based on timestop, dream area, weather, daytime
 
-static Color TimeStopTint={0xe0,0xe0,0xe0,0x20}; //greyscale
-static Color DreamTint={0xf0,0xe0,0xd0,0x10};    //light brown scale
-static Color NightTint={0x80,0x80,0xe0,0x40};    //dark, bluish
-static Color DuskTint={0xe0,0x80,0x80,0x40};     //dark, reddish
-static Color FogTint={0xff,0xff,0xff,0x40};      //whitish
-static Color DarkTint={0x80,0x80,0xe0,0x10};     //slightly dark bluish
+static const Color TimeStopTint={0xe0,0xe0,0xe0,0x20}; //greyscale
+static const Color DreamTint={0xf0,0xe0,0xd0,0x10};    //light brown scale
+static const Color NightTint={0x80,0x80,0xe0,0x40};    //dark, bluish
+static const Color DuskTint={0xe0,0x80,0x80,0x40};     //dark, reddish
+static const Color FogTint={0xff,0xff,0xff,0x40};      //whitish
+static const Color DarkTint={0x80,0x80,0xe0,0x10};     //slightly dark bluish
 
-Color *Game::GetGlobalTint()
+const Color *Game::GetGlobalTint() const
 {
 	if (timestop_end>GameTime) {
 		return &TimeStopTint;
@@ -1053,6 +1064,42 @@ Color *Game::GetGlobalTint()
 	return NULL;
 }
 
+void Game::InAttack(ieDword globalID)
+{
+	std::vector< ieDword>::const_iterator idx;
+
+	for(idx=Attackers.begin(); idx!=Attackers.end();idx++) {
+		if (*idx==globalID) return;
+	}
+	Attackers.push_back(globalID);
+}
+
+void Game::OutAttack(ieDword globalID)
+{
+	std::vector< ieDword>::iterator idx;
+
+	for(idx=Attackers.begin(); idx!=Attackers.end();idx++) {
+		if (*idx==globalID) Attackers.erase(idx);
+	}
+}
+
+int Game::AttackersOf(ieDword globalID) const
+{
+	std::vector< ieDword>::const_iterator idx;
+
+	int cnt = 0;
+	Map *area=GetCurrentArea();
+	for(idx=Attackers.begin(); idx!=Attackers.end();idx++) {
+		Actor * actor = area->GetActorByGlobalID(*idx);
+		if (actor) {
+			if (actor->LastTarget==globalID) {
+				cnt++;
+			}
+		}
+	}
+	return cnt;
+}
+
 void Game::DebugDump()
 {
 	printf("Currently loaded areas:\n");
@@ -1062,3 +1109,4 @@ void Game::DebugDump()
 		printf("%s\n",map->GetScriptName());
 	}
 }
+

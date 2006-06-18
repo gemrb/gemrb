@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.183 2006/05/22 16:39:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.184 2006/06/18 22:53:18 avenger_teambg Exp $
  *
  */
 
@@ -1227,7 +1227,10 @@ void Actor::Die(Scriptable *killer)
 		return;
 	}
 	//Can't simply set Selected to false, game has its own little list
-	core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
+	Game *game = core->GetGame();
+	game->SelectActor(this, false, SELECT_NORMAL);
+	game->OutAttack(GetID());
+
 	ClearPath();
 	SetModal( 0 );
 	DisplayStringCore(this, VB_DIE, DS_CONSOLE|DS_CONST );
@@ -1237,7 +1240,6 @@ void Actor::Die(Scriptable *killer)
 	InternalFlags|=IF_REALLYDIED|IF_JUSTDIED;
 	SetStance( IE_ANI_DIE );
 
-	Game *game = core->GetGame();
 	if (InParty) {
 		game->PartyMemberDied(this);
 		core->Autopause(AP_DEAD);
@@ -1574,6 +1576,9 @@ void Actor::SetTarget( Scriptable *target)
 		Actor *tar = (Actor *) target;
 		LastTarget = tar->GetID();
 		tar->LastAttacker = GetID();
+		//we tell the game object that this creature 
+		//must be added to the list of combatants
+		core->GetGame()->InAttack(tar->LastAttacker);
 	}
 	//calculate attack style
 	//set stance correctly based on attack style
@@ -1731,6 +1736,9 @@ void Actor::PerformAttack()
 	DealDamage (target, damage, damagetype, false);
 }
 
+static int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
+	DAMAGE_CRUSHING, DAMAGE_SLASHING, DAMAGE_MISSILE, DAMAGE_STUNNING};
+
 void Actor::DealDamage(Actor *target, int damage, int damagetype, bool critical)
 {
 	if (damage<0) damage = 0;
@@ -1738,7 +1746,8 @@ void Actor::DealDamage(Actor *target, int damage, int damagetype, bool critical)
 		damage <<=1; //critical damage is always double?
 		//check if critical hit is averted by helmet
 	}
-	target->Damage(damage, damagetype, this);
+	if (damagetype>4) damagetype = 0;
+	target->Damage(damage, weapon_damagetype[damagetype], this);
 }
 
 //idx could be: 0-6, 16-22, 32-38, 48-54
@@ -2159,6 +2168,10 @@ void Actor::AddVVCell(ScriptedAnimation* vvc)
 {
 	vvcVector *vvcCells;
 
+	//if the vvc was not created, don't try to add it
+	if (!vvc) {
+		return;
+	}
 	if (vvc->ZPos<0) {
 		vvcCells=&vvcShields;
 	} else {

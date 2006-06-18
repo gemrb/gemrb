@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.24 2006/05/26 18:44:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.25 2006/06/18 22:53:19 avenger_teambg Exp $
  *
  */
 
@@ -2045,11 +2045,9 @@ int fx_set_ai_script (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0x53 Protection:Projectile
-int fx_protection_from_projectile (Actor* /*Owner*/, Actor* target, Effect* fx)
+int fx_protection_from_projectile (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_protection_from_projectile (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
-	//this is unsure
-	STAT_SET( IE_SHIELDGLOBE, 1 );
 	return FX_APPLIED;
 }
 

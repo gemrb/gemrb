@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.78 2006/05/22 16:25:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.79 2006/06/18 22:53:18 avenger_teambg Exp $
  *
  */
 
@@ -154,6 +154,7 @@ private:
 	std::vector< Map*> Maps;
 	std::vector< GAMJournalEntry*> Journals;
 	std::vector< char*> mastarea;
+	std::vector< ieDword> Attackers;
 	int MapIndex;
 public:
 	std::vector< Actor*> selected;
@@ -250,6 +251,9 @@ public:
 	int DelMap(unsigned int index, int forced = 0);
 	int AddNPC(Actor* npc);
 	Actor* GetNPC(unsigned int Index);
+	void InAttack(ieDword globalID);
+	void OutAttack(ieDword globalID);
+	int AttackersOf(ieDword globalID) const;
 
 	//journal entries
 	void DeleteJournalEntry(ieStrRef strref);
@@ -284,10 +288,14 @@ public:
 		}
 		return Formations[WhichFormation];
 	}
+	size_t GetAttackerCount() const {
+		return Attackers.size();
+	}
+
 
 	void ShareXP(int XP, bool divide);
 	/** returns true if we should start the party overflow window */
-	bool PartyOverflow();
+	bool PartyOverflow() const;
 	/** returns true if the party death condition is true */
 	bool EveryoneDead() const;
 	/** returns true if no one moves */
@@ -314,15 +322,15 @@ public:
 	/** Adds ticks to game time */
 	void AdvanceTime(ieDword add);
 	/** Runs the script engine on the global script and the area scripts 
-            areas run scripts on door, infopoint, container, actors too */
+	  areas run scripts on door, infopoint, container, actors too */
 	void UpdateScripts();
 	/** runs area functionality, sets partyrested trigger */
 	void RestParty(bool noareacheck);
 	/** timestop effect initiated by actor */
 	void TimeStop(Actor *actor, ieDword end);
 	/** gets the colour which should be applied over the game area,
-	    may return NULL */
-	Color *GetGlobalTint();
+	  may return NULL */
+	const Color *GetGlobalTint() const;
 	/** Dumps information about the object */
 	void DebugDump();
 };

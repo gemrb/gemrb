@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.h,v 1.14 2006/01/28 19:56:34 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.h,v 1.15 2006/06/18 22:53:18 avenger_teambg Exp $
  *
  */
 
@@ -91,7 +91,7 @@ private:
 	//mouse cursor
 	unsigned char lastCursor;
 	//current area
-	ieResRef ca;
+	ieResRef currentArea;
 	/** Label color of a visited area */
 	Palette *pal_normal;
 	/** Label color of a currently selected area */

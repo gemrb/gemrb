@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.140 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.141 2006/06/18 22:53:18 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -101,7 +101,7 @@ char* Scriptable::GetScriptName(void)
 	 return scriptName;
 }
 
-Map* Scriptable::GetCurrentArea()
+Map* Scriptable::GetCurrentArea() const
 {
 	//removed currentarea abort (casting glow/spell hit are delayed based on this)
 	if (!area) {
@@ -286,8 +286,12 @@ void Scriptable::ReleaseCurrentAction()
 
 void Scriptable::ProcessActions(bool force)
 {
+	if (Type == ST_ACTOR) {
+		Actor *actor = (Actor *) this;
+		actor->PerformAttack();
+	}
+
 	unsigned long thisTime = core->GetGame()->Ticks;
-	//GetTime( thisTime );
 	if (!force && (( thisTime - startTime ) < interval)) {
 		return;
 	}
@@ -332,7 +336,6 @@ void Scriptable::ProcessActions(bool force)
 		}
 	}
 	if (InternalFlags&IF_IDLE) {
-printf("Deactivated idle scriptable: %s\n", scriptName);
 		Deactivate();
 	}
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.400 2006/06/12 18:05:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.401 2006/06/18 22:53:18 avenger_teambg Exp $
  *
  */
 
@@ -604,20 +604,47 @@ bool Interface::ReadAbilityTables()
 
 bool Interface::ReadAreaAliasTable(const ieResRef tablename)
 {
+	if (AreaAliasTable) {
+		AreaAliasTable->RemoveAll(NULL);
+	} else {
+		AreaAliasTable = new Variables();
+		AreaAliasTable->SetType(GEM_VARIABLES_INT);
+	}
+
 	int table = LoadTable( tablename );
 
 	if (table < 0) {
 		return false;
 	}
-	AreaAliasTable = GetTable( table );
-	if (!AreaAliasTable) {
+	TableMgr* aa = GetTable( table );
+	if (!aa) {
 		DelTable( table );
 		return false;
 	}
-	printf("XXX: %s\n", AreaAliasTable->QueryField( "AR0306a", "MAP_AREA" ));
+	size_t idx = aa->GetRowCount();
+	while (idx--) {
+		ieResRef key;
+
+		//the first column (area name) is the row name
+		strnlwrcpy(key,aa->GetRowName(idx),8);
+		//the second column appears to be the worldmap index
+		ieDword value = atoi(aa->QueryField(idx,0));
+		AreaAliasTable->SetAt(key, value);
+	}
+	DelTable( table );
 	return true;
 }
 
+//this isn't const
+int Interface::GetAreaAlias(ieResRef areaname)
+{
+	ieDword value;
+
+	if (AreaAliasTable && AreaAliasTable->Lookup(areaname, value)) {
+		return (int) value;
+	}
+	return -1;
+}
 
 /** this is the main loop */
 void Interface::Main()

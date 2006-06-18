@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.28 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.29 2006/06/18 22:53:18 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -42,8 +42,15 @@ WorldMapControl::WorldMapControl(const char *font, int direction)
 	if (Value!=(ieDword) -1) {
 		Game* game = core->GetGame();
 		WorldMap* worldmap = core->GetWorldMap();
-		worldmap->CalculateDistances(game->CurrentArea, Value);
-		strncpy(ca, game->CurrentArea, 8);
+		strncpy(currentArea, game->CurrentArea, 8);
+printf("CurrentArea:  %s\n",currentArea);
+		int entry = core->GetAreaAlias(currentArea);
+		if (entry >= 0) {
+			WMPAreaEntry *m = worldmap->GetEntry(entry);
+			strncpy(currentArea, m->AreaResRef, 8);
+		}
+printf("CurrentArea NEW:  %s\n",currentArea);
+		worldmap->CalculateDistances(currentArea, Value);
 	}
 	
 	// alpha bit is unfortunately ignored
@@ -104,7 +111,7 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 			video->BlitSprite( icon, xOffs, yOffs, true, &r );
 		}
 
-		if (AnimPicture && !strnicmp(m->AreaResRef, ca, 8) ) {
+		if (AnimPicture && !strnicmp(m->AreaResRef, currentArea, 8) ) {
 			core->GetVideoDriver()->BlitSprite( AnimPicture, xOffs, yOffs, true, &r );
 		}
 	}
@@ -211,7 +218,7 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 			if ( (ae->GetAreaStatus() & WMP_ENTRY_WALKABLE)!=WMP_ENTRY_WALKABLE) {
 				continue; //invisible or inaccessible
 			}
-			if (!strnicmp(ae->AreaResRef, ca, 8) ) {
+			if (!strnicmp(ae->AreaResRef, currentArea, 8) ) {
 				continue; //current area
 			}
 
