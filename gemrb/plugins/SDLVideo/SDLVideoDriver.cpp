@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.142 2006/04/19 20:34:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.143 2006/06/18 20:14:53 avenger_teambg Exp $
  *
  */
 
@@ -1388,10 +1388,9 @@ void SDLVideoDriver::GetPixel(short x, short y, Color* color)
 	SDL_GetRGBA( val, backBuf->format, &color->r, &color->g, &color->b, &color->a );
 }
 
-Color SDLVideoDriver::SpriteGetPixel(Sprite2D* sprite, unsigned short x, unsigned short y, int& res)
+Color SDLVideoDriver::SpriteGetPixel(Sprite2D* sprite, unsigned short x, unsigned short y)
 {
 	Color c = { 0, 0, 0, 0 };
-	res = 0;
 
 	if (x >= sprite->Width || y >= sprite->Height) return c;
 
@@ -1401,10 +1400,11 @@ Color SDLVideoDriver::SpriteGetPixel(Sprite2D* sprite, unsigned short x, unsigne
 		SDL_LockSurface( surf );
 		unsigned char * pixels = ( ( unsigned char * ) surf->pixels ) +
 			( ( y * surf->w + x) * surf->format->BytesPerPixel );
-		SDL_GetRGBA( *(Uint32*)pixels, surf->format, &c.r, &c.g, &c.b, &c.a );
+		long val = 0;
+		memcpy( &val, pixels, surf->format->BytesPerPixel );
 		SDL_UnlockSurface( surf );
 
-		res = 1;
+		SDL_GetRGBA( val, surf->format, &c.r, &c.g, &c.b, &c.a );
 	} else {
 		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)sprite->vptr;
 
@@ -1435,7 +1435,6 @@ Color SDLVideoDriver::SpriteGetPixel(Sprite2D* sprite, unsigned short x, unsigne
 			//c.g = data->pal->col[*rle].g;
 			//c.b = data->pal->col[*rle].b;
 			c.a = 0xff;
-			res = 2;
 		}
 	}
 	return c;
@@ -1945,8 +1944,7 @@ Color SDLVideoDriver::SpriteGetPixelSum(Sprite2D* sprite, unsigned short xbase, 
 
 	for (unsigned int x = 0; x < ratio; x++) {
 		for (unsigned int y = 0; y < ratio; y++) {
-			int res;
-			Color c = SpriteGetPixel( sprite, xbase*ratio+x, ybase*ratio+y, res );
+			Color c = SpriteGetPixel( sprite, xbase*ratio+x, ybase*ratio+y );
 			r += c.r;
 			g += c.g;
 			b += c.b;
