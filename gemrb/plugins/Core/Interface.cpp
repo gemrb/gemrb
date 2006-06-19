@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.402 2006/06/19 15:08:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.403 2006/06/19 15:15:42 avenger_teambg Exp $
  *
  */
 
@@ -1240,15 +1240,8 @@ int Interface::Init()
 		printStatus( "ERROR", LIGHT_RED );
 		goto end_of_init;
 	}
-	// FIXME: this calls single plugin only
-	/*
-	opcodemgr = ( OpcodeMgr * ) GetInterface( IE_FX_CLASS_ID );
-	if (opcodemgr == NULL) {
-		printStatus( "ERROR", LIGHT_RED );
-		goto end_of_init;
-	}
-	*/
-	printf("Loaded %d opcode blocks\n", opcodemgrs->size());
+
+	printf("Loaded %d opcode blocks\n", (int) opcodemgrs->size());
 	printStatus( "OK", LIGHT_GREEN );
 
 	printMessage( "Core", "Initializing effects...", WHITE );
