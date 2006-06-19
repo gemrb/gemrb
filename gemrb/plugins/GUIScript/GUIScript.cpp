@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.385 2006/06/05 12:30:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.386 2006/06/19 21:01:57 avenger_teambg Exp $
  *
  */
 
@@ -2833,11 +2833,6 @@ static PyObject* GemRB_SetToken(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "ss", &Variable, &value )) {
 		return AttributeError( GemRB_SetToken__doc );
 	}
-/* SetAtCopy does this trick now
-	char* newvalue = ( char* ) malloc( strlen( value ) + 1 ); //duplicating the string
-	strcpy( newvalue, value );
-	core->GetTokenDictionary()->SetAt( Variable, newvalue );
-*/
 	core->GetTokenDictionary()->SetAtCopy( Variable, value );
 
 	Py_INCREF( Py_None );
@@ -2851,13 +2846,14 @@ PyDoc_STRVAR( GemRB_SetVar__doc,
 static PyObject* GemRB_SetVar(PyObject * /*self*/, PyObject* args)
 {
 	char* Variable;
+	//this should be 32 bits, always, but i cannot tell that to Python
 	unsigned long value;
 
 	if (!PyArg_ParseTuple( args, "sl", &Variable, &value )) {
 		return AttributeError( GemRB_SetVar__doc );
 	}
 
-	core->GetDictionary()->SetAt( Variable, value );
+	core->GetDictionary()->SetAt( Variable, (ieDword) value );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -2901,7 +2897,7 @@ static PyObject* GemRB_GetVar(PyObject * /*self*/, PyObject* args)
 		return PyInt_FromLong( ( unsigned long ) 0 );
 	}
 
-	return PyInt_FromLong( value );
+	return PyInt_FromLong( (unsigned long) value );
 }
 
 PyDoc_STRVAR( GemRB_CheckVar__doc,
@@ -2952,7 +2948,7 @@ static PyObject* GemRB_GetGameVar(PyObject * /*self*/, PyObject* args)
 		return PyInt_FromLong( ( unsigned long ) 0 );
 	}
 
-	return PyInt_FromLong( value );
+	return PyInt_FromLong( (unsigned long) value );
 }
 
 PyDoc_STRVAR( GemRB_PlayMovie__doc,

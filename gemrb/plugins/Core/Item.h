@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.24 2006/05/22 16:39:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.25 2006/06/19 21:01:55 avenger_teambg Exp $
  *
  */
 
@@ -147,7 +147,7 @@ public:
 	ieDword Flags;
 	ieWord ItemType;
 	ieDword UsabilityBitmask;
-	char InventoryIconType[2];
+	char AnimationType[2];
 	ieWord MinLevel; //minlevel is actually just one byte, but who cares
 	ieByte MinStrength;
 	ieByte unknown2;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.403 2006/06/19 15:15:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.404 2006/06/19 21:01:55 avenger_teambg Exp $
  *
  */
 
@@ -288,6 +288,9 @@ void Interface::FreeResRefTable(ieResRef *&table, int &count)
 
 Interface::~Interface(void)
 {
+	if (AreaAliasTable) {
+		delete( AreaAliasTable );
+	}
 	if (music) {
 		music->HardEnd();
 	}

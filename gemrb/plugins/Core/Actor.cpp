@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.184 2006/06/18 22:53:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.185 2006/06/19 21:01:55 avenger_teambg Exp $
  *
  */
 
@@ -166,6 +166,7 @@ Actor::Actor()
 	LastDamage = 0;
 	LastDamageType = 0;
 	HotKey = 0;
+	attackcount = 0;
 
 	inventory.SetInventoryType(INVENTORY_CREATURE);
 	fxqueue.SetOwner( this );
@@ -557,6 +558,14 @@ void pcf_color(Actor *actor, ieDword /*Value*/)
 	}
 }
 
+void pcf_armorlevel(Actor *actor, ieDword Value)
+{
+	CharAnimations *anims = actor->GetAnims();
+	if (anims) {
+		anims->SetArmourLevel(Value);
+	}
+}
+
 static int maximum_values[256]={
 32767,32767,20,100,100,100,100,25,5,25,25,25,25,25,100,100,//0f
 100,100,100,100,100,100,100,100,100,200,200,200,200,200,100,100,//1f
@@ -605,7 +614,7 @@ NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //bf
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, pcf_ea, NULL, pcf_animid, NULL, //cf
 pcf_color,pcf_color,pcf_color,pcf_color, pcf_color, pcf_color, pcf_color, NULL,
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //df
+NULL,NULL,NULL,pcf_armorlevel, NULL, NULL, NULL, NULL, //df
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //ef
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,

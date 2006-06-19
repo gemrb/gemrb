@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.75 2006/06/18 22:53:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.76 2006/06/19 21:01:55 avenger_teambg Exp $
  *
  */
 
@@ -658,9 +658,10 @@ bool Inventory::EquipItem(unsigned int slot)
 	}
 	// add effects of an item just being equipped to actor's effect queue
 	int effect = core->QuerySlotEffects( slot );
-	if (effect==SLOT_EFFECT_MELEE) {
+	switch (effect) {
+	case SLOT_EFFECT_MELEE:
 		//if weapon is ranged, then find quarrel for it and equip that
-		if(item->Flags&IE_INV_ITEM_BOW) {
+		if (item->Flags&IE_INV_ITEM_BOW) {
 			//get the bow item
 			Item *itm = core->GetItem(item->ItemResRef);
 			//get its extended header
@@ -672,8 +673,21 @@ bool Inventory::EquipItem(unsigned int slot)
 			core->FreeItem(itm, item->ItemResRef, false);
 		}
 		SetEquippedSlot(slot-SLOT_MELEE);
-	} else if (effect==SLOT_RANGED) {
+		break;
+	case SLOT_EFFECT_MISSILE:
 		SetEquippedSlot(slot);
+		break;
+	case SLOT_EFFECT_ITEM:
+		//adjusting armour level if needed
+		{
+			Item *itm = core->GetItem(item->ItemResRef);
+			int l = itm->AnimationType[0]-'1';
+			if (l>=2 && l<=4) {
+				Owner->SetBase(IE_ARMOR_TYPE, l);
+			}
+			core->FreeItem(itm, item->ItemResRef, false);
+		}
+		break;
 	}
 	if (effect) {
 		item->Flags|=IE_INV_ITEM_EQUIPPED;
