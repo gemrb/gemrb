@@ -90,7 +90,7 @@ def OnLoad():
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
 	v = GemRB.FindTableValue(AlignmentTable,3,GemRB.GetVar("Alignment"))
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue(AlignmentTable,v,2))
-	for i in range(0,6):
+	for i in range(6):
 		v = GemRB.GetTableValue(AbilityTable, i,2)
 		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, v, -1)
 		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": "+str(GemRB.GetVar("Ability "+str(i))))

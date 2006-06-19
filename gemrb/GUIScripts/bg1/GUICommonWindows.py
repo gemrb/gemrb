@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICommonWindows.py,v 1.9 2006/01/03 17:16:04 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICommonWindows.py,v 1.10 2006/06/19 20:10:24 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -253,13 +253,13 @@ def GetActorClassTitle (actor):
 	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
 	ClassTable = GemRB.LoadTable ("classes")
 	Class = GemRB.FindTableValue ( ClassTable, 5, Class )
-	#KitTable = GemRB.LoadTable ("kitlist")
+	KitTable = GemRB.LoadTable ("kitlist")
 
 	if ClassTitle==0:
 		if KitIndex == 0:
 			ClassTitle=GemRB.GetTableValue (ClassTable, Class, 2)
-		#else:
-		#	ClassTitle=GemRB.GetTableValue (KitTable, KitIndex, 2)
+		else:
+			ClassTitle=GemRB.GetTableValue (KitTable, KitIndex, 2)
 
 	if ClassTitle == "*":
 		return 0

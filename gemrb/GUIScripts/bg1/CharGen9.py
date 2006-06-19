@@ -116,8 +116,12 @@ def NextPress():
 	GemRB.CreatePlayer("charbase", MyChar ) 
 	GemRB.SetPlayerStat (MyChar, IE_SEX, GemRB.GetVar ("Gender") )
 	GemRB.SetPlayerStat (MyChar, IE_RACE, GemRB.GetVar ("Race") )
-	Class=GemRB.GetVar ("Class")
+	ClassTable = GemRB.LoadTable("classes")
+        ClassIndex = GemRB.GetVar ("Class")-1
+        Class = GemRB.GetTableValue(ClassTable, ClassIndex, 5)
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
+	KitIndex = GemRB.GetVar ("Class Kit")
+	GemRB.SetPlayerStat (MyChar, IE_KIT, KitIndex)
 	t=GemRB.GetVar ("Alignment")
 	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, t)
 	TmpTable=GemRB.LoadTable ("repstart")
