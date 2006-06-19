@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.82 2006/04/19 20:09:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.83 2006/06/19 15:08:06 avenger_teambg Exp $
  *
  */
 
@@ -385,8 +385,7 @@ WSW 003      |      013 ESE
 
 */
 
-Animation** CharAnimations::GetAnimation(unsigned char StanceID,
-										 unsigned char Orient)
+Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char Orient)
 {
 	if (StanceID>=MAX_ANIMS) {
 		printf("Illegal stance ID\n");
@@ -525,11 +524,12 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID,
 		a->SetPos( 0 );
 
 		//setting up the sequencing of animation cycles
-		autoSwitchOnEnd = false;
 		switch (StanceID) {
 			case IE_ANI_SLEEP:
-			case IE_ANI_DIE:
 			case IE_ANI_TWITCH:
+			case IE_ANI_DIE:
+			case IE_ANI_PST_START:
+			case IE_ANI_HEAD_TURN:
 				a->Flags |= A_ANI_PLAYONCE;
 				break;
 			case IE_ANI_EMERGE:

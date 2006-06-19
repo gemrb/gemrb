@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.401 2006/06/18 22:53:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.402 2006/06/19 15:08:06 avenger_teambg Exp $
  *
  */
 
@@ -625,9 +625,7 @@ bool Interface::ReadAreaAliasTable(const ieResRef tablename)
 	while (idx--) {
 		ieResRef key;
 
-		//the first column (area name) is the row name
 		strnlwrcpy(key,aa->GetRowName(idx),8);
-		//the second column appears to be the worldmap index
 		ieDword value = atoi(aa->QueryField(idx,0));
 		AreaAliasTable->SetAt(key, value);
 	}
@@ -3419,7 +3417,7 @@ bool Interface::InitItemTypes()
 				case SLOT_EFFECT_MELEE: Inventory::SetWeaponSlot(i); break;
 				//ranged slot
 				case SLOT_EFFECT_MISSILE: Inventory::SetRangedSlot(i); break;
-			  //right hand
+				//right hand
 				case SLOT_EFFECT_LEFT: Inventory::SetShieldSlot(i); break;
 				default:;
 			}
@@ -3760,7 +3758,7 @@ bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)
 		//ieResRef (9 bytes) is bigger than int (on any platform)
 		//*(int *) itemlist=l;
 		for(int k=0;k<l;k++) {
-			strncpy(itemlist->ResRefs[k],tab->QueryField(j,k+1),sizeof(ieResRef) );
+			strncpy(itemlist->ResRefs[k],tab->QueryField(j,k),sizeof(ieResRef) );
 		}
 		ItemName[8]=0;
 		strlwr(ItemName);
@@ -3845,31 +3843,28 @@ CREItem *Interface::ReadItem(DataStream *str)
 bool Interface::ResolveRandomItem(CREItem *itm)
 {
 	if (!RtRows) return true;
-	for(int loop=0;loop<MAX_LOOP;loop++)
-	{
+	for(int loop=0;loop<MAX_LOOP;loop++) {
 		int i,j,k;
 		char *endptr;
 		ieResRef NewItem;
 
-		char *itemlist=NULL;
-		if ( (!RtRows->Lookup( itm->ItemResRef, itemlist )) )
-		{
+		ItemList *itemlist=NULL;
+		if ( (!RtRows->Lookup( itm->ItemResRef, (char *&) itemlist )) ) {
 			return true;
 		}
-		i=Roll(1,*(int *) itemlist,0);
-		strncpy( NewItem, ((ieResRef *) itemlist)[i], sizeof(ieResRef) );
+		i=Roll(1,itemlist->Count,-1);
+		strncpy( NewItem, itemlist->ResRefs[i], sizeof(ieResRef) );
 		char *p=(char *) strchr(NewItem,'*');
-		if (p)
-		{
+		if (p) {
 			*p=0; //doing this so endptr is ok
 			k=strtol(p+1,NULL,10);
-		}
-		else {
+		} else {
 			k=1;
 		}
 		j=strtol(NewItem,&endptr,10);
-		if (*endptr) strnlwrcpy(itm->ItemResRef,NewItem,sizeof(ieResRef) );
-		else {
+		if (*endptr) {
+			strnlwrcpy(itm->ItemResRef,NewItem,sizeof(ieResRef) );
+		} else {
 			strnlwrcpy(itm->ItemResRef, GoldResRef, sizeof(ieResRef) );
 			itm->Usages[0]=Roll(j,k,0);
 		}
