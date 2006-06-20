@@ -185,7 +185,7 @@ IDS
 0xb7	ApplyEffectItemType
 0xb8	DontJumpModifier
 0xb9	State:Hold2
-0xba	DestroySelf
+0xba	MoveToArea
 0xbb	Variable:StoreLocalVariable
 0xbc	AuraCleansingModifier
 0xbd	CastingSpeedModifier
@@ -282,7 +282,7 @@ IDS
 0x118	ForceSurgeModifier
 0x119	WildSurgeModifier
 0x11a	ScriptingState
-0x11b	ApplyEffectNoSave
+0x11b	ApplyEffectCurse
 0x11c	MeleeHitModifier
 0x11d	MeleeDamageModifier
 0x11e	MissileDamageModifier
@@ -294,12 +294,12 @@ IDS
 0x124	Protection:Backstab
 0x125	OffscreenAIModifier
 0x126	ExistanceDelayModifier
-0x127	DisablePermanentDeath
+0x127	DisableChunk
 0x128	Protection:Animation
 0x129	Protection:Turn
 0x12a	AreaSwitch
 0x12b	ChaosShieldModifier
-0x12c	DeactivateDeadModifier
+0x12c	NPCBump
 0x12d	CriticalHitModifier
 0x12e	CanUseAnyItem
 0x12f	AlwaysBackstab

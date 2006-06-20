@@ -185,7 +185,7 @@ IDS
 0xb7	ApplyEffectItemType
 0xb8	DontJumpModifier
 0xb9	State:Hold2
-0xba	DestroySelf
+0xba	MoveToArea
 0xbb	Variable:StoreLocalVariable
 0xbc	AuraCleansingModifier
 0xbd	CastingSpeedModifier
