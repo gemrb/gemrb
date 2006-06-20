@@ -1,5 +1,15 @@
 Description: This table lists the avatar animations. PST has a slightly different animation scheme, this could be turned on by the OneByteAnimationID option (in gemrb.ini). When it is on, the high byte of the animation ID will control the palette flag thus eliminating the need of the PALETTE column.
 
+[ Note: apparently, PST is more complicated than that:
+Foundry gears:    0x2000
+Iron Golem:       0x3000
+Mortuary ghost:   0xD400
+Pillar of Skulls: 0xF000
+black abishai:    0xE000
+
+The only normal one of them is black abishai, the others are all somewhat special. For example, Pillar of Skulls consists of two BAMs, POSMAIN and POSSHAD (the pillar and its shadow, both animated). See ANIMATE.IDS. ]
+
+
 Columns: AT_1 - first armour level animation prefix
 	 AT_2 - second armour level animation prefix
 	 AT_3 - third armour level animation prefix
@@ -24,6 +34,23 @@ Columns: AT_1 - first armour level animation prefix
 17 - stand still animation (no orientations)
 18 - stand still animation with orientations
 19 - full PST animation without different stc/std sequences
+
+PST ACTIONTYPE:
+AT1, AT2
+C2S
+CF1, CF2
+DFB
+GUP         Get Up
+HIT         Hit
+MS1, MS2
+RUN         Run
+S2C
+SF1, SF2
+SP1 .. SP4
+STC         Fight Stance?
+STD
+TK1 .. TK6  Talk
+WLK         Walk
 
         SPACE - the personal space of the creature
       PALETTE - set it to 1 if the animation has its own palette (0 for fake colored avatars). Not needed if OneByteAnimation was set.
