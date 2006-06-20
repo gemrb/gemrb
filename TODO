@@ -1,14 +1,9 @@
 Scripts:
 1. (DONE) Run All creature scripts when the creatures are 'activated'. 
-
 2. (DONE) Run All area scripts not just the active areas. (now Game runs them all)
-
 3. (DONE) TLK tags
-
 4. (DONE) fix loading/saving of local variables of creatures (needs effect framework)
-
 5. (DONE) Handle the protagonist/party death event
-
 6. (DONE) Handle the party limit exceeded event
 
 
@@ -21,9 +16,11 @@ Items:
 5. Equipped weapon range (create triggers)
 6. Break swords and stuff
 
+
 Effects:
 1. (PARTLY) Create base system for effect blocks (Edheldil)
 2. (PARTLY) Implement effects
+
 
 Area:
 1. (DONE) Implement cover (wallgroups) (wjp)
@@ -31,58 +28,86 @@ Area:
 3. Create real streaming ambients (do not preload them, just use them when needed)
 4. (DONE) in pathfinder, calculate with the actor's feet circle size 
 5. fix door wallgroups
+6. Improve pathfinder to not cancel pathfinding when the target point
+   is temporarily blocked by other actor
+
 
 Store:
 1. (DONE) Save stores, handle containers
 
+
 Animation:
-1. (PARTLY) fix char animation sequences (fixed?)
+1. (PARTLY) fix char animation sequences
 2. (DONE) animationfactory->one single palette
 3. (DONE) Use animationfactory in CharAnimations, and allow different palettes
 4. (DONE) Handle large multipart animations (2x2, 3x3)
 5. Handle equipment animations (armourlevel, weapons)
+6. Fix avatars for PST's actors marked with '*' in ANIMATE.IDS
+7. stanceID is still fuzzy. Fix it. (FIXED?)
+
 
 Actor:
 1. (DONE) Fix reputation
+2. Use the character sheet (Actor.cpp) itself to store attributes of the character 
+   during character generation. 
+   Benefits: data is already stored in the destination, data constraints and relations 
+   are easily implemented.
+   How to: replace GemRB.SetVar with GemRB.SetPlayerStat. Don't forget to create
+   the character first.
 
-Window/Widget management:
-- implement grabbing mouse pointer by a control to fix dragging of Float menu window
 
 Game GUI:
 1. (DONE) fix TextScreen/IncrementChapter
-2. (PARTLY) implement class based (but customisable) action button bar. Generally port the IWD2 system to all engines
+2. (PARTLY) implement class based (but customisable) action button bar. Generally port
+   the IWD2 system to all engines
+3. implement grabbing mouse pointer by a control to fix dragging of PST Float menu window
+
 
 General:
-The Cache and Variables classes could be rewritten to incorporate the release function more smoothly (use templates?)
-
-Known Bugs:
-1. problem: stanceID is still fuzzy. Fix it. (FIXED?)
-
-2. problem: valgrind reports invalid memory access due to Unqueueing buffers and using them in another thread (openal weirdness?)
-
-3. problem: sounds get sometimes distorted, might be connected to problem #2
-
-4. problem: valgrind reports a big heap of unreleased python objects
-
-Ideas:
-1. Use the character sheet (Actor.cpp) itself to store attributes of the character during character generation.
-Benefits: data is already stored in the destination, data constraints and relations are easily implemented.
-How to: replace GemRB.SetVar with GemRB.SetPlayerStat. Don't forget to create the character first.
-
-- make tool to scan GUIScript.cpp and parse function comments. compute hashes of them and compare them to hashes stored in gemrb/docs/en/GUIScript/*.txt - if hashes differ, the description in GUIScript.cpp has been updated and the *.txt should be updated as well (ED, DONE)
-
-- various directories (GemRB override, game override ...) should be resolved right after loading config files and remain static afterwards. Maybe define some PATH variable describing all the directories searched for files
-
-- fix CIA reporting email address (DONE)
-
-Compile scripts:
-
-- fix include paths during compilation, so the files do not use #include "../../Core/something.h" etc.
-
-- make sure GemRB vs. OpenAL still works on both Win32 and Linux
-
-- employ ccache?
+1. The Cache and Variables classes could be rewritten to incorporate the release 
+   function more smoothly (use templates?)
+2. various directories (GemRB override, game override ...) should be resolved 
+   right after loading config files and remain static afterwards. Maybe define 
+   some PATH variable describing all the directories searched for files
+3. employ ccache?
+4. valgrind reports a big heap of unreleased python objects
 
 
-- use scaling in Video::SpriteScaleDown() instead of in Video::GetPreview() and in BMPImporter
-- move SDLVideoDriver sprite functions to their own file, rename them to SpriteIsPixelTransparent etc.
+Graphics:
+1. use scaling in Video::SpriteScaleDown() instead of in Video::GetPreview() 
+   and in BMPImporter
+2. move SDLVideoDriver sprite functions to their own file, rename them to 
+   SpriteIsPixelTransparent etc.
+
+
+Sound:
+1. valgrind reports invalid memory access due to Unqueueing buffers and using 
+   them in another thread (openal weirdness?)
+2. sounds get sometimes distorted, might be connected to problem #1
+3. make sure GemRB vs. OpenAL still works on both Win32 and Linux
+
+
+Building:
+1. fix include paths during compilation, so the files do not 
+   use #include "../../Core/something.h" etc.
+
+Release:
+1. Create packages for various distros and get them to distributions. Requires
+   maintainers.
+2. Get a sample game with some free license which could be distributed
+   with GemRB.
+
+
+Documentation:
+1. (DONE) make tool to scan GUIScript.cpp and report functions with stale
+   documentation in docs/en/GUIScript
+2. (PARTLY) make tool to scan source files for those with non-standard
+   copyright notices
+3. Add Doxygen doc comments to more objects
+4. Write GemRB overview, structure and high-level flow docs
+
+
+Community:
+1. (DONE) fix CIA reporting email address
+2. Update the web page, get rid of postnuke
+3. Move this todo to bug/task tracker at Sourceforge :-)
