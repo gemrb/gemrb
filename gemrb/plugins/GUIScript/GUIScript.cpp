@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.386 2006/06/19 21:01:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.387 2006/06/20 16:18:58 avenger_teambg Exp $
  *
  */
 
@@ -6595,14 +6595,14 @@ bool GUIScript::Init(void)
 		printMessage( "GUIScript", string, RED );
 		return false;
 	}
-	sprintf( string, "import GemRB");
+	sprintf( string, "import GemRB\n");
 	if (PyRun_SimpleString( "import GemRB" ) == -1) {
 		printMessage( "GUIScript", string, RED );
 		return false;
 	}
-	sprintf( string, "from GUIDefines import *");
 	if (PyRun_SimpleString( "from GUIDefines import *" ) == -1) {
-		printMessage( "GUIScript", string, RED );
+		printMessage( "GUIScript", " ", RED );
+		printf("Check if %s/GUIDefines.py exists! ", path);
 		return false;
 	}
 	PyObject *pMainMod = PyImport_AddModule( "__main__" );
