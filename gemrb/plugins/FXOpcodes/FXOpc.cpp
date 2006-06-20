@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.25 2006/06/18 22:53:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.26 2006/06/20 16:39:43 avenger_teambg Exp $
  *
  */
 
@@ -370,6 +370,8 @@ int fx_avatar_removal_modifier (Actor* Owner, Actor* target, Effect* fx);//13b
 int fx_magical_rest (Actor* Owner, Actor* target, Effect* fx);//13c
 int fx_improved_haste_state (Actor* Owner, Actor* target, Effect* fx);//13d
 
+int fx_unknown (Actor* Owner, Actor* target, Effect* fx);//???
+
 // FIXME: Make this an ordered list, so we could use bsearch!
 static EffectRef effectnames[] = {
 	{ "*Crash*", fx_crash, 0 },
@@ -678,6 +680,7 @@ static EffectRef effectnames[] = {
 	{ "ToHitVsCreature", fx_generic_effect, 0 },
 	{ "TrackingModifier", fx_tracking_modifier, 0 },
 	{ "TransparencyModifier", fx_transparency_modifier, 0 },
+	{ "Unknown", fx_unknown, 0},
 	{ "Unlock", fx_knock, 0 }, //open doors/containers
 	{ "UnsummonCreature", fx_unsummon_creature, 0 },
 	{ "Variable:StoreLocalVariable", fx_local_variable, 0 },
@@ -4352,4 +4355,10 @@ int fx_improved_haste_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_improved_haste_state (%2d): Value: %d\n", fx->Opcode, fx->Parameter2 );
 	STAT_SET(IE_IMPROVEDHASTE, fx->Parameter2);
 	return FX_APPLIED;
+}
+
+int fx_unknown (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	printf( "fx_unknown (%2d): P1: %d P2: %d ResRef: %s\n", fx->Opcode, fx->Parameter1, fx->Parameter2, fx->Resource );
+	return FX_NOT_APPLIED;
 }
