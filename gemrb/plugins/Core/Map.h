@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.113 2006/06/11 16:01:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.114 2006/06/21 19:38:14 avenger_teambg Exp $
  *
  */
 
@@ -32,7 +32,6 @@ class Actor;
 class TileMap;
 class ImageMgr;
 class Ambient;
-class SpriteCover;
 class GameControl;
 struct PathNode;
 class ScriptedAnimation;

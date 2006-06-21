@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.141 2006/06/18 22:53:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.142 2006/06/21 19:38:14 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -537,6 +537,7 @@ void Selectable::SetCircle(int circlesize, Color color, Sprite2D* normal_circle,
 	overColor.r = color.r >> 1;
 	overColor.g = color.g >> 1;
 	overColor.b = color.b >> 1;
+	overColor.a = color.a;
 	circleBitmap[0] = normal_circle;
 	circleBitmap[1] = selected_circle;
 }
