@@ -7,6 +7,7 @@ DoneButton = 0
 SkillTable = 0
 PointsLeft = 0
 ProfColumn = 0
+ProfsMax = 0
 
 def RedrawSkills():
 
@@ -51,11 +52,15 @@ def RedrawSkills():
 
 def OnLoad():
 	global SkillWindow, TextAreaControl, DoneButton
-	global SkillTable, PointsLeft, ProfColumn
+	global SkillTable, PointsLeft, ProfColumn, ProfsMax
 	
+	ProfMaxTable = GemRB.LoadTable("profsmax")
 	ClassTable = GemRB.LoadTable("classes")
 	Class = GemRB.GetVar("Class")-1
 	ClassID = GemRB.GetTableValue(ClassTable, Class, 5)
+	#we always use first level column
+	ProfsMax = GemRB.GetTableValue(ProfMaxTable, ClassID-1, 0)
+	GemRB.UnloadTable(ProfMaxTable)
 	KitList = GemRB.LoadTable("kitlist")
 	Class = GemRB.FindTableValue(ClassTable, 5, ClassID)
 	ClassName = GemRB.GetTableRowName(ClassTable, Class)
@@ -139,8 +144,8 @@ def LeftPress():
 	if PointsLeft == 0:
 		return
 	MaxProf = GemRB.GetTableValue(SkillTable, Pos, ProfColumn)
-	if MaxProf>5:
-		MaxProf = 5
+	if MaxProf>ProfsMax:
+		MaxProf = ProfsMax
 
 	ActPoint = GemRB.GetVar("Prof "+str(Pos) )
 	if ActPoint >= MaxProf:
