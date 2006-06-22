@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.404 2006/06/19 21:01:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.405 2006/06/22 21:10:44 avenger_teambg Exp $
  *
  */
 
@@ -617,7 +617,8 @@ bool Interface::ReadAreaAliasTable(const ieResRef tablename)
 	int table = LoadTable( tablename );
 
 	if (table < 0) {
-		return false;
+		//don't report error when the file doesn't exist
+		return true;
 	}
 	TableMgr* aa = GetTable( table );
 	if (!aa) {
@@ -893,7 +894,7 @@ int Interface::Init()
 		goto end_of_init;
 	}
 
-	printMessage( "Core", "Initializing stock sounds...", WHITE );
+	printMessage( "Core", "Initializing stock sounds...\n", WHITE );
 	ReadResRefTable ("defsound", DefSound);
 	if (DSCount == 0) {
 		printStatus( "ERROR", LIGHT_RED );

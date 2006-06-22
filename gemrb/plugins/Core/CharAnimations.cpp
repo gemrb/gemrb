@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.83 2006/06/19 15:08:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.84 2006/06/22 21:10:44 avenger_teambg Exp $
  *
  */
 
@@ -83,6 +83,10 @@ int CharAnimations::GetPartCount() const
 void CharAnimations::SetArmourLevel(int ArmourLevel)
 {
 	if (AvatarsRowNum==~0u) return;
+	//ignore ArmourLevel for the static pst anims (all sprites are displayed)
+	if (AvatarTable[AvatarsRowNum].AnimationType == IE_ANI_PST_GHOST) {
+		ArmourLevel = 0;
+	}
 	strncpy( ResRef, AvatarTable[AvatarsRowNum].Prefixes[ArmourLevel], 8 );
 	ResRef[8]=0;
 }
@@ -237,7 +241,10 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 
 	AvatarsRowNum=AvatarsCount;
 	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
-		AnimID&=0xff;
+		ieDword tmp = AnimID&0xf000;
+		if (tmp==0x6000 || tmp==0xe000) {
+			AnimID&=0xff;
+		}
 	}
 
 	while (AvatarsRowNum--) {

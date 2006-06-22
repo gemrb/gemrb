@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.185 2006/06/19 21:01:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.186 2006/06/22 21:10:44 avenger_teambg Exp $
  *
  */
 
@@ -261,9 +261,8 @@ void Actor::SetAnimationID(unsigned int AnimID)
 		delete( anims );
 	}
 	//hacking PST no palette
-	if (core->HasFeature(GF_ONE_BYTE_ANIMID) )
-	{
-		if (AnimID&0x8000) {
+	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
+		if ((AnimID&0xf000)==0xe000) {
 			if (BaseStats[IE_COLORCOUNT]) {
 				printf("[Actor] Animation ID %x is supposed to be real colored (no recoloring), patched creature\n", AnimID);
 			}
@@ -417,12 +416,9 @@ void pcf_gold(Actor *actor, ieDword /*Value*/)
 	//gold to the party pool, not the same as in the original engine
 	if (actor->InParty) {
 		Game *game = core->GetGame();
-		game->AddGold ( actor->Modified[IE_GOLD] );
-		actor->Modified[IE_GOLD]=0;
+		game->AddGold ( actor->BaseStats[IE_GOLD] );
+		actor->BaseStats[IE_GOLD]=0;
 	}
-	//additionally to party pool, gold changes are permanent
-	//but this should be enforced by the effect system anyway
-	//actor->BaseStats[IE_GOLD]=actor->Modified[IE_GOLD];
 }
 
 //de/activates the entangle overlay
