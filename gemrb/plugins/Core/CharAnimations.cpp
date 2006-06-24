@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.84 2006/06/22 21:10:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.85 2006/06/24 11:24:02 avenger_teambg Exp $
  *
  */
 
@@ -50,6 +50,12 @@ int CharAnimations::GetAvatarsCount()
 AvatarStruct *CharAnimations::GetAvatarStruct(int RowNum)
 {
 	return AvatarTable+RowNum;
+}
+
+unsigned int CharAnimations::GetAnimationID() const
+{
+	if (AvatarsRowNum==~0u) return 0;
+	return AvatarTable[AvatarsRowNum].AnimID;
 }
 
 int CharAnimations::GetCircleSize() const

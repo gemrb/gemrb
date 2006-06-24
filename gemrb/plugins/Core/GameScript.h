@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.246 2006/06/13 15:46:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.247 2006/06/24 11:24:02 avenger_teambg Exp $
  *
  */
 
@@ -1036,6 +1036,7 @@ public:
 	static void FadeFromColor(Scriptable* Sender, Action* parameters);
 	static void FadeToAndFromColor(Scriptable* Sender, Action* parameters);
 	static void FadeToColor(Scriptable* Sender, Action* parameters);
+	static void FakeEffectExpiryCheck(Scriptable* Sender, Action* parameters);
 	static void FindTraps(Scriptable* Sender, Action* parameters);
 	static void FloatMessageFixed(Scriptable* Sender, Action* parameters);
 	static void FloatMessageFixedRnd(Scriptable* Sender, Action* parameters);

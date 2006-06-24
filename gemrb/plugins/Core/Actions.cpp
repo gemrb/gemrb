@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.68 2006/06/13 15:46:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.69 2006/06/24 11:24:01 avenger_teambg Exp $
  *
  */
 
@@ -4695,4 +4695,14 @@ void GameScript::SetBestWeapon(Scriptable* Sender, Action* parameters)
 	} else {
 		actor->inventory.EquipBestWeapon(EQUIP_MELEE);
 	}
+}
+
+void GameScript::FakeEffectExpiryCheck(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *target = (Actor *) tar;
+		target->fxqueue.RemoveExpiredEffects(parameters->int0Parameter);
 }

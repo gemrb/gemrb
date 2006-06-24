@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.61 2006/04/22 13:30:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.62 2006/06/24 11:24:02 avenger_teambg Exp $
  *
  */
 
@@ -55,7 +55,7 @@ inline bool IsInstant(ieByte timingmode)
 	if (timingmode>=MAX_TIMING_MODE) return false;
 	return fx_instant[timingmode];
 }
-
+//                                           0   1     2     3     4  5    6     7       8
 static bool fx_relative[MAX_TIMING_MODE]={true,false,false,true,true,true,false,false,false,false,false};
 
 inline bool NeedPrepare(ieByte timingmode)
@@ -249,7 +249,7 @@ bool EffectQueue::RemoveEffect(Effect* fx)
 	for (std::vector< Effect* >::iterator f = effects.begin(); f != effects.end(); f++ ) {
 		Effect* fx2 = *f;
 
-		if (! memcmp( fx, fx2, invariant_size)) {
+		if ( (fx==fx2) || !memcmp( fx, fx2, invariant_size)) {
 			delete fx2;
 			effects.erase( f );
 			return true;
@@ -304,6 +304,7 @@ void EffectQueue::AddAllEffects(Actor* target)
 //resisted effect based on level
 inline bool check_level(Actor *target, Effect *fx)
 {
+	//skip non level based effects
 	if ((ieDword) fx_damage_ref.EffText==fx->Opcode) return false;
 	if ((ieDword) fx_hp_modifier_ref.EffText==fx->Opcode) return false;
 	if ((ieDword) fx_maximum_hp_modifier_ref.EffText==fx->Opcode) return false;
@@ -393,7 +394,7 @@ inline bool check_resistance(Actor* actor, Effect* fx)
 }
 
 
-//this function is called two different way
+// this function is called two different ways
 // when first_apply is set, then the effect isn't stuck on the target
 // this happens when a new effect comes in contact with the target.
 // if the effect returns FX_DURATION_JUST_EXPIRED then it won't stick
@@ -572,6 +573,34 @@ void EffectQueue::RemoveAllEffectsWithParam(ieDword opcode, ieDword param2)
 		MATCH_PARAM2();
 
 		(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;
+	}
+}
+
+//this function is called by FakeEffectExpiryCheck
+//probably also called by rest
+void EffectQueue::RemoveExpiredEffects(ieDword futuretime)
+{
+	ieDword GameTime = core->GetGame()->GameTime;
+
+	std::vector< Effect* >::iterator f;
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
+		if ( !IsPrepared( (*f)->TimingMode) ) {
+			if ( (*f)->Duration<=GameTime+futuretime) {
+				(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;
+			}      
+		}
+	}
+}
+
+//this effect will expire all effects that are not truly permanent 
+//which i call permanent after death (iesdp calls it permanent after bonuses)
+void EffectQueue::RemoveAllNonPermanentEffects()
+{
+	std::vector< Effect* >::iterator f;
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
+		if( (*f)->TimingMode != FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES) {
+			(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;
+		}
 	}
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.41 2006/04/19 20:09:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.42 2006/06/24 11:24:02 avenger_teambg Exp $
  *
  */
 
@@ -144,6 +144,7 @@ public:
 public: //attribute functions
 	static int GetAvatarsCount();
 	static AvatarStruct *GetAvatarStruct(int RowNum);
+	unsigned int GetAnimationID() const;
 	int GetCircleSize() const;
 	int NoPalette() const;
 	int GetAnimType() const;

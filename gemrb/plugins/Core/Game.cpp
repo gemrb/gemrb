@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.114 2006/06/18 22:53:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.115 2006/06/24 11:24:02 avenger_teambg Exp $
  *
  */
 
@@ -942,9 +942,11 @@ bool Game::EveryoneDead() const
 //runs all area scripts
 void Game::UpdateScripts()
 {
-	size_t acnt=Attackers.size();
-	if (acnt) {
-		CombatCounter++;
+	if (GameTime & 0x10) {
+		size_t acnt=Attackers.size();
+		if (acnt) {
+			CombatCounter++;
+		}    
 	}
 	ExecuteScript( Scripts[0] );
 	ProcessActions(false);
@@ -952,11 +954,13 @@ void Game::UpdateScripts()
 
 	for (idx=0;idx<Maps.size();idx++) {
 		Maps[idx]->UpdateScripts();
-		size_t acnt=Attackers.size();
-		while(acnt--) {
-			Actor *actor = Maps[idx]->GetActorByGlobalID(Attackers[acnt]);
-			if (actor) {
-				actor->InitRound(!(CombatCounter&1) );
+		if (GameTime & 0x10) {
+			size_t acnt=Attackers.size();
+			while(acnt--) {
+				Actor *actor = Maps[idx]->GetActorByGlobalID(Attackers[acnt]);
+				if (actor) {
+					actor->InitRound(Ticks, !(CombatCounter&1) );
+				}
 			}
 		}
 	}

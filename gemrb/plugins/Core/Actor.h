@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.114 2006/05/22 16:39:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.115 2006/06/24 11:24:01 avenger_teambg Exp $
  *
  */
 
@@ -164,7 +164,10 @@ private:
 	//this stuff don't get saved
 	CharAnimations* anims;
 	ieByte SavingThrow[5];
+	//how many attacks in this round
 	int attackcount;
+	//when the next attack is scheduled (gametime+initiative)
+	ieDword initiative;
 
 	/** fixes the palette */
 	void SetupColors();
@@ -335,11 +338,11 @@ public:
 	/* sets target for immediate attack */
 	void SetTarget( Scriptable *actor);
 	/* starts combat round, possibly one more attacks in every second round*/
-	void InitRound(bool secondround);
+	void InitRound(ieDword gameTime, bool secondround);
 	/* gets the to hit value */
 	int GetToHit(int bonus, ieDword Flags);
 	/* performs attack against target */
-	void PerformAttack();
+	void PerformAttack(ieDword initiative);
 	/* deal damage to target */
 	void DealDamage(Actor *target, int damage,int damagetype, bool critical);
 	/* sets a colour gradient stat, handles location */
@@ -368,7 +371,7 @@ public:
 	/* draw videocells */
 	void DrawVideocells(Region &screen, vvcVector &vvcCells, Color &tint);
 
-	void add_animation(const ieResRef resource, int gradient, int height);
+	void add_animation(const ieResRef resource, int gradient, int height, bool playonce);
 	void PlayDamageAnimation(int x);
 	/* restores a spell of maximum maxlevel level, type is a mask of disabled spells */
 	int RestoreSpellLevel(ieDword maxlevel, ieDword typemask);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.28 2006/04/22 13:30:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.29 2006/06/24 11:24:02 avenger_teambg Exp $
  *
  */
 
@@ -154,9 +154,14 @@ public:
 	void AddAllEffects(Actor* target);
 	void ApplyAllEffects(Actor* target);
 	void ApplyEffect(Actor* target, Effect* fx, bool first_apply);
-	//remove all effects of a given spell
+	/* removes all effects of a given spell */
 	void RemoveAllEffects(ieResRef Removed);
+	/* removes all effects of type */
 	void RemoveAllEffects(EffectRef &effect_reference);
+	/* removes expired or to be expired effects */
+	void RemoveExpiredEffects(ieDword futuretime);
+	/* removes all effects except timing mode 9 */
+	void RemoveAllNonPermanentEffects();
 	void RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword param2);
 	void RemoveAllEffectsWithResource(EffectRef &effect_reference, const ieResRef resource);
 	void RemoveLevelEffects(ieDword level, ieDword flags, ieDword match);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.360 2006/06/13 15:46:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.361 2006/06/24 11:24:02 avenger_teambg Exp $
  *
  */
 
@@ -471,6 +471,7 @@ static ActionLink actionnames[] = {
 	{"fadetoandfromcolor", GameScript::FadeToAndFromColor, 0},
 	{"fadetoblack", GameScript::FadeToColor, 0}, //probably the same
 	{"fadetocolor", GameScript::FadeToColor, 0},
+	{"fakeeffectexpirycheck", GameScript::FakeEffectExpiryCheck, 0},
 	{"finalsave", GameScript::SaveGame, 0}, //synonym
 	{"findtraps", GameScript::FindTraps, 0},
 	{"floatmessage", GameScript::DisplayStringHead, 0},

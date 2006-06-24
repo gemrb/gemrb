@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.32 2006/04/22 17:46:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.33 2006/06/24 11:24:02 avenger_teambg Exp $
  *
  */
 
@@ -246,7 +246,7 @@ ScriptedAnimation::~ScriptedAnimation(void)
 
 void ScriptedAnimation::SetPhase(int arg)
 {
-	if (arg>=0 && arg<=2) {
+	if (arg>=P_ONSET && arg<=P_RELEASE) {
 		Phase = arg;
 	}
 	SetSpriteCover(NULL);
@@ -254,8 +254,18 @@ void ScriptedAnimation::SetPhase(int arg)
 
 void ScriptedAnimation::SetSound(int arg, const ieResRef sound)
 {
-	if (arg>=0 && arg<=2)
+	if (arg>=P_ONSET && arg<=P_RELEASE)
 		memcpy(sounds[arg],sound,sizeof(sound));
+}
+
+void ScriptedAnimation::PlayOnce()
+{
+	SequenceFlags&=~IE_VVC_LOOP;
+	for (unsigned int i=0;i<3;i++) {
+		if (anims[i]) {
+			anims[i]->Flags |= S_ANI_PLAYONCE;
+		}
+	}
 }
 
 void ScriptedAnimation::SetFullPalette(const ieResRef PaletteResRef)

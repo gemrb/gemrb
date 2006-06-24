@@ -76,6 +76,8 @@ public:
 	void SetPhase(int arg);
 	//sets sound for phase (p_onset, p_hold, p_release)
 	void SetSound(int arg, const ieResRef sound);
+	//sets the animation to play only once
+	void PlayOnce();
 	//sets gradient colour slot to gradient
 	void SetPalette(int gradient, int start=-1);
 	//sets complete palette to ResRef

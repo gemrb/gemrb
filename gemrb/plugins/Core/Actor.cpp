@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.186 2006/06/22 21:10:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.187 2006/06/24 11:24:01 avenger_teambg Exp $
  *
  */
 
@@ -167,6 +167,7 @@ Actor::Actor()
 	LastDamageType = 0;
 	HotKey = 0;
 	attackcount = 0;
+	initiative = 0;
 
 	inventory.SetInventoryType(INVENTORY_CREATURE);
 	fxqueue.SetOwner( this );
@@ -269,7 +270,7 @@ void Actor::SetAnimationID(unsigned int AnimID)
 			BaseStats[IE_COLORCOUNT]=0;
 		}
 	}
-	anims = new CharAnimations( AnimID, BaseStats[IE_ARMOR_TYPE]);
+	anims = new CharAnimations( AnimID&0xffff, BaseStats[IE_ARMOR_TYPE]);
 	if (anims) {
 		//if we have a recovery palette, then set it back
 		anims->palette=recover;
@@ -496,7 +497,7 @@ void pcf_grease(Actor *actor, ieDword Value)
 	if (Value) {
 		if (actor->HasVVCCell(overlay[OV_GREASE]))
 			return;
-		actor->add_animation(overlay[OV_GREASE], -1, -1);
+		actor->add_animation(overlay[OV_GREASE], -1, -1, false);
 	} else {
 		actor->RemoveVVCell(overlay[OV_GREASE], true);
 	}
@@ -509,25 +510,25 @@ void pcf_web(Actor *actor, ieDword Value)
 	if (Value) {
 		if (actor->HasVVCCell(overlay[OV_WEB]))
 			return;
-		actor->add_animation(overlay[OV_WEB], -1, 0);
+		actor->add_animation(overlay[OV_WEB], -1, 0, false);
 	} else {
 		actor->RemoveVVCell(overlay[OV_WEB], true);
 	}
 }
 
-//de/activates the grease background
+//de/activates the spell bounce background
 void pcf_bounce(Actor *actor, ieDword Value)
 {
 	switch(Value) {
 	case 1: //bounce passive
 		if (actor->HasVVCCell(overlay[OV_BOUNCE]))
 			return;
-		actor->add_animation(overlay[OV_BOUNCE], -1, 0);
+		actor->add_animation(overlay[OV_BOUNCE], -1, 0, false);
 		break;
 	case 2: //activated bounce
 		if (actor->HasVVCCell(overlay[OV_BOUNCE2]))
 			return;
-		actor->add_animation(overlay[OV_BOUNCE2], -1, 0);
+		actor->add_animation(overlay[OV_BOUNCE2], -1, 0, true);
 		break;
 	default:
 		actor->RemoveVVCell(overlay[OV_BOUNCE], true);
@@ -720,14 +721,14 @@ static void InitActorTables()
 		core->DelTable( table );
 	}
 }
-//TODO: every actor must have an own vvcell list
-//the area's vvc's are the stationary effects
-//the actor's vvc's are moving with the actor
-//this method adds a vvc to the actor
-void Actor::add_animation(const ieResRef resource, int gradient, int height)
+
+void Actor::add_animation(const ieResRef resource, int gradient, int height, bool playonce)
 {
 	ScriptedAnimation *sca = core->GetScriptedAnimation(resource);
 	sca->ZPos=height;
+	if (playonce) {
+		sca->PlayOnce();
+	}
 	if (gradient!=-1) {
 		sca->SetPalette(gradient, 4);
 	}
@@ -740,28 +741,30 @@ void Actor::PlayDamageAnimation(int type)
 
 	switch(type) {
 		case 0: case 1: case 2: case 3: //blood
-			add_animation(d_main[type], d_gradient[type], 0);
+			int b_gr = (int) GetStat(IE_ANIMATION_ID)>>16;
+			if (!b_gr) b_gr = d_gradient[type];
+			add_animation(d_main[type], b_gr, 0, true);
 			break;
 		case 4: case 5: case 7: //fire
-			add_animation(d_main[type], d_gradient[type], 0);
+			add_animation(d_main[type], d_gradient[type], 0, true);
 			for(i=DL_FIRE;i<=type;i++) {
-				add_animation(d_splash[i], d_gradient[i], 0);
+				add_animation(d_splash[i], d_gradient[i], 0, true);
 			}
 			break;
 		case 8: case 9: case 10: //electricity
-			add_animation(d_main[type], d_gradient[type], 0);
+			add_animation(d_main[type], d_gradient[type], 0, true);
 			for(i=DL_ELECTRICITY;i<=type;i++) {
-				add_animation(d_splash[i], d_gradient[i], 0);
+				add_animation(d_splash[i], d_gradient[i], 0, true);
 			}
 			break;
 		case 11: case 12: case 13://cold
-			add_animation(d_main[type], d_gradient[type], 0);
+			add_animation(d_main[type], d_gradient[type], 0, true);
 			break;
 		case 14: case 15: case 16://acid
-			add_animation(d_main[type], d_gradient[type], 0);
+			add_animation(d_main[type], d_gradient[type], 0, true);
 			break;
 		case 17: case 18: case 19://disintegrate
-			add_animation(d_main[type], d_gradient[type], 0);
+			add_animation(d_main[type], d_gradient[type], 0, true);
 			break;
 	}
 }
@@ -1594,7 +1597,7 @@ void Actor::SetTarget( Scriptable *target)
 
 //calculate how many attacks will be performed
 //in the next round
-void Actor::InitRound(bool secondround)
+void Actor::InitRound(ieDword gameTime, bool secondround)
 {
 	attackcount = 0;
 	if (!LastTarget) {
@@ -1606,7 +1609,8 @@ void Actor::InitRound(bool secondround)
 	if (stance!=IE_ANI_ATTACK && stance!=IE_ANI_SHOOT && stance!=IE_ANI_ATTACK_SLASH && stance!=IE_ANI_ATTACK_BACKSLASH && stance !=IE_ANI_ATTACK_JAB) {
 		return;
 	}
-	if (GetStat(IE_STATE_ID)&STATE_CANTMOVE) {
+	ieDword state = GetStat(IE_STATE_ID);
+	if (state&STATE_CANTMOVE) {
 		return;
 	}
 	if (GetStat(IE_CASTERHOLD)) {		
@@ -1622,6 +1626,16 @@ void Actor::InitRound(bool secondround)
 		attackcount++;
 	}
 	attackcount/=2;
+
+	//d10
+	int tmp = core->Roll(1, 10, 0);// GetStat(IE_WEAPONSPEED)-GetStat(IE_PHYSICALSPEED) );
+	if (state & STATE_SLOWED) tmp <<= 1;
+	if (state & STATE_HASTED) tmp >>= 1;
+	
+	if (tmp<0) tmp=0;
+	else if(tmp>0x10) tmp=0x10;
+	
+	initiative = (ieDword) (gameTime+tmp);
 }
 
 int Actor::GetToHit(int bonus, ieDword Flags)
@@ -1657,9 +1671,12 @@ int Actor::GetToHit(int bonus, ieDword Flags)
 	return tohit;
 }
 
-void Actor::PerformAttack()
+void Actor::PerformAttack(ieDword gameTime)
 {
 	if (!attackcount) {
+		return;
+	}
+	if (initiative>gameTime) {
 		return;
 	}
 	attackcount--;
@@ -1674,7 +1691,7 @@ void Actor::PerformAttack()
 		core->Autopause(AP_NOTARGET);
 	}
 	//which hand is used
-	bool leftorright = attackcount&1;
+	bool leftorright = (bool) (attackcount&1);
 	ITMExtHeader *header;
 	//can't reach target
 	if (GetWeapon(header,leftorright)<Distance(Pos, target)) {
@@ -2225,6 +2242,7 @@ void Actor::Rest(int hours)
 		int remaining = hours*10;
 		//removes hours*10 fatigue points
 		NewStat (IE_FATIGUE, -remaining, MOD_ADDITIVE);
+		NewStat (IE_INTOXICATION, -remaining, MOD_ADDITIVE);
 		//restore hours*10 spell levels
 		//rememorization starts with the lower spell levels?
 		for (int level = 1; level<16; level++) {
@@ -2237,6 +2255,7 @@ void Actor::Rest(int hours)
 		}
 	} else {
 		SetBase (IE_FATIGUE, 0);
+		SetBase (IE_INTOXICATION, 0);
 		spellbook.ChargeAllSpells ();
 	}
 }

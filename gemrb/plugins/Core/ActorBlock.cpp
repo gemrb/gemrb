@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.142 2006/06/21 19:38:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.143 2006/06/24 11:24:01 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -286,12 +286,13 @@ void Scriptable::ReleaseCurrentAction()
 
 void Scriptable::ProcessActions(bool force)
 {
+	unsigned long thisTime = core->GetGame()->Ticks;
+
 	if (Type == ST_ACTOR) {
 		Actor *actor = (Actor *) this;
-		actor->PerformAttack();
+		actor->PerformAttack(thisTime);
 	}
 
-	unsigned long thisTime = core->GetGame()->Ticks;
 	if (!force && (( thisTime - startTime ) < interval)) {
 		return;
 	}
