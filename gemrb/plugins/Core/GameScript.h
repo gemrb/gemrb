@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.247 2006/06/24 11:24:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.248 2006/06/25 10:33:15 avenger_teambg Exp $
  *
  */
 
@@ -544,6 +544,7 @@ struct TriggerLink {
 #define CC_STRING1   16         //resref is in second string
 #define CC_CHECK_OVERLAP 32     //other actors
 #define CC_COPY      64         //copy appearance
+#define CC_SCRIPTNAME 128       //scriptname in 2nd string
 
 //begindialog flags
 #define BD_STRING0   0

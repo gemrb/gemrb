@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.187 2006/06/24 11:24:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.188 2006/06/25 10:33:15 avenger_teambg Exp $
  *
  */
 
@@ -741,9 +741,9 @@ void Actor::PlayDamageAnimation(int type)
 
 	switch(type) {
 		case 0: case 1: case 2: case 3: //blood
-			int b_gr = (int) GetStat(IE_ANIMATION_ID)>>16;
-			if (!b_gr) b_gr = d_gradient[type];
-			add_animation(d_main[type], b_gr, 0, true);
+			i = (int) GetStat(IE_ANIMATION_ID)>>16;
+			if (!i) i = d_gradient[type];
+			add_animation(d_main[type], i, 0, true);
 			break;
 		case 4: case 5: case 7: //fire
 			add_animation(d_main[type], d_gradient[type], 0, true);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.54 2006/05/22 16:39:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.55 2006/06/25 10:33:15 avenger_teambg Exp $
  *
  */
 
@@ -537,6 +537,11 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 		ds = core->GetResourceMgr()->GetResource( parameters->string0Parameter, IE_CRE_CLASS_ID );
 	}
 	Actor *ab = core->GetCreature(ds);
+
+	if (flags & CC_SCRIPTNAME) {
+		ab->SetScriptName(parameters->string1Parameter);
+	}
+
 	int radius;
 	Point pnt;
 

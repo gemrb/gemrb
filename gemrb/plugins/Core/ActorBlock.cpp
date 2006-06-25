@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.143 2006/06/24 11:24:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.144 2006/06/25 10:33:15 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -65,6 +65,7 @@ Scriptable::Scriptable(ScriptableType type)
 	area = 0;
 	Pos.x = 0;
 	Pos.y = 0;
+	scriptName[0] = 0;
 
 	locals = new Variables();
 	locals->SetType( GEM_VARIABLES_INT );
@@ -92,7 +93,9 @@ Scriptable::~Scriptable(void)
 
 void Scriptable::SetScriptName(const char* text)
 {
-	strnspccpy( scriptName, text, 32 );
+	if (text && text[0]) {
+		strnspccpy( scriptName, text, 32 );
+	}
 }
 
 /** Gets the DeathVariable */
