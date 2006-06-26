@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.115 2006/06/24 11:24:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.116 2006/06/26 10:28:54 avenger_teambg Exp $
  *
  */
 
@@ -51,6 +51,9 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	mazedata = NULL;
 	timestop_owner = NULL;
 	timestop_end = 0;
+	event_timer = 0;
+	event_handler[0] = 0;
+
 	int mtab = core->LoadTable("mastarea");
 	if (mtab) {
 		TableMgr *table = core->GetTable(mtab);
@@ -940,9 +943,14 @@ bool Game::EveryoneDead() const
 }
 
 //runs all area scripts
+
+#define ROUND_SIZE     10
+
 void Game::UpdateScripts()
 {
-	if (GameTime & 0x10) {
+	bool StartTurn = GameTime%ROUND_SIZE==0;
+
+	if (StartTurn) {
 		size_t acnt=Attackers.size();
 		if (acnt) {
 			CombatCounter++;
@@ -954,7 +962,7 @@ void Game::UpdateScripts()
 
 	for (idx=0;idx<Maps.size();idx++) {
 		Maps[idx]->UpdateScripts();
-		if (GameTime & 0x10) {
+		if (StartTurn) {
 			size_t acnt=Attackers.size();
 			while(acnt--) {
 				Actor *actor = Maps[idx]->GetActorByGlobalID(Attackers[acnt]);
@@ -973,19 +981,35 @@ void Game::UpdateScripts()
 		}
 	}
 
-	if (GameTime & 0x10) {
+	//this is used only for the death delay so far
+	if (event_handler[0]) {
+		if (!event_timer) {
+			core->GetGUIScriptEngine()->RunFunction(event_handler);
+			event_handler[0]=0;
+		}
+		event_timer--;
+	}
+
+	if (StartTurn) {
 		if (EveryoneDead()) {
 			//don't check it any more
 			protagonist = PM_NO;
 			core->GetGUIScriptEngine()->RunFunction("DeathWindow");
 			return;
 		}
+
 		if (PartyOverflow()) {
 			partysize = 0;
 			core->GetGUIScriptEngine()->RunFunction("OpenReformPartyWindow");
 			return;
 		}
 	}
+}
+
+void Game::SetTimedEvent(const char *fname, int count)
+{
+	event_timer = count;
+	strncpy(event_handler, fname, sizeof(event_handler) );
 }
 
 void Game::SetProtagonistMode(int mode)

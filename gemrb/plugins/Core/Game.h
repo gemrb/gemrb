@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.79 2006/06/18 22:53:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.80 2006/06/26 10:28:54 avenger_teambg Exp $
  *
  */
 
@@ -175,7 +175,7 @@ public:
 	size_t partysize;
 public:
 	ieDword Ticks;
-	ieDword interval;
+	ieDword interval; // 1000/AI_UPDATE (a tenth of a round in ms)
 	ieDword GameTime;
 	ieDword RealTime;
 	ieWord  WhichFormation;
@@ -190,6 +190,8 @@ public:
 	ieResRef LoadMos;
 	Actor *timestop_owner;
 	ieDword timestop_end;
+	int event_timer;
+	char event_handler[64]; //like in Control
 public:
 	/** Returns the PC's slot count for partyID */
 	int FindPlayer(unsigned int partyID);
@@ -313,6 +315,8 @@ public:
 	void SetControlStatus(int value, int operation);
 	/** Sets party size (1-32000) */
 	void SetPartySize(int value);
+	/** Sets a guiscript function to happen after x AI cycles have elapsed */
+	void SetTimedEvent(const char *fname, int count);
 	/** Sets protagonist mode to 0-none,1-protagonist,2-team */
 	void SetProtagonistMode(int value);
 	void StartRainOrSnow(bool conditional, int weather);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.388 2006/06/26 08:40:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.389 2006/06/26 10:28:55 avenger_teambg Exp $
  *
  */
 
@@ -1337,6 +1337,28 @@ static PyObject* GemRB_ShowModal(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_SetTimedEvent__doc,
+"SetTimedEvent(FunctionName, Rounds)\n\n"
+"Sets a timed event, the timing is handled by the game object\n"
+"if the game object doesn't exist, this command is ignored\n\n" );
+
+static PyObject* GemRB_SetTimedEvent(PyObject * /*self*/, PyObject* args)
+{
+	char* funcName;
+	int rounds;
+
+	if (!PyArg_ParseTuple( args, "si", &funcName, &rounds )) {
+		return AttributeError( GemRB_SetTimedEvent__doc );
+	}
+
+	Game *game = core->GetGame();
+	if (game) {
+		game->SetTimedEvent(funcName, rounds);
+	}
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -6395,6 +6417,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetMasterScript, METH_VARARGS),
 	METHOD(ShowModal, METH_VARARGS),
 	METHOD(SetEvent, METH_VARARGS),
+	METHOD(SetTimedEvent, METH_VARARGS),
 	METHOD(SetNextScript, METH_VARARGS),
 	METHOD(SetControlStatus, METH_VARARGS),
 	METHOD(SetVarAssoc, METH_VARARGS),

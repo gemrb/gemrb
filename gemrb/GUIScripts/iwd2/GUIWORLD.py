@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUIWORLD.py,v 1.8 2006/01/04 23:22:06 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUIWORLD.py,v 1.9 2006/06/26 10:28:46 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -338,10 +338,15 @@ def OpenReformPartyWindow ():
 	if hideflag:
 		GemRB.UnhideGUI ()
 
-def DeathWindow() :
+def DeathWindow():
 	#no death movie, but music is changed
-	GemRB.LoadMusicPL("Theme.mus",1)
-	GemRB.GamePause(1,1)
+	GemRB.LoadMusicPL ("Theme.mus",1)
+	GemRB.HideGUI ()
+	GemRB.SetTimedEvent ("DeathWindowEnd", 10)
+	return
+
+def DeathWindowEnd ():
+	GemRB.GamePause (1,1)
 
 	GemRB.LoadWindowPack (GetWindowPack())
 	Window = GemRB.LoadWindow (17)
@@ -360,10 +365,10 @@ def DeathWindow() :
 	GemRB.SetText (Window, Button, 15417)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "QuitPress")
 
-	GemRB.HideGUI()
+	GemRB.HideGUI ()
 	GemRB.SetVar ("MessageWindow", -1)
 	GemRB.SetVar ("PortraitWindow", Window)
-	GemRB.UnhideGUI()
+	GemRB.UnhideGUI ()
 	#making the playing field gray
 	GemRB.SetVisible (0,2)
 	return

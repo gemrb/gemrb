@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.188 2006/06/25 10:33:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.189 2006/06/26 10:28:52 avenger_teambg Exp $
  *
  */
 
@@ -1674,6 +1674,10 @@ int Actor::GetToHit(int bonus, ieDword Flags)
 void Actor::PerformAttack(ieDword gameTime)
 {
 	if (!attackcount) {
+		if (initiative) {
+			core->Autopause(AP_ENDROUND);
+			initiative = 0;
+		}
 		return;
 	}
 	if (initiative>gameTime) {
@@ -1694,7 +1698,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	bool leftorright = (bool) (attackcount&1);
 	ITMExtHeader *header;
 	//can't reach target
-	if (GetWeapon(header,leftorright)<Distance(Pos, target)) {
+	if (GetWeapon(header,leftorright)*10<Distance(Pos, target)) {
 		return;
 	}
 	ieDword Flags;

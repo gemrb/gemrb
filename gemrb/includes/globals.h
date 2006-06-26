@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.88 2006/02/26 14:57:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.89 2006/06/26 10:28:48 avenger_teambg Exp $
  *
  */
 
@@ -118,7 +118,7 @@
 #define  GF_KNOW_WORLD                  23 //iwd2
 
 /////AI global defines
-#define AI_UPDATE_TIME	30
+#define AI_UPDATE_TIME	10
 
 /////globally used functions
 #ifdef WIN32

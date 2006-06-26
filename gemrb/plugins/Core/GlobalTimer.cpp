@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GlobalTimer.cpp,v 1.30 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GlobalTimer.cpp,v 1.31 2006/06/26 10:28:54 avenger_teambg Exp $
  *
  */
 
@@ -30,6 +30,7 @@ extern Interface* core;
 
 GlobalTimer::GlobalTimer(void)
 {
+	//AI_UPDATE_TIME: how many AI updates in a second
 	interval = ( 1000 / AI_UPDATE_TIME );
 	Init();
 }
@@ -79,11 +80,12 @@ void GlobalTimer::Update()
 	GetTime( thisTime );
 	advance = thisTime - startTime;
 	if ( advance >= interval) {
+		ieDword count = advance/interval;
 		startTime = thisTime;
 		if (shakeCounter) {
 			int x = shakeStartVP.x;
 			int y = shakeStartVP.y;
-			shakeCounter-=advance/interval;
+			shakeCounter-=count;
 			if (shakeCounter<0) {
 				shakeCounter=0;
 			}
@@ -94,7 +96,7 @@ void GlobalTimer::Update()
 			core->GetVideoDriver()->MoveViewportTo(x,y,false);
 		}
 		if (fadeToCounter) {
-			fadeToCounter-=advance/interval;
+			fadeToCounter-=count;
 			if (fadeToCounter<0) {
 				fadeToCounter=0;
 			}
@@ -138,7 +140,7 @@ void GlobalTimer::Update()
 			map->UpdateFog();
 			map->UpdateEffects();
 			//this measures in-world time (affected by effects, actions, etc)
-			game->AdvanceTime(advance/interval);
+			game->AdvanceTime(count);
 		}
 		//this measures time spent in the game (including pauses)
 		game->RealTime+=advance;

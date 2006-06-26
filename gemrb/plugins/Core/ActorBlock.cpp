@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.144 2006/06/25 10:33:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.145 2006/06/26 10:28:52 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -623,6 +623,17 @@ Moveble::~Moveble(void)
 	if (path) {
 		ClearPath();
 	}
+}
+
+Point Moveble::GetMostLikelyPosition()
+{
+	if (!path) {
+		return Pos;
+	}
+
+//actually, sometimes middle path would be better, if
+//we stand in Destination already
+	return Destination;
 }
 
 void Moveble::SetStance(unsigned int arg)

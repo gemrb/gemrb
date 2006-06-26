@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.55 2006/06/25 10:33:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.56 2006/06/26 10:28:54 avenger_teambg Exp $
  *
  */
 
@@ -649,7 +649,8 @@ void GetPositionFromScriptable(Scriptable* scr, Point &position, bool dest)
 			position = scr->Pos; //fake
 			break;
 		case ST_ACTOR:
-			position = ((Actor *)scr)->Destination;
+		//if there are other moveables, put them here
+			position = ((Moveble *) scr)->GetMostLikelyPosition();
 			break;
 		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
 		case ST_DOOR: case ST_CONTAINER:
