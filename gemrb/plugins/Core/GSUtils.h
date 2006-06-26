@@ -88,9 +88,9 @@ bool MatchActor(Scriptable *Sender, ieDword ID, Object* oC);
 /* returns the number of actors matching the IDS targeting */
 int GetObjectCount(Scriptable* Sender, Object* oC);
 int GetObjectLevelCount(Scriptable* Sender, Object* oC);
-void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, ieDword value);
 void SetVariable(Scriptable* Sender, const char* VarName, ieDword value);
 //these are used from other plugins
+GEM_EXPORT void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, ieDword value);
 GEM_EXPORT void MoveBetweenAreasCore(Actor* actor, const char *area, Point &position, int face, bool adjust);
 GEM_EXPORT ieDword CheckVariable(Scriptable* Sender, const char* VarName);
 GEM_EXPORT ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Context);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.387 2006/06/20 16:18:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.388 2006/06/26 08:40:12 avenger_teambg Exp $
  *
  */
 
@@ -2929,6 +2929,36 @@ static PyObject* GemRB_CheckVar(PyObject * /*self*/, PyObject* args)
 	printf("%s %s=%ld\n",Context, Variable, value);
 	textcolor(WHITE);
 	return PyInt_FromLong( value );
+}
+
+PyDoc_STRVAR( GemRB_SetGlobal__doc,
+"SetGlobal(VariableName, Context, Value)\n\n"
+"Sets a gamescript variable to the specificed numeric value." );
+
+static PyObject* GemRB_SetGlobal(PyObject * /*self*/, PyObject* args)
+{
+	char* Variable;
+	char* Context;
+	int Value;
+
+	if (!PyArg_ParseTuple( args, "ssi", &Variable, &Context, &Value )) {
+		return AttributeError( GemRB_SetGlobal__doc );
+	}
+	GameControl *gc = core->GetGameControl();
+	if (!gc) {
+		return RuntimeError("Can't find GameControl!");
+	}
+	Scriptable *Sender = (Scriptable *) gc->GetLastActor();
+	if (!Sender) {
+		Sender = (Scriptable *) core->GetGame()->GetCurrentArea();
+	}
+	if (!Sender) {
+		printMessage("GUIScript","No Game!\n", LIGHT_RED);
+		return NULL;
+	}
+	SetVariable(Sender, Variable, Context, (ieDword) Value);
+	Py_INCREF( Py_None );
+	return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_GetGameVar__doc,
@@ -6412,6 +6442,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetToken, METH_VARARGS),
 	METHOD(SetToken, METH_VARARGS),
 	METHOD(GetGameVar, METH_VARARGS),
+	METHOD(SetGlobal, METH_VARARGS),
 	METHOD(CheckVar, METH_VARARGS),
 	METHOD(PlayMovie, METH_VARARGS),
 	METHOD(Roll, METH_VARARGS),
