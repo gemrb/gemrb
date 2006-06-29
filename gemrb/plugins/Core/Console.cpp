@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Console.cpp,v 1.25 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Console.cpp,v 1.26 2006/06/29 06:54:00 avenger_teambg Exp $
  *
  */
 
@@ -170,12 +170,10 @@ void Console::OnSpecialKeyPress(unsigned char Key)
 //ctrl-up
 void Console::HistoryBack()
 {
-	if (HistPos >= HistMax-1)
-		return;
-	if (HistPos == 0) {
-		HistoryAdd(true);
+ 	HistoryAdd(false);
+	if (HistPos < HistMax-1 && Buffer[0]) {
+		HistPos++;
 	}
-	HistPos++;
 	memcpy(Buffer, History[HistPos], max);
 	CurPos = strlen ((const char *) Buffer);
 }
@@ -183,8 +181,12 @@ void Console::HistoryBack()
 //ctrl-down
 void Console::HistoryForward()
 {
-	if (HistPos == 0)
+ 	HistoryAdd(false);
+	if (HistPos == 0) {
+		Buffer[0]=0;
+		CurPos=0;
 		return;
+	}
 	HistPos--;
 	memcpy(Buffer, History[HistPos], max);
 	CurPos = strlen ((const char *) Buffer);
