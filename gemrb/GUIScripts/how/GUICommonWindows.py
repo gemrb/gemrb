@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUICommonWindows.py,v 1.16 2005/12/25 10:31:44 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUICommonWindows.py,v 1.17 2006/06/29 06:56:44 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -225,6 +225,9 @@ def UpdateActionsWindow ():
 	#this is based on class
 	GemRB.SetupControls (ActionsWindow, pc)
 	return
+
+def OpenFloatMenuWindow ():
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL )
 
 def ActionTalkPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_TALK)

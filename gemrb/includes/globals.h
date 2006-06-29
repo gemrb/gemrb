@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.89 2006/06/26 10:28:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.90 2006/06/29 06:56:45 avenger_teambg Exp $
  *
  */
 
@@ -146,7 +146,9 @@ GEM_EXPORT void strnspccpy(char* d, const char *s, int l);
 GEM_EXPORT unsigned char GetOrient(Point &s, Point &d);
 GEM_EXPORT unsigned int Distance(Point pos, Point pos2);
 GEM_EXPORT unsigned int Distance(Point pos, Scriptable *b);
+GEM_EXPORT unsigned int PersonalDistance(Point pos, Scriptable *b);
 GEM_EXPORT unsigned int Distance(Scriptable *a, Scriptable *b);
+GEM_EXPORT unsigned int PersonalDistance(Scriptable *a, Scriptable *b);
 GEM_EXPORT bool dir_exists(const char* path);
 GEM_EXPORT int strlench(const char* string, char ch);
 #ifndef HAVE_STRNDUP

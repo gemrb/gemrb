@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.70 2006/06/25 10:33:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.71 2006/06/29 06:56:43 avenger_teambg Exp $
  *
  */
 
@@ -1632,10 +1632,10 @@ void GameScript::Interact(Scriptable* Sender, Action* parameters)
 	BeginDialog( Sender, parameters, BD_INTERACT );
 }
 
-static Point &FindNearPoint(Scriptable* Sender, Point &p1, Point &p2, double& distance)
+static Point &FindNearPoint(Scriptable* Sender, Point &p1, Point &p2, unsigned int& distance)
 {
-	int distance1 = Distance(p1, Sender);
-	int distance2 = Distance(p2, Sender);
+	unsigned int distance1 = Distance(p1, Sender);
+	unsigned int distance2 = Distance(p2, Sender);
 	if (distance1 < distance2) {
 		distance = distance1;
 		return p1;
@@ -1727,7 +1727,7 @@ void GameScript::PickLock(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	double distance;
+	unsigned int distance;
 	Point &p = FindNearPoint( Sender, door->toOpen[0], door->toOpen[1],
 				distance );
 	if (distance <= MAX_OPERATING_DISTANCE) {
@@ -1765,7 +1765,7 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	double distance;
+	unsigned int distance;
 	Point &p = FindNearPoint( Sender, door->toOpen[0], door->toOpen[1],
 				distance );
 	if (distance <= MAX_OPERATING_DISTANCE) {
@@ -1820,7 +1820,7 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	double distance;
+	unsigned int distance;
 	Point &p = FindNearPoint( Sender, door->toOpen[0], door->toOpen[1],
 				distance );	
 	if (distance <= MAX_OPERATING_DISTANCE) {
@@ -2255,7 +2255,7 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 	//no need to change the pathfinder just for getting the entrance
 	Map *map = game->GetMap(actor->Area, false);
 	Entrance *ent = map->GetEntrance(parameters->string1Parameter);
-	if (Distance(ent->Pos, Sender) <= MAX_OPERATING_DISTANCE) {
+	if (PersonalDistance(ent->Pos, Sender) <= MAX_OPERATING_DISTANCE) {
 		LeaveAreaLUA(Sender, parameters);
 		Sender->ReleaseCurrentAction();
 		return;
@@ -2287,7 +2287,7 @@ void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 	//no need to change the pathfinder just for getting the entrance
 	Map *map = game->GetMap( actor->Area, false);
 	Entrance *ent = map->GetEntrance(parameters->string1Parameter);
-	if (Distance(ent->Pos, Sender) <= MAX_OPERATING_DISTANCE) {
+	if (PersonalDistance(ent->Pos, Sender) <= MAX_OPERATING_DISTANCE) {
 		LeaveAreaLUAPanic(Sender, parameters);
 		Sender->ReleaseCurrentAction();
 		return;
@@ -3292,7 +3292,7 @@ void GameScript::Plunder(Scriptable *Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	if (Distance(Sender, tar)>MAX_OPERATING_DISTANCE*20 ) {
+	if (PersonalDistance(Sender, tar)>MAX_OPERATING_DISTANCE ) {
 		GoNearAndRetry(Sender, tar, false);
 		Sender->ReleaseCurrentAction();
 		return;
@@ -3331,7 +3331,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	Actor *snd = (Actor *) Sender;
 	Actor *scr = (Actor *) tar;
 	//for PP one must go REALLY close
-	if (Distance(Sender, tar)>10 ) {
+	if (PersonalDistance(Sender, tar)>10 ) {
 		GoNearAndRetry(Sender, tar, true);
 		Sender->ReleaseCurrentAction();
 		return;
@@ -4061,8 +4061,8 @@ void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 
-	double distance = Distance(Sender, container);
-	double needed = MAX_OPERATING_DISTANCE;
+	ieDword distance = PersonalDistance(Sender, container);
+	ieDword needed = MAX_OPERATING_DISTANCE;
 	if (container->Type==IE_CONTAINER_PILE) {
 		needed = 15; // less than a search square (width)
 	}
@@ -4690,7 +4690,7 @@ void GameScript::SetBestWeapon(Scriptable* Sender, Action* parameters)
 	Actor* actor = ( Actor* ) Sender;
 
 	Actor *target = (Actor *) tar;
-	if (Distance(actor,target)>(unsigned int) parameters->int0Parameter) {
+	if (PersonalDistance(actor,target)>(unsigned int) parameters->int0Parameter) {
 		actor->inventory.EquipBestWeapon(EQUIP_RANGED);
 	} else {
 		actor->inventory.EquipBestWeapon(EQUIP_MELEE);

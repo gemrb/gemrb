@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.56 2006/06/26 10:28:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.57 2006/06/29 06:56:44 avenger_teambg Exp $
  *
  */
 
@@ -916,8 +916,10 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 			//play attack sound
 		}
 	}
+	//action performed
+	actor->SetTarget( target );
 
-	if ( Distance(Sender, target) > wrange ) {
+	if ( PersonalDistance(Sender, target) > wrange ) {
 		//we couldn't perform the action right now
 		//so we add it back to the queue with an additional movement
 		//increases refcount of Sender->CurrentAction, by pumping it back
@@ -926,9 +928,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	//action performed
-	actor->SetTarget( target );
-	//it shouldn't be a problem to call this the secodn time (in case of attackreevaluate)
+	//it shouldn't be a problem to call this the second time (in case of attackreevaluate)
 	//because ReleaseCurrentAction() allows NULL 
 	Sender->ReleaseCurrentAction();
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.39 2005/12/21 16:53:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.40 2006/06/29 06:56:44 avenger_teambg Exp $
  *
  */
 
@@ -52,7 +52,8 @@ BOOL WINAPI DllEntryPoint(HINSTANCE /*hinstDLL*/, DWORD /*fdwReason*/,
 
 #include "../../includes/globals.h"
 #include "Interface.h"
-#include "ActorBlock.h"
+//#include "ActorBlock.h"
+#include "Actor.h"
 
 //// Globally used functions
 
@@ -135,12 +136,41 @@ unsigned int Distance(Point p, Scriptable *b)
 	return (unsigned int) sqrt( ( double ) ( x* x + y* y ) );
 }
 
-/** Calculates distance between 2 points */
+unsigned int PersonalDistance(Point p, Scriptable *b)
+{
+	long x = ( p.x - b->Pos.x );
+	long y = ( p.y - b->Pos.y );
+	int ret = (int) sqrt( ( double ) ( x* x + y* y ) );
+	if (b->Type==ST_ACTOR) {
+		ret-=((Actor *)b)->size*5;
+	}
+	if (ret<0) return (unsigned int) 0;
+	return (unsigned int) ret;
+}
+
+/** Calculates distance between 2 scriptables */
 unsigned int Distance(Scriptable *a, Scriptable *b)
 {
 	long x = ( a->Pos.x - b->Pos.x );
 	long y = ( a->Pos.y - b->Pos.y );
 	return (unsigned int) sqrt( ( double ) ( x* x + y* y ) );
+}
+
+/** Calculates distance between 2 scriptables, including feet circle if applicable */
+unsigned int PersonalDistance(Scriptable *a, Scriptable *b)
+{
+	long x = ( a->Pos.x - b->Pos.x );
+	long y = ( a->Pos.y - b->Pos.y );
+	int ret = (int) sqrt( ( double ) ( x* x + y* y ) );
+	if (a->Type==ST_ACTOR) {
+		// *10 / 2
+		ret-=((Actor *)a)->size*5;
+	}
+	if (b->Type==ST_ACTOR) {
+		ret-=((Actor *)b)->size*5;
+	}
+	if (ret<0) return (unsigned int) 0;
+	return (unsigned int) ret;
 }
 
 /** Returns the length of string (up to a delimiter) */

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.189 2006/06/26 10:28:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.190 2006/06/29 06:56:43 avenger_teambg Exp $
  *
  */
 
@@ -1613,10 +1613,10 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 	if (state&STATE_CANTMOVE) {
 		return;
 	}
-	if (GetStat(IE_CASTERHOLD)) {		
+	if (GetStat(IE_CASTERHOLD)) {
 		return;
 	}
-	if (GetStat(IE_HELD)) {		
+	if (GetStat(IE_HELD)) {
 		return;
 	}
 	//last chance to disable attacking
@@ -1675,7 +1675,9 @@ void Actor::PerformAttack(ieDword gameTime)
 {
 	if (!attackcount) {
 		if (initiative) {
-			core->Autopause(AP_ENDROUND);
+			if (InParty) {
+				core->Autopause(AP_ENDROUND);
+			}
 			initiative = 0;
 		}
 		return;
@@ -1689,10 +1691,18 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 	//get target
 	Actor *target = area->GetActorByGlobalID(LastTarget);
+
+	if (target->GetStat(IE_STATE_ID)&STATE_DEAD) {
+		target = 0;
+	}
+
 	if (!target) {
 		LastTarget = 0;
 		InternalFlags|=IF_TARGETGONE; //this is for the trigger!
-		core->Autopause(AP_NOTARGET);
+		if (InParty) {
+			core->Autopause(AP_NOTARGET);
+		}
+		return;
 	}
 	//which hand is used
 	bool leftorright = (bool) (attackcount&1);

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.49 2006/06/17 12:07:19 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.50 2006/06/29 06:56:45 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -956,7 +956,7 @@ def AcceptLevelUp():
 	GemRB.SetPlayerStat (pc, IE_MAXHITPOINTS, HPGained+oldhp)
 	#increase weapon proficiency if needed
 	if WeapProfType!=-1:
-		GemRB.SetPlayerStat (pc, WeapProfType, CurrWeapProf + WeapProfGained );
+		GemRB.SetPlayerStat (pc, WeapProfType, CurrWeapProf + WeapProfGained )
 	Specific = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
 	if Specific == 1:
 		#TODO:

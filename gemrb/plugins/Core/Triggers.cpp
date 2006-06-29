@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.46 2006/05/22 16:39:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.47 2006/06/29 06:56:44 avenger_teambg Exp $
  *
  */
 
@@ -1107,6 +1107,7 @@ int GameScript::PersonalSpaceDistance(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	int range = parameters->int0Parameter;
+  /*
 	if (Sender->Type==ST_ACTOR) {
 		Actor *tmp = (Actor *) Sender;
 		range -= tmp->size;
@@ -1116,10 +1117,10 @@ int GameScript::PersonalSpaceDistance(Scriptable* Sender, Trigger* parameters)
 		Actor *tmp = (Actor *) scr;
 		range -= tmp->size;
 	}
-
+*/
 	
-	int distance = Distance(Sender, scr);
-	if (distance <= ( range * 20 )) {
+	int distance = PersonalDistance(Sender, scr);
+	if (distance <= ( range * 10 )) {
 		return 1;
 	}
 	return 0;
@@ -1132,7 +1133,7 @@ int GameScript::Range(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	int distance = Distance(Sender, scr);
-	return DiffCore(distance, parameters->int0Parameter*20, parameters->int1Parameter);
+	return DiffCore(distance, parameters->int0Parameter*10, parameters->int1Parameter);
 }
 
 //PST
@@ -1159,14 +1160,14 @@ int GameScript::NearLocation(Scriptable* Sender, Trigger* parameters)
 	}
 	if (parameters->pointParameter.isnull()) {
 		Point p(parameters->int0Parameter, parameters->int1Parameter);
-		int distance = Distance(p, scr);
-		if (distance <= ( parameters->int2Parameter * 20 )) {
+		int distance = PersonalDistance(p, scr);
+		if (distance <= ( parameters->int2Parameter * 10 )) {
 			return 1;
 		}
 		return 0;
 	}
 	int distance = Distance(parameters->pointParameter, scr);
-	if (distance <= ( parameters->int0Parameter * 20 )) {
+	if (distance <= ( parameters->int0Parameter * 10 )) {
 		return 1;
 	}
 	return 0;
@@ -1180,7 +1181,7 @@ int GameScript::NearSavedLocation(Scriptable* Sender, Trigger* parameters)
 	Actor *actor = (Actor *) Sender;
 	Point p( actor->GetStat(IE_SAVEDXPOS),actor->GetStat(IE_SAVEDYPOS) );
 	int distance = Distance(p, Sender);
-	if (distance <= ( parameters->int0Parameter * 20 )) {
+	if (distance <= ( parameters->int0Parameter * 10 )) {
 		return 1;
 	}
 	return 0;
@@ -1197,7 +1198,7 @@ int GameScript::WalkedToTrigger(Scriptable* Sender, Trigger* parameters)
 	if (!target) {
 		return 0;
 	}
-	if (Distance(target, Sender) > MAX_OPERATING_DISTANCE ) {
+	if (PersonalDistance(target, Sender) > MAX_OPERATING_DISTANCE ) {
 		return 0;
 	}
 	//now objects suicide themselves if they are empty objects
@@ -3012,7 +3013,7 @@ int GameScript::InWeaponRange(Scriptable* Sender, Trigger* parameters)
 	Actor *actor = (Actor *) Sender;
 	ITMExtHeader *header;
 	unsigned int wrange = actor->GetWeapon(header) * 10;
-	if ( Distance( Sender, tar ) <= wrange ) {
+	if ( PersonalDistance( Sender, tar ) <= wrange ) {
 		return 1;
 	}
 	return 0;

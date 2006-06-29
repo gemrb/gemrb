@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUISTORE.py,v 1.27 2005/12/12 18:40:05 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUISTORE.py,v 1.28 2006/06/29 06:56:45 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -729,7 +729,7 @@ def InfoIdentifyWindow ():
 	Slot = GemRB.GetSlotItem (inventory_slots[Index])
 	Item = GemRB.GetItem (Slot['ItemResRef'])
 	#identify the item
-	GemRB.ChangeStoreItem (pc, inventory_slots[Index], SHOP_ID);
+	GemRB.ChangeStoreItem (pc, inventory_slots[Index], SHOP_ID)
 	#deduce gold from player
 	IDPrice = Store['IDPrice']
 	GemRB.GameSetPartyGold (GemRB.GameGetPartyGold()-IDPrice)

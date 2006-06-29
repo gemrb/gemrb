@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.33 2006/04/16 23:57:07 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.34 2006/06/29 06:56:45 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -230,11 +230,30 @@ def UpdateActionsWindow ():
 	GemRB.SetupControls (ActionsWindow, pc)
 	return
 
+def OpenFloatMenuWindow ():
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL )
+
 def ActionTalkPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_TALK)
 
 def ActionAttackPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_ATTACK)
+
+def ActionQWeaponPressed (which):
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_ATTACK)
+	return
+
+def ActionQWeapon1Pressed ():
+	ActionQWeaponPressed(0)
+
+def ActionQWeapon2Pressed ():
+	ActionQWeaponPressed(1)
+
+def ActionQWeapon3Pressed ():
+	ActionQWeaponPressed(2)
+
+def ActionQWeapon4Pressed ():
+	ActionQWeaponPressed(3)
 
 def ActionStopPressed ():
 	for i in range (PARTY_SIZE):

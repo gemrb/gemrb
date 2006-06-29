@@ -229,7 +229,7 @@ def NextPress():
 	for i in range (SkillCount):
 		StatID=GemRB.GetTableValue (TmpTable, i,0)
 		GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Skill "+str(i) ) )
-	GemRB.UnloadTable (TmpTable);
+	GemRB.UnloadTable (TmpTable)
 
 	#does all the rest
 	GemRB.FillPlayerInfo (MyChar,PortraitName+"L", PortraitName+"S")
