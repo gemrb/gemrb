@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.85 2006/06/24 11:24:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.86 2006/06/29 14:58:58 avenger_teambg Exp $
  *
  */
 
@@ -95,6 +95,7 @@ void CharAnimations::SetArmourLevel(int ArmourLevel)
 	}
 	strncpy( ResRef, AvatarTable[AvatarsRowNum].Prefixes[ArmourLevel], 8 );
 	ResRef[8]=0;
+	DropAnims();
 }
 
 void CharAnimations::SetColors(ieDword *arg)
@@ -264,8 +265,8 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 	printf("Invalid or nonexistent avatar entry:%04X\n", AnimID);
 }
 
-//freeing the bitmaps only once, but using an intelligent algorithm
-CharAnimations::~CharAnimations(void)
+//we have to drop them when armourlevel changes
+void CharAnimations::DropAnims()
 {
 	Animation** tmppoi;
 	int partCount = GetPartCount();
@@ -288,6 +289,12 @@ CharAnimations::~CharAnimations(void)
 			}
 		}
 	}
+}
+
+//freeing the bitmaps only once, but using an intelligent algorithm
+CharAnimations::~CharAnimations(void)
+{
+	DropAnims();
 	core->FreePalette(palette, PaletteResRef);
 }
 /*

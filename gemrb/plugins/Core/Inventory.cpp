@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.76 2006/06/19 21:01:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.77 2006/06/29 14:58:59 avenger_teambg Exp $
  *
  */
 
@@ -652,6 +652,10 @@ bool Inventory::ChangeItemFlag(unsigned int slot, ieDword arg, int op)
 //all checks have been made previously
 bool Inventory::EquipItem(unsigned int slot)
 {
+	if (!Owner) {
+		//maybe assertion too?
+		return false;
+	}
 	CREItem *item = GetSlotItem(slot);
 	if (!item) {
 		return false;
@@ -682,7 +686,7 @@ bool Inventory::EquipItem(unsigned int slot)
 		{
 			Item *itm = core->GetItem(item->ItemResRef);
 			int l = itm->AnimationType[0]-'1';
-			if (l>=2 && l<=4) {
+			if (l>=0 && l<=3) {
 				Owner->SetBase(IE_ARMOR_TYPE, l);
 			}
 			core->FreeItem(itm, item->ItemResRef, false);
@@ -719,7 +723,21 @@ bool Inventory::UnEquipItem(unsigned int slot, bool removecurse)
 		return false;
 	}
 	item->Flags &= ~IE_INV_ITEM_EQUIPPED;
-	if (core->QuerySlotEffects( slot )) {
+	// add effects of an item just being equipped to actor's effect queue
+	int effect = core->QuerySlotEffects( slot );
+	switch (effect) {
+		case SLOT_EFFECT_ITEM:
+		{
+			Item *itm = core->GetItem(item->ItemResRef);
+			int l = itm->AnimationType[0]-'1';
+			if (l>=0 && l<=3) {
+				Owner->SetBase(IE_ARMOR_TYPE, 0);
+			}
+			core->FreeItem(itm, item->ItemResRef, false);
+		}
+		break;
+	}
+	if (effect) {
 		RemoveSlotEffects( item );
 	}
 	return true;
