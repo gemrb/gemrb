@@ -24,3 +24,4 @@ Return value: N/A
 
 See also: GetToken, GetText
 
+MD5: fd99519e2b63105ddb7d772476886701

@@ -9,7 +9,9 @@ String                     - literal text, it could have embedded colour codes
 Strref                     - a string index from the dialog.tlk table.
 Row                        - the row of text to add the text to, if omitted, the text will be added (in a new row) after the last row.
 
-Return value: N/A
+Return value: 
+    Index of the row appended or changed
 
 See also: TextAreaClear, SetText, QueryText
 
+MD5: 9bffcacd54b1adc18a92d0783c2f5364

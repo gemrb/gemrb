@@ -14,3 +14,5 @@ Special: If the 'DialogChoose' variable was set to -1 or 0 during a dialog sessi
 
 See also: SetButtonFlags, SetVar, GetVar, data_exchange, accessing_gui_controls
 
+
+MD5: df5c51a71e7368c22b2d3e5a0bac311a

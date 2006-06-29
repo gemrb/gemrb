@@ -30,3 +30,5 @@ The above code will set up the TextArea as a ListBox control, by reading the nam
 See also: RewindTA, SetTAHistory, GetCharSounds, GetCharList, QueryText,
           accessing_gui_controls
 
+
+MD5: 30fd7c88972e5fc7e4f41158a28ceaff

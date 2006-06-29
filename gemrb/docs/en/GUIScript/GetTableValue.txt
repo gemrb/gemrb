@@ -11,3 +11,5 @@ Return value: numeric or string, based on the indices
 
 See also: GetSymbolValue, FindTableValue, LoadTable
 
+
+MD5: 27a07ff76472c9880891f7548e1ca4f4

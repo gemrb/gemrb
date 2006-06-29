@@ -12,3 +12,5 @@ Examples:
 
 See also: SetVar, SetVarAssoc, data_exchange
 
+
+MD5: e1d12a5de0cce9841d6f44622223e79e

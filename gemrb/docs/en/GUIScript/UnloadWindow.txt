@@ -9,3 +9,5 @@ Return value: N/A
 
 See also: LoadWindow, EnterGame, QuitGame
 
+
+MD5: 0a64fd889b01eecf2351c4ebb77b3ca0

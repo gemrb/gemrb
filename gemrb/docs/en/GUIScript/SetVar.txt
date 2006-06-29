@@ -24,3 +24,5 @@ The above lines set up some windows of the main game screen.
 
 See also: SetVarAssoc, SetToken, LoadGame, HideGUI, data_exchange
 
+
+MD5: f85bcb143ff3359936e78780da210367

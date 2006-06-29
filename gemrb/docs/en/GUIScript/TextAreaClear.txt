@@ -9,3 +9,4 @@ Return value: N/A
 
 See also: TextAreaAppend
 
+MD5: 4c563da47e77f8962c62c67a6de8c906

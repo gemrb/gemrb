@@ -17,3 +17,5 @@ The above example sets the VoiceSet token to the value of the selected string in
 
 See also: SetText, SetToken, accessing_controls
 
+
+MD5: 7bcc3ff81f595b8d73c784ca32b06d5e

@@ -10,3 +10,5 @@ Return value: numeric, -1 if row doesn't exist
 
 See also: LoadTable
 
+
+MD5: eb41ba2363ba1262a8edfff8265514da

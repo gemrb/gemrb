@@ -17,3 +17,5 @@ The above example generates a 3d5+3 number.
 
 See also: N/A
 
+
+MD5: ad757524b8fb4284f423cd3f5fbb5eb1

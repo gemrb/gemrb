@@ -20,7 +20,9 @@ The position value tells the engine the window's relative position to the GameCo
 
 Parameters: N/A
 
-Return value: N/A
+Return value: 1 on success?
 
 See also: UnhideGUI, Invalidate, SetVisible
 
+
+MD5: b95f905bba48f95a878868c7c453d52f

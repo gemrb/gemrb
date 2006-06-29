@@ -5,7 +5,10 @@ Description: Loads a IDS Symbol List. In case it was already loaded, it will ret
 
 Parameters: IDSResRef - the symbol list's name (.ids resref)
 
-Return value: N/A
+Return value:
+  Symbol table reference index
 
 See also: UnloadSymbol
 
+
+MD5: 40c9dacdfad30df5302c753880a84aa0

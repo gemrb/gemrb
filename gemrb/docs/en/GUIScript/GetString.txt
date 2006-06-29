@@ -19,3 +19,5 @@ The above example will display "Level: <LEVEL>" in the addressed label.
 
 See also: StatComment, SetText
 
+
+MD5: 27500d4f0d9773b4cdfdc6f615d0b668

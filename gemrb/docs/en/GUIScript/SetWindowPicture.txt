@@ -18,3 +18,4 @@ The above snippet is responsible to generate a random loading screen.
 
 See also: SetButtonPicture
 
+MD5: 62884cae84603d33be1551873d6b93cc

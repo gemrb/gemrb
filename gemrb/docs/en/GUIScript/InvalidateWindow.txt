@@ -9,3 +9,5 @@ Return value: N/A
 
 See also: LoadWindow
 
+
+MD5: 98ab4933674a41c8ce3d21ab00ac45af
