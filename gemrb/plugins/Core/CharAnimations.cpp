@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.86 2006/06/29 14:58:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.87 2006/06/30 07:04:55 avenger_teambg Exp $
  *
  */
 
@@ -68,11 +68,13 @@ int CharAnimations::NoPalette() const
 	if (AvatarsRowNum==~0u) return -1;
 	return AvatarTable[AvatarsRowNum].PaletteType;
 }
+
 int CharAnimations::GetAnimType() const
 {
 	if (AvatarsRowNum==~0u) return -1;
 	return AvatarTable[AvatarsRowNum].AnimationType;
 }
+
 int CharAnimations::GetPartCount() const
 {
 	if (AvatarsRowNum==~0u) return -1;
@@ -80,6 +82,17 @@ int CharAnimations::GetPartCount() const
 	case IE_ANI_NINE_FRAMES: //dragon animations
 		return 9;
 	case IE_ANI_FOUR_FRAMES: //wyvern animations
+		return 4;
+	case IE_ANI_PST_GHOST:   //special pst anims
+		if (AvatarTable[AvatarsRowNum].Prefixes[1][0]=='*') {
+			return 1;
+		}
+		if (AvatarTable[AvatarsRowNum].Prefixes[2][0]=='*') {
+			return 2;
+		}
+		if (AvatarTable[AvatarsRowNum].Prefixes[3][0]=='*') {
+			return 3;
+		}
 		return 4;
 	default:
 		return 1;
@@ -388,11 +401,12 @@ IE_ANI_PST_STAND:	This is a modified PST animation, it contains only a
 			Standing image for every orientations, it follows the
 			[C/D]STD[NAME][B] standard.
 
-IE_ANI_PST_GHOST:	This is a special animation with no standard.
+IE_ANI_PST_GHOST:	This is a special static animation with no standard
+			All armourlevels are drawn simultaneously. There is no orientation or stance.
 
 
   WEST PART  |  EAST PART
-	     |
+             |
     NW  NNW  N  NNE  NE
  NW 006 007 008 009 010 NE
 WNW 005      |      011 ENE
@@ -400,8 +414,8 @@ WNW 005      |      011 ENE
 WSW 003      |      013 ESE
  SW 002 001 000 015 014 SE
     SW  SSW  S  SSE  SE
-	     |
-	     |
+             |
+             |
 
 */
 
@@ -421,8 +435,11 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 			return NULL;
 
 		case IE_ANI_PST_STAND:
+			StanceID=IE_ANI_AWAKE;
+			break;
 		case IE_ANI_PST_GHOST:
 			StanceID=IE_ANI_AWAKE;
+			Orient=0;
 			break;
 		case IE_ANI_PST_ANIMATION_3: //stc->std
 			if (StanceID==IE_ANI_READY) {
@@ -497,7 +514,7 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 		char NewResRef[12]; //this is longer than expected so it won't overflow
 		strncpy( NewResRef, ResRef, 8 ); //we need this long for special anims
 		unsigned char Cycle;
-		GetAnimResRef( StanceID, Orient, NewResRef, Cycle, part+1 );
+		GetAnimResRef( StanceID, Orient, NewResRef, Cycle, part );
 		NewResRef[8]=0; //cutting right to size
 
 		AnimationFactory* af = ( AnimationFactory* )
@@ -631,10 +648,14 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 			break;
 
 		case IE_ANI_PST_STAND:
-		case IE_ANI_PST_GHOST:
 			Orient &=~1;
 			Anims[StanceID][Orient] = anims;
 			Anims[StanceID][Orient+1] = anims;
+			break;
+		case IE_ANI_PST_GHOST:
+			Orient = 0;
+			StanceID = IE_ANI_AWAKE;
+			Anims[StanceID][0] = anims;
 			break;
 		default:
 			printMessage("CharAnimations","Unknown animation type\n",LIGHT_RED);
@@ -645,24 +666,24 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 }
 
 void CharAnimations::GetAnimResRef(unsigned char StanceID,
-								   unsigned char Orient,
-								   char* ResRef, unsigned char& Cycle,
-								   int Part)
+									 unsigned char Orient,
+									 char* NewResRef, unsigned char& Cycle,
+									 int Part)
 {
 	char tmp[256];
 
 	Orient &= 15;
 	switch (GetAnimType()) {
 		case IE_ANI_FOUR_FRAMES:
-			AddFFSuffix( ResRef, StanceID, Cycle, Orient, Part );
+			AddFFSuffix( NewResRef, StanceID, Cycle, Orient, Part );
 			break;
 
 		case IE_ANI_NINE_FRAMES:
-			AddNFSuffix( ResRef, StanceID, Cycle, Orient, Part );
+			AddNFSuffix( NewResRef, StanceID, Cycle, Orient, Part );
 			break;
 
 		case IE_ANI_CODE_MIRROR:
-			AddVHRSuffix( ResRef, StanceID, Cycle, Orient );
+			AddVHRSuffix( NewResRef, StanceID, Cycle, Orient );
 			break;
 
 		case IE_ANI_BIRD:
@@ -674,49 +695,51 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			break;
 
 		case IE_ANI_SIX_FILES:
-			AddSixSuffix( ResRef, StanceID, Cycle, Orient );
+			AddSixSuffix( NewResRef, StanceID, Cycle, Orient );
 			break;
 
 		case IE_ANI_TWENTYTWO:  //5+3 animations
-			AddMHRSuffix( ResRef, StanceID, Cycle, Orient );
+			AddMHRSuffix( NewResRef, StanceID, Cycle, Orient );
 			break;
 
 		case IE_ANI_TWO_FILES_2:  //4+4 animations
-			AddLR2Suffix( ResRef, StanceID, Cycle, Orient );
+			AddLR2Suffix( NewResRef, StanceID, Cycle, Orient );
 			break;
 
 		case IE_ANI_TWO_FILES_3: //IWD style anims
-			AddMMRSuffix( ResRef, StanceID, Cycle, Orient );
+			AddMMRSuffix( NewResRef, StanceID, Cycle, Orient );
 			break;
 
 		case IE_ANI_TWO_FILES: 
-			AddTwoFileSuffix(ResRef, StanceID, Cycle, Orient );
+			AddTwoFileSuffix(NewResRef, StanceID, Cycle, Orient );
 			break;
 
 		case IE_ANI_FOUR_FILES:
-			AddLRSuffix( ResRef, StanceID, Cycle, Orient );
+			AddLRSuffix( NewResRef, StanceID, Cycle, Orient );
 			break;
 
 		case IE_ANI_SIX_FILES_2: //MOGR (variant of FOUR_FILES)
-			AddLR3Suffix( ResRef, StanceID, Cycle, Orient );
+			AddLR3Suffix( NewResRef, StanceID, Cycle, Orient );
 			break;
 
 		case IE_ANI_CODE_MIRROR_2: //9 orientations
-			AddVHR2Suffix( ResRef, StanceID, Cycle, Orient );
+			AddVHR2Suffix( NewResRef, StanceID, Cycle, Orient );
 			break;
 
 		case IE_ANI_PST_ANIMATION_1:
 		case IE_ANI_PST_ANIMATION_2:
 		case IE_ANI_PST_ANIMATION_3:
-			AddPSTSuffix( ResRef, StanceID, Cycle, Orient );
+			AddPSTSuffix( NewResRef, StanceID, Cycle, Orient );
 			break;
 
 		case IE_ANI_PST_STAND:
-			sprintf(ResRef,"%cSTD%4s",this->ResRef[0], this->ResRef+1);
+			sprintf(NewResRef,"%cSTD%4s",ResRef[0], ResRef+1);
 			Cycle = SixteenToFive[Orient];
 			break;
 		case IE_ANI_PST_GHOST: // pst static animations
-			Cycle = SixteenToFive[Orient];
+			//still doesn't handle the second cycle of the golem anim
+			Cycle = 0;
+			strnlwrcpy(NewResRef, AvatarTable[AvatarsRowNum].Prefixes[Part], 8);
 			break;
 		default:
 			sprintf (tmp,"Unknown animation type in avatars.2da row: %d\n", AvatarsRowNum);
@@ -922,7 +945,7 @@ void CharAnimations::AddFFSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 	}
-	ResRef[6]=Part+'0';
+	ResRef[6]=Part+'1';
 	ResRef[7]=0;
 }
 
@@ -932,7 +955,7 @@ void CharAnimations::AddNFSuffix(char* ResRef, unsigned char StanceID,
 	char prefix[10];
 
 	Cycle = SixteenToNine[Orient];
-	snprintf(prefix, 9, "%s%s%d%s%d", ResRef, StancePrefix[StanceID], Part,
+	snprintf(prefix, 9, "%s%s%d%s%d", ResRef, StancePrefix[StanceID], Part+1,
 			 CyclePrefix[StanceID], Cycle);
 	strnlwrcpy(ResRef,prefix,8);
 	Cycle+=CycleOffset[StanceID];
