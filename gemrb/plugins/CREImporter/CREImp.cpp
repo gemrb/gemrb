@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.109 2006/05/22 16:39:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.110 2006/06/30 07:05:45 avenger_teambg Exp $
  *
  */
 
@@ -600,7 +600,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	for (i = 0; i < ItemsCount; i++) {
 		items[i] = core->ReadItem(str); //could be NULL item
 	}
-	act->inventory.SetSlotCount(core->GetInventorySize()+1);
+	act->inventory.SetSlotCount(Inventory_Size+1);
 
 	str->Seek( ItemSlotsOffset, GEM_STREAM_START );
 	int Slot = core->QuerySlot( 0 );
@@ -1544,7 +1544,7 @@ int CREImp::PutInventory(DataStream *stream, Actor *actor, unsigned int size)
 		indices[i]=(ieWord) -1;
 	}
 
-	for (i=0;i<core->GetInventorySize();i++) {
+	for (i=0;i<size;i++) {
 		//ignore first element, getinventorysize makes space for fist
 		unsigned int j = core->QuerySlot(i+1);
 		if (j>=size) {
