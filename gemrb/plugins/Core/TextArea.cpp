@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.88 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.89 2006/06/30 10:00:50 avenger_teambg Exp $
  *
  */
 
@@ -66,6 +66,10 @@ TextArea::~TextArea(void)
 	core->FreePalette( lineselpal );
 	for (size_t i = 0; i < lines.size(); i++) {
 		free( lines[i] );
+	}
+	if (AnimPicture) {
+		core->GetVideoDriver()->FreeSprite(AnimPicture);
+		SetAnimPicture(NULL);
 	}
 }
 
