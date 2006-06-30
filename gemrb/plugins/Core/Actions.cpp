@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.71 2006/06/29 06:56:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.72 2006/06/30 09:19:26 avenger_teambg Exp $
  *
  */
 
@@ -3735,12 +3735,8 @@ void GameScript::Attack( Scriptable* Sender, Action* parameters)
 	}
 	//using auto target!
 	Scriptable* tar;
-	if (!parameters->objects[1]) {
-		GameControl *gc = core->GetGameControl();
-		tar = gc->GetTarget();
-	} else {
-		tar = GetActorFromObject( Sender, parameters->objects[1] );
-	}
+	tar = GetActorFromObject( Sender, parameters->objects[1] );
+
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
 		Sender->ReleaseCurrentAction();
 		return;

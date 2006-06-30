@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.57 2006/06/29 06:56:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.58 2006/06/30 09:19:27 avenger_teambg Exp $
  *
  */
 
@@ -373,24 +373,36 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 	return MIC_GOTITEM;
 }
 
+static Targets* ReturnActorAsTarget(Actor *aC)
+{
+		if (!aC) {
+			return NULL;
+		}
+		//Ok :) we now have our Object. Let's create a Target struct and add the object to it
+		Targets *tgts = new Targets( );
+		tgts->AddTarget( aC, 0 );
+		//return here because object name/IDS targeting are mutually exclusive
+		return tgts;
+}
+
 /* returns actors that match the [x.y.z] expression */
 static Targets* EvaluateObject(Scriptable* Sender, Object* oC)
 {
 	Map *map=Sender->GetCurrentArea();
-	Targets *tgts=NULL;
 
 	if (oC->objectName[0]) {
 		//We want the object by its name... (doors/triggers don't play here!)
 		Actor* aC = map->GetActor( oC->objectName );
-		if (!aC) {
-			return tgts;
-		}
-		//Ok :) we now have our Object. Let's create a Target struct and add the object to it
-		tgts = new Targets( );
-		tgts->AddTarget( aC, 0 );
-		//return here because object name/IDS targeting are mutually exclusive
-		return tgts;
+		return ReturnActorAsTarget(aC);
 	}
+
+	if (oC->objectFields[0]==-1) {
+		Actor* aC = map->GetActorByGlobalID( (ieDword) oC->objectFields[1] );
+		return ReturnActorAsTarget(aC);
+	}
+
+	Targets *tgts=NULL;
+
 	//else branch, IDS targeting
 	for (int j = 0; j < ObjectIDSCount; j++) {
 		if (!oC->objectFields[j]) {
@@ -423,8 +435,7 @@ abort();
 				}
 				t = tgts->GetNextTarget(m, -1);
 			}
-		}
-		else {
+		} else {
 			//we need to get a subset of actors from the large array
 			//if this gets slow, we will need some index tables
 			int i = map->GetActorCount(true);
@@ -912,8 +923,10 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 
 	if (!(flags&AC_NO_SOUND) ) {
 		if (target->Type!=ST_ACTOR || actor->LastTarget != ((Actor *) target)->GetID() ) {
-			DisplayStringCore(Sender, VB_ATTACK, DS_CONSOLE|DS_CONST );
 			//play attack sound
+			DisplayStringCore(Sender, VB_ATTACK, DS_CONSOLE|DS_CONST );
+			//display attack message
+			core->DisplayConstantStringAction(STR_ACTION_ATTACK,0xf0f0f0, Sender, target);
 		}
 	}
 	//action performed
@@ -1110,6 +1123,12 @@ Action* GenerateActionCore(const char *src, const char *str, int acIndex)
 	int objectCount = ( newAction->actionID == 1 ) ? 0 : 1;
 	int stringsCount = 0;
 	int intCount = 0;
+	if (actionflags[newAction->actionID]&AF_DIRECT) {
+		Object *tmp = new Object();
+		tmp->objectFields[0] = -1;
+		tmp->objectFields[1] = core->GetGameControl()->targetID;
+		newAction->objects[objectCount++] = tmp;
+	}
 	//Here is the Action; Now we need to evaluate the parameters, if any
 	if (*str!=')') while (*str) {
 		if (*(str+1)!=':') {

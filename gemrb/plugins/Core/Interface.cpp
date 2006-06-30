@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.405 2006/06/22 21:10:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.406 2006/06/30 09:19:27 avenger_teambg Exp $
  *
  */
 
@@ -3516,6 +3516,7 @@ void Interface::DisplayString(const char* Text)
 }
 
 static const char* DisplayFormatName = "[color=%lX]%s - [/color][p][color=%lX]%s[/color][/p]";
+static const char* DisplayFormatAction = "[color=%lX]%s - [/color][p][color=%lX]%s %s[/color][/p]";
 static const char* DisplayFormat = "[/color][p][color=%lX]%s[/color][/p]";
 static const char* DisplayFormatValue = "[/color][p][color=%lX]%s: %d[/color][/p]";
 
@@ -3566,6 +3567,45 @@ void Interface::DisplayConstantStringName(int stridx, unsigned int color, Script
 	char* newstr = ( char* ) malloc( newlen );
 	sprintf( newstr, DisplayFormatName, speaker_color, name, color,
 		text );
+	FreeString( text );
+	DisplayString( newstr );
+	free( newstr );
+}
+
+void Interface::DisplayConstantStringAction(int stridx, unsigned int color, Scriptable *attacker, Scriptable *target)
+{
+	unsigned int attacker_color;
+	char *name1;
+	char *name2;
+	Color *tmp;
+
+	switch (attacker->Type) {
+		case ST_ACTOR:
+			name1 = ((Actor *) attacker)->GetName(-1);
+			tmp = GetPalette( ((Actor *) attacker)->GetStat(IE_MAJOR_COLOR),1 );
+			attacker_color = (tmp[0].r<<16) | (tmp[0].g<<8) | tmp[0].b;
+			free(tmp);
+			break;
+		default:
+			name1 = "";
+			attacker_color = 0x800000;
+			break;
+	}
+	switch (target->Type) {
+		case ST_ACTOR:
+			name2 = ((Actor *) target)->GetName(-1);
+			break;
+		default:
+			name2 = "";
+			break;
+	}
+
+	char* text = GetString( strref_table[stridx], IE_STR_SOUND|IE_STR_SPEECH );
+	int newlen = (int)(strlen( DisplayFormatAction ) + strlen( name1 ) +
+		+ strlen( name2 ) + strlen( text ) + 18);
+	char* newstr = ( char* ) malloc( newlen );
+	sprintf( newstr, DisplayFormatAction, attacker_color, name1, color,
+		text, name2);
 	FreeString( text );
 	DisplayString( newstr );
 	free( newstr );

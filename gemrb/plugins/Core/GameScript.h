@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.248 2006/06/25 10:33:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.249 2006/06/30 09:19:27 avenger_teambg Exp $
  *
  */
 
@@ -572,6 +572,7 @@ struct TriggerLink {
 //#define AF_RESTRICTED_LEVEL2  32 //maybe we could use 2 bits for this???
 #define AF_SCRIPTLEVEL   64  //this hack will transfer scriptlevel to int0parameter at runtime (changecurrentscript relies on it)
 #define AF_INVALID       128
+#define AF_DIRECT        256 //this hack will transfer target from gamecontrol to object1 at compile time
 
 struct ActionLink {
 	const char* Name;

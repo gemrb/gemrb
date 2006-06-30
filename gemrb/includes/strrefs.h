@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/strrefs.h,v 1.15 2006/04/12 20:32:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/strrefs.h,v 1.16 2006/06/30 09:19:28 avenger_teambg Exp $
  *
  */
 
@@ -97,5 +97,9 @@
 #define STR_LAWFUL          63
 #define STR_LNC_NEUTRAL     64
 #define STR_CHAOTIC         65
-
+#define STR_ACTION_CAST     66
+#define STR_ACTION_ATTACK   67
+#define STR_ACTION_TURN     68
+#define STR_ACTION_SONG     69
+#define STR_ACTION_FINDTRAP 70
 #endif //! IE_STRINGS_H
