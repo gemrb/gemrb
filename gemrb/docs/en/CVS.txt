@@ -1,12 +1,18 @@
 WORKING WITH CVS
 ----------------
-$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/CVS.txt,v 1.2 2005/11/18 17:43:07 avenger_teambg Exp $
+$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/CVS.txt,v 1.3 2006/07/01 17:13:33 edheldil Exp $
 
 
 This document is a short help on using CVS for getting GemRB
 sources and contributing back to the project. This is very
 basic and incomplete document - read CVS handbook for complete
-documentation!
+documentation and take a look at 
+
+  http://sourceforge.net/cvs/?group_id=10122.
+
+GemRB repository can be viewed at 
+
+  http://gemrb.cvs.sourceforge.net/ .
 
 
 
@@ -18,12 +24,12 @@ developer, you will need to get GemRB from anonymous CVS. It lags
 some time behind developer CVS, but mostly it's not a problem
 (unless you need some fresh patch quickly :-)):
 
-  export CVSROOT=:pserver:anonymous@cvs.sourceforge.net:/cvsroot/gemrb
+  export CVSROOT=:pserver:anonymous@gemrb.cvs.sourceforge.net:/cvsroot/gemrb
 
 If you are a GemRB developer, specify this CVSROOT instead
 (of course replace `username' with your own username):
 
-  export CVSROOT=:ext:username@cvs.sourceforge.net:/cvsroot/gemrb
+  export CVSROOT=:ext:username@gemrb.cvs.sourceforge.net:/cvsroot/gemrb
 
 Now do initial GemRB checkout:
 
@@ -107,3 +113,22 @@ Some caveats:
 
   - Do not commit mere indentation and aesthetic fixes. It's really
     annoying to read two pages of useless changes.
+
+
+Other modules in CVS:
+---------------------
+Apart from GemRB, there are other useful modules in CVS you can checkout.
+Just use their name in cvs checkout command instead of gemrb
+
+  cvs -z3 checkout <module>
+
+
+Utilities/chitem - Avenger's DLTCEP, Windows app to view and edit
+    IE data files. Probably the most complete IE viewer
+
+Utilities/ielister
+
+ie_shell - simple Python shell and modules to view IE files. Only few
+    formats and only their PST versions are supported.
+
+Win32 - files needed to build GemRB on Windows
