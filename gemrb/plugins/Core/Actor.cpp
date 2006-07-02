@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.191 2006/07/02 11:23:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.192 2006/07/02 17:48:20 wjpalenstijn Exp $
  *
  */
 
@@ -1831,6 +1831,7 @@ void Actor::SetColor( ieDword idx, ieDword grd)
 		if (shift>3) {
 			return;
 		}
+		shift *= 8;
 		value = gradient << shift;
 		value |= Modified[IE_COLORS+index] & ~(255<<shift);
 		Modified[IE_COLORS+index] = value;
