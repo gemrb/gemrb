@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.65 2006/06/18 20:14:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.66 2006/07/02 11:47:00 wjpalenstijn Exp $
  *
  */
 
@@ -60,6 +60,11 @@ public:
 	bool ToggleGrabInput();
 	short GetWidth() { return ( disp ? disp->w : 0 ); };
 	short GetHeight() { return ( disp ? disp->h : 0 ); };
+
+	void InitSpriteCover(SpriteCover* sc);
+	void AddPolygonToSpriteCover(SpriteCover* sc,Wall_Polygon* poly,int flags);
+	void DestroySpriteCover(SpriteCover* sc);
+
 	void MouseMovement(int x, int y);
 	void MoveMouse(unsigned int x, unsigned int y);
 	Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask,

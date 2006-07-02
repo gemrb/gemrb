@@ -15,11 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SpriteCover.cpp,v 1.1 2005/11/22 20:49:39 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SpriteCover.cpp,v 1.2 2006/07/02 11:46:58 wjpalenstijn Exp $
  *
  */
 
 #include "SpriteCover.h"
+#include "Interface.h"
+#include "Video.h"
 
 SpriteCover::SpriteCover()
 {
@@ -28,7 +30,7 @@ SpriteCover::SpriteCover()
 
 SpriteCover::~SpriteCover()
 {
-	delete[] pixels;
+	core->GetVideoDriver()->DestroySpriteCover(this);
 }
 
 bool SpriteCover::Covers(int x, int y, int xpos, int ypos,

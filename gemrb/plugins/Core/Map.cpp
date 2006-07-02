@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.241 2006/06/12 18:05:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.242 2006/07/02 11:46:58 wjpalenstijn Exp $
  *
  */
 
@@ -1243,16 +1243,11 @@ SpriteCover* Map::BuildSpriteCover(int x, int y, int xpos, int ypos,
 	sc->Width = width;
 	sc->Height = height;
 
-	sc->pixels = new unsigned char[width * height];
-	unsigned int i;
-	for (i = 0; i < width*height; ++i)
-		sc->pixels[i] = 0;
+	Video* video = core->GetVideoDriver();
+	video->InitSpriteCover(sc);
 
 	unsigned int wpcount = GetWallCount();
-
-	// TODO: change the cover to use a set of intervals per line
-
-	// WARNING: slow...
+	unsigned int i;
 
 	for (i = 0; i < wpcount; ++i)
 	{
@@ -1260,65 +1255,7 @@ SpriteCover* Map::BuildSpriteCover(int x, int y, int xpos, int ypos,
 		if (!wp) continue;
 		if (!wp->PointCovered(x, y)) continue;
 
-		int xoff = x - sc->XPos;
-		int yoff = y - sc->YPos;
-
-		std::list<Trapezoid>::iterator iter;
-		for (iter = wp->trapezoids.begin(); iter != wp->trapezoids.end();
-			 ++iter)
-		{
-			int y_top = iter->y1 - yoff; // inclusive
-			int y_bot = iter->y2 - yoff; // exclusive
-
-			if (y_top < 0) y_top = 0;
-			if ( y_bot > (signed) height) y_bot = (signed) height;
-			if (y_top >= y_bot) continue; // clipped
-
-			int ledge = iter->left_edge;
-			int redge = iter->right_edge;
-			Point& a = wp->points[ledge];
-			Point& b = wp->points[(ledge+1)%(wp->count)];
-			Point& c = wp->points[redge];
-			Point& d = wp->points[(redge+1)%(wp->count)];
-
-			unsigned char* line = sc->pixels + (y_top)*width;
-			for (int sy = y_top; sy < y_bot; ++sy) {
-				int py = sy + yoff;
-
-				// TODO: maybe use a 'real' line drawing algorithm to
-				// compute these values faster.
-
-				int lt = (b.x * (py - a.y) + a.x * (b.y - py))/(b.y - a.y);
-				int rt = (d.x * (py - c.y) + c.x * (d.y - py))/(d.y - c.y) + 1;
-
-				lt -= xoff;
-				rt -= xoff;
-
-				if (lt < 0) lt = 0;
-				if (rt > (signed) width) rt = (signed) width;
-				if (lt >= rt) { line += width; continue; } // clipped
-				int dither;
-
-				if (flags == 1) {
-					dither = wp->wall_flag & WF_DITHER;
-				} else {
-					dither = flags;
-				}
-				if (dither) {
-					unsigned char* pix = line + lt;
-					unsigned char* end = line + rt;
-
-					if ((lt + xoff + sy + yoff) % 2) pix++; // CHECKME: aliasing?
-					for (; pix < end; pix += 2)
-						*pix = 1;
-				} else {
-					// we hope memset is faster
-					// condition: lt < rt is true
-					memset (line+lt, 1, rt-lt);
-				}
-				line += width;
-			}
-		}
+		video->AddPolygonToSpriteCover(sc, wp, flags);
 	}
 
 	return sc;
