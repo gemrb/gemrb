@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.99 2006/04/22 13:30:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.100 2006/07/02 09:58:09 avenger_teambg Exp $
  *
  */
 
@@ -120,6 +120,7 @@ void Button::SetImage(unsigned char type, Sprite2D* img)
 			break;
 
 		case IE_GUI_BUTTON_DISABLED:
+		case IE_GUI_BUTTON_THIRD:
 			 {
 				if (Disabled && Clear)
 					core->GetVideoDriver()->FreeSprite( Disabled );
@@ -163,6 +164,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 				break;
 
 			case IE_GUI_BUTTON_DISABLED:
+			case IE_GUI_BUTTON_THIRD:
 				Image = Disabled;
 				if (! Image)
 					Image = Unpressed;
@@ -249,8 +251,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 /** Sets the Button State */
 void Button::SetState(unsigned char state)
 {
-	if (state > IE_GUI_BUTTON_LOCKED) // If wrong value inserted
-	{
+  if (state > IE_GUI_BUTTON_THIRD) {// If wrong value inserted
 		return;
 	}
 	if (State != state) {

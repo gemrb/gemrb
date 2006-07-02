@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.50 2006/01/28 19:56:34 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.51 2006/07/02 09:58:09 avenger_teambg Exp $
  *
  */
 
@@ -42,6 +42,8 @@ class Palette;
 #define IE_GUI_BUTTON_DISABLED  3
 // Like DISABLED, but processes MouseOver events and draws UNPRESSED bitmap
 #define IE_GUI_BUTTON_LOCKED    4
+// Draws the disabled bitmap, but otherwise works like unpressed
+#define IE_GUI_BUTTON_THIRD     5
 
 #define IE_GUI_BUTTON_NO_IMAGE     0x00000001   // don't draw image (BAM)
 #define IE_GUI_BUTTON_PICTURE      0x00000002   // draw picture (BMP, MOS, ...)
