@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.47 2006/05/26 18:44:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.48 2006/07/02 11:23:33 avenger_teambg Exp $
  *
  */
 
@@ -252,7 +252,7 @@ public:
 	int FindItem(const char *resref, unsigned int flags);
 	bool DropItemAtLocation(unsigned int slot, unsigned int flags, Map *map, Point &loc);
 	bool DropItemAtLocation(const char *resref, unsigned int flags, Map *map, Point &loc);
-	void SetEquippedSlot(int slotcode);
+	bool SetEquippedSlot(int slotcode);
 	int GetEquipped();
 	//right hand
 	int GetEquippedSlot();

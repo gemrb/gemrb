@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.31 2006/06/29 06:56:44 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.32 2006/07/02 11:23:25 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -238,6 +238,31 @@ def ActionTalkPressed ():
 
 def ActionAttackPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_ATTACK)
+
+def ActionQWeaponPressed (which):
+	pc = GemRB.GameGetFirstSelectedPC()
+
+	if GemRB.GetEquippedQuickSlot(pc)==which and not (GemRB.GameControlGetTargetMode() &TARGET_MODE_ATTACK):
+		GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_ATTACK)
+	else:
+		GemRB.GameControlSetTargetMode (TARGET_MODE_ALL)
+		GemRB.SetEquippedQuickSlot(pc, which)
+
+	GemRB.SetupControls (ActionsWindow, pc)
+	UpdateActionsWindow ()
+	return
+
+def ActionQWeapon1Pressed ():
+	ActionQWeaponPressed(0)
+
+def ActionQWeapon2Pressed ():
+	ActionQWeaponPressed(1)
+
+def ActionQWeapon3Pressed ():
+	ActionQWeaponPressed(2)
+
+def ActionQWeapon4Pressed ():
+	ActionQWeaponPressed(3)
 
 def ActionStopPressed ():
 	for i in range (PARTY_SIZE):

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.406 2006/06/30 09:19:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.407 2006/07/02 11:23:32 avenger_teambg Exp $
  *
  */
 
@@ -83,8 +83,8 @@ GEM_EXPORT HANDLE hConsole;
 
 //use DialogF.tlk if the protagonist is female, that's why we leave space
 static char dialogtlk[] = "dialog.tlk\0";
-#define STRREFCOUNT 100
-static int strref_table[STRREFCOUNT];
+
+static int strref_table[STRREF_COUNT];
 
 static int MaximumAbility = 25;
 static ieWord *strmod = NULL;
@@ -700,7 +700,7 @@ bool Interface::ReadStrrefs()
 	if (!tab) {
 		goto end;
 	}
-	for(i=0;i<STRREFCOUNT;i++) {
+	for(i=0;i<STRREF_COUNT;i++) {
 		strref_table[i]=atoi(tab->QueryField(i,0));
 	}
 end:

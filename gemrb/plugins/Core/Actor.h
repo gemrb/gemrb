@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.115 2006/06/24 11:24:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.116 2006/07/02 11:23:28 avenger_teambg Exp $
  *
  */
 
@@ -98,6 +98,8 @@ class ScriptedAnimation;
 
 #define GUIBT_COUNT  12
 
+#define VCONST_COUNT 100
+
 typedef ieByte ActionButtonRow[GUIBT_COUNT];
 
 typedef std::vector< ScriptedAnimation*> vvcVector;
@@ -115,7 +117,7 @@ public:
 	ieByte InParty;
 	char* LongName, * ShortName;
 	ieStrRef ShortStrRef, LongStrRef;
-	ieStrRef StrRefs[100];
+	ieStrRef StrRefs[VCONST_COUNT];
 
 	ieWord AppearanceFlags1;
 	ieWord AppearanceFlags2;
@@ -381,5 +383,9 @@ public:
 	void AddPortraitIcon(ieByte icon);
 	/* disables a state icon in the list, doesn't remove it! */
 	void DisablePortraitIcon(ieByte icon);
+	/* returns which slot belongs to the quickweapon slot */
+	int GetQuickSlot(int slot);
+	/* Sets equipped Quick slot */
+	int SetEquippedQuickSlot(int slot);
 };
 #endif

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.58 2006/06/30 09:19:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.59 2006/07/02 11:23:28 avenger_teambg Exp $
  *
  */
 
@@ -267,7 +267,7 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 	printf( "Displaying string on: %s\n", Sender->GetScriptName() );
 	if ((flags & DS_CONST) && (Sender->Type==ST_ACTOR) ) {
 		Actor* actor = ( Actor* ) Sender;
-		int tmp=actor->StrRefs[Strref];
+		int tmp=(int) actor->StrRefs[Strref];
 		if (tmp == -1) {
 			actor->ResolveStringConstant( sb.Sound, (unsigned int) Strref);
 		}
@@ -280,6 +280,8 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 				core->DisplayString( sb.text );
 			} else {
 				core->DisplayStringName( Strref,0x8080ff,Sender);
+				//already played the sound
+				sb.Sound[0] = 0;
 			}
 		}
 		if (flags & DS_HEAD) {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.389 2006/06/26 10:28:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.390 2006/07/02 11:23:33 avenger_teambg Exp $
  *
  */
 
@@ -2325,6 +2325,20 @@ static PyObject* GemRB_GameControlSetTargetMode(PyObject * /*self*/, PyObject* a
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_GameControlGetTargetMode__doc,
+"GameControlGetTargetMode()=>Mode\n\n"
+"Returns the targetting mode of the main game screen control (attack, cast spell,...)." );
+
+static PyObject* GemRB_GameControlGetTargetMode(PyObject * /*self*/, PyObject* /*args*/)
+{
+	GameControl *gc = core->GetGameControl();
+	if (!gc) {
+		return RuntimeError("Can't find GameControl!");
+	}
+
+	return PyInt_FromLong(gc->target_mode);
+}
+
 PyDoc_STRVAR( GemRB_SetButtonFlags__doc,
 "SetButtonFlags(WindowIndex, ControlIndex, Flags, Operation)\n\n"
 "Sets the Display Flags of a Button." );
@@ -3763,15 +3777,25 @@ static PyObject* GemRB_SetPlayerSound(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetSlotType__doc,
-"GetSlotType(idx) => dict\n\n"
+"GetSlotType(idx[, PartyID]) => dict\n\n"
 "Returns dictionary of an itemslot type (slottype.2da).");
 
 static PyObject* GemRB_GetSlotType(PyObject * /*self*/, PyObject* args)
 {
 	int idx;
+	int PartyID = 0;
+	Actor *actor = NULL;
 
-	if (!PyArg_ParseTuple( args, "i", &idx )) {
+	if (!PyArg_ParseTuple( args, "i|i", &idx, &PartyID )) {
 		return AttributeError( GemRB_GetSlotType__doc );
+	}
+
+	if (PartyID) {
+		Game *game = core->GetGame();
+		if (!game) {
+			return RuntimeError( "No game loaded!" );
+		}
+		actor = game->FindPC( PartyID );
 	}
 
 	PyObject* dict = PyDict_New();
@@ -3788,7 +3812,22 @@ static PyObject* GemRB_GetSlotType(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "Type", PyInt_FromLong(core->QuerySlotType(tmp)));
 	PyDict_SetItemString(dict, "ID", PyInt_FromLong(core->QuerySlotID(tmp)));
 	PyDict_SetItemString(dict, "Tip", PyInt_FromLong(core->QuerySlottip(tmp)));
+	//see if the actor shouldn't have some slots displayed
+	if (!actor || !actor->PCStats) {
+		goto has_slot;
+	}
+	//WARNING:idx isn't used any more, recycling it
+	idx = actor->inventory.GetWeaponSlot();
+	if (tmp<idx && tmp>idx+4) {
+		goto has_slot;
+	}
+	if (actor->GetQuickSlot(tmp-idx)==0xffff) {
+		PyDict_SetItemString(dict, "ResRef", PyString_FromString (""));
+		goto continue_quest;
+	}
+has_slot:
 	PyDict_SetItemString(dict, "ResRef", PyString_FromString (core->QuerySlotResRef(tmp)));
+continue_quest:
 	PyDict_SetItemString(dict, "Effects", PyInt_FromLong (core->QuerySlotEffects(tmp)));
 	return dict;
 }
@@ -6220,9 +6259,9 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 			ieDword slot;
 			if (magicweapon!=0xffff) {
 				slot = magicweapon;
-			}
-			else {
-				slot = actor->PCStats->QuickWeaponSlots[tmp-ACT_WEAPON1];
+	    } else {
+	        slot = actor->GetQuickSlot(tmp-ACT_WEAPON1);
+				//slot = actor->PCStats->QuickWeaponSlots[tmp-ACT_WEAPON1];
 			}
 			if (slot!=0xffff) {
 				//no slot translation required
@@ -6233,12 +6272,19 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 						if (fistdrawn) {
 							fistdrawn = false;
 						} else {
-							mode = 3;
+	            //empty weapon slot, already drawn
+	            break;
 						}
 					}
+	        //
+	        //
 					SetItemIcon(wi, ci, item->ItemResRef,mode,(item->Flags&IE_INV_ITEM_IDENTIFIED)?2:1, i+1);
 					if (usedslot == slot) {
-						state = IE_GUI_BUTTON_SELECTED;
+	          if (core->GetGameControl()->target_mode&TARGET_MODE_ATTACK) {
+	            state = IE_GUI_BUTTON_SELECTED;
+	          } else {
+						  state = IE_GUI_BUTTON_THIRD;
+	          }
 					}
 				}
 			}
@@ -6353,6 +6399,62 @@ static PyObject* GemRB_SetDefaultActions(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetEquippedQuickSlot__doc,
+"SetEquippedQuickSlot(PartyID, QWeaponSlot)->\n\n"
+"Sets the named weapon slot as equipped weapon slot."
+"Returns strref number of failure (0 success, -1 silent failure).\n\n" );
+
+static PyObject* GemRB_SetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
+{
+	int slot;
+	int PartyID;
+
+	if (!PyArg_ParseTuple( args, "ii", &PartyID, &slot)) {
+		return AttributeError( GemRB_SetEquippedQuickSlot__doc );
+	}
+
+	Game *game = core->GetGame();
+	Actor* actor = game->FindPC( PartyID );
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
+	}
+
+	int ret = actor->SetEquippedQuickSlot(slot);
+	return PyInt_FromLong( ret );
+}
+
+PyDoc_STRVAR( GemRB_GetEquippedQuickSlot__doc,
+"GetEquippedQuickSlot(PartyID)->QSlot\n\n"
+"returns the equipped weapon slot.\n\n" );
+
+static PyObject* GemRB_GetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID;
+
+	if (!PyArg_ParseTuple( args, "i", &PartyID)) {
+		return AttributeError( GemRB_GetEquippedQuickSlot__doc );
+	}
+
+	Game *game = core->GetGame();
+	Actor* actor = game->FindPC( PartyID );
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
+	}
+
+	int ret = actor->inventory.GetEquippedSlot();
+	if (actor->PCStats) {
+	  for(int i=0;i<4;i++) {
+	    if (ret == actor->PCStats->QuickWeaponSlots[i]) {
+	      ret = i;
+	      break;
+	    }
+	  }
+	} else {
+	  ret-=actor->inventory.GetWeaponSlot();
+	}
+	return PyInt_FromLong( ret );
+}
+
 static PyMethodDef GemRBMethods[] = {
 	METHOD(SetInfoTextColor, METH_VARARGS),
 	METHOD(HideGUI, METH_NOARGS),
@@ -6445,6 +6547,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GameSetScreenFlags, METH_VARARGS),
 	METHOD(GameControlSetScreenFlags, METH_VARARGS),
 	METHOD(GameControlSetTargetMode, METH_VARARGS),
+	METHOD(GameControlGetTargetMode, METH_NOARGS),
 	METHOD(SetButtonFlags, METH_VARARGS),
 	METHOD(SetButtonState, METH_VARARGS),
 	METHOD(SetButtonPictureClipping, METH_VARARGS),
@@ -6547,6 +6650,8 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetDefaultActions, METH_VARARGS),
 	METHOD(GetDestinationArea, METH_VARARGS),
 	METHOD(CreateMovement, METH_VARARGS),
+	METHOD(SetEquippedQuickSlot, METH_VARARGS),
+	METHOD(GetEquippedQuickSlot, METH_VARARGS),
 	// terminating entry	
 	{NULL, NULL, 0, NULL}
 };

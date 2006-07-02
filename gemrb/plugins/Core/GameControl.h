@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.87 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.88 2006/07/02 11:23:29 avenger_teambg Exp $
  */
 
 /**
@@ -105,7 +105,7 @@ private:
 	bool MouseIsDown;
 	Region SelectionRect;
 	short StartX, StartY;
-	int action;
+	//int action;
 public:
 	Door* overDoor;
 	Container* overContainer;

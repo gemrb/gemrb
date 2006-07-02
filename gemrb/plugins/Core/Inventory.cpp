@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.77 2006/06/29 14:58:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.78 2006/07/02 11:23:32 avenger_teambg Exp $
  *
  */
 
@@ -904,23 +904,24 @@ int Inventory::GetEquippedSlot()
 	return Equipped+SLOT_MELEE;
 }
 
-void Inventory::SetEquippedSlot(int slotcode)
+bool Inventory::SetEquippedSlot(int slotcode)
 {
 	//doesn't work if magic slot is used
 	if (HasItemInSlot("",SLOT_MAGIC)) {
 		Equipped = SLOT_MAGIC-SLOT_MELEE;
-		return;
+		return false;
 	}
 
 	if (slotcode == IW_NO_EQUIPPED) {
 		Equipped = IW_NO_EQUIPPED;
-		return;
+		return true;
 	}
 	if (!HasItemInSlot("",slotcode+SLOT_MELEE)) {
 		Equipped = IW_NO_EQUIPPED;
-		return;
+		return true;
 	}
 	Equipped = slotcode;
+	return true;
 }
 
 //returns the fist weapon if there is nothing else

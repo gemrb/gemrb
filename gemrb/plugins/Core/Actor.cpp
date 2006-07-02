@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.190 2006/06/29 06:56:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.191 2006/07/02 11:23:28 avenger_teambg Exp $
  *
  */
 
@@ -59,6 +59,9 @@ static Color magenta = {
 static int classcount=-1;
 static char **clericspelltables=NULL;
 static char **wizardspelltables=NULL;
+
+//letters for char sound resolution bg1/bg2
+static char csound[VCONST_COUNT];
 
 static char iwd2gemrb[32]={
 	0,0,20,2,22,25,0,14,
@@ -720,6 +723,21 @@ static void InitActorTables()
 		}
 		core->DelTable( table );
 	}
+
+	//csound for bg1/bg2
+	memset(csound,0,sizeof(csound));
+	if (!core->HasFeature(GF_SOUNDFOLDERS)) {
+		table = core->LoadTable( "csound" );
+		tm = core->GetTable( table );
+		if (tm) {
+			for(i=0;i<VCONST_COUNT;i++) {
+			  const char *tmp = tm->QueryField( i, 0 );
+			  if (tmp[0]!='*') {
+			    csound[i]=tmp[0];
+			  }
+			}
+		}
+	}
 }
 
 void Actor::add_animation(const ieResRef resource, int gradient, int height, bool playonce)
@@ -1369,6 +1387,7 @@ void Actor::ReinitQuickSlots()
 			case ACT_WEAPON4:
 				slot = inventory.GetWeaponSlot()+(which-ACT_WEAPON1);
 				break;
+			//WARNING:this cannot be condensed, because the symbols don't come in order!!!
 			case ACT_QSLOT1: slot = inventory.GetQuickSlot(); break;
 			case ACT_QSLOT2: slot = inventory.GetQuickSlot()+1; break;
 			case ACT_QSLOT3: slot = inventory.GetQuickSlot()+2; break;
@@ -1380,8 +1399,7 @@ void Actor::ReinitQuickSlots()
 			if (!slot) continue;
 			//if magic items are equipped the equipping info doesn't change
 			//(afaik)
-			if (!inventory.HasItemInSlot("", slot)) {
-				
+			if (!inventory.HasItemInSlot("", slot)) {				
 				if (core->QuerySlotEffects(slot)==SLOT_EFFECT_MELEE) {
 					slot = inventory.GetFistSlot();
 				} else {
@@ -2068,6 +2086,12 @@ void Actor::ResolveStringConstant(ieResRef Sound, unsigned int index)
 {
 	TableMgr * tab;
 
+	//resolving soundset (bg1/bg2 style)
+	if (PCStats && PCStats->SoundSet[0]&& csound[index]) {
+		snprintf(Sound, sizeof(ieResRef), "%s%c", PCStats->SoundSet, csound[index]);
+		return;
+	}
+
 	Sound[0]=0;
 	int table=core->LoadTable( anims->ResRef );
 
@@ -2272,4 +2296,35 @@ void Actor::Rest(int hours)
 		SetBase (IE_INTOXICATION, 0);
 		spellbook.ChargeAllSpells ();
 	}
+}
+
+//returns the actual slot from the quickslot
+int Actor::GetQuickSlot(int slot)
+{
+	assert(slot<8);
+	if (inventory.HasItemInSlot("",inventory.GetMagicSlot())) {
+		return inventory.GetMagicSlot();
+	}
+	if (!PCStats) {
+		return slot+inventory.GetWeaponSlot();
+	}
+	return PCStats->QuickWeaponSlots[slot];
+}
+
+//marks the quickslot as equipped
+int Actor::SetEquippedQuickSlot(int slot)
+{
+	//creatures and such
+	if (!PCStats) {
+		if (inventory.SetEquippedSlot(slot)) {
+			return 0;
+		}
+		return STR_MAGICWEAPON;
+	}
+
+	//player characters
+	if (inventory.SetEquippedSlot(PCStats->QuickWeaponSlots[slot]-inventory.GetWeaponSlot())) {
+		return 0;
+	}
+	return STR_MAGICWEAPON;
 }

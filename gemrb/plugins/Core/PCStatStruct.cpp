@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PCStatStruct.cpp,v 1.1 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PCStatStruct.cpp,v 1.2 2006/07/02 11:23:33 avenger_teambg Exp $
  *
  */
 
@@ -64,9 +64,21 @@ void PCStatsStruct::InitQuickSlot(unsigned int which, unsigned int state)
 	case ACT_QSLOT3: QuickItemSlots[2]=state; break;
 	case ACT_QSLOT4: QuickItemSlots[3]=state; break;
 	case ACT_QSLOT5: QuickItemSlots[4]=state; break;
-	case ACT_WEAPON1: QuickWeaponSlots[0]=state; break;
-	case ACT_WEAPON2: QuickWeaponSlots[1]=state; break;
-	case ACT_WEAPON3: QuickWeaponSlots[2]=state; break;
-	case ACT_WEAPON4: QuickWeaponSlots[3]=state; break;
+	case ACT_WEAPON1:
+		QuickWeaponSlots[0]=state;
+		QuickWeaponSlots[4]=state+1;
+		break;
+	case ACT_WEAPON2:
+		QuickWeaponSlots[1]=state;
+		QuickWeaponSlots[5]=state+1;
+		break;
+	case ACT_WEAPON3:
+		QuickWeaponSlots[2]=state;
+		QuickWeaponSlots[6]=state+1;
+		break;
+	case ACT_WEAPON4:
+		QuickWeaponSlots[3]=state;
+		QuickWeaponSlots[7]=state+1;
+		break;
 	}
 }

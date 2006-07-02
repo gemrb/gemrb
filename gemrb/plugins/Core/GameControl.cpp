@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.286 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.287 2006/07/02 11:23:28 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -88,7 +88,8 @@ GameControl::GameControl(void)
 	}
 	//this is the default action, individual actors should have one too
 	//at this moment we use only this
-	action = GA_DEFAULT | GA_SELECT | GA_NO_DEAD;
+	//maybe we don't even need it
+	//action = GA_DEFAULT | GA_SELECT | GA_NO_DEAD;
 	Changed = true;
 	lastActorID = 0;
 	MouseIsDown = false;
@@ -787,7 +788,8 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	}
 
 	if (!DrawSelectionRect) {
-		Actor* actor = area->GetActor( p, action);
+		Actor* actor = area->GetActor( p, GA_DEFAULT | GA_SELECT | GA_NO_DEAD);
+		//Actor* actor = area->GetActor( p, action);
 		Actor *lastActor = area->GetActorByGlobalID(lastActorID);
 		if (lastActor)
 			lastActor->SetOver( false );
@@ -983,21 +985,13 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 	}
 	//heh, i found no better place
 	core->CloseCurrentContainer();
-	if (Button == GEM_MB_MENU) {
-		core->GetDictionary()->SetAt( "MenuX", x );
-		core->GetDictionary()->SetAt( "MenuY", y );
-		core->GetGUIScriptEngine()->RunFunction( "OpenFloatMenuWindow" );
-		return;
-	}
-	if (Button != GEM_MB_ACTION) {
-		return;
-	}
 
 	MouseIsDown = false;
 	Point p(x,y);
 	core->GetVideoDriver()->ConvertToGame( p.x, p.y );
 	Game* game = core->GetGame();
 	Map* area = game->GetCurrentArea( );
+
 	if (DrawSelectionRect) {
 		Actor** ab;
 		unsigned int count = area->GetActorInRect( ab, SelectionRect,true );
@@ -1015,7 +1009,22 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 		DrawSelectionRect = false;
 		return;
 	}
-	Actor* actor = area->GetActor( p, action );
+
+  Actor* actor = area->GetActor( p, GA_DEFAULT | GA_SELECT | GA_NO_DEAD);
+	if (Button == GEM_MB_MENU) {
+    if (actor) {
+      //from GSUtils
+      DisplayStringCore(actor, VB_SELECT+core->Roll(1,3,-1), DS_CONST|DS_CONSOLE);
+      return;
+    }
+		core->GetDictionary()->SetAt( "MenuX", x );
+		core->GetDictionary()->SetAt( "MenuY", y );
+		core->GetGUIScriptEngine()->RunFunction( "OpenFloatMenuWindow" );
+		return;
+	}
+	if (Button != GEM_MB_ACTION) {
+		return;
+	}
 
 	if (!actor && ( game->selected.size() > 0 )) {
 		if (overDoor) {
@@ -1065,6 +1074,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 	}
 	if (!actor) return;
 	//we got an actor past this point
+  DisplayStringCore(actor, VB_SELECT+core->Roll(1,3,-1), DS_CONST|DS_CONSOLE);
 
 	//determining the type of the clicked actor
 	ieDword type;
@@ -1196,7 +1206,8 @@ void GameControl::CalculateSelection(Point &p)
 		}
 		free( ab );
 	} else {
-		Actor* actor = area->GetActor( p, action);
+		Actor* actor = area->GetActor( p, GA_DEFAULT | GA_SELECT | GA_NO_DEAD);
+		//Actor* actor = area->GetActor( p, action);
 		Actor *lastActor = area->GetActorByGlobalID(lastActorID);
 		if (lastActor)
 			lastActor->SetOver( false );
