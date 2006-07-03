@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.87 2006/06/30 07:04:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.88 2006/07/03 16:02:46 avenger_teambg Exp $
  *
  */
 
@@ -665,6 +665,8 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 	return Anims[StanceID][Orient];
 }
 
+static int one_file[19]={2, 1, 0, 0, 2, 3, 0, 1, 0, 4, 1, 0, 0, 0, 3, 1, 4, 4, 4};
+
 void CharAnimations::GetAnimResRef(unsigned char StanceID,
 									 unsigned char Orient,
 									 char* NewResRef, unsigned char& Cycle,
@@ -691,7 +693,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			break;
 
 		case IE_ANI_ONE_FILE:
-			Cycle = StanceID * 16 + Orient;
+			Cycle = one_file[StanceID] * 16 + Orient;
 			break;
 
 		case IE_ANI_SIX_FILES:
