@@ -1,0 +1,15 @@
+
+Prototype: GemRB.SetModalState(Slot, Value)
+
+Description: Sets a player character's modal state. The modal states are listed in ie_modal.py. 
+
+Parameters: Slot  - actor index in game structure
+            Value - New modal state
+
+Return value: N/A
+
+Examples: 
+ GemRB.SetModalState (pc, MS_TURNUNDEAD)
+The above example makes the player start the turn undead action.
+
+See also: SetPlayerStat, SetPlayerName
