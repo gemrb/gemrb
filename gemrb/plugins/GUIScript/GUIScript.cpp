@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.390 2006/07/02 11:23:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.391 2006/07/03 10:02:26 avenger_teambg Exp $
  *
  */
 
@@ -243,7 +243,7 @@ static PyObject* GemRB_HideGUI(PyObject*, PyObject* /*args*/)
 
 PyDoc_STRVAR( GemRB_GetGameString__doc,
 "GetGameString(Index)\n\n"
-"Returns various string attributes of the Game object, see the docs.\n");
+"Returns various string attributes of the Game object, see the docs.");
 
 static PyObject* GemRB_GetGameString(PyObject*, PyObject* args)
 {
@@ -338,7 +338,7 @@ static PyObject* GemRB_MoveTAText(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_RewindTA__doc,
 "RewindTA(Win, Ctrl, Ticks)\n\n"
-"Sets up a TextArea for scrolling. Ticks is the delay between the steps in scrolling.\n\n");
+"Sets up a TextArea for scrolling. Ticks is the delay between the steps in scrolling.");
 
 static PyObject* GemRB_RewindTA(PyObject * /*self*/, PyObject* args)
 {
@@ -1344,7 +1344,7 @@ static PyObject* GemRB_ShowModal(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_SetTimedEvent__doc,
 "SetTimedEvent(FunctionName, Rounds)\n\n"
 "Sets a timed event, the timing is handled by the game object\n"
-"if the game object doesn't exist, this command is ignored\n\n" );
+"if the game object doesn't exist, this command is ignored." );
 
 static PyObject* GemRB_SetTimedEvent(PyObject * /*self*/, PyObject* args)
 {
@@ -2048,7 +2048,7 @@ PyDoc_STRVAR( GemRB_CreateMapControl__doc,
 "[LabelID, FlagResRef[, Flag2ResRef]])\n\n"
 "Creates and adds a new Area Map Control to a Window.\n"
 "Note: LabelID is an ID, not an index. "
-"If there are two flags given, they will be considered a BMP.\n");
+"If there are two flags given, they will be considered a BMP.");
 
 static PyObject* GemRB_CreateMapControl(PyObject * /*self*/, PyObject* args)
 {
@@ -3045,7 +3045,7 @@ static PyObject* GemRB_PlayMovie(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_SaveGame__doc,
 "SaveGame(SlotCount, GameName)\n\n"
-"Dumps the save game.\n\n");
+"Dumps the save game.");
 
 static PyObject* GemRB_SaveGame(PyObject * /*self*/, PyObject * args)
 {
@@ -3072,7 +3072,7 @@ static PyObject* GemRB_GetSaveGameCount(PyObject * /*self*/,
 
 PyDoc_STRVAR( GemRB_DeleteSaveGame__doc,
 "DeleteSaveGame(SlotCount)\n\n"
-"Deletes a saved game folder completely.\n\n" );
+"Deletes a saved game folder completely." );
 
 static PyObject* GemRB_DeleteSaveGame(PyObject * /*self*/, PyObject* args)
 {
@@ -4440,7 +4440,11 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_ChangeContainerItem__doc,
 "ChangeContainerItem(PartyID, slot, action)\n\n"
-"Takes an item from a container, or puts it there. If PC is 0 then it uses the first selected PC and the current container, if it is not 0 then it autoselects the container. action=0: move item from PC to container. action=1: move item from container to PC.\n\n");
+"Takes an item from a container, or puts it there. "
+"If PC is 0 then it uses the first selected PC and the current container, "
+"if it is not 0 then it autoselects the container. "
+"action=0: move item from PC to container."
+"action=1: move item from container to PC.");
 
 static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 {
@@ -4614,7 +4618,8 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_IsValidStoreItem__doc,
 "IsValidStoreItem(pc, idx[, type]) => int\n\n"
-"Returns if a pc's inventory item or a store item is valid for buying, selling, identifying or stealing. It also has a flag for selected items. Type is 1 for store items and 0 for PC items.\n\n" );
+"Returns if a pc's inventory item or a store item is valid for buying, selling, identifying or stealing. It also has a flag for selected items. "
+"Type is 1 for store items and 0 for PC items." );
 
 static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 {
@@ -4665,7 +4670,7 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_SetPurchasedAmount__doc,
 "SetPurchasedAmount(idx, amount)\n\n"
-"Sets the amount of purchased items of a type.\n\n");
+"Sets the amount of purchased items of a type.");
 
 static PyObject* GemRB_SetPurchasedAmount(PyObject * /*self*/, PyObject* args)
 {
@@ -4703,7 +4708,8 @@ static PyObject* GemRB_SetPurchasedAmount(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_ChangeStoreItem__doc,
 "ChangeStoreItem(PartyID, Slot, action)\n\n"
-"Performs an action of buying, selling, identifying or stealing in a store. It can also toggle the selection of an item.\n\n" );
+"Performs an action of buying, selling, identifying or stealing in a store. "
+"It can also toggle the selection of an item." );
 
 static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 {
@@ -4954,7 +4960,7 @@ static PyObject* GemRB_GetStoreCure(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_ExecuteString__doc,
 "ExecuteString(String[,PC])\n\n"
 "Executes an In-Game Script Action in the current Area Script Context."
-"If a number was given, it will execute the action in the numbered actor's context." );
+"If a number was given, it will execute the action in the numbered PC's context." );
 
 static PyObject* GemRB_ExecuteString(PyObject * /*self*/, PyObject* args)
 {
@@ -4980,7 +4986,7 @@ static PyObject* GemRB_ExecuteString(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_RunEventHandler__doc,
 "RunEventHandler(String)\n\n"
-"Executes a GUIScript event handler function named String" );
+"Executes a GUIScript event handler function named String." );
 
 static PyObject* GemRB_RunEventHandler(PyObject * /*self*/, PyObject* args)
 {
@@ -5016,7 +5022,7 @@ static PyObject* GemRB_EvaluateString(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_UpdateMusicVolume__doc,
 "UpdateMusicVolume()\n\n"
-"Update music volume on-the-fly" );
+"Update music volume on-the-fly." );
 
 static PyObject* GemRB_UpdateMusicVolume(PyObject * /*self*/, PyObject* /*args*/)
 {
@@ -5028,7 +5034,7 @@ static PyObject* GemRB_UpdateMusicVolume(PyObject * /*self*/, PyObject* /*args*/
 
 PyDoc_STRVAR( GemRB_UpdateAmbientsVolume__doc,
 "UpdateAmbientsVolume()\n\n"
-"Update ambients volume on-the-fly" );
+"Update ambients volume on-the-fly." );
 
 static PyObject* GemRB_UpdateAmbientsVolume(PyObject * /*self*/, PyObject* /*args*/)
 {
@@ -5040,7 +5046,7 @@ static PyObject* GemRB_UpdateAmbientsVolume(PyObject * /*self*/, PyObject* /*arg
 
 PyDoc_STRVAR( GemRB_GetCurrentArea__doc,
 "GetCurrentArea()=>resref\n\n"
-"Returns current area's ResRef" );
+"Returns current area's ResRef." );
 
 static PyObject* GemRB_GetCurrentArea(PyObject * /*self*/, PyObject* /*args*/)
 {
@@ -5049,7 +5055,7 @@ static PyObject* GemRB_GetCurrentArea(PyObject * /*self*/, PyObject* /*args*/)
 
 PyDoc_STRVAR( GemRB_MoveToArea__doc,
 "MoveToArea(resref)\n\n"
-"Moves the selected characters to the area" );
+"Moves the selected characters to the area." );
 
 static PyObject* GemRB_MoveToArea(PyObject * /*self*/, PyObject* args)
 {
@@ -5082,7 +5088,7 @@ static PyObject* GemRB_MoveToArea(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_GetMemorizableSpellsCount__doc,
 "GetMemorizableSpellsCount(PartyID, SpellType, Level [,Bonus])=>int\n\n"
-"Returns number of memorizable spells of given type and level in PartyID's spellbook" );
+"Returns number of memorizable spells of given type and level in PC's spellbook." );
 
 static PyObject* GemRB_GetMemorizableSpellsCount(PyObject* /*self*/, PyObject* args)
 {
@@ -5103,7 +5109,7 @@ static PyObject* GemRB_GetMemorizableSpellsCount(PyObject* /*self*/, PyObject* a
 
 PyDoc_STRVAR( GemRB_SetMemorizableSpellsCount__doc,
 "SetMemorizableSpellsCount(PartyID, Value, SpellType, Level, [Bonus])=>int\n\n"
-"Sets number of memorizable spells of given type and level in PartyID's spellbook." );
+"Sets number of memorizable spells of given type and level in PC's spellbook." );
 
 static PyObject* GemRB_SetMemorizableSpellsCount(PyObject* /*self*/, PyObject* args)
 {
@@ -5127,7 +5133,7 @@ static PyObject* GemRB_SetMemorizableSpellsCount(PyObject* /*self*/, PyObject* a
 
 PyDoc_STRVAR( GemRB_GetKnownSpellsCount__doc,
 "GetKnownSpellsCount(PartyID, SpellType, Level)=>int\n\n"
-"Returns number of known spells of given type and level in PartyID's spellbook." );
+"Returns number of known spells of given type and level in PC's spellbook." );
 
 static PyObject* GemRB_GetKnownSpellsCount(PyObject * /*self*/, PyObject* args)
 {
@@ -6173,7 +6179,7 @@ static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_SetupControls__doc,
 "SetupControls(WindowIndex, slot[, Start])\n\n"
-"Automagically sets up the controls of the action window for a PC indexed by slot." );
+"Automagically sets up the controls of the action window for a PC indexed by slot.\n\n" );
 
 static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 {
@@ -6259,8 +6265,8 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 			ieDword slot;
 			if (magicweapon!=0xffff) {
 				slot = magicweapon;
-	    } else {
-	        slot = actor->GetQuickSlot(tmp-ACT_WEAPON1);
+			} else {
+				  slot = actor->GetQuickSlot(tmp-ACT_WEAPON1);
 				//slot = actor->PCStats->QuickWeaponSlots[tmp-ACT_WEAPON1];
 			}
 			if (slot!=0xffff) {
@@ -6272,19 +6278,19 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 						if (fistdrawn) {
 							fistdrawn = false;
 						} else {
-	            //empty weapon slot, already drawn
-	            break;
+				      //empty weapon slot, already drawn
+				      break;
 						}
 					}
-	        //
-	        //
+				  //
+				  //
 					SetItemIcon(wi, ci, item->ItemResRef,mode,(item->Flags&IE_INV_ITEM_IDENTIFIED)?2:1, i+1);
 					if (usedslot == slot) {
-	          if (core->GetGameControl()->target_mode&TARGET_MODE_ATTACK) {
-	            state = IE_GUI_BUTTON_SELECTED;
-	          } else {
-						  state = IE_GUI_BUTTON_THIRD;
-	          }
+				    if (core->GetGameControl()->target_mode&TARGET_MODE_ATTACK) {
+				      state = IE_GUI_BUTTON_SELECTED;
+				    } else {
+							state = IE_GUI_BUTTON_THIRD;
+				    }
 					}
 				}
 			}
@@ -6402,7 +6408,7 @@ static PyObject* GemRB_SetDefaultActions(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_SetEquippedQuickSlot__doc,
 "SetEquippedQuickSlot(PartyID, QWeaponSlot)->\n\n"
 "Sets the named weapon slot as equipped weapon slot."
-"Returns strref number of failure (0 success, -1 silent failure).\n\n" );
+"Returns strref number of failure (0 success, -1 silent failure)." );
 
 static PyObject* GemRB_SetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 {
@@ -6425,7 +6431,7 @@ static PyObject* GemRB_SetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_GetEquippedQuickSlot__doc,
 "GetEquippedQuickSlot(PartyID)->QSlot\n\n"
-"returns the equipped weapon slot.\n\n" );
+"returns the equipped weapon slot." );
 
 static PyObject* GemRB_GetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 {
@@ -6443,16 +6449,42 @@ static PyObject* GemRB_GetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 
 	int ret = actor->inventory.GetEquippedSlot();
 	if (actor->PCStats) {
-	  for(int i=0;i<4;i++) {
-	    if (ret == actor->PCStats->QuickWeaponSlots[i]) {
-	      ret = i;
-	      break;
-	    }
-	  }
+		for(int i=0;i<4;i++) {
+			if (ret == actor->PCStats->QuickWeaponSlots[i]) {
+				ret = i;
+				break;
+			}
+		}
 	} else {
-	  ret-=actor->inventory.GetWeaponSlot();
+		ret-=actor->inventory.GetWeaponSlot();
 	}
 	return PyInt_FromLong( ret );
+}
+
+PyDoc_STRVAR( GemRB_SetModalState__doc,
+"SetModalState(slot, state)\n\n"
+"Sets the modal state of the actor." );
+
+static PyObject* GemRB_SetModalState(PyObject * /*self*/, PyObject* args)
+{
+	int slot;
+	int state;
+
+	if (!PyArg_ParseTuple( args, "ii", &slot, &state )) {
+		return AttributeError( GemRB_SetModalState__doc );
+	}
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor* actor = game->FindPC( slot );
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
+	}
+	actor->SetModal( (ieDword) state);
+
+	Py_INCREF( Py_None );
+	return Py_None;
 }
 
 static PyMethodDef GemRBMethods[] = {
@@ -6652,6 +6684,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(CreateMovement, METH_VARARGS),
 	METHOD(SetEquippedQuickSlot, METH_VARARGS),
 	METHOD(GetEquippedQuickSlot, METH_VARARGS),
+	METHOD(SetModalState, METH_VARARGS),
 	// terminating entry	
 	{NULL, NULL, 0, NULL}
 };
@@ -6697,7 +6730,7 @@ GUIScript::~GUIScript(void)
 PyDoc_STRVAR( GemRB__doc,
 "Module exposing GemRB data and engine internals\n\n"
 "This module exposes to python GUIScripts GemRB engine data and internals."
-"It's implemented in gemrb/plugins/GUIScript/GUIScript.cpp\n\n" );
+"It's implemented in gemrb/plugins/GUIScript/GUIScript.cpp" );
 
 /** Initialization Routine */
 
