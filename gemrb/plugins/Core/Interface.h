@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.196 2006/06/30 09:19:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.197 2006/07/03 22:12:21 avenger_teambg Exp $
  *
  */
 
@@ -95,18 +95,18 @@ typedef struct SlotType {
 
 typedef class ItemList {
 public:
-        ieResRef *ResRefs;
-        unsigned int Count;
+	ieResRef *ResRefs;
+	unsigned int Count;
 
-        ItemList(unsigned int size) {
-                ResRefs = (ieResRef *) calloc(size, sizeof(ieResRef) );
-                Count = size;
-        }
-        ~ItemList() {
-                if (ResRefs) {
-                        free(ResRefs);
-                }
-        }
+	ItemList(unsigned int size) {
+		ResRefs = (ieResRef *) calloc(size, sizeof(ieResRef) );
+		Count = size;
+	}
+	~ItemList() {
+		if (ResRefs) {
+			free(ResRefs);
+		}
+	}
 } ItemList;
 
 #ifdef WIN32
@@ -354,7 +354,7 @@ public:
 	/** displays a string constant in the textarea, starting with actor, and ending with target */
 	void DisplayConstantStringAction(int stridx, unsigned int color, Scriptable *actor, Scriptable *target);
 	/** displays a string in the textarea, starting with speaker's name */
-	void DisplayStringName(int stridx, unsigned int color, Scriptable *speaker);
+	void DisplayStringName(int stridx, unsigned int color, Scriptable *speaker, ieDword flags);
 	/** returns the Window Visible Flag */
 	int GetVisible(unsigned short WindowIndex);
 	/** Set a Window Visible Flag */

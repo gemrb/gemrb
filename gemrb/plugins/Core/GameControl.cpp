@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.287 2006/07/02 11:23:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.288 2006/07/03 22:12:20 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1010,13 +1010,13 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 		return;
 	}
 
-  Actor* actor = area->GetActor( p, GA_DEFAULT | GA_SELECT | GA_NO_DEAD);
+	Actor* actor = area->GetActor( p, GA_DEFAULT | GA_SELECT | GA_NO_DEAD);
 	if (Button == GEM_MB_MENU) {
-    if (actor) {
-      //from GSUtils
-      DisplayStringCore(actor, VB_SELECT+core->Roll(1,3,-1), DS_CONST|DS_CONSOLE);
-      return;
-    }
+		if (actor) {
+			//from GSUtils
+			DisplayStringCore(actor, VB_SELECT+core->Roll(1,3,-1), DS_CONST|DS_CONSOLE);
+			return;
+		}
 		core->GetDictionary()->SetAt( "MenuX", x );
 		core->GetDictionary()->SetAt( "MenuY", y );
 		core->GetGUIScriptEngine()->RunFunction( "OpenFloatMenuWindow" );
@@ -1074,7 +1074,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 	}
 	if (!actor) return;
 	//we got an actor past this point
-  DisplayStringCore(actor, VB_SELECT+core->Roll(1,3,-1), DS_CONST|DS_CONSOLE);
+	DisplayStringCore(actor, VB_SELECT+core->Roll(1,3,-1), DS_CONST|DS_CONSOLE);
 
 	//determining the type of the clicked actor
 	ieDword type;
@@ -1601,7 +1601,7 @@ void GameControl::DialogChoose(unsigned int choose)
 		}
 
 		if (tr->textStrRef != 0xffffffff) {
-			core->DisplayStringName( tr->textStrRef, 0x8080FF, speaker);
+			core->DisplayStringName( tr->textStrRef, 0x8080FF, speaker, IE_STR_SOUND|IE_STR_SPEECH);
 			if (core->HasFeature( GF_DIALOGUE_SCROLLS )) {
 				ta->AppendText( "", -1 );
 			}
@@ -1646,7 +1646,7 @@ void GameControl::DialogChoose(unsigned int choose)
 		ds = dlg->GetState( si );
 	}
 	//displaying npc text
-	core->DisplayStringName( ds->StrRef, 0x70FF70, target );
+	core->DisplayStringName( ds->StrRef, 0x70FF70, target, IE_STR_SOUND|IE_STR_SPEECH);
 	//adding a gap between options and npc text
 	ta->AppendText("",-1); 
 	int i;
@@ -1721,7 +1721,7 @@ void GameControl::DisplayString(Point &p, const char *Text)
 	scr->textDisplaying = 1;
 	scr->timeStartDisplaying = 0;
 	scr->Pos = p;
-	scr->SetCutsceneID( NULL );
+	scr->ClearCutsceneID( );
 	//infoTexts.push_back( scr );
 }
 

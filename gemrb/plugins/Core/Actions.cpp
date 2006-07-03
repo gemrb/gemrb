@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.72 2006/06/30 09:19:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.73 2006/07/03 22:12:19 avenger_teambg Exp $
  *
  */
 
@@ -606,7 +606,7 @@ void GameScript::StartCutScene(Scriptable* Sender, Action* parameters)
 	gs->MySelf = Sender;
 	gs->EvaluateAllBlocks();
 	delete( gs );
-	Sender->SetCutsceneID(NULL);
+	Sender->ClearCutsceneID();
 /*
 	Sender->Active &= ~SCR_CUTSCENEID;
 	Sender->CutSceneId = NULL;
@@ -2595,8 +2595,15 @@ void GameScript::ClearAllActions(Scriptable* /*Sender*/, Action* /*parameters*/)
 	for (int i = 0; i < game->GetPartySize(false); i++) {
 		Actor* act = game->GetPC( i,false );
 		if (act) {
-			act->ClearActions();
+			//FIXME: i wonder what clearallactions do
+			//but in bg1 ch01cut1 doesn't work with this
+			//clearallactions isn't supposed to clear cutscene actions
+			//on the other hand, it is supposed to clear all actions
+			//not only player actions
+			//act->ClearActions();
 			act->ClearPath();
+			//not sure about this
+			//act->SetModal(MS_NONE);
 		}
 	}
 }
@@ -2605,7 +2612,10 @@ void GameScript::ClearActions(Scriptable* Sender, Action* /*parameters*/)
 {
 	Sender->ClearActions();
 	if (Sender->Type==ST_ACTOR) {
-		((Actor *) Sender)->ClearPath();
+		Actor* act = (Actor *) Sender;
+		act->ClearPath();
+		//not sure about this
+		//act->SetModal(MS_NONE);
 	}
 }
 

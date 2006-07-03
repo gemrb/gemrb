@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.26 2006/06/20 16:39:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.27 2006/07/03 22:12:22 avenger_teambg Exp $
  *
  */
 
@@ -2650,7 +2650,7 @@ int fx_animation_stance (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_display_string (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_display_string (%2d): StrRef: %d\n", fx->Opcode, fx->Parameter1 );
-	core->DisplayStringName(fx->Parameter1, fx->Parameter2?fx->Parameter2:0xffffff, target);
+	core->DisplayStringName(fx->Parameter1, fx->Parameter2?fx->Parameter2:0xffffff, target, IE_STR_SOUND|IE_STR_SPEECH);
 	return FX_NOT_APPLIED;
 }
 

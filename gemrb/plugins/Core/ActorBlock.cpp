@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.145 2006/06/26 10:28:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.146 2006/07/03 22:12:19 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -368,14 +368,19 @@ Scriptable *Scriptable::GetCutsceneID()
 	return CutSceneId;
 }
 
+//this ends cutscene mode for this Sender
+void Scriptable::ClearCutsceneID()
+{
+	CutSceneId=NULL;
+	InternalFlags &= ~IF_CUTSCENEID;
+}
+
+//if the cutsceneID doesn't exist, we simply skip the action
+//because the cutscene script executer DOESN'T get hijacked
 void Scriptable::SetCutsceneID(Scriptable *csid)
 {
 	CutSceneId=csid;
-	if (csid) {
-		InternalFlags |= IF_CUTSCENEID;
-	} else {
-		InternalFlags &= ~IF_CUTSCENEID;
-	}
+	InternalFlags |= IF_CUTSCENEID;
 }
 
 //also turning off the idle flag so it won't run continuously

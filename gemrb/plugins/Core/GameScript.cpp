@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.362 2006/06/30 09:19:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.363 2006/07/03 22:12:20 avenger_teambg Exp $
  *
  */
 
@@ -2728,9 +2728,13 @@ int GameScript::ExecuteResponse(Scriptable* Sender, Response* rE)
 					if (cs) {
 						cs->AddAction( aC );
 					} else {
-						printf("Did not find cutscene object, action ignored!\n");
+						//this can happen if a script refers to a wrong cutsceneid
+						if (InDebug&ID_CUTSCENE) {
+							printMessage("GameScript","Did not find cutscene object, action ignored!\n",YELLOW);
+						}
 					}
 				} else {
+					//this shouldn't happen, i think
 					if (Sender->GetCutsceneID()) {
 						printf("Stuck with cutscene ID!\n");
 						abort();

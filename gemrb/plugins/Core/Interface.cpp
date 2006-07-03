@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.407 2006/07/02 11:23:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.408 2006/07/03 22:12:20 avenger_teambg Exp $
  *
  */
 
@@ -3611,7 +3611,7 @@ void Interface::DisplayConstantStringAction(int stridx, unsigned int color, Scri
 	free( newstr );
 }
 
-void Interface::DisplayStringName(int stridx, unsigned int color, Scriptable *speaker)
+void Interface::DisplayStringName(int stridx, unsigned int color, Scriptable *speaker, ieDword flags)
 {
 	unsigned int speaker_color;
 	char *name;
@@ -3630,7 +3630,8 @@ void Interface::DisplayStringName(int stridx, unsigned int color, Scriptable *sp
 			break;
 	}
 
-	char* text = GetString( stridx, IE_STR_SOUND|IE_STR_SPEECH );
+	char* text = GetString( stridx, flags);
+
 	int newlen = (int)(strlen( DisplayFormatName ) + strlen( name ) +
 		+ strlen( text ) + 10);
 	char* newstr = ( char* ) malloc( newlen );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.59 2006/07/02 11:23:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.60 2006/07/03 22:12:20 avenger_teambg Exp $
  *
  */
 
@@ -276,12 +276,12 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 	if (Strref != -1) {
 		sb = core->strings->GetStringBlock( Strref );
 		if (flags & DS_CONSOLE) {
+			//can't play the sound here, we have to delay action
+			//and for that, we have to know how long the text takes
 			if(flags&DS_NONAME) {
 				core->DisplayString( sb.text );
 			} else {
-				core->DisplayStringName( Strref,0x8080ff,Sender);
-				//already played the sound
-				sb.Sound[0] = 0;
+				core->DisplayStringName( Strref,0x8080ff,Sender, 0);
 			}
 		}
 		if (flags & DS_HEAD) {
