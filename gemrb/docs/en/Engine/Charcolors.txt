@@ -1,0 +1,31 @@
+There are 4 distinct palettes.
+
+Known values of palette (p) are:
+0 Body
+1 Weapon
+2 Shield
+3 Helmet
+
+Each has 7 colour slots at most.
+Known values of slots (s) are:
+Body:
+ 0 - Metal
+ 1 - Minor
+ 2 - Major
+ 3 - Skin
+ 4 - Leather
+ 5 - Armor
+ 6 - Hair
+
+Weapon:
+ 0 - Crossguard
+ ..
+ 5 - Grip
+ 6 - Blade
+
+etc.
+
+The combined palette location is given in <p><s> format, where both numbers are 4 bits.
+
+TODO:
+palette locations for the slots (it could be that they are different for plt and bam).
