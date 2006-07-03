@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.192 2006/07/02 17:48:20 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.193 2006/07/03 16:02:07 avenger_teambg Exp $
  *
  */
 
@@ -1710,8 +1710,8 @@ void Actor::PerformAttack(ieDword gameTime)
 	//get target
 	Actor *target = area->GetActorByGlobalID(LastTarget);
 
-	if (target->GetStat(IE_STATE_ID)&STATE_DEAD) {
-		target = 0;
+	if (target && (target->GetStat(IE_STATE_ID)&STATE_DEAD)) {
+		target = NULL;
 	}
 
 	if (!target) {
