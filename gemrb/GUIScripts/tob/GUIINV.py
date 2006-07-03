@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.39 2006/07/02 11:23:26 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.40 2006/07/03 16:29:17 wjpalenstijn Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -162,7 +162,7 @@ def MajorPress():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ColorIndex = 2
-	PickedColor = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR)
+	PickedColor = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR, 1)
 	GetColor()
 	return
 
@@ -171,7 +171,7 @@ def MinorPress():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ColorIndex = 3
-	PickedColor = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR)
+	PickedColor = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR, 1)
 	GetColor()
 	return
 
@@ -272,11 +272,11 @@ def RefreshInventoryWindow ():
 	GemRB.SetText (Window, Label, ClassTitle)
 
 	Button = GemRB.GetControl (Window, 62)
-	Color = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR)
+	Color = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR, 1)
 	GemRB.SetButtonBAM (Window, Button, "COLGRAD", 0, 0, Color)
 
 	Button = GemRB.GetControl (Window, 63)
-	Color = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR)
+	Color = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR, 1)
 	GemRB.SetButtonBAM (Window, Button, "COLGRAD", 0, 0, Color)
 
 	# update ground inventory slots
