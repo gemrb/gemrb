@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIINV.py,v 1.7 2006/07/03 16:29:18 wjpalenstijn Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIINV.py,v 1.8 2006/07/04 14:31:29 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -305,7 +305,7 @@ def RefreshInventoryWindow ():
 def UpdateSlot (pc, slot):
 
 	Window = InventoryWindow
-	SlotType = GemRB.GetSlotType (slot+1)
+	SlotType = GemRB.GetSlotType (slot+1, pc)
 	if not SlotType["ID"]:
 		return
 
@@ -313,6 +313,7 @@ def UpdateSlot (pc, slot):
 	slot_item = GemRB.GetSlotItem (pc, slot+1)
 
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnDragItem")
+	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 	if slot_item:
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		identified = slot_item["Flags"] & IE_INV_ITEM_IDENTIFIED
@@ -335,6 +336,9 @@ def UpdateSlot (pc, slot):
 
 		if SlotType["ResRef"]=="*":
 			GemRB.SetButtonBAM (Window, Button, "",0,0,0)
+		elif SlotType["ResRef"]=="":
+			GemRB.SetButtonBAM (Window, Button, "",0,0,0)
+			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		else:
 			GemRB.SetButtonBAM (Window, Button, SlotType["ResRef"],0,0,0)
 		GemRB.SetText (Window, Button, "")

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.391 2006/07/03 10:02:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.392 2006/07/04 14:31:29 avenger_teambg Exp $
  *
  */
 
@@ -4236,6 +4236,19 @@ static PyObject* GemRB_SetSpellIcon(PyObject * /*self*/, PyObject* args)
 	return ret;
 }
 
+
+Sprite2D* GetUsedWeaponIcon(Item *item, int which)
+{
+	ITMExtHeader *ieh = item->GetWeaponHeader(false);
+	if (!ieh) {
+		ieh = item->GetWeaponHeader(true);
+	}
+	if (ieh) {
+		return core->GetBAMSprite(ieh->UseIcon, -1, which);
+	}
+	return core->GetBAMSprite(item->ItemIcon, -1, which);
+}
+
 PyDoc_STRVAR( GemRB_SetItemIcon__doc,
 "SetItemIcon(WindowIndex, ControlIndex, ITMResRef[, type, tooltip, Function])\n\n"
 "Sets Item icon image on a button. 0/1 - Inventory Icons, 2 - Description Icon, 3 - No icon" );
@@ -4263,6 +4276,9 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 			break;
 		case 2:
 			Picture = core->GetBAMSprite(item->CarriedIcon, -1, 0);
+			break;
+		case 4: case 5:
+			Picture = GetUsedWeaponIcon(item, Which-4);
 			break;
 		default:
 			Picture = NULL;
@@ -6015,6 +6031,13 @@ static void ReadActionButtons()
 	}
 }
 
+static void SetButtonCycle(AnimationMgr *bam, Button *btn, int cycle, unsigned char which)
+{
+	Sprite2D *tspr = bam->GetFrameFromCycle( 0, cycle);
+	btn->SetImage( which, tspr );
+}
+
+
 PyDoc_STRVAR( GemRB_SetActionIcon__doc,
 "SetActionIcon(Window, Button, ActionIndex[, Function])\n\n"
 "Sets up an action button. The ActionIndex should be less than 31." );
@@ -6057,14 +6080,10 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, int Index, int
 	packtype row;
 
 	row.data = GUIAction[Index];
-	Sprite2D *tspr = bam->GetFrameFromCycle( 0, row.bytes[0]);
-	btn->SetImage( IE_GUI_BUTTON_UNPRESSED, tspr );
-	tspr = bam->GetFrameFromCycle( 0, row.bytes[1]);
-	btn->SetImage( IE_GUI_BUTTON_PRESSED, tspr );
-	tspr = bam->GetFrameFromCycle( 0, row.bytes[2]);
-	btn->SetImage( IE_GUI_BUTTON_SELECTED, tspr );
-	tspr = bam->GetFrameFromCycle( 0, row.bytes[3]);
-	btn->SetImage( IE_GUI_BUTTON_DISABLED, tspr );
+	SetButtonCycle(bam, btn, (char) row.bytes[0], IE_GUI_BUTTON_UNPRESSED);
+	SetButtonCycle(bam, btn, (char) row.bytes[1], IE_GUI_BUTTON_PRESSED);
+	SetButtonCycle(bam, btn, (char) row.bytes[2], IE_GUI_BUTTON_SELECTED);
+	SetButtonCycle(bam, btn, (char) row.bytes[3], IE_GUI_BUTTON_DISABLED);
 	core->FreeInterface( bam );
 	btn->SetFlags( IE_GUI_BUTTON_NORMAL, BM_SET );
 	char Event[33];
@@ -6266,31 +6285,34 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 			if (magicweapon!=0xffff) {
 				slot = magicweapon;
 			} else {
-				  slot = actor->GetQuickSlot(tmp-ACT_WEAPON1);
+					slot = actor->GetQuickSlot(tmp-ACT_WEAPON1);
 				//slot = actor->PCStats->QuickWeaponSlots[tmp-ACT_WEAPON1];
 			}
 			if (slot!=0xffff) {
 				//no slot translation required
 				CREItem *item = actor->inventory.GetSlotItem(slot);
 				if (item) {
-					int mode = 0;
+					int mode = 4;
 					if (slot == fistweapon) {
 						if (fistdrawn) {
 							fistdrawn = false;
 						} else {
-				      //empty weapon slot, already drawn
-				      break;
+							//empty weapon slot, already drawn
+							break;
 						}
 					}
-				  //
-				  //
+					//
+					//
 					SetItemIcon(wi, ci, item->ItemResRef,mode,(item->Flags&IE_INV_ITEM_IDENTIFIED)?2:1, i+1);
 					if (usedslot == slot) {
-				    if (core->GetGameControl()->target_mode&TARGET_MODE_ATTACK) {
-				      state = IE_GUI_BUTTON_SELECTED;
-				    } else {
+						btn->EnableBorder(0, true);
+						if (core->GetGameControl()->target_mode&TARGET_MODE_ATTACK) {
+							state = IE_GUI_BUTTON_SELECTED;
+						} else {
 							state = IE_GUI_BUTTON_THIRD;
-				    }
+						}
+					} else {
+						btn->EnableBorder(0, false);
 					}
 				}
 			}

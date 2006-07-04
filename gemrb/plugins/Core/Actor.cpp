@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.193 2006/07/03 16:02:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.194 2006/07/04 14:31:29 avenger_teambg Exp $
  *
  */
 
@@ -731,10 +731,10 @@ static void InitActorTables()
 		tm = core->GetTable( table );
 		if (tm) {
 			for(i=0;i<VCONST_COUNT;i++) {
-			  const char *tmp = tm->QueryField( i, 0 );
-			  if (tmp[0]!='*') {
-			    csound[i]=tmp[0];
-			  }
+				const char *tmp = tm->QueryField( i, 0 );
+				if (tmp[0]!='*') {
+					csound[i]=tmp[0];
+				}
 			}
 		}
 	}
@@ -1375,10 +1375,10 @@ void Actor::ReinitQuickSlots()
 {
 	if (PCStats) {
 		int i=sizeof(PCStats->QSlots);
-		while (i-->=-2) {
+		while (i--) {
 			int slot;
 			int which;
-			if (i<0) which = ACT_WEAPON1+i+2;
+			if (i<0) which = ACT_WEAPON4+i+1;
 			else which = PCStats->QSlots[i];
 			switch (which) {
 			case ACT_WEAPON1:
@@ -1401,12 +1401,20 @@ void Actor::ReinitQuickSlots()
 			//(afaik)
 			if (!inventory.HasItemInSlot("", slot)) {				
 				if (core->QuerySlotEffects(slot)==SLOT_EFFECT_MELEE) {
-					slot = inventory.GetFistSlot();
+				  slot = inventory.GetFistSlot();
 				} else {
 					slot = 0xffff;
 				}
 			}
 			PCStats->InitQuickSlot(which, slot);
+		}
+
+		//disabling quick weapon slots for certain classes
+		for(i=0;i<2;i++) {
+			int which = ACT_WEAPON3+i;
+			if (PCStats->QSlots[i]!=which) {
+				PCStats->InitQuickSlot(which, 0xffff);
+			}
 		}
 	}
 }

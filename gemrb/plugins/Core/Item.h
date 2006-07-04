@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.25 2006/06/19 21:01:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.26 2006/07/04 14:31:29 avenger_teambg Exp $
  *
  */
 
@@ -78,8 +78,8 @@
 //attack types
 #define ITEM_AT_MELEE      1
 #define ITEM_AT_PROJECTILE 2
-#define ITEM_AT_BOW        3
-#define ITEM_AT_MAGIC      4
+#define ITEM_AT_MAGIC      3
+#define ITEM_AT_BOW        4
 
 #define PROJ_ARROW  1
 #define PROJ_BOLT   2

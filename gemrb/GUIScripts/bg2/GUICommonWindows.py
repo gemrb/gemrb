@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.32 2006/07/02 11:23:25 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.33 2006/07/04 14:31:28 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -353,15 +353,15 @@ def OpenPortraitWindow (needcontrols):
 
 	for i in range (PARTY_SIZE):
 		Button = GemRB.GetControl (Window, i)
-		GemRB.SetVarAssoc (Window, Button, "SelectedSingle", i)
+		GemRB.SetVarAssoc (Window, Button, "PressedPortrait", i)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "PortraitButtonOnShiftPress")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnDropItemToPC")
+		GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_ENTER_BUTTON, "PortraitButtonOnMouseEnter")
+		GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_LEAVE_BUTTON, "PortraitButtonOnMouseLeave")
 
-		GemRB.SetButtonBorder (Window, Button, FRAME_PC_SELECTED, 1, 1,
-2, 2, 0, 255, 0, 255)
+		GemRB.SetButtonBorder (Window, Button, FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
 		GemRB.SetButtonBorder (Window, Button, FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
-		GemRB.SetVarAssoc (Window, Button, "PressedPortrait", i)
 		GemRB.SetButtonFont (Window, Button, "NORMAL")
 
 	UpdatePortraitWindow ()
@@ -373,9 +373,10 @@ def UpdatePortraitWindow ():
 
 	for i in range (PARTY_SIZE):
 		Button = GemRB.GetControl (Window, i)
-		pic = GemRB.GetPlayerPortrait (i+1,1)
+		pic = GemRB.GetPlayerPortrait (i+1, 1)
 		if not pic:
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
 			GemRB.SetText (Window, Button, "")
 			GemRB.SetTooltip (Window, Button, "")
 			continue
@@ -401,7 +402,7 @@ def PortraitButtonOnPress ():
 	return
 
 def PortraitButtonOnShiftPress ():
-	i = GemRB.GetVar ('PressedPortrait')
+	i = GemRB.GetVar ("PressedPortrait")
 
 	if (not SelectionChangeHandler):
 		sel = GemRB.GameIsPCSelected (i + 1)
@@ -417,6 +418,7 @@ def SelectAllOnPress ():
 	GemRB.GameSelectPC (0, 1)
 	return
 
+# Run by Game class when selection was changed
 def SelectionChanged ():
 	global PortraitWindow
 
@@ -431,6 +433,18 @@ def SelectionChanged ():
 		for i in range (PARTY_SIZE):
 			Button = GemRB.GetControl (PortraitWindow, i)
 			GemRB.EnableButtonBorder (PortraitWindow, Button, FRAME_PC_SELECTED, i + 1 == sel)
+	return
+
+def PortraitButtonOnMouseEnter ():
+	i = GemRB.GetVar ("PressedPortrait")
+	if GemRB.IsDraggingItem ():
+		Button = GemRB.GetControl (PortraitWindow, i)
+		GemRB.EnableButtonBorder (PortraitWindow, Button, FRAME_PC_TARGET, 1)
+
+def PortraitButtonOnMouseLeave ():
+	i = GemRB.GetVar ("PressedPortrait")
+	Button = GemRB.GetControl (PortraitWindow, i)
+	GemRB.EnableButtonBorder (PortraitWindow, Button, FRAME_PC_TARGET, 0)
 
 def GetSavingThrow (SaveName, row, level):
 	SaveTable = GemRB.LoadTable (SaveName)

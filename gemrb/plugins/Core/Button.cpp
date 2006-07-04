@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.100 2006/07/02 09:58:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.101 2006/07/04 14:31:29 avenger_teambg Exp $
  *
  */
 
@@ -433,6 +433,10 @@ void Button::OnMouseEnter(unsigned short /*x*/, unsigned short /*y*/)
 		return;
 	}
 
+	if (MouseEnterButton[0] !=0 && VarName[0] != 0) {
+		core->GetDictionary()->SetAt( VarName, Value );
+	}
+
 	RunEventHandler( MouseEnterButton );
 }
 
@@ -440,6 +444,10 @@ void Button::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
 {
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
+	}
+
+	if (MouseLeaveButton[0] !=0 && VarName[0] != 0) {
+		core->GetDictionary()->SetAt( VarName, Value );
 	}
 
 	RunEventHandler( MouseLeaveButton );
