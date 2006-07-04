@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.28 2006/07/04 19:45:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.29 2006/07/04 19:48:30 wjpalenstijn Exp $
  *
  */
 
@@ -1207,7 +1207,7 @@ int fx_maximum_hp_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 		}
 		break;
 	}
-	return FX_APPLIED;
+	return FX_PERMANENT;
 }
 
 // 0x13
