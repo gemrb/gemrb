@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.50 2006/06/29 06:56:45 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.51 2006/07/04 19:46:39 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -1099,16 +1099,15 @@ def OpenLevelUpWindow ():
 			# this is the constitution bonus type for this level
 			CONType = 1
 			# We are leveling up one of those levels. Therefore, one of them has to be updated.
-			if avatar_header['PrimClass'] == "Fighter":
+			if avatar_header['PrimClass'] == "FIGHTER":
 				FighterLevel = NextLevel - 1
 				CONType = 0
-			elif avatar_header['PrimClass'] == "Mage":
+			elif avatar_header['PrimClass'] == "MAGE":
 				MageLevel = NextLevel - 1
 			else:
 				ThiefLevel = NextLevel - 1
 
-			ConHPBon = GetConHPBonus (pc, NumOfPrimLevUp, CONType)
-
+			ConHPBon = GetConHPBonus (pc, NumOfPrimLevUp, 0, CONType)
 			# Now we need to update the saving throws with the best values from those tables.
 			# The smaller the number, the better saving throw it is.
 			# We also need to check if any of the levels are larger than 21, since
@@ -1163,7 +1162,11 @@ def OpenLevelUpWindow ():
 			for i in range (NumOfPrimLevUp):
 				HPGained = HPGained + GetSingleClassHP (Class, avatar_header['PrimLevel'])
 
-			ConHPBon = GetConHPBonus (pc, NumOfPrimLevUp, 0)
+			if avatar_header['PrimClass'] == "FIGHTER":
+				CONType = 0
+			else:
+				CONType = 1
+			ConHPBon = GetConHPBonus (pc, NumOfPrimLevUp, 0, CONType)
 
 			# Thac0
 			Thac0 = GetThac0 (Class, NextLevel)
@@ -1306,17 +1309,17 @@ def GetSingleClassHP (Class, Level):
 
 	return GemRB.Roll (Rolls, Sides, Modif)
 
-def GetConHPBonus (pc, fighterlevels, otherlevels, type):
+def GetConHPBonus (pc, numPrimLevels, numSecoLevels, levelUpType):
 	ConHPBonTable = GemRB.LoadTable ("HPCONBON")
 
 	con = str (GemRB.GetPlayerStat (pc, IE_CON))
-	if type == 0:
+	if levelUpType == 0:
 		# Pure fighter
-		return GemRB.GetTableValue (ConHPBonTable, con, "WARRIOR") * fighterlevels
-	if type == 1:
+		return GemRB.GetTableValue (ConHPBonTable, con, "WARRIOR") * numPromLevels
+	if levelUpType == 1:
 		# Mage, Priest or Thief
-		return GemRB.GetTableValue (ConHPBonTable, con, "OTHER") * otherlevels
-	return GemRB.GetTableValue (ConHPBonTable, con, "WARRIOR") * fighterlevels / 2 + GemRB.GetTableValue (ConHPBonTable, con, "OTHER") * otherlevels / 2
+		return GemRB.GetTableValue (ConHPBonTable, con, "OTHER") * numPrimLevels
+	return GemRB.GetTableValue (ConHPBonTable, con, "WARRIOR") * numPrimLevels / 2 + GemRB.GetTableValue (ConHPBonTable, con, "OTHER") * numSecoLevels / 2
 
 def GetThac0 (Class, Level):
 	Thac0Table = GemRB.LoadTable ("THAC0")
