@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.29 2006/07/04 19:48:30 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.30 2006/07/04 20:28:49 wjpalenstijn Exp $
  *
  */
 
@@ -1152,18 +1152,17 @@ int fx_maximum_hp_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_maximum_hp_modifier (%2d): Stat Modif: %d ; Modif Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	int bonus;
 	bool base = fx->TimingMode==FX_DURATION_INSTANT_PERMANENT;
 
 	switch (fx->Parameter2) {
 	case 0:
-		bonus = DICE_ROLL( (signed)fx->Parameter1 );
+		// random value Parameter1 is set by level_check in EffectQueue
 		if (base) {
-			BASE_ADD( IE_MAXHITPOINTS, bonus );
-			BASE_ADD( IE_HITPOINTS, bonus );
+			BASE_ADD( IE_MAXHITPOINTS, fx->Parameter1 );
+			BASE_ADD( IE_HITPOINTS, fx->Parameter1 );
 		} else {
-			STAT_ADD( IE_MAXHITPOINTS, bonus );
-			STAT_ADD( IE_HITPOINTS, bonus );
+			STAT_ADD( IE_MAXHITPOINTS, fx->Parameter1 );
+			STAT_ADD( IE_HITPOINTS, fx->Parameter1 );
 		}
 		break;
 	case 1:
@@ -1185,11 +1184,11 @@ int fx_maximum_hp_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 		}
 		break;
 	case 3:
-		bonus = DICE_ROLL( (signed)fx->Parameter1 );
+		// random value Parameter1 is set by level_check in EffectQueue
 		if (base) {
-			BASE_ADD( IE_MAXHITPOINTS, bonus );
+			BASE_ADD( IE_MAXHITPOINTS, fx->Parameter1 );
 		} else {
-			STAT_ADD( IE_MAXHITPOINTS, bonus );
+			STAT_ADD( IE_MAXHITPOINTS, fx->Parameter1 );
 		}
 		break;
 	case 4:
