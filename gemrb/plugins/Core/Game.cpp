@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.117 2006/06/30 06:58:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.118 2006/07/04 18:59:24 wjpalenstijn Exp $
  *
  */
 
@@ -246,7 +246,7 @@ void Game::ConsolidateParty()
 		} else i++;
 	}
 	for ( m = PCs.begin(); m != PCs.end(); ++m) {
-		(*m)->Init();
+		(*m)->RefreshEffects();
 	}
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.194 2006/07/04 14:31:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.195 2006/07/04 18:59:24 wjpalenstijn Exp $
  *
  */
 
@@ -901,7 +901,7 @@ void Actor::DisablePortraitIcon(ieByte icon)
 }
 
 /** call this after load, to apply effects */
-void Actor::Init()
+void Actor::RefreshEffects()
 {
 	ieDword previous[MAX_STATS];
 

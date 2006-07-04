@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.116 2006/07/02 11:23:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.117 2006/07/04 18:59:24 wjpalenstijn Exp $
  *
  */
 
@@ -193,7 +193,7 @@ public:
 	/** returns the animations */
 	CharAnimations* GetAnims();
 	/** Re/Inits the Modified vector */
-	void Init();
+	void RefreshEffects();
 	/** gets saving throws */
 	void RollSaves();
 	/** returns a saving throw */

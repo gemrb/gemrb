@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.392 2006/07/04 14:31:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.393 2006/07/04 18:59:25 wjpalenstijn Exp $
  *
  */
 
@@ -5549,6 +5549,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 			}
 		}
 		si = actor->inventory.RemoveItem( core->QuerySlot(Slot), Count );
+		actor->RefreshEffects();
 		actor->ReinitQuickSlots();
 	}
 	if (! si) {
@@ -5629,6 +5630,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 			if ( Effect ) {
 				actor->inventory.EquipItem( Slot );
 			}
+			actor->RefreshEffects();
 			actor->ReinitQuickSlots();
 		} else {
 			res = 0;
