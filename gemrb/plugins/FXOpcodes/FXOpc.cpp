@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.27 2006/07/03 22:12:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.28 2006/07/04 19:45:20 avenger_teambg Exp $
  *
  */
 
@@ -2206,6 +2206,9 @@ int fx_set_regenerating_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	}
 	
 	target->NewBase( IE_HITPOINTS, damage, MOD_ADDITIVE );
+	if (target->BaseStats[IE_HITPOINTS]> target->BaseStats[IE_MAXHITPOINTS]) {
+		target->SetBase(IE_HITPOINTS, target->BaseStats[IE_MAXHITPOINTS]);
+	}
 	return FX_APPLIED;
 }
 // 0x63 SpellDurationModifier
