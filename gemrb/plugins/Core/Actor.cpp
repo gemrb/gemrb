@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.196 2006/07/05 09:41:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.197 2006/07/05 10:23:37 avenger_teambg Exp $
  *
  */
 
@@ -1467,9 +1467,9 @@ void Actor::GetNextAnimation()
 }
 
 //slot is the projectile slot
-int Actor::GetRangedWeapon(ITMExtHeader *&which, int slot)
+int Actor::GetRangedWeapon(ITMExtHeader *&which)
 {
-	slot = inventory.FindRangedWeapon();
+	unsigned int slot = inventory.FindRangedWeapon();
 	CREItem *wield = inventory.GetSlotItem(slot);
 	if (!wield) {
 		return 0;
@@ -1741,16 +1741,15 @@ void Actor::PerformAttack(ieDword gameTime)
 	ITMExtHeader *rangedheader = NULL;
 	switch(header->AttackType)
 	{
-	case 1:
+	case ITEM_AT_MELEE:
 		Flags = WEAPON_MELEE;		
 		break;
-	case 2: //throwing weapon
+	case ITEM_AT_PROJECTILE: //throwing weapon
 		Flags = WEAPON_RANGED;
 		break;
-	case 4:
-		if (GetRangedWeapon(rangedheader, inventory.GetEquippedSlot())) {
-		//out of ammo event
-		} else {
+	case ITEM_AT_BOW:
+		if (!GetRangedWeapon(rangedheader)) {
+			//out of ammo event
 			return;
 		}
 		return;

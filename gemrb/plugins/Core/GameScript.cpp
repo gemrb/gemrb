@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.363 2006/07/03 22:12:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.364 2006/07/05 10:23:38 avenger_teambg Exp $
  *
  */
 
@@ -136,7 +136,9 @@ static TriggerLink triggernames[] = {
 	{"hasinnateability", GameScript::HaveSpell, 0}, //these must be the same
 	{"hasitem", GameScript::HasItem, 0},
 	{"hasitemequiped", GameScript::HasItemEquipped, 0}, //typo in bg2
+	{"hasitemequipedreal", GameScript::HasItemEquipped, 0}, //not sure
 	{"hasitemequipped", GameScript::HasItemEquipped, 0},
+	{"hasitemequippedreal", GameScript::HasItemEquipped, 0}, //not sure
 	{"hasitemslot", GameScript::HasItemSlot, 0},
 	{"hasiteminslot", GameScript::HasItemSlot, 0},
 	{"hasweaponequipped", GameScript::HasWeaponEquipped, 0},
@@ -144,6 +146,7 @@ static TriggerLink triggernames[] = {
 	{"havespell", GameScript::HaveSpell, 0}, //these must be the same
 	{"havespellparty", GameScript::HaveSpellParty, 0}, 
 	{"havespellres", GameScript::HaveSpell, 0}, //they share the same ID
+	{"haveusableweaponequipped", GameScript::HaveUsableWeaponEquipped, 0},
 	{"heard", GameScript::Heard, 0},
 	{"help", GameScript::Help_Trigger, 0},
 	{"helpex", GameScript::HelpEX, 0},
@@ -261,6 +264,7 @@ static TriggerLink triggernames[] = {
 	{"opened", GameScript::Opened, 0}, 
 	{"openstate", GameScript::OpenState, 0},
 	{"or", GameScript::Or, 0},
+	{"outofammo", GameScript::OutOfAmmo, 0},
 	{"ownsfloatermessage", GameScript::OwnsFloaterMessage, 0},
 	{"partycounteq", GameScript::PartyCountEQ, 0},
 	{"partycountgt", GameScript::PartyCountGT, 0},

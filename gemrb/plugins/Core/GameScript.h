@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.249 2006/06/30 09:19:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.250 2006/07/05 10:23:40 avenger_teambg Exp $
  *
  */
 
@@ -753,6 +753,7 @@ public: //Script Functions
 	static int HaveAnySpells(Scriptable* Sender, Trigger* parameters);
 	static int HaveSpellParty(Scriptable* Sender, Trigger* parameters);
 	static int HaveSpell(Scriptable* Sender, Trigger* parameters);
+	static int HaveUsableWeaponEquipped(Scriptable* Sender, Trigger* parameters);
 	static int Heard(Scriptable* Sender, Trigger* parameters);
 	static int Help_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int HelpEX(Scriptable* Sender, Trigger* parameters);
@@ -852,6 +853,7 @@ public: //Script Functions
 	static int Opened(Scriptable* Sender, Trigger* parameters);
 	static int OpenState(Scriptable* Sender, Trigger* parameters);
 	static int Or(Scriptable* Sender, Trigger* parameters);
+	static int OutOfAmmo(Scriptable* Sender, Trigger* parameters);
 	static int OwnsFloaterMessage(Scriptable* Sender, Trigger* parameters);
 	static int PartyCountEQ(Scriptable* Sender, Trigger* parameters);
 	static int PartyCountGT(Scriptable* Sender, Trigger* parameters);

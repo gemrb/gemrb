@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.47 2006/06/29 06:56:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.48 2006/07/05 10:23:41 avenger_teambg Exp $
  *
  */
 
@@ -3017,6 +3017,59 @@ int GameScript::InWeaponRange(Scriptable* Sender, Trigger* parameters)
 		return 1;
 	}
 	return 0;
+}
+
+//this implementation returns only true if there is a bow wielded
+//but there is no ammo for it
+//if the implementation should sign 'no ranged attack possible'
+//then change some return values
+int GameScript::OutOfAmmo(Scriptable* Sender, Trigger* /*parameters*/)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) Sender;
+	ITMExtHeader *header;
+	unsigned int weapon = actor->GetWeapon(header);
+	//no weapon wielded?
+	if (weapon==0) {
+		return 0;
+	}
+	//if not bow wielded, then we either have projectile
+	//or wielding something else
+	if (header->AttackType!=ITEM_AT_BOW) {
+		return 0;
+	}
+	//bow has no ammo, if it has ammo, the ammo would be wielded!
+	return 1;
+}
+
+//returns true if a weapon is equipped (with more than 0 range)
+//if a bow is equipped without projectile, it is useless!
+//please notice how similar is this to OutOfAmmo, no wonder, iwd2 has this
+//instead of OutOfAmmo
+int GameScript::HaveUsableWeaponEquipped(Scriptable* Sender, Trigger* /*parameters*/)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) Sender;
+	ITMExtHeader *header;
+	unsigned int weapon = actor->GetWeapon(header);
+	//no weapon range
+	if (weapon==0) {
+		return 0;
+	}
+	//bows are not usable (because if they are loaded, the equipped
+	//weapon is the projectile)
+	if (header->AttackType==ITEM_AT_BOW) {
+		return 0;
+	}
+	//only fist we have, it is not qualified as weapon?
+	if (actor->inventory.GetEquippedSlot() == IW_NO_EQUIPPED) {
+		return 0;
+	}
+	return 1;
 }
 
 int GameScript::HasWeaponEquipped(Scriptable* Sender, Trigger* parameters)

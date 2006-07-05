@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.117 2006/07/04 18:59:24 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.118 2006/07/05 10:23:38 avenger_teambg Exp $
  *
  */
 
@@ -322,8 +322,8 @@ public:
 	void GetNextStance();
 	/* learns the given spell, possibly receive XP */
 	int LearnSpell(const ieResRef resref, ieDword flags);
-	/* returns the ranged weapon header associated with the projectile in slot */
-	int GetRangedWeapon(ITMExtHeader *&which, int slot);
+	/* returns the ranged weapon header associated with the currently equipped projectile */
+	int GetRangedWeapon(ITMExtHeader *&which);
 	/* Returns current weapon range and extended header
 	   if range is nonzero, then which is valid */
 	unsigned int GetWeapon(ITMExtHeader *&which, bool leftorright=false);
