@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.118 2006/07/04 18:59:24 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.119 2006/07/05 11:17:15 avenger_teambg Exp $
  *
  */
 
@@ -53,6 +53,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	timestop_end = 0;
 	event_timer = 0;
 	event_handler[0] = 0;
+	memset( script_timers,0, sizeof(script_timers));
 
 	int mtab = core->LoadTable("mastarea");
 	if (mtab) {
@@ -1129,6 +1130,38 @@ int Game::AttackersOf(ieDword globalID) const
 		}
 	}
 	return cnt;
+}
+
+bool Game::TimerActive(ieDword ID)
+{
+	if (ID>=MAX_TIMER) {
+		return false;
+	}
+	if (script_timers[ID]) {
+		return true;
+	}
+	return false;
+}
+
+bool Game::TimerExpired(ieDword ID)
+{
+	if (ID>=MAX_TIMER) {
+		return false;
+	}
+	if (script_timers[ID] && script_timers[ID]<GameTime) {
+	//would an expired timer become inactive?
+	//if yes, make it zero now
+		return true;
+	}
+	return false;
+}
+
+void Game::StartTimer(ieDword ID, ieDword expiration)
+{
+	if (ID>=MAX_TIMER) {
+		return;
+	}
+	script_timers[ID]=GameTime+expiration;
 }
 
 void Game::DebugDump()

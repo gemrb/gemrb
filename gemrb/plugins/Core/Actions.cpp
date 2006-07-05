@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.73 2006/07/03 22:12:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.74 2006/07/05 11:17:15 avenger_teambg Exp $
  *
  */
 
@@ -125,6 +125,11 @@ void GameScript::SetGlobalRandom(Scriptable* Sender, Action* parameters)
 	} else {
 		SetVariable( Sender, parameters->string0Parameter, 0);
 	}
+}
+
+void GameScript::StartTimer(Scriptable* /*Sender*/, Action* parameters)
+{
+	core->GetGame()->StartTimer(parameters->int0Parameter, parameters->int1Parameter);
 }
 
 void GameScript::SetGlobalTimer(Scriptable* Sender, Action* parameters)

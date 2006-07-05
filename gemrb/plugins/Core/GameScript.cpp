@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.364 2006/07/05 10:23:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.365 2006/07/05 11:17:15 avenger_teambg Exp $
  *
  */
 
@@ -141,6 +141,7 @@ static TriggerLink triggernames[] = {
 	{"hasitemequippedreal", GameScript::HasItemEquipped, 0}, //not sure
 	{"hasitemslot", GameScript::HasItemSlot, 0},
 	{"hasiteminslot", GameScript::HasItemSlot, 0},
+	{"hasweaponequiped", GameScript::HasWeaponEquipped, 0},//a typo again
 	{"hasweaponequipped", GameScript::HasWeaponEquipped, 0},
 	{"haveanyspells", GameScript::HaveAnySpells, 0},
 	{"havespell", GameScript::HaveSpell, 0}, //these must be the same
@@ -313,6 +314,8 @@ static TriggerLink triggernames[] = {
 	{"timegt", GameScript::TimeGT, 0},
 	{"timelt", GameScript::TimeLT, 0},
 	{"timeofday", GameScript::TimeOfDay, 0},
+	{"timeractive", GameScript::TimerActive, 0},
+	{"timerexpired", GameScript::TimerExpired, 0},
 	{"tookdamage", GameScript::TookDamage, 0},
 	{"totalitem", GameScript::TotalItemCnt, 0},
 	{"totalitemgt", GameScript::TotalItemCntGT, 0},
@@ -734,6 +737,7 @@ static ActionLink actionnames[] = {
 	{"startrainnow", GameScript::StartRainNow, 0},
 	{"startsong", GameScript::StartSong, 0},
 	{"startstore", GameScript::StartStore, 0},
+	{"starttimer", GameScript::StartTimer, 0},
 	{"staticpalette", GameScript::StaticPalette, 0},
 	{"staticsequence", GameScript::PlaySequence, 0},//bg2 animation sequence
 	{"staticstart", GameScript::StaticStart, 0},

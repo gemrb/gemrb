@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.250 2006/07/05 10:23:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.251 2006/07/05 11:17:16 avenger_teambg Exp $
  *
  */
 
@@ -719,7 +719,6 @@ public: //Script Functions
 	static int FallenRanger(Scriptable* Sender, Trigger* parameters);
 	static int False(Scriptable* Sender, Trigger* parameters);
 	static int Frame(Scriptable* Sender, Trigger* parameters);
-	static int TimeOfDay(Scriptable* Sender, Trigger* parameters);
 	static int Gender(Scriptable* Sender, Trigger* parameters);
 	static int General(Scriptable* Sender, Trigger* parameters);
 	static int G_Trigger(Scriptable* Sender, Trigger* parameters);
@@ -902,6 +901,9 @@ public: //Script Functions
 	static int Time(Scriptable* Sender, Trigger* parameters);
 	static int TimeGT(Scriptable* Sender, Trigger* parameters);
 	static int TimeLT(Scriptable* Sender, Trigger* parameters);
+	static int TimeOfDay(Scriptable* Sender, Trigger* parameters);
+	static int TimerActive(Scriptable* Sender, Trigger* parameters);
+	static int TimerExpired(Scriptable* Sender, Trigger* parameters);
 	static int TookDamage(Scriptable* Sender, Trigger* parameters);
 	static int TotalItemCnt(Scriptable* Sender, Trigger* parameters);
 	static int TotalItemCntGT(Scriptable* Sender, Trigger* parameters);
@@ -1268,6 +1270,7 @@ public:
 	static void StartRainNow(Scriptable* Sender, Action* parameters);
 	static void StartSong(Scriptable* Sender, Action* parameters);
 	static void StartStore(Scriptable* Sender, Action* parameters);
+	static void StartTimer(Scriptable* Sender, Action* parameters);
 	static void StaticPalette(Scriptable* Sender, Action* parameters);
 	static void StaticStart(Scriptable* Sender, Action* parameters);
 	static void StaticStop(Scriptable* Sender, Action* parameters);

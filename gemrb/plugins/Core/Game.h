@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.80 2006/06/26 10:28:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.81 2006/07/05 11:17:15 avenger_teambg Exp $
  *
  */
 
@@ -48,6 +48,9 @@ class Game;
 #include "Actor.h"
 #include "Map.h"
 #include "Variables.h"
+
+//timer counts
+#define MAX_TIMER 32
 
 //for global triggers
 #define IF_PARTYRESTED 1
@@ -192,6 +195,7 @@ public:
 	ieDword timestop_end;
 	int event_timer;
 	char event_handler[64]; //like in Control
+	ieDword script_timers[MAX_TIMER];
 public:
 	/** Returns the PC's slot count for partyID */
 	int FindPlayer(unsigned int partyID);
@@ -335,6 +339,10 @@ public:
 	/** gets the colour which should be applied over the game area,
 	  may return NULL */
 	const Color *GetGlobalTint() const;
+	/** timer functions (numeric ID, not saved) */
+	bool TimerActive(ieDword ID);
+	bool TimerExpired(ieDword ID);
+	void StartTimer(ieDword ID, ieDword expiration);
 	/** Dumps information about the object */
 	void DebugDump();
 };

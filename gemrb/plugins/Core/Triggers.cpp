@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.48 2006/07/05 10:23:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.49 2006/07/05 11:17:16 avenger_teambg Exp $
  *
  */
 
@@ -3380,3 +3380,20 @@ int GameScript::Sequence(Scriptable* Sender, Trigger* parameters)
 	}
 	return 0;
 }
+
+int GameScript::TimerExpired(Scriptable* /*Sender*/, Trigger* parameters)
+{
+	if (core->GetGame()->TimerExpired(parameters->int0Parameter) ) {
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::TimerActive(Scriptable* /*Sender*/, Trigger* parameters)
+{
+	if (core->GetGame()->TimerActive(parameters->int0Parameter) ) {
+		return 1;
+	}
+	return 0;
+}
+
