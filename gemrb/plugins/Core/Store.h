@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.18 2005/11/08 22:59:05 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.19 2006/07/05 08:42:19 avenger_teambg Exp $
  *
  */
 
@@ -167,6 +167,8 @@ public: //queries
 	STOItem *GetItem(unsigned int idx);
 	/** Evaluates item availability triggers */
 	int GetRealStockSize();
+	/** Recharges item */
+	void RechargeItem(CREItem *item);
 	/** Adds a new item to the store (selling) */
 	void AddItem(CREItem* item);
 	void RemoveItem(unsigned int idx);

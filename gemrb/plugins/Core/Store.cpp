@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.cpp,v 1.16 2006/01/08 22:07:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.cpp,v 1.17 2006/07/05 08:42:19 avenger_teambg Exp $
  *
  */
 
@@ -198,8 +198,30 @@ STOItem *Store::FindItem(CREItem *item, bool exact)
 	return NULL;
 }
 
+//some stores can recharge items
+void Store::RechargeItem(CREItem *item)
+{
+//is there any flag which store can recharge?
+	Item *itm = core->GetItem(item->ItemResRef);
+	if (!itm) {
+		return;
+	}
+	for (int i=0;i<3;i++) {
+		ITMExtHeader *h = itm->GetExtHeader(i);
+		if (!h) {
+			item->Usages[i]=0;
+			continue;
+		}
+		if (h->RechargeFlags&IE_ITEM_RECHARGE) {
+			item->Usages[i] = h->Charges;
+		}
+	}
+	core->FreeItem(itm, item->ItemResRef, 0);
+}
+
 void Store::AddItem(CREItem *item)
 {
+	RechargeItem(item);
 	STOItem *temp = FindItem(item, true);
 
 	if (temp) {
