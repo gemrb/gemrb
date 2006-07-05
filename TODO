@@ -13,24 +13,25 @@ Items:
 2a. (DONE) Render dropped items in area (ground icon)
 3. (DONE) Picking up an item (create opcode too)
 4. (PARTLY) Equipping items, weapons are special
-5. Equipped weapon range (create triggers)
-6. Break swords and stuff
+5. (DONE) Equipped weapon range (create triggers)
+6. Break items, count charges
 
 
 Effects:
-1. (PARTLY) Create base system for effect blocks (Edheldil)
-2. (PARTLY) Implement effects
-
+1. (PARTLY) Create base system for effect blocks (Avenger)
+2. (DONE-almost) Implement common effects
+3. Implement IWD2 effects
+4. (DONE-almost) Implement TOB effects
+5. Implement PST effects
 
 Area:
 1. (DONE) Implement cover (wallgroups) (wjp)
 2. Don't load scripts for pile items? (research when a script is unused)
 3. Create real streaming ambients (do not preload them, just use them when needed)
 4. (DONE) in pathfinder, calculate with the actor's feet circle size 
-5. fix door wallgroups
+5. fix door wallgroups and tiles
 6. Improve pathfinder to not cancel pathfinding when the target point
    is temporarily blocked by other actor
-
 
 Store:
 1. (DONE) Save stores, handle containers
@@ -41,8 +42,8 @@ Animation:
 2. (DONE) animationfactory->one single palette
 3. (DONE) Use animationfactory in CharAnimations, and allow different palettes
 4. (DONE) Handle large multipart animations (2x2, 3x3)
-5. Handle equipment animations (armourlevel, weapons)
-6. Fix avatars for PST's actors marked with '*' in ANIMATE.IDS
+5. (PARTLY) Handle equipment animations (armourlevel, weapons)
+6. (DONE) Fix avatars for PST's actors marked with '*' in ANIMATE.IDS
 7. stanceID is still fuzzy. Fix it. (FIXED?)
 
 
