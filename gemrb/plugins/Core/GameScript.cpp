@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.365 2006/07/05 11:17:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.366 2006/07/05 17:51:49 avenger_teambg Exp $
  *
  */
 
@@ -1468,7 +1468,7 @@ void GameScript::Update()
 						rB->responseSet ) != 0 );
 			endReached = false;
 			//clear triggers after response executed
-			MySelf->ClearTriggers();
+			//MySelf->ClearTriggers();
 			if (!continueExecution)
 				break;
 			continueExecution = false;

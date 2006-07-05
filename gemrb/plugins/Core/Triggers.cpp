@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.49 2006/07/05 11:17:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.50 2006/07/05 17:51:49 avenger_teambg Exp $
  *
  */
 
@@ -1107,17 +1107,6 @@ int GameScript::PersonalSpaceDistance(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	int range = parameters->int0Parameter;
-  /*
-	if (Sender->Type==ST_ACTOR) {
-		Actor *tmp = (Actor *) Sender;
-		range -= tmp->size;
-	}
-
-	if (scr->Type==ST_ACTOR) {
-		Actor *tmp = (Actor *) scr;
-		range -= tmp->size;
-	}
-*/
 	
 	int distance = PersonalDistance(Sender, scr);
 	if (distance <= ( range * 10 )) {
@@ -2019,9 +2008,11 @@ int GameScript::OpenState(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!tar) {
-		printMessage("GameScript"," ",LIGHT_RED);
-		printf("Couldn't find door/container:%s\n", parameters->objectParameter? parameters->objectParameter->objectName:"<NULL>");
-		printf("Sender: %s\n", Sender->GetScriptName() );
+		if (InDebug&ID_TRIGGERS) {
+			printMessage("GameScript"," ",LIGHT_RED);
+			printf("Couldn't find door/container:%s\n", parameters->objectParameter? parameters->objectParameter->objectName:"<NULL>");
+			printf("Sender: %s\n", Sender->GetScriptName() );
+		}
 		return 0;
 	}
 	switch(tar->Type) {

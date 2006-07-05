@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.146 2006/07/03 22:12:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.147 2006/07/05 17:51:49 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -325,8 +325,12 @@ void Scriptable::ProcessActions(bool force)
 	while (!CurrentAction) {
 		CurrentAction = PopNextAction();
 		if (!CurrentAction) {
-			if (CutSceneId)
+			if (CutSceneId) {
 				CutSceneId = NULL;
+			}
+			//removing the triggers at the end of the
+			//block
+			ClearTriggers();
 			break;
 		}
 		GameScript::ExecuteAction( this, CurrentAction );

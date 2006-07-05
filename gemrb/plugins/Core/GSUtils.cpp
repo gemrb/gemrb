@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.60 2006/07/03 22:12:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.61 2006/07/05 17:51:49 avenger_teambg Exp $
  *
  */
 
@@ -341,14 +341,15 @@ int ValidForDialogCore(Scriptable* Sender, Actor *target)
 	return 1;
 }
 
-//transfering item from Sender to target, target must be an actor
+//transfering item from Sender to target
+//if target has no inventory, the item will be destructed
 //if target can't get it, it will be dropped at its feet
 int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int flags)
 {
 	Inventory *myinv;
 	Map *map;
 
-	if (!target || target->Type!=ST_ACTOR) {
+	if (!target) {
 		return MIC_INVALID;
 	}
 	map=Sender->GetCurrentArea();
@@ -362,12 +363,27 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 		default:
 			return MIC_INVALID;
 	}
-	Actor *scr = (Actor *) target;
 	CREItem *item;
 	myinv->RemoveItem(resref, flags, &item);
-	if (!item)
+	if (!item) {
 		return MIC_NOITEM;
-	if ( scr->inventory.AddSlotItem(item, -1) !=2) {
+	}
+	switch(target->Type) {
+		case ST_ACTOR:
+			myinv=&((Actor *) target)->inventory;
+			break;
+		case ST_CONTAINER:
+			myinv=&((Container *) target)->inventory;
+			break;
+		default:
+			myinv = NULL;
+			break;
+	}
+	if (!myinv) {
+		delete item;
+		return MIC_GOTITEM;
+	}
+	if ( myinv->AddSlotItem(item, -1) !=2) {
 		// drop it at my feet
 		map->AddItemToLocation(target->Pos, item);
 		return MIC_FULL;

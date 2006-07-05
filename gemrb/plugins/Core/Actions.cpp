@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.74 2006/07/05 11:17:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.75 2006/07/05 17:51:49 avenger_teambg Exp $
  *
  */
 
@@ -3061,7 +3061,7 @@ void GameScript::TakePartyItemNum(Scriptable* Sender, Action* parameters)
 			i++;
 			count--;
 		}
-		if (res!=MIC_NOITEM || !count) return;
+		if (!count) return;
 	}
 }
 
@@ -3379,7 +3379,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		return;
 	}
 	// now this is a kind of giveitem
-//	MoveItemCore(tar, Sender, MOVABLE, slot);
+	MoveItemCore(tar, Sender, "", slot);
 	Sender->ReleaseCurrentAction();
 }
 
