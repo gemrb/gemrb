@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.195 2006/07/04 18:59:24 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.196 2006/07/05 09:41:52 avenger_teambg Exp $
  *
  */
 
@@ -1733,8 +1733,8 @@ void Actor::PerformAttack(ieDword gameTime)
 	//which hand is used
 	bool leftorright = (bool) (attackcount&1);
 	ITMExtHeader *header;
-	//can't reach target
-	if (GetWeapon(header,leftorright)*10<Distance(Pos, target)) {
+	//can't reach target, zero range shouldn't be allowed
+	if (GetWeapon(header,leftorright)*10<Distance(Pos, target)+1) {
 		return;
 	}
 	ieDword Flags;
