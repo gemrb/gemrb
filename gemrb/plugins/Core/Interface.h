@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.197 2006/07/03 22:12:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.198 2006/07/06 22:33:09 avenger_teambg Exp $
  *
  */
 
@@ -561,7 +561,7 @@ private:
 	bool ReadRandomItems();
 	bool ReadItemTable(const ieResRef item, const char *Prefix);
 	bool ReadAbilityTables();
-	bool ReadAbilityTable(const ieResRef name, ieWord *mem, int cols, int rows);
+	bool ReadAbilityTable(const ieResRef name, ieWordSigned *mem, int cols, int rows);
 	/** Reads table of area name mappings for WorldMap (PST only) */
 	bool ReadAreaAliasTable(const ieResRef name);
 	/** handles the QuitFlag bits (main loop events) */

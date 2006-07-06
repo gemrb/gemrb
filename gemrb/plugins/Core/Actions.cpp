@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.75 2006/07/05 17:51:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.76 2006/07/06 22:33:08 avenger_teambg Exp $
  *
  */
 
@@ -1191,23 +1191,22 @@ void GameScript::FloatMessageRnd(Scriptable* Sender, Action* parameters)
 	FreeSrc(rndstr, parameters->string0Parameter);
 }
 
-//displays string over sender, but on console it displays target's name
-//it is silent in the 2. place for 2 reasons:
-//1. to avoid echo effect
-//2. to not set wait timer in the innocent target
+//apparently this should not display over head
 void GameScript::DisplayString(Scriptable* Sender, Action* parameters)
 {
-	DisplayStringCore( Sender, parameters->int0Parameter, DS_HEAD);
+	//DisplayStringCore( Sender, parameters->int0Parameter, DS_HEAD);
 	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1]);
 	if (!target) {
 		target=Sender;
 	}
-	DisplayStringCore( target, parameters->int0Parameter, DS_CONSOLE|DS_SILENT);
+	//DisplayStringCore( target, parameters->int0Parameter, DS_CONSOLE|DS_SILENT);
+	DisplayStringCore( target, parameters->int0Parameter, DS_CONSOLE);
 }
 
 void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
 {
-	DisplayStringCore( Sender, parameters->int0Parameter, DS_HEAD|DS_WAIT);
+	//DisplayStringCore( Sender, parameters->int0Parameter, DS_HEAD|DS_WAIT);
+	DisplayStringCore( Sender, parameters->int0Parameter, DS_CONSOLE|DS_WAIT);
 }
 
 void GameScript::ForceFacing(Scriptable* Sender, Action* parameters)

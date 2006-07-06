@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.118 2006/07/05 10:23:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.119 2006/07/06 22:33:08 avenger_teambg Exp $
  *
  */
 
@@ -387,5 +387,7 @@ public:
 	int GetQuickSlot(int slot);
 	/* Sets equipped Quick slot */
 	int SetEquippedQuickSlot(int slot);
+	/* If it returns true, then default AC=10 and the lesser the better */
+	bool IsReverseToHit();
 };
 #endif

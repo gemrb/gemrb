@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.408 2006/07/03 22:12:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.409 2006/07/06 22:33:09 avenger_teambg Exp $
  *
  */
 
@@ -87,12 +87,12 @@ static char dialogtlk[] = "dialog.tlk\0";
 static int strref_table[STRREF_COUNT];
 
 static int MaximumAbility = 25;
-static ieWord *strmod = NULL;
-static ieWord *strmodex = NULL;
-static ieWord *intmod = NULL;
-static ieWord *dexmod = NULL;
-static ieWord *conmod = NULL;
-static ieWord *chrmod = NULL;
+static ieWordSigned *strmod = NULL;
+static ieWordSigned *strmodex = NULL;
+static ieWordSigned *intmod = NULL;
+static ieWordSigned *dexmod = NULL;
+static ieWordSigned *conmod = NULL;
+static ieWordSigned *chrmod = NULL;
 
 Interface::Interface(int iargc, char** iargv)
 {
@@ -535,28 +535,28 @@ bool GenerateAbilityTables()
 
 	//range is: 0 - maximumability
 	int tablesize = MaximumAbility+1;
-	strmod = (ieWord *) malloc (tablesize * 4 * sizeof(ieWord) );
+	strmod = (ieWordSigned *) malloc (tablesize * 4 * sizeof(ieWordSigned) );
 	if (!strmod)
 		return false;
-	strmodex = (ieWord *) malloc (101 * 4 * sizeof(ieWord) );
+	strmodex = (ieWordSigned *) malloc (101 * 4 * sizeof(ieWordSigned) );
 	if (!strmodex)
 		return false;
-	intmod = (ieWord *) malloc (tablesize * 3 * sizeof(ieWord) );
+	intmod = (ieWordSigned *) malloc (tablesize * 3 * sizeof(ieWordSigned) );
 	if (!intmod)
 		return false;
-	dexmod = (ieWord *) malloc (tablesize * 3 * sizeof(ieWord) );
+	dexmod = (ieWordSigned *) malloc (tablesize * 3 * sizeof(ieWordSigned) );
 	if (!dexmod)
 		return false;
-	conmod = (ieWord *) malloc (tablesize * 5 * sizeof(ieWord) );
+	conmod = (ieWordSigned *) malloc (tablesize * 5 * sizeof(ieWordSigned) );
 	if (!conmod)
 		return false;
-	chrmod = (ieWord *) malloc (tablesize * 1 * sizeof(ieWord) );
+	chrmod = (ieWordSigned *) malloc (tablesize * 1 * sizeof(ieWordSigned) );
 	if (!chrmod)
 		return false;
 	return true;
 }
 
-bool Interface::ReadAbilityTable(const ieResRef tablename, ieWord *mem, int columns, int rows)
+bool Interface::ReadAbilityTable(const ieResRef tablename, ieWordSigned *mem, int columns, int rows)
 {
 	TableMgr * tab;
 	int table=LoadTable( tablename );
@@ -571,7 +571,7 @@ bool Interface::ReadAbilityTable(const ieResRef tablename, ieWord *mem, int colu
 	}
 	for (int j=0;j<columns;j++) {
 		for( int i=0;i<rows;i++) {
-			mem[rows*j+i] = (ieWord) strtol(tab->QueryField(i,j),NULL,0 );
+			mem[rows*j+i] = (ieWordSigned) strtol(tab->QueryField(i,j),NULL,0 );
 		}
 	}
 	DelTable(table);
@@ -1931,6 +1931,7 @@ bool Interface::LoadGemRBINI()
 	SetFeature( ini->GetKeyAsInt( "resources", "ReverseDoor", 0 ), GF_REVERSE_DOOR );
 	SetFeature( ini->GetKeyAsInt( "resources", "DialogueScrolls", 0 ), GF_DIALOGUE_SCROLLS );
 	SetFeature( ini->GetKeyAsInt( "resources", "KnowWorld", 0 ), GF_KNOW_WORLD );
+	SetFeature( ini->GetKeyAsInt( "resources", "ReverseToHit", 1 ), GF_REVERSE_TOHIT );
 	ForceStereo = ini->GetKeyAsInt( "resources", "ForceStereo", 0 );
 
 	FreeInterface( ini );

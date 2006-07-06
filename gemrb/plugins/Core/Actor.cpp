@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.197 2006/07/05 10:23:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.198 2006/07/06 22:33:08 avenger_teambg Exp $
  *
  */
 
@@ -662,6 +662,7 @@ static void InitActorTables()
 {
 	int i;
 
+	REVERSE_TOHIT=core->HasFeature(GF_REVERSE_TOHIT);
 	//this table lists skill groups assigned to classes
 	//it is theoretically possible to create hybrid classes
 	int table = core->LoadTable( "clskills" );
@@ -1507,7 +1508,7 @@ unsigned int Actor::GetWeapon(ITMExtHeader *&which, bool leftorright)
 	if (which->Location!=ITEM_LOC_WEAPON) {
 		return 0;
 	}
-	return which->Range;
+	return which->Range+1;
 }
 
 void Actor::GetNextStance()
@@ -1734,7 +1735,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	bool leftorright = (bool) (attackcount&1);
 	ITMExtHeader *header;
 	//can't reach target, zero range shouldn't be allowed
-	if (GetWeapon(header,leftorright)*10<Distance(Pos, target)+1) {
+	if (GetWeapon(header,leftorright)*10<PersonalDistance(this, target)+1) {
 		return;
 	}
 	ieDword Flags;
@@ -1786,6 +1787,7 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	//get target's defense against attack
 	int defense = target->GetStat(IE_ARMORCLASS);
+	defense += core->GetDexterityBonus(STAT_DEX_AC, target->GetStat(IE_DEX) );
 	if (REVERSE_TOHIT) {
 		defense = DEFAULTAC - defense;
 	}
@@ -2335,4 +2337,9 @@ int Actor::SetEquippedQuickSlot(int slot)
 		return 0;
 	}
 	return STR_MAGICWEAPON;
+}
+
+bool Actor::IsReverseToHit()
+{
+	return REVERSE_TOHIT;
 }
