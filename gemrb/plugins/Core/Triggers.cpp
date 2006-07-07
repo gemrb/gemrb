@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.50 2006/07/05 17:51:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.51 2006/07/07 14:35:41 avenger_teambg Exp $
  *
  */
 
@@ -1074,9 +1074,11 @@ int GameScript::ObjectActionListEmpty(Scriptable* Sender, Trigger* parameters)
 	if (!scr) {
 		return 0;
 	}
+/* hmm, other objects might have an action list as well
 	if (scr->Type != ST_ACTOR) {
 		return 0;
 	}
+*/
 	if (scr->GetNextAction()) {
 		return 0;
 	}
@@ -1085,9 +1087,11 @@ int GameScript::ObjectActionListEmpty(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::ActionListEmpty(Scriptable* Sender, Trigger* /*parameters*/)
 {
+/*yeah, other objects might have an action list as well
 	if (Sender->Type != ST_ACTOR) {
 		return 0;
 	}
+*/
 	if (Sender->GetNextAction()) {
 		return 0;
 	}
