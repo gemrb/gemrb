@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.409 2006/07/06 22:33:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.410 2006/07/07 13:34:25 avenger_teambg Exp $
  *
  */
 
@@ -3552,8 +3552,8 @@ void Interface::DisplayConstantStringName(int stridx, unsigned int color, Script
 	switch (speaker->Type) {
 		case ST_ACTOR:
 			name = ((Actor *) speaker)->GetName(-1);
-			tmp = GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR),1 );
-			speaker_color = (tmp[0].r<<16) | (tmp[0].g<<8) | tmp[0].b;
+			tmp = GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR),8 );
+			speaker_color = (tmp[4].r<<16) | (tmp[4].g<<8) | tmp[4].b;
 			free(tmp);
 			break;
 		default:
@@ -3583,8 +3583,8 @@ void Interface::DisplayConstantStringAction(int stridx, unsigned int color, Scri
 	switch (attacker->Type) {
 		case ST_ACTOR:
 			name1 = ((Actor *) attacker)->GetName(-1);
-			tmp = GetPalette( ((Actor *) attacker)->GetStat(IE_MAJOR_COLOR),1 );
-			attacker_color = (tmp[0].r<<16) | (tmp[0].g<<8) | tmp[0].b;
+			tmp = GetPalette( ((Actor *) attacker)->GetStat(IE_MAJOR_COLOR),8 );
+			attacker_color = (tmp[4].r<<16) | (tmp[4].g<<8) | tmp[4].b;
 			free(tmp);
 			break;
 		default:
@@ -3621,8 +3621,8 @@ void Interface::DisplayStringName(int stridx, unsigned int color, Scriptable *sp
 	switch (speaker->Type) {
 		case ST_ACTOR:
 			name = ((Actor *) speaker)->GetName(-1);
-			tmp = GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR),1 );
-			speaker_color = (tmp[0].r<<16) | (tmp[0].g<<8) | tmp[0].b;
+			tmp = GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR),8 );
+			speaker_color = (tmp[4].r<<16) | (tmp[4].g<<8) | tmp[4].b;
 			free(tmp);
 			break;
 		default:

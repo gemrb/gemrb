@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.251 2006/07/05 11:17:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.252 2006/07/07 13:34:25 avenger_teambg Exp $
  *
  */
 
@@ -602,8 +602,8 @@ public:
 	Variables* locals;
 	Script* script;
 	Scriptable* MySelf;
+	unsigned int lastAction;
 	unsigned long scriptRunDelay;
-	bool endReached;
 	int scriptlevel;
 	void RunNow();
 	void Update();
@@ -625,7 +625,7 @@ private: //Internal variables
 	unsigned long scriptType;
 private: //Script Internal Variables
 	ieResRef Name;
-	bool continueExecution;
+//	bool continueExecution;
 	bool freeLocals;
 public:
 	GameScript(ieResRef ResRef, unsigned char ScriptType,
@@ -1221,6 +1221,7 @@ public:
 	static void SetGlobalTint(Scriptable* Sender, Action* parameters);
 	static void SetHP(Scriptable* Sender, Action* parameters);
 	static void SetInternal(Scriptable* Sender, Action* parameters);
+	static void SetInterrupt(Scriptable* Sender, Action* parameters);
 	static void SetLeavePartyDialogFile(Scriptable* Sender, Action* parameters);
 	static void SetMasterArea(Scriptable* Sender, Action* parameters);
 	static void SetMazeEasier(Scriptable* Sender, Action* parameters);

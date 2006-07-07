@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.147 2006/07/05 17:51:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.148 2006/07/07 13:34:24 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -219,9 +219,9 @@ void Scriptable::ImmediateEvent()
 
 void Scriptable::ExecuteScript(GameScript* Script)
 {
-	if (actionQueue.size()) {
-		return;
-	}
+//	if (actionQueue.size()) {
+//		return;
+//	}
 	if (Script) {
 		Script->Update();
 	}
@@ -403,6 +403,11 @@ void Scriptable::Unhide()
 	InternalFlags |= IF_ACTIVE|IF_VISIBLE;
 }
 
+void Scriptable::Interrupt()
+{
+	InternalFlags &= ~IF_NOINT;
+}
+
 void Scriptable::NoInterrupt()
 {
 	InternalFlags |= IF_NOINT;
@@ -410,10 +415,11 @@ void Scriptable::NoInterrupt()
 
 //turning off the not interruptable flag, actions should reenable it themselves
 //also turning off the idle flag
+//heh, no, i wonder why did i touch the interruptable flag here
 void Scriptable::Activate()
 {
 	InternalFlags |= IF_ACTIVE;
-	InternalFlags &= ~(IF_NOINT|IF_IDLE);
+	InternalFlags &= ~IF_IDLE;
 }
 
 ieDword Scriptable::GetInternalFlag()

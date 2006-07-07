@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.76 2006/07/06 22:33:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.77 2006/07/07 13:34:24 avenger_teambg Exp $
  *
  */
 
@@ -4715,4 +4715,13 @@ void GameScript::FakeEffectExpiryCheck(Scriptable* Sender, Action* parameters)
 	}
 	Actor *target = (Actor *) tar;
 		target->fxqueue.RemoveExpiredEffects(parameters->int0Parameter);
+}
+
+void GameScript::SetInterrupt(Scriptable* Sender, Action* parameters)
+{
+	if (parameters->int0Parameter) {
+		Sender->Interrupt();
+	} else {
+		Sender->NoInterrupt();
+	}
 }

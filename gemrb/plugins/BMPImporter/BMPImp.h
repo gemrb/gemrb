@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.22 2006/02/17 20:20:00 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.h,v 1.23 2006/07/07 13:34:23 avenger_teambg Exp $
  *
  */
 
@@ -42,9 +42,6 @@ private:
 
 	//OTHER
 	unsigned int PaddedRowLength;
-
-	//Conversion to 8 bits per pixel?
-	bool Convert;
 public:
 	BMPImp(void);
 	~BMPImp(void);

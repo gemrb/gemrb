@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.119 2006/07/05 11:17:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.120 2006/07/07 13:34:24 avenger_teambg Exp $
  *
  */
 
@@ -68,6 +68,8 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	}
 	core->DelTable(mtab);
 	interval = 1000/AI_UPDATE_TIME;
+	//FIXME:i'm not sure in this...
+	NoInterrupt();
 }
 
 Game::~Game(void)
@@ -287,19 +289,6 @@ int Game::JoinParty(Actor* actor, int join)
 	if (slot != -1) {
 		return slot;
 	}
-	if (join&JP_INITPOS) {
-		// 0 - single player, 1 - tutorial, 2 - multiplayer
-		int saindex = core->LoadTable( "startpos" );
-		TableMgr* strta = core->GetTable( saindex );
-		ieDword playmode = 0;
-		if (strta->GetRowCount()==6) {
-			core->GetDictionary()->Lookup( "PlayMode", playmode );
-			playmode *= 2;
-		}
-		actor->Pos.x = actor->Destination.x = atoi( strta->QueryField( playmode, actor->InParty-1 ) );
-		actor->Pos.y = actor->Destination.y = atoi( strta->QueryField( playmode + 1, actor->InParty-1 ) );
-		core->DelTable( saindex );
-	}
 	if (join&JP_JOIN) {
 		actor->PCStats->JoinDate = GameTime;
 		if (!PCs.size() ) {
@@ -316,6 +305,20 @@ int Game::JoinParty(Actor* actor, int join)
 	PCs.push_back( actor );
 	if (!actor->InParty) {
 		actor->InParty = (ieByte) (size+1);
+	}
+	if (join&JP_INITPOS) {
+		// 0 - single player, 1 - tutorial, 2 - multiplayer
+		int saindex = core->LoadTable( "startpos" );
+		TableMgr* strta = core->GetTable( saindex );
+		ieDword playmode = 0;
+		if (strta->GetRowCount()==6) {
+			core->GetDictionary()->Lookup( "PlayMode", playmode );
+			playmode *= 2;
+		}
+		actor->Pos.x = actor->Destination.x = atoi( strta->QueryField( playmode, actor->InParty-1 ) );
+		actor->Pos.y = actor->Destination.y = atoi( strta->QueryField( playmode + 1, actor->InParty-1 ) );
+		core->DelTable( saindex );
+    SelectActor(actor,true, SELECT_QUIET);
 	}
 
 	return ( int ) size;

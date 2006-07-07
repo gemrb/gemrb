@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.366 2006/07/05 17:51:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.367 2006/07/07 13:34:24 avenger_teambg Exp $
  *
  */
 
@@ -678,6 +678,7 @@ static ActionLink actionnames[] = {
 	{"sethomelocation", GameScript::SetSavedLocation, 0}, //bg2
 	{"sethp", GameScript::SetHP, 0},
 	{"setinternal", GameScript::SetInternal, 0},
+	{"setinterrupt", GameScript::SetInterrupt, 0},
 	{"setleavepartydialogfile", GameScript::SetLeavePartyDialogFile, 0},
 	{"setleavepartydialoguefile", GameScript::SetLeavePartyDialogFile, 0},
 	{"setmasterarea", GameScript::SetMasterArea, 0},
@@ -1093,6 +1094,7 @@ GameScript::GameScript(ieResRef ResRef, unsigned char ScriptType,
 		freeLocals = true;
 	}
 	scriptlevel = ScriptLevel;
+	lastAction = ~0;
 
 	if (!initialized) {
 		initialized = 1;
@@ -1229,14 +1231,12 @@ GameScript::GameScript(ieResRef ResRef, unsigned char ScriptType,
 		}
 		initialized = 2;
 	}
-	continueExecution = false;
 	strnlwrcpy( Name, ResRef, 8 );
 	script = CacheScript( Name );
 	MySelf = NULL;
 	scriptRunDelay = 1000;
 	scriptType = ScriptType;
 	lastRunTime = 0;
-	endReached = false;
 }
 
 GameScript::~GameScript(void)
@@ -1445,6 +1445,8 @@ void GameScript::RunNow()
 	lastRunTime = 0;
 }
 
+void nop() {}
+
 void GameScript::Update()
 {
 	if (!MySelf || !(MySelf->GetInternalFlag()&IF_ACTIVE) ) {
@@ -1459,19 +1461,41 @@ void GameScript::Update()
 	if (!script) {
 		return;
 	}
+	if (!memcmp(MySelf->GetScriptName(),"cat",4) ) {
+		if (MySelf->GetNextAction()) {
+			nop();
+		}
+	}
+
+	bool continueExecution = false;
+
 	RandomNumValue=rand();
 	for (unsigned int a = 0; a < script->responseBlocksCount; a++) {
 		ResponseBlock* rB = script->responseBlocks[a];
 		MySelf->InitTriggers();
 		if (EvaluateCondition( MySelf, rB->condition )) {
+			//if this isn't a continue-d block, we have to clear the queue
+			//we cannot clear the queue and cannot execute the new block
+			//if we already have stuff on the queue!
+			if (!continueExecution) {
+				if (MySelf->GetNextAction() ) {
+				  if (MySelf->GetInternalFlag()&IF_NOINT) {
+				    return;
+				  }
+				  if (lastAction==a) {
+				    return;
+				  }
+				  MySelf->ClearActions();
+				}
+				lastAction=a;
+			}
 			continueExecution = ( ExecuteResponseSet( MySelf,
 						rB->responseSet ) != 0 );
-			endReached = false;
 			//clear triggers after response executed
 			//MySelf->ClearTriggers();
 			if (!continueExecution)
 				break;
-			continueExecution = false;
+			//continueExecution = false;
 		}
 	}
 }
@@ -2721,6 +2745,7 @@ int GameScript::ExecuteResponseSet(Scriptable* Sender, ResponseSet* rS)
 	return 0;
 }
 
+//continue is effective only as the last action in the block
 int GameScript::ExecuteResponse(Scriptable* Sender, Response* rE)
 {
 	int ret = 0; // continue or not
@@ -2729,6 +2754,7 @@ int GameScript::ExecuteResponse(Scriptable* Sender, Response* rE)
 		switch (actionflags[aC->actionID] & AF_MASK) {
 			case AF_INSTANT:
 				ExecuteAction( Sender, aC );
+				ret = 0;
 				break;
 			case AF_NONE:
 				if (Sender->GetInternalFlag()&IF_CUTSCENEID) {
@@ -2753,6 +2779,7 @@ int GameScript::ExecuteResponse(Scriptable* Sender, Response* rE)
 					//requires it, so use the code above
 					//AddAction( Sender, aC );
 				}
+				ret = 0;
 				break;
 			case AF_CONTINUE:
 			case AF_MASK:

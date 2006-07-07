@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.243 2006/07/04 18:59:24 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.244 2006/07/07 13:34:25 avenger_teambg Exp $
  *
  */
 
@@ -587,8 +587,10 @@ void Map::UpdateScripts()
 		}
 		for (unsigned int i = 0; i < MAX_SCRIPTS; i++) {
 			if (actor->Scripts[i]) {
+				/* this will be handled by ExecuteScript
 				if (actor->GetNextAction())
 					break;
+				*/
 				actor->ExecuteScript( actor->Scripts[i] );
 			}
 		}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.30 2006/02/17 20:20:00 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.31 2006/07/07 13:34:23 avenger_teambg Exp $
  *
  */
 
@@ -341,6 +341,7 @@ void BMPImp::GetPalette(int index, int colors, Color* pal)
 			pal[i].b = *p++;
 			pal[i].g = *p++;
 			pal[i].r = *p++;
+			pal[i].a = 0xff;
 		}
 	} else if (BitCount == 8) {
 		int p = index;
@@ -348,6 +349,7 @@ void BMPImp::GetPalette(int index, int colors, Color* pal)
 			pal[i].r = Palette[p].r;
 			pal[i].g = Palette[p].g;
 			pal[i].b = Palette[p++].b;
+			pal[i].a = 0xff;
 		}
 	}
 }

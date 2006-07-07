@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.61 2006/07/05 17:51:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.62 2006/07/07 13:34:24 avenger_teambg Exp $
  *
  */
 
@@ -281,7 +281,7 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 			if(flags&DS_NONAME) {
 				core->DisplayString( sb.text );
 			} else {
-				core->DisplayStringName( Strref,0x8080ff,Sender, 0);
+				core->DisplayStringName( Strref,0xf0f0f0,Sender, 0);
 			}
 		}
 		if (flags & DS_HEAD) {
