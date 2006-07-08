@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.394 2006/07/08 15:15:00 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.395 2006/07/08 22:39:33 wjpalenstijn Exp $
  *
  */
 
@@ -2562,25 +2562,25 @@ static PyObject* GemRB_SetButtonMOS(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetButtonPLT__doc,
-"SetButtonPLT(WindowIndex, ControlIndex, PLTResRef, col1, col2, col3, col4, col5, col6, col7, col8)\n\n"
+"SetButtonPLT(WindowIndex, ControlIndex, PLTResRef, col1, col2, col3, col4, col5, col6, col7, col8, type)\n\n"
 "Sets the Picture of a Button Control from a PLT file." );
 
 static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
 	int col[8];
+	int type;
 	char* ResRef;
 
 	memset(col,-1,sizeof(col));
-	if (!PyArg_ParseTuple( args, "iis|iiiiiiii", &WindowIndex, &ControlIndex,
+	if (!PyArg_ParseTuple( args, "iis|iiiiiiiii", &WindowIndex, &ControlIndex,
 			&ResRef, &(col[0]), &(col[1]), &(col[2]), &(col[3]),
-			&(col[4]), &(col[5]), &(col[6]), &(col[7])) ) {
+			&(col[4]), &(col[5]), &(col[6]), &(col[7]), &type) ) {
 		return AttributeError( GemRB_SetButtonPLT__doc );
 	}
 	for (int i=0;i<8;i++) {
-		if (col[i] != -1) col[i] &= 0xFF;
+		if (col[i] != -1) col[i] = (col[i] >> (8*type)) & 0xFF;
 	}
-
 
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
 	if (!btn) {
@@ -2601,8 +2601,15 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 	if (str == NULL ) {
 		str = core->GetResourceMgr()->GetResource( ResRef, IE_BAM_CLASS_ID );
 		if (str == NULL) {
-			printf ("No stream\n");
-			return NULL;
+			printMessage("GUISCript","PLT/BAM not found for ref: ",YELLOW);
+			printf("%s\n", ResRef);
+			textcolor(WHITE);
+			if (type == 0)
+				return NULL;
+			else {
+				Py_INCREF( Py_None );
+				return Py_None;
+			}
 		}
 
 		AnimationMgr* am = ( AnimationMgr* ) core->GetInterface( IE_BAM_CLASS_ID );
@@ -2649,7 +2656,8 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 		}
 	}
 
-	btn->ClearPictureList();
+	if (type == 0)
+		btn->ClearPictureList();
 	btn->StackPicture(Picture);
 	if (Picture2) {
 		btn->StackPicture( Picture2 );
@@ -5464,6 +5472,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "Dialog", PyString_FromResRef (item->Dialog));
 	PyDict_SetItemString(dict, "Price", PyInt_FromLong (item->Price));
 	PyDict_SetItemString(dict, "Type", PyInt_FromLong (item->ItemType));
+	PyDict_SetItemString(dict, "AnimationType", PyString_FromStringAndSize(item->AnimationType, 2));
 
 	int function=0;
 	if (core->CanUseItemType(item->ItemType, SLOT_POTION, 0, 0, NULL) ) {
