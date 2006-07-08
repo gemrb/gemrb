@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.62 2006/07/07 13:34:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.63 2006/07/08 21:18:09 avenger_teambg Exp $
  *
  */
 
@@ -1426,7 +1426,7 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 	Trigger *newTrigger = new Trigger();
 	newTrigger->triggerID = (unsigned short) triggersTable->GetValueIndex( trIndex )&0x3fff;
 	newTrigger->flags = (unsigned short) negate;
-	int mergestrings = triggerflags[newTrigger->triggerID]&AF_MERGESTRINGS;
+	int mergestrings = triggerflags[newTrigger->triggerID]&TF_MERGESTRINGS;
 	int stringsCount = 0;
 	int intCount = 0;
 	//Here is the Trigger; Now we need to evaluate the parameters

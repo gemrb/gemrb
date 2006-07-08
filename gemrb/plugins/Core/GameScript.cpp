@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.367 2006/07/07 13:34:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.368 2006/07/08 21:18:09 avenger_teambg Exp $
  *
  */
 
@@ -576,7 +576,7 @@ static ActionLink actionnames[] = {
 	{"movetopoint", GameScript::MoveToPoint,AF_BLOCKING},
 	{"movetopointnointerrupt", GameScript::MoveToPointNoInterrupt,AF_BLOCKING},
 	{"movetopointnorecticle", GameScript::MoveToPointNoRecticle,AF_BLOCKING},//the same until we know better
-	{"movetosavedlocation", GameScript::MoveToSavedLocation,AF_BLOCKING},
+	{"movetosavedlocation", GameScript::MoveToSavedLocation,AF_MERGESTRINGS|AF_BLOCKING},
 	//take care of the typo in the original bg2 action.ids
 	{"movetosavedlocationn", GameScript::MoveToSavedLocation,AF_BLOCKING},
 	{"moveviewobject", GameScript::MoveViewObject, 0},
@@ -1523,7 +1523,6 @@ void GameScript::EvaluateAllBlocks()
 		ResponseBlock* rB = script->responseBlocks[a];
 		if (EvaluateCondition( MySelf, rB->condition )) {
 			ExecuteResponseSet( MySelf, rB->responseSet );
-			endReached = false;
 		}
 	}
 #else
