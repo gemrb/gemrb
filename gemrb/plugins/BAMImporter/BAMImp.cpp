@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.45 2006/04/16 23:57:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.46 2006/07/08 15:15:00 wjpalenstijn Exp $
  *
  */
 
@@ -478,18 +478,17 @@ Sprite2D* BAMImp::GetPaperdollImage(int *Colors, Sprite2D *&Picture2)
 
 	void *pixels = GetFramePixels(1);
 	Picture2 = core->GetVideoDriver()->CreateSprite8(frames[1].Width, frames[1].Height, 8, pixels, palette->col, true, 0 );
-	//this is the only value we still need for a hack, the relative position
-	//of the lower half (picture2) to the upper half
-	Picture2->XPos = frames[1].XPos-frames[0].XPos;
-	//this gets zeroed out, so why bother
-	//Picture2->YPos = frames[1].YPos;
+
+	fprintf(stderr, "Paperdoll Image:\nPicture1: %dx%d, x: %d, y: %d\nPicture2: %dx%d, x: %d, y:%d\n", frames[0].Width, frames[0].Height, frames[0].XPos, frames[0].YPos, frames[1].Width, frames[1].Height, frames[1].XPos, frames[1].YPos);
+
+	Picture2->XPos = (short)frames[1].XPos;
+	Picture2->YPos = (short)frames[1].YPos - 80;
 
 	pixels = GetFramePixels(0);
 	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8(frames[0].Width, frames[0].Height, 8, pixels, palette->col, true, 0 );
-	/* actually this gets zeroed out later, so why bother
-	spr->XPos = frames[0].XPos;
-	spr->YPos = frames[0].YPos;
-	*/
+	spr->XPos = (short)frames[0].XPos;
+	spr->YPos = (short)frames[0].YPos;
+
 	//don't free pixels, createsprite stores it in spr
 
 	return spr;

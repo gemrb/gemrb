@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.101 2006/07/04 14:31:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.102 2006/07/08 15:14:59 wjpalenstijn Exp $
  *
  */
 
@@ -52,7 +52,6 @@ Button::Button(bool Clear)
 	Flags = IE_GUI_BUTTON_NORMAL;
 	ToggleState = false;
 	Picture = NULL;
-	Picture2 = NULL;
 	Clipping = 1.0;
 	memset( borders, 0, sizeof( borders ));
 }
@@ -76,9 +75,7 @@ Button::~Button()
 	if (Picture) {
 		video->FreeSprite( Picture );
 	}
-	if (Picture2) {
-		video->FreeSprite( Picture2 );
-	}
+	ClearPictureList();
 	if (Text) {
 		free( Text );
 	}
@@ -186,18 +183,17 @@ void Button::Draw(unsigned short x, unsigned short y)
 	}
 
 	// Button picture
-	if (Picture && ( Flags & IE_GUI_BUTTON_PICTURE )) {
-		int h = Picture->Height;
-		if (Picture2) {
-			h += Picture2->Height;
+	if ((Picture || !PictureList.empty()) &&
+		( Flags & IE_GUI_BUTTON_PICTURE )) {
+		if (Picture) {
+			int xOffs = ( Width / 2 ) - ( Picture->Width / 2 );
+			int yOffs = ( Height / 2 ) - ( Picture->Height / 2 );
+			Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(Picture->Width * Clipping), Picture->Height );
+			core->GetVideoDriver()->BlitSprite( Picture, x + XPos + xOffs, y + YPos + yOffs, true, &r );
 		}
-		int xOffs = ( Width / 2 ) - ( Picture->Width / 2 );
-		int yOffs = ( Height / 2 ) - ( h / 2 );
-		Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(Picture->Width * Clipping), h );
-		core->GetVideoDriver()->BlitSprite( Picture, x + XPos + xOffs, y + YPos + yOffs, true, &r );
-		if (Picture2) {
-			core->GetVideoDriver()->BlitSprite( Picture2, x + XPos + xOffs, y + YPos + yOffs + Picture->Height, true, &r );
-		}
+		for (std::list<Sprite2D*>::iterator iter = PictureList.begin();
+			 iter != PictureList.end(); ++iter)
+			core->GetVideoDriver()->BlitSprite( *iter, x + XPos, y + YPos, true );
 	}
 
 	// Button picture
@@ -550,21 +546,25 @@ void Button::SetPicture(Sprite2D* newpic)
 	( ( Window * ) Owner )->Invalidate();
 }
 
-/** Sets the secondary Picture (low half of paperdolls) */
-void Button::SetPicture2(Sprite2D* newpic)
+/** Clears the list of Pictures */
+void Button::ClearPictureList()
 {
-	if (Picture2) {
-		core->GetVideoDriver()->FreeSprite( Picture2 );
-	}
-	if (newpic) {
-	// XPos contains a special adjustment, don't erase it!
-	// Yeah, i know this is the ugliest hack (hacking another hack)
-	//	newpic->XPos = 0;
-		newpic->YPos = 0;
-	}
-	Picture2 = newpic;
+	Video* video = core->GetVideoDriver();
+	for (std::list<Sprite2D*>::iterator iter = PictureList.begin();
+		 iter != PictureList.end(); ++iter)
+		video->FreeSprite( *iter );
+	PictureList.clear();
 	Changed = true;
-	( ( Window * ) Owner )->Invalidate();
+	( ( Window * ) Owner )->Invalidate();	
+}
+
+/** Add picture to the end of the list of Pictures */
+void Button::StackPicture(Sprite2D* Picture)
+{
+	PictureList.push_back(Picture);
+	Changed = true;
+	Flags |= IE_GUI_BUTTON_PICTURE;
+	( ( Window * ) Owner )->Invalidate();	
 }
 
 bool Button::IsPixelTransparent(unsigned short x, unsigned short y)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.51 2006/07/02 09:58:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.52 2006/07/08 15:14:59 wjpalenstijn Exp $
  *
  */
 
@@ -32,6 +32,8 @@
 #include "Control.h"
 #include "Sprite2D.h"
 #include "Font.h"
+
+#include <list>
 
 class Palette;
 
@@ -131,8 +133,10 @@ public:
 	int SetText(const char* string, int pos = 0);
 	/** Sets the Picture */
 	void SetPicture(Sprite2D* Picture);
-	/** Sets the second half Picture of paperdolls */
-	void SetPicture2(Sprite2D* Picture);
+	/** Clears the list of Pictures */
+	void ClearPictureList();
+	/** Add picture to the end of the list of Pictures */
+	void StackPicture(Sprite2D* Picture);
 	/** Sets border/frame parameters */
 	void SetBorder(int index, int dx1, int dy1, int dx2, int dy2, Color* color, bool enabled = false, bool filled = false);
 	/** Sets font used for drawing button label */
@@ -189,7 +193,8 @@ private: // Private attributes
 	Sprite2D* Disabled;
 	/** Pictures to Apply when the hasPicture flag is set */
 	Sprite2D* Picture;
-	Sprite2D* Picture2;
+	/** If non-empty, list of Pictures to draw when hasPicture is set */
+	std::list<Sprite2D*> PictureList;
 	/** The current state of the Button */
 	unsigned char State;
 	double Clipping;

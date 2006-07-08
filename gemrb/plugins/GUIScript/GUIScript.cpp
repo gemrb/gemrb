@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.393 2006/07/04 18:59:25 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.394 2006/07/08 15:15:00 wjpalenstijn Exp $
  *
  */
 
@@ -2577,6 +2577,10 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 			&(col[4]), &(col[5]), &(col[6]), &(col[7])) ) {
 		return AttributeError( GemRB_SetButtonPLT__doc );
 	}
+	for (int i=0;i<8;i++) {
+		if (col[i] != -1) col[i] &= 0xFF;
+	}
+
 
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
 	if (!btn) {
@@ -2645,9 +2649,10 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 		}
 	}
 
-	btn->SetPicture( Picture );
+	btn->ClearPictureList();
+	btn->StackPicture(Picture);
 	if (Picture2) {
-		btn->SetPicture2( Picture2 );
+		btn->StackPicture( Picture2 );
 	}
 
 	Py_INCREF( Py_None );
