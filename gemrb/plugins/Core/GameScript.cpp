@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.368 2006/07/08 21:18:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.369 2006/07/08 21:24:06 avenger_teambg Exp $
  *
  */
 
@@ -1372,6 +1372,10 @@ static Object* DecodeObject(const char* line)
 	line++; //Skip "
 	ParseString( line, oB->objectName );
 	line++; //Skip " (the same as above)
+	//this seems to be needed too
+	if (ExtraParametersCount) {
+		line++;
+	}
 	for (i = 0; i < ExtraParametersCount; i++) {
 		oB->objectFields[i + ObjectFieldsCount] = ParseInt( line );
 	}
