@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.30 2006/07/04 20:28:49 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.31 2006/07/09 08:34:44 avenger_teambg Exp $
  *
  */
 
@@ -3039,14 +3039,16 @@ int fx_add_innate (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_add_innate (%2d): Resource: %s\n", fx->Opcode, fx->Resource );
 	target->LearnSpell(fx->Resource,0);
-	return FX_APPLIED;
+	//this is an instant, so it shouldn't stick
+	return FX_NOT_APPLIED;
 }
 // 0xAC Spell:Remove
 int fx_remove_spell (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_remove_spell (%2d): Resource: %s\n", fx->Opcode, fx->Resource);
 	target->spellbook.RemoveSpell(fx->Resource);
-	return FX_APPLIED;
+	//this is an instant, so it shouldn't stick
+	return FX_NOT_APPLIED;
 }
 // 0xAD PoisonResistanceModifier
 int fx_poison_resistance_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
@@ -3067,7 +3069,8 @@ int fx_playsound (Actor* /*Owner*/, Actor* target, Effect* fx)
 	} else {
 		core->GetSoundMgr()->Play(fx->Resource);
 	}
-	return FX_APPLIED;
+	//this is an instant, it shouldn't stick
+	return FX_NOT_APPLIED;
 }
 
 //0x6d State:Hold3
@@ -3638,7 +3641,7 @@ int fx_wing_buffet (Actor* Owner, Actor* target, Effect* fx)
 	//could be GL_REBOUND too :)
 	//add effect to alter target's stance
 	target->MoveLine( fx->Parameter1, GL_NORMAL, dir );
-	return FX_APPLIED;
+	return FX_NOT_APPLIED;
 }
 
 // 0xec ProjectImage
@@ -4004,7 +4007,7 @@ int fx_teleport_to_target (Actor* /*Owner*/, Actor* target, Effect* fx)
 			target->SetPosition( map, victim->Pos, true, 0 );
 		}
 	}
-	return FX_APPLIED;
+	return FX_NOT_APPLIED;
 }
 // 0x113 HideInShadowsModifier
 int fx_hide_in_shadows_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
