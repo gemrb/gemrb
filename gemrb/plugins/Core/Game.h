@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.81 2006/07/05 11:17:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.82 2006/07/09 08:33:17 avenger_teambg Exp $
  *
  */
 
@@ -343,6 +343,8 @@ public:
 	bool TimerActive(ieDword ID);
 	bool TimerExpired(ieDword ID);
 	void StartTimer(ieDword ID, ieDword expiration);
+	/** updates current area music */
+	void ChangeSong();
 	/** Dumps information about the object */
 	void DebugDump();
 };

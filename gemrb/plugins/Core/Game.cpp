@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.120 2006/07/07 13:34:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.121 2006/07/09 08:33:17 avenger_teambg Exp $
  *
  */
 
@@ -318,7 +318,7 @@ int Game::JoinParty(Actor* actor, int join)
 		actor->Pos.x = actor->Destination.x = atoi( strta->QueryField( playmode, actor->InParty-1 ) );
 		actor->Pos.y = actor->Destination.y = atoi( strta->QueryField( playmode + 1, actor->InParty-1 ) );
 		core->DelTable( saindex );
-    SelectActor(actor,true, SELECT_QUIET);
+		SelectActor(actor,true, SELECT_QUIET);
 	}
 
 	return ( int ) size;
@@ -483,6 +483,9 @@ Map *Game::GetMap(const char *areaname, bool change)
 			MapIndex = index;
 			area = GetMap(index);
 			memcpy (CurrentArea, areaname, 8);
+	                area->SetupAmbients();
+	                ChangeSong();
+			return area;
 		}
 		return GetMap(index);
 	}
@@ -958,7 +961,7 @@ void Game::UpdateScripts()
 		size_t acnt=Attackers.size();
 		if (acnt) {
 			CombatCounter++;
-		}    
+		}
 	}
 	ExecuteScript( Scripts[0] );
 	ProcessActions(false);
@@ -1104,6 +1107,10 @@ void Game::InAttack(ieDword globalID)
 		if (*idx==globalID) return;
 	}
 	Attackers.push_back(globalID);
+	if (!CombatCounter) {
+		CombatCounter++;
+		ChangeSong();
+	}
 }
 
 void Game::OutAttack(ieDword globalID)
@@ -1113,9 +1120,28 @@ void Game::OutAttack(ieDword globalID)
 	for(idx=Attackers.begin(); idx!=Attackers.end();idx++) {
 		if (*idx==globalID) {
 			Attackers.erase(idx);
+			if (!Attackers.size()) {
+				CombatCounter = 0;
+				ChangeSong();
+			}
 			break;
 		}
 	}
+}
+
+void Game::ChangeSong()
+{
+	int Song;
+
+	if (CombatCounter) {
+		//battlesong
+		Song = 3;
+	} else {
+		//night or day
+		Song = GameTime%7200/3600;
+	}
+	//area may override the song played (stick in battlemusic)
+	area->PlayAreaSong( Song );
 }
 
 int Game::AttackersOf(ieDword globalID) const
@@ -1175,5 +1201,7 @@ void Game::DebugDump()
 
 		printf("%s\n",map->GetScriptName());
 	}
+	printf("CombatCounter: %d\n", (int) CombatCounter);
+	printf("Attackers count: %d\n", (int) Attackers.size());
 }
 

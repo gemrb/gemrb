@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.198 2006/07/06 22:33:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.199 2006/07/09 08:33:17 avenger_teambg Exp $
  *
  */
 
@@ -1402,7 +1402,7 @@ void Actor::ReinitQuickSlots()
 			//(afaik)
 			if (!inventory.HasItemInSlot("", slot)) {				
 				if (core->QuerySlotEffects(slot)==SLOT_EFFECT_MELEE) {
-				  slot = inventory.GetFistSlot();
+					slot = inventory.GetFistSlot();
 				} else {
 					slot = 0xffff;
 				}
@@ -1615,27 +1615,34 @@ void Actor::SetTarget( Scriptable *target)
 		//must be added to the list of combatants
 		core->GetGame()->InAttack(tar->LastAttacker);
 	}
-	//calculate attack style
-	//set stance correctly based on attack style
 	SetOrientation( GetOrient( target->Pos, Pos ), false );
-	SetStance( IE_ANI_ATTACK);
 	SetWait( 1 );
+}
+
+//in case of LastTarget = 0
+void Actor::StopAttack()
+{
+	SetStance(IE_ANI_READY);
+	core->GetGame()->OutAttack(GetID());
+	InternalFlags|=IF_TARGETGONE; //this is for the trigger!
+	if (InParty) {
+		core->Autopause(AP_NOTARGET);
+	}
 }
 
 //calculate how many attacks will be performed
 //in the next round
+//only called when Game thinks we are in attack
+//so it is safe to do cleanup here (it will be called only once)
 void Actor::InitRound(ieDword gameTime, bool secondround)
 {
 	attackcount = 0;
 	if (!LastTarget) {
+		StopAttack();
 		return;
 	}
-	//if held or disabled, etc, then attackcount = 0
-	unsigned int stance = GetStance();
-	//probably there are more subtypes (twohand attacks)
-	if (stance!=IE_ANI_ATTACK && stance!=IE_ANI_SHOOT && stance!=IE_ANI_ATTACK_SLASH && stance!=IE_ANI_ATTACK_BACKSLASH && stance !=IE_ANI_ATTACK_JAB) {
-		return;
-	}
+ 
+	//if held or disabled, etc, then cannot continue attacking
 	ieDword state = GetStat(IE_STATE_ID);
 	if (state&STATE_CANTMOVE) {
 		return;
@@ -1646,6 +1653,7 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 	if (GetStat(IE_HELD)) {
 		return;
 	}
+	SetStance(IE_ANI_ATTACK);
 	//last chance to disable attacking
 	//
 	attackcount = GetStat(IE_NUMBEROFATTACKS);
@@ -1714,6 +1722,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 	attackcount--;
 	if (!LastTarget) {
+		StopAttack();
 		return;
 	}
 	//get target
@@ -1725,10 +1734,6 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	if (!target) {
 		LastTarget = 0;
-		InternalFlags|=IF_TARGETGONE; //this is for the trigger!
-		if (InParty) {
-			core->Autopause(AP_NOTARGET);
-		}
 		return;
 	}
 	//which hand is used
@@ -1751,11 +1756,15 @@ void Actor::PerformAttack(ieDword gameTime)
 	case ITEM_AT_BOW:
 		if (!GetRangedWeapon(rangedheader)) {
 			//out of ammo event
+			//try to refill
+			SetStance(IE_ANI_READY);
 			return;
 		}
+		SetStance(IE_ANI_READY);
 		return;
 	default:
 		//item is unsuitable for fight
+		SetStance(IE_ANI_READY);
 		return;
 	}//melee or ranged
 	if (leftorright) Flags|=WEAPON_LEFTHAND;

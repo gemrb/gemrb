@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.288 2006/07/03 22:12:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.289 2006/07/09 08:33:17 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1753,18 +1753,7 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 		if (pc) {
 			areaname = pc->Area;
 		}
-		Map *map = game->GetMap( areaname, true );
-		map->SetupAmbients();
-		int Song;
-		if (game->CombatCounter) {
-			//battlesong
-			Song = 3;
-		} else {
-			//night or day
-			Song = game->GameTime%7200/3600;
-		}
-		map->PlayAreaSong( Song );
-
+		game->GetMap( areaname, true );
 		ScreenFlags|=SF_CENTERONACTOR;
 	}
 	//center on first selected actor
