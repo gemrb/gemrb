@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.395 2006/07/08 22:39:33 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.396 2006/07/09 10:54:41 wjpalenstijn Exp $
  *
  */
 
@@ -5397,6 +5397,40 @@ static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
 	return dict;
 }
 
+
+PyDoc_STRVAR( GemRB_CanUseItemType__doc,
+"CanUseItemType(itemtype, slottype[, use1, use2, actor])=>bool\n\n"
+"Checks the itemtype vs. slottype, and also checks the usability flags vs. Actor's stats (alignment, class, race, kit etc.)" );
+
+static PyObject* GemRB_CanUseItemType(PyObject * /*self*/, PyObject* args)
+{
+	int ItemType, SlotType, use1, use2, PartyID;
+
+	use1 = 0;
+	use2 = 0;
+	PartyID = 0;
+	if (!PyArg_ParseTuple( args, "ii|iii", &ItemType, &SlotType, &use1, &use2, &PartyID)) {
+		return AttributeError( GemRB_CanUseItemType__doc );
+	}
+
+	Actor* actor = 0;
+	if (PartyID) {
+		Game *game = core->GetGame();
+		actor = game->FindPC( PartyID );
+		if (!actor) {
+			return RuntimeError( "Actor not found" );
+		}
+	}
+
+	if (core->CanUseItemType(ItemType, SlotType, use1, use2, actor)) {
+		return PyInt_FromLong(1);
+	} else {
+		return PyInt_FromLong(0);
+	}
+}
+
+
+
 PyDoc_STRVAR( GemRB_GetSlots__doc,
 "GetSlots(PartyID, SlotType)=>dict\n\n"
 "Returns a tuple of slots of the inventory of a PC matching the slot type criteria." );
@@ -6694,6 +6728,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(UnmemorizeSpell, METH_VARARGS),
 	METHOD(GetSlotItem, METH_VARARGS),
 	METHOD(GetSlots, METH_VARARGS),
+	METHOD(CanUseItemType, METH_VARARGS),
 	METHOD(GetItem, METH_VARARGS),
 	METHOD(DragItem, METH_VARARGS),
 	METHOD(DropDraggedItem, METH_VARARGS),
