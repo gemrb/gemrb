@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.41 2006/07/09 16:28:09 wjpalenstijn Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.42 2006/07/11 20:34:50 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -254,14 +254,14 @@ def RefreshInventoryWindow ():
 	slot_item = GemRB.GetSlotItem (pc, 10+GemRB.GetEquippedQuickSlot(pc) )
 	if slot_item:
 		item = GemRB.GetItem (slot_item["ItemResRef"])
-		if (item['AnimationType'] != '  '):
+		if (item['AnimationType'] != ''):
 			GemRB.SetButtonPLT(Window, Button, "WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 1)
 		
 	# Shield
 	slot_item = GemRB.GetSlotItem (pc, 3)
 	if slot_item:
 		item = GemRB.GetItem (slot_item["ItemResRef"])
-		if (item['AnimationType'] != '  '):
+		if (item['AnimationType'] != ''):
 			if (GemRB.CanUseItemType(item['Type'], SLOT_WEAPON)):
 				# off-hand weapon
 				GemRB.SetButtonPLT(Window, Button, "WP" + size + item['AnimationType'] + "OIN", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 2)
@@ -273,7 +273,7 @@ def RefreshInventoryWindow ():
 	slot_item = GemRB.GetSlotItem (pc, 1)
 	if slot_item:
 		item = GemRB.GetItem (slot_item["ItemResRef"])
-		if (item['AnimationType'] != '  '):
+		if (item['AnimationType'] != ''):
 			GemRB.SetButtonPLT(Window, Button, "WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 3)
 
 	# encumbrance
