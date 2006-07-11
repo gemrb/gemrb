@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.18 2006/06/19 21:01:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.19 2006/07/11 16:21:34 avenger_teambg Exp $
  *
  */
 
@@ -80,6 +80,11 @@ Item* ITMImp::GetItem(Item *s)
 	str->ReadWord( &s->ItemType );
 	str->ReadDword( &s->UsabilityBitmask );
 	str->Read( s->AnimationType,2 ); //intentionally not reading word!
+	for (i=0;i<2;i++) {
+		if (s->AnimationType[i]==' ') {
+			s->AnimationType[i]=0;
+		}
+	}
 	str->ReadWord( &s->MinLevel );
 	str->Read( &s->MinStrength,1 );
 	str->Read( &s->unknown2,1 );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.396 2006/07/09 10:54:41 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.397 2006/07/11 16:21:32 avenger_teambg Exp $
  *
  */
 
@@ -117,6 +117,17 @@ inline PyObject* PyString_FromResRef(char* ResRef)
 		if (ResRef[i]==0) break;
 	}
 	return PyString_FromStringAndSize( ResRef, i );
+}
+
+// Like PyString_FromString(), but for ResRef
+inline PyObject* PyString_FromAnimID(char* AnimID)
+{
+	unsigned int i;
+
+	for (i = 0; i < 2; i++) {
+		if (AnimID[i]==0) break;
+	}
+	return PyString_FromStringAndSize( AnimID, i );
 }
 
 /* Sets RuntimeError exception and returns NULL, so this function
@@ -5506,7 +5517,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "Dialog", PyString_FromResRef (item->Dialog));
 	PyDict_SetItemString(dict, "Price", PyInt_FromLong (item->Price));
 	PyDict_SetItemString(dict, "Type", PyInt_FromLong (item->ItemType));
-	PyDict_SetItemString(dict, "AnimationType", PyString_FromStringAndSize(item->AnimationType, 2));
+	PyDict_SetItemString(dict, "AnimationType", PyString_FromAnimID(item->AnimationType));
 
 	int function=0;
 	if (core->CanUseItemType(item->ItemType, SLOT_POTION, 0, 0, NULL) ) {
