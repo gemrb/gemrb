@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.397 2006/07/11 16:21:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.398 2006/07/14 21:02:13 avenger_teambg Exp $
  *
  */
 
@@ -5386,13 +5386,19 @@ static PyObject* GemRB_GetSlotItem(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "ii", &PartyID, &Slot)) {
 		return AttributeError( GemRB_GetSlotItem__doc );
 	}
-	Game *game = core->GetGame();
-	Actor* actor = game->FindPC( PartyID );
-	if (!actor) {
-		return RuntimeError( "Actor not found" );
-	}
+	CREItem *si;
 
-	CREItem* si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );
+	if (PartyID==0) {
+		si = core->GetDraggedItem();
+	} else {
+		Game *game = core->GetGame();
+		Actor *actor = game->FindPC( PartyID );
+		if (!actor) {
+			return RuntimeError( "Actor not found" );
+		}
+
+		si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );
+	}
 	if (! si) {
 		Py_INCREF( Py_None );
 		return Py_None;

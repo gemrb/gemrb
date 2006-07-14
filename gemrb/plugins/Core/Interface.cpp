@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.410 2006/07/07 13:34:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.411 2006/07/14 21:02:12 avenger_teambg Exp $
  *
  */
 
@@ -3484,7 +3484,7 @@ int Interface::CanUseItemType(int itype, int slottype, ieDword /*use1*/, ieDword
 	if ( slottype<0 ) { 
 		return 1;
 	}
-	if ( itype>=ItemTypes ) {
+	if ( (unsigned int) itype>=(unsigned int) ItemTypes) {
 		//invalid itemtype
 		return 0;
 	}
