@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.42 2006/07/11 20:34:50 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.43 2006/07/14 21:03:22 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -353,6 +353,14 @@ def UpdateSlot (pc, slot):
 	if not SlotType["ID"]:
 		return
 
+	if GemRB.IsDraggingItem():
+		#get dragged item
+		drag_item = GemRB.GetSlotItem(0,0)
+		drag_item = GemRB.GetItem (drag_item["ItemResRef"])
+		itemtype = drag_item["Type"]
+	else:
+		itemtype = -1
+
 	Button = GemRB.GetControl (Window, SlotType["ID"])
 	slot_item = GemRB.GetSlotItem (pc, slot+1)
 
@@ -379,12 +387,13 @@ def UpdateSlot (pc, slot):
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenItemInfoWindow")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "OpenItemAmountWindow")
 	else:
-
 		if SlotType["ResRef"]=="*":
 			GemRB.SetButtonBAM (Window, Button, "",0,0,0)
+			itemtype = -1
 		elif SlotType["ResRef"]=="":
 			GemRB.SetButtonBAM (Window, Button, "",0,0,0)
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+			itemtype = -1
 		else:
 			GemRB.SetButtonBAM (Window, Button, SlotType["ResRef"],0,0,0)
 		GemRB.SetText (Window, Button, "")
@@ -394,6 +403,11 @@ def UpdateSlot (pc, slot):
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
+
+	if itemtype>=0 and GemRB.CanUseItemType(itemtype, SlotType["Type"]):
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_PRESSED)
+	else:
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 	return
 
 def OnDragItemGround ():
@@ -411,9 +425,11 @@ def OnDragItemGround ():
 	return
 
 def OnAutoEquip ():
+	print "AUTOEQUP"
 	if not GemRB.IsDraggingItem ():
 		return
 
+	print "AUTOEQUP"
 	pc = GemRB.GameGetSelectedPCSingle ()
 	#don't try to put stuff in the inventory
 	for i in range (21):
