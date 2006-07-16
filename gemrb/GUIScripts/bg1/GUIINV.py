@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.11 2006/07/04 14:31:27 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.12 2006/07/16 15:00:28 avenger_teambg Exp $
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
 
@@ -27,6 +27,7 @@ import GemRB
 import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
+from ie_slots import *
 from GUICommon import CloseOtherWindow
 from GUICommonWindows import *
 
@@ -219,7 +220,37 @@ def RefreshInventoryWindow ():
 	Color6 = GemRB.GetPlayerStat (pc, IE_METAL_COLOR)
 	Color7 = GemRB.GetPlayerStat (pc, IE_ARMOR_COLOR)
 	GemRB.SetButtonPLT (Window, Button, GetActorPaperDoll (pc),
-		Color5, Color4, Color3, Color2, Color6, Color7, Color1, 0)
+		Color5, Color4, Color3, Color2, Color6, Color7, Color1, 0, 0)
+
+	PortraitTable = GemRB.LoadTable ("PDOLLS")
+	anim_id = GemRB.GetPlayerStat (pc, IE_ANIMATION_ID)
+	row = "0x%04X" %anim_id
+	size = GemRB.GetTableValue (PortraitTable, row, "SIZE")
+
+	# Weapon
+	slot_item = GemRB.GetSlotItem (pc, 10+GemRB.GetEquippedQuickSlot(pc) )
+	if slot_item:
+		item = GemRB.GetItem (slot_item["ItemResRef"])
+		if (item['AnimationType'] != ''):
+			GemRB.SetButtonPLT(Window, Button, "WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 1)
+	# Shield
+	slot_item = GemRB.GetSlotItem (pc, 3)
+	if slot_item:
+		item = GemRB.GetItem (slot_item["ItemResRef"])
+		if (item['AnimationType'] != ''):
+			if (GemRB.CanUseItemType(item['Type'], SLOT_WEAPON)):
+				# off-hand weapon
+				GemRB.SetButtonPLT(Window, Button, "WP" + size + item['AnimationType'] + "OIN", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 2)
+			else:
+				# shield
+				GemRB.SetButtonPLT(Window, Button, "WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 2)
+
+	# Helmet
+	slot_item = GemRB.GetSlotItem (pc, 1)
+	if slot_item:
+		item = GemRB.GetItem (slot_item["ItemResRef"])
+		if (item['AnimationType'] != ''):
+			GemRB.SetButtonPLT(Window, Button, "WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 3)
 
 	# encumbrance
 	SetEncumbranceLabels( Window, 0x10000043, 0x10000044, pc)
