@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.24 2006/04/13 18:40:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.25 2006/07/16 18:39:38 wjpalenstijn Exp $
  *
  */
 
@@ -131,7 +131,11 @@ PluginMgr::PluginMgr(char* pluginpath)
 		printf( "%s", path );
 		textcolor( WHITE );
 		printf( "..." );
-		void* hMod = dlopen( path, RTLD_NOW ); //Try to load the Module
+
+		// Try to load the Module
+		// Note: the RTLD_GLOBAL is necessary to export symbols to modules
+		//       which python may have to dlopen (-wjp, 20060716)
+		void* hMod = dlopen( path, RTLD_NOW | RTLD_GLOBAL ); 
 		if (hMod == NULL) {
 			printBracket( "ERROR", LIGHT_RED );
 			printf( "\nCannot Load Module, Skipping...\n%s\n", dlerror() );
