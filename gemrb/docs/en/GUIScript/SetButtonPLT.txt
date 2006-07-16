@@ -8,6 +8,10 @@ WindowIndex, ControlIndex  - the control's reference
 PLTResRef                  - the name of the picture (a .plt resref)
 col1-8                     - color gradients
 type                       - the byte to use from the gradients
+  0 Body (robe or armour)
+  1 Weapon
+  2 Shield
+  3 Helmet
 
 Return value: N/A
 
