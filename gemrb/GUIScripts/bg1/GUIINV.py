@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.12 2006/07/16 15:00:28 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.13 2006/07/18 16:21:27 avenger_teambg Exp $
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
 
@@ -65,7 +65,7 @@ def OpenInventoryWindow ():
 	# ground items scrollbar
 	ScrollBar = GemRB.GetControl (Window, 66)
 	GemRB.SetEvent (Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "RefreshInventoryWindow")
-	
+
 	#major & minor clothing color
 	Button = GemRB.GetControl (Window, 62)
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE,OP_OR)
@@ -102,7 +102,7 @@ def OpenInventoryWindow ():
 	#info label, game paused, etc
 	Label = GemRB.GetControl (Window, 0x1000003f)
 	GemRB.SetText (Window, Label, "")
-	
+
 	SlotCount = GemRB.GetSlotType (-1)["Count"]
 	for slot in range (SlotCount):
 		SlotType = GemRB.GetSlotType (slot+1)
