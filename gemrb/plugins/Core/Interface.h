@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.198 2006/07/06 22:33:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.199 2006/07/19 17:44:10 avenger_teambg Exp $
  *
  */
 
@@ -452,6 +452,7 @@ public:
 	/*reads the filenames of the sounds folder into a list */
 	int GetCharSounds(TextArea *ta);
 	unsigned int GetInventorySize() const { return SlotTypes-1; }
+	ieDword FindSlot(unsigned int idx) const;
 	ieDword QuerySlot(unsigned int idx) const;
 	ieDword QuerySlotType(unsigned int idx) const;
 	ieDword QuerySlottip(unsigned int idx) const;

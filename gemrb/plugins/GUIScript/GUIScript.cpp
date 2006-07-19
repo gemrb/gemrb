@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.398 2006/07/14 21:02:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.399 2006/07/19 17:44:11 avenger_teambg Exp $
  *
  */
 
@@ -5630,6 +5630,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 
 	core->GetVideoDriver()->SetDragCursor (Picture);
 
+	core->GetGUIScriptEngine()->RunFunction("UpdateAnimation");
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -5708,6 +5709,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		core->GetVideoDriver()->SetDragCursor (NULL);
 	} 
 
+	core->GetGUIScriptEngine()->RunFunction("UpdateAnimation");
 	return PyInt_FromLong( res );
 }
 
@@ -6540,14 +6542,14 @@ static PyObject* GemRB_GetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 	if (actor->PCStats) {
 		for(int i=0;i<4;i++) {
 			if (ret == actor->PCStats->QuickWeaponSlots[i]) {
-				ret = i;
+				ret = i+actor->inventory.GetWeaponSlot();
 				break;
 			}
 		}
-	} else {
+	} /*else {
 		ret-=actor->inventory.GetWeaponSlot();
-	}
-	return PyInt_FromLong( ret );
+	}*/
+	return PyInt_FromLong( core->FindSlot(ret) );
 }
 
 PyDoc_STRVAR( GemRB_SetModalState__doc,

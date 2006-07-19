@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.411 2006/07/14 21:02:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.412 2006/07/19 17:44:10 avenger_teambg Exp $
  *
  */
 
@@ -3423,6 +3423,18 @@ bool Interface::InitItemTypes()
 		DelTable( SlotTypeTable );
 	}
 	return (it && st);
+}
+
+ieDword Interface::FindSlot(unsigned int idx) const
+{
+	ieDword i;
+
+	for (i=0;i<SlotTypes;i++) {
+		if (idx==slottypes[i].slot) {
+			break;
+		}
+	}
+	return i;
 }
 
 ieDword Interface::QuerySlot(unsigned int idx) const
