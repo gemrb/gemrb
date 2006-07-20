@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.14 2006/07/19 17:44:08 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.15 2006/07/20 17:33:38 avenger_teambg Exp $
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
 
@@ -296,15 +296,15 @@ def RefreshInventoryWindow ():
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnDragItemGround")
 		Slot = GemRB.GetContainerItem (pc, i+TopIndex)
 		if Slot != None:
-			Item = GemRB.GetItem (Slot['ItemResRef'])
+			item = GemRB.GetItem (Slot['ItemResRef'])
 			identified = Slot["Flags"] & IE_INV_ITEM_IDENTIFIED
 			GemRB.SetItemIcon (Window, Button, Slot['ItemResRef'],0)
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
 			if not identified or item["ItemNameIdentified"] == -1:
-				GemRB.SetTooltip (Window, Button, Item["ItemName"])
+				GemRB.SetTooltip (Window, Button, item["ItemName"])
 				GemRB.EnableButtonBorder (Window, Button, 0, 1)
 			else:
-				GemRB.SetTooltip (Window, Button, Item["ItemNameIdentified"])
+				GemRB.SetTooltip (Window, Button, item["ItemNameIdentified"])
 				GemRB.EnableButtonBorder (Window, Button, 0, 0)
 
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OnDragItemGround")
@@ -328,6 +328,14 @@ def UpdateSlot (pc, slot):
 	SlotType = GemRB.GetSlotType (slot+1, pc)
 	if not SlotType["ID"]:
 		return
+
+	if GemRB.IsDraggingItem():
+		#get dragged item
+		drag_item = GemRB.GetSlotItem(0,0)
+		drag_item = GemRB.GetItem (drag_item["ItemResRef"])
+		itemtype = drag_item["Type"]
+	else:
+		itemtype = -1
 
 	Button = GemRB.GetControl (Window, SlotType["ID"])
 	slot_item = GemRB.GetSlotItem (pc, slot+1)
@@ -357,9 +365,11 @@ def UpdateSlot (pc, slot):
 	else:
 		if SlotType["ResRef"]=="*":
 			GemRB.SetButtonBAM (Window, Button, "",0,0,0)
+			itemtype = -1
 		elif SlotType["ResRef"]=="":
 			GemRB.SetButtonBAM (Window, Button, "",0,0,0)
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+			itemtype = -1
 		else:
 			GemRB.SetButtonBAM (Window, Button, SlotType["ResRef"],0,0,0)
 		GemRB.SetText (Window, Button, "")
@@ -369,6 +379,15 @@ def UpdateSlot (pc, slot):
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
+
+	if itemtype>=0 and GemRB.CanUseItemType(itemtype, SlotType["Type"]):
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_PRESSED)
+	else:
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
+
+	if slot_item and (GemRB.GetEquippedQuickSlot (pc)==slot+1):
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_PRESSED)
+
 	return
 
 def OnDragItemGround ():
