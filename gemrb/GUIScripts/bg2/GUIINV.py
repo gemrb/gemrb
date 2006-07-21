@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.45 2006/07/19 18:22:48 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.46 2006/07/21 15:14:47 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -405,12 +405,12 @@ def UpdateSlot (pc, slot):
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
 
 	if itemtype>=0 and GemRB.CanUseItemType(itemtype, SlotType["Type"]):
-		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_PRESSED)
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SECOND)
 	else:
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 
 	if slot_item and (GemRB.GetEquippedQuickSlot (pc)==slot+1):
-		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_PRESSED)
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SECOND)
 
 	return
 

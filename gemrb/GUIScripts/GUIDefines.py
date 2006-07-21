@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.50 2006/05/22 16:26:38 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.51 2006/07/21 15:14:46 avenger_teambg Exp $
 
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
@@ -85,6 +85,10 @@ IE_GUI_BUTTON_SELECTED   = 0x00000002
 IE_GUI_BUTTON_DISABLED   = 0x00000003
 # Like DISABLED, but processes MouseOver events and draws UNPRESSED bitmap
 IE_GUI_BUTTON_LOCKED   = 0x00000004
+# Draws DISABLED bitmap, but it isn't disabled
+IE_GUI_BUTTON_THIRD    = 0x00000005
+# Draws PRESSED bitmap, but it isn't shifted
+IE_GUI_BUTTON_SECOND   = 0x00000006
 
 #edit field states
 IE_GUI_EDIT_NUMBER    =  0x030000001

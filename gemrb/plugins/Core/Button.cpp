@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.102 2006/07/08 15:14:59 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.103 2006/07/21 15:14:47 avenger_teambg Exp $
  *
  */
 
@@ -100,6 +100,7 @@ void Button::SetImage(unsigned char type, Sprite2D* img)
 			}
 			break;
 
+		case IE_GUI_BUTTON_SECOND:
 		case IE_GUI_BUTTON_PRESSED:
 			 {
 				if (Pressed && Clear)
@@ -148,6 +149,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 				Image = Unpressed;
 				break;
 
+			case IE_GUI_BUTTON_SECOND:
 			case IE_GUI_BUTTON_PRESSED:
 				Image = Pressed;
 				if (! Image)
@@ -247,7 +249,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 /** Sets the Button State */
 void Button::SetState(unsigned char state)
 {
-  if (state > IE_GUI_BUTTON_THIRD) {// If wrong value inserted
+	if (state > IE_GUI_BUTTON_SECOND) {// If wrong value inserted
 		return;
 	}
 	if (State != state) {
