@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.114 2006/06/21 19:38:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.115 2006/07/22 12:39:55 avenger_teambg Exp $
  *
  */
 
@@ -270,9 +270,9 @@ public:
 		WallCount = count;
 		Walls = walls;	
 	}
-	//void AddWallGroup(WallGroup* wg);
 	SpriteCover* BuildSpriteCover(int x, int y, int xpos, int ypos,
 			  unsigned int width, unsigned int height, int flag);
+	void ActivateWallgroups(unsigned int baseindex, unsigned int count, int flg);
 	void Shout(Actor* actor, int shoutID, unsigned int radius);
 	void AddActor(Actor* actor);
 	int GetBlocked(unsigned int x, unsigned int y);

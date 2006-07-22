@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.244 2006/07/07 13:34:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.245 2006/07/22 12:39:55 avenger_teambg Exp $
  *
  */
 
@@ -1261,6 +1261,31 @@ SpriteCover* Map::BuildSpriteCover(int x, int y, int xpos, int ypos,
 	}
 
 	return sc;
+}
+
+void Map::ActivateWallgroups(unsigned int baseindex, unsigned int count, int flg)
+{
+	unsigned int i;
+
+	if (!Walls) {
+		return;
+	}
+	for(i=baseindex; i < baseindex+count; ++i) {
+		Wall_Polygon* wp = GetWallGroup(i);
+		if (!wp)
+			continue;
+		ieDword value=wp->GetPolygonFlag();
+		if (flg)
+			value&=~WF_DISABLED;
+		else
+			value|=WF_DISABLED;
+		wp->SetPolygonFlag(value);
+	}
+	//all actors will have to generate a new spritecover
+	i=actors.size();
+	while(i--) {
+		actors[i]->SetSpriteCover(NULL);
+	}
 }
 
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.cpp,v 1.20 2006/01/03 17:16:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.cpp,v 1.21 2006/07/22 12:39:55 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "Polygon.h"
@@ -365,6 +365,8 @@ void Wall_Polygon::SetBaseline(Point &a, Point &b)
 
 bool Wall_Polygon::PointCovered(Point &p)
 {
+	if (wall_flag&WF_DISABLED)
+		return false;
 	if (wall_flag&WF_BASELINE) {
 		if (base0.x > base1.x)
 			return left(base0, base1, p);

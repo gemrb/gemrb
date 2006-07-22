@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.149 2006/07/09 08:33:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.150 2006/07/22 12:39:54 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -978,6 +978,7 @@ void Door::ToggleTiles(int State, bool playsound)
 	for (i = 0; i < count; i++) {
 		overlay->tiles[tiles[i]]->tileIndex = state;
 	}
+
 	//set door_open as state
 	Flags = (Flags & ~DOOR_OPEN) | (State==!core->HasFeature(GF_REVERSE_DOOR) );
 }
@@ -1074,12 +1075,15 @@ void Door::SetDoorOpen(bool Open, bool playsound, ieDword ID)
 	}
 	if (Open) {
 		LastEntered = ID; //used as lastOpener
-		SetDoorLocked (false,playsound);
+		SetDoorLocked(false,playsound);
 	} else {
 		LastTrigger = ID; //used as lastCloser
 	}
-	ToggleTiles (Open, playsound);
-	UpdateDoor ();
+	ToggleTiles(Open, playsound);
+	//synchronising other data with the door state
+	UpdateDoor();
+	area->ActivateWallgroups(open_wg_index, open_wg_count, Flags&DOOR_OPEN);
+	area->ActivateWallgroups(closed_wg_index, closed_wg_count, !(Flags&DOOR_OPEN));
 }
 
 void Door::SetPolygon(bool Open, Gem_Polygon* poly)

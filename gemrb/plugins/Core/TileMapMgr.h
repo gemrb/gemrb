@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMapMgr.h,v 1.6 2005/10/22 16:30:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMapMgr.h,v 1.7 2006/07/22 12:39:55 avenger_teambg Exp $
  *
  */
 
@@ -46,8 +46,14 @@ public:
 	virtual TileMap* GetTileMap() = 0;
 	virtual ieWord* GetDoorIndices(char* ResRef, int* count,
 		bool& BaseClosed) = 0;
+  virtual void SetupOpenDoor(unsigned int &index, unsigned int &count) = 0;
+  virtual void SetupClosedDoor(unsigned int &index, unsigned int &count) = 0;
+
 	virtual Wall_Polygon** GetWallGroups() = 0;
+  //returns only the wall polygon counts
 	virtual ieDword GetWallPolygonsCount() = 0;
+  //returns Wall + Door polygon counts
+  virtual ieDword GetPolygonsCount() = 0;
 };
 
 #endif

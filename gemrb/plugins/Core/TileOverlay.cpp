@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.22 2006/02/26 14:57:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileOverlay.cpp,v 1.23 2006/07/22 12:39:55 avenger_teambg Exp $
  *
  */
 
@@ -86,10 +86,15 @@ void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays)
 	for (int y = sy; y < dy && y < h; y++) {
 		for (int x = sx; x < dx && x < w; x++) {
 			Tile* tile = tiles[( y* w ) + x];
-			vid->BlitSprite( tile->anim[0]->NextFrame(),
-				viewport.x + ( x * 64 ), viewport.y + ( y * 64 ),
-				false, &viewport );
-			if (!tile->om) {
+
+			//draw door tiles if there are any
+			Animation* anim = tile->anim[tile->tileIndex];
+			if (!anim && tile->tileIndex) {
+				anim = tile->anim[0];
+			}
+			vid->BlitSprite( anim->NextFrame(), viewport.x + ( x * 64 ),
+				viewport.y + ( y * 64 ), false, &viewport );
+			if (!tile->om || tile->tileIndex) {
 				continue;
 			}
 
@@ -102,12 +107,12 @@ void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays)
 					if (tile->om & mask) {
 						if (RedrawTile) {
 							vid->BlitSprite( ovtile->anim[0]->NextFrame(),
-							    viewport.x + ( x * 64 ), viewport.y + ( y * 64 ),
-							    false, &viewport );
+								viewport.x + ( x * 64 ), viewport.y + ( y * 64 ),
+								false, &viewport );
 						} else {
 							vid->BlitSpriteHalfTrans( ovtile->anim[0]->NextFrame(),
-							    viewport.x + ( x * 64 ), viewport.y + ( y * 64 ),
-							    false, &viewport );
+								viewport.x + ( x * 64 ), viewport.y + ( y * 64 ),
+								false, &viewport );
 						}
 					}
 				}

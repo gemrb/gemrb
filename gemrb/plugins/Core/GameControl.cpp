@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.289 2006/07/09 08:33:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.290 2006/07/22 12:39:55 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -314,13 +314,16 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		for (unsigned int i = 0; i < count; ++i) {
 			Wall_Polygon* poly = area->GetWallGroup(i);
 			if (!poly) continue;
-
 			// yellow
 			Color c;
 			c.r = 0x7F;
 			c.g = 0x7F;
 			c.b = 0;
 			c.a = 0;
+			//if polygon is disabled, make it grey
+			if (poly->wall_flag&WF_DISABLED) {
+				c.b = 0x7F;
+			}
 
 			core->GetVideoDriver()->DrawPolyline( poly, c, true );
 		}

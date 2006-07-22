@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.21 2006/02/22 18:38:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.22 2006/07/22 12:39:55 avenger_teambg Exp $
  *
  */
 
@@ -24,6 +24,16 @@
 #include "../Core/TileSetMgr.h"
 #include "../Core/Interface.h"
 #include "../Core/ResourceMgr.h"
+
+typedef struct {
+	ieDword FirstVertex;
+	ieDword CountVertex;
+	ieWord Flags;
+	ieWord MinX, MaxX, MinY, MaxY;
+} wed_polygon;
+
+//the net sizeof(wed_polygon) is 0x12 but not all compilers know that
+#define WED_POLYGON_SIZE  0x12
 
 WEDImp::WEDImp(void)
 {
@@ -74,6 +84,7 @@ bool WEDImp::Open(DataStream* stream, bool autoFree)
 	//Reading the Secondary Header
 	str->Seek( SecHeaderOffset, GEM_STREAM_START );
 	str->ReadDword( &WallPolygonsCount );
+	DoorPolygonsCount = 0;
 	str->ReadDword( &PolygonsOffset );
 	str->ReadDword( &VerticesOffset );
 	str->ReadDword( &WallGroupsOffset );
@@ -181,89 +192,40 @@ TileMap* WEDImp::GetTileMap()
 		tm->AddOverlay( over );
 	}
 
-	//Clipping Polygons
-	/*
-	for(int d = 0; d < DoorsCount; d++) {
-		str->Seek(DoorsOffset + (d*0x1A), GEM_STREAM_START);
-		ieWord DoorClosed, DoorTileStart, DoorTileCount, *DoorTiles;
-		ieWord OpenPolyCount, ClosedPolyCount;
-		ieDword OpenPolyOffset, ClosedPolyOffset;
-		ieResRef Name;
-		str->ReadResRef( Name );
-		str->ReadWord( &DoorClosed );
-		str->ReadWord( &DoorTileStart );
-		str->ReadWord( &DoorTileCount );
-		str->ReadWord( &OpenPolyCount );
-		str->ReadWord( &ClosedPolyCount );
-		str->ReadDword( &OpenPolyOffset );
-		str->ReadDword( &ClosedPolyOffset );
-		//Reading Door Tile Cells
-		str->Seek(DoorTilesOffset + (DoorTileStart*2), GEM_STREAM_START);
-		DoorTiles = (ieWord*)calloc(DoorTileCount,sizeof(ieWord));
-		str->Read(DoorTiles, DoorTileCount*sizeof(ieWord));
-		if( DataStream::IsEndianSwitch()) {
-			swab( (char*) DoorTiles, (char*) DoorTiles, DoorTileCount * sizeof( ieWord) );
-		}
-		//Reading the Open Polygon
-		str->Seek(OpenPolyOffset, GEM_STREAM_START);
-		ieDword StartingVertex, VerticesCount;
-		ieWordt BitFlag, MinX, MaxX, MinY, MaxY;
-		Region BBox;
-		str->ReadDword( &StartingVertex );
-		str->ReadDword( &VerticesCount );
-		str->ReadWord( &BitFlag );
-		str->ReadWord( &MinX );
-		str->ReadWord( &MaxX );
-		str->ReadWord( &MinY );
-		str->ReadWord( &MaxY );
-		BBox.x = minX;
-		BBox.y = minY;
-		BBox.w = maxX - minX;
-		BBox.h = maxY - minY;
-
-		//Reading Vertices
-		str->Seek(VerticesOffset + (StartingVertex*4), GEM_STREAM_START);
-		Point * points = (Point*)malloc(VerticesCount*sizeof(Point));
-		for(int i = 0; i < VerticesCount; i++) {
-			str->ReadWord( &points[i].x );
-			str->ReadWord( &points[i].y );
-		}
-		Gem_Polygon * open = new Gem_Polygon(points, VerticesCount, BBox);
-		free(points);
-		//Reading the closed Polygon
-		str->Seek(ClosedPolyOffset, GEM_STREAM_START);
-		str->ReadDword( &StartingVertex );
-		str->ReadDword( &VerticesCount );
-		str->ReadWord( &BitFlag );
-		str->ReadWord( &MinX );
-		str->ReadWord( &MaxX );
-		str->ReadWord( &MinY );
-		str->ReadWord( &MaxY );
-		BBox.x = minX;
-		BBox.y = minY;
-		BBox.w = maxX - minX;
-		BBox.h = maxY - minY;
-
-		//Reading Vertices
-		str->Seek(VerticesOffset + (StartingVertex*4), GEM_STREAM_START);
-		points = (Point*)malloc(VerticesCount*sizeof(Point));
-		for(int i = 0; i < VerticesCount; i++) {
-			str->ReadWord( &points[i].x );
-			str->ReadWord( &points[i].y );
-		}
-		Gem_Polygon * closed = new Gem_Polygon(points, VerticesCount, BBox);
-		free(points);
-		tm->AddDoor(Name, DoorClosed, DoorTiles, DoorTileCount, open, closed);
-	}*/
 	core->FreeInterface( tis );
 	return tm;
+}
+
+void WEDImp::GetDoorPolygonCount(ieWord count, ieDword offset)
+{
+	ieDword basecount = offset-PolygonsOffset;
+	if (basecount%WED_POLYGON_SIZE) {
+		basecount+=WED_POLYGON_SIZE;
+		printf("[WEDImporter]: Found broken door polygon header!\n");
+	}
+	ieDword polycount = basecount/WED_POLYGON_SIZE+count-WallPolygonsCount;
+	if (polycount>DoorPolygonsCount) {
+		DoorPolygonsCount=polycount;
+	}
+}
+
+void WEDImp::SetupClosedDoor(unsigned int &index, unsigned int &count)
+{
+	index = (ClosedPolyOffset-PolygonsOffset)/WED_POLYGON_SIZE;
+	count = ClosedPolyCount;
+}
+
+void WEDImp::SetupOpenDoor(unsigned int &index, unsigned int &count)
+{
+	index = (OpenPolyOffset-PolygonsOffset)/WED_POLYGON_SIZE;
+	count = OpenPolyCount;
 }
 
 ieWord* WEDImp::GetDoorIndices(char* ResRef, int* count, bool& BaseClosed)
 {
 	ieWord DoorClosed, DoorTileStart, DoorTileCount, * DoorTiles;
-	ieWord OpenPolyCount, ClosedPolyCount;
-	ieDword OpenPolyOffset, ClosedPolyOffset;
+//	ieWord OpenPolyCount, ClosedPolyCount;
+//	ieDword OpenPolyOffset, ClosedPolyOffset;
 	ieResRef Name;
 	unsigned int i;
 
@@ -276,7 +238,7 @@ ieWord* WEDImp::GetDoorIndices(char* ResRef, int* count, bool& BaseClosed)
 	//The door has no representation in the WED file
 	if (i == DoorsCount) {
 		*count = 0;
-		printf( "Found door without WED entry!\n" );
+		printf( "[WEDImporter]: Found door without WED entry!\n" );
 		return NULL;
 	}
 
@@ -287,6 +249,10 @@ ieWord* WEDImp::GetDoorIndices(char* ResRef, int* count, bool& BaseClosed)
 	str->ReadWord( &ClosedPolyCount );
 	str->ReadDword( &OpenPolyOffset );
 	str->ReadDword( &ClosedPolyOffset );
+
+	GetDoorPolygonCount(OpenPolyCount, OpenPolyOffset);
+	GetDoorPolygonCount(ClosedPolyCount, ClosedPolyOffset);
+
 	//Reading Door Tile Cells
 	str->Seek( DoorTilesOffset + ( DoorTileStart * 2 ), GEM_STREAM_START );
 	DoorTiles = ( ieWord* ) calloc( DoorTileCount, sizeof( ieWord) );
@@ -303,23 +269,18 @@ ieWord* WEDImp::GetDoorIndices(char* ResRef, int* count, bool& BaseClosed)
 	return DoorTiles;
 }
 
-typedef struct {
-  ieDword FirstVertex;
-  ieDword CountVertex;
-  ieWord Flags;
-  ieWord MinX, MaxX, MinY, MaxY;
-} wed_polygon;
-
 Wall_Polygon **WEDImp::GetWallGroups()
 {
-	Wall_Polygon **Polygons = (Wall_Polygon **) calloc( WallPolygonsCount, sizeof(Wall_Polygon *) );
+	ieDword polygonCount = WallPolygonsCount+DoorPolygonsCount;
 
-	wed_polygon *PolygonHeaders = new wed_polygon[WallPolygonsCount];
+	Wall_Polygon **Polygons = (Wall_Polygon **) calloc( polygonCount, sizeof(Wall_Polygon *) );
+
+	wed_polygon *PolygonHeaders = new wed_polygon[polygonCount];
 
 	str->Seek (PolygonsOffset, GEM_STREAM_START);
 	
 	ieDword i; //msvc6.0 isn't ISO compatible, so this variable cannot be declared in 'for'
-	for (i=0;i<WallPolygonsCount;i++) {
+	for (i=0;i<polygonCount;i++) {
 		str->ReadDword ( &PolygonHeaders[i].FirstVertex);
 		str->ReadDword ( &PolygonHeaders[i].CountVertex);
 		str->ReadWord ( &PolygonHeaders[i].Flags);
@@ -329,7 +290,7 @@ Wall_Polygon **WEDImp::GetWallGroups()
 		str->ReadWord ( &PolygonHeaders[i].MaxY);
 	}
 
-	for (i=0;i<WallPolygonsCount;i++) {
+	for (i=0;i<polygonCount;i++) {
 		str->Seek (PolygonHeaders[i].FirstVertex*4+VerticesOffset, GEM_STREAM_START);
 		//compose polygon
 		ieDword count = PolygonHeaders[i].CountVertex;

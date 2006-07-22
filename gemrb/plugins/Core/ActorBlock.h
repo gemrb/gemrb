@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.110 2006/07/07 13:34:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.111 2006/07/22 12:39:54 avenger_teambg Exp $
  *
  */
 
@@ -373,12 +373,19 @@ public:
 	unsigned char count;
 	ieDword Flags;
 	int closedIndex;
+  //trigger areas
 	Gem_Polygon* open;
 	Gem_Polygon* closed;
+  //impeded blocks
 	Point* open_ib;   //impeded blocks stored in a Point array
 	int oibcount;
 	Point* closed_ib;
 	int cibcount;
+  //wallgroup covers
+  unsigned int open_wg_index;
+  unsigned int open_wg_count;
+  unsigned int closed_wg_index;
+  unsigned int closed_wg_count;
 	Point toOpen[2];
 	ieResRef OpenSound;
 	ieResRef CloseSound;
@@ -393,6 +400,7 @@ public:
 	ieStrRef NameStrRef;
 	ieResRef Dialog;
 private:
+  void SetWallgroups(int count, int value);
 	void ToggleTiles(int State, bool playsound = false);
 	void ImpedeBlocks(int count, Point *points, unsigned int value);
 	void UpdateDoor();

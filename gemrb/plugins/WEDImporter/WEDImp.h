@@ -8,14 +8,14 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.h,v 1.12 2005/10/22 16:30:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.h,v 1.13 2006/07/22 12:39:55 avenger_teambg Exp $
  *
  */
 
@@ -42,6 +42,13 @@ private:
 		DoorsOffset, DoorTilesOffset;
 	ieDword WallPolygonsCount, PolygonsOffset, VerticesOffset,
 		WallGroupsOffset, PILTOffset;
+	ieDword DoorPolygonsCount;
+	//these will change as doors are being read, so get them in time!
+	ieWord OpenPolyCount, ClosedPolyCount;
+	ieDword OpenPolyOffset, ClosedPolyOffset;
+
+private:
+	void GetDoorPolygonCount(ieWord count, ieDword offset);
 public:
 	WEDImp(void);
 	~WEDImp(void);
@@ -50,6 +57,9 @@ public:
 	ieWord* GetDoorIndices(char* ResRef, int* count, bool& BaseClosed);
 	Wall_Polygon **GetWallGroups();
 	ieDword GetWallPolygonsCount() { return WallPolygonsCount; }
+	ieDword GetPolygonsCount() { return WallPolygonsCount+DoorPolygonsCount; }
+	void SetupOpenDoor(unsigned int &index, unsigned int &count);
+	void SetupClosedDoor(unsigned int &index, unsigned int &count);
 public:
 	void release(void)
 	{

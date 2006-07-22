@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.157 2006/04/22 17:46:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.158 2006/07/22 12:39:54 avenger_teambg Exp $
  *
  */
 
@@ -566,9 +566,13 @@ Map* AREImp::GetMap(const char *ResRef)
 		if (core->HasFeature(GF_REVERSE_DOOR)) {
 			BaseClosed = !BaseClosed;
 		}
+
 		Door* door;
 		door = tm->AddDoor( ShortName, LongName, Flags, BaseClosed,
 					indices, count, open, closed );
+
+		tmm->SetupClosedDoor(door->closed_wg_index, door->closed_wg_count);
+		tmm->SetupOpenDoor(door->open_wg_index, door->open_wg_count);
 
 		//Reading Open Impeded blocks
 		str->Seek( VerticesOffset + ( OpenFirstImpeded * 4 ),
@@ -596,7 +600,6 @@ Map* AREImp::GetMap(const char *ResRef)
 		door->closed_ib = points;
 		door->cibcount = ClosedImpededCount;
 		door->SetMap(map);
-		door->SetDoorOpen(door->IsOpen(), false, 0);
 
 		door->TrapDetectionDiff = TrapDetect;
 		door->TrapRemovalDiff = TrapRemoval;
@@ -1009,8 +1012,12 @@ Map* AREImp::GetMap(const char *ResRef)
 	map->VisibleBitmap = (ieByte *) calloc(i, 1);
 
 	printf( "Loading wallgroups\n");
-	map->SetWallGroups( tmm->GetWallPolygonsCount(),tmm->GetWallGroups() );
-
+	map->SetWallGroups( tmm->GetPolygonsCount(),tmm->GetWallGroups() );
+	//setting up doors
+	for (i=0;i<DoorsCount;i++) {
+		Door *door = tm->GetDoor(i);
+		door->SetDoorOpen(door->IsOpen(), false, 0);
+	}
 	core->FreeInterface( tmm );
 	return map;
 }

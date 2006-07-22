@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.120 2006/07/09 08:33:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.121 2006/07/22 12:39:54 avenger_teambg Exp $
  *
  */
 
@@ -36,7 +36,6 @@
 #include "PCStatStruct.h"
 
 class Map;
-class SpriteCover;
 class ScriptedAnimation;
 
 #ifdef WIN32

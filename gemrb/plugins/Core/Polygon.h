@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.h,v 1.12 2005/11/23 06:39:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.h,v 1.13 2006/07/22 12:39:55 avenger_teambg Exp $
  */
 #ifndef POLYGON_H
 #define POLYGON_H
@@ -72,6 +72,8 @@ public:
 #define WF_HOVER 4
 // cover animations
 #define WF_COVERANIMS 8
+// door polygons are not always drawn
+#define WF_DISABLED 0x80
 
 class GEM_EXPORT Wall_Polygon: public Gem_Polygon {
 public:
