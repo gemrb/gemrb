@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PSTOpcodes/PSTOpcodesCD.cpp,v 1.1 2006/07/22 07:43:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PSTOpcodes/PSTOpcodesCD.cpp,v 1.2 2006/07/22 07:48:30 avenger_teambg Exp $
  *
  */
 
@@ -47,7 +47,7 @@ SClass_ID PSTOpcodesCD::SuperClassID(void)
 
 Class_ID PSTOpcodesCD::ClassID(void)
 {
-	return Class_ID( 0x00300000, 0x00000002 );
+	return Class_ID( 0x00300000, 0x00000003 );
 }
 
 const char* PSTOpcodesCD::InternalName(void)
