@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PSTOpcodes/PSTOpcodes.cpp,v 1.1 2006/07/22 07:43:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PSTOpcodes/PSTOpcodes.cpp,v 1.2 2006/07/22 12:32:38 avenger_teambg Exp $
  *
  */
 
@@ -52,7 +52,7 @@ GEM_EXPORT_DLL ClassDesc* LibClassDesc()
 
 GEM_EXPORT_DLL const char* LibDescription()
 {
-	return "Effect opcodes for the icewind branch of the games";
+	return "Effect opcodes for the torment branch of the games";
 }
 
 GEM_EXPORT_DLL const char* LibVersion()
