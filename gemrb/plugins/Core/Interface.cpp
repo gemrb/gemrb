@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.412 2006/07/19 17:44:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.413 2006/07/22 12:25:54 avenger_teambg Exp $
  *
  */
 
@@ -3216,9 +3216,9 @@ void Interface::LoadGame(int index)
 	Game* new_game = NULL;
 	WorldMapArray* new_worldmap = NULL;
 
-	LoadProgress(0);
+	LoadProgress(10);
 	DelTree((const char *) CachePath, true);
-	LoadProgress(5);
+	LoadProgress(15);
 
 	if (index == -1) {
 		//Load the Default Game
@@ -3269,7 +3269,7 @@ void Interface::LoadGame(int index)
 	wmp_mgr = NULL;
 	wmp_str = NULL;
 
-	LoadProgress(10);
+	LoadProgress(20);
 	// Unpack SAV (archive) file to Cache dir
 	if (sav_str) {
 		ArchiveImporter * ai = (ArchiveImporter*)GetInterface(IE_BIF_CLASS_ID);
