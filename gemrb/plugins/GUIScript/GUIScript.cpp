@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.399 2006/07/19 17:44:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.400 2006/07/22 07:43:42 avenger_teambg Exp $
  *
  */
 
@@ -5674,8 +5674,9 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	} else {
 		int Slottype, Effect;
 		if (Slot==-1) {
-			Slottype = -1;
-			Effect = 0;
+			//anything but inventory
+			Slottype = ~SLOT_INVENTORY;
+			Effect = 1;
 		} else {
 			Slot = core->QuerySlot(Slot);
 			Slottype = core->QuerySlotType( Slot );
