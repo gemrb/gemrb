@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.245 2006/07/22 12:39:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.246 2006/07/23 21:08:25 avenger_teambg Exp $
  *
  */
 
@@ -1394,7 +1394,7 @@ void Map::SortQueues()
 }
 
 //adding videocell in order, based on its height parameter
-void Map::AddVVCCell(ScriptedAnimation* vvc)
+void Map::AddVVCell(ScriptedAnimation* vvc)
 {
 	scaIterator iter;
 

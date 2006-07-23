@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.115 2006/07/22 12:39:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.116 2006/07/23 21:08:25 avenger_teambg Exp $
  *
  */
 
@@ -295,7 +295,7 @@ public:
 
 	SongHeaderType SongHeader;
 	RestHeaderType RestHeader;
-	void AddVVCCell(ScriptedAnimation* vvc);
+	void AddVVCell(ScriptedAnimation* vvc);
 	bool CanFree();
 	int GetCursor( Point &p);
 	void Sparkle(ieDword color, ieDword type, Point &pos);

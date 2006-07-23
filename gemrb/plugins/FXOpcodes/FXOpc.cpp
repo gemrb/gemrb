@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.31 2006/07/09 08:34:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.32 2006/07/23 21:08:26 avenger_teambg Exp $
  *
  */
 
@@ -809,7 +809,7 @@ bool SummonCreature(ieResRef resource, ieResRef vvcres, Actor *Owner, Actor *tar
 		ScriptedAnimation* vvc = core->GetScriptedAnimation(vvcres);
 		vvc->XPos=position.x;
 		vvc->YPos=position.y;
-		map->AddVVCCell( vvc );
+		map->AddVVCell( vvc );
 	}
 	return true;
 }
@@ -2512,6 +2512,7 @@ int fx_monster_summoning (Actor* Owner, Actor* target, Effect* fx)
 	//get monster resref from 2da determined by fx->Resource or fx->Parameter2
 	ieResRef monster;
 
+	//the monster should appear near the effect position
 	Point p(fx->PosX, fx->PosY);
 	SummonCreature(monster, fx->Resource2, Owner, target, p, fx->Parameter2);
 	return FX_NOT_APPLIED;
@@ -2688,7 +2689,7 @@ int fx_casting_glow (Actor* /*Owner*/, Actor* target, Effect* fx)
 		} else {
 			sca->SetDefaultDuration(10000);
 		}
-		map->AddVVCCell(sca);
+		map->AddVVCell(sca);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -2724,7 +2725,7 @@ int fx_visual_spell_hit (Actor* /*Owner*/, Actor* target, Effect* fx)
 			}
 		}
 		sca->SetBlend();
-		map->AddVVCCell(sca);
+		map->AddVVCell(sca);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -2837,7 +2838,9 @@ int fx_replace_creature (Actor* Owner, Actor* target, Effect *fx)
 {
 	if (0) printf( "fx_replace_creature (%2d): Resource: %s\n", fx->Opcode, fx->Resource );
 
-	Point p=target->Pos;
+	//FIXME: the monster should appear near the effect position?
+	//or the target position, this needs experiment
+	Point p(fx->PosX, fx->PosY);
 
 	//remove old creature
 	switch(fx->Parameter2)
@@ -3392,10 +3395,18 @@ int fx_select_spell (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 // 0xd7 PlayVisualEffect
 int fx_play_visual_effect (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_play_visual_effect (%2d): Resource: %s\n", fx->Opcode, fx->Resource );
+	if (0) printf( "fx_play_visual_effect (%2d): Resource: %s Type: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
 	if (fx->Resource[0]) {
 		ScriptedAnimation* vvc = core->GetScriptedAnimation(fx->Resource);
-		target->GetCurrentArea( )->AddVVCCell( vvc );
+		if (fx->Parameter2) {
+			//play over target
+			target->AddVVCell( vvc );
+		} else {
+			//the effect should already have its position set
+			vvc->XPos=fx->PosX;
+			vvc->YPos=fx->PosY;
+			target->GetCurrentArea()->AddVVCell( vvc );
+		}
 	}
 	return FX_APPLIED;
 }
@@ -3457,6 +3468,7 @@ int fx_dispel_secondary_type (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_teleport_field (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_teleport_field (%2d): Mod: %d\n", fx->Opcode, fx->Parameter1 );
+	//this should be the target's position, i think
 	Point p = target->Pos;
 	p.x+=core->Roll(1,fx->Parameter1,-(signed) (fx->Parameter1/2));
 	p.y+=core->Roll(1,fx->Parameter1,-(signed) (fx->Parameter1/2));

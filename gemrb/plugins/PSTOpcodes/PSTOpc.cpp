@@ -15,27 +15,56 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PSTOpcodes/PSTOpc.cpp,v 1.1 2006/07/22 07:43:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PSTOpcodes/PSTOpc.cpp,v 1.2 2006/07/23 21:08:26 avenger_teambg Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "../../includes/strrefs.h"
 #include "../Core/Actor.h"
+#include "../Core/Game.h"
 #include "../Core/EffectQueue.h"
 #include "../Core/Interface.h"
-#include "../Core/damages.h"
+//#include "../Core/damages.h"
+#include "../Core/Video.h"  //for tints
 #include "PSTOpc.h"
 
-
-int fx_iron_fist (Actor* Owner, Actor* target, Effect* fx);//ed
+//int fx_shake_screen (Actor* Owner, Actor* target, Effect* fx);//c1 already implemented
+int fx_flash_screen (Actor* Owner, Actor* target, Effect* fx);//c2
+int fx_tint_screen (Actor* Owner, Actor* target, Effect* fx);//c3
+int fx_special_effect (Actor* Owner, Actor* target, Effect* fx);//c4
+//unknown 0xc5-c8
+int fx_overlay (Actor* Owner, Actor* target, Effect* fx);//c9
+//unknown 0xca
+int fx_curse (Actor* Owner, Actor* target, Effect* fx);//cb
+int fx_prayer (Actor* Owner, Actor* target, Effect* fx);//cc
+int fx_move_view (Actor* Owner, Actor* target, Effect* fx);//cd
+int fx_embalm (Actor* Owner, Actor* target, Effect* fx);//ce
+int fx_stop_all_action (Actor* Owner, Actor* target, Effect* fx);//cf
+int fx_iron_fist (Actor* Owner, Actor* target, Effect* fx);//d0
+int fx_hostile_image(Actor* Owner, Actor* target, Effect* fx);//d1
+int fx_detect_evil (Actor* Owner, Actor* target, Effect* fx);//d2
+int fx_jumble_curse (Actor* Owner, Actor* target, Effect* fx);//d3
+int fx_detect_evil (Actor* Owner, Actor* target, Effect* fx);//d2
 
 // FIXME: Make this an ordered list, so we could use bsearch!
 static EffectRef effectnames[] = {
-	{ "IronFist", fx_iron_fist, 0}, //ed
+	{ "Curse", fx_curse, 0},//cb
+	{ "DetectEvil", fx_detect_evil, 0}, //d2
+	{ "Embalm", fx_embalm, 0}, //0xce
+	{ "FlashScreen", fx_flash_screen, 0}, //0xc2
+	{ "HostileImage", fx_hostile_image, 0},//d1
+	{ "IronFist", fx_iron_fist, 0}, //d0
+	{ "JumbleCurse", fx_jumble_curse, 0}, //d3
+	{ "MoveView", fx_move_view, 0},//cd
+	{ "Overlay", fx_overlay, 0}, //c9
+	{ "Prayer", fx_prayer, 0},//cc
+	//{ "ScreenShake", fx_shake_screen, 0}, //c1 //this is implemented in bg2
+	{ "SpecialEffect", fx_special_effect, 0},//c4
+	{ "StopAllAction", fx_stop_all_action, 0}, //cf
+	{ "TintScreen", fx_tint_screen, 0}, //0xc3
 	{ NULL, NULL, 0 },
 };
-
 
 PSTOpc::PSTOpc(void)
 {
@@ -44,6 +73,86 @@ PSTOpc::PSTOpc(void)
 
 PSTOpc::~PSTOpc(void)
 {
+}
+//0xc1 fx_shake_screen this is already implemented in BG2
+
+//0xc2 fx_flash_screen
+int fx_flash_screen (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_flash_screen (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
+	core->GetVideoDriver()->SetFadeColor(((char *) &fx->Parameter1)[0],((char *) &fx->Parameter1)[1],((char *) &fx->Parameter1)[2]);
+	core->timer->SetFadeFromColor(1);
+	core->timer->SetFadeToColor(1);
+	return FX_NOT_APPLIED;
+}
+
+//0xc3 fx_tint_screen
+int fx_tint_screen (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_tint_screen (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
+	core->timer->SetFadeFromColor(10);
+	core->timer->SetFadeToColor(10);  
+	return FX_NOT_APPLIED;
+}
+
+//0xc4 fx_special_effect
+int fx_special_effect (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_special_effect (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
+	
+	return FX_NOT_APPLIED;
+}
+//0xc5-c8 fx_unknown
+//0xc9 fx_overlay
+int fx_overlay (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_overlay (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
+	target->add_animation(fx->Resource,-1,0,true);
+	//special effects based on fx_param2
+	return FX_NOT_APPLIED;
+}
+//0xca fx_unknown
+//0xcb fx_curse
+int fx_curse (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_curse (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
+	//set thac0, ac, saving throws
+	return FX_NOT_APPLIED;
+}
+
+//0xcc fx_prayer
+int fx_prayer (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_prayer (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
+	//set thac0, ac, saving throws
+	return FX_NOT_APPLIED;
+}
+
+//0xcd fx_move_view
+int fx_move_view (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_move_view (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
+	core->MoveViewportTo( target->Pos.x, target->Pos.y, true );
+	return FX_NOT_APPLIED;
+}
+
+//0xce fx_embalm
+int fx_embalm (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_embalm (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
+	//set global flag
+	return FX_APPLIED;
+}
+//0xcf fx_stop_all_action
+int fx_stop_all_action (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_stop_all_action (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
+	if (fx->Parameter2) {
+		core->GetGame()->TimeStop(NULL, 0xffffffff);
+	} else {
+		core->GetGame()->TimeStop(NULL, 0);
+	}
+	return FX_NOT_APPLIED;
 }
 
 //0xd0 fx_iron_fist
@@ -62,5 +171,32 @@ int fx_iron_fist (Actor* /*Owner*/, Actor* target, Effect* fx)
 	}
 	STAT_ADD(IE_FISTHIT, p1);
 	STAT_ADD(IE_FISTDAMAGE, p2);
+	return FX_APPLIED;
+}
+
+//0xd1 fx_hostile_image
+int fx_hostile_image (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_hostile_image (%2d): Par1: %d  Par2: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	return FX_NOT_APPLIED;
+}
+
+//0xd2 fx_detect_evil
+int fx_detect_evil (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_detect_evil (%2d): Par1: %d  Par2: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	return FX_NOT_APPLIED;
+}
+
+//0xd3 fx_jumble_curse
+int fx_jumble_curse (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_jumble_curse (%2d): Par1: %d  Par2: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+        STAT_SET( IE_DEADMAGIC, 1);
+        STAT_SET( IE_SPELLFAILUREMAGE, 100);
+        STAT_SET( IE_SPELLFAILUREPRIEST, 100);
+        STAT_SET( IE_SPELLFAILUREINNATE, 100);
+	//hiccups
 	return FX_APPLIED;
 }
