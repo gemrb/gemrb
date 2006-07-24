@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PSTOpcodes/PSTOpc.cpp,v 1.2 2006/07/23 21:08:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PSTOpcodes/PSTOpc.cpp,v 1.3 2006/07/24 16:17:18 avenger_teambg Exp $
  *
  */
 
@@ -29,6 +29,10 @@
 #include "../Core/Video.h"  //for tints
 #include "PSTOpc.h"
 
+
+int fx_set_status (Actor* Owner, Actor* target, Effect* fx);//ba
+int fx_play_bam (Actor* Owner, Actor* target, Effect* fx);//bb,bc,bd,be,bf
+int fx_transfer_hp (Actor* Owner, Actor* target, Effect* fx);//c0
 //int fx_shake_screen (Actor* Owner, Actor* target, Effect* fx);//c1 already implemented
 int fx_flash_screen (Actor* Owner, Actor* target, Effect* fx);//c2
 int fx_tint_screen (Actor* Owner, Actor* target, Effect* fx);//c3
@@ -45,24 +49,27 @@ int fx_iron_fist (Actor* Owner, Actor* target, Effect* fx);//d0
 int fx_hostile_image(Actor* Owner, Actor* target, Effect* fx);//d1
 int fx_detect_evil (Actor* Owner, Actor* target, Effect* fx);//d2
 int fx_jumble_curse (Actor* Owner, Actor* target, Effect* fx);//d3
-int fx_detect_evil (Actor* Owner, Actor* target, Effect* fx);//d2
+//int fx_unknown (Actor* Owner, Actor* target, Effect* fx);//d4
 
 // FIXME: Make this an ordered list, so we could use bsearch!
 static EffectRef effectnames[] = {
 	{ "Curse", fx_curse, 0},//cb
 	{ "DetectEvil", fx_detect_evil, 0}, //d2
 	{ "Embalm", fx_embalm, 0}, //0xce
-	{ "FlashScreen", fx_flash_screen, 0}, //0xc2
+	{ "FlashScreen", fx_flash_screen, 0}, //c2
 	{ "HostileImage", fx_hostile_image, 0},//d1
 	{ "IronFist", fx_iron_fist, 0}, //d0
 	{ "JumbleCurse", fx_jumble_curse, 0}, //d3
 	{ "MoveView", fx_move_view, 0},//cd
 	{ "Overlay", fx_overlay, 0}, //c9
+	{ "PlayBAM", fx_play_bam, 0}, //bb,bc,bd,be,bf
 	{ "Prayer", fx_prayer, 0},//cc
 	//{ "ScreenShake", fx_shake_screen, 0}, //c1 //this is implemented in bg2
+	{ "SetStatus", fx_set_status, 0}, //ba
 	{ "SpecialEffect", fx_special_effect, 0},//c4
 	{ "StopAllAction", fx_stop_all_action, 0}, //cf
-	{ "TintScreen", fx_tint_screen, 0}, //0xc3
+	{ "TintScreen", fx_tint_screen, 0}, //c3
+	{ "TransferHP", fx_transfer_hp, 0}, //c0
 	{ NULL, NULL, 0 },
 };
 
@@ -74,6 +81,63 @@ PSTOpc::PSTOpc(void)
 PSTOpc::~PSTOpc(void)
 {
 }
+
+//0xba fx_set_status
+int fx_set_status (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_set_status (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
+	if (fx->Parameter1) {
+		BASE_STATE_SET (fx->Parameter2);
+	} else {
+		BASE_STATE_CURE (fx->Parameter2);
+	}
+	return FX_NOT_APPLIED;
+}
+
+//bb,bc,bd,be,bf fx_play_bam
+int fx_play_bam (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_play_bam (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
+	target->add_animation(fx->Resource, -1, 0, false);
+	return FX_NOT_APPLIED;
+}
+
+//0xc0 fx_transfer_hp
+int fx_transfer_hp (Actor* Owner, Actor* target, Effect* fx)
+{
+	if (Owner==target) {
+		return FX_NOT_APPLIED;
+	}
+
+	if (0) printf( "fx_transfer_hp (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
+	int damage = core->Roll(fx->DiceSides, fx->DiceThrown, fx->Parameter1);
+	Actor *receiver;
+	Actor *donor;
+	int a,b;
+
+	switch(fx->Parameter2) {
+		case 3:
+		case 0: receiver = target; donor = Owner; break;
+		case 4:
+		case 1: receiver = Owner; donor = target; break;
+		case 2:
+			a = Owner->GetBase(IE_HITPOINTS);
+			b = target->GetBase(IE_HITPOINTS);
+			Owner->SetBase(IE_HITPOINTS, a);
+			target->SetBase(IE_HITPOINTS, b);
+			//fallthrough
+		default:
+			return FX_NOT_APPLIED;
+	}
+	damage = donor->Damage(damage, fx->Parameter2, Owner); //FIXME!
+	if (fx->Parameter2>2) {
+		receiver->SetBase( IE_HITPOINTS, BASE_GET( IE_HITPOINTS ) + ( damage ) );
+	} else {
+		receiver->SetStat( IE_HITPOINTS, STAT_GET( IE_HITPOINTS ) + ( damage ), 0 );
+	}
+	return FX_NOT_APPLIED;
+}
+
 //0xc1 fx_shake_screen this is already implemented in BG2
 
 //0xc2 fx_flash_screen
