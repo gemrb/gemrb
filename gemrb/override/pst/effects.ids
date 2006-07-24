@@ -177,11 +177,11 @@ IDS
 0xaf	State:Hold
 0xb0	MovementModifier
 0xba    SetStatus
-0xbb    PlayBAM
-0xbc    PlayBAM
-0xbd    PlayBAM
-0xbe    PlayBAM
-0xbf    PlayBAM
+0xbb    PlayBAM1
+0xbc    PlayBAM2
+0xbd    PlayBAM3
+0xbe    PlayBAM4
+0xbf    PlayBAM5
 0xc0    TransferHP
 0xc1    ScreenShake
 0xc2    FlashScreen

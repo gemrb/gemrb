@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PSTOpcodes/PSTOpc.cpp,v 1.3 2006/07/24 16:17:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PSTOpcodes/PSTOpc.cpp,v 1.4 2006/07/24 20:41:35 avenger_teambg Exp $
  *
  */
 
@@ -62,9 +62,12 @@ static EffectRef effectnames[] = {
 	{ "JumbleCurse", fx_jumble_curse, 0}, //d3
 	{ "MoveView", fx_move_view, 0},//cd
 	{ "Overlay", fx_overlay, 0}, //c9
-	{ "PlayBAM", fx_play_bam, 0}, //bb,bc,bd,be,bf
+	{ "PlayBAM1", fx_play_bam, 0}, //bb,bc,bd,be,bf
+	{ "PlayBAM2", fx_play_bam, 0},
+	{ "PlayBAM3", fx_play_bam, 0},
+	{ "PlayBAM4", fx_play_bam, 0},
+	{ "PlayBAM5", fx_play_bam, 0},
 	{ "Prayer", fx_prayer, 0},//cc
-	//{ "ScreenShake", fx_shake_screen, 0}, //c1 //this is implemented in bg2
 	{ "SetStatus", fx_set_status, 0}, //ba
 	{ "SpecialEffect", fx_special_effect, 0},//c4
 	{ "StopAllAction", fx_stop_all_action, 0}, //cf
