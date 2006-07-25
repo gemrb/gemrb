@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.413 2006/07/22 12:25:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.414 2006/07/25 19:58:56 avenger_teambg Exp $
  *
  */
 
@@ -2130,6 +2130,59 @@ int Interface::LoadCreature(char* ResRef, int InParty, bool character)
 	}
 }
 
+#define EAM_NORMAL -1
+#define EAM_ALLY    0
+#define EAM_ENEMY   5
+
+bool Interface::SummonCreature(ieResRef resource, ieResRef vvcres, Actor *Owner, Actor *target, Point &position, int eamod)
+{
+	DataStream* ds = key->GetResource( resource, IE_CRE_CLASS_ID );
+	Actor *ab = GetCreature(ds);
+	if (!ab) {
+		return false;
+	}
+
+	ab->LastSummoner = Owner->GetID();
+
+	int enemyally;
+
+	if (target) {
+		enemyally = target->GetStat(IE_EA)>EA_GOODCUTOFF;
+	} else {
+		enemyally = true;
+	}
+
+	switch (eamod) {
+		case 0: case 1: case 3:      
+			if (enemyally) {
+				ab->SetBase(IE_EA, EA_ENEMY); //is this the summoned EA?
+			} else {
+				ab->SetBase(IE_EA, EA_ALLY); //is this the summoned EA?
+			}
+			break;
+		case 5:
+			if (enemyally) {
+				ab->SetBase(IE_EA, EA_ALLY); //is this the summoned EA?
+			} else {
+				ab->SetBase(IE_EA, EA_ENEMY); //is this the summoned EA?
+			}
+			break;
+		default:
+			break;
+	}
+
+	Map *map = target->GetCurrentArea();
+
+	ab->SetPosition(map, position, true, 0);
+	if (vvcres[0]) {
+		ScriptedAnimation* vvc = GetScriptedAnimation(vvcres);
+		vvc->XPos=position.x;
+		vvc->YPos=position.y;
+		map->AddVVCell( vvc );
+	}
+	return true;
+}
+
 int Interface::GetCreatureStat(unsigned int Slot, unsigned int StatID, int Mod)
 {
 	Actor * actor = game->FindPC(Slot);
@@ -3017,7 +3070,7 @@ int Interface::PlayMovie(const char* ResRef)
 	mp->CallBackAtFrames(cnt, frames, strrefs);
 	mp->Play();
 	FreeInterface( mp );
-	core->FreePalette( palette );
+	FreePalette( palette );
 	if (frames)
 		free(frames);
 	if (strrefs)

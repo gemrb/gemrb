@@ -237,3 +237,6 @@ IDS
 0xeb	IWDCastingGlow
 0xec	TurnUndead
 0xed	CrushingDamage
+0xee    SaveBonus
+0xef    SlowPoison
+0xf0    IWDMonsterSummoning

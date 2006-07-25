@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.cpp,v 1.3 2006/04/16 23:57:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.cpp,v 1.4 2006/07/25 19:58:56 avenger_teambg Exp $
  *
  */
 
@@ -34,6 +34,9 @@ int fx_cold_damage (Actor* Owner, Actor* target, Effect* fx);//ea
 int fx_iwd_casting_glow (Actor* Owner, Actor* target, Effect* fx);//eb
 int fx_turn_undead (Actor* Owner, Actor* target, Effect* fx);//ec
 int fx_crushing_damage (Actor* Owner, Actor* target, Effect* fx);//ed
+int fx_save_bonus (Actor* Owner, Actor* target, Effect* fx); //ee
+int fx_slow_poison (Actor* Owner, Actor* target, Effect* fx); //ef
+int fx_iwd_monster_summoning (Actor* Owner, Actor* target, Effect* fx); //f0
 
 // FIXME: Make this an ordered list, so we could use bsearch!
 static EffectRef effectnames[] = {
@@ -41,8 +44,11 @@ static EffectRef effectnames[] = {
 	{ "IWDVisualSpellHit", fx_iwd_visual_spell_hit, 0}, //e9
 	{ "ColdDamage", fx_cold_damage, 0}, //ea
 	{ "IWDCastingGlow", fx_iwd_casting_glow, 0}, //eb
+	{ "IWDMonsterSummoning", fx_iwd_monster_summoning, 0}, //f0
 	{ "TurnUndead", fx_turn_undead, 0}, //ec
 	{ "CrushingDamage", fx_crushing_damage, 0}, //ed
+	{ "SaveBonus", fx_save_bonus, 0}, //ee
+	{ "SlowPoison", fx_slow_poison, 0}, //ef
 	{ NULL, NULL, 0 },
 };
 
@@ -106,3 +112,39 @@ int fx_crushing_damage (Actor* Owner, Actor* target, Effect* fx)
 	damage = target->Damage(damage, DAMAGE_CRUSHING, Owner); //FIXME!
 	return FX_NOT_APPLIED;
 }
+
+//0xee SaveBonus
+int fx_save_bonus (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_save_bonus (%2d): Damage %d\n", fx->Opcode, fx->Parameter1 );
+	STAT_MOD( IE_SAVEVSDEATH );
+	STAT_MOD( IE_SAVEVSWANDS );
+	STAT_MOD( IE_SAVEVSPOLY );
+	STAT_MOD( IE_SAVEVSBREATH );
+	STAT_MOD( IE_SAVEVSSPELL );
+	return FX_APPLIED;
+}
+
+//0xef SlowPoison
+int fx_slow_poison (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_slow_poison (%2d): Damage %d\n", fx->Opcode, fx->Parameter1 );
+	return FX_NOT_APPLIED;
+}
+
+//0xf0 IWDMonsterSummoning
+int fx_iwd_monster_summoning (Actor* Owner, Actor* target, Effect* fx)
+{
+  if (0) printf( "fx_iwd_monster_summoning (%2d): ResRef:%s Anim:%s Type: %d\n", fx->Opcode, fx->Resource, fx->Resource2, fx->Parameter2 );
+  //check the summoning limit?
+  
+  //get monster resref from 2da determined by fx->Resource or fx->Parameter2
+  ieResRef monster;
+  
+  //the monster should appear near the effect position
+  Point p(fx->PosX, fx->PosY);
+  core->SummonCreature(monster, fx->Resource2, Owner, target, p, fx->Parameter2);
+  return FX_NOT_APPLIED;
+}
+
+
