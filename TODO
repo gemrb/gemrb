@@ -35,7 +35,7 @@ Area:
 
 Store:
 1. (DONE) Save stores, handle containers
-
+2. (DONE) Stores recharge rechargeable items
 
 Animation:
 1. (PARTLY) fix char animation sequences
@@ -62,7 +62,7 @@ Game GUI:
 2. (PARTLY) implement class based (but customisable) action button bar. Generally port
    the IWD2 system to all engines
 3. implement grabbing mouse pointer by a control to fix dragging of PST Float menu window
-
+4. Fix multi line editboxes. Allow attaching of scrollbar.
 
 General:
 1. The Cache and Variables classes could be rewritten to incorporate the release 
