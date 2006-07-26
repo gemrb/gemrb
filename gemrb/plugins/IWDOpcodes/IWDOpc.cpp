@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.cpp,v 1.4 2006/07/25 19:58:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.cpp,v 1.5 2006/07/26 17:41:36 avenger_teambg Exp $
  *
  */
 
@@ -27,6 +27,8 @@
 #include "../Core/damages.h"
 #include "IWDOpc.h"
 
+static ieResRef *iwd_spell_hits = NULL;
+static int shcount = -1;
 
 int fx_fade_rgb (Actor* Owner, Actor* target, Effect* fx);//e8
 int fx_iwd_visual_spell_hit (Actor* Owner, Actor* target, Effect* fx);//e9
@@ -70,9 +72,39 @@ int fx_fade_rgb (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 }
 
 //0xe9 IWDVisualSpellHit
-int fx_iwd_visual_spell_hit (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_iwd_visual_spell_hit (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_iwd_visual_spell_hit (%2d): Type: %d\n", fx->Opcode, fx->Parameter1 );
+	if (shcount<0) {
+		shcount = core->ReadResRefTable("iwdshtab",iwd_spell_hits);
+	}
+	//delay apply until map is loaded
+	Map *map = target->GetCurrentArea();
+	if (!map) {
+		return FX_APPLIED;
+	}
+	if (fx->Parameter2<(ieDword) shcount) {
+		ScriptedAnimation *sca = core->GetScriptedAnimation(iwd_spell_hits[fx->Parameter2]);
+		if (!sca) {
+			return FX_NOT_APPLIED;
+		}
+		if (fx->Parameter1) {
+			sca->XPos+=target->Pos.x;
+			sca->YPos+=target->Pos.y;
+		} else {
+			sca->XPos+=fx->PosX;
+			sca->YPos+=fx->PosY;
+		}
+		if (fx->Parameter2<32) {
+			int tmp = fx->Parameter2>>2;
+			if (tmp) {
+				sca->SetFullPalette(tmp);
+			}
+		}
+		sca->SetBlend();
+
+		map->AddVVCell(sca);
+	}
 	return FX_NOT_APPLIED;
 }
 
@@ -146,5 +178,4 @@ int fx_iwd_monster_summoning (Actor* Owner, Actor* target, Effect* fx)
   core->SummonCreature(monster, fx->Resource2, Owner, target, p, fx->Parameter2);
   return FX_NOT_APPLIED;
 }
-
 

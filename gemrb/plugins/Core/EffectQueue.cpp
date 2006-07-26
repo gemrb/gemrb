@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.63 2006/07/04 20:28:48 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.64 2006/07/26 17:41:36 avenger_teambg Exp $
  *
  */
 
@@ -115,9 +115,16 @@ static EffectRef* FindEffect(const char* effectname)
 }
 
 //special effects without level check
-static EffectRef fx_damage_ref={"Damage",NULL,-1};
-static EffectRef fx_hp_modifier_ref={"CurrentHPModifier",NULL,-1};
-static EffectRef fx_maximum_hp_modifier_ref={"MaximumHPModifier",NULL,-1};
+static EffectRef diced_effects[] = {
+	//core effects
+	{"Damage",NULL,-1},
+  {"CurrentHPModifier",NULL,-1},
+  {"MaximumHPModifier",NULL,-1},
+	//iwd effects
+	{"ColdDamage",NULL,-1},
+	{"CrushingDamage",NULL,-1},
+	//pst effects
+	{NULL,NULL,0} };
 
 inline static void ResolveEffectRef(EffectRef &effect_reference)
 {
@@ -135,62 +142,66 @@ inline static void ResolveEffectRef(EffectRef &effect_reference)
 
 bool Init_EffectQueue()
 {
-	if (!initialized) {
-		TableMgr* efftextTable=NULL;
-		SymbolMgr* effectsTable;
-		memset( effect_refs, 0, sizeof( effect_refs ) );
+	int i;
 
-		initialized = 1;
-
-		int effT = core->LoadTable( "efftext" );
-		efftextTable = core->GetTable( effT );
-		
-		int eT = core->LoadSymbol( "effects" );
-		if (eT < 0) {
-			printMessage( "EffectQueue","A critical scripting file is missing!\n",LIGHT_RED );
-			return false;
-		}
-		effectsTable = core->GetSymbol( eT );
-		if (!effectsTable) {
-			printMessage( "EffectQueue","A critical scripting file is damaged!\n",LIGHT_RED );
-			return false;
-		}
-
-		for (int i = 0; i < MAX_EFFECTS; i++) {
-			const char* effectname = effectsTable->GetValue( i );
-			if (efftextTable) {
-				int row = efftextTable->GetRowCount();
-				while (row--) {
-					const char* ret = efftextTable->GetRowName( row );
-					long val;
-					if (valid_number( ret, val ) && (i == val) ) {
-						effect_refs[i].EffText = atoi( efftextTable->QueryField( row, 1 ) );
-					}
-				}
-			}
-
-			EffectRef* poi = FindEffect( effectname );
-			if (poi != NULL) {
-				effect_refs[i].Function = poi->Function;
-				effect_refs[i].Name = poi->Name;
-				//reverse linking opcode number
-				//using this unused field
-				if (poi->EffText && effectname[0]!='*') {
-					printf("Clashing opcodes FN: %d vs. %d, %s\n", i, poi->EffText, effectname);
-					abort();
-				}
-				poi->EffText = i;
-			}
-			//printf("-------- FN: %d, %s\n", i, effectname);
-		}
-		core->DelSymbol( eT );
-		if ( efftextTable ) core->DelTable( effT );
-
-		//additional initialisations
-		ResolveEffectRef(fx_damage_ref);
-		ResolveEffectRef(fx_hp_modifier_ref);
-		ResolveEffectRef(fx_maximum_hp_modifier_ref);
+	if (initialized) {
+		return true;
 	}
+	TableMgr* efftextTable=NULL;
+	SymbolMgr* effectsTable;
+	memset( effect_refs, 0, sizeof( effect_refs ) );
+
+	initialized = 1;
+
+	int effT = core->LoadTable( "efftext" );
+	efftextTable = core->GetTable( effT );
+
+	int eT = core->LoadSymbol( "effects" );
+	if (eT < 0) {
+		printMessage( "EffectQueue","A critical scripting file is missing!\n",LIGHT_RED );
+		return false;
+	}
+	effectsTable = core->GetSymbol( eT );
+	if (!effectsTable) {
+		printMessage( "EffectQueue","A critical scripting file is damaged!\n",LIGHT_RED );
+		return false;
+	}
+
+	for (i = 0; i < MAX_EFFECTS; i++) {
+		const char* effectname = effectsTable->GetValue( i );
+		if (efftextTable) {
+			int row = efftextTable->GetRowCount();
+			while (row--) {
+				const char* ret = efftextTable->GetRowName( row );
+				long val;
+				if (valid_number( ret, val ) && (i == val) ) {
+					effect_refs[i].EffText = atoi( efftextTable->QueryField( row, 1 ) );
+				}
+			}
+		}
+
+		EffectRef* poi = FindEffect( effectname );
+		if (poi != NULL) {
+			effect_refs[i].Function = poi->Function;
+			effect_refs[i].Name = poi->Name;
+			//reverse linking opcode number
+			//using this unused field
+			if (poi->EffText && effectname[0]!='*') {
+				printf("Clashing opcodes FN: %d vs. %d, %s\n", i, poi->EffText, effectname);
+				abort();
+			}
+			poi->EffText = i;
+		}
+		//printf("-------- FN: %d, %s\n", i, effectname);
+	}
+	core->DelSymbol( eT );
+	if ( efftextTable ) core->DelTable( effT );
+
+	//additional initialisations
+	for (i=0;diced_effects[i].Name;i++) {
+		ResolveEffectRef(diced_effects[i]);
+	}
+
 	return true;
 }
 
@@ -301,27 +312,28 @@ void EffectQueue::AddAllEffects(Actor* target)
 	}
 }
 
+bool IsDicedEffect(int opcode)
+{
+	int i;
+
+	for(i=0;diced_effects[i].Name;i++) {
+		if(diced_effects[i].EffText==opcode) {
+			return true;
+		}
+	}
+	return false;
+}
 //resisted effect based on level
 inline bool check_level(Actor *target, Effect *fx)
 {
 	//skip non level based effects
-	if ((ieDword) fx_damage_ref.EffText==fx->Opcode) return false;
-	if ((ieDword) fx_hp_modifier_ref.EffText==fx->Opcode) return false;
-	if ((ieDword) fx_maximum_hp_modifier_ref.EffText==fx->Opcode) {
+	if (IsDicedEffect((int) fx->Opcode)) {
 		if (fx->Parameter2 == 0 || fx->Parameter2 == 3) {
 			// precompute random value for bonus
 			fx->Parameter1 = DICE_ROLL((signed)fx->Parameter1);
 		}
 		return false;
 	}
-	/*
-	switch (fx->Opcode) {
-	case 12: //damage
-	case 17: //hp modifier
-	case 18: //max hp modifier
-		return false;
-	}
-	*/
 	int level = target->GetXPLevel( true );
 	if ((fx->DiceSides != 0 || fx->DiceThrown != 0) && (level < (int)fx->DiceSides || level > (int)fx->DiceThrown)) {
 		return true;

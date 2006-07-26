@@ -5,6 +5,8 @@ from ie_stats import *
 
 CharGenWindow = 0
 TextAreaControl = 0
+BioWindow = 0
+EditControl = 0
 AlignmentTable = 0
 PortraitName = ""
 
@@ -77,7 +79,7 @@ def OnLoad():
 
 	BiographyButton = GemRB.GetControl (CharGenWindow, 16)
 	GemRB.SetText (CharGenWindow, BiographyButton, 18003)
-	GemRB.SetButtonState (CharGenWindow,BiographyButton,IE_GUI_BUTTON_DISABLED)
+	GemRB.SetButtonState (CharGenWindow,BiographyButton,IE_GUI_BUTTON_ENABLED)
 	TextAreaControl = GemRB.GetControl (CharGenWindow,9)
 	
 	GemRB.SetText (CharGenWindow, TextAreaControl, 1047)
@@ -126,6 +128,7 @@ def OnLoad():
 	GemRB.SetEvent (CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	GemRB.SetEvent (CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
 	GemRB.SetEvent (CharGenWindow, AcceptButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
+	GemRB.SetEvent (CharGenWindow, BiographyButton, IE_GUI_BUTTON_ON_PRESS, "BioPress")
 	GemRB.SetVisible (CharGenWindow,1)
 	return
 	
@@ -143,6 +146,62 @@ def SetRaceResistances(MyChar, racetitle):
 	GemRB.SetPlayerStat (MyChar, IE_RESISTPIERCING, GemRB.GetTableValue ( resistances, racetitle, "PIERCING") )
 	GemRB.SetPlayerStat (MyChar, IE_RESISTMISSILE, GemRB.GetTableValue ( resistances, racetitle, "MISSILE") )
 	GemRB.UnloadTable (resistances)
+	return
+
+def ClearPress():
+	global BioData
+
+	GemRB.SetToken("BIO", "")
+	GemRB.SetText (BioWindow, EditControl, GemRB.GetToken("BIO") )
+	return
+
+def RevertPress():
+	BioTable = GemRB.LoadTable ("bios")
+	Class = GemRB.GetVar ("BaseClass")
+	StrRef = GemRB.GetTableValue(BioTable,Class,1)
+	GemRB.SetToken ("BIO", GemRB.GetString(StrRef) )
+	GemRB.UnloadTable (BioTable)
+	GemRB.SetText (BioWindow, EditControl, GemRB.GetToken("BIO") )
+	return
+
+def BioCancelPress():
+	GemRB.SetToken("BIO",BioData)
+	GemRB.UnloadWindow (BioWindow)
+	return
+
+def BioDonePress():
+	GemRB.UnloadWindow (BioWindow)
+	return
+
+def BioPress():
+	global BioWindow, EditControl, BioData
+
+	BioData = GemRB.GetToken("BIO")
+	BioWindow = Window = GemRB.LoadWindow (51)
+	Button = GemRB.GetControl (Window, 5)
+	GemRB.SetText (Window, Button, 2240)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "RevertPress")
+
+	Button = GemRB.GetControl (Window, 6)
+	GemRB.SetText (Window, Button, 18622)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "ClearPress")
+
+	Button = GemRB.GetControl (Window, 1)
+	GemRB.SetText (Window, Button, 11962)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "BioDonePress")
+	
+	Button = GemRB.GetControl (Window, 2)
+	GemRB.SetText (Window, Button, 36788)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "BioCancelPress")
+	
+	EditControl = GemRB.GetControl (Window, 4)
+	BioData = GemRB.GetToken("BIO")
+	if BioData == "":
+		RevertPress()
+	else:
+		GemRB.SetText (Window, EditControl, BioData )
+	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
+	return
 
 def NextPress():
 
@@ -239,10 +298,12 @@ def NextPress():
 def CancelPress():
 	GemRB.UnloadWindow (CharGenWindow)
 	GemRB.SetNextScript ("CharGen")
+	BioData = None
 	return
 
 def BackPress():
 	GemRB.UnloadWindow (CharGenWindow)
 	GemRB.SetNextScript ("CharGen8") #name
+	BioData = None
 	return
 
