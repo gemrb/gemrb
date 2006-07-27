@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.150 2006/07/22 12:39:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.151 2006/07/27 17:14:56 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -70,6 +70,7 @@ Scriptable::Scriptable(ScriptableType type)
 	locals = new Variables();
 	locals->SetType( GEM_VARIABLES_INT );
 	locals->ParseKey( 1 );
+	InitTriggers();
 }
 
 Scriptable::~Scriptable(void)

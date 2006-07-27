@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.369 2006/07/08 21:24:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.370 2006/07/27 17:14:58 avenger_teambg Exp $
  *
  */
 
@@ -1476,7 +1476,6 @@ void GameScript::Update()
 	RandomNumValue=rand();
 	for (unsigned int a = 0; a < script->responseBlocksCount; a++) {
 		ResponseBlock* rB = script->responseBlocks[a];
-		MySelf->InitTriggers();
 		if (EvaluateCondition( MySelf, rB->condition )) {
 			//if this isn't a continue-d block, we have to clear the queue
 			//we cannot clear the queue and cannot execute the new block

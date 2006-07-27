@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/2DAImporter/2DAImporter.cpp,v 1.7 2005/05/14 11:18:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/2DAImporter/2DAImporter.cpp,v 1.8 2006/07/27 17:14:54 avenger_teambg Exp $
  *
  */
 
@@ -23,12 +23,6 @@
 //
 #include "../../includes/globals.h"
 #include "2DAImpCD.h"
-
-#ifdef WIN32
-#define GEM_EXPORT_DLL __declspec(dllexport)
-#else
-#define GEM_EXPORT_DLL
-#endif
 
 #ifdef WIN32
 #include <windows.h>

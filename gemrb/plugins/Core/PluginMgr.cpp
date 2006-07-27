@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.25 2006/07/16 18:39:38 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PluginMgr.cpp,v 1.26 2006/07/27 17:14:58 avenger_teambg Exp $
  *
  */
 
@@ -142,19 +142,11 @@ PluginMgr::PluginMgr(char* pluginpath)
 			continue;
 		}
 		printStatus( "OK", LIGHT_GREEN );
-		/*
-		GCC Version 3.2.x has changed the Export Names of the DLLs this statement is a simple
-		hack to make GemRB run on every version.
-		*/
-#ifdef GCC_OLD
-		LibVersion = ( charvoid ) my_dlsym( hMod, "LibVersion__Fv" );
-		LibDescription = ( charvoid ) my_dlsym( hMod, "LibDescription__Fv" );
-		LibClassDesc = ( cdvoid ) my_dlsym( hMod, "LibClassDesc__Fv" );
-#else
-		LibVersion = ( charvoid ) my_dlsym( hMod, "_Z10LibVersionv" );
-		LibDescription = ( charvoid ) my_dlsym( hMod, "_Z14LibDescriptionv" );
-		LibClassDesc = ( cdvoid ) my_dlsym( hMod, "_Z12LibClassDescv" );
-#endif
+		//using C bindings, so we don't need to jump through extra hoops
+		//with the symbol name
+		LibVersion = ( charvoid ) my_dlsym( hMod, "LibVersion" );
+		LibDescription = ( charvoid ) my_dlsym( hMod, "LibDescription" );
+		LibClassDesc = ( cdvoid ) my_dlsym( hMod, "LibClassDesc" );
 #endif
 		printMessage( "PluginMgr", "Checking Plugin Version...", WHITE );
 		if (LibVersion==NULL) {
