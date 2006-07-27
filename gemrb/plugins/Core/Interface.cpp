@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.414 2006/07/25 19:58:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.415 2006/07/27 19:11:34 avenger_teambg Exp $
  *
  */
 
@@ -2130,19 +2130,23 @@ int Interface::LoadCreature(char* ResRef, int InParty, bool character)
 	}
 }
 
-#define EAM_NORMAL -1
 #define EAM_ALLY    0
-#define EAM_ENEMY   5
+#define EAM_ENEMY   1
 
-bool Interface::SummonCreature(ieResRef resource, ieResRef vvcres, Actor *Owner, Actor *target, Point &position, int eamod)
+bool Interface::SummonCreature(ieResRef resource, ieResRef vvcres, Actor *Owner, Actor *target, Point &position, int eamod, int level)
 {
 	DataStream* ds = key->GetResource( resource, IE_CRE_CLASS_ID );
+	level = level * 100;
+	//maximum number of monsters summoned
+	int cnt=10;
+retry:
 	Actor *ab = GetCreature(ds);
 	if (!ab) {
 		return false;
 	}
 
 	ab->LastSummoner = Owner->GetID();
+	level -= ab->GetStat(IE_XP);
 
 	int enemyally;
 
@@ -2153,14 +2157,14 @@ bool Interface::SummonCreature(ieResRef resource, ieResRef vvcres, Actor *Owner,
 	}
 
 	switch (eamod) {
-		case 0: case 1: case 3:      
+		case EAM_ALLY:
 			if (enemyally) {
 				ab->SetBase(IE_EA, EA_ENEMY); //is this the summoned EA?
 			} else {
 				ab->SetBase(IE_EA, EA_ALLY); //is this the summoned EA?
 			}
 			break;
-		case 5:
+		case EAM_ENEMY:
 			if (enemyally) {
 				ab->SetBase(IE_EA, EA_ALLY); //is this the summoned EA?
 			} else {
@@ -2179,6 +2183,9 @@ bool Interface::SummonCreature(ieResRef resource, ieResRef vvcres, Actor *Owner,
 		vvc->XPos=position.x;
 		vvc->YPos=position.y;
 		map->AddVVCell( vvc );
+	}
+	if (cnt-- && level>0) {
+		goto retry;
 	}
 	return true;
 }
@@ -4672,3 +4679,28 @@ void Interface::SetInfoTextColor(Color &color)
 	InfoTextPalette = CreatePalette(color,black);
 }
 
+//todo row?
+void Interface::GetResRefFrom2DA(ieResRef resref, ieResRef resource1, ieResRef resource2, ieResRef resource3)
+{
+	if (!resource1) {
+		return;
+	}
+	resource1[0]=0;
+	if (resource2) {
+		resource2[0]=0;
+	}
+	if (resource3) {
+		resource3[0]=0;
+	}
+	int table = LoadTable(resref);
+	TableMgr *tab = GetTable(table);
+
+	if (tab) {
+		unsigned int row = (unsigned int) Roll(1,tab->GetRowCount(),-1);
+		strnuprcpy(resource1, tab->QueryField(row,0), 8);
+		if (resource2) 
+			strnuprcpy(resource2, tab->QueryField(row,1), 8);
+		if (resource3) 
+		strnuprcpy(resource3, tab->QueryField(row,2), 8);
+	}
+}

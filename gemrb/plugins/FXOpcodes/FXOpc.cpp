@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.33 2006/07/25 19:58:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.34 2006/07/27 19:11:35 avenger_teambg Exp $
  *
  */
 
@@ -1008,11 +1008,7 @@ int fx_cure_poisoned_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_damage (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_damage (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	int damage; //FIXME damage calculation, random damage, etc
-
-	damage = core->Roll(fx->DiceSides, fx->DiceThrown, fx->Parameter1);
-	damage = target->Damage(damage, fx->Parameter2, Owner); //FIXME!
-	//handle invulnerabilities, print damage caused
+	target->Damage(fx->Parameter1, fx->Parameter2, Owner);
 	//this effect doesn't stick
 	return FX_NOT_APPLIED;
 }
@@ -1759,6 +1755,7 @@ int fx_transparency_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
+static int eamods[]={0,0,-1,0,-1,1,0};
 // 0x43 SummonCreature
 int fx_summon_creature (Actor* Owner, Actor* target, Effect* fx)
 {
@@ -1768,8 +1765,11 @@ int fx_summon_creature (Actor* Owner, Actor* target, Effect* fx)
 	//creature's lastsummoner is Owner
 	//creature's target is target
 	//position of appearance is target's pos
-	//EA modification is Parameter2
-	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, target->Pos, fx->Parameter2);
+	int eamod = -1;
+	if (fx->Parameter2<6){
+		eamod = eamods[fx->Parameter2];
+	}
+	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, target->Pos, eamod, 0);
 	return FX_NOT_APPLIED;
 }
 
@@ -2450,6 +2450,10 @@ int fx_movement_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
+#define FX_MS 10
+ieResRef monster_summoning_2da[FX_MS]={"MONSUM01","MONSUM02","MONSUM03",
+ "ANISUM01","ANISUM02", "MONSUM01", "MONSUM02","MONSUM03","ANISUM01","ANISUM02"};
+
 // 0x7f MonsterSummoning
 int fx_monster_summoning (Actor* Owner, Actor* target, Effect* fx)
 {
@@ -2458,10 +2462,19 @@ int fx_monster_summoning (Actor* Owner, Actor* target, Effect* fx)
 
 	//get monster resref from 2da determined by fx->Resource or fx->Parameter2
 	ieResRef monster;
+	ieResRef hit;
+	ieResRef areahit;
+	if (fx->Parameter2>=FX_MS) {
+		strnuprcpy(monster,fx->Resource,8);
+		strnuprcpy(hit,fx->Resource2,8);
+		strnuprcpy(areahit,fx->Resource3,8);
+	} else {
+		core->GetResRefFrom2DA(monster_summoning_2da[fx->Parameter2], monster, hit, areahit);
+	}
 
 	//the monster should appear near the effect position
 	Point p(fx->PosX, fx->PosY);
-	core->SummonCreature(monster, fx->Resource2, Owner, target, p, fx->Parameter2);
+	core->SummonCreature(monster, areahit, Owner, target, p, fx->Parameter2/5, fx->Parameter1);
 	return FX_NOT_APPLIED;
 }
 
@@ -2805,7 +2818,7 @@ int fx_replace_creature (Actor* Owner, Actor* target, Effect *fx)
 	default:;
 	}
 	//create replacement
-	core->SummonCreature(fx->Resource, fx->Resource2, Owner, NULL,p, 0);
+	core->SummonCreature(fx->Resource, fx->Resource2, Owner, NULL,p, -1,0);
 	return FX_NOT_APPLIED;
 }
 
@@ -3160,7 +3173,7 @@ int fx_find_familiar (Actor* Owner, Actor* target, Effect* fx)
 	}
 	//summon familiar with fx->Resource
 	Point p(fx->PosX, fx->PosY);
-	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, p, fx->Parameter2);
+	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, p, -1,0);
 	return FX_NOT_APPLIED;
 }
 // 0xc1 InvisibleDetection 

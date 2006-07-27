@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PSTOpcodes/PSTOpc.cpp,v 1.4 2006/07/24 20:41:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PSTOpcodes/PSTOpc.cpp,v 1.5 2006/07/27 19:11:35 avenger_teambg Exp $
  *
  */
 
@@ -108,12 +108,11 @@ int fx_play_bam (Actor* /*Owner*/, Actor* target, Effect* fx)
 //0xc0 fx_transfer_hp
 int fx_transfer_hp (Actor* Owner, Actor* target, Effect* fx)
 {
+	if (0) printf( "fx_transfer_hp (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
 	if (Owner==target) {
 		return FX_NOT_APPLIED;
 	}
 
-	if (0) printf( "fx_transfer_hp (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
-	int damage = core->Roll(fx->DiceSides, fx->DiceThrown, fx->Parameter1);
 	Actor *receiver;
 	Actor *donor;
 	int a,b;
@@ -132,7 +131,7 @@ int fx_transfer_hp (Actor* Owner, Actor* target, Effect* fx)
 		default:
 			return FX_NOT_APPLIED;
 	}
-	damage = donor->Damage(damage, fx->Parameter2, Owner); //FIXME!
+	int damage = donor->Damage(fx->Parameter1, fx->Parameter2, Owner);
 	if (fx->Parameter2>2) {
 		receiver->SetBase( IE_HITPOINTS, BASE_GET( IE_HITPOINTS ) + ( damage ) );
 	} else {
