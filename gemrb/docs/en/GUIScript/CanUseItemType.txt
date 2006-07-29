@@ -11,5 +11,5 @@ actor       - unused currently
 
 Return value: boolean
 
-See also: 
+See also: DropDraggedItem
 
