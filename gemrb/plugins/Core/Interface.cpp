@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.415 2006/07/27 19:11:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.416 2006/07/29 18:17:26 avenger_teambg Exp $
  *
  */
 
@@ -198,6 +198,9 @@ Interface::Interface(int iargc, char** iargv)
 	memset( WindowFrames, 0, sizeof( WindowFrames ));
 	memset( GroundCircles, 0, sizeof( GroundCircles ));
 	AreaAliasTable = NULL;
+	ItemExclTable = NULL;
+	ItemDialTable = NULL;
+	ItemDial2Table = NULL;
 }
 
 #define FreeInterfaceVector(type, variable, member) \
@@ -603,6 +606,108 @@ bool Interface::ReadAbilityTables()
 	if (!ret)
 		return ret;
 	return true;
+}
+
+bool Interface::ReadAuxItemTables()
+{
+	size_t idx;
+	TableMgr* aa;
+	int table;
+	bool flag = true;
+
+	if (ItemExclTable) {
+		ItemExclTable->RemoveAll(NULL);
+	} else {
+		ItemExclTable = new Variables();
+		ItemExclTable->SetType(GEM_VARIABLES_INT);
+	}
+	table = LoadTable( "itemexcl" );
+
+	if (table < 0) {
+		//don't report error when the file doesn't exist
+		goto aux_1;
+	}
+	aa = GetTable( table );
+	if (!aa) {
+		DelTable( table );
+		flag = false;
+		goto aux_1;
+	}
+	idx = aa->GetRowCount();
+	while (idx--) {
+		ieResRef key;
+
+		strnlwrcpy(key,aa->GetRowName(idx),8);
+		ieDword value = atoi(aa->QueryField(idx,0));
+		ItemExclTable->SetAt(key, value);
+	}
+	DelTable( table );
+aux_1:
+	if (ItemDialTable) {
+		ItemDialTable->RemoveAll(NULL);
+	} else {
+		ItemDialTable = new Variables();
+		ItemDialTable->SetType(GEM_VARIABLES_INT);
+	}
+	if (ItemDial2Table) {
+		ItemDial2Table->RemoveAll(NULL);
+	} else {
+		ItemDial2Table = new Variables();
+		ItemDial2Table->SetType(GEM_VARIABLES_STRING);
+	}
+	table = LoadTable( "itemdial" );
+
+	if (table < 0) {
+		//don't report error when the file doesn't exist
+		goto aux_2;
+	}
+	aa = GetTable( table );
+	if (!aa) {
+		DelTable( table );
+		flag = false;
+		goto aux_2;
+	}
+	idx = aa->GetRowCount();
+	while (idx--) {
+		ieResRef key, dlgres;
+
+		strnlwrcpy(key,aa->GetRowName(idx),8);
+		ieDword value = atoi(aa->QueryField(idx,0));
+		ItemDialTable->SetAt(key, value);
+		strnlwrcpy(dlgres,aa->QueryField(idx,1),8);
+		ItemDial2Table->SetAt(key, dlgres);
+	}
+	DelTable( table );
+aux_2:
+	return flag;
+}
+
+int Interface::GetItemExcl(ieResRef itemname)
+{
+	ieDword value;
+
+	if (ItemExclTable && ItemExclTable->Lookup(itemname, value)) {
+		return (int) value;
+	}
+	return 0;
+}
+
+int Interface::GetItemDialStr(ieResRef itemname)
+{
+	ieDword value;
+
+	if (ItemDialTable && ItemDialTable->Lookup(itemname, value)) {
+		return (int) value;
+	}
+	return -1;
+}
+
+int Interface::GetItemDialRes(ieResRef itemname, ieResRef retval)
+{
+	if (ItemDial2Table && ItemDial2Table->Lookup(itemname, retval)) {
+		return 1;
+	}
+	return 0;
 }
 
 bool Interface::ReadAreaAliasTable(const ieResRef tablename)
@@ -1303,6 +1408,15 @@ int Interface::Init()
 
 	printMessage( "Core", "Initializing area aliases...\n", WHITE );
 	ret = ReadAreaAliasTable( "WMAPLAY" );
+	if (ret) {
+		printStatus( "OK", LIGHT_GREEN );
+	}
+	else {
+		printStatus( "ERROR", LIGHT_RED );
+	}
+
+	printMessage( "Core", "Reading item tables...\n", WHITE);
+	ret = ReadAuxItemTables();
 	if (ret) {
 		printStatus( "OK", LIGHT_GREEN );
 	}
@@ -3553,8 +3667,8 @@ int Interface::CanUseItemType(int itype, int slottype, ieDword /*use1*/, ieDword
 	if (actor) {
 		//
 	}
-	if ( slottype<0 ) { 
-		return 1;
+	if ( slottype==-1 ) { 
+		return SLOT_INVENTORY;
 	}
 	if ( (unsigned int) itype>=(unsigned int) ItemTypes) {
 		//invalid itemtype

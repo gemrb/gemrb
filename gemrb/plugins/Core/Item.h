@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.26 2006/07/04 14:31:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.27 2006/07/29 18:17:26 avenger_teambg Exp $
  *
  */
 
@@ -187,6 +187,8 @@ public:
 
 	// PST and IWD2 only
 	char unknown[26];
+	// flag items to mutually exclusive to equip
+	ieDword ItemExcl;
 public:
 	ieStrRef GetItemName(bool identified)
 	{

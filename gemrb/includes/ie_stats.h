@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.48 2006/05/26 18:44:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.49 2006/07/29 18:17:30 avenger_teambg Exp $
  *
  */
 
@@ -77,10 +77,12 @@
 #define STATE_PANIC      0x00000004
 #define STATE_STUNNED    0x00000008
 #define STATE_INVISIBLE  0x00000010
+#define STATE_PST_CURSE  0x00000010
 #define STATE_HELPLESS   0x00000020
 #define STATE_FROZEN     0x00000040
 #define STATE_PETRIFIED  0x00000080
 #define STATE_D3         0x00000100
+#define STATE_PST_MIRROR 0x00000100
 #define STATE_D4         0x00000200
 #define STATE_D5         0x00000400
 #define STATE_DEAD       0x00000800
@@ -88,7 +90,9 @@
 #define STATE_CHARMED    0x00002000
 #define STATE_POISONED   0x00004000
 #define STATE_HASTED     0x00008000
+#define STATE_CRIT_PROT  0x00008000
 #define STATE_SLOWED     0x00010000
+#define STATE_CRIT_ENH   0x00010000
 #define STATE_INFRA      0x00020000
 #define STATE_BLIND      0x00040000
 //this appears to be a mistake in the original state.ids
@@ -98,14 +102,19 @@
 #define STATE_FEEBLE     0x00100000
 #define STATE_NONDET     0x00200000
 #define STATE_INVIS2     0x00400000
+#define STATE_EE_DUPL    0x00400000
 #define STATE_BLESS      0x00800000
 #define STATE_CHANT      0x01000000
+#define STATE_DETECT_EVIL 0x01000000
 #define STATE_HOLY       0x02000000
+#define STATE_PST_INVIS  0x02000000
 #define STATE_LUCK       0x04000000
 #define STATE_AID        0x08000000
 #define STATE_CHANTBAD   0x10000000
+#define STATE_ANTIMAGIC  0x10000000
 #define STATE_BLUR       0x20000000
 #define STATE_MIRROR     0x40000000
+#define STATE_EMBALM     0x40000000
 #define STATE_CONFUSED   0x80000000
 
 #define STATE_CANTMOVE   0x80080fef

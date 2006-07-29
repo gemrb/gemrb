@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PSTOpcodes/PSTOpc.cpp,v 1.5 2006/07/27 19:11:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PSTOpcodes/PSTOpc.cpp,v 1.6 2006/07/29 18:17:30 avenger_teambg Exp $
  *
  */
 
@@ -203,9 +203,25 @@ int fx_move_view (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0xce fx_embalm
-int fx_embalm (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_embalm (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_embalm (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
+	if (STATE_GET (STATE_EMBALM) ) //embalm is non cummulative
+		return FX_NOT_APPLIED;
+	STATE_SET( STATE_EMBALM );
+	if (!fx->Parameter1) {
+		if (fx->Parameter2) {
+			fx->Parameter1=fx->Power*2;
+		} else {
+			fx->Parameter1=core->Roll(1,6,1);
+		}
+		BASE_ADD( IE_HITPOINTS, fx->Parameter1 );
+	}
+	if (fx->Parameter2) {
+		STAT_ADD( IE_ARMORCLASS,2 );
+	} else {
+		STAT_ADD( IE_ARMORCLASS,1 );
+	}
 	//set global flag
 	return FX_APPLIED;
 }
@@ -259,10 +275,10 @@ int fx_detect_evil (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 int fx_jumble_curse (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_jumble_curse (%2d): Par1: %d  Par2: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-        STAT_SET( IE_DEADMAGIC, 1);
-        STAT_SET( IE_SPELLFAILUREMAGE, 100);
-        STAT_SET( IE_SPELLFAILUREPRIEST, 100);
-        STAT_SET( IE_SPELLFAILUREINNATE, 100);
+	STAT_SET( IE_DEADMAGIC, 1);
+	STAT_SET( IE_SPELLFAILUREMAGE, 100);
+	STAT_SET( IE_SPELLFAILUREPRIEST, 100);
+	STAT_SET( IE_SPELLFAILUREINNATE, 100);
 	//hiccups
 	return FX_APPLIED;
 }

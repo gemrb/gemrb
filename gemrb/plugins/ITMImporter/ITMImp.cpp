@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.19 2006/07/11 16:21:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.20 2006/07/29 18:17:30 avenger_teambg Exp $
  *
  */
 
@@ -124,12 +124,15 @@ Item* ITMImp::GetItem(Item *s)
 
 	if (version == 20) {
 		str->Read( s->unknown, 16 );
+		s->DialogName = core->GetItemDialStr(s->Name);
+		core->GetItemDialRes(s->Name, s->Dialog);
 	} else if (version == 11) {
 		str->ReadResRef( s->Dialog );
 		str->ReadDword( &s->DialogName );
 		str->ReadWord( &s->WieldColor );
 		str->Read( s->unknown, 26 );
 	}
+	s->ItemExcl=core->GetItemExcl(s->Name);
 
 	s->ext_headers = core->GetITMExt( s->ExtHeaderCount );
 

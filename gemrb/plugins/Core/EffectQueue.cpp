@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.65 2006/07/27 19:11:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.66 2006/07/29 18:17:26 avenger_teambg Exp $
  *
  */
 
@@ -72,11 +72,19 @@ inline bool IsPrepared(ieByte timingmode)
 	return fx_absolute[timingmode];
 }
 
+//change the timing method after the effect triggered
 static ieByte fx_triggered[MAX_TIMING_MODE]={FX_DURATION_JUST_EXPIRED,FX_DURATION_INSTANT_PERMANENT,//0,1
 FX_DURATION_INSTANT_WHILE_EQUIPPED,FX_DURATION_DELAY_LIMITED_PENDING,//2,3
 FX_DURATION_AFTER_EXPIRES,FX_DURATION_PERMANENT_UNSAVED, //4,5
 FX_DURATION_INSTANT_LIMITED,FX_DURATION_JUST_EXPIRED,FX_DURATION_PERMANENT_UNSAVED,//6,8
 FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES,FX_DURATION_JUST_EXPIRED};//9,10
+
+//change the timing method for effect that should trigger after this effect expired
+static ieDword fx_to_delayed[]={FX_DURATION_AFTER_EXPIRES,FX_DURATION_JUST_EXPIRED,
+FX_DURATION_PERMANENT_UNSAVED,FX_DURATION_DELAY_LIMITED_PENDING,
+FX_DURATION_AFTER_EXPIRES,FX_DURATION_PERMANENT_UNSAVED, //4,5
+FX_DURATION_JUST_EXPIRED,FX_DURATION_JUST_EXPIRED,FX_DURATION_JUST_EXPIRED,//6,8
+FX_DURATION_JUST_EXPIRED,FX_DURATION_JUST_EXPIRED};//9,10
 
 inline ieByte TriggeredEffect(ieByte timingmode)
 {
@@ -851,6 +859,15 @@ ieDword EffectQueue::GetSavedEffectsCount() const
 			cnt++;
 	}
 	return cnt;
+}
+
+void EffectQueue::TransformToDelay(ieDword &TimingMode)
+{
+	if (TimingMode<MAX_TIMING_MODE) {;
+		TimingMode = fx_to_delayed[TimingMode];
+	} else {
+		TimingMode = FX_DURATION_JUST_EXPIRED;
+	}
 }
 
 int EffectQueue::ResolveEffect(EffectRef &effect_reference)

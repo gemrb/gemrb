@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.78 2006/07/02 11:23:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.79 2006/07/29 18:17:26 avenger_teambg Exp $
  *
  */
 
@@ -81,6 +81,7 @@ Inventory::Inventory()
 	Changed = false;
 	Weight = 0;
 	Equipped = IW_NO_EQUIPPED;
+	ItemExcl = 0;
 }
 
 Inventory::~Inventory()
@@ -202,6 +203,7 @@ void Inventory::RemoveSlotEffects(CREItem* slot)
 	Item* itm = core->GetItem( slot->ItemResRef );
 	if (!itm)
 		return;
+	ItemExcl&=~itm->ItemExcl;
 	for (int i = 0; i < itm->EquippingFeatureCount; i++) {
 		Effect* fx = &itm->equipping_features[i];
 		if (fx->TimingMode == FX_DURATION_INSTANT_WHILE_EQUIPPED) {
@@ -297,10 +299,27 @@ void Inventory::KillSlot(unsigned int index)
 {
 	if (InventoryType==INVENTORY_HEAP) {
 		Slots.erase(Slots.begin()+index);
-	} else {
-		RemoveSlotEffects( GetSlotItem(index) );
-		Slots[index] = NULL;
+		return;
 	}
+	CREItem *item = Slots[index];
+	if (!item) {
+		return;
+	}
+	Slots[index] = NULL;
+ 	int effect = core->QuerySlotEffects( index );
+	if (!effect) {
+		return;
+	}
+	RemoveSlotEffects( GetSlotItem(index) );
+	if (effect != SLOT_EFFECT_ITEM) {
+		return;
+	}
+	Item *itm = core->GetItem(item->ItemResRef);
+	int l = itm->AnimationType[0]-'1';
+	if (l>=0 && l<=3) {
+		Owner->SetBase(IE_ARMOR_TYPE, 0);
+	}
+	core->FreeItem(itm, item->ItemResRef, false);
 }
 /** if resref is "", then destroy ALL items
 this function can look for stolen, equipped, identified, destructible
@@ -408,7 +427,7 @@ void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
 	Slots[slot] = item;
 }
 
-int Inventory::AddSlotItem(CREItem* item, int slot)
+int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 {
 	if (slot >= 0) {
 		if ((unsigned)slot >= Slots.size()) {
@@ -438,19 +457,29 @@ int Inventory::AddSlotItem(CREItem* item, int slot)
 			myslot->Usages[0] += chunk;
 			item->Usages[0] -= chunk;
 			Changed = true;
+			EquipItem(slot);
 			if (item->Usages[0] == 0) {
 				delete item;
 				return 2;
 			}
-			else {
-				return 1;
-			}
+			return 1;
 		}
 		return 0;
 	}
 
+	bool which;
+	if (slot==-1) {
+		which=true;
+	} else {
+		which=false;
+	}
 	int res = 0;
-	for (int i = SLOT_INV; i<=LAST_INV; i++) {
+	int max = (int) Slots.size();
+	for (int i = 0;i<max;i++) {
+		if ((i<SLOT_INV || i>LAST_INV)!=which)
+			continue;
+		if (!(core->QuerySlotType(i)&slottype))
+			continue;
 		int part_res = AddSlotItem (item, i);
 		if (part_res == 2) return 2;
 		else if (part_res == 1) res = 1;
@@ -579,12 +608,9 @@ bool Inventory::DropItemAtLocation(unsigned int slot, unsigned int flags, Map *m
 	if ( ((flags^IE_INV_ITEM_UNDROPPABLE)&item->Flags)!=flags) {
 		return false;
 	}
-	if (core->QuerySlotEffects( slot )) {
-		RemoveSlotEffects( item );
-	}
 	map->AddItemToLocation(loc, item);
 	Changed = true;
-	Slots[slot]=NULL;
+	KillSlot(slot);
 	return true;
 }
 
@@ -610,13 +636,10 @@ bool Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
 			continue;
 		}
-		if (core->QuerySlotEffects( i )) {
-			RemoveSlotEffects( item );
-		}
 		map->AddItemToLocation(loc, item);
 		Changed = true;
 		dropped = true;
-		Slots[i]=NULL;
+		KillSlot(i);
 		//if it isn't all items then we stop here
 		if (resref[0])
 			break;
@@ -662,6 +685,7 @@ bool Inventory::EquipItem(unsigned int slot)
 	}
 	// add effects of an item just being equipped to actor's effect queue
 	int effect = core->QuerySlotEffects( slot );
+	Item *itm = core->GetItem(item->ItemResRef);
 	switch (effect) {
 	case SLOT_EFFECT_MELEE:
 		//if weapon is ranged, then find quarrel for it and equip that
@@ -674,7 +698,6 @@ bool Inventory::EquipItem(unsigned int slot)
 				//find the ranged projectile associated with it
 				slot = FindRangedProjectile(header->ProjectileType);
 			}
-			core->FreeItem(itm, item->ItemResRef, false);
 		}
 		SetEquippedSlot(slot-SLOT_MELEE);
 		break;
@@ -684,12 +707,10 @@ bool Inventory::EquipItem(unsigned int slot)
 	case SLOT_EFFECT_ITEM:
 		//adjusting armour level if needed
 		{
-			Item *itm = core->GetItem(item->ItemResRef);
 			int l = itm->AnimationType[0]-'1';
 			if (l>=0 && l<=3) {
 				Owner->SetBase(IE_ARMOR_TYPE, l);
 			}
-			core->FreeItem(itm, item->ItemResRef, false);
 		}
 		break;
 	}
@@ -700,6 +721,8 @@ bool Inventory::EquipItem(unsigned int slot)
 		}
 		AddSlotEffects( item );
 	}
+	ItemExcl|=itm->ItemExcl;
+	core->FreeItem(itm, item->ItemResRef, false);
 	return true;
 }
 
@@ -723,23 +746,6 @@ bool Inventory::UnEquipItem(unsigned int slot, bool removecurse)
 		return false;
 	}
 	item->Flags &= ~IE_INV_ITEM_EQUIPPED;
-	// add effects of an item just being equipped to actor's effect queue
-	int effect = core->QuerySlotEffects( slot );
-	switch (effect) {
-		case SLOT_EFFECT_ITEM:
-		{
-			Item *itm = core->GetItem(item->ItemResRef);
-			int l = itm->AnimationType[0]-'1';
-			if (l>=0 && l<=3) {
-				Owner->SetBase(IE_ARMOR_TYPE, 0);
-			}
-			core->FreeItem(itm, item->ItemResRef, false);
-		}
-		break;
-	}
-	if (effect) {
-		RemoveSlotEffects( item );
-	}
 	return true;
 }
 
@@ -753,14 +759,14 @@ int Inventory::FindRangedProjectile(unsigned int type)
 	for(int i=SLOT_RANGED;i<=LAST_RANGED;i++) {
 		CREItem *Slot;
 
-		Item *item = GetItemPointer(i, Slot);
-		if (!item) continue;
-		ITMExtHeader *ext_header = item->GetExtHeader(0);
+		Item *itm = GetItemPointer(i, Slot);
+		if (!itm) continue;
+		ITMExtHeader *ext_header = itm->GetExtHeader(0);
 		unsigned int weapontype = 0;
 		if (ext_header) {
 			weapontype = ext_header->ProjectileType;
 		}
-		core->FreeItem(item, Slot->ItemResRef, false);
+		core->FreeItem(itm, Slot->ItemResRef, false);
 		if (weapontype & type) {
 			return i-SLOT_MELEE;
 		}
@@ -776,29 +782,29 @@ int Inventory::FindRangedWeapon()
 	unsigned int slot = Equipped+SLOT_MELEE;
 
 	CREItem *Slot;   
-	Item *item = GetItemPointer(slot, Slot);
-	if (!item) return SLOT_FIST;
+	Item *itm = GetItemPointer(slot, Slot);
+	if (!itm) return SLOT_FIST;
 
-	ITMExtHeader *ext_header = item->GetExtHeader(0);
+	ITMExtHeader *ext_header = itm->GetExtHeader(0);
 	int type = 0;
 	if (ext_header) {
 		type = ext_header->ProjectileQualifier;
 	} 
-	core->FreeItem(item, Slot->ItemResRef, false);
+	core->FreeItem(itm, Slot->ItemResRef, false);
 	if (!type) {
 		return SLOT_FIST;
 	}
 	for(int i=SLOT_MELEE;i<=LAST_MELEE;i++) {
 		CREItem *Slot;
 
-		Item *item = GetItemPointer(i, Slot);
-		if (!item) continue;
-		ITMExtHeader *ext_header = item->GetExtHeader(0);
+		Item *itm = GetItemPointer(i, Slot);
+		if (!itm) continue;
+		ITMExtHeader *ext_header = itm->GetExtHeader(0);
 		int weapontype = 0;
 		if (ext_header) {
 			weapontype = ext_header->ProjectileQualifier;
 		}
-		core->FreeItem(item, Slot->ItemResRef, false);
+		core->FreeItem(itm, Slot->ItemResRef, false);
 		if (weapontype & type) {
 			return i-SLOT_MELEE;
 		}
@@ -1019,10 +1025,10 @@ void Inventory::BreakItemSlot(ieDword slot)
 	ieResRef newItem;
 	CREItem *Slot;
 
-	Item *item = GetItemPointer(slot, Slot);
-	if (!item) return;
-	memcpy(newItem, item->ReplacementItem,sizeof(newItem) );
-	core->FreeItem( item, Slot->ItemResRef, true );
+	Item *itm = GetItemPointer(slot, Slot);
+	if (!itm) return;
+	memcpy(newItem, itm->ReplacementItem,sizeof(newItem) );
+	core->FreeItem( itm, Slot->ItemResRef, true );
 	//this depends on setslotitemres using setslotitem
 	SetSlotItemRes(newItem, slot, 0,0,0);
 }
@@ -1138,12 +1144,12 @@ bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count
 		}    
 		CREItem *slot;
 		
-		Item *item = GetItemPointer(idx, slot);
-		if (!item) {
+		Item *itm = GetItemPointer(idx, slot);
+		if (!itm) {
 			continue;
 		}
-		for(int ehc=0;count && ehc<item->ExtHeaderCount;ehc++) {
-			ITMExtHeader *ext_header = item->ext_headers+ehc;
+		for(int ehc=0;count && ehc<itm->ExtHeaderCount;ehc++) {
+			ITMExtHeader *ext_header = itm->ext_headers+ehc;
 			if (ext_header->Location!=ITEM_LOC_EQUIPMENT) {
 				continue;
 			}
@@ -1152,7 +1158,7 @@ bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count
 
 				//store the item, return if we can't store more
 				if (!count) {
-					core->FreeItem(item, slot->ItemResRef, false);
+					core->FreeItem(itm, slot->ItemResRef, false);
 					return true;
 				}
 				count--;
@@ -1169,7 +1175,7 @@ bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count
 				pos++;
 			}
 		}
-		core->FreeItem(item, slot->ItemResRef, false);
+		core->FreeItem(itm, slot->ItemResRef, false);
 	}
 
 	return false;
@@ -1191,13 +1197,19 @@ bool Inventory::UseItem(unsigned int slotindex, unsigned int headerindex, Actor 
 	} else {
 		usagecount = slot->Usages[headerindex];
 	}
-	Item *item = core->GetItem(slot->ItemResRef);
-	if (!item) {
+	Item *itm = core->GetItem(slot->ItemResRef);
+	if (!itm) {
 		return false;
 	}
 	
-	EffectQueue *fxqueue = item->GetEffectBlock(headerindex);
-	core->FreeItem(item, slot->ItemResRef, false);
+	EffectQueue *fxqueue = itm->GetEffectBlock(headerindex);
+	core->FreeItem(itm, slot->ItemResRef, false);
 	fxqueue->ApplyAllEffects(target);
 	return true;
 }
+
+ieDword Inventory::GetEquipExclusion() const
+{
+	return ItemExcl;
+}
+

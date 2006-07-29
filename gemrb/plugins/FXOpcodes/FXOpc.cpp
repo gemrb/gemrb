@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.34 2006/07/27 19:11:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.35 2006/07/29 18:17:27 avenger_teambg Exp $
  *
  */
 
@@ -761,13 +761,24 @@ bool match_ids(Actor *target, int table, ieDword value)
 	return false;
 }
 
+static inline void HandleBonus(Actor *target, int stat, int mod, int mode)
+{
+	if (mode==FX_DURATION_INSTANT_PERMANENT) {
+		if (target->IsReverseToHit()) {
+			BASE_SUB( stat, mod );
+		} else {
+			BASE_ADD( stat, mod );
+		}
+		return;
+	}
+	if (target->IsReverseToHit()) {
+		STAT_SUB( stat, mod );
+	} else {
+		STAT_ADD( stat, mod );
+	}
+}
+
 // Effect opcodes
-// FIXME: These should be moved into their own plugins
-// NOTE: These opcode numbers are true for PS:T and are meant just for 
-// better orientation
-// <avenger> opcodes below 0xb0 are the same for ALL variations (or crash/nonfunctional)
-// so we can implement those without fear, overlapping functions could be marked
-// like 0xb1 (pst), and the effect.ids file points to the appropriate function
 
 // 0x00 ACVsDamageTypeModifier
 int fx_ac_vs_damage_type_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
@@ -779,43 +790,23 @@ int fx_ac_vs_damage_type_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	// it is a bitmask
 	int type = fx->Parameter2;
 	if (type == 0) {
-	 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-			BASE_ADD( IE_ARMORCLASS, fx->Parameter1 );
-		} else {
-			STAT_ADD( IE_ARMORCLASS, fx->Parameter1 );
-		}
+		HandleBonus(target, IE_ARMORCLASS, fx->Parameter1, fx->TimingMode);
 		return FX_PERMANENT;
 	}
 
 	//the original engine did work with the combination of these bits
 	//but since it crashed, we are not bound to the same rules
 	if (type & 1) {
-	 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-			BASE_ADD( IE_ACCRUSHINGMOD, fx->Parameter1 );
-		} else {
-			STAT_ADD( IE_ACCRUSHINGMOD, fx->Parameter1 );
-		}
+		HandleBonus(target, IE_ACCRUSHINGMOD, fx->Parameter1, fx->TimingMode);
 	}
 	if (type & 2) {
-	 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-			BASE_ADD( IE_ACMISSILEMOD, fx->Parameter1 );
-		} else {
-			STAT_ADD( IE_ACMISSILEMOD, fx->Parameter1 );
-		}
+		HandleBonus(target, IE_ACMISSILEMOD, fx->Parameter1, fx->TimingMode);
 	}
 	if (type & 4) {
-	 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-			BASE_ADD( IE_ACPIERCINGMOD, fx->Parameter1 );
-		} else {
-			STAT_ADD( IE_ACPIERCINGMOD, fx->Parameter1 );
-		}
+		HandleBonus(target, IE_ACPIERCINGMOD, fx->Parameter1, fx->TimingMode);
 	}
 	if (type & 8) {
-	 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-			BASE_ADD( IE_ACSLASHINGMOD, fx->Parameter1 );
-		} else {
-			STAT_ADD( IE_ACSLASHINGMOD, fx->Parameter1 );
-		}
+		HandleBonus(target, IE_ACSLASHINGMOD, fx->Parameter1, fx->TimingMode);
 	}
 
 	// FIXME: set to Param1 or Param1-1 ?
@@ -1400,6 +1391,8 @@ int fx_set_silenced_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
+EffectRef fx_animation_stance_ref = {"AnimationStateChange",NULL,-1};
+
 // 0x27 State:Helpless
 // this effect sets both bits, but 'awaken' only removes the sleep bit
 int fx_set_unconscious_state (Actor* /*Owner*/, Actor* target, Effect* fx)
@@ -1407,11 +1400,14 @@ int fx_set_unconscious_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_set_unconscious_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	if (fx->Parameter2) {
 		BASE_STATE_SET( STATE_HELPLESS | STATE_SLEEP ); //don't awaken on damage
+		//the effect directly sets the state bit, and doesn't stick
+		fx->Opcode=EffectQueue::ResolveEffect(fx_animation_stance_ref);
+		//convert effect to awaken
+		EffectQueue::TransformToDelay(fx->TimingMode);
 		//apply cure helpless timed
-	} else {
-		BASE_STATE_SET( STATE_SLEEP ); //awaken on damage
+		return FX_APPLIED;
 	}
-	//the effect directly sets the state bit, and doesn't stick
+	BASE_STATE_SET( STATE_SLEEP ); //awaken on damage
 	return FX_NOT_APPLIED;
 }
 

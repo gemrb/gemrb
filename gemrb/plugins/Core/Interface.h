@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.201 2006/07/27 19:11:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.202 2006/07/29 18:17:26 avenger_teambg Exp $
  *
  */
 
@@ -266,6 +266,8 @@ public:
 	ieResRef GlobalScript;
 	ieResRef WorldMapName;
 	Variables * AreaAliasTable;
+	Variables * ItemExclTable;
+	Variables * ItemDialTable, *ItemDial2Table;
 	Sprite2D **Cursors;
 	int CursorCount;
 	Sprite2D *FogSprites[32];
@@ -552,6 +554,12 @@ public:
 	int ReadResRefTable(const ieResRef tablename, ieResRef *&data);
 	/** frees the data */
 	void FreeResRefTable(ieResRef *&table, int &count);
+	/** Returns the item exclusion value */
+	int GetItemExcl(ieResRef itemname);
+	/** Returns the strref for the item dialog */
+	int GetItemDialStr(ieResRef itemname);
+	/** Returns the strref for the item dialog */
+	int GetItemDialRes(ieResRef itemname, ieResRef dialog);
 	/** Returns the virtual worldmap entry of a sub-area */
 	int GetAreaAlias(ieResRef areaname);
 	void GetResRefFrom2DA(ieResRef resref, ieResRef resource1, ieResRef resource2, ieResRef resource3);
@@ -568,6 +576,8 @@ private:
 	bool ReadAbilityTable(const ieResRef name, ieWordSigned *mem, int cols, int rows);
 	/** Reads table of area name mappings for WorldMap (PST only) */
 	bool ReadAreaAliasTable(const ieResRef name);
+	/** Reads itemexcl, itemdial, tooltip */
+	bool ReadAuxItemTables();
 	/** handles the QuitFlag bits (main loop events) */
 	void HandleFlags();
 	/** Creates a game control, closes all other windows */

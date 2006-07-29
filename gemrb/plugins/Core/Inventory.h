@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.48 2006/07/02 11:23:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.49 2006/07/29 18:17:26 avenger_teambg Exp $
  *
  */
 
@@ -142,11 +142,6 @@ struct ItemExtHeader {
 	ieDword RechargeFlags; //this is a bitfield with many bits
 	ieWord ProjectileAnimation;
 	ieWord MeleeAnimation[3];
-	/*
-	ieWord BowArrowQualifier;
-	ieWord CrossbowBoltQualifier;
-	ieWord MiscProjectileQualifier;
-	*/
 	int ProjectileQualifier; //this is a derived value determined on load time
 	//other data
 	ieResRef itemname;
@@ -193,7 +188,8 @@ private:
 	int Weight;
 
 	int Equipped;
-
+	/** this isn't saved */
+	ieDword ItemExcl;
 public: 
 	Inventory();
 	virtual ~Inventory();
@@ -230,8 +226,9 @@ public:
 
 	/** adds CREItem to the inventory. If slot == -1, finds
 	** first eligible slot, eventually splitting the item to
-	** more slots. Returns 2 if completely successful, 1 if partially, 0 else.*/
-	int AddSlotItem(CREItem* item, int slot);
+	** more slots. Returns 2 if completely successful, 1 if partially, 0 else.
+	** slottype is an optional filter for searching eligible slots */
+	int AddSlotItem(CREItem* item, int slot, int slottype=-1);
 	/** Adds STOItem to the inventory, it is never wielded, action might be STA_STEAL or STA_BUY */
 	/** The amount of items is stored in PurchasedAmount */
 	int AddStoreItem(STOItem* item, int action);
@@ -260,7 +257,6 @@ public:
 	int GetShieldSlot();
 	void AddSlotEffects( CREItem* slot );
 	//void AddAllEffects();
-	void RemoveSlotEffects( CREItem* slot );
 	/** Returns item in specified slot. Does NOT change inventory */
 	CREItem* GetSlotItem(unsigned int slot);
 	bool ChangeItemFlag(unsigned int slot, ieDword value, int mode);
@@ -286,6 +282,8 @@ public:
 	bool GetEquipmentInfo(ItemExtHeader *array, int startindex, int count);
 	/** uses the item in the given slot */
 	bool UseItem(unsigned int slotindex, unsigned int headerindex, Actor *target);
+	/** returns the exclusion bits */
+	ieDword GetEquipExclusion() const;
 	//setting important constants
 	static void Init();
 	static void SetFistSlot(int arg);
@@ -303,6 +301,8 @@ public:
 	static int GetInventorySlot();
 private:
 	int FindRangedProjectile(unsigned int type);
+	// called by KillSlot
+	void RemoveSlotEffects( CREItem* slot );
 	void KillSlot(unsigned int index);
 	inline Item *GetItemPointer(ieDword slot, CREItem *&Slot);
 };

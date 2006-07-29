@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.29 2006/06/24 11:24:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.30 2006/07/29 18:17:26 avenger_teambg Exp $
  *
  */
 
@@ -78,6 +78,7 @@ class Actor;
 //these macros should work differently in permanent mode (modify base too)
 #define STAT_GET(stat) (target->Modified[ stat ])
 #define STAT_ADD(stat, mod) target->SetStat( stat, STAT_GET( stat ) + ( mod ), 0 )
+#define STAT_SUB(stat, mod) target->SetStat( stat, STAT_GET( stat ) - ( mod ), 0 )
 #define STAT_BIT_OR(stat, mod) target->SetStat( stat, STAT_GET( stat ) | ( mod ), 0 )
 #define STAT_SET(stat, mod) target->SetStat( stat,  ( mod ), 0 )
 #define STAT_MUL(stat, mod) target->SetStat( stat, STAT_GET(stat) * ( mod ) / 100, 0 )
@@ -90,6 +91,7 @@ class Actor;
 #define BASE_GET(stat) (target->BaseStats[ stat ])
 #define BASE_SET(stat, mod) target->SetBase( stat,  ( mod ) )
 #define BASE_ADD(stat, mod) target->SetBase( stat,  BASE_GET(stat)+ ( mod ) )
+#define BASE_SUB(stat, mod) target->SetBase( stat,  BASE_GET(stat)- ( mod ) )
 #define BASE_MUL(stat, mod) target->SetBase( stat,  BASE_GET(stat)* ( mod ) / 100 )
 #define BASE_MOD(stat) target->NewBase( stat, fx->Parameter1, fx->Parameter2)
 #define BASE_MOD_VAR(stat, mod) target->NewBase( stat, (mod), fx->Parameter2 )
@@ -178,7 +180,8 @@ public:
 	Effect *HasEffectWithParamPair(EffectRef &effect_reference, ieDword param1, ieDword param2);
 	Effect *HasEffectWithResource(EffectRef &effect_reference, const ieResRef resource);
 	bool HasAnyDispellableEffect() const;
-
+	//transforming timing modes
+	static void TransformToDelay(ieDword &TimingMode);
 	//getting summarised effects
 	int BonusAgainstCreature(EffectRef &effect_reference, Actor *actor);
 

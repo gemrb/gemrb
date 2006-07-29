@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.400 2006/07/22 07:43:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.401 2006/07/29 18:17:30 avenger_teambg Exp $
  *
  */
 
@@ -5441,11 +5441,9 @@ static PyObject* GemRB_CanUseItemType(PyObject * /*self*/, PyObject* args)
 
 	if (core->CanUseItemType(ItemType, SlotType, use1, use2, actor)) {
 		return PyInt_FromLong(1);
-	} else {
-		return PyInt_FromLong(0);
 	}
+	return PyInt_FromLong(0);
 }
-
 
 
 PyDoc_STRVAR( GemRB_GetSlots__doc,
@@ -5499,6 +5497,10 @@ PyDoc_STRVAR( GemRB_GetItem__doc,
 "GetItem(ResRef)=>dict\n\n"
 "Returns dict with specified item" );
 
+#define CAN_DRINK  1    //potions
+#define CAN_READ   2    //scrolls
+#define CAN_STUFF  4    //containers
+
 static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 {
 	char* ResRef;
@@ -5524,10 +5526,11 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "Price", PyInt_FromLong (item->Price));
 	PyDict_SetItemString(dict, "Type", PyInt_FromLong (item->ItemType));
 	PyDict_SetItemString(dict, "AnimationType", PyString_FromAnimID(item->AnimationType));
+	PyDict_SetItemString(dict, "Exclusion", PyInt_FromLong(item->ItemExcl));
 
 	int function=0;
 	if (core->CanUseItemType(item->ItemType, SLOT_POTION, 0, 0, NULL) ) {
-			function|=1;
+			function|=CAN_DRINK;
 	}
 	if (core->CanUseItemType(item->ItemType, SLOT_SCROLL, 0, 0, NULL) ) {
 		ITMExtHeader *eh;
@@ -5549,7 +5552,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 		}
 		//maybe further checks for school exclusion?
 		//no, those were done by CanUseItemType
-		function|=2;
+		function|=CAN_READ;
 	}
 not_a_scroll:
 	if (core->CanUseItemType(item->ItemType, SLOT_BAG, 0, 0, NULL) ) {
@@ -5558,7 +5561,7 @@ not_a_scroll:
 		//got the same item type as bags)
 		//this isn't required anymore, as bag itemtypes are customisable
 		if (core->Exists( ResRef, IE_STO_CLASS_ID) ) {
-			function|=4;
+			function|=CAN_STUFF;
 		}
 	}
 	PyDict_SetItemString(dict, "Function", PyInt_FromLong(function));
@@ -5605,13 +5608,10 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		}
 		si = cc->RemoveItem(Slot, Count);
 	} else {
-		if (core->QuerySlotEffects( Slot )) {
-			// Item is worn
-			if (! actor->inventory.UnEquipItem( core->QuerySlot(Slot), false )) {
-				// Item is currently undroppable/cursed
-				Py_INCREF( Py_None );
-				return Py_None;
-			}
+		if (! actor->inventory.UnEquipItem( core->QuerySlot(Slot), false )) {
+			// Item is currently undroppable/cursed
+			Py_INCREF( Py_None );
+			return Py_None;
 		}
 		si = actor->inventory.RemoveItem( core->QuerySlot(Slot), Count );
 		actor->RefreshEffects();
@@ -5638,8 +5638,9 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_DropDraggedItem__doc,
 "DropDraggedItem(PartyID, Slot)=>int\n\n"
 "Put currently dragged item to specified PC and slot. "
-"If Slot==-1, puts it to a first empty slot. "
+"If Slot==-1, puts it to a first usable slot. "
 "If Slot==-2, puts it to a ground pile. "
+"If Slot==-3, puts it to the first empty inventory slot. "
 "Returns 0 (unsuccessful), 1 (partial success) or 2 (complete success)." );
 
 static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
@@ -5673,11 +5674,18 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		res = cc->AddItem(core->GetDraggedItem());
 	} else {
 		int Slottype, Effect;
-		if (Slot==-1) {
+		switch(Slot) {
+		case -1:
 			//anything but inventory
 			Slottype = ~SLOT_INVENTORY;
 			Effect = 1;
-		} else {
+			break;
+		case -3:
+			//only inventory
+			Slottype = -1;
+			Effect = 0;
+			break;
+		default:
 			Slot = core->QuerySlot(Slot);
 			Slottype = core->QuerySlotType( Slot );
 			Effect = core->QuerySlotEffects( Slot );
@@ -5687,16 +5695,18 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		if (!item) {
 			return PyInt_FromLong( -1 );
 		}
+		// can't equip item because of similar already equipped
+		if (Effect && item->ItemExcl & actor->inventory.GetEquipExclusion()) {
+			return PyInt_FromLong( 0 );
+		}
 		int Itemtype = item->ItemType;
 		int Use1 = item->UsabilityBitmask;
 		int Use2 = item->KitUsability;
 		core->FreeItem( item, slotitem->ItemResRef, false );
 		//CanUseItemType will check actor's class bits too
-		if (core->CanUseItemType (Itemtype, Slottype, Use1, Use2, actor) ) {
-			res = actor->inventory.AddSlotItem( slotitem, Slot );
-			if ( Effect ) {
-				actor->inventory.EquipItem( Slot );
-			}
+		Slottype =core->CanUseItemType (Itemtype, Slottype, Use1, Use2, actor);
+		if ( Slottype) {
+			res = actor->inventory.AddSlotItem( slotitem, Slot, Slottype );
 			actor->RefreshEffects();
 			actor->ReinitQuickSlots();
 		} else {
