@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.35 2006/07/29 18:17:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.36 2006/07/30 13:11:50 avenger_teambg Exp $
  *
  */
 
@@ -43,6 +43,10 @@
 #define COND_ATTACKED 7
 #define COND_HIT 8
 #define COND_ALWAYS 9
+
+//FIXME: find a way to handle portrait icons
+#define PI_SLOWED 41
+#define PI_STUN   55
 
 static ieResRef *casting_glows = NULL;
 static int cgcount = -1;
@@ -1047,10 +1051,10 @@ int fx_set_hasted_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	switch (fx->Parameter2) {
 	case 0: //normal haste
 		if ( STATE_GET(STATE_SLOWED) ) {
-			STATE_CURE( STATE_SLOWED );
+			BASE_STATE_CURE( STATE_SLOWED );
 			target->fxqueue.RemoveAllEffects( fx_set_slow_state_ref ); 
 		} else {
-			STATE_SET( STATE_HASTED );
+			BASE_STATE_SET( STATE_HASTED );
 		}
 		break;
 	case 1://improved haste
@@ -1395,9 +1399,11 @@ EffectRef fx_animation_stance_ref = {"AnimationStateChange",NULL,-1};
 
 // 0x27 State:Helpless
 // this effect sets both bits, but 'awaken' only removes the sleep bit
+// FIXME: this is probably a persistent effect
 int fx_set_unconscious_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_unconscious_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	target->SetStance(IE_ANI_SLEEP);
 	if (fx->Parameter2) {
 		BASE_STATE_SET( STATE_HELPLESS | STATE_SLEEP ); //don't awaken on damage
 		//the effect directly sets the state bit, and doesn't stick
@@ -1419,10 +1425,11 @@ int fx_set_slowed_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_slowed_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	if (STATE_GET(STATE_HASTED) ) {
-		STATE_CURE( STATE_HASTED );
+		BASE_STATE_CURE( STATE_HASTED );
 		target->fxqueue.RemoveAllEffects( fx_set_haste_state_ref ); 
 	} else {
 		STATE_SET( STATE_SLOWED );
+		target->AddPortraitIcon(PI_SLOWED);
 	}
 	return FX_APPLIED;
 }
@@ -1442,7 +1449,20 @@ int fx_bonus_wizard_spells (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_bonus_wizard_spells (%2d): Spell Add: %d ; Spell Level: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	
 	int i=1;
-	for( int j=0;j<MAX_SPELL_LEVEL;j++) {
+	//if param2 is 0, then double spells
+	if(!fx->Parameter2) {
+		for (unsigned int j=0;j<fx->Parameter1 && j<MAX_SPELL_LEVEL;j++) {
+			target->spellbook.SetMemorizableSpellsCount(0, IE_SPELL_TYPE_WIZARD, j, true);
+		}
+		return FX_APPLIED;
+	}
+	//no bonus to give
+	/*
+	if (!fx->Parameter1) {
+		return FX_NOT_APPLIED;
+	}
+	*/
+	for(unsigned int j=0;j<MAX_SPELL_LEVEL;j++) {
 		if (fx->Parameter2&i) {
 			target->spellbook.SetMemorizableSpellsCount(fx->Parameter1, IE_SPELL_TYPE_WIZARD, j, true);
 		}
@@ -1455,7 +1475,7 @@ int fx_bonus_wizard_spells (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_cure_petrified_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_petrified_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STATE_CURE( STATE_PETRIFIED );
+	BASE_STATE_CURE( STATE_PETRIFIED );
 	return FX_NOT_APPLIED;
 }
 
@@ -1477,17 +1497,20 @@ int fx_set_stun_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_stun_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STATE_SET( STATE_STUNNED );
+	target->AddPortraitIcon(PI_STUN);
 	return FX_APPLIED;
 }
 
 // 0x2E Cure:Stun
 EffectRef fx_set_stun_state_ref={"State:Stun",NULL,-1};
+EffectRef fx_hold_creature_no_icon_ref={"State:Hold3",NULL,-1};
 
 int fx_cure_stun_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_stun_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STATE_CURE( STATE_STUNNED );
+	BASE_STATE_CURE( STATE_STUNNED );
 	target->fxqueue.RemoveAllEffects(fx_set_stun_state_ref);
+	target->fxqueue.RemoveAllEffects(fx_hold_creature_no_icon_ref);
 	return FX_NOT_APPLIED;
 }
 
@@ -1497,8 +1520,10 @@ EffectRef fx_set_invisible_state_ref={"State:Invisible",NULL,-1};
 int fx_cure_invisible_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_invisible_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STATE_CURE( STATE_INVISIBLE );
-	target->fxqueue.RemoveAllEffects(fx_set_invisible_state_ref);
+	if (!STATE_GET(STATE_NONDET)) {
+		BASE_STATE_CURE( STATE_INVISIBLE );
+		target->fxqueue.RemoveAllEffects(fx_set_invisible_state_ref);
+	}
 	return FX_NOT_APPLIED;
 }
 
@@ -1508,7 +1533,7 @@ EffectRef fx_set_silenced_state_ref={"State:Silence",NULL,-1};
 int fx_cure_silenced_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_silenced_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STATE_CURE( STATE_SILENCED );
+	BASE_STATE_CURE( STATE_SILENCED );
 	target->fxqueue.RemoveAllEffects(fx_set_silenced_state_ref);
 	return FX_NOT_APPLIED;
 }
@@ -1699,7 +1724,16 @@ int fx_bonus_priest_spells (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_bonus_priest_spells (%2d): Spell Add: %d ; Spell Level: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	
 	int i=1;
-	for( int j=0;j<MAX_SPELL_LEVEL;j++) {
+	//if param2 is 0, then double spells
+	if(!fx->Parameter2) {
+		for (unsigned int j=0;j<fx->Parameter1 && j<MAX_SPELL_LEVEL;j++) {
+			target->spellbook.SetMemorizableSpellsCount(0, IE_SPELL_TYPE_PRIEST, j, true);
+		}
+		return FX_APPLIED;
+	}
+	//shall we check for 0 bonus here?
+
+	for(unsigned int j=0;j<MAX_SPELL_LEVEL;j++) {
 		if (fx->Parameter2&i) {
 			target->spellbook.SetMemorizableSpellsCount(fx->Parameter1, IE_SPELL_TYPE_PRIEST, j, true);
 		}
@@ -1747,6 +1781,19 @@ int fx_transparency_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_transparency_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
+	//maybe this needs some timing
+	switch (fx->Parameter2) {
+	case 1: //fade in
+		if (fx->Parameter1<255) {
+			fx->Parameter1++;
+		}
+		break;
+	case 2://fade out
+		if (fx->Parameter1) {
+			fx->Parameter1--;
+		}
+		break;
+	}
 	STAT_MOD( IE_TRANSLUCENT );
 	return FX_APPLIED;
 }
@@ -1795,8 +1842,8 @@ EffectRef fx_set_nondetection_state_ref={"State:Nondetection",NULL,-1};
 int fx_cure_nondetection_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_nondetection_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STATE_CURE( STATE_NONDET );
-	target->fxqueue.RemoveAllEffects(fx_set_infravision_state_ref);
+	BASE_STATE_CURE( STATE_NONDET );
+	target->fxqueue.RemoveAllEffects(fx_set_nondetection_state_ref);
 	return FX_NOT_APPLIED;
 }
 

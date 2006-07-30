@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.66 2006/07/29 18:17:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.67 2006/07/30 13:11:49 avenger_teambg Exp $
  *
  */
 
@@ -64,12 +64,18 @@ inline bool NeedPrepare(ieByte timingmode)
 	return fx_relative[timingmode];
 }
 
-static bool fx_absolute[MAX_TIMING_MODE]={false,false,false,false,false,false,true,true,false,false,false};
+#define INVALID  -1
+#define PERMANENT 0
+#define DELAYED   1
+#define DURATION  2
 
-inline bool IsPrepared(ieByte timingmode)
+static int fx_prepared[MAX_TIMING_MODE]={DURATION,PERMANENT,PERMANENT,DELAYED, //0-3
+DELAYED,DELAYED,DELAYED,DELAYED,PERMANENT,PERMANENT,PERMANENT};                //4-7
+
+inline int IsPrepared(ieByte timingmode)
 {
-	if (timingmode>=MAX_TIMING_MODE) return false;
-	return fx_absolute[timingmode];
+	if (timingmode>=MAX_TIMING_MODE) return INVALID;
+	return fx_prepared[timingmode];
 }
 
 //change the timing method after the effect triggered
@@ -421,7 +427,6 @@ inline bool check_resistance(Actor* actor, Effect* fx)
 	return true;
 }
 
-
 // this function is called two different ways
 // when first_apply is set, then the effect isn't stuck on the target
 // this happens when a new effect comes in contact with the target.
@@ -464,24 +469,31 @@ void EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 				return;
 			}
 		}
-
-		//the effect is delayed and needs duration setting
-		//if (NeedPrepare(fx->TimingMode) ) {
-		//  PrepareDuration(fx);
-		//  return;
-		//}
-	} else {
-		if (IsPrepared(fx->TimingMode) ) {
-			if (fx->Duration<=GameTime) {
-				fx->TimingMode=TriggeredEffect(fx->TimingMode);
-				//if i set up the TriggeredEffect function correctly, then
-				//timingmode just slipped into a NeedPrepare state
-				assert(NeedPrepare(fx->TimingMode) );
-				//prepare for delayed duration effects
-				fx->Duration=fx->SecondaryDelay;
-				PrepareDuration(fx);
-			}
+		if (NeedPrepare(fx->TimingMode) ) {
+			PrepareDuration(fx);
 		}
+	}
+	//check if the effect has triggered or expired
+	switch (IsPrepared(fx->TimingMode) ) {
+	case DELAYED:
+		if (fx->Duration>GameTime) {
+			return;
+		}
+		//effect triggered
+		fx->TimingMode=TriggeredEffect(fx->TimingMode);
+		break;
+	case DURATION:
+		if (fx->Duration>GameTime) {
+			fx->TimingMode=FX_DURATION_JUST_EXPIRED;
+			//add a return here, if 0 duration effects shouldn't work
+		}
+		break;
+	//permanent effect (so there is no warning)
+	case PERMANENT:
+		break;
+	//this shouldn't happen
+	default:
+		abort();
 	}
 	
 	EffectFunction fn = effect_refs[fx->Opcode].Function;
@@ -518,9 +530,11 @@ void EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 		//effect not found, it is going to be discarded
 		fx->TimingMode=FX_DURATION_JUST_EXPIRED;
 	}
-
-	if (NeedPrepare(fx->TimingMode) && first_apply) {
-		PrepareDuration(fx);
+	//delayed duration (3)
+	if (NeedPrepare(fx->TimingMode) ) {
+		//prepare for delayed duration effects
+		fx->Duration=fx->SecondaryDelay;
+		PrepareDuration(fx);      
 	}
 }
 
@@ -612,7 +626,8 @@ void EffectQueue::RemoveExpiredEffects(ieDword futuretime)
 
 	std::vector< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		if ( !IsPrepared( (*f)->TimingMode) ) {
+		//FIXME: how this method handles delayed effects???
+		if ( IsPrepared( (*f)->TimingMode)==DURATION ) {
 			if ( (*f)->Duration<=GameTime+futuretime) {
 				(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;
 			}      
