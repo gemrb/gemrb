@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.103 2006/07/21 15:14:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.104 2006/07/31 17:15:42 avenger_teambg Exp $
  *
  */
 
@@ -193,9 +193,14 @@ void Button::Draw(unsigned short x, unsigned short y)
 			Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(Picture->Width * Clipping), Picture->Height );
 			core->GetVideoDriver()->BlitSprite( Picture, x + XPos + xOffs, y + YPos + yOffs, true, &r );
 		}
-		for (std::list<Sprite2D*>::iterator iter = PictureList.begin();
-			 iter != PictureList.end(); ++iter)
-			core->GetVideoDriver()->BlitSprite( *iter, x + XPos, y + YPos, true );
+		std::list<Sprite2D*>::iterator iter = PictureList.begin();
+		if (iter!=PictureList.end()) {
+			int xOffs = ( Width - (*iter)->Width + (*iter)->XPos )/2;
+			int yOffs = ( Height - (*iter)->Height + (*iter)->YPos )/2;
+			for (; iter != PictureList.end(); ++iter) {
+				core->GetVideoDriver()->BlitSprite( *iter, x + XPos +xOffs, y + YPos +yOffs, true );
+			}
+		}
 	}
 
 	// Button picture

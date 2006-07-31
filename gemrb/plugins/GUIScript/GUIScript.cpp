@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.401 2006/07/29 18:17:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.402 2006/07/31 17:15:44 avenger_teambg Exp $
  *
  */
 
@@ -4299,8 +4299,13 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 			Picture = core->GetBAMSprite(item->ItemIcon, -1, Which);
 			break;
 		case 2:
-			Picture = core->GetBAMSprite(item->CarriedIcon, -1, 0);
-			break;
+			btn->ClearPictureList();
+			for (int i=0;i<4;i++) {
+				Picture = core->GetBAMSprite(item->CarriedIcon, -1, i);
+				if (Picture)
+					btn->StackPicture(Picture);
+			}
+			return Py_None; //no incref here!
 		case 4: case 5:
 			Picture = GetUsedWeaponIcon(item, Which-4);
 			break;
@@ -5521,8 +5526,10 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "ItemDesc", PyInt_FromLong (item->GetItemDesc(false)));
 	PyDict_SetItemString(dict, "ItemDescIdentified", PyInt_FromLong (item->GetItemDesc(true)));
 	PyDict_SetItemString(dict, "ItemIcon", PyString_FromResRef (item->ItemIcon));
+	PyDict_SetItemString(dict, "DescIcon", PyString_FromResRef (item->CarriedIcon));
 	PyDict_SetItemString(dict, "StackAmount", PyInt_FromLong (item->StackAmount));
 	PyDict_SetItemString(dict, "Dialog", PyString_FromResRef (item->Dialog));
+	PyDict_SetItemString(dict, "DialogName", PyInt_FromLong (item->DialogName));
 	PyDict_SetItemString(dict, "Price", PyInt_FromLong (item->Price));
 	PyDict_SetItemString(dict, "Type", PyInt_FromLong (item->ItemType));
 	PyDict_SetItemString(dict, "AnimationType", PyString_FromAnimID(item->AnimationType));
