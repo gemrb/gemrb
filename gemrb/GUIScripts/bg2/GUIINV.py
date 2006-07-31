@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.48 2006/07/31 17:15:44 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.49 2006/07/31 17:26:01 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -553,7 +553,7 @@ def OpenItemInfoWindow ():
 	slot_item = GemRB.GetSlotItem (pc, slot)
 	
 	if slot_item["Flags"] & IE_INV_ITEM_IDENTIFIED:
-	 	value = 1
+		value = 1
 	else:
 		value = 3
 	DisplayItem(slot_item["ItemResRef"], value)
@@ -568,7 +568,7 @@ def OpenGroundItemInfoWindow ():
 	print "OpenGroundItemInfo", slot
 	slot_item = GemRB.GetContainerItem (pc, slot)
 	if item["Flags"] & IE_INV_ITEM_IDENTIFIED:
-	 	value = 0
+		value = 0
 	else:
 		value = 2
 	DisplayItem(slot_item["ItemResRef"], value)  #the ground items are only displayable
