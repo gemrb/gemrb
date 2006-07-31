@@ -6,7 +6,13 @@ Description: Sets Item icon image on a Button control.
 Parameters:
 WindowIndex, ControlIndex  - the control's reference
 ITMResRef                  - the name of the item (.itm resref)
-Type                       - 0,1 or 2 (the icon's type)
+Type                       - 0-5 (the icon's type)
+   0  - Inventory Icon1
+   1  - Inventory Icon2
+   2  - Description Icon (for BG)
+   3  - No Icon (empty slot)
+   4  - Activation Icon1
+   5  - Activation Icon2
 Tooltip                    - if set to 1, the tooltip for the item will also be set
 Return value: N/A
 
