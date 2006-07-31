@@ -63,6 +63,8 @@ Game GUI:
    the IWD2 system to all engines
 3. implement grabbing mouse pointer by a control to fix dragging of PST Float menu window
 4. Fix multi line editboxes. Allow attaching of scrollbar.
+5. Fix drop capitals (initials) Calculate text height/width correctly, display
+   it correctly too.
 
 General:
 1. The Cache and Variables classes could be rewritten to incorporate the release 
