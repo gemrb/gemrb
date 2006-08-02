@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.64 2006/07/23 21:08:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.65 2006/08/02 18:00:52 avenger_teambg Exp $
  *
  */
 
@@ -444,7 +444,7 @@ static Targets* EvaluateObject(Scriptable* Sender, Object* oC)
 				if (t->actor->Type!=ST_ACTOR) {
 //we should never stumble here
 abort();
-					t = tgts->RemoveTargetAt(m);
+//					t = tgts->RemoveTargetAt(m);
 					continue;
 				}
 				if (!func( (Actor *) (t->actor), oC->objectFields[j] ) ) {
@@ -1749,7 +1749,17 @@ int DiffCore(ieDword a, ieDword b, int diffmode)
 				return 1;
 			}
 			break;
-		default: //less than or equals
+		case GREATER_OR_EQUALS:
+			if (a>=b) {
+				return 1;
+			}
+			break;
+		case NOT_EQUALS:
+			if (a!=b) {
+				return 1;
+			}
+			break;
+		default: //less or equals
 			if (a<=b) {
 				return 1;
 			}

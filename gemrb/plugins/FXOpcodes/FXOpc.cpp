@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.36 2006/07/30 13:11:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.37 2006/08/02 18:00:52 avenger_teambg Exp $
  *
  */
 
@@ -261,7 +261,7 @@ int fx_bounce_school (Actor* Owner, Actor* target, Effect* fx);//ca
 int fx_bounce_secondary_type (Actor* Owner, Actor* target, Effect* fx);//cb
 //cc resist school
 //cd resist sectype
-//ce int fx_resist_spell (Actor* Owner, Actor* target, Effect* fx);//ce
+int fx_resist_spell (Actor* Owner, Actor* target, Effect* fx);//ce
 int fx_bounce_spell (Actor* Owner, Actor* target, Effect* fx);//cf
 int fx_minimum_hp_modifier (Actor* Owner, Actor* target, Effect* fx);//d0
 int fx_power_word_kill (Actor* Owner, Actor* target, Effect* fx);//d1
@@ -382,6 +382,7 @@ static EffectRef effectnames[] = {
 	{ "AcidResistanceModifier", fx_acid_resistance_modifier, 0 },
 	{ "ACVsCreatureType", fx_generic_effect, 0 }, //0xdb
 	{ "ACVsDamageTypeModifier", fx_ac_vs_damage_type_modifier, 0 },
+	{ "ACVsDamageTypeModifier2", fx_ac_vs_damage_type_modifier, 0 },  // used in IWD
 	{ "AidNonCumulative", fx_set_aid_state, 0 },
 	{ "AIIdentifierModifier", fx_ids_modifier, 0 },
 	{ "AlchemyModifier", fx_alchemy_modifier, 0 },
@@ -418,6 +419,7 @@ static EffectRef effectnames[] = {
 	{ "CanUseAnyItem", fx_can_use_any_item_modifier, 0 },
 	{ "CastFromList", fx_select_spell, 0 },
 	{ "CastingGlow", fx_casting_glow, 0 },
+	{ "CastingGlow2", fx_casting_glow, 0 }, //used in iwd
 	{ "CastingLevelModifier", fx_castinglevel_modifier, 0 },
 	{ "CastingSpeedModifier", fx_castingspeed_modifier, 0 },
 	{ "CastSpellOnCondition", fx_cast_spell_on_condition, 0 },
@@ -557,7 +559,8 @@ static EffectRef effectnames[] = {
 	{ "MoraleBreakModifier", fx_morale_break_modifier, 0 },
 	{ "MoraleModifier", fx_morale_modifier, 0 },
 	{ "MovementRateModifier", fx_movement_modifier, 0 },    //fast (7e)
-	{ "MovementModifier", fx_movement_modifier, 0 },//slow (b0)
+	{ "MovementRateModifier2", fx_movement_modifier, 0 },//slow (b0)
+	{ "MovementRateModifier3", fx_movement_modifier, 0 },//forced (IWD - 10a)
 	{ "MoveToArea", fx_move_to_area, 0 }, //0xba
 	{ "NoCircleState", fx_no_circle_state, 0 },
 	{ "NPCBump", fx_npc_bump, 0 },
@@ -594,7 +597,7 @@ static EffectRef effectnames[] = {
 	{ "Protection:SchoolDecrement",fx_generic_decrement_effect,0},//overlay?
 	{ "Protection:SecondaryType",fx_generic_effect,0},//overlay?
 	{ "Protection:SecondaryTypeDecrement",fx_generic_decrement_effect,0},//overlay?
-	{ "Protection:Spell",fx_generic_effect,0},//overlay?
+	{ "Protection:Spell",fx_resist_spell,0},//overlay?
 	{ "Protection:SpellLevel",fx_generic_effect,0},//overlay?
 	{ "Protection:SpellLevelDecrement",fx_generic_decrement_effect,0},//overlay?
 	{ "Protection:String", fx_generic_effect, 0 },
@@ -1798,7 +1801,7 @@ int fx_transparency_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-static int eamods[]={0,0,-1,0,-1,1,0};
+static int eamods[]={EAM_ALLY,EAM_ALLY,EAM_DEFAULT,EAM_ALLY,EAM_DEFAULT,EAM_ENEMY,EAM_ALLY};
 // 0x43 SummonCreature
 int fx_summon_creature (Actor* Owner, Actor* target, Effect* fx)
 {
@@ -3311,6 +3314,15 @@ int fx_bounce_secondary_type (Actor* /*Owner*/, Actor* target, Effect* fx)
 // 0xcc //resist school
 // 0xcd //resist sectype
 // 0xce //resist spell
+int fx_resist_spell (Actor* /*Owner*/, Actor* /*target*/, Effect *fx)
+{
+	if (strnicmp(fx->Resource,fx->Source,sizeof(fx->Resource)) ) {
+		return FX_APPLIED;
+	}
+	//this has effect only on first apply, it will stop applying the spell
+	return FX_ABORT;
+}
+
 // 0xcf Bounce:Spell
 int fx_bounce_spell (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -3912,6 +3924,12 @@ int fx_modify_global_variable (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 		memmove(fx->Resource+24, fx->Resource4,8);
 		fx->IsVariable=1;
 	}
+
+	//hack for IWD
+	if (!fx->Resource[0]) {
+		strnuprcpy(fx->Resource,"RETURN_TO_LONELYWOOD",32);
+	}
+
 	if (0) printf( "fx_modify_global_variable (%2d): Variable: %s Value: %d Type: %d\n", fx->Opcode, fx->Resource, fx->Parameter1, fx->Parameter2 );
 	if (fx->Parameter2) {
 		ieDword var = 0;

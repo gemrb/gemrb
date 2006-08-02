@@ -60,7 +60,6 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 void InitScriptTables();
 void HandleBitMod(ieDword &value1, ieDword value2, int opcode);
 bool ResolveSpellName(ieResRef spellres, Action *parameter);
-void DisplayStringCore(Scriptable* Sender, int Strref, int flags);
 void EscapeAreaCore(Actor *src, const char *resref, Point &enter, Point &exit, int flags);
 void GoNearAndRetry(Scriptable *Sender, Scriptable *target, bool destination);
 void GoNearAndRetry(Scriptable *Sender, Point &p);
@@ -70,7 +69,12 @@ void GoNearAndRetry(Scriptable *Sender, Point &p);
 #define EQUALS 1
 #define LESS_THAN 2
 #define GREATER_THAN 3
-int DiffCore(ieDword a, ieDword b, int diffmode);
+#define GREATER_OR_EQUALS 4
+#define NOT_EQUALS 5
+#define BINARY_LESS_OR_EQUALS 6    (left has only bits in right)
+#define BINARY_MORE_OR_EQUALS 7    (left has equal or more bits than right)
+#define BINARY_INTERSECT 8 (left and right has at least one common bit)
+
 Targets *GetMyTarget(Scriptable *Sender, Actor *actor, Targets *parameters);
 Targets *XthNearestOf(Targets *parameters, int count);
 Targets *XthNearestDoor(Targets *parameters, unsigned int count);
@@ -90,6 +94,8 @@ int GetObjectCount(Scriptable* Sender, Object* oC);
 int GetObjectLevelCount(Scriptable* Sender, Object* oC);
 void SetVariable(Scriptable* Sender, const char* VarName, ieDword value);
 //these are used from other plugins
+GEM_EXPORT int DiffCore(ieDword a, ieDword b, int diffmode);
+GEM_EXPORT void DisplayStringCore(Scriptable* Sender, int Strref, int flags);
 GEM_EXPORT void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, ieDword value);
 GEM_EXPORT void MoveBetweenAreasCore(Actor* actor, const char *area, Point &position, int face, bool adjust);
 GEM_EXPORT ieDword CheckVariable(Scriptable* Sender, const char* VarName);

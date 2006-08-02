@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.67 2006/07/30 13:11:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.68 2006/08/02 18:00:52 avenger_teambg Exp $
  *
  */
 
@@ -33,7 +33,7 @@ static EffectRef *effectnames = NULL;
 static EffectRef effect_refs[MAX_EFFECTS];
 
 static int opcodes_count = 0;
-
+/*
 #define FX_DURATION_INSTANT_LIMITED          0
 #define FX_DURATION_INSTANT_PERMANENT        1
 #define FX_DURATION_INSTANT_WHILE_EQUIPPED   2
@@ -47,7 +47,7 @@ static int opcodes_count = 0;
 #define FX_DURATION_JUST_EXPIRED             10
 
 #define MAX_TIMING_MODE 11
-
+*/
 static bool fx_instant[MAX_TIMING_MODE]={true,true,true,false,false,false,false,false,true,true,true};
 
 inline bool IsInstant(ieByte timingmode)
@@ -295,6 +295,8 @@ void EffectQueue::ApplyAllEffects(Actor* target)
 	std::vector< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		//(*f)->random_value = random_value;
+		//no idea if we should honour FX_ABORT here (resistspell)
+		//if yes, then break when applyeffect returned true
 		ApplyEffect( target, *f, false );
 	}
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
@@ -321,9 +323,13 @@ void EffectQueue::AddAllEffects(Actor* target)
 		(*f)->random_value = random_value;
 		(*f)->PosX = target->Pos.x;
 		(*f)->PosY = target->Pos.y;
-		target->fxqueue.ApplyEffect( target, *f, true );
+		//if applyeffect returns true, we stop adding the future effects
+		bool flg = target->fxqueue.ApplyEffect( target, *f, true );
 		if ((*f)->TimingMode!=FX_DURATION_JUST_EXPIRED) {
 			target->fxqueue.AddEffect(*f);
+		}
+		if (flg) {
+			break;
 		}
 	}
 }
@@ -368,7 +374,8 @@ inline bool check_probability(Effect* fx)
 	return true;
 }
 
-static EffectRef fx_spell_immunity_ref={"ResistSpell",NULL,-1};
+static EffectRef fx_spell_immunity_ref={"ResistSpell",NULL,-1};  //bg2
+static EffectRef fx_spell_immunity2_ref={"ResistSpell2",NULL,-1};//iwd
 static EffectRef fx_school_immunity_ref={"ResistSchool",NULL,-1};
 static EffectRef fx_secondary_type_immunity_ref={"ResistSecondaryType",NULL,-1};
 
@@ -382,6 +389,9 @@ inline int check_type(Actor* actor, Effect* fx)
 
 	//immunity checks
 	if (actor->fxqueue.HasEffectWithResource(fx_spell_immunity_ref, fx->Source) ) {
+		return 0;
+	}
+	if (actor->fxqueue.HasEffectWithResource(fx_spell_immunity2_ref, fx->Source) ) {
 		return 0;
 	}
 	if (fx->PrimaryType) {
@@ -433,17 +443,18 @@ inline bool check_resistance(Actor* actor, Effect* fx)
 // if the effect returns FX_DURATION_JUST_EXPIRED then it won't stick
 // when first_apply is unset, the effect is already on the target
 // this happens on load time too!
+// returns true if the process should stop calling applyeffect anymore
 
-void EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
+bool EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 {
 	if (!target) {
 		fx->TimingMode=FX_DURATION_JUST_EXPIRED;
-		return;
+		return true;
 	}
 	//printf( "FX 0x%02x: %s(%d, %d)\n", fx->Opcode, effectnames[fx->Opcode].Name, fx->Parameter1, fx->Parameter2 );
 	if (fx->Opcode >= MAX_EFFECTS) {
 		fx->TimingMode=FX_DURATION_JUST_EXPIRED;
-		return;
+		return false;
 	}
 
 	ieDword GameTime = core->GetGame()->GameTime;
@@ -452,13 +463,13 @@ void EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 		//the effect didn't pass the probability check
 		if (!check_probability(fx) ) {
 			fx->TimingMode=FX_DURATION_JUST_EXPIRED;
-			return;
+			return false;
 		}
 
 		//the effect didn't pass the target level check
 		if (check_level(target, fx) ) {
 			fx->TimingMode=FX_DURATION_JUST_EXPIRED;
-			return;
+			return false;
 		}
 
 		//the effect didn't pass the resistance check
@@ -466,7 +477,7 @@ void EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 			fx->Resistance == FX_CAN_RESIST_NO_DISPEL) {
 			if (check_resistance(target, fx) ) {
 				fx->TimingMode=FX_DURATION_JUST_EXPIRED;
-				return;
+				return false;
 			}
 		}
 		if (NeedPrepare(fx->TimingMode) ) {
@@ -477,7 +488,7 @@ void EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 	switch (IsPrepared(fx->TimingMode) ) {
 	case DELAYED:
 		if (fx->Duration>GameTime) {
-			return;
+			return false;
 		}
 		//effect triggered
 		fx->TimingMode=TriggeredEffect(fx->TimingMode);
@@ -497,6 +508,7 @@ void EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 	}
 	
 	EffectFunction fn = effect_refs[fx->Opcode].Function;
+	bool flg = false;
 	if (fn) {		
 		if ( effect_refs[fx->Opcode].EffText > 0 ) {
 			char *text = core->GetString( effect_refs[fx->Opcode].EffText );
@@ -523,6 +535,9 @@ void EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 					fx->TimingMode=FX_DURATION_JUST_EXPIRED;
 				} 
 				break;
+			case FX_ABORT:
+				flg = true;
+				break;
 			default:
 				abort();
 		}
@@ -536,6 +551,7 @@ void EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 		fx->Duration=fx->SecondaryDelay;
 		PrepareDuration(fx);      
 	}
+	return flg;
 }
 
 // looks for opcode with param2
@@ -555,6 +571,7 @@ void EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 #define MATCH_PARAM2() if((*f)->Parameter2!=param2) { continue; }
 #define MATCH_RESOURCE() if( strnicmp( (*f)->Resource, resource, 8) ) { continue; }
 #define MATCH_SOURCE() if( strnicmp( (*f)->Source, Removed, 8) ) { continue; }
+#define MATCH_TIMING() if ((*f)->TimingMode!=timing) { continue; }
 
 //call this from an applied effect, after it returns, these effects
 //will be killed along with it
@@ -575,6 +592,18 @@ void EffectQueue::RemoveAllEffects(ieResRef Removed)
 	std::vector< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_LIVE_FX();
+		MATCH_SOURCE();
+
+		(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;
+	}
+}
+
+//remove effects belonging to a given spell, but only if they match timing method x
+void EffectQueue::RemoveAllEffects(ieResRef Removed, ieDword timing)
+{
+	std::vector< Effect* >::iterator f;
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
+		MATCH_TIMING();
 		MATCH_SOURCE();
 
 		(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;

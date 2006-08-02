@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.h,v 1.15 2006/04/09 15:22:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Effect.h,v 1.16 2006/08/02 18:00:52 avenger_teambg Exp $
  *
  */
 
@@ -56,6 +56,7 @@ class Actor;
 #define FX_DURATION_PERMANENT_UNSAVED        8
 #define FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES   9//this is a special permanent
 #define FX_DURATION_JUST_EXPIRED             10
+#define MAX_TIMING_MODE 11
 
 // Effect resistance types
 #define FX_NO_RESIST_NO_DISPEL      0

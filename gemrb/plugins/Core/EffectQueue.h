@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.30 2006/07/29 18:17:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.31 2006/08/02 18:00:52 avenger_teambg Exp $
  *
  */
 
@@ -46,8 +46,8 @@ class Actor;
 /** these effects don't stick around if used as permanent, 
  * in that case they modify a base stat like charisma modifier */
 #define FX_PERMANENT 2
-///** these effects stick but didn't trigger yet */
-#define FX_PENDING    3
+///** if the effect returns this, stop adding any other effect */
+#define FX_ABORT    3
 
 //remove level effects flags
 #define RL_DISPELLABLE  1  //only dispellables
@@ -155,9 +155,13 @@ public:
 
 	void AddAllEffects(Actor* target);
 	void ApplyAllEffects(Actor* target);
-	void ApplyEffect(Actor* target, Effect* fx, bool first_apply);
+	/* returns true if the process should abort applying a stack of effects */
+	bool ApplyEffect(Actor* target, Effect* fx, bool first_apply);
+	/* directly removes effects with specified opcode, use effect_reference when you can */
+	void RemoveAllEffects(ieDword opcode);
 	/* removes all effects of a given spell */
 	void RemoveAllEffects(ieResRef Removed);
+	void RemoveAllEffects(ieResRef Removed, ieDword timing);
 	/* removes all effects of type */
 	void RemoveAllEffects(EffectRef &effect_reference);
 	/* removes expired or to be expired effects */
@@ -193,7 +197,6 @@ public:
 	static int ResolveEffect(EffectRef &effect_reference);
 private:
 	//use the effect reference style calls from outside
-	void RemoveAllEffects(ieDword opcode);
 	void RemoveAllEffectsWithResource(ieDword opcode, const ieResRef resource);
 	void RemoveAllEffectsWithParam(ieDword opcode, ieDword param2);
 	Effect *HasOpcode(ieDword opcode) const;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.417 2006/07/31 17:15:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.418 2006/08/02 18:00:52 avenger_teambg Exp $
  *
  */
 
@@ -2244,9 +2244,6 @@ int Interface::LoadCreature(char* ResRef, int InParty, bool character)
 	}
 }
 
-#define EAM_ALLY    0
-#define EAM_ENEMY   1
-
 bool Interface::SummonCreature(ieResRef resource, ieResRef vvcres, Actor *Owner, Actor *target, Point &position, int eamod, int level)
 {
 	DataStream* ds = key->GetResource( resource, IE_CRE_CLASS_ID );
@@ -2264,13 +2261,18 @@ retry:
 
 	int enemyally;
 
-	if (target) {
-		enemyally = target->GetStat(IE_EA)>EA_GOODCUTOFF;
+	if (eamod==EAM_SOURCEALLY || eamod==EAM_SOURCEENEMY) {
+		enemyally = Owner->GetStat(IE_EA)>EA_GOODCUTOFF;
 	} else {
-		enemyally = true;
+		if (target) {
+			enemyally = target->GetStat(IE_EA)>EA_GOODCUTOFF;
+		} else {
+			enemyally = true;
+		}
 	}
 
 	switch (eamod) {
+		case EAM_SOURCEALLY:
 		case EAM_ALLY:
 			if (enemyally) {
 				ab->SetBase(IE_EA, EA_ENEMY); //is this the summoned EA?
@@ -2278,12 +2280,16 @@ retry:
 				ab->SetBase(IE_EA, EA_ALLY); //is this the summoned EA?
 			}
 			break;
+		case EAM_SOURCEENEMY:
 		case EAM_ENEMY:
 			if (enemyally) {
 				ab->SetBase(IE_EA, EA_ALLY); //is this the summoned EA?
 			} else {
 				ab->SetBase(IE_EA, EA_ENEMY); //is this the summoned EA?
 			}
+			break;
+		case EAM_NEUTRAL:
+			ab->SetBase(IE_EA, EA_NEUTRAL);
 			break;
 		default:
 			break;
@@ -4546,15 +4552,8 @@ void Interface::ApplySpellPoint(const ieResRef resname, Scriptable* /*target*/, 
 	delete fxqueue;
 }
 
-void Interface::ApplyEffect(const ieResRef resname, Actor *actor, Actor *caster, int level)
+void Interface::ApplyEffect(Effect *effect, Actor *actor, Actor *caster)
 {
-	Effect *effect = GetEffect(resname);
-	if (!effect) {
-		return;
-	}
-	if (!level) {
-		level = 1;
-	}
 	EffectQueue *fxqueue = new EffectQueue();
 	fxqueue->AddEffect( effect );
 	delete effect;
@@ -4568,6 +4567,19 @@ void Interface::ApplyEffect(const ieResRef resname, Actor *actor, Actor *caster,
 		fxqueue->AddAllEffects( actor );
 	}
 	delete fxqueue;
+}
+
+void Interface::ApplyEffect(const ieResRef resname, Actor *actor, Actor *caster, int level)
+{
+	Effect *effect = GetEffect(resname);
+	if (!effect) {
+		return;
+	}
+	if (!level) {
+		level = 1;
+	}
+	effect->Power=level;
+	ApplyEffect(effect, actor, caster);
 }
 
 // dealing with saved games

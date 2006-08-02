@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.202 2006/07/29 18:17:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.203 2006/08/02 18:00:52 avenger_teambg Exp $
  *
  */
 
@@ -158,6 +158,13 @@ public:
 /** Max size of actor's ground circle (PST) */
 #define MAX_CIRCLE_SIZE  3
 
+/** Summoning */
+#define EAM_DEFAULT -1
+#define EAM_ALLY    0
+#define EAM_ENEMY   1
+#define EAM_SOURCEALLY 2
+#define EAM_SOURCEENEMY 3
+#define EAM_NEUTRAL 4
 //
 #define STAT_CON_HP_NORMAL   0
 #define STAT_CON_HP_WARRIOR  1
@@ -536,8 +543,8 @@ public:
 	/** applies the spell on the area or on a scriptable object */
 	void ApplySpellPoint(const ieResRef resname, Scriptable *target, Point &pos, Actor *caster, int level);
 	/** applies a single effect on the target */
+	void ApplyEffect(Effect *fx, Actor *target, Actor *caster);
 	void ApplyEffect(const ieResRef resname, Actor *target, Actor *caster, int level);
-
 	/** dumps an area object to the cache */
 	int SwapoutArea(Map *map);
 	/** saves the game object to the destination folder */
