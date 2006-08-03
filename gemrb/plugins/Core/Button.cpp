@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.104 2006/07/31 17:15:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.105 2006/08/03 19:56:33 avenger_teambg Exp $
  *
  */
 
@@ -185,21 +185,20 @@ void Button::Draw(unsigned short x, unsigned short y)
 	}
 
 	// Button picture
-	if ((Picture || !PictureList.empty()) &&
-		( Flags & IE_GUI_BUTTON_PICTURE )) {
-		if (Picture) {
-			int xOffs = ( Width / 2 ) - ( Picture->Width / 2 );
-			int yOffs = ( Height / 2 ) - ( Picture->Height / 2 );
-			Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(Picture->Width * Clipping), Picture->Height );
-			core->GetVideoDriver()->BlitSprite( Picture, x + XPos + xOffs, y + YPos + yOffs, true, &r );
-		}
+	if (Picture  && (Flags & IE_GUI_BUTTON_PICTURE) ) {
+		int xOffs = ( Width / 2 ) - ( Picture->Width / 2 );
+		int yOffs = ( Height / 2 ) - ( Picture->Height / 2 );
+		Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(Picture->Width * Clipping), Picture->Height );
+		core->GetVideoDriver()->BlitSprite( Picture, x + XPos + xOffs, y + YPos + yOffs, true, &r );
+	}
+
+	// Composite pictures (paperdolls/description icons)
+	if (!PictureList.empty() && (Flags & IE_GUI_BUTTON_PICTURE) ) {
 		std::list<Sprite2D*>::iterator iter = PictureList.begin();
-		if (iter!=PictureList.end()) {
-			int xOffs = ( Width - (*iter)->Width + (*iter)->XPos )/2;
-			int yOffs = ( Height - (*iter)->Height + (*iter)->YPos )/2;
-			for (; iter != PictureList.end(); ++iter) {
-				core->GetVideoDriver()->BlitSprite( *iter, x + XPos +xOffs, y + YPos +yOffs, true );
-			}
+		int xOffs = ( Width - (*iter)->Width + (*iter)->XPos )/2;
+		int yOffs = ( Height - (*iter)->Height + (*iter)->YPos )/2;
+		for (; iter != PictureList.end(); ++iter) {
+			core->GetVideoDriver()->BlitSprite( *iter, x + XPos + xOffs, y + YPos + yOffs, true );
 		}
 	}
 
@@ -210,8 +209,6 @@ void Button::Draw(unsigned short x, unsigned short y)
 		Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(AnimPicture->Width * Clipping), AnimPicture->Height );
 		core->GetVideoDriver()->BlitSprite( AnimPicture, x + XPos + xOffs, y + YPos + yOffs, true, &r );
 	}
-
-
 
 	// Button label
 	if (hasText && ! ( Flags & IE_GUI_BUTTON_NO_TEXT )) {
@@ -239,16 +236,18 @@ void Button::Draw(unsigned short x, unsigned short y)
 			align |= IE_FONT_ALIGN_MIDDLE;
 
 		font->Print( Region( x + XPos, y + YPos, Width - 2, Height - 2 ),
-			     ( unsigned char * ) Text, ppoi,
-			     align | IE_FONT_SINGLE_LINE, true );
+			( unsigned char * ) Text, ppoi,
+			align | IE_FONT_SINGLE_LINE, true );
 	}
 
-	for (int i = 0; i < MAX_NUM_BORDERS; i++) {
-		ButtonBorder *fr = &borders[i];
-		if (! fr->enabled) continue;
-
-		Region r = Region( x + XPos + fr->dx1, y + YPos + fr->dy1, Width - (fr->dx1 + fr->dx2 + 1), Height - (fr->dy1 + fr->dy2 + 1) );
-		core->GetVideoDriver()->DrawRect( r, fr->color, fr->filled );
+	if (! (Flags&IE_GUI_BUTTON_NO_IMAGE)) {
+		for (int i = 0; i < MAX_NUM_BORDERS; i++) {
+			ButtonBorder *fr = &borders[i];
+			if (! fr->enabled) continue;
+			
+			Region r = Region( x + XPos + fr->dx1, y + YPos + fr->dy1, Width - (fr->dx1 + fr->dx2 + 1), Height - (fr->dy1 + fr->dy2 + 1) );
+			core->GetVideoDriver()->DrawRect( r, fr->color, fr->filled );
+		}
 	}
 }
 /** Sets the Button State */
