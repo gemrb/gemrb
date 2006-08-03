@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.49 2006/07/29 18:17:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.50 2006/08/03 20:08:44 avenger_teambg Exp $
  *
  */
 
@@ -347,6 +347,7 @@
 #define IE_TITLE2		173
 #define IE_DISABLEOVERLAY	174
 #define IE_DISABLEBACKSTAB	175
+
 #define IE_ENABLEOFFSCREENAI    183 // bg2 has this on this spot
 #define IE_EXISTANCEDELAY       184 // (sound2mn)
 #define IE_DISABLECHUNKING      186 //
@@ -372,12 +373,8 @@
 #define IE_BOUNCE               181 // has projectile bouncing effect
 #define IE_MIRRORIMAGES         182 
 //
-#define IE_RACE			201
-#define IE_CLASS		202
-#define IE_GENERAL		203
-#define IE_EA			204
-#define IE_SPECIFIC		205
 
+#define IE_DISABLEDBUTTON 205
 #define IE_ANIMATION_ID		206
 #define IE_STATE_ID		207
 #define IE_METAL_COLOR		208
@@ -406,6 +403,11 @@
 #define IE_HATEDRACE6       228
 #define IE_HATEDRACE7       229
 #define IE_HATEDRACE8       230
+#define IE_RACE			231
+#define IE_CLASS		232
+#define IE_GENERAL		233
+#define IE_EA			234
+#define IE_SPECIFIC		235
 //These are in IWD2, but in a different place
 #define IE_LEVELBARBARIAN        240 //iwd2 class levels (fighter, mage, thief are already stored)
 #define IE_LEVELBARD             241 
@@ -415,10 +417,9 @@
 #define IE_LEVELPALADIN          245
 #define IE_LEVELRANGER           246
 #define IE_LEVELSORCEROR         247
-
+// place for more classes
 #define IE_SAVEDXPOS             253
 #define IE_SAVEDYPOS             254
 #define IE_SAVEDFACE             255
-// place for more classes
 
 #endif  // ! IE_STATS_H

@@ -175,7 +175,7 @@ IDS
 0xad	PoisonResistanceModifier
 0xae	PlaySound
 0xaf	State:Hold
-0xb0	MovementModifier
+0xb0	MovementRateModifier2
 0xba    SetStatus
 0xbb    PlayBAM1
 0xbc    PlayBAM2

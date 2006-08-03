@@ -175,7 +175,7 @@ IDS
 0xad	PoisonResistanceModifier
 0xae	PlaySound
 0xaf	State:Hold
-0xb0	MovementModifier
+0xb0	MovementRateModifier2
 0xb1	ApplyEffect
 0xb2	ToHitVsCreature
 0xb3	DamageVsCreature
