@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.79 2006/07/29 18:17:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.80 2006/08/03 19:58:59 avenger_teambg Exp $
  *
  */
 
@@ -310,7 +310,7 @@ void Inventory::KillSlot(unsigned int index)
 	if (!effect) {
 		return;
 	}
-	RemoveSlotEffects( GetSlotItem(index) );
+	RemoveSlotEffects( item );
 	if (effect != SLOT_EFFECT_ITEM) {
 		return;
 	}
@@ -438,6 +438,7 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 			item->Flags |= IE_INV_ITEM_ACQUIRED;
 			Slots[slot] = item;
 			Changed = true;
+			EquipItem(slot);
 			return 2;
 		}
 
@@ -1137,7 +1138,7 @@ bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count
 {
 	int pos = 0;
 	int actual = 0;
-	memset(array, count * sizeof(ItemExtHeader),0 );
+	memset(array, 0, count * sizeof(ItemExtHeader) );
 	for(unsigned int idx=0;idx<Slots.size();idx++) {
 		if (!core->QuerySlotEffects(idx)) {
 			continue;
@@ -1148,7 +1149,7 @@ bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count
 		if (!itm) {
 			continue;
 		}
-		for(int ehc=0;count && ehc<itm->ExtHeaderCount;ehc++) {
+		for(int ehc=0;ehc<itm->ExtHeaderCount;ehc++) {
 			ITMExtHeader *ext_header = itm->ext_headers+ehc;
 			if (ext_header->Location!=ITEM_LOC_EQUIPMENT) {
 				continue;
