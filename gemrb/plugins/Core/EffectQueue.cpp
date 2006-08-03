@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.68 2006/08/02 18:00:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.69 2006/08/03 21:13:04 avenger_teambg Exp $
  *
  */
 
@@ -374,8 +374,10 @@ inline bool check_probability(Effect* fx)
 	return true;
 }
 
-static EffectRef fx_spell_immunity_ref={"ResistSpell",NULL,-1};  //bg2
-static EffectRef fx_spell_immunity2_ref={"ResistSpell2",NULL,-1};//iwd
+static EffectRef fx_opcode_immunity_ref={"Protection:Opcode",NULL,-1};  //bg2
+static EffectRef fx_opcode_immunity2_ref={"Protection:Opcode2",NULL,-1};//iwd
+static EffectRef fx_spell_immunity_ref={"Protection:Spell",NULL,-1};  //bg2
+static EffectRef fx_spell_immunity2_ref={"Protection:Spell2",NULL,-1};//iwd
 static EffectRef fx_school_immunity_ref={"ResistSchool",NULL,-1};
 static EffectRef fx_secondary_type_immunity_ref={"ResistSecondaryType",NULL,-1};
 
@@ -388,6 +390,12 @@ inline int check_type(Actor* actor, Effect* fx)
 	ieDword bounce = actor->GetStat(IE_BOUNCE);
 
 	//immunity checks
+	if (actor->fxqueue.HasEffectWithParam(fx_opcode_immunity_ref, fx->Opcode) ) {
+		return 0;
+	}
+	if (actor->fxqueue.HasEffectWithParam(fx_opcode_immunity2_ref, fx->Opcode) ) {
+		return 0;
+	}
 	if (actor->fxqueue.HasEffectWithResource(fx_spell_immunity_ref, fx->Source) ) {
 		return 0;
 	}

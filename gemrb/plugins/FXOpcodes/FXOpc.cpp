@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.37 2006/08/02 18:00:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.38 2006/08/03 21:13:05 avenger_teambg Exp $
  *
  */
 
@@ -592,6 +592,7 @@ static EffectRef effectnames[] = {
 	{ "Protection:Creature", fx_generic_effect, 0 },
 	{ "Protection:Weapons", fx_generic_effect, 0 },
 	{ "Protection:Opcode", fx_generic_effect, 0 },
+	{ "Protection:Opcode2", fx_generic_effect, 0 },
 	{ "Protection:Projectile",fx_protection_from_projectile, 0},
 	{ "Protection:School",fx_generic_effect,0},//overlay?
 	{ "Protection:SchoolDecrement",fx_generic_decrement_effect,0},//overlay?
@@ -649,6 +650,7 @@ static EffectRef effectnames[] = {
 	{ "Spelltrap",fx_spelltrap , 0 },
 	{ "State:Berserk", fx_set_berserk_state, 0 },
 	{ "State:Blind", fx_set_blind_state, 0 },
+	{ "State:Blind2", fx_set_blind_state, 0 },//sol's soaring orb???
 	{ "State:Blur", fx_set_blur_state, 0 },
 	{ "State:Charmed", fx_set_charmed_state, 0 }, //0x05
 	{ "State:Confused", fx_set_confused_state, 0 },
@@ -3052,10 +3054,24 @@ int fx_add_innate (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 // 0xAC Spell:Remove
+//gemrb extension: deplete spell by resref
 int fx_remove_spell (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_remove_spell (%2d): Resource: %s\n", fx->Opcode, fx->Resource);
-	target->spellbook.RemoveSpell(fx->Resource);
+	if (0) printf( "fx_remove_spell (%2d): Resource: %s Type:%d\n", fx->Opcode, fx->Resource, fx->Parameter2);
+	switch (fx->Parameter2)
+	{
+	default:
+		target->spellbook.RemoveSpell(fx->Resource);
+		break;
+	case 1: //forget all spells of Resource
+		do {} while(target->spellbook.HaveSpell( fx->Resource, HS_DEPLETE ));
+		break;
+	case 2: //forget x spells of resource
+		while( fx->Parameter1--) {
+			target->spellbook.HaveSpell( fx->Resource, HS_DEPLETE );
+		}
+		break;
+	}
 	//this is an instant, so it shouldn't stick
 	return FX_NOT_APPLIED;
 }

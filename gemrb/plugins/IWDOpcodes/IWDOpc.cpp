@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.cpp,v 1.7 2006/08/02 18:00:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.cpp,v 1.8 2006/08/03 21:13:05 avenger_teambg Exp $
  *
  */
 
@@ -66,14 +66,14 @@ int fx_control_undead (Actor* Owner, Actor* target, Effect* fx); //107
 int fx_static_charge (Actor* Owner, Actor* target, Effect* fx); //108
 int fx_cloak_of_fear (Actor* Owner, Actor* target, Effect* fx); //109
 //int fx_movement_modifier (Actor* Owner, Actor* target, Effect* fx); //10a
-//10b
-//10c
-//10d
-//10e
-//10f
-//110
-//111
-//112
+int fx_remove_confusion (Actor* Owner, Actor* target, Effect* fx);//10b
+int fx_eye_of_the_mind (Actor* Owner, Actor* target, Effect* fx);//10c
+int fx_eye_of_the_sword (Actor* Owner, Actor* target, Effect* fx);//10d
+int fx_eye_of_the_mage (Actor* Owner, Actor* target, Effect* fx);//10e
+int fx_eye_of_venom (Actor* Owner, Actor* target, Effect* fx);//10f
+int fx_eye_of_the_spirit (Actor* Owner, Actor* target, Effect* fx);//110
+int fx_eye_of_fortitude (Actor* Owner, Actor* target, Effect* fx);//111
+int fx_eye_of_stone (Actor* Owner, Actor* target, Effect* fx);//112
 int fx_remove_seven_eyes (Actor* Owner, Actor* target, Effect* fx);//113
 int fx_remove_effect (Actor* Owner, Actor* target, Effect* fx);//114
 int fx_soul_eater (Actor* Owner, Actor* target, Effect* fx);//115
@@ -94,8 +94,8 @@ int fx_resist_spell_and_message (Actor* Owner, Actor* target, Effect *fx);//122
 int fx_rod_of_smithing (Actor* Owner, Actor* target, Effect* fx); //123
 //0x124 MagicalRest (same as bg2)
 //0x125 BeholderDispelMagic (???)
-//0x126 HarpyWail (???)
-//0x127 JackalWereGaze (Charm ?)
+int fx_harpy_wail (Actor* Owner, Actor* target, Effect* fx); //126
+int fx_jackalwere_gaze (Actor* Owner, Actor* target, Effect* fx); //127
 //0x128 ModifyGlobalVariable (same as bg2)
 //0x129 HideInShadows (same as bg2)
 int fx_use_magic_device_modifier (Actor* Owner, Actor* target, Effect* fx);//12a
@@ -113,6 +113,7 @@ static EffectRef effectnames[] = {
 	{ "VampiricTouch", fx_vampiric_touch, 0}, //f1
 	{ "AnimateDead", fx_animate_dead, 0}, //f3
 	{ "SummonMonster2", fx_summon_monster2, 0}, //f6
+	{ "BurningBlood", fx_burning_blood, 0}, //f7
 	{ "SummonShadowMonster", fx_summon_shadow_monster, 0}, //f8
 	{ "RemoveEffects", fx_remove_effects, 0}, //fe
 	{ "SalamanderAura", fx_salamander_aura, 0}, //ff
@@ -123,6 +124,14 @@ static EffectRef effectnames[] = {
 	{ "ControlUndead", fx_control_undead, 0}, //107
 	{ "StaticCharge", fx_static_charge, 0}, //108
 	{ "CloakOfFear", fx_cloak_of_fear, 0}, //109
+	{ "RemoveConfusion", fx_remove_confusion, 0},//10b
+	{ "EyeOfTheMind", fx_eye_of_the_mind, 0}, //10c
+	{ "EyeOfTheSword", fx_eye_of_the_sword, 0}, //10d
+	{ "EyeOfTheMage", fx_eye_of_the_mage, 0}, //10e
+	{ "EyeOfVenom", fx_eye_of_venom, 0}, //10f
+	{ "EyeOfTheSpirit", fx_eye_of_the_spirit, 0}, //110
+	{ "EyeOfFortitude", fx_eye_of_fortitude, 0}, //111
+	{ "EyeOfStone", fx_eye_of_stone, 0}, //112
 	{ "RemoveSevenEyes", fx_remove_seven_eyes, 0}, //113
 	{ "RemoveEffect", fx_remove_effect, 0}, //114
 	{ "SoulEater", fx_soul_eater, 0}, //115
@@ -133,13 +142,13 @@ static EffectRef effectnames[] = {
 	{ "SuppressHP", fx_suppress_hp, 0}, //11a -- some stat???
 	{ "FloatText", fx_floattext, 0}, //11b
 	{ "MaceOfDisruption", fx_mace_of_disruption, 0}, //11c
-
 	{ "State:Set", fx_set_state, 0}, //120
 	{ "CutScene", fx_cutscene, 0}, //121
 	{ "Protection:Spell2", fx_resist_spell, 0}, //ce
-	{ "Protection:SpellMessage", fx_resist_spell_and_message, 0}, //122
+	{ "Protection:Spell3", fx_resist_spell_and_message, 0}, //122
 	{ "RodOfSmithing", fx_rod_of_smithing, 0}, //123
-
+	{ "HarpyWail", fx_harpy_wail, 0}, //126
+	{ "JackalWereGaze", fx_jackalwere_gaze, 0}, //127
 	{ "UseMagicDeviceModifier", fx_use_magic_device_modifier, 0}, //12a
 	{ NULL, NULL, 0 },
 };
@@ -461,6 +470,23 @@ int fx_summon_monster2 (Actor* Owner, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
+//0xf7 BurningBlood
+
+int fx_burning_blood (Actor* Owner, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_burning_blood (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	//inflicts damage calculated by dice values+parameter1
+	//creates damage opcode on everyone around. fx->Parameter2 - 0 fire, 1 - ice
+	ieDword damage = DAMAGE_FIRE;
+
+	if (fx->Parameter2==1) {
+		damage = DAMAGE_COLD;
+	}
+
+	target->Damage(fx->Parameter1, DAMAGE_FIRE, Owner);
+	return FX_APPLIED;
+}
+//0x117 AnimalRage
 //0xf8 SummonShadowMonster
 
 #define IWD_SSM 3
@@ -546,7 +572,7 @@ int fx_zombielord_aura (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-//0x102 ResistSpell (this is the same as in bg2)
+//0x102 Protection:Spell (this is the same as in bg2?)
 //0x103 SummonCreature2
 
 static int eamods[]={EAM_DEFAULT,EAM_SOURCEALLY,EAM_SOURCEENEMY,EAM_NEUTRAL};
@@ -645,11 +671,21 @@ int fx_cloak_of_fear(Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 }
 //0x10a MovementRateModifier3 (Like bg2)
 //0x10b RemoveConfusion
+EffectRef fx_confusion_ref={"State:Confused",NULL,-1};
+EffectRef fx_umberhulk_gaze_ref={"UmberHulkGaze",NULL,-1};
+int fx_remove_confusion (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_remove_confusion (%2d)\n", fx->Opcode );
+	target->fxqueue.RemoveAllEffects(fx_confusion_ref);
+	target->fxqueue.RemoveAllEffects(fx_umberhulk_gaze_ref);
+	return FX_APPLIED;
+}
 //0x10c EyeOfTheMind
 int fx_eye_of_the_mind (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_the_mind (%2d)\n", fx->Opcode );
 	target->add_animation("eyemind",-1,0,true);
+	//immunity to charm, emotion and fear
 	return FX_APPLIED;
 }
 //0x10d EyeOfTheSword
@@ -657,6 +693,7 @@ int fx_eye_of_the_sword (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_the_sword (%2d)\n", fx->Opcode );
 	target->add_animation("eyesword",-1,0,true);
+	//deflect one physical attack?
 	return FX_APPLIED;
 }
 //0x10e EyeOfTheMage
@@ -664,6 +701,7 @@ int fx_eye_of_the_mage (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_the_mage (%2d)\n", fx->Opcode );
 	target->add_animation("eyemage",-1,0,true);
+	//deflect one magical attack
 	return FX_APPLIED;
 }
 //0x10f EyeOfVenom
@@ -671,6 +709,7 @@ int fx_eye_of_venom (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_venom (%2d)\n", fx->Opcode );
 	target->add_animation("eyevenom",-1,0,true);
+	//deflect one poison attack
 	return FX_APPLIED;
 }
 //0x110 EyeOfTheSpirit
@@ -678,6 +717,7 @@ int fx_eye_of_the_spirit (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_the_spirit (%2d)\n", fx->Opcode );
 	target->add_animation("eyespir",-1,0,true);
+	//deflect one instant death attack
 	return FX_APPLIED;
 }
 //0x111 EyeOfFortitude
@@ -685,6 +725,7 @@ int fx_eye_of_fortitude (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_fortitude (%2d)\n", fx->Opcode );
 	target->add_animation("eyefort",-1,0,true);
+	//deflects one stunning, deafness, silence, blindness
 	return FX_APPLIED;
 }
 //0x112 EyeOfStone
@@ -692,6 +733,7 @@ int fx_eye_of_stone (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_stone (%2d)\n", fx->Opcode );
 	target->add_animation("eyestone",-1,0,true);
+	//deflects one petrification
 	return FX_APPLIED;
 }
 //0x113 RemoveSevenEyes
@@ -749,7 +791,19 @@ int fx_shroud_of_flame (Actor* Owner, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 //0x117 AnimalRage
+int fx_animal_rage (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_animal_rage (%2d): Damage %d\n", fx->Opcode, fx->Parameter1 );
+	STAT_SET( IE_BERSERKSTAGE2, 1 );
+	return FX_APPLIED;
+}
 //0x118 TurnUndead
+int fx_turn_undead (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_turn_undead (%2d): Damage %d\n", fx->Opcode, fx->Parameter1 );
+	STAT_SET( IE_BERSERKSTAGE2, 1 );
+	return FX_APPLIED;
+}
 //0x119 VitriolicSphere
 int fx_vitriolic_sphere (Actor* Owner, Actor* target, Effect* fx)
 {
@@ -788,6 +842,18 @@ int fx_floattext (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0x11c MaceOfDisruption
+int fx_mace_of_disruption (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_mace_of_disruption (%2d): ResRef:%s Anim:%s Type: %d\n", fx->Opcode, fx->Resource, fx->Resource2, fx->Parameter2 );
+	ieDword race = target->GetStat(IE_RACE);
+	//golem / outer planar gets hit
+	switch (race) {
+		case 144: // golem
+			break;
+		default:;
+	}
+	return FX_NOT_APPLIED;
+}
 //0x11d Sleep2 ??? power word sleep?
 //0x11e Reveal:Tracks (same as bg2)
 //0x11f Protection:Backstab (same as bg2)
@@ -822,7 +888,7 @@ int fx_resist_spell (Actor* Owner, Actor* target, Effect *fx)
 }
 EffectRef fx_resist_spell_ref={"ResistSpell2",NULL,-1};
 
-//0x122 Protection:SpellMessage ??? IWD ids targeting
+//0x122 Protection:Spell3 ??? IWD ids targeting
 // this is a variant of resist spell, used in iwd2
 int fx_resist_spell_and_message (Actor* Owner, Actor* target, Effect *fx)
 {
@@ -858,7 +924,19 @@ int fx_rod_of_smithing (Actor* /*Owner*/, Actor* target, Effect* fx)
 //0x124 MagicalRest (same as bg2)
 //0x125 BeholderDispelMagic (???)
 //0x126 HarpyWail (???)
+int fx_harpy_wail (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_harpy_wail (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	target->Panic();
+	return FX_NOT_APPLIED;
+}
 //0x127 JackalWereGaze (Charm ?)
+int fx_jackalwere_gaze (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_jackalwere_gaze (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	target->Panic();
+	return FX_APPLIED;
+}
 //0x128 ModifyGlobalVariable (same as bg2)
 //0x129 HideInShadows (same as bg2)
 //0x12a UseMagicDevice

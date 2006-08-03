@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.33 2006/07/04 14:31:28 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.34 2006/08/03 21:13:06 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -121,6 +121,7 @@ def RestPress ():
 def EmptyControls ():
 	global ActionsWindow
 
+	GemRB.SetVar ("ActionLevel", 0)
 	Window = ActionsWindow
 	for i in range (12):
 		Button = GemRB.GetControl (Window, i)
@@ -153,6 +154,7 @@ def SelectFormation ():
 def GroupControls ():
 	global ActionsWindow
 
+	GemRB.SetVar ("ActionLevel", 0)
 	Window = ActionsWindow
 	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetActionIcon (Window, Button, 7)
@@ -196,6 +198,7 @@ def OpenActionsWindowControls (Window):
 
 def UpdateActionsWindow ():
 	global ActionsWindow, PortraitWindow, OptionsWindow
+	global level, TopIndex
 
 	if ActionsWindow == -1:
 		return
@@ -220,6 +223,10 @@ def UpdateActionsWindow ():
 				pc = -1
 				break
 
+	#setting up the disabled button overlay (using the second border slot)
+	for i in range (12):
+		GemRB.SetButtonBorder(ActionsWindow, i, 1, 0, 0, 0, 0, 50,30,10,120, 0, 1)
+
 	if pc == 0:
 		EmptyControls ()
 		return
@@ -227,7 +234,15 @@ def UpdateActionsWindow ():
 		GroupControls ()
 		return
 	#this is based on class
-	GemRB.SetupControls (ActionsWindow, pc)
+
+	level = GemRB.GetVar ("ActionLevel")
+	TopIndex = GemRB.GetVar ("TopIndex")
+	if level == 0:
+		GemRB.SetupControls (ActionsWindow, pc)
+	elif level == 1:
+		GemRB.SetupEquipmentIcons(ActionsWindow, pc, TopIndex)
+	elif level == 2:
+		GemRB.SetupSpellIcons(ActionsWindow, pc, TopIndex)
 	return
 
 def OpenFloatMenuWindow ():
@@ -270,17 +285,22 @@ def ActionStopPressed ():
 			GemRB.ClearAction(i + 1)
 	return
 
-def RefreshUseItemWindow ():
-	pc = GemRB.GameGetFirstSelectedPC()
-	print "setting up useitem window topindex:",TopIndex
-	GemRB.SetupEquipmentIcons(ActionsWindow, pc, TopIndex)
+#no check needed because the button wouldn't be drawn if illegal
+def LeftScrollPressed ():
+	GemRB.SetVar ("TopIndex", GemRB.GetVar ("TopIndex") -1)
+	UpdateActionsWindow ()
+	return
+
+#no check needed because the button wouldn't be drawn if illegal
+def RightScrollPressed ():
+	GemRB.SetVar ("TopIndex", GemRB.GetVar ("TopIndex") +1)
+	UpdateActionsWindow ()
 	return
 
 def ActionUseItemPressed ():
-	global TopIndex
-
-	TopIndex = 0
-	RefreshUseItemWindow()
+	GemRB.SetVar ("TopIndex", 0)
+	GemRB.SetVar ("ActionLevel", 1)
+	UpdateActionsWindow ()
 	return
 
 def GetActorClassTitle (actor):
@@ -422,6 +442,7 @@ def SelectAllOnPress ():
 def SelectionChanged ():
 	global PortraitWindow
 
+	GemRB.SetVar ("ActionLevel", 0)
 	if (not SelectionChangeHandler):
 		UpdateActionsWindow ()
 		for i in range (PARTY_SIZE):

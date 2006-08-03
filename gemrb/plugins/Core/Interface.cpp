@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.418 2006/08/02 18:00:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.419 2006/08/03 21:13:04 avenger_teambg Exp $
  *
  */
 
@@ -201,6 +201,7 @@ Interface::Interface(int iargc, char** iargv)
 	ItemExclTable = NULL;
 	ItemDialTable = NULL;
 	ItemDial2Table = NULL;
+	ItemTooltipTable = NULL;
 }
 
 #define FreeInterfaceVector(type, variable, member) \
@@ -608,6 +609,11 @@ bool Interface::ReadAbilityTables()
 	return true;
 }
 
+static void ReleaseItemTooltip(void *poi)
+{
+	free(poi);
+}
+
 bool Interface::ReadAuxItemTables()
 {
 	size_t idx;
@@ -679,6 +685,37 @@ aux_1:
 	}
 	DelTable( table );
 aux_2:
+	if (ItemTooltipTable) {
+		ItemTooltipTable->RemoveAll(ReleaseItemTooltip);
+	} else {
+		ItemTooltipTable = new Variables();
+		ItemTooltipTable->SetType(GEM_VARIABLES_STRING);
+	}
+	table = LoadTable( "tooltip" );
+
+	if (table < 0) {
+		//don't report error when the file doesn't exist
+		goto aux_3;
+	}
+	aa = GetTable( table );
+	if (!aa) {
+		DelTable( table );
+		flag = false;
+		goto aux_3;
+	}
+	idx = aa->GetRowCount();
+	while (idx--) {
+		ieResRef key;
+		int *tmppoi = (int *) malloc(sizeof(int)*3);
+
+		strnlwrcpy(key,aa->GetRowName(idx),8);
+		for (int i=0;i<3;i++) {
+			tmppoi[i] = atoi(aa->QueryField(idx,i));
+		}
+		ItemTooltipTable->SetAt(key, (const char *) tmppoi);
+	}
+	DelTable( table );
+aux_3:
 	return flag;
 }
 
@@ -690,6 +727,25 @@ int Interface::GetItemExcl(ieResRef itemname)
 		return (int) value;
 	}
 	return 0;
+}
+
+int Interface::GetItemTooltip(ieResRef itemname, int header)
+{
+	int *value = NULL;
+
+	if (ItemTooltipTable) {
+		ItemTooltipTable->Lookup(itemname, (char *&) value);
+	}
+	if (value && (value[header]>=0)) {
+		return value[header];
+	}
+	Item *item = GetItem(itemname);
+	if (!item) {
+		return -1;
+	}
+	int ret = item->ItemName;
+	FreeItem(item, itemname, 0);
+	return ret;
 }
 
 int Interface::GetItemDialStr(ieResRef itemname)

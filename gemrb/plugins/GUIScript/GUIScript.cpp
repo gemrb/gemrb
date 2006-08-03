@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.402 2006/07/31 17:15:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.403 2006/08/03 21:13:05 avenger_teambg Exp $
  *
  */
 
@@ -4294,13 +4294,14 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 
 		btn->SetFlags( IE_GUI_BUTTON_PICTURE, BM_OR );
 		Sprite2D* Picture;
+		int i;
 		switch (Which) {
 		case 0: case 1:
 			Picture = core->GetBAMSprite(item->ItemIcon, -1, Which);
 			break;
 		case 2:
 			btn->ClearPictureList();
-			for (int i=0;i<4;i++) {
+			for (i=0;i<4;i++) {
 				Picture = core->GetBAMSprite(item->CarriedIcon, -1, i);
 				if (Picture)
 					btn->StackPicture(Picture);
@@ -6220,7 +6221,7 @@ static PyObject* GemRB_HasResource(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetupEquipmentIcons__doc,
-"SetupControls(WindowIndex, slot[, Start])\n\n"
+"SetupEquipmentIcons(WindowIndex, slot[, Start])\n\n"
 "Automagically sets up the controls of the equipment list window for a PC indexed by slot.");
 
 static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
@@ -6243,9 +6244,9 @@ static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 
 	//-2 because of the left/right scroll icons
 	if (!ItemArray) {
-		ItemArray = (ItemExtHeader *) malloc((GUIBT_COUNT-2) * sizeof (ItemExtHeader) );
+		ItemArray = (ItemExtHeader *) malloc((GUIBT_COUNT) * sizeof (ItemExtHeader) );
 	}
-	bool more = actor->inventory.GetEquipmentInfo(ItemArray, Start, GUIBT_COUNT-2);
+	bool more = actor->inventory.GetEquipmentInfo(ItemArray, Start, GUIBT_COUNT-(Start?1:0));
 	int i;
 	if (Start) {
 		PyObject *ret = SetActionIcon(wi,core->GetControl(wi, 0),ACT_LEFT,0);
@@ -6253,22 +6254,35 @@ static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 			return RuntimeError("Cannot set action button!\n");
 		}
 	}
-	for (i=0;i<GUIBT_COUNT-2;i++) {
-		int ci = core->GetControl(wi, i+1);
+
+	for (i=0;i<GUIBT_COUNT-(more?1:0);i++) {
+		int ci = core->GetControl(wi, i+(Start?1:0) );
 		Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
 		ItemExtHeader *item = ItemArray+i;
 
 		Sprite2D *Picture = core->GetBAMSprite(item->UseIcon, 0, 0);
-		btn->SetPicture( Picture );
-		btn->SetState(IE_GUI_BUTTON_UNPRESSED);
+		
+		if (!Picture) {
+			btn->SetState(IE_GUI_BUTTON_LOCKED);
+			btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, BM_SET);
+			btn->SetTooltip(NULL);
+		} else {
+			btn->SetPicture( Picture );
+			btn->SetState(IE_GUI_BUTTON_UNPRESSED);
+			int tip = core->GetItemTooltip(item->itemname, item->headerindex);
+			if (tip>0) {
+				btn->SetTooltip(core->GetString((ieDword) tip,0));
+			} else {
+				btn->SetTooltip(NULL);
+			}
+			char usagestr[10];
 
-		char usagestr[10];
-
-		if (item->Charges || item->ChargeDepletion) {
-			sprintf(usagestr,"%d", item->Charges);
-			btn->SetText( usagestr );
-			if (!item->Charges && item->ChargeDepletion) {
-				btn->SetState(IE_GUI_BUTTON_DISABLED);
+			if (item->Charges || item->ChargeDepletion) {
+				sprintf(usagestr,"%d", item->Charges);
+				btn->SetText( usagestr );
+				if (!item->Charges && item->ChargeDepletion) {
+					btn->SetState(IE_GUI_BUTTON_DISABLED);
+				}
 			}
 		}
 	}
@@ -6325,15 +6339,17 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 	}
 	ieDword fistweapon = actor->inventory.GetFistSlot();
 	ieDword usedslot = actor->inventory.GetEquippedSlot();
+	ieDword disabledbutton = actor->GetStat(IE_DISABLEDBUTTON);
+	int tmp;
 	for (int i=0;i<GUIBT_COUNT;i++) {
 		int ci = core->GetControl(wi, i+Start);
-		int tmp = myrow[i];
-		if (tmp==100) {
-			tmp = -1;
+		int action = myrow[i];
+		if (action==100) {
+			action = -1;
 		} else {
-			tmp&=31;
+			action&=31;
 		}
-		PyObject *ret = SetActionIcon(wi,ci,tmp,i+1);
+		PyObject *ret = SetActionIcon(wi,ci,action,i+1);
 		Button * btn = (Button *) GetControl(wi,ci,IE_GUI_BUTTON);
 		if (!btn) {
 			return NULL;
@@ -6341,7 +6357,13 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 
 		int state = IE_GUI_BUTTON_UNPRESSED;
 		ieDword modalstate = actor->ModalState;
-		switch (tmp) {
+		switch (action) {
+		case ACT_USE:
+			//returns true if there is ANY equipment
+			if(!actor->inventory.GetEquipmentInfo(NULL, 0, 0)) {
+				state = IE_GUI_BUTTON_DISABLED;
+			}
+			break;
 		case ACT_BARDSONG:
 			if (modalstate==MS_BATTLESONG) {
 				state = IE_GUI_BUTTON_SELECTED;
@@ -6372,8 +6394,7 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 			if (magicweapon!=0xffff) {
 				slot = magicweapon;
 			} else {
-					slot = actor->GetQuickSlot(tmp-ACT_WEAPON1);
-				//slot = actor->PCStats->QuickWeaponSlots[tmp-ACT_WEAPON1];
+					slot = actor->GetQuickSlot(action-ACT_WEAPON1);
 			}
 			if (slot!=0xffff) {
 				//no slot translation required
@@ -6388,8 +6409,6 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 							break;
 						}
 					}
-					//
-					//
 					SetItemIcon(wi, ci, item->ItemResRef,mode,(item->Flags&IE_INV_ITEM_IDENTIFIED)?2:1, i+1);
 					if (usedslot == slot) {
 						btn->EnableBorder(0, true);
@@ -6411,7 +6430,7 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 		//fixme iwd2 has 9
 		{
 			SetButtonBAM(wi, ci, "stonspel",0,0,-1);
-			ieResRef *poi = &actor->PCStats->QuickSpells[tmp-ACT_QSPELL1];
+			ieResRef *poi = &actor->PCStats->QuickSpells[action-ACT_QSPELL1];
 			if ((*poi)[0]) {
 				SetSpellIcon(wi, ci, *poi, 1, 1, i+1);
 			}
@@ -6450,7 +6469,12 @@ jump_label:
 		if (!ret) {
 			return RuntimeError("Cannot set action button!\n");
 		}
+		if (action<0 || (disabledbutton & (1<<action) )) {
+			state = IE_GUI_BUTTON_DISABLED;
+		}
 		btn->SetState(state);
+		//you have to set this overlay up
+		btn->EnableBorder(1, state==IE_GUI_BUTTON_DISABLED);
 	}
 	Py_INCREF( Py_None );
 	return Py_None;

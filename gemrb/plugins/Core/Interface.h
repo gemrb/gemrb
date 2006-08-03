@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.203 2006/08/02 18:00:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.204 2006/08/03 21:13:04 avenger_teambg Exp $
  *
  */
 
@@ -275,6 +275,7 @@ public:
 	Variables * AreaAliasTable;
 	Variables * ItemExclTable;
 	Variables * ItemDialTable, *ItemDial2Table;
+	Variables * ItemTooltipTable;
 	Sprite2D **Cursors;
 	int CursorCount;
 	Sprite2D *FogSprites[32];
@@ -561,6 +562,8 @@ public:
 	int ReadResRefTable(const ieResRef tablename, ieResRef *&data);
 	/** frees the data */
 	void FreeResRefTable(ieResRef *&table, int &count);
+	/** Returns the item tooltip value for the xth extension header */
+	int GetItemTooltip(ieResRef itemname, int idx);
 	/** Returns the item exclusion value */
 	int GetItemExcl(ieResRef itemname);
 	/** Returns the strref for the item dialog */
