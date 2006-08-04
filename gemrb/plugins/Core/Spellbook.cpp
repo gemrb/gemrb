@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.37 2006/04/11 16:32:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.38 2006/08/04 21:42:44 avenger_teambg Exp $
  *
  */
 
@@ -503,6 +503,64 @@ bool Spellbook::DepleteSpell(CREMemorizedSpell* spl)
 	return false;
 }
 
+/* returns true if there are more item usages not fitting in given array */
+bool Spellbook::GetSpellInfo(SpellExtHeader *array, int type, int startindex, int count)
+{
+	int pos = 0;
+	int actual = 0;
+  
+	memset(array, 0, count * sizeof(SpellExtHeader) );
+	for (int i = 0; i < NUM_SPELL_TYPES; i++) {
+		for (unsigned int j = 0; j < spells[i].size(); j++) {
+			CRESpellMemorization* sm = spells[i][j];
+			
+			if ( !(type & (1<<sm->Type)) ) {
+				continue;
+			}
+			for (unsigned int k = 0; k < sm->memorized_spells.size(); k++) {
+				CREMemorizedSpell* slot = sm->memorized_spells[k];
+				if (!slot)
+					continue;
+				if (!slot->Flags)
+					continue;
+				actual++;
+				if (actual>startindex) {
+					//store the item, return if we can't store more
+					if (!count) {
+						return true;
+					}
+					Spell *spl = core->GetSpell(slot->SpellResRef);
+					ieDword level = 0;
+					count--;
+					memcpy(array[pos].spellname, slot->SpellResRef, sizeof(ieResRef) );
+					int ehc;
+			
+					for(ehc=0;ehc<spl->ExtHeaderCount-1;ehc++) {
+						if (level<spl->ext_headers[ehc+1].RequiredLevel) {
+							break;
+						}
+					}
+					SPLExtHeader *ext_header = spl->ext_headers+ehc;
+					array[pos].headerindex = ehc;
+					array[pos].SpellForm = ext_header->SpellForm;
+					memcpy(array[pos].MemorisedIcon, ext_header->MemorisedIcon,sizeof(ieResRef) );
+					array[pos].Target = ext_header->Target;
+					array[pos].TargetNumber = ext_header->TargetNumber;
+					array[pos].Range = ext_header->Range;
+					array[pos].Projectile = ext_header->Projectile;
+					array[pos].CastingTime = ext_header->CastingTime;
+					array[pos].strref = spl->SpellName;
+			
+					pos++;
+					core->FreeSpell(spl, slot->SpellResRef, false);
+				}
+			}
+		}
+	}
+
+	return false;
+}
+ 
 bool Spellbook::CastSpell( ieResRef SpellResRef, Actor* Source, Actor* Target )
 {
 	if (! HaveSpell( SpellResRef, HS_DEPLETE )) {

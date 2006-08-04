@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.49 2006/07/29 18:17:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.50 2006/08/04 21:42:44 avenger_teambg Exp $
  *
  */
 
@@ -116,6 +116,11 @@ typedef enum ieCREItemFlagBits {
 #define EQUIP_MELEE 1
 #define EQUIP_RANGED 2
 
+//FIXME:
+//actually this header shouldn't be THIS large, i was just
+//lazy to pick the interesting elements
+//it could be possible that some elements need to be added from the
+//item header itself
 struct ItemExtHeader {
 	ieDword slot;
 	ieDword headerindex;

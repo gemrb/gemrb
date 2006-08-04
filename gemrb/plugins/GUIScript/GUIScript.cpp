@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.403 2006/08/03 21:13:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.404 2006/08/04 21:42:45 avenger_teambg Exp $
  *
  */
 
@@ -75,8 +75,8 @@ typedef char EventNameType[17];
 #define UNINIT_IEDWORD 0xcccccccc
 
 static SpellDescType *StoreSpells = NULL;
-ItemExtHeader *ItemArray;
-//SpellExtHeader *SpellArray;
+static ItemExtHeader *ItemArray = NULL;
+static SpellExtHeader *SpellArray = NULL;
 
 static int ReputationIncrease[20]={(int) UNINIT_IEDWORD};
 static int ReputationDonation[20]={(int) UNINIT_IEDWORD};
@@ -6297,6 +6297,75 @@ static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetupSpellIcons__doc,
+"SetupEquipmentIcons(WindowIndex, slot[, Start])\n\n"
+"Automagically sets up the controls of the equipment list window for a PC indexed by slot.");
+
+static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
+{
+	int wi, slot, Type;
+	int Start = 0;
+
+	if (!PyArg_ParseTuple( args, "iii|i", &wi, &slot, &Type, &Start )) {
+		return AttributeError( GemRB_SetupSpellIcons__doc );
+	}
+
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor* actor = game->FindPC( slot );
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
+	}
+
+	//-2 because of the left/right scroll icons
+	if (!SpellArray) {
+		SpellArray = (SpellExtHeader *) malloc((GUIBT_COUNT) * sizeof (SpellExtHeader) );
+	}
+	bool more = actor->spellbook.GetSpellInfo(SpellArray, Type, Start, GUIBT_COUNT-(Start?1:0));
+	int i;
+	if (Start) {
+		PyObject *ret = SetActionIcon(wi,core->GetControl(wi, 0),ACT_LEFT,0);
+		if (!ret) {
+			return RuntimeError("Cannot set action button!\n");
+		}
+	}
+
+	for (i=0;i<GUIBT_COUNT-(more?1:0);i++) {
+		int ci = core->GetControl(wi, i+(Start?1:0) );
+		Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
+		SpellExtHeader *spell = SpellArray+i;
+
+		Sprite2D *Picture = core->GetBAMSprite(spell->MemorisedIcon, 0, 0);
+		
+		if (!Picture) {
+			btn->SetState(IE_GUI_BUTTON_LOCKED);
+			btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, BM_SET);
+			btn->SetTooltip(NULL);
+		} else {
+			btn->SetPicture( Picture );
+			btn->SetState(IE_GUI_BUTTON_UNPRESSED);
+			btn->SetTooltip(core->GetString(spell->strref,0));
+			char usagestr[10];
+
+			if (spell->count>1) {
+				sprintf(usagestr,"%d", spell->count);
+				btn->SetText( usagestr );
+			}
+		}
+	}
+	if (more) {
+		PyObject *ret = SetActionIcon(wi,core->GetControl(wi, i+1),ACT_RIGHT,i+1);
+		if (!ret) {
+			return RuntimeError("Cannot set action button!\n");
+		}
+	}
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_SetupControls__doc,
 "SetupControls(WindowIndex, slot[, Start])\n\n"
 "Automagically sets up the controls of the action window for a PC indexed by slot.\n\n" );
@@ -6358,6 +6427,17 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 		int state = IE_GUI_BUTTON_UNPRESSED;
 		ieDword modalstate = actor->ModalState;
 		switch (action) {
+		case ACT_INNATE:
+			if(!actor->spellbook.GetSpellInfo(NULL, 4, 0, 0)) {
+				state = IE_GUI_BUTTON_DISABLED;
+			}
+			break;
+		case ACT_CAST:
+			//returns true if there is ANY equipment
+			if(!actor->spellbook.GetSpellInfo(NULL, 3, 0, 0)) {
+				state = IE_GUI_BUTTON_DISABLED;
+			}
+			break;
 		case ACT_USE:
 			//returns true if there is ANY equipment
 			if(!actor->inventory.GetEquipmentInfo(NULL, 0, 0)) {
@@ -6812,6 +6892,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(HasResource, METH_VARARGS),
 	METHOD(SetupControls, METH_VARARGS),
 	METHOD(SetupEquipmentIcons, METH_VARARGS),
+	METHOD(SetupSpellIcons, METH_VARARGS),
 	METHOD(ClearAction, METH_VARARGS),
 	METHOD(SetDefaultActions, METH_VARARGS),
 	METHOD(GetDestinationArea, METH_VARARGS),
@@ -6846,6 +6927,10 @@ GUIScript::~GUIScript(void)
 	if (ItemArray) {
 		free(ItemArray);
 		ItemArray=NULL;
+	}
+	if (SpellArray) {
+		free(SpellArray);
+		SpellArray=NULL;
 	}
 	if (StoreSpells) {
 		free(StoreSpells);

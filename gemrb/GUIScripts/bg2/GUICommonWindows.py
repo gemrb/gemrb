@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.34 2006/08/03 21:13:06 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.35 2006/08/04 21:42:45 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -241,8 +241,10 @@ def UpdateActionsWindow ():
 		GemRB.SetupControls (ActionsWindow, pc)
 	elif level == 1:
 		GemRB.SetupEquipmentIcons(ActionsWindow, pc, TopIndex)
-	elif level == 2:
-		GemRB.SetupSpellIcons(ActionsWindow, pc, TopIndex)
+	elif level == 2: #spells
+		GemRB.SetupSpellIcons(ActionsWindow, pc, 3, TopIndex)
+	elif level == 3: #innates
+		GemRB.SetupSpellIcons(ActionsWindow, pc, 4, TopIndex)
 	return
 
 def OpenFloatMenuWindow ():
@@ -300,6 +302,18 @@ def RightScrollPressed ():
 def ActionUseItemPressed ():
 	GemRB.SetVar ("TopIndex", 0)
 	GemRB.SetVar ("ActionLevel", 1)
+	UpdateActionsWindow ()
+	return
+
+def ActionCastPressed ():
+	GemRB.SetVar ("TopIndex", 0)
+	GemRB.SetVar ("ActionLevel", 2)
+	UpdateActionsWindow ()
+	return
+
+def ActionInnatePressed ():
+	GemRB.SetVar ("TopIndex", 0)
+	GemRB.SetVar ("ActionLevel", 3)
 	UpdateActionsWindow ()
 	return
 

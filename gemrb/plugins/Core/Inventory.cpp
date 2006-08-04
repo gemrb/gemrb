@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.80 2006/08/03 19:58:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.81 2006/08/04 21:42:44 avenger_teambg Exp $
  *
  */
 
@@ -1154,6 +1154,13 @@ bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count
 			if (ext_header->Location!=ITEM_LOC_EQUIPMENT) {
 				continue;
 			}
+			//skipping if we cannot use the item
+			int idreq1 = (slot->Flags&IE_INV_ITEM_IDENTIFIED);
+			int idreq2 = ext_header->IDReq;
+			if (idreq1!=idreq2) {
+				continue;
+			}
+
 			actual++;
 			if (actual>startindex) {
 

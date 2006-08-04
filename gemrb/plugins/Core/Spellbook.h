@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.19 2006/04/11 16:32:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.20 2006/08/04 21:42:44 avenger_teambg Exp $
  *
  */
 
@@ -108,6 +108,23 @@ typedef struct {
 	std::vector<CREMemorizedSpell*> memorized_spells;
 } CRESpellMemorization;
 
+struct SpellExtHeader {
+	ieDword level;
+	ieDword count;
+	ieDword type;          //spelltype
+	ieDword headerindex;
+	//these come from the header
+	ieByte SpellForm;
+	ieResRef MemorisedIcon;
+	ieByte Target;
+	ieByte TargetNumber;
+	ieWord Range;
+	ieWord Projectile;
+	ieWord CastingTime;
+	//other data
+	ieResRef spellname;
+	ieDword strref;       //the spell's name
+};
 
 /**
  * @class Spellbook
@@ -168,6 +185,10 @@ public:
 	/** recharges all spells */
 	void ChargeAllSpells();
 
+	/** lists spells of a type */
+	bool GetSpellInfo(SpellExtHeader *array, int type, int startindex, int count);
+
+	/** applies the spell on target */
 	bool CastSpell( ieResRef SpellResRef, Actor* Source, Actor* Target );
 
 	/** Dumps spellbook to stdout for debugging */
