@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.49 2006/07/31 17:26:01 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.50 2006/08/04 22:50:41 wjpalenstijn Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -510,7 +510,7 @@ def DisplayItem (itemresref, type):
 
 	#description icon
 	Button = GemRB.GetControl (Window, 7)
-	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
+	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_CENTER_PICTURES, OP_OR)
 	GemRB.SetItemIcon (Window, Button, itemresref,2)
 	#GemRB.SetButtonBAM (Window, Button, item["DescIcon"],0,0,-1)
 

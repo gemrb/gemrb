@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.51 2006/07/21 15:14:46 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.52 2006/08/04 22:50:42 wjpalenstijn Exp $
 
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
@@ -44,6 +44,9 @@ IE_GUI_BUTTON_DRAGGABLE    = 0x00001000
 IE_GUI_BUTTON_NO_TEXT    = 0x00010000   # don't draw button label
 IE_GUI_BUTTON_PLAYRANDOM = 0x00020000   # the button animation is random
 IE_GUI_BUTTON_PLAYONCE   = 0x00040000   # the button animation won't restart
+
+IE_GUI_BUTTON_CENTER_PICTURES = 0x00080000 # center the button's PictureList
+
 
 #textarea flags
 IE_GUI_TEXTAREA_SELECTABLE = 0x05000001

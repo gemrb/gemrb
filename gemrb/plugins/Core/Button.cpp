@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.105 2006/08/03 19:56:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.106 2006/08/04 22:50:36 wjpalenstijn Exp $
  *
  */
 
@@ -195,10 +195,14 @@ void Button::Draw(unsigned short x, unsigned short y)
 	// Composite pictures (paperdolls/description icons)
 	if (!PictureList.empty() && (Flags & IE_GUI_BUTTON_PICTURE) ) {
 		std::list<Sprite2D*>::iterator iter = PictureList.begin();
-		int xOffs = ( Width - (*iter)->Width + (*iter)->XPos )/2;
-		int yOffs = ( Height - (*iter)->Height + (*iter)->YPos )/2;
+		int xOffs = 0, yOffs = 0;
+		if (Flags & IE_GUI_BUTTON_CENTER_PICTURES) {
+			xOffs = Width/2;
+			yOffs = Height/2;
+		}
 		for (; iter != PictureList.end(); ++iter) {
-			core->GetVideoDriver()->BlitSprite( *iter, x + XPos + xOffs, y + YPos + yOffs, true );
+			core->GetVideoDriver()->BlitSprite( *iter, x + XPos + xOffs,
+												y + YPos + yOffs, true );
 		}
 	}
 
