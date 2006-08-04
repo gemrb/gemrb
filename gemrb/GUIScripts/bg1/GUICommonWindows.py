@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICommonWindows.py,v 1.13 2006/07/19 17:44:08 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICommonWindows.py,v 1.14 2006/08/04 22:41:09 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -120,6 +120,7 @@ def RestPress ():
 def EmptyControls ():
 	global ActionsWindow
 
+	GemRB.SetVar ("ActionLevel", 0)
 	Window = ActionsWindow
 	for i in range (12):
 		Button = GemRB.GetControl (Window, i)
@@ -136,7 +137,7 @@ def SetupFormation ():
 	global ActionsWindow
 
 	Window = ActionsWindow
-	for i in range(12):
+	for i in range (12):
 		Button = GemRB.GetControl (Window, i)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NORMAL, OP_SET)
 		GemRB.SetButtonSprites (Window, Button, "GUIBTBUT",0,0,1,2,3)
@@ -152,6 +153,7 @@ def SelectFormation ():
 def GroupControls ():
 	global ActionsWindow
 
+	GemRB.SetVar ("ActionLevel", 0)
 	Window = ActionsWindow
 	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetActionIcon (Window, Button, 7)
@@ -215,6 +217,7 @@ def UpdateActionsWindow ():
 	for i in range (12):
 		Button = GemRB.GetControl (ActionsWindow, i)
 		GemRB.SetButtonBorder (ActionsWindow, Button, 0,6,6,4,4,0,254,0,255)
+		GemRB.SetButtonBorder (ActionsWindow, Button, 1, 0, 0, 0, 0, 50,30,10,120, 0, 1)
 
 	if pc == 0:
 		EmptyControls ()
@@ -223,7 +226,17 @@ def UpdateActionsWindow ():
 		GroupControls ()
 		return
 	#this is based on class
-	GemRB.SetupControls (ActionsWindow, pc)
+
+	level = GemRB.GetVar ("ActionLevel")
+	TopIndex = GemRB.GetVar ("TopIndex")
+	if level == 0:
+		GemRB.SetupControls (ActionsWindow, pc)
+	elif level == 1:
+		GemRB.SetupEquipmentIcons(ActionsWindow, pc, TopIndex)
+	elif level == 2: #spells
+		GemRB.SetupSpellIcons(ActionsWindow, pc, 3, TopIndex)
+	elif level == 3: #innates
+		GemRB.SetupSpellIcons(ActionsWindow, pc, 4, TopIndex)
 	return
 
 def OpenFloatMenuWindow ():
@@ -238,11 +251,11 @@ def ActionAttackPressed ():
 def ActionQWeaponPressed (which):
 	pc = GemRB.GameGetFirstSelectedPC()
 
-	if GemRB.GetEquippedQuickSlot(pc)==which and not (GemRB.GameControlGetTargetMode() &TARGET_MODE_ATTACK):
+	if GemRB.GetEquippedQuickSlot (pc)==which and not (GemRB.GameControlGetTargetMode() &TARGET_MODE_ATTACK):
 		GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_ATTACK)
 	else:
 		GemRB.GameControlSetTargetMode (TARGET_MODE_ALL)
-		GemRB.SetEquippedQuickSlot(pc, which)
+		GemRB.SetEquippedQuickSlot (pc, which)
 
 	GemRB.SetupControls (ActionsWindow, pc)
 	UpdateActionsWindow ()
@@ -266,17 +279,34 @@ def ActionStopPressed ():
 			GemRB.ClearAction(i + 1)
 	return
 
-def RefreshUseItemWindow ():
-	pc = GemRB.GameGetFirstSelectedPC()
-	print "setting up useitem window topindex:",TopIndex
-	GemRB.SetupEquipmentIcons(ActionsWindow, pc, TopIndex)
+#no check needed because the button wouldn't be drawn if illegal
+def LeftScrollPressed ():
+	GemRB.SetVar ("TopIndex", GemRB.GetVar ("TopIndex") -1)
+	UpdateActionsWindow ()
+	return
+
+#no check needed because the button wouldn't be drawn if illegal
+def RightScrollPressed ():
+	GemRB.SetVar ("TopIndex", GemRB.GetVar ("TopIndex") +1)
+	UpdateActionsWindow ()
 	return
 
 def ActionUseItemPressed ():
-	global TopIndex
+	GemRB.SetVar ("TopIndex", 0)
+	GemRB.SetVar ("ActionLevel", 1)
+	UpdateActionsWindow ()
+	return
 
-	TopIndex = 0
-	RefreshUseItemWindow()
+def ActionCastPressed ():
+	GemRB.SetVar ("TopIndex", 0)
+	GemRB.SetVar ("ActionLevel", 2)
+	UpdateActionsWindow ()
+	return
+
+def ActionInnatePressed ():
+	GemRB.SetVar ("TopIndex", 0)
+	GemRB.SetVar ("ActionLevel", 3)
+	UpdateActionsWindow ()
 	return
 
 def GetActorClassTitle (actor):
@@ -412,6 +442,7 @@ def SelectAllOnPress ():
 def SelectionChanged ():
 	global PortraitWindow
 
+	GemRB.SetVar ("ActionLevel", 0)
 	if (not SelectionChangeHandler):
 		UpdateActionsWindow ()
 		for i in range (PARTY_SIZE):
@@ -502,5 +533,3 @@ def SetEncumbranceLabels (Window, Label, Label2, pc):
 		GemRB.SetLabelTextColor (Window, Label, 255, 255, 255)
 		GemRB.SetLabelTextColor (Window, Label2, 255, 0, 0)
 	return
-
-

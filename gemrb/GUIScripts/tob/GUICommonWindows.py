@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.38 2006/08/04 21:42:45 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.39 2006/08/04 22:41:11 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -225,7 +225,8 @@ def UpdateActionsWindow ():
 
 	#setting up the disabled button overlay (using the second border slot)
 	for i in range (12):
-		GemRB.SetButtonBorder(ActionsWindow, i, 1, 0, 0, 0, 0, 50,30,10,120, 0, 1)
+		Button = GemRB.GetControl (ActionsWindow, i)
+		GemRB.SetButtonBorder(ActionsWindow, Button, 1, 0, 0, 0, 0, 50,30,10,120, 0, 1)
 
 	if pc == 0:
 		EmptyControls ()
