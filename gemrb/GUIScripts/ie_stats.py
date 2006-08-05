@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/ie_stats.py,v 1.9 2005/03/31 13:54:31 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/ie_stats.py,v 1.10 2006/08/05 18:25:20 avenger_teambg Exp $
 
 # ie_stats.py - definitions of creature stats codes
 
@@ -231,14 +231,11 @@ IE_DIALOGRANGE                  = 178 # distance for dialogue
 #179-198 unused
 IE_STONESKINSGOLEM		= 199
 IE_LEVELDRAIN			= 200
-IE_RACE				= 201
-IE_CLASS			= 202
-IE_GENERAL			= 203
-IE_EA				= 204
-IE_SPECIFIC			= 205
+IE_AVATARREMOVAL                = 201
 # GemRB Specific Defines
-IE_ANIMATION_ID			= 206
-IE_STATE_ID			= 207
+IE_ANIMATION_ID			= 205
+IE_STATE_ID			= 206
+IE_EXTSTATE_ID                  = 207
 IE_METAL_COLOR			= 208
 IE_MINOR_COLOR			= 209
 IE_MAJOR_COLOR			= 210
@@ -255,24 +252,31 @@ IE_TEAM				= 220
 IE_FACTION			= 221
 IE_SUBRACE			= 222
 IE_SPECIES                      = 223 #pst specific
-IE_PRIESTBONUS1                 = 224 #6 more slots used
-IE_WIZARDBONUS1                 = 231 #8 more slots used
+IE_HATEDRACE2                   = 224
+IE_HATEDRACE3                   = 225
+IE_HATEDRACE4                   = 226
+IE_HATEDRACE5                   = 227
+IE_HATEDRACE6                   = 228
+IE_HATEDRACE7                   = 229
+IE_HATEDRACE8                   = 230
 # These are in original PST, IWD, IWD2, but not as stats
-IE_INTERNAL_0			= 240
-IE_INTERNAL_1			= 241
-IE_INTERNAL_2			= 242
-IE_INTERNAL_3			= 243
-IE_INTERNAL_4			= 244
-IE_INTERNAL_5			= 245
-IE_INTERNAL_6			= 246
-IE_INTERNAL_7			= 247
-IE_INTERNAL_8			= 248
-IE_INTERNAL_9			= 249
-IE_INTERNAL_A			= 250
-IE_INTERNAL_B			= 251
-IE_INTERNAL_C			= 252
-IE_INTERNAL_D			= 253
-IE_INTERNAL_E			= 254
-IE_INTERNAL_F			= 255
+IE_RACE				= 231
+IE_CLASS			= 232
+IE_GENERAL			= 233
+IE_EA				= 234
+IE_SPECIFIC			= 235
+#
+IE_LEVELBARBARIAN               = 240
+IE_LEVELBARD                    = 241
+IE_LEVELCLERIC                  = 242
+IE_LEVELDRUID                   = 243
+IE_LEVELMONK                    = 244
+IE_LEVELPALADIN                 = 245
+IE_LEVELRANGER                  = 246
+IE_LEVELSORCEROR                = 247
+#place for more classes
+IE_SAVEDXPOS                    = 253
+IE_SAVEDYPOS                    = 254
+IE_SAVEDFACE                    = 255
 
 # End of file ie_stats.py
