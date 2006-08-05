@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.200 2006/07/23 21:08:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.201 2006/08/05 18:58:13 avenger_teambg Exp $
  *
  */
 
@@ -578,10 +578,10 @@ static int maximum_values[256]={
 1,25,25,30,1,1,1,25,-1,100,100,1,255,255,255,255,//9f
 255,255,255,255,255,255,20,255,255,1,20,255,999999999,999999999,1,1,//af
 999999999,999999999,0,0,0,0,0,0,0,0,0,0,0,0,0,0,//bf
-0,0,0,0,0,0,0,25,25,255,255,255,255,255,65535,-1,//cf
-200,200,200,200,200,200,200,-1,-1,255,65535,3,255,255,255,255,//df
-20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,//ef
-255,255,255,255, 255,255,255,255, 255,255,255,255, 255,255,255,255//ff
+0,0,0,0,0,0,0,25,25,255,255,255,255,65535,-1,-1,//cf - 207
+200,200,200,200,200,200,200,-1,40,255,65535,3,255,255,255,255,//df - 223
+255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,//ef - 239
+40,40,40,40, 40,40,40,40, 40,40,40,40, 255,65535,65535,15//ff
 };
 
 typedef void (*PostChangeFunctionType)(Actor *actor, ieDword Value);
@@ -611,11 +611,11 @@ NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //af
 NULL,NULL,NULL,NULL, NULL, pcf_bounce, NULL, NULL, 
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //bf
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
-NULL,NULL,NULL,NULL, pcf_ea, NULL, pcf_animid, NULL, //cf
+NULL,NULL,NULL,NULL, NULL, pcf_animid,NULL, NULL, //cf
 pcf_color,pcf_color,pcf_color,pcf_color, pcf_color, pcf_color, pcf_color, NULL,
 NULL,NULL,NULL,pcf_armorlevel, NULL, NULL, NULL, NULL, //df
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //ef
+NULL,NULL,pcf_ea,NULL, NULL, NULL, NULL, NULL, //ef
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL //ff
 };
