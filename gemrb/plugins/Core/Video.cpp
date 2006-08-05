@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.cpp,v 1.7 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.cpp,v 1.8 2006/08/05 18:12:53 wjpalenstijn Exp $
  *
  */
 
@@ -37,4 +37,9 @@ void Video::SetEventMgr(EventMgr* evnt)
 {
 	//if 'evnt' is NULL then no Event Manager will be used
 	Evnt = evnt;
+}
+
+void Video::SetMouseEnabled(bool enabled)
+{
+	DisableMouse = !enabled;
 }

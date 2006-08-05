@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.64 2006/07/02 11:46:58 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.65 2006/08/05 18:12:53 wjpalenstijn Exp $
  *
  */
 
@@ -189,9 +189,16 @@ public:
 	/** Event Manager Pointer */
 	EventMgr* Evnt;
 	short moveX, moveY;
-	bool DisableMouse, DisableScroll;
-	short xCorr, yCorr;
+
+	void SetMouseEnabled(bool enabled);
+
+protected:
+	bool DisableMouse;
+
 public:
+	bool DisableScroll;
+	short xCorr, yCorr;
+
 	/** Returns true if a pixel on a given position in the sprite 
 	 * is transparent.
 	 * It is used to mask clicks to non-rectangular shaped controls */

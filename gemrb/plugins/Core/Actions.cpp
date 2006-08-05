@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.77 2006/07/07 13:34:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.78 2006/08/05 18:12:53 wjpalenstijn Exp $
  *
  */
 
@@ -2654,7 +2654,7 @@ void GameScript::TextScreen(Scriptable* /*Sender*/, Action* parameters)
 {
 	strnlwrcpy(core->GetGame()->LoadMos, parameters->string0Parameter,8);
 	core->GetGUIScriptEngine()->RunFunction( "StartTextScreen" );
-	core->GetVideoDriver()->DisableMouse = false;
+	core->GetVideoDriver()->SetMouseEnabled(true);
 }
 
 void GameScript::IncrementChapter(Scriptable* Sender, Action* parameters)
