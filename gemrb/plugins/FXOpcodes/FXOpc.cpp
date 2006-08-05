@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.38 2006/08/03 21:13:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.39 2006/08/05 17:47:02 avenger_teambg Exp $
  *
  */
 
@@ -857,10 +857,13 @@ int fx_attacks_per_round_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 // 0x02 Cure:Sleep (Awaken)
 // this effect clears the STATE_SLEEP (1) bit, but clearing it alone wouldn't remove the
 // unconscious effect, which is combined with STATE_HELPLESS (0x20+1)
+EffectRef fx_set_sleep_state_ref={"State:Sleep",NULL,-1};
+
 int fx_cure_sleep_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_sleep_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STATE_CURE( STATE_SLEEP );
+	BASE_STATE_CURE( STATE_SLEEP );
+	target->fxqueue.RemoveAllEffects(fx_set_sleep_state_ref);
 	return FX_NOT_APPLIED;
 }
 
@@ -4201,11 +4204,15 @@ int fx_disable_overlay_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_SET( IE_DISABLEOVERLAY, fx->Parameter1 );
 	return FX_APPLIED;
 }
-//0x124 Protection:Backstab
+//0x124 Protection:Backstab (bg2)
+//0x11f Protection:Backstab (how)
 int fx_no_backstab_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_no_backstab_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	//bg2
 	STAT_SET( IE_DISABLEBACKSTAB, fx->Parameter1 );
+	//how
+	EXTSTATE_SET(0x00004000);
 	return FX_APPLIED;
 }
 //0x125 OffscreenAIModifier

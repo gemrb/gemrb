@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.51 2006/07/07 14:35:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.52 2006/08/05 17:47:02 avenger_teambg Exp $
  *
  */
 
@@ -1963,6 +1963,16 @@ int GameScript::StateCheck(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor* actor = ( Actor* ) tar;
 	return actor->GetStat(IE_STATE_ID) & parameters->int0Parameter;
+}
+
+int GameScript::ExtendedStateCheck(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	return actor->GetStat(IE_EXTSTATE_ID) & parameters->int0Parameter;
 }
 
 int GameScript::NotStateCheck(Scriptable* Sender, Trigger* parameters)

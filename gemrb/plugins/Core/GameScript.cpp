@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.370 2006/07/27 17:14:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.371 2006/08/05 17:47:01 avenger_teambg Exp $
  *
  */
 
@@ -96,6 +96,7 @@ static TriggerLink triggernames[] = {
 	{"entered", GameScript::Entered, 0},
 	{"entirepartyonmap", GameScript::EntirePartyOnMap, 0},
 	{"exists", GameScript::Exists, 0},
+	{"extendedstatecheck", GameScript::ExtendedStateCheck, 0},
 	{"extraproficiency", GameScript::ExtraProficiency, 0},
 	{"extraproficiencygt", GameScript::ExtraProficiencyGT, 0},
 	{"extraproficiencylt", GameScript::ExtraProficiencyLT, 0},
@@ -1482,13 +1483,13 @@ void GameScript::Update()
 			//if we already have stuff on the queue!
 			if (!continueExecution) {
 				if (MySelf->GetNextAction() ) {
-				  if (MySelf->GetInternalFlag()&IF_NOINT) {
-				    return;
-				  }
-				  if (lastAction==a) {
-				    return;
-				  }
-				  MySelf->ClearActions();
+					if (MySelf->GetInternalFlag()&IF_NOINT) {
+						return;
+					}
+					if (lastAction==a) {
+						return;
+					}
+					MySelf->ClearActions();
 				}
 				lastAction=a;
 			}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.252 2006/07/07 13:34:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.253 2006/08/05 17:47:01 avenger_teambg Exp $
  *
  */
 
@@ -711,6 +711,7 @@ public: //Script Functions
 	static int Entered(Scriptable* Sender, Trigger* parameters);
 	static int EntirePartyOnMap(Scriptable* Sender, Trigger* parameters);
 	static int Exists(Scriptable* Sender, Trigger* parameters);
+	static int ExtendedStateCheck(Scriptable* Sender, Trigger* parameters);
 	static int ExtraProficiency(Scriptable* Sender, Trigger* parameters);
 	static int ExtraProficiencyGT(Scriptable* Sender, Trigger* parameters);
 	static int ExtraProficiencyLT(Scriptable* Sender, Trigger* parameters);

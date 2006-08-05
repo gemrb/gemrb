@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.cpp,v 1.8 2006/08/03 21:13:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.cpp,v 1.9 2006/08/05 17:47:02 avenger_teambg Exp $
  *
  */
 
@@ -24,6 +24,7 @@
 #include "../Core/Actor.h"
 #include "../Core/EffectQueue.h"
 #include "../Core/Interface.h"
+#include "../Core/Game.h"
 #include "../Core/damages.h"
 #include "../Core/GSUtils.h"  //needs for displaystringcore
 #include "IWDOpc.h"
@@ -43,14 +44,15 @@ int fx_iwd_monster_summoning (Actor* Owner, Actor* target, Effect* fx); //f0
 int fx_vampiric_touch (Actor* Owner, Actor* target, Effect* fx); //f1
 // int fx_overlay f2 (same as PST)
 int fx_animate_dead (Actor* Owner, Actor* target, Effect* fx);//f3
-// int fx_prayer f4 (same as PST)
-// int fx_curse f5 (same as PST)
+//int fx_prayer (Actor* Owner, Actor* target, Effect* fx); //f4 pst
+//int fx_prayer_bad (Actor* Owner, Actor* target, Effect* fx); //f5 pst
 int fx_summon_monster2 (Actor* Owner, Actor* target, Effect* fx); //f6
-int fx_burning_blood (Actor* Owner, Actor* target, Effect* fx); //f7
+int fx_burning_blood (Actor* Owner, Actor* target, Effect* fx); //f7 iwd
+int fx_burning_blood2 (Actor* Owner, Actor* target, Effect* fx); //f7 how, iwd2
 int fx_summon_shadow_monster (Actor* Owner, Actor* target, Effect* fx); //f8
-// positive recitation same as fx_prayer //f9
-// negative recitation same as fx_curse //fa
-// lich touch hold same as hold2 //fb
+int fx_recitation (Actor* Owner, Actor* target, Effect* fx); //f9
+int fx_recitation_bad (Actor* Owner, Actor* target, Effect* fx); //fa
+int fx_lich_touch (Actor* Owner, Actor* target, Effect* fx); //fb
 // sol's blinding //fc
 // ac vs damage //fd
 int fx_remove_effects (Actor* Owner, Actor* target, Effect* fx); //fe
@@ -78,8 +80,10 @@ int fx_remove_seven_eyes (Actor* Owner, Actor* target, Effect* fx);//113
 int fx_remove_effect (Actor* Owner, Actor* target, Effect* fx);//114
 int fx_soul_eater (Actor* Owner, Actor* target, Effect* fx);//115
 int fx_shroud_of_flame (Actor* Owner, Actor* target, Effect* fx);//116
+int fx_shroud_of_flame2 (Actor* Owner, Actor* target, Effect* fx);//116
 int fx_animal_rage (Actor* Owner, Actor* target, Effect* fx);//117
 int fx_turn_undead (Actor* Owner, Actor* target, Effect* fx);//118
+int fx_turn_undead2 (Actor* Owner, Actor* target, Effect* fx);//118
 int fx_vitriolic_sphere (Actor* Owner, Actor* target, Effect* fx);//119
 int fx_suppress_hp (Actor* Owner, Actor* target, Effect* fx);//11a
 int fx_floattext (Actor* Owner, Actor* target, Effect* fx);//11b
@@ -102,7 +106,7 @@ int fx_use_magic_device_modifier (Actor* Owner, Actor* target, Effect* fx);//12a
 
 //No need to make these ordered, they will be ordered by EffectQueue
 static EffectRef effectnames[] = {
-	{ "Color:FadeRGB", fx_fade_rgb, 0 }, //e8
+	{ "Color:FadeRGB", fx_fade_rgb, 0}, //e8
 	{ "IWDVisualSpellHit", fx_iwd_visual_spell_hit, 0}, //e9
 	{ "ColdDamage", fx_cold_damage, 0}, //ea
 	{ "PanicUndead", fx_panic_undead, 0}, //ec
@@ -114,13 +118,17 @@ static EffectRef effectnames[] = {
 	{ "AnimateDead", fx_animate_dead, 0}, //f3
 	{ "SummonMonster2", fx_summon_monster2, 0}, //f6
 	{ "BurningBlood", fx_burning_blood, 0}, //f7
+	{ "BurningBlood2", fx_burning_blood2, 0}, //f7
 	{ "SummonShadowMonster", fx_summon_shadow_monster, 0}, //f8
+	{ "Recitation", fx_recitation, 0}, //f9
+	{ "RecitationBad", fx_recitation_bad, 0},//fa
+	{ "LichTouch", fx_lich_touch, 0},//fb
 	{ "RemoveEffects", fx_remove_effects, 0}, //fe
 	{ "SalamanderAura", fx_salamander_aura, 0}, //ff
 	{ "UmberHulkGaze", fx_umberhulk_gaze, 0}, //100
 	{ "ZombieLordAura", fx_zombielord_aura, 0},//101
-	{ "SummonCreature2", fx_summon_creature2,0}, //103
-	{ "SummonPomab", fx_summon_pomab,0}, //106
+	{ "SummonCreature2", fx_summon_creature2, 0}, //103
+	{ "SummonPomab", fx_summon_pomab, 0}, //106
 	{ "ControlUndead", fx_control_undead, 0}, //107
 	{ "StaticCharge", fx_static_charge, 0}, //108
 	{ "CloakOfFear", fx_cloak_of_fear, 0}, //109
@@ -136,8 +144,10 @@ static EffectRef effectnames[] = {
 	{ "RemoveEffect", fx_remove_effect, 0}, //114
 	{ "SoulEater", fx_soul_eater, 0}, //115
 	{ "ShroudOfFlame", fx_shroud_of_flame, 0},//116
+	{ "ShroudOfFlame2", fx_shroud_of_flame2, 0},//116
 	{ "AnimalRage", fx_animal_rage, 0}, //117 - berserk?
-	{ "TurnUndead", fx_turn_undead, 0}, //118
+	{ "TurnUndead", fx_turn_undead, 0}, //118 how
+	{ "TurnUndead2", fx_turn_undead2, 0}, //118 iwd2
 	{ "VitriolicSphere", fx_vitriolic_sphere, 0}, //119
 	{ "SuppressHP", fx_suppress_hp, 0}, //11a -- some stat???
 	{ "FloatText", fx_floattext, 0}, //11b
@@ -255,7 +265,7 @@ EffectRef fx_damage_opcode_ref={"Damage",NULL,-1};
 
 static void ApplyDamageNearby(Actor* Owner, Actor* target, Effect *fx, ieDword damagetype)
 {
-  Effect *newfx = new Effect;
+	Effect *newfx = new Effect;
 	//fill with zeros
 	memset(newfx,0,sizeof(Effect));
 	newfx->Opcode = EffectQueue::ResolveEffect(fx_damage_opcode_ref);
@@ -375,7 +385,7 @@ int fx_slow_poison (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 
 #define IWD_MSC  13
 ieResRef iwd_monster_2da[IWD_MSC]={"MSUMMO1","MSUMMO2","MSUMMO3","MSUMMO4",
- "MSUMMO5","MSUMMO6","MSUMMO7","ASUMMO1","ASUMMO2","ASUMMO3","GINSECT","CDOOM",
+ "MSUMMO5","MSUMMO6","MSUMMO7","ASUMMO1","ASUMMO2","ASUMMO3","CDOOM","GINSECT",
  "MSUMMOM"};
 
 //0xf0 IWDMonsterSummoning
@@ -444,11 +454,12 @@ int fx_animate_dead (Actor* Owner, Actor* target, Effect* fx)
 	core->SummonCreature(monster, areahit, Owner, target, p, -1, fx->Parameter1);
 	return FX_NOT_APPLIED;
 }
+//f4,f5 (implemented in PST)
 
 //0xf6 SummonMonster2 
-#define IWD_SM2 10 
-ieResRef summon_monster_2da[IWD_SM2]={"STROLLS","SLIZARD","ISTALKE","SSHADOW",
- "CEELEMP","CFELEMP","CWELEMW","CEELEMM","CEELEMW","CFELEMW"};
+#define IWD_SM2 11 
+ieResRef summon_monster_2da[IWD_SM2]={"SLIZARD","STROLLS","SSHADOW","ISTALKE",
+ "CFELEMW","CEELEMW","CWELEMW","CFELEMP","CEELEMP","CWELEMP","CEELEMM"};
 
 int fx_summon_monster2 (Actor* Owner, Actor* target, Effect* fx)
 {
@@ -470,8 +481,7 @@ int fx_summon_monster2 (Actor* Owner, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-//0xf7 BurningBlood
-
+//0xf7 BurningBlood (iwd)
 int fx_burning_blood (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_burning_blood (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
@@ -484,9 +494,35 @@ int fx_burning_blood (Actor* Owner, Actor* target, Effect* fx)
 	}
 
 	target->Damage(fx->Parameter1, DAMAGE_FIRE, Owner);
+	STAT_SET(IE_CHECKFORBERSERK,1);
+	return FX_NOT_APPLIED;
+}
+//0xf7 BurningBlood2 (how, iwd2)
+int fx_burning_blood2 (Actor* Owner, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_burning_blood2 (%2d): Count: %d Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	//timing
+	if (core->GetGame()->GameTime%6) {
+		return FX_APPLIED;
+	}
+	//inflicts damage calculated by dice values+parameter1
+	if (!fx->Parameter1) {
+		return FX_NOT_APPLIED;
+	}
+	fx->Parameter1--;
+
+	ieDword damage = DAMAGE_FIRE;
+
+	if (fx->Parameter2==1) {
+		damage = DAMAGE_COLD;
+	}
+
+	//this effect doesn't use Parameter1 to modify damage, it is a counter instead
+	target->Damage(DICE_ROLL(0), DAMAGE_FIRE, Owner);
+	STAT_SET(IE_CHECKFORBERSERK,1);
 	return FX_APPLIED;
 }
-//0x117 AnimalRage
+
 //0xf8 SummonShadowMonster
 
 #define IWD_SSM 3
@@ -510,6 +546,30 @@ int fx_summon_shadow_monster (Actor* Owner, Actor* target, Effect* fx)
 	Point p(fx->PosX, fx->PosY);
 	core->SummonCreature(monster, areahit, Owner, target, p, -1, fx->Parameter1);
 	return FX_NOT_APPLIED;
+}
+//f9 Recitation
+int fx_recitation (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_recitation (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	if (EXTSTATE_GET(4)) return FX_NOT_APPLIED;
+	EXTSTATE_SET(4);
+	return FX_APPLIED;
+}
+//fa RecitationBad
+int fx_recitation_bad (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_recitation (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	if (EXTSTATE_GET(8)) return FX_NOT_APPLIED;
+	EXTSTATE_SET(8);
+	return FX_APPLIED;
+}
+//fb LichTouch
+int fx_lich_touch (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_lich_touch (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	if (EXTSTATE_GET(8)) return FX_NOT_APPLIED;
+	EXTSTATE_SET(8);
+	return FX_APPLIED;
 }
 
 //0xfe RemoveEffects
@@ -551,12 +611,16 @@ int fx_umberhulk_gaze (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_umberhulk_gaze (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STATE_SET( STATE_CONFUSED );
-	if (fx->Parameter1) {
-		//random event???
-		fx->Parameter1--;
+	//timing
+	if (core->GetGame()->GameTime%6) {
 		return FX_APPLIED;
 	}
-	return FX_NOT_APPLIED;
+	if (!fx->Parameter1) {
+		return FX_NOT_APPLIED;
+	}
+	//random event???
+	fx->Parameter1--;
+	return FX_APPLIED;
 }
 
 //0x101 ZombieLordAura (causes fear?)
@@ -564,12 +628,16 @@ int fx_zombielord_aura (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_zombielord_aura (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STATE_SET( STATE_CONFUSED );
-	if (fx->Parameter1) {
-		//random event???
-		fx->Parameter1--;
+	//timing
+	if (core->GetGame()->GameTime%6) {
 		return FX_APPLIED;
 	}
-	return FX_NOT_APPLIED;
+	if (!fx->Parameter1) {
+		return FX_NOT_APPLIED;
+	}
+	//random event???
+	fx->Parameter1--;
+	return FX_APPLIED;
 }
 
 //0x102 Protection:Spell (this is the same as in bg2?)
@@ -650,24 +718,34 @@ int fx_control_undead (Actor* Owner, Actor* target, Effect* fx)
 int fx_static_charge(Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_static_charge (%2d): Count: %d \n", fx->Opcode, fx->Parameter1 );
-	target->Damage(fx->Parameter1, DAMAGE_ELECTRICITY, Owner);
-	if (fx->Parameter1) {
-		fx->Parameter1--;
+	//timing
+	if (core->GetGame()->GameTime%6) {
 		return FX_APPLIED;
 	}
-	return FX_NOT_APPLIED;
+	if (!fx->Parameter1) {
+		return FX_NOT_APPLIED;
+	}
+	fx->Parameter1--;
+	//
+	target->Damage(fx->Parameter1, DAMAGE_ELECTRICITY, Owner);
+	return FX_APPLIED;
 }
 
 //0x109
 int fx_cloak_of_fear(Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_cloak_of_fear (%2d): Count: %d \n", fx->Opcode, fx->Parameter1 );
-	
-	if (fx->Parameter1) {
-		fx->Parameter1--;
+	//timing
+	if (core->GetGame()->GameTime%6) {
 		return FX_APPLIED;
 	}
-	return FX_NOT_APPLIED;
+
+	if (!fx->Parameter1) {
+		return FX_NOT_APPLIED;
+	}
+	fx->Parameter1--;
+	//
+	return FX_APPLIED;
 }
 //0x10a MovementRateModifier3 (Like bg2)
 //0x10b RemoveConfusion
@@ -685,7 +763,7 @@ int fx_eye_of_the_mind (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_the_mind (%2d)\n", fx->Opcode );
 	target->add_animation("eyemind",-1,0,true);
-	//immunity to charm, emotion and fear
+	EXTSTATE_SET(0x00000010);
 	return FX_APPLIED;
 }
 //0x10d EyeOfTheSword
@@ -693,7 +771,7 @@ int fx_eye_of_the_sword (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_the_sword (%2d)\n", fx->Opcode );
 	target->add_animation("eyesword",-1,0,true);
-	//deflect one physical attack?
+	EXTSTATE_SET(0x00000020);
 	return FX_APPLIED;
 }
 //0x10e EyeOfTheMage
@@ -701,7 +779,7 @@ int fx_eye_of_the_mage (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_the_mage (%2d)\n", fx->Opcode );
 	target->add_animation("eyemage",-1,0,true);
-	//deflect one magical attack
+	EXTSTATE_SET(0x00000040);
 	return FX_APPLIED;
 }
 //0x10f EyeOfVenom
@@ -709,7 +787,7 @@ int fx_eye_of_venom (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_venom (%2d)\n", fx->Opcode );
 	target->add_animation("eyevenom",-1,0,true);
-	//deflect one poison attack
+	EXTSTATE_SET(0x00000080);
 	return FX_APPLIED;
 }
 //0x110 EyeOfTheSpirit
@@ -717,7 +795,7 @@ int fx_eye_of_the_spirit (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_the_spirit (%2d)\n", fx->Opcode );
 	target->add_animation("eyespir",-1,0,true);
-	//deflect one instant death attack
+	EXTSTATE_SET(0x00000100);
 	return FX_APPLIED;
 }
 //0x111 EyeOfFortitude
@@ -725,7 +803,7 @@ int fx_eye_of_fortitude (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_fortitude (%2d)\n", fx->Opcode );
 	target->add_animation("eyefort",-1,0,true);
-	//deflects one stunning, deafness, silence, blindness
+	EXTSTATE_SET(0x00000200);
 	return FX_APPLIED;
 }
 //0x112 EyeOfStone
@@ -733,7 +811,7 @@ int fx_eye_of_stone (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_stone (%2d)\n", fx->Opcode );
 	target->add_animation("eyestone",-1,0,true);
-	//deflects one petrification
+	EXTSTATE_SET(0x00000400);
 	return FX_APPLIED;
 }
 //0x113 RemoveSevenEyes
@@ -774,10 +852,15 @@ int fx_soul_eater (Actor* Owner, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-//0x116 ShroudOfFlame
+//0x116 ShroudOfFlame (how)
+//FIXME: maybe it is cheaper to port effsof1/2 to how than having an alternate effect
 int fx_shroud_of_flame (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_shroud_of_flame (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	//timing
+	if (core->GetGame()->GameTime%6) {
+		return FX_APPLIED;
+	}
 	//inflicts damage calculated by dice values+parameter1
 	//creates damage opcode on everyone around. fx->Parameter2 - 0 fire, 1 - ice
 	ieDword damage = DAMAGE_FIRE;
@@ -790,37 +873,91 @@ int fx_shroud_of_flame (Actor* Owner, Actor* target, Effect* fx)
 	ApplyDamageNearby(Owner, target, fx, DAMAGE_FIRE);
 	return FX_APPLIED;
 }
+
+//0x116 ShroudOfFlame (iwd2)
+int fx_shroud_of_flame2 (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_shroud_of_flame2 (%2d)\n", fx->Opcode );
+	//timing
+	if (core->GetGame()->GameTime%6) {
+		return FX_APPLIED;
+	}
+	//apply effsof1 on target
+	//apply effsof2 on nearby
+	return FX_APPLIED;
+}
+
 //0x117 AnimalRage
 int fx_animal_rage (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_animal_rage (%2d): Damage %d\n", fx->Opcode, fx->Parameter1 );
-	STAT_SET( IE_BERSERKSTAGE2, 1 );
+	if (0) printf( "fx_animal_rage (%2d): Count %d\n", fx->Opcode, fx->Parameter1 );
+	//timing
+	if (core->GetGame()->GameTime%6) {
+		return FX_APPLIED;
+	}
+	if (!fx->Parameter1) {
+		return FX_NOT_APPLIED;
+	}
+	fx->Parameter1--;
+	STAT_SET( IE_CHECKFORBERSERK, 1 );
 	return FX_APPLIED;
 }
-//0x118 TurnUndead
-int fx_turn_undead (Actor* /*Owner*/, Actor* target, Effect* fx)
+//0x118 TurnUndead how
+int fx_turn_undead (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_turn_undead (%2d): Damage %d\n", fx->Opcode, fx->Parameter1 );
-	STAT_SET( IE_BERSERKSTAGE2, 1 );
+	target->Turn(Owner, Owner->GetXPLevel(true));
+	return FX_APPLIED;
+}
+
+//0x118 TurnUndead2 iwd2
+int fx_turn_undead2 (Actor* Owner, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_turn_undead2 (%2d): Damage %d\n", fx->Opcode, fx->Parameter1 );
+	switch (fx->Parameter2)
+	{
+	case 0: //command
+		target->Panic();
+		break;
+	case 1://rebuke
+		target->Panic();
+		break;
+	case 2://destroy
+		target->Die(Owner);
+		break;
+	case 3://panic
+		target->Panic();
+		break;
+	default://depends on caster
+		target->Turn(Owner, Owner->GetXPLevel(true));
+		break;
+	}
 	return FX_APPLIED;
 }
 //0x119 VitriolicSphere
 int fx_vitriolic_sphere (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_vitriolic_sphere (%2d): Damage %d\n", fx->Opcode, fx->Parameter1 );
+	//timing
+	if (core->GetGame()->GameTime%6) {
+		return FX_APPLIED;
+	}
 	target->Damage(fx->Parameter1, DAMAGE_ACID, Owner);
-	//also damage people nearby
-	ApplyDamageNearby(Owner, target, fx, DAMAGE_ACID);
-	return FX_NOT_APPLIED;
+	fx->DiceThrown-=2;
+	if (fx->DiceThrown<1) {
+		return FX_NOT_APPLIED;
+	}
+	//also damage people nearby?
+//	ApplyDamageNearby(Owner, target, fx, DAMAGE_ACID);
+	return FX_APPLIED;
 }
 
 //0x11a SuppressHP
 int fx_suppress_hp (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_suppress_hp (%2d)\n", fx->Opcode);
-	//whatever
-	target->SetBaseBit(IE_MC_FLAGS, 0x80000000, true);
-	return FX_NOT_APPLIED;
+	EXTSTATE_SET(0x00001000);
+	return FX_APPLIED;
 }
 
 //0x11b FloatText
@@ -832,8 +969,9 @@ int fx_floattext (Actor* /*Owner*/, Actor* target, Effect* fx)
 	default:
 		DisplayStringCore(target, fx->Parameter1, DS_HEAD);
 		break;
-	case 1: //cynism ????
-		break;
+	case 1: //cynicism ????
+		EXTSTATE_SET(0x00008000);
+		return FX_APPLIED;
 	case 2: //gemrb extension, displays verbalconstant
 		DisplayStringCore(target, fx->Parameter1, DS_CONST|DS_HEAD);
 		break;
@@ -865,10 +1003,12 @@ int fx_set_state (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 	return FX_APPLIED;
 }
 
-//0x121 Cutscene (dragon gem cutscene???)
+//0x121 Cutscene (this is a very ugly hack in iwd)
 int fx_cutscene (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	if (0) printf( "fx_cutscene (%2d): ResRef:%s Type: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
+	if (0) printf( "fx_cutscene (%2d)\n", fx->Opcode );
+	Game *game = core->GetGame();
+	game->locals->SetAt("GEM_ACTIVE", 1);
 	return FX_NOT_APPLIED;
 }
 

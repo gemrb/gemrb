@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.69 2006/08/03 21:13:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.70 2006/08/05 17:47:01 avenger_teambg Exp $
  *
  */
 
@@ -128,7 +128,7 @@ static EffectRef* FindEffect(const char* effectname)
 	return (EffectRef *) tmp;
 }
 
-//special effects without level check
+//special effects without level check (but with damage dices precalculated)
 static EffectRef diced_effects[] = {
 	//core effects
 	{"Damage",NULL,-1},
@@ -138,9 +138,16 @@ static EffectRef diced_effects[] = {
 	{"ColdDamage",NULL,-1},
 	{"CrushingDamage",NULL,-1},
 	{"VampiricTouch",NULL,-1},
+	{"BurningBlood",NULL,-1},
+	{"VitriolicSphere",NULL,-1},
 	//pst effects
 	{"TransferHP",NULL,-1},
-	{NULL,NULL,0} };
+{NULL,NULL,0} };
+
+//special effects without level check (but with damage dices not precalculated)
+static EffectRef diced_effects2[] = {
+	{"BurningBlood2",NULL,-1},
+{NULL,NULL,0} };
 
 inline static void ResolveEffectRef(EffectRef &effect_reference)
 {
@@ -216,6 +223,9 @@ bool Init_EffectQueue()
 	//additional initialisations
 	for (i=0;diced_effects[i].Name;i++) {
 		ResolveEffectRef(diced_effects[i]);
+	}
+	for (i=0;diced_effects2[i].Name;i++) {
+		ResolveEffectRef(diced_effects2[i]);
 	}
 
 	return true;
@@ -345,15 +355,28 @@ bool IsDicedEffect(int opcode)
 	}
 	return false;
 }
+
+bool IsDicedEffect2(int opcode)
+{
+	int i;
+
+	for(i=0;diced_effects2[i].Name;i++) {
+		if(diced_effects2[i].EffText==opcode) {
+			return true;
+		}
+	}
+	return false;
+}
+
 //resisted effect based on level
 inline bool check_level(Actor *target, Effect *fx)
 {
 	//skip non level based effects
 	if (IsDicedEffect((int) fx->Opcode)) {
-		if (fx->Parameter2 == 0 || fx->Parameter2 == 3) {
-			// precompute random value for bonus
-			fx->Parameter1 = DICE_ROLL((signed)fx->Parameter1);
-		}
+		fx->Parameter1 = DICE_ROLL((signed)fx->Parameter1);
+		return false;
+	}
+	if (IsDicedEffect2((int) fx->Opcode)) {
 		return false;
 	}
 	int level = target->GetXPLevel( true );
@@ -374,26 +397,35 @@ inline bool check_probability(Effect* fx)
 	return true;
 }
 
+static EffectRef fx_level_immunity_ref={"Protection:Spelllevel",NULL,-1};
 static EffectRef fx_opcode_immunity_ref={"Protection:Opcode",NULL,-1};  //bg2
 static EffectRef fx_opcode_immunity2_ref={"Protection:Opcode2",NULL,-1};//iwd
 static EffectRef fx_spell_immunity_ref={"Protection:Spell",NULL,-1};  //bg2
 static EffectRef fx_spell_immunity2_ref={"Protection:Spell2",NULL,-1};//iwd
-static EffectRef fx_school_immunity_ref={"ResistSchool",NULL,-1};
-static EffectRef fx_secondary_type_immunity_ref={"ResistSecondaryType",NULL,-1};
+static EffectRef fx_school_immunity_ref={"Protection:School",NULL,-1};
+static EffectRef fx_secondary_type_immunity_ref={"Protection:SecondaryType",NULL,-1};
 
-static EffectRef fx_spell_bounce_ref={"BounceSpell",NULL,-1};
-static EffectRef fx_school_bounce_ref={"BounceSchool",NULL,-1};
-static EffectRef fx_secondary_type_bounce_ref={"BounceSecondaryType",NULL,-1};
+static EffectRef fx_level_bounce_ref={"Bounce:SpellLevel",NULL,-1};
+//static EffectRef fx_opcode_bounce_ref={"Bounce:Opcode",NULL,-1};
+static EffectRef fx_spell_bounce_ref={"Bounce:Spell",NULL,-1};
+static EffectRef fx_school_bounce_ref={"Bounce:School",NULL,-1};
+static EffectRef fx_secondary_type_bounce_ref={"Bounce:SecondaryType",NULL,-1};
 
+//this is for whole spell immunity/bounce
 inline int check_type(Actor* actor, Effect* fx)
 {
 	ieDword bounce = actor->GetStat(IE_BOUNCE);
 
 	//immunity checks
+/*opcode immunity is elsewhere
 	if (actor->fxqueue.HasEffectWithParam(fx_opcode_immunity_ref, fx->Opcode) ) {
 		return 0;
 	}
 	if (actor->fxqueue.HasEffectWithParam(fx_opcode_immunity2_ref, fx->Opcode) ) {
+		return 0;
+	}
+*/
+	if (actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_ref, fx->Power, 0) ) {
 		return 0;
 	}
 	if (actor->fxqueue.HasEffectWithResource(fx_spell_immunity_ref, fx->Source) ) {
@@ -409,12 +441,16 @@ inline int check_type(Actor* actor, Effect* fx)
 	}
 
 	if (fx->SecondaryType) {
-		if (actor->fxqueue.HasEffectWithParam(fx_secondary_type_immunity_ref, fx->SecondaryType)) {
+		if (actor->fxqueue.HasEffectWithParam(fx_secondary_type_immunity_ref, fx->SecondaryType) ) {
 			return 0;
 		}
 	}
 
 	//bounce checks
+	if ((bounce&BNC_LEVEL) && actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_ref, fx->Power, 0) ) {
+		return 0;
+	}
+
 	if ((bounce&BNC_RESOURCE) && actor->fxqueue.HasEffectWithResource(fx_spell_bounce_ref, fx->Source) ) {
 		return -1;
 	}
@@ -437,10 +473,25 @@ inline int check_type(Actor* actor, Effect* fx)
 
 inline bool check_resistance(Actor* actor, Effect* fx)
 {
+	//magic immunity
 	ieDword val = actor->GetStat(IE_RESISTMAGIC);
 	if (fx->random_value < val) {
 		return false;
 	}
+	//opcode immunity
+	if (actor->fxqueue.HasEffectWithParam(fx_opcode_immunity_ref, fx->Opcode) ) {
+		return false;
+	}
+	if (actor->fxqueue.HasEffectWithParam(fx_opcode_immunity2_ref, fx->Opcode) ) {
+		return false;
+	}
+/* opcode bouncing isn't implemented?
+	//opcode bouncing
+	if (actor->fxqueue.HasEffectWithParam(fx_opcode_bounce_ref, fx->Opcode) ) {
+		return false;
+	}
+*/
+
 	//saving throws
 	return true;
 }
@@ -938,6 +989,7 @@ int EffectQueue::CheckImmunity(Actor *target)
 	if (effects.size() ) {
 		Effect* fx = effects[0];
 
+		//check level resistances
 		//check specific spell immunity
 		//check school/sectype immunity
 		return check_type(target, fx);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.31 2006/08/02 18:00:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.32 2006/08/05 17:47:01 avenger_teambg Exp $
  *
  */
 
@@ -85,7 +85,9 @@ class Actor;
 //if an effect sticks around
 #define STATE_CURE( mod ) target->Modified[ IE_STATE_ID ] &= ~(ieDword) ( mod )
 #define STATE_SET( mod ) target->Modified[ IE_STATE_ID ] |= (ieDword) ( mod )
+#define EXTSTATE_SET( mod ) target->Modified[ IE_EXTSTATE_ID ] |= (ieDword) ( mod )
 #define STATE_GET( mod ) (target->Modified[ IE_STATE_ID ] & (ieDword) ( mod ) )
+#define EXTSTATE_GET( mod ) (target->Modified[ IE_EXTSTATE_ID ] & (ieDword) ( mod ) )
 #define STAT_MOD( stat ) target->NewStat(stat, fx->Parameter1, fx->Parameter2)
 #define STAT_MOD_VAR( stat, mod ) target->NewStat(stat, ( mod ) , fx->Parameter2 )
 #define BASE_GET(stat) (target->BaseStats[ stat ])
