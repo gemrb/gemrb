@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.50 2006/08/03 20:08:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.51 2006/08/05 17:46:06 avenger_teambg Exp $
  *
  */
 
@@ -374,9 +374,10 @@
 #define IE_MIRRORIMAGES         182 
 //
 
-#define IE_DISABLEDBUTTON 205
-#define IE_ANIMATION_ID		206
-#define IE_STATE_ID		207
+#define IE_DISABLEDBUTTON 204
+#define IE_ANIMATION_ID		205
+#define IE_STATE_ID		206
+#define IE_EXTSTATE_ID		207     //used in how/iwd2
 #define IE_METAL_COLOR		208
 #define IE_COLORS		208 //same
 #define IE_MINOR_COLOR		209
