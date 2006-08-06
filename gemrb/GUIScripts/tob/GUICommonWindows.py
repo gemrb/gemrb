@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.39 2006/08/04 22:41:11 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.40 2006/08/06 21:57:42 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -243,8 +243,10 @@ def UpdateActionsWindow ():
 	elif level == 1:
 		GemRB.SetupEquipmentIcons(ActionsWindow, pc, TopIndex)
 	elif level == 2: #spells
+		GemRB.SetVar("Type", 3)
 		GemRB.SetupSpellIcons(ActionsWindow, pc, 3, TopIndex)
 	elif level == 3: #innates
+		GemRB.SetVar("Type", 4)
 		GemRB.SetupSpellIcons(ActionsWindow, pc, 4, TopIndex)
 	return
 
@@ -316,6 +318,23 @@ def ActionInnatePressed ():
 	GemRB.SetVar ("TopIndex", 0)
 	GemRB.SetVar ("ActionLevel", 3)
 	UpdateActionsWindow ()
+	return
+
+def SpellPressed ():
+	pc = GemRB.GameGetFirstSelectedPC()
+
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_CAST)
+	Spell = GemRB.GetVar("Spell")
+	Type = GemRB.GetVar("Type")
+	GemRB.SpellCast(pc, Type, Spell)
+	return
+
+def EquipmentPressed ():
+	pc = GemRB.GameGetFirstSelectedPC()
+
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_CAST)
+	Item = GemRB.GetVar("Equipment")
+	GemRB.UseItem(pc, Item)
 	return
 
 def GetActorClassTitle (actor):
@@ -548,5 +567,3 @@ def SetEncumbranceLabels (Window, Label, Label2, pc):
 		GemRB.SetLabelTextColor (Window, Label, 255, 255, 255)
 		GemRB.SetLabelTextColor (Window, Label2, 255, 0, 0)
 	return
-
-

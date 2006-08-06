@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.404 2006/08/04 21:42:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.405 2006/08/06 21:57:42 avenger_teambg Exp $
  *
  */
 
@@ -5784,7 +5784,7 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Actor not found" );
 	}
 
-	if (SlotID==-1) {
+  if (SlotID==-1) {
 		SlotID=actor->inventory.FindCandidateSlot(SLOT_INVENTORY,0);
 	}
 	if (SlotID!=-1) {
@@ -6254,12 +6254,22 @@ static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 			return RuntimeError("Cannot set action button!\n");
 		}
 	}
+	AnimationMgr* bam = ( AnimationMgr* )
+		core->GetInterface( IE_BAM_CLASS_ID );
+	//FIXME: this is a hardcoded resource (pst has no such one)
+	DataStream *str = core->GetResourceMgr()->GetResource( "guibtbut", IE_BAM_CLASS_ID );
+	if (!bam->Open(str, true) ) {
+		return RuntimeError( "BAM not found" );
+	}
 
 	for (i=0;i<GUIBT_COUNT-(more?1:0);i++) {
 		int ci = core->GetControl(wi, i+(Start?1:0) );
 		Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
-		ItemExtHeader *item = ItemArray+i;
+    btn->SetEvent(IE_GUI_BUTTON_ON_PRESS,"EquipmentPressed");
+    strcpy(btn->VarName,"Equipment");
+    btn->Value = Start+i;
 
+		ItemExtHeader *item = ItemArray+i;
 		Sprite2D *Picture = core->GetBAMSprite(item->UseIcon, 0, 0);
 		
 		if (!Picture) {
@@ -6267,6 +6277,10 @@ static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 			btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, BM_SET);
 			btn->SetTooltip(NULL);
 		} else {
+  	  SetButtonCycle(bam, btn, 0, IE_GUI_BUTTON_UNPRESSED);
+	    SetButtonCycle(bam, btn, 1, IE_GUI_BUTTON_PRESSED);
+	    SetButtonCycle(bam, btn, 2, IE_GUI_BUTTON_SELECTED);
+	    SetButtonCycle(bam, btn, 3, IE_GUI_BUTTON_DISABLED);
 			btn->SetPicture( Picture );
 			btn->SetState(IE_GUI_BUTTON_UNPRESSED);
 			int tip = core->GetItemTooltip(item->itemname, item->headerindex);
@@ -6286,6 +6300,8 @@ static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 			}
 		}
 	}
+	core->FreeInterface( bam );
+
 	if (more) {
 		PyObject *ret = SetActionIcon(wi,core->GetControl(wi, i+1),ACT_RIGHT,i+1);
 		if (!ret) {
@@ -6298,8 +6314,8 @@ static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetupSpellIcons__doc,
-"SetupEquipmentIcons(WindowIndex, slot[, Start])\n\n"
-"Automagically sets up the controls of the equipment list window for a PC indexed by slot.");
+"SetupSpellIcons(WindowIndex, slot, type[, Start])\n\n"
+"Automagically sets up the controls of the spell or innate list window for a PC indexed by slot.");
 
 static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 {
@@ -6331,12 +6347,22 @@ static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 			return RuntimeError("Cannot set action button!\n");
 		}
 	}
+	AnimationMgr* bam = ( AnimationMgr* )
+		core->GetInterface( IE_BAM_CLASS_ID );
+	//FIXME: this is a hardcoded resource (pst has no such one)
+	DataStream *str = core->GetResourceMgr()->GetResource( "guibtbut", IE_BAM_CLASS_ID );
+	if (!bam->Open(str, true) ) {
+		return RuntimeError( "BAM not found" );
+	}
 
 	for (i=0;i<GUIBT_COUNT-(more?1:0);i++) {
 		int ci = core->GetControl(wi, i+(Start?1:0) );
 		Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
-		SpellExtHeader *spell = SpellArray+i;
+    btn->SetEvent(IE_GUI_BUTTON_ON_PRESS,"SpellPressed");
+    strcpy(btn->VarName,"Spell");
+    btn->Value = Start+i;
 
+		SpellExtHeader *spell = SpellArray+i;
 		Sprite2D *Picture = core->GetBAMSprite(spell->MemorisedIcon, 0, 0);
 		
 		if (!Picture) {
@@ -6344,6 +6370,10 @@ static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 			btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, BM_SET);
 			btn->SetTooltip(NULL);
 		} else {
+  	  SetButtonCycle(bam, btn, 0, IE_GUI_BUTTON_UNPRESSED);
+	    SetButtonCycle(bam, btn, 1, IE_GUI_BUTTON_PRESSED);
+	    SetButtonCycle(bam, btn, 2, IE_GUI_BUTTON_SELECTED);
+	    SetButtonCycle(bam, btn, 3, IE_GUI_BUTTON_DISABLED);
 			btn->SetPicture( Picture );
 			btn->SetState(IE_GUI_BUTTON_UNPRESSED);
 			btn->SetTooltip(core->GetString(spell->strref,0));
@@ -6355,6 +6385,8 @@ static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 			}
 		}
 	}
+	core->FreeInterface( bam );
+
 	if (more) {
 		PyObject *ret = SetActionIcon(wi,core->GetControl(wi, i+1),ACT_RIGHT,i+1);
 		if (!ret) {
@@ -6700,6 +6732,75 @@ static PyObject* GemRB_SetModalState(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SpellCast__doc,
+"SpellCast(actor, type, spell)\n\n"
+"Makes the actor try to cast a spell. Type is the spell type like 3 for normal spells and 4 for innates.\n"
+"Spell is the index of the spell in the memorised spell list.\n\n");
+
+static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
+{
+	int slot;
+	int type;
+  int spell;
+
+	if (!PyArg_ParseTuple( args, "iii", &slot, &type, &spell )) {
+		return AttributeError( GemRB_SpellCast__doc );
+	}
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor* actor = game->FindPC( slot );
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
+	}
+  SpellExtHeader spelldata;
+
+ 	actor->spellbook.GetSpellInfo(&spelldata, type, spell, 1);
+
+  printf("Cast spell: %s\n", spelldata.spellname);
+  printf("Extended header: %d\n", spelldata.headerindex);
+  printf("Spellname: %s\n", core->GetString(spelldata.strref));
+  printf("Target: %d\n", spelldata.Target);
+  printf("Range: %d\n", spelldata.Range);
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_UseItem__doc,
+"UseItem(actor, item)\n\n"
+"Makes the actor try to use an item. "
+"Item is the index of the item functionality in the use item list.\n\n");
+
+static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
+{
+	int slot;
+	int item;
+
+	if (!PyArg_ParseTuple( args, "ii", &slot, &item )) {
+		return AttributeError( GemRB_UseItem__doc );
+	}
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor* actor = game->FindPC( slot );
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
+	}
+  ItemExtHeader itemdata;
+
+ 	actor->inventory.GetEquipmentInfo(&itemdata, item, 1);
+
+  printf("Use item: %s\n", itemdata.itemname);
+  printf("Extended header: %d\n", itemdata.headerindex);
+  printf("Attacktype: %d\n",itemdata.AttackType);
+  printf("Range: %d\n",itemdata.Range);
+  printf("Target: %d\n",itemdata.Target);
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 static PyMethodDef GemRBMethods[] = {
 	METHOD(SetInfoTextColor, METH_VARARGS),
 	METHOD(HideGUI, METH_NOARGS),
@@ -6900,6 +7001,8 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetEquippedQuickSlot, METH_VARARGS),
 	METHOD(GetEquippedQuickSlot, METH_VARARGS),
 	METHOD(SetModalState, METH_VARARGS),
+  METHOD(UseItem, METH_VARARGS),
+  METHOD(SpellCast, METH_VARARGS),
 	// terminating entry	
 	{NULL, NULL, 0, NULL}
 };

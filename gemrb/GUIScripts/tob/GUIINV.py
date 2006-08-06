@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.50 2006/08/05 18:49:18 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.51 2006/08/06 21:57:42 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -566,7 +566,6 @@ def OpenGroundItemInfoWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	slot = GemRB.GetVar("TopIndex")+GemRB.GetVar("GroundItemButton")
-	print "OpenGroundItemInfo", slot
 	slot_item = GemRB.GetContainerItem (pc, slot)
 	if item["Flags"] & IE_INV_ITEM_IDENTIFIED:
 		value = 0
