@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.cpp,v 1.9 2006/08/05 17:47:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.cpp,v 1.10 2006/08/06 17:18:49 avenger_teambg Exp $
  *
  */
 
@@ -53,7 +53,7 @@ int fx_summon_shadow_monster (Actor* Owner, Actor* target, Effect* fx); //f8
 int fx_recitation (Actor* Owner, Actor* target, Effect* fx); //f9
 int fx_recitation_bad (Actor* Owner, Actor* target, Effect* fx); //fa
 int fx_lich_touch (Actor* Owner, Actor* target, Effect* fx); //fb
-// sol's blinding //fc
+int fx_blinding_orb (Actor* Owner, Actor* target, Effect* fx); //fc
 // ac vs damage //fd
 int fx_remove_effects (Actor* Owner, Actor* target, Effect* fx); //fe
 int fx_salamander_aura (Actor* Owner, Actor* target, Effect* fx); //ff
@@ -123,6 +123,7 @@ static EffectRef effectnames[] = {
 	{ "Recitation", fx_recitation, 0}, //f9
 	{ "RecitationBad", fx_recitation_bad, 0},//fa
 	{ "LichTouch", fx_lich_touch, 0},//fb
+	{ "BlindingOrb", fx_blinding_orb, 0}, //fc
 	{ "RemoveEffects", fx_remove_effects, 0}, //fe
 	{ "SalamanderAura", fx_salamander_aura, 0}, //ff
 	{ "UmberHulkGaze", fx_umberhulk_gaze, 0}, //100
@@ -563,15 +564,49 @@ int fx_recitation_bad (Actor* /*Owner*/, Actor* target, Effect* fx)
 	EXTSTATE_SET(8);
 	return FX_APPLIED;
 }
-//fb LichTouch
-int fx_lich_touch (Actor* /*Owner*/, Actor* target, Effect* fx)
+//fb LichTouch (how)
+EffectRef fx_hold_creature_ref={"State:Hold",NULL,-1};
+
+int fx_lich_touch (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_lich_touch (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
-	if (EXTSTATE_GET(8)) return FX_NOT_APPLIED;
-	EXTSTATE_SET(8);
+	if (target->GetStat(IE_GENERAL)==GEN_UNDEAD) {
+		return FX_NOT_APPLIED;
+	}
+	target->Damage(DICE_ROLL(0), DAMAGE_COLD, Owner);
+	///convert to hold creature
+	///shall we check for immunity vs. #175?
+	///if yes, then probably it is easier to apply the hold effect instead of converting to it
+	fx->Opcode = EffectQueue::ResolveEffect(fx_hold_creature_ref);
+	fx->Duration = fx->Parameter1;
+	fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
+	ieDword GameTime = core->GetGame()->GameTime;
+	PrepareDuration(fx);
 	return FX_APPLIED;
 }
+//fc BlindingOrb (how)
+EffectRef fx_state_blind_ref={"State:Blind",NULL,-1};
 
+int fx_blinding_orb (Actor* Owner, Actor* target, Effect* fx)
+{
+	ieDword damage = fx->Parameter1;
+	if (target->GetStat(IE_GENERAL)==GEN_UNDEAD) {
+		damage *= 2;
+	}
+	//check saving throw
+	bool st = target->GetSavingThrow(4,0); //spell
+	if (st) {
+		target->Damage(damage/2, DAMAGE_FIRE, Owner);
+		return FX_NOT_APPLIED;
+	}
+	target->Damage(damage, DAMAGE_FIRE, Owner);
+	fx->Opcode = EffectQueue::ResolveEffect(fx_state_blind_ref);
+	fx->Duration = core->Roll(1,6,0);
+	fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
+	ieDword GameTime = core->GetGame()->GameTime;
+	PrepareDuration(fx);
+	return FX_APPLIED;
+}
 //0xfe RemoveEffects
 int fx_remove_effects (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -969,7 +1004,8 @@ int fx_floattext (Actor* /*Owner*/, Actor* target, Effect* fx)
 	default:
 		DisplayStringCore(target, fx->Parameter1, DS_HEAD);
 		break;
-	case 1: //cynicism ????
+	case 1:
+		//in the original game this signified that a specific weapon is equipped
 		EXTSTATE_SET(0x00008000);
 		return FX_APPLIED;
 	case 2: //gemrb extension, displays verbalconstant
@@ -997,9 +1033,11 @@ int fx_mace_of_disruption (Actor* /*Owner*/, Actor* target, Effect* fx)
 //0x11f Protection:Backstab (same as bg2)
 
 //0x120 State:Set
-int fx_set_state (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_set_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_state (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	//in HoW this also sets the last bits of extstate (until it runs out of bits)
+	EXTSTATE_SET(0x40000<<fx->Parameter2);
 	return FX_APPLIED;
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.121 2006/07/22 12:39:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.122 2006/08/06 17:18:49 avenger_teambg Exp $
  *
  */
 
@@ -198,7 +198,7 @@ public:
 	/** gets saving throws */
 	void RollSaves();
 	/** returns a saving throw */
-	int GetSavingThrow(ieDword type);
+	bool GetSavingThrow(ieDword type, int modifier);
 	/** Returns true if the actor is targetable */
 	bool ValidTarget(int ga_flags);
 	/** Returns a Stat value */

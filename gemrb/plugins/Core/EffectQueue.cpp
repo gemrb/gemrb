@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.70 2006/08/05 17:47:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.71 2006/08/06 17:18:49 avenger_teambg Exp $
  *
  */
 
@@ -146,7 +146,8 @@ static EffectRef diced_effects[] = {
 
 //special effects without level check (but with damage dices not precalculated)
 static EffectRef diced_effects2[] = {
-	{"BurningBlood2",NULL,-1},
+	{"BurningBlood2",NULL,-1}, //iwd2
+	{"LichTouch",NULL,-1}, //how
 {NULL,NULL,0} };
 
 inline static void ResolveEffectRef(EffectRef &effect_reference)
@@ -160,8 +161,6 @@ inline static void ResolveEffectRef(EffectRef &effect_reference)
 		}
 	}
 }
-
-#define	PrepareDuration(fx) fx->Duration = fx->Duration*6 + GameTime
 
 bool Init_EffectQueue()
 {
@@ -374,6 +373,16 @@ inline bool check_level(Actor *target, Effect *fx)
 	//skip non level based effects
 	if (IsDicedEffect((int) fx->Opcode)) {
 		fx->Parameter1 = DICE_ROLL((signed)fx->Parameter1);
+		//this is a hack for PST style diced effects
+		if (core->HasFeature(GF_SAVE_FOR_HALF) ) {
+			if (memcmp(fx->Resource,"NEG",4) ) {
+				fx->IsSaveForHalfDamage=1;
+			}
+		} else {
+			if ((fx->Parameter2&0xff)==3) {
+				fx->IsSaveForHalfDamage=1;
+			}
+		}
 		return false;
 	}
 	if (IsDicedEffect2((int) fx->Opcode)) {
@@ -493,6 +502,24 @@ inline bool check_resistance(Actor* actor, Effect* fx)
 */
 
 	//saving throws
+	bool saved = false;
+	ieDword j=1;
+	for (int i=0;i<5;i++) {
+		if (fx->SavingThrowType&j) {
+			saved = actor->GetSavingThrow(i, fx->SavingThrowBonus);
+			if (saved) {
+				break;
+			}
+		}
+	}
+	if (saved) {
+		if (fx->IsSaveForHalfDamage) {
+			fx->Parameter1/=2;
+		}
+		else {
+			return false;
+		}
+	}
 	return true;
 }
 

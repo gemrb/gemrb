@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.39 2006/08/05 17:47:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.40 2006/08/06 17:18:49 avenger_teambg Exp $
  *
  */
 
@@ -650,7 +650,6 @@ static EffectRef effectnames[] = {
 	{ "Spelltrap",fx_spelltrap , 0 },
 	{ "State:Berserk", fx_set_berserk_state, 0 },
 	{ "State:Blind", fx_set_blind_state, 0 },
-	{ "State:Blind2", fx_set_blind_state, 0 },//sol's soaring orb???
 	{ "State:Blur", fx_set_blur_state, 0 },
 	{ "State:Charmed", fx_set_charmed_state, 0 }, //0x05
 	{ "State:Confused", fx_set_confused_state, 0 },

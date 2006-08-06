@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.32 2006/08/05 17:47:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.33 2006/08/06 17:18:49 avenger_teambg Exp $
  *
  */
 
@@ -47,7 +47,7 @@ class Actor;
  * in that case they modify a base stat like charisma modifier */
 #define FX_PERMANENT 2
 ///** if the effect returns this, stop adding any other effect */
-#define FX_ABORT    3
+#define FX_ABORT 3
 
 //remove level effects flags
 #define RL_DISPELLABLE  1  //only dispellables
@@ -74,13 +74,16 @@ class Actor;
 // the damage function is an instant (the other 2 functions might be tricky with random values)
 #define DICE_ROLL(max_val) ((fx->DiceThrown && fx->DiceSides) ? ((max_val >=0) ? (MIN( core->Roll( fx->DiceThrown, fx->DiceSides, 0 ), max_val )) : (MAX( core->Roll( fx->DiceThrown, fx->DiceSides, 0 ), max_val ))) : max_val)
 
+// You will need to get GameTime somehow to use this macro
+#define	PrepareDuration(fx) fx->Duration = fx->Duration*6 + GameTime
+
 // often used stat modifications, usually Parameter2 types 0, 1 and 2
 //these macros should work differently in permanent mode (modify base too)
 #define STAT_GET(stat) (target->Modified[ stat ])
 #define STAT_ADD(stat, mod) target->SetStat( stat, STAT_GET( stat ) + ( mod ), 0 )
 #define STAT_SUB(stat, mod) target->SetStat( stat, STAT_GET( stat ) - ( mod ), 0 )
 #define STAT_BIT_OR(stat, mod) target->SetStat( stat, STAT_GET( stat ) | ( mod ), 0 )
-#define STAT_SET(stat, mod) target->SetStat( stat,  ( mod ), 0 )
+#define STAT_SET(stat, mod) target->SetStat( stat, ( mod ), 0 )
 #define STAT_MUL(stat, mod) target->SetStat( stat, STAT_GET(stat) * ( mod ) / 100, 0 )
 //if an effect sticks around
 #define STATE_CURE( mod ) target->Modified[ IE_STATE_ID ] &= ~(ieDword) ( mod )
@@ -91,17 +94,17 @@ class Actor;
 #define STAT_MOD( stat ) target->NewStat(stat, fx->Parameter1, fx->Parameter2)
 #define STAT_MOD_VAR( stat, mod ) target->NewStat(stat, ( mod ) , fx->Parameter2 )
 #define BASE_GET(stat) (target->BaseStats[ stat ])
-#define BASE_SET(stat, mod) target->SetBase( stat,  ( mod ) )
-#define BASE_ADD(stat, mod) target->SetBase( stat,  BASE_GET(stat)+ ( mod ) )
-#define BASE_SUB(stat, mod) target->SetBase( stat,  BASE_GET(stat)- ( mod ) )
-#define BASE_MUL(stat, mod) target->SetBase( stat,  BASE_GET(stat)* ( mod ) / 100 )
+#define BASE_SET(stat, mod) target->SetBase( stat, ( mod ) )
+#define BASE_ADD(stat, mod) target->SetBase( stat, BASE_GET(stat)+ ( mod ) )
+#define BASE_SUB(stat, mod) target->SetBase( stat, BASE_GET(stat)- ( mod ) )
+#define BASE_MUL(stat, mod) target->SetBase( stat, BASE_GET(stat)* ( mod ) / 100 )
 #define BASE_MOD(stat) target->NewBase( stat, fx->Parameter1, fx->Parameter2)
 #define BASE_MOD_VAR(stat, mod) target->NewBase( stat, (mod), fx->Parameter2 )
 //if an effect doesn't stick (and has permanent until cured effect) then
 //it has to modify the base stat (which is saved)
 //also use this one if the effect starts a cure effect automatically
-#define BASE_STATE_SET( mod ) target->SetBaseBit( IE_STATE_ID,  ( mod ), true )
-#define BASE_STATE_CURE( mod ) target->SetBaseBit( IE_STATE_ID,  ( mod ), false )
+#define BASE_STATE_SET( mod ) target->SetBaseBit( IE_STATE_ID, ( mod ), true )
+#define BASE_STATE_CURE( mod ) target->SetBaseBit( IE_STATE_ID, ( mod ), false )
 
 /** Prototype of a function implementing a particular Effect opcode */
 typedef int (* EffectFunction)(Actor*, Actor*, Effect*);
@@ -134,7 +137,7 @@ bool match_ids(Actor *target, int table, ieDword value);
 
 class GEM_EXPORT EffectQueue {
 	/** List of Effects applied on the Actor */
-	std::vector< Effect* >  effects;
+	std::vector< Effect* > effects;
 	/** Actor which is target of the Effects */
 	Actor* Owner;
 
@@ -208,4 +211,4 @@ private:
 	int BonusAgainstCreature(ieDword opcode, Actor *actor) const;
 };
 
-#endif  // ! EFFECTQUEUE_H
+#endif // ! EFFECTQUEUE_H

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.202 2006/08/05 19:04:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.203 2006/08/06 17:18:49 avenger_teambg Exp $
  *
  */
 
@@ -661,7 +661,7 @@ static void InitActorTables()
 {
 	int i;
 
-	REVERSE_TOHIT=core->HasFeature(GF_REVERSE_TOHIT);
+	REVERSE_TOHIT=(bool) core->HasFeature(GF_REVERSE_TOHIT);
 	//this table lists skill groups assigned to classes
 	//it is theoretically possible to create hybrid classes
 	int table = core->LoadTable( "clskills" );
@@ -954,11 +954,16 @@ void Actor::RollSaves()
 	}
 }
 
-int Actor::GetSavingThrow(ieDword type)
+/** returns true if actor made the save against saving throw type */
+bool Actor::GetSavingThrow(ieDword type, int modifier)
 {
 	assert(type<5);
 	InternalFlags|=IF_USEDSAVE;
-	return SavingThrow[type];
+	int ret = SavingThrow[type];
+	if (ret == 1) return false;
+	if (ret == SAVEROLL) return true;
+	ret += modifier;
+	return ret > (int) GetStat(IE_SAVEVSDEATH+type);
 }
 
 /** implements a generic opcode function, modify modified stats
