@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.92 2006/07/27 17:14:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.93 2006/08/06 17:14:10 avenger_teambg Exp $
  *
  */
 
@@ -116,9 +116,10 @@
 #define  GF_PROTAGONIST_TALKS   	19 //pst
 #define  GF_HAS_SPELLLIST       	20 //iwd2
 #define  GF_IWD2_SCRIPTNAME     	21 //iwd2
-#define  GF_DIALOGUE_SCROLLS            22 //pst
-#define  GF_KNOW_WORLD                  23 //iwd2
-#define  GF_REVERSE_TOHIT               24 //all except iwd2
+#define  GF_DIALOGUE_SCROLLS    	22 //pst
+#define  GF_KNOW_WORLD          	23 //iwd2
+#define  GF_REVERSE_TOHIT       	24 //all except iwd2
+#define  GF_SAVE_FOR_HALF       	25 //pst
 
 /////AI global defines
 #define AI_UPDATE_TIME	10
