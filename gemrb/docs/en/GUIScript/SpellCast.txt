@@ -1,0 +1,13 @@
+
+Prototype: GemRB.SpellCast(PartyID, Type, Spell)
+
+Description: Makes PartyID to cast a spell of Type. This handles targeting and executes the appropriate scripting command.
+
+Parameters:
+PartyID           - the player character's index in the party
+Type              - the spell type bitfield (1-mage, 2-priest, 4-innate)
+Spell             - the spell's index in the list
+
+Return value: N/A
+
+See also: SetupSpellIcons
