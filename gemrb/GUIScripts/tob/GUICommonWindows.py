@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.40 2006/08/06 21:57:42 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.41 2006/08/07 22:25:13 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -226,7 +226,9 @@ def UpdateActionsWindow ():
 	#setting up the disabled button overlay (using the second border slot)
 	for i in range (12):
 		Button = GemRB.GetControl (ActionsWindow, i)
-		GemRB.SetButtonBorder(ActionsWindow, Button, 1, 0, 0, 0, 0, 50,30,10,120, 0, 1)
+		GemRB.SetButtonBorder (ActionsWindow, Button, 1, 0, 0, 0, 0, 50,30,10,120, 0, 1)
+		GemRB.SetButtonFont (ActionsWindow, Button, "NUMBER")
+		GemRB.SetText (ActionsWindow, Button, "")
 
 	if pc == 0:
 		EmptyControls ()
@@ -291,14 +293,33 @@ def ActionStopPressed ():
 	return
 
 #no check needed because the button wouldn't be drawn if illegal
-def LeftScrollPressed ():
-	GemRB.SetVar ("TopIndex", GemRB.GetVar ("TopIndex") -1)
+def ActionLeftPressed ():
+	TopIndex = GemRB.GetVar ("TopIndex")
+	if TopIndex>10:
+		TopIndex -= 10
+	else:
+		TopIndex = 0
+	GemRB.SetVar ("TopIndex", TopIndex)
 	UpdateActionsWindow ()
 	return
 
 #no check needed because the button wouldn't be drawn if illegal
-def RightScrollPressed ():
-	GemRB.SetVar ("TopIndex", GemRB.GetVar ("TopIndex") +1)
+def ActionRightPressed ():
+	pc = GemRB.GameGetFirstSelectedPC()
+	TopIndex = GemRB.GetVar ("TopIndex")
+	Type = GemRB.GetVar ("Type")
+	if Type == 3:
+		Max = GemRB.GetMemorizedSpellsCount(pc,0)+GemRB.GetMemorizedSpellsCount(pc,1)
+	else:
+		Max = GemRB.GetMemorizedSpellsCount(pc,2)
+	TopIndex += 10
+	if TopIndex > Max - 10:
+		if Max>10:
+			TopIndex = Max-10
+		else:
+			TopIndex = 0
+
+	GemRB.SetVar ("TopIndex", TopIndex)
 	UpdateActionsWindow ()
 	return
 
@@ -312,6 +333,31 @@ def ActionCastPressed ():
 	GemRB.SetVar ("TopIndex", 0)
 	GemRB.SetVar ("ActionLevel", 2)
 	UpdateActionsWindow ()
+	return
+
+def ActionQItemPressed (action):
+	pc = GemRB.GameGetFirstSelectedPC()
+	GemRB.UseItem(pc, action)
+	return
+	
+def ActionQItem1Pressed ():
+	ActionQItemPressed (9)
+	return
+
+def ActionQItem2Pressed ():
+	ActionQItemPressed (11)
+	return
+
+def ActionQItem3Pressed ():
+	ActionQItemPressed (12)
+	return
+
+def ActionQItem4Pressed ():
+	ActionQItemPressed (10)
+	return
+
+def ActionQItem5Pressed ():
+	ActionQItemPressed (31)
 	return
 
 def ActionInnatePressed ():
@@ -334,7 +380,7 @@ def EquipmentPressed ():
 
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_CAST)
 	Item = GemRB.GetVar("Equipment")
-	GemRB.UseItem(pc, Item)
+	GemRB.UseItem(pc, -1, Item)
 	return
 
 def GetActorClassTitle (actor):
@@ -416,7 +462,7 @@ def OpenPortraitWindow (needcontrols):
 
 		GemRB.SetButtonBorder (Window, Button, FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
 		GemRB.SetButtonBorder (Window, Button, FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
-		GemRB.SetButtonFont (Window, Button, "NORMAL")
+		#GemRB.SetButtonFont (Window, Button, "NORMAL")
 
 	UpdatePortraitWindow ()
 	SelectionChanged ()
@@ -440,7 +486,7 @@ def UpdatePortraitWindow ():
 		hp = GemRB.GetPlayerStat (i+1, IE_HITPOINTS)
 		hp_max = GemRB.GetPlayerStat (i+1, IE_MAXHITPOINTS)
 
-		GemRB.SetText (Window, Button, "%d/%d" %(hp, hp_max))
+		#GemRB.SetText (Window, Button, "%d/%d" %(hp, hp_max))
 		GemRB.SetTooltip (Window, Button, GemRB.GetPlayerName (i+1, 1) + "\n%d/%d" %(hp, hp_max))
 
 

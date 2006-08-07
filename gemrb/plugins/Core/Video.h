@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.65 2006/08/05 18:12:53 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.66 2006/08/07 22:25:11 avenger_teambg Exp $
  *
  */
 
@@ -204,6 +204,7 @@ public:
 	 * It is used to mask clicks to non-rectangular shaped controls */
 	virtual bool IsSpritePixelTransparent(Sprite2D* sprite, unsigned short x, unsigned short y) = 0;
 	virtual Sprite2D* SpriteScaleDown( Sprite2D* sprite, unsigned int ratio ) = 0;
+	virtual void SetGamma(int brightness, int contrast) = 0;
 };
 
 #endif

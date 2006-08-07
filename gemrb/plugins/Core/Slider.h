@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Slider.h,v 1.11 2005/10/19 21:57:33 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Slider.h,v 1.12 2006/08/07 22:25:10 avenger_teambg Exp $
  *
  */
 
@@ -63,53 +63,53 @@ class GEM_EXPORT Slider : public Control  {
 public: 
 	Slider(short KnobXPos, short KnobYPos, short KnobStep, unsigned short KnobStepsCount, bool Clear = false);
 	~Slider();
-  /** Draws the Control on the Output Display */
-  void Draw(unsigned short x, unsigned short y);
-  /** Returns the actual Slider Position */
-  unsigned int GetPosition();
-  /** Sets the actual Slider Position trimming to the Max and Min Values */
-  void SetPosition(unsigned int pos);
-  /** Sets the selected image */
-  void SetImage(unsigned char type, Sprite2D * img);
-  /** Sets the Text of the current control */
-  int SetText(const char * string, int pos = 0);
-  /** Sets the State of the Slider */
-  void SetState(int arg) { State=(unsigned char) arg; }
-  /** Redraws a slider which is associated with VariableName */
-  void RedrawSlider(const char *VariableName, int Sum);
+	/** Draws the Control on the Output Display */
+	void Draw(unsigned short x, unsigned short y);
+	/** Returns the actual Slider Position */
+	unsigned int GetPosition();
+	/** Sets the actual Slider Position trimming to the Max and Min Values */
+	void SetPosition(unsigned int pos);
+	/** Sets the selected image */
+	void SetImage(unsigned char type, Sprite2D * img);
+	/** Sets the Text of the current control */
+	int SetText(const char * string, int pos = 0);
+	/** Sets the State of the Slider */
+	void SetState(int arg) { State=(unsigned char) arg; }
+	/** Redraws a slider which is associated with VariableName */
+	void RedrawSlider(const char *VariableName, int Sum);
 
 private: // Private attributes
-  /** BackGround Image. If smaller than the Control Size, the image will be tiled. */
-  Sprite2D * BackGround;
-  /** Knob Image */
-  Sprite2D * Knob;
-  /** Grabbed Knob Image */
-  Sprite2D * GrabbedKnob;
-  /** Knob Starting X Position */
-  short KnobXPos;
-  /** Knob Starting Y Position */
-  short KnobYPos;
-  /** Knob Step Size */
-  short KnobStep;
-  /** Knob Steps Count */
-  unsigned short KnobStepsCount;
-  /** If true, on deletion the Slider will destroy the associated images */
-  bool Clear;
-  /** Actual Knob Status */
-  unsigned char State;
-  /** Slider Position Value */
-  unsigned int Pos;
+	/** BackGround Image. If smaller than the Control Size, the image will be tiled. */
+	Sprite2D * BackGround;
+	/** Knob Image */
+	Sprite2D * Knob;
+	/** Grabbed Knob Image */
+	Sprite2D * GrabbedKnob;
+	/** Knob Starting X Position */
+	short KnobXPos;
+	/** Knob Starting Y Position */
+	short KnobYPos;
+	/** Knob Step Size */
+	short KnobStep;
+	/** Knob Steps Count */
+	unsigned short KnobStepsCount;
+	/** If true, on deletion the Slider will destroy the associated images */
+	bool Clear;
+	/** Actual Knob Status */
+	unsigned char State;
+	/** Slider Position Value */
+	unsigned int Pos;
 public: // Public Events
-  /** Mouse Button Down */
-  void OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
-  /** Mouse Button Up */
-  void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
-  /** Mouse Over Event */
-  void OnMouseOver(unsigned short x, unsigned short y);
-  /** Set handler for specified event */
-  bool SetEvent(int eventType, EventHandler handler);
-  /** OnChange Scripted Event Function Name */
-  EventHandler SliderOnChange;
+	/** Mouse Button Down */
+	void OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
+	/** Mouse Button Up */
+	void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
+	/** Mouse Over Event */
+	void OnMouseOver(unsigned short x, unsigned short y);
+	/** Set handler for specified event */
+	bool SetEvent(int eventType, EventHandler handler);
+	/** OnChange Scripted Event Function Name */
+	EventHandler SliderOnChange;
 };
 
 #endif

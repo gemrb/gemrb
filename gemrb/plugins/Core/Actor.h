@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.122 2006/08/06 17:18:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.123 2006/08/07 22:25:09 avenger_teambg Exp $
  *
  */
 
@@ -181,6 +181,8 @@ public:
 	~Actor(void);
 	/** releases memory */
 	static void ReleaseMemory();
+	/** sets game specific default data about action buttons */
+	static void SetDefaultActions(bool qslot, ieByte slot1, ieByte slot2, ieByte slot3);
 	/** prints useful information on console */
 	void DebugDump();
 	/** fixes the feet circle */
@@ -272,7 +274,7 @@ public:
 	/** Gets a Script ResRef */
 	const char* GetScript(int ScriptIndex) const;
 	/** Gets the Character's level for XP calculations */
-	int GetXPLevel(int modified) const;
+	ieDword GetXPLevel(int modified) const;
 
 	/** Gets the Dialog ResRef */
 	const char* GetDialog(bool checks=false) const;
@@ -289,7 +291,7 @@ public:
 	/* checks on death of actor, returns true if it should be removed*/
 	bool CheckOnDeath();
 	/* receives undead turning message */
-	void Turn(Scriptable *cleric, int turnlevel);
+	void Turn(Scriptable *cleric, ieDword turnlevel);
 	/* call this on gui selects */
 	void SelectActor();
 	/* sets the actor in panic (turn/morale break) */
@@ -305,6 +307,10 @@ public:
 	/* drops items from inventory to current spot */
 	void DropItem(const ieResRef resref, unsigned int flags);
 	void DropItem(int slot, unsigned int flags);
+	/* returns item information in quickitem slot */
+	void GetItemSlotInfo(ItemExtHeader *item, int which);
+	/* returns spell information in quickspell slot */
+	void GetSpellSlotInfo(SpellExtHeader *spell, int which);
 	/* updates quickslots */
 	void ReinitQuickSlots();
 	/* returns true if the actor is PC/joinable*/
@@ -356,8 +362,10 @@ public:
 	void WalkTo(Point &Des, ieDword flags, int MinDistance = 0);
 	/* resolve string constant (sound will be altered) */
 	void ResolveStringConstant(ieResRef sound, unsigned int index);
+	/* sets the quick slots */
+	void SetActionButtonRow(ActionButtonRow &ar);
 	/* updates the quick slots */
-	void GetActionButtonRow(ActionButtonRow &qs, int translation);
+	void GetActionButtonRow(ActionButtonRow &qs);
 
 	/* Handling automatic stance changes */
 	bool HandleActorStance();
@@ -390,5 +398,6 @@ public:
 	int SetEquippedQuickSlot(int slot);
 	/* If it returns true, then default AC=10 and the lesser the better */
 	bool IsReverseToHit();
+	void InitButtons(ieDword cls);
 };
 #endif

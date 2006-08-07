@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.cpp,v 1.10 2006/08/06 17:18:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.cpp,v 1.11 2006/08/07 22:25:12 avenger_teambg Exp $
  *
  */
 
@@ -217,16 +217,10 @@ static void ReadSpellProtTable(const ieResRef tablename)
 #define ST_ID         1
 #define ST_RELATION   2
 
-//unusual types which need hacking
+//unusual types which need hacking (fake stats)
 #define STI_SOURCE_TARGET     0x100
 #define STI_SOURCE_NOT_TARGET 0x101
-
-//                        0          1         2         3        4
-static ieDword idsidx[]={IE_EA, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC,
-//  5        6            7            8      9        10      11      12
- IE_SEX, IE_ALIGNMENT, IE_HITPOINTS, IE_STR, IE_INT, IE_WIS, IE_CON, IE_DEX,
-// 13
- IE_CHR};
+#define STI_CIRCLESIZE        0x102
 
 //returns true if iwd ids targeting resists the spell
 static int check_iwd_targeting(Actor* Owner, Actor* target, ieDword value, ieDword type)
@@ -238,7 +232,7 @@ static int check_iwd_targeting(Actor* Owner, Actor* target, ieDword value, ieDwo
 		return 0; //not resisted
 	}
 
-	ieDword idx = idsidx[spellres[spellrescnt*ST_TABLE+type]];
+	ieDword idx = spellres[spellrescnt*ST_TABLE+type];
 	ieDword val = spellres[spellrescnt*ST_ID+type];
 	//if IDS value is 'anything' then the supplied value is in Parameter1
 	if (val==0xffffffff) {
@@ -255,6 +249,8 @@ static int check_iwd_targeting(Actor* Owner, Actor* target, ieDword value, ieDwo
 			return 1;
 		}
 		return 0;
+	case STI_CIRCLESIZE:
+		return DiffCore((ieDword) target->GetAnims()->GetCircleSize(), value, spellres[spellrescnt*ST_RELATION+type]);
 	default:
 		return DiffCore(target->GetStat(idx), value, spellres[spellrescnt*ST_RELATION+type]);
 	}
@@ -940,15 +936,19 @@ int fx_animal_rage (Actor* /*Owner*/, Actor* target, Effect* fx)
 //0x118 TurnUndead how
 int fx_turn_undead (Actor* Owner, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_turn_undead (%2d): Damage %d\n", fx->Opcode, fx->Parameter1 );
-	target->Turn(Owner, Owner->GetXPLevel(true));
+	if (0) printf( "fx_turn_undead (%2d): Level %d\n", fx->Opcode, fx->Parameter1 );
+	if (fx->Parameter1) {
+		target->Turn(Owner, fx->Parameter1);
+	} else {
+		target->Turn(Owner, Owner->GetStat(IE_TURNUNDEADLEVEL));
+	}
 	return FX_APPLIED;
 }
 
 //0x118 TurnUndead2 iwd2
 int fx_turn_undead2 (Actor* Owner, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_turn_undead2 (%2d): Damage %d\n", fx->Opcode, fx->Parameter1 );
+	if (0) printf( "fx_turn_undead2 (%2d): Level: %d  Type %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	switch (fx->Parameter2)
 	{
 	case 0: //command
@@ -964,7 +964,11 @@ int fx_turn_undead2 (Actor* Owner, Actor* target, Effect* fx)
 		target->Panic();
 		break;
 	default://depends on caster
-		target->Turn(Owner, Owner->GetXPLevel(true));
+		if (fx->Parameter1) {
+			target->Turn(Owner, fx->Parameter1);
+		} else {
+			target->Turn(Owner, Owner->GetStat(IE_TURNUNDEADLEVEL));
+		}
 		break;
 	}
 	return FX_APPLIED;

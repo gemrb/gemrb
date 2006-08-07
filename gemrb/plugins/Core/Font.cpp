@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.48 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.49 2006/08/07 22:25:09 avenger_teambg Exp $
  *
  */
 
@@ -121,17 +121,18 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 	int ystep = 0;
 	if (Alignment & IE_FONT_SINGLE_LINE) {
 		for (size_t i = 0; i < len; i++) {
-			if (tmp[i] == 0) continue;
-			if (ystep < yPos[( unsigned char ) tmp[i] - 1])
-				ystep = yPos[( unsigned char ) tmp[i] - 1];
+			int height = yPos[( unsigned char ) tmp[i] - 1];
+			if (ystep < height)
+				ystep = height;
 		}
 	} else {
 		ystep = size[1].h;
 	}
+	if (!ystep) ystep = maxHeight;
 	int x = psx, y = ystep;
 	int w = CalcStringWidth( tmp, NoColor );
 	if (Alignment & IE_FONT_ALIGN_CENTER) {
-		x = ( rgn.w / 2 ) - ( w / 2 );
+		x = ( rgn.w - w) / 2;
 	} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
 		x = ( rgn.w - w );
 	}
@@ -142,15 +143,15 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 				h++;
 		}
 		h = h * ystep;
-		y += ( rgn.h / 2 ) - ( h / 2 );
+		y += ( rgn.h - h ) / 2;
 	} else if (Alignment & IE_FONT_ALIGN_BOTTOM) {
-		int h = 0;
+		int h = 1;
 		for (size_t i = 0; i <= len; i++) {
 			if (( tmp[i] == 0 ) || ( tmp[i] == '\n' ))
 				h++;
 		}
 		h = h * ystep;
-		y += ( rgn.h -  h );
+		y += ( rgn.h - h );
 	}
 	int row = 0;
 	for (size_t i = 0; i < len; i++) {
@@ -199,7 +200,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 			x = psx;
 			int w = CalcStringWidth( &tmp[i + 1], NoColor );
 			if (Alignment & IE_FONT_ALIGN_CENTER) {
-				x = ( rgn.w / 2 ) - ( w / 2 );
+				x = ( rgn.w - w ) / 2;
 			} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
 				x = ( rgn.w - w );
 			}
@@ -247,18 +248,21 @@ void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 	SetupString( tmp, rgn.w, NoColor );
 	int ystep = 0;
 	if (Alignment & IE_FONT_SINGLE_LINE) {
+		
 		for (size_t i = 0; i < len; i++) {
 			if (tmp[i] == 0) continue;
-			if (ystep < yPos[( unsigned char ) tmp[i] - 1])
-				ystep = yPos[( unsigned char ) tmp[i] - 1];
+			int height = yPos[( unsigned char ) tmp[i] - 1];
+			if (ystep < height)
+				ystep = height;
 		}
 	} else {
 		ystep = size[1].h;
 	}
+	if (!ystep) ystep = maxHeight;
 	int x = psx, y = ystep;
 	if (Alignment & IE_FONT_ALIGN_CENTER) {
 		int w = CalcStringWidth( tmp, NoColor );
-		x = ( rgn.w / 2 ) - ( w / 2 );
+		x = ( rgn.w - w ) / 2;
 	} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
 		int w = CalcStringWidth( tmp, NoColor );
 		x = ( rgn.w - w );
@@ -271,9 +275,9 @@ void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 				h++;
 		}
 		h = h * ystep;
-		y += ( rgn.h / 2 ) - ( h / 2 );
+		y += ( rgn.h - h ) / 2;
 	} else if (Alignment & IE_FONT_ALIGN_BOTTOM) {
-		int h = 0;
+		int h = 1;
 		for (size_t i = 0; i <= len; i++) {
 			if (tmp[i] == 0)
 				h++;
@@ -324,7 +328,7 @@ void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 			x = psx;
 			int w = CalcStringWidth( &tmp[i + 1], NoColor );
 			if (Alignment & IE_FONT_ALIGN_CENTER) {
-				x = ( rgn.w / 2 ) - ( w / 2 );
+				x = ( rgn.w - w ) / 2;
 			} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
 				x = ( rgn.w - w );
 			}
@@ -352,7 +356,6 @@ void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 int Font::PrintInitial(int x, int y, Region &rgn, unsigned char currChar)
 {
 	Video *video = core->GetVideoDriver();
-	//video->SetPalette( sprBuffer, palette );
 	video->BlitSpriteRegion( sprBuffer, size[currChar],
 		x + rgn.x, y + rgn.y - yPos[currChar], true, &rgn );
 	x += size[currChar].w;

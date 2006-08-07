@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.38 2006/08/04 21:42:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.39 2006/08/07 22:25:10 avenger_teambg Exp $
  *
  */
 
@@ -312,7 +312,17 @@ CREKnownSpell* Spellbook::GetKnownSpell(int type, unsigned int level, unsigned i
 
 unsigned int Spellbook::GetMemorizedSpellsCount(int type, unsigned int level) const
 {
-	if (type >= NUM_SPELL_TYPES || level >= spells[type].size())
+	if (type >= NUM_SPELL_TYPES)
+		return 0;
+	if (!level) {
+		unsigned int count = 0;
+		size_t i=spells[type].size();
+		while(i--) {
+			count += spells[type][i]->memorized_spells.size();
+		}
+		return count;
+	}
+	if(level >= spells[type].size())
 		return 0;
 	return spells[type][level]->memorized_spells.size();
 }
@@ -508,7 +518,7 @@ bool Spellbook::GetSpellInfo(SpellExtHeader *array, int type, int startindex, in
 {
 	int pos = 0;
 	int actual = 0;
-  
+	
 	memset(array, 0, count * sizeof(SpellExtHeader) );
 	for (int i = 0; i < NUM_SPELL_TYPES; i++) {
 		for (unsigned int j = 0; j < spells[i].size(); j++) {
@@ -550,7 +560,7 @@ bool Spellbook::GetSpellInfo(SpellExtHeader *array, int type, int startindex, in
 					array[pos].Projectile = ext_header->Projectile;
 					array[pos].CastingTime = ext_header->CastingTime;
 					array[pos].strref = spl->SpellName;
-			
+					array[pos].count = 1;
 					pos++;
 					core->FreeSpell(spl, slot->SpellResRef, false);
 				}

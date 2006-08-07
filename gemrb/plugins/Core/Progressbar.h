@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.h,v 1.9 2005/10/19 21:57:33 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.h,v 1.10 2006/08/07 22:25:10 avenger_teambg Exp $
  *
  */
 
@@ -92,7 +92,7 @@ private: // Private attributes
 	/** The most for the progressbar cap (linear progressbar) */
 	Sprite2D *PBarCap;
 public:
-        /** EndReached Scripted Event Function Name */
+	/** EndReached Scripted Event Function Name */
 	EventHandler EndReached;
 };
 

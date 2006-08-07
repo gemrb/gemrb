@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.203 2006/08/06 17:18:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.204 2006/08/07 22:25:09 avenger_teambg Exp $
  *
  */
 
@@ -59,8 +59,11 @@ static int classcount=-1;
 static char **clericspelltables=NULL;
 static char **wizardspelltables=NULL;
 
-//letters for char sound resolution bg1/bg2
-static char csound[VCONST_COUNT];
+static ActionButtonRow *GUIBTDefaults = NULL; //qslots row count
+ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
+ ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE,
+ ACT_NONE, ACT_INNATE};
+static int QslotTranslation = false;
 
 static char iwd2gemrb[32]={
 	0,0,20,2,22,25,0,14,
@@ -74,6 +77,9 @@ static char gemrb2iwd[32]={
 	0,0,0,0,2,15,4,9,  //16
 	13,5,0,0,0,0,0,0   //24
 };
+
+//letters for char sound resolution bg1/bg2
+static char csound[VCONST_COUNT];
 
 static void InitActorTables();
 
@@ -221,6 +227,14 @@ Actor::~Actor(void)
 	}
 }
 
+void Actor::SetDefaultActions(bool qslot, ieByte slot1, ieByte slot2, ieByte slot3)
+{
+	QslotTranslation=qslot;
+	DefaultButtons[0]=slot1;
+	DefaultButtons[1]=slot2;
+	DefaultButtons[2]=slot3;
+}
+
 void Actor::SetText(char* ptr, unsigned char type)
 {
 	size_t len = strlen( ptr ) + 1;
@@ -358,9 +372,14 @@ void Actor::SetCircleSize()
 	SetCircle( anims->GetCircleSize(), *color, core->GroundCircles[csize][color_index], core->GroundCircles[csize][(color_index == 0) ? 3 : color_index] );
 }
 
-void pcf_ea(Actor *actor, ieDword /*Value*/)
+void pcf_ea (Actor *actor, ieDword /*Value*/)
 {
 	actor->SetCircleSize();
+}
+
+void pcf_class (Actor *actor, ieDword Value)
+{
+	actor->InitButtons(Value);
 }
 
 void pcf_animid(Actor *actor, ieDword Value)
@@ -615,7 +634,7 @@ NULL,NULL,NULL,NULL, NULL, pcf_animid,NULL, NULL, //cf
 pcf_color,pcf_color,pcf_color,pcf_color, pcf_color, pcf_color, pcf_color, NULL,
 NULL,NULL,NULL,pcf_armorlevel, NULL, NULL, NULL, NULL, //df
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
-NULL,NULL,pcf_ea,NULL, NULL, NULL, NULL, NULL, //ef
+pcf_class,NULL,pcf_ea,NULL, NULL, NULL, NULL, NULL, //ef
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL //ff
 };
@@ -642,6 +661,10 @@ void Actor::ReleaseMemory()
 			}
 			free(wizardspelltables);
 		}
+	}
+	if (GUIBTDefaults) {
+		free (GUIBTDefaults);
+		GUIBTDefaults=NULL;
 	}
 	classcount=-1;
 }
@@ -737,6 +760,20 @@ static void InitActorTables()
 				}
 			}
 		}
+	}
+
+	table = core->LoadTable( "qslots");
+	tm = core->GetTable( table );
+	if (tm) {
+		GUIBTDefaults = (ActionButtonRow *) calloc( classcount,sizeof(ActionButtonRow) );
+
+		for (i = 0; i < classcount; i++) {
+			memcpy(GUIBTDefaults+i, &DefaultButtons, sizeof(ActionButtonRow));
+			for (int j=0;j<MAX_QSLOTS;j++) {
+				GUIBTDefaults[i][j+3]=atoi( tm->QueryField(i,j) );
+			}
+		}
+		core->DelTable( table );
 	}
 }
 
@@ -1196,7 +1233,7 @@ void Actor::SetPosition(Map *map, Point &position, int jump, int radius)
 /* this is returning the level of the character for xp calculations 
 	 later it could calculate with dual/multiclass, 
 	 also with iwd2's 3rd ed rules, this is why it is a separate function */
-int Actor::GetXPLevel(int modified) const
+ieDword Actor::GetXPLevel(int modified) const
 {
 	if (modified) {
 		return Modified[IE_LEVEL];
@@ -1212,7 +1249,7 @@ int Actor::GetEncumbrance()
 }
 
 //receive turning
-void Actor::Turn(Scriptable *cleric, int turnlevel)
+void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 {
 	//this is safely hardcoded i guess
 	if (Modified[IE_GENERAL]!=GEN_UNDEAD) {
@@ -1376,23 +1413,55 @@ void Actor::DropItem(int slot , unsigned int flags)
 	}
 }
 
+/** returns quick item data */
+/** which is a 'use quickitem' action */
+void Actor::GetItemSlotInfo(ItemExtHeader *item, int which)
+{
+	unsigned int idx;
+	unsigned int headerindex;
+
+	memset(item, 0, sizeof(ItemExtHeader) );
+	if (!PCStats) return; //not a player character
+	PCStats->GetSlotAndIndex(which,idx,headerindex);
+	if (headerindex==0xffff) return; //headerindex is invalid
+	CREItem *slot = inventory.GetSlotItem(idx);
+	if (!slot) return; //quick item slot is empty
+	Item *itm = core->GetItem(slot->ItemResRef);
+	if (!itm) return; //quick item slot contains invalid item resref
+	ITMExtHeader *ext_header = itm->GetExtHeader(headerindex);
+	if (!ext_header) return; //item has no extended header, or header index is wrong
+	memcpy(item->itemname, slot->ItemResRef, sizeof(ieResRef) );
+	item->headerindex = headerindex;
+	memcpy(&(item->AttackType), &(ext_header->AttackType),
+ ((char *) &(item->itemname)) -((char *) &(item->AttackType)) );
+	if (headerindex>2) {
+		item->Charges=0;
+	} else {
+		item->Charges=slot->Usages[headerindex];
+	}
+	core->FreeItem(itm,slot->ItemResRef, false);
+}
+
 void Actor::ReinitQuickSlots()
 {
-	if (PCStats) {
-		int i=sizeof(PCStats->QSlots);
-		while (i--) {
-			int slot;
-			int which;
-			if (i<0) which = ACT_WEAPON4+i+1;
-			else which = PCStats->QSlots[i];
-			switch (which) {
+	if (!PCStats) {
+		return;
+	}
+	int i=sizeof(PCStats->QSlots);
+	while (i--) {
+		int slot;
+		int headerindex = 0xffff;
+		int which;
+		if (i<0) which = ACT_WEAPON4+i+1;
+		else which = PCStats->QSlots[i];
+		switch (which) {
 			case ACT_WEAPON1:
 			case ACT_WEAPON2:
 			case ACT_WEAPON3:
 			case ACT_WEAPON4:
 				slot = inventory.GetWeaponSlot()+(which-ACT_WEAPON1);
 				break;
-			//WARNING:this cannot be condensed, because the symbols don't come in order!!!
+				//WARNING:this cannot be condensed, because the symbols don't come in order!!!
 			case ACT_QSLOT1: slot = inventory.GetQuickSlot(); break;
 			case ACT_QSLOT2: slot = inventory.GetQuickSlot()+1; break;
 			case ACT_QSLOT3: slot = inventory.GetQuickSlot()+2; break;
@@ -1400,26 +1469,28 @@ void Actor::ReinitQuickSlots()
 			case ACT_QSLOT5: slot = inventory.GetQuickSlot()+4; break;
 			default:;
 				slot = 0;
-			}
-			if (!slot) continue;
-			//if magic items are equipped the equipping info doesn't change
-			//(afaik)
-			if (!inventory.HasItemInSlot("", slot)) {				
-				if (core->QuerySlotEffects(slot)==SLOT_EFFECT_MELEE) {
-					slot = inventory.GetFistSlot();
-				} else {
-					slot = 0xffff;
-				}
-			}
-			PCStats->InitQuickSlot(which, slot);
 		}
-
-		//disabling quick weapon slots for certain classes
-		for(i=0;i<2;i++) {
-			int which = ACT_WEAPON3+i;
-			if (PCStats->QSlots[i]!=which) {
-				PCStats->InitQuickSlot(which, 0xffff);
+		if (!slot) continue;
+		//if magic items are equipped the equipping info doesn't change
+		//(afaik)
+		if (inventory.HasItemInSlot("", slot)) {
+			headerindex = 0;
+		} else {
+			if (core->QuerySlotEffects(slot)==SLOT_EFFECT_MELEE) {
+				slot = inventory.GetFistSlot();
+				headerindex = 0;
+			} else {
+				slot = 0xffff;
 			}
+		}
+		PCStats->InitQuickSlot(which, slot, headerindex);
+	}
+
+	//disabling quick weapon slots for certain classes
+	for(i=0;i<2;i++) {
+		int which = ACT_WEAPON3+i;
+		if (PCStats->QSlots[i]!=which) {
+			PCStats->InitQuickSlot(which, 0xffff, 0);
 		}
 	}
 }
@@ -2146,23 +2217,26 @@ end:
 
 }
 
+void Actor::SetActionButtonRow(ActionButtonRow &ar)
+{
+	for(int i=0;i<MAX_QSLOTS;i++) {
+		ieByte tmp = ar[i+3];
+		if (QslotTranslation) {
+			tmp=gemrb2iwd[tmp];
+		}
+		PCStats->QSlots[i]=tmp;
+	}
+}
+
 //the first 3 buttons are untouched by this function
-void Actor::GetActionButtonRow(ActionButtonRow &ar, int translation)
+void Actor::GetActionButtonRow(ActionButtonRow &ar)
 {
 	if (PCStats->QSlots[0]==0xff) {
-		for(int i=0;i<GUIBT_COUNT-3;i++) {
-			ieByte tmp = ar[i+3];
-			if (translation) {
-				tmp=gemrb2iwd[tmp];
-			}
-			PCStats->QSlots[i]=tmp;
-		}
-		ReinitQuickSlots();
-		return;
+		InitButtons(GetStat(IE_CLASS));
 	}
 	for(int i=0;i<GUIBT_COUNT-3;i++) {
 		ieByte tmp=PCStats->QSlots[i];
-		if (translation) {
+		if (QslotTranslation) {
 			if (tmp>=90) { //quick weapons
 				tmp=16+tmp%10;
 			} else if (tmp>=80) { //quick items
@@ -2175,6 +2249,7 @@ void Actor::GetActionButtonRow(ActionButtonRow &ar, int translation)
 		}
 		ar[i+3]=tmp;
 	}
+	memcpy(ar,DefaultButtons,3*sizeof(ieByte) );
 }
 
 void Actor::SetSoundFolder(const char *soundset)
@@ -2355,4 +2430,18 @@ int Actor::SetEquippedQuickSlot(int slot)
 bool Actor::IsReverseToHit()
 {
 	return REVERSE_TOHIT;
+}
+
+void Actor::InitButtons(ieDword cls)
+{
+	if (!PCStats) {
+		return;
+	}
+	ActionButtonRow myrow;
+	if ((int) cls >= classcount) {
+		memcpy(&myrow, &DefaultButtons, sizeof(ActionButtonRow));
+	} else {
+		memcpy(&myrow, GUIBTDefaults+cls, sizeof(ActionButtonRow));
+	}
+	SetActionButtonRow(myrow);
 }

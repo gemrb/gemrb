@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.121 2006/07/09 08:33:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.122 2006/08/07 22:25:09 avenger_teambg Exp $
  *
  */
 
@@ -284,6 +284,7 @@ int Game::LeaveParty (Actor* actor)
 int Game::JoinParty(Actor* actor, int join)
 {
 	actor->CreateStats(); //create stats if they didn't exist yet
+	actor->InitButtons(actor->GetStat(IE_CLASS)); //init actor's buttons
 	actor->SetBase(IE_EXPLORE, 1);
 	int slot = InParty( actor );
 	if (slot != -1) {

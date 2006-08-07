@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.27 2006/07/29 18:17:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.28 2006/08/07 22:25:10 avenger_teambg Exp $
  *
  */
 
@@ -214,7 +214,7 @@ public:
 	}
 
 	//returns the requested extended header
-	ITMExtHeader *GetExtHeader(unsigned int which)
+	ITMExtHeader *GetExtHeader(unsigned int which) const
 	{
 		if(ExtHeaderCount<=which) {
 			return NULL;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.81 2006/04/19 20:09:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.82 2006/08/07 22:25:11 avenger_teambg Exp $
  *
  */
 
@@ -269,13 +269,17 @@ Game* GAMImp::LoadGame(Game *newGame)
 	return newGame;
 }
 
-#define SanityCheck(a,b,message) \
-{\
-	int c = a==0xffff?0xffff:0;\
-	if (c!=b) {\
-		printMessage("GAMImp"," ",LIGHT_RED); \
-		printf("Invalid Slot Enabler caught: %s!\n", message);\
-	}\
+void SanityCheck(ieWord a,ieWord &b,const char *message)
+{
+	if (a==0xffff) {
+		b=0xffff;
+		return;
+	}
+	if (b==0xffff) {
+		printMessage("GAMImp"," ",LIGHT_RED);
+		printf("Invalid Slot Enabler caught: %s!\n", message);
+		b=0;
+	}
 }
 
 Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
@@ -304,12 +308,17 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 	if (version==GAM_VER_GEMRB || version==GAM_VER_IWD2) {
 		ieResRef tmp;
 
-		for (i = 0; i < 8; i++) {
+		for (i = 0; i < 4; i++) {
 			str->ReadWord( &pcInfo.QuickWeaponSlot[i] );
+			str->ReadWord( &pcInfo.QuickWeaponSlot[i+4] );
 		}
-		for (i = 0; i < 8; i++) {
+		for (i = 0; i < 4; i++) {
 			str->ReadWord( &tmpWord );
 			SanityCheck( pcInfo.QuickWeaponSlot[i], tmpWord, "weapon");
+			pcInfo.QuickWeaponHeader[i]=tmpWord;
+			str->ReadWord( &tmpWord );
+			SanityCheck( pcInfo.QuickWeaponSlot[i+4], tmpWord, "weapon");
+			pcInfo.QuickWeaponHeader[i+4]=tmpWord;
 		}
 		//str->Seek( 16, GEM_CURRENT_POS); //enabler fields, redundant
 		for (i = 0; i < 9; i++) {
@@ -335,8 +344,8 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 		for (i = 0; i < 3; i++) {
 			str->ReadWord( &tmpWord );
 			SanityCheck( pcInfo.QuickItemSlot[i], tmpWord, "item");
+			pcInfo.QuickItemHeader[i]=tmpWord;
 		}
-		//str->Seek( 6, GEM_CURRENT_POS); //enabler fields, redundant
 		//QuickSlots are customisable in iwd2 and GemRB
 		//thus we adopt the iwd2 style actor info
 		str->Seek( 72, GEM_CURRENT_POS);
@@ -351,6 +360,7 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 		for (i = 0; i < 4; i++) {
 			str->ReadWord( &tmpWord );
 			SanityCheck( pcInfo.QuickWeaponSlot[i], tmpWord, "weapon");
+			pcInfo.QuickWeaponHeader[i]=tmpWord;
 		}
 		//str->Seek( 8, GEM_CURRENT_POS);
 		for (i = 0; i < 3; i++) {
@@ -363,6 +373,7 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 			for (i = 0; i < 5; i++) {
 				str->ReadWord( &tmpWord );
 				SanityCheck( pcInfo.QuickItemSlot[i], tmpWord, "item");
+				pcInfo.QuickItemHeader[i]=tmpWord;
 			}
 			//str->Seek( 10, GEM_CURRENT_POS ); //enabler fields
 		} else {
@@ -372,6 +383,7 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 			for (i = 0; i < 3; i++) {
 				str->ReadWord( &tmpWord );
 				SanityCheck( pcInfo.QuickItemSlot[i], tmpWord, "item");
+				pcInfo.QuickItemHeader[i]=tmpWord;
 			}
 			//str->Seek( 6, GEM_CURRENT_POS ); //enabler fields
 		}
@@ -423,10 +435,12 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 	PCStatsStruct *ps = actor->PCStats;
 	GetPCStats(ps);
 	memcpy(ps->QSlots, pcInfo.QSlots, sizeof(pcInfo.QSlots) );
-	memcpy(ps->QuickSpells, pcInfo.QuickSpellResRef, 9*sizeof(ieResRef) );
-	memcpy(ps->QuickSpellClass, pcInfo.QuickSpellClass, 9 );
-	memcpy(ps->QuickWeaponSlots, pcInfo.QuickWeaponSlot, 8*sizeof(ieWord) );
-	memcpy(ps->QuickItemSlots, pcInfo.QuickItemSlot, 5*sizeof(ieWord) );
+	memcpy(ps->QuickSpells, pcInfo.QuickSpellResRef, MAX_QSLOTS*sizeof(ieResRef) );
+	memcpy(ps->QuickSpellClass, pcInfo.QuickSpellClass, MAX_QSLOTS );
+	memcpy(ps->QuickWeaponSlots, pcInfo.QuickWeaponSlot, MAX_QUICKWEAPONSLOT*sizeof(ieWord) );
+	memcpy(ps->QuickWeaponHeaders, pcInfo.QuickWeaponHeader, MAX_QUICKWEAPONSLOT*sizeof(ieWord) );
+	memcpy(ps->QuickItemSlots, pcInfo.QuickItemSlot, MAX_QUICKITEMSLOT*sizeof(ieWord) );
+	memcpy(ps->QuickItemHeaders, pcInfo.QuickItemHeader, MAX_QUICKITEMSLOT*sizeof(ieWord) );
 	actor->Destination.x = actor->Pos.x = pcInfo.XPos;
 	actor->Destination.y = actor->Pos.y = pcInfo.YPos;
 	strcpy( actor->Area, pcInfo.Area );
@@ -436,7 +450,6 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 	actor->SetPersistent( is_in_party ? (pcInfo.PartyOrder + 1) : 0);
 
 	actor->Selected = pcInfo.Selected;
-
 	return actor;
 }
 

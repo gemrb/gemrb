@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIOPT.py,v 1.17 2006/01/08 12:26:59 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIOPT.py,v 1.18 2006/08/07 22:25:13 avenger_teambg Exp $
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
 # Ingame options
@@ -153,8 +153,8 @@ def OpenVideoOptionsWindow ():
 	OptDone ('VideoOptions', Window, 21)
 	OptCancel ('VideoOptions', Window, 32)
 
-	OptSlider ('Brightness', Window, 3, 'Brightness Correction', 0)
-	OptSlider ('Contrast', Window, 22, 'Gamma Correction', 0)
+	OptSlider ('Brightness', Window, 3, 'Brightness Correction', 4)
+	OptSlider ('Contrast', Window, 22, 'Gamma Correction', 1)
 
 	OptRadio ('BPP', Window, 5, 37, 'BitsPerPixel', 16)
 	OptRadio ('BPP', Window, 6, 37, 'BitsPerPixel', 24)
@@ -177,9 +177,11 @@ def DisplayHelpBPP ():
 
 def DisplayHelpBrightness ():
 	GemRB.SetText (GameOptionsWindow, HelpTextArea, 17203)
+	GemRB.SetGamma (GemRB.GetVar("Brightness Correction"),GemRB.GetVar("Gamma Correction"))
 
 def DisplayHelpContrast ():
 	GemRB.SetText (GameOptionsWindow, HelpTextArea, 17204)
+	GemRB.SetGamma (GemRB.GetVar("Brightness Correction"),GemRB.GetVar("Gamma Correction"))
 
 def DisplayHelpSoftMirrBlt ():
 	GemRB.SetText (GameOptionsWindow, HelpTextArea, 18004)

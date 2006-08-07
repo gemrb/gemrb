@@ -1,22 +1,24 @@
 2DA V1.0
 
-#table
-0 ea
-1 general
-2 race
-3 class
-4 specific
-5 gender
-6 align
-7 hp
-8 str
-9 int
-10 wis
-11 dex
-12 con
-13 chr
-
-#relation
+#stat (see ie_stats.h)
+0xea ea
+0xe9 general
+0xe7 race
+0xe8 class
+0xeb specific
+35 gender
+0xd9 align
+0 hp
+36 str
+38 int
+39 wis
+40 dex
+41 con
+42 chr
+0x100 source equals target
+0x101 source not target
+0x102 circlesize
+#relation (see diffmodes)
 0 less or equal
 1 equal
 2 less
@@ -24,12 +26,12 @@
 4 greater or equal
 5 not equal
 
-	TABLE   ID   RELATION
-0       0       0    4
-1	1       4    1
-2	1       4    5
-3       2       161  1
-4       2       161  5
+	STAT    VALUE   RELATION       COMMENT
+0       0xea    0       4	       anything
+1	0xe9    4       1              general/undead
+2	0xe9    4       5              general/not undead
+3       0xe7    161     1              race
+4       0xe7    161     5              race
 5
 6
 7

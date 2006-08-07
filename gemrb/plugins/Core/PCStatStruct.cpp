@@ -15,12 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PCStatStruct.cpp,v 1.2 2006/07/02 11:23:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PCStatStruct.cpp,v 1.3 2006/08/07 22:25:10 avenger_teambg Exp $
  *
  */
 
 #include "../../includes/win32def.h"
-
+#include "../../includes/globals.h" //for abort()
 #include "PCStatStruct.h"
 #include <string.h>
 
@@ -56,29 +56,83 @@ void PCStatsStruct::IncrementChapter()
 }
 
 //init quick weapon/item slots
-void PCStatsStruct::InitQuickSlot(unsigned int which, unsigned int state)
+void PCStatsStruct::InitQuickSlot(unsigned int which, unsigned int slot, unsigned int headerindex)
 {
 	switch(which) {
-	case ACT_QSLOT1: QuickItemSlots[0]=state; break;
-	case ACT_QSLOT2: QuickItemSlots[1]=state; break;
-	case ACT_QSLOT3: QuickItemSlots[2]=state; break;
-	case ACT_QSLOT4: QuickItemSlots[3]=state; break;
-	case ACT_QSLOT5: QuickItemSlots[4]=state; break;
+	case ACT_QSLOT1:
+		QuickItemSlots[0]=slot;
+		QuickItemHeaders[0]=headerindex;
+		break;
+	case ACT_QSLOT2:
+		QuickItemSlots[1]=slot;
+		QuickItemHeaders[1]=headerindex;
+		break;
+	case ACT_QSLOT3:
+		QuickItemSlots[2]=slot;
+		QuickItemHeaders[2]=headerindex;
+		break;
+	case ACT_QSLOT4:
+		QuickItemSlots[3]=slot;
+		QuickItemHeaders[3]=headerindex;
+		break;
+	case ACT_QSLOT5:
+		QuickItemSlots[4]=slot;
+		QuickItemHeaders[4]=headerindex;
+		break;
 	case ACT_WEAPON1:
-		QuickWeaponSlots[0]=state;
-		QuickWeaponSlots[4]=state+1;
+		QuickWeaponSlots[0]=slot;
+		QuickWeaponHeaders[0]=0;
+		QuickWeaponSlots[4]=slot+1;
+		QuickWeaponHeaders[4]=0;
 		break;
 	case ACT_WEAPON2:
-		QuickWeaponSlots[1]=state;
-		QuickWeaponSlots[5]=state+1;
+		QuickWeaponSlots[1]=slot;
+		QuickWeaponHeaders[1]=0;
+		QuickWeaponSlots[5]=slot+1;
+		QuickWeaponHeaders[5]=0;
 		break;
 	case ACT_WEAPON3:
-		QuickWeaponSlots[2]=state;
-		QuickWeaponSlots[6]=state+1;
+		QuickWeaponSlots[2]=slot;
+		QuickWeaponHeaders[2]=0;
+		QuickWeaponSlots[6]=slot+1;
+		QuickWeaponHeaders[6]=0;
 		break;
 	case ACT_WEAPON4:
-		QuickWeaponSlots[3]=state;
-		QuickWeaponSlots[7]=state+1;
+		QuickWeaponSlots[3]=slot;
+		QuickWeaponHeaders[3]=0;
+		QuickWeaponSlots[7]=slot+1;
+		QuickWeaponHeaders[7]=0;
 		break;
 	}
 }
+
+void PCStatsStruct::SetSlotIndex(unsigned int which, unsigned int headerindex)
+{
+	//this is not correct, not the slot, but a separate headerindex should be here
+	switch(which) {
+	case ACT_QSLOT1: QuickItemHeaders[0]=headerindex; return;
+	case ACT_QSLOT2: QuickItemHeaders[1]=headerindex; return;
+	case ACT_QSLOT3: QuickItemHeaders[2]=headerindex; return;
+	case ACT_QSLOT4: QuickItemHeaders[3]=headerindex; return;
+	case ACT_QSLOT5: QuickItemHeaders[4]=headerindex; return;
+	}
+	///it shouldn't reach this point
+	abort();
+}
+
+void PCStatsStruct::GetSlotAndIndex(unsigned int which, unsigned int &slot, unsigned int &headerindex)
+{
+	int idx;
+
+	switch(which) {
+	case ACT_QSLOT1: idx = 0; break;
+	case ACT_QSLOT2: idx = 1; break;
+	case ACT_QSLOT3: idx = 2; break;
+	case ACT_QSLOT4: idx = 3; break;
+	case ACT_QSLOT5: idx = 4; break;
+	default: abort();
+	}
+	slot=QuickItemSlots[idx];
+	headerindex=QuickItemHeaders[idx];
+}
+//

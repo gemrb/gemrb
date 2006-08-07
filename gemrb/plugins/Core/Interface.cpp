@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.421 2006/08/06 17:18:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.422 2006/08/07 22:25:10 avenger_teambg Exp $
  *
  */
 
@@ -814,6 +814,11 @@ void Interface::Main()
 {
 	video->CreateDisplay( Width, Height, Bpp, FullScreen );
 	video->SetDisplayTitle( GameName, GameType );
+	ieDword brightness = 10;
+	ieDword contrast = 5;
+	vars->Lookup("Brightness Correction", brightness);
+	vars->Lookup("Gamma Correction", contrast);
+	video->SetGamma( 	brightness, contrast);
 	Font* fps = GetFont( ( unsigned int ) 0 );
 	char fpsstring[_MAX_PATH];
 	Color fpscolor = {0xff,0xff,0xff,0xff}, fpsblack = {0x00,0x00,0x00,0xff};
@@ -1088,12 +1093,14 @@ int Interface::Init()
 			}
 			strncpy( fnt->ResRef, ResRef, 8 );
 			if (needpalette) {
-				Color fore = {0xff, 0xff, 0xff, 0x00};
-				Color back = {0x00, 0x00, 0x00, 0x00};
+				Color fore = {0xff, 0xff, 0xff, 0};
+				Color back = {0x00, 0x00, 0x00, 0};
 				if (!strnicmp( TooltipFont, ResRef, 8) ) {
-					fore = TooltipColor;
+					fore = back;
+					back = TooltipColor;
 				}
 				Palette* pal = CreatePalette( fore, back );
+				pal->CreateShadedAlphaChannel();
 				fnt->SetPalette(pal);
 				FreePalette( pal );
 			}
@@ -2153,7 +2160,8 @@ Palette* Interface::CreatePalette(Color color, Color back)
 			( unsigned char ) ( ( ( color.g - back.g ) * ( i ) ) / 255.0 );
 		pal->col[i].b = back.b +
 			( unsigned char ) ( ( ( color.b - back.b ) * ( i ) ) / 255.0 );
-		pal->col[i].a = 0;
+		pal->col[i].a = back.a +
+			( unsigned char ) ( ( ( color.a - back.a ) * ( i ) ) / 255.0 );
 	}
 	return pal;
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.144 2006/07/02 11:47:00 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.145 2006/08/07 22:25:12 avenger_teambg Exp $
  *
  */
 
@@ -2302,4 +2302,10 @@ void SDLVideoDriver::DrawMovieSubtitle(ieDword strRef)
 		subtitlefont->Print(subtitleregion, (unsigned char *) subtitletext, subtitlepal, IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_BOTTOM, true);
 		backBuf = temp;
 	}
+}
+// sets brightness and contrast
+// FIXME:SetGammaRamp doesn't seem to work
+void SDLVideoDriver::SetGamma(int brightness, int /*contrast*/)
+{
+  SDL_SetGamma(0.8+brightness/50.0,0.8+brightness/50.0,0.8+brightness/50.0);
 }

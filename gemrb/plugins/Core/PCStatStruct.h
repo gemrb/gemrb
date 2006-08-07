@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PCStatStruct.h,v 1.1 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PCStatStruct.h,v 1.2 2006/08/07 22:25:10 avenger_teambg Exp $
  *
  */
 
@@ -40,7 +40,9 @@
 #define GEM_EXPORT
 #endif
 
-#define MAX_QSLOTS         9
+#define MAX_QUICKITEMSLOT   5   //pst has 5
+#define MAX_QUICKWEAPONSLOT 8   //iwd2 has 4x2
+#define MAX_QSLOTS          9   //iwd2 has 9
 #define MAX_PORTRAIT_ICONS 12
 #define MAX_FAVOURITES     4
 #define SOUNDFOLDERSIZE    32+1
@@ -80,6 +82,8 @@
 #define ACT_LEFT 32
 #define ACT_RIGHT 33
 
+#define MAX_ACT_COUNT 34 //update this
+
 class GEM_EXPORT PCStatsStruct {
 public:
 	ieStrRef  BestKilledName;
@@ -98,14 +102,18 @@ public:
 	ieResRef  SoundSet;
 	char      SoundFolder[SOUNDFOLDERSIZE];
 	ieResRef  QuickSpells[MAX_QSLOTS];     //iwd2 uses 9, others use only 3
-	ieWord    QuickWeaponSlots[8];         //iwd2 uses 8, others use only 4
-	ieWord    QuickItemSlots[5];           //pst has 5, others use only 3
+	ieWord    QuickWeaponSlots[MAX_QUICKWEAPONSLOT]; //iwd2 uses 8, others use only 4
+	ieWord    QuickWeaponHeaders[MAX_QUICKWEAPONSLOT];
+	ieWord    QuickItemSlots[MAX_QUICKITEMSLOT];           //pst has 5, others use only 3
+	ieWord    QuickItemHeaders[MAX_QUICKWEAPONSLOT];
 	ieByte    QSlots[MAX_QSLOTS];          //iwd2 specific
 	ieByte    QuickSpellClass[MAX_QSLOTS];
 	ieWord    PortraitIcons[MAX_PORTRAIT_ICONS];
 public:
 	PCStatsStruct();
 	void IncrementChapter();
-	void InitQuickSlot(unsigned int slot, unsigned int state);
+	void InitQuickSlot(unsigned int which, unsigned int slot, unsigned int headerindex);
+	void SetSlotIndex(unsigned int which, unsigned int headerindex);
+	void GetSlotAndIndex(unsigned int which, unsigned int &slot, unsigned int &headerindex);
 };
 #endif

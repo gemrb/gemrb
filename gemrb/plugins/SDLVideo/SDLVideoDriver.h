@@ -8,14 +8,14 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.66 2006/07/02 11:47:00 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.67 2006/08/07 22:25:12 avenger_teambg Exp $
  *
  */
 
@@ -73,8 +73,7 @@ public:
 	Sprite2D* CreateSprite8(int w, int h, int bpp, void* pixels,
 		void* palette, bool cK = false, int index = 0);
 	Sprite2D* CreateSpriteBAM8(int w, int h, bool RLE, void* pixeldata,
-							   unsigned int datasize,
-							   Palette* palette, int transindex);
+		unsigned int datasize, Palette* palette, int transindex);
 	void FreeSprite(Sprite2D* spr);
 	void BlitSprite(Sprite2D* spr, int x, int y, bool anchor = false,
 		Region* clip = NULL);
@@ -83,9 +82,9 @@ public:
 	void BlitSpriteRegion(Sprite2D* spr, Region& size, int x, int y,
 		bool anchor = true, Region* clip = NULL);
 	void BlitGameSprite(Sprite2D* spr, int x, int y,
-						unsigned int flags, Color tint,
-						SpriteCover* cover, Palette *palette = NULL,
-						Region* clip = NULL);
+		unsigned int flags, Color tint,
+		SpriteCover* cover, Palette *palette = NULL,
+		Region* clip = NULL);
 	void SetCursor(Sprite2D* up, Sprite2D* down);
 	void SetDragCursor(Sprite2D* drag);
 	Sprite2D* GetScreenshot( Region r );
@@ -149,6 +148,7 @@ public:
 	Color SpriteGetPixelSum (Sprite2D* sprite, unsigned short xbase, unsigned short ybase, unsigned int ratio);
 	bool IsSpritePixelTransparent (Sprite2D* sprite, unsigned short x, unsigned short y);
 	Sprite2D* SpriteScaleDown( Sprite2D* sprite, unsigned int ratio );
+	void SetGamma(int brightness, int contrast);
 	void release(void)
 	{
 		delete this;
