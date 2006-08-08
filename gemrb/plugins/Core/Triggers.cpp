@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.52 2006/08/05 17:47:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.53 2006/08/08 19:58:46 avenger_teambg Exp $
  *
  */
 
@@ -3355,6 +3355,7 @@ int GameScript::PartyRested(Scriptable* /*Sender*/, Trigger* /*parameters*/)
 {
 	Game *game = core->GetGame();
 	if (game->GetInternalFlag()&IF_PARTYRESTED) {
+		game->SetBitTrigger(BT_PARTYRESTED);
 		return 1;
 	}
 	return 0;
