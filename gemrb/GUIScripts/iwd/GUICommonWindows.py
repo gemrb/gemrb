@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUICommonWindows.py,v 1.17 2006/08/04 22:41:11 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUICommonWindows.py,v 1.18 2006/08/08 20:25:44 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -115,7 +115,8 @@ def AIPress ():
 		GemRB.SetTooltip (PortraitWindow, Button, 15918)
 
 def RestPress ():
-	print "RestPress"
+	GemRB.RestParty(0,0,0)
+	return
 
 def EmptyControls ():
 	global ActionsWindow

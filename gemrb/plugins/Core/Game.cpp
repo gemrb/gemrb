@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.122 2006/08/07 22:25:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.123 2006/08/08 20:25:45 avenger_teambg Exp $
  *
  */
 
@@ -55,18 +55,30 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	event_handler[0] = 0;
 	memset( script_timers,0, sizeof(script_timers));
 
+  //loading master areas
 	int mtab = core->LoadTable("mastarea");
-	if (mtab) {
-		TableMgr *table = core->GetTable(mtab);
+	TableMgr *table = core->GetTable(mtab);
+	if (table) {
 		int i = table->GetRowCount();
+    mastarea.reserve(i);
 		while(i--) {
 			char *tmp = (char *) malloc(9);
-			strncpy (tmp,table->QueryField(i,0),8);
-			tmp[8]=0;
+			strnuprcpy (tmp,table->QueryField(i,0),8);
 			mastarea.push_back( tmp );
 		}
+  	core->DelTable(mtab);
 	}
-	core->DelTable(mtab);
+
+  //loading rest movies (only bg2 has them)
+  memset(restmovies,'*',sizeof(restmovies));
+  mtab = core->LoadTable("restmov");
+	table = core->GetTable(mtab);
+  if (table) {
+    for(int i=0;i<8;i++) {
+      strnuprcpy(restmovies[i],table->QueryField(i,0),8);
+    }
+  	core->DelTable(mtab);
+  }
 	interval = 1000/AI_UPDATE_TIME;
 	//FIXME:i'm not sure in this...
 	NoInterrupt();
@@ -236,7 +248,7 @@ int Game::DelNPC(unsigned int slot, bool autoFree)
 //i'm sure this could be faster
 void Game::ConsolidateParty()
 {
-	int max = PCs.size();
+	int max = (int) PCs.size();
 	std::vector< Actor*>::const_iterator m;
 	for (int i=1;i<=max;) {
 		if (FindPlayer(i)==-1) {
@@ -337,7 +349,7 @@ int Game::GetPartySize(bool onlyalive) const
 		}
 		return count;
 	}
-	return PCs.size();
+	return (int) PCs.size();
 }
 
 /* sends the hotkey trigger to all selected actors */
@@ -458,7 +470,7 @@ int Game::GetPartyLevel(bool onlyalive) const
 // Returns map structure (ARE) if it is already loaded in memory
 int Game::FindMap(const char *ResRef)
 {
-	int index = Maps.size();
+	int index = (int) Maps.size();
 	while (index--) {
 		Map *map=Maps[index];
 		if (strnicmp(ResRef, map->GetScriptName(), 8) == 0) {
@@ -495,7 +507,7 @@ Map *Game::GetMap(const char *areaname, bool change)
 
 bool Game::MasterArea(const char *area)
 {
-	int i=mastarea.size();
+	unsigned int i=(int) mastarea.size();
 	while(i--) {
 		if (strnicmp(mastarea[i], area, 8) ) {
 			return true;
@@ -514,7 +526,7 @@ void Game::SetMasterArea(const char *area)
 
 int Game::AddMap(Map* map)
 {
-	unsigned int i = Maps.size();
+	unsigned int i = (unsigned int) Maps.size();
 	if (MasterArea(map->GetScriptName()) ) {
 		//no push_front, we do this ugly hack
 		Maps.push_back(NULL);
@@ -630,7 +642,7 @@ int Game::AddNPC(Actor* npc)
 	npc->SetPersistent(0);
 	NPCs.push_back( npc );
 
-	return NPCs.size() - 1;
+	return (int) NPCs.size() - 1;
 }
 
 Actor* Game::GetNPC(unsigned int Index)
@@ -652,11 +664,11 @@ void Game::DeleteJournalEntry(ieStrRef strref)
 	}
 }
 
-void Game::DeleteJournalGroup(ieByte Group)
+void Game::DeleteJournalGroup(int Group)
 {
 	size_t i=Journals.size();
 	while(i--) {
-		if (Journals[i]->Group==Group) {
+		if (Journals[i]->Group==(ieByte) Group) {
 			delete Journals[i];
 			Journals.erase(Journals.begin()+i);
 		}
@@ -671,13 +683,13 @@ bool Game::AddJournalEntry(ieStrRef strref, int Section, int Group)
 		if (je->Section==Section) {
 			return false;
 		}
-		if (Section == IE_GAM_QUEST_DONE && Group) {
+		if ((Section == IE_GAM_QUEST_DONE) && Group) {
 			//removing all of this group and adding a new entry
 			DeleteJournalGroup(Group);
 		} else {
 			//modifying existing entry
-			je->Section = Section;
-			je->Group = Group;
+			je->Section = (ieByte) Section;
+			je->Group = (ieByte) Group;
 			ieDword chapter = 0;
 			locals->Lookup("CHAPTER", chapter);
 			je->Chapter = (ieByte) chapter;
@@ -690,8 +702,8 @@ bool Game::AddJournalEntry(ieStrRef strref, int Section, int Group)
 	ieDword chapter = 0;
 	locals->Lookup("CHAPTER", chapter);
 	je->Chapter = (ieByte) chapter;
-	je->Section = Section;
-	je->Group = Group;
+	je->Section = (ieByte) Section;
+	je->Group = (ieByte) Group;
 	je->Text = strref;
 
 	Journals.push_back( je );
@@ -703,14 +715,14 @@ void Game::AddJournalEntry(GAMJournalEntry* entry)
 	Journals.push_back( entry );
 }
 
-int Game::GetJournalCount() const
+unsigned int Game::GetJournalCount() const
 {
-	return Journals.size();
+	return (unsigned int) Journals.size();
 }
 
 GAMJournalEntry* Game::FindJournalEntry(ieStrRef strref)
 {
-	unsigned int Index = Journals.size();
+	unsigned int Index = (unsigned int) Journals.size();
 	while(Index--) {
 		GAMJournalEntry *ret = Journals[Index];
 
@@ -985,7 +997,7 @@ void Game::UpdateScripts()
 		AnotherArea[0]=0;
 
 		while (idx--) {
-			DelMap( idx, false );
+			DelMap( (unsigned int) idx, false );
 		}
 	}
 
@@ -1035,20 +1047,88 @@ void Game::SetPartySize(int size)
 }
 
 //noareacheck = no random encounters
-void Game::RestParty(bool noareacheck)
+//dream = 0 - no dream non-0 - select from list
+//-1 dream based on area
+//hp is how much hp the rest will heal
+void Game::RestParty(int checks, int dream, int hp)
 {
-	Point p = GetPC(0,false)->Pos;
-	Map *area = GetCurrentArea();
-	//we let them rest if someone is paralyzed, but the others gather around
-	if (!EveryoneNearPoint( area, p, 0 ) ) {
-		//party too scattered
-		core->DisplayConstantString( STR_SCATTERED, 0xff0000 );
+	if (!(checks&REST_NOMOVE) ) {
+		if (!EveryoneStopped()) {
+			return;
+		}
+	}
+	Actor *leader = GetPC(0, true);
+	if (!leader) {
 		return;
 	}
+
+	Map *area = leader->GetCurrentArea();
+	//we let them rest if someone is paralyzed, but the others gather around
+	if (!(checks&REST_NOSCATTER) ) {
+		if (!EveryoneNearPoint( area, leader->Pos, 0 ) ) {
+			//party too scattered
+			core->DisplayConstantString( STR_SCATTERED, 0xff0000 );
+			return;
+		}
+	}
+
+  if (!(checks&REST_NOCRITTER) ) {
+    //don't allow resting while in combat
+    if (CombatCounter) {
+			core->DisplayConstantString( STR_CANTRESTMONS, 0xff0000 );
+			return;
+    }
+    //don't allow resting if hostiles are nearby
+    if (area->AnyEnemyNearPoint(leader->Pos)) {
+			core->DisplayConstantString( STR_CANTRESTMONS, 0xff0000 );
+			return;
+    }
+  }
+
 	//rest check, if PartyRested should be set, area should return true
 	//area should advance gametime too (so partial rest is possible)
-	if (noareacheck || area->Rest( p, 8, GameTime%7200/3600) ) {
-		InternalFlags |= IF_PARTYRESTED;
+	if (!(checks&REST_NOAREA) ) {
+    //you cannot rest here
+    if (area->AreaFlags&1) {
+			core->DisplayConstantString( STR_MAYNOTREST, 0xff0000 );
+			return;
+    }
+    //you may not rest here, find an inn
+    if (!(area->AreaType&(AT_OUTDOOR|AT_FOREST|AT_DUNGEON|AT_CAN_REST) ))
+    {
+      core->DisplayConstantString( STR_MAYNOTREST, 0xff0000 );
+      return;
+    }
+    //area encounters
+    if(area->Rest( leader->Pos, 8, GameTime%7200/3600) ) {
+		  return;
+    }
+	}
+	AdvanceTime(2400);
+
+	//movie
+	if (dream>=0) {
+		//select dream based on area
+    if (dream==0 || dream>7) {
+      dream = (area->AreaType&(AT_FOREST|AT_CITY|AT_DUNGEON))>>3;
+    }
+    if (restmovies[dream][0]!='*') {
+      core->PlayMovie(restmovies[dream]);
+    }
+	}
+	//play dream (rest movie)
+	InternalFlags |= IF_PARTYRESTED;
+	int i = GetPartySize(false);
+	
+	while (i--) {
+		Actor *tar = GetPC(i, false);
+		tar->ClearPath();
+		tar->ClearActions();
+		tar->SetModal(0);
+		//if hp = 0, then healing will be complete
+		tar->Heal(hp);
+		//removes fatigue, recharges spells
+		tar->Rest(0);
 	}
 }
 

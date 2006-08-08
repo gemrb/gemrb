@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.116 2006/07/23 21:08:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.117 2006/08/08 20:25:46 avenger_teambg Exp $
  *
  */
 
@@ -275,6 +275,8 @@ public:
 	void ActivateWallgroups(unsigned int baseindex, unsigned int count, int flg);
 	void Shout(Actor* actor, int shoutID, unsigned int radius);
 	void AddActor(Actor* actor);
+	//returns true if an enemy is near P (used in resting/saving)
+	bool AnyEnemyNearPoint(Point &p);
 	int GetBlocked(unsigned int x, unsigned int y);
 	int GetBlocked(Point &p);
 	Actor* GetActorByGlobalID(ieDword objectID);

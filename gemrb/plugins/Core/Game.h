@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.83 2006/08/07 22:25:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.84 2006/08/08 20:25:45 avenger_teambg Exp $
  *
  */
 
@@ -93,6 +93,11 @@ class Game;
 #define WB_LIGHTNING 8
 #define WB_START     0x80
 
+//Rest flags
+#define REST_NOAREA     1 //no area check
+#define REST_NOSCATTER  2 //no scatter check
+#define REST_NOMOVE     4 //no movement check
+#define REST_NOCRITTER  8 //no hostiles check
 /**
  * @struct PCStruct
  * Information about party member.
@@ -159,6 +164,7 @@ private:
 	std::vector< GAMJournalEntry*> Journals;
 	std::vector< char*> mastarea;
 	std::vector< ieDword> Attackers;
+  ieResRef restmovies[8];
 	int MapIndex;
 public:
 	std::vector< Actor*> selected;
@@ -264,14 +270,14 @@ public:
 
 	//journal entries
 	void DeleteJournalEntry(ieStrRef strref);
-	void DeleteJournalGroup(ieByte Group);
+	void DeleteJournalGroup(int Group);
 	/** Adds a journal entry from dialog data.
 	 * Time and chapter are calculated on the fly
 	 * Returns false if the entry already exists */
 	bool AddJournalEntry(ieStrRef strref, int section, int group);
 	/** Adds a journal entry while loading the .gam structure */
 	void AddJournalEntry(GAMJournalEntry* entry);
-	int GetJournalCount() const;
+	unsigned int GetJournalCount() const;
 	GAMJournalEntry* FindJournalEntry(ieStrRef strref);
 	GAMJournalEntry* GetJournalEntry(unsigned int Index);
 
@@ -334,7 +340,7 @@ public:
 	  areas run scripts on door, infopoint, container, actors too */
 	void UpdateScripts();
 	/** runs area functionality, sets partyrested trigger */
-	void RestParty(bool noareacheck);
+	void RestParty(int checks, int dream, int hp);
 	/** timestop effect initiated by actor */
 	void TimeStop(Actor *actor, ieDword end);
 	/** gets the colour which should be applied over the game area,

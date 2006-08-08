@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.78 2006/08/05 18:12:53 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.79 2006/08/08 20:25:45 avenger_teambg Exp $
  *
  */
 
@@ -3889,40 +3889,14 @@ void GameScript::DayNight(Scriptable* /*Sender*/, Action* parameters)
 }
 
 //implement pst style parameters:
-//suggested dream, hp, renting?
+//suggested dream - unused
 //if suggested dream is 0, then area flags determine the 'movie'
+//hp - number of hps healed
+//renting - crashes pst, we simply ignore it
 void GameScript::RestParty(Scriptable* Sender, Action* parameters)
 {
 	Game *game = core->GetGame();
-
-	if (!game->EveryoneStopped()) {
-		//
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-	//there must be someone alive, or we'll have a crash
-	Actor *leader = game->GetPC(0, true);
-	if (!game->EveryoneNearPoint(leader->GetCurrentArea(), leader->Pos, 0)) {
-		//
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-
-	game->AdvanceTime(2400); //8 hours
-	//HP set to 1 means HP will be recovered
-	int i = game->GetPartySize(false);
-	while (i--) {
-		Actor *tar = game->GetPC(i, false);
-		tar->ClearPath();
-		tar->ClearActions();
-		tar->SetModal(0);
-		if (parameters->int1Parameter) {
-			//renting could be 0,1,2,3 (the quality of resting)
-			tar->Heal(parameters->int2Parameter+1);
-		}
-		//removes fatigue, recharges spells
-		tar->Rest(0);
-	}
+	game->RestParty(REST_NOAREA|REST_NOMOVE|REST_NOCRITTER, parameters->int0Parameter, parameters->int1Parameter);
 	Sender->ReleaseCurrentAction();
 }
 
@@ -4723,5 +4697,38 @@ void GameScript::SetInterrupt(Scriptable* Sender, Action* parameters)
 		Sender->Interrupt();
 	} else {
 		Sender->NoInterrupt();
+	}
+}
+
+void GameScript::SelectWeaponAbility(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *scr = (Actor *) Sender;
+	int slot = parameters->int0Parameter;
+	int wslot = scr->inventory.GetWeaponSlot();
+	//weapon
+	if (core->QuerySlotType(slot)&SLOT_WEAPON) {
+		slot-=wslot;
+		if (slot<0 || slot>=MAX_QUICKWEAPONSLOT) {
+			return;
+		}
+		scr->SetEquippedQuickSlot(slot);
+		if (scr->PCStats) {
+			scr->PCStats->QuickWeaponHeaders[slot]=parameters->int1Parameter;
+		}
+		return;
+	}
+	//quick item
+	wslot = scr->inventory.GetQuickSlot();
+	if (core->QuerySlotType(slot)&SLOT_ITEM) {
+		slot-=wslot;
+		if (slot<0 || slot>=MAX_QUICKITEMSLOT) {
+			return;
+		}
+		if (scr->PCStats) {
+			scr->PCStats->QuickItemHeaders[slot-wslot]=parameters->int1Parameter;
+		}
 	}
 }

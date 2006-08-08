@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.204 2006/08/07 22:25:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.205 2006/08/08 20:25:45 avenger_teambg Exp $
  *
  */
 
@@ -29,7 +29,7 @@
 #include "Spell.h"
 #include "Game.h"
 #include "GameScript.h"
-#include "GSUtils.h"    //needed for DisplayStringCore
+#include "GSUtils.h" //needed for DisplayStringCore
 #include "Video.h"
 #include <cassert>
 #include "damages.h"
@@ -72,10 +72,10 @@ static char iwd2gemrb[32]={
 	0,0,0,0,0,0,0,0
 };
 static char gemrb2iwd[32]={
-	11,12,3,71,72,73,0,0,  //0
-	14,80,83,82,81,10,7,8,  //8
-	0,0,0,0,2,15,4,9,  //16
-	13,5,0,0,0,0,0,0   //24
+	11,12,3,71,72,73,0,0, //0
+	14,80,83,82,81,10,7,8, //8
+	0,0,0,0,2,15,4,9, //16
+	13,5,0,0,0,0,0,0  //24
 };
 
 //letters for char sound resolution bg1/bg2
@@ -98,7 +98,7 @@ static ieResRef d_main[DAMAGE_LEVELS]={
 };
 static ieResRef d_splash[DAMAGE_LEVELS]={
 	"","","","",
-	"SPBURN","SPBURN","SPBURN",   //flames
+	"SPBURN","SPBURN","SPBURN", //flames
 	"SPSPARKS","SPSPARKS","SPSPARKS", //sparks
 	"","","",
 };
@@ -1273,8 +1273,8 @@ void Actor::Resurrect()
 	if (!(Modified[IE_STATE_ID ] & STATE_DEAD)) {
 		return;
 	}
-	InternalFlags&=IF_FROMGAME;		 //keep these flags (what about IF_INITIALIZED)
-	InternalFlags|=IF_ACTIVE|IF_VISIBLE;  //set these flags  
+	InternalFlags&=IF_FROMGAME; //keep these flags (what about IF_INITIALIZED)
+	InternalFlags|=IF_ACTIVE|IF_VISIBLE; //set these flags  
 	SetBase(IE_STATE_ID, 0);
 	SetBase(IE_HITPOINTS, BaseStats[IE_MAXHITPOINTS]);
 	ClearActions();
@@ -1712,6 +1712,12 @@ void Actor::StopAttack()
 void Actor::InitRound(ieDword gameTime, bool secondround)
 {
 	attackcount = 0;
+
+	if (InternalFlags&IF_STOPATTACK) {
+		core->GetGame()->OutAttack(GetID());
+		return;
+	}
+
 	if (!LastTarget) {
 		StopAttack();
 		return;
@@ -1728,6 +1734,7 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 	if (GetStat(IE_HELD)) {
 		return;
 	}
+
 	SetStance(IE_ANI_ATTACK);
 	//last chance to disable attacking
 	//

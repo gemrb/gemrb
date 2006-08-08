@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.422 2006/08/07 22:25:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.423 2006/08/08 20:25:46 avenger_teambg Exp $
  *
  */
 
@@ -1425,15 +1425,6 @@ int Interface::Init()
 
 	printMessage( "Core", "Initializing Inventory Management...\n", WHITE );
 	ret = InitItemTypes();
-	if (ret) {
-		printStatus( "OK", LIGHT_GREEN );
-	}
-	else {
-		printStatus( "ERROR", LIGHT_RED );
-	}
-
-	printMessage( "Core", "Initializing Spellbook Management...\n", WHITE );
-	ret = Spellbook::InitializeSpellbook();
 	if (ret) {
 		printStatus( "OK", LIGHT_GREEN );
 	}
@@ -3785,6 +3776,17 @@ void Interface::DisplayConstantString(int stridx, unsigned int color)
 	int newlen = (int)(strlen( DisplayFormat ) + strlen( text ) + 12);
 	char* newstr = ( char* ) malloc( newlen );
 	snprintf( newstr, newlen, DisplayFormat, color, text );
+	FreeString( text );
+	DisplayString( newstr );
+	free( newstr );
+}
+
+void Interface::DisplayString(int stridx, unsigned int color, ieDword flags)
+{
+	char* text = GetString( stridx, flags);
+	int newlen = (int)(strlen( DisplayFormat) + strlen( text ) + 10);
+	char* newstr = ( char* ) malloc( newlen );
+	sprintf( newstr, DisplayFormat, color, text );
 	FreeString( text );
 	DisplayString( newstr );
 	free( newstr );

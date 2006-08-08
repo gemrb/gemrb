@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.37 2006/07/19 17:44:10 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.38 2006/08/08 20:25:45 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -137,7 +137,7 @@ def SetupMenuWindowControls (Window):
 	# Rest
 	Button = GemRB.GetControl (Window, 9)
 	GemRB.SetTooltip (Window, Button, 41628)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "DoRest")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "RestPress")
 
 
 	# AI
@@ -166,7 +166,8 @@ def TxtePress ():
 	print "TxtePress"
 
 def RestPress ():
-	print "RestPress"
+	GemRB.RestParty(0,0,0)
+	return
 
 def SetupActionsWindowControls (Window):
 	# time button

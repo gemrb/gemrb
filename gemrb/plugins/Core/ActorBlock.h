@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.112 2006/08/07 22:25:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.113 2006/08/08 20:25:45 avenger_teambg Exp $
  *
  */
 
@@ -107,13 +107,15 @@ class Gem_Polygon;
 #define IF_INITIALIZED  0x200
 #define IF_USEDSAVE     0x400 //actor needed saving throws
 #define IF_TARGETGONE   0x800 //actor's target is gone (trigger event)
-
 //scriptable flags
 #define IF_ACTIVE        0x1000
 #define IF_CUTSCENEID    0x2000
 #define IF_VISIBLE       0x4000
 #define IF_ONCREATION    0x8000
 #define IF_IDLE          0x10000
+//the actor should stop attacking
+#define IF_STOPATTACK (IF_JUSTDIED|IF_REALLYDIED|IF_CLEANUP|IF_IDLE)
+
 
 //CheckTravel return value
 #define CT_CANTMOVE       0 //inactive

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.253 2006/08/05 17:47:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.254 2006/08/08 20:25:46 avenger_teambg Exp $
  *
  */
 
@@ -1199,6 +1199,7 @@ public:
 	static void SaveLocation(Scriptable* Sender, Action* parameters);
 	static void SaveObjectLocation(Scriptable* Sender, Action* parameters);
 	static void ScreenShake(Scriptable* Sender, Action* parameters);
+	static void SelectWeaponAbility(Scriptable* Sender, Action* parameters);
 	static void SetAnimState(Scriptable* Sender, Action* parameters);
 	static void SetApparentName(Scriptable* Sender, Action* parameters);
 	static void SetAreaFlags(Scriptable* Sender, Action* parameters);

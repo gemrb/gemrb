@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.371 2006/08/05 17:47:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.372 2006/08/08 20:25:45 avenger_teambg Exp $
  *
  */
 
@@ -653,6 +653,7 @@ static ActionLink actionnames[] = {
 	{"saveplace", GameScript::SaveLocation, 0},
 	{"saveobjectlocation", GameScript::SaveObjectLocation, 0},
 	{"screenshake", GameScript::ScreenShake,AF_BLOCKING},
+	{"selectweaponability", GameScript::SelectWeaponAbility, 0},
 	{"setanimstate", GameScript::PlaySequence, 0},//pst
 	{"setapparentnamestrref", GameScript::SetApparentName, 0},
 	{"setareaflags", GameScript::SetAreaFlags, 0},

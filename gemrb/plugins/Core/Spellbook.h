@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.20 2006/08/04 21:42:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.21 2006/08/08 20:25:46 avenger_teambg Exp $
  *
  */
 
@@ -73,6 +73,8 @@ typedef enum ieSpellType {
 	IE_SPELL_TYPE_INNATE = 2
 } ieSpellType;
 
+#define NUM_SPELLTYPES 3
+
 typedef enum ieIWD2SpellType {
 	IE_IWD2_SPELL_BARD = 0,
 	IE_IWD2_SPELL_CLERIC = 1,
@@ -86,6 +88,8 @@ typedef enum ieIWD2SpellType {
 	IE_IWD2_SPELL_SONG = 9,
 	IE_IWD2_SPELL_SHAPE = 10
 } ieIWD2SPellType;
+
+#define NUM_IWD2_SPELLTYPES 11
 
 typedef struct {
 	ieResRef SpellResRef;
@@ -138,7 +142,7 @@ private:
 public: 
 	Spellbook();
 	~Spellbook();
-	static bool InitializeSpellbook();
+	static void InitializeSpellbook();
 	static void ReleaseMemory();
 
 	void FreeSpellPage(CRESpellMemorization* sm);
@@ -148,6 +152,7 @@ public:
 
 	bool AddSpellMemorization(CRESpellMemorization* sm);
 	int GetTypes() const;
+	bool IsIWDSpellBook() const;
 	unsigned int GetSpellLevelCount(int type) const;
 	unsigned int GetTotalPageCount() const;
 	unsigned int GetTotalKnownSpellsCount() const;

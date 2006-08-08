@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.41 2006/08/07 22:25:13 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUICommonWindows.py,v 1.42 2006/08/08 20:25:45 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -26,6 +26,7 @@
 import GemRB
 from GUIDefines import *
 from ie_stats import *
+from ie_modal import *
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
@@ -107,6 +108,7 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 
 	# Rest
 	Button = GemRB.GetControl (Window, rb)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "RestPress")
 	GemRB.SetTooltip (Window, Button, 11942)
 
 
@@ -115,7 +117,7 @@ def AIPress ():
 	return
 
 def RestPress ():
-	print "RestPress"
+	GemRB.RestParty(0,0,0)
 	return
 
 def EmptyControls ():
@@ -323,6 +325,30 @@ def ActionRightPressed ():
 	UpdateActionsWindow ()
 	return
 
+def ActionSongPressed ():
+	pc = GemRB.GameGetFirstSelectedPC()
+	GemRB.SetModalState (pc, MS_BATTLESONG)
+	UpdateActionsWindow ()
+	return
+
+def ActionSearchPressed ():
+	pc = GemRB.GameGetFirstSelectedPC()
+	GemRB.SetModalState (pc, MS_DETECTTRAPS)
+	UpdateActionsWindow ()
+	return
+
+def ActionStealthPressed ():
+	pc = GemRB.GameGetFirstSelectedPC()
+	GemRB.SetModalState (pc, MS_STEALTH)
+	UpdateActionsWindow ()
+	return
+	
+def ActionTurnPressed ():
+	pc = GemRB.GameGetFirstSelectedPC()
+	GemRB.SetModalState (pc, MS_TURNUNDEAD)
+	UpdateActionsWindow ()
+	return
+	
 def ActionUseItemPressed ():
 	GemRB.SetVar ("TopIndex", 0)
 	GemRB.SetVar ("ActionLevel", 1)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.246 2006/07/23 21:08:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.247 2006/08/08 20:25:46 avenger_teambg Exp $
  *
  */
 
@@ -951,18 +951,41 @@ void Map::Shout(Actor* actor, int shoutID, unsigned int radius)
 {
 	int i=actors.size();
 	while (i--) {
+		Actor *listener = actors[i];
+
 		if (radius) {
-			if (Distance(actor->Pos, actors[i]->Pos)>radius) {
+			if (Distance(actor->Pos, listener->Pos)>radius) {
 				continue;
 			}
 		}
 		if (shoutID) {
-			actors[i]->LastHeard = actor->GetID();
-			actors[i]->LastShout = shoutID;
+			listener->LastHeard = actor->GetID();
+			listener->LastShout = shoutID;
 		} else {
-			actors[i]->LastHelp = actor->GetID();
+			listener->LastHelp = actor->GetID();
 		}
 	}
+}
+
+bool Map::AnyEnemyNearPoint(Point &p)
+{
+	ieDword gametime = core->GetGame()->GameTime;
+	unsigned int i = actors.size();
+	while (i--) {
+		Actor *actor = actors[i];
+
+		if (actor->Schedule(gametime) ) {
+			continue;
+		}
+		if (Distance(actor->Pos, p) > 400) {
+			continue;
+		}
+		if (actor->GetStat(IE_EA)<EA_EVILCUTOFF) {
+			continue;
+		}
+		return true;
+	}
+	return false;
 }
 
 void Map::AddActor(Actor* actor)
@@ -1661,7 +1684,6 @@ PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, int flags)
 	PathNode* StartNode = new PathNode;
 	PathNode* Return = StartNode;
 	StartNode->Next = NULL;
-	StartNode->Parent = NULL;
 	StartNode->x = best.x;
 	StartNode->y = best.y;
 	if (flags) {
@@ -1698,6 +1720,7 @@ PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, int flags)
 		}
 		p = n;
 	}
+	Return->Parent = NULL;
 	return Return;
 }
 
@@ -2074,7 +2097,7 @@ bool Map::Rest(Point &pos, int hours, int day)
 	for (int i=0;i<hours;i++) {
 		if ( rand()%100<chance ) {
 			int idx = rand()%RestHeader.CreatureNum;
-			core->DisplayConstantString( RestHeader.Strref[idx], 0x00404000 );
+			core->DisplayString( RestHeader.Strref[idx], 0x00404000, IE_STR_SOUND );
 			SpawnCreature(pos, RestHeader.CreResRef[idx], 20 );
 			return true;
 		}

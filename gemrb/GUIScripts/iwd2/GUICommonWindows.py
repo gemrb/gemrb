@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUICommonWindows.py,v 1.15 2006/06/29 06:56:45 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUICommonWindows.py,v 1.16 2006/08/08 20:25:45 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -92,7 +92,7 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 		# Rest
 		Button = GemRB.GetControl (Window, 12)
 		GemRB.SetTooltip (Window, Button, 11942)
-		GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "RestPressed")
+		GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "RestPress")
 
 		# Character Arbitration
 		Button = GemRB.GetControl (Window, 13)
@@ -105,7 +105,7 @@ def AIPress ():
 	return
 
 def RestPress ():
-	print "RestPress"
+	GemRB.RestParty(0,0,0)
 	return
 
 def EmptyControls ():

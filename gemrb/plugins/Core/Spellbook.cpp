@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.39 2006/08/07 22:25:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.40 2006/08/08 20:25:46 avenger_teambg Exp $
  *
  */
 
@@ -32,6 +32,7 @@ static ieResRef *shapelist = NULL;
 
 static bool SBInitialized = false;
 static int NUM_SPELL_TYPES = 3;
+static bool IWD2Style = false;
 /* temporarily out
 static ieResRef *ResolveSpellName(ieDword index)
 {
@@ -84,15 +85,12 @@ static ieResRef *GetSpellTable(const ieResRef tableresref, int column)
 Spellbook::Spellbook()
 {
 	if (!SBInitialized) {
-		printMessage("Spellbook","Spellbook is not initialized, assuming BG2", LIGHT_RED);
-		NUM_SPELL_TYPES = 3;
-		SBInitialized = true;
+		InitializeSpellbook();
 	}
 	spells = new std::vector<CRESpellMemorization*> [NUM_SPELL_TYPES];
 }
 
-
-bool Spellbook::InitializeSpellbook()
+void Spellbook::InitializeSpellbook()
 {
 	if (!SBInitialized) {
 		SBInitialized=true;
@@ -101,11 +99,12 @@ bool Spellbook::InitializeSpellbook()
 			innatelist = GetSpellTable("listinnt",0);
 			songlist = GetSpellTable("listsong",0);
 			shapelist = GetSpellTable("listshap",0);
-			NUM_SPELL_TYPES=10; //iwd spell types
+			NUM_SPELL_TYPES=NUM_IWD2_SPELLTYPES; //iwd2 spell types
+		} else {
+			NUM_SPELL_TYPES=NUM_SPELLTYPES; //bg/pst/iwd1 spell types
 		}
-		return true;
 	}
-	return false;
+	return;
 }
 
 void Spellbook::ReleaseMemory()
@@ -208,6 +207,11 @@ bool Spellbook::HaveSpell(const char *resref, ieDword flags)
 int Spellbook::GetTypes() const
 {
 	return NUM_SPELL_TYPES;
+}
+
+bool Spellbook::IsIWDSpellBook() const
+{
+	return IWD2Style;
 }
 
 unsigned int Spellbook::GetSpellLevelCount(int type) const
@@ -514,6 +518,7 @@ bool Spellbook::DepleteSpell(CREMemorizedSpell* spl)
 }
 
 /* returns true if there are more item usages not fitting in given array */
+/* FIXME: it should first build up a list and then return a subset */
 bool Spellbook::GetSpellInfo(SpellExtHeader *array, int type, int startindex, int count)
 {
 	int pos = 0;

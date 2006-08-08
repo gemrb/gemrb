@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.406 2006/08/07 22:25:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.407 2006/08/08 20:25:47 avenger_teambg Exp $
  *
  */
 
@@ -3564,7 +3564,7 @@ static PyObject* GemRB_GetJournalSize(PyObject * /*self*/, PyObject * args)
 	}
 
 	int count = 0;
-	for (int i = 0; i < core->GetGame()->GetJournalCount(); i++) {
+	for (unsigned int i = 0; i < core->GetGame()->GetJournalCount(); i++) {
 		GAMJournalEntry* je = core->GetGame()->GetJournalEntry( i );
 		//printf ("JE: sec: %d; text: %d, time: %d, chapter: %d, un09: %d, un0b: %d\n", je->Section, je->Text, je->GameTime, je->Chapter, je->unknown09, je->unknown0B);
 		if ((section == je->Section) && (chapter==je->Chapter) )
@@ -3587,7 +3587,7 @@ static PyObject* GemRB_GetJournalEntry(PyObject * /*self*/, PyObject * args)
 	}
 
 	int count = 0;
-	for (int i = 0; i < core->GetGame()->GetJournalCount(); i++) {
+	for (unsigned int i = 0; i < core->GetGame()->GetJournalCount(); i++) {
 		GAMJournalEntry* je = core->GetGame()->GetJournalEntry( i );
 		if ((section == je->Section) && (chapter == je->Chapter)) {
 			if (index == count) {
@@ -6439,19 +6439,6 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 	}
 
 	ActionButtonRow myrow;
-/*	
-	unsigned int cls = (int) actor->GetStat(IE_CLASS);
-	if (GUIAction[0]==0xcccccccc) {
-		ReadActionButtons();
-	}
-
-	if (cls >= ClassCount) {
-		memcpy(&myrow, &DefaultButtons, sizeof(ActionButtonRow));
-	} else {
-		memcpy(&myrow, GUIBTDefaults+cls, sizeof(ActionButtonRow));
-	}
-*/
-	//this function either initializes the actor's settings, or modifies myrow
 	actor->GetActionButtonRow(myrow);
 	bool fistdrawn = true;
 	ieDword magicweapon = actor->inventory.GetMagicSlot();
@@ -6478,15 +6465,38 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 
 		int state = IE_GUI_BUTTON_UNPRESSED;
 		ieDword modalstate = actor->ModalState;
+		int type;
 		switch (action) {
 		case ACT_INNATE:
-			if (!actor->spellbook.GetSpellInfo(NULL, 4, 0, 0)) {
+			if (actor->spellbook.IsIWDSpellBook()) {
+				type = 1<<IE_IWD2_SPELL_INNATE;
+			} else {
+				type = 1<<IE_SPELL_TYPE_INNATE;
+			}
+			if (!actor->spellbook.GetSpellInfo(NULL, type, 0, 0)) {
 				state = IE_GUI_BUTTON_DISABLED;
 			}
 			break;
 		case ACT_CAST:
-			//returns true if there is ANY equipment
-			if (!actor->spellbook.GetSpellInfo(NULL, 3, 0, 0)) {
+			//luckily the castable spells in IWD2 are all bits below INNATE, so we can do this trick
+			if (actor->spellbook.IsIWDSpellBook()) {
+				type = (1<<IE_IWD2_SPELL_INNATE)-1;
+			} else {
+				type = (1<<IE_SPELL_TYPE_INNATE)-1;
+			}
+			//returns true if there are ANY spells to cast
+			if (!actor->spellbook.GetSpellInfo(NULL, type, 0, 0)) {
+				state = IE_GUI_BUTTON_DISABLED;
+			}
+			break;
+		case ACT_SHAPE:
+			if (actor->spellbook.IsIWDSpellBook()) {
+				type = 1<<IE_IWD2_SPELL_SHAPE;
+			} else {
+				type = 0; //no separate shapes in old spellbook
+			}
+			//returns true if there is ANY shape
+			if (!actor->spellbook.GetSpellInfo(NULL, type, 0, 0)) {
 				state = IE_GUI_BUTTON_DISABLED;
 			}
 			break;
@@ -6497,8 +6507,15 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 			}
 			break;
 		case ACT_BARDSONG:
-			if (modalstate==MS_BATTLESONG) {
-				state = IE_GUI_BUTTON_SELECTED;
+			if (actor->spellbook.IsIWDSpellBook()) {
+				type = 1<<IE_IWD2_SPELL_SONG;
+				if (!actor->spellbook.GetSpellInfo(NULL, type, 0, 0)) {
+					state = IE_GUI_BUTTON_DISABLED;
+				}
+			} else {
+				if (modalstate==MS_BATTLESONG) {
+					state = IE_GUI_BUTTON_SELECTED;
+				}
 			}
 			break;
 		case ACT_TURN:
@@ -6853,6 +6870,27 @@ static PyObject* GemRB_SetGamma(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_RestParty__doc,
+"RestParty(noareacheck, dream, hp)\n\n"
+"Executes the party rest function, used from both stores and via the main screen.");
+
+static PyObject* GemRB_RestParty(PyObject * /*self*/, PyObject* args)
+{
+	int noareacheck;
+	int dream, hp;
+
+	if (!PyArg_ParseTuple( args, "iii", &noareacheck, &dream, &hp)) {
+		return AttributeError( GemRB_RestParty__doc );
+	}
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	game->RestParty(noareacheck, dream, hp);
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 static PyMethodDef GemRBMethods[] = {
 	METHOD(SetInfoTextColor, METH_VARARGS),
 	METHOD(HideGUI, METH_NOARGS),
@@ -7056,6 +7094,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(UseItem, METH_VARARGS),
 	METHOD(SpellCast, METH_VARARGS),
 	METHOD(SetGamma, METH_VARARGS),
+	METHOD(RestParty, METH_VARARGS),
 	// terminating entry	
 	{NULL, NULL, 0, NULL}
 };

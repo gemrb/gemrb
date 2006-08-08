@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.204 2006/08/03 21:13:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.205 2006/08/08 20:25:46 avenger_teambg Exp $
  *
  */
 
@@ -365,6 +365,8 @@ public:
 	void DisplayConstantStringName(int stridx, unsigned int color, Scriptable *speaker);
 	/** displays a string constant in the textarea, starting with actor, and ending with target */
 	void DisplayConstantStringAction(int stridx, unsigned int color, Scriptable *actor, Scriptable *target);
+  /** displays a string in the textarea */
+  void DisplayString(int stridx, unsigned int color, ieDword flags);
 	/** displays a string in the textarea, starting with speaker's name */
 	void DisplayStringName(int stridx, unsigned int color, Scriptable *speaker, ieDword flags);
 	/** returns the Window Visible Flag */
