@@ -65,15 +65,16 @@ void GoNearAndRetry(Scriptable *Sender, Scriptable *target, bool destination);
 void GoNearAndRetry(Scriptable *Sender, Point &p);
 
 #define LESS_OR_EQUALS 0
-//iwd2 diffmode
+//iwd2 diffmode with gemrb enhancements
 #define EQUALS 1
 #define LESS_THAN 2
 #define GREATER_THAN 3
 #define GREATER_OR_EQUALS 4
 #define NOT_EQUALS 5
-#define BINARY_LESS_OR_EQUALS 6    (left has only bits in right)
-#define BINARY_MORE_OR_EQUALS 7    (left has equal or more bits than right)
-#define BINARY_INTERSECT 8 (left and right has at least one common bit)
+#define BINARY_LESS_OR_EQUALS 6 //(left has only bits in right)
+#define BINARY_MORE_OR_EQUALS 7 //(left has equal or more bits than right)
+#define BINARY_INTERSECT 8      //(left and right has at least one common bit)
+#define BINARY_NOT_INTERSECT 9  //(no common bits)
 
 Targets *GetMyTarget(Scriptable *Sender, Actor *actor, Targets *parameters);
 Targets *XthNearestOf(Targets *parameters, int count);
