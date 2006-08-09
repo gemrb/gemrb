@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.254 2006/08/08 20:25:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.255 2006/08/09 19:04:34 avenger_teambg Exp $
  *
  */
 
@@ -183,6 +183,7 @@ class GEM_EXPORT Trigger {
 public:
 	Trigger()
 	{
+		flags = 0;
 		objectParameter = NULL;
 		string0Parameter[0] = 0;
 		string1Parameter[0] = 0;
@@ -652,12 +653,14 @@ public: //Script Functions
 
 	//Triggers
 	static int ActionListEmpty(Scriptable* Sender, Trigger* parameters);
+	static int ActuallyInCombat(Scriptable* Sender, Trigger* parameters);
 	static int Acquired(Scriptable* Sender, Trigger* parameters);
 	static int Alignment(Scriptable* Sender, Trigger* parameters);
 	static int Allegiance(Scriptable* Sender, Trigger* parameters);
 	static int AnimationID(Scriptable* Sender, Trigger* parameters);
 	static int AnimState(Scriptable* Sender, Trigger* parameters);
 	static int AnyPCOnMap(Scriptable* Sender, Trigger* parameters);
+	static int AnyPCSeesEnemy(Scriptable* Sender, Trigger* parameters);
 	static int AreaCheck(Scriptable* Sender, Trigger* parameter);
 	static int AreaCheckObject(Scriptable* Sender, Trigger* parameter);
 	static int AreaFlag(Scriptable* Sender, Trigger* parameter);

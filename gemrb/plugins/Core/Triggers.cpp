@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.53 2006/08/08 19:58:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.54 2006/08/09 19:04:34 avenger_teambg Exp $
  *
  */
 
@@ -1152,7 +1152,7 @@ int GameScript::NearLocation(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	if (parameters->pointParameter.isnull()) {
-		Point p(parameters->int0Parameter, parameters->int1Parameter);
+		Point p((short) parameters->int0Parameter, (short) parameters->int1Parameter);
 		int distance = PersonalDistance(p, scr);
 		if (distance <= ( parameters->int2Parameter * 10 )) {
 			return 1;
@@ -1172,7 +1172,7 @@ int GameScript::NearSavedLocation(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor *actor = (Actor *) Sender;
-	Point p( actor->GetStat(IE_SAVEDXPOS),actor->GetStat(IE_SAVEDYPOS) );
+	Point p( (short) actor->GetStat(IE_SAVEDXPOS), (short) actor->GetStat(IE_SAVEDYPOS) );
 	int distance = Distance(p, Sender);
 	if (distance <= ( parameters->int0Parameter * 10 )) {
 		return 1;
@@ -2234,24 +2234,30 @@ int GameScript::CurrentAreaIs(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
-int GameScript::EntirePartyOnMap(Scriptable* /*Sender*/, Trigger* /*parameters*/)
+int GameScript::EntirePartyOnMap(Scriptable* Sender, Trigger* /*parameters*/)
 {
+	Map *map = Sender->GetCurrentArea();
 	Game *game=core->GetGame();
-	int i=game->GetPartySize(false);
+	int i=game->GetPartySize(true);
 	while (i--) {
-		Actor *actor=game->GetPC(i,false);
-		if (strnicmp(game->CurrentArea, actor->Area, 8) ) return 0;
+		Actor *actor=game->GetPC(i,true);
+		if (actor->GetCurrentArea()!=map) {
+			return 0;
+		}
 	}
 	return 1;
 }
 
-int GameScript::AnyPCOnMap(Scriptable* /*Sender*/, Trigger* /*parameters*/)
+int GameScript::AnyPCOnMap(Scriptable* Sender, Trigger* /*parameters*/)
 {
+	Map *map = Sender->GetCurrentArea();
 	Game *game=core->GetGame();
-	int i=game->GetPartySize(false);
+	int i=game->GetPartySize(true);
 	while (i--) {
-		Actor *actor=game->GetPC(i,false);
-		if (!strnicmp(game->CurrentArea, actor->Area, 8) ) return 1;
+		Actor *actor=game->GetPC(i,true);
+		if (actor->GetCurrentArea()==map) {
+			return 1;
+		}
 	}
 	return 0;
 }
@@ -3403,3 +3409,22 @@ int GameScript::TimerActive(Scriptable* /*Sender*/, Trigger* parameters)
 	return 0;
 }
 
+int GameScript::ActuallyInCombat(Scriptable* /*Sender*/, Trigger* /*parameters*/)
+{
+	Game *game=core->GetGame();
+	if (game->AnyPCInCombat()) return 1;
+	return 0;
+}
+
+int GameScript::AnyPCSeesEnemy(Scriptable* /*Sender*/, Trigger* /*parameters*/)
+{
+	Game *game = core->GetGame();
+	unsigned int i = (unsigned int) game->GetLoadedMapCount();
+	while(i--) {
+		Map *map = game->GetMap(i);
+		if (map->AnyPCSeesEnemy()) {
+			return 1;
+		}
+	}
+	return 0;
+}

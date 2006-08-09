@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.372 2006/08/08 20:25:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.373 2006/08/09 19:04:33 avenger_teambg Exp $
  *
  */
 
@@ -37,11 +37,13 @@
 //Make this an ordered list, so we could use bsearch!
 static TriggerLink triggernames[] = {
 	{"actionlistempty", GameScript::ActionListEmpty, 0},
+	{"actuallyincombat", GameScript::ActuallyInCombat,0},
 	{"acquired", GameScript::Acquired, 0},
 	{"alignment", GameScript::Alignment, 0},
 	{"allegiance", GameScript::Allegiance, 0},
 	{"animstate", GameScript::AnimState, 0},
 	{"anypconmap", GameScript::AnyPCOnMap, 0},
+	{"anypcseesenemy", GameScript::AnyPCSeesEnemy, 0},
 	{"areacheck", GameScript::AreaCheck, 0},
 	{"areacheckobject", GameScript::AreaCheckObject, 0},
 	{"areaflag", GameScript::AreaFlag, 0},

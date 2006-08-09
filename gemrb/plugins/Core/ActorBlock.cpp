@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.152 2006/08/08 20:25:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.153 2006/08/09 19:04:33 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -776,7 +776,7 @@ void Moveble::RandomWalk(bool can_stop)
 	//ClearPath();
 	//if not continous random walk, then stops for a while
 	if (can_stop && (rand()&3) ) {
-		SetWait(rand()&7+7);
+		SetWait((rand()&7)+7);
 		return;
 	}
 	area->BlockSearchMap( Pos, size, 0);
@@ -1023,7 +1023,11 @@ void Door::SetDoorLocked(bool Locked, bool playsound)
 
 bool Door::IsOpen() const
 {
-	return (Flags&DOOR_OPEN) == !core->HasFeature(GF_REVERSE_DOOR);
+	bool ret = (bool) core->HasFeature(GF_REVERSE_DOOR);
+	if (Flags&DOOR_OPEN) {
+		ret=!ret;
+	}
+	return ret;
 }
 
 //also mark actors to fix position

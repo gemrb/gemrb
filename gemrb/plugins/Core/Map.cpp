@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.247 2006/08/08 20:25:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.248 2006/08/09 19:04:34 avenger_teambg Exp $
  *
  */
 
@@ -1000,11 +1000,26 @@ void Map::AddActor(Actor* actor)
 	//guess game is always loaded? if not, then we'll crash
 	ieDword gametime = core->GetGame()->GameTime;
 
-	if (IsVisible(actor->Pos, false) && actor->Schedule(gametime) ) {
-		if (actor->Modified[IE_EA]>=EA_EVILCUTOFF) {
+	if (actor->Modified[IE_EA]>=EA_EVILCUTOFF) {
+		if (IsVisible(actor->Pos, false) && actor->Schedule(gametime) ) {
 			core->Autopause(AP_ENEMY);
 		}
 	}
+}
+
+bool Map::AnyPCSeesEnemy()
+{
+	ieDword gametime = core->GetGame()->GameTime;
+	unsigned int i = actors.size();
+	while (i--) {
+		Actor* actor = actors[i];
+		if (actor->Modified[IE_EA]>=EA_EVILCUTOFF) {
+			if (IsVisible(actor->Pos, false) && actor->Schedule(gametime) ) {
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 void Map::DeleteActor(int i)

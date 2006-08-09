@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.31 2006/01/28 19:56:34 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.32 2006/08/09 19:04:34 avenger_teambg Exp $
  *
  */
 
@@ -86,7 +86,7 @@ public:
 	/** Deletes last lines up to current 'minrow' */
 	void PopMinRow()
 	{
-		PopLines(lines.size()-minrow);
+		PopLines((unsigned int) (lines.size()-minrow));
 	}
 	/** adds empty lines so minrow will be the uppermost visible row */
 	void PadMinRow();

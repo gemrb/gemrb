@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.123 2006/08/08 20:25:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.124 2006/08/09 19:04:33 avenger_teambg Exp $
  *
  */
 
@@ -936,6 +936,26 @@ bool Game::PartyOverflow() const
 	}
 	return (PCs.size()>partysize);
 }
+
+bool Game::AnyPCInCombat() const
+{
+	if (!CombatCounter) {
+		return false;
+	}
+
+	for (unsigned int i=0; i<PCs.size(); i++) {
+		Actor *actor = PCs[i];
+
+		if ((actor->LastTarget) ) {
+			return true;
+		}
+		if (AttackersOf(actor->GetID(), actor->GetCurrentArea()) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
 //returns true if the protagonist (or the whole party died)
 bool Game::EveryoneDead() const
 {
@@ -1074,7 +1094,7 @@ void Game::RestParty(int checks, int dream, int hp)
 
   if (!(checks&REST_NOCRITTER) ) {
     //don't allow resting while in combat
-    if (CombatCounter) {
+    if (AnyPCInCombat()) {
 			core->DisplayConstantString( STR_CANTRESTMONS, 0xff0000 );
 			return;
     }
@@ -1225,12 +1245,14 @@ void Game::ChangeSong()
 	area->PlayAreaSong( Song );
 }
 
-int Game::AttackersOf(ieDword globalID) const
+int Game::AttackersOf(ieDword globalID, Map *area) const
 {
+	if (!area) {
+		return 0;
+	}
 	std::vector< ieDword>::const_iterator idx;
 
 	int cnt = 0;
-	Map *area=GetCurrentArea();
 	for(idx=Attackers.begin(); idx!=Attackers.end();idx++) {
 		Actor * actor = area->GetActorByGlobalID(*idx);
 		if (actor) {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.117 2006/08/08 20:25:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.118 2006/08/09 19:04:34 avenger_teambg Exp $
  *
  */
 
@@ -337,6 +337,8 @@ public:
 	PathNode* RunAway(Point &s, Point &d, unsigned int PathLen, int flags);
 	/* Returns true if there is no path to d */
 	bool TargetUnreachable(Point &s, Point &d);
+	/* returns true if there is enemy visible */
+	bool AnyPCSeesEnemy();
 	/* Finds straight path from s, length l and orientation o, f=1 passes wall, f=2 rebounds from wall*/
 	PathNode* GetLine(Point &start, int Steps, int Orientation, int flags);
 	PathNode* GetLine(Point &start, Point &dest, int flags);

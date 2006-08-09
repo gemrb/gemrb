@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.423 2006/08/08 20:25:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.424 2006/08/09 19:04:34 avenger_teambg Exp $
  *
  */
 
@@ -290,6 +290,11 @@ void Interface::FreeResRefTable(ieResRef *&table, int &count)
 	}
 }
 
+static void ReleaseItemTooltip(void *poi)
+{
+        free(poi);
+}
+
 Interface::~Interface(void)
 {
 	if (AreaAliasTable) {
@@ -427,6 +432,23 @@ Interface::~Interface(void)
 		RtRows->RemoveAll(ReleaseItemList);
 		delete( RtRows );
 	}
+	if (ItemExclTable) {
+		ItemExclTable->RemoveAll(NULL);
+		delete( ItemExclTable );
+	}
+	if (ItemDialTable) {
+		ItemDialTable->RemoveAll(NULL);
+		delete( ItemDialTable );
+	}
+	if (ItemDial2Table) {
+		ItemDial2Table->RemoveAll(NULL);
+		delete( ItemDial2Table );
+	}
+	if (ItemTooltipTable) {
+		ItemTooltipTable->RemoveAll(ReleaseItemTooltip);
+		delete( ItemTooltipTable );
+	}
+
 	FreeInterfaceVector( Table, tables, tm );
 	FreeInterfaceVector( Symbol, symbols, sm );
 	if (opcodemgrs) {
@@ -607,11 +629,6 @@ bool Interface::ReadAbilityTables()
 	if (!ret)
 		return ret;
 	return true;
-}
-
-static void ReleaseItemTooltip(void *poi)
-{
-	free(poi);
 }
 
 bool Interface::ReadAuxItemTables()
@@ -3743,7 +3760,8 @@ int Interface::CanUseItemType(int itype, int slottype, ieDword /*use1*/, ieDword
 
 TextArea *Interface::GetMessageTextArea()
 {
-	ieDword WinIndex, TAIndex;
+	ieDword WinIndex = (ieDword) -1;
+	ieDword TAIndex = (ieDword) -1;
 
 	vars->Lookup( "MessageWindow", WinIndex );
 	if (( WinIndex != (ieDword) -1 ) &&
