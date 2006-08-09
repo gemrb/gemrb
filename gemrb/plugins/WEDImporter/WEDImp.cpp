@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.22 2006/07/22 12:39:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.23 2006/08/09 18:59:35 avenger_teambg Exp $
  *
  */
 
@@ -153,9 +153,9 @@ TileMap* WEDImp::GetTileMap()
 			continue;
 		}
 		mask<<=1;
-		TileOverlay* over = new TileOverlay( overlays[i].Width, overlays[i].Height );
-		DataStream* tisfile = core->GetResourceMgr()->GetResource( overlays[i].TilesetResRef, IE_TIS_CLASS_ID );
-		TileSetMgr* tis = ( TileSetMgr* ) core->GetInterface( IE_TIS_CLASS_ID );
+		//don't declare these again, especially don't redeclare tis
+		over = new TileOverlay( overlays[i].Width, overlays[i].Height );
+		tisfile = core->GetResourceMgr()->GetResource( overlays[i].TilesetResRef, IE_TIS_CLASS_ID );
 		tis->Open( tisfile );
 		for (int y = 0; y < overlays[i].Height; y++) {
 			for (int x = 0; x < overlays[i].Width; x++) {
