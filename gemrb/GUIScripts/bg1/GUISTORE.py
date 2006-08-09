@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUISTORE.py,v 1.16 2005/08/13 10:50:07 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUISTORE.py,v 1.17 2006/08/09 19:05:31 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -42,6 +42,8 @@ StoreHealWindow = None
 StoreRumourWindow = None
 StoreRentWindow = None
 OldPortraitWindow = None
+ErrorWindow = None
+RentConfirmWindow = None
 
 RentIndex = -1
 Store = None
@@ -464,6 +466,9 @@ def OpenStoreRentWindow ():
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "UpdateStoreRentWindow")
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		GemRB.SetVarAssoc (Window, Button, "RentIndex", i)
+		#these bioware guys screw up everything possible
+		#remove this line if you fixed guistore
+		GemRB.SetButtonSprites (Window, Button, "GUISTROC",0, 1,2,0,3)
 		if ok<0:
 			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
 
@@ -959,27 +964,66 @@ def UpdateStoreRentWindow ():
 	Window = StoreRentWindow
 	UpdateStoreCommon (Window, 0x10000008, 0, 0x10000009)
 	RentIndex = GemRB.GetVar ("RentIndex")
-	TextArea = GemRB.GetControl (Window, 12)
-	GemRB.SetText (Window, TextArea, roomtypes[RentIndex] )
+	Button = GemRB.GetControl (Window, 11)
 	Label = GemRB.GetControl (Window, 0x1000000d)
-	price = Store['StoreRoomPrices'][RentIndex]
-	GemRB.SetText (Window, Label, str(price) )
+	if RentIndex>=0:
+		TextArea = GemRB.GetControl (Window, 12)
+		GemRB.SetText (Window, TextArea, roomtypes[RentIndex] )
+		price = Store['StoreRoomPrices'][RentIndex]
+		GemRB.SetText (Window, Label, str(price) )
+		GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_ENABLED)
+	else:
+		GemRB.SetText (Window, Label, "0" )
+		GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_DISABLED)
 
+def RentConfirm ():
+	RentIndex = GemRB.GetVar ("RentIndex")
+	price = Store['StoreRoomPrices'][RentIndex]
+	Gold = GemRB.GameGetPartyGold ()
+	GemRB.GameSetPartyGold (Gold-price)
+	GemRB.RestParty (13, 1, RentIndex+1)
+	GemRB.UnloadWindow (RentConfirmWindow)
+	Window = StoreRentWindow
+	TextArea = GemRB.GetControl (Window, 12)
+	#is there any way to change this???
+	GemRB.SetToken ("HOUR", "8")
+	GemRB.SetToken ("HP", "%d"%(RentIndex+1))
+	GemRB.SetText (Window, TextArea, 16476)
+	GemRB.SetVar ("RentIndex", -1)
+	Button = GemRB.GetControl (Window, RentIndex+4)
+	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
+	UpdateStoreRentWindow ()
+
+def RentDeny () :
+	GemRB.UnloadWindow (RentConfirmWindow)
+	UpdateStoreRentWindow ()
 
 def RentRoom ():
-	global RentIndex
+	global RentIndex, RentConfirmWindow
 
 	Window = StoreRentWindow
 	RentIndex = GemRB.GetVar ("RentIndex")
 	price = Store['StoreRoomPrices'][RentIndex]
 	Gold = GemRB.GameGetPartyGold ()
-	TextArea = GemRB.GetControl (Window, 12)
+	TextArea = GemRB.GetControl (Window, 11)
 	if Gold<price:
 		ErrorWindow (11051)
 		return
 
-	GemRB.GameSetPartyGold (Gold-price)
-	UpdateStoreRentWindow ()
+	RentConfirmWindow = Window = GemRB.LoadWindow (11)
+	#confirm
+	Button = GemRB.GetControl (Window, 0)
+	GemRB.SetText (Window, Button, 17199)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "RentConfirm")
+	#deny
+	Button = GemRB.GetControl (Window, 1)
+	GemRB.SetText (Window, Button, 13727)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "RentDeny")
+	#textarea
+	TextArea = GemRB.GetControl (Window, 3)
+	GemRB.SetText (Window, TextArea, 15358)
+
+	GemRB.ShowModal(Window, MODAL_SHADOW_GRAY)
 
 
 def CloseStoreShoppingWindow ():
@@ -1039,8 +1083,10 @@ def CloseStoreRentWindow ():
 
 
 def ErrorWindow (strref):
-	Window = GemRB.LoadWindow (10)
+	global ErrorWindow
 
+	ErrorWindow = Window = GemRB.LoadWindow (10)
+	
 	TextArea = GemRB.GetControl (Window, 3)
 	GemRB.SetText (Window, TextArea, strref)
 
@@ -1052,9 +1098,8 @@ def ErrorWindow (strref):
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 
 
-def ErrorDone ():
-	Window = GemRB.GetVar ("FloatWindow")
-	GemRB.UnloadWindow (Window)
+def ErrorDone ():	
+	GemRB.UnloadWindow (ErrorWindow)
 
 
 ###################################################

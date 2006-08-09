@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUISTORE.py,v 1.29 2006/06/29 06:56:44 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUISTORE.py,v 1.30 2006/08/09 19:05:32 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -1063,6 +1063,7 @@ def RentRoom ():
 		return
 
 	GemRB.GameSetPartyGold (Gold-price)
+	GemRB.RestParty (13, 1, 0)
 	UpdateStoreRentWindow ()
 
 

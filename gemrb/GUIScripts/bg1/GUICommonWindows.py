@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICommonWindows.py,v 1.15 2006/08/08 20:25:44 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICommonWindows.py,v 1.16 2006/08/09 19:05:31 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -280,14 +280,57 @@ def ActionStopPressed ():
 	return
 
 #no check needed because the button wouldn't be drawn if illegal
-def LeftScrollPressed ():
-	GemRB.SetVar ("TopIndex", GemRB.GetVar ("TopIndex") -1)
-	UpdateActionsWindow ()
+def ActionLeftPressed ():
+	TopIndex = GemRB.GetVar ("TopIndex")
+	if TopIndex>10:
+		TopIndex -= 10
+	else:
+		TopIndex = 0
+	GemRB.SetVar ("TopIndex", TopIndex)
+	UpdateActionsWindow () 
 	return
 
 #no check needed because the button wouldn't be drawn if illegal
-def RightScrollPressed ():
-	GemRB.SetVar ("TopIndex", GemRB.GetVar ("TopIndex") +1)
+def ActionRightPressed ():
+	pc = GemRB.GameGetFirstSelectedPC()
+	TopIndex = GemRB.GetVar ("TopIndex")
+	Type = GemRB.GetVar ("Type")
+	if Type == 3:
+		Max = GemRB.GetMemorizedSpellsCount(pc,0)+GemRB.GetMemorizedSpellsCount(pc,1)
+	else:
+		Max = GemRB.GetMemorizedSpellsCount(pc,2)
+	TopIndex += 10
+	if TopIndex > Max - 10:
+		if Max>10:
+			TopIndex = Max-10
+		else:
+			TopIndex = 0
+
+	GemRB.SetVar ("TopIndex", TopIndex) 
+	UpdateActionsWindow ()
+	return
+
+def ActionSongPressed ():
+	pc = GemRB.GameGetFirstSelectedPC()
+	GemRB.SetModalState (pc, MS_BATTLESONG)
+	UpdateActionsWindow ()
+	return
+
+def ActionSearchPressed ():
+	pc = GemRB.GameGetFirstSelectedPC()
+	GemRB.SetModalState (pc, MS_DETECTTRAPS)
+	UpdateActionsWindow ()
+	return
+
+def ActionStealthPressed ():
+	pc = GemRB.GameGetFirstSelectedPC()
+	GemRB.SetModalState (pc, MS_STEALTH)
+	UpdateActionsWindow ()
+	return
+	
+def ActionTurnPressed ():
+	pc = GemRB.GameGetFirstSelectedPC()
+	GemRB.SetModalState (pc, MS_TURNUNDEAD)
 	UpdateActionsWindow ()
 	return
 
@@ -303,12 +346,52 @@ def ActionCastPressed ():
 	UpdateActionsWindow ()
 	return
 
+def ActionQItemPressed (action):
+	pc = GemRB.GameGetFirstSelectedPC()
+	GemRB.UseItem(pc, action)
+	return
+	
+def ActionQItem1Pressed ():
+	ActionQItemPressed (9)
+	return
+
+def ActionQItem2Pressed ():
+	ActionQItemPressed (11)
+	return
+
+def ActionQItem3Pressed ():
+	ActionQItemPressed (12)
+	return
+
+def ActionQItem4Pressed ():
+	ActionQItemPressed (10)
+	return
+
+def ActionQItem5Pressed ():
+	ActionQItemPressed (31)
+	return
+
 def ActionInnatePressed ():
 	GemRB.SetVar ("TopIndex", 0)
 	GemRB.SetVar ("ActionLevel", 3)
 	UpdateActionsWindow ()
 	return
 
+def SpellPressed ():
+	pc = GemRB.GameGetFirstSelectedPC()
+
+	Spell = GemRB.GetVar("Spell")
+	Type = GemRB.GetVar("Type")
+	GemRB.SpellCast(pc, Type, Spell)
+	return
+
+def EquipmentPressed ():
+	pc = GemRB.GameGetFirstSelectedPC()
+
+	Item = GemRB.GetVar("Equipment")
+	GemRB.UseItem(pc, -1, Item)
+	return
+ 
 def GetActorClassTitle (actor):
 	ClassTitle = GemRB.GetPlayerStat (actor, IE_TITLE1)
 	KitIndex = GemRB.GetPlayerStat (actor, IE_KIT) & 0xfff
