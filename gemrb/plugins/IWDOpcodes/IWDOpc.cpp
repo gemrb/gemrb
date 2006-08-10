@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.cpp,v 1.11 2006/08/07 22:25:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.cpp,v 1.12 2006/08/10 16:44:21 avenger_teambg Exp $
  *
  */
 
@@ -221,7 +221,11 @@ static void ReadSpellProtTable(const ieResRef tablename)
 #define STI_SOURCE_TARGET     0x100
 #define STI_SOURCE_NOT_TARGET 0x101
 #define STI_CIRCLESIZE        0x102
-
+#define STI_TWO_ROWS          0x103
+#define STI_NOT_TWO_ROWS      0x104
+#define STI_MORAL_ALIGNMENT   0x105
+#define STI_AREATYPE          0x106
+#define STI_DAYTIME           0x107
 //returns true if iwd ids targeting resists the spell
 static int check_iwd_targeting(Actor* Owner, Actor* target, ieDword value, ieDword type)
 {
@@ -239,6 +243,20 @@ static int check_iwd_targeting(Actor* Owner, Actor* target, ieDword value, ieDwo
 		val = value;
 	}
 	switch (idx) {
+	case STI_DAYTIME:
+		return (core->GetGame()->GameTime%7200/3600) == val;
+	case STI_AREATYPE:
+		return DiffCore((ieDword) target->GetCurrentArea()->AreaType, val, spellres[spellrescnt*ST_RELATION+type]);
+	case STI_MORAL_ALIGNMENT:
+		return DiffCore((ieDword) Owner->GetStat(IE_ALIGNMENT)&0x3, (ieDword) target->GetStat(IE_ALIGNMENT)&0x3, spellres[spellrescnt*ST_RELATION+type]);
+	case STI_TWO_ROWS:
+		if (check_iwd_targeting(Owner, target, value, idx)) return 1;
+		if (check_iwd_targeting(Owner, target, value, val)) return 1;
+		return 0;
+	case STI_NOT_TWO_ROWS:
+		if (check_iwd_targeting(Owner, target, value, idx)) return 0;
+		if (check_iwd_targeting(Owner, target, value, val)) return 0;
+		return 1;
 	case STI_SOURCE_TARGET:
 		if (Owner==target) {
 			return 1;
@@ -250,9 +268,9 @@ static int check_iwd_targeting(Actor* Owner, Actor* target, ieDword value, ieDwo
 		}
 		return 0;
 	case STI_CIRCLESIZE:
-		return DiffCore((ieDword) target->GetAnims()->GetCircleSize(), value, spellres[spellrescnt*ST_RELATION+type]);
+		return DiffCore((ieDword) target->GetAnims()->GetCircleSize(), val, spellres[spellrescnt*ST_RELATION+type]);
 	default:
-		return DiffCore(target->GetStat(idx), value, spellres[spellrescnt*ST_RELATION+type]);
+		return DiffCore(target->GetStat(idx), val, spellres[spellrescnt*ST_RELATION+type]);
 	}
 }
 

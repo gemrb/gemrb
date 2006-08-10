@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.248 2006/08/09 19:04:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.249 2006/08/10 16:44:21 avenger_teambg Exp $
  *
  */
 
@@ -219,8 +219,8 @@ void AddLOS(int destx, int desty, int slot)
 			x += 16;
 			y += 16;
 		}
-		VisibilityMasks[i][slot].x=x;
-		VisibilityMasks[i][slot].y=y;
+		VisibilityMasks[i][slot].x=(short) x;
+		VisibilityMasks[i][slot].y=(short) y;
 	}
 }
 
@@ -229,8 +229,8 @@ void AddSpace(int destx, int desty, int slot)
 	for (int i=0;i<MAX_CIRCLESIZE;i++) {
 		int x=(destx*i+MAX_CIRCLESIZE/2)/MAX_CIRCLESIZE*16;
 		int y=(desty*i+MAX_CIRCLESIZE/2)/MAX_CIRCLESIZE*12;
-		PersonalSpaces[i][slot].x=x;
-		PersonalSpaces[i][slot].y=y;
+		PersonalSpaces[i][slot].x=(short) x;
+		PersonalSpaces[i][slot].y=(short) y;
 	}
 }
 
@@ -941,7 +941,7 @@ void Map::AddAnimation(AreaAnimation* anim)
 //this might be unnecessary later
 void Map::UpdateEffects()
 {
-	unsigned int i = actors.size();
+	size_t i = actors.size();
 	while (i--) {
 		actors[i]->RefreshEffects();
 	}
@@ -949,7 +949,7 @@ void Map::UpdateEffects()
 
 void Map::Shout(Actor* actor, int shoutID, unsigned int radius)
 {
-	int i=actors.size();
+	size_t i=actors.size();
 	while (i--) {
 		Actor *listener = actors[i];
 
@@ -970,7 +970,7 @@ void Map::Shout(Actor* actor, int shoutID, unsigned int radius)
 bool Map::AnyEnemyNearPoint(Point &p)
 {
 	ieDword gametime = core->GetGame()->GameTime;
-	unsigned int i = actors.size();
+	size_t i = actors.size();
 	while (i--) {
 		Actor *actor = actors[i];
 
@@ -1010,7 +1010,7 @@ void Map::AddActor(Actor* actor)
 bool Map::AnyPCSeesEnemy()
 {
 	ieDword gametime = core->GetGame()->GameTime;
-	unsigned int i = actors.size();
+	size_t i = actors.size();
 	while (i--) {
 		Actor* actor = actors[i];
 		if (actor->Modified[IE_EA]>=EA_EVILCUTOFF) {
@@ -1039,7 +1039,7 @@ Actor* Map::GetActorByGlobalID(ieDword objectID)
 	}
 	//truncation is intentional
 	ieWord globalID = (ieWord) objectID;
-	unsigned int i = actors.size();
+	size_t i = actors.size();
 	while (i--) {
 		Actor* actor = actors[i];
 		
@@ -1057,7 +1057,7 @@ Actor* Map::GetActorByGlobalID(ieDword objectID)
 Actor* Map::GetActor(Point &p, int flags)
 {
 	ieDword gametime = core->GetGame()->GameTime;
-	unsigned int i = actors.size();
+	size_t i = actors.size();
 	while (i--) {
 		Actor* actor = actors[i];
 		
@@ -1076,7 +1076,7 @@ Actor* Map::GetActor(Point &p, int flags)
 
 Actor* Map::GetActor(const char* Name)
 {
-	unsigned int i = actors.size();
+	size_t i = actors.size();
 	while (i--) {
 		Actor* actor = actors[i];
 		if (strnicmp( actor->GetScriptName(), Name, 32 ) == 0) {
@@ -1092,7 +1092,7 @@ int Map::GetActorCount(bool any) const
 		return (int) actors.size();
 	}
 	int ret = 0;
-	unsigned int i=actors.size();
+	size_t i=actors.size();
 	while (i--) {
 		if (MustSave(actors[i])) {
 			ret++;
@@ -1103,7 +1103,7 @@ int Map::GetActorCount(bool any) const
 
 void Map::JumpActors(bool jump)
 {
-	unsigned int i = actors.size();
+	size_t i = actors.size();
 	while (i--) {
 		Actor* actor = actors[i];
 		if (actor->Modified[IE_DONOTJUMP]&DNJ_JUMP) {
@@ -2353,7 +2353,7 @@ Container* Map::AddContainer(const char* Name, unsigned short Type,
 int Map::GetCursor( Point &p)
 {
 	if (!IsVisible( p, true ) ) {
-		return IE_CURSOR_BLOCKED;
+		return IE_CURSOR_INVALID;
 	}
 	switch (GetBlocked( p ) & (PATH_MAP_PASSABLE|PATH_MAP_TRAVEL)) {
 		case 0:

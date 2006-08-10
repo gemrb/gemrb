@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.291 2006/08/05 18:12:53 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.292 2006/08/10 16:44:21 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -747,6 +747,12 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	Map* area = game->GetCurrentArea( );
 
 	int nextCursor = area->GetCursor( p );
+	//make the invisible area really invisible
+	if (nextCursor == IE_CURSOR_INVALID) {
+		( ( Window * ) Owner )->Cursor = IE_CURSOR_BLOCKED;
+		lastCursor = IE_CURSOR_BLOCKED;
+		return;
+	}
 
 	overInfoPoint = area->TMap->GetInfoPoint( p );
 	if (overInfoPoint) {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.21 2006/01/27 18:09:12 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.h,v 1.22 2006/08/10 16:44:21 avenger_teambg Exp $
  *
  */
 
@@ -150,9 +150,9 @@ public:
 	void SetMapIcons(AnimationFactory *bam);
 	Sprite2D* GetMapMOS() { return MapMOS; }
 	void SetMapMOS(Sprite2D *newmos);
-	int GetEntryCount() { return area_entries.size(); }
+	int GetEntryCount() { return (int) area_entries.size(); }
 	WMPAreaEntry *GetEntry(unsigned int index) { return area_entries[index]; }
-	int GetLinkCount() { return area_links.size(); }
+	int GetLinkCount() { return (int) area_links.size(); }
 	WMPAreaLink *GetLink(unsigned int index) { return area_links[index]; }
 	WMPAreaEntry *GetNewAreaEntry();
 	void SetAreaEntry(unsigned int index, WMPAreaEntry *areaentry);

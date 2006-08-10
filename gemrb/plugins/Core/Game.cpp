@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.124 2006/08/09 19:04:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.125 2006/08/10 16:44:21 avenger_teambg Exp $
  *
  */
 
@@ -55,30 +55,30 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	event_handler[0] = 0;
 	memset( script_timers,0, sizeof(script_timers));
 
-  //loading master areas
+	//loading master areas
 	int mtab = core->LoadTable("mastarea");
 	TableMgr *table = core->GetTable(mtab);
 	if (table) {
 		int i = table->GetRowCount();
-    mastarea.reserve(i);
+		mastarea.reserve(i);
 		while(i--) {
 			char *tmp = (char *) malloc(9);
 			strnuprcpy (tmp,table->QueryField(i,0),8);
 			mastarea.push_back( tmp );
 		}
-  	core->DelTable(mtab);
+		core->DelTable(mtab);
 	}
 
-  //loading rest movies (only bg2 has them)
-  memset(restmovies,'*',sizeof(restmovies));
-  mtab = core->LoadTable("restmov");
+	//loading rest movies (only bg2 has them)
+	memset(restmovies,'*',sizeof(restmovies));
+	mtab = core->LoadTable("restmov");
 	table = core->GetTable(mtab);
-  if (table) {
-    for(int i=0;i<8;i++) {
-      strnuprcpy(restmovies[i],table->QueryField(i,0),8);
-    }
-  	core->DelTable(mtab);
-  }
+	if (table) {
+		for(int i=0;i<8;i++) {
+			strnuprcpy(restmovies[i],table->QueryField(i,0),8);
+		}
+		core->DelTable(mtab);
+	}
 	interval = 1000/AI_UPDATE_TIME;
 	//FIXME:i'm not sure in this...
 	NoInterrupt();
@@ -496,8 +496,8 @@ Map *Game::GetMap(const char *areaname, bool change)
 			MapIndex = index;
 			area = GetMap(index);
 			memcpy (CurrentArea, areaname, 8);
-	                area->SetupAmbients();
-	                ChangeSong();
+			            area->SetupAmbients();
+			            ChangeSong();
 			return area;
 		}
 		return GetMap(index);
@@ -564,7 +564,7 @@ int Game::DelMap(unsigned int index, int forced)
 		return 1;
 	}
 
-	if (forced || ((Maps.size()>MAX_MAPS_LOADED) && map->CanFree() ) )
+	if (forced || (Maps.size()>MAX_MAPS_LOADED) )
 	{
 		//keep at least one master
 		const char *name = map->GetScriptName();
@@ -575,6 +575,14 @@ int Game::DelMap(unsigned int index, int forced)
 					return -1;
 				}
 			}
+		}
+		//this check must be the last, because
+		//after PurgeActors you cannot keep the
+		//area in memory
+		//Or the queues should be regenerated!
+		if (!map->CanFree())
+		{
+			return 1;
 		}
 		//remove map from memory
 		core->SwapoutArea(Maps[index]);
@@ -1092,49 +1100,49 @@ void Game::RestParty(int checks, int dream, int hp)
 		}
 	}
 
-  if (!(checks&REST_NOCRITTER) ) {
-    //don't allow resting while in combat
-    if (AnyPCInCombat()) {
+	if (!(checks&REST_NOCRITTER) ) {
+		//don't allow resting while in combat
+		if (AnyPCInCombat()) {
 			core->DisplayConstantString( STR_CANTRESTMONS, 0xff0000 );
 			return;
-    }
-    //don't allow resting if hostiles are nearby
-    if (area->AnyEnemyNearPoint(leader->Pos)) {
+		}
+		//don't allow resting if hostiles are nearby
+		if (area->AnyEnemyNearPoint(leader->Pos)) {
 			core->DisplayConstantString( STR_CANTRESTMONS, 0xff0000 );
 			return;
-    }
-  }
+		}
+	}
 
 	//rest check, if PartyRested should be set, area should return true
 	//area should advance gametime too (so partial rest is possible)
 	if (!(checks&REST_NOAREA) ) {
-    //you cannot rest here
-    if (area->AreaFlags&1) {
+		//you cannot rest here
+		if (area->AreaFlags&1) {
 			core->DisplayConstantString( STR_MAYNOTREST, 0xff0000 );
 			return;
-    }
-    //you may not rest here, find an inn
-    if (!(area->AreaType&(AT_OUTDOOR|AT_FOREST|AT_DUNGEON|AT_CAN_REST) ))
-    {
-      core->DisplayConstantString( STR_MAYNOTREST, 0xff0000 );
-      return;
-    }
-    //area encounters
-    if(area->Rest( leader->Pos, 8, GameTime%7200/3600) ) {
-		  return;
-    }
+		}
+		//you may not rest here, find an inn
+		if (!(area->AreaType&(AT_OUTDOOR|AT_FOREST|AT_DUNGEON|AT_CAN_REST) ))
+		{
+			core->DisplayConstantString( STR_MAYNOTREST, 0xff0000 );
+			return;
+		}
+		//area encounters
+		if(area->Rest( leader->Pos, 8, GameTime%7200/3600) ) {
+			return;
+		}
 	}
 	AdvanceTime(2400);
 
 	//movie
 	if (dream>=0) {
 		//select dream based on area
-    if (dream==0 || dream>7) {
-      dream = (area->AreaType&(AT_FOREST|AT_CITY|AT_DUNGEON))>>3;
-    }
-    if (restmovies[dream][0]!='*') {
-      core->PlayMovie(restmovies[dream]);
-    }
+		if (dream==0 || dream>7) {
+			dream = (area->AreaType&(AT_FOREST|AT_CITY|AT_DUNGEON))>>3;
+		}
+		if (restmovies[dream][0]!='*') {
+			core->PlayMovie(restmovies[dream]);
+		}
 	}
 	//play dream (rest movie)
 	InternalFlags |= IF_PARTYRESTED;

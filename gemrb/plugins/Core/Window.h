@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.25 2006/01/08 12:28:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.26 2006/08/10 16:44:21 avenger_teambg Exp $
  *
  */
 
@@ -63,6 +63,8 @@
 #define WINDOW_BOUNDED       0x10
 
 // IE specific cursor types
+
+#define IE_CURSOR_INVALID -1
 #define IE_CURSOR_NORMAL  0
 #define IE_CURSOR_TAKE    2  //over pile type containers
 #define IE_CURSOR_WALK    4
