@@ -1,0 +1,5 @@
+Description: This table lists the resting movies. The resting movie index is determined by 3 bits of the areatype. (CITY/FOREST/DUNGEON).
+
+Columns - <N/A>
+
+Rows - The movie resrefs for each areatype.

@@ -1,0 +1,9 @@
+Description: This table lists the mage schools pickable in the game.
+
+Columns - 
+NAME_REF  - the name of the mage school
+CAP_REF   - the capitalized name of the mage school
+DESC_REF  - the description of the mage school
+KIT       - the mage school kit value (also used as usability flag)
+
+Rows - mage schools

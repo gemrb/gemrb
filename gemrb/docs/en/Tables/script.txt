@@ -1,0 +1,14 @@
+Description: This table describes how the script file objects and triggers look like.
+
+Columns: <N/A>
+
+Rows:
+ OBJECT_IDS_COUNT   - the count and name of the IDS identifiers (ea, general, race...)
+ MAX_OBJECT_NESTING - the maximum number of object filters
+
+ ADDITIONAL_RECT    - 1 if the object has additional rectangle parameter
+
+ EXTRA_PARAMETERS_COUNT  - the number of IDS after the string parameter
+
+ TRIGGER_POINT      - 1 if the triggers contain an extra point parameter
+

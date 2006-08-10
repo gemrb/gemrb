@@ -1,0 +1,5 @@
+Description: This table lists the hardcoded overlay animations.
+
+Columns - <N/A>
+
+Rows - resrefs for each overlay type (the slots are mandatory)

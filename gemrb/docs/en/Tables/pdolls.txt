@@ -1,0 +1,8 @@
+Description: This table lists the paperdolls linked to each avatar animation ID.
+
+Columns -
+ LEVEL1-4 - the paperdoll for each armour level
+ SIZE     - the size suffix (for equipment layers)
+
+Rows - animation IDs
+

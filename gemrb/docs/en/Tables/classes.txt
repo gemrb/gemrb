@@ -1,0 +1,15 @@
+Description: This table lists the playable classes in the game. 
+
+Columns - 
+NAME_REF  - the name of the class
+CAP_REF   - the capitalized name of the class
+DESC_REF  - the description of the class
+SAVE      - the saving throw table for this class
+USABILITY - the item usability flag
+MULTI     - if multi class, which classes are combined
+ID        - the class stat value
+HP        - the hp table for the class
+<racecolumns> - the rest of the columns enable or disable the class (2 means partially usable)
+
+Rows - classes
+

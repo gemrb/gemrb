@@ -1,0 +1,1 @@
+Description: This table lists save game name prefixes used by the SaveGame() action.

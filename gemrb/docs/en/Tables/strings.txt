@@ -1,0 +1,5 @@
+Description: This table lists the hardcoded string constants used by the core engine.
+
+Columns - <N/A>
+
+Rows - string references for each slot. (The order is mandatory).

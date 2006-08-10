@@ -1,0 +1,11 @@
+Description: This table lists the pickable portraits and the default colours for the avatar, based on the portrait icon.
+
+Columns -
+ GENDER - male of female portrait (the gender stat)
+ HAIR   - the default hair colour
+ SKIN   - the default skin colour
+ MAJOR  - the default major robe colour
+ MINOR  - the default minor robe colour
+
+Rows - 
+ portraits

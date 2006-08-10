@@ -1,0 +1,8 @@
+Description: This table lists the damage animations.
+
+Columns - 
+ MAIN     - the damage hit animation
+ SPARKS   - additional splash animations
+ GRADIENT - fake coloured animations will be recoloured with this gradient
+
+Rows - damage types
