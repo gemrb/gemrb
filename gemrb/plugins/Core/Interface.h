@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.205 2006/08/08 20:25:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.206 2006/08/10 21:34:40 avenger_teambg Exp $
  *
  */
 
@@ -304,7 +304,7 @@ public:
 	/* sets the floattext color */
 	void SetInfoTextColor(Color &color);
 	/** returns a gradient set */
-	Color * GetPalette(int index, int colors);
+	Color * GetPalette(int index, int colors, Color *buffer);
 	/** Returns a preloaded Font */
 	Font * GetFont(const char *) const;
 	Font * GetFont(unsigned int index) const;
@@ -459,6 +459,7 @@ public:
 	}
 	/** Gets the WorldMap class, returns the current worldmap or the first worldmap containing the area*/
 	WorldMap * GetWorldMap(const char *area = NULL);
+	void SetWindowFrame(int i, Sprite2D *Picture);
 	GameControl *GetGameControl();
 
 	void QuitGame(bool backtomain);

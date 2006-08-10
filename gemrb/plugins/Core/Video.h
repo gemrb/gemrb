@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.66 2006/08/07 22:25:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.67 2006/08/10 21:34:40 avenger_teambg Exp $
  *
  */
 
@@ -106,7 +106,7 @@ public:
 									   unsigned int /*datasize*/,
 									   Palette* /*palette*/,
 									   int /*transindex*/) { return 0; }
-	virtual void FreeSprite(Sprite2D* spr) = 0;
+	virtual void FreeSprite(Sprite2D* &spr) = 0;
 	virtual void BlitSprite(Sprite2D* spr, int x, int y, bool anchor = false,
 		Region* clip = NULL) = 0;
 	virtual void BlitSpriteHalfTrans(Sprite2D* spr, int x, int y,

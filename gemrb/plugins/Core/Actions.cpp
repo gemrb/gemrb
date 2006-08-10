@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.79 2006/08/08 20:25:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.80 2006/08/10 21:34:40 avenger_teambg Exp $
  *
  */
 
@@ -3090,25 +3090,6 @@ void GameScript::GiveItem(Scriptable *Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	MoveItemCore(Sender, tar, parameters->string0Parameter,0);
-}
-
-void CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
-{
-	strncpy(item->ItemResRef, resref, 8);
-	if (a==-1) {
-		Item *origitem = core->GetItem(resref);
-		for(int i=0;i<3;i++) {
-			ITMExtHeader *e = origitem->GetExtHeader(i);			
-			item->Usages[i]=e?e->Charges:0;
-		}
-		core->FreeItem(origitem, resref, false);
-	} else {
-		item->Usages[0]=(ieWord) a;
-		item->Usages[1]=(ieWord) b;
-		item->Usages[2]=(ieWord) c;
-	}
-	//no need, when Inventory receives it, it will be set
-	//item->Flags=IE_INV_ITEM_ACQUIRED; //get the flags right
 }
 
 //this action creates an item in a container or a creature

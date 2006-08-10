@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.88 2006/07/03 16:02:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.89 2006/08/10 21:34:40 avenger_teambg Exp $
  *
  */
 
@@ -141,10 +141,11 @@ void CharAnimations::SetupColors()
 			return;
 		}
 		for (unsigned int i = 0; i < Colors[6]; i++) {
-			Color* NewPal = core->GetPalette( Colors[i]&255, size );
-			memcpy( &palette->col[dest], NewPal, size*sizeof( Color ) );
+			core->GetPalette( Colors[i]&255, size, &palette->col[dest]);
+			//Color* NewPal = core->GetPalette( Colors[i]&255, size );
+			//memcpy( &palette->col[dest], NewPal, size*sizeof( Color ) );
 			dest +=size;
-			free( NewPal );
+			//free( NewPal );
 		}
 		return;
 	}
@@ -167,42 +168,46 @@ void CharAnimations::SetupColors()
 		return;
 	}
 
-	Color* MetalPal = core->GetPalette( Colors[0]&255, 12 );
-	Color* MinorPal = core->GetPalette( Colors[1]&255, 12 );
-	Color* MajorPal = core->GetPalette( Colors[2]&255, 12 );
-	Color* SkinPal = core->GetPalette( Colors[3]&255, 12 );
-	Color* LeatherPal = core->GetPalette( Colors[4]&255, 12 );
-	Color* ArmorPal = core->GetPalette( Colors[5]&255, 12 );
-	Color* HairPal = core->GetPalette( Colors[6]&255, 12 );
-	memcpy( &palette->col[0x04], MetalPal, 12 * sizeof( Color ) );
-	memcpy( &palette->col[0x10], MinorPal, 12 * sizeof( Color ) );
-	memcpy( &palette->col[0x1C], MajorPal, 12 * sizeof( Color ) );
-	memcpy( &palette->col[0x28], SkinPal, 12 * sizeof( Color ) );
-	memcpy( &palette->col[0x34], LeatherPal, 12 * sizeof( Color ) );
-	memcpy( &palette->col[0x40], ArmorPal, 12 * sizeof( Color ) );
-	memcpy( &palette->col[0x4C], HairPal, 12 * sizeof( Color ) );
-	memcpy( &palette->col[0x58], &MinorPal[1], 8 * sizeof( Color ) );
-	memcpy( &palette->col[0x60], &MajorPal[1], 8 * sizeof( Color ) );
-	memcpy( &palette->col[0x68], &MinorPal[1], 8 * sizeof( Color ) );
-	memcpy( &palette->col[0x70], &MetalPal[1], 8 * sizeof( Color ) );
-	memcpy( &palette->col[0x78], &LeatherPal[1], 8 * sizeof( Color ) );
-	memcpy( &palette->col[0x80], &LeatherPal[1], 8 * sizeof( Color ) );
-	memcpy( &palette->col[0x88], &MinorPal[1], 8 * sizeof( Color ) );
+	//metal
+	core->GetPalette( Colors[0]&255, 12, &palette->col[0x04]);
+	//minor
+	core->GetPalette( Colors[1]&255, 12, &palette->col[0x10]);
+	//major
+	core->GetPalette( Colors[2]&255, 12, &palette->col[0x1c]);
+	//skin
+	core->GetPalette( Colors[3]&255, 12, &palette->col[0x28]);
+	//leather
+	core->GetPalette( Colors[4]&255, 12, &palette->col[0x34]);
+	//armor
+	core->GetPalette( Colors[5]&255, 12, &palette->col[0x40]);
+	//hair
+	core->GetPalette( Colors[6]&255, 12, &palette->col[0x4c]);
+
+	//minor
+	memcpy( &palette->col[0x58], &palette->col[0x11], 8 * sizeof( Color ) );
+	//major
+	memcpy( &palette->col[0x60], &palette->col[0x1d], 8 * sizeof( Color ) );
+	//minor
+	memcpy( &palette->col[0x68], &palette->col[0x11], 8 * sizeof( Color ) );
+	//metal
+	memcpy( &palette->col[0x70], &palette->col[0x04], 8 * sizeof( Color ) );
+	//leather
+	memcpy( &palette->col[0x78], &palette->col[0x35], 8 * sizeof( Color ) );
+	//leather
+	memcpy( &palette->col[0x80], &palette->col[0x35], 8 * sizeof( Color ) );
+	//minor
+	memcpy( &palette->col[0x88], &palette->col[0x11], 8 * sizeof( Color ) );
 
 	int i; //moved here to be compatible with msvc6.0
 
 	for (i = 0x90; i < 0xA8; i += 0x08)
-		memcpy( &palette->col[i], &LeatherPal[1], 8 * sizeof( Color ) );
-	memcpy( &palette->col[0xB0], &SkinPal[1], 8 * sizeof( Color ) );
+		//leather
+		memcpy( &palette->col[i], &palette->col[0x35], 8 * sizeof( Color ) );
+	//skin
+	memcpy( &palette->col[0xB0], &palette->col[29], 8 * sizeof( Color ) );
 	for (i = 0xB8; i < 0xFF; i += 0x08)
-		memcpy( &palette->col[i], &LeatherPal[1], 8 * sizeof( Color ) );
-	free( MetalPal );
-	free( MinorPal );
-	free( MajorPal );
-	free( SkinPal );
-	free( LeatherPal );
-	free( ArmorPal );
-	free( HairPal );
+		//leather
+		memcpy( &palette->col[i], &palette->col[0x35], 8 * sizeof( Color ) );
 }
 
 void CharAnimations::InitAvatarsTable()

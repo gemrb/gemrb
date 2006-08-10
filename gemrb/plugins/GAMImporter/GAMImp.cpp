@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.82 2006/08/07 22:25:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.83 2006/08/10 21:34:40 avenger_teambg Exp $
  *
  */
 
@@ -346,6 +346,8 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 			SanityCheck( pcInfo.QuickItemSlot[i], tmpWord, "item");
 			pcInfo.QuickItemHeader[i]=tmpWord;
 		}
+		pcInfo.QuickItemHeader[3]=0xffff;
+		pcInfo.QuickItemHeader[4]=0xffff;
 		//QuickSlots are customisable in iwd2 and GemRB
 		//thus we adopt the iwd2 style actor info
 		str->Seek( 72, GEM_CURRENT_POS);

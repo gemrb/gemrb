@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PLTImporter/PLTImp.cpp,v 1.12 2005/12/14 18:33:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PLTImporter/PLTImp.cpp,v 1.13 2006/08/10 21:34:40 avenger_teambg Exp $
  *
  */
 
@@ -96,7 +96,8 @@ Sprite2D* PLTImp::GetImage()
 	for (int i = 0; i < 8; i++) {
 		if (Palettes[i])
 			free( Palettes[i] );
-		Palettes[i] = core->GetPalette( palIndices[i], 256 );
+		Palettes[i] = (Color *) malloc(256 * sizeof(Color) );
+		core->GetPalette( palIndices[i], 256, Palettes[i] );
 	}
 	unsigned char * p = ( unsigned char * ) malloc( Width * Height * 4 );
 	unsigned char * dest = p;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.407 2006/08/08 20:25:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.408 2006/08/10 21:34:40 avenger_teambg Exp $
  *
  */
 
@@ -600,8 +600,9 @@ static PyObject* GemRB_LoadWindowFrame(PyObject * /*self*/, PyObject* args)
 		}
 
 		// FIXME: delete previous WindowFrames
-
-		core->WindowFrames[i] = Picture;
+		
+		//core->WindowFrames[i] = Picture;
+		core->SetWindowFrame(i, Picture);
 
 	}
 	core->FreeInterface( im );
@@ -1701,7 +1702,7 @@ static PyObject* GemRB_CreateButton(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("Cannot find window!");
 	}
 
-	Button* btn = new Button( true );
+	Button* btn = new Button( );
 	btn->XPos = x;
 	btn->YPos = y;
 	btn->Width = w;
@@ -2581,7 +2582,7 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
 	int col[8];
-	int type;
+	int type = 0;
 	char* ResRef;
 
 	memset(col,-1,sizeof(col));
@@ -2719,12 +2720,10 @@ static PyObject* SetButtonBAM(int wi, int ci, const char *ResRef, int CycleIndex
 	}
 
 	if (col1 >= 0) {
-		Color* pal = core->GetPalette( col1, 12 );
 		Palette* newpal = core->GetVideoDriver()->GetPalette(Picture)->Copy();
-		memcpy( &newpal->col[4], pal, 12 * sizeof( Color ) );
+		core->GetPalette( col1, 12, &newpal->col[4]);
 		core->GetVideoDriver()->SetPalette( Picture, newpal );
-		free( pal );
-		//core->GetVideoDriver()->FreePalette( newpal );
+		newpal->Release();
 	}
 
 	btn->SetPicture( Picture );
@@ -3843,7 +3842,7 @@ static PyObject* GemRB_GetSlotType(PyObject * /*self*/, PyObject* args)
 	}
 	//WARNING:idx isn't used any more, recycling it
 	idx = actor->inventory.GetWeaponSlot();
-	if (tmp<idx && tmp>idx+4) {
+	if (tmp<idx || tmp>idx+3) {
 		goto has_slot;
 	}
 	if (actor->GetQuickSlot(tmp-idx)==0xffff) {

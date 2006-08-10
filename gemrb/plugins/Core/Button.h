@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.54 2006/08/04 22:50:36 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.55 2006/08/10 21:34:40 avenger_teambg Exp $
  *
  */
 
@@ -119,7 +119,7 @@ typedef struct ButtonBorder {
 
 class GEM_EXPORT Button : public Control {
 public: 
-	Button(bool Clear = false);
+	Button();
 	~Button();
 	/** Sets the 'type' Image of the Button to 'img'.
 	'type' may assume the following values:
@@ -179,7 +179,6 @@ public: // Public Events
 	/** Sets percent (0-1.0) of width for clipping picture */
 	void SetPictureClipping(double clip)  { Clipping = clip; };
 private: // Private attributes
-	bool Clear;
 	char* Text;
 	bool hasText;
 	Font* font;

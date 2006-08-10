@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.424 2006/08/09 19:04:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.425 2006/08/10 21:34:40 avenger_teambg Exp $
  *
  */
 
@@ -481,6 +481,12 @@ Interface::~Interface(void)
 	DelTree((const char *) CachePath, true);
 }
 
+void Interface::SetWindowFrame(int i, Sprite2D *Picture)
+{
+	video->FreeSprite(WindowFrames[i]);
+	WindowFrames[i]=Picture;
+}
+
 GameControl* Interface::StartGameControl()
 {
 	//making sure that our window is the first one
@@ -698,7 +704,7 @@ aux_1:
 		ieDword value = atoi(aa->QueryField(idx,0));
 		ItemDialTable->SetAt(key, value);
 		strnlwrcpy(dlgres,aa->QueryField(idx,1),8);
-		ItemDial2Table->SetAt(key, dlgres);
+		ItemDial2Table->SetAtCopy(key, dlgres);
 	}
 	DelTable( table );
 aux_2:
@@ -2208,17 +2214,17 @@ void Interface::FreePalette(Palette *&pal, const ieResRef name)
 }
 
 /** No descriptions */
-Color* Interface::GetPalette(int index, int colors)
+Color* Interface::GetPalette(int index, int colors, Color *pal)
 {
-	Color* pal = NULL;
+	//Color* pal = NULL;
 	if (colors == 32) {
-		pal = ( Color * ) malloc( colors * sizeof( Color ) );
+		//pal = ( Color * ) malloc( colors * sizeof( Color ) );
 		pal32->GetPalette( index, colors, pal );
 	} else if (colors <= 32) {
-		pal = ( Color * ) malloc( colors * sizeof( Color ) );
+		//pal = ( Color * ) malloc( colors * sizeof( Color ) );
 		pal16->GetPalette( index, colors, pal );
 	} else if (colors == 256) {
-		pal = ( Color * ) malloc( colors * sizeof( Color ) );
+		//pal = ( Color * ) malloc( colors * sizeof( Color ) );
 		pal256->GetPalette( index, colors, pal );
 	}
 	return pal;
@@ -3821,18 +3827,19 @@ void Interface::DisplayConstantStringValue(int stridx, unsigned int color, ieDwo
 	free( newstr );
 }
 
+#define PALSIZE 8
+static Color ActorColor[PALSIZE];
+
 void Interface::DisplayConstantStringName(int stridx, unsigned int color, Scriptable *speaker)
 {
 	unsigned int speaker_color;
 	char *name;
-	Color *tmp;
 
 	switch (speaker->Type) {
 		case ST_ACTOR:
 			name = ((Actor *) speaker)->GetName(-1);
-			tmp = GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR),8 );
-			speaker_color = (tmp[4].r<<16) | (tmp[4].g<<8) | tmp[4].b;
-			free(tmp);
+			GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR),8, ActorColor );
+			speaker_color = (ActorColor[4].r<<16) | (ActorColor[4].g<<8) | ActorColor[4].b;
 			break;
 		default:
 			name = "";
@@ -3856,14 +3863,12 @@ void Interface::DisplayConstantStringAction(int stridx, unsigned int color, Scri
 	unsigned int attacker_color;
 	char *name1;
 	char *name2;
-	Color *tmp;
 
 	switch (attacker->Type) {
 		case ST_ACTOR:
 			name1 = ((Actor *) attacker)->GetName(-1);
-			tmp = GetPalette( ((Actor *) attacker)->GetStat(IE_MAJOR_COLOR),8 );
-			attacker_color = (tmp[4].r<<16) | (tmp[4].g<<8) | tmp[4].b;
-			free(tmp);
+			GetPalette( ((Actor *) attacker)->GetStat(IE_MAJOR_COLOR),8, ActorColor );
+			attacker_color = (ActorColor[4].r<<16) | (ActorColor[4].g<<8) | ActorColor[4].b;
 			break;
 		default:
 			name1 = "";
@@ -3894,14 +3899,12 @@ void Interface::DisplayStringName(int stridx, unsigned int color, Scriptable *sp
 {
 	unsigned int speaker_color;
 	char *name;
-	Color *tmp;
 
 	switch (speaker->Type) {
 		case ST_ACTOR:
 			name = ((Actor *) speaker)->GetName(-1);
-			tmp = GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR),8 );
-			speaker_color = (tmp[4].r<<16) | (tmp[4].g<<8) | tmp[4].b;
-			free(tmp);
+			GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR),8, ActorColor );
+			speaker_color = (ActorColor[4].r<<16) | (ActorColor[4].g<<8) | ActorColor[4].b;
 			break;
 		default:
 			name = "";

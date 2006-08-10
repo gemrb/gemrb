@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.66 2006/08/09 21:28:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.67 2006/08/10 21:34:40 avenger_teambg Exp $
  *
  */
 
@@ -904,6 +904,24 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	actor->WalkTo( target->Pos, flags, 0 );
+}
+
+void CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
+{
+        strncpy(item->ItemResRef, resref, 8);
+        if (a==-1) {
+                Item *origitem = core->GetItem(resref);
+                for(int i=0;i<3;i++) {
+                        ITMExtHeader *e = origitem->GetExtHeader(i);              
+                        item->Usages[i]=e?e->Charges:0;
+                }
+                core->FreeItem(origitem, resref, false);
+        } else {
+                item->Usages[0]=(ieWord) a;
+                item->Usages[1]=(ieWord) b;
+                item->Usages[2]=(ieWord) c;
+        }
+        item->Flags=0;
 }
 
 //It is possible to attack CONTAINERS/DOORS as well!!!

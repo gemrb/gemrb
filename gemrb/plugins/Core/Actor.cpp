@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.205 2006/08/08 20:25:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.206 2006/08/10 21:34:40 avenger_teambg Exp $
  *
  */
 
@@ -970,7 +970,7 @@ void Actor::RefreshEffects()
 	Modified[IE_HITPOINTS]+=bonus;
 
 	for (unsigned int i=0;i<MAX_STATS;i++) {
-		if (first || Modified[i]!=previous[i]) {
+		if (first || (Modified[i]!=previous[i]) ) {
 			PostChangeFunctionType f = post_change_functions[i];
 			if (f) {
 				(*f)(this, Modified[i]);

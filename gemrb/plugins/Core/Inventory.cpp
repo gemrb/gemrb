@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.82 2006/08/06 21:37:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.83 2006/08/10 21:34:40 avenger_teambg Exp $
  *
  */
 
@@ -1003,7 +1003,7 @@ void Inventory::AddSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 	TmpItem->Usages[0]=Charge0;
 	TmpItem->Usages[1]=Charge1;
 	TmpItem->Usages[2]=Charge2;
-	TmpItem->Flags=IE_INV_ITEM_ACQUIRED;
+	TmpItem->Flags=0;
 	if (core->ResolveRandomItem(TmpItem) &&core->Exists(TmpItem->ItemResRef, IE_ITM_CLASS_ID)) {
 		AddSlotItem( TmpItem, SlotID );
 	} else {
@@ -1019,7 +1019,7 @@ void Inventory::SetSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 	TmpItem->Usages[0]=Charge0;
 	TmpItem->Usages[1]=Charge1;
 	TmpItem->Usages[2]=Charge2;
-	TmpItem->Flags=IE_INV_ITEM_ACQUIRED;
+	TmpItem->Flags=0;
 	if (core->ResolveRandomItem(TmpItem) &&core->Exists(TmpItem->ItemResRef, IE_ITM_CLASS_ID)) {
 		SetSlotItem( TmpItem, SlotID );
 	} else {

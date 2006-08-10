@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.52 2006/01/08 22:07:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.53 2006/08/10 21:34:40 avenger_teambg Exp $
  *
  */
 
@@ -139,7 +139,7 @@ Window* CHUImp::GetWindow(unsigned int wid)
 			case IE_GUI_BUTTON:
 			{
 			//Button
-				Button* btn = new Button( true );
+				Button* btn = new Button( );
 				btn->ControlID = ControlID;
 				btn->XPos = XPos;
 				btn->YPos = YPos;

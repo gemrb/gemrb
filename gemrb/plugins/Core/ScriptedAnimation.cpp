@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.33 2006/06/24 11:24:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.34 2006/08/10 21:34:40 avenger_teambg Exp $
  *
  */
 
@@ -295,6 +295,9 @@ void ScriptedAnimation::SetFullPalette(int idx)
 	SetFullPalette(PaletteResRef);
 }
 
+#define PALSIZE 12
+static Color NewPal[PALSIZE];
+
 void ScriptedAnimation::SetPalette(int gradient, int start)
 {
 	unsigned int i;
@@ -310,15 +313,13 @@ void ScriptedAnimation::SetPalette(int gradient, int start)
 	if (start==-1) {
 		start=4;
 	}
-	unsigned int size = 12;
-	Color* NewPal = core->GetPalette( gradient&255, size );
+	core->GetPalette( gradient&255, PALSIZE, NewPal );
 
 	for(i=0;i<3;i++) {
 		if (palettes[i]) {
-			memcpy( &palettes[i]->col[start], NewPal, size*sizeof( Color ) );
+			memcpy( &palettes[i]->col[start], NewPal, PALSIZE*sizeof( Color ) );
 		}
 	}
-	free( NewPal );
 }
 
 void ScriptedAnimation::SetDefaultDuration(ieDword duration)

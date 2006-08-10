@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.106 2006/08/04 22:50:36 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.107 2006/08/10 21:34:40 avenger_teambg Exp $
  *
  */
 
@@ -27,10 +27,10 @@
 #include "Variables.h"
 #include "../../includes/defsounds.h"
 
-Button::Button(bool Clear)
+Button::Button()
 {
 	Unpressed = Pressed = Selected = Disabled = NULL;
-	this->Clear = Clear;
+	//this->Clear = Clear;
 	State = IE_GUI_BUTTON_UNPRESSED;
 	ResetEventHandler( ButtonOnPress );
 	ResetEventHandler( ButtonOnShiftPress );
@@ -58,23 +58,11 @@ Button::Button(bool Clear)
 Button::~Button()
 {
 	Video* video = core->GetVideoDriver();
-	if (Clear) {
-		if (Unpressed)
-			video->FreeSprite( Unpressed );
-		if (Pressed && ( Pressed != Unpressed ))
-			video->FreeSprite( Pressed );
-		if (Selected &&
-			( ( Selected != Pressed ) && ( Selected != Unpressed ) ))
-			video->FreeSprite( Selected );
-		if (Disabled &&
-			( ( Disabled != Pressed ) &&
-			( Disabled != Unpressed ) &&
-			( Disabled != Selected ) ))
-			video->FreeSprite( Disabled );
-	}
-	if (Picture) {
-		video->FreeSprite( Picture );
-	}
+	video->FreeSprite( Disabled );
+	video->FreeSprite( Selected );
+	video->FreeSprite( Pressed );
+	video->FreeSprite( Unpressed );
+	video->FreeSprite( Picture );
 	ClearPictureList();
 	if (Text) {
 		free( Text );
@@ -93,37 +81,25 @@ void Button::SetImage(unsigned char type, Sprite2D* img)
 	switch (type) {
 		case IE_GUI_BUTTON_UNPRESSED:
 		case IE_GUI_BUTTON_LOCKED:
-			 {
-				if (Unpressed && Clear)
-					core->GetVideoDriver()->FreeSprite( Unpressed );
-				Unpressed = img;
-			}
+			core->GetVideoDriver()->FreeSprite( Unpressed );
+			Unpressed = img;
 			break;
 
 		case IE_GUI_BUTTON_SECOND:
 		case IE_GUI_BUTTON_PRESSED:
-			 {
-				if (Pressed && Clear)
-					core->GetVideoDriver()->FreeSprite( Pressed );
-				Pressed = img;
-			}
+			core->GetVideoDriver()->FreeSprite( Pressed );
+			Pressed = img;
 			break;
 
 		case IE_GUI_BUTTON_SELECTED:
-			 {
-				if (Selected && Clear)
-					core->GetVideoDriver()->FreeSprite( Selected );
-				Selected = img;
-			}
+			core->GetVideoDriver()->FreeSprite( Selected );
+			Selected = img;
 			break;
 
 		case IE_GUI_BUTTON_DISABLED:
 		case IE_GUI_BUTTON_THIRD:
-			 {
-				if (Disabled && Clear)
-					core->GetVideoDriver()->FreeSprite( Disabled );
-				Disabled = img;
-			}
+			core->GetVideoDriver()->FreeSprite( Disabled );
+			Disabled = img;
 			break;
 	}
 	Changed = true;
@@ -543,9 +519,7 @@ void Button::RedrawButton(const char* VariableName, unsigned int Sum)
 /** Sets the Picture */
 void Button::SetPicture(Sprite2D* newpic)
 {
-	if (Picture) {
-		core->GetVideoDriver()->FreeSprite( Picture );
-	}
+	core->GetVideoDriver()->FreeSprite( Picture );
 	if (newpic) {
 		newpic->XPos = 0;
 		newpic->YPos = 0;

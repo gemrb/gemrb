@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.cpp,v 1.33 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.cpp,v 1.34 2006/08/10 21:34:40 avenger_teambg Exp $
  *
  */
 
@@ -46,8 +46,8 @@ TextEdit::~TextEdit(void)
 	Video *video = core->GetVideoDriver();
 	core->FreePalette( palette );
 	free( Buffer );
-	if( Back )
-		video->FreeSprite( Back );
+	video->FreeSprite( Back );
+	video->FreeSprite( Cursor );
 }
 
 /** Draws the Control on the Output Display */
@@ -87,6 +87,7 @@ void TextEdit::SetFont(Font* f)
 /** Set Cursor */
 void TextEdit::SetCursor(Sprite2D* cur)
 {
+	core->GetVideoDriver()->FreeSprite( Cursor );
 	if (cur != NULL) {
 		Cursor = cur;
 	}

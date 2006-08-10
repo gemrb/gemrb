@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.67 2006/08/07 22:25:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.68 2006/08/10 21:34:41 avenger_teambg Exp $
  *
  */
 
@@ -74,7 +74,7 @@ public:
 		void* palette, bool cK = false, int index = 0);
 	Sprite2D* CreateSpriteBAM8(int w, int h, bool RLE, void* pixeldata,
 		unsigned int datasize, Palette* palette, int transindex);
-	void FreeSprite(Sprite2D* spr);
+	void FreeSprite(Sprite2D* &spr);
 	void BlitSprite(Sprite2D* spr, int x, int y, bool anchor = false,
 		Region* clip = NULL);
 	void BlitSpriteHalfTrans(Sprite2D* spr, int x, int y,
