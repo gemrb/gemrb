@@ -1,0 +1,9 @@
+Description: This table is used by the character generator (and when leveling up).
+It lists the thieving skills. The first two rows contain the distributable points per level.
+
+Columns - rogue classes or kits
+
+Rows - distributable points and skills
+
+The clskills.2da table's THIEFSKILL column contains the reference to this table.
+Theoretically it is possible to have different tables per class.

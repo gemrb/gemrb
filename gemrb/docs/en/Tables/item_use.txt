@@ -1,0 +1,7 @@
+Description: This table lists special items that won't be dropped by certain actors.
+
+Columns:
+USER   - the scripting name of the playable character
+STRREF - the displayed string
+
+Rows: Item resrefs

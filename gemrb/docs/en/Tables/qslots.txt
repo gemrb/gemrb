@@ -1,0 +1,11 @@
+Description: This file contains the default action buttons based on class.
+This file is inherited from IWD2, although IWD2 uses a slightly different version.
+The columns of the table contain the nine modifiable actions for each class.
+A value of 100 means an unavailable slot.
+The values may be 0-31, and represent the first 32 rows of guibtact.2da
+
+Columns: the quick slots
+
+Rows: the classes
+
+See also: guibtact.txt

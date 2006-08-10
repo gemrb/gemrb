@@ -1,0 +1,11 @@
+Description: This table lists the playable races in the game. 
+
+Columns - 
+NAME_REF  - the name of the race
+CAP_REF   - the capitalized name of the race
+DESC_REF  - the description of the race
+ID        - the race stat value
+USABILITY - the item usability flag
+
+Rows - races
+
