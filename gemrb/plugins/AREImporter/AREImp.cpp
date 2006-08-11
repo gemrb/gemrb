@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.158 2006/07/22 12:39:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.159 2006/08/11 23:17:18 avenger_teambg Exp $
  *
  */
 
@@ -811,7 +811,7 @@ Map* AREImp::GetMap(const char *ResRef)
 				continue;
 			}
 			if (anim->Flags & A_ANI_ALLCYCLES) {
-				anim->animcount = af->GetCycleCount();
+				anim->animcount = (int) af->GetCycleCount();
 				anim->animation = (Animation **) malloc(anim->animcount * sizeof(Animation *) );
 				for(int j=0;j<anim->animcount;j++) {
 					anim->animation[j]=GetAnimationPiece(af, j, anim);
@@ -1700,7 +1700,7 @@ int AREImp::PutAmbients( DataStream *stream, Map *map)
 		stream->WriteWord( &am->height );
 		stream->Write( filling, 6 );
 		stream->WriteWord( &am->gain );
-		tmpWord = am->sounds.size();
+		tmpWord = (ieWord) am->sounds.size();
 		int j;
 		for (j = 0;j < tmpWord; j++) {
 			stream->WriteResRef( am->sounds[j] );
@@ -1738,7 +1738,7 @@ int AREImp::PutMapnotes( DataStream *stream, Map *map)
 			stream->WriteDword( &tmpDword );
 			tmpDword = (ieDword) mn->Pos.y;
 			stream->WriteDword( &tmpDword );
-			int len = strlen(mn->text);
+			unsigned int len = (unsigned int) strlen(mn->text);
 			if (len>500) len=500;
 			stream->Write( mn->text, len);
 			x = 500-len;

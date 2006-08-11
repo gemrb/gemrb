@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.154 2006/08/10 21:34:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.155 2006/08/11 23:17:18 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -356,7 +356,7 @@ bool Scriptable::InMove()
 		return false;
 	}
 	Moveble *me = (Moveble *) this;
-	return me->path!=NULL;
+	return me->GetNextStep()!=NULL;
 }
 
 void Scriptable::SetWait(unsigned long time)
@@ -643,6 +643,29 @@ Moveble::~Moveble(void)
 	}
 }
 
+int Moveble::GetPathLength() const
+{
+	PathNode *node = step;
+	int i = 0;
+	while (node->Next) {
+		i++;
+		node = node->Next;
+	}
+	return i;
+}
+
+PathNode *Moveble::GetNextStep(int x)
+{
+	if (!step) {
+		DoStep((unsigned int) ~0);
+	}
+	PathNode *node = step;
+	while(node && x--) {
+		node = node->Next;
+	}
+	return node;
+}
+
 Point Moveble::GetMostLikelyPosition()
 {
 	if (!path) {
@@ -651,6 +674,11 @@ Point Moveble::GetMostLikelyPosition()
 
 //actually, sometimes middle path would be better, if
 //we stand in Destination already
+	int halfway = GetPathLength()/2;
+	PathNode *node = GetNextStep(halfway);
+	if (node) {
+		return Point(node->x, node->y);
+	}
 	return Destination;
 }
 
@@ -700,6 +728,9 @@ void Moveble::DoStep(unsigned int walk_speed)
 		//since clearpath no longer sets currentaction to NULL
 		//we set it here
 		ReleaseCurrentAction();
+		return;
+	}
+	if (!walk_speed) {
 		return;
 	}
 	if (step->Next->x > step->x)
@@ -774,7 +805,6 @@ void Moveble::RandomWalk(bool can_stop)
 	if (path) {
 		return;
 	}
-	//ClearPath();
 	//if not continous random walk, then stops for a while
 	if (can_stop && (rand()&3) ) {
 		SetWait((rand()&7)+7);

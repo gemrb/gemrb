@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.292 2006/08/10 16:44:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.293 2006/08/11 23:17:19 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -144,9 +144,9 @@ void GameControl::ReadFormations()
 	formations = (formation_type *) calloc(formationcount, sizeof(formation_type));
 	for(i=0; i<formationcount; i++) {
 		for(j=0;j<FORMATIONSIZE;j++) {
-			int k=atoi(tab->QueryField(i,j*2));
+			short k=(short) atoi(tab->QueryField(i,j*2));
 			formations[i][j].x=k;
-			k=atoi(tab->QueryField(i,j*2+1));
+			k=(short) atoi(tab->QueryField(i,j*2+1));
 			formations[i][j].y=k;
 		}
 	}
@@ -856,7 +856,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	}
 	if (lastCursor != nextCursor) {
 		( ( Window * ) Owner )->Cursor = nextCursor;
-		lastCursor = nextCursor;
+		lastCursor = (unsigned char) nextCursor;
 	}
 }
 
@@ -1245,9 +1245,9 @@ void GameControl::HandleWindowHide(const char *WindowName, const char *WindowPos
 
 	if (dict->Lookup( WindowName, index )) {
 		if (index != (ieDword) -1) {
-			Window* w = core->GetWindow( index );
+			Window* w = core->GetWindow( (unsigned short) index );
 			if (w) {
-				core->SetVisible( index, WINDOW_INVISIBLE );
+				core->SetVisible( (unsigned short) index, WINDOW_INVISIBLE );
 				if (dict->Lookup( WindowPosition, index )) {
 					ResizeDel( w, index );
 				}
@@ -1282,7 +1282,7 @@ int GameControl::HideGUI()
 
 	if (dict->Lookup( "FloatWindow", index )) {
 		if (index != (ieDword) -1) {
-			core->SetVisible( index, WINDOW_INVISIBLE );
+			core->SetVisible( (unsigned short) index, WINDOW_INVISIBLE );
 		}
 	}
 	core->GetVideoDriver()->SetViewport( ( ( Window * ) Owner )->XPos, ( ( Window * ) Owner )->YPos, Width, Height );
@@ -1297,9 +1297,9 @@ void GameControl::HandleWindowReveal(const char *WindowName, const char *WindowP
 
 	if (dict->Lookup( WindowName, index )) {
 		if (index != (ieDword) -1) {
-			Window* w = core->GetWindow( index );
+			Window* w = core->GetWindow( (unsigned short) index );
 			if (w) {
-				core->SetVisible( index, WINDOW_VISIBLE );
+				core->SetVisible( (unsigned short) index, WINDOW_VISIBLE );
 				if (dict->Lookup( WindowPosition, index )) {
 					ResizeAdd( w, index );
 				}
@@ -1332,8 +1332,8 @@ int GameControl::UnhideGUI()
 
 	if (dict->Lookup( "FloatWindow", index )) {
 		if (index != (ieDword) -1) {
-			Window* fw = core->GetWindow( index );
-			core->SetVisible( index, WINDOW_VISIBLE );
+			Window* fw = core->GetWindow( (unsigned short) index );
+			core->SetVisible( (unsigned short) index, WINDOW_VISIBLE );
 			fw->Flags |=WF_FLOAT;
 			core->SetOnTop( index );
 		}
@@ -1342,7 +1342,7 @@ int GameControl::UnhideGUI()
 	return 1;
 }
 
-void GameControl::ResizeDel(Window* win, unsigned char type)
+void GameControl::ResizeDel(Window* win, int type)
 {
 	switch (type) {
 	case 0: //Left
@@ -1404,7 +1404,7 @@ void GameControl::ResizeDel(Window* win, unsigned char type)
 	}
 }
 
-void GameControl::ResizeAdd(Window* win, unsigned char type)
+void GameControl::ResizeAdd(Window* win, int type)
 {
 	switch (type) {
 	case 0: //Left
@@ -1737,14 +1737,13 @@ void GameControl::DisplayString(Point &p, const char *Text)
 void GameControl::DisplayString(Scriptable* target)
 {
 	Scriptable* scr = new Scriptable( ST_TRIGGER );
-	int len = strlen( target->overHeadText ) + 1;
+	size_t len = strlen( target->overHeadText ) + 1;
 	scr->overHeadText = ( char * ) malloc( len );
 	strcpy( scr->overHeadText, target->overHeadText );
 	scr->textDisplaying = 1;
 	scr->timeStartDisplaying = target->timeStartDisplaying;
 	scr->Pos = target->Pos;
 	scr->SetCutsceneID( target );
-	//infoTexts.push_back( scr );
 }
 
 /** changes displayed map to the currently selected PC */

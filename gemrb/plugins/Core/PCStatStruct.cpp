@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PCStatStruct.cpp,v 1.3 2006/08/07 22:25:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PCStatStruct.cpp,v 1.4 2006/08/11 23:17:19 avenger_teambg Exp $
  *
  */
 
@@ -56,7 +56,7 @@ void PCStatsStruct::IncrementChapter()
 }
 
 //init quick weapon/item slots
-void PCStatsStruct::InitQuickSlot(unsigned int which, unsigned int slot, unsigned int headerindex)
+void PCStatsStruct::InitQuickSlot(unsigned int which, ieWord slot, ieWord headerindex)
 {
 	switch(which) {
 	case ACT_QSLOT1:
@@ -106,7 +106,7 @@ void PCStatsStruct::InitQuickSlot(unsigned int which, unsigned int slot, unsigne
 	}
 }
 
-void PCStatsStruct::SetSlotIndex(unsigned int which, unsigned int headerindex)
+void PCStatsStruct::SetSlotIndex(unsigned int which, ieWord headerindex)
 {
 	//this is not correct, not the slot, but a separate headerindex should be here
 	switch(which) {
@@ -120,7 +120,7 @@ void PCStatsStruct::SetSlotIndex(unsigned int which, unsigned int headerindex)
 	abort();
 }
 
-void PCStatsStruct::GetSlotAndIndex(unsigned int which, unsigned int &slot, unsigned int &headerindex)
+void PCStatsStruct::GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &headerindex)
 {
 	int idx;
 

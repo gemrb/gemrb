@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.83 2006/08/10 21:34:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.84 2006/08/11 23:17:19 avenger_teambg Exp $
  *
  */
 
@@ -94,7 +94,7 @@ Inventory::~Inventory()
 	}
 }
 
-CREItem *Inventory::GetItem(size_t slot)
+CREItem *Inventory::GetItem(unsigned int slot)
 {
 	if (slot>=Slots.size() ) {
 		InvalidSlot(slot);
@@ -253,7 +253,7 @@ bool Inventory::HasItemInSlot(const char *resref, unsigned int slot)
 int Inventory::CountItems(const char *resref, bool stacks)
 {
 	int count = 0;
-	int slot = Slots.size();
+	size_t slot = Slots.size();
 	while(slot--) {
 		CREItem *item = Slots[slot];
 		if (!item) {
@@ -278,7 +278,7 @@ int Inventory::CountItems(const char *resref, bool stacks)
 		specifying 1 in a bit signifies a requirement */
 bool Inventory::HasItem(const char *resref, ieDword flags)
 {
-	int slot = Slots.size();
+	size_t slot = Slots.size();
 	while(slot--) {
 		CREItem *item = Slots[slot];
 		if (!item) {
@@ -328,7 +328,7 @@ specifying 1 in a bit signifies a requirement */
 unsigned int Inventory::DestroyItem(const char *resref, ieDword flags, ieDword count)
 {
 	unsigned int destructed = 0;
-	unsigned int slot = Slots.size();
+	size_t slot = Slots.size();
 	while(slot--) {
 		CREItem *item = Slots[slot];
 		if (!item) {
@@ -350,14 +350,14 @@ unsigned int Inventory::DestroyItem(const char *resref, ieDword flags, ieDword c
 			removed=item->Usages[0];
 			if (count && (removed + destructed > count) ) {
 				removed = count - destructed;
-				item = RemoveItem( slot, removed );
+				item = RemoveItem( (unsigned int) slot, removed );
 			}
 			else {
-				KillSlot(slot);
+				KillSlot( (unsigned int) slot);
 			}
 		} else {
 			removed=1;
-			KillSlot(slot);
+			KillSlot( (unsigned int) slot);
 		}
 		delete item;
 		Changed = true;
@@ -389,14 +389,14 @@ CREItem *Inventory::RemoveItem(unsigned int slot, unsigned int count)
 	}
 
 	CREItem *returned = new CREItem(*item);
-	item->Usages[0]-=count;
-	returned->Usages[0]=count;
+	item->Usages[0]=(ieWord) (item->Usages[0]-count);
+	returned->Usages[0]=(ieWord) count;
 	return returned;
 }
 
 int Inventory::RemoveItem(const char *resref, unsigned int flags, CREItem **res_item)
 {
-	int slot = Slots.size();
+	size_t slot = Slots.size();
 	while(slot--) {
 		CREItem *item = Slots[slot];
 		if (!item) {
@@ -408,8 +408,8 @@ int Inventory::RemoveItem(const char *resref, unsigned int flags, CREItem **res_
 		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
 			continue;
 		}
-		*res_item=RemoveItem(slot, 0);
-		return slot;
+		*res_item=RemoveItem( (unsigned int) slot, 0);
+		return (int) slot;
 	}
 	*res_item = NULL;
 	return -1;
@@ -455,8 +455,8 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 				return -1;
 			}	
 			myslot->Flags |= IE_INV_ITEM_ACQUIRED;
-			myslot->Usages[0] += chunk;
-			item->Usages[0] -= chunk;
+			myslot->Usages[0] = (ieWord) (myslot->Usages[0] + chunk);
+			item->Usages[0] = (ieWord) (item->Usages[0] - chunk);
 			Changed = true;
 			EquipItem(slot);
 			if (item->Usages[0] == 0) {
@@ -585,7 +585,7 @@ int Inventory::FindItem(const char *resref, unsigned int flags)
 		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
 			continue;
 		}
-		return i;
+		return  (int) i;
 	}
 	return -1;
 }
@@ -640,7 +640,7 @@ bool Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 		map->AddItemToLocation(loc, item);
 		Changed = true;
 		dropped = true;
-		KillSlot(i);
+		KillSlot((unsigned int) i);
 		//if it isn't all items then we stop here
 		if (resref[0])
 			break;
@@ -968,14 +968,14 @@ int Inventory::FindCandidateSlot(int slottype, size_t first_slot, const char *re
 		return -1;
 
 	for (size_t i = first_slot; i < Slots.size(); i++) {
-		if (!(core->QuerySlotType(i)&slottype) ) {
+		if (!(core->QuerySlotType( (unsigned int) i) & slottype) ) {
 			continue;
 		}
 
 		CREItem *item = Slots[i];
 
 		if (!item) {
-			return i; //this is a good empty slot
+			return (int) i; //this is a good empty slot
 		}
 		if (!resref) {
 			continue;
@@ -988,8 +988,9 @@ int Inventory::FindCandidateSlot(int slottype, size_t first_slot, const char *re
 		}
 		// check if the item fits in this slot, we use the cached
 		// stackamount value
-		if (item->Usages[0]<item->StackAmount)
-			return i;
+		if (item->Usages[0]<item->StackAmount) {
+			return (int) i;
+		}
 	}
 
 	return -1;
@@ -1000,9 +1001,9 @@ void Inventory::AddSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 	CREItem *TmpItem = new CREItem();
 	strnlwrcpy(TmpItem->ItemResRef, ItemResRef, 8);
 	TmpItem->PurchasedAmount=0;
-	TmpItem->Usages[0]=Charge0;
-	TmpItem->Usages[1]=Charge1;
-	TmpItem->Usages[2]=Charge2;
+	TmpItem->Usages[0]=(ieWord) Charge0;
+	TmpItem->Usages[1]=(ieWord) Charge1;
+	TmpItem->Usages[2]=(ieWord) Charge2;
 	TmpItem->Flags=0;
 	if (core->ResolveRandomItem(TmpItem) &&core->Exists(TmpItem->ItemResRef, IE_ITM_CLASS_ID)) {
 		AddSlotItem( TmpItem, SlotID );
@@ -1016,9 +1017,9 @@ void Inventory::SetSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 	CREItem *TmpItem = new CREItem();
 	strnlwrcpy(TmpItem->ItemResRef, ItemResRef, 8);
 	TmpItem->PurchasedAmount=0;
-	TmpItem->Usages[0]=Charge0;
-	TmpItem->Usages[1]=Charge1;
-	TmpItem->Usages[2]=Charge2;
+	TmpItem->Usages[0]=(ieWord) Charge0;
+	TmpItem->Usages[1]=(ieWord) Charge1;
+	TmpItem->Usages[2]=(ieWord) Charge2;
 	TmpItem->Flags=0;
 	if (core->ResolveRandomItem(TmpItem) &&core->Exists(TmpItem->ItemResRef, IE_ITM_CLASS_ID)) {
 		SetSlotItem( TmpItem, SlotID );

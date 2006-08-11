@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.206 2006/08/10 21:34:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.207 2006/08/11 23:17:19 avenger_teambg Exp $
  *
  */
 
@@ -154,6 +154,11 @@ public:
 #define AP_ENEMY         7
 #define AP_TRAP          8
 #define AP_SPELLCAST     9
+
+/** ea relations (derivated from 2 actor's EA value) */
+#define EAR_FRIEND  0
+#define EAR_NEUTRAL 1
+#define EAR_HOSTILE 2
 
 /** Max size of actor's ground circle (PST) */
 #define MAX_CIRCLE_SIZE  3
@@ -365,8 +370,8 @@ public:
 	void DisplayConstantStringName(int stridx, unsigned int color, Scriptable *speaker);
 	/** displays a string constant in the textarea, starting with actor, and ending with target */
 	void DisplayConstantStringAction(int stridx, unsigned int color, Scriptable *actor, Scriptable *target);
-  /** displays a string in the textarea */
-  void DisplayString(int stridx, unsigned int color, ieDword flags);
+	/** displays a string in the textarea */
+	void DisplayString(int stridx, unsigned int color, ieDword flags);
 	/** displays a string in the textarea, starting with speaker's name */
 	void DisplayStringName(int stridx, unsigned int color, Scriptable *speaker, ieDword flags);
 	/** returns the Window Visible Flag */
@@ -461,8 +466,8 @@ public:
 	WorldMap * GetWorldMap(const char *area = NULL);
 	void SetWindowFrame(int i, Sprite2D *Picture);
 	GameControl *GetGameControl();
-
-	void QuitGame(bool backtomain);
+	/** if backtomain is not null then goes back to main screen */
+	void QuitGame(int backtomain);
 	void LoadGame(int index);
 	/*reads the filenames of the sounds folder into a list */
 	int GetCharSounds(TextArea *ta);

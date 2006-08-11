@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VideoModes.cpp,v 1.5 2005/03/05 10:26:52 guidoj Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VideoModes.cpp,v 1.6 2006/08/11 23:17:20 avenger_teambg Exp $
  *
  */
 
@@ -86,6 +86,6 @@ VideoMode VideoModes::operator[](unsigned int n)
 
 unsigned int VideoModes::Count(void)
 {
-	return modes.size();
+	return (unsigned int) modes.size();
 }
 

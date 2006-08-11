@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.21 2006/08/08 20:25:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.h,v 1.22 2006/08/11 23:17:20 avenger_teambg Exp $
  *
  */
 
@@ -163,6 +163,7 @@ public:
 	/** adds a spell to the book */
 	bool AddKnownSpell(int type, unsigned int level, CREKnownSpell *spl);
 	CREKnownSpell* GetKnownSpell(int type, unsigned int level, unsigned int index);
+	unsigned int GetMemorizedSpellsCount(int type) const;
 	unsigned int GetMemorizedSpellsCount(int type, unsigned int level) const;
 	CREMemorizedSpell* GetMemorizedSpell(int type, unsigned int level, unsigned int index);
 

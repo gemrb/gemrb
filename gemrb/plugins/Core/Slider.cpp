@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Slider.cpp,v 1.30 2005/11/24 17:44:09 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Slider.cpp,v 1.31 2006/08/11 23:17:20 avenger_teambg Exp $
  *
  */
 
@@ -156,9 +156,10 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y,
 {
 	Changed = true;
 	unsigned int oldPos = Pos;
-	short mx = KnobXPos + ( Pos * KnobStep ) - Knob->XPos,
-	my = KnobYPos - Knob->YPos;
-	short Mx = mx + Knob->Width, My = my + Knob->Height;
+	short mx = (short) (KnobXPos + ( Pos * KnobStep ) - Knob->XPos);
+	short my = (short) (KnobYPos - Knob->YPos);
+	short Mx = (short) (mx + Knob->Width);
+	short My = (short) (my + Knob->Height);
 
 	if (( x >= mx ) && ( y >= my )) {
 		if (( x <= Mx ) && ( y <= My )) {

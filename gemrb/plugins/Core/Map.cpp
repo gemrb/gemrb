@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.249 2006/08/10 16:44:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.250 2006/08/11 23:17:19 avenger_teambg Exp $
  *
  */
 
@@ -602,11 +602,11 @@ void Map::UpdateScripts()
 		int speed = 150;
 		if (actor->Modified[IE_DONOTJUMP]<2) {
 			BlockSearchMap( actor->Pos, actor->size, 0);
-			if (actor->path) {
+			if (actor->GetNextStep()) {
 				//we should actually wait for a short time and check then
-				if (!(GetBlocked(actor->path->x,actor->path->y)&PATH_MAP_PASSABLE)) {
-					actor->ClearPath();
-					actor->path = FindPath( actor->Pos, actor->Destination, actor->size );
+				PathNode * step = actor->GetNextStep();
+				if (!(GetBlocked(step->x,step->y)&PATH_MAP_PASSABLE)) {
+					actor->NewPath();
 				}
 			}
 		}
@@ -1119,7 +1119,7 @@ void Map::JumpActors(bool jump)
 void Map::PurgeArea(bool items)
 {
 	//1. remove dead actors without 'keep corpse' flag
-	unsigned int i=actors.size();
+	int i=(int) actors.size();
 	while (i--) {
 		Actor *ac = actors[i];
 
@@ -1133,7 +1133,7 @@ void Map::PurgeArea(bool items)
 	}
 	//2. remove any non critical items
 	if (items) {
-		unsigned int i=TMap->GetContainerCount();
+		i=(int) TMap->GetContainerCount();
 		while (i--) {
 			Container *c = TMap->GetContainer(i);
 			unsigned int j=c->inventory.GetSlotCount();
@@ -1167,7 +1167,7 @@ Actor* Map::GetActor(int index, bool any)
 
 Actor* Map::GetActorByDialog(const char *resref)
 {
-	unsigned int i = actors.size();
+	size_t i = actors.size();
 	while (i--) {
 		Actor* actor = actors[i];
 		if (strnicmp( actor->Dialog, resref, 8 ) == 0) {
@@ -1180,7 +1180,7 @@ Actor* Map::GetActorByDialog(const char *resref)
 //this function finds an actor by its original resref (not correct yet)
 Actor* Map::GetActorByResource(const char *resref)
 {
-	unsigned int i = actors.size();
+	size_t i = actors.size();
 	while (i--) {
 		Actor* actor = actors[i];
 		if (strnicmp( actor->GetScriptName(), resref, 8 ) == 0) { //temporarily!
@@ -1194,7 +1194,7 @@ int Map::GetActorInRect(Actor**& actorlist, Region& rgn, bool onlyparty)
 {
 	actorlist = ( Actor * * ) malloc( actors.size() * sizeof( Actor * ) );
 	int count = 0;
-	unsigned int i = actors.size();
+	size_t i = actors.size();
 	while (i--) {
 		Actor* actor = actors[i];
 //use this function only for party?
@@ -1320,7 +1320,7 @@ void Map::ActivateWallgroups(unsigned int baseindex, unsigned int count, int flg
 		wp->SetPolygonFlag(value);
 	}
 	//all actors will have to generate a new spritecover
-	i=actors.size();
+	i=(int) actors.size();
 	while(i--) {
 		actors[i]->SetSpriteCover(NULL);
 	}
@@ -1333,7 +1333,7 @@ void Map::GenerateQueues()
 {
 	int priority;
 
-	unsigned int i=actors.size();
+	unsigned int i=(unsigned int) actors.size();
 	for (priority=0;priority<QUEUE_COUNT;priority++) {
 		if (lastActorCount[priority] != i) {
 			if (queue[priority]) {
@@ -1461,8 +1461,8 @@ Spawn *Map::AddSpawn(char* Name, int XPos, int YPos, ieResRef *creatures, unsign
 	if (count>MAX_RESCOUNT) {
 		count=MAX_RESCOUNT;
 	}
-	sp->Pos.x = XPos;
-	sp->Pos.y = YPos;
+	sp->Pos.x = (ieWord) XPos;
+	sp->Pos.y = (ieWord) YPos;
 	sp->Count = count;
 	sp->Creatures = (ieResRef *) calloc( count, sizeof(ieResRef) );
 	for( unsigned int i=0;i<count;i++) {
@@ -1476,15 +1476,15 @@ void Map::AddEntrance(char* Name, int XPos, int YPos, short Face)
 {
 	Entrance* ent = new Entrance();
 	strncpy( ent->Name, Name, 32 );
-	ent->Pos.x = XPos;
-	ent->Pos.y = YPos;
-	ent->Face = Face;
+	ent->Pos.x = (ieWord) XPos;
+	ent->Pos.y = (ieWord) YPos;
+	ent->Face = (ieWord) Face;
 	entrances.push_back( ent );
 }
 
 Entrance* Map::GetEntrance(const char* Name)
 {
-	unsigned int i=entrances.size();
+	size_t i=entrances.size();
 	while (i--) {
 		Entrance *e = entrances[i];
 
@@ -1497,7 +1497,7 @@ Entrance* Map::GetEntrance(const char* Name)
 
 bool Map::HasActor(Actor *actor)
 {
-	unsigned int i=actors.size();
+	size_t i=actors.size();
 	while (i--) {
 		if (actors[i] == actor) {
 			return true;
@@ -1508,7 +1508,7 @@ bool Map::HasActor(Actor *actor)
 
 void Map::RemoveActor(Actor* actor)
 {
-	unsigned int i=actors.size();
+	size_t i=actors.size();
 	while (i--) {
 		if (actors[i] == actor) {
 			BlockSearchMap(actor->Pos, actor->size,0);
@@ -1521,7 +1521,7 @@ void Map::RemoveActor(Actor* actor)
 //returns true if none of the partymembers are on the map
 bool Map::CanFree()
 {
-	unsigned int i=actors.size();
+	size_t i=actors.size();
 	while (i--) {
 		if (actors[i]->InParty) {
 			return false;
@@ -1560,8 +1560,8 @@ void Map::Leveldown(unsigned int px, unsigned int py,
 	if (ndiff > diff) {
 		level = nlevel;
 		diff = ndiff;
-		n.x = px;
-		n.y = py;
+		n.x = (ieWord) px;
+		n.y = (ieWord) py;
 	}
 }
 
@@ -1580,8 +1580,63 @@ void Map::SetupNode(unsigned int x, unsigned int y, unsigned int Cost)
 		MapSet[pos] = 65535;
 		return;
 	}
-	MapSet[pos] = Cost;
+	MapSet[pos] = (ieWord) Cost;
 	InternalStack.push( ( x << 16 ) | y );
+}
+
+bool Map::AdjustPositionX(Point &goal, unsigned int radius)
+{
+	unsigned int minx = 0;
+	if ((unsigned int) goal.x > radius)
+		minx = goal.x - radius;
+	unsigned int maxx = goal.x + radius + 1;
+	if (maxx > Width)
+		maxx = Width;
+
+	for (unsigned int scanx = minx; scanx < maxx; scanx++) {
+		if ((unsigned int) goal.y >= radius) {
+			if (GetBlocked( scanx, goal.y - radius ) & PATH_MAP_PASSABLE) {
+				goal.x = (ieWord) scanx;
+				goal.y = (ieWord) (goal.y - radius);
+				return true;
+			}
+		}
+		if (goal.y + radius < Height) {
+			if (GetBlocked( scanx, goal.y + radius ) & PATH_MAP_PASSABLE) {
+				goal.x = (ieWord) scanx;
+				goal.y = (ieWord) (goal.y + radius);
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool Map::AdjustPositionY(Point &goal, unsigned int radius)
+{
+	unsigned int miny = 0;
+	if ((unsigned int) goal.y > radius)
+		miny = goal.y - radius;
+	unsigned int maxy = goal.y + radius + 1;
+	if (maxy > Height)
+		maxy = Height;
+	for (unsigned int scany = miny; scany < maxy; scany++) {
+		if ((unsigned int) goal.x >= radius) {
+			if (GetBlocked( goal.x - radius, scany ) & PATH_MAP_PASSABLE) {
+				goal.x = (ieWord) (goal.x - radius);
+				goal.y = (ieWord) scany;
+				return true;
+			}
+		}
+		if (goal.x + radius < Width) {
+			if (GetBlocked( goal.x - radius, scany ) & PATH_MAP_PASSABLE) {
+				goal.x = (ieWord) (goal.x + radius);
+				goal.y = (ieWord) scany;
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 void Map::AdjustPosition(Point &goal, unsigned int radius)
@@ -1591,55 +1646,27 @@ void Map::AdjustPosition(Point &goal, unsigned int radius)
 		maxr = Height;
 	}
 	if ((unsigned int) goal.x > Width) {
-		goal.x = Width;
+		goal.x = (ieWord) Width;
 	}
 	if ((unsigned int) goal.y > Height) {
-		goal.y = Height;
+		goal.y = (ieWord) Height;
 	}
-	for (; radius < maxr; radius++) {
-		unsigned int minx = 0;
-		if ((unsigned int) goal.x > radius)
-			minx = goal.x - radius;
-		unsigned int maxx = goal.x + radius + 1;
-		if (maxx > Width)
-			maxx = Width;
 
-		for (unsigned int scanx = minx; scanx < maxx; scanx++) {
-			if ((unsigned int) goal.y >= radius) {
-				if (GetBlocked( scanx, goal.y - radius ) & PATH_MAP_PASSABLE) {
-					goal.x = scanx;
-					goal.y -= radius;
-					return;
-				}
+	for (; radius < maxr; radius++) {
+		//lets make it slightly random where the actor will appear
+		if (rand()&1) {
+			if (AdjustPositionX(goal, radius)) {
+				return;
 			}
-			if (goal.y + radius < Height) {
-				if (GetBlocked( scanx, goal.y + radius ) & PATH_MAP_PASSABLE) {
-					goal.x = scanx;
-					goal.y += radius;
-					return;
-				}
+			if (AdjustPositionY(goal, radius)) {
+				return;
 			}
-		}
-		unsigned int miny = 0;
-		if ((unsigned int) goal.y > radius)
-			miny = goal.y - radius;
-		unsigned int maxy = goal.y + radius + 1;
-		if (maxy > Height)
-			maxy = Height;
-		for (unsigned int scany = miny; scany < maxy; scany++) {
-			if ((unsigned int) goal.x >= radius) {
-				if (GetBlocked( goal.x - radius, scany ) & PATH_MAP_PASSABLE) {
-					goal.x -= radius;
-					goal.y = scany;
-					return;
-				}
+		} else {
+			if (AdjustPositionY(goal, radius)) {
+				return;
 			}
-			if (goal.x + radius < Width) {
-				if (GetBlocked( goal.x - radius, scany ) & PATH_MAP_PASSABLE) {
-					goal.x += radius;
-					goal.y = scany;
-					return;
-				}
+			if (AdjustPositionX(goal, radius)) {
+				return;
 			}
 		}
 	}
@@ -1651,6 +1678,11 @@ PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, int flags)
 	Point start(s.x/16, s.y/12);
 	Point goal (d.x/16, d.y/12);
 	unsigned int dist;
+
+	//MapSet entries are made of 16 bits
+	if (PathLen>65535) {
+		PathLen = 65535;
+	}
 
 	memset( MapSet, 0, Width * Height * sizeof( unsigned short ) );
 	while (InternalStack.size())
@@ -1673,8 +1705,8 @@ PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, int flags)
 		long ty = ( y - goal.y );
 		unsigned int distance = (unsigned int) sqrt( ( double ) ( tx* tx + ty* ty ) );
 		if (dist<distance) {
-			best.x=x;
-			best.y=y;
+			best.x=(ieWord) x;
+			best.y=(ieWord) y;
 			dist=distance;
 		}
 
@@ -1723,8 +1755,10 @@ PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, int flags)
 		Leveldown( p.x + 1, p.y + 1, level, n, diff );
 		Leveldown( p.x + 1, p.y - 1, level, n, diff );
 		Leveldown( p.x - 1, p.y - 1, level, n, diff );
-		if (!diff)
+		if (!diff) {
+			Return->Parent = NULL;
 			return Return;
+		}
 		Return->x = n.x;
 		Return->y = n.y;
 
@@ -1815,8 +1849,8 @@ PathNode* Map::GetLine(Point &start, Point &dest, int Steps, int Orientation, in
 		StartNode->Next = NULL;
 		x = (start.x + dest.x) * Steps / Max;
 		y = (start.y + dest.y) * Steps / Max;
-		StartNode->x = x;
-		StartNode->y = y;
+		StartNode->x = (ieWord) x;
+		StartNode->y = (ieWord) y;
 		StartNode->orient = Orientation;
 		bool wall = !( GetBlocked( x, y ) & PATH_MAP_PASSABLE );
 		if (wall) switch (flags) {
@@ -2023,7 +2057,7 @@ void Map::AddMapNote(Point &point, int color, char *text)
 	MapNote *mn = new MapNote;
 
 	mn->Pos=point;
-	mn->color=color;
+	mn->color=(ieWord) color;
 	mn->text=text;
 	RemoveMapNote(point); //delete previous mapnote
 	mapnotes.push_back(mn);
@@ -2031,7 +2065,7 @@ void Map::AddMapNote(Point &point, int color, char *text)
 
 void Map::RemoveMapNote(Point &point)
 {
-	int i = mapnotes.size();
+	size_t i = mapnotes.size();
 	while (i--) {
 		if ((point.x==mapnotes[i]->Pos.x) &&
 			(point.y==mapnotes[i]->Pos.y)) {
@@ -2043,7 +2077,7 @@ void Map::RemoveMapNote(Point &point)
 
 MapNote *Map::GetMapNote(Point &point)
 {
-	int i = mapnotes.size();
+	size_t i = mapnotes.size();
 	while (i--) {
 		if (Distance(point, mapnotes[i]->Pos) < 10 ) {
 			return mapnotes[i];
@@ -2265,7 +2299,7 @@ Spawn *Map::GetSpawnRadius(Point &point, unsigned int radius)
 int Map::ConsolidateContainers()
 {
 	int itemcount = 0;
-	int containercount = TMap->GetContainerCount();
+	int containercount = (int) TMap->GetContainerCount();
 	while (containercount--) {
 		Container * c = TMap->GetContainer( containercount);
 
@@ -2281,7 +2315,7 @@ int Map::ConsolidateContainers()
 //original position in the second area
 void Map::CopyGroundPiles(Map *othermap, Point &Pos)
 {
-	int containercount = TMap->GetContainerCount();
+	int containercount = (int) TMap->GetContainerCount();
 	while (containercount--) {
 		Container * c = TMap->GetContainer( containercount);
 		if (c->Type==IE_CONTAINER_PILE) {

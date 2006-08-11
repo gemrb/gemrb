@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.89 2006/08/10 21:34:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.90 2006/08/11 23:17:19 avenger_teambg Exp $
  *
  */
 
@@ -31,8 +31,8 @@
 
 static int AvatarsCount = 0;
 static AvatarStruct *AvatarTable = NULL;
-static int SixteenToNine[16]={0,1,2,3,4,5,6,7,8,7,6,5,4,3,2,1};
-static int SixteenToFive[16]={0,0,1,1,2,2,3,3,4,4,3,3,2,2,1,1};
+static ieByte SixteenToNine[16]={0,1,2,3,4,5,6,7,8,7,6,5,4,3,2,1};
+static ieByte SixteenToFive[16]={0,0,1,1,2,2,3,3,4,4,3,3,2,2,1,1};
 
 void CharAnimations::ReleaseMemory()
 {
@@ -204,7 +204,7 @@ void CharAnimations::SetupColors()
 		//leather
 		memcpy( &palette->col[i], &palette->col[0x35], 8 * sizeof( Color ) );
 	//skin
-	memcpy( &palette->col[0xB0], &palette->col[29], 8 * sizeof( Color ) );
+	memcpy( &palette->col[0xB0], &palette->col[0x29], 8 * sizeof( Color ) );
 	for (i = 0xB8; i < 0xFF; i += 0x08)
 		//leather
 		memcpy( &palette->col[i], &palette->col[0x35], 8 * sizeof( Color ) );
@@ -226,8 +226,8 @@ void CharAnimations::InitAvatarsTable()
 		strnlwrcpy(AvatarTable[i].Prefixes[1],Avatars->QueryField(i,AV_PREFIX2),8);
 		strnlwrcpy(AvatarTable[i].Prefixes[2],Avatars->QueryField(i,AV_PREFIX3),8);
 		strnlwrcpy(AvatarTable[i].Prefixes[3],Avatars->QueryField(i,AV_PREFIX4),8);
-		AvatarTable[i].AnimationType=atoi(Avatars->QueryField(i,AV_ANIMTYPE) );
-		AvatarTable[i].CircleSize=atoi(Avatars->QueryField(i,AV_CIRCLESIZE) );
+		AvatarTable[i].AnimationType=(ieByte) atoi(Avatars->QueryField(i,AV_ANIMTYPE) );
+		AvatarTable[i].CircleSize=(ieByte) atoi(Avatars->QueryField(i,AV_CIRCLESIZE) );
 		const char *tmp = Avatars->QueryField(i,AV_USE_PALETTE);
 		//QueryField will always return a zero terminated string
 		//so tmp[0] must exist
@@ -694,11 +694,11 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			break;
 
 		case IE_ANI_BIRD:
-			Cycle = (StanceID&1) * 9 + SixteenToNine[Orient];
+			Cycle = (ieByte) ((StanceID&1) * 9 + SixteenToNine[Orient]);
 			break;
 
 		case IE_ANI_ONE_FILE:
-			Cycle = one_file[StanceID] * 16 + Orient;
+			Cycle = (ieByte) (one_file[StanceID] * 16 + Orient);
 			break;
 
 		case IE_ANI_SIX_FILES:
@@ -741,7 +741,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 
 		case IE_ANI_PST_STAND:
 			sprintf(NewResRef,"%cSTD%4s",ResRef[0], ResRef+1);
-			Cycle = SixteenToFive[Orient];
+			Cycle = (ieByte) SixteenToFive[Orient];
 			break;
 		case IE_ANI_PST_GHOST: // pst static animations
 			//still doesn't handle the second cycle of the golem anim
@@ -889,7 +889,7 @@ void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 //                            0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
 static char *StancePrefix[]={"3","2","5","5","4","4","2","2","5","4","1","3","3","3","4","1","4","4","4"};
 static char *CyclePrefix[]= {"0","0","1","1","1","1","0","0","1","1","1","1","1","1","1","1","1","1","1"};
-static int CycleOffset[] = {0,  0,  0,  0,  0,  9,  0,  0,  0, 18,  0,  0,  9,  18,  0,  0,  0,  0,  0};
+static unsigned int CycleOffset[] = {0,  0,  0,  0,  0,  9,  0,  0,  0, 18,  0,  0,  9,  18,  0,  0,  0,  0,  0};
 
 
 // Note: almost like SixSuffix
@@ -952,7 +952,7 @@ void CharAnimations::AddFFSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 	}
-	ResRef[6]=Part+'1';
+	ResRef[6]=(char) (Part+'1');
 	ResRef[7]=0;
 }
 
@@ -965,7 +965,7 @@ void CharAnimations::AddNFSuffix(char* ResRef, unsigned char StanceID,
 	snprintf(prefix, 9, "%s%s%d%s%d", ResRef, StancePrefix[StanceID], Part+1,
 			 CyclePrefix[StanceID], Cycle);
 	strnlwrcpy(ResRef,prefix,8);
-	Cycle+=CycleOffset[StanceID];
+	Cycle=(ieByte) (Cycle+CycleOffset[StanceID]);
 }
 
 //Attack

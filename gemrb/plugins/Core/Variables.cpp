@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.cpp,v 1.30 2006/06/12 18:05:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.cpp,v 1.31 2006/08/11 23:17:20 avenger_teambg Exp $
  *
  */
 
@@ -54,7 +54,7 @@ inline bool Variables::MyCopyKey(char*& dest, const char* key) const
 	}
 	for (i = 0,j = 0; key[i] && j < MAX_VARIABLE_LENGTH - 1; i++) {
 		if (key[i] != ' ') {
-			dest[j++] = tolower( key[i] );
+			dest[j++] = (char) tolower( key[i] );
 		}
 	}
 	dest[j] = 0;
@@ -316,7 +316,7 @@ bool Variables::Lookup(const char* key, ieDword& rValue) const
 
 void Variables::SetAtCopy(const char* key, const char* value)
 {
-	int len = strlen(value)+1;
+	size_t len = strlen(value)+1;
 	char *str=(char *) malloc(len);
 	memcpy(str,value,len);
 	SetAt(key, (const char *) str);

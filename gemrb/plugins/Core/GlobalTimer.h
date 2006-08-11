@@ -35,7 +35,7 @@ private:
 	unsigned long waitCounter;
 	int shakeCounter;
 	unsigned long shakeX, shakeY;
-	int first_animation;
+	unsigned int first_animation;
 	std::vector<AnimationRef*>  animations;
 public:
 	GlobalTimer(void);

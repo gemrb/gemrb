@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.24 2006/01/27 18:09:12 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.25 2006/08/11 23:17:20 avenger_teambg Exp $
  *
  */
 
@@ -90,7 +90,7 @@ Sprite2D *WMPAreaEntry::GetMapIcon(AnimationFactory *bam)
 			case 0: frame = 2; break;
 			}
 		}
-		MapIcon = bam->GetFrame(frame, IconSeq);
+		MapIcon = bam->GetFrame((ieWord) frame, (ieByte) IconSeq);
 	}
 	return MapIcon;
 }
@@ -209,7 +209,7 @@ void WorldMap::SetMapMOS(Sprite2D *newmos)
 
 WMPAreaEntry* WorldMap::GetArea(const ieResRef AreaName, unsigned int &i)
 {
-	i=area_entries.size();
+	i=(unsigned int) area_entries.size();
 	while (i--) {
 		if (!strnicmp(AreaName, area_entries[i]->AreaName,8)) {
 			return area_entries[i];
@@ -261,7 +261,7 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 	}
 	UpdateAreaVisibility(AreaName, direction);
 
-	int memsize =sizeof(int) * area_entries.size();
+	size_t memsize =sizeof(int) * area_entries.size();
 	Distances = (int *) malloc( memsize );
 	GotHereFrom = (int *) malloc( memsize );
 	memset( Distances, -1, memsize );

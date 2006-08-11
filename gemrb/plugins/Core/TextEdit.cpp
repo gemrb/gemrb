@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.cpp,v 1.34 2006/08/10 21:34:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextEdit.cpp,v 1.35 2006/08/11 23:17:20 avenger_teambg Exp $
  *
  */
 
@@ -136,7 +136,7 @@ void TextEdit::OnSpecialKeyPress(unsigned char Key)
 			CurPos = 0;
 			break;
 		case GEM_END:
-			CurPos = strlen( (char * ) Buffer);
+			CurPos = (ieWord) strlen( (char * ) Buffer);
 			break;
 		case GEM_LEFT:
 			if (CurPos > 0)
@@ -178,19 +178,19 @@ void TextEdit::OnSpecialKeyPress(unsigned char Key)
 int TextEdit::SetText(const char* string, int /*pos*/)
 {
 	strncpy( ( char * ) Buffer, string, max );
-	CurPos = strlen((char *) Buffer);
+	CurPos = (ieWord) strlen((char *) Buffer);
 	if (Owner) {
 		( ( Window * ) Owner )->Invalidate();
 	}
 	return 0;
 }
 
-void TextEdit::SetBufferLength(int buflen)
+void TextEdit::SetBufferLength(ieWord buflen)
 {
 	if(buflen<1) return;
 	if(buflen!=max) {
 		Buffer = (unsigned char *) realloc(Buffer, buflen);
-		max=buflen;
+		max=(ieWord) buflen;
 		Buffer[max-1]=0;
 	}
 }

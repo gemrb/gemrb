@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.40 2006/02/17 23:33:38 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.41 2006/08/11 23:17:19 avenger_teambg Exp $
  *
  */
 
@@ -270,7 +270,7 @@ int SaveGameIterator::GetSaveGameCount()
 	if (! loaded && ! RescanSaveGames())
 		return -1;
 
-	return save_slots.size();
+	return (int) save_slots.size();
 }
 
 char *SaveGameIterator::GetSaveName(int index)
@@ -351,20 +351,21 @@ void SaveGameIterator::PruneQuickSave(const char *folder)
 	for (charlist::iterator m = save_slots.begin();m!=save_slots.end();m++) {
 		int tmp = IsQuickSaveSlot(folder, (*m) );
 		if (tmp) {
-			int pos = myslots.size();
+			size_t pos = myslots.size();
 			while(pos-- && myslots[pos]>tmp);
 			myslots.insert(myslots.begin()+pos+1,tmp);
 		}
 	}
 	//now we got an integer array in myslots
-	if (!myslots.size()) {
+	size_t size = myslots.size();
+
+	if (!size) {
 		return;
 	}
 
-	int size = myslots.size();
 	int n=myslots[size-1];
-	int hole = GetHole(n);
-	int i;
+	size_t hole = GetHole(n);
+	size_t i;
 	if (hole<size) {
 		//prune second path
 		FormatQuickSavePath(from, myslots[hole]);
@@ -428,7 +429,7 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 
 	Game *game = core->GetGame();
 	//saving areas to cache currently in memory
-	size_t mc = game->GetLoadedMapCount();
+	unsigned int mc = (unsigned int) game->GetLoadedMapCount();
 	while (mc--) {
 		Map *map = game->GetMap(mc);
 		if (core->SwapoutArea(map)) {

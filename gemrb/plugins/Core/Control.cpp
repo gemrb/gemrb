@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.44 2006/01/04 16:34:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.45 2006/08/11 23:17:19 avenger_teambg Exp $
  *
  */
 
@@ -113,7 +113,7 @@ int Control::RunEventHandler(EventHandler handler)
 			return -1;
 		}
 		unsigned short WID = wnd->WindowID;
-		unsigned short ID = ControlID;
+		unsigned short ID = (unsigned short) ControlID;
 		InHandler = true;
 		core->GetGUIScriptEngine()->RunFunction( (char*)handler );
 		if (!core->IsValidWindow(WID,wnd) ) {

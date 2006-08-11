@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.89 2006/06/30 10:00:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.90 2006/08/11 23:17:20 avenger_teambg Exp $
  *
  */
 
@@ -158,7 +158,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 	if (XPos == 65535) {
 		return;
 	}
-	unsigned int linesize = lines.size();
+	size_t linesize = lines.size();
 	if (linesize == 0) {
 		return;
 	}
@@ -324,7 +324,7 @@ int TextArea::SetText(const char* text, int pos)
 void TextArea::SetMinRow(bool enable)
 {
 	if (enable) {
-		minrow = lines.size();
+		minrow = (int) lines.size();
 	} else {
 		minrow = 0;
 	}
@@ -371,7 +371,7 @@ int TextArea::AppendText(const char* text, int pos)
 		}
 		lines.push_back( str );
 		lrows.push_back( 0 );
-		ret = lines.size() - 1;
+		ret =(int) (lines.size() - 1);
 	} else {
 		int mylen = ( int ) strlen( lines[pos] );
 
@@ -396,7 +396,7 @@ int TextArea::AppendText(const char* text, int pos)
 void TextArea::PopLines(unsigned int count, bool top)
 {
 	if (count > lines.size()) {
-		count = lines.size();
+		count = (unsigned int) lines.size();
 	}
 
 	while (count > 0 ) {
@@ -433,6 +433,11 @@ void TextArea::UpdateControls()
 		if (pos < 0)
 			pos = 0;
 		bar->SetPos( pos );
+	} else {
+		if (Flags & IE_GUI_TEXTAREA_AUTOSCROLL) {
+			pos = rows - ( ( Height - 5 ) / ftext->maxHeight );
+			SetRow(pos);
+		}
 	}
 	core->RedrawAll();
 }
@@ -577,7 +582,7 @@ void TextArea::CalcRowCount()
 		return;
 	}
 	ScrollBar* bar = ( ScrollBar* ) sb;
-	bar->SetMax( rows );
+	bar->SetMax( (ieWord) rows );
 }
 /** Mouse Over Event */
 void TextArea::OnMouseOver(unsigned short /*x*/, unsigned short y)
@@ -679,7 +684,7 @@ bool TextArea::SetEvent(int eventType, EventHandler handler)
 void TextArea::PadMinRow()
 {
 	int row = 0;
-	int i=lines.size()-1;
+	int i=(int) (lines.size()-1);
 	//minrow -1 ->gap
 	//minrow -2 ->npc text
 	while (i>=minrow-2 && i>=0) {
@@ -725,7 +730,7 @@ void TextArea::SetupScroll(unsigned long tck)
 		lines.push_back(str);
 		lrows.push_back(0);
 	}
-	i = lines.size();
+	i = (unsigned int) lines.size();
 	Flags |= IE_GUI_TEXTAREA_SMOOTHSCROLL;
 	GetTime( starttime );
 	if (RunEventHandler( TextAreaOutOfText )) {

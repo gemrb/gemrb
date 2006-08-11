@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.50 2006/08/04 21:42:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.51 2006/08/11 23:17:19 avenger_teambg Exp $
  *
  */
 
@@ -201,7 +201,7 @@ public:
 	
 	/** Removes an item from the inventory, destroys slot.
 	 * Use it for containers only */
-	CREItem *GetItem(size_t idx);
+	CREItem *GetItem(unsigned int idx);
 	/** adds an item to the inventory */
 	void AddItem(CREItem *item);
 	/** Returns number of items in the inventory */
@@ -231,7 +231,8 @@ public:
 
 	/** adds CREItem to the inventory. If slot == -1, finds
 	** first eligible slot, eventually splitting the item to
-	** more slots. Returns 2 if completely successful, 1 if partially, 0 else.
+	** more slots. If slot == -3 then finds the first empty inventory slot
+	** Returns 2 if completely successful, 1 if partially, 0 else.
 	** slottype is an optional filter for searching eligible slots */
 	int AddSlotItem(CREItem* item, int slot, int slottype=-1);
 	/** Adds STOItem to the inventory, it is never wielded, action might be STA_STEAL or STA_BUY */

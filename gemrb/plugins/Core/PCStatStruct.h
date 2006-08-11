@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PCStatStruct.h,v 1.3 2006/08/08 20:25:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/PCStatStruct.h,v 1.4 2006/08/11 23:17:19 avenger_teambg Exp $
  *
  */
 
@@ -112,8 +112,8 @@ public:
 public:
 	PCStatsStruct();
 	void IncrementChapter();
-	void InitQuickSlot(unsigned int which, unsigned int slot, unsigned int headerindex);
-	void SetSlotIndex(unsigned int which, unsigned int headerindex);
-	void GetSlotAndIndex(unsigned int which, unsigned int &slot, unsigned int &headerindex);
+	void InitQuickSlot(unsigned int which, ieWord slot, ieWord headerindex);
+	void SetSlotIndex(unsigned int which, ieWord headerindex);
+	void GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &headerindex);
 };
 #endif

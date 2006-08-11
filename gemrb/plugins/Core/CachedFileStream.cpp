@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.cpp,v 1.36 2006/02/17 17:17:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CachedFileStream.cpp,v 1.37 2006/08/11 23:17:19 avenger_teambg Exp $
  *
  */
 
@@ -121,7 +121,7 @@ int CachedFileStream::Read(void* dest, unsigned int length)
 		return GEM_ERROR;
 	}
 
-	size_t c = _fread( dest, 1, length, str );
+	unsigned int c = (unsigned int) _fread( dest, 1, length, str );
 	if (c != length) {
 		return GEM_ERROR;
 	}
@@ -136,7 +136,7 @@ int CachedFileStream::Write(const void* src, unsigned int length)
 {
 	// do encryption here if needed
 
-	size_t c = _fwrite( src, 1, length, str );
+	unsigned int c = (unsigned int) _fwrite( src, 1, length, str );
 	if (c != length) {
 		return GEM_ERROR;
 	}

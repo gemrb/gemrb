@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/MessageWindow.py,v 1.19 2005/12/04 23:12:41 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/MessageWindow.py,v 1.20 2006/08/11 23:17:18 avenger_teambg Exp $
 
 import GemRB
 from GUICommonWindows import *
@@ -45,6 +45,11 @@ def OnLoad():
 	GemRB.GameSetPartySize(PARTY_SIZE)
 	GemRB.GameSetProtagonistMode(1)
 	GemRB.LoadWindowPack(GetWindowPack())
+
+	GUICommonWindows.PortraitWindow = None
+	GUICommonWindows.ActionsWindow = None
+	GUICommonWindows.OptionsWindow = None
+ 
 	ActionsWindow = GemRB.LoadWindow(3)
 	OptionsWindow = GemRB.LoadWindow(0)
 	PortraitWindow = OpenPortraitWindow(1)
@@ -62,8 +67,8 @@ def OnLoad():
 	GemRB.SetVar("OtherPosition", 5) #Inactivating
 	GemRB.SetVar("TopPosition", 5) #Inactivating
 	
-        OpenActionsWindowControls (ActionsWindow)
-        SetupMenuWindowControls (OptionsWindow, 1, "ReturnToGame")
+	OpenActionsWindowControls (ActionsWindow)
+	SetupMenuWindowControls (OptionsWindow, 1, "ReturnToGame")
 
 	UpdateControlStatus()
 
@@ -74,7 +79,6 @@ def OnIncreaseSize():
 	if Expand>2:
 		return
 	Expand = (Expand + 1)*2
-	print Expand+GSFlags
 	GemRB.GameSetScreenFlags(Expand + GSFlags, OP_SET)
 
 def OnDecreaseSize():
@@ -84,8 +88,20 @@ def OnDecreaseSize():
 	if Expand<2:
 		return
 	Expand = Expand/2 - 1
-	print Expand+GSFlags
 	GemRB.GameSetScreenFlags(Expand + GSFlags, OP_SET)
+
+def TogglePartyAI():
+	GemRB.GameSetScreenFlags(GS_PARTYAI, OP_XOR)
+ 
+def ScrollUp ():
+	TMessageWindow = GemRB.GetVar("MessageWindow")
+	TMessageTA = GemRB.GetVar("MessageTextArea")
+	GemRB.TextAreaScroll(TMessageWindow, TMessageTA, -1)
+
+def ScrollDown ():
+	TMessageWindow = GemRB.GetVar("MessageWindow")
+	TMessageTA = GemRB.GetVar("MessageTextArea")
+	GemRB.TextAreaScroll(TMessageWindow, TMessageTA, 1)
 
 def UpdateControlStatus():
 	global MessageWindow, ExpandButton, ContractButton
@@ -121,9 +137,15 @@ def UpdateControlStatus():
 
 	else:
 		TMessageWindow = GemRB.LoadWindow(4)
-		TMessageTA = GemRB.GetControl(TMessageWindow, 3)
+		TMessageTA = GemRB.GetControl(TMessageWindow, 3)		
 		ExpandButton = GemRB.GetControl(TMessageWindow, 2)
 		GemRB.SetEvent(TMessageWindow, ExpandButton, IE_GUI_BUTTON_ON_PRESS, "OnIncreaseSize")
+		#up button (instead of scrollbar)
+		Button = GemRB.GetControl(TMessageWindow, 0)
+		GemRB.SetEvent(TMessageWindow, Button, IE_GUI_BUTTON_ON_PRESS, "ScrollUp")
+		#down button (instead of scrollbar)
+		Button = GemRB.GetControl(TMessageWindow, 1)
+		GemRB.SetEvent(TMessageWindow, Button, IE_GUI_BUTTON_ON_PRESS, "ScrollDown")
 
 	GemRB.SetTextAreaFlags(TMessageWindow, TMessageTA, IE_GUI_TEXTAREA_AUTOSCROLL)
 	GemRB.SetTAHistory(TMessageWindow, TMessageTA, 100)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.425 2006/08/10 21:34:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.426 2006/08/11 23:17:19 avenger_teambg Exp $
  *
  */
 
@@ -217,7 +217,7 @@ Interface::Interface(int iargc, char** iargv)
 
 #define FreeResourceVector(type, variable) \
 { \
-	unsigned int i=variable.size(); \
+	size_t i=variable.size(); \
 	while(i--) { \
 		if (variable[i]) { \
 			delete variable[i]; \
@@ -493,14 +493,14 @@ GameControl* Interface::StartGameControl()
 	if (ConsolePopped) {
 		PopupConsole();
 	}
-	DelWindow(~0);//deleting ALL windows
-	DelTable(~0); //dropping ALL tables
-	Window* gamewin = new Window( 0xffff, 0, 0, Width, Height );
+	DelWindow(0xffffu);//deleting ALL windows
+	DelTable(0xffffu); //dropping ALL tables
+	Window* gamewin = new Window( 0xffff, 0, 0, (ieWord) Width, (ieWord) Height );
 	GameControl* gc = new GameControl();
 	gc->XPos = 0;
 	gc->YPos = 0;
-	gc->Width = Width;
-	gc->Height = Height;
+	gc->Width = (ieWord) Width;
+	gc->Height = (ieWord) Height;
 	gc->Owner = gamewin;
 	gc->ControlID = 0x00000000;
 	gc->ControlType = IE_GUI_GAMECONTROL;
@@ -639,7 +639,7 @@ bool Interface::ReadAbilityTables()
 
 bool Interface::ReadAuxItemTables()
 {
-	size_t idx;
+	int idx;
 	TableMgr* aa;
 	int table;
 	bool flag = true;
@@ -809,7 +809,7 @@ bool Interface::ReadAreaAliasTable(const ieResRef tablename)
 		DelTable( table );
 		return false;
 	}
-	size_t idx = aa->GetRowCount();
+	int idx = aa->GetRowCount();
 	while (idx--) {
 		ieResRef key;
 
@@ -1127,7 +1127,7 @@ int Interface::Init()
 				fnt->SetPalette(pal);
 				FreePalette( pal );
 			}
-			fnt->SetFirstChar( first_char );
+			fnt->SetFirstChar( (ieByte) first_char );
 			fonts.push_back( fnt );
 		}
 		DelTable( table );
@@ -1144,7 +1144,7 @@ int Interface::Init()
 		}
 		TooltipBack = new Sprite2D * [3];
 		for (int i = 0; i < 3; i++) {
-			TooltipBack[i] = anim->GetFrameFromCycle( i, 0 );
+			TooltipBack[i] = anim->GetFrameFromCycle( (ieByte) i, 0 );
 			TooltipBack[i]->XPos = 0;
 			TooltipBack[i]->YPos = 0;
 		}
@@ -1181,8 +1181,8 @@ int Interface::Init()
 	QuitFlag = QF_CHANGESCRIPT;
 	console = new Console();
 	console->XPos = 0;
-	console->YPos = Height - 25;
-	console->Width = Width;
+	console->YPos = (ieWord) (Height - 25);
+	console->Width = (ieWord) Width;
 	console->Height = 25;
 	console->SetFont( fonts[0] );
 	{
@@ -1305,7 +1305,7 @@ int Interface::Init()
 		CursorCount = anim->GetCycleCount();
 		Cursors = new Sprite2D * [CursorCount];
 		for (int i = 0; i < CursorCount; i++) {
-			Cursors[i] = anim->GetFrameFromCycle( i, 0 );
+			Cursors[i] = anim->GetFrameFromCycle( (ieByte) i, 0 );
 		}
 	}
 
@@ -1406,7 +1406,7 @@ int Interface::Init()
 			}
 
 			for (int i = 0; i < 6; i++) {
-				Sprite2D* sprite = anim->GetFrameFromCycle( i, 0 );
+				Sprite2D* sprite = anim->GetFrameFromCycle( (ieByte) i, 0 );
 				if (GroundCircleScale[size]) {
 					GroundCircles[size][i] = video->SpriteScaleDown( sprite, GroundCircleScale[size] );
 					video->FreeSprite( sprite );
@@ -1975,8 +1975,8 @@ bool Interface::LoadConfig(const char* filename)
 
 static void upperlower(int upper, int lower)
 {
-	pl_uppercase[lower]=upper;
-	pl_lowercase[upper]=lower;
+	pl_uppercase[lower]=(ieByte) upper;
+	pl_lowercase[upper]=(ieByte) lower;
 }
 
 /** Loads gemrb.ini */
@@ -2074,8 +2074,8 @@ bool Interface::LoadGemRBINI()
 
 	unsigned int i;
 	for(i=0;i<256;i++) {
-		pl_uppercase[i]=toupper(i);
-		pl_lowercase[i]=tolower(i);
+		pl_uppercase[i]=(ieByte) toupper(i);
+		pl_lowercase[i]=(ieByte) tolower(i);
 	}
 
 	i = (unsigned int) ini->GetKeyAsInt ("charset", "CharCount", 0);
@@ -2305,7 +2305,7 @@ int Interface::LoadCreature(char* ResRef, int InParty, bool character)
 	if ( !actor ) {
 		return -1;
 	}
-	actor->InParty = InParty;
+	actor->InParty = (ieByte) InParty;
 	//both fields are of length 9, make this sure!
 	memcpy(actor->Area, game->CurrentArea, sizeof(actor->Area) );
 	if (actor->BaseStats[IE_STATE_ID] & STATE_DEAD) {
@@ -2512,7 +2512,7 @@ int Interface::CreateWindow(unsigned short WindowID, int XPos, int YPos, unsigne
 		}
 	}
 
-	Window* win = new Window( WindowID, XPos, YPos, Width, Height );
+	Window* win = new Window( WindowID, (ieWord) XPos, (ieWord) YPos, (ieWord) Width, (ieWord) Height );
 	if (Background[0]) {
 		if (IsAvailable( IE_MOS_CLASS_ID )) {
 			DataStream* bkgr = key->GetResource( Background,
@@ -2596,7 +2596,7 @@ int Interface::GetControl(unsigned short WindowIndex, unsigned long ControlID)
 	}
 	int i = 0;
 	while (true) {
-		Control* ctrl = win->GetControl( i );
+		Control* ctrl = win->GetControl( (unsigned short) i );
 		if (ctrl == NULL)
 			return -1;
 		if (ctrl->ControlID == ControlID)
@@ -2693,7 +2693,7 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 		return -1;
 	}
 	if (visible!=WINDOW_FRONT) {
-		win->Visible = visible;
+		win->Visible = (char) visible;
 	}
 	switch (visible) {
 		case WINDOW_GRAYED:
@@ -2963,7 +2963,7 @@ Window* Interface::GetWindow(unsigned short WindowIndex)
 // by checking if its WindowID is the same as the reference
 bool Interface::IsValidWindow(unsigned short WindowID, Window *wnd)
 {
-	unsigned int WindowIndex = windows.size();
+	size_t WindowIndex = windows.size();
 	while (WindowIndex--) {
 		if (windows[WindowIndex] == wnd) {
 			return wnd->WindowID == WindowID;
@@ -3262,7 +3262,7 @@ int Interface::PlayMovie(const char* ResRef)
 			SubtitleFont = GetFont (MovieFont); //will change
 			DelTable(table);
 			if (SubtitleFont) {
-				Color fore = {r,g,b, 0x00};
+				Color fore = {(unsigned char) r,(unsigned char) g,(unsigned char) b, 0x00};
 				Color back = {0x00, 0x00, 0x00, 0x00};
 				palette = CreatePalette( fore, back );
 			}
@@ -3420,7 +3420,7 @@ bool Interface::InCutSceneMode()
 	return (GetGameControl()->GetScreenFlags()&SF_DISABLEMOUSE)!=0;
 }
 
-void Interface::QuitGame(bool BackToMain)
+void Interface::QuitGame(int BackToMain)
 {
 	SetCutSceneMode(false);
 	if (timer) {
@@ -4186,7 +4186,7 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 			strnlwrcpy(itm->ItemResRef,NewItem,sizeof(ieResRef) );
 		} else {
 			strnlwrcpy(itm->ItemResRef, GoldResRef, sizeof(ieResRef) );
-			itm->Usages[0]=Roll(j,k,0);
+			itm->Usages[0]=(ieWord) Roll(j,k,0);
 		}
 		if ( !memcmp( itm->ItemResRef,"NO_DROP",8 ) ) {
 			itm->ItemResRef[0]=0;
@@ -4570,10 +4570,10 @@ Sprite2D* Interface::GetBAMSprite(const ieResRef ResRef, int cycle, int frame)
 	}
 	Sprite2D *tspr;
 	if (cycle==-1) {
-		tspr = bam->GetFrame( frame );
+		tspr = bam->GetFrame( (unsigned short) frame );
 	}
 	else {
-		tspr = bam->GetFrameFromCycle( (unsigned char) cycle, frame );
+		tspr = bam->GetFrameFromCycle( (unsigned char) cycle, (unsigned short) frame );
 	}
 	FreeInterface( bam );
 

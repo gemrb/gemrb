@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.40 2006/06/29 06:56:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.41 2006/08/11 23:17:19 avenger_teambg Exp $
  *
  */
 
@@ -52,19 +52,18 @@ BOOL WINAPI DllEntryPoint(HINSTANCE /*hinstDLL*/, DWORD /*fdwReason*/,
 
 #include "../../includes/globals.h"
 #include "Interface.h"
-//#include "ActorBlock.h"
 #include "Actor.h"
 
 //// Globally used functions
 
-unsigned char pl_uppercase[256];
-unsigned char pl_lowercase[256];
+ieByte pl_uppercase[256];
+ieByte pl_lowercase[256];
 
 // these 3 functions will copy a string to a zero terminated string with a maximum length
 void strnlwrcpy(char *dest, const char *source, int count)
 {
 	while(count--) {
-		*dest++ = pl_lowercase[(unsigned char) *source];
+		*dest++ = pl_lowercase[(ieByte) *source];
 		if(!*source++) {
 			while(count--) *dest++=0;
 			return;
@@ -76,7 +75,7 @@ void strnlwrcpy(char *dest, const char *source, int count)
 void strnuprcpy(char* dest, const char *source, int count)
 {
 	while(count--) {
-		*dest++ = pl_uppercase[(unsigned char) *source];
+		*dest++ = pl_uppercase[(ieByte) *source];
 		if(!*source++) {
 			while(count--) *dest++=0;
 			return;
@@ -89,7 +88,7 @@ void strnuprcpy(char* dest, const char *source, int count)
 void strnspccpy(char* dest, const char *source, int count)
 {
 	while(count--) {
-		*dest = pl_lowercase[(unsigned char) *source];
+		*dest = pl_lowercase[(ieByte) *source];
 		if (*dest!=' ') dest++;
 		if(!*source++) {
 			while(count--) *dest++=0;
@@ -173,6 +172,38 @@ unsigned int PersonalDistance(Scriptable *a, Scriptable *b)
 	return (unsigned int) ret;
 }
 
+// returns EA relation between two actors
+// it is used for protectile targeting/iwd ids targeting too!
+int EARelation(Actor* Owner, Actor* target)
+{
+	ieDword ea = Owner->GetStat(IE_EA);
+	if (ea<=EA_GOODCUTOFF) {
+		ea = target->GetStat(IE_EA);
+		if (ea<=EA_GOODCUTOFF) {
+			return EAR_FRIEND;
+		}
+		if (ea>=EA_EVILCUTOFF) {
+			return EAR_HOSTILE;
+		}
+
+		return EAR_NEUTRAL;
+	}
+
+	if (ea>=EA_EVILCUTOFF) {
+		ea = target->GetStat(IE_EA);
+		if (ea<=EA_GOODCUTOFF) {
+			return EAR_HOSTILE;
+		}
+		if (ea>=EA_EVILCUTOFF) {
+			return EAR_FRIEND;
+		}
+
+		return EAR_NEUTRAL;
+	}
+
+	return EAR_NEUTRAL;
+}
+
 /** Returns the length of string (up to a delimiter) */
 GEM_EXPORT int strlench(const char* string, char ch)
 {
@@ -184,9 +215,9 @@ GEM_EXPORT int strlench(const char* string, char ch)
 
 //// Compatibility functions
 #ifndef HAVE_STRNDUP
-GEM_EXPORT char* strndup(const char* s, int l)
+GEM_EXPORT char* strndup(const char* s, unsigned int l)
 {
-	int len = strlen( s );
+	size_t len = strlen( s );
 	if (len < l) {
 		l = len;
 	}

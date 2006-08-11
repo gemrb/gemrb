@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.71 2006/08/06 17:18:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.72 2006/08/11 23:17:19 avenger_teambg Exp $
  *
  */
 
@@ -566,18 +566,18 @@ bool EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 				return false;
 			}
 		}
-		if (NeedPrepare(fx->TimingMode) ) {
+		if (NeedPrepare((ieByte) fx->TimingMode) ) {
 			PrepareDuration(fx);
 		}
 	}
 	//check if the effect has triggered or expired
-	switch (IsPrepared(fx->TimingMode) ) {
+	switch (IsPrepared((ieByte) fx->TimingMode) ) {
 	case DELAYED:
 		if (fx->Duration>GameTime) {
 			return false;
 		}
 		//effect triggered
-		fx->TimingMode=TriggeredEffect(fx->TimingMode);
+		fx->TimingMode=TriggeredEffect((ieByte) fx->TimingMode);
 		break;
 	case DURATION:
 		if (fx->Duration>GameTime) {
@@ -632,7 +632,7 @@ bool EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 		fx->TimingMode=FX_DURATION_JUST_EXPIRED;
 	}
 	//delayed duration (3)
-	if (NeedPrepare(fx->TimingMode) ) {
+	if (NeedPrepare((ieByte) fx->TimingMode) ) {
 		//prepare for delayed duration effects
 		fx->Duration=fx->SecondaryDelay;
 		PrepareDuration(fx);      
@@ -742,7 +742,7 @@ void EffectQueue::RemoveExpiredEffects(ieDword futuretime)
 	std::vector< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		//FIXME: how this method handles delayed effects???
-		if ( IsPrepared( (*f)->TimingMode)==DURATION ) {
+		if ( IsPrepared( (ieByte) ((*f)->TimingMode) )==DURATION ) {
 			if ( (*f)->Duration<=GameTime+futuretime) {
 				(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;
 			}      

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.88 2006/07/02 11:23:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.89 2006/08/11 23:17:19 avenger_teambg Exp $
  */
 
 /**
@@ -146,8 +146,8 @@ private:
 	/** this function safely retrieves an Actor by ID */
 	Actor *GetActorByGlobalID(ieWord ID);
 	void CalculateSelection(Point &p);
-	void ResizeDel(Window* win, unsigned char type);
-	void ResizeAdd(Window* win, unsigned char type);
+	void ResizeDel(Window* win, int type);
+	void ResizeAdd(Window* win, int type);
 	void HandleWindowHide(const char *WindowName, const char *WindowPosition);
 	void HandleWindowReveal(const char *WindowName, const char *WindowPosition);
 	void ReadFormations();

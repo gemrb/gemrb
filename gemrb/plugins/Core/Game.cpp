@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.125 2006/08/10 16:44:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.126 2006/08/11 23:17:19 avenger_teambg Exp $
  *
  */
 
@@ -328,8 +328,8 @@ int Game::JoinParty(Actor* actor, int join)
 			core->GetDictionary()->Lookup( "PlayMode", playmode );
 			playmode *= 2;
 		}
-		actor->Pos.x = actor->Destination.x = atoi( strta->QueryField( playmode, actor->InParty-1 ) );
-		actor->Pos.y = actor->Destination.y = atoi( strta->QueryField( playmode + 1, actor->InParty-1 ) );
+		actor->Pos.x = actor->Destination.x = (short) atoi( strta->QueryField( playmode, actor->InParty-1 ) );
+		actor->Pos.y = actor->Destination.y = (short) atoi( strta->QueryField( playmode + 1, actor->InParty-1 ) );
 		core->DelTable( saindex );
 		SelectActor(actor,true, SELECT_QUIET);
 	}
@@ -496,8 +496,8 @@ Map *Game::GetMap(const char *areaname, bool change)
 			MapIndex = index;
 			area = GetMap(index);
 			memcpy (CurrentArea, areaname, 8);
-			            area->SetupAmbients();
-			            ChangeSong();
+			area->SetupAmbients();
+			ChangeSong();
 			return area;
 		}
 		return GetMap(index);
@@ -789,7 +789,7 @@ void Game::ShareXP(int xp, bool divide)
 bool Game::EveryoneStopped() const
 {
 	for (unsigned int i=0; i<PCs.size(); i++) {
-		if (PCs[i]->path ) return false;
+		if (PCs[i]->GetNextStep() ) return false;
 	}
 	return true;
 }

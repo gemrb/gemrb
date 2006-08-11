@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.47 2006/08/10 21:34:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.48 2006/08/11 23:17:18 avenger_teambg Exp $
  *
  */
 
@@ -465,7 +465,7 @@ void BAMImp::SetupColors(int *Colors)
                 //leather
                 memcpy( &palette->col[i], &palette->col[0x35], 8 * sizeof( Color ) );
         //skin
-        memcpy( &palette->col[0xB0], &palette->col[29], 8 * sizeof( Color ) );
+        memcpy( &palette->col[0xB0], &palette->col[0x29], 8 * sizeof( Color ) );
         for (i = 0xB8; i < 0xFF; i += 0x08)
                 //leather
                 memcpy( &palette->col[i], &palette->col[0x35], 8 * sizeof( Color ) );

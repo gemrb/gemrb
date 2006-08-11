@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.49 2006/08/07 22:25:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.50 2006/08/11 23:17:19 avenger_teambg Exp $
  *
  */
 
@@ -170,7 +170,8 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 				unsigned int r,g,b;
 				if (sscanf( tag, "color=%02X%02X%02X", &r, &g, &b ) != 3)
 					continue;
-				Color c = {r,g, b, 0}, back = {0, 0, 0, 0};
+				Color c = {(unsigned char) r,(unsigned char)g, (unsigned char)b, 0};
+				Color back = {0, 0, 0, 0};
 				Palette* newPal = core->CreatePalette( c, back );
 				video->SetPalette( sprBuffer, newPal );
 				core->FreePalette( newPal );
@@ -304,7 +305,8 @@ void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 				unsigned int r,g,b;
 				if (sscanf( tag, "color=%02X%02X%02X", &r, &g, &b ) != 3)
 					continue;
-				Color c = {r,g, b, 0}, back = {0, 0, 0, 0};
+				Color c = {(unsigned char) r,(unsigned char) g,(unsigned char)  b, 0};
+				Color back = {0, 0, 0, 0};
 				Palette* newPal = core->CreatePalette( c, back );
 				video->SetPalette( sprBuffer, newPal );
 				core->FreePalette( newPal );
@@ -438,8 +440,9 @@ void Font::SetupString(char* string, unsigned int width, bool NoColor)
 			continue;
 		}
 
-		if (string[pos] && string[pos] != ' ') 
-			string[pos] -= FirstChar;
+		if (string[pos] && string[pos] != ' ') {
+			string[pos] = ( unsigned char ) (string[pos] - FirstChar);
+		}
 
 		wx += size[( unsigned char ) string[pos] - 1].w;
 		if (( string[pos] == ' ' ) || ( string[pos] == '-' )) {

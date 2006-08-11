@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.48 2006/01/08 12:28:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.49 2006/08/11 23:17:20 avenger_teambg Exp $
  *
  */
 
@@ -192,7 +192,7 @@ Control* Window::GetControl(unsigned short i)
 
 bool Window::IsValidControl(unsigned short ID, Control *ctrl)
 {
-	unsigned int i = Controls.size();
+	size_t i = Controls.size();
 	while (i--) {
 		if (Controls[i]==ctrl) {
 			return ctrl->ControlID==ID;
@@ -216,7 +216,7 @@ Control* Window::GetDefaultControl()
 	if (!Controls.size()) {
 		return NULL;
 	}
-	return GetControl( DefaultControl );
+	return GetControl( (ieWord) DefaultControl );
 }
 
 void Window::release(void)

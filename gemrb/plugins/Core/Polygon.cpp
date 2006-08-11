@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.cpp,v 1.21 2006/07/22 12:39:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Polygon.cpp,v 1.22 2006/08/11 23:17:19 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "Polygon.h"
@@ -156,8 +156,8 @@ static bool intersectSegments(Point& a, Point& b, Point& c, Point& d, Point& s)
 	__int64 A1 = area2(c, d, a);
 	__int64 A2 = area2(d, c, b);
 
-	s.x = (b.x*A1 + a.x*A2) / (A1 + A2);
-	s.y = (b.y*A1 + a.y*A2) / (A1 + A2);
+	s.x = (short) ((b.x*A1 + a.x*A2) / (A1 + A2));
+	s.y = (short) ((b.y*A1 + a.y*A2) / (A1 + A2));
 
 	return true;
 }
@@ -319,7 +319,7 @@ void Gem_Polygon::ComputeTrapezoids()
 		}
 
 		std::sort(ints.begin(), ints.end());
-		unsigned int newtcount = ints.size() / 2;
+		unsigned int newtcount = (unsigned int) (ints.size() / 2);
 
 		for (i = 0; i < newtcount; ++i) {
 			t.left_edge = ints[2*i].pi;
@@ -378,7 +378,7 @@ bool Wall_Polygon::PointCovered(Point &p)
 
 bool Wall_Polygon::PointCovered(int tx, int ty)
 {
-	Point p(tx, ty);
+	Point p((short) tx, (short) ty);
 	return PointCovered(p);
 }
 

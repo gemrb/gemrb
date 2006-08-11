@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.29 2006/06/18 22:53:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.30 2006/08/11 23:17:20 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -104,8 +104,8 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 		WMPAreaEntry *m = worldmap->GetEntry(i);
 		if (! (m->GetAreaStatus() & WMP_ENTRY_VISIBLE)) continue;
 
-		short xOffs = MAP_TO_SCREENX(m->X);
-		short yOffs = MAP_TO_SCREENY(m->Y);
+		int xOffs = MAP_TO_SCREENX(m->X);
+		int yOffs = MAP_TO_SCREENY(m->Y);
 		Sprite2D* icon = m->GetMapIcon(worldmap->bam);
 		if( icon ) {
 			video->BlitSprite( icon, xOffs, yOffs, true, &r );
@@ -204,8 +204,8 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 	lastMouseY = y;
 
 	if (Value!=(ieDword) -1) {
-		x += ScrollX;
-		y += ScrollY;
+		x =(ieWord) (x + ScrollX);
+		y =(ieWord) (y + ScrollY);
 
 		WMPAreaEntry *oldArea = Area;
 		Area = NULL;

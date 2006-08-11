@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.93 2006/08/06 17:14:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.94 2006/08/11 23:17:17 avenger_teambg Exp $
  *
  */
 
@@ -138,6 +138,7 @@
 #endif
 
 class Scriptable;
+class Actor;
 
 /* this function will work with pl/cz special characters */
 
@@ -153,10 +154,11 @@ GEM_EXPORT unsigned int Distance(Point pos, Scriptable *b);
 GEM_EXPORT unsigned int PersonalDistance(Point pos, Scriptable *b);
 GEM_EXPORT unsigned int Distance(Scriptable *a, Scriptable *b);
 GEM_EXPORT unsigned int PersonalDistance(Scriptable *a, Scriptable *b);
+GEM_EXPORT int EARelation(Actor *a, Actor *b);
 GEM_EXPORT bool dir_exists(const char* path);
 GEM_EXPORT int strlench(const char* string, char ch);
 #ifndef HAVE_STRNDUP
-GEM_EXPORT char* strndup(const char* s, int l);
+GEM_EXPORT char* strndup(const char* s, unsigned int l);
 #endif
 
 #ifndef WIN32

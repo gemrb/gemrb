@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.206 2006/08/10 21:34:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.207 2006/08/11 23:17:18 avenger_teambg Exp $
  *
  */
 
@@ -1417,8 +1417,8 @@ void Actor::DropItem(int slot , unsigned int flags)
 /** which is a 'use quickitem' action */
 void Actor::GetItemSlotInfo(ItemExtHeader *item, int which)
 {
-	unsigned int idx;
-	unsigned int headerindex;
+	ieWord idx;
+	ieWord headerindex;
 
 	memset(item, 0, sizeof(ItemExtHeader) );
 	if (!PCStats) return; //not a player character
@@ -1984,6 +1984,13 @@ bool Actor::Schedule(ieDword gametime)
 	return false;
 }
 
+void Actor::NewPath()
+{
+	Point tmp = Destination;
+	ClearPath();
+        Moveble::WalkTo(tmp, size );
+}
+
 void Actor::WalkTo(Point &Des, ieDword flags, int MinDistance)
 {
 	if (InternalFlags&IF_REALLYDIED) {
@@ -2037,7 +2044,7 @@ void Actor::Draw(Region &screen)
 			return;
 		if (CurrentAction)
 			return;
-		if (path)
+		if (GetNextStep())
 			return;
 		if (GetNextAction())
 			return;

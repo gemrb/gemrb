@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.67 2006/08/10 21:34:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.68 2006/08/11 23:17:19 avenger_teambg Exp $
  *
  */
 
@@ -183,7 +183,7 @@ void HandleBitMod(ieDword &value1, ieDword value2, int opcode)
 
 // SPIT is not in the original engine spec, it is reserved for the
 // enchantable items feature
-//					0      1       2     3      4
+//					0      1      2      3      4
 static const char *spell_suffices[]={"SPIT","SPPR","SPWI","SPIN","SPCL"};
 
 //this function handles the polymorphism of Spell[RES] actions
@@ -908,20 +908,20 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags)
 
 void CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
 {
-        strncpy(item->ItemResRef, resref, 8);
-        if (a==-1) {
-                Item *origitem = core->GetItem(resref);
-                for(int i=0;i<3;i++) {
-                        ITMExtHeader *e = origitem->GetExtHeader(i);              
-                        item->Usages[i]=e?e->Charges:0;
-                }
-                core->FreeItem(origitem, resref, false);
-        } else {
-                item->Usages[0]=(ieWord) a;
-                item->Usages[1]=(ieWord) b;
-                item->Usages[2]=(ieWord) c;
-        }
-        item->Flags=0;
+	strncpy(item->ItemResRef, resref, 8);
+	if (a==-1) {
+		Item *origitem = core->GetItem(resref);
+		for(int i=0;i<3;i++) {
+			ITMExtHeader *e = origitem->GetExtHeader(i);              
+			item->Usages[i]=e?e->Charges:0;
+		}
+		core->FreeItem(origitem, resref, false);
+	} else {
+		item->Usages[0]=(ieWord) a;
+		item->Usages[1]=(ieWord) b;
+		item->Usages[2]=(ieWord) c;
+	}
+	item->Flags=0;
 }
 
 //It is possible to attack CONTAINERS/DOORS as well!!!
@@ -1293,7 +1293,7 @@ Action* GenerateActionCore(const char *src, const char *str, int acIndex)
 				while (*src != '"') {
 					//sizeof(context+name) = 40
 					if (i<40) {
-						*dst++ = tolower(*src);
+						*dst++ = (char) tolower(*src);
 						i++;
 					}
 					src++;
@@ -1321,7 +1321,7 @@ Action* GenerateActionCore(const char *src, const char *str, int acIndex)
 					i=0;
 					while (*src != '"') {
 						if (i++<6) {
-							*dst++ = tolower(*src);
+							*dst++ = (char) tolower(*src);
 						}
 						src++;
 					}
@@ -1533,7 +1533,7 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 				while (*src != '"') {
 					//sizeof(context+name) = 40
 					if (i<40) {
-						*dst++ = tolower(*src);
+						*dst++ = (char) tolower(*src);
 						i++;
 					}
 					src++;
@@ -1561,7 +1561,7 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 					i=0;
 					while (*src != '"') {
 						if (i++<6) {
-							*dst++ = tolower(*src);
+							*dst++ = (char) tolower(*src);
 						}
 						src++;
 					}
@@ -1833,7 +1833,7 @@ Targets *XthNearestDoor(Targets *parameters, unsigned int count)
 	}
 	//get the doors based on it
 	Map *map = origin->GetCurrentArea();
-	unsigned int i = map->TMap->GetDoorCount();
+	unsigned int i =(unsigned int) map->TMap->GetDoorCount();
 	if (count>i) {
 		return parameters;
 	}

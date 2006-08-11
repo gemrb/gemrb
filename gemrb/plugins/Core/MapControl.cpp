@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.39 2006/01/08 22:07:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.40 2006/08/11 23:17:19 avenger_teambg Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -118,7 +118,7 @@ void MapControl::DrawFog()
 
 	for (int y = 0; y < h; y++) {
 		for (int x = 0; x < w; x++) {
-			Point p( MAP_MULT * x, MAP_MULT * y );
+			Point p( (short) (MAP_MULT * x), (short) (MAP_MULT * y) );
 			bool visible = MyMap->IsVisible( p, true );
 			if (! visible) {
 				Region rgn = Region ( MAP_DIV * x, MAP_DIV * y, MAP_DIV, MAP_DIV );
@@ -136,15 +136,15 @@ void MapControl::Realize()
 	//MapWidth = map->GetWidth();
 	//MapHeight = map->GetHeight();
 
-	MapWidth = MapMOS->Width;
-	MapHeight = MapMOS->Height;
+	MapWidth = (short) MapMOS->Width;
+	MapHeight = (short) MapMOS->Height;
 
 	// FIXME: ugly hack! What is the actual viewport size?
-	ViewWidth = core->Width * MAP_DIV / MAP_MULT;
-	ViewHeight = core->Height * MAP_DIV / MAP_MULT;
+	ViewWidth = (short) (core->Width * MAP_DIV / MAP_MULT);
+	ViewHeight = (short) (core->Height * MAP_DIV / MAP_MULT);
 
-	XCenter = (Width - MapMOS->Width ) / 2;
-	YCenter = (Height - MapMOS->Height ) / 2;
+	XCenter = (short) (Width - MapMOS->Width ) / 2;
+	YCenter = (short) (Height - MapMOS->Height ) / 2;
 	if (XCenter < 0) XCenter = 0;
 	if (YCenter < 0) YCenter = 0;
 }
@@ -194,7 +194,7 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 	while (i--) {
 		Actor* actor = game->GetPC( i, true );
 		if (MyMap->HasActor(actor) ) {
-			video->DrawEllipse( GAME_TO_SCREENX(actor->Pos.x), GAME_TO_SCREENY(actor->Pos.y), 3, 2, actor->Selected ? colors[green] : colors[darkgreen], false );
+			video->DrawEllipse( (short) GAME_TO_SCREENX(actor->Pos.x), (short) GAME_TO_SCREENY(actor->Pos.y), 3, 2, actor->Selected ? colors[green] : colors[darkgreen], false );
 		}
 	}
 	// Draw Map notes, could be turned off in bg2
@@ -217,7 +217,7 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 				video->BlitSprite( anim, vp.x, vp.y, true, &r );
 			}
 			else {
-				video->DrawEllipse( vp.x, vp.y, 6, 5, colors[mn->color&7], false );
+				video->DrawEllipse( (short) vp.x, (short) vp.y, 6, 5, colors[mn->color&7], false );
 			}
 		}
 	}
@@ -276,13 +276,13 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 		unsigned int dist;
 
 		if(ConvertToGame) {
-			mp.x = SCREEN_TO_GAMEX(x);
-			mp.y = SCREEN_TO_GAMEY(y);
+			mp.x = (short) SCREEN_TO_GAMEX(x);
+			mp.y = (short) SCREEN_TO_GAMEY(y);
 			dist = 100;
 		}
 		else {
-			mp.x = SCREEN_TO_MAPX(x);
-			mp.y = SCREEN_TO_MAPY(y);
+			mp.x = (short) SCREEN_TO_MAPX(x);
+			mp.y = (short) SCREEN_TO_MAPY(y);
 			dist = 16;
 		}
 		int i = MyMap -> GetMapNoteCount();
@@ -340,8 +340,8 @@ void MapControl::OnMouseDown(unsigned short x, unsigned short y,
 	lastMouseX = x;
 	lastMouseY = y;
 
-	short xp = SCREEN_TO_MAPX(x) - ViewWidth / 2;
-	short yp = SCREEN_TO_MAPY(y) - ViewHeight / 2;
+	short xp = (short) (SCREEN_TO_MAPX(x) - ViewWidth / 2);
+	short yp = (short) (SCREEN_TO_MAPY(y) - ViewHeight / 2);
 
 	if (xp + ViewWidth > MapWidth) xp = MapWidth - ViewWidth;
 	if (yp + ViewHeight > MapHeight) yp = MapHeight - ViewHeight;

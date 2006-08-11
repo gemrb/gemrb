@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.113 2006/08/08 20:25:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.114 2006/08/11 23:17:19 avenger_teambg Exp $
  *
  */
 
@@ -115,7 +115,6 @@ class Gem_Polygon;
 #define IF_IDLE          0x10000
 //the actor should stop attacking
 #define IF_STOPATTACK (IF_JUSTDIED|IF_REALLYDIED|IF_CLEANUP|IF_IDLE)
-
 
 //CheckTravel return value
 #define CT_CANTMOVE       0 //inactive
@@ -288,20 +287,30 @@ class GEM_EXPORT Moveble : public Selectable {
 private: //these seem to be sensitive, so get protection
 	unsigned char StanceID;
 	unsigned char Orientation, NewOrientation;
+	PathNode* path; //whole path
+	PathNode* step; //actual step
 public:
 	Moveble(ScriptableType type);
 	virtual ~Moveble(void);
 	Point Destination;
-	PathNode* path;
-	PathNode* step;
 	ieDword timeStartStep;
 	Sprite2D* lastFrame;
 	ieResRef Area;
 public:
+	PathNode *GetNextStep(int x);
+	int GetPathLength() const;
 //inliners to protect data consistency
-	inline unsigned char GetOrientation() {
+	inline PathNode * GetNextStep() {
+		if (!step) {
+			DoStep((unsigned int) ~0);
+		}
+		return step;
+	}
+
+	inline unsigned char GetOrientation() const {
 		return Orientation;
 	}
+
 	inline unsigned char GetNextFace() {
 		//slow turning
 		if (Orientation != NewOrientation) {

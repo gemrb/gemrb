@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICommonWindows.py,v 1.16 2006/08/09 19:05:31 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICommonWindows.py,v 1.17 2006/08/11 23:17:18 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -26,11 +26,14 @@
 import GemRB
 from GUIDefines import *
 from ie_stats import *
+from ie_modal import *
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
 
+PortraitWindow = None
 OptionsWindow = None
+ActionsWindow = None
 
 def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	global OptionsWindow
@@ -95,22 +98,8 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	# Party mgmt
 	Button = GemRB.GetControl (Window, 8)
 	GemRB.SetTooltip (Window, Button, 16312)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenPartyWindow")
 
-## 	# Rest
-## 	Button = GemRB.GetControl (Window, 8)
-## 	GemRB.SetTooltip (Window, Button, 11942)
-## 	GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenStoreWindow")
-
-	# AI
-	#Button = GemRB.GetControl (Window, 9)
-	#GemRB.SetTooltip (Window, Button, 41631) # or 41646 Activate ...
-	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenFloatMenuWindow")
-	return
-
-
-def AIPress ():
-	print "AIPress"
 	return
 
 def RestPress ():
@@ -163,7 +152,6 @@ def GroupControls ():
 	GemRB.SetActionIcon (Window, Button, 21)
 	Button = GemRB.GetControl (Window, 3)
 	GemRB.SetActionIcon (Window, Button, -1)
-	
 	Button = GemRB.GetControl (Window, 4)
 	GemRB.SetActionIcon (Window, Button, -1)
 	Button = GemRB.GetControl (Window, 5)
@@ -198,6 +186,7 @@ def OpenActionsWindowControls (Window):
 
 def UpdateActionsWindow ():
 	global ActionsWindow
+	global level, TopIndex
 
 	if ActionsWindow == -1:
 		return
@@ -214,10 +203,13 @@ def UpdateActionsWindow ():
 				pc = -1
 				break
 
+	#setting up the disabled button overlay (using the second border slot)
 	for i in range (12):
 		Button = GemRB.GetControl (ActionsWindow, i)
 		GemRB.SetButtonBorder (ActionsWindow, Button, 0,6,6,4,4,0,254,0,255)
 		GemRB.SetButtonBorder (ActionsWindow, Button, 1, 0, 0, 0, 0, 50,30,10,120, 0, 1)
+		GemRB.SetButtonFont (ActionsWindow, Button, "NUMBER")
+		GemRB.SetText (ActionsWindow, Button, "")
 
 	if pc == 0:
 		EmptyControls ()
@@ -234,8 +226,10 @@ def UpdateActionsWindow ():
 	elif level == 1:
 		GemRB.SetupEquipmentIcons(ActionsWindow, pc, TopIndex)
 	elif level == 2: #spells
+		GemRB.SetVar("Type", 3)
 		GemRB.SetupSpellIcons(ActionsWindow, pc, 3, TopIndex)
 	elif level == 3: #innates
+		GemRB.SetVar("Type", 4)
 		GemRB.SetupSpellIcons(ActionsWindow, pc, 4, TopIndex)
 	return
 
@@ -249,7 +243,7 @@ def ActionAttackPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_ATTACK)
 
 def ActionQWeaponPressed (which):
-	pc = GemRB.GameGetFirstSelectedPC()
+	pc = GemRB.GameGetFirstSelectedPC ()
 
 	if GemRB.GetEquippedQuickSlot (pc)==which and not (GemRB.GameControlGetTargetMode() &TARGET_MODE_ATTACK):
 		GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_ATTACK)
@@ -292,7 +286,7 @@ def ActionLeftPressed ():
 
 #no check needed because the button wouldn't be drawn if illegal
 def ActionRightPressed ():
-	pc = GemRB.GameGetFirstSelectedPC()
+	pc = GemRB.GameGetFirstSelectedPC ()
 	TopIndex = GemRB.GetVar ("TopIndex")
 	Type = GemRB.GetVar ("Type")
 	if Type == 3:
@@ -311,25 +305,25 @@ def ActionRightPressed ():
 	return
 
 def ActionSongPressed ():
-	pc = GemRB.GameGetFirstSelectedPC()
+	pc = GemRB.GameGetFirstSelectedPC ()
 	GemRB.SetModalState (pc, MS_BATTLESONG)
 	UpdateActionsWindow ()
 	return
 
 def ActionSearchPressed ():
-	pc = GemRB.GameGetFirstSelectedPC()
+	pc = GemRB.GameGetFirstSelectedPC ()
 	GemRB.SetModalState (pc, MS_DETECTTRAPS)
 	UpdateActionsWindow ()
 	return
 
 def ActionStealthPressed ():
-	pc = GemRB.GameGetFirstSelectedPC()
+	pc = GemRB.GameGetFirstSelectedPC ()
 	GemRB.SetModalState (pc, MS_STEALTH)
 	UpdateActionsWindow ()
 	return
 	
 def ActionTurnPressed ():
-	pc = GemRB.GameGetFirstSelectedPC()
+	pc = GemRB.GameGetFirstSelectedPC ()
 	GemRB.SetModalState (pc, MS_TURNUNDEAD)
 	UpdateActionsWindow ()
 	return
@@ -347,7 +341,7 @@ def ActionCastPressed ():
 	return
 
 def ActionQItemPressed (action):
-	pc = GemRB.GameGetFirstSelectedPC()
+	pc = GemRB.GameGetFirstSelectedPC ()
 	GemRB.UseItem(pc, action)
 	return
 	
@@ -378,7 +372,7 @@ def ActionInnatePressed ():
 	return
 
 def SpellPressed ():
-	pc = GemRB.GameGetFirstSelectedPC()
+	pc = GemRB.GameGetFirstSelectedPC ()
 
 	Spell = GemRB.GetVar("Spell")
 	Type = GemRB.GetVar("Type")
@@ -386,7 +380,7 @@ def SpellPressed ():
 	return
 
 def EquipmentPressed ():
-	pc = GemRB.GameGetFirstSelectedPC()
+	pc = GemRB.GameGetFirstSelectedPC ()
 
 	Item = GemRB.GetVar("Equipment")
 	GemRB.UseItem(pc, -1, Item)
@@ -445,11 +439,27 @@ def OpenPortraitWindow (needcontrols):
 	global PortraitWindow
 
 	PortraitWindow = Window = GemRB.LoadWindow(1)
-	#GemRB.SetVar ("PortraitWindow", PortraitWindow)
-	#GemRB.SetVar ("PortraitPosition", 2)    # Right
+
+	# AI
+	Button = GemRB.GetControl (Window, 6)
+	GSFlags = GemRB.GetVar ("MessageWindowSize")
+	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX,OP_OR)
+	#this control is crippled
+	GemRB.SetButtonSprites (Window, Button, "GUIBTACT", 0, 46, 47, 48, 49)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "TogglePartyAI")
+	if GSFlags&GS_PARTYAI:
+		GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_SELECTED)
+	else:
+		GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_ENABLED)
+
+	#Select All
+	Button = GemRB.GetControl (Window, 7)
+	GemRB.SetTooltip (Window, Button, 10485)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
 
 	for i in range (PARTY_SIZE):
 		Button = GemRB.GetControl (Window, i)
+		GemRB.SetVarAssoc (Window, Button, "PressedPortrait", i)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "PortraitButtonOnShiftPress")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnDropItemToPC")
@@ -460,6 +470,7 @@ def OpenPortraitWindow (needcontrols):
 		GemRB.SetButtonBorder (Window, Button, FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
 
 	UpdatePortraitWindow ()
+	SelectionChanged ()
 	return Window
 
 def UpdatePortraitWindow ():
@@ -469,29 +480,19 @@ def UpdatePortraitWindow ():
 		Button = GemRB.GetControl (Window, i)
 		pic = GemRB.GetPlayerPortrait (i+1, 1)
 		if not pic:
-			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
+			GemRB.SetText (Window, Button, "")
+			GemRB.SetTooltip (Window, Button, "")
 			continue
-		
-		sel = GemRB.GameGetSelectedPCSingle () == i + 1
+
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
 		GemRB.SetButtonPicture (Window, Button, pic, "NOPORTSM")
-		
-		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
-		GemRB.SetButtonFont (Window, Button, 'TOOLFONT')
-
-		GemRB.SetVarAssoc (Window, Button, "PressedPortrait", i)
-
 		hp = GemRB.GetPlayerStat (i+1, IE_HITPOINTS)
 		hp_max = GemRB.GetPlayerStat (i+1, IE_MAXHITPOINTS)
 
-		GemRB.SetText (Window, Button, "%d/%d" %(hp, hp_max))
 		GemRB.SetTooltip (Window, Button, GemRB.GetPlayerName (i+1, 1) + "\n%d/%d" %(hp, hp_max))
-		if sel:
-			#GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SELECTED)
-			GemRB.EnableButtonBorder (Window, Button, FRAME_PC_SELECTED, 1)
-		else:
-			#GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_UNPRESSED)
-			GemRB.EnableButtonBorder (Window, Button, FRAME_PC_SELECTED, 0)
-
+ 
 
 def PortraitButtonOnPress ():
 	i = GemRB.GetVar ("PressedPortrait")

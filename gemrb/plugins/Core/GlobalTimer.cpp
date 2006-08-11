@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GlobalTimer.cpp,v 1.31 2006/06/26 10:28:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GlobalTimer.cpp,v 1.32 2006/08/11 23:17:19 avenger_teambg Exp $
  *
  */
 
@@ -243,7 +243,7 @@ void GlobalTimer::UpdateAnimations()
 
 void GlobalTimer::ClearAnimations()
 {
-	first_animation = animations.size();
+	first_animation = (unsigned int) animations.size();
 }
 
 void GlobalTimer::SetScreenShake(unsigned long shakeX, unsigned long shakeY,

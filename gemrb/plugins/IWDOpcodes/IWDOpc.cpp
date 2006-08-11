@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.cpp,v 1.12 2006/08/10 16:44:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.cpp,v 1.13 2006/08/11 23:17:21 avenger_teambg Exp $
  *
  */
 
@@ -174,12 +174,33 @@ IWDOpc::~IWDOpc(void)
 {
 }
 
-//iwd got a weird ids targeting system
+//iwd got a weird targeting system
+//the opcode parameters are:
+//param1 - optional value used only rarely
+//param2 - a specific condition mostly based on target's stats
+//this is partly superior, partly inferior to the bioware
+//ids targeting.
+//superior because it can handle other stats and conditions
+//inferior because it is not moddable
+//The hardcoded conditions are simulated via the IWDIDSEntry
+//structure.
+//stat is usually a stat, but for special conditions it is a
+//function code (>=0x100).
+//If value is -1, then GemRB will use Param1, otherwise it is
+//compared to the target's stat using the relation function.
+//The relation function is exactly the same as the extended 
+//diffmode for gemrb. (Thus scripts can use the very same relation
+//functions).
+
+typedef struct {
+	ieDword value;
+	ieWord stat;
+	ieWord relation;
+} IWDIDSEntry;
 
 static int spellrescnt = -1;
-static ieWord *spellres = NULL;
+static IWDIDSEntry *spellres = NULL;
 
-#define SR_COLUMNS 4
 static void ReadSpellProtTable(const ieResRef tablename)
 {
 	TableMgr * tab;
@@ -199,23 +220,19 @@ static void ReadSpellProtTable(const ieResRef tablename)
 		return;
 	}
 	spellrescnt=tab->GetRowCount();
-	spellres = (ieWord *) malloc(sizeof(ieWord) * SR_COLUMNS * spellrescnt);
+	spellres = (IWDIDSEntry *) malloc(sizeof(IWDIDSEntry) * spellrescnt);
 	if (!spellres) {
 		core->DelTable(table);
 		return;
 	}
-	for (int j=0;j<SR_COLUMNS;j++) {
-		for( int i=0;i<spellrescnt;i++) {
-			spellres[spellrescnt*j+i] = (ieWord) strtol(tab->QueryField(i,j),NULL,0 );
-		}
+	for( int i=0;i<spellrescnt;i++) {
+		spellres[spellrescnt].stat = (ieWord) strtol(tab->QueryField(i,0),NULL,0 );
+		spellres[spellrescnt].value = (ieDword) strtol(tab->QueryField(i,1),NULL,0 );
+		spellres[spellrescnt].relation = (ieWord) strtol(tab->QueryField(i,2),NULL,0 );
 	}
 	core->DelTable(table);
 	return;
 }
-
-#define ST_TABLE      0
-#define ST_ID         1
-#define ST_RELATION   2
 
 //unusual types which need hacking (fake stats)
 #define STI_SOURCE_TARGET     0x100
@@ -226,6 +243,8 @@ static void ReadSpellProtTable(const ieResRef tablename)
 #define STI_MORAL_ALIGNMENT   0x105
 #define STI_AREATYPE          0x106
 #define STI_DAYTIME           0x107
+#define STI_EA                0x108
+
 //returns true if iwd ids targeting resists the spell
 static int check_iwd_targeting(Actor* Owner, Actor* target, ieDword value, ieDword type)
 {
@@ -236,41 +255,43 @@ static int check_iwd_targeting(Actor* Owner, Actor* target, ieDword value, ieDwo
 		return 0; //not resisted
 	}
 
-	ieDword idx = spellres[spellrescnt*ST_TABLE+type];
-	ieDword val = spellres[spellrescnt*ST_ID+type];
+	ieDword idx = spellres[type].stat;
+	ieDword val = spellres[type].value;
 	//if IDS value is 'anything' then the supplied value is in Parameter1
 	if (val==0xffffffff) {
 		val = value;
 	}
 	switch (idx) {
+	case STI_EA:
+		return DiffCore(EARelation(Owner, target), val, spellres[type].relation);
 	case STI_DAYTIME:
-		return (core->GetGame()->GameTime%7200/3600) == val;
+		return (core->GetGame()->GameTime%7200/3600) != val;
 	case STI_AREATYPE:
-		return DiffCore((ieDword) target->GetCurrentArea()->AreaType, val, spellres[spellrescnt*ST_RELATION+type]);
+		return DiffCore((ieDword) target->GetCurrentArea()->AreaType, val, spellres[type].relation);
 	case STI_MORAL_ALIGNMENT:
-		return DiffCore((ieDword) Owner->GetStat(IE_ALIGNMENT)&0x3, (ieDword) target->GetStat(IE_ALIGNMENT)&0x3, spellres[spellrescnt*ST_RELATION+type]);
+		return DiffCore(Owner->GetStat(IE_ALIGNMENT)&0x3,target->GetStat(IE_ALIGNMENT)&0x3, spellres[type].relation);
 	case STI_TWO_ROWS:
-		if (check_iwd_targeting(Owner, target, value, idx)) return 1;
-		if (check_iwd_targeting(Owner, target, value, val)) return 1;
-		return 0;
-	case STI_NOT_TWO_ROWS:
 		if (check_iwd_targeting(Owner, target, value, idx)) return 0;
 		if (check_iwd_targeting(Owner, target, value, val)) return 0;
 		return 1;
+	case STI_NOT_TWO_ROWS:
+		if (check_iwd_targeting(Owner, target, value, idx)) return 1;
+		if (check_iwd_targeting(Owner, target, value, val)) return 1;
+		return 0;
 	case STI_SOURCE_TARGET:
 		if (Owner==target) {
-			return 1;
+			return 0;
 		}
-		return 0;
+		return 1;
 	case STI_SOURCE_NOT_TARGET:
 		if (Owner!=target) {
-			return 1;
+			return 0;
 		}
-		return 0;
+		return 1;
 	case STI_CIRCLESIZE:
-		return DiffCore((ieDword) target->GetAnims()->GetCircleSize(), val, spellres[spellrescnt*ST_RELATION+type]);
+		return DiffCore((ieDword) target->GetAnims()->GetCircleSize(), val, spellres[type].relation);
 	default:
-		return DiffCore(target->GetStat(idx), val, spellres[spellrescnt*ST_RELATION+type]);
+		return DiffCore(target->GetStat(idx), val, spellres[type].relation);
 	}
 }
 

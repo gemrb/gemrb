@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.34 2006/08/10 21:34:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScriptedAnimation.cpp,v 1.35 2006/08/11 23:17:20 avenger_teambg Exp $
  *
  */
 
@@ -104,7 +104,7 @@ void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af)
 {
 	//getcycle returns NULL if there is no such cycle
 	for(unsigned int i=0;i<3;i++) {
-		anims[i] = af->GetCycle( i );
+		anims[i] = af->GetCycle( (ieByte) i );
 		palettes[i] = NULL;
 		sounds[i][0] = 0;
 		if (anims[i]) {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.cpp,v 1.34 2005/11/24 17:44:09 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ScrollBar.cpp,v 1.35 2006/08/11 23:17:20 avenger_teambg Exp $
  *
  */
 
@@ -52,7 +52,7 @@ void ScrollBar::SetPos(int NewPos)
 	if (Pos && ( Pos == NewPos )) {
 		return;
 	}
-	Pos = NewPos;
+	Pos = (ieWord) NewPos;
 	if (ta) {
 		TextArea* t = ( TextArea* ) ta;
 		t->SetRow( Pos );
@@ -80,15 +80,15 @@ void ScrollBar::Draw(unsigned short x, unsigned short y)
 	if (XPos == 65535) {
 		return;
 	}
-	unsigned short upMy = Frames[IE_GUI_SCROLLBAR_UP_UNPRESSED]->Height;
-	unsigned short doMy = Frames[IE_GUI_SCROLLBAR_DOWN_UNPRESSED]->Height;
-	unsigned short domy = Height - doMy;
+	int upMy = Frames[IE_GUI_SCROLLBAR_UP_UNPRESSED]->Height;
+	int doMy = Frames[IE_GUI_SCROLLBAR_DOWN_UNPRESSED]->Height;
+	unsigned int domy = (Height - doMy);
+
 	unsigned short slmy = ( unsigned short )
 		( upMy +
 		( Pos * ( ( domy - Frames[IE_GUI_SCROLLBAR_SLIDER]->Height - upMy ) /
 		( double ) ( Value < 2 ? 1 : Value - 1 ) ) ) );
-	unsigned short slx = ( Width / 2 ) -
-		( Frames[IE_GUI_SCROLLBAR_SLIDER]->Width / 2 );
+	unsigned short slx = ( unsigned short ) ((Width - Frames[IE_GUI_SCROLLBAR_SLIDER]->Width) / 2 );
 
 	if (( State & UP_PRESS ) != 0) {
 		core->GetVideoDriver()->BlitSprite( Frames[IE_GUI_SCROLLBAR_UP_PRESSED],
@@ -135,44 +135,44 @@ void ScrollBar::SetImage(unsigned char type, Sprite2D* img)
 void ScrollBar::OnMouseDown(unsigned short x, unsigned short y,
 	unsigned char /*Button*/, unsigned short /*Mod*/)
 {
-	//((Window*)Owner)->Invalidate();
 	core->RedrawAll();
-	unsigned short upmx = 0, upMx = Frames[0]->Width, upmy = 0,
-	upMy = Frames[0]->Height;
-	unsigned short domy = Height - Frames[2]->Height;
+	unsigned short upMx = (unsigned short) Frames[IE_GUI_SCROLLBAR_UP_UNPRESSED]->Width;
+	unsigned short upMy = (unsigned short) Frames[IE_GUI_SCROLLBAR_UP_UNPRESSED]->Height;
+	unsigned short domy = (unsigned short) (Height - Frames[IE_GUI_SCROLLBAR_DOWN_UNPRESSED]->Height);
 	unsigned short slheight = domy - upMy;
-	unsigned short refheight = slheight - Frames[5]->Height;
-	double step = refheight / ( double ) ( Value < 2 ? 1 : Value - 1 );
-	unsigned short yzero = upMy/* + ( Frames[5]->Height / 2 )*/;
-	unsigned short ymax = yzero + refheight;
-	unsigned short ymy = y - yzero;
-	unsigned short domx = 0, doMx = Frames[2]->Width, doMy = Height;
-	unsigned short slmx = 0, slMx = Frames[5]->Width,
-	slmy = yzero + ( unsigned short ) ( Pos * step ),
-	slMy = slmy + Frames[5]->Height;
-	if (( x >= upmx ) && ( y >= upmy )) {
-		if (( x <= upMx ) && ( y <= upMy )) {
-			if (Pos > 0)
-				SetPos( Pos - 1 );
-			State |= UP_PRESS;
-			return;
-		}
+	unsigned short refheight = (unsigned short) (slheight - Frames[IE_GUI_SCROLLBAR_SLIDER]->Height);
+	double step = refheight / (double) ( Value < 2 ? 1 : Value - 1 );
+	unsigned short ymax = upMy + refheight;
+	unsigned short ymy = y - upMy;
+	unsigned short doMx = (unsigned short) Frames[IE_GUI_SCROLLBAR_DOWN_UNPRESSED]->Width;
+	unsigned short slMx = (unsigned short) Frames[IE_GUI_SCROLLBAR_SLIDER]->Width;
+	unsigned short slmy = (unsigned short) (upMy + Pos * step);
+	unsigned short slMy = (unsigned short) (slmy + Frames[IE_GUI_SCROLLBAR_SLIDER]->Height);
+	//if (( x >= 0 ) && ( y >= 0 )) {
+	if (( x <= upMx ) && ( y <= upMy )) {
+		if (Pos > 0)
+			SetPos( Pos - 1 );
+		State |= UP_PRESS;
+		return;
+	//	}
 	}
-	if (( x >= domx ) && ( y >= domy )) {
-		if (( x <= doMx ) && ( y <= doMy )) {
+	if (y >= domy) {
+	//if (( x >= 0 ) && ( y >= domy )) {
+		if (( x <= doMx ) && ( y <= Height )) {
 			if ( (ieDword) Pos + 1 < Value )
 				SetPos( Pos + 1 );
 			State |= DOWN_PRESS;
 			return;
 		}
 	}
-	if (( x >= slmx ) && ( y >= slmy )) {
+	if (y >= slmy) {
+	//if (( x >= 0 ) && ( y >= slmy )) {
 		if (( x <= slMx ) && ( y <= slMy )) {
 			State |= SLIDER_GRAB;
 			return;
 		}
 	}
-	if (y <= yzero) {
+	if (y <= upMy) {
 		SetPos( 0 );
 		return;
 	}
@@ -199,15 +199,13 @@ void ScrollBar::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 void ScrollBar::OnMouseOver(unsigned short /*x*/, unsigned short y)
 {
 	if (( State & SLIDER_GRAB ) != 0) {
-		//((Window*)Owner)->Invalidate();
 		core->RedrawAll();
-		unsigned short upMy = Frames[IE_GUI_SCROLLBAR_UP_UNPRESSED]->Height;
-		unsigned short domy = Height - Frames[IE_GUI_SCROLLBAR_DOWN_UNPRESSED]->Height;
+		unsigned short upMy =(unsigned short) Frames[IE_GUI_SCROLLBAR_UP_UNPRESSED]->Height;
+		unsigned short domy = (unsigned short) (Height - Frames[IE_GUI_SCROLLBAR_DOWN_UNPRESSED]->Height);
 		unsigned short slheight = domy - upMy;
-		unsigned short refheight = slheight - Frames[IE_GUI_SCROLLBAR_SLIDER]->Height;
-		double step = refheight /
-			( double ) ( Value < 2 ? 1 : Value - 1 );
-		unsigned short yzero = upMy + ( Frames[IE_GUI_SCROLLBAR_SLIDER]->Height / 2 );
+		unsigned short refheight = (unsigned short) (slheight - Frames[IE_GUI_SCROLLBAR_SLIDER]->Height);
+		double step = refheight / ( double ) ( Value < 2 ? 1 : Value - 1 );
+		unsigned short yzero = (unsigned short) (upMy + Frames[IE_GUI_SCROLLBAR_SLIDER]->Height / 2 );
 		unsigned short ymax = yzero + refheight;
 		unsigned short ymy = y - yzero;
 		if (y <= yzero) {
@@ -221,6 +219,7 @@ void ScrollBar::OnMouseOver(unsigned short /*x*/, unsigned short y)
 		unsigned short befst = ( unsigned short ) ( ymy / step );
 		unsigned short aftst = befst + 1;
 		if (( ymy - ( befst * step ) ) < ( ( aftst * step ) - ymy )) {
+			if (befst > Value )
 			SetPos( befst );
 		} else {
 			if (aftst < Value )

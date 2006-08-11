@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.32 2006/08/09 19:04:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.h,v 1.33 2006/08/11 23:17:20 avenger_teambg Exp $
  *
  */
 
@@ -123,7 +123,7 @@ private: // Private attributes
 	/** lines to be kept even if scrolled out */
 	int keeplines;
 	/** vertical offset for smooth scrolling */
-	short smooth;
+	int smooth;
 	/** timer for scrolling */
 	unsigned long starttime;
 	/** timer ticks for scrolling (speed) */

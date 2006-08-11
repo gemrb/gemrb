@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Palette.cpp,v 1.2 2006/01/29 13:40:19 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Palette.cpp,v 1.3 2006/08/11 23:17:19 avenger_teambg Exp $
  *
  */
 
@@ -31,13 +31,17 @@ void Palette::CreateShadedAlphaChannel()
 		unsigned int g = col[i].g;
 		unsigned int b = col[i].b;
 		unsigned int m = (r + g + b) / 3;
-		if (m > MINCOL)
-			if (( r == 0 ) && ( g == 0xff ) && ( b == 0 ))
+		if (m > MINCOL) {
+			if (( r == 0 ) && ( g == 0xff ) && ( b == 0 )) {
 				col[i].a = 0xff;
-			else
-				col[i].a = ( m * MUL > 0xff ) ? 0xff : m * MUL;
-		else
+			} else {
+				int tmp = m * MUL;
+				col[i].a = ( tmp > 0xff ) ? 0xff : (unsigned char) tmp;
+			}
+		}
+		else {
 			col[i].a = 0;
+		}
 	}
 	alpha = true;
 }

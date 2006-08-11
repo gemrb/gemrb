@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ControlAnimation.cpp,v 1.5 2005/11/24 17:44:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ControlAnimation.cpp,v 1.6 2006/08/11 23:17:19 avenger_teambg Exp $
  *
  */
 
@@ -95,7 +95,7 @@ void ControlAnimation::UpdateAnimation(void)
 		time = 15;
 	}
 
-	Sprite2D* pic = bam->GetFrame( frame, cycle );
+	Sprite2D* pic = bam->GetFrame( (unsigned short) frame, (unsigned char) cycle );
 
 	if (pic == NULL) {
 		//stopping at end frame

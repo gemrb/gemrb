@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.cpp,v 1.20 2005/12/19 23:10:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/DataStream.cpp,v 1.21 2006/08/11 23:17:19 avenger_teambg Exp $
  *
  */
 
@@ -154,7 +154,7 @@ int DataStream::ReadResRef(ieResRef dest)
 	int i;
 	//zero filling from the first space or in the end
 	//we got a 9 bytes long buffer
-	for(i=0;(i<8) && (dest[i]!=' ');i++) dest[i]=tolower(dest[i]);
+	for(i=0;(i<8) && (dest[i]!=' ');i++) dest[i]=(char) tolower(dest[i]);
 	while(i<9) dest[i++]=0;
 	return len;
 }
