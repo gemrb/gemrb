@@ -76,6 +76,8 @@ void GoNearAndRetry(Scriptable *Sender, Point &p);
 #define BINARY_MORE_OR_EQUALS 7 //(left has equal or more bits than right)
 #define BINARY_INTERSECT 8      //(left and right has at least one common bit)
 #define BINARY_NOT_INTERSECT 9  //(no common bits)
+#define BINARY_MORE 10          //left has more bits than right
+#define BINARY_LESS 11          //left has less bits than right
 
 Targets *GetMyTarget(Scriptable *Sender, Actor *actor, Targets *parameters);
 Targets *XthNearestOf(Targets *parameters, int count);
