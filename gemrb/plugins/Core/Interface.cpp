@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.426 2006/08/11 23:17:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.427 2006/08/14 17:17:57 avenger_teambg Exp $
  *
  */
 
@@ -292,7 +292,7 @@ void Interface::FreeResRefTable(ieResRef *&table, int &count)
 
 static void ReleaseItemTooltip(void *poi)
 {
-        free(poi);
+			  free(poi);
 }
 
 Interface::~Interface(void)
@@ -3014,6 +3014,15 @@ int Interface::DelWindow(unsigned short WindowIndex)
 	}
 	evntmgr->DelWindow( win );
 	win->release();
+	//re-capturing new (old) modal window if any
+	size_t tw = topwin.size();
+	for(size_t i=0;i<tw;i++) {
+		Window *tmp = windows[topwin[i]];
+		if (tmp->Visible==WINDOW_FRONT) {
+			ModalWindow = tmp;
+			break;
+		}
+	}
 	return 0;
 }
 

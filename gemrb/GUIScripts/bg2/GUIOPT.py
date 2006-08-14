@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIOPT.py,v 1.18 2006/08/07 22:25:13 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIOPT.py,v 1.19 2006/08/14 17:17:57 avenger_teambg Exp $
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
 # Ingame options

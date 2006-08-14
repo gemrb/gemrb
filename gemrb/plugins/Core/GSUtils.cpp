@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.69 2006/08/12 21:47:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.70 2006/08/14 17:17:56 avenger_teambg Exp $
  *
  */
 
@@ -263,16 +263,26 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 {
 	StringBlock sb;
 
-	sb.text = NULL;
+	memset(&sb,0,sizeof(sb));
 	printf( "Displaying string on: %s\n", Sender->GetScriptName() );
-	if ((flags & DS_CONST) && (Sender->Type==ST_ACTOR) ) {
+	if (flags & DS_CONST) {
+		if (Sender->Type!=ST_ACTOR) {
+			printf("[GameScript] Verbal constant not supported for non actors!\n");
+			return;
+		}
 		Actor* actor = ( Actor* ) Sender;
+		if ((ieDword) Strref>=VCONST_COUNT) {
+			printf("[GameScript] Invalid verbal constant!\n");
+			return;
+		}
+
 		int tmp=(int) actor->StrRefs[Strref];
 		if (tmp == -1) {
 			actor->ResolveStringConstant( sb.Sound, (unsigned int) Strref);
 		}
 		Strref = tmp;
 	}
+
 	if (Strref != -1) {
 		sb = core->strings->GetStringBlock( Strref );
 		if (flags & DS_CONSOLE) {

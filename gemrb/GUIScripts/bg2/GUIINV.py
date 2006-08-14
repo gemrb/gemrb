@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.52 2006/08/06 21:57:42 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.53 2006/08/14 17:17:57 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -467,6 +467,36 @@ def OnDropItemToPC ():
 	if GemRB.IsDraggingItem ():
 		GemRB.PlaySound("GAM_47")  #failed equip
 	UpdateInventoryWindow ()
+	return
+
+def IdentifyUseSpell ():
+	return
+
+def IdentifyUseScroll ():
+	return
+
+def CloseIdentifyItemWindow ():
+	GemRB.UnloadWindow (ItemIdentifyWindow)
+	return
+
+def IdentifyItemWindow ():
+	global ItemIdentifyWindow
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+
+	ItemIdentifyWindow = Window = GemRB.LoadWindow (9)
+	Button = GemRB.GetControl (Window, 0)
+	GemRB.SetText (Window, Button, 17105)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "IdentifyUseSpell")
+	Button = GemRB.GetControl (Window, 1)
+	GemRB.SetText (Window, Button, 17106)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "IdentifyUseSpell")
+	Button = GemRB.GetControl (Window, 2)
+	GemRB.SetText (Window, Button, 13727)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseIdentifyItemWindow")
+	TextArea = GemRB.GetControl (Window, 3)
+	GemRB.SetText (Window, TextArea, 19394)
+	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 	return
 
 def CloseItemInfoWindow ():
