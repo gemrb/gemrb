@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIOPT.py,v 1.4 2006/01/08 12:27:02 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIOPT.py,v 1.5 2006/08/15 15:33:29 avenger_teambg Exp $
 
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
@@ -188,10 +188,12 @@ def DisplayHelpBPP ():
 	GemRB.SetText (GameOptionsWindow, HelpTextArea, 17205)
 
 def DisplayHelpBrightness ():
-	GemRB.SetText (VideoOptionsWindow, HelpTextArea, 17203)
+	GemRB.SetText (GameOptionsWindow, HelpTextArea, 17203)
+	GemRB.SetGamma (GemRB.GetVar("Brightness Correction"),GemRB.GetVar("Gamma Correction"))
 
 def DisplayHelpContrast ():
-	GemRB.SetText (VideoOptionsWindow, HelpTextArea, 17204)
+	GemRB.SetText (GameOptionsWindow, HelpTextArea, 17204)
+	GemRB.SetGamma (GemRB.GetVar("Brightness Correction"),GemRB.GetVar("Gamma Correction"))
 
 def DisplayHelpTransShadow ():
 	GemRB.SetText (GameOptionsWindow, HelpTextArea, 20620)

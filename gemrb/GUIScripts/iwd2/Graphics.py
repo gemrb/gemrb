@@ -17,7 +17,7 @@ def OnLoad():
 
 	ContrastButton = GemRB.GetControl(GraphicsWindow, 36)
 	ContrastSlider = GemRB.GetControl(GraphicsWindow, 22)
-	GemRB.SetVarAssoc(GraphicsWindow, ContrastSlider, "Gamma Correction",0)
+	GemRB.SetVarAssoc(GraphicsWindow, ContrastSlider, "Gamma Correction",1)
 
 	BppButton = GemRB.GetControl(GraphicsWindow, 37)
 	BppButtonB1 = GemRB.GetControl(GraphicsWindow, 5)
@@ -109,10 +109,12 @@ def OnLoad():
 	
 def BrightnessPress():
 	GemRB.SetText(GraphicsWindow, TextAreaControl, 17203)
+	GemRB.SetGamma (GemRB.GetVar("Brightness Correction"),GemRB.GetVar("Gamma Correction")/2)
 	return
 	
 def ContrastPress():
 	GemRB.SetText(GraphicsWindow, TextAreaControl, 17204)
+	GemRB.SetGamma (GemRB.GetVar("Brightness Correction"),GemRB.GetVar("Gamma Correction")/2)
 	return
 	
 def BppPress():

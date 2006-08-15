@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUIOPT.py,v 1.4 2006/01/08 12:27:05 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUIOPT.py,v 1.5 2006/08/15 15:33:29 avenger_teambg Exp $
 
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
@@ -131,7 +131,7 @@ def OpenOptionsWindow ():
 
 def OpenVideoOptionsWindow ():
 	"""Open video options window"""
-	global VideoOptionsWindow, VideoHelpText
+	global GameOptionsWindow, VideoHelpText
 
 	GemRB.HideGUI ()
 
@@ -165,19 +165,21 @@ def OpenVideoOptionsWindow ():
 	
 
 def DisplayHelpBrightness ():
-	GemRB.SetText (VideoOptionsWindow, VideoHelpText, 31431)
+	GemRB.SetText (GameOptionsWindow, VideoHelpText, 31431)
+	GemRB.SetGamma (GemRB.GetVar("Brightness Correction"),GemRB.GetVar("Gamma Correction"))
 
 def DisplayHelpContrast ():
-	GemRB.SetText (VideoOptionsWindow, VideoHelpText, 31459)
+	GemRB.SetText (GameOptionsWindow, VideoHelpText, 31459)
+	GemRB.SetGamma (GemRB.GetVar("Brightness Correction"),GemRB.GetVar("Gamma Correction"))
 
 def DisplayHelpSoftwareBlitting ():
-	GemRB.SetText (VideoOptionsWindow, VideoHelpText, 31221)
+	GemRB.SetText (GameOptionsWindow, VideoHelpText, 31221)
 
 def DisplayHelpSoftwareMirroring ():
-	GemRB.SetText (VideoOptionsWindow, VideoHelpText, 31216)
+	GemRB.SetText (GameOptionsWindow, VideoHelpText, 31216)
 
 def DisplayHelpSoftwareTransparency ():
-	GemRB.SetText (VideoOptionsWindow, VideoHelpText, 31220)
+	GemRB.SetText (GameOptionsWindow, VideoHelpText, 31220)
 
 
 

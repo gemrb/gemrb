@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.427 2006/08/14 17:17:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.428 2006/08/15 15:33:29 avenger_teambg Exp $
  *
  */
 
@@ -1119,8 +1119,12 @@ int Interface::Init()
 				Color fore = {0xff, 0xff, 0xff, 0};
 				Color back = {0x00, 0x00, 0x00, 0};
 				if (!strnicmp( TooltipFont, ResRef, 8) ) {
-					fore = back;
-					back = TooltipColor;
+					if (TooltipColor.a==0xff) {
+						fore = TooltipColor;
+					} else {
+						fore = back;
+						back = TooltipColor;
+					}
 				}
 				Palette* pal = CreatePalette( fore, back );
 				pal->CreateShadedAlphaChannel();
