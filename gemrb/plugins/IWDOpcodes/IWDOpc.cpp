@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.cpp,v 1.13 2006/08/11 23:17:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.cpp,v 1.14 2006/08/15 15:32:17 avenger_teambg Exp $
  *
  */
 
@@ -226,9 +226,9 @@ static void ReadSpellProtTable(const ieResRef tablename)
 		return;
 	}
 	for( int i=0;i<spellrescnt;i++) {
-		spellres[spellrescnt].stat = (ieWord) strtol(tab->QueryField(i,0),NULL,0 );
-		spellres[spellrescnt].value = (ieDword) strtol(tab->QueryField(i,1),NULL,0 );
-		spellres[spellrescnt].relation = (ieWord) strtol(tab->QueryField(i,2),NULL,0 );
+		spellres[i].stat = (ieWord) strtol(tab->QueryField(i,0),NULL,0 );
+		spellres[i].value = (ieDword) strtol(tab->QueryField(i,1),NULL,0 );
+		spellres[i].relation = (ieWord) strtol(tab->QueryField(i,2),NULL,0 );
 	}
 	core->DelTable(table);
 	return;
