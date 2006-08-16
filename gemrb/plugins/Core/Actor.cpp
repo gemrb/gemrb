@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.207 2006/08/11 23:17:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.208 2006/08/16 15:26:50 avenger_teambg Exp $
  *
  */
 
@@ -1274,7 +1274,7 @@ void Actor::Resurrect()
 		return;
 	}
 	InternalFlags&=IF_FROMGAME; //keep these flags (what about IF_INITIALIZED)
-	InternalFlags|=IF_ACTIVE|IF_VISIBLE; //set these flags  
+	InternalFlags|=IF_ACTIVE|IF_VISIBLE; //set these flags
 	SetBase(IE_STATE_ID, 0);
 	SetBase(IE_HITPOINTS, BaseStats[IE_MAXHITPOINTS]);
 	ClearActions();
@@ -1988,7 +1988,7 @@ void Actor::NewPath()
 {
 	Point tmp = Destination;
 	ClearPath();
-        Moveble::WalkTo(tmp, size );
+	Moveble::WalkTo(tmp, size );
 }
 
 void Actor::WalkTo(Point &Des, ieDword flags, int MinDistance)

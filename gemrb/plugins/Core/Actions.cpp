@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.81 2006/08/11 23:17:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.82 2006/08/16 15:26:50 avenger_teambg Exp $
  *
  */
 
@@ -420,7 +420,7 @@ void GameScript::JumpToSavedLocation(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *actor = (Actor *) tar;
-	Point p(actor->GetStat(IE_SAVEDXPOS), actor->GetStat(IE_SAVEDYPOS) );
+	Point p((short) actor->GetStat(IE_SAVEDXPOS), (short) actor->GetStat(IE_SAVEDYPOS) );
 	Map *map = Sender->GetCurrentArea();
 	actor->SetPosition( map, p, true );
 	actor->SetOrientation( actor->GetStat(IE_SAVEDFACE), false );
@@ -758,14 +758,14 @@ void GameScript::SetStartPos(Scriptable* Sender, Action* parameters)
 
 void GameScript::SaveObjectLocation(Scriptable* Sender, Action* parameters)
 {
-	unsigned int value;
+	ieDword value;
 
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		return;
 	}
-	*((unsigned short *) &value) = tar->Pos.x;
-	*(((unsigned short *) &value)+1) = (unsigned short) tar->Pos.y;
+	*((ieWord *) &value) = (ieWord) tar->Pos.x;
+	*(((ieWord *) &value)+1) = (ieWord) tar->Pos.y;
 	if (!parameters->string0Parameter[0]) {
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
@@ -780,9 +780,9 @@ void GameScript::CreateCreatureAtLocation(Scriptable* Sender, Action* parameters
 	if (!parameters->string0Parameter[0]) {
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
-	unsigned int value = CheckVariable(Sender, parameters->string0Parameter);
-	parameters->pointParameter.y = value & 0xffff;
-	parameters->pointParameter.x = value >> 16;
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter);
+	parameters->pointParameter.y = (ieWord) (value & 0xffff);
+	parameters->pointParameter.x = (ieWord) (value >> 16);
 	CreateCreatureCore(Sender, parameters, CC_CHECK_IMPASSABLE|CC_STRING1);
 }
 
@@ -927,7 +927,7 @@ void GameScript::ReturnToSavedLocation(Scriptable* Sender, Action* parameters)
 	}
 
 	Actor* actor = ( Actor* ) tar;
-	Point p(actor->GetStat(IE_SAVEDXPOS),actor->GetStat(IE_SAVEDYPOS) );
+	Point p((short) actor->GetStat(IE_SAVEDXPOS),(short) actor->GetStat(IE_SAVEDYPOS) );
 	actor->WalkTo( p, 0, 0 );
 }
 
@@ -943,7 +943,7 @@ void GameScript::RunToSavedLocation(Scriptable* Sender, Action* parameters)
 	}
 
 	Actor* actor = ( Actor* ) tar;
-	Point p(actor->GetStat(IE_SAVEDXPOS),actor->GetStat(IE_SAVEDYPOS) );
+	Point p((short) actor->GetStat(IE_SAVEDXPOS),(short) actor->GetStat(IE_SAVEDYPOS) );
 	actor->WalkTo( parameters->pointParameter, IF_RUNNING, 0 );
 }
 
@@ -959,7 +959,7 @@ void GameScript::ReturnToSavedLocationDelete(Scriptable* Sender, Action* paramet
 	}
 
 	Actor* actor = ( Actor* ) tar;
-	Point p(actor->GetStat(IE_SAVEDXPOS),actor->GetStat(IE_SAVEDYPOS) );
+	Point p((short) actor->GetStat(IE_SAVEDXPOS),(short) actor->GetStat(IE_SAVEDYPOS) );
 	actor->WalkTo( parameters->pointParameter, 0, 0 );
 	//what else?
 }
@@ -1039,7 +1039,7 @@ void GameScript::MoveToCenterOfScreen(Scriptable* Sender, Action* /*parameters*/
 	}
 	Region vp = core->GetVideoDriver()->GetViewport();
 	Actor* actor = ( Actor* ) Sender;
-	Point p(vp.x+vp.w/2, vp.y+vp.h/2);
+	Point p((short) (vp.x+vp.w/2), (short) (vp.y+vp.h/2) );
 	actor->WalkTo( p, IF_NOINT, 0 );
 }
 
@@ -2827,7 +2827,7 @@ void GameScript::DestroyAllEquipment(Scriptable* Sender, Action* /*parameters*/)
 		default:;
 	}
 	if (inv) {
-		inv->DestroyItem("",0,~0); //destroy any and all
+		inv->DestroyItem("",0,(ieDword) ~0); //destroy any and all
 	}
 }
 
@@ -2911,7 +2911,7 @@ void GameScript::DestroyAllDestructableEquipment(Scriptable* Sender, Action* /*p
 		default:;
 	}
 	if (inv) {
-		inv->DestroyItem("", IE_INV_ITEM_DESTRUCTIBLE, ~0);
+		inv->DestroyItem("", IE_INV_ITEM_DESTRUCTIBLE, (ieDword) ~0);
 	}
 }
 
@@ -3408,21 +3408,21 @@ void GameScript::TakeItemListParty(Scriptable * Sender, Action* parameters)
 void GameScript::SetRestEncounterProbabilityDay(Scriptable* Sender, Action* parameters)
 {
 	Map *map=Sender->GetCurrentArea();
-	map->RestHeader.DayChance = parameters->int0Parameter;
+	map->RestHeader.DayChance = (ieWord) parameters->int0Parameter;
 }
 
 void GameScript::SetRestEncounterProbabilityNight(Scriptable* Sender, Action* parameters)
 {
 	Map *map=Sender->GetCurrentArea();
-	map->RestHeader.NightChance = parameters->int0Parameter;
+	map->RestHeader.NightChance = (ieWord) parameters->int0Parameter;
 }
 
 //iwd
 void GameScript::SetRestEncounterChance(Scriptable * Sender, Action* parameters)
 {
 	Map *map=Sender->GetCurrentArea();
-	map->RestHeader.DayChance = parameters->int0Parameter;
-	map->RestHeader.NightChance = parameters->int1Parameter;
+	map->RestHeader.DayChance = (ieWord) parameters->int0Parameter;
+	map->RestHeader.NightChance = (ieWord) parameters->int1Parameter;
 }
 
 void GameScript::EndCredits(Scriptable* /*Sender*/, Action* /*parameters*/)
@@ -4273,7 +4273,7 @@ void GameScript::EscapeArea(Scriptable* Sender, Action* parameters)
 	}
 	Sender->SetWait(5);
 	if (parameters->string0Parameter[0]) {
-		Point q(parameters->int0Parameter, parameters->int1Parameter);
+		Point q((short) parameters->int0Parameter, (short) parameters->int1Parameter);
 		EscapeAreaCore((Actor *) Sender, parameters->string0Parameter, q, p, 0 );
 	} else {
 		EscapeAreaCore((Actor *) Sender, parameters->string0Parameter, p, p, EA_DESTROY );
@@ -4299,7 +4299,7 @@ void GameScript::EscapeAreaObject(Scriptable* Sender, Action* parameters)
 		//find nearest exit
 		Point p(0,0);
 		if (parameters->string0Parameter[0]) {
-			Point q(parameters->int0Parameter, parameters->int1Parameter);
+			Point q((short) parameters->int0Parameter, (short) parameters->int1Parameter);
 			EscapeAreaCore((Actor *) tar, parameters->string0Parameter, p, q, 0 );
 		} else {
 			EscapeAreaCore((Actor *) tar, 0, p, p, EA_DESTROY );
@@ -4313,7 +4313,7 @@ void GameScript::EscapeAreaObjectNoSee(Scriptable* Sender, Action* parameters)
 	if (tar && tar->Type == ST_ACTOR) {
 		//find nearest exit
 		Point p(0,0);
-		Point q(parameters->int0Parameter, parameters->int1Parameter);
+		Point q((short) parameters->int0Parameter, (short) parameters->int1Parameter);
 		EscapeAreaCore((Actor *) tar, parameters->string0Parameter, p, q, EA_DESTROY );
 	}
 }
@@ -4697,7 +4697,7 @@ void GameScript::SelectWeaponAbility(Scriptable* Sender, Action* parameters)
 		}
 		scr->SetEquippedQuickSlot(slot);
 		if (scr->PCStats) {
-			scr->PCStats->QuickWeaponHeaders[slot]=parameters->int1Parameter;
+			scr->PCStats->QuickWeaponHeaders[slot]=(ieWord) parameters->int1Parameter;
 		}
 		return;
 	}
@@ -4709,7 +4709,7 @@ void GameScript::SelectWeaponAbility(Scriptable* Sender, Action* parameters)
 			return;
 		}
 		if (scr->PCStats) {
-			scr->PCStats->QuickItemHeaders[slot-wslot]=parameters->int1Parameter;
+			scr->PCStats->QuickItemHeaders[slot-wslot]=(ieWord) parameters->int1Parameter;
 		}
 	}
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.250 2006/08/11 23:17:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.251 2006/08/16 15:26:50 avenger_teambg Exp $
  *
  */
 
@@ -599,7 +599,13 @@ void Map::UpdateScripts()
 		actor->inventory.CalculateWeight();
 		actor->SetBase( IE_ENCUMBRANCE, actor->inventory.GetWeight() );
 		//TODO:calculate actor speed!
-		int speed = 150;
+		int speed = (int) actor->GetStat(IE_MOVEMENTRATE);
+		if (speed) {
+			speed = 1500/speed;
+		} else {
+			speed = 0;
+		}
+
 		if (actor->Modified[IE_DONOTJUMP]<2) {
 			BlockSearchMap( actor->Pos, actor->size, 0);
 			if (actor->GetNextStep()) {

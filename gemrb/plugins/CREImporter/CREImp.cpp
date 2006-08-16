@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.110 2006/06/30 07:05:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.111 2006/08/16 15:26:50 avenger_teambg Exp $
  *
  */
 
@@ -26,6 +26,8 @@
 #include "../Core/GameScript.h"
 #include "../../includes/ie_stats.h"
 #include <cassert>
+
+#define DEFAULT_MOVEMENTRATE 12
 
 #define MAXCOLOR 12
 typedef unsigned char ColorSet[MAXCOLOR];
@@ -366,6 +368,7 @@ Actor* CREImp::GetActor()
 	// Reading inventory, spellbook, etc
 	ReadInventory( act, Inventory_Size );
 
+	act->SetBase(IE_MOVEMENTRATE, DEFAULT_MOVEMENTRATE);
 	//this is required so the actor has animation already
 	act->SetAnimationID( ( ieWord ) act->BaseStats[IE_ANIMATION_ID] );
 	// Setting up derived stats

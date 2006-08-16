@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIINV.py,v 1.15 2006/08/15 15:33:29 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIINV.py,v 1.16 2006/08/16 15:26:49 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -466,9 +466,23 @@ def OnDropItemToPC ():
 	return
 
 def IdentifyUseSpell ():
+	global ItemIdentifyWindow
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	GemRB.UnloadWindow (ItemIdentifyWindow)
+	GemRB.HasSpecialSpell (pc, 1, 1)
+	GemRB.UnloadWindow (ItemInfoWindow)
+	OpenItemInfoWindow()
 	return
 
 def IdentifyUseScroll ():
+	global ItemIdentifyWindow
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	GemRB.UnloadWindow (ItemIdentifyWindow)
+	GemRB.HasSpecialItem (pc, 1, 1)
+	GemRB.UnloadWindow (ItemInfoWindow)
+	OpenItemInfoWindow()
 	return
 
 def CloseIdentifyItemWindow ():
@@ -484,9 +498,15 @@ def IdentifyItemWindow ():
 	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, Button, 17105)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "IdentifyUseSpell")
+	if not GemRB.HasSpecialSpell (pc, 1, 0):
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
+
 	Button = GemRB.GetControl (Window, 1)
 	GemRB.SetText (Window, Button, 17106)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "IdentifyUseSpell")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "IdentifyUseScroll")
+	if not GemRB.HasSpecialItem (pc, 1, 0):
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
+
 	Button = GemRB.GetControl (Window, 2)
 	GemRB.SetText (Window, Button, 13727)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseIdentifyItemWindow")
@@ -577,6 +597,13 @@ def OpenItemInfoWindow ():
 
 	slot = GemRB.GetVar ("ItemButton")
 	slot_item = GemRB.GetSlotItem (pc, slot)
+	item = GemRB.GetItem (slot_item["ItemResRef"])
+
+	#auto identify when lore is high enough
+	if item["LoreToID"]<GemRB.GetPlayerStat (pc, IE_LORE):
+		GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
+		slot_item["Flags"] |= IE_INV_ITEM_IDENTIFIED
+		UpdateInventoryWindow ()
 
 	if slot_item["Flags"] & IE_INV_ITEM_IDENTIFIED:
 		value = 1
@@ -591,13 +618,14 @@ def OpenGroundItemInfoWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	slot = GemRB.GetVar("TopIndex")+GemRB.GetVar("GroundItemButton")
-	print "OpenGroundItemInfo", slot
 	slot_item = GemRB.GetContainerItem (pc, slot)
-	if item["Flags"] & IE_INV_ITEM_IDENTIFIED:
+
+	#the ground items are only displayable
+	if slot_item["Flags"] & IE_INV_ITEM_IDENTIFIED:
 		value = 0
 	else:
 		value = 2
-	DisplayItem(slot_item["ItemResRef"], value)  #the ground items are only displayable
+	DisplayItem(slot_item["ItemResRef"], value)
 	return
 
 
