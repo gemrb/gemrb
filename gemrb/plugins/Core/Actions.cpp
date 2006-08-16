@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.82 2006/08/16 15:26:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.83 2006/08/16 18:35:03 avenger_teambg Exp $
  *
  */
 
@@ -1911,15 +1911,21 @@ void GameScript::ReallyForceSpell(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+	Actor *actor = NULL;
 	if (Sender->Type == ST_ACTOR) {
-		Actor *actor = (Actor *) Sender;
+		actor = (Actor *) Sender;
 		actor->SetStance (IE_ANI_CAST);
 	}
 	Point s,d;
 	GetPositionFromScriptable( Sender, s, false );
 	GetPositionFromScriptable( tar, d, false );
 	printf( "ReallyForceSpell from [%d,%d] to [%d,%d]\n", s.x, s.y, d.x, d.y );
-	//this might be bad
+	//temporarily
+	if (tar->Type==ST_ACTOR) {
+		core->ApplySpell(spellres, (Actor *) tar, actor, 0);
+	} else {
+		core->ApplySpellPoint(spellres, tar, tar->Pos, actor, 0);
+	}
 	Sender->ReleaseCurrentAction();
 }
 
@@ -1938,17 +1944,21 @@ void GameScript::ReallyForceSpellDead(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-/* if dead, then do not move
+	Actor *actor = NULL;
 	if (Sender->Type == ST_ACTOR) {
-		Actor *actor = (Actor *) Sender;
-		actor->SetStance (IE_ANI_CAST);
+		actor = (Actor *) Sender;
 	}
-*/
 	Point s,d;
 	GetPositionFromScriptable( Sender, s, false );
 	GetPositionFromScriptable( tar, d, false );
 	printf( "ReallyForceSpellDead from [%d,%d] to [%d,%d]\n", s.x, s.y, d.x, d.y );
 	//this might be bad
+	//temporarily
+	if (tar->Type==ST_ACTOR) {
+		core->ApplySpell(spellres, (Actor *) tar, actor, 0);
+	} else {
+		core->ApplySpellPoint(spellres, tar, tar->Pos, actor, 0);
+	}
 	Sender->ReleaseCurrentAction();
 }
 

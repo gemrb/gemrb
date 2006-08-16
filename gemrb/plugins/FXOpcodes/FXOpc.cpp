@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.41 2006/08/10 16:44:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.42 2006/08/16 18:35:04 avenger_teambg Exp $
  *
  */
 
@@ -1019,7 +1019,45 @@ int fx_damage (Actor* Owner, Actor* target, Effect* fx)
 int fx_death (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_death (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	target->Damage(0, fx->Parameter2, Owner); //hmm?
+  STAT_SET(IE_MINHITPOINTS,0); //the die opcode seems to override minhp
+  ieDword damagetype = 0;
+  switch (fx->Parameter2) {
+  case 1:
+    BASE_STATE_SET(STATE_D4); //not sure, should be charred
+    damagetype = DAMAGE_FIRE;
+    break;
+  case 2:
+    damagetype = DAMAGE_CRUSHING;
+    break;
+  case 4:
+    damagetype = DAMAGE_CRUSHING;
+    break;
+  case 8:
+    damagetype = DAMAGE_CRUSHING|DAMAGE_CHUNKING;
+    break;
+  case 16:
+    BASE_STATE_SET(STATE_PETRIFIED);
+    damagetype = DAMAGE_CRUSHING;
+    break;
+  case 32:
+    BASE_STATE_SET(STATE_FROZEN);
+    damagetype = DAMAGE_COLD;
+    break;
+  case 64:
+    BASE_STATE_SET(STATE_PETRIFIED);
+    damagetype = DAMAGE_CRUSHING|DAMAGE_CHUNKING;
+    break;
+  case 128:
+    BASE_STATE_SET(STATE_FROZEN);
+    damagetype = DAMAGE_COLD|DAMAGE_CHUNKING;
+    break;
+  case 256:
+    damagetype = DAMAGE_ELECTRICITY;
+    break;
+  default:
+    damagetype = DAMAGE_ACID;
+  }
+	target->Damage(0, damagetype, Owner);
 	//death has damage type too
 	target->Die(Owner);
 	//this effect doesn't stick
@@ -4004,10 +4042,14 @@ int fx_unpause_caster (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 // 0x10f AvatarRemoval
-int fx_avatar_removal (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+// 0x104 AvatarRemoval (iwd)
+int fx_avatar_removal (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_avatar_removal (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	return FX_APPLIED;
+  //FIXME: this is a permanent irreversible effect in IWD
+  //if it is different in bg2, then create another effect
+  BASE_SET(IE_AVATARREMOVAL, 1);
+	return FX_NOT_APPLIED;
 }
 // 0x110 ApplyEffectRepeat
 int fx_apply_effect_repeat (Actor* Owner, Actor* target, Effect* fx)

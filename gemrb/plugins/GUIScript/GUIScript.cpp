@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.410 2006/08/16 15:26:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.411 2006/08/16 18:35:04 avenger_teambg Exp $
  *
  */
 
@@ -4989,6 +4989,8 @@ static PyObject* GemRB_GetStoreDrink(PyObject * /*self*/, PyObject* args)
 
 static void ReadSpecialSpells()
 {
+	int i;
+
 	SpecialSpellsCount = 0;
 	int table = core->LoadTable("splspec");
 	if (table>=0) {
@@ -4996,7 +4998,7 @@ static void ReadSpecialSpells()
 		if (!tab) goto table_loaded;
 		SpecialSpellsCount = tab->GetRowCount();
 		SpecialSpells = (SpellDescType *) malloc( sizeof(SpellDescType) * SpecialSpellsCount);
-		for (int i=0;i<SpecialSpellsCount;i++) {
+		for (i=0;i<SpecialSpellsCount;i++) {
 			strnlwrcpy(SpecialSpells[i].resref, tab->GetRowName(i),8 );
 			//if there are more flags, compose this value into a bitfield
 			SpecialSpells[i].value = atoi(tab->QueryField(i,0) );
@@ -5008,6 +5010,8 @@ table_loaded:
 
 static void ReadSpecialItems()
 {
+	int i;
+
 	SpecialItemsCount = 0;
 	int table = core->LoadTable("itemspec");
 	if (table>=0) {
@@ -5015,7 +5019,7 @@ static void ReadSpecialItems()
 		if (!tab) goto table_loaded;
 		SpecialItemsCount = tab->GetRowCount();
 		SpecialItems = (SpellDescType *) malloc( sizeof(SpellDescType) * SpecialItemsCount);
-		for (int i=0;i<SpecialItemsCount;i++) {
+		for (i=0;i<SpecialItemsCount;i++) {
 			strnlwrcpy(SpecialItems[i].resref, tab->GetRowName(i),8 );
 			//if there are more flags, compose this value into a bitfield
 			SpecialItems[i].value = atoi(tab->QueryField(i,0) );

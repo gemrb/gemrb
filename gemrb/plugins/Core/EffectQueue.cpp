@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.72 2006/08/11 23:17:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.73 2006/08/16 18:35:04 avenger_teambg Exp $
  *
  */
 
@@ -388,8 +388,8 @@ inline bool check_level(Actor *target, Effect *fx)
 	if (IsDicedEffect2((int) fx->Opcode)) {
 		return false;
 	}
-	int level = target->GetXPLevel( true );
-	if ((fx->DiceSides != 0 || fx->DiceThrown != 0) && (level < (int)fx->DiceSides || level > (int)fx->DiceThrown)) {
+	ieDword level = (ieDword) target->GetXPLevel( true );
+	if ((fx->DiceSides != 0 || fx->DiceThrown != 0) && (level > fx->DiceSides || level < fx->DiceThrown)) {
 		return true;
 	}
 	return false;

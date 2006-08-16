@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.70 2006/08/14 17:17:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.71 2006/08/16 18:35:04 avenger_teambg Exp $
  *
  */
 
@@ -189,7 +189,7 @@ static const char *spell_suffices[]={"SPIT","SPPR","SPWI","SPIN","SPCL"};
 //this function handles the polymorphism of Spell[RES] actions
 bool ResolveSpellName(ieResRef spellres, Action *parameters)
 {
-	if (parameters->string0Parameter) {
+	if (parameters->string0Parameter[0]) {
 		strnlwrcpy(spellres, parameters->string0Parameter, 8);
 	} else {
 		//resolve spell

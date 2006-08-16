@@ -17,6 +17,7 @@
 #define DAMAGE_SOULEATER 0x1000  //iwd2
 #define DAMAGE_DISEASE 0x4000    //iwd2
 
+#define DAMAGE_CHUNKING 0x8000
 //damage levels
 #define DL_BLOOD  0
 #define DL_CRITICAL 3

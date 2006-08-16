@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.208 2006/08/16 15:26:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.209 2006/08/16 18:35:04 avenger_teambg Exp $
  *
  */
 
@@ -1107,7 +1107,8 @@ int Actor::Damage(int damage, int damagetype, Actor *hitter)
 	if(Modified[IE_MORALE]<Modified[IE_MORALEBREAK] ) {
 		Panic();
 	}
-	LastDamageType=damagetype;
+	//add lastdamagetype up
+	LastDamageType|=damagetype;
 	LastDamage=damage;
 	LastHitter=hitter->GetID();
 	InternalFlags|=IF_ACTIVE;
@@ -1390,7 +1391,7 @@ bool Actor::CheckOnDeath()
 	if (Modified[IE_MC_FLAGS]&MC_REMOVE_CORPSE) return true;
 	if (Modified[IE_MC_FLAGS]&MC_KEEP_CORPSE) return false;
 	//if chunked death, then return true
-	if(LastDamage>10) {
+	if(LastDamageType&DAMAGE_CHUNKING) {
 		//play chunky animation
 		//chunks are projectiles
 		return true;
@@ -2058,6 +2059,10 @@ void Actor::Draw(Region &screen)
 	CharAnimations* ca = GetAnims();
 	if (!ca)
 		return;
+
+	if (Modified[IE_AVATARREMOVAL]) {
+		return;
+	}
 
 	//explored or visibilitymap (bird animations are visible in fog)
 	//0 means opaque
