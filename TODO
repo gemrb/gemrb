@@ -15,12 +15,13 @@ Items:
 4. (PARTLY) Equipping items, weapons are special
 5. (DONE) Equipped weapon range (create triggers)
 6. Break items, count charges
-
+7. Implement switching weapon abilities
+8. Implement item usage (similar to spells)
 
 Effects:
 1. (PARTLY) Create base system for effect blocks (Avenger)
 2. (DONE-almost) Implement common effects
-3. Implement IWD2 effects
+3. (PARTLY) Implement IWD2 effects
 4. (DONE-almost) Implement TOB effects
 5. Implement PST effects
 
@@ -29,8 +30,8 @@ Area:
 2. Don't load scripts for pile items? (research when a script is unused)
 3. Create real streaming ambients (do not preload them, just use them when needed)
 4. (DONE) in pathfinder, calculate with the actor's feet circle size 
-5. fix door wallgroups and tiles
-6. Improve pathfinder to not cancel pathfinding when the target point
+5. (DONE) fix door wallgroups and tiles
+6. (DONE) Improve pathfinder to not cancel pathfinding when the target point
    is temporarily blocked by other actor
 
 Store:
@@ -81,7 +82,7 @@ Graphics:
    and in BMPImporter
 2. move SDLVideoDriver sprite functions to their own file, rename them to 
    SpriteIsPixelTransparent etc.
-
+3. Add PNG support?
 
 Sound:
 1. valgrind reports invalid memory access due to Unqueueing buffers and using 
