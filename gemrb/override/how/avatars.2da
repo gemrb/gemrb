@@ -246,6 +246,7 @@
 0xE000     MBET       MBET       MBET       MBET       9          2          1  
 0xE012     MBBM       MBBM       MBBM       MBBM       9          2          1  
 0xE020     MTAN       MTAN       MTAN       MTAN       9          4          1  
+0xEBCD     MTAN       MTAN       MTAN       MTAN       9          4          1
 0xE022     MBBR       MBBR       MBBR       MBBR       9          2          1  
 0xE038     MBFI       MBFI       MBFI       MBFI       9          2          1  
 0xE048     MBRH       MBRH       MBRH       MBRH       9          5          1  
@@ -311,5 +312,18 @@
 0xEBD8     MSAL       MSAL       MSAL       MSAL       9          2          1  
 0xEBE8     MSA2       MSA2       MSA2       MSA2       9          2          1  
 0xED00     MYU1       MYU1       MYU1       MYU1       9          2          1  
+0xF10E     MYU1       MYU1       MYU1       MYU1       9          2          1  
 0xED10     MYU2       MYU2       MYU2       MYU2       9          2          1  
+0xF11E     MYU2       MYU2       MYU2       MYU2       9          2          1  
 0xED20     MYU3       MYU3       MYU3       MYU3       9          2          1  
+0xE8A1     MYU3       MYU3       MYU3       MYU3       9          2          1  
+0xEF1D     MMAD       MMAD       MMAD       MMAD       9          2          1
+0xF029     MWI4       MWI4       MWI4       MWI4       9          2          1
+0xF308     MGFI       MGFI       MGFI       MGFI       9          4          1
+0xF40B     MSAH       MSAH       MSAH       MSAH       9          2          1
+0xF41B     MSAT       MSAT       MSAT       MSAT       9          2          1
+0xF50B     MDRM       MDRM       MDRM       MDRM       9          4          1
+0xF51B     MDRF       MDRF       MDRF       MDRF       9          4          1
+0xF77A     MBA1       MBA1       MBA1       MBA1       9          2          1
+0xF78A     MBA2       MBA2       MBA2       MBA2       9          2          1
+0xF798     MBA3       MBA3       MBA3       MBA3       9          2          1

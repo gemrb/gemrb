@@ -259,7 +259,7 @@ IDS
 0x101	ZombieLordAura
 0x102	Protection:Spell
 0x103	SummonCreature2
-0x104	AvatarRemovalModifier
+0x104	AvatarRemoval
 0x105	Protection:Opcode2
 0x106	SummonPomab
 0x107	ControlUndead
