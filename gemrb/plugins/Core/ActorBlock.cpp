@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.155 2006/08/11 23:17:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.156 2006/08/17 15:32:52 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -52,6 +52,7 @@ Scriptable::Scriptable(ScriptableType type)
 	LastEntered = 0;
 	LastDisarmed = 0;
 	LastDisarmFailed = 0;
+	LastUnlocked = 0;
 	CurrentAction = NULL;
 	startTime = 0;
 	interval = ( 1000 / AI_UPDATE_TIME );
@@ -189,10 +190,10 @@ void Scriptable::DrawOverheadText(Region &screen)
 		if (time<256) {
 			Color black={0,0,0,0};
 			Color overHeadColor;
-			overHeadColor.a=time;
-			overHeadColor.b=time;
-			overHeadColor.r=time;
-			overHeadColor.g=time;
+			overHeadColor.a=(ieByte) time;
+			overHeadColor.b=(ieByte) time;
+			overHeadColor.r=(ieByte) time;
+			overHeadColor.g=(ieByte) time;
 			palette = core->CreatePalette(overHeadColor,black);
 		}
 	}
@@ -516,8 +517,8 @@ void Selectable::DrawCircle(Region &vp)
 		core->GetVideoDriver()->BlitSprite( sprite, Pos.x - vp.x, Pos.y - vp.y, true );
 	}
 	else {
-		core->GetVideoDriver()->DrawEllipse( Pos.x - vp.x, Pos.y - vp.y,
-		size * 10, ( ( size * 15 ) / 2 ), *col );
+		core->GetVideoDriver()->DrawEllipse( (ieWord) (Pos.x - vp.x), (ieWord) (Pos.y - vp.y),
+		(ieWord) (size * 10), (ieWord) ( ( size * 15 ) / 2 ), *col );
 	}
 }
 
@@ -545,7 +546,7 @@ void Selectable::SetOver(bool over)
 void Selectable::Select(int Value)
 {
 	if (Selected!=0x80 || Value!=1) {
-		Selected = Value;
+		Selected = (ieWord) Value;
 	}
 	//forcing regeneration of the cover
 	SetSpriteCover(NULL);
@@ -643,9 +644,9 @@ Moveble::~Moveble(void)
 	}
 }
 
-int Moveble::GetPathLength() const
+int Moveble::GetPathLength()
 {
-	PathNode *node = step;
+	PathNode *node = GetNextStep(0);
 	int i = 0;
 	while (node->Next) {
 		i++;
@@ -677,7 +678,7 @@ Point Moveble::GetMostLikelyPosition()
 	int halfway = GetPathLength()/2;
 	PathNode *node = GetNextStep(halfway);
 	if (node) {
-		return Point(node->x, node->y);
+		return Point((ieWord) ((node->x*16)+8), (ieWord) ((node->y*12)+6) );
 	}
 	return Destination;
 }
@@ -865,8 +866,8 @@ void Moveble::DrawTargetPoint(Region &vp)
 	step = tp_steps [(step >> 6) & 7];
 
 	//Region vp = core->GetVideoDriver()->GetViewport();
-	core->GetVideoDriver()->DrawEllipse( Destination.x - vp.x,
-		Destination.y - vp.y, (unsigned short) (size * 10 - step),
+	core->GetVideoDriver()->DrawEllipse( (ieWord) (Destination.x - vp.x),
+		(ieWord) (Destination.y - vp.y), (unsigned short) (size * 10 - step),
 		(unsigned short) ( size * 15 / 2 - step), selectedColor );
 
 }
@@ -920,7 +921,7 @@ Door::Door(TileOverlay* Overlay)
 	: Highlightable( ST_DOOR )
 {
 	tiles = NULL;
-	count = 0;
+	tilecount = 0;
 	Flags = 0;
 	open = NULL;
 	closed = NULL;
@@ -962,8 +963,8 @@ Door::~Door(void)
 void Door::ImpedeBlocks(int count, Point *points, unsigned int value)
 {
 	for(int i=0;i<count;i++) {
-		ieByte tmp = area->SearchMap->GetPixelIndex( points[i].x, points[i].y ) & PATH_MAP_NOTDOOR;
-		area->SearchMap->SetPixelIndex( points[i].x, points[i].y, tmp|value );
+		unsigned int tmp = area->SearchMap->GetPixelIndex( points[i].x, points[i].y ) & PATH_MAP_NOTDOOR;
+		area->SearchMap->SetPixelIndex( points[i].x, points[i].y, (ieByte) (tmp|value) );
 	}
 }
 
@@ -1013,8 +1014,8 @@ void Door::ToggleTiles(int State, bool playsound)
 		if (playsound && ( CloseSound[0] != '\0' ))
 			core->GetSoundMgr()->Play( CloseSound );
 	}
-	for (i = 0; i < count; i++) {
-		overlay->tiles[tiles[i]]->tileIndex = state;
+	for (i = 0; i < tilecount; i++) {
+		overlay->tiles[tiles[i]]->tileIndex = (ieByte) state;
 	}
 
 	//set door_open as state
@@ -1033,7 +1034,7 @@ void Door::SetTiles(unsigned short* Tiles, int cnt)
 		free( tiles );
 	}
 	tiles = Tiles;
-	count = cnt;
+	tilecount = cnt;
 }
 
 void Door::SetDoorLocked(bool Locked, bool playsound)
@@ -1084,7 +1085,7 @@ bool Door::BlockedOpen(bool Open, bool ForceOpen)
 		Actor** ab;
 		rgn.x=points[i].x*16;
 		rgn.y=points[i].y*12;
-		ieByte tmp = area->SearchMap->GetPixelIndex( points[i].x, points[i].y ) & PATH_MAP_ACTOR;
+		unsigned int tmp = area->SearchMap->GetPixelIndex( points[i].x, points[i].y ) & PATH_MAP_ACTOR;
 		if (tmp) {
 			int ac = area->GetActorInRect(ab, rgn, false);
 			while(ac--) {

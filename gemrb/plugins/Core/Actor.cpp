@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.209 2006/08/16 18:35:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.210 2006/08/17 15:32:52 avenger_teambg Exp $
  *
  */
 
@@ -158,16 +158,11 @@ Actor::Actor()
 	ShortStrRef = (ieStrRef) -1;
 
 	Leader = 0;
-	LastTarget = 0;
-	LastTalkedTo = 0;
-	LastAttacker = 0;
-	LastHitter = 0;
 	LastProtected = 0;
 	LastCommander = 0;
 	LastHelp = 0;
 	LastSeen = 0;
 	LastHeard = 0;
-	LastSummoner = 0;
 	PCStats = NULL;
 	LastCommand = 0; //used by order
 	LastShout = 0; //used by heard
@@ -770,7 +765,7 @@ static void InitActorTables()
 		for (i = 0; i < classcount; i++) {
 			memcpy(GUIBTDefaults+i, &DefaultButtons, sizeof(ActionButtonRow));
 			for (int j=0;j<MAX_QSLOTS;j++) {
-				GUIBTDefaults[i][j+3]=atoi( tm->QueryField(i,j) );
+				GUIBTDefaults[i][j+3]=(ieByte) atoi( tm->QueryField(i,j) );
 			}
 		}
 		core->DelTable( table );
@@ -982,11 +977,11 @@ void Actor::RefreshEffects()
 void Actor::RollSaves()
 {
 	if (InternalFlags&IF_USEDSAVE) {
-		SavingThrow[0]=core->Roll(1,SAVEROLL,0);
-		SavingThrow[1]=core->Roll(1,SAVEROLL,0);
-		SavingThrow[2]=core->Roll(1,SAVEROLL,0);
-		SavingThrow[3]=core->Roll(1,SAVEROLL,0);
-		SavingThrow[4]=core->Roll(1,SAVEROLL,0);
+		SavingThrow[0]=(ieByte) core->Roll(1,SAVEROLL,0);
+		SavingThrow[1]=(ieByte) core->Roll(1,SAVEROLL,0);
+		SavingThrow[2]=(ieByte) core->Roll(1,SAVEROLL,0);
+		SavingThrow[3]=(ieByte) core->Roll(1,SAVEROLL,0);
+		SavingThrow[4]=(ieByte) core->Roll(1,SAVEROLL,0);
 		InternalFlags&=~IF_USEDSAVE;
 	}
 }
@@ -1199,8 +1194,7 @@ void Actor::DebugDump()
 	fxqueue.dump();
 }
 
-//Last* ids should all be made ieWord?
-const char* Actor::GetActorNameByID(ieWord ID)
+const char* Actor::GetActorNameByID(ieDword ID)
 {
 	Actor *actor = GetCurrentArea()->GetActorByGlobalID(ID);
 	if (!actor) {
@@ -1484,7 +1478,7 @@ void Actor::ReinitQuickSlots()
 				slot = 0xffff;
 			}
 		}
-		PCStats->InitQuickSlot(which, slot, headerindex);
+		PCStats->InitQuickSlot(which, (ieWord) slot, (ieWord) headerindex);
 	}
 
 	//disabling quick weapon slots for certain classes
@@ -2001,7 +1995,7 @@ void Actor::WalkTo(Point &Des, ieDword flags, int MinDistance)
 	InternalFlags |= (flags & IF_RUNFLAGS);
 	// is this true???
 	if (Des.x==-2 && Des.y==-2) {
-		Point p(Modified[IE_SAVEDXPOS], Modified[IE_SAVEDYPOS] );
+		Point p((ieWord) Modified[IE_SAVEDXPOS], (ieWord) Modified[IE_SAVEDYPOS] );
 		Moveble::WalkTo(p, MinDistance);
 	} else {
 		Moveble::WalkTo(Des, MinDistance);
@@ -2095,7 +2089,7 @@ void Actor::Draw(Region &screen)
 	}
 
 	Color tint = area->LightMap->GetPixel( cx / 16, cy / 12);
-	tint.a = 255-Trans;
+	tint.a = (ieByte) (255-Trans);
 
 	//draw videocells under the actor
 	DrawVideocells(screen, vvcShields, tint);
@@ -2302,7 +2296,7 @@ bool Actor::HasVVCCell(const ieResRef resource)
 	int j = true;
 	vvcVector *vvcCells=&vvcShields;
 retry:
-	unsigned int i=vvcCells->size();
+	size_t i=vvcCells->size();
 	while (i--) {
 		ScriptedAnimation *vvc = (*vvcCells)[i];
 		if (vvc == NULL) {
@@ -2322,7 +2316,7 @@ void Actor::RemoveVVCell(const ieResRef resource, bool graceful)
 	bool j = true;
 	vvcVector *vvcCells=&vvcShields;
 retry:
-	unsigned int i=vvcCells->size();
+	size_t i=vvcCells->size();
 	while (i--) {
 		ScriptedAnimation *vvc = (*vvcCells)[i];
 		if (vvc == NULL) {
@@ -2354,7 +2348,7 @@ void Actor::AddVVCell(ScriptedAnimation* vvc)
 	} else {
 		vvcCells=&vvcOverlays;
 	}
-	unsigned int i=vvcCells->size();
+	size_t i=vvcCells->size();
 	while (i--) {
 		if ((*vvcCells)[i] == NULL) {
 			(*vvcCells)[i] = vvc;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.114 2006/08/11 23:17:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.115 2006/08/17 15:32:52 avenger_teambg Exp $
  *
  */
 
@@ -179,6 +179,7 @@ public:
 	ieDword LastEntered;
 	ieDword LastDisarmed;
 	ieDword LastDisarmFailed;
+	ieDword LastUnlocked;
 	std::list< Action*> actionQueue;
 	Action* CurrentAction;
 	unsigned long playDeadCounter;
@@ -298,7 +299,7 @@ public:
 	ieResRef Area;
 public:
 	PathNode *GetNextStep(int x);
-	int GetPathLength() const;
+	int GetPathLength();
 //inliners to protect data consistency
 	inline PathNode * GetNextStep() {
 		if (!step) {
@@ -381,7 +382,7 @@ public:
 	ieResRef ID;    //WED ID
 	TileOverlay* overlay;
 	unsigned short* tiles;
-	unsigned char count;
+	int tilecount;
 	ieDword Flags;
 	int closedIndex;
 	//trigger areas

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.374 2006/08/11 23:17:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.375 2006/08/17 15:32:52 avenger_teambg Exp $
  *
  */
 
@@ -326,6 +326,7 @@ static TriggerLink triggernames[] = {
 	{"traptriggered", GameScript::TrapTriggered, 0},
 	{"triggerclick", GameScript::Clicked, 0}, //not sure
 	{"true", GameScript::True, 0},
+	{"unlocked", GameScript::Unlocked, 0},
 	{"unselectablevariable", GameScript::UnselectableVariable, 0},
 	{"unselectablevariablegt", GameScript::UnselectableVariableGT, 0},
 	{"unselectablevariablelt", GameScript::UnselectableVariableLT, 0},
@@ -1086,7 +1087,7 @@ void Targets::Clear()
 }
 
 /********************** GameScript *******************************/
-GameScript::GameScript(ieResRef ResRef, unsigned char ScriptType,
+GameScript::GameScript(ieResRef ResRef, ScriptableType ScriptType,
 	Variables* local, int ScriptLevel)
 {
 	if (local) {

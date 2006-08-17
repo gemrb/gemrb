@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.54 2006/08/09 19:04:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.55 2006/08/17 15:32:52 avenger_teambg Exp $
  *
  */
 
@@ -1269,12 +1269,24 @@ int GameScript::DisarmFailed(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
-//opened for doors (using lastEntered)
+//opened for doors/containers (using lastEntered)
 int GameScript::Opened(Scriptable* Sender, Trigger* parameters)
 {
-	if (Sender->Type != ST_DOOR) {
-		return 0;
+	Door *door;
+
+	switch (Sender->Type) {
+		case ST_DOOR:
+			door = (Door *) Sender;
+			if (!door->IsOpen()) {
+				return 0;
+			}
+			break;
+		case ST_CONTAINER:
+			break;
+		default:
+			return 0;
 	}
+
 	if (parameters->objectParameter == NULL) {
 		if (Sender->LastEntered) {
 			Sender->AddTrigger (&Sender->LastEntered);
@@ -1295,6 +1307,11 @@ int GameScript::Closed(Scriptable* Sender, Trigger* parameters)
 	if (Sender->Type != ST_DOOR) {
 		return 0;
 	}
+	Door *door = (Door *) Sender;
+	if (door->IsOpen()) {
+		return 0;
+	}
+
 	if (parameters->objectParameter == NULL) {
 		if (Sender->LastTrigger) {
 			Sender->AddTrigger (&Sender->LastTrigger);
@@ -1304,6 +1321,38 @@ int GameScript::Closed(Scriptable* Sender, Trigger* parameters)
 	}
 	if (MatchActor(Sender, Sender->LastTrigger, parameters->objectParameter)) {
 		Sender->AddTrigger (&Sender->LastTrigger);
+		return 1;
+	}
+	return 0;
+}
+
+//unlocked for doors/containers (using lastUnlocked)
+int GameScript::Unlocked(Scriptable* Sender, Trigger* parameters)
+{
+	Door *door;
+
+	switch (Sender->Type) {
+		case ST_DOOR:
+			door = (Door *) Sender;
+			if ((door->Flags&DOOR_LOCKED) ) {
+				return 0;
+			}
+			break;
+		case ST_CONTAINER:
+			break;
+		default:
+			return 0;
+	}
+
+	if (parameters->objectParameter == NULL) {
+		if (Sender->LastUnlocked) {
+			Sender->AddTrigger (&Sender->LastUnlocked);
+			return 1;
+		}
+		return 0;
+	}
+	if (MatchActor(Sender, Sender->LastUnlocked, parameters->objectParameter)) {
+		Sender->AddTrigger (&Sender->LastUnlocked);
 		return 1;
 	}
 	return 0;

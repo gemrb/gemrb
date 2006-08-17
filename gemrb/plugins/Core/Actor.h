@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.124 2006/08/11 23:17:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.125 2006/08/17 15:32:52 avenger_teambg Exp $
  *
  */
 
@@ -144,7 +144,8 @@ public:
 	//ieDword LastHitter; use lastentered
 	#define LastSummoner LastTrigger
 	//ieDword LastSummoner; use lasttrigger
-	ieDword LastTalkedTo;
+	#define LastTalkedTo LastUnlocked
+	//ieDword LastTalkedTo; use lastunlocked
 	ieDword LastProtected;
 	ieDword LastCommander;
 	ieDword LastHelp;
@@ -173,7 +174,7 @@ private:
 	/** fixes the palette */
 	void SetupColors();
 	/** debugging function, gets the scripting name of an actor referenced by a global ID */
-	const char* GetActorNameByID(ieWord ID);
+	const char* GetActorNameByID(ieDword ID);
 	/* if Lasttarget is gone, call this */
 	void StopAttack();
 public:

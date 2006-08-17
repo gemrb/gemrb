@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.255 2006/08/09 19:04:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.256 2006/08/17 15:32:52 avenger_teambg Exp $
  *
  */
 
@@ -629,7 +629,7 @@ private: //Script Internal Variables
 //	bool continueExecution;
 	bool freeLocals;
 public:
-	GameScript(ieResRef ResRef, unsigned char ScriptType,
+	GameScript(ieResRef ResRef, ScriptableType ScriptType,
 		Variables* local = NULL, int ScriptLevel = 0);
 	~GameScript();
 	static void ReleaseMemory();
@@ -912,8 +912,9 @@ public: //Script Functions
 	static int TotalItemCnt(Scriptable* Sender, Trigger* parameters);
 	static int TotalItemCntGT(Scriptable* Sender, Trigger* parameters);
 	static int TotalItemCntLT(Scriptable* Sender, Trigger* parameters);
-	static int True(Scriptable* Sender, Trigger* parameters);
 	static int TrapTriggered(Scriptable* Sender, Trigger* parameters);
+	static int True(Scriptable* Sender, Trigger* parameters);
+	static int Unlocked(Scriptable* Sender, Trigger* parameters);
 	static int UnselectableVariable(Scriptable* Sender, Trigger* parameters);
 	static int UnselectableVariableGT(Scriptable* Sender, Trigger* parameters);
 	static int UnselectableVariableLT(Scriptable* Sender, Trigger* parameters);

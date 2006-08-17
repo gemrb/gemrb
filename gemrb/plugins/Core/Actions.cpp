@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.83 2006/08/16 18:35:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.84 2006/08/17 15:32:52 avenger_teambg Exp $
  *
  */
 
@@ -1550,7 +1550,7 @@ void GameScript::ChangeDialogue(Scriptable* Sender, Action* parameters)
 //string0, no interrupt, talkcount increased
 void GameScript::StartDialogue(Scriptable* Sender, Action* parameters)
 {
-	BeginDialog( Sender, parameters, BD_STRING0 | BD_TALKCOUNT | BD_SETDIALOG );
+	BeginDialog( Sender, parameters, BD_STRING0 | BD_TALKCOUNT | BD_SETDIALOG | BD_CHECKDIST );
 }
 
 //string0, no interrupt, talkcount increased, don't set default

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.41 2006/08/11 23:17:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spellbook.cpp,v 1.42 2006/08/17 15:32:52 avenger_teambg Exp $
  *
  */
 
@@ -273,6 +273,7 @@ void Spellbook::RemoveSpell(ieResRef ResRef)
 				}
 				delete *ks;
 				(*sm)->known_spells.erase(ks);
+				ks--;
 			}
 
 			std::vector< CREMemorizedSpell* >::iterator ms;
@@ -283,6 +284,7 @@ void Spellbook::RemoveSpell(ieResRef ResRef)
 				}
 				delete *ms;
 				(*sm)->memorized_spells.erase(ms);
+				ms--;
 			}
 		}
 	}

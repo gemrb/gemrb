@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.41 2006/08/11 23:17:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.42 2006/08/17 15:32:52 avenger_teambg Exp $
  *
  */
 
@@ -215,7 +215,7 @@ GEM_EXPORT int strlench(const char* string, char ch)
 
 //// Compatibility functions
 #ifndef HAVE_STRNDUP
-GEM_EXPORT char* strndup(const char* s, unsigned int l)
+GEM_EXPORT char* strndup(const char* s, size_t l)
 {
 	size_t len = strlen( s );
 	if (len < l) {

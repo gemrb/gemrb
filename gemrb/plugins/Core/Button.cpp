@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.107 2006/08/10 21:34:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.108 2006/08/17 15:32:52 avenger_teambg Exp $
  *
  */
 
@@ -217,7 +217,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 
 		font->Print( Region( x + XPos, y + YPos, Width - 2, Height - 2 ),
 			( unsigned char * ) Text, ppoi,
-			align | IE_FONT_SINGLE_LINE, true );
+			(ieByte) (align | IE_FONT_SINGLE_LINE), true );
 	}
 
 	if (! (Flags&IE_GUI_BUTTON_NO_IMAGE)) {
@@ -403,8 +403,8 @@ void Button::OnMouseOver(unsigned short x, unsigned short y)
 		int dy = ((Window*)Owner)->YPos + YPos + y - drag_start.y;
 		core->GetDictionary()->SetAt( "DragX", dx );
 		core->GetDictionary()->SetAt( "DragY", dy );
-		drag_start.x += dx;
-		drag_start.y += dy;
+		drag_start.x = (ieWord) (drag_start.x + dx);
+		drag_start.y = (ieWord) (drag_start.y + dy);
 		RunEventHandler( ButtonOnDrag );
 	}
 }

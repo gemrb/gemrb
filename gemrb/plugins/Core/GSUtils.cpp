@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.71 2006/08/16 18:35:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.72 2006/08/17 15:32:52 avenger_teambg Exp $
  *
  */
 
@@ -327,7 +327,7 @@ int CanSee(Scriptable* Sender, Scriptable* target, bool range)
 			dist = 30;
 		}
 	
-		if (Distance(target->Pos, Sender->Pos) > dist * 20) {
+		if (Distance(target->Pos, Sender->Pos) > dist * 15) {
 			return 0;
 		}
 	}
@@ -760,7 +760,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 	//CHECKDIST works only for mobile scriptables
 	if (Flags&BD_CHECKDIST) {
-		if (Distance(speaker, target)>speaker->GetStat(IE_DIALOGRANGE)*20 ) {
+		if (Distance(speaker, target)>speaker->GetStat(IE_DIALOGRANGE)*15 ) {
 			GoNearAndRetry(Sender, tar, true); //this is unsure, the target's path will be cleared
 			Sender->ReleaseCurrentAction();
 			return;
