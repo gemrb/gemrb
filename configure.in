@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/configure.in,v 1.58 2006/07/22 07:43:42 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/configure.in,v 1.59 2006/08/19 20:06:36 avenger_teambg Exp $
 
 ###################################################
 
@@ -213,6 +213,7 @@ gemrb/plugins/AREImporter/Makefile
 gemrb/plugins/BAMImporter/Makefile 
 gemrb/plugins/BIFImporter/Makefile 
 gemrb/plugins/BMPImporter/Makefile 
+gemrb/plugins/PNGImporter/Makefile 
 gemrb/plugins/CHUImporter/Makefile 
 gemrb/plugins/CREImporter/Makefile 
 gemrb/plugins/DLGImporter/Makefile 
