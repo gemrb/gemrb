@@ -8,14 +8,14 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/SClassID.h,v 1.9 2006/04/13 18:40:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/SClassID.h,v 1.10 2006/08/19 20:14:59 avenger_teambg Exp $
  *
  */
 
@@ -39,6 +39,7 @@ typedef unsigned long SClass_ID;
 #define IE_BCS_CLASS_ID			0x000003EF
 #define IE_BIF_CLASS_ID			0x00020000
 #define IE_BMP_CLASS_ID			0x00000001
+#define IE_PNG_CLASS_ID			0x00000003
 #define IE_CHR_CLASS_ID			0x000003FA
 #define IE_CHU_CLASS_ID			0x000003EA
 #define IE_CRE_CLASS_ID			0x000003F1
@@ -73,6 +74,6 @@ typedef unsigned long SClass_ID;
 #define IE_SCRIPT_CLASS_ID		0x000D0000
 #define IE_GUI_SCRIPT_CLASS_ID		0x000E0000
 #define IE_COMPRESSION_CLASS_ID 	0x000F0000
-#define IE_FX_CLASS_ID                  0x00100000
+#define IE_FX_CLASS_ID			0x00100000
 
 #endif
