@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.111 2006/08/16 15:26:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.112 2006/08/19 18:11:14 avenger_teambg Exp $
  *
  */
 
@@ -27,7 +27,7 @@
 #include "../../includes/ie_stats.h"
 #include <cassert>
 
-#define DEFAULT_MOVEMENTRATE 12
+#define DEFAULT_MOVEMENTRATE 9 //this is 9 in ToB
 
 #define MAXCOLOR 12
 typedef unsigned char ColorSet[MAXCOLOR];
