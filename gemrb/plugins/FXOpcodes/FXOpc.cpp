@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.42 2006/08/16 18:35:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.43 2006/08/19 18:08:14 avenger_teambg Exp $
  *
  */
 
@@ -28,13 +28,13 @@
 #include "../Core/SoundMgr.h"
 #include "../Core/Game.h"
 #include "../Core/damages.h"
-#include "../Core/TileMap.h"  //needs for knock!
-#include "../Core/GSUtils.h"  //needs for movebetweenareascore
+#include "../Core/TileMap.h" //needs for knock!
+#include "../Core/GSUtils.h" //needs for movebetweenareascore
 #include "FXOpc.h"
 
 //appply spell on condition
 #define COND_GOTHIT 0
-#define COND_NEAR   1
+#define COND_NEAR 1
 #define COND_HP_HALF 2
 #define COND_HP_QUART 3
 #define COND_HP_LOW 4
@@ -182,7 +182,7 @@ int fx_remove_inventory_item (Actor* Owner, Actor* target, Effect* fx);//7b
 int fx_dimension_door (Actor* Owner, Actor* target, Effect* fx);//7c
 int fx_knock (Actor* Owner, Actor* target, Effect* fx);//7d
 int fx_movement_modifier (Actor* Owner, Actor* target, Effect* fx);//7e
-int fx_monster_summoning  (Actor* Owner, Actor* target, Effect* fx);//7f
+int fx_monster_summoning (Actor* Owner, Actor* target, Effect* fx);//7f
 int fx_set_confused_state (Actor* Owner, Actor* target, Effect* fx);//80
 int fx_set_aid_state (Actor* Owner, Actor* target, Effect* fx);//81
 int fx_set_bless_state (Actor* Owner, Actor* target, Effect* fx);//82
@@ -382,7 +382,7 @@ static EffectRef effectnames[] = {
 	{ "AcidResistanceModifier", fx_acid_resistance_modifier, 0 },
 	{ "ACVsCreatureType", fx_generic_effect, 0 }, //0xdb
 	{ "ACVsDamageTypeModifier", fx_ac_vs_damage_type_modifier, 0 },
-	{ "ACVsDamageTypeModifier2", fx_ac_vs_damage_type_modifier, 0 },  // used in IWD
+	{ "ACVsDamageTypeModifier2", fx_ac_vs_damage_type_modifier, 0 }, // used in IWD
 	{ "AidNonCumulative", fx_set_aid_state, 0 },
 	{ "AIIdentifierModifier", fx_ids_modifier, 0 },
 	{ "AlchemyModifier", fx_alchemy_modifier, 0 },
@@ -398,7 +398,7 @@ static EffectRef effectnames[] = {
 	{ "AreaSwitch", fx_area_switch, 0 },
 	{ "AttackSpeedModifier", fx_attackspeed_modifier, 0 },
 	{ "AttacksPerRoundModifier", fx_attacks_per_round_modifier, 0 },
-	{ "AuraCleansingModifier",  fx_auracleansing_modifier, 0 },
+	{ "AuraCleansingModifier", fx_auracleansing_modifier, 0 },
 	{ "AvatarRemoval", fx_avatar_removal, 0 }, //unknown
 	{ "AvatarRemovalModifier", fx_avatar_removal_modifier, 0 },
 	{ "BackstabModifier", fx_backstab_modifier, 0 },
@@ -476,7 +476,7 @@ static EffectRef effectnames[] = {
 	{ "DetectIllusionsModifier", fx_detect_illusion_modifier, 0 },
 	{ "DexterityModifier", fx_dexterity_modifier, 0 },
 	{ "DimensionDoor", fx_dimension_door, 0 },
-	{ "DisableButton", fx_disable_button, 0 },  //sets disable button flag
+	{ "DisableButton", fx_disable_button, 0 }, //sets disable button flag
 	{ "DisableChunk", fx_disable_chunk_modifier, 0 },
 	{ "DisableOverlay", fx_disable_overlay_modifier, 0 },
 	{ "DisableCasting", fx_disable_spellcasting, 0 },
@@ -558,7 +558,7 @@ static EffectRef effectnames[] = {
 	{ "MonsterSummoning", fx_monster_summoning, 0 },
 	{ "MoraleBreakModifier", fx_morale_break_modifier, 0 },
 	{ "MoraleModifier", fx_morale_modifier, 0 },
-	{ "MovementRateModifier", fx_movement_modifier, 0 },    //fast (7e)
+	{ "MovementRateModifier", fx_movement_modifier, 0 }, //fast (7e)
 	{ "MovementRateModifier2", fx_movement_modifier, 0 },//slow (b0)
 	{ "MovementRateModifier3", fx_movement_modifier, 0 },//forced (IWD - 10a)
 	{ "MoveToArea", fx_move_to_area, 0 }, //0xba
@@ -614,7 +614,7 @@ static EffectRef effectnames[] = {
 	{ "RemoveCurse", fx_remove_curse, 0 },
 	{ "RemoveImmunity", fx_remove_immunity, 0 },
 	{ "RemoveProjectile", fx_remove_area_effect, 0 },
-	{ "RenableButton", fx_renable_button, 0 },  //removes disable button flag
+	{ "RenableButton", fx_renable_button, 0 }, //removes disable button flag
 	{ "RemoveCreature", fx_remove_creature, 0 },
 	{ "ReplaceCreature", fx_replace_creature, 0 },
 	{ "ReputationModifier", fx_reputation_modifier, 0 },
@@ -838,7 +838,7 @@ int fx_attacks_per_round_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_attacks_per_round_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	int tmp = (signed) fx->Parameter1;
 	if (fx->Parameter2!=2) {
-		if (tmp>10) tmp=10;    
+		if (tmp>10) tmp=10;
 		else if (tmp<-10) tmp=-10;
 		tmp <<= 1;
 		if (tmp>10) tmp-=11;
@@ -1019,44 +1019,44 @@ int fx_damage (Actor* Owner, Actor* target, Effect* fx)
 int fx_death (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_death (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-  STAT_SET(IE_MINHITPOINTS,0); //the die opcode seems to override minhp
-  ieDword damagetype = 0;
-  switch (fx->Parameter2) {
-  case 1:
-    BASE_STATE_SET(STATE_D4); //not sure, should be charred
-    damagetype = DAMAGE_FIRE;
-    break;
-  case 2:
-    damagetype = DAMAGE_CRUSHING;
-    break;
-  case 4:
-    damagetype = DAMAGE_CRUSHING;
-    break;
-  case 8:
-    damagetype = DAMAGE_CRUSHING|DAMAGE_CHUNKING;
-    break;
-  case 16:
-    BASE_STATE_SET(STATE_PETRIFIED);
-    damagetype = DAMAGE_CRUSHING;
-    break;
-  case 32:
-    BASE_STATE_SET(STATE_FROZEN);
-    damagetype = DAMAGE_COLD;
-    break;
-  case 64:
-    BASE_STATE_SET(STATE_PETRIFIED);
-    damagetype = DAMAGE_CRUSHING|DAMAGE_CHUNKING;
-    break;
-  case 128:
-    BASE_STATE_SET(STATE_FROZEN);
-    damagetype = DAMAGE_COLD|DAMAGE_CHUNKING;
-    break;
-  case 256:
-    damagetype = DAMAGE_ELECTRICITY;
-    break;
-  default:
-    damagetype = DAMAGE_ACID;
-  }
+	STAT_SET(IE_MINHITPOINTS,0); //the die opcode seems to override minhp
+	ieDword damagetype = 0;
+	switch (fx->Parameter2) {
+	case 1:
+		BASE_STATE_SET(STATE_D4); //not sure, should be charred
+		damagetype = DAMAGE_FIRE;
+		break;
+	case 2:
+		damagetype = DAMAGE_CRUSHING;
+		break;
+	case 4:
+		damagetype = DAMAGE_CRUSHING;
+		break;
+	case 8:
+		damagetype = DAMAGE_CRUSHING|DAMAGE_CHUNKING;
+		break;
+	case 16:
+		BASE_STATE_SET(STATE_PETRIFIED);
+		damagetype = DAMAGE_CRUSHING;
+		break;
+	case 32:
+		BASE_STATE_SET(STATE_FROZEN);
+		damagetype = DAMAGE_COLD;
+		break;
+	case 64:
+		BASE_STATE_SET(STATE_PETRIFIED);
+		damagetype = DAMAGE_CRUSHING|DAMAGE_CHUNKING;
+		break;
+	case 128:
+		BASE_STATE_SET(STATE_FROZEN);
+		damagetype = DAMAGE_COLD|DAMAGE_CHUNKING;
+		break;
+	case 256:
+		damagetype = DAMAGE_ELECTRICITY;
+		break;
+	default:
+		damagetype = DAMAGE_ACID;
+	}
 	target->Damage(0, damagetype, Owner);
 	//death has damage type too
 	target->Die(Owner);
@@ -1649,25 +1649,52 @@ int fx_to_hit_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x37 KillCreatureType
-int fx_kill_creature_type (Actor* Owner, Actor* target, Effect* fx)
+EffectRef fx_death_ref={"Death",NULL,-1};
+
+int fx_kill_creature_type (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_kill_creature_type (%2d): Value: %d, IDS: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	if (match_ids( target, fx->Parameter1, fx->Parameter2) ) {
-		target->Die( Owner );
+		//convert it to a death opcode or apply the new effect?
+		fx->Opcode = EffectQueue::ResolveEffect(fx_death_ref);
+		fx->TimingMode = FX_DURATION_INSTANT_PERMANENT;
+		fx->Parameter1 = 0;
+		fx->Parameter2 = 0;
+		return FX_APPLIED;
 	}
-	//need research (is this an instant action or sticks)
+	//doesn't stick
 	return FX_NOT_APPLIED;
 }
 
 // 0x38 Alignment:Invert
 //switch good to evil and evil to good
-static int gne_toggle[4]={0,3,2,1};
+//also switch chaotic to lawful and vice versa
+//gemrb extension: param2 actually controls which parts should be reversed
+// 0 - switch both (as original)
+// 1 - switch good and evil
+// 2 - switch lawful and chaotic
 
+static int al_switch_both[16]={0,0x33,0x32,0x31,0,0x23,0x22,0x21,0,0x13,0x12,0x11};
+static int al_switch_law[16]={0,0x31,0x32,0x33,0,0x21,0x22,0x23,0,0x11,0x12,0x13};
+static int al_switch_good[16]={0,0x13,0x12,0x11,0,0x23,0x22,0x21,0,0x33,0x32,0x31};
 int fx_alignment_invert (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_alignment_invert (%2d)\n", fx->Opcode );
-	ieDword newalign = target->GetStat( IE_ALIGNMENT );
-	newalign = (newalign & AL_LNC_MASK) + gne_toggle[newalign & AL_GNE_MASK];
+	register ieDword newalign = target->GetStat( IE_ALIGNMENT );
+	//compress the values. GNE is the first 2 bits originally
+	//LNC is the 4/5. bits.
+	newalign = (newalign & AL_GNE_MASK) | ((newalign & AL_LNC_MASK)>>2);
+	switch (fx->Parameter2) {
+	default:
+		newalign = al_switch_both[newalign];
+		break;
+	case 1: //switch good/evil
+		newalign = al_switch_good[newalign];
+		break;
+	case 2:
+		newalign = al_switch_law[newalign];
+		break;
+	}
 	STAT_SET( IE_ALIGNMENT, newalign );
 	return FX_APPLIED;
 }
@@ -3178,7 +3205,7 @@ int fx_apply_effect (Actor* Owner, Actor* target, Effect* fx)
 // b2 hitbonus generic effect ToHitVsCreature
 // b3 damagebonus generic effect DamageVsCreature
 // b4 can't use item (resource) generic effect CantUseItem
-// b5 can't use itemtype (resource) generic effect  CantUseItemType
+// b5 can't use itemtype (resource) generic effect CantUseItemType
 // b6
 // b7 generic effect ApplyEffectItemType
 // b8 DontJumpModifier
@@ -3400,7 +3427,7 @@ int fx_minimum_hp_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 //0xd1 PowerWordKill
 int fx_power_word_kill (Actor* Owner, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_power_word_kill (%2d): HP: %d  Stat: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_power_word_kill (%2d): HP: %d Stat: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	ieDword limit = 60;
 
 	if (fx->Parameter1) {
@@ -3417,7 +3444,7 @@ int fx_power_word_kill (Actor* Owner, Actor* target, Effect* fx)
 //0xd2 PowerWordStun
 int fx_power_word_stun (Actor* Owner, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_power_word_stun (%2d): HP: %d  Stat: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_power_word_stun (%2d): HP: %d Stat: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	ieDword limit = 60;
 
 	if (fx->Parameter1) {
@@ -3497,7 +3524,7 @@ EffectRef fx_sleep_ref={"State:Sleep",NULL,-1};
 
 int fx_power_word_sleep (Actor* Owner, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_power_word_sleep (%2d): HP: %d  Stat: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_power_word_sleep (%2d): HP: %d Stat: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	ieDword limit = 20;
 
 	if (fx->Parameter1) {
@@ -3679,7 +3706,10 @@ int fx_proficiency (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 	//probably no need to check the boundaries, the original IE
 	//did check it (though without boundaries, it is more useful)
-	STAT_SET (fx->Parameter2, fx->Parameter1);
+	//this opcode works only if the previous value was smaller
+	if (STAT_GET(fx->Parameter2)<fx->Parameter1) {
+		STAT_SET (fx->Parameter2, fx->Parameter1);
+	}
 	return FX_APPLIED;
 }
 
@@ -3905,10 +3935,10 @@ int fx_activate_spell_sequencer(Actor* Owner, Actor* target, Effect* fx)
 		core->ApplySpell(sequencer->Resource4, Owner, target, fx->Power);
 		//remove the spell sequencer store effec
 		sequencer->TimingMode=FX_DURATION_JUST_EXPIRED;
-	}  
+	}
 	return FX_NOT_APPLIED;
 }
-// 0x103  SpellTrap (Protection:SpellLevelDecrement + recall spells)
+// 0x103 SpellTrap (Protection:SpellLevelDecrement + recall spells)
 int fx_spelltrap(Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_spelltrap (%2d): Count: %d, Level: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -4046,9 +4076,9 @@ int fx_unpause_caster (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_avatar_removal (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_avatar_removal (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-  //FIXME: this is a permanent irreversible effect in IWD
-  //if it is different in bg2, then create another effect
-  BASE_SET(IE_AVATARREMOVAL, 1);
+	//FIXME: this is a permanent irreversible effect in IWD
+	//if it is different in bg2, then create another effect
+	BASE_SET(IE_AVATARREMOVAL, 1);
 	return FX_NOT_APPLIED;
 }
 // 0x110 ApplyEffectRepeat
