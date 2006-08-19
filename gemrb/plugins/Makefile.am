@@ -10,6 +10,7 @@ SUBDIRS = \
 	BAMImporter \
 	BIFImporter \
 	BMPImporter \
+	PNGImporter \
 	CHUImporter \
 	CREImporter \
 	DLGImporter \

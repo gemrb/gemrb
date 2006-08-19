@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.375 2006/08/17 15:32:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.376 2006/08/19 20:22:12 avenger_teambg Exp $
  *
  */
 
@@ -1278,6 +1278,7 @@ void GameScript::ReleaseMemory()
 	if (SkillStats)
 		free(SkillStats);
 	SkillStats = NULL;
+	SkillCount = -1;
 	if (ObjectIDSTableNames)
 		free(ObjectIDSTableNames);
 	ObjectIDSTableNames = NULL;

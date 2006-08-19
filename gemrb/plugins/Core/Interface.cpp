@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.429 2006/08/16 18:35:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.430 2006/08/19 20:22:12 avenger_teambg Exp $
  *
  */
 
@@ -167,6 +167,7 @@ Interface::Interface(int iargc, char** iargv)
 	strncpy( GameOverride, "override", sizeof(GameOverride) );
 	strncpy( GameSounds, "sounds", sizeof(GameSounds) );
 	strncpy( GameScripts, "scripts", sizeof(GameScripts) );
+	strncpy( GamePortraits, "portraits", sizeof(GamePortraits) );
 	strncpy( GameData, "data", sizeof(GameData) );
 	strncpy( INIConfig, "baldur.ini", sizeof(INIConfig) );
 	strncpy( ButtonFont, "STONESML", sizeof(ButtonFont) );
@@ -292,7 +293,7 @@ void Interface::FreeResRefTable(ieResRef *&table, int &count)
 
 static void ReleaseItemTooltip(void *poi)
 {
-			  free(poi);
+	free(poi);
 }
 
 Interface::~Interface(void)
@@ -1573,6 +1574,9 @@ const char* Interface::TypeExt(SClass_ID type)
 		case IE_BMP_CLASS_ID:
 			return ".bmp";
 
+		case IE_PNG_CLASS_ID:
+			return ".png";
+
 		case IE_CHR_CLASS_ID:
 			return ".chr";
 
@@ -1863,6 +1867,8 @@ bool Interface::LoadConfig(const char* filename)
 			strncpy( GameScripts, value, sizeof(GameScripts) );
 		} else if (stricmp( name, "GameSoundsPath" ) == 0) {
 			strncpy( GameSounds, value, sizeof(GameSounds) );
+		} else if (stricmp( name, "GamePortraitsPath" ) == 0) {
+			strncpy( GamePortraits, value, sizeof(GamePortraits) );
 		} else if (stricmp( name, "GameName" ) == 0) {
 			strncpy( GameName, value, sizeof(GameName) );
 		} else if (stricmp( name, "GameType" ) == 0) {
@@ -2042,8 +2048,8 @@ bool Interface::LoadGemRBINI()
 	TooltipMargin = ini->GetKeyAsInt( "resources", "TooltipMargin", TooltipMargin );
 
 	// The format of GroundCircle can be:
-	//   GroundCircleBAM1 = wmpickl/3
-	//   to denote that the bitmap should be scaled down 3x
+	// GroundCircleBAM1 = wmpickl/3
+	// to denote that the bitmap should be scaled down 3x
 	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
 		char name[30];
 		sprintf( name, "GroundCircleBAM%d", size+1 );

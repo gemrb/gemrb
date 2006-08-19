@@ -8,14 +8,14 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.62 2006/07/02 10:02:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.63 2006/08/19 20:22:12 avenger_teambg Exp $
  *
  */
 
@@ -177,7 +177,7 @@ bool KeyImp::LoadResFile(const char* resfile)
 	f[8] = 0; \
 	strcat(f, core->TypeExt(Type)); \
 	strlwr(f); \
-        PathJoin( p, BasePath, Path, f, NULL ); \
+	PathJoin( p, BasePath, Path, f, NULL ); \
 	ResolveFilePath(p); \
 	FILE * exist = fopen(p, "rb"); \
 	if(exist) { \
@@ -194,7 +194,7 @@ bool KeyImp::LoadResFile(const char* resfile)
 	f[8] = 0; \
 	strcat(f, core->TypeExt(Type)); \
 	strlwr(f); \
-        PathJoin( p, BasePath, Path, f, NULL ); \
+	PathJoin( p, BasePath, Path, f, NULL ); \
 	ResolveFilePath(p); \
 	FILE * exist = fopen(p, "rb"); \
 	if(exist) { \
@@ -224,6 +224,8 @@ bool KeyImp::HasResource(const char* resname, SClass_ID type)
 		"Found in Sounds" );
 	FindIn( core->GamePath, core->GameScripts, resname, type,
 		"Found in Scripts" );
+	FindIn( core->GamePath, core->GamePortraits, resname, type,
+		"Found in Portraits" );
 	FindIn( core->GamePath, core->GameData, resname, type,
 		"Found in Data" );
 	unsigned int ResLocator;
@@ -231,7 +233,7 @@ bool KeyImp::HasResource(const char* resname, SClass_ID type)
 		printStatus( "FOUND", LIGHT_GREEN );
 		return true;
 	}
-	printStatus( "ERROR", LIGHT_RED );
+	printStatus( "NOT FOUND", YELLOW );
 	return false;
 }
 
@@ -255,6 +257,8 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
 		"Found in Sounds" );
 	SearchIn( core->GamePath, core->GameScripts, resname, type,
 		"Found in Scripts" );
+	SearchIn( core->GamePath, core->GamePortraits, resname, type,
+		"Found in Portraits" );
 	SearchIn( core->GamePath, core->GameData, resname, type,
 		"Found in Data" );
 	unsigned int ResLocator;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.411 2006/08/16 18:35:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.412 2006/08/19 20:22:12 avenger_teambg Exp $
  *
  */
 
@@ -2523,15 +2523,24 @@ static PyObject* GemRB_SetButtonPicture(PyObject * /*self*/, PyObject* args)
 		return Py_None;
 	}
 
-	DataStream* str = core->GetResourceMgr()->GetResource( ResRef, IE_BMP_CLASS_ID );
+	ResourceMgr * rm = core->GetResourceMgr();
+	DataStream* str;
+	int restype = IE_BMP_CLASS_ID;
+
+	if (rm->HasResource(ResRef, IE_PNG_CLASS_ID) ) {
+		str = rm->GetResource( ResRef, IE_PNG_CLASS_ID );
+		restype = IE_PNG_CLASS_ID;
+	} else {
+		str = rm->GetResource( ResRef, IE_BMP_CLASS_ID );
+	}
 	//default portrait
 	if (str == NULL && DefResRef) {
-		str = core->GetResourceMgr()->GetResource( DefResRef, IE_BMP_CLASS_ID );
+		str = rm->GetResource( DefResRef, IE_BMP_CLASS_ID );
 	}
 	if (str == NULL) {
 		return NULL;
 	}
-	ImageMgr* im = ( ImageMgr* ) core->GetInterface( IE_BMP_CLASS_ID );
+	ImageMgr* im = ( ImageMgr* ) core->GetInterface( restype );
 	if (im == NULL) {
 		delete ( str );
 		return NULL;
@@ -5661,9 +5670,9 @@ PyDoc_STRVAR( GemRB_GetItem__doc,
 "GetItem(ResRef)=>dict\n\n"
 "Returns dict with specified item." );
 
-#define CAN_DRINK  1 //potions
-#define CAN_READ   2 //scrolls
-#define CAN_STUFF  4 //containers
+#define CAN_DRINK 1 //potions
+#define CAN_READ  2 //scrolls
+#define CAN_STUFF 4 //containers
 
 static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 {
