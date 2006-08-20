@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.22 2006/08/16 15:26:49 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.23 2006/08/20 12:19:42 avenger_teambg Exp $
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
 
@@ -40,6 +40,14 @@ def OpenInventoryWindow ():
 	global InventoryWindow
 	
 	if CloseOtherWindow (OpenInventoryWindow):
+		if GemRB.IsDraggingItem():
+			pc = GemRB.GameGetSelectedPCSingle ()
+			#store the item in the inventory before window is closed
+			GemRB.DropDraggedItem (pc, -3)
+			#dropping on ground if cannot store in inventory
+			if GemRB.IsDraggingItem():
+				GemRB.DropDraggedItem (pc, -2)
+
 		GemRB.HideGUI ()
 		GemRB.UnloadWindow (InventoryWindow)
 		InventoryWindow = None

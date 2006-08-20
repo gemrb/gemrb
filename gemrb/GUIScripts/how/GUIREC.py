@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIREC.py,v 1.6 2006/04/16 23:57:05 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIREC.py,v 1.7 2006/08/20 12:19:42 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -156,34 +156,45 @@ def UpdateRecordsWindow ():
 
 	sstr = GemRB.GetPlayerStat (pc, IE_STR)
 	sstrx = GemRB.GetPlayerStat (pc, IE_STREXTRA)
-
-	if sstrx > 0 and sstr==18 and HasExtra:
+	cstr = GetStatColor(pc, IE_STR)
+	if sstrx > 0 and sstr==18:
 		sstr = "%d/%02d" %(sstr, sstrx % 100)
 	else:
 		sstr = str(sstr)
 	sint = str(GemRB.GetPlayerStat (pc, IE_INT))
+	cint = GetStatColor(pc, IE_INT)
 	swis = str(GemRB.GetPlayerStat (pc, IE_WIS))
+	cwis = GetStatColor(pc, IE_WIS)
 	sdex = str(GemRB.GetPlayerStat (pc, IE_DEX))
+	cdex = GetStatColor(pc, IE_DEX)
 	scon = str(GemRB.GetPlayerStat (pc, IE_CON))
+	ccon = GetStatColor(pc, IE_CON)
 	schr = str(GemRB.GetPlayerStat (pc, IE_CHR))
+	cchr = GetStatColor(pc, IE_CHR)
 
 	Label = GemRB.GetControl (Window, 0x1000002f)
 	GemRB.SetText (Window, Label, sstr)
+	GemRB.SetLabelTextColor (Window, Label, cstr[0], cstr[1], cstr[2])
 
 	Label = GemRB.GetControl (Window, 0x10000009)
 	GemRB.SetText (Window, Label, sdex)
+	GemRB.SetLabelTextColor (Window, Label, cdex[0], cdex[1], cdex[2])
 
 	Label = GemRB.GetControl (Window, 0x1000000a)
 	GemRB.SetText (Window, Label, scon)
+	GemRB.SetLabelTextColor (Window, Label, ccon[0], ccon[1], ccon[2])
 
 	Label = GemRB.GetControl (Window, 0x1000000b)
 	GemRB.SetText (Window, Label, sint)
+	GemRB.SetLabelTextColor (Window, Label, cint[0], cint[1], cint[2])
 
 	Label = GemRB.GetControl (Window, 0x1000000c)
 	GemRB.SetText (Window, Label, swis)
+	GemRB.SetLabelTextColor (Window, Label, cwis[0], cwis[1], cwis[2])
 
 	Label = GemRB.GetControl (Window, 0x1000000d)
 	GemRB.SetText (Window, Label, schr)
+	GemRB.SetLabelTextColor (Window, Label, cchr[0], cchr[1], cchr[2])
 
 	# class
 	ClassTitle = GetActorClassTitle (pc)
@@ -225,6 +236,15 @@ def UpdateRecordsWindow ():
 	#if player is inaccessible make this grey
 	GemRB.SetVisible (Window, 1)
 
+
+def GetStatColor (pc, stat):
+	a = GemRB.GetPlayerStat(pc, stat)
+	b = GemRB.GetPlayerStat(pc, stat, 1)
+	if a==b:
+		return (255,255,255)
+	if a<b:
+		return (255,255,0)
+	return (0,255,0)
 
 def GetStatOverview (pc):
 	won = "[color=FFFFFF]"
