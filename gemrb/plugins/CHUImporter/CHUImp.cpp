@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.53 2006/08/10 21:34:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.54 2006/08/20 10:37:07 avenger_teambg Exp $
  *
  */
 
@@ -173,8 +173,8 @@ Window* CHUImp::GetWindow(unsigned int wid)
 				DataStream* s = core->GetResourceMgr()->GetResource( BAMFile, IE_BAM_CLASS_ID );
 				if (!s ) {
 					printf( "[CHUImporter]: Cannot Load Button Images, skipping control\n" );
-					//delete(btn);
 					/* IceWind Dale 2 has fake BAM ResRefs for some Buttons, this will handle bad ResRefs */
+					core->FreeInterface( bam );
 					win->AddControl( btn );
 					break;
 				}
