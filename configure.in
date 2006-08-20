@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/configure.in,v 1.59 2006/08/19 20:06:36 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/configure.in,v 1.60 2006/08/20 20:19:06 wjpalenstijn Exp $
 
 ###################################################
 
@@ -153,6 +153,11 @@ AM_CHECK_PYTHON_LIBS([], [AC_MSG_ERROR([
 AC_CHECK_LIB(vorbisfile, ov_info, 
 	AC_DEFINE( HAS_VORBIS_SUPPORT, 1, [Handling of .ogg soundfiles])
 	LIBS="$LIBS -lvorbis -lvorbisfile",, -lvorbis )
+
+dnl FIXME: check for libpng properly, using libpng(12)-config
+AC_CHECK_HEADER(png.h,,AC_MSG_ERROR([*** libpng not found!]))
+AC_CHECK_LIB(png,png_create_read_struct,,AC_MSG_ERROR([*** libpng not found!]))
+AC_SUBST(LIBPNG,-lpng)
 
 AC_C_CONST
 AC_C_INLINE

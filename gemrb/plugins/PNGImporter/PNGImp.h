@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PNGImporter/PNGImp.h,v 1.1 2006/08/19 20:16:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PNGImporter/PNGImp.h,v 1.2 2006/08/20 20:19:06 wjpalenstijn Exp $
  *
  */
 
@@ -24,24 +24,20 @@
 
 #include "../Core/ImageMgr.h"
 
+struct PNGInternal;
+
 class PNGImp : public ImageMgr {
 private:
 	DataStream* str;
 	bool autoFree;
+	PNGInternal* inf;
 
-	//BITMAPINFOHEADER
-	ieDword Size, Width, Height;
-
-	//COLORTABLE
-	ieDword NumColors;
-	Color* Palette;
-
-	//RASTERDATA
-	void* pixels;
-
+	ieDword Width, Height;
+	bool hasPalette;
 public:
 	PNGImp(void);
 	~PNGImp(void);
+	void Close();
 	bool Open(DataStream* stream, bool autoFree = true, bool convert = false);
 	bool OpenFromImage(Sprite2D* sprite, bool autoFree = true);
 	Sprite2D* GetImage();
@@ -49,7 +45,7 @@ public:
 	/** No descriptions */
 	void GetPalette(int index, int colors, Color* pal);
 	/** Searchmap only */
-	void SetPixelIndex(unsigned int x, unsigned int y, unsigned int idx)
+	void SetPixelIndex(unsigned int x, unsigned int y, unsigned int /*idx*/)
 	{
 		if(x>=Width || y>=Height) {
 			return;
