@@ -1,6 +1,6 @@
 G E M R B
 *********
-$Header: /data/gemrb/cvs2svn/gemrb/gemrb/README,v 1.4 2005/05/18 11:43:01 avenger_teambg Exp $
+$Header: /data/gemrb/cvs2svn/gemrb/gemrb/README,v 1.5 2006/08/20 22:16:56 avenger_teambg Exp $
 
 
 GemRB (Game Engine Made with preRendered Background) is a "port"
@@ -36,7 +36,7 @@ SDL 1.2
 OpenAL
 Python 2.2 or above, with shared libs (binaries are compiled with 2.3!)
 ZLib
-
+Png (optional)
 
 Contacts
 --------
