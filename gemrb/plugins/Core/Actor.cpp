@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.211 2006/08/20 10:33:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.212 2006/08/20 19:03:59 avenger_teambg Exp $
  *
  */
 
@@ -767,15 +767,17 @@ static void InitActorTables()
 
 	table = core->LoadTable( "qslots" );
 	tm = core->GetTable( table );
-	if (tm) {
-		GUIBTDefaults = (ActionButtonRow *) calloc( classcount,sizeof(ActionButtonRow) );
+	GUIBTDefaults = (ActionButtonRow *) calloc( classcount,sizeof(ActionButtonRow) );
 
-		for (i = 0; i < classcount; i++) {
-			memcpy(GUIBTDefaults+i, &DefaultButtons, sizeof(ActionButtonRow));
+	for (i = 0; i < classcount; i++) {
+		memcpy(GUIBTDefaults+i, &DefaultButtons, sizeof(ActionButtonRow));
+		if (tm) {
 			for (int j=0;j<MAX_QSLOTS;j++) {
 				GUIBTDefaults[i][j+3]=(ieByte) atoi( tm->QueryField(i,j) );
 			}
 		}
+	}
+	if (tm) {
 		core->DelTable( table );
 	}
 }
@@ -783,6 +785,8 @@ static void InitActorTables()
 void Actor::add_animation(const ieResRef resource, int gradient, int height, bool playonce)
 {
 	ScriptedAnimation *sca = core->GetScriptedAnimation(resource);
+	if (!sca)
+		return;
 	sca->ZPos=height;
 	if (playonce) {
 		sca->PlayOnce();
