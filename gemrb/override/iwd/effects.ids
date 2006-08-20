@@ -235,7 +235,7 @@ IDS
 0xe9	IWDVisualSpellHit
 0xea	ColdDamage
 0xeb	CastingGlow2
-0xec	PanicUndead
+0xec	ChillTouch
 0xed	CrushingDamage
 0xee    SaveBonus
 0xef    SlowPoison
