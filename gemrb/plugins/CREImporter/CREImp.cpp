@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.112 2006/08/19 18:11:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.113 2006/08/20 10:35:46 avenger_teambg Exp $
  *
  */
 
@@ -619,13 +619,14 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 				printf("[CREImp]: Invalid item index (%d) in creature!\n", index);
 				continue;
 			}
-			if (items[index]) {
-				act->inventory.SetSlotItem( items[index], Slot );
-				printf( "SLOT %d %s\n", i, items[index]->ItemResRef);
+			CREItem *item = items[index];
+			if (item && core->Exists(item->ItemResRef, IE_ITM_CLASS_ID)) {
+				act->inventory.SetSlotItem( item, Slot );
+				printf( "SLOT %d %s\n", i, item->ItemResRef);
 				if (core->QuerySlotEffects( i )) {
-					printf( "EQUIP 0x%04x\n", items[index]->Flags );
+					printf( "EQUIP 0x%04x\n", item->Flags );
 					if ( act->inventory.EquipItem( Slot ) ) {
-						printf( "EQUIP2 0x%04x\n", items[index]->Flags );
+						printf( "EQUIP2 0x%04x\n", item->Flags );
 					}
 				}
 				items[index] = NULL;
