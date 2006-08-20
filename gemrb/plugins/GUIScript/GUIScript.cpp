@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.412 2006/08/19 20:22:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.413 2006/08/20 10:33:14 avenger_teambg Exp $
  *
  */
 
@@ -5801,14 +5801,15 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		return Py_None;
 	}
 
-	core->DragItem (si);
+	core->DragItem (si, ResRef);
+/*
 	Sprite2D *Picture = core->GetBAMSprite( ResRef, 0, 0 );
 	if (Picture == NULL) {
 		return RuntimeError( "BAM not found");
 	}
 
 	core->GetVideoDriver()->SetDragCursor (Picture);
-
+*/
 	core->GetGUIScriptEngine()->RunFunction("UpdateAnimation");
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -5898,8 +5899,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 
 	if (res == 2) {
 		// Whole amount was placed
-		core->DragItem (NULL);
-		core->GetVideoDriver()->SetDragCursor (NULL);
+		core->ReleaseDraggedItem ();
 	} 
 
 	core->GetGUIScriptEngine()->RunFunction("UpdateAnimation");

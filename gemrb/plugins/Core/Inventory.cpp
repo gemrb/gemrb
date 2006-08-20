@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.84 2006/08/11 23:17:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.85 2006/08/20 10:33:17 avenger_teambg Exp $
  *
  */
 
@@ -687,6 +687,9 @@ bool Inventory::EquipItem(unsigned int slot)
 	// add effects of an item just being equipped to actor's effect queue
 	int effect = core->QuerySlotEffects( slot );
 	Item *itm = core->GetItem(item->ItemResRef);
+	if (!itm) {
+		printf("Invalid item Equipped: %s  Slot: %d\n", item->ItemResRef, slot);
+	}
 	switch (effect) {
 	case SLOT_EFFECT_MELEE:
 		//if weapon is ranged, then find quarrel for it and equip that

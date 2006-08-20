@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.430 2006/08/19 20:22:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.431 2006/08/20 10:33:16 avenger_teambg Exp $
  *
  */
 
@@ -113,7 +113,6 @@ Interface::Interface(int iargc, char** iargv)
 	RtRows = NULL;
 	music = NULL;
 	soundmgr = NULL;
-	//opcodemgr = NULL;
 	sgiterator = NULL;
 	INIparty = NULL;
 	INIbeasts = NULL;
@@ -192,6 +191,7 @@ Interface::Interface(int iargc, char** iargv)
 
 	TooltipBack = NULL;
 	DraggedItem = NULL;
+	DraggedCursor = NULL;
 	DefSound = NULL;
 	DSCount = -1;
 	for(unsigned int i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) FogSprites[i]=NULL;
@@ -298,6 +298,7 @@ static void ReleaseItemTooltip(void *poi)
 
 Interface::~Interface(void)
 {
+	DragItem(NULL,NULL);
 	if (AreaAliasTable) {
 		delete( AreaAliasTable );
 	}
@@ -334,11 +335,6 @@ Interface::~Interface(void)
 	PaletteCache.RemoveAll(ReleasePalette);
 
 	FreeResRefTable(DefSound, DSCount);
-	/*
-	if (DefSound) {
-		free( DefSound );
-		DSCount = -1;
-	}*/
 
 	if (slottypes) {
 		free( slottypes );
@@ -497,6 +493,7 @@ GameControl* Interface::StartGameControl()
 	DelWindow(0xffffu);//deleting ALL windows
 	DelTable(0xffffu); //dropping ALL tables
 	Window* gamewin = new Window( 0xffff, 0, 0, (ieWord) Width, (ieWord) Height );
+	gamewin->WindowPack[0]=0;
 	GameControl* gc = new GameControl();
 	gc->XPos = 0;
 	gc->YPos = 0;
@@ -3650,6 +3647,7 @@ bool Interface::InitItemTypes()
 	TableMgr *st = GetTable(SlotTypeTable);
 	if (slottypes) {
 		free(slottypes);
+		slottypes = NULL;
 	}
 	SlotTypes = 0;
 	if (st) {
@@ -4059,12 +4057,28 @@ void Interface::LoadProgress(int percent)
 	video->SwapBuffers();
 }
 
-void Interface::DragItem(CREItem *item)
+void Interface::ReleaseDraggedItem()
 {
-	// FIXME: what if we already drag st.?
-	// Avenger: We should drop the dragged item and pick this up
-	// We shouldn't have a valid DraggedItem at this point
+	DraggedItem=NULL; //shouldn't free this
+	video->SetDragCursor (NULL);
+	video->FreeSprite(DraggedCursor); //but should free this
+}
+
+void Interface::DragItem(CREItem *item, const ieResRef Picture)
+{
+	//We should drop the dragged item and pick this up,
+	//we shouldn't have a valid DraggedItem at this point.
+	//Anyway, if there is still a dragged item, it will be destroyed.
+	if (DraggedItem) {
+		printMessage("Core","Forgot to call ReleaseDraggedItem when leaving inventory (item destroyed)!\n",YELLOW);
+		delete DraggedItem;
+	}
 	DraggedItem = item;
+	video->FreeSprite (DraggedCursor);
+	if (item) {
+		DraggedCursor = core->GetBAMSprite( Picture, 0, 0 );
+	}
+	video->SetDragCursor (DraggedCursor);
 }
 
 bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)
@@ -4586,6 +4600,7 @@ Sprite2D* Interface::GetBAMSprite(const ieResRef ResRef, int cycle, int frame)
 	AnimationMgr* bam = ( AnimationMgr* ) GetInterface( IE_BAM_CLASS_ID );
 	DataStream *str = key->GetResource( ResRef, IE_BAM_CLASS_ID );
 	if (!bam->Open( str, true ) ) {
+		FreeInterface( bam );
 		return NULL;
 	}
 	Sprite2D *tspr;

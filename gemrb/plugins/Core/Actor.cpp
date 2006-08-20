@@ -15,13 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.210 2006/08/17 15:32:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.211 2006/08/20 10:33:16 avenger_teambg Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "TableMgr.h"
 #include "ResourceMgr.h"
+#include "SoundMgr.h" //pst (react to death sounds)
 #include "Actor.h"
 #include "Interface.h"
 #include "../../includes/strrefs.h"
@@ -326,9 +327,6 @@ void Actor::SetCircleSize()
 	if (Modified[IE_UNSELECTABLE]) {
 		color = &magenta;
 		color_index = 4;
-	} else if (GetMod(IE_MORALE)<0) {//if current morale < the max morale ?
-		color = &yellow;
-		color_index = 5;
 	} else if (Modified[IE_STATE_ID] & STATE_PANIC) {
 		color = &yellow;
 		color_index = 5;
@@ -365,6 +363,16 @@ void Actor::SetCircleSize()
 		csize = MAX_CIRCLE_SIZE - 1;
 
 	SetCircle( anims->GetCircleSize(), *color, core->GroundCircles[csize][color_index], core->GroundCircles[csize][(color_index == 0) ? 3 : color_index] );
+}
+
+//call this when morale or moralebreak changed
+void pcf_morale (Actor *actor, ieDword /*Value*/)
+{
+	if(actor->Modified[IE_MORALE]<=actor->Modified[IE_MORALEBREAK] ) {
+		actor->Panic();
+	}
+	//for new colour
+	actor->SetCircleSize();
 }
 
 void pcf_ea (Actor *actor, ieDword /*Value*/)
@@ -605,7 +613,7 @@ NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //0f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, pcf_fatigue, pcf_intoxication, //1f
 NULL,NULL,NULL,NULL, pcf_stat, NULL, pcf_stat, pcf_stat,
-pcf_stat,pcf_con,NULL,NULL, NULL, pcf_gold, NULL, NULL, //2f
+pcf_stat,pcf_con,NULL,NULL, NULL, pcf_gold, pcf_morale, NULL, //2f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, pcf_entangle, pcf_sanctuary, //3f
 pcf_minorglobe, pcf_shieldglobe, pcf_grease, pcf_web, NULL, NULL, NULL, NULL,
@@ -622,7 +630,7 @@ NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //9f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //af
-NULL,NULL,NULL,NULL, NULL, pcf_bounce, NULL, NULL, 
+NULL,NULL,NULL,NULL, pcf_morale, pcf_bounce, NULL, NULL, 
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //bf
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, pcf_animid,NULL, NULL, //cf
@@ -757,7 +765,7 @@ static void InitActorTables()
 		}
 	}
 
-	table = core->LoadTable( "qslots");
+	table = core->LoadTable( "qslots" );
 	tm = core->GetTable( table );
 	if (tm) {
 		GUIBTDefaults = (ActionButtonRow *) calloc( classcount,sizeof(ActionButtonRow) );
@@ -1043,14 +1051,33 @@ int Actor::NewBase(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 	return BaseStats[StatIndex] - oldmod;
 }
 
-void Actor::ReactToDeath(const char * /*deadname*/)
+void Actor::ReactToDeath(const char * deadname)
 {
+	int table = core->LoadTable( "death" );
+	TableMgr *tm = core->GetTable( table );
+	if (!tm) return;
 	// lookup value based on died's scriptingname and ours
 	// if value is 0 - use reactdeath
 	// if value is 1 - use reactspecial
 	// if value is string - use playsound instead (pst)
-	
-	DisplayStringCore(this, VB_REACT, DS_CONSOLE|DS_CONST );
+	const char *value = tm->QueryField (scriptName, deadname);
+	switch (value[0]) {
+	case '0':
+		DisplayStringCore(this, VB_REACT, DS_CONSOLE|DS_CONST );
+		break;
+	case '1':
+		DisplayStringCore(this, VB_REACT_S, DS_CONSOLE|DS_CONST );
+		break;
+	default:
+	{
+                ieDword len = core->GetSoundMgr()->Play( value );
+                ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
+                if (counter != 0)
+                        SetWait( counter );
+		break;
+	}
+	}
+	core->DelTable(table);
 }
 
 //call this only from gui selects
@@ -1061,7 +1088,10 @@ void Actor::SelectActor()
 
 void Actor::Panic()
 {
-	SetBase(IE_MORALE,0);
+	if (GetStat(IE_STATE_ID)&STATE_PANIC) {
+		//already in panic
+		return;
+	}
 	SetBaseBit(IE_STATE_ID, STATE_PANIC, true);
 	DisplayStringCore(this, VB_PANIC, DS_CONSOLE|DS_CONST );
 }
@@ -1099,9 +1129,6 @@ int Actor::Damage(int damage, int damagetype, Actor *hitter)
 	NewBase(IE_HITPOINTS, (ieDword) -damage, damagetype&3);
 	NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
 	//this is just a guess, probably morale is much more complex
-	if(Modified[IE_MORALE]<Modified[IE_MORALEBREAK] ) {
-		Panic();
-	}
 	//add lastdamagetype up
 	LastDamageType|=damagetype;
 	LastDamage=damage;
@@ -1892,6 +1919,8 @@ void Actor::DealDamage(Actor *target, int damage, int damagetype, bool critical)
 {
 	if (damage<0) damage = 0;
 	if (critical) {
+		//a critical surely raises the morale?
+		NewBase(IE_MORALE, 1, MOD_ADDITIVE);
 		damage <<=1; //critical damage is always double?
 		//check if critical hit is averted by helmet
 	}

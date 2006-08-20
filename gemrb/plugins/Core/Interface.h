@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.208 2006/08/19 20:22:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.209 2006/08/20 10:33:17 avenger_teambg Exp $
  *
  */
 
@@ -264,6 +264,7 @@ private:
 	Control* tooltip_ctrl;
 	// Currently dragged item or NULL
 	CREItem* DraggedItem;
+	Sprite2D* DraggedCursor;
 	// Current Store
 	Store* CurrentStore;
 	// Index of current container
@@ -498,8 +499,10 @@ public:
 	Palette* CreatePalette(Color color, Color back);
 	void FreePalette(Palette *&pal, const ieResRef name=NULL);  
 
-	void DragItem(CREItem* item);
+	void DragItem(CREItem* item, const ieResRef Picture);
 	CREItem* GetDraggedItem() { return DraggedItem; }
+	/* use this only when the dragged item is dropped */
+	void ReleaseDraggedItem();
 	CREItem *ReadItem(DataStream *str);
 	bool ResolveRandomItem(CREItem *itm);
 	Item* GetItem(const ieResRef resname);
