@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.251 2006/08/16 15:26:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.252 2006/08/20 15:40:27 wjpalenstijn Exp $
  *
  */
 
@@ -568,6 +568,12 @@ void Map::UpdateScripts()
 	//Execute Pending Actions
 	//if it is only here, then the drawing will fail
 	ProcessActions(false);
+
+	// If scripts frozen, return.
+	// This fixes starting a new IWD game. The above ProcessActions pauses the
+	// game for a textscreen, but one of the actor->ProcessActions calls
+	// below starts a cutscene, hiding the mouse. - wjp, 20060805
+	if (core->GetGameControl()->GetDialogueFlags() & DF_FREEZE_SCRIPTS) return;
 
 	//Run actor scripts (only for 0 priority)
 	int q=Qcount[PR_SCRIPT];
