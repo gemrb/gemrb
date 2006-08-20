@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/TextScreen.py,v 1.2 2006/01/06 23:10:00 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/TextScreen.py,v 1.3 2006/08/20 11:18:22 avenger_teambg Exp $
 
 # TextScreen.py - display Loading screen
 
@@ -39,7 +39,7 @@ def StartTextScreen ():
 	#set ID according to the Chapter?
 	Chapter = ID + 1
 
-	TextScreen = GemRB.LoadWindow (ID)
+	TextScreen = GemRB.LoadWindow (Chapter)
 	GemRB.SetWindowFrame (TextScreen)
 
 	TextArea = GemRB.GetControl (TextScreen, 2)
@@ -48,7 +48,7 @@ def StartTextScreen ():
 
 	#caption
 	Table = GemRB.LoadTable("chapters")
-	Value = GemRB.GetTableValue (Table, Chapter, 0)
+	Value = GemRB.GetTableValue (Table, Chapter+1, 0)
 	GemRB.UnloadTable (Table)
 	Label=GemRB.GetControl (TextScreen, 0x10000000)
 	GemRB.SetText (TextScreen, Label, Value)
@@ -74,7 +74,7 @@ def FeedScroll ():
 	global TextScreen, TextArea
 
 	Table = GemRB.LoadTable("chapters")
-	Value = GemRB.GetTableValue (Table, Chapter, 1)
+	Value = GemRB.GetTableValue (Table, Chapter+1, 1)
 	GemRB.UnloadTable (Table)
 	GemRB.TextAreaAppend (TextScreen, TextArea, Value, -1)
 
