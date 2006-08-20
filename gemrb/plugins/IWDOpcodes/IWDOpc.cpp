@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.cpp,v 1.14 2006/08/15 15:32:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.cpp,v 1.15 2006/08/20 10:34:08 avenger_teambg Exp $
  *
  */
 
@@ -32,84 +32,86 @@
 static ieResRef *iwd_spell_hits = NULL;
 static int shcount = -1;
 
-int fx_fade_rgb (Actor* Owner, Actor* target, Effect* fx);//e8
-int fx_iwd_visual_spell_hit (Actor* Owner, Actor* target, Effect* fx);//e9
-int fx_cold_damage (Actor* Owner, Actor* target, Effect* fx);//ea
+static int fx_fade_rgb (Actor* Owner, Actor* target, Effect* fx);//e8
+static int fx_iwd_visual_spell_hit (Actor* Owner, Actor* target, Effect* fx);//e9
+static int fx_cold_damage (Actor* Owner, Actor* target, Effect* fx);//ea
 //int fx_iwd_casting_glow (Actor* Owner, Actor* target, Effect* fx);//eb
-int fx_panic_undead (Actor* Owner, Actor* target, Effect* fx);//ec
-int fx_crushing_damage (Actor* Owner, Actor* target, Effect* fx);//ed
-int fx_save_bonus (Actor* Owner, Actor* target, Effect* fx); //ee
-int fx_slow_poison (Actor* Owner, Actor* target, Effect* fx); //ef
-int fx_iwd_monster_summoning (Actor* Owner, Actor* target, Effect* fx); //f0
-int fx_vampiric_touch (Actor* Owner, Actor* target, Effect* fx); //f1
+static int fx_chill_touch (Actor* Owner, Actor* target, Effect* fx);//ec (how)
+static int fx_chill_touch_panic (Actor* Owner, Actor* target, Effect* fx);//ec (iwd2)
+static int fx_crushing_damage (Actor* Owner, Actor* target, Effect* fx);//ed
+static int fx_save_bonus (Actor* Owner, Actor* target, Effect* fx); //ee
+static int fx_slow_poison (Actor* Owner, Actor* target, Effect* fx); //ef
+static int fx_iwd_monster_summoning (Actor* Owner, Actor* target, Effect* fx); //f0
+static int fx_vampiric_touch (Actor* Owner, Actor* target, Effect* fx); //f1
 // int fx_overlay f2 (same as PST)
-int fx_animate_dead (Actor* Owner, Actor* target, Effect* fx);//f3
+static int fx_animate_dead (Actor* Owner, Actor* target, Effect* fx);//f3
 //int fx_prayer (Actor* Owner, Actor* target, Effect* fx); //f4 pst
 //int fx_prayer_bad (Actor* Owner, Actor* target, Effect* fx); //f5 pst
-int fx_summon_monster2 (Actor* Owner, Actor* target, Effect* fx); //f6
-int fx_burning_blood (Actor* Owner, Actor* target, Effect* fx); //f7 iwd
-int fx_burning_blood2 (Actor* Owner, Actor* target, Effect* fx); //f7 how, iwd2
-int fx_summon_shadow_monster (Actor* Owner, Actor* target, Effect* fx); //f8
-int fx_recitation (Actor* Owner, Actor* target, Effect* fx); //f9
-int fx_recitation_bad (Actor* Owner, Actor* target, Effect* fx); //fa
-int fx_lich_touch (Actor* Owner, Actor* target, Effect* fx); //fb
-int fx_blinding_orb (Actor* Owner, Actor* target, Effect* fx); //fc
+static int fx_summon_monster2 (Actor* Owner, Actor* target, Effect* fx); //f6
+static int fx_burning_blood (Actor* Owner, Actor* target, Effect* fx); //f7 iwd
+static int fx_burning_blood2 (Actor* Owner, Actor* target, Effect* fx); //f7 how, iwd2
+static int fx_summon_shadow_monster (Actor* Owner, Actor* target, Effect* fx); //f8
+static int fx_recitation (Actor* Owner, Actor* target, Effect* fx); //f9
+static int fx_recitation_bad (Actor* Owner, Actor* target, Effect* fx); //fa
+static int fx_lich_touch (Actor* Owner, Actor* target, Effect* fx); //fb
+static int fx_blinding_orb (Actor* Owner, Actor* target, Effect* fx); //fc
 // ac vs damage //fd
-int fx_remove_effects (Actor* Owner, Actor* target, Effect* fx); //fe
-int fx_salamander_aura (Actor* Owner, Actor* target, Effect* fx); //ff
-int fx_umberhulk_gaze (Actor* Owner, Actor* target, Effect* fx); //100
-int fx_zombielord_aura (Actor* Owner, Actor* target, Effect* fx); //101
+static int fx_remove_effects (Actor* Owner, Actor* target, Effect* fx); //fe
+static int fx_salamander_aura (Actor* Owner, Actor* target, Effect* fx); //ff
+static int fx_umberhulk_gaze (Actor* Owner, Actor* target, Effect* fx); //100
+static int fx_zombielord_aura (Actor* Owner, Actor* target, Effect* fx); //101
 //int fx_resist_spell (Actor* Owner, Actor* target, Effect* fx); //102
-int fx_summon_creature2 (Actor* Owner, Actor* target, Effect* fx); //103
+static int fx_summon_creature2 (Actor* Owner, Actor* target, Effect* fx); //103
 //int fx_avatar_removal (Actor* Owner, Actor* target, Effect* fx); //104
 //int fx_immunity_effect2 (Actor* Owner, Actor* target, Effect* fx); //105
-int fx_summon_pomab (Actor* Owner, Actor* target, Effect* fx); //106
-int fx_control_undead (Actor* Owner, Actor* target, Effect* fx); //107
-int fx_static_charge (Actor* Owner, Actor* target, Effect* fx); //108
-int fx_cloak_of_fear (Actor* Owner, Actor* target, Effect* fx); //109
+static int fx_summon_pomab (Actor* Owner, Actor* target, Effect* fx); //106
+static int fx_control_undead (Actor* Owner, Actor* target, Effect* fx); //107
+static int fx_static_charge (Actor* Owner, Actor* target, Effect* fx); //108
+static int fx_cloak_of_fear (Actor* Owner, Actor* target, Effect* fx); //109
 //int fx_movement_modifier (Actor* Owner, Actor* target, Effect* fx); //10a
-int fx_remove_confusion (Actor* Owner, Actor* target, Effect* fx);//10b
-int fx_eye_of_the_mind (Actor* Owner, Actor* target, Effect* fx);//10c
-int fx_eye_of_the_sword (Actor* Owner, Actor* target, Effect* fx);//10d
-int fx_eye_of_the_mage (Actor* Owner, Actor* target, Effect* fx);//10e
-int fx_eye_of_venom (Actor* Owner, Actor* target, Effect* fx);//10f
-int fx_eye_of_the_spirit (Actor* Owner, Actor* target, Effect* fx);//110
-int fx_eye_of_fortitude (Actor* Owner, Actor* target, Effect* fx);//111
-int fx_eye_of_stone (Actor* Owner, Actor* target, Effect* fx);//112
-int fx_remove_seven_eyes (Actor* Owner, Actor* target, Effect* fx);//113
-int fx_remove_effect (Actor* Owner, Actor* target, Effect* fx);//114
-int fx_soul_eater (Actor* Owner, Actor* target, Effect* fx);//115
-int fx_shroud_of_flame (Actor* Owner, Actor* target, Effect* fx);//116
-int fx_shroud_of_flame2 (Actor* Owner, Actor* target, Effect* fx);//116
-int fx_animal_rage (Actor* Owner, Actor* target, Effect* fx);//117
-int fx_turn_undead (Actor* Owner, Actor* target, Effect* fx);//118
-int fx_turn_undead2 (Actor* Owner, Actor* target, Effect* fx);//118
-int fx_vitriolic_sphere (Actor* Owner, Actor* target, Effect* fx);//119
-int fx_suppress_hp (Actor* Owner, Actor* target, Effect* fx);//11a
-int fx_floattext (Actor* Owner, Actor* target, Effect* fx);//11b
-int fx_mace_of_disruption (Actor* Owner, Actor* target, Effect* fx);//11c
+static int fx_remove_confusion (Actor* Owner, Actor* target, Effect* fx);//10b
+static int fx_eye_of_the_mind (Actor* Owner, Actor* target, Effect* fx);//10c
+static int fx_eye_of_the_sword (Actor* Owner, Actor* target, Effect* fx);//10d
+static int fx_eye_of_the_mage (Actor* Owner, Actor* target, Effect* fx);//10e
+static int fx_eye_of_venom (Actor* Owner, Actor* target, Effect* fx);//10f
+static int fx_eye_of_the_spirit (Actor* Owner, Actor* target, Effect* fx);//110
+static int fx_eye_of_fortitude (Actor* Owner, Actor* target, Effect* fx);//111
+static int fx_eye_of_stone (Actor* Owner, Actor* target, Effect* fx);//112
+static int fx_remove_seven_eyes (Actor* Owner, Actor* target, Effect* fx);//113
+static int fx_remove_effect (Actor* Owner, Actor* target, Effect* fx);//114
+static int fx_soul_eater (Actor* Owner, Actor* target, Effect* fx);//115
+static int fx_shroud_of_flame (Actor* Owner, Actor* target, Effect* fx);//116
+static int fx_shroud_of_flame2 (Actor* Owner, Actor* target, Effect* fx);//116
+static int fx_animal_rage (Actor* Owner, Actor* target, Effect* fx);//117
+static int fx_turn_undead (Actor* Owner, Actor* target, Effect* fx);//118
+static int fx_turn_undead2 (Actor* Owner, Actor* target, Effect* fx);//118
+static int fx_vitriolic_sphere (Actor* Owner, Actor* target, Effect* fx);//119
+static int fx_suppress_hp (Actor* Owner, Actor* target, Effect* fx);//11a
+static int fx_floattext (Actor* Owner, Actor* target, Effect* fx);//11b
+static int fx_mace_of_disruption (Actor* Owner, Actor* target, Effect* fx);//11c
 //0x11d Sleep2 ??? power word sleep?
 //0x11e Reveal:Tracks (same as bg2)
 //0x11f Protection:Backstab (same as bg2)
-int fx_set_state (Actor* Owner, Actor* target, Effect* fx); //120
-int fx_cutscene (Actor* Owner, Actor* target, Effect* fx);//121
-int fx_resist_spell (Actor* Owner, Actor* target, Effect *fx);//ce
-int fx_resist_spell_and_message (Actor* Owner, Actor* target, Effect *fx);//122
-int fx_rod_of_smithing (Actor* Owner, Actor* target, Effect* fx); //123
+static int fx_set_state (Actor* Owner, Actor* target, Effect* fx); //120
+static int fx_cutscene (Actor* Owner, Actor* target, Effect* fx);//121
+static int fx_resist_spell (Actor* Owner, Actor* target, Effect *fx);//ce
+static int fx_resist_spell_and_message (Actor* Owner, Actor* target, Effect *fx);//122
+static int fx_rod_of_smithing (Actor* Owner, Actor* target, Effect* fx); //123
 //0x124 MagicalRest (same as bg2)
 //0x125 BeholderDispelMagic (???)
-int fx_harpy_wail (Actor* Owner, Actor* target, Effect* fx); //126
-int fx_jackalwere_gaze (Actor* Owner, Actor* target, Effect* fx); //127
+static int fx_harpy_wail (Actor* Owner, Actor* target, Effect* fx); //126
+static int fx_jackalwere_gaze (Actor* Owner, Actor* target, Effect* fx); //127
 //0x128 ModifyGlobalVariable (same as bg2)
 //0x129 HideInShadows (same as bg2)
-int fx_use_magic_device_modifier (Actor* Owner, Actor* target, Effect* fx);//12a
+static int fx_use_magic_device_modifier (Actor* Owner, Actor* target, Effect* fx);//12a
 
 //No need to make these ordered, they will be ordered by EffectQueue
 static EffectRef effectnames[] = {
 	{ "Color:FadeRGB", fx_fade_rgb, 0}, //e8
 	{ "IWDVisualSpellHit", fx_iwd_visual_spell_hit, 0}, //e9
 	{ "ColdDamage", fx_cold_damage, 0}, //ea
-	{ "PanicUndead", fx_panic_undead, 0}, //ec
+	{ "ChillTouch", fx_chill_touch, 0}, //ec (how)
+	{ "ChillTouchPanic", fx_chill_touch_panic, 0}, //ec (iwd2)
 	{ "CrushingDamage", fx_crushing_damage, 0}, //ed
 	{ "SaveBonus", fx_save_bonus, 0}, //ee
 	{ "SlowPoison", fx_slow_poison, 0}, //ef
@@ -382,14 +384,26 @@ int fx_cold_damage (Actor* Owner, Actor* target, Effect* fx)
 
 //0xeb CastingGlow2 will be same as original casting glow
 
-//0xec PanicUndead
-int fx_panic_undead (Actor* /*Owner*/, Actor* target, Effect* fx)
+//0xec ChillTouch (how)
+//this effect is to simulate the composite effects of chill touch
+//it is the usual iwd/how style hack
+int fx_chill_touch (Actor* Owner, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_panic_undead (%2d)\n", fx->Opcode);
+	if (0) printf( "fx_chill_touch (%2d)\n", fx->Opcode);
+	target->Damage(fx->Parameter1, DAMAGE_COLD, Owner);
 	if (target->GetStat(IE_GENERAL)==GEN_UNDEAD) {
 		target->Panic();
 	}
 	return FX_NOT_APPLIED;
+}
+
+//0xec ChillTouchPanic (iwd2)
+//the undead check is made by IDS targeting as it should be
+int fx_chill_touch_panic (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_chill_touch_panic (%2d)\n", fx->Opcode);
+	STAT_SET(IE_MORALE, target->GetStat(IE_MORALEBREAK));
+	return FX_APPLIED;
 }
 
 //0xed CrushingDamage (special)
