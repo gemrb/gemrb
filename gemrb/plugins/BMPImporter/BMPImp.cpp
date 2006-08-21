@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.31 2006/07/07 13:34:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BMPImporter/BMPImp.cpp,v 1.32 2006/08/21 19:41:41 avenger_teambg Exp $
  *
  */
 
@@ -132,6 +132,10 @@ bool BMPImp::Open(DataStream* stream, bool autoFree, bool convert)
 	//no idea if we have to swap this or not
 	//RASTERDATA
 	switch (BitCount) {
+		case 32:
+			PaddedRowLength = Width * 4;
+			break;
+
 		case 24:
 			PaddedRowLength = Width * 3;
 			break;
@@ -160,7 +164,24 @@ bool BMPImp::Open(DataStream* stream, bool autoFree, bool convert)
 	//}
 	void* rpixels = malloc( PaddedRowLength* Height );
 	str->Read( rpixels, PaddedRowLength * Height );
-	if (BitCount == 24) {
+	if (BitCount == 32) {
+		//convert to 24 bits on the fly
+		int size = Width * Height * 3;
+		pixels = malloc( size );
+		unsigned char * dest = ( unsigned char * ) pixels;
+		dest += size;
+		unsigned char * src = ( unsigned char * ) rpixels;
+		for (int i = Height; i; i--) {
+			dest -= ( Width * 3 );
+			for (unsigned int j=0;j<Width;j++) {
+				dest[j*3]=src[j*4];
+				dest[j*3+1]=src[j*4+1];
+				dest[j*3+2]=src[j*4+2];
+			}
+			src += PaddedRowLength;
+		}
+		BitCount = 24;
+	} else if (BitCount == 24) {
 		int size = Width * Height * 3;
 		pixels = malloc( size );
 		unsigned char * dest = ( unsigned char * ) pixels;
