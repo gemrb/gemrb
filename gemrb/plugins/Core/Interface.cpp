@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.431 2006/08/20 10:33:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.432 2006/08/21 19:42:47 avenger_teambg Exp $
  *
  */
 
@@ -3334,6 +3334,56 @@ bool Interface::SavingThrow(int Save, int Bonus)
 	int roll = Roll(1, 20, 0);
 	// FIXME: this is 2e saving throw, it's probably different in iwd2
 	return (roll > 1) && (roll + Bonus >= Save);
+}
+
+static char bmp_suffix[6]="M.BMP";
+static char png_suffix[6]="M.PNG";
+
+int Interface::GetPortraits(TextArea* ta, bool smallorlarge)
+{
+	int count = 0;
+	char Path[_MAX_PATH];
+
+	if (smallorlarge) {
+		bmp_suffix[0]='S';
+		png_suffix[0]='S';
+	} else {
+		bmp_suffix[0]='M';
+		png_suffix[0]='M';
+	}
+	PathJoin( Path, GamePath, GamePortraits, NULL );
+	DIR* dir = opendir( Path );
+	if (dir == NULL) {
+		return -1;
+	}
+	//Lookup the first entry in the Directory
+	struct dirent* de = readdir( dir );
+	if (de == NULL) {
+		closedir( dir );
+		return -1;
+	}
+	printf( "Looking in %s\n", Path );
+	do {
+		if (de->d_name[0] == '.')
+			continue;
+		char dtmp[_MAX_PATH];
+		PathJoin( dtmp, Path, de->d_name, NULL );
+		struct stat fst;
+		stat( dtmp, &fst );
+		if ( S_ISDIR( fst.st_mode ))
+			continue;
+		strupr(de->d_name);
+		char *pos = strstr(de->d_name,bmp_suffix);
+		if (!pos && IsAvailable(IE_PNG_CLASS_ID) ) {
+			pos = strstr(de->d_name,png_suffix);
+		}
+		if (!pos) continue;
+		pos[1]=0;
+		count++;
+		ta->AppendText( de->d_name, -1 );
+	} while (( de = readdir( dir ) ) != NULL);
+	closedir( dir );
+	return count;
 }
 
 int Interface::GetCharSounds(TextArea* ta)

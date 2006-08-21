@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.209 2006/08/20 10:33:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.210 2006/08/21 19:42:47 avenger_teambg Exp $
  *
  */
 
@@ -470,6 +470,8 @@ public:
 	/** if backtomain is not null then goes back to main screen */
 	void QuitGame(int backtomain);
 	void LoadGame(int index);
+	/*reads the filenames of the portraits folder into a list */
+	int GetPortraits(TextArea* ta, bool smallorlarge);
 	/*reads the filenames of the sounds folder into a list */
 	int GetCharSounds(TextArea *ta);
 	unsigned int GetInventorySize() const { return SlotTypes-1; }

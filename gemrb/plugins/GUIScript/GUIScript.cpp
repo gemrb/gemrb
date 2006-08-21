@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.413 2006/08/20 10:33:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.414 2006/08/21 19:42:47 avenger_teambg Exp $
  *
  */
 
@@ -1072,7 +1072,7 @@ static PyObject* GemRB_QueryText(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_QueryText__doc );
 	}
 
-	TextEdit *ctrl = (TextEdit *) GetControl(wi, ci, -1);
+	Control *ctrl = GetControl(wi, ci, -1);
 	if (!ctrl) {
 		return NULL;
 	}
@@ -2527,15 +2527,17 @@ static PyObject* GemRB_SetButtonPicture(PyObject * /*self*/, PyObject* args)
 	DataStream* str;
 	int restype = IE_BMP_CLASS_ID;
 
-	if (rm->HasResource(ResRef, IE_PNG_CLASS_ID) ) {
-		str = rm->GetResource( ResRef, IE_PNG_CLASS_ID );
-		restype = IE_PNG_CLASS_ID;
-	} else {
-		str = rm->GetResource( ResRef, IE_BMP_CLASS_ID );
+	//png is optional
+	if (core->IsAvailable(IE_PNG_CLASS_ID) ) {
+		if (rm->HasResource(ResRef, IE_PNG_CLASS_ID) ) {
+			restype = IE_PNG_CLASS_ID;
+		}
 	}
+	str = rm->GetResource( ResRef, restype );
 	//default portrait
 	if (str == NULL && DefResRef) {
 		str = rm->GetResource( DefResRef, IE_BMP_CLASS_ID );
+		restype = IE_BMP_CLASS_ID;
 	}
 	if (str == NULL) {
 		return NULL;
@@ -3388,6 +3390,25 @@ static PyObject* GemRB_Roll(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_Roll__doc );
 	}
 	return PyInt_FromLong( core->Roll( Dice, Size, Add ) );
+}
+
+PyDoc_STRVAR( GemRB_GetPortraits__doc,
+"GetPortraits(WindowIndex, ControlIndex, SmallOrLarge) => int\n\n"
+"Reads in the contents of the portraits subfolder." );
+
+static PyObject* GemRB_GetPortraits(PyObject * /*self*/, PyObject* args)
+{
+	int wi, ci;
+	int suffix;
+
+	if (!PyArg_ParseTuple( args, "iii", &wi, &ci, &suffix )) {
+		return AttributeError( GemRB_GetPortraits__doc );
+	}
+	TextArea* ta = ( TextArea* ) GetControl( wi, ci, IE_GUI_TEXTAREA );
+	if (!ta) {
+		return NULL;
+	}
+	return PyInt_FromLong( core->GetPortraits( ta, suffix ) );
 }
 
 PyDoc_STRVAR( GemRB_GetCharSounds__doc,
@@ -7269,6 +7290,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(PlayMovie, METH_VARARGS),
 	METHOD(Roll, METH_VARARGS),
 	METHOD(GetCharSounds, METH_VARARGS),
+	METHOD(GetPortraits, METH_VARARGS),
 	METHOD(GetSaveGameCount, METH_VARARGS),
 	METHOD(DeleteSaveGame, METH_VARARGS),
 	METHOD(GetSaveGameAttrib, METH_VARARGS),
