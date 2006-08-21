@@ -13,9 +13,8 @@ def OnLoad():
 	CharGenWindow = GemRB.LoadWindow(0)
 	PortraitButton = GemRB.GetControl(CharGenWindow, 12)
 	GemRB.SetButtonFlags(CharGenWindow, PortraitButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
-	PortraitTable = GemRB.LoadTable("pictures")
-	PortraitName = GemRB.GetTableRowName(PortraitTable,GemRB.GetVar("PortraitIndex") )
-	GemRB.SetButtonPicture(CharGenWindow,PortraitButton, PortraitName+"M")
+	PortraitName = GemRB.GetToken ("LargePortrait")
+	GemRB.SetButtonPicture (CharGenWindow,PortraitButton,PortraitName,"NOPORTMD")
 
 	GenderButton = GemRB.GetControl(CharGenWindow,0)
 	GemRB.SetText(CharGenWindow,GenderButton,11956)
