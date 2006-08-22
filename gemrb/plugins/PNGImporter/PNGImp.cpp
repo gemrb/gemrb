@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PNGImporter/PNGImp.cpp,v 1.2 2006/08/20 20:19:06 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PNGImporter/PNGImp.cpp,v 1.3 2006/08/22 22:11:40 avenger_teambg Exp $
  *
  */
 
@@ -228,7 +228,7 @@ void PNGImp::GetPalette(int index, int colors, Color* pal)
 }
 
 
-void PNGImp::PutImage(DataStream */*output*/)
+void PNGImp::PutImage(DataStream* /*output*/)
 {
   // FIXME: add png code here
 }
