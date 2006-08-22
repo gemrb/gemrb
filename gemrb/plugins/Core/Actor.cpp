@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.212 2006/08/20 19:03:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.213 2006/08/22 22:15:53 avenger_teambg Exp $
  *
  */
 
@@ -2473,6 +2473,19 @@ int Actor::SetEquippedQuickSlot(int slot)
 	return STR_MAGICWEAPON;
 }
 
+bool Actor::UseItem(int slot, Scriptable* /*target*/)
+{
+	CREItem *item = inventory.GetSlotItem(slot);
+	if (!item)
+		return false;
+	Item *itm = core->GetItem(item->ItemResRef);
+	if (!itm) return false; //quick item slot contains invalid item resref
+	//
+	//
+	core->FreeItem(itm,item->ItemResRef, false);
+	return true;
+}
+
 bool Actor::IsReverseToHit()
 {
 	return REVERSE_TOHIT;
@@ -2491,3 +2504,4 @@ void Actor::InitButtons(ieDword cls)
 	}
 	SetActionButtonRow(myrow);
 }
+

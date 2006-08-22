@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.414 2006/08/21 19:42:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.415 2006/08/22 22:15:56 avenger_teambg Exp $
  *
  */
 
@@ -7114,19 +7114,26 @@ static PyObject* GemRB_HasSpecialItem(PyObject * /*self*/, PyObject* args)
 	if (!actor) {
 		return RuntimeError( "Actor not found" );
 	}
+	int Slot = -1;
 	int i = SpecialItemsCount;
 	while(i--) {
-		if (actor->inventory.HasItem(SpecialItems[i].resref,0)) {
+		if (SpecialItems[i].value!=(ieDword) itemtype) {
+			continue;
+		}
+		Slot = actor->inventory.FindItem(SpecialItems[i].resref,0);
+		if (Slot!=-1) {
 			break;
 		}
 	}
 
-	if (i<0) {
+	if (Slot==-1) {
 		return PyInt_FromLong( 0 );	
 	}
 
 	if (useup) {
-		//useup = actor->UseItem(SpecialItems[i].resref, actor);
+		useup = actor->UseItem(Slot, actor);
+	} else {
+		useup = 1;
 	}
 	return PyInt_FromLong( useup );	
 }

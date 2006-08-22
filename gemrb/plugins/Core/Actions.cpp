@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.85 2006/08/17 16:54:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.86 2006/08/22 22:15:53 avenger_teambg Exp $
  *
  */
 
@@ -4722,4 +4722,23 @@ void GameScript::SelectWeaponAbility(Scriptable* Sender, Action* parameters)
 			scr->PCStats->QuickItemHeaders[slot-wslot]=(ieWord) parameters->int1Parameter;
 		}
 	}
+}
+
+void GameScript::UseItem(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		return;
+	}
+	int Slot;
+	Actor *scr = (Actor *) Sender;
+	if (parameters->string0Parameter) {
+		Slot = scr->inventory.FindItem(parameters->string0Parameter, 0);
+	} else {
+		Slot = parameters->int0Parameter;
+	}
+	scr->UseItem(Slot, tar);
 }

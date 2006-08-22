@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.376 2006/08/19 20:22:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.377 2006/08/22 22:15:54 avenger_teambg Exp $
  *
  */
 
@@ -777,6 +777,8 @@ static ActionLink actionnames[] = {
 	{"unmakeglobal", GameScript::UnMakeGlobal, 0}, //this is a GemRB extension
 	{"usecontainer", GameScript::UseContainer,AF_BLOCKING},
 	{"usedoor", GameScript::UseDoor,AF_BLOCKING},
+	{"useitem", GameScript::UseItem,AF_BLOCKING},
+	{"useitemslot", GameScript::UseItem,AF_BLOCKING},
 	{"vequip",GameScript::SetArmourLevel, 0},
 	{"verbalconstant", GameScript::VerbalConstant, 0},
 	{"verbalconstanthead", GameScript::VerbalConstantHead, 0},

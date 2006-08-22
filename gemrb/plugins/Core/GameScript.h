@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.256 2006/08/17 15:32:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.257 2006/08/22 22:15:55 avenger_teambg Exp $
  *
  */
 
@@ -1302,8 +1302,9 @@ public:
 	static void UnhideGUI(Scriptable* Sender, Action* parameters);
 	static void Unlock(Scriptable* Sender, Action* parameters);
 	static void UnlockScroll(Scriptable* Sender, Action* parameters);
-	static void UseDoor(Scriptable* Sender, Action* parameters);
 	static void UseContainer(Scriptable* Sender, Action* parameters);
+	static void UseDoor(Scriptable* Sender, Action* parameters);
+	static void UseItem(Scriptable* Sender, Action* parameters);
 	static void VerbalConstant(Scriptable* Sender, Action* parameters);
 	static void VerbalConstantHead(Scriptable* Sender, Action* parameters);
 	static void Wait(Scriptable* Sender, Action* parameters);
