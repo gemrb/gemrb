@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.113 2006/08/20 10:35:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.114 2006/08/28 16:16:00 avenger_teambg Exp $
  *
  */
 
@@ -1593,8 +1593,8 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 	stream->WriteDword( &actor->ShortStrRef);
 	stream->WriteDword( &actor->LongStrRef);
 	stream->WriteDword( &actor->BaseStats[IE_MC_FLAGS]);
-	stream->WriteDword( &actor->BaseStats[IE_XP]);
 	stream->WriteDword( &actor->BaseStats[IE_XPVALUE]);
+	stream->WriteDword( &actor->BaseStats[IE_XP]);
 	stream->WriteDword( &actor->BaseStats[IE_GOLD]);
 	stream->WriteDword( &actor->BaseStats[IE_STATE_ID]);
 	tmpWord = actor->BaseStats[IE_HITPOINTS];
