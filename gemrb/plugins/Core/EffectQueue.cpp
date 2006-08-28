@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.73 2006/08/16 18:35:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.74 2006/08/28 17:11:41 avenger_teambg Exp $
  *
  */
 
@@ -48,6 +48,7 @@ static int opcodes_count = 0;
 
 #define MAX_TIMING_MODE 11
 */
+
 static bool fx_instant[MAX_TIMING_MODE]={true,true,true,false,false,false,false,false,true,true,true};
 
 inline bool IsInstant(ieByte timingmode)
@@ -966,6 +967,29 @@ Effect *EffectQueue::GetEffect(ieDword idx) const
 		return NULL;
 	}
 	return effects[idx];
+}
+
+static EffectRef fx_variable_ref={"Variable:StoreLocalVariable",NULL,-1};
+
+bool EffectQueue::Persistent(Effect* fx) const
+{
+	//we save this as variable
+	if (fx->Opcode==(ieDword) ResolveEffect(fx_variable_ref)) {
+		return false;
+	}
+
+	switch (fx->TimingMode) {
+		//normal equipping fx of items
+		case FX_DURATION_INSTANT_WHILE_EQUIPPED:
+		//delayed effect not saved
+		case FX_DURATION_DELAY_UNSAVED:
+		//permanent effect not saved
+		case FX_DURATION_PERMANENT_UNSAVED:
+		//just expired effect
+		case FX_DURATION_JUST_EXPIRED:
+			return false;
+	}
+	return true;
 }
 
 Effect *EffectQueue::GetNextSavedEffect(ieDword &idx) const

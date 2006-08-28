@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.126 2006/08/22 22:15:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.127 2006/08/28 17:11:41 avenger_teambg Exp $
  *
  */
 
@@ -404,5 +404,7 @@ public:
 	/* If it returns true, then default AC=10 and the lesser the better */
 	bool IsReverseToHit();
 	void InitButtons(ieDword cls);
+	void SetFeat(unsigned int feat, int mode);
+	int GetFeat(unsigned int feat);
 };
 #endif

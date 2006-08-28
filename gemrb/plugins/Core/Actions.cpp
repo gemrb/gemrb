@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.86 2006/08/22 22:15:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.87 2006/08/28 17:11:41 avenger_teambg Exp $
  *
  */
 
@@ -4742,3 +4742,16 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 	}
 	scr->UseItem(Slot, tar);
 }
+
+//addfeat will be able to remove feats too
+//(the second int parameter is a bitmode)
+void GameScript::AddFeat(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *)tar;
+	actor->SetFeat(parameters->int0Parameter, parameters->int1Parameter);
+}
+

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.210 2006/08/21 19:42:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.211 2006/08/28 17:11:41 avenger_teambg Exp $
  *
  */
 
@@ -524,6 +524,8 @@ public:
 	// memory from Interface. Yes, it is ugly.
 	ITMExtHeader *GetITMExt(int count);
 	SPLExtHeader *GetSPLExt(int count);
+	//creates a standalone effect with opcode
+	Effect *GetEffect(ieDword opcode);
 	Effect *GetFeatures(int count);
 	void FreeITMExt(ITMExtHeader *p, Effect *e);
 	void FreeSPLExt(SPLExtHeader *p, Effect *e);

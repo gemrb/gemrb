@@ -290,6 +290,8 @@ def NextPress():
 		GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Skill "+str(i) ) )
 	GemRB.UnloadTable (TmpTable)
 
+	#setting feats
+
 	#does all the rest
 	GemRB.FillPlayerInfo (MyChar,PortraitName+"L", PortraitName+"S")
 	GemRB.SetNextScript ("SPPartyFormation")

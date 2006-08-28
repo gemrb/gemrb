@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.257 2006/08/22 22:15:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.258 2006/08/28 17:11:41 avenger_teambg Exp $
  *
  */
 
@@ -932,6 +932,7 @@ public:
 	static void AddAreaType(Scriptable* Sender, Action* parameters);
 	static void AddExperienceParty(Scriptable *Sender, Action* parameters);
 	static void AddExperiencePartyGlobal(Scriptable *Sender, Action* parameters);
+	static void AddFeat(Scriptable *Sender, Action* parameters);
 	static void AddGlobals(Scriptable* Sender, Action* parameters);
 	static void AddHP(Scriptable* Sender, Action* parameters);
 	static void AddJournalEntry(Scriptable* Sender, Action* parameters);

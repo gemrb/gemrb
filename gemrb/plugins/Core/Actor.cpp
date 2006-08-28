@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.213 2006/08/22 22:15:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.214 2006/08/28 17:11:41 avenger_teambg Exp $
  *
  */
 
@@ -2503,5 +2503,36 @@ void Actor::InitButtons(ieDword cls)
 		memcpy(&myrow, GUIBTDefaults+cls, sizeof(ActionButtonRow));
 	}
 	SetActionButtonRow(myrow);
+}
+
+void Actor::SetFeat(unsigned int feat, int mode)
+{
+	if (feat>3*sizeof(ieDword)) {
+		return;
+	}
+	ieDword mask = 1<<(feat&31);
+	ieDword idx = feat>>5;
+	switch (mode) {
+		case BM_SET: case BM_OR:
+			BaseStats[IE_FEATS1+idx]|=mask;
+			break;
+		case BM_NAND:
+			BaseStats[IE_FEATS1+idx]&=~mask;
+			break;
+		case BM_XOR:
+			BaseStats[IE_FEATS1+idx]^=mask;
+			break;
+	}
+}
+
+int Actor::GetFeat(unsigned int feat)
+{
+	if (feat>3*sizeof(ieDword)) {
+		return -1;
+	}
+	if (Modified[IE_FEATS1+(feat>>5)]&(1<<(feat&31)) ) {
+		return 1;
+	}
+	return 0;
 }
 

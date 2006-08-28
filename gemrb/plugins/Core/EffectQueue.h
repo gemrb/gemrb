@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.33 2006/08/06 17:18:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.34 2006/08/28 17:11:41 avenger_teambg Exp $
  *
  */
 
@@ -177,6 +177,7 @@ public:
 	void RemoveAllEffectsWithResource(EffectRef &effect_reference, const ieResRef resource);
 	void RemoveLevelEffects(ieDword level, ieDword flags, ieDword match);
 	Effect *GetEffect(ieDword idx) const;
+	bool Persistent(Effect* fx) const;
 	/* returns next saved effect, increases index */
 	Effect *GetNextSavedEffect(ieDword &idx) const;
 	/* returns the number of saved effects */

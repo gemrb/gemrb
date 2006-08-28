@@ -182,9 +182,11 @@ def NextPress():
 	TmpTable=GemRB.LoadTable("weapprof")
 	ProfCount = GemRB.GetTableRowCount(TmpTable)
 	#bg2 weapprof.2da contains the bg1 proficiencies too, skipping those
-	for i in range(8,ProfCount):
-		StatID=GemRB.GetTableValue(TmpTable, i, 0)
-		GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Prof "+str(i) ) )
+	for i in range(ProfCount-8):
+		StatID = GemRB.GetTableValue(TmpTable, i+8, 0)
+		Value = GemRB.GetVar ("Prof "+str(i) )
+		if Value:
+			GemRB.ApplyEffect (MyChar, "Proficiency", Value, StatID )
 	GemRB.UnloadTable (TmpTable)
 
 	GemRB.SetPlayerStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar ("HairColor") )

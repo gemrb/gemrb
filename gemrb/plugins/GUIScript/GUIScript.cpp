@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.415 2006/08/22 22:15:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.416 2006/08/28 17:11:42 avenger_teambg Exp $
  *
  */
 
@@ -43,6 +43,7 @@
 #include "../Core/ControlAnimation.h"
 #include "../Core/DataFileMgr.h"
 #include "../Core/WorldMap.h"
+#include "../Core/EffectQueue.h"
 
 //this stuff is missing from Python 2.2
 #ifndef PyDoc_VAR
@@ -7114,26 +7115,19 @@ static PyObject* GemRB_HasSpecialItem(PyObject * /*self*/, PyObject* args)
 	if (!actor) {
 		return RuntimeError( "Actor not found" );
 	}
-	int Slot = -1;
 	int i = SpecialItemsCount;
 	while(i--) {
-		if (SpecialItems[i].value!=(ieDword) itemtype) {
-			continue;
-		}
-		Slot = actor->inventory.FindItem(SpecialItems[i].resref,0);
-		if (Slot!=-1) {
+		if (actor->inventory.HasItem(SpecialItems[i].resref,0)) {
 			break;
 		}
 	}
 
-	if (Slot==-1) {
+	if (i<0) {
 		return PyInt_FromLong( 0 );	
 	}
 
 	if (useup) {
-		useup = actor->UseItem(Slot, actor);
-	} else {
-		useup = 1;
+		//useup = actor->UseItem(SpecialItems[i].resref, actor);
 	}
 	return PyInt_FromLong( useup );	
 }
@@ -7176,6 +7170,48 @@ static PyObject* GemRB_HasSpecialSpell(PyObject * /*self*/, PyObject* args)
 		return PyInt_FromLong( 0 );	
 	}
 	return PyInt_FromLong( 1 );	
+}
+
+PyDoc_STRVAR( GemRB_ApplyEffect__doc,
+"ApplyEffect(pc, effect, param1, param2)\n\n"
+"Creates a basic effect and applies it on the player character."
+"This function could be used to add stats that are stored in effect blocks.\n\n");
+
+static EffectRef work_ref;
+
+static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID;
+	char *opcodename;
+	int param1, param2;
+
+	if (!PyArg_ParseTuple( args, "isii", &PartyID, &opcodename, &param1, &param2)) {
+		return AttributeError( GemRB_ApplyEffect__doc );
+	}
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor* actor = game->FindPC( PartyID );
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
+	}
+	work_ref.Name=opcodename;
+	work_ref.EffText=-1;
+	EffectQueue::ResolveEffect(work_ref);
+	Effect *fx = core->GetEffect(work_ref.EffText);
+	if (!fx) {
+		//invalid effect name didn't resolve to opcode
+		return RuntimeError( "Invalid effect name!" );
+	}
+	fx->Parameter1=param1;
+	fx->Parameter2=param2;
+	fx->Probability1=100;
+	fx->TimingMode=FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
+	//fx is freed by this function
+	core->ApplyEffect(fx, actor, actor);
+	Py_INCREF( Py_None );
+	return Py_None;
 }
 
 static PyMethodDef GemRBMethods[] = {
@@ -7387,6 +7423,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(RestParty, METH_VARARGS),
 	METHOD(HasSpecialItem, METH_VARARGS),
 	METHOD(HasSpecialSpell, METH_VARARGS),
+	METHOD(ApplyEffect, METH_VARARGS),
 	// terminating entry	
 	{NULL, NULL, 0, NULL}
 };
