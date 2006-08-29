@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.87 2006/08/28 17:11:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.88 2006/08/29 21:28:42 avenger_teambg Exp $
  *
  */
 
@@ -4753,5 +4753,29 @@ void GameScript::AddFeat(Scriptable* Sender, Action* parameters)
 	}
 	Actor *actor = (Actor *)tar;
 	actor->SetFeat(parameters->int0Parameter, parameters->int1Parameter);
+}
+
+void GameScript::MatchHP(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *scr = (Actor *) Sender;
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *)tar;
+	switch (parameters->int0Parameter) {
+		case 1: //sadly the hpflags are not the same as stats
+			actor->SetBase(IE_HITPOINTS,scr->GetBase(IE_HITPOINTS));
+			break;
+		case 0:
+			actor->SetBase(IE_MAXHITPOINTS, scr->GetBase(IE_MAXHITPOINTS));
+			break;
+		default: //this is gemrb extension
+			actor->SetBase(parameters->int0Parameter, scr->GetBase(parameters->int0Parameter));
+			break;
+	}
 }
 

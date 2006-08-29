@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.258 2006/08/28 17:11:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.259 2006/08/29 21:28:42 avenger_teambg Exp $
  *
  */
 
@@ -1117,6 +1117,7 @@ public:
 	static void MakeGlobal(Scriptable* Sender, Action* parameters);
 	static void MakeUnselectable(Scriptable* Sender, Action* parameters);
 	static void MarkObject(Scriptable* Sender, Action* parameters);
+	static void MatchHP(Scriptable* Sender, Action* parameters);
 	static void MoraleDec(Scriptable* Sender, Action* parameters);
 	static void MoraleInc(Scriptable* Sender, Action* parameters);
 	static void MoraleSet(Scriptable* Sender, Action* parameters);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.378 2006/08/28 17:11:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.379 2006/08/29 21:28:42 avenger_teambg Exp $
  *
  */
 
@@ -70,7 +70,7 @@ static TriggerLink triggernames[] = {
 	{"checkstatlt", GameScript::CheckStatLT, 0},
 	{"class", GameScript::Class, 0},
 	{"classex", GameScript::ClassEx, 0}, //will return true for multis
-	{"classlevel", GameScript::ClassLevel, 0},
+	{"classlevel", GameScript::ClassLevel, 0}, //pst
 	{"classlevelgt", GameScript::ClassLevelGT, 0},
 	{"classlevellt", GameScript::ClassLevelLT, 0},
 	{"clicked", GameScript::Clicked, 0},
@@ -202,7 +202,7 @@ static TriggerLink triggernames[] = {
 	{"lastpersontalkedto", GameScript::LastPersonTalkedTo, 0}, //pst
 	{"level", GameScript::Level, 0},
 	{"levelgt", GameScript::LevelGT, 0},
-	{"levelinclass", GameScript::ClassLevel, 0},
+	{"levelinclass", GameScript::ClassLevel, 0},  //iwd2
 	{"levelinclassgt", GameScript::ClassLevelGT, 0},
 	{"levelinclasslt", GameScript::ClassLevelLT, 0},
 	{"levellt", GameScript::LevelLT, 0},
@@ -565,6 +565,7 @@ static ActionLink actionnames[] = {
 	{"moraledec", GameScript::MoraleDec, 0},
 	{"moraleinc", GameScript::MoraleInc, 0},
 	{"moraleset", GameScript::MoraleSet, 0},
+	{"matchhp", GameScript::MatchHP, 0},
 	{"movebetweenareas", GameScript::MoveBetweenAreas, 0},
 	{"movebetweenareaseffect", GameScript::MoveBetweenAreas, 0},
 	{"movecursorpoint", GameScript::MoveCursorPoint, 0},//immediate move
