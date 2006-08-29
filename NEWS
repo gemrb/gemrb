@@ -1,16 +1,22 @@
-GemRB V0.2.7 (2005-02-01):
+GemRB V0.2.7 (2005-08-30):
   New features:
     - large animations
     - worldmap travel
     - dialogue portraits
     - translucent shadows option
     - personal space of actors
+    - combat
+    - many new effects
+    - overlay animation
 
   Improved features:
     - Script fixes
     - Action menus
     - TextScreen
- 
+    - doors
+    - animated overlays
+    - new actions
+
 GemRB V0.2.6 (2005-12-06):
   New features:
     - Effects are in a different plugin
