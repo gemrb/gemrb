@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.74 2006/08/28 17:11:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.75 2006/08/30 19:02:51 avenger_teambg Exp $
  *
  */
 
@@ -969,9 +969,23 @@ Effect *EffectQueue::GetEffect(ieDword idx) const
 	return effects[idx];
 }
 
+//returns true if the effect supports simplified duration
+bool EffectQueue::HasDuration(Effect *fx) 
+{
+	switch(fx->TimingMode) {
+	case FX_DURATION_INSTANT_LIMITED: //simple duration
+	case FX_DURATION_DELAY_LIMITED:   //delayed duration
+	case FX_DURATION_DELAY_PERMANENT: //simple delayed
+		return true;
+	}
+	return false;
+}
+
 static EffectRef fx_variable_ref={"Variable:StoreLocalVariable",NULL,-1};
 
-bool EffectQueue::Persistent(Effect* fx) const
+//returns true if the effect must be saved
+//variables are saved differently
+bool EffectQueue::Persistent(Effect* fx)
 {
 	//we save this as variable
 	if (fx->Opcode==(ieDword) ResolveEffect(fx_variable_ref)) {

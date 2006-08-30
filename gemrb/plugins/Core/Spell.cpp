@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spell.cpp,v 1.9 2005/07/17 18:58:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spell.cpp,v 1.10 2006/08/30 19:02:51 avenger_teambg Exp $
  *
  */
 
@@ -79,9 +79,12 @@ EffectQueue *Spell::GetEffectBlock(int level)
 	
 	for (int i=0;i<count;i++) {
 		if (Flags & SF_SIMPLIFIED_DURATION) {
-		//hack the effect according to Level
-		//fxqueue->AddEffect will copy the effect,
-		//so we don't risk any overwriting
+			//hack the effect according to Level
+			//fxqueue->AddEffect will copy the effect,
+			//so we don't risk any overwriting
+			if (EffectQueue::HasDuration(features+i)) {
+				features[i].Duration=(TimePerLevel*level+TimeConstant)*7;
+			}
 		}
 		fxqueue->AddEffect( features+i );
 	}

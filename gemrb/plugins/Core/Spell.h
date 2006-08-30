@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spell.h,v 1.14 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spell.h,v 1.15 2006/08/30 19:02:51 avenger_teambg Exp $
  *
  */
 
@@ -49,14 +49,14 @@
 
 //values for Spell usability Flags
 
-#define SF_HOSTILE 0x4
-#define SF_NO_LOS  0x8
-#define SF_NOT_INDOORS 0x20
-#define SF_HLA 0x40
-#define SF_TRIGGER 0x80
-//this is a relocated bit (used in iwd2 as 0x40)
-#define SF_NOT_IN_COMBAT 0x100
-#define SF_SIMPLIFIED_DURATION   0x400
+#define SF_HOSTILE 0x400
+#define SF_NO_LOS  0x800
+#define SF_NOT_INDOORS 0x2000
+#define SF_HLA 0x4000 // probably this means a nonmagical ability
+#define SF_TRIGGER 0x8000
+#define SF_NOT_IN_COMBAT 0x10000
+//this is a relocated bit (used in iwd2 as 0x4000)
+#define SF_SIMPLIFIED_DURATION   0x40
 
 /**
  * @class SPLExtHeader
@@ -139,7 +139,9 @@ public:
 	ieWord CastingFeatureCount;
 
 	// IWD2 only
-	char unknown13[16];
+	ieDword TimePerLevel;
+	ieDword TimeConstant;
+	char unknown13[8];
 
 public:
 	//-1 will return the cfb

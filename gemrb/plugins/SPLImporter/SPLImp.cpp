@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImp.cpp,v 1.13 2005/07/25 16:46:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SPLImporter/SPLImp.cpp,v 1.14 2006/08/30 19:02:51 avenger_teambg Exp $
  *
  */
 
@@ -100,7 +100,14 @@ Spell* SPLImp::GetSpell(Spell *s)
 
 	memset( s->unknown13, 0, 16 );
 	if (version == 20) {
-		str->Read( s->unknown13, 16 );
+		//these fields are used in simplified duration
+		str->ReadDword( &s->TimePerLevel );
+		str->ReadDword( &s->TimeConstant );
+		str->Read( s->unknown13, 8 );
+		//moving some bits, because bg2 uses them differently
+		//the low byte is unused, so we can keep the iwd2 bits there
+		s->Flags|=(s->Flags>>8)&0xc0;
+		s->Flags&=~0xc000;
 	}
 
 	s->ext_headers = core->GetSPLExt(s->ExtHeaderCount);
