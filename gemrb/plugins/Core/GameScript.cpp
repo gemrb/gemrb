@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.379 2006/08/29 21:28:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.380 2006/08/31 17:05:08 avenger_teambg Exp $
  *
  */
 
@@ -387,6 +387,7 @@ static ActionLink actionnames[] = {
 	{"changeanimation", GameScript::ChangeAnimation, 0},
 	{"changeanimationnoeffect", GameScript::ChangeAnimationNoEffect, 0},
 	{"changeclass", GameScript::ChangeClass, 0},
+	{"changecolor", GameScript::ChangeColor, 0},
 	{"changecurrentscript", GameScript::ChangeAIScript,AF_SCRIPTLEVEL},
 	{"changedialog", GameScript::ChangeDialogue, 0},
 	{"changedialogue", GameScript::ChangeDialogue, 0},
@@ -725,6 +726,7 @@ static ActionLink actionnames[] = {
 	{"spawnptdeactivate", GameScript::SpawnPtDeactivate, 0},
 	{"spawnptspawn", GameScript::SpawnPtSpawn, 0},
 	{"startcutscene", GameScript::StartCutScene, 0},
+	{"startcutsceneex", GameScript::StartCutScene, 0}, //pst (unknown)
 	{"startcutscenemode", GameScript::StartCutSceneMode, 0},
 	{"startdialog", GameScript::StartDialogue,AF_BLOCKING},
 	{"startdialoginterrupt", GameScript::StartDialogueInterrupt,AF_BLOCKING},
@@ -743,6 +745,7 @@ static ActionLink actionnames[] = {
 	{"startmovie", GameScript::StartMovie,AF_BLOCKING},
 	{"startmusic", GameScript::StartMusic, 0},
 	{"startrainnow", GameScript::StartRainNow, 0},
+	{"startrandomtimer", GameScript::StartRandomTimer, 0},
 	{"startsong", GameScript::StartSong, 0},
 	{"startstore", GameScript::StartStore, 0},
 	{"starttimer", GameScript::StartTimer, 0},

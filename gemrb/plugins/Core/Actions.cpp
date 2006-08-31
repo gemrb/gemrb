@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.88 2006/08/29 21:28:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.89 2006/08/31 17:05:08 avenger_teambg Exp $
  *
  */
 
@@ -130,6 +130,12 @@ void GameScript::SetGlobalRandom(Scriptable* Sender, Action* parameters)
 void GameScript::StartTimer(Scriptable* /*Sender*/, Action* parameters)
 {
 	core->GetGame()->StartTimer(parameters->int0Parameter, parameters->int1Parameter);
+}
+
+void GameScript::StartRandomTimer(Scriptable* /*Sender*/, Action* parameters)
+{
+	ieDword value = core->Roll(1, parameters->int2Parameter-parameters->int1Parameter, parameters->int2Parameter-1);
+	core->GetGame()->StartTimer(parameters->int0Parameter, value);
 }
 
 void GameScript::SetGlobalTimer(Scriptable* Sender, Action* parameters)
@@ -4779,3 +4785,16 @@ void GameScript::MatchHP(Scriptable* Sender, Action* parameters)
 	}
 }
 
+void GameScript::ChangeColor(Scriptable* Sender, Action* parameters)
+{
+        if (Sender->Type!=ST_ACTOR) {
+                return;
+        }
+        Actor *scr = (Actor *) Sender;
+	ieDword stat = parameters->int0Parameter;
+	if (stat<9 || stat>14) {
+		return;
+	}
+	stat += IE_COLORS - 9;
+	scr->SetBase(stat, (scr->GetBase(stat)&~255)|(parameters->int1Parameter&255));
+}
