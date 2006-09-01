@@ -46,7 +46,9 @@ def OnLoad():
 	ColorTable = GemRB.LoadTable("clowncol")
 	#set these colors to some default
 	PortraitTable = GemRB.LoadTable("pictures")
-	PortraitIndex = GemRB.GetVar("PortraitIndex")
+	PortraitName = GemRB.GetToken("LargePortrait")
+	PortraitName = PortraitName[0:len(PortraitName)-1]
+	PortraitIndex = GemRB.GetTableRowIndex(PortraitTable, PortraitName)
 	HairColor=GemRB.GetTableValue(PortraitTable,PortraitIndex,1)
 	SkinColor=GemRB.GetTableValue(PortraitTable,PortraitIndex,2)
 	MinorColor=GemRB.GetTableValue(PortraitTable,PortraitIndex,3)
