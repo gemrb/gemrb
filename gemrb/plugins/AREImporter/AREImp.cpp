@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.159 2006/08/11 23:17:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.160 2006/09/02 10:37:01 avenger_teambg Exp $
  *
  */
 
@@ -274,7 +274,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		ieWord TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
 		ieWord LaunchX, LaunchY;
 		ieWord PosX, PosY;
-		char Name[33], Entrance[33];
+		ieVariable Name, Entrance;
 		ieResRef Script, DialogResRef, KeyResRef, Destination;
 		str->Read( Name, 32 );
 		Name[32] = 0;
@@ -362,7 +362,7 @@ Map* AREImp::GetMap(const char *ResRef)
 	//Loading Containers
 	for (i = 0; i < ContainersCount; i++) {
 		str->Seek( ContainersOffset + ( i * 0xC0 ), GEM_STREAM_START );
-		char Name[33];
+		ieVariable Name;
 		ieWord Type, LockDiff;
 		ieDword Flags;
 		ieWord TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
@@ -462,8 +462,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		ieDword OpenFirstImpeded, ClosedFirstImpeded;
 		ieWord OpenVerticesCount, ClosedVerticesCount;
 		ieWord OpenImpededCount, ClosedImpededCount;
-		char LongName[33];
-		char LinkedInfo[33];
+		ieVariable LongName, LinkedInfo;
 		ieResRef ShortName;
 		ieWord minX, maxX, minY, maxY;
 		ieDword cursor;
@@ -651,7 +650,7 @@ Map* AREImp::GetMap(const char *ResRef)
 	//Loading SpawnPoints
 	for (i = 0; i < SpawnCount; i++) {
 		str->Seek( SpawnOffset + (i*0xc8), GEM_STREAM_START );
-		char Name[33];
+		ieVariable Name;
 		ieWord XPos, YPos;
 		ieWord Count, Difficulty, Flags;
 		ieResRef creatures[MAX_RESCOUNT];
@@ -690,7 +689,7 @@ Map* AREImp::GetMap(const char *ResRef)
 	} else {
 		ActorMgr* actmgr = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
 		for (i = 0; i < ActorCount; i++) {
-			char DefaultName[33];
+			ieVariable DefaultName;
 			ieResRef CreResRef;
 			ieDword TalkCount;
 			ieDword Orientation, Schedule;
@@ -836,7 +835,7 @@ Map* AREImp::GetMap(const char *ResRef)
 	//Loading Entrances
 	str->Seek( EntrancesOffset, GEM_STREAM_START );
 	for (i = 0; i < EntrancesCount; i++) {
-		char Name[33];
+		ieVariable Name;
 		ieWord XPos, YPos, Face;
 		str->Read( Name, 32 );
 		Name[32] = 0;
@@ -854,7 +853,7 @@ Map* AREImp::GetMap(const char *ResRef)
 
 	str->Seek( VariablesOffset, GEM_STREAM_START );
 	for (i = 0; i < VariablesCount; i++) {
-		char Name[33];
+		ieVariable Name;
 		ieDword Value;
 		str->Read( Name, 32 );
 		Name[32] = 0;
@@ -974,7 +973,7 @@ Map* AREImp::GetMap(const char *ResRef)
 	//Loading Tiled objects (if any)
 	str->Seek( TileOffset, GEM_STREAM_START );
 	for (i = 0; i < TileCount; i++) {
-		char Name[33];
+		ieVariable Name;
 		ieResRef ID;
 		ieDword Flags;
 		ieDword OpenIndex, OpenCount;

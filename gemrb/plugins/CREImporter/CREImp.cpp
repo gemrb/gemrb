@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.114 2006/08/28 16:16:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.115 2006/09/02 10:32:33 avenger_teambg Exp $
  *
  */
 
@@ -152,7 +152,7 @@ bool CREImp::Open(DataStream* stream, bool aF)
 void CREImp::ReadChrHeader(Actor *act)
 {
 	ieDword tmpDword;
-	char name[33];
+	ieVariable name;
 	char Signature[8];
 
 	str->Rewind();
@@ -529,7 +529,7 @@ void CREImp::GetActorPST(Actor *act)
 		act->BaseStats[IE_INTERNAL_0+i]=tmpWord;
 	}
 	str->Seek( 4, GEM_CURRENT_POS );
-	char KillVar[33]; //use this as needed
+	ieVariable KillVar; //use this as needed
 	str->Read(KillVar,32);
 	KillVar[32]=0;
 	str->Seek( 3, GEM_CURRENT_POS ); // dialog radius, feet circle size???
@@ -570,7 +570,7 @@ void CREImp::GetActorPST(Actor *act)
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_ALIGNMENT]=tmpByte;
 	str->Seek( 4, GEM_CURRENT_POS );
-	char scriptname[33];
+	ieVariable scriptname;
 	str->Read( scriptname, 32);
 	scriptname[32]=0;
 	act->SetScriptName(scriptname);
@@ -972,7 +972,7 @@ void CREImp::GetActorBG(Actor *act)
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_ALIGNMENT]=tmpByte;
 	str->Seek( 4, GEM_CURRENT_POS );
-	char scriptname[33];
+	ieVariable scriptname;
 	str->Read( scriptname, 32);
 	scriptname[32]=0;
 	act->SetScriptName(scriptname);
@@ -1174,7 +1174,7 @@ void CREImp::GetActorIWD2(Actor *act)
 		str->ReadWord( &tmpWord );
 		act->BaseStats[IE_INTERNAL_0+i]=tmpWord;
 	}
-	char KillVar[33];
+	ieVariable KillVar;
 	str->Read(KillVar,32); //use these as needed
 	KillVar[32]=0;
 	str->Read(KillVar,32);
@@ -1203,7 +1203,7 @@ void CREImp::GetActorIWD2(Actor *act)
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_ALIGNMENT]=tmpByte;
 	str->Seek( 4, GEM_CURRENT_POS );
-	char scriptname[33];
+	ieVariable scriptname;
 	str->Read( scriptname, 32);
 	scriptname[32]=0;
 	act->SetScriptName(scriptname);
@@ -1394,7 +1394,7 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 		str->ReadWord( &tmpWord );
 		act->BaseStats[IE_INTERNAL_0+i]=tmpWord;
 	}
-	char KillVar[33];
+	ieVariable KillVar;
 	str->Read(KillVar,32); //use these as needed
 	KillVar[32]=0;
 	str->Read(KillVar,32);
@@ -1423,7 +1423,7 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_ALIGNMENT]=tmpByte;
 	str->Seek( 4, GEM_CURRENT_POS );
-	char scriptname[33];
+	ieVariable scriptname;
 	str->Read( scriptname, 32);
 	scriptname[32]=0;
 	act->SetScriptName(scriptname);

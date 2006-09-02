@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.84 2006/08/11 23:17:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.85 2006/09/02 10:30:52 avenger_teambg Exp $
  *
  */
 
@@ -207,7 +207,7 @@ Game* GAMImp::LoadGame(Game *newGame)
 	newGame->locals->SetAt("CHAPTER", (ieDword) -1);
 
 	//Loading Global Variables
-	char Name[33];
+	ieVariable Name;
 	Name[32] = 0;
 	str->Seek( GlobalOffset, GEM_STREAM_START );
 	for (i = 0; i < GlobalCount; i++) {
@@ -611,7 +611,7 @@ int GAMImp::PutJournals(DataStream *stream, Game *game)
 int GAMImp::PutKillVars(DataStream *stream, Game *game)
 {
 	char filling[40];
-	char tmpname[33];
+	ieVariable tmpname;
 	POSITION pos=NULL;
 	const char *name;
 	ieDword value;
@@ -633,7 +633,7 @@ int GAMImp::PutKillVars(DataStream *stream, Game *game)
 int GAMImp::PutVariables(DataStream *stream, Game *game)
 {
 	char filling[40];
-	char tmpname[33];
+	ieVariable tmpname;
 	POSITION pos=NULL;
 	const char *name;
 	ieDword value;
