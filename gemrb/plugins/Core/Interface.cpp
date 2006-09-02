@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.433 2006/08/28 17:11:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.434 2006/09/02 10:26:41 avenger_teambg Exp $
  *
  */
 
@@ -59,6 +59,7 @@
 #include "ActorMgr.h"
 #include "Factory.h"
 #include "Console.h"
+#include "Label.h"
 #include "Button.h"
 #include "SoundMgr.h"
 #include "SaveGameIterator.h"
@@ -3832,6 +3833,24 @@ int Interface::CanUseItemType(int itype, int slottype, ieDword /*use1*/, ieDword
 	return (slotmatrix[itype]&slottype);
 }
 
+Label *Interface::GetMessageLabel()
+{
+	ieDword WinIndex = (ieDword) -1;
+	ieDword TAIndex = (ieDword) -1;
+
+	vars->Lookup( "OtherWindow", WinIndex );
+	if (( WinIndex != (ieDword) -1 ) &&
+		( vars->Lookup( "MessageLabel", TAIndex ) )) {
+		Window* win = GetWindow( (unsigned short) WinIndex );
+		if (win) {
+			Control *ctrl = win->GetControl( (unsigned short) TAIndex );
+			if (ctrl && ctrl->ControlType==IE_GUI_LABEL)
+				return (Label *) ctrl;
+		}
+	}
+	return NULL;
+}
+
 TextArea *Interface::GetMessageTextArea()
 {
 	ieDword WinIndex = (ieDword) -1;
@@ -3843,7 +3862,7 @@ TextArea *Interface::GetMessageTextArea()
 		Window* win = GetWindow( (unsigned short) WinIndex );
 		if (win) {
 			Control *ctrl = win->GetControl( (unsigned short) TAIndex );
-			if (ctrl->ControlType==IE_GUI_TEXTAREA)
+			if (ctrl && ctrl->ControlType==IE_GUI_TEXTAREA)
 				return (TextArea *) ctrl;
 		}
 	}
@@ -3852,6 +3871,10 @@ TextArea *Interface::GetMessageTextArea()
 
 void Interface::DisplayString(const char* Text)
 {
+	Label *l = GetMessageLabel();
+	if (l) {
+		l->SetText(Text, 0);
+	}
 	TextArea *ta = GetMessageTextArea();
 	if (ta)
 		ta->AppendText( Text, -1 );

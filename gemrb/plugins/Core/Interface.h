@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.211 2006/08/28 17:11:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.212 2006/09/02 10:26:42 avenger_teambg Exp $
  *
  */
 
@@ -45,6 +45,7 @@ class WindowMgr;
 class ScriptEngine;
 class Console;
 class SoundMgr;
+class Label;
 class TextArea;
 class SaveGameIterator;
 class Variables;
@@ -359,6 +360,8 @@ public:
 	void DisplayTooltip(int x, int y, Control* ctrl);
 	/** Actually draws tooltip on the screen. Called from SDLVideoDriver */
 	void DrawTooltip();
+	/** returns the label which should receive game messages (overrides messagetextarea) */
+	Label *GetMessageLabel();
 	/** returns the textarea of the main game screen */
 	TextArea *GetMessageTextArea();
 	/** displays any string in the textarea */
