@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.215 2006/09/02 10:29:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.216 2006/09/02 20:10:24 avenger_teambg Exp $
  *
  */
 
@@ -107,6 +107,7 @@ static ieResRef d_splash[DAMAGE_LEVELS]={
 #define BLOOD_GRADIENT 19
 #define FIRE_GRADIENT 19
 #define ICE_GRADIENT 71
+#define STONE_GRADIENT 93
 
 static int d_gradient[DAMAGE_LEVELS]={
 	BLOOD_GRADIENT,BLOOD_GRADIENT,BLOOD_GRADIENT,BLOOD_GRADIENT,
@@ -390,6 +391,45 @@ void pcf_animid(Actor *actor, ieDword Value)
 	actor->SetAnimationID(Value);
 }
 
+static void SetLockedPalette(Actor *actor, ieDword *gradients)
+{
+	CharAnimations *anims = actor->GetAnims();
+	if (!anims) return; //cannot apply it (yet)
+	if (anims->lockPalette) return;
+	//force initialisation of animation
+	anims->SetColors( gradients );
+	anims->GetAnimation(0,0);
+	if (anims->palette) {
+		anims->lockPalette=true;
+	}
+}
+
+static void UnlockPalette(Actor *actor)
+{
+	CharAnimations *anims = actor->GetAnims();
+	if (anims) {
+		anims->lockPalette=false;
+		anims->SetColors(actor->Modified+IE_COLORS);
+	}
+}
+
+ieDword fullwhite[7]={ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT};
+
+ieDword fullstone[7]={STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT};
+
+void pcf_state(Actor *actor, ieDword Value)
+{
+	if (Value & STATE_PETRIFIED) {
+		SetLockedPalette( actor, fullstone);
+		return;
+	}
+	if (Value & STATE_FROZEN) {
+		SetLockedPalette(actor, fullwhite);
+		return;
+	}
+	UnlockPalette(actor);
+}
+
 void pcf_hitpoint(Actor *actor, ieDword Value)
 {
 	if ((signed) Value>(signed) actor->Modified[IE_MAXHITPOINTS]) {
@@ -461,7 +501,6 @@ void pcf_entangle(Actor *actor, ieDword Value)
 
 //de/activates the sanctuary overlay
 //the sanctuary effect draws the globe half transparent
-ieDword fullwhite[7]={ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT};
 
 void pcf_sanctuary(Actor *actor, ieDword Value)
 {
@@ -470,23 +509,11 @@ void pcf_sanctuary(Actor *actor, ieDword Value)
 			ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_SANCTUARY]);
 			actor->AddVVCell(sca);
 		}
-		CharAnimations *anims = actor->GetAnims();
-		if (!anims) return; //cannot apply it (yet)
-		if (anims->lockPalette) return;
-		//force initialisation of animation
-		anims->SetColors( fullwhite );
-		anims->GetAnimation(0,0);
-		if (anims->palette) {
-			anims->lockPalette=true;
-		}
-	} else {
-		actor->RemoveVVCell(overlay[OV_SANCTUARY], true);
-		CharAnimations *anims = actor->GetAnims();
-		if (anims) {
-			anims->lockPalette=false;
-			anims->SetColors(actor->Modified+IE_COLORS);
-		}
+		SetLockedPalette(actor, fullwhite);
+		return;
 	}
+	actor->RemoveVVCell(overlay[OV_SANCTUARY], true);
+	UnlockPalette(actor);
 }
 
 //de/activates the prot from missiles overlay
@@ -633,7 +660,7 @@ NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //af
 NULL,NULL,NULL,NULL, pcf_morale, pcf_bounce, NULL, NULL, 
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //bf
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
-NULL,NULL,NULL,NULL, NULL, pcf_animid,NULL, NULL, //cf
+NULL,NULL,NULL,NULL, NULL, pcf_animid,pcf_state, NULL, //cf
 pcf_color,pcf_color,pcf_color,pcf_color, pcf_color, pcf_color, pcf_color, NULL,
 NULL,NULL,NULL,pcf_armorlevel, NULL, NULL, NULL, NULL, //df
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
