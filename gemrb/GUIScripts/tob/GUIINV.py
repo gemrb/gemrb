@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.54 2006/08/20 12:19:42 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.55 2006/09/02 10:29:24 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -60,6 +60,7 @@ def OpenInventoryWindow ():
 
 		InventoryWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
+		GemRB.SetVar ("MessageLabel", -1)
 		GemRB.SetVisible (0,1)
 		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
@@ -75,6 +76,7 @@ def OpenInventoryWindow ():
 	GemRB.LoadWindowPack ("GUIINV", 640, 480)
 	InventoryWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", InventoryWindow)
+	GemRB.SetVar ("MessageLabel", GemRB.GetControl(Window, 0x1000003f) )
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)

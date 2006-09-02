@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.127 2006/08/28 17:11:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.128 2006/09/02 10:29:24 avenger_teambg Exp $
  *
  */
 
@@ -121,7 +121,7 @@ public:
 	ieWord AppearanceFlags1;
 	ieWord AppearanceFlags2;
 
-	char KillVar[33]; //this second field is present in pst and iwd1
+	ieVariable KillVar; //this second field is present in pst and iwd1
 
 	Inventory inventory;
 	Spellbook spellbook;

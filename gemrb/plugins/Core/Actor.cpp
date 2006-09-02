@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.214 2006/08/28 17:11:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.215 2006/09/02 10:29:24 avenger_teambg Exp $
  *
  */
 
@@ -1395,7 +1395,7 @@ bool Actor::CheckOnDeath()
 		}
 	}
 	if (scriptName[0]) {
-		char varname[33];
+		ieVariable varname;
 		ieDword value = 0;
 
 		if (core->HasFeature(GF_HAS_KAPUTZ) ) {

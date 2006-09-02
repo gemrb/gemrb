@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.89 2006/08/31 17:05:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.90 2006/09/02 10:29:24 avenger_teambg Exp $
  *
  */
 
@@ -1642,16 +1642,17 @@ void GameScript::Interact(Scriptable* Sender, Action* parameters)
 	BeginDialog( Sender, parameters, BD_INTERACT );
 }
 
-static Point &FindNearPoint(Scriptable* Sender, Point &p1, Point &p2, unsigned int& distance)
+static unsigned int FindNearPoint(Scriptable* Sender, Point *&p1, Point *&p2)
 {
-	unsigned int distance1 = Distance(p1, Sender);
-	unsigned int distance2 = Distance(p2, Sender);
-	if (distance1 < distance2) {
-		distance = distance1;
-		return p1;
+	unsigned int distance1 = Distance(*p1, Sender);
+	unsigned int distance2 = Distance(*p2, Sender);
+	if (distance1 <= distance2) {
+		return distance1;
 	} else {
-		distance = distance2;
-		return p2;
+		Point *tmp = p1;
+		p1 = p2;
+		p2 = tmp;
+		return distance2;
 	}
 }
 
@@ -1738,17 +1739,21 @@ void GameScript::PickLock(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	unsigned int distance;
-	Point &p = FindNearPoint( Sender, door->toOpen[0], door->toOpen[1],
-				distance );
+	Point *p = door->toOpen;
+	Point *otherp = door->toOpen+1;
+	distance = FindNearPoint( Sender, p, otherp);
+	Actor * actor = (Actor *) Sender;
+	actor->SetOrientation( GetOrient( *otherp, actor->Pos ), false);
 	if (distance <= MAX_OPERATING_DISTANCE) {
 		if (door->Flags&DOOR_LOCKED) {
-			door->TryPickLock((Actor *) Sender);
+			door->TryPickLock(actor);
 		} else {
 			//notlocked
 		}
 	} else {
-		GoNearAndRetry(Sender, p);
+		GoNearAndRetry(Sender, *p);
 	}
+	Sender->SetWait(1);
 	Sender->ReleaseCurrentAction();
 }
 
@@ -1776,11 +1781,12 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	unsigned int distance;
-	Point &p = FindNearPoint( Sender, door->toOpen[0], door->toOpen[1],
-				distance );
+	Point *p = door->toOpen;
+	Point *otherp = door->toOpen+1;
+	distance = FindNearPoint( Sender, p, otherp);
 	if (distance <= MAX_OPERATING_DISTANCE) {
 		Actor *actor = (Actor *) Sender;
-
+		actor->SetOrientation( GetOrient( *otherp, actor->Pos ), false);
 		if (door->Flags&DOOR_LOCKED) {
 			const char *Key = door->GetKey();
 			if (!Key || !actor->inventory.HasItem(Key,0) ) {
@@ -1802,8 +1808,9 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 		}
 		door->SetDoorOpen( true, true, actor->GetID() );
 	} else {
-		GoNearAndRetry(Sender, p);
+		GoNearAndRetry(Sender, *p);
 	}
+	Sender->SetWait(1);
 	Sender->ReleaseCurrentAction();
 }
 
@@ -1831,8 +1838,9 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	unsigned int distance;
-	Point &p = FindNearPoint( Sender, door->toOpen[0], door->toOpen[1],
-				distance );	
+	Point *p = door->toOpen;
+	Point *otherp = door->toOpen+1;
+	distance = FindNearPoint( Sender, p, otherp);
 	if (distance <= MAX_OPERATING_DISTANCE) {
 		//actually if we got the key, we could still open it
 		//we need a more sophisticated check here
@@ -1842,11 +1850,13 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 			core->PlaySound(DS_CLOSE_FAIL);
 		} else {
 			Actor *actor = (Actor *) Sender;
+	actor->SetOrientation( GetOrient( *otherp, actor->Pos ), false);
 			door->SetDoorOpen( false, true, actor->GetID() );
 		}
 	} else {
-		GoNearAndRetry(Sender, p);
+		GoNearAndRetry(Sender, *p);
 	}
+	Sender->SetWait(1);
 	Sender->ReleaseCurrentAction();
 }
 
@@ -4787,10 +4797,10 @@ void GameScript::MatchHP(Scriptable* Sender, Action* parameters)
 
 void GameScript::ChangeColor(Scriptable* Sender, Action* parameters)
 {
-        if (Sender->Type!=ST_ACTOR) {
-                return;
-        }
-        Actor *scr = (Actor *) Sender;
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *scr = (Actor *) Sender;
 	ieDword stat = parameters->int0Parameter;
 	if (stat<9 || stat>14) {
 		return;
@@ -4798,3 +4808,4 @@ void GameScript::ChangeColor(Scriptable* Sender, Action* parameters)
 	stat += IE_COLORS - 9;
 	scr->SetBase(stat, (scr->GetBase(stat)&~255)|(parameters->int1Parameter&255));
 }
+

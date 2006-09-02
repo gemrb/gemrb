@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.115 2006/08/17 15:32:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.116 2006/09/02 10:29:25 avenger_teambg Exp $
  *
  */
 
@@ -164,7 +164,7 @@ private:
 	unsigned long WaitCounter;
 protected: //let Actor access this
 	Map *area;
-	char scriptName[33];
+	ieVariable scriptName;
 	ieDword InternalFlags; //for triggers
 	Scriptable* CutSceneId;
 public:
@@ -364,7 +364,7 @@ public:
 	void SetClosedTiles(unsigned short *indices, int count);
 
 public:
-	char Name[33];
+	ieVariable Name;
 	ieResRef Tileset; //or wed door ID?
 	ieDword Flags;
 	unsigned short* opentiles;
@@ -378,7 +378,7 @@ public:
 	Door(TileOverlay* Overlay);
 	~Door(void);
 public:
-	char LinkedInfo[33];
+	ieVariable LinkedInfo;
 	ieResRef ID;    //WED ID
 	TileOverlay* overlay;
 	unsigned short* tiles;
@@ -485,7 +485,7 @@ public:
 
 public:
 	ieResRef Destination;
-	char EntranceName[33];
+	ieVariable EntranceName;
 	ieDword Flags;
 	ieWord TrapDetectionDiff;
 	ieWord TrapRemovalDiff;

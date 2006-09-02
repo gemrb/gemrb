@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.119 2006/08/11 23:17:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.120 2006/09/02 10:29:25 avenger_teambg Exp $
  *
  */
 
@@ -109,7 +109,7 @@ typedef struct RestHeaderType {
 } RestHeaderType;
 
 typedef struct Entrance {
-	char Name[33];
+	ieVariable Name;
 	Point Pos;
 	ieWord Face;
 } Entrance;
@@ -125,7 +125,7 @@ public:
 
 typedef class Spawn {
 public:
-	char Name[33];
+	ieVariable Name;
 	Point Pos;
 	ieResRef *Creatures;
 	unsigned int Count;
@@ -176,7 +176,7 @@ public:
 	ieByte startchance;
 	ieDword unknown48;
 	//string values, not in any particular order
-	char Name[33];
+	ieVariable Name;
 	ieResRef BAM; //not only for saving back (StaticSequence depends on this)
 	ieResRef PaletteRef;
 	Palette* palette;

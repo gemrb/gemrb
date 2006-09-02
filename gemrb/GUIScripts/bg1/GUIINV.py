@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.23 2006/08/20 12:19:42 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.24 2006/09/02 10:29:23 avenger_teambg Exp $
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
 
@@ -61,6 +61,7 @@ def OpenInventoryWindow ():
 	GemRB.LoadWindowPack ("GUIINV")
 	InventoryWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", InventoryWindow)
+	GemRB.SetVar ("MessageLabel", GemRB.GetControl(Window, 0x1000003f) )
 	SetupMenuWindowControls (GUICommonWindows.OptionsWindow, 0, "OpenInventoryWindow")
 
 	# Ground Item

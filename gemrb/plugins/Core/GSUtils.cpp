@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.72 2006/08/17 15:32:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.73 2006/09/02 10:29:25 avenger_teambg Exp $
  *
  */
 
@@ -1204,7 +1204,7 @@ Action* GenerateActionCore(const char *src, const char *str, int acIndex)
 				int value;
 				if (*str=='*') { //there may be an IDS table
 					str++;
-					char idsTabName[33];
+					ieVariable idsTabName;
 					char* tmp = idsTabName;
 					while (( *str != ',' ) && ( *str != ')' )) {
 						*tmp = *str;
@@ -1486,7 +1486,7 @@ Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int 
 				int value;
 				if (*str=='*') { //there may be an IDS table
 					str++;
-					char idsTabName[33];
+					ieVariable idsTabName;
 					char* tmp = idsTabName;
 					while (( *str != ',' ) && ( *str != ')' )) {
 						*tmp = *str;

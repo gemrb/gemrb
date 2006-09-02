@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.55 2006/08/17 15:32:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.56 2006/09/02 10:29:25 avenger_teambg Exp $
  *
  */
 
@@ -446,7 +446,7 @@ int GameScript::NumDead(Scriptable* Sender, Trigger* parameters)
 	if (core->HasFeature(GF_HAS_KAPUTZ) ) {
 		value = CheckVariable(Sender, parameters->string0Parameter, "KAPUTZ");
 	} else {
-		char VariableName[33];
+		ieVariable VariableName;
 		snprintf(VariableName,32, "SPRITE_IS_DEAD%s",parameters->string0Parameter);
 		value = CheckVariable(Sender, VariableName, "GLOBAL" );
 	}
@@ -460,7 +460,7 @@ int GameScript::NumDeadGT(Scriptable* Sender, Trigger* parameters)
 	if (core->HasFeature(GF_HAS_KAPUTZ) ) {
 		value = CheckVariable(Sender, parameters->string0Parameter, "KAPUTZ");
 	} else {
-		char VariableName[33];
+		ieVariable VariableName;
 		snprintf(VariableName,32, "SPRITE_IS_DEAD%s",parameters->string0Parameter);
 		value = CheckVariable(Sender, VariableName, "GLOBAL" );
 	}
@@ -474,7 +474,8 @@ int GameScript::NumDeadLT(Scriptable* Sender, Trigger* parameters)
 	if (core->HasFeature(GF_HAS_KAPUTZ) ) {
 		value = CheckVariable(Sender, parameters->string0Parameter, "KAPUTZ");
 	} else {
-		char VariableName[33];
+		ieVariable VariableName;
+
 		snprintf(VariableName,32, "SPRITE_IS_DEAD%s",parameters->string0Parameter);
 		value = CheckVariable(Sender, VariableName, "GLOBAL" );
 	}
@@ -1428,7 +1429,7 @@ int GameScript::Dead(Scriptable* Sender, Trigger* parameters)
 {
 	if (parameters->string0Parameter[0]) {
 		long value;
-		char Variable[33];
+		ieVariable Variable;
 
 		if (core->HasFeature( GF_HAS_KAPUTZ )) {
 			value = CheckVariable( Sender, parameters->string0Parameter, "KAPUTZ");

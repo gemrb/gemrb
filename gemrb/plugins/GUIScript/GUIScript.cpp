@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.416 2006/08/28 17:11:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.417 2006/09/02 10:29:25 avenger_teambg Exp $
  *
  */
 
@@ -68,6 +68,14 @@
 static int SpecialItemsCount = -1;
 static int SpecialSpellsCount = -1;
 static int StoreSpellsCount = -1;
+static int UsedItemsCount = -1;
+
+typedef struct UsedItemType {
+	ieResRef itemname;
+	ieVariable username; //death variable
+	ieStrRef value;
+} UsedItemType;
+
 typedef struct SpellDescType {
 	ieResRef resref;
 	ieStrRef value;
@@ -82,6 +90,7 @@ static SpellDescType *SpecialSpells = NULL;
 static SpellDescType *StoreSpells = NULL;
 static ItemExtHeader *ItemArray = NULL;
 static SpellExtHeader *SpellArray = NULL;
+static UsedItemType *UsedItems = NULL; 
 
 static int ReputationIncrease[20]={(int) UNINIT_IEDWORD};
 static int ReputationDonation[20]={(int) UNINIT_IEDWORD};
@@ -5039,6 +5048,28 @@ table_loaded:
 	}
 }
 
+static void ReadUsedItems()
+{
+	int i;
+
+	UsedItemsCount = 0;
+	int table = core->LoadTable("item_use");
+	if (table>=0) {
+		TableMgr *tab = core->GetTable(table);
+		if (!tab) goto table_loaded;
+		UsedItemsCount = tab->GetRowCount();
+		UsedItems = (UsedItemType *) malloc( sizeof(UsedItemType) * UsedItemsCount);
+		for (i=0;i<UsedItemsCount;i++) {
+			strnlwrcpy(UsedItems[i].itemname, tab->GetRowName(i),8 );
+			strnlwrcpy(UsedItems[i].username, tab->QueryField(i,0),32 );
+			//if there are more flags, compose this value into a bitfield
+			UsedItems[i].value = atoi(tab->QueryField(i,1) );
+		}
+table_loaded:
+		core->DelTable(table);
+	}
+}
+
 static void ReadSpecialItems()
 {
 	int i;
@@ -5809,12 +5840,35 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		}
 		si = cc->RemoveItem(Slot, Count);
 	} else {
-		if (! actor->inventory.UnEquipItem( core->QuerySlot(Slot), false )) {
-			// Item is currently undroppable/cursed
+
+		///check if item is undroppable because the actor likes it
+		if (UsedItemsCount==-1) {
+			ReadUsedItems();
+		}
+		Slot = core->QuerySlot(Slot);
+		unsigned int i=UsedItemsCount;
+		//we should use GetSlotItem here.
+		//getitem would remove the item from the inventory!
+		si = actor->inventory.GetSlotItem(Slot);
+		while(i--) {
+			if (UsedItems[i].itemname[0] && strnicmp(UsedItems[i].itemname, si->ItemResRef,8) ) {
+			  continue;
+			}
+			if (UsedItems[i].username[0] && strnicmp(UsedItems[i].username, actor->GetScriptName(), 32) ) {
+			  continue;
+			}
+			core->DisplayString(UsedItems[i].value,0xffffff, IE_STR_SOUND);
 			Py_INCREF( Py_None );
 			return Py_None;
 		}
-		si = actor->inventory.RemoveItem( core->QuerySlot(Slot), Count );
+		///fixme: make difference between cursed/unmovable
+		if (! actor->inventory.UnEquipItem( Slot, false )) {
+			// Item is currently undroppable/cursed
+			core->DisplayConstantString(STR_CANT_DROP_ITEM,0xffffff);
+			Py_INCREF( Py_None );
+			return Py_None;
+		}
+		si = actor->inventory.RemoveItem( Slot, Count );
 		actor->RefreshEffects();
 		actor->ReinitQuickSlots();
 	}
@@ -5824,14 +5878,6 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	core->DragItem (si, ResRef);
-/*
-	Sprite2D *Picture = core->GetBAMSprite( ResRef, 0, 0 );
-	if (Picture == NULL) {
-		return RuntimeError( "BAM not found");
-	}
-
-	core->GetVideoDriver()->SetDragCursor (Picture);
-*/
 	core->GetGUIScriptEngine()->RunFunction("UpdateAnimation");
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -6370,8 +6416,8 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, int Index, int
 	SetButtonCycle(bam, btn, (char) row.bytes[3], IE_GUI_BUTTON_DISABLED);
 	core->FreeInterface( bam );
 	btn->SetFlags( IE_GUI_BUTTON_NORMAL, BM_SET );
-	char Event[33];
-	snprintf(Event,32, "Action%sPressed", GUIEvent[Index]);
+	ieVariable Event;
+	snprintf(Event,sizeof(Event)-1, "Action%sPressed", GUIEvent[Index]);
 	btn->SetEvent( IE_GUI_BUTTON_ON_PRESS, Event );
 	char *txt = core->GetString( GUITooltip[Index] );
 	SetFunctionTooltip(WindowIndex, ControlIndex, txt, Function);//will free txt
