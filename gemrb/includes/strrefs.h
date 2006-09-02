@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/strrefs.h,v 1.18 2006/07/02 11:23:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/strrefs.h,v 1.19 2006/09/02 10:25:10 avenger_teambg Exp $
  *
  */
 
@@ -106,7 +106,8 @@
 #define STR_OFFHAND_USED    72
 #define STR_TWOHANDED_USED  73
 #define STR_CANNOT_USE_ITEM 74
+#define STR_CANT_DROP_ITEM  75
 
-#define STRREF_COUNT 75
+#define STRREF_COUNT 76
 
 #endif //! IE_STRINGS_H

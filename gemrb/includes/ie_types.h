@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_types.h,v 1.10 2005/11/26 15:12:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_types.h,v 1.11 2006/09/02 10:25:10 avenger_teambg Exp $
  *
  */
 
@@ -62,6 +62,7 @@ typedef ieDword ieStrRef;
 
 /** Resource reference */
 typedef char ieResRef[9];
+typedef char ieVariable[33];
 
 #endif  //! IE_TYPES_H
 
