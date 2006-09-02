@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.28 2006/04/22 13:30:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.h,v 1.29 2006/09/02 21:24:47 avenger_teambg Exp $
  *
  */
 
@@ -58,6 +58,7 @@ public:
 	Animation(int count);
 	~Animation(void);
 	void AddFrame(Sprite2D* frame, unsigned int index);
+	Sprite2D* LastFrame(void);
 	Sprite2D* NextFrame(void);
 	Sprite2D* GetSyncedNextFrame(Animation* master);
 	void release(void);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.128 2006/09/02 10:29:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.129 2006/09/02 21:24:47 avenger_teambg Exp $
  *
  */
 
@@ -406,5 +406,7 @@ public:
 	void InitButtons(ieDword cls);
 	void SetFeat(unsigned int feat, int mode);
 	int GetFeat(unsigned int feat);
+	/* Returns nonzero if the caster is held */
+	int Immobile();
 };
 #endif

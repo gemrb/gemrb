@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.293 2006/08/11 23:17:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.294 2006/09/02 21:24:47 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -798,7 +798,6 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 
 	if (!DrawSelectionRect) {
 		Actor* actor = area->GetActor( p, GA_DEFAULT | GA_SELECT | GA_NO_DEAD);
-		//Actor* actor = area->GetActor( p, action);
 		Actor *lastActor = area->GetActorByGlobalID(lastActorID);
 		if (lastActor)
 			lastActor->SetOver( false );

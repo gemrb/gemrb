@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.216 2006/09/02 20:10:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.217 2006/09/02 21:24:47 avenger_teambg Exp $
  *
  */
 
@@ -1550,6 +1550,7 @@ void Actor::ReinitQuickSlots()
 
 bool Actor::ValidTarget(int ga_flags)
 {
+	if (Immobile()) return false;
 	switch(ga_flags&GA_ACTION) {
 	case GA_PICK:
 		if (Modified[IE_STATE_ID] & STATE_CANTSTEAL) return false;
@@ -1758,6 +1759,17 @@ void Actor::StopAttack()
 	}
 }
 
+int Actor::Immobile()
+{
+	if (GetStat(IE_CASTERHOLD)) {
+		return 1;
+	}
+	if (GetStat(IE_HELD)) {
+		return 1;
+	}
+	return 0;
+}
+
 //calculate how many attacks will be performed
 //in the next round
 //only called when Game thinks we are in attack
@@ -1781,10 +1793,7 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 	if (state&STATE_CANTMOVE) {
 		return;
 	}
-	if (GetStat(IE_CASTERHOLD)) {
-		return;
-	}
-	if (GetStat(IE_HELD)) {
+	if (Immobile()) {
 		return;
 	}
 
@@ -2125,7 +2134,12 @@ void Actor::Draw(Region &screen)
 	if (Trans>255) {
 		Trans=255;
 	}
+	int Frozen = Immobile();
 	int State = Modified[IE_STATE_ID];
+	if (State&STATE_STILL) {
+		Frozen = 1;
+	}
+
 	if (State&STATE_INVISIBLE) {
 		//enemies/neutrals are fully invisible if invis flag 2 set
 		if (Modified[IE_EA]>EA_GOODCUTOFF) {
@@ -2146,6 +2160,10 @@ void Actor::Draw(Region &screen)
 	//no visual feedback
 	if (Trans>255) {
 		return;
+	}
+
+	if (State&STATE_BLUR) {
+		if (Trans>192) Trans = 192;
 	}
 
 	Color tint = area->LightMap->GetPixel( cx / 16, cy / 12);
@@ -2171,7 +2189,15 @@ void Actor::Draw(Region &screen)
 			Animation* anim = anims[part];
 			Sprite2D* nextFrame;
 			if (part == 0) {
-				nextFrame = anim->NextFrame();
+				if (Frozen) {
+					nextFrame = anim->LastFrame();
+					if (Selected!=0x80) {
+						Selected = 0x80;
+						core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
+					}
+				} else {
+					nextFrame = anim->NextFrame();
+				}
 				if (nextFrame && lastFrame != nextFrame) {
 					Region newBBox;
 					if (PartCount == 1) {

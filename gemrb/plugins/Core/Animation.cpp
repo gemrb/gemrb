@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.43 2006/03/29 17:37:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Animation.cpp,v 1.44 2006/09/02 21:24:47 avenger_teambg Exp $
  *
  */
 
@@ -114,6 +114,25 @@ int Animation::GetCurrentFrame()
 	if (playReversed)
 		return indicesCount-pos-1;
 	return pos;
+}
+
+Sprite2D* Animation::LastFrame(void)
+{
+	if (!Flags&A_ANI_ACTIVE) {
+		printf("Frame fetched while animation is inactive!\n");
+		return NULL;
+	}
+	if (gameAnimation) {
+		starttime = core->GetGame()->Ticks;
+	} else {
+		GetTime( starttime );
+	}
+	Sprite2D* ret;
+	if (playReversed)
+		ret = frames[indicesCount-pos-1];
+	else
+		ret = frames[pos];
+	return ret;
 }
 
 Sprite2D* Animation::NextFrame(void)

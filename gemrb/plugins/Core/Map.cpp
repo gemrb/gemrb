@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.252 2006/08/20 15:40:27 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.253 2006/09/02 21:24:48 avenger_teambg Exp $
  *
  */
 
@@ -608,8 +608,6 @@ void Map::UpdateScripts()
 		int speed = (int) actor->GetStat(IE_MOVEMENTRATE);
 		if (speed) {
 			speed = 1500/speed;
-		} else {
-			speed = 0;
 		}
 
 		if (actor->Modified[IE_DONOTJUMP]<2) {
@@ -622,8 +620,10 @@ void Map::UpdateScripts()
 				}
 			}
 		}
-		if (!(actor->GetBase(IE_STATE_ID)&STATE_DEAD) ) {
-			actor->DoStep( speed );
+		if (!(actor->GetBase(IE_STATE_ID)&STATE_CANTMOVE) ) {
+			if (!actor->Immobile()) {
+				actor->DoStep( speed );
+			}
 			BlockSearchMap( actor->Pos, actor->size, actor->InParty?PATH_MAP_PC:PATH_MAP_NPC);
 		}
 	}
@@ -742,31 +742,6 @@ void Map::DrawContainers( Region screen, Container *overContainer)
 		}
 	}
 }
-
-/*
-Actor *Map::GetNextActor(int &q, int &index)
-{
-	Actor *actor;
-retry:
-	switch(q) {
-		case PR_SCRIPT:
-			actor = GetRoot( q, index );
-			if (actor)
-				return actor;
-			q--;
-			return NULL;
-		case PR_DISPLAY:
-			actor = GetRoot( q, index );
-			if (actor)
-				return actor;
-			q--;
-			index = Qcount[q];
-			goto retry;
-		default:
-			return NULL;
-	}
-}
-*/
 
 Actor *Map::GetNextActor(int &q, int &index)
 {
