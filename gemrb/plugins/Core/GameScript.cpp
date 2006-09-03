@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.380 2006/08/31 17:05:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.381 2006/09/03 13:20:14 avenger_teambg Exp $
  *
  */
 
@@ -2117,7 +2117,7 @@ Targets *GameScript::StrongestOfMale(Scriptable* /*Sender*/, Targets *parameters
 	//assignment intentional
 	while ( (t = parameters->GetNextTarget(m, ST_ACTOR) ) ) {
 		Actor *actor = (Actor *) t->actor;
-		if (actor->GetStat(IE_SEX)!=1) continue;
+		if (actor->GetStat(IE_SEX)!=SEX_MALE) continue;
 		int hp=actor->GetStat(IE_HITPOINTS);
 		if ((pos==-1) || (worsthp<hp)) {
 			worsthp=hp;

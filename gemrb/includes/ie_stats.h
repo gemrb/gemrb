@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.54 2006/09/02 20:23:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.55 2006/09/03 13:20:14 avenger_teambg Exp $
  *
  */
 
@@ -118,11 +118,18 @@
 #define STATE_CONFUSED   0x80000000
 
 #define STATE_STILL      0xc8       //not animated
-#define STATE_CANTMOVE   0x80080fef
+#define STATE_CANTMOVE   0x80180fef
 #define STATE_CANTLISTEN 0x80080fef
-#define STATE_CANTSTEAL  0x00080fc0 //can't steal from
+#define STATE_CANTSTEAL  0x00180fc0 //can't steal from
 #define STATE_CANTSEE    0x00080fc0 //can't explore (even itself)
 #define STATE_NOSAVE     0x00000fc0 //don't save these
+
+#define EXTSTATE_PRAYER      0x00000001
+#define EXTSTATE_PRAYER_BAD  0x00000002
+#define EXTSTATE_RECITATION  0x00000004
+#define EXTSTATE_REC_BAD     0x00000008
+#define EXTSTATE_NO_BACKSTAB 0x00004000
+#define EXTSTATE_DEAF        0x00020000
 
 //Multiclass flags
 #define MC_REMOVE_CORPSE        0x0002

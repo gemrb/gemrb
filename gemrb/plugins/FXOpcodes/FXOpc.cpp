@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.43 2006/08/19 18:08:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.44 2006/09/03 13:20:15 avenger_teambg Exp $
  *
  */
 
@@ -1857,12 +1857,16 @@ int fx_transparency_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	switch (fx->Parameter2) {
 	case 1: //fade in
 		if (fx->Parameter1<255) {
-			fx->Parameter1++;
+			if (core->GetGame()->GameTime%2) {
+				fx->Parameter1++;
+			}
 		}
 		break;
 	case 2://fade out
 		if (fx->Parameter1) {
-			fx->Parameter1--;
+			if (core->GetGame()->GameTime%2) {
+				fx->Parameter1--;
+			}
 		}
 		break;
 	}
@@ -1923,7 +1927,18 @@ int fx_cure_nondetection_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_sex_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_sex_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STAT_MOD( IE_SEX );
+	ieDword value;
+	if (fx->Parameter2) {
+		value = fx->Parameter1;
+	} else {
+		value = STAT_GET(IE_SEX);
+		if (value==SEX_MALE) {
+			value = SEX_FEMALE;
+		} else {
+			value = SEX_MALE;
+		}
+	}
+	STAT_SET( IE_SEX, value );
 	return FX_APPLIED;
 }
 
@@ -1993,7 +2008,8 @@ int fx_set_feebleminded_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_feebleminded_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STATE_SET( STATE_FEEBLE );
-	return FX_NOT_APPLIED;
+	STAT_SET( IE_INT, 3);
+	return FX_APPLIED;
 }
 
 // 0x4d Cure:Feeblemind
@@ -2085,6 +2101,7 @@ int fx_set_deaf_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 		fx->Parameter2 = 50;
 	}
 	STAT_ADD(IE_SPELLFAILUREPRIEST, fx->Parameter2);
+	EXTSTATE_SET(EXTSTATE_DEAF);
 	return FX_APPLIED;
 }
 
@@ -3898,8 +3915,7 @@ int fx_create_item_days (Actor* /*Owner*/, Actor* target, Effect* fx)
 		//duration needs a hack (recalculate it for days)
 		//no idea if this multiplier is ok
 		fx->Duration+=(fx->Duration-core->GetGame()->GameTime)*2400;
-		fx->Opcode=EffectQueue::ResolveEffect(fx_remove_inventory_item_ref
-);
+		fx->Opcode=EffectQueue::ResolveEffect(fx_remove_inventory_item_ref);
 		fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
 		return FX_APPLIED;
 	}
@@ -4284,7 +4300,7 @@ int fx_no_backstab_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	//bg2
 	STAT_SET( IE_DISABLEBACKSTAB, fx->Parameter1 );
 	//how
-	EXTSTATE_SET(0x00004000);
+	EXTSTATE_SET(EXTSTATE_NO_BACKSTAB);
 	return FX_APPLIED;
 }
 //0x125 OffscreenAIModifier

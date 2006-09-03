@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.56 2006/01/08 22:07:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.57 2006/09/03 13:20:15 avenger_teambg Exp $
  *
  */
 
@@ -164,7 +164,7 @@ int TLKImp::GenderStrRef(int slot, int malestrref, int femalestrref)
 	Actor *act;
 
 	act = GetActorFromSlot(slot);
-	if (act && (act->GetStat(IE_SEX)==2) ) {
+	if (act && (act->GetStat(IE_SEX)==SEX_FEMALE) ) {
 		return femalestrref;
 	}
 	return malestrref;
