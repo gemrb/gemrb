@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.381 2006/09/03 13:20:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.382 2006/09/09 08:08:03 avenger_teambg Exp $
  *
  */
 
@@ -352,9 +352,11 @@ static ActionLink actionnames[] = {
 	{"addglobals", GameScript::AddGlobals, 0},
 	{"addhp", GameScript::AddHP, 0},
 	{"addjournalentry", GameScript::AddJournalEntry, 0},
+	{"addkit", GameScript::AddKit, 0},
 	{"addmapnote", GameScript::AddMapnote, 0},
 	{"addpartyexperience", GameScript::AddExperienceParty, 0},
 	{"addspecialability", GameScript::AddSpecialAbility, 0},
+	{"addsuperkit", GameScript::AddSuperKit, 0},
 	{"addwaypoint", GameScript::AddWayPoint,AF_BLOCKING},
 	{"addxp2da", GameScript::AddXP2DA, 0},
 	{"addxpobject", GameScript::AddXPObject, 0},

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.56 2006/09/02 10:29:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.57 2006/09/09 08:08:03 avenger_teambg Exp $
  *
  */
 
@@ -2874,14 +2874,15 @@ int GameScript::TookDamage(Scriptable* Sender, Trigger* /*parameters*/)
 	return 0;
 }
 
+//these triggers work on the current damage (not the last damage)
 int GameScript::DamageTaken(Scriptable* Sender, Trigger* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
 		return 0;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	if (actor->LastHitter && (actor->LastDamage==parameters->int0Parameter)) {
-		Sender->AddTrigger(&actor->LastHitter);
+	int damage = actor->GetStat(IE_MAXHITPOINTS)-actor->GetStat(IE_HITPOINTS);
+	if (damage==(int) parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -2893,8 +2894,8 @@ int GameScript::DamageTakenGT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	if (actor->LastHitter && (actor->LastDamage>parameters->int0Parameter)) {
-		Sender->AddTrigger(&actor->LastHitter);
+	int damage = actor->GetStat(IE_MAXHITPOINTS)-actor->GetStat(IE_HITPOINTS);
+	if (damage>(int) parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;
@@ -2906,8 +2907,8 @@ int GameScript::DamageTakenLT(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	if (actor->LastHitter && (actor->LastDamage<parameters->int0Parameter)) {
-		Sender->AddTrigger(&actor->LastHitter);
+	int damage = actor->GetStat(IE_MAXHITPOINTS)-actor->GetStat(IE_HITPOINTS);
+	if (damage<(int) parameters->int0Parameter) {
 		return 1;
 	}
 	return 0;

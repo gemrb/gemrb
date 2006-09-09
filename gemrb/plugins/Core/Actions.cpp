@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.90 2006/09/02 10:29:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.91 2006/09/09 08:08:03 avenger_teambg Exp $
  *
  */
 
@@ -4807,5 +4807,24 @@ void GameScript::ChangeColor(Scriptable* Sender, Action* parameters)
 	}
 	stat += IE_COLORS - 9;
 	scr->SetBase(stat, (scr->GetBase(stat)&~255)|(parameters->int1Parameter&255));
+}
+
+void GameScript::AddKit(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *scr = (Actor *) Sender;
+	scr->SetBase(IE_KIT, parameters->int0Parameter);
+}
+
+void GameScript::AddSuperKit(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *scr = (Actor *) Sender;
+//remove previous kit stuff?
+	scr->SetBase(IE_KIT, parameters->int0Parameter);
 }
 
