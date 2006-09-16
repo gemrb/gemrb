@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spell.h,v 1.15 2006/08/30 19:02:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Spell.h,v 1.16 2006/09/16 13:30:15 avenger_teambg Exp $
  *
  */
 
@@ -29,7 +29,6 @@
 #ifndef SPELL_H
 #define SPELL_H
 
-#include <vector>
 #include "../../includes/ie_types.h"
 
 #include "AnimationMgr.h"

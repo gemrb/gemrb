@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.434 2006/09/02 10:26:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.435 2006/09/16 13:30:15 avenger_teambg Exp $
  *
  */
 
@@ -71,6 +71,7 @@
 #include "SaveGameMgr.h"
 #include "WorldMapControl.h"
 #include "Palette.h"
+#include "ProjectileServer.h"
 
 GEM_EXPORT Interface* core;
 
@@ -104,6 +105,7 @@ Interface::Interface(int iargc, char** iargv)
 #endif
 	textcolor( LIGHT_WHITE );
 	printf( "GemRB Core Version v%s Loading...\n", VERSION_GEMRB );
+	projserv = NULL;
 	video = NULL;
 	key = NULL;
 	strings = NULL;
@@ -365,6 +367,11 @@ Interface::~Interface(void)
 
 	FreeResourceVector( Font, fonts );
 	FreeResourceVector( Window, windows );
+
+	if (projserv) {
+		delete( projserv );
+	}
+
 	if (console) {
 		delete( console );
 	}
@@ -1007,6 +1014,9 @@ int Interface::Init()
 		printf( "Cannot Load INI\nTermination in Progress...\n" );
 		return GEM_ERROR;
 	}
+	
+	printMessage( "Core", "Creating Projectile Server...\n", WHITE );
+	projserv = new ProjectileServer();
 
 	printMessage( "Core", "Checking for Dialogue Manager...", WHITE );
 	if (!IsAvailable( IE_TLK_CLASS_ID )) {
@@ -1508,6 +1518,7 @@ int Interface::Init()
 	ret = GEM_OK;
 end_of_init:
 	FreeInterface( anim );
+
 	return ret;
 }
 
@@ -1536,6 +1547,11 @@ std::vector<InterfaceElement>* Interface::GetInterfaceVector(SClass_ID filetype)
 		return NULL;
 	}
 	return plugin->GetAllPlugin( filetype );
+}
+
+ProjectileServer* Interface::GetProjectileServer() const
+{
+	return projserv;
 }
 
 Video* Interface::GetVideoDriver() const
@@ -1996,7 +2012,7 @@ bool Interface::LoadGemRBINI()
 		return false;
 	}
 
-	printMessage( "Core", "\nLoading game type-specific GemRB setup...", WHITE );
+	printMessage( "Core", "Loading game type-specific GemRB setup...", WHITE );
 
 	if (!IsAvailable( IE_INI_CLASS_ID )) {
 		printStatus( "ERROR", LIGHT_RED );
@@ -4991,7 +5007,7 @@ int Interface::Autopause(ieDword flag)
 	if (gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS) {
 		return -1;
 	}
-	ieDword autopause_flags = ~0u; //it is -1 just for testing
+	ieDword autopause_flags = 0;
 
 	vars->Lookup("Auto Pause State", autopause_flags);
 	if (autopause_flags & flag) {

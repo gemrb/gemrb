@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.212 2006/09/02 10:26:42 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.213 2006/09/16 13:30:15 avenger_teambg Exp $
  *
  */
 
@@ -72,6 +72,7 @@ class Map;
 class ScriptedAnimation;
 class Control;
 class Palette;
+class ProjectileServer;
 
 typedef struct Table {
 	TableMgr * tm;
@@ -206,6 +207,7 @@ private:
 	PluginMgr * plugin;
 	Video * video;
 	ResourceMgr * key;
+	ProjectileServer * projserv;
 public:
 	StringMgr *strings;
 	GlobalTimer * timer;
@@ -300,6 +302,7 @@ public:
 	void * GetInterface(SClass_ID filetype);
 	std::vector<InterfaceElement>* GetInterfaceVector(SClass_ID filetype);
 	const char * TypeExt(SClass_ID type);
+	ProjectileServer* GetProjectileServer() const;
 	Video * GetVideoDriver() const;
 	ResourceMgr * GetResourceMgr() const;
 	/* returns a newly created string */

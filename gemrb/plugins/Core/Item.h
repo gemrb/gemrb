@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.28 2006/08/07 22:25:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.29 2006/09/16 13:30:15 avenger_teambg Exp $
  *
  */
 
@@ -29,7 +29,6 @@
 #ifndef ITEM_H
 #define ITEM_H
 
-#include <vector>
 #include "../../includes/ie_types.h"
 
 #include "AnimationMgr.h"
