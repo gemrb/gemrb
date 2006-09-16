@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.90 2006/08/11 23:17:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.91 2006/09/16 13:20:12 avenger_teambg Exp $
  *
  */
 
@@ -190,7 +190,7 @@ void CharAnimations::SetupColors()
 	//minor
 	memcpy( &palette->col[0x68], &palette->col[0x11], 8 * sizeof( Color ) );
 	//metal
-	memcpy( &palette->col[0x70], &palette->col[0x04], 8 * sizeof( Color ) );
+	memcpy( &palette->col[0x70], &palette->col[0x05], 8 * sizeof( Color ) );
 	//leather
 	memcpy( &palette->col[0x78], &palette->col[0x35], 8 * sizeof( Color ) );
 	//leather
