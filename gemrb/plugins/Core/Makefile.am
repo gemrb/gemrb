@@ -97,6 +97,9 @@ libgemrb_core_la_SOURCES = \
 	OpcodeMgr.cpp \
 	SpriteCover.cpp \
 	PCStatStruct.cpp \
-	Palette.cpp
+	Palette.cpp \
+	ProjectileMgr.cpp \
+	Projectile.cpp \
+	ProjectileServer.cpp
 
 noinst_HEADERS = *.h
