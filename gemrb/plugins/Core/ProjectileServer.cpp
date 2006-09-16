@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ProjectileServer.cpp,v 1.1 2006/09/16 13:30:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ProjectileServer.cpp,v 1.2 2006/09/16 13:54:44 avenger_teambg Exp $
  *
  */
 
@@ -34,6 +34,7 @@
 ProjectileServer::ProjectileServer()
 {
 	projectilecount = -1;
+	projectiles = NULL;
 }
 
 ProjectileServer::~ProjectileServer()
