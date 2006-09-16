@@ -27,6 +27,7 @@ SUBDIRS = \
 	MUSImporter \
 	MVEPlayer \
 	PLTImporter \
+	PROImporter \
 	SPLImporter \
 	STOImporter \
 	TISImporter \
