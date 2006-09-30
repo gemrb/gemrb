@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.68 2006/08/10 21:34:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.69 2006/09/30 09:44:41 avenger_teambg Exp $
  *
  */
 
@@ -98,7 +98,9 @@ public:
 	void DrawRect(Region& rgn, Color& color, bool fill = true, bool clipped = false);
 	void DrawRectSprite(Region& rgn, Color& color, Sprite2D* sprite);
 	/** This functions Draws a Circle */
-	void DrawCircle(short cx, short cy, unsigned short r, Color& color);
+	void SetPixel(short x, short y, Color& color, bool clipped = true);
+	void GetPixel(short x, short y, Color* color);
+	void DrawCircle(short cx, short cy, unsigned short r, Color& color, bool clipped = true);
 	/** This functions Draws an Ellipse */
 	void DrawEllipse(short cx, short cy, unsigned short xr, unsigned short yr,
 		Color& color, bool clipped = true);
@@ -106,7 +108,7 @@ public:
 	void DrawPolyline(Gem_Polygon* poly, Color& color, bool fill = false);
 	inline void DrawHLine(short x1, short y, short x2, Color& color, bool clipped = false);
 	inline void DrawVLine(short x, short y1, short y2, Color& color, bool clipped = false);
-	inline void DrawLine(short x1, short y1, short x2, short y2, Color& color);
+	inline void DrawLine(short x1, short y1, short x2, short y2, Color& color, bool clipped = false);
 	/** Blits a Sprite filling the Region */
 	void BlitTiled(Region rgn, Sprite2D* img, bool anchor = false);
 	/** Send a Quit Signal to the Event Queue */
@@ -139,8 +141,6 @@ public:
 	unsigned char *palette, ieDword strRef);
 	int PollMovieEvents();
 private:
-	inline void SetPixel(short x, short y, Color& color, bool clipped = true);
-	inline void GetPixel(short x, short y, Color* color);
 	void DrawMovieSubtitle(ieDword strRef);
 
 public:

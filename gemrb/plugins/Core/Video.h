@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.67 2006/08/10 21:34:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.68 2006/09/30 09:44:40 avenger_teambg Exp $
  *
  */
 
@@ -137,8 +137,10 @@ public:
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	virtual void DrawRect(Region& rgn, Color& color, bool fill = true, bool clipped = false) = 0;
 	virtual void DrawRectSprite(Region& rgn, Color& color, Sprite2D* sprite) = 0;
+	virtual void SetPixel(short x, short y, Color& color, bool clipped = false) = 0;
+	virtual void GetPixel(short x, short y, Color* color) = 0;
 	/** Draws a circle */
-	virtual void DrawCircle(short cx, short cy, unsigned short r, Color& color) = 0;
+	virtual void DrawCircle(short cx, short cy, unsigned short r, Color& color, bool clipped = true) = 0;
 	/** Draws an ellipse */
 	virtual void DrawEllipse(short cx, short cy, unsigned short xr,
 		unsigned short yr, Color& color, bool clipped = true) = 0;
@@ -147,7 +149,7 @@ public:
 		bool fill = false) = 0;
 	/** Draws a line segment */
 	virtual void DrawLine(short x1, short y1, short x2, short y2,
-		Color& color) = 0;
+		Color& color, bool clipped = false) = 0;
 	/** Blits a Sprite filling the Region */
 	virtual void BlitTiled(Region rgn, Sprite2D* img, bool anchor = false) = 0;
 	/** Set Event Manager */

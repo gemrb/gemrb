@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.146 2006/08/10 21:34:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.147 2006/09/30 09:44:41 avenger_teambg Exp $
  *
  */
 
@@ -1620,7 +1620,7 @@ void SDLVideoDriver::DrawVLine(short x, short y1, short y2, Color& color, bool c
 }
 
 void SDLVideoDriver::DrawLine(short x1, short y1, short x2, short y2,
-	Color& color)
+	Color& color, bool clipped)
 {
 	x1 -= Viewport.x;
 	x2 -= Viewport.x;
@@ -1646,14 +1646,14 @@ void SDLVideoDriver::DrawLine(short x1, short y1, short x2, short y2,
 		if (longLen > 0) {
 			longLen += y1;
 			for (int j = 0x8000 + ( x1 << 16 ); y1 <= longLen; ++y1) {
-				SetPixel( j >> 16, y1, color );	
+				SetPixel( j >> 16, y1, color, clipped );	
 				j += decInc;
 			}
 			return;
 		}
 		longLen += y1;
 		for (int j = 0x8000 + ( x1 << 16 ); y1 >= longLen; --y1) {
-			SetPixel( j >> 16, y1, color );	
+			SetPixel( j >> 16, y1, color, clipped );	
 			j -= decInc;
 		}
 		return;
@@ -1662,20 +1662,20 @@ void SDLVideoDriver::DrawLine(short x1, short y1, short x2, short y2,
 	if (longLen > 0) {
 		longLen += x1;
 		for (int j = 0x8000 + ( y1 << 16 ); x1 <= longLen; ++x1) {
-			SetPixel( x1, j >> 16, color );
+			SetPixel( x1, j >> 16, color, clipped );
 			j += decInc;
 		}
 		return;
 	}
 	longLen += x1;
 	for (int j = 0x8000 + ( y1 << 16 ); x1 >= longLen; --x1) {
-		SetPixel( x1, j >> 16, color );
+		SetPixel( x1, j >> 16, color, clipped );
 		j -= decInc;
 	}
 }
 /** This functions Draws a Circle */
 void SDLVideoDriver::DrawCircle(short cx, short cy, unsigned short r,
-	Color& color)
+	Color& color, bool clipped)
 {
 	//Uses the Breshenham's Circle Algorithm
 	long x, y, xc, yc, re;
@@ -1690,14 +1690,14 @@ void SDLVideoDriver::DrawCircle(short cx, short cy, unsigned short r,
 		SDL_LockSurface( disp );
 	}
 	while (x >= y) {
-		SetPixel( cx + ( short ) x, cy + ( short ) y, color );
-		SetPixel( cx - ( short ) x, cy + ( short ) y, color );
-		SetPixel( cx - ( short ) x, cy - ( short ) y, color );
-		SetPixel( cx + ( short ) x, cy - ( short ) y, color );
-		SetPixel( cx + ( short ) y, cy + ( short ) x, color );
-		SetPixel( cx - ( short ) y, cy + ( short ) x, color );
-		SetPixel( cx - ( short ) y, cy - ( short ) x, color );
-		SetPixel( cx + ( short ) y, cy - ( short ) x, color );
+		SetPixel( cx + ( short ) x, cy + ( short ) y, color, clipped );
+		SetPixel( cx - ( short ) x, cy + ( short ) y, color, clipped );
+		SetPixel( cx - ( short ) x, cy - ( short ) y, color, clipped );
+		SetPixel( cx + ( short ) x, cy - ( short ) y, color, clipped );
+		SetPixel( cx + ( short ) y, cy + ( short ) x, color, clipped );
+		SetPixel( cx - ( short ) y, cy + ( short ) x, color, clipped );
+		SetPixel( cx - ( short ) y, cy - ( short ) x, color, clipped );
+		SetPixel( cx + ( short ) y, cy - ( short ) x, color, clipped );
 
 		y++;
 		re += yc;
