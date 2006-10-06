@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.86 2006/08/11 23:17:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.87 2006/10/06 23:01:09 avenger_teambg Exp $
  *
  */
 
@@ -47,6 +47,7 @@ class Game;
 #include "../../includes/ie_types.h"
 #include "Actor.h"
 #include "Map.h"
+#include "Particles.h"
 #include "Variables.h"
 
 //timer counts
@@ -90,8 +91,10 @@ class Game;
 #define WB_RAIN      1
 #define WB_SNOW      2
 #define WB_FOG       3
+#define WB_MASK      7
 #define WB_LIGHTNING 8
-#define WB_START     0x80
+#define WB_HASWEATHER 0x40
+#define WB_START      0x80
 
 //Rest flags
 #define REST_NOAREA     1 //no area check
@@ -200,6 +203,7 @@ public:
 	ieResRef LoadMos;
 	Actor *timestop_owner;
 	ieDword timestop_end;
+	Particles *weather;
 	int event_timer;
 	char event_handler[64]; //like in Control
 	ieDword script_timers[MAX_TIMER];
@@ -352,6 +356,8 @@ public:
 	bool TimerActive(ieDword ID);
 	bool TimerExpired(ieDword ID);
 	void StartTimer(ieDword ID, ieDword expiration);
+	/** draw weather */
+	void DrawWeather(Region &screen, bool update);
 	/** updates current area music */
 	void ChangeSong();
 	/** Dumps information about the object */

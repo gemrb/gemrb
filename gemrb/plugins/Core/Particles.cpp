@@ -1,0 +1,254 @@
+/* GemRB - Infinity Engine Emulator
+ * Copyright (C) 2006 The GemRB Project
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ *
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Particles.cpp,v 1.1 2006/10/06 23:01:10 avenger_teambg Exp $
+ *
+ */
+
+#include "Interface.h"
+#include "Video.h"
+#include "Particles.h"
+#include "ResourceMgr.h"
+
+Color sparkcolors[MAX_SPARK_COLOR][MAX_SPARK_PHASE];
+bool inited = false;
+
+void TranslateColor(const char *value, Color &color)
+{
+	int r = 0;
+	int g = 0;
+	int b = 0;
+	//if not RGB then try to interpret it as a dword
+	if (strnicmp(value,"RGB(",4)) {
+		r = strtol(value,NULL,0);
+		color.r = r&0xff;
+		color.g = (r>>8)&0xff;
+		color.b = (r>>16)&0xff;
+		color.a = (r>>24)&0xff;
+	}
+	sscanf(value+4,"%d,%d,%d)", &r, &g, &b);
+	color.r=r;
+	color.g=g;
+	color.b=b;
+}
+
+void InitSparks()
+{
+	int i,j;
+	TableMgr * tab;
+
+	int table=core->LoadTable( "sprklclr" );
+
+	if (table<0) {
+		return;
+	}
+	tab = core->GetTable( table );
+	if (!tab) {
+		goto end;
+	}
+	memset(sparkcolors,0,sizeof(sparkcolors));
+	for (i=0;i<MAX_SPARK_COLOR;i++) {
+		for (j=0;j<MAX_SPARK_PHASE;j++) {
+			sparkcolors[i][j].a=0xff;
+		}
+	}
+	i = tab->GetRowCount();
+	if (i>MAX_SPARK_COLOR) {
+		i = MAX_SPARK_COLOR;
+	}
+	while (i--) {
+		for (int j=0;j<MAX_SPARK_PHASE;j++) {
+			//not filling the first entry
+			const char *value = tab->QueryField(i,j);
+			TranslateColor(value, sparkcolors[i+1][j]);
+		}
+	}
+end:
+	core->DelTable( table );
+}
+
+Particles::Particles(int s)
+{
+	points = (Element *) malloc(s*sizeof(Element) );
+	memset(points, -1, s*sizeof(Element) );
+	for (int i=0;i<MAX_SPARK_PHASE;i++) {
+		bitmap[i]=NULL;
+	}
+	if (!inited) {
+		InitSparks();
+	}
+	size = last_insert = s;
+}
+
+Particles::~Particles()
+{
+	if (points) {
+		free(points);
+	}
+	for (int i=0;i<MAX_SPARK_PHASE;i++) {
+		delete( bitmap[i]);
+	}
+}
+
+void Particles::SetBitmap(const ieResRef BAM)
+{
+	int i;
+
+	for (i=0;i<MAX_SPARK_PHASE;i++) {
+		delete( bitmap[i] );
+	}
+
+	AnimationFactory* af = ( AnimationFactory* )
+				  core->GetResourceMgr()->GetFactoryResource( BAM, IE_BAM_CLASS_ID );
+
+	if (af == NULL) {
+		return;
+	}
+
+	for (i=0;i<MAX_SPARK_PHASE; i++) {
+		bitmap[i] = af->GetCycle( i );
+	}
+
+	core->FreeInterface( af );
+}
+
+void Particles::AddNew(Point &pos)
+{
+	int i = last_insert;
+	while (i--) {
+		if (points[i].state == -1) {
+			points[i].state = 0;
+			points[i].pos = pos;
+			last_insert = i;
+			return;
+		}
+	}
+	i = size;
+	while (i--!=last_insert) {
+		if (points[i].state == -1) {
+			points[i].state = 0;
+			points[i].pos = pos;
+			last_insert = i;
+			return;
+		}
+	}
+}
+
+void Particles::Draw(Region &screen)
+{
+	Video *video=core->GetVideoDriver();
+	Region region = video->GetViewport();
+	int i = size;
+	while (i--) {
+		if (points[i].state == -1) {
+			continue;
+		}
+		int state = points[i].state>>8;
+		if (state>=MAX_SPARK_PHASE) {
+			points[i].state = -1;
+			continue;
+		}
+		Color clr = sparkcolors[color][state];
+		switch (type) {
+			case SP_TYPE_BITMAP:
+				if (bitmap[state]) {
+					Sprite2D *frame = bitmap[state]->GetFrame(points[i].state&255);
+					video->BlitGameSprite(frame,
+						points[i].pos.x+screen.x,
+						points[i].pos.y+screen.y, 0, clr,
+						NULL, NULL, &screen);
+				}
+				break;
+			case SP_TYPE_CIRCLE:
+				video->DrawCircle (points[i].pos.x+screen.x,
+					points[i].pos.y+screen.y, 2, clr, true);
+				break;
+			case SP_TYPE_POINT:
+				video->SetPixel (points[i].pos.x+screen.x,
+					points[i].pos.y+screen.y, clr, true);
+				break;
+			case SP_TYPE_LINE:
+				
+				video->DrawLine (points[i].pos.x+region.x,
+					points[i].pos.y+region.y,
+					points[i].pos.x+region.x+(i&3),
+					points[i].pos.y+region.y+3+((i>>2)&3), clr, true);
+				break;
+		}
+	}
+}
+
+int Particles::Update()
+{
+	int i;
+	
+	for(i=0;i<size;i++)
+	{
+		if (points[i].state==-1) {
+			continue;
+		}
+		points[i].state++;
+		switch (path) {
+		case SP_PATH_FALL:
+			points[i].pos.x+=pos.w+(i&3);
+			points[i].pos.x%=pos.w;
+			points[i].pos.y+=3+((i>>2)&3);
+			points[i].pos.y%=pos.h;
+			break;
+		case SP_PATH_FLIT:
+			points[i].pos.x+=core->Roll(1,3,pos.w-2);
+			points[i].pos.x%=pos.w;
+			points[i].pos.y+=(i&3)+1;
+			points[i].pos.y%=pos.h;
+		case SP_PATH_FOUNT:
+			if (points[i].state>pos.h) {
+				if ( (points[i].state&7) == 7) {
+				  points[i].pos.x+=(i&3)-1;
+				}
+				points[i].pos.y++;
+			} else {
+				if ( (points[i].state&7) == 7) {
+				  points[i].pos.x+=(i&3)-1;
+				}
+				points[i].pos.y--;
+			}
+			break;
+		}    
+	}
+
+	if (phase == P_GROW) {
+		i = size/10;
+		while (i--) {
+			Point p;
+			
+			switch (path) {
+			case SP_PATH_FALL:
+			case SP_PATH_FLIT:
+				p.x = core->Roll(1,pos.w,0);
+				p.y = core->Roll(1,pos.h,0);
+				break;
+			case SP_PATH_FOUNT:
+				p.x = core->Roll(1,pos.w/2,pos.w/4);
+				p.y = core->Roll(1,pos.h/2,0);
+				break;
+			}
+			AddNew(p);
+		}
+		return 0;
+	}
+	return phase;
+}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.120 2006/09/02 10:29:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.121 2006/10/06 23:01:10 avenger_teambg Exp $
  *
  */
 
@@ -281,6 +281,7 @@ public:
 	int GetBlocked(Point &p);
 	Actor* GetActorByGlobalID(ieDword objectID);
 	Actor* GetActor(Point &p, int flags);
+	Actor* GetActorInRadius(Point &p, int flags, unsigned int radius);
 	Actor* GetActor(const char* Name);
 	Actor* GetActor(int i, bool any);
 	Actor* GetActorByDialog(const char* resref);
@@ -381,6 +382,9 @@ public:
 	void TriggerSpawn(Spawn *spawn);
 	//move some or all players to a new area
 	void MoveToNewArea(const char *area, const char *entrance, int EveryOne, Actor *actor);
+	bool HasWeather();
+	int GetWeather();
+
 private:
 	AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime);
 	ScriptedAnimation *GetNextScriptedAnimation(scaIterator &iter);

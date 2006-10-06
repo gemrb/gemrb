@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.126 2006/08/11 23:17:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.127 2006/10/06 23:01:09 avenger_teambg Exp $
  *
  */
 
@@ -28,6 +28,7 @@
 #include "ScriptEngine.h"
 #include "GameControl.h"
 #include "../../includes/strrefs.h"
+#include "../../includes/defsounds.h"
 
 #define MAX_MAPS_LOADED 1
 
@@ -54,6 +55,8 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	event_timer = 0;
 	event_handler[0] = 0;
 	memset( script_timers,0, sizeof(script_timers));
+	weather = new Particles(200);
+	weather->SetRegion(0, 0, core->Width, core->Height);
 
 	//loading master areas
 	int mtab = core->LoadTable("mastarea");
@@ -88,6 +91,7 @@ Game::~Game(void)
 {
 	size_t i;
 
+	delete weather;
 	for (i = 0; i < Maps.size(); i++) {
 		delete( Maps[i] );
 	}
@@ -896,13 +900,13 @@ void Game::SetControlStatus(int value, int mode)
 }
 
 /* sets the weather type */
-void Game::StartRainOrSnow(bool conditional, int weather)
+void Game::StartRainOrSnow(bool conditional, int w)
 {
-	if (conditional && weather) {
-		if (WeatherBits & (WB_RAIN| WB_SNOW) )
+	if (conditional && w) {
+		if (WeatherBits & (WB_RAIN | WB_SNOW) )
 			return;
 	}
-	WeatherBits = weather;
+	WeatherBits = w | WB_START;
 }
 
 void Game::AddGold(ieDword add)
@@ -924,7 +928,11 @@ void Game::AddGold(ieDword add)
 //later this could be more complicated
 void Game::AdvanceTime(ieDword add)
 {
+	ieDword h = GameTime/300;
 	GameTime+=add;
+	if (h!=GameTime/300) {
+		WeatherBits&=~WB_HASWEATHER;
+	}
 	Ticks+=add*interval;
 }
 
@@ -1302,6 +1310,71 @@ void Game::StartTimer(ieDword ID, ieDword expiration)
 		return;
 	}
 	script_timers[ID]=GameTime+expiration;
+}
+
+/* this function redraws weather, taking s_weather as suggestion for
+	 new weather
+*/
+void Game::DrawWeather(Region &screen, bool update)
+{
+	if (!area->HasWeather()) {
+		return;
+	}
+
+	weather->Draw( screen );
+	if (!update) {
+		return;
+	}
+
+	if (!(WeatherBits & (WB_RAIN|WB_SNOW)) ) {
+		if (weather->GetPhase() == P_GROW) {
+			weather->SetPhase(P_FADE);
+		}
+	}
+	if (weather && (GameTime&1) ) {
+		int drawn = weather->Update();
+		if (drawn) {
+			WeatherBits &= ~WB_START;
+		}
+	}
+
+	if (WeatherBits&WB_HASWEATHER) {
+		return;
+	}
+	WeatherBits|=WB_HASWEATHER;
+	int w = area->GetWeather();
+
+	if (w & WB_LIGHTNING) {
+		WeatherBits |= WB_LIGHTNING;
+		if (WeatherBits&WB_START) {
+			//already raining
+			if (GameTime&1) {
+				core->PlaySound(DS_LIGHTNING1);
+			} else {
+				core->PlaySound(DS_LIGHTNING2);
+			}
+		} else {
+			//start raining (far)
+			core->PlaySound(DS_LIGHTNING3);
+		}
+	}
+	if (! (WeatherBits &WB_START) ) {
+		WeatherBits |= w&WB_MASK;
+		if (w&WB_SNOW) {
+			core->PlaySound(DS_SNOW);
+			weather->SetType(SP_TYPE_POINT, SP_PATH_FLIT);
+			weather->SetPhase(P_GROW);
+			weather->SetColor(SPARK_COLOR_WHITE);
+		}
+		if (w&WB_RAIN) {
+			core->PlaySound(DS_RAIN);
+			weather->SetType(SP_TYPE_LINE, SP_PATH_FALL);
+			weather->SetPhase(P_GROW);
+			weather->SetColor(SPARK_COLOR_STONE);
+		}
+	} else {
+		weather->SetPhase(P_FADE);
+	}
 }
 
 void Game::DebugDump()

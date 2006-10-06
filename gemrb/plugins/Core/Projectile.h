@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Projectile.h,v 1.1 2006/09/16 13:30:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Projectile.h,v 1.2 2006/10/06 23:01:10 avenger_teambg Exp $
  *
  */
 
@@ -30,6 +30,9 @@
 #define PROJECTILE_H
 
 #include "../../includes/ie_types.h"
+#include "PathFinder.h"
+#include "CharAnimations.h"  //contains MAX_ORIENT
+#include "Map.h"
 
 #ifdef WIN32
 
@@ -42,6 +45,14 @@
 #else
 #define GEM_EXPORT
 #endif
+
+//projectile phases
+#define P_UNINITED  -1
+#define P_TRAVEL    0       //projectile moves to target
+#define P_TRIGGER   1       //projectile hovers over target, waits for trigger
+#define P_EXPLODING 2       //projectile explosion spreads
+#define P_EXPLODED  3       //projectile spread over area
+#define P_EXPIRED   99      //projectile scheduled for removal (existing parts are still drawn)
 
 //projectile spark flags
 #define PSF_SPARKS  1
@@ -99,6 +110,77 @@ public:
 	ieWord TrailSpeed[3];
 	//
 	ProjectileExtension *Extension;
+	//internals
+protected:
+	//attributes from moveable object
+	unsigned char Orientation, NewOrientation;
+	PathNode* path; //whole path
+	PathNode* step; //actual step
+	//similar to normal actors
+	Map *area;
+	Point Pos;
+	Point Destination;
+	ieDword Target; //the globalID of target actor
+	ieDword timeStartStep;
+	int phase;
+
+	//special (not using char animations)
+	Animation* travel[MAX_ORIENT];
+	Animation* shadow[MAX_ORIENT];
+	Sprite2D* light;//this is just a round/halftrans sprite, has no animation
+	Animation** fragments;
+public:
+	PathNode *GetNextStep(int x);
+	int GetPathLength();
+//inliners to protect data consistency
+	inline PathNode * GetNextStep() {
+		if (!step) {
+			DoStep((unsigned int) ~0);
+		}
+		return step;
+	}
+
+	inline unsigned char GetOrientation() const {
+		return Orientation;
+	}
+
+	inline unsigned char GetNextFace() {
+		//slow turning
+		if (Orientation != NewOrientation) {
+			if ( ( (NewOrientation-Orientation) & (MAX_ORIENT-1) ) <= MAX_ORIENT/2) {
+				Orientation++;
+			} else {
+				Orientation--;
+			}
+			Orientation = Orientation&(MAX_ORIENT-1);
+		}
+
+		return Orientation;
+	}
+
+	inline void SetOrientation(int value, bool slow) {
+		//MAX_ORIENT == 16, so we can do this
+		NewOrientation = (unsigned char) (value&(MAX_ORIENT-1));
+		if (!slow) {
+			Orientation = NewOrientation;
+		}
+	}
+
+	void Setup();
+	void ChangePhase();
+	void DoStep(unsigned int walk_speed);
+	void AddWayPoint(Point &Des);
+	void RunAwayFrom(Point &Des, int PathLength, int flags);
+	void MoveLine(int steps, int Pass, ieDword Orient);
+	void WalkTo(Point &Des, int MinDistance = 0);
+	void MoveTo(Point &Des);
+	void ClearPath();
+	void Draw(Region &screen);
+private:
+	void CheckTrigger(unsigned int radius);
+	void DrawTravel(Region &screen);
+	void DrawExplosion(Region &screen);
+	void DrawExploded(Region &screen);
 };
 
 #endif // PROJECTILE_H

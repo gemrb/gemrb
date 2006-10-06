@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.253 2006/09/02 21:24:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.254 2006/10/06 23:01:09 avenger_teambg Exp $
  *
  */
 
@@ -1049,6 +1049,26 @@ Actor* Map::GetActor(Point &p, int flags)
 		Actor* actor = actors[i];
 		
 		if (!actor->IsOver( p ))
+			continue;
+		if (!actor->ValidTarget(flags) ) {
+			continue; 
+		}
+		if (!actor->Schedule(gametime) ) {
+			continue;
+		}
+		return actor;
+	}
+	return NULL;
+}
+
+Actor* Map::GetActorInRadius(Point &p, int flags, unsigned int radius)
+{
+	ieDword gametime = core->GetGame()->GameTime;
+	size_t i = actors.size();
+	while (i--) {
+		Actor* actor = actors[i];
+		
+		if (PersonalDistance( p, actor ) > radius)
 			continue;
 		if (!actor->ValidTarget(flags) ) {
 			continue; 
@@ -2384,6 +2404,31 @@ int Map::GetCursor( Point &p)
 		default:
 			return IE_CURSOR_TRAVEL;
 	}
+}
+
+bool Map::HasWeather()
+{
+	if (AreaType & (AT_WEATHER|AT_OUTDOOR) != (AT_WEATHER|AT_OUTDOOR) ) {
+		return false;
+	}
+	return true;
+}
+
+int Map::GetWeather()
+{
+	if (Rain>=core->Roll(1,100,0) ) {
+		if (Lightning>=core->Roll(1,100,0) ) {
+			return WB_LIGHTNING|WB_RAIN;
+		}
+		return WB_RAIN;
+	}
+	if (Snow>=core->Roll(1,100,0) ) {
+		return WB_SNOW;
+	}
+	if (Fog>=core->Roll(1,100,0) ) {
+		return WB_FOG;
+	}
+	return WB_NORMAL;
 }
 
 #define SPARKLE_PUFF   1

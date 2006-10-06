@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.294 2006/09/02 21:24:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.295 2006/10/06 23:01:09 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -249,6 +249,8 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 
 	//drawmap should be here so it updates fog of war
 	area->DrawMap( screen, this );
+	game->DrawWeather(screen, update_scripts);
+
 	//in multi player (if we ever get to it), only the server must call this
 	if (update_scripts) {
 		// the game object will run the area scripts as well

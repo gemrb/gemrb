@@ -100,6 +100,7 @@ libgemrb_core_la_SOURCES = \
 	Palette.cpp \
 	ProjectileMgr.cpp \
 	Projectile.cpp \
-	ProjectileServer.cpp
+	ProjectileServer.cpp \
+	Particles.cpp
 
 noinst_HEADERS = *.h
