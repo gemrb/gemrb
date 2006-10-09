@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/defsounds.h,v 1.3 2005/10/20 23:13:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/defsounds.h,v 1.4 2006/10/09 18:24:19 avenger_teambg Exp $
  *
  */
 
@@ -38,5 +38,11 @@
 #define DS_WINDOW_CLOSE      6
 #define DS_OPEN_FAIL         7
 #define DS_CLOSE_FAIL        8
+
+#define DS_RAIN              20
+#define DS_SNOW              21
+#define DS_LIGHTNING1        22
+#define DS_LIGHTNING2        23
+#define DS_LIGHTNING3        24
 
 #endif //! IE_SOUNDS_H
