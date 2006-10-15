@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.417 2006/09/02 10:29:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.418 2006/10/15 09:49:31 avenger_teambg Exp $
  *
  */
 
@@ -2298,6 +2298,29 @@ static PyObject* GemRB_GameSetProtagonistMode(PyObject * /*self*/, PyObject* arg
 	}
 
 	game->SetProtagonistMode( Flags );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_GameSetExpansion__doc,
+"GameSetExpansion(expmode)\n\n"
+"Sets the expansion mode, 0-no expansion, 1-expansion." );
+
+static PyObject* GemRB_GameSetExpansion(PyObject * /*self*/, PyObject* args)
+{
+	int Flags;
+
+	if (!PyArg_ParseTuple( args, "i", &Flags )) {
+		return AttributeError( GemRB_GameSetExpansion__doc );
+	}
+
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+
+	game->SetExpansion( Flags );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -7351,6 +7374,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GameSetPartySize, METH_VARARGS),
 	METHOD(GameSetProtagonistMode, METH_VARARGS),
 	METHOD(GameSetScreenFlags, METH_VARARGS),
+	METHOD(GameSetExpansion, METH_VARARGS),
 	METHOD(GameControlSetScreenFlags, METH_VARARGS),
 	METHOD(GameControlSetTargetMode, METH_VARARGS),
 	METHOD(GameControlGetTargetMode, METH_NOARGS),

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.127 2006/10/06 23:01:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.128 2006/10/15 09:49:31 avenger_teambg Exp $
  *
  */
 
@@ -38,6 +38,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	partysize = 6;
 	Ticks = 0;
 	version = 0;
+	Expansion = 0;
 	LoadMos[0] = 0;
 	SelectedSingle = 1; //the PC we are looking at (inventory, shop)
 	PartyGold = 0;
@@ -328,7 +329,7 @@ int Game::JoinParty(Actor* actor, int join)
 		int saindex = core->LoadTable( "startpos" );
 		TableMgr* strta = core->GetTable( saindex );
 		ieDword playmode = 0;
-		if (strta->GetRowCount()==6) {
+		if (Expansion) {
 			core->GetDictionary()->Lookup( "PlayMode", playmode );
 			playmode *= 2;
 		}
@@ -1375,6 +1376,11 @@ void Game::DrawWeather(Region &screen, bool update)
 	} else {
 		weather->SetPhase(P_FADE);
 	}
+}
+
+void Game::SetExpansion(int exp)
+{
+	Expansion = exp;
 }
 
 void Game::DebugDump()

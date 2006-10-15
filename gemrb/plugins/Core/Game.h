@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.87 2006/10/06 23:01:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.88 2006/10/15 09:49:31 avenger_teambg Exp $
  *
  */
 
@@ -172,6 +172,7 @@ private:
 public:
 	std::vector< Actor*> selected;
 	int version;
+	int Expansion;
 	Variables* kaputz;
 	ieByte* beasts;
 	ieByte* mazedata; //only in PST
@@ -360,6 +361,8 @@ public:
 	void DrawWeather(Region &screen, bool update);
 	/** updates current area music */
 	void ChangeSong();
+	/** sets expansion mode */
+	void SetExpansion(int exp);
 	/** Dumps information about the object */
 	void DebugDump();
 };
