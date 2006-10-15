@@ -139,6 +139,9 @@ def NewSingle():
 	GemRB.UnloadWindow(TutorialWindow)
 	GemRB.SetVar("PlayMode",0) 
 	GemRB.SetVar("Slot",1)
+	#this is tob specific code!
+	if GemRB.GetVar("oldgame")==0:
+		GemRB.GameSetExpansion()
 	GemRB.LoadGame(-1)
 	GemRB.SetNextScript("CharGen")
 	return
