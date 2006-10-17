@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.85 2006/09/02 10:30:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.86 2006/10/17 15:58:19 avenger_teambg Exp $
  *
  */
 
@@ -327,6 +327,16 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 		str->Read( &pcInfo.QuickSpellClass, 9 ); //9 bytes
 
 		str->Seek( 1, GEM_CURRENT_POS);
+		for (i = 0; i < 3; i++) {
+			str->ReadWord( &pcInfo.QuickItemSlot[i] );
+		}
+		for (i = 0; i < 3; i++) {
+			str->ReadWord( &tmpWord );
+			SanityCheck( pcInfo.QuickItemSlot[i], tmpWord, "item");
+			pcInfo.QuickItemHeader[i]=tmpWord;
+		}
+		pcInfo.QuickItemHeader[3]=0xffff;
+		pcInfo.QuickItemHeader[4]=0xffff;
 		//innates, we spare some memory and time by storing them in the
 		//same place
 		if (version == GAM_VER_IWD2) {
@@ -338,16 +348,6 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 				}
 			}
 		}
-		for (i = 0; i < 3; i++) {
-			str->ReadWord( &pcInfo.QuickItemSlot[i] );
-		}
-		for (i = 0; i < 3; i++) {
-			str->ReadWord( &tmpWord );
-			SanityCheck( pcInfo.QuickItemSlot[i], tmpWord, "item");
-			pcInfo.QuickItemHeader[i]=tmpWord;
-		}
-		pcInfo.QuickItemHeader[3]=0xffff;
-		pcInfo.QuickItemHeader[4]=0xffff;
 		//QuickSlots are customisable in iwd2 and GemRB
 		//thus we adopt the iwd2 style actor info
 		str->Seek( 72, GEM_CURRENT_POS);
