@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.435 2006/09/16 13:30:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.436 2006/10/22 12:51:34 avenger_teambg Exp $
  *
  */
 
@@ -2122,6 +2122,7 @@ bool Interface::LoadGemRBINI()
 	MaximumAbility = ini->GetKeyAsInt ("resources", "MaximumAbility", 25 );
 
 	RedrawTile = ini->GetKeyAsInt( "resources", "RedrawTile", 0 )!=0;
+	SetFeature( ini->GetKeyAsInt( "resources", "CharNameIsGabber", 0 ), GF_CHARNAMEISGABBER );
 	SetFeature( ini->GetKeyAsInt( "resources", "IWD2ScriptName", 0 ), GF_IWD2_SCRIPTNAME );
 	SetFeature( ini->GetKeyAsInt( "resources", "HasSpellList", 0 ), GF_HAS_SPELLLIST );
 	SetFeature( ini->GetKeyAsInt( "resources", "ProtagonistTalks", 0 ), GF_PROTAGONIST_TALKS );
