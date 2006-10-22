@@ -8,14 +8,14 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.57 2006/09/03 13:20:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.58 2006/10/22 12:56:01 avenger_teambg Exp $
  *
  */
 
@@ -29,9 +29,16 @@
 static int *monthnames=NULL;
 static int *days=NULL;
 static int monthnamecount=0;
+//set this to -1 if charname is gabber (iwd2)
+static int charname=0;
 
 TLKImp::TLKImp(void)
 {
+	if (core->HasFeature(GF_CHARNAMEISGABBER)) {
+	  charname=-1;
+	} else {
+	  charname=0;
+	}
 	str = NULL;
 	autoFree = false;
 	if (monthnamecount==0) {
@@ -82,7 +89,7 @@ bool TLKImp::Open(DataStream* stream, bool autoFree)
 	this->autoFree = autoFree;
 	char Signature[8];
 	str->Read( Signature, 8 );
-	if (strncmp( Signature, "TLK V1  ", 8 ) != 0) {
+	if (strncmp( Signature, "TLK V1	", 8 ) != 0) {
 		printf( "[TLKImporter]: Not a valid TLK File." );
 		return false;
 	}
@@ -102,8 +109,8 @@ inline char* mystrncpy(char* dest, const char* source, int maxlength,
 	return dest;
 }
 
-/* -1   - GABBER
-		0   - PROTAGONIST
+/* -1	 - GABBER
+		0	 - PROTAGONIST
 		1-9 - PLAYERx
 */
 inline Actor *GetActorFromSlot(int slot)
@@ -201,7 +208,7 @@ int TLKImp::BuiltinToken(char* Token, char* dest)
 {
 	char* Decoded = NULL;
 	bool freeup = true;
-	int TokenLength;   //decoded token length
+	int TokenLength;	 //decoded token length
 
 	//these are hardcoded, all engines are the same or don't use them
 	if (!strcmp( Token, "DAYANDMONTH")) {
@@ -215,12 +222,6 @@ int TLKImp::BuiltinToken(char* Token, char* dest)
 
 	if (!strcmp( Token, "FIGHTERTYPE" )) {
 		Decoded = GetString( 10086, 0 );
-		goto exit_function;
-	}
-	if (!strcmp( Token, "GABBER" )) {
-		//don't free this!
-		Decoded=core->GetGameControl()->GetSpeaker()->LongName;
-		freeup = false;
 		goto exit_function;
 	}
 	if (!strcmp( Token, "RACE" )) {
@@ -269,8 +270,14 @@ int TLKImp::BuiltinToken(char* Token, char* dest)
 		goto exit_function;
 	}
 
+	if (!strcmp( Token, "GABBER" )) {
+		//don't free this!
+		Decoded=core->GetGameControl()->GetSpeaker()->LongName;
+		freeup = false;
+		goto exit_function;
+	}
 	if (!strcmp( Token, "CHARNAME" )) {
-		Decoded = CharName(0);
+		Decoded = CharName(charname);
 		freeup = false;
 		goto exit_function;
 	}
@@ -328,7 +335,7 @@ int TLKImp::BuiltinToken(char* Token, char* dest)
 		}
 	}
 
-	return -1;  //not decided
+	return -1;	//not decided
 
 	exit_function:
 	if (Decoded) {
@@ -520,6 +527,6 @@ StringBlock TLKImp::GetStringBlock(ieStrRef strref, unsigned int flags)
 
 void TLKImp::FreeString(char *str)
 {
-        free(str);
+	free(str);
 }
 
