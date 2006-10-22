@@ -109,7 +109,7 @@ def UpdateControlStatus():
 		#gets PC currently talking
 		pc = GemRB.GameGetSelectedPCSingle (1)
 		if pc:
-			Portrait = GemRB.GetPlayerPortrait(PC-1,1)
+			Portrait = GemRB.GetPlayerPortrait(pc,1)
 		else:
 			Portrait = None
 		Button = GemRB.GetControl(TMessageWindow, 11)
