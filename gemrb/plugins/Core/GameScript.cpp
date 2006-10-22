@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.382 2006/09/09 08:08:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.383 2006/10/22 12:55:32 avenger_teambg Exp $
  *
  */
 
@@ -304,7 +304,7 @@ static TriggerLink triggernames[] = {
 	{"reputation", GameScript::Reputation, 0},
 	{"reputationgt", GameScript::ReputationGT, 0},
 	{"reputationlt", GameScript::ReputationLT, 0},
-	{"school", GameScript::Kit, 0}, //is this the same?
+	{"school", GameScript::School, 0}, //similar to kit
 	{"see", GameScript::See, 0},
 	{"sequence", GameScript::Sequence, 0},
 	{"specifics", GameScript::Specifics, 0},
