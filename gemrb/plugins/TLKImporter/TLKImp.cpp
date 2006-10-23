@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.58 2006/10/22 12:56:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.59 2006/10/23 09:48:24 avenger_teambg Exp $
  *
  */
 
@@ -89,7 +89,7 @@ bool TLKImp::Open(DataStream* stream, bool autoFree)
 	this->autoFree = autoFree;
 	char Signature[8];
 	str->Read( Signature, 8 );
-	if (strncmp( Signature, "TLK V1	", 8 ) != 0) {
+	if (strncmp( Signature, "TLK\x20V1\x20\x20", 8 ) != 0) {
 		printf( "[TLKImporter]: Not a valid TLK File." );
 		return false;
 	}
