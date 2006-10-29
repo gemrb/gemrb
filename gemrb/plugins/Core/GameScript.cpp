@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.383 2006/10/22 12:55:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.384 2006/10/29 10:39:52 avenger_teambg Exp $
  *
  */
 
@@ -33,6 +33,8 @@
 // 4 - globals
 // 8 - action execution
 //16 - trigger evaluation
+
+static bool charnameisgabber;
 
 //Make this an ordered list, so we could use bsearch!
 static TriggerLink triggernames[] = {
@@ -1112,6 +1114,13 @@ GameScript::GameScript(ieResRef ResRef, ScriptableType ScriptType,
 
 	if (!initialized) {
 		initialized = 1;
+
+		if (core->HasFeature(GF_CHARNAMEISGABBER)) {
+			charnameisgabber=true;
+		} else {
+			charnameisgabber=false;
+		}
+
 		InitScriptTables();
 		int tT = core->LoadSymbol( "trigger" );
 		int aT = core->LoadSymbol( "action" );
@@ -1728,10 +1737,19 @@ Targets *GameScript::TenthNearestDoor(Scriptable* /*Sender*/, Targets *parameter
 }
 
 //same as player1 so far
+//in iwd2 this is the Gabber!!!
 Targets *GameScript::Protagonist(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(1), 0);
+	//this sucks but IWD2 is like that...
+	if (charnameisgabber) {
+		GameControl* gc = core->GetGameControl();
+		if (gc) {
+			parameters->AddTarget(gc->GetSpeaker(), 0);
+		}
+	} else {
+		parameters->AddTarget(core->GetGame()->FindPC(1), 0);
+	}
 	return parameters;
 }
 

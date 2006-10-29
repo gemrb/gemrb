@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.91 2006/09/09 08:08:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.92 2006/10/29 10:39:51 avenger_teambg Exp $
  *
  */
 
@@ -263,8 +263,11 @@ void GameScript::ChangeStat(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) tar;
-	actor->NewStat( parameters->int0Parameter, parameters->int1Parameter,
-			parameters->int2Parameter );
+	ieDword value = parameters->int1Parameter;
+	if (parameters->int1Parameter==1) {
+		value+=actor->GetBase(parameters->int0Parameter);
+	}
+	actor->SetBase( parameters->int0Parameter, value);
 }
 
 void GameScript::ChangeStatGlobal(Scriptable* Sender, Action* parameters)
@@ -278,8 +281,10 @@ void GameScript::ChangeStatGlobal(Scriptable* Sender, Action* parameters)
 	}
 	ieDword value = (ieDword) CheckVariable( Sender, parameters->string0Parameter, parameters->string1Parameter );
 	Actor* actor = ( Actor* ) tar;
-	actor->NewStat( parameters->int0Parameter, value,
-		parameters->int1Parameter);
+	if (parameters->int1Parameter==1) {
+		value+=actor->GetBase(parameters->int0Parameter);
+	}
+	actor->SetBase( parameters->int0Parameter, value);
 }
 
 void GameScript::ChangeGender(Scriptable* Sender, Action* parameters)
@@ -329,7 +334,7 @@ void GameScript::AddHP(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) scr;
-	actor->NewStat( IE_HITPOINTS, parameters->int0Parameter, MOD_ADDITIVE );
+	actor->SetBase(IE_HITPOINTS, actor->GetBase(IE_HITPOINTS)+parameters->int0Parameter);
 }
 
 void GameScript::SetTeam(Scriptable* Sender, Action* parameters)
@@ -2024,7 +2029,7 @@ void GameScript::GivePartyGoldGlobal(Scriptable* Sender, Action* parameters)
 			gold = mygold;
 		}
 		//will get saved, not adjusted
-		act->NewStat(IE_GOLD, -gold, MOD_ADDITIVE);
+		act->SetBase(IE_GOLD, act->GetBase(IE_GOLD)-gold);
 	}
 	core->GetGame()->AddGold(gold);
 }
@@ -2044,7 +2049,7 @@ void GameScript::GivePartyGold(Scriptable* Sender, Action* parameters)
 			gold = mygold;
 		}
 		//will get saved, not adjusted
-		act->NewStat(IE_GOLD, -gold, MOD_ADDITIVE);
+		act->SetBase(IE_GOLD, act->GetBase(IE_GOLD)-gold);
 	}
 	core->GetGame()->AddGold(gold);
 }
@@ -2067,7 +2072,7 @@ void GameScript::TakePartyGold(Scriptable* Sender, Action* parameters)
 	core->GetGame()->AddGold((ieDword) -(int) gold);
 	if (Sender->Type == ST_ACTOR) {
 		Actor* act = ( Actor* ) Sender;
-		act->NewStat(IE_GOLD, gold, MOD_ADDITIVE);
+		act->SetBase(IE_GOLD, act->GetBase(IE_GOLD)+gold);
 	}
 }
 
@@ -2081,7 +2086,7 @@ void GameScript::AddXPObject(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) tar;
-	actor->NewStat(IE_XP, parameters->int0Parameter, MOD_ADDITIVE);
+	actor->SetBase(IE_XP, actor->GetBase(IE_XP)+parameters->int0Parameter);
 }
 
 void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
@@ -2130,7 +2135,7 @@ void GameScript::SetMoraleAI(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* act = ( Actor* ) Sender;
-	act->NewStat(IE_MORALE, parameters->int0Parameter, MOD_ABSOLUTE);
+	act->SetBase(IE_MORALE, parameters->int0Parameter);
 }
 
 void GameScript::IncMoraleAI(Scriptable* Sender, Action* parameters)
@@ -2139,7 +2144,7 @@ void GameScript::IncMoraleAI(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* act = ( Actor* ) Sender;
-	act->NewStat(IE_MORALE, parameters->int0Parameter, MOD_ADDITIVE);
+	act->SetBase(IE_MORALE, parameters->int0Parameter+act->GetBase(IE_MORALE) );	
 }
 
 void GameScript::MoraleSet(Scriptable* Sender, Action* parameters)
@@ -2152,7 +2157,7 @@ void GameScript::MoraleSet(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* act = ( Actor* ) tar;
-	act->NewStat(IE_MORALEBREAK, parameters->int0Parameter, MOD_ABSOLUTE);
+	act->SetBase(IE_MORALEBREAK, parameters->int0Parameter);
 }
 
 void GameScript::MoraleInc(Scriptable* Sender, Action* parameters)
@@ -2165,7 +2170,7 @@ void GameScript::MoraleInc(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* act = ( Actor* ) tar;
-	act->NewStat(IE_MORALEBREAK, parameters->int0Parameter, MOD_ADDITIVE);
+	act->SetBase(IE_MORALEBREAK, act->GetBase(IE_MORALEBREAK)+parameters->int0Parameter);
 }
 
 void GameScript::MoraleDec(Scriptable* Sender, Action* parameters)
@@ -2178,7 +2183,7 @@ void GameScript::MoraleDec(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* act = ( Actor* ) tar;
-	act->NewStat(IE_MORALEBREAK, -parameters->int0Parameter, MOD_ADDITIVE);
+	act->SetBase(IE_MORALEBREAK, act->GetBase(IE_MORALEBREAK)-parameters->int0Parameter);
 }
 
 void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
@@ -2771,8 +2776,8 @@ void GameScript::IncrementProficiency(Scriptable* Sender, Action* parameters)
 	}
 	Actor* target = ( Actor* ) tar;
 	//start of the proficiency stats
-	target->NewStat(IE_PROFICIENCYBASTARDSWORD+idx,
-		parameters->int1Parameter,MOD_ADDITIVE);
+	target->SetBase(IE_PROFICIENCYBASTARDSWORD+idx,
+		target->GetBase(IE_PROFICIENCYBASTARDSWORD+idx)+parameters->int1Parameter);
 }
 
 void GameScript::IncrementExtraProficiency(Scriptable* Sender, Action* parameters)
@@ -2785,7 +2790,7 @@ void GameScript::IncrementExtraProficiency(Scriptable* Sender, Action* parameter
 		return;
 	}
 	Actor* target = ( Actor* ) tar;
-	target->NewStat(IE_FREESLOTS, parameters->int0Parameter,MOD_ADDITIVE);
+	target->SetBase(IE_FREESLOTS, target->GetBase(IE_FREESLOTS)+parameters->int0Parameter);
 }
 
 //the third parameter is a GemRB extension
@@ -2821,7 +2826,7 @@ void GameScript::SetInternal(Scriptable* Sender, Action* parameters)
 	}
 	Actor* target = ( Actor* ) tar;
 	//start of the internal stats
-	target->NewStat(IE_INTERNAL_0+idx, parameters->int1Parameter,MOD_ABSOLUTE);
+	target->SetBase(IE_INTERNAL_0+idx, parameters->int1Parameter);
 }
 
 void GameScript::IncInternal(Scriptable* Sender, Action* parameters)
@@ -2836,7 +2841,8 @@ void GameScript::IncInternal(Scriptable* Sender, Action* parameters)
 	}
 	Actor* target = ( Actor* ) tar;
 	//start of the internal stats
-	target->NewStat(IE_INTERNAL_0+idx, parameters->int1Parameter,MOD_ADDITIVE);
+	target->SetBase(IE_INTERNAL_0+idx,
+		target->GetBase(IE_INTERNAL_0+idx)+parameters->int1Parameter);
 }
 
 void GameScript::DestroyAllEquipment(Scriptable* Sender, Action* /*parameters*/)
@@ -2881,11 +2887,11 @@ void GameScript::DestroyGold(Scriptable* Sender, Action* parameters)
 	if (Sender->Type!=ST_ACTOR)
 		return;
 	Actor *act=(Actor *) Sender;
-	int max=act->GetStat(IE_GOLD);
+	int max=(int) act->GetStat(IE_GOLD);
 	if (max>parameters->int0Parameter) {
 		max=parameters->int0Parameter;
 	}
-	act->NewStat(IE_GOLD, -max, MOD_ADDITIVE);
+	act->SetBase(IE_GOLD, act->GetBase(IE_GOLD)-max);
 }
 
 void GameScript::DestroyPartyItem(Scriptable* /*Sender*/, Action* parameters)
@@ -3014,7 +3020,7 @@ void GameScript::FullHeal(Scriptable* Sender, Action* parameters)
 	Actor *scr = (Actor *) tar;
 	//0 means full healing
 	//Heal() might contain curing of some conditions
-	//if FullHeal doesn't do that, replace this with a setstat
+	//if FullHeal doesn't do that, replace this with a SetBase
 	scr->Heal(0);
 }
 
@@ -3379,8 +3385,8 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	//pickpocket failed trigger sent to the target and sender respectively
 	//slot == -1 here means money
 	if (slot == -1) { 
-		scr->NewStat(IE_GOLD,-money,MOD_ADDITIVE);
-		snd->NewStat(IE_GOLD,money,MOD_ADDITIVE);
+		scr->SetBase(IE_GOLD,scr->GetBase(IE_GOLD)-money);
+		snd->SetBase(IE_GOLD,snd->GetBase(IE_GOLD)+money);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -3564,7 +3570,7 @@ void GameScript::Berserk(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *act = (Actor *) Sender;
-	act->NewStat(IE_STATE_ID, act->GetStat(IE_STATE_ID)|STATE_BERSERK, MOD_ABSOLUTE);
+	act->SetBaseBit(IE_STATE_ID, STATE_BERSERK, true);
 }
 
 void GameScript::Panic(Scriptable* Sender, Action* /*parameters*/)
@@ -3583,7 +3589,7 @@ void GameScript::Calm(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor *act = (Actor *) Sender;
-	act->NewStat(IE_STATE_ID, act->GetStat(IE_STATE_ID) & ~(STATE_BERSERK|STATE_PANIC), MOD_ABSOLUTE);
+	act->SetBaseBit(IE_STATE_ID, STATE_BERSERK|STATE_PANIC, false);
 }
 
 void GameScript::RevealAreaOnMap(Scriptable* /*Sender*/, Action* parameters)
@@ -3992,7 +3998,7 @@ void GameScript::SetArmourLevel(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
-	actor->NewStat( IE_ARMOR_TYPE, parameters->int0Parameter, MOD_ABSOLUTE );
+	actor->SetBase( IE_ARMOR_TYPE, parameters->int0Parameter );
 }
 
 void GameScript::RandomWalk(Scriptable* Sender, Action* /*parameters*/)
