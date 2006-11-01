@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.89 2006/08/11 23:17:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.90 2006/11/01 10:23:29 avenger_teambg Exp $
  */
 
 /**
@@ -140,6 +140,8 @@ public: //Events
 	void SetDialogueFlags(int value, int mode);
 	int GetScreenFlags() { return ScreenFlags; }
 	int GetDialogueFlags() { return DialogueFlags; }
+	/** this function is called from the area when autosave is needed */
+	void AutoSave();
 private:
 	/** this function is called when the user presses 'q' (or equivalent) */
 	void QuickSave();

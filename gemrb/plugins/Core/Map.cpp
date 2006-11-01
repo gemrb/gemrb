@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.254 2006/10/06 23:01:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.255 2006/11/01 10:23:29 avenger_teambg Exp $
  *
  */
 
@@ -462,6 +462,9 @@ void Map::MoveToNewArea(const char *area, const char *entrance, int EveryOne, Ac
 	//check worldmap entry, if that doesn't contain anything,
 	//make a random pick
 
+	if (EveryOne==CT_WHOLE) {
+		core->GetGameControl()->AutoSave();
+	}
 	Game* game = core->GetGame();
 	Map* map = game->GetMap(area, false);
 	if (!map) {

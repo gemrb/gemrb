@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.295 2006/10/06 23:01:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.296 2006/11/01 10:23:29 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -201,6 +201,21 @@ GameControl::~GameControl(void)
 	}
 	if (dlg) {
 		delete dlg;
+	}
+}
+
+void GameControl::AutoSave()
+{
+	const char *folder;
+
+	int SlotTable = core->LoadTable( "savegame" );
+	if (SlotTable >= 0) {
+		TableMgr* tab = core->GetTable( SlotTable );
+		folder = tab->QueryField(0);
+		core->GetSaveGameIterator()->CreateSaveGame(0, folder, 0);
+		if (SlotTable >= 0) {
+			core->DelTable(SlotTable);
+		}
 	}
 }
 
