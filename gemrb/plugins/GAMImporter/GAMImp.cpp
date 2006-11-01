@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.87 2006/10/22 12:52:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.88 2006/11/01 10:27:50 avenger_teambg Exp $
  *
  */
 
@@ -734,7 +734,7 @@ int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CRE
 	int i;
 	ieDword tmpDword;
 	ieWord tmpWord;
-	char filling[218];
+	char filling[194];
 
 	memset(filling,0,sizeof(filling) );
 	if (ac->Selected) {
@@ -742,6 +742,7 @@ int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CRE
 	} else {
 		tmpWord=0;
 	}
+  
 	stream->WriteWord( &tmpWord);
 	tmpWord = ac->InParty-1;
 	stream->WriteWord( &tmpWord);
@@ -763,34 +764,84 @@ int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CRE
 	tmpWord = ac->Pos.y;
 	stream->WriteWord( &tmpWord);
 	//a lot of crap
-	stream->Write( filling, 50);
-	stream->Write( filling, 50);
-	//4 quickweapons, lets make 0xff
-	tmpWord = (ieWord) -1;
-	stream->WriteWord( &tmpWord);
-	stream->WriteWord( &tmpWord);
-	stream->WriteWord( &tmpWord);
-	stream->WriteWord( &tmpWord);
-	//some resrefs (quickspells?)
-	stream->Write(filling,8);
-	stream->Write(filling,8);
-	stream->Write(filling,8);
-	stream->Write(filling,8);
-	//more weirdo, quickitems?
-	stream->WriteWord( &tmpWord);
-	stream->WriteWord( &tmpWord);
-	stream->WriteWord( &tmpWord);
-	stream->WriteWord( &tmpWord);
-	stream->WriteWord( &tmpWord);
-	stream->WriteWord( &tmpWord);
+	stream->Write( filling, 100);
+
+  //quickweapons
+  if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
+    for (i=0;i<4;i++) {
+      stream->WriteWord(ac->PCStats->QuickWeaponSlots+i);
+      stream->WriteWord(ac->PCStats->QuickWeaponSlots+4+i);
+    }
+    for (i=0;i<4;i++) {
+      stream->WriteWord(ac->PCStats->QuickWeaponHeaders+i);
+      stream->WriteWord(ac->PCStats->QuickWeaponHeaders+4+i);
+    }
+  } else {
+    for (i=0;i<4;i++) {
+      stream->WriteWord(ac->PCStats->QuickWeaponSlots+i);
+    }
+    for (i=0;i<4;i++) {
+      stream->WriteWord(ac->PCStats->QuickWeaponHeaders+i);
+    }
+  }
+
+  //quickspells
+  if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
+    for (i=0;i<MAX_QSLOTS;i++) {
+      if (ac->PCStats->QuickSpellClass[i]==0xff) {
+        stream->Write(filling,8);
+      } else {
+  	    stream->Write(ac->PCStats->QuickSpells[i],8);
+      }
+    }
+    //quick spell classes
+    stream->Write(ac->PCStats->QuickSpellClass,MAX_QSLOTS);
+    stream->Write(filling,1);
+  } else {
+    for (i=0;i<3;i++) {
+  	  stream->Write(ac->PCStats->QuickSpells[i],8);
+    }
+  }
+
+  //quick items
+  switch (version) {
+  case GAM_VER_PST: case GAM_VER_GEMRB:
+    for (i=0;i<MAX_QUICKITEMSLOT;i++) {
+      stream->WriteWord(ac->PCStats->QuickItemSlots+i);
+    }
+    for (i=0;i<MAX_QUICKITEMSLOT;i++) {
+      stream->WriteWord(ac->PCStats->QuickItemHeaders+i);
+    }
+    break;
+  default:
+    for (i=0;i<3;i++) {
+      stream->WriteWord(ac->PCStats->QuickItemSlots+i);
+    }
+    for (i=0;i<3;i++) {
+      stream->WriteWord(ac->PCStats->QuickItemHeaders+i);
+    }
+    break;
+  }
+
+  //innates
+  if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
+    for (i=0;i<MAX_QSLOTS;i++) {
+      if (ac->PCStats->QuickSpellClass[i]==0xff) {
+    	  stream->Write(ac->PCStats->QuickSpells[i],8);
+      } else {
+        stream->Write(filling,8);
+      }
+    }
+  }
 
 	if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
-		stream->Write( filling, 218);
+		stream->Write( filling, 72);
 		for (i=0;i<MAX_QSLOTS;i++) {
 			tmpDword = ac->PCStats->QSlots[i];
 			stream->WriteDword( &tmpDword);
 		}
 	}
+
 	if (ac->LongStrRef==0xffffffff) {
 		strncpy(filling, ac->LongName, 32);
 	} else {
@@ -829,6 +880,9 @@ int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CRE
 	if (core->HasFeature(GF_SOUNDFOLDERS) ) {
 		stream->Write(ac->PCStats->SoundFolder, 32);
 	}
+  if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
+    stream->Write(filling, 194);
+  }
 	return 0;
 }
 
