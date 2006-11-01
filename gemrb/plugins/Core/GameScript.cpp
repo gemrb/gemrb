@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.384 2006/10/29 10:39:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.385 2006/11/01 10:25:46 avenger_teambg Exp $
  *
  */
 
@@ -1736,8 +1736,10 @@ Targets *GameScript::TenthNearestDoor(Scriptable* /*Sender*/, Targets *parameter
 	return XthNearestDoor(parameters, 9);
 }
 
-//same as player1 so far
+//in bg2 it is same as player1 so far
 //in iwd2 this is the Gabber!!!
+//but also, if there is no gabber, it is the first PC
+//probably it is simply the nearest exportable character...
 Targets *GameScript::Protagonist(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
@@ -1747,9 +1749,11 @@ Targets *GameScript::Protagonist(Scriptable* /*Sender*/, Targets *parameters)
 		if (gc) {
 			parameters->AddTarget(gc->GetSpeaker(), 0);
 		}
-	} else {
-		parameters->AddTarget(core->GetGame()->FindPC(1), 0);
+		if (parameters->Count()) {
+			return parameters;
+		}
 	}
+	parameters->AddTarget(core->GetGame()->FindPC(1), 0);
 	return parameters;
 }
 
