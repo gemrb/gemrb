@@ -82,14 +82,14 @@ Graphics:
    and in BMPImporter
 2. move SDLVideoDriver sprite functions to their own file, rename them to 
    SpriteIsPixelTransparent etc.
-3. Add PNG support?
+3. Add PNG support? (still image done)
 
 Sound:
 1. valgrind reports invalid memory access due to Unqueueing buffers and using 
    them in another thread (openal weirdness?)
 2. sounds get sometimes distorted, might be connected to problem #1
-3. make sure GemRB vs. OpenAL still works on both Win32 and Linux
-
+3. make sure GemRB vs. OpenAL still works on both Win32 and Linux (done)
+4. Separate OpenAL interface from ACM loader and MVE player
 
 Building:
 1. fix include paths during compilation, so the files do not 
