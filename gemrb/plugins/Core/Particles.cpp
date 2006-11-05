@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Particles.cpp,v 1.1 2006/10/06 23:01:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Particles.cpp,v 1.2 2006/11/05 11:11:45 avenger_teambg Exp $
  *
  */
 
@@ -113,7 +113,7 @@ void Particles::SetBitmap(const ieResRef BAM)
 	}
 
 	AnimationFactory* af = ( AnimationFactory* )
-				  core->GetResourceMgr()->GetFactoryResource( BAM, IE_BAM_CLASS_ID );
+					core->GetResourceMgr()->GetFactoryResource( BAM, IE_BAM_CLASS_ID );
 
 	if (af == NULL) {
 		return;
@@ -126,26 +126,28 @@ void Particles::SetBitmap(const ieResRef BAM)
 	core->FreeInterface( af );
 }
 
-void Particles::AddNew(Point &pos)
+bool Particles::AddNew(Point &point)
 {
+	int st=(MAX_SPARK_PHASE<<4) + core->Roll(2,pos.h,0);
 	int i = last_insert;
 	while (i--) {
 		if (points[i].state == -1) {
-			points[i].state = 0;
-			points[i].pos = pos;
+			points[i].state = st;
+			points[i].pos = point;
 			last_insert = i;
-			return;
+			return false;
 		}
 	}
 	i = size;
 	while (i--!=last_insert) {
 		if (points[i].state == -1) {
-			points[i].state = 0;
-			points[i].pos = pos;
+			points[i].state = st;
+			points[i].pos = point;
 			last_insert = i;
-			return;
+			return false;
 		}
 	}
+	return true;
 }
 
 void Particles::Draw(Region &screen)
@@ -157,10 +159,11 @@ void Particles::Draw(Region &screen)
 		if (points[i].state == -1) {
 			continue;
 		}
-		int state = points[i].state>>8;
+		int state = points[i].state>>4;
 		if (state>=MAX_SPARK_PHASE) {
-			points[i].state = -1;
-			continue;
+			state = 0;
+		} else {
+			state=MAX_SPARK_PHASE-state;
 		}
 		Color clr = sparkcolors[color][state];
 		switch (type) {
@@ -192,16 +195,44 @@ void Particles::Draw(Region &screen)
 	}
 }
 
+void Particles::AddParticles(int count)
+{
+	while (count--) {
+		Point p;
+		
+		switch (path) {
+		case SP_PATH_FALL:
+		case SP_PATH_FLIT:
+			p.x = core->Roll(1,pos.w,0);
+			p.y = core->Roll(1,pos.h/2,0);
+			break;
+		case SP_PATH_FOUNT:
+			p.x = core->Roll(1,pos.w/2,pos.w/4);
+			p.y = core->Roll(1,pos.h/2,0);
+			break;
+		}
+		if (AddNew(p) ) {
+			break;
+	 	}
+	}
+}
+
 int Particles::Update()
 {
+	int drawn=false;
 	int i;
-	
-	for(i=0;i<size;i++)
-	{
+
+	int grow = size/10;
+	for(i=0;i<size;i++) {
 		if (points[i].state==-1) {
 			continue;
 		}
-		points[i].state++;
+		drawn=true;
+ 		if (!points[i].state) {
+			grow++;
+		}
+		points[i].state--;
+
 		switch (path) {
 		case SP_PATH_FALL:
 			points[i].pos.x+=pos.w+(i&3);
@@ -210,45 +241,34 @@ int Particles::Update()
 			points[i].pos.y%=pos.h;
 			break;
 		case SP_PATH_FLIT:
+			if (points[i].state<=MAX_SPARK_PHASE<<4) {
+				break;
+			}
 			points[i].pos.x+=core->Roll(1,3,pos.w-2);
 			points[i].pos.x%=pos.w;
 			points[i].pos.y+=(i&3)+1;
-			points[i].pos.y%=pos.h;
+			break;
 		case SP_PATH_FOUNT:
-			if (points[i].state>pos.h) {
+			if (points[i].state<=MAX_SPARK_PHASE<<4) {
+				break;
+			}
+			if (points[i].state>(MAX_SPARK_PHASE<<4)+pos.h) {
 				if ( (points[i].state&7) == 7) {
-				  points[i].pos.x+=(i&3)-1;
+					points[i].pos.x+=(i&3)-1;
 				}
 				points[i].pos.y++;
 			} else {
 				if ( (points[i].state&7) == 7) {
-				  points[i].pos.x+=(i&3)-1;
+					points[i].pos.x+=(i&3)-1;
 				}
 				points[i].pos.y--;
 			}
 			break;
 		}    
 	}
-
-	if (phase == P_GROW) {
-		i = size/10;
-		while (i--) {
-			Point p;
-			
-			switch (path) {
-			case SP_PATH_FALL:
-			case SP_PATH_FLIT:
-				p.x = core->Roll(1,pos.w,0);
-				p.y = core->Roll(1,pos.h,0);
-				break;
-			case SP_PATH_FOUNT:
-				p.x = core->Roll(1,pos.w/2,pos.w/4);
-				p.y = core->Roll(1,pos.h/2,0);
-				break;
-			}
-			AddNew(p);
-		}
-		return 0;
+	if (phase==P_GROW) {
+		AddParticles(grow);
+		drawn=true;
 	}
-	return phase;
+	return drawn;
 }

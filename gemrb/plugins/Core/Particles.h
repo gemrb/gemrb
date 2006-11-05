@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Particles.h,v 1.1 2006/10/06 23:01:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Particles.h,v 1.2 2006/11/05 11:11:45 avenger_teambg Exp $
  *
  */
 
@@ -88,8 +88,10 @@ public:
 		pos.h = h;
 	}
 	void SetColor(ieByte c) { color=c; }
-	void AddNew(Point &pos);
+	/* returns true if it cannot add new elements */
+	bool AddNew(Point &point);
 	void Draw(Region &screen);
+	void AddParticles(int count);
 	/* returns true if it could be destroyed (didn't draw anything) */
 	int Update();
 public:
@@ -99,7 +101,6 @@ public:
 	ieWord last_insert;//last spark idx added
 	Scriptable *owner; //could be area or game
 	Region pos;
-	ieWord width;
 	ieByte phase;      //global phase
 	ieByte type;       //draw type (snow, rain)
 	ieByte path;       //path type

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.255 2006/11/01 10:23:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.256 2006/11/05 11:11:45 avenger_teambg Exp $
  *
  */
 
@@ -2411,7 +2411,7 @@ int Map::GetCursor( Point &p)
 
 bool Map::HasWeather()
 {
-	if (AreaType & (AT_WEATHER|AT_OUTDOOR) != (AT_WEATHER|AT_OUTDOOR) ) {
+	if ((AreaType & (AT_WEATHER|AT_OUTDOOR) ) != (AT_WEATHER|AT_OUTDOOR) ) {
 		return false;
 	}
 	return true;
