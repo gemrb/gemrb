@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.147 2006/09/30 09:44:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.148 2006/11/05 18:07:13 avenger_teambg Exp $
  *
  */
 
@@ -1622,10 +1622,12 @@ void SDLVideoDriver::DrawVLine(short x, short y1, short y2, Color& color, bool c
 void SDLVideoDriver::DrawLine(short x1, short y1, short x2, short y2,
 	Color& color, bool clipped)
 {
-	x1 -= Viewport.x;
-	x2 -= Viewport.x;
-	y1 -= Viewport.y;
-	y2 -= Viewport.y;
+	if (clipped) {
+		x1 -= Viewport.x;
+		x2 -= Viewport.x;
+		y1 -= Viewport.y;
+		y2 -= Viewport.y;
+	}
 	bool yLonger = false;
 	int shortLen = y2 - y1;
 	int longLen = x2 - x1;
@@ -1864,11 +1866,11 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, Color& color, bool fill)
 	unsigned int i;
 
 	for (i = 1; i < poly->count; i++) {
-		DrawLine( lastX, lastY, poly->points[i].x, poly->points[i].y, color );
+		DrawLine( lastX, lastY, poly->points[i].x, poly->points[i].y, color, true );
 		lastX = poly->points[i].x;
 		lastY = poly->points[i].y;
 	}
-	DrawLine( lastX, lastY, poly->points[0].x, poly->points[0].y, color );
+	DrawLine( lastX, lastY, poly->points[0].x, poly->points[0].y, color, true );
 
 	return;
 }
