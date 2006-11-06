@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PNGImporter/PNGImp.cpp,v 1.3 2006/08/22 22:11:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/PNGImporter/PNGImp.cpp,v 1.4 2006/11/06 19:08:37 avenger_teambg Exp $
  *
  */
 
@@ -171,13 +171,13 @@ Sprite2D* PNGImp::GetImage()
 	Sprite2D* spr = 0;
 	unsigned char* buffer = 0;
 	png_bytep* row_pointers = new png_bytep[Height];
-	buffer = new unsigned char[(hasPalette?1:4)*Width*Height];
+	buffer = (unsigned char *) malloc((hasPalette?1:4)*Width*Height);
 	for (unsigned int i = 0; i < Height; ++i)
 		row_pointers[i] = reinterpret_cast<png_bytep>(&buffer[(hasPalette?1:4)*i*Width]);
 
     if (setjmp(png_jmpbuf(inf->png_ptr))) {
 		delete[] row_pointers;
-		delete[] buffer;
+		free( buffer );
         png_destroy_read_struct(&inf->png_ptr, &inf->info_ptr, &inf->end_info);
         return false;
     }
