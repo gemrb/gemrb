@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Particles.cpp,v 1.2 2006/11/05 11:11:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Particles.cpp,v 1.3 2006/11/06 19:15:41 avenger_teambg Exp $
  *
  */
 
@@ -92,6 +92,7 @@ Particles::Particles(int s)
 		InitSparks();
 	}
 	size = last_insert = s;
+	phase = P_FADE;
 }
 
 Particles::~Particles()

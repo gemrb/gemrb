@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.128 2006/10/15 09:49:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.129 2006/11/06 19:15:41 avenger_teambg Exp $
  *
  */
 
@@ -1318,6 +1318,9 @@ void Game::StartTimer(ieDword ID, ieDword expiration)
 */
 void Game::DrawWeather(Region &screen, bool update)
 {
+	if (!weather) {
+		return;
+	}
 	if (!area->HasWeather()) {
 		return;
 	}
@@ -1332,7 +1335,7 @@ void Game::DrawWeather(Region &screen, bool update)
 			weather->SetPhase(P_FADE);
 		}
 	}
-	if (weather && (GameTime&1) ) {
+	if (GameTime&1) {
 		int drawn = weather->Update();
 		if (drawn) {
 			WeatherBits &= ~WB_START;
