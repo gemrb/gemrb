@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.92 2006/10/29 10:39:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.93 2006/11/11 12:18:28 avenger_teambg Exp $
  *
  */
 
@@ -182,11 +182,11 @@ void GameScript::RealSetGlobalTimer(Scriptable* Sender, Action* parameters)
 
 void GameScript::ChangeAllegiance(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!scr) {
-		return;
+	Scriptable *scr = Sender;
+	if (parameters->objects[1]) {
+		scr=GetActorFromObject( Sender, parameters->objects[1] );
 	}
-	if (scr->Type != ST_ACTOR) {
+	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
 	Actor* actor = ( Actor* ) scr;
@@ -195,11 +195,11 @@ void GameScript::ChangeAllegiance(Scriptable* Sender, Action* parameters)
 
 void GameScript::ChangeGeneral(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!scr) {
-		return;
+	Scriptable *scr = Sender;
+	if (parameters->objects[1]) {
+		scr=GetActorFromObject( Sender, parameters->objects[1] );
 	}
-	if (scr->Type != ST_ACTOR) {
+	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
 	Actor* actor = ( Actor* ) scr;
@@ -208,7 +208,10 @@ void GameScript::ChangeGeneral(Scriptable* Sender, Action* parameters)
 
 void GameScript::ChangeRace(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable *scr = Sender;
+	if (parameters->objects[1]) {
+		scr=GetActorFromObject( Sender, parameters->objects[1] );
+	}
 	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
@@ -218,7 +221,10 @@ void GameScript::ChangeRace(Scriptable* Sender, Action* parameters)
 
 void GameScript::ChangeClass(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable *scr = Sender;
+	if (parameters->objects[1]) {
+		scr=GetActorFromObject( Sender, parameters->objects[1] );
+	}
 	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
@@ -237,15 +243,20 @@ void GameScript::SetNamelessDisguise(Scriptable* Sender, Action* parameters)
 {
 	SetVariable(Sender, "APPEARANCE", "GLOBAL", parameters->int0Parameter);
 //maybe add a guiscript call here ?
+/*
 	if (parameters->int0Parameter) {
 	} else {
-		
+
 	}
+*/
 }
 
 void GameScript::ChangeSpecifics(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable *scr = Sender;
+	if (parameters->objects[1]) {
+		scr=GetActorFromObject( Sender, parameters->objects[1] );
+	}
 	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
@@ -255,14 +266,14 @@ void GameScript::ChangeSpecifics(Scriptable* Sender, Action* parameters)
 
 void GameScript::ChangeStat(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!tar) {
+	Scriptable *scr = Sender;
+	if (parameters->objects[1]) {
+		scr=GetActorFromObject( Sender, parameters->objects[1] );
+	}
+	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
-	if (tar->Type != ST_ACTOR) {
-		return;
-	}
-	Actor* actor = ( Actor* ) tar;
+	Actor* actor = ( Actor* ) scr;
 	ieDword value = parameters->int1Parameter;
 	if (parameters->int1Parameter==1) {
 		value+=actor->GetBase(parameters->int0Parameter);
@@ -272,15 +283,15 @@ void GameScript::ChangeStat(Scriptable* Sender, Action* parameters)
 
 void GameScript::ChangeStatGlobal(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!tar) {
-		return;
+	Scriptable *scr = Sender;
+	if (parameters->objects[1]) {
+		scr=GetActorFromObject( Sender, parameters->objects[1] );
 	}
-	if (tar->Type != ST_ACTOR) {
+	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
 	ieDword value = (ieDword) CheckVariable( Sender, parameters->string0Parameter, parameters->string1Parameter );
-	Actor* actor = ( Actor* ) tar;
+	Actor* actor = ( Actor* ) scr;
 	if (parameters->int1Parameter==1) {
 		value+=actor->GetBase(parameters->int0Parameter);
 	}
@@ -289,7 +300,10 @@ void GameScript::ChangeStatGlobal(Scriptable* Sender, Action* parameters)
 
 void GameScript::ChangeGender(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable *scr = Sender;
+	if (parameters->objects[1]) {
+		scr=GetActorFromObject( Sender, parameters->objects[1] );
+	}
 	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
@@ -299,7 +313,10 @@ void GameScript::ChangeGender(Scriptable* Sender, Action* parameters)
 
 void GameScript::ChangeAlignment(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable *scr = Sender;
+	if (parameters->objects[1]) {
+		scr=GetActorFromObject( Sender, parameters->objects[1] );
+	}
 	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
@@ -309,7 +326,10 @@ void GameScript::ChangeAlignment(Scriptable* Sender, Action* parameters)
 
 void GameScript::SetFaction(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable *scr = Sender;
+	if (parameters->objects[1]) {
+		scr=GetActorFromObject( Sender, parameters->objects[1] );
+	}
 	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
@@ -319,7 +339,10 @@ void GameScript::SetFaction(Scriptable* Sender, Action* parameters)
 
 void GameScript::SetHP(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable *scr = Sender;
+	if (parameters->objects[1]) {
+		scr=GetActorFromObject( Sender, parameters->objects[1] );
+	}
 	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
@@ -329,7 +352,10 @@ void GameScript::SetHP(Scriptable* Sender, Action* parameters)
 
 void GameScript::AddHP(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable *scr = Sender;
+	if (parameters->objects[1]) {
+		scr=GetActorFromObject( Sender, parameters->objects[1] );
+	}
 	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
@@ -337,9 +363,14 @@ void GameScript::AddHP(Scriptable* Sender, Action* parameters)
 	actor->SetBase(IE_HITPOINTS, actor->GetBase(IE_HITPOINTS)+parameters->int0Parameter);
 }
 
+//this works on an object (pst)
+//but can also work on actor itself (gemrb)
 void GameScript::SetTeam(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable *scr = Sender;
+	if (parameters->objects[1]) {
+		scr=GetActorFromObject( Sender, parameters->objects[1] );
+	}
 	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
@@ -347,14 +378,19 @@ void GameScript::SetTeam(Scriptable* Sender, Action* parameters)
 	actor->SetBase( IE_TEAM, parameters->int0Parameter );
 }
 
+//this works on an object (gemrb)
+//or on Myself if object isn't given (iwd2)
 void GameScript::SetTeamBit(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable *scr = Sender;
+	if (parameters->objects[1]) {
+		scr=GetActorFromObject( Sender, parameters->objects[1] );
+	}
 	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
 	Actor* actor = ( Actor* ) scr;
-	if (parameters->int0Parameter) {
+	if (parameters->int1Parameter) {
 		actor->SetBase( IE_TEAM, actor->GetStat(IE_TEAM) | parameters->int0Parameter );
 	} else {
 		actor->SetBase( IE_TEAM, actor->GetStat(IE_TEAM) & ~parameters->int0Parameter );
@@ -2092,13 +2128,13 @@ void GameScript::AddXPObject(Scriptable* Sender, Action* parameters)
 void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
 {
 	int xptable;
-	
+
 	if (core->HasFeature(GF_HAS_EXPTABLE) ) {
 		xptable = core->LoadTable("exptable");
 	} else {
 		xptable = core->LoadTable( "xplist" );
 	}
-	
+
 	if (parameters->int0Parameter>0) {
 		core->DisplayString(parameters->int0Parameter, 0x40f0f000,IE_STR_SOUND);
 	}
@@ -2107,7 +2143,7 @@ void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
 		return;
 	}
 	const char * xpvalue = core->GetTable( xptable )->QueryField( parameters->string0Parameter, "0" ); //level is unused
-	
+
 	if ( xpvalue[0]=='P' && xpvalue[1]=='_') {
 		//divide party xp
 		core->GetGame()->ShareXP(atoi(xpvalue+2), true );
@@ -2144,7 +2180,7 @@ void GameScript::IncMoraleAI(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* act = ( Actor* ) Sender;
-	act->SetBase(IE_MORALE, parameters->int0Parameter+act->GetBase(IE_MORALE) );	
+	act->SetBase(IE_MORALE, parameters->int0Parameter+act->GetBase(IE_MORALE) );
 }
 
 void GameScript::MoraleSet(Scriptable* Sender, Action* parameters)
@@ -3149,7 +3185,7 @@ void GameScript::CreateItem(Scriptable *Sender, Action* parameters)
 		default:
 			return;
 	}
-	
+
 	CREItem *item = new CREItem();
 	CreateItemCore(item, parameters->string0Parameter, parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter);
 	if (tar->Type==ST_CONTAINER) {
@@ -3197,7 +3233,7 @@ void GameScript::TakeItemReplace(Scriptable *Sender, Action* parameters)
 	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
-	
+
 	Actor *scr = (Actor *) tar;
 	CREItem *item;
 	int slot = scr->inventory.RemoveItem(parameters->string1Parameter, false, &item);
@@ -3378,8 +3414,6 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 				Sender->ReleaseCurrentAction();
 				return;
 		}
-	} else {
-		
 	}
 	//check for success, failure sends an attackedby trigger and a
 	//pickpocket failed trigger sent to the target and sender respectively

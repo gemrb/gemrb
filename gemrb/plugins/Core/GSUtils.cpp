@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.73 2006/09/02 10:29:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.74 2006/11/11 12:18:29 avenger_teambg Exp $
  *
  */
 
@@ -309,11 +309,23 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 	}
 }
 
-int CanSee(Scriptable* Sender, Scriptable* target, bool range)
+int CanSee(Scriptable* Sender, Scriptable* target, bool range, int seedead)
 {
 	Map *map;
 	unsigned int dist;
 
+	if (!seedead) {
+		if (target->Type==ST_ACTOR) {
+			Actor *tar = (Actor *) target;
+			if (target->GetInternalFlag()&IF_REALLYDIED) {
+				return 0;
+			}
+			//we should rather use STATE_SPEECHLESS_MASK
+			if (tar->GetStat(IE_STATE_ID)&STATE_DEAD) {
+				return 0;
+			}
+		}
+	}
 	map = target->GetCurrentArea();
 	if ( map!=Sender->GetCurrentArea() ) {
 		return 0;
@@ -326,7 +338,7 @@ int CanSee(Scriptable* Sender, Scriptable* target, bool range)
 		} else { 
 			dist = 30;
 		}
-	
+
 		if (Distance(target->Pos, Sender->Pos) > dist * 15) {
 			return 0;
 		}
@@ -335,20 +347,28 @@ int CanSee(Scriptable* Sender, Scriptable* target, bool range)
 	return map->IsVisible(target->Pos, Sender->Pos);
 }
 
-int ValidForDialogCore(Scriptable* Sender, Actor *target)
+//non actors can see too (reducing function to LOS)
+//non actors can be seen too (reducing function to LOS)
+int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 {
-	if (!CanSee(Sender, target, false) ) {
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	/* don't set LastSeen if this isn't an actor */
+	if (!tar) {
 		return 0;
 	}
-	
-	if (target->GetInternalFlag()&IF_REALLYDIED) {
-		return 0;
+	//both are actors
+	if (CanSee(Sender, tar, true, parameters->int0Parameter) ) {
+		if (justlos) {
+			return 1;
+		}
+		if (Sender->Type==ST_ACTOR && tar->Type==ST_ACTOR) {
+			Actor* snd = ( Actor* ) Sender;
+			//additional checks for invisibility?
+			snd->LastSeen = ((Actor *) tar)->GetID();
+		}
+		return 1;
 	}
-	//we should rather use STATE_SPEECHLESS_MASK
-	if (target->GetStat(IE_STATE_ID)&STATE_DEAD) {
-		return 0;
-	}
-	return 1;
+	return 0;
 }
 
 //transfering item from Sender to target
@@ -743,8 +763,8 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 	speaker = (Actor *) scr;
 	target = (Actor *) tar;
-	if (!ValidForDialogCore(scr, target) ) {
-		printf("ValidForDialogCore returned false! Speaker and target are:\n");
+	if (!CanSee(scr, target, false, 0) ) {
+		printf("CanSee returned false! Speaker and target are:\n");
 		((Actor *) scr)->DebugDump();
 		((Actor *) tar)->DebugDump();
 		Sender->ReleaseCurrentAction();
@@ -845,7 +865,6 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 				}
 			}
 		}
-		
 	}
 
 	//don't clear target's actions, because a sequence like this will be broken:
@@ -918,20 +937,20 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags)
 
 void CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
 {
-		    strncpy(item->ItemResRef, resref, 8);
-		    if (a==-1) {
-		            Item *origitem = core->GetItem(resref);
-		            for(int i=0;i<3;i++) {
-		                    ITMExtHeader *e = origitem->GetExtHeader(i);              
-		                    item->Usages[i]=e?e->Charges:0;
-		            }
-		            core->FreeItem(origitem, resref, false);
-		    } else {
-		            item->Usages[0]=(ieWord) a;
-		            item->Usages[1]=(ieWord) b;
-		            item->Usages[2]=(ieWord) c;
-		    }
-		    item->Flags=0;
+	strncpy(item->ItemResRef, resref, 8);
+	if (a==-1) {
+		Item *origitem = core->GetItem(resref);
+		for(int i=0;i<3;i++) {
+			ITMExtHeader *e = origitem->GetExtHeader(i);
+			item->Usages[i]=e?e->Charges:0;
+		}
+		core->FreeItem(origitem, resref, false);
+	} else {
+		item->Usages[0]=(ieWord) a;
+		item->Usages[1]=(ieWord) b;
+		item->Usages[2]=(ieWord) c;
+	}
+	item->Flags=0;
 }
 
 //It is possible to attack CONTAINERS/DOORS as well!!!
@@ -1138,7 +1157,7 @@ static void ParseObject(const char *&str,const char *&src, Object *&object)
 		break;
 	default: //nested object filters
 		int Nesting=0;
-		
+
 		while (Nesting<MaxObjectNesting) {
 			memmove(object->objectFilters+1, object->objectFilters, (int) sizeof(int) *(MaxObjectNesting-1) );
 			object->objectFilters[0]=GetIdsValue(src,"object");
@@ -1376,7 +1395,7 @@ void FreeSrc(SrcVector *poi, const ieResRef key)
 		abort();
 	}
 	if (!res) {
-		delete poi;	
+		delete poi;
 	}
 }
 

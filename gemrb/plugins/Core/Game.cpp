@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.129 2006/11/06 19:15:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.130 2006/11/11 12:18:29 avenger_teambg Exp $
  *
  */
 
@@ -932,6 +932,7 @@ void Game::AdvanceTime(ieDword add)
 	ieDword h = GameTime/300;
 	GameTime+=add;
 	if (h!=GameTime/300) {
+		//asking for a new weather when the hour changes
 		WeatherBits&=~WB_HASWEATHER;
 	}
 	Ticks+=add*interval;
@@ -1313,8 +1314,8 @@ void Game::StartTimer(ieDword ID, ieDword expiration)
 	script_timers[ID]=GameTime+expiration;
 }
 
-/* this function redraws weather, taking s_weather as suggestion for
-	 new weather
+/* this method redraws weather. If update is false,
+   then the weather particles won't change (game paused)
 */
 void Game::DrawWeather(Region &screen, bool update)
 {

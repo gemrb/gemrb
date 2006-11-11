@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.385 2006/11/01 10:25:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.386 2006/11/11 12:18:29 avenger_teambg Exp $
  *
  */
 
@@ -204,7 +204,7 @@ static TriggerLink triggernames[] = {
 	{"lastpersontalkedto", GameScript::LastPersonTalkedTo, 0}, //pst
 	{"level", GameScript::Level, 0},
 	{"levelgt", GameScript::LevelGT, 0},
-	{"levelinclass", GameScript::ClassLevel, 0},  //iwd2
+	{"levelinclass", GameScript::ClassLevel, 0}, //iwd2
 	{"levelinclassgt", GameScript::ClassLevelGT, 0},
 	{"levelinclasslt", GameScript::ClassLevelLT, 0},
 	{"levellt", GameScript::LevelLT, 0},
@@ -1148,7 +1148,7 @@ GameScript::GameScript(ieResRef ResRef, ScriptableType ScriptType,
 			printMessage("GameScript","The IDS Count shouldn't be more than 10!\n",LIGHT_RED);
 			abort();
 		}
-		
+
 		ObjectIDSTableNames = (ieResRef *) malloc( sizeof(ieResRef) * ObjectIDSCount );
 		for (i = 0; i < ObjectIDSCount; i++) {
 			const char *idsname;
@@ -1276,7 +1276,7 @@ GameScript::~GameScript(void)
 			printf("One instance of %s is dropped from %d.\n", Name, BcsCache.RefCount(Name) );
 		}
 		int res = BcsCache.DecRef(script, Name, true);
-		
+
 		if (res<0) {
 			printMessage( "GameScript", "Corrupted Script cache encountered (reference count went below zero), ", LIGHT_RED );
 			printf( "Script name is: %.8s\n", Name);
@@ -1331,7 +1331,7 @@ Script* GameScript::CacheScript(ieResRef ResRef)
 	if (InDebug&ID_REFERENCE) {
 		printf("Caching %s for the %d. time\n", ResRef, BcsCache.RefCount(ResRef) );
 	}
-	
+
 	std::vector< ResponseBlock*> rBv;
 	while (true) {
 		ResponseBlock* rB = ReadResponseBlock( stream );
@@ -1489,11 +1489,14 @@ void GameScript::Update()
 	if (!script) {
 		return;
 	}
+	// this is only for testing purposes
+	/*
 	if (!memcmp(MySelf->GetScriptName(),"cat",4) ) {
 		if (MySelf->GetNextAction()) {
 			nop();
 		}
 	}
+	*/
 
 	bool continueExecution = false;
 
@@ -1505,13 +1508,15 @@ void GameScript::Update()
 			//we cannot clear the queue and cannot execute the new block
 			//if we already have stuff on the queue!
 			if (!continueExecution) {
-				if (MySelf->GetNextAction() ) {
+				if (MySelf->GetNextAction()) {
 					if (MySelf->GetInternalFlag()&IF_NOINT) {
 						return;
 					}
+
 					if (lastAction==a) {
 						return;
 					}
+
 					MySelf->ClearActions();
 				}
 				lastAction=a;
@@ -1740,7 +1745,7 @@ Targets *GameScript::TenthNearestDoor(Scriptable* /*Sender*/, Targets *parameter
 //in iwd2 this is the Gabber!!!
 //but also, if there is no gabber, it is the first PC
 //probably it is simply the nearest exportable character...
-Targets *GameScript::Protagonist(Scriptable* /*Sender*/, Targets *parameters)
+Targets *GameScript::Protagonist(Scriptable* Sender, Targets *parameters)
 {
 	parameters->Clear();
 	//this sucks but IWD2 is like that...
@@ -1752,6 +1757,14 @@ Targets *GameScript::Protagonist(Scriptable* /*Sender*/, Targets *parameters)
 		if (parameters->Count()) {
 			return parameters;
 		}
+		//ok, this will return the nearest PC in the first slot
+		Game *game = core->GetGame();
+		int i = game->GetPartySize(false);
+		while(i--) {
+			Actor *target = game->GetPC(i,false);
+			parameters->AddTarget(target, Distance(Sender, target) );
+		}
+		return parameters;
 	}
 	parameters->AddTarget(core->GetGame()->FindPC(1), 0);
 	return parameters;

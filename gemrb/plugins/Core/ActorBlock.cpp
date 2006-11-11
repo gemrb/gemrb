@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.156 2006/08/17 15:32:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.157 2006/11/11 12:18:28 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -202,7 +202,7 @@ void Scriptable::DrawOverheadText(Region &screen)
 	if (Type==ST_ACTOR) {
 		cs = ((Selectable *) this)->size*50;
 	}
-	
+
 	Region rgn( Pos.x-100+screen.x, Pos.y - cs + screen.y, 200, 400 );
 	font->Print( rgn, ( unsigned char * ) overHeadText,
 		palette?palette:core->InfoTextPalette, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false );
@@ -718,7 +718,7 @@ void Moveble::DoStep(unsigned int walk_speed)
 		step = step->Next;
 		timeStartStep = time;
 	}
-	
+
 	SetOrientation (step->orient, false);
 	StanceID = IE_ANI_WALK;
 	Pos.x = ( step->x * 16 ) + 8;
@@ -1398,7 +1398,7 @@ void Container::CreateGroundIconCover()
 	int xpos = 0;
 	int ypos = 0;
 	int width = 0;
-	int height = 0;	
+	int height = 0;
 
 	int i; //msvc6.0
 	for (i=0;i<MAX_GROUND_ICON_DRAWN;i++) {

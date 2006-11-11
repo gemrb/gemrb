@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.58 2006/10/22 12:55:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.59 2006/11/11 12:18:29 avenger_teambg Exp $
  *
  */
 
@@ -183,9 +183,14 @@ int GameScript::SubRace(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+//if object parameter is given (gemrb) it is used
+//otherwise it works on the current object (iwd2)
 int GameScript::IsTeamBitOn(Scriptable* Sender, Trigger* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	Scriptable* scr = Sender;
+	if (parameters->objectParameter) {
+		scr = GetActorFromObject( Sender, parameters->objectParameter );
+	}
 	if (!scr || scr->Type != ST_ACTOR) {
 		return 0;
 	}
@@ -202,7 +207,7 @@ int GameScript::NearbyDialog(Scriptable* Sender, Trigger* parameters)
 	if ( !target ) {
 		return 0;
 	}
-	return ValidForDialogCore( Sender, target );
+	return CanSee( Sender, target, false, 0 );
 }
 
 //atm this checks for InParty and See, it is unsure what is required
@@ -228,7 +233,7 @@ int GameScript::IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters)
 	if (pc->globalID == gc->targetID || pc->globalID==gc->speakerID) {
 		return 0;
 	}
-	return ValidForDialogCore( Sender, target );
+	return CanSee( Sender, target, false, 0 );
 }
 
 int GameScript::InParty(Scriptable* Sender, Trigger* parameters)
@@ -339,7 +344,7 @@ int GameScript::Kit(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = (Actor *) scr;
-	
+
 	if ( actor->GetStat(IE_KIT) == (ieDword) parameters->int0Parameter) {
 		return 1;
 	}
@@ -933,7 +938,7 @@ int GameScript::HaveSpellParty(Scriptable* /*Sender*/, Trigger *parameters)
 				return 1;
 			}
 		}
-	} else {		
+	} else {
 		while(i--) {
 			Actor *actor = game->GetPC(i, true);
 			if (actor->spellbook.HaveSpell(parameters->int0Parameter, 0) ) {
@@ -1112,7 +1117,7 @@ int GameScript::PersonalSpaceDistance(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	int range = parameters->int0Parameter;
-	
+
 	int distance = PersonalDistance(Sender, scr);
 	if (distance <= ( range * 10 )) {
 		return 1;
@@ -1834,30 +1839,6 @@ int GameScript::CheckStatLT(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
-//non actors can see too (reducing function to LOS)
-//non actors can be seen too (reducing function to LOS)
-static int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
-{
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
-	/* don't set LastSeen if this isn't an actor */
-	if (!tar) {
-		return 0;
-	}
-	//both are actors
-	if (CanSee(Sender, tar, true) ) {
-		if (justlos) {
-			return 1;
-		}
-		if (Sender->Type==ST_ACTOR && tar->Type==ST_ACTOR) {
-			Actor* snd = ( Actor* ) Sender;
-			//additional checks for invisibility?
-			snd->LastSeen = ((Actor *) tar)->GetID();
-		}
-		return 1;
-	}
-	return 0;
-}
-
 int GameScript::See(Scriptable* Sender, Trigger* parameters)
 {
 	return SeeCore(Sender, parameters, 0);
@@ -2092,7 +2073,7 @@ int GameScript::OpenState(Scriptable* Sender, Trigger* parameters)
 		}
 		default:; //to remove a warning
 	}
-	printMessage("GameScript"," ",LIGHT_RED);	
+	printMessage("GameScript"," ",LIGHT_RED);
 	printf("Not a door/container:%s\n", tar->GetScriptName());
 	return 0;
 }
@@ -2119,7 +2100,7 @@ int GameScript::IsLocked(Scriptable * Sender, Trigger *parameters)
 		}
 		default:; //to remove a warning
 	}
-	printMessage("GameScript"," ",LIGHT_RED);	
+	printMessage("GameScript"," ",LIGHT_RED);
 	printf("Not a door/container:%s\n", tar->GetScriptName());
 	return 0;
 }
@@ -2148,7 +2129,7 @@ int GameScript::ClassLevel(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	
+
 	if (!ID_ClassMask( actor, parameters->int0Parameter) )
 		return 0;
 	return actor->GetStat(IE_LEVEL) == (unsigned) parameters->int1Parameter;
@@ -2336,7 +2317,7 @@ int GameScript::InMyArea(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor* actor1 = ( Actor* ) Sender;
 	Actor* actor2 = ( Actor* ) tar;
-	
+
 	return strnicmp(actor1->Area, actor2->Area, 8)==0;
 }
 
