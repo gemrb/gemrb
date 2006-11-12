@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.418 2006/10/15 09:49:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.419 2006/11/12 13:07:47 avenger_teambg Exp $
  *
  */
 
@@ -614,10 +614,8 @@ static PyObject* GemRB_LoadWindowFrame(PyObject * /*self*/, PyObject* args)
 		}
 
 		// FIXME: delete previous WindowFrames
-		
 		//core->WindowFrames[i] = Picture;
 		core->SetWindowFrame(i, Picture);
-
 	}
 	core->FreeInterface( im );
 
@@ -1174,17 +1172,22 @@ static PyObject* GemRB_SetText(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_TextAreaAppend__doc,
-"TextAreaAppend(WindowIndex, ControlIndex, String|Strref [, Row]) => int\n\n"
-"Appends the Text to the TextArea Control in the Window." );
+"TextAreaAppend(WindowIndex, ControlIndex, String|Strref [, Row[, Flag]]) => int\n\n"
+"Appends the Text to the TextArea Control in the Window.\n"
+"If Row is given then it will insert the text after that row\n"
+"If Flag is given, then it will use that value as a GetString flag");
 
 static PyObject* GemRB_TextAreaAppend(PyObject * /*self*/, PyObject* args)
 {
-	PyObject* wi, * ci, * str, * row = NULL;
-	long WindowIndex, ControlIndex, StrRef, Row;
+	PyObject* wi, * ci, * str;
+	PyObject* row = NULL;
+	PyObject* flag = NULL;
+	long WindowIndex, ControlIndex;
+	long StrRef, Row, Flag = 0;
 	char* string;
 	int ret;
 
-	if (PyArg_UnpackTuple( args, "ref", 3, 4, &wi, &ci, &str, &row )) {
+	if (PyArg_UnpackTuple( args, "ref", 3, 5, &wi, &ci, &str, &row, &flag )) {
 		if (!PyObject_TypeCheck( wi, &PyInt_Type ) ||
 			!PyObject_TypeCheck( ci, &PyInt_Type ) ||
 			( !PyObject_TypeCheck( str, &PyString_Type ) &&
@@ -1201,7 +1204,7 @@ static PyObject* GemRB_TextAreaAppend(PyObject * /*self*/, PyObject* args)
 		if (row) {
 			if (!PyObject_TypeCheck( row, &PyInt_Type )) {
 				printMessage( "GUIScript",
-					"Syntax Error: SetText row must be integer\n", LIGHT_RED );
+					"Syntax Error: AppendText row must be integer\n", LIGHT_RED );
 				return NULL;
 			}
 			Row = PyInt_AsLong( row );
@@ -1209,6 +1212,16 @@ static PyObject* GemRB_TextAreaAppend(PyObject * /*self*/, PyObject* args)
 				Row = -1;
 		} else
 			Row = ta->GetRowCount() - 1;
+
+		if (flag) {
+			if (!PyObject_TypeCheck( flag, &PyInt_Type )) {
+				printMessage( "GUIScript",
+					"Syntax Error: GetString flag must be integer\n", LIGHT_RED );
+				return NULL;
+			}
+			Flag = PyInt_AsLong( flag );
+		}
+
 		if (PyObject_TypeCheck( str, &PyString_Type )) {
 			string = PyString_AsString( str );
 			if (string == NULL)
@@ -1216,7 +1229,7 @@ static PyObject* GemRB_TextAreaAppend(PyObject * /*self*/, PyObject* args)
 			ret = ta->AppendText( string, Row );
 		} else {
 			StrRef = PyInt_AsLong( str );
-			char* str = core->GetString( StrRef, IE_STR_SOUND | IE_STR_SPEECH );
+			char* str = core->GetString( StrRef, Flag );
 			ret = ta->AppendText( str, Row );
 			core->FreeString( str );
 		}
@@ -2028,7 +2041,7 @@ static PyObject* GemRB_GetDestinationArea(PyObject * /*self*/, PyObject* args)
 			}
 		}
 	}
-	
+
 	//the entrance the user will fall on
 	PyDict_SetItemString(dict, "Distance", PyInt_FromLong (wm->GetDistance(wmc->Area->AreaName)) );
 	return dict;
@@ -2174,7 +2187,7 @@ static PyObject* GemRB_CreateMapControl(PyObject * /*self*/, PyObject* args)
 			for (int i=0;i<8;i++) {
 				map->Flag[i] = anim->GetFrame(0,i);
 			}
-			
+
 		}
 		core->FreeInterface( anim );
 	}
@@ -2690,7 +2703,7 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 	Sprite2D *Picture2=NULL;
 
 	DataStream* str = core->GetResourceMgr()->GetResource( ResRef, IE_PLT_CLASS_ID );
-	
+
 	if (str == NULL ) {
 		str = core->GetResourceMgr()->GetResource( ResRef, IE_BAM_CLASS_ID );
 		if (str == NULL) {
@@ -3991,13 +4004,13 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 	// FIXME!!!
 	if (ps->FavouriteSpells[0][0]) {
 		int largest = 0;
-		
+
 		for (int i = 1; i < 4; ++i) {
 			if (ps->FavouriteSpellsCount[i] > ps->FavouriteSpellsCount[largest]) {
 				largest = i;
 			}
 		}
-		
+
 		Spell* spell = core->GetSpell(ps->FavouriteSpells[largest]);
 		if (spell == NULL) {
 			return NULL;
@@ -4015,13 +4028,13 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 	// FIXME!!!
 	if (ps->FavouriteWeapons[0][0]) {
 		int largest = 0;
-		
+
 		for (int i = 1; i < 4; ++i) {
 			if (ps->FavouriteWeaponsCount[i] > ps->FavouriteWeaponsCount[largest]) {
 				largest = i;
 			}
 		}
-		
+
 		Item* item = core->GetItem(ps->FavouriteWeapons[largest]);
 		if (item == NULL) {
 			return NULL;
@@ -4440,7 +4453,7 @@ static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetItemIcon__doc );
 	}
 
-	
+
 	PyObject *ret = SetItemIcon(wi, ci, ItemResRef, Which, tooltip, Function);
 	if (ret) {
 		Py_INCREF(ret);
@@ -4843,7 +4856,7 @@ static PyObject* GemRB_SetPurchasedAmount(PyObject * /*self*/, PyObject* args)
 	if (!si) {
 		return NULL;
 	}
-	
+
 	if (si->InfiniteSupply!= (ieDword) -1) {
 		if (si->AmountInStock<amount) {
 			amount=si->AmountInStock;
@@ -5796,7 +5809,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 			goto not_a_scroll;
 		}
 		f = eh->features; //+0
-		
+
 		//normally the learn spell opcode is 147
 		EffectQueue::ResolveEffect(learn_spell_ref);
 		if (f->Opcode!=(ieDword) learn_spell_ref.EffText) {
@@ -5875,10 +5888,10 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		si = actor->inventory.GetSlotItem(Slot);
 		while(i--) {
 			if (UsedItems[i].itemname[0] && strnicmp(UsedItems[i].itemname, si->ItemResRef,8) ) {
-			  continue;
+				continue;
 			}
 			if (UsedItems[i].username[0] && strnicmp(UsedItems[i].username, actor->GetScriptName(), 32) ) {
-			  continue;
+				continue;
 			}
 			core->DisplayString(UsedItems[i].value,0xffffff, IE_STR_SOUND);
 			Py_INCREF( Py_None );
@@ -5938,7 +5951,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	int res;
-	
+
 	if (Slot==-2) {
 		Map *map = actor->GetCurrentArea();
 		Container *cc = map->GetPile(actor->Pos);
@@ -6536,11 +6549,11 @@ static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 
 		ItemExtHeader *item = ItemArray+i;
 		Sprite2D *Picture = NULL;
-		
+
 		if (item->UseIcon[0]) {
 			core->GetBAMSprite(item->UseIcon, 0, 0);
 		}
-		
+
 		if (!Picture) {
 			btn->SetState(IE_GUI_BUTTON_DISABLED);
 			btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, BM_SET);
@@ -6641,7 +6654,7 @@ static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 		if (spell->MemorisedIcon[0]) {
 			Picture = core->GetBAMSprite(spell->MemorisedIcon, 0, 0);
 		}
-		
+
 		if (!Picture) {
 			btn->SetState(IE_GUI_BUTTON_DISABLED);
 			btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, BM_SET);
@@ -7192,13 +7205,13 @@ static PyObject* GemRB_HasSpecialItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (i<0) {
-		return PyInt_FromLong( 0 );	
+		return PyInt_FromLong( 0 );
 	}
 
 	if (useup) {
 		//useup = actor->UseItem(SpecialItems[i].resref, actor);
 	}
-	return PyInt_FromLong( useup );	
+	return PyInt_FromLong( useup );
 }
 
 PyDoc_STRVAR( GemRB_HasSpecialSpell__doc,
@@ -7236,9 +7249,9 @@ static PyObject* GemRB_HasSpecialSpell(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (i<0) {
-		return PyInt_FromLong( 0 );	
+		return PyInt_FromLong( 0 );
 	}
-	return PyInt_FromLong( 1 );	
+	return PyInt_FromLong( 1 );
 }
 
 PyDoc_STRVAR( GemRB_ApplyEffect__doc,
@@ -7494,7 +7507,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(HasSpecialItem, METH_VARARGS),
 	METHOD(HasSpecialSpell, METH_VARARGS),
 	METHOD(ApplyEffect, METH_VARARGS),
-	// terminating entry	
+	// terminating entry
 	{NULL, NULL, 0, NULL}
 };
 
