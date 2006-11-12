@@ -9,10 +9,10 @@ Parameters: Slot  - actor index in game structure
 
 Return value: N/A
 
-Examples: 
+Example: 
  PickedColor=GemRB.GetTableValue(ColorTable, ColorIndex, GemRB.GetVar("Selected"))
  GemRB.SetPlayerStat (pc, IE_MAJOR_COLOR, PickedColor)
 The above example sets the player's color just picked via the color customisation dialog. ColorTable holds the available colors.
 
-See also: GetPlayerStat, SetPlayerName
+See also: GetPlayerStat, SetPlayerName, ApplyEffect
 
