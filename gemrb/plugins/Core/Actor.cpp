@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.218 2006/10/06 23:01:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.219 2006/11/14 19:17:08 avenger_teambg Exp $
  *
  */
 
@@ -140,7 +140,7 @@ static bool REVERSE_TOHIT=true;
 #define WEAPON_USESTRENGTH 32
 
 Actor::Actor()
-	: Moveble( ST_ACTOR )
+	: Movable( ST_ACTOR )
 {
 	int i;
 
@@ -2051,7 +2051,7 @@ void Actor::NewPath()
 {
 	Point tmp = Destination;
 	ClearPath();
-	Moveble::WalkTo(tmp, size );
+	Movable::WalkTo(tmp, size );
 }
 
 void Actor::WalkTo(Point &Des, ieDword flags, int MinDistance)
@@ -2064,9 +2064,9 @@ void Actor::WalkTo(Point &Des, ieDword flags, int MinDistance)
 	// is this true???
 	if (Des.x==-2 && Des.y==-2) {
 		Point p((ieWord) Modified[IE_SAVEDXPOS], (ieWord) Modified[IE_SAVEDYPOS] );
-		Moveble::WalkTo(p, MinDistance);
+		Movable::WalkTo(p, MinDistance);
 	} else {
-		Moveble::WalkTo(Des, MinDistance);
+		Movable::WalkTo(Des, MinDistance);
 	}
 }
 

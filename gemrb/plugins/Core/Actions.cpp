@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.93 2006/11/11 12:18:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.94 2006/11/14 19:17:08 avenger_teambg Exp $
  *
  */
 
@@ -3587,7 +3587,7 @@ void GameScript::SetHomeLocation(Scriptable* Sender, Action* parameters)
 	if (!tar || tar->Type!=ST_ACTOR) {
 		return;
 	}
-	Moveble *movable = (Moveble *) tar; //not actor, though it is the only moveable
+	Movable *movable = (Movable *) tar; //not actor, though it is the only moveable
 	movable->Destination = parameters->pointParameter;
 	//no movement should be started here, i think
 }

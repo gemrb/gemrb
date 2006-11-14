@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.116 2006/09/02 10:29:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.117 2006/11/14 19:17:09 avenger_teambg Exp $
  *
  */
 
@@ -25,7 +25,7 @@ class Scriptable;
 class Selectable;
 class Highlightable;
 class Actor;
-class Moveble;
+class Movable;
 class Door;
 class SpriteCover;
 class Gem_Polygon;
@@ -284,15 +284,15 @@ public:
 	}
 };
 
-class GEM_EXPORT Moveble : public Selectable {
+class GEM_EXPORT Movable : public Selectable {
 private: //these seem to be sensitive, so get protection
 	unsigned char StanceID;
 	unsigned char Orientation, NewOrientation;
 	PathNode* path; //whole path
 	PathNode* step; //actual step
 public:
-	Moveble(ScriptableType type);
-	virtual ~Moveble(void);
+	Movable(ScriptableType type);
+	virtual ~Movable(void);
 	Point Destination;
 	ieDword timeStartStep;
 	Sprite2D* lastFrame;

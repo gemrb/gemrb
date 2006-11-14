@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.157 2006/11/11 12:18:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.158 2006/11/14 19:17:09 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -306,7 +306,7 @@ void Scriptable::ProcessActions(bool force)
 	if (playDeadCounter) {
 		playDeadCounter--;
 		if (!playDeadCounter) {
-			Moveble* mov = ( Moveble* ) this;
+			Movable* mov = ( Movable* ) this;
 			mov->SetStance( IE_ANI_GET_UP );
 		}
 	}
@@ -356,7 +356,7 @@ bool Scriptable::InMove()
 	if (Type!=ST_ACTOR) {
 		return false;
 	}
-	Moveble *me = (Moveble *) this;
+	Movable *me = (Movable *) this;
 	return me->GetNextStep()!=NULL;
 }
 
@@ -620,10 +620,10 @@ void Highlightable::SetCursor(unsigned char CursorIndex)
 }
 
 /*****************
- * Moveble Class *
+ * Movable Class *
  *****************/
 
-Moveble::Moveble(ScriptableType type)
+Movable::Movable(ScriptableType type)
 	: Selectable( type )
 {
 	Destination = Pos;
@@ -637,14 +637,14 @@ Moveble::Moveble(ScriptableType type)
 	Area[0] = 0;
 }
 
-Moveble::~Moveble(void)
+Movable::~Movable(void)
 {
 	if (path) {
 		ClearPath();
 	}
 }
 
-int Moveble::GetPathLength()
+int Movable::GetPathLength()
 {
 	PathNode *node = GetNextStep(0);
 	int i = 0;
@@ -655,7 +655,7 @@ int Moveble::GetPathLength()
 	return i;
 }
 
-PathNode *Moveble::GetNextStep(int x)
+PathNode *Movable::GetNextStep(int x)
 {
 	if (!step) {
 		DoStep((unsigned int) ~0);
@@ -667,7 +667,7 @@ PathNode *Moveble::GetNextStep(int x)
 	return node;
 }
 
-Point Moveble::GetMostLikelyPosition()
+Point Movable::GetMostLikelyPosition()
 {
 	if (!path) {
 		return Pos;
@@ -683,7 +683,7 @@ Point Moveble::GetMostLikelyPosition()
 	return Destination;
 }
 
-void Moveble::SetStance(unsigned int arg)
+void Movable::SetStance(unsigned int arg)
 {
 	if (arg<MAX_ANIMS) {
 		 StanceID=(unsigned char) arg;
@@ -694,7 +694,7 @@ void Moveble::SetStance(unsigned int arg)
 }
 
 //this could be used for WingBuffet as well
-void Moveble::MoveLine(int steps, int Pass, ieDword orient)
+void Movable::MoveLine(int steps, int Pass, ieDword orient)
 {
 	//remove previous path
 	ClearPath();
@@ -703,7 +703,7 @@ void Moveble::MoveLine(int steps, int Pass, ieDword orient)
 	path = area->GetLine( Pos, steps, orient, Pass );
 }
 
-void Moveble::DoStep(unsigned int walk_speed)
+void Movable::DoStep(unsigned int walk_speed)
 {
 	if (!path) {
 		return;
@@ -748,13 +748,15 @@ void Moveble::DoStep(unsigned int walk_speed)
 			( ( ( Pos.y - ( ( step->Next->y * 12 ) + 6 ) ) * ( time - timeStartStep ) ) / walk_speed );
 }
 
-void Moveble::AddWayPoint(Point &Des)
+void Movable::AddWayPoint(Point &Des)
 {
 	if (!path) {
 		WalkTo(Des);
 		return;
 	}
 	Destination = Des;
+	//it is tempting to use 'step' here, as it could
+	//be about half of the current path already
 	PathNode *endNode=path;
 	while(endNode->Next) {
 		endNode=endNode->Next;
@@ -763,9 +765,11 @@ void Moveble::AddWayPoint(Point &Des)
 	area->BlockSearchMap( Pos, size, 0);
 	PathNode *path2 = area->FindPath( p, Des );
 	endNode->Next=path2;
+	//probably it is wise to connect it both ways?
+	path2->Parent=endNode;
 }
 
-void Moveble::FixPosition()
+void Movable::FixPosition()
 {
 	if (Type!=ST_ACTOR) {
 		return;
@@ -781,7 +785,7 @@ void Moveble::FixPosition()
 	Pos.y*=12;
 }
 
-void Moveble::WalkTo(Point &Des, int distance)
+void Movable::WalkTo(Point &Des, int distance)
 {
 	ClearPath();
 	area->BlockSearchMap( Pos, size, 0);
@@ -794,14 +798,14 @@ void Moveble::WalkTo(Point &Des, int distance)
 	}
 }
 
-void Moveble::RunAwayFrom(Point &Des, int PathLength, int flags)
+void Movable::RunAwayFrom(Point &Des, int PathLength, int flags)
 {
 	ClearPath();
 	area->BlockSearchMap( Pos, size, 0);
 	path = area->RunAway( Pos, Des, PathLength, flags );
 }
 
-void Moveble::RandomWalk(bool can_stop)
+void Movable::RandomWalk(bool can_stop)
 {
 	if (path) {
 		return;
@@ -818,14 +822,14 @@ void Moveble::RandomWalk(bool can_stop)
 	path = area->RunAway( Pos, p, 50, 0 );
 }
 
-void Moveble::MoveTo(Point &Des)
+void Movable::MoveTo(Point &Des)
 {
 	Pos = Des;
 	Destination = Des;
 	area->BlockSearchMap( Pos, size, PATH_MAP_PC);
 }
 
-void Moveble::ClearPath()
+void Movable::ClearPath()
 {
 	//this is to make sure attackers come to us
 	//make sure ClearPath doesn't screw Destination (in the rare cases Destination
@@ -835,17 +839,11 @@ void Moveble::ClearPath()
 		StanceID = IE_ANI_AWAKE;
 	}
 	InternalFlags&=~IF_NORECTICLE;
-	if (!path) {
-		return;
-	}
-	PathNode* nextNode = path->Next;
 	PathNode* thisNode = path;
-	while (true) {
+	while (thisNode) {
+		PathNode* nextNode = thisNode->Next;
 		delete( thisNode );
-		if (!nextNode)
-			break;
 		thisNode = nextNode;
-		nextNode = thisNode->Next;
 	}
 	path = NULL;
 	step = NULL;
@@ -854,7 +852,7 @@ void Moveble::ClearPath()
 
 static unsigned long tp_steps[8]={3,2,1,0,1,2,3,4};
 
-void Moveble::DrawTargetPoint(Region &vp)
+void Movable::DrawTargetPoint(Region &vp)
 {
 	if (!path || !Selected || (InternalFlags&IF_NORECTICLE) )
 		return;
