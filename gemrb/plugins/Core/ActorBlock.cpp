@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.158 2006/11/14 19:17:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.159 2006/11/16 21:44:41 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -95,7 +95,9 @@ Scriptable::~Scriptable(void)
 
 void Scriptable::SetScriptName(const char* text)
 {
-	if (text && text[0]) {
+	//if (text && text[0]) { //this leaves some uninitialized bytes
+	//lets hope this won't break anything
+	if (text) {
 		strnspccpy( scriptName, text, 32 );
 	}
 }
