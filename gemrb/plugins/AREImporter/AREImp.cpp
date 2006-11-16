@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.160 2006/09/02 10:37:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.161 2006/11/16 21:43:43 avenger_teambg Exp $
  *
  */
 
@@ -1758,7 +1758,8 @@ int AREImp::PutMapnotes( DataStream *stream, Map *map)
 			stream->WriteWord( &tmpWord );
 			tmpWord = (ieWord) mn->Pos.y;
 			stream->WriteWord( &tmpWord );
-			//strref
+			//strref (needs to be fixed?)
+			tmpDword = 0;
 			stream->WriteDword( &tmpDword);
 			stream->WriteWord( &tmpWord);
 			stream->WriteWord( &mn->color);
