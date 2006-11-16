@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.42 2006/08/17 15:32:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Core.cpp,v 1.43 2006/11/16 21:49:09 avenger_teambg Exp $
  *
  */
 
@@ -87,15 +87,16 @@ void strnuprcpy(char* dest, const char *source, int count)
 // this one also filters spaces
 void strnspccpy(char* dest, const char *source, int count)
 {
+	memset(dest,0,count);
 	while(count--) {
-		*dest = pl_lowercase[(ieByte) *source];
-		if (*dest!=' ') dest++;
+		char c = pl_lowercase[(ieByte) *source];
+		if (c!=' ') {
+			*dest++=c;
+		}
 		if(!*source++) {
-			while(count--) *dest++=0;
 			return;
 		}
 	}
-	*dest=0;
 }
 
 static unsigned char orientations[25]={
