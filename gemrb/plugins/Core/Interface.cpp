@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.436 2006/10/22 12:51:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.437 2006/11/25 15:21:00 wjpalenstijn Exp $
  *
  */
 
@@ -718,7 +718,7 @@ aux_2:
 		ItemTooltipTable->RemoveAll(ReleaseItemTooltip);
 	} else {
 		ItemTooltipTable = new Variables();
-		ItemTooltipTable->SetType(GEM_VARIABLES_STRING);
+		ItemTooltipTable->SetType(GEM_VARIABLES_POINTER);
 	}
 	table = LoadTable( "tooltip" );
 
@@ -741,7 +741,7 @@ aux_2:
 		for (int i=0;i<3;i++) {
 			tmppoi[i] = atoi(aa->QueryField(idx,i));
 		}
-		ItemTooltipTable->SetAt(key, (const char *) tmppoi);
+		ItemTooltipTable->SetAt(key, (void*)tmppoi);
 	}
 	DelTable( table );
 aux_3:
@@ -763,7 +763,9 @@ int Interface::GetItemTooltip(ieResRef itemname, int header)
 	int *value = NULL;
 
 	if (ItemTooltipTable) {
-		ItemTooltipTable->Lookup(itemname, (char *&) value);
+		void* lookup;
+		ItemTooltipTable->Lookup(itemname, lookup);
+		value = (int*)lookup;
 	}
 	if (value && (value[header]>=0)) {
 		return value[header];
@@ -4206,7 +4208,7 @@ bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)
 		}
 		ItemName[8]=0;
 		strlwr(ItemName);
-		RtRows->SetAt(ItemName, (const char *) itemlist);
+		RtRows->SetAt(ItemName, (void*)itemlist);
 	}
 end:
 	DelTable(table);
@@ -4230,7 +4232,7 @@ bool Interface::ReadRandomItems()
 		if (!RtRows) {
 			return false;
 		}
-		RtRows->SetType( GEM_VARIABLES_STRING );
+		RtRows->SetType( GEM_VARIABLES_POINTER );
 	}
 	if (table<0) {
 		return false;
@@ -4292,10 +4294,12 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 		char *endptr;
 		ieResRef NewItem;
 
-		ItemList *itemlist=NULL;
-		if ( (!RtRows->Lookup( itm->ItemResRef, (char *&) itemlist )) ) {
+		void* lookup;
+		if ( !RtRows->Lookup( itm->ItemResRef, lookup ) ) {
 			return true;
 		}
+		ItemList *itemlist = (ItemList*)lookup;
+
 		i=Roll(1,itemlist->Count,-1);
 		strncpy( NewItem, itemlist->ResRefs[i], sizeof(ieResRef) );
 		char *p=(char *) strchr(NewItem,'*');

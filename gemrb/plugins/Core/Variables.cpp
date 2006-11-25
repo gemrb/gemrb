@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.cpp,v 1.31 2006/08/11 23:17:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.cpp,v 1.32 2006/11/25 15:21:00 wjpalenstijn Exp $
  *
  */
 
@@ -301,6 +301,19 @@ bool Variables::Lookup(const char* key, char *&dest) const
 	return true;
 }
 
+bool Variables::Lookup(const char* key, void *&dest) const
+{
+	unsigned int nHash;
+	MYASSERT(m_type==GEM_VARIABLES_POINTER);
+	Variables::MyAssoc* pAssoc = GetAssocAt( key, nHash );
+	if (pAssoc == NULL) {
+		return false;
+	}  // not in map
+
+	dest = pAssoc->Value.pValue;
+	return true;
+}
+
 bool Variables::Lookup(const char* key, ieDword& rValue) const
 {
 	unsigned int nHash;
@@ -319,10 +332,10 @@ void Variables::SetAtCopy(const char* key, const char* value)
 	size_t len = strlen(value)+1;
 	char *str=(char *) malloc(len);
 	memcpy(str,value,len);
-	SetAt(key, (const char *) str);
+	SetAt(key, str);
 }
 
-void Variables::SetAt(const char* key, const char* value)
+void Variables::SetAt(const char* key, char* value)
 {
 	unsigned int nHash;
 	Variables::MyAssoc* pAssoc;
@@ -346,10 +359,40 @@ void Variables::SetAt(const char* key, const char* value)
 
 	//set value only if we have a key
 	if (pAssoc->key) {
-		pAssoc->Value.sValue = (char *) value;
+		pAssoc->Value.sValue = value;
 		pAssoc->nHashValue = nHash;
 	}
 }
+
+void Variables::SetAt(const char* key, void* value)
+{
+	unsigned int nHash;
+	Variables::MyAssoc* pAssoc;
+
+	MYASSERT( m_type == GEM_VARIABLES_POINTER );
+	if (( pAssoc = GetAssocAt( key, nHash ) ) == NULL) {
+		if (m_pHashTable == NULL)
+			InitHashTable( m_nHashTableSize );
+
+		// it doesn't exist, add a new Association
+		pAssoc = NewAssoc( key );
+		// put into hash table
+		pAssoc->pNext = m_pHashTable[nHash];
+		m_pHashTable[nHash] = pAssoc;
+	} else {
+		if (pAssoc->Value.sValue) {
+			free( pAssoc->Value.sValue );
+			pAssoc->Value.sValue = 0;
+		}
+	}
+
+	//set value only if we have a key
+	if (pAssoc->key) {
+		pAssoc->Value.pValue = value;
+		pAssoc->nHashValue = nHash;
+	}
+}
+
 
 void Variables::SetAt(const char* key, ieDword value)
 {

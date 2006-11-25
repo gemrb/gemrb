@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.256 2006/11/05 11:11:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.257 2006/11/25 15:21:00 wjpalenstijn Exp $
  *
  */
 
@@ -146,7 +146,7 @@ void InitSpawnGroups()
 	int table=core->LoadTable( "spawngrp" );
 
 	Spawns.RemoveAll(NULL);
-	Spawns.SetType( GEM_VARIABLES_STRING );
+	Spawns.SetType( GEM_VARIABLES_POINTER );
 	
 	if (table<0) {
 		return;
@@ -178,7 +178,7 @@ void InitSpawnGroups()
 				strnlwrcpy( creatures->ResRefs[j-1], tab->QueryField(j,i), sizeof( ieResRef ) );
 			}
 			strnlwrcpy( GroupName, tab->GetColumnName( i ), 8);
-			Spawns.SetAt( GroupName, (const char *) creatures );
+			Spawns.SetAt( GroupName, (void*) creatures );
 		}
 	}
 end:
@@ -2100,7 +2100,8 @@ void Map::SpawnCreature(Point &pos, char *CreName, int radius)
 {
 	SpawnGroup *sg=NULL;
 	Actor *creature;
-	if ( !Spawns.Lookup( CreName, (char *&) sg) ) {
+	void* lookup;
+	if ( !Spawns.Lookup( CreName, lookup) ) {
 		DataStream *stream = core->GetResourceMgr()->GetResource( CreName, IE_CRE_CLASS_ID );
 		creature = core->GetCreature(stream); 
 		if ( creature ) {
@@ -2109,6 +2110,7 @@ void Map::SpawnCreature(Point &pos, char *CreName, int radius)
 		}
 		return;
 	}
+	sg = (SpawnGroup*)lookup;
 	//adjust this with difflev too
 	unsigned int count = sg->Count;
 	//unsigned int difficulty = sg->Level;

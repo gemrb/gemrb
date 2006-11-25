@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.h,v 1.24 2006/06/12 18:05:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Variables.h,v 1.25 2006/11/25 15:21:00 wjpalenstijn Exp $
  *
  */
 
@@ -36,6 +36,7 @@ typedef void (*ReleaseFun)(void *);
 
 #define GEM_VARIABLES_INT      0
 #define GEM_VARIABLES_STRING   1
+#define GEM_VARIABLES_POINTER  2
 
 #ifdef WIN32
 
@@ -58,6 +59,7 @@ protected:
 		union {
 			ieDword nValue;
 			char* sValue;
+			void* pValue;
 		} Value;
 		unsigned long nHashValue;
 	};
@@ -96,10 +98,12 @@ public:
 	bool Lookup(const char* key, char* dest, int MaxLength) const;
 	bool Lookup(const char* key, ieDword& rValue) const;
 	bool Lookup(const char* key, char*& dest) const;
+	bool Lookup(const char* key, void*& dest) const;
 
 	// Operations
 	void SetAtCopy(const char* key, const char* newValue);
-	void SetAt(const char* key, const char* newValue);
+	void SetAt(const char* key, char* newValue);
+	void SetAt(const char* key, void* newValue);
 	void SetAt(const char* key, ieDword newValue);
 	void RemoveAll(ReleaseFun fun);
 	void InitHashTable(unsigned int hashSize, bool bAllocNow = true);
