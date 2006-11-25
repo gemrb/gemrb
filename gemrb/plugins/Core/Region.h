@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Region.h,v 1.13 2006/01/04 16:34:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Region.h,v 1.14 2006/11/25 13:21:46 wjpalenstijn Exp $
  *
  */
 
@@ -28,6 +28,9 @@
 
 #ifndef REGION_H
 #define REGION_H
+
+#include "../../includes/ie_types.h"
+
 
 #ifdef WIN32
 
@@ -49,17 +52,23 @@
 class GEM_EXPORT Point {
 public:
 	Point(void);
-	~Point(void);
-	short x,y;
 	Point(const Point& pnt);
+	Point(short x, short y);
+	~Point(void);
+
 	Point& operator=(const Point& pnt);
 	bool operator==(const Point &pnt);
 	bool operator!=(const Point &pnt);
-	Point(short x, short y);
+
 	/** if it is [-1.-1] */
 	bool isempty() const;
 	/** if it is [0.0] */
 	bool isnull() const;
+
+	ieDword asDword() const; // store coordinates in uint32 ((y << 16) | x)
+	void fromDword(ieDword val); // extract coordinates from uint32
+
+	short x,y;
 };
 
 

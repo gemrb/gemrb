@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.94 2006/11/14 19:17:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.95 2006/11/25 13:21:46 wjpalenstijn Exp $
  *
  */
 
@@ -750,10 +750,7 @@ void GameScript::VerbalConstant(Scriptable* Sender, Action* parameters)
 //bg2 - variable
 void GameScript::SaveLocation(Scriptable* Sender, Action* parameters)
 {
-	unsigned int value;
-
-	*((unsigned short *) &value) = parameters->pointParameter.x;
-	*(((unsigned short *) &value)+1) = (unsigned short) parameters->pointParameter.y;
+	ieDword value = parameters->pointParameter.asDword();
 	if (!parameters->string0Parameter[0]) {
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
@@ -805,14 +802,11 @@ void GameScript::SetStartPos(Scriptable* Sender, Action* parameters)
 
 void GameScript::SaveObjectLocation(Scriptable* Sender, Action* parameters)
 {
-	ieDword value;
-
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		return;
 	}
-	*((ieWord *) &value) = (ieWord) tar->Pos.x;
-	*(((ieWord *) &value)+1) = (ieWord) tar->Pos.y;
+	ieDword value = tar->Pos.asDword();
 	if (!parameters->string0Parameter[0]) {
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
@@ -955,8 +949,7 @@ void GameScript::MoveToSavedLocation(Scriptable* Sender, Action* parameters)
 	Point p;
 	Actor* actor = ( Actor* ) tar;
 	ieDword value = (ieDword) CheckVariable( Sender, parameters->string0Parameter );
-	p.x = *(unsigned short *) &value;
-	p.y = *(((unsigned short *) &value)+1);
+	p.fromDword(value);
 	Map *map = Sender->GetCurrentArea();
 	actor->SetPosition( map, p, true );
 }
@@ -1052,9 +1045,7 @@ void GameScript::StorePartyLocation(Scriptable* /*Sender*/, Action* /*parameters
 	for (int i = 0; i < game->GetPartySize(false); i++) {
 		Actor* act = game->GetPC( i, false );
 		if (act) {
-			ieDword value;
-			*((unsigned short *) &value) = act->Pos.x;
-			*(((unsigned short *) &value)+1) = act->Pos.y;
+			ieDword value = act->Pos.asDword();
 			SetVariable( act, "LOCALSsavedlocation", value);
 		}
 	}
@@ -1070,8 +1061,8 @@ void GameScript::RestorePartyLocation(Scriptable* Sender, Action* /*parameters*/
 			ieDword value=CheckVariable( act, "LOCALSsavedlocation");
 			Map *map = Sender->GetCurrentArea();
 			//setting position, don't put actor on another actor
-			Point p( *((unsigned short *) &value),
-				*(((unsigned short *) &value)+1) );
+			Point p;
+			p.fromDword(value);
 			act->SetPosition( map, p , -1 );
 		}
 	}
@@ -1312,7 +1303,9 @@ void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 		strcpy(parameters->string0Parameter,"LOCALSsavedlocation");
 	}
 	value = (ieDword) CheckVariable( target, parameters->string0Parameter );
-	Point p( *(unsigned short *) &value, *(((unsigned short *) &value)+1));
+	Point p;
+	p.fromDword(value);
+
 	actor->SetOrientation ( GetOrient( p, actor->Pos ), false);
 	actor->SetWait( 1 );
 }
