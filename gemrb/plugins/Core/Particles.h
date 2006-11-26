@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Particles.h,v 1.2 2006/11/05 11:11:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Particles.h,v 1.3 2006/11/26 23:19:19 avenger_teambg Exp $
  *
  */
 
@@ -33,6 +33,7 @@
 //global phase for the while spark structure
 #define P_GROW  0
 #define P_FADE  1
+#define P_EMPTY 2
 
 // this structure holds data for a single particle element
 typedef struct Element {
@@ -53,6 +54,7 @@ typedef struct Element {
 #define SP_PATH_FALL   0       //free falling
 #define SP_PATH_FOUNT  1       //going up and down
 #define SP_PATH_FLIT   2       //flitting
+#define SP_PATH_RAIN   3       //falling and vanishing quickly
 
 #define SPARK_COLOR_NONE 0
 #define SPARK_COLOR_BLUE 1

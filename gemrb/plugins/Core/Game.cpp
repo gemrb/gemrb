@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.130 2006/11/11 12:18:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.131 2006/11/26 23:19:19 avenger_teambg Exp $
  *
  */
 
@@ -900,16 +900,6 @@ void Game::SetControlStatus(int value, int mode)
 	}
 }
 
-/* sets the weather type */
-void Game::StartRainOrSnow(bool conditional, int w)
-{
-	if (conditional && w) {
-		if (WeatherBits & (WB_RAIN | WB_SNOW) )
-			return;
-	}
-	WeatherBits = w | WB_START;
-}
-
 void Game::AddGold(ieDword add)
 {
 	ieDword old;
@@ -1336,21 +1326,29 @@ void Game::DrawWeather(Region &screen, bool update)
 			weather->SetPhase(P_FADE);
 		}
 	}
-	if (GameTime&1) {
+	//if (GameTime&1) {
 		int drawn = weather->Update();
 		if (drawn) {
 			WeatherBits &= ~WB_START;
 		}
-	}
+	//}
 
 	if (WeatherBits&WB_HASWEATHER) {
 		return;
 	}
-	WeatherBits|=WB_HASWEATHER;
-	int w = area->GetWeather();
+	int w = area->GetWeather() | WB_HASWEATHER;
+  StartRainOrSnow(true, w);
+}
 
+/* sets the weather type */
+void Game::StartRainOrSnow(bool conditional, int w)
+{
+	if (conditional && (w & (WB_RAIN|WB_SNOW)) ) {
+		if (WeatherBits & (WB_RAIN | WB_SNOW) )
+			return;
+	}
+	WeatherBits = w;
 	if (w & WB_LIGHTNING) {
-		WeatherBits |= WB_LIGHTNING;
 		if (WeatherBits&WB_START) {
 			//already raining
 			if (GameTime&1) {
@@ -1362,24 +1360,22 @@ void Game::DrawWeather(Region &screen, bool update)
 			//start raining (far)
 			core->PlaySound(DS_LIGHTNING3);
 		}
-	}
-	if (! (WeatherBits &WB_START) ) {
-		WeatherBits |= w&WB_MASK;
-		if (w&WB_SNOW) {
-			core->PlaySound(DS_SNOW);
-			weather->SetType(SP_TYPE_POINT, SP_PATH_FLIT);
-			weather->SetPhase(P_GROW);
-			weather->SetColor(SPARK_COLOR_WHITE);
-		}
-		if (w&WB_RAIN) {
-			core->PlaySound(DS_RAIN);
-			weather->SetType(SP_TYPE_LINE, SP_PATH_FALL);
-			weather->SetPhase(P_GROW);
-			weather->SetColor(SPARK_COLOR_STONE);
-		}
-	} else {
-		weather->SetPhase(P_FADE);
-	}
+  }
+  if (w&WB_SNOW) {
+    core->PlaySound(DS_SNOW);
+    weather->SetType(SP_TYPE_POINT, SP_PATH_FLIT);
+    weather->SetPhase(P_GROW);
+    weather->SetColor(SPARK_COLOR_WHITE);
+    return;
+  }
+  if (w&WB_RAIN) {
+    core->PlaySound(DS_RAIN);
+    weather->SetType(SP_TYPE_LINE, SP_PATH_RAIN);
+    weather->SetPhase(P_GROW);
+    weather->SetColor(SPARK_COLOR_STONE);
+    return;
+  }
+	weather->SetPhase(P_FADE);
 }
 
 void Game::SetExpansion(int exp)

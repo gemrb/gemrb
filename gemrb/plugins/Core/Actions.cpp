@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.95 2006/11/25 13:21:46 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.96 2006/11/26 23:19:19 avenger_teambg Exp $
  *
  */
 
@@ -4127,7 +4127,7 @@ void GameScript::SetMazeHarder(Scriptable* Sender, Action* /*parameters*/)
 
 void GameScript::StartRainNow(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
-	core->GetGame()->StartRainOrSnow( false, WB_RAIN|WB_START|WB_LIGHTNING);
+	core->GetGame()->StartRainOrSnow( false, WB_RAIN|WB_LIGHTNING);
 }
 
 void GameScript::Weather(Scriptable* /*Sender*/, Action* parameters)
@@ -4138,13 +4138,13 @@ void GameScript::Weather(Scriptable* /*Sender*/, Action* parameters)
 			game->StartRainOrSnow( false, 0);
 			break;
 		case WB_RAIN:
-			game->StartRainOrSnow( true, WB_RAIN|WB_START|WB_LIGHTNING);
+			game->StartRainOrSnow( true, WB_RAIN|WB_LIGHTNING);
 			break;
 		case WB_SNOW:
-			game->StartRainOrSnow( true, WB_SNOW|WB_START);
+			game->StartRainOrSnow( true, WB_SNOW);
 			break;
 		case WB_FOG:
-			game->StartRainOrSnow( true, WB_FOG|WB_START);
+			game->StartRainOrSnow( true, WB_FOG);
 			break;
 	}
 }

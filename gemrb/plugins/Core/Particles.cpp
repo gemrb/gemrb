@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Particles.cpp,v 1.3 2006/11/06 19:15:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Particles.cpp,v 1.4 2006/11/26 23:19:19 avenger_teambg Exp $
  *
  */
 
@@ -129,7 +129,22 @@ void Particles::SetBitmap(const ieResRef BAM)
 
 bool Particles::AddNew(Point &point)
 {
-	int st=(MAX_SPARK_PHASE<<4) + core->Roll(2,pos.h,0);
+	int st;
+	
+	switch(path)
+	{
+	case SP_PATH_RAIN:
+	case SP_PATH_FLIT:
+		st = core->Roll(3,5,MAX_SPARK_PHASE)<<4;
+		break;
+	case SP_PATH_FOUNT:
+		st =(MAX_SPARK_PHASE + 2*pos.h)<<4;
+		break;
+	case SP_PATH_FALL:
+	default:
+		st =(MAX_SPARK_PHASE + pos.h)<<4;
+		break;
+	}
 	int i = last_insert;
 	while (i--) {
 		if (points[i].state == -1) {
@@ -153,6 +168,8 @@ bool Particles::AddNew(Point &point)
 
 void Particles::Draw(Region &screen)
 {
+	int length; //used only for raindrops
+
 	Video *video=core->GetVideoDriver();
 	Region region = video->GetViewport();
 	int i = size;
@@ -162,36 +179,39 @@ void Particles::Draw(Region &screen)
 		}
 		int state = points[i].state>>4;
 		if (state>=MAX_SPARK_PHASE) {
+			length = 6-abs(state-MAX_SPARK_PHASE-6);
 			state = 0;
 		} else {
 			state=MAX_SPARK_PHASE-state;
+			length=0;
 		}
 		Color clr = sparkcolors[color][state];
 		switch (type) {
-			case SP_TYPE_BITMAP:
-				if (bitmap[state]) {
-					Sprite2D *frame = bitmap[state]->GetFrame(points[i].state&255);
-					video->BlitGameSprite(frame,
-						points[i].pos.x+screen.x,
-						points[i].pos.y+screen.y, 0, clr,
-						NULL, NULL, &screen);
-				}
-				break;
-			case SP_TYPE_CIRCLE:
-				video->DrawCircle (points[i].pos.x+screen.x,
-					points[i].pos.y+screen.y, 2, clr, true);
-				break;
-			case SP_TYPE_POINT:
-				video->SetPixel (points[i].pos.x+screen.x,
-					points[i].pos.y+screen.y, clr, true);
-				break;
-			case SP_TYPE_LINE:
-				
+		case SP_TYPE_BITMAP:
+			if (bitmap[state]) {
+				Sprite2D *frame = bitmap[state]->GetFrame(points[i].state&255);
+				video->BlitGameSprite(frame,
+					points[i].pos.x+screen.x,
+					points[i].pos.y+screen.y, 0, clr,
+					NULL, NULL, &screen);
+			}
+			break;
+		case SP_TYPE_CIRCLE:
+			video->DrawCircle (points[i].pos.x+screen.x,
+				points[i].pos.y+screen.y, 2, clr, true);
+			break;
+		case SP_TYPE_POINT:
+			video->SetPixel (points[i].pos.x+screen.x,
+				points[i].pos.y+screen.y, clr, true);
+			break;
+		case SP_TYPE_LINE:         // this is more like a raindrop
+			if (length) {
 				video->DrawLine (points[i].pos.x+region.x,
 					points[i].pos.y+region.y,
-					points[i].pos.x+region.x+(i&3),
-					points[i].pos.y+region.y+3+((i>>2)&3), clr, true);
-				break;
+					points[i].pos.x+region.x+(i&1),
+					points[i].pos.y+region.y+length, clr, true);
+			}
+			break;
 		}
 	}
 }
@@ -203,9 +223,13 @@ void Particles::AddParticles(int count)
 		
 		switch (path) {
 		case SP_PATH_FALL:
-		case SP_PATH_FLIT:
 			p.x = core->Roll(1,pos.w,0);
 			p.y = core->Roll(1,pos.h/2,0);
+			break;
+		case SP_PATH_RAIN:
+		case SP_PATH_FLIT:
+			p.x = core->Roll(1,pos.w,0);
+			p.y = core->Roll(1,pos.h,0);
 			break;
 		case SP_PATH_FOUNT:
 			p.x = core->Roll(1,pos.w/2,pos.w/4);
@@ -236,7 +260,11 @@ int Particles::Update()
 
 		switch (path) {
 		case SP_PATH_FALL:
-			points[i].pos.x+=pos.w+(i&3);
+			points[i].pos.y+=3+((i>>2)&3);
+			points[i].pos.y%=pos.h;
+			break;
+		case SP_PATH_RAIN:
+			points[i].pos.x+=pos.w+(i&1);
 			points[i].pos.x%=pos.w;
 			points[i].pos.y+=3+((i>>2)&3);
 			points[i].pos.y%=pos.h;
@@ -270,6 +298,9 @@ int Particles::Update()
 	if (phase==P_GROW) {
 		AddParticles(grow);
 		drawn=true;
+	}
+	if (!drawn) {
+		phase = P_EMPTY;
 	}
 	return drawn;
 }

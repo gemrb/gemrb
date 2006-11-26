@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.23 2006/08/09 18:59:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.cpp,v 1.24 2006/11/26 23:19:19 avenger_teambg Exp $
  *
  */
 
@@ -92,56 +92,77 @@ bool WEDImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-TileMap* WEDImp::GetTileMap()
+int WEDImp::AddOverlay(TileMap *tm, Overlay *overlays, bool rain)
 {
+	ieResRef res;
 	int usedoverlays = 0;
 
-	TileMap* tm = new TileMap();
-	//TODO: Implement Multi Overlay
-	TileOverlay* over = new TileOverlay( overlays[0].Width, overlays[0].Height );
-	DataStream* tisfile = core->GetResourceMgr()->GetResource( overlays[0].TilesetResRef, IE_TIS_CLASS_ID );
-	if (!core->IsAvailable( IE_TIS_CLASS_ID )) {
-		printf( "[WEDImporter]: No TileSet Importer Available.\n" );
-		return NULL;
+	memcpy(res, overlays->TilesetResRef,sizeof(ieResRef));
+	if (rain) {
+		strncat(res,"R",8);
+		//no rain tileset available, rolling back
+		if (!core->Exists(res,IE_TIS_CLASS_ID)) {
+			memcpy(res, overlays->TilesetResRef,sizeof(ieResRef));
+		}
 	}
+	TileOverlay *over = new TileOverlay( overlays->Width, overlays->Height );
+	DataStream* tisfile = core->GetResourceMgr()->GetResource(res, IE_TIS_CLASS_ID);
 	TileSetMgr* tis = ( TileSetMgr* ) core->GetInterface( IE_TIS_CLASS_ID );
 	tis->Open( tisfile );
-	for (int y = 0; y < overlays[0].Height; y++) {
-		for (int x = 0; x < overlays[0].Width; x++) {
-			str->Seek( overlays[0].TilemapOffset +
-					( y * overlays[0].Width * 10 ) +
-					( x * 10 ),
-					GEM_STREAM_START );
+	for (int y = 0; y < overlays->Height; y++) {
+		for (int x = 0; x < overlays->Width; x++) {
+			str->Seek( overlays->TilemapOffset +
+				( y * overlays->Width * 10 ) + ( x * 10 ),
+				GEM_STREAM_START );
 			ieWord startindex, count, secondary;
 			ieByte overlaymask;
 			str->ReadWord( &startindex );
 			str->ReadWord( &count );
+			//should be always 0xffff
 			str->ReadWord( &secondary );
-			//now we are not sure if this is a real byte
-			//could be a dword, so endian problems may happen!!!
+			//should be always 0
 			str->Read( &overlaymask, 1 );
-			//TODO: Consider Alternative Tile and Overlay Mask
-			str->Seek( overlays[0].TILOffset + ( startindex * 2 ),
-					GEM_STREAM_START );
-			ieWord* indexes = ( ieWord* ) calloc( count, sizeof(ieWord) );
-			str->Read( indexes, count * sizeof(ieWord) );
+			str->Seek( overlays->TILOffset + ( startindex * 2 ),
+				GEM_STREAM_START );
+			ieWord* indices = ( ieWord* ) calloc( count, sizeof(ieWord) );
+			str->Read( indices, count * sizeof(ieWord) );
 			if( DataStream::IsEndianSwitch()) {
-				swab( (char*) indexes, (char*) indexes, count * sizeof(ieWord) );
+				swab( (char*) indices, (char*) indices, count * sizeof(ieWord) );
 			}
 			Tile* tile;
-			if (secondary == 0xffff)
-				tile = tis->GetTile( indexes, count );
-			else {
-				tile = tis->GetTile( indexes, 1, &secondary );
+			if (secondary == 0xffff) {
+				tile = tis->GetTile( indices, count );
+			} else {
+				tile = tis->GetTile( indices, 1, &secondary );
 			}
 			tile->om = overlaymask;
-			//getting used overlays
 			usedoverlays |= overlaymask;
 			over->AddTile( tile );
-			free( indexes );
+			free( indices );
 		}
 	}
-	tm->AddOverlay( over );
+	
+	if (rain) {
+		tm->AddRainOverlay( over );
+	} else {
+		tm->AddOverlay( over );
+	}
+	core->FreeInterface( tis );
+	return usedoverlays;
+}
+
+TileMap* WEDImp::GetTileMap()
+{
+	int usedoverlays;
+
+	if (!core->IsAvailable( IE_TIS_CLASS_ID )) {
+		printf( "[WEDImporter]: No TileSet Importer Available.\n" );
+		return NULL;
+	}
+	TileMap* tm = new TileMap();
+
+	usedoverlays = AddOverlay(tm, &overlays.at(0), false);
+	AddOverlay(tm, &overlays.at(0), true);
 
 	//reading additional overlays
 	int mask=2;
@@ -149,50 +170,15 @@ TileMap* WEDImp::GetTileMap()
 		//skipping unused overlays
 		if (!(mask&usedoverlays)) {
 			tm->AddOverlay( NULL );
+			tm->AddRainOverlay( NULL );
 			mask<<=1;
 			continue;
 		}
 		mask<<=1;
-		//don't declare these again, especially don't redeclare tis
-		over = new TileOverlay( overlays[i].Width, overlays[i].Height );
-		tisfile = core->GetResourceMgr()->GetResource( overlays[i].TilesetResRef, IE_TIS_CLASS_ID );
-		tis->Open( tisfile );
-		for (int y = 0; y < overlays[i].Height; y++) {
-			for (int x = 0; x < overlays[i].Width; x++) {
-				str->Seek( overlays[i].TilemapOffset +
-				( y * overlays[i].Width * 10 ) + ( x * 10 ),
-				GEM_STREAM_START );
-				ieWord startindex, count, secondary;
-				ieByte overlaymask;
-				str->ReadWord( &startindex );
-				str->ReadWord( &count );
-				//should be always 0xffff
-				str->ReadWord( &secondary );
-				//should be always 0
-				str->Read( &overlaymask, 1 );
-				str->Seek( overlays[i].TILOffset + ( startindex * 2 ),
-					GEM_STREAM_START );
-				ieWord* indexes = ( ieWord* ) calloc( count, sizeof(ieWord) );
-				str->Read( indexes, count * sizeof(ieWord) );
-				if( DataStream::IsEndianSwitch()) {
-					swab( (char*) indexes, (char*) indexes, count * sizeof(ieWord) );
-				}
-				Tile* tile;
-				if (secondary == 0xffff) {
-					tile = tis->GetTile( indexes, count );
-				} else {
-					tile = tis->GetTile( indexes, 1, &secondary );
-				}
-				tile->om = overlaymask;
-				over->AddTile( tile );
-				free( indexes );
-			}
-		}
 
-		tm->AddOverlay( over );
+		AddOverlay(tm, &overlays.at(i), false);
+		AddOverlay(tm, &overlays.at(i), true);
 	}
-
-	core->FreeInterface( tis );
 	return tm;
 }
 

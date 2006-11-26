@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.h,v 1.13 2006/07/22 12:39:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WEDImporter/WEDImp.h,v 1.14 2006/11/26 23:19:19 avenger_teambg Exp $
  *
  */
 
@@ -49,6 +49,7 @@ private:
 
 private:
 	void GetDoorPolygonCount(ieWord count, ieDword offset);
+	int AddOverlay(TileMap *tm, Overlay *overlays, bool rain);
 public:
 	WEDImp(void);
 	~WEDImp(void);

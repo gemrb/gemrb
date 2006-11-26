@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.54 2006/04/22 13:30:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.55 2006/11/26 23:19:19 avenger_teambg Exp $
  *
  */
 
@@ -39,6 +39,9 @@ TileMap::~TileMap(void)
 
 	for (i = 0; i < overlays.size(); i++) {
 		delete( overlays[i] );
+	}
+	for (i = 0; i < overlays.size(); i++) {
+		delete( rain_overlays[i]);
 	}
 	for (i = 0; i < infoPoints.size(); i++) {
 		delete( infoPoints[i] );
@@ -150,9 +153,26 @@ void TileMap::AddOverlay(TileOverlay* overlay)
 	overlays.push_back( overlay );
 }
 
-void TileMap::DrawOverlays(Region screen)
+void TileMap::AddRainOverlay(TileOverlay* overlay)
 {
-	overlays[0]->Draw( screen, overlays );
+	if (overlay) {
+		if (overlay->w > XCellCount) {
+			XCellCount = overlay->w;
+		}
+		if (overlay->h > YCellCount) {
+			YCellCount = overlay->h;
+		}
+	}
+	rain_overlays.push_back( overlay );
+}
+
+void TileMap::DrawOverlays(Region screen, int rain)
+{
+	if (rain) {
+		overlays[0]->Draw( screen, rain_overlays );
+	} else {
+		overlays[0]->Draw( screen, overlays );
+	}
 }
 
 // Size of Fog-Of-War shadow tile (and bitmap)
@@ -448,6 +468,10 @@ InfoPoint* TileMap::AddInfoPoint(const char* Name, unsigned short Type,
 
 		case 2:
 			ip->Type = ST_TRAVEL;
+			break;
+		//this is just to satisfy whiny compilers
+		default:
+			ip->Type = ST_PROXIMITY;
 			break;
 	}
 	ip->outline = outline;

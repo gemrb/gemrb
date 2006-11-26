@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.257 2006/11/25 15:21:00 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.258 2006/11/26 23:19:19 avenger_teambg Exp $
  *
  */
 
@@ -681,6 +681,10 @@ void Map::UpdateScripts()
 				//don't move if doing something else
 				if (actor->GetNextAction())
 					continue;
+        //this is needed, otherwise the travel
+        //trigger would be activated anytime
+        if (!(ip->Flags&TRAP_RESET))
+          continue;
 				if (ip->Entered(actor)) {
 					UseExit(actor, ip);
 				}
@@ -799,9 +803,18 @@ void Map::DrawMap(Region screen, GameControl* gc)
 	if (!TMap) {
 		return;
 	}
-	ieDword gametime = core->GetGame()->GameTime;
+  Game *game = core->GetGame();
+	ieDword gametime = game->GameTime;
 
-	TMap->DrawOverlays( screen );
+  int rain;
+  if (HasWeather()) {
+    //zero when the weather particles are all gone
+    rain = game->weather->GetPhase()-P_EMPTY;
+  } else {
+    rain = 0;
+  }
+	TMap->DrawOverlays( screen, rain );
+  
 	//Blit the Background Map Animations (before actors)
 	Video* video = core->GetVideoDriver();
 
@@ -1765,10 +1778,6 @@ PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, int flags)
 		Leveldown( p.x + 1, p.y + 1, level, n, diff );
 		Leveldown( p.x + 1, p.y - 1, level, n, diff );
 		Leveldown( p.x - 1, p.y - 1, level, n, diff );
-		if (!diff) {
-			Return->Parent = NULL;
-			return Return;
-		}
 		Return->x = n.x;
 		Return->y = n.y;
 
@@ -1778,6 +1787,9 @@ PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, int flags)
 			Return->orient = GetOrient( n, p );
 		}
 		p = n;
+		if (!diff) {
+			break;
+		}
 	}
 	Return->Parent = NULL;
 	return Return;
