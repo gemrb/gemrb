@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.296 2006/11/01 10:23:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.297 2006/11/26 23:08:32 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -655,7 +655,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				break;
 			case 't'://advances time
 				// 7200 (one day) /24 (hours) == 300
-				game->GameTime += 300;
+				game->AdvanceTime(300);
 				//refresh gui here once we got it
 				break;
 
