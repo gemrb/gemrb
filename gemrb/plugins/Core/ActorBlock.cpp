@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.159 2006/11/16 21:44:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.160 2006/11/27 18:48:25 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -941,12 +941,12 @@ Door::Door(TileOverlay* Overlay)
 Door::~Door(void)
 {
 	if (Flags&DOOR_OPEN) {
-		if (open) {
-			delete( open );
-		}
-	} else {
 		if (closed) {
 			delete( closed );
+		}
+	} else {
+		if (open) {
+			delete( open );
 		}
 	}
 	if (tiles) {
@@ -971,9 +971,9 @@ void Door::ImpedeBlocks(int count, Point *points, unsigned int value)
 void Door::UpdateDoor()
 {
 	if (Flags&DOOR_OPEN) {
-		outline = closed;
-	} else {
 		outline = open;
+	} else {
+		outline = closed;
 	}
 	unsigned int oval, cval;
 
