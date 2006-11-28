@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.258 2006/11/26 23:19:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.259 2006/11/28 21:45:21 avenger_teambg Exp $
  *
  */
 
@@ -96,7 +96,7 @@ void Map::ReleaseMemory()
 	PathFinderInited = false;
 }
 
-inline static AnimationObjectType SelectObject(Actor *actor, AreaAnimation *a, ScriptedAnimation *sca)
+inline static AnimationObjectType SelectObject(Actor *actor, AreaAnimation *a, ScriptedAnimation *sca, Particles *spark)
 {
 	int actorh;
 	if (actor) {
@@ -119,12 +119,21 @@ inline static AnimationObjectType SelectObject(Actor *actor, AreaAnimation *a, S
 		scah = 0x7fffffff;
 	}
 
-	if (actorh<aah) {
-		if (actorh<scah) return AOT_ACTOR;
-		return AOT_SCRIPTED;
+	int spah;
+	if (spark) {
+		//no idea if this should be plus or minus (or here at all)
+		spah = spark->GetHeight();//+spark->pos.h;
+	} else {
+		spah = 0x7fffffff;
 	}
-	if (aah<scah) return AOT_AREA;
-	return AOT_SCRIPTED;
+
+	if (spah<actorh && spah<scah && spah<aah) return AOT_SPARK;
+
+	if (aah<actorh && aah<scah) return AOT_AREA;
+
+	if (scah<actorh) return AOT_SCRIPTED;
+
+	return AOT_ACTOR;
 }
 
 //returns true if creature must be embedded in the area
@@ -414,11 +423,19 @@ Map::~Map(void)
 			queue[i] = NULL;
 		}
 	}
-	scaIterator iter;
+	
+	scaIterator sci;
 
-	for (iter = vvcCells.begin(); iter != vvcCells.end(); iter++) {
-		delete (*iter);
+	for (sci = vvcCells.begin(); sci != vvcCells.end(); sci++) {
+		delete (*sci);
 	}
+	
+	spaIterator spi;
+
+	for (spi = particles.begin(); spi != particles.end(); spi++) {
+		delete (*spi);
+	}
+	
 	for (i = 0; i < ambients.size(); i++) {
 		delete ambients[i];
 	}
@@ -681,10 +698,10 @@ void Map::UpdateScripts()
 				//don't move if doing something else
 				if (actor->GetNextAction())
 					continue;
-        //this is needed, otherwise the travel
-        //trigger would be activated anytime
-        if (!(ip->Flags&TRAP_RESET))
-          continue;
+				//this is needed, otherwise the travel
+				//trigger would be activated anytime
+				if (!(ip->Flags&TRAP_RESET))
+					continue;
 				if (ip->Entered(actor)) {
 					UseExit(actor, ip);
 				}
@@ -786,6 +803,14 @@ retry:
 	return a;
 }
 
+Particles *Map::GetNextSpark(spaIterator &iter)
+{
+	if (iter==particles.end()) {
+		return NULL;
+	}
+	return *iter;
+}
+
 //doesn't increase iterator, because we might need to erase it from the list
 ScriptedAnimation *Map::GetNextScriptedAnimation(scaIterator &iter)
 {
@@ -795,26 +820,25 @@ ScriptedAnimation *Map::GetNextScriptedAnimation(scaIterator &iter)
 	return *iter;
 }
 
+static ieDword oldgametime = 0;
+
 void Map::DrawMap(Region screen, GameControl* gc)
 {
-	//unsigned int i;
-	//Draw the Map
-
 	if (!TMap) {
 		return;
 	}
-  Game *game = core->GetGame();
+	Game *game = core->GetGame();
 	ieDword gametime = game->GameTime;
 
-  int rain;
-  if (HasWeather()) {
-    //zero when the weather particles are all gone
-    rain = game->weather->GetPhase()-P_EMPTY;
-  } else {
-    rain = 0;
-  }
+	int rain;
+	if (HasWeather()) {
+		//zero when the weather particles are all gone
+		rain = game->weather->GetPhase()-P_EMPTY;
+	} else {
+		rain = 0;
+	}
 	TMap->DrawOverlays( screen, rain );
-  
+	
 	//Blit the Background Map Animations (before actors)
 	Video* video = core->GetVideoDriver();
 
@@ -835,11 +859,14 @@ void Map::DrawMap(Region screen, GameControl* gc)
 	Actor* actor = GetNextActor(q, index);
 	aniIterator aniidx = animations.begin();
 	scaIterator scaidx = vvcCells.begin();
+	spaIterator spaidx = particles.begin();
+
 	AreaAnimation *a = GetNextAreaAnimation(aniidx, gametime);
 	ScriptedAnimation *sca = GetNextScriptedAnimation(scaidx);
+	Particles *spark = GetNextSpark(spaidx);
 
-	while (actor || a || sca) {
-		switch(SelectObject(actor,a,sca)) {
+	while (actor || a || sca || spark) {
+		switch(SelectObject(actor,a,sca,spark)) {
 		case AOT_ACTOR:
 			actor->Draw( screen );
 			actor = GetNextActor(q, index);
@@ -881,6 +908,24 @@ void Map::DrawMap(Region screen, GameControl* gc)
 			}
 			sca = GetNextScriptedAnimation(scaidx);
 			break;
+		case AOT_SPARK:
+			{
+				int drawn;
+				if (gametime>oldgametime) {
+					drawn = spark->Update();
+				} else {
+					drawn = 1;
+				}
+				if (drawn) {
+					spark->Draw( screen );
+					spaidx++;
+				} else {
+					delete( spark );
+					spaidx=particles.erase(spaidx);
+				}
+			}
+			spark = GetNextSpark(spaidx);
+			break;
 		default:
 			abort();
 		}
@@ -893,6 +938,7 @@ void Map::DrawMap(Region screen, GameControl* gc)
 			TMap->DrawFogOfWar( ExploredBitmap, VisibleBitmap, screen );
 		}
 	}
+
 	int ipCount = 0;
 	while (true) {
 		//For each InfoPoint in the map
@@ -901,6 +947,7 @@ void Map::DrawMap(Region screen, GameControl* gc)
 			break;
 		ip->DrawOverheadText(screen);
 	}
+	oldgametime=gametime;
 }
 
 void Map::DrawSearchMap(Region &screen)
@@ -2451,10 +2498,59 @@ int Map::GetWeather()
 #define SPARKLE_PUFF   1
 #define SPARKLE_SHOWER 3
 
+void Map::FadeSparkle(Point &pos, bool forced)
+{
+	spaIterator iter;
+
+	for(iter=particles.begin(); iter!=particles.end();iter++) {
+		if ((*iter)->MatchPos(pos) ) {
+			if (forced) {
+				//particles.erase(iter);
+				(*iter)->SetPhase(P_EMPTY);
+			} else {
+				(*iter)->SetPhase(P_FADE);
+			}
+			return;
+		}
+	}
+}
+
 void Map::Sparkle(ieDword color, ieDword type, Point &pos)
 {
+	Particles *sparkles = new Particles(100);
+	sparkles->SetOwner(this);
+	sparkles->SetRegion(pos.x-20, pos.y-80, 40, 80);
+
+	int style, path, grow;
+	switch(type) {
+	case SPARKLE_SHOWER:
+		style = SP_TYPE_POINT;
+		path = SP_PATH_FALL;
+		grow = SP_SPAWN_FULL;
+		break;
+	case SPARKLE_PUFF:
+		style = SP_TYPE_POINT;
+		path = SP_PATH_FOUNT;
+		grow = SP_SPAWN_FULL;
+		break;
+	default:
+		style = SP_TYPE_POINT;
+		path = SP_PATH_FLIT;
+		grow = SP_SPAWN_SOME;
+		break;
+		
+	}
+	sparkles->SetType(style, path, grow);
+	sparkles->SetColor(color);
+	sparkles->SetPhase(P_GROW);
 	printf("sparkle: %d %d\n", color, type);
 	printf("Position: %d.%d\n", pos.x,pos.y);
+
+	spaIterator iter;
+	//this is pos.y we just set
+	//int h = sparkles->GetHeight();
+	for(iter=particles.begin(); (iter!=particles.end()) && ((*iter)->GetHeight()<pos.y); iter++);
+	particles.insert(iter, sparkles);
 }
 
 ////////////////////AreaAnimation//////////////////

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.131 2006/11/26 23:19:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.132 2006/11/28 21:45:21 avenger_teambg Exp $
  *
  */
 
@@ -1305,7 +1305,7 @@ void Game::StartTimer(ieDword ID, ieDword expiration)
 }
 
 /* this method redraws weather. If update is false,
-   then the weather particles won't change (game paused)
+	 then the weather particles won't change (game paused)
 */
 void Game::DrawWeather(Region &screen, bool update)
 {
@@ -1337,7 +1337,7 @@ void Game::DrawWeather(Region &screen, bool update)
 		return;
 	}
 	int w = area->GetWeather() | WB_HASWEATHER;
-  StartRainOrSnow(true, w);
+	StartRainOrSnow(true, w);
 }
 
 /* sets the weather type */
@@ -1360,21 +1360,21 @@ void Game::StartRainOrSnow(bool conditional, int w)
 			//start raining (far)
 			core->PlaySound(DS_LIGHTNING3);
 		}
-  }
-  if (w&WB_SNOW) {
-    core->PlaySound(DS_SNOW);
-    weather->SetType(SP_TYPE_POINT, SP_PATH_FLIT);
-    weather->SetPhase(P_GROW);
-    weather->SetColor(SPARK_COLOR_WHITE);
-    return;
-  }
-  if (w&WB_RAIN) {
-    core->PlaySound(DS_RAIN);
-    weather->SetType(SP_TYPE_LINE, SP_PATH_RAIN);
-    weather->SetPhase(P_GROW);
-    weather->SetColor(SPARK_COLOR_STONE);
-    return;
-  }
+	}
+	if (w&WB_SNOW) {
+		core->PlaySound(DS_SNOW);
+		weather->SetType(SP_TYPE_POINT, SP_PATH_FLIT, SP_SPAWN_SOME);
+		weather->SetPhase(P_GROW);
+		weather->SetColor(SPARK_COLOR_WHITE);
+		return;
+	}
+	if (w&WB_RAIN) {
+		core->PlaySound(DS_RAIN);
+		weather->SetType(SP_TYPE_LINE, SP_PATH_RAIN, SP_SPAWN_SOME);
+		weather->SetPhase(P_GROW);
+		weather->SetColor(SPARK_COLOR_STONE);
+		return;
+	}
 	weather->SetPhase(P_FADE);
 }
 

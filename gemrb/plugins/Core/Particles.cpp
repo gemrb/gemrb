@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Particles.cpp,v 1.4 2006/11/26 23:19:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Particles.cpp,v 1.5 2006/11/28 21:45:21 avenger_teambg Exp $
  *
  */
 
@@ -92,7 +92,12 @@ Particles::Particles(int s)
 		InitSparks();
 	}
 	size = last_insert = s;
+	color = 0;
 	phase = P_FADE;
+	owner = NULL;
+	type = SP_TYPE_POINT;
+	path = SP_PATH_FALL;
+	spawn_type = SP_SPAWN_NONE;
 }
 
 Particles::~Particles()
@@ -172,6 +177,10 @@ void Particles::Draw(Region &screen)
 
 	Video *video=core->GetVideoDriver();
 	Region region = video->GetViewport();
+	if (owner) {
+		region.x-=pos.x;
+		region.y-=pos.y;
+	}
 	int i = size;
 	while (i--) {
 		if (points[i].state == -1) {
@@ -197,12 +206,13 @@ void Particles::Draw(Region &screen)
 			}
 			break;
 		case SP_TYPE_CIRCLE:
-			video->DrawCircle (points[i].pos.x+screen.x,
-				points[i].pos.y+screen.y, 2, clr, true);
+			video->DrawCircle (points[i].pos.x+region.x,
+				points[i].pos.y+region.y, 2, clr, true);
 			break;
 		case SP_TYPE_POINT:
-			video->SetPixel (points[i].pos.x+screen.x,
-				points[i].pos.y+screen.y, clr, true);
+		default:
+			video->SetPixel (points[i].pos.x-region.x,
+				points[i].pos.y-region.y, clr, true);
 			break;
 		case SP_TYPE_LINE:         // this is more like a raindrop
 			if (length) {
@@ -223,6 +233,7 @@ void Particles::AddParticles(int count)
 		
 		switch (path) {
 		case SP_PATH_FALL:
+		default:
 			p.x = core->Roll(1,pos.w,0);
 			p.y = core->Roll(1,pos.h/2,0);
 			break;
@@ -246,8 +257,24 @@ int Particles::Update()
 {
 	int drawn=false;
 	int i;
+	int grow;
 
-	int grow = size/10;
+	if (phase==P_EMPTY) {
+		return drawn;
+	}
+
+	switch(spawn_type) {
+	case SP_SPAWN_NONE:
+		grow = 0;
+		break;
+	case SP_SPAWN_FULL:
+		grow = size;
+		spawn_type=SP_SPAWN_NONE;
+		break;
+	case SP_SPAWN_SOME:
+	default:
+		grow = size/10;
+	}
 	for(i=0;i<size;i++) {
 		if (points[i].state==-1) {
 			continue;

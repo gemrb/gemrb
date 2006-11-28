@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Particles.h,v 1.3 2006/11/26 23:19:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Particles.h,v 1.4 2006/11/28 21:45:21 avenger_teambg Exp $
  *
  */
 
@@ -56,6 +56,10 @@ typedef struct Element {
 #define SP_PATH_FLIT   2       //flitting
 #define SP_PATH_RAIN   3       //falling and vanishing quickly
 
+#define SP_SPAWN_NONE  0       //don't create new sparks
+#define SP_SPAWN_FULL  1       //fill all, then switch to none
+#define SP_SPAWN_SOME  2       //add some new elements regularly
+
 #define SPARK_COLOR_NONE 0
 #define SPARK_COLOR_BLUE 1
 #define SPARK_COLOR_GOLD 2
@@ -81,7 +85,13 @@ public:
 	void SetBitmap(const ieResRef BAM);
 	void SetPhase(ieByte ph) { phase = ph; }
 	int GetPhase() { return phase; }
-	void SetType(ieByte t, ieByte p=SP_PATH_FALL) { type=t; path=p; }
+	bool MatchPos(Point &p) { return pos.x==p.x && pos.y==p.y; }
+	void SetType(ieByte t, ieByte p=SP_PATH_FALL, ieByte st=SP_SPAWN_NONE)
+	{
+		type=t;
+		path=p;
+		spawn_type=st;
+	}
 	void SetRegion(int x, int y, int w, int h)
 	{
 		pos.x = x;
@@ -90,24 +100,26 @@ public:
 		pos.h = h;
 	}
 	void SetColor(ieByte c) { color=c; }
+	void SetOwner(Scriptable *o) { owner=o; }
 	/* returns true if it cannot add new elements */
 	bool AddNew(Point &point);
 	void Draw(Region &screen);
 	void AddParticles(int count);
 	/* returns true if it could be destroyed (didn't draw anything) */
 	int Update();
-public:
+	int GetHeight() { return pos.y+pos.h; }
+private:
 	Element *points;
 	ieDword target;    //could be 0, in that case target is pos
 	ieWord size;       //spark number
 	ieWord last_insert;//last spark idx added
-	Scriptable *owner; //could be area or game
+	Scriptable *owner; //could be area or game or actor
 	Region pos;
 	ieByte phase;      //global phase
 	ieByte type;       //draw type (snow, rain)
 	ieByte path;       //path type
 	ieByte color;      //general spark color
-	bool spawn_type;
+	ieByte spawn_type;
 	Animation *bitmap[MAX_SPARK_PHASE];
 };
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.121 2006/10/06 23:01:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.122 2006/11/28 21:45:21 avenger_teambg Exp $
  *
  */
 
@@ -37,6 +37,7 @@ struct PathNode;
 class ScriptedAnimation;
 class Animation;
 class Wall_Polygon;
+class Particles;
 
 #ifdef WIN32
 
@@ -187,7 +188,7 @@ public:
 	bool Schedule(ieDword gametime);
 };
 
-enum AnimationObjectType {AOT_AREA, AOT_SCRIPTED, AOT_ACTOR};
+enum AnimationObjectType {AOT_AREA, AOT_SCRIPTED, AOT_ACTOR, AOT_SPARK};
 
 //i believe we need only the active actors/visible inactive actors queues
 #define QUEUE_COUNT 2
@@ -199,6 +200,7 @@ enum AnimationObjectType {AOT_AREA, AOT_SCRIPTED, AOT_ACTOR};
 
 typedef std::list<AreaAnimation*>::iterator aniIterator;
 typedef std::list<ScriptedAnimation*>::iterator scaIterator;
+typedef std::list<Particles*>::iterator spaIterator;
 
 class GEM_EXPORT Map : public Scriptable {
 public:
@@ -225,6 +227,7 @@ private:
 	Wall_Polygon **Walls;
 	unsigned int WallCount;
 	std::list< ScriptedAnimation*> vvcCells;
+	std::list< Particles*> particles;
 	std::vector< Entrance*> entrances;
 	std::vector< Ambient*> ambients;
 	std::vector< MapNote*> mapnotes;
@@ -301,7 +304,10 @@ public:
 	void AddVVCell(ScriptedAnimation* vvc);
 	bool CanFree();
 	int GetCursor( Point &p);
+	//adds a sparkle puff of colour to a point in the area
 	void Sparkle(ieDword color, ieDword type, Point &pos);
+	//removes or fades the sparkle puff at a point
+	void FadeSparkle(Point &pos, bool forced);
 
 	//entrances
 	void AddEntrance(char* Name, int XPos, int YPos, short Face);
@@ -387,6 +393,7 @@ public:
 
 private:
 	AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime);
+	Particles *GetNextSpark(spaIterator &iter);
 	ScriptedAnimation *GetNextScriptedAnimation(scaIterator &iter);
 	Actor *GetNextActor(int &q, int &index);
 	void DrawSearchMap(Region &screen);
