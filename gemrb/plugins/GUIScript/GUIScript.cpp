@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.420 2006/11/25 16:53:46 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.421 2006/11/28 22:29:18 wjpalenstijn Exp $
  *
  */
 
@@ -3047,10 +3047,13 @@ static PyObject* GemRB_GetVar(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (!core->GetDictionary()->Lookup( Variable, value )) {
-		return PyInt_FromLong( ( unsigned long ) 0 );
+		return PyInt_FromLong( 0 );
 	}
 
-	return PyInt_FromLong( (unsigned long) value );
+	// A PyInt is internally (probably) a long. Since we sometimes set
+	// variables to -1, cast value to a signed integer first, so it is
+	// sign-extended into a long if long is larger than int.
+	return PyInt_FromLong( (int)value );
 }
 
 PyDoc_STRVAR( GemRB_CheckVar__doc,
