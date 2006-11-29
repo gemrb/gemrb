@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.91 2006/09/16 13:20:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.92 2006/11/29 22:23:16 wjpalenstijn Exp $
  *
  */
 
@@ -75,7 +75,13 @@ int CharAnimations::GetAnimType() const
 	return AvatarTable[AvatarsRowNum].AnimationType;
 }
 
-int CharAnimations::GetPartCount() const
+char CharAnimations::GetSize() const
+{
+	if (AvatarsRowNum==~0u) return 0;
+	return AvatarTable[AvatarsRowNum].Size;
+}
+
+int CharAnimations::GetActorPartCount() const
 {
 	if (AvatarsRowNum==~0u) return -1;
 	switch (AvatarTable[AvatarsRowNum].AnimationType) {
@@ -99,6 +105,17 @@ int CharAnimations::GetPartCount() const
 	}
 }
 
+int CharAnimations::GetTotalPartCount() const
+{
+	if (AvatarsRowNum==~0u) return -1;
+	switch (AvatarTable[AvatarsRowNum].AnimationType) {
+	case IE_ANI_CODE_MIRROR:
+		return GetActorPartCount() + 3; // equipment
+	default:
+		return GetActorPartCount();
+	}
+}
+
 void CharAnimations::SetArmourLevel(int ArmourLevel)
 {
 	if (AvatarsRowNum==~0u) return;
@@ -109,6 +126,47 @@ void CharAnimations::SetArmourLevel(int ArmourLevel)
 	strncpy( ResRef, AvatarTable[AvatarsRowNum].Prefixes[ArmourLevel], 8 );
 	ResRef[8]=0;
 	DropAnims();
+}
+
+void CharAnimations::SetWeaponType(int wt)
+{
+	if (wt != WeaponType) {
+		WeaponType = wt;
+		DropAnims();
+	}
+}
+
+void CharAnimations::SetHelmetRef(const char* ref)
+{
+	if (HelmetRef[0] != ref[0] || HelmetRef[1] != ref[1]) {
+		HelmetRef[0] = ref[0];
+		HelmetRef[1] = ref[1];
+
+		// TODO: Only drop helmet anims
+		DropAnims();
+	}
+}
+
+void CharAnimations::SetWeaponRef(const char* ref)
+{
+	if (WeaponRef[0] != ref[0] || WeaponRef[1] != ref[1]) {
+		WeaponRef[0] = ref[0];
+		WeaponRef[1] = ref[1];
+
+		// TODO: Only drop weapon anims
+		DropAnims();
+	}
+}
+
+void CharAnimations::SetOffhandRef(const char* ref)
+{
+	if (OffhandRef[0] != ref[0] || OffhandRef[1] != ref[1]) {
+		OffhandRef[0] = ref[0];
+		OffhandRef[1] = ref[1];
+
+		// TODO: Only drop shield/offhand anims
+		DropAnims();
+	}
 }
 
 void CharAnimations::SetColors(ieDword *arg)
@@ -239,6 +297,7 @@ void CharAnimations::InitAvatarsTable()
 		else {
 			AvatarTable[i].PaletteType=atoi(Avatars->QueryField(i,AV_USE_PALETTE) );
 		}
+		AvatarTable[i].Size=Avatars->QueryField(i,AV_SIZE)[0];
 	}
 	core->DelTable( tmp );
 }
@@ -262,7 +321,10 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 	ArmorType = 0;
 	RangedType = 0;
 	WeaponType = 0;
-	PaletteResRef[0]=0;
+	PaletteResRef[0] = 0;
+	WeaponRef[0] = 0;
+	HelmetRef[0] = 0;
+	OffhandRef[0] = 0;
 
 	AvatarsRowNum=AvatarsCount;
 	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
@@ -287,7 +349,7 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 void CharAnimations::DropAnims()
 {
 	Animation** tmppoi;
-	int partCount = GetPartCount();
+	int partCount = GetTotalPartCount();
 	for (int StanceID = 0; StanceID < MAX_ANIMS; StanceID++) {
 		for (int i = 0; i < MAX_ORIENT; i++) {
 			if (Anims[StanceID][i]) {
@@ -509,17 +571,68 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 		return anims;
 	}
 
-	int partCount = GetPartCount();
+	int partCount = GetTotalPartCount();
+	int actorPartCount = GetActorPartCount();
 	if (partCount < 0) return 0;
 	anims = new Animation*[partCount];
 
+	unsigned char Cycle;
+	char mainResRef[9];
 	for (int part = 0; part < partCount; ++part)
 	{
-		//newresref is based on the prefix (ResRef) and various other things
-		char NewResRef[12]; //this is longer than expected so it won't overflow
-		strncpy( NewResRef, ResRef, 8 ); //we need this long for special anims
-		unsigned char Cycle;
-		GetAnimResRef( StanceID, Orient, NewResRef, Cycle, part );
+		//newresref is based on the prefix (ResRef) and various
+		// other things.
+		//this is longer than expected so it won't overflow
+		char NewResRef[12];
+		if (part < actorPartCount) {
+			// Character animation parts
+
+			//we need this long for special anims
+			strncpy( NewResRef, ResRef, 8 );
+			GetAnimResRef( StanceID, Orient, NewResRef, Cycle, part );
+
+			// Store the main resref to use for equipment
+			// Note that Cycle is also kept
+			strncpy( mainResRef, NewResRef, 8 );
+			mainResRef[8] = 0;
+		} else {
+			// Equipment animation parts
+
+			anims[part] = 0;
+			// TODO: This needs cleaning up. In particular:
+			// * The GetVHREquipmentRef function shouldn't be called
+			//   directly; there should be a wrapper like GetAnimResRef
+			// * Maybe not use a copy such as mainResRef, but rather
+			//   store the various parts of mainResRef separately when
+			//   generating the original VHR suffix
+
+			if (GetSize() == '*' || GetSize() == 0) continue;
+
+			if (part == actorPartCount) {
+				if (HelmetRef[0] == 0) continue;
+				// helmet
+				GetVHREquipmentRef(NewResRef,mainResRef,HelmetRef,false);
+				printf("Using helmet ref %s for %s\n", NewResRef,
+					   mainResRef);
+			} else if (part == actorPartCount+1) {
+				if (WeaponRef[0] == 0) continue;
+				// weapon
+				GetVHREquipmentRef(NewResRef,mainResRef,WeaponRef,false);
+				printf("Using weapon ref %s\n", NewResRef);
+			} else if (part == actorPartCount+2) {
+				if (OffhandRef[0] == 0) continue;
+				if (WeaponType == IE_ANI_WEAPON_2H) continue;
+				// off-hand
+				if (WeaponType == IE_ANI_WEAPON_1H) {
+					GetVHREquipmentRef(NewResRef,mainResRef,
+									   OffhandRef,false);
+				} else { // IE_ANI_WEAPON_2W
+					GetVHREquipmentRef(NewResRef,mainResRef,
+									   OffhandRef,true);
+				}
+				printf("Using offhand ref %s\n", NewResRef);
+			}
+		}
 		NewResRef[8]=0; //cutting right to size
 
 		AnimationFactory* af = ( AnimationFactory* )
@@ -1023,6 +1136,7 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 			//Maybe is Die reversed
 		case IE_ANI_GET_UP:
 		case IE_ANI_EMERGE:
+		case IE_ANI_PST_START: // to make ctrl-s work in BG2
 			strcat( ResRef, "g19" );
 			Cycle += 81;
 			break;
@@ -1071,6 +1185,17 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 	}
 }
 
+void CharAnimations::GetVHREquipmentRef(char* ResRef,
+										const char* mainResRef,
+										const char* equipRef,
+										bool offhand)
+{
+	if (offhand) {
+		sprintf( ResRef, "wq%c%c%co%c%c", GetSize(), equipRef[0], equipRef[1], mainResRef[5], mainResRef[6] );
+	} else {
+		sprintf( ResRef, "wq%c%c%c%c%c", GetSize(), equipRef[0], equipRef[1], mainResRef[5], mainResRef[6] );
+	}
+}
 
 void CharAnimations::AddSixSuffix(char* ResRef, unsigned char StanceID,
 	unsigned char& Cycle, unsigned char Orient)

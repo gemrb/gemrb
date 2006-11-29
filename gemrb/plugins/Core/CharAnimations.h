@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.43 2006/06/29 14:58:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.44 2006/11/29 22:23:16 wjpalenstijn Exp $
  *
  */
 
@@ -48,6 +48,7 @@ class Palette;
 #define AV_ANIMTYPE     4
 #define AV_CIRCLESIZE   5
 #define AV_USE_PALETTE  6
+#define AV_SIZE         7
 
 #define MAX_ORIENT				16
 #define MAX_ANIMS				19
@@ -109,17 +110,21 @@ class Palette;
 #define IE_ANI_RANGED_XBOW		1
 #define IE_ANI_RANGED_THROW		2
 
-typedef struct AvatarStruct {
+struct AvatarStruct {
 	unsigned int AnimID;
 	ieResRef Prefixes[4];
 	unsigned int PaletteType;
 	unsigned char AnimationType;
 	unsigned char CircleSize;
-} AvatarStruct;
+	char Size;
+};
 
 class GEM_EXPORT CharAnimations {
 private:
 	Animation** Anims[MAX_ANIMS][MAX_ORIENT];
+	char HelmetRef[2];
+	char WeaponRef[2];
+	char OffhandRef[2];
 public:
 	ieDword *Colors;  //these are the custom color indices
 	Palette* palette;
@@ -135,11 +140,16 @@ public:
 	~CharAnimations(void);
 	static void ReleaseMemory();
 	void SetArmourLevel(int ArmourLevel);
+	void SetWeaponType(int WeaponType);
+	void SetHelmetRef(const char* ref);
+	void SetWeaponRef(const char* ref);
+	void SetOffhandRef(const char* ref);
 	void SetupColors();
 	void SetColors(ieDword *Colors);
 
-	// returns an array of animations of size GetPartCount()
+	// returns an array of animations of size GetTotalPartCount()
 	Animation** GetAnimation(unsigned char Stance, unsigned char Orient);
+	int GetTotalPartCount() const;
 
 public: //attribute functions
 	static int GetAvatarsCount();
@@ -148,11 +158,12 @@ public: //attribute functions
 	int GetCircleSize() const;
 	int NoPalette() const;
 	int GetAnimType() const;
-	int GetPartCount() const;
+	char GetSize() const;
 
 private:
 	void DropAnims();
 	void InitAvatarsTable();
+	int GetActorPartCount() const;
 	void AddPSTSuffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void AddFFSuffix(char* ResRef, unsigned char AnimID,
@@ -163,6 +174,8 @@ private:
 		unsigned char& Cycle, unsigned char Orient);
 	void AddVHRSuffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
+	void GetVHREquipmentRef(char* ResRef, const char* mainResRef,
+							const char* equipRef, bool offhand);
 	void AddSixSuffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void AddMHRSuffix(char* ResRef, unsigned char AnimID,

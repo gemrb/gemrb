@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.220 2006/11/29 21:17:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.221 2006/11/29 22:23:16 wjpalenstijn Exp $
  *
  */
 
@@ -292,9 +292,9 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	anims = new CharAnimations( AnimID&0xffff, BaseStats[IE_ARMOR_TYPE]);
 	if (anims) {
 		//FIXME: fix this when CharAnimations is done
-		//anims->SetOffhandRef(ShieldRef);
-		//anims->SetHelmetRef(HelmetRef);
-		//anims->SetWeaponRef(WeaponRef);
+		anims->SetOffhandRef(ShieldRef);
+		anims->SetHelmetRef(HelmetRef);
+		anims->SetWeaponRef(WeaponRef);
 		//anims->SetAttackMoveChances(AttackMovements);
 
 		//if we have a recovery palette, then set it back
@@ -2190,15 +2190,75 @@ void Actor::Draw(Region &screen)
 		DrawCircle(vp);
 		DrawTargetPoint(vp);
 	}
-	
+
+	// FIXME: The below code won't be necessary any more
+	// as soon as WeaponType is set when changing weapons
+
+#if 1
+	CREItem* si;
+	// Helmet
+	si = inventory.GetSlotItem( core->QuerySlot(1) );
+	if (si) {
+		Item* it = core->GetItem(si->ItemResRef);
+		assert(it);
+		ca->SetHelmetRef(it->AnimationType);
+	} else {
+		ca->SetHelmetRef("");
+	}
+
+	// Shield
+	bool twoweapons = false;
+	si = inventory.GetSlotItem( core->QuerySlot(3) );
+	if (si) {
+		Item* it = core->GetItem(si->ItemResRef);
+		assert(it);
+		ca->SetOffhandRef(it->AnimationType);
+		twoweapons = core->CanUseItemType(it->ItemType, SLOT_WEAPON, 0, 0, 0);
+	} else {
+		ca->SetOffhandRef("");
+	}
+
+	// Weapon
+	// (It's also in GUIScript.cpp, GemRB_GetEquippedQuickSlot)
+	int weaponslot = inventory.GetEquippedSlot();
+	if (PCStats) {
+		for(int i=0;i<4;i++) {
+			if (weaponslot == PCStats->QuickWeaponSlots[i]) {
+				weaponslot = i+inventory.GetWeaponSlot();
+				break;
+			}
+		}
+	} /*else {
+		weaponslot-=inventory.GetWeaponSlot();
+	}*/
+	si = inventory.GetSlotItem( core->QuerySlot(core->FindSlot(weaponslot) ) );
+	if (si) {
+		Item* it = core->GetItem(si->ItemResRef);
+		assert(it);
+		ca->SetWeaponRef(it->AnimationType);
+		if (it->Flags & IE_ITEM_TWO_HANDED) {
+			ca->SetWeaponType(IE_ANI_WEAPON_2H);
+		} else {
+			if (twoweapons) {
+				ca->SetWeaponType(IE_ANI_WEAPON_2W);
+			} else {
+				ca->SetWeaponType(IE_ANI_WEAPON_1H);
+			}
+		}
+	} else {
+		ca->SetWeaponType(IE_ANI_WEAPON_1H);
+		ca->SetWeaponRef("");
+	}
+#endif
+
 	unsigned char StanceID = GetStance();
 	Animation** anims = ca->GetAnimation( StanceID, GetNextFace() );
 	if (anims) {
-		int PartCount = ca->GetPartCount();
+		int PartCount = ca->GetTotalPartCount();
 		Animation* masteranim = anims[0];
 		for (int part = 0; part < PartCount; ++part) {
 			Animation* anim = anims[part];
-			Sprite2D* nextFrame;
+			Sprite2D* nextFrame = 0;
 			if (part == 0) {
 				if (Frozen) {
 					nextFrame = anim->LastFrame();
@@ -2228,7 +2288,7 @@ void Actor::Draw(Region &screen)
 					lastFrame = nextFrame;
 					SetBBox( newBBox );
 				}
-			} else {
+			} else if (anim) {
 				nextFrame = anim->GetSyncedNextFrame(masteranim);
 			}
 			if (nextFrame && BBox.InsideRegion( vp ) ) {
@@ -2608,7 +2668,7 @@ void Actor::SetUsedWeapon(char* AnimationType, ieWord* MeleeAnimation)
 	printf("Movements: %hd%% %hd%% %hd%%\n", MeleeAnimation[0], MeleeAnimation[1], MeleeAnimation[2]);
 	if (!anims)
 		return;
-	//anims->SetWeaponRef(AnimationType);
+	anims->SetWeaponRef(AnimationType);
 	//anims->SetAttackMoveChances(MeleeAnimation);
 }
 
@@ -2618,7 +2678,7 @@ void Actor::SetUsedShield(char* AnimationType)
 	memcpy(ShieldRef, AnimationType, sizeof(ShieldRef) );
 	if (!anims)
 		return;
-	//anims->SetOffhandRef(AnimationType);
+	anims->SetOffhandRef(AnimationType);
 }
 
 void Actor::SetUsedHelmet(char* AnimationType)
@@ -2627,6 +2687,6 @@ void Actor::SetUsedHelmet(char* AnimationType)
 	memcpy(HelmetRef, AnimationType, sizeof(HelmetRef) );
 	if (!anims)
 		return;
-	//anims->SetHelmetRef(AnimationType);
+	anims->SetHelmetRef(AnimationType);
 }
 
