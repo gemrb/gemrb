@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.29 2006/09/16 13:30:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.30 2006/11/29 21:17:12 avenger_teambg Exp $
  *
  */
 
@@ -223,7 +223,7 @@ public:
 	//-1 will return the equipping feature block
 	EffectQueue *GetEffectBlock(int usage);
 	//returns the average damage of the weapon (doesn't check for special effects)
-	int GetDamagePotential(bool ranged);
+	int GetDamagePotential(bool ranged, ITMExtHeader *&header);
 	//returns the weapon header
 	ITMExtHeader *GetWeaponHeader(bool ranged);
 };

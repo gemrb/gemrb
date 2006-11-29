@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.219 2006/11/14 19:17:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.220 2006/11/29 21:17:12 avenger_teambg Exp $
  *
  */
 
@@ -153,6 +153,12 @@ Actor::Actor()
 	LargePortrait[0] = 0;
 
 	anims = NULL;
+	ShieldRef[0]=0;
+	HelmetRef[0]=0;
+	WeaponRef[0]=0;
+	AttackMovements[0]=100;
+	AttackMovements[1]=0;
+	AttackMovements[2]=0;
 
 	LongName = NULL;
 	ShortName = NULL;
@@ -285,6 +291,12 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	}
 	anims = new CharAnimations( AnimID&0xffff, BaseStats[IE_ARMOR_TYPE]);
 	if (anims) {
+		//FIXME: fix this when CharAnimations is done
+		//anims->SetOffhandRef(ShieldRef);
+		//anims->SetHelmetRef(HelmetRef);
+		//anims->SetWeaponRef(WeaponRef);
+		//anims->SetAttackMoveChances(AttackMovements);
+
 		//if we have a recovery palette, then set it back
 		anims->palette=recover;
 		if (recover) {
@@ -2586,5 +2598,35 @@ int Actor::GetFeat(unsigned int feat)
 		return 1;
 	}
 	return 0;
+}
+
+void Actor::SetUsedWeapon(char* AnimationType, ieWord* MeleeAnimation)
+{
+	memcpy(WeaponRef, AnimationType, sizeof(WeaponRef) );
+	memcpy(AttackMovements, MeleeAnimation, sizeof(AttackMovements) );
+	printf("Weapon: %c%c\n",AnimationType[0], AnimationType[1]);
+	printf("Movements: %hd%% %hd%% %hd%%\n", MeleeAnimation[0], MeleeAnimation[1], MeleeAnimation[2]);
+	if (!anims)
+		return;
+	//anims->SetWeaponRef(AnimationType);
+	//anims->SetAttackMoveChances(MeleeAnimation);
+}
+
+void Actor::SetUsedShield(char* AnimationType)
+{
+	printf("Shield: %c%c\n",AnimationType[0], AnimationType[1]);
+	memcpy(ShieldRef, AnimationType, sizeof(ShieldRef) );
+	if (!anims)
+		return;
+	//anims->SetOffhandRef(AnimationType);
+}
+
+void Actor::SetUsedHelmet(char* AnimationType)
+{
+	printf("Helmet: %c%c\n",AnimationType[0], AnimationType[1]);
+	memcpy(HelmetRef, AnimationType, sizeof(HelmetRef) );
+	if (!anims)
+		return;
+	//anims->SetHelmetRef(AnimationType);
 }
 

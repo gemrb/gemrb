@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.cpp,v 1.12 2006/07/04 14:31:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.cpp,v 1.13 2006/11/29 21:17:12 avenger_teambg Exp $
  *
  */
 
@@ -67,11 +67,11 @@ EffectQueue *Item::GetEffectBlock(int usage)
 }
 
 /** returns the average damage this weapon would cause */
-int Item::GetDamagePotential(bool ranged)
+int Item::GetDamagePotential(bool ranged, ITMExtHeader *&header)
 {
-	ITMExtHeader *ext_header = GetWeaponHeader(ranged);
-	if (ext_header) {
-		return ext_header->DiceThrown*(ext_header->DiceSides+1)/2+ext_header->DamageBonus;
+	header = GetWeaponHeader(ranged);
+	if (header) {
+		return header->DiceThrown*(header->DiceSides+1)/2+header->DamageBonus;
 	}
 	return 0;
 }

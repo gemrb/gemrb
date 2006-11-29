@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.130 2006/11/14 19:17:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.131 2006/11/29 21:17:12 avenger_teambg Exp $
  *
  */
 
@@ -152,6 +152,10 @@ public:
 	ieDword LastSeen;
 	ieDword LastHeard;
 	ieDword HotKey; 
+	ieWord AttackMovements[3];
+	char ShieldRef[2];
+	char HelmetRef[2];
+	char WeaponRef[2];
 
 	int LastCommand;   //lastcommander
 	int LastShout;     //lastheard
@@ -406,6 +410,9 @@ public:
 	void InitButtons(ieDword cls);
 	void SetFeat(unsigned int feat, int mode);
 	int GetFeat(unsigned int feat);
+	void SetUsedWeapon(char *AnimationType, ieWord *MeleeAnimation);
+	void SetUsedShield(char *AnimationType);
+	void SetUsedHelmet(char *AnimationType);
 	/* Returns nonzero if the caster is held */
 	int Immobile();
 };

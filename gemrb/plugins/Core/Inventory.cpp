@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.85 2006/08/20 10:33:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.86 2006/11/29 21:17:12 avenger_teambg Exp $
  *
  */
 
@@ -311,13 +311,30 @@ void Inventory::KillSlot(unsigned int index)
 		return;
 	}
 	RemoveSlotEffects( item );
-	if (effect != SLOT_EFFECT_ITEM) {
-		return;
-	}
 	Item *itm = core->GetItem(item->ItemResRef);
-	int l = itm->AnimationType[0]-'1';
-	if (l>=0 && l<=3) {
-		Owner->SetBase(IE_ARMOR_TYPE, 0);
+	switch (effect) {
+		case SLOT_EFFECT_LEFT:
+			Owner->SetUsedShield("  ");
+			break;
+		case SLOT_EFFECT_MISSILE:
+		case SLOT_EFFECT_MELEE:
+			{
+				ieWord MeleeAnimation[3]={100,0,0};
+				Owner->SetUsedWeapon("  ",MeleeAnimation);
+			}
+			break;
+		case SLOT_EFFECT_ITEM:
+			{
+				int l = itm->AnimationType[0]-'1';
+				if (l>=0 && l<=3) {
+					Owner->SetBase(IE_ARMOR_TYPE, 0);
+				} else {
+					if (itm->AnimationType[0]) {
+						Owner->SetUsedHelmet("  ");
+					}
+				}
+			}
+			break;
 	}
 	core->FreeItem(itm, item->ItemResRef, false);
 }
@@ -676,6 +693,8 @@ bool Inventory::ChangeItemFlag(unsigned int slot, ieDword arg, int op)
 //all checks have been made previously
 bool Inventory::EquipItem(unsigned int slot)
 {
+	ITMExtHeader *header;
+
 	if (!Owner) {
 		//maybe assertion too?
 		return false;
@@ -689,24 +708,37 @@ bool Inventory::EquipItem(unsigned int slot)
 	Item *itm = core->GetItem(item->ItemResRef);
 	if (!itm) {
 		printf("Invalid item Equipped: %s  Slot: %d\n", item->ItemResRef, slot);
+		return false;
 	}
 	switch (effect) {
+	case SLOT_EFFECT_LEFT:
+		//no idea if the offhand weapon has style, or simply the right
+		//hand style is dominant
+		Owner->SetUsedShield(itm->AnimationType);
+		break;
 	case SLOT_EFFECT_MELEE:
 		//if weapon is ranged, then find quarrel for it and equip that
 		if (item->Flags&IE_INV_ITEM_BOW) {
-			//get the bow item
-			Item *itm = core->GetItem(item->ItemResRef);
 			//get its extended header
-			ITMExtHeader *header = itm->GetExtHeader(0);
+			header = itm->GetExtHeader(0);
 			if (header) {
 				//find the ranged projectile associated with it
 				slot = FindRangedProjectile(header->ProjectileType);
 			}
+			header=itm->GetWeaponHeader(true);
+		} else {
+			header=itm->GetWeaponHeader(false);
 		}
-		SetEquippedSlot(slot-SLOT_MELEE);
+		if (header) {
+			SetEquippedSlot(slot-SLOT_MELEE);
+			Owner->SetUsedWeapon(itm->AnimationType, header->MeleeAnimation);
+		}
+
 		break;
 	case SLOT_EFFECT_MISSILE:
 		SetEquippedSlot(slot);
+		// no idea if this should change the used weapon
+		// maybe we have to get the bow item
 		break;
 	case SLOT_EFFECT_ITEM:
 		//adjusting armour level if needed
@@ -714,6 +746,10 @@ bool Inventory::EquipItem(unsigned int slot)
 			int l = itm->AnimationType[0]-'1';
 			if (l>=0 && l<=3) {
 				Owner->SetBase(IE_ARMOR_TYPE, l);
+			} else {
+				if (itm->AnimationType[0]) {
+					Owner->SetUsedHelmet(itm->AnimationType);
+				}
 			}
 		}
 		break;
@@ -1068,79 +1104,61 @@ void Inventory::EquipBestWeapon(int flags)
 	int i;
 	int damage = 0;
 	ieDword best_slot = SLOT_FIST;
-	//int best_header = 0;
+	ITMExtHeader *header;
 	CREItem *Slot;
+	char AnimationType[2]={0,0};
+	ieWord MeleeAnimation[3]={100,0,0};
 
 	if (flags&EQUIP_RANGED) {
 		for(i=SLOT_RANGED;i<LAST_RANGED;i++) {
-			Item *item = GetItemPointer(i, Slot);
-			if (!item) continue;
-			/*
-			int ehc = item->ExtHeaderCount;
-			while (ehc--) {
-				int tmp = item->GetDamagePotential(ehc,true); //best ranged
-				if (tmp>damage) {
-					damage = tmp;
-					best_slot = i;
-					best_header = ehc;
-				}
-			}
-			*/
-			int tmp = item->GetDamagePotential(true); //best ranged
+			Item *itm = GetItemPointer(i, Slot);
+			if (!itm) continue;
+ 			//best ranged
+			int tmp = itm->GetDamagePotential(true, header);
 			if (tmp>damage) {
 				best_slot = i;
 				damage = tmp;
+				memcpy(AnimationType,itm->AnimationType,sizeof(AnimationType) );
+				memcpy(MeleeAnimation,header->MeleeAnimation,sizeof(MeleeAnimation) );
 			}
+			core->FreeItem( itm, Slot->ItemResRef, false );
 		}
 
 		//ranged melee weapons like throwing daggers (not bows!)
 		for(i=SLOT_MELEE;i<LAST_MELEE;i++) {
-			Item *item = GetItemPointer(i, Slot);
-			if (!item) continue;
-			/*
-			int ehc = item->ExtHeaderCount;
-			while (ehc--) {
-				int tmp = item->GetDamagePotential(ehc,true); //best ranged
-				if (tmp>damage) {
-					damage = tmp;
-					best_slot = i;
-					best_header = ehc;
-				}
-			}
-			*/
-			int tmp = item->GetDamagePotential(true); //best ranged
+			Item *itm = GetItemPointer(i, Slot);
+			if (!itm) continue;
+			//best ranged
+			int tmp = itm->GetDamagePotential(true, header);
 			if (tmp>damage) {
 				best_slot = i;
 				damage = tmp;
+				memcpy(AnimationType,itm->AnimationType,sizeof(AnimationType) );
+				memcpy(MeleeAnimation,header->MeleeAnimation,sizeof(MeleeAnimation) );
 			}
+			core->FreeItem( itm, Slot->ItemResRef, false );
 		}
 	}
 
 	if (flags&EQUIP_MELEE) {
 		for(i=SLOT_MELEE;i<LAST_MELEE;i++) {
-			Item *item = GetItemPointer(i, Slot);
-			if (!item) continue;
-			if (item->Flags&IE_INV_ITEM_BOW) continue;
-			/*
-			int ehc = item->ExtHeaderCount;
-			while(ehc--) {
-				int tmp = item->GetDamagePotential(ehc,false);//best melee
-				if (tmp>damage) {
-					damage = tmp;
-					best_slot = i;
-					best_header = ehc;
-				}
-			}
-			*/
-			int tmp = item->GetDamagePotential(false); //best melee
+			Item *itm = GetItemPointer(i, Slot);
+			if (!itm) continue;
+			if (itm->Flags&IE_INV_ITEM_BOW) continue;
+			//best melee
+			int tmp = itm->GetDamagePotential(false, header);
 			if (tmp>damage) {
 				best_slot = i;
 				damage = tmp;
+				memcpy(AnimationType,itm->AnimationType,sizeof(AnimationType) );
+				memcpy(MeleeAnimation,header->MeleeAnimation,sizeof(MeleeAnimation) );
 			}
+			core->FreeItem( itm, Slot->ItemResRef, false );
 		}
 	}
 
 	SetEquippedSlot(best_slot);
+	Owner->SetUsedWeapon(AnimationType, MeleeAnimation);
 }
 
 /* returns true if there are more item usages not fitting in given array */
