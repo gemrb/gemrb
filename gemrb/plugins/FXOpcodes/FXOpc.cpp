@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.44 2006/09/03 13:20:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.45 2006/11/30 22:23:27 avenger_teambg Exp $
  *
  */
 
@@ -1566,7 +1566,7 @@ int fx_cure_invisible_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_invisible_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	if (!STATE_GET(STATE_NONDET)) {
-		BASE_STATE_CURE( STATE_INVISIBLE );
+		BASE_STATE_CURE( STATE_INVISIBLE | STATE_INVIS2 );
 		target->fxqueue.RemoveAllEffects(fx_set_invisible_state_ref);
 	}
 	return FX_NOT_APPLIED;
@@ -2661,11 +2661,7 @@ int fx_set_chant_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (STATE_GET (STATE_CHANT) ) //chant is non cummulative
 		return FX_NOT_APPLIED;
 	STATE_SET( STATE_CHANT );
-	STAT_ADD( IE_SAVEVSDEATH, fx->Parameter1);
-	STAT_ADD( IE_SAVEVSWANDS, fx->Parameter1);
-	STAT_ADD( IE_SAVEVSPOLY, fx->Parameter1);
-	STAT_ADD( IE_SAVEVSBREATH, fx->Parameter1);
-	STAT_ADD( IE_SAVEVSSPELL, fx->Parameter1);
+	STAT_ADD( IE_LUCK, fx->Parameter1 );
 	return FX_APPLIED;
 }
 
@@ -2691,7 +2687,7 @@ int fx_set_luck_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (STATE_GET (STATE_LUCK) ) //this luck is non cummulative
 		return FX_NOT_APPLIED;
 	STATE_SET( STATE_LUCK );
-	STAT_SET( IE_LUCK, fx->Parameter1 );
+	STAT_ADD( IE_LUCK, fx->Parameter1 );
 	return FX_APPLIED;
 }
 
@@ -2714,7 +2710,8 @@ int fx_polymorph (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_force_visible (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_force_visible (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STATE_CURE(STATE_INVISIBLE);
+	BASE_STATE_CURE(STATE_INVISIBLE);
+	target->fxqueue.RemoveAllEffects(fx_set_invisible_state_ref);
 	return FX_NOT_APPLIED;
 }
 // 0x89 ChantBadNonCumulative
@@ -2725,12 +2722,7 @@ int fx_set_chantbad_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (STATE_GET (STATE_CHANTBAD) ) //chant is non cummulative
 		return FX_NOT_APPLIED;
 	STATE_SET( STATE_CHANTBAD );
-	int tmp = -(int) fx->Parameter1;
-	STAT_ADD( IE_SAVEVSDEATH, tmp);
-	STAT_ADD( IE_SAVEVSWANDS, tmp);
-	STAT_ADD( IE_SAVEVSPOLY, tmp);
-	STAT_ADD( IE_SAVEVSBREATH, tmp);
-	STAT_ADD( IE_SAVEVSSPELL, tmp);
+	STAT_SUB( IE_LUCK, fx->Parameter1 );
 	return FX_APPLIED;
 }
 // 0x8A AnimationStateChange
