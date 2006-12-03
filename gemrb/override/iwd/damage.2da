@@ -1,10 +1,10 @@
 2DA V1.0
 *
 	MAIN		SPARKS		GRADIENT
+CRIT	BLOODCR		*               47
 SMALL	BLOODS		*               47
 MEDIUM	BLOODM		*               47
 LARGE	BLOODL		*               47
-CRIT	BLOODCR		*               47
 FIRES   FIREH 		FIREL           -1
 FIREM	FIREH 		FIREL           -1
 FIREL	FIREH 		FIREL           -1
