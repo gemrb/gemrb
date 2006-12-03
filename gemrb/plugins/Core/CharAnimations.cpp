@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.93 2006/12/03 16:10:19 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.94 2006/12/03 16:47:24 wjpalenstijn Exp $
  *
  */
 
@@ -585,6 +585,8 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 	EquipResRefData* equipdat = 0;
 	for (int part = 0; part < partCount; ++part)
 	{
+		anims[part] = 0;
+
 		//newresref is based on the prefix (ResRef) and various
 		// other things.
 		//this is longer than expected so it won't overflow
@@ -602,32 +604,28 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 			// Equipment animation parts
 
 			anims[part] = 0;
-			// TODO: This needs cleaning up. In particular:
-			// * The GetVHREquipmentRef function shouldn't be called
-			//   directly; there should be a wrapper like GetAnimResRef
-
 			if (GetSize() == '*' || GetSize() == 0) continue;
 
 			if (part == actorPartCount) {
 				if (HelmetRef[0] == 0) continue;
 				// helmet
-				GetVHREquipmentRef(NewResRef,Cycle,HelmetRef,false,equipdat);
+				GetEquipmentResRef(HelmetRef,false,NewResRef,Cycle,equipdat);
 				printf("Using helmet ref %s\n", NewResRef);
 			} else if (part == actorPartCount+1) {
 				if (WeaponRef[0] == 0) continue;
 				// weapon
-				GetVHREquipmentRef(NewResRef,Cycle,WeaponRef,false,equipdat);
+				GetEquipmentResRef(WeaponRef,false,NewResRef,Cycle,equipdat);
 				printf("Using weapon ref %s\n", NewResRef);
 			} else if (part == actorPartCount+2) {
 				if (OffhandRef[0] == 0) continue;
 				if (WeaponType == IE_ANI_WEAPON_2H) continue;
 				// off-hand
 				if (WeaponType == IE_ANI_WEAPON_1H) {
-					GetVHREquipmentRef(NewResRef,Cycle,OffhandRef,
-									   false,equipdat);
+					GetEquipmentResRef(OffhandRef,false,NewResRef,Cycle,
+									   equipdat);
 				} else { // IE_ANI_WEAPON_2W
-					GetVHREquipmentRef(NewResRef,Cycle,OffhandRef,
-									   true,equipdat);
+					GetEquipmentResRef(OffhandRef,true,NewResRef,Cycle,
+									   equipdat);
 				}
 				printf("Using offhand ref %s\n", NewResRef);
 			}
@@ -640,30 +638,41 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 														IE_NORMAL );
 
 		if (!af) {
-			char warnbuf[200];
-			snprintf(warnbuf, 200, "Couldn't create animationfactory: %s\n",
-					 NewResRef);
-			printMessage("CharAnimations",warnbuf,LIGHT_RED);
-			for (int i = 0; i < part; ++i)
-				delete anims[i];
-			delete[] anims;
-			delete equipdat;
-			return 0;
+			if (part < actorPartCount) {
+				char warnbuf[200];
+				snprintf(warnbuf, 200,
+						 "Couldn't create animationfactory: %s\n", NewResRef);
+				printMessage("CharAnimations",warnbuf,LIGHT_RED);
+				for (int i = 0; i < part; ++i)
+					delete anims[i];
+				delete[] anims;
+				delete equipdat;
+				return 0;
+			} else {
+				// not fatal if animation for equipment is missing
+				continue;
+			}
 		}
 
 		Animation* a = af->GetCycle( Cycle );
 		anims[part] = a;
 
 		if (!a) {
-			char warnbuf[200];
-			snprintf(warnbuf, 200, "Couldn't load animation: %s, cycle %d\n",
-					 NewResRef, Cycle);
-			printMessage("CharAnimations",warnbuf,LIGHT_RED);
-			for (int i = 0; i < part; ++i)
-				delete anims[i];
-			delete[] anims;
-			delete equipdat;
-			return 0;
+			if (part < actorPartCount) {
+				char warnbuf[200];
+				snprintf(warnbuf, 200,
+						 "Couldn't load animation: %s, cycle %d\n",
+						 NewResRef, Cycle);
+				printMessage("CharAnimations",warnbuf,LIGHT_RED);
+				for (int i = 0; i < part; ++i)
+					delete anims[i];
+				delete[] anims;
+				delete equipdat;
+				return 0;
+			} else {
+				// not fatal if animation for equipment is missing
+				continue;
+			}
 		}
 
 		if (!palette && (NoPalette()!=1) ) {
@@ -867,6 +876,20 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			sprintf (tmp,"Unknown animation type in avatars.2da row: %d\n", AvatarsRowNum);
 			printMessage ("CharAnimations",tmp, LIGHT_RED);
 			abort();
+	}
+}
+
+void CharAnimations::GetEquipmentResRef(const char* equipRef, bool offhand,
+	char* ResRef, unsigned char& Cycle, EquipResRefData* equip)
+{
+	switch (GetAnimType()) {
+		case IE_ANI_CODE_MIRROR:
+			GetVHREquipmentRef( ResRef, Cycle, equipRef, offhand, equip );
+			break;
+		default:
+			printMessage ("CharAnimations", "Unsupported animation type for equipment animation.\n", LIGHT_RED);
+			abort();
+		break;
 	}
 }
 
