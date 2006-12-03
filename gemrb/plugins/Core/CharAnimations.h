@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.44 2006/11/29 22:23:16 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.45 2006/12/03 16:10:19 wjpalenstijn Exp $
  *
  */
 
@@ -119,6 +119,8 @@ struct AvatarStruct {
 	char Size;
 };
 
+struct EquipResRefData;
+
 class GEM_EXPORT CharAnimations {
 private:
 	Animation** Anims[MAX_ANIMS][MAX_ORIENT];
@@ -173,9 +175,9 @@ private:
 	void AddVHR2Suffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void AddVHRSuffix(char* ResRef, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient);
-	void GetVHREquipmentRef(char* ResRef, const char* mainResRef,
-							const char* equipRef, bool offhand);
+		unsigned char& Cycle, unsigned char Orient, EquipResRefData*& equip);
+	void GetVHREquipmentRef(char* ResRef, unsigned char& Cycle,
+		const char* equipRef, bool offhand, EquipResRefData* equip);
 	void AddSixSuffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void AddMHRSuffix(char* ResRef, unsigned char AnimID,
@@ -191,7 +193,7 @@ private:
 	void AddLR3Suffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void GetAnimResRef(unsigned char AnimID, unsigned char Orient,
-		char* ResRef, unsigned char& Cycle, int Part);
+		char* ResRef, unsigned char& Cycle, int Part, EquipResRefData*& equip);
 };
 
 #endif

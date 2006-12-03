@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.92 2006/11/29 22:23:16 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.93 2006/12/03 16:10:19 wjpalenstijn Exp $
  *
  */
 
@@ -33,6 +33,12 @@ static int AvatarsCount = 0;
 static AvatarStruct *AvatarTable = NULL;
 static ieByte SixteenToNine[16]={0,1,2,3,4,5,6,7,8,7,6,5,4,3,2,1};
 static ieByte SixteenToFive[16]={0,0,1,1,2,2,3,3,4,4,3,3,2,2,1,1};
+
+struct EquipResRefData {
+	char Suffix[9];
+	unsigned char Cycle;
+};
+
 
 void CharAnimations::ReleaseMemory()
 {
@@ -576,25 +582,22 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 	if (partCount < 0) return 0;
 	anims = new Animation*[partCount];
 
-	unsigned char Cycle;
-	char mainResRef[9];
+	EquipResRefData* equipdat = 0;
 	for (int part = 0; part < partCount; ++part)
 	{
 		//newresref is based on the prefix (ResRef) and various
 		// other things.
 		//this is longer than expected so it won't overflow
 		char NewResRef[12];
+		unsigned char Cycle;
 		if (part < actorPartCount) {
 			// Character animation parts
 
+			if (equipdat) delete equipdat;
+
 			//we need this long for special anims
 			strncpy( NewResRef, ResRef, 8 );
-			GetAnimResRef( StanceID, Orient, NewResRef, Cycle, part );
-
-			// Store the main resref to use for equipment
-			// Note that Cycle is also kept
-			strncpy( mainResRef, NewResRef, 8 );
-			mainResRef[8] = 0;
+			GetAnimResRef( StanceID, Orient, NewResRef, Cycle, part, equipdat);
 		} else {
 			// Equipment animation parts
 
@@ -602,33 +605,29 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 			// TODO: This needs cleaning up. In particular:
 			// * The GetVHREquipmentRef function shouldn't be called
 			//   directly; there should be a wrapper like GetAnimResRef
-			// * Maybe not use a copy such as mainResRef, but rather
-			//   store the various parts of mainResRef separately when
-			//   generating the original VHR suffix
 
 			if (GetSize() == '*' || GetSize() == 0) continue;
 
 			if (part == actorPartCount) {
 				if (HelmetRef[0] == 0) continue;
 				// helmet
-				GetVHREquipmentRef(NewResRef,mainResRef,HelmetRef,false);
-				printf("Using helmet ref %s for %s\n", NewResRef,
-					   mainResRef);
+				GetVHREquipmentRef(NewResRef,Cycle,HelmetRef,false,equipdat);
+				printf("Using helmet ref %s\n", NewResRef);
 			} else if (part == actorPartCount+1) {
 				if (WeaponRef[0] == 0) continue;
 				// weapon
-				GetVHREquipmentRef(NewResRef,mainResRef,WeaponRef,false);
+				GetVHREquipmentRef(NewResRef,Cycle,WeaponRef,false,equipdat);
 				printf("Using weapon ref %s\n", NewResRef);
 			} else if (part == actorPartCount+2) {
 				if (OffhandRef[0] == 0) continue;
 				if (WeaponType == IE_ANI_WEAPON_2H) continue;
 				// off-hand
 				if (WeaponType == IE_ANI_WEAPON_1H) {
-					GetVHREquipmentRef(NewResRef,mainResRef,
-									   OffhandRef,false);
+					GetVHREquipmentRef(NewResRef,Cycle,OffhandRef,
+									   false,equipdat);
 				} else { // IE_ANI_WEAPON_2W
-					GetVHREquipmentRef(NewResRef,mainResRef,
-									   OffhandRef,true);
+					GetVHREquipmentRef(NewResRef,Cycle,OffhandRef,
+									   true,equipdat);
 				}
 				printf("Using offhand ref %s\n", NewResRef);
 			}
@@ -648,6 +647,7 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 			for (int i = 0; i < part; ++i)
 				delete anims[i];
 			delete[] anims;
+			delete equipdat;
 			return 0;
 		}
 
@@ -662,6 +662,7 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 			for (int i = 0; i < part; ++i)
 				delete anims[i];
 			delete[] anims;
+			delete equipdat;
 			return 0;
 		}
 
@@ -779,6 +780,7 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 			printMessage("CharAnimations","Unknown animation type\n",LIGHT_RED);
 			abort();
 	}
+	delete equipdat;
 
 	return Anims[StanceID][Orient];
 }
@@ -788,10 +790,10 @@ static int one_file[19]={2, 1, 0, 0, 2, 3, 0, 1, 0, 4, 1, 0, 0, 0, 3, 1, 4, 4, 4
 void CharAnimations::GetAnimResRef(unsigned char StanceID,
 									 unsigned char Orient,
 									 char* NewResRef, unsigned char& Cycle,
-									 int Part)
+									 int Part, EquipResRefData*& EquipData)
 {
 	char tmp[256];
-
+	EquipData = 0;
 	Orient &= 15;
 	switch (GetAnimType()) {
 		case IE_ANI_FOUR_FRAMES:
@@ -803,7 +805,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			break;
 
 		case IE_ANI_CODE_MIRROR:
-			AddVHRSuffix( NewResRef, StanceID, Cycle, Orient );
+			AddVHRSuffix( NewResRef, StanceID, Cycle, Orient, EquipData );
 			break;
 
 		case IE_ANI_BIRD:
@@ -1090,46 +1092,56 @@ static char *RangedPrefix[]={"sa","sx","ss"};
 static char *RangedPrefixOld[]={"sa","sx","a1"};
 
 void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
-	unsigned char& Cycle, unsigned char Orient)
+	unsigned char& Cycle, unsigned char Orient, EquipResRefData*& EquipData)
 {
 	Cycle = SixteenToNine[Orient];
+	EquipData = new EquipResRefData;
+	EquipData->Suffix[0] = 0;
 	switch (StanceID) {
 		//Attack is a special case... it takes cycles randomly
 		//based on the weapon type (TODO)
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
-			strcat (ResRef, SlashPrefix[WeaponType]);
+			strcat( ResRef, SlashPrefix[WeaponType] );
+			strcpy( EquipData->Suffix, SlashPrefix[WeaponType] );
 			break;
 
 		case IE_ANI_ATTACK_BACKSLASH:
-			strcat (ResRef, BackPrefix[WeaponType]);
+			strcat( ResRef, BackPrefix[WeaponType] );
+			strcpy( EquipData->Suffix, BackPrefix[WeaponType] );
 			break;
 
 		case IE_ANI_ATTACK_JAB:
-			strcat (ResRef, JabPrefix[WeaponType]);
+			strcat( ResRef, JabPrefix[WeaponType] );
+			strcpy( EquipData->Suffix, JabPrefix[WeaponType] );
 			break;
 
 		case IE_ANI_AWAKE:
 			strcat( ResRef, "g17" );
+			strcpy( EquipData->Suffix, "g1" );
 			Cycle += 63;
 			break;
 
 		case IE_ANI_CAST:
 			strcat( ResRef, "ca" );
+			strcpy( EquipData->Suffix, "ca" );
 			Cycle += 9;
 			break;
 
 		case IE_ANI_CONJURE:
 			strcat( ResRef, "ca" );
+			strcpy( EquipData->Suffix, "ca" );
 			break;
 
 		case IE_ANI_DAMAGE:
 			strcat( ResRef, "g14" );
+			strcpy( EquipData->Suffix, "g1" );
 			Cycle += 36;
 			break;
 
 		case IE_ANI_DIE:
 			strcat( ResRef, "g15" );
+			strcpy( EquipData->Suffix, "g1" );
 			Cycle += 45;
 			break;
 			//I cannot find an emerge animation...
@@ -1138,6 +1150,7 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 		case IE_ANI_EMERGE:
 		case IE_ANI_PST_START: // to make ctrl-s work in BG2
 			strcat( ResRef, "g19" );
+			strcpy( EquipData->Suffix, "g1" );
 			Cycle += 81;
 			break;
 
@@ -1149,6 +1162,7 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 				strcat( ResRef, "g18" );
 				Cycle += 72;
 			}
+			strcpy( EquipData->Suffix, "g1" );
 			break;
 
 			//Unknown... maybe only a transparency effect apply
@@ -1157,25 +1171,30 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 
 		case IE_ANI_READY:
 			strcat( ResRef, "g13" ); //two handed
+			strcpy( EquipData->Suffix, "g1" ); //two handed
 			Cycle += 27;
 			break;
 			//This depends on the ranged weapon equipped
 		case IE_ANI_SHOOT:
-			strcat (ResRef, RangedPrefix[RangedType]);
+			strcat( ResRef, RangedPrefix[RangedType] );
+			strcpy( EquipData->Suffix, RangedPrefix[RangedType] );
 			break;
 
 		case IE_ANI_SLEEP:
 			strcat( ResRef, "g16" );
+			strcpy( EquipData->Suffix, "g1" );
 			Cycle += 54;
 			break;
 
 		case IE_ANI_TWITCH:
 			strcat( ResRef, "g16" );
+			strcpy( EquipData->Suffix, "g1" );
 			Cycle += 54;
 			break;
 
 		case IE_ANI_WALK:
 			strcat( ResRef, "g11" );
+			strcpy( EquipData->Suffix, "g1" );
 			break;
 
 		default:
@@ -1183,17 +1202,18 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 			abort();
 			break;
 	}
+	EquipData->Cycle = Cycle;
 }
 
-void CharAnimations::GetVHREquipmentRef(char* ResRef,
-										const char* mainResRef,
-										const char* equipRef,
-										bool offhand)
+void CharAnimations::GetVHREquipmentRef(char* ResRef, unsigned char& Cycle,
+										const char* equipRef, bool offhand,
+										EquipResRefData* equip)
 {
+	Cycle = equip->Cycle;
 	if (offhand) {
-		sprintf( ResRef, "wq%c%c%co%c%c", GetSize(), equipRef[0], equipRef[1], mainResRef[5], mainResRef[6] );
+		sprintf( ResRef, "wq%c%c%co%s", GetSize(), equipRef[0], equipRef[1], equip->Suffix );
 	} else {
-		sprintf( ResRef, "wq%c%c%c%c%c", GetSize(), equipRef[0], equipRef[1], mainResRef[5], mainResRef[6] );
+		sprintf( ResRef, "wq%c%c%c%s", GetSize(), equipRef[0], equipRef[1], equip->Suffix );
 	}
 }
 
