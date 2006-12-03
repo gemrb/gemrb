@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.222 2006/12/03 17:16:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.223 2006/12/03 20:52:49 avenger_teambg Exp $
  *
  */
 
@@ -1179,17 +1179,17 @@ int Actor::Damage(int damage, int damagetype, Actor *hitter)
 	LastHitter=hitter->GetID();
 	InternalFlags|=IF_ACTIVE;
 	int chp = (signed) Modified[IE_HITPOINTS];
-	int damagelevel = 2;
+	int damagelevel = 3;
 	if (damage<5) {
-		damagelevel = 0;
-	} else if (damage<10) {
 		damagelevel = 1;
+	} else if (damage<10) {
+		damagelevel = 2;
 	} else {
 		if (chp<-10) {
-			damagelevel=3; //chunky death
+			damagelevel = 0; //chunky death
 		}
 		else {
-			damagelevel = 2;
+			damagelevel = 3;
 		}
 	}
 	if (damagetype & (DAMAGE_FIRE|DAMAGE_MAGICFIRE) ) {
