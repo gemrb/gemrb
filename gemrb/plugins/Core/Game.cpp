@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.132 2006/11/28 21:45:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.133 2006/12/03 17:34:46 avenger_teambg Exp $
  *
  */
 
@@ -898,6 +898,7 @@ void Game::SetControlStatus(int value, int mode)
 		case BM_AND: ControlStatus&=value; break;
 		case BM_XOR: ControlStatus^=value; break;
 	}
+	core->EventFlag|=EF_CONTROL;
 }
 
 void Game::AddGold(ieDword add)
