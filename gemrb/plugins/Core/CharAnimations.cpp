@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.98 2006/12/03 23:31:57 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.99 2006/12/03 23:57:15 wjpalenstijn Exp $
  *
  */
 
@@ -1355,7 +1355,11 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 
 		case IE_ANI_READY:
 			strcat( ResRef, "g1" );
-			Cycle = 8 + Orient;
+			if ( WeaponType == IE_ANI_WEAPON_2W ) {
+				Cycle = 24 + Orient;
+			} else {
+				Cycle = 8 + Orient;
+			}
 			break;
 
 		case IE_ANI_CAST:
@@ -1389,7 +1393,7 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 
 		case IE_ANI_HEAD_TURN:
 			strcat( ResRef, "g1" );
-			Cycle = 24 + Orient;
+			Cycle = 32 + Orient;
 			break;
 
 			//Unknown... maybe only a transparency effect apply
