@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.96 2006/12/03 23:00:59 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.97 2006/12/03 23:21:20 wjpalenstijn Exp $
  *
  */
 
@@ -1155,9 +1155,14 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 			break;
 
 		case IE_ANI_READY:
-			strcat( ResRef, "g13" ); //two handed
-			strcpy( EquipData->Suffix, "g1" ); //two handed
-			Cycle += 27;
+			if ( WeaponType == IE_ANI_WEAPON_2H ) {
+				strcat( ResRef, "g13" );
+				Cycle += 27;
+			} else {
+				strcat( ResRef, "g1" );
+				Cycle += 9;
+			}
+			strcpy( EquipData->Suffix, "g1" );
 			break;
 			//This depends on the ranged weapon equipped
 		case IE_ANI_SHOOT:
