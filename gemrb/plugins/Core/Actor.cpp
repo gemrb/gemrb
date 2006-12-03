@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.223 2006/12/03 20:52:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.224 2006/12/03 23:51:04 avenger_teambg Exp $
  *
  */
 
@@ -1604,6 +1604,16 @@ void Actor::GetNextAnimation()
 	int RowNum = anims->AvatarsRowNum - 1;
 	if (RowNum<0)
 		RowNum = CharAnimations::GetAvatarsCount() - 1;
+	int NewAnimID = CharAnimations::GetAvatarStruct(RowNum)->AnimID;
+	printf ("AnimID: %04X\n", NewAnimID);
+	SetAnimationID ( NewAnimID );
+}
+
+void Actor::GetPrevAnimation()
+{
+	int RowNum = anims->AvatarsRowNum + 1;
+	if (RowNum>=CharAnimations::GetAvatarsCount() )
+		RowNum = 0;
 	int NewAnimID = CharAnimations::GetAvatarStruct(RowNum)->AnimID;
 	printf ("AnimID: %04X\n", NewAnimID);
 	SetAnimationID ( NewAnimID );

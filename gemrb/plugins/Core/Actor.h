@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.131 2006/11/29 21:17:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.132 2006/12/03 23:51:04 avenger_teambg Exp $
  *
  */
 
@@ -330,6 +330,8 @@ public:
 	void Die(Scriptable *killer);
 	/* debug function */
 	void GetNextAnimation();
+	/* debug function */
+	void GetPrevAnimation();
 	/* debug function */
 	void GetNextStance();
 	/* learns the given spell, possibly receive XP */
