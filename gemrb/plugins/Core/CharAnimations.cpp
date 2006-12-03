@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.97 2006/12/03 23:21:20 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.98 2006/12/03 23:31:57 wjpalenstijn Exp $
  *
  */
 
@@ -965,6 +965,7 @@ void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 		case IE_ANI_DIE:
 		case IE_ANI_EMERGE:
 		case IE_ANI_GET_UP:
+		case IE_ANI_PST_START:
 			strcat( ResRef, "g14" );
 			Cycle+=36;
 			break;
@@ -1037,6 +1038,7 @@ void CharAnimations::AddFFSuffix(char* ResRef, unsigned char StanceID,
 		case IE_ANI_DIE:
 		case IE_ANI_GET_UP:
 		case IE_ANI_EMERGE:
+		case IE_ANI_PST_START:
 			strcat( ResRef, "g2" );
 			Cycle += 48;
 			break;
@@ -1133,7 +1135,7 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 			//Maybe is Die reversed
 		case IE_ANI_GET_UP:
 		case IE_ANI_EMERGE:
-		case IE_ANI_PST_START: // to make ctrl-s work in BG2
+		case IE_ANI_PST_START:
 			strcat( ResRef, "g19" );
 			strcpy( EquipData->Suffix, "g1" );
 			Cycle += 81;
@@ -1251,6 +1253,7 @@ void CharAnimations::AddSixSuffix(char* ResRef, unsigned char StanceID,
 		case IE_ANI_DIE:
 		case IE_ANI_GET_UP:
 		case IE_ANI_EMERGE:
+		case IE_ANI_PST_START:
 			strcat( ResRef, "g2" );
 			Cycle = 48 + Orient;
 			break;
@@ -1301,6 +1304,7 @@ void CharAnimations::AddLR2Suffix(char* ResRef, unsigned char StanceID,
 		case IE_ANI_DIE:
 		case IE_ANI_GET_UP:
 		case IE_ANI_EMERGE:
+		case IE_ANI_PST_START:
 			Cycle = 24 + Orient;
 			break;
 
@@ -1371,7 +1375,7 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 
 		case IE_ANI_DIE:
 		case IE_ANI_GET_UP:
-		case IE_ANI_PST_START: // to make ctrl-s work in BG2
+		case IE_ANI_PST_START:
 			strcat( ResRef, "g1" );
 			Cycle = 48 + Orient;
 			break;
@@ -1444,6 +1448,7 @@ void CharAnimations::AddTwoFileSuffix( char* ResRef, unsigned char StanceID,
 		case IE_ANI_GET_UP:
 		case IE_ANI_EMERGE:
 		case IE_ANI_DIE:
+		case IE_ANI_PST_START:
 			Cycle = 32 + Orient / 2;
 			break;
 		case IE_ANI_WALK:
@@ -1502,6 +1507,7 @@ void CharAnimations::AddLRSuffix( char* ResRef, unsigned char StanceID,
 			break;
 		case IE_ANI_GET_UP:
 		case IE_ANI_EMERGE:
+		case IE_ANI_PST_START:
 			strcat( ResRef, "g1" );
 			Cycle = 32 + Orient / 2;
 			break;
@@ -1568,6 +1574,7 @@ void CharAnimations::AddLR3Suffix( char* ResRef, unsigned char StanceID,
 		case IE_ANI_DIE:
 		case IE_ANI_GET_UP:
 		case IE_ANI_EMERGE:
+		case IE_ANI_PST_START:
 			strcat( ResRef, "g3" );
 			Cycle = 16 + Orient / 2;
 			break;
@@ -1642,6 +1649,7 @@ void CharAnimations::AddMMRSuffix(char* ResRef, unsigned char StanceID,
 
 		case IE_ANI_GET_UP:
 		case IE_ANI_EMERGE:
+		case IE_ANI_PST_START:
 			strcat( ResRef, "gu" );
 			Cycle = ( Orient / 2 );
 			break;
