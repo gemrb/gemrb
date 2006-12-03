@@ -15,11 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Palette.cpp,v 1.3 2006/08/11 23:17:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Palette.cpp,v 1.4 2006/12/03 20:37:56 wjpalenstijn Exp $
  *
  */
 
 #include "Palette.h"
+#include "Interface.h"
 
 #define MINCOL 2
 #define MUL    2
@@ -51,4 +52,50 @@ Palette* Palette::Copy()
 	Palette* pal = new Palette(col, alpha);
 	Release();
 	return pal;
+}
+
+void Palette::SetupPaperdollColours(ieDword* Colors, unsigned int type)
+{
+	unsigned int s = 8*type;
+	//metal
+	core->GetPalette( (Colors[0]>>s)&0xFF, 12, &col[0x04]);
+	//minor
+	core->GetPalette( (Colors[1]>>s)&0xFF, 12, &col[0x10]);
+	//major
+	core->GetPalette( (Colors[2]>>s)&0xFF, 12, &col[0x1c]);
+	//skin
+	core->GetPalette( (Colors[3]>>s)&0xFF, 12, &col[0x28]);
+	//leather
+	core->GetPalette( (Colors[4]>>s)&0xFF, 12, &col[0x34]);
+	//armor
+	core->GetPalette( (Colors[5]>>s)&0xFF, 12, &col[0x40]);
+	//hair
+	core->GetPalette( (Colors[6]>>s)&0xFF, 12, &col[0x4c]);
+	
+	//minor
+	memcpy( &col[0x58], &col[0x11], 8 * sizeof( Color ) );
+	//major
+	memcpy( &col[0x60], &col[0x1d], 8 * sizeof( Color ) );
+	//minor
+	memcpy( &col[0x68], &col[0x11], 8 * sizeof( Color ) );
+	//metal
+	memcpy( &col[0x70], &col[0x05], 8 * sizeof( Color ) );
+	//leather
+	memcpy( &col[0x78], &col[0x35], 8 * sizeof( Color ) );
+	//leather
+	memcpy( &col[0x80], &col[0x35], 8 * sizeof( Color ) );
+	//minor
+	memcpy( &col[0x88], &col[0x11], 8 * sizeof( Color ) );
+
+	int i;
+	for (i = 0x90; i < 0xA8; i += 0x08)
+		//leather
+		memcpy( &col[i], &col[0x35], 8 * sizeof( Color ) );
+
+	//skin
+	memcpy( &col[0xB0], &col[0x29], 8 * sizeof( Color ) );
+
+	for (i = 0xB8; i < 0xFF; i += 0x08)
+		//leather
+		memcpy( &col[i], &col[0x35], 8 * sizeof( Color ) );
 }

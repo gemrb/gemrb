@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Palette.h,v 1.3 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Palette.h,v 1.4 2006/12/03 20:37:56 wjpalenstijn Exp $
  */
 
 #ifndef PALETTE_H
@@ -24,6 +24,8 @@
 #include <cassert>
 
 #include "../../includes/RGBAColor.h"
+#include "../../includes/ie_types.h"
+
 
 #ifdef WIN32
 
@@ -73,6 +75,8 @@ public:
 	}
 
 	void CreateShadedAlphaChannel();
+
+	void SetupPaperdollColours(ieDword* Colors, unsigned int type);
 
 	Palette* Copy();
 

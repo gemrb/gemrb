@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.423 2006/12/03 17:34:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.424 2006/12/03 20:37:56 wjpalenstijn Exp $
  *
  */
 
@@ -2677,7 +2677,7 @@ PyDoc_STRVAR( GemRB_SetButtonPLT__doc,
 static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
-	int col[8];
+	ieDword col[8];
 	int type = 0;
 	char* ResRef;
 
@@ -2686,9 +2686,6 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 			&ResRef, &(col[0]), &(col[1]), &(col[2]), &(col[3]),
 			&(col[4]), &(col[5]), &(col[6]), &(col[7]), &type) ) {
 		return AttributeError( GemRB_SetButtonPLT__doc );
-	}
-	for (int i=0;i<8;i++) {
-		if (col[i] != -1) col[i] = (col[i] >> (8*type)) & 0xFF;
 	}
 
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
@@ -2733,7 +2730,7 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 			core->FreeInterface( am );
 			return NULL;
 		}
-		Picture = am->GetPaperdollImage(col[0]==-1?NULL:col, Picture2);
+		Picture = am->GetPaperdollImage(col[0]==0xFFFFFFFF?0:col, Picture2,(unsigned int)type);
 		core->FreeInterface( am );
 		if (Picture == NULL) {
 			printf ("Picture == NULL\n");
@@ -2754,7 +2751,7 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 		}
 
 		for (int i=0;i<8;i++) {
-			im->GetPalette( i, col[i], NULL );
+			im->GetPalette( i, (col[i] >> (8*type)) & 0xFF, NULL );
 		}
 
 		Picture = im->GetImage();

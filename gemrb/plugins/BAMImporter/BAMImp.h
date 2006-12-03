@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.h,v 1.20 2006/01/28 19:56:38 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.h,v 1.21 2006/12/03 20:37:56 wjpalenstijn Exp $
  *
  */
 
@@ -65,7 +65,8 @@ public:
 	If the Global Animation Palette is NULL, returns NULL. */
 	Sprite2D* GetPalette();
 	/** Returns a paperdoll BAM as image */
-	Sprite2D* GetPaperdollImage(int *Colors, Sprite2D *& Picture2);
+	Sprite2D* GetPaperdollImage(ieDword *Colors, Sprite2D *& Picture2,
+		unsigned int type);
 
 	/** Gets a Pixel Index from the Image, unused */
 	unsigned int GetPixelIndex(unsigned int /*x*/, unsigned int /*y*/)
@@ -80,7 +81,6 @@ public:
 		};
 		return null;
 	}
-	void SetupColors(int *Colors);
 public:
 	void release(void)
 	{

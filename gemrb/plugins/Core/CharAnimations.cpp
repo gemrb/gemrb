@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.94 2006/12/03 16:47:24 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.95 2006/12/03 20:37:56 wjpalenstijn Exp $
  *
  */
 
@@ -232,46 +232,7 @@ void CharAnimations::SetupColors()
 		return;
 	}
 
-	//metal
-	core->GetPalette( Colors[0]&255, 12, &palette->col[0x04]);
-	//minor
-	core->GetPalette( Colors[1]&255, 12, &palette->col[0x10]);
-	//major
-	core->GetPalette( Colors[2]&255, 12, &palette->col[0x1c]);
-	//skin
-	core->GetPalette( Colors[3]&255, 12, &palette->col[0x28]);
-	//leather
-	core->GetPalette( Colors[4]&255, 12, &palette->col[0x34]);
-	//armor
-	core->GetPalette( Colors[5]&255, 12, &palette->col[0x40]);
-	//hair
-	core->GetPalette( Colors[6]&255, 12, &palette->col[0x4c]);
-
-	//minor
-	memcpy( &palette->col[0x58], &palette->col[0x11], 8 * sizeof( Color ) );
-	//major
-	memcpy( &palette->col[0x60], &palette->col[0x1d], 8 * sizeof( Color ) );
-	//minor
-	memcpy( &palette->col[0x68], &palette->col[0x11], 8 * sizeof( Color ) );
-	//metal
-	memcpy( &palette->col[0x70], &palette->col[0x05], 8 * sizeof( Color ) );
-	//leather
-	memcpy( &palette->col[0x78], &palette->col[0x35], 8 * sizeof( Color ) );
-	//leather
-	memcpy( &palette->col[0x80], &palette->col[0x35], 8 * sizeof( Color ) );
-	//minor
-	memcpy( &palette->col[0x88], &palette->col[0x11], 8 * sizeof( Color ) );
-
-	int i; //moved here to be compatible with msvc6.0
-
-	for (i = 0x90; i < 0xA8; i += 0x08)
-		//leather
-		memcpy( &palette->col[i], &palette->col[0x35], 8 * sizeof( Color ) );
-	//skin
-	memcpy( &palette->col[0xB0], &palette->col[0x29], 8 * sizeof( Color ) );
-	for (i = 0xB8; i < 0xFF; i += 0x08)
-		//leather
-		memcpy( &palette->col[i], &palette->col[0x35], 8 * sizeof( Color ) );
+	palette->SetupPaperdollColours(Colors, 0);
 }
 
 void CharAnimations::InitAvatarsTable()
