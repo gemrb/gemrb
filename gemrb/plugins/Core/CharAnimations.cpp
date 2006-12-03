@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.95 2006/12/03 20:37:56 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.96 2006/12/03 23:00:59 wjpalenstijn Exp $
  *
  */
 
@@ -525,6 +525,9 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 		case IE_ANI_CONJURE:
 		case IE_ANI_SHOOT:
 		case IE_ANI_ATTACK:
+		case IE_ANI_ATTACK_JAB:
+		case IE_ANI_ATTACK_SLASH:
+		case IE_ANI_ATTACK_BACKSLASH:
 			nextStanceID = IE_ANI_READY;
 			autoSwitchOnEnd = true;
 			break;
@@ -987,7 +990,7 @@ void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 }
 //                            0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
 static char *StancePrefix[]={"3","2","5","5","4","4","2","2","5","4","1","3","3","3","4","1","4","4","4"};
-static char *CyclePrefix[]= {"0","0","1","1","1","1","0","0","1","1","1","1","1","1","1","1","1","1","1"};
+static char *CyclePrefix[]= {"0","0","1","1","1","1","0","0","1","1","0","1","1","1","1","1","1","1","1"};
 static unsigned int CycleOffset[] = {0,  0,  0,  0,  0,  9,  0,  0,  0, 18,  0,  0,  9,  18,  0,  0,  0,  0,  0};
 
 
@@ -995,54 +998,52 @@ static unsigned int CycleOffset[] = {0,  0,  0,  0,  0,  9,  0,  0,  0, 18,  0, 
 void CharAnimations::AddFFSuffix(char* ResRef, unsigned char StanceID,
 	unsigned char& Cycle, unsigned char Orient, int Part)
 {
+	Cycle=SixteenToNine[Orient];
 	switch (StanceID) {
 		case IE_ANI_WALK:
 			strcat( ResRef, "g1" );
-			Cycle = Orient;
 			break;
 
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
 			strcat( ResRef, "g3" );
-			Cycle = Orient;
 			break;
 
 		case IE_ANI_ATTACK_BACKSLASH:
 			strcat( ResRef, "g3" );
-			Cycle = 16 + Orient;
+			Cycle += 16;
 			break;
 
 		case IE_ANI_ATTACK_JAB:
 			strcat( ResRef, "g3" );
-			Cycle = 32 + Orient;
+			Cycle += 32;
 			break;
 
 		case IE_ANI_HEAD_TURN: //could be wrong
 		case IE_ANI_AWAKE:
 			strcat( ResRef, "g2" );
-			Cycle = 0 + Orient;
 			break;
 
 		case IE_ANI_READY:
 			strcat( ResRef, "g2" );
-			Cycle = 16 + Orient;
+			Cycle += 16;
 			break;
 
 		case IE_ANI_DAMAGE:
 			strcat( ResRef, "g2" );
-			Cycle = 32 + Orient;
+			Cycle += 32;
 			break;
 
 		case IE_ANI_DIE:
 		case IE_ANI_GET_UP:
 		case IE_ANI_EMERGE:
 			strcat( ResRef, "g2" );
-			Cycle = 48 + Orient;
+			Cycle += 48;
 			break;
 
 		case IE_ANI_TWITCH:
 			strcat( ResRef, "g2" );
-			Cycle = 64 + Orient;
+			Cycle += 64;
 			break;
 
 		default:
@@ -1365,6 +1366,7 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 
 		case IE_ANI_DIE:
 		case IE_ANI_GET_UP:
+		case IE_ANI_PST_START: // to make ctrl-s work in BG2
 			strcat( ResRef, "g1" );
 			Cycle = 48 + Orient;
 			break;
@@ -1378,7 +1380,7 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 
 		case IE_ANI_HEAD_TURN:
 			strcat( ResRef, "g1" );
-			Cycle = 16 + Orient;
+			Cycle = 24 + Orient;
 			break;
 
 			//Unknown... maybe only a transparency effect apply
@@ -1387,7 +1389,7 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 
 		case IE_ANI_AWAKE:
 			strcat( ResRef, "g1" );
-			Cycle = 24 + Orient;
+			Cycle = 16 + Orient;
 			break;
 
 			//This depends on the ranged weapon equipped
