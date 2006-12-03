@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.cpp,v 1.19 2006/01/08 21:47:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Progressbar.cpp,v 1.20 2006/12/03 17:16:55 avenger_teambg Exp $
  *
  */
 
@@ -60,7 +60,7 @@ Progressbar::~Progressbar()
 void Progressbar::Draw(unsigned short x, unsigned short y)
 {
 	//it is unlikely that a floating window is above us, but...
-	if (!Changed && !(( (Window*)Owner)->Flags&WF_FLOAT) ) {
+	if (!Changed && !(Owner->Flags&WF_FLOAT) ) {
 		return;
 	}
 	Changed = false;

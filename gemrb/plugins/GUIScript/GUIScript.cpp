@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.421 2006/11/28 22:29:18 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.422 2006/12/03 17:16:55 avenger_teambg Exp $
  *
  */
 
@@ -1363,6 +1363,9 @@ static PyObject* GemRB_SetVisible(PyObject * /*self*/, PyObject* args)
 	if (ret == -1) {
 		return NULL;
 	}
+	if (!WindowIndex) {
+		core->EventFlag|=EF_CONTROL;
+	}
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -2161,7 +2164,7 @@ static PyObject* GemRB_CreateMapControl(PyObject * /*self*/, PyObject* args)
 	map->ControlType = IE_GUI_MAP;
 	map->Owner = win;
 	if (Flag2) { //pst flavour
-		map->ConvertToGame = false;
+		map->convertToGame = false;
 		CtrlIndex = core->GetControl( WindowIndex, LabelID );
 		Control *lc = win->GetControl( CtrlIndex );
 		map->LinkedLabel = lc;
@@ -2362,6 +2365,7 @@ static PyObject* GemRB_GameSetScreenFlags(PyObject * /*self*/, PyObject* args)
 	}
 
 	game->SetControlStatus( Flags, Operation );
+	core->EventFlag|=EF_CONTROL;
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -3010,6 +3014,15 @@ static PyObject* GemRB_SetVar(PyObject * /*self*/, PyObject* args)
 
 	Py_INCREF( Py_None );
 	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_GetMessageWindowSize__doc,
+"GetMessageWindowSize(Value)\n\n"
+"Return current MessageWindowSize." );
+
+static PyObject* GemRB_GetMessageWindowSize(PyObject * /*self*/, PyObject* /*args*/)
+{
+	return PyInt_FromLong( core->MessageWindowSize );
 }
 
 PyDoc_STRVAR( GemRB_GetToken__doc,
@@ -6142,9 +6155,38 @@ static PyObject* GemRB_CreateCreature(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_RevealArea__doc,
+"RevealArea(x, y, radius, type)\n\n"
+"Reveals part of the area.");
+
+static PyObject* GemRB_RevealArea(PyObject * /*self*/, PyObject* args)
+{
+	int x,y;
+	int radius;
+	int Value;
+
+	if (!PyArg_ParseTuple( args, "iiii", &x, &y, &radius, &Value)) {
+		return AttributeError( GemRB_RevealArea__doc );
+	}
+
+	Point p(x,y);
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Map *map=game->GetCurrentArea();
+	if (!map) {
+		return RuntimeError( "No current area" );
+	}
+	map->ExploreMapChunk( p, radius, Value );
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_ExploreArea__doc,
 "ExploreArea([bitvalue=-1])\n\n"
-"Creates Creature in vicinity of a player character.");
+"Explores or unexplores whole area.");
 
 static PyObject* GemRB_ExploreArea(PyObject * /*self*/, PyObject* args)
 {
@@ -7411,6 +7453,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(Quit, METH_NOARGS),
 	METHOD(GetVar, METH_VARARGS),
 	METHOD(SetVar, METH_VARARGS),
+	METHOD(GetMessageWindowSize, METH_NOARGS),
 	METHOD(GetToken, METH_VARARGS),
 	METHOD(SetToken, METH_VARARGS),
 	METHOD(GetGameVar, METH_VARARGS),
@@ -7482,6 +7525,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetMapnote, METH_VARARGS),
 	METHOD(CreateCreature, METH_VARARGS),
 	METHOD(ExploreArea, METH_VARARGS),
+	METHOD(RevealArea, METH_VARARGS),
 	METHOD(GetRumour, METH_VARARGS),
 	METHOD(IsValidStoreItem, METH_VARARGS),
 	METHOD(ChangeStoreItem, METH_VARARGS),

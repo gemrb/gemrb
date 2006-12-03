@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.39 2006/08/08 20:25:44 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUICommonWindows.py,v 1.40 2006/12/03 17:16:56 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -111,9 +111,16 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "RestPress")
 	GemRB.SetTooltip (Window, Button, 11942)
 
-
 def AIPress ():
-	print "AIPress"
+	Button = GemRB.GetControl (PortraitWindow, 6)
+	AI = GemRB.GetMessageWindowSize() & GS_PARTYAI
+
+	if AI:
+		GemRB.GameSetScreenFlags(GS_PARTYAI, OP_NAND)
+		GemRB.SetTooltip (PortraitWindow, Button, 15917)
+	else:
+		GemRB.GameSetScreenFlags(GS_PARTYAI, OP_OR)
+		GemRB.SetTooltip (PortraitWindow, Button, 15918)
 	return
 
 def RestPress ():
@@ -469,8 +476,13 @@ def OpenPortraitWindow (needcontrols):
 
 		# AI
 		Button = GemRB.GetControl (Window, 6)
-		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
+		GSFlags = GemRB.GetMessageWindowSize()&GS_PARTYAI
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "AIPress")
+		GemRB.SetVarAssoc (Window, Button, "", GSFlags)
+		if GSFlags:
+			GemRB.SetTooltip (PortraitWindow, Button, 15917)
+		else:
+			GemRB.SetTooltip (PortraitWindow, Button, 15918)
 
 		#Select All
 		Button = GemRB.GetControl (Window, 7)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.36 2006/01/08 12:28:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.h,v 1.37 2006/12/03 17:16:54 avenger_teambg Exp $
  *
  */
 
@@ -75,6 +75,7 @@
 typedef char EventHandler[64];
 
 class ControlAnimation;
+class Window;
 
 /**
  * @class Control
@@ -127,12 +128,14 @@ public: // Public attributes
 	/** True if we are currently in an event handler */
 	bool InHandler;
 	/** Owner Window */
-	void* Owner;
+	Window* Owner;
 public: //Events
 	/** Reset/init event handler */
 	void ResetEventHandler(EventHandler handler);
 	/** Set handler from function name */
 	void SetEventHandler(EventHandler handler, char* funcName);
+	/** Returns the Owner */
+	Window *GetOwner() const { return Owner; }
 	/** Set the Flags */
 	int SetFlags(int arg_flags, int opcode);
 	/** Set handler for specified event. Override in child classes */

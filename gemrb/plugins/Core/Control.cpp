@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.45 2006/08/11 23:17:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Control.cpp,v 1.46 2006/12/03 17:16:54 avenger_teambg Exp $
  *
  */
 
@@ -38,7 +38,7 @@ Control::Control()
 	Value = 0;
 	Flags = 0;
 	Tooltip = NULL;
-	Owner = 0;
+	Owner = NULL;
 	XPos = 0;
 	YPos = 0;
 
@@ -81,7 +81,7 @@ int Control::SetTooltip(const char* string)
 void Control::DisplayTooltip()
 {
 	if (Tooltip)
-		core->DisplayTooltip( (( Window* )Owner)->XPos + XPos + Width / 2, (( Window* )Owner)->YPos + YPos + Height / 2, this );
+		core->DisplayTooltip( Owner->XPos + XPos + Width / 2, Owner->YPos + YPos + Height / 2, this );
 	else
 		core->DisplayTooltip( 0, 0, NULL );
 }
@@ -108,7 +108,7 @@ int Control::RunEventHandler(EventHandler handler)
 		return -1;
 	}
 	if (handler[0]) {
-		Window *wnd = (Window *) Owner;
+		Window *wnd = Owner;
 		if (!wnd) {
 			return -1;
 		}
@@ -204,7 +204,7 @@ int Control::SetFlags(int arg_flags, int opcode)
 			return -1;
 	}
 	Changed = true;
-	( ( Window * ) Owner )->Invalidate();
+	Owner->Invalidate();
 	return 0;
 }
 

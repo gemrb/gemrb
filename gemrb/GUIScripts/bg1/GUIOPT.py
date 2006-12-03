@@ -9,14 +9,14 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIOPT.py,v 1.4 2006/08/11 23:17:18 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIOPT.py,v 1.5 2006/12/03 17:16:56 avenger_teambg Exp $
 
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
@@ -518,320 +518,107 @@ def OpenSaveMsgWindow ():
 def OpenLoadMsgWindow ():
 	global LoadMsgWindow
 
-	GemRB.HideGUI()
-
 	if LoadMsgWindow:		
-		GemRB.UnloadWindow (LoadMsgWindow)
-		LoadMsgWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
-		
-		GemRB.UnhideGUI ()
 		return
 		
 	LoadMsgWindow = Window = GemRB.LoadWindow (4)
-	GemRB.SetVar ("FloatWindow", LoadMsgWindow)
 	
 	# Load
 	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, Button, 15590)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "LoadGame")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "LoadGamePress")
 
 	# Cancel
 	Button = GemRB.GetControl (Window, 1)
 	GemRB.SetText (Window, Button, 13727)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenLoadMsgWindow")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseLoadMsgWindow")
 
 	# Current game will be destroyed ...
 	Text = GemRB.GetControl (Window, 3)
 	GemRB.SetText (Window, Text, 19531)
 
-	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 
+def CloseLoadMsgWindow ():
+	global LoadMsgWindow
 
-def LoadGame ():
-	OpenOptionsWindow ()
+	GemRB.UnloadWindow (LoadMsgWindow)
+	LoadMsgWindow = None
+	GemRB.SetVisible (OptionsWindow, 1)
+	return
+
+def LoadGamePress ():
+	global LoadMsgWindow
+
+	GemRB.UnloadWindow (LoadMsgWindow)
+	LoadMsgWindow = None
 	GemRB.QuitGame ()
-	GemRB.SetNextScript ('GUILOAD')
+	OpenOptionsWindow()
+	GemRB.SetNextScript ("GUILOAD")
 
+def SaveGamePress():
+	global QuitMsgWindow
 
+	GemRB.UnloadWindow (QuitMsgWindow)
+	QuitMsgWindow = None
+	#we need to set a state: quit after save
+	GemRB.SetVar("QuitAfterSave",1)
+	OpenOptionsWindow()
+	OpenSaveWindow ()
+	return
+
+def QuitGamePress():
+	global QuitMsgWindow
+
+	GemRB.UnloadWindow (QuitMsgWindow)
+	QuitMsgWindow = None
+	GemRB.QuitGame ()
+	OpenOptionsWindow()
+	GemRB.SetNextScript ("Start")
+	return
 
 ###################################################
 
 def OpenQuitMsgWindow ():
 	global QuitMsgWindow
 
-	GemRB.HideGUI()
-
 	if QuitMsgWindow:		
-		GemRB.UnloadWindow (QuitMsgWindow)
-		QuitMsgWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
-		GemRB.SetVisible (GemRB.GetVar ("OtherWindow"), 1)
-		
-		GemRB.UnhideGUI ()
 		return
 		
 	QuitMsgWindow = Window = GemRB.LoadWindow (5)
-	GemRB.SetVar ("FloatWindow", QuitMsgWindow)
-	GemRB.SetVisible (GemRB.GetVar ("OtherWindow"), 0)
 	
 	# Save
 	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, Button, 15589)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SaveGame")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SaveGamePress")
 
 	# Quit Game
 	Button = GemRB.GetControl (Window, 1)
 	GemRB.SetText (Window, Button, 15417)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "QuitGame")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "QuitGamePress")
 
 	# Cancel
 	Button = GemRB.GetControl (Window, 2)
 	GemRB.SetText (Window, Button, 13727)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenQuitMsgWindow")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseQuitMsgWindow")
 
 	# Do you wish to save the game ....
 	Text = GemRB.GetControl (Window, 3)
-	GemRB.SetText (Window, Text, 16456)  # or ??? - cannot be saved atm
+	GemRB.SetText (Window, Text, 16456) # or ??? - cannot be saved atm
 
 	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 
+def CloseQuitMsgWindow ():
+	global QuitMsgWindow
 
-def QuitGame ():
-	OpenOptionsWindow ()
-	GemRB.QuitGame ()
-	GemRB.SetNextScript ('Start')
-
-def SaveGame ():
-	OpenOptionsWindow ()
-	GemRB.QuitGame ()
-	GemRB.SetNextScript ('GUISAVE')
+	GemRB.UnloadWindow (QuitMsgWindow)
+	QuitMsgWindow = None
+	GemRB.SetVisible (OptionsWindow, 1)
+	return
 
 
 ###################################################
-
-## key_list = [
-## 	('GemRB', None),
-## 	('Grab pointer', '^G'),
-## 	('Toggle fullscreen', '^F'),
-## 	('Enable cheats', '^T'),
-## 	('', None),
-	
-## 	('IE', None),
-## 	('Open Inventory', 'I'),
-## 	('Open Priest Spells', 'P'),
-## 	('Open Mage Spells', 'S'),
-## 	('Pause Game', 'SPC'),
-## 	('Select Weapon', ''),
-## 	('', None),
-## 	]
-
-
-## KEYS_PAGE_SIZE = 60
-## KEYS_PAGE_COUNT = ((len (key_list) - 1) / KEYS_PAGE_SIZE)+ 1
-
-## def OpenKeyboardMappingsWindow ():
-## 	global KeysWindow
-## 	global last_key_action
-
-## 	last_key_action = None
-
-## 	GemRB.HideGUI()
-
-## 	if KeysWindow:		
-## 		GemRB.UnloadWindow (KeysWindow)
-## 		KeysWindow = None
-## 		GemRB.SetVar ("OtherWindow", OptionsWindow)
-		
-## 		GemRB.LoadWindowPack ("GUIOPT")
-## 		GemRB.UnhideGUI ()
-## 		return
-		
-## 	GemRB.LoadWindowPack ("GUIKEYS")
-## 	KeysWindow = Window = GemRB.LoadWindow (0)
-## 	GemRB.SetVar ("OtherWindow", KeysWindow)
-
-
-## 	# Default
-## 	Button = GemRB.GetControl (Window, 3)
-## 	GemRB.SetText (Window, Button, 49051)
-## 	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")	
-
-## 	# Done
-## 	Button = GemRB.GetControl (Window, 4)
-## 	GemRB.SetText (Window, Button, 1403)
-## 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenKeyboardMappingsWindow")	
-
-## 	# Cancel
-## 	Button = GemRB.GetControl (Window, 5)
-## 	GemRB.SetText (Window, Button, 4196)
-## 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenKeyboardMappingsWindow")	
-
-## 	keys_setup_page (0)
-
-
-## 	#GemRB.SetVisible (KeysWindow, 1)
-## 	GemRB.UnhideGUI ()
-
-
-## def keys_setup_page (pageno):
-## 	Window = KeysWindow
-
-
-## 	# Page n of n
-## 	Label = GemRB.GetControl (Window, 0x10000001)
-## 	#txt = GemRB.ReplaceVarsInText (49053, {'PAGE': str (pageno + 1), 'NUMPAGES': str (KEYS_PAGE_COUNT)})
-## 	GemRB.SetToken ('PAGE', str (pageno + 1))
-## 	GemRB.SetToken ('NUMPAGES', str (KEYS_PAGE_COUNT))
-## 	GemRB.SetText (Window, Label, 49053)
-
-
-## 	for i in range (KEYS_PAGE_SIZE):
-## 		try:
-## 			label, key = key_list[pageno * KEYS_PAGE_SIZE + i]
-## 		except:
-## 			label = ''
-## 			key = None
-			
-
-## 		if key == None:
-## 			# Section header
-## 			Label = GemRB.GetControl (Window, 0x10000005 + i)
-## 			GemRB.SetText (Window, Label, '')
-
-## 			Label = GemRB.GetControl (Window, 0x10000041 + i)
-## 			GemRB.SetText (Window, Label, label)
-## 			GemRB.SetLabelTextColor (Window, Label, 0, 255, 255)
-
-## 		else:
-## 			Label = GemRB.GetControl (Window, 0x10000005 + i)
-## 			GemRB.SetText (Window, Label, key)
-## 			GemRB.SetEvent (Window, Label, IE_GUI_LABEL_ON_PRESS, "OnActionLabelPress")	
-## 			GemRB.SetVarAssoc (Window, Label, "KeyAction", i)	
-			
-## 			Label = GemRB.GetControl (Window, 0x10000041 + i)
-## 			GemRB.SetText (Window, Label, label)
-## 			GemRB.SetEvent (Window, Label, IE_GUI_LABEL_ON_PRESS, "OnActionLabelPress")	
-## 			GemRB.SetVarAssoc (Window, Label, "KeyAction", i)	
-		
-
-
-## last_key_action = None
-## def OnActionLabelPress ():
-## 	global last_key_action
-	
-## 	Window = KeysWindow
-## 	i = GemRB.GetVar ("KeyAction")
-
-## 	if last_key_action != None:
-## 		Label = GemRB.GetControl (Window, 0x10000005 + last_key_action)
-## 		GemRB.SetLabelTextColor (Window, Label, 255, 255, 255)
-## 		Label = GemRB.GetControl (Window, 0x10000041 + last_key_action)
-## 		GemRB.SetLabelTextColor (Window, Label, 255, 255, 255)
-		
-## 	Label = GemRB.GetControl (Window, 0x10000005 + i)
-## 	GemRB.SetLabelTextColor (Window, Label, 255, 255, 0)
-## 	Label = GemRB.GetControl (Window, 0x10000041 + i)
-## 	GemRB.SetLabelTextColor (Window, Label, 255, 255, 0)
-
-## 	last_key_action = i
-
-## 	# 49155
-	
-## ###################################################
-
-## def OpenMoviesWindow ():
-## 	global MoviesWindow
-
-## 	GemRB.HideGUI()
-
-## 	if MoviesWindow:		
-## 		GemRB.UnloadWindow (MoviesWindow)
-## 		MoviesWindow = None
-## 		GemRB.SetVar ("FloatWindow", -1)
-
-## 		GemRB.LoadWindowPack ("GUIOPT")
-## 		GemRB.UnhideGUI ()
-## 		return
-		
-## 	GemRB.LoadWindowPack ("GUIMOVIE")
-## 	# FIXME: clean the window to black
-## 	MoviesWindow = Window = GemRB.LoadWindow (0)
-## 	GemRB.SetVar ("FloatWindow", MoviesWindow)
-
-
-## 	# Play Movie
-## 	Button = GemRB.GetControl (Window, 2)
-## 	GemRB.SetText (Window, Button, 33034)
-## 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OnPlayMoviePress")	
-
-## 	# Credits
-## 	Button = GemRB.GetControl (Window, 3)
-## 	GemRB.SetText (Window, Button, 33078)
-## 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OnCreditsPress")	
-
-## 	# Done
-## 	Button = GemRB.GetControl (Window, 4)
-## 	GemRB.SetText (Window, Button, 1403)
-## 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenMoviesWindow")
-
-## 	# movie list
-## 	List = GemRB.GetControl (Window, 0)
-## 	GemRB.SetTextAreaFlags (Window, List, IE_GUI_TEXTAREA_SELECTABLE)
-## 	GemRB.SetVarAssoc (Window, List, 'SelectedMovie', -1)
-	
-## 	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenMoviesWindow")
-
-
-## 	MovieTable = GemRB.LoadTable ("MOVIDESC")
-
-## 	for i in range (GemRB.GetTableRowCount (MovieTable)):
-## 		#key = GemRB.GetTableRowName (MovieTable, i)
-## 		desc = GemRB.GetTableValue (MovieTable, i, 0)
-## 		GemRB.TextAreaAppend (Window, List, desc, i)
-
-## 	GemRB.UnloadTable (MovieTable)
-
-
-## 	GemRB.UnhideGUI ()
-## 	GemRB.ShowModal (Window, MODAL_SHADOW_BLACK)
-
-
-## ###################################################
-## def OnPlayMoviePress ():
-## 	selected = GemRB.GetVar ('SelectedMovie')
-
-## 	# FIXME: This should not happen, when the PlayMovie button gets
-## 	#   properly disabled/enabled, but it does not now
-## 	if selected == -1:
-## 		return
-	
-## 	MovieTable = GemRB.LoadTable ("MOVIDESC")
-## 	key = GemRB.GetTableRowName (MovieTable, selected)
-## 	GemRB.UnloadTable (MovieTable)
-
-## 	GemRB.SetVisible (MoviesWindow, 0)
-## 	GemRB.PlayMovie (key)
-## 	GemRB.SetVisible (MoviesWindow, 1)
-
-## ###################################################
-## def OnCreditsPress ():
-## 	GemRB.SetVisible (MoviesWindow, 0)
-## 	GemRB.PlayMovie ("CREDITS")
-## 	GemRB.SetVisible (MoviesWindow, 1)
-
-###################################################
-###################################################
-
-# These functions help to setup controls found
-#   in Video, Audio, Gameplay, Feedback and Autopause
-#   options windows
-
-# These controls are usually made from an active
-#   control (button, slider ...) and a label
-
 
 def OptSlider (name, window, slider_id, variable, value):
 	"""Standard slider for option windows"""

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/MessageWindow.py,v 1.20 2006/08/11 23:17:18 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/MessageWindow.py,v 1.21 2006/12/03 17:16:56 avenger_teambg Exp $
 
 import GemRB
 from GUICommonWindows import *
@@ -73,7 +73,7 @@ def OnLoad():
 	UpdateControlStatus()
 
 def OnIncreaseSize():
-	GSFlags = GemRB.GetVar("MessageWindowSize")
+	GSFlags = GemRB.GetMessageWindowSize()
 	Expand = GSFlags&GS_DIALOGMASK
 	GSFlags = GSFlags-Expand
 	if Expand>2:
@@ -82,7 +82,7 @@ def OnIncreaseSize():
 	GemRB.GameSetScreenFlags(Expand + GSFlags, OP_SET)
 
 def OnDecreaseSize():
-	GSFlags = GemRB.GetVar("MessageWindowSize")
+	GSFlags = GemRB.GetMessageWindowSize()
 	Expand = GSFlags&GS_DIALOGMASK
 	GSFlags = GSFlags-Expand
 	if Expand<2:
@@ -90,9 +90,6 @@ def OnDecreaseSize():
 	Expand = Expand/2 - 1
 	GemRB.GameSetScreenFlags(Expand + GSFlags, OP_SET)
 
-def TogglePartyAI():
-	GemRB.GameSetScreenFlags(GS_PARTYAI, OP_XOR)
- 
 def ScrollUp ():
 	TMessageWindow = GemRB.GetVar("MessageWindow")
 	TMessageTA = GemRB.GetVar("MessageTextArea")
@@ -108,7 +105,7 @@ def UpdateControlStatus():
 
 	TMessageWindow = 0
 	TMessageTA = 0
-	GSFlags = GemRB.GetVar("MessageWindowSize")
+	GSFlags = GemRB.GetMessageWindowSize()
 	Expand = GSFlags&GS_DIALOGMASK
 	Override = GSFlags&GS_DIALOG
 	GSFlags = GSFlags-Expand

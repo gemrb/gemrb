@@ -9,14 +9,14 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICommonWindows.py,v 1.17 2006/08/11 23:17:18 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICommonWindows.py,v 1.18 2006/12/03 17:16:56 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -100,6 +100,18 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	GemRB.SetTooltip (Window, Button, 16312)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenPartyWindow")
 
+	return
+
+def AIPress ():
+	Button = GemRB.GetControl (PortraitWindow, 6)
+	AI = GemRB.GetMessageWindowSize() & GS_PARTYAI
+
+	if AI:
+		GemRB.GameSetScreenFlags(GS_PARTYAI, OP_NAND)
+		GemRB.SetTooltip (PortraitWindow, Button, 15917)
+	else:
+		GemRB.GameSetScreenFlags(GS_PARTYAI, OP_OR)
+		GemRB.SetTooltip (PortraitWindow, Button, 15918)
 	return
 
 def RestPress ():
@@ -442,15 +454,16 @@ def OpenPortraitWindow (needcontrols):
 
 	# AI
 	Button = GemRB.GetControl (Window, 6)
-	GSFlags = GemRB.GetVar ("MessageWindowSize")
+	GSFlags = GemRB.GetMessageWindowSize()&GS_PARTYAI
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX,OP_OR)
 	#this control is crippled
 	GemRB.SetButtonSprites (Window, Button, "GUIBTACT", 0, 46, 47, 48, 49)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "TogglePartyAI")
-	if GSFlags&GS_PARTYAI:
-		GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_SELECTED)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "AIPress")
+	GemRB.SetVarAssoc (Window, Button, "", GSFlags)
+	if GSFlags:
+		GemRB.SetTooltip (PortraitWindow, Button, 15917)
 	else:
-		GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_ENABLED)
+		GemRB.SetTooltip (PortraitWindow, Button, 15918)
 
 	#Select All
 	Button = GemRB.GetControl (Window, 7)

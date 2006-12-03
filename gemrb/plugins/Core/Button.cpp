@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.108 2006/08/17 15:32:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.109 2006/12/03 17:16:54 avenger_teambg Exp $
  *
  */
 
@@ -107,7 +107,7 @@ void Button::SetImage(unsigned char type, Sprite2D* img)
 /** Draws the Control on the Output Display */
 void Button::Draw(unsigned short x, unsigned short y)
 {
-	if (!Changed && !(((Window*)Owner)->Flags&WF_FLOAT) ) {
+	if (!Changed && !(Owner->Flags&WF_FLOAT) ) {
 		return;
 	}
 	Changed = false;
@@ -300,8 +300,8 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 	if (Button == 1) {
 		// We use absolute screen position here, so drag_start
 		//   remains valid even after window/control is moved
-		drag_start.x = ((Window*)Owner)->XPos + XPos + x;
-		drag_start.y = ((Window*)Owner)->YPos + YPos + y;
+		drag_start.x = Owner->XPos + XPos + x;
+		drag_start.y = Owner->YPos + YPos + y;
 
  		if (State == IE_GUI_BUTTON_LOCKED) {
 			return;
@@ -345,7 +345,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 			core->GetDictionary()->Lookup( VarName, tmp );
 			tmp ^= Value;
 			core->GetDictionary()->SetAt( VarName, tmp );
-			( ( Window * ) Owner )->RedrawControls( VarName, tmp );
+			Owner->RedrawControls( VarName, tmp );
 		}
 	} else {
 		if (Flags & IE_GUI_BUTTON_RADIOBUTTON) {
@@ -355,7 +355,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 		}
 		if (VarName[0] != 0) {
 			core->GetDictionary()->SetAt( VarName, Value );
-			( ( Window * ) Owner )->RedrawControls( VarName, Value );
+			Owner->RedrawControls( VarName, Value );
 		}
 	}
 
@@ -394,13 +394,13 @@ void Button::OnMouseOver(unsigned short x, unsigned short y)
 		return;
 	}
 
-	( ( Window * ) Owner )->Cursor = IE_CURSOR_NORMAL;
+	Owner->Cursor = IE_CURSOR_NORMAL;
 
 	if ((Flags & IE_GUI_BUTTON_DRAGGABLE) && (State == IE_GUI_BUTTON_PRESSED)) {
 		// We use absolute screen position here, so drag_start
 		//   remains valid even after window/control is moved
-		int dx = ((Window*)Owner)->XPos + XPos + x - drag_start.x;
-		int dy = ((Window*)Owner)->YPos + YPos + y - drag_start.y;
+		int dx = Owner->XPos + XPos + x - drag_start.x;
+		int dy = Owner->YPos + YPos + y - drag_start.y;
 		core->GetDictionary()->SetAt( "DragX", dx );
 		core->GetDictionary()->SetAt( "DragY", dy );
 		drag_start.x = (ieWord) (drag_start.x + dx);
@@ -527,7 +527,7 @@ void Button::SetPicture(Sprite2D* newpic)
 	Picture = newpic;
 	Changed = true;
 	Flags |= IE_GUI_BUTTON_PICTURE;
-	( ( Window * ) Owner )->Invalidate();
+	Owner->Invalidate();
 }
 
 /** Clears the list of Pictures */
@@ -539,7 +539,7 @@ void Button::ClearPictureList()
 		video->FreeSprite( *iter );
 	PictureList.clear();
 	Changed = true;
-	( ( Window * ) Owner )->Invalidate();	
+	Owner->Invalidate();	
 }
 
 /** Add picture to the end of the list of Pictures */
@@ -548,7 +548,7 @@ void Button::StackPicture(Sprite2D* Picture)
 	PictureList.push_back(Picture);
 	Changed = true;
 	Flags |= IE_GUI_BUTTON_PICTURE;
-	( ( Window * ) Owner )->Invalidate();	
+	Owner->Invalidate();	
 }
 
 bool Button::IsPixelTransparent(unsigned short x, unsigned short y)

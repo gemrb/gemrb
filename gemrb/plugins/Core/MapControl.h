@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.h,v 1.17 2005/11/24 17:44:09 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.h,v 1.18 2006/12/03 17:16:55 avenger_teambg Exp $
  *
  */
 
@@ -60,8 +60,9 @@ public:
 	int ScrollX, ScrollY;
 	int NotePosX, NotePosY;
 	unsigned short lastMouseX, lastMouseY;
-	bool MouseIsDown;
-	bool ConvertToGame;
+	bool mouseIsDown;
+	bool mouseIsDragging;
+	bool convertToGame;
 	// Small map bitmap
 	Sprite2D* MapMOS;
 	// current map
@@ -107,6 +108,11 @@ public:
 	void OnSpecialKeyPress(unsigned char Key);
 	/** Set handler for specified event */
 	bool SetEvent(int eventType, EventHandler handler);
+private:
+	/** Call event handler on click */
+	void ClickHandle();
+	/** Move viewport */
+	void ViewHandle(unsigned short x, unsigned short y);
 };
 
 #endif

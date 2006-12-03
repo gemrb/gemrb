@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.221 2006/11/29 22:23:16 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.222 2006/12/03 17:16:54 avenger_teambg Exp $
  *
  */
 
@@ -92,7 +92,8 @@ static ieDword TranslucentShadows;
 #define DEFAULTAC     10
 
 static ieResRef d_main[DAMAGE_LEVELS]={
-	"BLOODS","BLOODM","BLOODL","BLOODCR", //blood
+	//slot 0 is not used in the original engine
+	"BLOODCR","BLOODS","BLOODM","BLOODL", //blood
 	"SPFIRIMP","SPFIRIMP","SPFIRIMP",     //fire
 	"SPSHKIMP","SPSHKIMP","SPSHKIMP",     //spark
 	"SPFIRIMP","SPFIRIMP","SPFIRIMP",     //ice

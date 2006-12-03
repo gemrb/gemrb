@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.40 2006/08/11 23:17:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.41 2006/12/03 17:16:55 avenger_teambg Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -28,6 +28,7 @@
 #define MAP_NO_NOTES   0
 #define MAP_VIEW_NOTES 1
 #define MAP_SET_NOTE   2
+#define MAP_REVEAL     3
 
 // Ratio between pixel sizes of an Area (Big map) and a Small map
 
@@ -63,11 +64,10 @@ Color colors[]={
 
 MapControl::MapControl(void)
 {
-	if(core->HasFeature(GF_IWD_MAP_DIMENSIONS) ) {
+	if (core->HasFeature(GF_IWD_MAP_DIMENSIONS) ) {
 		MAP_DIV=4;
 		MAP_MULT=32;
-	}
-	else {
+	} else {
 		MAP_DIV=3;
 		MAP_MULT=32;
 	}
@@ -77,9 +77,10 @@ MapControl::MapControl(void)
 	ScrollY = 0;
 	NotePosX = 0;
 	NotePosY = 0;
-	MouseIsDown = false;
+	mouseIsDown = false;
+	mouseIsDragging = false;
 	Changed = true;
-	ConvertToGame = true;
+	convertToGame = true;
 	memset(Flag,0,sizeof(Flag) );
 
 	// initialize var and event callback to no-ops
@@ -96,11 +97,11 @@ MapControl::~MapControl(void)
 {
 	Video *video = core->GetVideoDriver();
 
-	if(MapMOS) {
+	if (MapMOS) {
 		video->FreeSprite(MapMOS);
 	}
 	for(int i=0;i<8;i++) {
-		if(Flag[i]) {
+		if (Flag[i]) {
 			video->FreeSprite(Flag[i]);
 		}
 	}
@@ -164,7 +165,7 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 	if (!Width || !Height) {
 		return;
 	}
-	if ((( Window* ) Owner)->Visible!=WINDOW_VISIBLE) {
+	if (Owner->Visible!=WINDOW_VISIBLE) {
 		return;
 	}
 
@@ -205,18 +206,16 @@ void MapControl::Draw(unsigned short XWin, unsigned short YWin)
 		while (i--) {
 			MapNote * mn = MyMap -> GetMapNote(i);
 			Sprite2D *anim = Flag[mn->color&7];
-			if(ConvertToGame) {
+			if (convertToGame) {
 				vp.x = GAME_TO_SCREENX(mn->Pos.x);
 				vp.y = GAME_TO_SCREENY(mn->Pos.y);
-			}
-			else { //pst style
+			} else { //pst style
 				vp.x = MAP_TO_SCREENX(mn->Pos.x);
 				vp.y = MAP_TO_SCREENY(mn->Pos.y);
 			}
 			if (anim) {
 				video->BlitSprite( anim, vp.x, vp.y, true, &r );
-			}
-			else {
+			} else {
 				video->DrawEllipse( (short) vp.x, (short) vp.y, 6, 5, colors[mn->color&7], false );
 			}
 		}
@@ -254,7 +253,7 @@ void MapControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 /** Mouse Over Event */
 void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 {
-	if (MouseIsDown) {
+	if (mouseIsDown) {
 		ScrollX -= x - lastMouseX;
 		ScrollY -= y - lastMouseY;
 
@@ -268,6 +267,10 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 			ScrollY = 0;
 	}
 
+	if (mouseIsDragging) {
+		ViewHandle(x,y);
+	}
+
 	lastMouseX = x;
 	lastMouseY = y;
 
@@ -275,12 +278,11 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 		Point mp;
 		unsigned int dist;
 
-		if(ConvertToGame) {
+		if (convertToGame) {
 			mp.x = (short) SCREEN_TO_GAMEX(x);
 			mp.y = (short) SCREEN_TO_GAMEY(y);
 			dist = 100;
-		}
-		else {
+		} else {
 			mp.x = (short) SCREEN_TO_MAPX(x);
 			mp.y = (short) SCREEN_TO_MAPY(y);
 			dist = 16;
@@ -303,43 +305,35 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 	if (LinkedLabel) {
 		LinkedLabel->SetText( "" );
 	}
-	if (Value==MAP_SET_NOTE) {
-		( ( Window * ) Owner )->Cursor = IE_CURSOR_GRAB;
-	} else {
-		( ( Window * ) Owner )->Cursor = IE_CURSOR_NORMAL;
+	switch (Value)
+	{
+	case MAP_REVEAL: //for clairvoyance effect
+		Owner->Cursor = IE_CURSOR_CAST;
+		break;
+	case MAP_SET_NOTE:
+		Owner->Cursor = IE_CURSOR_GRAB;
+		break;
+	default:
+		Owner->Cursor = IE_CURSOR_NORMAL;
+		break;
 	}
 }
 
 /** Mouse Leave Event */
 void MapControl::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
 {
-	( ( Window * ) Owner )->Cursor = IE_CURSOR_NORMAL;
+	Owner->Cursor = IE_CURSOR_NORMAL;
 }
 
-/** Mouse Button Down */
-void MapControl::OnMouseDown(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short /*Mod*/)
+void MapControl::ClickHandle()
 {
-	switch(Value) {
-		case MAP_NO_NOTES:
-			break;
-		case MAP_VIEW_NOTES:
-			//left click allows setting only when in MAP_SET_NOTE mode
-			if ((Button == GEM_MB_ACTION) ) {
-				break;
-			}
-		default:
-			// FIXME: play mapnote pin sound here (if any)
-			core->GetDictionary()->SetAt( "MapControlX", NotePosX );
-			core->GetDictionary()->SetAt( "MapControlY", NotePosY );
-			RunEventHandler( MapControlOnPress );
-			return;
-	}
+	core->GetDictionary()->SetAt( "MapControlX", NotePosX );
+	core->GetDictionary()->SetAt( "MapControlY", NotePosY );
+	RunEventHandler( MapControlOnPress );
+}
 
-	MouseIsDown = true;
-	lastMouseX = x;
-	lastMouseY = y;
-
+void MapControl::ViewHandle(unsigned short x, unsigned short y)
+{
 	short xp = (short) (SCREEN_TO_MAPX(x) - ViewWidth / 2);
 	short yp = (short) (SCREEN_TO_MAPY(y) - ViewHeight / 2);
 
@@ -351,15 +345,51 @@ void MapControl::OnMouseDown(unsigned short x, unsigned short y,
 	core->MoveViewportTo( xp * MAP_MULT / MAP_DIV, yp * MAP_MULT / MAP_DIV, false );
 }
 
+/** Mouse Button Down */
+void MapControl::OnMouseDown(unsigned short x, unsigned short y,
+	unsigned char /*Button*/, unsigned short /*Mod*/)
+{
+	mouseIsDown = true;
+	short xp = (short) (SCREEN_TO_MAPX(x) - ViewWidth / 2);
+	short yp = (short) (SCREEN_TO_MAPY(y) - ViewHeight / 2);
+	Region vp = core->GetVideoDriver()->GetViewport();
+	if (xp>vp.x && xp<vp.x+vp.w && yp>vp.y && yp>vp.y+vp.h) {
+		mouseIsDragging = true;
+	} else {
+		mouseIsDragging = false;
+	}
+	lastMouseX = x;
+	lastMouseY = y;
+}
+
 /** Mouse Button Up */
-void MapControl::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
+void MapControl::OnMouseUp(unsigned short x, unsigned short y,
 	unsigned char Button, unsigned short /*Mod*/)
 {
-	if (Button != GEM_MB_ACTION) {
+	if (!mouseIsDown) {
 		return;
 	}
 
-	MouseIsDown = false;
+	mouseIsDown = false;
+	switch(Value) {
+		case MAP_REVEAL:
+			ViewHandle(x,y);
+			ClickHandle();
+			return;
+		case MAP_NO_NOTES:
+			ViewHandle(x,y);
+			return;
+		case MAP_VIEW_NOTES:
+			//left click allows setting only when in MAP_SET_NOTE mode
+			if ((Button == GEM_MB_ACTION) ) {
+				ViewHandle(x,y);
+			}
+			ClickHandle();
+			break;
+		default:
+			ClickHandle();
+			return;
+	}
 }
 
 /** Special Key Press */

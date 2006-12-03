@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.90 2006/08/11 23:17:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.91 2006/12/03 17:16:55 avenger_teambg Exp $
  *
  */
 
@@ -143,14 +143,14 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			}
 
 			/** Forcing redraw of whole screen before drawing text*/
-			( ( Window * ) Owner )->Invalidate();
+			Owner->Invalidate();
 			BiteMyTail = true;
-			( ( Window * ) Owner )->DrawWindow();
+			Owner->DrawWindow();
 			BiteMyTail = false;
 		}
 	}
 
-	if (!Changed && !(((Window*)Owner)->Flags&WF_FLOAT) ) {
+	if (!Changed && !(Owner->Flags&WF_FLOAT) ) {
 		return;
 	}
 	Changed = false;

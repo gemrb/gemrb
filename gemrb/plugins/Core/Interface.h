@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.213 2006/09/16 13:30:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.214 2006/12/03 17:16:55 avenger_teambg Exp $
  *
  */
 
@@ -144,6 +144,11 @@ public:
 #define QF_CHANGESCRIPT  4
 #define QF_LOADGAME      8
 #define QF_ENTERGAME     16
+
+//events that are called out of drawwindow
+//they wait until the condition is right
+#define EF_CONTROL       1
+#define EF_SHOWMAP       2
 
 //autopause
 #define AP_UNUSABLE      0
@@ -277,6 +282,8 @@ public:
 	Palette *InfoTextPalette;
 	int SaveAsOriginal; //if true, saves files in compatible mode
 	int QuitFlag;
+	int EventFlag;
+	int MessageWindowSize;
 	int LoadGameIndex;
 	unsigned int SlotTypes; //this is the same as the inventory size
 	ieResRef GlobalScript;
@@ -611,6 +618,8 @@ private:
 	bool ReadAuxItemTables();
 	/** handles the QuitFlag bits (main loop events) */
 	void HandleFlags();
+	/** handles the EventFlag bits (conditional events) */
+	void HandleEvents();
 	/** Creates a game control, closes all other windows */
 	GameControl* StartGameControl();
 

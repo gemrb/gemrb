@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUICommonWindows.py,v 1.18 2006/08/08 20:25:44 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUICommonWindows.py,v 1.19 2006/12/03 17:16:56 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -108,11 +108,13 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 
 def AIPress ():
 	Button = GemRB.GetControl (PortraitWindow, 6)
-	AI = GemRB.GetVar ("MessageWindowSize") & GS_PARTYAI
+	AI = GemRB.GetMessageWindowSize() & GS_PARTYAI
 	if AI:
-		GemRB.SetTooltip (PortraitWindow, Button, 15917)
-	else:
+		GemRB.GameSetScreenFlags(GS_PARTYAI, OP_NAND)
 		GemRB.SetTooltip (PortraitWindow, Button, 15918)
+	else:
+		GemRB.GameSetScreenFlags(GS_PARTYAI, OP_OR)
+		GemRB.SetTooltip (PortraitWindow, Button, 15917)
 
 def RestPress ():
 	GemRB.RestParty(0,0,0)
@@ -367,9 +369,7 @@ def OpenPortraitWindow (needcontrols):
 
 		GemRB.SetButtonSprites (Window, Button, "GUIBTACT",0,46,47,48,49)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
-		GemRB.SetVarAssoc (Window, Button, "MessageWindowSize", 1)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "AIPress")
-		AIPress()
 
 		#Select All
 		Button = GemRB.GetControl (Window, 7)

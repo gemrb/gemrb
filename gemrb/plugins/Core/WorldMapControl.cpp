@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.30 2006/08/11 23:17:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.31 2006/12/03 17:16:55 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -249,15 +249,15 @@ void WorldMapControl::OnMouseOver(unsigned short x, unsigned short y)
 		}
 	}
 
-	( ( Window * ) Owner )->Cursor = lastCursor;
+	Owner->Cursor = lastCursor;
 }
 
 /** Sets the tooltip to be displayed on the screen now */
 void WorldMapControl::DisplayTooltip()
 {
 	if (Area) {
-		int x = ((Window*) Owner)->XPos+XPos+lastMouseX;
-		int y = ((Window*) Owner)->YPos+YPos+lastMouseY-50;
+		int x = Owner->XPos+XPos+lastMouseX;
+		int y = Owner->YPos+YPos+lastMouseY-50;
 		core->DisplayTooltip( x, y, this );
 	} else {
 		core->DisplayTooltip( 0, 0, NULL );
@@ -267,7 +267,7 @@ void WorldMapControl::DisplayTooltip()
 /** Mouse Leave Event */
 void WorldMapControl::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
 {
-	( ( Window * ) Owner )->Cursor = IE_CURSOR_NORMAL;
+	Owner->Cursor = IE_CURSOR_NORMAL;
 	Area = NULL;
 }
 

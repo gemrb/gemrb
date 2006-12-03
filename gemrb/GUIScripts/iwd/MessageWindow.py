@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/MessageWindow.py,v 1.22 2005/12/20 20:14:03 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/MessageWindow.py,v 1.23 2006/12/03 17:16:56 avenger_teambg Exp $
 
 # MessageWindow.py - scripts and GUI for main (walk) window
 
@@ -78,7 +78,7 @@ def OnLoad():
 	UpdateControlStatus()
 
 def OnIncreaseSize():
-	GSFlags = GemRB.GetVar("MessageWindowSize")
+	GSFlags = GemRB.GetMessageWindowSize()
 	Expand = GSFlags&GS_DIALOGMASK
 	GSFlags = GSFlags-Expand
 	if Expand>2:
@@ -87,7 +87,7 @@ def OnIncreaseSize():
 	GemRB.GameSetScreenFlags(Expand + GSFlags, OP_SET)
 
 def OnDecreaseSize():
-	GSFlags = GemRB.GetVar("MessageWindowSize")
+	GSFlags = GemRB.GetMessageWindowSize()
 	Expand = GSFlags&GS_DIALOGMASK
 	GSFlags = GSFlags-Expand
 	if Expand<2:
@@ -100,7 +100,7 @@ def UpdateControlStatus():
 	
 	TMessageWindow = 0
 	TMessageTA = 0
-	GSFlags = GemRB.GetVar("MessageWindowSize")
+	GSFlags = GemRB.GetMessageWindowSize()
 	Expand = GSFlags&GS_DIALOGMASK
 	Override = GSFlags&GS_DIALOG
 	GSFlags = GSFlags-Expand

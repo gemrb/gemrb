@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.437 2006/11/25 15:21:00 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.438 2006/12/03 17:16:54 avenger_teambg Exp $
  *
  */
 
@@ -151,6 +151,8 @@ Interface::Interface(int iargc, char** iargv)
 	CheatFlag = false;
 	FogOfWar = 1;
 	QuitFlag = QF_NORMAL;
+	EventFlag = EF_CONTROL;
+	MessageWindowSize = -1;
 #ifndef WIN32
 	CaseSensitive = true; //this is the default value, so CD1/CD2 will be resolved
 #else
@@ -525,9 +527,50 @@ GameControl* Interface::StartGameControl()
 
 /* handle main loop events that might destroy or create windows 
 	 thus cannot be called from DrawWindows directly
+	 these events are pending until conditions are right
+ */
+void Interface::HandleEvents()
+{
+	GameControl *gc = GetGameControl();
+	if (!gc || !gc->Owner || !gc->Owner->Visible) {
+		return;
+	}
+
+	if (EventFlag&EF_CONTROL) {
+		EventFlag&=~EF_CONTROL;
+		//if (MessageWindowSize!=game->ControlStatus) {
+			MessageWindowSize = game->ControlStatus;
+			guiscript->RunFunction( "UpdateControlStatus" );
+			//giving control back to GameControl
+			SetControlStatus(0,0,0x7f000000|IE_GUI_CONTROL_FOCUSED);
+			//this is the only value we can use here
+			if (game->ControlStatus & CS_HIDEGUI)
+				gc->HideGUI();
+			else
+				gc->UnhideGUI();
+		//}
+		return;
+	}
+	if (EventFlag&EF_SHOWMAP) {
+		if (gc && gc->Owner && gc->Owner->Visible) {
+			ieDword tmp = ~0;
+			vars->Lookup( "OtherWindow", tmp );
+			if (tmp == (ieDword) ~0) {
+				EventFlag &= ~EF_SHOWMAP;
+				guiscript->RunFunction( "ShowMap" );
+			}
+		}
+		return;
+	}
+}
+
+/* handle main loop events that might destroy or create windows 
+	 thus cannot be called from DrawWindows directly
  */
 void Interface::HandleFlags()
 {
+	EventFlag = EF_CONTROL; //clear events because the context changed
+
 	if (QuitFlag&(QF_QUITGAME|QF_EXITGAME) ) {
 		// when reaching this, quitflag should be 1 or 2
 		// if Exitgame was set, we'll set Start.py too
@@ -863,6 +906,9 @@ void Interface::Main()
 
 		while (QuitFlag) {
 			HandleFlags();
+		}
+		if (EventFlag) {
+			HandleEvents();
 		}
 
 		DrawWindows();
@@ -2845,20 +2891,6 @@ void Interface::DrawWindows(void)
 		//updating panes according to the saved game
 		//pst requires this before initiating dialogs because it has
 		//no dialog window by default
-		ieDword index = 0;
-
-		if (!vars->Lookup( "MessageWindowSize", index ) || (index!=game->ControlStatus) ) {
-			vars->SetAt( "MessageWindowSize", game->ControlStatus);
-			guiscript->RunFunction( "UpdateControlStatus" );
-			//giving control back to GameControl
-			SetControlStatus(0,0,0x7f000000|IE_GUI_CONTROL_FOCUSED);
-			GameControl *gc = GetGameControl();
-			//this is the only value we can use here
-			if (game->ControlStatus & CS_HIDEGUI)
-				gc->HideGUI();
-			else
-				gc->UnhideGUI();
-		}
 
 		//initiating dialog
 		if (flg & DF_IN_DIALOG) {

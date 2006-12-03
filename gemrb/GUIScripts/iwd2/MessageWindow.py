@@ -72,7 +72,7 @@ def UpdateControlStatus():
 
 	TMessageWindow = 0
 	TMessageTA = 0
-	GSFlags = GemRB.GetVar ("MessageWindowSize")
+	GSFlags = GemRB.GetMessageWindowSize()
 	Expand = GSFlags&GS_DIALOGMASK
 	Override = GSFlags&GS_DIALOG
 	GSFlags = GSFlags-Expand

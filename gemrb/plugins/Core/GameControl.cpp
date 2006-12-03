@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.297 2006/11/26 23:08:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.298 2006/12/03 17:16:54 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -766,7 +766,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	int nextCursor = area->GetCursor( p );
 	//make the invisible area really invisible
 	if (nextCursor == IE_CURSOR_INVALID) {
-		( ( Window * ) Owner )->Cursor = IE_CURSOR_BLOCKED;
+		Owner->Cursor = IE_CURSOR_BLOCKED;
 		lastCursor = IE_CURSOR_BLOCKED;
 		return;
 	}
@@ -871,7 +871,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		}
 	}
 	if (lastCursor != nextCursor) {
-		( ( Window * ) Owner )->Cursor = nextCursor;
+		Owner->Cursor = nextCursor;
 		lastCursor = (unsigned char) nextCursor;
 	}
 }
@@ -1074,7 +1074,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
 			actor->AddAction( GenerateAction( Tmp) );
 			//we clicked over a searchmap travel region
-				if ( ( ( Window * ) Owner )->Cursor == IE_CURSOR_TRAVEL) {
+				if ( Owner->Cursor == IE_CURSOR_TRAVEL ) {
 				sprintf( Tmp, "NIDSpecial2()" );
 				actor->AddAction( GenerateAction( Tmp) );
 			}
@@ -1091,7 +1091,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			MoveToPointFormation(actor,p,orient);
 		}
 		//we clicked over a searchmap travel region
-		if ( ( ( Window * ) Owner )->Cursor == IE_CURSOR_TRAVEL) {
+		if ( Owner->Cursor == IE_CURSOR_TRAVEL ) {
 			sprintf( Tmp, "NIDSpecial2()" );
 			actor->AddAction( GenerateAction( Tmp) );
 		}
@@ -1301,7 +1301,7 @@ int GameControl::HideGUI()
 			core->SetVisible( (unsigned short) index, WINDOW_INVISIBLE );
 		}
 	}
-	core->GetVideoDriver()->SetViewport( ( ( Window * ) Owner )->XPos, ( ( Window * ) Owner )->YPos, Width, Height );
+	core->GetVideoDriver()->SetViewport( Owner->XPos, Owner->YPos, Width, Height );
 	return 1;
 }
 
@@ -1332,6 +1332,7 @@ int GameControl::UnhideGUI()
 	if (ScreenFlags&SF_GUIENABLED) {
 		return 0;
 	}
+
 	ScreenFlags |= SF_GUIENABLED;
 	// Unhide the gamecontrol window
 	core->SetVisible( 0, WINDOW_VISIBLE );
@@ -1354,7 +1355,7 @@ int GameControl::UnhideGUI()
 			core->SetOnTop( index );
 		}
 	}
-	core->GetVideoDriver()->SetViewport( ( ( Window * ) Owner )->XPos, ( ( Window * ) Owner )->YPos, Width, Height );
+	core->GetVideoDriver()->SetViewport( Owner->XPos, Owner->YPos, Width, Height );
 	return 1;
 }
 
@@ -1367,9 +1368,9 @@ void GameControl::ResizeDel(Window* win, int type)
 		}
 		LeftCount--;
 		if (!LeftCount) {
-			( ( Window * ) Owner )->XPos -= win->Width;
-			( ( Window * ) Owner )->Width += win->Width;
-			Width = ( ( Window * ) Owner )->Width;
+			Owner->XPos -= win->Width;
+			Owner->Width += win->Width;
+			Width = Owner->Width;
 		}
 		break;
 
@@ -1379,8 +1380,8 @@ void GameControl::ResizeDel(Window* win, int type)
 		}
 		BottomCount--;
 		if (!BottomCount) {
-			( ( Window * ) Owner )->Height += win->Height;
-			Height = ( ( Window * ) Owner )->Height;
+			Owner->Height += win->Height;
+			Height = Owner->Height;
 		}
 		break;
 
@@ -1390,8 +1391,8 @@ void GameControl::ResizeDel(Window* win, int type)
 		}
 		RightCount--;
 		if (!RightCount) {
-			( ( Window * ) Owner )->Width += win->Width;
-			Width = ( ( Window * ) Owner )->Width;
+			Owner->Width += win->Width;
+			Width = Owner->Width;
 		}
 		break;
 
@@ -1401,21 +1402,21 @@ void GameControl::ResizeDel(Window* win, int type)
 		}
 		TopCount--;
 		if (!TopCount) {
-			( ( Window * ) Owner )->YPos -= win->Height;
-			( ( Window * ) Owner )->Height += win->Height;
-			Height = ( ( Window * ) Owner )->Height;
+			Owner->YPos -= win->Height;
+			Owner->Height += win->Height;
+			Height = Owner->Height;
 		}
 		break;
 
 	case 4: //BottomAdded
 		BottomCount--;
-		( ( Window * ) Owner )->Height += win->Height;
-		Height = ( ( Window * ) Owner )->Height;
+		Owner->Height += win->Height;
+		Height = Owner->Height;
 		break;
 	case 5: //Inactivating
 		BottomCount--;
-		( ( Window * ) Owner )->Height += win->Height;
-		Height = ( ( Window * ) Owner )->Height;
+		Owner->Height += win->Height;
+		Height = Owner->Height;
 		break;
 	}
 }
@@ -1426,46 +1427,46 @@ void GameControl::ResizeAdd(Window* win, int type)
 	case 0: //Left
 		LeftCount++;
 		if (LeftCount == 1) {
-			( ( Window * ) Owner )->XPos += win->Width;
-			( ( Window * ) Owner )->Width -= win->Width;
-			Width = ( ( Window * ) Owner )->Width;
+			Owner->XPos += win->Width;
+			Owner->Width -= win->Width;
+			Width = Owner->Width;
 		}
 		break;
 
 	case 1: //Bottom
 		BottomCount++;
 		if (BottomCount == 1) {
-			( ( Window * ) Owner )->Height -= win->Height;
-			Height = ( ( Window * ) Owner )->Height;
+			Owner->Height -= win->Height;
+			Height = Owner->Height;
 		}
 		break;
 
 	case 2: //Right
 		RightCount++;
 		if (RightCount == 1) {
-			( ( Window * ) Owner )->Width -= win->Width;
-			Width = ( ( Window * ) Owner )->Width;
+			Owner->Width -= win->Width;
+			Width = Owner->Width;
 		}
 		break;
 
 	case 3: //Top
 		TopCount++;
 		if (TopCount == 1) {
-			( ( Window * ) Owner )->YPos += win->Height;
-			( ( Window * ) Owner )->Height -= win->Height;
-			Height = ( ( Window * ) Owner )->Height;
+			Owner->YPos += win->Height;
+			Owner->Height -= win->Height;
+			Height = Owner->Height;
 		}
 		break;
 
 	case 4: //BottomAdded
 		BottomCount++;
-		( ( Window * ) Owner )->Height -= win->Height;
-		Height = ( ( Window * ) Owner )->Height;
+		Owner->Height -= win->Height;
+		Height = Owner->Height;
 		break;
 
 	case 5: //Inactivating
 		BottomCount++;
-		( ( Window * ) Owner )->Height -= win->Height;
+		Owner->Height -= win->Height;
 		Height = 0;
 	}
 }

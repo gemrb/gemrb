@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.cpp,v 1.38 2006/04/16 23:57:02 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Label.cpp,v 1.39 2006/12/03 17:16:55 avenger_teambg Exp $
  *
  */
 
@@ -46,7 +46,7 @@ Label::~Label()
 /** Draws the Control on the Output Display */
 void Label::Draw(unsigned short x, unsigned short y)
 {
-	if (!Changed && !(((Window*)Owner)->Flags&WF_FLOAT)) {
+	if (!Changed && !(Owner->Flags&WF_FLOAT)) {
 		return;
 	}
 	Changed = false;
@@ -82,7 +82,7 @@ int Label::SetText(const char* string, int /*pos*/)
 		SetColor(white, black);
 	}
 	if (Owner) {
-		( ( Window * ) Owner )->Invalidate();
+		Owner->Invalidate();
 	}
 	return 0;
 }

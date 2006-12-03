@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.45 2006/11/30 22:23:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.46 2006/12/03 17:16:55 avenger_teambg Exp $
  *
  */
 
@@ -45,8 +45,11 @@
 #define COND_ALWAYS 9
 
 //FIXME: find a way to handle portrait icons
+#define PI_HELD   13
 #define PI_SLOWED 41
 #define PI_STUN   55
+#define PI_MAZE   78
+#define PI_PRISON 79
 
 static ieResRef *casting_glows = NULL;
 static int cgcount = -1;
@@ -2885,7 +2888,6 @@ int fx_identify (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_identify (%2d): Resource:%s Mode: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
 	STAT_SET (IE_IDENTIFYMODE, 1);
-	//start identify screen???
 	return FX_NOT_APPLIED;
 }
 // 0x96 FindTraps
@@ -3120,7 +3122,7 @@ int fx_damage_animation (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_damage_animation (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	target->PlayDamageAnimation(fx->Parameter2);
-	return FX_PERMANENT;
+	return FX_NOT_APPLIED;
 }
 // 0xAB Spell:Add
 int fx_add_innate (Actor* /*Owner*/, Actor* target, Effect* fx)
@@ -3178,6 +3180,10 @@ int fx_playsound (Actor* /*Owner*/, Actor* target, Effect* fx)
 //0x6d State:Hold3
 int fx_hold_creature_no_icon (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
+	if (0) printf( "fx_hold_creature_no_icon (%2d): Value: %d, IDS: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if ( STATE_GET(STATE_DEAD) ) {
+		return FX_NOT_APPLIED;
+	}
  	if (match_ids( target, fx->Parameter1, fx->Parameter2) ) {
 		STAT_SET( IE_HELD, 1);
 		return FX_APPLIED;
@@ -3191,14 +3197,19 @@ int fx_hold_creature_no_icon (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_hold_creature (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_hold_creature (%2d): Value: %d, IDS: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if ( STATE_GET(STATE_DEAD) ) {
+		return FX_NOT_APPLIED;
+	}
+
  	if (match_ids( target, fx->Parameter1, fx->Parameter2) ) {
 		STAT_SET( IE_HELD, 1);
+		target->AddPortraitIcon(PI_HELD);
 		return FX_APPLIED;
 	}
 	//if the ids don't match, the effect doesn't stick
 	return FX_NOT_APPLIED;
 }
-// b0 //movement rate
+// b0 see: fx_movement_modifier
 
 // b1 ApplyEffect
 int fx_apply_effect (Actor* Owner, Actor* target, Effect* fx)
@@ -3470,26 +3481,32 @@ int fx_power_word_stun (Actor* Owner, Actor* target, Effect* fx)
 }
 
 //0xd3 State:Imprisonment (avatar removal plus portrait icon)
-int fx_imprisonment (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_imprisonment (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_inprisonment (%2d)\n", fx->Opcode );
+	target->SetMCFlag(MC_HIDDEN, BM_OR);
+	target->AddPortraitIcon(PI_PRISON);
 	return FX_APPLIED;
 }
 
 //0xd4 Cure:Imprisonment
 
 EffectRef fx_imprisonment_ref={"Imprisonment",NULL,-1};
+EffectRef fx_maze_ref={"Maze",NULL,-1};
 
 int fx_freedom (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_freedom (%2d)\n", fx->Opcode );
 	target->fxqueue.RemoveAllEffects( fx_imprisonment_ref );
+	target->fxqueue.RemoveAllEffects( fx_maze_ref );
 	return FX_NOT_APPLIED;
 }
 //0xd5 Maze
-int fx_maze (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_maze (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_maze (%2d)\n", fx->Opcode );
+	target->SetMCFlag(MC_HIDDEN, BM_OR);
+	target->AddPortraitIcon(PI_MAZE);
 	return FX_APPLIED;
 }
 //0xd6 CastFromList
@@ -3798,6 +3815,7 @@ int fx_farsee (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_farsee (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	//invoke farsee guiscript
+	core->EventFlag|=EF_SHOWMAP;
 	return FX_NOT_APPLIED;
 }
 
