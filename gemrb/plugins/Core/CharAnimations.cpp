@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.99 2006/12/03 23:57:15 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.100 2006/12/04 21:30:15 wjpalenstijn Exp $
  *
  */
 
@@ -150,6 +150,7 @@ void CharAnimations::SetHelmetRef(const char* ref)
 
 		// TODO: Only drop helmet anims
 		DropAnims();
+		core->FreePalette(paletteHelmet, 0);
 	}
 }
 
@@ -161,6 +162,7 @@ void CharAnimations::SetWeaponRef(const char* ref)
 
 		// TODO: Only drop weapon anims
 		DropAnims();
+		core->FreePalette(paletteWeapon, 0);
 	}
 }
 
@@ -172,18 +174,40 @@ void CharAnimations::SetOffhandRef(const char* ref)
 
 		// TODO: Only drop shield/offhand anims
 		DropAnims();
+		core->FreePalette(paletteOffhand, 0);
 	}
 }
 
 void CharAnimations::SetColors(ieDword *arg)
 {
 	Colors = arg;
-	SetupColors();
+	SetupColors(0);
+	SetupColors(1);
+	SetupColors(2);
+	SetupColors(3);
 }
 
-void CharAnimations::SetupColors()
+void CharAnimations::SetupColors(unsigned int type)
 {
-	if (!palette) {
+	Palette* pal = 0;
+	switch (type) {
+	case 0:
+		pal = palette;
+		break;
+	case 1:
+		pal = paletteWeapon;
+		break;
+	case 2:
+		pal = paletteOffhand;
+		break;
+	case 3:
+		pal = paletteHelmet;
+		break;
+	default:
+		break;
+	}
+
+	if (!pal) {
 		return;
 	}
 
@@ -196,6 +220,8 @@ void CharAnimations::SetupColors()
 	}
 
 	if (GetAnimType() >= IE_ANI_PST_ANIMATION_1) {
+		// TODO: handle equipment colours (How?)
+
 		// Avatars in PS:T
 		int size = 32;
 		int dest = 256-Colors[6]*size;
@@ -215,7 +241,7 @@ void CharAnimations::SetupColors()
 	}
 
 	int PType = NoPalette();
-	if ( PType) {
+	if ( PType && type == 0 ) {
 		core->FreePalette(palette, PaletteResRef);
 		PaletteResRef[0]=0;
 		//handling special palettes like MBER_BL (black bear)
@@ -232,7 +258,18 @@ void CharAnimations::SetupColors()
 		return;
 	}
 
-	palette->SetupPaperdollColours(Colors, 0);
+	pal->SetupPaperdollColours(Colors, type);
+}
+
+Palette* CharAnimations::GetPartPalette(int part)
+{
+	int actorPartCount = GetActorPartCount();
+	
+	if (part < actorPartCount) return palette;
+	if (part == actorPartCount) return paletteWeapon;
+	if (part == actorPartCount+1) return paletteOffhand;
+	if (part == actorPartCount+2) return paletteHelmet;
+	return 0;
 }
 
 void CharAnimations::InitAvatarsTable()
@@ -273,6 +310,9 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 {
 	Colors = NULL;
 	palette = NULL;
+	paletteHelmet = NULL;
+	paletteWeapon = NULL;
+	paletteOffhand = NULL;
 	nextStanceID = 0;
 	autoSwitchOnEnd = false;
 	lockPalette = false;
@@ -338,11 +378,13 @@ void CharAnimations::DropAnims()
 	}
 }
 
-//freeing the bitmaps only once, but using an intelligent algorithm
 CharAnimations::~CharAnimations(void)
 {
 	DropAnims();
 	core->FreePalette(palette, PaletteResRef);
+	core->FreePalette(paletteHelmet, 0);
+	core->FreePalette(paletteWeapon, 0);
+	core->FreePalette(paletteOffhand, 0);
 }
 /*
 This is a simple Idea of how the animation are coded
@@ -571,16 +613,11 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 			if (GetSize() == '*' || GetSize() == 0) continue;
 
 			if (part == actorPartCount) {
-				if (HelmetRef[0] == 0) continue;
-				// helmet
-				GetEquipmentResRef(HelmetRef,false,NewResRef,Cycle,equipdat);
-				printf("Using helmet ref %s\n", NewResRef);
-			} else if (part == actorPartCount+1) {
 				if (WeaponRef[0] == 0) continue;
 				// weapon
 				GetEquipmentResRef(WeaponRef,false,NewResRef,Cycle,equipdat);
 				printf("Using weapon ref %s\n", NewResRef);
-			} else if (part == actorPartCount+2) {
+			} else if (part == actorPartCount+1) {
 				if (OffhandRef[0] == 0) continue;
 				if (WeaponType == IE_ANI_WEAPON_2H) continue;
 				// off-hand
@@ -592,6 +629,11 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 									   equipdat);
 				}
 				printf("Using offhand ref %s\n", NewResRef);
+			} else if (part == actorPartCount+2) {
+				if (HelmetRef[0] == 0) continue;
+				// helmet
+				GetEquipmentResRef(HelmetRef,false,NewResRef,Cycle,equipdat);
+				printf("Using helmet ref %s\n", NewResRef);
 			}
 		}
 		NewResRef[8]=0; //cutting right to size
@@ -639,13 +681,31 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 			}
 		}
 
-		if (!palette && (NoPalette()!=1) ) {
-			// This is the first time we're loading an Animation.
-			// We copy the palette of its first frame into our own palette
-			palette=core->GetVideoDriver()->GetPalette(a->GetFrame(0))->Copy();
+		if (part < actorPartCount) {
+			if (!palette && (NoPalette()!=1) ) {
+				// This is the first time we're loading an Animation.
+				// We copy the palette of its first frame into our own palette
+				palette=core->GetVideoDriver()->GetPalette(a->GetFrame(0))
+					->Copy();
 
-			// ...and setup the colours properly
-			SetupColors();
+				// ...and setup the colours properly
+				SetupColors(0);
+			}
+		} else if (part == actorPartCount) {
+			if (!paletteWeapon) {
+				paletteWeapon = core->GetVideoDriver()->GetPalette(a->GetFrame(0))->Copy();
+				SetupColors(1);
+			}
+		} else if (part == actorPartCount+1) {
+			if (!paletteOffhand) {
+				paletteOffhand = core->GetVideoDriver()->GetPalette(a->GetFrame(0))->Copy();
+				SetupColors(2);
+			}
+		} else if (part == actorPartCount+2) {
+			if (!paletteHelmet) {
+				paletteHelmet = core->GetVideoDriver()->GetPalette(a->GetFrame(0))->Copy();
+				SetupColors(3);
+			}
 		}
 	
 		//animation is affected by game flags

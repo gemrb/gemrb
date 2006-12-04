@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.46 2006/12/03 16:47:24 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.47 2006/12/04 21:30:15 wjpalenstijn Exp $
  *
  */
 
@@ -130,6 +130,9 @@ private:
 public:
 	ieDword *Colors;  //these are the custom color indices
 	Palette* palette;
+	Palette* paletteHelmet;
+	Palette* paletteWeapon;
+	Palette* paletteOffhand;
 	unsigned int AvatarsRowNum;
 	unsigned char ArmorType, WeaponType, RangedType;
 	ieResRef ResRef;
@@ -146,12 +149,14 @@ public:
 	void SetHelmetRef(const char* ref);
 	void SetWeaponRef(const char* ref);
 	void SetOffhandRef(const char* ref);
-	void SetupColors();
+	void SetupColors(unsigned int type);
 	void SetColors(ieDword *Colors);
 
 	// returns an array of animations of size GetTotalPartCount()
 	Animation** GetAnimation(unsigned char Stance, unsigned char Orient);
 	int GetTotalPartCount() const;
+	// returns Palette for a given part (unlocked)
+	Palette* GetPartPalette(int part); // TODO: clean this up
 
 public: //attribute functions
 	static int GetAvatarsCount();

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.224 2006/12/03 23:51:04 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.225 2006/12/04 21:30:14 wjpalenstijn Exp $
  *
  */
 
@@ -2318,7 +2318,7 @@ void Actor::Draw(Region &screen)
 				if (!ca->lockPalette) flags|=BLIT_TINTED;
 
 				video->BlitGameSprite( nextFrame, cx + screen.x, cy + screen.y,
-					 flags, tint, sc, ca->palette, &screen);
+					 flags, tint, sc, ca->GetPartPalette(part), &screen);
 			}
 		}
 		if (masteranim->endReached) {
