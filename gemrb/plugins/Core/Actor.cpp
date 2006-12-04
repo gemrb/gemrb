@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.226 2006/12/04 23:07:38 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.227 2006/12/04 23:46:49 wjpalenstijn Exp $
  *
  */
 
@@ -2671,29 +2671,40 @@ int Actor::GetFeat(unsigned int feat)
 	return 0;
 }
 
-void Actor::SetUsedWeapon(char* AnimationType, ieWord* MeleeAnimation)
+void Actor::SetUsedWeapon(char* AnimationType, ieWord* MeleeAnimation,
+						  int wt)
 {
 	// TODO: set WeaponType
 
 	memcpy(WeaponRef, AnimationType, sizeof(WeaponRef) );
 	memcpy(AttackMovements, MeleeAnimation, sizeof(AttackMovements) );
+	if (wt != -1) WeaponType = wt;
 	printf("Weapon: %c%c\n",AnimationType[0], AnimationType[1]);
 	printf("Movements: %hd%% %hd%% %hd%%\n", MeleeAnimation[0], MeleeAnimation[1], MeleeAnimation[2]);
+	printf("WeaponType: %d\n", WeaponType);
 	if (!anims)
 		return;
 	anims->SetWeaponRef(AnimationType);
+	anims->SetWeaponType(WeaponType);
 	//anims->SetAttackMoveChances(MeleeAnimation);
 }
 
-void Actor::SetUsedShield(char* AnimationType)
+void Actor::SetUsedShield(char* AnimationType, int wt)
 {
 	// TODO: set WeaponType
 
-	printf("Shield: %c%c\n",AnimationType[0], AnimationType[1]);
 	memcpy(ShieldRef, AnimationType, sizeof(ShieldRef) );
+	if (wt != -1) WeaponType = wt;
+	if (AnimationType[0] == ' ' || AnimationType[0] == 0)
+		if (WeaponType == IE_ANI_WEAPON_2W)
+			WeaponType = IE_ANI_WEAPON_1H;
+	printf("Shield: %c%c\n",AnimationType[0], AnimationType[1]);
+	printf("WeaponType: %d\n", WeaponType);
+
 	if (!anims)
 		return;
 	anims->SetOffhandRef(AnimationType);
+	anims->SetWeaponType(WeaponType);
 }
 
 void Actor::SetUsedHelmet(char* AnimationType)

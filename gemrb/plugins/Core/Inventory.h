@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.52 2006/12/04 23:06:49 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.53 2006/12/04 23:46:49 wjpalenstijn Exp $
  *
  */
 
@@ -312,6 +312,7 @@ private:
 	void KillSlot(unsigned int index);
 	inline Item *GetItemPointer(ieDword slot, CREItem *&Slot);
 	void UpdateWeaponAnimation();
+	void UpdateShieldAnimation();
 };
 
 #endif

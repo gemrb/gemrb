@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.87 2006/12/04 23:06:50 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.88 2006/12/04 23:46:49 wjpalenstijn Exp $
  *
  */
 
@@ -314,14 +314,11 @@ void Inventory::KillSlot(unsigned int index)
 	Item *itm = core->GetItem(item->ItemResRef);
 	switch (effect) {
 		case SLOT_EFFECT_LEFT:
-			Owner->SetUsedShield("  ");
+			UpdateShieldAnimation();
 			break;
 		case SLOT_EFFECT_MISSILE:
 		case SLOT_EFFECT_MELEE:
-			{
-				ieWord MeleeAnimation[3]={100,0,0};
-				Owner->SetUsedWeapon("  ",MeleeAnimation);
-			}
+			UpdateWeaponAnimation();
 			break;
 		case SLOT_EFFECT_ITEM:
 			{
@@ -714,7 +711,7 @@ bool Inventory::EquipItem(unsigned int slot)
 	case SLOT_EFFECT_LEFT:
 		//no idea if the offhand weapon has style, or simply the right
 		//hand style is dominant
-		Owner->SetUsedShield(itm->AnimationType);
+		UpdateShieldAnimation();
 		break;
 	case SLOT_EFFECT_MELEE:
 		//if weapon is ranged, then find quarrel for it and equip that
@@ -731,7 +728,7 @@ bool Inventory::EquipItem(unsigned int slot)
 		}
 		if (header) {
 			SetEquippedSlot(slot-SLOT_MELEE);
-			Owner->SetUsedWeapon(itm->AnimationType, header->MeleeAnimation);
+			UpdateWeaponAnimation();
 		}
 
 		break;
@@ -1161,7 +1158,7 @@ void Inventory::EquipBestWeapon(int flags)
 	}
 
 	SetEquippedSlot(best_slot);
-	Owner->SetUsedWeapon(AnimationType, MeleeAnimation);
+	UpdateWeaponAnimation();
 }
 
 /* returns true if there are more item usages not fitting in given array */
@@ -1252,24 +1249,69 @@ ieDword Inventory::GetEquipExclusion() const
 	return ItemExcl;
 }
 
+void Inventory::UpdateShieldAnimation()
+{
+	char AnimationType[2]={0,0};
+	int WeaponType = -1;
+
+	CREItem* si = GetSlotItem( core->QuerySlot(3) );
+	if (si) {
+		Item* it = core->GetItem(si->ItemResRef);
+		memcpy(AnimationType, it->AnimationType, 2);
+		if (core->CanUseItemType(it->ItemType, SLOT_WEAPON, 0, 0, 0))
+			WeaponType = IE_ANI_WEAPON_2W;
+		else
+			WeaponType = IE_ANI_WEAPON_1H;
+	} else {
+
+	}
+	Owner->SetUsedShield(AnimationType, WeaponType);
+}
+
 void Inventory::UpdateWeaponAnimation()
 {
 	int slot = GetEquippedSlot();
+	int WeaponType = -1;
 
 	char AnimationType[2]={0,0};
 	ieWord MeleeAnimation[3]={100,0,0};
 	CREItem *Slot;
+
+	// TODO: fix bows?
 
 	ITMExtHeader *header = 0;
 	Item *itm = GetItemPointer(slot, Slot);
 	if (itm) {
 		itm->GetDamagePotential(false, header);
 		memcpy(AnimationType,itm->AnimationType,sizeof(AnimationType) );
+
+		if (itm->Flags & IE_ITEM_TWO_HANDED)
+			WeaponType = IE_ANI_WEAPON_2H;
+		else {
+
+			// Examine shield slot to check if we're using two weapons
+			// TODO: for consistency, use same Item* access method as above
+			bool twoweapon = false;
+			CREItem* si = GetSlotItem( core->QuerySlot(3) );
+			if (si) {
+				Item* it = core->GetItem(si->ItemResRef);
+				memcpy(AnimationType, it->AnimationType, 2);
+				if (core->CanUseItemType(it->ItemType, SLOT_WEAPON, 0, 0, 0))
+					twoweapon = true;
+				core->FreeItem(it, si->ItemResRef, false);
+			}
+
+			if (twoweapon)
+				WeaponType = IE_ANI_WEAPON_2W;
+			else
+				WeaponType = IE_ANI_WEAPON_1H;
+		}
 	}
+
 	if (header)
 		memcpy(MeleeAnimation,header->MeleeAnimation,
 			   sizeof(MeleeAnimation) );
 	if (itm)
 		core->FreeItem( itm, Slot->ItemResRef, false );
-	Owner->SetUsedWeapon(AnimationType, MeleeAnimation);
+	Owner->SetUsedWeapon(AnimationType, MeleeAnimation, WeaponType);
 }
