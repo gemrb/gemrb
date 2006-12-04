@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.424 2006/12/03 20:37:56 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.425 2006/12/04 23:45:59 wjpalenstijn Exp $
  *
  */
 
@@ -3957,7 +3957,7 @@ static PyObject* GemRB_GetSlotType(PyObject * /*self*/, PyObject* args)
 	}
 
 	PyDict_SetItemString(dict, "Slot", PyInt_FromLong(tmp));
-	PyDict_SetItemString(dict, "Type", PyInt_FromLong(core->QuerySlotType(tmp)));
+	PyDict_SetItemString(dict, "Type", PyInt_FromLong((int)core->QuerySlotType(tmp)));
 	PyDict_SetItemString(dict, "ID", PyInt_FromLong(core->QuerySlotID(tmp)));
 	PyDict_SetItemString(dict, "Tip", PyInt_FromLong(core->QuerySlottip(tmp)));
 	//see if the actor shouldn't have some slots displayed
