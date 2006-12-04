@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.225 2006/12/04 21:30:14 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.226 2006/12/04 23:07:38 wjpalenstijn Exp $
  *
  */
 
@@ -2205,7 +2205,7 @@ void Actor::Draw(Region &screen)
 	// FIXME: The below code won't be necessary any more
 	// as soon as WeaponType is set when changing weapons
 
-#if 1
+#if 0
 	CREItem* si;
 	// Helmet
 	si = inventory.GetSlotItem( core->QuerySlot(1) );
@@ -2673,6 +2673,8 @@ int Actor::GetFeat(unsigned int feat)
 
 void Actor::SetUsedWeapon(char* AnimationType, ieWord* MeleeAnimation)
 {
+	// TODO: set WeaponType
+
 	memcpy(WeaponRef, AnimationType, sizeof(WeaponRef) );
 	memcpy(AttackMovements, MeleeAnimation, sizeof(AttackMovements) );
 	printf("Weapon: %c%c\n",AnimationType[0], AnimationType[1]);
@@ -2685,6 +2687,8 @@ void Actor::SetUsedWeapon(char* AnimationType, ieWord* MeleeAnimation)
 
 void Actor::SetUsedShield(char* AnimationType)
 {
+	// TODO: set WeaponType
+
 	printf("Shield: %c%c\n",AnimationType[0], AnimationType[1]);
 	memcpy(ShieldRef, AnimationType, sizeof(ShieldRef) );
 	if (!anims)
