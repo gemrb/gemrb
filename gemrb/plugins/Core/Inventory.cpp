@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.86 2006/11/29 21:17:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.87 2006/12/04 23:06:50 wjpalenstijn Exp $
  *
  */
 
@@ -960,13 +960,16 @@ bool Inventory::SetEquippedSlot(int slotcode)
 
 	if (slotcode == IW_NO_EQUIPPED) {
 		Equipped = IW_NO_EQUIPPED;
+		UpdateWeaponAnimation();
 		return true;
 	}
 	if (!HasItemInSlot("",slotcode+SLOT_MELEE)) {
 		Equipped = IW_NO_EQUIPPED;
+		UpdateWeaponAnimation();
 		return true;
 	}
 	Equipped = slotcode;
+	UpdateWeaponAnimation();
 	return true;
 }
 
@@ -1249,3 +1252,24 @@ ieDword Inventory::GetEquipExclusion() const
 	return ItemExcl;
 }
 
+void Inventory::UpdateWeaponAnimation()
+{
+	int slot = GetEquippedSlot();
+
+	char AnimationType[2]={0,0};
+	ieWord MeleeAnimation[3]={100,0,0};
+	CREItem *Slot;
+
+	ITMExtHeader *header = 0;
+	Item *itm = GetItemPointer(slot, Slot);
+	if (itm) {
+		itm->GetDamagePotential(false, header);
+		memcpy(AnimationType,itm->AnimationType,sizeof(AnimationType) );
+	}
+	if (header)
+		memcpy(MeleeAnimation,header->MeleeAnimation,
+			   sizeof(MeleeAnimation) );
+	if (itm)
+		core->FreeItem( itm, Slot->ItemResRef, false );
+	Owner->SetUsedWeapon(AnimationType, MeleeAnimation);
+}
