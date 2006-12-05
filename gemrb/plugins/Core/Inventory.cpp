@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.88 2006/12/04 23:46:49 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.89 2006/12/05 19:43:23 wjpalenstijn Exp $
  *
  */
 
@@ -728,6 +728,7 @@ bool Inventory::EquipItem(unsigned int slot)
 		}
 		if (header) {
 			SetEquippedSlot(slot-SLOT_MELEE);
+			effect = 0; // SetEquippedSlot will already call AddSlotEffects
 			UpdateWeaponAnimation();
 		}
 
@@ -949,6 +950,10 @@ int Inventory::GetEquippedSlot()
 
 bool Inventory::SetEquippedSlot(int slotcode)
 {
+	if (Equipped != slotcode && Equipped != IW_NO_EQUIPPED) {
+		RemoveSlotEffects( GetSlotItem(SLOT_MELEE+Equipped) );
+	}
+
 	//doesn't work if magic slot is used
 	if (HasItemInSlot("",SLOT_MAGIC)) {
 		Equipped = SLOT_MAGIC-SLOT_MELEE;
@@ -966,6 +971,8 @@ bool Inventory::SetEquippedSlot(int slotcode)
 		return true;
 	}
 	Equipped = slotcode;
+	if ( core->QuerySlotEffects( SLOT_MELEE+Equipped ) )
+		AddSlotEffects( GetSlotItem(SLOT_MELEE+Equipped) );
 	UpdateWeaponAnimation();
 	return true;
 }
@@ -1295,7 +1302,6 @@ void Inventory::UpdateWeaponAnimation()
 			CREItem* si = GetSlotItem( core->QuerySlot(3) );
 			if (si) {
 				Item* it = core->GetItem(si->ItemResRef);
-				memcpy(AnimationType, it->AnimationType, 2);
 				if (core->CanUseItemType(it->ItemType, SLOT_WEAPON, 0, 0, 0))
 					twoweapon = true;
 				core->FreeItem(it, si->ItemResRef, false);
