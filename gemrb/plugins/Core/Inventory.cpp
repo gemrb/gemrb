@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.89 2006/12/05 19:43:23 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.90 2006/12/05 20:22:38 wjpalenstijn Exp $
  *
  */
 
@@ -971,8 +971,14 @@ bool Inventory::SetEquippedSlot(int slotcode)
 		return true;
 	}
 	Equipped = slotcode;
-	if ( core->QuerySlotEffects( SLOT_MELEE+Equipped ) )
-		AddSlotEffects( GetSlotItem(SLOT_MELEE+Equipped) );
+	if ( core->QuerySlotEffects( SLOT_MELEE+Equipped ) ) {
+		CREItem* item = GetSlotItem(SLOT_MELEE+Equipped);
+		item->Flags|=IE_INV_ITEM_EQUIPPED;
+		if (item->Flags & IE_INV_ITEM_CURSED) {
+			item->Flags|=IE_INV_ITEM_UNDROPPABLE;
+		}
+		AddSlotEffects( item );
+	}
 	UpdateWeaponAnimation();
 	return true;
 }
@@ -1278,6 +1284,11 @@ void Inventory::UpdateShieldAnimation()
 void Inventory::UpdateWeaponAnimation()
 {
 	int slot = GetEquippedSlot();
+ 	int effect = core->QuerySlotEffects( slot );
+	if (effect == SLOT_EFFECT_MISSILE) {
+		// ranged weapon
+		slot = SLOT_MELEE + FindRangedWeapon();
+	}
 	int WeaponType = -1;
 
 	char AnimationType[2]={0,0};
