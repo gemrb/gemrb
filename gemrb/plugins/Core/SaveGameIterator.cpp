@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.41 2006/08/11 23:17:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SaveGameIterator.cpp,v 1.42 2006/12/09 19:41:58 avenger_teambg Exp $
  *
  */
 
@@ -392,7 +392,10 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 		return 1; //can't save while store is open
 	}
 	GameControl *gc = core->GetGameControl();
-	if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
+	if (!gc) {
+		return -1; //no gamecontrol!!!
+	}
+	if (gc->GetDialogueFlags()&DF_IN_DIALOG) {
 		return 2; //can't save while in dialog?
 	}
 
