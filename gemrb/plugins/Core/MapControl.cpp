@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.41 2006/12/03 17:16:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/MapControl.cpp,v 1.42 2006/12/09 15:00:26 avenger_teambg Exp $
  */
 
 #include "../../includes/win32def.h"
@@ -350,10 +350,12 @@ void MapControl::OnMouseDown(unsigned short x, unsigned short y,
 	unsigned char /*Button*/, unsigned short /*Mod*/)
 {
 	mouseIsDown = true;
-	short xp = (short) (SCREEN_TO_MAPX(x) - ViewWidth / 2);
-	short yp = (short) (SCREEN_TO_MAPY(y) - ViewHeight / 2);
+	short xp = (short) (SCREEN_TO_GAMEX(x));
+	short yp = (short) (SCREEN_TO_GAMEY(y));
 	Region vp = core->GetVideoDriver()->GetViewport();
-	if (xp>vp.x && xp<vp.x+vp.w && yp>vp.y && yp>vp.y+vp.h) {
+	vp.w = vp.x+ViewWidth*MAP_MULT/MAP_DIV;
+	vp.h = vp.y+ViewHeight*MAP_MULT/MAP_DIV;
+	if ((xp>vp.x) && (xp<vp.w) && (yp>vp.y) && (yp<vp.h)) {
 		mouseIsDragging = true;
 	} else {
 		mouseIsDragging = false;
@@ -371,6 +373,7 @@ void MapControl::OnMouseUp(unsigned short x, unsigned short y,
 	}
 
 	mouseIsDown = false;
+	mouseIsDragging = false;
 	switch(Value) {
 		case MAP_REVEAL:
 			ViewHandle(x,y);

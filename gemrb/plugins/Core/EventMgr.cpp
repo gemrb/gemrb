@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.43 2006/07/31 17:15:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.44 2006/12/09 15:00:25 avenger_teambg Exp $
  *
  */
 
@@ -279,5 +279,9 @@ void EventMgr::SetFocused(Window *win, Control *ctrl)
 	lastW=win;
 	lastF=ctrl;
 	lastW->SetFocused(lastF);
+	//this is to refresh changing mouse cursors should the focus change)
+	int x,y;
+	core->GetVideoDriver()->GetMousePos(x,y);
+	MouseMove((unsigned short) x, (unsigned short) y);
 }
 

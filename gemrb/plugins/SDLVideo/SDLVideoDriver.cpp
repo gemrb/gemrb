@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.148 2006/11/05 18:07:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.149 2006/12/09 15:00:26 avenger_teambg Exp $
  *
  */
 
@@ -237,13 +237,13 @@ int SDLVideoDriver::SwapBuffers(void)
 				case SDLK_RALT:
 					key = GEM_ALT;
 					break;
-		                default:
+				default:
 					if (event.key.keysym.sym>=256) {
 						key=0;
 					} else {
 						key=(unsigned char) event.key.keysym.sym;
 					}
-		                        break;
+					break;
 			}
 			if (!ConsolePopped && Evnt && ( key != 0 ))
 				Evnt->KeyRelease( key, GetModState(event.key.keysym.mod) );
@@ -407,8 +407,8 @@ void SDLVideoDriver::DestroySpriteCover(SpriteCover* sc)
 
 
 // flags: 0 - never dither (full cover)
-//        1 - dither if polygon wants it
-//        2 - always dither
+//	1 - dither if polygon wants it
+//	2 - always dither
 void SDLVideoDriver::AddPolygonToSpriteCover(SpriteCover* sc,
 											 Wall_Polygon* poly, int flags)
 {
@@ -1405,7 +1405,7 @@ void SDLVideoDriver::DrawRect(Region& rgn, Color& color, bool fill, bool clipped
 	}
 }
 
-/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
+/** This function Draws a clipped sprite */
 void SDLVideoDriver::DrawRectSprite(Region& rgn, Color& color, Sprite2D* sprite)
 {
 	if (sprite->BAM) {
@@ -2158,6 +2158,12 @@ void SDLVideoDriver::SetClipRect(Region* clip)
 	}
 }
 
+void SDLVideoDriver::GetMousePos(int &x, int &y)
+{
+  x=CursorPos.x;
+  y=CursorPos.y;
+}
+
 void SDLVideoDriver::MouseMovement(int x, int y)
 {
 	GetTime( lastMouseTime );
@@ -2225,16 +2231,16 @@ void SDLVideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 
 	if (g_truecolor) {
 		sprite = SDL_CreateRGBSurfaceFrom( buf, bufw, bufh, 16, 2 * bufw,
-		                        0x7C00, 0x03E0, 0x001F, 0 );
+					0x7C00, 0x03E0, 0x001F, 0 );
 	} else {
 		sprite = SDL_CreateRGBSurfaceFrom( buf, bufw, bufh, 8, bufw, 0x7C00,
-		                        0x03E0, 0x001F, 0 );
+					0x03E0, 0x001F, 0 );
 
 		for (i = 0; i < 256; i++) {
-		        sprite->format->palette->colors[i].r = ( *pal++ ) << 2;
-		        sprite->format->palette->colors[i].g = ( *pal++ ) << 2;
-		        sprite->format->palette->colors[i].b = ( *pal++ ) << 2;
-		        sprite->format->palette->colors[i].unused = 0;
+			sprite->format->palette->colors[i].r = ( *pal++ ) << 2;
+			sprite->format->palette->colors[i].g = ( *pal++ ) << 2;
+			sprite->format->palette->colors[i].b = ( *pal++ ) << 2;
+			sprite->format->palette->colors[i].unused = 0;
 		}
 	}
 
@@ -2256,31 +2262,31 @@ void SDLVideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 
 int SDLVideoDriver::PollMovieEvents()
 {
-        SDL_Event event;
+	SDL_Event event;
 
-        while (SDL_PollEvent( &event )) {
-                switch (event.type) {
-                        case SDL_QUIT:
-                        case SDL_MOUSEBUTTONDOWN:
-                                return 1;
-                        case SDL_KEYDOWN:
-                                switch (event.key.keysym.sym) {
-                                        case SDLK_ESCAPE:
-                                        case SDLK_q:
-                                                return 1;
-                                        case SDLK_f:
-                                                SDL_WM_ToggleFullScreen( disp );
-                                                break;
-                                        default:
-                                                break;
-                                }
-                                break;
-                        default:
-                                break;
-                }
-        }
+	while (SDL_PollEvent( &event )) {
+		switch (event.type) {
+			case SDL_QUIT:
+			case SDL_MOUSEBUTTONDOWN:
+				return 1;
+			case SDL_KEYDOWN:
+				switch (event.key.keysym.sym) {
+					case SDLK_ESCAPE:
+					case SDLK_q:
+						return 1;
+					case SDLK_f:
+						SDL_WM_ToggleFullScreen( disp );
+						break;
+					default:
+						break;
+				}
+				break;
+			default:
+				break;
+		}
+	}
 
-        return 0;
+	return 0;
 }
 
 void SDLVideoDriver::SetMovieFont(Font *stfont, Palette *pal)

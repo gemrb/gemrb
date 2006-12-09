@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.69 2006/09/30 09:44:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.70 2006/12/09 15:00:26 avenger_teambg Exp $
  *
  */
 
@@ -65,6 +65,7 @@ public:
 	void AddPolygonToSpriteCover(SpriteCover* sc,Wall_Polygon* poly,int flags);
 	void DestroySpriteCover(SpriteCover* sc);
 
+	void GetMousePos(int &x, int &y);
 	void MouseMovement(int x, int y);
 	void MoveMouse(unsigned int x, unsigned int y);
 	Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask,

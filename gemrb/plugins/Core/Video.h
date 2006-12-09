@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.68 2006/09/30 09:44:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.69 2006/12/09 15:00:26 avenger_teambg Exp $
  *
  */
 
@@ -136,6 +136,7 @@ public:
 	virtual void SetPalette(Sprite2D* spr, Palette* pal) = 0;
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
 	virtual void DrawRect(Region& rgn, Color& color, bool fill = true, bool clipped = false) = 0;
+	/** this function draws a clipped sprite */
 	virtual void DrawRectSprite(Region& rgn, Color& color, Sprite2D* sprite) = 0;
 	virtual void SetPixel(short x, short y, Color& color, bool clipped = false) = 0;
 	virtual void GetPixel(short x, short y, Color* color) = 0;
@@ -152,11 +153,11 @@ public:
 		Color& color, bool clipped = false) = 0;
 	/** Blits a Sprite filling the Region */
 	virtual void BlitTiled(Region rgn, Sprite2D* img, bool anchor = false) = 0;
-	/** Set Event Manager */
+	/** Sets Event Manager */
 	void SetEventMgr(EventMgr* evnt);
-	/** Send a Quit Signal to the Event Queue */
+	/** Sends a Quit Signal to the Event Queue */
 	virtual bool Quit(void) = 0;
-	/** Get the Palette of a Sprite */
+	/** Gets the Palette of a Sprite */
 	virtual Palette* GetPalette(Sprite2D* spr) = 0;
 	/** Flips sprite vertically, returns new sprite */
 	virtual Sprite2D *MirrorSpriteVertical(Sprite2D *sprite, bool MirrorAnchor) = 0;
@@ -171,21 +172,23 @@ public:
 	virtual void SetFadeColor(int r, int g, int b) = 0;
 	/** Sets the Fading to Color Percentage */
 	virtual void SetFadePercent(int percent) = 0;
-	/** Set Clip Rectangle */
+	/** Sets Clip Rectangle */
 	virtual void SetClipRect(Region* clip) = 0;
-	/** move the mouse forcibly */
+	/** returns the current mouse coordinates */
+	virtual void GetMousePos(int &x, int &y) = 0;
+	/** moves the mouse forcibly */
 	virtual void MoveMouse(unsigned int x, unsigned int y) = 0;
-	/** initialize the screen for movie */
+	/** initializes the screen for movie */
 	virtual void InitMovieScreen(int &w, int &h) = 0;
-	/** set the font and color of the movie subtitles */
+	/** sets the font and color of the movie subtitles */
 	virtual void SetMovieFont(Font *stfont, Palette *pal) = 0;
-	/** draw a movie frame */
+	/** draws a movie frame */
 	virtual void showFrame(unsigned char* buf, unsigned int bufw,
 		unsigned int bufh, unsigned int sx, unsigned int sy,
 		unsigned int w, unsigned int h, unsigned int dstx,
 		unsigned int dsty, int truecolor, unsigned char *palette,
 		ieDword titleref) = 0;
-	/** handle events during movie */
+	/** handles events during movie */
 	virtual int PollMovieEvents() = 0;
 public:
 	/** Event Manager Pointer */
