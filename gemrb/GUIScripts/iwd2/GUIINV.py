@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUIINV.py,v 1.11 2006/08/15 15:40:33 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUIINV.py,v 1.12 2006/12/09 14:58:33 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -117,7 +117,7 @@ def OpenInventoryWindow ():
 	# paperdoll
 	Button = GemRB.GetControl (Window, 50)
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
-	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
+	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnAutoEquip")
 
 	# portrait
@@ -283,7 +283,19 @@ def RefreshInventoryWindow ():
 
 	# paperdoll
 	Button = GemRB.GetControl (Window, 50)
-	GemRB.SetButtonBAM (Window, Button, GetActorPaperDoll (pc)+"G1",10,0,0)
+	Color1 = GemRB.GetPlayerStat (pc, IE_METAL_COLOR)
+	Color2 = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR)
+	Color3 = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR)
+	Color4 = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR)
+	Color5 = GemRB.GetPlayerStat (pc, IE_LEATHER_COLOR)
+	Color6 = GemRB.GetPlayerStat (pc, IE_ARMOR_COLOR)
+	Color7 = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
+
+	#GemRB.SetButtonBAM (Window, Button, GetActorPaperDoll (pc)+"G1",10,0,0)
+	print GetActorPaperDoll(pc)+"G11"
+	#GemRB.SetButtonPLT (Window, Button, GetActorPaperDoll (pc)+"G11",
+	#	Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 0)
+	GemRB.SetAnimation (Window, Button, GetActorPaperDoll (pc)+"G11")
 
 	# portrait
 	Button = GemRB.GetControl (Window, 84)

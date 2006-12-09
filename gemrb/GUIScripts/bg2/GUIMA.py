@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIMA.py,v 1.29 2006/12/03 17:16:56 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIMA.py,v 1.30 2006/12/09 14:58:32 avenger_teambg Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -117,11 +117,13 @@ def ShowMap ():
 	GemRB.SetVar("ShowMapNotes",IE_GUI_MAP_REVEAL_MAP)
 	GemRB.SetVarAssoc (Window, Map, "ShowMapNotes", IE_GUI_MAP_REVEAL_MAP)
 	GemRB.SetEvent (Window, Map, IE_GUI_MAP_ON_PRESS, "RevealMap")
-	GemRB.SetVisible (OptionsWindow, 1)
 	GemRB.SetVisible (Window, 1)
-	GemRB.SetVisible (PortraitWindow, 1)
 	GemRB.SetVisible (OptionsWindow, 2)
 	GemRB.SetVisible (PortraitWindow, 2)
+	GemRB.SetVisible (OptionsWindow, 3)
+	GemRB.SetVisible (PortraitWindow, 3)
+	GemRB.SetVisible (Window, 3)
+	GemRB.SetControlStatus(Window, Map, IE_GUI_CONTROL_FOCUSED)
 	return
 
 ###################################################
@@ -182,6 +184,7 @@ def OpenMapWindow ():
 	GemRB.SetVisible (OptionsWindow, 1)
 	GemRB.SetVisible (Window, 1)
 	GemRB.SetVisible (PortraitWindow, 1)
+	GemRB.SetControlStatus(Window, Map, IE_GUI_CONTROL_FOCUSED)
 
 def LeftDoublePressMap ():
 	print "MoveToPoint"
