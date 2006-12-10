@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.75 2006/11/14 19:17:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.76 2006/12/10 12:17:13 avenger_teambg Exp $
  *
  */
 
@@ -597,7 +597,10 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 	}
 	Actor *ab = core->GetCreature(ds);
 
-	if (flags & CC_SCRIPTNAME) {
+	//iwd2 allows an optional scriptname to be set
+	//but bg2 doesn't have this feature
+	//this way it works for both games
+	if ((flags & CC_SCRIPTNAME) && parameters->string1Parameter[0]) {
 		ab->SetScriptName(parameters->string1Parameter);
 	}
 
