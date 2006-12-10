@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.425 2006/12/04 23:45:59 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.426 2006/12/10 14:34:50 avenger_teambg Exp $
  *
  */
 
@@ -3184,8 +3184,12 @@ static PyObject* GemRB_SaveGame(PyObject * /*self*/, PyObject * args)
 	if (!PyArg_ParseTuple( args, "is", &SlotCount, &folder )) {
 		return AttributeError( GemRB_SaveGame__doc );
 	}
-	return PyInt_FromLong(
-			core->GetSaveGameIterator()->CreateSaveGame(SlotCount, folder) );
+	SaveGameIterator *sgi = core->GetSaveGameIterator();
+	if (!sgi) {
+		printf("No savegame iterator\n");
+		return NULL;
+	}
+	return PyInt_FromLong(sgi->CreateSaveGame(SlotCount, folder) );
 }
 
 PyDoc_STRVAR( GemRB_GetSaveGameCount__doc,

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.47 2006/12/04 21:30:15 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.48 2006/12/10 14:34:50 avenger_teambg Exp $
  *
  */
 
@@ -186,7 +186,9 @@ private:
 	void AddSixSuffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void AddMHRSuffix(char* ResRef, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient);
+		unsigned char& Cycle, unsigned char Orient, EquipResRefData*& equip);
+	void GetMHREquipmentRef(char* ResRef, unsigned char& Cycle,
+		const char* equipRef, bool offhand, EquipResRefData* equip);
 	void AddMMRSuffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void AddTwoFileSuffix(char* ResRef, unsigned char AnimID,
