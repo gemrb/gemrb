@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.227 2006/12/04 23:46:49 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.228 2006/12/16 11:54:09 avenger_teambg Exp $
  *
  */
 
@@ -1606,7 +1606,8 @@ void Actor::GetNextAnimation()
 		RowNum = CharAnimations::GetAvatarsCount() - 1;
 	int NewAnimID = CharAnimations::GetAvatarStruct(RowNum)->AnimID;
 	printf ("AnimID: %04X\n", NewAnimID);
-	SetAnimationID ( NewAnimID );
+	SetBase( IE_ANIMATION_ID, NewAnimID);
+	//SetAnimationID ( NewAnimID );
 }
 
 void Actor::GetPrevAnimation()
@@ -1616,7 +1617,8 @@ void Actor::GetPrevAnimation()
 		RowNum = 0;
 	int NewAnimID = CharAnimations::GetAvatarStruct(RowNum)->AnimID;
 	printf ("AnimID: %04X\n", NewAnimID);
-	SetAnimationID ( NewAnimID );
+	SetBase( IE_ANIMATION_ID, NewAnimID);
+	//SetAnimationID ( NewAnimID );
 }
 
 //slot is the projectile slot
