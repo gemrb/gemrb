@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.101 2006/12/10 14:34:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.102 2006/12/16 12:51:35 avenger_teambg Exp $
  *
  */
 
@@ -115,6 +115,8 @@ int CharAnimations::GetTotalPartCount() const
 {
 	if (AvatarsRowNum==~0u) return -1;
 	switch (AvatarTable[AvatarsRowNum].AnimationType) {
+	case IE_ANI_FOUR_FILES:
+		return GetActorPartCount() + 1; // only weapon
 	case IE_ANI_CODE_MIRROR:
 		return GetActorPartCount() + 3; // equipment
 	case IE_ANI_TWENTYTWO:
@@ -142,6 +144,13 @@ void CharAnimations::SetWeaponType(int wt)
 		WeaponType = wt;
 		DropAnims();
 	}
+}
+
+void CharAnimations::SetAttackMoveChances(ieWord *amc)
+{
+	AttackMoves[0]=amc[0];
+	AttackMoves[1]=amc[1];
+	AttackMoves[2]=amc[2];
 }
 
 void CharAnimations::SetHelmetRef(const char* ref)
@@ -872,7 +881,7 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			break;
 
 		case IE_ANI_FOUR_FILES:
-			AddLRSuffix( NewResRef, StanceID, Cycle, Orient );
+			AddLRSuffix( NewResRef, StanceID, Cycle, Orient, EquipData );
 			break;
 
 		case IE_ANI_SIX_FILES_2: //MOGR (variant of FOUR_FILES)
@@ -909,6 +918,9 @@ void CharAnimations::GetEquipmentResRef(const char* equipRef, bool offhand,
 	char* ResRef, unsigned char& Cycle, EquipResRefData* equip)
 {
 	switch (GetAnimType()) {
+		case IE_ANI_FOUR_FILES:
+			GetLREquipmentRef( ResRef, Cycle, equipRef, offhand, equip );
+			break;
 		case IE_ANI_CODE_MIRROR:
 			GetVHREquipmentRef( ResRef, Cycle, equipRef, offhand, equip );
 			break;
@@ -1530,7 +1542,6 @@ void CharAnimations::GetMHREquipmentRef(char* ResRef, unsigned char& Cycle,
 	} else {
 		sprintf( ResRef, "wp%c%c%c%s", GetSize(), equipRef[0], equipRef[1], equip->Suffix );
 	}
-printf("MHR: %s\n", ResRef);
 }
 
 void CharAnimations::AddTwoFileSuffix( char* ResRef, unsigned char StanceID,
@@ -1567,20 +1578,25 @@ void CharAnimations::AddTwoFileSuffix( char* ResRef, unsigned char StanceID,
 }
 
 void CharAnimations::AddLRSuffix( char* ResRef, unsigned char StanceID,
-	unsigned char& Cycle, unsigned char Orient)
+	unsigned char& Cycle, unsigned char Orient, EquipResRefData *&EquipData)
 {
+	EquipData = new EquipResRefData;
+	EquipData->Suffix[0] = 0;
 	switch (StanceID) {
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_BACKSLASH:
 			strcat( ResRef, "g2" );
+			strcpy( EquipData->Suffix, "g2" );
 			Cycle = Orient / 2;
 			break;
 		case IE_ANI_ATTACK_SLASH:
 			strcat( ResRef, "g2" );
+			strcpy( EquipData->Suffix, "g2" );
 			Cycle = 8 + Orient / 2;
 			break;
 		case IE_ANI_ATTACK_JAB:
 			strcat( ResRef, "g2" );
+			strcpy( EquipData->Suffix, "g2" );
 			Cycle = 16 + Orient / 2;
 			break;
 		case IE_ANI_CAST:
@@ -1588,38 +1604,46 @@ void CharAnimations::AddLRSuffix( char* ResRef, unsigned char StanceID,
 		case IE_ANI_SHOOT:
 			//these animations are missing
 			strcat( ResRef, "g2" );
+			strcpy( EquipData->Suffix, "g2" );
 			Cycle = Orient / 2;
 			break;
 		case IE_ANI_WALK:
 			strcat( ResRef, "g1" );
+			strcpy( EquipData->Suffix, "g1" );
 			Cycle = Orient / 2;
 			break;
 		case IE_ANI_READY:
 			strcat( ResRef, "g1" );
+			strcpy( EquipData->Suffix, "g1" );
 			Cycle = 8 + Orient / 2;
 			break;
 		case IE_ANI_HEAD_TURN: //could be wrong
 		case IE_ANI_AWAKE:
 			strcat( ResRef, "g1" );
+			strcpy( EquipData->Suffix, "g1" );
 			Cycle = 16 + Orient / 2;
 			break;
 		case IE_ANI_DAMAGE:
 			strcat( ResRef, "g1" );
+			strcpy( EquipData->Suffix, "g1" );
 			Cycle = 24 + Orient / 2;
 			break;
 		case IE_ANI_GET_UP:
 		case IE_ANI_EMERGE:
 		case IE_ANI_PST_START:
 			strcat( ResRef, "g1" );
+			strcpy( EquipData->Suffix, "g1" );
 			Cycle = 32 + Orient / 2;
 			break;
 			break;
 		case IE_ANI_DIE:
 			strcat( ResRef, "g1" );
+			strcpy( EquipData->Suffix, "g1" );
 			Cycle = 32 + Orient / 2;
 			break;
 		case IE_ANI_TWITCH:
 			strcat( ResRef, "g1" );
+			strcpy( EquipData->Suffix, "g1" );
 			Cycle = 40 + Orient / 2;
 			break;
 		default:
@@ -1629,7 +1653,19 @@ void CharAnimations::AddLRSuffix( char* ResRef, unsigned char StanceID,
 	}
 	if (Orient > 9) {
 		strcat( ResRef, "e" );
+		strcat( EquipData->Suffix, "e");
 	}
+	EquipData->Cycle = Cycle;
+}
+
+void CharAnimations::GetLREquipmentRef(char* ResRef, unsigned char& Cycle,
+			const char* equipRef, bool /*offhand*/,
+			EquipResRefData* equip)
+{
+	Cycle = equip->Cycle;
+	//hackhackhack
+	sprintf( ResRef, "%4s%c%s", this->ResRef, equipRef[0], equip->Suffix );
+printf("LREquipment resref: %s\n", ResRef);
 }
 
 //Only for the ogre animation (MOGR)

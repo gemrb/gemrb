@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.228 2006/12/16 11:54:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.229 2006/12/16 12:51:34 avenger_teambg Exp $
  *
  */
 
@@ -292,11 +292,10 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	}
 	anims = new CharAnimations( AnimID&0xffff, BaseStats[IE_ARMOR_TYPE]);
 	if (anims) {
-		//FIXME: fix this when CharAnimations is done
 		anims->SetOffhandRef(ShieldRef);
 		anims->SetHelmetRef(HelmetRef);
 		anims->SetWeaponRef(WeaponRef);
-		//anims->SetAttackMoveChances(AttackMovements);
+		anims->SetAttackMoveChances(AttackMovements);
 
 		//if we have a recovery palette, then set it back
 		anims->palette=recover;
@@ -2688,7 +2687,7 @@ void Actor::SetUsedWeapon(char* AnimationType, ieWord* MeleeAnimation,
 		return;
 	anims->SetWeaponRef(AnimationType);
 	anims->SetWeaponType(WeaponType);
-	//anims->SetAttackMoveChances(MeleeAnimation);
+	anims->SetAttackMoveChances(MeleeAnimation);
 }
 
 void Actor::SetUsedShield(char* AnimationType, int wt)

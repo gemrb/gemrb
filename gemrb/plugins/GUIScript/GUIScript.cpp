@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.426 2006/12/10 14:34:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.427 2006/12/16 12:51:35 avenger_teambg Exp $
  *
  */
 
@@ -2693,7 +2693,8 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	if (ResRef[0] == 0) {
+	//empty image
+	if (ResRef[0] == 0 || ResRef[0]=='*') {
 		btn->SetPicture( NULL );
 		Py_INCREF( Py_None );
 		return Py_None;

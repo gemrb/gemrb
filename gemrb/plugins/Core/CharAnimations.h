@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.48 2006/12/10 14:34:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.49 2006/12/16 12:51:35 avenger_teambg Exp $
  *
  */
 
@@ -135,6 +135,7 @@ public:
 	Palette* paletteOffhand;
 	unsigned int AvatarsRowNum;
 	unsigned char ArmorType, WeaponType, RangedType;
+	ieDword AttackMoves[3]; //percentages for the 3 attack move types
 	ieResRef ResRef;
 	ieResRef PaletteResRef;
 	unsigned char nextStanceID;
@@ -146,6 +147,7 @@ public:
 	static void ReleaseMemory();
 	void SetArmourLevel(int ArmourLevel);
 	void SetWeaponType(int WeaponType);
+	void SetAttackMoveChances(ieWord *amc);
 	void SetHelmetRef(const char* ref);
 	void SetWeaponRef(const char* ref);
 	void SetOffhandRef(const char* ref);
@@ -194,7 +196,9 @@ private:
 	void AddTwoFileSuffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void AddLRSuffix(char* ResRef, unsigned char AnimID,
-		unsigned char& Cycle, unsigned char Orient);
+		unsigned char& Cycle, unsigned char Orient, EquipResRefData*& equip);
+	void GetLREquipmentRef(char* ResRef, unsigned char& Cycle,
+		const char* equipRef, bool offhand, EquipResRefData* equip);
 	void AddLR2Suffix(char* ResRef, unsigned char AnimID,
 		unsigned char& Cycle, unsigned char Orient);
 	void AddLR3Suffix(char* ResRef, unsigned char AnimID,
