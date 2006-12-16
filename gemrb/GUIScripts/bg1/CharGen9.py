@@ -180,7 +180,9 @@ def NextPress():
 
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken("CHARNAME"), 0)
 	#does all the rest
-	GemRB.FillPlayerInfo (MyChar,PortraitName+"L", PortraitName+"S") 
+	LargePortrait = GemRB.GetToken ("LargePortrait")
+	SmallPortrait = GemRB.GetToken ("SmallPortrait")
+	GemRB.FillPlayerInfo(MyChar, LargePortrait, SmallPortrait)
 	#LETS PLAY!!
 	playmode = GemRB.GetVar ("PlayMode")
 	if playmode >=0:
