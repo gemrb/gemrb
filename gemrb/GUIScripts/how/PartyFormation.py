@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/PartyFormation.py,v 1.10 2005/03/20 16:24:20 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/PartyFormation.py,v 1.11 2006/12/16 14:31:04 avenger_teambg Exp $
 
 
 # PartyFormation.py - Single Player Party Formation
@@ -31,6 +31,8 @@ ExitWindow = 0
 
 def OnLoad():
 	global PartyFormationWindow
+
+	GemRB.SetVar("PlayMode",2) #using mpsave
 
 	GemRB.LoadWindowPack("GUISP", 640, 480)
 	PartyFormationWindow = GemRB.LoadWindow(0)
