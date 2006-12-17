@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.229 2006/12/16 12:51:34 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.230 2006/12/17 13:27:26 avenger_teambg Exp $
  *
  */
 
@@ -1112,13 +1112,13 @@ void Actor::ReactToDeath(const char * deadname)
 		DisplayStringCore(this, VB_REACT_S, DS_CONSOLE|DS_CONST );
 		break;
 	default:
-	{
-                ieDword len = core->GetSoundMgr()->Play( value );
-                ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
-                if (counter != 0)
-                        SetWait( counter );
-		break;
-	}
+		{
+			ieDword len = core->GetSoundMgr()->Play( value );
+			ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
+			if (counter != 0)
+				SetWait( counter );
+			break;
+		}
 	}
 	core->DelTable(table);
 }
@@ -1558,6 +1558,8 @@ void Actor::ReinitQuickSlots()
 			PCStats->InitQuickSlot(which, 0xffff, 0);
 		}
 	}
+	//this is always present
+	PCStats->InitQuickSlot(ACT_WEAPON1, inventory.GetWeaponSlot(), 0);
 }
 
 bool Actor::ValidTarget(int ga_flags)
@@ -2672,8 +2674,7 @@ int Actor::GetFeat(unsigned int feat)
 	return 0;
 }
 
-void Actor::SetUsedWeapon(char* AnimationType, ieWord* MeleeAnimation,
-						  int wt)
+void Actor::SetUsedWeapon(char* AnimationType, ieWord* MeleeAnimation, int wt)
 {
 	// TODO: set WeaponType
 

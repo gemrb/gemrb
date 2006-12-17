@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/CharGen.py,v 1.35 2006/01/29 13:52:00 wjpalenstijn Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/CharGen.py,v 1.36 2006/12/17 13:27:27 avenger_teambg Exp $
 
 
 #Character Generation
@@ -366,6 +366,10 @@ def AcceptPress():
 	GemRB.SetPlayerStat (MyChar, IE_ARMOR_COLOR, 0x17 )
 
 	GemRB.FillPlayerInfo(MyChar, PortraitName+"L", PortraitName+"S")
+	#35 is a weapon slot
+	GemRB.CreateItem(MyChar, "staf01", 35, 1, 0, 0)
+	GemRB.SetEquippedQuickSlot(MyChar, 0)
+
 	GemRB.UnloadWindow (CharGenWindow)
 	GemRB.SetNextScript("PartyFormation")
 	return
@@ -2042,8 +2046,8 @@ def DrawAvatar():
 	AvatarID = AvatarID+GemRB.GetTableValue (table, GemRB.GetVar ("Gender"),0)
 
 	AvatarRef = GemRB.GetTableValue (AppearanceAvatarTable, hex(AvatarID), "LEVEL1")
-        GemRB.SetButtonPLT(AppearanceWindow, AppearanceAvatarButton, AvatarRef,
-	        0, MinorColor, MajorColor, SkinColor, 0, 0, HairColor, 0)
+	GemRB.SetButtonPLT(AppearanceWindow, AppearanceAvatarButton, AvatarRef,
+		0, MinorColor, MajorColor, SkinColor, 0, 0, HairColor, 0)
 
 	#GemRB.SetButtonBAM (AppearanceWindow, AppearanceAvatarButton, AvatarRef, 0, 0, 0)
 	return
@@ -2093,7 +2097,7 @@ def AppearanceColorChoice (CurrentColor):
 	return
 
 def AppearanceColorSelected():
-        global HairColor, SkinColor, MajorColor, MinorColor
+	global HairColor, SkinColor, MajorColor, MinorColor
 	global AppearanceWindow, AppearanceColorWindow
 	global AppearanceHairButton, AppearanceSkinButton
 	global AppearanceMajorButton, AppearanceMinorButton

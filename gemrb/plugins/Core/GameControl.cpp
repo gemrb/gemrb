@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.300 2006/12/09 15:00:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.301 2006/12/17 13:27:26 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -545,7 +545,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					}
 				}
 				break;
-			case 'b':
+			case 'l':
 				if (game->selected.size() > 0) {
 					if (!effect) {
 						AnimationFactory* af = ( AnimationFactory* )
@@ -567,7 +567,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				}
 				break;
 
-			case 'p':
+			case 'b':
 				//path
 				if (drawPath) {
 					PathNode* nextNode = drawPath->Next;
@@ -668,7 +668,11 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					lastActor->AddAction( GenerateAction(Tmp) );
 				}
 				break;
-			case 'w': //removes actor
+			case 'p': //center on actor
+				ScreenFlags|=SF_CENTERONACTOR;
+				ScreenFlags^=SF_ALWAYSCENTER;
+				break;
+			case 'k': //kicks out actor
 				if (lastActor && lastActor->InParty) {
 					lastActor->ClearActions();
 					lastActor->ClearPath();

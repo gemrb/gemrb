@@ -183,6 +183,9 @@ def NextPress():
 	LargePortrait = GemRB.GetToken ("LargePortrait")
 	SmallPortrait = GemRB.GetToken ("SmallPortrait")
 	GemRB.FillPlayerInfo(MyChar, LargePortrait, SmallPortrait)
+	#35 is a weapon slot
+	GemRB.CreateItem(MyChar, "staf01", 35, 1, 0, 0)
+	GemRB.SetEquippedQuickSlot(MyChar, 0)
 	#LETS PLAY!!
 	playmode = GemRB.GetVar ("PlayMode")
 	if playmode >=0:
