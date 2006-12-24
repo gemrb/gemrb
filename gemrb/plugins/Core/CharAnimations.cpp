@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.103 2006/12/24 15:34:49 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.104 2006/12/24 16:47:20 wjpalenstijn Exp $
  *
  */
 
@@ -54,7 +54,7 @@ static const int zOrder_Mirror16[16][4] = {
 	{ 0, 3, 2, 1 }
 };
 
-static const int zOrder_8[16][4] = {
+static const int zOrder_8[8][4] = {
 	{ 0, 3, 2, 1 },
 	{ 0, 3, 1, 2 },
 	{ 1, 0, 3, 2 },
@@ -62,7 +62,7 @@ static const int zOrder_8[16][4] = {
 	{ 1, 0, 3, 2 },
 	{ 2, 0, 3, 1 },
 	{ 2, 0, 3, 1 },
-	{ 0, 3, 2, 1 }
+	{ 2, 0, 3, 1 }
 };
 
 struct EquipResRefData {
