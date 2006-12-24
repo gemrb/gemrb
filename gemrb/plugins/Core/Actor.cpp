@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.231 2006/12/24 14:30:09 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.232 2006/12/24 14:59:05 wjpalenstijn Exp $
  *
  */
 
@@ -2208,49 +2208,48 @@ void Actor::Draw(Region &screen)
 	unsigned char StanceID = GetStance();
 	Animation** anims = ca->GetAnimation( StanceID, GetNextFace() );
 	if (anims) {
+		// update bounding box and such
 		int PartCount = ca->GetTotalPartCount();
-		Animation* masteranim = anims[0];
+		Sprite2D* nextFrame = 0;
+		nextFrame = anims[0]->GetFrame(anims[0]->GetCurrentFrame());
+		if (Frozen) {
+			if (Selected!=0x80) {
+				Selected = 0x80;
+				core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
+			}
+		}
+		if (nextFrame && lastFrame != nextFrame) {
+			Region newBBox;
+			if (PartCount == 1) {
+				newBBox.x = cx - nextFrame->XPos;
+				newBBox.w = nextFrame->Width;
+				newBBox.y = cy - nextFrame->YPos;
+				newBBox.h = nextFrame->Height;
+			} else {
+				// FIXME: currently using the animarea instead
+				// of the real bounding box of this (multi-part) frame.
+				// Shouldn't matter much, though. (wjp)
+				newBBox.x = cx + anims[0]->animArea.x;
+				newBBox.y = cy + anims[0]->animArea.y;
+				newBBox.w = anims[0]->animArea.w;
+				newBBox.h = anims[0]->animArea.h;
+			}
+			lastFrame = nextFrame;
+			SetBBox( newBBox );
+		}
+
+		// display current frames in the right order
 		for (int part = 0; part < PartCount; ++part) {
 			Animation* anim = anims[part];
-			Sprite2D* nextFrame = 0;
-			if (part == 0) {
-				if (Frozen) {
-					nextFrame = anim->LastFrame();
-					if (Selected!=0x80) {
-						Selected = 0x80;
-						core->GetGame()->SelectActor(this, false, SELECT_NORMAL);
-					}
-				} else {
-					nextFrame = anim->NextFrame();
-				}
-				if (nextFrame && lastFrame != nextFrame) {
-					Region newBBox;
-					if (PartCount == 1) {
-						newBBox.x = cx - nextFrame->XPos;
-						newBBox.w = nextFrame->Width;
-						newBBox.y = cy - nextFrame->YPos;
-						newBBox.h = nextFrame->Height;
-					} else {
-						// FIXME: currently using the animarea instead
-						// of the real bounding box of this frame.
-						// Shouldn't matter much, though. (wjp)
-						newBBox.x = cx + masteranim->animArea.x;
-						newBBox.y = cy + masteranim->animArea.y;
-						newBBox.w = masteranim->animArea.w;
-						newBBox.h = masteranim->animArea.h;
-					}
-					lastFrame = nextFrame;
-					SetBBox( newBBox );
-				}
-			} else if (anim) {
-				nextFrame = anim->GetSyncedNextFrame(masteranim);
-			}
+			nextFrame = 0;
+			if (anim)
+				nextFrame = anim->GetFrame(anim->GetCurrentFrame());
 			if (nextFrame && BBox.InsideRegion( vp ) ) {
 				SpriteCover* sc = GetSpriteCover();
 				if (!sc || !sc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height)) {
-					// the masteranim contains the animarea for
+					// the first anim contains the animarea for
 					// the entire multi-part animation
-					sc = area->BuildSpriteCover(cx, cy, -masteranim->animArea.x, -masteranim->animArea.y, masteranim->animArea.w, masteranim->animArea.h, WantDither() );
+					sc = area->BuildSpriteCover(cx, cy, -anims[0]->animArea.x, -anims[0]->animArea.y, anims[0]->animArea.w, anims[0]->animArea.h, WantDither() );
 					//this will delete previous spritecover
 					SetSpriteCover(sc);
 
@@ -2264,9 +2263,17 @@ void Actor::Draw(Region &screen)
 					 flags, tint, sc, ca->GetPartPalette(part), &screen);
 			}
 		}
-		if (masteranim->endReached) {
+
+		// advance animations one frame (in sync)
+		anims[0]->NextFrame();
+		for (int part = 1; part < PartCount; ++part) {
+			if (anims[part])
+				anims[part]->GetSyncedNextFrame(anims[0]);
+		}
+
+		if (anims[0]->endReached) {
 			if (HandleActorStance() ) {
-				masteranim->endReached = false;
+				anims[0]->endReached = false;
 			}
 		}
 	}
