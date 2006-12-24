@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.90 2006/12/05 20:22:38 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.91 2006/12/24 17:02:13 wjpalenstijn Exp $
  *
  */
 
@@ -326,8 +326,10 @@ void Inventory::KillSlot(unsigned int index)
 				if (l>=0 && l<=3) {
 					Owner->SetBase(IE_ARMOR_TYPE, 0);
 				} else {
-					if (itm->AnimationType[0]) {
-						Owner->SetUsedHelmet("  ");
+					if (core->CanUseItemType(itm->ItemType, SLOT_HELM, 0, 0, 0)) {
+						Owner->SetUsedHelmet("");
+					} else if (core->CanUseItemType(itm->ItemType, SLOT_SHIELD, 0, 0, 0)) {
+						Owner->SetUsedShield("");
 					}
 				}
 			}
@@ -745,8 +747,10 @@ bool Inventory::EquipItem(unsigned int slot)
 			if (l>=0 && l<=3) {
 				Owner->SetBase(IE_ARMOR_TYPE, l);
 			} else {
-				if (itm->AnimationType[0]) {
+				if (core->CanUseItemType(itm->ItemType, SLOT_HELM, 0, 0, 0)) {
 					Owner->SetUsedHelmet(itm->AnimationType);
+				} else if (core->CanUseItemType(itm->ItemType, SLOT_SHIELD, 0, 0, 0)) {
+					Owner->SetUsedShield(itm->AnimationType);
 				}
 			}
 		}
