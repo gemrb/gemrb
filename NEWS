@@ -1,3 +1,12 @@
+GemRB V0.2.8 (2006-12-24):
+  New features:
+    - equipment is rendered both on paperdoll and avatar
+    - weather (snow/rain) is now rendered
+
+  Improved features:
+    - action menus
+    - game scripting (actions/triggers)
+
 GemRB V0.2.7 (2006-08-30):
   New features:
     - large animations
