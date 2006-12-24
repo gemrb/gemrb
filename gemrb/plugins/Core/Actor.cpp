@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.230 2006/12/17 13:27:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.231 2006/12/24 14:30:09 wjpalenstijn Exp $
  *
  */
 
@@ -2204,66 +2204,6 @@ void Actor::Draw(Region &screen)
 		DrawCircle(vp);
 		DrawTargetPoint(vp);
 	}
-
-	// FIXME: The below code won't be necessary any more
-	// as soon as WeaponType is set when changing weapons
-
-#if 0
-	CREItem* si;
-	// Helmet
-	si = inventory.GetSlotItem( core->QuerySlot(1) );
-	if (si) {
-		Item* it = core->GetItem(si->ItemResRef);
-		assert(it);
-		ca->SetHelmetRef(it->AnimationType);
-	} else {
-		ca->SetHelmetRef("");
-	}
-
-	// Shield
-	bool twoweapons = false;
-	si = inventory.GetSlotItem( core->QuerySlot(3) );
-	if (si) {
-		Item* it = core->GetItem(si->ItemResRef);
-		assert(it);
-		ca->SetOffhandRef(it->AnimationType);
-		twoweapons = core->CanUseItemType(it->ItemType, SLOT_WEAPON, 0, 0, 0);
-	} else {
-		ca->SetOffhandRef("");
-	}
-
-	// Weapon
-	// (It's also in GUIScript.cpp, GemRB_GetEquippedQuickSlot)
-	int weaponslot = inventory.GetEquippedSlot();
-	if (PCStats) {
-		for(int i=0;i<4;i++) {
-			if (weaponslot == PCStats->QuickWeaponSlots[i]) {
-				weaponslot = i+inventory.GetWeaponSlot();
-				break;
-			}
-		}
-	} /*else {
-		weaponslot-=inventory.GetWeaponSlot();
-	}*/
-	si = inventory.GetSlotItem( core->QuerySlot(core->FindSlot(weaponslot) ) );
-	if (si) {
-		Item* it = core->GetItem(si->ItemResRef);
-		assert(it);
-		ca->SetWeaponRef(it->AnimationType);
-		if (it->Flags & IE_ITEM_TWO_HANDED) {
-			ca->SetWeaponType(IE_ANI_WEAPON_2H);
-		} else {
-			if (twoweapons) {
-				ca->SetWeaponType(IE_ANI_WEAPON_2W);
-			} else {
-				ca->SetWeaponType(IE_ANI_WEAPON_1H);
-			}
-		}
-	} else {
-		ca->SetWeaponType(IE_ANI_WEAPON_1H);
-		ca->SetWeaponRef("");
-	}
-#endif
 
 	unsigned char StanceID = GetStance();
 	Animation** anims = ca->GetAnimation( StanceID, GetNextFace() );
