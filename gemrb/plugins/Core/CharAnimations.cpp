@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.102 2006/12/16 12:51:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.103 2006/12/24 15:34:49 wjpalenstijn Exp $
  *
  */
 
@@ -33,6 +33,37 @@ static int AvatarsCount = 0;
 static AvatarStruct *AvatarTable = NULL;
 static ieByte SixteenToNine[16]={0,1,2,3,4,5,6,7,8,7,6,5,4,3,2,1};
 static ieByte SixteenToFive[16]={0,0,1,1,2,2,3,3,4,4,3,3,2,2,1,1};
+
+
+static const int zOrder_Mirror16[16][4] = {
+	{ 0, 3, 2, 1 },
+	{ 0, 3, 2, 1 },
+	{ 0, 3, 1, 2 },
+	{ 0, 3, 1, 2 },
+	{ 1, 0, 3, 2 },
+	{ 1, 0, 3, 2 },
+	{ 1, 0, 3, 2 },
+	{ 1, 0, 3, 2 },
+	{ 1, 0, 3, 2 },
+	{ 1, 0, 3, 2 },
+	{ 1, 0, 3, 2 },
+	{ 1, 0, 3, 2 },
+	{ 1, 0, 3, 2 },
+	{ 0, 3, 1, 2 },
+	{ 0, 3, 1, 2 },
+	{ 0, 3, 2, 1 }
+};
+
+static const int zOrder_8[16][4] = {
+	{ 0, 3, 2, 1 },
+	{ 0, 3, 1, 2 },
+	{ 1, 0, 3, 2 },
+	{ 1, 0, 3, 2 },
+	{ 1, 0, 3, 2 },
+	{ 2, 0, 3, 1 },
+	{ 2, 0, 3, 1 },
+	{ 0, 3, 2, 1 }
+};
 
 struct EquipResRefData {
 	char Suffix[9];
@@ -155,38 +186,34 @@ void CharAnimations::SetAttackMoveChances(ieWord *amc)
 
 void CharAnimations::SetHelmetRef(const char* ref)
 {
-	if (HelmetRef[0] != ref[0] || HelmetRef[1] != ref[1]) {
-		HelmetRef[0] = ref[0];
-		HelmetRef[1] = ref[1];
+	HelmetRef[0] = ref[0];
+	HelmetRef[1] = ref[1];
 
-		// TODO: Only drop helmet anims
-		DropAnims();
-		core->FreePalette(paletteHelmet, 0);
-	}
+	// TODO: Only drop helmet anims?
+	// Note: this doesn't happen "often", so this isn't a performance
+	//       bottleneck. (wjp)
+	DropAnims();
+	core->FreePalette(paletteHelmet, 0);
 }
 
 void CharAnimations::SetWeaponRef(const char* ref)
 {
-	if (WeaponRef[0] != ref[0] || WeaponRef[1] != ref[1]) {
-		WeaponRef[0] = ref[0];
-		WeaponRef[1] = ref[1];
+	WeaponRef[0] = ref[0];
+	WeaponRef[1] = ref[1];
 
-		// TODO: Only drop weapon anims
-		DropAnims();
-		core->FreePalette(paletteWeapon, 0);
-	}
+	// TODO: Only drop weapon anims?
+	DropAnims();
+	core->FreePalette(paletteWeapon, 0);
 }
 
 void CharAnimations::SetOffhandRef(const char* ref)
 {
-	if (OffhandRef[0] != ref[0] || OffhandRef[1] != ref[1]) {
-		OffhandRef[0] = ref[0];
-		OffhandRef[1] = ref[1];
-
-		// TODO: Only drop shield/offhand anims
-		DropAnims();
-		core->FreePalette(paletteOffhand, 0);
-	}
+	OffhandRef[0] = ref[0];
+	OffhandRef[1] = ref[1];
+	
+	// TODO: Only drop shield/offhand anims?
+	DropAnims();
+	core->FreePalette(paletteOffhand, 0);
 }
 
 void CharAnimations::SetColors(ieDword *arg)
@@ -933,6 +960,21 @@ void CharAnimations::GetEquipmentResRef(const char* equipRef, bool offhand,
 		break;
 	}
 }
+
+const int* CharAnimations::GetZOrder(unsigned char Orient)
+{
+	switch (GetAnimType()) {
+		case IE_ANI_CODE_MIRROR:
+			return zOrder_Mirror16[Orient];
+		case IE_ANI_TWENTYTWO:
+			return zOrder_8[Orient/2];
+		case IE_ANI_FOUR_FILES:
+			return 0; // FIXME
+		default:
+			return 0;
+	}
+}
+
 
 void CharAnimations::AddPSTSuffix(char* ResRef, unsigned char StanceID,
 	unsigned char& Cycle, unsigned char Orient)

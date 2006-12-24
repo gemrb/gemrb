@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.233 2006/12/24 15:05:00 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.234 2006/12/24 15:34:49 wjpalenstijn Exp $
  *
  */
 
@@ -2206,7 +2206,8 @@ void Actor::Draw(Region &screen)
 	}
 
 	unsigned char StanceID = GetStance();
-	Animation** anims = ca->GetAnimation( StanceID, GetNextFace() );
+	unsigned char Face = GetNextFace();
+	Animation** anims = ca->GetAnimation( StanceID, Face );
 	if (anims) {
 		// update bounding box and such
 		int PartCount = ca->GetTotalPartCount();
@@ -2239,8 +2240,11 @@ void Actor::Draw(Region &screen)
 		}
 
 		// display current frames in the right order
+		const int* zOrder = ca->GetZOrder(Face);
 		for (int part = 0; part < PartCount; ++part) {
-			Animation* anim = anims[part];
+			int partnum = part;
+			if (zOrder) partnum = zOrder[part];
+			Animation* anim = anims[partnum];
 			nextFrame = 0;
 			if (anim)
 				nextFrame = anim->GetFrame(anim->GetCurrentFrame());
@@ -2260,7 +2264,7 @@ void Actor::Draw(Region &screen)
 				if (!ca->lockPalette) flags|=BLIT_TINTED;
 
 				video->BlitGameSprite( nextFrame, cx + screen.x, cy + screen.y,
-					 flags, tint, sc, ca->GetPartPalette(part), &screen);
+					 flags, tint, sc, ca->GetPartPalette(partnum), &screen);
 			}
 		}
 

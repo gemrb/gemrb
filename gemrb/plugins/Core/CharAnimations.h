@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.49 2006/12/16 12:51:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.50 2006/12/24 15:34:49 wjpalenstijn Exp $
  *
  */
 
@@ -157,6 +157,8 @@ public:
 	// returns an array of animations of size GetTotalPartCount()
 	Animation** GetAnimation(unsigned char Stance, unsigned char Orient);
 	int GetTotalPartCount() const;
+	const int* GetZOrder(unsigned char Orient);
+
 	// returns Palette for a given part (unlocked)
 	Palette* GetPartPalette(int part); // TODO: clean this up
 
