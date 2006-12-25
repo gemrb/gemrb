@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.20 2006/07/29 18:17:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.21 2006/12/25 17:09:32 avenger_teambg Exp $
  *
  */
 
@@ -195,6 +195,10 @@ void ITMImp::GetExtHeader(Item *s, ITMExtHeader* eh)
 	if (tmp) i|=PROJ_BOLT;
 	str->ReadWord( &tmp ); //bullet
 	if (tmp) i|=PROJ_BULLET;
+	//this hack is required for Nordom's crossbow in PST
+	if (!i && (eh->AttackType==ITEM_AT_BOW || eh->AttackType==ITEM_AT_PROJECTILE) ) {
+		i|=PROJ_BOLT;
+	}
 	eh->ProjectileQualifier=i;
 
 	//48 is the size of the feature block
