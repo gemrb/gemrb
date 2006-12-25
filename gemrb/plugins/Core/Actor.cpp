@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.235 2006/12/25 14:30:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.236 2006/12/25 15:39:13 avenger_teambg Exp $
  *
  */
 
@@ -1538,29 +1538,34 @@ void Actor::ReinitQuickSlots()
 		if (!slot) continue;
 		//if magic items are equipped the equipping info doesn't change
 		//(afaik)
-		if (inventory.HasItemInSlot("", slot)) {
-			headerindex = 0;
-		} else {
-			if (core->QuerySlotEffects(slot)==SLOT_EFFECT_MELEE) {
-				slot = inventory.GetFistSlot();
-				headerindex = 0;
-			} else {
-				slot = 0xffff;
-			}
-		}
-		PCStats->InitQuickSlot(which, (ieWord) slot, (ieWord) headerindex);
+		SetupQuickSlot(which, slot, headerindex);
 	}
 
+	//these are always present
+	SetupQuickSlot(ACT_WEAPON1, inventory.GetWeaponSlot(), 0);
+	SetupQuickSlot(ACT_WEAPON2, inventory.GetWeaponSlot()+1, 0);
 	//disabling quick weapon slots for certain classes
 	for(i=0;i<2;i++) {
 		int which = ACT_WEAPON3+i;
 		if (PCStats->QSlots[i]!=which) {
-			PCStats->InitQuickSlot(which, 0xffff, 0);
+			SetupQuickSlot(which, 0xffff, 0);
 		}
 	}
-	//these are always present
-	PCStats->InitQuickSlot(ACT_WEAPON1, inventory.GetWeaponSlot(), 0);
-	PCStats->InitQuickSlot(ACT_WEAPON2, inventory.GetWeaponSlot()+1, 0);
+}
+
+void Actor::SetupQuickSlot(unsigned int which, int slot, int headerindex)
+{
+	if (inventory.HasItemInSlot("", slot)) {
+		headerindex = 0;
+	} else {
+		if (core->QuerySlotEffects(slot)==SLOT_EFFECT_MELEE) {
+			slot = inventory.GetFistSlot();
+			headerindex = 0;
+		} else {
+			slot = 0xffff;
+		}
+	}
+	PCStats->InitQuickSlot(which, (ieWord) slot, (ieWord) headerindex);
 }
 
 bool Actor::ValidTarget(int ga_flags)
@@ -2242,7 +2247,8 @@ void Actor::Draw(Region &screen)
 
 		// display current frames in the right order
 		const int* zOrder = ca->GetZOrder(Face);
-		for (int part = 0; part < PartCount; ++part) {
+		int part;
+		for (part = 0; part < PartCount; ++part) {
 			int partnum = part;
 			if (zOrder) partnum = zOrder[part];
 			Animation* anim = anims[partnum];
@@ -2274,7 +2280,7 @@ void Actor::Draw(Region &screen)
 			anims[0]->LastFrame();
 		else
 			anims[0]->NextFrame();
-		for (int part = 1; part < PartCount; ++part) {
+		for (part = 1; part < PartCount; ++part) {
 			if (anims[part])
 				anims[part]->GetSyncedNextFrame(anims[0]);
 		}

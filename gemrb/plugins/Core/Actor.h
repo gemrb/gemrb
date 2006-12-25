@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.133 2006/12/04 23:46:49 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.134 2006/12/25 15:39:13 avenger_teambg Exp $
  *
  */
 
@@ -319,6 +319,8 @@ public:
 	void GetSpellSlotInfo(SpellExtHeader *spell, int which);
 	/* updates quickslots */
 	void ReinitQuickSlots();
+	/* calls InitQuickSlot in PCStatStruct, overrides values as necessary */
+	void SetupQuickSlot(unsigned int which, int slot, int headerindex);
 	/* returns true if the actor is PC/joinable*/
 	bool Persistent();
 	/* assigns actor to party slot, 0 = NPC, areas won't remove it */
