@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.109 2006/12/03 17:16:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.110 2006/12/25 18:25:10 avenger_teambg Exp $
  *
  */
 
@@ -115,6 +115,13 @@ void Button::Draw(unsigned short x, unsigned short y)
 		return;
 	}
 
+	Video * video = core->GetVideoDriver();
+
+#ifdef _DEBUG
+		Color green = {0,255,0,0};
+		Region r = Region( x + XPos, y + YPos, Width, Height );
+		video->DrawRect( r, green, false );
+#endif
 	// Button image
 	if (!( Flags & IE_GUI_BUTTON_NO_IMAGE )) {
 		Sprite2D* Image = NULL;
@@ -150,7 +157,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 			int xOffs = ( Width / 2 ) - ( Image->Width / 2 );
 			int yOffs = ( Height / 2 ) - ( Image->Height / 2 );
 
-			core->GetVideoDriver()->BlitSprite( Image, x + XPos + xOffs, y + YPos + yOffs, true );
+			video->BlitSprite( Image, x + XPos + xOffs, y + YPos + yOffs, true );
 		}
 	}
 
@@ -165,7 +172,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 		int xOffs = ( Width / 2 ) - ( Picture->Width / 2 );
 		int yOffs = ( Height / 2 ) - ( Picture->Height / 2 );
 		Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(Picture->Width * Clipping), Picture->Height );
-		core->GetVideoDriver()->BlitSprite( Picture, x + XPos + xOffs, y + YPos + yOffs, true, &r );
+		video->BlitSprite( Picture, x + XPos + xOffs, y + YPos + yOffs, true, &r );
 	}
 
 	// Composite pictures (paperdolls/description icons)
@@ -177,8 +184,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 			yOffs = Height/2;
 		}
 		for (; iter != PictureList.end(); ++iter) {
-			core->GetVideoDriver()->BlitSprite( *iter, x + XPos + xOffs,
-												y + YPos + yOffs, true );
+			video->BlitSprite( *iter, x + XPos + xOffs, y + YPos + yOffs, true );
 		}
 	}
 
@@ -187,7 +193,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 		int xOffs = ( Width / 2 ) - ( AnimPicture->Width / 2 );
 		int yOffs = ( Height / 2 ) - ( AnimPicture->Height / 2 );
 		Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(AnimPicture->Width * Clipping), AnimPicture->Height );
-		core->GetVideoDriver()->BlitSprite( AnimPicture, x + XPos + xOffs, y + YPos + yOffs, true, &r );
+		video->BlitSprite( AnimPicture, x + XPos + xOffs, y + YPos + yOffs, true, &r );
 	}
 
 	// Button label
@@ -226,7 +232,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 			if (! fr->enabled) continue;
 			
 			Region r = Region( x + XPos + fr->dx1, y + YPos + fr->dy1, Width - (fr->dx1 + fr->dx2 + 1), Height - (fr->dy1 + fr->dy2 + 1) );
-			core->GetVideoDriver()->DrawRect( r, fr->color, fr->filled );
+			video->DrawRect( r, fr->color, fr->filled );
 		}
 	}
 }
@@ -555,7 +561,7 @@ bool Button::IsPixelTransparent(unsigned short x, unsigned short y)
 {
 	// some buttons have hollow Image frame filled w/ Picture
 	// some buttons in BG2 are text only (if BAM == 'GUICTRL')
-	if (Picture || ! Unpressed) return false;
+	if (Picture || PictureList.size() || ! Unpressed) return false;
 	return core->GetVideoDriver()->IsSpritePixelTransparent(Unpressed, x, y);
 }
 
