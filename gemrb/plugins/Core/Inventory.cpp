@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.93 2006/12/25 13:58:19 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.94 2006/12/25 16:20:44 wjpalenstijn Exp $
  *
  */
 
@@ -729,7 +729,10 @@ bool Inventory::EquipItem(unsigned int slot)
 			header=itm->GetWeaponHeader(false);
 		}
 		if (header) {
-			SetEquippedSlot(slot-SLOT_MELEE);
+			if (slot == IW_NO_EQUIPPED)
+				SetEquippedSlot(IW_NO_EQUIPPED);
+			else
+				SetEquippedSlot(slot-SLOT_MELEE);
 			effect = 0; // SetEquippedSlot will already call AddSlotEffects
 			UpdateWeaponAnimation();
 		}
