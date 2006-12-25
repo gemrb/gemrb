@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.20 2005/11/17 23:49:22 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.21 2006/12/25 17:56:39 avenger_teambg Exp $
 
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
@@ -829,7 +829,7 @@ def OnPlayMoviePress ():
 	key = GemRB.GetTableRowName (MovieTable, selected)
 	GemRB.UnloadTable (MovieTable)
 
-	GemRB.PlayMovie (key)
+	GemRB.PlayMovie (key, 1)
 
 ###################################################
 def OnCreditsPress ():
