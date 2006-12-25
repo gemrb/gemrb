@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.95 2006/12/25 17:00:42 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.96 2006/12/25 23:27:49 wjpalenstijn Exp $
  *
  */
 
@@ -702,6 +702,9 @@ bool Inventory::EquipItem(unsigned int slot)
 	if (!item) {
 		return false;
 	}
+
+	int weaponslot;
+
 	// add effects of an item just being equipped to actor's effect queue
 	int effect = core->QuerySlotEffects( slot );
 	Item *itm = core->GetItem(item->ItemResRef);
@@ -717,29 +720,39 @@ bool Inventory::EquipItem(unsigned int slot)
 		break;
 	case SLOT_EFFECT_MELEE:
 		//if weapon is ranged, then find quarrel for it and equip that
+		slot -= SLOT_MELEE;
+		weaponslot = slot;
 		header = itm->GetExtHeader(0);
-		if (header && header->ProjectileQualifier != 0) {
-			//find the ranged projectile associated with it
+		if (header && header->AttackType == ITEM_AT_BOW) {
+			//find the ranged projectile associated with it.
 			slot = FindRangedProjectile(header->ProjectileQualifier);
-			if (slot != IW_NO_EQUIPPED) slot += SLOT_MELEE;
+			header = itm->GetWeaponHeader(true);
+		} else if (header && header->AttackType == ITEM_AT_PROJECTILE) {
 			header = itm->GetWeaponHeader(true);
 		} else {
 			header = itm->GetWeaponHeader(false);
 		}
 		if (header) {
-			if (slot == IW_NO_EQUIPPED)
+			if (slot == IW_NO_EQUIPPED) {
 				SetEquippedSlot(IW_NO_EQUIPPED);
-			else
-				SetEquippedSlot(slot-SLOT_MELEE);
+			} else {
+				Owner->SetupQuickSlot(ACT_WEAPON1+weaponslot, slot+SLOT_MELEE, 0);
+				SetEquippedSlot(slot);
+			}
 			effect = 0; // SetEquippedSlot will already call AddSlotEffects
 			UpdateWeaponAnimation();
 		}
-
 		break;
 	case SLOT_EFFECT_MISSILE:
-		SetEquippedSlot(slot);
-		// no idea if this should change the used weapon
-		// maybe we have to get the bow item
+		header = itm->GetExtHeader(0);
+		if (header) {
+			weaponslot = FindTypedRangedWeapon(header->ProjectileQualifier);
+			if (weaponslot != SLOT_FIST) {
+				weaponslot -= SLOT_MELEE;
+				SetEquippedSlot(slot-SLOT_MELEE);
+				Owner->SetupQuickSlot(ACT_WEAPON1+weaponslot, slot, 0);
+			}
+		}
 		break;
 	case SLOT_EFFECT_ITEM:
 		//adjusting armour level if needed
@@ -829,11 +842,17 @@ int Inventory::FindRangedWeapon()
 	if (!itm) return SLOT_FIST;
 
 	ITMExtHeader *ext_header = itm->GetExtHeader(0);
-	int type = 0;
+	unsigned int type = 0;
 	if (ext_header) {
 		type = ext_header->ProjectileQualifier;
-	} 
+	}
 	core->FreeItem(itm, Slot->ItemResRef, false);
+	return FindTypedRangedWeapon(type);
+}
+
+// find bow for a specific projectile type
+int Inventory::FindTypedRangedWeapon(unsigned int type)
+{
 	if (!type) {
 		return SLOT_FIST;
 	}
@@ -849,7 +868,7 @@ int Inventory::FindRangedWeapon()
 		}
 		core->FreeItem(itm, Slot->ItemResRef, false);
 		if (weapontype & type) {
-			return i-SLOT_MELEE;
+			return i;
 		}
 	}
 	return SLOT_FIST;
@@ -1292,11 +1311,7 @@ void Inventory::UpdateWeaponAnimation()
  	int effect = core->QuerySlotEffects( slot );
 	if (effect == SLOT_EFFECT_MISSILE) {
 		// ranged weapon
-		int s = FindRangedWeapon();
-		if (s == SLOT_FIST)
-			slot = s;
-		else
-			slot = SLOT_MELEE + s;
+		slot = FindRangedWeapon();
 	}
 	int WeaponType = -1;
 

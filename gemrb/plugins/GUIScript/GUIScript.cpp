@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.428 2006/12/17 13:27:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.429 2006/12/25 23:27:49 wjpalenstijn Exp $
  *
  */
 
@@ -7061,6 +7061,10 @@ static PyObject* GemRB_GetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 	}
 
 	int ret = actor->inventory.GetEquippedSlot();
+	int effect = core->QuerySlotEffects(ret);
+	if (effect == SLOT_EFFECT_MISSILE) {
+		ret = actor->inventory.FindRangedWeapon();
+	}
 	if (actor->PCStats) {
 		for(int i=0;i<4;i++) {
 			if (ret == actor->PCStats->QuickWeaponSlots[i]) {
@@ -7072,6 +7076,36 @@ static PyObject* GemRB_GetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 		ret-=actor->inventory.GetWeaponSlot();
 	}*/
 	return PyInt_FromLong( core->FindSlot(ret) );
+}
+
+PyDoc_STRVAR( GemRB_GetEquippedAmmunition__doc,
+"GetEquippedAmmunition(PartyID) => QSlot\n\n"
+"Returns the equipped ammunition slot, if any; -1 if none." );
+
+static PyObject* GemRB_GetEquippedAmmunition(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID;
+
+	if (!PyArg_ParseTuple( args, "i", &PartyID)) {
+		return AttributeError( GemRB_GetEquippedQuickSlot__doc );
+	}
+
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor* actor = game->FindPC( PartyID );
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
+	}
+
+	int ret = actor->inventory.GetEquippedSlot();
+	int effect = core->QuerySlotEffects(ret);
+	if (effect == SLOT_EFFECT_MISSILE) {
+		return PyInt_FromLong( core->FindSlot(ret) );
+	} else {
+		return PyInt_FromLong( -1 );
+	}
 }
 
 PyDoc_STRVAR( GemRB_SetModalState__doc,
@@ -7549,6 +7583,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(CreateMovement, METH_VARARGS),
 	METHOD(SetEquippedQuickSlot, METH_VARARGS),
 	METHOD(GetEquippedQuickSlot, METH_VARARGS),
+	METHOD(GetEquippedAmmunition, METH_VARARGS),
 	METHOD(SetModalState, METH_VARARGS),
 	METHOD(UseItem, METH_VARARGS),
 	METHOD(SpellCast, METH_VARARGS),

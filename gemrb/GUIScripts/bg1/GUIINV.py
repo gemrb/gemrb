@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.24 2006/09/02 10:29:23 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.25 2006/12/25 23:27:49 wjpalenstijn Exp $
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
 
@@ -394,7 +394,7 @@ def UpdateSlot (pc, slot):
 	else:
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 
-	if slot_item and (GemRB.GetEquippedQuickSlot (pc)==slot+1):
+	if slot_item and (GemRB.GetEquippedQuickSlot (pc)==slot+1 or GemRB.GetEquippedAmmunition (pc)==slot+1):
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SECOND)
 
 	return

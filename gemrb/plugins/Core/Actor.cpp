@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.236 2006/12/25 15:39:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.237 2006/12/25 23:27:49 wjpalenstijn Exp $
  *
  */
 
@@ -1555,6 +1555,7 @@ void Actor::ReinitQuickSlots()
 
 void Actor::SetupQuickSlot(unsigned int which, int slot, int headerindex)
 {
+	if (!PCStats) return;
 	if (inventory.HasItemInSlot("", slot)) {
 		headerindex = 0;
 	} else {
