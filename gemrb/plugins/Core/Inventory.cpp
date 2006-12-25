@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.92 2006/12/25 13:35:33 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.93 2006/12/25 13:58:19 wjpalenstijn Exp $
  *
  */
 
@@ -1291,7 +1291,11 @@ void Inventory::UpdateWeaponAnimation()
  	int effect = core->QuerySlotEffects( slot );
 	if (effect == SLOT_EFFECT_MISSILE) {
 		// ranged weapon
-		slot = SLOT_MELEE + FindRangedWeapon();
+		int s = FindRangedWeapon();
+		if (s == SLOT_FIST)
+			slot = s;
+		else
+			slot = SLOT_MELEE + s;
 	}
 	int WeaponType = -1;
 
