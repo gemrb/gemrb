@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.234 2006/12/24 15:34:49 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.235 2006/12/25 14:30:01 avenger_teambg Exp $
  *
  */
 
@@ -1558,8 +1558,9 @@ void Actor::ReinitQuickSlots()
 			PCStats->InitQuickSlot(which, 0xffff, 0);
 		}
 	}
-	//this is always present
+	//these are always present
 	PCStats->InitQuickSlot(ACT_WEAPON1, inventory.GetWeaponSlot(), 0);
+	PCStats->InitQuickSlot(ACT_WEAPON2, inventory.GetWeaponSlot()+1, 0);
 }
 
 bool Actor::ValidTarget(int ga_flags)
