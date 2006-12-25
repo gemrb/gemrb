@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.94 2006/12/25 16:20:44 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.95 2006/12/25 17:00:42 wjpalenstijn Exp $
  *
  */
 
@@ -717,16 +717,14 @@ bool Inventory::EquipItem(unsigned int slot)
 		break;
 	case SLOT_EFFECT_MELEE:
 		//if weapon is ranged, then find quarrel for it and equip that
-		if (item->Flags&IE_INV_ITEM_BOW) {
-			//get its extended header
-			header = itm->GetExtHeader(0);
-			if (header) {
-				//find the ranged projectile associated with it
-				slot = FindRangedProjectile(header->ProjectileType);
-			}
-			header=itm->GetWeaponHeader(true);
+		header = itm->GetExtHeader(0);
+		if (header && header->ProjectileQualifier != 0) {
+			//find the ranged projectile associated with it
+			slot = FindRangedProjectile(header->ProjectileQualifier);
+			if (slot != IW_NO_EQUIPPED) slot += SLOT_MELEE;
+			header = itm->GetWeaponHeader(true);
 		} else {
-			header=itm->GetWeaponHeader(false);
+			header = itm->GetWeaponHeader(false);
 		}
 		if (header) {
 			if (slot == IW_NO_EQUIPPED)
@@ -809,7 +807,7 @@ int Inventory::FindRangedProjectile(unsigned int type)
 		ITMExtHeader *ext_header = itm->GetExtHeader(0);
 		unsigned int weapontype = 0;
 		if (ext_header) {
-			weapontype = ext_header->ProjectileType;
+			weapontype = ext_header->ProjectileQualifier;
 		}
 		core->FreeItem(itm, Slot->ItemResRef, false);
 		if (weapontype & type) {
