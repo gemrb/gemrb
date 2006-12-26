@@ -33,7 +33,6 @@ def OnLoad():
 	return
 	
 def PlayPress():
-	print "MovieIndex", GemRB.GetVar("MovieIndex")
 	s = GemRB.GetVar("MovieIndex")
 	for i in range(0, GemRB.GetTableRowCount(MoviesTable) ):
 		t = GemRB.GetTableRowName(MoviesTable, i)
