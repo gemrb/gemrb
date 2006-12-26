@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.237 2006/12/25 23:27:49 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.238 2006/12/26 13:34:24 wjpalenstijn Exp $
  *
  */
 
@@ -1512,10 +1512,25 @@ void Actor::ReinitQuickSlots()
 	if (!PCStats) {
 		return;
 	}
+
+	// Note: (wjp, 20061226)
+	// This function needs some rethinking.
+	// It tries to satisfy two things at the moment:
+	//   Fill quickslots when they are empty and an item is placed in the
+	//      inventory slot corresponding to the quickslot
+	//   Reset quickslots when an item is removed
+	// Currently, it resets all slots when items are removed,
+	// but it only refills the ACT_QSLOTn slots, not the ACT_WEAPONx slots.
+	//
+	// Refilling a weapon slot is possible, but essentially duplicates a lot
+	// of code from Inventory::EquipItem() which performs the same steps for
+	// the Inventory::Equipped slot.
+	// Hopefully, weapons/arrows are never added to inventory slots without
+	// EquipItem being called (Exception: GUIScript::CreateItem)
+
 	int i=sizeof(PCStats->QSlots);
 	while (i--) {
 		int slot;
-		int headerindex = 0xffff;
 		int which;
 		if (i<0) which = ACT_WEAPON4+i+1;
 		else which = PCStats->QSlots[i];
@@ -1524,7 +1539,8 @@ void Actor::ReinitQuickSlots()
 			case ACT_WEAPON2:
 			case ACT_WEAPON3:
 			case ACT_WEAPON4:
-				slot = inventory.GetWeaponSlot()+(which-ACT_WEAPON1);
+				CheckWeaponQuickSlot(which-ACT_WEAPON1);
+				slot = 0;
 				break;
 				//WARNING:this cannot be condensed, because the symbols don't come in order!!!
 			case ACT_QSLOT1: slot = inventory.GetQuickSlot(); break;
@@ -1532,40 +1548,82 @@ void Actor::ReinitQuickSlots()
 			case ACT_QSLOT3: slot = inventory.GetQuickSlot()+2; break;
 			case ACT_QSLOT4: slot = inventory.GetQuickSlot()+3; break;
 			case ACT_QSLOT5: slot = inventory.GetQuickSlot()+4; break;
-			default:;
+			default:
 				slot = 0;
 		}
 		if (!slot) continue;
 		//if magic items are equipped the equipping info doesn't change
 		//(afaik)
-		SetupQuickSlot(which, slot, headerindex);
+
+		// Note: we're now in the QSLOTn case
+		// If slot is empty, reset quickslot to 0xffff/0
+
+		if (!inventory.HasItemInSlot("", slot)) {
+			SetupQuickSlot(which, 0xffff, 0);
+		} else {
+			ieWord idx;
+			ieWord headerindex;
+			PCStats->GetSlotAndIndex(which,idx,headerindex);
+			if (idx != slot || headerindex == 0xffff) {
+				// If slot just became filled, set it to filled
+				SetupQuickSlot(which,slot,0);
+			}
+		}
 	}
 
 	//these are always present
-	SetupQuickSlot(ACT_WEAPON1, inventory.GetWeaponSlot(), 0);
-	SetupQuickSlot(ACT_WEAPON2, inventory.GetWeaponSlot()+1, 0);
+	CheckWeaponQuickSlot(0);
+	CheckWeaponQuickSlot(1);
 	//disabling quick weapon slots for certain classes
 	for(i=0;i<2;i++) {
 		int which = ACT_WEAPON3+i;
+		// Assuming that ACT_WEAPON3 and 4 are always in the first two spots
 		if (PCStats->QSlots[i]!=which) {
 			SetupQuickSlot(which, 0xffff, 0);
 		}
 	}
 }
 
+void Actor::CheckWeaponQuickSlot(unsigned int which)
+{
+	if (!PCStats) return;
+
+	bool empty = false;
+    // If current quickweaponslot doesn't contain an item, reset it to fist
+	int slot = PCStats->QuickWeaponSlots[which];
+	int header = PCStats->QuickWeaponHeaders[which];
+	if (!inventory.HasItemInSlot("", slot) || header == 0xffff) {
+		empty = true;
+	} else {
+		// If current quickweaponslot contains ammo, and bow not found, reset
+
+		if (core->QuerySlotEffects(slot) == SLOT_EFFECT_MISSILE) {
+			CREItem *slotitm = inventory.GetSlotItem(slot);
+			assert(slotitm);
+			Item *itm = core->GetItem(slotitm->ItemResRef);
+			assert(itm);
+			ITMExtHeader *ext_header = itm->GetExtHeader(header);
+			if (ext_header) {
+				int type = ext_header->ProjectileQualifier;
+				int weaponslot = inventory.FindTypedRangedWeapon(type);
+				if (weaponslot == inventory.GetFistSlot()) {
+					empty = true;
+				}
+			} else {
+				empty = true;
+			}
+			core->FreeItem(itm,slotitm->ItemResRef, false);
+		}
+	}
+
+	if (empty)
+		SetupQuickSlot(ACT_WEAPON1+which, inventory.GetFistSlot(), 0);
+}
+
+
 void Actor::SetupQuickSlot(unsigned int which, int slot, int headerindex)
 {
 	if (!PCStats) return;
-	if (inventory.HasItemInSlot("", slot)) {
-		headerindex = 0;
-	} else {
-		if (core->QuerySlotEffects(slot)==SLOT_EFFECT_MELEE) {
-			slot = inventory.GetFistSlot();
-			headerindex = 0;
-		} else {
-			slot = 0xffff;
-		}
-	}
 	PCStats->InitQuickSlot(which, (ieWord) slot, (ieWord) headerindex);
 }
 

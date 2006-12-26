@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.54 2006/12/25 23:27:49 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.55 2006/12/26 13:34:24 wjpalenstijn Exp $
  *
  */
 
@@ -272,6 +272,8 @@ public:
 	CREItem *GetUsedWeapon(bool leftorright);
 	/** returns slot of launcher weapon currently equipped */
 	int FindRangedWeapon(); 
+	/** returns slot of launcher weapon for specified projectile type */
+	int FindTypedRangedWeapon(unsigned int type);
 	/** Returns a slot which might be empty, or capable of holding item (or part of it) */
 	int FindCandidateSlot(int slottype, size_t first_slot, const char *resref = NULL);
 	/** Creates an item in the slot*/
@@ -307,7 +309,6 @@ public:
 	static int GetInventorySlot();
 private:
 	int FindRangedProjectile(unsigned int type);
-	int FindTypedRangedWeapon(unsigned int type);
 	// called by KillSlot
 	void RemoveSlotEffects( CREItem* slot );
 	void KillSlot(unsigned int index);

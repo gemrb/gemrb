@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.134 2006/12/25 15:39:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.135 2006/12/26 13:34:24 wjpalenstijn Exp $
  *
  */
 
@@ -319,7 +319,11 @@ public:
 	void GetSpellSlotInfo(SpellExtHeader *spell, int which);
 	/* updates quickslots */
 	void ReinitQuickSlots();
-	/* calls InitQuickSlot in PCStatStruct, overrides values as necessary */
+private:
+	/* checks a weapon quick slot and resets it to fist if it is empty */
+	void CheckWeaponQuickSlot(unsigned int which);
+public:
+	/* calls InitQuickSlot in PCStatStruct */
 	void SetupQuickSlot(unsigned int which, int slot, int headerindex);
 	/* returns true if the actor is PC/joinable*/
 	bool Persistent();
