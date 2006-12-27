@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.111 2006/12/27 14:05:35 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.112 2006/12/27 14:15:17 wjpalenstijn Exp $
  *
  */
 
@@ -169,8 +169,9 @@ void Button::Draw(unsigned short x, unsigned short y)
 
 	// Button picture
 	if (Picture  && (Flags & IE_GUI_BUTTON_PICTURE) ) {
-		int xOffs = ( Width / 2 ) - ( Picture->Width / 2 );
-		int yOffs = ( Height / 2 ) - ( Picture->Height / 2 );
+		// Picture is drawn centered
+		int xOffs = ( Width / 2 ) - ( Picture->Width / 2 ) + Picture->XPos;
+		int yOffs = ( Height / 2 ) - ( Picture->Height / 2 ) + Picture->YPos;
 		Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(Picture->Width * Clipping), Picture->Height );
 		video->BlitSprite( Picture, x + XPos + xOffs, y + YPos + yOffs, true, &r );
 	}
@@ -530,10 +531,6 @@ void Button::RedrawButton(const char* VariableName, unsigned int Sum)
 void Button::SetPicture(Sprite2D* newpic)
 {
 	core->GetVideoDriver()->FreeSprite( Picture );
-	if (newpic) {
-		newpic->XPos = 0;
-		newpic->YPos = 0;
-	}
 	Picture = newpic;
 	Changed = true;
 	Flags |= IE_GUI_BUTTON_PICTURE;
