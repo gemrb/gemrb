@@ -16,7 +16,7 @@
 #along with this program; if not, write to the Free Software
 #Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.57 2006/12/27 18:45:38 avenger_teambg Exp $
+#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.58 2006/12/27 19:14:26 avenger_teambg Exp $
 
 
 #GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -140,6 +140,9 @@ def OpenInventoryWindow ():
 		if SlotType["ID"]:
 			Button = GemRB.GetControl (Window, SlotType["ID"])
 			GemRB.SetVarAssoc (Window, Button, "ItemButton", slot+1)
+			#keeping 2 in the original place, because it is how
+			#the gui resource has it, but setting the other cycles
+			GemRB.SetButtonSprites (Window, Button, "GUIBTBUT",0,0,2,1,3)
 			GemRB.SetButtonFont (Window, Button, "NUMBER")
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
 			GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,128,128,255,64,0,1)
@@ -423,7 +426,7 @@ def UpdateSlot (pc, slot):
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 
 	if slot_item and (GemRB.GetEquippedQuickSlot (pc)==slot+1 or GemRB.GetEquippedAmmunition (pc)==slot+1):
-		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SECOND)
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_THIRD)
 
 	return
 
