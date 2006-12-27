@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.113 2006/12/27 14:34:59 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.114 2006/12/27 14:41:59 wjpalenstijn Exp $
  *
  */
 
@@ -170,10 +170,10 @@ void Button::Draw(unsigned short x, unsigned short y)
 	// Button picture
 	if (Picture  && (Flags & IE_GUI_BUTTON_PICTURE) ) {
 		// Picture is drawn centered
-		int xOffs = ( Width / 2 ) - ( Picture->Width / 2 ) + Picture->XPos;
-		int yOffs = ( Height / 2 ) - ( Picture->Height / 2 ) + Picture->YPos;
+		int xOffs = ( Width / 2 ) - ( Picture->Width / 2 );
+		int yOffs = ( Height / 2 ) - ( Picture->Height / 2 );
 		Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(Picture->Width * Clipping), Picture->Height );
-		video->BlitSprite( Picture, x + XPos + xOffs, y + YPos + yOffs, true, &r );
+		video->BlitSprite( Picture, x + XPos + xOffs + Picture->XPos, y + YPos + yOffs + Picture->YPos, true, &r );
 	}
 
 	// Composite pictures (paperdolls/description icons)
