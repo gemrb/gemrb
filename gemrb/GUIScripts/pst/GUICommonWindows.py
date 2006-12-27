@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.38 2006/08/08 20:25:45 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.39 2006/12/27 22:05:48 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -207,7 +207,15 @@ def GetActorPortrait (actor, which):
 	
 
 def UpdateAnimation ():
+	disguise = GemRB.GetGameVar ("APPEARANCE")
 	pc = GemRB.GameGetSelectedPCSingle ()
+	if disguise == 2: #dustman
+		GemRB.SetPlayerStat (pc, IE_ANIMATION_ID, 0x5d)
+		return
+	if disguise == 1: #zombie
+		GemRB.SetPlayerStat (pc, IE_ANIMATION_ID, 0x52)
+		return
+
 	slot = GemRB.GetEquippedQuickSlot (pc)
 	item = GemRB.GetSlotItem (pc, slot )
 	animid = ""
