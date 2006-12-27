@@ -1,0 +1,13 @@
+Prototype: GemRB.SetEquippedQuickSlot(PartyID, QWeaponSlot)
+
+Description: Sets the specified weapon slot as equipped weapon slot.
+
+Parameters:
+PartyID     - the PC's position in the party (1 based)
+QWeaponSlot - the quickslot to equip
+
+Return value: N/A
+
+See also: GetEquippedQuickSlot
+
+MD5: d5987a066d03c89c5832d96143fa34e7

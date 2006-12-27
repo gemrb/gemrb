@@ -1,5 +1,5 @@
 
-Prototype: GemRB.SetItemIcon(WindowIndex, ControlIndex, ITMResRef[, Type, Tooltip])
+Prototype: GemRB.SetItemIcon(WindowIndex, ControlIndex, ITMResRef[, Type, Tooltip, ITM2ResRef])
 
 Description: Sets Item icon image on a Button control.
 
@@ -14,6 +14,9 @@ Type                       - 0-5 (the icon's type)
    4  - Activation Icon1
    5  - Activation Icon2
 Tooltip                    - if set to 1, the tooltip for the item will also be set
+ITM2ResRef                 - if set, a second item to display in the icon. ITM2 is drawn first. The tooltip of ITM is used. Only valid for Type 4 and 5
 Return value: N/A
 
 See also: SetSpellIcon, SetActionIcon
+
+MD5: 620f7945c39b6eeb5eb5935b698acb7a
