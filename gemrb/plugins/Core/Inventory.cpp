@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.99 2006/12/27 16:03:40 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.100 2006/12/27 18:17:09 wjpalenstijn Exp $
  *
  */
 
@@ -197,9 +197,9 @@ void Inventory::AddSlotEffects(CREItem* slot, int type)
 		// FIXME: some other opcodes probably need this too
 		if (fx->Opcode == 7) { // set_color_gradient
 			unsigned int gradienttype = fx->Parameter2 & 0xF0;
-			if (type == SLOT_EFFECT_MELEE)
+			if (type == SLOT_EFFECT_MELEE && gradienttype == 0x20)
 				gradienttype = 0x10; // weapon
-			else if (type == SLOT_EFFECT_LEFT)
+			else if (type == SLOT_EFFECT_LEFT && gradienttype == 0x10)
 				gradienttype = 0x20; // off-hand
 			fx->Parameter2 &= ~0xF0;
 			fx->Parameter2 |= gradienttype;
