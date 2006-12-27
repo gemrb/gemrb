@@ -16,7 +16,7 @@
 #along with this program; if not, write to the Free Software
 #Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.26 2006/12/27 18:45:37 avenger_teambg Exp $
+#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.27 2006/12/27 19:45:19 avenger_teambg Exp $
 
 #GUIINV.py - scripts to control inventory windows from GUIINV winpack
 
@@ -302,6 +302,10 @@ def RefreshInventoryWindow ():
 	TopIndex = GemRB.GetVar ("TopIndex")
 	for i in range (5):
 		Button = GemRB.GetControl (Window, i+68)
+		if GemRB.IsDraggingItem():
+			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SECOND)
+		else:
+			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnDragItemGround")
 		Slot = GemRB.GetContainerItem (pc, i+TopIndex)
 		if Slot != None:
@@ -392,13 +396,13 @@ def UpdateSlot (pc, slot):
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
 
-	if itemtype>=0 and GemRB.CanUseItemType(itemtype, SlotType["Type"]):
-		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SECOND)
-	else:
+	if (SlotType["Type"]&SLOT_INVENTORY) or not GemRB.CanUseItemType(itemtype, SlotType["Type"]):
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
+	else:
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SECOND)
 
 	if slot_item and (GemRB.GetEquippedQuickSlot (pc)==slot+1 or GemRB.GetEquippedAmmunition (pc)==slot+1):
-		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SECOND)
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_THIRD)
 
 	return
 

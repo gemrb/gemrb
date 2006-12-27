@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/ie_slots.py,v 1.1 2006/07/09 10:54:43 wjpalenstijn Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/ie_slots.py,v 1.2 2006/12/27 19:45:18 avenger_teambg Exp $
 
 # ie_slots.py - definitions of slottypes
 
@@ -37,5 +37,6 @@ SLOT_ITEM      = 2048  #quick item
 SLOT_SCROLL    = 4096
 SLOT_BAG       = 8192
 SLOT_POTION    = 16384
+SLOT_INVENTORY = 32768
 
 # End of file ie_slots.py
