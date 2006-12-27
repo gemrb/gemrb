@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.100 2006/12/27 18:17:09 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.101 2006/12/27 18:48:21 avenger_teambg Exp $
  *
  */
 
@@ -518,6 +518,12 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 			continue;
 		if (!(core->QuerySlotType(i)&slottype))
 			continue;
+		//the slot has been disabled for this actor
+	        if (i>=SLOT_MELEE && i<=LAST_MELEE) {
+        		if (Owner->GetQuickSlot(i-SLOT_MELEE)==0xffff) {
+				continue;
+			}
+	        }
 		int part_res = AddSlotItem (item, i);
 		if (part_res == 2) return 2;
 		else if (part_res == 1) res = 1;
