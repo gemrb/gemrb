@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.98 2006/12/27 14:05:35 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.99 2006/12/27 16:03:40 wjpalenstijn Exp $
  *
  */
 
@@ -174,7 +174,7 @@ void Inventory::CalculateWeight()
 	Changed = false;
 }
 
-void Inventory::AddSlotEffects(CREItem* slot)
+void Inventory::AddSlotEffects(CREItem* slot, int type)
 {
 	Item* itm = core->GetItem( slot->ItemResRef );
 	if (!itm) {
@@ -190,6 +190,21 @@ void Inventory::AddSlotEffects(CREItem* slot)
 		Effect *fx = itm->equipping_features+i;
 		fx->PosX = Owner->Pos.x;
 		fx->PosY = Owner->Pos.y;
+
+		// Tweak colour effects for weapons:
+		// If a weapon is in the off-hand, it needs to set the off-hand palette
+		// If it is in the main hand, it should set the weapon palette
+		// FIXME: some other opcodes probably need this too
+		if (fx->Opcode == 7) { // set_color_gradient
+			unsigned int gradienttype = fx->Parameter2 & 0xF0;
+			if (type == SLOT_EFFECT_MELEE)
+				gradienttype = 0x10; // weapon
+			else if (type == SLOT_EFFECT_LEFT)
+				gradienttype = 0x20; // off-hand
+			fx->Parameter2 &= ~0xF0;
+			fx->Parameter2 |= gradienttype;
+		}
+
 		Owner->fxqueue.AddEffect( fx );
 	}
 
@@ -781,7 +796,7 @@ bool Inventory::EquipItem(unsigned int slot)
 		if (item->Flags & IE_INV_ITEM_CURSED) {
 			item->Flags|=IE_INV_ITEM_UNDROPPABLE;
 		}
-		AddSlotEffects( item );
+		AddSlotEffects( item, effect );
 	}
 	ItemExcl|=itm->ItemExcl;
 	core->FreeItem(itm, item->ItemResRef, false);
@@ -1006,13 +1021,14 @@ bool Inventory::SetEquippedSlot(int slotcode)
 		return true;
 	}
 	Equipped = slotcode;
-	if ( core->QuerySlotEffects( SLOT_MELEE+Equipped ) ) {
+	int effects = core->QuerySlotEffects( SLOT_MELEE+Equipped );
+	if (effects) {
 		CREItem* item = GetSlotItem(SLOT_MELEE+Equipped);
 		item->Flags|=IE_INV_ITEM_EQUIPPED;
 		if (item->Flags & IE_INV_ITEM_CURSED) {
 			item->Flags|=IE_INV_ITEM_UNDROPPABLE;
 		}
-		AddSlotEffects( item );
+		AddSlotEffects( item, effects );
 	}
 	UpdateWeaponAnimation();
 	return true;
