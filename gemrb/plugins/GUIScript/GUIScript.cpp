@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.431 2006/12/27 14:34:59 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.432 2006/12/27 22:07:07 avenger_teambg Exp $
  *
  */
 
@@ -5945,7 +5945,8 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	core->DragItem (si, ResRef);
-	core->GetGUIScriptEngine()->RunFunction("UpdateAnimation");
+	//this is PST specific
+	core->GetGUIScriptEngine()->RunFunction("UpdateAnimation", false);
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -6037,7 +6038,8 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		core->ReleaseDraggedItem ();
 	} 
 
-	core->GetGUIScriptEngine()->RunFunction("UpdateAnimation");
+	//this is PST specific, change animation
+	core->GetGUIScriptEngine()->RunFunction("UpdateAnimation", false);
 	return PyInt_FromLong( res );
 }
 
@@ -7779,7 +7781,7 @@ bool GUIScript::LoadScript(const char* filename)
 	return true;
 }
 
-bool GUIScript::RunFunction(const char* fname)
+bool GUIScript::RunFunction(const char* fname, bool error)
 {
 	if (!Py_IsInitialized()) {
 		return false;
@@ -7793,8 +7795,10 @@ bool GUIScript::RunFunction(const char* fname)
 	pFunc = PyDict_GetItemString( pDict, (char *) fname );
 	/* pFunc: Borrowed reference */
 	if (( !pFunc ) || ( !PyCallable_Check( pFunc ) )) {
-		printMessage( "GUIScript", "Missing function:", LIGHT_RED );
-		printf("%s\n", fname);
+		if (error) {
+			printMessage( "GUIScript", "Missing function:", LIGHT_RED );
+			printf("%s\n", fname);
+		}
 		return false;
 	}
 	pArgs = NULL;
