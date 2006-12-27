@@ -1,25 +1,25 @@
-# -*-python-*-
-# GemRB - Infinity Engine Emulator
-# Copyright (C) 2003-2004 The GemRB Project
+#-*-python-*-
+#GemRB - Infinity Engine Emulator
+#Copyright (C) 2003-2004 The GemRB Project
 #
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
+#This program is free software; you can redistribute it and/or
+#modify it under the terms of the GNU General Public License
+#as published by the Free Software Foundation; either version 2
+#of the License, or (at your option) any later version.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#This program is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#You should have received a copy of the GNU General Public License
+#along with this program; if not, write to the Free Software
+#Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.56 2006/12/25 23:27:50 wjpalenstijn Exp $
+#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.57 2006/12/27 18:45:38 avenger_teambg Exp $
 
 
-# GUIINV.py - scripts to control inventory windows from GUIINV winpack
+#GUIINV.py - scripts to control inventory windows from GUIINV winpack
 
 ###################################################
 
@@ -85,7 +85,7 @@ def OpenInventoryWindow ():
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = OpenPortraitWindow (0)
 
-	# Ground Item
+	#Ground Item
 	for i in range (5):
 		Button = GemRB.GetControl (Window, i+68)
 		GemRB.SetVarAssoc (Window, Button, "GroundItemButton", i)
@@ -108,25 +108,25 @@ def OpenInventoryWindow ():
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS,"MinorPress")
 	GemRB.SetTooltip (Window, Button, 12008)
 
-	# portrait
+	#portrait
 	Button = GemRB.GetControl (Window, 50)
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnAutoEquip")
 
-	# encumbrance
+	#encumbrance
 	Label = GemRB.CreateLabel (Window, 0x10000043, 5,385,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
 	Label = GemRB.CreateLabel (Window, 0x10000044, 5,455,80,15,"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_TOP)
 
-	# armor class
+	#armor class
 	Label = GemRB.GetControl (Window, 0x10000038)
 	GemRB.SetTooltip (Window, Label, 4197)
 
-	# hp current
+	#hp current
 	Label = GemRB.GetControl (Window, 0x10000039)
 	GemRB.SetTooltip (Window, Label, 4198)
 
-	# hp max
+	#hp max
 	Label = GemRB.GetControl (Window, 0x1000003a)
 	GemRB.SetTooltip (Window, Label, 4199)
 
@@ -227,7 +227,7 @@ def UpdateInventoryWindow ():
 		Count=1
 	GemRB.SetVarAssoc (Window, ScrollBar, "TopIndex", Count)
 	RefreshInventoryWindow ()
-	# populate inventory slot controls
+	#populate inventory slot controls
 	SlotCount = GemRB.GetSlotType (-1)["Count"]
 	for i in range (SlotCount):
 		UpdateSlot (pc, i)
@@ -239,11 +239,11 @@ def RefreshInventoryWindow ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 
-	# name
+	#name
 	Label = GemRB.GetControl (Window, 0x10000032)
 	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc, 0))
 
-	# portrait
+	#portrait
 	Button = GemRB.GetControl (Window, 50)
 	Color1 = GemRB.GetPlayerStat (pc, IE_METAL_COLOR)
 	Color2 = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR)
@@ -260,55 +260,55 @@ def RefreshInventoryWindow ():
 	row = "0x%04X" %anim_id
 	size = GemRB.GetTableValue (PortraitTable, row, "SIZE")
 
-	# Weapon
+	#Weapon
 	slot_item = GemRB.GetSlotItem (pc, GemRB.GetEquippedQuickSlot(pc) )
 	if slot_item:
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		if (item['AnimationType'] != ''):
 			GemRB.SetButtonPLT(Window, Button, "WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 1)
 		
-	# Shield
+	#Shield
 	slot_item = GemRB.GetSlotItem (pc, 3)
 	if slot_item:
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		if (item['AnimationType'] != ''):
 			if (GemRB.CanUseItemType(item['Type'], SLOT_WEAPON)):
-				# off-hand weapon
+				#off-hand weapon
 				GemRB.SetButtonPLT(Window, Button, "WP" + size + item['AnimationType'] + "OIN", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 2)
 			else:
-				# shield
+				#shield
 				GemRB.SetButtonPLT(Window, Button, "WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 2)
 
-	# Helmet
+	#Helmet
 	slot_item = GemRB.GetSlotItem (pc, 1)
 	if slot_item:
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		if (item['AnimationType'] != ''):
 			GemRB.SetButtonPLT(Window, Button, "WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 3)
 
-	# encumbrance
+	#encumbrance
 	SetEncumbranceLabels( Window, 0x10000043, 0x10000044, pc)
 
-	# armor class
+	#armor class
 	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
 	Label = GemRB.GetControl (Window, 0x10000038)
 	GemRB.SetText (Window, Label, str (ac))
 
-	# hp current
+	#hp current
 	hp = GemRB.GetPlayerStat (pc, IE_HITPOINTS)
 	Label = GemRB.GetControl (Window, 0x10000039)
 	GemRB.SetText (Window, Label, str (hp))
 
-	# hp max
+	#hp max
 	hpmax = GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)
 	Label = GemRB.GetControl (Window, 0x1000003a)
 	GemRB.SetText (Window, Label, str (hpmax))
 
-	# party gold
+	#party gold
 	Label = GemRB.GetControl (Window, 0x10000040)
 	GemRB.SetText (Window, Label, str (GemRB.GameGetPartyGold ()))
 
-	# class
+	#class
 	ClassTitle = GetActorClassTitle (pc)
 	Label = GemRB.GetControl (Window, 0x10000042)
 	GemRB.SetText (Window, Label, ClassTitle)
@@ -321,7 +321,7 @@ def RefreshInventoryWindow ():
 	Color = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR, 1)
 	GemRB.SetButtonBAM (Window, Button, "COLGRAD", 0, 0, Color)
 
-	# update ground inventory slots
+	#update ground inventory slots
 	Container = GemRB.GetContainer(pc, 1)
 	TopIndex = GemRB.GetVar ("TopIndex")
 	for i in range (5):
@@ -399,15 +399,18 @@ def UpdateSlot (pc, slot):
 	else:
 		if SlotType["ResRef"]=="*":
 			GemRB.SetButtonBAM (Window, Button, "",0,0,0)
+			GemRB.SetTooltip (Window, Button, SlotType["Tip"])
 			itemtype = -1
 		elif SlotType["ResRef"]=="":
 			GemRB.SetButtonBAM (Window, Button, "",0,0,0)
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+			GemRB.SetTooltip (Window, Button, "")
 			itemtype = -1
 		else:
 			GemRB.SetButtonBAM (Window, Button, SlotType["ResRef"],0,0,0)
+			GemRB.SetTooltip (Window, Button, SlotType["Tip"])
+
 		GemRB.SetText (Window, Button, "")
-		GemRB.SetTooltip (Window, Button, SlotType["Tip"])
 		GemRB.EnableButtonBorder (Window, Button, 0, 0)
 
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")
@@ -427,7 +430,7 @@ def UpdateSlot (pc, slot):
 def OnDragItemGround ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 
-	slot = GemRB.GetVar ("GroundItemButton")+GemRB.GetVar("TopIndex")
+	slot = GemRB.GetVar ("GroundItemButton") + GemRB.GetVar("TopIndex")
 	if not GemRB.IsDraggingItem ():
 		slot_item = GemRB.GetContainerItem (pc, slot)
 		item = GemRB.GetItem (slot_item["ItemResRef"])
@@ -444,7 +447,7 @@ def OnAutoEquip ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 
-	# -1 : drop stuff in equipable slots (but not inventory)
+	#-1 : drop stuff in equipable slots (but not inventory)
 	GemRB.DropDraggedItem (pc, -1)
 
 	if GemRB.IsDraggingItem ():
@@ -462,7 +465,9 @@ def OnDragItem ():
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 0)
 	else:
-		GemRB.DropDraggedItem (pc, slot)
+		SlotType = GemRB.GetSlotType (slot, pc)
+		if SlotType["ResRef"]!="":
+			GemRB.DropDraggedItem (pc, slot)
 		if GemRB.IsDraggingItem ():
 			GemRB.PlaySound("GAM_47")  #failed equip
 
@@ -472,7 +477,7 @@ def OnDragItem ():
 def OnDropItemToPC ():
 	pc = GemRB.GetVar ("PressedPortrait") + 1
 
-	# -3 : drop stuff in inventory (but not equippable slots)
+	#-3 : drop stuff in inventory (but not equippable slots)
 	GemRB.DropDraggedItem (pc, -3)
 	if GemRB.IsDraggingItem ():
 		GemRB.PlaySound("GAM_47")  #failed equip
@@ -644,4 +649,4 @@ def OpenGroundItemInfoWindow ():
 	return
 
 ###################################################
-# End of file GUIINV.py
+#End of file GUIINV.py

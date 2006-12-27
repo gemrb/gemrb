@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.57 2006/12/25 23:27:50 wjpalenstijn Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.58 2006/12/27 18:45:38 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -399,15 +399,18 @@ def UpdateSlot (pc, slot):
 	else:
 		if SlotType["ResRef"]=="*":
 			GemRB.SetButtonBAM (Window, Button, "",0,0,0)
+			GemRB.SetTooltip (Window, Button, SlotType["Tip"])
 			itemtype = -1
 		elif SlotType["ResRef"]=="":
 			GemRB.SetButtonBAM (Window, Button, "",0,0,0)
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+			GemRB.SetTooltip (Window, Button, "")
 			itemtype = -1
 		else:
 			GemRB.SetButtonBAM (Window, Button, SlotType["ResRef"],0,0,0)
+			GemRB.SetTooltip (Window, Button, SlotType["Tip"])
+
 		GemRB.SetText (Window, Button, "")
-		GemRB.SetTooltip (Window, Button, SlotType["Tip"])
 		GemRB.EnableButtonBorder (Window, Button, 0, 0)
 
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")
@@ -462,7 +465,9 @@ def OnDragItem ():
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 0)
 	else:
-		GemRB.DropDraggedItem (pc, slot)
+		SlotType = GemRB.GetSlotType (slot, pc)
+		if SlotType["ResRef"]!="":
+			GemRB.DropDraggedItem (pc, slot)
 		if GemRB.IsDraggingItem ():
 			GemRB.PlaySound("GAM_47")  #failed equip
 
