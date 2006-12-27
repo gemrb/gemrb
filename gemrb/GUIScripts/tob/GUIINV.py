@@ -16,7 +16,7 @@
 #along with this program; if not, write to the Free Software
 #Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.59 2006/12/27 19:45:19 avenger_teambg Exp $
+#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.60 2006/12/27 19:55:41 avenger_teambg Exp $
 
 
 #GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -99,11 +99,13 @@ def OpenInventoryWindow ():
 
 	#major & minor clothing color
 	Button = GemRB.GetControl (Window, 62)
+	GemRB.SetButtonSprites (Window, Button, "INVBUT",0,0,1,0,0)
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE,OP_OR)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS,"MajorPress")
 	GemRB.SetTooltip (Window, Button, 12007)
 
 	Button = GemRB.GetControl (Window, 63)
+	GemRB.SetButtonSprites (Window, Button, "INVBUT",0,0,1,0,0)
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE,OP_OR)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS,"MinorPress")
 	GemRB.SetTooltip (Window, Button, 12008)
