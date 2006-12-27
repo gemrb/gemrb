@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.439 2006/12/17 13:27:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.440 2006/12/27 13:54:53 edheldil Exp $
  *
  */
 
@@ -1943,16 +1943,6 @@ bool Interface::LoadConfig(const char* filename)
 			SetScriptDebugMode(atoi(value));
 		} else if (stricmp( name, "CachePath" ) == 0) {
 			strncpy( CachePath, value, sizeof(CachePath) );
-			FixPath( CachePath, false );
-			mkdir( CachePath, S_IREAD|S_IWRITE|S_IEXEC );
-			chmod( CachePath, S_IREAD|S_IWRITE|S_IEXEC );
-			if ( StupidityDetector( CachePath )) {
-				printMessage("Core"," ",LIGHT_RED);
-				printf( "Cache folder %s doesn't exist, invalid or contains executable files!\n", CachePath );
-				fclose( config );
-				return false;
-			}
-			DelTree((const char *) CachePath, false);
 		} else if (stricmp( name, "GUIScriptsPath" ) == 0) {
 			strncpy( GUIScriptsPath, value, sizeof(GUIScriptsPath) );
 #ifndef WIN32
@@ -2007,39 +1997,57 @@ bool Interface::LoadConfig(const char* filename)
 	}
 	fclose( config );
 
+
 	if (!GameType[0]) {
-		strcpy( GameType, "gemrb");
+		strcpy( GameType, "gemrb" );
 	}
 
 #ifdef DATADIR
 	if (!GemRBPath[0]) {
 		strcpy( GemRBPath, DATADIR );
-		strcat( GemRBPath, SPathDelimiter );
 	}
 #endif
+
 	if (!PluginsPath[0]) {
 #ifdef PLUGINDIR
 		strcpy( PluginsPath, PLUGINDIR );
 #else
 		PathJoin( PluginsPath, GemRBPath, "plugins", NULL );
 #endif
-		strcat( PluginsPath, SPathDelimiter );
 	}
-	FixPath(GemRBPath, true);
-	FixPath(CachePath, true);
-	if (GUIScriptsPath[0]) {
-		FixPath(GUIScriptsPath, true);
+
+	if (!GUIScriptsPath[0]) {
+		strcpy( GUIScriptsPath, GemRBPath );
 	}
-	else {
-		memcpy( GUIScriptsPath, GemRBPath, sizeof( GUIScriptsPath ) );
-	}
+
 	if (!GameName[0]) {
 		strcpy( GameName, GEMRB_STRING );
 	}
+
 	if (!SavePath[0]) {
 		// FIXME: maybe should use UserDir instead of GamePath
-		memcpy( SavePath, GamePath, sizeof( GamePath ) );
+		strcpy( SavePath, GamePath );
 	}
+
+	if (! CachePath[0]) {
+		PathJoin( CachePath, UserDir, "Cache", NULL );
+	}
+
+
+	FixPath( GUIScriptsPath, true );
+	FixPath( PluginsPath, true );
+	FixPath( GemRBPath, true );
+
+	FixPath( CachePath, false );
+	mkdir( CachePath, S_IREAD|S_IWRITE|S_IEXEC );
+	chmod( CachePath, S_IREAD|S_IWRITE|S_IEXEC );
+	if ( StupidityDetector( CachePath )) {
+		printMessage("Core"," ",LIGHT_RED);
+		printf( "Cache folder %s doesn't exist, invalid or contains executable files!\n", CachePath );
+		return false;
+	}
+	DelTree((const char *) CachePath, false);
+	FixPath( CachePath, true );
 
 	printf( "Loaded config file %s\n", filename );
 	return true;
