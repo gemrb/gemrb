@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.430 2006/12/27 14:05:35 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.431 2006/12/27 14:34:59 wjpalenstijn Exp $
  *
  */
 
@@ -4421,7 +4421,7 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 			return Py_None;
 		}
 
-		btn->SetFlags( IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_CENTER_FIRST_PIC, BM_OR );
+		btn->SetFlags( IE_GUI_BUTTON_PICTURE, BM_OR );
 		Sprite2D* Picture;
 		int i;
 		switch (Which) {

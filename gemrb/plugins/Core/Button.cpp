@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.112 2006/12/27 14:15:17 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.113 2006/12/27 14:34:59 wjpalenstijn Exp $
  *
  */
 
@@ -181,9 +181,11 @@ void Button::Draw(unsigned short x, unsigned short y)
 		std::list<Sprite2D*>::iterator iter = PictureList.begin();
 		int xOffs = 0, yOffs = 0;
 		if (Flags & IE_GUI_BUTTON_CENTER_PICTURES) {
+			// Center the hotspots of all pictures
 			xOffs = Width/2;
 			yOffs = Height/2;
-		} else if (Flags & IE_GUI_BUTTON_CENTER_FIRST_PIC) {
+		} else {
+			// Center the first picture, and align the rest to that
 			xOffs = Width/2 - (*iter)->Width/2 + (*iter)->XPos;
 			yOffs = Height/2 - (*iter)->Height/2 + (*iter)->YPos;
 		}
