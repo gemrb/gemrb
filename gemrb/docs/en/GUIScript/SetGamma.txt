@@ -4,9 +4,12 @@ Prototype: GemRB.SetGamma(brightness, contrast)
 Description: Adjusts brightness and contrast.
 
 Parameters:
-brightness  -
-contrast    -
+brightness  - value must be 0 .. 40
+contrast    - value must be 0 .. 5
 
 Return value: N/A
 
 See also:
+
+
+MD5: f0b39e902bfdf54f924e3829cbd92c1a

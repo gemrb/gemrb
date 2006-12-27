@@ -12,3 +12,5 @@ Return value: 0 - movie played
 
 See also: SetVar, GetVar
 
+
+MD5: 5aa65188f90931b955b6c91969b3393c

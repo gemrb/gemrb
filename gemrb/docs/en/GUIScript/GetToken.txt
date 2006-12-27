@@ -12,3 +12,5 @@ The above example will add the protagonist's name to the TextArea (if the token 
 
 See also: SetToken, GetText
 
+
+MD5: fea89d3ea3aa58100ad165ea6b9cb605

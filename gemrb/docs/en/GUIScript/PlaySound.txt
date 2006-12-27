@@ -9,3 +9,5 @@ Return value: N/A
 
 See also: LoadMusicPL
 
+
+MD5: 7370df8f931c57fc8317ca7472ea612e

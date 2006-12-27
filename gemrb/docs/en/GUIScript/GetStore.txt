@@ -1,9 +1,9 @@
 
 Prototype: GetStore( )
 
-Description: Gets the basic header information of a store an returns it in a dictionary. The information is precompiled based on room availability, store type
+Description: Gets the basic header information of the current store and returns it in a dictionary. The information is precompiled based on room availability, store type
 
-Parameters: -
+Parameters: N/A
 
 Return value: dictionary
 "StoreType"       - numeric (see IESDP)
@@ -20,3 +20,5 @@ Return value: dictionary
 
 See also: EnterStore, GetStoreCure, GetStoreDrink, GetRumour
 
+
+MD5: 1899d9bf9e161d3b1a6ec8b3d9fdff19
