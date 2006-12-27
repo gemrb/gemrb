@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.55 2006/12/26 13:34:24 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.56 2006/12/27 14:05:34 wjpalenstijn Exp $
  *
  */
 
@@ -274,6 +274,8 @@ public:
 	int FindRangedWeapon(); 
 	/** returns slot of launcher weapon for specified projectile type */
 	int FindTypedRangedWeapon(unsigned int type);
+	/** returns slot of launcher weapon for projectile in specified slot */
+	int FindSlotRangedWeapon(unsigned int slot);
 	/** Returns a slot which might be empty, or capable of holding item (or part of it) */
 	int FindCandidateSlot(int slottype, size_t first_slot, const char *resref = NULL);
 	/** Creates an item in the slot*/

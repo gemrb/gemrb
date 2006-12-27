@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.110 2006/12/25 18:25:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.111 2006/12/27 14:05:35 wjpalenstijn Exp $
  *
  */
 
@@ -182,7 +182,11 @@ void Button::Draw(unsigned short x, unsigned short y)
 		if (Flags & IE_GUI_BUTTON_CENTER_PICTURES) {
 			xOffs = Width/2;
 			yOffs = Height/2;
+		} else if (Flags & IE_GUI_BUTTON_CENTER_FIRST_PIC) {
+			xOffs = Width/2 - (*iter)->Width/2 + (*iter)->XPos;
+			yOffs = Height/2 - (*iter)->Height/2 + (*iter)->YPos;
 		}
+
 		for (; iter != PictureList.end(); ++iter) {
 			video->BlitSprite( *iter, x + XPos + xOffs, y + YPos + yOffs, true );
 		}

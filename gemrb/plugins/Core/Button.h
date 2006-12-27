@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.55 2006/08/10 21:34:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.h,v 1.56 2006/12/27 14:05:35 wjpalenstijn Exp $
  *
  */
 
@@ -71,6 +71,7 @@ class Palette;
 #define IE_GUI_BUTTON_PLAYONCE     0x00040000
 
 #define IE_GUI_BUTTON_CENTER_PICTURES 0x00080000 // center button's PictureList
+#define IE_GUI_BUTTON_CENTER_FIRST_PIC 0x00100000 // center button's PictureList's first image; align the rest to that (mutually exclusive with CENTER_PICTURES)
 
 #define IE_GUI_BUTTON_NORMAL       0x00000004   // default button, doesn't stick
 

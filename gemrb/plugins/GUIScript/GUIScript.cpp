@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.429 2006/12/25 23:27:49 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.430 2006/12/27 14:05:35 wjpalenstijn Exp $
  *
  */
 
@@ -4403,10 +4403,10 @@ Sprite2D* GetUsedWeaponIcon(Item *item, int which)
 }
 
 PyDoc_STRVAR( GemRB_SetItemIcon__doc,
-"SetItemIcon(WindowIndex, ControlIndex, ITMResRef[, type, tooltip, Function])\n\n"
+"SetItemIcon(WindowIndex, ControlIndex, ITMResRef[, type, tooltip, Function, ITM2ResRef])\n\n"
 "Sets Item icon image on a button. 0/1 - Inventory Icons, 2 - Description Icon, 3 - No icon." );
 
-PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int tooltip, int Function)
+PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int tooltip, int Function, const char *Item2ResRef)
 {
 	Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
 	if (!btn) {
@@ -4421,7 +4421,7 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 			return Py_None;
 		}
 
-		btn->SetFlags( IE_GUI_BUTTON_PICTURE, BM_OR );
+		btn->SetFlags( IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_CENTER_FIRST_PIC, BM_OR );
 		Sprite2D* Picture;
 		int i;
 		switch (Which) {
@@ -4435,9 +4435,22 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 				if (Picture)
 					btn->StackPicture(Picture);
 			}
-			return Py_None; //no incref here!
+			Picture = NULL;
+			break;
 		case 4: case 5:
+			btn->ClearPictureList();
 			Picture = GetUsedWeaponIcon(item, Which-4);
+			if (Item2ResRef) {
+				Item* item2 = core->GetItem(Item2ResRef);
+				if (item2) {
+					Sprite2D* Picture2;
+					Picture2 = core->GetBAMSprite(item2->ItemIcon, -1, Which-4);
+					if (Picture2) btn->StackPicture(Picture2);
+					core->FreeItem( item2, Item2ResRef, false );
+				}
+				if (Picture) btn->StackPicture(Picture);
+				Picture = NULL;
+			}
 			break;
 		default:
 			Picture = NULL;
@@ -4465,13 +4478,14 @@ static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
 	int Which = 0;
 	int tooltip = 0;
 	int Function = 0;
+	const char* Item2ResRef = 0;
 
-	if (!PyArg_ParseTuple( args, "iis|iii", &wi, &ci, &ItemResRef, &Which, &tooltip, &Function )) {
+	if (!PyArg_ParseTuple( args, "iis|iiis", &wi, &ci, &ItemResRef, &Which, &tooltip, &Function, &Item2ResRef )) {
 		return AttributeError( GemRB_SetItemIcon__doc );
 	}
 
 
-	PyObject *ret = SetItemIcon(wi, ci, ItemResRef, Which, tooltip, Function);
+	PyObject *ret = SetItemIcon(wi, ci, ItemResRef, Which, tooltip, Function, Item2ResRef);
 	if (ret) {
 		Py_INCREF(ret);
 	}
@@ -6874,8 +6888,17 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 					slot = actor->GetQuickSlot(action-ACT_WEAPON1);
 			}
 			if (slot!=0xffff) {
-				//no slot translation required
 				CREItem *item = actor->inventory.GetSlotItem(slot);
+				//no slot translation required
+				int launcherslot = actor->inventory.FindSlotRangedWeapon(slot);
+				const char* Item2ResRef = 0;
+				if (launcherslot != actor->inventory.GetFistSlot()) {
+					// launcher/projectile in this slot
+					CREItem* item2;
+					item2 = actor->inventory.GetSlotItem(launcherslot);
+					Item2ResRef = item2->ItemResRef;
+				}
+
 				if (item) {
 					int mode = 4;
 					if (slot == fistweapon) {
@@ -6886,7 +6909,7 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 							break;
 						}
 					}
-					SetItemIcon(wi, ci, item->ItemResRef,mode,(item->Flags&IE_INV_ITEM_IDENTIFIED)?2:1, i+1);
+					SetItemIcon(wi, ci, item->ItemResRef,mode,(item->Flags&IE_INV_ITEM_IDENTIFIED)?2:1, i+1, Item2ResRef);
 					if (usedslot == slot) {
 						btn->EnableBorder(0, true);
 						if (core->GetGameControl()->target_mode&TARGET_MODE_ATTACK) {
@@ -6935,7 +6958,7 @@ jump_label:
 				//no slot translation required
 				CREItem *item = actor->inventory.GetSlotItem(slot);
 				if (item) {
-					SetItemIcon(wi, ci, item->ItemResRef,0,(item->Flags&IE_INV_ITEM_IDENTIFIED)?2:1, i+1);
+					SetItemIcon(wi, ci, item->ItemResRef,0,(item->Flags&IE_INV_ITEM_IDENTIFIED)?2:1, i+1, 0);
 				}
 			}
 		}

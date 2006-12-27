@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.97 2006/12/26 14:08:16 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.98 2006/12/27 14:05:35 wjpalenstijn Exp $
  *
  */
 
@@ -841,8 +841,12 @@ int Inventory::FindRangedProjectile(unsigned int type)
 int Inventory::FindRangedWeapon()
 {
 	if (Equipped>=0) return SLOT_FIST;
-	unsigned int slot = Equipped+SLOT_MELEE;
+	return FindSlotRangedWeapon(Equipped+SLOT_MELEE);
+}
 
+int Inventory::FindSlotRangedWeapon(unsigned int slot)
+{
+	if ((int)slot >= SLOT_MELEE) return SLOT_FIST;
 	CREItem *Slot;   
 	Item *itm = GetItemPointer(slot, Slot);
 	if (!itm) return SLOT_FIST;
@@ -853,8 +857,9 @@ int Inventory::FindRangedWeapon()
 		type = ext_header->ProjectileQualifier;
 	}
 	core->FreeItem(itm, Slot->ItemResRef, false);
-	return FindTypedRangedWeapon(type);
+	return FindTypedRangedWeapon(type);	
 }
+
 
 // find bow for a specific projectile type
 int Inventory::FindTypedRangedWeapon(unsigned int type)
