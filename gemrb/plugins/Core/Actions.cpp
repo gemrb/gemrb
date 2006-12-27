@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.96 2006/11/26 23:19:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.97 2006/12/27 22:35:47 avenger_teambg Exp $
  *
  */
 
@@ -242,13 +242,8 @@ void GameScript::SetNamelessClass(Scriptable* /*Sender*/, Action* parameters)
 void GameScript::SetNamelessDisguise(Scriptable* Sender, Action* parameters)
 {
 	SetVariable(Sender, "APPEARANCE", "GLOBAL", parameters->int0Parameter);
-//maybe add a guiscript call here ?
-/*
-	if (parameters->int0Parameter) {
-	} else {
-
-	}
-*/
+	//don't use the error suppressing flag here
+	core->GetGUIScriptEngine()->RunFunction("UpdateAnimation");
 }
 
 void GameScript::ChangeSpecifics(Scriptable* Sender, Action* parameters)
