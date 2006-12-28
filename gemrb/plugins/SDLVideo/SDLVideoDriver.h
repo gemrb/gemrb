@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.70 2006/12/09 15:00:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.71 2006/12/28 09:41:17 wjpalenstijn Exp $
  *
  */
 
@@ -123,7 +123,9 @@ public:
 	/** Creates sprite with alpha channel */
 	void CreateAlpha(Sprite2D *sprite);
 	/** Set Clip Rect */
-	void SetClipRect(Region* clip);
+	void SetClipRect(const Region* clip);
+	/** Get Clip Rect */
+	void GetClipRect(Region& clip);
 	/** Convers a Screen Coordinate to a Game Coordinate */
 
 	void ConvertToGame(short& x, short& y)

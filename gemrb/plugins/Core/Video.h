@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.69 2006/12/09 15:00:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.70 2006/12/28 09:41:17 wjpalenstijn Exp $
  *
  */
 
@@ -173,7 +173,9 @@ public:
 	/** Sets the Fading to Color Percentage */
 	virtual void SetFadePercent(int percent) = 0;
 	/** Sets Clip Rectangle */
-	virtual void SetClipRect(Region* clip) = 0;
+	virtual void SetClipRect(const Region* clip) = 0;
+	/** Gets Clip Rectangle */
+	virtual void GetClipRect(Region& clip) = 0;
 	/** returns the current mouse coordinates */
 	virtual void GetMousePos(int &x, int &y) = 0;
 	/** moves the mouse forcibly */

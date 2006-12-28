@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.150 2006/12/28 09:28:15 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.151 2006/12/28 09:41:17 wjpalenstijn Exp $
  *
  */
 
@@ -2143,20 +2143,31 @@ void SDLVideoDriver::SetFadePercent(int percent)
 	fadeColor.a = (255 * percent ) / 100;
 }
 
-void SDLVideoDriver::SetClipRect(Region* clip)
+void SDLVideoDriver::SetClipRect(const Region* clip)
 {
 	if (clip) {
 		SDL_Rect tmp;
-		SDL_Rect* rect = &tmp;
-		rect->x = clip->x;
-		rect->y = clip->y;
-		rect->w = clip->w;
-		rect->h = clip->h;
-		SDL_SetClipRect( backBuf, rect );
+		tmp.x = clip->x;
+		tmp.y = clip->y;
+		tmp.w = clip->w;
+		tmp.h = clip->h;
+		SDL_SetClipRect( backBuf, &tmp );
 	} else {
 		SDL_SetClipRect( backBuf, NULL );
 	}
 }
+
+void SDLVideoDriver::GetClipRect(Region& clip)
+{
+	SDL_Rect tmp;
+	SDL_GetClipRect( backBuf, &tmp );
+
+	clip.x = tmp.x;
+	clip.y = tmp.y;
+	clip.w = tmp.w;
+	clip.h = tmp.h;
+}
+
 
 void SDLVideoDriver::GetMousePos(int &x, int &y)
 {
