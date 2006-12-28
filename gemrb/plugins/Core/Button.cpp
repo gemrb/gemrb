@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.114 2006/12/27 14:41:59 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.115 2006/12/28 14:13:18 wjpalenstijn Exp $
  *
  */
 
@@ -184,6 +184,10 @@ void Button::Draw(unsigned short x, unsigned short y)
 			// Center the hotspots of all pictures
 			xOffs = Width/2;
 			yOffs = Height/2;
+		} else if (Flags & IE_GUI_BUTTON_BG1_PAPERDOLL) {
+			// Display as-is
+			xOffs = 0;
+			yOffs = 0;
 		} else {
 			// Center the first picture, and align the rest to that
 			xOffs = Width/2 - (*iter)->Width/2 + (*iter)->XPos;

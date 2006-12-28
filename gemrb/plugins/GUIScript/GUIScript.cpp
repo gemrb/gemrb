@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.432 2006/12/27 22:07:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.433 2006/12/28 14:13:17 wjpalenstijn Exp $
  *
  */
 
@@ -2767,7 +2767,10 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 		btn->ClearPictureList();
 	btn->StackPicture(Picture);
 	if (Picture2) {
+		btn->SetFlags ( IE_GUI_BUTTON_BG1_PAPERDOLL, BM_OR );
 		btn->StackPicture( Picture2 );
+	} else if (type == 0) {
+		btn->SetFlags ( ~IE_GUI_BUTTON_BG1_PAPERDOLL, BM_AND );
 	}
 
 	Py_INCREF( Py_None );
