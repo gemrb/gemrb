@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.115 2006/12/28 14:13:18 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.116 2006/12/28 14:26:16 wjpalenstijn Exp $
  *
  */
 
@@ -537,6 +537,7 @@ void Button::RedrawButton(const char* VariableName, unsigned int Sum)
 void Button::SetPicture(Sprite2D* newpic)
 {
 	core->GetVideoDriver()->FreeSprite( Picture );
+	ClearPictureList();
 	Picture = newpic;
 	Changed = true;
 	Flags |= IE_GUI_BUTTON_PICTURE;

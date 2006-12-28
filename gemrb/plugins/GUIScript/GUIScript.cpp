@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.433 2006/12/28 14:13:17 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.434 2006/12/28 14:26:17 wjpalenstijn Exp $
  *
  */
 
@@ -4426,6 +4426,7 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 
 		btn->SetFlags( IE_GUI_BUTTON_PICTURE, BM_OR );
 		Sprite2D* Picture;
+		bool setpicture = true;
 		int i;
 		switch (Which) {
 		case 0: case 1:
@@ -4438,12 +4439,13 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 				if (Picture)
 					btn->StackPicture(Picture);
 			}
+			setpicture = false;
 			Picture = NULL;
 			break;
 		case 4: case 5:
-			btn->ClearPictureList();
 			Picture = GetUsedWeaponIcon(item, Which-4);
 			if (Item2ResRef) {
+				btn->ClearPictureList();
 				Item* item2 = core->GetItem(Item2ResRef);
 				if (item2) {
 					Sprite2D* Picture2;
@@ -4452,14 +4454,15 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 					core->FreeItem( item2, Item2ResRef, false );
 				}
 				if (Picture) btn->StackPicture(Picture);
-				Picture = NULL;
+				setpicture = false;
 			}
 			break;
 		default:
 			Picture = NULL;
 		}
 
-		btn->SetPicture( Picture );
+		if (setpicture)
+			btn->SetPicture( Picture );
 		if (tooltip) {
 			//later getitemname could also return tooltip stuff
 			char *str = core->GetString(item->GetItemName(tooltip==2),0);
