@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.440 2006/12/27 13:54:53 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.441 2006/12/28 20:54:37 avenger_teambg Exp $
  *
  */
 
@@ -2206,6 +2206,8 @@ bool Interface::LoadGemRBINI()
 	SetFeature( ini->GetKeyAsInt( "resources", "KnowWorld", 0 ), GF_KNOW_WORLD );
 	SetFeature( ini->GetKeyAsInt( "resources", "ReverseToHit", 1 ), GF_REVERSE_TOHIT );
 	SetFeature( ini->GetKeyAsInt( "resources", "SaveForHalfDamage", 0 ), GF_SAVE_FOR_HALF );
+	SetFeature( ini->GetKeyAsInt( "resources", "MagicBit", 0 ), GF_MAGICBIT );
+
 	ForceStereo = ini->GetKeyAsInt( "resources", "ForceStereo", 0 );
 
 	FreeInterface( ini );
@@ -3753,7 +3755,7 @@ bool Interface::InitItemTypes()
 	}
 
 	//slottype describes the inventory structure
-	Inventory::Init();
+	Inventory::Init(HasFeature(GF_MAGICBIT));
 	int SlotTypeTable = LoadTable( "slottype" );
 	TableMgr *st = GetTable(SlotTypeTable);
 	if (slottypes) {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.101 2006/12/27 18:48:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.102 2006/12/28 20:54:37 avenger_teambg Exp $
  *
  */
 
@@ -41,6 +41,7 @@ static int SLOT_LEFT = -1;
 
 //IWD2 style slots
 static bool IWD2 = false;
+static int MagicBit = 0;
 
 static void InvalidSlot(int slot)
 {
@@ -59,7 +60,7 @@ inline Item *Inventory::GetItemPointer(ieDword slot, CREItem *&item)
 
 #define addr(s,m)   (size_t)&(((s->m)
 
-void Inventory::Init()
+void Inventory::Init(int mb)
 {
 	SLOT_MAGIC=-1;
 	SLOT_FIST=-1;
@@ -72,6 +73,7 @@ void Inventory::Init()
 	SLOT_LEFT=-1;
 	//TODO: set this correctly
 	IWD2 = false;
+	MagicBit = mb;
 }
 
 Inventory::Inventory()
@@ -132,6 +134,14 @@ void Inventory::CalculateWeight()
 				if (!(slot->Flags & IE_INV_ITEM_CRITICAL)) {
 					slot->Flags |= IE_INV_ITEM_DESTRUCTIBLE;
 				}
+				//this is for converting IWD items magic flag
+				if (MagicBit) {
+					if (slot->Flags&IE_INV_ITEM_UNDROPPABLE) {
+						slot->Flags|=IE_INV_ITEM_MAGICAL;
+						slot->Flags&=~IE_INV_ITEM_UNDROPPABLE;
+					}
+				}
+
 				if (!(slot->Flags & IE_INV_ITEM_MOVABLE)) {
 					slot->Flags |= IE_INV_ITEM_UNDROPPABLE;
 				}
@@ -519,11 +529,11 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 		if (!(core->QuerySlotType(i)&slottype))
 			continue;
 		//the slot has been disabled for this actor
-	        if (i>=SLOT_MELEE && i<=LAST_MELEE) {
-        		if (Owner->GetQuickSlot(i-SLOT_MELEE)==0xffff) {
+		if (i>=SLOT_MELEE && i<=LAST_MELEE) {
+			if (Owner->GetQuickSlot(i-SLOT_MELEE)==0xffff) {
 				continue;
 			}
-	        }
+		}
 		int part_res = AddSlotItem (item, i);
 		if (part_res == 2) return 2;
 		else if (part_res == 1) res = 1;
@@ -1384,7 +1394,7 @@ void Inventory::UpdateWeaponAnimation()
 
 	if (header)
 		memcpy(MeleeAnimation,header->MeleeAnimation,
-			   sizeof(MeleeAnimation) );
+			 sizeof(MeleeAnimation) );
 	if (itm)
 		core->FreeItem( itm, Slot->ItemResRef, false );
 	Owner->SetUsedWeapon(AnimationType, MeleeAnimation, WeaponType);
