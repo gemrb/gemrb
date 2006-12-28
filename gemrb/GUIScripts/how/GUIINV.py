@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIINV.py,v 1.18 2006/12/25 23:27:50 wjpalenstijn Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIINV.py,v 1.19 2006/12/28 21:05:10 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -40,6 +40,7 @@ PortraitWindow = None
 OptionsWindow = None
 OldPortraitWindow = None
 OldOptionsWindow = None
+OverSlot = None
 
 def OpenInventoryWindow ():
 	global InventoryWindow, OptionsWindow, PortraitWindow
@@ -86,7 +87,10 @@ def OpenInventoryWindow ():
 	#Ground Item
 	for i in range (5):
 		Button = GemRB.GetControl (Window, i+68)
+		GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_ENTER_BUTTON, "MouseEnterGround")
+		GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_LEAVE_BUTTON, "MouseLeaveGround")
 		GemRB.SetVarAssoc (Window, Button, "GroundItemButton", i)
+		GemRB.SetButtonSprites (Window, Button, "STONSLOT",0,0,1,2,3)
 		GemRB.SetButtonFont (Window, Button, "NUMBER")
 		GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,128,128,255,64,0,1)
 
@@ -136,10 +140,14 @@ def OpenInventoryWindow ():
 		SlotType = GemRB.GetSlotType (slot+1)
 		if SlotType["ID"]:
 			Button = GemRB.GetControl (Window, SlotType["ID"])
+			GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_ENTER_BUTTON, "MouseEnterSlot")
+			GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_LEAVE_BUTTON, "MouseLeaveSlot")
 			GemRB.SetVarAssoc (Window, Button, "ItemButton", slot+1)
+			GemRB.SetButtonSprites (Window, Button, "STONSLOT",0,0,1,2,3)
 			GemRB.SetButtonFont (Window, Button, "NUMBER")
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
 			GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,128,128,255,64,0,1)
+			GemRB.SetButtonBorder (Window, Button, 1,0,0,2,2,32,32,255,0,0,0)
 
 	GemRB.SetVar ("TopIndex", 0)
 	SetSelectionChangeHandler (UpdateInventoryWindow)
@@ -327,14 +335,21 @@ def RefreshInventoryWindow ():
 		if Slot != None:
 			item = GemRB.GetItem (Slot['ItemResRef'])
 			identified = Slot["Flags"] & IE_INV_ITEM_IDENTIFIED
+			magical = Slot["Flags"] & IE_INV_ITEM_MAGICAL
+
 			GemRB.SetItemIcon (Window, Button, Slot['ItemResRef'],0)
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
 			if not identified or item["ItemNameIdentified"] == -1:
 				GemRB.SetTooltip (Window, Button, item["ItemName"])
 				GemRB.EnableButtonBorder (Window, Button, 0, 1)
+				GemRB.EnableButtonBorder (Window, Button, 1, 0)
 			else:
 				GemRB.SetTooltip (Window, Button, item["ItemNameIdentified"])
 				GemRB.EnableButtonBorder (Window, Button, 0, 0)
+				if magical:
+					GemRB.EnableButtonBorder (Window, Button, 1, 1)
+				else:
+					GemRB.EnableButtonBorder (Window, Button, 1, 0)
 
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OnDragItemGround")
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenGroundItemInfoWindow")
@@ -410,13 +425,19 @@ def UpdateSlot (pc, slot):
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
 
-	if itemtype>=0 and GemRB.CanUseItemType(itemtype, SlotType["Type"]):
-		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SECOND)
+	if OverSlot == slot+1:
+		if GemRB.CanUseItemType(itemtype, SlotType["Type"]):
+			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SELECTED)
+		else:
+			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 	else:
-		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
+		if (SlotType["Type"]&SLOT_INVENTORY) or not GemRB.CanUseItemType(itemtype, SlotType["Type"]):
+			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
+		else:
+			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SECOND)
 
-	if slot_item and (GemRB.GetEquippedQuickSlot (pc)==slot+1 or GemRB.GetEquippedAmmunition (pc)==slot+1):
-		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SECOND)
+		if slot_item and (GemRB.GetEquippedQuickSlot (pc)==slot+1 or GemRB.GetEquippedAmmunition (pc)==slot+1):
+			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_THIRD)
 
 	return
 
@@ -636,6 +657,40 @@ def OpenGroundItemInfoWindow ():
 	DisplayItem(slot_item["ItemResRef"], value)
 	return
 
+def MouseEnterSlot ():
+	global OverSlot
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	OverSlot = GemRB.GetVar ("ItemButton")
+	if GemRB.IsDraggingItem():
+		UpdateSlot (pc, OverSlot-1)
+	return
+
+def MouseLeaveSlot ():
+	global OverSlot
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	if slot == OverSlot or not GemRB.IsDraggingItem ():
+		OverSlot = None
+	UpdateSlot (pc, slot-1)
+	return
+
+def MouseEnterGround ():
+	Window = InventoryWindow
+	i = GemRB.GetVar("GroundItemButton")
+	Button = GemRB.GetControl (Window, i+68)
+	if GemRB.IsDraggingItem():
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SELECTED)
+	return
+
+def MouseLeaveGround ():
+	Window = InventoryWindow
+	i = GemRB.GetVar("GroundItemButton")
+	Button = GemRB.GetControl (Window, i+68)
+	if GemRB.IsDraggingItem():
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SECOND)
+	return
 
 ###################################################
 # End of file GUIINV.py
