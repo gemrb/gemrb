@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.h,v 1.25 2006/01/28 19:56:34 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.h,v 1.26 2006/12/28 11:05:41 wjpalenstijn Exp $
  *
  */
 
@@ -77,15 +77,22 @@ private:
 
 	short xPos[256];
 	short yPos[256];
+
+	// For the temporary bitmap
+	unsigned char* tmpPixels;
+	unsigned int width, height;
 public:
 	/** ResRef of the Font image */
 	ieResRef ResRef;
 	int maxHeight;
 	Region size[256];
 public:
-	Font(int w, int h, Palette* palette, bool cK, int index);
+	Font(int w, int h, Palette* palette);
 	~Font(void);
-	void AddChar(void* spr, int w, int h, short xPos, short yPos);
+	void AddChar(unsigned char* spr, int w, int h, short xPos, short yPos);
+	/** Call this after adding all characters */
+	void FinalizeSprite(bool cK, int index);
+
 	void Print(Region rgn, const unsigned char* string, Palette* color,
 		unsigned char Alignment, bool anchor = false,
 		Font* initials = NULL, Sprite2D* cursor = NULL,
@@ -94,6 +101,7 @@ public:
 		Palette* color, unsigned char Alignment,
 		Font* initials = NULL, Sprite2D* cursor = NULL,
 		unsigned int curpos = 0, bool NoColor = false);
+
 	Palette* GetPalette();
 	void SetPalette(Palette* pal);
 	/** Returns width of the string rendered in this font in pixels */

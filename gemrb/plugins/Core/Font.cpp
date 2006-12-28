@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.50 2006/08/11 23:17:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Font.cpp,v 1.51 2006/12/28 11:05:41 wjpalenstijn Exp $
  *
  */
 
@@ -48,15 +48,20 @@ inline size_t mystrlen(const char* string)
 	return count;
 }
 
-Font::Font(int w, int h, Palette* pal, bool cK, int index)
+Font::Font(int w, int h, Palette* pal)
 {
 	lastX = 0;
 	count = 0;
 	FirstChar = 0;
-	void* pixels = malloc( w* h );
+	sprBuffer = 0;
+
+	width = w;
+	height = h;
+	tmpPixels = (unsigned char*)malloc(width*height);
+
 	memset( xPos, 0, sizeof( xPos) );
 	memset( yPos, 0, sizeof( yPos) );
-	sprBuffer = core->GetVideoDriver()->CreateSprite8( w, h, 8, pixels, pal ? pal->col : 0, cK, index );
+
 	pal->IncRef();
 	palette = pal;
 	maxHeight = h;
@@ -69,7 +74,13 @@ Font::~Font(void)
 	video->FreeSprite( sprBuffer );
 }
 
-void Font::AddChar(void* spr, int w, int h, short xPos, short yPos)
+void Font::FinalizeSprite(bool cK, int index)
+{
+	sprBuffer = core->GetVideoDriver()->CreateSprite8( width, height, 8, tmpPixels, palette ? palette->col : 0, cK, index );
+	tmpPixels = 0;
+}
+
+void Font::AddChar(unsigned char* spr, int w, int h, short xPos, short yPos)
 {
 	if (!spr) {
 		size[count].x = 0;
@@ -81,13 +92,12 @@ void Font::AddChar(void* spr, int w, int h, short xPos, short yPos)
 		count++;
 		return;
 	}
-	unsigned char * startPtr = ( unsigned char * ) sprBuffer->pixels;
-	unsigned char * currPtr;
+	unsigned char * currPtr = tmpPixels + lastX;
 	unsigned char * srcPtr = ( unsigned char * ) spr;
 	for (int y = 0; y < h; y++) {
-		currPtr = startPtr + ( y * sprBuffer->Width ) + lastX;
 		memcpy( currPtr, srcPtr, w );
 		srcPtr += w;
+		currPtr += width;
 	}
 	size[count].x = lastX;
 	size[count].y = 0;

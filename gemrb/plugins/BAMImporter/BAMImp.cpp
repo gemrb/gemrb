@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.50 2006/12/03 20:37:56 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.51 2006/12/28 11:05:41 wjpalenstijn Exp $
  *
  */
 
@@ -387,7 +387,7 @@ Font* BAMImp::GetFont()
 			h = frames[index].Height;
 	}
 
-	Font* fnt = new Font( w, h, palette, true, 0 );
+	Font* fnt = new Font( w, h, palette );
 	for (i = 0; i < Count; i++) {
 		unsigned int index;
 		if (CyclesCount > 1) {
@@ -400,7 +400,7 @@ Font* BAMImp::GetFont()
 			index = i;
 		}
 
-		void* pixels = GetFramePixels( index );
+		unsigned char* pixels = (unsigned char*)GetFramePixels( index );
 		if( !pixels) {
 			fnt->AddChar( NULL, 0, 0, 0, 0 );
 			continue;
@@ -412,6 +412,9 @@ Font* BAMImp::GetFont()
 		free( pixels );
 	}
 	free( FLT );
+
+	fnt->FinalizeSprite( true, 0 );
+
 	return fnt;
 }
 /** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
