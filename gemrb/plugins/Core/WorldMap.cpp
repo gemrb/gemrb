@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.25 2006/08/11 23:17:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.26 2006/12/28 17:45:00 avenger_teambg Exp $
  *
  */
 
@@ -279,6 +279,11 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 		for(int d=0;d<4;d++) {
 			int j=ae->AreaLinksIndex[d];
 			int k=j+ae->AreaLinksCount[d];
+			if ((size_t) k>=area_links.size()) {
+				printMessage("WorldMap","The worldmap file is corrupted... and it would crash right now!\n",RED);
+				printf("Entry #: %d  Direction: %d\n",i,d);
+				break;
+			}
 			for(;j<k;j++) {
 				WMPAreaLink* al = area_links[j];
 				WMPAreaEntry* ae2 = area_entries[al->AreaIndex];
