@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.434 2006/12/28 14:26:17 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.435 2006/12/28 21:05:45 avenger_teambg Exp $
  *
  */
 
@@ -115,7 +115,7 @@ static int CHUHeight = 0;
 
 EffectRef learn_spell_ref={"Spell:Learn",NULL,-1};
 
-inline bool valid_number(const char* string, long& val)
+static inline bool valid_number(const char* string, long& val)
 {
 	char* endpr;
 
@@ -124,7 +124,7 @@ inline bool valid_number(const char* string, long& val)
 }
 
 // Like PyString_FromString(), but for ResRef
-inline PyObject* PyString_FromResRef(char* ResRef)
+static inline PyObject* PyString_FromResRef(char* ResRef)
 {
 	unsigned int i;
 
@@ -135,7 +135,7 @@ inline PyObject* PyString_FromResRef(char* ResRef)
 }
 
 // Like PyString_FromString(), but for ResRef
-inline PyObject* PyString_FromAnimID(char* AnimID)
+static inline PyObject* PyString_FromAnimID(char* AnimID)
 {
 	unsigned int i;
 
@@ -148,7 +148,7 @@ inline PyObject* PyString_FromAnimID(char* AnimID)
 /* Sets RuntimeError exception and returns NULL, so this function
  * can be called in `return'. 
  */
-inline PyObject* RuntimeError(char* msg)
+static inline PyObject* RuntimeError(char* msg)
 {
 	printMessage( "GUIScript", "Runtime Error:\n", LIGHT_RED );
 	PyErr_SetString( PyExc_RuntimeError, msg );
@@ -163,7 +163,7 @@ inline PyObject* RuntimeError(char* msg)
  * can be called in `return'. The exception should be set by previous
  * call to e.g. PyArg_ParseTuple()
  */
-inline PyObject* AttributeError(char* doc_string)
+static inline PyObject* AttributeError(char* doc_string)
 {
 	printMessage( "GUIScript", "Syntax Error:\n", LIGHT_RED );
 	PyErr_SetString(PyExc_AttributeError, doc_string);
@@ -173,7 +173,7 @@ inline PyObject* AttributeError(char* doc_string)
 	return NULL;
 }
 
-inline Control *GetControl( int wi, int ci, int ct)
+static inline Control *GetControl( int wi, int ci, int ct)
 {
 	char errorbuffer[256];
 
@@ -216,6 +216,152 @@ static inline void SetFunctionTooltip(int WindowIndex, int ControlIndex, char *t
 		free(txt);
 	}
 	core->SetTooltip((ieWord) WindowIndex, (ieWord) ControlIndex, "");
+}
+
+static inline void DragItem(CREItem *si)
+{
+	if (!si) {
+		return;
+	}
+	Item *item = core->GetItem (si->ItemResRef );
+	if (!item) {
+		return;
+	}
+	core->DragItem(si, item->ItemIcon);
+	core->FreeItem( item, si->ItemResRef, false );
+}
+
+static void ReadSpecialSpells()
+{
+	int i;
+
+	SpecialSpellsCount = 0;
+	int table = core->LoadTable("splspec");
+	if (table>=0) {
+		TableMgr *tab = core->GetTable(table);
+		if (!tab) goto table_loaded;
+		SpecialSpellsCount = tab->GetRowCount();
+		SpecialSpells = (SpellDescType *) malloc( sizeof(SpellDescType) * SpecialSpellsCount);
+		for (i=0;i<SpecialSpellsCount;i++) {
+			strnlwrcpy(SpecialSpells[i].resref, tab->GetRowName(i),8 );
+			//if there are more flags, compose this value into a bitfield
+			SpecialSpells[i].value = atoi(tab->QueryField(i,0) );
+		}
+table_loaded:
+		core->DelTable(table);
+	}
+}
+
+static void ReadUsedItems()
+{
+	int i;
+
+	UsedItemsCount = 0;
+	int table = core->LoadTable("item_use");
+	if (table>=0) {
+		TableMgr *tab = core->GetTable(table);
+		if (!tab) goto table_loaded;
+		UsedItemsCount = tab->GetRowCount();
+		UsedItems = (UsedItemType *) malloc( sizeof(UsedItemType) * UsedItemsCount);
+		for (i=0;i<UsedItemsCount;i++) {
+			strnlwrcpy(UsedItems[i].itemname, tab->GetRowName(i),8 );
+			strnlwrcpy(UsedItems[i].username, tab->QueryField(i,0),32 );
+			//if there are more flags, compose this value into a bitfield
+			UsedItems[i].value = atoi(tab->QueryField(i,1) );
+		}
+table_loaded:
+		core->DelTable(table);
+	}
+}
+
+static void ReadSpecialItems()
+{
+	int i;
+
+	SpecialItemsCount = 0;
+	int table = core->LoadTable("itemspec");
+	if (table>=0) {
+		TableMgr *tab = core->GetTable(table);
+		if (!tab) goto table_loaded;
+		SpecialItemsCount = tab->GetRowCount();
+		SpecialItems = (SpellDescType *) malloc( sizeof(SpellDescType) * SpecialItemsCount);
+		for (i=0;i<SpecialItemsCount;i++) {
+			strnlwrcpy(SpecialItems[i].resref, tab->GetRowName(i),8 );
+			//if there are more flags, compose this value into a bitfield
+			SpecialItems[i].value = atoi(tab->QueryField(i,0) );
+		}
+table_loaded:
+		core->DelTable(table);
+	}
+}
+
+static ieStrRef GetSpellDesc(ieResRef CureResRef)
+{
+	int i;
+
+	if (StoreSpellsCount==-1) {
+		StoreSpellsCount = 0;
+		int table = core->LoadTable("speldesc");
+		if (table>=0) {
+			TableMgr *tab = core->GetTable(table);
+			if (!tab) goto table_loaded;
+			StoreSpellsCount = tab->GetRowCount();
+			StoreSpells = (SpellDescType *) malloc( sizeof(SpellDescType) * StoreSpellsCount);
+			for (i=0;i<StoreSpellsCount;i++) {
+				strnlwrcpy(StoreSpells[i].resref, tab->GetRowName(i),8 );
+				StoreSpells[i].value = atoi(tab->QueryField(i,0) );
+			}
+table_loaded:
+			core->DelTable(table);
+		}
+	}
+	if (StoreSpellsCount==0) {
+		Spell *spell = core->GetSpell(CureResRef);
+		if (!spell) {
+			return 0;
+		}
+		int ret = spell->SpellDescIdentified;
+		core->FreeSpell(spell, CureResRef, 0);
+		return ret;
+	}
+	for (i=0;i<StoreSpellsCount;i++) {
+		if (!strnicmp(StoreSpells[i].resref, CureResRef, 8) ) {
+			return StoreSpells[i].value;
+		}
+	}
+	return 0;
+}
+
+static CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count)
+{
+	CREItem *si = NULL;
+
+	///check if item is undroppable because the actor likes it
+	if (UsedItemsCount==-1) {
+		ReadUsedItems();
+	}	
+	unsigned int i=UsedItemsCount;
+	//we should use GetSlotItem here.
+	//getitem would remove the item from the inventory!
+	si = actor->inventory.GetSlotItem(Slot);
+	while(i--) {
+		if (UsedItems[i].itemname[0] && strnicmp(UsedItems[i].itemname, si->ItemResRef,8) ) {
+			continue;
+		}
+		if (UsedItems[i].username[0] && strnicmp(UsedItems[i].username, actor->GetScriptName(), 32) ) {
+			continue;
+		}
+		core->DisplayString(UsedItems[i].value,0xffffff, IE_STR_SOUND);
+		return NULL;
+	}
+	///fixme: make difference between cursed/unmovable
+	if (! actor->inventory.UnEquipItem( Slot, false )) {
+		// Item is currently undroppable/cursed
+		core->DisplayConstantString(STR_CANT_DROP_ITEM,0xffffff);
+		return NULL;
+	}
+	si = actor->inventory.RemoveItem( Slot, Count );
+	return si;
 }
 
 PyDoc_STRVAR( GemRB_SetInfoTextColor__doc, 
@@ -5100,107 +5246,6 @@ static PyObject* GemRB_GetStoreDrink(PyObject * /*self*/, PyObject* args)
 	return dict;
 }
 
-static void ReadSpecialSpells()
-{
-	int i;
-
-	SpecialSpellsCount = 0;
-	int table = core->LoadTable("splspec");
-	if (table>=0) {
-		TableMgr *tab = core->GetTable(table);
-		if (!tab) goto table_loaded;
-		SpecialSpellsCount = tab->GetRowCount();
-		SpecialSpells = (SpellDescType *) malloc( sizeof(SpellDescType) * SpecialSpellsCount);
-		for (i=0;i<SpecialSpellsCount;i++) {
-			strnlwrcpy(SpecialSpells[i].resref, tab->GetRowName(i),8 );
-			//if there are more flags, compose this value into a bitfield
-			SpecialSpells[i].value = atoi(tab->QueryField(i,0) );
-		}
-table_loaded:
-		core->DelTable(table);
-	}
-}
-
-static void ReadUsedItems()
-{
-	int i;
-
-	UsedItemsCount = 0;
-	int table = core->LoadTable("item_use");
-	if (table>=0) {
-		TableMgr *tab = core->GetTable(table);
-		if (!tab) goto table_loaded;
-		UsedItemsCount = tab->GetRowCount();
-		UsedItems = (UsedItemType *) malloc( sizeof(UsedItemType) * UsedItemsCount);
-		for (i=0;i<UsedItemsCount;i++) {
-			strnlwrcpy(UsedItems[i].itemname, tab->GetRowName(i),8 );
-			strnlwrcpy(UsedItems[i].username, tab->QueryField(i,0),32 );
-			//if there are more flags, compose this value into a bitfield
-			UsedItems[i].value = atoi(tab->QueryField(i,1) );
-		}
-table_loaded:
-		core->DelTable(table);
-	}
-}
-
-static void ReadSpecialItems()
-{
-	int i;
-
-	SpecialItemsCount = 0;
-	int table = core->LoadTable("itemspec");
-	if (table>=0) {
-		TableMgr *tab = core->GetTable(table);
-		if (!tab) goto table_loaded;
-		SpecialItemsCount = tab->GetRowCount();
-		SpecialItems = (SpellDescType *) malloc( sizeof(SpellDescType) * SpecialItemsCount);
-		for (i=0;i<SpecialItemsCount;i++) {
-			strnlwrcpy(SpecialItems[i].resref, tab->GetRowName(i),8 );
-			//if there are more flags, compose this value into a bitfield
-			SpecialItems[i].value = atoi(tab->QueryField(i,0) );
-		}
-table_loaded:
-		core->DelTable(table);
-	}
-}
-
-static ieStrRef GetSpellDesc(ieResRef CureResRef)
-{
-	int i;
-
-	if (StoreSpellsCount==-1) {
-		StoreSpellsCount = 0;
-		int table = core->LoadTable("speldesc");
-		if (table>=0) {
-			TableMgr *tab = core->GetTable(table);
-			if (!tab) goto table_loaded;
-			StoreSpellsCount = tab->GetRowCount();
-			StoreSpells = (SpellDescType *) malloc( sizeof(SpellDescType) * StoreSpellsCount);
-			for (i=0;i<StoreSpellsCount;i++) {
-				strnlwrcpy(StoreSpells[i].resref, tab->GetRowName(i),8 );
-				StoreSpells[i].value = atoi(tab->QueryField(i,0) );
-			}
-table_loaded:
-			core->DelTable(table);
-		}
-	}
-	if (StoreSpellsCount==0) {
-		Spell *spell = core->GetSpell(CureResRef);
-		if (!spell) {
-			return 0;
-		}
-		int ret = spell->SpellDescIdentified;
-		core->FreeSpell(spell, CureResRef, 0);
-		return ret;
-	}
-	for (i=0;i<StoreSpellsCount;i++) {
-		if (!strnicmp(StoreSpells[i].resref, CureResRef, 8) ) {
-			return StoreSpells[i].value;
-		}
-	}
-	return 0;
-}
-
 PyDoc_STRVAR( GemRB_GetStoreCure__doc,
 "GetStoreCure(idx) => dictionary\n\n"
 "Returns the cure structure indexed. Returns None if the index is wrong." );
@@ -5913,35 +5958,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		}
 		si = cc->RemoveItem(Slot, Count);
 	} else {
-
-		///check if item is undroppable because the actor likes it
-		if (UsedItemsCount==-1) {
-			ReadUsedItems();
-		}
-		Slot = core->QuerySlot(Slot);
-		unsigned int i=UsedItemsCount;
-		//we should use GetSlotItem here.
-		//getitem would remove the item from the inventory!
-		si = actor->inventory.GetSlotItem(Slot);
-		while(i--) {
-			if (UsedItems[i].itemname[0] && strnicmp(UsedItems[i].itemname, si->ItemResRef,8) ) {
-				continue;
-			}
-			if (UsedItems[i].username[0] && strnicmp(UsedItems[i].username, actor->GetScriptName(), 32) ) {
-				continue;
-			}
-			core->DisplayString(UsedItems[i].value,0xffffff, IE_STR_SOUND);
-			Py_INCREF( Py_None );
-			return Py_None;
-		}
-		///fixme: make difference between cursed/unmovable
-		if (! actor->inventory.UnEquipItem( Slot, false )) {
-			// Item is currently undroppable/cursed
-			core->DisplayConstantString(STR_CANT_DROP_ITEM,0xffffff);
-			Py_INCREF( Py_None );
-			return Py_None;
-		}
-		si = actor->inventory.RemoveItem( Slot, Count );
+		si = TryToUnequip( actor, core->QuerySlot(Slot), Count );
 		actor->RefreshEffects();
 		actor->ReinitQuickSlots();
 	}
@@ -5963,7 +5980,8 @@ PyDoc_STRVAR( GemRB_DropDraggedItem__doc,
 "If Slot==-1, puts it to a first usable slot. "
 "If Slot==-2, puts it to a ground pile. "
 "If Slot==-3, puts it to the first empty inventory slot. "
-"Returns 0 (unsuccessful), 1 (partial success) or 2 (complete success)." );
+"Returns 0 (unsuccessful), 1 (partial success) or 2 (complete success)."
+"Can also return 3 (swapped item)\n" );
 
 static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 {
@@ -5997,53 +6015,68 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 			return RuntimeError( "No current container" );
 		}
 		res = cc->AddItem(core->GetDraggedItem());
-	} else {
-		int Slottype, Effect;
-		switch(Slot) {
-		case -1:
-			//anything but inventory
-			Slottype = ~SLOT_INVENTORY;
-			Effect = 1;
-			break;
-		case -3:
-			//only inventory
-			Slottype = -1;
-			Effect = 0;
-			break;
-		default:
-			Slot = core->QuerySlot(Slot);
-			Slottype = core->QuerySlotType( Slot );
-			Effect = core->QuerySlotEffects( Slot );
+		if (res == 2) {
+			// Whole amount was placed
+			core->ReleaseDraggedItem ();
 		}
-		CREItem * slotitem = core->GetDraggedItem();
-		Item *item = core->GetItem( slotitem->ItemResRef );
-		if (!item) {
-			return PyInt_FromLong( -1 );
-		}
-		// can't equip item because of similar already equipped
-		if (Effect && item->ItemExcl & actor->inventory.GetEquipExclusion()) {
-			return PyInt_FromLong( 0 );
-		}
-		int Itemtype = item->ItemType;
-		int Use1 = item->UsabilityBitmask;
-		int Use2 = item->KitUsability;
-		core->FreeItem( item, slotitem->ItemResRef, false );
-		//CanUseItemType will check actor's class bits too
-		Slottype =core->CanUseItemType (Itemtype, Slottype, Use1, Use2, actor);
-		if ( Slottype) {
-			res = actor->inventory.AddSlotItem( slotitem, Slot, Slottype );
-			actor->RefreshEffects();
-			actor->ReinitQuickSlots();
+		return PyInt_FromLong( res );
+	}
+
+	int Slottype, Effect;
+	switch(Slot) {
+	case -1:
+		//anything but inventory
+		Slottype = ~SLOT_INVENTORY;
+		Effect = 1;
+		break;
+	case -3:
+		//only inventory
+		Slottype = -1;
+		Effect = 0;
+		break;
+	default:
+		Slot = core->QuerySlot(Slot);
+		Slottype = core->QuerySlotType( Slot );
+		Effect = core->QuerySlotEffects( Slot );
+	}
+	CREItem * slotitem = core->GetDraggedItem();
+	Item *item = core->GetItem( slotitem->ItemResRef );
+	if (!item) {
+		return PyInt_FromLong( -1 );
+	}
+	// can't equip item because of similar already equipped
+	if (Effect && item->ItemExcl & actor->inventory.GetEquipExclusion()) {
+		return PyInt_FromLong( 0 );
+	}
+	int Itemtype = item->ItemType;
+	int Use1 = item->UsabilityBitmask;
+	int Use2 = item->KitUsability;
+	core->FreeItem( item, slotitem->ItemResRef, false );
+	//CanUseItemType will check actor's class bits too
+	Slottype =core->CanUseItemType (Itemtype, Slottype, Use1, Use2, actor);
+	if ( !Slottype) {
+		return PyInt_FromLong( 0 );
+	}
+	res = actor->inventory.AddSlotItem( slotitem, Slot, Slottype );
+	//couldn't place item there, try swapping (only if slot is explicit)
+	if ((res == 0) && (Slot >= 0) ) {
+		CREItem *tmp = TryToUnequip(actor, Slot, 0 );
+		if (tmp) {
+			//this addslotitem MUST succeed because the slot was
+			//just emptied (canuseitemtype already confirmed too)
+			actor->inventory.AddSlotItem( slotitem, Slot, Slottype );
+			core->ReleaseDraggedItem ();
+			DragItem(tmp);
+			res = 3;
 		} else {
 			res = 0;
 		}
+		goto done;
 	}
-
-	if (res == 2) {
-		// Whole amount was placed
-		core->ReleaseDraggedItem ();
-	} 
-
+	core->ReleaseDraggedItem ();
+done:
+	actor->RefreshEffects();
+	actor->ReinitQuickSlots();
 	//this is PST specific, change animation
 	core->GetGUIScriptEngine()->RunFunction("UpdateAnimation", false);
 	return PyInt_FromLong( res );
