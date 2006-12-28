@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.115 2006/09/02 10:32:33 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.116 2006/12/28 20:56:41 avenger_teambg Exp $
  *
  */
 
@@ -40,6 +40,7 @@ static ColorSet* randcolors=NULL;
 static int FistRows=-1;
 static FistResType *fistres=NULL;
 static ieResRef DefaultFist={"FIST"};
+static int MagicBit = 0;
 
 void ReleaseMemoryCRE()
 {
@@ -65,6 +66,7 @@ CREImp::CREImp(void)
 void SetupFist(Inventory &inventory, int slot, int row, int col)
 {
 	if (FistRows<0) {
+		MagicBit = core->HasFeature(GF_MAGICBIT);
 		FistRows=0;
 		int table = core->LoadTable( "fistweap" );
 		TableMgr *fist = core->GetTable( table );
@@ -1563,7 +1565,16 @@ int CREImp::PutInventory(DataStream *stream, Actor *actor, unsigned int size)
 		stream->WriteWord( &it->Usages[0]);
 		stream->WriteWord( &it->Usages[1]);
 		stream->WriteWord( &it->Usages[2]);
-		stream->WriteDword( &it->Flags);
+		tmpDword = it->Flags;
+		//IWD uses this bit differently
+		if (MagicBit) {
+			if (it->Flags&IE_INV_ITEM_MAGICAL) {
+				tmpDword|=IE_INV_ITEM_UNDROPPABLE;
+			} else {
+				tmpDword&=~IE_INV_ITEM_UNDROPPABLE;
+			}
+		}
+		stream->WriteDword( &tmpDword);
 		indices[i] = ItemCount++;
 	}
 	for (i=0;i<size;i++) {
