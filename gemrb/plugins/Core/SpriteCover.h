@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SpriteCover.h,v 1.1 2005/11/22 20:49:39 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/SpriteCover.h,v 1.2 2006/12/28 11:49:26 wjpalenstijn Exp $
  *
  */
 
@@ -39,6 +39,7 @@ public:
 	unsigned char* pixels;
 	int worldx, worldy; // world coords for which the cover has been computed
 	int XPos, YPos, Width, Height;
+	int flags;
 	SpriteCover(void);
 	~SpriteCover(void);
 

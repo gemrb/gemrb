@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.259 2006/11/28 21:45:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.260 2006/12/28 11:49:26 wjpalenstijn Exp $
  *
  */
 
@@ -1354,7 +1354,7 @@ SpriteCover* Map::BuildSpriteCover(int x, int y, int xpos, int ypos,
 	sc->Height = height;
 
 	Video* video = core->GetVideoDriver();
-	video->InitSpriteCover(sc);
+	video->InitSpriteCover(sc, flags);
 
 	unsigned int wpcount = GetWallCount();
 	unsigned int i;
@@ -1365,7 +1365,7 @@ SpriteCover* Map::BuildSpriteCover(int x, int y, int xpos, int ypos,
 		if (!wp) continue;
 		if (!wp->PointCovered(x, y)) continue;
 
-		video->AddPolygonToSpriteCover(sc, wp, flags);
+		video->AddPolygonToSpriteCover(sc, wp);
 	}
 
 	return sc;

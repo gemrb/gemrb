@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.151 2006/12/28 09:41:17 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.152 2006/12/28 11:49:27 wjpalenstijn Exp $
  *
  */
 
@@ -389,10 +389,10 @@ bool SDLVideoDriver::ToggleGrabInput()
 	}
 }
 
-void SDLVideoDriver::InitSpriteCover(SpriteCover* sc)
+void SDLVideoDriver::InitSpriteCover(SpriteCover* sc, int flags)
 {
 	int i;
-
+	sc->flags = flags;
 	sc->pixels = new unsigned char[sc->Width * sc->Height];
 	for (i = 0; i < sc->Width*sc->Height; ++i)
 		sc->pixels[i] = 0;
@@ -410,7 +410,7 @@ void SDLVideoDriver::DestroySpriteCover(SpriteCover* sc)
 //	1 - dither if polygon wants it
 //	2 - always dither
 void SDLVideoDriver::AddPolygonToSpriteCover(SpriteCover* sc,
-											 Wall_Polygon* poly, int flags)
+											 Wall_Polygon* poly)
 {
 
 	// possible TODO: change the cover to use a set of intervals per line?
@@ -456,10 +456,10 @@ void SDLVideoDriver::AddPolygonToSpriteCover(SpriteCover* sc,
 			if (lt >= rt) { line += sc->Width; continue; } // clipped
 			int dither;
 
-			if (flags == 1) {
+			if (sc->flags == 1) {
 				dither = poly->wall_flag & WF_DITHER;
 			} else {
-				dither = flags;
+				dither = sc->flags;
 			}
 			if (dither) {
 				unsigned char* pix = line + lt;

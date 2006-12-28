@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.70 2006/12/28 09:41:17 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.71 2006/12/28 11:49:26 wjpalenstijn Exp $
  *
  */
 
@@ -91,9 +91,9 @@ public:
 	virtual short GetWidth() = 0;
 	virtual short GetHeight() = 0;
 
-	virtual void InitSpriteCover(SpriteCover* sc) = 0;
-	virtual void AddPolygonToSpriteCover(SpriteCover* sc, Wall_Polygon* poly,
-										 int flags) = 0;
+	virtual void InitSpriteCover(SpriteCover* sc, int flags) = 0;
+	virtual void AddPolygonToSpriteCover(SpriteCover* sc,
+										 Wall_Polygon* poly) = 0;
 	virtual void DestroySpriteCover(SpriteCover* sc) = 0;
 
 	virtual Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask,

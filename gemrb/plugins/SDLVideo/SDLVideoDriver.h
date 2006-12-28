@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.71 2006/12/28 09:41:17 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.72 2006/12/28 11:49:27 wjpalenstijn Exp $
  *
  */
 
@@ -61,8 +61,8 @@ public:
 	short GetWidth() { return ( disp ? disp->w : 0 ); };
 	short GetHeight() { return ( disp ? disp->h : 0 ); };
 
-	void InitSpriteCover(SpriteCover* sc);
-	void AddPolygonToSpriteCover(SpriteCover* sc,Wall_Polygon* poly,int flags);
+	void InitSpriteCover(SpriteCover* sc, int flags);
+	void AddPolygonToSpriteCover(SpriteCover* sc, Wall_Polygon* poly);
 	void DestroySpriteCover(SpriteCover* sc);
 
 	void GetMousePos(int &x, int &y);
