@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.97 2006/12/27 22:35:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.98 2006/12/28 21:11:00 avenger_teambg Exp $
  *
  */
 
@@ -1546,6 +1546,9 @@ void GameScript::PlaySequence(Scriptable* Sender, Action* parameters)
 			AreaAnimation* anim = Sender->GetCurrentArea( )->GetAnimation( parameters->string0Parameter);
 			if (anim) {
 				//set animation's cycle to parameters->int0Parameter;
+				anim->sequence=parameters->int0Parameter;
+				anim->frame=0;
+				//what else to be done???
 			}
 			return;
 		}
