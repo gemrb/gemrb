@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.31 2006/12/03 17:16:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMapControl.cpp,v 1.32 2006/12/28 09:41:37 wjpalenstijn Exp $
  */
 
 #ifndef WIN32
@@ -43,13 +43,13 @@ WorldMapControl::WorldMapControl(const char *font, int direction)
 		Game* game = core->GetGame();
 		WorldMap* worldmap = core->GetWorldMap();
 		strncpy(currentArea, game->CurrentArea, 8);
-printf("CurrentArea:  %s\n",currentArea);
+		printf("CurrentArea:  %s\n",currentArea);
 		int entry = core->GetAreaAlias(currentArea);
 		if (entry >= 0) {
 			WMPAreaEntry *m = worldmap->GetEntry(entry);
 			strncpy(currentArea, m->AreaResRef, 8);
 		}
-printf("CurrentArea NEW:  %s\n",currentArea);
+		printf("CurrentArea NEW:  %s\n",currentArea);
 		worldmap->CalculateDistances(currentArea, Value);
 	}
 	
@@ -96,6 +96,9 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 	Changed = false;
 	Video* video = core->GetVideoDriver();
 	Region r( XWin+XPos, YWin+YPos, Width, Height );
+	Region clipbackup;
+	video->GetClipRect(clipbackup);
+	video->SetClipRect(&r);
 	video->BlitSprite( worldmap->GetMapMOS(), MAP_TO_SCREENX(0), MAP_TO_SCREENY(0), true, &r );
 
 	unsigned int i;
@@ -118,6 +121,7 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 
 	// Draw WMP entry labels
 	if (ftext==NULL) {
+		video->SetClipRect(&clipbackup);
 		return;
 	}
 	for(i=0;i<ec;i++) {
@@ -133,8 +137,6 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 		}
 
 		Region r2 = Region( MAP_TO_SCREENX(m->X-xpos), MAP_TO_SCREENY(m->Y-ypos), w, h );
-		if (r2.y+r2.h<r.y)
-			 continue;
 		if (!m->GetCaption())
 			continue;
 
@@ -154,6 +156,7 @@ void WorldMapControl::Draw(unsigned short XWin, unsigned short YWin)
 		ftext->Print( Region( r2.x + (r2.w - tw)/2, r2.y + r2.h, tw, th ),
 				( const unsigned char * ) m->GetCaption(), text_pal, 0, true );
 	}
+	video->SetClipRect(&clipbackup);
 }
 
 /** Key Release Event */
