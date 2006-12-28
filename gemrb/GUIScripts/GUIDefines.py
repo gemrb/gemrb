@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.56 2006/12/28 14:13:18 wjpalenstijn Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.57 2006/12/28 20:50:51 avenger_teambg Exp $
 
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts
@@ -212,6 +212,21 @@ IE_INV_ITEM_ACQUIRED      = 0x10
 IE_INV_ITEM_DESTRUCTIBLE  = 0x20
 IE_INV_ITEM_EQUIPPED      = 0x40
 IE_INV_ITEM_STACKED       = 0x80
+# these come from the original item bits
+IE_INV_ITEM_CRITICAL      = 0x100
+IE_INV_ITEM_TWOHANDED     = 0x200
+IE_INV_ITEM_MOVABLE       = 0x400
+IE_INV_ITEM_UNKNOWN800    = 0x800
+IE_INV_ITEM_CURSED        = 0x1000
+IE_INV_ITEM_UNKNOWN2000   = 0x2000
+IE_INV_ITEM_MAGICAL       = 0x4000
+IE_INV_ITEM_BOW           = 0x8000
+IE_INV_ITEM_SILVER        = 0x10000
+IE_INV_ITEM_COLDIRON      = 0x20000
+IE_INV_ITEM_STOLEN2       = 0x40000
+IE_INV_ITEM_CONVERSIBLE   = 0x80000
+IE_INV_ITEM_PULSATING     = 0x100000
+
 
 SHOP_BUY    = 1
 SHOP_SELL   = 2
