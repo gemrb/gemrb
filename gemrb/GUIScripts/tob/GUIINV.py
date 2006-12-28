@@ -16,7 +16,7 @@
 #along with this program; if not, write to the Free Software
 #Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.61 2006/12/27 21:19:20 avenger_teambg Exp $
+#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.62 2006/12/28 16:44:54 avenger_teambg Exp $
 
 
 #GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -89,10 +89,12 @@ def OpenInventoryWindow ():
 	#Ground Item
 	for i in range (5):
 		Button = GemRB.GetControl (Window, i+68)
+		GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_ENTER_BUTTON, "MouseEnterGround")
+		GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_LEAVE_BUTTON, "MouseLeaveGround")
 		GemRB.SetVarAssoc (Window, Button, "GroundItemButton", i)
+		GemRB.SetButtonSprites (Window, Button, "STONSLOT",0,0,2,4,3)
 		GemRB.SetButtonFont (Window, Button, "NUMBER")
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
-		GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,128,128,255,64,0,1)
 
 	#ground items scrollbar
 	ScrollBar = GemRB.GetControl (Window, 66)
@@ -150,7 +152,6 @@ def OpenInventoryWindow ():
 			GemRB.SetButtonSprites (Window, Button, "STONSLOT",0,0,2,4,3)
 			GemRB.SetButtonFont (Window, Button, "NUMBER")
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
-			GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,128,128,255,64,0,1)
 	
 	GemRB.SetVar ("TopIndex", 0)
 	SetSelectionChangeHandler (UpdateInventoryWindow)
@@ -683,6 +684,22 @@ def MouseLeaveSlot ():
 	if slot == OverSlot or not GemRB.IsDraggingItem ():
 		OverSlot = None
 	UpdateSlot (pc, slot-1)
+	return
+
+def MouseEnterGround ():
+	Window = InventoryWindow
+	i = GemRB.GetVar("GroundItemButton")
+	Button = GemRB.GetControl (Window, i+68)
+	if GemRB.IsDraggingItem():
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SELECTED)
+	return
+
+def MouseLeaveGround ():
+	Window = InventoryWindow
+	i = GemRB.GetVar("GroundItemButton")
+	Button = GemRB.GetControl (Window, i+68)
+	if GemRB.IsDraggingItem():
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SECOND)
 	return
 
 ###################################################
