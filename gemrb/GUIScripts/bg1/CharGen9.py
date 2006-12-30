@@ -1,6 +1,7 @@
 #character generation (GUICG 0)
 import GemRB
 from ie_stats import *
+from GUICommon import SetColorStat
 
 CharGenWindow = 0
 TextAreaControl = 0
@@ -147,13 +148,13 @@ def NextPress():
 		GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Prof "+str(i) ) )
 	GemRB.UnloadTable (TmpTable)
 
-	GemRB.SetPlayerStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar ("HairColor") )
-	GemRB.SetPlayerStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar ("SkinColor") )
-	GemRB.SetPlayerStat (MyChar, IE_MAJOR_COLOR, GemRB.GetVar ("MajorColor") )
-	GemRB.SetPlayerStat (MyChar, IE_MINOR_COLOR, GemRB.GetVar ("MinorColor") )
-	GemRB.SetPlayerStat (MyChar, IE_METAL_COLOR, 0x1B )
-	GemRB.SetPlayerStat (MyChar, IE_LEATHER_COLOR, 0x16 )
-	GemRB.SetPlayerStat (MyChar, IE_ARMOR_COLOR, 0x17 )
+	SetColorStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar ("HairColor") )
+	SetColorStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar ("SkinColor") )
+	SetColorStat (MyChar, IE_MAJOR_COLOR, GemRB.GetVar ("MajorColor") )
+	SetColorStat (MyChar, IE_MINOR_COLOR, GemRB.GetVar ("MinorColor") )
+	SetColorStat (MyChar, IE_METAL_COLOR, 0x1B )
+	SetColorStat (MyChar, IE_LEATHER_COLOR, 0x16 )
+	SetColorStat (MyChar, IE_ARMOR_COLOR, 0x17 )
 	GemRB.SetPlayerStat (MyChar, IE_EA, 2 )
 	Str=GemRB.GetVar ("Ability 0")
 	GemRB.SetPlayerStat (MyChar, IE_STR, Str)

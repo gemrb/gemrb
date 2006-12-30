@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUICommon.py,v 1.6 2005/06/17 19:33:03 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUICommon.py,v 1.7 2006/12/30 16:43:21 wjpalenstijn Exp $
 
 import GemRB
 # GUICommon.py - common functions for GUIScripts of all game types
@@ -79,3 +79,9 @@ def GetLearnablePriestSpells (Class, Alignment, Level):
 		Learnable.append (SpellName)
 	return Learnable
 
+def SetColorStat (Actor, Stat, Value):
+	t = Value & 0xFF
+	t |= t << 8
+	t |= t << 16
+	GemRB.SetPlayerStat(Actor, Stat, t)
+	return

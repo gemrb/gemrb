@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUIINV.py,v 1.12 2006/12/09 14:58:33 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUIINV.py,v 1.13 2006/12/30 16:43:21 wjpalenstijn Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -28,7 +28,7 @@ import GemRB
 import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
-from GUICommon import CloseOtherWindow
+from GUICommon import CloseOtherWindow, SetColorStat
 from GUICommonWindows import *
 
 InventoryWindow = None
@@ -170,18 +170,13 @@ def ColorDonePress():
 	PickedColor=GemRB.GetTableValue (ColorTable, ColorIndex, GemRB.GetVar ("Selected"))
 	GemRB.UnloadTable (ColorTable)
 	if ColorIndex==0:
-		GemRB.SetPlayerStat (pc, IE_HAIR_COLOR, PickedColor)
-		UpdateInventoryWindow ()
-		return
-	if ColorIndex==1:
-		GemRB.SetPlayerStat (pc, IE_SKIN_COLOR, PickedColor)
-		UpdateInventoryWindow ()
-		return
-	if ColorIndex==2:
-		GemRB.SetPlayerStat (pc, IE_MAJOR_COLOR, PickedColor)
-		UpdateInventoryWindow ()
-		return
-	GemRB.SetPlayerStat (pc, IE_MINOR_COLOR, PickedColor)
+		SetColorStat (pc, IE_HAIR_COLOR, PickedColor)
+	elif ColorIndex==1:
+		SetColorStat (pc, IE_SKIN_COLOR, PickedColor)
+	elif ColorIndex==2:
+		SetColorStat (pc, IE_MAJOR_COLOR, PickedColor)
+	else:
+		SetColorStat (pc, IE_MINOR_COLOR, PickedColor)
 	UpdateInventoryWindow ()
 	return
 
@@ -190,7 +185,7 @@ def HairPress():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ColorIndex = 0
-	PickedColor = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR, 1)
+	PickedColor = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR, 1) & 0xFF
 	GetColor()
 	return
 
@@ -199,7 +194,7 @@ def SkinPress():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ColorIndex = 1
-	PickedColor = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR, 1)
+	PickedColor = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR, 1) & 0xFF
 	GetColor()
 	return
 
@@ -208,7 +203,7 @@ def MajorPress():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ColorIndex = 2
-	PickedColor = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR, 1)
+	PickedColor = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR, 1) & 0xFF
 	GetColor()
 	return
 
@@ -217,7 +212,7 @@ def MinorPress():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	ColorIndex = 3
-	PickedColor = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR, 1)
+	PickedColor = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR, 1) & 0xFF
 	GetColor()
 	return
 
@@ -342,19 +337,19 @@ def RefreshInventoryWindow ():
 	GemRB.SetText (Window, Label, str (GemRB.GameGetPartyGold ()))
 
 	Button = GemRB.GetControl (Window, 62)
-	Color = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR, 1)
+	Color = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR, 1) & 0xFF
 	GemRB.SetButtonBAM (Window, Button, "COLGRAD", 0, 0, Color)
 
 	Button = GemRB.GetControl (Window, 63)
-	Color = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR, 1)
+	Color = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR, 1) & 0xFF
 	GemRB.SetButtonBAM (Window, Button, "COLGRAD", 0, 0, Color)
 
 	Button = GemRB.GetControl (Window, 82)
-	Color = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR, 1)
+	Color = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR, 1) & 0xFF
 	GemRB.SetButtonBAM (Window, Button, "COLGRAD", 0, 0, Color)
 
 	Button = GemRB.GetControl (Window, 83)
-	Color = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR, 1)
+	Color = GemRB.GetPlayerStat (pc, IE_SKIN_COLOR, 1) & 0xFF
 	GemRB.SetButtonBAM (Window, Button, "COLGRAD", 0, 0, Color)
 
 	# update ground inventory slots

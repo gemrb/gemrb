@@ -1,6 +1,7 @@
 #character generation (GUICG 0)
 import GemRB
 from ie_stats import *
+from GUICommon import SetColorStat
 
 
 CharGenWindow = 0
@@ -260,13 +261,13 @@ def NextPress():
 #	for i in range(ProfCount):
 #		StatID=GemRB.GetTableValue (TmpTable, i, 0)
 #		GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Prof "+str(i) ) )
-	GemRB.SetPlayerStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar ("Color1") )
-	GemRB.SetPlayerStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar ("Color2") )
-	GemRB.SetPlayerStat (MyChar, IE_MAJOR_COLOR, GemRB.GetVar ("Color4") )
-	GemRB.SetPlayerStat (MyChar, IE_MINOR_COLOR, GemRB.GetVar ("Color3") )
-	GemRB.SetPlayerStat (MyChar, IE_METAL_COLOR, 0x1B )
-	GemRB.SetPlayerStat (MyChar, IE_LEATHER_COLOR, 0x16 )
-	GemRB.SetPlayerStat (MyChar, IE_ARMOR_COLOR, 0x17 )
+	SetColorStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar ("Color1") )
+	SetColorStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar ("Color2") )
+	SetColorStat (MyChar, IE_MAJOR_COLOR, GemRB.GetVar ("Color4") )
+	SetColorStat (MyChar, IE_MINOR_COLOR, GemRB.GetVar ("Color3") )
+	SetColorStat (MyChar, IE_METAL_COLOR, 0x1B )
+	SetColorStat (MyChar, IE_LEATHER_COLOR, 0x16 )
+	SetColorStat (MyChar, IE_ARMOR_COLOR, 0x17 )
 	GemRB.SetPlayerStat (MyChar, IE_EA, 2 )
 	Str=GemRB.GetVar ("Ability 1")
 	GemRB.SetPlayerStat (MyChar, IE_STR, Str)

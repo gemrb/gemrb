@@ -1,7 +1,7 @@
 #character generation (GUICG 0)
 import GemRB
 from ie_stats import *
-from GUICommon import GetLearnableMageSpells, GetLearnablePriestSpells
+from GUICommon import GetLearnableMageSpells, GetLearnablePriestSpells, SetColorStat
 
 CharGenWindow = 0
 TextAreaControl = 0

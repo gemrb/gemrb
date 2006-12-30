@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.116 2006/12/28 20:56:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.117 2006/12/30 16:43:22 wjpalenstijn Exp $
  *
  */
 
@@ -306,8 +306,12 @@ Actor* CREImp::GetActor()
 	ieByte tmp2[7];
 	str->Read( tmp2, 7);
 	for (int i=0;i<7;i++) {
-		act->BaseStats[IE_METAL_COLOR+i]=tmp2[i];
-		SetupColor(act->BaseStats[IE_METAL_COLOR+i]);
+		ieDword t = tmp2[i];
+		// apply RANDCOLR.2DA transformation
+		SetupColor(t);
+		t |= t << 8;
+		t |= t << 16;
+		act->BaseStats[IE_COLORS+i]=t;
 	}
 
 	str->Read( &TotSCEFF, 1 );
@@ -1614,7 +1618,7 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 	stream->WriteWord( &tmpWord);
 	stream->WriteDword( &actor->BaseStats[IE_ANIMATION_ID]);
 	for (i=0;i<7;i++) {
-		Signature[i] = (char) actor->BaseStats[IE_METAL_COLOR+i];
+		Signature[i] = (char) actor->BaseStats[IE_COLORS+i];
 	}
 	//old effect type
 	Signature[7] = TotSCEFF;

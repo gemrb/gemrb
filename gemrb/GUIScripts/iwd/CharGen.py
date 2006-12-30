@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.42 2006/12/17 13:27:28 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.43 2006/12/30 16:43:21 wjpalenstijn Exp $
 
 
 #Character Generation
@@ -25,7 +25,7 @@
 
 import GemRB
 from ie_stats import *
-from GUICommon import GetLearnableMageSpells, GetLearnablePriestSpells
+from GUICommon import GetLearnableMageSpells, GetLearnablePriestSpells, SetColorStat
 
 CharGenWindow = 0
 CharGenState = 0
@@ -357,13 +357,13 @@ def AcceptPress():
 	TmpTable = GemRB.LoadTable ("clskills")
 	GemRB.SetPlayerStat(MyChar, IE_XP, GemRB.GetTableValue (TmpTable, Class, 3) )  #this will also set the level (automatically)
 
-	GemRB.SetPlayerStat(MyChar, IE_SKIN_COLOR, GemRB.GetVar("SkinColor"))
-	GemRB.SetPlayerStat(MyChar, IE_HAIR_COLOR, GemRB.GetVar("HairColor"))
-	GemRB.SetPlayerStat(MyChar, IE_MAJOR_COLOR, GemRB.GetVar("MajorColor"))
-	GemRB.SetPlayerStat(MyChar, IE_MINOR_COLOR, GemRB.GetVar("MinorColor"))
-	GemRB.SetPlayerStat (MyChar, IE_METAL_COLOR, 0x1B )
-	GemRB.SetPlayerStat (MyChar, IE_LEATHER_COLOR, 0x16 )
-	GemRB.SetPlayerStat (MyChar, IE_ARMOR_COLOR, 0x17 )
+	SetColorStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar("SkinColor") )
+	SetColorStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar("HairColor") )
+	SetColorStat (MyChar, IE_MAJOR_COLOR, GemRB.GetVar("MajorColor") )
+	SetColorStat (MyChar, IE_MINOR_COLOR, GemRB.GetVar("MinorColor") )
+	SetColorStat (MyChar, IE_METAL_COLOR, 0x1B )
+	SetColorStat (MyChar, IE_LEATHER_COLOR, 0x16 )
+	SetColorStat (MyChar, IE_ARMOR_COLOR, 0x17 )
 
 	GemRB.FillPlayerInfo(MyChar, PortraitName+"L", PortraitName+"S")
 	#35 is a weapon slot
