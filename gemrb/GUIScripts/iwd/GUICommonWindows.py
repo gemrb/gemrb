@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUICommonWindows.py,v 1.19 2006/12/03 17:16:56 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUICommonWindows.py,v 1.20 2006/12/30 22:29:20 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -403,13 +403,17 @@ def UpdatePortraitWindow ():
 		Button = GemRB.GetControl (Window, i)
 		pic = GemRB.GetPlayerPortrait (i+1, 1)
 		if not pic:
-			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
+			GemRB.SetText (Window, Button, "")
+			GemRB.SetTooltip (Window, Button, "")
 			continue
 		
 		sel = GemRB.GameGetSelectedPCSingle () == i + 1
 		GemRB.SetButtonPicture (Window, Button, pic, "NOPORTSM")
 		
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 		GemRB.SetButtonFont (Window, Button, 'NUMFONT')
 
 		GemRB.SetVarAssoc (Window, Button, "PressedPortrait", i)

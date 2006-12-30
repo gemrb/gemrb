@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICommonWindows.py,v 1.18 2006/12/03 17:16:56 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICommonWindows.py,v 1.19 2006/12/30 22:29:20 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -500,6 +500,7 @@ def UpdatePortraitWindow ():
 			continue
 
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 		GemRB.SetButtonPicture (Window, Button, pic, "NOPORTSM")
 		hp = GemRB.GetPlayerStat (i+1, IE_HITPOINTS)
 		hp_max = GemRB.GetPlayerStat (i+1, IE_MAXHITPOINTS)
