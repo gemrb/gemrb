@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.29 2006/12/30 13:50:50 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.30 2006/12/30 21:49:46 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -253,7 +253,6 @@ def UpdateSlot (pc, i):
 	if ControlID<0:
 		return
 
-	print i,":",slot,":",SlotType["ResRef"]
 	Button = GemRB.GetControl (Window, ControlID)
 	ItemHash[ControlID] = [slot, slot_item]
 	GemRB.SetButtonSprites (Window, Button, 'IVSLOT', 0,  0, 0, 0, 0)

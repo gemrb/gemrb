@@ -16,7 +16,7 @@
 #along with this program; if not, write to the Free Software
 #Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.33 2006/12/30 16:43:21 wjpalenstijn Exp $
+#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.34 2006/12/30 21:49:45 avenger_teambg Exp $
 
 #GUIINV.py - scripts to control inventory windows from GUIINV winpack
 
@@ -475,6 +475,18 @@ def OnDropItemToPC ():
 	if GemRB.IsDraggingItem ():
 		GemRB.PlaySound ("GAM_47")  #failed equip
 	UpdateInventoryWindow ()
+	return
+
+def DialogItemWindow ():
+	GemRB.UnloadWindow (ItemInfoWindow)
+	OpenInventoryWindow ()
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	slot_item = GemRB.GetSlotItem (pc, slot)
+	ResRef = slot_item['ItemResRef']
+	item = GemRB.GetItem (ResRef)
+	dialog=item["Dialog"]
+	GemRB.ExecuteString("StartDialog(\""+dialog+"\",Myself)", pc)
 	return
 
 def IdentifyUseSpell ():

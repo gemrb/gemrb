@@ -16,7 +16,7 @@
 #along with this program; if not, write to the Free Software
 #Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.65 2006/12/30 19:54:57 wjpalenstijn Exp $
+#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.66 2006/12/30 21:49:46 avenger_teambg Exp $
 
 
 #GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -383,7 +383,8 @@ def UpdateSlot (pc, slot):
 	else:
 		itemtype = -1
 
-	Button = GemRB.GetControl (Window, SlotType["ID"])
+	ControlID = SlotType["ID"]
+	Button = GemRB.GetControl (Window, ControlID)
 	slot_item = GemRB.GetSlotItem (pc, slot+1)
 
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnDragItem")
@@ -476,10 +477,9 @@ def OnAutoEquip ():
 
 def OnDragItem ():
 	pc = GemRB.GameGetSelectedPCSingle ()
-
 	slot = GemRB.GetVar ("ItemButton")
+	slot_item = GemRB.GetSlotItem (pc, slot)
 	if not GemRB.IsDraggingItem ():
-		slot_item = GemRB.GetSlotItem (pc, slot)
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 0)
 	else:
@@ -501,6 +501,17 @@ def OnDropItemToPC ():
 		GemRB.PlaySound("GAM_47")  #failed equip
 	UpdateInventoryWindow ()
 	return
+
+def DialogItemWindow ():
+	GemRB.UnloadWindow (ItemInfoWindow)
+	OpenInventoryWindow ()
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	slot_item = GemRB.GetSlotItem (pc, slot)
+	ResRef = slot_item['ItemResRef']
+	item = GemRB.GetItem (ResRef)
+	dialog=item["Dialog"]
+	GemRB.ExecuteString("StartDialog(\""+dialog+"\",Myself)", pc)
 
 def IdentifyUseSpell ():
 	global ItemIdentifyWindow
@@ -632,7 +643,6 @@ def DisplayItem (itemresref, type):
 
 def OpenItemInfoWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
-
 	slot = GemRB.GetVar ("ItemButton")
 	slot_item = GemRB.GetSlotItem (pc, slot)
 	item = GemRB.GetItem (slot_item["ItemResRef"])

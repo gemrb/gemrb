@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.442 2006/12/30 19:11:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.443 2006/12/30 21:49:47 avenger_teambg Exp $
  *
  */
 
@@ -835,7 +835,7 @@ int Interface::GetItemDialStr(ieResRef itemname)
 
 int Interface::GetItemDialRes(ieResRef itemname, ieResRef retval)
 {
-	if (ItemDial2Table && ItemDial2Table->Lookup(itemname, retval)) {
+	if (ItemDial2Table && ItemDial2Table->Lookup(itemname, retval, sizeof(ieResRef))) {
 		return 1;
 	}
 	return 0;

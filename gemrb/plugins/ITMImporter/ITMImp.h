@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.h,v 1.7 2005/02/06 11:04:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.h,v 1.8 2006/12/30 21:49:49 avenger_teambg Exp $
  *
  */
 
@@ -30,6 +30,9 @@
 #include "../Core/Item.h"
 #include "../Core/ItemMgr.h"
 
+#define ITM_VER_BG 10
+#define ITM_VER_PST 11
+#define ITM_VER_IWD2 20
 
 class ITMImp : public ItemMgr {
 private:
