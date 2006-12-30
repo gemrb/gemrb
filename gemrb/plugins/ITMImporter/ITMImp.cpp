@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.21 2006/12/25 17:09:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.22 2006/12/30 21:22:26 avenger_teambg Exp $
  *
  */
 
@@ -122,15 +122,21 @@ Item* ITMImp::GetItem(Item *s)
 	s->WieldColor = 0;
 	memset( s->unknown, 0, 26 );
 
+	printf("Version: %d\n", version);
+	//skipping header data for iwd2
 	if (version == 20) {
 		str->Read( s->unknown, 16 );
-		s->DialogName = core->GetItemDialStr(s->Name);
-		core->GetItemDialRes(s->Name, s->Dialog);
-	} else if (version == 11) {
+	}
+	//pst data
+	if (version==11) {
 		str->ReadResRef( s->Dialog );
 		str->ReadDword( &s->DialogName );
 		str->ReadWord( &s->WieldColor );
 		str->Read( s->unknown, 26 );
+	} else {
+	//all non pst
+		s->DialogName = core->GetItemDialStr(s->Name);
+		core->GetItemDialRes(s->Name, s->Dialog);
 	}
 	s->ItemExcl=core->GetItemExcl(s->Name);
 
