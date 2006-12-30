@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.436 2006/12/30 13:05:56 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.437 2006/12/30 13:53:58 avenger_teambg Exp $
  *
  */
 
@@ -5287,7 +5287,7 @@ static PyObject* GemRB_ExecuteString(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_ExecuteString__doc );
 	}
 	if (actornum) {
-		Actor *pc = core->GetGame()->GetPC(actornum, false);
+		Actor *pc = core->GetGame()->GetPC(actornum-1, false);
 		if (pc) {
 			GameScript::ExecuteString( pc, String );
 		} else {
