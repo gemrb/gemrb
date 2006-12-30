@@ -16,7 +16,7 @@
 #along with this program; if not, write to the Free Software
 #Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.64 2006/12/30 16:43:21 wjpalenstijn Exp $
+#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.65 2006/12/30 19:54:57 wjpalenstijn Exp $
 
 
 #GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -322,11 +322,11 @@ def RefreshInventoryWindow ():
 	GemRB.SetText (Window, Label, ClassTitle)
 
 	Button = GemRB.GetControl (Window, 62)
-	Color = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR, 1)
+	Color = GemRB.GetPlayerStat (pc, IE_MAJOR_COLOR, 1) & 0xFF
 	GemRB.SetButtonBAM (Window, Button, "COLGRAD", 0, 0, Color)
 
 	Button = GemRB.GetControl (Window, 63)
-	Color = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR, 1)
+	Color = GemRB.GetPlayerStat (pc, IE_MINOR_COLOR, 1) & 0xFF
 	GemRB.SetButtonBAM (Window, Button, "COLGRAD", 0, 0, Color)
 
 	#update ground inventory slots
