@@ -26,7 +26,6 @@ from GUIJRNL import *
 from GUIMA import *
 from GUIOPT import *
 from GUISPL import *
-from GUIREC import *
 from GUISTORE import *
 from GUIWORLD import *
 from TextScreen import *
