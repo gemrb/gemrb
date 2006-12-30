@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/CharGen.py,v 1.37 2006/12/30 16:43:22 wjpalenstijn Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/CharGen.py,v 1.38 2006/12/30 19:35:34 avenger_teambg Exp $
 
 
 #Character Generation
@@ -2181,7 +2181,6 @@ def CharSoundPlayPress():
 	column = str(GemRB.Roll(1,40,0))
 	print row, column
 	x=GemRB.GetTableValue (CharSoundStrings, row, column)
-	print x
 	print GemRB.GetString (x)
 	return
 
@@ -2310,6 +2309,13 @@ def ImportPress():
 	global CharGenWindow, ImportWindow
 	GemRB.SetVisible (CharGenWindow, 0)
 	ImportWindow = GemRB.LoadWindow (20)
+
+	TextAreaControl = GemRB.GetControl(ImportWindow, 4)
+	GemRB.SetText(ImportWindow, TextAreaControl, 10963)
+
+	TextAreaControl = GemRB.GetControl(ImportWindow,2)
+	GemRB.SetTextAreaFlags (ImportWindow, TextAreaControl, IE_GUI_TEXTAREA_SELECTABLE)
+	GemRB.GetCharacters(ImportWindow, TextAreaControl)
 
 	ImportDoneButton = GemRB.GetControl (ImportWindow, 0)
 	GemRB.SetButtonState (ImportWindow, ImportDoneButton, IE_GUI_BUTTON_DISABLED)

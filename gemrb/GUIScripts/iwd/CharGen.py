@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.43 2006/12/30 16:43:21 wjpalenstijn Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.44 2006/12/30 19:35:34 avenger_teambg Exp $
 
 
 #Character Generation
@@ -2140,6 +2140,8 @@ def AppearanceCancelPress():
 
 def CharSoundSelect():
 	global CharGenWindow, CharSoundWindow, CharSoundTable, CharSoundStrings
+	global CharSoundVoiceList
+
 	GemRB.SetVisible (CharGenWindow, 0)
 	CharSoundWindow = GemRB.LoadWindow (19)
 	CharSoundTable = GemRB.LoadTable ("CHARSND")
@@ -2147,15 +2149,8 @@ def CharSoundSelect():
 
 	CharSoundVoiceList = GemRB.GetControl (CharSoundWindow, 45)
 	GemRB.SetTextAreaFlags (CharSoundWindow, CharSoundVoiceList, IE_GUI_TEXTAREA_SELECTABLE)
+	RowCount=GemRB.GetCharSounds(CharSoundWindow, CharSoundVoiceList)
 	
-	VoiceList = []
-	for i in range (GemRB.GetTableRowCount (CharSoundStrings) ):
-		VoiceList.append(str(GemRB.GetTableRowName (CharSoundStrings, i)).upper())
-	VoiceList.sort()
-	VoiceList.reverse()
-	while (len(VoiceList) > 0):
-		GemRB.TextAreaAppend (CharSoundWindow, CharSoundVoiceList, VoiceList.pop(), -1)
-
 	CharSoundPlayButton = GemRB.GetControl (CharSoundWindow, 47)
 	GemRB.SetButtonState (CharSoundWindow, CharSoundPlayButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetEvent (CharSoundWindow, CharSoundPlayButton, IE_GUI_BUTTON_ON_PRESS, "CharSoundPlayPress")
@@ -2179,6 +2174,14 @@ def CharSoundSelect():
 	return
 
 def CharSoundPlayPress():
+	global CharGenWindow, CharSoundWindow, CharSoundTable, CharSoundStrings
+	global CharSoundVoiceList
+
+	row = GemRB.QueryText (CharSoundWindow, CharSoundVoiceList)
+	column = str(GemRB.Roll(1,40,0))
+	print row, column
+	x=GemRB.GetTableValue (CharSoundStrings, row, column)
+	print GemRB.GetString (x)
 	return
 
 def CharSoundDonePress():
@@ -2306,6 +2309,13 @@ def ImportPress():
 	global CharGenWindow, ImportWindow
 	GemRB.SetVisible (CharGenWindow, 0)
 	ImportWindow = GemRB.LoadWindow (20)
+
+	TextAreaControl = GemRB.GetControl(ImportWindow, 4)
+	GemRB.SetText(ImportWindow, TextAreaControl, 10963)
+
+	TextAreaControl = GemRB.GetControl(ImportWindow,2)
+	GemRB.SetTextAreaFlags (ImportWindow, TextAreaControl, IE_GUI_TEXTAREA_SELECTABLE)
+	GemRB.GetCharacters(ImportWindow, TextAreaControl)
 
 	ImportDoneButton = GemRB.GetControl (ImportWindow, 0)
 	GemRB.SetButtonState (ImportWindow, ImportDoneButton, IE_GUI_BUTTON_DISABLED)
