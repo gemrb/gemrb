@@ -19,7 +19,7 @@ def RedrawSkills():
 	SumLabel = GemRB.GetControl(SkillWindow, 0x10000009)
 	GemRB.SetText(SkillWindow, SumLabel, str(PointsLeft) )  #points to distribute
 
-	for i in range(0,8):
+	for i in range(8):
 		Pos=i
 		SkillName = GemRB.GetTableValue(SkillTable, Pos, 1)
 		MaxProf = GemRB.GetTableValue(SkillTable, Pos, ProfColumn)
@@ -41,7 +41,7 @@ def RedrawSkills():
 		GemRB.SetText(SkillWindow, Label, SkillName)
 
 		ActPoint = GemRB.GetVar("Prof "+str(Pos) )
-		for j in range(0,5):  #5 is maximum distributable
+		for j in range(5):  #5 is maximum distributable
 			Star=GemRB.GetControl(SkillWindow, i*5+j+27)
 			GemRB.SetButtonSprites(SkillWindow, Star, "GUIPFC", 0, 0, 0, 0, 0)
 			if ActPoint >j:
@@ -81,11 +81,11 @@ def OnLoad():
 		PointsLeft=PointsLeft + Level/GemRB.GetTableValue(SkillTable, ClassName, "RATE")
 
 	GemRB.LoadWindowPack("GUICG")
-        SkillTable = GemRB.LoadTable("weapprof")
+	SkillTable = GemRB.LoadTable("weapprof")
 	RowCount = GemRB.GetTableRowCount(SkillTable)-7  #we decrease it with the bg1 skills
 	SkillWindow = GemRB.LoadWindow(9)
 
-	for i in range(0,8):
+	for i in range(8):
 		Button=GemRB.GetControl(SkillWindow, i+69)
 		GemRB.SetVarAssoc(SkillWindow, Button, "Prof", i)
 		GemRB.SetEvent(SkillWindow, Button, IE_GUI_BUTTON_ON_PRESS, "JustPress")
@@ -98,7 +98,7 @@ def OnLoad():
 		GemRB.SetVarAssoc(SkillWindow, Button, "Prof", i)
 		GemRB.SetEvent(SkillWindow, Button, IE_GUI_BUTTON_ON_PRESS, "RightPress")
 
-		for j in range(0,5):
+		for j in range(5):
 			Star=GemRB.GetControl(SkillWindow, i*5+j+27)
 			GemRB.SetButtonState(SkillWindow, Star, IE_GUI_BUTTON_DISABLED)
 
@@ -106,7 +106,7 @@ def OnLoad():
 	GemRB.SetText(SkillWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(SkillWindow,0)
 	GemRB.SetText(SkillWindow,DoneButton,11973)
-        GemRB.SetButtonFlags(SkillWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
+	GemRB.SetButtonFlags(SkillWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	TextAreaControl = GemRB.GetControl(SkillWindow, 68)
 	GemRB.SetText(SkillWindow,TextAreaControl,9588)
@@ -162,6 +162,6 @@ def BackPress():
 	return
 
 def NextPress():
-        GemRB.UnloadWindow(SkillWindow)
+	GemRB.UnloadWindow(SkillWindow)
 	GemRB.SetNextScript("CharGen7") #appearance
 	return

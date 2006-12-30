@@ -191,5 +191,5 @@ def NextPress():
 	GemRB.SetVar("SkinColor",SkinColor)
 	GemRB.SetVar("MinorColor",MinorColor)
 	GemRB.SetVar("MajorColor",MajorColor)
-	GemRB.SetNextScript("CharGen8") #name
+	GemRB.SetNextScript("GUICG19") #sounds
 	return

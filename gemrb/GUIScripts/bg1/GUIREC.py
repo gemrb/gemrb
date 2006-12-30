@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIREC.py,v 1.7 2006/08/09 19:05:31 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIREC.py,v 1.8 2006/12/30 19:11:15 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -84,7 +84,7 @@ def OpenRecordsWindow ():
 
 	# export
 	Button = GemRB.GetControl (Window, 36)
-	GemRB.SetText (Window, Button, 7175)
+	GemRB.SetText (Window, Button, 13956)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "ExportWindow")
 
 ## 	# kit info

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.441 2006/12/28 20:54:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.442 2006/12/30 19:11:16 avenger_teambg Exp $
  *
  */
 
@@ -172,6 +172,7 @@ Interface::Interface(int iargc, char** iargv)
 	strncpy( GameSounds, "sounds", sizeof(GameSounds) );
 	strncpy( GameScripts, "scripts", sizeof(GameScripts) );
 	strncpy( GamePortraits, "portraits", sizeof(GamePortraits) );
+	strncpy( GameCharacters, "characters", sizeof(GameCharacters) );
 	strncpy( GameData, "data", sizeof(GameData) );
 	strncpy( INIConfig, "baldur.ini", sizeof(INIConfig) );
 	strncpy( ButtonFont, "STONESML", sizeof(ButtonFont) );
@@ -1931,6 +1932,8 @@ bool Interface::LoadConfig(const char* filename)
 			strncpy( GameSounds, value, sizeof(GameSounds) );
 		} else if (stricmp( name, "GamePortraitsPath" ) == 0) {
 			strncpy( GamePortraits, value, sizeof(GamePortraits) );
+		} else if (stricmp( name, "GameCharactersPath" ) == 0) {
+			strncpy( GameCharacters, value, sizeof(GameCharacters) );
 		} else if (stricmp( name, "GameName" ) == 0) {
 			strncpy( GameName, value, sizeof(GameName) );
 		} else if (stricmp( name, "GameType" ) == 0) {
@@ -2207,7 +2210,6 @@ bool Interface::LoadGemRBINI()
 	SetFeature( ini->GetKeyAsInt( "resources", "ReverseToHit", 1 ), GF_REVERSE_TOHIT );
 	SetFeature( ini->GetKeyAsInt( "resources", "SaveForHalfDamage", 0 ), GF_SAVE_FOR_HALF );
 	SetFeature( ini->GetKeyAsInt( "resources", "MagicBit", 0 ), GF_MAGICBIT );
-
 	ForceStereo = ini->GetKeyAsInt( "resources", "ForceStereo", 0 );
 
 	FreeInterface( ini );
@@ -3490,6 +3492,41 @@ int Interface::GetCharSounds(TextArea* ta)
 	return count;
 }
 
+int Interface::GetCharacters(TextArea* ta)
+{
+	int count = 0;
+	char Path[_MAX_PATH];
+
+	PathJoin( Path, GamePath, GameCharacters, NULL );
+	DIR* dir = opendir( Path );
+	if (dir == NULL) {
+		return -1;
+	}
+	//Lookup the first entry in the Directory
+	struct dirent* de = readdir( dir );
+	if (de == NULL) {
+		closedir( dir );
+		return -1;
+	}
+	printf( "Looking in %s\n", Path );
+	do {
+		if (de->d_name[0] == '.')
+			continue;
+		char dtmp[_MAX_PATH];
+		PathJoin( dtmp, Path, de->d_name, NULL );
+		struct stat fst;
+		stat( dtmp, &fst );
+		strupr(de->d_name);
+		char *pos = strstr(de->d_name,".CHR");
+		if (!pos) continue;
+		*pos=0;
+		count++;
+		ta->AppendText( de->d_name, -1 );
+	} while (( de = readdir( dir ) ) != NULL);
+	closedir( dir );
+	return count;
+}
+
 bool Interface::LoadINI(const char* filename)
 {
 	FILE* config;
@@ -3755,7 +3792,7 @@ bool Interface::InitItemTypes()
 	}
 
 	//slottype describes the inventory structure
-	Inventory::Init(HasFeature(GF_MAGICBIT));
+	Inventory::Init(core->HasFeature(GF_MAGICBIT));
 	int SlotTypeTable = LoadTable( "slottype" );
 	TableMgr *st = GetTable(SlotTypeTable);
 	if (slottypes) {

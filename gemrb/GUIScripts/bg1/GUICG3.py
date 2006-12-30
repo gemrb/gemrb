@@ -14,13 +14,13 @@ def OnLoad():
 	Class = GemRB.GetVar("Class")-1
 	KitName = GemRB.GetTableRowName(ClassTable, Class)
 
-        AlignmentOk = GemRB.LoadTable("ALIGNMNT")
+	AlignmentOk = GemRB.LoadTable("ALIGNMNT")
 
 	GemRB.LoadWindowPack("GUICG")
 	AlignmentTable = GemRB.LoadTable("aligns")
 	AlignmentWindow = GemRB.LoadWindow(3)
 
-	for i in range(0,9):
+	for i in range(9):
 		Button = GemRB.GetControl(AlignmentWindow, i+2)
 		GemRB.SetButtonFlags(AlignmentWindow, Button, IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 		GemRB.SetButtonState(AlignmentWindow, Button, IE_GUI_BUTTON_DISABLED)
@@ -30,7 +30,7 @@ def OnLoad():
 	# based on Class, and depends on the ALIGNMNT.2DA table
 	#
 	# For now, we just enable all buttons
-	for i in range(0,9):
+	for i in range(9):
 		Button = GemRB.GetControl(AlignmentWindow, i+2)
 		if GemRB.GetTableValue(AlignmentOk, KitName, GemRB.GetTableValue(AlignmentTable, i, 4) ) != 0:
 			GemRB.SetButtonState(AlignmentWindow, Button, IE_GUI_BUTTON_ENABLED)

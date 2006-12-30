@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.301 2006/12/17 13:27:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.302 2006/12/30 19:11:16 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1360,9 +1360,11 @@ int GameControl::UnhideGUI()
 	if (dict->Lookup( "FloatWindow", index )) {
 		if (index != (ieDword) -1) {
 			Window* fw = core->GetWindow( (unsigned short) index );
-			core->SetVisible( (unsigned short) index, WINDOW_VISIBLE );
-			fw->Flags |=WF_FLOAT;
-			core->SetOnTop( index );
+			if (fw) {
+				core->SetVisible( (unsigned short) index, WINDOW_VISIBLE );
+				fw->Flags |=WF_FLOAT;
+				core->SetOnTop( index );
+			}
 		}
 	}
 	core->GetVideoDriver()->SetViewport( Owner->XPos, Owner->YPos, Width, Height );

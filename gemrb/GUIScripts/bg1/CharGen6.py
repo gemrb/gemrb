@@ -67,7 +67,7 @@ def OnLoad():
 
 	ImportButton = GemRB.GetControl(CharGenWindow, 13)
 	GemRB.SetText(CharGenWindow, ImportButton, 13955)
-	GemRB.SetButtonState(CharGenWindow,ImportButton,IE_GUI_BUTTON_DISABLED)
+	GemRB.SetButtonState(CharGenWindow,ImportButton,IE_GUI_BUTTON_ENABLED)
 
 	CancelButton = GemRB.GetControl(CharGenWindow, 15)
 	GemRB.SetText(CharGenWindow, CancelButton, 13727)
@@ -102,6 +102,7 @@ def OnLoad():
 	GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
 	GemRB.SetEvent(CharGenWindow, SkillButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
+	GemRB.SetEvent(CharGenWindow, ImportButton, IE_GUI_BUTTON_ON_PRESS, "ImportPress")
 	GemRB.SetVisible(CharGenWindow,1)
 	return
 	
@@ -119,3 +120,10 @@ def BackPress():
 	GemRB.UnloadWindow(CharGenWindow)
 	GemRB.SetNextScript("CharGen5") #abilities
 	return
+
+def ImportPress():
+	GemRB.UnloadWindow(CharGenWindow)
+	GemRB.SetToken("NextScript","CharGen6")
+	GemRB.SetNextScript("ImportFile") #import
+	return
+

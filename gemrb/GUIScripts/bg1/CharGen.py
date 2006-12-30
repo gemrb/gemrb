@@ -15,7 +15,7 @@ def OnLoad():
 	GemRB.SetVar("Alignment",0) #alignment
 
 	GemRB.LoadWindowPack("GUICG")
-        CharGenWindow = GemRB.LoadWindow(0)
+	CharGenWindow = GemRB.LoadWindow(0)
 	PortraitButton = GemRB.GetControl(CharGenWindow, 12)
 	GemRB.SetButtonFlags(CharGenWindow, PortraitButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
 
@@ -66,15 +66,15 @@ def OnLoad():
 	GemRB.SetText(CharGenWindow, ImportButton, 13955)
 	GemRB.SetButtonState(CharGenWindow,ImportButton,IE_GUI_BUTTON_ENABLED)
 
-        CancelButton = GemRB.GetControl(CharGenWindow, 15)
-        GemRB.SetText(CharGenWindow, CancelButton, 13727)
+	CancelButton = GemRB.GetControl(CharGenWindow, 15)
+	GemRB.SetText(CharGenWindow, CancelButton, 13727)
 	GemRB.SetButtonState(CharGenWindow,CancelButton,IE_GUI_BUTTON_ENABLED)
 
-        GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	# this button does nothing when you click it at this stage:
-        # GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-        GemRB.SetEvent(CharGenWindow, GenderButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
-        GemRB.SetEvent(CharGenWindow, ImportButton, IE_GUI_BUTTON_ON_PRESS, "ImportPress")
+	# GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	GemRB.SetEvent(CharGenWindow, GenderButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
+	GemRB.SetEvent(CharGenWindow, ImportButton, IE_GUI_BUTTON_ON_PRESS, "ImportPress")
 	GemRB.SetVisible(CharGenWindow,1)
 	return
 	
@@ -82,17 +82,18 @@ def NextPress():
 	GemRB.SetButtonState(CharGenWindow, ImportButton, IE_GUI_BUTTON_DISABLED)
 	GemRB.SetButtonState(CharGenWindow, CancelButton, IE_GUI_BUTTON_DISABLED)
 	GemRB.DrawWindows()   #needed to redraw the windows NOW
-        GemRB.UnloadWindow(CharGenWindow)
+	GemRB.UnloadWindow(CharGenWindow)
 	GemRB.SetNextScript("GUICG1") #gender
 	return
 
 def CancelPress():
-        GemRB.UnloadWindow(CharGenWindow)
-        GemRB.SetNextScript("Start")
-        return
+	GemRB.UnloadWindow(CharGenWindow)
+	GemRB.SetNextScript("Start")
+	return
 
 def ImportPress():
-        GemRB.UnloadWindow(CharGenWindow)
+	GemRB.UnloadWindow(CharGenWindow)
+	GemRB.SetToken("NextScript","CharGen")
 	GemRB.SetNextScript("ImportFile") #import
 	return
 

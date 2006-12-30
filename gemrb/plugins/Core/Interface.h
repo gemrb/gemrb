@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.214 2006/12/03 17:16:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.215 2006/12/30 19:11:16 avenger_teambg Exp $
  *
  */
 
@@ -487,6 +487,8 @@ public:
 	int GetPortraits(TextArea* ta, bool smallorlarge);
 	/*reads the filenames of the sounds folder into a list */
 	int GetCharSounds(TextArea *ta);
+	/*reads the filenames of the characters folder into a list */
+	int GetCharacters(TextArea *ta);
 	unsigned int GetInventorySize() const { return SlotTypes-1; }
 	ieDword FindSlot(unsigned int idx) const;
 	ieDword QuerySlot(unsigned int idx) const;
@@ -629,6 +631,7 @@ public:
 	char GameSounds[12];
 	char GameScripts[12];
 	char GamePortraits[12];
+  char GameCharacters[12];
 	ieResRef GameNameResRef;
 	ieResRef GoldResRef; //MISC07.itm
 	Variables *RtRows;

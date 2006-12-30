@@ -15,7 +15,7 @@ def OnLoad():
 	ClassCount = GemRB.GetTableRowCount(ClassTable)+1
 	ClassWindow = GemRB.LoadWindow(2)
 	TmpTable=GemRB.LoadTable("races")
-        RaceName = GemRB.GetTableRowName(TmpTable, GemRB.GetVar("Race")-1 )
+	RaceName = GemRB.GetTableRowName(TmpTable, GemRB.GetVar("Race")-1 )
 
 	#radiobutton groups must be set up before doing anything else to them
 	for i in range(1,ClassCount):

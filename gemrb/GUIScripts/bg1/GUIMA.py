@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIMA.py,v 1.4 2006/12/03 17:16:56 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIMA.py,v 1.5 2006/12/30 19:11:15 avenger_teambg Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -62,60 +62,60 @@ def RevealMap ():
 # for clairvoyance effect
 ###################################################
 def ShowMap ():
-        global MapWindow, OptionsWindow, PortraitWindow
-        global OldPortraitWindow, OldOptionsWindow
+	global MapWindow, OptionsWindow, PortraitWindow
+	global OldPortraitWindow, OldOptionsWindow
 
-        if CloseOtherWindow (ShowMap):
-                GemRB.UnloadWindow (MapWindow)
-                GemRB.UnloadWindow (OptionsWindow)
-                GemRB.UnloadWindow (PortraitWindow)
+	if CloseOtherWindow (ShowMap):
+		GemRB.UnloadWindow (MapWindow)
+		GemRB.UnloadWindow (OptionsWindow)
+		GemRB.UnloadWindow (PortraitWindow)
 
-                MapWindow = None
-                #this window type should block the game
-                GemRB.SetVar ("OtherWindow", -1)
-                GemRB.SetVisible (0,1)
-                GemRB.UnhideGUI ()
-                GUICommonWindows.PortraitWindow = OldPortraitWindow
-                OldPortraitWindow = None
-                GUICommonWindows.OptionsWindow = OldOptionsWindow
-                OldOptionsWindow = None
-                return
+		MapWindow = None
+		#this window type should block the game
+		GemRB.SetVar ("OtherWindow", -1)
+		GemRB.SetVisible (0,1)
+		GemRB.UnhideGUI ()
+		GUICommonWindows.PortraitWindow = OldPortraitWindow
+		OldPortraitWindow = None
+		GUICommonWindows.OptionsWindow = OldOptionsWindow
+		OldOptionsWindow = None
+		return
 
-        GemRB.HideGUI ()
-        GemRB.SetVisible (0,0)
+	GemRB.HideGUI ()
+	GemRB.SetVisible (0,0)
 
-        GemRB.LoadWindowPack ("GUIMAP", 640, 480)
-        MapWindow = Window = GemRB.LoadWindow (2)
-        #this window type blocks the game normally, but map window doesn't
-        GemRB.SetVar ("OtherWindow", MapWindow)
-        #saving the original portrait window
-        OldOptionsWindow = GUICommonWindows.OptionsWindow
-        OptionsWindow = GemRB.LoadWindow (0)
-        SetupMenuWindowControls (OptionsWindow, 0, "ShowMap")
-        OldPortraitWindow = GUICommonWindows.PortraitWindow
-        PortraitWindow = OpenPortraitWindow (0)
-        GemRB.SetWindowFrame (OptionsWindow)
+	GemRB.LoadWindowPack ("GUIMAP", 640, 480)
+	MapWindow = Window = GemRB.LoadWindow (2)
+	#this window type blocks the game normally, but map window doesn't
+	GemRB.SetVar ("OtherWindow", MapWindow)
+	#saving the original portrait window
+	OldOptionsWindow = GUICommonWindows.OptionsWindow
+	OptionsWindow = GemRB.LoadWindow (0)
+	SetupMenuWindowControls (OptionsWindow, 0, "ShowMap")
+	OldPortraitWindow = GUICommonWindows.PortraitWindow
+	PortraitWindow = OpenPortraitWindow (0)
+	GemRB.SetWindowFrame (OptionsWindow)
 
-        # World Map
-        Button = GemRB.GetControl (Window, 1)
-        GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+	# World Map
+	Button = GemRB.GetControl (Window, 1)
+	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 
-        # Hide or Show mapnotes
-        Button = GemRB.GetControl (Window, 3)
-        GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+	# Hide or Show mapnotes
+	Button = GemRB.GetControl (Window, 3)
+	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 
-        Label = GemRB.GetControl (Window, 0x10000003)
-        GemRB.SetText (Window, Label, "")
-        # Map Control
-        GemRB.CreateMapControl (Window, 2, 0, 0, 0, 0, 0x10000003, "FLAG1")
-        Map = GemRB.GetControl (Window, 2)
-        GemRB.SetVar("ShowMapNotes",3)
-        GemRB.SetVarAssoc (Window, Map, "ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
-        GemRB.SetEvent (Window, Map, IE_GUI_MAP_ON_PRESS, "RevealMap")
-        GemRB.SetVisible (OptionsWindow, 2)
-        GemRB.SetVisible (Window, 1)
-        GemRB.SetVisible (PortraitWindow, 2)
-        return
+	Label = GemRB.GetControl (Window, 0x10000003)
+	GemRB.SetText (Window, Label, "")
+	# Map Control
+	GemRB.CreateMapControl (Window, 2, 0, 0, 0, 0, 0x10000003, "FLAG1")
+	Map = GemRB.GetControl (Window, 2)
+	GemRB.SetVar("ShowMapNotes",3)
+	GemRB.SetVarAssoc (Window, Map, "ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
+	GemRB.SetEvent (Window, Map, IE_GUI_MAP_ON_PRESS, "RevealMap")
+	GemRB.SetVisible (OptionsWindow, 2)
+	GemRB.SetVisible (Window, 1)
+	GemRB.SetVisible (PortraitWindow, 2)
+	return
 
 ###################################################
 def OpenMapWindow ():
