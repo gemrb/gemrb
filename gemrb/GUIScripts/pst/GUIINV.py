@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.28 2006/07/29 18:17:26 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.29 2006/12/30 13:50:50 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -356,7 +356,7 @@ def OpenItemInfoWindow ():
 		return
 		
 	ItemInfoWindow = Window = GemRB.LoadWindow (5)
-        GemRB.SetVar ("FloatWindow", ItemInfoWindow)
+	GemRB.SetVar ("FloatWindow", ItemInfoWindow)
 
 	slot, slot_item = ItemHash[GemRB.GetVar ('ItemButton')]
 
@@ -382,6 +382,7 @@ def OpenItemInfoWindow ():
 
 	# Talk to Item/Use
 	Button = GemRB.GetControl (Window, 9)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenItemDialogWindow")
 	if item['Dialog']:
 		GemRB.SetText (Window, Button, 4254)
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
@@ -485,6 +486,17 @@ def OpenItemAmountWindow ():
 	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 
+
+def OpenItemDialogWindow ():
+	
+	OpenItemInfoWindow ()
+	OpenInventoryWindow ()	
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot, slot_item = ItemHash[GemRB.GetVar ('ItemButton')]
+	ResRef = slot_item['ItemResRef']
+	item = GemRB.GetItem (ResRef)
+	dialog=item['Dialog']
+	GemRB.ExecuteString("StartDialog(\""+dialog+"\",Myself)", pc)
 
 
 def OpenItemIdentifyWindow ():
