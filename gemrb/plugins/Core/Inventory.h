@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.58 2006/12/28 20:54:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.59 2006/12/30 23:47:26 avenger_teambg Exp $
  *
  */
 
@@ -294,6 +294,8 @@ public:
 	bool UseItem(unsigned int slotindex, unsigned int headerindex, Actor *target);
 	/** returns the exclusion bits */
 	ieDword GetEquipExclusion() const;
+	/** returns if a slot is temporarily blocked */
+	bool IsSlotBlocked(int slot);
 	//setting important constants
 	static void Init(int mb);
 	static void SetFistSlot(int arg);
@@ -316,7 +318,7 @@ private:
 	void KillSlot(unsigned int index);
 	inline Item *GetItemPointer(ieDword slot, CREItem *&Slot);
 	void UpdateWeaponAnimation();
-	void UpdateShieldAnimation();
+	void UpdateShieldAnimation(Item *it);
 };
 
 #endif

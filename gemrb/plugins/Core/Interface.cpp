@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.443 2006/12/30 21:49:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.444 2006/12/30 23:47:26 avenger_teambg Exp $
  *
  */
 
@@ -3915,7 +3915,7 @@ const char *Interface::QuerySlotResRef(unsigned int idx) const
 
 // checks the itemtype vs. slottype, and also checks the usability flags
 // vs. Actor's stats (alignment, class, race, kit etc.)
-int Interface::CanUseItemType(int itype, int slottype, ieDword /*use1*/, ieDword /*use2*/, Actor *actor) const
+int Interface::CanUseItemType(int slottype, Item *item, Actor *actor) const
 {
 	// check if actor may use the item
 	if (actor) {
@@ -3924,12 +3924,24 @@ int Interface::CanUseItemType(int itype, int slottype, ieDword /*use1*/, ieDword
 	if ( slottype==-1 ) { 
 		return SLOT_INVENTORY;
 	}
-	if ( (unsigned int) itype>=(unsigned int) ItemTypes) {
+	if (slottype&SLOT_SHIELD) {
+		if (item->Flags&IE_INV_ITEM_TWOHANDED) {
+			return 0;
+		}
+	}
+
+	if ( (unsigned int) item->ItemType>=(unsigned int) ItemTypes) {
 		//invalid itemtype
 		return 0;
 	}
 	//if any bit is true, we return true (int->bool conversion)
-	return (slotmatrix[itype]&slottype);
+	int ret = (slotmatrix[item->ItemType]&slottype);
+	if (ret) {
+		//
+	} else {
+		//invalid itemtype
+	}
+	return ret;
 }
 
 Label *Interface::GetMessageLabel()

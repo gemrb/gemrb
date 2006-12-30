@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.76 2006/12/10 12:17:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.77 2006/12/30 23:47:26 avenger_teambg Exp $
  *
  */
 
@@ -247,7 +247,7 @@ bool HasItemCore(Inventory *inventory, ieResRef itemname, ieDword flags)
 		if (!item)
 			continue;
 		bool ret = false;
-		if (core->CanUseItemType(item->ItemType,SLOT_BAG,0,0,NULL) ) {
+		if (core->CanUseItemType(SLOT_BAG,item,NULL) ) {
 			//the store is the same as the item's name
 			ret = StoreHasItemCore(itemslot->ItemResRef, itemname);
 		}

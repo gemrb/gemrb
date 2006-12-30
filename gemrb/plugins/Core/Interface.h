@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.215 2006/12/30 19:11:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.216 2006/12/30 23:47:26 avenger_teambg Exp $
  *
  */
 
@@ -498,7 +498,7 @@ public:
 	ieDword QuerySlotEffects(unsigned int idx) const;
 	const char * QuerySlotResRef(unsigned int idx) const;
 	/*returns true if an itemtype is acceptable for a slottype, also checks the usability flags */
-	int CanUseItemType(int itype, int slottype, ieDword use1=0, ieDword use2=0, Actor *actor=NULL) const;
+	int CanUseItemType(int slottype, Item *item, Actor *actor=NULL) const;
 	/*removes single file from cache*/
 	void RemoveFromCache(const ieResRef resref, SClass_ID SClassID);
 	/*removes all files from directory*/

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.438 2006/12/30 19:11:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.439 2006/12/30 23:47:26 avenger_teambg Exp $
  *
  */
 
@@ -5727,20 +5727,22 @@ static PyObject* GemRB_ChangeItemFlag(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_CanUseItemType__doc,
-"CanUseItemType(itemtype, slottype[, use1, use2, actor])=>bool\n\n"
+"CanUseItemType( slottype, itemname[, actor])=>bool\n\n"
 "Checks the itemtype vs. slottype, and also checks the usability flags vs. Actor's stats (alignment, class, race, kit etc.)" );
 
 static PyObject* GemRB_CanUseItemType(PyObject * /*self*/, PyObject* args)
 {
-	int ItemType, SlotType, use1, use2, PartyID;
+	int SlotType, PartyID;
+	char *ItemName;
 
-	use1 = 0;
-	use2 = 0;
 	PartyID = 0;
-	if (!PyArg_ParseTuple( args, "ii|iii", &ItemType, &SlotType, &use1, &use2, &PartyID)) {
+	if (!PyArg_ParseTuple( args, "isi", &SlotType, &ItemName, &PartyID)) {
 		return AttributeError( GemRB_CanUseItemType__doc );
 	}
-
+	Item *item = core->GetItem(ItemName);
+	if (!item) {
+		return PyInt_FromLong(0);
+	}
 	Actor* actor = 0;
 	if (PartyID) {
 		Game *game = core->GetGame();
@@ -5753,10 +5755,9 @@ static PyObject* GemRB_CanUseItemType(PyObject * /*self*/, PyObject* args)
 		}
 	}
 
-	if (core->CanUseItemType(ItemType, SlotType, use1, use2, actor)) {
-		return PyInt_FromLong(1);
-	}
-	return PyInt_FromLong(0);
+	int ret=core->CanUseItemType(SlotType, item, actor);
+	core->FreeItem(item, ItemName, false);
+	return PyInt_FromLong(ret);
 }
 
 
@@ -5849,10 +5850,10 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "LoreToID", PyInt_FromLong(item->LoreToID));
 
 	int function=0;
-	if (core->CanUseItemType(item->ItemType, SLOT_POTION, 0, 0, NULL) ) {
+	if (core->CanUseItemType(SLOT_POTION, item, NULL) ) {
 			function|=CAN_DRINK;
 	}
-	if (core->CanUseItemType(item->ItemType, SLOT_SCROLL, 0, 0, NULL) ) {
+	if (core->CanUseItemType(SLOT_SCROLL, item, NULL) ) {
 		ITMExtHeader *eh;
 		Effect *f;
 		//determining if this is a copyable scroll
@@ -5875,7 +5876,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 		function|=CAN_READ;
 	}
 not_a_scroll:
-	if (core->CanUseItemType(item->ItemType, SLOT_BAG, 0, 0, NULL) ) {
+	if (core->CanUseItemType(SLOT_BAG, item, NULL) ) {
 		//allow the open container flag only if there is
 		//a store file (this fixes pst eye items, which 
 		//got the same item type as bags)
@@ -6066,12 +6067,9 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	if (Effect && item->ItemExcl & actor->inventory.GetEquipExclusion()) {
 		return PyInt_FromLong( 0 );
 	}
-	int Itemtype = item->ItemType;
-	int Use1 = item->UsabilityBitmask;
-	int Use2 = item->KitUsability;
-	core->FreeItem( item, slotitem->ItemResRef, false );
 	//CanUseItemType will check actor's class bits too
-	Slottype =core->CanUseItemType (Itemtype, Slottype, Use1, Use2, actor);
+	Slottype =core->CanUseItemType (Slottype, item, actor);
+	core->FreeItem( item, slotitem->ItemResRef, false );
 	if ( !Slottype) {
 		return PyInt_FromLong( 0 );
 	}

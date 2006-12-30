@@ -16,7 +16,7 @@
 #along with this program; if not, write to the Free Software
 #Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUIINV.py,v 1.21 2006/12/30 16:43:21 wjpalenstijn Exp $
+#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUIINV.py,v 1.22 2006/12/30 23:47:25 avenger_teambg Exp $
 
 
 #GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -274,9 +274,10 @@ def RefreshInventoryWindow ():
 	#Shield
 	slot_item = GemRB.GetSlotItem (pc, 3)
 	if slot_item:
-		item = GemRB.GetItem (slot_item["ItemResRef"])
+		itemname = slot_item["ItemResRef"]
+		item = GemRB.GetItem (itemname)
 		if (item['AnimationType'] != ''):
-			if (GemRB.CanUseItemType(item['Type'], SLOT_WEAPON)):
+			if (GemRB.CanUseItemType (SLOT_WEAPON, itemname)):
 				#off-hand weapon
 				GemRB.SetButtonPLT(Window, Button, "WP" + size + item['AnimationType'] + "OIN", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 2)
 			else:
@@ -380,10 +381,10 @@ def UpdateSlot (pc, slot):
 	if GemRB.IsDraggingItem ():
 		#get dragged item
 		drag_item = GemRB.GetSlotItem (0,0)
-		drag_item = GemRB.GetItem (drag_item["ItemResRef"])
-		itemtype = drag_item["Type"]
+		itemname = drag_item["ItemResRef"]
+		drag_item = GemRB.GetItem (itemname)
 	else:
-		itemtype = -1
+		itemname = ""
 
 	Button = GemRB.GetControl (Window, SlotType["ID"])
 	slot_item = GemRB.GetSlotItem (pc, slot+1)
@@ -415,12 +416,12 @@ def UpdateSlot (pc, slot):
 		if SlotType["ResRef"]=="*":
 			GemRB.SetButtonBAM (Window, Button, "",0,0,0)
 			GemRB.SetTooltip (Window, Button, SlotType["Tip"])
-			itemtype = -1
+			itemname = ""
 		elif SlotType["ResRef"]=="":
 			GemRB.SetButtonBAM (Window, Button, "",0,0,0)
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 			GemRB.SetTooltip (Window, Button, "")
-			itemtype = -1
+			itemname = ""
 		else:
 			GemRB.SetButtonBAM (Window, Button, SlotType["ResRef"],0,0,0)
 			GemRB.SetTooltip (Window, Button, SlotType["Tip"])
@@ -433,12 +434,12 @@ def UpdateSlot (pc, slot):
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
 
 	if OverSlot == slot+1:
-		if GemRB.CanUseItemType(itemtype, SlotType["Type"]):
+		if GemRB.CanUseItemType (SlotType["Type"], itemname):
 			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SELECTED)
 		else:
 			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 	else:
-		if (SlotType["Type"]&SLOT_INVENTORY) or not GemRB.CanUseItemType(itemtype, SlotType["Type"]):
+		if (SlotType["Type"]&SLOT_INVENTORY) or not GemRB.CanUseItemType (SlotType["Type"], itemname):
 			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 		else:
 			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SECOND)
@@ -472,7 +473,7 @@ def OnAutoEquip ():
 	GemRB.DropDraggedItem (pc, -1)
 
 	if GemRB.IsDraggingItem ():
-		GemRB.PlaySound("GAM_47")  #failed equip
+		GemRB.PlaySound ("GAM_47")  #failed equip
 
 	UpdateInventoryWindow ()
 	return
@@ -490,7 +491,7 @@ def OnDragItem ():
 		if SlotType["ResRef"]!="":
 			GemRB.DropDraggedItem (pc, slot)
 		if GemRB.IsDraggingItem ():
-			GemRB.PlaySound("GAM_47")  #failed equip
+			GemRB.PlaySound ("GAM_47")  #failed equip
 
 	UpdateInventoryWindow ()
 	return
@@ -501,7 +502,7 @@ def OnDropItemToPC ():
 	#-3 : drop stuff in inventory (but not equippable slots)
 	GemRB.DropDraggedItem (pc, -3)
 	if GemRB.IsDraggingItem ():
-		GemRB.PlaySound("GAM_47")  #failed equip
+		GemRB.PlaySound ("GAM_47")  #failed equip
 	UpdateInventoryWindow ()
 	return
 

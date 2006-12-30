@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.102 2006/12/28 20:54:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.103 2006/12/30 23:47:26 avenger_teambg Exp $
  *
  */
 
@@ -339,7 +339,7 @@ void Inventory::KillSlot(unsigned int index)
 	Item *itm = core->GetItem(item->ItemResRef);
 	switch (effect) {
 		case SLOT_EFFECT_LEFT:
-			UpdateShieldAnimation();
+			UpdateShieldAnimation(itm);
 			break;
 		case SLOT_EFFECT_MISSILE:
 		case SLOT_EFFECT_MELEE:
@@ -357,9 +357,9 @@ void Inventory::KillSlot(unsigned int index)
 				if (l>=0 && l<=3) {
 					Owner->SetBase(IE_ARMOR_TYPE, 0);
 				} else {
-					if (core->CanUseItemType(itm->ItemType, SLOT_HELM, 0, 0, 0)) {
+					if (core->CanUseItemType(SLOT_HELM, itm)) {
 						Owner->SetUsedHelmet("");
-					} else if (core->CanUseItemType(itm->ItemType, SLOT_SHIELD, 0, 0, 0)) {
+					} else if (core->CanUseItemType(SLOT_SHIELD, itm)) {
 						Owner->SetUsedShield("");
 					}
 				}
@@ -481,6 +481,9 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 			InvalidSlot(slot);
 		}
 
+		if (IsSlotBlocked(slot)) {
+			return 0;
+		}
 		if (!Slots[slot]) {
 			item->Flags |= IE_INV_ITEM_ACQUIRED;
 			Slots[slot] = item;
@@ -524,6 +527,8 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 	int res = 0;
 	int max = (int) Slots.size();
 	for (int i = 0;i<max;i++) {
+		if (IsSlotBlocked(i))
+			continue;
 		if ((i<SLOT_INV || i>LAST_INV)!=which)
 			continue;
 		if (!(core->QuerySlotType(i)&slottype))
@@ -612,7 +617,7 @@ int Inventory::DepleteItem(ieDword flags)
 			if (!itm)
 				continue;
 			//if the item is usable in weapon slot, then it is weapon
-			int weapon = core->CanUseItemType(itm->ItemType, SLOT_WEAPON);
+			int weapon = core->CanUseItemType( SLOT_WEAPON, itm );
 			core->FreeItem( itm, item->ItemResRef, false );
 			if (weapon)
 				continue;
@@ -753,7 +758,7 @@ bool Inventory::EquipItem(unsigned int slot)
 	case SLOT_EFFECT_LEFT:
 		//no idea if the offhand weapon has style, or simply the right
 		//hand style is dominant
-		UpdateShieldAnimation();
+		UpdateShieldAnimation(itm);
 		break;
 	case SLOT_EFFECT_MELEE:
 		//if weapon is ranged, then find quarrel for it and equip that
@@ -798,9 +803,9 @@ bool Inventory::EquipItem(unsigned int slot)
 			if (l>=0 && l<=3) {
 				Owner->SetBase(IE_ARMOR_TYPE, l);
 			} else {
-				if (core->CanUseItemType(itm->ItemType, SLOT_HELM, 0, 0, 0)) {
+				if (core->CanUseItemType( SLOT_HELM, itm)) {
 					Owner->SetUsedHelmet(itm->AnimationType);
-				} else if (core->CanUseItemType(itm->ItemType, SLOT_SHIELD, 0, 0, 0)) {
+				} else if (core->CanUseItemType(SLOT_SHIELD, itm)) {
 					Owner->SetUsedShield(itm->AnimationType);
 				}
 			}
@@ -1000,7 +1005,7 @@ int Inventory::GetShieldSlot()
 	if (IWD2 && Equipped>=0) {
 		return Equipped*2+SLOT_MELEE+1;
 	}
-	return SLOT_SHIELD;
+	return SLOT_LEFT;
 }
 
 int Inventory::GetEquippedSlot()
@@ -1329,22 +1334,16 @@ ieDword Inventory::GetEquipExclusion() const
 	return ItemExcl;
 }
 
-void Inventory::UpdateShieldAnimation()
+void Inventory::UpdateShieldAnimation(Item *it)
 {
 	char AnimationType[2]={0,0};
 	int WeaponType = -1;
 
-	CREItem* si = GetSlotItem( core->QuerySlot(3) );
-	if (si) {
-		Item* it = core->GetItem(si->ItemResRef);
-		memcpy(AnimationType, it->AnimationType, 2);
-		if (core->CanUseItemType(it->ItemType, SLOT_WEAPON, 0, 0, 0))
-			WeaponType = IE_ANI_WEAPON_2W;
-		else
-			WeaponType = IE_ANI_WEAPON_1H;
-	} else {
-
-	}
+	memcpy(AnimationType, it->AnimationType, 2);
+	if (core->CanUseItemType(SLOT_WEAPON, it))
+		WeaponType = IE_ANI_WEAPON_2W;
+	else
+		WeaponType = IE_ANI_WEAPON_1H;
 	Owner->SetUsedShield(AnimationType, WeaponType);
 }
 
@@ -1377,10 +1376,10 @@ void Inventory::UpdateWeaponAnimation()
 			// Examine shield slot to check if we're using two weapons
 			// TODO: for consistency, use same Item* access method as above
 			bool twoweapon = false;
-			CREItem* si = GetSlotItem( core->QuerySlot(3) );
+			CREItem* si = GetSlotItem( core->QuerySlot(GetShieldSlot()) );
 			if (si) {
 				Item* it = core->GetItem(si->ItemResRef);
-				if (core->CanUseItemType(it->ItemType, SLOT_WEAPON, 0, 0, 0))
+				if (core->CanUseItemType(SLOT_WEAPON, it))
 					twoweapon = true;
 				core->FreeItem(it, si->ItemResRef, false);
 			}
@@ -1399,3 +1398,18 @@ void Inventory::UpdateWeaponAnimation()
 		core->FreeItem( itm, Slot->ItemResRef, false );
 	Owner->SetUsedWeapon(AnimationType, MeleeAnimation, WeaponType);
 }
+
+//this function will also check disabled slots (if that feature will be imped)
+bool Inventory::IsSlotBlocked(int slot)
+{
+        if (slot<SLOT_MELEE) return false;
+        if (slot>LAST_MELEE) return false;
+	int otherslot;
+        if (IWD2) {
+		otherslot = slot+1;
+	} else {
+		otherslot = SLOT_LEFT;
+	}
+	return HasItemInSlot("",otherslot);
+}
+
