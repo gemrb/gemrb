@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.103 2006/12/30 23:47:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.104 2006/12/30 23:58:24 wjpalenstijn Exp $
  *
  */
 
@@ -204,8 +204,7 @@ void Inventory::AddSlotEffects(CREItem* slot, int type)
 		// Tweak colour effects for weapons:
 		// If a weapon is in the off-hand, it needs to set the off-hand palette
 		// If it is in the main hand, it should set the weapon palette
-		// FIXME: some other opcodes probably need this too
-		if (fx->Opcode == 7) { // set_color_gradient
+		if (IsColorslotEffect(fx->Opcode)) {
 			unsigned int gradienttype = fx->Parameter2 & 0xF0;
 			if (type == SLOT_EFFECT_MELEE && gradienttype == 0x20)
 				gradienttype = 0x10; // weapon
@@ -1014,6 +1013,7 @@ int Inventory::GetEquippedSlot()
 		return SLOT_FIST;
 	}
 	if (IWD2 && Equipped>=0) {
+		if (Equipped == 4) Equipped = 0; 
 		return Equipped*2+SLOT_MELEE;
 	}
 	return Equipped+SLOT_MELEE;
@@ -1351,10 +1351,12 @@ void Inventory::UpdateWeaponAnimation()
 {
 	int slot = GetEquippedSlot();
  	int effect = core->QuerySlotEffects( slot );
+	printf("UpdateWeaponAnimation: %d, %d, %d, %d\n", Equipped, SLOT_MELEE, slot, effect);
 	if (effect == SLOT_EFFECT_MISSILE) {
 		// ranged weapon
 		slot = FindRangedWeapon();
 	}
+	printf("UpdateWeaponAnimation: %d\n", slot);
 	int WeaponType = -1;
 
 	char AnimationType[2]={0,0};

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.75 2006/08/30 19:02:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.76 2006/12/30 23:58:24 wjpalenstijn Exp $
  *
  */
 
@@ -151,6 +151,13 @@ static EffectRef diced_effects2[] = {
 	{"LichTouch",NULL,-1}, //how
 {NULL,NULL,0} };
 
+//effects that take a color slot as parameter
+static EffectRef colorslot_effects[] = {
+	{"Color:SetPalette",NULL,-1},
+	{"Color:SetRGB",NULL,-1},
+	{"Color:PulseRGB",NULL,-1},
+{NULL,NULL,0} };
+
 inline static void ResolveEffectRef(EffectRef &effect_reference)
 {
 	if (effect_reference.EffText==-1) {
@@ -226,6 +233,9 @@ bool Init_EffectQueue()
 	}
 	for (i=0;diced_effects2[i].Name;i++) {
 		ResolveEffectRef(diced_effects2[i]);
+	}
+	for (i=0;colorslot_effects[i].Name;i++) {
+		ResolveEffectRef(colorslot_effects[i]);
 	}
 
 	return true;
@@ -362,6 +372,18 @@ bool IsDicedEffect2(int opcode)
 
 	for(i=0;diced_effects2[i].Name;i++) {
 		if(diced_effects2[i].EffText==opcode) {
+			return true;
+		}
+	}
+	return false;
+}
+
+bool IsColorslotEffect(int opcode)
+{
+	int i;
+
+	for(i=0;colorslot_effects[i].Name;i++) {
+		if(colorslot_effects[i].EffText==opcode) {
 			return true;
 		}
 	}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.35 2006/08/30 19:02:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.h,v 1.36 2006/12/30 23:58:24 wjpalenstijn Exp $
  *
  */
 
@@ -129,6 +129,8 @@ void EffectQueue_ReleaseMemory();
 
 bool match_ids(Actor *target, int table, ieDword value);
 
+/** Check if opcode is for an effect that takes a color slot as parameter. */
+bool IsColorslotEffect(int opcode);
 
 /**
  * @class EffectQueue
