@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.117 2006/12/30 16:43:22 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.118 2006/12/31 13:45:52 avenger_teambg Exp $
  *
  */
 
@@ -389,6 +389,7 @@ Actor* CREImp::GetActor()
 		ReadChrHeader(act);
 	}
 
+	act->inventory.CalculateWeight();
 	return act;
 }
 
