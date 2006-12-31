@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIREC.py,v 1.8 2006/12/30 19:11:15 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIREC.py,v 1.9 2006/12/31 15:18:36 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -85,7 +85,7 @@ def OpenRecordsWindow ():
 	# export
 	Button = GemRB.GetControl (Window, 36)
 	GemRB.SetText (Window, Button, 13956)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "ExportWindow")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenExportWindow")
 
 ## 	# kit info
 ## 	Button = GemRB.GetControl (Window, 52)
@@ -108,6 +108,13 @@ def UpdateRecordsWindow ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	
+	# exportable
+	Button = GemRB.GetControl (Window, 36)
+	if GemRB.GetPlayerStat (pc, IE_MC_FLAGS)&MC_EXPORTABLE:
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
+	else:
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
+
 	# name
 	Label = GemRB.GetControl (Window, 0x1000000e)
 	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc, 0))
@@ -365,7 +372,6 @@ def GetStatOverview (pc):
 
 	return Main + CurrentState + string.join (res, "\n")
 
-
 def OpenInformationWindow ():
 	global InformationWindow
 	
@@ -397,7 +403,7 @@ def OpenInformationWindow ():
 
 	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
-
+	return
 
 def OpenBiographyWindow ():
 	global BiographyWindow
@@ -427,6 +433,51 @@ def OpenBiographyWindow ():
 
 	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
-	
+	return
+
+def OpenExportWindow ():
+	global ExportWindow, NameField, ExportDoneButton
+
+	ExportWindow = GemRB.LoadWindow(13)
+
+	TextArea = GemRB.GetControl(ExportWindow, 2)
+	GemRB.SetText(ExportWindow, TextArea, 10962)
+
+	TextArea = GemRB.GetControl(ExportWindow,0)
+	GemRB.GetCharacters (ExportWindow, TextArea)
+
+	ExportDoneButton = GemRB.GetControl(ExportWindow, 4)
+	GemRB.SetText(ExportWindow, ExportDoneButton, 11973)
+	GemRB.SetButtonState(ExportWindow, ExportDoneButton, IE_GUI_BUTTON_DISABLED)
+
+	CancelButton = GemRB.GetControl(ExportWindow,5)
+	GemRB.SetText(ExportWindow, CancelButton, 13727)
+
+	NameField = GemRB.GetControl(ExportWindow,6)
+
+	GemRB.SetEvent(ExportWindow, ExportDoneButton, IE_GUI_BUTTON_ON_PRESS, "ExportDonePress")
+	GemRB.SetEvent(ExportWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "ExportCancelPress")
+	GemRB.SetEvent(ExportWindow, NameField, IE_GUI_EDIT_ON_CHANGE, "ExportEditChanged")
+	GemRB.ShowModal (ExportWindow, MODAL_SHADOW_GRAY)
+	GemRB.SetControlStatus (ExportWindow, NameField,IE_GUI_CONTROL_FOCUSED)
+	return
+
+def ExportDonePress():
+	GemRB.UnloadWindow(ExportWindow)
+	#save file under name from EditControl
+	return
+
+def ExportCancelPress():
+	GemRB.UnloadWindow(ExportWindow)
+	return
+
+def ExportEditChanged():
+	ExportFileName = GemRB.QueryText(ExportWindow, NameField)
+	if ExportFileName == "":
+		GemRB.SetButtonState(ExportWindow, ExportDoneButton, IE_GUI_BUTTON_DISABLED)
+	else:
+		GemRB.SetButtonState(ExportWindow, ExportDoneButton, IE_GUI_BUTTON_ENABLED)
+	return
+
 ###################################################
 # End of file GUIREC.py

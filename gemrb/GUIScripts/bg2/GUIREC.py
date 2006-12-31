@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.28 2006/12/31 14:18:54 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIREC.py,v 1.29 2006/12/31 15:18:36 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -48,7 +48,7 @@ def OpenRecordsWindow ():
 
 	if CloseOtherWindow (OpenRecordsWindow):
 		if InformationWindow: OpenInformationWindow ()
-		
+	
 		GemRB.UnloadWindow (RecordsWindow)
 		GemRB.UnloadWindow (OptionsWindow)
 		GemRB.UnloadWindow (PortraitWindow)
@@ -62,7 +62,7 @@ def OpenRecordsWindow ():
 		GUICommonWindows.OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
 		SetSelectionChangeHandler (None)
-		return	
+		return
 
 	GemRB.HideGUI ()
 	GemRB.SetVisible (0,0)
@@ -123,14 +123,21 @@ def OpenRecordsWindow ():
 
 def UpdateRecordsWindow ():
 	global stats_overview, alignment_help
-	
+
 	Window = RecordsWindow
 	if not RecordsWindow:
 		print "SelectionChange handler points to non existing window\n"
 		return
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	
+
+	# exportable
+	Button = GemRB.GetControl (Window, 36)
+	if GemRB.GetPlayerStat (pc, IE_MC_FLAGS)&MC_EXPORTABLE:
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
+	else:
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
+
 	# name
 	Label = GemRB.GetControl (Window, 0x1000000e)
 	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc, 0))
@@ -160,7 +167,7 @@ def UpdateRecordsWindow ():
 
 	sstr = GemRB.GetPlayerStat (pc, IE_STR)
 	sstrx = GemRB.GetPlayerStat (pc, IE_STREXTRA)
-	
+
 	if sstrx > 0 and sstr==18:
 		sstr = "%d/%02d" %(sstr, sstrx % 100)
 	else:
@@ -198,7 +205,7 @@ def UpdateRecordsWindow ():
 	Table = GemRB.LoadTable ("races")
 	text = GemRB.GetTableValue (Table, GemRB.GetPlayerStat (pc, IE_RACE) - 1, 0)
 	GemRB.UnloadTable (Table)
-	
+
 	Label = GemRB.GetControl (Window, 0x1000000f)
 	GemRB.SetText (Window, Label, text)
 
@@ -237,7 +244,7 @@ def GetStatOverview (pc):
 	won = ""
 	woff = ""
 	str_None = GemRB.GetString (61560)
-	
+
 	GS = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s)
 
 	stats = []
@@ -406,7 +413,7 @@ def GetReputation (repvalue):
 
 def OpenInformationWindow ():
 	global InformationWindow
-	
+
 	if InformationWindow != None:
 		if BiographyWindow: OpenBiographyWindow ()
 
@@ -415,7 +422,7 @@ def OpenInformationWindow ():
 		GemRB.SetVisible (RecordsWindow, 3)
 		GemRB.SetVisible (PortraitWindow, 3)
 		InformationWindow = None
-		
+	
 		return
 
 	InformationWindow = Window = GemRB.LoadWindow (4)
@@ -546,7 +553,7 @@ def OpenBiographyWindow ():
 	TextArea = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, TextArea, 39424)
 
-	
+
 	# Done
 	Button = GemRB.GetControl (Window, 2)
 	GemRB.SetText (Window, Button, 1403)
@@ -574,7 +581,7 @@ def OpenExportWindow ():
 	GemRB.SetText(ExportWindow, CancelButton, 13727)
 
 	NameField = GemRB.GetControl(ExportWindow,6)
-	
+
 	GemRB.SetEvent(ExportWindow, ExportDoneButton, IE_GUI_BUTTON_ON_PRESS, "ExportDonePress")
 	GemRB.SetEvent(ExportWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "ExportCancelPress")
 	GemRB.SetEvent(ExportWindow, NameField, IE_GUI_EDIT_ON_CHANGE, "ExportEditChanged")
