@@ -16,7 +16,7 @@
 #along with this program; if not, write to the Free Software
 #Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.36 2006/12/31 13:48:23 avenger_teambg Exp $
+#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.37 2006/12/31 16:22:20 avenger_teambg Exp $
 
 #GUIINV.py - scripts to control inventory windows from GUIINV winpack
 
@@ -73,6 +73,7 @@ def OpenInventoryWindow ():
 		GemRB.SetVarAssoc (Window, Button, "GroundItemButton", i)
 		GemRB.SetButtonSprites (Window, Button, "STONSLOT",0,0,2,4,3)
 		GemRB.SetButtonFont (Window, Button, "NUMBER")
+		GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,128,128,255,64,0,1)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
 
 	#ground items scrollbar
@@ -128,6 +129,7 @@ def OpenInventoryWindow ():
 			#the gui resource has it, but setting the other cycles
 			GemRB.SetButtonSprites (Window, Button, "STONSLOT",0,0,1,2,3)
 			GemRB.SetButtonFont (Window, Button, "NUMBER")
+			GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,128,128,255,64,0,1)
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
 
 	GemRB.UnhideGUI ()
@@ -494,9 +496,11 @@ def IdentifyUseSpell ():
 	global ItemIdentifyWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
 	GemRB.UnloadWindow (ItemIdentifyWindow)
 	GemRB.HasSpecialSpell (pc, 1, 1)
 	GemRB.UnloadWindow (ItemInfoWindow)
+	GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
 	OpenItemInfoWindow()
 	return
 
@@ -504,9 +508,11 @@ def IdentifyUseScroll ():
 	global ItemIdentifyWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
 	GemRB.UnloadWindow (ItemIdentifyWindow)
 	GemRB.HasSpecialItem (pc, 1, 1)
 	GemRB.UnloadWindow (ItemInfoWindow)
+	GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
 	OpenItemInfoWindow()
 	return
 
@@ -542,6 +548,7 @@ def IdentifyItemWindow ():
 
 def CloseItemInfoWindow ():
 	GemRB.UnloadWindow (ItemInfoWindow)
+	UpdateInventoryWindow ()
 	return
 
 def DisplayItem (itemresref, type):
@@ -625,7 +632,7 @@ def OpenItemInfoWindow ():
 	item = GemRB.GetItem (slot_item["ItemResRef"])
 
 	#auto identify when lore is high enough
-	if item["LoreToID"]<GemRB.GetPlayerStat (pc, IE_LORE):
+	if item["LoreToID"]<=GemRB.GetPlayerStat (pc, IE_LORE):
 		GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
 		slot_item["Flags"] |= IE_INV_ITEM_IDENTIFIED
 		UpdateInventoryWindow ()
