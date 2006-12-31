@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.441 2006/12/31 13:48:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.442 2006/12/31 14:10:45 wjpalenstijn Exp $
  *
  */
 
@@ -4451,7 +4451,7 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 			Picture = core->GetBAMSprite(item->ItemIcon, -1, Which);
 			break;
 		case 2:
-			btn->ClearPictureList();
+			btn->SetPicture( NULL ); // also calls ClearPictureList
 			for (i=0;i<4;i++) {
 				Picture = core->GetBAMSprite(item->CarriedIcon, -1, i);
 				if (Picture)
@@ -4463,7 +4463,7 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 		case 4: case 5:
 			Picture = GetUsedWeaponIcon(item, Which-4);
 			if (Item2ResRef) {
-				btn->ClearPictureList();
+				btn->SetPicture( NULL ); // also calls ClearPictureList
 				Item* item2 = core->GetItem(Item2ResRef);
 				if (item2) {
 					Sprite2D* Picture2;
