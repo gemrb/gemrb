@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIREC.py,v 1.29 2006/12/31 13:48:23 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIREC.py,v 1.30 2006/12/31 14:18:55 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -39,7 +39,7 @@ PortraitWindow = None
 OptionsWindow = None
 OldPortraitWindow = None
 OldOptionsWindow = None
-DoneButton = None
+ExportDoneButton = None
 
 ###################################################
 def OpenRecordsWindow ():
@@ -556,46 +556,48 @@ def OpenBiographyWindow ():
 	return
 
 def OpenExportWindow ():
-        global ExportWindow, NameField
+	global ExportWindow, NameField, ExportDoneButton
 
-        ExportWindow = GemRB.LoadWindow(13)
+	ExportWindow = GemRB.LoadWindow(13)
 
-        TextAreaControl = GemRB.GetControl(ExportWindow, 4)
-        GemRB.SetText(ExportWindow, TextAreaControl, 10963)
+	TextArea = GemRB.GetControl(ExportWindow, 2)
+	GemRB.SetText(ExportWindow, TextArea, 10962)
 
-        TextAreaControl = GemRB.GetControl(ExportWindow,2)
-#Fill TextArea Control with character sheets, make textarea a listbox
+	TextArea = GemRB.GetControl(ExportWindow,0)
+	GemRB.GetCharacters (ExportWindow, TextArea)
 
-        DoneButton = GemRB.GetControl(ExportWindow, 4)
-        GemRB.SetText(ExportWindow, DoneButton, 11973)
-        GemRB.SetButtonState(ExportWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
+	ExportDoneButton = GemRB.GetControl(ExportWindow, 4)
+	GemRB.SetText(ExportWindow, ExportDoneButton, 11973)
+	GemRB.SetButtonState(ExportWindow, ExportDoneButton, IE_GUI_BUTTON_DISABLED)
 
-        CancelButton = GemRB.GetControl(ExportWindow,5)
-        GemRB.SetText(ExportWindow, CancelButton, 13727)
+	CancelButton = GemRB.GetControl(ExportWindow,5)
+	GemRB.SetText(ExportWindow, CancelButton, 13727)
 
 	NameField = GemRB.GetControl(ExportWindow,6)
 	
-        GemRB.SetEvent(ExportWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS, "ExportDonePress")
-        GemRB.SetEvent(ExportWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "ExportCancelPress")
-        GemRB.SetEvent(ExportWindow, NameField, IE_GUI_EDIT_ON_CHANGE, "ExportEditChanged")
+	GemRB.SetEvent(ExportWindow, ExportDoneButton, IE_GUI_BUTTON_ON_PRESS, "ExportDonePress")
+	GemRB.SetEvent(ExportWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "ExportCancelPress")
+	GemRB.SetEvent(ExportWindow, NameField, IE_GUI_EDIT_ON_CHANGE, "ExportEditChanged")
 	GemRB.ShowModal (ExportWindow, MODAL_SHADOW_GRAY)
 	GemRB.SetControlStatus (ExportWindow, NameField,IE_GUI_CONTROL_FOCUSED)
-        return
+	return
 
 def ExportDonePress():
-        GemRB.UnloadWindow(ExportWindow)
+	GemRB.UnloadWindow(ExportWindow)
 	#save file under name from EditControl
-        return
+	return
 
 def ExportCancelPress():
-        GemRB.UnloadWindow(ExportWindow)
-        return
+	GemRB.UnloadWindow(ExportWindow)
+	return
 
 def ExportEditChanged():
-	ExportFileName = GemRB.GetToken(ExportWindow, NameField)
+	ExportFileName = GemRB.QueryText(ExportWindow, NameField)
 	if ExportFileName == "":
-	        GemRB.SetButtonState(ExportWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
+		GemRB.SetButtonState(ExportWindow, ExportDoneButton, IE_GUI_BUTTON_DISABLED)
 	else:
-        	GemRB.SetButtonState(ExportWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
+		GemRB.SetButtonState(ExportWindow, ExportDoneButton, IE_GUI_BUTTON_ENABLED)
+	return
+
 ###################################################
 # End of file GUIREC.py

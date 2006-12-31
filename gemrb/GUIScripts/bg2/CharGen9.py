@@ -214,7 +214,7 @@ def NextPress():
 	TmpTable = GemRB.LoadTable ("skills")
 	RowCount = GemRB.GetTableRowCount (TmpTable)-2
 
-        for i in range(RowCount):
+	for i in range(RowCount):
 		stat = GemRB.GetTableValue (TmpTable, i+2, 2)
 		value = GemRB.GetVar ("Skill "+str(i) )
 		GemRB.SetPlayerStat (MyChar, stat, value )
