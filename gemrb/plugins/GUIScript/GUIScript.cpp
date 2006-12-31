@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.442 2006/12/31 14:10:45 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.443 2006/12/31 14:58:12 avenger_teambg Exp $
  *
  */
 
@@ -5738,6 +5738,9 @@ static PyObject* GemRB_CanUseItemType(PyObject * /*self*/, PyObject* args)
 	PartyID = 0;
 	if (!PyArg_ParseTuple( args, "is|i", &SlotType, &ItemName, &PartyID)) {
 		return AttributeError( GemRB_CanUseItemType__doc );
+	}
+	if (!ItemName[0]) {
+		return PyInt_FromLong(0);
 	}
 	Item *item = core->GetItem(ItemName);
 	if (!item) {
