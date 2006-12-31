@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.440 2006/12/30 23:59:47 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.441 2006/12/31 13:48:23 avenger_teambg Exp $
  *
  */
 
@@ -5915,6 +5915,9 @@ CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count)
 	//we should use GetSlotItem here.
 	//getitem would remove the item from the inventory!
 	si = actor->inventory.GetSlotItem(Slot);
+	if (!si) {
+		return NULL;
+	}
 	while(i--) {
 		if (UsedItems[i].itemname[0] && strnicmp(UsedItems[i].itemname, si->ItemResRef,8) ) {
 			continue;
@@ -6074,8 +6077,21 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		return PyInt_FromLong( 0 );
 	}
 	res = actor->inventory.AddSlotItem( slotitem, Slot, Slottype );
+	if (res) {
+		//release it only when fully placed
+		if (res==2) {
+			core->ReleaseDraggedItem ();
+		}
+		actor->RefreshEffects();
+		actor->ReinitQuickSlots();
 	//couldn't place item there, try swapping (only if slot is explicit)
-	if ((res == 0) && (Slot >= 0) ) {
+	} else if ( Slot >= 0 ) {
+		//swapping won't cure this
+		res = actor->inventory.WhyCantEquip(Slot, slotitem->Flags&IE_INV_ITEM_TWOHANDED);
+		if (res) {
+			core->DisplayConstantString(res,0xffffff);
+			return PyInt_FromLong( 0 );
+		}
 		CREItem *tmp = TryToUnequip(actor, Slot, 0 );
 		if (tmp) {
 			//this addslotitem MUST succeed because the slot was
@@ -6084,15 +6100,12 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 			core->ReleaseDraggedItem ();
 			DragItem(tmp);
 			res = 3;
+			actor->RefreshEffects();
+			actor->ReinitQuickSlots();
 		} else {
 			res = 0;
 		}
-		goto done;
 	}
-	core->ReleaseDraggedItem ();
-done:
-	actor->RefreshEffects();
-	actor->ReinitQuickSlots();
 	//this is PST specific, change animation
 	core->GetGUIScriptEngine()->RunFunction("UpdateAnimation", false);
 	return PyInt_FromLong( res );

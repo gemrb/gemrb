@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.30 2006/11/29 21:17:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.31 2006/12/31 13:48:22 avenger_teambg Exp $
  *
  */
 
@@ -189,7 +189,7 @@ public:
 	// flag items to mutually exclusive to equip
 	ieDword ItemExcl;
 public:
-	ieStrRef GetItemName(bool identified)
+	ieStrRef GetItemName(bool identified) const
 	{
 		if(identified) {
 			if((int) ItemNameIdentified>=0) return ItemNameIdentified;
@@ -200,7 +200,7 @@ public:
 		}
 		return ItemNameIdentified;
 	};
-	ieStrRef GetItemDesc(bool identified)
+	ieStrRef GetItemDesc(bool identified) const
 	{
 		if(identified) {
 			if((int) ItemDescIdentified>=0) return ItemDescIdentified;
@@ -221,11 +221,11 @@ public:
 		return ext_headers+which;
 	}
 	//-1 will return the equipping feature block
-	EffectQueue *GetEffectBlock(int usage);
+	EffectQueue *GetEffectBlock(int usage) const;
 	//returns the average damage of the weapon (doesn't check for special effects)
-	int GetDamagePotential(bool ranged, ITMExtHeader *&header);
+	int GetDamagePotential(bool ranged, ITMExtHeader *&header) const;
 	//returns the weapon header
-	ITMExtHeader *GetWeaponHeader(bool ranged);
+	ITMExtHeader *GetWeaponHeader(bool ranged) const;
 };
 
 #endif  // ! ITEM_H

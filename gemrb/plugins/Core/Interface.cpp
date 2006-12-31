@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.444 2006/12/30 23:47:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.445 2006/12/31 13:48:22 avenger_teambg Exp $
  *
  */
 
@@ -4450,7 +4450,7 @@ Item* Interface::GetItem(const ieResRef resname)
 }
 
 //you can supply name for faster access
-void Interface::FreeItem(Item *itm, const ieResRef name, bool free)
+void Interface::FreeItem(Item const *itm, const ieResRef name, bool free)
 {
 	int res;
 

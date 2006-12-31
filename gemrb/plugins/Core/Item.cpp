@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.cpp,v 1.13 2006/11/29 21:17:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.cpp,v 1.14 2006/12/31 13:48:22 avenger_teambg Exp $
  *
  */
 
@@ -43,7 +43,7 @@ Item::~Item(void)
 
 //-1 will return equipping feature block
 //otherwise returns the n'th feature block
-EffectQueue *Item::GetEffectBlock(int usage)
+EffectQueue *Item::GetEffectBlock(int usage) const
 {
 	Effect *features;
 	int count;
@@ -67,7 +67,7 @@ EffectQueue *Item::GetEffectBlock(int usage)
 }
 
 /** returns the average damage this weapon would cause */
-int Item::GetDamagePotential(bool ranged, ITMExtHeader *&header)
+int Item::GetDamagePotential(bool ranged, ITMExtHeader *&header) const
 {
 	header = GetWeaponHeader(ranged);
 	if (header) {
@@ -76,7 +76,7 @@ int Item::GetDamagePotential(bool ranged, ITMExtHeader *&header)
 	return 0;
 }
 
-ITMExtHeader *Item::GetWeaponHeader(bool ranged)
+ITMExtHeader *Item::GetWeaponHeader(bool ranged) const
 {
 	int ehc = ExtHeaderCount;
 	while(ehc--) {

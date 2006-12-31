@@ -15,12 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.104 2006/12/30 23:58:24 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.105 2006/12/31 13:48:22 avenger_teambg Exp $
  *
  */
 
 #include <stdio.h>
 #include "../../includes/win32def.h"
+#include "../../includes/strrefs.h"
 #include "Interface.h"
 #include "Inventory.h"
 #include "Item.h"
@@ -50,7 +51,7 @@ static void InvalidSlot(int slot)
 	abort();
 }
 
-inline Item *Inventory::GetItemPointer(ieDword slot, CREItem *&item)
+inline const Item *Inventory::GetItemPointer(ieDword slot, CREItem *&item)
 {
 	item = GetSlotItem(slot);
 	if (!item) return NULL;
@@ -145,11 +146,6 @@ void Inventory::CalculateWeight()
 				if (!(slot->Flags & IE_INV_ITEM_MOVABLE)) {
 					slot->Flags |= IE_INV_ITEM_UNDROPPABLE;
 				}
-				//this is not correct, cursed items are droppable if unwielded
-				//the consolidated flags will help this, new flag: IE_INV_ITEM_CURSED
-				//if (itm->Flags & IE_ITEM_CURSED) {
-				//	slot->Flags |= IE_INV_ITEM_UNDROPPABLE;
-				//}
 				
 				if (slot->Flags & IE_INV_ITEM_STOLEN2) {
 					slot->Flags |= IE_INV_ITEM_STOLEN;
@@ -475,12 +471,13 @@ void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
 
 int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 {
+	int twohanded = item->Flags&IE_INV_ITEM_TWOHANDED;
 	if (slot >= 0) {
 		if ((unsigned)slot >= Slots.size()) {
 			InvalidSlot(slot);
 		}
 
-		if (IsSlotBlocked(slot)) {
+		if (WhyCantEquip(slot,twohanded)) {
 			return 0;
 		}
 		if (!Slots[slot]) {
@@ -526,7 +523,8 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 	int res = 0;
 	int max = (int) Slots.size();
 	for (int i = 0;i<max;i++) {
-		if (IsSlotBlocked(i))
+		//never autoequip in the magic slot!
+		if (i==SLOT_MAGIC)
 			continue;
 		if ((i<SLOT_INV || i>LAST_INV)!=which)
 			continue;
@@ -538,6 +536,8 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 				continue;
 			}
 		}
+		if (WhyCantEquip(i,twohanded))
+			continue;
 		int part_res = AddSlotItem (item, i);
 		if (part_res == 2) return 2;
 		else if (part_res == 1) res = 1;
@@ -856,7 +856,7 @@ int Inventory::FindRangedProjectile(unsigned int type)
 	for(int i=SLOT_RANGED;i<=LAST_RANGED;i++) {
 		CREItem *Slot;
 
-		Item *itm = GetItemPointer(i, Slot);
+		const Item *itm = GetItemPointer(i, Slot);
 		if (!itm) continue;
 		ITMExtHeader *ext_header = itm->GetExtHeader(0);
 		unsigned int weapontype = 0;
@@ -883,7 +883,7 @@ int Inventory::FindSlotRangedWeapon(unsigned int slot)
 {
 	if ((int)slot >= SLOT_MELEE) return SLOT_FIST;
 	CREItem *Slot;   
-	Item *itm = GetItemPointer(slot, Slot);
+	const Item *itm = GetItemPointer(slot, Slot);
 	if (!itm) return SLOT_FIST;
 
 	ITMExtHeader *ext_header = itm->GetExtHeader(0);
@@ -905,7 +905,7 @@ int Inventory::FindTypedRangedWeapon(unsigned int type)
 	for(int i=SLOT_MELEE;i<=LAST_MELEE;i++) {
 		CREItem *Slot;
 
-		Item *itm = GetItemPointer(i, Slot);
+		const Item *itm = GetItemPointer(i, Slot);
 		if (!itm) continue;
 		ITMExtHeader *ext_header = itm->GetExtHeader(0);
 		int weapontype = 0;
@@ -1134,6 +1134,7 @@ void Inventory::AddSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 	} else {
 		delete TmpItem;
 	}
+	CalculateWeight();
 }
 
 void Inventory::SetSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge0, int Charge1, int Charge2)
@@ -1150,6 +1151,7 @@ void Inventory::SetSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 	} else {
 		delete TmpItem;
 	}
+	CalculateWeight();
 }
 
 void Inventory::BreakItemSlot(ieDword slot)
@@ -1157,7 +1159,7 @@ void Inventory::BreakItemSlot(ieDword slot)
 	ieResRef newItem;
 	CREItem *Slot;
 
-	Item *itm = GetItemPointer(slot, Slot);
+	const Item *itm = GetItemPointer(slot, Slot);
 	if (!itm) return;
 	memcpy(newItem, itm->ReplacementItem,sizeof(newItem) );
 	core->FreeItem( itm, Slot->ItemResRef, true );
@@ -1196,7 +1198,7 @@ void Inventory::EquipBestWeapon(int flags)
 
 	if (flags&EQUIP_RANGED) {
 		for(i=SLOT_RANGED;i<LAST_RANGED;i++) {
-			Item *itm = GetItemPointer(i, Slot);
+			const Item *itm = GetItemPointer(i, Slot);
 			if (!itm) continue;
  			//best ranged
 			int tmp = itm->GetDamagePotential(true, header);
@@ -1211,7 +1213,7 @@ void Inventory::EquipBestWeapon(int flags)
 
 		//ranged melee weapons like throwing daggers (not bows!)
 		for(i=SLOT_MELEE;i<LAST_MELEE;i++) {
-			Item *itm = GetItemPointer(i, Slot);
+			const Item *itm = GetItemPointer(i, Slot);
 			if (!itm) continue;
 			//best ranged
 			int tmp = itm->GetDamagePotential(true, header);
@@ -1227,9 +1229,11 @@ void Inventory::EquipBestWeapon(int flags)
 
 	if (flags&EQUIP_MELEE) {
 		for(i=SLOT_MELEE;i<LAST_MELEE;i++) {
-			Item *itm = GetItemPointer(i, Slot);
+			const Item *itm = GetItemPointer(i, Slot);
 			if (!itm) continue;
-			if (itm->Flags&IE_INV_ITEM_BOW) continue;
+			//the Slot flag is enough for this
+			//though we need animation type/damagepotential anyway
+			if (Slot->Flags&IE_INV_ITEM_BOW) continue;
 			//best melee
 			int tmp = itm->GetDamagePotential(false, header);
 			if (tmp>damage) {
@@ -1258,7 +1262,7 @@ bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count
 		}    
 		CREItem *slot;
 		
-		Item *itm = GetItemPointer(idx, slot);
+		const Item *itm = GetItemPointer(idx, slot);
 		if (!itm) {
 			continue;
 		}
@@ -1318,7 +1322,7 @@ bool Inventory::UseItem(unsigned int slotindex, unsigned int headerindex, Actor 
 	} else {
 		usagecount = slot->Usages[headerindex];
 	}
-	Item *itm = core->GetItem(slot->ItemResRef);
+	const Item *itm = core->GetItem(slot->ItemResRef);
 	if (!itm) {
 		return false;
 	}
@@ -1366,12 +1370,12 @@ void Inventory::UpdateWeaponAnimation()
 	// TODO: fix bows?
 
 	ITMExtHeader *header = 0;
-	Item *itm = GetItemPointer(slot, Slot);
+	const Item *itm = GetItemPointer(slot, Slot);
 	if (itm) {
 		itm->GetDamagePotential(false, header);
 		memcpy(AnimationType,itm->AnimationType,sizeof(AnimationType) );
-
-		if (itm->Flags & IE_ITEM_TWO_HANDED)
+		//for twohanded flag, you don't need itm
+		if (Slot->Flags & IE_INV_ITEM_TWOHANDED)
 			WeaponType = IE_ANI_WEAPON_2H;
 		else {
 
@@ -1404,10 +1408,10 @@ void Inventory::UpdateWeaponAnimation()
 //this function will also check disabled slots (if that feature will be imped)
 bool Inventory::IsSlotBlocked(int slot)
 {
-        if (slot<SLOT_MELEE) return false;
-        if (slot>LAST_MELEE) return false;
+	if (slot<SLOT_MELEE) return false;
+	if (slot>LAST_MELEE) return false;
 	int otherslot;
-        if (IWD2) {
+	if (IWD2) {
 		otherslot = slot+1;
 	} else {
 		otherslot = SLOT_LEFT;
@@ -1415,3 +1419,53 @@ bool Inventory::IsSlotBlocked(int slot)
 	return HasItemInSlot("",otherslot);
 }
 
+inline bool Inventory::TwoHandedInSlot(int slot)
+{
+	CREItem *item;
+
+				item = GetSlotItem(slot);
+				if (!item) return false;
+	if (item->Flags&IE_INV_ITEM_TWOHANDED) {
+		return true;
+	}
+	return false;
+}
+
+int Inventory::WhyCantEquip(int slot, int twohanded)
+{
+	//can't equip in shield slot if a weapon slot is twohanded
+	for (int i=SLOT_MELEE; i<=LAST_MELEE;i++) {
+		int otherslot;
+		if (IWD2) {
+			otherslot = ++i;
+		} else {
+			otherslot = SLOT_LEFT;
+		}
+		if (slot==otherslot) {
+			if (TwoHandedInSlot(i)) {
+				return STR_TWOHANDED_USED;
+			}
+		}
+	}
+
+	if (twohanded) {
+		if(IWD2) {
+			if(slot>=SLOT_MELEE&&slot<=LAST_MELEE && (slot&1) ) {
+				return STR_NOT_IN_OFFHAND;
+			}
+		} else {
+			if (slot==SLOT_LEFT) {
+				return STR_NOT_IN_OFFHAND;
+			}
+		}
+		if(IsSlotBlocked(slot)) {
+		//cannot equip two handed while shield slot is in use?
+			return STR_OFFHAND_USED;
+		}
+	}
+	if ( HasItemInSlot("", GetMagicSlot())) {
+		//magic weapon is in use
+		return STR_MAGICWEAPON;
+	}
+	return 0;
+}

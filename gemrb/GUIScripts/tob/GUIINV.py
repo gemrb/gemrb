@@ -16,7 +16,7 @@
 #along with this program; if not, write to the Free Software
 #Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.68 2006/12/31 00:11:43 wjpalenstijn Exp $
+#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.69 2006/12/31 13:48:23 avenger_teambg Exp $
 
 
 #GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -281,7 +281,7 @@ def RefreshInventoryWindow ():
 		itemname = slot_item["ItemResRef"]
 		item = GemRB.GetItem (itemname)
 		if (item['AnimationType'] != ''):
-			if (GemRB.CanUseItemType(SLOT_WEAPON, itemname)):
+			if (GemRB.CanUseItemType (SLOT_WEAPON, itemname)):
 				#off-hand weapon
 				GemRB.SetButtonPLT(Window, Button, "WP" + size + item['AnimationType'] + "OIN", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 2)
 			else:
@@ -372,8 +372,9 @@ def UpdateSlot (pc, slot):
 
 	Window = InventoryWindow
 	SlotType = GemRB.GetSlotType (slot+1, pc)
+	ControlID = SlotType["ID"]
 
-	if not SlotType["ID"]:
+	if not ControlID:
 		return
 
 	if GemRB.IsDraggingItem ():
@@ -384,7 +385,6 @@ def UpdateSlot (pc, slot):
 	else:
 		itemname = ""
 
-	ControlID = SlotType["ID"]
 	Button = GemRB.GetControl (Window, ControlID)
 	slot_item = GemRB.GetSlotItem (pc, slot+1)
 
@@ -432,12 +432,12 @@ def UpdateSlot (pc, slot):
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
 
 	if OverSlot == slot+1:
-		if GemRB.CanUseItemType(SlotType["Type"], itemname):
+		if GemRB.CanUseItemType (SlotType["Type"], itemname):
 			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SELECTED)
 		else:
 			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 	else:
-		if (SlotType["Type"]&SLOT_INVENTORY) or not GemRB.CanUseItemType(SlotType["Type"], itemname):
+		if (SlotType["Type"]&SLOT_INVENTORY) or not GemRB.CanUseItemType (SlotType["Type"], itemname):
 			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 		else:
 			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SECOND)
@@ -471,7 +471,7 @@ def OnAutoEquip ():
 	GemRB.DropDraggedItem (pc, -1)
 
 	if GemRB.IsDraggingItem ():
-		GemRB.PlaySound("GAM_47")  #failed equip
+		GemRB.PlaySound ("GAM_47")  #failed equip
 
 	UpdateInventoryWindow ()
 	return
@@ -479,8 +479,8 @@ def OnAutoEquip ():
 def OnDragItem ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
-	slot_item = GemRB.GetSlotItem (pc, slot)
 	if not GemRB.IsDraggingItem ():
+		slot_item = GemRB.GetSlotItem (pc, slot)
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 0)
 	else:
@@ -488,7 +488,7 @@ def OnDragItem ():
 		if SlotType["ResRef"]!="":
 			GemRB.DropDraggedItem (pc, slot)
 		if GemRB.IsDraggingItem ():
-			GemRB.PlaySound("GAM_47")  #failed equip
+			GemRB.PlaySound ("GAM_47")  #failed equip
 
 	UpdateInventoryWindow ()
 	return
@@ -499,7 +499,7 @@ def OnDropItemToPC ():
 	#-3 : drop stuff in inventory (but not equippable slots)
 	GemRB.DropDraggedItem (pc, -3)
 	if GemRB.IsDraggingItem ():
-		GemRB.PlaySound("GAM_47")  #failed equip
+		GemRB.PlaySound ("GAM_47")  #failed equip
 	UpdateInventoryWindow ()
 	return
 
@@ -513,6 +513,7 @@ def DialogItemWindow ():
 	item = GemRB.GetItem (ResRef)
 	dialog=item["Dialog"]
 	GemRB.ExecuteString("StartDialog(\""+dialog+"\",Myself)", pc)
+	return
 
 def IdentifyUseSpell ():
 	global ItemIdentifyWindow
@@ -665,7 +666,6 @@ def OpenGroundItemInfoWindow ():
 	global ItemInfoWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-
 	slot = GemRB.GetVar ("TopIndex") + GemRB.GetVar ("GroundItemButton")
 	slot_item = GemRB.GetContainerItem (pc, slot)
 

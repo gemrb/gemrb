@@ -16,7 +16,7 @@
 #along with this program; if not, write to the Free Software
 #Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.35 2006/12/30 23:47:25 avenger_teambg Exp $
+#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.36 2006/12/31 13:48:23 avenger_teambg Exp $
 
 #GUIINV.py - scripts to control inventory windows from GUIINV winpack
 
@@ -235,7 +235,6 @@ def RefreshInventoryWindow ():
 	Color5 = GemRB.GetPlayerStat (pc, IE_LEATHER_COLOR)
 	Color6 = GemRB.GetPlayerStat (pc, IE_ARMOR_COLOR)
 	Color7 = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
-	print Color2
 	GemRB.SetButtonPLT (Window, Button, GetActorPaperDoll (pc),
 		Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 0)
 
@@ -348,7 +347,9 @@ def UpdateSlot (pc, slot):
 
 	Window = InventoryWindow
 	SlotType = GemRB.GetSlotType (slot+1, pc)
-	if not SlotType["ID"]:
+	ControlID = SlotType["ID"]
+
+	if not ControlID:
 		return
 
 	if GemRB.IsDraggingItem ():
@@ -359,7 +360,7 @@ def UpdateSlot (pc, slot):
 	else:
 		itemname = ""
 
-	Button = GemRB.GetControl (Window, SlotType["ID"])
+	Button = GemRB.GetControl (Window, ControlID)
 	slot_item = GemRB.GetSlotItem (pc, slot+1)
 
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnDragItem")
@@ -452,7 +453,6 @@ def OnAutoEquip ():
 
 def OnDragItem ():
 	pc = GemRB.GameGetSelectedPCSingle ()
-
 	slot = GemRB.GetVar ("ItemButton")
 	if not GemRB.IsDraggingItem ():
 		slot_item = GemRB.GetSlotItem (pc, slot)
@@ -620,7 +620,6 @@ def DisplayItem (itemresref, type):
 
 def OpenItemInfoWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
-
 	slot = GemRB.GetVar ("ItemButton")
 	slot_item = GemRB.GetSlotItem (pc, slot)
 	item = GemRB.GetItem (slot_item["ItemResRef"])
@@ -642,7 +641,6 @@ def OpenGroundItemInfoWindow ():
 	global ItemInfoWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-
 	slot = GemRB.GetVar ("TopIndex") + GemRB.GetVar ("GroundItemButton")
 	slot_item = GemRB.GetContainerItem (pc, slot)
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.59 2006/12/30 23:47:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.60 2006/12/31 13:48:22 avenger_teambg Exp $
  *
  */
 
@@ -296,6 +296,10 @@ public:
 	ieDword GetEquipExclusion() const;
 	/** returns if a slot is temporarily blocked */
 	bool IsSlotBlocked(int slot);
+	/** returns true if a two handed weapon is in slot */
+	inline bool TwoHandedInSlot(int slot);
+	/** returns the strref for the reason why the item cannot be equipped */
+	int WhyCantEquip(int slot, int twohanded);
 	//setting important constants
 	static void Init(int mb);
 	static void SetFistSlot(int arg);
@@ -316,7 +320,7 @@ private:
 	// called by KillSlot
 	void RemoveSlotEffects( CREItem* slot );
 	void KillSlot(unsigned int index);
-	inline Item *GetItemPointer(ieDword slot, CREItem *&Slot);
+	inline const Item *GetItemPointer(ieDword slot, CREItem *&Slot);
 	void UpdateWeaponAnimation();
 	void UpdateShieldAnimation(Item *it);
 };
