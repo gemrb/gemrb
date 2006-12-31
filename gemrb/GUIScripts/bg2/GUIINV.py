@@ -16,7 +16,7 @@
 #along with this program; if not, write to the Free Software
 #Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.67 2006/12/30 23:47:25 avenger_teambg Exp $
+#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIINV.py,v 1.68 2006/12/31 00:11:43 wjpalenstijn Exp $
 
 
 #GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -379,8 +379,8 @@ def UpdateSlot (pc, slot):
 	if GemRB.IsDraggingItem ():
 		#get dragged item
 		drag_item = GemRB.GetSlotItem (0,0)
-		drag_item = GemRB.GetItem (drag_item["ItemResRef"])
 		itemname = drag_item["ItemResRef"]
+		drag_item = GemRB.GetItem (itemname)
 	else:
 		itemname = ""
 
