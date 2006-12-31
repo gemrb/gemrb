@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.55 2006/09/03 13:20:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.56 2006/12/31 15:09:35 avenger_teambg Exp $
  *
  */
 
@@ -142,6 +142,7 @@
 #define MC_WAS_RANGER		0x0100
 #define MC_FALLEN_PALADIN	0x0200
 #define MC_FALLEN_RANGER	0x0400
+#define MC_EXPORTABLE           0x0800
 
 #define MC_BEENINPARTY          0x8000
 #define MC_HIDDEN               0x10000
