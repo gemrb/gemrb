@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.445 2006/12/31 13:48:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.446 2006/12/31 14:12:53 wjpalenstijn Exp $
  *
  */
 
@@ -587,6 +587,8 @@ void Interface::HandleFlags()
 	if (QuitFlag&QF_ENTERGAME) {
 		QuitFlag &= ~QF_ENTERGAME;
 		if (game) {
+			timer->Init();
+
 			//rearrange party slots
 			game->ConsolidateParty();
 			GameControl* gc = StartGameControl();
