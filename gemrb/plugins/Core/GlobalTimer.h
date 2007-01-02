@@ -1,6 +1,7 @@
 #ifndef GLOBALTIMER_H
 #define GLOBALTIMER_H
 
+#include "../../includes/win32def.h"
 #include <vector>
 #include "Region.h"
 

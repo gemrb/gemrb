@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/win32def.h,v 1.25 2005/10/20 23:13:14 edheldil Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/win32def.h,v 1.26 2007/01/02 20:26:11 avenger_teambg Exp $
  *
  */
 
@@ -34,7 +34,12 @@
 #include <windows.h>
 
 #if _MSC_VER >= 1000
+// 4251 disables the annoying warning about missing dll interface in templates
 #pragma warning( disable: 4251 521 )
+//disables annoying warning caused by STL:Map in msvc 6.0
+# if _MSC_VER < 7000
+#   pragma warning(disable:4786)
+# endif
 #endif
 
 #define ADV_TEXT
