@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.118 2006/12/31 13:45:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.119 2007/01/02 17:01:03 avenger_teambg Exp $
  *
  */
 
@@ -31,16 +31,11 @@
 
 #define MAXCOLOR 12
 typedef unsigned char ColorSet[MAXCOLOR];
-#define MAXLEVEL 30
-typedef ieResRef FistResType[MAXLEVEL+1];
 
 static int RandColor=-1;
 static int RandRows=-1;
 static ColorSet* randcolors=NULL;
-static int FistRows=-1;
-static FistResType *fistres=NULL;
-static ieResRef DefaultFist={"FIST"};
-static int MagicBit = 0;
+static int MagicBit = core->HasFeature(GF_MAGICBIT);
 
 void ReleaseMemoryCRE()
 {
@@ -49,11 +44,6 @@ void ReleaseMemoryCRE()
 		randcolors = NULL;
 	}
 	RandColor = -1;
-	if (fistres) {
-		delete [] fistres;
-		fistres = NULL;
-	}
-	FistRows = -1;
 }
 
 CREImp::CREImp(void)
@@ -61,41 +51,6 @@ CREImp::CREImp(void)
 	str = NULL;
 	autoFree = false;
 	TotSCEFF = 0xff;
-}
-
-void SetupFist(Inventory &inventory, int slot, int row, int col)
-{
-	if (FistRows<0) {
-		MagicBit = core->HasFeature(GF_MAGICBIT);
-		FistRows=0;
-		int table = core->LoadTable( "fistweap" );
-		TableMgr *fist = core->GetTable( table );
-		if (fist) {
-			//default value
-			strnlwrcpy( DefaultFist, fist->QueryField( (unsigned int) -1), 8);
-			FistRows = fist->GetRowCount();
-			fistres = new FistResType[FistRows];
-			for (int cols = 1;cols<=MAXLEVEL;cols++) {
-				for (int i=0;i<FistRows;i++) {
-					strnlwrcpy( fistres[i][cols], fist->QueryField( i, cols ), 8);
-				}
-			}
-			for (int i=0;i<FistRows;i++) {
-				*(int *) fistres[i] = atoi(fist->QueryField( i,0));
-			}
-		}
-		core->DelTable( table );
-	}
-	if (col>MAXLEVEL) col=MAXLEVEL;
-	if (col<1) col=1;
-
-	const char *ItemResRef = DefaultFist;
-	for (int i = 0;i<FistRows;i++) {
-		if (*(int *) fistres[i] == row) {
-			ItemResRef = fistres[i][col];
-		}
-	}
-	inventory.SetSlotItemRes(ItemResRef, slot);
 }
 
 CREImp::~CREImp(void)
@@ -613,9 +568,8 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	act->inventory.SetSlotCount(Inventory_Size+1);
 
 	str->Seek( ItemSlotsOffset, GEM_STREAM_START );
-	int Slot = core->QuerySlot( 0 );
-	assert (core->QuerySlotEffects(Slot)==SLOT_EFFECT_FIST);
-	SetupFist(act->inventory, Slot, act->GetBase(IE_CLASS), act->GetXPLevel(false) );
+	act->SetupFist();
+	
 	for (i = 1; i <= Inventory_Size; i++) {
 		int Slot = core->QuerySlot( i );
 		ieWord index;
@@ -857,9 +811,9 @@ void CREImp::GetActorBG(Actor *act)
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_TOHIT]=(ieByteSigned) tmpByte;
 	str->Read( &tmpByte, 1 );
-	tmpByte = tmpByte * 2;
-	if (tmpByte>10) tmpByte-=11;
-	act->BaseStats[IE_NUMBEROFATTACKS]=tmpByte;
+	tmpWord = tmpByte * 2;
+	if (tmpWord>10) tmpWord-=11;
+	act->BaseStats[IE_NUMBEROFATTACKS]=(ieByte) tmpWord;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_SAVEVSDEATH]=(ieByteSigned) tmpByte;
 	str->Read( &tmpByte, 1 );

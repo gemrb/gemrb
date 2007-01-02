@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.239 2006/12/30 23:47:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.240 2007/01/02 17:01:03 avenger_teambg Exp $
  *
  */
 
@@ -59,6 +59,11 @@ static Color magenta = {
 static int classcount=-1;
 static char **clericspelltables=NULL;
 static char **wizardspelltables=NULL;
+static int FistRows=-1;
+typedef ieResRef FistResType[MAX_LEVEL+1];
+
+static FistResType *fistres=NULL;
+static ieResRef DefaultFist={"FIST"};
 
 static ActionButtonRow *GUIBTDefaults = NULL; //qslots row count
 ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
@@ -139,6 +144,15 @@ static bool REVERSE_TOHIT=true;
 #define WEAPON_STYLEMASK   15
 #define WEAPON_LEFTHAND    16
 #define WEAPON_USESTRENGTH 32
+
+void ReleaseMemoryActor()
+{
+	if (fistres) {
+		delete [] fistres;
+		fistres = NULL;
+	}
+	FistRows = -1;
+}
 
 Actor::Actor()
 	: Movable( ST_ACTOR )
@@ -393,6 +407,25 @@ void pcf_ea (Actor *actor, ieDword /*Value*/)
 	actor->SetCircleSize();
 }
 
+//this is a good place to recalculate level up stuff
+void pcf_level (Actor *actor, ieDword /*Value*/)
+{
+	ieDword sum = 
+		actor->BaseStats[IE_LEVELFIGHTER]+
+		actor->BaseStats[IE_LEVELMAGE]+
+		actor->BaseStats[IE_LEVELTHIEF]+
+		actor->BaseStats[IE_LEVELBARBARIAN]+
+		actor->BaseStats[IE_LEVELBARD]+
+		actor->BaseStats[IE_LEVELCLERIC]+
+		actor->BaseStats[IE_LEVELDRUID]+
+		actor->BaseStats[IE_LEVELMONK]+
+		actor->BaseStats[IE_LEVELPALADIN]+
+		actor->BaseStats[IE_LEVELRANGER]+
+		actor->BaseStats[IE_LEVELSORCEROR];
+	actor->SetBase(IE_CLASSLEVELSUM,sum);
+	actor->SetupFist();
+}
+
 void pcf_class (Actor *actor, ieDword Value)
 {
 	actor->InitButtons(Value);
@@ -629,9 +662,9 @@ void pcf_armorlevel(Actor *actor, ieDword Value)
 static int maximum_values[256]={
 32767,32767,20,100,100,100,100,25,5,25,25,25,25,25,100,100,//0f
 100,100,100,100,100,100,100,100,100,200,200,200,200,200,100,100,//1f
-200,200,50,255,25,100,25,25,25,25,25,999999999,999999999,999999999,25,25,//2f
+200,200,MAX_LEVEL,255,25,100,25,25,25,25,25,999999999,999999999,999999999,25,25,//2f
 200,255,200,100,100,200,200,25,5,100,1,1,100,1,1,1,//3f
-1,1,1,1,50,50,1,9999,25,100,100,255,1,20,20,25,//4f
+1,1,1,1,MAX_LEVEL,MAX_LEVEL,1,9999,25,100,100,255,1,20,20,25,//4f
 25,1,1,255,25,25,255,255,25,5,5,5,5,5,5,5,//5f
 5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,//6f
 5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,//7f
@@ -640,9 +673,10 @@ static int maximum_values[256]={
 255,255,255,255,255,255,20,255,255,1,20,255,999999999,999999999,1,1,//af
 999999999,999999999,0,0,0,0,0,0,0,0,0,0,0,0,0,0,//bf
 0,0,0,0,0,0,0,25,25,255,255,255,255,65535,-1,-1,//cf - 207
--1,-1,-1,-1,-1,-1,-1,-1,40,255,65535,3,255,255,255,255,//df - 223
+-1,-1,-1,-1,-1,-1,-1,-1,MAX_LEVEL,255,65535,3,255,255,255,255,//df - 223
 255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,//ef - 239
-40,40,40,40, 40,40,40,40, 40,40,40,40, 255,65535,65535,15//ff
+MAX_LEVEL,MAX_LEVEL,MAX_LEVEL,MAX_LEVEL, MAX_LEVEL,MAX_LEVEL,MAX_LEVEL,MAX_LEVEL, //0xf7 - 247
+MAX_LEVEL,MAX_LEVEL,MAX_LEVEL,MAX_LEVEL, 255,65535,65535,15//ff
 };
 
 typedef void (*PostChangeFunctionType)(Actor *actor, ieDword Value);
@@ -651,11 +685,11 @@ pcf_hitpoint, pcf_maxhitpoint, NULL, NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //0f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, pcf_fatigue, pcf_intoxication, //1f
-NULL,NULL,NULL,NULL, pcf_stat, NULL, pcf_stat, pcf_stat,
+NULL,NULL,pcf_level,NULL, pcf_stat, NULL, pcf_stat, pcf_stat,
 pcf_stat,pcf_con,NULL,NULL, NULL, pcf_gold, pcf_morale, NULL, //2f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, pcf_entangle, pcf_sanctuary, //3f
-pcf_minorglobe, pcf_shieldglobe, pcf_grease, pcf_web, NULL, NULL, NULL, NULL,
+pcf_minorglobe, pcf_shieldglobe, pcf_grease, pcf_web, pcf_level, pcf_level, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //4f
 NULL,NULL,NULL,pcf_minhitpoint, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //5f
@@ -677,7 +711,7 @@ pcf_color,pcf_color,pcf_color,pcf_color, pcf_color, pcf_color, pcf_color, NULL,
 NULL,NULL,NULL,pcf_armorlevel, NULL, NULL, NULL, NULL, //df
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 pcf_class,NULL,pcf_ea,NULL, NULL, NULL, NULL, NULL, //ef
-NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
+pcf_level,pcf_level,pcf_level,pcf_level, pcf_level, pcf_level, pcf_level, pcf_level,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL //ff
 };
 
@@ -1589,7 +1623,7 @@ void Actor::CheckWeaponQuickSlot(unsigned int which)
 	if (!PCStats) return;
 
 	bool empty = false;
-    // If current quickweaponslot doesn't contain an item, reset it to fist
+	// If current quickweaponslot doesn't contain an item, reset it to fist
 	int slot = PCStats->QuickWeaponSlots[which];
 	int header = PCStats->QuickWeaponHeaders[which];
 	if (!inventory.HasItemInSlot("", slot) || header == 0xffff) {
@@ -2737,3 +2771,45 @@ void Actor::SetUsedHelmet(char* AnimationType)
 		return;
 	anims->SetHelmetRef(AnimationType);
 }
+
+//set up stuff here, like attack number, turn undead level
+//and similar derived stats that change with level
+void Actor::SetupFist()
+{
+	int slot = core->QuerySlot( 0 );
+	assert (core->QuerySlotEffects(slot)==SLOT_EFFECT_FIST);
+	int row = GetBase(IE_CLASS);
+	int col = GetXPLevel(false);
+
+	if (FistRows<0) {
+		FistRows=0;
+		int table = core->LoadTable( "fistweap" );
+		TableMgr *fist = core->GetTable( table );
+		if (fist) {
+			//default value
+			strnlwrcpy( DefaultFist, fist->QueryField( (unsigned int) -1), 8);
+			FistRows = fist->GetRowCount();
+			fistres = new FistResType[FistRows];
+			for (int cols = 1;cols<=MAX_LEVEL;cols++) {
+				for (int i=0;i<FistRows;i++) {
+					strnlwrcpy( fistres[i][cols], fist->QueryField( i, cols ), 8);
+				}
+			}
+			for (int i=0;i<FistRows;i++) {
+				*(int *) fistres[i] = atoi(fist->QueryField( i,0));
+			}
+		}
+		core->DelTable( table );
+	}
+	if (col>MAX_LEVEL) col=MAX_LEVEL;
+	if (col<1) col=1;
+
+	const char *ItemResRef = DefaultFist;
+	for (int i = 0;i<FistRows;i++) {
+		if (*(int *) fistres[i] == row) {
+			ItemResRef = fistres[i][col];
+		}
+	}
+	inventory.SetSlotItemRes(ItemResRef, slot);
+}
+
