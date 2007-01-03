@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.119 2007/01/02 17:01:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.120 2007/01/03 21:08:10 avenger_teambg Exp $
  *
  */
 
@@ -51,6 +51,7 @@ CREImp::CREImp(void)
 	str = NULL;
 	autoFree = false;
 	TotSCEFF = 0xff;
+	CREVersion = 0xff;
 }
 
 CREImp::~CREImp(void)
@@ -106,12 +107,139 @@ bool CREImp::Open(DataStream* stream, bool aF)
 	return false;
 }
 
+void CREImp::SetupSlotCounts()
+{
+	switch (CREVersion) {
+		case IE_CRE_V1_2: //pst
+			QWPCount=4;
+			QSPCount=3;
+			QITCount=5;
+			break;
+		case IE_CRE_GEMRB: //own
+			QWPCount=8;
+			QSPCount=9;
+			QITCount=5;
+			break;
+		case IE_CRE_V2_2: //iwd2
+			QWPCount=8;
+			QSPCount=9;
+			QITCount=3;
+			break;
+		default: //others
+			QWPCount=4;
+			QSPCount=3;
+			QITCount=3;
+			break;
+	}
+}
+
+void CREImp::WriteChrHeader(DataStream *stream, Actor *act)
+{
+	char Signature[8];
+	ieVariable name;
+	ieDword tmpDword;
+	ieWord tmpWord;
+	ieByte tmpByte;
+
+	switch (CREVersion) {
+		case IE_CRE_V1_0: //bg1
+		case IE_CRE_V9_0: //iwd/HoW
+			memcpy(Signature, "CHR V1.0",8);
+			tmpDword = 0x64; //headersize
+			break;
+		case IE_CRE_V1_1: //bg2 (fake)
+			memcpy(Signature, "CHR V2.0",8);
+			tmpDword = 0x64; //headersize
+			break;
+		case IE_CRE_V1_2: //pst
+			memcpy(Signature, "CHR V1.2",8);
+			tmpDword = 0x68; //headersize
+			break;
+			break;
+		case IE_CRE_V2_2:   //iwd2
+			memcpy(Signature, "CHR V2.2",8);
+			tmpDword = 0x21c; //headersize
+			break;
+		case IE_CRE_GEMRB:  //own format
+			memcpy(Signature, "CHR V0.0",8);
+			tmpDword = 0x1dc; //headersize (iwd2-9x8+8)
+			break;
+	}
+	stream->Write (Signature, 8);
+	memset (Signature,0,sizeof(Signature));
+	memset (name,0,sizeof(name));
+	strncpy (name, act->GetName(0), sizeof(name) );
+	stream->Write (name, 32);
+
+	stream->WriteDword (&tmpDword); //cre offset (chr header size)
+	tmpDword = GetStoredFileSize (act);
+	str->WriteDword (&tmpDword);    //cre size
+
+	SetupSlotCounts();
+	int i;
+	for (i=0;i<QWPCount;i++) {
+		tmpWord = act->PCStats->QuickWeaponSlots[i];
+		str->WriteWord (&tmpWord);
+	}
+	for (i=0;i<QWPCount;i++) {
+		tmpWord = act->PCStats->QuickWeaponHeaders[i];
+		str->WriteWord (&tmpWord);
+	}
+	for (i=0;i<QSPCount;i++) {
+		str->WriteResRef (act->PCStats->QuickSpells[i]);
+	}
+	if (QSPCount==9) {
+		str->Write (act->PCStats->QuickSpellClass,9);
+		tmpByte = 0;
+		str->Write (&tmpByte,1);
+	}
+	for (i=0;i<QITCount;i++) {
+		tmpWord = act->PCStats->QuickItemSlots[i];
+		str->WriteWord (&tmpWord);
+	}
+	for (i=0;i<QITCount;i++) {
+		tmpWord = act->PCStats->QuickItemHeaders[i];
+		str->WriteWord (&tmpWord);
+	}
+	switch (CREVersion) {
+	case IE_CRE_V2_2:
+		//IWD2 quick innates are saved elsewhere, redundantly
+		for (i=0;i<QSPCount;i++) {
+			str->WriteResRef (act->PCStats->QuickSpells[i]);
+		}
+		//fallthrough
+	case IE_CRE_GEMRB:
+		for (i=0;i<18;i++) {
+			str->WriteDword (&tmpDword);
+		}
+		for (i=0;i<QSPCount;i++) {
+			tmpDword = act->PCStats->QSlots[i];
+			str->WriteDword (&tmpDword);
+		}
+		for (i=0;i<13;i++) {
+			str->WriteWord (&tmpWord);
+		}
+		str->Write (act->PCStats->SoundFolder, 32);
+		str->Write (act->PCStats->SoundSet, 8);
+		for (i=0;i<32;i++) {
+			str->WriteDword (&tmpDword);
+		}
+		break;
+	default:
+		break;
+	}
+}
+
 void CREImp::ReadChrHeader(Actor *act)
 {
-	ieDword tmpDword;
 	ieVariable name;
 	char Signature[8];
+	ieDword offset, size;
+	ieDword tmpDword;
+	ieWord tmpWord;
+	ieByte tmpByte;
 
+	act->CreateStats();
 	str->Rewind();
 	str->Read (Signature, 8);
 	str->Read (name, 32);
@@ -120,10 +248,45 @@ void CREImp::ReadChrHeader(Actor *act)
 	if (tmpDword != 0 && tmpDword !=1) {
 		act->SetText( name, 0 ); //setting longname
 	}
+	str->ReadDword (&offset);
+	str->ReadDword (&size);
+	SetupSlotCounts();
+	int i;
+	for (i=0;i<QWPCount;i++) {
+		str->ReadWord (&tmpWord);
+		act->PCStats->QuickWeaponSlots[i]=tmpWord;
+	}
+	for (i=0;i<QWPCount;i++) {
+		str->ReadWord (&tmpWord);
+		act->PCStats->QuickWeaponHeaders[i]=tmpWord;
+	}
+	for (i=0;i<QSPCount;i++) {
+		str->ReadResRef (act->PCStats->QuickSpells[i]);
+	}
+	if (QSPCount==9) {
+		str->Read (act->PCStats->QuickSpellClass,9);
+		str->Read (&tmpByte,1);
+	}
+	for (i=0;i<QITCount;i++) {
+		str->ReadWord (&tmpWord);
+		act->PCStats->QuickItemSlots[i]=tmpWord;
+	}
+	for (i=0;i<QITCount;i++) {
+		str->ReadWord (&tmpWord);
+		act->PCStats->QuickItemHeaders[i]=tmpWord;
+	}
+	//here comes the version specific read
 }
 
 bool CREImp::SeekCreHeader(char *Signature)
 {
+	ieDword offset;
+
+	str->Seek(32, GEM_CURRENT_POS);
+	str->ReadDword( &offset );
+	//8-signature, 32-name, 4-offset
+	str->Seek(offset-8-32-4, GEM_CURRENT_POS);
+/*
 	if (strncmp( Signature, "CHR V1.0", 8) == 0) {
 		str->Seek(0x3c, GEM_CURRENT_POS);
 		goto done;
@@ -134,6 +297,7 @@ bool CREImp::SeekCreHeader(char *Signature)
 	}
 	return false;
 done:
+*/
 	str->Read( Signature, 8);
 	return true;
 }
@@ -1412,7 +1576,8 @@ int CREImp::GetStoredFileSize(Actor *actor)
 	unsigned int Inventory_Size;
 	unsigned int i;
 
-	switch (actor->version) {
+	CREVersion = actor->version;
+	switch (CREVersion) {
 		case IE_CRE_GEMRB:
 			headersize = 0x2d4;
 			Inventory_Size=actor->inventory.GetSlotCount();
@@ -2250,6 +2415,10 @@ int CREImp::PutActor(DataStream *stream, Actor *actor)
 
 	assert(TotSCEFF==0 || TotSCEFF==1);
 
+	if (IsCharacter) {
+		WriteChrHeader( stream, actor );
+	}
+
 	ret = PutHeader( stream, actor);
 	if (ret) {
 		return ret;
@@ -2257,7 +2426,7 @@ int CREImp::PutActor(DataStream *stream, Actor *actor)
 	//here comes the fuzzy part
 	ieDword Inventory_Size;
 
-	switch (actor->version) {
+	switch (CREVersion) {
 		case IE_CRE_GEMRB:
 			//don't add fist
 			Inventory_Size=(ieDword) actor->inventory.GetSlotCount()-1;

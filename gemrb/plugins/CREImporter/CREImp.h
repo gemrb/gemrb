@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.h,v 1.20 2006/05/22 16:39:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.h,v 1.21 2007/01/03 21:08:11 avenger_teambg Exp $
  *
  */
 
@@ -54,6 +54,10 @@ private:
 	ieDword VariablesCount;
 	ieDword OverlayOffset;
 	ieDword OverlayMemorySize;
+	//used in CHR header
+        int QWPCount; //weapons
+        int QSPCount; //spells
+        int QITCount; //items
 public:
 	CREImp(void);
 	~CREImp(void);
@@ -70,7 +74,13 @@ public:
 		delete this;
 	}
 private:
+	/** sets up some variables based on creature version for serializing the object */
+	void SetupSlotCounts();
+	/** writes out the chr header */
+	void WriteChrHeader(DataStream *stream, Actor *actor);
+	/** reads the chr header data (into PCStatStructs) */
 	void ReadChrHeader(Actor *actor);
+	/** skips the chr header */
 	bool SeekCreHeader(char *Signature);
 	void GetActorPST(Actor *actor);
 	ieDword GetActorGemRB(Actor *act);
