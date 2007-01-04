@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.122 2007/01/04 18:23:59 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.123 2007/01/04 19:28:44 avenger_teambg Exp $
  *
  */
 
@@ -2405,7 +2405,7 @@ int CREImp::PutVariables( DataStream *stream, Actor *actor)
 }
 
 /* this function expects GetStoredFileSize to be called before */
-int CREImp::PutActor(DataStream *stream, Actor *actor)
+int CREImp::PutActor(DataStream *stream, Actor *actor, bool chr)
 {
 	ieDword tmpDword=0;
 	int ret;
@@ -2416,7 +2416,8 @@ int CREImp::PutActor(DataStream *stream, Actor *actor)
 
 	assert(TotSCEFF==0 || TotSCEFF==1);
 
-	if (IsCharacter) {
+	IsCharacter = chr;
+	if (chr) {
 		WriteChrHeader( stream, actor );
 	}
 

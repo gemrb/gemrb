@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.h,v 1.21 2007/01/03 21:08:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.h,v 1.22 2007/01/04 19:28:44 avenger_teambg Exp $
  *
  */
 
@@ -67,7 +67,7 @@ public:
 	//returns saved size, updates internal offsets before save
 	int GetStoredFileSize(Actor *ac);
 	//saves file
-	int PutActor(DataStream *stream, Actor *actor);
+	int PutActor(DataStream *stream, Actor *actor, bool chr=false);
 public:
 	void release(void)
 	{
