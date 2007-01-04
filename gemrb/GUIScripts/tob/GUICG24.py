@@ -24,7 +24,7 @@ def OnLoad():
 	GemRB.SetEvent(ImportWindow, FileButton, IE_GUI_BUTTON_ON_PRESS, "FilePress")
 	GemRB.SetEvent(ImportWindow, SavedGameButton, IE_GUI_BUTTON_ON_PRESS, "GamePress")
 	GemRB.SetEvent(ImportWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-	GemRB.SetVisible(ImportWindow,1)
+	GemRB.ShowModal(ImportWindow, MODAL_SHADOW_GRAY)
 	return
 
 def FilePress():

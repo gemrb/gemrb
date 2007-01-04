@@ -7,15 +7,16 @@ ImportWindow = 0
 def OnLoad():
 	global ImportWindow
 
-	GemRB.LoadWindowPack("GUICG")
+	GemRB.LoadWindowPack("GUICG",640,480)
 	ImportWindow = GemRB.LoadWindow(20)
 
 	TextAreaControl = GemRB.GetControl(ImportWindow, 4)
 	GemRB.SetText(ImportWindow, TextAreaControl, 10963)
 
 	TextAreaControl = GemRB.GetControl(ImportWindow,2)
-#Fill TextArea Control with character sheets, make textarea a listbox
-
+	GemRB.SetTextAreaFlags (ImportWindow, TextAreaControl, IE_GUI_TEXTAREA_SELECTABLE)
+	GemRB.GetCharacters(ImportWindow, TextAreaControl)
+ 
 	DoneButton = GemRB.GetControl(ImportWindow, 0)
 	GemRB.SetText(ImportWindow, DoneButton, 2610)
 	GemRB.SetButtonState(ImportWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
