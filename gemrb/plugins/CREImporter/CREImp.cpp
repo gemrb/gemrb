@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.121 2007/01/04 17:29:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.122 2007/01/04 18:23:59 wjpalenstijn Exp $
  *
  */
 
@@ -173,56 +173,56 @@ void CREImp::WriteChrHeader(DataStream *stream, Actor *act)
 
 	stream->WriteDword (&tmpDword); //cre offset (chr header size)
 	tmpDword = GetStoredFileSize (act);
-	str->WriteDword (&tmpDword);    //cre size
+	stream->WriteDword (&tmpDword);    //cre size
 
 	SetupSlotCounts();
 	int i;
 	for (i=0;i<QWPCount;i++) {
 		tmpWord = act->PCStats->QuickWeaponSlots[i];
-		str->WriteWord (&tmpWord);
+		stream->WriteWord (&tmpWord);
 	}
 	for (i=0;i<QWPCount;i++) {
 		tmpWord = act->PCStats->QuickWeaponHeaders[i];
-		str->WriteWord (&tmpWord);
+		stream->WriteWord (&tmpWord);
 	}
 	for (i=0;i<QSPCount;i++) {
-		str->WriteResRef (act->PCStats->QuickSpells[i]);
+		stream->WriteResRef (act->PCStats->QuickSpells[i]);
 	}
 	if (QSPCount==9) {
-		str->Write (act->PCStats->QuickSpellClass,9);
+		stream->Write (act->PCStats->QuickSpellClass,9);
 		tmpByte = 0;
-		str->Write (&tmpByte,1);
+		stream->Write (&tmpByte,1);
 	}
 	for (i=0;i<QITCount;i++) {
 		tmpWord = act->PCStats->QuickItemSlots[i];
-		str->WriteWord (&tmpWord);
+		stream->WriteWord (&tmpWord);
 	}
 	for (i=0;i<QITCount;i++) {
 		tmpWord = act->PCStats->QuickItemHeaders[i];
-		str->WriteWord (&tmpWord);
+		stream->WriteWord (&tmpWord);
 	}
 	switch (CREVersion) {
 	case IE_CRE_V2_2:
 		//IWD2 quick innates are saved elsewhere, redundantly
 		for (i=0;i<QSPCount;i++) {
-			str->WriteResRef (act->PCStats->QuickSpells[i]);
+			stream->WriteResRef (act->PCStats->QuickSpells[i]);
 		}
 		//fallthrough
 	case IE_CRE_GEMRB:
 		for (i=0;i<18;i++) {
-			str->WriteDword (&tmpDword);
+			stream->WriteDword (&tmpDword);
 		}
 		for (i=0;i<QSPCount;i++) {
 			tmpDword = act->PCStats->QSlots[i];
-			str->WriteDword (&tmpDword);
+			stream->WriteDword (&tmpDword);
 		}
 		for (i=0;i<13;i++) {
-			str->WriteWord (&tmpWord);
+			stream->WriteWord (&tmpWord);
 		}
-		str->Write (act->PCStats->SoundFolder, 32);
-		str->Write (act->PCStats->SoundSet, 8);
+		stream->Write (act->PCStats->SoundFolder, 32);
+		stream->Write (act->PCStats->SoundSet, 8);
 		for (i=0;i<32;i++) {
-			str->WriteDword (&tmpDword);
+			stream->WriteDword (&tmpDword);
 		}
 		break;
 	default:
