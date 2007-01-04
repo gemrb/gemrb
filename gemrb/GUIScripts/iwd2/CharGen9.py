@@ -19,9 +19,8 @@ def OnLoad():
 	GemRB.SetWindowFrame ( CharGenWindow)
 	PortraitButton = GemRB.GetControl (CharGenWindow, 12)
 	GemRB.SetButtonFlags (CharGenWindow, PortraitButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
-	PortraitTable = GemRB.LoadTable ("pictures")
-	PortraitName = GemRB.GetTableRowName (PortraitTable,GemRB.GetVar ("PortraitIndex") )
-	GemRB.SetButtonPicture(CharGenWindow,PortraitButton, PortraitName+"L")
+	PortraitName = GemRB.GetToken ("LargePortrait")
+	GemRB.SetButtonPicture(CharGenWindow, PortraitButton, PortraitName,"NOPORTLG")
 
 	RaceTable = GemRB.LoadTable ("races")
 	ClassTable = GemRB.LoadTable ("classes")
@@ -294,8 +293,10 @@ def NextPress():
 	#setting feats
 
 	#does all the rest
-	GemRB.FillPlayerInfo (MyChar,PortraitName+"L", PortraitName+"S")
-	GemRB.SetNextScript ("SPPartyFormation")
+	LargePortrait = GemRB.GetToken ("LargePortrait")
+	SmallPortrait = GemRB.GetToken ("SmallPortrait")
+	GemRB.FillPlayerInfo(MyChar, LargePortrait, SmallPortrait) 
+ 	GemRB.SetNextScript ("SPPartyFormation")
 	return
 
 def CancelPress():
