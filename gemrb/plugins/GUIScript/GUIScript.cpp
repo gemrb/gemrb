@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.445 2006/12/31 16:22:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.446 2007/01/04 19:09:39 avenger_teambg Exp $
  *
  */
 
@@ -3847,29 +3847,30 @@ static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "si|i", &CreResRef, &PlayerSlot, &Import)) {
 		return AttributeError( GemRB_CreatePlayer__doc );
 	}
-	//PlayerSlot is zero based, if not, remove the +1
-	//removed it!
+	//PlayerSlot is zero based
 	Slot = ( PlayerSlot & 0x7fff ); 
 	Game *game = core->GetGame();
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
 	}
+	//FIXME:overwriting original slot
+	//is dangerous if the game is already loaded
+	//maybe the actor should be removed the area first
 	if (PlayerSlot & 0x8000) {
 		PlayerSlot = game->FindPlayer( Slot );
-		if (PlayerSlot < 0) {
-			PlayerSlot = core->LoadCreature( CreResRef, Slot, (bool) Import );
+		if (PlayerSlot >= 0) {
+			game->DelPC(PlayerSlot, true);
 		}
+		PlayerSlot = core->LoadCreature( CreResRef, Slot, (bool) Import );
 	} else {
 		PlayerSlot = game->FindPlayer( PlayerSlot );
 		if (PlayerSlot >= 0) {
-			printMessage( "GUIScript", "Slot is already filled!\n", LIGHT_RED );
-			return NULL;
+			return RuntimeError("Slot is already filled!");
 		}
 		PlayerSlot = core->LoadCreature( CreResRef, Slot, (bool) Import ); //inparty flag
 	}
 	if (PlayerSlot < 0) {
-		printMessage( "GUIScript", "Not found!\n", LIGHT_RED );
-		return NULL;
+		return RuntimeError("File not found!");
 	}
 	return PyInt_FromLong( PlayerSlot );
 }
