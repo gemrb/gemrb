@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.51 2006/07/04 19:46:39 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIREC.py,v 1.52 2007/01/05 15:49:57 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -1315,7 +1315,7 @@ def GetConHPBonus (pc, numPrimLevels, numSecoLevels, levelUpType):
 	con = str (GemRB.GetPlayerStat (pc, IE_CON))
 	if levelUpType == 0:
 		# Pure fighter
-		return GemRB.GetTableValue (ConHPBonTable, con, "WARRIOR") * numPromLevels
+		return GemRB.GetTableValue (ConHPBonTable, con, "WARRIOR") * numPrimLevels
 	if levelUpType == 1:
 		# Mage, Priest or Thief
 		return GemRB.GetTableValue (ConHPBonTable, con, "OTHER") * numPrimLevels
