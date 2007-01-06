@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.123 2007/01/04 19:28:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.124 2007/01/06 17:17:36 avenger_teambg Exp $
  *
  */
 
@@ -80,6 +80,8 @@ bool CREImp::Open(DataStream* stream, bool aF)
 		if (!SeekCreHeader(Signature)) {
 			return false;
 		}
+	} else {
+		CREOffset = 0;
 	}
 	if (strncmp( Signature, "CRE V1.0", 8 ) == 0) {
 		CREVersion = IE_CRE_V1_0;
@@ -280,24 +282,9 @@ void CREImp::ReadChrHeader(Actor *act)
 
 bool CREImp::SeekCreHeader(char *Signature)
 {
-	ieDword offset;
-
 	str->Seek(32, GEM_CURRENT_POS);
-	str->ReadDword( &offset );
-	//8-signature, 32-name, 4-offset
-	str->Seek(offset-8-32-4, GEM_CURRENT_POS);
-/*
-	if (strncmp( Signature, "CHR V1.0", 8) == 0) {
-		str->Seek(0x3c, GEM_CURRENT_POS);
-		goto done;
-	}
-	if (strncmp( Signature, "CHR V2.2", 8) == 0) {
-		str->Seek(0x21c, GEM_CURRENT_POS);
-		goto done;
-	}
-	return false;
-done:
-*/
+	str->ReadDword( &CREOffset );
+	str->Seek(CREOffset, GEM_STREAM_START);
 	str->Read( Signature, 8);
 	return true;
 }
@@ -723,7 +710,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	CREItem** items;
 	unsigned int i,j,k;
 
-	str->Seek( ItemsOffset, GEM_STREAM_START );
+	str->Seek( ItemsOffset+CREOffset, GEM_STREAM_START );
 	items = (CREItem **) calloc (ItemsCount, sizeof(CREItem *) );
 
 	for (i = 0; i < ItemsCount; i++) {
@@ -731,7 +718,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	}
 	act->inventory.SetSlotCount(Inventory_Size+1);
 
-	str->Seek( ItemSlotsOffset, GEM_STREAM_START );
+	str->Seek( ItemSlotsOffset+CREOffset, GEM_STREAM_START );
 	act->SetupFist();
 	
 	for (i = 1; i <= Inventory_Size; i++) {
@@ -783,17 +770,17 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	CREKnownSpell **known_spells=(CREKnownSpell **) calloc(KnownSpellsCount, sizeof(CREKnownSpell *) );
 	CREMemorizedSpell **memorized_spells=(CREMemorizedSpell **) calloc(MemorizedSpellsCount, sizeof(CREKnownSpell *) );
 
-	str->Seek( KnownSpellsOffset, GEM_STREAM_START );
+	str->Seek( KnownSpellsOffset+CREOffset, GEM_STREAM_START );
 	for (i = 0; i < KnownSpellsCount; i++) {
 		known_spells[i]=GetKnownSpell();
 	}
 
-	str->Seek( MemorizedSpellsOffset, GEM_STREAM_START );
+	str->Seek( MemorizedSpellsOffset+CREOffset, GEM_STREAM_START );
 	for (i = 0; i < MemorizedSpellsCount; i++) {
 		memorized_spells[i]=GetMemorizedSpell();
 	}
 
-	str->Seek( SpellMemorizationOffset, GEM_STREAM_START );
+	str->Seek( SpellMemorizationOffset+CREOffset, GEM_STREAM_START );
 	for (i = 0; i < SpellMemorizationCount; i++) {
 		CRESpellMemorization* sm = GetSpellMemorization();
 
@@ -846,7 +833,7 @@ void CREImp::ReadEffects(Actor *act)
 {
 	unsigned int i;
 
-	str->Seek( EffectsOffset, GEM_STREAM_START );
+	str->Seek( EffectsOffset+CREOffset, GEM_STREAM_START );
 
 	for (i = 0; i < EffectsCount; i++) {
 		Effect fx;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.h,v 1.22 2007/01/04 19:28:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.h,v 1.23 2007/01/06 17:17:36 avenger_teambg Exp $
  *
  */
 
@@ -51,13 +51,14 @@ private:
 	ieDword EffectsCount;
 	ieByte TotSCEFF;
 	ieByte IsCharacter;
+	ieDword CREOffset;
 	ieDword VariablesCount;
 	ieDword OverlayOffset;
 	ieDword OverlayMemorySize;
 	//used in CHR header
-        int QWPCount; //weapons
-        int QSPCount; //spells
-        int QITCount; //items
+	int QWPCount; //weapons
+	int QSPCount; //spells
+	int QITCount; //items
 public:
 	CREImp(void);
 	~CREImp(void);
