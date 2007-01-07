@@ -13,7 +13,7 @@ Return value: N/A
 Example:	GemRB.SetVar("PlayMode", 0)
 		GemRB.LoadGame(-1)
 
-See also: EnterGame, CreatePlayer, SetVar
+See also: EnterGame, CreatePlayer, SetVar, SaveGame
 
 
 MD5: a1bc07430d99c420a4e662a67eeda8fb
