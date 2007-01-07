@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.302 2006/12/30 19:11:16 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.303 2007/01/07 14:35:10 wjpalenstijn Exp $
  */
 
 #ifndef WIN32
@@ -1892,6 +1892,9 @@ Sprite2D* GameControl::GetPortraitPreview(int pcslot)
 	Video *video = core->GetVideoDriver();
 
 	Actor *actor = core->GetGame()->GetPC( pcslot, false );
+	if (! actor) {
+		return NULL;
+	}
 	DataStream *str = core->GetResourceMgr()->GetResource( actor->GetPortrait( true ), IE_BMP_CLASS_ID );
 	if (! str) {
 		return NULL;
