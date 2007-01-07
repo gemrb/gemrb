@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUILOAD.py,v 1.10 2005/03/20 16:24:22 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUILOAD.py,v 1.11 2007/01/07 16:19:17 avenger_teambg Exp $
 
 
 # GUILOAD.py - Load window
@@ -34,7 +34,7 @@ ScrollBar = 0
 def OnLoad():
 	global LoadWindow, TextAreaControl, GameCount, ScrollBar
 
-	GemRB.SetVar("PlayMode",2)   #iwd is always using 'mpsave'		                             
+	GemRB.SetVar("PlayMode",2)   #iwd is always using 'mpsave'
 	GemRB.LoadWindowPack("GUILOAD", 640, 480)
 	LoadWindow = GemRB.LoadWindow(0)
 	GemRB.SetWindowFrame(LoadWindow)

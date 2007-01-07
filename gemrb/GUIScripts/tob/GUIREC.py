@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIREC.py,v 1.31 2006/12/31 15:18:36 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIREC.py,v 1.32 2007/01/07 16:19:18 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -40,6 +40,7 @@ OptionsWindow = None
 OldPortraitWindow = None
 OldOptionsWindow = None
 ExportDoneButton = None
+ExportFileName = ""
 
 ###################################################
 def OpenRecordsWindow ():
@@ -592,6 +593,8 @@ def OpenExportWindow ():
 def ExportDonePress():
 	GemRB.UnloadWindow(ExportWindow)
 	#save file under name from EditControl
+	pc = GemRB.GameGetSelectedPCSingle ()
+	GemRB.SaveCharacter(pc, ExportFileName)
 	return
 
 def ExportCancelPress():
@@ -599,6 +602,8 @@ def ExportCancelPress():
 	return
 
 def ExportEditChanged():
+	global ExportFileName
+
 	ExportFileName = GemRB.QueryText(ExportWindow, NameField)
 	if ExportFileName == "":
 		GemRB.SetButtonState(ExportWindow, ExportDoneButton, IE_GUI_BUTTON_DISABLED)

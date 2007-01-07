@@ -3,9 +3,10 @@ import GemRB
 
 #import from a character sheet
 ImportWindow = 0
+TextAreaControl = 0
 
 def OnLoad():
-	global ImportWindow
+	global ImportWindow, TextAreaControl
 
 	GemRB.LoadWindowPack("GUICG",640,480)
 	ImportWindow = GemRB.LoadWindow(20)
@@ -26,12 +27,21 @@ def OnLoad():
 
 	GemRB.SetEvent(ImportWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS, "DonePress")
 	GemRB.SetEvent(ImportWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	GemRB.SetEvent(ImportWindow, TextAreaControl, IE_GUI_TEXTAREA_ON_CHANGE, "SelectPress")
 	GemRB.SetVisible(ImportWindow,1)
 	return
 
+def SelectPress():
+	DoneButton = GemRB.GetControl(ImportWindow, 0)
+	GemRB.SetButtonState(ImportWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
+	return
+
 def DonePress():
+	FileName = GemRB.QueryText(ImportWindow, TextAreaControl)
+	Slot = GemRB.GetVar("Slot")
+	GemRB.CreatePlayer(FileName, Slot| 0x8000, 1)
 	GemRB.UnloadWindow(ImportWindow)
-	GemRB.SetNextScript("Start")
+	GemRB.SetNextScript("CharGen7")
 	return
 	
 def CancelPress():

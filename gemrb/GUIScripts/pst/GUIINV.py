@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.30 2006/12/30 21:49:46 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.31 2007/01/07 16:19:17 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -77,7 +77,7 @@ def OpenInventoryWindow ():
 	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIINV")
 	InventoryWindow = Window = GemRB.LoadWindow(3)
-        GemRB.SetVar("OtherWindow", InventoryWindow)
+	GemRB.SetVar("OtherWindow", InventoryWindow)
 
 
 	# inventory slots
@@ -513,7 +513,7 @@ def OpenItemIdentifyWindow ():
 		return
 		
 	ItemIdentifyWindow = Window = GemRB.LoadWindow (9)
-        GemRB.SetVar ("FloatWindow", ItemIdentifyWindow)
+	GemRB.SetVar ("FloatWindow", ItemIdentifyWindow)
 
 
 	# how would you like to identify ....

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIWORLD.py,v 1.10 2005/12/04 21:09:33 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIWORLD.py,v 1.11 2007/01/07 16:19:18 avenger_teambg Exp $
 
 
 # GUIWORLD.py - scripts to control some windows from GUIWORLD winpack
@@ -36,21 +36,21 @@ ReformPartyWindow = None
 Container = None
 
 def CloseContinueWindow ():
-        GemRB.SetVar ("DialogChoose", GemRB.GetVar ("DialogOption"))
+	GemRB.SetVar ("DialogChoose", GemRB.GetVar ("DialogOption"))
 
 
 def OpenEndMessageWindow ():
 	Window = GemRB.GetVar ("MessageWindow")
-        Button = GemRB.GetControl (Window, 0)
-        GemRB.SetText (Window, Button, 34602)
-        GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
+	Button = GemRB.GetControl (Window, 0)
+	GemRB.SetText (Window, Button, 34602)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
 
 
 def OpenContinueMessageWindow ():
 	Window = GemRB.GetVar ("MessageWindow")
-        Button = GemRB.GetControl (Window, 0)
-        GemRB.SetText (Window, Button, 34603)
-        GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
+	Button = GemRB.GetControl (Window, 0)
+	GemRB.SetText (Window, Button, 34603)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseContinueWindow")
 
 
 def OpenContainerWindow ():

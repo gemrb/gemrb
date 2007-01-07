@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIMA.py,v 1.19 2006/01/06 00:50:46 edheldil Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIMA.py,v 1.20 2007/01/07 16:19:18 avenger_teambg Exp $
 
 
 # GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
@@ -118,12 +118,12 @@ def SetMapNote ():
 	return
 
 def OpenWorldMapWindowInside ():
-        WorldMapWindowCommon (-1)
-        return
+	WorldMapWindowCommon (-1)
+	return
 
 def OpenWorldMapWindow ():
-        WorldMapWindowCommon (GemRB.GetVar ("Travel"))
-        return
+	WorldMapWindowCommon (GemRB.GetVar ("Travel"))
+	return
 
 def WorldMapWindowCommon (Travel):
 	global WorldMapWindow

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.39 2006/12/27 22:05:48 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUICommonWindows.py,v 1.40 2007/01/07 16:19:17 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common windows in lower part of the screen
@@ -224,8 +224,8 @@ def UpdateAnimation ():
 		if item:
 			animid = item["AnimationType"]
 	BioTable = GemRB.LoadTable ("BIOS")
-        Specific = "%d"%GemRB.GetPlayerStat (pc, IE_SPECIFIC)
-        AvatarName = GemRB.GetTableValue (BioTable, Specific, "PC")
+	Specific = "%d"%GemRB.GetPlayerStat (pc, IE_SPECIFIC)
+	AvatarName = GemRB.GetTableValue (BioTable, Specific, "PC")
 	AnimTable = GemRB.LoadTable ("ANIMS")
 	if animid=="":
 		animid="*"
