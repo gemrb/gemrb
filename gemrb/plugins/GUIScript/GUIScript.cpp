@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.447 2007/01/07 13:28:38 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.448 2007/01/07 16:43:58 avenger_teambg Exp $
  *
  */
 
@@ -3174,6 +3174,33 @@ static PyObject* GemRB_PlayMovie(PyObject * /*self*/, PyObject* args)
 	}
 	//don't return NULL
 	return PyInt_FromLong( ind );
+}
+
+PyDoc_STRVAR( GemRB_SaveCharacter__doc,
+"SaveCharacter(PartyID, CharName)\n\n"
+"Exports the character from party.");
+
+static PyObject* GemRB_SaveCharacter(PyObject * /*self*/, PyObject * args)
+{
+	int PartyID;
+	char *name;
+
+	if (!PyArg_ParseTuple( args, "is", &PartyID, &name )) {
+		return AttributeError( GemRB_SaveCharacter__doc );
+	}
+	if (!name[0]) {
+		return AttributeError( GemRB_SaveCharacter__doc );
+	}
+
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor *actor = game->FindPC(PartyID);
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
+	}
+	return PyInt_FromLong(core->WriteCharacter(name, actor) );
 }
 
 PyDoc_STRVAR( GemRB_SaveGame__doc,
@@ -7489,6 +7516,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(ExecuteString, METH_VARARGS),
 	METHOD(EvaluateString, METH_VARARGS),
 	METHOD(GetGameString, METH_VARARGS),
+	METHOD(SaveCharacter, METH_VARARGS),
 	METHOD(LoadGame, METH_VARARGS),
 	METHOD(SaveGame, METH_VARARGS),
 	METHOD(EnterGame, METH_NOARGS),

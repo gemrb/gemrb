@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.124 2007/01/06 17:17:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.125 2007/01/07 16:43:58 avenger_teambg Exp $
  *
  */
 
@@ -139,43 +139,54 @@ void CREImp::WriteChrHeader(DataStream *stream, Actor *act)
 {
 	char Signature[8];
 	ieVariable name;
-	ieDword tmpDword;
+	ieDword tmpDword, CRESize;
 	ieWord tmpWord;
 	ieByte tmpByte;
 
+	CRESize = GetStoredFileSize (act);
 	switch (CREVersion) {
-		case IE_CRE_V1_0: //bg1
 		case IE_CRE_V9_0: //iwd/HoW
 			memcpy(Signature, "CHR V1.0",8);
 			tmpDword = 0x64; //headersize
+			TotSCEFF = 1;
+			break;
+		case IE_CRE_V1_0: //bg1
+			memcpy(Signature, "CHR V1.0",8);
+			tmpDword = 0x64; //headersize
+			TotSCEFF = 0;
 			break;
 		case IE_CRE_V1_1: //bg2 (fake)
 			memcpy(Signature, "CHR V2.0",8);
 			tmpDword = 0x64; //headersize
+			TotSCEFF = 1;
 			break;
 		case IE_CRE_V1_2: //pst
 			memcpy(Signature, "CHR V1.2",8);
 			tmpDword = 0x68; //headersize
-			break;
+			TotSCEFF = 0;
 			break;
 		case IE_CRE_V2_2:   //iwd2
 			memcpy(Signature, "CHR V2.2",8);
 			tmpDword = 0x21c; //headersize
+			TotSCEFF = 1;
 			break;
 		case IE_CRE_GEMRB:  //own format
 			memcpy(Signature, "CHR V0.0",8);
 			tmpDword = 0x1dc; //headersize (iwd2-9x8+8)
+			TotSCEFF = 1;
 			break;
+		default:
+			printMessage("CREImporter","Unknown CHR version!\n",LIGHT_RED);
+			return;
 	}
-	stream->Write (Signature, 8);
-	memset (Signature,0,sizeof(Signature));
-	memset (name,0,sizeof(name));
-	strncpy (name, act->GetName(0), sizeof(name) );
-	stream->Write (name, 32);
+	stream->Write( Signature, 8);
+	memset( Signature,0,sizeof(Signature));
+	memset( name,0,sizeof(name));
+	strncpy( name, act->GetName(0), sizeof(name) );
+	stream->Write( name, 32);
 
-	stream->WriteDword (&tmpDword); //cre offset (chr header size)
-	tmpDword = GetStoredFileSize (act);
-	stream->WriteDword (&tmpDword);    //cre size
+	stream->WriteDword( &tmpDword); //cre offset (chr header size)
+	stream->WriteDword( &CRESize);    //cre size
 
 	SetupSlotCounts();
 	int i;
@@ -191,9 +202,9 @@ void CREImp::WriteChrHeader(DataStream *stream, Actor *act)
 		stream->WriteResRef (act->PCStats->QuickSpells[i]);
 	}
 	if (QSPCount==9) {
-		stream->Write (act->PCStats->QuickSpellClass,9);
+		stream->Write( act->PCStats->QuickSpellClass,9);
 		tmpByte = 0;
-		stream->Write (&tmpByte,1);
+		stream->Write( &tmpByte,1);
 	}
 	for (i=0;i<QITCount;i++) {
 		tmpWord = act->PCStats->QuickItemSlots[i];
@@ -212,19 +223,19 @@ void CREImp::WriteChrHeader(DataStream *stream, Actor *act)
 		//fallthrough
 	case IE_CRE_GEMRB:
 		for (i=0;i<18;i++) {
-			stream->WriteDword (&tmpDword);
+			stream->WriteDword( &tmpDword);
 		}
 		for (i=0;i<QSPCount;i++) {
 			tmpDword = act->PCStats->QSlots[i];
-			stream->WriteDword (&tmpDword);
+			stream->WriteDword( &tmpDword);
 		}
 		for (i=0;i<13;i++) {
 			stream->WriteWord (&tmpWord);
 		}
-		stream->Write (act->PCStats->SoundFolder, 32);
-		stream->Write (act->PCStats->SoundSet, 8);
+		stream->Write( act->PCStats->SoundFolder, 32);
+		stream->Write( act->PCStats->SoundSet, 8);
 		for (i=0;i<32;i++) {
-			stream->WriteDword (&tmpDword);
+			stream->WriteDword( &tmpDword);
 		}
 		break;
 	default:
@@ -250,8 +261,8 @@ void CREImp::ReadChrHeader(Actor *act)
 	if (tmpDword != 0 && tmpDword !=1) {
 		act->SetText( name, 0 ); //setting longname
 	}
-	str->ReadDword (&offset);
-	str->ReadDword (&size);
+	str->ReadDword( &offset);
+	str->ReadDword( &size);
 	SetupSlotCounts();
 	int i;
 	for (i=0;i<QWPCount;i++) {
@@ -866,7 +877,7 @@ ieDword CREImp::GetActorGemRB(Actor *act)
 	act->BaseStats[IE_REPUTATION]=tmpByte;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_HIDEINSHADOWS]=tmpByte;
-	//skipping a word (useful for something)
+	//skipping a word( useful for something)
 	str->ReadWord( &tmpWord );
 	str->ReadWord( &tmpWord );
 	act->BaseStats[IE_ARMORCLASS]=(ieWordSigned) tmpWord;
@@ -949,7 +960,7 @@ void CREImp::GetActorBG(Actor *act)
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_HIDEINSHADOWS]=tmpByte;
 	str->ReadWord( &tmpWord );
-	//skipping a word (useful for something)
+	//skipping a word
 	str->ReadWord( &tmpWord );
 	act->BaseStats[IE_ARMORCLASS]=(ieWordSigned) tmpWord;
 	str->ReadWord( &tmpWord );
@@ -2401,12 +2412,11 @@ int CREImp::PutActor(DataStream *stream, Actor *actor, bool chr)
 		return -1;
 	}
 
-	assert(TotSCEFF==0 || TotSCEFF==1);
-
 	IsCharacter = chr;
 	if (chr) {
 		WriteChrHeader( stream, actor );
 	}
+	assert(TotSCEFF==0 || TotSCEFF==1);
 
 	ret = PutHeader( stream, actor);
 	if (ret) {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.446 2006/12/31 14:12:53 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.447 2007/01/07 16:43:57 avenger_teambg Exp $
  *
  */
 
@@ -4937,6 +4937,34 @@ int Interface::SwapoutArea(Map *map)
 	return 0;
 }
 
+int Interface::WriteCharacter(const char *name, Actor *actor)
+{
+        char Path[_MAX_PATH];
+
+        PathJoin( Path, GamePath, GameCharacters, NULL );
+	if (!actor) {
+		return -1;
+	}
+	ActorMgr* gm = ( ActorMgr* ) GetInterface( IE_CRE_CLASS_ID );
+	if (gm == NULL) {
+		return -1;
+	}
+	FileStream str;
+
+	str.Create( Path, name, IE_CHR_CLASS_ID );
+
+	//this is not needed, because the chr header writer automatically
+	//calls it
+	//int size = gm->GetStoredFileSize (actor);
+	int ret = gm->PutActor(&str, actor, true);
+	if (ret <0) {
+		printMessage("Core"," ", YELLOW);
+		printf("Character cannot be saved: %s\n", name);
+	}
+	FreeInterface(gm);
+	return 0;
+}
+
 int Interface::WriteGame(const char *folder)
 {
 	SaveGameMgr* gm = ( SaveGameMgr* ) GetInterface( IE_GAM_CLASS_ID );
@@ -4954,11 +4982,11 @@ int Interface::WriteGame(const char *folder)
 		int ret = gm->PutGame (&str, game);
 		if (ret <0) {
 			printMessage("Core"," ", YELLOW);
-			printf("Internal error, game cannot be saved: %s\n", GameNameResRef);
+			printf("Game cannot be saved: %s\n", GameNameResRef);
 		}
 	} else {
 		printMessage("Core"," ", YELLOW);
-			printf("Internal error, game cannot be saved: %s\n", GameNameResRef);
+		printf("Internal error, game cannot be saved: %s\n", GameNameResRef);
 	}
 	//make sure the stream isn't connected to sm, or it will be double freed
 	FreeInterface( gm );

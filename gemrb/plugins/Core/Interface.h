@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.217 2006/12/31 13:48:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.218 2007/01/07 16:43:57 avenger_teambg Exp $
  *
  */
 
@@ -578,6 +578,8 @@ public:
 	void ApplyEffect(const ieResRef resname, Actor *target, Actor *caster, int level);
 	/** dumps an area object to the cache */
 	int SwapoutArea(Map *map);
+	/** saves (exports a character to the characters folder */
+	int WriteCharacter(const char *name, Actor *actor);
 	/** saves the game object to the destination folder */
 	int WriteGame(const char *folder);
 	/** saves the worldmap object to the destination folder */
