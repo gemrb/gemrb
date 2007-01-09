@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.240 2007/01/02 17:01:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.241 2007/01/09 23:05:29 avenger_teambg Exp $
  *
  */
 
@@ -299,7 +299,8 @@ void Actor::SetAnimationID(unsigned int AnimID)
 	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
 		if ((AnimID&0xf000)==0xe000) {
 			if (BaseStats[IE_COLORCOUNT]) {
-				printf("[Actor] Animation ID %x is supposed to be real colored (no recoloring), patched creature\n", AnimID);
+				printMessage("Actor"," ",YELLOW);
+				printf("Animation ID %x is supposed to be real colored (no recoloring), patched creature\n", AnimID);
 			}
 			BaseStats[IE_COLORCOUNT]=0;
 		}
@@ -2293,6 +2294,9 @@ void Actor::Draw(Region &screen)
 	Color tint = area->LightMap->GetPixel( cx / 16, cy / 12);
 	tint.a = (ieByte) (255-Trans);
 
+	//don't use cy for area map access beyond this point
+	cy-=area->HeightMap->GetPixelIndex( cx / 16, cy / 12);
+
 	//draw videocells under the actor
 	DrawVideocells(screen, vvcShields, tint);
 
@@ -2735,9 +2739,6 @@ void Actor::SetUsedWeapon(char* AnimationType, ieWord* MeleeAnimation, int wt)
 	memcpy(WeaponRef, AnimationType, sizeof(WeaponRef) );
 	memcpy(AttackMovements, MeleeAnimation, sizeof(AttackMovements) );
 	if (wt != -1) WeaponType = wt;
-	printf("Weapon: %c%c\n",AnimationType[0], AnimationType[1]);
-	printf("Movements: %hd%% %hd%% %hd%%\n", MeleeAnimation[0], MeleeAnimation[1], MeleeAnimation[2]);
-	printf("WeaponType: %d\n", WeaponType);
 	if (!anims)
 		return;
 	anims->SetWeaponRef(AnimationType);
@@ -2754,8 +2755,6 @@ void Actor::SetUsedShield(char* AnimationType, int wt)
 	if (AnimationType[0] == ' ' || AnimationType[0] == 0)
 		if (WeaponType == IE_ANI_WEAPON_2W)
 			WeaponType = IE_ANI_WEAPON_1H;
-	printf("Shield: %c%c\n",AnimationType[0], AnimationType[1]);
-	printf("WeaponType: %d\n", WeaponType);
 
 	if (!anims)
 		return;
@@ -2765,7 +2764,6 @@ void Actor::SetUsedShield(char* AnimationType, int wt)
 
 void Actor::SetUsedHelmet(char* AnimationType)
 {
-	printf("Helmet: %c%c\n",AnimationType[0], AnimationType[1]);
 	memcpy(HelmetRef, AnimationType, sizeof(HelmetRef) );
 	if (!anims)
 		return;

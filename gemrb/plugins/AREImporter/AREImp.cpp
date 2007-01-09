@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.161 2006/11/16 21:43:43 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.162 2007/01/09 23:05:29 avenger_teambg Exp $
  *
  */
 
@@ -237,12 +237,18 @@ Map* AREImp::GetMap(const char *ResRef)
 	DataStream* srstr = core->GetResourceMgr()->GetResource( TmpResRef, IE_BMP_CLASS_ID );
 	sr->Open( srstr, true, true );
 
+	snprintf( TmpResRef, 9, "%sHT", WEDResRef);
+
+	ImageMgr* hm = ( ImageMgr* ) core->GetInterface( IE_BMP_CLASS_ID );
+	DataStream* hmstr = core->GetResourceMgr()->GetResource( TmpResRef, IE_BMP_CLASS_ID );
+	hm->Open( hmstr, true );
+
 	// Small map for MapControl
 	ImageMgr* sm = ( ImageMgr* ) core->GetInterface( IE_MOS_CLASS_ID );
 	DataStream* smstr = core->GetResourceMgr()->GetResource( WEDResRef, IE_MOS_CLASS_ID );
 	sm->Open( smstr, true );
 
-	map->AddTileMap( tm, lm, sr, sm );
+	map->AddTileMap( tm, lm, sr, sm, hm );
 	strnlwrcpy( map->WEDResRef, WEDResRef, 8);
 
 	str->Seek( SongHeader, GEM_STREAM_START );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.260 2006/12/28 11:49:26 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.261 2007/01/09 23:05:29 avenger_teambg Exp $
  *
  */
 
@@ -353,6 +353,7 @@ Map::Map(void)
 	TMap = NULL;
 	LightMap = NULL;
 	SearchMap = NULL;
+	HeightMap = NULL;
 	SmallMap = NULL;
 	MapSet = NULL;
 	Walls = NULL;
@@ -415,6 +416,8 @@ Map::~Map(void)
 		core->FreeInterface( LightMap );
 	if (SearchMap)
 		core->FreeInterface( SearchMap );
+	if (HeightMap)
+		core->FreeInterface( HeightMap );
 	if (SmallMap)
 		core->FreeInterface( SmallMap );
 	for (i = 0; i < QUEUE_COUNT; i++) {
@@ -459,11 +462,12 @@ Map::~Map(void)
 	WallCount=0;
 }
 
-void Map::AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm)
+void Map::AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm, ImageMgr* hm)
 {
 	TMap = tm;
 	LightMap = lm;
 	SearchMap = sr;
+	HeightMap = hm;
 	SmallMap = sm;
 	Width=TMap->XCellCount * 4;
 	Height=( TMap->YCellCount * 64 ) / 12;

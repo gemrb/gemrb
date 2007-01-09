@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.122 2006/11/28 21:45:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.123 2007/01/09 23:05:29 avenger_teambg Exp $
  *
  */
 
@@ -207,6 +207,7 @@ public:
 	TileMap* TMap;
 	ImageMgr* LightMap;
 	ImageMgr* SearchMap;
+	ImageMgr* HeightMap;
 	ImageMgr* SmallMap;
 	ieDword AreaFlags;
 	ieWord AreaType;
@@ -242,7 +243,7 @@ public:
 
 	/** prints useful information on console */
 	void DebugDump();
-	void AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm);
+	void AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm, ImageMgr* hm);
 	void UpdateScripts();
 	void UpdateEffects();
 	/* removes empty heaps and returns total itemcount */
