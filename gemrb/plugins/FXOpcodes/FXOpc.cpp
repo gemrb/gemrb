@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.46 2006/12/03 17:16:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.47 2007/01/12 23:31:08 avenger_teambg Exp $
  *
  */
 
@@ -1214,13 +1214,31 @@ int fx_intelligence_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_invisible_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	switch (fx->Parameter2) {
-		case 1:
+		case 0:
 			STATE_SET( STATE_INVISIBLE );
 			break;
-		case 2:
+		case 1:
 			STATE_SET( STATE_INVIS2 );
 			break;
+		default:
+			break;
 	}
+	ieDword Trans = fx->Parameter4;
+	if (fx->Parameter3) {
+		if (Trans>=240) {
+			fx->Parameter3=0;
+		} else {
+			Trans+=16;
+		}
+	} else {
+		if (Trans<=32) {
+			fx->Parameter3=1;
+		} else {
+			Trans-=16;
+		}
+	}
+	fx->Parameter4=Trans;
+	STAT_SET( IE_TRANSLUCENT, Trans);
 	return FX_APPLIED;
 }
 
