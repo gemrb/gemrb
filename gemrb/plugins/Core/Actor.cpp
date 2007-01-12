@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.241 2007/01/09 23:05:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.242 2007/01/12 23:32:19 avenger_teambg Exp $
  *
  */
 
@@ -2265,6 +2265,13 @@ void Actor::Draw(Region &screen)
 		Frozen = 1;
 	}
 
+	//adjust invisibility for enemies
+	if (Modified[IE_EA]>EA_GOODCUTOFF) {
+		if (State&STATE_INVISIBLE) {
+			Trans = 256;
+		}
+	}
+	/*
 	if (State&STATE_INVISIBLE) {
 		//enemies/neutrals are fully invisible if invis flag 2 set
 		if (Modified[IE_EA]>EA_GOODCUTOFF) {
@@ -2286,11 +2293,13 @@ void Actor::Draw(Region &screen)
 	if (Trans>255) {
 		return;
 	}
+	*/
 
+	//can't move this, because there is permanent blur state where
+	//there is no effect (just state bit)
 	if (State&STATE_BLUR) {
-		if (Trans>192) Trans = 192;
+		Trans = 64;
 	}
-
 	Color tint = area->LightMap->GetPixel( cx / 16, cy / 12);
 	tint.a = (ieByte) (255-Trans);
 
