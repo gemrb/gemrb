@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.21 2006/12/25 17:56:39 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIOPT.py,v 1.22 2007/01/13 12:17:42 avenger_teambg Exp $
 
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
@@ -357,7 +357,6 @@ def DisplayHelpGore ():
 def DisplayHelpAlwaysRun ():
 	GemRB.SetText (GameplayOptionsWindow, GameplayHelpText, 62419)
 
-
 def DisplayHelpFeedbackOptions ():
 	GemRB.SetText (GameplayOptionsWindow, GameplayHelpText, 31213)
 
@@ -408,10 +407,6 @@ def OpenFeedbackOptionsWindow ():
 	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 	
-
-def DisplayHelpFeedbackOptions ():
-	GemRB.SetText (FeedbackOptionsWindow, FeedbackHelpText, 37410)
-
 def DisplayHelpMarkerFeedback ():
 	GemRB.SetText (FeedbackOptionsWindow, FeedbackHelpText, 37411)
 
@@ -503,10 +498,6 @@ def OnAutoPauseClicked ():
 
 	GemRB.SetVar("Auto Pause State", state)
 	
-
-def DisplayHelpAutopauseOptions ():
-	GemRB.SetText (AutopauseOptionsWindow, AutopauseHelpText, 31214)
-
 def DisplayHelpCharacterHit ():
 	GemRB.SetText (AutopauseOptionsWindow, AutopauseHelpText, 37688)
 
