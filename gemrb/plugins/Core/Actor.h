@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.136 2007/01/02 17:01:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.137 2007/01/13 15:35:07 wjpalenstijn Exp $
  *
  */
 
@@ -169,13 +169,17 @@ public:
 	vvcVector vvcOverlays;
 	vvcVector vvcShields;
 private:
-	//this stuff don't get saved
+	//this stuff doesn't get saved
 	CharAnimations* anims;
 	ieByte SavingThrow[5];
 	//how many attacks in this round
 	int attackcount;
 	//when the next attack is scheduled (gametime+initiative)
 	ieDword initiative;
+
+	/** paint the actor itself. Called internally by Draw() */
+	void DrawActorSprite(Region &screen, int cx, int cy, Region& bbox,
+						 SpriteCover*& sc, Animation** anims, Color& tint);
 
 	/** fixes the palette */
 	void SetupColors();

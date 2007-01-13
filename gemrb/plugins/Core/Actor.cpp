@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.243 2007/01/13 11:54:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.244 2007/01/13 15:35:07 wjpalenstijn Exp $
  *
  */
 
@@ -2222,6 +2222,42 @@ void Actor::DrawVideocells(Region &screen, vvcVector &vvcCells, Color &tint)
 	}
 }
 
+void Actor::DrawActorSprite(Region &screen, int cx, int cy, Region& bbox,
+							SpriteCover*& sc, Animation** anims, Color& tint)
+{
+	CharAnimations* ca = GetAnims();
+	unsigned char Face = GetNextFace();
+	int PartCount = ca->GetTotalPartCount();
+	Video* video = core->GetVideoDriver();
+	Region vp = video->GetViewport();
+
+	// display current frames in the right order
+	const int* zOrder = ca->GetZOrder(Face);
+	for (int part = 0; part < PartCount; ++part) {
+		int partnum = part;
+		if (zOrder) partnum = zOrder[part];
+		Animation* anim = anims[partnum];
+		Sprite2D* nextFrame = 0;
+		if (anim)
+			nextFrame = anim->GetFrame(anim->GetCurrentFrame());
+		if (nextFrame && bbox.InsideRegion( vp ) ) {
+			if (!sc || !sc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height)) {
+				// the first anim contains the animarea for
+				// the entire multi-part animation
+				sc = area->BuildSpriteCover(cx, cy, -anims[0]->animArea.x, -anims[0]->animArea.y, anims[0]->animArea.w, anims[0]->animArea.h, WantDither() );
+			}
+			assert(sc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height));
+
+			unsigned int flags = TranslucentShadows ? BLIT_TRANSSHADOW : 0;
+			if (!ca->lockPalette) flags|=BLIT_TINTED;
+
+			video->BlitGameSprite( nextFrame, cx + screen.x, cy + screen.y,
+				 flags, tint, sc, ca->GetPartPalette(partnum), &screen);
+		}
+	}
+}
+
+
 void Actor::Draw(Region &screen)
 {
 	Map* area = GetCurrentArea();
@@ -2355,42 +2391,17 @@ void Actor::Draw(Region &screen)
 			SetBBox( newBBox );
 		}
 
-		// display current frames in the right order
-		const int* zOrder = ca->GetZOrder(Face);
-		int part;
-		for (part = 0; part < PartCount; ++part) {
-			int partnum = part;
-			if (zOrder) partnum = zOrder[part];
-			Animation* anim = anims[partnum];
-			nextFrame = 0;
-			if (anim)
-				nextFrame = anim->GetFrame(anim->GetCurrentFrame());
-			if (nextFrame && BBox.InsideRegion( vp ) ) {
-				SpriteCover* sc = GetSpriteCover();
-				if (!sc || !sc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height)) {
-					// the first anim contains the animarea for
-					// the entire multi-part animation
-					sc = area->BuildSpriteCover(cx, cy, -anims[0]->animArea.x, -anims[0]->animArea.y, anims[0]->animArea.w, anims[0]->animArea.h, WantDither() );
-					//this will delete previous spritecover
-					SetSpriteCover(sc);
-
-				}
-				assert(sc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height));
-
-				unsigned int flags = TranslucentShadows ? BLIT_TRANSSHADOW : 0;
-				if (!ca->lockPalette) flags|=BLIT_TINTED;
-
-				video->BlitGameSprite( nextFrame, cx + screen.x, cy + screen.y,
-					 flags, tint, sc, ca->GetPartPalette(partnum), &screen);
-			}
-		}
+		SpriteCover* sc = GetSpriteCover();
+		SpriteCover* newsc = sc;
+		DrawActorSprite(screen, cx, cy, BBox, newsc, anims, tint);
+		if (newsc != sc) SetSpriteCover(newsc);
 
 		// advance animations one frame (in sync)
 		if (Frozen)
 			anims[0]->LastFrame();
 		else
 			anims[0]->NextFrame();
-		for (part = 1; part < PartCount; ++part) {
+		for (int part = 1; part < PartCount; ++part) {
 			if (anims[part])
 				anims[part]->GetSyncedNextFrame(anims[0]);
 		}
