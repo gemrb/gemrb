@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.23 2006/12/30 21:49:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.24 2007/01/13 11:54:41 avenger_teambg Exp $
  *
  */
 
@@ -178,7 +178,8 @@ void ITMImp::GetExtHeader(Item *s, ITMExtHeader* eh)
 	str->ReadWord( &eh->THAC0Bonus );
 	str->ReadWord( &eh->DiceSides );
 	str->ReadWord( &eh->DiceThrown );
-	str->ReadWord( &eh->DamageBonus );
+	//if your compiler doesn't like this, then we need a ReadWordSigned
+	str->ReadWord( (ieWord *) &eh->DamageBonus );
 	str->ReadWord( &eh->DamageType );
 	str->ReadWord( &eh->FeatureCount );
 	str->ReadWord( &eh->FeatureOffset );

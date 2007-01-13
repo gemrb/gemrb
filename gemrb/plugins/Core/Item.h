@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.31 2006/12/31 13:48:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Item.h,v 1.32 2007/01/13 11:54:38 avenger_teambg Exp $
  *
  */
 
@@ -106,7 +106,7 @@ public:
 	ieWord THAC0Bonus;
 	ieWord DiceSides;
 	ieWord DiceThrown;
-	ieWord DamageBonus;
+	ieWordSigned DamageBonus; //this must be signed!!!
 	ieWord DamageType;
 	ieWord FeatureCount;
 	ieWord FeatureOffset;

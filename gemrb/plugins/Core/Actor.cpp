@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.242 2007/01/12 23:32:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.243 2007/01/13 11:54:38 avenger_teambg Exp $
  *
  */
 
@@ -1239,6 +1239,8 @@ int Actor::Damage(int damage, int damagetype, Actor *hitter)
 	} else {
 		PlayDamageAnimation(damagelevel);
 	}
+	printMessage("Actor"," ",GREEN);
+	printf("%d damage taken.\n", LastDamage);
 	DisplayStringCore(this, VB_DAMAGE, DS_CONSOLE|DS_CONST );
 	if (InParty) {
 		if (chp<(signed) Modified[IE_MAXHITPOINTS]/10) {
@@ -2050,7 +2052,9 @@ void Actor::PerformAttack(ieDword gameTime)
 	//damage type is?
 	//modify defense with damage type
 	ieDword damagetype = header->DamageType;
+	printMessage("Attack"," ",GREEN);
 	int damage = core->Roll(header->DiceThrown, header->DiceSides, header->DamageBonus);
+	printf("Damage %dd%d%+d = %d\n",header->DiceThrown, header->DiceSides, header->DamageBonus, damage);
 	int damageluck = (int) GetStat(IE_DAMAGELUCK);
 	if (damage<damageluck) {
 		damage = damageluck;
