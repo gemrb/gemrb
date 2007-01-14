@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.244 2007/01/13 15:35:07 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.245 2007/01/14 16:29:28 wjpalenstijn Exp $
  *
  */
 
@@ -174,6 +174,8 @@ Actor::Actor()
 	AttackMovements[0]=100;
 	AttackMovements[1]=0;
 	AttackMovements[2]=0;
+	for (i = 0; i < EXTRA_ACTORCOVERS; ++i)
+		extraCovers[i] = NULL;
 
 	LongName = NULL;
 	ShortName = NULL;
@@ -2223,10 +2225,10 @@ void Actor::DrawVideocells(Region &screen, vvcVector &vvcCells, Color &tint)
 }
 
 void Actor::DrawActorSprite(Region &screen, int cx, int cy, Region& bbox,
-							SpriteCover*& sc, Animation** anims, Color& tint)
+							SpriteCover*& sc, Animation** anims,
+							unsigned char Face, Color& tint)
 {
 	CharAnimations* ca = GetAnims();
-	unsigned char Face = GetNextFace();
 	int PartCount = ca->GetTotalPartCount();
 	Video* video = core->GetVideoDriver();
 	Region vp = video->GetViewport();
@@ -2257,6 +2259,11 @@ void Actor::DrawActorSprite(Region &screen, int cx, int cy, Region& bbox,
 	}
 }
 
+
+int OrientdX[16] = { 0, -4, -7, -9, -10, -9, -7, -4, 0, 4, 7, 9, 10, 9, 7, 4 };
+int OrientdY[16] = { 10, 9, 7, 4, 0, -4, -7, -9, -10, -9, -7, -4, 0, 4, 7, 9 };
+unsigned int MirrorImageLocation[8] = { 4, 12, 8, 0, 6, 14, 10, 2 };
+unsigned int MirrorImageZOrder[8] = { 2, 4, 6, 0, 1, 7, 5, 3 };
 
 void Actor::Draw(Region &screen)
 {
@@ -2391,10 +2398,129 @@ void Actor::Draw(Region &screen)
 			SetBBox( newBBox );
 		}
 
-		SpriteCover* sc = GetSpriteCover();
-		SpriteCover* newsc = sc;
-		DrawActorSprite(screen, cx, cy, BBox, newsc, anims, tint);
+		// Drawing the actor:
+		// * mirror images:
+		//     Drawn without transparency, unless fully invisible.
+		//     Order: W, E, N, S, NW, SE, NE, SW
+		//     Uses extraCovers 3-10
+		// * blurred copies (3 of them)
+		//     Drawn with transparency.
+		//     distance between copies depends on IE_MOVEMENTRATE
+		//     TODO: actually, the direction is the real movement direction,
+		//           not the (rounded) direction given Face
+		//     Uses extraCovers 0-2
+		// * actor itself
+		//     Uses main spritecover
+
+
+		SpriteCover *sc = 0, *newsc = 0;
+		int blurx = cx;
+		int blury = cy;
+		int blurdx = (OrientdX[Face]*(int)Modified[IE_MOVEMENTRATE])/20;
+		int blurdy = (OrientdY[Face]*(int)Modified[IE_MOVEMENTRATE])/20;
+		Color mirrortint = tint;
+		if (mirrortint.a > 0) mirrortint.a = 255;
+
+		int i;
+
+		// mirror images behind the actor
+		for (i = 0; i < 4; ++i) {
+			unsigned int m = MirrorImageZOrder[i];
+			if (m < Modified[IE_MIRRORIMAGES]) {
+				Region sbbox = BBox;
+				int dir = MirrorImageLocation[m];
+				int icx = cx + 3*OrientdX[dir];
+				int icy = cy + 3*OrientdY[dir];
+				Point iPos(icx, icy);
+				// FIXME: clean this up once GetBlocked returns all search bits
+				if ((area->GetBlocked(iPos) & PATH_MAP_PASSABLE) ||
+					(area->SearchMap->GetPixelIndex(icx/16,icy/12) & PATH_MAP_ACTOR)) {
+					sbbox.x += 3*OrientdX[dir];
+					sbbox.y += 3*OrientdY[dir];
+					newsc = sc = extraCovers[3+m];
+					DrawActorSprite(screen, icx, icy, sbbox, newsc,
+									anims, Face, mirrortint);
+					if (newsc != sc) {
+						delete sc;
+						extraCovers[3+m] = newsc;
+					}
+				}
+			} else {
+				delete extraCovers[3+m];
+				extraCovers[3+m] = NULL;
+			}
+		}
+
+		// blur sprites behind the actor
+		if (State & STATE_BLUR) {
+			if (Face < 4 || Face >= 12) {
+				Region sbbox = BBox;
+				sbbox.x -= 4*blurdx; sbbox.y -= 4*blurdy;
+				blurx -= 4*blurdx; blury -= 4*blurdy;
+				for (i = 0; i < 3; ++i) {
+					sbbox.x += blurdx; sbbox.y += blurdy;
+					blurx += blurdx; blury += blurdy;
+					newsc = sc = extraCovers[i]; 
+					DrawActorSprite(screen, blurx, blury, sbbox, newsc,
+									anims, Face, tint);
+					if (newsc != sc) {
+						delete sc;
+						extraCovers[i] = newsc;
+					}
+				}
+			}
+		}
+
+		// actor itself
+		newsc = sc = GetSpriteCover();
+		DrawActorSprite(screen, cx, cy, BBox, newsc, anims, Face, tint);
 		if (newsc != sc) SetSpriteCover(newsc);
+
+		// blur sprites in front of the actor
+		if (State & STATE_BLUR) {
+			if (Face >= 4 && Face < 12) {
+				Region sbbox = BBox;
+				for (i = 0; i < 3; ++i) {
+					sbbox.x -= blurdx; sbbox.y -= blurdy;
+					blurx -= blurdx; blury -= blurdy;
+					newsc = sc = extraCovers[i]; 
+					DrawActorSprite(screen, blurx, blury, sbbox, newsc,
+									anims, Face, tint);
+					if (newsc != sc) {
+						delete sc;
+						extraCovers[i] = newsc;
+					}
+				}
+			}
+		}
+
+		// mirror images in front of the actor
+		for (i = 4; i < 8; ++i) {
+			unsigned int m = MirrorImageZOrder[i];
+			if (m < Modified[IE_MIRRORIMAGES]) {
+				Region sbbox = BBox;
+				int dir = MirrorImageLocation[m];
+				int icx = cx + 3*OrientdX[dir];
+				int icy = cy + 3*OrientdY[dir];
+				Point iPos(icx, icy);
+				// FIXME: clean this up once GetBlocked returns all search bits
+				if ((area->GetBlocked(iPos) & PATH_MAP_PASSABLE) ||
+					(area->SearchMap->GetPixelIndex(icx/16,icy/12) & PATH_MAP_ACTOR)) {
+					sbbox.x += 3*OrientdX[dir];
+					sbbox.y += 3*OrientdY[dir];
+					newsc = sc = extraCovers[3+m];
+					DrawActorSprite(screen, icx, icy, sbbox, newsc,
+									anims, Face, mirrortint);
+					if (newsc != sc) {
+						delete sc;
+						extraCovers[3+m] = newsc;
+					}
+				}
+			} else {
+				delete extraCovers[3+m];
+				extraCovers[3+m] = NULL;
+			}
+		}
 
 		// advance animations one frame (in sync)
 		if (Frozen)

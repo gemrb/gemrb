@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.137 2007/01/13 15:35:07 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.138 2007/01/14 16:29:27 wjpalenstijn Exp $
  *
  */
 
@@ -100,6 +100,9 @@ class ScriptedAnimation;
 
 #define VCONST_COUNT 100
 
+// 3 for blur, 8 for mirror images
+#define EXTRA_ACTORCOVERS 11
+
 typedef ieByte ActionButtonRow[GUIBT_COUNT];
 
 typedef std::vector< ScriptedAnimation*> vvcVector;
@@ -171,6 +174,7 @@ public:
 private:
 	//this stuff doesn't get saved
 	CharAnimations* anims;
+	SpriteCover* extraCovers[EXTRA_ACTORCOVERS];
 	ieByte SavingThrow[5];
 	//how many attacks in this round
 	int attackcount;
@@ -179,7 +183,8 @@ private:
 
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(Region &screen, int cx, int cy, Region& bbox,
-						 SpriteCover*& sc, Animation** anims, Color& tint);
+						 SpriteCover*& sc, Animation** anims,
+						 unsigned char Face, Color& tint);
 
 	/** fixes the palette */
 	void SetupColors();
