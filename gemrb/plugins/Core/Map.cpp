@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.261 2007/01/09 23:05:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.262 2007/01/14 19:06:58 avenger_teambg Exp $
  *
  */
 
@@ -473,6 +473,14 @@ void Map::AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm, Imag
 	Height=( TMap->YCellCount * 64 ) / 12;
 	//Filling Matrices
 	MapSet = (unsigned short *) malloc(sizeof(unsigned short) * Width * Height);
+	//converting searchmap to internal format
+	int y=SearchMap->GetHeight();
+	while(y--) {
+	  int x=SearchMap->GetWidth();
+	  while(x--) {
+	    SearchMap->SetPixelIndex(x,y,Passable[SearchMap->GetPixelIndex(x,y)&PATH_MAP_AREAMASK]);
+	  }
+	}
 }
 
 void Map::MoveToNewArea(const char *area, const char *entrance, int EveryOne, Actor *actor)
@@ -1326,13 +1334,12 @@ void Map::PlayAreaSong(int SongType)
 
 int Map::GetBlocked(unsigned int x, unsigned int y)
 {
-	int block = SearchMap->GetPixelIndex( x, y );
-	int ret = Passable[block&PATH_MAP_AREAMASK];
-	if (block&PATH_MAP_DOOR_OPAQUE) {
-		ret=PATH_MAP_NO_SEE;
-	}
-	if (block&(PATH_MAP_DOOR_TRANSPARENT|PATH_MAP_ACTOR)) {
+	int ret = SearchMap->GetPixelIndex( x, y );
+	if (ret&(PATH_MAP_DOOR_TRANSPARENT|PATH_MAP_ACTOR)) {
 		ret&=~PATH_MAP_PASSABLE;
+	}
+	if (ret&PATH_MAP_DOOR_OPAQUE) {
+		ret=PATH_MAP_NO_SEE;
 	}
 	return ret;
 }
