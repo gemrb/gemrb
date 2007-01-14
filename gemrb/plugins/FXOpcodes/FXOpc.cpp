@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.47 2007/01/12 23:31:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.48 2007/01/14 19:04:11 avenger_teambg Exp $
  *
  */
 
@@ -2517,20 +2517,21 @@ EffectRef fx_mirror_image_modifier_ref={"MirrorImageModifier",NULL,-1};
 
 int fx_mirror_image (Actor* Owner, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_cure_improved_invisible_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	fx->Opcode = EffectQueue::ResolveEffect(fx_mirror_image_modifier_ref);
-	fx->Parameter1 = core->Roll(1, fx->Parameter1, 0);
+	if (0) printf( "fx_mirror_image (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	ieDword images = core->Roll(1, fx->Parameter1, 0);
 	Effect *fx2 = target->fxqueue.HasEffect(fx_mirror_image_modifier_ref);
 	if (fx2) {
 		//update old effect with our numbers if our numbers are more
-		if (fx2->Parameter1<fx->Parameter1) {
-			fx2->Parameter1=fx->Parameter1;
+		if (fx2->Parameter1<images) {
+			fx2->Parameter1=images;
 		}
 		if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
 			fx2->TimingMode = FX_DURATION_INSTANT_PERMANENT;
 		}
 		return FX_NOT_APPLIED;
 	}
+	fx->Opcode = EffectQueue::ResolveEffect(fx_mirror_image_modifier_ref);
+	fx->Parameter1=images;
 	//execute the translated effect
 	return fx_mirror_image_modifier(Owner, target, fx);
 }
@@ -3028,16 +3029,16 @@ int fx_set_grease_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 // 0x9f MirrorImageModifier
 int fx_mirror_image_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_mirror_image_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_mirror_image_modifier (%2d): Mod: %d\n", fx->Opcode, fx->Parameter1 );
 	if (STATE_GET(STATE_DEAD) ) {
 		return FX_NOT_APPLIED;
 	}
-	if (!fx->Parameter2) {
+	if (!fx->Parameter1) {
 		return FX_NOT_APPLIED;
 	}
 	STATE_SET( STATE_MIRROR );
-	//actually, there is no such state in the original IE
-	STAT_SET( IE_MIRRORIMAGES, fx->Parameter2);
+	//actually, there is no such stat in the original IE
+	STAT_SET( IE_MIRRORIMAGES, fx->Parameter1);
 	return FX_APPLIED;
 }
 
