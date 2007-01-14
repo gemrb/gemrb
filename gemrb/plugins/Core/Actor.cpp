@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.245 2007/01/14 16:29:28 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.246 2007/01/14 16:36:15 wjpalenstijn Exp $
  *
  */
 
@@ -2318,34 +2318,11 @@ void Actor::Draw(Region &screen)
 			Trans = 256;
 		}
 	}
-	/*
-	if (State&STATE_INVISIBLE) {
-		//enemies/neutrals are fully invisible if invis flag 2 set
-		if (Modified[IE_EA]>EA_GOODCUTOFF) {
-			if (State&STATE_INVIS2)
-				Trans=256;
-			else
-				Trans=128;
-		} else {
-			Trans=256;
-		}
-	}
-	//friendlies are half transparent at best
-	if (Trans>128) {
-		if (Modified[IE_EA]<=EA_GOODCUTOFF) {
-			Trans=128;
-		}
-	}
-	//no visual feedback
-	if (Trans>255) {
-		return;
-	}
-	*/
 
 	//can't move this, because there is permanent blur state where
 	//there is no effect (just state bit)
-	if (State&STATE_BLUR) {
-		Trans = 64;
+	if ((State&STATE_BLUR) && Trans < 128) {
+		Trans = 128;
 	}
 	Color tint = area->LightMap->GetPixel( cx / 16, cy / 12);
 	tint.a = (ieByte) (255-Trans);
