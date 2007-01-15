@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.247 2007/01/14 19:06:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.248 2007/01/15 18:45:34 wjpalenstijn Exp $
  *
  */
 
@@ -2410,7 +2410,6 @@ void Actor::Draw(Region &screen)
 				int icx = cx + 3*OrientdX[dir];
 				int icy = cy + 3*OrientdY[dir];
 				Point iPos(icx, icy);
-				// FIXME: clean this up once GetBlocked returns all search bits
 				if (area->GetBlocked(iPos) & (PATH_MAP_PASSABLE|PATH_MAP_ACTOR)) {
 					sbbox.x += 3*OrientdX[dir];
 					sbbox.y += 3*OrientdY[dir];
@@ -2480,9 +2479,7 @@ void Actor::Draw(Region &screen)
 				int icx = cx + 3*OrientdX[dir];
 				int icy = cy + 3*OrientdY[dir];
 				Point iPos(icx, icy);
-				// FIXME: clean this up once GetBlocked returns all search bits
-				if ((area->GetBlocked(iPos) & PATH_MAP_PASSABLE) ||
-					(area->SearchMap->GetPixelIndex(icx/16,icy/12) & PATH_MAP_ACTOR)) {
+				if (area->GetBlocked(iPos) & (PATH_MAP_PASSABLE|PATH_MAP_ACTOR)) {
 					sbbox.x += 3*OrientdX[dir];
 					sbbox.y += 3*OrientdY[dir];
 					newsc = sc = extraCovers[3+m];
