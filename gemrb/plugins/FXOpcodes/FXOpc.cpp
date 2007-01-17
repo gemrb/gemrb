@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.48 2007/01/14 19:04:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.49 2007/01/17 21:15:19 avenger_teambg Exp $
  *
  */
 
@@ -48,6 +48,7 @@
 #define PI_HELD   13
 #define PI_SLOWED 41
 #define PI_STUN   55
+#define PI_BOUNCE 65
 #define PI_MAZE   78
 #define PI_PRISON 79
 
@@ -3403,6 +3404,7 @@ int fx_bounce_spelllevel_dec (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_bounce_spellevel_dec (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
 	STAT_BIT_OR( IE_BOUNCE, BNC_LEVEL_DEC );
+	target->AddPortraitIcon(PI_BOUNCE);
 	return FX_APPLIED;
 }
 
