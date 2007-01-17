@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.448 2007/01/07 16:43:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.449 2007/01/17 21:18:03 avenger_teambg Exp $
  *
  */
 
@@ -3902,6 +3902,28 @@ static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( PlayerSlot );
 }
 
+PyDoc_STRVAR( GemRB_GetPlayerStates__doc,
+"GetPlayerStates(PartyID) => string\n\n"
+"Returns the state string for the player.");
+
+static PyObject* GemRB_GetPlayerStates(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID;
+
+	if (!PyArg_ParseTuple( args, "i", &PartyID )) {
+		return AttributeError( GemRB_GetPlayerStates__doc );
+	}
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor* MyActor = game->FindPC( PartyID );
+	if (!MyActor) {
+		return RuntimeError( "Actor not found" );
+	}
+	return PyString_FromString((const char *) MyActor->GetStateString() );
+}
+
 PyDoc_STRVAR( GemRB_GetPlayerName__doc,
 "GetPlayerName(PartyID[, LongOrShort]) => string\n\n"
 "Queries the player name." );
@@ -7645,6 +7667,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GameGetSelectedPCSingle, METH_VARARGS),
 	METHOD(GameGetFirstSelectedPC, METH_NOARGS),
 	METHOD(GetPlayerPortrait, METH_VARARGS),
+	METHOD(GetPlayerStates, METH_VARARGS),
 	METHOD(GetPlayerName, METH_VARARGS),
 	METHOD(SetPlayerName, METH_VARARGS),
 	METHOD(SetPlayerSound, METH_VARARGS),
