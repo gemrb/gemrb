@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.248 2007/01/15 18:45:34 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.249 2007/01/17 21:16:24 avenger_teambg Exp $
  *
  */
 
@@ -618,19 +618,11 @@ void pcf_web(Actor *actor, ieDword Value)
 //de/activates the spell bounce background
 void pcf_bounce(Actor *actor, ieDword Value)
 {
-	switch(Value) {
-	case 1: //bounce passive
-		if (actor->HasVVCCell(overlay[OV_BOUNCE]))
-			return;
-		actor->add_animation(overlay[OV_BOUNCE], -1, 0, false);
-		break;
-	case 2: //activated bounce
-		if (actor->HasVVCCell(overlay[OV_BOUNCE2]))
-			return;
-		actor->add_animation(overlay[OV_BOUNCE2], -1, 0, true);
-		break;
-	default:
-		actor->RemoveVVCell(overlay[OV_BOUNCE], true);
+	if (Value) {
+		actor->add_animation(overlay[OV_BOUNCE], -1, -1, false);
+	} else {
+		//it seems we have to remove it abruptly
+		actor->RemoveVVCell(overlay[OV_BOUNCE], false); 
 	}
 }
 
@@ -985,6 +977,23 @@ bool Actor::SetBaseBit(unsigned int StatIndex, ieDword Value, bool setreset)
 	return true;
 }
 
+const unsigned char *Actor::GetStateString()
+{
+	if (!PCStats) {
+		return NULL;
+	}
+	ieByte *tmp = PCStats->PortraitIconString;
+	ieWord *Icons = PCStats->PortraitIcons;
+	int j=0;
+	for (int i=0;i<MAX_PORTRAIT_ICONS;i++) {
+		if (!(Icons[i]&0xff00)) {
+			tmp[j++]=(ieByte) ((Icons[i]&0xff)+65);
+		}
+	}
+	tmp[j]=0;
+	return tmp;
+}
+
 void Actor::AddPortraitIcon(ieByte icon)
 {
 	if (!PCStats) {
@@ -992,15 +1001,14 @@ void Actor::AddPortraitIcon(ieByte icon)
 	}
 	ieWord *Icons = PCStats->PortraitIcons;
 
-	int i;
-
-	for(i=0;i<MAX_PORTRAIT_ICONS;i++) {
+	for(int i=0;i<MAX_PORTRAIT_ICONS;i++) {
+		if (Icons[i]==0xffff) {
+			Icons[i]=icon;
+			return;
+		}
 		if (icon == (Icons[i]&0xff)) {
 			return;
 		}
-	}
-	if (i<MAX_PORTRAIT_ICONS) {
-		Icons[i]=icon;
 	}
 }
 

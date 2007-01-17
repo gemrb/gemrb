@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.447 2007/01/07 16:43:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.448 2007/01/17 21:16:24 avenger_teambg Exp $
  *
  */
 
@@ -4769,19 +4769,23 @@ bool Interface::Exists(const char *ResRef, SClass_ID type)
 //create a vvc for it!
 ScriptedAnimation* Interface::GetScriptedAnimation( const char *effect)
 {
+	ScriptedAnimation *ret = NULL;
+
 	if (Exists( effect, IE_VVC_CLASS_ID ) ) {
 		DataStream *ds = key->GetResource( effect, IE_VVC_CLASS_ID );
-		return new ScriptedAnimation(ds, true);
+		ret = new ScriptedAnimation(ds, true);
+	} else {
+		AnimationFactory *af = (AnimationFactory *)
+			key->GetFactoryResource( effect, IE_BAM_CLASS_ID, IE_NORMAL );
+		if (af) {
+			ScriptedAnimation *ret=new ScriptedAnimation();
+			ret->LoadAnimationFactory( af);
+		}
 	}
-	AnimationFactory *af = (AnimationFactory *)
-		key->GetFactoryResource( effect, IE_BAM_CLASS_ID, IE_NORMAL );
-	if (af) {
-		ScriptedAnimation *ret=new ScriptedAnimation();
-		ret->LoadAnimationFactory( af);
+	if (ret) {
 		strnlwrcpy(ret->ResName, effect, 8);
-		return ret;
 	}
-	return NULL;
+	return ret;
 }
 
 Actor *Interface::GetFirstSelectedPC()
@@ -4939,9 +4943,9 @@ int Interface::SwapoutArea(Map *map)
 
 int Interface::WriteCharacter(const char *name, Actor *actor)
 {
-        char Path[_MAX_PATH];
+	char Path[_MAX_PATH];
 
-        PathJoin( Path, GamePath, GameCharacters, NULL );
+	PathJoin( Path, GamePath, GameCharacters, NULL );
 	if (!actor) {
 		return -1;
 	}
