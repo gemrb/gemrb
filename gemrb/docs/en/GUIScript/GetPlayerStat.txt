@@ -8,5 +8,5 @@ Parameters: Slot  - actor index in game structure
 
 Return value: numeric
 
-See also: SetPlayerStat, GetPlayerName
+See also: SetPlayerStat, GetPlayerName, GetPlayerStates
 
