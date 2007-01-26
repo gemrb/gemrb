@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.249 2007/01/17 21:16:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.250 2007/01/26 21:51:06 wjpalenstijn Exp $
  *
  */
 
@@ -289,9 +289,9 @@ void Actor::SetAnimationID(unsigned int AnimID)
 
 	if (anims) {
 		if (anims->lockPalette) {
-			recover = anims->palette;
+			recover = anims->palette[PAL_MAIN];
 		}
-		//increase refcount hack so the palette won't get sunk
+		// Take ownership so the palette won't be deleted
 		if (recover) {
 			recover->IncRef();
 		}
@@ -315,7 +315,8 @@ void Actor::SetAnimationID(unsigned int AnimID)
 		anims->SetAttackMoveChances(AttackMovements);
 
 		//if we have a recovery palette, then set it back
-		anims->palette=recover;
+		assert(anims->palette[PAL_MAIN] == 0);
+		anims->palette[PAL_MAIN] = recover;
 		if (recover) {
 			anims->lockPalette = true;
 		}
@@ -447,7 +448,7 @@ static void SetLockedPalette(Actor *actor, ieDword *gradients)
 	//force initialisation of animation
 	anims->SetColors( gradients );
 	anims->GetAnimation(0,0);
-	if (anims->palette) {
+	if (anims->palette[PAL_MAIN]) {
 		anims->lockPalette=true;
 	}
 }

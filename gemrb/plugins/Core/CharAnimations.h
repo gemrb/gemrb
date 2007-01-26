@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.50 2006/12/24 15:34:49 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.51 2007/01/26 21:51:06 wjpalenstijn Exp $
  *
  */
 
@@ -119,6 +119,13 @@ struct AvatarStruct {
 	char Size;
 };
 
+enum PaletteType {
+	PAL_MAIN,
+	PAL_WEAPON,
+	PAL_OFFHAND,
+	PAL_HELMET
+};
+
 struct EquipResRefData;
 
 class GEM_EXPORT CharAnimations {
@@ -129,10 +136,7 @@ private:
 	char OffhandRef[2];
 public:
 	ieDword *Colors;  //these are the custom color indices
-	Palette* palette;
-	Palette* paletteHelmet;
-	Palette* paletteWeapon;
-	Palette* paletteOffhand;
+	Palette* palette[4];
 	unsigned int AvatarsRowNum;
 	unsigned char ArmorType, WeaponType, RangedType;
 	ieDword AttackMoves[3]; //percentages for the 3 attack move types
@@ -151,7 +155,7 @@ public:
 	void SetHelmetRef(const char* ref);
 	void SetWeaponRef(const char* ref);
 	void SetOffhandRef(const char* ref);
-	void SetupColors(unsigned int type);
+	void SetupColors(PaletteType type);
 	void SetColors(ieDword *Colors);
 
 	// returns an array of animations of size GetTotalPartCount()

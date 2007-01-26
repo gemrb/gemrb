@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.104 2006/12/24 16:47:20 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.105 2007/01/26 21:51:06 wjpalenstijn Exp $
  *
  */
 
@@ -193,7 +193,7 @@ void CharAnimations::SetHelmetRef(const char* ref)
 	// Note: this doesn't happen "often", so this isn't a performance
 	//       bottleneck. (wjp)
 	DropAnims();
-	core->FreePalette(paletteHelmet, 0);
+	core->FreePalette(palette[PAL_HELMET], 0);
 }
 
 void CharAnimations::SetWeaponRef(const char* ref)
@@ -203,7 +203,7 @@ void CharAnimations::SetWeaponRef(const char* ref)
 
 	// TODO: Only drop weapon anims?
 	DropAnims();
-	core->FreePalette(paletteWeapon, 0);
+	core->FreePalette(palette[PAL_WEAPON], 0);
 }
 
 void CharAnimations::SetOffhandRef(const char* ref)
@@ -213,37 +213,21 @@ void CharAnimations::SetOffhandRef(const char* ref)
 	
 	// TODO: Only drop shield/offhand anims?
 	DropAnims();
-	core->FreePalette(paletteOffhand, 0);
+	core->FreePalette(palette[PAL_OFFHAND], 0);
 }
 
 void CharAnimations::SetColors(ieDword *arg)
 {
 	Colors = arg;
-	SetupColors(0);
-	SetupColors(1);
-	SetupColors(2);
-	SetupColors(3);
+	SetupColors(PAL_MAIN);
+	SetupColors(PAL_WEAPON);
+	SetupColors(PAL_OFFHAND);
+	SetupColors(PAL_HELMET);
 }
 
-void CharAnimations::SetupColors(unsigned int type)
+void CharAnimations::SetupColors(PaletteType type)
 {
-	Palette* pal = 0;
-	switch (type) {
-	case 0:
-		pal = palette;
-		break;
-	case 1:
-		pal = paletteWeapon;
-		break;
-	case 2:
-		pal = paletteOffhand;
-		break;
-	case 3:
-		pal = paletteHelmet;
-		break;
-	default:
-		break;
-	}
+	Palette* pal = palette[(int)type];
 
 	if (!pal) {
 		return;
@@ -264,12 +248,13 @@ void CharAnimations::SetupColors(unsigned int type)
 		int size = 32;
 		int dest = 256-Colors[6]*size;
 		if (Colors[6] == 0) {
-			core->FreePalette(palette, PaletteResRef);
+			core->FreePalette(palette[PAL_MAIN], PaletteResRef);
 			PaletteResRef[0]=0;
 			return;
 		}
 		for (unsigned int i = 0; i < Colors[6]; i++) {
-			core->GetPalette( Colors[i]&255, size, &palette->col[dest]);
+			core->GetPalette( Colors[i]&255, size,
+							  &palette[PAL_MAIN]->col[dest] );
 			//Color* NewPal = core->GetPalette( Colors[i]&255, size );
 			//memcpy( &palette->col[dest], NewPal, size*sizeof( Color ) );
 			dest +=size;
@@ -279,8 +264,8 @@ void CharAnimations::SetupColors(unsigned int type)
 	}
 
 	int PType = NoPalette();
-	if ( PType && type == 0 ) {
-		core->FreePalette(palette, PaletteResRef);
+	if ( PType && type == PAL_MAIN ) {
+		core->FreePalette(palette[PAL_MAIN], PaletteResRef);
 		PaletteResRef[0]=0;
 		//handling special palettes like MBER_BL (black bear)
 		if (PType==1) {
@@ -288,7 +273,7 @@ void CharAnimations::SetupColors(unsigned int type)
 		}
 		snprintf(PaletteResRef,8,"%.4s_%-.2s",ResRef, (char *) &PType);
 		strlwr(PaletteResRef);
-		palette = core->GetPalette(PaletteResRef);
+		palette[PAL_MAIN] = core->GetPalette(PaletteResRef);
 		//invalid palette, rolling back
 		if (!palette) {
 			PaletteResRef[0]=0;
@@ -296,17 +281,17 @@ void CharAnimations::SetupColors(unsigned int type)
 		return;
 	}
 
-	pal->SetupPaperdollColours(Colors, type);
+	pal->SetupPaperdollColours(Colors, (int)type);
 }
 
 Palette* CharAnimations::GetPartPalette(int part)
 {
 	int actorPartCount = GetActorPartCount();
 	
-	if (part < actorPartCount) return palette;
-	if (part == actorPartCount) return paletteWeapon;
-	if (part == actorPartCount+1) return paletteOffhand;
-	if (part == actorPartCount+2) return paletteHelmet;
+	if (part < actorPartCount) return palette[PAL_MAIN];
+	if (part == actorPartCount) return palette[PAL_WEAPON];
+	if (part == actorPartCount+1) return palette[PAL_OFFHAND];
+	if (part == actorPartCount+2) return palette[PAL_HELMET];
 	return 0;
 }
 
@@ -347,10 +332,9 @@ void CharAnimations::InitAvatarsTable()
 CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 {
 	Colors = NULL;
-	palette = NULL;
-	paletteHelmet = NULL;
-	paletteWeapon = NULL;
-	paletteOffhand = NULL;
+	int i,j;
+	for (i = 0; i < 4; ++i)
+		palette[i] = NULL;
 	nextStanceID = 0;
 	autoSwitchOnEnd = false;
 	lockPalette = false;
@@ -358,8 +342,8 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 		InitAvatarsTable();
 	}
 
-	for (int i = 0; i < MAX_ANIMS; i++) {
-		for (int j = 0; j < MAX_ORIENT; j++) {
+	for (i = 0; i < MAX_ANIMS; i++) {
+		for (j = 0; j < MAX_ORIENT; j++) {
 			Anims[i][j] = NULL;
 		}
 	}
@@ -419,10 +403,9 @@ void CharAnimations::DropAnims()
 CharAnimations::~CharAnimations(void)
 {
 	DropAnims();
-	core->FreePalette(palette, PaletteResRef);
-	core->FreePalette(paletteHelmet, 0);
-	core->FreePalette(paletteWeapon, 0);
-	core->FreePalette(paletteOffhand, 0);
+	core->FreePalette(palette[PAL_MAIN], PaletteResRef);
+	for (int i = 1; i < 4; ++i)
+		core->FreePalette(palette[i], 0);
 }
 /*
 This is a simple Idea of how the animation are coded
@@ -720,29 +703,32 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 		}
 
 		if (part < actorPartCount) {
-			if (!palette && (NoPalette()!=1) ) {
+			if (!palette[PAL_MAIN] && (NoPalette()!=1) ) {
 				// This is the first time we're loading an Animation.
 				// We copy the palette of its first frame into our own palette
-				palette=core->GetVideoDriver()->GetPalette(a->GetFrame(0))
-					->Copy();
+				palette[PAL_MAIN] = 
+					core->GetVideoDriver()->GetPalette(a->GetFrame(0))->Copy();
 
 				// ...and setup the colours properly
-				SetupColors(0);
+				SetupColors(PAL_MAIN);
 			}
 		} else if (part == actorPartCount) {
-			if (!paletteWeapon) {
-				paletteWeapon = core->GetVideoDriver()->GetPalette(a->GetFrame(0))->Copy();
-				SetupColors(1);
+			if (!palette[PAL_WEAPON]) {
+				palette[PAL_WEAPON] =
+					core->GetVideoDriver()->GetPalette(a->GetFrame(0))->Copy();
+				SetupColors(PAL_WEAPON);
 			}
 		} else if (part == actorPartCount+1) {
-			if (!paletteOffhand) {
-				paletteOffhand = core->GetVideoDriver()->GetPalette(a->GetFrame(0))->Copy();
-				SetupColors(2);
+			if (!palette[PAL_OFFHAND]) {
+				palette[PAL_OFFHAND] =
+					core->GetVideoDriver()->GetPalette(a->GetFrame(0))->Copy();
+				SetupColors(PAL_OFFHAND);
 			}
 		} else if (part == actorPartCount+2) {
-			if (!paletteHelmet) {
-				paletteHelmet = core->GetVideoDriver()->GetPalette(a->GetFrame(0))->Copy();
-				SetupColors(3);
+			if (!palette[PAL_HELMET]) {
+				palette[PAL_HELMET] =
+					core->GetVideoDriver()->GetPalette(a->GetFrame(0))->Copy();
+				SetupColors(PAL_HELMET);
 			}
 		}
 	
