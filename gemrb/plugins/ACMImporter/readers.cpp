@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.cpp,v 1.12 2005/06/14 22:29:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.cpp,v 1.13 2007/01/27 18:00:59 avenger_teambg Exp $
  *
  */
 
@@ -137,16 +137,30 @@ int CACMReader::init_reader()
 	} else {
 		stream->Seek( -4, GEM_CURRENT_POS );
 	}
-	stream->Read( &hdr, sizeof( ACM_Header ) );
+	//stream->Read( &hdr, sizeof( ACM_Header ) );
+	//maybe this'll work on a PPC
+
+	stream->ReadDword( &hdr.signature );
+	stream->ReadDword( &hdr.samples );
+	stream->ReadWord( &hdr.channels );
+	stream->ReadWord( &hdr.rate );
+	ieWord tmpword;
+	stream->ReadWord( &tmpword );
+	//subblocks = (int) (tmpword&0xfff);
+	//levels = (int) (tmpword>>12);
+	subblocks = (int) (tmpword>>4);
+	levels = (int) (tmpword&15);
+
 	if (hdr.signature != IP_ACM_SIG) {
 		return 0;
 	}
 	samples_left = ( samples = hdr.samples );
 	channels = hdr.channels;
 	samplerate = hdr.rate;
-	levels = hdr.levels;
-	subblocks = hdr.subblocks;
+	//levels = hdr.levels;
+	//subblocks = hdr.subblocks;
 
+printf("Subblocks: %d, levels: %d\n", levels, subblocks);
 	block_size = ( 1 << levels ) * subblocks;
 	//using malloc for simple arrays (supposed to be faster)
 	block = (int *) malloc(sizeof(int)*block_size);
@@ -260,6 +274,26 @@ int CRawPCMReader::read_samples(short* buffer, int count)
 	return res;
 }
 
+inline void fix_endian(ieDword &dest)
+{
+	unsigned char tmp;
+	tmp=((unsigned char *) dest)[0];
+	((unsigned char *) dest)[0]=((unsigned char *) dest)[3];
+	((unsigned char *) dest)[3]=tmp;
+	tmp=((unsigned char *) dest)[1];
+	((unsigned char *) dest)[1]=((unsigned char *) dest)[2];
+	((unsigned char *) dest)[2]=tmp;
+
+}
+
+inline void fix_endian(ieWord &dest)
+{
+	unsigned char tmp;
+	tmp=((unsigned char *) dest)[0];
+	((unsigned char *) dest)[0]=((unsigned char *) dest)[1];
+	((unsigned char *) dest)[1]=tmp;
+}
+
 int CWavPCMReader::init_reader()
 {
 	int res = CRawPCMReader::init_reader(); if (!res) {
@@ -270,29 +304,56 @@ int CWavPCMReader::init_reader()
 	RIFF_CHUNK r_hdr, fmt_hdr, data_hdr;
 	unsigned int wave;
 	memset( &fmt, 0, sizeof( fmt ) );
-	stream->Read( &r_hdr, sizeof( r_hdr ) );
+
+	//stream->Read( &r_hdr, sizeof( r_hdr ) );
+	//don't swap this
+	stream->Read(&r_hdr.fourcc, 4);
+	stream->ReadDword(&r_hdr.length);
+	//don't swap this
 	stream->Read( &wave, 4 );
 	if (r_hdr.fourcc != *( unsigned int * ) RIFF_4cc ||
 		wave != *( unsigned int * ) WAVE_4cc) {
 		return 0;
 	}
 
-	stream->Read( &fmt_hdr, sizeof( fmt_hdr ) );
+	//stream->Read( &fmt_hdr, sizeof( fmt_hdr ) );
+	//don't swap this
+	stream->Read(&fmt_hdr.fourcc,4);
+	stream->ReadDword(&fmt_hdr.length);
 	if (fmt_hdr.fourcc != *( unsigned int * ) fmt_4cc ||
 		fmt_hdr.length > sizeof( cWAVEFORMATEX )) {
 		return 0;
 	}
+	memset(&fmt,0,sizeof(fmt) );
 	stream->Read( &fmt, fmt_hdr.length );
+	//hmm, we should swap fmt bytes if we are on a mac
+	//but we don't know exactly how much of the structure we'll read
+	//so we have to swap the bytes after reading them
+	if (stream->IsEndianSwitch()) {
+		fix_endian(fmt.wFormatTag);
+		fix_endian(fmt.nChannels);
+		fix_endian(fmt.nSamplesPerSec);
+		//we don't use these fields, so who cares
+		//fix_endian(fmt.nAvgBytesPerSec);
+		//fix_endian(fmt.nBlockAlign);
+		//fix_endian(fmt.wBitsPerSample);
+		//fix_endian(fmt.cbSize);
+	}
 	if (fmt.wFormatTag != 1) {
 		return 0;
 	}
 	is16bit = ( fmt.wBitsPerSample == 16 );
 
-	stream->Read( &data_hdr, sizeof( data_hdr ) );
+	//stream->Read( &data_hdr, sizeof( data_hdr ) );
+	//don't swap this
+	stream->Read(&data_hdr.fourcc,4);
+	stream->ReadDword(&data_hdr.length);
 
 	if (data_hdr.fourcc == *( unsigned int * ) fact_4cc) {
 		stream->Seek( data_hdr.length, GEM_CURRENT_POS );
-		stream->Read( &data_hdr, sizeof( data_hdr ) );
+		//stream->Read( &data_hdr, sizeof( data_hdr ) );
+		stream->ReadDword(&data_hdr.fourcc);
+		stream->ReadDword(&data_hdr.length);
 	}
 	if (data_hdr.fourcc != *( unsigned int * ) data_4cc) {
 		return 0;
