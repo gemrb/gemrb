@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.49 2007/01/17 21:15:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.50 2007/01/27 15:12:13 avenger_teambg Exp $
  *
  */
 
@@ -44,13 +44,19 @@
 #define COND_HIT 8
 #define COND_ALWAYS 9
 
-//FIXME: find a way to handle portrait icons
+//FIXME: find a way to handle portrait icons better
 #define PI_HELD   13
+#define PI_HASTED 38
 #define PI_SLOWED 41
 #define PI_STUN   55
 #define PI_BOUNCE 65
+#define PI_BOUNCE2 67
 #define PI_MAZE   78
 #define PI_PRISON 79
+#define PI_SEQUENCER 92
+#define PI_SPELLTRAP 117
+#define PI_CSHIELD 162
+#define PI_CSHIELD2 163
 
 static ieResRef *casting_glows = NULL;
 static int cgcount = -1;
@@ -1089,10 +1095,11 @@ int fx_dexterity_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_PERMANENT;
 }
 
-// 0x10 haste
+EffectRef fx_set_slow_state_ref={"State:Slowed",NULL,-1};
+//this reference is used by many other effects
+EffectRef fx_display_portrait_icon_ref={"Icon:Display",NULL,-1};
 
-EffectRef fx_set_slow_state_ref={"State:Slow",NULL,-1};
-
+// 0x10 State:Hasted
 // this function removes slowed state, or sets hasted state
 int fx_set_hasted_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1102,6 +1109,7 @@ int fx_set_hasted_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 		if ( STATE_GET(STATE_SLOWED) ) {
 			BASE_STATE_CURE( STATE_SLOWED );
 			target->fxqueue.RemoveAllEffects( fx_set_slow_state_ref ); 
+			target->fxqueue.RemoveAllEffectsWithParam( fx_display_portrait_icon_ref, PI_SLOWED );
 		} else {
 			BASE_STATE_SET( STATE_HASTED );
 		}
@@ -1110,6 +1118,7 @@ int fx_set_hasted_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 		if ( STATE_GET(STATE_SLOWED) ) {
 			BASE_STATE_CURE( STATE_SLOWED );
 			target->fxqueue.RemoveAllEffects( fx_set_slow_state_ref ); 
+			target->fxqueue.RemoveAllEffectsWithParam( fx_display_portrait_icon_ref, PI_SLOWED );
 		} else {
 			BASE_STATE_SET( STATE_HASTED );
 		}
@@ -1486,7 +1495,7 @@ int fx_set_unconscious_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 // 0x28 State:Slowed
 // this function removes hasted state, or sets slowed state
-EffectRef fx_set_haste_state_ref={"State:Haste",NULL,-1};
+EffectRef fx_set_haste_state_ref={"State:Hasted",NULL,-1};
 
 int fx_set_slowed_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1494,6 +1503,7 @@ int fx_set_slowed_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (STATE_GET(STATE_HASTED) ) {
 		BASE_STATE_CURE( STATE_HASTED );
 		target->fxqueue.RemoveAllEffects( fx_set_haste_state_ref ); 
+		target->fxqueue.RemoveAllEffectsWithParam( fx_display_portrait_icon_ref, PI_HASTED );
 	} else {
 		STATE_SET( STATE_SLOWED );
 		target->AddPortraitIcon(PI_SLOWED);
@@ -3425,6 +3435,7 @@ int fx_bounce_school (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_bounce_school (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
 	STAT_BIT_OR( IE_BOUNCE, BNC_SCHOOL );
+	target->AddPortraitIcon(PI_BOUNCE2);
 	return FX_APPLIED;
 }
 
@@ -3433,6 +3444,7 @@ int fx_bounce_secondary_type (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_bounce_secondary_type (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
 	STAT_BIT_OR( IE_BOUNCE, BNC_SECTYPE );
+	target->AddPortraitIcon(PI_BOUNCE2);
 	return FX_APPLIED;
 }
 
@@ -3647,6 +3659,7 @@ int fx_bounce_school_dec (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_bounce_school_dec (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
 	STAT_BIT_OR( IE_BOUNCE, BNC_SCHOOL_DEC );
+	target->AddPortraitIcon(PI_BOUNCE2);
 	return FX_APPLIED;
 }
 
@@ -3655,6 +3668,7 @@ int fx_bounce_secondary_type_dec (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_bounce_secondary_type_dec (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
 	STAT_BIT_OR( IE_BOUNCE, BNC_SECTYPE_DEC );
+	target->AddPortraitIcon(PI_BOUNCE2);
 	return FX_APPLIED;
 }
 
@@ -3841,8 +3855,6 @@ int fx_farsee (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 }
 
 // 0xf0 Icon:Remove
-EffectRef fx_display_portrait_icon_ref={"Icon:Display",NULL,-1};
-
 int fx_remove_portrait_icon (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_remove_portrait_icon (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
@@ -3953,10 +3965,11 @@ int fx_create_item_days (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 // 0x100 Sequencer:Store
-int fx_store_spell_sequencer(Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_store_spell_sequencer(Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_store_spell_sequencer (%2d)\n", fx->Opcode );
 	//just display the spell sequencer portrait icon
+	target->AddPortraitIcon(PI_SEQUENCER);
 	return FX_APPLIED;
 }
 // 0x101 Sequencer:Create
@@ -3986,14 +3999,14 @@ int fx_activate_spell_sequencer(Actor* Owner, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 // 0x103 SpellTrap (Protection:SpellLevelDecrement + recall spells)
-int fx_spelltrap(Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_spelltrap(Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_spelltrap (%2d): Count: %d, Level: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	if (fx->Parameter1<=0) {
 		//gone down to zero
 		return FX_NOT_APPLIED;
 	}
-	//it has some portrait icon i think
+	target->AddPortraitIcon(PI_SPELLTRAP);
 	return FX_APPLIED;
 }
 //0x104 Crash104
@@ -4234,19 +4247,22 @@ int fx_wild_surge_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_MOD( IE_SURGEMOD );
 	return FX_APPLIED;
 }
+
 // 0x11a ScriptingState
 int fx_scripting_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_scripting_state (%2d): Value: %d, Stat: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	//original engine didn't check boundaries, causing crashes
-	//we allow only positive indices
+	//we allow only positive indices (some extra stats are still addressable)
 	if (fx->Parameter2>100) {
 		return FX_NOT_APPLIED;
 	}
+	//original engine used only single byte value, we allow full dword
 	STAT_SET( IE_SCRIPTINGSTATE1+fx->Parameter2, fx->Parameter1 );
 	return FX_APPLIED;
 }
+
 // 0x11b ApplyEffectCurse
 int fx_apply_effect_curse (Actor* Owner, Actor* target, Effect* fx)
 {
@@ -4385,6 +4401,11 @@ int fx_chaos_shield_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_chaos_shield_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_MOD( IE_CHAOSSHIELD );
+	if (fx->Parameter2) {
+		target->AddPortraitIcon(PI_CSHIELD);  //162
+	} else {
+		target->AddPortraitIcon(PI_CSHIELD2); //163
+	}
 	return FX_APPLIED;
 }
 //0x12c NPCBump
