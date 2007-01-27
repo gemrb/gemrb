@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.67 2005/12/17 21:02:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.68 2007/01/27 18:58:21 wjpalenstijn Exp $
  *
  */
 
@@ -349,7 +349,6 @@ ALuint ACMImp::LoadSound(const char *ResRef, int *time_length)
 	acm = CreateSoundReader( stream, type, stream->Size(), true );
 	if (!acm) {
 		printMessage( "ACMImp::Play","Can't create sound reader. ", LIGHT_RED );
-		delete( stream );
 		return 0;
 	}
 	int cnt = acm->get_length();
