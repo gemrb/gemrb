@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.250 2007/01/26 21:51:06 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.251 2007/01/27 18:07:55 avenger_teambg Exp $
  *
  */
 
@@ -1446,6 +1446,8 @@ void Actor::SetPersistent(int partyslot)
 {
 	InParty = (ieByte) partyslot;
 	InternalFlags|=IF_FROMGAME;
+	//if an actor is coming from a game, it should have these too
+	CreateStats();
 }
 
 void Actor::DestroySelf()
