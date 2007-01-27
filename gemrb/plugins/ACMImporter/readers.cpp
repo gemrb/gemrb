@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.cpp,v 1.13 2007/01/27 18:00:59 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.cpp,v 1.14 2007/01/27 18:57:37 wjpalenstijn Exp $
  *
  */
 
@@ -226,6 +226,9 @@ CSoundReader* CreateSoundReader(DataStream* stream, int type, int samples,
 			break;
 		case SND_READER_WAV:
 			res = new CWavPCMReader( stream, samples, autoFree );
+			break;
+		default:
+			if (autoFree) delete stream;
 			break;
 	}
 	if (res) {
