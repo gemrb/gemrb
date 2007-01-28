@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.60 2006/12/31 13:48:22 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.61 2007/01/28 15:56:17 avenger_teambg Exp $
  *
  */
 
@@ -99,7 +99,7 @@ typedef enum ieCREItemFlagBits {
 	IE_INV_ITEM_CRITICAL = 0x100, //coming from original item
 	IE_INV_ITEM_TWOHANDED = 0x200,
 	IE_INV_ITEM_MOVABLE = 0x400, //same as undroppable
-	IE_INV_ITEM_UNKNOWN800 = 0x800, //displayable in shop???
+	IE_INV_ITEM_RESELLABLE = 0x800, //item will appear in shop when sold
 	IE_INV_ITEM_CURSED = 0x1000, //item is cursed
 	IE_INV_ITEM_UNKNOWN2000 = 0x2000, //totally unknown
 	IE_INV_ITEM_MAGICAL = 0x4000, //magical

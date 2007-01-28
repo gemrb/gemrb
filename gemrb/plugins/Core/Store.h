@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.19 2006/07/05 08:42:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.20 2007/01/28 15:56:17 avenger_teambg Exp $
  *
  */
 
@@ -55,17 +55,18 @@ STT_BG2CONT=4, STT_IWD2CONT=5 } StoreType;
 typedef enum StoreActionType { STA_BUYSELL=0, STA_IDENTIFY=1, STA_STEAL=2,
 STA_CURE=3, STA_DONATE=4, STA_DRINK=5, STA_ROOMRENT=6, STA_OPTIONAL=0x80} StoreActionType;
 
-#define IE_STORE_BUY     1
-#define IE_STORE_SELL    2
-#define IE_STORE_ID      4
-#define IE_STORE_STEAL   8
-#define IE_STORE_DONATE  16     //gemrb extension
-#define IE_STORE_CURE    32
-#define IE_STORE_DRINK   64
-#define IE_STORE_SELECT  0x40   //valid when these flags used as store action
-#define IE_STORE_RENT    128    //gemrb extension
-#define IE_STORE_QUALITY 0x600  //2 bits
-#define IE_STORE_FENCE   0x2000 //
+#define IE_STORE_BUY      1
+#define IE_STORE_SELL     2
+#define IE_STORE_ID       4
+#define IE_STORE_STEAL    8
+#define IE_STORE_DONATE   16     //gemrb extension
+#define IE_STORE_CURE     32
+#define IE_STORE_DRINK    64
+#define IE_STORE_SELECT   0x40   //valid when these flags used as store action
+#define IE_STORE_RENT     128    //gemrb extension
+#define IE_STORE_QUALITY  0x600  //2 bits
+#define IE_STORE_FENCE    0x2000 //
+#define IE_STORE_RECHARGE 0x4000 //gemrb extension, if set, store won't recharge
 
 
 /**
@@ -82,7 +83,7 @@ typedef struct STOItem {
 	int Weight;
 	int StackAmount;
 	ieDword AmountInStock;
-	ieDword InfiniteSupply;
+	ieDwordSigned InfiniteSupply;
 	// V1.1
 	//ieDword TriggerRef; use infinitesupply
 	char unknown2[56];

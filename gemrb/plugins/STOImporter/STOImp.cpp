@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.15 2005/06/10 21:12:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.16 2007/01/28 15:56:17 avenger_teambg Exp $
  *
  */
 
@@ -126,8 +126,10 @@ Store* STOImp::GetStore(Store *s)
 
 	str->Seek( s->ItemsOffset, GEM_STREAM_START );
 	for (i = 0; i < s->ItemsCount; i++) {
-		GetItem(s->items[i]);
-		if (s->items[i]->InfiniteSupply>0) { 
+	STOItem *item = s->items[i];
+		GetItem(item);
+		//it is important to handle this field as signed
+		if (item->InfiniteSupply>0) { 
 			//if there are no triggers, GetRealStockSize is simpler
 			//also it is compatible only with pst/gemrb saved stores
 			s->HasTriggers=true;
@@ -156,16 +158,16 @@ void STOImp::GetItem(STOItem *it)
 	}
 	str->ReadDword( &it->Flags );
 	str->ReadDword( &it->AmountInStock );
-	str->ReadDword( &it->InfiniteSupply );
-	ieDword tmp;
+	str->ReadDword( (ieDword *) &it->InfiniteSupply );
+	ieDwordSigned tmp;
 
 	switch (version) {
 		case 11: //pst
 			if (it->InfiniteSupply) {
-				it->InfiniteSupply=(ieDword) -1;
+				it->InfiniteSupply=-1;
 			}
-			str->ReadDword( &tmp );
-			if ((int) tmp>0) {
+			str->ReadDword( (ieDword *) &tmp );
+			if (tmp>0) {
 				it->InfiniteSupply=tmp;
 			}
 			str->Read( it->unknown2, 56 );
@@ -175,7 +177,7 @@ void STOImp::GetItem(STOItem *it)
 			break;
 		default:
 			if (it->InfiniteSupply) {
-				it->InfiniteSupply=(ieDword) -1;
+				it->InfiniteSupply=-1;
 			}
 			memset( it->unknown2, 0, 56 );
 	}
@@ -312,11 +314,11 @@ int STOImp::PutItems(DataStream *stream, Store *store)
 		stream->WriteDword( &it->Flags );
 		stream->WriteDword( &it->AmountInStock );
 		if (store->version==11) {
-			stream->WriteDword( &it->InfiniteSupply);
-			stream->WriteDword( &it->InfiniteSupply);
+			stream->WriteDword( (ieDword *) &it->InfiniteSupply);
+			stream->WriteDword( (ieDword *) &it->InfiniteSupply);
 			stream->Write( it->unknown2, 56);
 		} else {
-			stream->WriteDword( &it->InfiniteSupply );
+			stream->WriteDword( (ieDword *) &it->InfiniteSupply );
 		}
 	}
 	return 0;
