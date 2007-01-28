@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.106 2007/01/28 15:56:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.107 2007/01/28 20:47:50 wjpalenstijn Exp $
  *
  */
 
@@ -334,7 +334,7 @@ void Inventory::KillSlot(unsigned int index)
 	Item *itm = core->GetItem(item->ItemResRef);
 	switch (effect) {
 		case SLOT_EFFECT_LEFT:
-			UpdateShieldAnimation(itm);
+			UpdateShieldAnimation(0);
 			break;
 		case SLOT_EFFECT_MISSILE:
 		case SLOT_EFFECT_MELEE:
@@ -1343,11 +1343,15 @@ void Inventory::UpdateShieldAnimation(Item *it)
 	char AnimationType[2]={0,0};
 	int WeaponType = -1;
 
-	memcpy(AnimationType, it->AnimationType, 2);
-	if (core->CanUseItemType(SLOT_WEAPON, it))
-		WeaponType = IE_ANI_WEAPON_2W;
-	else
+	if (it) {
+		memcpy(AnimationType, it->AnimationType, 2);
+		if (core->CanUseItemType(SLOT_WEAPON, it))
+			WeaponType = IE_ANI_WEAPON_2W;
+		else
+			WeaponType = IE_ANI_WEAPON_1H;
+	} else {
 		WeaponType = IE_ANI_WEAPON_1H;
+	}
 	Owner->SetUsedShield(AnimationType, WeaponType);
 }
 
