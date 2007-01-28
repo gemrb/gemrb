@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.451 2007/01/28 21:06:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.452 2007/01/28 21:37:38 avenger_teambg Exp $
  *
  */
 
@@ -5075,8 +5075,13 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		if (!si) {
 			return NULL;
 		}
+		//well, it shouldn't be sold at all, but if it is here
+		//it will vanish!!!
+		if (si->Expired) {
+			delete si;
+			break;
+		}
 		si->Flags &= ~IE_INV_ITEM_SELECTED;
-		si->PurchasedAmount=0;
 		store->AddItem( si );
 		break;
 	}
