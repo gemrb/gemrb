@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.107 2007/01/28 20:47:50 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.108 2007/01/28 21:15:30 avenger_teambg Exp $
  *
  */
 
@@ -1124,7 +1124,7 @@ void Inventory::AddSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 {
 	CREItem *TmpItem = new CREItem();
 	strnlwrcpy(TmpItem->ItemResRef, ItemResRef, 8);
-	TmpItem->PurchasedAmount=0;
+	TmpItem->Expired=0;
 	TmpItem->Usages[0]=(ieWord) Charge0;
 	TmpItem->Usages[1]=(ieWord) Charge1;
 	TmpItem->Usages[2]=(ieWord) Charge2;
@@ -1141,7 +1141,7 @@ void Inventory::SetSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 {
 	CREItem *TmpItem = new CREItem();
 	strnlwrcpy(TmpItem->ItemResRef, ItemResRef, 8);
-	TmpItem->PurchasedAmount=0;
+	TmpItem->Expired=0;
 	TmpItem->Usages[0]=(ieWord) Charge0;
 	TmpItem->Usages[1]=(ieWord) Charge1;
 	TmpItem->Usages[2]=(ieWord) Charge2;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.125 2007/01/07 16:43:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.126 2007/01/28 21:15:28 avenger_teambg Exp $
  *
  */
 
@@ -1684,7 +1684,7 @@ int CREImp::PutInventory(DataStream *stream, Actor *actor, unsigned int size)
 			continue;
 		}
 		stream->WriteResRef( it->ItemResRef);
-		stream->WriteWord( &it->PurchasedAmount);
+		stream->WriteWord( &it->Expired);
 		stream->WriteWord( &it->Usages[0]);
 		stream->WriteWord( &it->Usages[1]);
 		stream->WriteWord( &it->Usages[2]);

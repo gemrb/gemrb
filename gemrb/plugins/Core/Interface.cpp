@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.448 2007/01/17 21:16:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.449 2007/01/28 21:15:28 avenger_teambg Exp $
  *
  */
 
@@ -4363,7 +4363,7 @@ CREItem *Interface::ReadItem(DataStream *str)
 	CREItem *itm = new CREItem();
 
 	str->ReadResRef( itm->ItemResRef );
-	str->ReadWord( &itm->PurchasedAmount );
+	str->ReadWord( &itm->Expired );
 	str->ReadWord( &itm->Usages[0] );
 	str->ReadWord( &itm->Usages[1] );
 	str->ReadWord( &itm->Usages[2] );

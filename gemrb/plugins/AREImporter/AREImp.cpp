@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.162 2007/01/09 23:05:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.163 2007/01/28 21:15:28 avenger_teambg Exp $
  *
  */
 
@@ -1371,7 +1371,7 @@ int AREImp::PutItems( DataStream *stream, Map *map)
 			CREItem *ci = c->inventory.GetSlotItem(j);
 
 			stream->WriteResRef( ci->ItemResRef);
-			stream->WriteWord( &ci->PurchasedAmount);
+			stream->WriteWord( &ci->Expired);
 			stream->WriteWord( &ci->Usages[0]);
 			stream->WriteWord( &ci->Usages[1]);
 			stream->WriteWord( &ci->Usages[2]);
