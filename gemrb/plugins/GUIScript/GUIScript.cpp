@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.449 2007/01/17 21:18:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.450 2007/01/28 15:58:23 avenger_teambg Exp $
  *
  */
 
@@ -4963,7 +4963,7 @@ static PyObject* GemRB_SetPurchasedAmount(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	if (si->InfiniteSupply!= (ieDword) -1) {
+	if (si->InfiniteSupply != -1) {
 		if (si->AmountInStock<amount) {
 			amount=si->AmountInStock;
 		}
@@ -5014,7 +5014,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		}
 		//the amount of items is stored in si->PurchasedAmount
 		actor->inventory.AddStoreItem(si, action);
-		if ((si->InfiniteSupply==(ieDword) -1) || si->AmountInStock) {
+		if ((si->InfiniteSupply==-1) || si->AmountInStock) {
 			si->Flags &= ~IE_INV_ITEM_SELECTED;
 			si->PurchasedAmount=0;
 		} else {
@@ -5111,7 +5111,7 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "Purchased", PyInt_FromLong (si->PurchasedAmount) );
 
 	int amount;
-	if (si->InfiniteSupply==(ieDword) -1) {
+	if (si->InfiniteSupply==-1) {
 		PyDict_SetItemString(dict, "Amount", PyInt_FromLong( -1 ) );
 		amount = 100;
 	} else {
