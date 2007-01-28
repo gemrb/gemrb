@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUISTORE.py,v 1.30 2007/01/28 15:56:17 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUISTORE.py,v 1.31 2007/01/28 21:06:46 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -29,6 +29,7 @@ import GUICommonWindows
 from GUIDefines import *
 from GUICommonWindows import *
 from ie_stats import *
+from ie_slots import *
 
 StoreWindow = None
 MessageWindow = None
@@ -50,6 +51,7 @@ ITEM_STORE = 1
 RentIndex = -1
 Store = None
 Buttons = [-1,-1,-1,-1]
+inventory_slots = ()
 total_price = 0
 total_income = 0
 
@@ -165,9 +167,6 @@ def OpenStoreWindow ():
 
 def OpenStoreShoppingWindow ():
 	global StoreShoppingWindow
-
-	GemRB.SetVar ("BuySum", 0)
-	GemRB.SetVar ("SellSum", 0)
 
 	CloseWindows()
 
@@ -473,7 +472,7 @@ def UpdateStoreCommon (Window, title, name, gold):
 
 
 def UpdateStoreShoppingWindow ():
-	global Store
+	global Store, inventory_slots
 
 	Window = StoreShoppingWindow
 	#reget store in case of a change
@@ -483,7 +482,7 @@ def UpdateStoreShoppingWindow ():
 	GemRB.SetVarAssoc (Window, ScrollBar, "LeftTopIndex", LeftCount-3)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	inventory_slots = GemRB.GetSlots (pc, -1)
+	inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
 	RightCount = len(inventory_slots)
 	ScrollBar = GemRB.GetControl (Window, 12)
 	GemRB.SetVarAssoc (Window, ScrollBar, "RightTopIndex", RightCount-3)
@@ -493,8 +492,8 @@ def UpdateStoreShoppingWindow ():
 def SelectBuy ():
 	Window = StoreShoppingWindow
 
-	LeftIndex = GemRB.GetVar ("LeftTopIndex")+GemRB.GetVar ("LeftIndex")
 	pc = GemRB.GameGetSelectedPCSingle ()
+	LeftIndex = GemRB.GetVar ("LeftTopIndex")+GemRB.GetVar ("LeftIndex")
 	GemRB.ChangeStoreItem (pc, LeftIndex, SHOP_BUY|SHOP_SELECT)
 	RedrawStoreShoppingWindow ()
 
@@ -520,10 +519,8 @@ def BuyPressed ():
 def SelectSell ():
 	Window = StoreShoppingWindow
 
-	GemRB.SetVar ("SellSum",0)
-	RightIndex = GemRB.GetVar ("RightTopIndex")+GemRB.GetVar ("RightIndex")
 	pc = GemRB.GameGetSelectedPCSingle ()
-	inventory_slots = GemRB.GetSlots (pc, -1)
+	RightIndex = GemRB.GetVar ("RightTopIndex")+GemRB.GetVar ("RightIndex")
 	GemRB.ChangeStoreItem (pc, inventory_slots[RightIndex], SHOP_SELL|SHOP_SELECT)
 	RedrawStoreShoppingWindow ()
 
@@ -532,7 +529,6 @@ def SellPressed ():
 	Window = StoreShoppingWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	inventory_slots = GemRB.GetSlots (pc, -1)
 	RightCount = len (inventory_slots)
 	#no need to go reverse
 	for Slot in range(RightCount):
@@ -567,7 +563,6 @@ def RedrawStoreShoppingWindow ():
 				Price = 1
 			BuySum = BuySum + Price
 
-	inventory_slots = GemRB.GetSlots (pc, -1)
 	RightCount = len(inventory_slots)
 	SellSum = 0
 	for i in range(RightCount):
@@ -657,10 +652,12 @@ def RedrawStoreShoppingWindow ():
 
 
 def UpdateStoreIdentifyWindow ():
+	global inventory_slots
+
 	Window = StoreIdentifyWindow
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	inventory_slots = GemRB.GetSlots (pc, -1)
+	inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
 	Count = len(inventory_slots)
 	ScrollBar = GemRB.GetControl (Window, 7)
 	GemRB.SetVarAssoc (Window, ScrollBar, "TopIndex", Count-3)
@@ -674,7 +671,6 @@ def RedrawStoreIdentifyWindow ():
 	TopIndex = GemRB.GetVar ("TopIndex")
 	Index = GemRB.GetVar ("Index")
 	pc = GemRB.GameGetSelectedPCSingle ()
-	inventory_slots = GemRB.GetSlots (pc, -1)
 	Count = len(inventory_slots)
 	IDPrice = Store['IDPrice']
 	for i in range(4):
@@ -727,7 +723,6 @@ def InfoIdentifyWindow ():
 	UpdateStoreIdentifyWindow ()
 	Index = GemRB.GetVar ("Index")
 	pc = GemRB.GameGetSelectedPCSingle ()
-	inventory_slots = GemRB.GetSlots (pc, -1)
 	Count = len(inventory_slots)
 	if Index >= Count:
 		return
@@ -764,7 +759,7 @@ def InfoIdentifyWindow ():
 
 
 def UpdateStoreStealWindow ():
-	global Store
+	global Store, inventory_slots
 
 	Window = StoreStealWindow
 
@@ -775,7 +770,7 @@ def UpdateStoreStealWindow ():
 	GemRB.SetVarAssoc (Window, ScrollBar, "LeftTopIndex", LeftCount-3)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	inventory_slots = GemRB.GetSlots (pc, -1)
+	inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
 	RightCount = len(inventory_slots)
 	ScrollBar = GemRB.GetControl (Window, 10)
 	GemRB.SetVarAssoc (Window, ScrollBar, "RightTopIndex", RightCount-3)
@@ -792,7 +787,6 @@ def RedrawStoreStealWindow ():
 	RightIndex = GemRB.GetVar ("RightIndex")
 	LeftCount = Store['StoreItemCount']
 	pc = GemRB.GameGetSelectedPCSingle ()
-	inventory_slots = GemRB.GetSlots (pc, -1)
 	RightCount = len(inventory_slots)
 	for i in range(4):
 		Slot = GemRB.GetStoreItem (i+LeftTopIndex)

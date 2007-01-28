@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.61 2007/01/28 15:56:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.62 2007/01/28 21:06:46 avenger_teambg Exp $
  *
  */
 
@@ -162,7 +162,9 @@ struct ItemExtHeader {
 class GEM_EXPORT CREItem {
 public:
 	ieResRef ItemResRef;
-	ieWord PurchasedAmount; //actually, this field is useless in creatures
+	//recent research showed that this field is used by the create item
+	//for days effect. This field shows the expiration in gametime hours
+	ieWord Expired;
 	ieWord Usages[3];
 	ieDword Flags;
 	// 2 cached values from associated item. LEAVE IT SIGNED!

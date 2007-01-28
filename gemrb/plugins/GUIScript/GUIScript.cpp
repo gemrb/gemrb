@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.450 2007/01/28 15:58:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.451 2007/01/28 21:06:46 avenger_teambg Exp $
  *
  */
 
@@ -5048,16 +5048,18 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 
 	case IE_STORE_SELECT|IE_STORE_SELL:
 	{
+		//this is  not removeitem, because the item is just marked
 		CREItem* si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );
 		if (!si) {
 			return NULL;
 		}
 		si->Flags ^= IE_INV_ITEM_SELECTED;
-		if (si->Flags & IE_INV_ITEM_SELECTED) {
-			si->PurchasedAmount=1;
-		} else {
-			si->PurchasedAmount=0;
-		}
+		//this field is used for something else, and we don't need it
+		//if (si->Flags & IE_INV_ITEM_SELECTED) {
+		//	si->PurchasedAmount=1;
+		//} else {
+		//	si->PurchasedAmount=0;
+		//}
 		break;
 	}
 	case IE_STORE_SELL:
@@ -5068,7 +5070,8 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			Py_INCREF( Py_None );
 			return Py_None;
 		}
-		CREItem* si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );
+		//this is removeitem, because the item leaves our inventory
+		CREItem* si = actor->inventory.RemoveItem( core->QuerySlot(Slot) );
 		if (!si) {
 			return NULL;
 		}
@@ -5840,23 +5843,24 @@ static PyObject* GemRB_GetSlots(PyObject * /*self*/, PyObject* args)
 	int i;
 	Count = 0;
 	for (i=0;i<MaxCount;i++) {
-		if ((core->QuerySlotType( i ) & (ieDword) SlotType) != (ieDword) SlotType) {
+		int id = core->QuerySlot(i);
+		if ((core->QuerySlotType( id ) & (ieDword) SlotType) != (ieDword) SlotType) {
 			continue;
 		}
-		CREItem *slot = actor->inventory.GetSlotItem( core->QuerySlot(i) );
-		if (!slot) {
-			continue;
+		CREItem *slot = actor->inventory.GetSlotItem( id );
+		if (slot) {
+			Count++;
 		}
-		Count++;
 	}
 
 	PyObject* tuple = PyTuple_New( Count );
 	Count = 0;
 	for (i=0;i<MaxCount;i++) {
-		if ((core->QuerySlotType( i ) & (ieDword) SlotType) != (ieDword) SlotType) {
+		int id = core->QuerySlot(i);
+		if ((core->QuerySlotType( id ) & (ieDword) SlotType) != (ieDword) SlotType) {
 			continue;
 		}
-		CREItem *slot = actor->inventory.GetSlotItem( core->QuerySlot(i) );
+		CREItem *slot = actor->inventory.GetSlotItem( id );
 		if (slot) {
 			PyTuple_SetItem( tuple, Count++, PyInt_FromLong( i ) );
 		}
