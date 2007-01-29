@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.453 2007/01/29 21:31:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.454 2007/01/29 22:41:57 avenger_teambg Exp $
  *
  */
 
@@ -4919,14 +4919,14 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 	if (type) {
 		STOItem* si = store->GetItem( Slot );
 		if (!si) {
-			return NULL;
+			return PyInt_FromLong(0);
 		}
 		ItemResRef = si->ItemResRef;
 		Flags = si->Flags;
 	} else {
 		CREItem* si = actor->inventory.GetSlotItem( core->QuerySlot(Slot) );
 		if (!si) {
-			return NULL;
+			return PyInt_FromLong(0);
 		}
 		ItemResRef = si->ItemResRef;
 		Flags = si->Flags;
