@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.386 2006/11/11 12:18:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.387 2007/01/29 21:50:06 avenger_teambg Exp $
  *
  */
 
@@ -712,6 +712,7 @@ static ActionLink actionnames[] = {
 	{"setsavedlocation", GameScript::SetSavedLocation, 0},
 	{"setsavedlocationpoint", GameScript::SetSavedLocationPoint, 0},
 	{"setscriptname", GameScript::SetScriptName, 0},
+	{"setselection", GameScript::SetSelection, 0},
 	{"setsequence", GameScript::PlaySequence, 0}, //bg2 (only own)
 	{"setstartpos", GameScript::SetStartPos, 0},
 	{"setteam", GameScript::SetTeam, 0},

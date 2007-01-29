@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.261 2006/09/09 08:08:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.262 2007/01/29 21:50:07 avenger_teambg Exp $
  *
  */
 
@@ -1252,6 +1252,7 @@ public:
 	static void SetSavedLocation(Scriptable* Sender, Action* parameters);
 	static void SetSavedLocationPoint(Scriptable* Sender, Action* parameters);
 	static void SetScriptName(Scriptable* Sender, Action* parameters);
+	static void SetSelection(Scriptable* Sender, Action* parameters);
 	static void SetStartPos(Scriptable* Sender, Action* parameters);
 	static void SetTeam(Scriptable* Sender, Action* parameters);
 	static void SetTeamBit(Scriptable* Sender, Action* parameters);

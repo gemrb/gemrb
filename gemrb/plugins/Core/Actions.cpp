@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.98 2006/12/28 21:11:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.99 2007/01/29 21:50:06 avenger_teambg Exp $
  *
  */
 
@@ -4857,5 +4857,14 @@ void GameScript::AddSuperKit(Scriptable* Sender, Action* parameters)
 	Actor *scr = (Actor *) Sender;
 //remove previous kit stuff?
 	scr->SetBase(IE_KIT, parameters->int0Parameter);
+}
+
+void GameScript::SetSelection(Scriptable* /*Sender*/, Action* parameters)
+{
+	GameControl *gc = core->GetGameControl();
+	if (!gc) {
+		return;
+	}
+	gc->SelectActor(parameters->int0Parameter, parameters->int1Parameter);
 }
 
