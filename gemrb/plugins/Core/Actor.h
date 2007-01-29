@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.139 2007/01/17 21:16:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.140 2007/01/29 21:21:36 wjpalenstijn Exp $
  *
  */
 
@@ -380,6 +380,9 @@ public:
 	void DealDamage(Actor *target, int damage,int damagetype, bool critical);
 	/* sets a colour gradient stat, handles location */
 	void SetColor( ieDword idx, ieDword grd);
+	/* sets an RGB colour modification effect; location -1 for global */
+	void SetColorMod( int location, RGBModifier::Type type, int speed, 
+					  unsigned char r, unsigned char g, unsigned char b );
 	void RemoveTimedEffects();
 	bool Schedule(ieDword gametime);
 	/* call this when path needs to be changed */

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.51 2007/01/26 21:51:06 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.h,v 1.52 2007/01/29 21:21:36 wjpalenstijn Exp $
  *
  */
 
@@ -26,8 +26,7 @@
 #include "../../includes/RGBAColor.h"
 #include "TableMgr.h"
 #include <vector>
-
-class Palette;
+#include "Palette.h"
 
 #ifdef WIN32
 
@@ -119,13 +118,6 @@ struct AvatarStruct {
 	char Size;
 };
 
-enum PaletteType {
-	PAL_MAIN,
-	PAL_WEAPON,
-	PAL_OFFHAND,
-	PAL_HELMET
-};
-
 struct EquipResRefData;
 
 class GEM_EXPORT CharAnimations {
@@ -136,7 +128,12 @@ private:
 	char OffhandRef[2];
 public:
 	ieDword *Colors;  //these are the custom color indices
+	RGBModifier ColorMods[32]; // color modification effects
+	unsigned long lastModUpdate;
+	RGBModifier GlobalColorMod; // global color modification effect
+
 	Palette* palette[4];
+	Palette* modifiedPalette[4];
 	unsigned int AvatarsRowNum;
 	unsigned char ArmorType, WeaponType, RangedType;
 	ieDword AttackMoves[3]; //percentages for the 3 attack move types
@@ -174,6 +171,8 @@ public: //attribute functions
 	int NoPalette() const;
 	int GetAnimType() const;
 	char GetSize() const;
+
+	void PulseRGBModifiers();
 
 private:
 	void DropAnims();

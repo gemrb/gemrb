@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Palette.cpp,v 1.4 2006/12/03 20:37:56 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Palette.cpp,v 1.5 2007/01/29 21:21:36 wjpalenstijn Exp $
  *
  */
 
@@ -98,4 +98,123 @@ void Palette::SetupPaperdollColours(ieDword* Colors, unsigned int type)
 	for (i = 0xB8; i < 0xFF; i += 0x08)
 		//leather
 		memcpy( &col[i], &col[0x35], 8 * sizeof( Color ) );
+}
+
+
+static inline void applyMod(const Color& src, Color& dest,
+							const RGBModifier& mod) {
+	if (mod.speed == -1) {
+		if (mod.type == RGBModifier::TINT) {
+			dest.r = ((unsigned int)src.r * mod.rgb.r)>>8;
+			dest.g = ((unsigned int)src.g * mod.rgb.g)>>8;
+			dest.b = ((unsigned int)src.b * mod.rgb.b)>>8;
+		} else if (mod.type == RGBModifier::BRIGHTEN) {
+			unsigned int r = (unsigned int)src.r * mod.rgb.r;
+			if (r & (~0x7FF)) r = 0x7FF;
+			dest.r = r >> 3;
+
+			unsigned int g = (unsigned int)src.g * mod.rgb.g;
+			if (g & (~0x7FF)) g = 0x7FF;
+			dest.g = g >> 3;
+
+			unsigned int b = (unsigned int)src.b * mod.rgb.b;
+			if (b & (~0x7FF)) b = 0x7FF;
+			dest.b = b >> 3;
+		}
+	} else if (mod.speed > 0) {
+
+		// TODO: a sinewave will probably look better
+		int phase = (mod.phase % (2*mod.speed));
+		if (phase > mod.speed) {
+			phase = 512 - (256*phase)/mod.speed;
+		} else {
+			phase = (256*phase)/mod.speed;
+		}
+
+		if (mod.type == RGBModifier::TINT) {
+			dest.r = ((unsigned int)src.r * (256*256 + phase*mod.rgb.r - 256*phase))>>16;
+			dest.g = ((unsigned int)src.g * (256*256 + phase*mod.rgb.g - 256*phase))>>16;
+			dest.b = ((unsigned int)src.b * (256*256 + phase*mod.rgb.b - 256*phase))>>16;
+		} else if (mod.type == RGBModifier::BRIGHTEN) {
+			unsigned int r = src.r * (256*256 + phase*mod.rgb.r - 256*phase);
+			if (r & (~0x7FFFF)) r = 0x7FFFF;
+			dest.r = r >> 11;
+
+			unsigned int g = src.g * (256*256 + phase*mod.rgb.g - 256*phase);
+			if (g & (~0x7FFFF)) g = 0x7FFFF;
+			dest.g = g >> 11;
+
+			unsigned int b = src.b * (256*256 + phase*mod.rgb.b - 256*phase);
+			if (b & (~0x7FFFF)) b = 0x7FFFF;
+			dest.b = b >> 11;
+		}
+	}
+}
+
+void Palette::SetupRGBModification(const Palette* src, const RGBModifier* mods,
+								   unsigned int type)
+{
+	const RGBModifier* tmods = mods+(8*type);
+	int i;
+
+	for (i = 0; i < 4; ++i)
+		col[i] = src->col[i];
+
+	for (i = 0; i < 12; ++i)
+		applyMod(src->col[0x04+i],col[0x04+i],tmods[0]);
+	for (i = 0; i < 12; ++i)
+		applyMod(src->col[0x10+i],col[0x10+i],tmods[1]);
+	for (i = 0; i < 12; ++i)
+		applyMod(src->col[0x1c+i],col[0x1c+i],tmods[2]);
+	for (i = 0; i < 12; ++i)
+		applyMod(src->col[0x28+i],col[0x28+i],tmods[3]);
+	for (i = 0; i < 12; ++i)
+		applyMod(src->col[0x34+i],col[0x34+i],tmods[4]);
+	for (i = 0; i < 12; ++i)
+		applyMod(src->col[0x40+i],col[0x40+i],tmods[5]);
+	for (i = 0; i < 12; ++i)
+		applyMod(src->col[0x4c+i],col[0x4c+i],tmods[6]);
+	for (i = 0; i < 8; ++i)
+		applyMod(src->col[0x58+i],col[0x58+i],tmods[1]);
+	for (i = 0; i < 8; ++i)
+		applyMod(src->col[0x60+i],col[0x60+i],tmods[2]);
+	for (i = 0; i < 8; ++i)
+		applyMod(src->col[0x68+i],col[0x68+i],tmods[1]);
+	for (i = 0; i < 8; ++i)
+		applyMod(src->col[0x70+i],col[0x70+i],tmods[0]);
+	for (i = 0; i < 8; ++i)
+		applyMod(src->col[0x78+i],col[0x78+i],tmods[4]);
+	for (i = 0; i < 8; ++i)
+		applyMod(src->col[0x80+i],col[0x80+i],tmods[4]);
+	for (i = 0; i < 8; ++i)
+		applyMod(src->col[0x88+i],col[0x88+i],tmods[1]);
+	for (i = 0; i < 24; ++i)
+		applyMod(src->col[0x90+i],col[0x90+i],tmods[4]);
+
+	for (i = 0; i < 8; ++i)
+		col[0xA8+i] = src->col[0xA8+i];
+
+	for (i = 0; i < 8; ++i)
+		applyMod(src->col[0xB0+i],col[0xB0+i],tmods[3]);
+	for (i = 0; i < 72; ++i)
+		applyMod(src->col[0xB8+i],col[0xB8+i],tmods[4]);
+}
+
+void Palette::SetupGlobalRGBModification(const Palette* src,
+										 const RGBModifier& mod)
+{
+	int i;
+	for (i = 0; i < 4; ++i)
+		col[i] = src->col[i];
+
+	for (i = 0; i < 164; ++i)
+		applyMod(src->col[0x04+i],col[0x04+i],mod);
+
+	for (i = 0; i < 8; ++i)
+		col[0xA8+i] = src->col[0xA8+i];
+
+	for (i = 0; i < 80; ++i)
+		applyMod(src->col[0xB0+i],col[0xB0+i],mod);
+
+
 }

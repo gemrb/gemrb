@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.105 2007/01/26 21:51:06 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.106 2007/01/29 21:21:36 wjpalenstijn Exp $
  *
  */
 
@@ -28,6 +28,7 @@
 #include "ResourceMgr.h"
 #include "ImageMgr.h"
 #include "Map.h"
+#include "Game.h"
 
 static int AvatarsCount = 0;
 static AvatarStruct *AvatarTable = NULL;
@@ -194,6 +195,7 @@ void CharAnimations::SetHelmetRef(const char* ref)
 	//       bottleneck. (wjp)
 	DropAnims();
 	core->FreePalette(palette[PAL_HELMET], 0);
+	core->FreePalette(modifiedPalette[PAL_HELMET], 0);
 }
 
 void CharAnimations::SetWeaponRef(const char* ref)
@@ -204,6 +206,7 @@ void CharAnimations::SetWeaponRef(const char* ref)
 	// TODO: Only drop weapon anims?
 	DropAnims();
 	core->FreePalette(palette[PAL_WEAPON], 0);
+	core->FreePalette(modifiedPalette[PAL_HELMET], 0);
 }
 
 void CharAnimations::SetOffhandRef(const char* ref)
@@ -214,6 +217,7 @@ void CharAnimations::SetOffhandRef(const char* ref)
 	// TODO: Only drop shield/offhand anims?
 	DropAnims();
 	core->FreePalette(palette[PAL_OFFHAND], 0);
+	core->FreePalette(modifiedPalette[PAL_OFFHAND], 0);
 }
 
 void CharAnimations::SetColors(ieDword *arg)
@@ -282,17 +286,47 @@ void CharAnimations::SetupColors(PaletteType type)
 	}
 
 	pal->SetupPaperdollColours(Colors, (int)type);
+
+	int i;
+	bool needmod = false;
+	if (GlobalColorMod.type != RGBModifier::NONE) {
+		needmod = true;
+	} else {
+		for (i = 0; i < 7; ++i) {
+			if (ColorMods[i+8*((int)type)].type != RGBModifier::NONE)
+				needmod = true;
+		}
+	}
+
+
+	if (needmod) {
+		if (!modifiedPalette[(int)type])
+			modifiedPalette[(int)type] = new Palette();
+
+		if (GlobalColorMod.type != RGBModifier::NONE) {
+			modifiedPalette[(int)type]->SetupGlobalRGBModification(palette[(int)type], GlobalColorMod);
+		} else {
+			modifiedPalette[(int)type]->SetupRGBModification(palette[(int)type],ColorMods, (int)type);
+		}
+	} else {
+		core->FreePalette(modifiedPalette[(int)type], 0);
+	}
+
 }
 
 Palette* CharAnimations::GetPartPalette(int part)
 {
 	int actorPartCount = GetActorPartCount();
-	
-	if (part < actorPartCount) return palette[PAL_MAIN];
-	if (part == actorPartCount) return palette[PAL_WEAPON];
-	if (part == actorPartCount+1) return palette[PAL_OFFHAND];
-	if (part == actorPartCount+2) return palette[PAL_HELMET];
-	return 0;
+	PaletteType type = PAL_MAIN;
+
+	if (part == actorPartCount) type = PAL_WEAPON;
+	if (part == actorPartCount+1) type = PAL_OFFHAND;
+	if (part == actorPartCount+2) type = PAL_HELMET;
+
+	if (modifiedPalette[(int)type])
+		return modifiedPalette[(int)type];
+
+	return palette[(int)type];
 }
 
 void CharAnimations::InitAvatarsTable()
@@ -333,8 +367,10 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 {
 	Colors = NULL;
 	int i,j;
-	for (i = 0; i < 4; ++i)
+	for (i = 0; i < 4; ++i) {
+		modifiedPalette[i] = NULL;
 		palette[i] = NULL;
+	}
 	nextStanceID = 0;
 	autoSwitchOnEnd = false;
 	lockPalette = false;
@@ -354,6 +390,18 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 	WeaponRef[0] = 0;
 	HelmetRef[0] = 0;
 	OffhandRef[0] = 0;
+	for (i = 0; i < 32; ++i) {
+		ColorMods[i].type = RGBModifier::NONE;
+		ColorMods[i].speed = 0;
+		// make initial phase depend on location to make the pulse appear
+		// less even
+		ColorMods[i].phase = 5*i;
+	}
+	GlobalColorMod.type = RGBModifier::NONE;
+	GlobalColorMod.speed = 0;
+
+	lastModUpdate = 0;
+
 
 	AvatarsRowNum=AvatarsCount;
 	if (core->HasFeature(GF_ONE_BYTE_ANIMID) ) {
@@ -1845,5 +1893,46 @@ void CharAnimations::AddMMRSuffix(char* ResRef, unsigned char StanceID,
 	}
 	if (Orient > 9) {
 		strcat( ResRef, "e" );
+	}
+}
+
+void CharAnimations::PulseRGBModifiers()
+{
+	unsigned long time = core->GetGame()->Ticks;
+
+	if (time - lastModUpdate > 40) {
+		if (time - lastModUpdate > 400) lastModUpdate = time - 40; 
+
+		int inc = (time - lastModUpdate)/40;
+		bool change[4] = { false, false, false, false };
+		if (GlobalColorMod.type != RGBModifier::NONE &&
+			GlobalColorMod.speed > 0)
+		{
+			GlobalColorMod.phase += inc;
+			change[0] = change[1] = change[2] = change[3] = true;
+
+			// reset if done
+			if (GlobalColorMod.phase > 2*GlobalColorMod.speed) {
+				GlobalColorMod.type = RGBModifier::NONE;
+				GlobalColorMod.phase = 0;
+				GlobalColorMod.speed = 0;
+			}
+		}
+
+		for (int i = 0; i < 32; ++i) {
+			if (ColorMods[i].type != RGBModifier::NONE &&
+				ColorMods[i].speed > 0)
+			{
+				ColorMods[i].phase += inc;
+				change[i>>3] = true;
+			}
+		}
+
+		if (change[0]) SetupColors(PAL_MAIN);
+		if (change[1]) SetupColors(PAL_WEAPON);
+		if (change[2]) SetupColors(PAL_OFFHAND);
+		if (change[3]) SetupColors(PAL_HELMET);
+
+		lastModUpdate += inc*40;
 	}
 }

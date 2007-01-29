@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Palette.h,v 1.4 2006/12/03 20:37:56 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Palette.h,v 1.5 2007/01/29 21:21:36 wjpalenstijn Exp $
  */
 
 #ifndef PALETTE_H
@@ -38,6 +38,25 @@
 #else
 #define GEM_EXPORT
 #endif
+
+enum PaletteType {
+	PAL_MAIN,
+	PAL_WEAPON,
+	PAL_OFFHAND,
+	PAL_HELMET
+};
+
+struct RGBModifier {
+	Color rgb;
+	int speed;
+	int phase;
+	enum Type {
+		NONE,
+		TINT,
+		BRIGHTEN
+	} type;
+};
+
 
 class GEM_EXPORT Palette {
 public:
@@ -77,6 +96,10 @@ public:
 	void CreateShadedAlphaChannel();
 
 	void SetupPaperdollColours(ieDword* Colors, unsigned int type);
+	void SetupRGBModification(const Palette* src, const RGBModifier* mods,
+							  unsigned int type);
+	void SetupGlobalRGBModification(const Palette* src,
+									const RGBModifier& mod);
 
 	Palette* Copy();
 

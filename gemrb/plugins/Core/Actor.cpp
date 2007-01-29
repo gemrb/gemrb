@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.251 2007/01/27 18:07:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.252 2007/01/29 21:21:36 wjpalenstijn Exp $
  *
  */
 
@@ -1045,6 +1045,16 @@ void Actor::RefreshEffects()
 		memcpy( previous, Modified, MAX_STATS * sizeof( *Modified ) );
 	}
 	memcpy( Modified, BaseStats, MAX_STATS * sizeof( *Modified ) );
+
+	CharAnimations* anims = GetAnims();
+	if (anims) {
+		unsigned int location;
+		for (location = 0; location < 32; ++location) {
+			anims->ColorMods[location].type = RGBModifier::NONE;
+			anims->ColorMods[location].speed = 0;
+		}
+	}
+
 	fxqueue.ApplyAllEffects( this );
 
 	//calculate hp bonus
@@ -2149,6 +2159,29 @@ void Actor::SetColor( ieDword idx, ieDword grd)
 */
 }
 
+void Actor::SetColorMod( int location, RGBModifier::Type type, int speed, 
+						 unsigned char r, unsigned char g, unsigned char b )
+{
+	CharAnimations* ca = GetAnims();
+	if (!ca) return;
+	if (location >= 32) return;
+
+	if (location == -1) {
+		ca->GlobalColorMod.type = type;
+		ca->GlobalColorMod.speed = speed;
+		ca->GlobalColorMod.phase = 0;
+		ca->GlobalColorMod.rgb.r = r;
+		ca->GlobalColorMod.rgb.g = g;
+		ca->GlobalColorMod.rgb.b = b;
+	} else {
+		ca->ColorMods[location].type = type;
+		ca->ColorMods[location].speed = speed;
+		ca->ColorMods[location].rgb.r = r;
+		ca->ColorMods[location].rgb.g = g;
+		ca->ColorMods[location].rgb.b = b;
+	}
+}
+
 void Actor::SetLeader(Actor *actor, int xoffset, int yoffset)
 {
 	Leader = actor->GetID();
@@ -2512,6 +2545,7 @@ void Actor::Draw(Region &screen)
 			anims[0]->LastFrame();
 		else
 			anims[0]->NextFrame();
+
 		for (int part = 1; part < PartCount; ++part) {
 			if (anims[part])
 				anims[part]->GetSyncedNextFrame(anims[0]);
@@ -2522,6 +2556,8 @@ void Actor::Draw(Region &screen)
 				anims[0]->endReached = false;
 			}
 		}
+
+		ca->PulseRGBModifiers();
 	}
 		
 	//draw videocells over the actor
@@ -2869,8 +2905,6 @@ int Actor::GetFeat(unsigned int feat)
 
 void Actor::SetUsedWeapon(char* AnimationType, ieWord* MeleeAnimation, int wt)
 {
-	// TODO: set WeaponType
-
 	memcpy(WeaponRef, AnimationType, sizeof(WeaponRef) );
 	memcpy(AttackMovements, MeleeAnimation, sizeof(AttackMovements) );
 	if (wt != -1) WeaponType = wt;
@@ -2883,8 +2917,6 @@ void Actor::SetUsedWeapon(char* AnimationType, ieWord* MeleeAnimation, int wt)
 
 void Actor::SetUsedShield(char* AnimationType, int wt)
 {
-	// TODO: set WeaponType
-
 	memcpy(ShieldRef, AnimationType, sizeof(ShieldRef) );
 	if (wt != -1) WeaponType = wt;
 	if (AnimationType[0] == ' ' || AnimationType[0] == 0)
