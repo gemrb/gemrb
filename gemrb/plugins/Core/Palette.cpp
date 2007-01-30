@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Palette.cpp,v 1.7 2007/01/30 19:26:30 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Palette.cpp,v 1.8 2007/01/30 19:42:07 wjpalenstijn Exp $
  *
  */
 
@@ -172,6 +172,8 @@ static inline void applyMod(const Color& src, Color& dest,
 			if (b & (~0xFF)) b = 0xFF;
 			dest.b = b;
 		}
+	} else {
+		dest = src;
 	}
 }
 
