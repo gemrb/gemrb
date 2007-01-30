@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.62 2007/01/28 21:06:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.63 2007/01/30 19:07:37 avenger_teambg Exp $
  *
  */
 
@@ -49,7 +49,17 @@ class Map;
 #define GEM_EXPORT
 #endif
 
-//slottypes
+//AddSlotItem return values
+#define ASI_FAILED     0
+#define ASI_PARTIAL    1
+#define ASI_SUCCESS    2
+#define ASI_SWAPPED    3 //not returned normally, but Gui uses this value
+
+//AddSlotItem extra slot ID's
+#define SLOT_AUTOEQUIP     -1
+#define SLOT_ONLYINVENTORY -3
+
+//slottypes (bitfield)
 #define SLOT_HELM      1
 #define SLOT_ARMOUR    2
 #define SLOT_SHIELD    4

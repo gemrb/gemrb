@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.108 2007/01/28 21:15:30 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.109 2007/01/30 19:07:37 avenger_teambg Exp $
  *
  */
 
@@ -478,14 +478,14 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 		}
 
 		if (WhyCantEquip(slot,twohanded)) {
-			return 0;
+			return ASI_FAILED;
 		}
 		if (!Slots[slot]) {
 			item->Flags |= IE_INV_ITEM_ACQUIRED;
 			Slots[slot] = item;
 			Changed = true;
 			EquipItem(slot);
-			return 2;
+			return ASI_SUCCESS;
 		}
 
 		CREItem *myslot = Slots[slot];
@@ -507,20 +507,20 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 			EquipItem(slot);
 			if (item->Usages[0] == 0) {
 				delete item;
-				return 2;
+				return ASI_SUCCESS;
 			}
-			return 1;
+			return ASI_PARTIAL;
 		}
-		return 0;
+		return ASI_FAILED;
 	}
 
 	bool which;
-	if (slot==-1) {
+	if (slot==SLOT_AUTOEQUIP) {
 		which=true;
 	} else {
 		which=false;
 	}
-	int res = 0;
+	int res = ASI_FAILED;
 	int max = (int) Slots.size();
 	for (int i = 0;i<max;i++) {
 		//never autoequip in the magic slot!
@@ -539,8 +539,8 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 		if (WhyCantEquip(i,twohanded))
 			continue;
 		int part_res = AddSlotItem (item, i);
-		if (part_res == 2) return 2;
-		else if (part_res == 1) res = 1;
+		if (part_res == ASI_SUCCESS) return ASI_SUCCESS;
+		else if (part_res == ASI_PARTIAL) res = ASI_PARTIAL;
 	}
 
 	return res;
@@ -554,8 +554,8 @@ int Inventory::AddStoreItem(STOItem* item, int action)
 	// item->PurchasedAmount is the number of items bought
 	// (you can still add grouped objects in a single step,
 	// just set up STOItem)
-	for (int i = 0; i < item->PurchasedAmount; i++) {
-		if (item->InfiniteSupply==-1) {
+	while (item->PurchasedAmount--) {
+		if (item->InfiniteSupply!=-1) {
 			if (!item->AmountInStock) {
 				break;
 			}
@@ -569,13 +569,12 @@ int Inventory::AddStoreItem(STOItem* item, int action)
 			temp->Flags |= IE_INV_ITEM_STOLEN;
 		}
 
-		ret = AddSlotItem( temp, -1 );
-		if (ret != 2) {
-			//FIXME: drop remains at feet of actor
+		ret = AddSlotItem( temp, SLOT_ONLYINVENTORY );
+		if (ret != ASI_SUCCESS) {
 			delete temp;
+			break;
 		}
 	}
-	item->PurchasedAmount = 0;
 	return ret;
 }
 

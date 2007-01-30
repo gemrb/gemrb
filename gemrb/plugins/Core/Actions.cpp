@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.99 2007/01/29 21:50:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.100 2007/01/30 19:07:37 avenger_teambg Exp $
  *
  */
 
@@ -3182,7 +3182,7 @@ void GameScript::CreateItem(Scriptable *Sender, Action* parameters)
 	if (tar->Type==ST_CONTAINER) {
 		myinv->AddItem(item);
 	} else {
-		if ( 2 != myinv->AddSlotItem(item, -3)) {
+		if ( ASI_SUCCESS != myinv->AddSlotItem(item, SLOT_ONLYINVENTORY)) {
 			Map *map=Sender->GetCurrentArea();
 			// drop it at my feet
 			map->AddItemToLocation(Sender->Pos, item);
@@ -3210,7 +3210,7 @@ void GameScript::CreateItemNumGlobal(Scriptable *Sender, Action* parameters)
 	if (Sender->Type==ST_CONTAINER) {
 		myinv->AddItem(item);
 	} else {
-		if ( 2 != myinv->AddSlotItem(item, -3)) {
+		if ( ASI_SUCCESS != myinv->AddSlotItem(item, SLOT_ONLYINVENTORY)) {
 			Map *map=Sender->GetCurrentArea();
 			// drop it at my feet
 			map->AddItemToLocation(Sender->Pos, item);
@@ -3232,7 +3232,7 @@ void GameScript::TakeItemReplace(Scriptable *Sender, Action* parameters)
 		item = new CREItem();
 	}
 	CreateItemCore(item, parameters->string0Parameter, -1, 0, 0);
-	if (2 != scr->inventory.AddSlotItem(item,slot)) {
+	if (ASI_SUCCESS != scr->inventory.AddSlotItem(item,slot)) {
 		Map *map = scr->GetCurrentArea();
 		map->AddItemToLocation(Sender->Pos, item);
 	}
@@ -4403,8 +4403,8 @@ void GameScript::PickUpItem(Scriptable* Sender, Action* parameters)
 	if (res!=-1 && scr->InParty) { //it is gold and we got the party pool!
 		goto item_is_gold;
 	}
-	res = scr->inventory.AddSlotItem(item, -3);
-	if (res !=2) { //putting it back
+	res = scr->inventory.AddSlotItem(item, SLOT_ONLYINVENTORY);
+	if (res !=ASI_SUCCESS) { //putting it back
 		c->AddItem(item);
 	}
 	return;

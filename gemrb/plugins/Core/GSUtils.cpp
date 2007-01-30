@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.77 2006/12/30 23:47:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.78 2007/01/30 19:07:37 avenger_teambg Exp $
  *
  */
 
@@ -413,7 +413,7 @@ int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int
 		delete item;
 		return MIC_GOTITEM;
 	}
-	if ( myinv->AddSlotItem(item, -1) !=2) {
+	if ( myinv->AddSlotItem(item, SLOT_ONLYINVENTORY) !=ASI_SUCCESS) {
 		// drop it at my feet
 		map->AddItemToLocation(target->Pos, item);
 		return MIC_FULL;

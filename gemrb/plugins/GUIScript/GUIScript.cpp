@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.454 2007/01/29 22:41:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.455 2007/01/30 19:07:38 avenger_teambg Exp $
  *
  */
 
@@ -4770,8 +4770,8 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 		if (res!=-1) { //it is gold!
 			goto item_is_gold;
 		}
-		res = actor->inventory.AddSlotItem(item, -3);
-		if (res !=2) { //putting it back
+		res = actor->inventory.AddSlotItem(item, SLOT_ONLYINVENTORY);
+		if (res !=ASI_SUCCESS) { //putting it back
 			container->AddItem(item);
 		}
 	} else { //put stuff in container, simple!
@@ -5013,10 +5013,14 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			return NULL;
 		}
 		//the amount of items is stored in si->PurchasedAmount
+		//it will adjust AmountInStock/PurchasedAmount
 		actor->inventory.AddStoreItem(si, action);
-		if ((si->InfiniteSupply==-1) || si->AmountInStock) {
+		if (si->PurchasedAmount) {
+			//was not able to buy it due to lack of space
+			break;
+		}
+		if (si->InfiniteSupply==-1) {
 			si->Flags &= ~IE_INV_ITEM_SELECTED;
-			si->PurchasedAmount=0;
 		} else {
 			store->RemoveItem( Slot );
 		}
@@ -6141,7 +6145,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	res = actor->inventory.AddSlotItem( slotitem, Slot, Slottype );
 	if (res) {
 		//release it only when fully placed
-		if (res==2) {
+		if (res==ASI_SUCCESS) {
 			core->ReleaseDraggedItem ();
 		}
 		actor->RefreshEffects();
@@ -6161,11 +6165,12 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 			actor->inventory.AddSlotItem( slotitem, Slot, Slottype );
 			core->ReleaseDraggedItem ();
 			DragItem(tmp);
-			res = 3;
+			// switched items, not returned by normal AddSlotItem
+			res = ASI_SWAPPED;
 			actor->RefreshEffects();
 			actor->ReinitQuickSlots();
 		} else {
-			res = 0;
+			res = ASI_FAILED;
 		}
 	}
 	//this is PST specific, change animation
