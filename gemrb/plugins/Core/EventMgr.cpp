@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.44 2006/12/09 15:00:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.45 2007/01/30 22:45:46 wjpalenstijn Exp $
  *
  */
 
@@ -123,7 +123,6 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 	if (!lastW) {
 		return;
 	}
-	core->DisplayTooltip( 0, 0, NULL );
 	std::vector< int>::iterator t;
 	std::vector< Window*>::iterator m;
 	for (t = topwin.begin(); t != topwin.end(); ++t) {
@@ -144,6 +143,8 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 					ctrl = ( *m )->GetControl( x, y, false);
 				}
 				if (ctrl != last_ctrl_over) {
+					// Remove tooltip if mouse moved to different control
+					core->DisplayTooltip( 0, 0, NULL );
 					if (last_ctrl_over)
 						last_ctrl_over->OnMouseLeave( x - lastW->XPos - last_ctrl_over->XPos, y - lastW->YPos - last_ctrl_over->YPos );
 					if (ctrl)
@@ -162,6 +163,7 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 		if (( *m )->Visible==WINDOW_FRONT)
 			break;
 	}
+	core->DisplayTooltip( 0, 0, NULL );
 }
 
 /** BroadCast Mouse Move Event */

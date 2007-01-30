@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.153 2007/01/30 22:03:50 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.154 2007/01/30 22:45:46 wjpalenstijn Exp $
  *
  */
 
@@ -352,12 +352,6 @@ int SDLVideoDriver::SwapBuffers(void)
 		};
 		SDL_BlitSurface( extra, &src, disp, &dst );
 	}
-	if (Cursor[CursorIndex] && !DisableMouse) {
-		SDL_Surface* temp = backBuf;
-		backBuf = disp; // FIXME: UGLY HACK!
-		BlitSprite(Cursor[CursorIndex], CursorPos.x, CursorPos.y, true);
-		backBuf = temp;
-	}
 
 	if (!ConsolePopped) {
 		GetTime( time );
@@ -365,13 +359,20 @@ int SDLVideoDriver::SwapBuffers(void)
 		if (( time - lastMouseTime ) > core->TooltipDelay) {
 			if (Evnt)
 				Evnt->MouseIdle( time - lastMouseTime );
-
-			/** This causes the tooltip to be rendered directly to display */
-			SDL_Surface* tmp = backBuf;
-			backBuf = disp;
-			core->DrawTooltip();
-			backBuf = tmp;
 		}
+
+		/** This causes the tooltip to be rendered directly to display */
+		SDL_Surface* tmp = backBuf;
+		backBuf = disp; // FIXME: UGLY HACK!
+		core->DrawTooltip();
+		backBuf = tmp;
+	}
+
+	if (Cursor[CursorIndex] && !DisableMouse) {
+		SDL_Surface* temp = backBuf;
+		backBuf = disp; // FIXME: UGLY HACK!
+		BlitSprite(Cursor[CursorIndex], CursorPos.x, CursorPos.y, true);
+		backBuf = temp;
 	}
 
 	SDL_Flip( disp );
