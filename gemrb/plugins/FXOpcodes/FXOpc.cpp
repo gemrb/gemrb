@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.53 2007/01/30 19:24:23 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.54 2007/01/30 19:55:15 wjpalenstijn Exp $
  *
  */
 
@@ -1645,7 +1645,7 @@ int fx_brief_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 	// FIXME: figure out exact brightness
 	int speed = (fx->Parameter2 >> 16) & 0xFF;
-	target->SetColorMod(-1, RGBModifier::TINT, speed,
+	target->SetColorMod(-1, RGBModifier::ADD, speed,
 						fx->Parameter1 >> 8, fx->Parameter1 >> 16,
 						fx->Parameter1 >> 24);
 
