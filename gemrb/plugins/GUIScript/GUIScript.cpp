@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.455 2007/01/30 19:07:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.456 2007/01/30 19:44:11 avenger_teambg Exp $
  *
  */
 
@@ -4980,7 +4980,7 @@ static PyObject* GemRB_SetPurchasedAmount(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_ChangeStoreItem__doc,
-"ChangeStoreItem(PartyID, Slot, action)\n\n"
+"ChangeStoreItem(PartyID, Slot, action)=>int\n\n"
 "Performs an action of buying, selling, identifying or stealing in a store. "
 "It can also toggle the selection of an item." );
 
@@ -4988,6 +4988,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 {
 	int PartyID, Slot;
 	int action;
+	int res = ASI_FAILED;
 
 	if (!PyArg_ParseTuple( args, "iii", &PartyID, &Slot, &action)) {
 		return AttributeError( GemRB_ChangeStoreItem__doc );
@@ -5017,6 +5018,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		actor->inventory.AddStoreItem(si, action);
 		if (si->PurchasedAmount) {
 			//was not able to buy it due to lack of space
+			res = ASI_FAILED;
 			break;
 		}
 		if (si->InfiniteSupply==-1) {
@@ -5024,6 +5026,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		} else {
 			store->RemoveItem( Slot );
 		}
+		res = ASI_SUCCESS;
 		break;
 	}
 	case IE_STORE_ID:
@@ -5033,6 +5036,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			return NULL;
 		}
 		si->Flags |= IE_INV_ITEM_IDENTIFIED;
+		res = ASI_SUCCESS;
 		break;
 	}
 	case IE_STORE_SELECT|IE_STORE_BUY:
@@ -5047,6 +5051,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		} else {
 			si->PurchasedAmount=0;
 		}
+		res = ASI_SUCCESS;
 		break;
 	}
 
@@ -5064,6 +5069,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		//} else {
 		//	si->PurchasedAmount=0;
 		//}
+		res = ASI_SUCCESS;
 		break;
 	}
 	case IE_STORE_SELL:
@@ -5071,8 +5077,8 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		//store/bag is at full capacity
 		if (store->Capacity && (store->Capacity >= store->GetRealStockSize()) ) {
 			printMessage("GUIScript", "Store is full.\n", GREEN);
-			Py_INCREF( Py_None );
-			return Py_None;
+			res = ASI_FAILED;
+			break;
 		}
 		//this is removeitem, because the item leaves our inventory
 		CREItem* si = actor->inventory.RemoveItem( core->QuerySlot(Slot) );
@@ -5086,11 +5092,11 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 			store->AddItem( si );
 		}
 		delete si;
+		res = ASI_SUCCESS;
 		break;
 	}
 	}
-	Py_INCREF( Py_None );
-	return Py_None;
+	return PyInt_FromLong(res);
 }
 
 PyDoc_STRVAR( GemRB_GetStoreItem__doc,
