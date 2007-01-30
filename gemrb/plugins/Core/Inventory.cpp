@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.109 2007/01/30 19:07:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.110 2007/01/30 21:46:47 avenger_teambg Exp $
  *
  */
 
@@ -554,26 +554,29 @@ int Inventory::AddStoreItem(STOItem* item, int action)
 	// item->PurchasedAmount is the number of items bought
 	// (you can still add grouped objects in a single step,
 	// just set up STOItem)
-	while (item->PurchasedAmount--) {
-		if (item->InfiniteSupply!=-1) {
-			if (!item->AmountInStock) {
-				break;
-			}
-			item->AmountInStock--;
-		}
-
+	while (item->PurchasedAmount) {
 		//the first part of a STOItem is essentially a CREItem
 		temp = new CREItem();
 		memcpy( temp, item, sizeof( CREItem ) ); 
+		//except the Expired flag
+		temp->Expired=0;
 		if (action==STA_STEAL) {
 			temp->Flags |= IE_INV_ITEM_STOLEN;
 		}
+		temp->Flags &= ~IE_INV_ITEM_SELECTED;
 
 		ret = AddSlotItem( temp, SLOT_ONLYINVENTORY );
 		if (ret != ASI_SUCCESS) {
 			delete temp;
 			break;
 		}
+		if (item->InfiniteSupply!=-1) {
+			if (!item->AmountInStock) {
+				break;
+			}
+			item->AmountInStock--;
+		}
+		item->PurchasedAmount--;
 	}
 	return ret;
 }
