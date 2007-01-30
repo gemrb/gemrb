@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.51 2007/01/29 21:21:36 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.52 2007/01/30 17:05:27 avenger_teambg Exp $
  *
  */
 
@@ -2374,9 +2374,9 @@ int fx_generic_effect (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 //0x67 ChangeName
 int fx_change_name (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_change_name_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_change_name_modifier (%2d): StrRef: %d\n", fx->Opcode, fx->Parameter1 );
 	target->SetText(fx->Parameter1, 0);
-	return FX_NOT_APPLIED; //???
+	return FX_NOT_APPLIED;
 }
 
 //0x68 ExperienceModifier
@@ -4434,10 +4434,11 @@ int fx_chaos_shield_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 //0x12c NPCBump
-int fx_npc_bump (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_npc_bump (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	//unknown
 	if (0) printf( "fx_npc_bump (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	//unknown effect, but known stat position
+	STAT_MOD( IE_NPCBUMP );
 	return FX_APPLIED;
 }
 //0x12d CriticalHitModifier
@@ -4539,7 +4540,7 @@ int fx_modify_local_variable (Actor* /*Owner*/, Actor* target, Effect* fx)
 // 0x136 TimelessState
 int fx_timeless_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_to_hit_modifier (%2d): Mod: %d\n", fx->Opcode, fx->Parameter2 );
+	if (0) printf( "fx_timeless_modifier (%2d): Mod: %d\n", fx->Opcode, fx->Parameter2 );
 	STAT_SET(IE_DISABLETIMESTOP, fx->Parameter2);
 	return FX_APPLIED;
 }
@@ -4550,7 +4551,15 @@ int fx_generate_wish (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 	if (0) printf( "fx_generate_wish (%2d): Mod: %d\n", fx->Opcode, fx->Parameter2 );
 	return FX_NOT_APPLIED;
 }
-//0x138 //see fx_crash
+//0x138 //see fx_crash, this effect is not fully enabled in original bg2/tob
+int fx_immunity_sequester (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_immunity_sequester (%2d): Mod: %d\n", fx->Opcode, fx->Parameter2 );
+	//this effect is supposed to provide immunity against sequester (maze/etc?)
+	STAT_SET(IE_NOSEQUESTER, fx->Parameter2);
+	return FX_APPLIED;
+}
+
 //0x139 //HLA generic effect
 //0x13a StoneSkin2Modifier
 int fx_golem_stoneskin_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)

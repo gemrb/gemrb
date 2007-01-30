@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.56 2006/12/31 15:09:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.57 2007/01/30 17:05:25 avenger_teambg Exp $
  *
  */
 
@@ -362,12 +362,14 @@
 #define IE_DISABLECHUNKING      186 //
 #define IE_NOTURNABLE           187 // immune to turn
 #define IE_CHAOSSHIELD          189 // defense against wild surge
+#define IE_NPCBUMP              190 // not entirely sure what is this
 #define IE_CANUSEANYITEM        191
 #define IE_ALWAYSBACKSTAB       192
 #define IE_SPELLFAILUREINNATE   194
 #define IE_NOTRACKING           195 // tracking doesn't detect this
 #define IE_DEADMAGIC            196
 #define IE_DISABLETIMESTOP      197
+#define IE_NOSEQUESTER          198 // this doesn't work in IE, but intended
 #define IE_STONESKINSGOLEM	199
 #define IE_LEVELDRAIN		200
 #define IE_AVATARREMOVAL        201
