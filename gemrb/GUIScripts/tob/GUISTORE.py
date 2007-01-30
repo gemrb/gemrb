@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUISTORE.py,v 1.31 2007/01/28 21:06:46 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUISTORE.py,v 1.32 2007/01/30 21:47:22 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -44,6 +44,8 @@ StoreRumourWindow = None
 StoreRentWindow = None
 OldPortraitWindow = None
 RentConfirmWindow = None
+LeftButton = None
+RightButton = None
 
 ITEM_PC    = 0
 ITEM_STORE = 1
@@ -167,6 +169,7 @@ def OpenStoreWindow ():
 
 def OpenStoreShoppingWindow ():
 	global StoreShoppingWindow
+	global LeftButton, RightButton
 
 	CloseWindows()
 
@@ -192,12 +195,12 @@ def OpenStoreShoppingWindow ():
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectSell")
 
 	# Buy
-	Button = GemRB.GetControl (Window, 2)
+	LeftButton = Button = GemRB.GetControl (Window, 2)
 	GemRB.SetText (Window, Button, 13703)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "BuyPressed")
 
 	# Sell
-	Button = GemRB.GetControl (Window, 3)
+	RightButton = Button = GemRB.GetControl (Window, 3)
 	GemRB.SetText (Window, Button, 13704)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SellPressed")
 
@@ -508,11 +511,17 @@ def BuyPressed ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	LeftCount = Store['StoreItemCount']
 	#going backwards because removed items shift the slots
-	for Slot in range(LeftCount, 0, -1):
-		Flags = GemRB.IsValidStoreItem (pc, Slot-1, ITEM_STORE) & SHOP_SELECT
+	for i in range(LeftCount, 0, -1):
+		Flags = GemRB.IsValidStoreItem (pc, i-1, ITEM_STORE)&SHOP_SELECT
 		if Flags:
-			GemRB.ChangeStoreItem (pc, Slot-1, SHOP_BUY)
-	GemRB.GameSetPartyGold (GemRB.GameGetPartyGold()-BuySum)
+			Slot = GemRB.GetStoreItem (i-1)
+			Item = GemRB.GetItem (Slot['ItemResRef'])
+			Price = Item['Price'] * Store['SellMarkup'] / 100
+			if Price <= 0:
+				Price = 1
+
+			if GemRB.ChangeStoreItem (pc, i-1, SHOP_BUY):
+				GemRB.GameSetPartyGold (GemRB.GameGetPartyGold()-Price)
 	UpdateStoreShoppingWindow ()
 
 
@@ -574,9 +583,17 @@ def RedrawStoreShoppingWindow ():
 
 	Label = GemRB.GetControl (Window, 0x1000002b)
 	GemRB.SetText (Window, Label, str(BuySum) )
+	if BuySum:
+		GemRB.SetButtonState(Window, LeftButton, IE_GUI_BUTTON_ENABLED)
+	else:
+		GemRB.SetButtonState(Window, LeftButton, IE_GUI_BUTTON_DISABLED)
 
 	Label = GemRB.GetControl (Window, 0x1000002c)
 	GemRB.SetText (Window, Label, str(SellSum) )
+	if SellSum:
+		GemRB.SetButtonState(Window, RightButton, IE_GUI_BUTTON_ENABLED)
+	else:
+		GemRB.SetButtonState(Window, RightButton, IE_GUI_BUTTON_DISABLED)
 
 	for i in range(4):
 		Slot = GemRB.GetStoreItem (i+LeftTopIndex)
