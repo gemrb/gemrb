@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.140 2007/01/29 21:21:36 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.141 2007/01/30 20:02:16 wjpalenstijn Exp $
  *
  */
 
@@ -382,7 +382,8 @@ public:
 	void SetColor( ieDword idx, ieDword grd);
 	/* sets an RGB colour modification effect; location -1 for global */
 	void SetColorMod( int location, RGBModifier::Type type, int speed, 
-					  unsigned char r, unsigned char g, unsigned char b );
+					  unsigned char r, unsigned char g, unsigned char b,
+					  int phase=-1 );
 	void RemoveTimedEffects();
 	bool Schedule(ieDword gametime);
 	/* call this when path needs to be changed */

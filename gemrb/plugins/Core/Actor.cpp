@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.252 2007/01/29 21:21:36 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.253 2007/01/30 20:02:16 wjpalenstijn Exp $
  *
  */
 
@@ -2160,7 +2160,8 @@ void Actor::SetColor( ieDword idx, ieDword grd)
 }
 
 void Actor::SetColorMod( int location, RGBModifier::Type type, int speed, 
-						 unsigned char r, unsigned char g, unsigned char b )
+						 unsigned char r, unsigned char g, unsigned char b,
+						 int phase)
 {
 	CharAnimations* ca = GetAnims();
 	if (!ca) return;
@@ -2169,16 +2170,20 @@ void Actor::SetColorMod( int location, RGBModifier::Type type, int speed,
 	if (location == -1) {
 		ca->GlobalColorMod.type = type;
 		ca->GlobalColorMod.speed = speed;
-		ca->GlobalColorMod.phase = 0;
 		ca->GlobalColorMod.rgb.r = r;
 		ca->GlobalColorMod.rgb.g = g;
 		ca->GlobalColorMod.rgb.b = b;
+		if (phase >= 0)
+			ca->GlobalColorMod.phase = phase;
+		else
+			ca->GlobalColorMod.phase = 0;
 	} else {
 		ca->ColorMods[location].type = type;
 		ca->ColorMods[location].speed = speed;
 		ca->ColorMods[location].rgb.r = r;
 		ca->ColorMods[location].rgb.g = g;
 		ca->ColorMods[location].rgb.b = b;
+		// keep phase as-is, to prevent the phase being reset each AI cycle
 	}
 }
 
