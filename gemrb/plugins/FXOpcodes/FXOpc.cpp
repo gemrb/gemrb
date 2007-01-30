@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.52 2007/01/30 17:05:27 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.53 2007/01/30 19:24:23 wjpalenstijn Exp $
  *
  */
 
@@ -980,7 +980,7 @@ int fx_set_color_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 	// FIXME: figure out exact brightness
 	int location = (fx->Parameter2 & 0xF) + 8*((fx->Parameter2 & 0xF0)>>4);
-	target->SetColorMod(location, RGBModifier::TINT, -1, fx->Parameter1 >> 8,
+	target->SetColorMod(location, RGBModifier::ADD, -1, fx->Parameter1 >> 8,
 						fx->Parameter1 >> 16, fx->Parameter1 >> 24);
 
 	return FX_APPLIED;
@@ -994,7 +994,7 @@ int fx_set_color_pulse_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 	// FIXME: figure out exact brightness
 	int location = (fx->Parameter2 & 0xF) + 8*((fx->Parameter2 & 0xF0)>>4);
 	int speed = (fx->Parameter2 >> 16) & 0xFF;
-	target->SetColorMod(location, RGBModifier::TINT, speed,
+	target->SetColorMod(location, RGBModifier::ADD, speed,
 						fx->Parameter1 >> 8, fx->Parameter1 >> 16,
 						fx->Parameter1 >> 24);
 

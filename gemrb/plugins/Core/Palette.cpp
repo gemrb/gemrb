@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Palette.cpp,v 1.5 2007/01/29 21:21:36 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Palette.cpp,v 1.6 2007/01/30 19:24:22 wjpalenstijn Exp $
  *
  */
 
@@ -88,7 +88,7 @@ void Palette::SetupPaperdollColours(ieDword* Colors, unsigned int type)
 	memcpy( &col[0x88], &col[0x11], 8 * sizeof( Color ) );
 
 	int i;
-	for (i = 0x90; i < 0xA8; i += 0x08)
+	for (i = 0x90; i <= 0xA8; i += 0x08)
 		//leather
 		memcpy( &col[i], &col[0x35], 8 * sizeof( Color ) );
 
@@ -120,6 +120,18 @@ static inline void applyMod(const Color& src, Color& dest,
 			unsigned int b = (unsigned int)src.b * mod.rgb.b;
 			if (b & (~0x7FF)) b = 0x7FF;
 			dest.b = b >> 3;
+		} else if (mod.type == RGBModifier::ADD) {
+			unsigned int r = (unsigned int)src.r + mod.rgb.r;
+			if (r & (~0xFF)) r = 0xFF;
+			dest.r = r;
+
+			unsigned int g = (unsigned int)src.g + mod.rgb.g;
+			if (g & (~0xFF)) g = 0xFF;
+			dest.g = g;
+
+			unsigned int b = (unsigned int)src.b + mod.rgb.b;
+			if (b & (~0xFF)) b = 0xFF;
+			dest.b = b;
 		}
 	} else if (mod.speed > 0) {
 
@@ -136,7 +148,7 @@ static inline void applyMod(const Color& src, Color& dest,
 			dest.g = ((unsigned int)src.g * (256*256 + phase*mod.rgb.g - 256*phase))>>16;
 			dest.b = ((unsigned int)src.b * (256*256 + phase*mod.rgb.b - 256*phase))>>16;
 		} else if (mod.type == RGBModifier::BRIGHTEN) {
-			unsigned int r = src.r * (256*256 + phase*mod.rgb.r - 256*phase);
+			unsigned int r = src.r + (256*256 + phase*mod.rgb.r - 256*phase);
 			if (r & (~0x7FFFF)) r = 0x7FFFF;
 			dest.r = r >> 11;
 
@@ -147,6 +159,18 @@ static inline void applyMod(const Color& src, Color& dest,
 			unsigned int b = src.b * (256*256 + phase*mod.rgb.b - 256*phase);
 			if (b & (~0x7FFFF)) b = 0x7FFFF;
 			dest.b = b >> 11;
+		} else if (mod.type == RGBModifier::ADD) {
+			unsigned int r = src.r + ((phase*mod.rgb.r)>>8);
+			if (r & (~0xFF)) r = 0xFF;
+			dest.r = r;
+
+			unsigned int g = src.g + ((phase*mod.rgb.g)>>8);
+			if (g & (~0xFF)) g = 0xFF;
+			dest.g = g;
+
+			unsigned int b = src.b + ((phase*mod.rgb.b)>>8);
+			if (b & (~0xFF)) b = 0xFF;
+			dest.b = b;
 		}
 	}
 }
@@ -188,11 +212,11 @@ void Palette::SetupRGBModification(const Palette* src, const RGBModifier* mods,
 		applyMod(src->col[0x80+i],col[0x80+i],tmods[4]);
 	for (i = 0; i < 8; ++i)
 		applyMod(src->col[0x88+i],col[0x88+i],tmods[1]);
-	for (i = 0; i < 24; ++i)
+	for (i = 0; i < 32; ++i)
 		applyMod(src->col[0x90+i],col[0x90+i],tmods[4]);
 
-	for (i = 0; i < 8; ++i)
-		col[0xA8+i] = src->col[0xA8+i];
+/*	for (i = 0; i < 8; ++i)
+	col[0xA8+i] = src->col[0xA8+i];*/
 
 	for (i = 0; i < 8; ++i)
 		applyMod(src->col[0xB0+i],col[0xB0+i],tmods[3]);
