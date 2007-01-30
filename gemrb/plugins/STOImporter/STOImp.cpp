@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.16 2007/01/28 15:56:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.17 2007/01/30 19:55:25 avenger_teambg Exp $
  *
  */
 
@@ -158,6 +158,11 @@ void STOImp::GetItem(STOItem *it)
 	}
 	str->ReadDword( &it->Flags );
 	str->ReadDword( &it->AmountInStock );
+	//if there was no item on stock, how this could be 0
+	//we hack-fix this here so it won't cause trouble
+	if (!it->AmountInStock) {
+		it->AmountInStock = 1;
+	}
 	str->ReadDword( (ieDword *) &it->InfiniteSupply );
 	ieDwordSigned tmp;
 
