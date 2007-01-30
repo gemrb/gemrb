@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.54 2007/01/30 19:55:15 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.55 2007/01/30 19:55:58 wjpalenstijn Exp $
  *
  */
 
@@ -978,7 +978,6 @@ int fx_set_color_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_color_rgb (%2d): RGB: %x, Location: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	// FIXME: figure out exact brightness
 	int location = (fx->Parameter2 & 0xF) + 8*((fx->Parameter2 & 0xF0)>>4);
 	target->SetColorMod(location, RGBModifier::ADD, -1, fx->Parameter1 >> 8,
 						fx->Parameter1 >> 16, fx->Parameter1 >> 24);
@@ -991,7 +990,6 @@ int fx_set_color_pulse_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_color_pulse_rgb (%2d): RGB: %x, Location: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	// FIXME: figure out exact brightness
 	int location = (fx->Parameter2 & 0xF) + 8*((fx->Parameter2 & 0xF0)>>4);
 	int speed = (fx->Parameter2 >> 16) & 0xFF;
 	target->SetColorMod(location, RGBModifier::ADD, speed,
@@ -1643,7 +1641,6 @@ int fx_brief_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_brief_rgb (%2d): RGB: %d, Location and speed: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	// FIXME: figure out exact brightness
 	int speed = (fx->Parameter2 >> 16) & 0xFF;
 	target->SetColorMod(-1, RGBModifier::ADD, speed,
 						fx->Parameter1 >> 8, fx->Parameter1 >> 16,
@@ -1656,7 +1653,6 @@ int fx_darken_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_darken_rgb (%2d): RGB: %d, Location and speed: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	// FIXME: figure out exact brightness
 	int location = (fx->Parameter2 & 0xF) + 8*((fx->Parameter2 & 0xF0)>>4);
 	target->SetColorMod(location, RGBModifier::TINT, -1, fx->Parameter1 >> 8,
 						fx->Parameter1 >> 16, fx->Parameter1 >> 24);
