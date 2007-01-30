@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.110 2007/01/30 21:46:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.111 2007/01/30 22:32:22 wjpalenstijn Exp $
  *
  */
 
@@ -187,6 +187,8 @@ void Inventory::AddSlotEffects(CREItem* slot, int type)
 		printMessage("Inventory","Invalid item equipped...\n",LIGHT_RED);
 		return;
 	}
+	ItemExcl|=itm->ItemExcl;
+
 	//get the equipping effects
 	//EffectQueue *fxqueue = itm->GetEffectBlock(-1);
 	//fxqueue->SetOwner(Owner); //the equipped items owner is the equipping character
@@ -820,7 +822,6 @@ bool Inventory::EquipItem(unsigned int slot)
 		}
 		AddSlotEffects( item, effect );
 	}
-	ItemExcl|=itm->ItemExcl;
 	core->FreeItem(itm, item->ItemResRef, false);
 	return true;
 }
