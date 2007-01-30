@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Palette.cpp,v 1.6 2007/01/30 19:24:22 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Palette.cpp,v 1.7 2007/01/30 19:26:30 wjpalenstijn Exp $
  *
  */
 
@@ -88,7 +88,7 @@ void Palette::SetupPaperdollColours(ieDword* Colors, unsigned int type)
 	memcpy( &col[0x88], &col[0x11], 8 * sizeof( Color ) );
 
 	int i;
-	for (i = 0x90; i <= 0xA8; i += 0x08)
+	for (i = 0x90; i < 0xA8; i += 0x08)
 		//leather
 		memcpy( &col[i], &col[0x35], 8 * sizeof( Color ) );
 
@@ -212,11 +212,11 @@ void Palette::SetupRGBModification(const Palette* src, const RGBModifier* mods,
 		applyMod(src->col[0x80+i],col[0x80+i],tmods[4]);
 	for (i = 0; i < 8; ++i)
 		applyMod(src->col[0x88+i],col[0x88+i],tmods[1]);
-	for (i = 0; i < 32; ++i)
+	for (i = 0; i < 24; ++i)
 		applyMod(src->col[0x90+i],col[0x90+i],tmods[4]);
 
-/*	for (i = 0; i < 8; ++i)
-	col[0xA8+i] = src->col[0xA8+i];*/
+	for (i = 0; i < 8; ++i)
+		col[0xA8+i] = src->col[0xA8+i];
 
 	for (i = 0; i < 8; ++i)
 		applyMod(src->col[0xB0+i],col[0xB0+i],tmods[3]);
