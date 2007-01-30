@@ -586,7 +586,8 @@ static void dispatchDecoder16(unsigned short** pFrame, unsigned char codeType,
 
 		case 0xb:
 			for (i = 0; i < 8; i++) {
-				memcpy( *pFrame, *pData, 16 );
+				for (j = 0; j < 8; j++)
+					(*pFrame)[j] = GETPIXEL ( pData, 2*j );
 				*pFrame += g_width;
 				*pData += 16;
 				*pDataRemain -= 16;
