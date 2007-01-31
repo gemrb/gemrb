@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.449 2007/01/28 21:15:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.450 2007/01/31 21:20:29 avenger_teambg Exp $
  *
  */
 
@@ -2131,7 +2131,7 @@ bool Interface::LoadGemRBINI()
 		sprintf( name, "GroundCircleBAM%d", size+1 );
 		s = ini->GetKeyAsString( "resources", name, NULL );
 		if (s) {
-			char *pos = strchr( s, '/' );
+			const char *pos = strchr( s, '/' );
 			if (pos) {
 				GroundCircleScale[size] = atoi( pos+1 );
 				strncpy( GroundCircleBam[size], s, pos - s );
@@ -2171,12 +2171,9 @@ bool Interface::LoadGemRBINI()
 		snprintf(key,9,"Letter%d", i+1);
 		s = ini->GetKeyAsString( "charset", key, NULL );
 		if (s) {
-			char *s2 = strchr(s,',');
+			const char *s2 = strchr(s,',');
 			if (s2) {
 				upperlower(atoi(s), atoi(s2+1) );
-				printMessage("Core"," ",WHITE);
-				printf("Upperlower %d %d ",atoi(s), atoi(s2+1) );
-				printStatus( "SET", LIGHT_GREEN );
 			}
 		}
 	}
@@ -4133,7 +4130,7 @@ static char *saved_extensions[]={".are",".sto",".tot",".toh",0};
 //returns true if file should be saved
 bool Interface::SavedExtension(const char *filename)
 {
-	char *str=strchr(filename,'.');
+	const char *str=strchr(filename,'.');
 	if (!str) return false;
 	int i=0;
 	while(saved_extensions[i]) {
@@ -4148,7 +4145,7 @@ static char *protected_extensions[]={".exe",".dll",".so",0};
 //returns true if file should be saved
 bool Interface::ProtectedExtension(const char *filename)
 {
-	char *str=strchr(filename,'.');
+	const char *str=strchr(filename,'.');
 	if (!str) return false;
 	int i=0;
 	while(protected_extensions[i]) {

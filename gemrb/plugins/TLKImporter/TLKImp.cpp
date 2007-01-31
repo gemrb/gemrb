@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.59 2006/10/23 09:48:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.60 2007/01/31 21:20:32 avenger_teambg Exp $
  *
  */
 
@@ -372,7 +372,7 @@ bool TLKImp::ResolveTags(char* dest, char* source, int Length)
 			NewLength += TokenLength;
 		} else {
 			if (source[i] == '[') {
-				char* tmppoi = strchr( source + i + 1, ']' );
+				const char* tmppoi = strchr( source + i + 1, ']' );
 				if (tmppoi)
 					i = (int) (tmppoi - source);
 				else
@@ -410,7 +410,7 @@ bool TLKImp::GetNewStringLength(char* string, int& Length)
 			if (string[i] == '[') {
 				//voice actor directives
 				lChange = true;
-				char* tmppoi = strchr( string + i + 1, ']' );
+				const char* tmppoi = strchr( string + i + 1, ']' );
 				if (tmppoi)
 					i += (int) (tmppoi - string) - i;
 				else

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.91 2006/12/03 17:16:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TextArea.cpp,v 1.92 2007/01/31 21:20:29 avenger_teambg Exp $
  *
  */
 
@@ -356,7 +356,7 @@ int TextArea::AppendText(const char* text, int pos)
 	int newlen = ( int ) strlen( text );
 
 	if (pos == -1) {
-		char *note = strstr(text,"\r\n\r\nNOTE:");
+		const char *note = strstr(text,"\r\n\r\nNOTE:");
 		char *str;
 		if (NULL == note) {
 			str = ( char* ) malloc( newlen +1 );
