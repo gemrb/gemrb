@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.154 2007/01/30 22:45:46 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.155 2007/01/31 21:44:11 wjpalenstijn Exp $
  *
  */
 
@@ -353,6 +353,13 @@ int SDLVideoDriver::SwapBuffers(void)
 		SDL_BlitSurface( extra, &src, disp, &dst );
 	}
 
+	if (Cursor[CursorIndex] && !DisableMouse) {
+		SDL_Surface* temp = backBuf;
+		backBuf = disp; // FIXME: UGLY HACK!
+		BlitSprite(Cursor[CursorIndex], CursorPos.x, CursorPos.y, true);
+		backBuf = temp;
+	}
+
 	if (!ConsolePopped) {
 		GetTime( time );
 		/** Display tooltip if mouse is idle */
@@ -366,13 +373,6 @@ int SDLVideoDriver::SwapBuffers(void)
 		backBuf = disp; // FIXME: UGLY HACK!
 		core->DrawTooltip();
 		backBuf = tmp;
-	}
-
-	if (Cursor[CursorIndex] && !DisableMouse) {
-		SDL_Surface* temp = backBuf;
-		backBuf = disp; // FIXME: UGLY HACK!
-		BlitSprite(Cursor[CursorIndex], CursorPos.x, CursorPos.y, true);
-		backBuf = temp;
 	}
 
 	SDL_Flip( disp );
