@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.100 2007/01/30 19:07:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.101 2007/01/31 18:55:56 avenger_teambg Exp $
  *
  */
 
@@ -926,7 +926,21 @@ void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->WalkTo( parameters->pointParameter, 0 );
+	//InMove could release the current action, so we need this
+	ieDword tmp = (ieDword) parameters->int0Parameter;
+	actor->WalkTo( parameters->pointParameter, tmp );
+	if (tmp) {
+		//InMove will clear destination too, so we need to save it
+		Point dest = actor->Destination;
+		if (!actor->InMove()) {
+			//can't reach target, movement failed
+			if (Distance(dest,actor)>tmp) {
+				//to prevent deadlocks, we free the action
+				//which caused MoveToPoint in the first place
+				Sender->PopNextAction();
+			}
+		}
+	}
 	Sender->ReleaseCurrentAction();
 }
 
@@ -1783,7 +1797,7 @@ void GameScript::PickLock(Scriptable* Sender, Action* parameters)
 			//notlocked
 		}
 	} else {
-		GoNearAndRetry(Sender, *p);
+		GoNearAndRetry(Sender, *p, MAX_OPERATING_DISTANCE);
 	}
 	Sender->SetWait(1);
 	Sender->ReleaseCurrentAction();
@@ -1840,7 +1854,7 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 		}
 		door->SetDoorOpen( true, true, actor->GetID() );
 	} else {
-		GoNearAndRetry(Sender, *p);
+		GoNearAndRetry(Sender, *p, MAX_OPERATING_DISTANCE);
 	}
 	Sender->SetWait(1);
 	Sender->ReleaseCurrentAction();
@@ -1886,7 +1900,7 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 			door->SetDoorOpen( false, true, actor->GetID() );
 		}
 	} else {
-		GoNearAndRetry(Sender, *p);
+		GoNearAndRetry(Sender, *p, MAX_OPERATING_DISTANCE);
 	}
 	Sender->SetWait(1);
 	Sender->ReleaseCurrentAction();
@@ -2322,7 +2336,7 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	GoNearAndRetry( Sender, ent->Pos);
+	GoNearAndRetry( Sender, ent->Pos, MAX_OPERATING_DISTANCE);
 	Sender->ReleaseCurrentAction();
 }
 
@@ -2354,7 +2368,7 @@ void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	GoNearAndRetry( Sender, ent->Pos);
+	GoNearAndRetry( Sender, ent->Pos, MAX_OPERATING_DISTANCE);
 	Sender->ReleaseCurrentAction();
 }
 
@@ -3278,7 +3292,7 @@ void GameScript::DropItem(Scriptable *Sender, Action* parameters)
 		return;
 	}
 	if (Distance(parameters->pointParameter, Sender) > 10) {
-		GoNearAndRetry(Sender, parameters->pointParameter);
+		GoNearAndRetry(Sender, parameters->pointParameter, 10);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -3347,7 +3361,7 @@ void GameScript::Plunder(Scriptable *Sender, Action* parameters)
 		return;
 	}
 	if (PersonalDistance(Sender, tar)>MAX_OPERATING_DISTANCE ) {
-		GoNearAndRetry(Sender, tar, false);
+		GoNearAndRetry(Sender, tar, false, MAX_OPERATING_DISTANCE);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -3386,7 +3400,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	Actor *scr = (Actor *) tar;
 	//for PP one must go REALLY close
 	if (PersonalDistance(Sender, tar)>10 ) {
-		GoNearAndRetry(Sender, tar, true);
+		GoNearAndRetry(Sender, tar, true, 10);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -4102,7 +4116,7 @@ void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	GoNearAndRetry(Sender, container, false);
+	GoNearAndRetry(Sender, container, false, needed);
 	Sender->ReleaseCurrentAction();
 }
 

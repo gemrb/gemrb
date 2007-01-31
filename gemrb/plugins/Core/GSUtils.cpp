@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.78 2007/01/30 19:07:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.79 2007/01/31 18:55:56 avenger_teambg Exp $
  *
  */
 
@@ -784,7 +784,8 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	//CHECKDIST works only for mobile scriptables
 	if (Flags&BD_CHECKDIST) {
 		if (Distance(speaker, target)>speaker->GetStat(IE_DIALOGRANGE)*15 ) {
-			GoNearAndRetry(Sender, tar, true); //this is unsure, the target's path will be cleared
+	     //this is unsure, the target's path will be cleared
+			GoNearAndRetry(Sender, tar, true, speaker->GetStat(IE_DIALOGRANGE)*15);
 			Sender->ReleaseCurrentAction();
 			return;
 		}
@@ -1005,7 +1006,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 		//so we add it back to the queue with an additional movement
 		//increases refcount of Sender->CurrentAction, by pumping it back
 		//in the action queue
-		GoNearAndRetry(Sender, target, true);
+		GoNearAndRetry(Sender, target, true, wrange);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -1370,14 +1371,14 @@ Action* GenerateActionCore(const char *src, const char *str, int acIndex)
 	return newAction;
 }
 
-void GoNearAndRetry(Scriptable *Sender, Scriptable *target, bool flag)
+void GoNearAndRetry(Scriptable *Sender, Scriptable *target, bool flag, int distance)
 {
 	Point p;
 	GetPositionFromScriptable(target,p,flag);
-	GoNearAndRetry(Sender, p);
+	GoNearAndRetry(Sender, p, distance);
 }
 
-void GoNearAndRetry(Scriptable *Sender, Point &p)
+void GoNearAndRetry(Scriptable *Sender, Point &p, int distance)
 {
 	if (!Sender->CurrentAction) {
 		printMessage("GameScript","NULL action retried???\n",LIGHT_RED);
@@ -1386,7 +1387,13 @@ void GoNearAndRetry(Scriptable *Sender, Point &p)
 	Sender->AddActionInFront( Sender->CurrentAction );
 	char Tmp[256];
 	sprintf( Tmp, "MoveToPoint([%hd.%hd])", p.x, p.y );
-	Sender->AddActionInFront( GenerateAction( Tmp) );
+	Action * action = GenerateAction( Tmp);
+	//experimental hack, this value means,
+	//MoveToPoint shall pop the next action too if movement fails
+	//and the actor is farther than distance
+	//this will prevent deadlocks
+	action->int0Parameter = distance;
+	Sender->AddActionInFront( action );
 }
 
 void FreeSrc(SrcVector *poi, const ieResRef key)
