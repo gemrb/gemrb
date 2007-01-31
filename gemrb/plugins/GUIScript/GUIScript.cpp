@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.457 2007/01/30 21:46:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.458 2007/01/31 21:33:35 wjpalenstijn Exp $
  *
  */
 
@@ -2833,10 +2833,10 @@ static PyObject* SetButtonBAM(int wi, int ci, const char *ResRef, int CycleIndex
 
 static PyObject* GemRB_SetButtonBAM(PyObject * /*self*/, PyObject* args)
 {
-	int wi, ci, CycleIndex, FrameIndex, col1;
+	int wi, ci, CycleIndex, FrameIndex, col1 = -1;
 	char* ResRef;
 
-	if (!PyArg_ParseTuple( args, "iisiii", &wi, &ci,
+	if (!PyArg_ParseTuple( args, "iisii|i", &wi, &ci,
 			&ResRef, &CycleIndex, &FrameIndex, &col1 )) {
 		return AttributeError( GemRB_SetButtonBAM__doc );
 	}

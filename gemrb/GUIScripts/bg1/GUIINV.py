@@ -16,7 +16,7 @@
 #along with this program; if not, write to the Free Software
 #Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.37 2006/12/31 16:22:20 avenger_teambg Exp $
+#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.38 2007/01/31 21:33:34 wjpalenstijn Exp $
 
 #GUIINV.py - scripts to control inventory windows from GUIINV winpack
 
@@ -389,16 +389,16 @@ def UpdateSlot (pc, slot):
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "OpenItemAmountWindow")
 	else:
 		if SlotType["ResRef"]=="*":
-			GemRB.SetButtonBAM (Window, Button, "",0,0,0)
+			GemRB.SetButtonBAM (Window, Button, "",0,0)
 			GemRB.SetTooltip (Window, Button, SlotType["Tip"])
 			itemname = ""
 		elif SlotType["ResRef"]=="":
-			GemRB.SetButtonBAM (Window, Button, "",0,0,0)
+			GemRB.SetButtonBAM (Window, Button, "",0,0)
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 			GemRB.SetTooltip (Window, Button, "")
 			itemname = ""
 		else:
-			GemRB.SetButtonBAM (Window, Button, SlotType["ResRef"],0,0,0)
+			GemRB.SetButtonBAM (Window, Button, SlotType["ResRef"],0,0)
 			GemRB.SetTooltip (Window, Button, SlotType["Tip"])
 
 		GemRB.SetText (Window, Button, "")
