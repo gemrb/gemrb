@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.126 2007/01/28 21:15:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.127 2007/02/01 18:58:28 avenger_teambg Exp $
  *
  */
 
@@ -1636,10 +1636,14 @@ int CREImp::GetStoredFileSize(Actor *actor)
 	//adding effects
 	EffectsCount = actor->fxqueue.GetSavedEffectsCount();
 	VariablesCount = actor->locals->GetCount();
+	if (VariablesCount) {
+		TotSCEFF=1;
+	}
 	if (TotSCEFF) {
 		headersize += (VariablesCount + EffectsCount) * 264;
 	} else {
-		headersize += (VariablesCount + EffectsCount) * 48;
+		//if there are variables, then TotSCEFF is set
+		headersize += EffectsCount * 48;
 	}
 	ItemsOffset = headersize;
 
