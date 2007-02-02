@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.127 2007/02/01 18:58:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.128 2007/02/02 21:30:31 wjpalenstijn Exp $
  *
  */
 
@@ -771,11 +771,10 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	//this dword contains the equipping info (which slot is selected)
 	// 0,1,2,3 - weapon slots
 	// 1000 - fist
-	// weird values - quiver
+	// -24,-23,-22,-21 - quiver
 	ieDword Equipped;
 	str->ReadDword( &Equipped );
-	act->SetEquippedQuickSlot(Equipped);
-	//act->inventory.SetEquippedSlot( ((short)Equipped));
+	act->inventory.SetEquippedSlot( ((short)Equipped));
 	// Reading spellbook
 
 	CREKnownSpell **known_spells=(CREKnownSpell **) calloc(KnownSpellsCount, sizeof(CREKnownSpell *) );
