@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.450 2007/01/31 21:20:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.451 2007/02/02 16:00:49 avenger_teambg Exp $
  *
  */
 
@@ -4775,7 +4775,7 @@ ScriptedAnimation* Interface::GetScriptedAnimation( const char *effect)
 		AnimationFactory *af = (AnimationFactory *)
 			key->GetFactoryResource( effect, IE_BAM_CLASS_ID, IE_NORMAL );
 		if (af) {
-			ScriptedAnimation *ret=new ScriptedAnimation();
+			ret = new ScriptedAnimation();
 			ret->LoadAnimationFactory( af);
 		}
 	}

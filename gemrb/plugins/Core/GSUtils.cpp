@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.79 2007/01/31 18:55:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.80 2007/02/02 16:00:49 avenger_teambg Exp $
  *
  */
 
@@ -662,6 +662,10 @@ void CreateVisualEffectCore(Scriptable *Sender, Point &position, const char *eff
 //stick to object flag, sounds, iterations etc.
 	if (effect[0]) {
 		ScriptedAnimation* vvc = core->GetScriptedAnimation(effect);
+		if (!vvc) {
+			printMessage("GameScript","Failed to create effect.",LIGHT_RED);
+			return;
+		}
 		vvc->XPos +=position.x;
 		vvc->YPos +=position.y;
 		Sender->GetCurrentArea( )->AddVVCell( vvc );
