@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.128 2007/02/02 21:30:31 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.129 2007/02/03 15:07:03 wjpalenstijn Exp $
  *
  */
 
@@ -1650,7 +1650,7 @@ int CREImp::GetStoredFileSize(Actor *actor)
 	ItemsCount = 0;
 	for (i=0;i<core->GetInventorySize();i++) {
 		unsigned int j = core->QuerySlot(i+1);
-		if (j>=Inventory_Size) {
+		if (j>Inventory_Size) {
 			continue;
 		}
 		CREItem *it = actor->inventory.GetSlotItem(j);
@@ -1679,7 +1679,7 @@ int CREImp::PutInventory(DataStream *stream, Actor *actor, unsigned int size)
 	for (i=0;i<size;i++) {
 		//ignore first element, getinventorysize makes space for fist
 		unsigned int j = core->QuerySlot(i+1);
-		if (j>=size) {
+		if (j > size) {
 			continue;
 		}
 		CREItem *it = actor->inventory.GetSlotItem( j );
