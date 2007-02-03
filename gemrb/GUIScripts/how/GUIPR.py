@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIPR.py,v 1.3 2004/12/09 22:08:06 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIPR.py,v 1.4 2007/02/03 20:29:35 avenger_teambg Exp $
 
 
 # GUIPR.py - scripts to control priest spells windows from GUIPR winpack
@@ -24,35 +24,54 @@
 ###################################################
 
 import GemRB
+import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
 from GUICommon import CloseOtherWindow
-from GUICommonWindows import SetSelectionChangeHandler
+from GUICommonWindows import *
 
 PriestWindow = None
 PriestSpellInfoWindow = None
 PriestSpellLevel = 0
 PriestSpellUnmemorizeWindow = None
+PortraitWindow = None
+OptionsWindow = None
+OldPortraitWindow = None
+OldOptionsWindow = None
 
 
 def OpenPriestWindow ():
-	global PriestWindow
-
+	global PriestWindow, PortraitWindow, OptionsWindow
+	global OldPortraitWindow, OldOptionsWindow
 	
 	if CloseOtherWindow (OpenPriestWindow):
-		GemRB.HideGUI ()
 		GemRB.UnloadWindow (PriestWindow)
+		GemRB.UnloadWindow (OptionsWindow)
+		GemRB.UnloadWindow (PortraitWindow)
+
 		PriestWindow = None
-		GemRB.SetVar ("OtherWindow", -1)
-		
-		SetSelectionChangeHandler (None)
-		GemRB.UnhideGUI ()
+	        GemRB.SetVar ("OtherWindow", -1)
+	        GemRB.SetVisible (0,1)
+	        GemRB.UnhideGUI ()
+	        GUICommonWindows.PortraitWindow = OldPortraitWindow
+	        OldPortraitWindow = None
+	        GUICommonWindows.OptionsWindow = OldOptionsWindow
+	        OldOptionsWindow = None
+	        SetSelectionChangeHandler (None)
 		return
 		
 	GemRB.HideGUI ()
-	GemRB.LoadWindowPack ("GUIPR")
+	GemRB.SetVisible (0,0)
+	GemRB.LoadWindowPack ("GUIPR", 640, 480)
 	PriestWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", PriestWindow)
+	#saving the original portrait window
+	OldOptionsWindow = GUICommonWindows.OptionsWindow
+	OptionsWindow = GemRB.LoadWindow (0)
+	SetupMenuWindowControls (OptionsWindow, 0, "OpenPriestWindow")
+	GemRB.SetWindowFrame (OptionsWindow)
+	OldPortraitWindow = GUICommonWindows.PortraitWindow
+	PortraitWindow = OpenPortraitWindow (0)
 
 	Button = GemRB.GetControl (Window, 1)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PriestPrevLevelPress")
@@ -60,16 +79,6 @@ def OpenPriestWindow ():
 	Button = GemRB.GetControl (Window, 2)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PriestNextLevelPress")
 
-## 	#setup level buttons
-## 	for i in range (7):
-## 		Button = GemRB.GetControl (Window, 55 + i)
-## 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "RefreshPriestLevel")
-## 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-
-## 	for i in range (7):
-## 		Button = GemRB.GetControl (Window, 55 + i)
-## 		GemRB.SetVarAssoc (Window, Button, "PriestSpellLevel", i)
-		
 	# Setup memorized spells buttons
 	for i in range (12):
 		Button = GemRB.GetControl (Window, 3 + i)
@@ -85,9 +94,10 @@ def OpenPriestWindow ():
 
 	SetSelectionChangeHandler (UpdatePriestWindow)
 	UpdatePriestWindow ()
+	GemRB.SetVisible (OptionsWindow, 1)
+	GemRB.SetVisible (Window, 3)
+	GemRB.SetVisible (PortraitWindow, 1)
 
-	GemRB.UnhideGUI ()
-	
 
 def UpdatePriestWindow ():
 	global PriestMemorizedSpellList, PriestKnownSpellList

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIMG.py,v 1.2 2004/12/09 22:08:06 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIMG.py,v 1.3 2007/02/03 20:29:35 avenger_teambg Exp $
 
 
 # GUIMG.py - scripts to control mage spells windows from GUIMG winpack
@@ -24,35 +24,55 @@
 ###################################################
 
 import GemRB
+import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
 from GUICommon import CloseOtherWindow
-from GUICommonWindows import SetSelectionChangeHandler
+from GUICommonWindows import *
 
 MageWindow = None
 MageSpellInfoWindow = None
 MageSpellLevel = 0
 MageSpellUnmemorizeWindow = None
+PortraitWindow = None
+OptionsWindow = None
+OldPortraitWindow = None
+OldOptionsWindow = None
 
 
 def OpenMageWindow ():
-	global MageWindow
+	global MageWindow, PortraitWindow, OptionsWindow
+	global OldPortraitWindow, OldOptionsWindow
 
 	if CloseOtherWindow (OpenMageWindow):
-		GemRB.HideGUI ()
 		GemRB.UnloadWindow (MageWindow)
+		GemRB.UnloadWindow (OptionsWindow)
+		GemRB.UnloadWindow (PortraitWindow)
+
 		MageWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		
-		SetSelectionChangeHandler (None)
+		GemRB.SetVisible (0,1)
 		GemRB.UnhideGUI ()
+		GUICommonWindows.PortraitWindow = OldPortraitWindow
+		OldPortraitWindow = None
+		GUICommonWindows.OptionsWindow = OldOptionsWindow
+		OldOptionsWindow = None
+		SetSelectionChangeHandler (None)
 		return
 		
 	GemRB.HideGUI ()
-	GemRB.LoadWindowPack ("GUIMG")
+	GemRB.SetVisible (0,0)
+	GemRB.LoadWindowPack ("GUIMG", 640, 480)
 	MageWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", MageWindow)
-	
+	#saving the original portrait window
+	OldOptionsWindow = GUICommonWindows.OptionsWindow
+	OptionsWindow = GemRB.LoadWindow (0)
+	SetupMenuWindowControls (OptionsWindow, 0, "OpenMageWindow")
+	GemRB.SetWindowFrame (OptionsWindow)
+	OldPortraitWindow = GUICommonWindows.PortraitWindow
+	PortraitWindow = OpenPortraitWindow (0)
+
 	Button = GemRB.GetControl (Window, 1)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MagePrevLevelPress")
 
@@ -91,8 +111,9 @@ def OpenMageWindow ():
 
 	SetSelectionChangeHandler (UpdateMageWindow)
 	UpdateMageWindow ()
-
-	GemRB.UnhideGUI ()	
+	GemRB.SetVisible (OptionsWindow, 1)
+	GemRB.SetVisible (Window, 3)
+	GemRB.SetVisible (PortraitWindow, 1)
 
 
 def UpdateMageWindow ():
