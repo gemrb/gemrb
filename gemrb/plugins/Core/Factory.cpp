@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Factory.cpp,v 1.4 2004/02/24 22:20:36 balrog994 Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Factory.cpp,v 1.5 2007/02/03 23:01:52 wjpalenstijn Exp $
  *
  */
 
@@ -42,7 +42,7 @@ int Factory::IsLoaded(const char* ResRef, SClass_ID type)
 {
 	for (unsigned int i = 0; i < fobjects.size(); i++) {
 		if (fobjects[i]->SuperClassID == type) {
-			if (strncmp( fobjects[i]->ResRef, ResRef, 8 ) == 0) {
+			if (strnicmp( fobjects[i]->ResRef, ResRef, 8 ) == 0) {
 				return i;
 			}
 		}
