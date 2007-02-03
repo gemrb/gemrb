@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.459 2007/02/02 21:43:41 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.460 2007/02/03 14:31:47 avenger_teambg Exp $
  *
  */
 
@@ -4932,6 +4932,11 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 		Flags = si->Flags;
 	}
 	Item *item = core->GetItem( ItemResRef );
+	if (!item) {
+		printMessage("GUIScript", " ", LIGHT_RED);
+		printf("Invalid resource reference: %s\n", ItemResRef);
+		return PyInt_FromLong(0);
+	}
 	ret = store->AcceptableItemType( item->ItemType, Flags, !type );
 	//this is a hack to report on selected items
 	if (Flags & IE_INV_ITEM_SELECTED) {
@@ -5116,11 +5121,17 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("No current store!");
 	}
 	if (index>=(int) store->GetRealStockSize()) {
+		printMessage("GUIScript","Item is not available???",YELLOW);
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
 	PyObject* dict = PyDict_New();
 	STOItem *si=store->GetItem( index );
+	if (!si) {
+		printMessage("GUIScript","Item is not available???",YELLOW);
+		Py_INCREF( Py_None );
+		return Py_None;
+	}
 	PyDict_SetItemString(dict, "ItemResRef", PyString_FromResRef( si->ItemResRef ));
 	PyDict_SetItemString(dict, "Usages0", PyInt_FromLong (si->Usages[0]));
 	PyDict_SetItemString(dict, "Usages1", PyInt_FromLong (si->Usages[1]));
@@ -5138,6 +5149,12 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	Item *item = core->GetItem( si->ItemResRef );
+
+	if (!item) {
+		printMessage("GUIScript","Item is not available???",YELLOW);
+		Py_INCREF( Py_None );
+		return Py_None;
+	}
 
 	int identified = !!(si->Flags & IE_INV_ITEM_IDENTIFIED);
 	PyDict_SetItemString(dict, "ItemName", PyInt_FromLong( item->GetItemName( (bool) identified )) );
