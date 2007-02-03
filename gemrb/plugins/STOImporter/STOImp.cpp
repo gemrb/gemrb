@@ -15,13 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.18 2007/02/03 14:27:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.19 2007/02/03 17:47:04 avenger_teambg Exp $
  *
  */
 
 #include "../../includes/win32def.h"
 #include "../Core/Interface.h"
 #include "../Core/AnimationMgr.h"
+#include "../Core/Inventory.h"
 #include "STOImp.h"
 
 STOImp::STOImp(void)
@@ -162,6 +163,14 @@ void STOImp::GetItem(STOItem *it)
 	//we hack-fix this here so it won't cause trouble
 	if (!it->AmountInStock) {
 		it->AmountInStock = 1;
+	}
+	//another hack-fix
+	Item *item = core->GetItem( it->ItemResRef );
+	if (item) {
+		if (!item->LoreToID) {
+			it->Flags |= IE_INV_ITEM_IDENTIFIED;
+		}
+		core->FreeItem( item, it->ItemResRef, false );
 	}
 	str->ReadDword( (ieDword *) &it->InfiniteSupply );
 	ieDwordSigned tmp;
