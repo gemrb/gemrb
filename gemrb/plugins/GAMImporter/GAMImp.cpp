@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.89 2007/02/03 15:30:44 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.90 2007/02/03 15:34:21 avenger_teambg Exp $
  *
  */
 
@@ -567,9 +567,8 @@ int GAMImp::GetStoredFileSize(Game *game)
 	JournalCount = game->GetJournalCount();
 	headersize += JournalCount * 12;
 
-	if (core->HasFeature(GF_HAS_KAPUTZ) ) {
-		KillVarsOffset = headersize;
-		KillVarsCount = game->kaputz->GetCount();
+	KillVarsOffset = headersize;
+	if (KillVarsCount) {
 		headersize += KillVarsCount * 84;
 	}
 
