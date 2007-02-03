@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.17 2007/01/30 19:55:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/STOImporter/STOImp.cpp,v 1.18 2007/02/03 14:27:55 avenger_teambg Exp $
  *
  */
 
@@ -261,10 +261,13 @@ int STOImp::PutPurchasedCategories(DataStream *stream, Store* s)
 int STOImp::PutHeader(DataStream *stream, Store *s)
 {
 	char Signature[8];
+	ieDword tmpDword;
+	ieWord tmpWord;
 
+	version = s->version;
 	memcpy( Signature, "STORV0.0", 8);
-	Signature[5]+=s->version/10;
-	Signature[7]+=s->version%10;
+	Signature[5]+=version/10;
+	Signature[7]+=version%10;
 	stream->Write( Signature, 8);
 	stream->WriteDword( &s->Type);
 	stream->WriteDword( &s->StoreName);
@@ -274,16 +277,15 @@ int STOImp::PutHeader(DataStream *stream, Store *s)
 	stream->WriteDword( &s->DepreciationRate);
 	stream->WriteWord( &s->StealFailureChance);
 
-	ieWord tmp;
-	switch (s->version) {
+	switch (version) {
 	case 10: case 0: // bg2, gemrb
-		tmp = s->Capacity;
+		tmpWord = s->Capacity;
 		break;
 	default:
-		tmp = 0;
+		tmpWord = 0;
 		break;
 	}
-	stream->WriteWord( &tmp);
+	stream->WriteWord( &tmpWord);
 
 	stream->Write( s->unknown, 8);
 	stream->WriteDword( &s->PurchasedCategoriesOffset);
@@ -302,7 +304,12 @@ int STOImp::PutHeader(DataStream *stream, Store *s)
 	}
 	stream->WriteDword( &s->CuresOffset);
 	stream->WriteDword( &s->CuresCount);
-	stream->Write (s->unknown3, 36);
+	stream->Write (s->unknown3, 36);  //use these as padding
+	if (version==90) {
+		tmpDword = s->Capacity;
+		stream->WriteDword( &tmpDword);
+		stream->Write( s->unknown3, 80); //writing out original fillers
+	}
 	return 0;
 }
 
@@ -318,7 +325,7 @@ int STOImp::PutItems(DataStream *stream, Store *store)
 		}
 		stream->WriteDword( &it->Flags );
 		stream->WriteDword( &it->AmountInStock );
-		if (store->version==11) {
+		if (version==11) {
 			stream->WriteDword( (ieDword *) &it->InfiniteSupply);
 			stream->WriteDword( (ieDword *) &it->InfiniteSupply);
 			stream->Write( it->unknown2, 56);
