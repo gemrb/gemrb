@@ -16,7 +16,7 @@
 #along with this program; if not, write to the Free Software
 #Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIINV.py,v 1.25 2007/01/31 21:33:35 wjpalenstijn Exp $
+#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIINV.py,v 1.26 2007/02/03 19:57:08 avenger_teambg Exp $
 
 
 #GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -41,6 +41,12 @@ OptionsWindow = None
 OldPortraitWindow = None
 OldOptionsWindow = None
 OverSlot = None
+
+def OpenInventoryWindowClick():
+	tmp = GemRB.GetVar("PressedPortrait")+1
+	GemRB.GameSelectPC(tmp, True, SELECT_REPLACE)
+	OpenInventoryWindow()
+
 
 def OpenInventoryWindow ():
 	global InventoryWindow, OptionsWindow, PortraitWindow
