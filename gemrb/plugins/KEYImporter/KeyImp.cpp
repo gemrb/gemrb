@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.63 2006/08/19 20:22:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/KEYImporter/KeyImp.cpp,v 1.64 2007/02/04 16:33:00 wjpalenstijn Exp $
  *
  */
 
@@ -170,7 +170,7 @@ bool KeyImp::LoadResFile(const char* resfile)
 	return true;
 }
 
-#define FindIn(BasePath, Path, ResRef, Type, foundMessage) \
+#define FindIn(BasePath, Path, ResRef, Type) \
 { \
 	char p[_MAX_PATH], f[_MAX_PATH] = {0}; \
 	strncpy(f, ResRef, 8); \
@@ -182,7 +182,6 @@ bool KeyImp::LoadResFile(const char* resfile)
 	FILE * exist = fopen(p, "rb"); \
 	if(exist) { \
 		fclose(exist); \
-		printBracket(foundMessage, LIGHT_GREEN); printf("\n"); \
 		return true; \
 	} \
 }
@@ -210,29 +209,21 @@ bool KeyImp::LoadResFile(const char* resfile)
 bool KeyImp::HasResource(const char* resname, SClass_ID type)
 {
 	char path[_MAX_PATH];
-	printMessage( "KEYImporter", "Searching for ", WHITE );
-	printf( "%.8s%s...", resname, core->TypeExt( type ) );
 	//Search it in the GemRB override Directory
 	PathJoin( path, "override", core->GameType, NULL ); //this shouldn't change
-	FindIn( core->CachePath, "", resname, type,
-		"Found in Cache" );
-	FindIn( core->GemRBPath, path, resname, type,
-		"Found in GemRB Override" );
-	FindIn( core->GamePath, core->GameOverride, resname, type,
-		"Found in Override" );
-	FindIn( core->GamePath, core->GameSounds, resname, type,
-		"Found in Sounds" );
-	FindIn( core->GamePath, core->GameScripts, resname, type,
-		"Found in Scripts" );
-	FindIn( core->GamePath, core->GamePortraits, resname, type,
-		"Found in Portraits" );
-	FindIn( core->GamePath, core->GameData, resname, type,
-		"Found in Data" );
+	FindIn( core->CachePath, "", resname, type);
+	FindIn( core->GemRBPath, path, resname, type);
+	FindIn( core->GamePath, core->GameOverride, resname, type);
+	FindIn( core->GamePath, core->GameSounds, resname, type);
+	FindIn( core->GamePath, core->GameScripts, resname, type);
+	FindIn( core->GamePath, core->GamePortraits, resname, type);
+	FindIn( core->GamePath, core->GameData, resname, type);
 	unsigned int ResLocator;
 	if (resources.Lookup( resname, type, ResLocator )) {
-		printStatus( "FOUND", LIGHT_GREEN );
 		return true;
 	}
+	printMessage( "KEYImporter", "Searching for ", WHITE );
+	printf( "%.8s%s...", resname, core->TypeExt( type ) );
 	printStatus( "NOT FOUND", YELLOW );
 	return false;
 }
