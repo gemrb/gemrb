@@ -21,7 +21,7 @@ def OnLoad():
 	GemRB.SetVar("LoadIdx",0)
 	GemRB.SetVar("TopIndex",0)
 
-	for i in range(0,5):
+	for i in range(5):
 		Button = GemRB.GetControl(LoadWindow,55+i)
 		GemRB.SetText(LoadWindow, Button, 15590)
 		GemRB.SetEvent(LoadWindow, Button, IE_GUI_BUTTON_ON_PRESS, "LoadGamePress")
@@ -58,7 +58,7 @@ def OnLoad():
 def ScrollBarPress():
 	#draw load game portraits
 	Pos = GemRB.GetVar("TopIndex")
-	for i in range(0,5):
+	for i in range(5):
 		ActPos = Pos + i
 
 		Button1 = GemRB.GetControl(LoadWindow,55+i)

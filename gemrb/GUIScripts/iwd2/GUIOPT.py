@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUIOPT.py,v 1.3 2005/06/04 18:38:13 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUIOPT.py,v 1.4 2007/02/04 19:24:28 avenger_teambg Exp $
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
 # Ingame options
@@ -24,6 +24,7 @@
 ###################################################
 import GemRB
 from GUIDefines import *
+from GUISAVE import *
 
 ###################################################
 OptionsWindow = None
@@ -110,9 +111,10 @@ def LoadGamePress():
 
 def SaveGamePress():
 	OpenOptionsWindow ()
-	GemRB.QuitGame ()
-	GemRB.SetNextScript ('GUISAVE')
-	return
+        GemRB.SetVar("QuitAfterSave",0)
+        OpenSaveWindow ()
+        #save the game without quitting
+        return
 
 def QuitGamePress():
 	OpenOptionsWindow ()
