@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.20 2007/01/28 15:56:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.h,v 1.21 2007/02/04 14:22:07 avenger_teambg Exp $
  *
  */
 
@@ -160,6 +160,8 @@ public:
 	char unknown3[80];
 
 	int version;
+	// the scripting name of the owner
+	ieVariable StoreOwner;
 
 public: //queries
 	int AcceptableItemType(ieDword type, ieDword invflags, bool pc) const;
@@ -175,6 +177,8 @@ public: //queries
 	void RemoveItem(unsigned int idx);
 	/** Returns index of item */
 	unsigned int FindItem(ieResRef item, bool usetrigger) const;
+	const char *GetOwner() const;
+	void SetOwner(const char* name);
 private:
 	/** Finds a mergeable item in the stock, if exact is set, it checks for usage counts too */
 	STOItem *FindItem(CREItem *item, bool exact);

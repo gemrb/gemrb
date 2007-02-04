@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.101 2007/01/31 18:55:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.102 2007/02/04 14:22:05 avenger_teambg Exp $
  *
  */
 
@@ -3879,7 +3879,7 @@ void GameScript::StartStore( Scriptable* Sender, Action* parameters)
 	if (core->GetCurrentStore() ) {
 		return;
 	}
-	core->SetCurrentStore( parameters->string0Parameter );
+	core->SetCurrentStore( parameters->string0Parameter, Sender->GetScriptName());
 	core->GetGUIScriptEngine()->RunFunction( "OpenStoreWindow" );
 	//sorry, i have absolutely no idea when i should do this :)
 	Sender->ReleaseCurrentAction();
@@ -4431,15 +4431,17 @@ void GameScript::ChangeStoreMarkup(Scriptable* /*Sender*/, Action* parameters)
 {
 	bool has_current = false;
 	ieResRef current;
+	ieVariable owner;
 
 	Store *store = core->GetCurrentStore();
 	if (!store) {
-		store = core->SetCurrentStore(parameters->string0Parameter);
+		store = core->SetCurrentStore(parameters->string0Parameter,NULL);
 	} else {
 		if (strnicmp(store->Name, parameters->string0Parameter, 8) ) {
 			//not the current store, we need some dirty hack
 			has_current = true;
 			strnlwrcpy(current, store->Name, 8);
+			strnuprcpy(owner, store->GetOwner(), 32);
 		}
 	}
 	store->BuyMarkup = parameters->int0Parameter;
@@ -4448,7 +4450,7 @@ void GameScript::ChangeStoreMarkup(Scriptable* /*Sender*/, Action* parameters)
 	store->DepreciationRate = parameters->int2Parameter;
 	if (has_current) {
 		//setting back old store (this will save our current store)
-		core->SetCurrentStore(current);
+		core->SetCurrentStore(current, owner);
 	}
 }
 

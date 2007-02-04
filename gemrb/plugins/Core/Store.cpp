@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.cpp,v 1.18 2007/01/28 15:56:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Store.cpp,v 1.19 2007/02/04 14:22:06 avenger_teambg Exp $
  *
  */
 
@@ -33,6 +33,7 @@ Store::Store(void)
 	drinks=NULL;
 	cures=NULL;
 	version=0;
+	StoreOwner[0]=0;
 }
 
 Store::~Store(void)
@@ -255,4 +256,14 @@ void Store::RemoveItem( unsigned int idx )
 	}
 	items.erase(items.begin()+idx);
 	ItemsCount--;
+}
+
+const char *Store::GetOwner() const
+{
+	return StoreOwner;
+}
+
+void Store::SetOwner(const char *name)
+{
+	strnuprcpy(StoreOwner, name, sizeof(StoreOwner));
 }

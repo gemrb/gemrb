@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.55 2007/01/30 19:55:58 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.56 2007/02/04 14:22:08 avenger_teambg Exp $
  *
  */
 
@@ -3289,7 +3289,7 @@ int fx_dontjump_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 // b9 see above: fx_hold_creature
 
-// 0xBa MoveToArea
+// 0xba MoveToArea
 int fx_move_to_area (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_move_to_area (%2d) %s", fx->Opcode, fx->Resource );
@@ -3299,7 +3299,7 @@ int fx_move_to_area (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-// 0xBB Variable:StoreLocalVariable
+// 0xbb Variable:StoreLocalVariable
 int fx_local_variable (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	//this is a hack, the variable name spreads across the resources
@@ -4159,6 +4159,7 @@ int fx_avatar_removal (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_avatar_removal (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	//FIXME: this is a permanent irreversible effect in IWD
 	//if it is different in bg2, then create another effect
+	//bg2 calls this SummonDisable
 	BASE_SET(IE_AVATARREMOVAL, 1);
 	return FX_NOT_APPLIED;
 }

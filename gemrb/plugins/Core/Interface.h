@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.218 2007/01/07 16:43:57 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.219 2007/02/04 14:22:06 avenger_teambg Exp $
  *
  */
 
@@ -534,7 +534,7 @@ public:
 	void SetCurrentContainer(Actor *actor, Container *arg, bool flag=false);
 	Store *GetCurrentStore();
 	int CloseCurrentStore();
-	Store *SetCurrentStore(const ieResRef resname);
+	Store *SetCurrentStore(const ieResRef resname, const ieVariable owner);
 	// FIXME: due to Win32 we have to allocate/release all common
 	// memory from Interface. Yes, it is ugly.
 	ITMExtHeader *GetITMExt(int count);

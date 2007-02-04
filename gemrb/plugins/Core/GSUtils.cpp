@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.80 2007/02/02 16:00:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.81 2007/02/04 14:22:05 avenger_teambg Exp $
  *
  */
 
@@ -207,16 +207,18 @@ bool StoreHasItemCore(ieResRef storename, ieResRef itemname)
 {
 	bool has_current=false;
 	ieResRef current;
+	ieVariable owner;
 	CREItem item;
 
 	Store *store = core->GetCurrentStore();
 	if (!store) {
-		store = core->SetCurrentStore(storename);
+		store = core->SetCurrentStore(storename, NULL);
 	} else {
 		if (strnicmp(store->Name, storename, 8) ) {
 			//not the current store, we need some dirty hack
 			has_current = true;
 			strnlwrcpy(current, store->Name, 8);
+			strnuprcpy(owner, store->GetOwner(), 32);
 		}
 	}
 	bool ret = false;
@@ -226,7 +228,7 @@ bool StoreHasItemCore(ieResRef storename, ieResRef itemname)
 	}
 	if (has_current) {
 		//setting back old store (this will save our current store)
-		core->SetCurrentStore(current);
+		core->SetCurrentStore(current, owner);
 	}
 	return ret;
 }

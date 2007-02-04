@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.160 2006/11/27 18:48:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.161 2007/02/04 14:22:05 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -103,7 +103,7 @@ void Scriptable::SetScriptName(const char* text)
 }
 
 /** Gets the DeathVariable */
-char* Scriptable::GetScriptName(void)
+const char* Scriptable::GetScriptName(void)
 {
 	 return scriptName;
 }

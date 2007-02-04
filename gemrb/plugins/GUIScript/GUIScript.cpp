@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.460 2007/02/03 14:31:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.461 2007/02/04 14:22:09 avenger_teambg Exp $
  *
  */
 
@@ -4578,7 +4578,7 @@ static PyObject* GemRB_EnterStore(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "s", &StoreResRef )) {
 		return AttributeError( GemRB_EnterStore__doc );
 	}
-	core->SetCurrentStore( StoreResRef );
+	core->SetCurrentStore( StoreResRef, NULL );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -7567,6 +7567,38 @@ static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_StealFailed__doc,
+"StealFailed()\n\n"
+"Sends the steal failed trigger (attacked) to the owner of the current store. "
+"The owner of the current store was set to the Sender of StartStore action.\n\n");
+
+static PyObject* GemRB_StealFailed(PyObject * /*self*/, PyObject* /*args*/)
+{
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Store *store = core->GetCurrentStore();
+	if (!store) {
+		return RuntimeError( "No store loaded!" );
+	}
+	Map *map = game->GetCurrentArea();
+	if (!map) {
+		return RuntimeError( "No area loaded!" );
+	}
+	Actor* owner = map->GetActor( store->GetOwner() );
+	if (!owner) {
+		return RuntimeError( "No owner found!" );
+	}
+	Actor* attacker = game->GetPC(game->GetSelectedPCSingle(), false);
+	if (!attacker) {
+		return RuntimeError( "No thief found!" );
+	}
+	owner->LastAttacker = attacker->GetID();
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 static PyMethodDef GemRBMethods[] = {
 	METHOD(SetInfoTextColor, METH_VARARGS),
 	METHOD(HideGUI, METH_NOARGS),
@@ -7784,6 +7816,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(HasSpecialItem, METH_VARARGS),
 	METHOD(HasSpecialSpell, METH_VARARGS),
 	METHOD(ApplyEffect, METH_VARARGS),
+	METHOD(StealFailed, METH_NOARGS),
 	// terminating entry
 	{NULL, NULL, 0, NULL}
 };
