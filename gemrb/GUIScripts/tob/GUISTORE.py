@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUISTORE.py,v 1.33 2007/02/04 18:06:56 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUISTORE.py,v 1.34 2007/02/04 21:35:23 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -862,7 +862,7 @@ def StealPressed ():
 	if failure:
 		GemRB.StealFailed ()
 	else:
-		GemRB.ChangeStoreItem (pc, inventory_slots[LeftIndex], SHOP_STEAL)
+		GemRB.ChangeStoreItem (pc, LeftIndex, SHOP_STEAL)
 	UpdateStoreStealWindow ()
 
 
@@ -940,6 +940,10 @@ def RedrawStoreStealWindow ():
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_NAND)
 			GemRB.SetText (Window, Label, "")
+	if LeftIndex>=0:
+		GemRB.SetButtonState (Window, LeftButton, IE_GUI_BUTTON_ENABLED)
+	else:
+		GemRB.SetButtonState (Window, LeftButton, IE_GUI_BUTTON_DISABLED)
 
 
 def UpdateStoreDonateWindow ():

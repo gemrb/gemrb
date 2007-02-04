@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUISTORE.py,v 1.21 2007/02/04 18:06:55 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUISTORE.py,v 1.22 2007/02/04 21:35:23 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -611,10 +611,8 @@ def RedrawStoreShoppingWindow ():
 			if Flags & SHOP_BUY:
 				if Flags & SHOP_SELECT:
 					GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SELECTED)
-					print "Enabled",i+LeftTopIndex
 				else:
 					GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
-					print "disabled",i+LeftTopIndex
 			else:
 				GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
 
@@ -853,7 +851,6 @@ def UpdateStoreStealWindow ():
 	ScrollBar = GemRB.GetControl (Window, 10)
 	GemRB.SetVarAssoc (Window, ScrollBar, "RightTopIndex", RightCount-3)
 	GemRB.SetVar ("LeftIndex", -1)
-	GemRB.SetButtonState (Window, LeftButton, IE_GUI_BUTTON_DISABLED)
 	RedrawStoreStealWindow ()
 
 
@@ -861,13 +858,14 @@ def StealPressed ():
 	Window = StoreShoppingWindow
 
 	LeftIndex = GemRB.GetVar ("LeftIndex")
+	print LeftIndex
 	pc = GemRB.GameGetSelectedPCSingle ()
 	#skill check, if fails
 	failure = 0
 	if failure:
 		GemRB.StealFailed ()
 	else:
-		GemRB.ChangeStoreItem (pc, inventory_slots[LeftIndex], SHOP_STEAL)
+		GemRB.ChangeStoreItem (pc, LeftIndex, SHOP_STEAL)
 	UpdateStoreStealWindow ()
 
 
@@ -896,10 +894,8 @@ def RedrawStoreStealWindow ():
 			if Flags & SHOP_STEAL:
 				if LeftIndex == LeftTopIndex + i:
 					GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SELECTED)
-					print "Selectbutton", i+LeftTopIndex
 				else:
 					GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
-					print "disabletbutton", i+LeftTopIndex
 			else:
 				GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
 
@@ -947,6 +943,10 @@ def RedrawStoreStealWindow ():
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_NAND)
 			GemRB.SetText (Window, Label, "")
+	if LeftIndex>=0:
+		GemRB.SetButtonState (Window, LeftButton, IE_GUI_BUTTON_ENABLED)
+	else:
+		GemRB.SetButtonState (Window, LeftButton, IE_GUI_BUTTON_DISABLED)
 
 
 def UpdateStoreDonateWindow ():
