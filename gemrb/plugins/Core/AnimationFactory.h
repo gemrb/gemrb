@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationFactory.h,v 1.6 2006/03/29 17:58:54 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationFactory.h,v 1.7 2007/02/04 15:50:00 wjpalenstijn Exp $
  *
  */
 
@@ -43,18 +43,23 @@ private:
 	std::vector< Sprite2D*> frames;
 	std::vector< CycleEntry> cycles;
 	unsigned short* FLTable;	// Frame Lookup Table
+	const unsigned char* FrameData;
 public:
 	AnimationFactory(const char* ResRef);
 	~AnimationFactory(void);
 	void AddFrame(Sprite2D* frame);
 	void AddCycle(CycleEntry cycle);
 	void LoadFLT(unsigned short* buffer, int count);
+	void SetFrameData(const unsigned char* FrameData);
 	Animation* GetCycle(unsigned char cycle);
 	/** No descriptions */
 	Sprite2D* GetFrame(unsigned short index, unsigned char cycle=0);
+	Sprite2D* GetFrameWithoutCycle(unsigned short index);
 	size_t GetCycleCount() { return cycles.size(); }
 	size_t GetFrameCount() { return frames.size(); }
 	int GetCycleSize(int idx) { return cycles[idx].FramesCount; }
+	Sprite2D* GetPaperdollImage(ieDword *Colors, Sprite2D *&Picture2,
+								unsigned int type);
 };
 
 #endif

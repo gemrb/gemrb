@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.h,v 1.21 2006/12/03 20:37:56 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.h,v 1.22 2007/02/04 15:50:00 wjpalenstijn Exp $
  *
  */
 
@@ -47,8 +47,11 @@ private:
 	Palette* palette;
 	ieByte CompressedColorIndex;
 	ieDword FramesOffset, PaletteOffset, FLTOffset;
+	unsigned long DataStart;
 private:
-	void* GetFramePixels(unsigned short findex, unsigned char* RLEinpix=0);
+	Sprite2D* GetFrameInternal(unsigned short findex, unsigned char mode,
+							   bool BAMsprite, const unsigned char* data);
+	void* GetFramePixels(unsigned short findex);
 	ieWord * CacheFLT(unsigned int &count);
 public:
 	BAMImp(void);
@@ -64,9 +67,6 @@ public:
 	/** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
 	If the Global Animation Palette is NULL, returns NULL. */
 	Sprite2D* GetPalette();
-	/** Returns a paperdoll BAM as image */
-	Sprite2D* GetPaperdollImage(ieDword *Colors, Sprite2D *& Picture2,
-		unsigned int type);
 
 	/** Gets a Pixel Index from the Image, unused */
 	unsigned int GetPixelIndex(unsigned int /*x*/, unsigned int /*y*/)

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.51 2006/12/28 11:05:41 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.52 2007/02/04 15:50:00 wjpalenstijn Exp $
  *
  */
 
@@ -115,12 +115,15 @@ bool BAMImp::Open(DataStream* stream, bool autoFree)
 	str->ReadDword( &FLTOffset );
 	str->Seek( FramesOffset, GEM_STREAM_START );
 	frames = new FrameEntry[FramesCount];
+	DataStart = str->Size();
 	for (i = 0; i < FramesCount; i++) {
 		str->ReadWord( &frames[i].Width );
 		str->ReadWord( &frames[i].Height );
 		str->ReadWord( &frames[i].XPos );
 		str->ReadWord( &frames[i].YPos );
 		str->ReadDword( &frames[i].FrameData );
+		if ((frames[i].FrameData & 0x7FFFFFFF) < DataStart)
+			DataStart = (frames[i].FrameData & 0x7FFFFFFF);
 	}
 	cycles = new CycleEntry[CyclesCount];
 	for (i = 0; i < CyclesCount; i++) {
@@ -138,6 +141,7 @@ bool BAMImp::Open(DataStream* stream, bool autoFree)
 		palette->col[i].b = rc.b;
 		palette->col[i].a = rc.a;
 	}
+
 	return true;
 }
 
@@ -166,56 +170,60 @@ Sprite2D* BAMImp::GetFrameFromCycle(unsigned char Cycle, unsigned short frame)
 	return GetFrame( findex );
 }
 
-Sprite2D* BAMImp::GetFrame(unsigned short findex, unsigned char mode)
+Sprite2D* BAMImp::GetFrameInternal(unsigned short findex, unsigned char mode,
+								   bool BAMsprite, const unsigned char* data)
 {
-	if (findex >= FramesCount) {
-		findex = cycles[0].FirstFrame;
-	}
 	Sprite2D* spr = 0;
-	unsigned char* RLEinpix = 0;
-	void* pixels = 0;
-#if 1
-	bool RLECompressed = ( ( frames[findex].FrameData & 0x80000000 ) == 0 );
-	unsigned long RLESize = 0;
-	if (RLECompressed) {
-		// FIXME: get the real size of the RLE data somehow, or cache
-		// the entire BAM in memory consecutively
-		RLESize = ( unsigned long )
-			( frames[findex].Width * frames[findex].Height * 3 ) / 2 + 1;
-		//without partial reads, we should be careful
-		str->Seek( ( frames[findex].FrameData & 0x7FFFFFFF ), GEM_STREAM_START );
-		unsigned long remains = str->Remains();
-		if (RLESize > remains) {
-			RLESize = remains;
-		}
-		RLEinpix = (unsigned char*)malloc( RLESize );
-		if (str->Read( RLEinpix, RLESize ) == GEM_ERROR) {
-			free( RLEinpix );
-			return NULL;
-		}
 
-		spr = core->GetVideoDriver()->CreateSpriteBAM8(frames[findex].Width,
-													   frames[findex].Height,
-													   true,
-													   RLEinpix, RLESize,
-													   palette,
-													   CompressedColorIndex);
-		//don't free RLEinpix, createsprite stores it if it was successful
+	if (BAMsprite) {
+		bool RLECompressed = (frames[findex].FrameData & 0x80000000) == 0;
+		if (data) {
+			const unsigned char* framedata = data;
+			framedata += (frames[findex].FrameData & 0x7FFFFFFF) - DataStart;
+			if (RLECompressed) {
+				spr = core->GetVideoDriver()->CreateSpriteBAM8(
+					frames[findex].Width, frames[findex].Height,
+					true, framedata, 0, palette, CompressedColorIndex);
+			} else {
+				spr = core->GetVideoDriver()->CreateSpriteBAM8(
+					frames[findex].Width, frames[findex].Height, false,
+					framedata, 0, palette, CompressedColorIndex );
+			}
+		} else {
+			if (RLECompressed) {
+				// FIXME: get the real size of the RLE data somehow, or cache
+				// the entire BAM in memory consecutively
+				unsigned long RLESize =
+				( frames[findex].Width * frames[findex].Height * 3 ) / 2 + 1;
+				//without partial reads, we should be careful
+				str->Seek( ( frames[findex].FrameData & 0x7FFFFFFF ), GEM_STREAM_START );
+				unsigned long remains = str->Remains();
+				if (RLESize > remains) {
+					RLESize = remains;
+				}
+				unsigned char* RLEinpix = (unsigned char*)malloc( RLESize );
+				if (str->Read( RLEinpix, RLESize ) == GEM_ERROR) {
+					free( RLEinpix );
+					return NULL;
+				}
+
+				spr = core->GetVideoDriver()->CreateSpriteBAM8(
+					frames[findex].Width, frames[findex].Height,
+					true, RLEinpix, RLESize, palette, CompressedColorIndex);
+			} else {
+				const unsigned char* pixels;
+				pixels = (const unsigned char*)GetFramePixels(findex);
+				spr = core->GetVideoDriver()->CreateSpriteBAM8(
+					frames[findex].Width, frames[findex].Height, false,
+					pixels, frames[findex].Width*frames[findex].Height, 
+					palette, CompressedColorIndex );
+			}
+		}
 	} else {
 		void* pixels = GetFramePixels(findex);
-		spr = core->GetVideoDriver()->CreateSpriteBAM8(
-			frames[findex].Width, frames[findex].Height, false,
-			pixels, frames[findex].Width*frames[findex].Height, 
-			palette, CompressedColorIndex );
-	}
-#endif
-	if (!spr) {
-		if (!pixels)
-			pixels = GetFramePixels(findex, RLEinpix);
 		spr = core->GetVideoDriver()->CreateSprite8(
 			frames[findex].Width, frames[findex].Height, 8,
 			pixels, palette->col, true, 0 );
-		//don't free pixels, createsprite stores it
 	}
 
 	spr->XPos = (ieWordSigned)frames[findex].XPos;
@@ -230,7 +238,17 @@ Sprite2D* BAMImp::GetFrame(unsigned short findex, unsigned char mode)
 	return spr;
 }
 
-void* BAMImp::GetFramePixels(unsigned short findex, unsigned char* RLEinpix)
+Sprite2D* BAMImp::GetFrame(unsigned short findex, unsigned char mode)
+{
+	if (findex >= FramesCount) {
+		findex = cycles[0].FirstFrame;
+	}
+	bool videoBAMsupport = core->GetVideoDriver()->SupportsBAMSprites();
+
+	return GetFrameInternal(findex, mode, videoBAMsupport, 0);
+}
+
+void* BAMImp::GetFramePixels(unsigned short findex)
 {
 	if (findex >= FramesCount) {
 		findex = cycles[0].FirstFrame;
@@ -249,13 +267,11 @@ void* BAMImp::GetFramePixels(unsigned short findex, unsigned char* RLEinpix)
 		if (RLESize > remains) {
 			RLESize = remains;
 		}
-		unsigned char* inpix = RLEinpix;
-		if (!inpix) {
-			inpix = (unsigned char*)malloc( RLESize );
-			if (str->Read( inpix, RLESize ) == GEM_ERROR) {
-				free( inpix );
-				return NULL;
-			}
+		unsigned char* inpix;
+		inpix = (unsigned char*)malloc( RLESize );
+		if (str->Read( inpix, RLESize ) == GEM_ERROR) {
+			free( inpix );
+			return NULL;
 		}
 		unsigned char * p = inpix;
 		unsigned char * Buffer = (unsigned char*)pixels;
@@ -310,51 +326,35 @@ ieWord * BAMImp::CacheFLT(unsigned int &count)
 
 AnimationFactory* BAMImp::GetAnimationFactory(const char* ResRef, unsigned char mode)
 {
-	unsigned int i;
-	unsigned int count;
-	Point translation; //x = original frame index, y = new frame index
-
-	translation.y = 0;
+	unsigned int i, count;
 	AnimationFactory* af = new AnimationFactory( ResRef );
 	ieWord *FLT = CacheFLT( count );
-	ieWord *NewFLT = (ieWord*) malloc( count * sizeof( ieWord ));
 
-	CycleEntry newcycle={0,0};
-	std::vector<Point> indices; //this stores the duplicate frame indices
-	for (i = 0; i < CyclesCount; i++) {
-		unsigned int ff = cycles[i].FirstFrame;
-		unsigned int lf = ff + cycles[i].FramesCount;
-		newcycle.FramesCount=0;
-		for (unsigned int f = ff; f < lf; f++) {
-			translation.x = FLT[f];
+	bool videoBAMsupport = core->GetVideoDriver()->SupportsBAMSprites();
+	unsigned char* data = NULL;
 
-			// looking for duplicate frames
-			bool found = false;
-			for (unsigned int k = 0; k < indices.size(); k++) {
-				if (indices[k].x == translation.x) {
-					found = true;
-					NewFLT[newcycle.FirstFrame+newcycle.FramesCount] = indices[k].y;
-					newcycle.FramesCount++;
-					break;
-				}
-			}
-			if (found) continue;
-
-			//not found a duplicate, we take the original
-			indices.push_back( translation );
-			af->AddFrame( GetFrame( translation.x, mode ) );
-			NewFLT[newcycle.FirstFrame+newcycle.FramesCount] = translation.y;
-			translation.y++;
-			newcycle.FramesCount++;
-		}
-		af->AddCycle( newcycle );
-		newcycle.FirstFrame+=newcycle.FramesCount;
+	if (videoBAMsupport) {
+		str->Seek( DataStart, GEM_STREAM_START );
+		unsigned long length = str->Remains();
+		if (length == 0) return af;
+		data = new unsigned char[length];
+		str->Read( data, length );
+		af->SetFrameData(data);
 	}
-	af->LoadFLT( NewFLT, newcycle.FirstFrame);
-	free( FLT );
-	free( NewFLT );
+
+	for (i = 0; i < FramesCount; ++i) {
+		Sprite2D* frame = GetFrameInternal( i, mode, videoBAMsupport, data );
+		assert(frame->BAM);
+		af->AddFrame(frame);
+	}
+	for (i = 0; i < CyclesCount; ++i) {
+		af->AddCycle( cycles[i] );
+	}
+	af->LoadFLT ( FLT, count );
+	free (FLT);
 	return af;
 }
+
 /** This function will load the Animation as a Font */
 Font* BAMImp::GetFont()
 {
@@ -427,33 +427,4 @@ Sprite2D* BAMImp::GetPalette()
 		*p++ = ( unsigned char ) i;
 	}
 	return core->GetVideoDriver()->CreateSprite8( 16, 16, 8, pixels, palette->col, false );
-}
-
-
-Sprite2D* BAMImp::GetPaperdollImage(ieDword *Colors, Sprite2D *&Picture2,
-									unsigned int type)
-{
-	if (FramesCount<2) {
-		return NULL;
-	}
-	if (Colors) {
-		palette->SetupPaperdollColours(Colors, type);
-	}
-
-	void *pixels = GetFramePixels(1);
-	Picture2 = core->GetVideoDriver()->CreateSprite8(frames[1].Width, frames[1].Height, 8, pixels, palette->col, true, 0 );
-
-	fprintf(stderr, "Paperdoll Image:\nPicture1: %dx%d, x: %d, y: %d\nPicture2: %dx%d, x: %d, y:%d\n", frames[0].Width, frames[0].Height, frames[0].XPos, frames[0].YPos, frames[1].Width, frames[1].Height, frames[1].XPos, frames[1].YPos);
-
-	Picture2->XPos = (short)frames[1].XPos;
-	Picture2->YPos = (short)frames[1].YPos - 80;
-
-	pixels = GetFramePixels(0);
-	Sprite2D* spr = core->GetVideoDriver()->CreateSprite8(frames[0].Width, frames[0].Height, 8, pixels, palette->col, true, 0 );
-	spr->XPos = (short)frames[0].XPos;
-	spr->YPos = (short)frames[0].YPos;
-
-	//don't free pixels, createsprite stores it in spr
-
-	return spr;
 }

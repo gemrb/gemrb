@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ControlAnimation.cpp,v 1.6 2006/08/11 23:17:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ControlAnimation.cpp,v 1.7 2007/02/04 15:50:00 wjpalenstijn Exp $
  *
  */
 
@@ -35,28 +35,12 @@ ControlAnimation::ControlAnimation(Control* ctl, ieResRef ResRef)
 	frame = 0;
 	anim_phase = 0;
 
-
-	DataStream* str = core->GetResourceMgr()->GetResource( ResRef, IE_BAM_CLASS_ID );
-	if (str == NULL) {
+	bam = ( AnimationFactory* )
+		core->GetResourceMgr()->GetFactoryResource( ResRef,
+													IE_BAM_CLASS_ID,
+													IE_NORMAL );
+	if (! bam)
 		return;
-	}
-
-	AnimationMgr* am = ( AnimationMgr* )core->GetInterface( IE_BAM_CLASS_ID );
-	if (am == NULL) {
-		delete ( str );
-		return;
-	}
-
-	if (!am->Open( str, true )) {
-		core->FreeInterface( am );
-		return;
-	}
-
-	bam = am->GetAnimationFactory( ResRef, 0 );
-	core->FreeInterface( am );
-	if (! bam) {
-		return;
-	}
 
 	control = ctl;
 	control->animation = this;
@@ -67,8 +51,8 @@ ControlAnimation::~ControlAnimation(void)
 {
 	//removing from timer first
 	core->timer->RemoveAnimation( this );
-	//destructing ourselves
-	if (bam) delete bam;
+
+	bam = NULL;
 }
 
 void ControlAnimation::UpdateAnimation(void)

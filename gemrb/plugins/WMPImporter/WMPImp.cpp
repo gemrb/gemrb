@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.20 2006/01/05 14:14:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/WMPImporter/WMPImp.cpp,v 1.21 2007/02/04 15:50:02 wjpalenstijn Exp $
  *
  */
 
@@ -106,12 +106,12 @@ void WMPImp::GetWorldMap(WorldMap *m, unsigned int index)
 	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
 		printMessage( "WMPImporter","No BAM Importer Available.\n", LIGHT_RED );
 	} else {
-		AnimationMgr* icon = ( AnimationMgr* ) core->GetInterface( IE_BAM_CLASS_ID );
-		DataStream* iconfile = core->GetResourceMgr()->GetResource( m->MapIconResRef, IE_BAM_CLASS_ID );
-		if (icon->Open( iconfile, true )) {
-			m->SetMapIcons( icon->GetAnimationFactory( m->MapIconResRef, 0 ) );
-		}
-		core->FreeInterface( icon );
+		AnimationFactory* af = ( AnimationFactory* )
+			core->GetResourceMgr()->GetFactoryResource( m->MapIconResRef,
+														IE_BAM_CLASS_ID,
+														IE_NORMAL );
+		if (af)
+			m->SetMapIcons( af );
 	}
 
 	str->Seek( m->AreaEntriesOffset, GEM_STREAM_START );

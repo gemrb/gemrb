@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationFactory.cpp,v 1.12 2005/11/24 17:44:08 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationFactory.cpp,v 1.13 2007/02/04 15:50:00 wjpalenstijn Exp $
  *
  */
 
@@ -30,6 +30,7 @@ AnimationFactory::AnimationFactory(const char* ResRef)
 	: FactoryObject( ResRef, IE_BAM_CLASS_ID )
 {
 	FLTable = NULL;
+	FrameData = NULL;
 }
 
 AnimationFactory::~AnimationFactory(void)
@@ -37,9 +38,9 @@ AnimationFactory::~AnimationFactory(void)
 	for (unsigned int i = 0; i < frames.size(); i++) {
 		core->GetVideoDriver()->FreeSprite( frames[i] );
 	}
-	if (FLTable) {
-		free( FLTable );
-	}
+	delete[] FLTable;
+	// TODO: add assert here on refcount (which needs to be added...)
+	delete[] FrameData;
 }
 
 void AnimationFactory::AddFrame(Sprite2D* frame)
@@ -57,9 +58,15 @@ void AnimationFactory::LoadFLT(unsigned short* buffer, int count)
 	if (FLTable) {
 		free( FLTable );
 	}
-	FLTable = ( unsigned short * ) malloc( count * sizeof( unsigned short ) );
+	FLTable = new unsigned short[count];
 	memcpy( FLTable, buffer, count * sizeof( unsigned short ) );
 }
+
+void AnimationFactory::SetFrameData(const unsigned char* FrameData)
+{
+	this->FrameData = FrameData;
+}
+
 
 Animation* AnimationFactory::GetCycle(unsigned char cycle)
 {
@@ -85,5 +92,54 @@ Sprite2D* AnimationFactory::GetFrame(unsigned short index, unsigned char cycle)
 	if(index >= fc) {
 		return NULL;
 	}
-	return frames[FLTable[ff+index]];
+	Sprite2D* spr = frames[FLTable[ff+index]];
+	spr->RefCount++;
+	return spr;
+}
+
+Sprite2D* AnimationFactory::GetFrameWithoutCycle(unsigned short index)
+{
+	if(index >= frames.size()) {
+		return NULL;
+	}
+	Sprite2D* spr = frames[index];
+	spr->RefCount++;
+	return spr;
+}
+
+Sprite2D* AnimationFactory::GetPaperdollImage(ieDword *Colors,
+											  Sprite2D *&Picture2,
+											  unsigned int type)
+{
+	if (frames.size()<2) {
+		return NULL;
+	}
+
+	Video* video = core->GetVideoDriver();
+	Picture2 = video->DuplicateSprite(frames[1]);
+	if (Colors) {
+		Palette* palette = video->GetPalette(Picture2);
+		palette->SetupPaperdollColours(Colors, type);
+		video->SetPalette(Picture2, palette);
+		palette->Release();
+	}
+
+	Picture2->XPos = (short)frames[1]->XPos;
+	Picture2->YPos = (short)frames[1]->YPos - 80;
+
+
+	Sprite2D* spr = core->GetVideoDriver()->DuplicateSprite(frames[0]);
+	if (Colors) {
+		Palette* palette = video->GetPalette(spr);
+		palette->SetupPaperdollColours(Colors, type);
+		video->SetPalette(spr, palette);
+		palette->Release();
+	}
+
+	spr->XPos = (short)frames[0]->XPos;
+	spr->YPos = (short)frames[0]->YPos;
+
+	//don't free pixels, createsprite stores it in spr
+
+	return spr;
 }

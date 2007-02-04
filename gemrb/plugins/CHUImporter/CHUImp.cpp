@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.54 2006/08/20 10:37:07 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CHUImporter/CHUImp.cpp,v 1.55 2007/02/04 15:50:00 wjpalenstijn Exp $
  *
  */
 
@@ -168,34 +168,36 @@ Window* CHUImp::GetWindow(unsigned int wid)
 						break;
 					}
 				}
-				AnimationMgr* bam = ( AnimationMgr* )
-					core->GetInterface( IE_BAM_CLASS_ID );
-				DataStream* s = core->GetResourceMgr()->GetResource( BAMFile, IE_BAM_CLASS_ID );
-				if (!s ) {
+				AnimationFactory* bam = ( AnimationFactory* )
+					core->GetResourceMgr()->GetFactoryResource( BAMFile,
+															IE_BAM_CLASS_ID,
+															IE_NORMAL );
+				if (!bam ) {
 					printf( "[CHUImporter]: Cannot Load Button Images, skipping control\n" );
-					/* IceWind Dale 2 has fake BAM ResRefs for some Buttons, this will handle bad ResRefs */
-					core->FreeInterface( bam );
+					/* IceWind Dale 2 has fake BAM ResRefs for some Buttons,
+					   this will handle bad ResRefs */
 					win->AddControl( btn );
 					break;
 				}
-				bam->Open( s, true );
 				/** Cycle is only a byte for buttons */
-				Sprite2D* tspr = bam->GetFrameFromCycle( (unsigned char) Cycle, UnpressedIndex );
+				Sprite2D* tspr = bam->GetFrame( UnpressedIndex,
+												(unsigned char) Cycle );
 				btn->SetImage( IE_GUI_BUTTON_UNPRESSED, tspr );
-				tspr = bam->GetFrameFromCycle( (unsigned char) Cycle, PressedIndex );
+				tspr = bam->GetFrame( PressedIndex, (unsigned char) Cycle );
 				btn->SetImage( IE_GUI_BUTTON_PRESSED, tspr );
 				//ignorebuttonframes is a terrible hack
 				if (core->HasFeature( GF_IGNORE_BUTTON_FRAMES) ) {
-					if (bam->GetCycleSize( (unsigned char) Cycle) == 4 ) SelectedIndex=2;
+					if (bam->GetCycleSize( (unsigned char) Cycle) == 4 )
+						SelectedIndex=2;
 				}
-				tspr = bam->GetFrameFromCycle( (unsigned char) Cycle, SelectedIndex );
+				tspr = bam->GetFrame( SelectedIndex, (unsigned char) Cycle );
 				btn->SetImage( IE_GUI_BUTTON_SELECTED, tspr );
 				if (core->HasFeature( GF_IGNORE_BUTTON_FRAMES) ) {
-					if (bam->GetCycleSize( (unsigned char) Cycle) == 4 ) DisabledIndex=3;
+					if (bam->GetCycleSize( (unsigned char) Cycle) == 4 )
+						DisabledIndex=3;
 				}
-				tspr = bam->GetFrameFromCycle( (unsigned char) Cycle, DisabledIndex );
+				tspr = bam->GetFrame( DisabledIndex, (unsigned char) Cycle );
 				btn->SetImage( IE_GUI_BUTTON_DISABLED, tspr );
-				core->FreeInterface( bam );
 				win->AddControl( btn );
 			}
 			break;
@@ -291,19 +293,19 @@ Window* CHUImp::GetWindow(unsigned int wid)
 				sldr->SetImage( IE_GUI_SLIDER_BACKGROUND, img);
 				core->FreeInterface( mos );
 
-				AnimationMgr* bam = ( AnimationMgr* )
-					core->GetInterface( IE_BAM_CLASS_ID );
-				s = core->GetResourceMgr()->GetResource( BAMFile, IE_BAM_CLASS_ID );
-				if( bam->Open( s, true ) ) {
-					img = bam->GetFrameFromCycle(0, Knob );
+				AnimationFactory* bam = ( AnimationFactory* )
+					core->GetResourceMgr()->GetFactoryResource( BAMFile,
+															IE_BAM_CLASS_ID,
+															IE_NORMAL );
+				if( bam ) {
+					img = bam->GetFrame( Knob, 0 );
 					sldr->SetImage( IE_GUI_SLIDER_KNOB, img );
-					img = bam->GetFrameFromCycle(0, GrabbedKnob );
+					img = bam->GetFrame( GrabbedKnob, 0 );
 					sldr->SetImage( IE_GUI_SLIDER_GRABBEDKNOB, img );
 				}
 				else {
 					 sldr->SetState(IE_GUI_SLIDER_BACKGROUND);
 				}
-				core->FreeInterface( bam );
 				win->AddControl( sldr );
 			}
 			break;
@@ -323,16 +325,17 @@ Window* CHUImp::GetWindow(unsigned int wid)
 				str->ReadWord( &maxInput );
 				Font* fnt = core->GetFont( FontResRef );
 
-				AnimationMgr* bam = ( AnimationMgr* )
-					core->GetInterface( IE_BAM_CLASS_ID );
-				DataStream* ds = core->GetResourceMgr()->GetResource( CursorResRef, IE_BAM_CLASS_ID );
-				bam->Open( ds, true );
-				Sprite2D *cursor = bam->GetFrameFromCycle( 0,0 );
-				core->FreeInterface( bam );
+				AnimationFactory* bam = ( AnimationFactory* )
+					core->GetResourceMgr()->GetFactoryResource( CursorResRef,
+															IE_BAM_CLASS_ID,
+															IE_NORMAL );
+				Sprite2D *cursor = NULL;
+				if (bam)
+					cursor = bam->GetFrame( 0,0 );
 
 				ImageMgr* mos = ( ImageMgr* )
 					core->GetInterface( IE_MOS_CLASS_ID );
-				ds = core->GetResourceMgr()->GetResource( BGMos, IE_MOS_CLASS_ID );
+				DataStream* ds = core->GetResourceMgr()->GetResource( BGMos, IE_MOS_CLASS_ID );
 				Sprite2D *img = NULL;
 				if(mos->Open( ds, true ) ) {
 					img = mos->GetImage();
@@ -469,23 +472,25 @@ endalign:
 				sbar->Width = Width;
 				sbar->Height = Height;
 				sbar->ControlType = ControlType;
-				AnimationMgr* bam = ( AnimationMgr* )
-					core->GetInterface( IE_BAM_CLASS_ID );
-				DataStream *ds = core->GetResourceMgr()->GetResource( BAMResRef, IE_BAM_CLASS_ID);
-				bam->Open( ds, true );
-				sbar->SetImage( IE_GUI_SCROLLBAR_UP_UNPRESSED,
-					bam->GetFrameFromCycle( Cycle, UpUnPressed ) );
-				sbar->SetImage( IE_GUI_SCROLLBAR_UP_PRESSED,
-					bam->GetFrameFromCycle( Cycle, UpPressed ) );
-				sbar->SetImage( IE_GUI_SCROLLBAR_DOWN_UNPRESSED,
-					bam->GetFrameFromCycle( Cycle, DownUnPressed ) );
-				sbar->SetImage( IE_GUI_SCROLLBAR_DOWN_PRESSED,
-					bam->GetFrameFromCycle( Cycle, DownPressed ) );
-				sbar->SetImage( IE_GUI_SCROLLBAR_TROUGH,
-					bam->GetFrameFromCycle( Cycle, Trough ) );
-				sbar->SetImage( IE_GUI_SCROLLBAR_SLIDER,
-					bam->GetFrameFromCycle( Cycle, Slider ) );
-				core->FreeInterface( bam );
+
+				AnimationFactory* bam = ( AnimationFactory* )
+					core->GetResourceMgr()->GetFactoryResource( BAMResRef,
+															IE_BAM_CLASS_ID,
+															IE_NORMAL );
+				if (bam) {
+					sbar->SetImage( IE_GUI_SCROLLBAR_UP_UNPRESSED,
+									bam->GetFrame( UpUnPressed, Cycle ) );
+					sbar->SetImage( IE_GUI_SCROLLBAR_UP_PRESSED,
+									bam->GetFrame( UpPressed, Cycle ) );
+					sbar->SetImage( IE_GUI_SCROLLBAR_DOWN_UNPRESSED,
+									bam->GetFrame( DownUnPressed, Cycle ) );
+					sbar->SetImage( IE_GUI_SCROLLBAR_DOWN_PRESSED,
+									bam->GetFrame( DownPressed, Cycle ) );
+					sbar->SetImage( IE_GUI_SCROLLBAR_TROUGH,
+									bam->GetFrame( Trough, Cycle ) );
+					sbar->SetImage( IE_GUI_SCROLLBAR_SLIDER,
+									bam->GetFrame( Slider, Cycle ) );
+				}
 				win->AddControl( sbar );
 				if (TAID != 0xffff)
 					win->Link( ( unsigned short ) ControlID, TAID );

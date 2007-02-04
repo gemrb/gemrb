@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.26 2006/12/28 17:45:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/WorldMap.cpp,v 1.27 2007/02/04 15:50:01 wjpalenstijn Exp $
  *
  */
 
@@ -189,14 +189,11 @@ WorldMap::~WorldMap(void)
 	if (GotHereFrom) {
 		free(GotHereFrom);
 	}
-	if (bam) delete bam;
+	if (bam) bam = NULL;
 }
 
 void WorldMap::SetMapIcons(AnimationFactory *newicons)
 {
-	if (bam) {
-		delete bam;
-	}
 	bam = newicons;
 }
 void WorldMap::SetMapMOS(Sprite2D *newmos)

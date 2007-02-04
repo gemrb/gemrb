@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.303 2007/01/07 14:35:10 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.304 2007/02/04 15:50:01 wjpalenstijn Exp $
  */
 
 #ifndef WIN32
@@ -24,7 +24,6 @@
 #include "../../includes/win32def.h"
 #include "GameControl.h"
 #include "Interface.h"
-#include "AnimationMgr.h"
 #include "DialogMgr.h"
 #include "../../includes/strrefs.h"
 #include "Effect.h"

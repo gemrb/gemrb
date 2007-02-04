@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.155 2007/01/31 21:44:11 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.156 2007/02/04 15:50:02 wjpalenstijn Exp $
  *
  */
 
@@ -523,7 +523,7 @@ Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, int bpp, void* pixels,
 }
 
 Sprite2D* SDLVideoDriver::CreateSpriteBAM8(int w, int h, bool rle,
-										   void* pixeldata,
+										   const unsigned char* pixeldata,
 										   unsigned int datasize,
 										   Palette* palette, int transindex)
 {
@@ -540,7 +540,7 @@ Sprite2D* SDLVideoDriver::CreateSpriteBAM8(int w, int h, bool rle,
 	data->flip_ver = false;
 	data->RLE = rle;
 
-	spr->pixels = pixeldata;
+	spr->pixels = (const void*)pixeldata;
 	spr->Width = w;
 	spr->Height = h;
 	spr->Bpp = 8; // FIXME!!!!
@@ -552,10 +552,17 @@ void SDLVideoDriver::FreeSprite(Sprite2D*& spr)
 {
 	if(!spr)
 		return;
+	assert(spr->RefCount > 0);
+	if (--spr->RefCount > 0) {
+		spr = NULL;
+		return;
+	}
 
 	if (spr->BAM) {
 		if (spr->vptr) {
 			Sprite2D_BAM_Internal* tmp = (Sprite2D_BAM_Internal*)spr->vptr;
+			if (tmp->datasize)
+				free( (void*)spr->pixels );
 			delete tmp;
 			// this delete also calls Release() on the used palette
 		}
@@ -563,13 +570,49 @@ void SDLVideoDriver::FreeSprite(Sprite2D*& spr)
 		if (spr->vptr) {
 			SDL_FreeSurface( ( SDL_Surface * ) spr->vptr );
 		}
-	}
-	if (spr->pixels) {
-		free( spr->pixels );
+		free( (void*)spr->pixels );
 	}
 	delete spr;
 	spr = NULL;
 }
+
+Sprite2D* SDLVideoDriver::DuplicateSprite(Sprite2D* sprite)
+{
+	if (!sprite) return NULL;
+	Sprite2D* dest = 0;
+
+	if (!sprite->BAM) {
+		SDL_Surface* tmp = ( SDL_Surface* ) sprite->vptr;
+		unsigned char *newpixels = (unsigned char*) malloc( sprite->Width*sprite->Height );
+
+		SDL_LockSurface( tmp );
+		memcpy(newpixels, sprite->pixels, sprite->Width*sprite->Height);	
+		dest = CreateSprite8(sprite->Width, sprite->Height, 8,
+							 newpixels, tmp->format->palette->colors, true, 0);
+		SDL_UnlockSurface( tmp );
+	} else {
+		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)sprite->vptr;
+		const Uint8* rledata;
+		if (data->datasize) {
+			void* newdata = malloc(data->datasize);
+			memcpy(newdata, sprite->pixels, data->datasize);
+			rledata = (const Uint8*)newdata;
+		} else {
+			rledata = (const Uint8*)sprite->pixels;
+			// FIXME!!!!! increase refcount in AnimationFactory
+			// (currently AnimationFactories are never deleted, so safe for now
+		}
+		dest = CreateSpriteBAM8(sprite->Width, sprite->Height, data->RLE,
+								rledata, data->datasize, data->pal,
+								data->transindex);
+		Sprite2D_BAM_Internal* destdata = (Sprite2D_BAM_Internal*)dest->vptr;
+		destdata->flip_ver = data->flip_ver;
+		destdata->flip_hor = data->flip_hor;
+	}
+
+	return dest;
+}
+
 
 void SDLVideoDriver::BlitSpriteRegion(Sprite2D* spr, Region& size, int x,
 	int y, bool anchor, Region* clip)
@@ -635,7 +678,7 @@ void SDLVideoDriver::BlitSpriteRegion(Sprite2D* spr, Region& size, int x,
 	} else {
 		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)spr->vptr;
 
-		Uint8* rle = (Uint8*)spr->pixels;
+		const Uint8* rle = (const Uint8*)spr->pixels;
 		int tx, ty;
 		if (anchor) {
 			tx = x - spr->XPos;
@@ -807,7 +850,7 @@ void SDLVideoDriver::BlitSprite(Sprite2D* spr, int x, int y, bool anchor,
 	} else {
 		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)spr->vptr;
 
-		Uint8* rle = (Uint8*)spr->pixels;
+		const Uint8* rle = (const Uint8*)spr->pixels;
 		int tx, ty;
 		if (anchor) {
 			tx = x - spr->XPos;
@@ -938,7 +981,7 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 	// other combinations use general case
 
 
-	Uint8* rle = (Uint8*)spr->pixels;
+	const Uint8* rle = (const Uint8*)spr->pixels;
 	int tx = x - spr->XPos - Viewport.x;
 	int ty = y - spr->YPos - Viewport.y;
 	if (tx > backBuf->w) return;
@@ -1368,9 +1411,7 @@ void SDLVideoDriver::ConvertToVideoFormat(Sprite2D* sprite)
 			return;
 		}
 		SDL_FreeSurface( ss );
-		if (sprite->pixels) {
-			free( sprite->pixels );
-		}
+		free( (void*)sprite->pixels );
 		sprite->pixels = NULL;
 		sprite->vptr = ns;
 	}
@@ -1507,7 +1548,7 @@ Color SDLVideoDriver::SpriteGetPixel(Sprite2D* sprite, unsigned short x, unsigne
 
 		int skipcount = y * sprite->Width + x;
 
-		Uint8* rle = (Uint8*)sprite->pixels;
+		const Uint8* rle = (const Uint8*)sprite->pixels;
 		if (data->RLE) {
 			while (skipcount > 0) {
 				if (*rle++ == data->transindex)
@@ -1558,7 +1599,7 @@ bool SDLVideoDriver::IsSpritePixelTransparent(Sprite2D* sprite, unsigned short x
 
 		int skipcount = y * sprite->Width + x;
 
-		Uint8* rle = (Uint8*)sprite->pixels;
+		const Uint8* rle = (const Uint8*)sprite->pixels;
 		if (data->RLE) {
 			while (skipcount > 0) {
 				if (*rle++ == data->transindex)
@@ -1938,14 +1979,7 @@ Sprite2D *SDLVideoDriver::MirrorSpriteVertical(Sprite2D* sprite, bool MirrorAnch
 
 
 	if (!sprite->BAM) {
-		SDL_Surface* tmp = ( SDL_Surface* ) sprite->vptr;
-		unsigned char *newpixels = (unsigned char*) malloc( sprite->Width*sprite->Height );
-
-		SDL_LockSurface( tmp );
-		memcpy(newpixels, sprite->pixels, sprite->Width*sprite->Height);	
-	dest = CreateSprite8(sprite->Width, sprite->Height, 8,
-							 newpixels, tmp->format->palette->colors, true, 0);
-		
+		dest = DuplicateSprite(sprite);
 		for (int x = 0; x < dest->Width; x++) {
 			unsigned char * dst = ( unsigned char * ) dest->pixels + x;
 			unsigned char * src = dst + ( dest->Height - 1 ) * dest->Width;
@@ -1957,18 +1991,10 @@ Sprite2D *SDLVideoDriver::MirrorSpriteVertical(Sprite2D* sprite, bool MirrorAnch
 				src -= dest->Width;
 			}
 		}
-		SDL_UnlockSurface( tmp );
 	} else {
-		// TODO: use refcounting on the data to avoid copying it
-		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)sprite->vptr;
-		Uint8* rledata = (Uint8*)malloc(data->datasize);
-		memcpy(rledata, sprite->pixels, data->datasize);
-		dest = CreateSpriteBAM8(sprite->Width, sprite->Height, data->RLE,
-								rledata, data->datasize, data->pal,
-								data->transindex);
+		dest = DuplicateSprite(sprite);
 		Sprite2D_BAM_Internal* destdata = (Sprite2D_BAM_Internal*)dest->vptr;
-		destdata->flip_ver = !data->flip_ver;
-		destdata->flip_hor = data->flip_hor;
+		destdata->flip_ver = !destdata->flip_ver;
 	}
 
 	dest->XPos = dest->XPos;
@@ -1990,14 +2016,7 @@ Sprite2D *SDLVideoDriver::MirrorSpriteHorizontal(Sprite2D* sprite, bool MirrorAn
 	Sprite2D* dest = 0;
 
 	if (!sprite->BAM) {
-		SDL_Surface* tmp = ( SDL_Surface* ) sprite->vptr;
-		unsigned char *newpixels = (unsigned char*) malloc( sprite->Width*sprite->Height );
-
-		SDL_LockSurface( tmp );
-		memcpy(newpixels, sprite->pixels, sprite->Width*sprite->Height);
-		dest = CreateSprite8(sprite->Width, sprite->Height, 8,
-							 newpixels, tmp->format->palette->colors, true, 0);
-		
+		dest = DuplicateSprite(sprite);
 		for (int y = 0; y < dest->Height; y++) {
 			unsigned char * dst = (unsigned char *) dest->pixels + ( y * dest->Width );
 			unsigned char * src = dst + dest->Width - 1;
@@ -2007,18 +2026,10 @@ Sprite2D *SDLVideoDriver::MirrorSpriteHorizontal(Sprite2D* sprite, bool MirrorAn
 				*src-- = swp;
 			}
 		}
-		SDL_UnlockSurface( tmp );
 	} else {
-		// TODO: use refcounting on the data to avoid copying it
-		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)sprite->vptr;
-		Uint8* rledata = (Uint8*)malloc(data->datasize);
-		memcpy(rledata, sprite->pixels, data->datasize);
-		dest = CreateSpriteBAM8(sprite->Width, sprite->Height, data->RLE,
-								rledata, data->datasize, data->pal,
-								data->transindex);
+		dest = DuplicateSprite(sprite);
 		Sprite2D_BAM_Internal* destdata = (Sprite2D_BAM_Internal*)dest->vptr;
-		destdata->flip_ver = data->flip_ver;
-		destdata->flip_hor = !data->flip_hor;
+		destdata->flip_hor = !destdata->flip_hor;
 	}
 
 	if (MirrorAnchor)
@@ -2108,14 +2119,20 @@ void SDLVideoDriver::CreateAlpha( Sprite2D *sprite)
 			pixels[i++]=tmp;
 		}
 	}
-	if ( sprite->pixels ) {
-		free (sprite->pixels);
-	}
 	if (sprite->BAM) {
 		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)sprite->vptr;
+
+		// FIXME: if we're part of an AnimationFactory, this transformation
+		// will (potentially) confuse things. For now check this
+		// isn't the case.
+		assert(data->datasize);
+
+		if ( data->datasize )
+			free( (void*)sprite->pixels );
 		delete data;
 		sprite->BAM = false;
 	} else {
+		free( (void*)sprite->pixels );
 		SDL_FreeSurface ((SDL_Surface*)sprite->vptr);
 	}
 	sprite->pixels = pixels;

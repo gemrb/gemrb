@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.461 2007/02/04 14:22:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.462 2007/02/04 15:50:01 wjpalenstijn Exp $
  *
  */
 
@@ -23,7 +23,6 @@
 #include "../Core/Interface.h"
 #include "../Core/Map.h"
 #include "../Core/Label.h"
-#include "../Core/AnimationMgr.h"
 #include "../Core/GameControl.h"
 #include "../Core/WorldMapControl.h"
 #include "../Core/MapControl.h"
@@ -1804,21 +1803,21 @@ static PyObject* GemRB_SetButtonSprites(PyObject * /*self*/, PyObject* args)
 		return Py_None;
 	}
 
-	AnimationMgr* bam = ( AnimationMgr* )
-		core->GetInterface( IE_BAM_CLASS_ID );
-	DataStream *str = core->GetResourceMgr()->GetResource( ResRef, IE_BAM_CLASS_ID );
-	if (!bam->Open(str, true) ) {
+	AnimationFactory* af = ( AnimationFactory* )
+		core->GetResourceMgr()->GetFactoryResource( ResRef,
+													IE_BAM_CLASS_ID,
+													IE_NORMAL );
+	if (!af) {
 		return RuntimeError( "BAM not found" );
 	}
-	Sprite2D *tspr = bam->GetFrameFromCycle( (unsigned char) cycle, unpressed);
+	Sprite2D *tspr = af->GetFrame(unpressed, (unsigned char)cycle);
 	btn->SetImage( IE_GUI_BUTTON_UNPRESSED, tspr );
-	tspr = bam->GetFrameFromCycle( (unsigned char) cycle, pressed);
+	tspr = af->GetFrame( pressed, (unsigned char) cycle);
 	btn->SetImage( IE_GUI_BUTTON_PRESSED, tspr );
-	tspr = bam->GetFrameFromCycle( (unsigned char) cycle, selected);
+	tspr = af->GetFrame( selected, (unsigned char) cycle);
 	btn->SetImage( IE_GUI_BUTTON_SELECTED, tspr );
-	tspr = bam->GetFrameFromCycle( (unsigned char) cycle, disabled);
+	tspr = af->GetFrame( disabled, (unsigned char) cycle);
 	btn->SetImage( IE_GUI_BUTTON_DISABLED, tspr );
-	core->FreeInterface( bam );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -2184,15 +2183,16 @@ static PyObject* GemRB_CreateMapControl(PyObject * /*self*/, PyObject* args)
 		CtrlIndex = core->GetControl( WindowIndex, LabelID );
 		Control *lc = win->GetControl( CtrlIndex );
 		map->LinkedLabel = lc;
-		AnimationMgr *anim = ( AnimationMgr* ) core->GetInterface(IE_BAM_CLASS_ID );
-		DataStream* str = core->GetResourceMgr()->GetResource( Flag, IE_BAM_CLASS_ID );
-		if (anim -> Open(str, true) ) {
+		AnimationFactory* af = ( AnimationFactory* )
+			core->GetResourceMgr()->GetFactoryResource( Flag,
+														IE_BAM_CLASS_ID,
+														IE_NORMAL );
+		if (af) {
 			for (int i=0;i<8;i++) {
-				map->Flag[i] = anim->GetFrame(0,i);
+				map->Flag[i] = af->GetFrame(i,0);
 			}
 
 		}
-		core->FreeInterface( anim );
 	}
 setup_done:
 	win->AddControl( map );
@@ -2706,8 +2706,11 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 	DataStream* str = core->GetResourceMgr()->GetResource( ResRef, IE_PLT_CLASS_ID );
 
 	if (str == NULL ) {
-		str = core->GetResourceMgr()->GetResource( ResRef, IE_BAM_CLASS_ID );
-		if (str == NULL) {
+		AnimationFactory* af = ( AnimationFactory* )
+			core->GetResourceMgr()->GetFactoryResource( ResRef,
+														IE_BAM_CLASS_ID,
+														IE_NORMAL );
+		if (!af) {
 			printMessage("GUISCript","PLT/BAM not found for ref: ",YELLOW);
 			printf("%s\n", ResRef);
 			textcolor(WHITE);
@@ -2719,20 +2722,7 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 			}
 		}
 
-		AnimationMgr* am = ( AnimationMgr* ) core->GetInterface( IE_BAM_CLASS_ID );
-		if (am == NULL) {
-			printf ("No animation manager\n");
-			delete ( str );
-			return NULL;
-		}
-
-		if (!am->Open( str, true )) {
-			printf ("Can't open bam\n");
-			core->FreeInterface( am );
-			return NULL;
-		}
-		Picture = am->GetPaperdollImage(col[0]==0xFFFFFFFF?0:col, Picture2,(unsigned int)type);
-		core->FreeInterface( am );
+		Picture = af->GetPaperdollImage(col[0]==0xFFFFFFFF?0:col, Picture2,(unsigned int)type);
 		if (Picture == NULL) {
 			printf ("Picture == NULL\n");
 			return NULL;
@@ -2790,33 +2780,27 @@ static PyObject* SetButtonBAM(int wi, int ci, const char *ResRef, int CycleIndex
 
 	if (ResRef[0] == 0) {
 		btn->SetPicture( NULL );
-		//no incref!
+		//no incref! (happens in caller if necessary)
 		return Py_None;
 	}
 
-	DataStream* str = core->GetResourceMgr()->GetResource( ResRef, IE_BAM_CLASS_ID );
-	if (str == NULL) {
+	AnimationFactory* af = ( AnimationFactory* )
+		core->GetResourceMgr()->GetFactoryResource( ResRef,
+													IE_BAM_CLASS_ID,
+													IE_NORMAL );
+	if (!af)
 		return NULL;
-	}
-	AnimationMgr* am = ( AnimationMgr* )
-		core->GetInterface( IE_BAM_CLASS_ID );
-	if (am == NULL) {
-		delete ( str );
-		return NULL;
-	}
+	Sprite2D* Picture = af->GetFrame ( FrameIndex, CycleIndex );
 
-	if (!am->Open( str, true )) {
-		core->FreeInterface( am );
-		return NULL;
-	}
-
-	Sprite2D* Picture = am->GetFrameFromCycle( CycleIndex, FrameIndex );
 	if (Picture == NULL) {
-		core->FreeInterface( am );
 		return NULL;
 	}
 
 	if (col1 >= 0) {
+		Sprite2D* old = Picture;
+		Picture = core->GetVideoDriver()->DuplicateSprite(old);
+		old->RefCount--;
+
 		Palette* newpal = core->GetVideoDriver()->GetPalette(Picture)->Copy();
 		core->GetPalette( col1, 12, &newpal->col[4]);
 		core->GetVideoDriver()->SetPalette( Picture, newpal );
@@ -2825,9 +2809,7 @@ static PyObject* SetButtonBAM(int wi, int ci, const char *ResRef, int CycleIndex
 
 	btn->SetPicture( Picture );
 
-	core->FreeInterface( am );
-
-	//no incref!
+	//no incref! (happens in caller if necessary)
 	return Py_None;
 }
 
@@ -2849,8 +2831,8 @@ static PyObject* GemRB_SetButtonBAM(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetAnimation__doc,
-"SetAnimation(WindowIndex, ControlIndex, BAMResRef, CycleIndex, FrameIndex, col1)\n\n"
-"Sets the Picture of a Button Control from a BAM file. If col1 is >= 0, changes palette picture's palette to one specified by col1. Since it uses 12 colors palette, it has issues in PST." );
+"SetAnimation(WindowIndex, ControlIndex, BAMResRef)\n\n"
+"Sets the animation of a Button Control from a BAM file.");
 
 static PyObject* GemRB_SetAnimation(PyObject * /*self*/, PyObject* args)
 {
@@ -4411,33 +4393,34 @@ PyObject *SetSpellIcon(int wi, int ci, ieResRef SpellResRef, int type, int toolt
 		return Py_None;
 	}
 
-	AnimationMgr* bam = ( AnimationMgr* ) core->GetInterface( IE_BAM_CLASS_ID );
-	DataStream *str;
+	const char* IconResRef;
 	if (type) {
-		str = core->GetResourceMgr()->GetResource( spell->ext_headers[0].MemorisedIcon, IE_BAM_CLASS_ID );
+		IconResRef = spell->ext_headers[0].MemorisedIcon;
 	}
 	else {
-		str = core->GetResourceMgr()->GetResource( spell->SpellbookIcon, IE_BAM_CLASS_ID );
+		IconResRef = spell->SpellbookIcon;
 	}
-	if (!bam->Open( str, true ) ) {
+	AnimationFactory* af = ( AnimationFactory* )
+		core->GetResourceMgr()->GetFactoryResource( IconResRef,
+													IE_BAM_CLASS_ID,
+													IE_NORMAL );
+	if (!af) {
 		return RuntimeError( "BAM not found" );
 	}
-	//AnimationMgr *bam = spell->SpellIconBAM;
 	//small difference between pst and others
-	if (bam->GetCycleSize(0)!=4) { //non-pst
-		btn->SetPicture( bam->GetFrameFromCycle(0, 0));
+	if (af->GetCycleSize(0)!=4) { //non-pst
+		btn->SetPicture( af->GetFrame(0, 0));
 	}
 	else { //pst
-		btn->SetImage( IE_GUI_BUTTON_UNPRESSED, bam->GetFrameFromCycle(0, 0));
-		btn->SetImage( IE_GUI_BUTTON_PRESSED, bam->GetFrameFromCycle(0, 1));
-		btn->SetImage( IE_GUI_BUTTON_SELECTED, bam->GetFrameFromCycle(0, 2));
-		btn->SetImage( IE_GUI_BUTTON_DISABLED, bam->GetFrameFromCycle(0, 3));
+		btn->SetImage( IE_GUI_BUTTON_UNPRESSED, af->GetFrame(0, 0));
+		btn->SetImage( IE_GUI_BUTTON_PRESSED, af->GetFrame(1, 0));
+		btn->SetImage( IE_GUI_BUTTON_SELECTED, af->GetFrame(2, 0));
+		btn->SetImage( IE_GUI_BUTTON_DISABLED, af->GetFrame(3, 0));
 	}
 	if (tooltip) {
 		char *str = core->GetString(spell->SpellName,0);
 		SetFunctionTooltip(wi, ci, str, Function); //will free str
 	}
-	core->FreeInterface( bam );
 	core->FreeSpell( spell, SpellResRef, false );
 	//no incref here!
 	return Py_None;
@@ -6624,9 +6607,9 @@ static void ReadActionButtons()
 	}
 }
 */
-static void SetButtonCycle(AnimationMgr *bam, Button *btn, int cycle, unsigned char which)
+static void SetButtonCycle(AnimationFactory *bam, Button *btn, int cycle, unsigned char which)
 {
-	Sprite2D *tspr = bam->GetFrameFromCycle( 0, cycle);
+	Sprite2D *tspr = bam->GetFrame( cycle, 0 );
 	btn->SetImage( which, tspr );
 }
 
@@ -6662,11 +6645,14 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, int Index, int
 	if (GUIAction[0]==0xcccccccc) {
 		ReadActionButtons();
 	}
-	AnimationMgr* bam = ( AnimationMgr* )
-		core->GetInterface( IE_BAM_CLASS_ID );
+
+
 	//FIXME: this is a hardcoded resource (pst has no such one)
-	DataStream *str = core->GetResourceMgr()->GetResource( GUIResRef[Index], IE_BAM_CLASS_ID );
-	if (!bam->Open(str, true) ) {
+	AnimationFactory* bam = ( AnimationFactory* )
+		core->GetResourceMgr()->GetFactoryResource( GUIResRef[Index],
+													IE_BAM_CLASS_ID,
+													IE_NORMAL );
+	if (!bam) {
 		return RuntimeError( "BAM not found" );
 	}
 	packtype row;
@@ -6676,7 +6662,6 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, int Index, int
 	SetButtonCycle(bam, btn, (char) row.bytes[1], IE_GUI_BUTTON_PRESSED);
 	SetButtonCycle(bam, btn, (char) row.bytes[2], IE_GUI_BUTTON_SELECTED);
 	SetButtonCycle(bam, btn, (char) row.bytes[3], IE_GUI_BUTTON_DISABLED);
-	core->FreeInterface( bam );
 	btn->SetFlags( IE_GUI_BUTTON_NORMAL, BM_SET );
 	ieVariable Event;
 	snprintf(Event,sizeof(Event)-1, "Action%sPressed", GUIEvent[Index]);
@@ -6758,11 +6743,12 @@ static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 			return RuntimeError("Cannot set action button!\n");
 		}
 	}
-	AnimationMgr* bam = ( AnimationMgr* )
-		core->GetInterface( IE_BAM_CLASS_ID );
 	//FIXME: this is a hardcoded resource (pst has no such one)
-	DataStream *str = core->GetResourceMgr()->GetResource( "guibtbut", IE_BAM_CLASS_ID );
-	if (!bam->Open(str, true) ) {
+	AnimationFactory* bam = ( AnimationFactory* )
+		core->GetResourceMgr()->GetFactoryResource( "guibtbut",
+													IE_BAM_CLASS_ID,
+													IE_NORMAL );
+	if (!bam) {
 		return RuntimeError( "BAM not found" );
 	}
 
@@ -6809,7 +6795,6 @@ static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 			}
 		}
 	}
-	core->FreeInterface( bam );
 
 	if (more) {
 		PyObject *ret = SetActionIcon(wi,core->GetControl(wi, i+1),ACT_RIGHT,i+1);
@@ -6859,11 +6844,13 @@ static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 			return RuntimeError("Cannot set action button!\n");
 		}
 	}
-	AnimationMgr* bam = ( AnimationMgr* )
-		core->GetInterface( IE_BAM_CLASS_ID );
+
 	//FIXME: this is a hardcoded resource (pst has no such one)
-	DataStream *str = core->GetResourceMgr()->GetResource( "guibtbut", IE_BAM_CLASS_ID );
-	if (!bam->Open(str, true) ) {
+	AnimationFactory* bam = ( AnimationFactory* )
+		core->GetResourceMgr()->GetFactoryResource( "guibtbut",
+													IE_BAM_CLASS_ID,
+													IE_NORMAL );
+	if (!bam) {
 		return RuntimeError( "BAM not found" );
 	}
 
@@ -6905,7 +6892,6 @@ static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 			}
 		}
 	}
-	core->FreeInterface( bam );
 
 	if (more) {
 		PyObject *ret = SetActionIcon(wi,core->GetControl(wi, i+1),ACT_RIGHT,i+1);

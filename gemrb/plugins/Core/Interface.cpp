@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.452 2007/02/04 14:22:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.453 2007/02/04 15:50:01 wjpalenstijn Exp $
  *
  */
 
@@ -2979,7 +2979,7 @@ void Interface::DrawTooltip ()
 
 	int w1 = 0;
 	int w2 = 0;
-	int w = fnt->CalcStringWidth( tooltip_text );
+	int w = fnt->CalcStringWidth( tooltip_text ) + 8;
 	int h = fnt->maxHeight;
 
 	if (TooltipBack) {
@@ -4258,9 +4258,9 @@ void Interface::DragItem(CREItem *item, const ieResRef Picture)
 	}
 	DraggedItem = item;
 	video->FreeSprite (DraggedCursor);
-	if (item) {
+	if (item)
 		DraggedCursor = core->GetBAMSprite( Picture, 0, 0 );
-	}
+
 	video->SetDragCursor (DraggedCursor);
 }
 
@@ -4802,21 +4802,16 @@ Actor *Interface::GetFirstSelectedPC()
 // otherwise it's not efficient
 Sprite2D* Interface::GetBAMSprite(const ieResRef ResRef, int cycle, int frame)
 {
-	AnimationMgr* bam = ( AnimationMgr* ) GetInterface( IE_BAM_CLASS_ID );
-	DataStream *str = key->GetResource( ResRef, IE_BAM_CLASS_ID );
-	if (!bam->Open( str, true ) ) {
-		FreeInterface( bam );
-		return NULL;
-	}
 	Sprite2D *tspr;
-	if (cycle==-1) {
-		tspr = bam->GetFrame( (unsigned short) frame );
-	}
-	else {
-		tspr = bam->GetFrameFromCycle( (unsigned char) cycle, (unsigned short) frame );
-	}
-	FreeInterface( bam );
-
+	AnimationFactory* af = ( AnimationFactory* )
+		core->GetResourceMgr()->GetFactoryResource( ResRef,
+													IE_BAM_CLASS_ID,
+													IE_NORMAL );
+	if (!af) return 0;
+	if (cycle == -1)
+		tspr = af->GetFrameWithoutCycle( (unsigned short) frame );
+	else
+		tspr = af->GetFrame( (unsigned short) frame, (unsigned char) cycle );
 	return tspr;
 }
 

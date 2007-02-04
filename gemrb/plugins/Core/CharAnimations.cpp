@@ -15,12 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.106 2007/01/29 21:21:36 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/CharAnimations.cpp,v 1.107 2007/02/04 15:50:00 wjpalenstijn Exp $
  *
  */
 
 #include "../../includes/win32def.h"
-#include "AnimationMgr.h"
 #include "CharAnimations.h"
 #include "Interface.h"
 #include "Video.h"
@@ -685,7 +684,6 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 				if (WeaponRef[0] == 0) continue;
 				// weapon
 				GetEquipmentResRef(WeaponRef,false,NewResRef,Cycle,equipdat);
-				printf("Using weapon ref %s\n", NewResRef);
 			} else if (part == actorPartCount+1) {
 				if (OffhandRef[0] == 0) continue;
 				if (WeaponType == IE_ANI_WEAPON_2H) continue;
@@ -697,12 +695,10 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 					GetEquipmentResRef(OffhandRef,true,NewResRef,Cycle,
 									   equipdat);
 				}
-				printf("Using offhand ref %s\n", NewResRef);
 			} else if (part == actorPartCount+2) {
 				if (HelmetRef[0] == 0) continue;
 				// helmet
 				GetEquipmentResRef(HelmetRef,false,NewResRef,Cycle,equipdat);
-				printf("Using helmet ref %s\n", NewResRef);
 			}
 		}
 		NewResRef[8]=0; //cutting right to size
