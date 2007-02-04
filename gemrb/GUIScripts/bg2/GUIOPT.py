@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIOPT.py,v 1.20 2006/12/26 19:57:40 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUIOPT.py,v 1.21 2007/02/04 22:18:11 avenger_teambg Exp $
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
 # Ingame options
@@ -171,6 +171,7 @@ def OpenVideoOptionsWindow ():
 
 def DisplayHelpFullScreen ():
 	GemRB.SetText (GameOptionsWindow, HelpTextArea, 18000)
+	GemRB.SetFullScreen (GemRB.GetVar("Full Screen"))
 
 def DisplayHelpBPP ():
 	GemRB.SetText (GameOptionsWindow, HelpTextArea, 17205)

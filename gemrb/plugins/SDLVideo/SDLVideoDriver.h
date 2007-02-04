@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.73 2007/02/04 15:50:02 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.h,v 1.74 2007/02/04 22:18:11 avenger_teambg Exp $
  *
  */
 
@@ -47,6 +47,8 @@ private:
 	Region subtitleregion;
 	char *subtitletext;
 	ieDword subtitlestrref;
+	int width,height,bpp;
+	bool fullscreen;
 public:
 	SDLVideoDriver(void);
 	~SDLVideoDriver(void);
@@ -55,7 +57,7 @@ public:
 	void SetDisplayTitle(char* title, char* icon);
 	VideoModes GetVideoModes(bool fullscreen = false);
 	bool TestVideoMode(VideoMode& vm);
-	bool ToggleFullscreenMode();
+	bool ToggleFullscreenMode(int set_reset=-1);
 	int SwapBuffers(void);
 	bool ToggleGrabInput();
 	short GetWidth() { return ( disp ? disp->w : 0 ); };

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.462 2007/02/04 15:50:01 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.463 2007/02/04 22:18:11 avenger_teambg Exp $
  *
  */
 
@@ -7407,6 +7407,22 @@ static PyObject* GemRB_SetGamma(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetFullScreen__doc,
+"SetFullScreen(int)\n\n"
+"0 - windowed, 1 - fullscreen, -1 - toggle");
+
+static PyObject* GemRB_SetFullScreen(PyObject * /*self*/, PyObject* args)
+{
+	int fullscreen;
+
+	if (!PyArg_ParseTuple( args, "i", &fullscreen )) {
+		return AttributeError( GemRB_SetFullScreen__doc );
+	}
+	core->GetVideoDriver()->ToggleFullscreenMode(fullscreen);
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_RestParty__doc,
 "RestParty(noareacheck, dream, hp)\n\n"
 "Executes the party rest function, used from both stores and via the main screen.");
@@ -7798,6 +7814,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(UseItem, METH_VARARGS),
 	METHOD(SpellCast, METH_VARARGS),
 	METHOD(SetGamma, METH_VARARGS),
+	METHOD(SetFullScreen, METH_VARARGS),
 	METHOD(RestParty, METH_VARARGS),
 	METHOD(HasSpecialItem, METH_VARARGS),
 	METHOD(HasSpecialSpell, METH_VARARGS),

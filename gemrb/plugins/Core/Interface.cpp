@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.453 2007/02/04 15:50:01 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.454 2007/02/04 22:18:11 avenger_teambg Exp $
  *
  */
 
@@ -4365,8 +4365,7 @@ CREItem *Interface::ReadItem(DataStream *str)
 	str->ReadWord( &itm->Usages[1] );
 	str->ReadWord( &itm->Usages[2] );
 	str->ReadDword( &itm->Flags );
-	if (ResolveRandomItem(itm) )
-	{
+	if (ResolveRandomItem(itm) ) {
 		return itm;
 	}
 	delete itm;

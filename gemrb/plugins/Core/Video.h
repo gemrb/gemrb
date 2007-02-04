@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.72 2007/02/04 15:50:01 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Video.h,v 1.73 2007/02/04 22:18:11 avenger_teambg Exp $
  *
  */
 
@@ -83,7 +83,7 @@ public:
 	virtual VideoModes GetVideoModes(bool fullscreen = false) = 0;
 	virtual bool TestVideoMode(VideoMode& vm) = 0;
 	/** Toggles GemRB between fullscreen and windowed mode */
-	virtual bool ToggleFullscreenMode() = 0;
+	virtual bool ToggleFullscreenMode(int set_reset=-1) = 0;
 	/** Swaps displayed and back buffers */
 	virtual int SwapBuffers(void) = 0;
 	/** Grabs and releases mouse cursor within GemRB window */
