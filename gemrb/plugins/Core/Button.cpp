@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.116 2006/12/28 14:26:16 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Button.cpp,v 1.117 2007/02/04 18:23:50 avenger_teambg Exp $
  *
  */
 
@@ -524,8 +524,8 @@ void Button::RedrawButton(const char* VariableName, unsigned int Sum)
 		ToggleState = !!( Sum & Value );
 	} //checkbox, bitvalue
 	else {
-		ToggleState = false;
-	}		//other buttons, no value
+		return;
+	} //other buttons, nothing to redraw
 	if (ToggleState) {
 		State = IE_GUI_BUTTON_SELECTED;
 	} else {
