@@ -16,7 +16,7 @@
 #along with this program; if not, write to the Free Software
 #Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.38 2007/01/31 21:33:34 wjpalenstijn Exp $
+#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIINV.py,v 1.39 2007/02/04 18:06:55 avenger_teambg Exp $
 
 #GUIINV.py - scripts to control inventory windows from GUIINV winpack
 
@@ -32,14 +32,23 @@ from GUICommon import CloseOtherWindow, SetColorStat
 from GUICommonWindows import *
 
 InventoryWindow = None
+PortraitWindow = None
+OldPortraitWindow = None
 ItemInfoWindow = None
 ItemAmountWindow = None
 ItemIdentifyWindow = None
 OverSlot = None
 
+def OpenInventoryWindowClick():
+	tmp = GemRB.GetVar("PressedPortrait")+1
+	GemRB.GameSelectPC(tmp, True, SELECT_REPLACE)
+	OpenInventoryWindow()
+
+
 def OpenInventoryWindow ():
-	global InventoryWindow
-	
+	global InventoryWindow, PortraitWindow
+	global OldPortraitWindow
+
 	if CloseOtherWindow (OpenInventoryWindow):
 		if GemRB.IsDraggingItem ():
 			pc = GemRB.GameGetSelectedPCSingle ()
@@ -51,7 +60,10 @@ def OpenInventoryWindow ():
 
 		GemRB.HideGUI ()
 		GemRB.UnloadWindow (InventoryWindow)
+		GemRB.UnloadWindow (PortraitWindow)
 		InventoryWindow = None
+		GUICommonWindows.PortraitWindow = OldPortraitWindow
+		OldPortraitWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
 		SetSelectionChangeHandler (None)
 		GemRB.UnhideGUI ()
@@ -64,6 +76,9 @@ def OpenInventoryWindow ():
 	GemRB.SetVar ("OtherWindow", InventoryWindow)
 	GemRB.SetVar ("MessageLabel", GemRB.GetControl(Window, 0x1000003f) )
 	SetupMenuWindowControls (GUICommonWindows.OptionsWindow, 0, "OpenInventoryWindow")
+	OldPortraitWindow = GUICommonWindows.PortraitWindow
+	GemRB.SetVisible (OldPortraitWindow, 0)
+	PortraitWindow = OpenPortraitWindow (0)
 
 	#Ground Item
 	for i in range (5):

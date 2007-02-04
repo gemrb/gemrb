@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUISTORE.py,v 1.15 2006/08/09 19:05:32 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUISTORE.py,v 1.16 2007/02/04 18:06:56 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -652,7 +652,7 @@ def InfoIdentifyWindow ():
 	Count = len(inventory_slots)
 	if Index >= Count:
 		return
-	Slot = GemRB.GetSlotItem (inventory_slots[Index])
+	Slot = GemRB.GetSlotItem (pc, inventory_slots[Index])
 	Item = GemRB.GetItem (Slot['ItemResRef'])
 	#set the identify flag to 1
 	#GemRB.SetSlotItem (inventory_slots[Index], {"Flags":4})

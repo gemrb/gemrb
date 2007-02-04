@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICommonWindows.py,v 1.20 2007/01/25 18:19:40 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICommonWindows.py,v 1.21 2007/02/04 18:06:55 avenger_teambg Exp $
 
 
 # GUICommonWindows.py - functions to open common
@@ -474,6 +474,11 @@ def OpenPortraitWindow (needcontrols):
 	for i in range (PARTY_SIZE):
 		Button = GemRB.GetControl (Window, i)
 		GemRB.SetVarAssoc (Window, Button, "PressedPortrait", i)
+		if (needcontrols):
+			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenInventoryWindowClick")
+		else:
+			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "PortraitButtonOnPress")
+
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "PortraitButtonOnShiftPress")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnDropItemToPC")
