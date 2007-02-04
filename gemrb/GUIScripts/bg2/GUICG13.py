@@ -25,7 +25,10 @@ def RefreshPDoll():
 	table = GemRB.LoadTable("avprefr")
 	AnimID = AnimID+GemRB.GetTableValue(table, GemRB.GetVar("Race"),0)
 	table = GemRB.LoadTable("avprefc")
-	AnimID = AnimID+GemRB.GetTableValue(table, GemRB.GetVar("Class"),0)
+	ClassTable = GemRB.LoadTable("classes")
+	ClassIndex = GemRB.GetVar ("Class")-1
+	Class = GemRB.GetTableValue(ClassTable, ClassIndex, 5)
+	AnimID = AnimID+GemRB.GetTableValue(table, Class, 0)
 	table = GemRB.LoadTable("avprefg")
 	AnimID = AnimID+GemRB.GetTableValue(table, GemRB.GetVar("Gender"),0)
 	print "AnimID:",hex(AnimID)
