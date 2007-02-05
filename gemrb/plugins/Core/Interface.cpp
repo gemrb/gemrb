@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.454 2007/02/04 22:18:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.455 2007/02/05 20:15:45 avenger_teambg Exp $
  *
  */
 
@@ -897,7 +897,7 @@ void Interface::Main()
 	vars->Lookup("Gamma Correction", contrast);
 	video->SetGamma( 	brightness, contrast);
 	Font* fps = GetFont( ( unsigned int ) 0 );
-	char fpsstring[_MAX_PATH];
+	char fpsstring[40]={"???.??? fps"};
 	Color fpscolor = {0xff,0xff,0xff,0xff}, fpsblack = {0x00,0x00,0x00,0xff};
 	unsigned long frame = 0, time, timebase;
 	GetTime(timebase);
