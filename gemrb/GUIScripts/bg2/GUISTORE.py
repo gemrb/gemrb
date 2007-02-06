@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUISTORE.py,v 1.35 2007/02/04 21:35:23 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/GUISTORE.py,v 1.36 2007/02/06 22:20:37 avenger_teambg Exp $
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
@@ -30,6 +30,7 @@ from GUIDefines import *
 from GUICommonWindows import *
 from ie_stats import *
 from ie_slots import *
+from GUICommon import CheckStat100
 
 StoreWindow = None
 MessageWindow = None
@@ -857,13 +858,15 @@ def StealPressed ():
 
 	LeftIndex = GemRB.GetVar ("LeftIndex")
 	pc = GemRB.GameGetSelectedPCSingle ()
-	#skill check, if fails
-	failure = 0
-	if failure:
-		GemRB.StealFailed ()
-	else:
+	#percentage skill check, if fails, trigger StealFailed
+	if CheckStat100 (pc, IE_PICKPOCKET, Store['StealFailure']):
+		print "success!"
 		GemRB.ChangeStoreItem (pc, LeftIndex, SHOP_STEAL)
-	UpdateStoreStealWindow ()
+		UpdateStoreStealWindow ()
+	else:
+		print "failure!"
+		GemRB.StealFailed ()
+		CloseStoreWindow ()
 
 
 def RedrawStoreStealWindow ():

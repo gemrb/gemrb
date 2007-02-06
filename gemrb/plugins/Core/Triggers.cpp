@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.60 2006/12/28 21:11:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.61 2007/02/06 22:20:38 avenger_teambg Exp $
  *
  */
 
@@ -1248,6 +1248,30 @@ int GameScript::Disarmed(Scriptable* Sender, Trigger* parameters)
 	}
 	if (MatchActor(Sender, Sender->LastDisarmed, parameters->objectParameter)) {
 		Sender->AddTrigger (&Sender->LastDisarmed);
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::StealFailed(Scriptable* Sender, Trigger* parameters)
+{
+	switch(Sender->Type) {
+		case ST_ACTOR:
+			break;
+		default:
+			return 0;
+	}
+	// maybe check if Sender is a shopkeeper???
+
+	if (parameters->objectParameter == NULL) {
+		if (Sender->LastDisarmFailed) {
+			Sender->AddTrigger (&Sender->LastDisarmFailed);
+			return 1;
+		}
+		return 0;
+	}
+	if (MatchActor(Sender, Sender->LastDisarmFailed, parameters->objectParameter)) {
+		Sender->AddTrigger (&Sender->LastDisarmFailed);
 		return 1;
 	}
 	return 0;

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.387 2007/01/29 21:50:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.388 2007/02/06 22:20:38 avenger_teambg Exp $
  *
  */
 
@@ -311,6 +311,8 @@ static TriggerLink triggernames[] = {
 	{"sequence", GameScript::Sequence, 0},
 	{"specifics", GameScript::Specifics, 0},
 	{"statecheck", GameScript::StateCheck, 0},
+	{"stealfailed", GameScript::StealFailed, 0},
+	{"storehasitem", GameScript::StoreHasItem, 0},
 	{"stuffglobalrandom", GameScript::StuffGlobalRandom, 0},//hm, this is a trigger
 	{"subrace", GameScript::SubRace, 0},
 	{"targetunreachable", GameScript::TargetUnreachable, 0},

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUICommon.py,v 1.7 2006/12/30 16:43:21 wjpalenstijn Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUICommon.py,v 1.8 2007/02/06 22:20:25 avenger_teambg Exp $
 
 import GemRB
 # GUICommon.py - common functions for GUIScripts of all game types
@@ -83,5 +83,19 @@ def SetColorStat (Actor, Stat, Value):
 	t = Value & 0xFF
 	t |= t << 8
 	t |= t << 16
-	GemRB.SetPlayerStat(Actor, Stat, t)
+	GemRB.SetPlayerStat (Actor, Stat, t)
 	return
+
+def CheckStat100 (Actor, Stat, Diff):
+	mystat = GemRB.GetPlayerStat (Actor, Stat)
+	goal = GemRB.Roll (1,100, Diff)
+	if mystat>=goal:
+		return True
+	return False
+
+def CheckStat20 (Actor, Stat, Diff):
+	mystat = GemRB.GetPlayerStat (Actor, Stat)
+	goal = GemRB.Roll (1,20, Diff)
+	if mystat>=goal:
+		return True
+	return False
