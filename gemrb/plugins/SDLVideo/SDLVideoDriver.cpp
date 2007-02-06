@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.157 2007/02/04 22:18:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/SDLVideo/SDLVideoDriver.cpp,v 1.158 2007/02/06 18:37:14 avenger_teambg Exp $
  *
  */
 
@@ -187,8 +187,7 @@ bool SDLVideoDriver::TestVideoMode(VideoMode& vm)
 	if (vm.GetFullScreen()) {
 		flags |= SDL_FULLSCREEN;
 	}
-	if (SDL_VideoModeOK( vm.GetWidth(), vm.GetHeight(), vm.GetBPP(), flags ) ==
-		vm.GetBPP()) {
+	if (SDL_VideoModeOK( vm.GetWidth(), vm.GetHeight(), vm.GetBPP(), flags ) == vm.GetBPP()) {
 		return true;
 	}
 	return false;
@@ -196,13 +195,11 @@ bool SDLVideoDriver::TestVideoMode(VideoMode& vm)
 
 bool SDLVideoDriver::ToggleFullscreenMode(int set_reset)
 {
-	printf("Set fullscreen: %d\n", set_reset);
 	if (set_reset==-1) {
 		 set_reset=fullscreen;
 	}
 	if (fullscreen == !set_reset) {
 		fullscreen=set_reset;
-		//return SDL_WM_ToggleFullScreen(disp) != 0;
 		ieDword flags = SDL_SWSURFACE;// | SDL_DOUBLEBUF;
 		if (fullscreen) {
 			flags |= SDL_FULLSCREEN;
@@ -210,6 +207,7 @@ bool SDLVideoDriver::ToggleFullscreenMode(int set_reset)
 		SDL_Surface* disp2 = SDL_SetVideoMode( width, height, bpp, flags );
 		if (disp2) {
 			disp = disp2;
+			MoveMouse(CursorPos.x,CursorPos.y);
 			return true;
 		}
 	}
