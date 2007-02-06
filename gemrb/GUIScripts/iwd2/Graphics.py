@@ -123,6 +123,7 @@ def BppPress():
 	
 def FullScreenPress():
 	GemRB.SetText(GraphicsWindow, TextAreaControl, 18000)
+	GemRB.SetFullScreen (GemRB.GetVar("Full Screen"))
 	return
 	
 def TransShadowPress():

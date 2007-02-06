@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIOPT.py,v 1.6 2006/12/26 19:57:39 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIOPT.py,v 1.7 2007/02/06 18:48:13 avenger_teambg Exp $
 
 
 # GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
@@ -175,6 +175,7 @@ def OpenVideoOptionsWindow ():
 
 def DisplayHelpFullScreen ():
 	GemRB.SetText (GameOptionsWindow, HelpTextArea, 18000)
+	GemRB.SetFullScreen (GemRB.GetVar("Full Screen"))
 
 def DisplayHelpBPP ():
 	GemRB.SetText (GameOptionsWindow, HelpTextArea, 17205)
@@ -654,15 +655,8 @@ def OptCheckbox (name, window, button_id, label_id, variable, value):
 	button = GemRB.GetControl (window, button_id)
 	GemRB.SetButtonFlags (window, button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
 	GemRB.SetButtonState (window, button, IE_GUI_BUTTON_SELECTED)
-	GemRB.SetEvent (window, button, IE_GUI_MOUSE_OVER_BUTTON, "DisplayHelp" + name)
+	GemRB.SetEvent (window, button, IE_GUI_BUTTON_ON_PRESS, "DisplayHelp" + name)
 	GemRB.SetVarAssoc (window, button, variable, value)
-
-	#label = GemRB.GetControl (window, label_id)
-	#GemRB.SetText (window, label, label_strref)
-	#GemRB.SetButtonFlags (window, label, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-	#GemRB.SetButtonState (window, label, IE_GUI_BUTTON_LOCKED)
-	#GemRB.SetEvent (window, label, IE_GUI_MOUSE_ENTER_BUTTON, "DisplayHelp" + name)
-
 	return button
 
 def OptButton (name, window, button_id, button_strref):
