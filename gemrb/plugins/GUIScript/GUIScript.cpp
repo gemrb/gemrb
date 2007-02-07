@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.463 2007/02/04 22:18:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.464 2007/02/07 18:56:40 avenger_teambg Exp $
  *
  */
 
@@ -7592,11 +7592,13 @@ static PyObject* GemRB_StealFailed(PyObject * /*self*/, PyObject* /*args*/)
 	if (!owner) {
 		return RuntimeError( "No owner found!" );
 	}
-	Actor* attacker = game->GetPC(game->GetSelectedPCSingle(), false);
+	Actor* attacker = game->FindPC((int) game->GetSelectedPCSingle() );
 	if (!attacker) {
 		return RuntimeError( "No thief found!" );
 	}
-	owner->LastAttacker = attacker->GetID();
+	//not sure if this is ok
+	//owner->LastAttacker = attacker->GetID();
+	owner->LastDisarmFailed = attacker->GetID();
 	Py_INCREF( Py_None );
 	return Py_None;
 }
