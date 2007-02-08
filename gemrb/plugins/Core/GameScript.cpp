@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.391 2007/02/08 22:10:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.392 2007/02/08 22:56:56 avenger_teambg Exp $
  *
  */
 
@@ -391,6 +391,7 @@ static ActionLink actionnames[] = {
 	{"breakinstants", GameScript::BreakInstants, AF_BLOCKING},//delay execution of instants to the next AI cycle???
 	{"calm", GameScript::Calm, 0}, 
 	{"changeaiscript", GameScript::ChangeAIScript, 0},
+	{"changeaitype", GameScript::ChangeAIType, 0},
 	{"changealignment", GameScript::ChangeAlignment, 0},
 	{"changeallegiance", GameScript::ChangeAllegiance, 0},
 	{"changeanimation", GameScript::ChangeAnimation, 0},
@@ -502,9 +503,13 @@ static ActionLink actionnames[] = {
 	{"floatmessagefixed", GameScript::FloatMessageFixed, 0},
 	{"floatmessagefixedrnd", GameScript::FloatMessageFixedRnd, 0},
 	{"floatmessagernd", GameScript::FloatMessageRnd, 0},
+	{"follow", GameScript::Follow, 0},
+	{"followcreature", GameScript::FollowCreature, 0}, //pst
+	{"followobjectformation", GameScript::FollowObjectFormation, 0},
 	{"forceaiscript", GameScript::ForceAIScript, 0},
 	{"forceattack", GameScript::ForceAttack, 0},
 	{"forcefacing", GameScript::ForceFacing, 0},
+	{"forcehide", GameScript::ForceHide, 0},
 	{"forceleavearealua", GameScript::ForceLeaveAreaLUA, 0},
 	{"forcespell", GameScript::ForceSpell, AF_BLOCKING},
 	{"fullheal", GameScript::FullHeal, 0},
@@ -625,6 +630,8 @@ static ActionLink actionnames[] = {
 	{"polymorph", GameScript::Polymorph, 0},
 	{"polymorphcopy", GameScript::PolymorphCopy, 0},
 	{"polymorphcopybase", GameScript::PolymorphCopyBase, 0},
+	{"protectobject", GameScript::ProtectObject, 0},
+	{"protectpoint", GameScript::ProtectPoint, AF_BLOCKING},
 	{"quitgame", GameScript::QuitGame, 0},
 	{"randomfly", GameScript::RandomFly, AF_BLOCKING},
 	{"randomrun", GameScript::RandomWalk, AF_BLOCKING},//no running yet

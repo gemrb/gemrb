@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.264 2007/02/08 22:10:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.265 2007/02/08 22:56:56 avenger_teambg Exp $
  *
  */
 
@@ -1059,9 +1059,13 @@ public:
 	static void FloatMessageFixed(Scriptable* Sender, Action* parameters);
 	static void FloatMessageFixedRnd(Scriptable* Sender, Action* parameters);
 	static void FloatMessageRnd(Scriptable* Sender, Action* parameters);
+	static void Follow(Scriptable* Sender, Action* parameters);
+	static void FollowCreature(Scriptable* Sender, Action* parameters);
+	static void FollowObjectFormation(Scriptable* Sender, Action* parameters);
 	static void ForceAIScript(Scriptable* Sender, Action* parameters);
 	static void ForceAttack(Scriptable* Sender, Action* parameters);
 	static void ForceFacing(Scriptable* Sender, Action* parameters);
+	static void ForceHide(Scriptable* Sender, Action* parameters);
 	static void ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters);
 	static void ForceSpell(Scriptable* Sender, Action* parameters);
 	static void FullHeal(Scriptable* Sender, Action* parameters);
@@ -1169,7 +1173,7 @@ public:
 	static void Polymorph(Scriptable* Sender, Action* parameters);
 	static void PolymorphCopy(Scriptable* Sender, Action* parameters);
 	static void PolymorphCopyBase(Scriptable* Sender, Action* parameters);
-	static void Protect(Scriptable* Sender, Action* parameters);
+	static void ProtectObject(Scriptable* Sender, Action* parameters);
 	static void ProtectPoint(Scriptable* Sender, Action* parameters);
 	static void QuitGame(Scriptable* Sender, Action* parameters);
 	static void RandomFly(Scriptable* Sender, Action* parameters);

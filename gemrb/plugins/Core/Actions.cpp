@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.105 2007/02/08 22:10:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.106 2007/02/08 22:56:56 avenger_teambg Exp $
  *
  */
 
@@ -881,7 +881,7 @@ void GameScript::MoveToPointNoRecticle(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Actor* actor = ( Actor* ) Sender;
+	Actor *actor = ( Actor* ) Sender;
 	actor->WalkTo( parameters->pointParameter, IF_NORECTICLE, 0 );
 	Sender->ReleaseCurrentAction();
 }
@@ -928,7 +928,7 @@ void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
 	Actor* actor = ( Actor* ) Sender;
 	//InMove could release the current action, so we need this
 	ieDword tmp = (ieDword) parameters->int0Parameter;
-	actor->WalkTo( parameters->pointParameter, tmp );
+	actor->WalkTo( parameters->pointParameter, 0, tmp );
 	if (tmp) {
 		//InMove will clear destination too, so we need to save it
 		Point dest = actor->Destination;
@@ -2287,6 +2287,20 @@ void GameScript::HideCreature(Scriptable* Sender, Action* parameters)
 	}
 }
 
+//i have absolutely no idea why this is needed when we have HideCreature
+void GameScript::ForceHide(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		tar=Sender;
+	}
+	if (tar->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) tar;
+	actor->SetMCFlag(MC_HIDDEN, BM_OR);
+}
+
 //this isn't sure
 void GameScript::Activate(Scriptable* Sender, Action* parameters)
 {
@@ -3332,15 +3346,15 @@ void GameScript::DropInventoryEX(Scriptable *Sender, Action* parameters)
 		return;
 	}
 	Inventory *inv = NULL;
-        switch (Sender->Type) {
-                case ST_ACTOR:
-                        inv = &(((Actor *) tar)->inventory);
-                        break;
-                case ST_CONTAINER:
-                        inv = &(((Container *) tar)->inventory);
-                        break;
-                default:;
-        }
+	switch (Sender->Type) {
+		case ST_ACTOR:
+			inv = &(((Actor *) tar)->inventory);
+			break;
+		case ST_CONTAINER:
+			inv = &(((Container *) tar)->inventory);
+			break;
+		default:;
+	}
 	if (inv) {
 		int x = inv->GetSlotCount();
 		Map *area = tar->GetCurrentArea();
@@ -4964,5 +4978,83 @@ void GameScript::ChangeAIType(Scriptable* Sender, Action* parameters)
 			continue;
 		}
 	}
+}
+
+void GameScript::Follow(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+
+	Actor *scr = (Actor *)Sender;
+	scr->FollowOffset = parameters->pointParameter;
+}
+
+void GameScript::FollowCreature(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *scr = (Actor *)Sender;
+	Actor *actor = (Actor *)tar;
+	scr->LastFollowed = actor->GetID();
+	scr->FollowOffset.x = -1;
+	scr->FollowOffset.y = -1;
+}
+
+void GameScript::ProtectPoint(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *scr = (Actor *)Sender;
+	scr->WalkTo( parameters->pointParameter, 0, 0 );
+	Sender->ReleaseCurrentAction();
+}
+
+void GameScript::ProtectObject(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *scr = (Actor *)Sender;
+	Actor *actor = (Actor *)tar;
+	scr->LastFollowed = actor->GetID();
+	scr->LastProtected = actor->GetID();
+	//not exactly range
+	scr->FollowOffset.x = parameters->int0Parameter;
+	scr->FollowOffset.y = parameters->int0Parameter;
+}
+
+void GameScript::FollowObjectFormation(Scriptable* Sender, Action* parameters)
+{
+	GameControl *gc = core->GetGameControl();
+	if (!gc) {
+		return;
+	}
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *scr = (Actor *)Sender;
+	Actor *actor = (Actor *)tar;
+	scr->LastFollowed = actor->GetID();
+	ieDword formation = parameters->int0Parameter;
+	ieDword pos = parameters->int1Parameter;
+	scr->FollowOffset = gc->GetFormationOffset(formation, pos);
 }
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.304 2007/02/04 15:50:01 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.305 2007/02/08 22:56:56 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -71,7 +71,7 @@ Animation* effect;
 
 #define FORMATIONSIZE 10
 typedef Point formation_type[FORMATIONSIZE];
-int formationcount;
+ieDword formationcount;
 static formation_type *formations=NULL;
 static bool mqs = false;
 
@@ -128,7 +128,7 @@ GameControl::GameControl(void)
 //actually the savegame contains some formation data too, how to use it?
 void GameControl::ReadFormations()
 {
-	int i,j;
+	unsigned int i,j;
 	TableMgr * tab;
 	int table=core->LoadTable("formatio");
 	if (table<0) {
@@ -157,6 +157,13 @@ void GameControl::ReadFormations()
 fallback:
 	formationcount = 1;
 	formations = (formation_type *) calloc(1,sizeof(formation_type) );
+}
+
+Point GameControl::GetFormationOffset(ieDword formation, ieDword pos)
+{
+	if (formation>=formationcount) formation = 0;
+	if (pos>=FORMATIONSIZE) pos=FORMATIONSIZE-1;
+	return formations[formation][pos];
 }
 
 //don't pass p as a reference
