@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TableMgr.h,v 1.18 2005/12/21 16:53:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TableMgr.h,v 1.19 2007/02/08 22:10:10 avenger_teambg Exp $
  *
  */
 
@@ -54,11 +54,11 @@ public:
 	TableMgr();
 	virtual ~TableMgr();
 	/** Returns the actual number of Rows in the Table */
-	virtual int GetRowCount() const = 0;
+	virtual ieDword GetRowCount() const = 0;
 	/** Returns the number of Columns in the Table */
-	virtual int GetColNamesCount() const = 0;
+	virtual ieDword GetColNamesCount() const = 0;
 	/** Returns the actual number of Columns in a row */
-	virtual int GetColumnCount(unsigned int row = 0) const = 0;
+	virtual ieDword GetColumnCount(unsigned int row = 0) const = 0;
 	/** Returns a pointer to a zero terminated 2da element,
 	 * 0,0 returns the default value, it may return NULL */
 	virtual const char* QueryField(unsigned int row = 0, unsigned int column = 0) const = 0;

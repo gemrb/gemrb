@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.455 2007/02/05 20:15:45 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.456 2007/02/08 22:10:10 avenger_teambg Exp $
  *
  */
 
@@ -4313,8 +4313,8 @@ bool Interface::ReadRandomItems()
 	TableMgr * tab;
 
 	int table=LoadTable( "randitem" );
-	int difflev=0; //rt norm or rt fury
-
+	ieDword difflev=0; //rt norm or rt fury
+	vars->Lookup("Nightmare Mode", difflev);
 	if (RtRows) {
 		RtRows->RemoveAll(ReleaseItemList);
 	}
@@ -4331,6 +4331,9 @@ bool Interface::ReadRandomItems()
 	tab = GetTable( table );
 	if (!tab) {
 		goto end;
+	}
+	if (difflev>=tab->GetColumnCount()) {
+		difflev = tab->GetColumnCount()-1;
 	}
 	strncpy( GoldResRef, tab->QueryField((unsigned int) 0,(unsigned int) 0), sizeof(ieResRef) ); //gold
 	if ( GoldResRef[0]=='*' ) {

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.263 2007/02/06 22:20:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.264 2007/02/08 22:10:09 avenger_teambg Exp $
  *
  */
 
@@ -821,6 +821,7 @@ public: //Script Functions
 	static int NearbyDialog(Scriptable* Sender, Trigger* parameters);
 	static int NearLocation(Scriptable* Sender, Trigger* parameters);
 	static int NearSavedLocation(Scriptable* Sender, Trigger* parameters);
+	static int NightmareModeOn(Scriptable* Sender, Trigger* parameters);
 	static int NotStateCheck(Scriptable* Sender, Trigger* parameters);
 	static int NullDialog(Scriptable* Sender, Trigger* parameters);
 	static int NumCreatures(Scriptable* Sender, Trigger* parameters);
@@ -964,6 +965,7 @@ public:
 	static void BreakInstants(Scriptable* Sender, Action* parameters);
 	static void Calm(Scriptable* Sender, Action* parameters);
 	static void ChangeAIScript(Scriptable* Sender, Action* parameters);
+	static void ChangeAIType(Scriptable* Sender, Action* parameters);
 	static void ChangeAlignment(Scriptable* Sender, Action* parameters);
 	static void ChangeAllegiance(Scriptable* Sender, Action* parameters);
 	static void ChangeAnimation(Scriptable* Sender, Action* parameters);

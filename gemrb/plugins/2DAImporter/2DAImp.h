@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/2DAImporter/2DAImp.h,v 1.21 2005/12/21 16:53:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/2DAImporter/2DAImp.h,v 1.22 2007/02/08 22:10:09 avenger_teambg Exp $
  *
  */
 
@@ -41,23 +41,23 @@ public:
 	~p2DAImp(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	/** Returns the actual number of Rows in the Table */
-	inline int GetRowCount() const
+	inline ieDword GetRowCount() const
 	{
-		return ( int ) rows.size();
+		return ( ieDword ) rows.size();
 	}
 
-	inline int GetColNamesCount() const
+	inline ieDword GetColNamesCount() const
 	{
-		return (int) colNames.size();
+		return (ieDword) colNames.size();
 	}
 
 	/** Returns the actual number of Columns in the Table */
-	inline int GetColumnCount(unsigned int row = 0) const
+	inline ieDword GetColumnCount(unsigned int row = 0) const
 	{
 		if (rows.size() <= row) {
 			return 0;
 		}
-		return ( int ) rows[row].size();
+		return ( ieDword ) rows[row].size();
 	}
 	/** Returns a pointer to a zero terminated 2da element,
 		if it cannot return a value, it returns the default */

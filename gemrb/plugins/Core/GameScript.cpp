@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.390 2007/02/08 21:05:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.391 2007/02/08 22:10:09 avenger_teambg Exp $
  *
  */
 
@@ -61,6 +61,7 @@ static TriggerLink triggernames[] = {
 	{"calledbyname", GameScript::CalledByName, 0}, //this is still a question
 	{"chargecount", GameScript::ChargeCount, 0},
 	{"charname", GameScript::CharName, 0}, //not scripting name
+	{"checkareadifflevel", GameScript::DifficultyLT, 0},//iwd2 guess
 	{"checkdoorflags", GameScript::CheckDoorFlags, 0},
 	{"checkpartyaveragelevel", GameScript::CheckPartyAverageLevel, 0},
 	{"checkpartylevel", GameScript::CheckPartyLevel, 0},
@@ -187,6 +188,7 @@ static TriggerLink triggernames[] = {
 	{"isfacingobject", GameScript::IsFacingObject, 0},
 	{"isfacingsavedrotation", GameScript::IsFacingSavedRotation, 0},
 	{"isgabber", GameScript::IsGabber, 0},
+	{"isheartoffurymodeon", GameScript::NightmareModeOn, 0},
 	{"islocked", GameScript::IsLocked, 0},
 	{"isextendednight", GameScript::IsExtendedNight, 0},
 	{"isoverme", GameScript::IsOverMe, 0}, // same as harmlessentered?
@@ -225,6 +227,7 @@ static TriggerLink triggernames[] = {
 	{"nearbydialogue", GameScript::NearbyDialog, 0},
 	{"nearlocation", GameScript::NearLocation, 0},
 	{"nearsavedlocation", GameScript::NearSavedLocation, 0},
+	{"nightmaremodeon", GameScript::NightmareModeOn, 0},
 	{"notstatecheck", GameScript::NotStateCheck, 0},
 	{"nulldialog", GameScript::NullDialog, 0},
 	{"nulldialogue", GameScript::NullDialog, 0},

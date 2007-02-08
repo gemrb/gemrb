@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.104 2007/02/08 21:05:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.105 2007/02/08 22:10:09 avenger_teambg Exp $
  *
  */
 
@@ -4916,5 +4916,53 @@ void GameScript::SetSelection(Scriptable* /*Sender*/, Action* parameters)
 		return;
 	}
 	gc->SelectActor(parameters->int0Parameter, parameters->int1Parameter);
+}
+
+//this action is weird in the original game, because it overwrites ALL
+//IDS stats.
+//in this version, if a stat is set to 0, it won't change
+//it will alter only the main IDS stats
+void GameScript::ChangeAIType(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Object *ob = parameters->objects[1];
+	if (!ob) {
+		return;
+	}
+	Actor *scr = (Actor *) Sender;
+	for (int i=0;i<MAX_OBJECT_FIELDS;i++) {
+		int val = ob->objectFields[i];
+		if (!val) continue;
+		if (!strnicmp(ObjectIDSTableNames[i],"ea",8)) {
+			scr->SetBase(IE_EA, val);
+			continue;
+		}
+		if (!strnicmp(ObjectIDSTableNames[i],"general",8)) {
+			scr->SetBase(IE_GENERAL, val);
+			continue;
+		}
+		if (!strnicmp(ObjectIDSTableNames[i],"race",8)) {
+			scr->SetBase(IE_RACE, val);
+			continue;
+		}
+		if (!strnicmp(ObjectIDSTableNames[i],"class",8)) {
+			scr->SetBase(IE_RACE, val);
+			continue;
+		}
+		if (!strnicmp(ObjectIDSTableNames[i],"gender",8)) {
+			scr->SetBase(IE_SEX, val);
+			continue;
+		}
+		if (!strnicmp(ObjectIDSTableNames[i],"specific",8)) {
+			scr->SetBase(IE_SPECIFIC, val);
+			continue;
+		}
+		if (!strnicmp(ObjectIDSTableNames[i],"align",8)) {
+			scr->SetBase(IE_ALIGNMENT, val);
+			continue;
+		}
+	}
 }
 

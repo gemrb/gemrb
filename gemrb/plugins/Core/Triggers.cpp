@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.61 2007/02/06 22:20:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.62 2007/02/08 22:10:10 avenger_teambg Exp $
  *
  */
 
@@ -3033,12 +3033,28 @@ int GameScript::FallenRanger(Scriptable* Sender, Trigger* /*parameters*/)
 	return (act->GetStat(IE_MC_FLAGS) & MC_FALLEN_RANGER)!=0;
 }
 
+int GameScript::NightmareModeOn(Scriptable* /*Sender*/, Trigger* /*parameters*/)
+{
+	ieDword diff;
+
+	core->GetDictionary()->Lookup("Nightmare Mode", diff);
+	if (diff) {
+		return 1;
+	}
+	return 0;
+}
+
 int GameScript::Difficulty(Scriptable* /*Sender*/, Trigger* parameters)
 {
 	ieDword diff;
 
 	core->GetDictionary()->Lookup("Difficulty Level", diff);
-	return diff==(ieDword) parameters->int0Parameter;
+	int mode = parameters->int1Parameter;
+	//hack for compatibility
+	if (!mode) {
+		mode = EQUALS;
+	}
+	return DiffCore(diff, (ieDword) parameters->int0Parameter, mode);
 }
 
 int GameScript::DifficultyGT(Scriptable* /*Sender*/, Trigger* parameters)
