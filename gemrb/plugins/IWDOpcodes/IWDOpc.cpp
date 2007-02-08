@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.cpp,v 1.16 2007/01/30 20:02:16 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.cpp,v 1.17 2007/02/08 20:12:14 avenger_teambg Exp $
  *
  */
 
@@ -31,6 +31,10 @@
 
 static ieResRef *iwd_spell_hits = NULL;
 static int shcount = -1;
+
+#define PI_PROTFROMEVIL 9
+#define PI_FREEACTION 19
+#define PI_HOPELESSNESS 47
 
 static int fx_fade_rgb (Actor* Owner, Actor* target, Effect* fx);//e8
 static int fx_iwd_visual_spell_hit (Actor* Owner, Actor* target, Effect* fx);//e9
@@ -105,6 +109,10 @@ static int fx_jackalwere_gaze (Actor* Owner, Actor* target, Effect* fx); //127
 //0x129 HideInShadows (same as bg2)
 static int fx_use_magic_device_modifier (Actor* Owner, Actor* target, Effect* fx);//12a
 
+static int fx_hopelessness (Actor* /*Owner*/, Actor* target, Effect* fx);//400
+static int fx_protection_from_evil (Actor* /*Owner*/, Actor* target, Effect* fx);//401
+static int fx_free_action_iwd2 (Actor* /*Owner*/, Actor* target, Effect* fx); //418
+
 //No need to make these ordered, they will be ordered by EffectQueue
 static EffectRef effectnames[] = {
 	{ "Color:FadeRGB", fx_fade_rgb, 0}, //e8
@@ -163,6 +171,11 @@ static EffectRef effectnames[] = {
 	{ "HarpyWail", fx_harpy_wail, 0}, //126
 	{ "JackalWereGaze", fx_jackalwere_gaze, 0}, //127
 	{ "UseMagicDeviceModifier", fx_use_magic_device_modifier, 0}, //12a
+	//iwd2 effects
+	{ "Hopelessness", fx_hopelessness, 0}, //400
+	{ "ProtectionFromEvil", fx_protection_from_evil, 0}, //401
+	{ "FreeAction2", fx_free_action_iwd2, 0}, //418
+	{ "ControlUndead2", fx_control_undead, 0}, //425
 	{ NULL, NULL, 0 },
 };
 
@@ -1187,3 +1200,86 @@ int fx_use_magic_device_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_MOD( IE_MAGICDEVICE );
 	return FX_APPLIED;
 }
+
+//IWD2 effects
+
+//400 Hopelessness
+int fx_hopelessness (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_hopelessness (%2d)\n", fx->Opcode);
+	EXTSTATE_SET(400);
+	target->AddPortraitIcon(PI_HOPELESSNESS);
+	return FX_APPLIED;
+}
+
+//401 ProtectionFromEvil
+int fx_protection_from_evil (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_protection_from_evil (%2d)\n", fx->Opcode);
+	EXTSTATE_SET(400);
+	target->AddPortraitIcon(PI_PROTFROMEVIL);
+	return FX_APPLIED;
+}
+//402 AddEffectsList
+//403 ArmorOfFaith
+//404 Nausea
+//405 Enfeeblement
+//406 FireShield
+//407 DeathWard
+//408 HolyPower
+//409 RighteousWrath
+//410 SummonAllyIWD2
+//411 SummonEnemyIWD2
+//412 Control2
+//413 VisualEffectIWD2
+//414 ResilientSphere
+//415 Barkskin
+//416 BleedingWounds
+//417 AreaEffect
+//418 FreeAction2
+int fx_free_action_iwd2 (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+        if (0) printf( "fx_free_action_iwd2 (%2d)\n", fx->Opcode);
+	target->AddPortraitIcon(PI_FREEACTION);
+	return FX_APPLIED;	
+}
+//419 Unconsciousness
+//420 Death2 (see in core effects)
+//421 EntropyShield
+//422
+//423
+//424
+//425 ControlUndead2 (see above)
+//426
+//427
+//428
+//429
+//430
+//431
+//432
+//433
+//434
+//435
+//436
+//437
+//438
+//439
+//440
+//441
+//442
+//443
+//444
+//445
+//446
+//447
+//448
+//449
+//450
+//451
+//452
+//453
+//454
+//455
+//456
+//457
+

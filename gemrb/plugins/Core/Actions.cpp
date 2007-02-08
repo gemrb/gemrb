@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.102 2007/02/04 14:22:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.103 2007/02/08 20:12:12 avenger_teambg Exp $
  *
  */
 
@@ -3496,21 +3496,29 @@ void GameScript::SetRestEncounterChance(Scriptable * Sender, Action* parameters)
 	map->RestHeader.NightChance = (ieWord) parameters->int1Parameter;
 }
 
+//easily hardcoded end sequence
 void GameScript::EndCredits(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	core->PlayMovie("credits");
 }
 
+//easily hardcoded end sequence
 void GameScript::ExpansionEndCredits(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	core->PlayMovie("ecredit");
 }
 
+//always quits game, but based on game it can play end animation, or display
+//death text, etc
+//this covers:
+//QuitGame (play one of 3 movies in PST)
+//EndGame (display death screen with strref)
 void GameScript::QuitGame(Scriptable* Sender, Action* parameters)
 {
 	ClearAllActions(Sender, parameters);
-	//back to start script
-	core->QuitFlag = QF_EXITGAME;
+	core->GetDictionary()->SetAt("QuitGame", (ieDword) parameters->int0Parameter);
+	strncpy( core->NextScript, "QuitGame", sizeof(core->NextScript) );
+	core->QuitFlag |= QF_CHANGESCRIPT;
 }
 
 void GameScript::StopMoving(Scriptable* Sender, Action* /*parameters*/)

@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUIWORLD.py,v 1.9 2006/06/26 10:28:46 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/GUIWORLD.py,v 1.10 2007/02/08 20:12:12 avenger_teambg Exp $
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
@@ -342,6 +342,7 @@ def DeathWindow():
 	#no death movie, but music is changed
 	GemRB.LoadMusicPL ("Theme.mus",1)
 	GemRB.HideGUI ()
+	GemRB.SetVar("QuitGame", 16498)
 	GemRB.SetTimedEvent ("DeathWindowEnd", 10)
 	return
 
@@ -353,7 +354,8 @@ def DeathWindowEnd ():
 
 	#reason for death
 	Label = GemRB.GetControl (Window, 0x0fffffff)
-	GemRB.SetText (Window, Label, 16498)
+	strref = GemRB.GetVar ("QuitGame")
+	GemRB.SetText (Window, Label, strref)
 
 	#load
 	Button = GemRB.GetControl (Window, 1)

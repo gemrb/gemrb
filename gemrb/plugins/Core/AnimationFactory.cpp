@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationFactory.cpp,v 1.13 2007/02/04 15:50:00 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/AnimationFactory.cpp,v 1.14 2007/02/08 20:12:12 avenger_teambg Exp $
  *
  */
 
@@ -38,9 +38,11 @@ AnimationFactory::~AnimationFactory(void)
 	for (unsigned int i = 0; i < frames.size(); i++) {
 		core->GetVideoDriver()->FreeSprite( frames[i] );
 	}
-	delete[] FLTable;
+	if (FLTable)
+		free( FLTable);
 	// TODO: add assert here on refcount (which needs to be added...)
-	delete[] FrameData;
+	if (FrameData)
+		free( FrameData);
 }
 
 void AnimationFactory::AddFrame(Sprite2D* frame)
@@ -58,11 +60,12 @@ void AnimationFactory::LoadFLT(unsigned short* buffer, int count)
 	if (FLTable) {
 		free( FLTable );
 	}
-	FLTable = new unsigned short[count];
+	//FLTable = new unsigned short[count];
+	FLTable = (unsigned short *) malloc(count * sizeof( unsigned short ) );
 	memcpy( FLTable, buffer, count * sizeof( unsigned short ) );
 }
 
-void AnimationFactory::SetFrameData(const unsigned char* FrameData)
+void AnimationFactory::SetFrameData(unsigned char* FrameData)
 {
 	this->FrameData = FrameData;
 }
@@ -108,8 +111,7 @@ Sprite2D* AnimationFactory::GetFrameWithoutCycle(unsigned short index)
 }
 
 Sprite2D* AnimationFactory::GetPaperdollImage(ieDword *Colors,
-											  Sprite2D *&Picture2,
-											  unsigned int type)
+		Sprite2D *&Picture2, unsigned int type)
 {
 	if (frames.size()<2) {
 		return NULL;

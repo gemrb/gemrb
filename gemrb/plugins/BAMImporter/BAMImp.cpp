@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.52 2007/02/04 15:50:00 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/BAMImporter/BAMImp.cpp,v 1.53 2007/02/08 20:12:12 avenger_teambg Exp $
  *
  */
 
@@ -337,7 +337,8 @@ AnimationFactory* BAMImp::GetAnimationFactory(const char* ResRef, unsigned char 
 		str->Seek( DataStart, GEM_STREAM_START );
 		unsigned long length = str->Remains();
 		if (length == 0) return af;
-		data = new unsigned char[length];
+		//data = new unsigned char[length];
+		data = (unsigned char *) malloc(length);
 		str->Read( data, length );
 		af->SetFrameData(data);
 	}

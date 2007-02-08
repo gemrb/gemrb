@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.388 2007/02/06 22:20:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.389 2007/02/08 20:12:12 avenger_teambg Exp $
  *
  */
 
@@ -470,6 +470,7 @@ static ActionLink actionnames[] = {
 	{"enableportaltravel", GameScript::EnablePortalTravel, 0},
 	{"endcredits", GameScript::EndCredits, 0},//movie
 	{"endcutscenemode", GameScript::EndCutSceneMode, 0},
+	{"endgame", GameScript::QuitGame, 0},  //ending in iwd2
 	{"enemy", GameScript::Enemy, 0},
 	{"equipitem", GameScript::EquipItem, AF_BLOCKING}, //why blocking???
 	{"equipmostdamagingmelee",GameScript::EquipMostDamagingMelee,0},
@@ -534,7 +535,7 @@ static ActionLink actionnames[] = {
 	{"globalsubglobal", GameScript::GlobalSubGlobal,AF_MERGESTRINGS},
 	{"globalxor", GameScript::GlobalXor,AF_MERGESTRINGS},
 	{"globalxorglobal", GameScript::GlobalXorGlobal,AF_MERGESTRINGS},
-	{"gotostartscreen", GameScript::QuitGame, 0},
+	{"gotostartscreen", GameScript::QuitGame, 0},//ending
 	{"help", GameScript::Help, 0},
 	{"hide", GameScript::Hide, 0},
 	{"hideareaonmap", GameScript::HideAreaOnMap, 0},

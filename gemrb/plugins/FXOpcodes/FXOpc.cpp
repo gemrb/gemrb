@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.56 2007/02/04 14:22:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.57 2007/02/08 20:12:13 avenger_teambg Exp $
  *
  */
 
@@ -482,6 +482,7 @@ static EffectRef effectnames[] = {
 	{ "DamageLuckModifier", fx_damageluck_modifier, 0 },
 	{ "DamageVsCreature", fx_generic_effect, 0 },
 	{ "Death", fx_death, 0 },
+	{ "Death2", fx_death, 0 }, //(iwd2 effect)
 	{ "DetectAlignment", fx_detect_alignment, 0 },
 	{ "DetectIllusionsModifier", fx_detect_illusion_modifier, 0 },
 	{ "DexterityModifier", fx_dexterity_modifier, 0 },
