@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.389 2007/02/08 20:12:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.390 2007/02/08 21:05:40 avenger_teambg Exp $
  *
  */
 
@@ -466,6 +466,7 @@ static ActionLink actionnames[] = {
 	{"displaystringwait", GameScript::DisplayStringWait,AF_BLOCKING},
 	{"dropinventory", GameScript::DropInventory, 0},
 	{"dropinventoryex", GameScript::DropInventoryEX, 0},
+	{"dropinventoryexexclude", GameScript::DropInventoryEX, 0}, //same
 	{"dropitem", GameScript::DropItem, AF_BLOCKING},
 	{"enableportaltravel", GameScript::EnablePortalTravel, 0},
 	{"endcredits", GameScript::EndCredits, 0},//movie
@@ -595,6 +596,7 @@ static ActionLink actionnames[] = {
 	{"movetosavedlocationn", GameScript::MoveToSavedLocation,AF_BLOCKING},
 	{"moveviewobject", GameScript::MoveViewObject, 0},
 	{"moveviewpoint", GameScript::MoveViewPoint, 0},
+	{"moveviewpointuntildone", GameScript::MoveViewPoint, 0},
 	{"nidspecial1", GameScript::NIDSpecial1,AF_BLOCKING},//we use this for dialogs, hack
 	{"nidspecial2", GameScript::NIDSpecial2,AF_BLOCKING},//we use this for worldmap, another hack
 	{"nidspecial3", GameScript::Attack,AF_BLOCKING|AF_DIRECT},//this hack is for attacking preset target

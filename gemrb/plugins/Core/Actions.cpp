@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.103 2007/02/08 20:12:12 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.104 2007/02/08 21:05:40 avenger_teambg Exp $
  *
  */
 
@@ -1524,7 +1524,7 @@ void GameScript::PlaySequenceTimed(Scriptable* Sender, Action* parameters)
 	} else {
 		tar=Sender;
 	}
-	if (tar->Type != ST_ACTOR) {
+	if (!tar || tar->Type != ST_ACTOR) {
 		return;
 	}
 	Actor* actor = ( Actor* ) tar;
@@ -1537,6 +1537,9 @@ void GameScript::PlaySequenceTimed(Scriptable* Sender, Action* parameters)
 void GameScript::WaitAnimation(Scriptable* Sender, Action* parameters)
 {
 	Scriptable *tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		tar=Sender;
+	}
 	if (tar->Type != ST_ACTOR) {
 		return;
 	}
@@ -3320,14 +3323,37 @@ void GameScript::DropInventory(Scriptable *Sender, Action* /*parameters*/)
 	scr->DropItem("",0);
 }
 
+//this should work on containers!
+//using the same code for DropInventoryEXExclude
 void GameScript::DropInventoryEX(Scriptable *Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	if (tar->Type!=ST_ACTOR) {
+	if (!tar) {
 		return;
 	}
-	Actor *scr = (Actor *) tar;
-	scr->DropItem("",0);
+	Inventory *inv = NULL;
+        switch (Sender->Type) {
+                case ST_ACTOR:
+                        inv = &(((Actor *) tar)->inventory);
+                        break;
+                case ST_CONTAINER:
+                        inv = &(((Container *) tar)->inventory);
+                        break;
+                default:;
+        }
+	if (inv) {
+		int x = inv->GetSlotCount();
+		Map *area = tar->GetCurrentArea();
+		while(x--) {
+			if (parameters->string0Parameter[0]) {
+				const char *resref = inv->GetSlotItem(x)->ItemResRef;
+				if (!strnicmp(parameters->string0Parameter, resref, 8)) {
+					continue;
+				}
+			}
+			inv->DropItemAtLocation(x, 0, area, tar->Pos);
+		}
+	}
 }
 
 void GameScript::GivePartyAllEquipment(Scriptable *Sender, Action* /*parameters*/)
@@ -4257,7 +4283,7 @@ void GameScript::AttachTransitionToDoor(Scriptable* Sender, Action* parameters)
 	if (!tar) {
 		return;
 	}
-	if (tar->Type != ST_DOOR) {
+	if (!tar || tar->Type != ST_DOOR) {
 		return;
 	}
 	Door* door = ( Door* ) tar;

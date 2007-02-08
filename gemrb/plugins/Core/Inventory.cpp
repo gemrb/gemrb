@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.111 2007/01/30 22:32:22 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.112 2007/02/08 21:05:40 avenger_teambg Exp $
  *
  */
 
@@ -99,7 +99,7 @@ Inventory::~Inventory()
 
 CREItem *Inventory::GetItem(unsigned int slot)
 {
-	if (slot>=Slots.size() ) {
+	if (slot >= Slots.size() ) {
 		InvalidSlot(slot);
 	}
 	CREItem *item = Slots[slot];
@@ -254,7 +254,7 @@ void Inventory::SetSlotCount(unsigned int size)
 /** if you supply a "" string, then it checks if the slot is empty */
 bool Inventory::HasItemInSlot(const char *resref, unsigned int slot)
 {
-	if (slot>=Slots.size()) {
+	if (slot >= Slots.size()) {
 		return false;
 	}
 	CREItem *item = Slots[slot];
@@ -417,7 +417,7 @@ CREItem *Inventory::RemoveItem(unsigned int slot, unsigned int count)
 {
 	CREItem *item;
 
-	if (slot>=Slots.size() ) {
+	if (slot >= Slots.size() ) {
 		InvalidSlot(slot);
 		abort();
 	}
@@ -461,7 +461,7 @@ int Inventory::RemoveItem(const char *resref, unsigned int flags, CREItem **res_
 
 void Inventory::SetSlotItem(CREItem* item, unsigned int slot)
 {
-	if (slot>=Slots.size() ) {
+	if (slot >= Slots.size() ) {
 		InvalidSlot(slot);
 	}
 	Changed = true;
@@ -653,7 +653,7 @@ int Inventory::FindItem(const char *resref, unsigned int flags)
 
 bool Inventory::DropItemAtLocation(unsigned int slot, unsigned int flags, Map *map, Point &loc)
 {
-	if (slot>Slots.size()) {
+	if (slot >= Slots.size()) {
 		return false;
 	}
 	//these slots will never 'drop' the item
@@ -711,7 +711,7 @@ bool Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 
 CREItem *Inventory::GetSlotItem(unsigned int slot)
 {
-	if (slot>=Slots.size() ) {
+	if (slot >= Slots.size() ) {
 		InvalidSlot(slot);
 	}
 	return Slots[slot];
@@ -1311,7 +1311,7 @@ bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count
 
 bool Inventory::UseItem(unsigned int slotindex, unsigned int headerindex, Actor *target)
 {
-	if (slotindex>=Slots.size())
+	if (slotindex >= Slots.size())
 		return false;
 	CREItem *slot = Slots[slotindex];
 
@@ -1456,8 +1456,8 @@ int Inventory::WhyCantEquip(int slot, int twohanded)
 	}
 
 	if (twohanded) {
-		if(IWD2) {
-			if(slot>=SLOT_MELEE&&slot<=LAST_MELEE && (slot&1) ) {
+		if (IWD2) {
+			if (slot>=SLOT_MELEE&&slot<=LAST_MELEE && (slot&1) ) {
 				return STR_NOT_IN_OFFHAND;
 			}
 		} else {
@@ -1465,7 +1465,7 @@ int Inventory::WhyCantEquip(int slot, int twohanded)
 				return STR_NOT_IN_OFFHAND;
 			}
 		}
-		if(IsSlotBlocked(slot)) {
+		if (IsSlotBlocked(slot)) {
 		//cannot equip two handed while shield slot is in use?
 			return STR_OFFHAND_USED;
 		}
