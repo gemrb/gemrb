@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/NewLife.py,v 1.18 2004/11/21 18:28:25 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/NewLife.py,v 1.19 2007/02/09 19:37:34 avenger_teambg Exp $
 
 # NewLife.py - Character generation screen
 
@@ -292,7 +292,19 @@ def AcceptPress():
 	GemRB.SetPlayerStat(1, IE_CHR, Cha)
 
 	#don't add con bonus, it will be calculated by the game
-	GemRB.SetPlayerStat(1, IE_HITPOINTS, 20 + (Con-10)*2)
+	#interestingly enough, the game adds only one level's con bonus
+	if Con>14:
+		x = 30
+	else:
+		x = 20+(Con-9)*2
+
+	print "Setting max hp to: ",x
+	GemRB.SetPlayerStat(1, IE_MAXHITPOINTS, x)
+	#adding the remaining constitution bonus to the current hp
+	#if Con>14:
+	#	x = x+(Con-14)*3
+	print "Setting current hp to: ",x
+	GemRB.SetPlayerStat(1, IE_HITPOINTS, x)
 
 	GemRB.FillPlayerInfo(1) #does all the rest
 	#LETS PLAY!!
