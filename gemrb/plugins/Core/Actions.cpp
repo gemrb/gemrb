@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.106 2007/02/08 22:56:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.107 2007/02/09 20:36:11 avenger_teambg Exp $
  *
  */
 
@@ -5056,5 +5056,43 @@ void GameScript::FollowObjectFormation(Scriptable* Sender, Action* parameters)
 	ieDword formation = parameters->int0Parameter;
 	ieDword pos = parameters->int1Parameter;
 	scr->FollowOffset = gc->GetFormationOffset(formation, pos);
+}
+
+void GameScript::TransformItem(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return;
+	}
+	TransformItemCore((Actor *)tar, parameters, true);
+}
+
+void GameScript::TransformPartyItem(Scriptable* /*Sender*/, Action* parameters)
+{
+	Game *game = core->GetGame();
+	int i = game->GetPartySize(false);
+	while (i--) {
+		Actor *tar = game->GetPC(i, false);
+		TransformItemCore(tar, parameters, true);
+	}
+}
+
+void GameScript::TransformItemAll(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return;
+	}
+	TransformItemCore((Actor *)tar, parameters, false);
+}
+
+void GameScript::TransformPartyItemAll(Scriptable* /*Sender*/, Action* parameters)
+{
+	Game *game = core->GetGame();
+	int i = game->GetPartySize(false);
+	while (i--) {
+		Actor *tar = game->GetPC(i, false);
+		TransformItemCore(tar, parameters, false);
+	}
 }
 

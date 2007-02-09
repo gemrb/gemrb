@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.392 2007/02/08 22:56:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.393 2007/02/09 20:36:11 avenger_teambg Exp $
  *
  */
 
@@ -790,6 +790,10 @@ static ActionLink actionnames[] = {
 	{"textscreen", GameScript::TextScreen, AF_BLOCKING},
 	{"timedmovetopoint", GameScript::MoveToPoint,AF_BLOCKING},//no timing yet
 	{"tomsstringdisplayer", GameScript::DisplayMessage, 0},
+	{"transformitem", GameScript::TransformItem, 0},
+	{"transformitemall", GameScript::TransformItemAll, 0},
+	{"transformpartyitem", GameScript::TransformPartyItem, 0},
+	{"transformpartyitemall", GameScript::TransformPartyItemAll, 0},
 	{"triggeractivation", GameScript::TriggerActivation, 0},
 	{"triggerwalkto", GameScript::MoveToObject,AF_BLOCKING}, //something like this
 	{"turn", GameScript::Turn, 0},

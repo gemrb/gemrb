@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.265 2007/02/08 22:56:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.266 2007/02/09 20:36:11 avenger_teambg Exp $
  *
  */
 
@@ -1309,6 +1309,10 @@ public:
 	static void TakePartyItemRange(Scriptable* Sender, Action* parameters);
 	static void TeleportParty(Scriptable* Sender, Action* parameters);
 	static void TextScreen(Scriptable* Sender, Action* parameters);
+	static void TransformItem(Scriptable* Sender, Action* parameters);
+	static void TransformItemAll(Scriptable* Sender, Action* parameters);
+	static void TransformPartyItem(Scriptable* Sender, Action* parameters);
+	static void TransformPartyItemAll(Scriptable* Sender, Action* parameters);
 	static void TriggerActivation(Scriptable* Sender, Action* parameters);
 	static void Turn(Scriptable* Sender, Action* parameters);
 	static void TurnAMT(Scriptable* Sender, Action* parameters);
