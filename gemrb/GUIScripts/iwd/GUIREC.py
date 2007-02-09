@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUIREC.py,v 1.10 2007/01/18 19:25:20 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUIREC.py,v 1.11 2007/02/09 17:23:48 avenger_teambg Exp $
 
 
 # GUIREC.py - scripts to control stats/records windows from GUIREC winpack
@@ -272,9 +272,9 @@ def GetStatOverview (pc):
 	CurrentState = won + GemRB.GetString (59856) + woff + "\n\n"
 	stats.append (None)
 	effects = GemRB.GetPlayerStates (pc)
-	for chr in effects:
-		tmp = GemRB.GetTableValue (StateTable, ord(chr)-65, 0)
-		print chr, GemRB.GetString(tmp)
+	for c in effects:
+		tmp = GemRB.GetTableValue (StateTable, ord(c)-65, 0)
+		print c, GemRB.GetString(tmp)
 		stats.append (tmp)
 
 	stats.append (None)
