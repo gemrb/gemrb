@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.129 2007/02/03 15:07:03 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.130 2007/02/09 19:34:47 avenger_teambg Exp $
  *
  */
 
@@ -186,7 +186,7 @@ void CREImp::WriteChrHeader(DataStream *stream, Actor *act)
 	stream->Write( name, 32);
 
 	stream->WriteDword( &tmpDword); //cre offset (chr header size)
-	stream->WriteDword( &CRESize);    //cre size
+	stream->WriteDword( &CRESize);  //cre size
 
 	SetupSlotCounts();
 	int i;
@@ -497,7 +497,6 @@ Actor* CREImp::GetActor()
 	// Setting up derived stats
 	if (act->BaseStats[IE_STATE_ID] & STATE_DEAD) {
 		act->SetStance( IE_ANI_TWITCH );
-		//act->Active=0;
 		act->Deactivate();
 	} else {
 		act->SetStance( IE_ANI_AWAKE );
@@ -506,6 +505,10 @@ Actor* CREImp::GetActor()
 		ReadChrHeader(act);
 	}
 
+	if (CREVersion==IE_CRE_V1_2) {
+		ieDword hp = act->BaseStats[IE_HITPOINTS] - GetHpAdjustment(act);
+		act->BaseStats[IE_HITPOINTS]=hp;
+	}
 	act->inventory.CalculateWeight();
 	return act;
 }
@@ -731,7 +734,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 
 	str->Seek( ItemSlotsOffset+CREOffset, GEM_STREAM_START );
 	act->SetupFist();
-	
+
 	for (i = 1; i <= Inventory_Size; i++) {
 		int Slot = core->QuerySlot( i );
 		ieWord index;
@@ -739,15 +742,14 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 
 		if (index != 0xFFFF) {
 			if (index>=ItemsCount) {
-				printf("[CREImp]: Invalid item index (%d) in creature!\n", index);
+				printMessage("CREImp"," ",LIGHT_RED);
+				printf("Invalid item index (%d) in creature!\n", index);
 				continue;
 			}
 			CREItem *item = items[index];
 			if (item && core->Exists(item->ItemResRef, IE_ITM_CLASS_ID)) {
 				act->inventory.SetSlotItem( item, Slot );
-				printf( "SLOT %d %s\n", i, item->ItemResRef);
 				if (core->QuerySlotEffects( i )) {
-					printf( "EQUIP 0x%04x\n", item->Flags );
 					if ( act->inventory.EquipItem( Slot ) ) {
 						printf( "EQUIP2 0x%04x\n", item->Flags );
 					}
@@ -755,14 +757,16 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 				items[index] = NULL;
 				continue;
 			}
-			printf("[CREImp]: Duplicate or (no-drop) item (%d) in creature!\n", index);
+			printMessage("CREImp"," ",LIGHT_RED);
+			printf("Duplicate or (no-drop) item (%d) in creature!\n", index);
 		}
 	}
 
 	i = ItemsCount;
 	while(i--) {
 		if ( items[i]) {
-			printf("[CREImp]: Dangling item in creature: %s!\n", items[i]->ItemResRef);
+			printMessage("CREImp"," ",LIGHT_RED);
+			printf("Dangling item in creature: %s!\n", items[i]->ItemResRef);
 			delete items[i];
 		}
 	}
@@ -859,9 +863,9 @@ void CREImp::GetEffect(Effect *fx)
 
 	eM->Open( str, false );
 	if (TotSCEFF) {
-		 eM->GetEffectV20( fx );
+		eM->GetEffectV20( fx );
 	} else {
-		 eM->GetEffectV1( fx );
+		eM->GetEffectV1( fx );
 	}
 	core->FreeInterface( eM );
 
@@ -1712,6 +1716,19 @@ int CREImp::PutInventory(DataStream *stream, Actor *actor, unsigned int size)
 	return 0;
 }
 
+//this hack is needed for PST to adjust the current hp for compatibility
+int CREImp::GetHpAdjustment(Actor *actor)
+{
+	int val;
+
+	if (actor->Modified[IE_CLASS]==2) {
+		val = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR,actor->BaseStats[IE_CON]);
+	} else {
+		val = core->GetConstitutionBonus(STAT_CON_HP_NORMAL,actor->BaseStats[IE_CON]);
+	}
+	return val * actor->GetXPLevel( false );
+}
+
 int CREImp::PutHeader(DataStream *stream, Actor *actor)
 {
 	char Signature[8];
@@ -1722,9 +1739,9 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 
 	memset(filling,0,sizeof(filling));
 	memcpy( Signature, "CRE V0.0", 8);
-	Signature[5]+=actor->version/10;
+	Signature[5]+=CREVersion/10;
 	if (actor->version!=IE_CRE_V1_1) {
-		Signature[7]+=actor->version%10;
+		Signature[7]+=CREVersion%10;
 	}
 	stream->Write( Signature, 8);
 	stream->WriteDword( &actor->ShortStrRef);
@@ -1735,6 +1752,9 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 	stream->WriteDword( &actor->BaseStats[IE_GOLD]);
 	stream->WriteDword( &actor->BaseStats[IE_STATE_ID]);
 	tmpWord = actor->BaseStats[IE_HITPOINTS];
+	if (CREVersion==IE_CRE_V1_2) {
+		tmpWord = (ieWord) (tmpWord + GetHpAdjustment(actor));
+	}
 	stream->WriteWord( &tmpWord);
 	tmpWord = actor->BaseStats[IE_MAXHITPOINTS];
 	stream->WriteWord( &tmpWord);
