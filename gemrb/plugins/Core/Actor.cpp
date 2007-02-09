@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.254 2007/02/02 21:43:41 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.255 2007/02/09 19:36:58 avenger_teambg Exp $
  *
  */
 
@@ -214,7 +214,7 @@ Actor::Actor()
 	//these are used only in iwd2 so we have to default them
 	for(i=0;i<7;i++) {
 		BaseStats[IE_HATEDRACE2+i]=0xff;
-	}	
+	}
 	//this one is saved only for PC's
 	ModalState = 0;
 	//this one is saved, but not loaded?
@@ -259,7 +259,7 @@ void Actor::SetText(char* ptr, unsigned char type)
 {
 	size_t len = strlen( ptr ) + 1;
 	//32 is the maximum possible length of the actor name in the original games
-	if (len>32) len=33; 
+	if (len>32) len=33;
 	if (type!=2) {
 		LongName = ( char * ) realloc( LongName, len );
 		memcpy( LongName, ptr, len );
@@ -390,7 +390,7 @@ void Actor::SetCircleSize()
 	if (!anims)
 		return;
 	int csize = anims->GetCircleSize() - 1;
-	if (csize >= MAX_CIRCLE_SIZE) 
+	if (csize >= MAX_CIRCLE_SIZE)
 		csize = MAX_CIRCLE_SIZE - 1;
 
 	SetCircle( anims->GetCircleSize(), *color, core->GroundCircles[csize][color_index], core->GroundCircles[csize][(color_index == 0) ? 3 : color_index] );
@@ -399,7 +399,7 @@ void Actor::SetCircleSize()
 //call this when morale or moralebreak changed
 void pcf_morale (Actor *actor, ieDword /*Value*/)
 {
-	if(actor->Modified[IE_MORALE]<=actor->Modified[IE_MORALEBREAK] ) {
+	if (actor->Modified[IE_MORALE]<=actor->Modified[IE_MORALEBREAK] ) {
 		actor->Panic();
 	}
 	//for new colour
@@ -414,7 +414,7 @@ void pcf_ea (Actor *actor, ieDword /*Value*/)
 //this is a good place to recalculate level up stuff
 void pcf_level (Actor *actor, ieDword /*Value*/)
 {
-	ieDword sum = 
+	ieDword sum =
 		actor->BaseStats[IE_LEVELFIGHTER]+
 		actor->BaseStats[IE_LEVELMAGE]+
 		actor->BaseStats[IE_LEVELTHIEF]+
@@ -623,7 +623,7 @@ void pcf_bounce(Actor *actor, ieDword Value)
 		actor->add_animation(overlay[OV_BOUNCE], -1, -1, false);
 	} else {
 		//it seems we have to remove it abruptly
-		actor->RemoveVVCell(overlay[OV_BOUNCE], false); 
+		actor->RemoveVVCell(overlay[OV_BOUNCE], false);
 	}
 }
 
@@ -699,7 +699,7 @@ NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //9f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //af
-NULL,NULL,NULL,NULL, pcf_morale, pcf_bounce, NULL, NULL, 
+NULL,NULL,NULL,NULL, pcf_morale, pcf_bounce, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //bf
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, pcf_animid,pcf_state, NULL, //cf
@@ -1041,7 +1041,7 @@ void Actor::RefreshEffects()
 	}
 	if (first) {
 		InternalFlags|=IF_INITIALIZED;
-	} else {	
+	} else {
 		memcpy( previous, Modified, MAX_STATS * sizeof( *Modified ) );
 	}
 	memcpy( Modified, BaseStats, MAX_STATS * sizeof( *Modified ) );
@@ -1061,7 +1061,7 @@ void Actor::RefreshEffects()
 	int bonus;
 
 	//fighter or not (still very primitive model, we need multiclass)
-	if(Modified[IE_CLASS]==0) {
+	if (Modified[IE_CLASS]==2) {
 		bonus = core->GetConstitutionBonus(STAT_CON_HP_WARRIOR,Modified[IE_CON]);
 	} else {
 		bonus = core->GetConstitutionBonus(STAT_CON_HP_NORMAL,Modified[IE_CON]);
@@ -1211,7 +1211,7 @@ void Actor::SetMCFlag(ieDword arg, int op)
 void Actor::DialogInterrupt()
 {
 	//if dialoginterrupt was set, no verbal constant
-	if( Modified[IE_MC_FLAGS]&MC_NO_TALK)
+	if ( Modified[IE_MC_FLAGS]&MC_NO_TALK)
 		return;
 	if (Modified[IE_EA]>=EA_EVILCUTOFF) {
 		DisplayStringCore(this, VB_HOSTILE, DS_CONSOLE|DS_CONST );
@@ -1353,8 +1353,8 @@ void Actor::SetPosition(Map *map, Point &position, int jump, int radius)
 	MoveTo( p );
 }
 
-/* this is returning the level of the character for xp calculations 
-	 later it could calculate with dual/multiclass, 
+/* this is returning the level of the character for xp calculations
+	 later it could calculate with dual/multiclass,
 	 also with iwd2's 3rd ed rules, this is why it is a separate function */
 ieDword Actor::GetXPLevel(int modified) const
 {
@@ -1379,7 +1379,7 @@ void Actor::Turn(Scriptable *cleric, ieDword turnlevel)
 		return;
 	}
 	//determine if we see the cleric (distance)
-	
+
 	//determine alignment (if equals, then no turning)
 
 	//determine panic or destruction
@@ -1436,7 +1436,7 @@ void Actor::Die(Scriptable *killer)
 		core->Autopause(AP_DEAD);
 	} else {
 		Actor *act=NULL;
-		
+
 		if (killer) {
 			if (killer->Type==ST_ACTOR) {
 				act = (Actor *) killer;
@@ -1515,7 +1515,7 @@ bool Actor::CheckOnDeath()
 	if (Modified[IE_MC_FLAGS]&MC_REMOVE_CORPSE) return true;
 	if (Modified[IE_MC_FLAGS]&MC_KEEP_CORPSE) return false;
 	//if chunked death, then return true
-	if(LastDamageType&DAMAGE_CHUNKING) {
+	if (LastDamageType&DAMAGE_CHUNKING) {
 		//play chunky animation
 		//chunks are projectiles
 		return true;
@@ -1782,7 +1782,7 @@ unsigned int Actor::GetWeapon(ITMExtHeader *&which, bool leftorright)
 	//make sure we use 'false' in this freeitem
 	//so 'which' won't point into invalid memory
 	core->FreeItem(item, wield->ItemResRef, false);
-	if (!which) {	
+	if (!which) {
 		return 0;
 	}
 	if (which->Location!=ITEM_LOC_WEAPON) {
@@ -1825,7 +1825,7 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 		return LSR_INVALID;
 	}
 	if (flags&LS_ADDXP) {
-		AddExperience(spl->Level*100);		
+		AddExperience(spl->Level*100);
 	}
 	return LSR_OK;
 }
@@ -1891,7 +1891,7 @@ void Actor::SetTarget( Scriptable *target)
 		Actor *tar = (Actor *) target;
 		LastTarget = tar->GetID();
 		tar->LastAttacker = GetID();
-		//we tell the game object that this creature 
+		//we tell the game object that this creature
 		//must be added to the list of combatants
 		core->GetGame()->InAttack(tar->LastAttacker);
 	}
@@ -1938,7 +1938,7 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 		StopAttack();
 		return;
 	}
- 
+
 	//if held or disabled, etc, then cannot continue attacking
 	ieDword state = GetStat(IE_STATE_ID);
 	if (state&STATE_CANTMOVE) {
@@ -1961,10 +1961,10 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 	int tmp = core->Roll(1, 10, 0);// GetStat(IE_WEAPONSPEED)-GetStat(IE_PHYSICALSPEED) );
 	if (state & STATE_SLOWED) tmp <<= 1;
 	if (state & STATE_HASTED) tmp >>= 1;
-	
+
 	if (tmp<0) tmp=0;
-	else if(tmp>0x10) tmp=0x10;
-	
+	else if (tmp>0x10) tmp=0x10;
+
 	initiative = (ieDword) (gameTime+tmp);
 }
 
@@ -2042,7 +2042,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	ITMExtHeader *rangedheader = NULL;
 	switch(header->AttackType) {
 	case ITEM_AT_MELEE:
-		Flags = WEAPON_MELEE;		
+		Flags = WEAPON_MELEE;
 		break;
 	case ITEM_AT_PROJECTILE: //throwing weapon
 		Flags = WEAPON_RANGED;
@@ -2159,7 +2159,7 @@ void Actor::SetColor( ieDword idx, ieDword grd)
 */
 }
 
-void Actor::SetColorMod( int location, RGBModifier::Type type, int speed, 
+void Actor::SetColorMod( int location, RGBModifier::Type type, int speed,
 						 unsigned char r, unsigned char g, unsigned char b,
 						 int phase)
 {
@@ -2485,7 +2485,7 @@ void Actor::Draw(Region &screen)
 				for (i = 0; i < 3; ++i) {
 					sbbox.x += blurdx; sbbox.y += blurdy;
 					blurx += blurdx; blury += blurdy;
-					newsc = sc = extraCovers[i]; 
+					newsc = sc = extraCovers[i];
 					DrawActorSprite(screen, blurx, blury, sbbox, newsc,
 									anims, Face, tint);
 					if (newsc != sc) {
@@ -2508,7 +2508,7 @@ void Actor::Draw(Region &screen)
 				for (i = 0; i < 3; ++i) {
 					sbbox.x -= blurdx; sbbox.y -= blurdy;
 					blurx -= blurdx; blury -= blurdy;
-					newsc = sc = extraCovers[i]; 
+					newsc = sc = extraCovers[i];
 					DrawActorSprite(screen, blurx, blury, sbbox, newsc,
 									anims, Face, tint);
 					if (newsc != sc) {
@@ -2564,7 +2564,7 @@ void Actor::Draw(Region &screen)
 
 		ca->PulseRGBModifiers();
 	}
-		
+
 	//draw videocells over the actor
 	DrawVideocells(screen, vvcOverlays, tint);
 
