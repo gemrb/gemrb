@@ -21,9 +21,9 @@ MAINTAINERCLEANFILES = \
 dist_man1_MANS = gemrb.1
 
 install-data-hook:
-	rm -f $(bindir)/plugins/libgemrb_core.so
-	mkdir -p $(bindir)/Cache 2>/dev/null
-	rm -rf $(bindir)/Cache/*
+	rm -f $(DESTDIR)$(bindir)/plugins/libgemrb_core.so
+	mkdir -p $(DESTDIR)$(bindir)/Cache 2>/dev/null
+	rm -rf $(DESTDIR)$(bindir)/Cache/*
 
 docs:
 	doxygen
