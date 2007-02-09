@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.266 2007/02/09 20:36:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.267 2007/02/09 21:12:26 avenger_teambg Exp $
  *
  */
 
@@ -1024,6 +1024,7 @@ public:
 	static void Dialogue(Scriptable* Sender, Action* parameters);
 	static void DialogueForceInterrupt(Scriptable* Sender, Action* parameters);
 	static void DialogueInterrupt(Scriptable* Sender, Action* parameters);
+	static void DisableFogDither(Scriptable* Sender, Action* parameters);
 	static void DisplayMessage(Scriptable* Sender, Action* parameters);
 	static void DisplayString(Scriptable* Sender, Action* parameters);
 	static void DisplayStringHead(Scriptable* Sender, Action* parameters);
@@ -1034,6 +1035,7 @@ public:
 	static void DropInventory(Scriptable* Sender, Action* parameters);
 	static void DropInventoryEX(Scriptable* Sender, Action* parameters);
 	static void DropItem(Scriptable* Sender, Action* parameters);
+	static void EnableFogDither(Scriptable* Sender, Action* parameters);
 	static void EnablePortalTravel(Scriptable* Sender, Action* parameters);
 	static void EndCredits(Scriptable* Sender, Action* parameters);
 	static void EndCutSceneMode(Scriptable* Sender, Action* parameters);
@@ -1069,6 +1071,7 @@ public:
 	static void ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters);
 	static void ForceSpell(Scriptable* Sender, Action* parameters);
 	static void FullHeal(Scriptable* Sender, Action* parameters);
+	static void GeneratePartyMember(Scriptable* Sender, Action* parameters);
 	static void GetItem(Scriptable* Sender, Action* parameters);
 	static void GetStat(Scriptable* Sender, Action* parameters);
 	static void GiveItem(Scriptable* Sender, Action* parameters);

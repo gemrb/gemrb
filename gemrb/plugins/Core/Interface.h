@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.219 2007/02/04 14:22:06 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.220 2007/02/09 21:12:26 avenger_teambg Exp $
  *
  */
 
@@ -336,9 +336,9 @@ public:
 	/** Returns actor */
 	Actor *GetCreature(DataStream *stream);
 	/** Returns a PC index, by loading a creature */
-	int LoadCreature(char *ResRef, int InParty, bool character=false);
+	int LoadCreature(const char *ResRef, int InParty, bool character=false);
 	/** core for summoning creatures */
-	bool SummonCreature(ieResRef resource, ieResRef vvcres, Actor *Owner, Actor *target, Point &position, int eamod, int level);
+	bool SummonCreature(const ieResRef resource, ieResRef vvcres, Actor *Owner, Actor *target, Point &position, int eamod, int level);
 	/** Sets a stat for the creature in actor index Slot */
 	int SetCreatureStat(unsigned int Slot, unsigned int StatID, int StatValue);
 	/** returns the stat of a creature (mod:1-modified, 0-base) */

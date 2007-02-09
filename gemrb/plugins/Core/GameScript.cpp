@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.393 2007/02/09 20:36:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.394 2007/02/09 21:12:26 avenger_teambg Exp $
  *
  */
 
@@ -460,6 +460,7 @@ static ActionLink actionnames[] = {
 	{"dialogue", GameScript::Dialogue,AF_BLOCKING},
 	{"dialogueforceinterrupt", GameScript::DialogueForceInterrupt,AF_BLOCKING},
 	{"dialogueinterrupt", GameScript::DialogueInterrupt,0},
+	{"disablefogdither", GameScript::DisableFogDither, 0},
 	{"displaymessage", GameScript::DisplayMessage, 0},
 	{"displaystring", GameScript::DisplayString, 0},
 	{"displaystringhead", GameScript::DisplayStringHead, 0},
@@ -472,6 +473,7 @@ static ActionLink actionnames[] = {
 	{"dropinventoryex", GameScript::DropInventoryEX, 0},
 	{"dropinventoryexexclude", GameScript::DropInventoryEX, 0}, //same
 	{"dropitem", GameScript::DropItem, AF_BLOCKING},
+	{"enablefogdither", GameScript::EnableFogDither, 0},
 	{"enableportaltravel", GameScript::EnablePortalTravel, 0},
 	{"endcredits", GameScript::EndCredits, 0},//movie
 	{"endcutscenemode", GameScript::EndCutSceneMode, 0},
@@ -513,6 +515,7 @@ static ActionLink actionnames[] = {
 	{"forceleavearealua", GameScript::ForceLeaveAreaLUA, 0},
 	{"forcespell", GameScript::ForceSpell, AF_BLOCKING},
 	{"fullheal", GameScript::FullHeal, 0},
+	{"generatepartymember", GameScript::GeneratePartyMember, 0},
 	{"getitem", GameScript::GetItem, 0},
 	{"getstat", GameScript::GetStat, 0}, //gemrb specific
 	{"giveexperience", GameScript::AddXPObject, 0},

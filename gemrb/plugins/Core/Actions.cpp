@@ -1,5 +1,5 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2003-2005 The GemRB Project
+ * Copyright (C) 2003-2007 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.107 2007/02/09 20:36:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.108 2007/02/09 21:12:26 avenger_teambg Exp $
  *
  */
 
@@ -5094,5 +5094,37 @@ void GameScript::TransformPartyItemAll(Scriptable* /*Sender*/, Action* parameter
 		Actor *tar = game->GetPC(i, false);
 		TransformItemCore(tar, parameters, false);
 	}
+}
+
+void GameScript::GeneratePartyMember(Scriptable* /*Sender*/, Action* parameters)
+{
+	int PCTable = core->LoadTable( "bios" );
+	if (PCTable<0) {
+		return;
+	}
+	TableMgr* pcs = core->GetTable( PCTable );
+	const char* string = pcs->QueryField( parameters->int0Parameter, 0 );
+printf ("GeneratePartyMember: %s\n", string);
+	int pos = core->LoadCreature(string,0,false);
+	core->DelTable( PCTable );
+	if (pos<0) {
+		return;
+	}
+	Actor *actor = core->GetGame()->GetNPC(pos);
+	if (!actor) {
+		return;
+	}
+	actor->SetOrientation(parameters->int1Parameter, false);
+	actor->MoveTo(parameters->pointParameter);
+}
+
+void GameScript::EnableFogDither(Scriptable* /*Sender*/, Action* /*parameters*/)
+{
+	core->FogOfWar|=1;
+}
+
+void GameScript::DisableFogDither(Scriptable* /*Sender*/, Action* /*parameters*/)
+{
+	core->FogOfWar&=~1;
 }
 

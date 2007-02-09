@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.456 2007/02/08 22:10:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.457 2007/02/09 21:12:26 avenger_teambg Exp $
  *
  */
 
@@ -2368,7 +2368,7 @@ Actor *Interface::GetCreature(DataStream *stream)
 	return actor;
 }
 
-int Interface::LoadCreature(char* ResRef, int InParty, bool character)
+int Interface::LoadCreature(const char* ResRef, int InParty, bool character)
 {
 	DataStream *stream;
 
@@ -2408,7 +2408,7 @@ int Interface::LoadCreature(char* ResRef, int InParty, bool character)
 	}
 }
 
-bool Interface::SummonCreature(ieResRef resource, ieResRef vvcres, Actor *Owner, Actor *target, Point &position, int eamod, int level)
+bool Interface::SummonCreature(const ieResRef resource, ieResRef vvcres, Actor *Owner, Actor *target, Point &position, int eamod, int level)
 {
 	DataStream* ds = key->GetResource( resource, IE_CRE_CLASS_ID );
 	level = level * 100;
