@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.255 2007/02/09 19:36:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.256 2007/02/10 14:29:23 avenger_teambg Exp $
  *
  */
 
@@ -163,7 +163,6 @@ Actor::Actor()
 		BaseStats[i] = 0;
 		Modified[i] = 0;
 	}
-	Dialog[0] = 0;
 	SmallPortrait[0] = 0;
 	LargePortrait[0] = 0;
 
@@ -196,6 +195,7 @@ Actor::Actor()
 	HotKey = 0;
 	attackcount = 0;
 	initiative = 0;
+	InTrap = 0;
 
 	inventory.SetInventoryType(INVENTORY_CREATURE);
 	fxqueue.SetOwner( this );
@@ -2235,13 +2235,28 @@ void Actor::NewPath()
 	Movable::WalkTo(tmp, size );
 }
 
+void Actor::SetInTrap(ieDword setreset)
+{
+	InTrap = setreset;
+	if (setreset) {
+		InternalFlags |= IF_INTRAP;    
+	} else {
+		InternalFlags &= ~IF_INTRAP;
+	}
+}
+
+void Actor::SetRunFlags(ieDword flags)
+{
+	InternalFlags &= ~IF_RUNFLAGS;
+	InternalFlags |= (flags & IF_RUNFLAGS);
+}
+
 void Actor::WalkTo(Point &Des, ieDword flags, int MinDistance)
 {
 	if (InternalFlags&IF_REALLYDIED) {
 		return;
 	}
-	InternalFlags &= ~IF_RUNFLAGS;
-	InternalFlags |= (flags & IF_RUNFLAGS);
+	SetRunFlags(flags);
 	// is this true???
 	if (Des.x==-2 && Des.y==-2) {
 		Point p((ieWord) Modified[IE_SAVEDXPOS], (ieWord) Modified[IE_SAVEDYPOS] );
@@ -2337,6 +2352,10 @@ void Actor::Draw(Region &screen)
 			return;
 		//turning actor inactive if there is no action next turn
 		InternalFlags|=IF_IDLE;
+	}
+
+	if (InTrap) {
+		area->ClearTrap(this, InTrap-1);
 	}
 
 	//visual feedback

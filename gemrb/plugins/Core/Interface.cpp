@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.457 2007/02/09 21:12:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.458 2007/02/10 14:29:23 avenger_teambg Exp $
  *
  */
 
@@ -4034,7 +4034,7 @@ static Color ActorColor[PALSIZE];
 void Interface::DisplayConstantStringName(int stridx, unsigned int color, Scriptable *speaker)
 {
 	unsigned int speaker_color;
-	char *name;
+	const char *name;
 
 	switch (speaker->Type) {
 		case ST_ACTOR:
@@ -4042,6 +4042,10 @@ void Interface::DisplayConstantStringName(int stridx, unsigned int color, Script
 			GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR),8, ActorColor );
 			speaker_color = (ActorColor[4].r<<16) | (ActorColor[4].g<<8) | ActorColor[4].b;
 			break;
+    case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
+      name = GetString( ((InfoPoint *) speaker)->DialogName );
+      speaker_color = 0xc0c0c0;
+      break;
 		default:
 			name = "";
 			speaker_color = 0x800000;
@@ -4062,8 +4066,8 @@ void Interface::DisplayConstantStringName(int stridx, unsigned int color, Script
 void Interface::DisplayConstantStringAction(int stridx, unsigned int color, Scriptable *attacker, Scriptable *target)
 {
 	unsigned int attacker_color;
-	char *name1;
-	char *name2;
+	const char *name1;
+	const char *name2;
 
 	switch (attacker->Type) {
 		case ST_ACTOR:
@@ -4099,7 +4103,7 @@ void Interface::DisplayConstantStringAction(int stridx, unsigned int color, Scri
 void Interface::DisplayStringName(int stridx, unsigned int color, Scriptable *speaker, ieDword flags)
 {
 	unsigned int speaker_color;
-	char *name;
+	const char *name;
 
 	switch (speaker->Type) {
 		case ST_ACTOR:
@@ -4107,6 +4111,10 @@ void Interface::DisplayStringName(int stridx, unsigned int color, Scriptable *sp
 			GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR),8, ActorColor );
 			speaker_color = (ActorColor[4].r<<16) | (ActorColor[4].g<<8) | ActorColor[4].b;
 			break;
+    case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
+      name = GetString( ((InfoPoint *) speaker)->DialogName );
+      speaker_color = 0xc0c0c0;
+      break;
 		default:
 			name = "";
 			speaker_color = 0x800000;
@@ -4114,7 +4122,6 @@ void Interface::DisplayStringName(int stridx, unsigned int color, Scriptable *sp
 	}
 
 	char* text = GetString( stridx, flags);
-
 	int newlen = (int)(strlen( DisplayFormatName ) + strlen( name ) +
 		+ strlen( text ) + 10);
 	char* newstr = ( char* ) malloc( newlen );

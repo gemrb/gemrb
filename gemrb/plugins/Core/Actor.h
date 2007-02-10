@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.142 2007/02/08 22:56:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.143 2007/02/10 14:29:23 avenger_teambg Exp $
  *
  */
 
@@ -113,7 +113,6 @@ public:
 	ieDword BaseStats[MAX_STATS];
 	ieDword Modified[MAX_STATS];
 	PCStatsStruct*  PCStats;
-	ieResRef Dialog;
 	ieResRef SmallPortrait;
 	ieResRef LargePortrait;
 	/** 0: NPC, 1-8 party slot */
@@ -182,6 +181,7 @@ private:
 	int attackcount;
 	//when the next attack is scheduled (gametime+initiative)
 	ieDword initiative;
+  ieDword InTrap;
 
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(Region &screen, int cx, int cy, Region& bbox,
@@ -243,6 +243,7 @@ public:
 		return (localID<<16) | globalID;
 	}
 	/** Sets the Dialog ResRef */
+/*
 	void SetDialog(const char* ResRef)
 	{
 		if (ResRef == NULL) {
@@ -251,6 +252,7 @@ public:
 		strncpy( Dialog, ResRef, 8 );
 		printf("Setting Dialog for %s: %.8s\n",LongName, Dialog);
 	}
+*/
 	/** Sets the Icon ResRef */
 	//Which - 0 both, 1 Large, 2 Small
 	void SetPortrait(const char* ResRef, int Which=0)
@@ -278,7 +280,7 @@ public:
 	/** Gets the Character Long Name/Short Name */
 	char* GetName(int which) const
 	{
-		if(which==-1) which=!TalkCount;
+		if(which==-1) which=TalkCount;
 		if (which) {
 			return LongName;
 		}
@@ -331,6 +333,10 @@ public:
 	void GetSpellSlotInfo(SpellExtHeader *spell, int which);
 	/* updates quickslots */
 	void ReinitQuickSlots();
+  /* actor is in trap */
+  void SetInTrap(ieDword tmp);
+	/* sets some of the internal flags */
+	void SetRunFlags(ieDword flags);
 private:
 	/* checks a weapon quick slot and resets it to fist if it is empty */
 	void CheckWeaponQuickSlot(unsigned int which);

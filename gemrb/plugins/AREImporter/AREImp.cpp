@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.163 2007/01/28 21:15:28 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.164 2007/02/10 14:29:19 avenger_teambg Exp $
  *
  */
 
@@ -280,8 +280,10 @@ Map* AREImp::GetMap(const char *ResRef)
 		ieWord TrapDetDiff, TrapRemDiff, Trapped, TrapDetected;
 		ieWord LaunchX, LaunchY;
 		ieWord PosX, PosY;
+		ieWord TalkX, TalkY;
 		ieVariable Name, Entrance;
 		ieResRef Script, DialogResRef, KeyResRef, Destination;
+		ieStrRef DialogName;
 		str->Read( Name, 32 );
 		Name[32] = 0;
 		str->ReadWord( &Type );
@@ -317,7 +319,10 @@ Map* AREImp::GetMap(const char *ResRef)
 		str->ReadWord( &PosX);
 		str->ReadWord( &PosY);
 		//maybe we have to store this
-		str->Seek( 52, GEM_CURRENT_POS );
+		str->Seek( 44, GEM_CURRENT_POS );
+		str->ReadWord( &TalkX);
+		str->ReadWord( &TalkY);
+		str->ReadDword( &DialogName );
 		str->ReadResRef( DialogResRef );
 		char* string = core->GetString( StrRef );
 		str->Seek( VerticesOffset + ( FirstVertex * 4 ), GEM_STREAM_START );
@@ -353,7 +358,13 @@ Map* AREImp::GetMap(const char *ResRef)
 		memcpy( ip->Destination, Destination, sizeof(Destination) );
 		memcpy( ip->EntranceName, Entrance, sizeof(Entrance) );
 		memcpy( ip->KeyResRef, KeyResRef, sizeof(KeyResRef) );
-		memcpy( ip->DialogResRef, DialogResRef, sizeof(DialogResRef) );
+
+		//these appear only in PST, but we could support them everywhere
+		ip->TalkPos.x=TalkX;
+		ip->TalkPos.y=TalkY;
+		ip->DialogName=DialogName;
+		ip->SetDialog(DialogResRef);
+
 		if (Script[0]) {
 			ip->Scripts[0] = new GameScript( Script, ST_TRIGGER );
 		} else {
@@ -649,7 +660,7 @@ Map* AREImp::GetMap(const char *ResRef)
 		strnspccpy(door->LinkedInfo, LinkedInfo, 32);
 		//these 2 fields are not sure
 		door->NameStrRef=NameStrRef;
-		strnlwrcpy(door->Dialog, Dialog, 8);
+		door->SetDialog(Dialog);
 	}
 
 	printf( "Loading spawnpoints\n" );
@@ -1318,7 +1329,7 @@ int AREImp::PutDoors( DataStream *stream, Map *map, ieDword &VertIndex)
 		stream->WriteDword( &d->OpenStrRef);
 		stream->Write( d->LinkedInfo, 32);
 		stream->WriteDword( &d->NameStrRef);
-		stream->WriteResRef( d->Dialog);
+		stream->WriteResRef( d->GetDialog());
 	}
 	return 0;
 }
@@ -1500,8 +1511,14 @@ int AREImp::PutRegions( DataStream *stream, Map *map, ieDword &VertIndex)
 		stream->WriteWord( &tmpWord);
 		tmpWord = (ieWord) ip->Pos.y;
 		stream->WriteWord( &tmpWord);
-		stream->Write( filling, 52); //unknown, including some points
-		stream->WriteResRef( ip->DialogResRef);
+		stream->Write( filling, 44); //unknown
+		//these are probably only in PST
+		tmpWord = (ieWord) ip->TalkPos.x;
+		stream->WriteWord( &tmpWord);
+		tmpWord = (ieWord) ip->TalkPos.y;
+		stream->WriteWord( &tmpWord);
+		stream->WriteDword( &ip->DialogName);
+		stream->WriteResRef( ip->GetDialog());
 	}
 	return 0;
 }
@@ -1587,7 +1604,7 @@ int AREImp::PutActors( DataStream *stream, Map *map)
 		stream->WriteDword( &tmpDword); //more unknowns
 		stream->WriteDword( &ac->appearance);
 		stream->WriteDword( &ac->TalkCount);
-		stream->WriteResRef( ac->Dialog);
+		stream->WriteResRef( ac->GetDialog());
 		PutScript(stream, ac, SCR_OVERRIDE);
 		PutScript(stream, ac, SCR_CLASS);
 		PutScript(stream, ac, SCR_RACE);

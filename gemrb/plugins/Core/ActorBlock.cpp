@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.161 2007/02/04 14:22:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.162 2007/02/10 14:29:23 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -569,6 +569,10 @@ void Selectable::SetCircle(int circlesize, Color color, Sprite2D* normal_circle,
 //used for creatures
 int Selectable::WantDither()
 {
+	//if dithering is disabled globally, don't do it
+	if (core->FogOfWar&4) {
+		return 0;
+	}
 	//if actor is dead, dither it if polygon wants
 	if (Selected&0x80) {
 		return 1;
@@ -1196,7 +1200,8 @@ InfoPoint::InfoPoint(void)
 	TrapDetected = 0;
 	TrapLaunch.x = 0; 
 	TrapLaunch.y = 0;
-	DialogResRef[0] = 0;
+	Dialog[0] = 0;
+	DialogName = 0;
 }
 
 InfoPoint::~InfoPoint(void)
@@ -1289,7 +1294,10 @@ bool InfoPoint::TriggerTrap(int skill)
 bool InfoPoint::Entered(Actor *actor)
 {
 	if (outline->PointIn( actor->Pos ) ) {
-		goto check;
+		//don't trigger again for this actor
+		if (!(actor->GetInternalFlag()&IF_INTRAP)) {
+			goto check;
+		}
 	}
 	if (Distance(Pos, actor->Pos)<MAX_OPERATING_DISTANCE) {
 		goto check;
@@ -1334,7 +1342,7 @@ void InfoPoint::DebugDump()
 	if (Scripts[0]) {
 		name = Scripts[0]->GetName();
 	}
-	printf( "Script: %s, Key: %s, Dialog: %s\n", name, KeyResRef, DialogResRef );
+	printf( "Script: %s, Key: %s, Dialog: %s\n", name, KeyResRef, Dialog );
 	printf( "Active: %s\n", YESNO(InternalFlags&IF_ACTIVE));
 }
 

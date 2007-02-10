@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.40 2006/11/26 23:19:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.h,v 1.41 2007/02/10 14:29:23 avenger_teambg Exp $
  *
  */
 
@@ -73,7 +73,7 @@ public:
 
 	InfoPoint* AddInfoPoint(const char* Name, unsigned short Type,
 		Gem_Polygon* outline);
-	InfoPoint* GetInfoPoint(Point &position);
+	InfoPoint* GetInfoPoint(Point &position, bool detectable);
 	InfoPoint* GetInfoPoint(const char* Name);
 	InfoPoint* GetInfoPoint(unsigned int idx);
 	size_t GetInfoPointCount() { return infoPoints.size(); }

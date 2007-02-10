@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.91 2007/02/08 22:56:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.h,v 1.92 2007/02/10 14:29:23 avenger_teambg Exp $
  */
 
 /**
@@ -157,10 +157,10 @@ private:
 	DialogState* ds;
 	Dialog* dlg;
 public:
-	//Actor* speaker;
-	//Actor* target;
 	ieWord speakerID;
 	ieWord targetID;
+  //no idea if this is viable
+  Scriptable *targetOB;
 public:
 	Actor *GetTarget();
 	Actor *GetSpeaker();
@@ -176,7 +176,7 @@ public:
 	bool HandleActiveRegion(InfoPoint *trap, Actor *actor, Point &p);
 	Point GetFormationOffset(ieDword formation, ieDword pos);
 	void MoveToPointFormation(Actor *actor, Point p, int Orient);
-	void InitDialog(Actor* speaker, Actor* target, const char* dlgref);
+	void InitDialog(Scriptable* speaker, Scriptable* target, const char* dlgref);
 	void EndDialog(bool try_to_break=false);
 	void DialogChoose(unsigned int choose);
 	/** Displays a string over an object */

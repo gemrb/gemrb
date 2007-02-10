@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.305 2007/02/08 22:56:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.306 2007/02/10 14:29:23 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -123,6 +123,7 @@ GameControl::GameControl(void)
 	dlg = NULL;
 	targetID = 0;
 	speakerID = 0;
+  targetOB = NULL;
 }
 
 //actually the savegame contains some formation data too, how to use it?
@@ -787,11 +788,9 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		return;
 	}
 
-	overInfoPoint = area->TMap->GetInfoPoint( p );
+	overInfoPoint = area->TMap->GetInfoPoint( p, true );
 	if (overInfoPoint) {
-		if (overInfoPoint->Type != ST_PROXIMITY) {
-			nextCursor = overInfoPoint->Cursor;
-		}
+	  nextCursor = overInfoPoint->Cursor;
 	}
 
 	if (overDoor) {
@@ -1489,7 +1488,7 @@ void GameControl::ResizeAdd(Window* win, int type)
 	}
 }
 
-void GameControl::InitDialog(Actor* spk, Actor* tgt, const char* dlgref)
+void GameControl::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgref)
 {
 	if (tgt->GetInternalFlag()&IF_NOINT) {
 		core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
@@ -1513,10 +1512,23 @@ void GameControl::InitDialog(Actor* spk, Actor* tgt, const char* dlgref)
 	//target is here because it could be changed when a dialog runs onto
 	//and external link, we need to find the new target (whose dialog was
 	//linked to)
-	targetID = tgt->globalID;
-	spk->LastTalkedTo=targetID;
-	speakerID = spk->globalID;
-	tgt->LastTalkedTo=speakerID;
+
+  Actor *spe = (Actor *) spk;
+  speakerID = spe->globalID;
+  if (tgt->Type!=ST_ACTOR) {
+    targetID=0xffff;
+    //most likely this dangling object reference
+    //won't cause problems, because trigger points don't
+    //get destroyed during a dialog
+    targetOB=tgt;
+    spk->LastTalkedTo=0;
+  } else {
+    Actor *tar = (Actor *) tgt;
+    speakerID = spe->globalID;
+    targetID = tar->globalID;
+    spe->LastTalkedTo=targetID;
+    tar->LastTalkedTo=speakerID;
+  }
 
 	//check if we are already in dialog
 	if (DialogueFlags&DF_IN_DIALOG) {
@@ -1526,7 +1538,10 @@ void GameControl::InitDialog(Actor* spk, Actor* tgt, const char* dlgref)
 	ScreenFlags |= SF_GUIENABLED|SF_DISABLEMOUSE|SF_LOCKSCROLL;
 	DialogueFlags |= DF_IN_DIALOG;
 
-	tgt->DialogInterrupt();
+	if (tgt->Type==ST_ACTOR) {
+		Actor *tar = (Actor *) tgt;
+		tar->DialogInterrupt();
+	}
 
 	//allow mouse selection from dialog (even though screen is locked)
 	core->GetVideoDriver()->SetMouseEnabled(true);
@@ -1547,18 +1562,8 @@ void GameControl::EndDialog(bool try_to_break)
 		return;
 	}
 
-	/* I'm not convinced we should call these, but it is possible
-	Actor *target = GetTarget();
-	Actor *speaker = GetSpeaker();
-	if (target) {
-		target->ReleaseCurrentAction();
-	}
-	if (speaker) {
-		speaker->ReleaseCurrentAction();
-	}
-	*/
-
 	speakerID = 0;
+  targetOB = NULL;
 	targetID = 0;
 	ds = NULL;
 	if (dlg) {
@@ -1582,19 +1587,29 @@ void GameControl::DialogChoose(unsigned int choose)
 		return;
 	}
 
-	Actor *speaker = GetSpeaker();
-	if (!speaker) {
-		printMessage("GameControl","Speaker gone???",LIGHT_RED);
-		EndDialog();
-		return;
-	}
+  Actor *speaker = GetSpeaker();
+  if (!speaker) {
+    printMessage("GameControl","Speaker gone???",LIGHT_RED);
+    EndDialog();
+    return;
+  }
+  Actor *tgt;
+  Scriptable *target;  
+  
+  if (targetID!=0xffff) {
+    tgt = GetTarget();
+    target = tgt;    
+  } else {
+    //risky!!!
+    target = targetOB;
+    tgt=NULL;
+  }
+  if (!target) {
+    printMessage("GameControl","Target gone???",LIGHT_RED);
+    EndDialog();
+    return;
+  }
 
-	Actor *target = GetTarget();
-	if (!target) {
-		printMessage("GameControl","Target gone???",LIGHT_RED);
-		EndDialog();
-		return;
-	}
 	//get the first state with true triggers!
 	int si;
 	if (choose == (unsigned int) -1) {
@@ -1606,13 +1621,16 @@ void GameControl::DialogChoose(unsigned int choose)
 			return;
 		}
 		//increasing talkcount after top level condition was determined
-		if (DialogueFlags&DF_TALKCOUNT) {
-			DialogueFlags&=~DF_TALKCOUNT; 
-			target->TalkCount++;
-		} else if (DialogueFlags&DF_INTERACT) {
-			DialogueFlags&=~DF_INTERACT;
-			target->InteractCount++;
-		}
+
+    if (tgt) {
+      if (DialogueFlags&DF_TALKCOUNT) {
+        DialogueFlags&=~DF_TALKCOUNT; 
+        tgt->TalkCount++;
+      } else if (DialogueFlags&DF_INTERACT) {
+        DialogueFlags&=~DF_INTERACT;
+        tgt->InteractCount++;
+      }
+    }
 		ds = dlg->GetState( si );
 	} else {
 		if (ds->transitionsCount <= choose) {
@@ -1674,14 +1692,15 @@ void GameControl::DialogChoose(unsigned int choose)
 		//follow external linkage, if required
 		if (tr->Dialog[0] && strnicmp( tr->Dialog, dlg->ResRef, 8 )) {
 			//target should be recalculated!
-			target = target->GetCurrentArea()->GetActorByDialog(tr->Dialog);
+			tgt = target->GetCurrentArea()->GetActorByDialog(tr->Dialog);
+      target = tgt;
 			if (!target) {
 				printMessage("Dialog","Can't redirect dialog\n",YELLOW);
 				ta->SetMinRow( false );
 				EndDialog();
 				return;
 			}
-			targetID = target->globalID;
+			targetID = tgt->globalID;
 			// we have to make a backup, tr->Dialog is freed
 			ieResRef tmpresref;
 			strnlwrcpy(tmpresref,tr->Dialog, 8);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.118 2007/02/04 14:22:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.119 2007/02/10 14:29:23 avenger_teambg Exp $
  *
  */
 
@@ -59,6 +59,9 @@ class Gem_Polygon;
 #define SCR_GENERAL  6
 #define SCR_DEFAULT  7
 
+//pst trap flags (portal)
+#define PORTAL_CURSOR 1
+#define PORTAL_TRAVEL 2
 //trigger flags
 #define TRAP_INVISIBLE  1
 #define TRAP_RESET      2
@@ -113,6 +116,8 @@ class Gem_Polygon;
 #define IF_VISIBLE       0x4000
 #define IF_ONCREATION    0x8000
 #define IF_IDLE          0x10000
+#define IF_INTRAP        0x20000 //actor is currently in a trap (intrap trigger event)
+
 //the actor should stop attacking
 #define IF_STOPATTACK (IF_JUSTDIED|IF_REALLYDIED|IF_CLEANUP|IF_IDLE)
 
@@ -167,10 +172,12 @@ protected: //let Actor access this
 	ieVariable scriptName;
 	ieDword InternalFlags; //for triggers
 	Scriptable* CutSceneId;
+	ieResRef Dialog;
 public:
 	Variables* locals;
 	ScriptableType Type;
 	Point Pos;
+	ieStrRef DialogName;
 	GameScript* Scripts[MAX_SCRIPTS];
 	char* overHeadText;
 	unsigned char textDisplaying;
@@ -184,6 +191,14 @@ public:
 	Action* CurrentAction;
 	unsigned long playDeadCounter;
 public:
+	/** Gets the Dialog ResRef */
+	const char* GetDialog(void) const
+	{
+		return Dialog;
+	}
+	void SetDialog(const char *resref) {
+		strnuprcpy(Dialog, resref, 8);
+	}
 	void SetScript(ieResRef aScript, int idx);
 	void SetWait(unsigned long time);
 	unsigned long GetWait();
@@ -265,18 +280,12 @@ public:
 	Color outlineColor;
 	ieDword Cursor;
 	bool Highlight;
-	ieResRef DialogResRef;
 	Point TrapLaunch;
 	ieResRef KeyResRef;
 public:
 	bool IsOver(Point &Pos);
 	void DrawOutline();
 	void SetCursor(unsigned char CursorIndex);
-	/** Gets the Dialog ResRef */
-	const char* GetDialog(void) const
-	{
-		return DialogResRef;
-	}
 	const char* GetKey(void) const
 	{
 		if (KeyResRef[0]) return KeyResRef;
@@ -494,6 +503,7 @@ public:
 	//overheadtext contains the string, but we have to save this
 	ieStrRef StrRef;
 	Point UsePoint;
+  Point TalkPos;
 };
 
 #endif

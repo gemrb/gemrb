@@ -63,6 +63,7 @@ void InitScriptTables();
 void HandleBitMod(ieDword &value1, ieDword value2, int opcode);
 bool ResolveSpellName(ieResRef spellres, Action *parameter);
 void EscapeAreaCore(Actor *src, const char *resref, Point &enter, Point &exit, int flags);
+void GoNear(Scriptable *Sender, Point &p);
 void GoNearAndRetry(Scriptable *Sender, Scriptable *target, bool destination, int distance);
 void GoNearAndRetry(Scriptable *Sender, Point &p, int distance);
 

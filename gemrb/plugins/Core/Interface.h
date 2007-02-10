@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.220 2007/02/09 21:12:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.221 2007/02/10 14:29:23 avenger_teambg Exp $
  *
  */
 
@@ -200,6 +200,12 @@ public:
 #define SLOT_EFFECT_MELEE    4 //normal weapon slot
 #define SLOT_EFFECT_MISSILE  5 //quiver slots
 #define SLOT_EFFECT_LEFT     6 //shield (left hand) slot
+
+
+//fog of war bits
+#define FOG_DRAWFOG       1
+#define FOG_DRAWSEARCHMAP 2
+#define FOG_DITHERSPRITES 4
 
 /**
  * @class Interface

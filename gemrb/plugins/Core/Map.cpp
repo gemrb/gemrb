@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.262 2007/01/14 19:06:58 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.263 2007/02/10 14:29:23 avenger_teambg Exp $
  *
  */
 
@@ -476,10 +476,10 @@ void Map::AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm, Imag
 	//converting searchmap to internal format
 	int y=SearchMap->GetHeight();
 	while(y--) {
-	  int x=SearchMap->GetWidth();
-	  while(x--) {
-	    SearchMap->SetPixelIndex(x,y,Passable[SearchMap->GetPixelIndex(x,y)&PATH_MAP_AREAMASK]);
-	  }
+		int x=SearchMap->GetWidth();
+		while(x--) {
+			SearchMap->SetPixelIndex(x,y,Passable[SearchMap->GetPixelIndex(x,y)&PATH_MAP_AREAMASK]);
+		}
 	}
 }
 
@@ -704,7 +704,10 @@ void Map::UpdateScripts()
 		while (q--) {
 			Actor* actor = queue[PR_SCRIPT][q];
 			if (ip->Type == ST_PROXIMITY) {
-				ip->Entered(actor);
+			  if(ip->Entered(actor)) {
+			    //if trap triggered, then mark actor
+			    actor->SetInTrap(ipCount);
+			  }
 			} else {
 				//ST_TRAVEL
 				//don't move if doing something else
@@ -943,10 +946,10 @@ void Map::DrawMap(Region screen, GameControl* gc)
 		}
 	}
 
-	if ((core->FogOfWar&2) && SearchMap) {
+	if ((core->FogOfWar&FOG_DRAWSEARCHMAP) && SearchMap) {
 		DrawSearchMap(screen);
 	} else {
-		if ((core->FogOfWar&1) && TMap) {
+		if ((core->FogOfWar&FOG_DRAWFOG) && TMap) {
 			TMap->DrawFogOfWar( ExploredBitmap, VisibleBitmap, screen );
 		}
 	}
@@ -1252,7 +1255,7 @@ Actor* Map::GetActorByDialog(const char *resref)
 	size_t i = actors.size();
 	while (i--) {
 		Actor* actor = actors[i];
-		if (strnicmp( actor->Dialog, resref, 8 ) == 0) {
+		if (strnicmp( actor->GetDialog(false), resref, 8 ) == 0) {
 			return actor;
 		}
 	}
@@ -2028,10 +2031,20 @@ PathNode* Map::FindPath(const Point &s, const Point &d, int MinDistance)
 		p = n;
 	}
 	//stepping back on the calculated path
-	while (MinDistance-- && StartNode->Parent) {
-		StartNode = StartNode->Parent;
-		delete StartNode->Next;
-		StartNode->Next = NULL;
+	if (MinDistance) {
+		while (StartNode->Parent) {
+			Point tar;
+
+			tar.x=StartNode->Parent->x*16;
+			tar.y=StartNode->Parent->y*12;
+			int dist = Distance(tar,d);
+			if (dist>=MinDistance) {
+			  break;
+			}
+			StartNode = StartNode->Parent;
+			delete StartNode->Next;
+			StartNode->Next = NULL;
+		}
 	}
 	return Return;
 }
@@ -2316,7 +2329,7 @@ void Map::ExploreMapChunk(Point &Pos, int range, int los)
 
 void Map::UpdateFog()
 {
-	if (!(core->FogOfWar&1) ) {
+	if (!(core->FogOfWar&FOG_DRAWFOG) ) {
 		SetMapVisibility( -1 );
 		return;
 	}
@@ -2564,6 +2577,18 @@ void Map::Sparkle(ieDword color, ieDword type, Point &pos)
 	particles.insert(iter, sparkles);
 }
 
+//remove flags from actor if it has left the trigger area it had last entered
+void Map::ClearTrap(Actor *actor, ieDword InTrap)
+{
+	InfoPoint *trap = TMap->GetInfoPoint(InTrap);
+	if (!trap) {
+		actor->SetInTrap(0);
+	} else {
+		if(!trap->outline->PointIn(actor->Pos)) {
+			actor->SetInTrap(0);
+		}
+	}
+}
 ////////////////////AreaAnimation//////////////////
 //Area animation
 

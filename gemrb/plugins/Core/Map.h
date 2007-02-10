@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.123 2007/01/09 23:05:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.124 2007/02/10 14:29:23 avenger_teambg Exp $
  *
  */
 
@@ -391,6 +391,7 @@ public:
 	void MoveToNewArea(const char *area, const char *entrance, int EveryOne, Actor *actor);
 	bool HasWeather();
 	int GetWeather();
+	void ClearTrap(Actor *actor, ieDword InTrap);
 
 private:
 	AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.108 2007/02/09 21:12:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.109 2007/02/10 14:29:23 avenger_teambg Exp $
  *
  */
 
@@ -3079,6 +3079,7 @@ void GameScript::FullHeal(Scriptable* Sender, Action* parameters)
 	//0 means full healing
 	//Heal() might contain curing of some conditions
 	//if FullHeal doesn't do that, replace this with a SetBase
+	//fullhealex might still be the curing action
 	scr->Heal(0);
 }
 
@@ -3551,12 +3552,14 @@ void GameScript::ExpansionEndCredits(Scriptable* /*Sender*/, Action* /*parameter
 //always quits game, but based on game it can play end animation, or display
 //death text, etc
 //this covers:
-//QuitGame (play one of 3 movies in PST)
+//QuitGame (play two of 3 movies in PST, display death screen with strref)
 //EndGame (display death screen with strref)
 void GameScript::QuitGame(Scriptable* Sender, Action* parameters)
 {
 	ClearAllActions(Sender, parameters);
-	core->GetDictionary()->SetAt("QuitGame", (ieDword) parameters->int0Parameter);
+	core->GetDictionary()->SetAt("QuitGame1", (ieDword) parameters->int0Parameter);
+	core->GetDictionary()->SetAt("QuitGame2", (ieDword) parameters->int1Parameter);
+	core->GetDictionary()->SetAt("QuitGame3", (ieDword) parameters->int2Parameter);
 	strncpy( core->NextScript, "QuitGame", sizeof(core->NextScript) );
 	core->QuitFlag |= QF_CHANGESCRIPT;
 }
@@ -4696,9 +4699,9 @@ void GameScript::ActivatePortalCursor(Scriptable* Sender, Action* parameters)
 	}
 	InfoPoint *tar = (InfoPoint *) ip;
 	if (parameters->int0Parameter) {
-		tar->Trapped|=1;
+		tar->Trapped|=PORTAL_CURSOR;
 	} else {
-		tar->Trapped&=~1;
+		tar->Trapped&=~PORTAL_CURSOR;
 	}
 }
 
@@ -4720,9 +4723,9 @@ void GameScript::EnablePortalTravel(Scriptable* Sender, Action* parameters)
 	}
 	InfoPoint *tar = (InfoPoint *) ip;
 	if (parameters->int0Parameter) {
-		tar->Trapped|=2;
+		tar->Trapped|=PORTAL_TRAVEL;
 	} else {
-		tar->Trapped&=~2;
+		tar->Trapped&=~PORTAL_TRAVEL;
 	}
 }
 
@@ -5007,13 +5010,32 @@ void GameScript::FollowCreature(Scriptable* Sender, Action* parameters)
 	scr->FollowOffset.y = -1;
 }
 
+void GameScript::RunFollow(Scriptable* Sender, Action* parameters)
+{
+	      if (Sender->Type!=ST_ACTOR) {
+	              return;
+	      }
+
+	      Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	      if (!tar || tar->Type!=ST_ACTOR) {
+	              return;
+	      }
+	      Actor *scr = (Actor *)Sender;
+	      Actor *actor = (Actor *)tar;
+	      scr->LastFollowed = actor->GetID();
+	scr->FollowOffset.x = -1;
+	scr->FollowOffset.y = -1;
+	scr->WalkTo(actor->Pos, IF_RUNNING, 1);
+	Sender->ReleaseCurrentAction();
+}
+
 void GameScript::ProtectPoint(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type!=ST_ACTOR) {
 		return;
 	}
 	Actor *scr = (Actor *)Sender;
-	scr->WalkTo( parameters->pointParameter, 0, 0 );
+	scr->WalkTo( parameters->pointParameter, 0, 1 );
 	Sender->ReleaseCurrentAction();
 }
 
@@ -5056,6 +5078,8 @@ void GameScript::FollowObjectFormation(Scriptable* Sender, Action* parameters)
 	ieDword formation = parameters->int0Parameter;
 	ieDword pos = parameters->int1Parameter;
 	scr->FollowOffset = gc->GetFormationOffset(formation, pos);
+	scr->WalkTo( tar->Pos, 0, 1 );
+	Sender->ReleaseCurrentAction();
 }
 
 void GameScript::TransformItem(Scriptable* Sender, Action* parameters)
@@ -5120,11 +5144,54 @@ printf ("GeneratePartyMember: %s\n", string);
 
 void GameScript::EnableFogDither(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
-	core->FogOfWar|=1;
+	core->FogOfWar|=FOG_DRAWFOG;
 }
 
 void GameScript::DisableFogDither(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
-	core->FogOfWar&=~1;
+	core->FogOfWar&=~FOG_DRAWFOG;
 }
 
+void DeleteAllSpriteCovers()
+{
+	Game *game = core->GetGame();
+	int i = game->GetPartySize(false);
+	while (i--) {
+		Selectable *tar = (Selectable *) game->GetPC(i, false);
+		tar->SetSpriteCover(NULL);
+	}
+}
+
+void GameScript::EnableSpriteDither(Scriptable* /*Sender*/, Action* /*parameters*/)
+{
+	core->FogOfWar&=~FOG_DITHERSPRITES;
+	DeleteAllSpriteCovers();
+}
+
+void GameScript::DisableSpriteDither(Scriptable* /*Sender*/, Action* /*parameters*/)
+{
+	core->FogOfWar|=~FOG_DITHERSPRITES;
+	DeleteAllSpriteCovers();
+}
+
+//the PST crew apparently loved hardcoding stuff
+ieResRef RebusResRef={"DABUS1"};
+
+void GameScript::FloatRebus(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *)tar;
+	RebusResRef[5]=(char) core->Roll(1,5,'0');
+	ScriptedAnimation *vvc = core->GetScriptedAnimation(RebusResRef);
+	if (vvc) {
+		//setting the height
+		vvc->ZPos=actor->size*20;
+		vvc->PlayOnce();
+		//maybe this needs setting up some time
+		vvc->SetDefaultDuration(20);
+		actor->AddVVCell(vvc);
+	}
+}

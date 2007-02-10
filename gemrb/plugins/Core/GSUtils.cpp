@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.82 2007/02/09 20:36:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.83 2007/02/10 14:29:23 avenger_teambg Exp $
  *
  */
 
@@ -721,6 +721,25 @@ void EscapeAreaCore(Actor* src, const char* resref, Point &enter, Point &exit, i
 	src->AddActionInFront( GenerateAction( Tmp) );
 }
 
+void GetTalkPositionFromScriptable(Scriptable* scr, Point &position)
+{
+	switch (scr->Type) {
+		case ST_AREA: case ST_GLOBAL:
+			position = scr->Pos; //fake
+			break;
+		case ST_ACTOR:
+			//if there are other moveables, put them here
+			position = ((Movable *) scr)->GetMostLikelyPosition();
+			break;
+		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
+			position=((InfoPoint *) scr)->TrapLaunch;
+			break;
+		case ST_DOOR: case ST_CONTAINER:
+			position=((Highlightable *) scr)->TrapLaunch;
+			break;
+	}
+}
+
 void GetPositionFromScriptable(Scriptable* scr, Point &position, bool dest)
 {
 	if (!dest) {
@@ -762,14 +781,17 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		}
 		scr = Sender;
 	}
-	if (!scr || scr->Type != ST_ACTOR) {
-		printf("[GameScript]: Speaker for dialog couldn't be found (Sender: %s, Type: %d).\n", Sender->GetScriptName(), Sender->Type);
+	if (!scr) {
+	//if (!scr || scr->Type != ST_ACTOR) {
+		printMessage("GameScript"," ",LIGHT_RED);
+		printf("Speaker for dialog couldn't be found (Sender: %s, Type: %d) Flags:%d.\n", Sender->GetScriptName(), Sender->Type, Flags);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
 
 	if (!tar || tar->Type!=ST_ACTOR) {
-		printf("[GameScript]: Target for dialog couldn't be found (Sender: %s, Type: %d).\n", Sender->GetScriptName(), Sender->Type);
+		printMessage("GameScript"," ",LIGHT_RED);
+		printf("Target for dialog couldn't be found (Sender: %s, Type: %d).\n", Sender->GetScriptName(), Sender->Type);
 		if (Sender->Type == ST_ACTOR) {
 			((Actor *) Sender)->DebugDump();
 		}
@@ -785,36 +807,65 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 	Actor *speaker, *target;
 
-	speaker = (Actor *) scr;
+	speaker = NULL;
 	target = (Actor *) tar;
 	if (!CanSee(scr, target, false, 0) ) {
+		printMessage("GameScript"," ",LIGHT_RED);
 		printf("CanSee returned false! Speaker and target are:\n");
 		((Actor *) scr)->DebugDump();
 		((Actor *) tar)->DebugDump();
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	if (speaker->GetStat(IE_STATE_ID)&STATE_DEAD) {
-		printf("Speaker is dead, cannot start dialogue. Speaker and target are:\n");
-		((Actor *) scr)->DebugDump();
-		((Actor *) tar)->DebugDump();
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-
-	//CHECKDIST works only for mobile scriptables
-	if (Flags&BD_CHECKDIST) {
-		if (Distance(speaker, target)>speaker->GetStat(IE_DIALOGRANGE)*15 ) {
-	     //this is unsure, the target's path will be cleared
-			GoNearAndRetry(Sender, tar, true, speaker->GetStat(IE_DIALOGRANGE)*15);
+	bool swap = false;
+	if (scr->Type==ST_ACTOR) {
+		speaker = (Actor *) scr;
+		if (speaker->GetStat(IE_STATE_ID)&STATE_DEAD) {
+			printMessage("GameScript"," ",LIGHT_RED);
+			printf("Speaker is dead, cannot start dialogue. Speaker and target are:\n");
+			speaker->DebugDump();
+			target->DebugDump();
 			Sender->ReleaseCurrentAction();
 			return;
 		}
+		ieDword range = MAX_OPERATING_DISTANCE;
+		//making sure speaker is the protagonist, player, actor
+		if ( target->InParty == 1) swap = true;
+		else if ( speaker->InParty !=1 && target->InParty) swap = true;
+		//CHECKDIST works only for mobile scriptables
+		if (Flags&BD_CHECKDIST) {
+			if (PersonalDistance(scr, target)>range ) {
+				 //this is unsure, the target's path will be cleared
+				GoNearAndRetry(Sender, tar, true, range);
+				Sender->ReleaseCurrentAction();
+				return;
+			}
+		}
+	} else {
+		//pst style dialog with trigger points
+		swap=true;
+		if (Flags&BD_CHECKDIST) {
+			Point TalkPos;
+
+			if (target->InMove()) {
+				//waiting for target
+				Sender->AddActionInFront( Sender->CurrentAction );
+				Sender->ReleaseCurrentAction();
+				Sender->SetWait(1);
+				return;
+			}
+			GetTalkPositionFromScriptable(scr, TalkPos);      
+			if (Distance(TalkPos, target)>MAX_OPERATING_DISTANCE ) {
+				//try to force the target to come closer???  
+				GoNear(target, TalkPos);
+				Sender->AddActionInFront( Sender->CurrentAction );
+				Sender->ReleaseCurrentAction();
+				Sender->SetWait(1);
+				return;
+			}
+		}
 	}
-	//making sure speaker is the protagonist, player, actor
-	bool swap = false;
-	if ( target->InParty == 1) swap = true;
-	else if ( speaker->InParty !=1 && target->InParty) swap = true;
+
 
 	GameControl* gc = core->GetGameControl();
 	if (!gc) {
@@ -843,13 +894,13 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		case BD_STRING0:
 			Dialog = parameters->string0Parameter;
 			if (Flags & BD_SETDIALOG) {
-				speaker->SetDialog( Dialog );
+				scr->SetDialog( Dialog );
 			}
 			break;
 		case BD_SOURCE:
 		case BD_TARGET:
-			if (swap) Dialog = speaker->Dialog;
-			else Dialog = target->Dialog;
+			if (swap) Dialog = scr->GetDialog();
+			else Dialog = target->GetDialog(true);
 			break;
 		case BD_RESERVED:
 			//what if playerdialog was initiated from Player2?
@@ -858,7 +909,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			break;
 		case BD_INTERACT: //using the source for the dialog
 			pdtable = core->LoadTable( "interdia" );
-			const char* scriptingname = ((Actor *) scr)->GetScriptName();
+			const char* scriptingname = scr->GetScriptName();
 			//Dialog is a borrowed reference, we cannot free pdtable while it is being used
 			if (pdtable!=-1) {
 				Dialog = core->GetTable( pdtable )->QueryField( scriptingname, "FILE" );
@@ -878,10 +929,10 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 	if (speaker!=target) {
 		if (swap) {
-			Actor *tmp = target;
-			target = speaker;
-			speaker = tmp;
-		} else {
+			Scriptable *tmp = tar;
+			tar = scr;
+			scr = tmp;
+		} else {      
 			if (!(Flags & BD_INTERRUPT)) {
 				if (tar->GetNextAction()) {
 					core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
@@ -894,9 +945,14 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 	//don't clear target's actions, because a sequence like this will be broken:
 	//StartDialog([PC]); SetGlobal("Talked","LOCALS",1);
-	speaker->ClearActions();
-	speaker->SetOrientation(GetOrient( target->Pos, speaker->Pos), true);
-	target->SetOrientation(GetOrient( speaker->Pos, target->Pos), true);
+	if (scr!=tar) {
+		if (scr->Type==ST_ACTOR) {
+			((Actor *) scr)->SetOrientation(GetOrient( tar->Pos, scr->Pos), true);
+		}
+		if (tar->Type==ST_ACTOR) {
+			((Actor *) tar)->SetOrientation(GetOrient( scr->Pos, tar->Pos), true);
+		}
+	}
 
 	if (Dialog[0]) {
 		//increasing NumTimesTalkedTo or NumTimesInteracted
@@ -907,7 +963,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		}
 
 		core->GetDictionary()->SetAt("DialogChoose",(ieDword) -1);
-		gc->InitDialog( speaker, target, Dialog);
+		gc->InitDialog( scr, tar, Dialog);
 	}
 //if pdtable was allocated, free it now, it will release Dialog
 end_of_quest:
@@ -1390,6 +1446,19 @@ Action* GenerateActionCore(const char *src, const char *str, int acIndex)
 			src++;
 	}
 	return newAction;
+}
+
+void GoNear(Scriptable *Sender, Point &p)
+{
+	if (Sender->CurrentAction) {
+		printMessage("GameScript","Target busy???\n",LIGHT_RED);
+		return;
+	}
+	Sender->AddActionInFront( Sender->CurrentAction );
+	char Tmp[256];
+	sprintf( Tmp, "MoveToPoint([%hd.%hd])", p.x, p.y );
+	Action * action = GenerateAction( Tmp);
+	Sender->AddActionInFront( action );
 }
 
 void GoNearAndRetry(Scriptable *Sender, Scriptable *target, bool flag, int distance)

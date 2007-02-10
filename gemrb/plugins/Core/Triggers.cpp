@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.62 2007/02/08 22:10:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.63 2007/02/10 14:29:24 avenger_teambg Exp $
  *
  */
 
@@ -316,6 +316,18 @@ int GameScript::IsActive(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	if (scr->GetInternalFlag()&IF_ACTIVE) {
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::InTrap(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr) {
+		return 0;
+	}
+	if (scr->GetInternalFlag()&IF_INTRAP) {
 		return 1;
 	}
 	return 0;
@@ -2017,7 +2029,10 @@ int GameScript::StateCheck(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return actor->GetStat(IE_STATE_ID) & parameters->int0Parameter;
+	if (actor->GetStat(IE_STATE_ID) & parameters->int0Parameter) {
+		return 1;
+	}
+	return 0;
 }
 
 int GameScript::ExtendedStateCheck(Scriptable* Sender, Trigger* parameters)
@@ -2027,7 +2042,10 @@ int GameScript::ExtendedStateCheck(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return actor->GetStat(IE_EXTSTATE_ID) & parameters->int0Parameter;
+	if (actor->GetStat(IE_EXTSTATE_ID) & parameters->int0Parameter) {
+		return 1;
+	}
+	return 0;
 }
 
 int GameScript::NotStateCheck(Scriptable* Sender, Trigger* parameters)
@@ -2037,7 +2055,10 @@ int GameScript::NotStateCheck(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	return actor->GetStat(IE_STATE_ID) & ~parameters->int0Parameter;
+	if (actor->GetStat(IE_STATE_ID) & ~parameters->int0Parameter) {
+		return 1;
+	}
+	return 0;
 }
 
 int GameScript::RandomNum(Scriptable* /*Sender*/, Trigger* parameters)

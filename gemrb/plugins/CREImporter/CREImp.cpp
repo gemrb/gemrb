@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.130 2007/02/09 19:34:47 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.131 2007/02/10 14:29:23 avenger_teambg Exp $
  *
  */
 
@@ -477,10 +477,13 @@ Actor* CREImp::GetActor()
 			printMessage("CREImp","Unknown creature signature.\n", YELLOW);
 	}
 
+	ieResRef Dialog;
+	str->ReadResRef(Dialog);
 	//Hacking NONE to no error
-	if (stricmp(act->Dialog,"NONE") == 0) {
-		act->Dialog[0]=0;
+	if (strnicmp(Dialog,"NONE",8) == 0) {
+		Dialog[0]=0;
 	}
+	act->SetDialog(Dialog);
 
 	// Read saved effects
 	if (core->IsAvailable(IE_EFF_CLASS_ID) ) {
@@ -716,7 +719,7 @@ void CREImp::GetActorPST(Actor *act)
 	str->ReadDword( &EffectsOffset );
 	str->ReadDword( &EffectsCount ); //also variables
 
-	str->ReadResRef( act->Dialog );
+	//str->ReadResRef( act->Dialog );
 }
 
 void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
@@ -1118,7 +1121,7 @@ void CREImp::GetActorBG(Actor *act)
 	str->ReadDword( &EffectsOffset );
 	str->ReadDword( &EffectsCount );
 
-	str->ReadResRef( act->Dialog );
+	//str->ReadResRef( act->Dialog );
 }
 
 void CREImp::GetActorIWD2(Actor *act)
@@ -1384,7 +1387,7 @@ void CREImp::GetActorIWD2(Actor *act)
 	str->ReadDword( &EffectsOffset );
 	str->ReadDword( &EffectsCount );
 
-	str->ReadResRef( act->Dialog );
+	//str->ReadResRef( act->Dialog );
 }
 
 void CREImp::GetActorIWD1(Actor *act) //9.0
@@ -1569,7 +1572,7 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	str->ReadDword( &EffectsOffset );
 	str->ReadDword( &EffectsCount );
 
-	str->ReadResRef( act->Dialog );
+	//str->ReadResRef( act->Dialog );
 }
 
 int CREImp::GetStoredFileSize(Actor *actor)
@@ -2518,7 +2521,7 @@ int CREImp::PutActor(DataStream *stream, Actor *actor, bool chr)
 	stream->WriteDword( &EffectsOffset );
 	tmpDword = EffectsCount+VariablesCount;
 	stream->WriteDword( &tmpDword );
-	stream->WriteResRef( actor->Dialog );
+	stream->WriteResRef( actor->GetDialog(false) );
 	//spells, spellbook etc
 
 	if (actor->version==IE_CRE_V2_2) {

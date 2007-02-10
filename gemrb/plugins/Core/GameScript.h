@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.267 2007/02/09 21:12:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.268 2007/02/10 14:29:23 avenger_teambg Exp $
  *
  */
 
@@ -781,6 +781,7 @@ public: //Script Functions
 	static int Internal(Scriptable* Sender, Trigger* parameters);
 	static int InternalGT(Scriptable* Sender, Trigger* parameters);
 	static int InternalLT(Scriptable* Sender, Trigger* parameters);
+	static int InTrap(Scriptable* Sender, Trigger* parameters);
 	static int InventoryFull(Scriptable* Sender, Trigger* parameter);
 	static int InWeaponRange(Scriptable* Sender, Trigger* parameter);
 	static int IsAClown(Scriptable* Sender, Trigger* parameters);
@@ -1025,6 +1026,7 @@ public:
 	static void DialogueForceInterrupt(Scriptable* Sender, Action* parameters);
 	static void DialogueInterrupt(Scriptable* Sender, Action* parameters);
 	static void DisableFogDither(Scriptable* Sender, Action* parameters);
+	static void DisableSpriteDither(Scriptable* Sender, Action* parameters);
 	static void DisplayMessage(Scriptable* Sender, Action* parameters);
 	static void DisplayString(Scriptable* Sender, Action* parameters);
 	static void DisplayStringHead(Scriptable* Sender, Action* parameters);
@@ -1037,6 +1039,7 @@ public:
 	static void DropItem(Scriptable* Sender, Action* parameters);
 	static void EnableFogDither(Scriptable* Sender, Action* parameters);
 	static void EnablePortalTravel(Scriptable* Sender, Action* parameters);
+	static void EnableSpriteDither(Scriptable* Sender, Action* parameters);
 	static void EndCredits(Scriptable* Sender, Action* parameters);
 	static void EndCutSceneMode(Scriptable* Sender, Action* parameters);
 	static void Enemy(Scriptable* Sender, Action* parameters);
@@ -1061,6 +1064,7 @@ public:
 	static void FloatMessageFixed(Scriptable* Sender, Action* parameters);
 	static void FloatMessageFixedRnd(Scriptable* Sender, Action* parameters);
 	static void FloatMessageRnd(Scriptable* Sender, Action* parameters);
+	static void FloatRebus(Scriptable* Sender, Action* parameters);
 	static void Follow(Scriptable* Sender, Action* parameters);
 	static void FollowCreature(Scriptable* Sender, Action* parameters);
 	static void FollowObjectFormation(Scriptable* Sender, Action* parameters);
@@ -1208,6 +1212,7 @@ public:
 	static void RevealAreaOnMap(Scriptable* Sender, Action* parameters);
 	static void RunAwayFrom(Scriptable* Sender, Action* parameters);
 	static void RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters);
+	static void RunFollow(Scriptable* Sender, Action* parameters);
 	static void RunningAttack(Scriptable* Sender, Action* parameters);
 	static void RunningAttackNoSound(Scriptable* Sender, Action* parameters);
 	static void RunToObject(Scriptable* Sender, Action* parameters);

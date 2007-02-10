@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.394 2007/02/09 21:12:26 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.395 2007/02/10 14:29:23 avenger_teambg Exp $
  *
  */
 
@@ -178,6 +178,7 @@ static TriggerLink triggernames[] = {
 	{"internalgt", GameScript::InternalGT, 0},
 	{"internallt", GameScript::InternalLT, 0},
 	{"interactingwith", GameScript::InteractingWith, 0},
+	{"intrap", GameScript::InTrap, 0},
 	{"inventoryfull", GameScript::InventoryFull, 0},
 	{"inview", GameScript::LOS, 0}, //it seems the same, needs research
 	{"inweaponrange", GameScript::InWeaponRange, 0},
@@ -461,6 +462,7 @@ static ActionLink actionnames[] = {
 	{"dialogueforceinterrupt", GameScript::DialogueForceInterrupt,AF_BLOCKING},
 	{"dialogueinterrupt", GameScript::DialogueInterrupt,0},
 	{"disablefogdither", GameScript::DisableFogDither, 0},
+	{"disablespritedither", GameScript::DisableSpriteDither, 0},
 	{"displaymessage", GameScript::DisplayMessage, 0},
 	{"displaystring", GameScript::DisplayString, 0},
 	{"displaystringhead", GameScript::DisplayStringHead, 0},
@@ -475,6 +477,7 @@ static ActionLink actionnames[] = {
 	{"dropitem", GameScript::DropItem, AF_BLOCKING},
 	{"enablefogdither", GameScript::EnableFogDither, 0},
 	{"enableportaltravel", GameScript::EnablePortalTravel, 0},
+	{"enablespritedither", GameScript::EnableSpriteDither, 0},
 	{"endcredits", GameScript::EndCredits, 0},//movie
 	{"endcutscenemode", GameScript::EndCutSceneMode, 0},
 	{"endgame", GameScript::QuitGame, 0},  //ending in iwd2
@@ -505,9 +508,10 @@ static ActionLink actionnames[] = {
 	{"floatmessagefixed", GameScript::FloatMessageFixed, 0},
 	{"floatmessagefixedrnd", GameScript::FloatMessageFixedRnd, 0},
 	{"floatmessagernd", GameScript::FloatMessageRnd, 0},
+	{"floatrebus", GameScript::FloatRebus, 0},
 	{"follow", GameScript::Follow, 0},
-	{"followcreature", GameScript::FollowCreature, 0}, //pst
-	{"followobjectformation", GameScript::FollowObjectFormation, 0},
+	{"followcreature", GameScript::FollowCreature, AF_BLOCKING}, //pst
+	{"followobjectformation", GameScript::FollowObjectFormation, AF_BLOCKING},
 	{"forceaiscript", GameScript::ForceAIScript, 0},
 	{"forceattack", GameScript::ForceAttack, 0},
 	{"forcefacing", GameScript::ForceFacing, 0},
@@ -515,6 +519,7 @@ static ActionLink actionnames[] = {
 	{"forceleavearealua", GameScript::ForceLeaveAreaLUA, 0},
 	{"forcespell", GameScript::ForceSpell, AF_BLOCKING},
 	{"fullheal", GameScript::FullHeal, 0},
+	{"fullhealex", GameScript::FullHeal, 0}, //pst, not sure what's different
 	{"generatepartymember", GameScript::GeneratePartyMember, 0},
 	{"getitem", GameScript::GetItem, 0},
 	{"getstat", GameScript::GetStat, 0}, //gemrb specific
@@ -670,6 +675,7 @@ static ActionLink actionnames[] = {
 	{"runawayfrom", GameScript::RunAwayFrom,AF_BLOCKING},
 	{"runawayfromnointerrupt", GameScript::RunAwayFromNoInterrupt,AF_BLOCKING},
 	{"runawayfrompoint", GameScript::RunAwayFromPoint,AF_BLOCKING},
+	{"runfollow", GameScript::RunAwayFrom,AF_BLOCKING},
 	{"runningattack", GameScript::RunningAttack,AF_BLOCKING},
 	{"runningattacknosound", GameScript::RunningAttackNoSound,AF_BLOCKING},
 	{"runtoobject", GameScript::RunToObject,AF_BLOCKING},

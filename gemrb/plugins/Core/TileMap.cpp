@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.56 2006/11/27 18:48:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.57 2007/02/10 14:29:23 avenger_teambg Exp $
  *
  */
 
@@ -479,7 +479,9 @@ InfoPoint* TileMap::AddInfoPoint(const char* Name, unsigned short Type,
 	infoPoints.push_back( ip );
 	return ip;
 }
-InfoPoint* TileMap::GetInfoPoint(Point &p)
+
+//if detectable is set, then only detectable infopoints will be returned
+InfoPoint* TileMap::GetInfoPoint(Point &p, bool detectable)
 {
 	for (size_t i = 0; i < infoPoints.size(); i++) {
 		InfoPoint* ip = infoPoints[i];
@@ -487,6 +489,17 @@ InfoPoint* TileMap::GetInfoPoint(Point &p)
 		//scripts can still access an infopoint by name
 		if (ip->Flags&(INFO_DOOR|TRAP_DEACTIVATED) )
 			continue;
+
+		if (detectable) {
+			if (ip->Type==ST_PROXIMITY) {
+				continue;
+			}
+			if (ip->Type==ST_TRAVEL) {
+				if (!(ip->Trapped&PORTAL_CURSOR)) {
+					continue;
+				}
+			}
+		}
 
 		if (!(ip->GetInternalFlag()&IF_ACTIVE))
 			continue;
