@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.458 2007/02/10 14:29:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.459 2007/02/10 17:34:15 avenger_teambg Exp $
  *
  */
 
@@ -996,14 +996,9 @@ int Interface::Init()
 	vars->SetAt( "Volume Voices", 100 );
 	printStatus( "OK", LIGHT_GREEN );
 
-	printMessage( "Core", "Loading Configuration File...", WHITE );
 	if (!LoadConfig()) {
-		printStatus( "ERROR", LIGHT_RED );
-		printMessage( "Core",
-			"Cannot Load Config File.\nTermination in Progress...\n", WHITE );
 		return GEM_ERROR;
 	}
-	printStatus( "OK", LIGHT_GREEN );
 	printMessage( "Core", "Starting Plugin Manager...\n", WHITE );
 	plugin = new PluginMgr( PluginsPath );
 	if (plugin && plugin->GetPluginCount()) {		
@@ -1868,8 +1863,12 @@ bool Interface::LoadConfig(void)
 bool Interface::LoadConfig(const char* filename)
 {
 	FILE* config;
+
+	printMessage("Config"," ", WHITE);
+	printf("Trying to open %s\n", filename);
 	config = fopen( filename, "rb" );
 	if (config == NULL) {
+		printStatus("NOT FOUND", LIGHT_RED);
 		return false;
 	}
 	char name[65], value[_MAX_PATH + 3];
@@ -2046,6 +2045,8 @@ bool Interface::LoadConfig(const char* filename)
 	FixPath( CachePath, false );
 	mkdir( CachePath, S_IREAD|S_IWRITE|S_IEXEC );
 	chmod( CachePath, S_IREAD|S_IWRITE|S_IEXEC );
+
+	printStatus( "OK", GREEN );
 	if ( StupidityDetector( CachePath )) {
 		printMessage("Core"," ",LIGHT_RED);
 		printf( "Cache folder %s doesn't exist, invalid or contains executable files!\n", CachePath );
@@ -2054,7 +2055,6 @@ bool Interface::LoadConfig(const char* filename)
 	DelTree((const char *) CachePath, false);
 	FixPath( CachePath, true );
 
-	printf( "Loaded config file %s\n", filename );
 	return true;
 }
 

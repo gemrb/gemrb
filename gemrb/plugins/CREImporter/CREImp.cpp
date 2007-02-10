@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.131 2007/02/10 14:29:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.132 2007/02/10 17:34:14 avenger_teambg Exp $
  *
  */
 
@@ -1585,7 +1585,8 @@ int CREImp::GetStoredFileSize(Actor *actor)
 	switch (CREVersion) {
 		case IE_CRE_GEMRB:
 			headersize = 0x2d4;
-			Inventory_Size=actor->inventory.GetSlotCount();
+			//minus fist
+			Inventory_Size=actor->inventory.GetSlotCount()-1;
 			TotSCEFF = 1;
 			break;
 		case IE_CRE_V1_1://totsc/bg2/tob (still V1.0, but large effects)
@@ -1655,11 +1656,9 @@ int CREImp::GetStoredFileSize(Actor *actor)
 
 	//counting items (calculating item storage)
 	ItemsCount = 0;
-	for (i=0;i<core->GetInventorySize();i++) {
+	for (i=0;i<Inventory_Size;i++) {
+	//for (i=0;i<core->GetInventorySize();i++) {
 		unsigned int j = core->QuerySlot(i+1);
-		if (j>Inventory_Size) {
-			continue;
-		}
 		CREItem *it = actor->inventory.GetSlotItem(j);
 		if (it) {
 			ItemsCount++;
@@ -1686,9 +1685,6 @@ int CREImp::PutInventory(DataStream *stream, Actor *actor, unsigned int size)
 	for (i=0;i<size;i++) {
 		//ignore first element, getinventorysize makes space for fist
 		unsigned int j = core->QuerySlot(i+1);
-		if (j > size) {
-			continue;
-		}
 		CREItem *it = actor->inventory.GetSlotItem( j );
 		if (!it) {
 			continue;

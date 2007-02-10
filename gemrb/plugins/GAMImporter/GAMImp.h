@@ -45,7 +45,6 @@ private:
 	ieDword JournalOffset, JournalCount;
 	ieDword KillVarsOffset, KillVarsCount;
 	ieDword FamiliarsOffset;
-	ieDword BestiaryOffset;
 	ieDword SavedLocOffset, SavedLocCount;
 
 public:

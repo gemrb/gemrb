@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.90 2007/02/03 15:34:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GAMImporter/GAMImp.cpp,v 1.91 2007/02/10 17:34:16 avenger_teambg Exp $
  *
  */
 
@@ -31,6 +31,7 @@
 
 #define MAZE_DATA_SIZE 1720
 #define FAMILIAR_FILL_SIZE 324
+#define BESTIARY_SIZE 260
 // if your compiler chokes on this, use -1 or 0xff whichever works for you
 #define UNINITIALIZED_CHAR '\xff'
 
@@ -125,7 +126,7 @@ Game* GAMImp::LoadGame(Game *newGame)
 		newGame->WhichFormation = 0;
 	}
 	str->ReadDword( &newGame->PartyGold );
-	str->ReadDword( &newGame->WeatherBits ); 
+	str->ReadDword( &newGame->WeatherBits );
 	str->ReadDword( &PCOffset );
 	str->ReadDword( &PCCount );
 	//these fields are not really used by any engine, and never saved
@@ -182,7 +183,7 @@ Game* GAMImp::LoadGame(Game *newGame)
 		const char* resref = tm->QueryField( playmode );
 		strnlwrcpy( newGame->CurrentArea, resref, 8 );
 	}
-	
+
 	//Loading PCs
 	ActorMgr* aM = ( ActorMgr* ) core->GetInterface( IE_CRE_CLASS_ID );
 	for (i = 0; i < PCCount; i++) {
@@ -244,9 +245,9 @@ Game* GAMImp::LoadGame(Game *newGame)
 		if (MazeOffset) {
 			newGame->mazedata = (ieByte*)malloc(MAZE_DATA_SIZE);
 			str->Seek(MazeOffset, GEM_STREAM_START );
-			str->Read(newGame->mazedata, MAZE_DATA_SIZE); 
-			str->Seek( FamiliarsOffset, GEM_STREAM_START );
+			str->Read(newGame->mazedata, MAZE_DATA_SIZE);
 		}
+		str->Seek( FamiliarsOffset, GEM_STREAM_START );
 	} else {
 		if (FamiliarsOffset) {
 			str->Seek( FamiliarsOffset, GEM_STREAM_START );
@@ -257,11 +258,11 @@ Game* GAMImp::LoadGame(Game *newGame)
 	}
 	// Loading known creatures array (beasts)
 	if(core->GetBeastsINI() != NULL) {
-		int beasts_count = core->GetBeastsINI()->GetTagsCount();
+		int beasts_count = BESTIARY_SIZE;
 		newGame->beasts = (ieByte*)malloc(beasts_count);
 		str->Read( newGame->beasts, beasts_count );
 	}
-	
+
 	if (SavedLocCount && SavedLocOffset) {
 		str->Seek( SavedLocOffset, GEM_STREAM_START );
 		//reading saved locations
@@ -447,6 +448,7 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 	strcpy( actor->Area, pcInfo.Area );
 	actor->SetOrientation( pcInfo.Orientation,0 );
 	actor->TalkCount = pcInfo.TalkCount;
+	actor->ModalState = pcInfo.ModalState;
 
 	actor->SetPersistent( is_in_party ? (pcInfo.PartyOrder + 1) : 0);
 
@@ -491,7 +493,7 @@ GAMJournalEntry* GAMImp::GetJournalEntry()
 	GAMJournalEntry* j = new GAMJournalEntry();
 
 	str->ReadDword( &j->Text );
-	str->ReadDword( &j->GameTime ); 
+	str->ReadDword( &j->GameTime );
 	//this could be wrong, most likely these are 2 words, or a dword
 	str->Read( &j->Chapter, 1 );
 	str->Read( &j->unknown09, 1 );
@@ -558,6 +560,14 @@ int GAMImp::GetStoredFileSize(Game *game)
 		headersize +=am->GetStoredFileSize(ac);
 	}
 	core->FreeInterface( am );
+
+	if (game->mazedata) {
+		MazeOffset = headersize;
+		headersize += MAZE_DATA_SIZE;
+	} else {
+		MazeOffset = 0;
+	}
+
 	GlobalOffset = headersize;
 
 	GlobalCount = game->locals->GetCount();
@@ -577,8 +587,9 @@ int GAMImp::GetStoredFileSize(Game *game)
 	} else {
 		FamiliarsOffset = headersize;
 		if (core->GetBeastsINI()) {
-			headersize +=core->GetBeastsINI()->GetTagsCount();
-		} else {
+			headersize +=BESTIARY_SIZE;
+		}
+		if (game->version!=GAM_VER_PST) {
 			headersize += 9 * 8 + 82 * 4;
 		}
 	}
@@ -594,7 +605,7 @@ int GAMImp::PutJournals(DataStream *stream, Game *game)
 		GAMJournalEntry *j = game->GetJournalEntry(i);
 
 		stream->WriteDword( &j->Text );
-		stream->WriteDword( &j->GameTime ); 
+		stream->WriteDword( &j->GameTime );
 		//this could be wrong, most likely these are 2 words, or a dword
 		stream->Write( &j->Chapter, 1 );
 		stream->Write( &j->unknown09, 1 );
@@ -717,7 +728,8 @@ int GAMImp::PutHeader(DataStream *stream, Game *game)
 		stream->WriteResRef( game->CurrentArea );
 		stream->WriteDword( &KillVarsOffset );
 		stream->WriteDword( &KillVarsCount );
-		stream->WriteDword( &BestiaryOffset );
+		stream->WriteDword( &FamiliarsOffset );
+		stream->WriteResRef( game->CurrentArea ); //again
 		break;
 	}
 	stream->WriteDword( &game->RealTime ); //this isn't correct, this field is the realtime
@@ -741,7 +753,7 @@ int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CRE
 	} else {
 		tmpWord=0;
 	}
-  
+
 	stream->WriteWord( &tmpWord);
 	tmpWord = ac->InParty-1;
 	stream->WriteWord( &tmpWord);
@@ -751,7 +763,7 @@ int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CRE
 	//creature resref is always unused in saved games
 	stream->Write( filling, 8);
 	tmpDword = ac->GetOrientation();
-	stream->WriteDword (&tmpDword);
+	stream->WriteDword( &tmpDword);
 	stream->WriteResRef(ac->Area);
 	tmpWord = ac->Pos.x;
 	stream->WriteWord( &tmpWord);
@@ -762,76 +774,80 @@ int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CRE
 	stream->WriteWord( &tmpWord);
 	tmpWord = ac->Pos.y;
 	stream->WriteWord( &tmpWord);
-	//a lot of crap
-	stream->Write( filling, 100);
+	tmpWord = (ieWord) ac->ModalState;
+	stream->WriteWord( &tmpWord);
+	tmpWord = 0; //happiness
+	stream->WriteWord( &tmpWord);
+	//a field of zeroes
+	stream->Write(filling, 96);
 
-  //quickweapons
-  if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
-    for (i=0;i<4;i++) {
-      stream->WriteWord(ac->PCStats->QuickWeaponSlots+i);
-      stream->WriteWord(ac->PCStats->QuickWeaponSlots+4+i);
-    }
-    for (i=0;i<4;i++) {
-      stream->WriteWord(ac->PCStats->QuickWeaponHeaders+i);
-      stream->WriteWord(ac->PCStats->QuickWeaponHeaders+4+i);
-    }
-  } else {
-    for (i=0;i<4;i++) {
-      stream->WriteWord(ac->PCStats->QuickWeaponSlots+i);
-    }
-    for (i=0;i<4;i++) {
-      stream->WriteWord(ac->PCStats->QuickWeaponHeaders+i);
-    }
-  }
+	//quickweapons
+	if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
+		for (i=0;i<4;i++) {
+			stream->WriteWord( ac->PCStats->QuickWeaponSlots+i);
+			stream->WriteWord( ac->PCStats->QuickWeaponSlots+4+i);
+		}
+		for (i=0;i<4;i++) {
+			stream->WriteWord( ac->PCStats->QuickWeaponHeaders+i);
+			stream->WriteWord( ac->PCStats->QuickWeaponHeaders+4+i);
+		}
+	} else {
+		for (i=0;i<4;i++) {
+			stream->WriteWord( ac->PCStats->QuickWeaponSlots+i);
+		}
+		for (i=0;i<4;i++) {
+			stream->WriteWord( ac->PCStats->QuickWeaponHeaders+i);
+		}
+	}
 
-  //quickspells
-  if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
-    for (i=0;i<MAX_QSLOTS;i++) {
-      if (ac->PCStats->QuickSpellClass[i]==0xff) {
-        stream->Write(filling,8);
-      } else {
-  	    stream->Write(ac->PCStats->QuickSpells[i],8);
-      }
-    }
-    //quick spell classes
-    stream->Write(ac->PCStats->QuickSpellClass,MAX_QSLOTS);
-    stream->Write(filling,1);
-  } else {
-    for (i=0;i<3;i++) {
-  	  stream->Write(ac->PCStats->QuickSpells[i],8);
-    }
-  }
+	//quickspells
+	if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
+		for (i=0;i<MAX_QSLOTS;i++) {
+			if (ac->PCStats->QuickSpellClass[i]==0xff) {
+				stream->Write(filling,8);
+			} else {
+				stream->Write(ac->PCStats->QuickSpells[i],8);
+			}
+		}
+		//quick spell classes
+		stream->Write(ac->PCStats->QuickSpellClass,MAX_QSLOTS);
+		stream->Write(filling,1);
+	} else {
+		for (i=0;i<3;i++) {
+			stream->Write(ac->PCStats->QuickSpells[i],8);
+		}
+	}
 
-  //quick items
-  switch (version) {
-  case GAM_VER_PST: case GAM_VER_GEMRB:
-    for (i=0;i<MAX_QUICKITEMSLOT;i++) {
-      stream->WriteWord(ac->PCStats->QuickItemSlots+i);
-    }
-    for (i=0;i<MAX_QUICKITEMSLOT;i++) {
-      stream->WriteWord(ac->PCStats->QuickItemHeaders+i);
-    }
-    break;
-  default:
-    for (i=0;i<3;i++) {
-      stream->WriteWord(ac->PCStats->QuickItemSlots+i);
-    }
-    for (i=0;i<3;i++) {
-      stream->WriteWord(ac->PCStats->QuickItemHeaders+i);
-    }
-    break;
-  }
+	//quick items
+	switch (version) {
+	case GAM_VER_PST: case GAM_VER_GEMRB:
+		for (i=0;i<MAX_QUICKITEMSLOT;i++) {
+			stream->WriteWord(ac->PCStats->QuickItemSlots+i);
+		}
+		for (i=0;i<MAX_QUICKITEMSLOT;i++) {
+			stream->WriteWord(ac->PCStats->QuickItemHeaders+i);
+		}
+		break;
+	default:
+		for (i=0;i<3;i++) {
+			stream->WriteWord(ac->PCStats->QuickItemSlots+i);
+		}
+		for (i=0;i<3;i++) {
+			stream->WriteWord(ac->PCStats->QuickItemHeaders+i);
+		}
+		break;
+	}
 
-  //innates
-  if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
-    for (i=0;i<MAX_QSLOTS;i++) {
-      if (ac->PCStats->QuickSpellClass[i]==0xff) {
-    	  stream->Write(ac->PCStats->QuickSpells[i],8);
-      } else {
-        stream->Write(filling,8);
-      }
-    }
-  }
+	//innates
+	if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
+		for (i=0;i<MAX_QSLOTS;i++) {
+			if (ac->PCStats->QuickSpellClass[i]==0xff) {
+				stream->Write(ac->PCStats->QuickSpells[i],8);
+			} else {
+				stream->Write(filling,8);
+			}
+		}
+	}
 
 	if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
 		stream->Write( filling, 72);
@@ -850,9 +866,6 @@ int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CRE
 	}
 	stream->Write( filling, 32);
 	memset(filling,0,32);
-	if (version==GAM_VER_PST) { //Torment
-		stream->Write( filling, 8);
-	}
 	stream->WriteDword( &ac->TalkCount);
 	stream->WriteDword( &ac->PCStats->BestKilledName);
 	stream->WriteDword( &ac->PCStats->BestKilledXP);
@@ -879,9 +892,9 @@ int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CRE
 	if (core->HasFeature(GF_SOUNDFOLDERS) ) {
 		stream->Write(ac->PCStats->SoundFolder, 32);
 	}
-  if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
-    stream->Write(filling, 194);
-  }
+	if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
+		stream->Write(filling, 194);
+	}
 	return 0;
 }
 
@@ -940,10 +953,11 @@ int GAMImp::PutFamiliars(DataStream *stream, Game *game)
 {
 	int len = 0;
 	if (core->GetBeastsINI()) {
-		len = core->GetBeastsINI()->GetTagsCount();
+		len = BESTIARY_SIZE;
 		if (game->version==GAM_VER_PST) {
-			stream->Write( game->beasts, len );
 			//only GemRB version can have all features, return when it is PST
+			//gemrb version will have the beasts after the familiars
+			stream->Write( game->beasts, len );
 			return 0;
 		}
 	}
@@ -985,6 +999,13 @@ int GAMImp::PutGame(DataStream *stream, Game *game)
 		return ret;
 	}
 
+	if (game->mazedata) {
+		ret = PutMaze( stream, game);
+		if (ret) {
+			return ret;
+		}
+	}
+
 	ret = PutVariables( stream, game);
 	if (ret) {
 		return ret;
@@ -1001,12 +1022,7 @@ int GAMImp::PutGame(DataStream *stream, Game *game)
 			return ret;
 		}
 
-		ret = PutMaze( stream, game);
-		if (ret) {
-			return ret;
-		}
 	}
-
 	if (FamiliarsOffset) {
 		ret = PutFamiliars( stream, game);
 		if (ret) {

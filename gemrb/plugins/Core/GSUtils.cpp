@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.83 2007/02/10 14:29:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.84 2007/02/10 17:34:15 avenger_teambg Exp $
  *
  */
 
@@ -1454,7 +1454,6 @@ void GoNear(Scriptable *Sender, Point &p)
 		printMessage("GameScript","Target busy???\n",LIGHT_RED);
 		return;
 	}
-	Sender->AddActionInFront( Sender->CurrentAction );
 	char Tmp[256];
 	sprintf( Tmp, "MoveToPoint([%hd.%hd])", p.x, p.y );
 	Action * action = GenerateAction( Tmp);
