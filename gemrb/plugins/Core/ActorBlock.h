@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.119 2007/02/10 14:29:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.120 2007/02/11 12:07:09 avenger_teambg Exp $
  *
  */
 
@@ -182,11 +182,12 @@ public:
 	char* overHeadText;
 	unsigned char textDisplaying;
 	unsigned long timeStartDisplaying;
-	ieDword LastTrigger;
-	ieDword LastEntered;
-	ieDword LastDisarmed;
+	ieDword LastTrigger;  // also LastClosed
+	ieDword LastEntered;  // also LastOpened
+	ieDword LastDisarmed; // also LastAttacker
 	ieDword LastDisarmFailed;
 	ieDword LastUnlocked;
+	ieDword LastOpenFailed; // also LastPickpocketFailed
 	std::list< Action*> actionQueue;
 	Action* CurrentAction;
 	unsigned long playDeadCounter;
@@ -388,7 +389,7 @@ public:
 	~Door(void);
 public:
 	ieVariable LinkedInfo;
-	ieResRef ID;    //WED ID
+	ieResRef ID; //WED ID
 	TileOverlay* overlay;
 	unsigned short* tiles;
 	int tilecount;
@@ -398,7 +399,7 @@ public:
 	Gem_Polygon* open;
 	Gem_Polygon* closed;
 	//impeded blocks
-	Point* open_ib;   //impeded blocks stored in a Point array
+	Point* open_ib; //impeded blocks stored in a Point array
 	int oibcount;
 	Point* closed_ib;
 	int cibcount;
@@ -503,7 +504,7 @@ public:
 	//overheadtext contains the string, but we have to save this
 	ieStrRef StrRef;
 	Point UsePoint;
-  Point TalkPos;
+	Point TalkPos;
 };
 
 #endif

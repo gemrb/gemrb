@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.395 2007/02/10 14:29:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.396 2007/02/11 12:07:09 avenger_teambg Exp $
  *
  */
 
@@ -137,7 +137,8 @@ static TriggerLink triggernames[] = {
 	{"happiness", GameScript::Happiness, 0},
 	{"happinessgt", GameScript::HappinessGT, 0},
 	{"happinesslt", GameScript::HappinessLT, 0},
-	{"harmlessentered", GameScript::IsOverMe, 0}, //pst, not sure
+	{"harmlessclosed", GameScript::Closed, 0},  //pst, not sure
+	{"harmlessentered", GameScript::HarmlessEntered, 0}, //???
 	{"harmlessopened", GameScript::Opened, 0}, //pst, not sure
 	{"hasinnateability", GameScript::HaveSpell, 0}, //these must be the same
 	{"hasitem", GameScript::HasItem, 0},
@@ -192,7 +193,7 @@ static TriggerLink triggernames[] = {
 	{"isheartoffurymodeon", GameScript::NightmareModeOn, 0},
 	{"islocked", GameScript::IsLocked, 0},
 	{"isextendednight", GameScript::IsExtendedNight, 0},
-	{"isoverme", GameScript::IsOverMe, 0}, // same as harmlessentered?
+	{"isoverme", GameScript::IsOverMe, 0}, 
 	{"isplayernumber", GameScript::IsPlayerNumber, 0},
 	{"isrotation", GameScript::IsRotation, 0},
 	{"isscriptname", GameScript::CalledByName, 0}, //seems the same
@@ -272,6 +273,7 @@ static TriggerLink triggernames[] = {
 	{"oncreation", GameScript::OnCreation, 0},
 	{"onscreen", GameScript::OnScreen, 0},
 	{"opened", GameScript::Opened, 0}, 
+	{"openfailed", GameScript::OpenFailed, 0}, 
 	{"openstate", GameScript::OpenState, 0},
 	{"or", GameScript::Or, 0},
 	{"outofammo", GameScript::OutOfAmmo, 0},
@@ -292,6 +294,7 @@ static TriggerLink triggernames[] = {
 	{"pccanseepoint", GameScript::PCCanSeePoint, 0},
 	{"pcinstore", GameScript::PCInStore, 0},
 	{"personalspacedistance", GameScript::PersonalSpaceDistance, 0},
+	{"pickpocketfailed", GameScript::PickpocketFailed, 0}, 
 	{"proficiency", GameScript::Proficiency, 0},
 	{"proficiencygt", GameScript::ProficiencyGT, 0},
 	{"proficiencylt", GameScript::ProficiencyLT, 0},
@@ -565,6 +568,7 @@ static ActionLink actionnames[] = {
 	{"incrementextraproficiency", GameScript::IncrementExtraProficiency, 0},
 	{"incrementglobal", GameScript::IncrementGlobal,AF_MERGESTRINGS},
 	{"incrementglobalonce", GameScript::IncrementGlobalOnce,AF_MERGESTRINGS},
+	{"incrementkillstat", GameScript::IncrementKillStat, 0},
 	{"incrementproficiency", GameScript::IncrementProficiency, 0},
 	{"interact", GameScript::Interact, 0},
 	{"joinparty", GameScript::JoinParty, 0},

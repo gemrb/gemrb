@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.109 2007/02/10 14:29:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.110 2007/02/11 12:07:08 avenger_teambg Exp $
  *
  */
 
@@ -33,6 +33,7 @@
 #include "Game.h"
 #include "GameControl.h"
 #include "WorldMap.h"
+#include "DataFileMgr.h"
 
 //------------------------------------------------------------
 // Action Functions
@@ -5194,4 +5195,20 @@ void GameScript::FloatRebus(Scriptable* Sender, Action* parameters)
 		vvc->SetDefaultDuration(20);
 		actor->AddVVCell(vvc);
 	}
+}
+
+void GameScript::IncrementKillStat(Scriptable* Sender, Action* parameters)
+{
+	DataFileMgr * ini = core->GetBeastsINI();
+	if (!ini) {
+		return;
+	}
+	char key[5];
+	sprintf(key,"%d", parameters->int0Parameter);
+	const char *variable = ini->GetKeyAsString( key, "killvar", NULL );
+	if (!variable) {
+		return;
+	}
+        ieDword value = CheckVariable( Sender, variable, "GLOBAL" ) + 1;
+        SetVariable( Sender, variable, "GLOBAL", value );
 }

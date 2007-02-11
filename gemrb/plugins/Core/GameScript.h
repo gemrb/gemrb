@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.268 2007/02/10 14:29:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.269 2007/02/11 12:07:09 avenger_teambg Exp $
  *
  */
 
@@ -748,6 +748,7 @@ public: //Script Functions
 	static int Happiness(Scriptable* Sender, Trigger* parameters);
 	static int HappinessGT(Scriptable* Sender, Trigger* parameters);
 	static int HappinessLT(Scriptable* Sender, Trigger* parameters);
+	static int HarmlessEntered(Scriptable* Sender, Trigger* parameters);
 	static int HasInnateAbility(Scriptable* Sender, Trigger* parameters);
 	static int HasItem(Scriptable* Sender, Trigger* parameters);
 	static int HasItemEquipped(Scriptable* Sender, Trigger* parameters);
@@ -856,6 +857,7 @@ public: //Script Functions
 	static int OnCreation(Scriptable* Sender, Trigger* parameters);
 	static int OnScreen(Scriptable* Sender, Trigger* parameters);
 	static int Opened(Scriptable* Sender, Trigger* parameters);
+	static int OpenFailed(Scriptable* Sender, Trigger* parameters);
 	static int OpenState(Scriptable* Sender, Trigger* parameters);
 	static int Or(Scriptable* Sender, Trigger* parameters);
 	static int OutOfAmmo(Scriptable* Sender, Trigger* parameters);
@@ -876,6 +878,7 @@ public: //Script Functions
 	static int PCCanSeePoint(Scriptable* Sender, Trigger* parameters);
 	static int PCInStore(Scriptable* Sender, Trigger* parameters);
 	static int PersonalSpaceDistance(Scriptable* Sender, Trigger* parameters);
+	static int PickpocketFailed(Scriptable* Sender, Trigger* parameters);
 	static int Proficiency(Scriptable* Sender, Trigger* parameters);
 	static int ProficiencyGT(Scriptable* Sender, Trigger* parameters);
 	static int ProficiencyLT(Scriptable* Sender, Trigger* parameters);
@@ -1114,6 +1117,7 @@ public:
 	static void IncrementExtraProficiency(Scriptable* Sender, Action* parameters);
 	static void IncrementGlobal(Scriptable* Sender, Action* parameters);
 	static void IncrementGlobalOnce(Scriptable* Sender, Action* parameters);
+	static void IncrementKillStat(Scriptable* Sender, Action* parameters);
 	static void IncrementProficiency(Scriptable* Sender, Action* parameters);
 	static void Interact(Scriptable* Sender, Action* parameters);
 	static void JoinParty(Scriptable* Sender, Action* parameters);

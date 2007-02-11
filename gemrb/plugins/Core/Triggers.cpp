@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.63 2007/02/10 14:29:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.64 2007/02/11 12:07:11 avenger_teambg Exp $
  *
  */
 
@@ -1265,6 +1265,7 @@ int GameScript::Disarmed(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+//stealing from a store failed, owner triggered
 int GameScript::StealFailed(Scriptable* Sender, Trigger* parameters)
 {
 	switch(Sender->Type) {
@@ -1287,6 +1288,51 @@ int GameScript::StealFailed(Scriptable* Sender, Trigger* parameters)
 		return 1;
 	}
 	return 0;
+}
+
+int GameScript::PickpocketFailed(Scriptable* Sender, Trigger* parameters)
+{
+	switch(Sender->Type) {
+		case ST_ACTOR:
+			break;
+		default:
+			return 0;
+	}
+	if (parameters->objectParameter == NULL) {
+		if (Sender->LastOpenFailed) {
+			Sender->AddTrigger (&Sender->LastOpenFailed);
+			return 1;
+		}
+		return 0;
+	}
+	if (MatchActor(Sender, Sender->LastOpenFailed, parameters->objectParameter)) {
+		Sender->AddTrigger (&Sender->LastOpenFailed);
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::OpenFailed(Scriptable* Sender, Trigger* parameters)
+{
+        switch(Sender->Type) {
+		case ST_DOOR: case ST_CONTAINER:
+                        break;
+                default:
+                        return 0;
+        }
+        if (parameters->objectParameter == NULL) {
+                if (Sender->LastOpenFailed) {
+                        Sender->AddTrigger (&Sender->LastOpenFailed);
+                        return 1;
+                }
+                return 0;
+        }
+        if (MatchActor(Sender, Sender->LastOpenFailed, parameters->objectParameter
+)) {
+                Sender->AddTrigger (&Sender->LastOpenFailed);
+                return 1;
+        }
+        return 0;
 }
 
 int GameScript::DisarmFailed(Scriptable* Sender, Trigger* parameters)
@@ -1424,6 +1470,25 @@ int GameScript::Entered(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+int GameScript::HarmlessEntered(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type != ST_PROXIMITY) {
+		return 0;
+	}
+	if (parameters->objectParameter == NULL) {
+		if (Sender->LastEntered) {
+			Sender->AddTrigger (&Sender->LastEntered);
+			return 1;
+		}
+		return 0;
+	}
+	if (MatchActor(Sender, Sender->LastEntered, parameters->objectParameter)) {
+		Sender->AddTrigger (&Sender->LastEntered);
+		return 1;
+	}
+	return 0;
+}
+
 /* Same as entered, except that 'Trapped' isn't checked */
 int GameScript::IsOverMe(Scriptable* Sender, Trigger* parameters)
 {
@@ -1444,24 +1509,6 @@ int GameScript::IsOverMe(Scriptable* Sender, Trigger* parameters)
 	}
 	return 0;
 }
-
-/*
-int GameScript::IsOverMe(Scriptable* Sender, Trigger* parameters)
-{
-	if (Sender->Type != ST_PROXIMITY && Sender->Type != ST_TRAVEL) {
-		return 0;
-	}
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
-	if (!tar || tar->Type!=ST_ACTOR) {
-		return 0;
-	}
-	Highlightable *trigger = (Highlightable *) Sender;
-	if (trigger->IsOver(tar->Pos) ) {
-		return 1;
-	}
-	return 0;
-}
-*/
 
 //this function is different in every engines, if you use a string0parameter
 //then it will be considered as a variable check

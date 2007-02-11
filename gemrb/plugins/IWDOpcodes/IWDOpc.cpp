@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.cpp,v 1.17 2007/02/08 20:12:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/IWDOpcodes/IWDOpc.cpp,v 1.18 2007/02/11 12:07:13 avenger_teambg Exp $
  *
  */
 
@@ -1207,7 +1207,7 @@ int fx_use_magic_device_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_hopelessness (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_hopelessness (%2d)\n", fx->Opcode);
-	EXTSTATE_SET(400);
+	//what else we need
 	target->AddPortraitIcon(PI_HOPELESSNESS);
 	return FX_APPLIED;
 }
@@ -1216,7 +1216,6 @@ int fx_hopelessness (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_protection_from_evil (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_protection_from_evil (%2d)\n", fx->Opcode);
-	EXTSTATE_SET(400);
 	target->AddPortraitIcon(PI_PROTFROMEVIL);
 	return FX_APPLIED;
 }
