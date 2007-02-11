@@ -1,7 +1,7 @@
 2DA V1.0
 0
            HELMET     ARMOR      SHIELD     GLOVES     RING       AMULET     BELT       BOOTS      WEAPON     QUIVER     CLOAK      QUICK      SCROLL     BAG        POTION     
-MISC       0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          
+MISC       0          0          0          0          0          0          0          0          0          0          0          1          0          0          0          
 AMULET     0          0          0          0          0          1          0          0          0          0          0          0          0          0          0          
 ARMOR      0          1          0          0          0          0          0          0          0          0          0          0          0          0          0          
 BELT       0          0          0          0          0          0          1          0          0          0          0          0          0          0          0          

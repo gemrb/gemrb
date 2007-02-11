@@ -16,7 +16,7 @@
 #along with this program; if not, write to the Free Software
 #Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.73 2007/02/03 19:52:05 avenger_teambg Exp $
+#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIINV.py,v 1.74 2007/02/11 22:55:04 avenger_teambg Exp $
 
 
 #GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -102,6 +102,7 @@ def OpenInventoryWindow ():
 		GemRB.SetButtonFont (Window, Button, "NUMBER")
 		GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,128,128,255,64,0,1)
 		GemRB.SetButtonBorder (Window, Button, 1,2,2,5,5,32,32,255,0,0,0)
+		GemRB.SetButtonBorder (Window, Button, 2,0,0,0,0,255,128,128,64,0,1)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
 
 	#ground items scrollbar
@@ -161,6 +162,7 @@ def OpenInventoryWindow ():
 			GemRB.SetButtonFont (Window, Button, "NUMBER")
 			GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,128,128,255,64,0,1)
 			GemRB.SetButtonBorder (Window, Button, 1,2,2,5,5,32,32,255,0,0,0)
+			GemRB.SetButtonBorder (Window, Button, 2,0,0,0,0,255,128,128,64,0,1)
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
 	
 	GemRB.SetVar ("TopIndex", 0)
@@ -433,6 +435,11 @@ def UpdateSlot (pc, slot):
 			else:
 				GemRB.EnableButtonBorder (Window, Button, 1, 0)
 
+		if GemRB.CanUseItemType (SLOT_ANY, slot_item['ItemResRef'], pc):
+			GemRB.EnableButtonBorder (Window, Button, 2, 0)
+		else:
+			GemRB.EnableButtonBorder (Window, Button, 2, 1)
+
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OnDragItem")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenItemInfoWindow")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "OpenItemAmountWindow")
@@ -453,6 +460,7 @@ def UpdateSlot (pc, slot):
 		GemRB.SetText (Window, Button, "")
 		GemRB.EnableButtonBorder (Window, Button, 0, 0)
 		GemRB.EnableButtonBorder (Window, Button, 1, 0)
+		GemRB.EnableButtonBorder (Window, Button, 2, 0)
 
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
@@ -606,6 +614,10 @@ def DisplayItem (itemresref, type):
 
 	item = GemRB.GetItem (itemresref)
 	ItemInfoWindow = Window = GemRB.LoadWindow (5)
+
+	#fake label
+	Label = GemRB.GetControl (Window, 0x10000000)
+	GemRB.SetText(Window, Label, "")
 
 	#item icon
 	Button = GemRB.GetControl (Window, 2)
