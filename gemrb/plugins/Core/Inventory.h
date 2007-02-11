@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.63 2007/01/30 19:07:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.h,v 1.64 2007/02/11 21:27:18 avenger_teambg Exp $
  *
  */
 
@@ -75,9 +75,9 @@ class Map;
 #define SLOT_SCROLL    4096
 #define SLOT_BAG       8192
 #define SLOT_POTION    16384
-
-#define SLOT_INVENTORY 0x8000
-#define SLOT_ANY       -1
+#define SLOT_ANY       32767
+#define SLOT_INVENTORY 32768
+#define SLOT_ALL       -1
 
 //weapon slot types (1000==not equipped)
 #define IW_NO_EQUIPPED  1000

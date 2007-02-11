@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.64 2007/02/11 12:07:11 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.65 2007/02/11 21:27:18 avenger_teambg Exp $
  *
  */
 
@@ -644,6 +644,15 @@ int GameScript::GlobalTimerStarted(Scriptable* Sender, Trigger* parameters)
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
 	if (!value1) return 0;
 	return ( value1 > core->GetGame()->GameTime );
+}
+
+int GameScript::WasInDialog(Scriptable* Sender, Trigger* /*parameters*/)
+{
+	if (Sender->GetInternalFlag()&IF_WASINDIALOG) {
+		Sender->SetBitTrigger(BT_WASINDIALOG);
+		return 1;
+	}
+	return 0;
 }
 
 int GameScript::OnCreation(Scriptable* Sender, Trigger* /*parameters*/)
@@ -1307,6 +1316,28 @@ int GameScript::PickpocketFailed(Scriptable* Sender, Trigger* parameters)
 	}
 	if (MatchActor(Sender, Sender->LastOpenFailed, parameters->objectParameter)) {
 		Sender->AddTrigger (&Sender->LastOpenFailed);
+		return 1;
+	}
+	return 0;
+}
+
+int GameScript::PickLockFailed(Scriptable* Sender, Trigger* parameters)
+{
+	switch(Sender->Type) {
+		case ST_DOOR: case ST_CONTAINER:
+			break;
+		default:
+			return 0;
+	}
+	if (parameters->objectParameter == NULL) {
+		if (Sender->LastPickLockFailed) {
+			Sender->AddTrigger (&Sender->LastPickLockFailed);
+			return 1;
+		}
+		return 0;
+	}
+	if (MatchActor(Sender, Sender->LastPickLockFailed, parameters->objectParameter)) {
+		Sender->AddTrigger (&Sender->LastPickLockFailed);
 		return 1;
 	}
 	return 0;
@@ -3579,3 +3610,22 @@ int GameScript::AnyPCSeesEnemy(Scriptable* /*Sender*/, Trigger* /*parameters*/)
 	}
 	return 0;
 }
+
+int GameScript::Unusable(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) Sender;
+
+	Item *item = core->GetItem(parameters->string0Parameter);
+	int ret;
+	if (actor->Unusable(item)) {
+		ret = 0;
+	} else {
+		ret = 1;
+	}
+	core->FreeItem(item, parameters->string0Parameter, true);
+	return ret;
+}
+

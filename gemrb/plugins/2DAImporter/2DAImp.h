@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/2DAImporter/2DAImp.h,v 1.22 2007/02/08 22:10:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/2DAImporter/2DAImp.h,v 1.23 2007/02/11 21:27:14 avenger_teambg Exp $
  *
  */
 
@@ -127,6 +127,21 @@ public:
 		}
 		return "";
 	};
+
+	inline unsigned int FindTableValue(unsigned int col, long val) const
+	{
+		ieDword row, max;
+
+		max = GetRowCount();
+	        for (row = 0; row < max; row++) {
+        	        const char* ret = QueryField( row, col );
+                	long Value;
+	                if (valid_number( ret, Value ) && (Value == val) )
+        	                return row;
+		}
+		return 0xffffffff;
+        }
+
 public:
 	void release(void)
 	{

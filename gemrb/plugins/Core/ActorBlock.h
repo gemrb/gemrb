@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.120 2007/02/11 12:07:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.121 2007/02/11 21:27:17 avenger_teambg Exp $
  *
  */
 
@@ -117,6 +117,7 @@ class Gem_Polygon;
 #define IF_ONCREATION    0x8000
 #define IF_IDLE          0x10000
 #define IF_INTRAP        0x20000 //actor is currently in a trap (intrap trigger event)
+#define IF_WASINDIALOG   0x40000 //actor just left dialog
 
 //the actor should stop attacking
 #define IF_STOPATTACK (IF_JUSTDIED|IF_REALLYDIED|IF_CLEANUP|IF_IDLE)
@@ -133,6 +134,7 @@ class Gem_Polygon;
 #define BT_DIE            1
 #define BT_ONCREATION     2
 #define BT_BECAMEVISIBLE  4
+#define BT_WASINDIALOG    8
 
 //global bittriggers (set in game)
 #define BT_PARTYRESTED    0x10000
@@ -188,6 +190,7 @@ public:
 	ieDword LastDisarmFailed;
 	ieDword LastUnlocked;
 	ieDword LastOpenFailed; // also LastPickpocketFailed
+	ieDword LastPickLockFailed;
 	std::list< Action*> actionQueue;
 	Action* CurrentAction;
 	unsigned long playDeadCounter;
@@ -203,6 +206,7 @@ public:
 	void SetScript(ieResRef aScript, int idx);
 	void SetWait(unsigned long time);
 	unsigned long GetWait();
+	void LeaveDialog();
 	Scriptable *GetCutsceneID();
 	void ClearCutsceneID();
 	void SetCutsceneID(Scriptable *csid);

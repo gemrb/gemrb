@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.143 2007/02/10 14:29:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.144 2007/02/11 21:27:17 avenger_teambg Exp $
  *
  */
 
@@ -450,5 +450,7 @@ public:
 	void SetupFist();
 	/* Returns nonzero if the caster is held */
 	int Immobile();
+	/* Returns negative error code if the item is unusable */
+	int Unusable(Item *item) const;
 };
 #endif

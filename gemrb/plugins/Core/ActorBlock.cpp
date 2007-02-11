@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.162 2007/02/10 14:29:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.163 2007/02/11 21:27:17 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -377,6 +377,11 @@ Scriptable *Scriptable::GetCutsceneID()
 	return CutSceneId;
 }
 
+void Scriptable::LeaveDialog()
+{
+	InternalFlags |=IF_WASINDIALOG;
+}
+
 //this ends cutscene mode for this Sender
 void Scriptable::ClearCutsceneID()
 {
@@ -443,8 +448,11 @@ void Scriptable::ClearTriggers()
 	for (TriggerObjects::iterator m = tolist.begin(); m != tolist.end (); m++) {
 		*(*m) = 0;
 	}
+	if (!bittriggers) {
+		return;
+	}
 	if (bittriggers & BT_DIE) {
-		InternalFlags&=~IF_JUSTDIED;
+		InternalFlags &= ~IF_JUSTDIED;
 	}
 	if (bittriggers & BT_ONCREATION) {
 		 InternalFlags &= ~IF_ONCREATION;
@@ -454,6 +462,9 @@ void Scriptable::ClearTriggers()
 	}
 	if (bittriggers & BT_PARTYRESTED) {
 		 InternalFlags &= ~IF_PARTYRESTED;
+	}
+	if (bittriggers & BT_WASINDIALOG) {
+		InternalFlags &= ~IF_WASINDIALOG;
 	}
 }
 

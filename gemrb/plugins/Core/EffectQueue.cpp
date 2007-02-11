@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.76 2006/12/30 23:58:24 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.77 2007/02/11 21:27:17 avenger_teambg Exp $
  *
  */
 
@@ -97,14 +97,6 @@ inline ieByte TriggeredEffect(ieByte timingmode)
 {
 	if (timingmode>=MAX_TIMING_MODE) return false;
 	return fx_triggered[timingmode];
-}
-
-inline bool valid_number(const char* string, long& val)
-{
-	char* endpr;
-
-	val = strtol( string, &endpr, 0 );
-	return ( const char * ) endpr != string;
 }
 
 int compare_effects(const void *a, const void *b)

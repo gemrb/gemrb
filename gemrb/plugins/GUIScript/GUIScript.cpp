@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.465 2007/02/08 22:10:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.466 2007/02/11 21:27:18 avenger_teambg Exp $
  *
  */
 
@@ -113,14 +113,6 @@ static int CHUWidth = 0;
 static int CHUHeight = 0;
 
 EffectRef learn_spell_ref={"Spell:Learn",NULL,-1};
-
-inline bool valid_number(const char* string, long& val)
-{
-	char* endpr;
-
-	val = strtol( string, &endpr, 0 );
-	return ( const char * ) endpr != string;
-}
 
 // Like PyString_FromString(), but for ResRef
 inline PyObject* PyString_FromResRef(char* ResRef)
@@ -863,7 +855,6 @@ PyDoc_STRVAR( GemRB_FindTableValue__doc,
 static PyObject* GemRB_FindTableValue(PyObject * /*self*/, PyObject* args)
 {
 	int ti, col;
-	ieDword row;
 	long Value;
 
 	if (!PyArg_ParseTuple( args, "iil", &ti, &col, &Value )) {
@@ -874,6 +865,8 @@ static PyObject* GemRB_FindTableValue(PyObject * /*self*/, PyObject* args)
 	if (tm == NULL) {
 		return RuntimeError("Can't find resource");
 	}
+	return PyInt_FromLong(tm->FindTableValue(col, Value));
+/*
 	for (row = 0; row < tm->GetRowCount(); row++) {
 		const char* ret = tm->QueryField( row, col );
 		long val;
@@ -881,6 +874,7 @@ static PyObject* GemRB_FindTableValue(PyObject * /*self*/, PyObject* args)
 			return PyInt_FromLong( row );
 	}
 	return PyInt_FromLong( -1 ); //row not found
+*/
 }
 
 PyDoc_STRVAR( GemRB_GetTableRowIndex__doc,

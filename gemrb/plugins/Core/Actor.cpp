@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.256 2007/02/10 14:29:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.257 2007/02/11 21:27:17 avenger_teambg Exp $
  *
  */
 
@@ -56,14 +56,26 @@ static Color magenta = {
 	0xff, 0x00, 0xff, 0xff
 };
 
-static int classcount=-1;
-static char **clericspelltables=NULL;
-static char **wizardspelltables=NULL;
-static int FistRows=-1;
+static int classcount = -1;
+static char **clericspelltables = NULL;
+static char **wizardspelltables = NULL;
+static int FistRows = -1;
 typedef ieResRef FistResType[MAX_LEVEL+1];
 
-static FistResType *fistres=NULL;
-static ieResRef DefaultFist={"FIST"};
+static FistResType *fistres = NULL;
+static ieResRef DefaultFist = {"FIST"};
+
+//item usability array
+struct ItemUseType {
+	ieResRef table; //which table contains the stat usability flags
+	ieByte stat;	//which actor stat we talk about
+	ieByte mcol;	//which column should be matched against the stat
+	ieByte vcol;	//which column has the bit value for it
+	ieByte which;	//which item dword should be used (1 = kit)
+};
+
+static ItemUseType *itemuse = NULL;
+static int usecount = -1;
 
 static ActionButtonRow *GUIBTDefaults = NULL; //qslots row count
 ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
@@ -71,13 +83,13 @@ ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
  ACT_NONE, ACT_INNATE};
 static int QslotTranslation = false;
 
-static char iwd2gemrb[32]={
+static char iwd2gemrb[32] = {
 	0,0,20,2,22,25,0,14,
 	15,23,13,0,1,24,8,21,
 	0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0
 };
-static char gemrb2iwd[32]={
+static char gemrb2iwd[32] = {
 	11,12,3,71,72,73,0,0, //0
 	14,80,83,82,81,10,7,8, //8
 	0,0,0,0,2,15,4,9, //16
@@ -96,14 +108,14 @@ static ieDword TranslucentShadows;
 #define SAVEROLL      20
 #define DEFAULTAC     10
 
-static ieResRef d_main[DAMAGE_LEVELS]={
+static ieResRef d_main[DAMAGE_LEVELS] = {
 	//slot 0 is not used in the original engine
 	"BLOODCR","BLOODS","BLOODM","BLOODL", //blood
 	"SPFIRIMP","SPFIRIMP","SPFIRIMP",     //fire
 	"SPSHKIMP","SPSHKIMP","SPSHKIMP",     //spark
 	"SPFIRIMP","SPFIRIMP","SPFIRIMP",     //ice
 };
-static ieResRef d_splash[DAMAGE_LEVELS]={
+static ieResRef d_splash[DAMAGE_LEVELS] = {
 	"","","","",
 	"SPBURN","SPBURN","SPBURN", //flames
 	"SPSPARKS","SPSPARKS","SPSPARKS", //sparks
@@ -115,7 +127,7 @@ static ieResRef d_splash[DAMAGE_LEVELS]={
 #define ICE_GRADIENT 71
 #define STONE_GRADIENT 93
 
-static int d_gradient[DAMAGE_LEVELS]={
+static int d_gradient[DAMAGE_LEVELS] = {
 	BLOOD_GRADIENT,BLOOD_GRADIENT,BLOOD_GRADIENT,BLOOD_GRADIENT,
 	FIRE_GRADIENT,FIRE_GRADIENT,FIRE_GRADIENT,
 	-1,-1,-1,
@@ -150,6 +162,10 @@ void ReleaseMemoryActor()
 	if (fistres) {
 		delete [] fistres;
 		fistres = NULL;
+	}
+	if (itemuse) {
+		delete [] itemuse;
+		itemuse = NULL;
 	}
 	FistRows = -1;
 }
@@ -763,22 +779,22 @@ static void InitActorTables()
 	TableMgr *tm = core->GetTable( table );
 	if (tm) {
 		classcount = tm->GetRowCount();
+		clericspelltables = (char **) calloc(classcount, sizeof(char*));
+		wizardspelltables = (char **) calloc(classcount, sizeof(char*));
+		for(i = 0; i<classcount; i++) {
+			const char *spelltablename = tm->QueryField( i, 1 );
+			if (spelltablename[0]!='*') {
+				clericspelltables[i]=strdup(spelltablename);
+			}
+			spelltablename = tm->QueryField( i, 2 );
+			if (spelltablename[0]!='*') {
+				wizardspelltables[i]=strdup(spelltablename);
+			}
+		}
+		core->DelTable( table );
 	} else {
 		classcount = 0; //well
 	}
-	clericspelltables = (char **) calloc(classcount, sizeof(char*));
-	wizardspelltables = (char **) calloc(classcount, sizeof(char*));
-	for(i = 0; i<classcount; i++) {
-		const char *spelltablename = tm->QueryField( i, 1 );
-		if (spelltablename[0]!='*') {
-			clericspelltables[i]=strdup(spelltablename);
-		}
-		spelltablename = tm->QueryField( i, 2 );
-		if (spelltablename[0]!='*') {
-			wizardspelltables[i]=strdup(spelltablename);
-		}
-	}
-	core->DelTable( table );
 
 	i = core->GetMaximumAbility();
 	maximum_values[IE_STR]=i;
@@ -831,6 +847,7 @@ static void InitActorTables()
 					csound[i]=tmp[0];
 				}
 			}
+			core->DelTable( table );
 		}
 	}
 
@@ -847,6 +864,25 @@ static void InitActorTables()
 		}
 	}
 	if (tm) {
+		core->DelTable( table );
+	}
+
+	table = core->LoadTable( "itemuse" );
+	tm = core->GetTable( table );
+	if (tm) {
+		usecount = tm->GetRowCount();
+		itemuse = new ItemUseType[usecount];
+		for (i = 0; i < usecount; i++) {
+			itemuse[i].stat = (ieByte) atoi( tm->QueryField(i,0) );
+			strnlwrcpy(itemuse[i].table, tm->QueryField(i,1),8 );
+			itemuse[i].mcol = (ieByte) atoi( tm->QueryField(i,2) );
+			itemuse[i].vcol = (ieByte) atoi( tm->QueryField(i,3) );
+			itemuse[i].which = (ieByte) atoi( tm->QueryField(i,4) );
+			//limiting it to 0 or 1 to avoid crashes
+			if (itemuse[i].which!=1) {
+				itemuse[i].which=0;
+			}
+		}
 		core->DelTable( table );
 	}
 }
@@ -2239,7 +2275,7 @@ void Actor::SetInTrap(ieDword setreset)
 {
 	InTrap = setreset;
 	if (setreset) {
-		InternalFlags |= IF_INTRAP;    
+		InternalFlags |= IF_INTRAP;
 	} else {
 		InternalFlags &= ~IF_INTRAP;
 	}
@@ -3002,3 +3038,75 @@ void Actor::SetupFist()
 	inventory.SetSlotItemRes(ItemResRef, slot);
 }
 
+static ieDword ResolveTableValue(const char *resref, ieDword stat, ieDword mcol, ieDword vcol) {
+	long ret = 0;
+	//don't close this table, it can mess with the guiscripts
+	int table = core->LoadTable(resref);
+	TableMgr *tm = core->GetTable(table);
+	if (tm>=0) {
+		unsigned int row;
+		if (mcol == 0xff) {
+			row = stat;
+		} else {
+			row = tm->FindTableValue(mcol, stat);
+			if (row==0xffffffff) {
+				return 0;
+			}
+		}
+		if (valid_number(tm->QueryField(row, vcol), ret)) {
+		  return (ieDword) ret;
+		}
+	}
+
+	return 0;
+}
+
+//checks usability only
+int Actor::Unusable(Item *item) const
+{
+	if (GetStat(IE_CANUSEANYITEM)) {
+		return 0;
+	}
+
+	ieDword itembits[2]={item->UsabilityBitmask, item->KitUsability};
+
+	for (int i=0;i<usecount;i++) {
+		ieDword itemvalue = itembits[itemuse[i].which];
+		ieDword stat = ResolveTableValue(itemuse[i].table, GetStat(itemuse[i].stat), itemuse[i].mcol, itemuse[i].vcol);
+		if (stat&itemvalue) {
+			return 1;
+		}
+	}
+
+	if (item->MinLevel>GetXPLevel(true)) {
+		return 1;
+	}
+
+	if (item->MinStrength>GetStat(IE_STR)) {
+		return 1;
+	}
+	if (item->MinStrength==18) {
+		if (item->MinStrengthBonus>GetStat(IE_STREXTRA)) {
+			return 1;
+		}
+	}
+
+	if (item->MinIntelligence>GetStat(IE_INT)) {
+		return 1;
+	}
+	if (item->MinDexterity>GetStat(IE_DEX)) {
+		return 1;
+	}
+	if (item->MinWisdom>GetStat(IE_WIS)) {
+		return 1;
+	}
+	if (item->MinConstitution>GetStat(IE_CON)) {
+		return 1;
+	}
+	if (item->MinCharisma>GetStat(IE_CHR)) {
+		return 1;
+	}
+	//note, weapon proficiencies shouldn't be checked here
+	//missing proficiency causes only attack penalty
+	return 0;
+}

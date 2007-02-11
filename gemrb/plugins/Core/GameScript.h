@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.269 2007/02/11 12:07:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.270 2007/02/11 21:27:18 avenger_teambg Exp $
  *
  */
 
@@ -878,6 +878,7 @@ public: //Script Functions
 	static int PCCanSeePoint(Scriptable* Sender, Trigger* parameters);
 	static int PCInStore(Scriptable* Sender, Trigger* parameters);
 	static int PersonalSpaceDistance(Scriptable* Sender, Trigger* parameters);
+	static int PickLockFailed(Scriptable* Sender, Trigger* parameters);
 	static int PickpocketFailed(Scriptable* Sender, Trigger* parameters);
 	static int Proficiency(Scriptable* Sender, Trigger* parameters);
 	static int ProficiencyGT(Scriptable* Sender, Trigger* parameters);
@@ -924,8 +925,10 @@ public: //Script Functions
 	static int UnselectableVariable(Scriptable* Sender, Trigger* parameters);
 	static int UnselectableVariableGT(Scriptable* Sender, Trigger* parameters);
 	static int UnselectableVariableLT(Scriptable* Sender, Trigger* parameters);
+	static int Unusable(Scriptable* Sender, Trigger* parameters);
 	static int Vacant(Scriptable* Sender, Trigger* parameters);
 	static int WalkedToTrigger(Scriptable* Sender, Trigger* parameters);
+	static int WasInDialog(Scriptable* Sender, Trigger* parameters);
 	static int Xor(Scriptable* Sender, Trigger* parameters);
 	static int XP(Scriptable* Sender, Trigger* parameters);
 	static int XPGT(Scriptable* Sender, Trigger* parameters);

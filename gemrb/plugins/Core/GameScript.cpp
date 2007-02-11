@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.396 2007/02/11 12:07:09 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.397 2007/02/11 21:27:17 avenger_teambg Exp $
  *
  */
 
@@ -106,6 +106,7 @@ static TriggerLink triggernames[] = {
 	{"extraproficiencygt", GameScript::ExtraProficiencyGT, 0},
 	{"extraproficiencylt", GameScript::ExtraProficiencyLT, 0},
 	{"faction", GameScript::Faction, 0},
+	{"failedtoopen", GameScript::OpenFailed, 0}, 
 	{"fallenpaladin", GameScript::FallenPaladin, 0},
 	{"fallenranger", GameScript::FallenRanger, 0},
 	{"false", GameScript::False, 0},
@@ -294,6 +295,7 @@ static TriggerLink triggernames[] = {
 	{"pccanseepoint", GameScript::PCCanSeePoint, 0},
 	{"pcinstore", GameScript::PCInStore, 0},
 	{"personalspacedistance", GameScript::PersonalSpaceDistance, 0},
+	{"picklockfailed", GameScript::PickLockFailed, 0}, 
 	{"pickpocketfailed", GameScript::PickpocketFailed, 0}, 
 	{"proficiency", GameScript::Proficiency, 0},
 	{"proficiencygt", GameScript::ProficiencyGT, 0},
@@ -341,8 +343,10 @@ static TriggerLink triggernames[] = {
 	{"unselectablevariable", GameScript::UnselectableVariable, 0},
 	{"unselectablevariablegt", GameScript::UnselectableVariableGT, 0},
 	{"unselectablevariablelt", GameScript::UnselectableVariableLT, 0},
+	{"unusable",GameScript::Unusable, 0},
 	{"vacant",GameScript::Vacant, 0},
 	{"walkedtotrigger", GameScript::WalkedToTrigger, 0},
+	{"wasindialog", GameScript::WasInDialog, 0},
 	{"xor", GameScript::Xor,TF_MERGESTRINGS},
 	{"xp", GameScript::XP, 0},
 	{"xpgt", GameScript::XPGT, 0},

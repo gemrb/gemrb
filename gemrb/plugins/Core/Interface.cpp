@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.459 2007/02/10 17:34:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.460 2007/02/11 21:27:18 avenger_teambg Exp $
  *
  */
 
@@ -139,7 +139,7 @@ Interface::Interface(int iargc, char** iargv)
 	tooltip_ctrl = NULL;
 	plugin = NULL;
 	factory = NULL;
-	
+
 	pal16 = NULL;
 	pal32 = NULL;
 	pal256 = NULL;
@@ -313,7 +313,7 @@ Interface::~Interface(void)
 	}
 	// stop any ambients which are still enqueued
 	if (soundmgr) {
-		soundmgr->GetAmbientMgr()->deactivate(); 
+		soundmgr->GetAmbientMgr()->deactivate();
 	}
 	//destroy the highest objects in the hierarchy first!
 	if (game) {
@@ -381,7 +381,7 @@ Interface::~Interface(void)
 
 	if (key) {
 		FreeInterface( key );
-	}	
+	}
 	if (pal256) {
 		FreeInterface( pal256 );
 	}
@@ -402,7 +402,7 @@ Interface::~Interface(void)
 
 	if (video) {
 		unsigned int i;
-		
+
 		for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
 			//freesprite checks for null pointer
 			video->FreeSprite(FogSprites[i]);
@@ -410,7 +410,7 @@ Interface::~Interface(void)
 		for(i=0;i<4;i++) {
 			video->FreeSprite(WindowFrames[i]);
 		}
-		
+
 		if (TooltipBack) {
 			for(i=0;i<3;i++) {
 				//freesprite checks for null pointer
@@ -516,7 +516,7 @@ GameControl* Interface::StartGameControl()
 	gamewin->AddControl( gc );
 	AddWindow( gamewin );
 	SetVisible( 0, WINDOW_VISIBLE );
-	//setting the focus to the game control 
+	//setting the focus to the game control
 	evntmgr->SetFocused(gamewin, gc);
 	if (guiscript->LoadScript( "MessageWindow" )) {
 		guiscript->RunFunction( "OnLoad" );
@@ -526,7 +526,7 @@ GameControl* Interface::StartGameControl()
 	return gc;
 }
 
-/* handle main loop events that might destroy or create windows 
+/* handle main loop events that might destroy or create windows
 	 thus cannot be called from DrawWindows directly
 	 these events are pending until conditions are right
  */
@@ -565,7 +565,7 @@ void Interface::HandleEvents()
 	}
 }
 
-/* handle main loop events that might destroy or create windows 
+/* handle main loop events that might destroy or create windows
 	 thus cannot be called from DrawWindows directly
  */
 void Interface::HandleFlags()
@@ -578,12 +578,12 @@ void Interface::HandleFlags()
 			QuitGame (QuitFlag&QF_EXITGAME);
 			QuitFlag &= ~(QF_QUITGAME|QF_EXITGAME);
 	}
-	
+
 	if (QuitFlag&QF_LOADGAME) {
 		QuitFlag &= ~QF_LOADGAME;
 		LoadGame(LoadGameIndex);
 	}
-	
+
 	if (QuitFlag&QF_ENTERGAME) {
 		QuitFlag &= ~QF_ENTERGAME;
 		if (game) {
@@ -605,10 +605,10 @@ void Interface::HandleFlags()
 			QuitFlag = QF_QUITGAME;
 		}
 	}
-	
+
 	if (QuitFlag&QF_CHANGESCRIPT) {
 		QuitFlag &= ~QF_CHANGESCRIPT;
-		guiscript->LoadScript( NextScript );			
+		guiscript->LoadScript( NextScript );
 		guiscript->RunFunction( "OnLoad" );
 	}
 }
@@ -1001,7 +1001,7 @@ int Interface::Init()
 	}
 	printMessage( "Core", "Starting Plugin Manager...\n", WHITE );
 	plugin = new PluginMgr( PluginsPath );
-	if (plugin && plugin->GetPluginCount()) {		
+	if (plugin && plugin->GetPluginCount()) {
 		printMessage( "Core", "Plugin Loading Complete...", WHITE );
 		printStatus( "OK", LIGHT_GREEN );
 	} else {
@@ -1060,7 +1060,7 @@ int Interface::Init()
 		printf( "Cannot Load INI\nTermination in Progress...\n" );
 		return GEM_ERROR;
 	}
-	
+
 	printMessage( "Core", "Creating Projectile Server...\n", WHITE );
 	projserv = new ProjectileServer();
 
@@ -1127,7 +1127,7 @@ int Interface::Init()
 	if (!anim) {
 		printf( "No BAM Importer Available.\nTermination in Progress...\n" );
 		return GEM_ERROR;
-		
+
 	}
 
 	DataStream* str = NULL;
@@ -1469,9 +1469,9 @@ int Interface::Init()
 				if (GroundCircleScale[size]) {
 					GroundCircles[size][i] = video->SpriteScaleDown( sprite, GroundCircleScale[size] );
 					video->FreeSprite( sprite );
-				}
-				else 
+				} else {
 					GroundCircles[size][i] = sprite;
+				}
 			}
 		}
 	}
@@ -1789,7 +1789,7 @@ bool Interface::LoadConfig(void)
 	}
 
 	// Find basename of this program. It does the same as basename (3),
-	// but that's probably missing on some archs 
+	// but that's probably missing on some archs
 	s = strrchr( argv[0], PathDelimiter );
 	if (s) {
 		s++;
@@ -2088,7 +2088,7 @@ bool Interface::LoadGemRBINI()
 
 	const char *s;
 
-	// Resrefs are already initialized in Interface::Interface() 
+	// Resrefs are already initialized in Interface::Interface()
 	s = ini->GetKeyAsString( "resources", "CursorBAM", NULL );
 	if (s)
 		strcpy( CursorBam, s );
@@ -2145,7 +2145,7 @@ bool Interface::LoadGemRBINI()
 	s = ini->GetKeyAsString( "resources", "INIConfig", NULL );
 	if (s)
 		strcpy( INIConfig, s );
-	
+
 	s = ini->GetKeyAsString( "resources", "Palette16", NULL );
 	if (s)
 		strcpy( Palette16, s );
@@ -2552,7 +2552,7 @@ int Interface::LoadWindow(unsigned short WindowID)
 		if (win->Visible==WINDOW_INVALID) {
 			continue;
 		}
-		if (win->WindowID == WindowID && 
+		if (win->WindowID == WindowID &&
 			!strnicmp( WindowPack, win->WindowPack, sizeof(WindowPack) )) {
 			SetOnTop( i );
 			win->Invalidate();
@@ -2655,7 +2655,7 @@ void Interface::AddWindow(Window * win)
 	int slot = -1;
 	for(unsigned int i = 0; i < windows.size(); i++) {
 		Window *w = windows[i];
-		
+
 		if(w==NULL) {
 			slot = i;
 			break;
@@ -2941,7 +2941,7 @@ void Interface::DrawWindows(void)
 		}
 		//end of gui hacks
 	}
-	
+
 	//here comes the REAL drawing of windows
 	if (ModalWindow) {
 		ModalWindow->DrawWindow();
@@ -2970,8 +2970,8 @@ void Interface::DrawWindows(void)
 }
 
 void Interface::DrawTooltip ()
-{	
-	if (! tooltip_ctrl || !tooltip_ctrl->Tooltip) 
+{
+	if (! tooltip_ctrl || !tooltip_ctrl->Tooltip)
 		return;
 
 	Font* fnt = GetFont( TooltipFont );
@@ -2997,10 +2997,10 @@ void Interface::DrawTooltip ()
 
 	// Ensure placement within the screen
 	if (x < 0) x = 0;
-	else if (x + w + w1 + w2 > Width) 
+	else if (x + w + w1 + w2 > Width)
 		x = Width - w - w1 - w2;
 	if (y < 0) y = 0;
-	else if (y + h > Height) 
+	else if (y + h > Height)
 		y = Height - h;
 
 
@@ -3598,14 +3598,14 @@ void Interface::QuitGame(int BackToMain)
 
 	DelWindow(0xffff); //delete all windows, including GameControl
 
-	//shutting down ingame music 
+	//shutting down ingame music
 	//(do it before deleting the game)
 	if (music) {
 		music->HardEnd();
 	}
 	// stop any ambients which are still enqueued
 	if (soundmgr) {
-		soundmgr->GetAmbientMgr()->deactivate(); 
+		soundmgr->GetAmbientMgr()->deactivate();
 	}
 	//delete game, worldmap
 	if (game) {
@@ -3685,7 +3685,7 @@ void Interface::LoadGame(int index)
 	wmp_mgr = ( WorldMapMgr* ) GetInterface( IE_WMP_CLASS_ID );
 	if (! wmp_mgr)
 		goto cleanup;
-	
+
 	if (!wmp_mgr->Open( wmp_str, true ))
 		goto cleanup;
 
@@ -3916,14 +3916,13 @@ const char *Interface::QuerySlotResRef(unsigned int idx) const
 // vs. Actor's stats (alignment, class, race, kit etc.)
 int Interface::CanUseItemType(int slottype, Item *item, Actor *actor) const
 {
-	// check if actor may use the item
-	if (actor) {
-		//
-	}
-	if ( slottype==-1 ) { 
+	//inventory is a special case, we allow any items to enter it
+	if ( slottype==SLOT_ALL ) {
 		return SLOT_INVENTORY;
 	}
-	if (slottype&SLOT_SHIELD) {
+	//if we look for ALL slot types, then SLOT_SHIELD shouldn't interfere
+	//with twohandedness
+	if ((slottype&SLOT_SHIELD) && (slottype!=SLOT_ANY) ) {
 		if (item->Flags&IE_INV_ITEM_TWOHANDED) {
 			return 0;
 		}
@@ -3933,13 +3932,16 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor) const
 		//invalid itemtype
 		return 0;
 	}
-	//if any bit is true, we return true (int->bool conversion)
-	int ret = (slotmatrix[item->ItemType]&slottype);
-	if (ret) {
-		//
-	} else {
-		//invalid itemtype
+
+	//if actor is supplied, check its usability fields
+	if (actor) {
+		if (actor->Unusable(item)) {
+			return 0;
+		}
 	}
+
+	//if any bit is true, the answer counts as true
+	int ret = (slotmatrix[item->ItemType]&slottype);
 	return ret;
 }
 
@@ -4042,10 +4044,10 @@ void Interface::DisplayConstantStringName(int stridx, unsigned int color, Script
 			GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR),8, ActorColor );
 			speaker_color = (ActorColor[4].r<<16) | (ActorColor[4].g<<8) | ActorColor[4].b;
 			break;
-    case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
-      name = GetString( ((InfoPoint *) speaker)->DialogName );
-      speaker_color = 0xc0c0c0;
-      break;
+		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
+			name = GetString( ((InfoPoint *) speaker)->DialogName );
+			speaker_color = 0xc0c0c0;
+			break;
 		default:
 			name = "";
 			speaker_color = 0x800000;
@@ -4111,10 +4113,10 @@ void Interface::DisplayStringName(int stridx, unsigned int color, Scriptable *sp
 			GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR),8, ActorColor );
 			speaker_color = (ActorColor[4].r<<16) | (ActorColor[4].g<<8) | ActorColor[4].b;
 			break;
-    case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
-      name = GetString( ((InfoPoint *) speaker)->DialogName );
-      speaker_color = 0xc0c0c0;
-      break;
+		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
+			name = GetString( ((InfoPoint *) speaker)->DialogName );
+			speaker_color = 0xc0c0c0;
+			break;
 		default:
 			name = "";
 			speaker_color = 0x800000;
@@ -4729,7 +4731,7 @@ ieStrRef Interface::GetRumour(const ieResRef dlgref)
 		return (ieStrRef) -1;
 	}
 	Scriptable *pc=game->GetPC( game->GetSelectedPCSingle(), false );
-	
+
 	ieStrRef ret = (ieStrRef) -1;
 	int i = dlg->FindRandomState( pc );
 	if (i>=0 ) {
@@ -5185,9 +5187,9 @@ void Interface::GetResRefFrom2DA(ieResRef resref, ieResRef resource1, ieResRef r
 	if (tab) {
 		unsigned int row = (unsigned int) Roll(1,tab->GetRowCount(),-1);
 		strnuprcpy(resource1, tab->QueryField(row,0), 8);
-		if (resource2) 
+		if (resource2)
 			strnuprcpy(resource2, tab->QueryField(row,1), 8);
-		if (resource3) 
+		if (resource3)
 		strnuprcpy(resource3, tab->QueryField(row,2), 8);
 	}
 }

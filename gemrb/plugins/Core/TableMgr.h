@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TableMgr.h,v 1.19 2007/02/08 22:10:10 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TableMgr.h,v 1.20 2007/02/11 21:27:18 avenger_teambg Exp $
  *
  */
 
@@ -66,12 +66,14 @@ public:
 	 * uses column name and row name to search the field,
 	 * may return NULL */
 	virtual const char* QueryField(const char* row, const char* column) const = 0;
-	/** Opens a Table File */
-	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
-	/** Returns a Row Name, returns NULL on error */
 	virtual int GetRowIndex(const char* rowname) const = 0;
 	virtual const char* GetColumnName(unsigned int index) const = 0;
 	virtual const char* GetRowName(unsigned int index) const = 0;
+	virtual unsigned int FindTableValue(unsigned int column, long value) const = 0;
+
+	/** Opens a Table File */
+	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
+	/** Returns a Row Name, returns NULL on error */
 };
 
 #endif  // ! TABLEMGR_H
