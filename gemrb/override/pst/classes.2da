@@ -1,12 +1,12 @@
 2DA V1.0
 *
-               NAME_REF   DESC_REF   CAP_REF    SAVE       MULTI      ID         HP         HUMAN      
-MAGE           19762      *          19750      SAVEWIZ    0          1          HPWIZ      1          
-FIGHTER        19748      *          19747      SAVEWAR    0          2          HPWAR      1          
-CLERIC         19764      *          19752      SAVEPRS    0          3          HPPRS      0          
-THIEF          19758      *          19749      SAVEROG    0          4          HPROG      1          
-BARD           *          *          *          SAVEROG    0          5          HPROG      0          
-PALADIN        *          *          *          SAVEWAR    0          6          HPWAR      0          
-FIGHTER_MAGE   19767      *          19756      *          3          7          *          0          
-FIGHTER_CLERIC *          *          *          *          6          8          *          0          
-FIGHTER_THIEF  19766      *          19754      *          10         9          *          0          
+               NAME_REF   DESC_REF   CAP_REF    SAVE       MULTI      ID         HP         USABILITY  HUMAN
+MAGE           19762      *          19750      SAVEWIZ    0          1          HPWIZ      0x40000    1
+FIGHTER        19748      *          19747      SAVEWAR    0          2          HPWAR      0x800      1
+CLERIC         19764      *          19752      SAVEPRS    0          3          HPPRS      0x80       0
+THIEF          19758      *          19749      SAVEROG    0          4          HPROG      0x400000   1
+BARD           *          *          *          SAVEROG    0          5          HPROG      0          0
+PALADIN        *          *          *          SAVEWAR    0          6          HPWAR      0          0
+FIGHTER_MAGE   19767      *          19756      *          3          7          *          0x200      0
+FIGHTER_CLERIC *          *          *          *          6          8          *          0          0
+FIGHTER_THIEF  19766      *          19754      *          10         9          *          0x2000     0
