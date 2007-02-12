@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.257 2007/02/11 21:27:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.258 2007/02/12 17:30:56 avenger_teambg Exp $
  *
  */
 
@@ -148,6 +148,7 @@ static ieResRef overlay[OVERLAY_COUNT]={"SPENTACI","SANCTRY","MINORGLB","SPSHIEL
 
 //for every game except IWD2 we need to reverse TOHIT
 static bool REVERSE_TOHIT=true;
+static bool CHECK_ABILITIES=false;
 
 //internal flags for calculating to hit
 #define WEAPON_FIST        0
@@ -773,6 +774,8 @@ static void InitActorTables()
 	int i;
 
 	REVERSE_TOHIT=(bool) core->HasFeature(GF_REVERSE_TOHIT);
+	CHECK_ABILITIES=(bool) core->HasFeature(GF_CHECK_ABILITIES);
+
 	//this table lists skill groups assigned to classes
 	//it is theoretically possible to create hybrid classes
 	int table = core->LoadTable( "clskills" );
@@ -3054,7 +3057,7 @@ static ieDword ResolveTableValue(const char *resref, ieDword stat, ieDword mcol,
 			}
 		}
 		if (valid_number(tm->QueryField(row, vcol), ret)) {
-		  return (ieDword) ret;
+			return (ieDword) ret;
 		}
 	}
 
@@ -3076,6 +3079,10 @@ int Actor::Unusable(Item *item) const
 		if (stat&itemvalue) {
 			return 1;
 		}
+	}
+
+	if (!CHECK_ABILITIES) {
+		return 0;
 	}
 
 	if (item->MinLevel>GetXPLevel(true)) {
