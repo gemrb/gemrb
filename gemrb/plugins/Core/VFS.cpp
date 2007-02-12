@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.18 2006/08/11 23:17:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/VFS.cpp,v 1.19 2007/02/12 20:51:40 avenger_teambg Exp $
  *
  */
 
@@ -360,6 +360,14 @@ void ResolveFilePath(char* FilePath)
 	char TempFileName[_MAX_PATH];
 	int j, pos;
 
+	if (FilePath[0]=='~') {
+		const char *home = getenv("HOME");
+		if (home) {
+			PathJoin(TempFilePath, home, FilePath+1, NULL);
+			strncpy(FilePath, TempFilePath, _MAX_PATH);
+		}
+	}
+
 	if (core && !core->CaseSensitive) {
 		return;
 	}
@@ -388,8 +396,8 @@ void ResolveFilePath(char* FilePath)
 			}
 		}
 	}
-	//should work (same size)
-	strcpy( FilePath, TempFilePath );
+	//should work (same or less size)
+	strncpy( FilePath, TempFilePath, _MAX_PATH );
 }
 
 #endif

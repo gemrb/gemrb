@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.461 2007/02/12 17:30:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.462 2007/02/12 20:51:40 avenger_teambg Exp $
  *
  */
 
@@ -2041,6 +2041,10 @@ bool Interface::LoadConfig(const char* filename)
 	FixPath( GUIScriptsPath, true );
 	FixPath( PluginsPath, true );
 	FixPath( GemRBPath, true );
+
+	FixPath( SavePath, false );
+	mkdir( SavePath, S_IREAD|S_IWRITE|S_IEXEC );
+	chmod( SavePath, S_IREAD|S_IWRITE|S_IEXEC );
 
 	FixPath( CachePath, false );
 	mkdir( CachePath, S_IREAD|S_IWRITE|S_IEXEC );

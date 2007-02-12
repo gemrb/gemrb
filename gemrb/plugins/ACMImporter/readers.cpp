@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.cpp,v 1.14 2007/01/27 18:57:37 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/readers.cpp,v 1.15 2007/02/12 20:51:40 avenger_teambg Exp $
  *
  */
 
@@ -86,14 +86,12 @@ int COGGReader::init_reader()
 
 	res=ov_open_callbacks(stream, &OggStream, NULL, 0, cbstruct);
 	if(res<0) {
-		printf("Couldn't initialize vorbis!\n");
+		printMessage("Sound","Couldn't initialize vorbis!\n", LIGHT_RED);
 		return 0;
 	}
 	info = ov_info(&OggStream, -1);
 	channels = info->channels;
-printf("Channels: %d\n",channels);
 	samplerate = info->rate;
-printf("Samplerate: %d\n",samplerate);
 	samples_left = ( samples = ov_pcm_total(&OggStream, -1) );
 	return 1;
 }
@@ -160,7 +158,6 @@ int CACMReader::init_reader()
 	//levels = hdr.levels;
 	//subblocks = hdr.subblocks;
 
-printf("Subblocks: %d, levels: %d\n", levels, subblocks);
 	block_size = ( 1 << levels ) * subblocks;
 	//using malloc for simple arrays (supposed to be faster)
 	block = (int *) malloc(sizeof(int)*block_size);
