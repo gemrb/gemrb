@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.84 2007/02/10 17:34:15 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.85 2007/02/13 22:37:49 avenger_teambg Exp $
  *
  */
 
@@ -650,11 +650,10 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 			break;
 	}
 
-	printf("CreateCreature: %s at [%d.%d] face:%d\n",parameters->string0Parameter, pnt.x,pnt.y,parameters->int0Parameter);
 	Map *map = Sender->GetCurrentArea();
-	ab->SetPosition(map, pnt, flags&CC_CHECK_IMPASSABLE, radius );
-	ab->SetOrientation(parameters->int0Parameter, false );
 	map->AddActor( ab );
+	ab->SetPosition( pnt, flags&CC_CHECK_IMPASSABLE, radius );
+	ab->SetOrientation(parameters->int0Parameter, false );
 
 	//if string1 is animation, then we can't use it for a DV too
 	if (flags & CC_PLAY_ANIM) {
@@ -696,9 +695,9 @@ void ChangeAnimationCore(Actor *src, const char *resref, bool effect)
 	Actor *tar = core->GetCreature(ds);
 	if (tar) {
 		Map *map = src->GetCurrentArea();
-		tar->SetPosition(map, src->Pos, 1);
-		tar->SetOrientation(src->GetOrientation(), false );
 		map->AddActor( tar );
+		tar->SetPosition(src->Pos, 1);
+		tar->SetOrientation(src->GetOrientation(), false );
 		src->DestroySelf();
 		if (effect) {
 			CreateVisualEffectCore(tar, tar->Pos,"smokepuffeffect");
@@ -990,10 +989,7 @@ void MoveBetweenAreasCore(Actor* actor, const char *area, Point &position, int f
 			map2->AddActor( actor );
 		}
 	}
-	else {
-		map2=actor->GetCurrentArea();
-	}
-	actor->SetPosition(map2, position, adjust);
+	actor->SetPosition(position, adjust);
 	if (face !=-1) {
 		actor->SetOrientation( face, false );
 	}

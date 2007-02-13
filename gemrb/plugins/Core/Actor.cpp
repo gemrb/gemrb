@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.258 2007/02/12 17:30:56 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.259 2007/02/13 22:37:49 avenger_teambg Exp $
  *
  */
 
@@ -1377,16 +1377,15 @@ void Actor::SetMap(Map *map, ieWord LID, ieWord GID)
 	globalID = GID;
 }
 
-void Actor::SetPosition(Map *map, Point &position, int jump, int radius)
+void Actor::SetPosition(Point &position, int jump, int radius)
 {
 	ClearPath();
 	Point p;
 	p.x = position.x/16;
 	p.y = position.y/12;
 	if (jump && !(Modified[IE_DONOTJUMP] & DNJ_FIT) && size ) {
-		map->AdjustPosition( p, radius );
+		GetCurrentArea()->AdjustPosition( p, radius );
 	}
-	area = map;
 	p.x = p.x * 16 + 8;
 	p.y = p.y * 12 + 6;
 	MoveTo( p );

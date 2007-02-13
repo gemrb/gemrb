@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.110 2007/02/11 12:07:08 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.111 2007/02/13 22:37:48 avenger_teambg Exp $
  *
  */
 
@@ -98,7 +98,7 @@ void GameScript::NoActionAtAll(Scriptable* /*Sender*/, Action* /*parameters*/)
 	//thats all :)
 }
 
-// this action stops modal actions, so... 
+// this action stops modal actions, so...
 void GameScript::NoAction(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type!=ST_ACTOR) {
@@ -436,8 +436,7 @@ void GameScript::JumpToPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* ab = ( Actor* ) Sender;
-	Map *map = Sender->GetCurrentArea();
-	ab->SetPosition( map, parameters->pointParameter, true );
+	ab->SetPosition( parameters->pointParameter, true );
 }
 
 void GameScript::JumpToPointInstant(Scriptable* Sender, Action* parameters)
@@ -447,8 +446,7 @@ void GameScript::JumpToPointInstant(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* ab = ( Actor* ) tar;
-	Map *map = Sender->GetCurrentArea();
-	ab->SetPosition( map, parameters->pointParameter, true );
+	ab->SetPosition( parameters->pointParameter, true );
 }
 
 /** instant jump to location saved in stats */
@@ -464,8 +462,7 @@ void GameScript::JumpToSavedLocation(Scriptable* Sender, Action* parameters)
 	}
 	Actor *actor = (Actor *) tar;
 	Point p((short) actor->GetStat(IE_SAVEDXPOS), (short) actor->GetStat(IE_SAVEDYPOS) );
-	Map *map = Sender->GetCurrentArea();
-	actor->SetPosition( map, p, true );
+	actor->SetPosition(p, true );
 	actor->SetOrientation( actor->GetStat(IE_SAVEDFACE), false );
 }
 
@@ -499,7 +496,7 @@ void GameScript::TeleportParty(Scriptable* /*Sender*/, Action* parameters)
 	int i = game->GetPartySize(false);
 	while (i--) {
 		Actor *tar = game->GetPC(i, false);
-		MoveBetweenAreasCore( tar, parameters->string1Parameter, 
+		MoveBetweenAreasCore( tar, parameters->string1Parameter,
 			parameters->pointParameter, -1, true);
 	}
 }
@@ -515,7 +512,7 @@ void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 		if (strnicmp(tar->Area, parameters->string0Parameter,8) ) {
 			continue;
 		}
-		MoveBetweenAreasCore( tar, parameters->string1Parameter, 
+		MoveBetweenAreasCore( tar, parameters->string1Parameter,
 			parameters->pointParameter, -1, true);
 	}
 	i = game->GetNPCCount();
@@ -525,7 +522,7 @@ void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 		if (strnicmp(tar->Area, parameters->string0Parameter,8) ) {
 			continue;
 		}
-		MoveBetweenAreasCore( tar, parameters->string1Parameter, 
+		MoveBetweenAreasCore( tar, parameters->string1Parameter,
 			parameters->pointParameter, -1, true);
 	}
 }
@@ -960,8 +957,7 @@ void GameScript::MoveToSavedLocation(Scriptable* Sender, Action* parameters)
 	Actor* actor = ( Actor* ) tar;
 	ieDword value = (ieDword) CheckVariable( Sender, parameters->string0Parameter );
 	p.fromDword(value);
-	Map *map = Sender->GetCurrentArea();
-	actor->SetPosition( map, p, true );
+	actor->SetPosition(p, true );
 }
 /** iwd2 returntosavedlocation (with stats) */
 /** pst returntosavedplace */
@@ -1062,18 +1058,17 @@ void GameScript::StorePartyLocation(Scriptable* /*Sender*/, Action* /*parameters
 
 }
 
-void GameScript::RestorePartyLocation(Scriptable* Sender, Action* /*parameters*/)
+void GameScript::RestorePartyLocation(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	Game *game = core->GetGame();
 	for (int i = 0; i < game->GetPartySize(false); i++) {
 		Actor* act = game->GetPC( i, false );
 		if (act) {
 			ieDword value=CheckVariable( act, "LOCALSsavedlocation");
-			Map *map = Sender->GetCurrentArea();
 			//setting position, don't put actor on another actor
 			Point p;
 			p.fromDword(value);
-			act->SetPosition( map, p , -1 );
+			act->SetPosition(p, -1);
 		}
 	}
 
@@ -1877,7 +1872,7 @@ void GameScript::CloseDoor(Scriptable* Sender, Action* parameters)
 	}
 	Door* door = ( Door* ) tar;
 	if (!door->IsOpen() ) {
-		//door is already closed 
+		//door is already closed
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -2935,7 +2930,7 @@ void GameScript::DestroyItem(Scriptable* Sender, Action* parameters)
 			break;
 		default:;
 	}
-	if (inv) { 
+	if (inv) {
 		inv->DestroyItem(parameters->string0Parameter,0,1); //destroy one (even indestructible?)
 	}
 }
@@ -3465,7 +3460,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	//check for success, failure sends an attackedby trigger and a
 	//pickpocket failed trigger sent to the target and sender respectively
 	//slot == -1 here means money
-	if (slot == -1) { 
+	if (slot == -1) {
 		scr->SetBase(IE_GOLD,scr->GetBase(IE_GOLD)-money);
 		snd->SetBase(IE_GOLD,snd->GetBase(IE_GOLD)+money);
 		Sender->ReleaseCurrentAction();
@@ -4525,7 +4520,7 @@ void GameScript::SpawnPtActivate(Scriptable* Sender, Action* parameters)
 	if (parameters->objects[1]) {
 		Map *map = Sender->GetCurrentArea();
 		Spawn *spawn = map->GetSpawn(parameters->objects[1]->objectName);
-		if (spawn) { 
+		if (spawn) {
 			spawn->Flags = 1;
 		}
 	}
@@ -4536,7 +4531,7 @@ void GameScript::SpawnPtDeactivate(Scriptable* Sender, Action* parameters)
 	if (parameters->objects[1]) {
 		Map *map = Sender->GetCurrentArea();
 		Spawn *spawn = map->GetSpawn(parameters->objects[1]->objectName);
-		if (spawn) { 
+		if (spawn) {
 			spawn->Flags = 0;
 		}
 	}
@@ -4547,7 +4542,7 @@ void GameScript::SpawnPtSpawn(Scriptable* Sender, Action* parameters)
 	if (parameters->objects[1]) {
 		Map *map = Sender->GetCurrentArea();
 		Spawn *spawn = map->GetSpawn(parameters->objects[1]->objectName);
-		if (spawn) { 
+		if (spawn) {
 			spawn->Flags = 1; //??? maybe use an unconditionality flag
 			map->TriggerSpawn(spawn);
 		}
@@ -5013,17 +5008,17 @@ void GameScript::FollowCreature(Scriptable* Sender, Action* parameters)
 
 void GameScript::RunFollow(Scriptable* Sender, Action* parameters)
 {
-	      if (Sender->Type!=ST_ACTOR) {
-	              return;
-	      }
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
 
-	      Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	      if (!tar || tar->Type!=ST_ACTOR) {
-	              return;
-	      }
-	      Actor *scr = (Actor *)Sender;
-	      Actor *actor = (Actor *)tar;
-	      scr->LastFollowed = actor->GetID();
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *scr = (Actor *)Sender;
+	Actor *actor = (Actor *)tar;
+	scr->LastFollowed = actor->GetID();
 	scr->FollowOffset.x = -1;
 	scr->FollowOffset.y = -1;
 	scr->WalkTo(actor->Pos, IF_RUNNING, 1);
@@ -5209,6 +5204,6 @@ void GameScript::IncrementKillStat(Scriptable* Sender, Action* parameters)
 	if (!variable) {
 		return;
 	}
-        ieDword value = CheckVariable( Sender, variable, "GLOBAL" ) + 1;
-        SetVariable( Sender, variable, "GLOBAL", value );
+	ieDword value = CheckVariable( Sender, variable, "GLOBAL" ) + 1;
+	SetVariable( Sender, variable, "GLOBAL", value );
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.57 2007/02/08 20:12:13 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/FXOpcodes/FXOpc.cpp,v 1.58 2007/02/13 22:37:50 avenger_teambg Exp $
  *
  */
 
@@ -2607,7 +2607,7 @@ int fx_dimension_door (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_dimension_door (%2d)\n", fx->Opcode );
 	Point p(fx->PosX, fx->PosY);
-	target->SetPosition(target->GetCurrentArea(), p, true, 0 );
+	target->SetPosition(p, true, 0 );
 	return FX_NOT_APPLIED;
 }
 // 0x7d Unlock
@@ -3652,7 +3652,7 @@ int fx_teleport_field (Actor* /*Owner*/, Actor* target, Effect* fx)
 	Point p = target->Pos;
 	p.x+=core->Roll(1,fx->Parameter1,-(signed) (fx->Parameter1/2));
 	p.y+=core->Roll(1,fx->Parameter1,-(signed) (fx->Parameter1/2));
-	target->SetPosition(target->GetCurrentArea(), p, true, 0);
+	target->SetPosition( p, true, 0);
 	return FX_NOT_APPLIED;
 }
 //0xDF decrementing school immunity (general)
@@ -4211,7 +4211,7 @@ int fx_teleport_to_target (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (map) {
 		Actor *victim = map->GetActorByGlobalID(target->LastAttacker);
 		if (victim) {
-			target->SetPosition( map, victim->Pos, true, 0 );
+			target->SetPosition( victim->Pos, true, 0 );
 		}
 	}
 	return FX_NOT_APPLIED;

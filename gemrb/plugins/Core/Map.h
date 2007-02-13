@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.124 2007/02/10 14:29:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.h,v 1.125 2007/02/13 22:37:50 avenger_teambg Exp $
  *
  */
 
@@ -24,8 +24,9 @@ class Map;
 #ifndef MAP_H
 #define MAP_H
 
-#include "ActorBlock.h"
 #include "../../includes/globals.h"
+#include "ActorBlock.h"
+#include "IniSpawn.h"
 #include <queue>
 
 class Actor;
@@ -209,10 +210,10 @@ public:
 	ImageMgr* SearchMap;
 	ImageMgr* HeightMap;
 	ImageMgr* SmallMap;
+	IniSpawn *INISpawn;
 	ieDword AreaFlags;
 	ieWord AreaType;
 	ieWord Rain, Snow, Fog, Lightning;
-	//bool ChangeArea; //set true if movement is allowed between areas
 	ieByte* ExploredBitmap;
 	ieByte* VisibleBitmap;
 	int version;
@@ -378,6 +379,7 @@ public:
 	void SpawnCreature(Point &pos, char *CreName, int radius = 0);
 
 	//spawns
+	void LoadIniSpawn();
 	Spawn *AddSpawn(char* Name, int XPos, int YPos, ieResRef *creatures, unsigned int count);
 	Spawn *GetSpawn(int i) { return spawns[i]; }
 	//returns spawn by name

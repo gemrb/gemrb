@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.263 2007/02/10 14:29:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.264 2007/02/13 22:37:50 avenger_teambg Exp $
  *
  */
 
@@ -360,6 +360,7 @@ Map::Map(void)
 	WallCount = 0;
 	queue[PR_SCRIPT] = NULL;
 	queue[PR_DISPLAY] = NULL;
+	INISpawn = NULL;
 	//no one needs this queue
 	//queue[PR_IGNORE] = NULL;
 	Qcount[PR_SCRIPT] = 0;
@@ -392,6 +393,9 @@ Map::~Map(void)
 	}
 	if (TMap) {
 		delete TMap;
+	}
+	if (INISpawn) {
+		delete INISpawn;
 	}
 	aniIterator aniidx;
 	for (aniidx = animations.begin(); aniidx != animations.end(); aniidx++) {
@@ -704,10 +708,10 @@ void Map::UpdateScripts()
 		while (q--) {
 			Actor* actor = queue[PR_SCRIPT][q];
 			if (ip->Type == ST_PROXIMITY) {
-			  if(ip->Entered(actor)) {
-			    //if trap triggered, then mark actor
-			    actor->SetInTrap(ipCount);
-			  }
+				if(ip->Entered(actor)) {
+					//if trap triggered, then mark actor
+					actor->SetInTrap(ipCount);
+				}
 			} else {
 				//ST_TRAVEL
 				//don't move if doing something else
@@ -2039,7 +2043,7 @@ PathNode* Map::FindPath(const Point &s, const Point &d, int MinDistance)
 			tar.y=StartNode->Parent->y*12;
 			int dist = Distance(tar,d);
 			if (dist>=MinDistance) {
-			  break;
+				break;
 			}
 			StartNode = StartNode->Parent;
 			delete StartNode->Next;
@@ -2179,6 +2183,12 @@ MapNote *Map::GetMapNote(Point &point)
 	return NULL;
 }
 //--------spawning------------------
+void Map::LoadIniSpawn()
+{
+	INISpawn = new IniSpawn(this);
+	INISpawn->InitSpawn(WEDResRef);
+}
+
 void Map::SpawnCreature(Point &pos, char *CreName, int radius)
 {
 	SpawnGroup *sg=NULL;
@@ -2188,8 +2198,8 @@ void Map::SpawnCreature(Point &pos, char *CreName, int radius)
 		DataStream *stream = core->GetResourceMgr()->GetResource( CreName, IE_CRE_CLASS_ID );
 		creature = core->GetCreature(stream); 
 		if ( creature ) {
-			creature->SetPosition( this, pos, true, radius );
 			AddActor(creature);
+			creature->SetPosition( pos, true, radius );
 		}
 		return;
 	}
@@ -2201,8 +2211,8 @@ void Map::SpawnCreature(Point &pos, char *CreName, int radius)
 		DataStream *stream = core->GetResourceMgr()->GetResource( sg->ResRefs[count], IE_CRE_CLASS_ID );
 		creature = core->GetCreature(stream); 
 		if ( creature ) {
-			creature->SetPosition( this, pos, true, radius );
 			AddActor(creature);
+			creature->SetPosition( pos, true, radius );
 		}
 	}
 }

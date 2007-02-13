@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.164 2007/02/10 14:29:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.165 2007/02/13 22:37:48 avenger_teambg Exp $
  *
  */
 
@@ -33,7 +33,6 @@
 #include "../Core/Game.h"
 #include "../Core/Video.h"
 #include "../Core/Palette.h"
-
 
 #define DEF_OPEN   0
 #define DEF_CLOSE  1
@@ -928,6 +927,10 @@ Map* AREImp::GetMap(const char *ResRef)
 	char *text;
 	//Don't bother with autonote.ini if the area has autonotes (ie. it is a saved area)
 	int pst = core->HasFeature( GF_AUTOMAP_INI );
+	if (pst) {
+		map->LoadIniSpawn();
+	}
+
 	if (pst && !NoteCount) {
 		if( !INInote ) {
 			ReadAutonoteINI();
