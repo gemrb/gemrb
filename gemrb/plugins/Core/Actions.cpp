@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.111 2007/02/13 22:37:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.112 2007/02/14 20:27:41 avenger_teambg Exp $
  *
  */
 
@@ -260,6 +260,36 @@ void GameScript::ChangeSpecifics(Scriptable* Sender, Action* parameters)
 	actor->SetBase( IE_SPECIFIC, parameters->int0Parameter );
 }
 
+void GameScript::PermanentStatChange(Scriptable* Sender, Action* parameters)
+{
+	Scriptable *scr = Sender;
+	if (parameters->objects[1]) {
+		scr=GetActorFromObject( Sender, parameters->objects[1] );
+	}
+	if (!scr || scr->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) scr;
+	ieDword value;
+	switch (parameters->int1Parameter) {
+		case 1:
+			value = actor->GetBase(parameters->int0Parameter);
+			value-= parameters->int2Parameter;
+			break;
+		case 2:
+			value = actor->GetBase(parameters->int0Parameter);
+			value+= parameters->int2Parameter;
+			break;
+		case 3:
+		default: //no idea what happens 
+			value = parameters->int2Parameter;
+			break;
+	}
+parameters->Dump();
+printf("Setting STat to: %d\n", (int) value);
+	actor->SetBase( parameters->int0Parameter, value);
+}
+
 void GameScript::ChangeStat(Scriptable* Sender, Action* parameters)
 {
 	Scriptable *scr = Sender;
@@ -271,7 +301,7 @@ void GameScript::ChangeStat(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) scr;
 	ieDword value = parameters->int1Parameter;
-	if (parameters->int1Parameter==1) {
+	if (parameters->int2Parameter==1) {
 		value+=actor->GetBase(parameters->int0Parameter);
 	}
 	actor->SetBase( parameters->int0Parameter, value);

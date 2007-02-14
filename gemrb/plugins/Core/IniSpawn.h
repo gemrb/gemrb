@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/IniSpawn.h,v 1.1 2007/02/13 22:37:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/IniSpawn.h,v 1.2 2007/02/14 20:27:41 avenger_teambg Exp $
  *
  */
 
@@ -57,14 +57,14 @@ class Map;
 
 //spec ids flags
 #define AI_EA		0
-#define AI_GENERAL	1
-#define AI_RACE		2
-#define AI_CLASS	3
-#define AI_GENDER	4
-#define AI_SPECIFICS	5
-#define AI_ALIGNMENT	6
-#define AI_FACTION	7
-#define AI_TEAM		8
+#define AI_FACTION	1
+#define AI_TEAM		2
+#define AI_GENERAL	3
+#define AI_RACE		4
+#define AI_CLASS	5
+#define AI_SPECIFICS	6
+#define AI_GENDER	7
+#define AI_ALIGNMENT	8
 
 //spawn point could be:
 // s - single
@@ -75,7 +75,8 @@ class Map;
 struct CritterEntry {
 	int creaturecount;
 	ieResRef *CreFile;        //spawn one of these creatures
-	ieByte Spec[9];					  //existance check IDS qualifier
+	ieByte Spec[9];		  //existance check IDS qualifier
+	ieByte SetSpec[9];	  //set IDS qualifier
 	ieVariable ScriptName;    //existance check scripting name
 	ieVariable SpecVar;       //condition variable
 	ieResRef SpecContext;     //condition variable context

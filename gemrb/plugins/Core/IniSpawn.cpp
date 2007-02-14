@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/IniSpawn.cpp,v 1.1 2007/02/13 22:37:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/IniSpawn.cpp,v 1.2 2007/02/14 20:27:41 avenger_teambg Exp $
  *
  */
 
@@ -30,6 +30,10 @@
 #include "ResourceMgr.h"
 #include "Interface.h"
 #include "GSUtils.h"
+
+static int StatValues[9]={
+IE_EA, IE_FACTION, IE_TEAM, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, 
+IE_SEX, IE_ALIGNMENT };
 
 IniSpawn::IniSpawn(Map *owner)
 {
@@ -172,7 +176,34 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	}
 
 	//sometimes only the orientation is given, the point is stored in a variable
-	critter.Orientation = inifile->GetKeyAsInt(crittername,"facing",0);
+	ps = inifile->GetKeyAsInt(crittername,"facing",-1);
+	if (ps!=-1) critter.Orientation = ps;
+	ps = inifile->GetKeyAsInt(crittername, "ai_ea",-1);
+	if (ps!=-1) critter.SetSpec[AI_EA] = (ieByte) ps;
+	ps = inifile->GetKeyAsInt(crittername, "ai_team",-1);
+	if (ps!=-1) critter.SetSpec[AI_TEAM] = (ieByte) ps;
+	ps = inifile->GetKeyAsInt(crittername, "ai_general",-1);
+	if (ps!=-1) critter.SetSpec[AI_GENERAL] = (ieByte) ps;
+	ps = inifile->GetKeyAsInt(crittername, "ai_race",-1);
+	if (ps!=-1) critter.SetSpec[AI_RACE] = (ieByte) ps;
+	ps = inifile->GetKeyAsInt(crittername, "ai_class",-1);
+	if (ps!=-1) critter.SetSpec[AI_CLASS] = (ieByte) ps;
+	ps = inifile->GetKeyAsInt(crittername, "ai_specifics",-1);
+	if (ps!=-1) critter.SetSpec[AI_SPECIFICS] = (ieByte) ps;
+	ps = inifile->GetKeyAsInt(crittername, "ai_gender",-1);
+	if (ps!=-1) critter.SetSpec[AI_GENDER] = (ieByte) ps;
+	ps = inifile->GetKeyAsInt(crittername, "ai_alignment",-1);
+	if (ps!=-1) critter.SetSpec[AI_ALIGNMENT] = (ieByte) ps;
+
+	s = inifile->GetKeyAsString(crittername,"spec",NULL);
+	int x[9];
+
+	ps = sscanf(s,"[%d.%d.%d.%d.%d.%d.%d.%d.%d]", x, x+1, x+2, x+3, x+4, x+5,
+		x+6, x+7, x+8);
+	while(ps--) {
+		critter.Spec[ps]=(ieByte) x[ps];
+	}
+
 	s = inifile->GetKeyAsString(crittername,"script_name",NULL);
 	if (s) {
 		strnuprcpy(critter.ScriptName, s, 32);
@@ -301,11 +332,27 @@ void IniSpawn::SpawnCreature(CritterEntry &critter)
 	SetVariable(map,critter.SpecVar,critter.SpecContext,1);
 
 	if (critter.ScriptName[0]) {
+		//maybe this one needs to be using getobjectcount as well
+		//currently we cannot count objects with scriptname???
 		if (map->GetActor( critter.ScriptName )) {
 			return;
 		}
 	} else {
-		//count how many actors exists there which match the 'spec'
+		Object *object = new Object();
+		//objectfields based on spec
+		object->objectFields[0]=critter.Spec[0];
+		object->objectFields[1]=critter.Spec[1];
+		object->objectFields[2]=critter.Spec[2];
+		object->objectFields[3]=critter.Spec[3];
+		object->objectFields[4]=critter.Spec[4];
+		object->objectFields[5]=critter.Spec[5];
+		object->objectFields[6]=critter.Spec[6];
+		object->objectFields[7]=critter.Spec[7];
+		object->objectFields[8]=critter.Spec[8];
+		int cnt = GetObjectCount(map, object);
+		if (cnt>=critter.TotalQuantity) {
+			return;
+		}
 	}
 
 	int x = core->Roll(1,critter.creaturecount,-1);
@@ -318,6 +365,11 @@ void IniSpawn::SpawnCreature(CritterEntry &critter)
 		return;
 	}
 	map->AddActor(cre);
+	for (x=0;x<9;x++) {
+		if (critter.SetSpec[x]) {
+			cre->SetBase(StatValues[x], critter.SetSpec[x]);
+		}
+	}
 	cre->SetPosition( critter.SpawnPoint, 0, 0);//maybe critters could be repositioned
 	cre->SetOrientation(critter.Orientation,false);
 	if (critter.ScriptName[0]) {
