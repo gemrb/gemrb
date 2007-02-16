@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.85 2007/02/13 22:37:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.86 2007/02/16 18:03:35 avenger_teambg Exp $
  *
  */
 
@@ -1325,6 +1325,7 @@ Action* GenerateActionCore(const char *src, const char *str, int acIndex)
 				} else {
 					newAction->int2Parameter = value;
 				}
+				intCount++;
 			}
 			break;
 
