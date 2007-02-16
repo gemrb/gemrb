@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.32 2007/02/11 21:27:13 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.33 2007/02/16 23:28:33 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -63,7 +63,7 @@ ItemHash = {}
 def OpenInventoryWindow ():
 	global AvSlotsTable
 	global InventoryWindow
-	
+
 	AvSlotsTable = GemRB.LoadTable ('avslots')
 
 	if CloseOtherWindow (OpenInventoryWindow):
@@ -74,11 +74,11 @@ def OpenInventoryWindow ():
 		SetSelectionChangeHandler (None)
 		GemRB.UnhideGUI ()
 		return
-		
+
 	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIINV")
-	InventoryWindow = Window = GemRB.LoadWindow(3)
-	GemRB.SetVar("OtherWindow", InventoryWindow)
+	InventoryWindow = Window = GemRB.LoadWindow (3)
+	GemRB.SetVar ("OtherWindow", InventoryWindow)
 
 
 	# inventory slots
@@ -100,18 +100,17 @@ def OpenInventoryWindow ():
 
 	ScrollBar = GemRB.GetControl (Window, 45)
 	GemRB.SetEvent (Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "RefreshInventoryWindow")
- 
+
 	for i in range (57, 64):
 		Label = GemRB.GetControl (Window, 0x10000000 + i)
 		GemRB.SetText (Window, Label, str (i))
-		
 
 	# portrait
 	Button = GemRB.GetControl (Window, 44)
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 	GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnAutoEquip")
- 
+
 	# encumbrance
 	Button = GemRB.GetControl (Window, 46)
 	GemRB.SetButtonFont (Window, Button, "NUMBER")
@@ -149,7 +148,7 @@ def UpdateInventoryWindow ():
 	Count = Container['ItemCount']
 	if Count<1:
 		Count=1
-	GemRB.SetVarAssoc (Window, ScrollBar, "TopIndex", Count) 
+	GemRB.SetVarAssoc (Window, ScrollBar, "TopIndex", Count)
 	RefreshInventoryWindow ()
 	# And now for the items ....
 
@@ -159,7 +158,7 @@ def UpdateInventoryWindow ():
 	row = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
 	#usability = GemRB.GetTableValue (AvSlotsTable, row, 0)
 	slot_list = map (int, string.split (GemRB.GetTableValue (AvSlotsTable, row, 1, 0), ','))
-	
+
 	# populate inventory slot controls
 	for i in range (46):
 		UpdateSlot (pc, i)
@@ -171,7 +170,7 @@ def RefreshInventoryWindow ():
 	# name
 	Label = GemRB.GetControl (Window, 0x10000039)
 	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc, 1))
-	
+
 
 	# portrait
 	Button = GemRB.GetControl (Window, 44)
@@ -262,7 +261,7 @@ def UpdateSlot (pc, i):
 	if slot_item:
 		item = GemRB.GetItem (slot_item['ItemResRef'])
 		identified = slot_item['Flags'] & IE_INV_ITEM_IDENTIFIED
-		
+
 		GemRB.SetItemIcon (Window, Button, slot_item['ItemResRef'])
 		if item['StackAmount'] > 1:
 			GemRB.SetText (Window, Button, str (slot_item['Usages0']))
@@ -289,7 +288,7 @@ def UpdateSlot (pc, i):
 	else:
 		GemRB.SetItemIcon (Window, Button, '')
 		GemRB.SetText (Window, Button, '')
-		
+
 		if slot_list[i]>=0:
 			GemRB.SetButtonSprites (Window, Button, SlotType["ResRef"], 0, 0, 0, 0, 0)
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
@@ -299,7 +298,7 @@ def UpdateSlot (pc, i):
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, '')
 			GemRB.SetTooltip (Window, Button, '')
-			
+
 		GemRB.EnableButtonBorder (Window, Button, 0, 0)
 		GemRB.EnableButtonBorder (Window, Button, 1, 0)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")
@@ -336,35 +335,35 @@ def OnDragItem ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	slot, slot_item = ItemHash[GemRB.GetVar ('ItemButton')]
-	
+
 	if not GemRB.IsDraggingItem ():
 		ResRef = slot_item['ItemResRef']
 		item = GemRB.GetItem (ResRef)
 		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 0)
 	else:
 		GemRB.DropDraggedItem (pc, slot)
- 
+
 	UpdateInventoryWindow ()
 
 def OnDropItemToPC ():
 	pc = GemRB.GetVar ("PressedPortrait") + 1
 	GemRB.DropDraggedItem (pc, -3)
 	UpdateInventoryWindow ()
-	
+
 
 def OpenItemInfoWindow ():
 	global ItemInfoWindow
 
 	GemRB.HideGUI ()
-	
+
 	if ItemInfoWindow != None:
 		GemRB.UnloadWindow (ItemInfoWindow)
 		ItemInfoWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
-		
+
 		GemRB.UnhideGUI ()
 		return
-		
+
 	ItemInfoWindow = Window = GemRB.LoadWindow (5)
 	GemRB.SetVar ("FloatWindow", ItemInfoWindow)
 
@@ -415,8 +414,6 @@ def OpenItemInfoWindow ():
 	else:
 		GemRB.SetText (Window, Text, item['ItemDescIdentified'])
 
-
-
 	IdText = GemRB.GetControl (Window, 0x1000000b)
 	if identified:
 		GemRB.SetText (Window, IdText, '')
@@ -424,13 +421,11 @@ def OpenItemInfoWindow ():
 		# 4279 - This item has not been identified
 		GemRB.SetText (Window, IdText, 4279)
 
-	
 	Icon = GemRB.GetControl (Window, 7)
 	GemRB.SetButtonFlags (Window, Icon, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	GemRB.SetItemIcon (Window, Icon, ResRef, 1)
 
 	# 9, 8, 4
-
 
 	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
@@ -445,21 +440,19 @@ def OpenItemInfoWindow ():
 # amnt dialog:
 # Done/Cancel
 
-
-
 def OpenItemAmountWindow ():
 	global ItemAmountWindow
 
 	GemRB.HideGUI ()
-	
+
 	if ItemAmountWindow != None:
 		GemRB.UnloadWindow (ItemAmountWindow)
 		ItemAmountWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
-		
+
 		GemRB.UnhideGUI ()
 		return
-		
+
 	ItemAmountWindow = Window = GemRB.LoadWindow (4)
 	GemRB.SetVar ("FloatWindow", ItemAmountWindow)
 
@@ -486,7 +479,6 @@ def OpenItemAmountWindow ():
 	GemRB.SetText (Window, Button, 4196)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenItemAmountWindow")
 
-
 	# 0 bmp
 	# 1,2 done/cancel?
 	# 3 +
@@ -498,34 +490,51 @@ def OpenItemAmountWindow ():
 
 
 def OpenItemDialogWindow ():
-	
+
 	OpenItemInfoWindow ()
-	OpenInventoryWindow ()	
+	OpenInventoryWindow ()
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot, slot_item = ItemHash[GemRB.GetVar ('ItemButton')]
 	ResRef = slot_item['ItemResRef']
 	item = GemRB.GetItem (ResRef)
 	dialog=item['Dialog']
-	GemRB.ExecuteString("StartDialog(\""+dialog+"\",Myself)", pc)
+	GemRB.ExecuteString ("StartDialog(\""+dialog+"\",Myself)", pc)
 
+def IdentifyUseSpell ():
+	global ItemIdentifyWindow
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	GemRB.UnloadWindow (ItemIdentifyWindow)
+	GemRB.HasSpecialSpell (pc, 1, 1)
+	GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
+	CloseIdentifyItemWindow()
+	return
+
+def IdentifyUseScroll ():
+	global ItemIdentifyWindow
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	GemRB.UnloadWindow (ItemIdentifyWindow)
+	GemRB.HasSpecialItem (pc, 1, 1)
+	GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
+	CloseIdentifyItemWindow()
+	return
+
+def CloseIdentifyItemWindow ():
+	global ItemIdentifyWindow
+
+	GemRB.UnloadWindow (ItemIdentifyWindow)
+	ItemIdentifyWindow = None
+	return
 
 def OpenItemIdentifyWindow ():
 	global ItemIdentifyWindow
 
-	GemRB.HideGUI ()
-	
-	if ItemIdentifyWindow != None:
-		GemRB.UnloadWindow (ItemIdentifyWindow)
-		ItemIdentifyWindow = None
-		GemRB.SetVar ("FloatWindow", ItemInfoWindow)
-		
-		GemRB.UnhideGUI ()
-		GemRB.ShowModal (ItemInfoWindow, MODAL_SHADOW_GRAY)
-		return
-		
-	ItemIdentifyWindow = Window = GemRB.LoadWindow (9)
-	GemRB.SetVar ("FloatWindow", ItemIdentifyWindow)
+	pc = GemRB.GameGetSelectedPCSingle ()
 
+	ItemIdentifyWindow = Window = GemRB.LoadWindow (9)
 
 	# how would you like to identify ....
 	Text = GemRB.GetControl (Window, 3)
@@ -534,54 +543,23 @@ def OpenItemIdentifyWindow ():
 	# Spell
 	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, Button, 4259)
-	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
-	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenItemAmountWindow")
+	if not GemRB.HasSpecialSpell (pc, 1, 0):
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "IdentifyUseSpell")
 
 	# Scroll
 	Button = GemRB.GetControl (Window, 1)
 	GemRB.SetText (Window, Button, 4260)
-	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
-	#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenItemAmountWindow")
+	if not GemRB.HasSpecialItem (pc, 1, 0):
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "IdentifyUseScroll")
 
 	# Cancel
 	Button = GemRB.GetControl (Window, 2)
 	GemRB.SetText (Window, Button, 4196)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenItemIdentifyWindow")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseIdentifyItemWindow")
 
-
-	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
-	
-
-
-# IVIARW
-#IVISWRD
-
-#IVPIBOW
-#IVPICHST
-#IVPIEARL
-#IVPIEARR
-#IVPIEYER
-#IVPIHNDL/R
-#IVPILENS
-#IVPIRING
-#IVPITATT
-#IVPITETH
-#IVPIWRST
-#IVQIARRW
-#IVQIITM
-#IVQIWEAP
-
-# 6 eye
-# 9-12 quick weapon
-# 20-24 quick item
-# 25-44 personal item
-
-# default weapons:
-# Annah's punch daggers
-# Morte's bite
-# Grace's touch
-# Ignus? fireball?
 
 ###################################################
 # End of file GUIINV.py
