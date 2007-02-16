@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/IniSpawn.cpp,v 1.2 2007/02/14 20:27:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/IniSpawn.cpp,v 1.3 2007/02/16 21:16:45 wjpalenstijn Exp $
  *
  */
 
@@ -254,7 +254,7 @@ void IniSpawn::ReadSpawnEntry(DataFileMgr *inifile, const char *entryname, Spawn
 {
 	const char *s;
 	
-	entry.interval = (unsigned int) inifile->GetKeyAsString(entryname,"interval",0);
+	entry.interval = (unsigned int) inifile->GetKeyAsInt(entryname,"interval",0);
 	s = inifile->GetKeyAsString(entryname,"critters",NULL);
 	int crittercount = CountElements(s,',');
 	entry.crittercount=crittercount;
