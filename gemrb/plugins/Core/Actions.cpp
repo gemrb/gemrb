@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.112 2007/02/14 20:27:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.113 2007/02/17 23:39:35 avenger_teambg Exp $
  *
  */
 
@@ -4040,7 +4040,7 @@ void GameScript::Rest(Scriptable* Sender, Action* /*parameters*/)
 	actor->spellbook.ChargeAllSpells();
 	//check if this should be a full heal
 	actor->Heal(0);
-	actor->RemoveTimedEffects();
+	actor->fxqueue.RemoveExpiredEffects(0xffffffff);
 }
 
 //doesn't advance game time (unsure), just refreshes spells of target
@@ -4052,7 +4052,7 @@ void GameScript::RestNoSpells(Scriptable* Sender, Action* /*parameters*/)
 	Actor *actor = (Actor *) Sender;
 	//check if this should be a full heal
 	actor->Heal(0);
-	actor->RemoveTimedEffects();
+	actor->fxqueue.RemoveExpiredEffects(0xffffffff);
 }
 
 //this is most likely advances time
@@ -4075,7 +4075,7 @@ void GameScript::ClearPartyEffects(Scriptable* /*Sender*/, Action* /*parameters*
 	int i = game->GetPartySize(false);
 	while (i--) {
 		Actor *tar = game->GetPC(i, false);
-		tar->RemoveTimedEffects();
+		tar->fxqueue.RemoveExpiredEffects(0xffffffff);
 	}
 }
 

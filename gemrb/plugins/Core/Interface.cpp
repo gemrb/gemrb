@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.464 2007/02/14 20:27:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.465 2007/02/17 23:39:35 avenger_teambg Exp $
  *
  */
 
@@ -4272,8 +4272,9 @@ void Interface::DragItem(CREItem *item, const ieResRef Picture)
 	}
 	DraggedItem = item;
 	video->FreeSprite (DraggedCursor);
-	if (item)
+	if (item) {
 		DraggedCursor = core->GetBAMSprite( Picture, 0, 0 );
+	}
 
 	video->SetDragCursor (DraggedCursor);
 }

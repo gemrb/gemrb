@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.24 2007/01/13 11:54:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ITMImporter/ITMImp.cpp,v 1.25 2007/02/17 23:39:36 avenger_teambg Exp $
  *
  */
 
@@ -109,7 +109,7 @@ Item* ITMImp::GetItem(Item *s)
 	str->ReadDword( &s->Weight );
 	str->ReadDword( &s->ItemDesc );
 	str->ReadDword( &s->ItemDescIdentified );
-	str->ReadResRef( s->CarriedIcon );
+	str->ReadResRef( s->DescriptionIcon );
 	str->ReadDword( &s->Enchantment );
 	str->ReadDword( &s->ExtHeaderOffset );
 	str->ReadWord( &s->ExtHeaderCount );

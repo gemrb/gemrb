@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.165 2007/02/13 22:37:48 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/AREImporter/AREImp.cpp,v 1.166 2007/02/17 23:39:35 avenger_teambg Exp $
  *
  */
 
@@ -781,6 +781,7 @@ Map* AREImp::GetMap(const char *ResRef)
 			}
 			ab->SetOrientation( Orientation,0 );
 			ab->TalkCount = TalkCount;
+			ab->RefreshEffects();
 			//maybe there is a flag (deactivate), but 
 			//right now we just set this
 			//it is automatically enabled, we should disable it

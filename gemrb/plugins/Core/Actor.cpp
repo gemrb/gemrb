@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.259 2007/02/13 22:37:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.260 2007/02/17 23:39:35 avenger_teambg Exp $
  *
  */
 
@@ -1318,20 +1318,26 @@ void Actor::DebugDump()
 	unsigned int i;
 
 	printf( "Debugdump of Actor %s:\n", LongName );
+	printf ("Scripts:");
 	for (i = 0; i < MAX_SCRIPTS; i++) {
 		const char* poi = "<none>";
 		if (Scripts[i] && Scripts[i]->script) {
 			poi = Scripts[i]->GetName();
 		}
-		printf( "Script %d: %s\n", i, poi );
+		printf( " %.8s", poi );
 	}
-	printf( "Area:       %.8s   ", Area );
+	printf( "\nArea:       %.8s   ", Area );
 	printf( "Dialog:     %.8s\n", Dialog );
 	printf( "Global ID:  %d   Local ID:  %d\n", globalID, localID);
 	printf( "Script name:%.32s\n", scriptName );
 	printf( "TalkCount:  %d   ", TalkCount );
 	printf( "PartySlot:  %d\n", InParty );
 	printf( "Allegiance: %d   current allegiance:%d\n", BaseStats[IE_EA], Modified[IE_EA] );
+	printf( "Class:      %d   current class:%d\n", BaseStats[IE_CLASS], Modified[IE_CLASS] );
+	printf( "Race:       %d   current race:%d\n", BaseStats[IE_RACE], Modified[IE_RACE] );
+	printf( "Gender:     %d   current gender:%d\n", BaseStats[IE_SEX], Modified[IE_SEX] );
+	printf( "Specifics:  %d   current specifics:%d\n", BaseStats[IE_SPECIFIC], Modified[IE_SPECIFIC] );
+	printf( "Alignment:  %x   current alignment:%x\n", BaseStats[IE_ALIGNMENT], Modified[IE_ALIGNMENT] );
 	printf( "Morale:     %d   current morale:%d\n", BaseStats[IE_MORALE], Modified[IE_MORALE] );
 	printf( "Moralebreak:%d   Morale recovery:%d\n", Modified[IE_MORALEBREAK], Modified[IE_MORALERECOVERYTIME] );
 	printf( "Visualrange:%d (Explorer: %d)\n", Modified[IE_VISUALRANGE], Modified[IE_EXPLORE] );
@@ -2246,10 +2252,6 @@ void Actor::Heal(int days)
 void Actor::AddExperience(int exp)
 {
 	SetBase(IE_XP,BaseStats[IE_XP]+exp);
-}
-
-void Actor::RemoveTimedEffects()
-{
 }
 
 bool Actor::Schedule(ieDword gametime)

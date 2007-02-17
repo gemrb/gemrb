@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GlobalTimer.cpp,v 1.32 2006/08/11 23:17:19 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GlobalTimer.cpp,v 1.33 2007/02/17 23:39:35 avenger_teambg Exp $
  *
  */
 
@@ -72,6 +72,9 @@ void GlobalTimer::Freeze()
 
 void GlobalTimer::Update()
 {
+	Map *map;
+	Game *game;
+	GameControl* gc;
 	unsigned long thisTime;
 	unsigned long advance;
 
@@ -79,72 +82,78 @@ void GlobalTimer::Update()
 
 	GetTime( thisTime );
 	advance = thisTime - startTime;
-	if ( advance >= interval) {
-		ieDword count = advance/interval;
-		startTime = thisTime;
+	if ( advance < interval) {
+		return;
+	}
+	ieDword count = advance/interval;
+	if (shakeCounter) {
+		int x = shakeStartVP.x;
+		int y = shakeStartVP.y;
+		shakeCounter-=count;
+		if (shakeCounter<0) {
+			shakeCounter=0;
+		}
 		if (shakeCounter) {
-			int x = shakeStartVP.x;
-			int y = shakeStartVP.y;
-			shakeCounter-=count;
-			if (shakeCounter<0) {
-				shakeCounter=0;
+			x += (rand()%shakeX) - (shakeX>>1);
+			y += (rand()%shakeY) - (shakeY>>1);
+		}
+		core->GetVideoDriver()->MoveViewportTo(x,y,false);
+	}
+	if (fadeToCounter) {
+		fadeToCounter-=count;
+		if (fadeToCounter<0) {
+			fadeToCounter=0;
+		}
+		core->GetVideoDriver()->SetFadePercent( ( ( fadeToMax - fadeToCounter ) * 100 ) / fadeToMax );
+		goto end; //hmm, freeze gametime?
+	}
+	if (fadeFromCounter!=fadeFromMax) {
+		if (fadeFromCounter>fadeFromMax) {
+			fadeFromCounter-=advance/interval;
+			if (fadeFromCounter<fadeFromMax) {
+			  fadeFromCounter=fadeFromMax;
 			}
-			if (shakeCounter) {
-				x += (rand()%shakeX) - (shakeX>>1);
-				y += (rand()%shakeY) - (shakeY>>1);
+			//don't freeze gametime when already dark
+		} else {
+			fadeFromCounter+=advance/interval;
+			if (fadeToCounter>fadeFromMax) {
+			  fadeToCounter=fadeFromMax;
 			}
-			core->GetVideoDriver()->MoveViewportTo(x,y,false);
+			core->GetVideoDriver()->SetFadePercent( ( ( fadeFromMax - fadeFromCounter ) * 100 ) / fadeFromMax );
+			goto end; //freeze gametime?
 		}
-		if (fadeToCounter) {
-			fadeToCounter-=count;
-			if (fadeToCounter<0) {
-				fadeToCounter=0;
-			}
-			core->GetVideoDriver()->SetFadePercent( ( ( fadeToMax - fadeToCounter ) * 100 ) / fadeToMax );
-			return; //hmm, freeze gametime
-		}
-		if (fadeFromCounter!=fadeFromMax) {
-			if (fadeFromCounter>fadeFromMax) {
-				fadeFromCounter-=advance/interval;
-				if (fadeFromCounter<fadeFromMax) {
-					fadeFromCounter=fadeFromMax;
-				}
-				//don't freeze gametime when already dark
-			} else {
-				fadeFromCounter+=advance/interval;
-				if (fadeToCounter>fadeFromMax) {
-					fadeToCounter=fadeFromMax;
-				}
-				core->GetVideoDriver()->SetFadePercent( ( ( fadeFromMax - fadeFromCounter ) * 100 ) / fadeFromMax );
-				return; //freeze gametime
-			}
-		}
-		if (fadeFromCounter==fadeFromMax) {
-			core->GetVideoDriver()->SetFadePercent( 0 );
-		}
-		GameControl* gc = core->GetGameControl();
-		if (!gc) {
-			return;
-		}
-		Game* game = core->GetGame();
-		if (!game) {
-			return;
-		}
-		Map* map = game->GetCurrentArea();
-		if (!map) {
-			return;
-		}
-		//do spell effects expire in dialogs?
-		//if yes, then we should remove this condition
-		if (!(gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
-			map->UpdateFog();
-			map->UpdateEffects();
+	}
+	if (fadeFromCounter==fadeFromMax) {
+		core->GetVideoDriver()->SetFadePercent( 0 );
+	}
+	gc = core->GetGameControl();
+	if (!gc) {
+		goto end;
+	}
+	game = core->GetGame();
+	if (!game) {
+		goto end;
+	}
+	map = game->GetCurrentArea();
+	if (!map) {
+		goto end;
+	}
+	//do spell effects expire in dialogs?
+	//if yes, then we should remove this condition
+	if (!(gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
+		map->UpdateFog();
+		map->UpdateEffects();
+		if (thisTime) {
 			//this measures in-world time (affected by effects, actions, etc)
 			game->AdvanceTime(count);
 		}
-		//this measures time spent in the game (including pauses)
+	}
+	//this measures time spent in the game (including pauses)
+	if (thisTime) {
 		game->RealTime+=advance;
 	}
+end:
+	startTime = thisTime;
 }
 
 void GlobalTimer::SetFadeToColor(unsigned long Count)
@@ -205,12 +214,11 @@ void GlobalTimer::AddAnimation(ControlAnimation* ctlanim, unsigned long time)
 	}
 	if (anim)
 		animations.push_back( anim );
-		
 }
 
 void GlobalTimer::RemoveAnimation(ControlAnimation* ctlanim)
 {
-	// Animation refs for given control are not physically removed, 
+	// Animation refs for given control are not physically removed,
 	// but just marked by erasing ptr to the control. They will be
 	// collected when they get to the front of the vector
 	for (std::vector<AnimationRef*>::iterator it = animations.begin() + first_animation; it != animations.end (); it++) {
@@ -238,7 +246,6 @@ void GlobalTimer::UpdateAnimations()
 		}
 		break;
 	}
-			
 }
 
 void GlobalTimer::ClearAnimations()

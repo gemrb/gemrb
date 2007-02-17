@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.77 2007/02/11 21:27:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EffectQueue.cpp,v 1.78 2007/02/17 23:39:35 avenger_teambg Exp $
  *
  */
 
@@ -753,12 +753,18 @@ void EffectQueue::RemoveAllEffectsWithParam(ieDword opcode, ieDword param2)
 void EffectQueue::RemoveExpiredEffects(ieDword futuretime)
 {
 	ieDword GameTime = core->GetGame()->GameTime;
+	if (GameTime+futuretime<GameTime) {
+		GameTime=0xffffffff;
+	} else {
+		GameTime+=futuretime;
+	}
 
 	std::vector< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		//FIXME: how this method handles delayed effects???
-		if ( IsPrepared( (ieByte) ((*f)->TimingMode) )==DURATION ) {
-			if ( (*f)->Duration<=GameTime+futuretime) {
+		//it should remove them as well, i think
+		if ( IsPrepared( (ieByte) ((*f)->TimingMode) )!=PERMANENT ) {
+			if ( (*f)->Duration<=GameTime) {
 				(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;
 			}      
 		}

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.145 2007/02/13 22:37:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.146 2007/02/17 23:39:35 avenger_teambg Exp $
  *
  */
 
@@ -381,7 +381,6 @@ public:
 	void SetColorMod( int location, RGBModifier::Type type, int speed, 
 					  unsigned char r, unsigned char g, unsigned char b,
 					  int phase=-1 );
-	void RemoveTimedEffects();
 	bool Schedule(ieDword gametime);
 	/* call this when path needs to be changed */
 	void NewPath();

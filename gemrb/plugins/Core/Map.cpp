@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.264 2007/02/13 22:37:50 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.265 2007/02/17 23:39:35 avenger_teambg Exp $
  *
  */
 
@@ -2200,6 +2200,7 @@ void Map::SpawnCreature(Point &pos, char *CreName, int radius)
 		if ( creature ) {
 			AddActor(creature);
 			creature->SetPosition( pos, true, radius );
+			creature->RefreshEffects();
 		}
 		return;
 	}
@@ -2213,6 +2214,7 @@ void Map::SpawnCreature(Point &pos, char *CreName, int radius)
 		if ( creature ) {
 			AddActor(creature);
 			creature->SetPosition( pos, true, radius );
+			creature->RefreshEffects();
 		}
 	}
 }

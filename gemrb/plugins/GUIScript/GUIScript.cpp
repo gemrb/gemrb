@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.466 2007/02/11 21:27:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.467 2007/02/17 23:39:35 avenger_teambg Exp $
  *
  */
 
@@ -68,6 +68,7 @@ static int SpecialItemsCount = -1;
 static int SpecialSpellsCount = -1;
 static int StoreSpellsCount = -1;
 static int UsedItemsCount = -1;
+static int ItemSoundsCount = -1;
 
 typedef struct UsedItemType {
 	ieResRef itemname;
@@ -81,6 +82,10 @@ typedef struct SpellDescType {
 } SpellDescType;
 
 typedef char EventNameType[17];
+#define IS_DROP   	0
+#define IS_GET    	1
+
+typedef ieResRef ResRefPairs[2];
 
 #define UNINIT_IEDWORD 0xcccccccc
 
@@ -90,6 +95,7 @@ static SpellDescType *StoreSpells = NULL;
 static ItemExtHeader *ItemArray = NULL;
 static SpellExtHeader *SpellArray = NULL;
 static UsedItemType *UsedItems = NULL; 
+static ResRefPairs *ItemSounds = NULL;
 
 static int ReputationIncrease[20]={(int) UNINIT_IEDWORD};
 static int ReputationDonation[20]={(int) UNINIT_IEDWORD};
@@ -100,13 +106,6 @@ static ieDword GUITooltip[MAX_ACT_COUNT]={UNINIT_IEDWORD};
 static ieResRef GUIResRef[MAX_ACT_COUNT];
 static EventNameType GUIEvent[MAX_ACT_COUNT];
 static bool QuitOnError = false;
-/*
-static unsigned int ClassCount = 0;
-static ActionButtonRow *GUIBTDefaults = NULL; //qslots row count
-ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
- ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE,
- ACT_NONE, ACT_INNATE};
-*/
 
 // Natural screen size of currently loaded winpack
 static int CHUWidth = 0;
@@ -207,6 +206,40 @@ static inline void SetFunctionTooltip(int WindowIndex, int ControlIndex, char *t
 		free(txt);
 	}
 	core->SetTooltip((ieWord) WindowIndex, (ieWord) ControlIndex, "");
+}
+
+void ReadItemSounds()
+{
+	int table = core->LoadTable( "itemsnd" );
+	if (table<0) {
+		ItemSoundsCount = 0;
+		ItemSounds = NULL;
+		return;
+	}
+	TableMgr *tab = core->GetTable( table );
+	ItemSoundsCount = tab->GetRowCount();
+	ItemSounds = (ResRefPairs *) malloc( sizeof(ResRefPairs)*ItemSoundsCount);
+	for (int i = 0; i < ItemSoundsCount; i++) {
+		strnlwrcpy(ItemSounds[i][0], tab->QueryField(i,0), 8);
+		strnlwrcpy(ItemSounds[i][1], tab->QueryField(i,1), 8);
+	}
+	core->DelTable( table );
+}
+
+static void GetItemSound(ieResRef &Sound, ieDword ItemType, ieDword Col)
+{
+	Sound[0]=0;
+	if (Col>1) {
+		return;
+	}
+
+	if (ItemSoundsCount<0) {
+		ReadItemSounds();
+	}
+	if (ItemType>=(ieDword) ItemSoundsCount) {
+		return;
+	}
+	strnlwrcpy(Sound, ItemSounds[ItemType][Col], 8);
 }
 
 PyDoc_STRVAR( GemRB_SetInfoTextColor__doc, 
@@ -4482,7 +4515,7 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 		case 2:
 			btn->SetPicture( NULL ); // also calls ClearPictureList
 			for (i=0;i<4;i++) {
-				Picture = core->GetBAMSprite(item->CarriedIcon, -1, i);
+				Picture = core->GetBAMSprite(item->DescriptionIcon, -1, i);
 				if (Picture)
 					btn->StackPicture(Picture);
 			}
@@ -5907,7 +5940,8 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "ItemDesc", PyInt_FromLong (item->GetItemDesc(false)));
 	PyDict_SetItemString(dict, "ItemDescIdentified", PyInt_FromLong (item->GetItemDesc(true)));
 	PyDict_SetItemString(dict, "ItemIcon", PyString_FromResRef (item->ItemIcon));
-	PyDict_SetItemString(dict, "DescIcon", PyString_FromResRef (item->CarriedIcon));
+	PyDict_SetItemString(dict, "DescIcon", PyString_FromResRef (item->DescriptionIcon));
+	PyDict_SetItemString(dict, "BrokenItem", PyString_FromResRef (item->ReplacementItem));
 	PyDict_SetItemString(dict, "StackAmount", PyInt_FromLong (item->StackAmount));
 	PyDict_SetItemString(dict, "Dialog", PyString_FromResRef (item->Dialog));
 	PyDict_SetItemString(dict, "DialogName", PyInt_FromLong (item->DialogName));
@@ -6012,6 +6046,7 @@ PyDoc_STRVAR( GemRB_DragItem__doc,
 
 static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 {
+	ieResRef Sound;
 	int PartyID, Slot, Count = 0, Type = 0;
 	char *ResRef;
 
@@ -6056,7 +6091,18 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
-
+	Item *item = core->GetItem(si->ItemResRef);
+	if (item) {
+		if (core->HasFeature(GF_HAS_PICK_SOUND) && item->DescriptionIcon[0]) {
+			memcpy(Sound,item->DescriptionIcon,8);
+		} else {
+			GetItemSound(Sound, item->ItemType, IS_GET);
+		}
+		core->FreeItem(item, si->ItemResRef,0);
+	}
+	if (Sound[0]) {
+		core->GetSoundMgr()->Play(Sound);
+	}
 	core->DragItem (si, ResRef);
 	//this is PST specific
 	core->GetGUIScriptEngine()->RunFunction("UpdateAnimation", false);
@@ -6075,6 +6121,7 @@ PyDoc_STRVAR( GemRB_DropDraggedItem__doc,
 
 static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 {
+	ieResRef Sound;
 	int PartyID, Slot;
 
 	if (!PyArg_ParseTuple( args, "ii", &PartyID, &Slot)) {
@@ -6136,10 +6183,17 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	}
 	// can't equip item because of similar already equipped
 	if (Effect && item->ItemExcl & actor->inventory.GetEquipExclusion()) {
+		core->FreeItem( item, slotitem->ItemResRef, false );
 		return PyInt_FromLong( 0 );
 	}
 	//CanUseItemType will check actor's class bits too
 	Slottype =core->CanUseItemType (Slottype, item, actor);
+	//resolve the equipping sound
+	if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
+		memcpy(Sound, item->ReplacementItem, 9);
+	} else {
+		GetItemSound(Sound, item->ItemType, IS_DROP);
+	}
 	core->FreeItem( item, slotitem->ItemResRef, false );
 	if ( !Slottype) {
 		return PyInt_FromLong( 0 );
@@ -6174,6 +6228,9 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		} else {
 			res = ASI_FAILED;
 		}
+	}
+	if (Sound[0]) {
+		core->GetSoundMgr()->Play(Sound);
 	}
 	//this is PST specific, change animation
 	core->GetGUIScriptEngine()->RunFunction("UpdateAnimation", false);
