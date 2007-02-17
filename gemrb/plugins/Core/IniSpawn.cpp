@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/IniSpawn.cpp,v 1.3 2007/02/16 21:16:45 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/IniSpawn.cpp,v 1.4 2007/02/17 13:22:17 avenger_teambg Exp $
  *
  */
 
@@ -374,6 +374,27 @@ void IniSpawn::SpawnCreature(CritterEntry &critter)
 	cre->SetOrientation(critter.Orientation,false);
 	if (critter.ScriptName[0]) {
 		cre->SetScriptName(critter.ScriptName);
+	}
+	if (critter.OverrideScript[0]) {
+		cre->SetScript(critter.OverrideScript, SCR_OVERRIDE);
+	}
+	if (critter.ClassScript[0]) {
+		cre->SetScript(critter.ClassScript, SCR_CLASS);
+	}
+	if (critter.RaceScript[0]) {
+		cre->SetScript(critter.RaceScript, SCR_RACE);
+	}
+	if (critter.GeneralScript[0]) {
+		cre->SetScript(critter.GeneralScript, SCR_GENERAL);
+	}
+	if (critter.DefaultScript[0]) {
+		cre->SetScript(critter.DefaultScript, SCR_DEFAULT);
+	}
+	if (critter.AreaScript[0]) {
+		cre->SetScript(critter.AreaScript, SCR_AREA);
+	}
+	if (critter.SpecificScript[0]) {
+		cre->SetScript(critter.SpecificScript, SCR_SPECIFICS);
 	}
 	if (critter.Dialog[0]) {
 		cre->SetDialog(critter.Dialog);
