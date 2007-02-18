@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.88 2006/10/15 09:49:31 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.h,v 1.89 2007/02/18 22:43:39 avenger_teambg Exp $
  *
  */
 
@@ -55,6 +55,10 @@ class Game;
 
 //for global triggers
 #define IF_PARTYRESTED 1
+
+//ShareXP flags
+#define SX_DIVIDE  1   //divide XP among team members
+#define SX_CR      2   //use challenge rating resolution
 
 //joinparty flags
 #define JP_JOIN     1  //refresh join time
@@ -151,6 +155,10 @@ typedef struct GAMJournalEntry {
 	ieByte   Group;   // this is a GemRB extension
 } GAMJournalEntry;
 
+#define MAX_CRLEVEL 32
+
+typedef int CRRow[MAX_CRLEVEL];
+
 /**
  * @class Game
  * Object representing current game state, mostly party.
@@ -167,6 +175,7 @@ private:
 	std::vector< GAMJournalEntry*> Journals;
 	std::vector< char*> mastarea;
 	std::vector< ieDword> Attackers;
+	CRRow *crtable;
 	ieResRef restmovies[8];
 	int MapIndex;
 public:
@@ -187,7 +196,6 @@ public:
 	int protagonist;
 	/** if party size exceeds this amount, a callback will be called */
 	size_t partysize;
-public:
 	ieDword Ticks;
 	ieDword interval; // 1000/AI_UPDATE (a tenth of a round in ms)
 	ieDword GameTime;
@@ -208,6 +216,9 @@ public:
 	int event_timer;
 	char event_handler[64]; //like in Control
 	ieDword script_timers[MAX_TIMER];
+private:
+	/** reads the challenge rating table */
+	void LoadCRTable();
 public:
 	/** Returns the PC's slot count for partyID */
 	int FindPlayer(unsigned int partyID);
@@ -310,8 +321,7 @@ public:
 		return Attackers.size();
 	}
 
-
-	void ShareXP(int XP, bool divide);
+	void ShareXP(int XP, int flags);
 	/** returns true if we should start the party overflow window */
 	bool PartyOverflow() const;
 	/** returns true if any pc is attacker or being attacked */

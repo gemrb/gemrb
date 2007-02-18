@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.261 2007/02/18 14:50:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.262 2007/02/18 22:43:39 avenger_teambg Exp $
  *
  */
 
@@ -56,6 +56,7 @@ static Color magenta = {
 	0xff, 0x00, 0xff, 0xff
 };
 
+static int sharexp = SX_DIVIDE;
 static int classcount = -1;
 static char **clericspelltables = NULL;
 static char **wizardspelltables = NULL;
@@ -773,6 +774,11 @@ static void InitActorTables()
 {
 	int i;
 
+	if (core->HasFeature(GF_CHALLENGERATING)) {
+		sharexp=SX_DIVIDE|SX_CR;
+	} else {
+		sharexp=SX_DIVIDE;
+	}
 	REVERSE_TOHIT=(bool) core->HasFeature(GF_REVERSE_TOHIT);
 	CHECK_ABILITIES=(bool) core->HasFeature(GF_CHECK_ABILITIES);
 
@@ -1522,7 +1528,7 @@ bool Actor::CheckOnDeath()
 	Game *game = core->GetGame();
 	if (InternalFlags&IF_GIVEXP) {
 		//give experience to party
-		game->ShareXP(Modified[IE_XPVALUE], true );
+		game->ShareXP(Modified[IE_XPVALUE], sharexp );
 		//handle reputation here
 		//
 	}

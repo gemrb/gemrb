@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.398 2007/02/14 20:27:41 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.399 2007/02/18 22:43:39 avenger_teambg Exp $
  *
  */
 
@@ -362,6 +362,7 @@ static ActionLink actionnames[] = {
 	{"addareaflag", GameScript::AddAreaFlag, 0},
 	{"addareatype", GameScript::AddAreaType, 0},
 	{"addexperienceparty", GameScript::AddExperienceParty, 0},
+	{"addexperiencepartycr", GameScript::AddExperiencePartyCR, 0},
 	{"addexperiencepartyglobal", GameScript::AddExperiencePartyGlobal, 0},
 	{"addfeat", GameScript::AddFeat, 0},
 	{"addglobals", GameScript::AddGlobals, 0},

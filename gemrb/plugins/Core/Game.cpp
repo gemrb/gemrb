@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.133 2006/12/03 17:34:46 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.134 2007/02/18 22:43:39 avenger_teambg Exp $
  *
  */
 
@@ -48,6 +48,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	ControlStatus = 0;
 	CombatCounter = 0; //stored here until we know better
 	WeatherBits = 0;
+	crtable = NULL;
 	kaputz = NULL;
 	beasts = NULL;
 	mazedata = NULL;
@@ -106,6 +107,10 @@ Game::~Game(void)
 		free ( mastarea[i] );
 	}
 
+	if (crtable) {
+		delete[] crtable;
+	}
+
 	if (mazedata) {
 		free (mazedata);
 	}
@@ -150,8 +155,7 @@ Actor* Game::FindPC(unsigned int partyID)
 Actor* Game::FindPC(const char *scriptingname)
 {
 	for (unsigned int slot=0; slot<PCs.size(); slot++) {
-		if (strnicmp(PCs[slot]->GetScriptName(),scriptingname,32)==0 )
-		{
+		if (strnicmp(PCs[slot]->GetScriptName(),scriptingname,32)==0 ) {
 			return PCs[slot];
 		}
 	}
@@ -760,11 +764,48 @@ char *Game::GetFamiliar(unsigned int Index)
 	return Familiars[Index];
 }
 
-void Game::ShareXP(int xp, bool divide)
+//reading the challenge rating table for iwd2 (only when needed)
+void Game::LoadCRTable()
+{
+	int mtab = core->LoadTable("moncrate");
+	TableMgr *table = core->GetTable(mtab);
+	if (table) {
+		int maxrow = table->GetRowCount()-1;
+		crtable = new CRRow[MAX_LEVEL];
+		for(int i=0;i<MAX_LEVEL;i++) {
+			//row shouldn't be larger than maxrow
+			int row = i<maxrow?i:maxrow;
+			int maxcol = table->GetColumnCount(row)-1;
+			for(int j=0;j<MAX_CRLEVEL;j++) {
+				//col shouldn't be larger than maxcol
+				int col = j<maxcol?j:maxcol;
+				crtable[i][j]=atoi(table->QueryField(row,col) );
+			}
+		}
+		core->DelTable(mtab);
+	}
+}
+
+void Game::ShareXP(int xp, int flags)
 {
 	int individual;
 
-	if (divide) {
+	if (flags&SX_CR) {
+		if (!crtable) LoadCRTable();
+		if (crtable) {
+			int level = GetPartyLevel(true);
+			if (xp>=MAX_CRLEVEL) {
+				xp=MAX_CRLEVEL-1;
+			}
+			printf("Challenge Rating: %d, party level: %d ", xp, level);
+			xp = crtable[level][xp];
+			printf(" to %d xp.\n",xp);
+		} else {
+			printMessage("Game","Cannot find moncrate.2da!", LIGHT_RED);
+		}
+	}
+
+	if (flags&SX_DIVIDE) {
 		int PartySize = GetPartySize(true); //party size, only alive
 		if (PartySize<1) {
 			return;

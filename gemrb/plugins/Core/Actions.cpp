@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.113 2007/02/17 23:39:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.114 2007/02/18 22:43:38 avenger_teambg Exp $
  *
  */
 
@@ -2180,23 +2180,29 @@ void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
 
 	if ( xpvalue[0]=='P' && xpvalue[1]=='_') {
 		//divide party xp
-		core->GetGame()->ShareXP(atoi(xpvalue+2), true );
+		core->GetGame()->ShareXP(atoi(xpvalue+2), SX_DIVIDE );
 	} else {
 		//give xp everyone
-		core->GetGame()->ShareXP(atoi(xpvalue), false );
+		core->GetGame()->ShareXP(atoi(xpvalue), 0 );
 	}
 	core->DelTable( xptable );
 }
 
 void GameScript::AddExperienceParty(Scriptable* /*Sender*/, Action* parameters)
 {
-	core->GetGame()->ShareXP(parameters->int0Parameter, true);
+	core->GetGame()->ShareXP(parameters->int0Parameter, SX_DIVIDE);
+}
+
+//this needs moncrate.2da, but otherwise independent from GF_CHALLENGERATING
+void GameScript::AddExperiencePartyCR(Scriptable* /*Sender*/, Action* parameters)
+{
+	core->GetGame()->ShareXP(parameters->int0Parameter, SX_DIVIDE|SX_CR);
 }
 
 void GameScript::AddExperiencePartyGlobal(Scriptable* Sender, Action* parameters)
 {
 	ieDword xp = CheckVariable( Sender, parameters->string0Parameter, parameters->string1Parameter );
-	core->GetGame()->ShareXP(xp, true);
+	core->GetGame()->ShareXP(xp, SX_DIVIDE);
 }
 
 void GameScript::SetMoraleAI(Scriptable* Sender, Action* parameters)
