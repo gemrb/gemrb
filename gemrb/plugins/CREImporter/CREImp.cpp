@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.132 2007/02/10 17:34:14 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.133 2007/02/18 22:39:38 avenger_teambg Exp $
  *
  */
 
@@ -204,7 +204,7 @@ void CREImp::WriteChrHeader(DataStream *stream, Actor *act)
 	if (QSPCount==9) {
 		stream->Write( act->PCStats->QuickSpellClass,9);
 		tmpByte = 0;
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 	}
 	for (i=0;i<QITCount;i++) {
 		tmpWord = act->PCStats->QuickItemSlots[i];
@@ -278,7 +278,7 @@ void CREImp::ReadChrHeader(Actor *act)
 	}
 	if (QSPCount==9) {
 		str->Read (act->PCStats->QuickSpellClass,9);
-		str->Read (&tmpByte,1);
+		str->Read (&tmpByte, 1);
 	}
 	for (i=0;i<QITCount;i++) {
 		str->ReadWord (&tmpWord);
@@ -1260,7 +1260,9 @@ void CREImp::GetActorIWD2(Actor *act)
 	act->BaseStats[IE_MAGICDEVICE]=tmpByte;
 	str->Read( &tmpByte, 1);
 	act->BaseStats[IE_TRACKING]=tmpByte;
-	str->Seek( 51, GEM_CURRENT_POS );
+	str->Seek( 50, GEM_CURRENT_POS );
+	str->Read( &tmpByte, 1);
+	act->BaseStats[IE_CR]=tmpByte;
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_HATEDRACE]=tmpByte;
 	//we got 7 more hated races
@@ -1793,11 +1795,11 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 	if (actor->version == IE_CRE_V2_2) {
 		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_SAVEFORTITUDE];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_SAVEREFLEX];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_SAVEWILL];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 	} else {
 		if (actor->version!=IE_CRE_GEMRB) {
 			if (tmpByte&1) tmpByte = tmpByte/2+6;
@@ -1805,96 +1807,96 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 		}
 		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_SAVEVSDEATH];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_SAVEVSWANDS];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_SAVEVSPOLY];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_SAVEVSBREATH];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_SAVEVSSPELL];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 	}
 	tmpByte = actor->BaseStats[IE_RESISTFIRE];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_RESISTCOLD];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_RESISTELECTRICITY];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_RESISTACID];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_RESISTMAGIC];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_RESISTMAGICFIRE];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_RESISTMAGICCOLD];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_RESISTSLASHING];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_RESISTCRUSHING];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_RESISTPIERCING];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_RESISTMISSILE];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	if (actor->version == IE_CRE_V2_2) {
 		tmpByte = actor->BaseStats[IE_MAGICDAMAGERESISTANCE];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		stream->Write( Signature, 4);
 	} else {
 		tmpByte = actor->BaseStats[IE_DETECTILLUSIONS];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_SETTRAPS];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_LORE];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_LOCKPICKING];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_STEALTH];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_TRAPS];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_PICKPOCKET];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 	}
 	tmpByte = actor->BaseStats[IE_FATIGUE];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_INTOXICATION];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_LUCK];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 
 	if (actor->version == IE_CRE_V2_2) {
 		//this is rather fuzzy
 		//turnundead level, + 33 bytes of zero
 		tmpByte = actor->BaseStats[IE_TURNUNDEADLEVEL];
-		stream->Write(&tmpByte,1);
+		stream->Write(&tmpByte, 1);
 		stream->Write( filling,33);
 		//total levels
 		tmpByte = actor->BaseStats[IE_CLASSLEVELSUM];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_LEVELBARBARIAN];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_LEVELBARD];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_LEVELCLERIC];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_LEVELDRUID];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_LEVELFIGHTER];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_LEVELMONK];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_LEVELPALADIN];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_LEVELRANGER];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_LEVELTHIEF];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_LEVELSORCEROR];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_LEVELMAGE];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		//some stuffing
 		stream->Write( filling, 22);
 		//string references
@@ -1913,87 +1915,89 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 		//proficiencies
 		for (i=0;i<26;i++) {
 			tmpByte = actor->BaseStats[IE_PROFICIENCYBASTARDSWORD+i];
-			stream->Write( &tmpByte,1);
+			stream->Write( &tmpByte, 1);
 		}
 		stream->Write( filling, 38);
 		//alchemy
 		tmpByte = actor->BaseStats[IE_ALCHEMY];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		//animals
 		tmpByte = actor->BaseStats[IE_ANIMALS];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		//bluff
 		tmpByte = actor->BaseStats[IE_BLUFF];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		//concentration
 		tmpByte = actor->BaseStats[IE_CONCENTRATION];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		//diplomacy
 		tmpByte = actor->BaseStats[IE_DIPLOMACY];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		//disarm trap
 		tmpByte = actor->BaseStats[IE_TRAPS];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		//hide
 		tmpByte = actor->BaseStats[IE_HIDEINSHADOWS];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		//intimidate
 		tmpByte = actor->BaseStats[IE_INTIMIDATE];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		//lore
 		tmpByte = actor->BaseStats[IE_LORE];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		//move silently
 		tmpByte = actor->BaseStats[IE_STEALTH];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		//open lock
 		tmpByte = actor->BaseStats[IE_LOCKPICKING];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		//pickpocket
 		tmpByte = actor->BaseStats[IE_PICKPOCKET];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		//search
 		tmpByte = actor->BaseStats[IE_SEARCH];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		//spellcraft
 		tmpByte = actor->BaseStats[IE_SPELLCRAFT];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		//use magic device
 		tmpByte = actor->BaseStats[IE_MAGICDEVICE];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		//tracking
 		tmpByte = actor->BaseStats[IE_TRACKING];
-		stream->Write( &tmpByte,1);
-		stream->Write( filling, 51);
+		stream->Write( &tmpByte, 1);
+		stream->Write( filling, 50);
+		tmpByte = actor->BaseStats[IE_CR];
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_HATEDRACE];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		for (i=0;i<7;i++) {
 			tmpByte = actor->BaseStats[IE_HATEDRACE2+i];
-			stream->Write( &tmpByte,1);
+			stream->Write( &tmpByte, 1);
 		}
 		tmpByte = actor->BaseStats[IE_SUBRACE];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		stream->Write( filling, 1); //unknown
 		tmpByte = actor->BaseStats[IE_SEX]; //
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_STR];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_INT];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_WIS];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_DEX];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_CON];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_CHR];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_MORALE];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_MORALEBREAK];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_MORALERECOVERYTIME];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		// unknown byte
 		stream->Write( &filling,1);
 		stream->WriteDword( &actor->BaseStats[IE_KIT] );
@@ -2005,44 +2009,44 @@ int CREImp::PutHeader(DataStream *stream, Actor *actor)
 	} else {
 		for (i=0;i<21;i++) {
 			tmpByte = actor->BaseStats[IE_PROFICIENCYBASTARDSWORD+i];
-			stream->Write( &tmpByte,1);
+			stream->Write( &tmpByte, 1);
 		}
 		tmpByte = actor->BaseStats[IE_TRACKING];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		stream->Write( filling, 32);
 		for (i=0;i<100;i++) {
 			stream->WriteDword( &actor->StrRefs[i]);
 		}
 		tmpByte = actor->BaseStats[IE_LEVEL];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_LEVEL2];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_LEVEL3];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_SEX]; //
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_STR];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_STREXTRA];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_INT];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_WIS];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_DEX];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_CON];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_CHR];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_MORALE];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_MORALEBREAK];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_HATEDRACE];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		tmpByte = actor->BaseStats[IE_MORALERECOVERYTIME];
-		stream->Write( &tmpByte,1);
+		stream->Write( &tmpByte, 1);
 		// unknown byte
 		stream->Write( &Signature,1);
 		stream->WriteDword( &actor->BaseStats[IE_KIT] );
@@ -2064,20 +2068,20 @@ int CREImp::PutActorGemRB(DataStream *stream, Actor *actor, ieDword InvSize)
 	memset(filling,0,sizeof(filling));
 	//similar in all engines
 	tmpByte = actor->BaseStats[IE_EA];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_GENERAL];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_RACE];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_CLASS];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_SPECIFIC];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_SEX];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	stream->Write( filling, 5); //unknown bytes
 	tmpByte = actor->BaseStats[IE_ALIGNMENT];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	stream->WriteDword( &InvSize ); //saving the inventory size to this unused part
 	stream->Write( actor->GetScriptName(), 32);
 	return 0;
@@ -2091,20 +2095,20 @@ int CREImp::PutActorBG(DataStream *stream, Actor *actor)
 	memset(filling,0,sizeof(filling));
 	//similar in all engines
 	tmpByte = actor->BaseStats[IE_EA];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_GENERAL];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_RACE];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_CLASS];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_SPECIFIC];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_SEX];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	stream->Write( filling, 5); //unknown bytes
 	tmpByte = actor->BaseStats[IE_ALIGNMENT];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	stream->Write( filling,4); //this is called ID in iwd2, and contains 2 words
 	stream->Write( actor->GetScriptName(), 32);
 	return 0;
@@ -2138,27 +2142,27 @@ int CREImp::PutActorPST(DataStream *stream, Actor *actor)
 	}
 	stream->Write(filling,31);
 	tmpByte = actor->BaseStats[IE_SPECIES];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_TEAM];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_FACTION];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	//similar in all engines
 	tmpByte = actor->BaseStats[IE_EA];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_GENERAL];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_RACE];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_CLASS];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_SPECIFIC];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_SEX];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	stream->Write( filling, 5); //unknown bytes
 	tmpByte = actor->BaseStats[IE_ALIGNMENT];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	stream->Write( filling,4); //this is called ID in iwd2, and contains 2 words
 	stream->Write( actor->GetScriptName(), 32);
 	return 0;
@@ -2189,20 +2193,20 @@ int CREImp::PutActorIWD1(DataStream *stream, Actor *actor)
 	stream->Write( filling, 18);
 	//similar in all engines
 	tmpByte = actor->BaseStats[IE_EA];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_GENERAL];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_RACE];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_CLASS];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_SPECIFIC];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_SEX];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	stream->Write( filling, 5); //unknown bytes
 	tmpByte = actor->BaseStats[IE_ALIGNMENT];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	stream->Write( filling,4); //this is called ID in iwd2, and contains 2 words
 	stream->Write( actor->GetScriptName(), 32);
 	return 0;
@@ -2233,20 +2237,20 @@ int CREImp::PutActorIWD2(DataStream *stream, Actor *actor)
 	stream->Write( filling, 146);
 	//similar in all engines
 	tmpByte = actor->BaseStats[IE_EA];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_GENERAL];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_RACE];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_CLASS];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_SPECIFIC];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	tmpByte = actor->BaseStats[IE_SEX];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	stream->Write( filling, 5); //unknown bytes
 	tmpByte = actor->BaseStats[IE_ALIGNMENT];
-	stream->Write( &tmpByte,1);
+	stream->Write( &tmpByte, 1);
 	stream->Write( filling,4); //this is called ID in iwd2, and contains 2 words
 	stream->Write( actor->GetScriptName(), 32);
 	//3 unknown words
@@ -2372,20 +2376,20 @@ int CREImp::PutEffects( DataStream *stream, Actor *actor)
 			tmpWord = (ieWord) fx->Opcode;
 			stream->WriteWord( &tmpWord);
 			tmpByte = (ieByte) fx->Target;
-			stream->Write(&tmpByte,1);
+			stream->Write(&tmpByte, 1);
 			tmpByte = (ieByte) fx->Power;
-			stream->Write(&tmpByte,1);
+			stream->Write(&tmpByte, 1);
 			stream->WriteDword( &fx->Parameter1);
 			stream->WriteDword( &fx->Parameter2);
 			tmpByte = (ieByte) fx->TimingMode;
-			stream->Write(&tmpByte,1);
+			stream->Write(&tmpByte, 1);
 			tmpByte = (ieByte) fx->Resistance;
-			stream->Write(&tmpByte,1);
+			stream->Write(&tmpByte, 1);
 			stream->WriteDword( &fx->Duration);
 			tmpByte = (ieByte) fx->Probability1;
-			stream->Write(&tmpByte,1);
+			stream->Write(&tmpByte, 1);
 			tmpByte = (ieByte) fx->Probability2;
-			stream->Write(&tmpByte,1);
+			stream->Write(&tmpByte, 1);
 			stream->Write(fx->Resource, 8);
 			stream->WriteDword( &fx->DiceThrown );
 			stream->WriteDword( &fx->DiceSides );
