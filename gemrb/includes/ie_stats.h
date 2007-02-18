@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.57 2007/01/30 17:05:25 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/ie_stats.h,v 1.58 2007/02/18 22:14:05 avenger_teambg Exp $
  *
  */
 
@@ -197,7 +197,8 @@
 #define IE_DEX		40
 #define IE_CON		41
 #define IE_CHR		42
-#define IE_XPVALUE		43
+#define IE_XPVALUE	43
+#define IE_CR           43      //for iwd2, not sure if this is a good idea yet
 #define IE_XP		44
 #define IE_GOLD		45
 #define IE_MORALEBREAK	46

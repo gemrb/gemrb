@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.98 2007/02/12 17:28:55 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.99 2007/02/18 22:14:05 avenger_teambg Exp $
  *
  */
 
@@ -123,6 +123,7 @@
 #define  GF_CHARNAMEISGABBER   		26 //iwd2
 #define  GF_MAGICBIT            	27 //iwd, iwd2
 #define  GF_CHECK_ABILITIES             28 //bg2 (others?)
+#define  GF_CHALLENGERATING             29 //iwd2
 
 /////AI global defines
 #define AI_UPDATE_TIME	10
