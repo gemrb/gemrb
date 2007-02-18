@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.260 2007/02/17 23:39:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.261 2007/02/18 14:50:23 avenger_teambg Exp $
  *
  */
 
@@ -3047,7 +3047,7 @@ static ieDword ResolveTableValue(const char *resref, ieDword stat, ieDword mcol,
 	//don't close this table, it can mess with the guiscripts
 	int table = core->LoadTable(resref);
 	TableMgr *tm = core->GetTable(table);
-	if (tm>=0) {
+	if (tm) {
 		unsigned int row;
 		if (mcol == 0xff) {
 			row = stat;
