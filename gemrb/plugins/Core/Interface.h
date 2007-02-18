@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.221 2007/02/10 14:29:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.h,v 1.222 2007/02/18 22:18:17 avenger_teambg Exp $
  *
  */
 
@@ -254,7 +254,8 @@ private:
 	DataFileMgr * INIquests;
 	Game * game;
 	WorldMapArray* worldmap;
-	int GameFeatures;
+	ieDword GameFeatures;   //the first 32 bits
+	ieDword GameFeatures2;  //the second 32 bits
 	ieResRef ButtonFont;
 	ieResRef CursorBam;
 	ieResRef GroundCircleBam[MAX_CIRCLE_SIZE];
@@ -309,8 +310,9 @@ public:
 	~Interface(void);
 	int Init(void);
 	//TODO: Core Methods in Interface Class
-	int SetFeature(int value, int position);
-	int HasFeature(int position) const;
+	void SetFeature(int value, int position);
+	/* don't rely on the exact return value of this function */
+	ieDword HasFeature(int position) const;
 	bool IsAvailable(SClass_ID filetype);
 	void * GetInterface(SClass_ID filetype);
 	std::vector<InterfaceElement>* GetInterfaceVector(SClass_ID filetype);

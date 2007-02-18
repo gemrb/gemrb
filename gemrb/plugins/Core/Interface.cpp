@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.465 2007/02/17 23:39:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.466 2007/02/18 22:18:17 avenger_teambg Exp $
  *
  */
 
@@ -1755,17 +1755,28 @@ Factory* Interface::GetFactory(void) const
 	return factory;
 }
 
-int Interface::SetFeature(int flag, int position)
+void Interface::SetFeature(int flag, int position)
 {
+	if (position>=32) {
+		position-=32;
+		if (flag) {
+			GameFeatures2 |= 1 << position;
+		} else {
+			GameFeatures2 &= ~( 1 << position );
+		}
+	}
 	if (flag) {
 		GameFeatures |= 1 << position;
 	} else {
 		GameFeatures &= ~( 1 << position );
 	}
-	return GameFeatures;
 }
-int Interface::HasFeature(int position) const
+
+ieDword Interface::HasFeature(int position) const
 {
+	if (position>=32) {
+		return GameFeatures2 & ( 1 << (position-32) );
+	}
 	return GameFeatures & ( 1 << position );
 }
 
@@ -2215,6 +2226,7 @@ bool Interface::LoadGemRBINI()
 	SetFeature( ini->GetKeyAsInt( "resources", "SaveForHalfDamage", 0 ), GF_SAVE_FOR_HALF );
 	SetFeature( ini->GetKeyAsInt( "resources", "MagicBit", 0 ), GF_MAGICBIT );
 	SetFeature( ini->GetKeyAsInt( "resources", "CheckAbilities", 0 ), GF_CHECK_ABILITIES );
+	SetFeature( ini->GetKeyAsInt( "resources", "ChallengeRating", 0 ), GF_CHALLENGERATING );
 	ForceStereo = ini->GetKeyAsInt( "resources", "ForceStereo", 0 );
 
 	FreeInterface( ini );
@@ -3796,7 +3808,7 @@ bool Interface::InitItemTypes()
 	}
 
 	//slottype describes the inventory structure
-	Inventory::Init(core->HasFeature(GF_MAGICBIT));
+	Inventory::Init(HasFeature(GF_MAGICBIT));
 	int SlotTypeTable = LoadTable( "slottype" );
 	TableMgr *st = GetTable(SlotTypeTable);
 	if (slottypes) {
@@ -4273,7 +4285,7 @@ void Interface::DragItem(CREItem *item, const ieResRef Picture)
 	DraggedItem = item;
 	video->FreeSprite (DraggedCursor);
 	if (item) {
-		DraggedCursor = core->GetBAMSprite( Picture, 0, 0 );
+		DraggedCursor = GetBAMSprite( Picture, 0, 0 );
 	}
 
 	video->SetDragCursor (DraggedCursor);
@@ -4821,9 +4833,7 @@ Sprite2D* Interface::GetBAMSprite(const ieResRef ResRef, int cycle, int frame)
 {
 	Sprite2D *tspr;
 	AnimationFactory* af = ( AnimationFactory* )
-		core->GetResourceMgr()->GetFactoryResource( ResRef,
-													IE_BAM_CLASS_ID,
-													IE_NORMAL );
+		key->GetFactoryResource( ResRef, IE_BAM_CLASS_ID, IE_NORMAL );
 	if (!af) return 0;
 	if (cycle == -1)
 		tspr = af->GetFrameWithoutCycle( (unsigned short) frame );
