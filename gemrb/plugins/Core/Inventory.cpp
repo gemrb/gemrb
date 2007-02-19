@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.112 2007/02/08 21:05:40 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.113 2007/02/19 20:37:39 avenger_teambg Exp $
  *
  */
 
@@ -1430,8 +1430,8 @@ inline bool Inventory::TwoHandedInSlot(int slot)
 {
 	CREItem *item;
 
-				item = GetSlotItem(slot);
-				if (!item) return false;
+	item = GetSlotItem(slot);
+	if (!item) return false;
 	if (item->Flags&IE_INV_ITEM_TWOHANDED) {
 		return true;
 	}

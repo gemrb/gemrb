@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.65 2007/02/11 21:27:18 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.66 2007/02/19 20:37:39 avenger_teambg Exp $
  *
  */
 
@@ -838,6 +838,32 @@ int GameScript::HasItemSlot(Scriptable* Sender, Trigger* parameters)
 	Actor *actor = (Actor *) scr;
 	//this might require a conversion of the slots
 	if (actor->inventory.HasItemInSlot(parameters->string0Parameter, parameters->int0Parameter) ) {
+		return 1;
+	}
+	return 0;
+}
+
+//this is a GemRB extension
+//HasItemTypeSlot(SLOT, ItemType)
+//returns true if the item in SLOT is of ItemType
+int GameScript::HasItemTypeSlot(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if ( !scr || scr->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Inventory *inv = &((Actor *) scr)->inventory;
+	if (parameters->int0Parameter>=inv->GetSlotCount()) {
+		return 0;
+	}
+	CREItem *slot = inv->GetSlotItem(parameters->int0Parameter);
+	if (!slot) {
+		return 0;
+	}
+	Item *itm = core->GetItem(slot->ItemResRef);
+	int itemtype = itm->ItemType;
+	core->FreeItem(itm, slot->ItemResRef, 0);
+	if (itemtype==parameters->int1Parameter) {
 		return 1;
 	}
 	return 0;

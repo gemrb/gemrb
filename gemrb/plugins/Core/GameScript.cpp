@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.399 2007/02/18 22:43:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.400 2007/02/19 20:37:38 avenger_teambg Exp $
  *
  */
 
@@ -147,8 +147,9 @@ static TriggerLink triggernames[] = {
 	{"hasitemequipedreal", GameScript::HasItemEquipped, 0}, //not sure
 	{"hasitemequipped", GameScript::HasItemEquipped, 0},
 	{"hasitemequippedreal", GameScript::HasItemEquipped, 0}, //not sure
-	{"hasitemslot", GameScript::HasItemSlot, 0},
 	{"hasiteminslot", GameScript::HasItemSlot, 0},
+	{"hasitemslot", GameScript::HasItemSlot, 0},
+	{"hasitemtypeslot", GameScript::HasItemTypeSlot, 0},//gemrb extension
 	{"hasweaponequiped", GameScript::HasWeaponEquipped, 0},//a typo again
 	{"hasweaponequipped", GameScript::HasWeaponEquipped, 0},
 	{"haveanyspells", GameScript::HaveAnySpells, 0},
