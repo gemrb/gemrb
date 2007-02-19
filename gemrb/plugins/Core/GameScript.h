@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.273 2007/02/19 20:37:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.274 2007/02/19 22:47:53 avenger_teambg Exp $
  *
  */
 
@@ -1244,6 +1244,7 @@ public:
 	static void SetCreatureAreaFlags(Scriptable* Sender, Action* parameters);
 	static void SetDialogue(Scriptable* Sender, Action* parameters);
 	static void SetDialogueRange(Scriptable* Sender, Action* parameters);
+	static void SetDoorFlag(Scriptable* Sender, Action* parameters);
 	static void SetDoorLocked(Scriptable* Sender, Action* parameters);
 	static void SetEncounterProbability(Scriptable* Sender, Action* parameters);
 	static void SetExtendedNight(Scriptable* Sender, Action* parameters);
@@ -1256,6 +1257,7 @@ public:
 	static void SetGlobalTimerRandom(Scriptable* Sender, Action* parameters);
 	static void SetGlobalTint(Scriptable* Sender, Action* parameters);
 	static void SetHP(Scriptable* Sender, Action* parameters);
+	static void SetHPPercent(Scriptable* Sender, Action* parameters);
 	static void SetInternal(Scriptable* Sender, Action* parameters);
 	static void SetInterrupt(Scriptable* Sender, Action* parameters);
 	static void SetLeavePartyDialogFile(Scriptable* Sender, Action* parameters);

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.400 2007/02/19 20:37:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.401 2007/02/19 22:47:52 avenger_teambg Exp $
  *
  */
 
@@ -706,11 +706,12 @@ static ActionLink actionnames[] = {
 	{"setbestweapon", GameScript::SetBestWeapon, 0},
 	{"setcorpseenabled", GameScript::AmbientActivate, 0},//another weird name
 	{"setcreatureareaflags", GameScript::SetCreatureAreaFlags, 0},
-	{"setdialog", GameScript::SetDialogue,AF_BLOCKING},
+	{"setdialog", GameScript::SetDialogue,0},
 	{"setdialogrange", GameScript::SetDialogueRange, 0},
-	{"setdialogue", GameScript::SetDialogue,AF_BLOCKING},
+	{"setdialogue", GameScript::SetDialogue,0},
 	{"setdialoguerange", GameScript::SetDialogueRange, 0},
-	{"setdoorlocked", GameScript::SetDoorLocked,AF_BLOCKING},
+	{"setdoorflag", GameScript::SetDoorFlag,0},
+	{"setdoorlocked", GameScript::SetDoorLocked,0},
 	{"setencounterprobability", GameScript::SetEncounterProbability,0},
 	{"setextendednight", GameScript::SetExtendedNight, 0},
 	{"setfaction", GameScript::SetFaction, 0},
@@ -723,6 +724,7 @@ static ActionLink actionnames[] = {
 	{"setglobaltint", GameScript::SetGlobalTint, 0},
 	{"sethomelocation", GameScript::SetSavedLocation, 0}, //bg2
 	{"sethp", GameScript::SetHP, 0},
+	{"sethppercent", GameScript::SetHPPercent, 0},
 	{"setinternal", GameScript::SetInternal, 0},
 	{"setinterrupt", GameScript::SetInterrupt, 0},
 	{"setleavepartydialogfile", GameScript::SetLeavePartyDialogFile, 0},

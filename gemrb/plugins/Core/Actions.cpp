@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.114 2007/02/18 22:43:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.115 2007/02/19 22:47:52 avenger_teambg Exp $
  *
  */
 
@@ -376,6 +376,19 @@ void GameScript::SetHP(Scriptable* Sender, Action* parameters)
 	actor->SetBase( IE_HITPOINTS, parameters->int0Parameter );
 }
 
+void GameScript::SetHPPercent(Scriptable* Sender, Action* parameters)
+{
+	Scriptable *scr = Sender;
+	if (parameters->objects[1]) {
+		scr=GetActorFromObject( Sender, parameters->objects[1] );
+	}
+	if (!scr || scr->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) scr;
+	actor->NewBase( IE_HITPOINTS, parameters->int0Parameter, MOD_PERCENT);
+}
+
 void GameScript::AddHP(Scriptable* Sender, Action* parameters)
 {
 	Scriptable *scr = Sender;
@@ -386,7 +399,7 @@ void GameScript::AddHP(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) scr;
-	actor->SetBase(IE_HITPOINTS, actor->GetBase(IE_HITPOINTS)+parameters->int0Parameter);
+	actor->NewBase(IE_HITPOINTS, parameters->int0Parameter, MOD_ADDITIVE);
 }
 
 //this works on an object (pst)
@@ -1765,11 +1778,9 @@ void GameScript::Unlock(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
-		Sender->ReleaseCurrentAction();
 		return;
 	}
 	if (tar->Type != ST_DOOR) {
-		Sender->ReleaseCurrentAction();
 		return;
 	}
 	Door* door = ( Door* ) tar;
@@ -1780,15 +1791,42 @@ void GameScript::SetDoorLocked(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
-		Sender->ReleaseCurrentAction();
 		return;
 	}
 	if (tar->Type != ST_DOOR) {
-		Sender->ReleaseCurrentAction();
 		return;
 	}
 	Door* door = ( Door* ) tar;
 	door->SetDoorLocked( parameters->int0Parameter!=0, false);
+}
+
+void GameScript::SetDoorFlag(Scriptable* Sender, Action* parameters)
+{
+        Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+        if (!tar) {
+                return;
+        }
+        if (tar->Type != ST_DOOR) {
+                return;
+        }
+        Door* door = ( Door* ) tar;
+	ieDword flag = parameters->int0Parameter;
+
+	//these are special flags
+	if (flag&DOOR_LOCKED) {
+		flag&=~DOOR_LOCKED;
+		door->SetDoorLocked(parameters->int1Parameter!=0, false);
+	}
+	if (flag&DOOR_OPEN) {
+		flag&=~DOOR_OPEN;
+		door->SetDoorOpen(parameters->int1Parameter!=0, false, 0);
+	}
+
+	if (parameters->int1Parameter) {
+	        door->Flags|=flag;
+	} else {
+	        door->Flags&=~flag;
+	}
 }
 
 void GameScript::PickLock(Scriptable* Sender, Action* parameters)
