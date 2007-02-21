@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.403 2007/02/21 20:47:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.404 2007/02/21 21:05:52 avenger_teambg Exp $
  *
  */
 
@@ -338,8 +338,11 @@ static TriggerLink triggernames[] = {
 	{"totalitemcntexclude", GameScript::TotalItemCntExclude, 0}, //iwd2
 	{"totalitemcntexcludegt", GameScript::TotalItemCntExcludeGT, 0}, //iwd2
 	{"totalitemcntexcludelt", GameScript::TotalItemCntExcludeLT, 0}, //iwd2
+	{"totalitemcntgt", GameScript::TotalItemCntGT, 0}, //iwd2
+	{"totalitemcntlt", GameScript::TotalItemCntLT, 0}, //iwd2
 	{"traptriggered", GameScript::TrapTriggered, 0},
 	{"triggerclick", GameScript::Clicked, 0}, //not sure
+	{"triggersetglobal", GameScript::TriggerSetGlobal,0}, //iwd2, but never used
 	{"true", GameScript::True, 0},
 	{"unlocked", GameScript::Unlocked, 0},
 	{"unselectablevariable", GameScript::UnselectableVariable, 0},

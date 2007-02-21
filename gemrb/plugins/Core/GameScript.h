@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.276 2007/02/21 20:47:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.277 2007/02/21 21:05:52 avenger_teambg Exp $
  *
  */
 
@@ -924,6 +924,7 @@ public: //Script Functions
 	static int TotalItemCntGT(Scriptable* Sender, Trigger* parameters);
 	static int TotalItemCntLT(Scriptable* Sender, Trigger* parameters);
 	static int TrapTriggered(Scriptable* Sender, Trigger* parameters);
+	static int TriggerSetGlobal(Scriptable* Sender, Trigger* parameters);
 	static int True(Scriptable* Sender, Trigger* parameters);
 	static int Unlocked(Scriptable* Sender, Trigger* parameters);
 	static int UnselectableVariable(Scriptable* Sender, Trigger* parameters);

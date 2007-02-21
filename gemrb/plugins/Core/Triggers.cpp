@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.68 2007/02/21 20:47:20 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.69 2007/02/21 21:05:52 avenger_teambg Exp $
  *
  */
 
@@ -447,6 +447,14 @@ int GameScript::GlobalBitGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 	ieDword value2 = CheckVariable(Sender, parameters->string1Parameter );
 	HandleBitMod( value1, value2, parameters->int1Parameter);
 	return value1!=0;
+}
+
+//no what exactly this trigger would do, defined in iwd2, but never used
+//i just assume it sets a global in the trigger block
+int GameScript::TriggerSetGlobal(Scriptable* Sender, Trigger* parameters)
+{
+        SetVariable( Sender, parameters->string0Parameter, parameters->int0Parameter );
+	return 1;
 }
 
 //would this function also alter the variable?
