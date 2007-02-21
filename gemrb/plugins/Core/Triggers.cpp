@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.67 2007/02/21 20:34:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.68 2007/02/21 20:47:20 avenger_teambg Exp $
  *
  */
 
@@ -725,6 +725,17 @@ int GameScript::TotalItemCnt(Scriptable* Sender, Trigger* parameters)
 	return cnt==parameters->int0Parameter;
 }
 
+int GameScript::TotalItemCntExclude(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if ( !tar || tar->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+	int cnt = actor->inventory.CountItems("",1)-actor->inventory.CountItems(parameters->string0Parameter,1); //shall we count heaps or not?
+	return cnt==parameters->int0Parameter;
+}
+
 int GameScript::NumItemsGT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
@@ -747,6 +758,17 @@ int GameScript::TotalItemCntGT(Scriptable* Sender, Trigger* parameters)
 	return cnt>parameters->int0Parameter;
 }
 
+int GameScript::TotalItemCntExcludeGT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if ( !tar || tar->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+	int cnt = actor->inventory.CountItems("",1)-actor->inventory.CountItems(parameters->string0Parameter,1); //shall we count heaps or not?
+	return cnt>parameters->int0Parameter;
+}
+
 int GameScript::NumItemsLT(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
@@ -766,6 +788,17 @@ int GameScript::TotalItemCntLT(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor *actor = (Actor *) tar;
 	int cnt = actor->inventory.CountItems("",1); //shall we count heaps or not?
+	return cnt<parameters->int0Parameter;
+}
+
+int GameScript::TotalItemCntExcludeLT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if ( !tar || tar->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) tar;
+	int cnt = actor->inventory.CountItems("",1)-actor->inventory.CountItems(parameters->string0Parameter,1); //shall we count heaps or not?
 	return cnt<parameters->int0Parameter;
 }
 

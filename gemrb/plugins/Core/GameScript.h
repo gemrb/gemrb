@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.275 2007/02/21 20:34:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.276 2007/02/21 20:47:20 avenger_teambg Exp $
  *
  */
 
@@ -918,6 +918,9 @@ public: //Script Functions
 	static int TimerExpired(Scriptable* Sender, Trigger* parameters);
 	static int TookDamage(Scriptable* Sender, Trigger* parameters);
 	static int TotalItemCnt(Scriptable* Sender, Trigger* parameters);
+	static int TotalItemCntExclude(Scriptable* Sender, Trigger* parameters);
+	static int TotalItemCntExcludeGT(Scriptable* Sender, Trigger* parameters);
+	static int TotalItemCntExcludeLT(Scriptable* Sender, Trigger* parameters);
 	static int TotalItemCntGT(Scriptable* Sender, Trigger* parameters);
 	static int TotalItemCntLT(Scriptable* Sender, Trigger* parameters);
 	static int TrapTriggered(Scriptable* Sender, Trigger* parameters);

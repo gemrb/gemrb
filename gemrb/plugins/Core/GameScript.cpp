@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.402 2007/02/21 20:34:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.403 2007/02/21 20:47:20 avenger_teambg Exp $
  *
  */
 
@@ -334,9 +334,10 @@ static TriggerLink triggernames[] = {
 	{"timeractive", GameScript::TimerActive, 0},
 	{"timerexpired", GameScript::TimerExpired, 0},
 	{"tookdamage", GameScript::TookDamage, 0},
-	{"totalitem", GameScript::TotalItemCnt, 0},
-	{"totalitemgt", GameScript::TotalItemCntGT, 0},
-	{"totalitemlt", GameScript::TotalItemCntLT, 0},
+	{"totalitemcnt", GameScript::TotalItemCnt, 0}, //iwd2
+	{"totalitemcntexclude", GameScript::TotalItemCntExclude, 0}, //iwd2
+	{"totalitemcntexcludegt", GameScript::TotalItemCntExcludeGT, 0}, //iwd2
+	{"totalitemcntexcludelt", GameScript::TotalItemCntExcludeLT, 0}, //iwd2
 	{"traptriggered", GameScript::TrapTriggered, 0},
 	{"triggerclick", GameScript::Clicked, 0}, //not sure
 	{"true", GameScript::True, 0},
