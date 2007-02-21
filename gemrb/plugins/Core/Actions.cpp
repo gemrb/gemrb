@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.115 2007/02/19 22:47:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.116 2007/02/21 20:34:39 avenger_teambg Exp $
  *
  */
 
@@ -1152,6 +1152,22 @@ void GameScript::RunAwayFrom(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+	//TODO: actor could use travel areas
+	actor->RunAwayFrom( tar->Pos, parameters->int0Parameter, false);
+}
+
+void GameScript::RunAwayFromNoLeaveArea(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
 	actor->RunAwayFrom( tar->Pos, parameters->int0Parameter, false);
 }
 
@@ -1802,14 +1818,14 @@ void GameScript::SetDoorLocked(Scriptable* Sender, Action* parameters)
 
 void GameScript::SetDoorFlag(Scriptable* Sender, Action* parameters)
 {
-        Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-        if (!tar) {
-                return;
-        }
-        if (tar->Type != ST_DOOR) {
-                return;
-        }
-        Door* door = ( Door* ) tar;
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		return;
+	}
+	if (tar->Type != ST_DOOR) {
+		return;
+	}
+	Door* door = ( Door* ) tar;
 	ieDword flag = parameters->int0Parameter;
 
 	//these are special flags
@@ -1823,9 +1839,9 @@ void GameScript::SetDoorFlag(Scriptable* Sender, Action* parameters)
 	}
 
 	if (parameters->int1Parameter) {
-	        door->Flags|=flag;
+		door->Flags|=flag;
 	} else {
-	        door->Flags&=~flag;
+		door->Flags&=~flag;
 	}
 }
 
@@ -4028,11 +4044,6 @@ void GameScript::RemoveSpell( Scriptable* Sender, Action* parameters)
 		return;
 	}
 	actor->spellbook.HaveSpell(parameters->int0Parameter, HS_DEPLETE);
-/*
-	ieResRef tmpname;
-	CreateSpellName(tmpname, parameters->int0Parameter);
-	actor->spellbook.HaveSpell(tmpname, HS_DEPLETE);
-*/
 }
 
 void GameScript::SetScriptName( Scriptable* Sender, Action* parameters)
@@ -4121,6 +4132,17 @@ void GameScript::ClearPartyEffects(Scriptable* /*Sender*/, Action* /*parameters*
 		Actor *tar = game->GetPC(i, false);
 		tar->fxqueue.RemoveExpiredEffects(0xffffffff);
 	}
+}
+
+//iwd2 removes effects from a single sprite
+void GameScript::ClearSpriteEffects(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor *actor = (Actor *) tar;
+	actor->fxqueue.RemoveExpiredEffects(0xffffffff);
 }
 
 //IWD2 special, can mark only actors, hope it is enough
@@ -4834,6 +4856,16 @@ void GameScript::EquipRanged(Scriptable* Sender, Action* /*parameters*/)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	actor->inventory.EquipBestWeapon(EQUIP_RANGED);
+}
+
+//will equip best weapon regardless of range considerations
+void GameScript::EquipWeapon(Scriptable* Sender, Action* /*parameters*/)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	actor->inventory.EquipBestWeapon(EQUIP_MELEE|EQUIP_RANGED);
 }
 
 void GameScript::SetBestWeapon(Scriptable* Sender, Action* parameters)

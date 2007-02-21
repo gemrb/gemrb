@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.66 2007/02/19 20:37:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.67 2007/02/21 20:34:39 avenger_teambg Exp $
  *
  */
 
@@ -1371,25 +1371,25 @@ int GameScript::PickLockFailed(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::OpenFailed(Scriptable* Sender, Trigger* parameters)
 {
-        switch(Sender->Type) {
+	switch(Sender->Type) {
 		case ST_DOOR: case ST_CONTAINER:
-                        break;
-                default:
-                        return 0;
-        }
-        if (parameters->objectParameter == NULL) {
-                if (Sender->LastOpenFailed) {
-                        Sender->AddTrigger (&Sender->LastOpenFailed);
-                        return 1;
-                }
-                return 0;
-        }
-        if (MatchActor(Sender, Sender->LastOpenFailed, parameters->objectParameter
+			break;
+		default:
+			return 0;
+	}
+	if (parameters->objectParameter == NULL) {
+		if (Sender->LastOpenFailed) {
+			Sender->AddTrigger (&Sender->LastOpenFailed);
+			return 1;
+		}
+		return 0;
+	}
+	if (MatchActor(Sender, Sender->LastOpenFailed, parameters->objectParameter
 )) {
-                Sender->AddTrigger (&Sender->LastOpenFailed);
-                return 1;
-        }
-        return 0;
+		Sender->AddTrigger (&Sender->LastOpenFailed);
+		return 1;
+	}
+	return 0;
 }
 
 int GameScript::DisarmFailed(Scriptable* Sender, Trigger* parameters)
@@ -3231,31 +3231,40 @@ int GameScript::InWeaponRange(Scriptable* Sender, Trigger* parameters)
 //but there is no ammo for it
 //if the implementation should sign 'no ranged attack possible'
 //then change some return values
-int GameScript::OutOfAmmo(Scriptable* Sender, Trigger* /*parameters*/)
+//in bg2/iwd2 it doesn't accept an object (the object parameter is gemrb ext.)
+int GameScript::OutOfAmmo(Scriptable* Sender, Trigger* parameters)
 {
-	if (Sender->Type!=ST_ACTOR) {
+	Scriptable* scr = Sender;
+	if (parameters->objectParameter) {
+		scr = GetActorFromObject( Sender, parameters->objectParameter );
+	}
+	if ( !scr || scr->Type!=ST_ACTOR) {
 		return 0;
 	}
-	Actor *actor = (Actor *) Sender;
+	Actor *actor = (Actor *) scr;
 	ITMExtHeader *header;
 	unsigned int weapon = actor->GetWeapon(header);
 	//no weapon wielded?
 	if (weapon==0) {
 		return 0;
 	}
-	//if not bow wielded, then we either have projectile
-	//or wielding something else
-	if (header->AttackType!=ITEM_AT_BOW) {
+	//if not bow is wielded, then we either have projectile
+	//or wielding something else (which has no ammo)
+	if (!header || header->AttackType!=ITEM_AT_BOW) {
 		return 0;
 	}
-	//bow has no ammo, if it has ammo, the ammo would be wielded!
+	//we either have a projectile (negative) or an empty bow (positive)
+	//so we should find a negative slot, positive slot means: OutOfAmmo
+	if (actor->inventory.GetEquipped()<0) {
+		return 0;
+	}
+	//out of ammo
 	return 1;
 }
 
 //returns true if a weapon is equipped (with more than 0 range)
 //if a bow is equipped without projectile, it is useless!
-//please notice how similar is this to OutOfAmmo, no wonder, iwd2 has this
-//instead of OutOfAmmo
+//please notice how similar is this to OutOfAmmo
 int GameScript::HaveUsableWeaponEquipped(Scriptable* Sender, Trigger* /*parameters*/)
 {
 	if (Sender->Type!=ST_ACTOR) {
@@ -3270,11 +3279,11 @@ int GameScript::HaveUsableWeaponEquipped(Scriptable* Sender, Trigger* /*paramete
 	}
 	//bows are not usable (because if they are loaded, the equipped
 	//weapon is the projectile)
-	if (header->AttackType==ITEM_AT_BOW) {
+	if (!header || header->AttackType==ITEM_AT_BOW) {
 		return 0;
 	}
 	//only fist we have, it is not qualified as weapon?
-	if (actor->inventory.GetEquippedSlot() == IW_NO_EQUIPPED) {
+	if (actor->inventory.GetEquippedSlot() == actor->inventory.GetFistSlot()) {
 		return 0;
 	}
 	return 1;

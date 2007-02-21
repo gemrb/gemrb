@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.274 2007/02/19 22:47:53 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.275 2007/02/21 20:34:39 avenger_teambg Exp $
  *
  */
 
@@ -993,6 +993,7 @@ public:
 	static void ClearActions(Scriptable* Sender, Action* parameters);
 	static void ClearAllActions(Scriptable* Sender, Action* parameters);
 	static void ClearPartyEffects(Scriptable* Sender, Action* parameters);
+	static void ClearSpriteEffects(Scriptable* Sender, Action* parameters);
 	static void CloseDoor(Scriptable* Sender, Action* parameters);
 	static void ContainerEnable(Scriptable* Sender, Action* parameters);
 	static void Continue(Scriptable* Sender, Action* parameters);
@@ -1058,6 +1059,7 @@ public:
 	static void EquipItem(Scriptable *Sender, Action *parameters);
 	static void EquipMostDamagingMelee(Scriptable *Sender, Action *parameters);
 	static void EquipRanged(Scriptable *Sender, Action *parameters);
+	static void EquipWeapon(Scriptable *Sender, Action *parameters);
 	static void ExpansionEndCredits(Scriptable* Sender, Action* parameters);
 	static void Explore(Scriptable *Sender, Action *parameters);
 	static void ExploreMapChunk(Scriptable *Sender, Action *parameters);
@@ -1222,6 +1224,7 @@ public:
 	static void RevealAreaOnMap(Scriptable* Sender, Action* parameters);
 	static void RunAwayFrom(Scriptable* Sender, Action* parameters);
 	static void RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters);
+	static void RunAwayFromNoLeaveArea(Scriptable* Sender, Action* parameters);
 	static void RunFollow(Scriptable* Sender, Action* parameters);
 	static void RunningAttack(Scriptable* Sender, Action* parameters);
 	static void RunningAttackNoSound(Scriptable* Sender, Action* parameters);

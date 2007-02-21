@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.401 2007/02/19 22:47:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.402 2007/02/21 20:34:39 avenger_teambg Exp $
  *
  */
 
@@ -239,8 +239,8 @@ static TriggerLink triggernames[] = {
 	{"numcreaturegt", GameScript::NumCreaturesGT, 0},
 	{"numcreaturelt", GameScript::NumCreaturesLT, 0},
 	{"numcreaturesatmylevel", GameScript::NumCreaturesAtMyLevel, 0},
-	{"numcreaturegtmylevel", GameScript::NumCreaturesGTMyLevel, 0},
-	{"numcreatureltmylevel", GameScript::NumCreaturesLTMyLevel, 0},
+	{"numcreaturesgtmylevel", GameScript::NumCreaturesGTMyLevel, 0},
+	{"numcreaturesltmylevel", GameScript::NumCreaturesLTMyLevel, 0},
 	{"numcreaturevsparty", GameScript::NumCreatureVsParty, 0},
 	{"numcreaturevspartygt", GameScript::NumCreatureVsPartyGT, 0},
 	{"numcreaturevspartylt", GameScript::NumCreatureVsPartyLT, 0},
@@ -424,6 +424,8 @@ static ActionLink actionnames[] = {
 	{"chunkcreature", GameScript::Kill, 0}, //should be more graphical
 	{"clearactions", GameScript::ClearActions, 0},
 	{"clearallactions", GameScript::ClearAllActions, 0},
+	{"clearpartyeffects", GameScript::ClearPartyEffects, 0},
+	{"clearspriteeffects", GameScript::ClearSpriteEffects, 0},
 	{"closedoor", GameScript::CloseDoor,AF_BLOCKING},
 	{"containerenable", GameScript::ContainerEnable, 0},
 	{"continue", GameScript::Continue,AF_INSTANT | AF_CONTINUE},
@@ -494,6 +496,7 @@ static ActionLink actionnames[] = {
 	{"equipitem", GameScript::EquipItem, AF_BLOCKING}, //why blocking???
 	{"equipmostdamagingmelee",GameScript::EquipMostDamagingMelee,0},
 	{"equipranged", GameScript::EquipRanged,0},
+	{"equipweapon", GameScript::EquipWeapon,0},
 	{"erasejournalentry", GameScript::RemoveJournalEntry, 0},
 	{"escapearea", GameScript::EscapeArea, 0},
 	{"escapeareadestroy", GameScript::EscapeAreaDestroy, 0},
@@ -684,6 +687,7 @@ static ActionLink actionnames[] = {
 	{"revealareaonmap", GameScript::RevealAreaOnMap, 0},
 	{"runawayfrom", GameScript::RunAwayFrom,AF_BLOCKING},
 	{"runawayfromnointerrupt", GameScript::RunAwayFromNoInterrupt,AF_BLOCKING},
+	{"runawayfromnoleavearea", GameScript::RunAwayFromNoLeaveArea,AF_BLOCKING},
 	{"runawayfrompoint", GameScript::RunAwayFromPoint,AF_BLOCKING},
 	{"runfollow", GameScript::RunAwayFrom,AF_BLOCKING},
 	{"runningattack", GameScript::RunningAttack,AF_BLOCKING},
