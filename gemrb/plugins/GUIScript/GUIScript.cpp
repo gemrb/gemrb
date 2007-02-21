@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.467 2007/02/17 23:39:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.468 2007/02/21 22:53:38 avenger_teambg Exp $
  *
  */
 
@@ -3028,11 +3028,15 @@ static PyObject* GemRB_SetVar(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_GetMessageWindowSize__doc,
 "GetMessageWindowSize(Value)\n\n"
-"Return current MessageWindowSize." );
+"Returns current MessageWindowSize, it works only when a game is loaded." );
 
 static PyObject* GemRB_GetMessageWindowSize(PyObject * /*self*/, PyObject* /*args*/)
 {
-	return PyInt_FromLong( core->MessageWindowSize );
+	Game *game = core->GetGame();
+	if (!game) {
+		return NULL;
+	}
+	return PyInt_FromLong( game->ControlStatus );
 }
 
 PyDoc_STRVAR( GemRB_GetToken__doc,

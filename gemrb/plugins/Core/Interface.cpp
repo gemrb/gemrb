@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.466 2007/02/18 22:18:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.467 2007/02/21 22:53:37 avenger_teambg Exp $
  *
  */
 
@@ -152,7 +152,6 @@ Interface::Interface(int iargc, char** iargv)
 	FogOfWar = 1;
 	QuitFlag = QF_NORMAL;
 	EventFlag = EF_CONTROL;
-	MessageWindowSize = -1;
 #ifndef WIN32
 	CaseSensitive = true; //this is the default value, so CD1/CD2 will be resolved
 #else
@@ -539,17 +538,12 @@ void Interface::HandleEvents()
 
 	if (EventFlag&EF_CONTROL) {
 		EventFlag&=~EF_CONTROL;
-		//if (MessageWindowSize!=game->ControlStatus) {
-			MessageWindowSize = game->ControlStatus;
-			guiscript->RunFunction( "UpdateControlStatus" );
-			//giving control back to GameControl
-			SetControlStatus(0,0,0x7f000000|IE_GUI_CONTROL_FOCUSED);
-			//this is the only value we can use here
-			if (game->ControlStatus & CS_HIDEGUI)
-				gc->HideGUI();
-			else
-				gc->UnhideGUI();
-		//}
+		guiscript->RunFunction( "UpdateControlStatus" );
+		//this is the only value we can use here
+		if (game->ControlStatus & CS_HIDEGUI)
+			gc->HideGUI();
+		else
+			gc->UnhideGUI();
 		return;
 	}
 	if (EventFlag&EF_SHOWMAP) {

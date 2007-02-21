@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.45 2007/01/30 22:45:46 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.46 2007/02/21 22:53:37 avenger_teambg Exp $
  *
  */
 
@@ -48,8 +48,10 @@ void EventMgr::AddWindow(Window* win)
 	for (i = 0; i < windows.size(); i++) {
 		if (windows[i] == win) {
 			SetOnTop( i );
+/*
 			lastW = win;
 			lastF = NULL;
+*/
 			last_ctrl_over = NULL;
 			return;
 		}
@@ -70,8 +72,10 @@ void EventMgr::AddWindow(Window* win)
 		else
 			SetOnTop( ( int ) windows.size() - 1 );
 	}
+/*
 	lastW = win;
 	lastF = NULL;
+*/
 	last_ctrl_over = NULL;
 }
 /** Frees and Removes all the Windows in the Array */
@@ -98,9 +102,9 @@ void EventMgr::DelWindow(Window *win)
 		if ( (*m)==win) {
 			if (lastW == ( *m )) {
 				lastW = NULL;
+				lastF = NULL;
 			}
 			( *m ) = NULL;
-			lastF = NULL;
 			last_ctrl_over = NULL;
 			std::vector< int>::iterator t;
 			for (t = topwin.begin(); t != topwin.end(); ++t) {
@@ -225,7 +229,6 @@ void EventMgr::MouseUp(unsigned short x, unsigned short y,
 /** BroadCast Mouse Idle Event */
 void EventMgr::MouseIdle(unsigned long /*time*/)
 {
-	//MButtons &= ~Button;
 	if (last_ctrl_over != NULL) {
 		last_ctrl_over->DisplayTooltip();
 	}
@@ -235,8 +238,12 @@ void EventMgr::MouseIdle(unsigned long /*time*/)
 void EventMgr::KeyPress(unsigned char Key, unsigned short Mod)
 {
 	if (lastF) {
+printf("Lastf %d\n", lastF->ControlID);
 		lastF->OnKeyPress( Key, Mod );
 	}
+else {
+printf("Lastf xxxxx\n");
+}
 }
 /** BroadCast Key Release Event */
 void EventMgr::KeyRelease(unsigned char Key, unsigned short Mod)
@@ -279,8 +286,9 @@ void EventMgr::OnSpecialKeyPress(unsigned char Key)
 void EventMgr::SetFocused(Window *win, Control *ctrl)
 {
 	lastW=win;
+	lastW->SetFocused(ctrl);
 	lastF=ctrl;
-	lastW->SetFocused(lastF);
+printf("SetFocus: %d/%d\n",(int) (lastW->WindowID), lastF->ControlID);
 	//this is to refresh changing mouse cursors should the focus change)
 	int x,y;
 	core->GetVideoDriver()->GetMousePos(x,y);

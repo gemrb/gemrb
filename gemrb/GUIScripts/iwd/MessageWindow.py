@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/MessageWindow.py,v 1.23 2006/12/03 17:16:56 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/MessageWindow.py,v 1.24 2007/02/21 22:53:39 avenger_teambg Exp $
 
 # MessageWindow.py - scripts and GUI for main (walk) window
 
@@ -142,6 +142,10 @@ def UpdateControlStatus():
 
 	GemRB.SetVar("MessageWindow", TMessageWindow)
 	GemRB.SetVar("MessageTextArea", TMessageTA)
+	if Override:
+		GemRB.SetControlStatus (MessageWindow,MessageTA,IE_GUI_CONTROL_FOCUSED)
+	else:
+		GemRB.SetControlStatus (0,0,IE_GUI_CONTROL_FOCUSED)
 
 	if hideflag:
 		GemRB.UnhideGUI()

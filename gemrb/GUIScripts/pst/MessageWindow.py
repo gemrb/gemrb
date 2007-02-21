@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.37 2006/12/03 17:16:57 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/MessageWindow.py,v 1.38 2007/02/21 22:53:39 avenger_teambg Exp $
 
 
 # MessageWindow.py - scripts and GUI for main (walk) window
@@ -71,7 +71,6 @@ def OnLoad():
 	GemRB.SetVar ("MessagePosition", 1) #Bottom
 	GemRB.SetVar ("OtherPosition", 0) #Left
 	
-	GemRB.SetVar ("MessageTextArea", MessageTA)
 	GemRB.GameSetScreenFlags (0, OP_SET)
 	
 	CloseButton= GemRB.GetControl (MessageWindow, 0)

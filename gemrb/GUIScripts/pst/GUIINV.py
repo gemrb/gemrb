@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.33 2007/02/16 23:28:33 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.34 2007/02/21 22:53:39 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -314,6 +314,7 @@ def OnDragItemGround ():
 		slot_item = GemRB.GetContainerItem (pc, slot)
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 1) #container
+		GemRB.PlaySound (item["DescIcon"])
 	else:
 		GemRB.DropDraggedItem (pc, -2) #dropping on ground
 
@@ -327,7 +328,8 @@ def OnAutoEquip ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	GemRB.DropDraggedItem (pc, -1)
-
+	#item = GemRB.GetItem (ResRef)
+	#GemRB.PlaySound (item["BrokenItem"])
 	UpdateInventoryWindow ()
 	return
 

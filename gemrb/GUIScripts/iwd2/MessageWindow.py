@@ -105,6 +105,7 @@ def UpdateControlStatus():
 	GemRB.SetVar ("MessageTextArea", TMessageTA)
 
 	if Override:
+		GemRB.SetControlStatus (MessageWindow,MessageTA,IE_GUI_CONTROL_FOCUSED)
 		#gets PC currently talking
 		pc = GemRB.GameGetSelectedPCSingle (1)
 		if pc:
@@ -117,6 +118,8 @@ def UpdateControlStatus():
 			GemRB.SetButtonFlags(TMessageWindow, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 		else:
 			GemRB.SetButtonPicture(TMessageWindow, Button, Portrait, "NOPORTSM")
+	else:
+		GemRB.SetControlStatus (0,0,IE_GUI_CONTROL_FOCUSED)
 		
 	if hideflag:
 		GemRB.UnhideGUI()

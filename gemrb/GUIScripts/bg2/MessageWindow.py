@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/MessageWindow.py,v 1.43 2006/12/03 17:16:56 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/MessageWindow.py,v 1.44 2007/02/21 22:53:38 avenger_teambg Exp $
 
 # MessageWindow.py - scripts and GUI for main (walk) window
 
@@ -131,7 +131,7 @@ def UpdateControlStatus():
 	#a dialogue is running, setting messagewindow size to maximum
 	if Override:
 		Expand = GS_LARGEDIALOG
-		
+	
 	MessageWindow = GemRB.GetVar("MessageWindow")
 
 	GemRB.LoadWindowPack(GetWindowPack())
@@ -165,6 +165,11 @@ def UpdateControlStatus():
 
 	GemRB.SetVar("MessageWindow", TMessageWindow)
 	GemRB.SetVar("MessageTextArea", TMessageTA)
+	if Override:
+		GemRB.SetControlStatus (MessageWindow,MessageTA,IE_GUI_CONTROL_FOCUSED)
+	else:
+		GemRB.SetControlStatus (0,0,IE_GUI_CONTROL_FOCUSED)
+
 	if GSFlags & GS_OPTIONPANE:
 		GemRB.SetVar("OptionsWindow", -1)
 	else:
