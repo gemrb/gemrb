@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.134 2007/02/18 22:43:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.135 2007/02/23 21:10:36 avenger_teambg Exp $
  *
  */
 
@@ -307,6 +307,20 @@ int Game::JoinParty(Actor* actor, int join)
 	actor->CreateStats(); //create stats if they didn't exist yet
 	actor->InitButtons(actor->GetStat(IE_CLASS)); //init actor's buttons
 	actor->SetBase(IE_EXPLORE, 1);
+	if (join&JP_INITPOS) {
+		// 0 - single player, 1 - tutorial, 2 - multiplayer
+		int saindex = core->LoadTable( "startpos" );
+		TableMgr* strta = core->GetTable( saindex );
+		ieDword playmode = 0;
+		if (Expansion) {
+			core->GetDictionary()->Lookup( "PlayMode", playmode );
+			playmode *= 2;
+		}
+		actor->Pos.x = actor->Destination.x = (short) atoi( strta->QueryField( playmode, actor->InParty-1 ) );
+		actor->Pos.y = actor->Destination.y = (short) atoi( strta->QueryField( playmode + 1, actor->InParty-1 ) );
+		core->DelTable( saindex );
+		SelectActor(actor,true, SELECT_QUIET);
+	}
 	int slot = InParty( actor );
 	if (slot != -1) {
 		return slot;
@@ -327,20 +341,6 @@ int Game::JoinParty(Actor* actor, int join)
 	PCs.push_back( actor );
 	if (!actor->InParty) {
 		actor->InParty = (ieByte) (size+1);
-	}
-	if (join&JP_INITPOS) {
-		// 0 - single player, 1 - tutorial, 2 - multiplayer
-		int saindex = core->LoadTable( "startpos" );
-		TableMgr* strta = core->GetTable( saindex );
-		ieDword playmode = 0;
-		if (Expansion) {
-			core->GetDictionary()->Lookup( "PlayMode", playmode );
-			playmode *= 2;
-		}
-		actor->Pos.x = actor->Destination.x = (short) atoi( strta->QueryField( playmode, actor->InParty-1 ) );
-		actor->Pos.y = actor->Destination.y = (short) atoi( strta->QueryField( playmode + 1, actor->InParty-1 ) );
-		core->DelTable( saindex );
-		SelectActor(actor,true, SELECT_QUIET);
 	}
 
 	return ( int ) size;
@@ -1009,12 +1009,18 @@ bool Game::AnyPCInCombat() const
 //returns true if the protagonist (or the whole party died)
 bool Game::EveryoneDead() const
 {
-	if (protagonist==PM_NO) {
-		return false;
-	}
 	//if there are no PCs, then we assume everyone dead
 	if (!PCs.size() ) {
 		return true;
+	}
+	if (protagonist==PM_NO) {
+		Actor *nameless = PCs[0];
+		if (nameless->GetStat(IE_STATE_ID)&STATE_NOSAVE) {
+			if (area->INISpawn) {
+				area->INISpawn->RespawnNameless();
+			}      
+		}
+		return false;
 	}
 	// if protagonist died
 	if (protagonist==PM_YES) {

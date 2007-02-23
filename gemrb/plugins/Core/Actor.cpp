@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.262 2007/02/18 22:43:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.263 2007/02/23 21:10:36 avenger_teambg Exp $
  *
  */
 
@@ -1195,6 +1195,16 @@ int Actor::NewBase(unsigned int StatIndex, ieDword ModifierValue, ieDword Modifi
 	return BaseStats[StatIndex] - oldmod;
 }
 
+inline int CountElements(const char *s, char separator)
+{
+	int ret = 1;
+	while(*s) {
+		if (*s==separator) ret++;
+		s++;
+	}
+	return ret;
+}
+
 void Actor::ReactToDeath(const char * deadname)
 {
 	int table = core->LoadTable( "death" );
@@ -1214,7 +1224,19 @@ void Actor::ReactToDeath(const char * deadname)
 		break;
 	default:
 		{
-			ieDword len = core->GetSoundMgr()->Play( value );
+			int count = CountElements(value,',');
+			if (count<=0) break;
+			count = core->Roll(1,count,-1);
+			ieResRef resref;
+			while(count--) {
+				while(*value && *value!=',') value++;
+				if (*value==',') value++;
+			}
+			strncpy(resref, value, 8);
+			for(count=0;count<8 && resref[count]!=',';count++);
+			resref[count]=0;
+
+			ieDword len = core->GetSoundMgr()->Play( resref );
 			ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
 			if (counter != 0)
 				SetWait( counter );
@@ -1359,11 +1381,6 @@ void Actor::DebugDump()
 			printf("   %d", Modified[IE_COLORS+i]);
 		}
 	}
-/* not too important right now
-	ieDword tmp=0;
-	core->GetGame()->locals->Lookup("APPEARANCE",tmp);
-	printf( "\nDisguise: %d\n", tmp);
-*/
 	printf ("\nAnimate ID: %x\n", Modified[IE_ANIMATION_ID]);
 	printf( "WaitCounter: %d\n", (int) GetWait());
 	printf( "LastTarget: %d %s\n", LastTarget, GetActorNameByID(LastTarget));
@@ -1449,6 +1466,7 @@ void Actor::Resurrect()
 	InternalFlags&=IF_FROMGAME; //keep these flags (what about IF_INITIALIZED)
 	InternalFlags|=IF_ACTIVE|IF_VISIBLE; //set these flags
 	SetBase(IE_STATE_ID, 0);
+	SetBase(IE_MORALE, 20);
 	SetBase(IE_HITPOINTS, BaseStats[IE_MAXHITPOINTS]);
 	ClearActions();
 	ClearPath();

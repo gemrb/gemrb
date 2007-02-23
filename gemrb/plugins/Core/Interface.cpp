@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.467 2007/02/21 22:53:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.468 2007/02/23 21:10:37 avenger_teambg Exp $
  *
  */
 
@@ -23,7 +23,9 @@
 #define INTERFACE
 #endif
 
-#include <config.h>
+#include "../../includes/win32def.h"
+#include "../../includes/globals.h"
+#include "../../includes/strrefs.h"
 
 #include <stdlib.h>
 #include <time.h>
@@ -79,9 +81,9 @@ GEM_EXPORT Interface* core;
 GEM_EXPORT HANDLE hConsole;
 #endif
 
-#include "../../includes/win32def.h"
-#include "../../includes/globals.h"
-#include "../../includes/strrefs.h"
+//#include "../../includes/win32def.h"
+//#include "../../includes/globals.h"
+//#include "../../includes/strrefs.h"
 
 //use DialogF.tlk if the protagonist is female, that's why we leave space
 static char dialogtlk[] = "dialog.tlk\0";

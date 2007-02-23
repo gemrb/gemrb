@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.69 2007/02/21 21:05:52 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.70 2007/02/23 21:10:37 avenger_teambg Exp $
  *
  */
 
@@ -453,7 +453,7 @@ int GameScript::GlobalBitGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 //i just assume it sets a global in the trigger block
 int GameScript::TriggerSetGlobal(Scriptable* Sender, Trigger* parameters)
 {
-        SetVariable( Sender, parameters->string0Parameter, parameters->int0Parameter );
+	SetVariable( Sender, parameters->string0Parameter, parameters->int0Parameter );
 	return 1;
 }
 

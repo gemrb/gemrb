@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.116 2007/02/21 20:34:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.117 2007/02/23 21:10:36 avenger_teambg Exp $
  *
  */
 
@@ -957,6 +957,19 @@ void GameScript::RunToPoint(Scriptable* Sender, Action* parameters)
 	}
 	Actor* actor = ( Actor* ) Sender;
 	actor->WalkTo( parameters->pointParameter, IF_RUNNING, 0 );
+	Sender->ReleaseCurrentAction();
+}
+
+//not sure if this works correctly, but sounds like the way
+void GameScript::TimedMoveToPoint(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	Actor *actor = ( Actor* ) Sender;
+	actor->WalkTo( parameters->pointParameter, 0, 0 );
+	actor->SetWait(parameters->int0Parameter * AI_UPDATE_TIME);
 	Sender->ReleaseCurrentAction();
 }
 

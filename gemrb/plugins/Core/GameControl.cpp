@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.307 2007/02/11 21:27:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.308 2007/02/23 21:10:37 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -1636,11 +1636,11 @@ void GameControl::DialogChoose(unsigned int choose)
 
 		if (tgt) {
 			if (DialogueFlags&DF_TALKCOUNT) {
-			  DialogueFlags&=~DF_TALKCOUNT; 
-			  tgt->TalkCount++;
+				DialogueFlags&=~DF_TALKCOUNT; 
+				tgt->TalkCount++;
 			} else if (DialogueFlags&DF_INTERACT) {
-			  DialogueFlags&=~DF_INTERACT;
-			  tgt->InteractCount++;
+				DialogueFlags&=~DF_INTERACT;
+				tgt->InteractCount++;
 			}
 		}
 		ds = dlg->GetState( si );
@@ -1675,7 +1675,8 @@ void GameControl::DialogChoose(unsigned int choose)
 		}
 
 		if (tr->textStrRef != 0xffffffff) {
-			core->DisplayStringName( tr->textStrRef, 0x8080FF, speaker, IE_STR_SOUND|IE_STR_SPEECH);
+			//allow_zero is for PST (deionarra's text)
+			core->DisplayStringName( tr->textStrRef, 0x8080FF, speaker, IE_STR_SOUND|IE_STR_SPEECH|IE_STR_ALLOW_ZERO);
 			if (core->HasFeature( GF_DIALOGUE_SCROLLS )) {
 				ta->AppendText( "", -1 );
 			}

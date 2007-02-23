@@ -8,14 +8,14 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/IniSpawn.cpp,v 1.4 2007/02/17 13:22:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/IniSpawn.cpp,v 1.5 2007/02/23 21:10:37 avenger_teambg Exp $
  *
  */
 
@@ -56,13 +56,13 @@ DataFileMgr *GetIniFile(ieResRef DefaultArea)
 {
 	DataStream* inifile = core->GetResourceMgr()->GetResource( DefaultArea, IE_INI_CLASS_ID );
 	if (!inifile) {
-			    printStatus( "NOT_FOUND", LIGHT_RED );
+		printStatus( "NOT_FOUND", LIGHT_RED );
 		return NULL;
 	}
 	if (!core->IsAvailable( IE_INI_CLASS_ID )) {
-			    printStatus( "ERROR", LIGHT_RED );
-			    printMessage( "IniSpawn","No INI Importer Available.\n",LIGHT_RED );
-			    return NULL;
+		printStatus( "ERROR", LIGHT_RED );
+		printMessage( "IniSpawn","No INI Importer Available.\n",LIGHT_RED );
+		return NULL;
 	}
 
 	DataFileMgr *ini = ( DataFileMgr* )core->GetInterface( IE_INI_CLASS_ID );
@@ -151,7 +151,7 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 			int count = core->Roll(1,CountElements(s,']'),-1);
 			//go to the selected spawnpoint
 			while(count--) {
-			  while(*s++!=']');
+				while(*s++!=']');
 			}
 		}
 		//parse the selected spawnpoint
@@ -314,14 +314,24 @@ void IniSpawn::InitSpawn(ieResRef DefaultArea)
 }
 
 
-/***  events ***/
+/*** events ***/
 
 //respawn nameless after he bit the dust
 void IniSpawn::RespawnNameless()
 {
 	Game *game = core->GetGame();
 	Actor *nameless = game->FindPC(1);
-	nameless->Heal(0);
+
+	if (NamelessSpawnPoint.isnull()) {
+		core->GetGame()->JoinParty(nameless,JP_INITPOS);
+		NamelessSpawnPoint=nameless->Pos;
+	}
+
+	nameless->Resurrect();
+	//hardcoded!!!
+	if (NamelessState==36) {
+		nameless->SetStance(18);
+	}
 	for (int i=0;i<game->GetPartySize(false);i++) {
 		MoveBetweenAreasCore(game->GetPC(i, false),NamelessSpawnArea,NamelessSpawnPoint,-1, true);
 	}
