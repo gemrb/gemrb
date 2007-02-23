@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.133 2007/02/18 22:39:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/CREImporter/CREImp.cpp,v 1.134 2007/02/23 21:06:39 avenger_teambg Exp $
  *
  */
 
@@ -400,7 +400,8 @@ Actor* CREImp::GetActor()
 		return NULL;
 	act->InParty = 0;
 	str->ReadDword( &act->LongStrRef );
-	char* poi = core->GetString( act->LongStrRef );
+	//Beetle name in IWD needs the allow zero flag
+	char* poi = core->GetString( act->LongStrRef, IE_STR_ALLOW_ZERO );
 	act->SetText( poi, 1 ); //setting longname
 	free( poi );
 	str->ReadDword( &act->ShortStrRef );

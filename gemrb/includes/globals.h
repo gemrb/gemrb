@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.99 2007/02/18 22:14:05 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/globals.h,v 1.100 2007/02/23 21:06:38 avenger_teambg Exp $
  *
  */
 
@@ -75,11 +75,11 @@
 #define IE_NORMAL 0
 #define IE_SHADED 1
 
-#define IE_STR_STRREFON 1
-#define IE_STR_SOUND	2
-#define IE_STR_SPEECH   4
-
-#define IE_STR_STRREFOFF 256
+#define IE_STR_STRREFON   1
+#define IE_STR_SOUND      2
+#define IE_STR_SPEECH     4
+#define IE_STR_ALLOW_ZERO 8     //0 strref is allowed
+#define IE_STR_STRREFOFF  256
 
 // bitflag operations
 // !!! Keep these synchronized with GUIDefines.py !!!

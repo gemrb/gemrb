@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA	02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.60 2007/01/31 21:20:32 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/TLKImporter/TLKImp.cpp,v 1.61 2007/02/23 21:06:39 avenger_teambg Exp $
  *
  */
 
@@ -35,9 +35,9 @@ static int charname=0;
 TLKImp::TLKImp(void)
 {
 	if (core->HasFeature(GF_CHARNAMEISGABBER)) {
-	  charname=-1;
+		charname=-1;
 	} else {
-	  charname=0;
+		charname=0;
 	}
 	str = NULL;
 	autoFree = false;
@@ -426,11 +426,16 @@ bool TLKImp::GetNewStringLength(char* string, int& Length)
 
 char* TLKImp::GetString(ieStrRef strref, ieDword flags)
 {
+	if (!(flags&IE_STR_ALLOW_ZERO) && !strref) {
+		goto empty;
+	}
 	if (strref >= StrRefCount) {
+empty:
 		char* ret = ( char* ) malloc( 1 );
 		ret[0] = 0;
 		return ret;
 	}
+
 	ieDword Volume, Pitch, StrOffset;
 	ieDword l;
 	ieWord type;
@@ -511,7 +516,12 @@ char* TLKImp::GetString(ieStrRef strref, ieDword flags)
 StringBlock TLKImp::GetStringBlock(ieStrRef strref, unsigned int flags)
 {
 	StringBlock sb;
+
+	if (!(flags&IE_STR_ALLOW_ZERO) && !strref) {
+		goto empty;
+	}
 	if (strref >= StrRefCount) {
+empty:
 		sb.text = ( char * ) malloc( 1 );
 		sb.text[0] = 0;
 		sb.Sound[0] = 0;
