@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.308 2007/02/23 21:10:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameControl.cpp,v 1.309 2007/02/25 12:36:05 avenger_teambg Exp $
  */
 
 #ifndef WIN32
@@ -431,8 +431,43 @@ int GameControl::SetText(const char* /*string*/, int /*pos*/)
 /** Key Press Event */
 void GameControl::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {
-	core->GetGame()->SetHotKey(toupper(Key));
+	if (DialogueFlags&DF_IN_DIALOG) {
+		return;
+	}
+	unsigned int i;
+	Game* game = core->GetGame();
+	if (!game) return;
+
 	switch (Key) {
+		case '0':
+			game->SelectActor( NULL, false, SELECT_NORMAL );
+			i = game->GetPartySize(false)/2;
+			while(i--) {
+				SelectActor(i, true);
+			}
+			break;
+		case '-':
+			game->SelectActor( NULL, true, SELECT_NORMAL );
+			i = game->GetPartySize(false)/2;
+			while(i--) {
+				SelectActor(i, false);
+			}
+			break;
+		case '=':
+			SelectActor(-1);
+			break;
+		case '1':
+		case '2':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
+		case '8':
+		case '9':
+			SelectActor(Key-'1');
+			break;
+			/*
 	case ' ':
 		DialogueFlags ^= DF_FREEZE_SCRIPTS;
 		if (DialogueFlags&DF_FREEZE_SCRIPTS) {
@@ -440,6 +475,10 @@ void GameControl::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 		} else {
 			core->DisplayConstantString(STR_UNPAUSED,0xff0000);
 		}
+		break;
+		*/
+	default:
+		core->GetGame()->SetHotKey(toupper(Key));
 		break;
 	}
 }
@@ -477,60 +516,38 @@ void GameControl::SelectActor(int whom, int type)
 void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 {
 	unsigned int i;
-
 	Game* game = core->GetGame();
 
 	if (!game)
 		return;
 
-	switch (Key) {
-		case 'q':
-			QuickSave();
-			break;
-		case GEM_ALT:
-			DebugFlags &= ~DEBUG_SHOW_CONTAINERS;
-			break;
-		case '0':
-			game->SelectActor( NULL, false, SELECT_NORMAL );
-			i = game->GetPartySize(false)/2;
-			while(i--) {
-				SelectActor(i, true);
-			}
-			break;
-		case '-':
-			game->SelectActor( NULL, true, SELECT_NORMAL );
-			i = game->GetPartySize(false)/2;
-			while(i--) {
-				SelectActor(i, false);
-			}
-			break;
-		case '=':
-			SelectActor(-1);
-			break;
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-		case '9':
-			SelectActor(Key-'1');
-			break;
-		case '\t':
-			//not GEM_TAB
-			DebugFlags &= ~DEBUG_XXX;
-			printf( "TAB released\n" );
-			return;
-		default:
-			break;
-	}
-	if (!core->CheatEnabled()) {
+	if (DialogueFlags&DF_IN_DIALOG) {
+		if (Mod) return;
+		switch(Key) {
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+			case '9':
+				{
+					TextArea *ta = core->GetMessageTextArea();
+					if (ta) {
+						ta->OnKeyPress(Key,Mod);
+					}
+				}
+				break;
+		}
 		return;
 	}
-	if (Mod & GEM_MOD_CTRL) //ctrl
-	{
+	//cheatkeys with ctrl-
+	if (Mod & GEM_MOD_CTRL) {
+		if (!core->CheatEnabled()) {
+			return;
+		}
 		Map* area = game->GetCurrentArea( );
 		if (!area)
 			return;
@@ -703,25 +720,6 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				if (lastActor) {
 					lastActor->GetPrevAnimation();
 				}
-/*
-				if (! lastActor)
-					break;
-
-				for (i = 0; i < 10; i++) {
-					CREItem* ci = lastActor->inventory.GetSlotItem (i);
-					if (! ci)
-						continue;
-
-					Item* item = core->GetItem(ci->ItemResRef);
-					if (item) {
-						for (int f = 0; f < item->EquippingFeatureCount; f++) {
-							AddEffect( item->equipping_features+f, lastActor, lastActor );
-						}
-						core->FreeItem( item, false );
-					}
-				}
-				lastActor->fxqueue.ApplyAllEffects( lastActor );
-*/
 				break;
 			case '1':
 				//change paperdoll armour level
@@ -758,6 +756,30 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				printf( "KeyRelease:%d - %d\n", Key, Mod );
 				break;
 		}
+		return; //return from cheatkeys
+	}
+	switch (Key) {
+		case ' ':
+			DialogueFlags ^= DF_FREEZE_SCRIPTS;
+	 		if (DialogueFlags&DF_FREEZE_SCRIPTS) {
+				core->DisplayConstantString(STR_PAUSED,0xff0000);
+		 	} else {
+				core->DisplayConstantString(STR_UNPAUSED,0xff0000);
+			}
+			break;
+		case 'q':
+			QuickSave();
+			break;
+		case GEM_ALT:
+			DebugFlags &= ~DEBUG_SHOW_CONTAINERS;
+			break;
+		case '\t':
+			//not GEM_TAB
+			DebugFlags &= ~DEBUG_XXX;
+			printf( "TAB released\n" );
+			return;
+		default:
+			break;
 	}
 }
 /** Mouse Over Event */
@@ -1172,6 +1194,12 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 void GameControl::OnSpecialKeyPress(unsigned char Key)
 {
 	if (DialogueFlags&DF_IN_DIALOG) {
+		switch(Key) {
+			case GEM_RETURN:
+				//simulating the continue/end button pressed
+				core->GetGUIScriptEngine()->RunFunction("CloseContinueWindow");
+				break;
+		}
 		return; //don't accept keys in dialog
 	}
 	Region Viewport = core->GetVideoDriver()->GetViewport();
