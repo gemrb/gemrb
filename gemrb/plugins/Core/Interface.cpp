@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.469 2007/02/25 11:30:29 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.470 2007/02/25 22:33:01 avenger_teambg Exp $
  *
  */
 
@@ -2132,6 +2132,9 @@ bool Interface::LoadGemRBINI()
 			TooltipColor.a = (unsigned char) (c);
 		}
 	}
+
+	//which stat determines the fist weapon (defaults to class)
+	Actor::SetFistStat(ini->GetKeyAsInt( "resources", "FistStat", IE_CLASS));
 
 	TooltipMargin = ini->GetKeyAsInt( "resources", "TooltipMargin", TooltipMargin );
 

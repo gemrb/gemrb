@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.148 2007/02/25 13:56:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.149 2007/02/25 22:33:01 avenger_teambg Exp $
  *
  */
 
@@ -198,6 +198,8 @@ public:
 	~Actor(void);
 	/** releases memory */
 	static void ReleaseMemory();
+	/** sets game specific parameter (which stat should determine the fist weapon type */
+	static void SetFistStat(ieDword stat);
 	/** sets game specific default data about action buttons */
 	static void SetDefaultActions(bool qslot, ieByte slot1, ieByte slot2, ieByte slot3);
 	/** prints useful information on console */

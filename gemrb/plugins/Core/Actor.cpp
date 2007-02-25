@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.265 2007/02/25 13:56:49 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.266 2007/02/25 22:33:00 avenger_teambg Exp $
  *
  */
 
@@ -77,6 +77,7 @@ struct ItemUseType {
 
 static ItemUseType *itemuse = NULL;
 static int usecount = -1;
+static int fiststat = IE_CLASS;
 
 static ActionButtonRow *GUIBTDefaults = NULL; //qslots row count
 ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
@@ -94,7 +95,7 @@ static char gemrb2iwd[32] = {
 	11,12,3,71,72,73,0,0, //0
 	14,80,83,82,81,10,7,8, //8
 	0,0,0,0,2,15,4,9, //16
-	13,5,0,0,0,0,0,0  //24
+	13,5,0,0,0,0,0,0 //24
 };
 
 //letters for char sound resolution bg1/bg2
@@ -264,6 +265,11 @@ Actor::~Actor(void)
 			vvcShields[i] = NULL;
 		}
 	}
+}
+
+void Actor::SetFistStat(ieDword stat)
+{
+	fiststat = stat;
 }
 
 void Actor::SetDefaultActions(bool qslot, ieByte slot1, ieByte slot2, ieByte slot3)
@@ -3062,7 +3068,7 @@ void Actor::SetupFist()
 {
 	int slot = core->QuerySlot( 0 );
 	assert (core->QuerySlotEffects(slot)==SLOT_EFFECT_FIST);
-	int row = GetBase(IE_CLASS);
+	int row = GetBase(fiststat);
 	int col = GetXPLevel(false);
 
 	if (FistRows<0) {
@@ -3074,13 +3080,12 @@ void Actor::SetupFist()
 			strnlwrcpy( DefaultFist, fist->QueryField( (unsigned int) -1), 8);
 			FistRows = fist->GetRowCount();
 			fistres = new FistResType[FistRows];
-			for (int cols = 1;cols<=MAX_LEVEL;cols++) {
-				for (int i=0;i<FistRows;i++) {
-					strnlwrcpy( fistres[i][cols], fist->QueryField( i, cols ), 8);
-				}
-			}
 			for (int i=0;i<FistRows;i++) {
-				*(int *) fistres[i] = atoi(fist->QueryField( i,0));
+				int maxcol = fist->GetColumnCount(i)-1;
+				for (int cols = 0;cols<MAX_LEVEL;cols++) {
+					strnlwrcpy( fistres[i][cols], fist->QueryField( i, cols>maxcol?maxcol:cols ), 8);
+				}
+				*(int *) fistres[i] = atoi(fist->GetRowName( i));
 			}
 		}
 		core->DelTable( table );
