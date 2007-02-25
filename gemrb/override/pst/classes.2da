@@ -7,6 +7,6 @@ CLERIC         19764      *          19752      SAVEPRS    0          3         
 THIEF          19758      *          19749      SAVEROG    0          4          HPROG      0x400000   1
 BARD           *          *          *          SAVEROG    0          5          HPROG      0          0
 PALADIN        *          *          *          SAVEWAR    0          6          HPWAR      0          0
-FIGHTER_MAGE   19767      *          19756      *          3          7          *          0x200      0
-FIGHTER_CLERIC *          *          *          *          6          8          *          0          0
-FIGHTER_THIEF  19766      *          19754      *          10         9          *          0x2000     0
+FIGHTER_MAGE   19767      *          19756      *          3          7          *          0x2000     0
+FIGHTER_CLERIC *          *          *          *          6          8          *          0x4000     0
+FIGHTER_THIEF  19766      *          19754      *          10         9          *          0x20000    0
