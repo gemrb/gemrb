@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.57 2007/02/10 14:29:23 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/TileMap.cpp,v 1.58 2007/02/25 11:36:23 avenger_teambg Exp $
  *
  */
 
@@ -237,13 +237,13 @@ void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region v
 				// Unexplored tiles are all black
 				vid->DrawRect(r, black, true, true);
 				continue;  // Don't draw 'invisible' fog
-			} 
+			}
 			else {
 				// If an explored tile is adjacent to an
 				//   unexplored one, we draw border sprite
 				//   (gradient black <-> transparent)
 				// Tiles in four cardinal directions have these
-				//   values. 
+				//   values.
 				//
 				//      1
 				//    2   8
@@ -252,7 +252,7 @@ void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region v
 				// Values of those unexplored are
 				//   added together, the resulting number being
 				//   an index of shadow sprite to use. For now,
-				//   some tiles are made 'on the fly' by 
+				//   some tiles are made 'on the fly' by
 				//   drawing two or more tiles
 
 				int e = ! IS_EXPLORED( x, y - 1);
@@ -271,27 +271,27 @@ void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region v
 				case 12:
 					FOG( e );
 					break;
-				case 5: 
+				case 5:
 					FOG( 1 );
 					FOG( 4 );
 					break;
-				case 7: 
+				case 7:
 					FOG( 3 );
 					FOG( 6 );
 					break;
-				case 10: 
+				case 10:
 					FOG( 2 );
 					FOG( 8 );
 					break;
-				case 11: 
+				case 11:
 					FOG( 3 );
 					FOG( 9 );
 					break;
-				case 13: 
+				case 13:
 					FOG( 9 );
 					FOG( 12 );
 					break;
-				case 14: 
+				case 14:
 					FOG( 6 );
 					FOG( 12 );
 					break;
@@ -305,13 +305,13 @@ void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region v
 				// Invisible tiles are all gray
 				FOG( 16 );
 				continue;  // Don't draw 'invisible' fog
-			} 
+			}
 			else {
 				// If a visible tile is adjacent to an
 				//   invisible one, we draw border sprite
 				//   (gradient gray <-> transparent)
 				// Tiles in four cardinal directions have these
-				//   values. 
+				//   values.
 				//
 				//      1
 				//    2   8
@@ -320,7 +320,7 @@ void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region v
 				// Values of those invisible are
 				//   added together, the resulting number being
 				//   an index of shadow sprite to use. For now,
-				//   some tiles are made 'on the fly' by 
+				//   some tiles are made 'on the fly' by
 				//   drawing two or more tiles
 
 				int e = ! IS_VISIBLE( x, y - 1);
@@ -339,27 +339,27 @@ void TileMap::DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region v
 				case 12:
 					FOG( 16 + e );
 					break;
-				case 5: 
+				case 5:
 					FOG( 16 + 1 );
 					FOG( 16 + 4 );
 					break;
-				case 7: 
+				case 7:
 					FOG( 16 + 3 );
 					FOG( 16 + 6 );
 					break;
-				case 10: 
+				case 10:
 					FOG( 16 + 2 );
 					FOG( 16 + 8 );
 					break;
-				case 11: 
+				case 11:
 					FOG( 16 + 3 );
 					FOG( 16 + 9 );
 					break;
-				case 13: 
+				case 13:
 					FOG( 16 + 9 );
 					FOG( 16 + 12 );
 					break;
-				case 14: 
+				case 14:
 					FOG( 16 + 6 );
 					FOG( 16 + 12 );
 					break;
@@ -416,7 +416,7 @@ Container* TileMap::GetContainer(Point &position, int type)
 			continue;
 		if (c->outline->BBox.y + c->outline->BBox.h < position.y)
 			continue;
-	
+
 		//IE piles don't have polygons, the bounding box is enough for them
 		if (c->Type == IE_CONTAINER_PILE) {
 			//don't find empty piles if we look for any container
@@ -438,7 +438,7 @@ int TileMap::CleanupContainer(Container *container)
 		return 0;
 	if (container->inventory.GetSlotCount())
 		return 0;
-	
+
 	for (size_t i = 0; i < containers.size(); i++) {
 		if (containers[i]==container) {
 			containers.erase(containers.begin()+i);
@@ -495,7 +495,7 @@ InfoPoint* TileMap::GetInfoPoint(Point &p, bool detectable)
 				continue;
 			}
 			if (ip->Type==ST_TRAVEL) {
-				if (!(ip->Trapped&PORTAL_CURSOR)) {
+				if (ip->Trapped & (PORTAL_CURSOR|PORTAL_TRAVEL) == PORTAL_TRAVEL) {
 					continue;
 				}
 			}
