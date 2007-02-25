@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.146 2007/02/17 23:39:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.h,v 1.147 2007/02/25 11:56:44 avenger_teambg Exp $
  *
  */
 
@@ -138,7 +138,6 @@ public:
 	ieWord globalID;
 	ieWord localID;
 public:
-	ieDword Leader;
 	#define LastTarget LastDisarmFailed
 	//ieDword LastTarget; use lastdisarmfailed
 	#define LastAttacker LastDisarmed
@@ -151,7 +150,6 @@ public:
 	//ieDword LastTalkedTo; use lastunlocked
 	ieDword LastProtected;
 	ieDword LastFollowed;
-	Point FollowOffset;
 	ieDword LastCommander;
 	ieDword LastHelp;
 	ieDword LastSeen;
@@ -167,7 +165,7 @@ public:
 	int LastShout;     //lastheard
 	int LastDamage;    //lasthitter
 	int LastDamageType;//lasthitter
-	int XF, YF;        //follow leader in this offset
+	Point FollowOffset;//follow lastfollowed at this offset
 
 	EffectQueue fxqueue;
 	vvcVector vvcOverlays;
@@ -379,8 +377,8 @@ public:
 	void SetColor( ieDword idx, ieDword grd);
 	/* sets an RGB colour modification effect; location -1 for global */
 	void SetColorMod( int location, RGBModifier::Type type, int speed, 
-					  unsigned char r, unsigned char g, unsigned char b,
-					  int phase=-1 );
+		unsigned char r, unsigned char g, unsigned char b,
+		int phase=-1 );
 	bool Schedule(ieDword gametime);
 	/* call this when path needs to be changed */
 	void NewPath();

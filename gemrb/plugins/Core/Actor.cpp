@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.263 2007/02/23 21:10:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actor.cpp,v 1.264 2007/02/25 11:56:44 avenger_teambg Exp $
  *
  */
 
@@ -199,8 +199,8 @@ Actor::Actor()
 	LongStrRef = (ieStrRef) -1;
 	ShortStrRef = (ieStrRef) -1;
 
-	Leader = 0;
 	LastProtected = 0;
+	LastFollowed = 0;
 	LastCommander = 0;
 	LastHelp = 0;
 	LastSeen = 0;
@@ -1113,6 +1113,10 @@ void Actor::RefreshEffects()
 	}
 	bonus *= GetXPLevel( true );
 
+	NewBase(IE_MORALE,1,MOD_ADDITIVE);
+	if (bonus<0 && (Modified[IE_MAXHITPOINTS]+bonus)<=0) {
+		bonus=1-Modified[IE_MAXHITPOINTS];
+	}
 	Modified[IE_MAXHITPOINTS]+=bonus;
 	Modified[IE_HITPOINTS]+=bonus;
 
@@ -1504,6 +1508,9 @@ void Actor::Die(Scriptable *killer)
 		core->Autopause(AP_DEAD);
 	} else {
 		Actor *act=NULL;
+		if (!killer) {
+			killer = area->GetActorByGlobalID(LastHitter);
+		}
 
 		if (killer) {
 			if (killer->Type==ST_ACTOR) {
@@ -1535,13 +1542,26 @@ void Actor::DestroySelf()
 
 bool Actor::CheckOnDeath()
 {
-	if (InternalFlags&IF_CLEANUP) return true;
-	if (!(InternalFlags&IF_REALLYDIED) ) return false;
+	if (InternalFlags&IF_CLEANUP) {
+		return true;
+	}
+	if (InternalFlags&IF_JUSTDIED) {
+		if (GetNextAction()) {
+			return false; //actor is currently dying, let him die first
+		}
+	}
+	if (!(InternalFlags&IF_REALLYDIED) ) {
+		return false;
+	}
 	//don't mess with the already deceased
-	if (Modified[IE_STATE_ID]&STATE_DEAD) return false;
+	if (BaseStats[IE_STATE_ID]&STATE_DEAD) {
+		return false;
+	}
 	//we need to check animID here, if it has not played the death
 	//sequence yet, then we could return now
 	ClearActions();
+	//missed the opportunity of Died()
+	InternalFlags&=~IF_JUSTDIED;
 
 	Game *game = core->GetGame();
 	if (InternalFlags&IF_GIVEXP) {
@@ -2084,6 +2104,12 @@ void Actor::PerformAttack(ieDword gameTime)
 		return;
 	}
 	attackcount--;
+
+	if (InternalFlags&IF_STOPATTACK) {
+		core->GetGame()->OutAttack(GetID());
+		return;
+	}
+
 	if (!LastTarget) {
 		StopAttack();
 		return;
@@ -2257,9 +2283,9 @@ void Actor::SetColorMod( int location, RGBModifier::Type type, int speed,
 
 void Actor::SetLeader(Actor *actor, int xoffset, int yoffset)
 {
-	Leader = actor->GetID();
-	XF = xoffset;
-	YF = yoffset;
+	LastFollowed = actor->GetID();
+	FollowOffset.x = xoffset;
+	FollowOffset.y = yoffset;
 }
 
 //if days == 0, it means full healing
@@ -2402,9 +2428,12 @@ void Actor::Draw(Region &screen)
 	int explored = Modified[IE_DONOTJUMP]&DNJ_UNHINDERED;
 	//check the deactivation condition only if needed
 	//this fixes dead actors disappearing from fog of war (they should be permanently visible)
-	if ((!area->IsVisible( Pos, explored) || (InternalFlags&IF_JUSTDIED) ) &&	(InternalFlags&IF_ACTIVE) ) {
+	if ((!area->IsVisible( Pos, explored) || (InternalFlags&IF_REALLYDIED) ) &&	(InternalFlags&IF_ACTIVE) ) {
+//    if ((!area->IsVisible( Pos, explored) || (InternalFlags&IF_JUSTDIED) ) &&	(InternalFlags&IF_ACTIVE) ) {
 		//finding an excuse why we don't hybernate the actor
 		if (Modified[IE_ENABLEOFFSCREENAI])
+			return;
+		if (LastTarget) //currently attacking someone
 			return;
 		if (CurrentAction)
 			return;
@@ -2664,6 +2693,7 @@ bool Actor::HandleActorStance()
 	int x = rand()%1000;
 	if (ca->autoSwitchOnEnd) {
 		SetStance( ca->nextStanceID );
+		ca->autoSwitchOnEnd = false;
 		return true;
 	}
 	if ((StanceID==IE_ANI_AWAKE) && !x ) {
