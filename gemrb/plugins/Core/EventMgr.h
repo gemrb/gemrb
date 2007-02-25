@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.h,v 1.22 2005/12/17 17:27:00 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.h,v 1.23 2007/02/25 13:56:49 avenger_teambg Exp $
  *
  */
 
@@ -109,28 +109,13 @@ public:
 	/** Mask of which Mouse Buttons are pressed */
 	unsigned char MButtons;
 private:
+	/** Last Window focused */
+	Window* last_win_focused;
 	/** Last Window under Mouse Pointer*/
-	Window* lastW;
-	/** Last Focused Control */
-	Control* lastF;
-	/** Last Active (entered) Control */
-	Control* last_ctrl_over;
+	Window* last_win_over;
 	/** Sets a Window on the Top of the Window Queue */
-	void SetOnTop(int Index)
-	{
-		std::vector< int>::iterator t;
-		for (t = topwin.begin(); t != topwin.end(); ++t) {
-			if (( *t ) == Index) {
-				topwin.erase( t );
-				break;
-			}
-		}
-		if (topwin.size() != 0) {
-			topwin.insert( topwin.begin(), Index );
-		} else {
-			topwin.push_back( Index );
-		}
-	}
+	void SetDefaultFocus(Window *win);
+	void SetOnTop(int Index);
 };
 
-#endif  // ! EVENTMGR_H
+#endif // ! EVENTMGR_H

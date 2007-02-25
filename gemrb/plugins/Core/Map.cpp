@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.265 2007/02/17 23:39:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Map.cpp,v 1.266 2007/02/25 13:56:50 avenger_teambg Exp $
  *
  */
 
@@ -156,7 +156,7 @@ void InitSpawnGroups()
 
 	Spawns.RemoveAll(NULL);
 	Spawns.SetType( GEM_VARIABLES_POINTER );
-	
+
 	if (table<0) {
 		return;
 	}
@@ -404,7 +404,7 @@ Map::~Map(void)
 
 	for (i = 0; i < actors.size(); i++) {
 		Actor* a = actors[i];
-		//don't delete NPC/PC 
+		//don't delete NPC/PC
 		if (a && !a->Persistent() ) {
 			delete a;
 		}
@@ -430,19 +430,19 @@ Map::~Map(void)
 			queue[i] = NULL;
 		}
 	}
-	
+
 	scaIterator sci;
 
 	for (sci = vvcCells.begin(); sci != vvcCells.end(); sci++) {
 		delete (*sci);
 	}
-	
+
 	spaIterator spi;
 
 	for (spi = particles.begin(); spi != particles.end(); spi++) {
 		delete (*spi);
 	}
-	
+
 	for (i = 0; i < ambients.size(); i++) {
 		delete ambients[i];
 	}
@@ -539,7 +539,7 @@ void Map::MoveToNewArea(const char *area, const char *entrance, int EveryOne, Ac
 		int i=game->GetPartySize(false);
 		while (i--) {
 			Actor *pc = game->GetPC(i,false);
-			
+
 			if (!pc->IsSelected()) {
 				continue;
 			}
@@ -552,7 +552,7 @@ void Map::MoveToNewArea(const char *area, const char *entrance, int EveryOne, Ac
 		}
 		return;
 	}
-	
+
 	actor->ClearPath();
 	actor->ClearActions();
 	actor->AddAction( GenerateAction( command ) );
@@ -594,8 +594,9 @@ void Map::UpdateScripts()
 {
 	// if masterarea, then we allow 'any' actors
 	// if not masterarea, we allow only players
-	if (!GetActorCount(MasterArea) )
+	if (!GetActorCount(MasterArea) ) {
 		return;
+	}
 
 	//Run the Map Script
 	if (Scripts[0]) {
@@ -703,7 +704,7 @@ void Map::UpdateScripts()
 			}
 			continue;
 		}
-		
+
 		q=Qcount[PR_SCRIPT];
 		while (q--) {
 			Actor* actor = queue[PR_SCRIPT][q];
@@ -734,29 +735,6 @@ void Map::UpdateScripts()
 		}
 	}
 }
-
-//there is a similar function in Actors for mobile vvcs
-//this probably needs an additional container object which stores position, duration etc
-/*
-void Map::DrawVideocells(Region screen)
-{
-	for (unsigned int i = 0; i < vvcCells.size(); i++) {
-		ScriptedAnimation* vvc = vvcCells[i];
-
-		Point Pos(0,0); //we need the position of the vvc on the area
-
-		Color tint = LightMap->GetPixel( Pos.x / 16, Pos.y / 12);
-		tint.a = 255;
-		
-		bool endReached = vvc->Draw(screen, Pos, tint, this, false);
-		if (endReached) {
-			delete( vvc );
-			vvcCells.erase(vvcCells.begin()+i);
-			continue;
-		}
-	}
-}
-*/
 
 void Map::DrawContainers( Region screen, Container *overContainer)
 {
@@ -849,6 +827,10 @@ void Map::DrawMap(Region screen, GameControl* gc)
 	Game *game = core->GetGame();
 	ieDword gametime = game->GameTime;
 
+	if (INISpawn) {
+		INISpawn->CheckSpawn();
+	}
+
 	int rain;
 	if (HasWeather()) {
 		//zero when the weather particles are all gone
@@ -857,7 +839,7 @@ void Map::DrawMap(Region screen, GameControl* gc)
 		rain = 0;
 	}
 	TMap->DrawOverlays( screen, rain );
-	
+
 	//Blit the Background Map Animations (before actors)
 	Video* video = core->GetVideoDriver();
 
@@ -1111,7 +1093,7 @@ Actor* Map::GetActorByGlobalID(ieDword objectID)
 	size_t i = actors.size();
 	while (i--) {
 		Actor* actor = actors[i];
-		
+
 		if (actor->globalID==globalID) {
 			return actor;
 		}
@@ -1129,11 +1111,11 @@ Actor* Map::GetActor(Point &p, int flags)
 	size_t i = actors.size();
 	while (i--) {
 		Actor* actor = actors[i];
-		
+
 		if (!actor->IsOver( p ))
 			continue;
 		if (!actor->ValidTarget(flags) ) {
-			continue; 
+			continue;
 		}
 		if (!actor->Schedule(gametime) ) {
 			continue;
@@ -1149,11 +1131,11 @@ Actor* Map::GetActorInRadius(Point &p, int flags, unsigned int radius)
 	size_t i = actors.size();
 	while (i--) {
 		Actor* actor = actors[i];
-		
+
 		if (PersonalDistance( p, actor ) > radius)
 			continue;
 		if (!actor->ValidTarget(flags) ) {
-			continue; 
+			continue;
 		}
 		if (!actor->Schedule(gametime) ) {
 			continue;
@@ -1163,12 +1145,15 @@ Actor* Map::GetActorInRadius(Point &p, int flags, unsigned int radius)
 	return NULL;
 }
 
-Actor* Map::GetActor(const char* Name)
+Actor* Map::GetActor(const char* Name, int flags)
 {
 	size_t i = actors.size();
 	while (i--) {
 		Actor* actor = actors[i];
 		if (strnicmp( actor->GetScriptName(), Name, 32 ) == 0) {
+			if (!actor->ValidTarget(flags) ) {
+				return NULL;
+			}
 			return actor;
 		}
 	}
@@ -1207,6 +1192,8 @@ void Map::JumpActors(bool jump)
 //before writing the area out, perform some cleanups
 void Map::PurgeArea(bool items)
 {
+	InternalFlags |= IF_JUSTDIED; //area marked for swapping out
+
 	//1. remove dead actors without 'keep corpse' flag
 	int i=(int) actors.size();
 	while (i--) {
@@ -1319,7 +1306,7 @@ void Map::PlayAreaSong(int SongType)
 		column = 1;
 		tablename = "songlist";
 	} else {
-		/*since bg1 and pst has no .2da for songlist, 
+		/*since bg1 and pst has no .2da for songlist,
 		we must supply one in the gemrb/override folder.
 		It should be: music.2da, first column is a .mus filename
 		*/
@@ -1511,7 +1498,7 @@ void Map::SortQueues()
 					baseline[parent] = baseline[child];
 					parent = child;
 					child = parent*2+1;
-				} else 
+				} else
 					break;
 			}
 			baseline[parent]=tmp;
@@ -2135,7 +2122,7 @@ int Map::WhichEdge(Point &s)
 	}
 	//south or west
 	if (Width*Height<sX+sY) { //
-		return WMP_SOUTH; 
+		return WMP_SOUTH;
 	}
 	return WMP_WEST;
 }
@@ -2196,7 +2183,7 @@ void Map::SpawnCreature(Point &pos, char *CreName, int radius)
 	void* lookup;
 	if ( !Spawns.Lookup( CreName, lookup) ) {
 		DataStream *stream = core->GetResourceMgr()->GetResource( CreName, IE_CRE_CLASS_ID );
-		creature = core->GetCreature(stream); 
+		creature = core->GetCreature(stream);
 		if ( creature ) {
 			AddActor(creature);
 			creature->SetPosition( pos, true, radius );
@@ -2210,7 +2197,7 @@ void Map::SpawnCreature(Point &pos, char *CreName, int radius)
 	//unsigned int difficulty = sg->Level;
 	while ( count-- ) {
 		DataStream *stream = core->GetResourceMgr()->GetResource( sg->ResRefs[count], IE_CRE_CLASS_ID );
-		creature = core->GetCreature(stream); 
+		creature = core->GetCreature(stream);
 		if ( creature ) {
 			AddActor(creature);
 			creature->SetPosition( pos, true, radius );
@@ -2319,7 +2306,7 @@ void Map::ExploreMapChunk(Point &Pos, int range, int los)
 		for (int i=0;i<range;i++) {
 			Tile.x = Pos.x+VisibilityMasks[i][p].x;
 			Tile.y = Pos.y+VisibilityMasks[i][p].y;
-			
+
 			if (los) {
 				if (!block) {
 					int type = GetBlocked(Tile);
@@ -2359,7 +2346,7 @@ void Map::UpdateFog()
 		if (sp) {
 			TriggerSpawn(sp);
 		}
-	}	
+	}
 }
 
 //Valid values are - PATH_MAP_FREE, PATH_MAP_PC, PATH_MAP_NPC
@@ -2373,7 +2360,7 @@ void Map::BlockSearchMap(Point &Pos, int size, unsigned int value)
 		for (int i=0;i<size;i++) {
 			unsigned int x = (Pos.x+PersonalSpaces[i][p].x)/16;
 			unsigned int y = (Pos.y+PersonalSpaces[i][p].y)/12;
-			
+
 			unsigned int tmp=SearchMap->GetPixelIndex(x,y)&PATH_MAP_NOTACTOR;//keep door flags too
 			SearchMap->SetPixelIndex(x,y,tmp|value);
 		}
@@ -2574,7 +2561,6 @@ void Map::Sparkle(ieDword color, ieDword type, Point &pos)
 		path = SP_PATH_FLIT;
 		grow = SP_SPAWN_SOME;
 		break;
-		
 	}
 	sparkles->SetType(style, path, grow);
 	sparkles->SetColor(color);

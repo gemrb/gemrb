@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.163 2007/02/11 21:27:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.cpp,v 1.164 2007/02/25 13:56:49 avenger_teambg Exp $
  */
 #include "../../includes/win32def.h"
 #include "ActorBlock.h"
@@ -53,6 +53,9 @@ Scriptable::Scriptable(ScriptableType type)
 	LastDisarmed = 0;
 	LastDisarmFailed = 0;
 	LastUnlocked = 0;
+	LastOpenFailed = 0;
+	LastPickLockFailed = 0;
+	DialogName = 0;
 	CurrentAction = NULL;
 	startTime = 0;
 	interval = ( 1000 / AI_UPDATE_TIME );
@@ -226,6 +229,9 @@ void Scriptable::ExecuteScript(GameScript* Script)
 //	if (actionQueue.size()) {
 //		return;
 //	}
+	if (WaitCounter) {
+	  return;
+	}
 	if (Script) {
 		Script->Update();
 	}
@@ -282,6 +288,8 @@ void Scriptable::ClearActions()
 	WaitCounter = 0;
 	playDeadCounter = 0; // i'm not sure about this
 	LastTarget = 0;
+	//clear the triggers as fast as possible when queue ended?
+	ClearTriggers();
 }
 
 void Scriptable::ReleaseCurrentAction()
@@ -335,12 +343,14 @@ void Scriptable::ProcessActions(bool force)
 			}
 			//removing the triggers at the end of the
 			//block
-			ClearTriggers();
+			//ClearTriggers();
 			break;
 		}
 		GameScript::ExecuteAction( this, CurrentAction );
 		//break execution in case of a Wait flag
 		if (WaitCounter) {
+			//clear triggers while waiting
+			//ClearTriggers();
 			break;
 		}
 		//break execution in case of movement
@@ -348,6 +358,9 @@ void Scriptable::ProcessActions(bool force)
 			break;
 		}
 	}
+	//most likely the best place to clear triggers is here
+	//queue is empty, or there is a looong action subject to break
+	ClearTriggers();
 	if (InternalFlags&IF_IDLE) {
 		Deactivate();
 	}
@@ -466,6 +479,7 @@ void Scriptable::ClearTriggers()
 	if (bittriggers & BT_WASINDIALOG) {
 		InternalFlags &= ~IF_WASINDIALOG;
 	}
+	InitTriggers();
 }
 
 void Scriptable::SetBitTrigger(ieDword bittrigger)
@@ -1212,7 +1226,6 @@ InfoPoint::InfoPoint(void)
 	TrapLaunch.x = 0; 
 	TrapLaunch.y = 0;
 	Dialog[0] = 0;
-	DialogName = 0;
 }
 
 InfoPoint::~InfoPoint(void)

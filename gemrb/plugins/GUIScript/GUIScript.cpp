@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.468 2007/02/21 22:53:38 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.469 2007/02/25 13:56:51 avenger_teambg Exp $
  *
  */
 
@@ -4760,9 +4760,11 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("No current container!");
 	}
 
-	CREItem *item;
+	ieResRef Sound;
+	CREItem *si;
 	int res;
 
+	Sound[0]=0;
 	if (action) { //get stuff from container
 		if (Slot<0 || Slot>=(int) container->inventory.GetSlotCount()) {
 			return RuntimeError("Invalid Container slot!");
@@ -4776,18 +4778,29 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 		}
 
 		//this will update the container
-		item = container->RemoveItem(Slot,0);
-		if (!item) {
+		si = container->RemoveItem(Slot,0);
+		if (!si) {
 			printMessage("GUIScript","Cannot move item, there is something weird!\n", YELLOW);
 			Py_INCREF( Py_None );
 			return Py_None;
 		}
-		if (res!=-1) { //it is gold!
-			goto item_is_gold;
+ 		Item *item = core->GetItem(si->ItemResRef);
+		if (item) {
+ 			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
+	 			memcpy(Sound,item->ReplacementItem,8);
+			} else {
+				GetItemSound(Sound, item->ItemType, IS_DROP);
+			}
+			core->FreeItem(item, si->ItemResRef,0);
 		}
-		res = actor->inventory.AddSlotItem(item, SLOT_ONLYINVENTORY);
-		if (res !=ASI_SUCCESS) { //putting it back
-			container->AddItem(item);
+		if (res!=-1) { //it is gold!
+			game->PartyGold += res;
+			delete si;
+		} else {
+			res = actor->inventory.AddSlotItem(si, SLOT_ONLYINVENTORY);
+			if (res !=ASI_SUCCESS) { //putting it back
+				container->AddItem(si);
+			}
 		}
 	} else { //put stuff in container, simple!
 		res = core->CanMoveItem(actor->inventory.GetSlotItem(core->QuerySlot(Slot) ) );
@@ -4797,27 +4810,34 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 			return Py_None;
 		}
 
-		item = actor->inventory.RemoveItem(core->QuerySlot(Slot));
-		if (!item) {
+		si = actor->inventory.RemoveItem(core->QuerySlot(Slot));
+		if (!si) {
 			printMessage("GUIScript","Cannot move item, there is something weird!\n", YELLOW);
 			Py_INCREF( Py_None );
 			return Py_None;
 		}
+ 		Item *item = core->GetItem(si->ItemResRef);
+		if (item) {
+ 			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->DescriptionIcon[0]) {
+	 			memcpy(Sound,item->DescriptionIcon,8);
+			} else {
+				GetItemSound(Sound, item->ItemType, IS_GET);
+			}
+			core->FreeItem(item, si->ItemResRef,0);
+		}
 		actor->ReinitQuickSlots();
 
 		if (res!=-1) { //it is gold!
-			goto item_is_gold;
+			game->PartyGold += res;
+			delete si;
+		} else {
+			container->AddItem(si);
 		}
-
-		container->AddItem(item);
 	}
 
-	Py_INCREF( Py_None );
-	return Py_None;
-
-item_is_gold: //we take gold!
-	core->GetGame()->PartyGold += res;
-	delete item;
+	if (Sound[0]) {
+		core->GetSoundMgr()->Play(Sound);
+	}
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -6155,7 +6175,20 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		if (!cc) {
 			return RuntimeError( "No current container" );
 		}
-		res = cc->AddItem(core->GetDraggedItem());
+		CREItem *si = core->GetDraggedItem();
+		res = cc->AddItem(si);
+ 		Item *item = core->GetItem(si->ItemResRef);
+		if (item) {
+ 			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
+	 			memcpy(Sound,item->ReplacementItem,8);
+			} else {
+				GetItemSound(Sound, item->ItemType, IS_DROP);
+			}
+			core->FreeItem(item, si->ItemResRef,0);
+			if (Sound[0]) {
+				core->GetSoundMgr()->Play(Sound);
+			}
+		}
 		if (res == 2) {
 			// Whole amount was placed
 			core->ReleaseDraggedItem ();
@@ -6297,8 +6330,8 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 		SlotID=actor->inventory.FindCandidateSlot(SLOT_INVENTORY,0);
 	}
 	if (SlotID!=-1) {
-		// Note: this forcefully gets rid of any item currently in the slot
-		//       without properly unequipping it
+		// Note: this forcefully gets rid of any item currently
+		// in the slot without properly unequipping it
 		actor->inventory.SetSlotItemRes( ItemResRef, SlotID, Charge0, Charge1, Charge2 );
 		actor->inventory.EquipItem(SlotID);
 		actor->RefreshEffects();
@@ -7644,13 +7677,17 @@ static PyObject* GemRB_StealFailed(PyObject * /*self*/, PyObject* /*args*/)
 	if (!map) {
 		return RuntimeError( "No area loaded!" );
 	}
-	Actor* owner = map->GetActor( store->GetOwner() );
+	Actor* owner = map->GetActor( store->GetOwner(), 0 );
 	if (!owner) {
-		return RuntimeError( "No owner found!" );
+		printMessage("GUIScript", "No owner found!", YELLOW );
+		Py_INCREF( Py_None );
+		return Py_None;
 	}
 	Actor* attacker = game->FindPC((int) game->GetSelectedPCSingle() );
 	if (!attacker) {
-		return RuntimeError( "No thief found!" );
+		printMessage("GUIScript", "No thief found!", YELLOW );
+		Py_INCREF( Py_None );
+		return Py_None;
 	}
 	//not sure if this is ok
 	//owner->LastAttacker = attacker->GetID();

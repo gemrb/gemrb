@@ -8,14 +8,14 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.46 2007/02/21 22:53:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/EventMgr.cpp,v 1.47 2007/02/25 13:56:49 avenger_teambg Exp $
  *
  */
 
@@ -26,15 +26,39 @@
 
 EventMgr::EventMgr(void)
 {
-	lastW = NULL;
-	lastF = NULL;
-	// Last control we were over. Used to determine MouseEnter and MouseLeave events
-	last_ctrl_over = NULL;
+	last_win_focused = NULL;
+	// Last window we were over. Used to determine MouseEnter and MouseLeave events
+	last_win_over = NULL;
 	MButtons = 0;
 }
 
 EventMgr::~EventMgr(void)
 {
+}
+
+void EventMgr::SetOnTop(int Index)
+{
+	std::vector< int>::iterator t;
+	for (t = topwin.begin(); t != topwin.end(); ++t) {
+		if (( *t ) == Index) {
+			topwin.erase( t );
+			break;
+		}
+	}
+	if (topwin.size() != 0) {
+			topwin.insert( topwin.begin(), Index );
+	} else {
+		topwin.push_back( Index );
+	}
+}
+
+void EventMgr::SetDefaultFocus(Window *win)
+{
+	if (!last_win_focused) {
+		last_win_focused = win;
+		last_win_focused->SetFocused(last_win_focused->GetControl(0));
+	}
+	last_win_over = NULL;
 }
 
 /** Adds a Window to the Event Manager */
@@ -45,21 +69,14 @@ void EventMgr::AddWindow(Window* win)
 	if (win == NULL) {
 		return;
 	}
-	for (i = 0; i < windows.size(); i++) {
-		if (windows[i] == win) {
-			SetOnTop( i );
-/*
-			lastW = win;
-			lastF = NULL;
-*/
-			last_ctrl_over = NULL;
-			return;
-		}
-	}
 	bool found = false;
 	for (i = 0; i < windows.size(); i++) {
-		if (windows[i] == NULL) {
+		if (windows[i] == win) {
+			goto ok;
+		}
+		if(windows[i]==NULL) {
 			windows[i] = win;
+ok:
 			SetOnTop( i );
 			found = true;
 			break;
@@ -72,26 +89,28 @@ void EventMgr::AddWindow(Window* win)
 		else
 			SetOnTop( ( int ) windows.size() - 1 );
 	}
-/*
-	lastW = win;
-	lastF = NULL;
-*/
-	last_ctrl_over = NULL;
+	SetDefaultFocus(win);
 }
 /** Frees and Removes all the Windows in the Array */
 void EventMgr::Clear()
 {
 	topwin.clear();
 	windows.clear();
-	lastW = NULL;
-	lastF = NULL;
-	last_ctrl_over = NULL;
+	last_win_focused = NULL;
+	last_win_over = NULL;
 }
 
 /** Remove a Window from the array */
 void EventMgr::DelWindow(Window *win)
 //unsigned short WindowID, const char *WindowPack)
 {
+	if (last_win_focused == win) {
+		last_win_focused = NULL;
+	}
+	if (last_win_over == win) {
+		last_win_over = NULL;
+	}
+
 	if (windows.size() == 0) {
 		return;
 	}
@@ -99,16 +118,11 @@ void EventMgr::DelWindow(Window *win)
 	std::vector< Window*>::iterator m;
 	for (m = windows.begin(); m != windows.end(); ++m) {
 		pos++;
-		if ( (*m)==win) {
-			if (lastW == ( *m )) {
-				lastW = NULL;
-				lastF = NULL;
-			}
-			( *m ) = NULL;
-			last_ctrl_over = NULL;
+		if ( (*m) == win) {
+			(*m) = NULL;
 			std::vector< int>::iterator t;
 			for (t = topwin.begin(); t != topwin.end(); ++t) {
-				if (( *t ) == pos) {
+				if ( (*t) == pos) {
 					topwin.erase( t );
 					return;
 				}
@@ -124,7 +138,7 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 	if (windows.size() == 0) {
 		return;
 	}
-	if (!lastW) {
+	if (!last_win_focused) {
 		return;
 	}
 	std::vector< int>::iterator t;
@@ -132,39 +146,37 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 	for (t = topwin.begin(); t != topwin.end(); ++t) {
 		m = windows.begin();
 		m += ( *t );
-		if (( *m ) == NULL)
+		Window *win = *m;
+		if (win == NULL)
 			continue;
-		if (!( *m )->Visible)
+		if (!win->Visible)
 			continue;
-		if (( ( *m )->XPos <= x ) && ( ( *m )->YPos <= y )) {
+		if (( win->XPos <= x ) && ( win->YPos <= y )) {
 			//Maybe we are on the window, let's check
-			if (( ( *m )->XPos + ( *m )->Width >= x ) &&
-				( ( *m )->YPos + ( *m )->Height >= y )) {
+			if (( win->XPos + win->Width >= x ) &&
+				( win->YPos + win->Height >= y )) {
 				//Yes, we are on the Window
 				//Let's check if we have a Control under the Mouse Pointer
-				Control* ctrl = ( *m )->GetControl( x, y, true );
-				if (!ctrl) {
-					ctrl = ( *m )->GetControl( x, y, false);
+				Control* ctrl = win->GetControl( x, y, true );
+				//look for the low priority flagged controls (mostly static labels)
+				if (ctrl != NULL) {
+					ctrl = win->GetControl( x, y, false );
 				}
-				if (ctrl != last_ctrl_over) {
+				if (ctrl != win->GetOver()) {
 					// Remove tooltip if mouse moved to different control
 					core->DisplayTooltip( 0, 0, NULL );
-					if (last_ctrl_over)
-						last_ctrl_over->OnMouseLeave( x - lastW->XPos - last_ctrl_over->XPos, y - lastW->YPos - last_ctrl_over->YPos );
-					if (ctrl)
-						ctrl->OnMouseEnter( x - lastW->XPos - ctrl->XPos, y - lastW->YPos - ctrl->YPos );
-					last_ctrl_over = ctrl;
+					last_win_focused->OnMouseLeave( x, y );
+					win->OnMouseEnter( x, y, ctrl );
 				}
 				if (ctrl != NULL) {
-					ctrl->OnMouseOver( x - lastW->XPos - ctrl->XPos, y - lastW->YPos - ctrl->YPos );
+					win->OnMouseOver( x, y );
 				}
-				lastW = *m;
-				core->GetVideoDriver()->SetCursor( core->Cursors[( *m )->Cursor], core->Cursors[( ( *m )->Cursor ) ^ 1] );
+				core->GetVideoDriver()->SetCursor( core->Cursors[win->Cursor], core->Cursors[win->Cursor ^ 1] );
 				return;
 			}
 		}
 		//stop going further
-		if (( *m )->Visible==WINDOW_FRONT)
+		if (( *m )->Visible == WINDOW_FRONT)
 			break;
 	}
 	core->DisplayTooltip( 0, 0, NULL );
@@ -195,25 +207,20 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y,
 					ctrl = ( *m )->GetControl( x, y, false);
 				}
 				//printf( "dn: ctrl: %p\n", ctrl );
-				if (lastW == NULL)
-					lastW = ( *m );
+				last_win_focused = *m;
 				if (ctrl != NULL) {
-					( *m )->SetFocused( ctrl );
-					ctrl->OnMouseDown( x - lastW->XPos - ctrl->XPos, y - lastW->YPos - ctrl->YPos, Button, Mod );
-					lastF = ctrl;
-					//printf( "dn lastF: %p\n", lastF );
+					last_win_focused->SetFocused( ctrl );
+					ctrl->OnMouseDown( x - last_win_focused->XPos - ctrl->XPos, y - last_win_focused->YPos - ctrl->YPos, Button, Mod );
 				}
-				lastW = *m;
 				return;
 			}
 		}
-		if (( *m )->Visible==WINDOW_FRONT) //stop looking further
+		if (( *m )->Visible == WINDOW_FRONT) //stop looking further
 			break;
 	}
-	if (lastF) {
-		lastF->hasFocus = false;
+	if (last_win_focused) {
+		last_win_focused->SetFocused(NULL);
 	}
-	lastF = NULL;
 }
 /** BroadCast Mouse Up Event */
 void EventMgr::MouseUp(unsigned short x, unsigned short y,
@@ -221,77 +228,75 @@ void EventMgr::MouseUp(unsigned short x, unsigned short y,
 {
 	MButtons &= ~Button;
 	//printf( "up lastF: %p\n", lastF );
-	if (lastF != NULL) {
-		lastF->OnMouseUp( x - lastW->XPos - lastF->XPos, y - lastW->YPos - lastF->YPos, Button, Mod );
-	}
+	if (last_win_focused == NULL) return;
+	Control *last_ctrl_focused = last_win_focused->GetFocus();
+	if (last_ctrl_focused == NULL) return;
+	last_ctrl_focused->OnMouseUp( x - last_win_focused->XPos - last_ctrl_focused->XPos,
+		y - last_win_focused->YPos - last_ctrl_focused->YPos, Button, Mod );
 }
 
 /** BroadCast Mouse Idle Event */
 void EventMgr::MouseIdle(unsigned long /*time*/)
 {
-	if (last_ctrl_over != NULL) {
-		last_ctrl_over->DisplayTooltip();
-	}
+	if (last_win_over == NULL) return;
+	Control *ctrl = last_win_over->GetOver();
+	if (ctrl == NULL) return;
+	ctrl->DisplayTooltip();
 }
 
 /** BroadCast Key Press Event */
 void EventMgr::KeyPress(unsigned char Key, unsigned short Mod)
 {
-	if (lastF) {
-printf("Lastf %d\n", lastF->ControlID);
-		lastF->OnKeyPress( Key, Mod );
-	}
-else {
-printf("Lastf xxxxx\n");
-}
+	if (last_win_focused == NULL) return;
+	Control *ctrl = last_win_focused->GetFocus();
+	if (ctrl == NULL) return;
+	ctrl->OnKeyPress( Key, Mod );
 }
 /** BroadCast Key Release Event */
 void EventMgr::KeyRelease(unsigned char Key, unsigned short Mod)
 {
-	if (lastF) {
-		lastF->OnKeyRelease( Key, Mod );
-	}
+	if (last_win_focused == NULL) return;
+	Control *ctrl = last_win_focused->GetFocus();
+	if (ctrl == NULL) return;
+	ctrl->OnKeyRelease( Key, Mod );
 }
 
 /** Special Key Press Event */
 void EventMgr::OnSpecialKeyPress(unsigned char Key)
 {
-	if (lastW) {
-		Control* ctrl = lastW->GetDefaultControl();
-		if (!ctrl) {
-			if (lastF)
-				lastF->OnSpecialKeyPress( Key );
-			return;
-		}
-		switch (ctrl->ControlType) {
-			case IE_GUI_GAMECONTROL:
-				ctrl->OnSpecialKeyPress( Key );
-				return;
-			case IE_GUI_BUTTON:
-				if (Key == GEM_RETURN) {
-					ctrl->OnSpecialKeyPress( Key );
-					return;
-				}
-			default:
-				if (lastF)
-					lastF->OnSpecialKeyPress( Key );
-		}
+	if (!last_win_focused) {
 		return;
 	}
-	if (lastF) {
-		lastF->OnSpecialKeyPress( Key );
+	Control *ctrl = last_win_focused->GetDefaultControl();
+	//if there was no default button set, then the current focus will get it
+	if (!ctrl) {
+		ctrl = last_win_focused->GetFocus();
+	}
+	if (ctrl) {
+		switch (ctrl->ControlType) {
+			//buttons will receive only GEM_RETURN
+			case IE_GUI_BUTTON:
+				if (Key != GEM_RETURN) {
+					return;
+				}
+				break;
+			case IE_GUI_GAMECONTROL:
+				//gamecontrols will receive all special keys
+				break;
+			default:
+				//other controls don't receive any
+				return;
+		}
+		ctrl->OnSpecialKeyPress( Key );
 	}
 }
 
 void EventMgr::SetFocused(Window *win, Control *ctrl)
 {
-	lastW=win;
-	lastW->SetFocused(ctrl);
-	lastF=ctrl;
-printf("SetFocus: %d/%d\n",(int) (lastW->WindowID), lastF->ControlID);
+	last_win_focused = win;
+	last_win_focused->SetFocused(ctrl);
 	//this is to refresh changing mouse cursors should the focus change)
 	int x,y;
 	core->GetVideoDriver()->GetMousePos(x,y);
 	MouseMove((unsigned short) x, (unsigned short) y);
 }
-

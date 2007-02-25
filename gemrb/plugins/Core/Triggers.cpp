@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.70 2007/02/23 21:10:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Triggers.cpp,v 1.71 2007/02/25 13:56:50 avenger_teambg Exp $
  *
  */
 
@@ -207,7 +207,7 @@ int GameScript::NearbyDialog(Scriptable* Sender, Trigger* parameters)
 	if ( !target ) {
 		return 0;
 	}
-	return CanSee( Sender, target, false, 0 );
+	return CanSee( Sender, target, false, GA_NO_DEAD );
 }
 
 //atm this checks for InParty and See, it is unsure what is required
@@ -233,7 +233,7 @@ int GameScript::IsValidForPartyDialog(Scriptable* Sender, Trigger* parameters)
 	if (pc->globalID == gc->targetID || pc->globalID==gc->speakerID) {
 		return 0;
 	}
-	return CanSee( Sender, target, false, 0 );
+	return CanSee( Sender, target, false, GA_NO_DEAD );
 }
 
 int GameScript::InParty(Scriptable* Sender, Trigger* parameters)
@@ -1122,45 +1122,45 @@ int GameScript::NumTimesInteractedLT(Scriptable* Sender, Trigger* parameters)
 	Actor* actor = ( Actor* ) scr;
 	return actor->InteractCount < (ieDword) parameters->int1Parameter ? 1 : 0;
 }
- 
-int GameScript::NumTimesInteractedObject(Scriptable* Sender, Trigger* parameters) 
-{ 
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter ); 
-	if (!scr) { 
-		scr = Sender; 
-	} 
-	if (scr->Type != ST_ACTOR) { 
-		return 0; 
-	} 
-	Actor* actor = ( Actor* ) scr; 
-	return actor->InteractCount == (ieDword) parameters->int0Parameter ? 1 : 0; 
-} 
- 
-int GameScript::NumTimesInteractedObjectGT(Scriptable* Sender, Trigger* parameters) 
-{ 
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter ); 
-	if (!scr) { 
-		scr = Sender; 
-	} 
-	if (scr->Type != ST_ACTOR) { 
-		return 0; 
-	} 
-	Actor* actor = ( Actor* ) scr; 
-	return actor->InteractCount > (ieDword) parameters->int0Parameter ? 1 : 0; 
-} 
- 
-int GameScript::NumTimesInteractedObjectLT(Scriptable* Sender, Trigger* parameters) 
-{ 
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter ); 
-	if (!scr) { 
-		scr = Sender; 
-	} 
-	if (scr->Type != ST_ACTOR) { 
-		return 0; 
-	} 
-	Actor* actor = ( Actor* ) scr; 
-	return actor->InteractCount < (ieDword) parameters->int0Parameter ? 1 : 0; 
-} 
+
+int GameScript::NumTimesInteractedObject(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr) {
+		scr = Sender;
+	}
+	if (scr->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) scr;
+	return actor->InteractCount == (ieDword) parameters->int0Parameter ? 1 : 0;
+}
+
+int GameScript::NumTimesInteractedObjectGT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr) {
+		scr = Sender;
+	}
+	if (scr->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) scr;
+	return actor->InteractCount > (ieDword) parameters->int0Parameter ? 1 : 0;
+}
+
+int GameScript::NumTimesInteractedObjectLT(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!scr) {
+		scr = Sender;
+	}
+	if (scr->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) scr;
+	return actor->InteractCount < (ieDword) parameters->int0Parameter ? 1 : 0;
+}
 
 int GameScript::ObjectActionListEmpty(Scriptable* Sender, Trigger* parameters)
 {
@@ -2022,13 +2022,26 @@ int GameScript::CheckStatLT(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::See(Scriptable* Sender, Trigger* parameters)
 {
-	return SeeCore(Sender, parameters, 0);
+	int see = SeeCore(Sender, parameters, 0);
+	//mark LastSeen for clear!!!
+	if (Sender->Type==ST_ACTOR && see) {
+		Actor *act = (Actor *) Sender;
+		//save lastseen as lastmarked
+		act->LastMarked = act->LastSeen;
+		Sender->AddTrigger (&act->LastSeen);
+	}
+	return see;
 }
 
 //unsure if this should be different from see, we'll see :)
 int GameScript::Detect(Scriptable* Sender, Trigger* parameters)
 {
-	return SeeCore(Sender, parameters, 0);
+	parameters->int0Parameter=1; //seedead
+	int see = SeeCore(Sender, parameters, 0);
+	if (!see) {
+		return 0;
+	}
+	return 1;
 }
 
 int GameScript::LOS(Scriptable* Sender, Trigger* parameters)
@@ -3009,7 +3022,7 @@ int GameScript::AttackedBy(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor *scr = (Actor *) Sender;
-	Targets *tgts = GetAllObjects(Sender, parameters->objectParameter);
+	Targets *tgts = GetAllObjects(Sender, parameters->objectParameter, GA_NO_DEAD);
 	int ret = 0;
 	int AStyle = parameters->int0Parameter;
 	//iterate through targets to get the actor
@@ -3127,8 +3140,9 @@ int GameScript::LastMarkedObject_Trigger(Scriptable* Sender, Trigger* parameters
 		return 0;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	if (MatchActor(Sender, actor->LastSeen, parameters->objectParameter)) {
-		Sender->AddTrigger(&actor->LastSeen);
+	if (MatchActor(Sender, actor->LastMarked, parameters->objectParameter)) {
+		//don't mark this object for clear
+		//Sender->AddTrigger(&actor->LastSeen);
 		return 1;
 	}
 	return 0;
@@ -3245,7 +3259,9 @@ int GameScript::Vacant(Scriptable* Sender, Trigger* /*parameters*/)
 		return 0;
 	}
 	Map *map = (Map *) Sender;
-	if ( map->CanFree() ) return 1;
+	if ( map->CanFree() ) {
+		return 1;
+	}
 	return 0;
 }
 
@@ -3261,7 +3277,11 @@ int GameScript::InWeaponRange(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor *actor = (Actor *) Sender;
 	ITMExtHeader *header;
-	unsigned int wrange = actor->GetWeapon(header) * 10;
+	unsigned int wrange = actor->GetWeapon(header, false) * 10;
+	unsigned int wrange2 = actor->GetWeapon(header, true) * 10;
+	if (wrange2>wrange) {
+		wrange=wrange2;
+	}
 	if ( PersonalDistance( Sender, tar ) <= wrange ) {
 		return 1;
 	}

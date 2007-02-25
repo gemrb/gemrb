@@ -8,14 +8,14 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.26 2006/08/10 16:44:21 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.h,v 1.27 2007/02/25 13:56:50 avenger_teambg Exp $
  *
  */
 
@@ -122,16 +122,28 @@ public:
 	bool IsValidControl(unsigned short ID, Control *ctrl);
 	/** Deletes the xth. Control */
 	void DelControl(unsigned short i);
-	/** Returns the Default Control which is a button atm */
+	/** Returns the Default Control which may be a button/gamecontrol atm */
 	Control* GetDefaultControl();
+	/** Sets 'ctrl' as currently under mouse */
+	void SetOver(Control* ctrl);
+	/** Returns last control under mouse */
+	Control* GetOver();
 	/** Sets 'ctrl' as Focused */
 	void SetFocused(Control* ctrl);
+	/** Returns last focused control */
+	Control* GetFocus();
 	/** Redraw all the Window */
 	void Invalidate();
 	/** Redraw controls of the same group */
 	void RedrawControls(const char* VarName, unsigned int Sum);
 	/** Links a scrollbar to a text area */
 	void Link(unsigned short SBID, unsigned short TAID);
+	/** Mouse entered a new control's rectangle */
+	void OnMouseEnter(unsigned short x, unsigned short y, Control *ctrl);
+	/** Mouse left the current control */
+	void OnMouseLeave(unsigned short x, unsigned short y);
+	/** Mouse is over the current control */
+	void OnMouseOver(unsigned short x, unsigned short y);
 public: //Public attributes
 	/** WinPack */
 	char WindowPack[10];
@@ -160,6 +172,9 @@ private: // Private attributes
 	Control* lastC;
 	/** Last Focused Control */
 	Control* lastFocus;
+	/** Last Control under mouse */
+	Control* lastOver;
+
 public:
 	void release(void);
 };

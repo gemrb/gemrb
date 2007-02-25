@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.121 2007/02/11 21:27:17 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/ActorBlock.h,v 1.122 2007/02/25 13:56:49 avenger_teambg Exp $
  *
  */
 
@@ -138,6 +138,7 @@ class Gem_Polygon;
 
 //global bittriggers (set in game)
 #define BT_PARTYRESTED    0x10000
+#define BT_VACANT         0x20000
 
 #ifdef WIN32
 

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.86 2007/02/16 18:03:35 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GSUtils.cpp,v 1.87 2007/02/25 13:56:49 avenger_teambg Exp $
  *
  */
 
@@ -326,12 +326,12 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 	}
 }
 
-int CanSee(Scriptable* Sender, Scriptable* target, bool range, int seedead)
+int CanSee(Scriptable* Sender, Scriptable* target, bool range, int nodead)
 {
 	Map *map;
 	unsigned int dist;
 
-	if (!seedead) {
+	if (nodead) {
 		if (target->Type==ST_ACTOR) {
 			Actor *tar = (Actor *) target;
 			if (target->GetInternalFlag()&IF_REALLYDIED) {
@@ -368,13 +368,21 @@ int CanSee(Scriptable* Sender, Scriptable* target, bool range, int seedead)
 //non actors can be seen too (reducing function to LOS)
 int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos)
 {
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	//see dead
+	int flags;
+
+	if (parameters->int0Parameter) {
+		flags = 0;
+	} else {
+		flags = GA_NO_DEAD;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter, flags );
 	/* don't set LastSeen if this isn't an actor */
 	if (!tar) {
 		return 0;
 	}
 	//both are actors
-	if (CanSee(Sender, tar, true, parameters->int0Parameter) ) {
+	if (CanSee(Sender, tar, true, flags) ) {
 		if (justlos) {
 			return 1;
 		}
@@ -445,19 +453,19 @@ static Targets* ReturnActorAsTarget(Actor *aC)
 		}
 		//Ok :) we now have our Object. Let's create a Target struct and add the object to it
 		Targets *tgts = new Targets( );
-		tgts->AddTarget( aC, 0 );
+		tgts->AddTarget( aC, 0, 0 );
 		//return here because object name/IDS targeting are mutually exclusive
 		return tgts;
 }
 
 /* returns actors that match the [x.y.z] expression */
-static Targets* EvaluateObject(Scriptable* Sender, Object* oC)
+static Targets* EvaluateObject(Scriptable* Sender, Object* oC, int ga_flags)
 {
 	Map *map=Sender->GetCurrentArea();
 
 	if (oC->objectName[0]) {
 		//We want the object by its name... (doors/triggers don't play here!)
-		Actor* aC = map->GetActor( oC->objectName );
+		Actor* aC = map->GetActor( oC->objectName, ga_flags );
 		return ReturnActorAsTarget(aC);
 	}
 
@@ -509,7 +517,7 @@ abort();
 				Actor *ac=map->GetActor(i,true);
 				int dist = Distance(Sender->Pos, ac->Pos);
 				if (ac && func(ac, oC->objectFields[j]) ) {
-					tgts->AddTarget((Scriptable *) ac, dist);
+					tgts->AddTarget((Scriptable *) ac, dist, ga_flags);
 				}
 			}
 		}
@@ -517,12 +525,12 @@ abort();
 	return tgts;
 }
 
-Targets* GetAllObjects(Scriptable* Sender, Object* oC)
+Targets* GetAllObjects(Scriptable* Sender, Object* oC, int ga_flags)
 {
 	if (!oC) {
 		return NULL;
 	}
-	Targets* tgts = EvaluateObject(Sender, oC);
+	Targets* tgts = EvaluateObject(Sender, oC, ga_flags);
 	//if we couldn't find an endpoint by name or object qualifiers
 	//it is not an Actor, but could still be a Door or Container (scriptable)
 	if (!tgts && oC->objectName[0]) {
@@ -555,12 +563,12 @@ Targets* GetAllObjects(Scriptable* Sender, Object* oC)
 	return tgts;
 }
 
-Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC)
+Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags)
 {
 	if (!oC) {
 		return NULL;
 	}
-	Targets *tgts = GetAllObjects(Sender, oC);
+	Targets *tgts = GetAllObjects(Sender, oC, ga_flags);
 	if (tgts) {
 		//now this could return other than actor objects
 		Scriptable *object = tgts->GetTarget(0,-1);
@@ -769,14 +777,14 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		printf("BeginDialog core\n");
 	}
 	if (Flags & BD_OWN) {
-		scr = tar = GetActorFromObject( Sender, parameters->objects[1] );
+		scr = tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 	} else {
 		if (Flags & BD_NUMERIC) {
 			//the target was already set, this is a crude hack
 			tar = core->GetGameControl()->GetTarget();
 		}
 		else {
-			tar = GetActorFromObject( Sender, parameters->objects[1] );
+			tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 		}
 		scr = Sender;
 	}
@@ -808,7 +816,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 
 	speaker = NULL;
 	target = (Actor *) tar;
-	if (!CanSee(scr, target, false, 0) ) {
+	if (!CanSee(scr, target, false, GA_NO_DEAD) ) {
 		printMessage("GameScript"," ",LIGHT_RED);
 		printf("CanSee returned false! Speaker and target are:\n");
 		((Actor *) scr)->DebugDump();
@@ -827,7 +835,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			Sender->ReleaseCurrentAction();
 			return;
 		}
-		ieDword range = MAX_OPERATING_DISTANCE;
+		ieDword range = MAX_TRAVELING_DISTANCE;
 		//making sure speaker is the protagonist, player, actor
 		if ( target->InParty == 1) swap = true;
 		else if ( speaker->InParty !=1 && target->InParty) swap = true;
@@ -835,7 +843,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		if (Flags&BD_CHECKDIST) {
 			if (PersonalDistance(scr, target)>range ) {
 				 //this is unsure, the target's path will be cleared
-				GoNearAndRetry(Sender, tar, true, range);
+				GoNearAndRetry(Sender, tar, true, MAX_OPERATING_DISTANCE);
 				Sender->ReleaseCurrentAction();
 				return;
 			}
@@ -853,9 +861,9 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 				Sender->SetWait(1);
 				return;
 			}
-			GetTalkPositionFromScriptable(scr, TalkPos);      
-			if (Distance(TalkPos, target)>MAX_OPERATING_DISTANCE ) {
-				//try to force the target to come closer???  
+			GetTalkPositionFromScriptable(scr, TalkPos);
+			if (Distance(TalkPos, target)>MAX_TRAVELING_DISTANCE ) {
+				//try to force the target to come closer???
 				GoNear(target, TalkPos);
 				Sender->AddActionInFront( Sender->CurrentAction );
 				Sender->ReleaseCurrentAction();
@@ -931,7 +939,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			Scriptable *tmp = tar;
 			tar = scr;
 			scr = tmp;
-		} else {      
+		} else {
 			if (!(Flags & BD_INTERRUPT)) {
 				if (tar->GetNextAction()) {
 					core->DisplayConstantString(STR_TARGETBUSY,0xff0000);
@@ -1063,8 +1071,18 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 		wrange = 10;
 	}
 
+	Actor *tar = NULL;
+	ieDword targetID = 0;
+	if (target->Type==ST_ACTOR) {
+		tar = (Actor *) target;
+		targetID = tar->GetID();
+	}
+	if (actor == tar) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
 	if (!(flags&AC_NO_SOUND) ) {
-		if (target->Type!=ST_ACTOR || actor->LastTarget != ((Actor *) target)->GetID() ) {
+		if (actor->LastTarget != targetID) {
 			//play attack sound
 			DisplayStringCore(Sender, VB_ATTACK, DS_CONSOLE|DS_CONST );
 			//display attack message
@@ -1093,7 +1111,7 @@ bool MatchActor(Scriptable *Sender, ieDword actorID, Object* oC)
 	if (!Sender || !oC) {
 		return false;
 	}
-	Targets *tgts = GetAllObjects(Sender, oC);
+	Targets *tgts = GetAllObjects(Sender, oC, 0);
 	bool ret = false;
 
 	if (tgts) {
@@ -1120,7 +1138,7 @@ int GetObjectCount(Scriptable* Sender, Object* oC)
 	// EvaluateObject will return [PC]
 	// GetAllObjects will also return Myself (evaluates object filters)
 	// i believe we need the latter here
-	Targets* tgts = GetAllObjects(Sender, oC);
+	Targets* tgts = GetAllObjects(Sender, oC, 0);
 	int count = tgts->Count();
 	delete tgts;
 	return count;
@@ -1141,7 +1159,7 @@ int GetObjectLevelCount(Scriptable* Sender, Object* oC)
 	// EvaluateObject will return [PC]
 	// GetAllObjects will also return Myself (evaluates object filters)
 	// i believe we need the latter here
-	Targets* tgts = GetAllObjects(Sender, oC);
+	Targets* tgts = GetAllObjects(Sender, oC, 0);
 	int count = 0;
 	if (tgts) {
 		targetlist::iterator m;
@@ -1952,7 +1970,7 @@ Targets *GetMyTarget(Scriptable *Sender, Actor *actor, Targets *parameters)
 	if (actor) {
 		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastTarget);
 		if (target) {
-			parameters->AddTarget(target, 0);
+			parameters->AddTarget(target, 0, 0);
 		}
 	}
 	return parameters;
@@ -1975,7 +1993,7 @@ Targets *XthNearestDoor(Targets *parameters, unsigned int count)
 	while (i--) {
 		Door *door = map->TMap->GetDoor(i);
 		unsigned int dist = Distance(origin->Pos, door->Pos);
-		parameters->AddTarget(door, dist);
+		parameters->AddTarget(door, dist, 0);
 	}
 
 	//now get the xth door
@@ -1984,7 +2002,7 @@ Targets *XthNearestDoor(Targets *parameters, unsigned int count)
 	if (!origin) {
 		return parameters;
 	}
-	parameters->AddTarget(origin, 0);
+	parameters->AddTarget(origin, 0, 0);
 	return parameters;
 }
 
@@ -2002,10 +2020,11 @@ Targets *XthNearestOf(Targets *parameters, int count)
 	if (!origin) {
 		return parameters;
 	}
-	parameters->AddTarget(origin, 0);
+	parameters->AddTarget(origin, 0, 0);
 	return parameters;
 }
 
+//mygroup means the same specifics as origin
 Targets *XthNearestMyGroupOfType(Scriptable *origin, Targets *parameters, unsigned int count)
 {
 	if (origin->Type != ST_ACTOR) {
@@ -2019,18 +2038,8 @@ Targets *XthNearestMyGroupOfType(Scriptable *origin, Targets *parameters, unsign
 		return parameters;
 	}
 	Actor *actor = (Actor *) origin;
-	//determining the allegiance of the origin
-	int type = 2; //neutral, has no enemies
-	if (actor->GetStat(IE_EA) <= EA_GOODCUTOFF) {
-		type = 0; //PC
-	}
-	if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
-		type = 1;
-	}
-	if (type==2) {
-		parameters->Clear();
-		return parameters;
-	}
+	//determining the specifics of origin
+	ieDword type = actor->GetStat(IE_SPECIFIC); //my group
 
 	while ( t ) {
 		if (t->actor->Type!=ST_ACTOR) {
@@ -2038,17 +2047,9 @@ Targets *XthNearestMyGroupOfType(Scriptable *origin, Targets *parameters, unsign
 			continue;
 		}
 		Actor *actor = (Actor *) (t->actor);
-		if (type) { //origin is enemy, so we remove PC groups
-			if (actor->GetStat(IE_EA) <= EA_GOODCUTOFF) {
-				t=parameters->RemoveTargetAt(m);
-				continue;
-			}
-		}
-		else {
-			if (actor->GetStat(IE_EA) >= EA_EVILCUTOFF) {
-				t=parameters->RemoveTargetAt(m);
-				continue;
-			}
+		if (actor->GetStat(IE_SPECIFIC) != type) {
+			t=parameters->RemoveTargetAt(m);
+			continue;
 		}
 		t = parameters->GetNextTarget(m, ST_ACTOR);
 	}
@@ -2100,7 +2101,7 @@ Targets *NearestEnemySummoned(Scriptable *origin, Targets *parameters)
 		t = parameters->GetNextTarget(m, ST_ACTOR);
 	}
 	parameters->Clear();
-	parameters->AddTarget(actor, 0);
+	parameters->AddTarget(actor, 0, GA_NO_DEAD);
 	return parameters;
 }
 
@@ -2178,14 +2179,15 @@ Targets *XthNearestEnemyOf(Targets *parameters, int count)
 		int distance = Distance(ac, origin);
 		if (type) { //origin is PC
 			if (ac->GetStat(IE_EA) >= EA_EVILCUTOFF) {
-				parameters->AddTarget(ac, distance);
+				parameters->AddTarget(ac, distance, GA_NO_DEAD);
 			}
 		}
 		else {
 			if (ac->GetStat(IE_EA) <= EA_GOODCUTOFF) {
-				parameters->AddTarget(ac, distance);
+				parameters->AddTarget(ac, distance, GA_NO_DEAD);
 			}
 		}
 	}
 	return XthNearestOf(parameters,count);
 }
+

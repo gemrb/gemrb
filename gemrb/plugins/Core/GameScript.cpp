@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.405 2007/02/23 21:10:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.cpp,v 1.406 2007/02/25 13:56:49 avenger_teambg Exp $
  *
  */
 
@@ -876,7 +876,7 @@ static ObjectLink objectnames[] = {
 	{"lastheardby", GameScript::LastHeardBy},
 	{"lasthelp", GameScript::LastHelp},
 	{"lasthitter", GameScript::LastHitter},
-	{"lastmarkedobject", GameScript::LastSeenBy},
+	{"lastmarkedobject", GameScript::LastMarkedObject},
 	{"lastseenby", GameScript::LastSeenBy},
 	{"lastsummonerof", GameScript::LastSummonerOf},
 	{"lasttalkedtoby", GameScript::LastTalkedToBy},
@@ -1110,7 +1110,7 @@ Scriptable *Targets::GetTarget(unsigned int index, int Type)
 }
 
 //this stuff should be refined, dead actors are sometimes targetable by script?
-void Targets::AddTarget(Scriptable* target, unsigned int distance)
+void Targets::AddTarget(Scriptable* target, unsigned int distance, int ga_flags)
 {
 	if (!target) {
 		return;
@@ -1120,9 +1120,12 @@ void Targets::AddTarget(Scriptable* target, unsigned int distance)
 	case ST_ACTOR:
 		//i don't know if unselectable actors are targetable by script
 		//if yes, then remove GA_SELECT
-		if (!((Actor *) target)->ValidTarget(GA_SELECT|GA_NO_DEAD) ) {
-			return;
+		if (ga_flags) {
+			if (!((Actor *) target)->ValidTarget(ga_flags) ) {
+				return;
+			}
 		}
+		break;
 	case ST_CONTAINER:
 		break;
 	case ST_DOOR:
@@ -1566,7 +1569,7 @@ void GameScript::Update()
 						return;
 					}
 
-					MySelf->ClearActions();
+					//MySelf->ClearActions();
 				}
 				lastAction=a;
 			}
@@ -1736,7 +1739,7 @@ void GameScript::ExecuteString(Scriptable* Sender, char* String)
 Targets *GameScript::Myself(Scriptable* Sender, Targets* parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(Sender, 0);
+	parameters->AddTarget(Sender, 0, 0);
 	return parameters;
 }
 
@@ -1801,7 +1804,7 @@ Targets *GameScript::Protagonist(Scriptable* Sender, Targets *parameters)
 	if (charnameisgabber) {
 		GameControl* gc = core->GetGameControl();
 		if (gc) {
-			parameters->AddTarget(gc->GetSpeaker(), 0);
+			parameters->AddTarget(gc->GetSpeaker(), 0, 0);
 		}
 		if (parameters->Count()) {
 			return parameters;
@@ -1811,11 +1814,11 @@ Targets *GameScript::Protagonist(Scriptable* Sender, Targets *parameters)
 		int i = game->GetPartySize(false);
 		while(i--) {
 			Actor *target = game->GetPC(i,false);
-			parameters->AddTarget(target, Distance(Sender, target) );
+			parameters->AddTarget(target, Distance(Sender, target), 0 );
 		}
 		return parameters;
 	}
-	parameters->AddTarget(core->GetGame()->FindPC(1), 0);
+	parameters->AddTarget(core->GetGame()->FindPC(1), 0, 0);
 	return parameters;
 }
 
@@ -1825,7 +1828,7 @@ Targets *GameScript::Gabber(Scriptable* /*Sender*/, Targets *parameters)
 	parameters->Clear();
 	GameControl* gc = core->GetGameControl();
 	if (gc) {
-		parameters->AddTarget(gc->GetSpeaker(), 0);
+		parameters->AddTarget(gc->GetSpeaker(), 0, 0);
 	}
 	return parameters;
 }
@@ -1835,11 +1838,30 @@ Targets *GameScript::LastTrigger(Scriptable *Sender, Targets *parameters)
 	parameters->Clear();
 	if (Sender->LastTrigger) {
 		Actor *target = Sender->GetCurrentArea()->GetActorByGlobalID(Sender->LastTrigger);
- 		parameters->AddTarget(target, 0);
+ 		parameters->AddTarget(target, 0, 0);
 	}
 	return parameters;
 }
 
+Targets *GameScript::LastMarkedObject(Scriptable *Sender, Targets *parameters)
+{
+	Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
+	if (!actor) {
+		if (Sender->Type==ST_ACTOR) {
+			actor = (Actor *) Sender;
+		}
+	}
+	parameters->Clear();
+	if (actor) {
+		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastMarked);
+		if (target) {
+			parameters->AddTarget(target, 0, 0);
+		}
+	}
+	return parameters;
+}
+
+//actions should always use LastMarkedObject, because LastSeen could be deleted
 Targets *GameScript::LastSeenBy(Scriptable *Sender, Targets *parameters)
 {
 	Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
@@ -1852,7 +1874,7 @@ Targets *GameScript::LastSeenBy(Scriptable *Sender, Targets *parameters)
 	if (actor) {
 		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastSeen);
 		if (target) {
-			parameters->AddTarget(target, 0);
+			parameters->AddTarget(target, 0, 0);
 		}
 	}
 	return parameters;
@@ -1870,7 +1892,7 @@ Targets *GameScript::LastHelp(Scriptable *Sender, Targets *parameters)
 	if (actor) {
 		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastHelp);
 		if (target) {
-			parameters->AddTarget(target, 0);
+			parameters->AddTarget(target, 0, 0);
 		}
 	}
 	return parameters;
@@ -1888,7 +1910,7 @@ Targets *GameScript::LastHeardBy(Scriptable *Sender, Targets *parameters)
 	if (actor) {
 		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastHeard);
 		if (target) {
-			parameters->AddTarget(target, 0);
+			parameters->AddTarget(target, 0, 0);
 		}
 	}
 	return parameters;
@@ -1907,7 +1929,7 @@ Targets *GameScript::ProtectorOf(Scriptable *Sender, Targets *parameters)
 	if (actor) {
 		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastProtected);
 		if (target) {
-			parameters->AddTarget(target, 0);
+			parameters->AddTarget(target, 0, 0);
 		}
 	}
 	return parameters;
@@ -1925,7 +1947,7 @@ Targets *GameScript::ProtectedBy(Scriptable *Sender, Targets *parameters)
 	if (actor) {
 		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastProtected);
 		if (target) {
-			parameters->AddTarget(target, 0);
+			parameters->AddTarget(target, 0, 0);
 		}
 	}
 	return parameters;
@@ -1943,7 +1965,7 @@ Targets *GameScript::LastCommandedBy(Scriptable *Sender, Targets *parameters)
 	if (actor) {
 		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastCommander);
 		if (target) {
-			parameters->AddTarget(target, 0);
+			parameters->AddTarget(target, 0, 0);
 		}
 	}
 	return parameters;
@@ -1992,7 +2014,7 @@ Targets *GameScript::LastAttackerOf(Scriptable *Sender, Targets *parameters)
 	if (actor) {
 		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastHitter);
 		if (target) {
-			parameters->AddTarget(target, 0);
+			parameters->AddTarget(target, 0, GA_NO_DEAD);
 		}
 	}
 	return parameters;
@@ -2010,7 +2032,7 @@ Targets *GameScript::LastHitter(Scriptable *Sender, Targets *parameters)
 	if (actor) {
 		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastHitter);
 		if (target) {
-			parameters->AddTarget(target, 0);
+			parameters->AddTarget(target, 0, GA_NO_DEAD);
 		}
 	}
 	return parameters;
@@ -2028,7 +2050,7 @@ Targets *GameScript::LastTalkedToBy(Scriptable *Sender, Targets *parameters)
 	if (actor) {
 		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastTalkedTo);
 		if (target) {
-			parameters->AddTarget(target, 0);
+			parameters->AddTarget(target, 0, 0);
 		}
 	}
 	return parameters;
@@ -2046,7 +2068,7 @@ Targets *GameScript::LastSummonerOf(Scriptable* Sender, Targets *parameters)
 	if (actor) {
 		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastSummoner);
 		if (target) {
-			parameters->AddTarget(target, 0);
+			parameters->AddTarget(target, 0, 0);
 		}
 	}
 	return parameters;
@@ -2055,112 +2077,112 @@ Targets *GameScript::LastSummonerOf(Scriptable* Sender, Targets *parameters)
 Targets *GameScript::Player1(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(1), 0);
+	parameters->AddTarget(core->GetGame()->FindPC(1), 0, 0);
 	return parameters;
 }
 
 Targets *GameScript::Player1Fill(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(0,false), 0);
+	parameters->AddTarget(core->GetGame()->GetPC(0,false), 0, 0);
 	return parameters;
 }
 
 Targets *GameScript::Player2(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(2), 0);
+	parameters->AddTarget(core->GetGame()->FindPC(2), 0, 0);
 	return parameters;
 }
 
 Targets *GameScript::Player2Fill(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(1,false), 0);
+	parameters->AddTarget(core->GetGame()->GetPC(1,false), 0, 0);
 	return parameters;
 }
 
 Targets *GameScript::Player3(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(3), 0);
+	parameters->AddTarget(core->GetGame()->FindPC(3), 0, 0);
 	return parameters;
 }
 
 Targets *GameScript::Player3Fill(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(2,false), 0);
+	parameters->AddTarget(core->GetGame()->GetPC(2,false), 0, 0);
 	return parameters;
 }
 
 Targets *GameScript::Player4(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(4), 0);
+	parameters->AddTarget(core->GetGame()->FindPC(4), 0, 0);
 	return parameters;
 }
 
 Targets *GameScript::Player4Fill(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(3,false), 0);
+	parameters->AddTarget(core->GetGame()->GetPC(3,false), 0, 0);
 	return parameters;
 }
 
 Targets *GameScript::Player5(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(5), 0);
+	parameters->AddTarget(core->GetGame()->FindPC(5), 0, 0);
 	return parameters;
 }
 
 Targets *GameScript::Player5Fill(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(4,false), 0);
+	parameters->AddTarget(core->GetGame()->GetPC(4,false), 0, 0);
 	return parameters;
 }
 
 Targets *GameScript::Player6(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(6), 0);
+	parameters->AddTarget(core->GetGame()->FindPC(6), 0, 0);
 	return parameters;
 }
 
 Targets *GameScript::Player6Fill(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(5,false), 0);
+	parameters->AddTarget(core->GetGame()->GetPC(5,false), 0, 0);
 	return parameters;
 }
 
 Targets *GameScript::Player7(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(7), 0);
+	parameters->AddTarget(core->GetGame()->FindPC(7), 0, 0);
 	return parameters;
 }
 
 Targets *GameScript::Player7Fill(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(6,false), 0);
+	parameters->AddTarget(core->GetGame()->GetPC(6,false), 0, 0);
 	return parameters;
 }
 
 Targets *GameScript::Player8(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->FindPC(8), 0);
+	parameters->AddTarget(core->GetGame()->FindPC(8), 0, 0);
 	return parameters;
 }
 
 Targets *GameScript::Player8Fill(Scriptable* /*Sender*/, Targets *parameters)
 {
 	parameters->Clear();
-	parameters->AddTarget(core->GetGame()->GetPC(7,false), 0);
+	parameters->AddTarget(core->GetGame()->GetPC(7,false), 0, 0);
 	return parameters;
 }
 
@@ -2185,7 +2207,7 @@ Targets *GameScript::BestAC(Scriptable* /*Sender*/, Targets *parameters)
 	}
 
 	parameters->Clear();
-	parameters->AddTarget(scr, 0);
+	parameters->AddTarget(scr, 0, GA_NO_DEAD);
 	return parameters;
 }
 
@@ -2212,7 +2234,7 @@ Targets *GameScript::StrongestOfMale(Scriptable* /*Sender*/, Targets *parameters
 	}
 	parameters->Clear();
 	if (scr) {
-		parameters->AddTarget(scr, 0);
+		parameters->AddTarget(scr, 0, GA_NO_DEAD);
 	}
 	return parameters;
 }
@@ -2237,7 +2259,7 @@ Targets *GameScript::StrongestOf(Scriptable* /*Sender*/, Targets *parameters)
 		}
 	}
 	parameters->Clear();
-	parameters->AddTarget(scr, 0);
+	parameters->AddTarget(scr, 0, GA_NO_DEAD);
 	return parameters;
 }
 
@@ -2261,7 +2283,7 @@ Targets *GameScript::WeakestOf(Scriptable* /*Sender*/, Targets *parameters)
 		}
 	}
 	parameters->Clear();
-	parameters->AddTarget(scr, 0);
+	parameters->AddTarget(scr, 0, GA_NO_DEAD);
 	return parameters;
 }
 
@@ -2285,7 +2307,7 @@ Targets *GameScript::WorstAC(Scriptable* /*Sender*/, Targets *parameters)
 		}
 	}
 	parameters->Clear();
-	parameters->AddTarget(scr, 0);
+	parameters->AddTarget(scr, 0, GA_NO_DEAD);
 	return parameters;
 }
 
@@ -2309,7 +2331,7 @@ Targets *GameScript::MostDamagedOf(Scriptable* /*Sender*/, Targets *parameters)
 		}
 	}
 	parameters->Clear();
-	parameters->AddTarget(scr, 0);
+	parameters->AddTarget(scr, 0, GA_NO_DEAD);
 	return parameters;
 }
 Targets *GameScript::LeastDamagedOf(Scriptable* /*Sender*/, Targets *parameters)
@@ -2332,7 +2354,7 @@ Targets *GameScript::LeastDamagedOf(Scriptable* /*Sender*/, Targets *parameters)
 		}
 	}
 	parameters->Clear();
-	parameters->AddTarget(scr, 0);
+	parameters->AddTarget(scr, 0, GA_NO_DEAD);
 	return parameters;
 }
 
@@ -2341,7 +2363,7 @@ Targets *GameScript::Farthest(Scriptable* /*Sender*/, Targets *parameters)
 	const targettype *t = parameters->GetLastTarget(ST_ACTOR);
 	parameters->Clear();
 	if (t) {
-		parameters->AddTarget(t->actor, 0);
+		parameters->AddTarget(t->actor, 0, 0);
 	}
 	return parameters;
 }
@@ -2532,7 +2554,7 @@ Targets *GameScript::NearestPC(Scriptable* Sender, Targets *parameters)
 		}
 	}
 	if (ac) {
-		parameters->AddTarget(ac, 0);
+		parameters->AddTarget(ac, 0, 0);
 	}
 	return parameters;
 }
@@ -2598,7 +2620,7 @@ Targets *GameScript::SelectedCharacter(Scriptable* Sender, Targets* parameters)
 			continue;
 		}
 		if (ac->IsSelected()) {
-			parameters->AddTarget(ac, Distance(Sender, ac) );
+			parameters->AddTarget(ac, Distance(Sender, ac), GA_NO_DEAD );
 		}
 	}
 	return parameters;

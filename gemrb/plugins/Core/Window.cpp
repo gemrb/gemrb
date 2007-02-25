@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.50 2007/02/21 22:53:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Window.cpp,v 1.51 2007/02/25 13:56:50 avenger_teambg Exp $
  *
  */
 
@@ -40,6 +40,7 @@ Window::Window(unsigned short WindowID, unsigned short XPos,
 	this->BackGround = NULL;
 	lastC = NULL;
 	lastFocus = NULL;
+	lastOver = NULL;
 	Visible = WINDOW_INVISIBLE;
 	Flags = WF_CHANGED;
 	Cursor = IE_CURSOR_NORMAL;
@@ -142,10 +143,10 @@ Control* Window::GetControl(unsigned short x, unsigned short y, bool ignore)
 	//Check if we are still on the last control
 	if (( lastC != NULL )) {
 		if (( XPos + lastC->XPos <= x ) 
-		    && ( YPos + lastC->YPos <= y )
-		    && ( XPos + lastC->XPos + lastC->Width >= x )
-		    && ( YPos + lastC->YPos + lastC->Height >= y )
-		    && ! lastC->IsPixelTransparent (x - XPos - lastC->XPos, y - YPos - lastC->YPos)) {
+			&& ( YPos + lastC->YPos <= y )
+			&& ( XPos + lastC->XPos + lastC->Width >= x )
+			&& ( YPos + lastC->YPos + lastC->Height >= y )
+			&& ! lastC->IsPixelTransparent (x - XPos - lastC->XPos, y - YPos - lastC->YPos)) {
 			//Yes, we are on the last returned Control
 			return lastC;
 		}
@@ -156,10 +157,10 @@ Control* Window::GetControl(unsigned short x, unsigned short y, bool ignore)
 			continue;
 		}
 		if (( XPos + ( *m )->XPos <= x ) 
-		    && ( YPos + ( *m )->YPos <= y )
-		    && ( XPos + ( *m )->XPos + ( *m )->Width >= x ) 
-		    && ( YPos + ( *m )->YPos + ( *m )->Height >= y )
-		    && ! ( *m )->IsPixelTransparent (x - XPos - ( *m )->XPos, y - YPos - ( *m )->YPos)) {
+			&& ( YPos + ( *m )->YPos <= y )
+			&& ( XPos + ( *m )->XPos + ( *m )->Width >= x ) 
+			&& ( YPos + ( *m )->YPos + ( *m )->Height >= y )
+			&& ! ( *m )->IsPixelTransparent (x - XPos - ( *m )->XPos, y - YPos - ( *m )->YPos)) {
 			ctrl = *m;
 			break;
 		}
@@ -168,15 +169,28 @@ Control* Window::GetControl(unsigned short x, unsigned short y, bool ignore)
 	return ctrl;
 }
 
+Control* Window::GetOver()
+{
+	return lastOver;
+}
+
+Control* Window::GetFocus()
+{
+	return lastFocus;
+}
+
 /** Sets 'ctrl' as Focused */
 void Window::SetFocused(Control* ctrl)
 {
 	if (lastFocus != NULL) {
 		lastFocus->hasFocus = false;
+		lastFocus->Changed = true;
 	}
 	lastFocus = ctrl;
-	lastFocus->hasFocus = true;
-	lastFocus->Changed = true;
+	if (ctrl != NULL) {
+		lastFocus->hasFocus = true;
+		lastFocus->Changed = true;
+	}
 }
 
 Control* Window::GetControl(unsigned short i)
@@ -201,10 +215,19 @@ bool Window::IsValidControl(unsigned short ID, Control *ctrl)
 void Window::DelControl(unsigned short i)
 {
 	if (i < Controls.size() ) {
-		delete Controls[i];
+		Control *ctrl = Controls[i];
+		if (ctrl==lastC) {
+			lastC=NULL;
+		}
+		if (ctrl==lastOver) {
+			lastOver=NULL;
+		}
+		if (ctrl==lastFocus) {
+			lastFocus=NULL;
+		}
+		delete ctrl;
 		Controls.erase(Controls.begin()+i);
 	}
-	lastC=NULL;
 	Invalidate();
 }
 
@@ -219,6 +242,9 @@ Control* Window::GetDefaultControl()
 void Window::release(void)
 {
 	Visible = WINDOW_INVALID;
+	lastC = NULL;
+	lastFocus = NULL;
+	lastOver = NULL;
 }
 
 /** Redraw all the Window */
@@ -252,7 +278,6 @@ void Window::RedrawControls(const char* VarName, unsigned int Sum)
 			{
 				MapControl *mc = ( MapControl* ) (Controls[i]);
 				mc->RedrawMapControl( VarName, Sum );
-				
 				break;
 			}
 			case IE_GUI_BUTTON:
@@ -316,4 +341,30 @@ void Window::Link(unsigned short SBID, unsigned short TAID)
 		sb->ta = ta;
 		ta->SetScrollBar( sb );
 	}
+}
+
+void Window::OnMouseEnter(unsigned short x, unsigned short y, Control *ctrl)
+{
+	lastOver = ctrl;
+	if (!lastOver) {
+		return;
+	}
+	lastOver->OnMouseOver( x - XPos - lastOver->XPos, y - YPos - lastOver->YPos );
+}
+
+void Window::OnMouseLeave(unsigned short x, unsigned short y)
+{
+	if (!lastOver) {
+		return;
+	}
+	lastOver->OnMouseLeave( x - XPos - lastOver->XPos, y - YPos - lastOver->YPos );
+	lastOver = NULL;
+}
+
+void Window::OnMouseOver(unsigned short x, unsigned short y)
+{
+	if (!lastOver) {
+		return;
+	}
+	lastOver->OnMouseOver( x - XPos - lastOver->XPos, y - YPos - lastOver->YPos );
 }

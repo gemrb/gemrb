@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.135 2007/02/23 21:10:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Game.cpp,v 1.136 2007/02/25 13:56:49 avenger_teambg Exp $
  *
  */
 
@@ -190,7 +190,7 @@ Actor* Game::GetPC(unsigned int slot, bool onlyalive)
 		unsigned int i=0;
 		while(i<PCs.size() ) {
 			Actor *ac = PCs[i++];
-			
+
 			if (IsAlive(ac) ) {
 				if (!slot--) {
 					return ac;
@@ -261,7 +261,7 @@ void Game::ConsolidateParty()
 	std::vector< Actor*>::const_iterator m;
 	for (int i=1;i<=max;) {
 		if (FindPlayer(i)==-1) {
-			
+
 			for ( m = PCs.begin(); m != PCs.end(); ++m) {
 				if ( (*m)->InParty>i) {
 					(*m)->InParty--;
@@ -285,7 +285,7 @@ int Game::LeaveParty (Actor* actor)
 	}
 	std::vector< Actor*>::iterator m = PCs.begin() + slot;
 	PCs.erase( m );
-	
+
 	for ( m = PCs.begin(); m != PCs.end(); ++m) {
 		if ( (*m)->InParty>actor->InParty) {
 			(*m)->InParty--;
@@ -351,7 +351,7 @@ int Game::GetPartySize(bool onlyalive) const
 	if (onlyalive) {
 		int count = 0;
 		for (unsigned int i = 0; i < PCs.size(); i++) {
-			if (!IsAlive(PCs[i])) {			
+			if (!IsAlive(PCs[i])) {
 				continue;
 			}
 			count++;
@@ -433,7 +433,7 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 	//if (actor->IsSelected() == select)
 	//	return true;
 
-	
+
 	if (select) {
 		if (! actor->ValidTarget( GA_SELECT | GA_NO_DEAD ))
 			return false;
@@ -557,12 +557,14 @@ int Game::DelMap(unsigned int index, int forced)
 	if (index >= Maps.size()) {
 		return -1;
 	}
+	Map *map = Maps[index];
 
 	if (MapIndex==(int) index) { //can't remove current map in any case
+		const char *name = map->GetScriptName();
+		memcpy(AnotherArea, name, sizeof(AnotherArea) );
 		return -1;
 	}
 
-	Map *map = Maps[index];
 
 	if (!map) { //this shouldn't happen, i guess
 		printMessage("Game","Erased NULL Map\n",YELLOW);
@@ -818,7 +820,7 @@ void Game::ShareXP(int xp, int flags)
 	if (!individual) {
 		return;
 	}
-	
+
 	for (unsigned int i=0; i<PCs.size(); i++) {
 		if (PCs[i]->GetStat(IE_STATE_ID)&STATE_DEAD) {
 			continue;
@@ -908,7 +910,7 @@ void Game::IncrementChapter()
 	ieDword chapter = (ieDword) -1;
 	locals->Lookup("CHAPTER",chapter);
 	locals->SetAt("CHAPTER",chapter+1);
-	//clear statistics	
+	//clear statistics
 	for (unsigned int i=0; i<PCs.size(); i++) {
 		//all PCs must have this!
 		PCs[i]->PCStats->IncrementChapter();
@@ -1018,7 +1020,7 @@ bool Game::EveryoneDead() const
 		if (nameless->GetStat(IE_STATE_ID)&STATE_NOSAVE) {
 			if (area->INISpawn) {
 				area->INISpawn->RespawnNameless();
-			}      
+			}
 		}
 		return false;
 	}
@@ -1070,10 +1072,10 @@ void Game::UpdateScripts()
 	}
 	if (Maps.size()>MAX_MAPS_LOADED) {
 		idx = Maps.size();
-		AnotherArea[0]=0;
 
-		while (idx--) {
-			DelMap( (unsigned int) idx, false );
+		//starting from 0, so we see the most recent master area first
+		for(unsigned int i=0;i<idx;i++) {
+			DelMap( (unsigned int) i, false );
 		}
 	}
 
@@ -1195,7 +1197,7 @@ void Game::RestParty(int checks, int dream, int hp)
 	//play dream (rest movie)
 	InternalFlags |= IF_PARTYRESTED;
 	int i = GetPartySize(false);
-	
+
 	while (i--) {
 		Actor *tar = GetPC(i, false);
 		tar->ClearPath();

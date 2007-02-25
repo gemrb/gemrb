@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.117 2007/02/23 21:10:36 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Actions.cpp,v 1.118 2007/02/25 13:56:49 avenger_teambg Exp $
  *
  */
 
@@ -1020,11 +1020,12 @@ void GameScript::MoveToSavedLocation(Scriptable* Sender, Action* parameters)
 /** use Sender as default subject */
 void GameScript::ReturnToSavedLocation(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 	if (!tar) {
 		tar = Sender;
 	}
 	if (tar->Type != ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 
@@ -1036,11 +1037,12 @@ void GameScript::ReturnToSavedLocation(Scriptable* Sender, Action* parameters)
 //PST
 void GameScript::RunToSavedLocation(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 	if (!tar) {
 		tar = Sender;
 	}
 	if (tar->Type != ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 
@@ -1052,11 +1054,12 @@ void GameScript::RunToSavedLocation(Scriptable* Sender, Action* parameters)
 //iwd2
 void GameScript::ReturnToSavedLocationDelete(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 	if (!tar) {
 		tar = Sender;
 	}
 	if (tar->Type != ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
 		return;
 	}
 
@@ -1111,7 +1114,6 @@ void GameScript::StorePartyLocation(Scriptable* /*Sender*/, Action* /*parameters
 			SetVariable( act, "LOCALSsavedlocation", value);
 		}
 	}
-
 }
 
 void GameScript::RestorePartyLocation(Scriptable* /*Sender*/, Action* /*parameters*/)
@@ -1159,6 +1161,10 @@ void GameScript::RunAwayFrom(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+	if (Sender->GetInternalFlag()&IF_STOPATTACK) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
 	Actor* actor = ( Actor* ) Sender;
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
@@ -1172,6 +1178,10 @@ void GameScript::RunAwayFrom(Scriptable* Sender, Action* parameters)
 void GameScript::RunAwayFromNoLeaveArea(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	if (Sender->GetInternalFlag()&IF_STOPATTACK) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -1190,6 +1200,11 @@ void GameScript::RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+	//i believe being dead still interrupts this action
+	if (Sender->GetInternalFlag()&IF_STOPATTACK) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
 	Actor* actor = ( Actor* ) Sender;
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
@@ -1204,6 +1219,10 @@ void GameScript::RunAwayFromNoInterrupt(Scriptable* Sender, Action* parameters)
 void GameScript::RunAwayFromPoint(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	if (Sender->GetInternalFlag()&IF_STOPATTACK) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -1776,7 +1795,7 @@ static unsigned int FindNearPoint(Scriptable* Sender, Point *&p1, Point *&p2)
 //this is an immediate action without checking Sender
 void GameScript::DetectSecretDoor(Scriptable* Sender, Action* parameters)
 {
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 	if (!tar) {
 		return;
 	}
@@ -3865,13 +3884,30 @@ void GameScript::AttackOneRound( Scriptable* Sender, Action* parameters)
 		GameControl *gc = core->GetGameControl();
 		tar = gc->GetTarget();
 	} else {
-		tar = GetActorFromObject( Sender, parameters->objects[1] );
+		tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 	}
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	AttackCore(Sender, tar, NULL, 0);
+
+	//actor is already incapable of attack
+	if (Sender->GetInternalFlag()&IF_STOPATTACK) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	Action *newAction = ParamCopyNoOverride( parameters );
+	if (!newAction->int0Parameter) {
+		newAction->int0Parameter=2;
+		Sender->AddActionInFront(newAction);
+		Sender->SetWait(AI_UPDATE_TIME);
+		AttackCore(Sender, tar, newAction, AC_REEVALUATE);
+	} else {
+		Sender->ReleaseCurrentAction();
+		//this is the LastDisarmFailed field, but this is an actor
+		Sender->LastTarget = 0;
+	}
 }
 
 void GameScript::RunningAttackNoSound( Scriptable* Sender, Action* parameters)
@@ -3886,12 +3922,19 @@ void GameScript::RunningAttackNoSound( Scriptable* Sender, Action* parameters)
 		GameControl *gc = core->GetGameControl();
 		tar = gc->GetTarget();
 	} else {
-		tar = GetActorFromObject( Sender, parameters->objects[1] );
+		tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 	}
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+
+	//actor is already incapable of attack
+	if (Sender->GetInternalFlag()&IF_STOPATTACK) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
 	//feed Attack back to the queue
 	Sender->AddAction(parameters);
 	AttackCore(Sender, tar, NULL, AC_NO_SOUND|AC_RUNNING);
@@ -3909,12 +3952,19 @@ void GameScript::AttackNoSound( Scriptable* Sender, Action* parameters)
 		GameControl *gc = core->GetGameControl();
 		tar = gc->GetTarget();
 	} else {
-		tar = GetActorFromObject( Sender, parameters->objects[1] );
+		tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 	}
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+
+	//actor is already incapable of attack
+	if (Sender->GetInternalFlag()&IF_STOPATTACK) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
 	//feed Attack back to the queue
 	Sender->AddAction(parameters);
 	AttackCore(Sender, tar, NULL, AC_NO_SOUND);
@@ -3932,12 +3982,19 @@ void GameScript::RunningAttack( Scriptable* Sender, Action* parameters)
 		GameControl *gc = core->GetGameControl();
 		tar = gc->GetTarget();
 	} else {
-		tar = GetActorFromObject( Sender, parameters->objects[1] );
+		tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 	}
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+
+	//actor is already incapable of attack
+	if (Sender->GetInternalFlag()&IF_STOPATTACK) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
 	//feed Attack back to the queue
 	Sender->AddAction(parameters);
 	AttackCore(Sender, tar, NULL, AC_RUNNING);
@@ -3951,12 +4008,19 @@ void GameScript::Attack( Scriptable* Sender, Action* parameters)
 	}
 	//using auto target!
 	Scriptable* tar;
-	tar = GetActorFromObject( Sender, parameters->objects[1] );
+	tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+
+	//actor is already incapable of attack
+	if (Sender->GetInternalFlag()&IF_STOPATTACK) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
 	//feed Attack back to the queue
 	Sender->AddAction(parameters);
 	AttackCore(Sender, tar, NULL, 0);
@@ -3964,11 +4028,11 @@ void GameScript::Attack( Scriptable* Sender, Action* parameters)
 
 void GameScript::ForceAttack( Scriptable* Sender, Action* parameters)
 {
-	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable* scr = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 	if (!scr || scr->Type != ST_ACTOR) {
 		return;
 	}
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[2] );
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[2], GA_NO_DEAD );
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
 		return;
 	}
@@ -3992,11 +4056,18 @@ void GameScript::AttackReevaluate( Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 	if (!tar || (tar->Type != ST_ACTOR && tar->Type !=ST_DOOR && tar->Type !=ST_CONTAINER) ) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+
+	//actor is already incapable of attack
+	if (Sender->GetInternalFlag()&IF_STOPATTACK) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
 	//pumping parameters back for AttackReevaluate
 	Action *newAction = ParamCopyNoOverride( parameters );
 	AttackCore(Sender, tar, newAction, AC_REEVALUATE);
@@ -4164,12 +4235,15 @@ void GameScript::MarkObject(Scriptable* Sender, Action* parameters)
 	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	//unsure, could mark dead objects?
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 	if (!tar || tar->Type!=ST_ACTOR) {
 		return;
 	}
 	Actor *actor = (Actor *) Sender;
-	actor->LastSeen = ((Actor *) tar)->GetID();
+	actor->LastMarked = ((Actor *) tar)->GetID();
+	//if this doesn't modify LastSeen, then remove this line
+	actor->LastSeen = actor->LastMarked;
 }
 
 void GameScript::SetDialogueRange(Scriptable* Sender, Action* parameters)

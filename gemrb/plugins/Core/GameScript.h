@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.278 2007/02/23 21:10:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/GameScript.h,v 1.279 2007/02/25 13:56:50 avenger_teambg Exp $
  *
  */
 
@@ -97,7 +97,7 @@ class Action;
 typedef std::vector<ieDword> SrcVector;
 
 typedef struct targettype {
-	Scriptable *actor; //hmm, could be door 
+	Scriptable *actor; //hmm, could be door
 	unsigned int distance;
 } targettype;
 
@@ -122,7 +122,7 @@ public:
 	const targettype *GetLastTarget(int Type);
 	const targettype *GetFirstTarget(targetlist::iterator &m, int Type);
 	Scriptable *GetTarget(unsigned int index, int Type);
-	void AddTarget(Scriptable* target, unsigned int distance);
+	void AddTarget(Scriptable* target, unsigned int distance, int flags);
 	void Clear();
 };
 
@@ -526,8 +526,8 @@ typedef Targets* (* ObjectFunction)(Scriptable *, Targets*);
 typedef int (* IDSFunction)(Actor *, int parameter);
 
 #define TF_NONE 	 0
-#define TF_CONDITION     1  //this isn't a trigger, just a condition (0x4000)
-#define TF_MERGESTRINGS  8  //same value as actions' mergestring
+#define TF_CONDITION     1 //this isn't a trigger, just a condition (0x4000)
+#define TF_MERGESTRINGS  8 //same value as actions' mergestring
 
 struct TriggerLink {
 	const char* Name;
@@ -536,8 +536,8 @@ struct TriggerLink {
 };
 
 //createcreature flags
-#define CC_OFFSET    1 
-#define CC_OBJECT    2  
+#define CC_OFFSET    1
+#define CC_OBJECT    2
 #define CC_OFFSCREEN 3
 #define CC_MASK      3
 #define CC_CHECK_IMPASSABLE  4  //adjust position (searchmap)
@@ -569,7 +569,7 @@ struct TriggerLink {
 #define AF_MERGESTRINGS  8
 //we could use this flag to restrict player scripts from using dangerous
 //opcodes, it would be a very useful and easy to implement feature!
-#define AF_RESTRICTED    16 
+#define AF_RESTRICTED    16
 //#define AF_RESTRICTED_LEVEL2  32 //maybe we could use 2 bits for this???
 #define AF_SCRIPTLEVEL   64  //this hack will transfer scriptlevel to int0parameter at runtime (changecurrentscript relies on it)
 #define AF_INVALID       128
@@ -1384,6 +1384,7 @@ public:
 	static Targets *LastHeardBy(Scriptable *Sender, Targets *parameters);
 	static Targets *LastHelp(Scriptable *Sender, Targets *parameters);
 	static Targets *LastHitter(Scriptable *Sender, Targets *parameters);
+	static Targets *LastMarkedObject(Scriptable *Sender, Targets *parameters);
 	static Targets *LastSeenBy(Scriptable *Sender, Targets *parameters);
 	static Targets *LastSummonerOf(Scriptable *Sender, Targets *parameters);
 	static Targets *LastTalkedToBy(Scriptable *Sender, Targets *parameters);

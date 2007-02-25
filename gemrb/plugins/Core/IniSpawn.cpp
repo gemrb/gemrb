@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/IniSpawn.cpp,v 1.5 2007/02/23 21:10:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/IniSpawn.cpp,v 1.6 2007/02/25 13:56:50 avenger_teambg Exp $
  *
  */
 
@@ -330,7 +330,7 @@ void IniSpawn::RespawnNameless()
 	nameless->Resurrect();
 	//hardcoded!!!
 	if (NamelessState==36) {
-		nameless->SetStance(18);
+		nameless->SetStance(IE_ANI_PST_START);
 	}
 	for (int i=0;i<game->GetPartySize(false);i++) {
 		MoveBetweenAreasCore(game->GetPC(i, false),NamelessSpawnArea,NamelessSpawnPoint,-1, true);
@@ -339,12 +339,16 @@ void IniSpawn::RespawnNameless()
 
 void IniSpawn::SpawnCreature(CritterEntry &critter)
 {
-	SetVariable(map,critter.SpecVar,critter.SpecContext,1);
+	if (critter.SpecVar[0]) {
+		if (!CheckVariable(map,critter.SpecVar, critter.SpecContext)) {
+			return;
+		}
+	}
 
 	if (critter.ScriptName[0]) {
 		//maybe this one needs to be using getobjectcount as well
 		//currently we cannot count objects with scriptname???
-		if (map->GetActor( critter.ScriptName )) {
+		if (map->GetActor( critter.ScriptName, 0 )) {
 			return;
 		}
 	} else {
