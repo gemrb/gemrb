@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.468 2007/02/23 21:10:37 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.469 2007/02/25 11:30:29 avenger_teambg Exp $
  *
  */
 
@@ -2827,10 +2827,8 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 int Interface::SetControlStatus(unsigned short WindowIndex,
 	unsigned short ControlIndex, unsigned long Status)
 {
-	if (WindowIndex >= windows.size()) {
-		return -1;
-	}
-	Window* win = windows[WindowIndex];
+	//don't set the status of an already invalidated window
+	Window* win = GetWindow(WindowIndex);
 	if (win == NULL) {
 		return -1;
 	}
