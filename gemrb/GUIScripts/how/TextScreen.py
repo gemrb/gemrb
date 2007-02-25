@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/TextScreen.py,v 1.8 2006/01/28 08:25:37 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/TextScreen.py,v 1.9 2007/02/25 23:15:59 avenger_teambg Exp $
 
 # TextScreen.py - display Loading screen
 
@@ -58,7 +58,7 @@ def StartTextScreen ():
 	#fixme: this works only for chapter text, if there is other textscreen
 	#then we should check LoadPic
 	#caption
-	Table = GemRB.LoadTable("chapters")
+	Table = GemRB.LoadTable ("chapters")
 	Value = GemRB.GetTableValue (Table, Chapter, 0)
 	GemRB.UnloadTable (Table)
 	Label=GemRB.GetControl (TextScreen, 0x10000000)
@@ -68,6 +68,7 @@ def StartTextScreen ():
 	Button=GemRB.GetControl (TextScreen, 0)
 	GemRB.SetText (TextScreen, Button, 11973)
 	GemRB.SetEvent (TextScreen, Button, IE_GUI_BUTTON_ON_PRESS, "EndTextScreen")
+	GemRB.SetButtonFlags (TextScreen, Button, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	#replay
 	Button=GemRB.GetControl (TextScreen, 3)
@@ -77,8 +78,8 @@ def StartTextScreen ():
 	GemRB.HideGUI ()
 	GemRB.SetVisible (0, 0) #removing the gamecontrol screen
 	GemRB.SetVisible (TextScreen, 1)
-	GemRB.RewindTA(TextScreen, TextArea, 200)
-	GemRB.GamePause(1, 1)
+	GemRB.RewindTA (TextScreen, TextArea, 200)
+	GemRB.GamePause (1, 1)
 
 
 def FeedScroll ():
@@ -89,7 +90,7 @@ def FeedScroll ():
 		return
 
 	Feed = 1
-	Table = GemRB.LoadTable("chapters")
+	Table = GemRB.LoadTable ("chapters")
 	Value = GemRB.GetTableValue (Table, Chapter, 1)
 	GemRB.UnloadTable (Table)
 	GemRB.TextAreaAppend (TextScreen, TextArea, Value, -1)
@@ -99,7 +100,7 @@ def ReplayTextScreen ():
 
 	GemRB.SetEvent (TextScreen, TextArea, IE_GUI_TEXTAREA_OUT_OF_TEXT, "FeedScroll")
 	Feed = 0
-	GemRB.RewindTA(TextScreen, TextArea, 200)
+	GemRB.RewindTA (TextScreen, TextArea, 200)
 
 def EndTextScreen ():
 	global TextScreen
@@ -108,5 +109,5 @@ def EndTextScreen ():
 	GemRB.UnloadWindow (TextScreen)
 	GemRB.SetVisible (0, 1) #enabling gamecontrol screen
 	GemRB.UnhideGUI ()
-	GemRB.GamePause(0, 1)
+	GemRB.GamePause (0, 1)
 

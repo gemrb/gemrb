@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.34 2007/02/21 22:53:39 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/GUIINV.py,v 1.35 2007/02/25 23:15:59 avenger_teambg Exp $
 
 
 # GUIINV.py - scripts to control inventory windows from GUIINV winpack
@@ -71,6 +71,7 @@ def OpenInventoryWindow ():
 		GemRB.UnloadWindow (InventoryWindow)
 		InventoryWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
+		GemRB.SetVar ("MessageLabel", -1)
 		SetSelectionChangeHandler (None)
 		GemRB.UnhideGUI ()
 		return
@@ -79,7 +80,7 @@ def OpenInventoryWindow ():
 	GemRB.LoadWindowPack ("GUIINV")
 	InventoryWindow = Window = GemRB.LoadWindow (3)
 	GemRB.SetVar ("OtherWindow", InventoryWindow)
-
+	GemRB.SetVar ("MessageLabel", GemRB.GetControl(Window, 0x1000003d))
 
 	# inventory slots
 	for i in range (44):
@@ -128,6 +129,11 @@ def OpenInventoryWindow ():
 	# hp max
 	Label = GemRB.GetControl (Window, 0x1000003c)
 	GemRB.SetTooltip (Window, Label, 4199)
+
+	# info label, game paused, etc
+	Label = GemRB.GetControl (Window, 0x1000003d)
+	GemRB.SetLabelTextColor(Window, Label, 255, 255, 255)
+	GemRB.SetText (Window, Label, "")
 
 	SetSelectionChangeHandler (UpdateInventoryWindow)
 	UpdateInventoryWindow ()

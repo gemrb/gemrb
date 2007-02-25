@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/MessageWindow.py,v 1.27 2007/02/21 22:53:39 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/MessageWindow.py,v 1.28 2007/02/25 23:15:59 avenger_teambg Exp $
 
 # MessageWindow.py - scripts and GUI for main (walk) window
 
@@ -54,8 +54,8 @@ def OnLoad():
 	GUICommonWindows.ActionsWindow = None
 	GUICommonWindows.OptionsWindow = None
 
-	#this is different in IWD and HoW
-	OptionsWindow = GemRB.LoadWindow(25)
+	#this is different in IWD (0) and HoW (25)
+	OptionsWindow = GemRB.LoadWindow(0)
 	SetupMenuWindowControls (OptionsWindow, 1, "ReturnToGame")
 	PortraitWindow = OpenPortraitWindow(1)
 
@@ -143,7 +143,7 @@ def UpdateControlStatus():
 	GemRB.SetVar("MessageWindow", TMessageWindow)
 	GemRB.SetVar("MessageTextArea", TMessageTA)
 	if Override:
-		GemRB.SetControlStatus (MessageWindow,MessageTA,IE_GUI_CONTROL_FOCUSED)
+		GemRB.SetControlStatus (TMessageWindow,TMessageTA,IE_GUI_CONTROL_FOCUSED)
 	else:
 		GemRB.SetControlStatus (0,0,IE_GUI_CONTROL_FOCUSED)
 

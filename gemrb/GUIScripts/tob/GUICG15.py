@@ -7,12 +7,14 @@ DoneButton = 0
 RaceTable = 0
 RaceCount = 0
 TopIndex = 0
+#the size of the selection list
+LISTSIZE = 11
 
 def DisplayRaces():
 	global TopIndex
 
 	TopIndex=GemRB.GetVar("TopIndex")
-	for i in range(0, 11):
+	for i in range(LISTSIZE):
 		Button = GemRB.GetControl(RaceWindow,i+6)
 		Val = GemRB.GetTableValue(RaceTable, i+TopIndex,0)
 		if Val==0:
@@ -40,15 +42,15 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG", 640, 480)
 	RaceWindow = GemRB.LoadWindow(15)
 	RaceTable = GemRB.LoadTable(TableName)
-	RaceCount = GemRB.GetTableRowCount(RaceTable)-11
+	RaceCount = GemRB.GetTableRowCount(RaceTable)-LISTSIZE+1
 	if RaceCount<0:
 		RaceCount=0
 
-	for i in range(0,11):
+	for i in range(LISTSIZE):
 		Button = GemRB.GetControl(RaceWindow,i+6)
 		GemRB.SetButtonFlags(RaceWindow,Button,IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 
-	BackButton = GemRB.GetControl(RaceWindow,4)  #i=8 now (when race count is 7)
+	BackButton = GemRB.GetControl(RaceWindow,4)
 	GemRB.SetText(RaceWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(RaceWindow,5)
 	GemRB.SetText(RaceWindow,DoneButton,11973)
@@ -78,7 +80,7 @@ def RacePress():
 
 def BackPress():
 	GemRB.UnloadWindow(RaceWindow)
-	GemRB.SetVar("HateRace",0)  #scrapping the race value
+	GemRB.SetVar("HateRace",0) #scrapping the race value
 	GemRB.SetNextScript("CharGen6")
 	return
 

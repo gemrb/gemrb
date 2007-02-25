@@ -9,14 +9,14 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/TextScreen.py,v 1.8 2006/01/06 23:09:59 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/TextScreen.py,v 1.9 2007/02/25 23:15:57 avenger_teambg Exp $
 
 # TextScreen.py - display Loading screen
 
@@ -48,7 +48,7 @@ def StartTextScreen ():
 	GemRB.SetEvent (TextScreen, TextArea, IE_GUI_TEXTAREA_OUT_OF_TEXT, "FeedScroll")
 
 	#caption	
-	Table = GemRB.LoadTable(TableName)
+	Table = GemRB.LoadTable (TableName)
 	Value = GemRB.GetTableValue (Table, 2, 0)
 	GemRB.UnloadTable (Table)
 	Label=GemRB.GetControl (TextScreen, 0x10000000)
@@ -58,6 +58,7 @@ def StartTextScreen ():
 	Button=GemRB.GetControl (TextScreen, 0)
 	GemRB.SetText (TextScreen, Button, 11973)
 	GemRB.SetEvent (TextScreen, Button, IE_GUI_BUTTON_ON_PRESS, "EndTextScreen")
+	GemRB.SetButtonFlags (TextScreen, Button, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	#replay
 	Button=GemRB.GetControl (TextScreen, 3)
@@ -67,15 +68,15 @@ def StartTextScreen ():
 	GemRB.HideGUI ()
 	GemRB.SetVisible (0, 0) #removing the gamecontrol screen
 	GemRB.SetVisible (TextScreen, 1)
-	GemRB.RewindTA(TextScreen, TextArea, 300)
-	GemRB.GamePause(1, 1)
+	GemRB.RewindTA (TextScreen, TextArea, 300)
+	GemRB.GamePause (1, 1)
 
 
 def FeedScroll ():
 	global TextScreen, TextArea, Position
 
 	TableName = GemRB.GetGameString (STR_LOADMOS)
-	Table = GemRB.LoadTable(TableName)
+	Table = GemRB.LoadTable (TableName)
 	Value = GemRB.GetTableValue (Table, 2, Position)
 	GemRB.UnloadTable (Table)
 	if Value == 'NONE':
@@ -90,7 +91,7 @@ def ReplayTextScreen ():
 
 	Position = 1
 	GemRB.SetEvent (TextScreen, TextArea, IE_GUI_TEXTAREA_OUT_OF_TEXT, "FeedScroll")
-	GemRB.RewindTA(TextScreen, TextArea, 300)
+	GemRB.RewindTA (TextScreen, TextArea, 300)
 
 
 def EndTextScreen ():
@@ -100,5 +101,5 @@ def EndTextScreen ():
 	GemRB.UnloadWindow (TextScreen)
 	GemRB.SetVisible (0, 1) #enabling gamecontrol screen
 	GemRB.UnhideGUI ()
-	GemRB.GamePause(0, 1)
+	GemRB.GamePause (0, 1)
 

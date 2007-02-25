@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.44 2006/12/30 19:35:34 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/CharGen.py,v 1.45 2007/02/25 23:15:59 avenger_teambg Exp $
 
 
 #Character Generation
@@ -292,18 +292,18 @@ def CancelPress():
 def AcceptPress():
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.CreatePlayer("charbase", MyChar)
-	GemRB.SetPlayerStat(MyChar, IE_SEX, GemRB.GetVar ("Gender") )
-	GemRB.SetPlayerStat(MyChar, IE_RACE, GemRB.GetVar ("Race") )
+	GemRB.SetPlayerStat (MyChar, IE_SEX, GemRB.GetVar ("Gender") )
+	GemRB.SetPlayerStat (MyChar, IE_RACE, GemRB.GetVar ("Race") )
 
 	ClassIndex = GemRB.GetVar ("Class")-1
 	ClassTable = GemRB.LoadTable ("classes")
 	Class = GemRB.GetTableValue (ClassTable, ClassIndex, 5)
-	GemRB.SetPlayerStat(MyChar, IE_CLASS, Class)
+	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 	KitIndex = GemRB.GetVar ("Class Kit")
-	GemRB.SetPlayerStat(MyChar, IE_KIT, KitIndex)
+	GemRB.SetPlayerStat (MyChar, IE_KIT, KitIndex)
 	AlignmentTable = GemRB.LoadTable ("aligns")
 	t = GemRB.GetTableValue ( AlignmentTable, GemRB.GetVar ("Alignment")-1, 3)
-	GemRB.SetPlayerStat(MyChar, IE_ALIGNMENT, t)
+	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, t)
 
 	#mage spells
 	Learnable = GetLearnableMageSpells( KitIndex, t, 1)
@@ -325,42 +325,43 @@ def AcceptPress():
 	TmpTable = GemRB.LoadTable ("repstart")
 	t=GemRB.FindTableValue (AlignmentTable, 3, t)
 	t = GemRB.GetTableValue (TmpTable, t, 0)
-	GemRB.SetPlayerStat(MyChar, IE_REPUTATION, t)
+	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, t)
 	TmpTable = GemRB.LoadTable ("strtgold")
 	a = GemRB.GetTableValue (TmpTable, Class, 1) #number of dice
 	b = GemRB.GetTableValue (TmpTable, Class, 0) #size
 	c = GemRB.GetTableValue (TmpTable, Class, 2) #adjustment
 	d = GemRB.GetTableValue (TmpTable, Class, 3) #external multiplier
 	e = GemRB.GetTableValue (TmpTable, Class, 4) #level bonus rate
-	t = GemRB.GetPlayerStat(MyChar, IE_LEVEL) #FIXME: calculate multiclass average
+	t = GemRB.GetPlayerStat (MyChar, IE_LEVEL) #FIXME: calculate multiclass average
 	if t>1:
 		e=e*(t-1)
 	else:
 		e=0
-	t = GemRB.Roll(a,b,c)*d+e
-	GemRB.SetPlayerStat(MyChar, IE_GOLD, t)
-	GemRB.SetPlayerStat(MyChar, IE_EA, 2 )
+	t = GemRB.Roll (a,b,c)*d+e
+	GemRB.SetPlayerStat (MyChar, IE_GOLD, t)
+	GemRB.SetPlayerStat (MyChar, IE_EA, 2 )
+	GemRB.SetPlayerStat (MyChar, IE_HATEDRACE, GemRB.GetVar ("HatedRace") )
 	Str = GemRB.GetVar ("Ability1")
-	GemRB.SetPlayerStat(MyChar, IE_STR, Str)
+	GemRB.SetPlayerStat (MyChar, IE_STR, Str)
 	if Str == 18:
-		GemRB.SetPlayerStat(MyChar, IE_STREXTRA, GemRB.GetVar ("StrExtra"))
+		GemRB.SetPlayerStat (MyChar, IE_STREXTRA, GemRB.GetVar ("StrExtra"))
 	else:
-		GemRB.SetPlayerStat(MyChar, IE_STREXTRA, 0)
+		GemRB.SetPlayerStat (MyChar, IE_STREXTRA, 0)
 
-	GemRB.SetPlayerStat(MyChar, IE_INT, GemRB.GetVar ("Ability2"))
-	GemRB.SetPlayerStat(MyChar, IE_WIS, GemRB.GetVar ("Ability3"))
-	GemRB.SetPlayerStat(MyChar, IE_DEX, GemRB.GetVar ("Ability4"))
-	GemRB.SetPlayerStat(MyChar, IE_CON, GemRB.GetVar ("Ability5"))
-	GemRB.SetPlayerStat(MyChar, IE_CHR, GemRB.GetVar ("Ability6"))
+	GemRB.SetPlayerStat (MyChar, IE_INT, GemRB.GetVar ("Ability2"))
+	GemRB.SetPlayerStat (MyChar, IE_WIS, GemRB.GetVar ("Ability3"))
+	GemRB.SetPlayerStat (MyChar, IE_DEX, GemRB.GetVar ("Ability4"))
+	GemRB.SetPlayerStat (MyChar, IE_CON, GemRB.GetVar ("Ability5"))
+	GemRB.SetPlayerStat (MyChar, IE_CHR, GemRB.GetVar ("Ability6"))
 
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
 	TmpTable = GemRB.LoadTable ("clskills")
-	GemRB.SetPlayerStat(MyChar, IE_XP, GemRB.GetTableValue (TmpTable, Class, 3) )  #this will also set the level (automatically)
+	GemRB.SetPlayerStat (MyChar, IE_XP, GemRB.GetTableValue (TmpTable, Class, 3) )  #this will also set the level (automatically)
 
-	SetColorStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar("SkinColor") )
-	SetColorStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar("HairColor") )
-	SetColorStat (MyChar, IE_MAJOR_COLOR, GemRB.GetVar("MajorColor") )
-	SetColorStat (MyChar, IE_MINOR_COLOR, GemRB.GetVar("MinorColor") )
+	SetColorStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar ("SkinColor") )
+	SetColorStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar ("HairColor") )
+	SetColorStat (MyChar, IE_MAJOR_COLOR, GemRB.GetVar ("MajorColor") )
+	SetColorStat (MyChar, IE_MINOR_COLOR, GemRB.GetVar ("MinorColor") )
 	SetColorStat (MyChar, IE_METAL_COLOR, 0x1B )
 	SetColorStat (MyChar, IE_LEATHER_COLOR, 0x16 )
 	SetColorStat (MyChar, IE_ARMOR_COLOR, 0x17 )
@@ -371,7 +372,7 @@ def AcceptPress():
 	GemRB.SetEquippedQuickSlot(MyChar, 0)
 
 	GemRB.UnloadWindow (CharGenWindow)
-	GemRB.SetNextScript("PartyFormation")
+	GemRB.SetNextScript ("PartyFormation")
 	return
 
 def SetCharacterDescription():
@@ -447,7 +448,8 @@ def SetCharacterDescription():
 			GemRB.TextAreaAppend (CharGenWindow, TextArea, "", -1)
 			GemRB.TextAreaAppend (CharGenWindow, TextArea, 15982, -1)
 			GemRB.TextAreaAppend (CharGenWindow, TextArea, ": " )
-			GemRB.TextAreaAppend (CharGenWindow, TextArea, GemRB.GetTableValue (RacialEnemyTable, GemRB.GetVar ("RacialEnemy") - 1, 2) )
+			RacialEnemy = GemRB.GetVar ("RacialEnemyIndex") + GemRB.GetVar ("RacialEnemy") - 1
+			GemRB.TextAreaAppend (CharGenWindow, TextArea, GemRB.GetTableValue (RacialEnemyTable, RacialEnemy, 2) )
 		elif IsBard!="*":
 			GemRB.TextAreaAppend (CharGenWindow, TextArea, "", -1)
 			GemRB.TextAreaAppend (CharGenWindow, TextArea, 8442, -1)
@@ -1071,13 +1073,13 @@ def AbilitiesCalcLimits(Index):
 	global RaceTable, AbilitiesRaceReqTable, AbilitiesRaceAddTable, ClassTable, AbilitiesClassReqTable
 	global AbilitiesMinimum, AbilitiesMaximum, AbilitiesModifier
 	RaceName = GemRB.GetTableRowName (RaceTable, GemRB.GetVar ("Race") - 1)
-	Race = GemRB.GetTableRowIndex(AbilitiesRaceReqTable, RaceName)
+	Race = GemRB.GetTableRowIndex (AbilitiesRaceReqTable, RaceName)
 	AbilitiesMinimum = GemRB.GetTableValue (AbilitiesRaceReqTable, Race, Index * 2)
 	AbilitiesMaximum = GemRB.GetTableValue (AbilitiesRaceReqTable, Race, Index * 2 + 1)
 	AbilitiesModifier = GemRB.GetTableValue (AbilitiesRaceAddTable, Race, Index)
 
 	ClassName = GemRB.GetTableRowName (ClassTable, GemRB.GetVar ("Class") - 1)
-	Class = GemRB.GetTableRowIndex(AbilitiesClassReqTable, ClassName)
+	Class = GemRB.GetTableRowIndex (AbilitiesClassReqTable, ClassName)
 	Min = GemRB.GetTableValue (AbilitiesClassReqTable, Class, Index)
 	if Min > 0 and AbilitiesMinimum < Min:
 		AbilitiesMinimum = Min
@@ -1142,7 +1144,7 @@ def AbilitiesMinusPress():
 def AbilitiesStorePress():
 	global AbilitiesWindow, AbilitiesRecallButton
 	for i in range (7):
-		GemRB.SetVar ("Stored" + str(i), GemRB.GetVar("Ability" + str(i)))
+		GemRB.SetVar ("Stored" + str(i), GemRB.GetVar ("Ability" + str(i)))
 	GemRB.SetButtonState (AbilitiesWindow, AbilitiesRecallButton, IE_GUI_BUTTON_ENABLED)
 	return
 
@@ -1150,7 +1152,7 @@ def AbilitiesRecallPress():
 	global AbilitiesWindow
 	GemRB.InvalidateWindow (AbilitiesWindow)
 	for i in range (7):
-		GemRB.SetVar ("Ability" + str(i), GemRB.GetVar("Stored" + str(i)) )
+		GemRB.SetVar ("Ability" + str(i), GemRB.GetVar ("Stored" + str(i)) )
 		AbilityLabel = GemRB.GetControl (AbilitiesWindow, 0x10000002 + i)
 		GemRB.SetText (AbilitiesWindow, AbilityLabel, str(GemRB.GetVar ("Ability" + str(i))) )
 	return
@@ -1405,6 +1407,7 @@ def RacialEnemySelect():
 		GemRB.SetVarAssoc (RacialEnemyWindow, RacialEnemySelectButton, "RacialEnemy", i - 1)
 
 	GemRB.SetVar ("RacialEnemyIndex", 0)
+	GemRB.SetVar ("HatedRace", 0)
 	RacialEnemyScrollBar = GemRB.GetControl (RacialEnemyWindow, 1)
 	GemRB.SetVarAssoc (RacialEnemyWindow, RacialEnemyScrollBar, "RacialEnemyIndex", RacialEnemyCount - 5)
 	GemRB.SetEvent (RacialEnemyWindow, RacialEnemyScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "DisplayRacialEnemies")
@@ -1437,8 +1440,9 @@ def DisplayRacialEnemies():
 
 def RacialEnemySelectPress():
 	global RacialEnemyWindow, RacialEnemyDoneButton, RacialEnemyTable, RacialEnemyTextArea
-	RacialEnemy = GemRB.GetVar ("RacialEnemyIndex") + GemRB.GetVar("RacialEnemy") - 1
+	RacialEnemy = GemRB.GetVar ("RacialEnemyIndex") + GemRB.GetVar ("RacialEnemy") - 1
 	GemRB.SetText (RacialEnemyWindow, RacialEnemyTextArea, GemRB.GetTableValue (RacialEnemyTable, RacialEnemy, 1) )
+	GemRB.SetVar ("HatedRace", GemRB.GetTableValue (RacialEnemyTable, RacialEnemy, 3) )
 	GemRB.SetButtonState (RacialEnemyWindow, RacialEnemyDoneButton, IE_GUI_BUTTON_ENABLED)
 	return
 
@@ -1470,7 +1474,7 @@ def ProficienciesSelect():
 	ProfsMaxTable = GemRB.LoadTable ("profsmax")
 	ClassWeaponsTable = GemRB.LoadTable ("clasweap")
 
-	Class = GemRB.GetTableRowIndex(ProfsTable, ClassName)
+	Class = GemRB.GetTableRowIndex (ProfsTable, ClassName)
 	ProficienciesPointsLeft = GemRB.GetTableValue (ProfsTable, Class, 0)
 	PointsLeftLabel = GemRB.GetControl (ProficienciesWindow, 0x10000009)
 	GemRB.SetLabelUseRGB (ProficienciesWindow, PointsLeftLabel, 1)
@@ -1573,7 +1577,7 @@ def ProficienciesPlusPress():
 	ProficienciesIndex = GemRB.GetVar ("ProficienciesIndex") - 1
 	ProficienciesValue = GemRB.GetVar ("Proficiency" + str(ProficienciesIndex) )
 	ClassName = GemRB.GetTableRowName (ClassTable, GemRB.GetVar ("Class") - 1)
-	Class = GemRB.GetTableRowIndex(ProfsMaxTable, ClassName)
+	Class = GemRB.GetTableRowIndex (ProfsMaxTable, ClassName)
 	if ProficienciesPointsLeft > 0 and ProficienciesValue < GemRB.GetTableValue (ProfsMaxTable, Class, 0):
 		ProficienciesPointsLeft = ProficienciesPointsLeft - 1
 		PointsLeftLabel = GemRB.GetControl (ProficienciesWindow, 0x10000009)
@@ -1982,7 +1986,7 @@ def AppearancePress():
 	AppearanceWindow = GemRB.LoadWindow (13)
 	PortraitName = GemRB.GetTableRowName (PortraitTable, Portrait)
 	AppearanceTable = GemRB.LoadTable ("PORTCOLR")
-	PortraitIndex = GemRB.GetTableRowIndex(AppearanceTable, PortraitName + "L")
+	PortraitIndex = GemRB.GetTableRowIndex (AppearanceTable, PortraitName + "L")
 	HairColor = GemRB.GetTableValue (AppearanceTable, PortraitIndex, 1)
 	GemRB.SetVar ("HairColor", HairColor)
 	SkinColor = GemRB.GetTableValue (AppearanceTable, PortraitIndex, 2)

@@ -9,14 +9,14 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/TextScreen.py,v 1.10 2006/01/06 23:10:01 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/TextScreen.py,v 1.11 2007/02/25 23:16:00 avenger_teambg Exp $
 
 # TextScreen.py - display Loading screen
 
@@ -38,13 +38,13 @@ def StartTextScreen ():
 
 	#if there is no preset loadpic, try to determine it from the chapter
 	if TableName == "":
-		Chapter = GemRB.GetGameVar("CHAPTER")
+		Chapter = GemRB.GetGameVar ("CHAPTER")
 		TableName = "CHPTXT"+str(Chapter)
 		#set ID according to the Chapter?
 
 	print "TableName:", TableName
-	Table = GemRB.LoadTable(TableName)
-	LoadPic = GemRB.GetTableValue(Table, -1, -1)
+	Table = GemRB.LoadTable (TableName)
+	LoadPic = GemRB.GetTableValue (Table, -1, -1)
 	print "Loadpic:", LoadPic
 	TextScreen = GemRB.LoadWindow (62)
 	GemRB.SetWindowFrame (TextScreen)
@@ -58,6 +58,7 @@ def StartTextScreen ():
 	Button=GemRB.GetControl (TextScreen, 0)
 	GemRB.SetText (TextScreen, Button, 11973)
 	GemRB.SetEvent (TextScreen, Button, IE_GUI_BUTTON_ON_PRESS, "EndTextScreen")
+	GemRB.SetButtonFlags (TextScreen, Button, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	#replay
 	Button=GemRB.GetControl (TextScreen, 3)
@@ -69,14 +70,13 @@ def StartTextScreen ():
 
 	GemRB.SetVisible (TextScreen, 1)
 	GemRB.RewindTA (TextScreen, TextArea, 300)
-	GemRB.GamePause(1, 1)
-
+	GemRB.GamePause (1, 1)
 
 def FeedScroll ():
 	global TextScreen, TextArea, Chapter, TableName
 
 	#this is a rather primitive selection but works for the games
-	Table = GemRB.LoadTable(TableName)
+	Table = GemRB.LoadTable (TableName)
 	Value = GemRB.GetTableValue (Table, 0, 1)
 	print "Value", Value
 	if Value == "REPUTATION":
@@ -103,4 +103,4 @@ def EndTextScreen ():
 	GemRB.UnloadWindow (TextScreen)
 	GemRB.SetVisible (0, 1) #enabling gamecontrol screen
 	GemRB.UnhideGUI ()
-	GemRB.GamePause(0, 1)
+	GemRB.GamePause (0, 1)

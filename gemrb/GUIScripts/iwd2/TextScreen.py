@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/TextScreen.py,v 1.3 2006/08/20 11:18:22 avenger_teambg Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd2/TextScreen.py,v 1.4 2007/02/25 23:15:59 avenger_teambg Exp $
 
 # TextScreen.py - display Loading screen
 
@@ -47,7 +47,7 @@ def StartTextScreen ():
 	GemRB.SetEvent (TextScreen, TextArea, IE_GUI_TEXTAREA_OUT_OF_TEXT, "FeedScroll")
 
 	#caption
-	Table = GemRB.LoadTable("chapters")
+	Table = GemRB.LoadTable ("chapters")
 	Value = GemRB.GetTableValue (Table, Chapter+1, 0)
 	GemRB.UnloadTable (Table)
 	Label=GemRB.GetControl (TextScreen, 0x10000000)
@@ -57,6 +57,7 @@ def StartTextScreen ():
 	Button=GemRB.GetControl (TextScreen, 0)
 	GemRB.SetText (TextScreen, Button, 11973)
 	GemRB.SetEvent (TextScreen, Button, IE_GUI_BUTTON_ON_PRESS, "EndTextScreen")
+	GemRB.SetButtonFlags (TextScreen, Button, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	#replay
 	Button=GemRB.GetControl (TextScreen, 3)
@@ -66,14 +67,14 @@ def StartTextScreen ():
 	GemRB.HideGUI ()
 	GemRB.SetVisible (0, 0) #removing the gamecontrol screen
 	GemRB.SetVisible (TextScreen, 1)
-	GemRB.RewindTA(TextScreen, TextArea, 200)
+	GemRB.RewindTA (TextScreen, TextArea, 200)
 	GemRB.GamePause(1, 1)
 
 
 def FeedScroll ():
 	global TextScreen, TextArea
 
-	Table = GemRB.LoadTable("chapters")
+	Table = GemRB.LoadTable ("chapters")
 	Value = GemRB.GetTableValue (Table, Chapter+1, 1)
 	GemRB.UnloadTable (Table)
 	GemRB.TextAreaAppend (TextScreen, TextArea, Value, -1)
@@ -82,7 +83,7 @@ def ReplayTextScreen ():
 	global TextScreen, TextArea
 
 	GemRB.SetEvent (TextScreen, TextArea, IE_GUI_TEXTAREA_OUT_OF_TEXT, "FeedScroll")
-	GemRB.RewindTA(TextScreen, TextArea, 200)
+	GemRB.RewindTA (TextScreen, TextArea, 200)
 
 def EndTextScreen ():
 	global TextScreen
