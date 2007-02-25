@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.113 2007/02/19 20:37:39 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Inventory.cpp,v 1.114 2007/02/25 11:45:08 avenger_teambg Exp $
  *
  */
 
@@ -246,7 +246,7 @@ void Inventory::SetSlotCount(unsigned int size)
 		printf("Inventory size changed???\n");
 		//we don't allow reassignment,
 		//if you want this, delete the previous Slots here
-		abort(); 
+		abort();
 	}
 	Slots.assign((size_t) size, NULL);
 }
@@ -270,7 +270,7 @@ bool Inventory::HasItemInSlot(const char *resref, unsigned int slot)
 	return false;
 }
 
-/** counts the items in the inventory, if stacks == 1 then stacks are 
+/** counts the items in the inventory, if stacks == 1 then stacks are
 		accounted for their heap size */
 int Inventory::CountItems(const char *resref, bool stacks)
 {
@@ -559,7 +559,7 @@ int Inventory::AddStoreItem(STOItem* item, int action)
 	while (item->PurchasedAmount) {
 		//the first part of a STOItem is essentially a CREItem
 		temp = new CREItem();
-		memcpy( temp, item, sizeof( CREItem ) ); 
+		memcpy( temp, item, sizeof( CREItem ) );
 		//except the Expired flag
 		temp->Expired=0;
 		if (action==STA_STEAL) {
@@ -885,7 +885,7 @@ int Inventory::FindRangedWeapon()
 int Inventory::FindSlotRangedWeapon(unsigned int slot)
 {
 	if ((int)slot >= SLOT_MELEE) return SLOT_FIST;
-	CREItem *Slot;   
+	CREItem *Slot;
 	const Item *itm = GetItemPointer(slot, Slot);
 	if (!itm) return SLOT_FIST;
 
@@ -1016,7 +1016,9 @@ int Inventory::GetEquippedSlot()
 		return SLOT_FIST;
 	}
 	if (IWD2 && Equipped>=0) {
-		if (Equipped == 4) Equipped = 0; 
+		//i've absolutely NO idea what is this 4 (Avenger)
+		//Equipped should be 0-3 in iWD2, no???
+		if (Equipped == 4) Equipped = 0;
 		return Equipped*2+SLOT_MELEE;
 	}
 	return Equipped+SLOT_MELEE;
@@ -1071,10 +1073,13 @@ CREItem *Inventory::GetUsedWeapon(bool leftorright)
 		}
 	}
 	if (leftorright) {
+		//no shield slot
 		slot = GetShieldSlot();
-		ret = GetSlotItem(slot);
-		if (ret) {
-			return ret;
+		if (slot>=0) {
+			ret = GetSlotItem(slot);
+			if (ret) {
+				return ret;
+			}
 		}
 	}
 	slot = GetEquippedSlot();
@@ -1262,7 +1267,7 @@ bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count
 	for(unsigned int idx=0;idx<Slots.size();idx++) {
 		if (!core->QuerySlotEffects(idx)) {
 			continue;
-		}    
+		}
 		CREItem *slot;
 		
 		const Item *itm = GetItemPointer(idx, slot);
