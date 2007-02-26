@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.471 2007/02/26 19:22:24 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.472 2007/02/26 19:25:12 wjpalenstijn Exp $
  *
  */
 
@@ -4787,6 +4787,7 @@ void Interface::PlaySound(int index)
 
 bool Interface::Exists(const char *ResRef, SClass_ID type)
 {
+	// TODO: check various caches before going to KeyImp
 	return key->HasResource( ResRef, type );
 }
 
