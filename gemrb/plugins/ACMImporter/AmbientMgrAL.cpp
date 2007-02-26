@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/AmbientMgrAL.cpp,v 1.5 2005/11/24 17:44:07 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/AmbientMgrAL.cpp,v 1.6 2007/02/26 19:24:16 wjpalenstijn Exp $
  *
  */
 
@@ -275,9 +275,9 @@ void AmbientMgrAL::AmbientSource::dequeProcessed()
 
 	alGetSourcei( source, AL_BUFFERS_PROCESSED, &processed );
 	if (0 == processed) return;
-	ALuint * buffers = (ALuint *) malloc ( processed * sizeof(ALuint) );
-	alSourceUnqueueBuffers( source, processed, buffers );
-	free(buffers);
+	ALuint * b = (ALuint *) malloc ( processed * sizeof(ALuint) );
+	alSourceUnqueueBuffers( source, processed, b );
+	free(b);
 	// do not destroy buffers since we reuse them
 }
 
