@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.469 2007/02/25 13:56:51 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/GUIScript/GUIScript.cpp,v 1.470 2007/02/26 19:22:24 avenger_teambg Exp $
  *
  */
 
@@ -70,10 +70,13 @@ static int StoreSpellsCount = -1;
 static int UsedItemsCount = -1;
 static int ItemSoundsCount = -1;
 
+//#define UIT_ALLOW_REPLACE    1 //item is replaceable with another item on this list
+
 typedef struct UsedItemType {
 	ieResRef itemname;
 	ieVariable username; //death variable
 	ieStrRef value;
+//	int flags;           //UIT flags
 } UsedItemType;
 
 typedef struct SpellDescType {
@@ -5274,7 +5277,7 @@ static void ReadUsedItems()
 		for (i=0;i<UsedItemsCount;i++) {
 			strnlwrcpy(UsedItems[i].itemname, tab->GetRowName(i),8 );
 			strnlwrcpy(UsedItems[i].username, tab->QueryField(i,0),32 );
-			//if there are more flags, compose this value into a bitfield
+			//this is an strref
 			UsedItems[i].value = atoi(tab->QueryField(i,1) );
 		}
 table_loaded:
@@ -6029,21 +6032,14 @@ void DragItem(CREItem *si)
 	core->FreeItem( item, si->ItemResRef, false );
 }
 
-CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count)
+int CheckRemoveItem(Actor *actor, CREItem *si)
 {
-	CREItem *si = NULL;
-
 	///check if item is undroppable because the actor likes it
 	if (UsedItemsCount==-1) {
 		ReadUsedItems();
 	}	
 	unsigned int i=UsedItemsCount;
-	//we should use GetSlotItem here.
-	//getitem would remove the item from the inventory!
-	si = actor->inventory.GetSlotItem(Slot);
-	if (!si) {
-		return NULL;
-	}
+
 	while(i--) {
 		if (UsedItems[i].itemname[0] && strnicmp(UsedItems[i].itemname, si->ItemResRef,8) ) {
 			continue;
@@ -6052,7 +6048,25 @@ CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count)
 			continue;
 		}
 		core->DisplayString(UsedItems[i].value,0xffffff, IE_STR_SOUND);
+		return 1;
+	}
+	return 0;
+}
+
+CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count)
+{
+	//we should use getslotitem, because
+	//getitem would remove the item from the inventory!
+	CREItem *si = actor->inventory.GetSlotItem(Slot);
+	if (!si) {
 		return NULL;
+	}
+	
+	//it is always possible to put these items into the inventory
+	if (!(core->QuerySlotType(Slot)&SLOT_INVENTORY)) {
+		if (CheckRemoveItem(actor, si)) {
+			return NULL;
+		}
 	}
 	///fixme: make difference between cursed/unmovable
 	if (! actor->inventory.UnEquipItem( Slot, false )) {

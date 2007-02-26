@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.470 2007/02/25 22:33:01 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/Core/Interface.cpp,v 1.471 2007/02/26 19:22:24 avenger_teambg Exp $
  *
  */
 
@@ -550,7 +550,7 @@ void Interface::HandleEvents()
 	}
 	if (EventFlag&EF_SHOWMAP) {
 		if (gc && gc->Owner && gc->Owner->Visible) {
-			ieDword tmp = ~0;
+			ieDword tmp = (ieDword) ~0;
 			vars->Lookup( "OtherWindow", tmp );
 			if (tmp == (ieDword) ~0) {
 				EventFlag &= ~EF_SHOWMAP;
@@ -1135,7 +1135,7 @@ int Interface::Init()
 	}
 
 	printMessage( "Core", "Initializing stock sounds...\n", WHITE );
-	ReadResRefTable ("defsound", DefSound);
+	DSCount = ReadResRefTable ("defsound", DefSound);
 	if (DSCount == 0) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "Cannot find defsound.2da.\nTermination in Progress...\n" );

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.68 2007/01/27 18:58:21 wjpalenstijn Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/ACMImp.cpp,v 1.69 2007/02/26 19:22:24 avenger_teambg Exp $
  *
  */
 
@@ -48,6 +48,49 @@ static CSoundReader *MusicReader = NULL;
 static SDL_mutex* musicMutex = NULL;
 static SDL_Thread* musicThread = NULL;
 static unsigned char* static_memory = NULL;
+static ALCcontext *alutContext = NULL;
+
+//This stuff is a modified version of alut
+
+static ALboolean GemRBalutInit()
+{
+	ALCdevice *device;
+	ALCcontext *context;
+
+	device = alcOpenDevice (NULL);
+	if (device == NULL) {
+		return AL_FALSE;
+	}
+
+	context = alcCreateContext (device, NULL);
+	if (context == NULL) {
+		alcCloseDevice (device);
+		return AL_FALSE;
+	}
+
+	if (!alcMakeContextCurrent (context)) {
+		alcDestroyContext (context);
+		alcCloseDevice (device);
+		return AL_FALSE;
+	}
+	alutContext = context;
+	return AL_TRUE;
+}
+
+static void GemRBalutExit()
+{
+	ALCdevice *device;
+
+	alcMakeContextCurrent (NULL);
+
+	device = alcGetContextsDevice (alutContext);
+	alcDestroyContext (alutContext);
+	if (alcGetError (device) == ALC_NO_ERROR) {
+		alcCloseDevice (device);
+	}
+	alutContext = NULL;
+}
+//
 
 static int isWAVC(DataStream* stream)
 {
@@ -58,15 +101,13 @@ static int isWAVC(DataStream* stream)
 	stream->Read( Signature, 4 );
 	stream->Seek( 0, GEM_STREAM_START );
 #ifdef HAS_VORBIS_SUPPORT
-	if(strnicmp(Signature, "oggs", 4) == 0)
+	if(strnicmp(Signature, "oggs", 4) == 0) {
 		return SND_READER_OGG;
+	} //ogg
 #endif
-	if(strnicmp(Signature, "RIFF", 4) == 0)
-		return SND_READER_WAV; //wav
-	/*
-	if( * (unsigned short *) Signature == 0xfffb)
-		return SND_READER_MP3; //mp3
-	*/
+	if(strnicmp(Signature, "RIFF", 4) == 0) {
+		return SND_READER_WAV;
+	} //wav
 	if (*( unsigned int * ) Signature == IP_ACM_SIG) {
 		return SND_READER_ACM;
 	} //acm
@@ -257,10 +298,10 @@ ACMImp::~ACMImp(void)
 	}
 	//freeing the memory of the music thread
 	free(static_memory);
-	
+
 	delete ambim;
 
-	alutExit();
+	GemRBalutExit();
 }
 
 #define RETRY 5
@@ -269,7 +310,7 @@ bool ACMImp::Init(void)
 {
 	int i;
 
-	alutInit( 0, NULL );
+	GemRBalutInit( );
 	ALenum error = alGetError();
 	if (error != AL_NO_ERROR) {
 		return false;
@@ -290,7 +331,7 @@ bool ACMImp::Init(void)
 		}
 		printf( "Retrying to open sound, last error:(%d)\n", alGetError() );
 		SDL_Delay( 15 * 1000 ); //it is given in milliseconds
-		alutInit( 0, NULL );
+		GemRBalutInit( );
 	}
 	if (i == RETRY) {
 		return false;
@@ -327,7 +368,7 @@ ALuint ACMImp::LoadSound(const char *ResRef, int *time_length)
 
 	ALuint Buffer;
 	ALenum error;
-	
+
 	for (unsigned int i = 0; i < RETRY; i++) {
 		alGenBuffers( 1, &Buffer );
 		if (( error = alGetError() ) == AL_NO_ERROR) {
@@ -352,11 +393,11 @@ ALuint ACMImp::LoadSound(const char *ResRef, int *time_length)
 		return 0;
 	}
 	int cnt = acm->get_length();
-	int riff_chans = acm->get_channels();	
+	int riff_chans = acm->get_channels();
 	int samplerate = acm->get_samplerate();
 	//multiply always by 2 because it is in 16 bits
 	int rawsize = cnt * riff_chans * 2;
-	unsigned char * memory = (unsigned char*) malloc(rawsize); 
+	unsigned char * memory = (unsigned char*) malloc(rawsize);
 	//multiply always with 2 because it is in 16 bits
 	int cnt1 = acm->read_samples( ( short* ) memory, cnt ) * riff_chans * 2;
 	//Sound Length in milliseconds
@@ -375,7 +416,7 @@ ALuint ACMImp::LoadSound(const char *ResRef, int *time_length)
 }
 
 /*
- * flags: 
+ * flags:
  * 	GEM_SND_SPEECH: replace any previous with this flag set
  * 	GEM_SND_RELATIVE: sound position is relative to the listener
  * the default flags are: GEM_SND_RELATIVE
@@ -386,7 +427,7 @@ unsigned int ACMImp::Play(const char* ResRef, int XPos, int YPos, unsigned int f
 
 	int time_length;
 	ALuint Buffer = LoadSound(ResRef, &time_length);
-	if (0 == Buffer) { 
+	if (0 == Buffer) {
 		return 0;
 	}
 	ALuint Source;
@@ -435,7 +476,7 @@ unsigned int ACMImp::Play(const char* ResRef, int XPos, int YPos, unsigned int f
 			DisplayALError( "[ACMImp::Play] alGenSources : ", error );
 			return 0;
 		}
-	
+
 		alSourcef( Source, AL_PITCH, 1.0f );
 		alSourcefv( Source, AL_VELOCITY, SourceVel );
 		alSourcei( Source, AL_LOOPING, 0 );
@@ -446,11 +487,11 @@ unsigned int ACMImp::Play(const char* ResRef, int XPos, int YPos, unsigned int f
 		alSourcei( Source, AL_SOURCE_RELATIVE, flags & GEM_SND_RELATIVE );
 		alSourcefv( Source, AL_POSITION, SourcePos );
 		alSourcei( Source, AL_BUFFER, Buffer );
-			
+
 		if (alGetError() != AL_NO_ERROR) {
 			return 0;
 		}
-	
+
 		for (i = 0; i < MAX_STREAMS; i++) {
 			if (!streams[i].free) {
 				alGetSourcei( streams[i].Source, AL_SOURCE_STATE, &state );

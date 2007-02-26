@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/AmbientMgrAL.h,v 1.3 2005/02/23 18:59:03 avenger_teambg Exp $
+ * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/plugins/ACMImporter/AmbientMgrAL.h,v 1.4 2007/02/26 19:22:24 avenger_teambg Exp $
  *
  */
 
@@ -30,13 +30,9 @@
 #ifndef WIN32
 #include <AL/al.h>
 #include <AL/alc.h>
-//#include <AL/alu.h>
-#include <AL/alut.h>
 #else
 #include <al.h>
 #include <alc.h>
-//#include <alu.h>
-#include <alut.h>
 #endif
 
 class Ambient;
