@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/configure.in,v 1.63 2006/12/17 10:24:36 wjpalenstijn Exp $
+# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/configure.in,v 1.64 2007/02/26 19:20:49 avenger_teambg Exp $
 
 ###################################################
 
@@ -28,7 +28,7 @@
 dnl Initialize autoconf and automake
 
 AC_PREREQ([2.57])
-AC_INIT(gemrb, 0.2.7)
+AC_INIT(gemrb, 0.2.8)
 AC_CONFIG_AUX_DIR([admin])
 AC_CONFIG_SRCDIR([gemrb/])
 AC_CANONICAL_SYSTEM
@@ -123,11 +123,14 @@ AM_PATH_SDL(1.2.0, [], [AC_MSG_ERROR([
 ])])
 
 dnl Check for OpenAL, fail if not found.
+AC_CHECK_LIB([openal], [alGetError], [ $(which true) ], [AC_MSG_ERROR([
+*** You need OpenAL (www.openal.org) to compile GemRB
+])])
 #AC_CHECK_LIB([alut], [alutInit], [ $(which true) ], [AC_MSG_ERROR([
 #*** You need OpenAL (www.openal.org) to compile GemRB
 #])])
 
-GEMRB_CHECK_ALUT()
+#GEMRB_CHECK_ALUT()
 
 dnl Check for Python version >= 2.3.0, fail if not found.
 AM_PATH_PYTHON(2.3.0, [], [AC_MSG_ERROR([
