@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/ie_slots.py,v 1.3 2007/02/11 21:27:12 avenger_teambg Exp $
+# $Id$
 
 # ie_slots.py - definitions of slottypes
 

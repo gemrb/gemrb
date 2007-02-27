@@ -16,7 +16,7 @@
 #along with this program; if not, write to the Free Software
 #Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-#$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/how/GUIINV.py,v 1.28 2007/02/11 22:55:04 avenger_teambg Exp $
+#$Id$
 
 
 #GUIINV.py - scripts to control inventory windows from GUIINV winpack

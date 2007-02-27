@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUIDefines.py,v 1.57 2006/12/28 20:50:51 avenger_teambg Exp $
+# $Id$
 
 
 # GUIDefines.py - common definitions of GUI-related constants for GUIScripts

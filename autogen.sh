@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/autogen.sh,v 1.12 2005/02/02 00:36:23 edheldil Exp $
+# $Id$
 
 # Gentoo and Mandrake specific flags
 export WANT_AUTOMAKE="1.7"

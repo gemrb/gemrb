@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUIJRNL.py,v 1.3 2006/12/26 19:57:39 avenger_teambg Exp $
+# $Id$
 
 
 # GUIJRNL.py - scripts to control journal/diary windows from GUIJRNL winpack

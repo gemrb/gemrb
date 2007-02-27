@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg1/GUICG7.py,v 1.2 2005/05/24 17:36:10 avenger_teambg Exp $
+# $Id$
 # character generation, mage spells (GUICG7)
 
 import GemRB

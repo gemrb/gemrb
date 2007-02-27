@@ -1,4 +1,4 @@
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/Release.txt,v 1.4 2006/03/15 20:55:33 edheldil Exp $
+# $Id$
 
 
 How to make a release

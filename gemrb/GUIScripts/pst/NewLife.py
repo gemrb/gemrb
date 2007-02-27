@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/pst/NewLife.py,v 1.19 2007/02/09 19:37:34 avenger_teambg Exp $
+# $Id$
 
 # NewLife.py - Character generation screen
 

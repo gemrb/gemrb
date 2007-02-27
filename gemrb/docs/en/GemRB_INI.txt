@@ -1,6 +1,6 @@
 GAME-SPECIFIC CONFIGURATION FILE GEMRB.INI
 ******************************************
-$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/GemRB_INI.txt,v 1.5 2006/02/09 22:46:11 edheldil Exp $
+$Id$
 
 Contents
 --------

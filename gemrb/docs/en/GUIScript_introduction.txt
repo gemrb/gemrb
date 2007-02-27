@@ -1,6 +1,6 @@
 GUISCRIPT INTRODUCTION
 **********************
-$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/GUIScript_introduction.txt,v 1.2 2005/03/06 22:54:30 edheldil Exp $
+$Id$
 
 This file is intended as a brief overview for one of two scripting systems
 in GemRB - GUIScript. You should read it if you want to hack on GemRB's GUI.
@@ -114,7 +114,7 @@ an example
     # GemRB - Infinity Engine Emulator
     # Copyright (C) 2003 The GemRB Project
     .....
-    # $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/GUIScript_introduction.txt,v 1.2 2005/03/06 22:54:30 edheldil Exp $
+    # $Id$
 
 
     ## Since this is only a module, GemRB and GUIDefines have to be explicitly 

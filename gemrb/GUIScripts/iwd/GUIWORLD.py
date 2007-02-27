@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/iwd/GUIWORLD.py,v 1.11 2006/06/26 10:28:46 avenger_teambg Exp $
+# $Id$
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack

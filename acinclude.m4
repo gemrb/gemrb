@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/acinclude.m4,v 1.16 2007/02/26 19:20:49 avenger_teambg Exp $
+# $Id$
 
 ###################################################
 dnl Configure paths for SDL

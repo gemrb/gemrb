@@ -1,4 +1,4 @@
-/* $Id: mve_play.cpp,v 1.15 2007/02/26 19:22:24 avenger_teambg Exp $ */
+/* $Id$ */
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif

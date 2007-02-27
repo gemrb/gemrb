@@ -1,6 +1,6 @@
 CHEAT AND DEBUG KEYS
 --------------------
-$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/CheatKeys.txt,v 1.9 2006/12/09 19:52:04 avenger_teambg Exp $
+$Id$
 
 
 Following is a list of cheats you can use during development of GemRB.

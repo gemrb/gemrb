@@ -1,6 +1,6 @@
 WORKING WITH CVS
 ----------------
-$Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/docs/en/CVS.txt,v 1.3 2006/07/01 17:13:33 edheldil Exp $
+$Id$
 
 
 This document is a short help on using CVS for getting GemRB

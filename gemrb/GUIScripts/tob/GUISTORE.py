@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUISTORE.py,v 1.35 2007/02/06 22:20:38 avenger_teambg Exp $
+# $Id$
 
 
 # GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack

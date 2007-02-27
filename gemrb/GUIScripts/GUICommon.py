@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/GUICommon.py,v 1.8 2007/02/06 22:20:25 avenger_teambg Exp $
+# $Id$
 
 import GemRB
 # GUICommon.py - common functions for GUIScripts of all game types

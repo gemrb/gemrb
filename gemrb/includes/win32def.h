@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/includes/win32def.h,v 1.26 2007/01/02 20:26:11 avenger_teambg Exp $
+ * $Id$
  *
  */
 

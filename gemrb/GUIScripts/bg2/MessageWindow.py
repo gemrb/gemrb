@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/bg2/MessageWindow.py,v 1.44 2007/02/21 22:53:38 avenger_teambg Exp $
+# $Id$
 
 # MessageWindow.py - scripts and GUI for main (walk) window
 

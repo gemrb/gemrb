@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Header: /data/gemrb/cvs2svn/gemrb/gemrb/gemrb/GUIScripts/tob/GUIPR.py,v 1.20 2005/12/17 21:02:50 avenger_teambg Exp $
+# $Id$
 
 
 # GUIPR.py - scripts to control priest spells windows from GUIPR winpack

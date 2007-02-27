@@ -22,7 +22,7 @@ my $copyright_cpp = <<EOT;
  \\* along with this program; if not, write to the Free Software
  \\* Foundation, Inc\\., 59 Temple Place - Suite 330, Boston, MA  02111\\-1307, USA\\.
  \\*
- \\* \\\$Header: /data/gemrb/cvs2svn/gemrb/gemrb/admin/check_copyright.pl,v 1.1 2005/11/04 09:25:42 edheldil Exp $
+ \\* \\\$Id$
  \\*
  \\*/
 
@@ -52,7 +52,7 @@ my $copyright_py = <<EOT;
 # along with this program; if not, write to the Free Software
 # Foundation, Inc\\., 59 Temple Place \\- Suite 330, Boston, MA  02111\\-1307, USA\\.
 #
-# \\\$Header: /data/gemrb/cvs2svn/gemrb/gemrb/admin/check_copyright.pl,v 1.1 2005/11/04 09:25:42 edheldil Exp $
+# \\\$Id$
 EOT
 
 
