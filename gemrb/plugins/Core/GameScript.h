@@ -1380,6 +1380,7 @@ public:
 	static Targets *FourthNearestEnemyOfType(Scriptable *Sender, Targets *parameters);
 	static Targets *FourthNearestMyGroupOfType(Scriptable *Sender, Targets *parameters);
 	static Targets *Gabber(Scriptable *Sender, Targets *parameters);
+	static Targets *GroupOf(Scriptable *Sender, Targets *parameters);
 	static Targets *LastAttackerOf(Scriptable *Sender, Targets *parameters);
 	static Targets *LastCommandedBy(Scriptable *Sender, Targets *parameters);
 	static Targets *LastHeardBy(Scriptable *Sender, Targets *parameters);

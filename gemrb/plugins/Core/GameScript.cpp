@@ -872,6 +872,8 @@ static ObjectLink objectnames[] = {
 	{"fourthnearestenemyof", GameScript::FourthNearestEnemyOf},
 	{"fourthnearestenemyoftype", GameScript::FourthNearestEnemyOfType},
 	{"fourthnearestmygroupoftype", GameScript::FourthNearestEnemyOfType},
+	{"gabber", GameScript::Gabber},
+	{"groupof", GameScript::GroupOf},
 	{"lastattackerof", GameScript::LastAttackerOf},
 	{"lastcommandedby", GameScript::LastCommandedBy},
 	{"lastheardby", GameScript::LastHeardBy},
@@ -917,6 +919,7 @@ static ObjectLink objectnames[] = {
 	{"player8", GameScript::Player8},
 	{"player8fill", GameScript::Player8Fill},
 	{"protectedby", GameScript::ProtectedBy},
+	{"protectorof", GameScript::ProtectorOf},
 	{"protagonist", GameScript::Protagonist},
 	{"secondnearest", GameScript::SecondNearest},
 	{"secondnearestdoor", GameScript::SecondNearestDoor},
@@ -1917,7 +1920,32 @@ Targets *GameScript::LastHeardBy(Scriptable *Sender, Targets *parameters)
 	return parameters;
 }
 
-/*this one is tough*/
+//i was told that Group means the same specifics, so this is just an
+//object selector for everyone with the same specifics as the current object
+Targets *GameScript::GroupOf(Scriptable *Sender, Targets *parameters)
+{
+	Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
+	if (!actor) {
+		if (Sender->Type==ST_ACTOR) {
+			actor = (Actor *) Sender;
+		}
+	}
+	parameters->Clear();
+	if (actor) {
+		ieDword tmp = actor->GetStat(IE_SPECIFIC);
+		Map *cm = Sender->GetCurrentArea();
+		int i = cm->GetActorCount(true);
+		while (i--) {
+			Actor *target=cm->GetActor(i,true);
+			if (target && (target->GetStat(IE_SPECIFIC)==tmp) ) {
+				parameters->AddTarget(target, 0, 0);
+			}
+		}
+	}
+	return parameters;
+}
+
+/*this one is tough, but done */
 Targets *GameScript::ProtectorOf(Scriptable *Sender, Targets *parameters)
 {
 	Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
@@ -1928,9 +1956,14 @@ Targets *GameScript::ProtectorOf(Scriptable *Sender, Targets *parameters)
 	}
 	parameters->Clear();
 	if (actor) {
-		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastProtected);
-		if (target) {
-			parameters->AddTarget(target, 0, 0);
+		ieWord tmp = actor->LastProtected;
+		Map *cm = Sender->GetCurrentArea();
+		int i = cm->GetActorCount(true);
+		while (i--) {
+			Actor *target=cm->GetActor(i,true);
+			if (target && (target->LastProtected ==tmp) ) {
+				parameters->AddTarget(target, 0, 0);
+			}
 		}
 	}
 	return parameters;
@@ -1985,24 +2018,6 @@ Targets *GameScript::LastTargetedBy(Scriptable *Sender, Targets *parameters)
 	return GetMyTarget(Sender, actor, parameters);
 }
 
-/*
-Targets *GetMyTarget(Actor *actor, Targets *parameters)
-{
-	if (!actor) {
-		if (Sender->Type==ST_ACTOR) {
-			actor = (Actor *) Sender;
-		}
-	}
-	parameters->Clear();
-	if (actor) {
-		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastTarget);
-		if (target) {
-			parameters->AddTarget(target, 0);
-		}
-	}
-	return parameters;
-}
-*/
 Targets *GameScript::LastAttackerOf(Scriptable *Sender, Targets *parameters)
 {
 	Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);

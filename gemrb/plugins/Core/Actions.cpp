@@ -5418,15 +5418,17 @@ void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)
 	}
 	int opcode = EffectQueue::ResolveEffect(fx_iwd_visual_spell_hit_ref);
 	Effect *fx = core->GetEffect(opcode);
-        if (!fx) {
-                //invalid effect name didn't resolve to opcode
-                return;
-        }
+	if (!fx) {
+	        //invalid effect name didn't resolve to opcode
+	        return;
+	}
 	
 	//vvc type
 	fx->Parameter2 = parameters->int0Parameter;
 	//height (not sure if this is in the opcode, but seems acceptable)
 	fx->Parameter1 = parameters->int1Parameter;
+	fx->Probability1=100;
+	fx->TimingMode=FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
 	core->ApplyEffect(fx, (Actor *) src, (Actor *) tar);
 }
 
