@@ -5400,3 +5400,33 @@ void GameScript::IncrementKillStat(Scriptable* Sender, Action* parameters)
 	ieDword value = CheckVariable( Sender, variable, "GLOBAL" ) + 1;
 	SetVariable( Sender, variable, "GLOBAL", value );
 }
+
+//this action plays a vvc animation over target
+//we simply apply the appropriate opcode on the target (see iwdopcodes)
+//the list of vvcs is in iwdshtab.2da
+EffectRef fx_iwd_visual_spell_hit_ref={"IWDVisualSpellHit",NULL,-1};
+
+void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* src = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!src || src->Type!=ST_ACTOR) {
+		return;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type!=ST_ACTOR) {
+		return;
+	}
+	int opcode = EffectQueue::ResolveEffect(fx_iwd_visual_spell_hit_ref);
+	Effect *fx = core->GetEffect(opcode);
+        if (!fx) {
+                //invalid effect name didn't resolve to opcode
+                return;
+        }
+	
+	//vvc type
+	fx->Parameter2 = parameters->int0Parameter;
+	//height (not sure if this is in the opcode, but seems acceptable)
+	fx->Parameter1 = parameters->int1Parameter;
+	core->ApplyEffect(fx, (Actor *) src, (Actor *) tar);
+}
+

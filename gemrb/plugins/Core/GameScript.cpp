@@ -774,6 +774,7 @@ static ActionLink actionnames[] = {
 	{"spawnptactivate", GameScript::SpawnPtActivate, 0},
 	{"spawnptdeactivate", GameScript::SpawnPtDeactivate, 0},
 	{"spawnptspawn", GameScript::SpawnPtSpawn, 0},
+	{"spellhiteffectsprite", GameScript::SpellHitEffectSprite, 0},
 	{"startcutscene", GameScript::StartCutScene, 0},
 	{"startcutsceneex", GameScript::StartCutScene, 0}, //pst (unknown)
 	{"startcutscenemode", GameScript::StartCutSceneMode, 0},
@@ -968,7 +969,7 @@ static IDSLink idsnames[] = {
 	{ NULL,NULL}
 };
 
-static TriggerLink* FindTrigger(const char* triggername)
+static TriggerLink* FindTrigger(const char* triggername, int index)
 {
 	if (!triggername) {
 		return NULL;
@@ -981,11 +982,11 @@ static TriggerLink* FindTrigger(const char* triggername)
 			}
 		}
 	}
-	printf( "Warning: Couldn't assign trigger: %.*s\n", len, triggername );
+	printf( "Warning: Couldn't assign trigger: 0x%x %.*s\n", index, len, triggername );
 	return NULL;
 }
 
-static ActionLink* FindAction(const char* actionname)
+static ActionLink* FindAction(const char* actionname, int index)
 {
 	if (!actionname) {
 		return NULL;
@@ -998,11 +999,11 @@ static ActionLink* FindAction(const char* actionname)
 			}
 		}
 	}
-	printf( "Warning: Couldn't assign action: %.*s\n", len, actionname );
+	printf( "Warning: Couldn't assign action: %d %.*s\n", index, len, actionname );
 	return NULL;
 }
 
-static ObjectLink* FindObject(const char* objectname)
+static ObjectLink* FindObject(const char* objectname, int index)
 {
 	if (!objectname) {
 		return NULL;
@@ -1015,7 +1016,7 @@ static ObjectLink* FindObject(const char* objectname)
 			}
 		}
 	}
-	printf( "Warning: Couldn't assign object: %.*s\n", len, objectname );
+	printf( "Warning: Couldn't assign object: %d %.*s\n", index, len, objectname );
 	return NULL;
 }
 
@@ -1238,9 +1239,9 @@ GameScript::GameScript(ieResRef ResRef, ScriptableType ScriptType,
 		while (j--) {
 			i = triggersTable->GetValueIndex( j );
 			//maybe we should watch for this bit?
+			TriggerLink* poi = FindTrigger(triggersTable->GetStringIndex( j ), i );
 			//bool triggerflag = i & 0x4000;
 			i &= 0x3fff;
-			TriggerLink* poi = FindTrigger(triggersTable->GetStringIndex( j ) );
 			if (triggers[i]) {
 				if (poi && triggers[i]!=poi->Function) {
 					printMessage("GameScript"," ", YELLOW);
@@ -1264,7 +1265,7 @@ GameScript::GameScript(ieResRef ResRef, ScriptableType ScriptType,
 		j = actionsTable->GetSize();
 		while (j--) {
 			i = actionsTable->GetValueIndex( j );
-			ActionLink* poi = FindAction( actionsTable->GetStringIndex( j ) );
+			ActionLink* poi = FindAction( actionsTable->GetStringIndex( j ), i );
 			if (actions[i]) {
 				if (poi && actions[i]!=poi->Function) {
 					printMessage("GameScript"," ", YELLOW);
@@ -1287,7 +1288,7 @@ GameScript::GameScript(ieResRef ResRef, ScriptableType ScriptType,
 		j = objectsTable->GetSize();
 		while (j--) {
 			i = objectsTable->GetValueIndex( j );
-			ObjectLink* poi = FindObject( objectsTable->GetStringIndex( j ) );
+			ObjectLink* poi = FindObject( objectsTable->GetStringIndex( j ), i );
 			if (objects[i]) {
 				if (poi && objects[i]!=poi->Function) {
 					printMessage("GameScript"," ", YELLOW);
