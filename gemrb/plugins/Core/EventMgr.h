@@ -54,6 +54,8 @@
 // Mouse buttons
 #define GEM_MB_ACTION           1
 #define GEM_MB_MENU             4
+//not working actually
+#define GEM_MB_DOUBLECLICK      256
 
 #ifdef WIN32
 

@@ -168,8 +168,10 @@ public:
 	/** Transforms sprite to have an alpha channel */
 	virtual void CreateAlpha(Sprite2D *sprite) = 0;
 
-	/** Convers a Screen Coordinate to a Game Coordinate */
+	/** Converts a Screen Coordinate to a Game Coordinate */
 	virtual void ConvertToGame(short& x, short& y) = 0;
+	/** Converts a Game Coordinate to a Screen Coordinate */
+	virtual void ConvertToScreen(short& x, short& y) = 0;
 	/** Sets the Fading Color */
 	virtual void SetFadeColor(int r, int g, int b) = 0;
 	/** Sets the Fading to Color Percentage */
@@ -180,6 +182,8 @@ public:
 	virtual void GetClipRect(Region& clip) = 0;
 	/** returns the current mouse coordinates */
 	virtual void GetMousePos(int &x, int &y) = 0;
+	/** clicks the mouse forcibly */
+	virtual void ClickMouse(unsigned int button) = 0;
 	/** moves the mouse forcibly */
 	virtual void MoveMouse(unsigned int x, unsigned int y) = 0;
 	/** initializes the screen for movie */

@@ -2250,6 +2250,27 @@ void SDLVideoDriver::MoveMouse(unsigned int x, unsigned int y)
 	SDL_WarpMouse(x,y);
 }
 
+void SDLVideoDriver::ClickMouse(unsigned int button)
+{
+	MouseClickEvent(SDL_MOUSEBUTTONDOWN, (Uint8) button);
+	MouseClickEvent(SDL_MOUSEBUTTONUP, (Uint8) button);
+	if (button&GEM_MB_DOUBLECLICK) {
+		MouseClickEvent(SDL_MOUSEBUTTONDOWN, (Uint8) button);
+		MouseClickEvent(SDL_MOUSEBUTTONUP, (Uint8) button);
+	}
+}
+
+void SDLVideoDriver::MouseClickEvent(Uint8 type, Uint8 button)
+{
+	SDL_MouseButtonEvent *event = new SDL_MouseButtonEvent();
+	event->type = type;
+	event->button = button;
+	event->state = (type==SDL_MOUSEBUTTONDOWN)?SDL_PRESSED:SDL_RELEASED;
+	event->x = CursorPos.x;
+	event->y = CursorPos.y;
+	SDL_PushEvent((SDL_Event *) event);
+}
+
 void SDLVideoDriver::InitMovieScreen(int &w, int &h)
 {
 	SDL_LockSurface( disp );
