@@ -1014,7 +1014,8 @@ void MoveBetweenAreasCore(Actor* actor, const char *area, Point &position, int f
 	gc->SetScreenFlags(SF_CENTERONACTOR,BM_OR);
 }
 
-void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags)
+//repeat movement, if goal isn't reached
+void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, bool untilsee)
 {
 	if (Sender->Type != ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
@@ -1026,6 +1027,15 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
+	if (untilsee && CanSee(actor, target, true, 0) ) {
+		Sender->ReleaseCurrentAction();
+		return;
+	} else {
+		if (PersonalDistance(actor, target)<MAX_OPERATING_DISTANCE) {
+			Sender->ReleaseCurrentAction();
+			return;
+		}
+	}
 	actor->WalkTo( target->Pos, flags, 0 );
 }
 

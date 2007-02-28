@@ -2020,6 +2020,24 @@ int GameScript::CheckStatLT(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+/* i believe this trigger is the same as 'MarkObject' action
+   except that  if it cannot set the marked object, it returns false */
+int GameScript::SetLastMarkedObject(Scriptable* Sender, Trigger* parameters)
+{
+	if (Sender->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor *scr = (Actor *) Sender;
+
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	scr->LastMarked = actor->GetID();
+	return 1;
+}
+
 int GameScript::See(Scriptable* Sender, Trigger* parameters)
 {
 	int see = SeeCore(Sender, parameters, 0);

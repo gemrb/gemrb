@@ -319,6 +319,7 @@ static TriggerLink triggernames[] = {
 	{"school", GameScript::School, 0}, //similar to kit
 	{"see", GameScript::See, 0},
 	{"sequence", GameScript::Sequence, 0},
+	{"setlastmarkedobject", GameScript::SetLastMarkedObject, 0},
 	{"specifics", GameScript::Specifics, 0},
 	{"statecheck", GameScript::StateCheck, 0},
 	{"stealfailed", GameScript::StealFailed, 0},
@@ -628,6 +629,7 @@ static ActionLink actionnames[] = {
 	{"movetoobject", GameScript::MoveToObject,AF_BLOCKING},
 	{"movetoobjectfollow", GameScript::MoveToObjectFollow,AF_BLOCKING},
 	{"movetoobjectnointerrupt", GameScript::MoveToObjectNoInterrupt,AF_BLOCKING},
+	{"movetoobjectuntilsee", GameScript::MoveToObjectUntilSee,AF_BLOCKING},
 	{"movetooffset", GameScript::MoveToOffset,AF_BLOCKING},
 	{"movetopoint", GameScript::MoveToPoint,AF_BLOCKING},
 	{"movetopointnointerrupt", GameScript::MoveToPointNoInterrupt,AF_BLOCKING},

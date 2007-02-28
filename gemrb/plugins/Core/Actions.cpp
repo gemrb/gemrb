@@ -1071,17 +1071,22 @@ void GameScript::ReturnToSavedLocationDelete(Scriptable* Sender, Action* paramet
 
 void GameScript::MoveToObjectNoInterrupt(Scriptable* Sender, Action* parameters)
 {
-	MoveToObjectCore(Sender, parameters, IF_NOINT);
+	MoveToObjectCore(Sender, parameters, IF_NOINT, false);
 }
 
 void GameScript::RunToObject(Scriptable* Sender, Action* parameters)
 {
-	MoveToObjectCore(Sender, parameters, IF_RUNNING);
+	MoveToObjectCore(Sender, parameters, IF_RUNNING, false);
 }
 
 void GameScript::MoveToObject(Scriptable* Sender, Action* parameters)
 {
-	MoveToObjectCore(Sender, parameters, 0);
+	MoveToObjectCore(Sender, parameters, 0, false);
+}
+
+void GameScript::MoveToObjectUntilSee(Scriptable* Sender, Action* parameters)
+{
+	MoveToObjectCore(Sender, parameters, 0, true);
 }
 
 void GameScript::MoveToObjectFollow(Scriptable* Sender, Action* parameters)

@@ -902,6 +902,7 @@ public: //Script Functions
 	static int School(Scriptable* Sender, Trigger* parameters);
 	static int See(Scriptable* Sender, Trigger* parameters);
 	static int Sequence(Scriptable* Sender, Trigger* parameters);
+	static int SetLastMarkedObject(Scriptable* Sender, Trigger* parameters);
 	static int Specifics(Scriptable* Sender, Trigger* parameters);
 	static int StateCheck(Scriptable* Sender, Trigger* parameters);
 	static int StealFailed(Scriptable* Sender, Trigger* parameters);
@@ -1174,6 +1175,7 @@ public:
 	static void MoveToObject(Scriptable* Sender, Action* parameters);
 	static void MoveToObjectFollow(Scriptable* Sender, Action* parameters);
 	static void MoveToObjectNoInterrupt(Scriptable* Sender, Action* parameters);
+	static void MoveToObjectUntilSee(Scriptable* Sender, Action* parameters);
 	static void MoveToOffset(Scriptable* Sender, Action* parameters);
 	static void MoveToPoint(Scriptable* Sender, Action* parameters);
 	static void MoveToPointNoInterrupt(Scriptable* Sender, Action* parameters);
