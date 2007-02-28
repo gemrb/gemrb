@@ -233,6 +233,15 @@ bool StoreHasItemCore(ieResRef storename, ieResRef itemname)
 	return ret;
 }
 
+void ClickCore(Point &point, int type, int /*speed*/)
+{
+	core->MoveViewportTo( point.x, point.y, true );
+	Video *video = core->GetVideoDriver();
+	video->ConvertToScreen(point.x, point.y);
+	video->MoveMouse(point.x, point.y);
+	video->ClickMouse(type);
+}
+
 void TransformItemCore(Actor *actor, Action *parameters, bool onlyone)
 {
 	int i = actor->inventory.GetSlotCount();

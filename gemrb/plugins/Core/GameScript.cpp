@@ -430,6 +430,10 @@ static ActionLink actionnames[] = {
 	{"clearallactions", GameScript::ClearAllActions, 0},
 	{"clearpartyeffects", GameScript::ClearPartyEffects, 0},
 	{"clearspriteeffects", GameScript::ClearSpriteEffects, 0},
+	{"clicklbuttonobject", GameScript::ClickLButtonObject, AF_BLOCKING},
+	{"clicklbuttonpoint", GameScript::ClickLButtonPoint, AF_BLOCKING},
+	{"clickrbuttonobject", GameScript::ClickLButtonObject, AF_BLOCKING},
+	{"clickrbuttonpoint", GameScript::ClickLButtonPoint, AF_BLOCKING},
 	{"closedoor", GameScript::CloseDoor,AF_BLOCKING},
 	{"containerenable", GameScript::ContainerEnable, 0},
 	{"continue", GameScript::Continue,AF_INSTANT | AF_CONTINUE},
@@ -486,6 +490,10 @@ static ActionLink actionnames[] = {
 	{"displaystringnoname", GameScript::DisplayStringNoName, 0},
 	{"displaystringnonamehead", GameScript::DisplayStringNoNameHead, 0},
 	{"displaystringwait", GameScript::DisplayStringWait,AF_BLOCKING},
+	{"doubleclicklbuttonobject", GameScript::DoubleClickLButtonObject, AF_BLOCKING},
+	{"doubleclicklbuttonpoint", GameScript::DoubleClickLButtonPoint, AF_BLOCKING},
+	{"doubleclickrbuttonobject", GameScript::DoubleClickLButtonObject, AF_BLOCKING},
+	{"doubleclickrbuttonpoint", GameScript::DoubleClickLButtonPoint, AF_BLOCKING},
 	{"dropinventory", GameScript::DropInventory, 0},
 	{"dropinventoryex", GameScript::DropInventoryEX, 0},
 	{"dropinventoryexexclude", GameScript::DropInventoryEX, 0}, //same
@@ -627,8 +635,8 @@ static ActionLink actionnames[] = {
 	{"movetosavedlocation", GameScript::MoveToSavedLocation,AF_MERGESTRINGS|AF_BLOCKING},
 	//take care of the typo in the original bg2 action.ids
 	{"movetosavedlocationn", GameScript::MoveToSavedLocation,AF_BLOCKING},
-	{"moveviewobject", GameScript::MoveViewObject, 0},
-	{"moveviewpoint", GameScript::MoveViewPoint, 0},
+	{"moveviewobject", GameScript::MoveViewObject, AF_BLOCKING},
+	{"moveviewpoint", GameScript::MoveViewPoint, AF_BLOCKING},
 	{"moveviewpointuntildone", GameScript::MoveViewPoint, 0},
 	{"nidspecial1", GameScript::NIDSpecial1,AF_BLOCKING},//we use this for dialogs, hack
 	{"nidspecial2", GameScript::NIDSpecial2,AF_BLOCKING},//we use this for worldmap, another hack
@@ -885,6 +893,7 @@ static ObjectLink objectnames[] = {
 	{"lasttalkedtoby", GameScript::LastTalkedToBy},
 	{"lasttargetedby", GameScript::LastTargetedBy},
 	{"lasttrigger", GameScript::LastTrigger},
+	{"leaderof", GameScript::LeaderOf},
 	{"leastdamagedof", GameScript::LeastDamagedOf},
 	{"mostdamagedof", GameScript::MostDamagedOf},
 	{"myself", GameScript::Myself},
@@ -2049,6 +2058,24 @@ Targets *GameScript::LastHitter(Scriptable *Sender, Targets *parameters)
 		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastHitter);
 		if (target) {
 			parameters->AddTarget(target, 0, GA_NO_DEAD);
+		}
+	}
+	return parameters;
+}
+
+Targets *GameScript::LeaderOf(Scriptable *Sender, Targets *parameters)
+{
+	Actor *actor = (Actor *) parameters->GetTarget(0, ST_ACTOR);
+	if (!actor) {
+		if (Sender->Type==ST_ACTOR) {
+			actor = (Actor *) Sender;
+		}
+	}
+	parameters->Clear();
+	if (actor) {
+		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastFollowed);
+		if (target) {
+			parameters->AddTarget(target, 0, 0);
 		}
 	}
 	return parameters;

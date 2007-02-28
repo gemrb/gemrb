@@ -314,7 +314,7 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 		return;
 
 	//Button == 1 means Left Mouse Button
-	if (Button == 1) {
+	if (Button == GEM_MB_ACTION) {
 		// We use absolute screen position here, so drag_start
 		//   remains valid even after window/control is moved
 		drag_start.x = Owner->XPos + XPos + x;

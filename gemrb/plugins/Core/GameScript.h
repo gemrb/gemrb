@@ -998,6 +998,10 @@ public:
 	static void ClearAllActions(Scriptable* Sender, Action* parameters);
 	static void ClearPartyEffects(Scriptable* Sender, Action* parameters);
 	static void ClearSpriteEffects(Scriptable* Sender, Action* parameters);
+	static void ClickLButtonObject(Scriptable* Sender, Action* parameters);
+	static void ClickLButtonPoint(Scriptable* Sender, Action* parameters);
+	static void ClickRButtonObject(Scriptable* Sender, Action* parameters);
+	static void ClickRButtonPoint(Scriptable* Sender, Action* parameters);
 	static void CloseDoor(Scriptable* Sender, Action* parameters);
 	static void ContainerEnable(Scriptable* Sender, Action* parameters);
 	static void Continue(Scriptable* Sender, Action* parameters);
@@ -1047,6 +1051,11 @@ public:
 	static void DisplayStringNoName(Scriptable* Sender, Action* parameters);
 	static void DisplayStringNoNameHead(Scriptable* Sender, Action* parameters);
 	static void DisplayStringWait(Scriptable* Sender, Action* parameters);
+	static void DoubleClickLButtonObject(Scriptable* Sender, Action* parameters);
+	static void DoubleClickLButtonPoint(Scriptable* Sender, Action* parameters);
+	static void DoubleClickRButtonObject(Scriptable* Sender, Action* parameters);
+	static void DoubleClickRButtonPoint(Scriptable* Sender, Action* parameters);
+
 	static void DropInventory(Scriptable* Sender, Action* parameters);
 	static void DropInventoryEX(Scriptable* Sender, Action* parameters);
 	static void DropItem(Scriptable* Sender, Action* parameters);
@@ -1392,6 +1401,7 @@ public:
 	static Targets *LastTalkedToBy(Scriptable *Sender, Targets *parameters);
 	static Targets *LastTargetedBy(Scriptable *Sender, Targets *parameters);
 	static Targets *LastTrigger(Scriptable *Sender, Targets *parameters);
+	static Targets *LeaderOf(Scriptable *Sender, Targets *parameters);
 	static Targets *LeastDamagedOf(Scriptable *Sender, Targets *parameters);
 	static Targets *MostDamagedOf(Scriptable *Sender, Targets *parameters);
 	static Targets *Myself(Scriptable *Sender, Targets *parameters);

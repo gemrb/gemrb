@@ -5432,3 +5432,60 @@ void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)
 	core->ApplyEffect(fx, (Actor *) src, (Actor *) tar);
 }
 
+void GameScript::ClickLButtonObject(Scriptable* Sender, Action* parameters)
+{
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objects[1] );
+	if (!tar) {
+		return;
+	}
+	ClickCore(tar->Pos, GEM_MB_ACTION, parameters->int0Parameter);
+}
+
+void GameScript::ClickLButtonPoint(Scriptable* /*Sender*/, Action* parameters)
+{
+	ClickCore(parameters->pointParameter, GEM_MB_ACTION, parameters->int0Parameter);
+}
+
+void GameScript::ClickRButtonObject(Scriptable* Sender, Action* parameters)
+{
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objects[1] );
+	if (!tar) {
+		return;
+	}
+	ClickCore(tar->Pos, GEM_MB_MENU, parameters->int0Parameter);
+}
+
+void GameScript::ClickRButtonPoint(Scriptable* /*Sender*/, Action* parameters)
+{
+	ClickCore(parameters->pointParameter, GEM_MB_MENU, parameters->int0Parameter);
+}
+
+void GameScript::DoubleClickLButtonObject(Scriptable* Sender, Action* parameters)
+{
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objects[1] );
+	if (!tar) {
+		return;
+	}
+	ClickCore(tar->Pos, GEM_MB_ACTION|GEM_MB_DOUBLECLICK, parameters->int0Parameter);
+}
+
+void GameScript::DoubleClickLButtonPoint(Scriptable* /*Sender*/, Action* parameters)
+{
+	ClickCore(parameters->pointParameter, GEM_MB_ACTION|GEM_MB_DOUBLECLICK, parameters->int0Parameter);
+}
+
+void GameScript::DoubleClickRButtonObject(Scriptable* Sender, Action* parameters)
+{
+	Scriptable *tar = GetActorFromObject(Sender, parameters->objects[1] );
+	if (!tar) {
+		return;
+	}
+	ClickCore(tar->Pos, GEM_MB_MENU|GEM_MB_DOUBLECLICK, parameters->int0Parameter);
+}
+
+void GameScript::DoubleClickRButtonPoint(Scriptable* /*Sender*/, Action* parameters)
+{
+	ClickCore(parameters->pointParameter, GEM_MB_MENU|GEM_MB_DOUBLECLICK, parameters->int0Parameter);
+}
+
+

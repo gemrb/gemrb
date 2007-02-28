@@ -44,6 +44,7 @@ int GetHappiness(Scriptable *Sender, int reputation);
 int GetHPPercent(Scriptable *Sender);
 bool StoreHasItemCore(ieResRef storename, ieResRef itemname);
 bool HasItemCore(Inventory *inventory, ieResRef itemname, ieDword flags);
+void ClickCore(Point &point, int type, int speed);
 void TransformItemCore(Actor *actor, Action *parameters, bool onlyone);
 void CreateVisualEffectCore(Scriptable *Sender, Point &position, const char *effect);
 void GetPositionFromScriptable(Scriptable* scr, Point &position, bool trap);
