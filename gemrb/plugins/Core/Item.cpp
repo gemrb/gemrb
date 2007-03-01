@@ -78,8 +78,8 @@ int Item::GetDamagePotential(bool ranged, ITMExtHeader *&header) const
 
 ITMExtHeader *Item::GetWeaponHeader(bool ranged) const
 {
-	int ehc = ExtHeaderCount;
-	while(ehc--) {
+	//start from the beginning
+	for(int ehc=0; ehc<ExtHeaderCount; ehc++) {
 		ITMExtHeader *ext_header = GetExtHeader(ehc);
 		if (ext_header->Location!=ITEM_LOC_WEAPON) {
 			continue;
