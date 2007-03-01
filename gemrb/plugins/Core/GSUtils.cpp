@@ -1014,7 +1014,8 @@ void MoveBetweenAreasCore(Actor* actor, const char *area, Point &position, int f
 	gc->SetScreenFlags(SF_CENTERONACTOR,BM_OR);
 }
 
-//repeat movement, if goal isn't reached
+//repeat movement, until goal isn't reached
+//if int0parameter is !=0, then it will try only x times
 void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, bool untilsee)
 {
 	if (Sender->Type != ST_ACTOR) {
@@ -1037,6 +1038,16 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 		}
 	}
 	actor->WalkTo( target->Pos, flags, 0 );
+	//repeat movement...
+	Action *newaction = ParamCopyNoOverride(parameters);
+	if (newaction->int0Parameter!=1) {
+		if (newaction->int0Parameter) {
+			newaction->int0Parameter--;
+		}
+		actor->AddActionInFront(newaction);
+	}
+
+	Sender->ReleaseCurrentAction();
 }
 
 void CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)

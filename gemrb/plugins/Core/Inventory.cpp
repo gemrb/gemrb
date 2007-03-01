@@ -28,6 +28,7 @@
 #include "Actor.h"
 #include "Game.h"
 
+static int SLOT_HEAD = -1;
 static int SLOT_MAGIC = -1;
 static int SLOT_FIST = -1;
 static int SLOT_MELEE = -1;
@@ -348,19 +349,11 @@ void Inventory::KillSlot(unsigned int index)
 				
 			UpdateWeaponAnimation();
 			break;
+		case SLOT_EFFECT_HEAD:
+			Owner->SetUsedHelmet("");
+			break;
 		case SLOT_EFFECT_ITEM:
-			{
-				int l = itm->AnimationType[0]-'1';
-				if (l>=0 && l<=3) {
-					Owner->SetBase(IE_ARMOR_TYPE, 0);
-				} else {
-					if (core->CanUseItemType(SLOT_HELM, itm)) {
-						Owner->SetUsedHelmet("");
-					} else if (core->CanUseItemType(SLOT_SHIELD, itm)) {
-						Owner->SetUsedShield("");
-					}
-				}
-			}
+			Owner->SetBase(IE_ARMOR_TYPE, 0);
 			break;
 	}
 	core->FreeItem(itm, item->ItemResRef, false);
@@ -799,6 +792,9 @@ bool Inventory::EquipItem(unsigned int slot)
 			}
 		}
 		break;
+	case SLOT_EFFECT_HEAD:
+		Owner->SetUsedHelmet(itm->AnimationType);
+		break;
 	case SLOT_EFFECT_ITEM:
 		//adjusting armour level if needed
 		{
@@ -806,11 +802,7 @@ bool Inventory::EquipItem(unsigned int slot)
 			if (l>=0 && l<=3) {
 				Owner->SetBase(IE_ARMOR_TYPE, l);
 			} else {
-				if (core->CanUseItemType( SLOT_HELM, itm)) {
-					Owner->SetUsedHelmet(itm->AnimationType);
-				} else if (core->CanUseItemType(SLOT_SHIELD, itm)) {
-					Owner->SetUsedShield(itm->AnimationType);
-				}
+				UpdateShieldAnimation(itm);
 			}
 		}
 		break;
@@ -923,6 +915,7 @@ int Inventory::FindTypedRangedWeapon(unsigned int type)
 	return SLOT_FIST;
 }
 
+void Inventory::SetHeadSlot(int arg) { SLOT_HEAD=arg; }
 void Inventory::SetFistSlot(int arg) { SLOT_FIST=arg; }
 void Inventory::SetMagicSlot(int arg) { SLOT_MAGIC=arg; }
 void Inventory::SetWeaponSlot(int arg)
@@ -969,6 +962,11 @@ void Inventory::SetShieldSlot(int arg)
 		return;
 	}
 	SLOT_LEFT=arg;
+}
+
+int Inventory::GetHeadSlot()
+{
+	return SLOT_HEAD;
 }
 
 int Inventory::GetFistSlot()
@@ -1394,7 +1392,12 @@ void Inventory::UpdateWeaponAnimation()
 			// Examine shield slot to check if we're using two weapons
 			// TODO: for consistency, use same Item* access method as above
 			bool twoweapon = false;
-			CREItem* si = GetSlotItem( core->QuerySlot(GetShieldSlot()) );
+			int slot = GetShieldSlot();
+			CREItem* si = NULL;
+			if (slot>0) {
+				si = GetSlotItem( (ieDword) slot );
+			}
+			//CREItem* si = GetSlotItem( core->QuerySlot(GetShieldSlot()) );
 			if (si) {
 				Item* it = core->GetItem(si->ItemResRef);
 				if (core->CanUseItemType(SLOT_WEAPON, it))

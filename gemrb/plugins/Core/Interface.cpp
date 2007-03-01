@@ -3858,6 +3858,8 @@ bool Interface::InitItemTypes()
 				case SLOT_EFFECT_MISSILE: Inventory::SetRangedSlot(i); break;
 				//right hand
 				case SLOT_EFFECT_LEFT: Inventory::SetShieldSlot(i); break;
+				//head (for averting critical hit)
+				case SLOT_EFFECT_HEAD: Inventory::SetHeadSlot(i); break;
 				default:;
 			}
 		}

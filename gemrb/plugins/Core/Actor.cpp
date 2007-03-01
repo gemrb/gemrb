@@ -2214,11 +2214,23 @@ void Actor::DealDamage(Actor *target, int damage, int damagetype, bool critical)
 	if (critical) {
 		//a critical surely raises the morale?
 		NewBase(IE_MORALE, 1, MOD_ADDITIVE);
-		damage <<=1; //critical damage is always double?
-		//check if critical hit is averted by helmet
+		int head = inventory.GetHeadSlot();
+		if ((head!=-1) && target->inventory.HasItemInSlot("",(ieDword) head)) {
+			//critical hit is averted by helmet
+			core->DisplayConstantString(STR_NO_CRITICAL,0xffffff);
+		} else {
+			damage <<=1; //critical damage is always double?
+			core->timer->SetScreenShake(2,2,2);
+		}
 	}
-	if (damagetype>4) damagetype = 0;
+	ieDword tmp = target->Modified[IE_MINHITPOINTS];
+	if (damagetype>5) {
+		//hack for nonlethal damage (this round only)
+		target->Modified[IE_MINHITPOINTS]=1;
+		damagetype = 0;
+	}
 	target->Damage(damage, weapon_damagetype[damagetype], this);
+	target->Modified[IE_MINHITPOINTS]=tmp;
 }
 
 //idx could be: 0-6, 16-22, 32-38, 48-54

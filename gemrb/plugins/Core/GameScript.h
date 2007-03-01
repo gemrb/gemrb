@@ -1098,6 +1098,8 @@ public:
 	static void ForceHide(Scriptable* Sender, Action* parameters);
 	static void ForceLeaveAreaLUA(Scriptable* Sender, Action* parameters);
 	static void ForceSpell(Scriptable* Sender, Action* parameters);
+	static void ForceUseContainer(Scriptable* Sender, Action* parameters);
+	static void Formation(Scriptable* Sender, Action* parameters);
 	static void FullHeal(Scriptable* Sender, Action* parameters);
 	static void GeneratePartyMember(Scriptable* Sender, Action* parameters);
 	static void GetItem(Scriptable* Sender, Action* parameters);

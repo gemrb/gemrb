@@ -1106,7 +1106,10 @@ void GameScript::MoveToObjectFollow(Scriptable* Sender, Action* parameters)
 	if (target->Type==ST_ACTOR) {
 		actor->SetLeader( (Actor *) target, 5);
 	}
-	actor->WalkTo( target->Pos, 0, 5 );
+	actor->WalkTo( target->Pos, 0, MAX_OPERATING_DISTANCE );
+	Sender->AddActionInFront(parameters);
+	Sender->SetWait(1);
+	Sender->ReleaseCurrentAction();
 }
 
 void GameScript::StorePartyLocation(Scriptable* /*Sender*/, Action* /*parameters*/)
@@ -4355,6 +4358,19 @@ void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 	Sender->ReleaseCurrentAction();
 }
 
+//call the usecontainer action in target (not used)
+void GameScript::ForceUseContainer(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return;
+	}
+	char Tmp[256];
+	sprintf( Tmp, "UseContainer()");
+	Action *newaction = GenerateAction(Tmp);
+	tar->AddActionInFront(newaction);
+}
+
 //these actions directly manipulate a game variable (as the original engine)
 void GameScript::SetMazeEasier(Scriptable* Sender, Action* /*parameters*/)
 {
@@ -4481,9 +4497,6 @@ void GameScript::RandomTurn(Scriptable* Sender, Action* /*parameters*/)
 void GameScript::AttachTransitionToDoor(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!tar) {
-		return;
-	}
 	if (!tar || tar->Type != ST_DOOR) {
 		return;
 	}
@@ -5252,6 +5265,7 @@ void GameScript::ProtectObject(Scriptable* Sender, Action* parameters)
 	scr->FollowOffset.y = parameters->int0Parameter;
 }
 
+//keeps following the object in formation
 void GameScript::FollowObjectFormation(Scriptable* Sender, Action* parameters)
 {
 	GameControl *gc = core->GetGameControl();
@@ -5273,6 +5287,30 @@ void GameScript::FollowObjectFormation(Scriptable* Sender, Action* parameters)
 	ieDword pos = parameters->int1Parameter;
 	scr->FollowOffset = gc->GetFormationOffset(formation, pos);
 	scr->WalkTo( tar->Pos, 0, 1 );
+	Sender->ReleaseCurrentAction();
+}
+
+//walks to a specific offset of target (quite like movetoobject)
+void GameScript::Formation(Scriptable* Sender, Action* parameters)
+{
+	GameControl *gc = core->GetGameControl();
+	if (!gc) {
+		return;
+	}
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		return;
+	}
+	Actor *scr = (Actor *)Sender;
+	ieDword formation = parameters->int0Parameter;
+	ieDword pos = parameters->int1Parameter;
+	Point FollowOffset = gc->GetFormationOffset(formation, pos);
+	FollowOffset.x+=tar->Pos.x;
+	FollowOffset.y+=tar->Pos.y;
+	scr->WalkTo( FollowOffset, 0, 1 );
 	Sender->ReleaseCurrentAction();
 }
 
@@ -5424,8 +5462,8 @@ void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)
 	int opcode = EffectQueue::ResolveEffect(fx_iwd_visual_spell_hit_ref);
 	Effect *fx = core->GetEffect(opcode);
 	if (!fx) {
-	        //invalid effect name didn't resolve to opcode
-	        return;
+		//invalid effect name didn't resolve to opcode
+		return;
 	}
 	
 	//vvc type

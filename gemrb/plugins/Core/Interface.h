@@ -200,7 +200,7 @@ public:
 #define SLOT_EFFECT_MELEE    4 //normal weapon slot
 #define SLOT_EFFECT_MISSILE  5 //quiver slots
 #define SLOT_EFFECT_LEFT     6 //shield (left hand) slot
-
+#define SLOT_EFFECT_HEAD     7 //head slot
 
 //fog of war bits
 #define FOG_DRAWFOG       1

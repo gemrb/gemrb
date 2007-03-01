@@ -109,6 +109,7 @@
 #define STR_CANT_DROP_ITEM  75
 #define STR_NOT_IN_OFFHAND  76
 #define STR_ITEM_IS_CURSED  77
-#define STRREF_COUNT 78
+#define STR_NO_CRITICAL	    78
+#define STRREF_COUNT 79
 
 #endif //! IE_STRINGS_H

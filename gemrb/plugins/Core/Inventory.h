@@ -314,6 +314,7 @@ public:
 	int WhyCantEquip(int slot, int twohanded);
 	//setting important constants
 	static void Init(int mb);
+	static void SetHeadSlot(int arg);
 	static void SetFistSlot(int arg);
 	static void SetMagicSlot(int arg);
 	static void SetWeaponSlot(int arg);
@@ -321,6 +322,7 @@ public:
 	static void SetQuickSlot(int arg);
 	static void SetInventorySlot(int arg);
 	static void SetShieldSlot(int arg);
+	static int GetHeadSlot();
 	static int GetFistSlot();
 	static int GetMagicSlot();
 	static int GetWeaponSlot();

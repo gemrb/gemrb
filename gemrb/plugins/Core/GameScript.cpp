@@ -52,6 +52,7 @@ static TriggerLink triggernames[] = {
 	{"arearestdisabled", GameScript::AreaRestDisabled, 0},
 	{"areatype", GameScript::AreaType, 0},
 	{"atlocation", GameScript::AtLocation, 0},
+	{"assaltedby", GameScript::AttackedBy, 0},//pst
 	{"attackedby", GameScript::AttackedBy, 0},
 	{"becamevisible", GameScript::BecameVisible, 0},
 	{"bitcheck", GameScript::BitCheck,TF_MERGESTRINGS},
@@ -543,6 +544,8 @@ static ActionLink actionnames[] = {
 	{"forcehide", GameScript::ForceHide, 0},
 	{"forceleavearealua", GameScript::ForceLeaveAreaLUA, 0},
 	{"forcespell", GameScript::ForceSpell, AF_BLOCKING},
+	{"forceusecontainer", GameScript::ForceUseContainer,AF_BLOCKING},
+	{"formation", GameScript::Formation, AF_BLOCKING},
 	{"fullheal", GameScript::FullHeal, 0},
 	{"fullhealex", GameScript::FullHeal, 0}, //pst, not sure what's different
 	{"generatepartymember", GameScript::GeneratePartyMember, 0},
@@ -897,6 +900,7 @@ static ObjectLink objectnames[] = {
 	{"lasttrigger", GameScript::LastTrigger},
 	{"leaderof", GameScript::LeaderOf},
 	{"leastdamagedof", GameScript::LeastDamagedOf},
+	{"marked", GameScript::LastMarkedObject}, //pst
 	{"mostdamagedof", GameScript::MostDamagedOf},
 	{"myself", GameScript::Myself},
 	{"mytarget", GameScript::MyTarget},//see lasttargetedby(myself)
@@ -1584,12 +1588,15 @@ void GameScript::Update()
 						return;
 					}
 
-					//MySelf->ClearActions();
+					//movetoobjectfollow would break if this isn't called
+					//(what is broken if it is here?)
+					MySelf->ClearActions();
+					//IE even clears the path, shall we?
 				}
 				lastAction=a;
 			}
 			continueExecution = ( ExecuteResponseSet( MySelf,
-						rB->responseSet ) != 0 );
+				rB->responseSet ) != 0 );
 			//clear triggers after response executed
 			//MySelf->ClearTriggers();
 			if (!continueExecution)
