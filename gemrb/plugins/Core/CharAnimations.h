@@ -136,7 +136,6 @@ public:
 	Palette* modifiedPalette[4];
 	unsigned int AvatarsRowNum;
 	unsigned char ArmorType, WeaponType, RangedType;
-	ieDword AttackMoves[3]; //percentages for the 3 attack move types
 	ieResRef ResRef;
 	ieResRef PaletteResRef;
 	unsigned char nextStanceID;
@@ -148,7 +147,6 @@ public:
 	static void ReleaseMemory();
 	void SetArmourLevel(int ArmourLevel);
 	void SetWeaponType(int WeaponType);
-	void SetAttackMoveChances(ieWord *amc);
 	void SetHelmetRef(const char* ref);
 	void SetWeaponRef(const char* ref);
 	void SetOffhandRef(const char* ref);

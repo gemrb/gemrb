@@ -189,9 +189,6 @@ Actor::Actor()
 	ShieldRef[0]=0;
 	HelmetRef[0]=0;
 	WeaponRef[0]=0;
-	AttackMovements[0]=100;
-	AttackMovements[1]=0;
-	AttackMovements[2]=0;
 	for (i = 0; i < EXTRA_ACTORCOVERS; ++i)
 		extraCovers[i] = NULL;
 
@@ -337,7 +334,6 @@ void Actor::SetAnimationID(unsigned int AnimID)
 		anims->SetOffhandRef(ShieldRef);
 		anims->SetHelmetRef(HelmetRef);
 		anims->SetWeaponRef(WeaponRef);
-		anims->SetAttackMoveChances(AttackMovements);
 
 		//if we have a recovery palette, then set it back
 		assert(anims->palette[PAL_MAIN] == 0);
@@ -2709,18 +2705,24 @@ bool Actor::HandleActorStance()
 	CharAnimations* ca = GetAnims();
 	int StanceID = GetStance();
 
-	int x = rand()%1000;
 	if (ca->autoSwitchOnEnd) {
 		SetStance( ca->nextStanceID );
 		ca->autoSwitchOnEnd = false;
 		return true;
 	}
+	int x = rand()%1000;
 	if ((StanceID==IE_ANI_AWAKE) && !x ) {
 		SetStance( IE_ANI_HEAD_TURN );
 		return true;
 	}
 	if ((StanceID==IE_ANI_READY) && !GetNextAction()) {
 		SetStance( IE_ANI_AWAKE );
+		return true;
+	}
+	if (StanceID == IE_ANI_ATTACK || StanceID == IE_ANI_ATTACK_JAB ||
+		StanceID == IE_ANI_ATTACK_SLASH || StanceID == IE_ANI_ATTACK_BACKSLASH)
+	{
+		SetStance( IE_ANI_ATTACK );
 		return true;
 	}
 	return false;
@@ -3043,13 +3045,12 @@ int Actor::GetFeat(unsigned int feat)
 void Actor::SetUsedWeapon(char* AnimationType, ieWord* MeleeAnimation, int wt)
 {
 	memcpy(WeaponRef, AnimationType, sizeof(WeaponRef) );
-	memcpy(AttackMovements, MeleeAnimation, sizeof(AttackMovements) );
 	if (wt != -1) WeaponType = wt;
 	if (!anims)
 		return;
 	anims->SetWeaponRef(AnimationType);
 	anims->SetWeaponType(WeaponType);
-	anims->SetAttackMoveChances(MeleeAnimation);
+	SetAttackMoveChances(MeleeAnimation);
 }
 
 void Actor::SetUsedShield(char* AnimationType, int wt)

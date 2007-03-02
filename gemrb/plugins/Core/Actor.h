@@ -156,7 +156,6 @@ public:
 	ieDword LastMarked; // no idea if non-actors could mark objects
 	ieDword LastHeard;
 	ieDword HotKey; 
-	ieWord AttackMovements[3];
 	char ShieldRef[2];
 	char HelmetRef[2];
 	char WeaponRef[2];

@@ -666,6 +666,9 @@ Movable::Movable(ScriptableType type)
 	timeStartStep = 0;
 	lastFrame = NULL;
 	Area[0] = 0;
+	AttackMovements[0] = 100;
+	AttackMovements[1] = 0;
+	AttackMovements[2] = 0;
 }
 
 Movable::~Movable(void)
@@ -718,11 +721,34 @@ void Movable::SetStance(unsigned int arg)
 {
 	if (arg<MAX_ANIMS) {
 		 StanceID=(unsigned char) arg;
+
+		 if (StanceID == IE_ANI_ATTACK) {
+			 // Set stance to a random attack animation
+
+			 int random = rand()%100;
+			 if (random < AttackMovements[0]) {
+				 StanceID = IE_ANI_ATTACK_BACKSLASH;
+			 } else if (random < AttackMovements[0] + AttackMovements[1]) {
+				 StanceID = IE_ANI_ATTACK_SLASH;
+			 } else {
+				 StanceID = IE_ANI_ATTACK_JAB;
+			 }
+		 }
+
 	} else {
 		StanceID=IE_ANI_AWAKE; //
 		printf("Tried to set invalid stance id (%u)\n", arg);
 	}
 }
+
+void Movable::SetAttackMoveChances(ieWord *amc)
+{
+	AttackMovements[0]=amc[0];
+	AttackMovements[1]=amc[1];
+	AttackMovements[2]=amc[2];
+}
+
+
 
 //this could be used for WingBuffet as well
 void Movable::MoveLine(int steps, int Pass, ieDword orient)

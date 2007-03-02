@@ -177,13 +177,6 @@ void CharAnimations::SetWeaponType(int wt)
 	}
 }
 
-void CharAnimations::SetAttackMoveChances(ieWord *amc)
-{
-	AttackMoves[0]=amc[0];
-	AttackMoves[1]=amc[1];
-	AttackMoves[2]=amc[2];
-}
-
 void CharAnimations::SetHelmetRef(const char* ref)
 {
 	HelmetRef[0] = ref[0];
@@ -1013,6 +1006,9 @@ void CharAnimations::AddPSTSuffix(char* ResRef, unsigned char StanceID,
 
 	switch (StanceID) {
 		case IE_ANI_ATTACK:
+		case IE_ANI_ATTACK_SLASH:
+		case IE_ANI_ATTACK_JAB:
+		case IE_ANI_ATTACK_BACKSLASH:
 			Cycle=SixteenToFive[Orient];
 			Prefix="at1"; break;
 		case IE_ANI_DAMAGE:
@@ -1234,8 +1230,6 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 	EquipData = new EquipResRefData;
 	EquipData->Suffix[0] = 0;
 	switch (StanceID) {
-		//Attack is a special case... it takes cycles randomly
-		//based on the weapon type (TODO)
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
 			strcat( ResRef, SlashPrefix[WeaponType] );
@@ -1429,9 +1423,6 @@ void CharAnimations::AddLR2Suffix(char* ResRef, unsigned char StanceID,
 	Orient /= 2;
 
 	switch (StanceID) {
-			//Attack is a special case... it cycles randomly
-			//through SLASH, BACKSLASH and JAB so we will choose
-			//which animation return randomly
 		case IE_ANI_READY:
 		case IE_ANI_CAST:
 		case IE_ANI_CONJURE:
@@ -1485,9 +1476,6 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 	EquipData->Suffix[0] = 0;
 
 	switch (StanceID) {
-			//Attack is a special case... it cycles randomly
-			//through SLASH, BACKSLASH and JAB so we will choose
-			//which animation return randomly
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
 			strcat (ResRef, SlashPrefix[WeaponType]);
@@ -1806,9 +1794,6 @@ void CharAnimations::AddMMRSuffix(char* ResRef, unsigned char StanceID,
 	unsigned char& Cycle, unsigned char Orient)
 {
 	switch (StanceID) {
-			//Attack is a special case... it cycles randomly
-			//through SLASH, BACKSLASH and JAB so we will choose
-			//which animation return randomly
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_SLASH:
 		case IE_ANI_ATTACK_BACKSLASH:

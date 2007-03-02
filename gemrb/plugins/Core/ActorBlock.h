@@ -303,6 +303,8 @@ class GEM_EXPORT Movable : public Selectable {
 private: //these seem to be sensitive, so get protection
 	unsigned char StanceID;
 	unsigned char Orientation, NewOrientation;
+	ieWord AttackMovements[3];
+
 	PathNode* path; //whole path
 	PathNode* step; //actual step
 public:
@@ -353,6 +355,7 @@ public:
 	}
 
 	void SetStance(unsigned int arg);
+	void SetAttackMoveChances(ieWord *amc);
 	void DoStep(unsigned int walk_speed);
 	void AddWayPoint(Point &Des);
 	void RunAwayFrom(Point &Des, int PathLength, int flags);
