@@ -1365,12 +1365,10 @@ void Inventory::UpdateWeaponAnimation()
 {
 	int slot = GetEquippedSlot();
  	int effect = core->QuerySlotEffects( slot );
-	printf("UpdateWeaponAnimation: %d, %d, %d, %d\n", Equipped, SLOT_MELEE, slot, effect);
 	if (effect == SLOT_EFFECT_MISSILE) {
 		// ranged weapon
 		slot = FindRangedWeapon();
 	}
-	printf("UpdateWeaponAnimation: %d\n", slot);
 	int WeaponType = -1;
 
 	char AnimationType[2]={0,0};
