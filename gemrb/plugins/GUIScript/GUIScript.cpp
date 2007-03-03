@@ -1203,9 +1203,9 @@ static PyObject* GemRB_SetText(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_TextAreaAppend__doc,
 "TextAreaAppend(WindowIndex, ControlIndex, String|Strref [, Row[, Flag]]) => int\n\n"
-"Appends the Text to the TextArea Control in the Window.\n"
-"If Row is given then it will insert the text after that row\n"
-"If Flag is given, then it will use that value as a GetString flag");
+"Appends the Text to the TextArea Control in the Window. "
+"If Row is given then it will insert the text after that row. "
+"If Flag is given, then it will use that value as a GetString flag.");
 
 static PyObject* GemRB_TextAreaAppend(PyObject * /*self*/, PyObject* args)
 {
@@ -1422,7 +1422,7 @@ PyObject* GemRB_SetMasterScript(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_ShowModal__doc,
 "ShowModal(WindowIndex, [Shadow=MODAL_SHADOW_NONE])\n\n"
-"Show a Window on Screen setting the Modal Status."
+"Show a Window on Screen setting the Modal Status. "
 "If Shadow is MODAL_SHADOW_GRAY, other windows are grayed. "
 "If Shadow is MODAL_SHADOW_BLACK, they are blacked out." );
 
@@ -4587,7 +4587,7 @@ static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_EnterStore__doc,
 "EnterStore(STOResRef)\n\n"
-"Loads the store referenced." );
+"Loads the store referenced and opens the store window." );
 
 static PyObject* GemRB_EnterStore(PyObject * /*self*/, PyObject* args)
 {
@@ -4596,8 +4596,15 @@ static PyObject* GemRB_EnterStore(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "s", &StoreResRef )) {
 		return AttributeError( GemRB_EnterStore__doc );
 	}
+
+	if (core->GetCurrentStore()) {
+	  return RuntimeError( "Already in a store!\n");
+	}
+
 	core->SetCurrentStore( StoreResRef, NULL );
 
+	//the error flag is not optional, we should open a store now
+	core->GetGUIScriptEngine()->RunFunction( "OpenStoreWindow", true);
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -4850,12 +4857,22 @@ PyDoc_STRVAR( GemRB_GetStore__doc,
 "GetStore() => dictionary\n\n"
 "Returns relevant data of the current store." );
 
-static int storebuttons[6][4]={
+#define STORETYPE_COUNT  7
+static int storebuttons[STORETYPE_COUNT][4]={
+//store
 {STA_BUYSELL,STA_IDENTIFY|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL,STA_CURE|STA_OPTIONAL},
+//tavern
 {STA_DRINK,STA_BUYSELL|STA_OPTIONAL,STA_IDENTIFY|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL}, 
+//inn
 {STA_ROOMRENT,STA_BUYSELL|STA_OPTIONAL,STA_DRINK|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL},
+//temple
 {STA_CURE, STA_DONATE|STA_OPTIONAL,STA_BUYSELL|STA_OPTIONAL,STA_IDENTIFY|STA_OPTIONAL},
-{STA_BUYSELL,-1,-1,-1,},{STA_BUYSELL,-1,-1,-1} };
+//iwd container
+{STA_BUYSELL,-1,-1,-1,},
+//no need to steal from your own container (original engine had STEAL instead of DRINK)
+{STA_BUYSELL,STA_IDENTIFY|STA_OPTIONAL,STA_DRINK|STA_OPTIONAL,STA_CURE|STA_OPTIONAL},
+//gemrb specific store type: (temple 2), added steal, removed identify
+{STA_BUYSELL,STA_STEAL|STA_OPTIONAL,STA_DONATE|STA_OPTIONAL,STA_CURE|STA_OPTIONAL} };
 
 //buy/sell, identify, steal, cure, donate, drink, rent
 static int storebits[7]={IE_STORE_BUY|IE_STORE_SELL,IE_STORE_ID,IE_STORE_STEAL,
@@ -4870,6 +4887,9 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 	Store *store = core->GetCurrentStore();
 	if (!store) {
 		return RuntimeError("No current store!");
+	}
+	if (store->Type>STORETYPE_COUNT-1) {
+	  store->Type=STORETYPE_COUNT-1;
 	}
 	PyObject* dict = PyDict_New();
 	PyDict_SetItemString(dict, "StoreType", PyInt_FromLong( store->Type ));
@@ -5372,7 +5392,7 @@ static PyObject* GemRB_GetStoreCure(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_ExecuteString__doc,
 "ExecuteString(String[,PC])\n\n"
-"Executes an In-Game Script Action in the current Area Script Context."
+"Executes an In-Game Script Action in the current Area Script Context. "
 "If a number was given, it will execute the action in the numbered PC's context." );
 
 static PyObject* GemRB_ExecuteString(PyObject * /*self*/, PyObject* args)
@@ -5398,17 +5418,19 @@ static PyObject* GemRB_ExecuteString(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_RunEventHandler__doc,
-"RunEventHandler(String)\n\n"
-"Executes a GUIScript event handler function named String." );
+"RunEventHandler(String[,error])\n\n"
+"Executes a GUIScript event handler function named String. "
+"If error set to nonzero, then a missing handler will cause error." );
 
 static PyObject* GemRB_RunEventHandler(PyObject * /*self*/, PyObject* args)
 {
 	char* String;
+	int error = 0;
 
-	if (!PyArg_ParseTuple( args, "s", &String )) {
+	if (!PyArg_ParseTuple( args, "s|i", &String, error )) {
 		return AttributeError( GemRB_RunEventHandler__doc );
 	}
-	core->GetGUIScriptEngine()->RunFunction( String );
+	core->GetGUIScriptEngine()->RunFunction( String, error );
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -5613,7 +5635,7 @@ static PyObject* GemRB_GetKnownSpell(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_GetMemorizedSpellsCount__doc,
 "GetMemorizedSpellsCount(PartyID, SpellType[, Level])=>int\n\n"
-"Returns number of spells of given type and level in PartyID's memory."
+"Returns number of spells of given type and level in PartyID's memory. "
 "If level is omitted then it returns the number of distinct spells memorised." );
 
 static PyObject* GemRB_GetMemorizedSpellsCount(PyObject * /*self*/, PyObject* args)
@@ -6142,7 +6164,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		core->GetSoundMgr()->Play(Sound);
 	}
 	core->DragItem (si, ResRef);
-	//this is PST specific
+	//this is PST specific, so the error flag is false
 	core->GetGUIScriptEngine()->RunFunction("UpdateAnimation", false);
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -6283,7 +6305,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	if (Sound[0]) {
 		core->GetSoundMgr()->Play(Sound);
 	}
-	//this is PST specific, change animation
+	//this is PST specific, changes animation
 	core->GetGUIScriptEngine()->RunFunction("UpdateAnimation", false);
 	return PyInt_FromLong( res );
 }
@@ -7448,7 +7470,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 PyDoc_STRVAR( GemRB_UseItem__doc,
 "UseItem(actor, slot[, item])\n\n"
 "Makes the actor try to use an item. "
-"If slot is negative, then item is the index of the item functionality in the use item list."
+"If slot is negative, then item is the index of the item functionality in the use item list. "
 "If slot is non-negative, then item is the quick item or weapon in slot.");
 
 static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
