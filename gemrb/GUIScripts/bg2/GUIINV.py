@@ -541,6 +541,22 @@ def OnDropItemToPC ():
 	UpdateInventoryWindow ()
 	return
 
+def DrinkItemWindow ():
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	# the drink item header is always the first
+	GemRB.UseItem (pc, slot, 0)
+	GemRB.UnloadWindow (ItemInfoWindow)
+	return
+
+def ReadItemWindow ():
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	# the learn scroll header is always the second
+	GemRB.UseItem (pc, slot, 1)
+	GemRB.UnloadWindow (ItemInfoWindow)
+	return
+
 def OpenItemWindow ():
 	#close inventory
 	GemRB.SetVar ("Inventory", 1)

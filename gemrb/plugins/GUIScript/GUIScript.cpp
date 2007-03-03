@@ -97,7 +97,7 @@ static SpellDescType *SpecialSpells = NULL;
 static SpellDescType *StoreSpells = NULL;
 static ItemExtHeader *ItemArray = NULL;
 static SpellExtHeader *SpellArray = NULL;
-static UsedItemType *UsedItems = NULL; 
+static UsedItemType *UsedItems = NULL;
 static ResRefPairs *ItemSounds = NULL;
 
 static int ReputationIncrease[20]={(int) UNINIT_IEDWORD};
@@ -139,7 +139,7 @@ inline PyObject* PyString_FromAnimID(char* AnimID)
 }
 
 /* Sets RuntimeError exception and returns NULL, so this function
- * can be called in `return'. 
+ * can be called in `return'.
  */
 inline PyObject* RuntimeError(char* msg)
 {
@@ -245,7 +245,7 @@ static void GetItemSound(ieResRef &Sound, ieDword ItemType, ieDword Col)
 	strnlwrcpy(Sound, ItemSounds[ItemType][Col], 8);
 }
 
-PyDoc_STRVAR( GemRB_SetInfoTextColor__doc, 
+PyDoc_STRVAR( GemRB_SetInfoTextColor__doc,
 "SetInfoTextColor(red, green, blue, [alpha])\n\n"
 "Sets the color of Floating Messages in GameControl." );
 
@@ -660,7 +660,7 @@ static PyObject* GemRB_EnableCheatKeys(PyObject * /*self*/, PyObject* args)
 	int Flag;
 
 	if (!PyArg_ParseTuple( args, "i", &Flag )) {
-		return AttributeError( GemRB_EnableCheatKeys__doc ); 
+		return AttributeError( GemRB_EnableCheatKeys__doc );
 	}
 
 	core->EnableCheatKeys( Flag );
@@ -1004,7 +1004,7 @@ static PyObject* GemRB_GetTableRowCount(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_LoadSymbol__doc,
-"LoadSymbol(IDSResRef) => SymbolIndex\n\n" 
+"LoadSymbol(IDSResRef) => SymbolIndex\n\n"
 "Loads a IDS Symbol Table." );
 
 static PyObject* GemRB_LoadSymbol(PyObject * /*self*/, PyObject* args)
@@ -1281,7 +1281,7 @@ static PyObject* GemRB_TextAreaClear(PyObject * /*self*/, PyObject* args)
 
 	if (PyArg_UnpackTuple( args, "ref", 2, 2, &wi, &ci )) {
 		if (!PyObject_TypeCheck( wi, &PyInt_Type ) ||
-			!PyObject_TypeCheck( ci, &PyInt_Type )) { 
+			!PyObject_TypeCheck( ci, &PyInt_Type )) {
 			return AttributeError( GemRB_TextAreaClear__doc );
 		}
 		WindowIndex = PyInt_AsLong( wi );
@@ -1615,7 +1615,7 @@ static PyObject* GemRB_InvalidateWindow(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
-PyDoc_STRVAR( GemRB_CreateWindow__doc, 
+PyDoc_STRVAR( GemRB_CreateWindow__doc,
 "CreateWindow(WindowID, X, Y, Width, Height, MosResRef) => WindowIndex\n\n"
 "Creates a new empty window and returns its index.");
 
@@ -1949,7 +1949,7 @@ static PyObject* GemRB_SetButtonTextColor(PyObject * /*self*/, PyObject* args)
 
 	// FIXME: swap is a hack for fonts which apparently have swapped f & B
 	// colors. Maybe it depends on need_palette?
-	if (! swap) 
+	if (! swap)
 		but->SetTextColor( fore, back );
 	else
 		but->SetTextColor( back, fore );
@@ -3892,7 +3892,7 @@ static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_CreatePlayer__doc );
 	}
 	//PlayerSlot is zero based
-	Slot = ( PlayerSlot & 0x7fff ); 
+	Slot = ( PlayerSlot & 0x7fff );
 	Game *game = core->GetGame();
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
@@ -4598,7 +4598,7 @@ static PyObject* GemRB_EnterStore(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (core->GetCurrentStore()) {
-	  return RuntimeError( "Already in a store!\n");
+		return RuntimeError( "Already in a store!\n");
 	}
 
 	core->SetCurrentStore( StoreResRef, NULL );
@@ -4862,7 +4862,7 @@ static int storebuttons[STORETYPE_COUNT][4]={
 //store
 {STA_BUYSELL,STA_IDENTIFY|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL,STA_CURE|STA_OPTIONAL},
 //tavern
-{STA_DRINK,STA_BUYSELL|STA_OPTIONAL,STA_IDENTIFY|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL}, 
+{STA_DRINK,STA_BUYSELL|STA_OPTIONAL,STA_IDENTIFY|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL},
 //inn
 {STA_ROOMRENT,STA_BUYSELL|STA_OPTIONAL,STA_DRINK|STA_OPTIONAL,STA_STEAL|STA_OPTIONAL},
 //temple
@@ -4889,7 +4889,7 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("No current store!");
 	}
 	if (store->Type>STORETYPE_COUNT-1) {
-	  store->Type=STORETYPE_COUNT-1;
+		store->Type=STORETYPE_COUNT-1;
 	}
 	PyObject* dict = PyDict_New();
 	PyDict_SetItemString(dict, "StoreType", PyInt_FromLong( store->Type ));
@@ -5972,9 +5972,19 @@ PyDoc_STRVAR( GemRB_GetItem__doc,
 static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 {
 	char* ResRef;
+	int PartyID = 0;
+	Actor *actor = NULL;
 
-	if (!PyArg_ParseTuple( args, "s", &ResRef)) {
+	if (!PyArg_ParseTuple( args, "s|i", &ResRef, &PartyID)) {
 		return AttributeError( GemRB_GetItem__doc );
+	}
+	//it isn't a problem if actor not found
+	Game *game = core->GetGame();
+	if (game) {
+		if (!PartyID) {
+			PartyID = game->GetSelectedPCSingle();
+		}
+		actor = game->FindPC( PartyID );
 	}
 
 	Item* item = core->GetItem(ResRef);
@@ -6001,10 +6011,10 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "LoreToID", PyInt_FromLong(item->LoreToID));
 
 	int function=0;
-	if (core->CanUseItemType(SLOT_POTION, item, NULL) ) {
+	if (core->CanUseItemType(SLOT_POTION, item, actor) ) {
 			function|=CAN_DRINK;
 	}
-	if (core->CanUseItemType(SLOT_SCROLL, item, NULL) ) {
+	if (core->CanUseItemType(SLOT_SCROLL, item, actor) ) {
 		ITMExtHeader *eh;
 		Effect *f;
 		//determining if this is a copyable scroll
@@ -6029,7 +6039,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 not_a_scroll:
 	if (core->CanUseItemType(SLOT_BAG, item, NULL) ) {
 		//allow the open container flag only if there is
-		//a store file (this fixes pst eye items, which 
+		//a store file (this fixes pst eye items, which
 		//got the same item type as bags)
 		//this isn't required anymore, as bag itemtypes are customisable
 		if (core->Exists( ResRef, IE_STO_CLASS_ID) ) {
@@ -6059,7 +6069,7 @@ int CheckRemoveItem(Actor *actor, CREItem *si)
 	///check if item is undroppable because the actor likes it
 	if (UsedItemsCount==-1) {
 		ReadUsedItems();
-	}	
+	}
 	unsigned int i=UsedItemsCount;
 
 	while(i--) {
@@ -6083,7 +6093,7 @@ CREItem *TryToUnequip(Actor *actor, unsigned int Slot, unsigned int Count)
 	if (!si) {
 		return NULL;
 	}
-	
+
 	//it is always possible to put these items into the inventory
 	if (!(core->QuerySlotType(Slot)&SLOT_INVENTORY)) {
 		if (CheckRemoveItem(actor, si)) {
@@ -6682,7 +6692,7 @@ static PyObject* GemRB_LeaveParty(PyObject * /*self*/, PyObject* args)
 	Py_INCREF( Py_None );
 	return Py_None;
 }
- 
+
 typedef union pack {
 	ieDword data;
 	ieByte bytes[4];
@@ -7468,20 +7478,22 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_UseItem__doc,
-"UseItem(actor, slot[, item])\n\n"
+"UseItem(actor, slot, header)\n\n"
 "Makes the actor try to use an item. "
-"If slot is negative, then item is the index of the item functionality in the use item list. "
-"If slot is non-negative, then item is the quick item or weapon in slot.");
+"If slot is -1, then header is the index of the item functionality in the use item list. "
+"If slot is -2, then header is the quickslot index. "
+"If slot is non-negative, then header is the header of the item in the 'slot'.");
 
 static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 {
 	int PartyID;
 	int slot;
-	int item = -1;
+	int header;
 
-	if (!PyArg_ParseTuple( args, "ii|i", &PartyID, &slot, &item )) {
+	if (!PyArg_ParseTuple( args, "iii", &PartyID, &slot, &header )) {
 		return AttributeError( GemRB_UseItem__doc );
 	}
+
 	Game *game = core->GetGame();
 	if (!game) {
 		return RuntimeError( "No game loaded!" );
@@ -7492,15 +7504,22 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 	}
 	ItemExtHeader itemdata;
 
-	if (slot>=0) {
-		actor->GetItemSlotInfo(&itemdata, slot);
-	} else {
-		if (item<0) {
-			return RuntimeError( "Invalid position" );
-		}
- 		actor->inventory.GetEquipmentInfo(&itemdata, item, 1);
+	switch (slot) {
+		case -1:
+			//some equipment
+ 			actor->inventory.GetEquipmentInfo(&itemdata, header, 1);
+			break;
+		case -2:
+			//quickslot
+			actor->GetItemSlotInfo(&itemdata, header, -1);
+			break;
+		default:
+			//any normal slot
+			actor->GetItemSlotInfo(&itemdata, core->QuerySlot(slot), header);
+			break;
 	}
 
+	actor->UseItem(itemdata.slot, itemdata.headerindex, actor);
 	printf("Use item: %s\n", itemdata.itemname);
 	printf("Extended header: %d\n", itemdata.headerindex);
 	printf("Attacktype: %d\n",itemdata.AttackType);
@@ -7891,7 +7910,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetStoreCure, METH_VARARGS),
 	METHOD(GetStoreItem, METH_VARARGS),
 	METHOD(InvalidateWindow, METH_VARARGS),
-	METHOD(EnableCheatKeys, METH_VARARGS), 
+	METHOD(EnableCheatKeys, METH_VARARGS),
 	METHOD(UpdateMusicVolume, METH_NOARGS),
 	METHOD(UpdateAmbientsVolume, METH_NOARGS),
 	METHOD(GetCurrentArea, METH_NOARGS),

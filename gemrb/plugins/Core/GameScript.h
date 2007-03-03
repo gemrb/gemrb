@@ -1366,6 +1366,7 @@ public:
 	static void UseContainer(Scriptable* Sender, Action* parameters);
 	static void UseDoor(Scriptable* Sender, Action* parameters);
 	static void UseItem(Scriptable* Sender, Action* parameters);
+	static void UseItemPoint(Scriptable* Sender, Action* parameters);
 	static void VerbalConstant(Scriptable* Sender, Action* parameters);
 	static void VerbalConstantHead(Scriptable* Sender, Action* parameters);
 	static void Wait(Scriptable* Sender, Action* parameters);

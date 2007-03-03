@@ -317,7 +317,7 @@ public:
 	void DropItem(const ieResRef resref, unsigned int flags);
 	void DropItem(int slot, unsigned int flags);
 	/* returns item information in quickitem slot */
-	void GetItemSlotInfo(ItemExtHeader *item, int which);
+	void GetItemSlotInfo(ItemExtHeader *item, int which, int header);
 	/* returns spell information in quickspell slot */
 	void GetSpellSlotInfo(SpellExtHeader *spell, int which);
 	/* updates quickslots */
@@ -424,8 +424,9 @@ public:
 	int GetQuickSlot(int slot);
 	/* Sets equipped Quick slot */
 	int SetEquippedQuickSlot(int slot);
-	/* Uses an item on the target */
-	bool UseItem(int slot, Scriptable *target);
+	/* Uses an item on the target or point */
+	bool UseItemPoint(int slot, int header, Point &point);
+	bool UseItem(int slot, int header, Scriptable *target);
 	/* If it returns true, then default AC=10 and the lesser the better */
 	bool IsReverseToHit();
 	void InitButtons(ieDword cls);

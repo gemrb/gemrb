@@ -370,27 +370,28 @@ def ActionCastPressed ():
 
 def ActionQItemPressed (action):
 	pc = GemRB.GameGetFirstSelectedPC()
-	GemRB.UseItem(pc, action)
+	#quick slot
+	GemRB.UseItem(pc, -2, action)
 	return
 	
 def ActionQItem1Pressed ():
-	ActionQItemPressed (9)
+	ActionQItemPressed (0)
 	return
 
 def ActionQItem2Pressed ():
-	ActionQItemPressed (11)
+	ActionQItemPressed (1)
 	return
 
 def ActionQItem3Pressed ():
-	ActionQItemPressed (12)
+	ActionQItemPressed (2)
 	return
 
 def ActionQItem4Pressed ():
-	ActionQItemPressed (10)
+	ActionQItemPressed (3)
 	return
 
 def ActionQItem5Pressed ():
-	ActionQItemPressed (31)
+	ActionQItemPressed (4)
 	return
 
 def ActionInnatePressed ():
@@ -413,6 +414,7 @@ def EquipmentPressed ():
 
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_CAST)
 	Item = GemRB.GetVar("Equipment")
+	#equipment index
 	GemRB.UseItem(pc, -1, Item)
 	return
 

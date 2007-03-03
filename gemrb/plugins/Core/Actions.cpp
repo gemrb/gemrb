@@ -5068,14 +5068,41 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 	if (!tar) {
 		return;
 	}
-	int Slot;
+	int Slot, header;
 	Actor *scr = (Actor *) Sender;
 	if (parameters->string0Parameter) {
 		Slot = scr->inventory.FindItem(parameters->string0Parameter, 0);
+		//this is actually not in the original game code
+		header = parameters->int0Parameter;
 	} else {
 		Slot = parameters->int0Parameter;
+		//this is actually not in the original game code
+		header = parameters->int1Parameter;
 	}
-	scr->UseItem(Slot, tar);
+	scr->UseItem(Slot, header, tar);
+}
+
+void GameScript::UseItemPoint(Scriptable* Sender, Action* parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		return;
+	}
+	int Slot, header;
+	Actor *scr = (Actor *) Sender;
+	if (parameters->string0Parameter) {
+		Slot = scr->inventory.FindItem(parameters->string0Parameter, 0);
+		//this IS in the original game code (ability)
+		header = parameters->int0Parameter;
+	} else {
+		Slot = parameters->int0Parameter;
+		//this is actually not in the original game code
+		header = parameters->int1Parameter;
+	}
+	scr->UseItemPoint(Slot, header, parameters->pointParameter);
 }
 
 //addfeat will be able to remove feats too

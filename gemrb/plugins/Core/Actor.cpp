@@ -1635,23 +1635,32 @@ void Actor::DropItem(int slot , unsigned int flags)
 }
 
 /** returns quick item data */
-/** which is a 'use quickitem' action */
-void Actor::GetItemSlotInfo(ItemExtHeader *item, int which)
+/** if header==-1 which is a 'use quickitem' action */
+/** if header is set, then which is the absolute slot index, */
+/** and header is the header index */
+void Actor::GetItemSlotInfo(ItemExtHeader *item, int which, int header)
 {
 	ieWord idx;
 	ieWord headerindex;
 
 	memset(item, 0, sizeof(ItemExtHeader) );
-	if (!PCStats) return; //not a player character
-	PCStats->GetSlotAndIndex(which,idx,headerindex);
-	if (headerindex==0xffff) return; //headerindex is invalid
+	if (header<0) {
+		if (!PCStats) return; //not a player character
+		PCStats->GetSlotAndIndex(which,idx,headerindex);
+		if (headerindex==0xffff) return; //headerindex is invalid
+	} else {
+		idx=(ieWord) which;
+		headerindex=(ieWord) header;
+	}
 	CREItem *slot = inventory.GetSlotItem(idx);
 	if (!slot) return; //quick item slot is empty
 	Item *itm = core->GetItem(slot->ItemResRef);
 	if (!itm) return; //quick item slot contains invalid item resref
 	ITMExtHeader *ext_header = itm->GetExtHeader(headerindex);
-	if (!ext_header) return; //item has no extended header, or header index is wrong
+	//item has no extended header, or header index is wrong
+	if (!ext_header) return;
 	memcpy(item->itemname, slot->ItemResRef, sizeof(ieResRef) );
+	item->slot = idx;
 	item->headerindex = headerindex;
 	memcpy(&(item->AttackType), &(ext_header->AttackType),
  ((char *) &(item->itemname)) -((char *) &(item->AttackType)) );
@@ -2984,14 +2993,42 @@ int Actor::SetEquippedQuickSlot(int slot)
 	return STR_MAGICWEAPON;
 }
 
-bool Actor::UseItem(int slot, Scriptable* /*target*/)
+bool Actor::UseItemPoint(int slot, int header, Point &target)
 {
 	CREItem *item = inventory.GetSlotItem(slot);
 	if (!item)
 		return false;
 	Item *itm = core->GetItem(item->ItemResRef);
 	if (!itm) return false; //quick item slot contains invalid item resref
+	//in fact this should build a projectile and hurl it at the target
+	//this is just a temporary solution
+	EffectQueue *fx = itm->GetEffectBlock(header);
+	Actor *tar=GetCurrentArea()->GetActor(target, 10);
+	if (tar) {
+		fx->SetOwner(this);
+		fx->AddAllEffects(tar);
+	}
 	//
+	core->FreeItem(itm,item->ItemResRef, false);
+	return true;
+}
+
+bool Actor::UseItem(int slot, int header, Scriptable* target)
+{
+	CREItem *item = inventory.GetSlotItem(slot);
+	if (!item)
+		return false;
+	Item *itm = core->GetItem(item->ItemResRef);
+	if (!itm) return false; //quick item slot contains invalid item resref
+	//in fact this should build a projectile and hurl it at the target
+	//this is just a temporary solution
+	EffectQueue *fx = itm->GetEffectBlock(header);
+	fx->SetOwner(this);
+	if (target->Type==ST_ACTOR) {
+		fx->AddAllEffects((Actor *) target);
+	} else {
+		//ABSOLUTELY NO IDEA YET, only a few effects work on non actors
+	}
 	//
 	core->FreeItem(itm,item->ItemResRef, false);
 	return true;

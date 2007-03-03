@@ -851,6 +851,8 @@ static ActionLink actionnames[] = {
 	{"usecontainer", GameScript::UseContainer,AF_BLOCKING},
 	{"usedoor", GameScript::UseDoor,AF_BLOCKING},
 	{"useitem", GameScript::UseItem,AF_BLOCKING},
+	{"useitempoint", GameScript::UseItemPoint,AF_BLOCKING},
+	{"useitempointslot", GameScript::UseItemPoint,AF_BLOCKING},
 	{"useitemslot", GameScript::UseItem,AF_BLOCKING},
 	{"vequip",GameScript::SetArmourLevel, 0},
 	{"verbalconstant", GameScript::VerbalConstant, 0},
