@@ -7503,6 +7503,7 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Actor not found" );
 	}
 	ItemExtHeader itemdata;
+	bool silent = false;
 
 	switch (slot) {
 		case -1:
@@ -7516,15 +7517,19 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 		default:
 			//any normal slot
 			actor->GetItemSlotInfo(&itemdata, core->QuerySlot(slot), header);
+			silent = true;
 			break;
 	}
 
-	actor->UseItem(itemdata.slot, itemdata.headerindex, actor);
+	/// remove this after projectile is done
 	printf("Use item: %s\n", itemdata.itemname);
 	printf("Extended header: %d\n", itemdata.headerindex);
 	printf("Attacktype: %d\n",itemdata.AttackType);
 	printf("Range: %d\n",itemdata.Range);
 	printf("Target: %d\n",itemdata.Target);
+	printf("Projectile: %d\n", itemdata.ProjectileAnimation);
+	//
+	actor->UseItem(itemdata.slot, itemdata.headerindex, actor, silent);
 	Py_INCREF( Py_None );
 	return Py_None;
 }

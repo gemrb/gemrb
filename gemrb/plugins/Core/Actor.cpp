@@ -3003,18 +3003,20 @@ bool Actor::UseItemPoint(int slot, int header, Point &target)
 	//in fact this should build a projectile and hurl it at the target
 	//this is just a temporary solution
 	EffectQueue *fx = itm->GetEffectBlock(header);
+	if (!fx)
+		return false;
 	Actor *tar=GetCurrentArea()->GetActor(target, 10);
 	if (tar) {
 		fx->SetOwner(this);
 		fx->AddAllEffects(tar);
 	}
 	//
+	ChargeItem(slot, header, item, itm, false);
 	core->FreeItem(itm,item->ItemResRef, false);
-	inventory.BreakItemSlot(slot);
 	return true;
 }
 
-bool Actor::UseItem(int slot, int header, Scriptable* target)
+bool Actor::UseItem(int slot, int header, Scriptable* target, bool silent)
 {
 	CREItem *item = inventory.GetSlotItem(slot);
 	if (!item)
@@ -3024,6 +3026,8 @@ bool Actor::UseItem(int slot, int header, Scriptable* target)
 	//in fact this should build a projectile and hurl it at the target
 	//this is just a temporary solution
 	EffectQueue *fx = itm->GetEffectBlock(header);
+	if (!fx)
+		return false;
 	fx->SetOwner(this);
 	if (target->Type==ST_ACTOR) {
 		fx->AddAllEffects((Actor *) target);
@@ -3031,9 +3035,34 @@ bool Actor::UseItem(int slot, int header, Scriptable* target)
 		//ABSOLUTELY NO IDEA YET, only a few effects work on non actors
 	}
 	//
+	ChargeItem(slot, header, item, itm, silent);
 	core->FreeItem(itm,item->ItemResRef, false);
-	inventory.BreakItemSlot(slot);
 	return true;
+}
+
+void Actor::ChargeItem(int slot, int header, CREItem *item, Item *itm, bool silent)
+{
+	if (!itm) {
+		item = inventory.GetSlotItem(slot);
+		if (!item)
+			return;
+		itm = core->GetItem(item->ItemResRef);
+	}
+	if (!itm) return; //quick item slot contains invalid item resref
+
+	switch(itm->UseCharge(item->Usages, header)) {
+		case CHG_NOSOUND: //remove item
+			inventory.BreakItemSlot(slot);
+			break;
+		case CHG_BREAK: //both
+			if (!silent) {
+				core->PlaySound(DS_ITEM_GONE);
+			}
+			inventory.BreakItemSlot(slot);
+			break;
+		default: //don't do anything
+			break;
+	}
 }
 
 bool Actor::IsReverseToHit()

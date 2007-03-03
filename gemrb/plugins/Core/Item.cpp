@@ -98,3 +98,24 @@ ITMExtHeader *Item::GetWeaponHeader(bool ranged) const
 	}
 	return NULL;
 }
+
+#define CHARGE_COUNTERS  3
+
+int Item::UseCharge(ieWord *Charges, int header)
+{
+	ITMExtHeader *ieh = GetExtHeader(header);
+	if (!ieh) return 0;
+	int type = ieh->ChargeDepletion;
+	int ccount = 0;
+	if (header<CHARGE_COUNTERS) {
+		ccount = --Charges[header];
+	}
+	if (ccount>0) {
+		return CHG_NONE;
+	}
+	if (type == CHG_NONE) {
+		Charges[header]=0;
+	}
+	return type;
+}
+

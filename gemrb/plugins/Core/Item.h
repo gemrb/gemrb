@@ -80,9 +80,15 @@
 #define ITEM_AT_MAGIC      3
 #define ITEM_AT_BOW        4
 
+//projectile qualifiers
 #define PROJ_ARROW  1
 #define PROJ_BOLT   2
 #define PROJ_BULLET 4
+
+//charge depletion flags
+#define CHG_BREAK   1
+#define CHG_NOSOUND 2
+#define CHG_NONE    3
 
 /**
  * @class ITMExtHeader
@@ -115,16 +121,10 @@ public:
 	ieDword RechargeFlags; //this is a bitfield with many bits
 	ieWord ProjectileAnimation;
 	ieWord MeleeAnimation[3];
-	/*
-	ieWord BowArrowQualifier;
-	ieWord CrossbowBoltQualifier;
-	ieWord MiscProjectileQualifier;
-	*/
 	//this value is set in projectiles and launchers too
 	int ProjectileQualifier; //this is a derived value determined on load time
 	Effect *features;
 };
-
 
 /**
  * @class Item
@@ -211,6 +211,8 @@ public:
 		}
 		return ItemDescIdentified;
 	}
+
+	int UseCharge(ieWord *Charges, int header);
 
 	//returns the requested extended header
 	ITMExtHeader *GetExtHeader(unsigned int which) const

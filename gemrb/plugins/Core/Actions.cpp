@@ -5079,7 +5079,7 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 		//this is actually not in the original game code
 		header = parameters->int1Parameter;
 	}
-	scr->UseItem(Slot, header, tar);
+	scr->UseItem(Slot, header, tar, false);
 }
 
 void GameScript::UseItemPoint(Scriptable* Sender, Action* parameters)

@@ -426,7 +426,9 @@ public:
 	int SetEquippedQuickSlot(int slot);
 	/* Uses an item on the target or point */
 	bool UseItemPoint(int slot, int header, Point &point);
-	bool UseItem(int slot, int header, Scriptable *target);
+	bool UseItem(int slot, int header, Scriptable *target, bool silent);
+	/* Deducts a charge from an item */
+	void ChargeItem(int slot, int header, CREItem *item, Item *itm, bool silent);
 	/* If it returns true, then default AC=10 and the lesser the better */
 	bool IsReverseToHit();
 	void InitButtons(ieDword cls);

@@ -754,9 +754,11 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 			if (item && core->Exists(item->ItemResRef, IE_ITM_CLASS_ID)) {
 				act->inventory.SetSlotItem( item, Slot );
 				if (core->QuerySlotEffects( i )) {
+/*
 					if ( act->inventory.EquipItem( Slot ) ) {
 						printf( "EQUIP2 0x%04x\n", item->Flags );
 					}
+*/
 				}
 				items[index] = NULL;
 				continue;
