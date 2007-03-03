@@ -26,6 +26,7 @@
 import string
 import GemRB
 import GUICommonWindows
+from GUISTORE import *
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
@@ -68,13 +69,15 @@ def OpenInventoryWindow ():
 		InventoryWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
 		GemRB.SetVar ("MessageLabel", -1)
-		GemRB.SetVisible (0,1)
-		GemRB.UnhideGUI ()
 		GUICommonWindows.PortraitWindow = OldPortraitWindow
 		OldPortraitWindow = None
 		GUICommonWindows.OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
-		SetSelectionChangeHandler (None)
+		#don't go back to multi selection mode when going to the store screen
+		if not GemRB.GetVar("Inventory"):
+			GemRB.SetVisible (0,1)
+			GemRB.UnhideGUI ()
+			SetSelectionChangeHandler (None)
 		return
 
 	GemRB.HideGUI ()
@@ -538,6 +541,19 @@ def OnDropItemToPC ():
 	UpdateInventoryWindow ()
 	return
 
+def OpenItemWindow ():
+	#close inventory
+	GemRB.SetVar ("Inventory", 1)
+	GemRB.UnloadWindow (ItemInfoWindow)
+	OpenInventoryWindow ()
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	slot_item = GemRB.GetSlotItem (pc, slot)
+	ResRef = slot_item['ItemResRef']
+	#the store will have to reopen the inventory
+	GemRB.EnterStore (ResRef)
+	return
+
 def DialogItemWindow ():
 	GemRB.UnloadWindow (ItemInfoWindow)
 	OpenInventoryWindow ()
@@ -547,7 +563,7 @@ def DialogItemWindow ():
 	ResRef = slot_item['ItemResRef']
 	item = GemRB.GetItem (ResRef)
 	dialog=item["Dialog"]
-	GemRB.ExecuteString("StartDialog(\""+dialog+"\",Myself)", pc)
+	GemRB.ExecuteString ("StartDialog(\""+dialog+"\",Myself)", pc)
 	return
 
 def IdentifyUseSpell ():
@@ -606,7 +622,7 @@ def IdentifyItemWindow ():
 
 def CloseItemInfoWindow ():
 	GemRB.UnloadWindow (ItemInfoWindow)
-	UpdateInventoryWindow ()
+	UpdateInventoryWindow()
 	return
 
 def DisplayItem (itemresref, type):

@@ -51,6 +51,7 @@ RightButton = None
 ITEM_PC    = 0
 ITEM_STORE = 1
 
+Inventory = None
 RentIndex = -1
 Store = None
 Buttons = [-1,-1,-1,-1]
@@ -95,23 +96,28 @@ def CloseStoreWindow ():
 	global StoreWindow, ActionWindow, PortraitWindow
 	global OldPortraitWindow
 
+	GemRB.SetVar ("Inventory", 0)
 	CloseWindows ()
 	GemRB.UnloadWindow (StoreWindow)
 	GemRB.UnloadWindow (ActionWindow)
 	GemRB.UnloadWindow (PortraitWindow)
 	StoreWindow = None
 	GemRB.LeaveStore ()
-	GemRB.SetVisible (0,1) #enabling the game control screen
-	GemRB.UnhideGUI () #enabling the other windows
 	GUICommonWindows.PortraitWindow = OldPortraitWindow
-	SetSelectionChangeHandler( None )
-
+	if Inventory:
+		GemRB.RunEventHandler("OpenInventoryWindow")
+	else:
+		GemRB.SetVisible (0,1) #enabling the game control screen
+		GemRB.UnhideGUI () #enabling the other windows
+		SetSelectionChangeHandler( None )
+	return
 
 def OpenStoreWindow ():
 	global Store
 	global StoreWindow, ActionWindow, PortraitWindow
 	global OldPortraitWindow
 	global store_update_funcs
+	global Inventory
 
 	#these are function pointers, not strings
 	#can't put this in global init, doh!
@@ -122,6 +128,11 @@ def OpenStoreWindow ():
 
 	GemRB.HideGUI ()
 	GemRB.SetVisible (0,0) #removing the game control screen
+
+	if GemRB.GetVar ("Inventory"):
+		Inventory = 1
+	else:
+		Inventory = None
 
 	GemRB.SetVar ("Action", 0)
 	GemRB.LoadWindowPack ("GUISTORE", 640, 480)
@@ -166,6 +177,7 @@ def OpenStoreWindow ():
 	GemRB.SetVisible (Window, 1)
 	store_update_funcs[store_buttons[0]] ()
 	GemRB.SetVisible (PortraitWindow, 1)
+	#GemRB.SetVar ("Inventory", 0)
 
 
 def OpenStoreShoppingWindow ():
@@ -195,12 +207,19 @@ def OpenStoreShoppingWindow ():
 
 	# Buy
 	LeftButton = Button = GemRB.GetControl (Window, 2)
-	GemRB.SetText (Window, Button, 13703)
+	if Inventory:
+		GemRB.SetText (Window, Button, 51882)
+	else:
+		GemRB.SetText (Window, Button, 13703)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "BuyPressed")
 
 	# Sell
 	RightButton = Button = GemRB.GetControl (Window, 3)
-	GemRB.SetText (Window, Button, 13704)
+	if Inventory:
+		GemRB.SetText (Window, Button, 51883)
+	else:
+		GemRB.SetText (Window, Button, 13704)
+
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SellPressed")
 
 	# inactive button

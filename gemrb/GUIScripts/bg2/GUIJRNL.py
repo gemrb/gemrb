@@ -61,6 +61,7 @@ def OpenJournalWindow ():
 		OldPortraitWindow = None
 		GUICommonWindows.OptionsWindow = OldOptionsWindow
 		OldOptionsWindow = None
+		SetSelectionChangeHandler (None)
 		return
 		
 	Table = GemRB.LoadTable("YEARS")
@@ -126,9 +127,10 @@ def OpenJournalWindow ():
 	#GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
 
 	Chapter = GemRB.GetGameVar("chapter")
+	SetSelectionChangeHandler (UpdateLogWindow)
 	UpdateLogWindow ()
 	GemRB.SetVisible (OptionsWindow, 1)
-	GemRB.SetVisible (Window, 1)
+	GemRB.SetVisible (Window, 3)
 	GemRB.SetVisible (PortraitWindow, 1)
 	return
 
@@ -174,6 +176,7 @@ def UpdateLogWindow ():
 		GemRB.TextAreaAppend (Window, Text, je['Text'], 3*i+1)
 		GemRB.TextAreaAppend (Window, Text, "", 3*i + 2)
 
+	GemRB.SetVisible (Window, 1)
 	return
 
 ###################################################
