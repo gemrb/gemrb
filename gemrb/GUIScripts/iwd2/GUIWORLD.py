@@ -9,18 +9,18 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 # $Id$
 
 
 # GUIW.py - scripts to control some windows from GUIWORLD winpack
-#    except of Portrait, Options and Dialog windows
+# except of Portrait, Options and Dialog windows
 
 ###################################################
 
@@ -337,6 +337,14 @@ def OpenReformPartyWindow ():
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenReformPartyWindow")
 	if hideflag:
 		GemRB.UnhideGUI ()
+
+def DeathWindowPlot():
+	#no death movie, but music is changed
+	GemRB.LoadMusicPL ("Theme.mus",1)
+	GemRB.HideGUI ()
+	GemRB.SetVar("QuitGame1", 32848)
+	GemRB.SetTimedEvent ("DeathWindowEnd", 10)
+	return
 
 def DeathWindow():
 	#no death movie, but music is changed
