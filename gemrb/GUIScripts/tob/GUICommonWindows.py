@@ -27,6 +27,7 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 from ie_modal import *
+from ie_action import *
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
@@ -375,23 +376,23 @@ def ActionQItemPressed (action):
 	return
 	
 def ActionQItem1Pressed ():
-	ActionQItemPressed (0)
+	ActionQItemPressed (ACT_QSLOT1)
 	return
 
 def ActionQItem2Pressed ():
-	ActionQItemPressed (1)
+	ActionQItemPressed (ACT_QSLOT2)
 	return
 
 def ActionQItem3Pressed ():
-	ActionQItemPressed (2)
+	ActionQItemPressed (ACT_QSLOT3)
 	return
 
 def ActionQItem4Pressed ():
-	ActionQItemPressed (3)
+	ActionQItemPressed (ACT_QSLOT4)
 	return
 
 def ActionQItem5Pressed ():
-	ActionQItemPressed (4)
+	ActionQItemPressed (ACT_QSLOT5)
 	return
 
 def ActionInnatePressed ():
