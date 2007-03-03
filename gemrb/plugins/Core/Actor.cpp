@@ -3010,6 +3010,7 @@ bool Actor::UseItemPoint(int slot, int header, Point &target)
 	}
 	//
 	core->FreeItem(itm,item->ItemResRef, false);
+	inventory.BreakItemSlot(slot);
 	return true;
 }
 
@@ -3031,6 +3032,7 @@ bool Actor::UseItem(int slot, int header, Scriptable* target)
 	}
 	//
 	core->FreeItem(itm,item->ItemResRef, false);
+	inventory.BreakItemSlot(slot);
 	return true;
 }
 

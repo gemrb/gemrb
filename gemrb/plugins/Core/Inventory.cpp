@@ -1155,6 +1155,8 @@ void Inventory::SetSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 	if (core->ResolveRandomItem(TmpItem) &&core->Exists(TmpItem->ItemResRef, IE_ITM_CLASS_ID)) {
 		SetSlotItem( TmpItem, SlotID );
 	} else {
+		//if the item isn't creatable, we still destroy the old item
+		KillSlot( SlotID );
 		delete TmpItem;
 	}
 	CalculateWeight();
