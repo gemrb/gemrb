@@ -30,6 +30,7 @@
 #include "Spell.h"
 #include "Game.h"
 #include "GameScript.h"
+#include "ScriptEngine.h"
 #include "GSUtils.h" //needed for DisplayStringCore
 #include "Video.h"
 #include <cassert>
@@ -1525,6 +1526,10 @@ void Actor::Die(Scriptable *killer)
 			//game->KillStat(this, killer);
 			InternalFlags|=IF_GIVEXP;
 		}
+	}
+	//a plot critical creature has died (iwd2)
+	if (BaseStats[IE_MC_FLAGS]&MC_PLOT_CRITICAL) {
+		core->GetGUIScriptEngine()->RunFunction("DeathWindowPlot", false);
 	}
 	//ensure that the scripts of the actor will run as soon as possible
 	ImmediateEvent();

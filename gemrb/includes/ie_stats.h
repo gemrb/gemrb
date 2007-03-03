@@ -144,10 +144,11 @@
 #define MC_FALLEN_RANGER	0x0400
 #define MC_EXPORTABLE           0x0800
 
+#define MC_PLOT_CRITICAL        0x2000  //if dies, it means game over
 #define MC_BEENINPARTY          0x8000
 #define MC_HIDDEN               0x10000
 
-#define MC_NO_TALK              0x80000    //ignore dialoginterrupt
+#define MC_NO_TALK              0x80000 //ignore dialoginterrupt
 
 //stats
 #define IE_HITPOINTS		0

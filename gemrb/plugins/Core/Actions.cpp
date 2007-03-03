@@ -2878,6 +2878,20 @@ void GameScript::IncrementChapter(Scriptable* Sender, Action* parameters)
 	core->GetGame()->IncrementChapter();
 }
 
+void GameScript::SetCriticalPathObject(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return;
+	}
+	Actor* actor = ( Actor* ) tar;
+	if (parameters->int0Parameter) {
+		actor->SetMCFlag(MC_PLOT_CRITICAL, BM_OR);
+	} else {
+		actor->SetMCFlag(MC_PLOT_CRITICAL, BM_NAND);
+	}
+}
+
 void GameScript::SetBeenInPartyFlags(Scriptable* Sender, Action* /*parameters*/)
 {
 	if (Sender->Type != ST_ACTOR) {

@@ -727,6 +727,7 @@ static ActionLink actionnames[] = {
 	{"setbestweapon", GameScript::SetBestWeapon, 0},
 	{"setcorpseenabled", GameScript::AmbientActivate, 0},//another weird name
 	{"setcreatureareaflags", GameScript::SetCreatureAreaFlags, 0},
+	{"setcriticalpathobject", GameScript::SetCriticalPathObject, 0},
 	{"setdialog", GameScript::SetDialogue,0},
 	{"setdialogrange", GameScript::SetDialogueRange, 0},
 	{"setdialogue", GameScript::SetDialogue,0},
