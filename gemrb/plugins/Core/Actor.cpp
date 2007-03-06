@@ -1664,7 +1664,7 @@ void Actor::GetItemSlotInfo(ItemExtHeader *item, int which, int header)
 	item->headerindex = headerindex;
 	memcpy(&(item->AttackType), &(ext_header->AttackType),
  ((char *) &(item->itemname)) -((char *) &(item->AttackType)) );
-	if (headerindex>2) {
+	if (headerindex>=CHARGE_COUNTERS) {
 		item->Charges=0;
 	} else {
 		item->Charges=slot->Usages[headerindex];
@@ -2993,13 +2993,17 @@ int Actor::SetEquippedQuickSlot(int slot)
 	return STR_MAGICWEAPON;
 }
 
-bool Actor::UseItemPoint(int slot, int header, Point &target)
+bool Actor::UseItemPoint(int slot, ieDword header, Point &target)
 {
 	CREItem *item = inventory.GetSlotItem(slot);
 	if (!item)
 		return false;
 	Item *itm = core->GetItem(item->ItemResRef);
 	if (!itm) return false; //quick item slot contains invalid item resref
+	if ((header<CHARGE_COUNTERS) && !item->Usages[header]) {
+		return false;
+	}
+
 	//in fact this should build a projectile and hurl it at the target
 	//this is just a temporary solution
 	EffectQueue *fx = itm->GetEffectBlock(header);
@@ -3016,13 +3020,16 @@ bool Actor::UseItemPoint(int slot, int header, Point &target)
 	return true;
 }
 
-bool Actor::UseItem(int slot, int header, Scriptable* target, bool silent)
+bool Actor::UseItem(int slot, ieDword header, Scriptable* target, bool silent)
 {
 	CREItem *item = inventory.GetSlotItem(slot);
 	if (!item)
 		return false;
 	Item *itm = core->GetItem(item->ItemResRef);
 	if (!itm) return false; //quick item slot contains invalid item resref
+	if ((header<CHARGE_COUNTERS) && !item->Usages[header]) {
+		return false;
+	}
 	//in fact this should build a projectile and hurl it at the target
 	//this is just a temporary solution
 	EffectQueue *fx = itm->GetEffectBlock(header);
@@ -3040,7 +3047,7 @@ bool Actor::UseItem(int slot, int header, Scriptable* target, bool silent)
 	return true;
 }
 
-void Actor::ChargeItem(int slot, int header, CREItem *item, Item *itm, bool silent)
+void Actor::ChargeItem(int slot, ieDword header, CREItem *item, Item *itm, bool silent)
 {
 	if (!itm) {
 		item = inventory.GetSlotItem(slot);

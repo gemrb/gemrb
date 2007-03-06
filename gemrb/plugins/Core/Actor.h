@@ -425,10 +425,10 @@ public:
 	/* Sets equipped Quick slot */
 	int SetEquippedQuickSlot(int slot);
 	/* Uses an item on the target or point */
-	bool UseItemPoint(int slot, int header, Point &point);
-	bool UseItem(int slot, int header, Scriptable *target, bool silent);
+	bool UseItemPoint(int slot, ieDword header, Point &point);
+	bool UseItem(int slot, ieDword header, Scriptable *target, bool silent);
 	/* Deducts a charge from an item */
-	void ChargeItem(int slot, int header, CREItem *item, Item *itm, bool silent);
+	void ChargeItem(int slot, ieDword header, CREItem *item, Item *itm, bool silent);
 	/* If it returns true, then default AC=10 and the lesser the better */
 	bool IsReverseToHit();
 	void InitButtons(ieDword cls);

@@ -1258,6 +1258,10 @@ void Inventory::EquipBestWeapon(int flags)
 	UpdateWeaponAnimation();
 }
 
+#define ID_NONEED  0   //id is not important
+#define ID_NEED    1   //id is important
+#define ID_NO      2   //shouldn't id
+
 /* returns true if there are more item usages not fitting in given array */
 bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count)
 {
@@ -1282,8 +1286,13 @@ bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count
 			//skipping if we cannot use the item
 			int idreq1 = (slot->Flags&IE_INV_ITEM_IDENTIFIED);
 			int idreq2 = ext_header->IDReq;
-			if (idreq1!=idreq2) {
-				continue;
+			switch (idreq2) {
+				case ID_NO:
+					if (idreq1) continue;
+					break;
+				case ID_NEED:
+					if (!idreq1) continue;
+				default:;
 			}
 
 			actual++;
@@ -1297,13 +1306,17 @@ bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count
 				count--;
 				memcpy(array[pos].itemname, slot->ItemResRef, sizeof(ieResRef) );
 				array[pos].headerindex = ehc;
-				memcpy(&(array[pos].AttackType), &(ext_header->AttackType),
- ((char *) &(array[pos].itemname)) -((char *) &(array[pos].AttackType)) );
-				//StoreItemInfo(array+pos, ext_header, ehc);
-				if (ehc>2) {
-					array[pos].Charges=0;
+ 				int slen = ((char *) &(array[pos].itemname)) -((char *) &(array[pos].AttackType));
+				memcpy(&(array[pos].AttackType), &(ext_header->AttackType), slen);
+				if (ext_header->Charges) {
+					//don't modify ehc, it is a counter
+					if (ehc>=CHARGE_COUNTERS) {
+						array[pos].Charges=slot->Usages[0];
+					} else {
+						array[pos].Charges=slot->Usages[ehc];
+					}
 				} else {
-					array[pos].Charges=slot->Usages[ehc];
+					array[pos].Charges=0xffff;
 				}
 				pos++;
 			}

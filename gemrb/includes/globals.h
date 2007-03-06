@@ -125,6 +125,9 @@
 #define  GF_CHECK_ABILITIES             28 //bg2 (others?)
 #define  GF_CHALLENGERATING             29 //iwd2
 
+//the number of item usage fields (used in CREItem and STOItem)
+#define CHARGE_COUNTERS  3
+
 /////AI global defines
 #define AI_UPDATE_TIME	10
 

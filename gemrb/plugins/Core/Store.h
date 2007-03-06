@@ -73,11 +73,10 @@ STA_CURE=3, STA_DONATE=4, STA_DRINK=5, STA_ROOMRENT=6, STA_OPTIONAL=0x80} StoreA
  * @struct STOItem
  * Item in a store, together with available amount etc.
  */
-
 typedef struct STOItem {
 	ieResRef ItemResRef;
 	ieWord PurchasedAmount;
-	ieWord Usages[3];
+	ieWord Usages[CHARGE_COUNTERS];
 	ieDword Flags;
 	// 2 cached values from associated item. LEAVE IT SIGNED!
 	int Weight;

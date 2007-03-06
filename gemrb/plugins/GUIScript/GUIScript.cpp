@@ -6898,7 +6898,7 @@ static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 		Sprite2D *Picture = NULL;
 
 		if (item->UseIcon[0]) {
-			core->GetBAMSprite(item->UseIcon, 0, 0);
+			Picture = core->GetBAMSprite(item->UseIcon, 0, 0);
 		}
 
 		if (!Picture) {
@@ -6921,12 +6921,12 @@ static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 			}
 			char usagestr[10];
 
-			if (item->Charges || item->ChargeDepletion) {
+			if (item->Charges && (item->Charges!=0xffff) ) {
 				sprintf(usagestr,"%d", item->Charges);
 				btn->SetText( usagestr );
-				if (!item->Charges && item->ChargeDepletion) {
-					btn->SetState(IE_GUI_BUTTON_DISABLED);
-				}
+			}
+			if (!item->Charges && (item->ChargeDepletion==CHG_NONE) ) {
+				btn->SetState(IE_GUI_BUTTON_DISABLED);
 			}
 		}
 	}

@@ -805,7 +805,7 @@ int Interface::GetItemTooltip(ieResRef itemname, int header)
 	int *value = NULL;
 
 	if (ItemTooltipTable) {
-		void* lookup;
+		void* lookup = NULL;
 		ItemTooltipTable->Lookup(itemname, lookup);
 		value = (int*)lookup;
 	}

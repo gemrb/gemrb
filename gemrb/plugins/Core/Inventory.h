@@ -175,7 +175,7 @@ public:
 	//recent research showed that this field is used by the create item
 	//for days effect. This field shows the expiration in gametime hours
 	ieWord Expired;
-	ieWord Usages[3];
+	ieWord Usages[CHARGE_COUNTERS];
 	ieDword Flags;
 	// 2 cached values from associated item. LEAVE IT SIGNED!
 	/** Weight of items in the stack */
