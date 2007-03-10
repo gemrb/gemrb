@@ -166,6 +166,7 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 					// Remove tooltip if mouse moved to different control
 					core->DisplayTooltip( 0, 0, NULL );
 					last_win_focused->OnMouseLeave( x, y );
+					last_win_over = win;
 					win->OnMouseEnter( x, y, ctrl );
 				}
 				if (ctrl != NULL) {
