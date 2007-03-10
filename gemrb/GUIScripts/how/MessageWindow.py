@@ -55,7 +55,7 @@ def OnLoad():
 	GUICommonWindows.OptionsWindow = None
 
 	#this is different in IWD (0) and HoW (25)
-	OptionsWindow = GemRB.LoadWindow(0)
+	OptionsWindow = GemRB.LoadWindow(25)
 	SetupMenuWindowControls (OptionsWindow, 1, "ReturnToGame")
 	PortraitWindow = OpenPortraitWindow(1)
 
