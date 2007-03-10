@@ -6898,7 +6898,7 @@ static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 		Sprite2D *Picture = NULL;
 
 		if (item->UseIcon[0]) {
-			Picture = core->GetBAMSprite(item->UseIcon, 0, 0);
+			Picture = core->GetBAMSprite(item->UseIcon, 1, 0);
 		}
 
 		if (!Picture) {
