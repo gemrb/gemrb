@@ -27,6 +27,8 @@ import GemRB
 from GUIDefines import *
 from GUICommon import CloseOtherWindow
 from ie_stats import *
+from ie_modal import *
+from ie_action import *
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
@@ -241,8 +243,10 @@ def UpdateActionsWindow ():
 	elif level == 1:
 		GemRB.SetupEquipmentIcons(ActionsWindow, pc, TopIndex)
 	elif level == 2: #spells
+		GemRB.SetVar("Type", 3)
 		GemRB.SetupSpellIcons(ActionsWindow, pc, 3, TopIndex)
 	elif level == 3: #innates
+		GemRB.SetVar("Type", 4)
 		GemRB.SetupSpellIcons(ActionsWindow, pc, 4, TopIndex)
 	return
 
@@ -287,14 +291,57 @@ def ActionStopPressed ():
 	return
 
 #no check needed because the button wouldn't be drawn if illegal
-def LeftScrollPressed ():
-	GemRB.SetVar ("TopIndex", GemRB.GetVar ("TopIndex") -1)
+def ActionLeftPressed ():
+	TopIndex = GemRB.GetVar ("TopIndex")
+	if TopIndex>10:
+		TopIndex -= 10
+	else:
+		TopIndex = 0
+	GemRB.SetVar ("TopIndex", TopIndex)
 	UpdateActionsWindow ()
 	return
 
 #no check needed because the button wouldn't be drawn if illegal
-def RightScrollPressed ():
-	GemRB.SetVar ("TopIndex", GemRB.GetVar ("TopIndex") +1)
+def ActionRightPressed ():
+	pc = GemRB.GameGetFirstSelectedPC()
+	TopIndex = GemRB.GetVar ("TopIndex")
+	Type = GemRB.GetVar ("Type")
+	if Type == 3:
+		Max = GemRB.GetMemorizedSpellsCount(pc,0)+GemRB.GetMemorizedSpellsCount(pc,1)
+	else:
+		Max = GemRB.GetMemorizedSpellsCount(pc,2)
+	TopIndex += 10
+	if TopIndex > Max - 10:
+		if Max>10:
+			TopIndex = Max-10
+		else:
+			TopIndex = 0
+
+	GemRB.SetVar ("TopIndex", TopIndex)
+	UpdateActionsWindow ()
+	return
+
+def ActionSongPressed ():
+	pc = GemRB.GameGetFirstSelectedPC()
+	GemRB.SetModalState (pc, MS_BATTLESONG)
+	UpdateActionsWindow ()
+	return
+
+def ActionSearchPressed ():
+	pc = GemRB.GameGetFirstSelectedPC()
+	GemRB.SetModalState (pc, MS_DETECTTRAPS)
+	UpdateActionsWindow ()
+	return
+
+def ActionStealthPressed ():
+	pc = GemRB.GameGetFirstSelectedPC()
+	GemRB.SetModalState (pc, MS_STEALTH)
+	UpdateActionsWindow ()
+	return
+
+def ActionTurnPressed ():
+	pc = GemRB.GameGetFirstSelectedPC()
+	GemRB.SetModalState (pc, MS_TURNUNDEAD)
 	UpdateActionsWindow ()
 	return
 
@@ -310,10 +357,54 @@ def ActionCastPressed ():
 	UpdateActionsWindow ()
 	return
 
+def ActionQItemPressed (action):
+	pc = GemRB.GameGetFirstSelectedPC()
+	#quick slot
+	GemRB.UseItem(pc, -2, action)
+	return
+
+def ActionQItem1Pressed ():
+	ActionQItemPressed (ACT_QSLOT1)
+	return
+
+def ActionQItem2Pressed ():
+	ActionQItemPressed (ACT_QSLOT2)
+	return
+
+def ActionQItem3Pressed ():
+	ActionQItemPressed (ACT_QSLOT3)
+	return
+
+def ActionQItem4Pressed ():
+	ActionQItemPressed (ACT_QSLOT4)
+	return
+
+def ActionQItem5Pressed ():
+	ActionQItemPressed (ACT_QSLOT5)
+	return
+
 def ActionInnatePressed ():
 	GemRB.SetVar ("TopIndex", 0)
 	GemRB.SetVar ("ActionLevel", 3)
 	UpdateActionsWindow ()
+	return
+
+def SpellPressed ():
+	pc = GemRB.GameGetFirstSelectedPC()
+
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_CAST)
+	Spell = GemRB.GetVar("Spell")
+	Type = GemRB.GetVar("Type")
+	GemRB.SpellCast(pc, Type, Spell)
+	return
+
+def EquipmentPressed ():
+	pc = GemRB.GameGetFirstSelectedPC()
+
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_CAST)
+	Item = GemRB.GetVar("Equipment")
+	#equipment index
+	GemRB.UseItem(pc, -1, Item)
 	return
 
 def GetActorClassTitle (actor):
