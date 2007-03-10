@@ -1002,8 +1002,11 @@ int Inventory::GetEquipped()
 //if shield slot is empty, call again for fist slot!
 int Inventory::GetShieldSlot()
 {	
-	if (IWD2 && Equipped>=0) {
-		return Equipped*2+SLOT_MELEE+1;
+	if (IWD2) {
+		if (Equipped>=0 && Equipped<=3) {
+			return Equipped*2+SLOT_MELEE+1;
+		}
+		return -1;
 	}
 	return SLOT_LEFT;
 }
