@@ -920,7 +920,6 @@ void GameControl::TryToAttack(Actor *source, Actor *tgt)
 	char Tmp[40];
 	ieWord tmp;
 
-	//this won't work atm, target must be honoured by Attack
 	source->ClearPath();
 	source->ClearActions();
 	strncpy(Tmp,"NIDSpecial3()",sizeof(Tmp) );
@@ -937,10 +936,9 @@ void GameControl::TryToDefend(Actor *source, Actor *tgt)
 	char Tmp[40];
 	ieWord tmp;
 
-	//this won't work atm, target must be honoured by Attack
 	source->ClearPath();
 	source->ClearActions();
-	strncpy(Tmp,"ProtectObject()",sizeof(Tmp) );
+	strncpy(Tmp,"NIDSpecial4()",sizeof(Tmp) );
 	tmp = targetID;
 	targetID=tgt->globalID; //this is a hack, not deadly, but a hack
 	source->AddAction( GenerateAction( Tmp) );

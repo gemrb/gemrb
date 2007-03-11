@@ -5304,6 +5304,7 @@ void GameScript::ProtectObject(Scriptable* Sender, Action* parameters)
 	//not exactly range
 	scr->FollowOffset.x = parameters->int0Parameter;
 	scr->FollowOffset.y = parameters->int0Parameter;
+	scr->WalkTo( tar->Pos, 0, MAX_OPERATING_DISTANCE );
 }
 
 //keeps following the object in formation
