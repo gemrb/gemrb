@@ -289,9 +289,9 @@ void ScriptedAnimation::SetFullPalette(int idx)
 {
 	ieResRef PaletteResRef;
 
-	snprintf(PaletteResRef,8,"%.7s%d",ResName, idx);
-	strlwr(PaletteResRef);
-
+	//make sure this field is zero terminated, or strlwr will run rampant!!!
+	snprintf(PaletteResRef,sizeof(PaletteResRef),"%.7s%d",ResName, idx);
+	strnlwrcpy(PaletteResRef,PaletteResRef,8);
 	SetFullPalette(PaletteResRef);
 }
 
