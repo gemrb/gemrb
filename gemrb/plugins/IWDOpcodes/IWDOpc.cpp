@@ -387,7 +387,7 @@ int fx_iwd_visual_spell_hit (Actor* /*Owner*/, Actor* target, Effect* fx)
 			}
 		}
 		sca->SetBlend();
-
+		sca->PlayOnce();
 		map->AddVVCell(sca);
 	}
 	return FX_NOT_APPLIED;
