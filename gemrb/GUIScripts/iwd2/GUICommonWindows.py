@@ -214,6 +214,9 @@ def ActionTalkPressed ():
 def ActionAttackPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_ATTACK)
 
+def ActionDefendPressed ():
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_DEFEND)
+
 def ActionStopPressed ():
 	for i in range (PARTY_SIZE):
 		if GemRB.GameIsPCSelected(i + 1):
@@ -237,19 +240,15 @@ def GetActorClassTitle (actor):
 	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
 	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
 	ClassTable = GemRB.LoadTable ("classes")
-	print "Kit:",Kit
 	if Kit==0x4000 or Kit==0: #pure class
 		ClassIndex = Class
 	else: #bad, because kit clashes with classid
 		ClassIndex = GemRB.FindTableValue (ClassTable, 2, Kit)
-		print "ClassIndex",ClassIndex
 
 	if ClassTitle==0:
 		ClassTitle=GemRB.GetTableValue (ClassTable, ClassIndex, 0)
-		print "ClassTitle",ClassTitle
 
 	GemRB.UnloadTable (ClassTable)
-	print "ClassTitle", ClassTitle
 	return ClassTitle
 
 def GetActorPaperDoll (actor):
@@ -293,6 +292,9 @@ def OpenPortraitWindow ():
 		Button = GemRB.GetControl (Window, i)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "PortraitButtonOnPress")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "PortraitButtonOnShiftPress")
+		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnDropItemToPC")
+		GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_ENTER_BUTTON, "PortraitButtonOnMouseEnter")
+		GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_LEAVE_BUTTON, "PortraitButtonOnMouseLeave")
 
 		GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_ALIGN_TOP|IE_GUI_BUTTON_ALIGN_LEFT|IE_GUI_BUTTON_PICTURE, OP_SET)
 
@@ -305,7 +307,7 @@ def OpenPortraitWindow ():
 	UpdatePortraitWindow ()
 	SelectionChanged ()
 	return Window
-	
+
 def UpdatePortraitWindow ():
 	Window = PortraitWindow
 
@@ -369,6 +371,17 @@ def SelectionChanged ():
 			Button = GemRB.GetControl (PortraitWindow, i)
 			GemRB.EnableButtonBorder (PortraitWindow, Button, FRAME_PC_SELECTED, i + 1 == sel)
 
+def PortraitButtonOnMouseEnter ():
+	i = GemRB.GetVar ("PressedPortrait")
+	if GemRB.IsDraggingItem ():
+		Button = GemRB.GetControl (PortraitWindow, i)
+		GemRB.EnableButtonBorder (PortraitWindow, Button, FRAME_PC_TARGET, 1)
+
+def PortraitButtonOnMouseLeave ():
+	i = GemRB.GetVar ("PressedPortrait")
+	Button = GemRB.GetControl (PortraitWindow, i)
+	GemRB.EnableButtonBorder (PortraitWindow, Button, FRAME_PC_TARGET, 0)
+
 def GetSavingThrow (SaveName, row, level):
 	SaveTable = GemRB.LoadTable (SaveName)
 	tmp = GemRB.GetTableValue (SaveTable, level)
@@ -395,10 +408,8 @@ def SetupSavingThrows (pc):
 			Class = GemRB.FindTableValue (ClassTable, 5, 4)
 		SaveName2 = GemRB.GetTableValue (ClassTable, Class, 3)
 		Class = 0  #fighter
-		print "SaveName2", SaveName2
 
 	SaveName1 = GemRB.GetTableValue (ClassTable, Class, 3)
-	print "SaveName1", SaveName1
 
 	for row in range(5):
 		tmp1 = GetSavingThrow (SaveName1, row, level1)
@@ -407,19 +418,18 @@ def SetupSavingThrows (pc):
 			if tmp2<tmp1:
 				tmp1=tmp2
 		GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+row, tmp1)
-		print "Savingthrow:", tmp1
 	return
 
 def SetEncumbranceLabels (Window, Label, Label2, pc):
 	# encumbrance
 	# Loading tables of modifications
-	Table = GemRB.LoadTable("strmod")
-	TableEx = GemRB.LoadTable("strmodex")
+	Table = GemRB.LoadTable ("strmod")
+	TableEx = GemRB.LoadTable ("strmodex")
 	# Getting the character's strength
 	sstr = GemRB.GetPlayerStat (pc, IE_STR)
 	ext_str = GemRB.GetPlayerStat (pc, IE_STREXTRA)
 
-	max_encumb = GemRB.GetTableValue (Table, sstr, 3) + GemRB.GetTableValue(TableEx, ext_str, 3)
+	max_encumb = GemRB.GetTableValue (Table, sstr, 3) + GemRB.GetTableValue (TableEx, ext_str, 3)
 	encumbrance = GemRB.GetPlayerStat (pc, IE_ENCUMBRANCE)
 
 	Label = GemRB.GetControl (Window, 0x10000043)

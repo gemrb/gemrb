@@ -255,7 +255,7 @@ def ActionTalkPressed ():
 def ActionAttackPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_ATTACK)
 
-def ActionDefendpressed ():
+def ActionDefendPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_DEFEND)
 
 def ActionQWeaponPressed (which):

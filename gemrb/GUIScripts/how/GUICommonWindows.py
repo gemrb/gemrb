@@ -261,7 +261,7 @@ def ActionTalkPressed ():
 def ActionAttackPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_ATTACK)
 
-def ActionDefendpressed ():
+def ActionDefendPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_DEFEND)
 
 def ActionQWeaponPressed (which):
@@ -520,7 +520,7 @@ def UpdatePortraitWindow ():
 			GemRB.SetText (Window, Button, "")
 			GemRB.SetTooltip (Window, Button, "")
 			continue
-		
+
 		sel = GemRB.GameGetSelectedPCSingle () == i + 1
 		GemRB.SetButtonPicture (Window, Button, pic, "NOPORTSM")
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
