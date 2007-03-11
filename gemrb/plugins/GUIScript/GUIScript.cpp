@@ -4480,7 +4480,7 @@ static PyObject* GemRB_SetSpellIcon(PyObject * /*self*/, PyObject* args)
 }
 
 
-Sprite2D* GetUsedWeaponIcon(Item *item, int which)
+static Sprite2D* GetUsedWeaponIcon(Item *item, int which)
 {
 	ITMExtHeader *ieh = item->GetWeaponHeader(false);
 	if (!ieh) {
@@ -4490,6 +4490,22 @@ Sprite2D* GetUsedWeaponIcon(Item *item, int which)
 		return core->GetBAMSprite(ieh->UseIcon, -1, which);
 	}
 	return core->GetBAMSprite(item->ItemIcon, -1, which);
+}
+
+static void SetItemText(int wi, int ci, int charges)
+{
+	Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
+	if (!btn) {
+		return;
+	}
+	char tmp[10];
+
+	if (charges) {
+		sprintf(tmp,"%d",charges);
+	} else {
+		tmp[0]=0;
+	}
+	btn->SetText(tmp);
 }
 
 PyDoc_STRVAR( GemRB_SetItemIcon__doc,
@@ -6725,23 +6741,7 @@ static void ReadActionButtons()
 	}
 	core->DelTable( table );
 }
-/*
-	table = core->LoadTable( "qslots");
-	if (table<0) {
-		return;
-	}
-	tab = core->GetTable( table );
-	ClassCount = tab->GetRowCount();
-	GUIBTDefaults = new ActionButtonRow[ClassCount];
 
-	for (i = 0; i < ClassCount; i++) {
-		memcpy(GUIBTDefaults+i, &DefaultButtons, sizeof(ActionButtonRow));
-		for (int j=0;j<9;j++) {
-			GUIBTDefaults[i][j+3]=atoi( tab->QueryField(i,j) );
-		}
-	}
-}
-*/
 static void SetButtonCycle(AnimationFactory *bam, Button *btn, int cycle, unsigned char which)
 {
 	Sprite2D *tspr = bam->GetFrame( cycle, 0 );
@@ -7195,6 +7195,7 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 						}
 					}
 					SetItemIcon(wi, ci, item->ItemResRef,mode,(item->Flags&IE_INV_ITEM_IDENTIFIED)?2:1, i+1, Item2ResRef);
+					SetItemText(wi, ci, item->Usages[actor->PCStats->QuickWeaponHeaders[action-ACT_WEAPON1]]);
 					if (usedslot == slot) {
 						btn->EnableBorder(0, true);
 						if (core->GetGameControl()->target_mode&TARGET_MODE_ATTACK) {
@@ -7244,6 +7245,7 @@ jump_label:
 				CREItem *item = actor->inventory.GetSlotItem(slot);
 				if (item) {
 					SetItemIcon(wi, ci, item->ItemResRef,0,(item->Flags&IE_INV_ITEM_IDENTIFIED)?2:1, i+1, 0);
+					SetItemText(wi, ci, item->Usages[actor->PCStats->QuickItemHeaders[tmp]]);
 				}
 			}
 		}

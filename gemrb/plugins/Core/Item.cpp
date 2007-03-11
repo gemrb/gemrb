@@ -109,7 +109,7 @@ int Item::UseCharge(ieWord *Charges, int header)
 		header = 0;
 	}
 	ccount = --Charges[header];
-	if (!ieh->Charges) {
+	if (ieh->Charges==0) {
 		return CHG_NONE;
 	}
 	if (ccount>0) {
