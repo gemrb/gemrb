@@ -4492,7 +4492,7 @@ static Sprite2D* GetUsedWeaponIcon(Item *item, int which)
 	return core->GetBAMSprite(item->ItemIcon, -1, which);
 }
 
-static void SetItemText(int wi, int ci, int charges)
+static void SetItemText(int wi, int ci, int charges, bool oneisnone)
 {
 	Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
 	if (!btn) {
@@ -4500,7 +4500,7 @@ static void SetItemText(int wi, int ci, int charges)
 	}
 	char tmp[10];
 
-	if (charges) {
+	if (charges && (charges>1 || !oneisnone) ) {
 		sprintf(tmp,"%d",charges);
 	} else {
 		tmp[0]=0;
@@ -6797,7 +6797,7 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, int Index, int
 	SetButtonCycle(bam, btn, (char) row.bytes[1], IE_GUI_BUTTON_PRESSED);
 	SetButtonCycle(bam, btn, (char) row.bytes[2], IE_GUI_BUTTON_SELECTED);
 	SetButtonCycle(bam, btn, (char) row.bytes[3], IE_GUI_BUTTON_DISABLED);
-	btn->SetFlags( IE_GUI_BUTTON_NORMAL, BM_SET );
+	btn->SetFlags( IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_PICTURE, BM_NAND );
 	ieVariable Event;
 	snprintf(Event,sizeof(Event)-1, "Action%sPressed", GUIEvent[Index]);
 	btn->SetEvent( IE_GUI_BUTTON_ON_PRESS, Event );
@@ -7013,7 +7013,6 @@ static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 			SetButtonCycle(bam, btn, 2, IE_GUI_BUTTON_SELECTED);
 			SetButtonCycle(bam, btn, 3, IE_GUI_BUTTON_DISABLED);
 			btn->SetPicture( Picture );
-			//btn->SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_RIGHT, BM_SET);
 			btn->SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, BM_SET);
 			btn->SetTooltip(core->GetString(spell->strref,0));
 			char usagestr[10];
@@ -7080,11 +7079,13 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 		} else {
 			action&=31;
 		}
-		PyObject *ret = SetActionIcon(wi,ci,action,i+1);
 		Button * btn = (Button *) GetControl(wi,ci,IE_GUI_BUTTON);
 		if (!btn) {
 			return NULL;
 		}
+		btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, BM_SET);
+		SetItemText(wi, ci, 0, false);
+		PyObject *ret = SetActionIcon(wi,ci,action,i+1);
 
 		int state = IE_GUI_BUTTON_UNPRESSED;
 		ieDword modalstate = actor->ModalState;
@@ -7195,7 +7196,7 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 						}
 					}
 					SetItemIcon(wi, ci, item->ItemResRef,mode,(item->Flags&IE_INV_ITEM_IDENTIFIED)?2:1, i+1, Item2ResRef);
-					SetItemText(wi, ci, item->Usages[actor->PCStats->QuickWeaponHeaders[action-ACT_WEAPON1]]);
+					SetItemText(wi, ci, item->Usages[actor->PCStats->QuickWeaponHeaders[action-ACT_WEAPON1]], true);
 					if (usedslot == slot) {
 						btn->EnableBorder(0, true);
 						if (core->GetGameControl()->target_mode&TARGET_MODE_ATTACK) {
@@ -7245,7 +7246,7 @@ jump_label:
 				CREItem *item = actor->inventory.GetSlotItem(slot);
 				if (item) {
 					SetItemIcon(wi, ci, item->ItemResRef,0,(item->Flags&IE_INV_ITEM_IDENTIFIED)?2:1, i+1, 0);
-					SetItemText(wi, ci, item->Usages[actor->PCStats->QuickItemHeaders[tmp]]);
+					SetItemText(wi, ci, item->Usages[actor->PCStats->QuickItemHeaders[tmp]], false);
 				}
 			}
 		}
