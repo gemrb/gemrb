@@ -114,7 +114,7 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 
 def AIPress ():
 	Button = GemRB.GetControl (PortraitWindow, 6)
-	AI = GemRB.GetMessageWindowSize() & GS_PARTYAI
+	AI = GemRB.GetMessageWindowSize () & GS_PARTYAI
 
 	if AI:
 		GemRB.GameSetScreenFlags(GS_PARTYAI, OP_NAND)
@@ -140,7 +140,7 @@ def EmptyControls ():
 	return
 
 def SelectFormationPreset ():
-	GemRB.GameSetFormation ( GemRB.GetVar ("Value"), GemRB.GetVar ("Formation") )
+	GemRB.GameSetFormation (GemRB.GetVar ("Value"), GemRB.GetVar ("Formation") )
 	GroupControls ()
 	return
 
@@ -271,14 +271,17 @@ def ActionTalkPressed ():
 def ActionAttackPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_ATTACK)
 
-def ActionQWeaponPressed (which):
-	pc = GemRB.GameGetFirstSelectedPC()
+def ActionDefendpressed ():
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_DEFEND)
 
-	if GemRB.GetEquippedQuickSlot(pc)==which and not (GemRB.GameControlGetTargetMode() &TARGET_MODE_ATTACK):
+def ActionQWeaponPressed (which):
+	pc = GemRB.GameGetFirstSelectedPC ()
+
+	if GemRB.GetEquippedQuickSlot (pc)==which and not (GemRB.GameControlGetTargetMode() &TARGET_MODE_ATTACK):
 		GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_ATTACK)
 	else:
 		GemRB.GameControlSetTargetMode (TARGET_MODE_ALL)
-		GemRB.SetEquippedQuickSlot(pc, which)
+		GemRB.SetEquippedQuickSlot (pc, which)
 
 	GemRB.SetupControls (ActionsWindow, pc)
 	UpdateActionsWindow ()
@@ -315,7 +318,7 @@ def ActionLeftPressed ():
 
 #no check needed because the button wouldn't be drawn if illegal
 def ActionRightPressed ():
-	pc = GemRB.GameGetFirstSelectedPC()
+	pc = GemRB.GameGetFirstSelectedPC ()
 	TopIndex = GemRB.GetVar ("TopIndex")
 	Type = GemRB.GetVar ("Type")
 	if Type == 3:
@@ -334,25 +337,25 @@ def ActionRightPressed ():
 	return
 
 def ActionSongPressed ():
-	pc = GemRB.GameGetFirstSelectedPC()
+	pc = GemRB.GameGetFirstSelectedPC ()
 	GemRB.SetModalState (pc, MS_BATTLESONG)
 	UpdateActionsWindow ()
 	return
 
 def ActionSearchPressed ():
-	pc = GemRB.GameGetFirstSelectedPC()
+	pc = GemRB.GameGetFirstSelectedPC ()
 	GemRB.SetModalState (pc, MS_DETECTTRAPS)
 	UpdateActionsWindow ()
 	return
 
 def ActionStealthPressed ():
-	pc = GemRB.GameGetFirstSelectedPC()
+	pc = GemRB.GameGetFirstSelectedPC ()
 	GemRB.SetModalState (pc, MS_STEALTH)
 	UpdateActionsWindow ()
 	return
 	
 def ActionTurnPressed ():
-	pc = GemRB.GameGetFirstSelectedPC()
+	pc = GemRB.GameGetFirstSelectedPC ()
 	GemRB.SetModalState (pc, MS_TURNUNDEAD)
 	UpdateActionsWindow ()
 	return
@@ -370,7 +373,7 @@ def ActionCastPressed ():
 	return
 
 def ActionQItemPressed (action):
-	pc = GemRB.GameGetFirstSelectedPC()
+	pc = GemRB.GameGetFirstSelectedPC ()
 	#quick slot
 	GemRB.UseItem(pc, -2, action)
 	return
@@ -402,7 +405,7 @@ def ActionInnatePressed ():
 	return
 
 def SpellPressed ():
-	pc = GemRB.GameGetFirstSelectedPC()
+	pc = GemRB.GameGetFirstSelectedPC ()
 
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_CAST)
 	Spell = GemRB.GetVar("Spell")
@@ -411,7 +414,7 @@ def SpellPressed ():
 	return
 
 def EquipmentPressed ():
-	pc = GemRB.GameGetFirstSelectedPC()
+	pc = GemRB.GameGetFirstSelectedPC ()
 
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_CAST)
 	Item = GemRB.GetVar("Equipment")
@@ -480,7 +483,7 @@ def OpenPortraitWindow (needcontrols):
 
 		# AI
 		Button = GemRB.GetControl (Window, 6)
-		GSFlags = GemRB.GetMessageWindowSize()&GS_PARTYAI
+		GSFlags = GemRB.GetMessageWindowSize ()&GS_PARTYAI
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "AIPress")
 		GemRB.SetVarAssoc (Window, Button, "", GSFlags)
 		if GSFlags:

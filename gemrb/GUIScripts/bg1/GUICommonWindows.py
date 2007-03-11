@@ -27,6 +27,7 @@ import GemRB
 from GUIDefines import *
 from ie_stats import *
 from ie_modal import *
+from ie_action import *
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
@@ -104,7 +105,7 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 
 def AIPress ():
 	Button = GemRB.GetControl (PortraitWindow, 6)
-	AI = GemRB.GetMessageWindowSize() & GS_PARTYAI
+	AI = GemRB.GetMessageWindowSize () & GS_PARTYAI
 
 	if AI:
 		GemRB.GameSetScreenFlags(GS_PARTYAI, OP_NAND)
@@ -138,7 +139,7 @@ def SetupFormation ():
 	global ActionsWindow
 
 	Window = ActionsWindow
-	for i in range (12):
+	for i in range(12):
 		Button = GemRB.GetControl (Window, i)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NORMAL, OP_SET)
 		GemRB.SetButtonSprites (Window, Button, "GUIBTBUT",0,0,1,2,3)
@@ -254,6 +255,9 @@ def ActionTalkPressed ():
 def ActionAttackPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_ATTACK)
 
+def ActionDefendpressed ():
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_DEFEND)
+
 def ActionQWeaponPressed (which):
 	pc = GemRB.GameGetFirstSelectedPC ()
 
@@ -293,7 +297,7 @@ def ActionLeftPressed ():
 	else:
 		TopIndex = 0
 	GemRB.SetVar ("TopIndex", TopIndex)
-	UpdateActionsWindow () 
+	UpdateActionsWindow ()
 	return
 
 #no check needed because the button wouldn't be drawn if illegal
@@ -312,7 +316,7 @@ def ActionRightPressed ():
 		else:
 			TopIndex = 0
 
-	GemRB.SetVar ("TopIndex", TopIndex) 
+	GemRB.SetVar ("TopIndex", TopIndex)
 	UpdateActionsWindow ()
 	return
 
@@ -354,27 +358,28 @@ def ActionCastPressed ():
 
 def ActionQItemPressed (action):
 	pc = GemRB.GameGetFirstSelectedPC ()
-	GemRB.UseItem(pc, action)
+	#quick slot
+	GemRB.UseItem(pc, -2, action)
 	return
 	
 def ActionQItem1Pressed ():
-	ActionQItemPressed (9)
+	ActionQItemPressed (ACT_QSLOT1)
 	return
 
 def ActionQItem2Pressed ():
-	ActionQItemPressed (11)
+	ActionQItemPressed (ACT_QSLOT2)
 	return
 
 def ActionQItem3Pressed ():
-	ActionQItemPressed (12)
+	ActionQItemPressed (ACT_QSLOT3)
 	return
 
 def ActionQItem4Pressed ():
-	ActionQItemPressed (10)
+	ActionQItemPressed (ACT_QSLOT4)
 	return
 
 def ActionQItem5Pressed ():
-	ActionQItemPressed (31)
+	ActionQItemPressed (ACT_QSLOT5)
 	return
 
 def ActionInnatePressed ():
@@ -397,7 +402,7 @@ def EquipmentPressed ():
 	Item = GemRB.GetVar("Equipment")
 	GemRB.UseItem(pc, -1, Item)
 	return
- 
+
 def GetActorClassTitle (actor):
 	ClassTitle = GemRB.GetPlayerStat (actor, IE_TITLE1)
 	KitIndex = GemRB.GetPlayerStat (actor, IE_KIT) & 0xfff
@@ -450,12 +455,12 @@ def RunSelectionChangeHandler ():
 def OpenPortraitWindow (needcontrols):
 	global PortraitWindow
 
-	PortraitWindow = Window = GemRB.LoadWindow(1)
+	PortraitWindow = Window = GemRB.LoadWindow (1)
 
 	# AI
 	if needcontrols:
 		Button = GemRB.GetControl (Window, 6)
-		GSFlags = GemRB.GetMessageWindowSize()&GS_PARTYAI
+		GSFlags = GemRB.GetMessageWindowSize ()&GS_PARTYAI
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX,OP_OR)
 		#this control is crippled
 		GemRB.SetButtonSprites (Window, Button, "GUIBTACT", 0, 46, 47, 48, 49)
@@ -470,6 +475,8 @@ def OpenPortraitWindow (needcontrols):
 		Button = GemRB.GetControl (Window, 7)
 		GemRB.SetTooltip (Window, Button, 10485)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
+	pc = GemRB.GameGetSelectedPCSingle ()
+	Inventory = GemRB.GetVar ("Inventory")
 
 	for i in range (PARTY_SIZE):
 		Button = GemRB.GetControl (Window, i)
@@ -484,6 +491,11 @@ def OpenPortraitWindow (needcontrols):
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnDropItemToPC")
 		GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_ENTER_BUTTON, "PortraitButtonOnMouseEnter")
 		GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_LEAVE_BUTTON, "PortraitButtonOnMouseLeave")
+		if Inventory and pc !=i+1:
+			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
+			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
+			GemRB.SetText (Window, Button, "")
+			GemRB.SetTooltip (Window, Button, "")
 
 		GemRB.SetButtonBorder (Window, Button, FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
 		GemRB.SetButtonBorder (Window, Button, FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
@@ -512,7 +524,7 @@ def UpdatePortraitWindow ():
 		hp_max = GemRB.GetPlayerStat (i+1, IE_MAXHITPOINTS)
 
 		GemRB.SetTooltip (Window, Button, GemRB.GetPlayerName (i+1, 1) + "\n%d/%d" %(hp, hp_max))
- 
+
 
 def PortraitButtonOnPress ():
 	i = GemRB.GetVar ("PressedPortrait")

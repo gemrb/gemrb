@@ -111,10 +111,10 @@ def LoadGamePress():
 
 def SaveGamePress():
 	OpenOptionsWindow ()
-        GemRB.SetVar("QuitAfterSave",0)
-        OpenSaveWindow ()
-        #save the game without quitting
-        return
+	GemRB.SetVar("QuitAfterSave",0)
+	OpenSaveWindow ()
+	#save the game without quitting
+	return
 
 def QuitGamePress():
 	OpenOptionsWindow ()

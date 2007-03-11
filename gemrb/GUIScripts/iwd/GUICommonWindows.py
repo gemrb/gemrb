@@ -225,6 +225,9 @@ def UpdateActionsWindow ():
 	for i in range (12):
 		Button = GemRB.GetControl (ActionsWindow, i)
 		GemRB.SetButtonBorder (ActionsWindow, Button, 1, 0, 0, 0, 0, 50,30,10,120, 0, 1)
+		GemRB.SetButtonFont (ActionsWindow, Button, "NUMBER")
+		GemRB.SetText (ActionsWindow, Button, "")
+
 
 	if pc == 0:
 		EmptyControls ()
@@ -256,6 +259,9 @@ def ActionTalkPressed ():
 
 def ActionAttackPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_ATTACK)
+
+def ActionDefendpressed ():
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_DEFEND)
 
 def ActionQWeaponPressed (which):
 	pc = GemRB.GameGetFirstSelectedPC()

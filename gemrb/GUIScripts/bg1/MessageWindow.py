@@ -156,7 +156,7 @@ def UpdateControlStatus():
 	GemRB.SetVar("MessageWindow", TMessageWindow)
 	GemRB.SetVar("MessageTextArea", TMessageTA)
 	if Override:
-		GemRB.SetControlStatus (MessageWindow,MessageTA,IE_GUI_CONTROL_FOCUSED)
+		GemRB.SetControlStatus (TMessageWindow,TMessageTA,IE_GUI_CONTROL_FOCUSED)
 	else:
 		GemRB.SetControlStatus (0,0,IE_GUI_CONTROL_FOCUSED)
 
