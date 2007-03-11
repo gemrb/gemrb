@@ -876,6 +876,8 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			nextCursor = IE_CURSOR_ATTACK;
 		} else if (target_mode & TARGET_MODE_CAST) {
 			nextCursor = IE_CURSOR_CAST;
+		} else if (target_mode & TARGET_MODE_DEFEND) {
+			nextCursor = IE_CURSOR_DEFEND;
 		}
 
 		
@@ -922,6 +924,23 @@ void GameControl::TryToAttack(Actor *source, Actor *tgt)
 	source->ClearPath();
 	source->ClearActions();
 	strncpy(Tmp,"NIDSpecial3()",sizeof(Tmp) );
+	tmp = targetID;
+	targetID=tgt->globalID; //this is a hack, not deadly, but a hack
+	source->AddAction( GenerateAction( Tmp) );
+	//we restore the old target ID, because this variable is primarily
+	//to keep track of the target of a dialog, and attacking isn't talking
+	targetID = tmp;
+}
+
+void GameControl::TryToDefend(Actor *source, Actor *tgt)
+{
+	char Tmp[40];
+	ieWord tmp;
+
+	//this won't work atm, target must be honoured by Attack
+	source->ClearPath();
+	source->ClearActions();
+	strncpy(Tmp,"ProtectObject()",sizeof(Tmp) );
 	tmp = targetID;
 	targetID=tgt->globalID; //this is a hack, not deadly, but a hack
 	source->AddAction( GenerateAction( Tmp) );
@@ -1156,6 +1175,8 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 		type = 1;
 	} else if (target_mode&TARGET_MODE_CAST) {
 		type = 3;
+	} else if (target_mode&TARGET_MODE_DEFEND) {
+		type = 4;
 	}
 
 	target_mode = TARGET_MODE_NONE;
@@ -1188,6 +1209,11 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			break;
 		case 3: //cast on target
 			break;
+		case 4:
+			for(i=0;i<game->selected.size();i++) {
+				TryToDefend(game->selected[i], actor);
+			}
+			
 	}
 }
 /** Special Key Press */

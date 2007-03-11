@@ -72,6 +72,7 @@ class Window;
 #define TARGET_MODE_TALK    0x01
 #define TARGET_MODE_ATTACK  0x02
 #define TARGET_MODE_CAST    0x04
+#define TARGET_MODE_DEFEND  0x08
 
 #define TARGET_MODE_ALLY    0x10
 #define TARGET_MODE_ENEMY   0x20
@@ -170,6 +171,7 @@ public:
 	int HideGUI();
 	int UnhideGUI();
 	void TryToAttack(Actor *source, Actor *target);
+	void TryToDefend(Actor *source, Actor *target);
 	void TryToTalk(Actor *source, Actor *target);
 	void HandleContainer(Container *container, Actor *actor);
 	void HandleDoor(Door *door, Actor *actor);
