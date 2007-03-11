@@ -593,9 +593,15 @@ bool EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 		}
 		//effect triggered
 		fx->TimingMode=TriggeredEffect((ieByte) fx->TimingMode);
+		//delayed duration (3)
+		if (NeedPrepare((ieByte) fx->TimingMode) ) {
+			//prepare for delayed duration effects
+			fx->Duration=fx->SecondaryDelay;
+			PrepareDuration(fx);      
+		}
 		break;
 	case DURATION:
-		if (fx->Duration>GameTime) {
+		if (fx->Duration<=GameTime) {
 			fx->TimingMode=FX_DURATION_JUST_EXPIRED;
 			//add a return here, if 0 duration effects shouldn't work
 		}
@@ -645,12 +651,6 @@ bool EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 	} else {
 		//effect not found, it is going to be discarded
 		fx->TimingMode=FX_DURATION_JUST_EXPIRED;
-	}
-	//delayed duration (3)
-	if (NeedPrepare((ieByte) fx->TimingMode) ) {
-		//prepare for delayed duration effects
-		fx->Duration=fx->SecondaryDelay;
-		PrepareDuration(fx);      
 	}
 	return flg;
 }

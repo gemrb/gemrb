@@ -447,8 +447,6 @@ public:
 	int PlayMovie(const char * ResRef);
 	/** Generates traditional random number xdy+z */
 	int Roll(int dice, int size, int add);
-	/** Returns true on successful saving throw */
-	bool SavingThrow(int Save, int Bonus);
 	/** Loads a Game Compiled Script */
 	int LoadScript(const char * ResRef);
 	/** Enables/Disables the CutScene Mode */

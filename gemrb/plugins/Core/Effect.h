@@ -60,10 +60,11 @@ class Actor;
 
 // Effect resistance types
 #define FX_NO_RESIST_NO_DISPEL      0
-#define FX_CAN_RESIST_CAN_DISPEL    1
+#define FX_NO_RESIST_CAN_DISPEL     1
 #define FX_CAN_RESIST_NO_DISPEL     2
-#define FX_NO_RESIST_CAN_DISPEL     3
+#define FX_CAN_RESIST_CAN_DISPEL    3
 #define FX_CAN_DISPEL               1
+#define FX_CAN_RESIST               2
 
 /**
  * @class Effect

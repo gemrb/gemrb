@@ -3407,13 +3407,6 @@ int Interface::Roll(int dice, int size, int add)
 	return add;
 }
 
-bool Interface::SavingThrow(int Save, int Bonus)
-{
-	int roll = Roll(1, 20, 0);
-	// FIXME: this is 2e saving throw, it's probably different in iwd2
-	return (roll > 1) && (roll + Bonus >= Save);
-}
-
 static char bmp_suffix[6]="M.BMP";
 static char png_suffix[6]="M.PNG";
 
