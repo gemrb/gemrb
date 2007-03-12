@@ -425,7 +425,7 @@ public:
 	/* Sets equipped Quick slot */
 	int SetEquippedQuickSlot(int slot);
 	/* Uses an item on the target or point */
-	bool UseItemPoint(int slot, ieDword header, Point &point);
+	bool UseItemPoint(int slot, ieDword header, Point &point, bool silent);
 	bool UseItem(int slot, ieDword header, Scriptable *target, bool silent);
 	/* Deducts a charge from an item */
 	void ChargeItem(int slot, ieDword header, CREItem *item, Item *itm, bool silent);

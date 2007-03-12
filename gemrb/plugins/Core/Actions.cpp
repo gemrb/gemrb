@@ -5102,7 +5102,7 @@ void GameScript::UseItemPoint(Scriptable* Sender, Action* parameters)
 		//this is actually not in the original game code
 		header = parameters->int1Parameter;
 	}
-	scr->UseItemPoint(Slot, header, parameters->pointParameter);
+	scr->UseItemPoint(Slot, header, parameters->pointParameter, false);
 }
 
 //addfeat will be able to remove feats too

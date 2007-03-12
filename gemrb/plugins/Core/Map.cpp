@@ -29,6 +29,7 @@
 #include "SpriteCover.h"
 #include "TileMap.h"
 #include "ScriptedAnimation.h"
+#include "Projectile.h"
 #include "ImageMgr.h"
 #include "Video.h"
 #include "ResourceMgr.h"
@@ -96,7 +97,7 @@ void Map::ReleaseMemory()
 	PathFinderInited = false;
 }
 
-inline static AnimationObjectType SelectObject(Actor *actor, AreaAnimation *a, ScriptedAnimation *sca, Particles *spark)
+inline static AnimationObjectType SelectObject(Actor *actor, AreaAnimation *a, ScriptedAnimation *sca, Particles *spark, Projectile *pro)
 {
 	int actorh;
 	if (actor) {
@@ -126,6 +127,15 @@ inline static AnimationObjectType SelectObject(Actor *actor, AreaAnimation *a, S
 	} else {
 		spah = 0x7fffffff;
 	}
+
+	int proh;
+	if (pro) {
+		proh = pro->GetHeight();
+	} else {
+		proh = 0x7fffffff;
+	}
+
+	if (proh<actorh && proh<scah && proh<aah && proh<spah) return AOT_PROJECTILE;
 
 	if (spah<actorh && spah<scah && spah<aah) return AOT_SPARK;
 
@@ -429,6 +439,12 @@ Map::~Map(void)
 			free(queue[i]);
 			queue[i] = NULL;
 		}
+	}
+
+	proIterator pri;
+
+	for (pri = projectiles.begin(); pri != projectiles.end(); pri++) {
+		delete (*pri);
 	}
 
 	scaIterator sci;
@@ -809,6 +825,15 @@ Particles *Map::GetNextSpark(spaIterator &iter)
 }
 
 //doesn't increase iterator, because we might need to erase it from the list
+Projectile *Map::GetNextProjectile(proIterator &iter)
+{
+	if (iter==projectiles.end()) {
+		return NULL;
+	}
+	return *iter;
+}
+
+//doesn't increase iterator, because we might need to erase it from the list
 ScriptedAnimation *Map::GetNextScriptedAnimation(scaIterator &iter)
 {
 	if (iter==vvcCells.end()) {
@@ -860,14 +885,16 @@ void Map::DrawMap(Region screen, GameControl* gc)
 	Actor* actor = GetNextActor(q, index);
 	aniIterator aniidx = animations.begin();
 	scaIterator scaidx = vvcCells.begin();
+	proIterator proidx = projectiles.begin();
 	spaIterator spaidx = particles.begin();
 
 	AreaAnimation *a = GetNextAreaAnimation(aniidx, gametime);
 	ScriptedAnimation *sca = GetNextScriptedAnimation(scaidx);
+	Projectile *pro = GetNextProjectile(proidx);
 	Particles *spark = GetNextSpark(spaidx);
 
-	while (actor || a || sca || spark) {
-		switch(SelectObject(actor,a,sca,spark)) {
+	while (actor || a || sca || spark || pro) {
+		switch(SelectObject(actor,a,sca,spark,pro)) {
 		case AOT_ACTOR:
 			actor->Draw( screen );
 			actor = GetNextActor(q, index);
@@ -908,6 +935,24 @@ void Map::DrawMap(Region screen, GameControl* gc)
 				}
 			}
 			sca = GetNextScriptedAnimation(scaidx);
+			break;
+		case AOT_PROJECTILE:
+			{
+				int drawn;
+				if (gametime>oldgametime) {
+					drawn = pro->Update();
+				} else {
+					drawn = 1;
+				}
+				if (drawn) {
+					pro->Draw( screen );
+					proidx++;
+				} else {
+					delete( pro );
+					proidx = projectiles.erase(proidx);
+				}
+			}
+			pro = GetNextProjectile(proidx);
 			break;
 		case AOT_SPARK:
 			{
@@ -1450,8 +1495,10 @@ void Map::GenerateQueues()
 				if (IsVisible(actor->Pos, false) && actor->Schedule(gametime) ) {
 					priority = PR_SCRIPT; //run scripts and display, activated now
 					actor->Unhide();
-					if (actor->Modified[IE_EA]>=EA_EVILCUTOFF) {
-						core->Autopause(AP_ENEMY);
+					if (!(actor->GetInternalFlag()&IF_STOPATTACK)) {
+						if (actor->Modified[IE_EA]>=EA_EVILCUTOFF) {
+							core->Autopause(AP_ENEMY);
+						}
 					}
 				} else {
 					priority = PR_IGNORE;
@@ -1504,6 +1551,29 @@ void Map::SortQueues()
 			baseline[parent]=tmp;
 		}
 	}
+}
+
+void Map::AddProjectile(Projectile* pro, Point &source, ieWord actorID)
+{
+	proIterator iter;
+
+	pro->MoveTo(this,source);
+	pro->SetTarget(actorID);
+	int height = pro->GetHeight();
+	for(iter=projectiles.begin();iter!=projectiles.end() && (*iter)->GetHeight()>height; iter++);
+	projectiles.insert(iter, pro);
+}
+
+//adding projectile in order, based on its height parameter
+void Map::AddProjectile(Projectile* pro, Point &source, Point &dest)
+{
+	proIterator iter;
+
+	pro->MoveTo(this,source);
+	pro->SetTarget(dest);
+	int height = pro->GetHeight();
+	for(iter=projectiles.begin();iter!=projectiles.end() && (*iter)->GetHeight()>height; iter++);
+	projectiles.insert(iter, pro);
 }
 
 //adding videocell in order, based on its height parameter

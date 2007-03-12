@@ -26,6 +26,8 @@
 #include "Interface.h"
 #include "Video.h"
 #include "Game.h"
+#include "ResourceMgr.h"
+#include "SoundMgr.h"
 
 extern Interface* core;
 #ifdef WIN32
@@ -34,8 +36,9 @@ extern HANDLE hConsole;
 
 Projectile::Projectile()
 {
+	autofree = false;
 	Extension = NULL;
-	area = 0;
+	area = NULL;
 	Pos.x = 0;
 	Pos.y = 0;
 	Destination = Pos;
@@ -45,17 +48,23 @@ Projectile::Projectile()
 	step = NULL;
 	timeStartStep = 0;
 	phase = P_UNINITED;
+	effects = NULL;
 }
 
 Projectile::~Projectile()
 {
-	if (Extension) {
+	if (Extension && autofree) {
 		free(Extension);
 	}
+	if (effects) {
+		delete effects;
+	}
+	ClearPath();
 }
 
 void Projectile::InitExtension()
 {
+	autofree = false;
 	if (!Extension) {
 		Extension = (ProjectileExtension *) calloc( 1, sizeof(ProjectileExtension));
 	}
@@ -73,20 +82,48 @@ PathNode *Projectile::GetNextStep(int x)
 	return node;
 }
 
-//this could be used for WingBuffet as well
+//Pass means passing/rebounding/extinguishing on walls
 void Projectile::MoveLine(int steps, int Pass, ieDword orient)
 {
 	//remove previous path
 	ClearPath();
-	if (!steps)
+	if (!steps) {
+		Pos = Destination;
 		return;
+	}
 	path = area->GetLine( Pos, steps, orient, Pass );
+}
+
+void Projectile::CreateAnimations(Animation **anims, ieResRef bamres)
+{
+	AnimationFactory* af = ( AnimationFactory* )
+		core->GetResourceMgr()->GetFactoryResource( bamres,
+		IE_BAM_CLASS_ID, IE_NORMAL );
+	//
+	if (!af) {
+		return;
+	}
+	for (int Cycle = 0; Cycle<MAX_ORIENT; Cycle++) {
+		Animation* a = af->GetCycle( Cycle );
+		anims[Cycle] = a;
+	}
 }
 
 // load animations, start sound
 void Projectile::Setup()
 {
 	phase = P_TRAVEL;
+	core->GetSoundMgr()->Play(SoundRes1, Pos.x, Pos.y, GEM_SND_RELATIVE);
+	memset(travel,0,sizeof(travel));
+	memset(shadow,0,sizeof(shadow));
+	light = NULL;
+	CreateAnimations(travel, BAMRes1);
+	if (TFlags&PTF_SHADOW) {
+		CreateAnimations(shadow, BAMRes2);
+	}
+	if (TFlags&PTF_LIGHT) {
+		//light = CreateLight(LightX, LightY, LightZ);
+	}
 }
 
 //control the phase change when the projectile reached its target
@@ -102,21 +139,37 @@ void Projectile::ChangePhase()
 			phase = P_EXPIRED;
 			return;
 		}
-		Destination = target->Pos;
-		//next position should be current position+speed towards
-		//target
-		return;
+		int steps = Distance(Pos, target);
+
+		if (steps) {
+			SetTarget(target->Pos);
+			return;
+		}
 	}
+
 	//reached target
 	if (!Extension) {
 		phase = P_EXPIRED;
-		//deliver payload to target
+		if (Target) {
+			Actor *target = area->GetActorByGlobalID(Target);
+			if (!target) {
+			  return;
+			}
+			//deliver payload to target
+			effects->AddAllEffects(target);
+			effects = NULL;
+			return;
+		}
+		//get target
+		return;
 	}
+	phase = P_TRIGGER;
 }
 
 void Projectile::DoStep(unsigned int walk_speed)
 {
-	if (!path) {
+	if (!path || !walk_speed) {
+		ChangePhase();
 		return;
 	}
 	ieDword time = core->GetGame()->Ticks;
@@ -140,9 +193,6 @@ void Projectile::DoStep(unsigned int walk_speed)
 		ChangePhase();
 		return;
 	}
-	if (!walk_speed) {
-		return;
-	}
 	if (step->Next->x > step->x)
 		Pos.x += ( unsigned short )
 			( ( ( ( ( step->Next->x * 16 ) + 8 ) - Pos.x ) * ( time - timeStartStep ) ) / walk_speed );
@@ -157,41 +207,27 @@ void Projectile::DoStep(unsigned int walk_speed)
 			( ( ( Pos.y - ( ( step->Next->y * 12 ) + 6 ) ) * ( time - timeStartStep ) ) / walk_speed );
 }
 
-void Projectile::AddWayPoint(Point &Des)
+void Projectile::SetTarget(Point &p)
 {
-	if (!path) {
-		WalkTo(Des);
+	Destination = p;
+	ClearPath();
+	MoveLine( Speed, true, GetOrient(p, Pos) );
+}
+
+void Projectile::SetTarget(ieDword tar)
+{
+	Target = tar;
+	Actor *target = area->GetActorByGlobalID(tar);
+	if (!target) {
+		phase = P_EXPIRED;
 		return;
 	}
-	Destination = Des;
-	PathNode *endNode=path;
-	while(endNode->Next) {
-		endNode=endNode->Next;
-	}
-	Point p(endNode->x, endNode->y);
-	PathNode *path2 = area->FindPath( p, Des );
-	endNode->Next=path2;
+	SetTarget(target->Pos);
 }
 
-void Projectile::WalkTo(Point &Des, int distance)
+void Projectile::MoveTo(Map *map, Point &Des)
 {
-	ClearPath();
-	path = area->FindPath( Pos, Des, distance );
-	//ClearPath sets destination, so Destination must be set after it
-	//also we should set Destination only if there is a walkable path
-	if (path) {
-		Destination = Des;
-	}
-}
-
-void Projectile::RunAwayFrom(Point &Des, int PathLength, int flags)
-{
-	ClearPath();
-	path = area->RunAway( Pos, Des, PathLength, flags );
-}
-
-void Projectile::MoveTo(Point &Des)
-{
+	area = map;
 	Pos = Des;
 	Destination = Des;
 }
@@ -228,6 +264,22 @@ void Projectile::CheckTrigger(unsigned int radius)
 	}
 }
 
+int Projectile::Update()
+{
+	//if reached target explode
+	//if target doesn't exist expire
+	if (phase == P_EXPIRED) {
+		return 0;
+	}
+	if (phase ==P_UNINITED) {
+		Setup();
+	}
+	if (phase == P_TRAVEL) {
+		DoStep(Speed);
+	}
+	return 1;
+}
+
 void Projectile::Draw(Region &screen)
 {
 	switch (phase) {
@@ -244,8 +296,7 @@ void Projectile::Draw(Region &screen)
 		case P_EXPLODING:
 			DrawExplosion(screen);
 			return;
-		case P_EXPLODED:
-		case P_EXPIRED:
+		default:
 			DrawExploded(screen);
 			return;
 	}
@@ -276,6 +327,32 @@ void Projectile::DrawExplosion(Region & /*screen*/)
 */
 }
 
+int Projectile::GetTravelPos(int face)
+{
+	if (travel[face]) {
+		return travel[face]->GetCurrentFrame();
+	}
+	return 0;
+}
+
+int Projectile::GetShadowPos(int face)
+{
+	if (shadow[face]) {
+		return shadow[face]->GetCurrentFrame();
+	}
+	return 0;
+}
+
+void Projectile::SetPos(int face, int frame1, int frame2)
+{
+	if (travel[face]) {
+		travel[face]->SetPos(frame1);
+	}
+	if (shadow[face]) {
+		shadow[face]->SetPos(frame2);
+	}
+}
+
 void Projectile::DrawTravel(Region &screen)
 {
 	Video *video = core->GetVideoDriver();
@@ -283,14 +360,20 @@ void Projectile::DrawTravel(Region &screen)
 	Color tint = {128,128,128,255};
 	unsigned int face = GetNextFace();
 	if (face!=Orientation) {
-		travel[face]->SetPos(travel[Orientation]->GetCurrentFrame());
-		shadow[face]->SetPos(shadow[Orientation]->GetCurrentFrame());
+		SetPos(face, GetTravelPos(face), GetShadowPos(face));
 	}
-	Sprite2D *frame = travel[face]->NextFrame();
-	video->BlitGameSprite( frame, Pos.x + screen.x, Pos.y + screen.y, flag, tint, NULL, NULL, &screen);
+	if (travel[face]) {
+		Sprite2D *frame = travel[face]->NextFrame();
+		video->BlitGameSprite( frame, Pos.x + screen.x, Pos.y + screen.y, flag, tint, NULL, NULL, &screen);
+	}
 
-	frame = shadow[face]->NextFrame();
-	video->BlitGameSprite( frame, Pos.x + screen.x, Pos.y + screen.y, flag, tint, NULL, NULL, &screen);
+	if (shadow[face]) {
+		Sprite2D *frame = shadow[face]->NextFrame();
+		video->BlitGameSprite( frame, Pos.x + screen.x, Pos.y + screen.y, flag, tint, NULL, NULL, &screen);
+	}
 
-	video->BlitGameSprite( light, Pos.x + screen.x, Pos.y + screen.y, flag, tint, NULL, NULL, &screen);
+	if (light) {
+		video->BlitGameSprite( light, Pos.x + screen.x, Pos.y + screen.y, flag, tint, NULL, NULL, &screen);
+	}
 }
+

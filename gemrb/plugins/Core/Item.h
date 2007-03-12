@@ -34,6 +34,8 @@
 #include "AnimationMgr.h"
 #include "EffectQueue.h"
 
+class Projectile;
+
 #ifdef WIN32
 
 #ifdef GEM_BUILD_DLL
@@ -224,6 +226,8 @@ public:
 	}
 	//-1 will return the equipping feature block
 	EffectQueue *GetEffectBlock(int usage) const;
+	//returns a projectile created from an extended header
+	Projectile *GetProjectile(int header) const;
 	//returns the average damage of the weapon (doesn't check for special effects)
 	int GetDamagePotential(bool ranged, ITMExtHeader *&header) const;
 	//returns the weapon header

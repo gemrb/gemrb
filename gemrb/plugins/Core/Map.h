@@ -39,6 +39,7 @@ class ScriptedAnimation;
 class Animation;
 class Wall_Polygon;
 class Particles;
+class Projectile;
 
 #ifdef WIN32
 
@@ -189,7 +190,7 @@ public:
 	bool Schedule(ieDword gametime);
 };
 
-enum AnimationObjectType {AOT_AREA, AOT_SCRIPTED, AOT_ACTOR, AOT_SPARK};
+enum AnimationObjectType {AOT_AREA, AOT_SCRIPTED, AOT_ACTOR, AOT_SPARK, AOT_PROJECTILE};
 
 //i believe we need only the active actors/visible inactive actors queues
 #define QUEUE_COUNT 2
@@ -201,6 +202,7 @@ enum AnimationObjectType {AOT_AREA, AOT_SCRIPTED, AOT_ACTOR, AOT_SPARK};
 
 typedef std::list<AreaAnimation*>::iterator aniIterator;
 typedef std::list<ScriptedAnimation*>::iterator scaIterator;
+typedef std::list<Projectile*>::iterator proIterator;
 typedef std::list<Particles*>::iterator spaIterator;
 
 class GEM_EXPORT Map : public Scriptable {
@@ -229,6 +231,7 @@ private:
 	Wall_Polygon **Walls;
 	unsigned int WallCount;
 	std::list< ScriptedAnimation*> vvcCells;
+	std::list< Projectile*> projectiles;
 	std::list< Particles*> particles;
 	std::vector< Entrance*> entrances;
 	std::vector< Ambient*> ambients;
@@ -303,6 +306,8 @@ public:
 
 	SongHeaderType SongHeader;
 	RestHeaderType RestHeader;
+	void AddProjectile(Projectile* pro, Point &source, Point &dest);
+	void AddProjectile(Projectile* pro, Point &source, ieWord actorID);
 	void AddVVCell(ScriptedAnimation* vvc);
 	bool CanFree();
 	int GetCursor( Point &p);
@@ -398,6 +403,7 @@ public:
 private:
 	AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime);
 	Particles *GetNextSpark(spaIterator &iter);
+	Projectile *GetNextProjectile(proIterator &iter);
 	ScriptedAnimation *GetNextScriptedAnimation(scaIterator &iter);
 	Actor *GetNextActor(int &q, int &index);
 	void DrawSearchMap(Region &screen);

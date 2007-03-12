@@ -28,6 +28,7 @@
 #include "../../includes/strrefs.h"
 #include "Item.h"
 #include "Spell.h"
+#include "Projectile.h"
 #include "Game.h"
 #include "GameScript.h"
 #include "ScriptEngine.h"
@@ -2993,7 +2994,10 @@ int Actor::SetEquippedQuickSlot(int slot)
 	return STR_MAGICWEAPON;
 }
 
-bool Actor::UseItemPoint(int slot, ieDword header, Point &target)
+//if target is a non living scriptable, then we simply shoot for its position
+//the fx should get a NULL target, and handle itself by using the position
+//(shouldn't crash when target is NULL)
+bool Actor::UseItemPoint(int slot, ieDword header, Point &target, bool silent)
 {
 	CREItem *item = inventory.GetSlotItem(slot);
 	if (!item)
@@ -3004,8 +3008,11 @@ bool Actor::UseItemPoint(int slot, ieDword header, Point &target)
 		return false;
 	}
 
+	Projectile *pro = itm->GetProjectile(header);
+	GetCurrentArea()->AddProjectile(pro, Pos, target);
 	//in fact this should build a projectile and hurl it at the target
 	//this is just a temporary solution
+	/*
 	EffectQueue *fx = itm->GetEffectBlock(header);
 	if (!fx)
 		return false;
@@ -3014,14 +3021,20 @@ bool Actor::UseItemPoint(int slot, ieDword header, Point &target)
 		fx->SetOwner(this);
 		fx->AddAllEffects(tar);
 	}
+	*/
 	//
-	ChargeItem(slot, header, item, itm, false);
+	ChargeItem(slot, header, item, itm, silent);
 	core->FreeItem(itm,item->ItemResRef, false);
 	return true;
 }
 
 bool Actor::UseItem(int slot, ieDword header, Scriptable* target, bool silent)
 {
+	if (target->Type!=ST_ACTOR) {
+		return UseItemPoint(slot, header, target->Pos, silent);
+	}
+
+	Actor *tar = (Actor *) target;
 	CREItem *item = inventory.GetSlotItem(slot);
 	if (!item)
 		return false;
@@ -3030,17 +3043,19 @@ bool Actor::UseItem(int slot, ieDword header, Scriptable* target, bool silent)
 	if ((header<CHARGE_COUNTERS) && !item->Usages[header]) {
 		return false;
 	}
+	Projectile *pro = itm->GetProjectile(header);
+	if (pro) {
+		GetCurrentArea()->AddProjectile(pro, Pos, tar->globalID);
+	}
 	//in fact this should build a projectile and hurl it at the target
 	//this is just a temporary solution
+	/*
 	EffectQueue *fx = itm->GetEffectBlock(header);
 	if (!fx)
 		return false;
 	fx->SetOwner(this);
-	if (target->Type==ST_ACTOR) {
-		fx->AddAllEffects((Actor *) target);
-	} else {
-		//ABSOLUTELY NO IDEA YET, only a few effects work on non actors
-	}
+	fx->AddAllEffects(tar);
+	*/
 	//
 	ChargeItem(slot, header, item, itm, silent);
 	core->FreeItem(itm,item->ItemResRef, false);

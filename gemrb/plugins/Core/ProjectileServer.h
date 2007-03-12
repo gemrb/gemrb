@@ -61,6 +61,9 @@ private:
 	unsigned int GetHighestProjectileNumber(); 
 	//this method is used internally
 	Projectile *GetProjectile(unsigned int idx);
+	Projectile *CreateDefaultProjectile(unsigned int idx);
+	//creates a clone from the cached projectiles
+	Projectile *ReturnCopy(unsigned int idx);
 };
 
 #endif // PROJSERVER_H

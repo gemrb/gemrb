@@ -60,6 +60,14 @@
 #define PSF_LOOPING 4  //looping sound
 #define PSF_IGNORE_CENTER 16
 
+//projectile travel flags
+#define PTF_COLOUR  1       //fake colours
+#define PTF_SMOKE   2       //has smoke
+#define PTF_TINT    8       //tint projectile
+#define PTF_SHADOW  32      //has shadow bam
+#define PTF_LIGHT   64      //has light shadow
+#define PTF_BLEND   128     //blend colours
+
 typedef struct ProjectileExtension
 {
 	ieDword AFlags;
@@ -84,6 +92,7 @@ public:
 	Projectile();
 	~Projectile();
 	void InitExtension();
+	void CreateAnimations(Animation **anims, ieResRef bam);
 
 	ieWord Type;
 	ieWord Speed;
@@ -110,6 +119,7 @@ public:
 	ieWord TrailSpeed[3];
 	//
 	ProjectileExtension *Extension;
+	bool autofree;
 	//internals
 protected:
 	//attributes from moveable object
@@ -129,9 +139,13 @@ protected:
 	Animation* shadow[MAX_ORIENT];
 	Sprite2D* light;//this is just a round/halftrans sprite, has no animation
 	Animation** fragments;
+	EffectQueue* effects;
 public:
 	PathNode *GetNextStep(int x);
 	int GetPathLength();
+	void SetTarget(ieDword t);
+	void SetTarget(Point &p);
+
 //inliners to protect data consistency
 	inline PathNode * GetNextStep() {
 		if (!step) {
@@ -142,6 +156,16 @@ public:
 
 	inline unsigned char GetOrientation() const {
 		return Orientation;
+	}
+	//no idea if projectiles got height, using y
+	inline int GetHeight() const {
+		return Pos.y;
+	}
+
+	//don't forget to set effects to NULL when the projectile discharges
+	//unexploded projectiles are responsible to destruct their payload
+	inline void SetEffects(EffectQueue *fx) {
+		effects = fx;
 	}
 
 	inline unsigned char GetNextFace() {
@@ -169,18 +193,21 @@ public:
 	void Setup();
 	void ChangePhase();
 	void DoStep(unsigned int walk_speed);
-	void AddWayPoint(Point &Des);
-	void RunAwayFrom(Point &Des, int PathLength, int flags);
 	void MoveLine(int steps, int Pass, ieDword Orient);
-	void WalkTo(Point &Des, int MinDistance = 0);
-	void MoveTo(Point &Des);
+	void MoveTo(Map *map, Point &Des);
 	void ClearPath();
+	//handle phases, return 0 when expired
+	int Update();
+	//draw object
 	void Draw(Region &screen);
 private:
 	void CheckTrigger(unsigned int radius);
 	void DrawTravel(Region &screen);
 	void DrawExplosion(Region &screen);
 	void DrawExploded(Region &screen);
+	int GetTravelPos(int face);
+	int GetShadowPos(int face);
+	void SetPos(int face, int frame1, int frame2);
 };
 
 #endif // PROJECTILE_H

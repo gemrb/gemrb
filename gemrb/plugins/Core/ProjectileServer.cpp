@@ -44,6 +44,15 @@ ProjectileServer::~ProjectileServer()
 	}
 }
 
+Projectile *ProjectileServer::CreateDefaultProjectile(unsigned int idx)
+{
+	Projectile *pro = new Projectile();
+	int strlength = (ieByte *) (&pro->Extension)-(ieByte *) (&pro->Type);
+	memset(&pro->Type, 0, strlength );
+	projectiles[idx].projectile = pro;
+	return ReturnCopy(idx);
+}
+
 //this function can return only projectiles listed in projectl.ids
 Projectile *ProjectileServer::GetProjectileByName(const ieResRef resname)
 {
@@ -65,33 +74,47 @@ Projectile *ProjectileServer::GetProjectileByIndex(unsigned int idx)
 		return NULL;
 	}
 	if (idx>=GetHighestProjectileNumber()) {
-		return NULL;
+		return GetProjectile(0);
 	}
 
 	return GetProjectile(idx);
 }
 
+Projectile *ProjectileServer::ReturnCopy(unsigned int idx)
+{
+	Projectile *pro = new Projectile();  
+	int strlength = (ieByte *) (&pro->Extension)-(ieByte *) (&pro->Type);
+	Projectile *old = projectiles[idx].projectile;
+	memcpy(&pro->Type, &old->Type, strlength );
+	if(old->Extension) {
+		pro->Extension = old->Extension;
+	}
+	return pro;
+}
+
 Projectile *ProjectileServer::GetProjectile(unsigned int idx)
 {
 	if (projectiles[idx].projectile) {
-		return projectiles[idx].projectile;
+		return ReturnCopy(idx);
 	}
 	DataStream* str = core->GetResourceMgr()->GetResource( projectiles[idx].resname, IE_PRO_CLASS_ID );
 	ProjectileMgr* sm = ( ProjectileMgr* ) core->GetInterface( IE_PRO_CLASS_ID );
 	if (sm == NULL) {
 		delete ( str );
-		return NULL;
+		return CreateDefaultProjectile(idx);
 	}
 	if (!sm->Open( str, true )) {
 		core->FreeInterface( sm );
-		return NULL;
+		return CreateDefaultProjectile(idx);
 	}
-
-	projectiles[idx].projectile = new Projectile();
-	sm->GetProjectile( projectiles[idx].projectile );
+	Projectile *pro = new Projectile();
+	projectiles[idx].projectile = pro;
+	
+	sm->GetProjectile( pro );
 	core->FreeInterface( sm );
 
-	return projectiles[idx].projectile;
+	pro->autofree = true;
+	return ReturnCopy(idx);
 }
 
 unsigned int ProjectileServer::GetHighestProjectileNumber()
@@ -99,18 +122,18 @@ unsigned int ProjectileServer::GetHighestProjectileNumber()
 	if (projectilecount>=0) {
 		return (unsigned int) projectilecount;
 	}
-	projectilecount = 0;
 
 	unsigned int resource = core->LoadSymbol("projectl");
 	SymbolMgr *projlist = core->GetSymbol(resource);
 	if (projlist) {
+		projectilecount = 0;
 
 		unsigned int rows = (unsigned int) projlist->GetSize();
 		while(rows--) {
 			unsigned int value = projlist->GetValueIndex(rows);
 			if (value>MAX_PROJ_IDX) {
 				value = MAX_PROJ_IDX;
-				printMessage("ProjectileServer","To high projectilenumber\n", YELLOW);
+				printMessage("ProjectileServer","Too high projectilenumber\n", YELLOW);
 			}
 			if (value>(unsigned int) projectilecount) {
 				projectilecount = (unsigned int) value+1;
@@ -120,11 +143,12 @@ unsigned int ProjectileServer::GetHighestProjectileNumber()
 
 		rows = (unsigned int) projlist->GetSize();
 		while(rows--) {
-			strnuprcpy(projectiles[ projlist->GetValueIndex(rows)].resname, projlist->GetStringIndex(rows), 8);
+			strnuprcpy(projectiles[ projlist->GetValueIndex(rows)].resname, projlist->GetStringIndex(rows), 8);      
 		}
 		core->DelSymbol(resource);
+	} else {
+		projectilecount=1;
+		projectiles = new ProjectileEntry[projectilecount];
 	}
 	return (unsigned int) projectilecount;
 }
-
-

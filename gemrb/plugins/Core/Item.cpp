@@ -21,6 +21,8 @@
 
 #include "../../includes/win32def.h"
 #include "Item.h"
+#include "Projectile.h"
+#include "ProjectileServer.h"
 #include "Interface.h"
 
 ITMExtHeader::ITMExtHeader(void)
@@ -119,5 +121,18 @@ int Item::UseCharge(ieWord *Charges, int header)
 		Charges[header]=0;
 	}
 	return type;
+}
+
+//returns a projectile loaded with the effect queue
+Projectile *Item::GetProjectile(int header) const
+{
+	ITMExtHeader *eh = GetExtHeader(header);
+	if (!eh) {
+		return NULL;
+	}
+        EffectQueue *fx = GetEffectBlock(header);
+	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(eh->ProjectileAnimation);
+	pro->SetEffects(fx);
+	return pro;
 }
 
