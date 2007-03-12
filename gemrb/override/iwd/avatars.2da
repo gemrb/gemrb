@@ -2,6 +2,7 @@
 *
            AT_1       AT_2       AT_3       AT_4       TYPE       SPACE      PALETTE    SIZE
 0x1000     MWYV       MWYV       MWYV       MWYV       11         5          1		*
+0x1001     MWYV       MWYV       MWYV       MWYV       11         5          1		*
 0x1100     MTAN       MTAN       MTAN       MTAN       11         5          1		*
 0x1200     MDR1       MDR1       MDR1       MDR1       12         5          1		*
 0x1201     MDR2       MDR2       MDR2       MDR2       12         5          1		*
