@@ -119,7 +119,7 @@ Item* ITMImp::GetItem(Item *s)
 
 	s->Dialog[0] = 0;
 	s->DialogName = 0;
-	s->WieldColor = 0;
+	s->WieldColor = 0xffff;
 	memset( s->unknown, 0, 26 );
 
 	//skipping header data for iwd2
@@ -130,7 +130,11 @@ Item* ITMImp::GetItem(Item *s)
 	if (version == ITM_VER_PST) {
 		str->ReadResRef( s->Dialog );
 		str->ReadDword( &s->DialogName );
-		str->ReadWord( &s->WieldColor );
+		ieWord WieldColor;
+		str->ReadWord( &WieldColor );
+		if (s->AnimationType[0]) {
+			s->WieldColor = WieldColor;
+		}
 		str->Read( s->unknown, 26 );
 	} else {
 	//all non pst
