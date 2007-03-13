@@ -753,7 +753,11 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 			CREItem *item = items[index];
 			if (item && core->Exists(item->ItemResRef, IE_ITM_CLASS_ID)) {
 				act->inventory.SetSlotItem( item, Slot );
-				if (core->QuerySlotEffects( i )) {
+				int slottype = core->QuerySlotEffects( Slot );
+				//weapons will be equipped differently, see SetEquippedSlot later
+				//i think missiles equipping effects are always
+				//in effect, if not, then add SLOT_EFFECT_MISSILE
+				if (slottype != SLOT_EFFECT_NONE && slottype != SLOT_EFFECT_MELEE) {
 					act->inventory.EquipItem( Slot );
 				}
 				items[index] = NULL;
@@ -781,8 +785,8 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	ieDword Equipped;
 	str->ReadDword( &Equipped );
 	act->inventory.SetEquippedSlot( ((short)Equipped));
-	// Reading spellbook
 
+	// Reading spellbook
 	CREKnownSpell **known_spells=(CREKnownSpell **) calloc(KnownSpellsCount, sizeof(CREKnownSpell *) );
 	CREMemorizedSpell **memorized_spells=(CREMemorizedSpell **) calloc(MemorizedSpellsCount, sizeof(CREKnownSpell *) );
 
