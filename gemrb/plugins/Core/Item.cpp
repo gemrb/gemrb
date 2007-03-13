@@ -65,6 +65,13 @@ EffectQueue *Item::GetEffectBlock(int usage) const
 	for (int i=0;i<count;i++) {
 		fxqueue->AddEffect( features+i );
 	}
+
+	//adding a pulse effect for weapons (PST)
+	if (WieldColor!=0xffff) {
+		if (Flags&IE_ITEM_PULSATING) {
+			fxqueue->AddEffect( BuildGlowEffect(WieldColor) );
+		}
+	}
 	return fxqueue;
 }
 
@@ -101,7 +108,7 @@ ITMExtHeader *Item::GetWeaponHeader(bool ranged) const
 	return NULL;
 }
 
-int Item::UseCharge(ieWord *Charges, int header)
+int Item::UseCharge(ieWord *Charges, int header) const
 {
 	ITMExtHeader *ieh = GetExtHeader(header);
 	if (!ieh) return 0;
@@ -130,9 +137,25 @@ Projectile *Item::GetProjectile(int header) const
 	if (!eh) {
 		return NULL;
 	}
-        EffectQueue *fx = GetEffectBlock(header);
+	EffectQueue *fx = GetEffectBlock(header);
 	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(eh->ProjectileAnimation);
 	pro->SetEffects(fx);
 	return pro;
 }
 
+//this is the implementation of the weapon glow effect in PST
+static EffectRef glow_ref ={"Color:PulseRGB",NULL,-1};
+//this type of colour uses PAL32, a PST specific palette
+#define PALSIZE 32
+static Color ActorColor[PALSIZE];
+
+Effect *Item::BuildGlowEffect(int gradient) const
+{
+	//palette entry to to RGB conversion
+	core->GetPalette( gradient, PALSIZE, ActorColor );
+	ieDword rgb = (ActorColor[16].r<<16) | (ActorColor[16].g<<8) | ActorColor[16].b;
+	ieDword location = 0;
+	ieDword speed = 128;
+	Effect *fx = EffectQueue::CreateEffect(glow_ref, rgb, location|(speed<<16), FX_DURATION_INSTANT_WHILE_EQUIPPED);
+	return fx;
+}

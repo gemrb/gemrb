@@ -203,7 +203,7 @@ IWDOpc::~IWDOpc(void)
 //function code (>=0x100).
 //If value is -1, then GemRB will use Param1, otherwise it is
 //compared to the target's stat using the relation function.
-//The relation function is exactly the same as the extended 
+//The relation function is exactly the same as the extended
 //diffmode for gemrb. (Thus scripts can use the very same relation
 //functions).
 
@@ -462,7 +462,7 @@ int fx_iwd_monster_summoning (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_iwd_monster_summoning (%2d): ResRef:%s Anim:%s Type: %d\n", fx->Opcode, fx->Resource, fx->Resource2, fx->Parameter2 );
 	//check the summoning limit?
-	
+
 	ieResRef monster;
 	ieResRef hit;
 	ieResRef areahit;
@@ -508,7 +508,7 @@ int fx_animate_dead (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_animate_dead (%2d): ResRef:%s Type: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
 	//check the summoning limit?
-	
+
 	ieResRef monster;
 	ieResRef hit;
 	ieResRef areahit;
@@ -525,8 +525,8 @@ int fx_animate_dead (Actor* Owner, Actor* target, Effect* fx)
 }
 //f4,f5 (implemented in PST)
 
-//0xf6 SummonMonster2 
-#define IWD_SM2 11 
+//0xf6 SummonMonster2
+#define IWD_SM2 11
 ieResRef summon_monster_2da[IWD_SM2]={"SLIZARD","STROLLS","SSHADOW","ISTALKE",
  "CFELEMW","CEELEMW","CWELEMW","CFELEMP","CEELEMP","CWELEMP","CEELEMM"};
 
@@ -534,7 +534,7 @@ int fx_summon_monster2 (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_summon_monster2 (%2d): ResRef:%s Type: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
 	//check the summoning limit?
-	
+
 	ieResRef monster;
 	ieResRef hit;
 	ieResRef areahit;
@@ -601,7 +601,7 @@ int fx_summon_shadow_monster (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_summon_shadow_monster (%2d): ResRef:%s Type: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
 	//check the summoning limit?
-	
+
 	ieResRef monster;
 	ieResRef hit;
 	ieResRef areahit;
@@ -1238,9 +1238,9 @@ int fx_protection_from_evil (Actor* /*Owner*/, Actor* target, Effect* fx)
 //418 FreeAction2
 int fx_free_action_iwd2 (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-        if (0) printf( "fx_free_action_iwd2 (%2d)\n", fx->Opcode);
+	if (0) printf( "fx_free_action_iwd2 (%2d)\n", fx->Opcode);
 	target->AddPortraitIcon(PI_FREEACTION);
-	return FX_APPLIED;	
+	return FX_APPLIED;
 }
 //419 Unconsciousness
 //420 Death2 (see in core effects)

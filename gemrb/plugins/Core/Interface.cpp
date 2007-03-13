@@ -4050,7 +4050,7 @@ void Interface::DisplayConstantStringName(int stridx, unsigned int color, Script
 	switch (speaker->Type) {
 		case ST_ACTOR:
 			name = ((Actor *) speaker)->GetName(-1);
-			GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR),8, ActorColor );
+			GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR), PALSIZE, ActorColor );
 			speaker_color = (ActorColor[4].r<<16) | (ActorColor[4].g<<8) | ActorColor[4].b;
 			break;
 		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
@@ -4083,7 +4083,7 @@ void Interface::DisplayConstantStringAction(int stridx, unsigned int color, Scri
 	switch (attacker->Type) {
 		case ST_ACTOR:
 			name1 = ((Actor *) attacker)->GetName(-1);
-			GetPalette( ((Actor *) attacker)->GetStat(IE_MAJOR_COLOR),8, ActorColor );
+			GetPalette( ((Actor *) attacker)->GetStat(IE_MAJOR_COLOR),PALSIZE, ActorColor );
 			attacker_color = (ActorColor[4].r<<16) | (ActorColor[4].g<<8) | ActorColor[4].b;
 			break;
 		default:
@@ -4119,7 +4119,7 @@ void Interface::DisplayStringName(int stridx, unsigned int color, Scriptable *sp
 	switch (speaker->Type) {
 		case ST_ACTOR:
 			name = ((Actor *) speaker)->GetName(-1);
-			GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR),8, ActorColor );
+			GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR), PALSIZE, ActorColor );
 			speaker_color = (ActorColor[4].r<<16) | (ActorColor[4].g<<8) | ActorColor[4].b;
 			break;
 		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:

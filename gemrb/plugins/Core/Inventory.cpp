@@ -27,6 +27,7 @@
 #include "Item.h"
 #include "Actor.h"
 #include "Game.h"
+#include "ScriptEngine.h"
 
 static int SLOT_HEAD = -1;
 static int SLOT_MAGIC = -1;
@@ -190,13 +191,18 @@ void Inventory::AddSlotEffects(CREItem* slot, int type)
 	}
 	ItemExcl|=itm->ItemExcl;
 
-	//get the equipping effects
-	//EffectQueue *fxqueue = itm->GetEffectBlock(-1);
-	//fxqueue->SetOwner(Owner); //the equipped items owner is the equipping character
-	//fxqueue->ApplyAllEffects(Owner);
+	ieWord gradient = itm->GetWieldedGradient();
+	if (gradient!=0xffff) {
+		Owner->SetBase(IE_COLORS, gradient);
+	}
 
-	for (int i = 0; i < itm->EquippingFeatureCount; i++) {
-		Effect *fx = itm->equipping_features+i;
+	//get the equipping effects
+	EffectQueue *eqfx = itm->GetEffectBlock(-1);
+	core->FreeItem( itm, slot->ItemResRef, false );
+
+	int cnt = eqfx->GetEffectsCount();
+	for (int i = 0; i < cnt; i++) {
+		Effect* fx = eqfx->GetEffect(i);
 		fx->PosX = Owner->Pos.x;
 		fx->PosY = Owner->Pos.y;
 
@@ -215,8 +221,8 @@ void Inventory::AddSlotEffects(CREItem* slot, int type)
 
 		Owner->fxqueue.AddEffect( fx );
 	}
-
-	core->FreeItem( itm, slot->ItemResRef, false );
+	delete eqfx;
+	core->GetGUIScriptEngine()->RunFunction("UpdateAnimation", false);
 }
 
 void Inventory::RemoveSlotEffects(CREItem* slot)
@@ -227,13 +233,28 @@ void Inventory::RemoveSlotEffects(CREItem* slot)
 	if (!itm)
 		return;
 	ItemExcl&=~itm->ItemExcl;
+	EffectQueue *eqfx = itm->GetEffectBlock(-1);
+	core->FreeItem( itm, slot->ItemResRef, false );
+	//this block is also ok, but knows too much about the item effect block
+	//if item wants other equipping effects (like pst weapon pulse)
+	//this one isn't good enough
+/*
 	for (int i = 0; i < itm->EquippingFeatureCount; i++) {
 		Effect* fx = &itm->equipping_features[i];
 		if (fx->TimingMode == FX_DURATION_INSTANT_WHILE_EQUIPPED) {
 			Owner->fxqueue.RemoveEffect( fx );
 		}
 	}
-	core->FreeItem( itm, slot->ItemResRef, false );
+*/
+	int cnt = eqfx->GetEffectsCount();
+	for (int i = 0; i < cnt; i++) {
+		Effect* fx = eqfx->GetEffect(i);
+		if (fx->TimingMode == FX_DURATION_INSTANT_WHILE_EQUIPPED) {
+			Owner->fxqueue.RemoveEffect( fx );
+		}
+	}
+	delete eqfx;
+	core->GetGUIScriptEngine()->RunFunction("UpdateAnimation", false);
 }
 
 void Inventory::SetInventoryType(int arg)
@@ -1013,7 +1034,7 @@ int Inventory::GetShieldSlot()
 
 int Inventory::GetEquippedSlot()
 {
-	if (Equipped==IW_NO_EQUIPPED) {
+	if (Equipped == IW_NO_EQUIPPED) {
 		return SLOT_FIST;
 	}
 	if (IWD2 && Equipped>=0) {

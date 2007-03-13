@@ -278,6 +278,7 @@ public:
 	/** Returns item in specified slot. Does NOT change inventory */
 	CREItem* GetSlotItem(unsigned int slot);
 	bool ChangeItemFlag(unsigned int slot, ieDword value, int mode);
+	/** Equips the item, don't use it directly for weapons */
 	bool EquipItem(unsigned int slot);
 	bool UnEquipItem(unsigned int slot, bool removecurse);
 	/** Returns equipped weapon */

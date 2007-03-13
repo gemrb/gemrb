@@ -8,12 +8,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * $Id$
  *
@@ -57,7 +57,7 @@ class Projectile;
 #define IE_ITEM_CURSED       0x00000010
 #define IE_ITEM_NOT_COPYABLE 0x00000020
 #define IE_ITEM_MAGICAL      0x00000040
-#define IE_ITEM_BOW          0x00000080
+#define IE_ITEM_BOW	  0x00000080
 #define IE_ITEM_SILVER       0x00000100
 #define IE_ITEM_COLD_IRON    0x00000200
 #define IE_ITEM_STOLEN       0x00000400
@@ -80,7 +80,7 @@ class Projectile;
 #define ITEM_AT_MELEE      1
 #define ITEM_AT_PROJECTILE 2
 #define ITEM_AT_MAGIC      3
-#define ITEM_AT_BOW        4
+#define ITEM_AT_BOW	4
 
 //projectile qualifiers
 #define PROJ_ARROW  1
@@ -214,7 +214,7 @@ public:
 		return ItemDescIdentified;
 	}
 
-	int UseCharge(ieWord *Charges, int header);
+	int UseCharge(ieWord *Charges, int header) const;
 
 	//returns the requested extended header
 	ITMExtHeader *GetExtHeader(unsigned int which) const
@@ -224,14 +224,23 @@ public:
 		}
 		return ext_headers+which;
 	}
+	ieDword GetWieldedGradient() const
+	{
+		return WieldColor;
+	}
+
 	//-1 will return the equipping feature block
 	EffectQueue *GetEffectBlock(int usage) const;
 	//returns a projectile created from an extended header
 	Projectile *GetProjectile(int header) const;
+	//Builds an equipping glow effect from gradient colour
+	//this stuff is not item specific, could be moved elsewhere
+	Effect *BuildGlowEffect(int gradient) const;
 	//returns the average damage of the weapon (doesn't check for special effects)
 	int GetDamagePotential(bool ranged, ITMExtHeader *&header) const;
 	//returns the weapon header
 	ITMExtHeader *GetWeaponHeader(bool ranged) const;
+
 };
 
-#endif  // ! ITEM_H
+#endif // ! ITEM_H

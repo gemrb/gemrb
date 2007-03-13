@@ -147,6 +147,8 @@ def UpdateInventoryWindow ():
 
 	Window = InventoryWindow
 
+	GemRB.RunEventHandler("UpdateAnimation")
+
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	Container = GemRB.GetContainer (pc, 1)
@@ -333,9 +335,13 @@ def OnAutoEquip ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 
-	GemRB.DropDraggedItem (pc, -1)
-	#item = GemRB.GetItem (ResRef)
-	#GemRB.PlaySound (item["BrokenItem"])
+	item = GemRB.GetSlotItem (0,0)
+	ret = GemRB.DropDraggedItem (pc, -1)
+	#this is exactly the same hack as the blackisle guys did it
+	#quite lame, but we should copy their efforts the best
+	if ret == 2 and item and (item['ItemResRef'] == "dustrobe"):
+		GemRB.SetGlobal("APPEARANCE","GLOBAL",2)
+
 	UpdateInventoryWindow ()
 	return
 
@@ -348,10 +354,19 @@ def OnDragItem ():
 		ResRef = slot_item['ItemResRef']
 		item = GemRB.GetItem (ResRef)
 		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 0)
+		if slot == 2:
+			GemRB.SetGlobal("APPEARANCE","GLOBAL",0)
 	else:
+		item = GemRB.GetSlotItem (0,0)
+		itemdata = GemRB.GetItem(item['ItemResRef'])
 		GemRB.DropDraggedItem (pc, slot)
+		if slot == 2 and item['ItemResRef'] == 'dustrobe':
+			GemRB.SetGlobal("APPEARANCE","GLOBAL",2)
+		elif slot < 21 and itemdata['AnimationType'] != '':
+			GemRB.SetGlobal("APPEARANCE","GLOBAL",0)
 
 	UpdateInventoryWindow ()
+
 
 def OnDropItemToPC ():
 	pc = GemRB.GetVar ("PressedPortrait") + 1

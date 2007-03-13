@@ -159,8 +159,8 @@ int MVEPlay::doPlay(const DataStream* mve)
 	video->InitMovieScreen(w,h);
 	MVE_rmPrepMovie( ( void * ) mve, -1, -1, 1 );
 
-        vSpec.screenWidth = w;
-        vSpec.screenHeight = h;
+	vSpec.screenWidth = w;
+	vSpec.screenHeight = h;
 
 	MVE_getVideoSpec( &vSpec );
 	bpp = vSpec.truecolor ? 16 : 8;

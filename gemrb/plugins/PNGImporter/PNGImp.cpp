@@ -29,7 +29,7 @@
 #include <png.h>
 
 static void DataStream_png_read_data(png_structp png_ptr,
-									 png_bytep data, png_size_t length)
+		 png_bytep data, png_size_t length)
 {
 	voidp read_io_ptr = png_get_io_ptr(png_ptr);
 	DataStream* str = reinterpret_cast<DataStream*>(read_io_ptr);
@@ -47,8 +47,6 @@ static ieDword blue_mask = 0x00ff0000;
 static ieDword green_mask = 0x0000ff00;
 static ieDword red_mask = 0x000000ff;
 static ieDword alpha_mask = 0xff000000;
-
-
 
 
 PNGImp::PNGImp(void)
@@ -73,7 +71,7 @@ void PNGImp::Close()
 	if (inf) {
 		if (inf->png_ptr) {
 			png_destroy_read_struct(&inf->png_ptr, &inf->info_ptr,
-									&inf->end_info);
+				&inf->end_info);
 		}
 		inf->png_ptr = 0;
 		inf->info_ptr = 0;
@@ -103,26 +101,26 @@ bool PNGImp::Open(DataStream* stream, bool autoFree, bool /*convert*/)
 	if (!inf->png_ptr)
 		return false;
 
-    inf->info_ptr = png_create_info_struct(inf->png_ptr);
-    if (!inf->info_ptr)
-    {
-        png_destroy_read_struct(&inf->png_ptr, (png_infopp)NULL,
-								(png_infopp)NULL);
-        return false;
-    }
+	inf->info_ptr = png_create_info_struct(inf->png_ptr);
+	if (!inf->info_ptr)
+	{
+		png_destroy_read_struct(&inf->png_ptr, (png_infopp)NULL,
+			(png_infopp)NULL);
+		return false;
+	}
 
-    inf->end_info = png_create_info_struct(inf->png_ptr);
-    if (!inf->end_info)
-    {
-        png_destroy_read_struct(&inf->png_ptr, &inf->info_ptr,
-								(png_infopp)NULL);
-        return false;
-    }
+	inf->end_info = png_create_info_struct(inf->png_ptr);
+	if (!inf->end_info)
+	{
+		png_destroy_read_struct(&inf->png_ptr, &inf->info_ptr,
+			(png_infopp)NULL);
+		return false;
+	}
 
-    if (setjmp(png_jmpbuf(inf->png_ptr))) {
-        png_destroy_read_struct(&inf->png_ptr, &inf->info_ptr, &inf->end_info);
-        return false;
-    }
+	if (setjmp(png_jmpbuf(inf->png_ptr))) {
+		png_destroy_read_struct(&inf->png_ptr, &inf->info_ptr, &inf->end_info);
+		return false;
+	}
 
 	png_set_read_fn(inf->png_ptr, stream, DataStream_png_read_data);
 	png_set_sig_bytes(inf->png_ptr, 8);
@@ -133,8 +131,8 @@ bool PNGImp::Open(DataStream* stream, bool autoFree, bool /*convert*/)
 	int bit_depth, color_type;
 	int interlace_type, compression_type, filter_method;
 	png_get_IHDR(inf->png_ptr, inf->info_ptr, &width, &height,
-				 &bit_depth, &color_type,
-				 &interlace_type, &compression_type, &filter_method);
+		 &bit_depth, &color_type,
+		 &interlace_type, &compression_type, &filter_method);
 
 	if (color_type != PNG_COLOR_TYPE_PALETTE &&
 		png_get_valid(inf->png_ptr, inf->info_ptr, PNG_INFO_tRNS))
@@ -144,8 +142,8 @@ bool PNGImp::Open(DataStream* stream, bool autoFree, bool /*convert*/)
 		png_set_tRNS_to_alpha(inf->png_ptr);
 	}
 
-    if (bit_depth == 16)
-        png_set_strip_16(inf->png_ptr);
+	if (bit_depth == 16)
+		png_set_strip_16(inf->png_ptr);
 
 	if (color_type == PNG_COLOR_TYPE_RGB)
 		png_set_filler(inf->png_ptr, 0xFF, PNG_FILLER_AFTER);
@@ -175,12 +173,12 @@ Sprite2D* PNGImp::GetImage()
 	for (unsigned int i = 0; i < Height; ++i)
 		row_pointers[i] = reinterpret_cast<png_bytep>(&buffer[(hasPalette?1:4)*i*Width]);
 
-    if (setjmp(png_jmpbuf(inf->png_ptr))) {
+	if (setjmp(png_jmpbuf(inf->png_ptr))) {
 		delete[] row_pointers;
 		free( buffer );
-        png_destroy_read_struct(&inf->png_ptr, &inf->info_ptr, &inf->end_info);
-        return false;
-    }
+		png_destroy_read_struct(&inf->png_ptr, &inf->info_ptr, &inf->end_info);
+		return false;
+	}
 
 	png_read_image(inf->png_ptr, row_pointers);
 
@@ -230,5 +228,5 @@ void PNGImp::GetPalette(int index, int colors, Color* pal)
 
 void PNGImp::PutImage(DataStream* /*output*/)
 {
-  // FIXME: add png code here
+	// FIXME: add png code here
 }

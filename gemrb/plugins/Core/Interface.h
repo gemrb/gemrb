@@ -638,7 +638,7 @@ public:
 	char GameSounds[12];
 	char GameScripts[12];
 	char GamePortraits[12];
-  char GameCharacters[12];
+	char GameCharacters[12];
 	ieResRef GameNameResRef;
 	ieResRef GoldResRef; //MISC07.itm
 	Variables *RtRows;

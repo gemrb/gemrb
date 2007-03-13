@@ -104,8 +104,8 @@ DialogState* DLGImp::GetDialogState(Dialog *d, unsigned int index)
 	DialogState* ds = new DialogState();
 	//16 = sizeof(State)
 	str->Seek( StatesOffset + ( index * 16 ), GEM_STREAM_START );
-        ieDword  FirstTransitionIndex;
-        ieDword  TriggerIndex;
+	ieDword  FirstTransitionIndex;
+	ieDword  TriggerIndex;
 	str->ReadDword( &ds->StrRef );
 	str->ReadDword( &FirstTransitionIndex );
 	str->ReadDword( &ds->transitionsCount );

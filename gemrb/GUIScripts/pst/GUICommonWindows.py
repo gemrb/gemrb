@@ -207,22 +207,22 @@ def GetActorPortrait (actor, which):
 	
 
 def UpdateAnimation ():
-	disguise = GemRB.GetGameVar ("APPEARANCE")
 	pc = GemRB.GameGetSelectedPCSingle ()
-	if disguise == 2: #dustman
-		GemRB.SetPlayerStat (pc, IE_ANIMATION_ID, 0x5d)
-		return
-	if disguise == 1: #zombie
-		GemRB.SetPlayerStat (pc, IE_ANIMATION_ID, 0x52)
-		return
 
-	slot = GemRB.GetEquippedQuickSlot (pc)
-	item = GemRB.GetSlotItem (pc, slot )
-	animid = ""
-	if item:
-		item = GemRB.GetItem(item["ItemResRef"])
+	disguise = GemRB.GetGameVar ("APPEARANCE")
+	if disguise == 2: #dustman
+		animid = "DR"				
+	elif disguise == 1: #zombie
+		animid = "ZO"
+	else:
+		slot = GemRB.GetEquippedQuickSlot (pc)
+		item = GemRB.GetSlotItem (pc, slot )
+		animid = ""
 		if item:
-			animid = item["AnimationType"]
+			item = GemRB.GetItem(item["ItemResRef"])
+			if item:
+				animid = item["AnimationType"]
+
 	BioTable = GemRB.LoadTable ("BIOS")
 	Specific = "%d"%GemRB.GetPlayerStat (pc, IE_SPECIFIC)
 	AvatarName = GemRB.GetTableValue (BioTable, Specific, "PC")
@@ -465,10 +465,8 @@ def SetupSavingThrows (pc):
 			Class = GemRB.FindTableValue (ClassTable, 5, 4)
 		SaveName2 = GemRB.GetTableValue (ClassTable, Class, 3)
 		Class = 0  #fighter
-		print "SaveName2", SaveName2
 
 	SaveName1 = GemRB.GetTableValue (ClassTable, Class, 3)
-	print "SaveName1", SaveName1
 	
 	for row in range(5):
 		tmp1 = GetSavingThrow (SaveName1, row, level1)
@@ -477,7 +475,6 @@ def SetupSavingThrows (pc):
 			if tmp2<tmp1:
 				tmp1=tmp2
 		GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+row, tmp1)
-		print "Savingthrow:", tmp1
 	return
 
 

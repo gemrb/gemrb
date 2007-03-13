@@ -254,7 +254,7 @@ void EffectQueue_RegisterOpcodes(int count, EffectRef* opcodes)
 	opcodes_count += count;
 	effectnames[opcodes_count].Name = NULL;
 	//if we merge two effect lists, then we need to sort their effect tables
-	//actually, we might always want to sort this list, so there is no 
+	//actually, we might always want to sort this list, so there is no
 	//need to do it manually (sorted table is needed if we use bsearch)
 	qsort(effectnames, opcodes_count, sizeof(EffectRef), compare_effects);
 }
@@ -262,7 +262,6 @@ void EffectQueue_RegisterOpcodes(int count, EffectRef* opcodes)
 EffectQueue::EffectQueue()
 {
 	Owner = NULL;
-//	opcodes_count = 0;
 }
 
 EffectQueue::~EffectQueue()
@@ -270,6 +269,30 @@ EffectQueue::~EffectQueue()
 	for (unsigned i = 0; i < effects.size(); i++) {
 		delete( effects[i] );
 	}
+}
+
+Effect *EffectQueue::CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieDword timing)
+{
+	if (opcode==0xffffffff) {
+		return NULL;
+	}
+	Effect *fx = new Effect();
+	if (!fx) {
+		return NULL;
+	}
+	memset(fx,0,sizeof(Effect));
+	fx->Opcode=opcode;
+	fx->Probability1=100;
+	fx->Parameter1=param1;
+	fx->Parameter2=param2;
+	fx->TimingMode=timing;
+	return fx;
+}
+
+Effect *EffectQueue::CreateEffect(EffectRef &effect_reference, ieDword param1, ieDword param2, ieDword timing)
+{
+	ResolveEffectRef(effect_reference);
+	return CreateEffect(effect_reference.EffText, param1, param2, timing);
 }
 
 bool EffectQueue::AddEffect(Effect* fx)
@@ -597,7 +620,7 @@ bool EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 		if (NeedPrepare((ieByte) fx->TimingMode) ) {
 			//prepare for delayed duration effects
 			fx->Duration=fx->SecondaryDelay;
-			PrepareDuration(fx);      
+			PrepareDuration(fx);
 		}
 		break;
 	case DURATION:
@@ -613,10 +636,10 @@ bool EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 	default:
 		abort();
 	}
-	
+
 	EffectFunction fn = effect_refs[fx->Opcode].Function;
 	bool flg = false;
-	if (fn) {		
+	if (fn) {
 		if ( effect_refs[fx->Opcode].EffText > 0 ) {
 			char *text = core->GetString( effect_refs[fx->Opcode].EffText );
 			core->DisplayString( text );
@@ -640,7 +663,7 @@ bool EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 				//for example, a strength modifier effect
 				if ((fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) ) {
 					fx->TimingMode=FX_DURATION_JUST_EXPIRED;
-				} 
+				}
 				break;
 			case FX_ABORT:
 				flg = true;
@@ -766,12 +789,12 @@ void EffectQueue::RemoveExpiredEffects(ieDword futuretime)
 		if ( IsPrepared( (ieByte) ((*f)->TimingMode) )!=PERMANENT ) {
 			if ( (*f)->Duration<=GameTime) {
 				(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;
-			}      
+			}
 		}
 	}
 }
 
-//this effect will expire all effects that are not truly permanent 
+//this effect will expire all effects that are not truly permanent
 //which i call permanent after death (iesdp calls it permanent after bonuses)
 void EffectQueue::RemoveAllNonPermanentEffects()
 {
@@ -990,7 +1013,7 @@ Effect *EffectQueue::GetEffect(ieDword idx) const
 }
 
 //returns true if the effect supports simplified duration
-bool EffectQueue::HasDuration(Effect *fx) 
+bool EffectQueue::HasDuration(Effect *fx)
 {
 	switch(fx->TimingMode) {
 	case FX_DURATION_INSTANT_LIMITED: //simple duration

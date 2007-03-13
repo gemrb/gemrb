@@ -6190,8 +6190,6 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		core->GetSoundMgr()->Play(Sound);
 	}
 	core->DragItem (si, ResRef);
-	//this is PST specific, so the error flag is false
-	core->GetGUIScriptEngine()->RunFunction("UpdateAnimation", false);
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -6331,8 +6329,6 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	if (Sound[0]) {
 		core->GetSoundMgr()->Play(Sound);
 	}
-	//this is PST specific, changes animation
-	core->GetGUIScriptEngine()->RunFunction("UpdateAnimation", false);
 	return PyInt_FromLong( res );
 }
 
@@ -7705,16 +7701,11 @@ static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 	}
 	work_ref.Name=opcodename;
 	work_ref.EffText=-1;
-	EffectQueue::ResolveEffect(work_ref);
-	Effect *fx = core->GetEffect(work_ref.EffText);
+	Effect *fx = EffectQueue::CreateEffect(work_ref, param1, param2, FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES);
 	if (!fx) {
 		//invalid effect name didn't resolve to opcode
 		return RuntimeError( "Invalid effect name!" );
 	}
-	fx->Parameter1=param1;
-	fx->Parameter2=param2;
-	fx->Probability1=100;
-	fx->TimingMode=FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES;
 	//fx is freed by this function
 	core->ApplyEffect(fx, actor, actor);
 	Py_INCREF( Py_None );

@@ -188,6 +188,7 @@ public:
 	/* returns the number of saved effects */
 	ieDword GetSavedEffectsCount() const;
 	size_t GetEffectsCount() const { return effects.size(); }
+	static Effect *CreateEffect(EffectRef &effect_reference, ieDword param1, ieDword param2, ieDword timing);
 
 	//locating opcodes
 	Effect *HasEffect(EffectRef &effect_reference);
@@ -208,6 +209,7 @@ public:
 	static int ResolveEffect(EffectRef &effect_reference);
 private:
 	//use the effect reference style calls from outside
+	static Effect *CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieDword timing);
 	void RemoveAllEffectsWithResource(ieDword opcode, const ieResRef resource);
 	void RemoveAllEffectsWithParam(ieDword opcode, ieDword param2);
 	Effect *HasOpcode(ieDword opcode) const;
