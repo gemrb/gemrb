@@ -238,9 +238,12 @@ void CharAnimations::SetupColors(PaletteType type)
 	}
 
 	if (GetAnimType() >= IE_ANI_PST_ANIMATION_1) {
-		// TODO: handle equipment colours (How?)
+		// TODO: handle equipment colour glows
 
-		// Avatars in PS:T
+		//Colors[6] is the COLORCOUNT stat in PST
+		//it tells how many customisable color slots we have
+		//the color slots start from the end of the palette and go
+		//backwards There are 5 available slots with a size of 32 each
 		int size = 32;
 		int dest = 256-Colors[6]*size;
 		if (Colors[6] == 0) {
@@ -250,7 +253,7 @@ void CharAnimations::SetupColors(PaletteType type)
 		}
 		for (unsigned int i = 0; i < Colors[6]; i++) {
 			core->GetPalette( Colors[i]&255, size,
-							  &palette[PAL_MAIN]->col[dest] );
+				  &palette[PAL_MAIN]->col[dest] );
 			//Color* NewPal = core->GetPalette( Colors[i]&255, size );
 			//memcpy( &palette->col[dest], NewPal, size*sizeof( Color ) );
 			dest +=size;
