@@ -169,13 +169,19 @@ Item* ITMImp::GetItem(Item *s)
 
 void ITMImp::GetExtHeader(Item *s, ITMExtHeader* eh)
 {
+	ieByte tmpByte;
+
 	str->Read( &eh->AttackType,1 );
 	str->Read( &eh->IDReq,1 );
 	str->Read( &eh->Location,1 );
 	str->Read( &eh->unknown1,1 );
 	str->ReadResRef( eh->UseIcon );
 	str->Read( &eh->Target,1 );
-	str->Read( &eh->TargetNumber,1 );
+	str->Read( &tmpByte,1 );
+	if (!tmpByte) {
+		tmpByte = 1;
+	}
+	eh->TargetNumber = tmpByte;
 	str->ReadWord( &eh->Range );
 	str->ReadWord( &eh->ProjectileType );
 	str->ReadWord( &eh->Speed );
