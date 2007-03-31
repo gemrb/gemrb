@@ -1329,6 +1329,7 @@ bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count
 				}
 				count--;
 				memcpy(array[pos].itemname, slot->ItemResRef, sizeof(ieResRef) );
+				array[pos].slot = idx;
 				array[pos].headerindex = ehc;
  				int slen = ((char *) &(array[pos].itemname)) -((char *) &(array[pos].AttackType));
 				memcpy(&(array[pos].AttackType), &(ext_header->AttackType), slen);
