@@ -85,8 +85,10 @@ PathNode *Projectile::GetNextStep(int x)
 //Pass means passing/rebounding/extinguishing on walls
 void Projectile::MoveLine(int steps, int Pass, ieDword orient)
 {
-	//remove previous path
-	ClearPath();
+	//call this with destination
+	if (path) {
+		return;
+	}
 	if (!steps) {
 		Pos = Destination;
 		return;
@@ -153,7 +155,7 @@ void Projectile::ChangePhase()
 		if (Target) {
 			Actor *target = area->GetActorByGlobalID(Target);
 			if (!target) {
-			  return;
+				return;
 			}
 			//deliver payload to target
 			effects->AddAllEffects(target);
@@ -168,7 +170,7 @@ void Projectile::ChangePhase()
 
 void Projectile::DoStep(unsigned int walk_speed)
 {
-	if (!path || !walk_speed) {
+	if (!path) {
 		ChangePhase();
 		return;
 	}
@@ -178,11 +180,10 @@ void Projectile::DoStep(unsigned int walk_speed)
 		timeStartStep = time;
 	}
 	if (( time - timeStartStep ) >= walk_speed) {
-		//printf("[New Step] : Orientation = %d\n", step->orient);
 		step = step->Next;
 		timeStartStep = time;
 	}
-	
+
 	SetOrientation (step->orient, false);
 
 	Pos.x = ( step->x * 16 ) + 8;
@@ -191,6 +192,9 @@ void Projectile::DoStep(unsigned int walk_speed)
 		ClearPath();
 		NewOrientation = Orientation;
 		ChangePhase();
+		return;
+	}
+	if (!walk_speed) {
 		return;
 	}
 	if (step->Next->x > step->x)
@@ -209,8 +213,8 @@ void Projectile::DoStep(unsigned int walk_speed)
 
 void Projectile::SetTarget(Point &p)
 {
-	Destination = p;
 	ClearPath();
+	Destination = p;
 	MoveLine( Speed, true, GetOrient(p, Pos) );
 }
 

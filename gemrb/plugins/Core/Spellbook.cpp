@@ -506,6 +506,22 @@ bool Spellbook::DepleteSpell(int type)
 	return false;
 }
 
+bool Spellbook::DepleteSpell(int type, unsigned int page, unsigned int slot)
+{
+	if (NUM_SPELL_TYPES<=type) {
+		return false;
+	}
+	if (spells[type].size()<=page) {
+		return false;
+	}
+	CRESpellMemorization* sm = spells[page][type];
+	if (sm->memorized_spells.size()<=slot) {
+		return false;
+	}
+	CREMemorizedSpell* cms = sm->memorized_spells[slot];
+	return DepleteSpell(cms);
+}
+
 bool Spellbook::ChargeSpell(CREMemorizedSpell* spl)
 {
 	spl->Flags = 1;

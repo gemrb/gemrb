@@ -2055,6 +2055,32 @@ void GameScript::MoveBetweenAreas(Scriptable* Sender, Action* parameters)
 		parameters->pointParameter, parameters->int0Parameter, true);
 }
 
+void GameScript::Spell(Scriptable* Sender, Action* parameters)
+{
+	ieResRef spellres;
+
+	if (!ResolveSpellName( spellres, parameters) ) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	if (Sender->Type == ST_ACTOR) {
+		Actor *actor = (Actor *) Sender;
+		actor->SetStance (IE_ANI_CAST);
+	}
+	Point s,d;
+	GetPositionFromScriptable( Sender, s, false );
+	GetPositionFromScriptable( tar, d, false );
+	printf( "Spell from [%d,%d] to [%d,%d]\n", s.x, s.y, d.x, d.y );
+	//this might be bad
+	Sender->ReleaseCurrentAction();
+}
+
 //it is unsure how the ForceSpell actions differ
 void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 {
@@ -5070,7 +5096,7 @@ void GameScript::UseItem(Scriptable* Sender, Action* parameters)
 	}
 	int Slot, header;
 	Actor *scr = (Actor *) Sender;
-	if (parameters->string0Parameter) {
+	if (parameters->string0Parameter[0]) {
 		Slot = scr->inventory.FindItem(parameters->string0Parameter, 0);
 		//this is actually not in the original game code
 		header = parameters->int0Parameter;

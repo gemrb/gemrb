@@ -95,6 +95,8 @@ class ScriptedAnimation;
 #define GA_SELECT   16
 //dead actor may not be selected
 #define GA_NO_DEAD  32
+//any point could be selected (area effect)
+#define GA_POINT    64
 
 #define GUIBT_COUNT  12
 

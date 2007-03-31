@@ -139,6 +139,8 @@ class GEM_EXPORT Spellbook {
 private:
 	std::vector<CRESpellMemorization*> *spells;
 
+	/** Sets spell from memorized as 'already-cast' */
+	bool DepleteSpell(CREMemorizedSpell* spl);
 public: 
 	Spellbook();
 	~Spellbook();
@@ -183,7 +185,7 @@ public:
 	bool ChargeSpell(CREMemorizedSpell* spl);
 
 	/** Sets spell from memorized as 'already-cast' */
-	bool DepleteSpell(CREMemorizedSpell* spl);
+	bool DepleteSpell(int type, unsigned int page, unsigned int slot);
 
 	/** picks the highest spell of type and makes it 'already cast' */
 	bool DepleteSpell(int type);

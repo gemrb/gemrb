@@ -90,6 +90,9 @@ GameControl::GameControl(void)
 	//maybe we don't even need it
 	//action = GA_DEFAULT | GA_SELECT | GA_NO_DEAD;
 	Changed = true;
+	spellOrItem = 0;
+	spellCount = 0;
+	user = NULL;
 	lastActorID = 0;
 	MouseIsDown = false;
 	DrawSelectionRect = false;
@@ -947,6 +950,69 @@ void GameControl::TryToDefend(Actor *source, Actor *tgt)
 	targetID = tmp;
 }
 
+void GameControl::TryToCast(Actor *source, Point &tgt)
+{
+	char Tmp[40];
+
+	if (!spellCount) spellOrItem = 0;
+	if (!spellOrItem) return; //not casting or using an own item
+	spellCount--;
+	if (!spellOrItem) return; //not casting or using an own item
+	if (spellOrItem>0) {
+		CREMemorizedSpell *si;
+		//spell casting at target
+		si = source->spellbook.GetMemorizedSpell(spellOrItem, spellSlot, spellIndex);
+		sprintf(Tmp, "SpellPoint([%d.%d], %s)", tgt.x, tgt.y, si->SpellResRef );
+	} else {
+		//using item on target
+		sprintf(Tmp, "UseItemPoint(\"\",[%d.%d],%d,%d)", tgt.x,tgt.y,spellIndex, spellSlot );
+	}
+	source->AddAction( GenerateAction( Tmp) );
+	if (!spellCount) {
+		spellOrItem = 0;
+		target_mode = TARGET_MODE_NONE;
+	}
+}
+
+void GameControl::TryToCast(Actor *source, Actor *tgt)
+{
+	char Tmp[40];
+	ieWord tmp;
+
+	if (!spellCount) spellOrItem = 0;
+	if (!spellOrItem) return; //not casting or using an own item
+	spellCount--;
+	if (spellOrItem>0) {
+		sprintf(Tmp, "NIDSpecial6()");
+	} else {
+		//using item on target
+		sprintf(Tmp, "NIDSpecial5()");
+	}
+	tmp = targetID;
+	targetID=tgt->globalID; //this is a hack, not deadly, but a hack
+	Action* action = GenerateAction( Tmp);
+	source->AddAction( action );
+	if (spellOrItem>0)
+	{
+		CREMemorizedSpell *si;
+		//spell casting at target
+		si = source->spellbook.GetMemorizedSpell(spellOrItem, spellSlot, spellIndex);
+		sprintf(action->string0Parameter,"%.8s",si->SpellResRef);
+	}
+	else
+	{
+		action->int0Parameter=spellSlot;
+		action->int1Parameter=spellIndex;
+	}
+	//we restore the old target ID, because this variable is primarily
+	//to keep track of the target of a dialog, and attacking isn't talking
+	targetID = tmp;
+	if (!spellCount) {
+		spellOrItem = 0;
+		target_mode = TARGET_MODE_NONE;
+	}
+}
+
 void GameControl::TryToTalk(Actor *source, Actor *tgt)
 {
 	char Tmp[40];
@@ -966,6 +1032,11 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 {
 	char Tmp[256];
 
+	if (spellOrItem) {
+		//we'll get the container back from the coordinates
+		TryToCast(actor, container->Pos);
+		return;
+	}
 	actor->ClearPath();
 	actor->ClearActions();
 	strncpy(Tmp,"UseContainer()",sizeof(Tmp) );
@@ -976,6 +1047,12 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 void GameControl::HandleDoor(Door *door, Actor *actor)
 {
 	char Tmp[256];
+
+	if (spellOrItem) {
+		//we'll get the door back from the coordinates
+		TryToCast(actor, door->Pos);
+		return;
+	}
 
 	if (door->IsOpen()) {
 		actor->ClearPath();
@@ -992,6 +1069,12 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 
 bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 {
+	if (spellOrItem) {
+		//we'll get the active region from the coordinates (if needed)
+		TryToCast(actor, p);
+		//don't bother with this region further
+		return true;
+	}
 	switch(trap->Type) {
 		case ST_TRAVEL:
 			trap->Flags|=TRAP_RESET;
@@ -1122,6 +1205,12 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 
 		//just a single actor, no formation
 		if (game->selected.size()==1) {
+			//the player is using an item or spell on the ground
+			if (spellOrItem) {
+				TryToCast(core->GetFirstSelectedPC(), p);
+				return;
+			}
+
 			actor=game->selected[0];
 			actor->ClearPath();
 			actor->ClearActions();
@@ -1160,33 +1249,38 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 
 	type = actor->GetStat(IE_EA);
 	if ( type >= EA_EVILCUTOFF ) {
-		type = 2; //hostile
+		type = ACT_ATTACK; //hostile
 	} else if ( type > EA_CHARMED ) {
-		type = 1; //neutral
+		type = ACT_TALK; //neutral
 	} else {
-		type = 0; //party
+		type = ACT_NONE; //party
 	}
 	
 	if (target_mode&TARGET_MODE_ATTACK) {
-		type = 2;
+		type = ACT_ATTACK;
 	} else if (target_mode&TARGET_MODE_TALK) {
-		type = 1;
+		type = ACT_TALK;
 	} else if (target_mode&TARGET_MODE_CAST) {
-		type = 3;
+		type = ACT_CAST;
 	} else if (target_mode&TARGET_MODE_DEFEND) {
-		type = 4;
+		type = ACT_DEFEND;
 	}
 
-	target_mode = TARGET_MODE_NONE;
+	//we shouldn't zero this for two reasons in case of spell or item
+	//1. there could be multiple targets
+	//2. the target mode is important
+	if (!spellOrItem) {
+		target_mode = TARGET_MODE_NONE;
+	}
 
 	switch (type) {
-		case 0:
+		case ACT_NONE: //none
 			//clicked on a new party member
 			// FIXME: call GameControl::SelectActor() instead
 			//game->SelectActor( actor, true, SELECT_REPLACE );
 			SelectActor( game->InParty(actor) );
 			break;
-		case 1:
+		case ACT_TALK:
 			//talk (first selected talks)
 			if (game->selected.size()) {
 				//if we are in PST modify this to NO!
@@ -1199,15 +1293,20 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 				TryToTalk(source, actor);
 			}
 			break;
-		case 2:
+		case ACT_ATTACK:
 			//all of them attacks the red circled actor
 			for(i=0;i<game->selected.size();i++) {
 				TryToAttack(game->selected[i], actor);
 			}
 			break;
-		case 3: //cast on target
+		case ACT_CAST: //cast on target or use item on target
+			if (game->selected.size()==1) {
+				Actor *source;
+				source = core->GetFirstSelectedPC();
+				TryToCast(source, actor);
+			}
 			break;
-		case 4:
+		case ACT_DEFEND:
 			for(i=0;i<game->selected.size();i++) {
 				TryToDefend(game->selected[i], actor);
 			}
@@ -2033,3 +2132,25 @@ Actor *GameControl::GetSpeaker()
 {
 	return GetActorByGlobalID(speakerID);
 }
+
+void GameControl::SetupItemUse(int slot, int header, Actor *u, int targettype, int cnt)
+{
+	spellOrItem = -1;
+	spellUser = u;
+	spellSlot = slot;
+	spellIndex = header;
+	//item use also uses the casting icon, this might be changed
+	target_mode = targettype|TARGET_MODE_CAST;
+	spellCount = cnt;
+}
+
+void GameControl::SetupCasting(int type, int level, int idx, Actor *u, int targettype, int cnt)
+{
+	spellOrItem = type;
+	spellUser = u;
+	spellSlot = level;
+	spellIndex = idx;
+	target_mode = targettype|TARGET_MODE_CAST;
+	spellCount = cnt;
+}
+

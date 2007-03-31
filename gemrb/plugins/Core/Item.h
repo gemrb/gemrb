@@ -82,6 +82,16 @@ class Projectile;
 #define ITEM_AT_MAGIC      3
 #define ITEM_AT_BOW	4
 
+//target types
+#define TARGET_INVALID  0          //all the rest (default)
+#define TARGET_CREA  1             //single living creature
+#define TARGET_INV   2             //inventory item (not used?)
+#define TARGET_DEAD  3             //creature, item or point
+#define TARGET_AREA  4             //point target
+#define TARGET_SELF  5             //self
+#define TARGET_UNKNOWN 6           //unknown (use default)
+#define TARGET_NONE  7             //self
+
 //projectile qualifiers
 #define PROJ_ARROW  1
 #define PROJ_BOLT   2

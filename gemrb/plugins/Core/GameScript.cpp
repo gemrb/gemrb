@@ -647,6 +647,8 @@ static ActionLink actionnames[] = {
 	{"nidspecial2", GameScript::NIDSpecial2,AF_BLOCKING},//we use this for worldmap, another hack
 	{"nidspecial3", GameScript::Attack,AF_BLOCKING|AF_DIRECT},//this hack is for attacking preset target
 	{"nidspecial4", GameScript::ProtectObject,AF_BLOCKING|AF_DIRECT},
+	{"nidspecial5", GameScript::UseItem, AF_BLOCKING|AF_DIRECT},
+	{"nidspecial6", GameScript::Spell, AF_BLOCKING|AF_DIRECT},
 	{"noaction", GameScript::NoAction, 0},
 	{"opendoor", GameScript::OpenDoor,AF_BLOCKING},
 	{"panic", GameScript::Panic, 0},

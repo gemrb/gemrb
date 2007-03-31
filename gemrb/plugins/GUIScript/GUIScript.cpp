@@ -7528,7 +7528,26 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 	printf("Target: %d\n",itemdata.Target);
 	printf("Projectile: %d\n", itemdata.ProjectileAnimation);
 	//
-	actor->UseItem(itemdata.slot, itemdata.headerindex, actor, silent);
+	switch (itemdata.Target) {
+		case TARGET_SELF:
+			actor->UseItem(itemdata.slot, itemdata.headerindex, actor, silent);
+			break;
+		case TARGET_NONE:
+			actor->UseItem(itemdata.slot, itemdata.headerindex, NULL, silent);
+			break;
+		case TARGET_AREA:
+			core->GetGameControl()->SetupItemUse(itemdata.slot, itemdata.headerindex, actor, GA_POINT, itemdata.TargetNumber);
+			break;
+		case TARGET_CREA:
+			core->GetGameControl()->SetupItemUse(itemdata.slot, itemdata.headerindex, actor, GA_NO_DEAD, itemdata.TargetNumber);
+			break;
+		case TARGET_DEAD:
+			core->GetGameControl()->SetupItemUse(itemdata.slot, itemdata.headerindex, actor, 0, itemdata.TargetNumber);
+			break;
+		default:
+			printMessage("GUIScript", "Unhandled target type!", LIGHT_RED );
+			break;
+	}
 	Py_INCREF( Py_None );
 	return Py_None;
 }

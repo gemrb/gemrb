@@ -154,14 +154,23 @@ private:
 	void HandleWindowHide(const char *WindowName, const char *WindowPosition);
 	void HandleWindowReveal(const char *WindowName, const char *WindowPosition);
 	void ReadFormations();
+
+private:
 	unsigned char LeftCount, BottomCount, RightCount, TopCount;
 	DialogState* ds;
 	Dialog* dlg;
+	Actor *user;     //the user of item or spell
 public:
 	ieWord speakerID;
 	ieWord targetID;
-  //no idea if this is viable
-  Scriptable *targetOB;
+	//no idea if this is viable
+	Scriptable *targetOB;
+	//using spell or item
+	int spellOrItem; // -1 = item, otherwise the spell type
+	//the user of spell or item
+	Actor *spellUser;
+	int spellSlot, spellIndex; //or inventorySlot/itemHeader
+	int spellCount; //multiple targeting
 public:
 	Actor *GetTarget();
 	Actor *GetSpeaker();
@@ -171,6 +180,8 @@ public:
 	int HideGUI();
 	int UnhideGUI();
 	void TryToAttack(Actor *source, Actor *target);
+	void TryToCast(Actor *source, Point &p);
+	void TryToCast(Actor *source, Actor *target);
 	void TryToDefend(Actor *source, Actor *target);
 	void TryToTalk(Actor *source, Actor *target);
 	void HandleContainer(Container *container, Actor *actor);
@@ -194,6 +205,10 @@ public:
 	Sprite2D* GetPreview();
 	/** Returns PC portrait for a currently running game */
 	Sprite2D* GetPortraitPreview(int pcslot);
+	/** Sets up targeting with spells or items */
+	void SetupItemUse(int slot, int header, Actor *actor, int targettype, int cnt);
+	/** Page is the spell type + spell level info */
+	void SetupCasting(int type, int level, int slot, Actor *actor, int targettype, int cnt);
 };
 
 #endif
