@@ -1486,6 +1486,7 @@ public:
 };
 
 Action* GenerateAction(char* String);
+Action* GenerateActionDirect(char* String, Actor *object);
 Trigger* GenerateTrigger(char* String);
 
 #endif

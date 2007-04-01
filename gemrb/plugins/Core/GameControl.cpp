@@ -921,33 +921,21 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 void GameControl::TryToAttack(Actor *source, Actor *tgt)
 {
 	char Tmp[40];
-	ieWord tmp;
 
 	source->ClearPath();
 	source->ClearActions();
 	strncpy(Tmp,"NIDSpecial3()",sizeof(Tmp) );
-	tmp = targetID;
-	targetID=tgt->globalID; //this is a hack, not deadly, but a hack
-	source->AddAction( GenerateAction( Tmp) );
-	//we restore the old target ID, because this variable is primarily
-	//to keep track of the target of a dialog, and attacking isn't talking
-	targetID = tmp;
+	source->AddAction( GenerateActionDirect( Tmp, tgt) );
 }
 
 void GameControl::TryToDefend(Actor *source, Actor *tgt)
 {
 	char Tmp[40];
-	ieWord tmp;
 
 	source->ClearPath();
 	source->ClearActions();
 	strncpy(Tmp,"NIDSpecial4()",sizeof(Tmp) );
-	tmp = targetID;
-	targetID=tgt->globalID; //this is a hack, not deadly, but a hack
-	source->AddAction( GenerateAction( Tmp) );
-	//we restore the old target ID, because this variable is primarily
-	//to keep track of the target of a dialog, and attacking isn't talking
-	targetID = tmp;
+	source->AddAction( GenerateActionDirect( Tmp, tgt) );
 }
 
 void GameControl::TryToCast(Actor *source, Point &tgt)
@@ -977,7 +965,6 @@ void GameControl::TryToCast(Actor *source, Point &tgt)
 void GameControl::TryToCast(Actor *source, Actor *tgt)
 {
 	char Tmp[40];
-	ieWord tmp;
 
 	if (!spellCount) spellOrItem = 0;
 	if (!spellOrItem) return; //not casting or using an own item
@@ -988,9 +975,7 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 		//using item on target
 		sprintf(Tmp, "NIDSpecial5()");
 	}
-	tmp = targetID;
-	targetID=tgt->globalID; //this is a hack, not deadly, but a hack
-	Action* action = GenerateAction( Tmp);
+	Action* action = GenerateActionDirect( Tmp, tgt);
 	source->AddAction( action );
 	if (spellOrItem>0)
 	{
@@ -1004,9 +989,6 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 		action->int0Parameter=spellSlot;
 		action->int1Parameter=spellIndex;
 	}
-	//we restore the old target ID, because this variable is primarily
-	//to keep track of the target of a dialog, and attacking isn't talking
-	targetID = tmp;
 	if (!spellCount) {
 		spellOrItem = 0;
 		target_mode = TARGET_MODE_NONE;
@@ -1024,8 +1006,8 @@ void GameControl::TryToTalk(Actor *source, Actor *tgt)
 	source->ClearPath();
 	source->ClearActions();
 	strncpy(Tmp,"NIDSpecial1()",sizeof(Tmp) );
-	targetID=tgt->globalID; //this is a hack, but not so deadly
-	source->AddAction( GenerateAction( Tmp) );
+	targetID = tgt->globalID; //this is a hack, but not so deadly
+	source->AddAction( GenerateActionDirect( Tmp, tgt) );
 }
 
 void GameControl::HandleContainer(Container *container, Actor *actor)

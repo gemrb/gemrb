@@ -788,13 +788,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 	if (Flags & BD_OWN) {
 		scr = tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 	} else {
-		if (Flags & BD_NUMERIC) {
-			//the target was already set, this is a crude hack
-			tar = core->GetGameControl()->GetTarget();
-		}
-		else {
-			tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
-		}
+		tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
 		scr = Sender;
 	}
 	if (!scr) {
@@ -1316,7 +1310,7 @@ Action* GenerateActionCore(const char *src, const char *str, int acIndex)
 	if (actionflags[newAction->actionID]&AF_DIRECT) {
 		Object *tmp = new Object();
 		tmp->objectFields[0] = -1;
-		tmp->objectFields[1] = core->GetGameControl()->targetID;
+		//tmp->objectFields[1] = core->GetGameControl()->targetID;
 		newAction->objects[objectCount++] = tmp;
 	}
 	//Here is the Action; Now we need to evaluate the parameters, if any

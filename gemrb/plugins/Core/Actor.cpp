@@ -620,7 +620,7 @@ void pcf_grease(Actor *actor, ieDword Value)
 	if (Value) {
 		if (actor->HasVVCCell(overlay[OV_GREASE]))
 			return;
-		actor->add_animation(overlay[OV_GREASE], -1, -1, false);
+		actor->add_animation(overlay[OV_GREASE], -1, -1, 0);
 	} else {
 		actor->RemoveVVCell(overlay[OV_GREASE], true);
 	}
@@ -633,7 +633,7 @@ void pcf_web(Actor *actor, ieDword Value)
 	if (Value) {
 		if (actor->HasVVCCell(overlay[OV_WEB]))
 			return;
-		actor->add_animation(overlay[OV_WEB], -1, 0, false);
+		actor->add_animation(overlay[OV_WEB], -1, 0, 0);
 	} else {
 		actor->RemoveVVCell(overlay[OV_WEB], true);
 	}
@@ -643,7 +643,7 @@ void pcf_web(Actor *actor, ieDword Value)
 void pcf_bounce(Actor *actor, ieDword Value)
 {
 	if (Value) {
-		actor->add_animation(overlay[OV_BOUNCE], -1, -1, false);
+		actor->add_animation(overlay[OV_BOUNCE], -1, -1, 0);
 	} else {
 		//it seems we have to remove it abruptly
 		actor->RemoveVVCell(overlay[OV_BOUNCE], false);
@@ -901,14 +901,18 @@ static void InitActorTables()
 	}
 }
 
-void Actor::add_animation(const ieResRef resource, int gradient, int height, bool playonce)
+void Actor::add_animation(const ieResRef resource, int gradient, int height, int flags)
 {
 	ScriptedAnimation *sca = core->GetScriptedAnimation(resource);
 	if (!sca)
 		return;
 	sca->ZPos=height;
-	if (playonce) {
+	if (flags&AA_PLAYONCE) {
 		sca->PlayOnce();
+	}
+	if (flags&&AA_BLEND) {
+		//pst anims need this?
+		sca->SetBlend();
 	}
 	if (gradient!=-1) {
 		sca->SetPalette(gradient, 4);
@@ -924,28 +928,28 @@ void Actor::PlayDamageAnimation(int type)
 		case 0: case 1: case 2: case 3: //blood
 			i = (int) GetStat(IE_ANIMATION_ID)>>16;
 			if (!i) i = d_gradient[type];
-			add_animation(d_main[type], i, 0, true);
+			add_animation(d_main[type], i, 0, AA_PLAYONCE);
 			break;
 		case 4: case 5: case 7: //fire
-			add_animation(d_main[type], d_gradient[type], 0, true);
+			add_animation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
 			for(i=DL_FIRE;i<=type;i++) {
-				add_animation(d_splash[i], d_gradient[i], 0, true);
+				add_animation(d_splash[i], d_gradient[i], 0, AA_PLAYONCE);
 			}
 			break;
 		case 8: case 9: case 10: //electricity
-			add_animation(d_main[type], d_gradient[type], 0, true);
+			add_animation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
 			for(i=DL_ELECTRICITY;i<=type;i++) {
-				add_animation(d_splash[i], d_gradient[i], 0, true);
+				add_animation(d_splash[i], d_gradient[i], 0, AA_PLAYONCE);
 			}
 			break;
 		case 11: case 12: case 13://cold
-			add_animation(d_main[type], d_gradient[type], 0, true);
+			add_animation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
 			break;
 		case 14: case 15: case 16://acid
-			add_animation(d_main[type], d_gradient[type], 0, true);
+			add_animation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
 			break;
 		case 17: case 18: case 19://disintegrate
-			add_animation(d_main[type], d_gradient[type], 0, true);
+			add_animation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
 			break;
 	}
 }

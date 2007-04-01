@@ -77,6 +77,10 @@ class ScriptedAnimation;
 #define DNJ_JUMP       4
 #define DNJ_BIRD       (DNJ_FIT|DNJ_UNHINDERED)
 
+//add_animation flags (override vvc)
+#define AA_PLAYONCE    1
+#define AA_BLEND       2
+
 /** flags for GetActor */
 //default action
 #define GA_DEFAULT  0
@@ -409,8 +413,8 @@ public:
 	bool HasVVCCell(const ieResRef resource);
 	/* draw videocells */
 	void DrawVideocells(Region &screen, vvcVector &vvcCells, Color &tint);
-
-	void add_animation(const ieResRef resource, int gradient, int height, bool playonce);
+	
+	void add_animation(const ieResRef resource, int gradient, int height, int flags);
 	void PlayDamageAnimation(int x);
 	/* restores a spell of maximum maxlevel level, type is a mask of disabled spells */
 	int RestoreSpellLevel(ieDword maxlevel, ieDword typemask);

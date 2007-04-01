@@ -1725,7 +1725,7 @@ void GameScript::PlayerDialogue(Scriptable* Sender, Action* parameters)
 //we hijack this action for the player initiated dialogue
 void GameScript::NIDSpecial1(Scriptable* Sender, Action* parameters)
 {
-	BeginDialog( Sender, parameters, BD_INTERRUPT | BD_TARGET | BD_NUMERIC | BD_TALKCOUNT | BD_CHECKDIST );
+	BeginDialog( Sender, parameters, BD_INTERRUPT | BD_TARGET /*| BD_NUMERIC*/ | BD_TALKCOUNT | BD_CHECKDIST );
 }
 
 void GameScript::NIDSpecial2(Scriptable* Sender, Action* /*parameters*/)
@@ -4085,16 +4085,18 @@ void GameScript::ForceAttack( Scriptable* Sender, Action* parameters)
 		return;
 	}
 	//this is a hack, we use a gui variable for our own hideous reasons?
-	GameControl *gc = core->GetGameControl();
-	if (gc) {
-		//saving the target object ID from the gui variable
-		ieWord tmp = gc->targetID;
-		gc->targetID = ((Actor *) tar)->globalID;
-		char Tmp[256];
-		strncpy(Tmp,"NIDSpecial3()",sizeof(Tmp) );
-		scr->AddAction( GenerateAction(Tmp) );
-		//restore the gui variable
-		gc->targetID=tmp;
+	if (tar->Type==ST_ACTOR) {
+		GameControl *gc = core->GetGameControl();
+		if (gc) {
+			//saving the target object ID from the gui variable
+			char Tmp[40];
+			strncpy(Tmp,"NIDSpecial3()",sizeof(Tmp) );
+			scr->AddAction( GenerateActionDirect(Tmp, (Actor *) tar) );
+		}
+	} else {
+		char Tmp[80];
+		snprintf(Tmp, sizeof(Tmp), "BashDoor(%s)", tar->GetScriptName());
+		scr->AddAction ( GenerateAction(Tmp) );
 	}
 }
 

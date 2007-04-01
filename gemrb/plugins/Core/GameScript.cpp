@@ -139,7 +139,7 @@ static TriggerLink triggernames[] = {
 	{"happiness", GameScript::Happiness, 0},
 	{"happinessgt", GameScript::HappinessGT, 0},
 	{"happinesslt", GameScript::HappinessLT, 0},
-	{"harmlessclosed", GameScript::Closed, 0},  //pst, not sure
+	{"harmlessclosed", GameScript::Closed, 0}, //pst, not sure
 	{"harmlessentered", GameScript::HarmlessEntered, 0}, //???
 	{"harmlessopened", GameScript::Opened, 0}, //pst, not sure
 	{"hasinnateability", GameScript::HaveSpell, 0}, //these must be the same
@@ -505,7 +505,7 @@ static ActionLink actionnames[] = {
 	{"enablespritedither", GameScript::EnableSpriteDither, 0},
 	{"endcredits", GameScript::EndCredits, 0},//movie
 	{"endcutscenemode", GameScript::EndCutSceneMode, 0},
-	{"endgame", GameScript::QuitGame, 0},  //ending in iwd2
+	{"endgame", GameScript::QuitGame, 0}, //ending in iwd2
 	{"enemy", GameScript::Enemy, 0},
 	{"equipitem", GameScript::EquipItem, AF_BLOCKING}, //why blocking???
 	{"equipmostdamagingmelee",GameScript::EquipMostDamagingMelee,0},
@@ -643,7 +643,7 @@ static ActionLink actionnames[] = {
 	{"moveviewobject", GameScript::MoveViewObject, AF_BLOCKING},
 	{"moveviewpoint", GameScript::MoveViewPoint, AF_BLOCKING},
 	{"moveviewpointuntildone", GameScript::MoveViewPoint, 0},
-	{"nidspecial1", GameScript::NIDSpecial1,AF_BLOCKING},//we use this for dialogs, hack
+	{"nidspecial1", GameScript::NIDSpecial1,AF_BLOCKING|AF_DIRECT},//we use this for dialogs, hack
 	{"nidspecial2", GameScript::NIDSpecial2,AF_BLOCKING},//we use this for worldmap, another hack
 	{"nidspecial3", GameScript::Attack,AF_BLOCKING|AF_DIRECT},//this hack is for attacking preset target
 	{"nidspecial4", GameScript::ProtectObject,AF_BLOCKING|AF_DIRECT},
@@ -3074,6 +3074,16 @@ Action* GenerateAction(char* String)
 	char *src = String+len;
 	char *str = actionsTable->GetStringIndex( i )+len;
 	return GenerateActionCore( src, str, i);
+}
+
+Action* GenerateActionDirect(char *String, Actor *object)
+{
+	Action* action = GenerateAction(String);
+	Object *tmp = action->objects[1];
+	if (tmp && tmp->objectFields[0]==-1) {
+		tmp->objectFields[1] = object->globalID;
+	}
+	return action;
 }
 
 /** Self-destructing object if it is empty */
