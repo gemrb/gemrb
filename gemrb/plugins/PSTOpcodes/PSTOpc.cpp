@@ -101,7 +101,9 @@ int fx_set_status (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_play_bam (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_play_bam (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
-	target->add_animation(fx->Resource, -1, 0, false);
+	//play once set to true
+	//check tearring.itm (0xbb effect)
+	target->add_animation(fx->Resource, -1, 0, AA_BLEND|AA_PLAYONCE);
 	return FX_NOT_APPLIED;
 }
 

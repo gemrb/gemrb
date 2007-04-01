@@ -2386,6 +2386,8 @@ int fx_experience_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0x69 GoldModifier
+//in BG2 this effect subtracts gold when type is MOD_ADDITIVE
+//no one uses it, though. To keep the function, the default branch will do the subtraction
 int fx_gold_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_gold_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -2407,8 +2409,8 @@ int fx_gold_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 			gold = game->PartyGold*fx->Parameter1/100-game->PartyGold;
 			break;
 		default:
-			//ie crashes here, i guess
-			return FX_NOT_APPLIED;
+			gold = (ieDword) -fx->Parameter1;
+			break;
 	}
 	game->AddGold (gold);
 	return FX_NOT_APPLIED;
@@ -4579,8 +4581,9 @@ int fx_avatar_removal_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_magical_rest (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_magical_rest (%2d)\n", fx->Opcode );
-	target->Rest(0);       //full rest
-	return FX_NOT_APPLIED; //this is an instant effect
+	//instant, full rest
+	target->Rest(0);
+	return FX_NOT_APPLIED;
 }
 
 // 0x13d ImprovedHaste
