@@ -427,7 +427,7 @@ inline bool check_level(Actor *target, Effect *fx)
 		return false;
 	}
 	ieDword level = (ieDword) target->GetXPLevel( true );
-	if ((fx->DiceSides != 0 || fx->DiceThrown != 0) && (level > fx->DiceSides || level < fx->DiceThrown)) {
+	if ((fx->DiceSides != 0 && fx->DiceThrown != 0) && (level > fx->DiceSides || level < fx->DiceThrown)) {
 		return true;
 	}
 	return false;
@@ -445,9 +445,9 @@ inline bool check_probability(Effect* fx)
 }
 
 static EffectRef fx_level_immunity_ref={"Protection:Spelllevel",NULL,-1};
-static EffectRef fx_opcode_immunity_ref={"Protection:Opcode",NULL,-1};  //bg2
+static EffectRef fx_opcode_immunity_ref={"Protection:Opcode",NULL,-1}; //bg2
 static EffectRef fx_opcode_immunity2_ref={"Protection:Opcode2",NULL,-1};//iwd
-static EffectRef fx_spell_immunity_ref={"Protection:Spell",NULL,-1};  //bg2
+static EffectRef fx_spell_immunity_ref={"Protection:Spell",NULL,-1}; //bg2
 static EffectRef fx_spell_immunity2_ref={"Protection:Spell2",NULL,-1};//iwd
 static EffectRef fx_school_immunity_ref={"Protection:School",NULL,-1};
 static EffectRef fx_secondary_type_immunity_ref={"Protection:SecondaryType",NULL,-1};
