@@ -9,12 +9,12 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 # $Id$
 
@@ -38,7 +38,19 @@ MENU_MODE_ABILITIES = 5
 
 float_menu_mode = MENU_MODE_SINGLE
 float_menu_index = 0
+float_menu_selected = -1
 
+def UseItem ():
+	pc = GemRB.GameGetFirstSelectedPC ()
+	if float_menu_selected>=0:
+		GemRB.UseItem (pc, float_menu_selected+20, 0)
+	return
+
+def UseWeapon ():
+	pc = GemRB.GameGetFirstSelectedPC ()
+	#if float_menu_selected>=0:
+		#GemRB.UseItem (pc, float_menu_selected+9, 0)
+	return
 
 def OpenFloatMenuWindow ():
 	global FloatMenuWindow
@@ -55,9 +67,13 @@ def OpenFloatMenuWindow ():
 		GemRB.SetVar ("FloatWindow", -1)
 		SetSelectionChangeMultiHandler (None)
 		GemRB.UnhideGUI ()
+		if float_menu_mode == MENU_MODE_ITEMS:
+			UseItem()
+		elif float_menu_mode == MENU_MODE_WEAPONS:
+			UseWeapon()
 		return
 
-
+	ActionLevel = 0
 	if not GemRB.GameGetFirstSelectedPC ():
 		GemRB.UnhideGUI ()
 		return
@@ -134,9 +150,6 @@ def OpenFloatMenuWindow ():
 	for i in range (15, 20):
 		Button = GemRB.GetControl (Window, i)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM, OP_OR)
-		#GemRB.SetButtonFont (Window, Button, 'NUMBER')
-		#GemRB.SetVarAssoc (Window, Button, 'ItemButton', i)
-
 
 	# BAMs:
 	# AMALLSTP - 41655
@@ -250,12 +263,18 @@ def UpdateFloatMenuGroupAction (i):
 
 def UpdateFloatMenuItem (pc, i, weapons):
 	Window = FloatMenuWindow
+	#no float menu index needed for weapons or quick items
 	if weapons:
-		slot_item = GemRB.GetSlotItem (pc, 9 + i + float_menu_index)
+		slot_item = GemRB.GetSlotItem (pc, 9 + i)
 	else:
-		slot_item = GemRB.GetSlotItem (pc, 20 + i + float_menu_index)
+		slot_item = GemRB.GetSlotItem (pc, 20 + i)
 	Button = GemRB.GetControl (Window, 15 + i)
-	GemRB.SetButtonSprites (Window, Button, 'AMGENS', 0, 0, 1, 2, 3)
+
+	#the selected state is in another bam, sucks, we have to do everything manually
+	if i == float_menu_selected:
+		GemRB.SetButtonSprites (Window, Button, 'AMHILITE', 0, 0, 1, 0, 0)
+	else:
+		GemRB.SetButtonSprites (Window, Button, 'AMGENS', 0, 0, 1, 0, 0)
 
 	# Weapons - the last action is 'Guard'
 	
@@ -263,9 +282,12 @@ def UpdateFloatMenuItem (pc, i, weapons):
 	if slot_item:
 		item = GemRB.GetItem (slot_item['ItemResRef'])
 		identified = slot_item['Flags'] & IE_INV_ITEM_IDENTIFIED
+		if not identified:
+			GemRB.SetItemIcon (Window, Button, '')
+			GemRB.SetText (Window, Button, '')
+			GemRB.SetTooltip (Window, Button, '')
+			return
 
-
-		#GemRB.SetButtonSprites (Window, Button, 'IVSLOT', 0,  0, 0, 0, 0)
 		GemRB.SetItemIcon (Window, Button, slot_item['ItemResRef'])
 		if item['StackAmount'] > 1:
 			GemRB.SetText (Window, Button, str (slot_item['Usages0']))
@@ -276,12 +298,43 @@ def UpdateFloatMenuItem (pc, i, weapons):
 		else:
 			GemRB.SetTooltip (Window, Button, item['ItemNameIdentified'])
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
+		if weapons:
+			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectWeapon")
+		else:
+			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectItem")
+		GemRB.SetVarAssoc (Window, Button, 'ItemButton', i)
+		return
+
+	GemRB.SetItemIcon (Window, Button, '')
+	GemRB.SetText (Window, Button, '')
+	GemRB.SetTooltip (Window, Button, '')
+	return
+
+def SelectItem ():
+	global float_menu_selected
+
+	Window = FloatMenuWindow
+	Button = GemRB.GetVar ('ItemButton')
+	#simulating radiobutton+checkbox hybrid
+	if float_menu_selected == Button:
+		float_menu_selected = -1
 	else:
+		float_menu_selected = Button
+	UpdateFloatMenuWindow()
+	return
 
-		GemRB.SetItemIcon (Window, Button, '')
-		GemRB.SetText (Window, Button, '')
-		GemRB.SetTooltip (Window, Button, '')
+def SelectWeapon ():
+	global float_menu_selected
 
+	Window = FloatMenuWindow
+	Button = GemRB.GetVar ('ItemButton')
+	#simulating radiobutton+checkbox hybrid
+	if float_menu_selected == Button:
+		float_menu_selected = -1
+	else:
+		float_menu_selected = Button
+	UpdateFloatMenuWindow()
+	return
 
 def UpdateFloatMenuSpell (pc, i, innate):
 	Window = FloatMenuWindow
@@ -350,41 +403,48 @@ def FloatMenuSelectNextPC ():
 	# NOTE: it invokes FloatMenuSelectAnotherPC() through selection change handler
 
 def FloatMenuSelectAnotherPC ():
-	global float_menu_mode, float_menu_index
+	global float_menu_mode, float_menu_index, float_menu_selected
 	float_menu_mode = MENU_MODE_SINGLE
 	float_menu_index = 0
+	float_menu_selected = -1
 	UpdateFloatMenuWindow ()
 
 
 def FloatMenuSelectDialog ():
+	global float_menu_selected
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_TALK)
+	float_menu_selected = -1
 	UpdateFloatMenuWindow ()
 
 def FloatMenuSelectWeapons ():
-	global float_menu_mode, float_menu_index
+	global float_menu_mode, float_menu_index, float_menu_selected
 	float_menu_mode = MENU_MODE_WEAPONS
 	float_menu_index = 0
+	float_menu_selected = -1
 	# FIXME: Force attack mode
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_ATTACK)
 	UpdateFloatMenuWindow ()
 
 def FloatMenuSelectItems ():
-	global float_menu_mode, float_menu_index
+	global float_menu_mode, float_menu_index, float_menu_selected
 	float_menu_mode = MENU_MODE_ITEMS
 	float_menu_index = 0
+	float_menu_selected = -1
 	UpdateFloatMenuWindow ()
 
 def FloatMenuSelectSpells ():
-	global float_menu_mode, float_menu_index
+	global float_menu_mode, float_menu_index, float_menu_selected
 	float_menu_mode = MENU_MODE_SPELLS
 	float_menu_index = 0
+	float_menu_selected = -1
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_CAST)
 	UpdateFloatMenuWindow ()
 
 def FloatMenuSelectAbilities ():
-	global float_menu_mode, float_menu_index
+	global float_menu_mode, float_menu_index, float_menu_selected
 	float_menu_mode = MENU_MODE_ABILITIES
 	float_menu_index = 0
+	float_menu_selected = -1
 	UpdateFloatMenuWindow ()
 
 
