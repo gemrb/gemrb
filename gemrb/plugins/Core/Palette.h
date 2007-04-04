@@ -98,9 +98,11 @@ public:
 
 	void SetupPaperdollColours(ieDword* Colors, unsigned int type);
 	void SetupRGBModification(const Palette* src, const RGBModifier* mods,
-							  unsigned int type);
+		unsigned int type);
 	void SetupGlobalRGBModification(const Palette* src,
-									const RGBModifier& mod);
+		const RGBModifier& mod);
+	void SetupCompleteRGBModification(const Palette* src,
+		const RGBModifier& mod);
 
 	Palette* Copy();
 

@@ -55,7 +55,8 @@ void ScriptedAnimation::Init()
 	Duration = 0xffffffff;
 	justCreated = true;
 	PaletteName[0]=0;
-	SetPhase(P_ONSET);
+	twin = NULL;
+	Phase = P_NOTINITED;
 }
 
 void ScriptedAnimation::Override(ScriptedAnimation *templ)
@@ -100,11 +101,23 @@ void ScriptedAnimation::PrepareAnimation(Animation *anim, Palette *&palette, ieD
 }
 
 /* Creating animation from BAM */
-void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af)
+void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af, bool gettwin)
 {
 	//getcycle returns NULL if there is no such cycle
+	//special case, PST double animations
+	bool dcyc;
+	if (af->GetCycleCount()==6) {
+		dcyc=true;
+	} else {
+		dcyc=false;
+	}
 	for(unsigned int i=0;i<3;i++) {
-		anims[i] = af->GetCycle( (ieByte) i );
+		int c = i;
+		if (dcyc) {
+			c<<=1;
+			if (gettwin) c++;
+		}
+		anims[i] = af->GetCycle( (ieByte) c );
 		palettes[i] = NULL;
 		sounds[i][0] = 0;
 		if (anims[i]) {
@@ -124,6 +137,17 @@ void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af)
 		anims[P_RELEASE]->Flags |= S_ANI_PLAYONCE;
 
 	memcpy(ResName, af->ResRef, sizeof(ResName) );
+	//we are getting a twin, no need of going further,
+	//if there is any more common initialisation, it should
+	//go above this point
+	if (gettwin) {
+		return;
+	}
+	if (dcyc) {
+		twin = new ScriptedAnimation();
+		twin->LoadAnimationFactory(af, true);
+	}
+	SetPhase(P_ONSET);
 }
 
 /* Creating animation from VVC */
@@ -242,6 +266,9 @@ ScriptedAnimation::~ScriptedAnimation(void)
 	if (cover) {
 		SetSpriteCover(NULL);
 	}
+	if (twin) {
+		delete twin;
+	}
 }
 
 void ScriptedAnimation::SetPhase(int arg)
@@ -250,12 +277,17 @@ void ScriptedAnimation::SetPhase(int arg)
 		Phase = arg;
 	}
 	SetSpriteCover(NULL);
+	if (twin) {
+		twin->SetPhase(Phase);
+	}
 }
 
 void ScriptedAnimation::SetSound(int arg, const ieResRef sound)
 {
-	if (arg>=P_ONSET && arg<=P_RELEASE)
+	if (arg>=P_ONSET && arg<=P_RELEASE) {
 		memcpy(sounds[arg],sound,sizeof(sound));
+	}
+	//no need to call the twin
 }
 
 void ScriptedAnimation::PlayOnce()
@@ -265,6 +297,9 @@ void ScriptedAnimation::PlayOnce()
 		if (anims[i]) {
 			anims[i]->Flags |= S_ANI_PLAYONCE;
 		}
+	}
+	if (twin) {
+		twin->PlayOnce();
 	}
 }
 
@@ -283,6 +318,9 @@ void ScriptedAnimation::SetFullPalette(const ieResRef PaletteResRef)
 		palettes[i]=core->GetPalette(PaletteResRef);
 	}
 	memcpy(PaletteName, PaletteResRef, sizeof(PaletteName) );
+	if (twin) {
+		twin->SetFullPalette(PaletteResRef);
+	}
 }
 
 void ScriptedAnimation::SetFullPalette(int idx)
@@ -293,6 +331,7 @@ void ScriptedAnimation::SetFullPalette(int idx)
 	snprintf(PaletteResRef,sizeof(PaletteResRef),"%.7s%d",ResName, idx);
 	strnlwrcpy(PaletteResRef,PaletteResRef,8);
 	SetFullPalette(PaletteResRef);
+	//no need to call twin
 }
 
 #define PALSIZE 12
@@ -320,6 +359,14 @@ void ScriptedAnimation::SetPalette(int gradient, int start)
 			memcpy( &palettes[i]->col[start], NewPal, PALSIZE*sizeof( Color ) );
 		}
 	}
+	if (twin) {
+		twin->SetPalette(gradient, start);
+	}
+}
+
+ieDword ScriptedAnimation::GetSequenceDuration(ieDword multiplier)
+{
+	return anims[1]->GetFrameCount()*multiplier/FrameRate;
 }
 
 void ScriptedAnimation::SetDefaultDuration(ieDword duration)
@@ -327,14 +374,26 @@ void ScriptedAnimation::SetDefaultDuration(ieDword duration)
 	if (Duration==0xffffffff) {
 		Duration = duration;
 	}
+	if (twin) {
+		twin->Duration=Duration;
+	}
 }
 
 //it is not sure if we need tint at all
 bool ScriptedAnimation::Draw(Region &screen, Point &Pos, Color &p_tint, Map *area, int p_dither)
 {
+	// not sure
+	if (twin) {
+		twin->Draw(screen, Pos, p_tint, area, p_dither);
+	}
+
 	Video *video = core->GetVideoDriver();
 
 	if (justCreated) {
+		if (Phase == P_NOTINITED) {
+			printMessage("ScriptedAnimation", "Not fully initialised VVC!", LIGHT_RED);
+			return true;
+		}
 		justCreated = false;
 		if (Duration!=0xffffffff) {
 			Duration += core->GetGame()->Ticks;
@@ -430,4 +489,36 @@ void ScriptedAnimation::SetBlend()
 			PrepareAnimation(anims[i], palettes[i], IE_VVC_BLENDED);
 		}
 	}
+	if (twin) {
+		twin->SetBlend();
+	}
+}
+
+void ScriptedAnimation::AlterPalette(const RGBModifier& mod)
+{
+	for(unsigned int i=0;i<3;i++) {
+		if (anims[i]) {
+			if (!palettes[i]) {
+				Sprite2D* spr = anims[i]->GetFrame(0);
+				if (!spr) return;
+				palettes[i] = core->GetVideoDriver()->GetPalette(spr)->Copy();
+			}
+			palettes[i]->SetupCompleteRGBModification(palettes[i],mod);
+		}
+	}
+	if (twin) {
+		twin->AlterPalette(mod);
+	}
+}
+
+ScriptedAnimation *ScriptedAnimation::DetachTwin()
+{
+	if (!twin) {
+		return NULL;
+	}
+	ScriptedAnimation * ret = twin;
+	ret->YPos+=ret->ZPos+1;
+        ret->ZPos=-1;
+        twin=NULL;
+	return ret;
 }

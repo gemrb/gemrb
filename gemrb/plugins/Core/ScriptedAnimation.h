@@ -39,6 +39,7 @@
 #define IE_VVC_UNUSED           0xe0000000U
 
 //phases
+#define P_NOTINITED -1
 #define P_ONSET   0
 #define P_HOLD    1
 #define P_RELEASE 2
@@ -49,7 +50,7 @@ public:
 	~ScriptedAnimation(void);
 	ScriptedAnimation(DataStream* stream, bool autoFree = true);
 	void Init();
-	void LoadAnimationFactory(AnimationFactory *af);
+	void LoadAnimationFactory(AnimationFactory *af, bool gettwin = false);
 	void Override(ScriptedAnimation *templ);
 	//there are 3 phases: start, hold, release
 	//it will usually cycle in the 2. phase
@@ -69,6 +70,7 @@ public:
 	ieResRef ResName;
 	int Phase;
 	SpriteCover* cover;
+	ScriptedAnimation *twin;
 public:
 	//draws the next frame of the videocell
 	bool Draw(Region &screen, Point &Pos, Color &tint, Map *area, int dither);
@@ -88,10 +90,15 @@ public:
 	void SetSpriteCover(SpriteCover* c) { delete cover; cover = c; }
 	/* get stored SpriteCover */
 	SpriteCover* GetSpriteCover() const { return cover; }
+	ieDword GetSequenceDuration(ieDword multiplier);
 	/* sets default duration if it wasn't set yet */
 	void SetDefaultDuration(unsigned int duration);
 	/* transforms vvc to blended */
 	void SetBlend();
+	/* alters palette with rgb factor */
+	void AlterPalette(const RGBModifier &rgb);
+	/* returns possible twin after altering it to become underlay */
+	ScriptedAnimation *DetachTwin();
 private:
 	void PrepareAnimation(Animation *anim, Palette *&palette, ieDword Transparency);
 };

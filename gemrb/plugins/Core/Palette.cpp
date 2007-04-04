@@ -182,7 +182,7 @@ static inline void applyMod(const Color& src, Color& dest,
 }
 
 void Palette::SetupRGBModification(const Palette* src, const RGBModifier* mods,
-								   unsigned int type)
+	unsigned int type)
 {
 	const RGBModifier* tmods = mods+(8*type);
 	int i;
@@ -231,7 +231,7 @@ void Palette::SetupRGBModification(const Palette* src, const RGBModifier* mods,
 }
 
 void Palette::SetupGlobalRGBModification(const Palette* src,
-										 const RGBModifier& mod)
+	const RGBModifier& mod)
 {
 	int i;
 	for (i = 0; i < 4; ++i)
@@ -247,4 +247,17 @@ void Palette::SetupGlobalRGBModification(const Palette* src,
 		applyMod(src->col[0xB0+i],col[0xB0+i],mod);
 
 
+}
+
+//only the shadow and transparent slot isn't tinted
+void Palette::SetupCompleteRGBModification(const Palette* src,
+	const RGBModifier& mod)
+{
+	int i;
+
+	for (i = 0; i < 2; ++i)
+		col[i] = src->col[i];
+
+	for (i = 0; i < 254; ++i)
+		applyMod(src->col[0x02+i],col[0x02+i],mod);
 }

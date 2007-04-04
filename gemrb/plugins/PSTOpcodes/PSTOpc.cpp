@@ -31,7 +31,8 @@
 
 
 int fx_set_status (Actor* Owner, Actor* target, Effect* fx);//ba
-int fx_play_bam (Actor* Owner, Actor* target, Effect* fx);//bb,bc,bd,be,bf
+int fx_play_bam_bb (Actor* Owner, Actor* target, Effect* fx);//bb
+int fx_play_bam (Actor* Owner, Actor* target, Effect* fx);//bc,bd,be,bf
 int fx_transfer_hp (Actor* Owner, Actor* target, Effect* fx);//c0
 //int fx_shake_screen (Actor* Owner, Actor* target, Effect* fx);//c1 already implemented
 int fx_flash_screen (Actor* Owner, Actor* target, Effect* fx);//c2
@@ -62,8 +63,8 @@ static EffectRef effectnames[] = {
 	{ "JumbleCurse", fx_jumble_curse, 0}, //d3
 	{ "MoveView", fx_move_view, 0},//cd
 	{ "Overlay", fx_overlay, 0}, //c9
-	{ "PlayBAM1", fx_play_bam, 0}, //bb,bc,bd,be,bf
-	{ "PlayBAM2", fx_play_bam, 0},
+	{ "PlayBAM1", fx_play_bam_bb, 0}, //bb
+	{ "PlayBAM2", fx_play_bam, 0},//bc,bd,be,bf
 	{ "PlayBAM3", fx_play_bam, 0},
 	{ "PlayBAM4", fx_play_bam, 0},
 	{ "PlayBAM5", fx_play_bam, 0},
@@ -97,13 +98,109 @@ int fx_set_status (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-//bb,bc,bd,be,bf fx_play_bam
+//bb fx_play_bam_bb (play blended animation)
+int fx_play_bam_bb (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	bool playonce;
+
+	if (0) printf( "fx_play_bam_bb (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
+	//play once set to true
+	//check tearring.itm (0xbb effect)
+	ScriptedAnimation *sca = core->GetScriptedAnimation(fx->Resource);
+	if (!sca)
+		return FX_NOT_APPLIED;
+
+	sca->SetBlend();
+	//the transparency is based on the original palette
+	if (fx->Parameter1) {
+		RGBModifier rgb;
+
+		rgb.speed=-1;
+		rgb.phase=0;
+		rgb.rgb.r=fx->Parameter1;
+		rgb.rgb.g=fx->Parameter1 >> 8;
+		rgb.rgb.b=fx->Parameter1 >> 16;
+		rgb.rgb.a=0;
+		rgb.type=RGBModifier::TINT;
+		sca->AlterPalette(rgb);
+	}
+	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
+		playonce=true;
+	} else {
+		playonce=false;
+	}
+	if (fx->Parameter2&1) {
+		//four cycles, duration is in millisecond
+		sca->SetDefaultDuration(sca->GetSequenceDuration(4000));
+	} else {
+		if (playonce) {
+			sca->PlayOnce();
+		} else {
+			sca->SetDefaultDuration(fx->Duration-core->GetGame()->Ticks);
+		}
+	}
+	if (fx->Parameter2&2) {
+		sca->XPos+=fx->PosX;
+		sca->YPos+=fx->PosY;
+		//probably we should use Owner?
+		target->GetCurrentArea()->AddVVCell(sca);
+	} else {
+		ScriptedAnimation *twin = sca->DetachTwin();
+		if (twin) {
+			target->AddVVCell(twin);
+		}
+		target->AddVVCell(sca);
+	}
+	return FX_NOT_APPLIED;
+}
+
+//bc,bd,be,bf fx_play_bam
+//these are not yet fully implemented
 int fx_play_bam (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
+	bool playonce;
+
 	if (0) printf( "fx_play_bam (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
 	//play once set to true
 	//check tearring.itm (0xbb effect)
-	target->add_animation(fx->Resource, -1, 0, AA_BLEND|AA_PLAYONCE);
+	ScriptedAnimation *sca = core->GetScriptedAnimation(fx->Resource);
+	if (!sca)
+		return FX_NOT_APPLIED;
+	if (fx->Parameter1) {
+		RGBModifier rgb;
+		
+		rgb.speed=-1;
+		rgb.phase=0;
+		rgb.rgb.r=fx->Parameter1;
+		rgb.rgb.g=fx->Parameter1 >> 8;
+		rgb.rgb.b=fx->Parameter1 >> 16;
+		rgb.rgb.a=fx->Parameter1 >> 24;
+		rgb.type=RGBModifier::TINT;
+		sca->AlterPalette(rgb);
+	}
+	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
+		playonce=true;
+	} else {
+		playonce=false;
+	}
+	if (fx->Parameter2&1) {
+		//four cycles, duration is in millisecond
+		sca->SetDefaultDuration(sca->GetSequenceDuration(4000));
+	} else {
+		if (playonce) {
+			sca->PlayOnce();
+		} else {
+			sca->SetDefaultDuration(fx->Duration-core->GetGame()->Ticks);
+		}
+	}
+	sca->SetBlend();
+	if (fx->Parameter2&2) {
+		sca->XPos+=fx->PosX;
+		sca->YPos+=fx->PosY;
+		target->GetCurrentArea()->AddVVCell(sca);
+	} else {
+		target->AddVVCell(sca);
+	}
 	return FX_NOT_APPLIED;
 }
 
