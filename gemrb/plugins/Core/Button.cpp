@@ -117,11 +117,6 @@ void Button::Draw(unsigned short x, unsigned short y)
 
 	Video * video = core->GetVideoDriver();
 
-#ifdef _DEBUG
-		Color green = {0,255,0,0};
-		Region r = Region( x + XPos, y + YPos, Width, Height );
-		video->DrawRect( r, green, false );
-#endif
 	// Button image
 	if (!( Flags & IE_GUI_BUTTON_NO_IMAGE )) {
 		Sprite2D* Image = NULL;
