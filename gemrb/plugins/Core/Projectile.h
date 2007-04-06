@@ -56,7 +56,7 @@
 
 //projectile spark flags
 #define PSF_SPARKS  1
-#define PSF_FLYING  2  
+#define PSF_FLYING  2
 #define PSF_LOOPING 4  //looping sound
 #define PSF_IGNORE_CENTER 16
 
@@ -86,7 +86,7 @@ typedef struct ProjectileExtension
 	//there could be some more unused bytes we don't load
 } ProjectileExtension;
 
-class GEM_EXPORT Projectile  
+class GEM_EXPORT Projectile
 {
 public:
 	Projectile();
@@ -130,6 +130,7 @@ protected:
 	Map *area;
 	Point Pos;
 	Point Destination;
+	ieDword Caster; //the globalID of the caster actor
 	ieDword Target; //the globalID of target actor
 	ieDword timeStartStep;
 	int phase;
@@ -143,6 +144,7 @@ protected:
 public:
 	PathNode *GetNextStep(int x);
 	int GetPathLength();
+	void SetCaster(ieDword t);
 	void SetTarget(ieDword t);
 	void SetTarget(Point &p);
 

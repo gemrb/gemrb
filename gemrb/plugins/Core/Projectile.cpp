@@ -158,6 +158,8 @@ void Projectile::ChangePhase()
 				return;
 			}
 			//deliver payload to target
+			Actor *original = area->GetActorByGlobalID(Caster);
+			effects->SetOwner(original?original:target);
 			effects->AddAllEffects(target);
 			effects = NULL;
 			return;
@@ -209,6 +211,11 @@ void Projectile::DoStep(unsigned int walk_speed)
 	else
 		Pos.y -= ( unsigned short )
 			( ( ( Pos.y - ( ( step->Next->y * 12 ) + 6 ) ) * ( time - timeStartStep ) ) / walk_speed );
+}
+
+void Projectile::SetCaster(ieDword caster)
+{
+	Caster=caster;
 }
 
 void Projectile::SetTarget(Point &p)

@@ -564,7 +564,7 @@ void pcf_entangle(Actor *actor, ieDword Value)
 	if (Value) {
 		if (actor->HasVVCCell(overlay[OV_ENTANGLE]))
 			return;
-		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_ENTANGLE]);
+		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_ENTANGLE], false);
 		actor->AddVVCell(sca);
 	} else {
 		actor->RemoveVVCell(overlay[OV_ENTANGLE], true);
@@ -578,7 +578,7 @@ void pcf_sanctuary(Actor *actor, ieDword Value)
 {
 	if (Value) {
 		if (!actor->HasVVCCell(overlay[OV_SANCTUARY])) {
-			ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_SANCTUARY]);
+			ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_SANCTUARY], false);
 			actor->AddVVCell(sca);
 		}
 		SetLockedPalette(actor, fullwhite);
@@ -594,7 +594,7 @@ void pcf_shieldglobe(Actor *actor, ieDword Value)
 	if (Value) {
 		if (actor->HasVVCCell(overlay[OV_SHIELDGLOBE]))
 			return;
-		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_SHIELDGLOBE]);
+		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_SHIELDGLOBE], false);
 		actor->AddVVCell(sca);
 	} else {
 		actor->RemoveVVCell(overlay[OV_SHIELDGLOBE], true);
@@ -607,7 +607,7 @@ void pcf_minorglobe(Actor *actor, ieDword Value)
 	if (Value) {
 		if (actor->HasVVCCell(overlay[OV_MINORGLOBE]))
 			return;
-		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_MINORGLOBE]);
+		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_MINORGLOBE], false);
 		actor->AddVVCell(sca);
 	} else {
 		actor->RemoveVVCell(overlay[OV_MINORGLOBE], true);
@@ -903,7 +903,7 @@ static void InitActorTables()
 
 void Actor::add_animation(const ieResRef resource, int gradient, int height, int flags)
 {
-	ScriptedAnimation *sca = core->GetScriptedAnimation(resource);
+	ScriptedAnimation *sca = core->GetScriptedAnimation(resource, false);
 	if (!sca)
 		return;
 	sca->ZPos=height;
@@ -2403,7 +2403,7 @@ void Actor::DrawVideocells(Region &screen, vvcVector &vvcCells, Color &tint)
 */
 
 		// actually this is better be drawn by the vvc
-		bool endReached = vvc->Draw(screen, Pos, tint, area, WantDither());
+		bool endReached = vvc->Draw(screen, Pos, tint, area, WantDither(), GetOrientation());
 		if (endReached) {
 			delete vvc;
 			vvcCells.erase(vvcCells.begin()+i);
@@ -3013,6 +3013,7 @@ bool Actor::UseItemPoint(int slot, ieDword header, Point &target, bool silent)
 	}
 
 	Projectile *pro = itm->GetProjectile(header);
+	pro->SetCaster(globalID);
 	GetCurrentArea()->AddProjectile(pro, Pos, target);
 	//in fact this should build a projectile and hurl it at the target
 	//this is just a temporary solution
@@ -3049,6 +3050,7 @@ bool Actor::UseItem(int slot, ieDword header, Scriptable* target, bool silent)
 	}
 	Projectile *pro = itm->GetProjectile(header);
 	if (pro) {
+		pro->SetCaster(globalID);
 		GetCurrentArea()->AddProjectile(pro, Pos, tar->globalID);
 	}
 	//in fact this should build a projectile and hurl it at the target
