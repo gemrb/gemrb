@@ -327,6 +327,7 @@ static TriggerLink triggernames[] = {
 	{"storehasitem", GameScript::StoreHasItem, 0},
 	{"stuffglobalrandom", GameScript::StuffGlobalRandom, 0},//hm, this is a trigger
 	{"subrace", GameScript::SubRace, 0},
+	{"systemvariable", GameScript::SystemVariable_Trigger, 0}, //gemrb
 	{"targetunreachable", GameScript::TargetUnreachable, 0},
 	{"team", GameScript::Team, 0},
 	{"time", GameScript::Time, 0},

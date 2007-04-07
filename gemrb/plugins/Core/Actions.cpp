@@ -4380,7 +4380,7 @@ void GameScript::UseContainer(Scriptable* Sender, Action* /*parameters*/)
 	ieDword distance = PersonalDistance(Sender, container);
 	ieDword needed = MAX_OPERATING_DISTANCE;
 	if (container->Type==IE_CONTAINER_PILE) {
-		needed = 15; // less than a search square (width)
+		needed = 0; // less than a search square (width)
 	}
 	if (distance<=needed)
 	{

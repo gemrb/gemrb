@@ -817,6 +817,13 @@ static void InitActorTables()
 	maximum_values[IE_CON]=i;
 	maximum_values[IE_CHR]=i;
 	maximum_values[IE_WIS]=i;
+	if (REVERSE_TOHIT) {
+		//all games except iwd2
+		maximum_values[IE_ARMORCLASS]=20;
+	} else {
+		//iwd2
+		maximum_values[IE_ARMORCLASS]=199;
+	}
 
 	//initializing the vvc resource references
 	table = core->LoadTable( "damage" );

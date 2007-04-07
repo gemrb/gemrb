@@ -3743,3 +3743,37 @@ int GameScript::Unusable(Scriptable* Sender, Trigger* parameters)
 	return ret;
 }
 
+// this is a GemRB specific trigger, to transfer some system variables
+// to a global (game variable), it will always return true, and the
+// variable could be checked in a subsequent trigger (like triggersetglobal)
+
+#define SYSV_SCREENFLAGS    0
+#define SYSV_CONTROLSTATUS  1
+#define SYSV_REPUTATION     2
+#define SYSV_PARTYGOLD      3
+
+int GameScript::SystemVariable_Trigger(Scriptable* Sender, Trigger* parameters)
+{
+	ieDword value;
+
+	switch (parameters->int0Parameter) {
+	case SYSV_SCREENFLAGS:
+		value = core->GetGameControl()->GetScreenFlags();
+		break;
+	case SYSV_CONTROLSTATUS:
+		value = core->GetGame()->ControlStatus;
+		break;
+	case SYSV_REPUTATION:
+		value = core->GetGame()->Reputation;
+		break;
+	case SYSV_PARTYGOLD:
+		value = core->GetGame()->PartyGold;
+		break;
+	default:
+		value = 0;
+	}
+
+	SetVariable(Sender, parameters->string0Parameter, value);
+	return 1;
+}
+

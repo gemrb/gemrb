@@ -909,6 +909,7 @@ public: //Script Functions
 	static int StoreHasItem(Scriptable* Sender, Trigger* parameters);
 	static int StuffGlobalRandom(Scriptable* Sender, Trigger* parameters);
 	static int SubRace(Scriptable* Sender, Trigger* parameters);
+	static int SystemVariable_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int TargetUnreachable(Scriptable* Sender, Trigger* parameters);
 	static int Team(Scriptable* Sender, Trigger* parameters);
 	static int Time(Scriptable* Sender, Trigger* parameters);
