@@ -159,7 +159,7 @@ void SPLImp::GetExtHeader(Spell *s, SPLExtHeader* eh)
 	str->ReadWord( &eh->FeatureOffset );
 	str->ReadWord( &eh->Charges );
 	str->ReadWord( &eh->ChargeDepletion );
-	str->ReadWord( &eh->Projectile );
+	str->ReadWord( &eh->ProjectileAnimation );
 
 	eh->features = core->GetFeatures( eh->FeatureCount );
 	str->Seek( s->FeatureBlockOffset + 48*eh->FeatureOffset, GEM_STREAM_START );

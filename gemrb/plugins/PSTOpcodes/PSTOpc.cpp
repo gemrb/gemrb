@@ -33,6 +33,7 @@
 int fx_set_status (Actor* Owner, Actor* target, Effect* fx);//ba
 int fx_play_bam_bb (Actor* Owner, Actor* target, Effect* fx);//bb
 int fx_play_bam (Actor* Owner, Actor* target, Effect* fx);//bc,bd,be,bf
+int fx_play_bam_bf (Actor* Owner, Actor* target, Effect* fx);//bf
 int fx_transfer_hp (Actor* Owner, Actor* target, Effect* fx);//c0
 //int fx_shake_screen (Actor* Owner, Actor* target, Effect* fx);//c1 already implemented
 int fx_flash_screen (Actor* Owner, Actor* target, Effect* fx);//c2
@@ -67,7 +68,7 @@ static EffectRef effectnames[] = {
 	{ "PlayBAM2", fx_play_bam, 0},//bc,bd,be,bf
 	{ "PlayBAM3", fx_play_bam, 0},
 	{ "PlayBAM4", fx_play_bam, 0},
-	{ "PlayBAM5", fx_play_bam, 0},
+	{ "PlayBAM5", fx_play_bam_bf, 0},
 	{ "Prayer", fx_prayer, 0},//cc
 	{ "SetStatus", fx_set_status, 0}, //ba
 	{ "SpecialEffect", fx_special_effect, 0},//c4
@@ -99,14 +100,14 @@ int fx_set_status (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //bb fx_play_bam_bb (play blended animation)
-int fx_play_bam_bb (Actor* /*Owner*/, Actor* target, Effect* fx)
+int fx_play_bam_bb (Actor* Owner, Actor* target, Effect* fx)
 {
 	bool playonce;
 
 	if (0) printf( "fx_play_bam_bb (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
 	//play once set to true
 	//check tearring.itm (0xbb effect)
-	ScriptedAnimation *sca = core->GetScriptedAnimation(fx->Resource);
+	ScriptedAnimation *sca = core->GetScriptedAnimation(fx->Resource, true);
 	if (!sca)
 		return FX_NOT_APPLIED;
 
@@ -141,9 +142,8 @@ int fx_play_bam_bb (Actor* /*Owner*/, Actor* target, Effect* fx)
 	}
 	if (fx->Parameter2&2) {
 		sca->XPos+=fx->PosX;
-		sca->YPos+=fx->PosY;
-		//probably we should use Owner?
-		target->GetCurrentArea()->AddVVCell(sca);
+		sca->YPos+=fx->PosY;		
+		Owner->GetCurrentArea()->AddVVCell(sca);
 	} else {
 		ScriptedAnimation *twin = sca->DetachTwin();
 		if (twin) {
@@ -156,14 +156,14 @@ int fx_play_bam_bb (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 //bc,bd,be,bf fx_play_bam
 //these are not yet fully implemented
-int fx_play_bam (Actor* /*Owner*/, Actor* target, Effect* fx)
+int fx_play_bam (Actor* Owner, Actor* target, Effect* fx)
 {
 	bool playonce;
 
 	if (0) printf( "fx_play_bam (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
 	//play once set to true
 	//check tearring.itm (0xbb effect)
-	ScriptedAnimation *sca = core->GetScriptedAnimation(fx->Resource);
+	ScriptedAnimation *sca = core->GetScriptedAnimation(fx->Resource, false);
 	if (!sca)
 		return FX_NOT_APPLIED;
 	if (fx->Parameter1) {
@@ -197,8 +197,60 @@ int fx_play_bam (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (fx->Parameter2&2) {
 		sca->XPos+=fx->PosX;
 		sca->YPos+=fx->PosY;
-		target->GetCurrentArea()->AddVVCell(sca);
+		Owner->GetCurrentArea()->AddVVCell(sca);
 	} else {
+		target->AddVVCell(sca);
+	}
+	return FX_NOT_APPLIED;
+}
+
+int fx_play_bam_bf (Actor* Owner, Actor* target, Effect* fx)
+{
+	bool playonce;
+
+	if (0) printf( "fx_play_bam (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
+	//play once set to true
+	//check tearring.itm (0xbb effect)
+	ScriptedAnimation *sca = core->GetScriptedAnimation(fx->Resource, true);
+	if (!sca)
+		return FX_NOT_APPLIED;
+	if (fx->Parameter1) {
+		RGBModifier rgb;
+		
+		rgb.speed=-1;
+		rgb.phase=0;
+		rgb.rgb.r=fx->Parameter1;
+		rgb.rgb.g=fx->Parameter1 >> 8;
+		rgb.rgb.b=fx->Parameter1 >> 16;
+		rgb.rgb.a=fx->Parameter1 >> 24;
+		rgb.type=RGBModifier::TINT;
+		sca->AlterPalette(rgb);
+	}
+	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
+		playonce=true;
+	} else {
+		playonce=false;
+	}
+	if (fx->Parameter2&1) {
+		//four cycles, duration is in millisecond
+		sca->SetDefaultDuration(sca->GetSequenceDuration(4000));
+	} else {
+		if (playonce) {
+			sca->PlayOnce();
+		} else {
+			sca->SetDefaultDuration(fx->Duration-core->GetGame()->Ticks);
+		}
+	}
+	sca->SetBlend();
+	if (fx->Parameter2&2) {
+		sca->XPos+=fx->PosX;
+		sca->YPos+=fx->PosY;
+		Owner->GetCurrentArea()->AddVVCell(sca);
+	} else {
+		ScriptedAnimation *twin = sca->DetachTwin();
+		if (twin) {
+			target->AddVVCell(twin);
+		}
 		target->AddVVCell(sca);
 	}
 	return FX_NOT_APPLIED;

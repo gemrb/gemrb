@@ -557,7 +557,7 @@ public:
 	/** returns true if resource exists */
 	bool Exists(const char *ResRef, SClass_ID type);
 	/** creates a vvc/bam animation object at point */
-	ScriptedAnimation* GetScriptedAnimation( const char *ResRef);
+	ScriptedAnimation* GetScriptedAnimation( const char *ResRef, bool doublehint);
 	/** returns the first selected PC */
 	Actor *GetFirstSelectedPC();
 	/** returns a single sprite (not cached) from a BAM resource */

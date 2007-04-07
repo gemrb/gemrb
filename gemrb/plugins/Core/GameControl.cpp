@@ -589,7 +589,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			case 'c':
 				if (game->selected.size() > 0 && lastActor) {
 					Actor *src = game->selected[0];
-					bool res = src->spellbook.CastSpell( "SPWI207", src, lastActor );
+					bool res = src->CastSpell( "SPWI207", lastActor );
 					printf( "Cast Spell: %d\n", res );
 				}
 				break;

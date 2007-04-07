@@ -24,6 +24,7 @@
 #include "Spell.h"
 #include "TableMgr.h"
 #include "Actor.h"
+#include "Projectile.h"
 
 static ieResRef *spelllist = NULL;
 static ieResRef *innatelist = NULL;
@@ -582,7 +583,7 @@ bool Spellbook::GetSpellInfo(SpellExtHeader *array, int type, int startindex, in
 					array[pos].Target = ext_header->Target;
 					array[pos].TargetNumber = ext_header->TargetNumber;
 					array[pos].Range = ext_header->Range;
-					array[pos].Projectile = ext_header->Projectile;
+					array[pos].Projectile = ext_header->ProjectileAnimation;
 					array[pos].CastingTime = (ieWord) ext_header->CastingTime;
 					array[pos].strref = spl->SpellName;
 					array[pos].count = 1;
@@ -596,21 +597,6 @@ bool Spellbook::GetSpellInfo(SpellExtHeader *array, int type, int startindex, in
 	return false;
 }
  
-bool Spellbook::CastSpell( ieResRef SpellResRef, Actor* Source, Actor* Target )
-{
-	if (! HaveSpell( SpellResRef, HS_DEPLETE )) {
-		return false;
-	}
-
-	Spell* spl = core->GetSpell( SpellResRef );
-	for (int i = 0; i < spl->CastingFeatureCount; i++) {
-		Effect* fx = &spl->casting_features[i];
-		AddEffect( fx, Source, Target );
-	}
-
-	return true;
-}
-
 void Spellbook::dump()
 {
 	unsigned int k;

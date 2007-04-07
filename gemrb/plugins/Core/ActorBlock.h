@@ -342,7 +342,7 @@ public:
 
 		return Orientation;
 	}
-	inline unsigned char GetStance() {
+	inline unsigned char GetStance() const {
 		return StanceID;
 	}
 

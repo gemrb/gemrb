@@ -2480,7 +2480,7 @@ retry:
 	map->AddActor(ab);
 	ab->SetPosition(position, true, 0);
 	if (vvcres[0]) {
-		ScriptedAnimation* vvc = GetScriptedAnimation(vvcres);
+		ScriptedAnimation* vvc = GetScriptedAnimation(vvcres, false);
 		vvc->XPos=position.x;
 		vvc->YPos=position.y;
 		map->AddVVCell( vvc );
@@ -4788,7 +4788,7 @@ bool Interface::Exists(const char *ResRef, SClass_ID type)
 
 //if the default setup doesn't fit for an animation
 //create a vvc for it!
-ScriptedAnimation* Interface::GetScriptedAnimation( const char *effect)
+ScriptedAnimation* Interface::GetScriptedAnimation( const char *effect, bool doublehint)
 {
 	ScriptedAnimation *ret = NULL;
 
@@ -4797,10 +4797,10 @@ ScriptedAnimation* Interface::GetScriptedAnimation( const char *effect)
 		ret = new ScriptedAnimation(ds, true);
 	} else {
 		AnimationFactory *af = (AnimationFactory *)
-			key->GetFactoryResource( effect, IE_BAM_CLASS_ID, IE_NORMAL );
+		key->GetFactoryResource( effect, IE_BAM_CLASS_ID, IE_NORMAL );
 		if (af) {
 			ret = new ScriptedAnimation();
-			ret->LoadAnimationFactory( af);
+			ret->LoadAnimationFactory( af, doublehint?2:0);
 		}
 	}
 	if (ret) {

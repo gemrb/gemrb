@@ -156,6 +156,7 @@ public:
 	 * Returns true is successful. fx is just a reference, AddEffect()
 	 * will malloc its own copy */
 	bool AddEffect(Effect* fx);
+	bool AddEffect(Effect* fx, Actor* self, Actor* pretarget);
 	/** Removes first Effect matching fx from the queue. 
 	 * Effects are matched based on their contents */
 	bool RemoveEffect(Effect* fx);

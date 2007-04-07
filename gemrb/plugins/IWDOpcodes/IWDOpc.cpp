@@ -369,7 +369,7 @@ int fx_iwd_visual_spell_hit (Actor* /*Owner*/, Actor* target, Effect* fx)
 		return FX_APPLIED;
 	}
 	if (fx->Parameter2<(ieDword) shcount) {
-		ScriptedAnimation *sca = core->GetScriptedAnimation(iwd_spell_hits[fx->Parameter2]);
+		ScriptedAnimation *sca = core->GetScriptedAnimation(iwd_spell_hits[fx->Parameter2], false);
 		if (!sca) {
 			return FX_NOT_APPLIED;
 		}

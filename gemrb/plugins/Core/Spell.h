@@ -34,6 +34,8 @@
 #include "AnimationMgr.h"
 #include "EffectQueue.h"
 
+class Projectile;
+
 #ifdef WIN32
 
 #ifdef GEM_BUILD_DLL
@@ -85,7 +87,7 @@ public:
 	ieWord FeatureOffset;
 	ieWord Charges;
 	ieWord ChargeDepletion;
-	ieWord Projectile;
+	ieWord ProjectileAnimation;
 	Effect* features;
 };
 
@@ -143,8 +145,18 @@ public:
 	char unknown13[8];
 
 public:
+	//returns the requested extended header
+	SPLExtHeader *GetExtHeader(unsigned int which) const
+	{
+		if(ExtHeaderCount<=which) {
+			return NULL;
+		}
+		return ext_headers+which;
+	}
 	//-1 will return the cfb
-	EffectQueue *GetEffectBlock(int wanted_level);
+	EffectQueue *GetEffectBlock(int wanted_level) const;
+	//returns a projectile created from an extended header
+	Projectile *GetProjectile(int header) const;
 };
 
 #endif  // ! SPELL_H

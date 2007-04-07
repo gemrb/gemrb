@@ -249,7 +249,7 @@ int fx_apply_effect (Actor* Owner, Actor* target, Effect* fx);//b1
 //b5 //unknown
 //b6 //unknown
 //b7 //unknown
-int fx_dontjump_modifier (Actor* Owner, Actor* target, Effect* fx);//b8 
+int fx_dontjump_modifier (Actor* Owner, Actor* target, Effect* fx);//b8
 // this function is exactly the same as 0xaf hold_creature (in bg2 at least) //b9
 int fx_move_to_area (Actor* Owner, Actor* target, Effect* fx);//ba
 int fx_local_variable (Actor* Owner, Actor* target, Effect* fx);//bb
@@ -294,7 +294,7 @@ int fx_reveal_magic (Actor* Owner, Actor* target, Effect* fx);//e1
 //e2 decrementing secondary type immunity (fx_generic_decrement_effect)
 int fx_bounce_school_dec (Actor* Owner, Actor* target, Effect* fx);//e3
 int fx_bounce_secondary_type_dec (Actor* Owner, Actor* target, Effect* fx);//e4
-int fx_dispel_school_one (Actor* Owner, Actor* target, Effect* fx);//e5 
+int fx_dispel_school_one (Actor* Owner, Actor* target, Effect* fx);//e5
 int fx_dispel_secondary_type_one (Actor* Owner, Actor* target, Effect* fx);//e6
 int fx_timestop (Actor* Owner, Actor* target, Effect* fx);//e7
 int fx_cast_spell_on_condition (Actor* Owner, Actor* target, Effect* fx);//e8
@@ -448,7 +448,7 @@ static EffectRef effectnames[] = {
 	{ "Color:SetRGB", fx_set_color_rgb, 0 },
 	{ "Color:PulseRGB", fx_set_color_pulse_rgb, 0 }, //8
 	{ "ConstitutionModifier", fx_constitution_modifier, 0 },
-	{ "ControlCreature", fx_set_charmed_state, 0 }, //0xf1 same as charm 
+	{ "ControlCreature", fx_set_charmed_state, 0 }, //0xf1 same as charm
 	{ "CreateContingency", fx_create_contingency, 0 },
 	{ "CriticalHitModifier", fx_critical_hit_modifier, 0 },
 	{ "CrushingResistanceModifier", fx_crushing_resistance_modifier, 0 },
@@ -744,35 +744,35 @@ bool match_ids(Actor *target, int table, ieDword value)
 	int a, stat;
 
 	switch (table) {
-		case 2: //EA
-			stat = IE_EA; break;
-		case 3: //GENERAL
-			stat = IE_GENERAL; break;
-		case 4: //RACE
-			stat = IE_RACE; break;
-		case 5: //CLASS
-			stat = IE_CLASS; break;
-		case 6: //SPECIFIC
-			stat = IE_SPECIFIC; break;
-		case 7: //GENDER
-			stat = IE_SEX; break;
-		case 8: //ALIGNMENT
-			stat = target->GetStat(IE_ALIGNMENT);
-			a = value&15;
-			if (a) {
-				if (a != ( stat & 15 )) {
-					return false;
-				}
+	case 2: //EA
+		stat = IE_EA; break;
+	case 3: //GENERAL
+		stat = IE_GENERAL; break;
+	case 4: //RACE
+		stat = IE_RACE; break;
+	case 5: //CLASS
+		stat = IE_CLASS; break;
+	case 6: //SPECIFIC
+		stat = IE_SPECIFIC; break;
+	case 7: //GENDER
+		stat = IE_SEX; break;
+	case 8: //ALIGNMENT
+		stat = target->GetStat(IE_ALIGNMENT);
+		a = value&15;
+		if (a) {
+			if (a != ( stat & 15 )) {
+				return false;
 			}
-			a = value & 240;
-			if (a) {
-				if (a != ( stat & 240 )) {
-					return false;
-				}
+		}
+		a = value & 240;
+		if (a) {
+			if (a != ( stat & 240 )) {
+				return false;
 			}
-			return true;
-		default:
-			return false;
+		}
+		return true;
+	default:
+		return false;
 	}
 	if (target->GetStat(stat)==value) {
 		return true;
@@ -1117,7 +1117,7 @@ int fx_set_hasted_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	case 0: //normal haste
 		if ( STATE_GET(STATE_SLOWED) ) {
 			BASE_STATE_CURE( STATE_SLOWED );
-			target->fxqueue.RemoveAllEffects( fx_set_slow_state_ref ); 
+			target->fxqueue.RemoveAllEffects(fx_set_slow_state_ref);
 			target->fxqueue.RemoveAllEffectsWithParam( fx_display_portrait_icon_ref, PI_SLOWED );
 		} else {
 			BASE_STATE_SET( STATE_HASTED );
@@ -1126,7 +1126,7 @@ int fx_set_hasted_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	case 1://improved haste
 		if ( STATE_GET(STATE_SLOWED) ) {
 			BASE_STATE_CURE( STATE_SLOWED );
-			target->fxqueue.RemoveAllEffects( fx_set_slow_state_ref ); 
+			target->fxqueue.RemoveAllEffects(fx_set_slow_state_ref);
 			target->fxqueue.RemoveAllEffectsWithParam( fx_display_portrait_icon_ref, PI_SLOWED );
 		} else {
 			BASE_STATE_SET( STATE_HASTED );
@@ -1233,14 +1233,14 @@ int fx_intelligence_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_invisible_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	switch (fx->Parameter2) {
-		case 0:
-			STATE_SET( STATE_INVISIBLE );
-			break;
-		case 1:
-			STATE_SET( STATE_INVIS2 );
-			break;
-		default:
-			break;
+	case 0:
+		STATE_SET( STATE_INVISIBLE );
+		break;
+	case 1:
+		STATE_SET( STATE_INVIS2 );
+		break;
+	default:
+		break;
 	}
 	ieDword Trans = fx->Parameter4;
 	if (fx->Parameter3) {
@@ -1322,8 +1322,7 @@ int fx_set_poisoned_state (Actor* Owner, Actor* target, Effect* fx)
 	//also this effect is executed every update
 	ieDword damage;
 
-	switch(fx->Parameter2)
-	{
+	switch(fx->Parameter2) {
 	case RPD_PERCENT:
 		damage = target->GetStat(IE_MAXHITPOINTS) * fx->Parameter1 / 100;
 		break;
@@ -1344,7 +1343,6 @@ int fx_set_poisoned_state (Actor* Owner, Actor* target, Effect* fx)
 	target->Damage(damage, DAMAGE_POISON, Owner);
 	return FX_APPLIED;
 }
-
 
 // 0x1a
 EffectRef fx_apply_effect_curse_ref={"ApplyEffectCurse",NULL,-1};
@@ -1511,7 +1509,7 @@ int fx_set_slowed_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_set_slowed_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	if (STATE_GET(STATE_HASTED) ) {
 		BASE_STATE_CURE( STATE_HASTED );
-		target->fxqueue.RemoveAllEffects( fx_set_haste_state_ref ); 
+		target->fxqueue.RemoveAllEffects( fx_set_haste_state_ref );
 		target->fxqueue.RemoveAllEffectsWithParam( fx_display_portrait_icon_ref, PI_HASTED );
 	} else {
 		STATE_SET( STATE_SLOWED );
@@ -1768,20 +1766,20 @@ int fx_dispel_effects (Actor* /*Owner*/, Actor* target, Effect* fx)
 	ieDword level;
 
 	switch (fx->Parameter2) {
-		case 0:
-		default:
-			level = 0xffffffff;
-			break;
-		case 1:
-			//same level: 50% success, each diff modifies it by 5%
-			level = core->Roll(1,20,fx->Power-10);
-			if (level>0x80000000) level = 0;
-			break;
-		case 2:
-			//same level: 50% success, each diff modifies it by 5%
-			level = core->Roll(1,20,fx->Parameter1-10);
-			if (level>0x80000000) level = 0;
-			break;
+	case 0:
+	default:
+		level = 0xffffffff;
+		break;
+	case 1:
+		//same level: 50% success, each diff modifies it by 5%
+		level = core->Roll(1,20,fx->Power-10);
+		if (level>0x80000000) level = 0;
+		break;
+	case 2:
+		//same level: 50% success, each diff modifies it by 5%
+		level = core->Roll(1,20,fx->Parameter1-10);
+		if (level>0x80000000) level = 0;
+		break;
 	}
 	target->fxqueue.RemoveLevelEffects(level, RL_DISPELLABLE, 0);
 	return FX_NOT_APPLIED;
@@ -1802,23 +1800,23 @@ int fx_miscast_magic_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_miscast_magic_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	switch (fx->Parameter2) {
-		case 3:
-			STAT_SET( IE_DEADMAGIC, 1);
-		case 0:
-			STAT_SET( IE_SPELLFAILUREMAGE, fx->Parameter1);
-			break;
-		case 4:
-			STAT_SET( IE_DEADMAGIC, 1);
-		case 1:
-			STAT_SET( IE_SPELLFAILUREPRIEST, fx->Parameter1);
-			break;
-		case 5:
-			STAT_SET( IE_DEADMAGIC, 1);
-		case 2:
-			STAT_SET( IE_SPELLFAILUREINNATE, fx->Parameter1);
-			break;
-		default:
-			return FX_NOT_APPLIED;
+	case 3:
+		STAT_SET( IE_DEADMAGIC, 1);
+	case 0:
+		STAT_SET( IE_SPELLFAILUREMAGE, fx->Parameter1);
+		break;
+	case 4:
+		STAT_SET( IE_DEADMAGIC, 1);
+	case 1:
+		STAT_SET( IE_SPELLFAILUREPRIEST, fx->Parameter1);
+		break;
+	case 5:
+		STAT_SET( IE_DEADMAGIC, 1);
+	case 2:
+		STAT_SET( IE_SPELLFAILUREINNATE, fx->Parameter1);
+		break;
+	default:
+		return FX_NOT_APPLIED;
 	}
 	return FX_APPLIED;
 }
@@ -2085,8 +2083,7 @@ int fx_set_diseased_state (Actor* Owner, Actor* target, Effect* fx)
 	//setting damage to 0 because not all types do damage
 	ieDword damage = 0;
 
-	switch(fx->Parameter2)
-	{
+	switch(fx->Parameter2) {
 	case RPD_PERCENT:
 		damage = target->GetStat(IE_MAXHITPOINTS) * fx->Parameter1 / 100;
 		break;
@@ -2318,8 +2315,7 @@ int fx_set_regenerating_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_set_regenerating_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	int damage;
 
-	switch(fx->Parameter2)
-	{
+	switch(fx->Parameter2) {
 	case RPD_PERCENT:
 		damage = target->GetStat(IE_MAXHITPOINTS) * fx->Parameter1 / 100;
 		break;
@@ -2814,7 +2810,7 @@ int fx_casting_glow (Actor* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	if (fx->Parameter2<(ieDword) cgcount) {
-		ScriptedAnimation *sca = core->GetScriptedAnimation(casting_glows[fx->Parameter2]);
+		ScriptedAnimation *sca = core->GetScriptedAnimation(casting_glows[fx->Parameter2], false);
 		if (!sca) {
 			return FX_NOT_APPLIED;
 		}
@@ -2848,7 +2844,7 @@ int fx_visual_spell_hit (Actor* /*Owner*/, Actor* target, Effect* fx)
 		return FX_APPLIED;
 	}
 	if (fx->Parameter2<(ieDword) shcount) {
-		ScriptedAnimation *sca = core->GetScriptedAnimation(spell_hits[fx->Parameter2]);
+		ScriptedAnimation *sca = core->GetScriptedAnimation(spell_hits[fx->Parameter2], false);
 		if (!sca) {
 			return FX_NOT_APPLIED;
 		}
@@ -2926,7 +2922,7 @@ int fx_learn_spell (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_learn_spell (%2d): Resource:%s Mode: %d\n", fx->Opcode, fx->Resource, fx->Parameter1 );
 	//parameter1 is unused, gemrb lets you to make it not give XP
-	//probably we should also let this via a game flag if we want 
+	//probably we should also let this via a game flag if we want
 	//full compatibility with bg1
 	target->LearnSpell(fx->Resource, fx->Parameter1^LS_ADDXP);
 	return FX_NOT_APPLIED;
@@ -2985,8 +2981,7 @@ int fx_replace_creature (Actor* Owner, Actor* target, Effect *fx)
 	Point p(fx->PosX, fx->PosY);
 
 	//remove old creature
-	switch(fx->Parameter2)
-	{
+	switch(fx->Parameter2) {
 	case 0: //remove silently
 		target->DestroySelf();
 		break;
@@ -3016,7 +3011,7 @@ int fx_set_sanctuary_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_sanctuary_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET( IE_SANCTUARY, 1);
-	return FX_APPLIED; 
+	return FX_APPLIED;
 }
 
 // 0x9a Overlay:Entangle
@@ -3025,7 +3020,7 @@ int fx_set_entangle_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_set_entangle_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET( IE_ENTANGLE, 1);
 	//STAT_SET(IE_MOVEMENTRATE, 0); //
-	return FX_APPLIED; 
+	return FX_APPLIED;
 }
 
 // 0x9b Overlay:MinorGlobe
@@ -3033,7 +3028,7 @@ int fx_set_minorglobe_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_minorglobe_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET( IE_MINORGLOBE, 1);
-	return FX_APPLIED; 
+	return FX_APPLIED;
 }
 
 // 0x9c Overlay:ShieldGlobe
@@ -3041,7 +3036,7 @@ int fx_set_shieldglobe_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_shieldglobe_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET( IE_SHIELDGLOBE, 1);
-	return FX_APPLIED; 
+	return FX_APPLIED;
 }
 
 // 0x9d Overlay:Web
@@ -3050,7 +3045,7 @@ int fx_set_web_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_set_web_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET( IE_WEB, 1);
 	STAT_SET(IE_MOVEMENTRATE, 0); //
-	return FX_APPLIED; 
+	return FX_APPLIED;
 }
 
 // 0x9e Overlay:Grease
@@ -3059,7 +3054,7 @@ int fx_set_grease_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_set_grease_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET( IE_GREASE, 1);
 	STAT_SET(IE_MOVEMENTRATE, 3); //
-	return FX_APPLIED; 
+	return FX_APPLIED;
 }
 
 // 0x9f MirrorImageModifier
@@ -3107,7 +3102,7 @@ int fx_cure_hold_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_hold_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	//note that this effect doesn't remove 185 (another hold effect)
-	target->fxqueue.RemoveAllEffects( fx_hold_creature_ref ); 
+	target->fxqueue.RemoveAllEffects( fx_hold_creature_ref );
 	return FX_NOT_APPLIED;
 }
 
@@ -3117,7 +3112,7 @@ EffectRef fx_movement_modifier_ref={"MovementModifier",NULL,-1};
 int fx_cure_slow_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_slow_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	target->fxqueue.RemoveAllEffects( fx_movement_modifier_ref ); 
+	target->fxqueue.RemoveAllEffects( fx_movement_modifier_ref );
 //	STATE_CURE( STATE_SLOWED );
 	return FX_NOT_APPLIED;
 }
@@ -3192,8 +3187,7 @@ int fx_add_innate (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_remove_spell (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_remove_spell (%2d): Resource: %s Type:%d\n", fx->Opcode, fx->Resource, fx->Parameter2);
-	switch (fx->Parameter2)
-	{
+	switch (fx->Parameter2) {
 	default:
 		target->spellbook.RemoveSpell(fx->Resource);
 		break;
@@ -3381,7 +3375,7 @@ int fx_find_familiar (Actor* Owner, Actor* target, Effect* fx)
 	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, p, -1,0);
 	return FX_NOT_APPLIED;
 }
-// 0xc1 InvisibleDetection 
+// 0xc1 InvisibleDetection
 int fx_see_invisible_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_see_invisible_modifier (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
@@ -3580,7 +3574,7 @@ int fx_play_visual_effect (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_play_visual_effect (%2d): Resource: %s Type: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
 	if (fx->Resource[0]) {
-		ScriptedAnimation* vvc = core->GetScriptedAnimation(fx->Resource);
+		ScriptedAnimation* vvc = core->GetScriptedAnimation(fx->Resource, false);
 		if (fx->Parameter2) {
 			//play over target
 			target->AddVVCell( vvc );
@@ -3727,8 +3721,7 @@ int fx_cast_spell_on_condition (Actor* Owner, Actor* target, Effect* fx)
 	//get subject of check
 	Actor *actor = NULL;
 	Map *map = target->GetCurrentArea();
-	switch(fx->Parameter1)
-	{
+	switch(fx->Parameter1) {
 		//self
 	case 0: actor = target; break;
 		//last attacker
@@ -3743,8 +3736,7 @@ int fx_cast_spell_on_condition (Actor* Owner, Actor* target, Effect* fx)
 	}
 	int condition;
 	//check condition
-	switch(fx->Parameter2)
-	{
+	switch(fx->Parameter2) {
 	case COND_GOTHIT: //on hit
 		condition = target->LastDamage;
 		break;
@@ -3912,7 +3904,7 @@ int fx_drain_spells (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_drain_spells (%2d): Count: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	ieDword i=fx->Parameter1;
-	if (fx->Parameter2) 
+	if (fx->Parameter2)
 	while(i--) {
 		if (!target->spellbook.DepleteSpell(IE_SPELL_TYPE_WIZARD)) {
 			break;

@@ -50,12 +50,15 @@ public:
 	~ScriptedAnimation(void);
 	ScriptedAnimation(DataStream* stream, bool autoFree = true);
 	void Init();
-	void LoadAnimationFactory(AnimationFactory *af, bool gettwin = false);
+	void LoadAnimationFactory(AnimationFactory *af, int gettwin = 0);
 	void Override(ScriptedAnimation *templ);
 	//there are 3 phases: start, hold, release
 	//it will usually cycle in the 2. phase
-	Animation* anims[3];
-	Palette *palettes[3];
+	//the anims could also be used 'orientation based' if FaceTarget is
+	//set to 5, 9, 16
+	Animation* anims[3*MAX_ORIENT];
+	//there is only one palette
+	Palette *palette;
 	ieResRef sounds[3];
 	ieResRef PaletteName;
 	ieDword Transparency;
@@ -65,6 +68,7 @@ public:
 	int XPos, YPos, ZPos;
 	ieDword FrameRate;
 	ieDword FaceTarget;
+	unsigned char Orientation, NewOrientation;
 	ieDword Duration;
 	bool justCreated;
 	ieResRef ResName;
@@ -73,7 +77,7 @@ public:
 	ScriptedAnimation *twin;
 public:
 	//draws the next frame of the videocell
-	bool Draw(Region &screen, Point &Pos, Color &tint, Map *area, int dither);
+	bool Draw(Region &screen, Point &Pos, Color &tint, Map *area, int dither, int orientation);
 	//sets phase (0-2)
 	void SetPhase(int arg);
 	//sets sound for phase (p_onset, p_hold, p_release)
@@ -93,6 +97,8 @@ public:
 	ieDword GetSequenceDuration(ieDword multiplier);
 	/* sets default duration if it wasn't set yet */
 	void SetDefaultDuration(unsigned int duration);
+	/* sets up the direction of the vvc */
+	void SetOrientation(int orientation);
 	/* transforms vvc to blended */
 	void SetBlend();
 	/* alters palette with rgb factor */
@@ -100,7 +106,9 @@ public:
 	/* returns possible twin after altering it to become underlay */
 	ScriptedAnimation *DetachTwin();
 private:
-	void PrepareAnimation(Animation *anim, Palette *&palette, ieDword Transparency);
+	void PrepareAnimation(Animation *anim, ieDword Transparency);
+	bool HandlePhase(Sprite2D *&frame);
+	void GetPaletteCopy();
 };
 
 #endif

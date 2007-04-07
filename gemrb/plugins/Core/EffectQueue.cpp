@@ -343,6 +343,80 @@ void EffectQueue::ApplyAllEffects(Actor* target)
 	}
 }
 
+bool EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget)
+{
+	int i;
+	Game *game;
+	Map *map;
+	bool flg;
+
+	switch (fx->Target) {
+	case FX_TARGET_ORIGINAL:
+		flg = self->fxqueue.ApplyEffect( self, fx, true );
+		if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
+			self->fxqueue.AddEffect( fx );
+		}
+		break;
+	case FX_TARGET_SELF:
+		flg = self->fxqueue.ApplyEffect( self, fx, true );
+		if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
+			self->fxqueue.AddEffect( fx );
+		}
+		break;
+
+	case FX_TARGET_PRESET:
+		flg = self->fxqueue.ApplyEffect( pretarget, fx, true );
+		if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
+			pretarget->fxqueue.AddEffect( fx );
+		}
+		break;
+
+	case FX_TARGET_PARTY:
+		game=core->GetGame();
+		for (i = game->GetPartySize(true); i >= 0; i--) {
+			Actor* actor = game->GetPC( i, true );
+			self->fxqueue.ApplyEffect( actor, fx, true );
+			if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
+				actor->fxqueue.AddEffect( fx );
+			}
+		}
+		flg = false;
+		break;
+
+	case FX_TARGET_GLOBAL_INCL_PARTY:
+		map=self->GetCurrentArea();
+		for (i = map->GetActorCount(true); i >= 0; i--) {
+			Actor* actor = map->GetActor( i, true );
+			self->fxqueue.ApplyEffect( actor, fx, true );
+			if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
+				actor->fxqueue.AddEffect( fx );
+			}
+		}
+		flg = false;
+		break;
+
+	case FX_TARGET_GLOBAL_EXCL_PARTY:
+		map=self->GetCurrentArea();
+		for (i = map->GetActorCount(false); i >= 0; i--) {
+			Actor* actor = map->GetActor( i, false );
+			self->fxqueue.ApplyEffect( actor, fx, true );
+			//GetActorCount can now return all nonparty critters
+			//if (actor->InParty) continue;
+			if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
+				actor->fxqueue.AddEffect( fx );
+			}
+		}
+		flg = false;
+		break;
+
+	case FX_TARGET_UNKNOWN:
+	default:
+		printf( "Unknown FX target type: %d\n", fx->Target);
+		flg = false;
+		break;
+	}
+	return flg;
+}
 
 //this is where effects from spells first get in touch with the target
 //the effects are currently NOT in the target's fxqueue, those that stick
@@ -359,11 +433,8 @@ void EffectQueue::AddAllEffects(Actor* target)
 		(*f)->PosX = target->Pos.x;
 		(*f)->PosY = target->Pos.y;
 		//if applyeffect returns true, we stop adding the future effects
-		bool flg = target->fxqueue.ApplyEffect( target, *f, true );
-		if ((*f)->TimingMode!=FX_DURATION_JUST_EXPIRED) {
-			target->fxqueue.AddEffect(*f);
-		}
-		if (flg) {
+		//this is to simulate iwd2's on the fly spell resistance
+		if(AddEffect(*f, Owner, target)) {		
 			break;
 		}
 	}

@@ -5487,7 +5487,7 @@ void GameScript::FloatRebus(Scriptable* Sender, Action* parameters)
 	}
 	Actor *actor = (Actor *)tar;
 	RebusResRef[5]=(char) core->Roll(1,5,'0');
-	ScriptedAnimation *vvc = core->GetScriptedAnimation(RebusResRef);
+	ScriptedAnimation *vvc = core->GetScriptedAnimation(RebusResRef, 0);
 	if (vvc) {
 		//setting the height
 		vvc->ZPos=actor->size*20;

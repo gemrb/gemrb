@@ -694,7 +694,7 @@ void CreateVisualEffectCore(Scriptable *Sender, Point &position, const char *eff
 //TODO: add engine specific VVC replacement methods
 //stick to object flag, sounds, iterations etc.
 	if (effect[0]) {
-		ScriptedAnimation* vvc = core->GetScriptedAnimation(effect);
+		ScriptedAnimation* vvc = core->GetScriptedAnimation(effect, false);
 		if (!vvc) {
 			printMessage("GameScript","Failed to create effect.",LIGHT_RED);
 			return;

@@ -435,6 +435,9 @@ public:
 	bool UseItem(int slot, ieDword header, Scriptable *target, bool silent);
 	/* Deducts a charge from an item */
 	void ChargeItem(int slot, ieDword header, CREItem *item, Item *itm, bool silent);
+	/* actor casts spell */
+	bool CastSpellPoint( ieResRef SpellResRef, Point &Target );
+	bool CastSpell( ieResRef SpellResRef, Scriptable* Target );
 	/* If it returns true, then default AC=10 and the lesser the better */
 	bool IsReverseToHit();
 	void InitButtons(ieDword cls);

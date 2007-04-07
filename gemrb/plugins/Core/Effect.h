@@ -21,7 +21,7 @@
 
 /**
  * @file Effect.h
- * Declares Effect class implementing spell and spell-like effects 
+ * Declares Effect class implementing spell and spell-like effects
  * and related defines
  */
 
@@ -43,6 +43,7 @@ class Actor;
 #define FX_TARGET_PARTY      3
 #define FX_TARGET_GLOBAL_INCL_PARTY   4
 #define FX_TARGET_GLOBAL_EXCL_PARTY   5
+#define FX_TARGET_ORIGINAL   9
 
 // Effect duration/timing types
 #define FX_DURATION_INSTANT_LIMITED          0
@@ -109,6 +110,6 @@ struct Effect {
 };
 
 // FIXME: what about area spells? They can have map & coordinates as target
-void AddEffect(Effect* fx, Actor* self, Actor* pretarget);
+//void AddEffect(Effect* fx, Actor* self, Actor* pretarget);
 
 #endif  // ! EFFECT_H

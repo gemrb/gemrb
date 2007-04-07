@@ -21,6 +21,8 @@
 
 #include "../../includes/win32def.h"
 #include "Spell.h"
+#include "Projectile.h"
+#include "ProjectileServer.h"
 #include "Interface.h"
 
 SPLExtHeader::SPLExtHeader(void)
@@ -40,18 +42,12 @@ Spell::Spell(void)
 Spell::~Spell(void)
 {
 	core->FreeSPLExt(ext_headers, casting_features);
-/*
-	if (SpellIconBAM) {
-		core->FreeInterface( SpellIconBAM );
-		SpellIconBAM = NULL;
-	}
-*/
 }
 
 //-1 will return cfb
 //0 will always return first spell block
 //otherwise set to caster level
-EffectQueue *Spell::GetEffectBlock(int level)
+EffectQueue *Spell::GetEffectBlock(int level) const
 {
 	Effect *features;
 	int count;
@@ -90,3 +86,16 @@ EffectQueue *Spell::GetEffectBlock(int level)
 	}
 	return fxqueue;
 }
+
+Projectile *Spell::GetProjectile(int header) const
+{
+	SPLExtHeader *eh = GetExtHeader(header);
+	if (!eh) {
+		return NULL;
+	}
+	EffectQueue *fx = GetEffectBlock(header);
+	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(eh->ProjectileAnimation);
+	pro->SetEffects(fx);
+	return pro;
+}
+

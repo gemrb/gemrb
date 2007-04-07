@@ -195,10 +195,6 @@ public:
 
 	/** lists spells of a type */
 	bool GetSpellInfo(SpellExtHeader *array, int type, int startindex, int count);
-
-	/** applies the spell on target */
-	bool CastSpell( ieResRef SpellResRef, Actor* Source, Actor* Target );
-
 	/** Dumps spellbook to stdout for debugging */
 	void dump();
 };
