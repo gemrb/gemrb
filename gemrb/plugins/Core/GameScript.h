@@ -1014,7 +1014,8 @@ public:
 	static void CreateCreatureCopyPoint(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureDoor(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureImpassable(Scriptable* Sender, Action* parameters);
-	static void CreateCreatureImpassableAllowOverlap(Scriptable* Sender, Action* parameters);
+	static void CreateCreatureImpassableAllowOverlap(Scriptable* Sender,
+		Action* parameters);
 	static void CreateCreatureObject(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureObjectCopy(Scriptable* Sender, Action* parameters);
 	static void CreateCreatureObjectDoor(Scriptable* Sender, Action* parameters);
@@ -1027,12 +1028,15 @@ public:
 	static void CreateVisualEffect(Scriptable* Sender, Action* parameters);
 	static void CreateVisualEffectObject(Scriptable* Sender,
 		Action* parameters);
+	static void CreateVisualEffectObjectSticky(Scriptable* Sender,
+		Action* parameters);
 	static void CutSceneID(Scriptable* Sender, Action* parameters);
 	static void Damage(Scriptable* Sender, Action* parameters);
 	static void DayNight(Scriptable *Sender, Action* parameters);
 	static void Deactivate(Scriptable* Sender, Action* parameters);
 	static void Debug(Scriptable* Sender, Action* parameters);
-	static void DestroyAllDestructableEquipment(Scriptable* Sender, Action* parameters);
+	static void DestroyAllDestructableEquipment(Scriptable* Sender,
+		Action* parameters);
 	static void DestroyAllEquipment(Scriptable* Sender, Action* parameters);
 	static void DestroyGold(Scriptable* Sender, Action* parameters);
 	static void DestroyItem(Scriptable* Sender, Action* parameters);

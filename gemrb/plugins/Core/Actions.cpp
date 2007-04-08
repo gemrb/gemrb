@@ -528,7 +528,7 @@ void GameScript::JumpToObject(Scriptable* Sender, Action* parameters)
 		Area[0]=0;
 	}
 	if (parameters->string0Parameter[0]) {
-		CreateVisualEffectCore(Sender, Sender->Pos, parameters->string0Parameter);
+		CreateVisualEffectCore(Sender, Sender->Pos, parameters->string0Parameter, 0);
 	}
 	MoveBetweenAreasCore( (Actor *) Sender, Area, tar->Pos, -1, true);
 }
@@ -1470,18 +1470,34 @@ void GameScript::Continue(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 }
 
+// creates area vvc at position of object
 void GameScript::CreateVisualEffectObject(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		return;
 	}
-	CreateVisualEffectCore(tar, tar->Pos, parameters->string0Parameter);
+	CreateVisualEffectCore(tar, tar->Pos, parameters->string0Parameter, parameters->int0Parameter);
 }
 
+// creates sticky vvc on actor or normal animation on object
+void GameScript::CreateVisualEffectObjectSticky(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		return;
+	}
+	if (tar->Type==ST_ACTOR) {
+		CreateVisualEffectCore((Actor *) tar, parameters->string0Parameter, parameters->int0Parameter);
+	} else {
+		CreateVisualEffectCore(tar, tar->Pos, parameters->string0Parameter, parameters->int0Parameter);
+	}
+}
+
+// creates area effect at point
 void GameScript::CreateVisualEffect(Scriptable* Sender, Action* parameters)
 {
-	CreateVisualEffectCore(Sender, parameters->pointParameter, parameters->string0Parameter);
+	CreateVisualEffectCore(Sender, parameters->pointParameter, parameters->string0Parameter, parameters->int0Parameter);
 }
 
 void GameScript::DestroySelf(Scriptable* Sender, Action* /*parameters*/)
@@ -2049,7 +2065,7 @@ void GameScript::MoveBetweenAreas(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	if (parameters->string1Parameter[0]) {
-		CreateVisualEffectCore(Sender, Sender->Pos, parameters->string1Parameter);
+		CreateVisualEffectCore(Sender, Sender->Pos, parameters->string1Parameter, 0);
 	}
 	MoveBetweenAreasCore((Actor *) Sender, parameters->string0Parameter,
 		parameters->pointParameter, parameters->int0Parameter, true);

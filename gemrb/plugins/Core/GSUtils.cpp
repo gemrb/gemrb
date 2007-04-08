@@ -674,7 +674,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 
 	//if string1 is animation, then we can't use it for a DV too
 	if (flags & CC_PLAY_ANIM) {
-		CreateVisualEffectCore( ab, ab->Pos, parameters->string1Parameter);
+		CreateVisualEffectCore( ab, ab->Pos, parameters->string1Parameter, 1);
 	} else {
 		//setting the deathvariable if it exists (iwd2)
 		if (parameters->string1Parameter[0]) {
@@ -689,16 +689,34 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 	}
 }
 
-void CreateVisualEffectCore(Scriptable *Sender, Point &position, const char *effect)
+static ScriptedAnimation *GetVVCEffect(const char *effect, int iterations)
 {
-//TODO: add engine specific VVC replacement methods
-//stick to object flag, sounds, iterations etc.
 	if (effect[0]) {
 		ScriptedAnimation* vvc = core->GetScriptedAnimation(effect, false);
 		if (!vvc) {
 			printMessage("GameScript","Failed to create effect.",LIGHT_RED);
-			return;
+			return NULL;
 		}
+		if (iterations) {
+			vvc->SetDefaultDuration( vvc->GetSequenceDuration(1000 * iterations));
+		}
+		return vvc;
+	}
+	return NULL;
+}
+
+void CreateVisualEffectCore(Actor *target, const char *effect, int iterations)
+{
+	ScriptedAnimation *vvc = GetVVCEffect(effect, iterations);
+	if (vvc) {
+		target->AddVVCell( vvc );
+	}
+}
+
+void CreateVisualEffectCore(Scriptable *Sender, Point &position, const char *effect, int iterations)
+{
+	ScriptedAnimation *vvc = GetVVCEffect(effect, iterations);
+	if (vvc) {
 		vvc->XPos +=position.x;
 		vvc->YPos +=position.y;
 		Sender->GetCurrentArea( )->AddVVCell( vvc );
@@ -717,7 +735,7 @@ void ChangeAnimationCore(Actor *src, const char *resref, bool effect)
 		tar->SetOrientation(src->GetOrientation(), false );
 		src->DestroySelf();
 		if (effect) {
-			CreateVisualEffectCore(tar, tar->Pos,"smokepuffeffect");
+			CreateVisualEffectCore(tar, tar->Pos,"smokepuffeffect",1);
 		}
 	}
 }

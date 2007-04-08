@@ -61,9 +61,11 @@ public:
 	Palette *palette;
 	ieResRef sounds[3];
 	ieResRef PaletteName;
+	Color Tint;
+	int Fade;
 	ieDword Transparency;
 	ieDword SequenceFlags;
-	int dither;
+	int Dither;
 	//these are signed
 	int XPos, YPos, ZPos;
 	ieDword FrameRate;
@@ -101,6 +103,8 @@ public:
 	void SetOrientation(int orientation);
 	/* transforms vvc to blended */
 	void SetBlend();
+	/* sets fade effect at end of animation (pst feature) */
+	void SetFade(ieByte initial, int speed);
 	/* alters palette with rgb factor */
 	void AlterPalette(const RGBModifier &rgb);
 	/* returns possible twin after altering it to become underlay */

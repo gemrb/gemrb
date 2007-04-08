@@ -68,14 +68,14 @@ void ScriptedAnimation::Init()
 	sounds[0][0] = 0;
 	sounds[1][0] = 0;
 	sounds[2][0] = 0;
-
+	memset(&Tint,0,sizeof(Tint));
 	Transparency = 0;
 	SequenceFlags = 0;
 	XPos = YPos = ZPos = 0;
 	FrameRate = 15;
 	FaceTarget = 0;
 	Orientation = 0;
-	dither = 0;
+	Dither = 0;
 	Duration = 0xffffffff;
 	justCreated = true;
 	PaletteName[0]=0;
@@ -112,7 +112,7 @@ void ScriptedAnimation::PrepareAnimation(Animation *anim, ieDword Transparency)
 	if (Transparency&IE_VVC_MIRRORY) {
 		anim->MirrorAnimationVert();
 	}
-	
+
 	//make this the last if possible, because of the return
 	if (Transparency&IE_VVC_BLENDED) {
 		GetPaletteCopy();
@@ -184,7 +184,7 @@ void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af, int gettwin)
 			c=SixteenToNine[c];
 			if ((i&15)>=9) mirror = true;
 		} else p*=MAX_ORIENT;
-	 
+
 		anims[p] = af->GetCycle( (ieByte) c );
 		if (anims[p]) {
 			anims[p]->pos=0;
@@ -241,7 +241,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 			delete( stream );
 		return;
 	}
-	ieResRef Anim1ResRef;  
+	ieResRef Anim1ResRef; 
 	ieDword seq1, seq2, seq3;
 	stream->ReadResRef( Anim1ResRef );
 	//there is no proof it is a second resref
@@ -290,7 +290,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 			anims[P_ONSET]->Flags |= S_ANI_PLAYONCE;
 		}
 
-		anims[P_HOLD] = af->GetCycle( ( unsigned char ) seq2 );  
+		anims[P_HOLD] = af->GetCycle( ( unsigned char ) seq2 ); 
 		if (anims[P_HOLD]) {
 			PrepareAnimation(anims[P_HOLD], Transparency);
 
@@ -301,7 +301,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 			}
 		}
 
-		anims[P_RELEASE] = af->GetCycle( ( unsigned char ) seq3 );  
+		anims[P_RELEASE] = af->GetCycle( ( unsigned char ) seq3 ); 
 		if (anims[P_RELEASE]) {
 			PrepareAnimation(anims[P_RELEASE], Transparency);
 
@@ -334,7 +334,7 @@ ScriptedAnimation::~ScriptedAnimation(void)
 	for(unsigned int i=0;i<3*MAX_ORIENT;i++) {
 		if (anims[i]) {
 			delete( anims[i] );
-		}		
+		}
 	}
 	core->FreePalette(palette, PaletteName);
 
@@ -496,7 +496,7 @@ retry:
 }
 
 //it is not sure if we need tint at all
-bool ScriptedAnimation::Draw(Region &screen, Point &Pos, Color &p_tint, Map *area, int p_dither, int orientation)
+bool ScriptedAnimation::Draw(Region &screen, Point &Pos, Color &p_tint, Map *area, int dither, int orientation)
 {
 	if (FaceTarget) {
 		SetOrientation(orientation);
@@ -504,7 +504,7 @@ bool ScriptedAnimation::Draw(Region &screen, Point &Pos, Color &p_tint, Map *are
 
 	// not sure
 	if (twin) {
-		twin->Draw(screen, Pos, p_tint, area, p_dither, -1);
+		twin->Draw(screen, Pos, p_tint, area, dither, -1);
 	}
 
 	Video *video = core->GetVideoDriver();
@@ -522,7 +522,7 @@ bool ScriptedAnimation::Draw(Region &screen, Point &Pos, Color &p_tint, Map *are
 		flag |= BLIT_HALFTRANS;
 	}
 
-	Color tint = {0,0,0,0};
+	Color tint = Tint;
 
 	//darken, greyscale, red tint are probably not needed if the global tint works
 	//these are used in the original engine to implement weather/daylight effects
@@ -536,8 +536,11 @@ bool ScriptedAnimation::Draw(Region &screen, Point &Pos, Color &p_tint, Map *are
 		flag |= BLIT_RED;
 	}
 
-	if ((Transparency & IE_VVC_TINT)==IE_VVC_TINT) {
+	if (Transparency & BLIT_TINTED) {
 		flag |= BLIT_TINTED;
+	}
+
+	if ((Transparency & IE_VVC_TINT)==IE_VVC_TINT) {
 		tint = p_tint;
 	}
 
@@ -547,11 +550,11 @@ bool ScriptedAnimation::Draw(Region &screen, Point &Pos, Color &p_tint, Map *are
 	if( SequenceFlags&IE_VVC_NOCOVER) {
 		if (cover) SetSpriteCover(NULL);
 	} else {
-		if (!cover || (dither!=p_dither) || (!cover->Covers(cx, cy, frame->XPos, frame->YPos, frame->Width, frame->Height)) ) {
-			dither = p_dither;
+		if (!cover || (Dither!=dither) || (!cover->Covers(cx, cy, frame->XPos, frame->YPos, frame->Width, frame->Height)) ) {
+			Dither = dither;
 			Animation *anim = anims[Phase*MAX_ORIENT+Orientation];
-			SetSpriteCover(area->BuildSpriteCover(cx, cy, -anim->animArea.x, 
-			-anim->animArea.y, anim->animArea.w, anim->animArea.h, p_dither) );
+			SetSpriteCover(area->BuildSpriteCover(cx, cy, -anim->animArea.x,
+			-anim->animArea.y, anim->animArea.w, anim->animArea.h, dither) );
 		}
 		assert(cover->Covers(cx, cy, frame->XPos, frame->YPos, frame->Width, frame->Height));
 	}
@@ -573,6 +576,16 @@ void ScriptedAnimation::SetBlend()
 	if (twin) {
 		twin->SetBlend();
 	}
+}
+
+void ScriptedAnimation::SetFade(ieByte initial, int speed)
+{
+	Tint.r=255;
+	Tint.g=255;
+	Tint.b=255;
+	Tint.a=initial;
+	Fade=speed;
+	Transparency|=BLIT_TINTED;
 }
 
 void ScriptedAnimation::GetPaletteCopy()

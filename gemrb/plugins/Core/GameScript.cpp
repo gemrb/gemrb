@@ -461,6 +461,7 @@ static ActionLink actionnames[] = {
 	{"createpartygold", GameScript::CreatePartyGold, 0},
 	{"createvisualeffect", GameScript::CreateVisualEffect, 0},
 	{"createvisualeffectobject", GameScript::CreateVisualEffectObject, 0},
+	{"createvisualeffectobjectSticky", GameScript::CreateVisualEffectObjectSticky, 0},
 	{"cutsceneid", GameScript::CutSceneID,AF_INSTANT},
 	{"damage", GameScript::Damage, 0},
 	{"daynight", GameScript::DayNight, 0},
@@ -821,7 +822,7 @@ static ActionLink actionnames[] = {
 	{"staticsequence", GameScript::PlaySequence, 0},//bg2 animation sequence
 	{"staticstart", GameScript::StaticStart, 0},
 	{"staticstop", GameScript::StaticStop, 0},
-	{"stickysinisterpoof", GameScript::CreateVisualEffectObject, 0},
+	{"stickysinisterpoof", GameScript::CreateVisualEffectObjectSticky, 0},
 	{"stopmoving", GameScript::StopMoving, 0},
 	{"storepartylocations", GameScript::StorePartyLocation, 0},
 	{"swing", GameScript::Swing, 0},
