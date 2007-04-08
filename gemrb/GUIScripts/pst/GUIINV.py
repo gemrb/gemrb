@@ -97,7 +97,7 @@ def OpenInventoryWindow ():
 	# Ground Item
 	for i in range (10):
 		Button = GemRB.GetControl (Window, i+47)
-		GemRB.SetVarAssoc (Window, Button, "GroundItemButton", i) 
+		GemRB.SetVarAssoc (Window, Button, "GroundItemButton", i)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT , OP_OR)
 		GemRB.SetButtonFont (Window, Button, "NUMBER2")
 		GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,128,128,255,64,0,1)
@@ -462,15 +462,13 @@ def LeftItemScroll ():
 		tmp = 43
 
 	while not ItemHash.has_key(tmp) or not ItemHash[tmp][1]:
-		print tmp
 		tmp = tmp - 1
 		if tmp < 0:
 			tmp = 43
 
 	GemRB.SetVar ('ItemButton', tmp)
-	print "became", tmp, ItemHash[tmp]
 	#one for close, one for reopen
-	OpenItemInfoWindow ()
+	CloseItemInfoWindow ()
 	OpenItemInfoWindow ()
 	return
 
@@ -480,15 +478,13 @@ def RightItemScroll ():
 		tmp = 0
 
 	while not ItemHash.has_key(tmp) or not ItemHash[tmp][1]:
-		print tmp
 		tmp = tmp + 1
 		if tmp > 43:
 			tmp = 0
 
 	GemRB.SetVar ('ItemButton', tmp)
-	print "became", tmp, ItemHash[tmp]
 	#one for close, one for reopen
-	OpenItemInfoWindow ()
+	CloseItemInfoWindow ()
 	OpenItemInfoWindow ()
 	return
 
@@ -523,7 +519,7 @@ def OpenItemWindow ():
 
 def DialogItemWindow ():
 
-	OpenItemInfoWindow ()
+	CloseItemInfoWindow ()
 	OpenInventoryWindow ()
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot, slot_item = ItemHash[GemRB.GetVar ('ItemButton')]
@@ -595,37 +591,25 @@ def IdentifyItemWindow ():
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 	return
 
-def OpenItemInfoWindow ():
+def CloseItemInfoWindow ():
+	GemRB.UnloadWindow (ItemInfoWindow)
+	UpdateInventoryWindow()
+	return
+
+def DisplayItem (itemresref, type):
 	global ItemInfoWindow
 
-	GemRB.HideGUI ()
-
-	if ItemInfoWindow != None:
-		GemRB.UnloadWindow (ItemInfoWindow)
-		ItemInfoWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
-
-		GemRB.UnhideGUI ()
-		return
-
+	item = GemRB.GetItem (itemresref)
 	ItemInfoWindow = Window = GemRB.LoadWindow (5)
-	GemRB.SetVar ("FloatWindow", ItemInfoWindow)
-
-	slot, slot_item = ItemHash[GemRB.GetVar ('ItemButton')]
-
-	identified = slot_item['Flags'] & IE_INV_ITEM_IDENTIFIED
-
-	ResRef = slot_item['ItemResRef']
-	item = GemRB.GetItem (ResRef)
 
 	# Done
 	Button = GemRB.GetControl (Window, 4)
 	GemRB.SetText (Window, Button, 1403)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenItemInfoWindow")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseItemInfoWindow")
 
 	# Identify
 	Button = GemRB.GetControl (Window, 8)
-	if not identified:
+	if type&2:
 		GemRB.SetText (Window, Button, 4256)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "IdentifyItemWindow")
 	else:
@@ -634,11 +618,13 @@ def OpenItemInfoWindow ():
 
 	# Talk to Item/Use
 	Button = GemRB.GetControl (Window, 9)
-	drink = (item["Function"]&1)
-	read = (item["Function"]&2)
-	container = (item["Function"]&4)
-	dialog = (item["Dialog"]!="")
+	drink = (type&1) and (item["Function"]&1)
+	read = (type&1) and (item["Function"]&2)
+	container = (type&1) and (item["Function"]&4)
+	dialog = (type&1) and (item["Dialog"]!="")
 
+	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NORMAL, OP_SET)
 	if drink:
 		#no drink/food in PST, this is the closest strref in stock pst
 		GemRB.SetText (Window, Button, 4251)
@@ -654,35 +640,36 @@ def OpenItemInfoWindow ():
 		GemRB.SetText (Window, Button, 4254)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "DialogItemWindow")
 	else:
+		GemRB.SetText (Window, Button, '')
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 
 	Label = GemRB.GetControl (Window, 0x10000000)
-	if not identified or item['ItemNameIdentified'] == -1:
+	if type&2:
 		GemRB.SetText (Window, Label, string.upper (GemRB.GetString (item['ItemName'])))
 	else:
 		GemRB.SetText (Window, Label, string.upper (GemRB.GetString (item['ItemNameIdentified'])))
 
 	Icon = GemRB.GetControl (Window, 2)
 	GemRB.SetButtonFlags (Window, Icon, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-	GemRB.SetItemIcon (Window, Icon, ResRef)
+	GemRB.SetItemIcon (Window, Icon, itemresref)
 
 	Text = GemRB.GetControl (Window, 5)
-	if not identified or item['ItemDescIdentified'] == -1:
+	if type&2:
 		GemRB.SetText (Window, Text, item['ItemDesc'])
 	else:
 		GemRB.SetText (Window, Text, item['ItemDescIdentified'])
 
 	IdText = GemRB.GetControl (Window, 0x1000000b)
-	if identified:
-		GemRB.SetText (Window, IdText, '')
-	else:
+	if type&2:
 		# 4279 - This item has not been identified
 		GemRB.SetText (Window, IdText, 4279)
+	else:
+		GemRB.SetText (Window, IdText, '')
 
 	Icon = GemRB.GetControl (Window, 7)
 	GemRB.SetButtonFlags (Window, Icon, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-	GemRB.SetItemIcon (Window, Icon, ResRef, 1)
+	GemRB.SetItemIcon (Window, Icon, itemresref, 1)
 
 	#left scroll
 	Button = GemRB.GetControl (Window, 13)
@@ -692,8 +679,26 @@ def OpenItemInfoWindow ():
 	Button = GemRB.GetControl (Window, 14)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "RightItemScroll")
 
-	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
+	return
+
+def OpenItemInfoWindow ():
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot, slot_item = ItemHash[GemRB.GetVar ('ItemButton')]
+	ResRef = slot_item['ItemResRef']
+	item = GemRB.GetItem (slot_item["ItemResRef"])
+
+	#auto identify when lore is high enough
+	if item["LoreToID"]<=GemRB.GetPlayerStat (pc, IE_LORE):
+		GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
+		slot_item["Flags"] |= IE_INV_ITEM_IDENTIFIED
+		UpdateInventoryWindow ()
+
+	if slot_item["Flags"] & IE_INV_ITEM_IDENTIFIED:
+		value = 1
+	else:
+		value = 3
+	DisplayItem (slot_item["ItemResRef"], value)
 	return
 
 def OpenGroundItemInfoWindow ():
@@ -745,6 +750,6 @@ def MouseLeaveGround ():
 	if GemRB.IsDraggingItem ():
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SECOND)
 	return
- 
+
 ###################################################
 # End of file GUIINV.py
