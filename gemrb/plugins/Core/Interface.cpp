@@ -4308,11 +4308,8 @@ bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)
 		//well, not anymore, we can use ReleaseFunction
 		int l=tab->GetColumnCount(j);
 		if (l<1) continue;
-		//we just allocate one more ieResRef for the item count
-		//itemlist = (ieResRef *) malloc( sizeof(ieResRef) * (l+1) );
-		ItemList *itemlist = new ItemList(l);
-		//ieResRef (9 bytes) is bigger than int (on any platform)
-		//*(int *) itemlist=l;
+		int cl = atoi(tab->GetColumnName(0));
+		ItemList *itemlist = new ItemList(l, cl);
 		for(int k=0;k<l;k++) {
 			strncpy(itemlist->ResRefs[k],tab->QueryField(j,k),sizeof(ieResRef) );
 		}
@@ -4411,8 +4408,12 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 			return true;
 		}
 		ItemList *itemlist = (ItemList*)lookup;
-
-		i=Roll(1,itemlist->Count,-1);
+		if (itemlist->WeightOdds) {
+			//instead of 1d19 we calculate with 2d10 (which also has 19 possible values)
+			i=Roll(2,(itemlist->Count+1)/2,-2);
+		} else {
+			i=Roll(1,itemlist->Count,-1);
+		}
 		strncpy( NewItem, itemlist->ResRefs[i], sizeof(ieResRef) );
 		char *p=(char *) strchr(NewItem,'*');
 		if (p) {

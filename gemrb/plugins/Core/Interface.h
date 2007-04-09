@@ -99,10 +99,17 @@ typedef class ItemList {
 public:
 	ieResRef *ResRefs;
 	unsigned int Count;
+	//if count is odd and the column titles start with 2, the random roll should be 2d((c+1)/2)-1
+	bool WeightOdds;
 
-	ItemList(unsigned int size) {
+	ItemList(unsigned int size, int label) {
 		ResRefs = (ieResRef *) calloc(size, sizeof(ieResRef) );
 		Count = size;
+                if ((size&1) && (label==2)) {
+                        WeightOdds=true;
+                } else {
+                        WeightOdds=false;
+                }
 	}
 	~ItemList() {
 		if (ResRefs) {
