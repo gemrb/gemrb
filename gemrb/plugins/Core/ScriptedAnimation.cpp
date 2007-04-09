@@ -70,6 +70,7 @@ void ScriptedAnimation::Init()
 	sounds[2][0] = 0;
 	memset(&Tint,0,sizeof(Tint));
 	Transparency = 0;
+	Fade = 0;
 	SequenceFlags = 0;
 	XPos = YPos = ZPos = 0;
 	FrameRate = 15;
@@ -489,6 +490,14 @@ retry:
 		if (Phase>=P_RELEASE) {
 			return true;
 		}
+		//this section implements the freeze fading effect (see ice dagger)
+		if (frame && Fade && Tint.a && (Phase==P_HOLD) ) {
+			if (Tint.a<=Fade) {
+				return true;
+			}
+			Tint.a-=Fade;
+			return false;
+		}
 		Phase++;
 		goto retry;
 	}
@@ -619,8 +628,10 @@ ScriptedAnimation *ScriptedAnimation::DetachTwin()
 		return NULL;
 	}
 	ScriptedAnimation * ret = twin;
-	ret->YPos+=ret->ZPos+1;
-	ret->ZPos=-1;
+	//ret->YPos+=ret->ZPos+1;
+	if (ret->ZPos>=0) {
+		ret->ZPos=-1;
+	}
 	twin=NULL;
 	return ret;
 }
