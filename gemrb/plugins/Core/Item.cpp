@@ -69,7 +69,11 @@ EffectQueue *Item::GetEffectBlock(int usage) const
 	//adding a pulse effect for weapons (PST)
 	if (WieldColor!=0xffff) {
 		if (Flags&IE_ITEM_PULSATING) {
-			fxqueue->AddEffect( BuildGlowEffect(WieldColor) );
+			Effect *tmp = BuildGlowEffect(WieldColor);
+			if (tmp) {
+				fxqueue->AddEffect( tmp );
+				delete tmp;
+			}
 		}
 	}
 	return fxqueue;

@@ -411,7 +411,11 @@ Interface::~Interface(void)
 		for(i=0;i<4;i++) {
 			video->FreeSprite(WindowFrames[i]);
 		}
-
+		for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
+			for(i=0;i<6;i++) {
+				video->FreeSprite(GroundCircles[size][i]);
+			}
+		}
 		if (TooltipBack) {
 			for(i=0;i<3;i++) {
 				//freesprite checks for null pointer

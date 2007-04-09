@@ -264,6 +264,8 @@ Actor::~Actor(void)
 			vvcShields[i] = NULL;
 		}
 	}
+	for (i = 0; i < EXTRA_ACTORCOVERS; i++)
+		delete extraCovers[i];
 }
 
 void Actor::SetFistStat(ieDword stat)
@@ -2420,8 +2422,8 @@ void Actor::DrawVideocells(Region &screen, vvcVector &vvcCells, Color &tint)
 }
 
 void Actor::DrawActorSprite(Region &screen, int cx, int cy, Region& bbox,
-							SpriteCover*& sc, Animation** anims,
-							unsigned char Face, Color& tint)
+			SpriteCover*& newsc, Animation** anims,
+			unsigned char Face, Color& tint)
 {
 	CharAnimations* ca = GetAnims();
 	int PartCount = ca->GetTotalPartCount();
@@ -2438,18 +2440,22 @@ void Actor::DrawActorSprite(Region &screen, int cx, int cy, Region& bbox,
 		if (anim)
 			nextFrame = anim->GetFrame(anim->GetCurrentFrame());
 		if (nextFrame && bbox.InsideRegion( vp ) ) {
-			if (!sc || !sc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height)) {
+			if (!newsc || !newsc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height)) {
 				// the first anim contains the animarea for
 				// the entire multi-part animation
-				sc = area->BuildSpriteCover(cx, cy, -anims[0]->animArea.x, -anims[0]->animArea.y, anims[0]->animArea.w, anims[0]->animArea.h, WantDither() );
+				newsc = area->BuildSpriteCover(cx,
+					cy, -anims[0]->animArea.x,
+					-anims[0]->animArea.y,
+					anims[0]->animArea.w,
+					anims[0]->animArea.h, WantDither() );
 			}
-			assert(sc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height));
+			assert(newsc->Covers(cx, cy, nextFrame->XPos, nextFrame->YPos, nextFrame->Width, nextFrame->Height));
 
 			unsigned int flags = TranslucentShadows ? BLIT_TRANSSHADOW : 0;
 			if (!ca->lockPalette) flags|=BLIT_TINTED;
 
 			video->BlitGameSprite( nextFrame, cx + screen.x, cy + screen.y,
-				 flags, tint, sc, ca->GetPartPalette(partnum), &screen);
+				 flags, tint, newsc, ca->GetPartPalette(partnum), &screen);
 		}
 	}
 }
@@ -2617,7 +2623,7 @@ void Actor::Draw(Region &screen)
 					sbbox.y += 3*OrientdY[dir];
 					newsc = sc = extraCovers[3+m];
 					DrawActorSprite(screen, icx, icy, sbbox, newsc,
-									anims, Face, mirrortint);
+						anims, Face, mirrortint);
 					if (newsc != sc) {
 						delete sc;
 						extraCovers[3+m] = newsc;
@@ -2640,7 +2646,7 @@ void Actor::Draw(Region &screen)
 					blurx += blurdx; blury += blurdy;
 					newsc = sc = extraCovers[i];
 					DrawActorSprite(screen, blurx, blury, sbbox, newsc,
-									anims, Face, tint);
+						anims, Face, tint);
 					if (newsc != sc) {
 						delete sc;
 						extraCovers[i] = newsc;
@@ -2663,7 +2669,7 @@ void Actor::Draw(Region &screen)
 					blurx -= blurdx; blury -= blurdy;
 					newsc = sc = extraCovers[i];
 					DrawActorSprite(screen, blurx, blury, sbbox, newsc,
-									anims, Face, tint);
+						anims, Face, tint);
 					if (newsc != sc) {
 						delete sc;
 						extraCovers[i] = newsc;
@@ -2686,7 +2692,7 @@ void Actor::Draw(Region &screen)
 					sbbox.y += 3*OrientdY[dir];
 					newsc = sc = extraCovers[3+m];
 					DrawActorSprite(screen, icx, icy, sbbox, newsc,
-									anims, Face, mirrortint);
+						anims, Face, mirrortint);
 					if (newsc != sc) {
 						delete sc;
 						extraCovers[3+m] = newsc;

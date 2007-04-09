@@ -189,8 +189,8 @@ private:
 
 	/** paint the actor itself. Called internally by Draw() */
 	void DrawActorSprite(Region &screen, int cx, int cy, Region& bbox,
-						 SpriteCover*& sc, Animation** anims,
-						 unsigned char Face, Color& tint);
+				 SpriteCover*& sc, Animation** anims,
+				 unsigned char Face, Color& tint);
 
 	/** fixes the palette */
 	void SetupColors();
