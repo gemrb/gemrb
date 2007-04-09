@@ -430,8 +430,6 @@ void EffectQueue::AddAllEffects(Actor* target)
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		//handle resistances and saving throws here
 		(*f)->random_value = random_value;
-		(*f)->PosX = target->Pos.x;
-		(*f)->PosY = target->Pos.y;
 		//if applyeffect returns true, we stop adding the future effects
 		//this is to simulate iwd2's on the fly spell resistance
 		if(AddEffect(*f, Owner, target)) {		
@@ -655,6 +653,8 @@ bool EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 	ieDword GameTime = core->GetGame()->GameTime;
 
 	if (first_apply) {
+		fx->PosX = target->Pos.x;
+		fx->PosY = target->Pos.y;
 		//the effect didn't pass the probability check
 		if (!check_probability(fx) ) {
 			fx->TimingMode=FX_DURATION_JUST_EXPIRED;
