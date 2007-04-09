@@ -1560,7 +1560,7 @@ void Map::AddProjectile(Projectile* pro, Point &source, ieWord actorID)
 	pro->MoveTo(this,source);
 	pro->SetTarget(actorID);
 	int height = pro->GetHeight();
-	for(iter=projectiles.begin();iter!=projectiles.end() && (*iter)->GetHeight()>height; iter++);
+	for(iter=projectiles.begin();iter!=projectiles.end() && (*iter)->GetHeight()<height; iter++);
 	projectiles.insert(iter, pro);
 }
 
@@ -1572,7 +1572,7 @@ void Map::AddProjectile(Projectile* pro, Point &source, Point &dest)
 	pro->MoveTo(this,source);
 	pro->SetTarget(dest);
 	int height = pro->GetHeight();
-	for(iter=projectiles.begin();iter!=projectiles.end() && (*iter)->GetHeight()>height; iter++);
+	for(iter=projectiles.begin();iter!=projectiles.end() && (*iter)->GetHeight()<height; iter++);
 	projectiles.insert(iter, pro);
 }
 
@@ -1581,7 +1581,7 @@ void Map::AddVVCell(ScriptedAnimation* vvc)
 {
 	scaIterator iter;
 
-	for(iter=vvcCells.begin();iter!=vvcCells.end() && (*iter)->ZPos>vvc->ZPos; iter++);
+	for(iter=vvcCells.begin();iter!=vvcCells.end() && (*iter)->ZPos<vvc->ZPos; iter++);
 	vvcCells.insert(iter, vvc);
 }
 
