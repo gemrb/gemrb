@@ -970,7 +970,8 @@ Map* AREImp::GetMap(const char *ResRef)
 			text[499] = 0;
 			str->ReadDword(&color); //readonly == 1
 			str->Seek(20, GEM_CURRENT_POS);
-			text = (char *) realloc( text, strlen(text) );
+			//+1 for the terminating zero!!!
+			text = (char *) realloc( text, strlen(text)+1 );
 		}
 		else {
 			ieWord px,py;
