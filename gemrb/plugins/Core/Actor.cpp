@@ -144,7 +144,7 @@ static int d_gradient[DAMAGE_LEVELS] = {
 #define OV_MINORGLOBE  2
 #define OV_SHIELDGLOBE 3
 #define OV_GREASE      4
-#define OV_WEB         5
+#define OV_WEB	 5
 #define OV_BOUNCE      6  //bouncing
 #define OV_BOUNCE2     7  //bouncing activated
 static ieResRef overlay[OVERLAY_COUNT]={"SPENTACI","SANCTRY","MINORGLB","SPSHIELD",
@@ -155,7 +155,7 @@ static bool REVERSE_TOHIT=true;
 static bool CHECK_ABILITIES=false;
 
 //internal flags for calculating to hit
-#define WEAPON_FIST        0
+#define WEAPON_FIST	0
 #define WEAPON_MELEE       1
 #define WEAPON_RANGED      2
 #define WEAPON_STYLEMASK   15
@@ -1309,6 +1309,12 @@ void Actor::DialogInterrupt()
 	}
 }
 
+void Actor::GetHit()
+{
+	SetStance( IE_ANI_DAMAGE );
+	DisplayStringCore(this, VB_DAMAGE, DS_CONSOLE|DS_CONST );
+}
+
 //returns actual damage
 int Actor::Damage(int damage, int damagetype, Actor *hitter)
 {
@@ -1336,6 +1342,7 @@ int Actor::Damage(int damage, int damagetype, Actor *hitter)
 			damagelevel = 3;
 		}
 	}
+	GetHit();
 	if (damagetype & (DAMAGE_FIRE|DAMAGE_MAGICFIRE) ) {
 		PlayDamageAnimation(DL_FIRE+damagelevel);
 	} else if (damagetype & (DAMAGE_COLD|DAMAGE_MAGICCOLD) ) {
@@ -1351,7 +1358,6 @@ int Actor::Damage(int damage, int damagetype, Actor *hitter)
 	}
 	printMessage("Actor"," ",GREEN);
 	printf("%d damage taken.\n", LastDamage);
-	DisplayStringCore(this, VB_DAMAGE, DS_CONSOLE|DS_CONST );
 	if (InParty) {
 		if (chp<(signed) Modified[IE_MAXHITPOINTS]/10) {
 			core->Autopause(AP_WOUNDED);
@@ -2592,7 +2598,7 @@ void Actor::Draw(Region &screen)
 		//     Drawn with transparency.
 		//     distance between copies depends on IE_MOVEMENTRATE
 		//     TODO: actually, the direction is the real movement direction,
-		//           not the (rounded) direction given Face
+		//		 not the (rounded) direction given Face
 		//     Uses extraCovers 0-2
 		// * actor itself
 		//     Uses main spritecover
@@ -2738,7 +2744,15 @@ bool Actor::HandleActorStance()
 	int StanceID = GetStance();
 
 	if (ca->autoSwitchOnEnd) {
-		SetStance( ca->nextStanceID );
+		int nextstance = ca->nextStanceID;
+/*
+		if (nextstance == IE_ANI_READY) {
+			if (!core->GetGame()->CombatCounter) {
+				nextstance = IE_ANI_AWAKE;
+			}
+		}
+*/
+		SetStance( nextstance );    
 		ca->autoSwitchOnEnd = false;
 		return true;
 	}
@@ -3085,43 +3099,43 @@ void Actor::ChargeItem(int slot, ieDword header, CREItem *item, Item *itm, bool 
 
 bool Actor::CastSpellPoint( ieResRef SpellResRef, Point &target )
 {
-        if (! spellbook.HaveSpell( SpellResRef, HS_DEPLETE )) {
-                return false;
-        }
+	if (! spellbook.HaveSpell( SpellResRef, HS_DEPLETE )) {
+		return false;
+	}
 
-        Spell* spl = core->GetSpell( SpellResRef );
-        //cfb
-        EffectQueue *fxqueue=spl->GetEffectBlock(-1);
-        fxqueue->SetOwner(this);
-        fxqueue->ApplyAllEffects(this);
-        //spell
-        Projectile *pro=spl->GetProjectile(GetXPLevel(true));
-        pro->SetCaster(globalID);
-        GetCurrentArea()->AddProjectile(pro, Pos, target);
-        return true;
+	Spell* spl = core->GetSpell( SpellResRef );
+	//cfb
+	EffectQueue *fxqueue=spl->GetEffectBlock(-1);
+	fxqueue->SetOwner(this);
+	fxqueue->ApplyAllEffects(this);
+	//spell
+	Projectile *pro=spl->GetProjectile(GetXPLevel(true));
+	pro->SetCaster(globalID);
+	GetCurrentArea()->AddProjectile(pro, Pos, target);
+	return true;
 }
 
 bool Actor::CastSpell( ieResRef SpellResRef, Scriptable* target )
 {
-        if (! spellbook.HaveSpell( SpellResRef, HS_DEPLETE )) {
-                return false;
-        }
+	if (! spellbook.HaveSpell( SpellResRef, HS_DEPLETE )) {
+		return false;
+	}
 
 	if (target->Type!=ST_ACTOR) {
 		return CastSpellPoint(SpellResRef, target->Pos);
 	}
 
 	Actor *Target = (Actor *) target;
-        Spell* spl = core->GetSpell( SpellResRef );
-        //cfb
-        EffectQueue *fxqueue=spl->GetEffectBlock(-1);
-        fxqueue->SetOwner(this);
-        fxqueue->ApplyAllEffects(this);
-        //spell
-        Projectile *pro=spl->GetProjectile(GetXPLevel(true));
-        pro->SetCaster(globalID);
-        GetCurrentArea()->AddProjectile(pro, Pos, Target->globalID);
-        return true;
+	Spell* spl = core->GetSpell( SpellResRef );
+	//cfb
+	EffectQueue *fxqueue=spl->GetEffectBlock(-1);
+	fxqueue->SetOwner(this);
+	fxqueue->ApplyAllEffects(this);
+	//spell
+	Projectile *pro=spl->GetProjectile(GetXPLevel(true));
+	pro->SetCaster(globalID);
+	GetCurrentArea()->AddProjectile(pro, Pos, Target->globalID);
+	return true;
 }
 
 bool Actor::IsReverseToHit()

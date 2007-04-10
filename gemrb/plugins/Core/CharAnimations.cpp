@@ -253,7 +253,7 @@ void CharAnimations::SetupColors(PaletteType type)
 		}
 		for (unsigned int i = 0; i < Colors[6]; i++) {
 			core->GetPalette( Colors[i]&255, size,
-				  &palette[PAL_MAIN]->col[dest] );
+					&palette[PAL_MAIN]->col[dest] );
 			//Color* NewPal = core->GetPalette( Colors[i]&255, size );
 			//memcpy( &palette->col[dest], NewPal, size*sizeof( Color ) );
 			dest +=size;
@@ -545,17 +545,17 @@ IE_ANI_PST_GHOST:	This is a special static animation with no standard
 			All armourlevels are drawn simultaneously. There is no orientation or stance.
 
 
-  WEST PART  |  EAST PART
-	     |
-    NW  NNW  N  NNE  NE
+	WEST PART  |  EAST PART
+			 |
+		NW  NNW  N  NNE  NE
  NW 006 007 008 009 010 NE
 WNW 005      |      011 ENE
-  W 004     xxx     012 E
+	W 004     xxx     012 E
 WSW 003      |      013 ESE
  SW 002 001 000 015 014 SE
-    SW  SSW  S  SSE  SE
-	     |
-	     |
+		SW  SSW  S  SSE  SE
+			 |
+			 |
 
 */
 
@@ -603,6 +603,10 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 	//setting up the sequencing of animation cycles
 	autoSwitchOnEnd = false;
 	switch (StanceID) {
+		case IE_ANI_DAMAGE:
+			nextStanceID = IE_ANI_READY;
+			autoSwitchOnEnd = true;
+			break;
 		case IE_ANI_SLEEP: //going to sleep
 			nextStanceID = IE_ANI_TWITCH;
 			autoSwitchOnEnd = true;
@@ -686,10 +690,10 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 				// off-hand
 				if (WeaponType == IE_ANI_WEAPON_1H) {
 					GetEquipmentResRef(OffhandRef,false,NewResRef,Cycle,
-									   equipdat);
+										 equipdat);
 				} else { // IE_ANI_WEAPON_2W
 					GetEquipmentResRef(OffhandRef,true,NewResRef,Cycle,
-									   equipdat);
+										 equipdat);
 				}
 			} else if (part == actorPartCount+2) {
 				if (HelmetRef[0] == 0) continue;
@@ -778,6 +782,7 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 
 		//setting up the sequencing of animation cycles
 		switch (StanceID) {
+			case IE_ANI_DAMAGE:
 			case IE_ANI_SLEEP:
 			case IE_ANI_TWITCH:
 			case IE_ANI_DIE:

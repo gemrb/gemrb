@@ -425,11 +425,21 @@ int fx_detect_evil (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 //0xd3 fx_jumble_curse
 int fx_jumble_curse (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_jumble_curse (%2d): Par1: %d  Par2: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_jumble_curse (%2d)\n", fx->Opcode );
+	if (!(core->GetGame()->GameTime%100)) {
+		//hiccups
+		//PST has this hardcoded deep in the engine
+		//gemrb lets you specify the strref in P#1
+		ieStrRef tmp = fx->Parameter1;
+		if (!tmp) tmp = 46633;
+		char *tmpstr = core->GetString(tmp, IE_STR_SPEECH|IE_STR_SOUND);
+		target->DisplayHeadText(tmpstr);
+		//tmpstr shouldn't be freed, it is taken care by Actor
+		target->GetHit();
+	}
 	STAT_SET( IE_DEADMAGIC, 1);
 	STAT_SET( IE_SPELLFAILUREMAGE, 100);
 	STAT_SET( IE_SPELLFAILUREPRIEST, 100);
 	STAT_SET( IE_SPELLFAILUREINNATE, 100);
-	//hiccups
 	return FX_APPLIED;
 }

@@ -303,7 +303,8 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 		}
 
 		int tmp=(int) actor->StrRefs[Strref];
-		if (tmp == -1) {
+		// 0 is also illegal as string constant (in pst at least)
+		if (tmp <= 0) {
 			actor->ResolveStringConstant( sb.Sound, (unsigned int) Strref);
 		}
 		Strref = tmp;

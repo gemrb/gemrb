@@ -1836,8 +1836,7 @@ static PyObject* GemRB_SetButtonSprites(PyObject * /*self*/, PyObject* args)
 
 	AnimationFactory* af = ( AnimationFactory* )
 		core->GetResourceMgr()->GetFactoryResource( ResRef,
-													IE_BAM_CLASS_ID,
-													IE_NORMAL );
+		IE_BAM_CLASS_ID, IE_NORMAL );
 	if (!af) {
 		return RuntimeError( "BAM not found" );
 	}
@@ -2216,8 +2215,7 @@ static PyObject* GemRB_CreateMapControl(PyObject * /*self*/, PyObject* args)
 		map->LinkedLabel = lc;
 		AnimationFactory* af = ( AnimationFactory* )
 			core->GetResourceMgr()->GetFactoryResource( Flag,
-														IE_BAM_CLASS_ID,
-														IE_NORMAL );
+			IE_BAM_CLASS_ID, IE_NORMAL );
 		if (af) {
 			for (int i=0;i<8;i++) {
 				map->Flag[i] = af->GetFrame(i,0);
@@ -2739,8 +2737,7 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 	if (str == NULL ) {
 		AnimationFactory* af = ( AnimationFactory* )
 			core->GetResourceMgr()->GetFactoryResource( ResRef,
-														IE_BAM_CLASS_ID,
-														IE_NORMAL );
+			IE_BAM_CLASS_ID, IE_NORMAL );
 		if (!af) {
 			printMessage("GUISCript","PLT/BAM not found for ref: ",YELLOW);
 			printf("%s\n", ResRef);
@@ -2817,8 +2814,7 @@ static PyObject* SetButtonBAM(int wi, int ci, const char *ResRef, int CycleIndex
 
 	AnimationFactory* af = ( AnimationFactory* )
 		core->GetResourceMgr()->GetFactoryResource( ResRef,
-													IE_BAM_CLASS_ID,
-													IE_NORMAL );
+		IE_BAM_CLASS_ID, IE_NORMAL );
 	if (!af)
 		return NULL;
 	Sprite2D* Picture = af->GetFrame ( FrameIndex, CycleIndex );
@@ -4437,8 +4433,7 @@ PyObject *SetSpellIcon(int wi, int ci, ieResRef SpellResRef, int type, int toolt
 	}
 	AnimationFactory* af = ( AnimationFactory* )
 		core->GetResourceMgr()->GetFactoryResource( IconResRef,
-													IE_BAM_CLASS_ID,
-													IE_NORMAL );
+		IE_BAM_CLASS_ID, IE_NORMAL );
 	if (!af) {
 		return RuntimeError( "BAM not found" );
 	}
@@ -6781,8 +6776,7 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, int Index, int
 	//FIXME: this is a hardcoded resource (pst has no such one)
 	AnimationFactory* bam = ( AnimationFactory* )
 		core->GetResourceMgr()->GetFactoryResource( GUIResRef[Index],
-													IE_BAM_CLASS_ID,
-													IE_NORMAL );
+		IE_BAM_CLASS_ID, IE_NORMAL );
 	if (!bam) {
 		return RuntimeError( "BAM not found" );
 	}
@@ -6877,8 +6871,7 @@ static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 	//FIXME: this is a hardcoded resource (pst has no such one)
 	AnimationFactory* bam = ( AnimationFactory* )
 		core->GetResourceMgr()->GetFactoryResource( "guibtbut",
-													IE_BAM_CLASS_ID,
-													IE_NORMAL );
+		IE_BAM_CLASS_ID, IE_NORMAL );
 	if (!bam) {
 		return RuntimeError( "BAM not found" );
 	}
@@ -6979,8 +6972,7 @@ static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 	//FIXME: this is a hardcoded resource (pst has no such one)
 	AnimationFactory* bam = ( AnimationFactory* )
 		core->GetResourceMgr()->GetFactoryResource( "guibtbut",
-													IE_BAM_CLASS_ID,
-													IE_NORMAL );
+		IE_BAM_CLASS_ID, IE_NORMAL );
 	if (!bam) {
 		return RuntimeError( "BAM not found" );
 	}

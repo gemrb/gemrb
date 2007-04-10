@@ -317,6 +317,8 @@ public:
 	void ReactToDeath(const char *deadname);
 	/* called when someone talks to Actor */
 	void DialogInterrupt();
+	/* called when actor was hit */
+	void GetHit();
 	/* deals damage to this actor */
 	int Damage(int damage, int damagetype, Actor *hitter);
 	/* drops items from inventory to current spot */

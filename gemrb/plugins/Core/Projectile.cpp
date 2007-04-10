@@ -161,6 +161,8 @@ void Projectile::ChangePhase()
 			Actor *original = area->GetActorByGlobalID(Caster);
 			effects->SetOwner(original?original:target);
 			effects->AddAllEffects(target);
+			//not simply nulling it, addalleffects copies them
+			delete effects;
 			effects = NULL;
 			return;
 		}
