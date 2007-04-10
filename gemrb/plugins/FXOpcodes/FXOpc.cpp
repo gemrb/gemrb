@@ -1346,26 +1346,35 @@ int fx_set_poisoned_state (Actor* Owner, Actor* target, Effect* fx)
 
 // 0x1a
 EffectRef fx_apply_effect_curse_ref={"ApplyEffectCurse",NULL,-1};
+EffectRef fx_pst_jumble_curse_ref={"JumbleCurse",NULL,-1};
 
 // gemrb extension: if the resource field is filled, it will remove curse only from the specified item
 int fx_remove_curse (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_remove_curse (%2d): Resource: %s\n", fx->Opcode, fx->Resource );
 
-	int i = target->inventory.GetSlotCount();
-	while(i--) {
-		//does this slot need unequipping
-		if (core->QuerySlotEffects(i) ) {
-			if (fx->Resource[0] && strnicmp(target->inventory.GetSlotItem(i)->ItemResRef, fx->Resource,8) ) {
-				continue;
+	switch(fx->Parameter2)
+	{
+	case 1:
+		//this is pst specific
+		target->fxqueue.RemoveAllEffects(fx_pst_jumble_curse_ref);
+		break;
+	default:
+		int i = target->inventory.GetSlotCount();
+		while(i--) {
+			//does this slot need unequipping
+			if (core->QuerySlotEffects(i) ) {
+				if (fx->Resource[0] && strnicmp(target->inventory.GetSlotItem(i)->ItemResRef, fx->Resource,8) ) {
+					continue;
+				}
+				if (target->inventory.UnEquipItem(i,true)) {
+					//
+				}
+				target->inventory.ChangeItemFlag(i, IE_INV_ITEM_CURSED, BM_NAND);
 			}
-			if (target->inventory.UnEquipItem(i,true)) {
-				//
-			}
-			target->inventory.ChangeItemFlag(i, IE_INV_ITEM_CURSED, BM_NAND);
 		}
+		target->fxqueue.RemoveAllEffects(fx_apply_effect_curse_ref);
 	}
-	target->fxqueue.RemoveAllEffects(fx_apply_effect_curse_ref);
 	//this is an instant effect
 	return FX_NOT_APPLIED;
 }
