@@ -238,6 +238,9 @@ void CharAnimations::SetupColors(PaletteType type)
 	}
 
 	if (GetAnimType() >= IE_ANI_PST_ANIMATION_1) {
+		if (type!=PAL_MAIN) {
+			return;
+		}
 		// TODO: handle equipment colour glows
 
 		//Colors[6] is the COLORCOUNT stat in PST
@@ -246,36 +249,56 @@ void CharAnimations::SetupColors(PaletteType type)
 		//backwards There are 5 available slots with a size of 32 each
 		int size = 32;
 		int dest = 256-Colors[6]*size;
-		if (Colors[6] == 0) {
+		bool needmod = false;
+		if (GlobalColorMod.type != RGBModifier::NONE) {
+			needmod = true;
+		}
+		if ((Colors[6] == 0) && (needmod==false) ) {
 			core->FreePalette(palette[PAL_MAIN], PaletteResRef);
 			PaletteResRef[0]=0;
 			return;
 		}
+
 		for (unsigned int i = 0; i < Colors[6]; i++) {
-			core->GetPalette( Colors[i]&255, size,
-					&palette[PAL_MAIN]->col[dest] );
-			//Color* NewPal = core->GetPalette( Colors[i]&255, size );
-			//memcpy( &palette->col[dest], NewPal, size*sizeof( Color ) );
-			dest +=size;
-			//free( NewPal );
+		  core->GetPalette( Colors[i]&255, size,
+		    &palette[PAL_MAIN]->col[dest] );
+		  dest +=size;
+		}
+
+		if (GlobalColorMod.type != RGBModifier::NONE) {
+			if (!modifiedPalette[PAL_MAIN])
+				modifiedPalette[PAL_MAIN] = new Palette();
+			//pst needs all color slots changed, luckily i already made this function
+			modifiedPalette[PAL_MAIN]->SetupCompleteRGBModification(palette[PAL_MAIN], GlobalColorMod);
 		}
 		return;
 	}
 
 	int PType = NoPalette();
-	if ( PType && type == PAL_MAIN ) {
-		core->FreePalette(palette[PAL_MAIN], PaletteResRef);
+	if ( PType && (type == PAL_MAIN) ) {
+		bool needmod = false;
+		if (GlobalColorMod.type != RGBModifier::NONE) {
+			needmod = true;
+		}
+		if (!needmod && PaletteResRef[0]) {
+			core->FreePalette(palette[PAL_MAIN], PaletteResRef);
+		}
 		PaletteResRef[0]=0;
 		//handling special palettes like MBER_BL (black bear)
-		if (PType==1) {
-			return;
+		if (PType!=1) {
+			snprintf(PaletteResRef,8,"%.4s_%-.2s",ResRef, (char *) &PType);
+			strlwr(PaletteResRef);
+			Palette *tmppal = core->GetPalette(PaletteResRef);
+			if (tmppal) {
+				palette[PAL_MAIN] = tmppal;
+			} else {
+				PaletteResRef[0]=0;
+			}
 		}
-		snprintf(PaletteResRef,8,"%.4s_%-.2s",ResRef, (char *) &PType);
-		strlwr(PaletteResRef);
-		palette[PAL_MAIN] = core->GetPalette(PaletteResRef);
-		//invalid palette, rolling back
-		if (!palette) {
-			PaletteResRef[0]=0;
+		if (needmod) {
+			if (!modifiedPalette[PAL_MAIN])
+				modifiedPalette[PAL_MAIN] = new Palette();
+			modifiedPalette[PAL_MAIN]->SetupCompleteRGBModification(palette[PAL_MAIN], GlobalColorMod);
 		}
 		return;
 	}
