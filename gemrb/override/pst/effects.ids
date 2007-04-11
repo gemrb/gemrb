@@ -7,8 +7,8 @@ IDS
 0x5	State:Charmed
 0x6	CharismaModifier
 0x7	Color:SetPalette
-0x8	Color:SetRGB
-0x9	Color:PulseRGB
+0x8	Color:SetRGBGlobal
+0x9	Color:PulseRGBGlobal
 0xa	ConstitutionModifier
 0xb	Cure:Poison
 0xc	Damage
