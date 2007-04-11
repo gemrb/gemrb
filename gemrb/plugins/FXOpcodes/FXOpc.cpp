@@ -74,7 +74,9 @@ int fx_set_charmed_state (Actor* Owner, Actor* target, Effect* fx);//05
 int fx_charisma_modifier (Actor* Owner, Actor* target, Effect* fx);//06
 int fx_set_color_gradient (Actor* Owner, Actor* target, Effect* fx);//07
 int fx_set_color_rgb (Actor* Owner, Actor* target, Effect* fx);//08
+int fx_set_color_rgb_global (Actor* Owner, Actor* target, Effect* fx);//08
 int fx_set_color_pulse_rgb (Actor* Owner, Actor* target, Effect* fx);//09
+int fx_set_color_pulse_rgb_global (Actor* Owner, Actor* target, Effect* fx);//09
 int fx_constitution_modifier (Actor* Owner, Actor* target, Effect* fx);//0a
 int fx_cure_poisoned_state (Actor* Owner, Actor* target, Effect* fx);//0b
 int fx_damage (Actor* Owner, Actor* target, Effect* fx);//0c
@@ -446,7 +448,9 @@ static EffectRef effectnames[] = {
 	{ "Color:DarkenRGB", fx_darken_rgb, 0},
 	{ "Color:SetPalette", fx_set_color_gradient, 0 },
 	{ "Color:SetRGB", fx_set_color_rgb, 0 },
-	{ "Color:PulseRGB", fx_set_color_pulse_rgb, 0 }, //8
+	{ "Color:SetRGBGlobal", fx_set_color_rgb_global, 0 }, //08
+	{ "Color:PulseRGB", fx_set_color_pulse_rgb, 0 }, //9
+	{ "Color:PulseRGBGlobal", fx_set_color_pulse_rgb_global, 0 }, //9
 	{ "ConstitutionModifier", fx_constitution_modifier, 0 },
 	{ "ControlCreature", fx_set_charmed_state, 0 }, //0xf1 same as charm
 	{ "CreateContingency", fx_create_contingency, 0 },
@@ -985,6 +989,17 @@ int fx_set_color_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 	return FX_APPLIED;
 }
+// 08 Color:SetRGBGlobal
+int fx_set_color_rgb_global (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_set_color_rgb_global (%2d): RGB: %x, Location: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	int location = -1;
+	target->SetColorMod(location, RGBModifier::ADD, -1, fx->Parameter1 >> 8,
+						fx->Parameter1 >> 16, fx->Parameter1 >> 24);
+
+	return FX_APPLIED;
+}
 
 // 09 Color:PulseRGB
 int fx_set_color_pulse_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
@@ -994,6 +1009,19 @@ int fx_set_color_pulse_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 	int location = (fx->Parameter2 & 0xF) + 8*((fx->Parameter2 & 0xF0)>>4);
 	int speed = (fx->Parameter2 >> 16) & 0xFF;
 	target->SetColorMod(location, RGBModifier::ADD, speed,
+						fx->Parameter1 >> 8, fx->Parameter1 >> 16,
+						fx->Parameter1 >> 24);
+
+	return FX_APPLIED;
+}
+
+// 09 Color:PulseRGBGlobal (pst variant)
+int fx_set_color_pulse_rgb_global (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_set_color_pulse_rgb_global (%2d): RGB: %x, Location: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	int speed = (fx->Parameter2 >> 16) & 0xFF;
+	target->SetColorMod(-1, RGBModifier::ADD, speed,
 						fx->Parameter1 >> 8, fx->Parameter1 >> 16,
 						fx->Parameter1 >> 24);
 
