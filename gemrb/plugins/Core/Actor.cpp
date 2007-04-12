@@ -2318,15 +2318,14 @@ void Actor::SetColorMod( int location, RGBModifier::Type type, int speed,
 		ca->GlobalColorMod.rgb.b = b;
 		if (phase >= 0)
 			ca->GlobalColorMod.phase = phase;
-		else
-			ca->GlobalColorMod.phase = 0;
 	} else {
 		ca->ColorMods[location].type = type;
 		ca->ColorMods[location].speed = speed;
 		ca->ColorMods[location].rgb.r = r;
 		ca->ColorMods[location].rgb.g = g;
 		ca->ColorMods[location].rgb.b = b;
-		// keep phase as-is, to prevent the phase being reset each AI cycle
+		if (phase >= 0)
+			ca->ColorMods[location].phase = phase;
 	}
 }
 

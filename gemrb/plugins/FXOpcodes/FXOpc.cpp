@@ -1680,7 +1680,7 @@ int fx_brief_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 	int speed = (fx->Parameter2 >> 16) & 0xFF;
 	target->SetColorMod(-1, RGBModifier::ADD, speed,
 						fx->Parameter1 >> 8, fx->Parameter1 >> 16,
-						fx->Parameter1 >> 24);
+						fx->Parameter1 >> 24, 0);
 
 	return FX_NOT_APPLIED;
 }
