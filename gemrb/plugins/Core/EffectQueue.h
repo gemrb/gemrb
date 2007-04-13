@@ -34,7 +34,7 @@
 #include "Effect.h"
 
 class Actor;
-
+class Map;
 
 /** Maximum number of different Effect opcodes */
 #define MAX_EFFECTS 512
@@ -127,8 +127,6 @@ void EffectQueue_RegisterOpcodes(int count, EffectRef *opcodes);
 /** release effect list when Interface is destroyed */
 void EffectQueue_ReleaseMemory();
 
-bool match_ids(Actor *target, int table, ieDword value);
-
 /** Check if opcode is for an effect that takes a color slot as parameter. */
 bool IsColorslotEffect(int opcode);
 
@@ -204,10 +202,14 @@ public:
 
 	// returns -1 if bounced, 0 if resisted, 1 if accepted spell
 	int CheckImmunity(Actor *target);
+	// apply this effectqueue on all actors matching ids targeting
+	// from pos, in range (no cone size yet)
+	void AffectAllInRange(Map *map, Point &pos, int idstype, int idsvalue, unsigned int range);
 	/** Lists contents of the queue on a terminal for debugging */
 	void dump();
 	//resolve effect
 	static int ResolveEffect(EffectRef &effect_reference);
+	static bool match_ids(Actor *target, int table, ieDword value);
 private:
 	//use the effect reference style calls from outside
 	static Effect *CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieDword timing);

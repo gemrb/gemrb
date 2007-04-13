@@ -730,60 +730,6 @@ FXOpc::~FXOpc(void)
 	core->FreeResRefTable(spell_hits, shcount);
 }
 
-// Helper macros and functions for effect opcodes
-/*
-#define CHECK_LEVEL() { \
-	int level = target->GetXPLevel( true ); \
-	if ((fx->DiceSides != 0 || fx->DiceThrown != 0) && (level < (int)fx->DiceSides || level > (int)fx->DiceThrown)) \
-		return FX_NOT_APPLIED; \
-	}
-*/
-
-bool match_ids(Actor *target, int table, ieDword value)
-{
-	if (value == 0) {
-		return true;
-	}
-
-	int a, stat;
-
-	switch (table) {
-	case 2: //EA
-		stat = IE_EA; break;
-	case 3: //GENERAL
-		stat = IE_GENERAL; break;
-	case 4: //RACE
-		stat = IE_RACE; break;
-	case 5: //CLASS
-		stat = IE_CLASS; break;
-	case 6: //SPECIFIC
-		stat = IE_SPECIFIC; break;
-	case 7: //GENDER
-		stat = IE_SEX; break;
-	case 8: //ALIGNMENT
-		stat = target->GetStat(IE_ALIGNMENT);
-		a = value&15;
-		if (a) {
-			if (a != ( stat & 15 )) {
-				return false;
-			}
-		}
-		a = value & 240;
-		if (a) {
-			if (a != ( stat & 240 )) {
-				return false;
-			}
-		}
-		return true;
-	default:
-		return false;
-	}
-	if (target->GetStat(stat)==value) {
-		return true;
-	}
-	return false;
-}
-
 static inline void HandleBonus(Actor *target, int stat, int mod, int mode)
 {
 	if (mode==FX_DURATION_INSTANT_PERMANENT) {
@@ -1743,7 +1689,7 @@ EffectRef fx_death_ref={"Death",NULL,-1};
 int fx_kill_creature_type (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_kill_creature_type (%2d): Value: %d, IDS: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	if (match_ids( target, fx->Parameter1, fx->Parameter2) ) {
+	if (EffectQueue::match_ids( target, fx->Parameter1, fx->Parameter2) ) {
 		//convert it to a death opcode or apply the new effect?
 		fx->Opcode = EffectQueue::ResolveEffect(fx_death_ref);
 		fx->TimingMode = FX_DURATION_INSTANT_PERMANENT;
@@ -2983,7 +2929,7 @@ int fx_find_traps (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_find_traps (%2d)\n", fx->Opcode );
 	//reveal trapped containers, doors, triggers that are in the visible range
-	ieDword range = target->GetStat(IE_VISUALRANGE);
+	ieDword range = target->GetStat(IE_VISUALRANGE)*10;
 
 	TileMap *TMap = target->GetCurrentArea()->TMap;
 
@@ -3270,7 +3216,7 @@ int fx_hold_creature_no_icon (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if ( STATE_GET(STATE_DEAD) ) {
 		return FX_NOT_APPLIED;
 	}
- 	if (match_ids( target, fx->Parameter1, fx->Parameter2) ) {
+ 	if (EffectQueue::match_ids( target, fx->Parameter1, fx->Parameter2) ) {
 		STAT_SET( IE_HELD, 1);
 		return FX_APPLIED;
 	}
@@ -3287,7 +3233,7 @@ int fx_hold_creature (Actor* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
- 	if (match_ids( target, fx->Parameter1, fx->Parameter2) ) {
+ 	if (EffectQueue::match_ids( target, fx->Parameter1, fx->Parameter2) ) {
 		STAT_SET( IE_HELD, 1);
 		target->AddPortraitIcon(PI_HELD);
 		return FX_APPLIED;
@@ -3301,7 +3247,7 @@ int fx_hold_creature (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_apply_effect (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_apply_effect (%2d) %s", fx->Opcode, fx->Resource );
- 	if (match_ids( target, fx->Parameter1, fx->Parameter2) ) {
+ 	if (EffectQueue::match_ids( target, fx->Parameter1, fx->Parameter2) ) {
 		//apply effect
 		core->ApplyEffect(fx->Resource, target, Owner, fx->Power);
 	}
@@ -3778,7 +3724,7 @@ int fx_cast_spell_on_condition (Actor* Owner, Actor* target, Effect* fx)
 		condition = target->LastDamage;
 		break;
 	case COND_NEAR: //
-		condition = Distance(actor, target)<30;
+		condition = PersonalDistance(actor, target)<30;
 		break;
 	case COND_HP_HALF:
 		condition = actor->GetStat(IE_HITPOINTS)<actor->GetStat(IE_MAXHITPOINTS)/2;
@@ -3892,7 +3838,7 @@ int fx_puppet_marker (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_disintegrate (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_disintegrate (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
- 	if (match_ids( target, fx->Parameter1, fx->Parameter2) ) {
+ 	if (EffectQueue::match_ids( target, fx->Parameter1, fx->Parameter2) ) {
 		target->Damage(0, fx->Parameter2, Owner); //hmm?
 		//death has damage type too
 		target->Die(Owner);
@@ -4322,7 +4268,7 @@ int fx_scripting_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_apply_effect_curse (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_apply_effect_curse (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	if (match_ids( target, fx->Parameter1, fx->Parameter2) ) {
+	if (EffectQueue::match_ids( target, fx->Parameter1, fx->Parameter2) ) {
 		//load effect and add it to the end of the effect queue?
 		core->ApplyEffect(fx->Resource, target, Owner, fx->Power);
 	}

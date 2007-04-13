@@ -26,7 +26,7 @@
 #include "EffectQueue.h"
 #include "SymbolMgr.h"
 #include "Game.h"
-
+#include "Map.h"
 
 static int initialized = 0;
 static EffectRef *effectnames = NULL;
@@ -48,6 +48,51 @@ static int opcodes_count = 0;
 
 #define MAX_TIMING_MODE 11
 */
+
+bool EffectQueue::match_ids(Actor *target, int table, ieDword value)
+{
+	if (value == 0) {
+		return true;
+	}
+
+	int a, stat;
+
+	switch (table) {
+	case 2: //EA
+		stat = IE_EA; break;
+	case 3: //GENERAL
+		stat = IE_GENERAL; break;
+	case 4: //RACE
+		stat = IE_RACE; break;
+	case 5: //CLASS
+		stat = IE_CLASS; break;
+	case 6: //SPECIFIC
+		stat = IE_SPECIFIC; break;
+	case 7: //GENDER
+		stat = IE_SEX; break;
+	case 8: //ALIGNMENT
+		stat = target->GetStat(IE_ALIGNMENT);
+		a = value&15;
+		if (a) {
+			if (a != ( stat & 15 )) {
+				return false;
+			}
+		}
+		a = value & 0xf0;
+		if (a) {
+			if (a != ( stat & 0xf0 )) {
+				return false;
+			}
+		}
+		return true;
+	default:
+		return false;
+	}
+	if (target->GetStat(stat)==value) {
+		return true;
+	}
+	return false;
+}
 
 static bool fx_instant[MAX_TIMING_MODE]={true,true,true,false,false,false,false,false,true,true,true};
 
@@ -1174,5 +1219,27 @@ int EffectQueue::CheckImmunity(Actor *target)
 		return check_type(target, fx);
 	}
 	return 0;
+}
+
+void EffectQueue::AffectAllInRange(Map *map, Point &pos, int idstype, int idsvalue,
+		unsigned int range)
+{
+	int cnt = map->GetActorCount(true);
+	while(cnt--) {
+		Actor *actor = map->GetActor(cnt,true);
+		//distance
+		if (Distance(pos, actor)>range) {
+			continue;
+		}
+		//ids targeting
+		if (!match_ids(actor, idstype, idsvalue)) {
+			continue;
+		}
+		//line of sight
+		if (!map->IsVisible(actor->Pos, pos)) {
+			continue;
+		}
+		AddAllEffects(actor);
+	}
 }
 

@@ -415,11 +415,31 @@ int fx_hostile_image (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 }
 
 //0xd2 fx_detect_evil
-int fx_detect_evil (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+EffectRef single_color_pulse_ref={"Color:BriefRGB",NULL,-1};
+
+int fx_detect_evil (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_detect_evil (%2d): Par1: %d  Par2: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	ieDword type = fx->Parameter2;
+	//default is alignment/evil/speed 30/range 10
+	if (!type) type = 0x08031e0a;
+	int speed = (type&0xff00)>>8;
+	if (!speed) speed=30;
+	if (!(core->GetGame()->GameTime%speed)) {
+		ieDword color = fx->Parameter1;
+		//default is magenta (rgba)
+		if (!color) color = 0xff00ff00;
+		Effect *newfx = EffectQueue::CreateEffect(single_color_pulse_ref, color, speed<<16, FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES);
+		newfx->Target=FX_TARGET_PRESET;
+		EffectQueue *fxqueue = new EffectQueue();
+		fxqueue->SetOwner(Owner);
+		fxqueue->AddEffect(newfx);
+		delete newfx;
 
-	return FX_NOT_APPLIED;
+		fxqueue->AffectAllInRange(target->GetCurrentArea(), target->Pos, (type&0xff000000)>>24, (type&0xff0000)>>16, (type&0xff)*10);
+		delete fxqueue;
+	}
+	return FX_APPLIED;
 }
 
 //0xd3 fx_jumble_curse
