@@ -129,7 +129,7 @@ int SDLVideoDriver::CreateDisplay(int w, int h, int b, bool fs)
 	printStatus( "OK", LIGHT_GREEN );
 	SDL_LockSurface( extra );
 	long val = SDL_MapRGBA( extra->format, fadeColor.r, fadeColor.g, fadeColor.b, 0 );
-	SDL_FillRect( extra, NULL, val );	
+	SDL_FillRect( extra, NULL, val );
 	SDL_UnlockSurface( extra );
 	SDL_FreeSurface( tmp );
 	printMessage( "SDLVideo", "CreateDisplay...", WHITE );
@@ -484,7 +484,7 @@ void SDLVideoDriver::AddPolygonToSpriteCover(SpriteCover* sc,
 			if (dither) {
 				unsigned char* pix = line + lt;
 				unsigned char* end = line + rt;
-				
+
 				if ((lt + xoff + sy + yoff) % 2) pix++; // CHECKME: aliasing?
 				for (; pix < end; pix += 2)
 					*pix = 1;
@@ -495,7 +495,7 @@ void SDLVideoDriver::AddPolygonToSpriteCover(SpriteCover* sc,
 			}
 			line += sc->Width;
 		}
-	}	
+	}
 }
 
 
@@ -604,7 +604,7 @@ Sprite2D* SDLVideoDriver::DuplicateSprite(Sprite2D* sprite)
 		unsigned char *newpixels = (unsigned char*) malloc( sprite->Width*sprite->Height );
 
 		SDL_LockSurface( tmp );
-		memcpy(newpixels, sprite->pixels, sprite->Width*sprite->Height);	
+		memcpy(newpixels, sprite->pixels, sprite->Width*sprite->Height);
 		dest = CreateSprite8(sprite->Width, sprite->Height, 8,
 							 newpixels, tmp->format->palette->colors, true, 0);
 		SDL_UnlockSurface( tmp );
@@ -757,7 +757,7 @@ void SDLVideoDriver::BlitSpriteRegion(Sprite2D* spr, Region& size, int x,
 
 #define ALREADYCLIPPED
 #define SPECIALPIXEL
-#define FLIP 
+#define FLIP
 #define HFLIP_CONDITIONAL data->flip_hor
 #define VFLIP_CONDITIONAL data->flip_ver
 #define RLE data->RLE
@@ -828,7 +828,7 @@ void SDLVideoDriver::BlitSprite(Sprite2D* spr, int x, int y, bool anchor,
 			drect.x = x - spr->XPos - Viewport.x;
 			drect.y = y - spr->YPos - Viewport.y;
 		}
-		
+
 		if (clip) {
 			if (drect.x + spr->Width <= clip->x)
 				return;
@@ -884,7 +884,7 @@ void SDLVideoDriver::BlitSprite(Sprite2D* spr, int x, int y, bool anchor,
 
 #define SPECIALPIXEL
 #undef BPP16
-#define FLIP 
+#define FLIP
 #define HFLIP_CONDITIONAL data->flip_hor
 #define VFLIP_CONDITIONAL data->flip_ver
 #define RLE data->RLE
@@ -1028,7 +1028,7 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 	unsigned int remflags = flags & ~(BLIT_MIRRORX | BLIT_MIRRORY);
 	if (remflags & BLIT_NOSHADOW) remflags &= ~BLIT_TRANSSHADOW;
 
-#define FLIP 
+#define FLIP
 #define HFLIP_CONDITIONAL hflip
 #define VFLIP_CONDITIONAL vflip
 #define RLE data->RLE
@@ -1190,7 +1190,7 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 
 //		printf("Unoptimized blit: %04X\n", flags);
 
-#define SPECIALPIXEL   int ia=0; if ((remflags & BLIT_HALFTRANS) || (p == 1 && (remflags & BLIT_TRANSSHADOW))) ia = 1; if (p == 1 && (remflags & BLIT_NOSHADOW)) { } else 
+#define SPECIALPIXEL   int ia=0; if ((remflags & BLIT_HALFTRANS) || (p == 1 && (remflags & BLIT_TRANSSHADOW))) ia = 1; if (p == 1 && (remflags & BLIT_NOSHADOW)) { } else
 
 #define CUSTOMBLENDING
 #define RVALUE(r,g,b) (r)
@@ -1246,7 +1246,7 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 #define BPP16
 #include "SDLVideoDriver.inl"
 					}
-				} 
+				}
 			}
 #undef PALETTE_ALPHA
 		} else {
@@ -1291,7 +1291,7 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 #define BPP16
 #include "SDLVideoDriver.inl"
 					}
-				} 
+				}
 			}
 		}
 
@@ -1388,13 +1388,8 @@ void SDLVideoDriver::SetViewport(int x, int y, unsigned int w, unsigned int h)
 	Viewport.h = h;
 }
 
-void SDLVideoDriver::MoveViewportTo(int x, int y, bool center)
+void SDLVideoDriver::MoveViewportTo(int x, int y)
 {
-	if (center) {
-		x -= ( Viewport.w / 2 );
-		y -= ( Viewport.h / 2 );
-	}
-
 	if (x != Viewport.x || y != Viewport.y) {
 		core->GetSoundMgr()->UpdateViewportPos( (x - xCorr) + disp->w / 2, (y - yCorr) + disp->h / 2 );
 		Viewport.x = x;
@@ -1638,8 +1633,8 @@ bool SDLVideoDriver::IsSpritePixelTransparent(Sprite2D* sprite, unsigned short x
 }
 
 /*
- * Draws horizontal line. When clipped=true, it draws the line relative 
- * to Area origin and clips it by Area viewport borders, 
+ * Draws horizontal line. When clipped=true, it draws the line relative
+ * to Area origin and clips it by Area viewport borders,
  * else it draws relative to screen origin and ignores the vieport
  */
 void SDLVideoDriver::DrawHLine(short x1, short y, short x2, Color& color, bool clipped)
@@ -1654,13 +1649,13 @@ void SDLVideoDriver::DrawHLine(short x1, short y, short x2, Color& color, bool c
 		y -= Viewport.y;
 		x2 -= Viewport.x;
 	}
-	for ( ; x1 <= x2 ; x1++ ) 
+	for ( ; x1 <= x2 ; x1++ )
 		SetPixel( x1, y, color, clipped );
 }
 
 /*
- * Draws vertical line. When clipped=true, it draws the line relative 
- * to Area origin and clips it by Area viewport borders, 
+ * Draws vertical line. When clipped=true, it draws the line relative
+ * to Area origin and clips it by Area viewport borders,
  * else it draws relative to screen origin and ignores the vieport
  */
 void SDLVideoDriver::DrawVLine(short x, short y1, short y2, Color& color, bool clipped)
@@ -1676,7 +1671,7 @@ void SDLVideoDriver::DrawVLine(short x, short y1, short y2, Color& color, bool c
 		y2 -= Viewport.y;
 	}
 
-	for ( ; y1 <= y2 ; y1++ ) 
+	for ( ; y1 <= y2 ; y1++ )
 		SetPixel( x, y1, color, clipped );
 }
 
@@ -1695,7 +1690,7 @@ void SDLVideoDriver::DrawLine(short x1, short y1, short x2, short y2,
 	if (abs( shortLen ) > abs( longLen )) {
 		int swap = shortLen;
 		shortLen = longLen;
-		longLen = swap;				
+		longLen = swap;
 		yLonger = true;
 	}
 	int decInc;
@@ -1709,14 +1704,14 @@ void SDLVideoDriver::DrawLine(short x1, short y1, short x2, short y2,
 		if (longLen > 0) {
 			longLen += y1;
 			for (int j = 0x8000 + ( x1 << 16 ); y1 <= longLen; ++y1) {
-				SetPixel( j >> 16, y1, color, clipped );	
+				SetPixel( j >> 16, y1, color, clipped );
 				j += decInc;
 			}
 			return;
 		}
 		longLen += y1;
 		for (int j = 0x8000 + ( x1 << 16 ); y1 >= longLen; --y1) {
-			SetPixel( j >> 16, y1, color, clipped );	
+			SetPixel( j >> 16, y1, color, clipped );
 			j -= decInc;
 		}
 		return;
@@ -1901,7 +1896,7 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, Color& color, bool fill)
 				if (rt > Viewport.w) rt = Viewport.w;
 				if (lt >= rt) { line += backBuf->pitch; continue; } // clipped
 
-				
+
 				// Draw a 50% alpha line from (y,lt) to (y,rt)
 
 				if (backBuf->format->BytesPerPixel == 2) {
@@ -2020,7 +2015,7 @@ Sprite2D *SDLVideoDriver::MirrorSpriteVertical(Sprite2D* sprite, bool MirrorAnch
 		dest->YPos = sprite->Height - sprite->YPos;
 	else
 		dest->YPos = sprite->YPos;
-	
+
 	return dest;
 }
 
@@ -2055,7 +2050,7 @@ Sprite2D *SDLVideoDriver::MirrorSpriteHorizontal(Sprite2D* sprite, bool MirrorAn
 	else
 		dest->XPos = sprite->XPos;
 	dest->YPos = sprite->YPos;
-	
+
 	return dest;
 }
 
@@ -2170,7 +2165,7 @@ void SDLVideoDriver::SetFadeColor(int r, int g, int b)
 	else if(b<0) b=0;
 	fadeColor.b=b;
 	long val = SDL_MapRGBA( extra->format, fadeColor.r, fadeColor.g, fadeColor.b, fadeColor.a );
-	SDL_FillRect( extra, NULL, val );	
+	SDL_FillRect( extra, NULL, val );
 }
 
 void SDLVideoDriver::SetFadePercent(int percent)
@@ -2208,8 +2203,8 @@ void SDLVideoDriver::GetClipRect(Region& clip)
 
 void SDLVideoDriver::GetMousePos(int &x, int &y)
 {
-  x=CursorPos.x;
-  y=CursorPos.y;
+	x=CursorPos.x;
+	y=CursorPos.y;
 }
 
 void SDLVideoDriver::MouseMovement(int x, int y)
@@ -2289,7 +2284,7 @@ void SDLVideoDriver::InitMovieScreen(int &w, int &h)
 
 void SDLVideoDriver::showFrame(unsigned char* buf, unsigned int bufw,
 	unsigned int bufh, unsigned int sx, unsigned int sy, unsigned int w,
-	unsigned int h, unsigned int dstx, unsigned int dsty, 
+	unsigned int h, unsigned int dstx, unsigned int dsty,
 	int g_truecolor, unsigned char *pal, ieDword titleref)
 {
 	int i;
@@ -2384,5 +2379,5 @@ void SDLVideoDriver::DrawMovieSubtitle(ieDword strRef)
 // FIXME:SetGammaRamp doesn't seem to work
 void SDLVideoDriver::SetGamma(int brightness, int /*contrast*/)
 {
-  SDL_SetGamma(0.8+brightness/50.0,0.8+brightness/50.0,0.8+brightness/50.0);
+	SDL_SetGamma(0.8+brightness/50.0,0.8+brightness/50.0,0.8+brightness/50.0);
 }

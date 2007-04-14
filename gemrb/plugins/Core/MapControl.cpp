@@ -342,7 +342,7 @@ void MapControl::ViewHandle(unsigned short x, unsigned short y)
 	if (xp < 0) xp = 0;
 	if (yp < 0) yp = 0;
 
-	core->MoveViewportTo( xp * MAP_MULT / MAP_DIV, yp * MAP_MULT / MAP_DIV, false );
+	core->timer->SetMoveViewPort( xp * MAP_MULT / MAP_DIV, yp * MAP_MULT / MAP_DIV, 0, false );
 }
 
 /** Mouse Button Down */

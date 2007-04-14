@@ -260,17 +260,19 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		ChangeMap(core->GetFirstSelectedPC(), false);
 	}
 	Video* video = core->GetVideoDriver();
-	Region viewport = core->GetVideoDriver()->GetViewport();
-	viewport.x += video->moveX;
-	viewport.y += video->moveY;
-	core->MoveViewportTo( viewport.x, viewport.y, false );
+	if (video->moveX || video->moveY) {
+		Region viewport = video->GetViewport();
+		viewport.x += video->moveX;
+		viewport.y += video->moveY;
+		core->timer->SetMoveViewPort( viewport.x, viewport.y, 0, false );
+	}
 	Region screen( x + XPos, y + YPos, Width, Height );
 	Map* area = game->GetCurrentArea( );
 	if (!area) {
-		core->GetVideoDriver()->DrawRect( screen, blue, true );
+		video->DrawRect( screen, blue, true );
 		return;
 	}
-	core->GetVideoDriver()->DrawRect( screen, black, true );
+	video->DrawRect( screen, black, true );
 
 	//drawmap should be here so it updates fog of war
 	area->DrawMap( screen, this );
@@ -352,7 +354,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 				c.b = 0x7F;
 			}
 
-			core->GetVideoDriver()->DrawPolyline( poly, c, true );
+			video->DrawPolyline( poly, c, true );
 		}
 	}
 
@@ -1327,22 +1329,24 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 			break;
 		case GEM_ALT:
 			DebugFlags |= DEBUG_SHOW_CONTAINERS;
-			break;
+			return;
 		case GEM_TAB:
 			DebugFlags |= DEBUG_XXX;
 			printf( "TAB pressed\n" );
-			break;
+			return;
 		case GEM_MOUSEOUT:
 			moveX = 0;
 			moveY = 0;
-			break;
+			return;
+		default:
+			return;
 	}
 	if (ScreenFlags & SF_LOCKSCROLL) {
 		moveX = 0;
 		moveY = 0;
 	}
 	else {
-		core->MoveViewportTo( Viewport.x, Viewport.y, false );
+		core->timer->SetMoveViewPort( Viewport.x, Viewport.y, 0, false );
 	}
 }
 
@@ -1678,7 +1682,7 @@ void GameControl::InitDialog(Scriptable* spk, Scriptable* tgt, const char* dlgre
 
 	//allow mouse selection from dialog (even though screen is locked)
 	core->GetVideoDriver()->SetMouseEnabled(true);
-	core->MoveViewportTo( tgt->Pos.x, tgt->Pos.y, true );
+	core->timer->SetMoveViewPort( tgt->Pos.x, tgt->Pos.y, 0, true );
 	//there are 3 bits, if they are all unset, the dialog freezes scripts
 	if (!(dlg->Flags&7) ) {
 		DialogueFlags |= DF_FREEZE_SCRIPTS;
@@ -1967,7 +1971,7 @@ void GameControl::ChangeMap(Actor *pc, bool forced)
 	//center on first selected actor
 	Region vp = core->GetVideoDriver()->GetViewport();
 	if (ScreenFlags&SF_CENTERONACTOR) {
-		core->MoveViewportTo( pc->Pos.x, pc->Pos.y, true );
+		core->timer->SetMoveViewPort( pc->Pos.x, pc->Pos.y, 0, true );
 		ScreenFlags&=~SF_CENTERONACTOR;
 	}
 }

@@ -233,9 +233,9 @@ bool StoreHasItemCore(ieResRef storename, ieResRef itemname)
 	return ret;
 }
 
-void ClickCore(Point &point, int type, int /*speed*/)
+void ClickCore(Point &point, int type, int speed)
 {
-	core->MoveViewportTo( point.x, point.y, true );
+	core->timer->SetMoveViewPort( point.x, point.y, speed, true );
 	Video *video = core->GetVideoDriver();
 	video->ConvertToScreen(point.x, point.y);
 	video->MoveMouse(point.x, point.y);

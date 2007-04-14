@@ -98,7 +98,7 @@ public:
 	Sprite2D* GetScreenshot( Region r );
 	Region GetViewport(void);
 	void SetViewport(int x, int y, unsigned int w, unsigned int h);
-	void MoveViewportTo(int x, int y, bool center);
+	void MoveViewportTo(int x, int y);
 	void ConvertToVideoFormat(Sprite2D* sprite);
 	/** No descriptions */
 	void SetPalette(Sprite2D* spr, Palette* pal);

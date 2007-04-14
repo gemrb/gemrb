@@ -38,6 +38,10 @@ private:
 	unsigned long shakeX, shakeY;
 	unsigned int first_animation;
 	std::vector<AnimationRef*>  animations;
+	//move viewport to this coordinate
+	Point goal;
+	int speed;
+	Region currentVP;
 public:
 	GlobalTimer(void);
 	~GlobalTimer(void);
@@ -45,19 +49,16 @@ public:
 	void Init();
 	void Freeze();
 	void Update();
+	void SetMoveViewPort(ieDword x, ieDword y, int spd, bool center);
 	void SetFadeToColor(unsigned long Count);
 	void SetFadeFromColor(unsigned long Count);
 	void SetWait(unsigned long Count);
-	//void SetCutScene(GameScript* script);
 	void SetScreenShake(unsigned long shakeX, unsigned long shakeY,
 		unsigned long Count);
 	void AddAnimation(ControlAnimation* ctlanim, unsigned long time);
 	void RemoveAnimation(ControlAnimation* ctlanim);
 	void ClearAnimations();
 	void UpdateAnimations();
-public:
-	//bool CutSceneMode;
-	Region shakeStartVP;
 };
 
 #endif

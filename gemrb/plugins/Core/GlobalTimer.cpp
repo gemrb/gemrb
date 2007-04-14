@@ -52,6 +52,7 @@ void GlobalTimer::Init()
 	waitCounter = 0;
 	shakeCounter = 0;
 	startTime = 0; //forcing an update
+	speed = 0;
 	ClearAnimations();
 }
 
@@ -70,6 +71,18 @@ void GlobalTimer::Freeze()
 	game->RealTime+=advance;
 }
 
+void GlobalTimer::SetMoveViewPort(ieDword x, ieDword y, int spd, bool center)
+{
+	speed=spd;
+	currentVP=core->GetVideoDriver()->GetViewport();
+	if (center) {
+		x-=currentVP.w/2;
+		y-=currentVP.h/2;
+	}
+	goal.x=(short) x;
+	goal.y=(short) y;
+}
+
 void GlobalTimer::Update()
 {
 	Map *map;
@@ -77,6 +90,7 @@ void GlobalTimer::Update()
 	GameControl* gc;
 	unsigned long thisTime;
 	unsigned long advance;
+	Video *video = core->GetVideoDriver();
 
 	UpdateAnimations();
 
@@ -86,9 +100,33 @@ void GlobalTimer::Update()
 		return;
 	}
 	ieDword count = advance/interval;
+
+	int x = currentVP.x;
+	int y = currentVP.y;
+	if ( (x != goal.x) || (y != goal.y)) {
+		if (speed) {
+			if (x<goal.x) {
+				x+=speed;
+				if (x>goal.x) x=goal.x;
+			} else {
+				x-=speed;
+				if (x<goal.x) x=goal.x;
+			}
+			if (y<goal.y) {
+				y+=speed;
+				if (y>goal.y) y=goal.y;
+			} else {
+				y-=speed;
+				if (y<goal.y) y=goal.y;
+			}
+		} else {
+			x=goal.x;
+			y=goal.y;
+		}
+		currentVP.x=x;
+		currentVP.y=y;
+	}
 	if (shakeCounter) {
-		int x = shakeStartVP.x;
-		int y = shakeStartVP.y;
 		shakeCounter-=count;
 		if (shakeCounter<0) {
 			shakeCounter=0;
@@ -97,34 +135,34 @@ void GlobalTimer::Update()
 			x += (rand()%shakeX) - (shakeX>>1);
 			y += (rand()%shakeY) - (shakeY>>1);
 		}
-		core->GetVideoDriver()->MoveViewportTo(x,y,false);
 	}
+	video->MoveViewportTo(x,y);
 	if (fadeToCounter) {
 		fadeToCounter-=count;
 		if (fadeToCounter<0) {
 			fadeToCounter=0;
 		}
-		core->GetVideoDriver()->SetFadePercent( ( ( fadeToMax - fadeToCounter ) * 100 ) / fadeToMax );
+		video->SetFadePercent( ( ( fadeToMax - fadeToCounter ) * 100 ) / fadeToMax );
 		goto end; //hmm, freeze gametime?
 	}
 	if (fadeFromCounter!=fadeFromMax) {
 		if (fadeFromCounter>fadeFromMax) {
 			fadeFromCounter-=advance/interval;
 			if (fadeFromCounter<fadeFromMax) {
-			  fadeFromCounter=fadeFromMax;
+				fadeFromCounter=fadeFromMax;
 			}
 			//don't freeze gametime when already dark
 		} else {
 			fadeFromCounter+=advance/interval;
 			if (fadeToCounter>fadeFromMax) {
-			  fadeToCounter=fadeFromMax;
+				fadeToCounter=fadeFromMax;
 			}
-			core->GetVideoDriver()->SetFadePercent( ( ( fadeFromMax - fadeFromCounter ) * 100 ) / fadeFromMax );
+			video->SetFadePercent( ( ( fadeFromMax - fadeFromCounter ) * 100 ) / fadeFromMax );
 			goto end; //freeze gametime?
 		}
 	}
 	if (fadeFromCounter==fadeFromMax) {
-		core->GetVideoDriver()->SetFadePercent( 0 );
+		video->SetFadePercent( 0 );
 	}
 	gc = core->GetGameControl();
 	if (!gc) {
@@ -258,5 +296,5 @@ void GlobalTimer::SetScreenShake(unsigned long shakeX, unsigned long shakeY,
 {
 	this->shakeX = shakeX;
 	this->shakeY = shakeY;
-	shakeCounter = Count;
+	shakeCounter = Count+1;
 }

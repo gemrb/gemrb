@@ -346,10 +346,10 @@ int fx_prayer (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 }
 
 //0xcd fx_move_view
-int fx_move_view (Actor* /*Owner*/, Actor* target, Effect* fx)
+int fx_move_view (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	if (0) printf( "fx_move_view (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
-	core->MoveViewportTo( target->Pos.x, target->Pos.y, true );
+	if (0) printf( "fx_move_view (%2d): Speed: %d\n", fx->Opcode, fx->Parameter1 );
+	core->timer->SetMoveViewPort( fx->PosX, fx->PosY, fx->Parameter1, true);
 	return FX_NOT_APPLIED;
 }
 

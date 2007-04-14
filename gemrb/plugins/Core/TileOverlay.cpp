@@ -74,7 +74,7 @@ void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays)
 		bump = true;
 	}
 	if( bump ) {
-		core->MoveViewportTo( vp.x, vp.y, false );
+		core->timer->SetMoveViewPort( vp.x, vp.y, 0, false );
 	}
 
 	// determine which tiles are visible

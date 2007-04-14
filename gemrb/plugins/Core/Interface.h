@@ -105,11 +105,11 @@ public:
 	ItemList(unsigned int size, int label) {
 		ResRefs = (ieResRef *) calloc(size, sizeof(ieResRef) );
 		Count = size;
-                if ((size&1) && (label==2)) {
-                        WeightOdds=true;
-                } else {
-                        WeightOdds=false;
-                }
+		if ((size&1) && (label==2)) {
+			WeightOdds=true;
+		} else {
+			WeightOdds=false;
+		}
 	}
 	~ItemList() {
 		if (ResRefs) {
@@ -558,7 +558,6 @@ public:
 	void FreeSPLExt(SPLExtHeader *p, Effect *e);
 	WorldMapArray *NewWorldMapArray(int count);
 	void DoTheStoreHack(Store *s);
-	void MoveViewportTo(int x, int y, bool center);
 	/** plays stock gui sound referenced by index */
 	void PlaySound(int idx);
 	/** returns true if resource exists */

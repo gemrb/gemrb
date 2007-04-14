@@ -132,7 +132,7 @@ public:
 	virtual Sprite2D* GetScreenshot( Region r ) = 0;
 	virtual Region GetViewport(void) = 0;
 	virtual void SetViewport(int x, int y, unsigned int w, unsigned int h) = 0;
-	virtual void MoveViewportTo(int x, int y, bool center) = 0;
+	virtual void MoveViewportTo(int x, int y) = 0;
 	virtual void ConvertToVideoFormat(Sprite2D* sprite) = 0;
 	/** No descriptions */
 	virtual void SetPalette(Sprite2D* spr, Palette* pal) = 0;

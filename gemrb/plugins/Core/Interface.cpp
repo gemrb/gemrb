@@ -4771,12 +4771,6 @@ void Interface::DoTheStoreHack(Store *s)
 		s->items.push_back( new STOItem() );
 }
 
-void Interface::MoveViewportTo(int x, int y, bool center)
-{
-	video->MoveViewportTo( x, y, center );
-	timer->shakeStartVP = video->GetViewport();
-}
-
 //plays stock sound listed in defsound.2da
 void Interface::PlaySound(int index)
 {
