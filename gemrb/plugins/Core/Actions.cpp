@@ -2849,22 +2849,27 @@ void GameScript::GlobalShRGlobal(Scriptable* Sender, Action* parameters)
 	SetVariable( Sender, parameters->string0Parameter, value1 );
 }
 
-void GameScript::ClearAllActions(Scriptable* /*Sender*/, Action* /*parameters*/)
+void GameScript::ClearAllActions(Scriptable* Sender, Action* /*parameters*/)
 {
-	Game* game = core->GetGame();
-
-	for (int i = 0; i < game->GetPartySize(false); i++) {
-		Actor* act = game->GetPC( i,false );
-		if (act) {
-			//FIXME: i wonder what clearallactions do
-			//but in bg1 ch01cut1 doesn't work with this
-			//clearallactions isn't supposed to clear cutscene actions
-			//on the other hand, it is supposed to clear all actions
-			//not only player actions
-			//act->ClearActions();
+	Actor *except = NULL;
+	if (Sender->Type==ST_ACTOR) {
+		except = (Actor *) Sender;
+	}
+	Map *map = Sender->GetCurrentArea();
+	ieDword gametime = core->GetGame()->GameTime;
+	int i = map->GetActorCount(true);
+	while(i--) {
+		Actor* act = map->GetActor(i,true);
+		if (act && act!=except) {
+			if (!act->ValidTarget(GA_NO_DEAD) ) {
+				continue;
+			}
+			if (!act->Schedule(gametime) ) {
+				continue;
+			}
+			act->ClearActions();
 			act->ClearPath();
-			//not sure about this
-			//act->SetModal(MS_NONE);
+			act->SetModal(MS_NONE);
 		}
 	}
 }

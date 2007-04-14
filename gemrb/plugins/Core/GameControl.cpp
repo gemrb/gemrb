@@ -1400,9 +1400,9 @@ void GameControl::CalculateSelection(Point &p)
 void GameControl::SetCutSceneMode(bool active)
 {
 	if (active) {
-		ScreenFlags |= (SF_DISABLEMOUSE | SF_LOCKSCROLL);
+		ScreenFlags |= (SF_DISABLEMOUSE | SF_LOCKSCROLL | SF_CUTSCENE);
 	} else {
-		ScreenFlags &= ~(SF_DISABLEMOUSE | SF_LOCKSCROLL);
+		ScreenFlags &= ~(SF_DISABLEMOUSE | SF_LOCKSCROLL | SF_CUTSCENE);
 	}
 }
 

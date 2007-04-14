@@ -27,6 +27,7 @@
 #include "Item.h"
 #include "Map.h"
 #include "Game.h"
+#include "GameControl.h"
 
 #include <cassert>
 
@@ -226,11 +227,11 @@ void Scriptable::ImmediateEvent()
 
 void Scriptable::ExecuteScript(GameScript* Script)
 {
-//	if (actionQueue.size()) {
-//		return;
-//	}
+	if (core->GetGameControl()->GetScreenFlags()&SF_CUTSCENE) {
+		return;
+	}
 	if (WaitCounter) {
-	  return;
+		return;
 	}
 	if (Script) {
 		Script->Update();
