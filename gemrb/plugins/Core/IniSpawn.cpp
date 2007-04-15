@@ -87,12 +87,13 @@ inline void GetElements(const char *s, ieResRef *storage, int count)
 	while(count--) {
 		ieResRef *field = storage+count;
 		strnuprcpy(*field, s, sizeof(ieResRef)-1);
-		for(size_t i=0;i<sizeof(ieResRef);i++) {
+		for(size_t i=0;i<sizeof(ieResRef) && (*field)[i];i++) {
 			if ((*field)[i]==',') {
 				(*field)[i]='\0';
 				break;
 			}
 		}
+		if (!count) break;
 		while(*s && *s!=',') s++;
 		s++;
 		if (*s==' ') s++; //this is because there is one single screwed up entry in ar1100.ini
@@ -104,7 +105,7 @@ inline void GetElements(const char *s, ieVariable *storage, int count)
 	while(count--) {
 		ieVariable *field = storage+count;
 		strnuprcpy(*field, s, sizeof(ieVariable)-1);
-		for(size_t i=0;i<sizeof(ieVariable);i++) {
+		for(size_t i=0;i<sizeof(ieVariable) && (*field)[i];i++) {
 			if ((*field)[i]==',') {
 				(*field)[i]='\0';
 				break;
@@ -352,18 +353,19 @@ void IniSpawn::SpawnCreature(CritterEntry &critter)
 			return;
 		}
 	} else {
-		Object *object = new Object();
+		//Object *object = new Object();
+		Object object;
 		//objectfields based on spec
-		object->objectFields[0]=critter.Spec[0];
-		object->objectFields[1]=critter.Spec[1];
-		object->objectFields[2]=critter.Spec[2];
-		object->objectFields[3]=critter.Spec[3];
-		object->objectFields[4]=critter.Spec[4];
-		object->objectFields[5]=critter.Spec[5];
-		object->objectFields[6]=critter.Spec[6];
-		object->objectFields[7]=critter.Spec[7];
-		object->objectFields[8]=critter.Spec[8];
-		int cnt = GetObjectCount(map, object);
+		object.objectFields[0]=critter.Spec[0];
+		object.objectFields[1]=critter.Spec[1];
+		object.objectFields[2]=critter.Spec[2];
+		object.objectFields[3]=critter.Spec[3];
+		object.objectFields[4]=critter.Spec[4];
+		object.objectFields[5]=critter.Spec[5];
+		object.objectFields[6]=critter.Spec[6];
+		object.objectFields[7]=critter.Spec[7];
+		object.objectFields[8]=critter.Spec[8];
+		int cnt = GetObjectCount(map, &object);
 		if (cnt>=critter.TotalQuantity) {
 			return;
 		}
