@@ -8,12 +8,12 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * $Id$
  *
@@ -25,7 +25,7 @@
 #include "../Core/Game.h"
 #include "../Core/EffectQueue.h"
 #include "../Core/Interface.h"
-#include "../Core/Video.h"  //for tints
+#include "../Core/Video.h" //for tints
 #include "PSTOpc.h"
 
 
@@ -53,7 +53,7 @@ int fx_jumble_curse (Actor* Owner, Actor* target, Effect* fx);//d3
 
 // FIXME: Make this an ordered list, so we could use bsearch!
 static EffectRef effectnames[] = {
-	{ "Curse", fx_curse, 0},//cb
+	{ "CurseNonCumulative", fx_curse, 0},//cb
 	{ "DetectEvil", fx_detect_evil, 0}, //d2
 	{ "Embalm", fx_embalm, 0}, //0xce
 	{ "FlashScreen", fx_flash_screen, 0}, //c2
@@ -142,7 +142,7 @@ int fx_play_bam_blended (Actor* Owner, Actor* target, Effect* fx)
 	}
 	if (fx->Parameter2&2) {
 		sca->XPos+=fx->PosX;
-		sca->YPos+=fx->PosY;		
+		sca->YPos+=fx->PosY;
 		Owner->GetCurrentArea()->AddVVCell(sca);
 	} else {
 		ScriptedAnimation *twin = sca->DetachTwin();
@@ -181,19 +181,19 @@ int fx_play_bam_not_blended (Actor* Owner, Actor* target, Effect* fx)
 
 	switch (fx->Parameter2&0x300000) {
 	case 0x300000:
-		sca->SetBlend();  //per pixel transparency
+		sca->SetBlend(); //per pixel transparency
 		break;
 	case 0x200000: //this is an insane combo
-		sca->SetBlend();  //per pixel transparency
+		sca->SetBlend(); //per pixel transparency
 		sca->SetFade((ieByte) fx->Parameter1, fx->DiceSides); //per surface transparency
 		break;
-	case 0x100000:      //per surface transparency
+	case 0x100000: //per surface transparency
 		sca->SetFade((ieByte) fx->Parameter1, fx->DiceSides);
 		break;
 	default:
 		if (fx->Parameter1) {
 			RGBModifier rgb;
-		
+
 			rgb.speed=-1;
 			rgb.phase=0;
 			rgb.rgb.r=fx->Parameter1;
@@ -243,7 +243,7 @@ int fx_play_bam_not_blended (Actor* Owner, Actor* target, Effect* fx)
 			x = tmp&31;
 			y = (tmp>>5)&31;
 		}
-		
+
 		sca->XPos+=fx->PosX-x;
 		sca->YPos+=fx->PosY+sca->ZPos-y;
 		if (twin) {
@@ -308,7 +308,7 @@ int fx_tint_screen (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_tint_screen (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
 	core->timer->SetFadeFromColor(10);
-	core->timer->SetFadeToColor(10);  
+	core->timer->SetFadeToColor(10);
 	return FX_NOT_APPLIED;
 }
 
@@ -316,7 +316,7 @@ int fx_tint_screen (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 int fx_special_effect (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_special_effect (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
-	
+
 	return FX_NOT_APPLIED;
 }
 //0xc5-c8 fx_unknown
@@ -330,19 +330,52 @@ int fx_overlay (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 //0xca fx_unknown
 //0xcb fx_curse
-int fx_curse (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_curse (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_curse (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
-	//set thac0, ac, saving throws
-	return FX_NOT_APPLIED;
+	if (0) printf( "fx_curse (%2d): Par1: %d\n", fx->Opcode, fx->Parameter1 );
+	//this bit is the same as the invisibility bit in other games
+	//it should be considered what if we replace the pst invis bit
+	//with this one (losing binary compatibility, gaining easier
+	//invis checks at core level)
+	if (STATE_GET (STATE_PST_CURSE) ) //curse is non cummulative
+		return FX_NOT_APPLIED;
+	STATE_SET( STATE_PST_CURSE );
+	STAT_SUB( IE_TOHIT, fx->Parameter1);
+	STAT_SUB( IE_SAVEVSDEATH, fx->Parameter1);
+	STAT_SUB( IE_SAVEVSWANDS, fx->Parameter1);
+	STAT_SUB( IE_SAVEVSPOLY, fx->Parameter1);
+	STAT_SUB( IE_SAVEVSBREATH, fx->Parameter1);
+	STAT_SUB( IE_SAVEVSSPELL, fx->Parameter1);
+	return FX_APPLIED;
 }
 
 //0xcc fx_prayer
-int fx_prayer (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+EffectRef curse_ref={"CurseNonCumulative",NULL,-1};
+EffectRef bless_ref={"BlessNonCumulative",NULL,-1};
+int fx_prayer (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_prayer (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
-	//set thac0, ac, saving throws
-	return FX_NOT_APPLIED;
+	if (0) printf( "fx_prayer (%2d): Par1: %d\n", fx->Opcode, fx->Parameter1 );
+	int ea = target->GetStat(IE_EA);
+	int type;
+	if (ea>EA_EVILCUTOFF) type = 1;
+	else if (ea<EA_GOODCUTOFF) type = 0;
+	else return FX_NOT_APPLIED;  //what happens if the target goes neutral during the effect? if the effect remains, make this FX_APPLIED
+
+	Map *map = target->GetCurrentArea();
+	int i = map->GetActorCount(true);
+	while(i--) {
+		Actor *tar=map->GetActor(i,true);
+		ea = tar->GetStat(IE_EA);
+		if (ea>EA_EVILCUTOFF) type^=1;
+		else if (ea>EA_GOODCUTOFF) continue;
+		//this isn't a real perma effect, just applying the effect now
+		Effect *newfx = EffectQueue::CreateEffect(type?curse_ref:bless_ref, fx->Parameter1, fx->Parameter2, FX_DURATION_INSTANT_PERMANENT);
+		//no idea how this should work with spell resistances, etc
+		//lets assume it is never resisted
+		tar->fxqueue.ApplyEffect(tar, newfx, true);
+		delete newfx;
+	}
+	return FX_APPLIED;
 }
 
 //0xcd fx_move_view
@@ -394,10 +427,10 @@ int fx_iron_fist (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	ieDword p1,p2;
 
-	if (0) printf( "fx_iron_fist (%2d): Par1: %d  Par2: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_iron_fist (%2d): Par1: %d Par2: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	switch (fx->Parameter2)
 	{
-	case 0:  p1 = 3; p2 = 6; break;
+	case 0: p1 = 3; p2 = 6; break;
 	default:
 		p1 = ieWord (fx->Parameter1&0xffff);
 		p2 = ieWord (fx->Parameter1>>16);
@@ -410,7 +443,7 @@ int fx_iron_fist (Actor* /*Owner*/, Actor* target, Effect* fx)
 //0xd1 fx_hostile_image
 int fx_hostile_image (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-	if (0) printf( "fx_hostile_image (%2d): Par1: %d  Par2: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_hostile_image (%2d): Par1: %d Par2: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	return FX_NOT_APPLIED;
 }
 
@@ -419,7 +452,7 @@ EffectRef single_color_pulse_ref={"Color:BriefRGB",NULL,-1};
 
 int fx_detect_evil (Actor* Owner, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_detect_evil (%2d): Par1: %d  Par2: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_detect_evil (%2d): Par1: %d Par2: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	ieDword type = fx->Parameter2;
 	//default is alignment/evil/speed 30/range 10
 	if (!type) type = 0x08031e0a;
