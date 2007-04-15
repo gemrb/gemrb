@@ -616,7 +616,7 @@ void ScriptedAnimation::AlterPalette(const RGBModifier& mod)
 	GetPaletteCopy();
 	if (!palette)
 		return;
-	palette->SetupCompleteRGBModification(palette,mod);
+	palette->SetupGlobalRGBModification(palette,mod);
 	if (twin) {
 		twin->AlterPalette(mod);
 	}

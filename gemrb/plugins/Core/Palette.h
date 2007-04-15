@@ -101,8 +101,6 @@ public:
 		unsigned int type);
 	void SetupGlobalRGBModification(const Palette* src,
 		const RGBModifier& mod);
-	void SetupCompleteRGBModification(const Palette* src,
-		const RGBModifier& mod);
 
 	Palette* Copy();
 

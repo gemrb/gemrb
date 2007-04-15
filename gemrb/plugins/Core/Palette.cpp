@@ -234,30 +234,10 @@ void Palette::SetupGlobalRGBModification(const Palette* src,
 	const RGBModifier& mod)
 {
 	int i;
-	for (i = 0; i < 4; ++i)
-		col[i] = src->col[i];
-
-	for (i = 0; i < 164; ++i)
-		applyMod(src->col[0x04+i],col[0x04+i],mod);
-
-	for (i = 0; i < 8; ++i)
-		col[0xA8+i] = src->col[0xA8+i];
-
-	for (i = 0; i < 80; ++i)
-		applyMod(src->col[0xB0+i],col[0xB0+i],mod);
-
-
-}
-
-//only the shadow and transparent slot isn't tinted
-void Palette::SetupCompleteRGBModification(const Palette* src,
-	const RGBModifier& mod)
-{
-	int i;
-
+	// don't modify the transparency and shadow colour
 	for (i = 0; i < 2; ++i)
 		col[i] = src->col[i];
 
-	for (i = 0; i < 254; ++i)
-		applyMod(src->col[0x02+i],col[0x02+i],mod);
+	for (i = 2; i < 256; ++i)
+		applyMod(src->col[i],col[i],mod);
 }

@@ -238,38 +238,40 @@ void CharAnimations::SetupColors(PaletteType type)
 	}
 
 	if (GetAnimType() >= IE_ANI_PST_ANIMATION_1) {
-		if (type!=PAL_MAIN) {
+		// Only do main palette
+		if (type != PAL_MAIN) {
 			return;
 		}
 		// TODO: handle equipment colour glows
 
-		//Colors[6] is the COLORCOUNT stat in PST
-		//it tells how many customisable color slots we have
-		//the color slots start from the end of the palette and go
-		//backwards There are 5 available slots with a size of 32 each
+		// Colors[6] is the COLORCOUNT stat in PST.
+		// It tells how many customisable color slots we have.
+		// The color slots start from the end of the palette and go
+		// backwards. There are 6 available slots with a size of 32 each.
+		int colorcount = Colors[6];
 		int size = 32;
-		int dest = 256-Colors[6]*size;
+		int dest = 256-colorcount*size;
 		bool needmod = false;
 		if (GlobalColorMod.type != RGBModifier::NONE) {
 			needmod = true;
 		}
-		if ((Colors[6] == 0) && (needmod==false) ) {
+		if ((colorcount == 0) && (needmod==false) ) {
 			core->FreePalette(palette[PAL_MAIN], PaletteResRef);
 			PaletteResRef[0]=0;
+			// FIXME: apply GlobalColorMod?
 			return;
 		}
-
-		for (unsigned int i = 0; i < Colors[6]; i++) {
-		  core->GetPalette( Colors[i]&255, size,
-		    &palette[PAL_MAIN]->col[dest] );
-		  dest +=size;
+		for (int i = 0; i < colorcount; i++) {
+			core->GetPalette( Colors[i]&255, size,
+		    		&palette[PAL_MAIN]->col[dest] );
+			dest +=size;
 		}
 
 		if (GlobalColorMod.type != RGBModifier::NONE) {
 			if (!modifiedPalette[PAL_MAIN])
 				modifiedPalette[PAL_MAIN] = new Palette();
 			//pst needs all color slots changed, luckily i already made this function
-			modifiedPalette[PAL_MAIN]->SetupCompleteRGBModification(palette[PAL_MAIN], GlobalColorMod);
+			modifiedPalette[PAL_MAIN]->SetupGlobalRGBModification(palette[PAL_MAIN], GlobalColorMod);
 		}
 		return;
 	}
@@ -298,7 +300,7 @@ void CharAnimations::SetupColors(PaletteType type)
 		if (needmod) {
 			if (!modifiedPalette[PAL_MAIN])
 				modifiedPalette[PAL_MAIN] = new Palette();
-			modifiedPalette[PAL_MAIN]->SetupCompleteRGBModification(palette[PAL_MAIN], GlobalColorMod);
+			modifiedPalette[PAL_MAIN]->SetupGlobalRGBModification(palette[PAL_MAIN], GlobalColorMod);
 		}
 		return;
 	}
