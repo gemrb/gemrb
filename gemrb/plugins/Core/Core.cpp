@@ -66,7 +66,7 @@ void strnlwrcpy(char *dest, const char *source, int count)
 		*dest++ = pl_lowercase[(ieByte) *source];
 		if(!*source++) {
 			while(count--) *dest++=0;
-			return;
+			break;
 		}
 	}
 	*dest=0;
@@ -78,7 +78,7 @@ void strnuprcpy(char* dest, const char *source, int count)
 		*dest++ = pl_uppercase[(ieByte) *source];
 		if(!*source++) {
 			while(count--) *dest++=0;
-			return;
+			break;
 		}
 	}
 	*dest=0;
