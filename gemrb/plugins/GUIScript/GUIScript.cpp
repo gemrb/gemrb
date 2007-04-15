@@ -5162,7 +5162,7 @@ static PyObject* GemRB_ChangeStoreItem(PyObject * /*self*/, PyObject* args)
 		}
 		//well, it shouldn't be sold at all, but if it is here
 		//it will vanish!!!
-		if (!si->Expired) {
+		if (!si->Expired && (si->Flags& IE_INV_ITEM_RESELLABLE)) {
 			si->Flags &= ~IE_INV_ITEM_SELECTED;
 			store->AddItem( si );
 		}
