@@ -198,7 +198,7 @@ void CharAnimations::SetWeaponRef(const char* ref)
 	// TODO: Only drop weapon anims?
 	DropAnims();
 	core->FreePalette(palette[PAL_WEAPON], 0);
-	core->FreePalette(modifiedPalette[PAL_HELMET], 0);
+	core->FreePalette(modifiedPalette[PAL_WEAPON], 0);
 }
 
 void CharAnimations::SetOffhandRef(const char* ref)
@@ -248,6 +248,8 @@ void CharAnimations::SetupColors(PaletteType type)
 		// It tells how many customisable color slots we have.
 		// The color slots start from the end of the palette and go
 		// backwards. There are 6 available slots with a size of 32 each.
+		// Actually, the slots seem to be written in the cre file
+		// but we ignore them, i'm not sure this is correct
 		int colorcount = Colors[6];
 		int size = 32;
 		int dest = 256-colorcount*size;
@@ -258,20 +260,20 @@ void CharAnimations::SetupColors(PaletteType type)
 		if ((colorcount == 0) && (needmod==false) ) {
 			core->FreePalette(palette[PAL_MAIN], PaletteResRef);
 			PaletteResRef[0]=0;
-			// FIXME: apply GlobalColorMod?
 			return;
 		}
 		for (int i = 0; i < colorcount; i++) {
 			core->GetPalette( Colors[i]&255, size,
-		    		&palette[PAL_MAIN]->col[dest] );
+				&palette[PAL_MAIN]->col[dest] );
 			dest +=size;
 		}
 
-		if (GlobalColorMod.type != RGBModifier::NONE) {
+		if (needmod) {
 			if (!modifiedPalette[PAL_MAIN])
 				modifiedPalette[PAL_MAIN] = new Palette();
-			//pst needs all color slots changed, luckily i already made this function
 			modifiedPalette[PAL_MAIN]->SetupGlobalRGBModification(palette[PAL_MAIN], GlobalColorMod);
+		} else {
+			core->FreePalette(modifiedPalette[PAL_MAIN], 0);
 		}
 		return;
 	}
@@ -301,6 +303,8 @@ void CharAnimations::SetupColors(PaletteType type)
 			if (!modifiedPalette[PAL_MAIN])
 				modifiedPalette[PAL_MAIN] = new Palette();
 			modifiedPalette[PAL_MAIN]->SetupGlobalRGBModification(palette[PAL_MAIN], GlobalColorMod);
+		} else {
+			core->FreePalette(modifiedPalette[PAL_MAIN], 0);
 		}
 		return;
 	}
@@ -472,8 +476,11 @@ CharAnimations::~CharAnimations(void)
 {
 	DropAnims();
 	core->FreePalette(palette[PAL_MAIN], PaletteResRef);
-	for (int i = 1; i < 4; ++i)
+	int i;
+	for (i = 1; i < 4; ++i)
 		core->FreePalette(palette[i], 0);
+	for (i = 0; i < 4; ++i)
+		core->FreePalette(modifiedPalette[i], 0);
 }
 /*
 This is a simple Idea of how the animation are coded
@@ -772,7 +779,7 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 		}
 
 		if (part < actorPartCount) {
-			if (!palette[PAL_MAIN] && (NoPalette()!=1) ) {
+			if (!palette[PAL_MAIN] && (GlobalColorMod.type!=RGBModifier::NONE) || (NoPalette()!=1) ) {
 				// This is the first time we're loading an Animation.
 				// We copy the palette of its first frame into our own palette
 				palette[PAL_MAIN] = 

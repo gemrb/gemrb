@@ -40,6 +40,7 @@ int fx_special_effect (Actor* Owner, Actor* target, Effect* fx);//c4
 //unknown 0xc5-c8
 int fx_overlay (Actor* Owner, Actor* target, Effect* fx);//c9
 //unknown 0xca
+int fx_bless (Actor* Owner, Actor* target, Effect* fx);//82 (this is a modified effect)
 int fx_curse (Actor* Owner, Actor* target, Effect* fx);//cb
 int fx_prayer (Actor* Owner, Actor* target, Effect* fx);//cc
 int fx_move_view (Actor* Owner, Actor* target, Effect* fx);//cd
@@ -53,7 +54,8 @@ int fx_jumble_curse (Actor* Owner, Actor* target, Effect* fx);//d3
 
 // FIXME: Make this an ordered list, so we could use bsearch!
 static EffectRef effectnames[] = {
-	{ "CurseNonCumulative", fx_curse, 0},//cb
+	{ "Bless", fx_bless, 0},//82
+	{ "Curse", fx_curse, 0},//cb
 	{ "DetectEvil", fx_detect_evil, 0}, //d2
 	{ "Embalm", fx_embalm, 0}, //0xce
 	{ "FlashScreen", fx_flash_screen, 0}, //c2
@@ -329,6 +331,35 @@ int fx_overlay (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 //0xca fx_unknown
+
+//0x82 fx_bless
+static EffectRef glow_ref ={"Color:PulseRGBGlobal",NULL,-1};
+//pst bless effect spawns a color glow automatically
+int fx_bless (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_curse (%2d): Par1: %d\n", fx->Opcode, fx->Parameter1 );
+	//this bit is the same as the invisibility bit in other games
+	//it should be considered what if we replace the pst invis bit
+	//with this one (losing binary compatibility, gaining easier
+	//invis checks at core level)
+	if (STATE_GET (STATE_BLESS) ) //curse is non cummulative
+		return FX_NOT_APPLIED;
+	if (!target->fxqueue.HasEffectWithParamPair(glow_ref, 0xc8c8c800,0x300018)) {
+		Effect *newfx = EffectQueue::CreateEffect(glow_ref, 0xc8c8c800,0x300018, fx->TimingMode);
+		//calculating duration
+		newfx->Duration=(fx->Duration-core->GetGame()->GameTime)/6;
+		core->ApplyEffect(newfx, target, target);
+	}
+	STATE_SET( STATE_BLESS );
+	STAT_SUB( IE_TOHIT, fx->Parameter1);
+	STAT_SUB( IE_SAVEVSDEATH, fx->Parameter1);
+	STAT_SUB( IE_SAVEVSWANDS, fx->Parameter1);
+	STAT_SUB( IE_SAVEVSPOLY, fx->Parameter1);
+	STAT_SUB( IE_SAVEVSBREATH, fx->Parameter1);
+	STAT_SUB( IE_SAVEVSSPELL, fx->Parameter1);
+	return FX_APPLIED;
+}
+
 //0xcb fx_curse
 int fx_curse (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -350,9 +381,9 @@ int fx_curse (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0xcc fx_prayer
-EffectRef curse_ref={"CurseNonCumulative",NULL,-1};
-EffectRef bless_ref={"BlessNonCumulative",NULL,-1};
-int fx_prayer (Actor* /*Owner*/, Actor* target, Effect* fx)
+EffectRef curse_ref={"Curse",NULL,-1};
+EffectRef bless_ref={"Bless",NULL,-1};
+int fx_prayer (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_prayer (%2d): Par1: %d\n", fx->Opcode, fx->Parameter1 );
 	int ea = target->GetStat(IE_EA);
@@ -369,11 +400,13 @@ int fx_prayer (Actor* /*Owner*/, Actor* target, Effect* fx)
 		if (ea>EA_EVILCUTOFF) type^=1;
 		else if (ea>EA_GOODCUTOFF) continue;
 		//this isn't a real perma effect, just applying the effect now
-		Effect *newfx = EffectQueue::CreateEffect(type?curse_ref:bless_ref, fx->Parameter1, fx->Parameter2, FX_DURATION_INSTANT_PERMANENT);
+		Effect *newfx = EffectQueue::CreateEffect(type?curse_ref:bless_ref, fx->Parameter1, fx->Parameter2, FX_DURATION_INSTANT_LIMITED);
+		memcpy(newfx, fx->Source,sizeof(ieResRef));
+		newfx->Duration=60;
 		//no idea how this should work with spell resistances, etc
 		//lets assume it is never resisted
-		tar->fxqueue.ApplyEffect(tar, newfx, true);
-		delete newfx;
+		//the effect will be destructed by ApplyEffect
+		core->ApplyEffect(newfx, tar, Owner);
 	}
 	return FX_APPLIED;
 }

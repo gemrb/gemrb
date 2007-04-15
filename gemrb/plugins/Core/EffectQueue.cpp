@@ -326,7 +326,9 @@ Effect *EffectQueue::CreateEffect(ieDword opcode, ieDword param1, ieDword param2
 		return NULL;
 	}
 	memset(fx,0,sizeof(Effect));
+	fx->Target=FX_TARGET_SELF;
 	fx->Opcode=opcode;
+	//probability2 is the low number (by effectqueue 331)
 	fx->Probability1=100;
 	fx->Parameter1=param1;
 	fx->Parameter2=param2;
@@ -589,11 +591,14 @@ inline int check_type(Actor* actor, Effect* fx)
 	if (actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_ref, fx->Power, 0) ) {
 		return 0;
 	}
-	if (actor->fxqueue.HasEffectWithResource(fx_spell_immunity_ref, fx->Source) ) {
-		return 0;
-	}
-	if (actor->fxqueue.HasEffectWithResource(fx_spell_immunity2_ref, fx->Source) ) {
-		return 0;
+	//if source is unspecified, don't resist it
+	if (fx->Source[0]) {
+		if (actor->fxqueue.HasEffectWithResource(fx_spell_immunity_ref, fx->Source) ) {
+			return 0;
+		}
+		if (actor->fxqueue.HasEffectWithResource(fx_spell_immunity2_ref, fx->Source) ) {
+			return 0;
+		}
 	}
 	if (fx->PrimaryType) {
 		if (actor->fxqueue.HasEffectWithParam(fx_school_immunity_ref, fx->PrimaryType)) {
