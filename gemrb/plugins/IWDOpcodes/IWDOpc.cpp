@@ -316,18 +316,10 @@ EffectRef fx_damage_opcode_ref={"Damage",NULL,-1};
 
 static void ApplyDamageNearby(Actor* Owner, Actor* target, Effect *fx, ieDword damagetype)
 {
-	Effect *newfx = new Effect;
-	//fill with zeros
-	memset(newfx,0,sizeof(Effect));
-	newfx->Opcode = EffectQueue::ResolveEffect(fx_damage_opcode_ref);
-	newfx->Target = FX_TARGET_SELF;
+	Effect *newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, fx->Parameter1, damagetype,FX_DURATION_INSTANT_PERMANENT);
 	newfx->Power = fx->Power;
-	newfx->Parameter1 = fx->Parameter1;
-	newfx->Parameter2 = damagetype;
-	//newfx->Resistance = ?
-	newfx->Probability2=100;
 	newfx->DiceThrown = fx->DiceThrown;
-	newfx->DiceSides = fx->DiceSides;
+	newfx->DiceSides = fx->DiceSides;  
 	memcpy(newfx->Resource, fx->Resource,sizeof(newfx->Resource) );
 	//applyeffectcopy on everyone near us
 	Map *area = target->GetCurrentArea();
@@ -336,7 +328,10 @@ static void ApplyDamageNearby(Actor* Owner, Actor* target, Effect *fx, ieDword d
 		Actor *victim = area->GetActor(i,true);
 		if (target!=victim) continue;
 		if (PersonalDistance(target, victim)<20) {
-			core->ApplyEffect(newfx, victim, Owner);
+			Effect *tmp = new Effect();
+			memcpy(tmp, newfx, sizeof(Effect));
+			//this function deletes tmp
+			core->ApplyEffect(tmp, victim, Owner);
 		}
 	}
 	//finally remove the master copy
@@ -620,16 +615,16 @@ int fx_summon_shadow_monster (Actor* Owner, Actor* target, Effect* fx)
 int fx_recitation (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_recitation (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
-	if (EXTSTATE_GET(4)) return FX_NOT_APPLIED;
-	EXTSTATE_SET(4);
+	if (EXTSTATE_GET(EXTSTATE_RECITATION)) return FX_NOT_APPLIED;
+	EXTSTATE_SET(EXTSTATE_RECITATION);
 	return FX_APPLIED;
 }
 //fa RecitationBad
 int fx_recitation_bad (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_recitation (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
-	if (EXTSTATE_GET(8)) return FX_NOT_APPLIED;
-	EXTSTATE_SET(8);
+	if (EXTSTATE_GET(EXTSTATE_REC_BAD)) return FX_NOT_APPLIED;
+	EXTSTATE_SET(EXTSTATE_REC_BAD);
 	return FX_APPLIED;
 }
 //fb LichTouch (how)
@@ -866,7 +861,7 @@ int fx_eye_of_the_mind (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_the_mind (%2d)\n", fx->Opcode );
 	target->add_animation("eyemind",-1,0,true);
-	EXTSTATE_SET(0x00000010);
+	EXTSTATE_SET(EXTSTATE_EYE_MIND);
 	return FX_APPLIED;
 }
 //0x10d EyeOfTheSword
@@ -874,7 +869,7 @@ int fx_eye_of_the_sword (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_the_sword (%2d)\n", fx->Opcode );
 	target->add_animation("eyesword",-1,0,true);
-	EXTSTATE_SET(0x00000020);
+	EXTSTATE_SET(EXTSTATE_EYE_SWORD);
 	return FX_APPLIED;
 }
 //0x10e EyeOfTheMage
@@ -882,7 +877,7 @@ int fx_eye_of_the_mage (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_the_mage (%2d)\n", fx->Opcode );
 	target->add_animation("eyemage",-1,0,true);
-	EXTSTATE_SET(0x00000040);
+	EXTSTATE_SET(EXTSTATE_EYE_MAGE);
 	return FX_APPLIED;
 }
 //0x10f EyeOfVenom
@@ -890,7 +885,7 @@ int fx_eye_of_venom (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_venom (%2d)\n", fx->Opcode );
 	target->add_animation("eyevenom",-1,0,true);
-	EXTSTATE_SET(0x00000080);
+	EXTSTATE_SET(EXTSTATE_EYE_VENOM);
 	return FX_APPLIED;
 }
 //0x110 EyeOfTheSpirit
@@ -898,7 +893,7 @@ int fx_eye_of_the_spirit (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_the_spirit (%2d)\n", fx->Opcode );
 	target->add_animation("eyespir",-1,0,true);
-	EXTSTATE_SET(0x00000100);
+	EXTSTATE_SET(EXTSTATE_EYE_SPIRIT);
 	return FX_APPLIED;
 }
 //0x111 EyeOfFortitude
@@ -906,7 +901,7 @@ int fx_eye_of_fortitude (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_fortitude (%2d)\n", fx->Opcode );
 	target->add_animation("eyefort",-1,0,true);
-	EXTSTATE_SET(0x00000200);
+	EXTSTATE_SET(EXTSTATE_EYE_FORT);
 	return FX_APPLIED;
 }
 //0x112 EyeOfStone
