@@ -7464,6 +7464,26 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 	printf("Spellname: %s\n", core->GetString(spelldata.strref));
 	printf("Target: %d\n", spelldata.Target);
 	printf("Range: %d\n", spelldata.Range);
+	switch (spelldata.Target) {
+		case TARGET_SELF:
+			actor->CastSpell(spelldata.spellname, actor, true);
+			break;
+		case TARGET_NONE:
+			actor->CastSpell(spelldata.spellname, NULL, true);
+			break;
+		case TARGET_AREA:
+			core->GetGameControl()->SetupCasting(spelldata.type, spelldata.level, spelldata.headerindex, actor, GA_POINT, spelldata.TargetNumber);
+			break;
+		case TARGET_CREA:
+			core->GetGameControl()->SetupCasting(spelldata.type, spelldata.level, spelldata.headerindex, actor, GA_NO_DEAD, spelldata.TargetNumber);
+			break;
+		case TARGET_DEAD:
+			core->GetGameControl()->SetupCasting(spelldata.type, spelldata.level, spelldata.headerindex, actor, 0, spelldata.TargetNumber);
+			break;
+		default:
+			printMessage("GUIScript", "Unhandled target type!", LIGHT_RED );
+			break;
+	}
 	Py_INCREF( Py_None );
 	return Py_None;
 }
