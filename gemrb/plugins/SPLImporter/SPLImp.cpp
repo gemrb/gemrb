@@ -8,12 +8,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * $Id$
  *
@@ -141,13 +141,19 @@ Spell* SPLImp::GetSpell(Spell *s)
 
 void SPLImp::GetExtHeader(Spell *s, SPLExtHeader* eh)
 {
+	ieByte tmpByte;
+
 	str->Read( &eh->SpellForm, 1 );
 	str->Read( &eh->unknown1, 1 );
 	str->Read( &eh->Location, 1 );
 	str->Read( &eh->unknown2, 1 );
 	str->ReadResRef( eh->MemorisedIcon );
 	str->Read( &eh->Target, 1 );
-	str->Read( &eh->TargetNumber, 1 );
+	str->Read( &tmpByte,1 );
+	if (!tmpByte) {
+		tmpByte = 1;
+	}
+	eh->TargetNumber = tmpByte;
 	str->ReadWord( &eh->Range );
 	str->ReadWord( &eh->RequiredLevel );
 	str->ReadDword( &eh->CastingTime );
