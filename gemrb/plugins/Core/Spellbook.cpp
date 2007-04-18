@@ -578,6 +578,9 @@ bool Spellbook::GetSpellInfo(SpellExtHeader *array, int type, int startindex, in
 					}
 					SPLExtHeader *ext_header = spl->ext_headers+ehc;
 					array[pos].headerindex = ehc;
+					array[pos].level = sm->Level;
+					array[pos].type = sm->Type;
+					array[pos].count = k;
 					array[pos].SpellForm = ext_header->SpellForm;
 					memcpy(array[pos].MemorisedIcon, ext_header->MemorisedIcon,sizeof(ieResRef) );
 					array[pos].Target = ext_header->Target;
@@ -586,7 +589,6 @@ bool Spellbook::GetSpellInfo(SpellExtHeader *array, int type, int startindex, in
 					array[pos].Projectile = ext_header->ProjectileAnimation;
 					array[pos].CastingTime = (ieWord) ext_header->CastingTime;
 					array[pos].strref = spl->SpellName;
-					array[pos].count = 1;
 					pos++;
 					core->FreeSpell(spl, slot->SpellResRef, false);
 				}

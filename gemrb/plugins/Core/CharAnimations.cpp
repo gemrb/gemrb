@@ -1921,39 +1921,40 @@ void CharAnimations::PulseRGBModifiers()
 {
 	unsigned long time = core->GetGame()->Ticks;
 
-	if (time - lastModUpdate > 40) {
-		if (time - lastModUpdate > 400) lastModUpdate = time - 40; 
+	if (time - lastModUpdate <= 40)
+		return;
 
-		int inc = (time - lastModUpdate)/40;
-		bool change[4] = { false, false, false, false };
-		if (GlobalColorMod.type != RGBModifier::NONE &&
-			GlobalColorMod.speed > 0)
-		{
-			GlobalColorMod.phase += inc;
-			change[0] = change[1] = change[2] = change[3] = true;
+	if (time - lastModUpdate > 400) lastModUpdate = time - 40; 
 
-			// reset if done
-			if (GlobalColorMod.phase > 2*GlobalColorMod.speed) {
-				GlobalColorMod.type = RGBModifier::NONE;
-				GlobalColorMod.phase = 0;
-				GlobalColorMod.speed = 0;
-			}
+	int inc = (time - lastModUpdate)/40;
+	bool change[4] = { false, false, false, false };
+	if (GlobalColorMod.type != RGBModifier::NONE &&
+		GlobalColorMod.speed > 0)
+	{
+		GlobalColorMod.phase += inc;
+		change[0] = change[1] = change[2] = change[3] = true;
+
+		// reset if done
+		if (GlobalColorMod.phase > 2*GlobalColorMod.speed) {
+			GlobalColorMod.type = RGBModifier::NONE;
+			GlobalColorMod.phase = 0;
+			GlobalColorMod.speed = 0;
 		}
-
-		for (int i = 0; i < 32; ++i) {
-			if (ColorMods[i].type != RGBModifier::NONE &&
-				ColorMods[i].speed > 0)
-			{
-				ColorMods[i].phase += inc;
-				change[i>>3] = true;
-			}
-		}
-
-		if (change[0]) SetupColors(PAL_MAIN);
-		if (change[1]) SetupColors(PAL_WEAPON);
-		if (change[2]) SetupColors(PAL_OFFHAND);
-		if (change[3]) SetupColors(PAL_HELMET);
-
-		lastModUpdate += inc*40;
 	}
+
+	for (int i = 0; i < 32; ++i) {
+		if (ColorMods[i].type != RGBModifier::NONE &&
+			ColorMods[i].speed > 0)
+		{
+			ColorMods[i].phase += inc;
+			change[i>>3] = true;
+		}
+	}
+
+	if (change[0]) SetupColors(PAL_MAIN);
+	if (change[1]) SetupColors(PAL_WEAPON);
+	if (change[2]) SetupColors(PAL_OFFHAND);
+	if (change[3]) SetupColors(PAL_HELMET);
+
+	lastModUpdate += inc*40;
 }

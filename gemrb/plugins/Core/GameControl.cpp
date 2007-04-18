@@ -591,7 +591,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			case 'c':
 				if (game->selected.size() > 0 && lastActor) {
 					Actor *src = game->selected[0];
-					bool res = src->CastSpell( "SPWI207", lastActor );
+					bool res = src->CastSpell( "SPWI207", lastActor, false );
 					printf( "Cast Spell: %d\n", res );
 				}
 				break;
@@ -944,11 +944,12 @@ void GameControl::TryToCast(Actor *source, Point &tgt)
 {
 	char Tmp[40];
 
-	if (!spellCount) spellOrItem = 0;
-	if (!spellOrItem) return; //not casting or using an own item
+	if (!spellCount) {
+		target_mode = TARGET_MODE_NONE;
+		return; //not casting or using an own item
+	}
 	spellCount--;
-	if (!spellOrItem) return; //not casting or using an own item
-	if (spellOrItem>0) {
+	if (spellOrItem>=0) {
 		CREMemorizedSpell *si;
 		//spell casting at target
 		si = source->spellbook.GetMemorizedSpell(spellOrItem, spellSlot, spellIndex);
@@ -959,7 +960,6 @@ void GameControl::TryToCast(Actor *source, Point &tgt)
 	}
 	source->AddAction( GenerateAction( Tmp) );
 	if (!spellCount) {
-		spellOrItem = 0;
 		target_mode = TARGET_MODE_NONE;
 	}
 }
@@ -968,8 +968,10 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 {
 	char Tmp[40];
 
-	if (!spellCount) spellOrItem = 0;
-	if (!spellOrItem) return; //not casting or using an own item
+	if (!spellCount) {
+		target_mode = TARGET_MODE_NONE;
+		return; //not casting or using an own item
+	}
 	spellCount--;
 	if (spellOrItem>0) {
 		sprintf(Tmp, "NIDSpecial6()");
@@ -979,7 +981,7 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 	}
 	Action* action = GenerateActionDirect( Tmp, tgt);
 	source->AddAction( action );
-	if (spellOrItem>0)
+	if (spellOrItem>=0)
 	{
 		CREMemorizedSpell *si;
 		//spell casting at target
@@ -992,7 +994,6 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 		action->int1Parameter=spellIndex;
 	}
 	if (!spellCount) {
-		spellOrItem = 0;
 		target_mode = TARGET_MODE_NONE;
 	}
 }
@@ -1016,7 +1017,7 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 {
 	char Tmp[256];
 
-	if (spellOrItem) {
+	if (spellCount) {
 		//we'll get the container back from the coordinates
 		TryToCast(actor, container->Pos);
 		return;
@@ -1032,7 +1033,7 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 {
 	char Tmp[256];
 
-	if (spellOrItem) {
+	if (spellCount) {
 		//we'll get the door back from the coordinates
 		TryToCast(actor, door->Pos);
 		return;
@@ -1053,7 +1054,7 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 
 bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 {
-	if (spellOrItem) {
+	if (spellCount) {
 		//we'll get the active region from the coordinates (if needed)
 		TryToCast(actor, p);
 		//don't bother with this region further
@@ -1190,7 +1191,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 		//just a single actor, no formation
 		if (game->selected.size()==1) {
 			//the player is using an item or spell on the ground
-			if (spellOrItem) {
+			if (spellCount) {
 				TryToCast(core->GetFirstSelectedPC(), p);
 				return;
 			}
@@ -1253,7 +1254,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 	//we shouldn't zero this for two reasons in case of spell or item
 	//1. there could be multiple targets
 	//2. the target mode is important
-	if (!spellOrItem) {
+	if (!spellCount) {
 		target_mode = TARGET_MODE_NONE;
 	}
 

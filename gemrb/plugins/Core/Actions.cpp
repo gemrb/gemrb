@@ -2075,7 +2075,9 @@ void GameScript::Spell(Scriptable* Sender, Action* parameters)
 {
 	ieResRef spellres;
 
+printf("Spell casting\n");
 	if (!ResolveSpellName( spellres, parameters) ) {
+printf("failed to resolve\n");
 		Sender->ReleaseCurrentAction();
 		return;
 	}
@@ -2088,11 +2090,12 @@ void GameScript::Spell(Scriptable* Sender, Action* parameters)
 	if (Sender->Type == ST_ACTOR) {
 		Actor *actor = (Actor *) Sender;
 		actor->SetStance (IE_ANI_CAST);
+		actor->CastSpell (spellres, tar, true);
 	}
 	Point s,d;
 	GetPositionFromScriptable( Sender, s, false );
 	GetPositionFromScriptable( tar, d, false );
-	printf( "Spell from [%d,%d] to [%d,%d]\n", s.x, s.y, d.x, d.y );
+printf( "Spell from [%d,%d] to [%d,%d]\n", s.x, s.y, d.x, d.y );
 	//this might be bad
 	Sender->ReleaseCurrentAction();
 }
@@ -2115,6 +2118,7 @@ void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 	if (Sender->Type == ST_ACTOR) {
 		Actor *actor = (Actor *) Sender;
 		actor->SetStance (IE_ANI_CAST);
+		actor->CastSpell (spellres, tar, false);
 	}
 	Point s,d;
 	GetPositionFromScriptable( Sender, s, false );

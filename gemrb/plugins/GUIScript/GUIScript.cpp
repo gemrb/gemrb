@@ -7472,13 +7472,13 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 			actor->CastSpell(spelldata.spellname, NULL, true);
 			break;
 		case TARGET_AREA:
-			core->GetGameControl()->SetupCasting(spelldata.type, spelldata.level, spelldata.headerindex, actor, GA_POINT, spelldata.TargetNumber);
+			core->GetGameControl()->SetupCasting(spelldata.type, spelldata.level, spelldata.count, actor, GA_POINT, spelldata.TargetNumber);
 			break;
 		case TARGET_CREA:
-			core->GetGameControl()->SetupCasting(spelldata.type, spelldata.level, spelldata.headerindex, actor, GA_NO_DEAD, spelldata.TargetNumber);
+			core->GetGameControl()->SetupCasting(spelldata.type, spelldata.level, spelldata.count, actor, GA_NO_DEAD, spelldata.TargetNumber);
 			break;
 		case TARGET_DEAD:
-			core->GetGameControl()->SetupCasting(spelldata.type, spelldata.level, spelldata.headerindex, actor, 0, spelldata.TargetNumber);
+			core->GetGameControl()->SetupCasting(spelldata.type, spelldata.level, spelldata.count, actor, 0, spelldata.TargetNumber);
 			break;
 		default:
 			printMessage("GUIScript", "Unhandled target type!", LIGHT_RED );

@@ -101,7 +101,7 @@ inline bool IsInstant(ieByte timingmode)
 	if (timingmode>=MAX_TIMING_MODE) return false;
 	return fx_instant[timingmode];
 }
-//                                           0   1     2     3     4  5    6     7       8
+//                                        0    1     2     3    4    5    6     7       8   9     10
 static bool fx_relative[MAX_TIMING_MODE]={true,false,false,true,true,true,false,false,false,false,false};
 
 inline bool NeedPrepare(ieByte timingmode)
@@ -642,14 +642,14 @@ inline bool check_resistance(Actor* actor, Effect* fx)
 	//magic immunity
 	ieDword val = actor->GetStat(IE_RESISTMAGIC);
 	if (fx->random_value < val) {
-		return false;
+		return true;
 	}
 	//opcode immunity
 	if (actor->fxqueue.HasEffectWithParam(fx_opcode_immunity_ref, fx->Opcode) ) {
-		return false;
+		return true;
 	}
 	if (actor->fxqueue.HasEffectWithParam(fx_opcode_immunity2_ref, fx->Opcode) ) {
-		return false;
+		return true;
 	}
 /* opcode bouncing isn't implemented?
 	//opcode bouncing
@@ -672,12 +672,11 @@ inline bool check_resistance(Actor* actor, Effect* fx)
 	if (saved) {
 		if (fx->IsSaveForHalfDamage) {
 			fx->Parameter1/=2;
-		}
-		else {
-			return false;
+		} else {
+			return true;
 		}
 	}
-	return true;
+	return false;
 }
 
 // this function is called two different ways

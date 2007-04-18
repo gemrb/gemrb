@@ -438,8 +438,8 @@ public:
 	/* Deducts a charge from an item */
 	void ChargeItem(int slot, ieDword header, CREItem *item, Item *itm, bool silent);
 	/* actor casts spell */
-	bool CastSpellPoint( ieResRef SpellResRef, Point &Target );
-	bool CastSpell( ieResRef SpellResRef, Scriptable* Target );
+	bool CastSpellPoint( ieResRef SpellResRef, Point &Target, bool deplete );
+	bool CastSpell( ieResRef SpellResRef, Scriptable* Target, bool deplete );
 	/* If it returns true, then default AC=10 and the lesser the better */
 	bool IsReverseToHit();
 	void InitButtons(ieDword cls);

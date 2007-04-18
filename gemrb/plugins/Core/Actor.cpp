@@ -3039,11 +3039,14 @@ bool Actor::UseItemPoint(int slot, ieDword header, Point &target, bool silent)
 	}
 
 	Projectile *pro = itm->GetProjectile(header);
-	pro->SetCaster(globalID);
-	GetCurrentArea()->AddProjectile(pro, Pos, target);
 	ChargeItem(slot, header, item, itm, silent);
 	core->FreeItem(itm,item->ItemResRef, false);
-	return true;
+	if (pro) {
+		pro->SetCaster(globalID);
+		GetCurrentArea()->AddProjectile(pro, Pos, target);
+		return true;
+	}
+	return false;
 }
 
 bool Actor::UseItem(int slot, ieDword header, Scriptable* target, bool silent)
@@ -3062,13 +3065,14 @@ bool Actor::UseItem(int slot, ieDword header, Scriptable* target, bool silent)
 		return false;
 	}
 	Projectile *pro = itm->GetProjectile(header);
+	ChargeItem(slot, header, item, itm, silent);
+	core->FreeItem(itm,item->ItemResRef, false);
 	if (pro) {
 		pro->SetCaster(globalID);
 		GetCurrentArea()->AddProjectile(pro, Pos, tar->globalID);
+		return true;
 	}
-	ChargeItem(slot, header, item, itm, silent);
-	core->FreeItem(itm,item->ItemResRef, false);
-	return true;
+	return false;
 }
 
 void Actor::ChargeItem(int slot, ieDword header, CREItem *item, Item *itm, bool silent)
@@ -3096,45 +3100,61 @@ void Actor::ChargeItem(int slot, ieDword header, CREItem *item, Item *itm, bool 
 	}
 }
 
-bool Actor::CastSpellPoint( ieResRef SpellResRef, Point &target )
+bool Actor::CastSpellPoint( ieResRef SpellResRef, Point &target, bool deplete )
 {
-	if (! spellbook.HaveSpell( SpellResRef, HS_DEPLETE )) {
-		return false;
+	if (deplete) {
+		if (! spellbook.HaveSpell( SpellResRef, HS_DEPLETE )) {
+			SetStance(IE_ANI_READY);
+			return false;
+		}
 	}
 
+	SetStance(IE_ANI_CONJURE);
 	Spell* spl = core->GetSpell( SpellResRef );
 	//cfb
-	EffectQueue *fxqueue=spl->GetEffectBlock(-1);
+	int dummy;
+	EffectQueue *fxqueue=spl->GetEffectBlock(-1, dummy);
 	fxqueue->SetOwner(this);
 	fxqueue->ApplyAllEffects(this);
 	//spell
 	Projectile *pro=spl->GetProjectile(GetXPLevel(true));
-	pro->SetCaster(globalID);
-	GetCurrentArea()->AddProjectile(pro, Pos, target);
-	return true;
+	if (pro) {
+		pro->SetCaster(globalID);
+		GetCurrentArea()->AddProjectile(pro, Pos, target);
+		return true;
+	}
+	return false;
 }
 
-bool Actor::CastSpell( ieResRef SpellResRef, Scriptable* target )
+bool Actor::CastSpell( ieResRef SpellResRef, Scriptable* target, bool deplete )
 {
-	if (! spellbook.HaveSpell( SpellResRef, HS_DEPLETE )) {
-		return false;
-	}
-
 	if (target->Type!=ST_ACTOR) {
-		return CastSpellPoint(SpellResRef, target->Pos);
+		return CastSpellPoint(SpellResRef, target->Pos, deplete);
 	}
 
+	if (deplete) {
+		if (! spellbook.HaveSpell( SpellResRef, HS_DEPLETE )) {
+			SetStance(IE_ANI_READY);
+			return false;
+		}
+	}
+
+	SetStance(IE_ANI_CONJURE);
 	Actor *Target = (Actor *) target;
 	Spell* spl = core->GetSpell( SpellResRef );
 	//cfb
-	EffectQueue *fxqueue=spl->GetEffectBlock(-1);
+	int dummy;
+	EffectQueue *fxqueue=spl->GetEffectBlock(-1, dummy);
 	fxqueue->SetOwner(this);
 	fxqueue->ApplyAllEffects(this);
 	//spell
 	Projectile *pro=spl->GetProjectile(GetXPLevel(true));
-	pro->SetCaster(globalID);
-	GetCurrentArea()->AddProjectile(pro, Pos, Target->globalID);
-	return true;
+	if (pro) {
+		pro->SetCaster(globalID);
+		GetCurrentArea()->AddProjectile(pro, Pos, Target->globalID);
+		return true;
+	}
+	return false;
 }
 
 bool Actor::IsReverseToHit()

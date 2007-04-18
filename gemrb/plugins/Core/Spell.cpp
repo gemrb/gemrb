@@ -47,18 +47,18 @@ Spell::~Spell(void)
 //-1 will return cfb
 //0 will always return first spell block
 //otherwise set to caster level
-EffectQueue *Spell::GetEffectBlock(int level) const
+EffectQueue *Spell::GetEffectBlock(int level, int &block_index) const
 {
 	Effect *features;
 	int count;
 
+	block_index=0;
 	//iwd2 has this hack
 	if (level>=0) {
 		if (Flags & SF_SIMPLIFIED_DURATION) {
 			features = ext_headers[0].features;
 			count = ext_headers[0].FeatureCount;
 		} else {
-			int block_index;
 			for(block_index=0;block_index<ExtHeaderCount-1;block_index++) {
 				if (ext_headers[block_index+1].RequiredLevel>level) {
 					break;
@@ -87,15 +87,15 @@ EffectQueue *Spell::GetEffectBlock(int level) const
 	return fxqueue;
 }
 
-Projectile *Spell::GetProjectile(int header) const
+Projectile *Spell::GetProjectile(int level) const
 {
-	SPLExtHeader *eh = GetExtHeader(header);
-	if (!eh) {
-		return NULL;
+	int ext_block;
+	EffectQueue *fx = GetEffectBlock(level, ext_block);
+	if (fx->GetEffectsCount()) {
+		Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(ext_headers[ext_block].ProjectileAnimation);
+		pro->SetEffects(fx);
+		return pro;
 	}
-	EffectQueue *fx = GetEffectBlock(header);
-	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(eh->ProjectileAnimation);
-	pro->SetEffects(fx);
-	return pro;
+	return NULL;
 }
 

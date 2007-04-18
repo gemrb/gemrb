@@ -154,9 +154,9 @@ public:
 		return ext_headers+which;
 	}
 	//-1 will return the cfb
-	EffectQueue *GetEffectBlock(int wanted_level) const;
+	EffectQueue *GetEffectBlock(int wanted_level, int &block_index) const;
 	//returns a projectile created from an extended header
-	Projectile *GetProjectile(int header) const;
+	Projectile *GetProjectile(int wanted_level) const;
 };
 
 #endif  // ! SPELL_H
