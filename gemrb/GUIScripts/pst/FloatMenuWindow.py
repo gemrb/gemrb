@@ -38,24 +38,30 @@ MENU_MODE_ABILITIES = 5
 
 float_menu_mode = MENU_MODE_SINGLE
 float_menu_index = 0
-float_menu_selected = -1
+float_menu_selected = None
+type = None
+
+def UseSpell ():
+	pc = GemRB.GameGetFirstSelectedPC ()
+	slot = float_menu_selected+float_menu_index
+	print "spell", type, slot
+	GemRB.SpellCast (pc, 1<<type, slot)
+	return
 
 def UseItem ():
 	pc = GemRB.GameGetFirstSelectedPC ()
-	if float_menu_selected>=0:
-		GemRB.UseItem (pc, float_menu_selected+20, 0)
+	GemRB.UseItem (pc, float_menu_selected+20, 0)
 	return
 
 def UseWeapon ():
 	pc = GemRB.GameGetFirstSelectedPC ()
-	#if float_menu_selected>=0:
-		#GemRB.UseItem (pc, float_menu_selected+9, 0)
+	GemRB.SetEquippedQuickSlot (pc, float_menu_selected)
 	return
 
 def OpenFloatMenuWindow ():
 	global FloatMenuWindow
 	global float_menu_mode, float_menu_index
-	
+
 	GemRB.HideGUI ()
 
 	if FloatMenuWindow:
@@ -67,10 +73,19 @@ def OpenFloatMenuWindow ():
 		GemRB.SetVar ("FloatWindow", -1)
 		SetSelectionChangeMultiHandler (None)
 		GemRB.UnhideGUI ()
+
+		if float_menu_selected==None:
+			GemRB.GameControlSetTargetMode (TARGET_MODE_ALL)
+			return
+
 		if float_menu_mode == MENU_MODE_ITEMS:
 			UseItem()
 		elif float_menu_mode == MENU_MODE_WEAPONS:
 			UseWeapon()
+		elif float_menu_mode == MENU_MODE_SPELLS:
+			UseSpell()
+		elif float_menu_mode == MENU_MODE_ABILITIES:
+			UseSpell()
 		return
 
 	ActionLevel = 0
@@ -125,7 +140,7 @@ def OpenFloatMenuWindow ():
 	GemRB.SetTooltip (Window, Button, 8199)
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_DRAGGABLE, OP_OR)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG, "FloatMenuDrag")
-	
+
 	Button = GemRB.GetControl (Window, 12)
 	GemRB.SetTooltip (Window, Button, 8199)
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_DRAGGABLE, OP_OR)
@@ -164,7 +179,7 @@ def OpenFloatMenuWindow ():
 	#AMSPLL - 4709
 	#AMSTAT - 4707
 	#AMTLK - 41653
-	
+
 	#AMPANN
 	#AMPDKK
 	#AMPFFG
@@ -189,18 +204,21 @@ def OpenFloatMenuWindow ():
 
 	SetSelectionChangeMultiHandler (FloatMenuSelectAnotherPC)
 	UpdateFloatMenuWindow ()
-	
+
 	GemRB.UnhideGUI ()
 
 
 def UpdateFloatMenuWindow ():
 	Window = FloatMenuWindow
-	
+
 	pc = GemRB.GameGetFirstSelectedPC ()
 
 	Button = GemRB.GetControl (Window, 0)
-	#GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_NO_IMAGE | IE_GUI_BUTTON_PICTURE, OP_SET)
 	GemRB.SetButtonSprites (Window, Button, GetActorPortrait (pc, 'FMENU'), 0, 0, 1, 2, 3)
+	Button = GemRB.GetControl (Window, 13)
+	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+	Button = GemRB.GetControl (Window, 14)
+	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 
 	if float_menu_mode == MENU_MODE_SINGLE:
 		for i in range (5):
@@ -217,11 +235,27 @@ def UpdateFloatMenuWindow ():
 		for i in range (5):
 			UpdateFloatMenuItem (pc, i, 0)
 	elif float_menu_mode == MENU_MODE_SPELLS:
+		# spells
+		RefreshSpellList(pc, False)
+		if float_menu_index:
+			Button = GemRB.GetControl (Window, 13)
+			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
+		if float_menu_index+3<len(spell_list):
+			Button = GemRB.GetControl (Window, 14)
+			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 		for i in range (5):
-			UpdateFloatMenuSpell (pc, i, False)
+			UpdateFloatMenuSpell (pc, i)
 	elif float_menu_mode == MENU_MODE_ABILITIES:
+		# abilities
+		RefreshSpellList(pc, True)
+		if float_menu_index:
+			Button = GemRB.GetControl (Window, 13)
+			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
+		if float_menu_index+3<len(spell_list):
+			Button = GemRB.GetControl (Window, 14)
+			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 		for i in range (5):
-			UpdateFloatMenuSpell (pc, i, True)
+			UpdateFloatMenuSpell (pc, i)
 
 def UpdateFloatMenuSingleAction (i):
 	Window = FloatMenuWindow
@@ -235,7 +269,7 @@ def UpdateFloatMenuSingleAction (i):
 	# Inventory screen
 	# Statistics screen
 	# Mage Spell Book / Priest Scroll
-	
+
 	Button = GemRB.GetControl (Window, 15 + i)
 
 	GemRB.SetButtonSprites (Window, Button, butts[i][0], 0, 0, 1, 2, 3)
@@ -260,6 +294,36 @@ def UpdateFloatMenuGroupAction (i):
 	GemRB.SetTooltip (Window, Button, butts[i][1])
 	GemRB.SetText (Window, Button, '')
 
+def RefreshSpellList(pc, innate):
+	global spell_hash, spell_list, type
+
+	if innate:
+		type = IE_SPELL_TYPE_INNATE
+	else:
+		Table = GemRB.LoadTable ("clskills")
+		if (GemRB.GetTableValue (Table, GemRB.GetPlayerStat( pc, IE_CLASS), 1)=="*"):
+			type = IE_SPELL_TYPE_WIZARD
+		else:
+			type = IE_SPELL_TYPE_PRIEST
+
+	# FIXME: ugly, should be in Spellbook.cpp
+	spell_hash = {}
+	spell_list = []
+	#level==0 is level #1
+	for level in range (9):
+		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level)
+		for j in range (mem_cnt):
+			ms = GemRB.GetMemorizedSpell (pc, type, level, j)
+
+			# Spell was already used up
+			if not ms['Flags']: continue
+
+			if spell_hash.has_key (ms['SpellResRef']):
+				spell_hash[ms['SpellResRef']] = spell_hash[ms['SpellResRef']] + 1
+			else:
+				spell_hash[ms['SpellResRef']] = 1
+				spell_list.append( ms['SpellResRef'] )
+	return
 
 def UpdateFloatMenuItem (pc, i, weapons):
 	Window = FloatMenuWindow
@@ -277,7 +341,7 @@ def UpdateFloatMenuItem (pc, i, weapons):
 		GemRB.SetButtonSprites (Window, Button, 'AMGENS', 0, 0, 1, 0, 0)
 
 	# Weapons - the last action is 'Guard'
-	
+
 	#if slot_item and slottype:
 	if slot_item:
 		item = GemRB.GetItem (slot_item['ItemResRef'])
@@ -298,10 +362,7 @@ def UpdateFloatMenuItem (pc, i, weapons):
 		else:
 			GemRB.SetTooltip (Window, Button, item['ItemNameIdentified'])
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-		if weapons:
-			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectWeapon")
-		else:
-			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectItem")
+		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectItem")
 		GemRB.SetVarAssoc (Window, Button, 'ItemButton', i)
 		return
 
@@ -317,81 +378,38 @@ def SelectItem ():
 	Button = GemRB.GetVar ('ItemButton')
 	#simulating radiobutton+checkbox hybrid
 	if float_menu_selected == Button:
-		float_menu_selected = -1
+		float_menu_selected = None
 	else:
-		float_menu_selected = Button
+		float_menu_selected = Button+float_menu_index
 	UpdateFloatMenuWindow()
 	return
 
-def SelectWeapon ():
-	global float_menu_selected
-
+def UpdateFloatMenuSpell (pc, i):
 	Window = FloatMenuWindow
-	Button = GemRB.GetVar ('ItemButton')
-	#simulating radiobutton+checkbox hybrid
-	if float_menu_selected == Button:
-		float_menu_selected = -1
-	else:
-		float_menu_selected = Button
-	UpdateFloatMenuWindow()
-	return
-
-def UpdateFloatMenuSpell (pc, i, innate):
-	Window = FloatMenuWindow
-	if innate:
-		type = IE_SPELL_TYPE_INNATE
-	else:
-		Table = GemRB.LoadTable ("clskills")
-		if (GemRB.GetTableValue (Table, GemRB.GetPlayerStat( pc, IE_CLASS), 1)=="*"):
-			type = IE_SPELL_TYPE_WIZARD
-		else:
-			type = IE_SPELL_TYPE_PRIEST
-
-	# FIXME: ugly, should be in Spellbook.cpp
-	spell_hash = {}
-	spell_list = []
-	for level in range (1, 10):
-		mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level)
-		for j in range (mem_cnt):
-			ms = GemRB.GetMemorizedSpell (pc, type, level, j)
-
-			# Spell was already used up
-			if not ms['Flags']: continue
-			
-			if spell_hash.has_key (ms['SpellResRef']):
-				spell_hash[ms['SpellResRef']] = spell_hash[ms['SpellResRef']] + 1
-			else:
-				spell_hash[ms['SpellResRef']] = 1
-				spell_list.append( ms['SpellResRef'] )
-
 
 	Button = GemRB.GetControl (Window, 15 + i)
-	GemRB.SetButtonSprites (Window, Button, 'AMGENS', 0, 0, 1, 2, 3)
-
+	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
+	if i == float_menu_selected:
+		GemRB.SetButtonBAM (Window, Button, 'AMHILITE', 0, 0)
+	else:
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_NAND)
 
 	if i + float_menu_index < len (spell_list):
 		SpellResRef = spell_list[i + float_menu_index]
-		GemRB.SetSpellIcon (Window, Button, '') # clear item sprites
 		GemRB.SetSpellIcon (Window, Button, SpellResRef)
 		GemRB.SetText (Window, Button, "%d" %spell_hash[SpellResRef])
-		
-		#	GemRB.SetEvent (Window, Icon, IE_GUI_BUTTON_ON_PRESS, "OpenPriestSpellUnmemorizeWindow")
-		#else:
-		#	GemRB.SetEvent (Window, Icon, IE_GUI_BUTTON_ON_PRESS, "OnPriestUnmemorizeSpell")
-		#GemRB.SetEvent (Window, Icon, IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenPriestSpellInfoWindow")
+
 		spell = GemRB.GetSpell (SpellResRef)
 		GemRB.SetTooltip (Window, Button, spell['SpellName'])
-		#PriestMemorizedSpellList.append (ms['SpellResRef'])
-		#GemRB.SetVarAssoc (Window, Icon, "SpellButton", i)
-		#GemRB.EnableButtonBorder (Window, Icon, 0, ms['Flags'] == 0)
-		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
+		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectItem")
+		GemRB.SetVarAssoc (Window, Button, 'ItemButton', i)
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 	else:
 		GemRB.SetSpellIcon (Window, Button, '')
 		GemRB.SetText (Window, Button, '')
 		GemRB.SetTooltip (Window, Button, '')
-
-
-
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
+	return
 
 def FloatMenuSelectNextPC ():
 	sel = GemRB.GameGetFirstSelectedPC ()
@@ -406,21 +424,21 @@ def FloatMenuSelectAnotherPC ():
 	global float_menu_mode, float_menu_index, float_menu_selected
 	float_menu_mode = MENU_MODE_SINGLE
 	float_menu_index = 0
-	float_menu_selected = -1
+	float_menu_selected = None
 	UpdateFloatMenuWindow ()
 
 
 def FloatMenuSelectDialog ():
 	global float_menu_selected
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_TALK)
-	float_menu_selected = -1
+	float_menu_selected = None
 	UpdateFloatMenuWindow ()
 
 def FloatMenuSelectWeapons ():
 	global float_menu_mode, float_menu_index, float_menu_selected
 	float_menu_mode = MENU_MODE_WEAPONS
 	float_menu_index = 0
-	float_menu_selected = -1
+	float_menu_selected = None
 	# FIXME: Force attack mode
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_ATTACK)
 	UpdateFloatMenuWindow ()
@@ -429,14 +447,14 @@ def FloatMenuSelectItems ():
 	global float_menu_mode, float_menu_index, float_menu_selected
 	float_menu_mode = MENU_MODE_ITEMS
 	float_menu_index = 0
-	float_menu_selected = -1
+	float_menu_selected = None
 	UpdateFloatMenuWindow ()
 
 def FloatMenuSelectSpells ():
 	global float_menu_mode, float_menu_index, float_menu_selected
 	float_menu_mode = MENU_MODE_SPELLS
 	float_menu_index = 0
-	float_menu_selected = -1
+	float_menu_selected = None
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_CAST)
 	UpdateFloatMenuWindow ()
 
@@ -444,21 +462,23 @@ def FloatMenuSelectAbilities ():
 	global float_menu_mode, float_menu_index, float_menu_selected
 	float_menu_mode = MENU_MODE_ABILITIES
 	float_menu_index = 0
-	float_menu_selected = -1
+	float_menu_selected = None
 	UpdateFloatMenuWindow ()
 
 
 def FloatMenuPreviousItem ():
-	global float_menu_index
+	global float_menu_index, float_menu_selected
 	if float_menu_index > 0:
 		float_menu_index = float_menu_index - 1
-		print "P", float_menu_index
+		if float_menu_selected!=None:
+			float_menu_selected = float_menu_selected + 1
 		UpdateFloatMenuWindow ()
 
 def FloatMenuNextItem ():
-	global float_menu_index
+	global float_menu_index, float_menu_selected
 	float_menu_index = float_menu_index + 1
-	print "N", float_menu_index
+	if float_menu_selected!=None:
+		float_menu_selected = float_menu_selected - 1
 	UpdateFloatMenuWindow ()
 
 
