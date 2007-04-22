@@ -90,7 +90,6 @@ GameControl::GameControl(void)
 	//maybe we don't even need it
 	//action = GA_DEFAULT | GA_SELECT | GA_NO_DEAD;
 	Changed = true;
-	spellOrItem = 0;
 	spellCount = 0;
 	user = NULL;
 	lastActorID = 0;
@@ -973,7 +972,7 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 		return; //not casting or using an own item
 	}
 	spellCount--;
-	if (spellOrItem>0) {
+	if (spellOrItem>=0) {
 		sprintf(Tmp, "NIDSpecial6()");
 	} else {
 		//using item on target
