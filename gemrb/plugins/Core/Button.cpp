@@ -36,6 +36,7 @@ Button::Button()
 	ResetEventHandler( ButtonOnShiftPress );
 	ResetEventHandler( ButtonOnRightPress );
 	ResetEventHandler( ButtonOnDragDrop );
+	ResetEventHandler( ButtonOnDrag );
 	ResetEventHandler( MouseEnterButton );
 	ResetEventHandler( MouseLeaveButton );
 	ResetEventHandler( MouseOverButton );
