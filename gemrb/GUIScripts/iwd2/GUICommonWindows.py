@@ -223,6 +223,33 @@ def ActionStopPressed ():
 			GemRB.ClearAction(i + 1)
 	return
 
+#no check needed because the button wouldn't be drawn if illegal
+def ActionLeftPressed ():
+	TopIndex = GemRB.GetVar ("TopIndex")
+	if TopIndex>10:
+		TopIndex -= 10
+	else:
+		TopIndex = 0
+	GemRB.SetVar ("TopIndex", TopIndex)
+	UpdateActionsWindow ()
+	return
+
+def ActionRightPressed ():
+	pc = GemRB.GameGetFirstSelectedPC()
+	TopIndex = GemRB.GetVar ("TopIndex")
+	Type = GemRB.GetVar ("Type")
+	Max = GemRB.GetMemorizedSpellsCount(pc, Type)
+	TopIndex += 10
+	if TopIndex > Max - 10:
+		if Max>10:
+			TopIndex = Max-10
+		else:
+			TopIndex = 0
+
+	GemRB.SetVar ("TopIndex", TopIndex)
+	UpdateActionsWindow ()
+	return
+
 def GetActorRaceTitle (actor):
 	Table = GemRB.LoadTable ("races")
 	RaceID = GemRB.GetPlayerStat (actor, IE_SUBRACE)

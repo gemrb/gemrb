@@ -305,10 +305,7 @@ def ActionRightPressed ():
 	pc = GemRB.GameGetFirstSelectedPC ()
 	TopIndex = GemRB.GetVar ("TopIndex")
 	Type = GemRB.GetVar ("Type")
-	if Type == 3:
-		Max = GemRB.GetMemorizedSpellsCount(pc,0)+GemRB.GetMemorizedSpellsCount(pc,1)
-	else:
-		Max = GemRB.GetMemorizedSpellsCount(pc,2)
+	Max = GemRB.GetMemorizedSpellsCount(pc, Type)
 	TopIndex += 10
 	if TopIndex > Max - 10:
 		if Max>10:
@@ -394,6 +391,8 @@ def SpellPressed ():
 	Spell = GemRB.GetVar("Spell")
 	Type = GemRB.GetVar("Type")
 	GemRB.SpellCast(pc, Type, Spell)
+	GemRB.SetVar ("ActionLevel", 0)
+	UpdateActionsWindow ()
 	return
 
 def EquipmentPressed ():
@@ -401,6 +400,8 @@ def EquipmentPressed ():
 
 	Item = GemRB.GetVar("Equipment")
 	GemRB.UseItem(pc, -1, Item)
+	GemRB.SetVar ("ActionLevel", 0)
+	UpdateActionsWindow ()
 	return
 
 def GetActorClassTitle (actor):
