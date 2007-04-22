@@ -117,6 +117,7 @@ struct SpellExtHeader {
 	ieDword count;
 	ieDword type;          //spelltype
 	ieDword headerindex;
+	ieDword slot;
 	//these come from the header
 	ieByte SpellForm;
 	ieResRef MemorisedIcon;
@@ -138,9 +139,16 @@ struct SpellExtHeader {
 class GEM_EXPORT Spellbook {
 private:
 	std::vector<CRESpellMemorization*> *spells;
+	std::vector<SpellExtHeader*> spellinfo;
 
 	/** Sets spell from memorized as 'already-cast' */
 	bool DepleteSpell(CREMemorizedSpell* spl);
+	/** regenerates the spellinfo list */
+	void GenerateSpellInfo();
+	/** invalidates the spellinfo list */
+	void ClearSpellInfo();
+	/** looks up the spellinfo list for an element */
+	SpellExtHeader *FindSpellInfo(unsigned int level, unsigned int type, ieResRef name);
 public: 
 	Spellbook();
 	~Spellbook();
@@ -164,10 +172,10 @@ public:
 	void RemoveSpell(ieResRef ResRef);
 	/** adds a spell to the book */
 	bool AddKnownSpell(int type, unsigned int level, CREKnownSpell *spl);
-	CREKnownSpell* GetKnownSpell(int type, unsigned int level, unsigned int index);
+	CREKnownSpell* GetKnownSpell(int type, unsigned int level, unsigned int index) const;
 	unsigned int GetMemorizedSpellsCount(int type) const;
 	unsigned int GetMemorizedSpellsCount(int type, unsigned int level) const;
-	CREMemorizedSpell* GetMemorizedSpell(int type, unsigned int level, unsigned int index);
+	CREMemorizedSpell* GetMemorizedSpell(int type, unsigned int level, unsigned int index) const;
 
 	int GetMemorizableSpellsCount(int type, unsigned int level, bool bonus) const;
 	void SetMemorizableSpellsCount(int Value, int type, unsigned int level, bool bonus);
@@ -192,6 +200,9 @@ public:
 
 	/** recharges all spells */
 	void ChargeAllSpells();
+
+	/** returns the number of distinct spells (generates spellinfo) */
+	unsigned int GetSpellInfoSize(int type);
 
 	/** lists spells of a type */
 	bool GetSpellInfo(SpellExtHeader *array, int type, int startindex, int count);

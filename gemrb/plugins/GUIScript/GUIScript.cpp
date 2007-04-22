@@ -6957,15 +6957,22 @@ static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 	if (!SpellArray) {
 		SpellArray = (SpellExtHeader *) malloc((GUIBT_COUNT) * sizeof (SpellExtHeader) );
 	}
-	bool more = actor->spellbook.GetSpellInfo(SpellArray, Type, Start, GUIBT_COUNT-(Start?1:0));
+	int more = actor->spellbook.GetSpellInfo(SpellArray, Type, Start, GUIBT_COUNT-(Start?1:0));
 	int i;
 	if (Start) {
-		more = true;
+		more |= 2;
 	}
 	if (more) {
-		PyObject *ret = SetActionIcon(wi,core->GetControl(wi, 0),ACT_LEFT,0);
+		int ci = core->GetControl(wi, 0);
+		PyObject *ret = SetActionIcon(wi, ci, ACT_LEFT, 0);
 		if (!ret) {
 			return RuntimeError("Cannot set action button!\n");
+		}
+		Button * btn = (Button *) GetControl(wi, ci, IE_GUI_BUTTON);
+		if (Start) {
+			btn->SetState(IE_GUI_BUTTON_UNPRESSED);
+		} else {
+			btn->SetState(IE_GUI_BUTTON_DISABLED);
 		}
 	}
 
@@ -6981,6 +6988,7 @@ static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 		int ci = core->GetControl(wi, i+(more?1:0) );
 		Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
 		btn->SetEvent(IE_GUI_BUTTON_ON_PRESS,"SpellPressed");
+		btn->SetState(IE_GUI_BUTTON_UNPRESSED);
 		strcpy(btn->VarName,"Spell");
 		btn->Value = Start+i;
 
@@ -7016,9 +7024,18 @@ static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (more) {
-		PyObject *ret = SetActionIcon(wi,core->GetControl(wi, i+1),ACT_RIGHT,i+1);
+		int ci = core->GetControl(wi, i+1);
+		PyObject *ret = SetActionIcon(wi, ci, ACT_RIGHT, i+1);
 		if (!ret) {
 			return RuntimeError("Cannot set action button!\n");
+		}
+		Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
+		if (more&1) {
+			btn->SetState(IE_GUI_BUTTON_UNPRESSED);
+		} else {
+			btn->SetState(IE_GUI_BUTTON_DISABLED);
+			btn->SetFlags(IE_GUI_BUTTON_NO_IMAGE, BM_SET);
+			btn->SetTooltip(NULL);
 		}
 	}
 
@@ -7085,7 +7102,7 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 			} else {
 				type = 1<<IE_SPELL_TYPE_INNATE;
 			}
-			if (!actor->spellbook.GetSpellInfo(NULL, type, 0, 0)) {
+			if (!actor->spellbook.GetSpellInfoSize(type)) {
 				state = IE_GUI_BUTTON_DISABLED;
 			}
 			break;
@@ -7097,7 +7114,7 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 				type = (1<<IE_SPELL_TYPE_INNATE)-1;
 			}
 			//returns true if there are ANY spells to cast
-			if (!actor->spellbook.GetSpellInfo(NULL, type, 0, 0)) {
+			if (!actor->spellbook.GetSpellInfoSize(type)) {
 				state = IE_GUI_BUTTON_DISABLED;
 			}
 			break;
@@ -7108,7 +7125,7 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 				type = 0; //no separate shapes in old spellbook
 			}
 			//returns true if there is ANY shape
-			if (!actor->spellbook.GetSpellInfo(NULL, type, 0, 0)) {
+			if (!actor->spellbook.GetSpellInfoSize(type)) {
 				state = IE_GUI_BUTTON_DISABLED;
 			}
 			break;
@@ -7121,7 +7138,7 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 		case ACT_BARDSONG:
 			if (actor->spellbook.IsIWDSpellBook()) {
 				type = 1<<IE_IWD2_SPELL_SONG;
-				if (!actor->spellbook.GetSpellInfo(NULL, type, 0, 0)) {
+				if (!actor->spellbook.GetSpellInfoSize(type)) {
 					state = IE_GUI_BUTTON_DISABLED;
 				}
 			} else {
@@ -7472,13 +7489,13 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 			actor->CastSpell(spelldata.spellname, NULL, true);
 			break;
 		case TARGET_AREA:
-			core->GetGameControl()->SetupCasting(spelldata.type, spelldata.level, spelldata.count, actor, GA_POINT, spelldata.TargetNumber);
+			core->GetGameControl()->SetupCasting(spelldata.type, spelldata.level, spelldata.slot, actor, GA_POINT, spelldata.TargetNumber);
 			break;
 		case TARGET_CREA:
-			core->GetGameControl()->SetupCasting(spelldata.type, spelldata.level, spelldata.count, actor, GA_NO_DEAD, spelldata.TargetNumber);
+			core->GetGameControl()->SetupCasting(spelldata.type, spelldata.level, spelldata.slot, actor, GA_NO_DEAD, spelldata.TargetNumber);
 			break;
 		case TARGET_DEAD:
-			core->GetGameControl()->SetupCasting(spelldata.type, spelldata.level, spelldata.count, actor, 0, spelldata.TargetNumber);
+			core->GetGameControl()->SetupCasting(spelldata.type, spelldata.level, spelldata.slot, actor, 0, spelldata.TargetNumber);
 			break;
 		default:
 			printMessage("GUIScript", "Unhandled target type!", LIGHT_RED );

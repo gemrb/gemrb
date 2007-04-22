@@ -2100,6 +2100,34 @@ printf( "Spell from [%d,%d] to [%d,%d]\n", s.x, s.y, d.x, d.y );
 	Sender->ReleaseCurrentAction();
 }
 
+void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
+{
+	ieResRef spellres;
+
+printf("Spell casting\n");
+	if (!ResolveSpellName( spellres, parameters) ) {
+printf("failed to resolve\n");
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	if (Sender->Type == ST_ACTOR) {
+		Actor *actor = (Actor *) Sender;
+		actor->SetStance (IE_ANI_CAST);
+		actor->CastSpellPoint (spellres, parameters->pointParameter, true);
+	}
+	Point s;
+	GetPositionFromScriptable( Sender, s, false );
+	printf( "Spell from [%d,%d] to [%d,%d]\n", s.x, s.y, parameters->pointParameter.x, parameters->pointParameter.y );
+	//this might be bad
+	Sender->ReleaseCurrentAction();
+}
+
 //it is unsure how the ForceSpell actions differ
 void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 {
@@ -2124,6 +2152,32 @@ void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 	GetPositionFromScriptable( Sender, s, false );
 	GetPositionFromScriptable( tar, d, false );
 	printf( "ForceSpell from [%d,%d] to [%d,%d]\n", s.x, s.y, d.x, d.y );
+	//this might be bad
+	Sender->ReleaseCurrentAction();
+}
+
+void GameScript::ForceSpellPoint(Scriptable* Sender, Action* parameters)
+{
+	ieResRef spellres;
+
+	if (!ResolveSpellName( spellres, parameters) ) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	if (Sender->Type == ST_ACTOR) {
+		Actor *actor = (Actor *) Sender;
+		actor->SetStance (IE_ANI_CAST);
+		actor->CastSpellPoint (spellres, parameters->pointParameter, false);
+	}
+	Point s;
+	GetPositionFromScriptable( Sender, s, false );
+	printf( "ForceSpell from [%d,%d] to [%d,%d]\n", s.x, s.y, parameters->pointParameter.x, parameters->pointParameter.y );
 	//this might be bad
 	Sender->ReleaseCurrentAction();
 }

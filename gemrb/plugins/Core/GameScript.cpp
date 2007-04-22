@@ -546,6 +546,7 @@ static ActionLink actionnames[] = {
 	{"forcehide", GameScript::ForceHide, 0},
 	{"forceleavearealua", GameScript::ForceLeaveAreaLUA, 0},
 	{"forcespell", GameScript::ForceSpell, AF_BLOCKING},
+	{"forcespellpoint", GameScript::ForceSpellPoint, AF_BLOCKING},
 	{"forceusecontainer", GameScript::ForceUseContainer,AF_BLOCKING},
 	{"formation", GameScript::Formation, AF_BLOCKING},
 	{"fullheal", GameScript::FullHeal, 0},
@@ -793,7 +794,9 @@ static ActionLink actionnames[] = {
 	{"spawnptactivate", GameScript::SpawnPtActivate, 0},
 	{"spawnptdeactivate", GameScript::SpawnPtDeactivate, 0},
 	{"spawnptspawn", GameScript::SpawnPtSpawn, 0},
+	{"spell", GameScript::Spell, AF_BLOCKING},
 	{"spellhiteffectsprite", GameScript::SpellHitEffectSprite, 0},
+	{"spellpoint", GameScript::SpellPoint, AF_BLOCKING},
 	{"startcutscene", GameScript::StartCutScene, 0},
 	{"startcutsceneex", GameScript::StartCutScene, 0}, //pst (unknown)
 	{"startcutscenemode", GameScript::StartCutSceneMode, 0},

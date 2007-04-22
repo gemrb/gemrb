@@ -310,7 +310,7 @@ bool Spellbook::AddKnownSpell(int type, unsigned int level, CREKnownSpell *spl)
 	return true;
 }
 
-CREKnownSpell* Spellbook::GetKnownSpell(int type, unsigned int level, unsigned int index)
+CREKnownSpell* Spellbook::GetKnownSpell(int type, unsigned int level, unsigned int index) const
 {
 	if (type >= NUM_SPELL_TYPES || level >= GetSpellLevelCount(type) || index >= spells[type][level]->known_spells.size())
 		return NULL;
@@ -336,7 +336,7 @@ unsigned int Spellbook::GetMemorizedSpellsCount(int type, unsigned int level) co
 	return (unsigned int) spells[type][level]->memorized_spells.size();
 }
 
-CREMemorizedSpell* Spellbook::GetMemorizedSpell(int type, unsigned int level, unsigned int index)
+CREMemorizedSpell* Spellbook::GetMemorizedSpell(int type, unsigned int level, unsigned int index) const
 {
 	if (type >= NUM_SPELL_TYPES || level >= GetSpellLevelCount(type) || index >= spells[type][level]->memorized_spells.size())
 		return NULL;
@@ -423,7 +423,7 @@ bool Spellbook::MemorizeSpell(CREKnownSpell* spell, bool usable)
 	mem_spl->Flags = usable ? 1 : 0; // FIXME: is it all it's used for?
 
 	sm->memorized_spells.push_back( mem_spl );
-
+	ClearSpellInfo();
 	return true;
 }
 
@@ -437,6 +437,7 @@ bool Spellbook::UnmemorizeSpell(CREMemorizedSpell* spell)
 				if (*s == spell) {
 					delete *s;
 					(*sm)->memorized_spells.erase( s );
+				  ClearSpellInfo();
 					return true;
 				}
 			}
@@ -526,6 +527,7 @@ bool Spellbook::DepleteSpell(int type, unsigned int page, unsigned int slot)
 bool Spellbook::ChargeSpell(CREMemorizedSpell* spl)
 {
 	spl->Flags = 1;
+	ClearSpellInfo();
 	return true;
 }
 
@@ -533,6 +535,7 @@ bool Spellbook::DepleteSpell(CREMemorizedSpell* spl)
 {
 	if (spl->Flags) {
 		spl->Flags = 0;
+		ClearSpellInfo();
 		return true;
 	}
 	return false;
@@ -540,6 +543,7 @@ bool Spellbook::DepleteSpell(CREMemorizedSpell* spl)
 
 /* returns true if there are more item usages not fitting in given array */
 /* FIXME: it should first build up a list and then return a subset */
+/*
 bool Spellbook::GetSpellInfo(SpellExtHeader *array, int type, int startindex, int count)
 {
 	int pos = 0;
@@ -580,7 +584,8 @@ bool Spellbook::GetSpellInfo(SpellExtHeader *array, int type, int startindex, in
 					array[pos].headerindex = ehc;
 					array[pos].level = sm->Level;
 					array[pos].type = sm->Type;
-					array[pos].count = k;
+					array[pos].slot = k;
+					array[pos].count = 1;
 					array[pos].SpellForm = ext_header->SpellForm;
 					memcpy(array[pos].MemorisedIcon, ext_header->MemorisedIcon,sizeof(ieResRef) );
 					array[pos].Target = ext_header->Target;
@@ -598,7 +603,125 @@ bool Spellbook::GetSpellInfo(SpellExtHeader *array, int type, int startindex, in
 
 	return false;
 }
- 
+*/
+
+void Spellbook::ClearSpellInfo()
+{
+	size_t i = spellinfo.size();
+	while(i--) {
+		delete spellinfo[i];
+	}
+	spellinfo.clear();
+}
+
+bool Spellbook::GetSpellInfo(SpellExtHeader *array, int type, int startindex, int count)
+{
+	memset(array, 0, count * sizeof(SpellExtHeader) );
+	if (spellinfo.size()==0) {
+		GenerateSpellInfo();
+	}
+	int actual = 0;
+	bool ret = false;
+	for (unsigned int i = startindex; i<spellinfo.size(); i++) {
+		if ( !(type & (1<<spellinfo[i]->type)) ) {
+			continue;
+		}
+		if (actual>=count) {
+			ret = true;
+			break;
+		}
+		memcpy(array+actual, spellinfo[i], sizeof(SpellExtHeader));
+		actual++;
+	}
+	return ret;
+}
+
+// returns the size of spellinfo vector, if type is nonzero it is used as filter
+// for example type==1 lists the number of different mage spells
+unsigned int Spellbook::GetSpellInfoSize(int type)
+{
+	size_t i = spellinfo.size();
+	if (!i) {
+		GenerateSpellInfo();
+		i = spellinfo.size();
+	}
+	if (type) {
+		return (unsigned int) i;
+	}
+	unsigned int count = 0;
+	while(i--) {
+		if (spellinfo[i]->type&type) {
+			count++;
+		}
+	}
+	return count;
+}
+
+SpellExtHeader *Spellbook::FindSpellInfo(unsigned int level, unsigned int type, ieResRef spellname)
+{
+	size_t i = spellinfo.size();
+	while(i--) {
+		if( (spellinfo[i]->level==level) && 
+			(spellinfo[i]->type==type) && 
+			!strnicmp(spellinfo[i]->spellname, spellname, 8)) {
+				return spellinfo[i];
+		}
+	}
+	return NULL;
+}
+
+// grouping the castable spells
+void Spellbook::GenerateSpellInfo()
+{
+	ClearSpellInfo(); //just in case
+	for (int i = 0; i < NUM_SPELL_TYPES; i++) {
+		for (unsigned int j = 0; j < spells[i].size(); j++) {
+			CRESpellMemorization* sm = spells[i][j];
+
+			for (unsigned int k = 0; k < sm->memorized_spells.size(); k++) {
+				CREMemorizedSpell* slot = sm->memorized_spells[k];
+				if (!slot)
+					continue;
+				if (!slot->Flags)
+					continue;
+				Spell *spl = core->GetSpell(slot->SpellResRef);
+				ieDword level = 0;
+				SpellExtHeader *seh = FindSpellInfo(sm->Level, sm->Type, slot->SpellResRef);
+				if (seh) {
+				  seh->count++;
+				  continue;
+				}
+				seh = new SpellExtHeader;
+				spellinfo.push_back( seh );
+
+				memcpy(seh->spellname, slot->SpellResRef, sizeof(ieResRef) );
+				int ehc;
+				
+				for(ehc=0;ehc<spl->ExtHeaderCount-1;ehc++) {
+				  if (level<spl->ext_headers[ehc+1].RequiredLevel) {
+				    break;
+				  }
+				}
+				SPLExtHeader *ext_header = spl->ext_headers+ehc;
+				seh->headerindex = ehc;
+				seh->level = sm->Level;
+				seh->type = sm->Type;
+				seh->slot = k;
+				seh->count = 1;
+				seh->SpellForm = ext_header->SpellForm;
+				memcpy(seh->MemorisedIcon, ext_header->MemorisedIcon,sizeof(ieResRef) );
+				seh->Target = ext_header->Target;
+				seh->TargetNumber = ext_header->TargetNumber;
+				seh->Range = ext_header->Range;
+				seh->Projectile = ext_header->ProjectileAnimation;
+				seh->CastingTime = (ieWord) ext_header->CastingTime;
+				seh->strref = spl->SpellName;
+				core->FreeSpell(spl, slot->SpellResRef, false);
+			}
+		}
+	}
+}
+
 void Spellbook::dump()
 {
 	unsigned int k;
