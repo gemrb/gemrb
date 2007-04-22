@@ -380,7 +380,7 @@ def SelectItem ():
 	if float_menu_selected == Button:
 		float_menu_selected = None
 	else:
-		float_menu_selected = Button+float_menu_index
+		float_menu_selected = Button
 	UpdateFloatMenuWindow()
 	return
 
