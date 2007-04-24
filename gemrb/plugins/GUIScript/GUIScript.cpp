@@ -7477,26 +7477,33 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
  	actor->spellbook.GetSpellInfo(&spelldata, type, spell, 1);
 
 	printf("Cast spell: %s\n", spelldata.spellname);
-	printf("Extended header: %d\n", spelldata.headerindex);
+	printf("Slot: %d\n", spelldata.slot);
+	printf("Type: %d\n", spelldata.type);
 	printf("Spellname: %s\n", core->GetString(spelldata.strref));
 	printf("Target: %d\n", spelldata.Target);
 	printf("Range: %d\n", spelldata.Range);
+	GameControl *gc = core->GetGameControl();
 	switch (spelldata.Target) {
 		case TARGET_SELF:
-			actor->CastSpell(spelldata.spellname, actor, true);
+			gc->SetupCasting(spelldata.type, spelldata.level, spelldata.slot, actor, GA_NO_DEAD, spelldata.TargetNumber);
+			gc->TryToCast(actor, actor);
 			break;
 		case TARGET_NONE:
+			//this is always instant casting
 			actor->CastSpell(spelldata.spellname, NULL, true);
 			break;
 		case TARGET_AREA:
-			core->GetGameControl()->SetupCasting(spelldata.type, spelldata.level, spelldata.slot, actor, GA_POINT, spelldata.TargetNumber);
+			gc->SetupCasting(spelldata.type, spelldata.level, spelldata.slot, actor, GA_POINT, spelldata.TargetNumber);
 			break;
 		case TARGET_CREA:
-			core->GetGameControl()->SetupCasting(spelldata.type, spelldata.level, spelldata.slot, actor, GA_NO_DEAD, spelldata.TargetNumber);
+			gc->SetupCasting(spelldata.type, spelldata.level, spelldata.slot, actor, GA_NO_DEAD, spelldata.TargetNumber);
 			break;
 		case TARGET_DEAD:
-			core->GetGameControl()->SetupCasting(spelldata.type, spelldata.level, spelldata.slot, actor, 0, spelldata.TargetNumber);
+			gc->SetupCasting(spelldata.type, spelldata.level, spelldata.slot, actor, 0, spelldata.TargetNumber);
 			break;
+		case TARGET_INV:
+			//bring up inventory in the end???
+			//break;
 		default:
 			printMessage("GUIScript", "Unhandled target type!", LIGHT_RED );
 			break;
