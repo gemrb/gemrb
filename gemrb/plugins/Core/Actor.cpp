@@ -1315,6 +1315,18 @@ void Actor::GetHit()
 	DisplayStringCore(this, VB_DAMAGE, DS_CONSOLE|DS_CONST );
 }
 
+bool Actor::HandleCastingStance(ieResRef SpellResRef, bool deplete)
+{
+	if (deplete) {
+		if (! spellbook.HaveSpell( SpellResRef, HS_DEPLETE )) {
+			SetStance(IE_ANI_READY);
+			return true;
+		}
+	}
+	SetStance(IE_ANI_CAST);
+	return false;
+}
+
 //returns actual damage
 int Actor::Damage(int damage, int damagetype, Actor *hitter)
 {
@@ -2302,7 +2314,7 @@ void Actor::SetColor( ieDword idx, ieDword grd)
 */
 }
 
-void Actor::SetColorMod( ieByte location, RGBModifier::Type type, int speed,
+void Actor::SetColorMod( ieDword location, RGBModifier::Type type, int speed,
 			 unsigned char r, unsigned char g, unsigned char b,
 			 int phase)
 {
@@ -2317,10 +2329,14 @@ void Actor::SetColorMod( ieByte location, RGBModifier::Type type, int speed,
 		ca->GlobalColorMod.rgb.b = b;
 		if (phase >= 0)
 			ca->GlobalColorMod.phase = phase;
+		else {
+			if (ca->GlobalColorMod.phase > 2*speed)
+				ca->GlobalColorMod.phase=0;
+		}
 		return;
 	}
 	//00xx0yyy-->000xxyyy
-	if (location&0xc8) return; //invalid location
+	if (location&0xffffffc8) return; //invalid location
 	location = (location &7) | ((location>>1)&0x18);
 	ca->ColorMods[location].type = type;
 	ca->ColorMods[location].speed = speed;
@@ -2329,6 +2345,10 @@ void Actor::SetColorMod( ieByte location, RGBModifier::Type type, int speed,
 	ca->ColorMods[location].rgb.b = b;
 	if (phase >= 0)
 		ca->ColorMods[location].phase = phase;
+	else {
+		if (ca->ColorMods[location].phase > 2*speed)
+			ca->ColorMods[location].phase = 0;
+	}
 }
 
 void Actor::SetLeader(Actor *actor, int xoffset, int yoffset)
@@ -3066,6 +3086,7 @@ bool Actor::UseItem(int slot, ieDword header, Scriptable* target, bool silent)
 	if ((header<CHARGE_COUNTERS) && !item->Usages[header]) {
 		return false;
 	}
+
 	Projectile *pro = itm->GetProjectile(header);
 	ChargeItem(slot, header, item, itm, silent);
 	core->FreeItem(itm,item->ItemResRef, false);
@@ -3100,63 +3121,6 @@ void Actor::ChargeItem(int slot, ieDword header, CREItem *item, Item *itm, bool 
 		default: //don't do anything
 			break;
 	}
-}
-
-bool Actor::CastSpellPoint( ieResRef SpellResRef, Point &target, bool deplete )
-{
-	if (deplete) {
-		if (! spellbook.HaveSpell( SpellResRef, HS_DEPLETE )) {
-			SetStance(IE_ANI_READY);
-			return false;
-		}
-	}
-
-	SetStance(IE_ANI_CONJURE);
-	Spell* spl = core->GetSpell( SpellResRef );
-	//cfb
-	int dummy;
-	EffectQueue *fxqueue=spl->GetEffectBlock(-1, dummy);
-	fxqueue->SetOwner(this);
-	fxqueue->ApplyAllEffects(this);
-	//spell
-	Projectile *pro=spl->GetProjectile(GetXPLevel(true));
-	if (pro) {
-		pro->SetCaster(globalID);
-		GetCurrentArea()->AddProjectile(pro, Pos, target);
-		return true;
-	}
-	return false;
-}
-
-bool Actor::CastSpell( ieResRef SpellResRef, Scriptable* target, bool deplete )
-{
-	if (target->Type!=ST_ACTOR) {
-		return CastSpellPoint(SpellResRef, target->Pos, deplete);
-	}
-
-	if (deplete) {
-		if (! spellbook.HaveSpell( SpellResRef, HS_DEPLETE )) {
-			SetStance(IE_ANI_READY);
-			return false;
-		}
-	}
-
-	SetStance(IE_ANI_CONJURE);
-	Actor *Target = (Actor *) target;
-	Spell* spl = core->GetSpell( SpellResRef );
-	//cfb
-	int dummy;
-	EffectQueue *fxqueue=spl->GetEffectBlock(-1, dummy);
-	fxqueue->SetOwner(this);
-	fxqueue->ApplyAllEffects(this);
-	//spell
-	Projectile *pro=spl->GetProjectile(GetXPLevel(true));
-	if (pro) {
-		pro->SetCaster(globalID);
-		GetCurrentArea()->AddProjectile(pro, Pos, Target->globalID);
-		return true;
-	}
-	return false;
 }
 
 bool Actor::IsReverseToHit()

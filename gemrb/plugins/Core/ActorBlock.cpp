@@ -25,9 +25,11 @@
 #include "Video.h"
 #include "SoundMgr.h"
 #include "Item.h"
+#include "Spell.h"
 #include "Map.h"
 #include "Game.h"
 #include "GameControl.h"
+#include "Projectile.h"
 
 #include <cassert>
 
@@ -72,6 +74,8 @@ Scriptable::Scriptable(ScriptableType type)
 	Pos.y = 0;
 	scriptName[0] = 0;
 
+	SpellHeader = -1;
+	LastTargetPos.empty();
 	locals = new Variables();
 	locals->SetType( GEM_VARIABLES_INT );
 	locals->ParseKey( 1 );
@@ -301,6 +305,15 @@ void Scriptable::ReleaseCurrentAction()
 	}
 }
 
+ieWord Scriptable::GetGlobalID()
+{
+	if (Type == ST_ACTOR) {
+		Actor *actor = (Actor *) this;
+		return actor->globalID;
+	}
+	return 0;
+}
+
 void Scriptable::ProcessActions(bool force)
 {
 	unsigned long thisTime = core->GetGame()->Ticks;
@@ -491,6 +504,122 @@ void Scriptable::SetBitTrigger(ieDword bittrigger)
 void Scriptable::AddTrigger(ieDword *actorref)
 {
 	tolist.push_back(actorref);
+}
+
+void Scriptable::CastSpellPointEnd( ieResRef SpellResRef )
+{
+	if (Type==ST_ACTOR) {
+		((Actor *) this)->SetStance(IE_ANI_CONJURE);
+	}
+
+	if (SpellHeader == -1) {
+		LastTargetPos.empty();
+		return;
+	}
+
+	if (LastTargetPos.isempty()) {
+		SpellHeader = -1;
+		return;
+	}
+
+	Spell* spl = core->GetSpell( SpellResRef );
+	//create projectile from known spellheader
+	Projectile *pro=spl->GetProjectile(SpellHeader);
+	SpellHeader = -1;
+	if (pro) {
+		pro->SetCaster(GetGlobalID());
+		GetCurrentArea()->AddProjectile(pro, Pos, LastTargetPos);
+	}
+}
+
+void Scriptable::CastSpellEnd( ieResRef SpellResRef )
+{
+	if (Type==ST_ACTOR) {
+		((Actor *) this)->SetStance(IE_ANI_CONJURE);
+	}
+
+	if (SpellHeader == -1) {
+		LastTarget=0;
+		return;
+	}
+	if (!LastTarget) {
+		SpellHeader = -1;
+		return;
+	}
+	Spell* spl = core->GetSpell( SpellResRef );
+	//create projectile from known spellheader
+	Projectile *pro=spl->GetProjectile(SpellHeader);
+	if (pro) {
+		pro->SetCaster(GetGlobalID());
+		GetCurrentArea()->AddProjectile(pro, Pos, LastTarget);
+	}
+	core->FreeSpell(spl, SpellResRef, false);
+}
+
+//set target as point
+//if spell needs to be depleted, do it
+//if spell is illegal stop casting
+void Scriptable::CastSpellPoint( ieResRef SpellResRef, Point &target, bool deplete )
+{
+	LastTarget = 0;
+	LastTargetPos.empty();
+	if (Type==ST_ACTOR) {
+		Actor *actor = (Actor *) this;
+		if (actor->HandleCastingStance(SpellResRef,deplete) ) {
+			return;
+		}
+	}
+	LastTarget = 0;
+	LastTargetPos = target;
+	SpellCast(SpellResRef);
+}
+
+//set target as actor (if target isn't actor, use its position)
+//if spell needs to be depleted, do it
+//if spell is illegal stop casting
+void Scriptable::CastSpell( ieResRef SpellResRef, Scriptable* target, bool deplete )
+{
+	LastTarget = 0;
+	LastTargetPos.empty();
+	if (Type==ST_ACTOR) {
+		Actor *actor = (Actor *) this;
+		if (actor->HandleCastingStance(SpellResRef,deplete) ) {
+			return;
+		}
+	}
+
+	if (target->Type!=ST_ACTOR) {
+		LastTargetPos = target->Pos;
+	} else {
+		LastTarget = target->GetGlobalID();
+	}
+	SpellCast(SpellResRef);
+}
+
+//start spellcasting (common part)
+void Scriptable::SpellCast(ieResRef SpellResRef)
+{
+	Spell* spl = core->GetSpell( SpellResRef );
+	if (!spl) {
+		SpellHeader = -1;
+		return;
+	}
+
+	//cfb
+	int level = 0;
+	if (Type==ST_ACTOR) {
+		Actor *actor = (Actor *) this;
+		EffectQueue *fxqueue=spl->GetEffectBlock(-1);
+		fxqueue->SetOwner(actor);
+		fxqueue->ApplyAllEffects(actor);
+		delete fxqueue;
+		level = ((Actor *) this)->GetXPLevel(true);
+	}
+
+	SpellHeader = spl->GetHeaderIndexFromLevel(level);
+	SPLExtHeader *header = spl->GetExtHeader(SpellHeader);
+	SetWait(header->CastingTime*AI_UPDATE_TIME);
+	core->FreeSpell(spl, SpellResRef, false);
 }
 
 /********************
@@ -720,6 +849,13 @@ Point Movable::GetMostLikelyPosition()
 
 void Movable::SetStance(unsigned int arg)
 {
+	if (StanceID==IE_ANI_DIE) {
+		if (GetInternalFlag()&IF_REALLYDIED) {
+			printMessage("Movable","Stance overridden by death\n", YELLOW);
+			return;
+		}
+	}
+
 	if (arg<MAX_ANIMS) {
 		 StanceID=(unsigned char) arg;
 
@@ -1250,8 +1386,7 @@ InfoPoint::InfoPoint(void)
 	TrapDetectionDiff = 0;
 	TrapRemovalDiff = 0;
 	TrapDetected = 0;
-	TrapLaunch.x = 0; 
-	TrapLaunch.y = 0;
+	TrapLaunch.empty();
 	Dialog[0] = 0;
 }
 

@@ -146,17 +146,19 @@ public:
 
 public:
 	//returns the requested extended header
-	SPLExtHeader *GetExtHeader(unsigned int which) const
+	inline SPLExtHeader *GetExtHeader(unsigned int which) const
 	{
 		if(ExtHeaderCount<=which) {
 			return NULL;
 		}
 		return ext_headers+which;
 	}
+	//converts a wanted level to block index count
+	int GetHeaderIndexFromLevel(int level) const;
 	//-1 will return the cfb
-	EffectQueue *GetEffectBlock(int wanted_level, int &block_index) const;
+	EffectQueue *GetEffectBlock(int block_index) const;
 	//returns a projectile created from an extended header
-	Projectile *GetProjectile(int wanted_level) const;
+	Projectile *GetProjectile(int headerindex) const;
 };
 
 #endif  // ! SPELL_H

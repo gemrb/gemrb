@@ -119,9 +119,9 @@ static TriggerLink triggernames[] = {
 	{"glt", GameScript::GLT_Trigger, 0},
 	{"global", GameScript::Global,TF_MERGESTRINGS},
 	{"globalandglobal", GameScript::GlobalAndGlobal_Trigger,TF_MERGESTRINGS},
-	{"globalband", GameScript::BitCheck,AF_MERGESTRINGS},
-	{"globalbandglobal", GameScript::GlobalBAndGlobal_Trigger,AF_MERGESTRINGS},
-	{"globalbandglobalexact", GameScript::GlobalBAndGlobalExact,AF_MERGESTRINGS},
+	{"globalband", GameScript::BitCheck,TF_MERGESTRINGS},
+	{"globalbandglobal", GameScript::GlobalBAndGlobal_Trigger,TF_MERGESTRINGS},
+	{"globalbandglobalexact", GameScript::GlobalBAndGlobalExact,TF_MERGESTRINGS},
 	{"globalbitglobal", GameScript::GlobalBitGlobal_Trigger,TF_MERGESTRINGS},
 	{"globalequalsglobal", GameScript::GlobalsEqual,TF_MERGESTRINGS}, //this is the same
 	{"globalgt", GameScript::GlobalGT,TF_MERGESTRINGS},
@@ -394,14 +394,14 @@ static ActionLink actionnames[] = {
 	{"applyspell", GameScript::ApplySpell, 0},
 	{"applyspellpoint", GameScript::ApplySpellPoint, 0}, //gemrb extension
 	{"attachtransitiontodoor", GameScript::AttachTransitionToDoor, 0},
-	{"attack", GameScript::Attack,AF_BLOCKING},
-	{"attacknosound", GameScript::AttackNoSound,AF_BLOCKING}, //no sound yet anyway
-	{"attackoneround", GameScript::AttackOneRound,AF_BLOCKING},
-	{"attackreevaluate", GameScript::AttackReevaluate,AF_BLOCKING},
-	{"backstab", GameScript::Attack,AF_BLOCKING},//actually hide+attack
-	{"bashdoor", GameScript::BashDoor,AF_BLOCKING}, //the same until we know better
-	{"battlesong", GameScript::BattleSong, 0},
-	{"berserk", GameScript::Berserk, 0}, 
+	{"attack", GameScript::Attack,AF_BLOCKING|AF_ALIVE},
+	{"attacknosound", GameScript::AttackNoSound,AF_BLOCKING|AF_ALIVE}, //no sound yet anyway
+	{"attackoneround", GameScript::AttackOneRound,AF_BLOCKING|AF_ALIVE},
+	{"attackreevaluate", GameScript::AttackReevaluate,AF_BLOCKING|AF_ALIVE},
+	{"backstab", GameScript::Attack,AF_BLOCKING|AF_ALIVE},//actually hide+attack
+	{"bashdoor", GameScript::BashDoor,AF_BLOCKING|AF_ALIVE}, //the same until we know better
+	{"battlesong", GameScript::BattleSong, AF_ALIVE},
+	{"berserk", GameScript::Berserk, AF_ALIVE}, 
 	{"bitclear", GameScript::BitClear,AF_MERGESTRINGS},
 	{"bitglobal", GameScript::BitGlobal,AF_MERGESTRINGS},
 	{"bitset", GameScript::GlobalBOr,AF_MERGESTRINGS}, //probably the same
@@ -537,9 +537,9 @@ static ActionLink actionnames[] = {
 	{"floatmessagefixedrnd", GameScript::FloatMessageFixedRnd, 0},
 	{"floatmessagernd", GameScript::FloatMessageRnd, 0},
 	{"floatrebus", GameScript::FloatRebus, 0},
-	{"follow", GameScript::Follow, 0},
-	{"followcreature", GameScript::FollowCreature, AF_BLOCKING}, //pst
-	{"followobjectformation", GameScript::FollowObjectFormation, AF_BLOCKING},
+	{"follow", GameScript::Follow, AF_ALIVE},
+	{"followcreature", GameScript::FollowCreature, AF_BLOCKING|AF_ALIVE}, //pst
+	{"followobjectformation", GameScript::FollowObjectFormation, AF_BLOCKING|AF_ALIVE},
 	{"forceaiscript", GameScript::ForceAIScript, 0},
 	{"forceattack", GameScript::ForceAttack, 0},
 	{"forcefacing", GameScript::ForceFacing, 0},
@@ -646,12 +646,12 @@ static ActionLink actionnames[] = {
 	{"moveviewobject", GameScript::MoveViewObject, AF_BLOCKING},
 	{"moveviewpoint", GameScript::MoveViewPoint, AF_BLOCKING},
 	{"moveviewpointuntildone", GameScript::MoveViewPoint, 0},
-	{"nidspecial1", GameScript::NIDSpecial1,AF_BLOCKING|AF_DIRECT},//we use this for dialogs, hack
+	{"nidspecial1", GameScript::NIDSpecial1,AF_BLOCKING|AF_DIRECT|AF_ALIVE},//we use this for dialogs, hack
 	{"nidspecial2", GameScript::NIDSpecial2,AF_BLOCKING},//we use this for worldmap, another hack
-	{"nidspecial3", GameScript::Attack,AF_BLOCKING|AF_DIRECT},//this hack is for attacking preset target
-	{"nidspecial4", GameScript::ProtectObject,AF_BLOCKING|AF_DIRECT},
-	{"nidspecial5", GameScript::UseItem, AF_BLOCKING|AF_DIRECT},
-	{"nidspecial6", GameScript::Spell, AF_BLOCKING|AF_DIRECT},
+	{"nidspecial3", GameScript::Attack,AF_BLOCKING|AF_DIRECT|AF_ALIVE},//this hack is for attacking preset target
+	{"nidspecial4", GameScript::ProtectObject,AF_BLOCKING|AF_DIRECT|AF_ALIVE},
+	{"nidspecial5", GameScript::UseItem, AF_BLOCKING|AF_DIRECT|AF_ALIVE},
+	{"nidspecial6", GameScript::Spell, AF_BLOCKING|AF_DIRECT|AF_ALIVE},
 	{"noaction", GameScript::NoAction, 0},
 	{"opendoor", GameScript::OpenDoor,AF_BLOCKING},
 	{"panic", GameScript::Panic, 0},
@@ -794,9 +794,9 @@ static ActionLink actionnames[] = {
 	{"spawnptactivate", GameScript::SpawnPtActivate, 0},
 	{"spawnptdeactivate", GameScript::SpawnPtDeactivate, 0},
 	{"spawnptspawn", GameScript::SpawnPtSpawn, 0},
-	{"spell", GameScript::Spell, AF_BLOCKING},
+	{"spell", GameScript::Spell, AF_BLOCKING|AF_ALIVE},
 	{"spellhiteffectsprite", GameScript::SpellHitEffectSprite, 0},
-	{"spellpoint", GameScript::SpellPoint, AF_BLOCKING},
+	{"spellpoint", GameScript::SpellPoint, AF_BLOCKING|AF_ALIVE},
 	{"startcutscene", GameScript::StartCutScene, 0},
 	{"startcutsceneex", GameScript::StartCutScene, 0}, //pst (unknown)
 	{"startcutscenemode", GameScript::StartCutSceneMode, 0},
@@ -3011,6 +3011,13 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 		//uninterruptable actions will set it back
 		if (Sender->Type==ST_ACTOR) {
 			Sender->Activate();
+			if (actionflags[actionID]&AF_ALIVE) {
+				if (Sender->GetInternalFlag()&IF_STOPATTACK) {
+					printMessage("GameScript", "Aborted action due to death", YELLOW);
+					Sender->ReleaseCurrentAction();
+					return;
+				}
+			}
 		}
 		func( Sender, aC );
 	} else {

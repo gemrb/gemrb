@@ -44,26 +44,35 @@ Spell::~Spell(void)
 	core->FreeSPLExt(ext_headers, casting_features);
 }
 
+int Spell::GetHeaderIndexFromLevel(int level) const
+{
+	if (level<0) return -1;
+	if (Flags & SF_SIMPLIFIED_DURATION) {
+		return level;
+	}
+	int block_index;
+	for(block_index=0;block_index<ExtHeaderCount-1;block_index++) {
+		if (ext_headers[block_index+1].RequiredLevel>level) {
+			return block_index;
+		}
+	}
+	return ExtHeaderCount-1;
+}
+
 //-1 will return cfb
 //0 will always return first spell block
 //otherwise set to caster level
-EffectQueue *Spell::GetEffectBlock(int level, int &block_index) const
+EffectQueue *Spell::GetEffectBlock(int block_index) const
 {
 	Effect *features;
 	int count;
-
-	block_index=0;
+	
 	//iwd2 has this hack
-	if (level>=0) {
+	if (block_index>=0) {
 		if (Flags & SF_SIMPLIFIED_DURATION) {
 			features = ext_headers[0].features;
 			count = ext_headers[0].FeatureCount;
 		} else {
-			for(block_index=0;block_index<ExtHeaderCount-1;block_index++) {
-				if (ext_headers[block_index+1].RequiredLevel>level) {
-					break;
-				}
-			}
 			features = ext_headers[block_index].features;
 			count = ext_headers[block_index].FeatureCount;
 		}
@@ -79,7 +88,7 @@ EffectQueue *Spell::GetEffectBlock(int level, int &block_index) const
 			//fxqueue->AddEffect will copy the effect,
 			//so we don't risk any overwriting
 			if (EffectQueue::HasDuration(features+i)) {
-				features[i].Duration=(TimePerLevel*level+TimeConstant)*7;
+				features[i].Duration=(TimePerLevel*block_index+TimeConstant)*7;
 			}
 		}
 		fxqueue->AddEffect( features+i );
@@ -87,15 +96,14 @@ EffectQueue *Spell::GetEffectBlock(int level, int &block_index) const
 	return fxqueue;
 }
 
-Projectile *Spell::GetProjectile(int level) const
+Projectile *Spell::GetProjectile(int header) const
 {
-	int ext_block;
-	EffectQueue *fx = GetEffectBlock(level, ext_block);
-	if (fx->GetEffectsCount()) {
-		Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(ext_headers[ext_block].ProjectileAnimation);
-		pro->SetEffects(fx);
+	SPLExtHeader *seh = GetExtHeader(header);
+	if (seh->FeatureCount) {
+		Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(seh->ProjectileAnimation);
+
+		pro->SetEffects(GetEffectBlock(header));
 		return pro;
 	}
 	return NULL;
 }
-

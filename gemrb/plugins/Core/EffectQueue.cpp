@@ -462,6 +462,7 @@ bool EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget)
 		flg = false;
 		break;
 	}
+
 	return flg;
 }
 

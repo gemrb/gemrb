@@ -319,6 +319,8 @@ public:
 	void DialogInterrupt();
 	/* called when actor was hit */
 	void GetHit();
+	/* called when actor starts to cast a spell*/
+	bool HandleCastingStance(ieResRef SpellResRef, bool deplete);
 	/* deals damage to this actor */
 	int Damage(int damage, int damagetype, Actor *hitter);
 	/* drops items from inventory to current spot */
@@ -361,7 +363,7 @@ public:
 	/* returns the ranged weapon header associated with the currently equipped projectile */
 	int GetRangedWeapon(ITMExtHeader *&which);
 	/* Returns current weapon range and extended header
-	   if range is nonzero, then which is valid */
+	 if range is nonzero, then which is valid */
 	unsigned int GetWeapon(ITMExtHeader *&which, bool leftorright=false);
 	/* Creates player statistics */
 	void CreateStats();
@@ -385,8 +387,8 @@ public:
 	void DealDamage(Actor *target, int damage,int damagetype, bool critical);
 	/* sets a colour gradient stat, handles location */
 	void SetColor( ieDword idx, ieDword grd);
-	/* sets an RGB colour modification effect; location -1 for global */
-	void SetColorMod( ieByte location, RGBModifier::Type type, int speed, 
+	/* sets an RGB colour modification effect; location 0xff for global */
+	void SetColorMod( ieDword location, RGBModifier::Type type, int speed, 
 		unsigned char r, unsigned char g, unsigned char b,
 		int phase=-1 );
 	bool Schedule(ieDword gametime);
@@ -437,9 +439,6 @@ public:
 	bool UseItem(int slot, ieDword header, Scriptable *target, bool silent);
 	/* Deducts a charge from an item */
 	void ChargeItem(int slot, ieDword header, CREItem *item, Item *itm, bool silent);
-	/* actor casts spell */
-	bool CastSpellPoint( ieResRef SpellResRef, Point &Target, bool deplete );
-	bool CastSpell( ieResRef SpellResRef, Scriptable* Target, bool deplete );
 	/* If it returns true, then default AC=10 and the lesser the better */
 	bool IsReverseToHit();
 	void InitButtons(ieDword cls);

@@ -189,8 +189,7 @@ public:
 		string1Parameter[0] = 0;
 		int0Parameter = 0;
 		int1Parameter = 0;
-		pointParameter.x = 0;
-		pointParameter.y = 0;
+		pointParameter.null();
 		canary = (unsigned long) 0xdeadbeef;
 	};
 	~Trigger()
@@ -283,8 +282,7 @@ public:
 		string0Parameter[0] = 0;
 		string1Parameter[0] = 0;
 		int0Parameter = 0;
-		pointParameter.x = 0;
-		pointParameter.y = 0;
+		pointParameter.null();
 		int1Parameter = 0;
 		int2Parameter = 0;
 		//changed now
@@ -574,7 +572,7 @@ struct TriggerLink {
 #define AF_SCRIPTLEVEL   64  //this hack will transfer scriptlevel to int0parameter at runtime (changecurrentscript relies on it)
 #define AF_INVALID       128
 #define AF_DIRECT        256 //this hack will transfer target from gamecontrol to object1 at compile time
-
+#define AF_ALIVE         512 //only alive actors can do this
 struct ActionLink {
 	const char* Name;
 	ActionFunction Function;
@@ -1225,6 +1223,7 @@ public:
 	static void RealSetGlobalTimer(Scriptable* Sender, Action* parameters);
 	static void ReallyForceSpell(Scriptable* Sender, Action* parameters);
 	static void ReallyForceSpellDead(Scriptable* Sender, Action* parameters);
+	static void ReallyForceSpellPoint(Scriptable* Sender, Action* parameters);
 	static void Recoil(Scriptable* Sender, Action* parameters);
 	static void RegainPaladinHood(Scriptable* Sender, Action* parameters);
 	static void RegainRangerHood(Scriptable* Sender, Action* parameters);

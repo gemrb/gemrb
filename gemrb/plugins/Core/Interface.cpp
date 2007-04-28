@@ -4862,11 +4862,8 @@ void Interface::ApplySpell(const ieResRef resname, Actor *actor, Actor *caster, 
 
 	actor->RollSaves();
 
-	if (!level) {
-		level = 1;
-	}
-	int dummy; //the extended header #
-	EffectQueue *fxqueue = spell->GetEffectBlock(level, dummy);
+	level = spell->GetHeaderIndexFromLevel(level);
+	EffectQueue *fxqueue = spell->GetEffectBlock(level);
 
 	//check effect immunities
 	int res = fxqueue->CheckImmunity ( actor );
@@ -4880,17 +4877,14 @@ void Interface::ApplySpell(const ieResRef resname, Actor *actor, Actor *caster, 
 	delete fxqueue;
 }
 
-void Interface::ApplySpellPoint(const ieResRef resname, Scriptable* /*target*/, Point &/*pos*/, Actor *caster, int level)
+void Interface::ApplySpellPoint(const ieResRef resname, Scriptable* /*area*/, Point &/*pos*/, Actor *caster, int level)
 {
 	Spell *spell = GetSpell(resname);
 	if (!spell) {
 		return;
 	}
-	if (!level) {
-		level = 1;
-	}
-	int dummy;
-	EffectQueue *fxqueue = spell->GetEffectBlock(level, dummy);
+	level = spell->GetHeaderIndexFromLevel(level);
+	EffectQueue *fxqueue = spell->GetEffectBlock(level);
 	fxqueue->SetOwner( caster );
 	//add effect to area???
 	delete fxqueue;

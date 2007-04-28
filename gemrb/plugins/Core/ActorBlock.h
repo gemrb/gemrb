@@ -188,13 +188,15 @@ public:
 	ieDword LastTrigger;  // also LastClosed
 	ieDword LastEntered;  // also LastOpened
 	ieDword LastDisarmed; // also LastAttacker
-	ieDword LastDisarmFailed;
+	ieDword LastDisarmFailed; //also LastTarget
 	ieDword LastUnlocked;
 	ieDword LastOpenFailed; // also LastPickpocketFailed
 	ieDword LastPickLockFailed;
 	std::list< Action*> actionQueue;
 	Action* CurrentAction;
 	unsigned long playDeadCounter;
+	Point LastTargetPos;
+	int SpellHeader;
 public:
 	/** Gets the Dialog ResRef */
 	const char* GetDialog(void) const
@@ -243,6 +245,16 @@ public:
 	void AddTrigger(ieDword *actorref);
 	/* re/draws overhead text on the map screen */
 	void DrawOverheadText(Region &screen);
+	/* actor/scriptable casts spell */
+	void CastSpellPoint( ieResRef SpellResRef, Point &Target, bool deplete );
+	void CastSpell( ieResRef SpellResRef, Scriptable* Target, bool deplete );
+	/* spellcasting finished */
+	void CastSpellPointEnd( ieResRef SpellResRef);
+	void CastSpellEnd( ieResRef SpellResRef);
+	ieWord GetGlobalID();
+private:
+	/* used internally to handle start of spellcasting */
+	void SpellCast(ieResRef SpellResRef);
 };
 
 class GEM_EXPORT Selectable : public Scriptable {

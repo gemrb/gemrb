@@ -240,7 +240,7 @@ public:
 	}
 
 	//-1 will return the equipping feature block
-	EffectQueue *GetEffectBlock(int usage) const;
+	EffectQueue *GetEffectBlock(int header) const;
 	//returns a projectile created from an extended header
 	Projectile *GetProjectile(int header) const;
 	//Builds an equipping glow effect from gradient colour

@@ -2071,91 +2071,109 @@ void GameScript::MoveBetweenAreas(Scriptable* Sender, Action* parameters)
 		parameters->pointParameter, parameters->int0Parameter, true);
 }
 
+//spell is depleted, casting time is calculated
 void GameScript::Spell(Scriptable* Sender, Action* parameters)
 {
 	ieResRef spellres;
 
-printf("Spell casting\n");
+	//resolve spellname
 	if (!ResolveSpellName( spellres, parameters) ) {
-printf("failed to resolve\n");
 		Sender->ReleaseCurrentAction();
 		return;
 	}
 
+	//if target was set, fire spell
+	if (Sender->LastTarget) {
+		Sender->CastSpellEnd( spellres );
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	//parse target
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	if (Sender->Type == ST_ACTOR) {
-		Actor *actor = (Actor *) Sender;
-		actor->SetStance (IE_ANI_CAST);
-		actor->CastSpell (spellres, tar, true);
+
+	//set target
+	Sender->CastSpell( spellres, tar, true );
+
+	//if target was set, feed action back
+	if (Sender->LastTarget) {
+		Sender->AddActionInFront( Sender->CurrentAction );
 	}
-	Point s,d;
-	GetPositionFromScriptable( Sender, s, false );
-	GetPositionFromScriptable( tar, d, false );
-printf( "Spell from [%d,%d] to [%d,%d]\n", s.x, s.y, d.x, d.y );
-	//this might be bad
-	Sender->ReleaseCurrentAction();
 }
 
+//spell is depleted, casting time is calculated
 void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
 {
 	ieResRef spellres;
 
-printf("Spell casting\n");
+	//resolve spellname
 	if (!ResolveSpellName( spellres, parameters) ) {
-printf("failed to resolve\n");
 		Sender->ReleaseCurrentAction();
 		return;
 	}
 
+	//if target was set, fire spell
+	if (!Sender->LastTargetPos.isempty()) {
+		Sender->CastSpellPointEnd( spellres );
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	//parse target
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	if (Sender->Type == ST_ACTOR) {
-		Actor *actor = (Actor *) Sender;
-		actor->SetStance (IE_ANI_CAST);
-		actor->CastSpellPoint (spellres, parameters->pointParameter, true);
+
+	//set target
+	Sender->CastSpellPoint( spellres, parameters->pointParameter, true );
+
+	//if target was set, feed action back
+	if (!Sender->LastTargetPos.isempty()) {
+		Sender->AddActionInFront( Sender->CurrentAction );
 	}
-	Point s;
-	GetPositionFromScriptable( Sender, s, false );
-	printf( "Spell from [%d,%d] to [%d,%d]\n", s.x, s.y, parameters->pointParameter.x, parameters->pointParameter.y );
-	//this might be bad
-	Sender->ReleaseCurrentAction();
 }
 
-//it is unsure how the ForceSpell actions differ
+//spell isn't depleted, but casting time is calculated
 void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 {
 	ieResRef spellres;
 
+	//resolve spellname
 	if (!ResolveSpellName( spellres, parameters) ) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
 
+	//if target was set, fire spell
+	if (!Sender->LastTarget) {
+		Sender->CastSpellEnd( spellres );
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	//parse target
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	if (Sender->Type == ST_ACTOR) {
-		Actor *actor = (Actor *) Sender;
-		actor->SetStance (IE_ANI_CAST);
-		actor->CastSpell (spellres, tar, false);
+
+	//set target
+	Sender->CastSpell (spellres, tar, false);
+
+	//if target was set, feed action back
+	if (Sender->LastTarget) {
+		Sender->AddActionInFront( Sender->CurrentAction );
 	}
-	Point s,d;
-	GetPositionFromScriptable( Sender, s, false );
-	GetPositionFromScriptable( tar, d, false );
-	printf( "ForceSpell from [%d,%d] to [%d,%d]\n", s.x, s.y, d.x, d.y );
-	//this might be bad
-	Sender->ReleaseCurrentAction();
 }
 
+//spell isn't depleted, but casting time is calculated
 void GameScript::ForceSpellPoint(Scriptable* Sender, Action* parameters)
 {
 	ieResRef spellres;
@@ -2165,23 +2183,30 @@ void GameScript::ForceSpellPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
+	//if target was set, fire spell
+	if (!Sender->LastTargetPos.isempty()) {
+		Sender->CastSpellPointEnd( spellres );
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	//parse target
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
 	if (!tar) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	if (Sender->Type == ST_ACTOR) {
-		Actor *actor = (Actor *) Sender;
-		actor->SetStance (IE_ANI_CAST);
-		actor->CastSpellPoint (spellres, parameters->pointParameter, false);
+
+	//set target
+	Sender->CastSpellPoint (spellres, parameters->pointParameter, false);
+
+	//if target was set, feed action back
+	if (!Sender->LastTargetPos.isempty()) {
+		Sender->AddActionInFront( Sender->CurrentAction );
 	}
-	Point s;
-	GetPositionFromScriptable( Sender, s, false );
-	printf( "ForceSpell from [%d,%d] to [%d,%d]\n", s.x, s.y, parameters->pointParameter.x, parameters->pointParameter.y );
-	//this might be bad
-	Sender->ReleaseCurrentAction();
 }
 
+//zero casting time, no depletion
 void GameScript::ReallyForceSpell(Scriptable* Sender, Action* parameters)
 {
 	ieResRef spellres;
@@ -2196,25 +2221,42 @@ void GameScript::ReallyForceSpell(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Actor *actor = NULL;
-	if (Sender->Type == ST_ACTOR) {
-		actor = (Actor *) Sender;
-		actor->SetStance (IE_ANI_CAST);
-	}
-	Point s,d;
-	GetPositionFromScriptable( Sender, s, false );
-	GetPositionFromScriptable( tar, d, false );
-	printf( "ReallyForceSpell from [%d,%d] to [%d,%d]\n", s.x, s.y, d.x, d.y );
-	//temporarily
 	if (tar->Type==ST_ACTOR) {
-		core->ApplySpell(spellres, (Actor *) tar, actor, 0);
+		Sender->LastTarget=tar->GetGlobalID();
 	} else {
-		core->ApplySpellPoint(spellres, tar, tar->Pos, actor, 0);
+		GetPositionFromScriptable(tar, Sender->LastTargetPos, false);
 	}
+	Sender->CastSpellPointEnd(spellres);
+	Sender->ReleaseCurrentAction();
+}
+
+//zero casting time, no depletion (finish casting at point)
+//no CFB
+void GameScript::ReallyForceSpellPoint(Scriptable* Sender, Action* parameters)
+{
+	ieResRef spellres;
+
+	if (!ResolveSpellName( spellres, parameters) ) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	Sender->LastTargetPos=parameters->pointParameter;
+	if (Sender->Type == ST_ACTOR) {
+		Actor *actor = (Actor *) Sender;
+		actor->SetStance (IE_ANI_CONJURE);
+	}
+	Sender->CastSpellPointEnd(spellres);
 	Sender->ReleaseCurrentAction();
 }
 
 // this differs from ReallyForceSpell that this one allows dead Sender casting
+// zero casting time, no depletion
 void GameScript::ReallyForceSpellDead(Scriptable* Sender, Action* parameters)
 {
 	ieResRef spellres;
@@ -2229,21 +2271,12 @@ void GameScript::ReallyForceSpellDead(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Actor *actor = NULL;
+	Sender->LastTargetPos=parameters->pointParameter;
 	if (Sender->Type == ST_ACTOR) {
-		actor = (Actor *) Sender;
+		Actor *actor = (Actor *) Sender;
+		actor->SetStance (IE_ANI_CONJURE);
 	}
-	Point s,d;
-	GetPositionFromScriptable( Sender, s, false );
-	GetPositionFromScriptable( tar, d, false );
-	printf( "ReallyForceSpellDead from [%d,%d] to [%d,%d]\n", s.x, s.y, d.x, d.y );
-	//this might be bad
-	//temporarily
-	if (tar->Type==ST_ACTOR) {
-		core->ApplySpell(spellres, (Actor *) tar, actor, 0);
-	} else {
-		core->ApplySpellPoint(spellres, tar, tar->Pos, actor, 0);
-	}
+	Sender->CastSpellPointEnd(spellres);
 	Sender->ReleaseCurrentAction();
 }
 
@@ -2640,9 +2673,8 @@ void GameScript::PlayDead(Scriptable* Sender, Action* parameters)
 	Actor* actor = ( Actor* ) Sender;
 	actor->SetStance( IE_ANI_DIE );
 	actor->NoInterrupt();
-	//actor->InternalFlags|=IF_NOINT;
 	actor->playDeadCounter = parameters->int0Parameter;
-	actor->SetWait( parameters->int0Parameter );
+	actor->SetWait( 1 );
 }
 
 /** no difference at this moment, but this action should be interruptable */
@@ -2657,7 +2689,7 @@ void GameScript::PlayDeadInterruptable(Scriptable* Sender, Action* parameters)
 	actor->SetStance( IE_ANI_DIE );
 	//also set time for playdead!
 	actor->playDeadCounter = parameters->int0Parameter;
-	actor->SetWait( parameters->int0Parameter );
+	actor->SetWait( 1 );
 }
 
 /* this may not be correct, just a placeholder you can fix */
@@ -4253,10 +4285,12 @@ void GameScript::RemoveSpell( Scriptable* Sender, Action* parameters)
 	}
 	Actor *actor = (Actor *) Sender;
 	if (parameters->string0Parameter[0]) {
-		actor->spellbook.HaveSpell(parameters->string0Parameter, HS_DEPLETE);
+		//actor->spellbook.HaveSpell(parameters->string0Parameter, HS_DEPLETE);
+		actor->spellbook.RemoveSpell(parameters->string0Parameter);
 		return;
 	}
 	actor->spellbook.HaveSpell(parameters->int0Parameter, HS_DEPLETE);
+	actor->spellbook.RemoveSpell(parameters->int0Parameter);
 }
 
 void GameScript::SetScriptName( Scriptable* Sender, Action* parameters)
@@ -4903,7 +4937,9 @@ void GameScript::ApplySpell(Scriptable* Sender, Action* parameters)
 			owner = NULL;
 		}
 		//apply spell on point
-		core->ApplySpellPoint(spellres, tar, tar->Pos, owner, parameters->int1Parameter);
+		Point d;
+		GetPositionFromScriptable(tar, d, false);
+		core->ApplySpellPoint(spellres, tar->GetCurrentArea(), d, owner, parameters->int1Parameter);
 	}
 }
 
@@ -4921,8 +4957,7 @@ void GameScript::ApplySpellPoint(Scriptable* Sender, Action* parameters)
 	} else {
 		owner = NULL;
 	}
-	Scriptable *tar = Sender->GetCurrentArea();
-	core->ApplySpellPoint(spellres, tar, parameters->pointParameter, owner, parameters->int1Parameter);
+	core->ApplySpellPoint(spellres, Sender->GetCurrentArea(), parameters->pointParameter, owner, parameters->int1Parameter);
 }
 
 //this is a gemrb extension
@@ -5361,8 +5396,7 @@ void GameScript::FollowCreature(Scriptable* Sender, Action* parameters)
 	Actor *scr = (Actor *)Sender;
 	Actor *actor = (Actor *)tar;
 	scr->LastFollowed = actor->GetID();
-	scr->FollowOffset.x = -1;
-	scr->FollowOffset.y = -1;
+	scr->FollowOffset.empty();
 }
 
 void GameScript::RunFollow(Scriptable* Sender, Action* parameters)
@@ -5378,8 +5412,7 @@ void GameScript::RunFollow(Scriptable* Sender, Action* parameters)
 	Actor *scr = (Actor *)Sender;
 	Actor *actor = (Actor *)tar;
 	scr->LastFollowed = actor->GetID();
-	scr->FollowOffset.x = -1;
-	scr->FollowOffset.y = -1;
+	scr->FollowOffset.empty();
 	scr->WalkTo(actor->Pos, IF_RUNNING, 1);
 	Sender->ReleaseCurrentAction();
 }

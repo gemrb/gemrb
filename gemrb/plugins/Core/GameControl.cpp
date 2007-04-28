@@ -99,8 +99,7 @@ GameControl::GameControl(void)
 	overContainer = NULL;
 	overInfoPoint = NULL;
 	drawPath = NULL;
-	pfs.x = 0;
-	pfs.y = 0;
+	pfs.null();
 	lastCursor = IE_CURSOR_NORMAL;
 	moveX = moveY = 0;
 	DebugFlags = 0;
@@ -590,8 +589,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			case 'c':
 				if (game->selected.size() > 0 && lastActor) {
 					Actor *src = game->selected[0];
-					bool res = src->CastSpell( "SPWI207", lastActor, false );
-					printf( "Cast Spell: %d\n", res );
+					src->CastSpell( "SPWI207", lastActor, false );
 				}
 				break;
 
