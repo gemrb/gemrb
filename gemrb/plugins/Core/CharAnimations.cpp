@@ -423,7 +423,7 @@ CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
 	}
 	GlobalColorMod.type = RGBModifier::NONE;
 	GlobalColorMod.speed = 0;
-
+	GlobalColorMod.phase = 0;
 	lastModUpdate = 0;
 
 
@@ -652,7 +652,7 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 			break;
 		case IE_ANI_WALK:
 		case IE_ANI_RUN:
-		case IE_ANI_CAST: //IE_ANI_CONJURE is the ending casting anim
+		case IE_ANI_CAST: // looping
 		case IE_ANI_READY:
 			break;
 		case IE_ANI_AWAKE:
@@ -664,7 +664,7 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 			nextStanceID = IE_ANI_AWAKE;
 			autoSwitchOnEnd = true;
 			break;
-		case IE_ANI_CONJURE:
+		case IE_ANI_CONJURE: //ending
 		case IE_ANI_SHOOT:
 		case IE_ANI_ATTACK:
 		case IE_ANI_ATTACK_JAB:
@@ -820,6 +820,7 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 			case IE_ANI_DIE:
 			case IE_ANI_PST_START:
 			case IE_ANI_HEAD_TURN:
+			case IE_ANI_CONJURE:
 				a->Flags |= A_ANI_PLAYONCE;
 				break;
 			case IE_ANI_EMERGE:
@@ -1121,12 +1122,12 @@ void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 			Cycle+=45;
 			break;
 
-		case IE_ANI_CAST:
+		case IE_ANI_CAST: //looping
 			strcat( ResRef, "g25" );
 			Cycle+=45;
 			break;
 
-		case IE_ANI_CONJURE:
+		case IE_ANI_CONJURE://ending
 			strcat( ResRef, "g26" );
 			Cycle+=54;
 			break;
@@ -1292,15 +1293,15 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 			Cycle += 63;
 			break;
 
-		case IE_ANI_CAST:
+		case IE_ANI_CAST: //looping
+			strcat( ResRef, "ca" );
+			strcpy( EquipData->Suffix, "ca" );
+			break;
+
+		case IE_ANI_CONJURE: //ending
 			strcat( ResRef, "ca" );
 			strcpy( EquipData->Suffix, "ca" );
 			Cycle += 9;
-			break;
-
-		case IE_ANI_CONJURE:
-			strcat( ResRef, "ca" );
-			strcpy( EquipData->Suffix, "ca" );
 			break;
 
 		case IE_ANI_DAMAGE:
@@ -1464,8 +1465,8 @@ void CharAnimations::AddLR2Suffix(char* ResRef, unsigned char StanceID,
 
 	switch (StanceID) {
 		case IE_ANI_READY:
-		case IE_ANI_CAST:
-		case IE_ANI_CONJURE:
+		case IE_ANI_CAST: //looping
+		case IE_ANI_CONJURE://ending
 		case IE_ANI_HIDE:
 		case IE_ANI_WALK:
 		case IE_ANI_AWAKE:
@@ -1545,13 +1546,13 @@ void CharAnimations::AddMHRSuffix(char* ResRef, unsigned char StanceID,
 			}
 			break;
 
-		case IE_ANI_CAST:
+		case IE_ANI_CAST://looping
 			strcat( ResRef, "ca" );
 			strcpy( EquipData->Suffix, "ca" );
 			Cycle = 8 + Orient;
 			break;
 
-		case IE_ANI_CONJURE:
+		case IE_ANI_CONJURE://ending
 			strcat( ResRef, "ca" );
 			strcpy( EquipData->Suffix, "ca" );
 			Cycle = Orient;
