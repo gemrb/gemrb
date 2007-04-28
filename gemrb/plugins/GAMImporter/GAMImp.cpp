@@ -146,6 +146,7 @@ Game* GAMImp::LoadGame(Game *newGame)
 			MazeOffset = 0;
 			str->ReadDword( &newGame->Reputation );
 			str->ReadResRef( newGame->CurrentArea ); // FIXME: see above
+			memcpy(newGame->AnotherArea, newGame->CurrentArea, sizeof(ieResRef) );
 			str->ReadDword( &newGame->ControlStatus );
 			str->ReadDword( &KillVarsCount ); //this is still unknown
 			str->ReadDword( &FamiliarsOffset );

@@ -183,20 +183,12 @@ void InitSpawnGroups()
 		}
 		if (j>0) {
 			SpawnGroup *creatures = new SpawnGroup(j);
-/*
-			ieResRef *creatures = (ieResRef *) malloc( sizeof(ieResRef)*(j+1) );
-			//count of creatures
-			*(ieDword *) creatures = (ieDword) j;
-*/
 			creatures->Level = (ieDword) atoi( tab->QueryField(i,0) );
 			//difficulty
-/*
-			*(((ieDword *) creatures)+1) = (ieDword) atoi( tab->QueryField(i,0) );
-*/
 			for (;j;j--) {
-				strnlwrcpy( creatures->ResRefs[j-1], tab->QueryField(j,i), sizeof( ieResRef ) );
+				strnlwrcpy( creatures->ResRefs[j-1], tab->QueryField(j,i), 8 );
 			}
-			strnlwrcpy( GroupName, tab->GetColumnName( i ), 8);
+			strnlwrcpy( GroupName, tab->GetColumnName( i ), 8 );
 			Spawns.SetAt( GroupName, (void*) creatures );
 		}
 	}
