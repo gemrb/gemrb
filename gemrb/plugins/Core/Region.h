@@ -64,6 +64,14 @@ public:
 	bool isempty() const;
 	/** if it is [0.0] */
 	bool isnull() const;
+	inline void empty() {
+		x=-1;
+		y=-1;
+	}
+	inline void null() {
+		x=0;
+		y=0;
+	}
 
 	ieDword asDword() const; // store coordinates in uint32 ((y << 16) | x)
 	void fromDword(ieDword val); // extract coordinates from uint32
