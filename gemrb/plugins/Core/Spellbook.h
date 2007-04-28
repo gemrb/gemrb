@@ -170,6 +170,8 @@ public:
 	unsigned int GetKnownSpellsCount(int type, unsigned int level) const;
 	/** removes a spell from memory/book */
 	void RemoveSpell(ieResRef ResRef);
+	void RemoveSpell(int spellid);
+
 	/** adds a spell to the book */
 	bool AddKnownSpell(int type, unsigned int level, CREKnownSpell *spl);
 	CREKnownSpell* GetKnownSpell(int type, unsigned int level, unsigned int index) const;

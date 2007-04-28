@@ -172,7 +172,7 @@ bool Spellbook::HaveSpell(int spellid, ieDword flags)
 			if (ms->Flags) {
 				if (atoi(ms->SpellResRef+4)==spellid) {
 					if (flags&HS_DEPLETE) {
-						ms->Flags=0;
+						DepleteSpell(ms);
 					}
 					return true;
 				}
@@ -195,7 +195,7 @@ bool Spellbook::HaveSpell(const char *resref, ieDword flags)
 						continue;
 					}
 					if (flags&HS_DEPLETE) {
-						ms->Flags=0;
+						DepleteSpell(ms);
 					}
 					return true;
 				}
@@ -258,6 +258,38 @@ unsigned int Spellbook::GetKnownSpellsCount(int type, unsigned int level) const
 	if (type >= NUM_SPELL_TYPES || level >= GetSpellLevelCount(type))
 		return 0;
 	return (unsigned int) spells[type][level]->known_spells.size();
+}
+
+void Spellbook::RemoveSpell(int spellid)
+{
+	int type = spellid/1000;
+	if (type>4) {
+		return;
+	}
+	type = sections[type];
+	spellid = spellid % 1000;
+	std::vector< CRESpellMemorization* >::iterator sm;
+	for (sm = spells[type].begin(); sm != spells[type].end(); sm++) {
+		std::vector< CREKnownSpell* >::iterator ks;
+		
+		for (ks = (*sm)->known_spells.begin(); ks != (*sm)->known_spells.end(); ks++) {
+			if (atoi((*ks)->SpellResRef+4)==spellid) {
+				delete *ks;
+				(*sm)->known_spells.erase(ks);
+				ks--;
+			}
+		}
+		
+		std::vector< CREMemorizedSpell* >::iterator ms;
+		
+		for (ms = (*sm)->memorized_spells.begin(); ms != (*sm)->memorized_spells.end(); ms++) {
+			if (atoi((*ms)->SpellResRef+4)==spellid) {
+				delete *ms;
+				(*sm)->memorized_spells.erase(ms);
+				ms--;
+			}
+		}
+	}
 }
 
 //removes spell from both memorized/book
@@ -437,7 +469,7 @@ bool Spellbook::UnmemorizeSpell(CREMemorizedSpell* spell)
 				if (*s == spell) {
 					delete *s;
 					(*sm)->memorized_spells.erase( s );
-				  ClearSpellInfo();
+					ClearSpellInfo();
 					return true;
 				}
 			}
@@ -688,8 +720,8 @@ void Spellbook::GenerateSpellInfo()
 				ieDword level = 0;
 				SpellExtHeader *seh = FindSpellInfo(sm->Level, sm->Type, slot->SpellResRef);
 				if (seh) {
-				  seh->count++;
-				  continue;
+					seh->count++;
+					continue;
 				}
 				seh = new SpellExtHeader;
 				spellinfo.push_back( seh );
@@ -698,9 +730,9 @@ void Spellbook::GenerateSpellInfo()
 				int ehc;
 				
 				for(ehc=0;ehc<spl->ExtHeaderCount-1;ehc++) {
-				  if (level<spl->ext_headers[ehc+1].RequiredLevel) {
-				    break;
-				  }
+					if (level<spl->ext_headers[ehc+1].RequiredLevel) {
+						break;
+					}
 				}
 				SPLExtHeader *ext_header = spl->ext_headers+ehc;
 				seh->headerindex = ehc;
