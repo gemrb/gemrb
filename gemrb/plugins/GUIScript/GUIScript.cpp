@@ -5363,7 +5363,7 @@ table_loaded:
 			return 0;
 		}
 		int ret = spell->SpellDescIdentified;
-		core->FreeSpell(spell, CureResRef, 0);
+		core->FreeSpell(spell, CureResRef, false);
 		return ret;
 	}
 	for (i=0;i<StoreSpellsCount;i++) {
