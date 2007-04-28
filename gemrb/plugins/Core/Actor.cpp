@@ -2302,15 +2302,14 @@ void Actor::SetColor( ieDword idx, ieDword grd)
 */
 }
 
-void Actor::SetColorMod( int location, RGBModifier::Type type, int speed,
-						 unsigned char r, unsigned char g, unsigned char b,
-						 int phase)
+void Actor::SetColorMod( ieByte location, RGBModifier::Type type, int speed,
+			 unsigned char r, unsigned char g, unsigned char b,
+			 int phase)
 {
 	CharAnimations* ca = GetAnims();
 	if (!ca) return;
-	if (location >= 32) return;
 
-	if (location == -1) {
+	if (location == 0xff) {
 		ca->GlobalColorMod.type = type;
 		ca->GlobalColorMod.speed = speed;
 		ca->GlobalColorMod.rgb.r = r;
@@ -2318,15 +2317,18 @@ void Actor::SetColorMod( int location, RGBModifier::Type type, int speed,
 		ca->GlobalColorMod.rgb.b = b;
 		if (phase >= 0)
 			ca->GlobalColorMod.phase = phase;
-	} else {
-		ca->ColorMods[location].type = type;
-		ca->ColorMods[location].speed = speed;
-		ca->ColorMods[location].rgb.r = r;
-		ca->ColorMods[location].rgb.g = g;
-		ca->ColorMods[location].rgb.b = b;
-		if (phase >= 0)
-			ca->ColorMods[location].phase = phase;
+		return;
 	}
+	//00xx0yyy-->000xxyyy
+	if (location&0xc8) return; //invalid location
+	location = (location &7) | ((location>>1)&0x18);
+	ca->ColorMods[location].type = type;
+	ca->ColorMods[location].speed = speed;
+	ca->ColorMods[location].rgb.r = r;
+	ca->ColorMods[location].rgb.g = g;
+	ca->ColorMods[location].rgb.b = b;
+	if (phase >= 0)
+		ca->ColorMods[location].phase = phase;
 }
 
 void Actor::SetLeader(Actor *actor, int xoffset, int yoffset)

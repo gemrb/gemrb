@@ -929,9 +929,9 @@ int fx_set_color_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_color_rgb (%2d): RGB: %x, Location: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	int location = (fx->Parameter2 & 0xF) + 8*((fx->Parameter2 & 0xF0)>>4);
+	ieByte location = fx->Parameter2 & 0xff;
 	target->SetColorMod(location, RGBModifier::ADD, -1, fx->Parameter1 >> 8,
-						fx->Parameter1 >> 16, fx->Parameter1 >> 24);
+			fx->Parameter1 >> 16, fx->Parameter1 >> 24);
 
 	return FX_APPLIED;
 }
@@ -940,9 +940,8 @@ int fx_set_color_rgb_global (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_color_rgb_global (%2d): RGB: %x, Location: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	int location = -1;
-	target->SetColorMod(location, RGBModifier::ADD, -1, fx->Parameter1 >> 8,
-						fx->Parameter1 >> 16, fx->Parameter1 >> 24);
+	target->SetColorMod(0xff, RGBModifier::ADD, -1, fx->Parameter1 >> 8,
+			fx->Parameter1 >> 16, fx->Parameter1 >> 24);
 
 	return FX_APPLIED;
 }
@@ -952,11 +951,11 @@ int fx_set_color_pulse_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_color_pulse_rgb (%2d): RGB: %x, Location: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	int location = (fx->Parameter2 & 0xF) + 8*((fx->Parameter2 & 0xF0)>>4);
+	ieByte location = fx->Parameter2 & 0xff;
 	int speed = (fx->Parameter2 >> 16) & 0xFF;
 	target->SetColorMod(location, RGBModifier::ADD, speed,
-						fx->Parameter1 >> 8, fx->Parameter1 >> 16,
-						fx->Parameter1 >> 24);
+			fx->Parameter1 >> 8, fx->Parameter1 >> 16,
+			fx->Parameter1 >> 24);
 
 	return FX_APPLIED;
 }
@@ -967,9 +966,9 @@ int fx_set_color_pulse_rgb_global (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_set_color_pulse_rgb_global (%2d): RGB: %x, Location: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	int speed = (fx->Parameter2 >> 16) & 0xFF;
-	target->SetColorMod(-1, RGBModifier::ADD, speed,
-						fx->Parameter1 >> 8, fx->Parameter1 >> 16,
-						fx->Parameter1 >> 24);
+	target->SetColorMod(0xff, RGBModifier::ADD, speed,
+			fx->Parameter1 >> 8, fx->Parameter1 >> 16,
+			fx->Parameter1 >> 24);
 
 	return FX_APPLIED;
 }
@@ -1624,9 +1623,9 @@ int fx_brief_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_brief_rgb (%2d): RGB: %d, Location and speed: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	int speed = (fx->Parameter2 >> 16) & 0xFF;
-	target->SetColorMod(-1, RGBModifier::ADD, speed,
-						fx->Parameter1 >> 8, fx->Parameter1 >> 16,
-						fx->Parameter1 >> 24, 0);
+	target->SetColorMod(0xff, RGBModifier::ADD, speed,
+			fx->Parameter1 >> 8, fx->Parameter1 >> 16,
+			fx->Parameter1 >> 24, 0);
 
 	return FX_NOT_APPLIED;
 }
@@ -1635,9 +1634,9 @@ int fx_darken_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_darken_rgb (%2d): RGB: %d, Location and speed: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	int location = (fx->Parameter2 & 0xF) + 8*((fx->Parameter2 & 0xF0)>>4);
+	ieByte location = fx->Parameter2 & 0xff;
 	target->SetColorMod(location, RGBModifier::TINT, -1, fx->Parameter1 >> 8,
-						fx->Parameter1 >> 16, fx->Parameter1 >> 24);
+			fx->Parameter1 >> 16, fx->Parameter1 >> 24);
 	return FX_APPLIED;
 }
 // 0x34 Color:GlowRGB
@@ -1645,10 +1644,10 @@ int fx_glow_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_glow_rgb (%2d): RGB: %d, Location and speed: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	int location = (fx->Parameter2 & 0xF) + 8*((fx->Parameter2 & 0xF0)>>4);
+	ieByte location = fx->Parameter2 & 0xff;
 	target->SetColorMod(location, RGBModifier::BRIGHTEN, -1,
-						fx->Parameter1 >> 8, fx->Parameter1 >> 16,
-						fx->Parameter1 >> 24);
+			fx->Parameter1 >> 8, fx->Parameter1 >> 16,
+			fx->Parameter1 >> 24);
 
 	return FX_APPLIED;
 }

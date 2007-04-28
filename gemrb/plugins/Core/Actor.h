@@ -386,7 +386,7 @@ public:
 	/* sets a colour gradient stat, handles location */
 	void SetColor( ieDword idx, ieDword grd);
 	/* sets an RGB colour modification effect; location -1 for global */
-	void SetColorMod( int location, RGBModifier::Type type, int speed, 
+	void SetColorMod( ieByte location, RGBModifier::Type type, int speed, 
 		unsigned char r, unsigned char g, unsigned char b,
 		int phase=-1 );
 	bool Schedule(ieDword gametime);
