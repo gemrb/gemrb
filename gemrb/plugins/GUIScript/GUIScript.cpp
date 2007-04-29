@@ -3293,9 +3293,9 @@ static PyObject *GetGameDate(DataStream *ds)
 		else c=core->GetString(10700);
 	}
 	retval = PyString_FromFormat("%s%s%s",a?a:"",b?b:"",c?c:"");
-	if (a) free(a);
-	if (b) free(b);
-	if (c) free(c);
+	core->FreeString(a);
+	core->FreeString(b);
+	core->FreeString(c);
 	return retval;
 }
 
@@ -4564,6 +4564,7 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 		if (tooltip) {
 			//later getitemname could also return tooltip stuff
 			char *str = core->GetString(item->GetItemName(tooltip==2),0);
+			//this will free str, no need of freeing it
 			SetFunctionTooltip(wi, ci, str, Function);
 		}
 
@@ -6792,7 +6793,8 @@ static PyObject* SetActionIcon(int WindowIndex, int ControlIndex, int Index, int
 	snprintf(Event,sizeof(Event)-1, "Action%sPressed", GUIEvent[Index]);
 	btn->SetEvent( IE_GUI_BUTTON_ON_PRESS, Event );
 	char *txt = core->GetString( GUITooltip[Index] );
-	SetFunctionTooltip(WindowIndex, ControlIndex, txt, Function);//will free txt
+	//will free txt
+	SetFunctionTooltip(WindowIndex, ControlIndex, txt, Function);
 	//no incref
 	return Py_None;
 }
@@ -7479,7 +7481,9 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 	printf("Cast spell: %s\n", spelldata.spellname);
 	printf("Slot: %d\n", spelldata.slot);
 	printf("Type: %d\n", spelldata.type);
-	printf("Spellname: %s\n", core->GetString(spelldata.strref));
+	char *tmp = core->GetString(spelldata.strref);
+	printf("Spellname: %s\n", tmp);
+	core->FreeString(tmp);
 	printf("Target: %d\n", spelldata.Target);
 	printf("Range: %d\n", spelldata.Range);
 	GameControl *gc = core->GetGameControl();
