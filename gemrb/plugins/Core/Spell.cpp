@@ -99,6 +99,11 @@ EffectQueue *Spell::GetEffectBlock(int block_index) const
 Projectile *Spell::GetProjectile(int header) const
 {
 	SPLExtHeader *seh = GetExtHeader(header);
+	if (!seh) {
+		printMessage("Spell", "Cannot retrieve spell header!!! ",RED);
+		printf("required header: %d, maximum: %d\n", header, (int) ExtHeaderCount);
+		return NULL;
+	}
 	if (seh->FeatureCount) {
 		Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(seh->ProjectileAnimation);
 
