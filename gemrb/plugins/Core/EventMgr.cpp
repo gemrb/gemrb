@@ -268,7 +268,12 @@ void EventMgr::OnSpecialKeyPress(unsigned char Key)
 	if (!last_win_focused) {
 		return;
 	}
-	Control *ctrl = last_win_focused->GetDefaultControl();
+	Control *ctrl = NULL;
+
+	//the default control will get only GEM_RETURN
+	if (Key == GEM_RETURN) {
+		ctrl = last_win_focused->GetDefaultControl();
+	}
 	//if there was no default button set, then the current focus will get it
 	if (!ctrl) {
 		ctrl = last_win_focused->GetFocus();
@@ -283,6 +288,9 @@ void EventMgr::OnSpecialKeyPress(unsigned char Key)
 				break;
 			case IE_GUI_GAMECONTROL:
 				//gamecontrols will receive all special keys
+				break;
+			case IE_GUI_EDIT:
+				//editboxes will receive all special keys
 				break;
 			default:
 				//other controls don't receive any
