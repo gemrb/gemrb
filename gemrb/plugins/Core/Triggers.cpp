@@ -397,56 +397,109 @@ int GameScript::Specifics(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::BitCheck(Scriptable* Sender, Trigger* parameters)
 {
-	ieDword value = CheckVariable(Sender, parameters->string0Parameter );
-	return ( value& parameters->int0Parameter ) !=0;
+	bool valid;
+
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	if (valid) {
+		if ( value & parameters->int0Parameter ) return 1;
+	}
+	return 0;
 }
 
 int GameScript::BitCheckExact(Scriptable* Sender, Trigger* parameters)
 {
-	ieDword value = CheckVariable(Sender, parameters->string0Parameter );
-	return (value & parameters->int0Parameter ) == (ieDword) parameters->int0Parameter;
+	bool valid;
+
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	if (valid) {
+		ieDword tmp = (ieDword) parameters->int0Parameter ;
+		if ((value & tmp) == tmp) return 1;
+	}
+	return 0;
 }
 
 //BM_OR would make sense only if this trigger changes the value of the variable
 //should I do that???
 int GameScript::BitGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 {
-	ieDword value = CheckVariable(Sender, parameters->string0Parameter );
-	HandleBitMod(value, parameters->int0Parameter, parameters->int1Parameter);
-	//set the variable here if BitGlobal_Trigger really does that
-	//SetVariable(Sender, parameters->string0Parameter, value);
-	return value!=0;
+	bool valid;
+
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	if (valid) {
+		HandleBitMod(value, parameters->int0Parameter, parameters->int1Parameter);
+		if (value!=0) return 1;
+	}
+	return 0;
 }
 
 int GameScript::GlobalOrGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 {
-	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter );
-	if ( value1 ) return 1;
-	ieDword value2 = CheckVariable(Sender, parameters->string1Parameter );
-	if ( value2 ) return 1;
+	bool valid;
+
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	if (valid) {
+		if ( value1 ) return 1;
+		ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, &valid );
+		if (valid) {
+			if ( value2 ) return 1;
+		}
+	}
+	return 0;
+}
+
+int GameScript::GlobalAndGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
+{
+	bool valid;
+
+	ieDword value1 = CheckVariable( Sender, parameters->string0Parameter, &valid );
+	if (valid && value1) {
+		ieDword value2 = CheckVariable( Sender, parameters->string1Parameter, &valid );
+		if (valid && value2) return 1;
+	}
 	return 0;
 }
 
 int GameScript::GlobalBAndGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 {
-	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter );
-	ieDword value2 = CheckVariable(Sender, parameters->string1Parameter );
-	return ( value1& value2 ) != 0;
+	bool valid;
+
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	if (valid) {
+		ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, &valid );
+		if (valid) {
+			if ((value1& value2 ) != 0) return 1;
+		}
+	}
+	return 0;
 }
 
 int GameScript::GlobalBAndGlobalExact(Scriptable* Sender, Trigger* parameters)
 {
-	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter );
-	ieDword value2 = CheckVariable(Sender, parameters->string1Parameter );
-	return ( value1& value2 ) == value2;
+	bool valid;
+
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	if (valid) {
+		ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, &valid );
+		if (valid) {
+			if (( value1& value2 ) == value2) return 1;
+		}
+	}
+	return 0;
 }
 
 int GameScript::GlobalBitGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 {
-	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter );
-	ieDword value2 = CheckVariable(Sender, parameters->string1Parameter );
-	HandleBitMod( value1, value2, parameters->int1Parameter);
-	return value1!=0;
+	bool valid;
+
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	if (valid) {
+		ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, &valid );
+		if (valid) {
+			HandleBitMod( value1, value2, parameters->int1Parameter);
+			if (value1!=0) return 1;
+		}
+	}
+	return 0;
 }
 
 //no what exactly this trigger would do, defined in iwd2, but never used
@@ -460,8 +513,13 @@ int GameScript::TriggerSetGlobal(Scriptable* Sender, Trigger* parameters)
 //would this function also alter the variable?
 int GameScript::Xor(Scriptable* Sender, Trigger* parameters)
 {
-	ieDword value = CheckVariable(Sender, parameters->string0Parameter );
-	return ( value ^ parameters->int0Parameter ) != 0;
+	bool valid;
+
+	ieDword value = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	if (valid) {
+		if (( value ^ parameters->int0Parameter ) != 0) return 1;
+	}
+	return 0;
 }
 
 int GameScript::NumDead(Scriptable* Sender, Trigger* parameters)
@@ -515,8 +573,13 @@ int GameScript::G_Trigger(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::Global(Scriptable* Sender, Trigger* parameters)
 {
-	long value = CheckVariable(Sender, parameters->string0Parameter );
-	return ( value == parameters->int0Parameter );
+	bool valid;
+
+	long value = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	if (valid) {
+		if ( value == parameters->int0Parameter ) return 1;
+	}
+	return 0;
 }
 
 int GameScript::GLT_Trigger(Scriptable* Sender, Trigger* parameters)
@@ -527,8 +590,13 @@ int GameScript::GLT_Trigger(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::GlobalLT(Scriptable* Sender, Trigger* parameters)
 {
-	long value = CheckVariable(Sender, parameters->string0Parameter );
-	return ( value < parameters->int0Parameter );
+	bool valid;
+
+	long value = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	if (valid) {
+		if ( value < parameters->int0Parameter ) return 1;
+	}
+	return 0;
 }
 
 int GameScript::GGT_Trigger(Scriptable* Sender, Trigger* parameters)
@@ -539,22 +607,41 @@ int GameScript::GGT_Trigger(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::GlobalGT(Scriptable* Sender, Trigger* parameters)
 {
-	long value = CheckVariable(Sender, parameters->string0Parameter );
-	return ( value > parameters->int0Parameter );
+	bool valid;
+
+	long value = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	if (valid) {
+		if ( value > parameters->int0Parameter ) return 1;
+	}
+	return 0;
 }
 
 int GameScript::GlobalLTGlobal(Scriptable* Sender, Trigger* parameters)
 {
-	long value1 = CheckVariable(Sender, parameters->string0Parameter );
-	long value2 = CheckVariable(Sender, parameters->string1Parameter );
-	return ( value1 < value2 );
+	bool valid;
+
+	long value1 = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	if (valid) {
+		long value2 = CheckVariable(Sender, parameters->string1Parameter, &valid );
+		if (valid) {
+			if ( value1 < value2 ) return 1;
+		}
+	}
+	return 0;
 }
 
 int GameScript::GlobalGTGlobal(Scriptable* Sender, Trigger* parameters)
 {
-	long value1 = CheckVariable(Sender, parameters->string0Parameter );
-	long value2 = CheckVariable(Sender, parameters->string1Parameter );
-	return ( value1 > value2 );
+	bool valid;
+
+	long value1 = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	if (valid) {
+		long value2 = CheckVariable(Sender, parameters->string1Parameter, &valid );
+		if (valid) {
+			if ( value1 > value2 ) return 1;
+		}
+	}
+	return 0;
 }
 
 int GameScript::GlobalsEqual(Scriptable* Sender, Trigger* parameters)
@@ -601,57 +688,83 @@ int GameScript::LocalsLT(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::RealGlobalTimerExact(Scriptable* Sender, Trigger* parameters)
 {
-	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
-	if (!value1) return 0;
-	ieDword value2 = core->GetGame()->RealTime;
-	return ( value1 == value2 );
+	bool valid;
+
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter, &valid );
+	if (valid && value1) {
+		ieDword value2 = core->GetGame()->RealTime;
+		if ( value1 == value2 ) return 1;
+	}
+	return 0;
 }
 
 int GameScript::RealGlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
 {
-	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
-	if (!value1) return 0;
-	ieDword value2 = core->GetGame()->RealTime;
-	return ( value1 < value2 );
+	bool valid;
+
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter, &valid );
+	if (valid && value1) {
+		if ( value1 < core->GetGame()->RealTime ) return 1;
+	}
+	return 0;
 }
 
 int GameScript::RealGlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters)
 {
-	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
-	if (!value1) return 0;
-	ieDword value2 = core->GetGame()->RealTime;
-	return ( value1 > value2 );
+	bool valid;
+
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter, &valid );
+	if (valid && value1) {
+		if ( value1 > core->GetGame()->RealTime ) return 1;
+	}
+	return 0;
 }
 
 int GameScript::GlobalTimerExact(Scriptable* Sender, Trigger* parameters)
 {
-	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
-	if (!value1) return 0;
-	return ( value1 == core->GetGame()->GameTime );
+	bool valid;
+
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter, &valid );
+	if (valid) {
+		if ( value1 == core->GetGame()->GameTime ) return 1;
+	}
+	return 0;
 }
 
 int GameScript::GlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
 {
-	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
-	if (!value1) return 0;
-	return ( value1 < core->GetGame()->GameTime );
+	bool valid;
+
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter, &valid );
+	if (valid && value1) {    
+		if ( value1 < core->GetGame()->GameTime ) return 1;
+	}
+	return 0;
 }
 
 //globaltimernotexpired returns false if the timer doesn't exist
 int GameScript::GlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters)
 {
-	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
-	if (!value1) return 0;
-	return ( value1 > core->GetGame()->GameTime );
+	bool valid;
+
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter, &valid );
+	if (valid && value1) {
+	 	if ( value1 > core->GetGame()->GameTime ) return 1;
+	}
+	return 0;
 }
 
 //globaltimerstarted returns false if the timer doesn't exist
 //is it the same as globaltimernotexpired?
 int GameScript::GlobalTimerStarted(Scriptable* Sender, Trigger* parameters)
 {
-	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter );
-	if (!value1) return 0;
-	return ( value1 > core->GetGame()->GameTime );
+	bool valid;
+
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter, &valid );
+	if (valid && value1) {
+		if ( value1 > core->GetGame()->GameTime ) return 1;
+	}
+	return 0;
 }
 
 int GameScript::WasInDialog(Scriptable* Sender, Trigger* /*parameters*/)
@@ -2021,7 +2134,7 @@ int GameScript::CheckStatLT(Scriptable* Sender, Trigger* parameters)
 }
 
 /* i believe this trigger is the same as 'MarkObject' action
-   except that  if it cannot set the marked object, it returns false */
+ except that if it cannot set the marked object, it returns false */
 int GameScript::SetLastMarkedObject(Scriptable* Sender, Trigger* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
@@ -2649,13 +2762,6 @@ int GameScript::OwnsFloaterMessage(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	return tar->textDisplaying;
-}
-
-int GameScript::GlobalAndGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
-{
-	ieDword value1 = CheckVariable( Sender, parameters->string0Parameter );
-	ieDword value2 = CheckVariable( Sender, parameters->string1Parameter );
-	return (value1 && value2)!=0; //should be 1 or 0!
 }
 
 int GameScript::InCutSceneMode(Scriptable* /*Sender*/, Trigger* /*parameters*/)

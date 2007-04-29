@@ -1105,9 +1105,9 @@ void Actor::RefreshEffects()
 	if (first) {
 		InternalFlags|=IF_INITIALIZED;
 	} else {
-		memcpy( previous, Modified, MAX_STATS * sizeof( *Modified ) );
+		memcpy( previous, Modified, MAX_STATS * sizeof( ieDword ) );
 	}
-	memcpy( Modified, BaseStats, MAX_STATS * sizeof( *Modified ) );
+	memcpy( Modified, BaseStats, MAX_STATS * sizeof( ieDword ) );
 
 	CharAnimations* anims = GetAnims();
 	if (anims) {

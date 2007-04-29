@@ -1840,7 +1840,7 @@ void SetVariable(Scriptable* Sender, const char* VarName, ieDword value)
 	}
 }
 
-ieDword CheckVariable(Scriptable* Sender, const char* VarName)
+ieDword CheckVariable(Scriptable* Sender, const char* VarName, bool *valid)
 {
 	char newVarName[8];
 	ieDword value = 0;
@@ -1873,13 +1873,16 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName)
 		Map *map=game->GetMap(game->FindMap(newVarName));
 		if (map) {
 			map->locals->Lookup( &VarName[6], value);
+		} else {
+			if (*valid) {
+				*valid=false;
+			}
+			if (InDebug&ID_VARIABLES) {
+				printMessage("GameScript"," ",YELLOW);
+				printf("Invalid variable %s in checkvariable\n",VarName);
+			}
 		}
-		else if (InDebug&ID_VARIABLES) {
-			printMessage("GameScript"," ",YELLOW);
-			printf("Invalid variable %s in checkvariable\n",VarName);
-		}
-	}
-	else {
+	}	else {
 		game->locals->Lookup( &VarName[6], value );
 	}
 	if (InDebug&ID_VARIABLES) {
@@ -1888,7 +1891,7 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName)
 	return value;
 }
 
-ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Context)
+ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Context, bool *valid)
 {
 	char newVarName[8];
 	ieDword value = 0;
@@ -1921,10 +1924,14 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Conte
 		Map *map=game->GetMap(game->FindMap(newVarName));
 		if (map) {
 			map->locals->Lookup( VarName, value);
-		}
-		else if (InDebug&ID_VARIABLES) {
-			printMessage("GameScript"," ",YELLOW);
-			printf("Invalid variable %s %s in checkvariable\n",Context, VarName);
+		} else {
+			if (*valid) {
+				*valid=false;
+			}
+			if (InDebug&ID_VARIABLES) {
+				printMessage("GameScript"," ",YELLOW);
+				printf("Invalid variable %s %s in checkvariable\n",Context, VarName);
+			}
 		}
 	} else {
 		game->locals->Lookup( VarName, value );

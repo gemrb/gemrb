@@ -106,8 +106,8 @@ GEM_EXPORT int DiffCore(ieDword a, ieDword b, int diffmode);
 GEM_EXPORT void DisplayStringCore(Scriptable* Sender, int Strref, int flags);
 GEM_EXPORT void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, ieDword value);
 GEM_EXPORT void MoveBetweenAreasCore(Actor* actor, const char *area, Point &position, int face, bool adjust);
-GEM_EXPORT ieDword CheckVariable(Scriptable* Sender, const char* VarName);
-GEM_EXPORT ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Context);
+GEM_EXPORT ieDword CheckVariable(Scriptable* Sender, const char* VarName, bool *valid = NULL);
+GEM_EXPORT ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Context, bool *valid = NULL);
 Action* GenerateActionCore(const char *src, const char *str, int acIndex);
 Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int negate);
 
