@@ -197,6 +197,11 @@ void ITMImp::GetExtHeader(Item *s, ITMExtHeader* eh)
 	str->ReadWord( &eh->ChargeDepletion );
 	str->ReadDword( &eh->RechargeFlags );
 	str->ReadWord( &eh->ProjectileAnimation );
+	//for some odd reasons 0 and 1 are the same
+	if (eh->ProjectileAnimation) {
+		eh->ProjectileAnimation--;
+	}
+
 	unsigned int i; //msvc6.0 can't cope with index variable scope
 
 	for (i = 0; i < 3; i++) {
