@@ -233,10 +233,6 @@ void CharAnimations::SetupColors(PaletteType type)
 		return;
 	}
 
-	if (lockPalette) {
-		return;
-	}
-
 	if (GetAnimType() >= IE_ANI_PST_ANIMATION_1) {
 		// Only do main palette
 		if (type != PAL_MAIN) {
@@ -310,6 +306,9 @@ void CharAnimations::SetupColors(PaletteType type)
 	}
 
 	pal->SetupPaperdollColours(Colors, (int)type);
+	if (!lockPalette) {
+		return;
+	}
 
 	int i;
 	bool needmod = false;
