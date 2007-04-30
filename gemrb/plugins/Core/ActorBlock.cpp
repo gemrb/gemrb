@@ -530,6 +530,8 @@ void Scriptable::CastSpellPointEnd( ieResRef SpellResRef )
 		pro->SetCaster(GetGlobalID());
 		GetCurrentArea()->AddProjectile(pro, Pos, LastTargetPos);
 	}
+	LastTarget = 0;
+	LastTargetPos.empty();
 }
 
 void Scriptable::CastSpellEnd( ieResRef SpellResRef )
@@ -554,6 +556,8 @@ void Scriptable::CastSpellEnd( ieResRef SpellResRef )
 		GetCurrentArea()->AddProjectile(pro, Pos, LastTarget);
 	}
 	core->FreeSpell(spl, SpellResRef, false);
+	LastTarget = 0;
+	LastTargetPos.empty();
 }
 
 //set target as point
