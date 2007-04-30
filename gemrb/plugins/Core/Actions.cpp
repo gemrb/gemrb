@@ -2123,13 +2123,6 @@ void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	//parse target
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!tar) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-
 	//set target
 	Sender->CastSpellPoint( spellres, parameters->pointParameter, true );
 
@@ -2190,13 +2183,6 @@ void GameScript::ForceSpellPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	//parse target
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!tar) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-
 	//set target
 	Sender->CastSpellPoint (spellres, parameters->pointParameter, false);
 
@@ -2221,12 +2207,17 @@ void GameScript::ReallyForceSpell(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+	if (Sender->Type == ST_ACTOR) {
+		Actor *actor = (Actor *) Sender;
+		actor->SetStance (IE_ANI_CONJURE);
+	}
 	if (tar->Type==ST_ACTOR) {
 		Sender->LastTarget=tar->GetGlobalID();
+		Sender->CastSpellEnd(spellres);
 	} else {
 		GetPositionFromScriptable(tar, Sender->LastTargetPos, false);
+		Sender->CastSpellPointEnd(spellres);
 	}
-	Sender->CastSpellPointEnd(spellres);
 	Sender->ReleaseCurrentAction();
 }
 
@@ -2241,13 +2232,12 @@ void GameScript::ReallyForceSpellPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
-	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	if (!tar) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
 	Sender->LastTargetPos=parameters->pointParameter;
 	if (Sender->Type == ST_ACTOR) {
+		if (Sender->GetInternalFlag()&IF_STOPATTACK) {
+			Sender->ReleaseCurrentAction();
+			return;
+		}
 		Actor *actor = (Actor *) Sender;
 		actor->SetStance (IE_ANI_CONJURE);
 	}
@@ -2276,7 +2266,13 @@ void GameScript::ReallyForceSpellDead(Scriptable* Sender, Action* parameters)
 		Actor *actor = (Actor *) Sender;
 		actor->SetStance (IE_ANI_CONJURE);
 	}
-	Sender->CastSpellPointEnd(spellres);
+	if (tar->Type==ST_ACTOR) {
+		Sender->LastTarget=tar->GetGlobalID();
+		Sender->CastSpellEnd(spellres);
+	} else {
+		GetPositionFromScriptable(tar, Sender->LastTargetPos, false);
+		Sender->CastSpellPointEnd(spellres);
+	}
 	Sender->ReleaseCurrentAction();
 }
 
@@ -2290,7 +2286,6 @@ void GameScript::Deactivate(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	tar->Hide();
-	//tar->Active &=~(SCR_ACTIVE|SCR_VISIBLE);
 }
 
 void GameScript::MakeGlobal(Scriptable* Sender, Action* /*parameters*/)

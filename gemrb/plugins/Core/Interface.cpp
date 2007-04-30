@@ -4872,7 +4872,7 @@ void Interface::ApplySpell(const ieResRef resname, Actor *actor, Actor *caster, 
 			actor = caster;
 		}
 		fxqueue->SetOwner( caster );
-		fxqueue->AddAllEffects(actor);
+		fxqueue->AddAllEffects(actor, actor->Pos);
 	}
 	delete fxqueue;
 }
@@ -4902,7 +4902,7 @@ void Interface::ApplyEffect(Effect *effect, Actor *actor, Actor *caster)
 			actor = caster;
 		}
 		fxqueue->SetOwner( caster );
-		fxqueue->AddAllEffects( actor );
+		fxqueue->AddAllEffects( actor, actor->Pos );
 	}
 	delete fxqueue;
 }

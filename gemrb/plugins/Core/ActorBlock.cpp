@@ -894,7 +894,10 @@ void Movable::MoveLine(int steps, int Pass, ieDword orient)
 	ClearPath();
 	if (!steps)
 		return;
-	path = area->GetLine( Pos, steps, orient, Pass );
+	Point p = Pos;
+	p.x/=16;
+	p.y/=14;
+	path = area->GetLine( p, steps, orient, Pass );
 }
 
 void Movable::DoStep(unsigned int walk_speed)

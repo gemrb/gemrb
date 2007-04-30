@@ -493,7 +493,7 @@ unsigned int ACMImp::Play(const char* ResRef, int XPos, int YPos, unsigned int f
 		}
 
 		for (i = 0; i < MAX_STREAMS; i++) {
-			if (!streams[i].free) {
+			if (!streams[i].free && alIsSource(streams[i].Source)) {
 				alGetSourcei( streams[i].Source, AL_SOURCE_STATE, &state );
 				if (state == AL_STOPPED) {
 					alDeleteSources( 1, &streams[i].Source );

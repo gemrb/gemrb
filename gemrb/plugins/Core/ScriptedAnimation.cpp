@@ -37,22 +37,20 @@
 #define NINE 16           //nine faces (orientation)
 
 #define MAX_CYCLE_TYPE 16
-//  0       1   2    3        4         5       6           7
-static ieByte ctypes[MAX_CYCLE_TYPE]=
-{ ILLEGAL, ONE, TWO, THREE, TWO|DOUBLE, ONE|FIVE, THREE|DOUBLE, ILLEGAL,
-// 8       9   10           11       12       13      14       15
+static ieByte ctypes[MAX_CYCLE_TYPE]={
+	ILLEGAL, ONE, TWO, THREE, TWO|DOUBLE, ONE|FIVE, THREE|DOUBLE, ILLEGAL,
 	ILLEGAL,ONE|NINE, TWO|FIVE, ILLEGAL, ILLEGAL, ILLEGAL, ILLEGAL,THREE|FIVE,
 };
 
 static ieByte SixteenToNine[3*MAX_ORIENT]={
 	0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1,
 	9,10,11,12,13,14,15,16,17,16,15,14,13,12,11,10,
- 18,19,20,21,22,23,24,25,26,25,24,23,22,21,20,19
+	18,19,20,21,22,23,24,25,26,25,24,23,22,21,20,19
 };
 static ieByte SixteenToFive[3*MAX_ORIENT]={
 	0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 3, 3, 2, 2, 1, 1,
 	5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 8, 8, 7, 7, 6, 6,
- 10,10,11,11,12,12,13,13,14,14,13,13,12,12,11,11
+	10,10,11,11,12,12,13,13,14,14,13,13,12,12,11,11
 };
 
 ScriptedAnimation::ScriptedAnimation()
@@ -281,34 +279,64 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 			core->GetResourceMgr()->GetFactoryResource( Anim1ResRef, IE_BAM_CLASS_ID );
 		//no idea about vvc phases, i think they got no endphase?
 		//they certainly got onset and hold phases
-		anims[P_ONSET] = af->GetCycle( ( unsigned char ) seq1 );
-		if (anims[P_ONSET]) {
-			PrepareAnimation(anims[P_ONSET], Transparency);
-			//creature anims may start at random position, vvcs always start on 0
-			anims[P_ONSET]->pos=0;
-			//vvcs are always paused
-			anims[P_ONSET]->gameAnimation=true;
-			anims[P_ONSET]->Flags |= S_ANI_PLAYONCE;
-		}
-
-		anims[P_HOLD] = af->GetCycle( ( unsigned char ) seq2 ); 
-		if (anims[P_HOLD]) {
-			PrepareAnimation(anims[P_HOLD], Transparency);
-
-			anims[P_HOLD]->pos=0;
-			anims[P_HOLD]->gameAnimation=true;
-			if (!(SequenceFlags&IE_VVC_LOOP) ) {
-				anims[P_HOLD]->Flags |= S_ANI_PLAYONCE;
+		//the face target flag should be handled too
+		for (int i=0;i<MAX_ORIENT;i++) {
+			unsigned int p_hold = P_HOLD*MAX_ORIENT+i;
+			unsigned int p_onset = P_ONSET*MAX_ORIENT+i;
+			unsigned int p_release = P_RELEASE*MAX_ORIENT+i;
+			int c = seq1;
+			switch (FaceTarget) {
+			case 5:
+				c=SixteenToFive[i];
+				break;
+			case 9:
+				c=SixteenToNine[i];
+				break;
+			case 16:
+				c=i;
+				break;
 			}
-		}
-
-		anims[P_RELEASE] = af->GetCycle( ( unsigned char ) seq3 ); 
-		if (anims[P_RELEASE]) {
-			PrepareAnimation(anims[P_RELEASE], Transparency);
-
-			anims[P_RELEASE]->pos=0;
-			anims[P_RELEASE]->gameAnimation=true;
-			anims[P_RELEASE]->Flags |= S_ANI_PLAYONCE;
+			anims[p_onset] = af->GetCycle( c );
+			if (anims[p_onset]) {
+				PrepareAnimation(anims[p_onset], Transparency);
+				//creature anims may start at random position, vvcs always start on 0
+				anims[p_onset]->pos=0;
+				//vvcs are always paused
+				anims[p_onset]->gameAnimation=true;
+				anims[p_onset]->Flags |= S_ANI_PLAYONCE;
+			}
+			
+			c = seq2;
+			switch (FaceTarget) {
+			case 5:
+				c=SixteenToFive[i];
+				break;
+			case 9:
+				c=SixteenToNine[i];
+				break;
+			case 16:
+				c=i;
+				break;
+			}
+			anims[p_hold] = af->GetCycle( c ); 
+			if (anims[p_hold]) {
+				PrepareAnimation(anims[p_hold], Transparency);
+				
+				anims[p_hold]->pos=0;
+				anims[p_hold]->gameAnimation=true;
+				if (!(SequenceFlags&IE_VVC_LOOP) ) {
+					anims[p_hold]->Flags |= S_ANI_PLAYONCE;
+				}
+			}
+			
+			anims[p_release] = af->GetCycle( ( unsigned char ) seq3 ); 
+			if (anims[p_release]) {
+				PrepareAnimation(anims[p_release], Transparency);
+				
+				anims[p_release]->pos=0;
+				anims[p_release]->gameAnimation=true;
+				anims[p_release]->Flags |= S_ANI_PLAYONCE;
+			}
 		}
 	}
 

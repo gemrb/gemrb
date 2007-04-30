@@ -68,6 +68,16 @@
 #define PTF_LIGHT   64      //has light shadow
 #define PTF_BLEND   128     //blend colours
 
+//projectile area flags
+#define PAF_VISIBLE   1     //the travel projectile is visible until explosion
+#define PAF_INANIMATE 2     //target inanimates
+#define PAF_TRIGGER   4     //explosion needs to be triggered
+#define PAF_SYNC      8     //one explosion at a time
+#define PAF_SECONDARY 16    //secondary projectiles at explosion
+#define PAF_FRAGMENT  32    //fragments (charanimation) at explosion
+#define PAF_TGT       64    //target party or not party
+#define PAF_PARTY     128   //target party
+
 typedef struct ProjectileExtension
 {
 	ieDword AFlags;
@@ -92,7 +102,7 @@ public:
 	Projectile();
 	~Projectile();
 	void InitExtension();
-	void CreateAnimations(Animation **anims, ieResRef bam);
+	void CreateAnimations(Animation **anims, ieResRef bam, int Seq);
 
 	ieWord Type;
 	ieWord Speed;
@@ -113,7 +123,7 @@ public:
 	ieByte Gradients[7];
 	ieByte SmokeSpeed;
 	ieByte SmokeGrad[7];
-	ieByte SmokeAim;
+	ieByte Aim;
 	ieWord SmokeAnimID;
 	ieResRef TrailBAM[3];
 	ieWord TrailSpeed[3];
@@ -195,7 +205,6 @@ public:
 	void Setup();
 	void ChangePhase();
 	void DoStep(unsigned int walk_speed);
-	void MoveLine(int steps, int Pass, ieDword Orient);
 	void MoveTo(Map *map, Point &Des);
 	void ClearPath();
 	//handle phases, return 0 when expired
@@ -210,6 +219,7 @@ private:
 	int GetTravelPos(int face);
 	int GetShadowPos(int face);
 	void SetPos(int face, int frame1, int frame2);
+	void NextTarget(Point &p);
 };
 
 #endif // PROJECTILE_H

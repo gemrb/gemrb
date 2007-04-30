@@ -2992,7 +2992,7 @@ int fx_play_movie (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 int fx_set_sanctuary_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_sanctuary_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STAT_SET( IE_SANCTUARY, 1);
+	STAT_SET_PCF( IE_SANCTUARY, 1);
 	return FX_APPLIED;
 }
 
@@ -3000,7 +3000,7 @@ int fx_set_sanctuary_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_entangle_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_entangle_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STAT_SET( IE_ENTANGLE, 1);
+	STAT_SET_PCF( IE_ENTANGLE, 1);
 	//STAT_SET(IE_MOVEMENTRATE, 0); //
 	return FX_APPLIED;
 }
@@ -3009,7 +3009,7 @@ int fx_set_entangle_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_minorglobe_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_minorglobe_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STAT_SET( IE_MINORGLOBE, 1);
+	STAT_SET_PCF( IE_MINORGLOBE, 1);
 	return FX_APPLIED;
 }
 
@@ -3017,7 +3017,7 @@ int fx_set_minorglobe_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_shieldglobe_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_shieldglobe_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STAT_SET( IE_SHIELDGLOBE, 1);
+	STAT_SET_PCF( IE_SHIELDGLOBE, 1);
 	return FX_APPLIED;
 }
 
@@ -3025,7 +3025,7 @@ int fx_set_shieldglobe_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_web_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_web_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STAT_SET( IE_WEB, 1);
+	STAT_SET_PCF( IE_WEB, 1);
 	STAT_SET(IE_MOVEMENTRATE, 0); //
 	return FX_APPLIED;
 }
@@ -3034,7 +3034,7 @@ int fx_set_web_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_grease_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_grease_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STAT_SET( IE_GREASE, 1);
+	STAT_SET_PCF( IE_GREASE, 1);
 	STAT_SET(IE_MOVEMENTRATE, 3); //
 	return FX_APPLIED;
 }
@@ -3555,19 +3555,26 @@ int fx_select_spell (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 int fx_play_visual_effect (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_play_visual_effect (%2d): Resource: %s Type: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
-	if (fx->Resource[0]) {
-		ScriptedAnimation* vvc = core->GetScriptedAnimation(fx->Resource, false);
-		if (fx->Parameter2) {
-			//play over target
-			target->AddVVCell( vvc );
-		} else {
-			//the effect should already have its position set
-			vvc->XPos=fx->PosX;
-			vvc->YPos=fx->PosY;
-			target->GetCurrentArea()->AddVVCell( vvc );
-		}
+	if (!fx->Resource[0]) {
+		return FX_NOT_APPLIED;
 	}
-	return FX_APPLIED;
+	ScriptedAnimation* sca = core->GetScriptedAnimation(fx->Resource, false);
+	if (fx->TimingMode!=FX_DURATION_INSTANT_PERMANENT) {
+		sca->SetDefaultDuration(fx->Duration-core->GetGame()->Ticks);
+	}
+	if (fx->Parameter2) {
+		//play over target (sticky)
+		if (!target->HasVVCCell(fx->Resource) ) {
+			target->AddVVCell( sca );
+		}
+		return FX_APPLIED;
+	}
+
+	//not sticky
+	sca->XPos=fx->PosX;
+	sca->YPos=fx->PosY;
+	target->GetCurrentArea()->AddVVCell( sca );
+	return FX_NOT_APPLIED;
 }
 
 //d8 LevelDrainModifier

@@ -947,15 +947,26 @@ void GameControl::TryToCast(Actor *source, Point &tgt)
 	}
 	spellCount--;
 	if (spellOrItem>=0) {
+		sprintf(Tmp, "NIDSpecial8()");
+	} else {
+		//using item on target
+		sprintf(Tmp, "NIDSpecial7()");
+	}
+	Action* action = GenerateAction( Tmp );
+	action->pointParameter=tgt;
+	if (spellOrItem>=0)
+	{
 		CREMemorizedSpell *si;
 		//spell casting at target
 		si = source->spellbook.GetMemorizedSpell(spellOrItem, spellSlot, spellIndex);
-		sprintf(Tmp, "SpellPoint([%d.%d], %s)", tgt.x, tgt.y, si->SpellResRef );
-	} else {
-		//using item on target
-		sprintf(Tmp, "UseItemPoint(\"\",[%d.%d],%d,%d)", tgt.x,tgt.y,spellIndex, spellSlot );
+		sprintf(action->string0Parameter,"%.8s",si->SpellResRef);
 	}
-	source->AddAction( GenerateAction( Tmp) );
+	else
+	{
+		action->int0Parameter=spellSlot;
+		action->int1Parameter=spellIndex;
+	}
+	source->AddAction( action );
 	if (!spellCount) {
 		target_mode = TARGET_MODE_NONE;
 	}
@@ -977,7 +988,6 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 		sprintf(Tmp, "NIDSpecial5()");
 	}
 	Action* action = GenerateActionDirect( Tmp, tgt);
-	source->AddAction( action );
 	if (spellOrItem>=0)
 	{
 		CREMemorizedSpell *si;
@@ -990,6 +1000,7 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 		action->int0Parameter=spellSlot;
 		action->int1Parameter=spellIndex;
 	}
+	source->AddAction( action );
 	if (!spellCount) {
 		target_mode = TARGET_MODE_NONE;
 	}

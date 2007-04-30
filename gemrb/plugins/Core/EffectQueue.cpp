@@ -390,7 +390,7 @@ void EffectQueue::ApplyAllEffects(Actor* target)
 	}
 }
 
-bool EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget)
+bool EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &dest)
 {
 	int i;
 	Game *game;
@@ -399,12 +399,16 @@ bool EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget)
 
 	switch (fx->Target) {
 	case FX_TARGET_ORIGINAL:
+		fx->PosX=self->Pos.x;
+		fx->PosY=self->Pos.y;
 		flg = self->fxqueue.ApplyEffect( self, fx, true );
 		if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
 			self->fxqueue.AddEffect( fx );
 		}
 		break;
 	case FX_TARGET_SELF:
+		fx->PosX=dest.x;
+		fx->PosY=dest.y;
 		flg = self->fxqueue.ApplyEffect( self, fx, true );
 		if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
 			self->fxqueue.AddEffect( fx );
@@ -412,6 +416,8 @@ bool EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget)
 		break;
 
 	case FX_TARGET_PRESET:
+		fx->PosX=pretarget->Pos.x;
+		fx->PosY=pretarget->Pos.y;
 		flg = self->fxqueue.ApplyEffect( pretarget, fx, true );
 		if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
 			pretarget->fxqueue.AddEffect( fx );
@@ -422,6 +428,8 @@ bool EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget)
 		game=core->GetGame();
 		for (i = game->GetPartySize(true); i >= 0; i--) {
 			Actor* actor = game->GetPC( i, true );
+			fx->PosX=actor->Pos.x;
+			fx->PosY=actor->Pos.y;
 			self->fxqueue.ApplyEffect( actor, fx, true );
 			if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
 				actor->fxqueue.AddEffect( fx );
@@ -434,6 +442,8 @@ bool EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget)
 		map=self->GetCurrentArea();
 		for (i = map->GetActorCount(true); i >= 0; i--) {
 			Actor* actor = map->GetActor( i, true );
+			fx->PosX=actor->Pos.x;
+			fx->PosY=actor->Pos.y;
 			self->fxqueue.ApplyEffect( actor, fx, true );
 			if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
 				actor->fxqueue.AddEffect( fx );
@@ -446,6 +456,8 @@ bool EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget)
 		map=self->GetCurrentArea();
 		for (i = map->GetActorCount(false); i >= 0; i--) {
 			Actor* actor = map->GetActor( i, false );
+			fx->PosX=actor->Pos.x;
+			fx->PosY=actor->Pos.y;
 			self->fxqueue.ApplyEffect( actor, fx, true );
 			//GetActorCount can now return all nonparty critters
 			//if (actor->InParty) continue;
@@ -469,7 +481,7 @@ bool EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget)
 //this is where effects from spells first get in touch with the target
 //the effects are currently NOT in the target's fxqueue, those that stick
 //will get copied (hence the fxqueue.AddEffect call)
-void EffectQueue::AddAllEffects(Actor* target)
+void EffectQueue::AddAllEffects(Actor* target, Point &destination)
 {
 	// pre-roll dice for fx needing them and stow them in the effect
 	ieDword random_value = core->Roll( 1, 100, 0 );
@@ -480,7 +492,7 @@ void EffectQueue::AddAllEffects(Actor* target)
 		(*f)->random_value = random_value;
 		//if applyeffect returns true, we stop adding the future effects
 		//this is to simulate iwd2's on the fly spell resistance
-		if(AddEffect(*f, Owner, target)) {		
+		if(AddEffect(*f, Owner, target, destination)) {		
 			break;
 		}
 	}
@@ -703,8 +715,10 @@ bool EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 	ieDword GameTime = core->GetGame()->GameTime;
 
 	if (first_apply) {
-		fx->PosX = target->Pos.x;
-		fx->PosY = target->Pos.y;
+		if ((fx->PosX==0xffff) && (fx->PosY==0xffff)) {
+			fx->PosX = (ieWord) target->Pos.x;
+			fx->PosY = (ieWord) target->Pos.y;
+		}
 		//the effect didn't pass the probability check
 		if (!check_probability(fx) ) {
 			fx->TimingMode=FX_DURATION_JUST_EXPIRED;
@@ -1244,7 +1258,7 @@ void EffectQueue::AffectAllInRange(Map *map, Point &pos, int idstype, int idsval
 		if (!map->IsVisible(actor->Pos, pos)) {
 			continue;
 		}
-		AddAllEffects(actor);
+		AddAllEffects(actor, actor->Pos);
 	}
 }
 

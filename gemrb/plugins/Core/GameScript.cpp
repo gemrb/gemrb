@@ -652,6 +652,8 @@ static ActionLink actionnames[] = {
 	{"nidspecial4", GameScript::ProtectObject,AF_BLOCKING|AF_DIRECT|AF_ALIVE},
 	{"nidspecial5", GameScript::UseItem, AF_BLOCKING|AF_DIRECT|AF_ALIVE},
 	{"nidspecial6", GameScript::Spell, AF_BLOCKING|AF_DIRECT|AF_ALIVE},
+	{"nidspecial7", GameScript::UseItemPoint, AF_BLOCKING|AF_ALIVE},
+	{"nidspecial8", GameScript::SpellPoint, AF_BLOCKING|AF_ALIVE},
 	{"noaction", GameScript::NoAction, 0},
 	{"opendoor", GameScript::OpenDoor,AF_BLOCKING},
 	{"panic", GameScript::Panic, 0},
@@ -3095,6 +3097,7 @@ Action* GenerateActionDirect(char *String, Actor *object)
 	if (tmp && tmp->objectFields[0]==-1) {
 		tmp->objectFields[1] = object->globalID;
 	}
+	action->pointParameter.empty();
 	return action;
 }
 

@@ -28,19 +28,22 @@
 #include "Game.h"
 #include "ResourceMgr.h"
 #include "SoundMgr.h"
+#include "ProjectileServer.h"
 
 extern Interface* core;
 #ifdef WIN32
 extern HANDLE hConsole;
 #endif
 
+static ieByte SixteenToNine[MAX_ORIENT]={0,1,2,3,4,5,6,7,8,7,6,5,4,3,2,1};
+static ieByte SixteenToFive[MAX_ORIENT]={0,0,1,1,2,2,3,3,4,4,3,3,2,2,1,1};
+
 Projectile::Projectile()
 {
 	autofree = false;
 	Extension = NULL;
 	area = NULL;
-	Pos.x = 0;
-	Pos.y = 0;
+	Pos.empty();
 	Destination = Pos;
 	Orientation = 0;
 	NewOrientation = 0;
@@ -82,21 +85,7 @@ PathNode *Projectile::GetNextStep(int x)
 	return node;
 }
 
-//Pass means passing/rebounding/extinguishing on walls
-void Projectile::MoveLine(int steps, int Pass, ieDword orient)
-{
-	//call this with destination
-	if (path) {
-		return;
-	}
-	if (!steps) {
-		Pos = Destination;
-		return;
-	}
-	path = area->GetLine( Pos, steps, orient, Pass );
-}
-
-void Projectile::CreateAnimations(Animation **anims, ieResRef bamres)
+void Projectile::CreateAnimations(Animation **anims, ieResRef bamres, int Seq)
 {
 	AnimationFactory* af = ( AnimationFactory* )
 		core->GetResourceMgr()->GetFactoryResource( bamres,
@@ -105,8 +94,30 @@ void Projectile::CreateAnimations(Animation **anims, ieResRef bamres)
 	if (!af) {
 		return;
 	}
+	//this hack is needed because bioware .pro files are sometimes
+	//reporting bigger face count than possible by the animation
+	int Max = af->GetCycleCount();
+	if (Aim>Max) Aim=Max;
 	for (int Cycle = 0; Cycle<MAX_ORIENT; Cycle++) {
-		Animation* a = af->GetCycle( Cycle );
+		int c;
+		switch(Aim) {
+		default:
+			c = Seq;
+			break;
+		case 5:
+			c = SixteenToFive[Cycle];
+			break;
+		case 9:
+			c = SixteenToNine[Cycle];
+			break;
+		case 16:
+			c=Cycle;
+			break;
+		}
+		Animation* a = af->GetCycle( c );
+		if (a && c!=Cycle) {
+			a->MirrorAnimation();
+		}
 		anims[Cycle] = a;
 	}
 }
@@ -119,9 +130,9 @@ void Projectile::Setup()
 	memset(travel,0,sizeof(travel));
 	memset(shadow,0,sizeof(shadow));
 	light = NULL;
-	CreateAnimations(travel, BAMRes1);
+	CreateAnimations(travel, BAMRes1, Seq1);
 	if (TFlags&PTF_SHADOW) {
-		CreateAnimations(shadow, BAMRes2);
+		CreateAnimations(shadow, BAMRes2, Seq2);
 	}
 	if (TFlags&PTF_LIGHT) {
 		//light = CreateLight(LightX, LightY, LightZ);
@@ -142,9 +153,9 @@ void Projectile::ChangePhase()
 			return;
 		}
 		int steps = Distance(Pos, target);
-
-		if (steps) {
-			SetTarget(target->Pos);
+		//48 = 6*8
+		if (steps>=48) {
+			NextTarget(target->Pos);
 			return;
 		}
 	}
@@ -152,24 +163,36 @@ void Projectile::ChangePhase()
 	//reached target
 	if (!Extension) {
 		phase = P_EXPIRED;
+		//there could be no-effect projectiles
+		if (!effects) return;
+
+		Actor *target;
 		if (Target) {
-			Actor *target = area->GetActorByGlobalID(Target);
+			target = area->GetActorByGlobalID(Target);
 			if (!target) {
 				return;
 			}
-			//deliver payload to target
 			Actor *original = area->GetActorByGlobalID(Caster);
 			effects->SetOwner(original?original:target);
-			effects->AddAllEffects(target);
-			//not simply nulling it, addalleffects copies them
-			delete effects;
-			effects = NULL;
-			return;
+		} else {
+			//the target is the original caster
+			//in case of single point area target (dimension door)
+			target = area->GetActorByGlobalID(Caster);
+			if (!target) {
+				return;
+			}
+			effects->SetOwner(target);
 		}
-		//get target
+		effects->AddAllEffects(target, Destination);
+		delete effects;
+		effects = NULL;
 		return;
 	}
-	phase = P_TRIGGER;
+	if (Extension->AFlags&PAF_TRIGGER) {
+		phase = P_TRIGGER;
+	} else {
+		phase = P_EXPLODING;
+	}
 }
 
 void Projectile::DoStep(unsigned int walk_speed)
@@ -178,6 +201,12 @@ void Projectile::DoStep(unsigned int walk_speed)
 		ChangePhase();
 		return;
 	}
+	if (Pos==Destination) {
+		ClearPath();
+		ChangePhase();
+		return;
+	}
+
 	ieDword time = core->GetGame()->Ticks;
 	if (!step) {
 		step = path;
@@ -190,8 +219,8 @@ void Projectile::DoStep(unsigned int walk_speed)
 
 	SetOrientation (step->orient, false);
 
-	Pos.x = ( step->x * 16 ) + 8;
-	Pos.y = ( step->y * 12 ) + 6;
+	Pos.x=step->x;
+	Pos.y=step->y;
 	if (!step->Next) {
 		ClearPath();
 		NewOrientation = Orientation;
@@ -203,16 +232,16 @@ void Projectile::DoStep(unsigned int walk_speed)
 	}
 	if (step->Next->x > step->x)
 		Pos.x += ( unsigned short )
-			( ( ( ( ( step->Next->x * 16 ) + 8 ) - Pos.x ) * ( time - timeStartStep ) ) / walk_speed );
+			( ( step->Next->x - Pos.x ) * ( time - timeStartStep ) / walk_speed );
 	else
 		Pos.x -= ( unsigned short )
-			( ( ( Pos.x - ( ( step->Next->x * 16 ) + 8 ) ) * ( time - timeStartStep ) ) / walk_speed );
+			( ( Pos.x - step->Next->x ) * ( time - timeStartStep ) / walk_speed );
 	if (step->Next->y > step->y)
 		Pos.y += ( unsigned short )
-			( ( ( ( ( step->Next->y * 12 ) + 6 ) - Pos.y ) * ( time - timeStartStep ) ) / walk_speed );
+			( ( step->Next->y - Pos.y ) * ( time - timeStartStep ) / walk_speed );
 	else
 		Pos.y -= ( unsigned short )
-			( ( ( Pos.y - ( ( step->Next->y * 12 ) + 6 ) ) * ( time - timeStartStep ) ) / walk_speed );
+			( ( Pos.y - step->Next->y ) * ( time - timeStartStep ) / walk_speed );
 }
 
 void Projectile::SetCaster(ieDword caster)
@@ -220,11 +249,26 @@ void Projectile::SetCaster(ieDword caster)
 	Caster=caster;
 }
 
-void Projectile::SetTarget(Point &p)
+void Projectile::NextTarget(Point &p)
 {
 	ClearPath();
 	Destination = p;
-	MoveLine( Speed, true, GetOrient(p, Pos) );
+	//call this with destination
+	if (path) {
+		return;
+	}
+	if (!Speed) {
+		Pos = Destination;
+		return;
+	}
+	Orientation = GetOrient(Pos, Destination);
+	path = area->GetLine( Pos, Destination, Speed, Orientation, GL_PASS );
+}
+
+void Projectile::SetTarget(Point &p)
+{
+	Target = 0;
+	NextTarget(p);
 }
 
 void Projectile::SetTarget(ieDword tar)
@@ -235,7 +279,7 @@ void Projectile::SetTarget(ieDword tar)
 		phase = P_EXPIRED;
 		return;
 	}
-	SetTarget(target->Pos);
+	NextTarget(target->Pos);
 }
 
 void Projectile::MoveTo(Map *map, Point &Des)
@@ -247,10 +291,6 @@ void Projectile::MoveTo(Map *map, Point &Des)
 
 void Projectile::ClearPath()
 {
-	//this is to make sure attackers come to us
-	//make sure ClearPath doesn't screw Destination (in the rare cases Destination
-	//is set before ClearPath
-	Destination = Pos;
 	if (!path) {
 		return;
 	}
@@ -265,7 +305,6 @@ void Projectile::ClearPath()
 	}
 	path = NULL;
 	step = NULL;
-	//don't call ReleaseCurrentAction
 }
 
 //get actors covered in area of effect radius
@@ -299,6 +338,9 @@ void Projectile::Draw(Region &screen)
 		case P_UNINITED:
 			return;
 		case P_TRIGGER:
+			if (Extension->AFlags&PAF_VISIBLE) {
+			  DrawTravel(screen);
+			}
 			CheckTrigger(Extension->TriggerRadius);
 		case P_TRAVEL:
 			if (phase != P_EXPLODING) {
@@ -334,6 +376,18 @@ void Projectile::DrawExplosion(Region & /*screen*/)
 		Extension->ExplosionCount--;
 	} else {
 		phase = P_EXPLODED;
+	}
+
+	//there is a secondary projectile
+	if (Extension->AFlags&PAF_SECONDARY) {
+		//the secondary projectile will target everyone in the area of effect
+	}
+	//the center of the explosion could be another projectile played over the target
+	if (Extension->FragProjIdx) {
+		Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(Extension->FragProjIdx);
+		if (pro) {
+			area->AddProjectile(pro, Pos, Pos);
+		}
 	}
 /*
 	Video *video = core->GetVideoDriver();

@@ -84,6 +84,7 @@ class Map;
 #define STAT_SUB(stat, mod) target->SetStat( stat, STAT_GET( stat ) - ( mod ), 0 )
 #define STAT_BIT_OR(stat, mod) target->SetStat( stat, STAT_GET( stat ) | ( mod ), 0 )
 #define STAT_SET(stat, mod) target->SetStat( stat, ( mod ), 0 )
+#define STAT_SET_PCF(stat, mod) target->SetStat( stat, ( mod ), 1 )
 #define STAT_MUL(stat, mod) target->SetStat( stat, STAT_GET(stat) * ( mod ) / 100, 0 )
 //if an effect sticks around
 #define STATE_CURE( mod ) target->Modified[ IE_STATE_ID ] &= ~(ieDword) ( mod )
@@ -154,12 +155,12 @@ public:
 	 * Returns true is successful. fx is just a reference, AddEffect()
 	 * will malloc its own copy */
 	bool AddEffect(Effect* fx);
-	bool AddEffect(Effect* fx, Actor* self, Actor* pretarget);
+	bool AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &dest);
 	/** Removes first Effect matching fx from the queue. 
 	 * Effects are matched based on their contents */
 	bool RemoveEffect(Effect* fx);
 
-	void AddAllEffects(Actor* target);
+	void AddAllEffects(Actor* target, Point &dest);
 	void ApplyAllEffects(Actor* target);
 	/* returns true if the process should abort applying a stack of effects */
 	bool ApplyEffect(Actor* target, Effect* fx, bool first_apply);

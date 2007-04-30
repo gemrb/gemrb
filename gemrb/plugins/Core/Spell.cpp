@@ -106,7 +106,6 @@ Projectile *Spell::GetProjectile(int header) const
 	}
 	if (seh->FeatureCount) {
 		Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(seh->ProjectileAnimation);
-
 		pro->SetEffects(GetEffectBlock(header));
 		return pro;
 	}

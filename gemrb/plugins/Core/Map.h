@@ -354,8 +354,9 @@ public:
 	/* returns true if there is enemy visible */
 	bool AnyPCSeesEnemy();
 	/* Finds straight path from s, length l and orientation o, f=1 passes wall, f=2 rebounds from wall*/
-	PathNode* GetLine(Point &start, int Steps, int Orientation, int flags);
 	PathNode* GetLine(Point &start, Point &dest, int flags);
+	PathNode* GetLine(Point &start, int Steps, int Orientation, int flags);
+	PathNode* GetLine(Point &start, Point &dest, int Steps, int Orientation, int flags);
 	/* Finds the path which leads to d */
 	PathNode* FindPath(const Point &s, const Point &d, int MinDistance = 0);
 	/* returns false if point isn't visible on visibility/explored map */
@@ -416,7 +417,6 @@ private:
 	void SetupNode(unsigned int x, unsigned int y, unsigned int Cost);
 	//actor uses travel region
 	void UseExit(Actor *pc, InfoPoint *ip);
-	PathNode* GetLine(Point &start, Point &dest, int Steps, int Orientation, int flags);
 	//separated position adjustment, so their order could be randomised */
 	bool AdjustPositionX(Point &goal, unsigned int radius);
 	bool AdjustPositionY(Point &goal, unsigned int radius);

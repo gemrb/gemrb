@@ -1949,23 +1949,30 @@ bool Map::TargetUnreachable(Point &s, Point &d)
 
 /* Use this function when you target something by a straight line projectile (like a lightning bolt, arrow, etc)
 */
+
 PathNode* Map::GetLine(Point &start, Point &dest, int flags)
 {
 	int Orientation = GetOrient(start, dest);
-	int Steps = Distance(start, dest);
-
-	return GetLine(start, dest, Steps, Orientation, flags);
+	return GetLine(start, dest, 1, Orientation, flags);
 }
 
 PathNode* Map::GetLine(Point &start, int Steps, int Orientation, int flags)
 {
-	Point dest;
+	Point dest=start;
+	int count = Steps;
 
+	while(count) {
+		int st = Steps>MaxVisibility?MaxVisibility:Steps;
+		int p = VisibilityPerimeter*Orientation/MAX_ORIENT;
+		dest.x += VisibilityMasks[Steps][p].x;
+		dest.y += VisibilityMasks[Steps][p].y;
+		count-=st;
+	}
 	//FIXME: calculate dest based on distance and orientation
 	return GetLine(start, dest, Steps, Orientation, flags);
 }
 
-PathNode* Map::GetLine(Point &start, Point &dest, int Steps, int Orientation, int flags)
+PathNode* Map::GetLine(Point &start, Point &dest, int Speed, int Orientation, int flags)
 {
 	PathNode* StartNode = new PathNode;
 	PathNode *Return = StartNode;
@@ -1975,23 +1982,31 @@ PathNode* Map::GetLine(Point &start, Point &dest, int Steps, int Orientation, in
 	StartNode->y = start.y;
 	StartNode->orient = Orientation;
 
-	int Max = Steps;
-	while (Steps--) {
-		int x,y;
+	int Count = 0;
+	int Max = Distance(start,dest);
+	for (int Steps = 0; Steps<Max; Steps++) {
+		if (!Count) {
+			StartNode->Next = new PathNode;
+			StartNode->Next->Parent = StartNode;
+			StartNode = StartNode->Next;
+			StartNode->Next = NULL;
+			Count=Speed;
+		} else {
+			Count--;
+		}
 
-		StartNode->Next = new PathNode;
-		StartNode->Next->Parent = StartNode;
-		StartNode = StartNode->Next;
-		StartNode->Next = NULL;
-		x = (start.x + dest.x) * Steps / Max;
-		y = (start.y + dest.y) * Steps / Max;
-		StartNode->x = (ieWord) x;
-		StartNode->y = (ieWord) y;
+		Point p;
+		p.x = (ieWord) start.x + ((dest.x - start.x) * Steps / Max);
+		p.y = (ieWord) start.y + ((dest.y - start.y) * Steps / Max);
+		StartNode->x = p.x;
+		StartNode->y = p.y;
 		StartNode->orient = Orientation;
-		bool wall = !( GetBlocked( x, y ) & PATH_MAP_PASSABLE );
+		bool wall = !( GetBlocked( p ) & PATH_MAP_PASSABLE );
 		if (wall) switch (flags) {
 			case GL_REBOUND:
 				Orientation = (Orientation + 8) &15;
+				//recalculate dest (mirror it)
+				//
 				break;
 			case GL_PASS:
 				break;

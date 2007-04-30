@@ -87,7 +87,7 @@ Projectile* PROImp::GetProjectile(Projectile *s)
 	str->Read( s->Gradients, 7);
 	str->Read( &s->SmokeSpeed, 1);
 	str->Read( s->SmokeGrad, 7);
-	str->Read( &s->SmokeAim, 1);
+	str->Read( &s->Aim, 1);
 	str->ReadWord( &s->SmokeAnimID);
 	str->ReadResRef( s->TrailBAM[0] );
 	str->ReadResRef( s->TrailBAM[1] );
@@ -112,11 +112,19 @@ void PROImp::GetAreaExtension(ProjectileExtension *e)
 	str->ReadResRef( e->SoundRes ); //explosion sound
 	str->ReadWord( &e->Delay );
 	str->ReadWord( &e->FragAnimID );
+	//this projectile index shouldn't be adjusted like the others!!!
 	str->ReadWord( &e->FragProjIdx );
 	str->Read( &e->ExplosionCount,1 );
-	str->Read( &e->ExplType,1); //the area puff type (flames, puffs, clouds) fireball.ids
+	//the area puff type (flames, puffs, clouds) fireball.ids
+	//gemrb will need a fireball.2da for this
+	str->Read( &e->ExplType,1);
 	str->ReadWord( &e->ExplColor);
 	str->ReadWord( &e->ExplProjIdx);
+	//i don't know why is this here
+	if (e->ExplProjIdx) {
+		e->ExplProjIdx--;
+	}
+
 	str->ReadResRef( e->VVCRes );
 	str->ReadWord( &e->ConeWidth);
 	//we skip the rest
