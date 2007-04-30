@@ -92,15 +92,16 @@ def OpenPriestWindow ():
 	# Setup memorized spells buttons
 	for i in range (12):
 		Button = GemRB.GetControl (Window, 3 + i)
-		GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,0,0,0,160,0,1)
-		GemRB.SetButtonBAM (Window, Button, "SPELFRAM",0,0,0)
+		GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,0,0,0,64,0,1)
+		GemRB.SetButtonSprites (Window, Button, "SPELFRAM",0,0,0,0,0)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
-		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SECOND)
 
 	# Setup book spells buttons
 	for i in range (24):
 		Button = GemRB.GetControl (Window, 27 + i)
-		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SECOND)
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 
 	SetSelectionChangeHandler (UpdatePriestWindow)
 	UpdatePriestWindow ()
@@ -108,7 +109,7 @@ def OpenPriestWindow ():
 	#bringing window front
 	GemRB.SetVisible (Window, 3)
 	GemRB.SetVisible (PortraitWindow, 1)
-
+	return
 
 def UpdatePriestWindow ():
 	global PriestMemorizedSpellList, PriestKnownSpellList
@@ -135,7 +136,7 @@ def UpdatePriestWindow ():
 		Button = GemRB.GetControl (Window, 3 + i)
 		if i < mem_cnt:
 			ms = GemRB.GetMemorizedSpell (pc, type, level, i)
-			GemRB.SetSpellIcon (Window, Button, ms['SpellResRef'])
+			GemRB.SetSpellIcon (Window, Button, ms['SpellResRef'], 0)
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
 			if ms['Flags']:
@@ -150,11 +151,13 @@ def UpdatePriestWindow ():
 			GemRB.EnableButtonBorder (Window, Button, 0, ms['Flags'] == 0)
 		else:
 			if i < max_mem_cnt:
-				GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
-				GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
+				#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
+				#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
+				GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NORMAL, OP_SET)
 			else:
-				GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
-				GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_NAND)
+				#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+				#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_NAND)
+				GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
 			GemRB.SetTooltip (Window, Button, '')
@@ -166,8 +169,8 @@ def UpdatePriestWindow ():
 		Button = GemRB.GetControl (Window, 27 + i)
 		if i < known_cnt:
 			ks = GemRB.GetKnownSpell (pc, type, level, i)
-			GemRB.SetSpellIcon (Window, Button, ks['SpellResRef'])
-			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
+			GemRB.SetSpellIcon (Window, Button, ks['SpellResRef'], 0)
+			#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OnPriestMemorizeSpell")
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenPriestSpellInfoWindow")
 			spell = GemRB.GetSpell (ks['SpellResRef'])
@@ -241,15 +244,10 @@ def OpenPriestSpellInfoWindow ():
 	GemRB.SetText (Window, Label, spell['SpellName'])
 
 	Button = GemRB.GetControl (Window, 2)
-	GemRB.SetSpellIcon (Window, Button, ResRef)
+	GemRB.SetSpellIcon (Window, Button, ResRef, 1)
 
 	Text = GemRB.GetControl (Window, 3)
 	GemRB.SetText (Window, Text, spell['SpellDesc'])
-
-	#IconResRef = 'SPL' + spell['SpellbookIcon'][2:]
-	
-	#Button = GemRB.GetControl (Window, 5)
-	#GemRB.SetButtonSprites (Window, Button, IconResRef, 0, 0, 0, 0, 0)
 
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 	return
@@ -269,17 +267,11 @@ def OnPriestMemorizeSpell ():
 def OpenPriestSpellRemoveWindow ():
 	global PriestSpellUnmemorizeWindow
 	
-	if PriestSpellUnmemorizeWindow != None:
-		GemRB.UnloadWindow (PriestSpellUnmemorizeWindow)
-		PriestSpellUnmemorizeWindow = None
-		
-		return
-		
 	PriestSpellUnmemorizeWindow = Window = GemRB.LoadWindow (5)
 
 	# "Are you sure you want to ....?"
 	TextArea = GemRB.GetControl (Window, 3)
-	GemRB.SetText (Window, TextArea, 63745)
+	GemRB.SetText (Window, TextArea, 11824)
 
 	# Remove
 	Button = GemRB.GetControl (Window, 0)
@@ -294,15 +286,16 @@ def OpenPriestSpellRemoveWindow ():
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 	return
 
+def ClosePriestSpellUnmemorizeWindow ():
+	global PriestSpellUnmemorizeWindow
+
+	GemRB.UnloadWindow (PriestSpellUnmemorizeWindow)
+	PriestSpellUnmemorizeWindow = None
+	return
+
 def OpenPriestSpellUnmemorizeWindow ():
 	global PriestSpellUnmemorizeWindow
-	
-	if PriestSpellUnmemorizeWindow != None:
-		GemRB.UnloadWindow (PriestSpellUnmemorizeWindow)
-		PriestSpellUnmemorizeWindow = None
-		
-		return
-		
+			
 	PriestSpellUnmemorizeWindow = Window = GemRB.LoadWindow (5)
 
 	# "Are you sure you want to ....?"
@@ -317,14 +310,14 @@ def OpenPriestSpellUnmemorizeWindow ():
 	# Cancel
 	Button = GemRB.GetControl (Window, 1)
 	GemRB.SetText (Window, Button, 13727)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenPriestSpellUnmemorizeWindow")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "ClosePriestSpellUnmemorizeWindow")
 
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 	return
 
 def OnPriestUnmemorizeSpell ():
 	if PriestSpellUnmemorizeWindow:
-		OpenPriestSpellUnmemorizeWindow ()
+		ClosePriestSpellUnmemorizeWindow ()
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = PriestSpellLevel
@@ -338,19 +331,17 @@ def OnPriestUnmemorizeSpell ():
 
 
 def OnPriestRemoveSpell ():
-	if PriestSpellUnmemorizeWindow:
-		OpenPriestSpellRemoveWindow ()
+	ClosePriestSpellUnmemorizeWindow()
+	OpenPriestSpellInfoWindow()
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = PriestSpellLevel
 	type = IE_SPELL_TYPE_PRIEST
 
-	index = GemRB.GetVar ("SpellButton")
+	index = GemRB.GetVar ("SpellButton")-100
 
 	#remove spell from memory
-	#GemRB.UnmemorizeSpell (pc, type, level, index)
-	#remove spell from book
-	#GemRB.RemoveSpell (pc, type, level, index)
+	GemRB.RemoveSpell (pc, type, level, index)
 	UpdatePriestWindow ()
 	return
 
