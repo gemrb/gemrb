@@ -852,7 +852,8 @@ Point Movable::GetMostLikelyPosition()
 
 void Movable::SetStance(unsigned int arg)
 {
-	if (StanceID==IE_ANI_DIE) {
+	//don't modify stance from dead back to anything if the actor is dead
+	if ((StanceID==IE_ANI_TWITCH || StanceID==IE_ANI_DIE) && (arg!=IE_ANI_TWITCH) ) {
 		if (GetInternalFlag()&IF_REALLYDIED) {
 			printMessage("Movable","Stance overridden by death\n", YELLOW);
 			return;
