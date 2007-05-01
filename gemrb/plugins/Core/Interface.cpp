@@ -2230,6 +2230,7 @@ bool Interface::LoadGemRBINI()
 	SetFeature( ini->GetKeyAsInt( "resources", "MagicBit", 0 ), GF_MAGICBIT );
 	SetFeature( ini->GetKeyAsInt( "resources", "CheckAbilities", 0 ), GF_CHECK_ABILITIES );
 	SetFeature( ini->GetKeyAsInt( "resources", "ChallengeRating", 0 ), GF_CHALLENGERATING );
+	SetFeature( ini->GetKeyAsInt( "resources", "SpellBookIconHack", 0), GF_SPELLBOOKICONHACK );
 	ForceStereo = ini->GetKeyAsInt( "resources", "ForceStereo", 0 );
 
 	FreeInterface( ini );

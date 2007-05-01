@@ -83,6 +83,12 @@ Spell* SPLImp::GetSpell(Spell *s)
 	str->ReadDword( &s->SpellLevel );
 	str->ReadWord( &s->unknown5 );
 	str->ReadResRef( s->SpellbookIcon );
+	//this hack is needed in ToB at least
+	if (core->HasFeature(GF_SPELLBOOKICONHACK)) {
+		i=strlen(s->SpellbookIcon);
+		if (i) s->SpellbookIcon[i]='C';
+	}
+
 	str->ReadWord( &s->unknown6 );
 	str->ReadDword( &s->unknown7 );
 	str->ReadDword( &s->unknown8 );
@@ -123,18 +129,6 @@ Spell* SPLImp::GetSpell(Spell *s)
 	for (i = 0; i < s->CastingFeatureCount; i++) {
 		GetFeature(s, s->casting_features+i);
 	}
-/*
-	DataStream* bamfile = core->GetResourceMgr()->GetResource( s->SpellbookIcon, IE_BAM_CLASS_ID );
-	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
-		printf( "[SPLImporter]: No BAM Importer Available.\n" );
-		return NULL;
-	}
-	AnimationMgr* bam = ( AnimationMgr* )
-		core->GetInterface( IE_BAM_CLASS_ID );
-	bam->Open( bamfile );
-
-	s->SpellIconBAM = bam;
-*/
 
 	return s;
 }

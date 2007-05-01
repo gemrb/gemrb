@@ -440,8 +440,11 @@ unsigned int ACMImp::Play(const char* ResRef, int XPos, int YPos, unsigned int f
 
 	ALenum error;
 	ALint state;
+	ieDword volume = 100;
 
 	if (flags & GEM_SND_SPEECH) {
+		//speech has a single channel, if a new speech started
+		//we stop the previous one
 		if (speech.free || !alIsSource( speech.Source )) {
 			alGenSources( 1, &speech.Source );
 			if (( error = alGetError() ) != AL_NO_ERROR) {
@@ -461,7 +464,6 @@ unsigned int ACMImp::Play(const char* ResRef, int XPos, int YPos, unsigned int f
 			}
 			printf("***speech.free: %d source:%d\n", speech.free,speech.Source);
 		}
-		ieDword volume;
 		core->GetDictionary()->Lookup( "Volume Voices", volume );
 		alSourcef( speech.Source, AL_GAIN, 0.01f * volume );
 		alSourcei( speech.Source, AL_SOURCE_RELATIVE, flags & GEM_SND_RELATIVE );
@@ -470,49 +472,51 @@ unsigned int ACMImp::Play(const char* ResRef, int XPos, int YPos, unsigned int f
 		speech.Buffer = Buffer;
 		alSourcePlay( speech.Source );
 		return time_length;
-	} else {
-		alGenSources( 1, &Source );
-		if (( error = alGetError() ) != AL_NO_ERROR) {
-			DisplayALError( "[ACMImp::Play] alGenSources : ", error );
-			return 0;
-		}
+	}
 
-		alSourcef( Source, AL_PITCH, 1.0f );
-		alSourcefv( Source, AL_VELOCITY, SourceVel );
-		alSourcei( Source, AL_LOOPING, 0 );
-		alSourcef( Source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
-		ieDword volume;
-		core->GetDictionary()->Lookup( "Volume SFX", volume );
-		alSourcef( Source, AL_GAIN, 0.01f * volume );
-		alSourcei( Source, AL_SOURCE_RELATIVE, flags & GEM_SND_RELATIVE );
-		alSourcefv( Source, AL_POSITION, SourcePos );
-		alSourcei( Source, AL_BUFFER, Buffer );
+	// not speech
+	alGenSources( 1, &Source );
+	if (( error = alGetError() ) != AL_NO_ERROR) {
+		//failed to generate new sound source
+		DisplayALError( "[ACMImp::Play] alGenSources : ", error );
+		return 0;
+	}
 
-		if (alGetError() != AL_NO_ERROR) {
-			return 0;
-		}
+	alSourcef( Source, AL_PITCH, 1.0f );
+	alSourcefv( Source, AL_VELOCITY, SourceVel );
+	alSourcei( Source, AL_LOOPING, 0 );
+	alSourcef( Source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
+	core->GetDictionary()->Lookup( "Volume SFX", volume );
+	alSourcef( Source, AL_GAIN, 0.01f * volume );
+	alSourcei( Source, AL_SOURCE_RELATIVE, flags & GEM_SND_RELATIVE );
+	alSourcefv( Source, AL_POSITION, SourcePos );
+	alSourcei( Source, AL_BUFFER, Buffer );
 
-		for (i = 0; i < MAX_STREAMS; i++) {
-			if (!streams[i].free && alIsSource(streams[i].Source)) {
-				alGetSourcei( streams[i].Source, AL_SOURCE_STATE, &state );
-				if (state == AL_STOPPED) {
-					alDeleteSources( 1, &streams[i].Source );
-					alDeleteBuffers( 1, &streams[i].Buffer );
-					streams[i].Buffer = Buffer;
-					streams[i].Source = Source;
-					alSourcePlay( Source );
-					return time_length;
-				}
-			} else {
+	if (alGetError() != AL_NO_ERROR) {
+		return 0;
+	}
+
+	for (i = 0; i < MAX_STREAMS; i++) {
+		if (!streams[i].free && alIsSource(streams[i].Source)) {
+			alGetSourcei( streams[i].Source, AL_SOURCE_STATE, &state );
+			if (state == AL_STOPPED) {
+				alDeleteSources( 1, &streams[i].Source );
+				alDeleteBuffers( 1, &streams[i].Buffer );
 				streams[i].Buffer = Buffer;
 				streams[i].Source = Source;
-				streams[i].free = false;
 				alSourcePlay( Source );
 				return time_length;
 			}
+		} else {
+			streams[i].Buffer = Buffer;
+			streams[i].Source = Source;
+			streams[i].free = false;
+			alSourcePlay( Source );
+			return time_length;
 		}
 	}
 
+	//failed to assign new sound
 	alDeleteSources( 1, &Source );
 	alDeleteBuffers( 1, &Buffer );
 
