@@ -124,6 +124,7 @@
 #define  GF_MAGICBIT            	27 //iwd, iwd2
 #define  GF_CHECK_ABILITIES             28 //bg2 (others?)
 #define  GF_CHALLENGERATING             29 //iwd2
+#define  GF_SPELLBOOKICONHACK		30 //bg2
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3
