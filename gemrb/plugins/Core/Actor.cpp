@@ -692,7 +692,7 @@ static int maximum_values[256]={
 5,5,5,5,5,5,5,100,100,100,255,5,5,255,1,1,//8f
 1,25,25,30,1,1,1,25,-1,100,100,1,255,255,255,255,//9f
 255,255,255,255,255,255,20,255,255,1,20,255,999999999,999999999,1,1,//af
-999999999,999999999,0,0,0,0,0,0,0,0,0,0,0,0,0,0,//bf
+999999999,999999999,0,0,10,0,0,0,0,0,0,0,0,0,0,0,//bf
 0,0,0,0,0,0,0,25,25,255,255,255,255,65535,-1,-1,//cf - 207
 -1,-1,-1,-1,-1,-1,-1,-1,MAX_LEVEL,255,65535,3,255,255,255,255,//df - 223
 255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,//ef - 239
@@ -1014,7 +1014,15 @@ bool Actor::SetBase(unsigned int StatIndex, ieDword Value)
 	}
 	ieDword diff = Modified[StatIndex]-BaseStats[StatIndex];
 
+	//maximize the base stat
+	if ( maximum_values[StatIndex]>0) {
+		if ( (signed) Value>maximum_values[StatIndex]) {
+		  Value = (ieDword) maximum_values[StatIndex];
+		}
+	}
+
 	BaseStats[StatIndex] = Value;
+
 	//if already initialized, then the modified stats
 	//need to run the post change function (stat change can kill actor)
 	SetStat (StatIndex, Value+diff, InternalFlags&IF_INITIALIZED);
@@ -1131,7 +1139,14 @@ void Actor::RefreshEffects()
 	}
 	bonus *= GetXPLevel( true );
 
-	NewBase(IE_MORALE,1,MOD_ADDITIVE);
+	//morale recovery every xth AI cycle
+	int mrec = GetStat(IE_MORALERECOVERYTIME);
+	if (mrec) {
+		if (!(core->GetGame()->GameTime%mrec)) {
+			NewBase(IE_MORALE,1,MOD_ADDITIVE);
+		}
+	}
+
 	if (bonus<0 && (Modified[IE_MAXHITPOINTS]+bonus)<=0) {
 		bonus=1-Modified[IE_MAXHITPOINTS];
 	}
@@ -1333,7 +1348,6 @@ int Actor::Damage(int damage, int damagetype, Actor *hitter)
 	//recalculate damage based on resistances and difficulty level
 	//the lower 2 bits are actually modifier types
 	NewBase(IE_HITPOINTS, (ieDword) -damage, damagetype&3);
-	NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
 	//this is just a guess, probably morale is much more complex
 	//add lastdamagetype up
 	LastDamageType|=damagetype;
@@ -1347,6 +1361,7 @@ int Actor::Damage(int damage, int damagetype, Actor *hitter)
 	} else if (damage<10) {
 		damagelevel = 2;
 	} else {
+		NewBase(IE_MORALE, (ieDword) -1, MOD_ADDITIVE);
 		if (chp<-10) {
 			damagelevel = 0; //chunky death
 		}
@@ -1506,7 +1521,7 @@ void Actor::Resurrect()
 	InternalFlags&=IF_FROMGAME; //keep these flags (what about IF_INITIALIZED)
 	InternalFlags|=IF_ACTIVE|IF_VISIBLE; //set these flags
 	SetBase(IE_STATE_ID, 0);
-	SetBase(IE_MORALE, 20);
+	SetBase(IE_MORALE, 10);
 	SetBase(IE_HITPOINTS, BaseStats[IE_MAXHITPOINTS]);
 	ClearActions();
 	ClearPath();

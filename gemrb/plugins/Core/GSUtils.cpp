@@ -1051,6 +1051,13 @@ void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, boo
 		}
 	}
 	actor->WalkTo( target->Pos, flags, 0 );
+	Point dest = actor->Destination;
+	//hopefully this hack will prevent lockups
+	if (!actor->InMove()) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
 	//repeat movement...
 	Action *newaction = ParamCopyNoOverride(parameters);
 	if (newaction->int0Parameter!=1) {

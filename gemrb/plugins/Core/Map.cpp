@@ -1367,6 +1367,7 @@ int Map::GetBlocked(unsigned int x, unsigned int y)
 {
 	int ret = SearchMap->GetPixelIndex( x, y );
 	if (ret&(PATH_MAP_DOOR_TRANSPARENT|PATH_MAP_ACTOR)) {
+//  if (ret&PATH_MAP_DOOR_TRANSPARENT) {
 		ret&=~PATH_MAP_PASSABLE;
 	}
 	if (ret&PATH_MAP_DOOR_OPAQUE) {

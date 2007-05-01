@@ -4280,11 +4280,9 @@ void GameScript::RemoveSpell( Scriptable* Sender, Action* parameters)
 	}
 	Actor *actor = (Actor *) Sender;
 	if (parameters->string0Parameter[0]) {
-		//actor->spellbook.HaveSpell(parameters->string0Parameter, HS_DEPLETE);
 		actor->spellbook.RemoveSpell(parameters->string0Parameter);
 		return;
 	}
-	actor->spellbook.HaveSpell(parameters->int0Parameter, HS_DEPLETE);
 	actor->spellbook.RemoveSpell(parameters->int0Parameter);
 }
 

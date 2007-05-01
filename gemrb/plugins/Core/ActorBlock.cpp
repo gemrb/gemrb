@@ -573,7 +573,6 @@ void Scriptable::CastSpellPoint( ieResRef SpellResRef, Point &target, bool deple
 			return;
 		}
 	}
-	LastTarget = 0;
 	LastTargetPos = target;
 	SpellCast(SpellResRef);
 }
@@ -1309,7 +1308,11 @@ bool Door::BlockedOpen(bool Open, bool ForceOpen)
 void Door::SetDoorOpen(bool Open, bool playsound, ieDword ID)
 {
 	if (playsound) {
-		if (BlockedOpen(Open,0)) {
+		//the door cannot be blocked when opening,
+		//but the actors will be pushed
+		//BlockedOpen will mark actors to be pushed
+		if (BlockedOpen(Open,0) && !Open) {
+			//clear up the blocking actors
 			area->JumpActors(false);
 			return;
 		}

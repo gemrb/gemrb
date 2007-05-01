@@ -5759,6 +5759,33 @@ static PyObject* GemRB_LearnSpell(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( actor->LearnSpell(Spell, Flags) );
 }
 
+PyDoc_STRVAR( GemRB_RemoveSpell__doc,
+"RemoveSpell(PartyID, SpellType, Level, Index)=>bool\n\n"
+"Removes specified known spell. Returns 1 on success." );
+
+static PyObject* GemRB_RemoveSpell(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID, SpellType, Level, Index;
+
+	if (!PyArg_ParseTuple( args, "iiii", &PartyID, &SpellType, &Level, &Index )) {
+		return AttributeError( GemRB_RemoveSpell__doc );
+	}
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor* actor = game->FindPC( PartyID );
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
+	}
+
+	CREKnownSpell* ks = actor->spellbook.GetKnownSpell( SpellType, Level, Index );
+	if (! ks) {
+		return NULL;
+	}
+
+	return PyInt_FromLong( actor->spellbook.RemoveSpell( ks ) );
+}
 
 PyDoc_STRVAR( GemRB_MemorizeSpell__doc,
 "MemorizeSpell(PartyID, SpellType, Level, Index)=>bool\n\n"
@@ -7981,6 +8008,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetMemorizedSpell, METH_VARARGS),
 	METHOD(GetSpell, METH_VARARGS),
 	METHOD(LearnSpell, METH_VARARGS),
+	METHOD(RemoveSpell, METH_VARARGS),
 	METHOD(MemorizeSpell, METH_VARARGS),
 	METHOD(UnmemorizeSpell, METH_VARARGS),
 	METHOD(GetSlotItem, METH_VARARGS),

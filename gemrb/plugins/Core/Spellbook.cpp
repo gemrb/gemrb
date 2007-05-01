@@ -260,6 +260,49 @@ unsigned int Spellbook::GetKnownSpellsCount(int type, unsigned int level) const
 	return (unsigned int) spells[type][level]->known_spells.size();
 }
 
+//called when a spell was removed from spellbook
+//this one purges all instances of known spells of the same name from memory
+void Spellbook::RemoveMemorization(CRESpellMemorization* sm, ieResRef ResRef)
+{
+	std::vector< CREMemorizedSpell* >::iterator ms;
+
+	for (ms = sm->memorized_spells.begin(); ms != sm->memorized_spells.end(); ms++) {
+		if (strnicmp(ResRef, (*ms)->SpellResRef, sizeof(ieResRef) ) ) {
+			continue;
+		}
+printf("Removing %s\n", (*ms)->SpellResRef);
+		delete *ms;
+		sm->memorized_spells.erase(ms);
+		ms--;
+	}          
+}
+
+//removes one instance of spell (from creknownspell)
+bool Spellbook::RemoveSpell(CREKnownSpell* spell)
+{
+	for (int i = 0; i < NUM_SPELL_TYPES; i++) {
+		std::vector< CRESpellMemorization* >::iterator sm;
+		for (sm = spells[i].begin(); sm != spells[i].end(); sm++) {
+			std::vector< CREKnownSpell* >::iterator ks;
+			for (ks = (*sm)->known_spells.begin(); ks != (*sm)->known_spells.end(); ks++) {
+				if (*ks == spell) {
+				  ieResRef ResRef;
+				  
+				  memcpy(ResRef, (*ks)->SpellResRef, sizeof(ieResRef) );
+				  delete *ks;
+				  (*sm)->known_spells.erase(ks);
+				  RemoveMemorization(*sm, ResRef);
+				  ClearSpellInfo();
+				  return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+
+//removes all instances of spellid (probably not needed)
 void Spellbook::RemoveSpell(int spellid)
 {
 	int type = spellid/1000;
@@ -274,19 +317,13 @@ void Spellbook::RemoveSpell(int spellid)
 		
 		for (ks = (*sm)->known_spells.begin(); ks != (*sm)->known_spells.end(); ks++) {
 			if (atoi((*ks)->SpellResRef+4)==spellid) {
+				ieResRef ResRef;
+				
+				memcpy(ResRef, (*ks)->SpellResRef, sizeof(ieResRef) );
 				delete *ks;
 				(*sm)->known_spells.erase(ks);
+				RemoveMemorization(*sm, ResRef);
 				ks--;
-			}
-		}
-		
-		std::vector< CREMemorizedSpell* >::iterator ms;
-		
-		for (ms = (*sm)->memorized_spells.begin(); ms != (*sm)->memorized_spells.end(); ms++) {
-			if (atoi((*ms)->SpellResRef+4)==spellid) {
-				delete *ms;
-				(*sm)->memorized_spells.erase(ms);
-				ms--;
 			}
 		}
 	}
@@ -306,18 +343,8 @@ void Spellbook::RemoveSpell(ieResRef ResRef)
 				}
 				delete *ks;
 				(*sm)->known_spells.erase(ks);
+				RemoveMemorization(*sm, ResRef);
 				ks--;
-			}
-
-			std::vector< CREMemorizedSpell* >::iterator ms;
-
-			for (ms = (*sm)->memorized_spells.begin(); ms != (*sm)->memorized_spells.end(); ms++) {
-				if (strnicmp(ResRef, (*ms)->SpellResRef, sizeof(ResRef) ) ) {
-					continue;
-				}
-				delete *ms;
-				(*sm)->memorized_spells.erase(ms);
-				ms--;
 			}
 		}
 	}

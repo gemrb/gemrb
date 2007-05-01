@@ -149,6 +149,8 @@ private:
 	void ClearSpellInfo();
 	/** looks up the spellinfo list for an element */
 	SpellExtHeader *FindSpellInfo(unsigned int level, unsigned int type, ieResRef name);
+	/** removes all instances of a spell from a given page */
+	void RemoveMemorization(CRESpellMemorization* sm, ieResRef ResRef);
 public: 
 	Spellbook();
 	~Spellbook();
@@ -169,7 +171,10 @@ public:
 	unsigned int GetTotalMemorizedSpellsCount() const;
 	unsigned int GetKnownSpellsCount(int type, unsigned int level) const;
 	/** removes a spell from memory/book */
+	bool RemoveSpell(CREKnownSpell* spell);
+	/** this removes ALL spells of name ResRef */
 	void RemoveSpell(ieResRef ResRef);
+	/** this removes ALL spells matching spellid */
 	void RemoveSpell(int spellid);
 
 	/** adds a spell to the book */
