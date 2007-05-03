@@ -34,6 +34,7 @@ static ieResRef *shapelist = NULL;
 static bool SBInitialized = false;
 static int NUM_SPELL_TYPES = 3;
 static bool IWD2Style = false;
+
 /* temporarily out
 static ieResRef *ResolveSpellName(ieDword index)
 {
@@ -286,14 +287,14 @@ bool Spellbook::RemoveSpell(CREKnownSpell* spell)
 			std::vector< CREKnownSpell* >::iterator ks;
 			for (ks = (*sm)->known_spells.begin(); ks != (*sm)->known_spells.end(); ks++) {
 				if (*ks == spell) {
-				  ieResRef ResRef;
-				  
-				  memcpy(ResRef, (*ks)->SpellResRef, sizeof(ieResRef) );
-				  delete *ks;
-				  (*sm)->known_spells.erase(ks);
-				  RemoveMemorization(*sm, ResRef);
-				  ClearSpellInfo();
-				  return true;
+					ieResRef ResRef;
+					
+					memcpy(ResRef, (*ks)->SpellResRef, sizeof(ieResRef) );
+					delete *ks;
+					(*sm)->known_spells.erase(ks);
+					RemoveMemorization(*sm, ResRef);
+					ClearSpellInfo();
+					return true;
 				}
 			}
 		}
@@ -424,6 +425,32 @@ bool Spellbook::AddSpellMemorization(CRESpellMemorization* sm)
 	}
 	(*s)[level] = sm;
 	return true;
+}
+
+//apply the wisdom bonus on all spell levels for type
+//count is optimally the count of spell levels
+void Spellbook::BonusSpells(int type, int count, int *bonuses)
+{
+	int level = GetSpellLevelCount(type);
+	if (level>count) level=count;
+	while(level--) {
+		CRESpellMemorization* sm = spells[type][level];
+		sm->Number2+=bonuses[level];
+	}
+}
+
+//call this in every ai cycle when recalculating spell bonus
+//TODO:add in wisdom bonus here
+void Spellbook::ClearBonus()
+{
+	int type;
+
+	for(type=0;type<NUM_SPELL_TYPES;type++) {
+		for(int level = GetSpellLevelCount(type); level--;) {
+			CRESpellMemorization* sm = spells[type][level];
+			sm->Number2=sm->Number;
+		}
+	}
 }
 
 //if bonus is not set, then sets the base value (adjusts bonus too)

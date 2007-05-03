@@ -377,9 +377,11 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 		return;
 	}
 		
+/* spellbooks need the LOCKED state processing these events
 	if (State == IE_GUI_BUTTON_LOCKED) {
 		return;
 	}
+*/
 
 	if (Button == GEM_MB_ACTION) {
 		if ((Mod & GEM_MOD_SHIFT) && ButtonOnShiftPress[0])

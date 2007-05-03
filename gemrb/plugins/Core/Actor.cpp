@@ -149,6 +149,8 @@ static int d_gradient[DAMAGE_LEVELS] = {
 #define OV_BOUNCE2     7  //bouncing activated
 static ieResRef overlay[OVERLAY_COUNT]={"SPENTACI","SANCTRY","MINORGLB","SPSHIELD",
 "GREASED","WEBENTD","SPTURNI2","SPTURNI"};
+static int *mxsplwis = NULL;
+static int spllevels;
 
 //for every game except IWD2 we need to reverse TOHIT
 static bool REVERSE_TOHIT=true;
@@ -164,6 +166,12 @@ static bool CHECK_ABILITIES=false;
 
 void ReleaseMemoryActor()
 {
+	if (mxsplwis) {
+		//calloc'd x*y integer matrix
+		free (mxsplwis);
+		mxsplwis = NULL;
+	}
+
 	if (fistres) {
 		delete [] fistres;
 		fistres = NULL;
@@ -908,6 +916,22 @@ static void InitActorTables()
 		}
 		core->DelTable( table );
 	}
+
+	table = core->LoadTable( "mxsplwis" );
+	tm = core->GetTable( table );
+	if (tm) {
+		spllevels = tm->GetColumnCount(0);
+		int max = core->GetMaximumAbility();
+		mxsplwis = (int *) calloc(max*spllevels, sizeof(int));
+		for (i = 0 ; i < spllevels; i++) {
+			for(int j = 0; j < max; j++) {
+				int k = atoi(tm->GetRowName(j))-1;
+				if (k>=0 && k<max) {
+					mxsplwis[k*spllevels+i]=atoi(tm->QueryField(j,i));
+				}
+			}
+		}
+	}
 }
 
 void Actor::add_animation(const ieResRef resource, int gradient, int height, int flags)
@@ -1017,7 +1041,7 @@ bool Actor::SetBase(unsigned int StatIndex, ieDword Value)
 	//maximize the base stat
 	if ( maximum_values[StatIndex]>0) {
 		if ( (signed) Value>maximum_values[StatIndex]) {
-		  Value = (ieDword) maximum_values[StatIndex];
+			Value = (ieDword) maximum_values[StatIndex];
 		}
 	}
 
@@ -1105,18 +1129,10 @@ void Actor::RefreshEffects()
 {
 	ieDword previous[MAX_STATS];
 
-	bool first = !(InternalFlags&IF_INITIALIZED);
-
+	//put all special cleanup calls here
 	if (PCStats) {
 		memset( PCStats->PortraitIcons, -1, sizeof(PCStats->PortraitIcons) );
 	}
-	if (first) {
-		InternalFlags|=IF_INITIALIZED;
-	} else {
-		memcpy( previous, Modified, MAX_STATS * sizeof( ieDword ) );
-	}
-	memcpy( Modified, BaseStats, MAX_STATS * sizeof( ieDword ) );
-
 	CharAnimations* anims = GetAnims();
 	if (anims) {
 		unsigned int location;
@@ -1125,6 +1141,17 @@ void Actor::RefreshEffects()
 			anims->ColorMods[location].speed = 0;
 		}
 	}
+	spellbook.ClearBonus();
+
+	//initialize base stats
+	bool first = !(InternalFlags&IF_INITIALIZED);
+
+	if (first) {
+		InternalFlags|=IF_INITIALIZED;
+	} else {
+		memcpy( previous, Modified, MAX_STATS * sizeof( ieDword ) );
+	}
+	memcpy( Modified, BaseStats, MAX_STATS * sizeof( ieDword ) );
 
 	fxqueue.ApplyAllEffects( this );
 
@@ -1159,6 +1186,13 @@ void Actor::RefreshEffects()
 			if (f) {
 				(*f)(this, Modified[i]);
 			}
+		}
+	}
+	//add wisdom bonus spells
+	if (!spellbook.IsIWDSpellBook() && mxsplwis) {
+		int level = Modified[IE_WIS];
+		if (level--) {
+			spellbook.BonusSpells(IE_SPELL_TYPE_PRIEST, spllevels, mxsplwis+spllevels*level);
 		}
 	}
 }

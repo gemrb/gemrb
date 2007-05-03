@@ -170,6 +170,10 @@ public:
 	unsigned int GetTotalKnownSpellsCount() const;
 	unsigned int GetTotalMemorizedSpellsCount() const;
 	unsigned int GetKnownSpellsCount(int type, unsigned int level) const;
+	/** adds the priest slot bonuses from mxsplwis */
+	void BonusSpells(int type, int count, int *bonuses);
+	/** clears up the spell bonuses before recalculation */
+	void ClearBonus();
 	/** removes a spell from memory/book */
 	bool RemoveSpell(CREKnownSpell* spell);
 	/** this removes ALL spells of name ResRef */
