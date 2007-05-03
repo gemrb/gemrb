@@ -11,6 +11,6 @@ Flags       - give xp, etc.
 
 Return value: integer, 0 on success, different values on failure.
 
-See also: MemorizeSpell
+See also: MemorizeSpell, RemoveSpell
 
 MD5: 768a8203f408816c5294f8601a7a4b4e
