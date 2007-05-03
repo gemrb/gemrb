@@ -225,12 +225,8 @@ def OpenMageSpellInfoWindow ():
 	index = GemRB.GetVar ("SpellButton")
 	if index < 100:
 		ResRef = MageMemorizedSpellList[index]
-	#	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")
-	#	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 	else:
 		ResRef = MageKnownSpellList[index - 100]
-	#	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenMageSpellRemoveWindow")
-	#	GemRB.SetText (Window, Button, 63668)
 
 	spell = GemRB.GetSpell (ResRef)
 

@@ -229,7 +229,6 @@ def OpenPriestSpellInfoWindow ():
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 	return
 
-
 def OnPriestMemorizeSpell ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	level = PriestSpellLevel
@@ -305,7 +304,6 @@ def OnPriestUnmemorizeSpell ():
 	if GemRB.UnmemorizeSpell (pc, type, level, index):
 		UpdatePriestWindow ()
 	return
-
 
 def OnPriestRemoveSpell ():
 	ClosePriestSpellUnmemorizeWindow()

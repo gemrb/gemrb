@@ -158,7 +158,7 @@ def UpdateMageWindow ():
 				GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NORMAL, OP_SET)
 			else:
 				GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS,"")
+			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "")
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
 			GemRB.SetTooltip (Window, Button, '')
 			GemRB.EnableButtonBorder (Window, Button, 0, 0)
@@ -170,7 +170,7 @@ def UpdateMageWindow ():
 		if i < known_cnt:
 			ks = GemRB.GetKnownSpell (pc, type, level, i)
 			GemRB.SetSpellIcon (Window, Button, ks['SpellResRef'], 0)
-			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS,"OnMageMemorizeSpell")
+			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OnMageMemorizeSpell")
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "OpenMageSpellInfoWindow")
 			spell = GemRB.GetSpell (ks['SpellResRef'])
 			GemRB.SetTooltip (Window, Button, spell['SpellName'])
@@ -232,7 +232,7 @@ def OpenMageSpellInfoWindow ():
 		GemRB.UnloadWindow (MageSpellInfoWindow)
 		MageSpellInfoWindow = None
 		return
-		
+
 	MageSpellInfoWindow = Window = GemRB.LoadWindow (3)
 
 	#back
@@ -286,7 +286,7 @@ def CloseMageSpellUnmemorizeWindow ():
 
 def OpenMageSpellRemoveWindow ():
 	global MageSpellUnmemorizeWindow
-		
+
 	MageSpellUnmemorizeWindow = Window = GemRB.LoadWindow (101)
 
 	# "Are you sure you want to ....?"
