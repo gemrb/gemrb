@@ -81,13 +81,13 @@ def OpenMageWindow ():
 		GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,0,0,0,64,0,1)
 		GemRB.SetButtonSprites (Window, Button, "SPELFRAM",0,0,0,0,0)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
-		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SECOND)
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 
 	# Setup book spells buttons
 	for i in range (20):
 		Button = GemRB.GetControl (Window, 27 + i)
-		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SECOND)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 
 	SetSelectionChangeHandler (UpdateMageWindow)
 	UpdateMageWindow ()

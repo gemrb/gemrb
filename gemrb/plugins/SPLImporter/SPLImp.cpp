@@ -86,7 +86,7 @@ Spell* SPLImp::GetSpell(Spell *s)
 	//this hack is needed in ToB at least
 	if (core->HasFeature(GF_SPELLBOOKICONHACK)) {
 		i=strlen(s->SpellbookIcon);
-		if (i) s->SpellbookIcon[i]='C';
+		if (i) s->SpellbookIcon[i-1]='c';
 	}
 
 	str->ReadWord( &s->unknown6 );

@@ -99,14 +99,15 @@ def OpenMageWindow ():
 	# Setup memorized spells buttons
 	for i in range (12):
 		Button = GemRB.GetControl (Window, 3 + i)
-		GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,0,0,0,160,0,1)
-		GemRB.SetButtonBAM (Window, Button, "SPELFRAM",0,0,0)
+		GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,0,0,0,64,0,1)
+		GemRB.SetButtonSprites (Window, Button, "SPELFRAM",0,0,0,0,0)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 
 	# Setup book spells buttons
 	for i in range (20):
 		Button = GemRB.GetControl (Window, 27 + i)
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 
 	SetSelectionChangeHandler (UpdateMageWindow)

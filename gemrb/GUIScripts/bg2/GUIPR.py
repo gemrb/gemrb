@@ -88,20 +88,20 @@ def OpenPriestWindow ():
 	for i in range (7):
 		Button = GemRB.GetControl (Window, 55 + i)
 		GemRB.SetVarAssoc (Window, Button, "PriestSpellLevel", i)
-		
+
 	# Setup memorized spells buttons
 	for i in range (12):
 		Button = GemRB.GetControl (Window, 3 + i)
 		GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,0,0,0,64,0,1)
 		GemRB.SetButtonSprites (Window, Button, "SPELFRAM",0,0,0,0,0)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
-		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SECOND)
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 
 	# Setup book spells buttons
 	for i in range (24):
 		Button = GemRB.GetControl (Window, 27 + i)
-		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SECOND)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 
 	SetSelectionChangeHandler (UpdatePriestWindow)
 	UpdatePriestWindow ()
@@ -185,13 +185,13 @@ def UpdatePriestWindow ():
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
 			GemRB.SetTooltip (Window, Button, '')
 			GemRB.EnableButtonBorder (Window, Button, 0, 0)
+
 	Table = GemRB.LoadTable ("clskills")
 	if (GemRB.GetTableValue (Table, GemRB.GetPlayerStat( GemRB.GameGetSelectedPCSingle(), IE_CLASS), 1)=="*"):
 		GemRB.SetVisible (Window, 2)
 	else:
 		GemRB.SetVisible (Window, 1)
 	return
-
 
 def PriestPrevLevelPress ():
 	global PriestSpellLevel
@@ -200,7 +200,6 @@ def PriestPrevLevelPress ():
 		PriestSpellLevel = PriestSpellLevel - 1
 		UpdatePriestWindow ()
 	return
-
 
 def PriestNextLevelPress ():
 	global PriestSpellLevel
@@ -216,7 +215,7 @@ def RefreshPriestLevel ():
 	PriestSpellLevel = GemRB.GetVar ("PriestSpellLevel")
 	UpdatePriestWindow ()
 	return
-	
+
 def OpenPriestSpellInfoWindow ():
 	global PriestSpellInfoWindow
 
@@ -224,7 +223,7 @@ def OpenPriestSpellInfoWindow ():
 		GemRB.UnloadWindow (PriestSpellInfoWindow)
 		PriestSpellInfoWindow = None
 		return
-		
+
 	PriestSpellInfoWindow = Window = GemRB.LoadWindow (3)
 
 	#back
@@ -266,7 +265,7 @@ def OnPriestMemorizeSpell ():
 
 def OpenPriestSpellRemoveWindow ():
 	global PriestSpellUnmemorizeWindow
-	
+
 	PriestSpellUnmemorizeWindow = Window = GemRB.LoadWindow (5)
 
 	# "Are you sure you want to ....?"
@@ -295,7 +294,7 @@ def ClosePriestSpellUnmemorizeWindow ():
 
 def OpenPriestSpellUnmemorizeWindow ():
 	global PriestSpellUnmemorizeWindow
-			
+
 	PriestSpellUnmemorizeWindow = Window = GemRB.LoadWindow (5)
 
 	# "Are you sure you want to ....?"
