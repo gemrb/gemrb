@@ -1995,23 +1995,12 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 	if (!spell) {
 		return LSR_INVALID; //not existent spell
 	}
-	//from now on, you must delete spl if you don't push back it
-	CREKnownSpell *spl = new CREKnownSpell();
-	strncpy(spl->SpellResRef, spellname, 8);
-	spl->Type = spell->SpellType;
-	if ( spl->Type == IE_SPELL_TYPE_INNATE ) {
-		spl->Level = 0;
-	}
-	else {
-		spl->Level = (ieWord) (spell->SpellLevel-1);
-	}
-	bool ret=spellbook.AddKnownSpell(spl->Type, spl->Level, spl);
-	if (!ret) {
-		delete spl;
+	int exp = spellbook.LearnSpell(spell);
+	if (!exp) {
 		return LSR_INVALID;
 	}
 	if (flags&LS_ADDXP) {
-		AddExperience(spl->Level*100);
+		AddExperience(exp);
 	}
 	return LSR_OK;
 }

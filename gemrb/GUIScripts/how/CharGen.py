@@ -25,7 +25,7 @@
 
 import GemRB
 from ie_stats import *
-from GUICommon import GetLearnableMageSpells, GetLearnablePriestSpells, SetColorStat
+from GUICommon import *
 
 CharGenWindow = 0
 CharGenState = 0
@@ -52,7 +52,7 @@ ClassButton = 0
 ClassWindow = 0
 ClassTable = 0
 KitTable = 0
-ClassSkillTable = 0
+ClassSkillsTable = 0
 ClassTextArea = 0
 ClassDoneButton = 0
 
@@ -105,7 +105,6 @@ ProficienciesDoneButton = 0
 ProficienciesPointsLeft = 0
 
 MageSpellsWindow = 0
-MageSpellsTable = 0
 MageSpellsTextArea = 0
 MageSpellsDoneButton = 0
 MageSpellsSelectPointsLeft = 0
@@ -115,7 +114,6 @@ MageMemorizeTextArea = 0
 MageMemorizeDoneButton = 0
 MageMemorizePointsLeft = 0
 
-PriestSpellsTable = 0
 PriestMemorizeWindow = 0
 PriestMemorizeTextArea = 0
 PriestMemorizeDoneButton = 0
@@ -306,17 +304,23 @@ def AcceptPress():
 	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, t)
 
 	#mage spells
-	Learnable = GetLearnableMageSpells( KitIndex, t, 1)
-	SpellBook = GemRB.GetVar ("MageSpellBook")
-	j=1
-	for i in range (len(Learnable) ):
-		if SpellBook & j:
-			GemRB.LearnSpell (MyChar, Learnable[i], 0)
-		j=j<<1
+	TableName = GemRB.GetTableValue (ClassSkillsTable, Class, 2, 0)
+	if TableName != "*":
+		#todo: set up ALL spell levels not just level 1
+		SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_WIZARD, 1)
+		Learnable = GetLearnableMageSpells( KitIndex, t, 1)
+		SpellBook = GemRB.GetVar ("MageSpellBook")
+		j=1
+		for i in range (len(Learnable) ):
+			if SpellBook & j:
+				GemRB.LearnSpell (MyChar, Learnable[i], 0)
+			j=j<<1
 
 	#priest spells
-	TableName = GemRB.GetTableValue (ClassSkillTable, Class, 1)
+	TableName = GemRB.GetTableValue (ClassSkillsTable, Class, 1, 0)
 	if TableName != "*":
+		#todo: set up ALL spell levels not just level 1
+		SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
 		ClassFlag = 0 #set this according to class
 		Learnable = GetLearnablePriestSpells( ClassFlag, t, 1)
 		for i in range (len(Learnable) ):
@@ -379,7 +383,6 @@ def SetCharacterDescription():
 	global CharGenWindow, TextArea, CharGenState, ClassFlag
 	global ClassTable, KitTable, RaceTable, AlignmentTable, AbilitiesTable
  	global SkillsTable, ProficienciesTable, RacialEnemyTable
-	global MageSpellsTable, PriestSpellsTable, ClassSkillTable
 
 	GemRB.TextAreaClear(CharGenWindow, TextArea)
 	if CharGenState > 7:
@@ -1752,7 +1755,7 @@ def MageSpellsCancelPress():
 # Mage Spells Memorize
 
 def MageSpellsMemorize(SpellTable, Level, SpellLevel):
-	global CharGenWindow, MageMemorizeWindow, MageSpellsTable, MageMemorizeTextArea, MageMemorizeDoneButton, MageMemorizePointsLeft
+	global CharGenWindow, MageMemorizeWindow, MageMemorizeTextArea, MageMemorizeDoneButton, MageMemorizePointsLeft
 
 	GemRB.SetVisible (CharGenWindow, 0)
 	MageMemorizeWindow = GemRB.LoadWindow (16)
@@ -2183,9 +2186,7 @@ def CharSoundPlayPress():
 
 	row = GemRB.QueryText (CharSoundWindow, CharSoundVoiceList)
 	column = str(GemRB.Roll(1,40,0))
-	print row, column
 	x=GemRB.GetTableValue (CharSoundStrings, row, column)
-	print GemRB.GetString (x)
 	return
 
 def CharSoundDonePress():

@@ -105,7 +105,7 @@ def OpenMageWindow ():
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 
 	# Setup book spells buttons
-	for i in range (24):
+	for i in range (20): #only 20 for iwd
 		Button = GemRB.GetControl (Window, 27 + i)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
@@ -167,7 +167,7 @@ def UpdateMageWindow ():
 
 
 	known_cnt = GemRB.GetKnownSpellsCount (pc, type, level)
-	for i in range (24):
+	for i in range (20):
 		Button = GemRB.GetControl (Window, 27 + i)
 		if i < known_cnt:
 			ks = GemRB.GetKnownSpell (pc, type, level, i)

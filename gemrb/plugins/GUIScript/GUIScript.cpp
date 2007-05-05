@@ -772,14 +772,14 @@ PyDoc_STRVAR( GemRB_LoadTable__doc,
 
 static PyObject* GemRB_LoadTable(PyObject * /*self*/, PyObject* args)
 {
-	char* string;
+	char* tablename;
 	int noerror = 0;
 
-	if (!PyArg_ParseTuple( args, "s|i", &string, &noerror )) {
+	if (!PyArg_ParseTuple( args, "s|i", &tablename, &noerror )) {
 		return AttributeError( GemRB_LoadTable__doc );
 	}
 
-	int ind = core->LoadTable( string );
+	int ind = core->LoadTable( tablename );
 	if (!noerror && ind == -1) {
 		return RuntimeError("Can't find resource");
 	}
@@ -902,15 +902,6 @@ static PyObject* GemRB_FindTableValue(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("Can't find resource");
 	}
 	return PyInt_FromLong(tm->FindTableValue(col, Value));
-/*
-	for (row = 0; row < tm->GetRowCount(); row++) {
-		const char* ret = tm->QueryField( row, col );
-		long val;
-		if (valid_number( ret, val ) && (Value == val) )
-			return PyInt_FromLong( row );
-	}
-	return PyInt_FromLong( -1 ); //row not found
-*/
 }
 
 PyDoc_STRVAR( GemRB_GetTableRowIndex__doc,
@@ -1001,6 +992,27 @@ static PyObject* GemRB_GetTableRowCount(PyObject * /*self*/, PyObject* args)
 	}
 
 	return PyInt_FromLong( tm->GetRowCount() );
+}
+
+PyDoc_STRVAR( GemRB_GetTableColumnCount__doc,
+"GetTableColumnCount(TableIndex[, Row]) => ColumnCount\n\n"
+"Returns the number of columns in the given row of a 2DA Table. Row may be omitted." );
+
+static PyObject* GemRB_GetTableColumnCount(PyObject * /*self*/, PyObject* args)
+{
+	int ti;
+	int row = 0;
+
+	if (!PyArg_ParseTuple( args, "i|i", &ti, &row )) {
+		return AttributeError( GemRB_GetTableColumnCount__doc );
+	}
+
+	TableMgr* tm = core->GetTable( ti );
+	if (tm == NULL) {
+		return RuntimeError("Can't find resource");
+	}
+
+	return PyInt_FromLong( tm->GetColumnCount(row) );
 }
 
 PyDoc_STRVAR( GemRB_LoadSymbol__doc,
@@ -5566,9 +5578,9 @@ PyDoc_STRVAR( GemRB_SetMemorizableSpellsCount__doc,
 
 static PyObject* GemRB_SetMemorizableSpellsCount(PyObject* /*self*/, PyObject* args)
 {
-	int PartyID, Value, SpellType, Level, Bonus=1;
+	int PartyID, Value, SpellType, Level;
 
-	if (!PyArg_ParseTuple( args, "iiii|i", &PartyID, &Value, &SpellType, &Level, &Bonus )) {
+	if (!PyArg_ParseTuple( args, "iiii", &PartyID, &Value, &SpellType, &Level)) {
 		return AttributeError( GemRB_SetMemorizableSpellsCount__doc );
 	}
 	Game *game = core->GetGame();
@@ -5580,8 +5592,8 @@ static PyObject* GemRB_SetMemorizableSpellsCount(PyObject* /*self*/, PyObject* a
 		return RuntimeError( "Actor not found" );
 	}
 
-	//this isn't in the actor's spellbook, handles Wisdom
-	actor->spellbook.SetMemorizableSpellsCount( Value, (ieSpellType) SpellType, Level, (bool) Bonus );
+	//the bonus increased value (with wisdom too) is handled by the core
+	actor->spellbook.SetMemorizableSpellsCount( Value, (ieSpellType) SpellType, Level, 0 );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -7887,6 +7899,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GetTableRowName, METH_VARARGS),
 	METHOD(GetTableColumnName, METH_VARARGS),
 	METHOD(GetTableRowCount, METH_VARARGS),
+	METHOD(GetTableColumnCount, METH_VARARGS),
 	METHOD(LoadSymbol, METH_VARARGS),
 	METHOD(UnloadSymbol, METH_VARARGS),
 	METHOD(GetSymbolValue, METH_VARARGS),

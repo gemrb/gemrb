@@ -34,6 +34,7 @@
 #include <vector>
 
 class Actor;
+class Spell;
 
 #ifdef WIN32
 
@@ -181,7 +182,11 @@ public:
 	/** this removes ALL spells matching spellid */
 	void RemoveSpell(int spellid);
 
-	/** adds a spell to the book */
+	/** returns the page number for the spelltype */
+	static int GetSpellType(int spelltype);
+	/** adds a spell to the book, returns experience if learned */
+	int LearnSpell(Spell *spell);
+	/** adds a spell to the book, internal */
 	bool AddKnownSpell(int type, unsigned int level, CREKnownSpell *spl);
 	CREKnownSpell* GetKnownSpell(int type, unsigned int level, unsigned int index) const;
 	unsigned int GetMemorizedSpellsCount(int type) const;

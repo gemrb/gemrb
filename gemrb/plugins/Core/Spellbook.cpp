@@ -35,6 +35,13 @@ static bool SBInitialized = false;
 static int NUM_SPELL_TYPES = 3;
 static bool IWD2Style = false;
 
+//spelltypes in all games except iwd2
+#define  IE_SPL_WIZARD 1
+#define  IE_SPL_PRIEST 2
+#define  IE_SPL_INNATE 4
+
+static int spelltypes[3]={IE_SPL_PRIEST,IE_SPL_WIZARD,IE_SPL_INNATE};
+
 /* temporarily out
 static ieResRef *ResolveSpellName(ieDword index)
 {
@@ -349,6 +356,34 @@ void Spellbook::RemoveSpell(ieResRef ResRef)
 			}
 		}
 	}
+}
+
+int Spellbook::GetSpellType(int spelltype)
+{
+	if (IWD2Style) return spelltype;
+
+	for(int i=0;i<3;i++) {
+		if (spelltypes[i]==spelltype) return i;
+	}
+	return IE_SPELL_TYPE_INNATE;
+}
+
+int Spellbook::LearnSpell(Spell *spell)
+{
+	CREKnownSpell *spl = new CREKnownSpell();
+	strncpy(spl->SpellResRef, spell->Name, 8);
+	spl->Type = GetSpellType(spell->SpellType);
+	if ( spl->Type == IE_SPELL_TYPE_INNATE) {
+		spl->Level = 0;
+	}
+	else {
+		spl->Level = (ieWord) (spell->SpellLevel-1);
+	}
+	bool ret=AddKnownSpell(spl->Type, spl->Level, spl);
+	if (!ret) {
+		delete spl;
+	}
+	return spell->SpellLevel*100;
 }
 
 bool Spellbook::AddKnownSpell(int type, unsigned int level, CREKnownSpell *spl)
