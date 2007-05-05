@@ -79,6 +79,13 @@ def GetLearnablePriestSpells (Class, Alignment, Level):
 		Learnable.append (SpellName)
 	return Learnable
 
+def SetupSpellLevels (pc, TableName, Type, Level):
+	Table=GemRB.LoadTable (TableName)
+	for i in range(GemRB.GetTableColumnCount (0)):
+		value = GemRB.GetTableValue (Table, Level, i)
+		GemRB.SetMemorizableSpellsCount (pc, value, Type, i)
+	return
+
 def SetColorStat (Actor, Stat, Value):
 	t = Value & 0xFF
 	t |= t << 8
