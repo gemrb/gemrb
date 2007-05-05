@@ -1,0 +1,15 @@
+
+Prototype: GemRB.GetTableColumnCount(TableIndex[, Row])
+
+Description: Returns the number of columns in the specified row in a 2DA Table.
+
+Parameters:
+  TableIndex - returned by a previous LoadTable command.
+  Row        - the row of the table, if omitted, defaults to 0
+
+Return value: numeric
+
+See also: LoadTable, GetTableRowCount
+
+
+MD5: 
