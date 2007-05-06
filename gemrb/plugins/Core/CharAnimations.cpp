@@ -205,7 +205,7 @@ void CharAnimations::SetOffhandRef(const char* ref)
 {
 	OffhandRef[0] = ref[0];
 	OffhandRef[1] = ref[1];
-	
+
 	// TODO: Only drop shield/offhand anims?
 	DropAnims();
 	core->FreePalette(palette[PAL_OFFHAND], 0);
@@ -778,7 +778,7 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 		}
 
 		if (part < actorPartCount) {
-			if (!palette[PAL_MAIN] && (GlobalColorMod.type!=RGBModifier::NONE) || (NoPalette()!=1) ) {
+			if (!palette[PAL_MAIN] && ((GlobalColorMod.type!=RGBModifier::NONE) || (NoPalette()!=1)) ) {
 				// This is the first time we're loading an Animation.
 				// We copy the palette of its first frame into our own palette
 				palette[PAL_MAIN] = 
@@ -806,7 +806,7 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 				SetupColors(PAL_HELMET);
 			}
 		}
-	
+
 		//animation is affected by game flags
 		a->gameAnimation = true;
 		a->SetPos( 0 );
@@ -864,7 +864,7 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 		case IE_ANI_CODE_MIRROR:
 			Anims[StanceID][Orient] = anims;
 			break;
-			
+
 		case IE_ANI_SIX_FILES: //16 anims some are stored elsewhere
 		case IE_ANI_ONE_FILE: //16 orientations
 			Anims[StanceID][Orient] = anims;
