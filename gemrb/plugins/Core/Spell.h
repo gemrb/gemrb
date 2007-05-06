@@ -59,6 +59,17 @@ class Projectile;
 //this is a relocated bit (used in iwd2 as 0x4000)
 #define SF_SIMPLIFIED_DURATION   0x40
 
+//spelltypes in spells
+#define  IE_SPL_ITEM   0
+#define  IE_SPL_WIZARD 1
+#define  IE_SPL_PRIEST 2
+#define  IE_SPL_PSION  3
+#define  IE_SPL_INNATE 4
+#define  IE_SPL_SONG   5
+
+//this is not the same as the book types which is 3 or 11)
+#define NUM_SPELL_TYPES 6
+
 /**
  * @class SPLExtHeader
  * Header for Spell special effects

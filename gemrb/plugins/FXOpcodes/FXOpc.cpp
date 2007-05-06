@@ -763,6 +763,20 @@ int fx_ac_vs_damage_type_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 		return FX_PERMANENT;
 	}
 
+	// FIXME: set to Param1 or Param1-1 ?
+	if (type == 16) {
+	 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
+			if (BASE_GET( IE_ARMORCLASS) > fx->Parameter1) {
+				BASE_SET( IE_ARMORCLASS, fx->Parameter1 );
+			}
+		} else {
+			if (STAT_GET( IE_ARMORCLASS) > fx->Parameter1) {
+				STAT_SET( IE_ARMORCLASS, fx->Parameter1 );
+			}
+		}
+		return FX_INSERT;
+	}
+
 	//the original engine did work with the combination of these bits
 	//but since it crashed, we are not bound to the same rules
 	if (type & 1) {
@@ -778,18 +792,6 @@ int fx_ac_vs_damage_type_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 		HandleBonus(target, IE_ACSLASHINGMOD, fx->Parameter1, fx->TimingMode);
 	}
 
-	// FIXME: set to Param1 or Param1-1 ?
-	if (type == 16) {
-	 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-			if (BASE_GET( IE_ARMORCLASS) > fx->Parameter1) {
-				BASE_SET( IE_ARMORCLASS, fx->Parameter1 );
-			}
-		} else {
-			if (STAT_GET( IE_ARMORCLASS) > fx->Parameter1) {
-				STAT_SET( IE_ARMORCLASS, fx->Parameter1 );
-			}
-		}
-	}
 	return FX_PERMANENT;
 }
 
@@ -2461,7 +2463,7 @@ int fx_remove_item (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_equip_item (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (core->QuerySlotEffects( fx->Parameter2 )) {
-		target->inventory.EquipItem(fx->Parameter2);
+		target->inventory.EquipItem(fx->Parameter2, true);
 	}
 	target->ReinitQuickSlots();
 	return FX_NOT_APPLIED;

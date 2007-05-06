@@ -5175,7 +5175,7 @@ void GameScript::SelectWeaponAbility(Scriptable* Sender, Action* parameters)
 		if (slot<0 || slot>=MAX_QUICKWEAPONSLOT) {
 			return;
 		}
-		scr->SetEquippedQuickSlot(slot);
+		scr->SetEquippedQuickSlot(slot, true);
 		if (scr->PCStats) {
 			scr->PCStats->QuickWeaponHeaders[slot]=(ieWord) parameters->int1Parameter;
 		}
@@ -5296,6 +5296,7 @@ void GameScript::AddKit(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *scr = (Actor *) Sender;
+	//remove previous kit stuff
 	scr->SetBase(IE_KIT, parameters->int0Parameter);
 }
 
@@ -5305,7 +5306,6 @@ void GameScript::AddSuperKit(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor *scr = (Actor *) Sender;
-//remove previous kit stuff?
 	scr->SetBase(IE_KIT, parameters->int0Parameter);
 }
 

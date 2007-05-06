@@ -6426,7 +6426,7 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 		// Note: this forcefully gets rid of any item currently
 		// in the slot without properly unequipping it
 		actor->inventory.SetSlotItemRes( ItemResRef, SlotID, Charge0, Charge1, Charge2 );
-		actor->inventory.EquipItem(SlotID);
+		actor->inventory.EquipItem(SlotID, true);
 		actor->RefreshEffects();
 		actor->ReinitQuickSlots();
 	}
@@ -7392,7 +7392,7 @@ static PyObject* GemRB_SetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "Actor not found" );
 	}
 
-	int ret = actor->SetEquippedQuickSlot(slot);
+	int ret = actor->SetEquippedQuickSlot(slot, true);
 	return PyInt_FromLong( ret );
 }
 

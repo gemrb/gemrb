@@ -342,13 +342,15 @@ Effect *EffectQueue::CreateEffect(EffectRef &effect_reference, ieDword param1, i
 	return CreateEffect(effect_reference.EffText, param1, param2, timing);
 }
 
-bool EffectQueue::AddEffect(Effect* fx)
+void EffectQueue::AddEffect(Effect* fx, bool insert)
 {
 	Effect* new_fx = new Effect;
 	memcpy( new_fx, fx, sizeof( Effect ) );
-	effects.push_back( new_fx );
-
-	return true;
+	if (insert) {
+		effects.insert( effects.begin(), new_fx );
+	} else {
+		effects.push_back( new_fx );
+	}
 }
 
 bool EffectQueue::RemoveEffect(Effect* fx)
@@ -358,6 +360,8 @@ bool EffectQueue::RemoveEffect(Effect* fx)
 	for (std::vector< Effect* >::iterator f = effects.begin(); f != effects.end(); f++ ) {
 		Effect* fx2 = *f;
 
+		//TODO:
+		//equipped effects do not have point at removal
 		if ( (fx==fx2) || !memcmp( fx, fx2, invariant_size)) {
 			delete fx2;
 			effects.erase( f );
@@ -390,12 +394,12 @@ void EffectQueue::ApplyAllEffects(Actor* target)
 	}
 }
 
-bool EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &dest)
+int EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &dest)
 {
 	int i;
 	Game *game;
 	Map *map;
-	bool flg;
+	int flg;
 
 	switch (fx->Target) {
 	case FX_TARGET_ORIGINAL:
@@ -403,7 +407,7 @@ bool EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &de
 		fx->PosY=self->Pos.y;
 		flg = self->fxqueue.ApplyEffect( self, fx, true );
 		if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
-			self->fxqueue.AddEffect( fx );
+			self->fxqueue.AddEffect( fx, flg==FX_INSERT );
 		}
 		break;
 	case FX_TARGET_SELF:
@@ -411,7 +415,7 @@ bool EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &de
 		fx->PosY=dest.y;
 		flg = self->fxqueue.ApplyEffect( self, fx, true );
 		if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
-			self->fxqueue.AddEffect( fx );
+			self->fxqueue.AddEffect( fx, flg==FX_INSERT );
 		}
 		break;
 
@@ -420,7 +424,7 @@ bool EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &de
 		fx->PosY=pretarget->Pos.y;
 		flg = self->fxqueue.ApplyEffect( pretarget, fx, true );
 		if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
-			pretarget->fxqueue.AddEffect( fx );
+			pretarget->fxqueue.AddEffect( fx, flg==FX_INSERT );
 		}
 		break;
 
@@ -430,12 +434,12 @@ bool EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &de
 			Actor* actor = game->GetPC( i, true );
 			fx->PosX=actor->Pos.x;
 			fx->PosY=actor->Pos.y;
-			self->fxqueue.ApplyEffect( actor, fx, true );
+			flg = self->fxqueue.ApplyEffect( actor, fx, true );
 			if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
-				actor->fxqueue.AddEffect( fx );
+				actor->fxqueue.AddEffect( fx, flg==FX_INSERT );
 			}
 		}
-		flg = false;
+		flg = FX_APPLIED;
 		break;
 
 	case FX_TARGET_GLOBAL_INCL_PARTY:
@@ -444,12 +448,12 @@ bool EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &de
 			Actor* actor = map->GetActor( i, true );
 			fx->PosX=actor->Pos.x;
 			fx->PosY=actor->Pos.y;
-			self->fxqueue.ApplyEffect( actor, fx, true );
+			flg = self->fxqueue.ApplyEffect( actor, fx, true );
 			if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
-				actor->fxqueue.AddEffect( fx );
+				actor->fxqueue.AddEffect( fx, flg==FX_INSERT );
 			}
 		}
-		flg = false;
+		flg = FX_APPLIED;
 		break;
 
 	case FX_TARGET_GLOBAL_EXCL_PARTY:
@@ -458,20 +462,20 @@ bool EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &de
 			Actor* actor = map->GetActor( i, false );
 			fx->PosX=actor->Pos.x;
 			fx->PosY=actor->Pos.y;
-			self->fxqueue.ApplyEffect( actor, fx, true );
+			flg = self->fxqueue.ApplyEffect( actor, fx, true );
 			//GetActorCount can now return all nonparty critters
 			//if (actor->InParty) continue;
 			if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
-				actor->fxqueue.AddEffect( fx );
+				actor->fxqueue.AddEffect( fx, flg==FX_INSERT );
 			}
 		}
-		flg = false;
+		flg = FX_APPLIED;
 		break;
 
 	case FX_TARGET_UNKNOWN:
 	default:
 		printf( "Unknown FX target type: %d\n", fx->Target);
-		flg = false;
+		flg = FX_ABORT;
 		break;
 	}
 
@@ -492,7 +496,7 @@ void EffectQueue::AddAllEffects(Actor* target, Point &destination)
 		(*f)->random_value = random_value;
 		//if applyeffect returns true, we stop adding the future effects
 		//this is to simulate iwd2's on the fly spell resistance
-		if(AddEffect(*f, Owner, target, destination)) {		
+		if(AddEffect(*f, Owner, target, destination)==FX_ABORT) {		
 			break;
 		}
 	}
@@ -700,16 +704,16 @@ inline bool check_resistance(Actor* actor, Effect* fx)
 // this happens on load time too!
 // returns true if the process should stop calling applyeffect anymore
 
-bool EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
+int EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 {
 	if (!target) {
 		fx->TimingMode=FX_DURATION_JUST_EXPIRED;
-		return true;
+		return FX_ABORT;
 	}
 	//printf( "FX 0x%02x: %s(%d, %d)\n", fx->Opcode, effectnames[fx->Opcode].Name, fx->Parameter1, fx->Parameter2 );
 	if (fx->Opcode >= MAX_EFFECTS) {
 		fx->TimingMode=FX_DURATION_JUST_EXPIRED;
-		return false;
+		return FX_NOT_APPLIED;
 	}
 
 	ieDword GameTime = core->GetGame()->GameTime;
@@ -722,13 +726,13 @@ bool EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 		//the effect didn't pass the probability check
 		if (!check_probability(fx) ) {
 			fx->TimingMode=FX_DURATION_JUST_EXPIRED;
-			return false;
+			return FX_NOT_APPLIED;
 		}
 
 		//the effect didn't pass the target level check
 		if (check_level(target, fx) ) {
 			fx->TimingMode=FX_DURATION_JUST_EXPIRED;
-			return false;
+			return FX_NOT_APPLIED;
 		}
 
 		//the effect didn't pass the resistance check
@@ -736,7 +740,7 @@ bool EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 			fx->Resistance == FX_CAN_RESIST_NO_DISPEL) {
 			if (check_resistance(target, fx) ) {
 				fx->TimingMode=FX_DURATION_JUST_EXPIRED;
-				return false;
+				return FX_NOT_APPLIED;
 			}
 		}
 		if (NeedPrepare((ieByte) fx->TimingMode) ) {
@@ -747,7 +751,7 @@ bool EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 	switch (IsPrepared((ieByte) fx->TimingMode) ) {
 	case DELAYED:
 		if (fx->Duration>GameTime) {
-			return false;
+			return FX_NOT_APPLIED;
 		}
 		//effect triggered
 		fx->TimingMode=TriggeredEffect((ieByte) fx->TimingMode);
@@ -773,7 +777,7 @@ bool EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 	}
 
 	EffectFunction fn = effect_refs[fx->Opcode].Function;
-	bool flg = false;
+	int res = FX_ABORT;
 	if (fn) {
 		if ( effect_refs[fx->Opcode].EffText > 0 ) {
 			char *text = core->GetString( effect_refs[fx->Opcode].EffText );
@@ -781,7 +785,7 @@ bool EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 			free( text );
 		}
 
-		int res=fn( Owner?Owner:target, target, fx );
+		res=fn( Owner?Owner:target, target, fx );
 
 		//if there is no owner, we assume it is the target
 		switch( res ) {
@@ -793,6 +797,12 @@ bool EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 				//for example, a damage effect
 				fx->TimingMode=FX_DURATION_JUST_EXPIRED;
 				break;
+			case FX_INSERT:
+				//put this effect in the beginning of the queue
+				//all known insert effects are 'permanent' too
+				//that is the AC effect only
+				//actually, permanent effects seem to be
+				//inserted by the game engine too
 			case FX_PERMANENT:
 				//don't stick around if it was permanent
 				//for example, a strength modifier effect
@@ -801,7 +811,6 @@ bool EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 				}
 				break;
 			case FX_ABORT:
-				flg = true;
 				break;
 			default:
 				abort();
@@ -810,7 +819,7 @@ bool EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 		//effect not found, it is going to be discarded
 		fx->TimingMode=FX_DURATION_JUST_EXPIRED;
 	}
-	return flg;
+	return res;
 }
 
 // looks for opcode with param2

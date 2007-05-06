@@ -357,7 +357,16 @@ int GameScript::Kit(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor* actor = (Actor *) scr;
 
-	if ( actor->GetStat(IE_KIT) == (ieDword) parameters->int0Parameter) {
+	ieDword kit = actor->GetStat(IE_KIT);
+	//TODO: fix baseclass / barbarian confusion
+
+	//IWD2 style kit matching (also used for mage schools)
+	if (kit == (ieDword) (parameters->int0Parameter)) {
+		return 1;
+	}
+	//BG2 style kit matching
+	kit = (kit>>16)|(kit<<16);
+	if ( kit == (ieDword) (parameters->int0Parameter)) {
 		return 1;
 	}
 	return 0;

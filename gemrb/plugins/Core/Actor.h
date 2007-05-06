@@ -198,6 +198,8 @@ private:
 	const char* GetActorNameByID(ieDword ID);
 	/* if Lasttarget is gone, call this */
 	void StopAttack();
+	/* checks a weapon quick slot and resets it to fist if it is empty */
+	void CheckWeaponQuickSlot(unsigned int which);
 public:
 	Actor(void);
 	~Actor(void);
@@ -336,9 +338,8 @@ public:
 	void SetInTrap(ieDword tmp);
 	/* sets some of the internal flags */
 	void SetRunFlags(ieDword flags);
-private:
-	/* checks a weapon quick slot and resets it to fist if it is empty */
-	void CheckWeaponQuickSlot(unsigned int which);
+	/* applies the kit abilities, returns false if kit is not applicable */
+	bool ApplyKit(ieDword Value);
 public:
 	/* calls InitQuickSlot in PCStatStruct */
 	void SetupQuickSlot(unsigned int which, int slot, int headerindex);
@@ -433,7 +434,7 @@ public:
 	/* returns which slot belongs to the quickweapon slot */
 	int GetQuickSlot(int slot);
 	/* Sets equipped Quick slot */
-	int SetEquippedQuickSlot(int slot);
+	int SetEquippedQuickSlot(int slot, bool reequip);
 	/* Uses an item on the target or point */
 	bool UseItemPoint(int slot, ieDword header, Point &point, bool silent);
 	bool UseItem(int slot, ieDword header, Scriptable *target, bool silent);

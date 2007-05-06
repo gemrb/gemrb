@@ -96,7 +96,7 @@ Item* ITMImp::GetItem(Item *s)
 	str->Read( &k3,1 );
 	str->Read( &s->MinWisdom,1 );
 	str->Read( &k4,1 );
-	s->KitUsability=(k1<<24) | (k2<<16) | (k3<<8) | k1; //bg2/iwd2 specific
+	s->KitUsability=(k1<<24) | (k2<<16) | (k3<<8) | k4; //bg2/iwd2 specific
 	str->Read( &s->MinConstitution,1 );
 	str->Read( &s->WeaProf,1 ); //bg2 specific
 	str->Read( &s->MinCharisma,1 );

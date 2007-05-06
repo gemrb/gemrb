@@ -21,7 +21,7 @@
 
 /**
  * @file EffectQueue.h
- * Declares EffectQueue class holding and processing all spell effects 
+ * Declares EffectQueue class holding and processing all spell effects
  * on a single Actor
  * @author The GemRB Project
  */
@@ -39,15 +39,17 @@ class Map;
 /** Maximum number of different Effect opcodes */
 #define MAX_EFFECTS 512
 
-/** these effects never stick around, use them for instant effects like damage */
-#define FX_NOT_APPLIED 0 
-/** these effects always stick around when applied as permanent or duration */
-#define FX_APPLIED 1	
-/** these effects don't stick around if used as permanent, 
+///** if the effect returns this, stop adding any other effect */
+#define FX_ABORT 0
+/** these effects don't stick around if used as permanent,
  * in that case they modify a base stat like charisma modifier */
 #define FX_PERMANENT 2
-///** if the effect returns this, stop adding any other effect */
-#define FX_ABORT 3
+/** these effects never stick around, use them for instant effects like damage */
+#define FX_NOT_APPLIED 3
+/** these effects always stick around when applied as permanent or duration */
+#define FX_APPLIED 1	
+///** insert the effect instead of push back */
+#define FX_INSERT 4
 
 //remove level effects flags
 #define RL_DISPELLABLE  1  //only dispellables
@@ -68,7 +70,7 @@ class Map;
 #define BNC_SECTYPE_DEC 0x1000
 #define BNC_RESOURCE_DEC 0x2000
 
-// FIXME: Dice roll should be probably done just once, e.g. when equipping 
+// FIXME: Dice roll should be probably done just once, e.g. when equipping
 // the item, not each time the fx are applied
 // <avenger> the dice values are actually level limits, except in 3 hp modifier functions
 // the damage function is an instant (the other 2 functions might be tricky with random values)
@@ -151,19 +153,22 @@ public:
 	/** Returns Actor affected by these effects */
 	Actor* GetOwner() { return Owner; }
 
+	/** adds an effect to the queue, it could also insert it if flagged so
+	 *  fx should be freed by the caller
+	 */
+	void AddEffect(Effect* fx, bool insert=false);
 	/** Adds an Effect to the queue, subject to level and other checks.
-	 * Returns true is successful. fx is just a reference, AddEffect()
+	 * Returns FX_ABORT is unsuccessful. fx is just a reference, AddEffect()
 	 * will malloc its own copy */
-	bool AddEffect(Effect* fx);
-	bool AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &dest);
-	/** Removes first Effect matching fx from the queue. 
+	int AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &dest);
+	/** Removes first Effect matching fx from the queue.
 	 * Effects are matched based on their contents */
 	bool RemoveEffect(Effect* fx);
 
 	void AddAllEffects(Actor* target, Point &dest);
 	void ApplyAllEffects(Actor* target);
 	/* returns true if the process should abort applying a stack of effects */
-	bool ApplyEffect(Actor* target, Effect* fx, bool first_apply);
+	int ApplyEffect(Actor* target, Effect* fx, bool first_apply);
 	/* directly removes effects with specified opcode, use effect_reference when you can */
 	void RemoveAllEffects(ieDword opcode);
 	/* removes all effects of a given spell */

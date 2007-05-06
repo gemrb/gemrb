@@ -54,9 +54,9 @@ class Spell;
 #define HS_DEPLETE 1
 
 //LearnSpell flags
-#define LS_ADDXP  1
-#define LS_LEARN  2
-#define LS_STATS  4
+#define LS_ADDXP   1   //give xp for learning it
+#define LS_LEARN   2   //give message when learned it
+#define LS_STATS   4   //check stats (alignment, etc)
 
 //LearnSpell return values
 #define LSR_OK      0
@@ -71,7 +71,8 @@ class Spell;
 typedef enum ieSpellType {
 	IE_SPELL_TYPE_PRIEST = 0,
 	IE_SPELL_TYPE_WIZARD = 1,
-	IE_SPELL_TYPE_INNATE = 2
+	IE_SPELL_TYPE_INNATE = 2,
+	IE_SPELL_TYPE_SONG = 3     //not in spellbook
 } ieSpellType;
 
 #define NUM_SPELLTYPES 3

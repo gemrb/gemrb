@@ -182,7 +182,7 @@ void Inventory::CalculateWeight()
 	Changed = false;
 }
 
-void Inventory::AddSlotEffects(CREItem* slot, int type)
+void Inventory::AddSlotEffects(CREItem* slot, int type, bool reequip)
 {
 	Item* itm = core->GetItem( slot->ItemResRef );
 	if (!itm) {
@@ -190,36 +190,45 @@ void Inventory::AddSlotEffects(CREItem* slot, int type)
 		return;
 	}
 	ItemExcl|=itm->ItemExcl;
-
+	
 	ieWord gradient = itm->GetWieldedGradient();
 	if (gradient!=0xffff) {
 		Owner->SetBase(IE_COLORS, gradient);
 	}
-
+	
 	//get the equipping effects
 	EffectQueue *eqfx = itm->GetEffectBlock(-1);
 	core->FreeItem( itm, slot->ItemResRef, false );
-
-	int cnt = eqfx->GetEffectsCount();
-	for (int i = 0; i < cnt; i++) {
-		Effect* fx = eqfx->GetEffect(i);
-		fx->PosX = Owner->Pos.x;
-		fx->PosY = Owner->Pos.y;
-
-		// Tweak colour effects for weapons:
-		// If a weapon is in the off-hand, it needs to set the off-hand palette
-		// If it is in the main hand, it should set the weapon palette
-		if (IsColorslotEffect(fx->Opcode)) {
-			unsigned int gradienttype = fx->Parameter2 & 0xF0;
-			if (type == SLOT_EFFECT_MELEE && gradienttype == 0x20)
-				gradienttype = 0x10; // weapon
-			else if (type == SLOT_EFFECT_LEFT && gradienttype == 0x10)
-				gradienttype = 0x20; // off-hand
-			fx->Parameter2 &= ~0xF0;
-			fx->Parameter2 |= gradienttype;
+	if (reequip) {
+		eqfx->SetOwner(Owner);
+		eqfx->AddAllEffects( Owner, Owner->Pos);
+	} else {
+		int cnt = eqfx->GetEffectsCount();
+		for (int i = 0; i < cnt; i++) {
+			Effect* fx = eqfx->GetEffect(i);
+			fx->PosX = Owner->Pos.x;
+			fx->PosY = Owner->Pos.y;
+			
+			// Tweak colour effects for weapons:
+			// If a weapon is in the off-hand, it needs to set the off-hand palette
+			// If it is in the main hand, it should set the weapon palette
+			// TODO: move this code into the effects
+			if (IsColorslotEffect(fx->Opcode)) {
+				unsigned int gradienttype = fx->Parameter2 & 0xF0;
+				if (type == SLOT_EFFECT_MELEE && gradienttype == 0x20)
+					gradienttype = 0x10; // weapon
+				else if (type == SLOT_EFFECT_LEFT && gradienttype == 0x10)
+					gradienttype = 0x20; // off-hand
+				fx->Parameter2 &= ~0xF0;
+				fx->Parameter2 |= gradienttype;
+			}
+			
+			if (reequip) {
+				//Owner->fxqueue.AddEffect( fx, Owner, Owner, Owner->Pos);
+			} else {
+				Owner->fxqueue.AddEffect( fx, false );
+			}
 		}
-
-		Owner->fxqueue.AddEffect( fx );
 	}
 	delete eqfx;
 	core->GetGUIScriptEngine()->RunFunction("UpdateAnimation", false);
@@ -500,7 +509,7 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 			item->Flags |= IE_INV_ITEM_ACQUIRED;
 			Slots[slot] = item;
 			Changed = true;
-			EquipItem(slot);
+			EquipItem(slot, true);
 			return ASI_SUCCESS;
 		}
 
@@ -520,7 +529,7 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 			myslot->Usages[0] = (ieWord) (myslot->Usages[0] + chunk);
 			item->Usages[0] = (ieWord) (item->Usages[0] - chunk);
 			Changed = true;
-			EquipItem(slot);
+			EquipItem(slot, true);
 			if (item->Usages[0] == 0) {
 				delete item;
 				return ASI_SUCCESS;
@@ -749,7 +758,7 @@ bool Inventory::ChangeItemFlag(unsigned int slot, ieDword arg, int op)
 
 //this is the low level equipping
 //all checks have been made previously
-bool Inventory::EquipItem(unsigned int slot)
+bool Inventory::EquipItem(unsigned int slot, bool reequip)
 {
 	ITMExtHeader *header;
 
@@ -792,12 +801,10 @@ bool Inventory::EquipItem(unsigned int slot)
 			header = itm->GetWeaponHeader(false);
 		}
 		if (header) {
-			if (slot == IW_NO_EQUIPPED) {
-				SetEquippedSlot(IW_NO_EQUIPPED);
-			} else {
+			if (slot != IW_NO_EQUIPPED) {
 				Owner->SetupQuickSlot(ACT_WEAPON1+weaponslot, slot+SLOT_MELEE, 0);
-				SetEquippedSlot(slot);
 			}
+			SetEquippedSlot(slot, true);
 			effect = 0; // SetEquippedSlot will already call AddSlotEffects
 			UpdateWeaponAnimation();
 		}
@@ -808,7 +815,7 @@ bool Inventory::EquipItem(unsigned int slot)
 			weaponslot = FindTypedRangedWeapon(header->ProjectileQualifier);
 			if (weaponslot != SLOT_FIST) {
 				weaponslot -= SLOT_MELEE;
-				SetEquippedSlot(slot-SLOT_MELEE);
+				SetEquippedSlot(slot-SLOT_MELEE, true);
 				Owner->SetupQuickSlot(ACT_WEAPON1+weaponslot, slot, 0);
 			}
 		}
@@ -833,7 +840,7 @@ bool Inventory::EquipItem(unsigned int slot)
 		if (item->Flags & IE_INV_ITEM_CURSED) {
 			item->Flags|=IE_INV_ITEM_UNDROPPABLE;
 		}
-		AddSlotEffects( item, effect );
+		AddSlotEffects( item, effect, reequip );
 	}
 	core->FreeItem(itm, item->ItemResRef, false);
 	return true;
@@ -1046,7 +1053,7 @@ int Inventory::GetEquippedSlot()
 	return Equipped+SLOT_MELEE;
 }
 
-bool Inventory::SetEquippedSlot(int slotcode)
+bool Inventory::SetEquippedSlot(int slotcode, bool reequip)
 {
 	if (Equipped != IW_NO_EQUIPPED) {
 		RemoveSlotEffects( GetSlotItem(SLOT_MELEE+Equipped) );
@@ -1076,7 +1083,7 @@ bool Inventory::SetEquippedSlot(int slotcode)
 		if (item->Flags & IE_INV_ITEM_CURSED) {
 			item->Flags|=IE_INV_ITEM_UNDROPPABLE;
 		}
-		AddSlotEffects( item, effects );
+		AddSlotEffects( item, effects, reequip );
 	}
 	UpdateWeaponAnimation();
 	return true;
@@ -1278,7 +1285,7 @@ void Inventory::EquipBestWeapon(int flags)
 		}
 	}
 
-	SetEquippedSlot(best_slot);
+	SetEquippedSlot(best_slot, true);
 	UpdateWeaponAnimation();
 }
 

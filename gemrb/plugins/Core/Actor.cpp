@@ -429,6 +429,81 @@ void Actor::SetCircleSize()
 	SetCircle( anims->GetCircleSize(), *color, core->GroundCircles[csize][color_index], core->GroundCircles[csize][(color_index == 0) ? 3 : color_index] );
 }
 
+void ApplyClab(Actor *actor, const char *clab, int level)
+{
+	int tidx = core->LoadTable(clab);
+	TableMgr *table = core->GetTable(tidx);
+	if (table) {
+		int row = table->GetRowCount();
+		for(int i=0;i<level;i++) {
+			for (int j=0;j<row;j++) {
+				const char *res = table->QueryField(j,i);
+				if (!memcmp(res,"AP_",3)) {
+					core->ApplySpell(res+2, actor, actor, 0);
+				}
+				else if (!memcmp(res,"GA_",3)) {
+					actor->LearnSpell(res+2, 0);
+				}
+				else if (!memcmp(res,"FA_",3)) {//iwd2 only
+					int x=atoi(res+3);
+					core->DisplayStringName(x,0xffffff,actor,0);
+				}
+				else if (!memcmp(res,"FS_",3)) {//iwd2? (song?)
+					int x=atoi(res+3);
+					core->DisplayStringName(x,0xffffff,actor,0);
+				}
+				else if (!memcmp(res,"RA_",3)) {//iwd2
+					int x=atoi(res+3);
+					core->DisplayStringName(x,0xffffff,actor,0);
+				}
+			}
+		}
+		core->DelTable(tidx);
+	}
+}
+
+#define BG2_KITMASK  0xc000ffff
+#define KIT_BARBARIAN 0x40000000
+#define KIT_BASECLASS 0x4000
+
+//applies a kit on the character (only bg2)
+bool Actor::ApplyKit(ieDword Value)
+{
+	//get current unmodified level (i guess)
+	int level = GetXPLevel(false);
+	int tidx = core->LoadTable("kitlist");
+	TableMgr *table = core->GetTable(tidx);
+	if (table) {
+		ieDword row;
+		//find row by unusability
+		row = table->GetRowCount();
+		while (row) {
+			row--;
+			ieDword Unusability = (ieDword) atoi(table->QueryField(row, 6));
+			if (Value == Unusability) {
+				goto found_row;
+			}
+		}
+		//if it wasn't found, try the bg2 kit format
+		if ((Value&BG2_KITMASK)==KIT_BARBARIAN) {
+			row = (Value>>16)&0xfff;
+		}
+		//cannot find kit
+		if (table->GetRowCount()>=row) {
+			return false;
+		}
+found_row:
+		ieDword cls = (ieDword) atoi(table->QueryField(row, 7));
+		if (cls!=BaseStats[IE_CLASS]) {
+			//cannot apply kit, because the class doesn't fit
+			return false;
+		}
+		const char *clab = table->QueryField(row, 4);
+		ApplyClab(this, clab, level);
+	}
+	return true;
+}
+
 //call this when morale or moralebreak changed
 void pcf_morale (Actor *actor, ieDword /*Value*/)
 {
@@ -1996,8 +2071,27 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 		return LSR_INVALID; //not existent spell
 	}
 	int exp = spellbook.LearnSpell(spell);
+	int tmp = spell->SpellNameIdentified;
+	if (flags&LS_LEARN) {
+		core->GetTokenDictionary()->SetAt("SPECIALABILITYNAME", core->GetString(tmp));
+		switch (spell->SpellType) {
+		case IE_SPL_INNATE:
+			tmp = STR_GOTABILITY;
+			break;
+		case IE_SPL_SONG:
+			tmp = STR_GOTSONG;
+			break;
+		default:
+			tmp = STR_GOTSPELL;
+			break;
+		}
+	} else tmp = 0;
+	core->FreeSpell(spell, spellname, false);
 	if (!exp) {
 		return LSR_INVALID;
+	}
+	if (tmp) {
+		core->DisplayConstantStringName(tmp, 0xffffff, this);
 	}
 	if (flags&LS_ADDXP) {
 		AddExperience(exp);
@@ -2811,7 +2905,7 @@ bool Actor::HandleActorStance()
 			}
 		}
 */
-		SetStance( nextstance );    
+		SetStance( nextstance );
 		ca->autoSwitchOnEnd = false;
 		return true;
 	}
@@ -3067,18 +3161,13 @@ int Actor::GetQuickSlot(int slot)
 }
 
 //marks the quickslot as equipped
-int Actor::SetEquippedQuickSlot(int slot)
+int Actor::SetEquippedQuickSlot(int slot, bool reequip)
 {
 	//creatures and such
-	if (!PCStats) {
-		if (inventory.SetEquippedSlot(slot)) {
-			return 0;
-		}
-		return STR_MAGICWEAPON;
+	if (PCStats) {
+		slot = PCStats->QuickWeaponSlots[slot]-inventory.GetWeaponSlot();
 	}
-
-	//player characters
-	if (inventory.SetEquippedSlot(PCStats->QuickWeaponSlots[slot]-inventory.GetWeaponSlot())) {
+	if (inventory.SetEquippedSlot(slot, reequip)) {
 		return 0;
 	}
 	return STR_MAGICWEAPON;
@@ -3318,7 +3407,23 @@ int Actor::Unusable(Item *item) const
 
 	for (int i=0;i<usecount;i++) {
 		ieDword itemvalue = itembits[itemuse[i].which];
-		ieDword stat = ResolveTableValue(itemuse[i].table, GetStat(itemuse[i].stat), itemuse[i].mcol, itemuse[i].vcol);
+		ieDword stat = GetStat(itemuse[i].stat);
+		ieDword mcol = itemuse[i].mcol;
+		//here comes an unavoidable hackety hack because of bg2
+		//feel free to solve this logic without a goto
+		if (itemuse[i].stat==IE_KIT) {
+			if ((stat&BG2_KITMASK)==KIT_BARBARIAN) {
+				stat = (stat>>16)&0xfff;
+				if (stat) {
+					goto resolve_stat;
+				} else {
+					stat = KIT_BASECLASS;
+				}
+			}
+		} else {
+resolve_stat:
+			stat = ResolveTableValue(itemuse[i].table, stat, mcol, itemuse[i].vcol);
+		}
 		if (stat&itemvalue) {
 			return 1;
 		}
@@ -3360,3 +3465,4 @@ int Actor::Unusable(Item *item) const
 	//missing proficiency causes only attack penalty
 	return 0;
 }
+

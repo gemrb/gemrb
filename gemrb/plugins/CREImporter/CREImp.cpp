@@ -165,12 +165,12 @@ void CREImp::WriteChrHeader(DataStream *stream, Actor *act)
 			tmpDword = 0x68; //headersize
 			TotSCEFF = 0;
 			break;
-		case IE_CRE_V2_2:   //iwd2
+		case IE_CRE_V2_2:  //iwd2
 			memcpy(Signature, "CHR V2.2",8);
 			tmpDword = 0x21c; //headersize
 			TotSCEFF = 1;
 			break;
-		case IE_CRE_GEMRB:  //own format
+		case IE_CRE_GEMRB: //own format
 			memcpy(Signature, "CHR V0.0",8);
 			tmpDword = 0x1dc; //headersize (iwd2-9x8+8)
 			TotSCEFF = 1;
@@ -758,7 +758,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 				//i think missiles equipping effects are always
 				//in effect, if not, then add SLOT_EFFECT_MISSILE
 				if (slottype != SLOT_EFFECT_NONE && slottype != SLOT_EFFECT_MELEE) {
-					act->inventory.EquipItem( Slot );
+					act->inventory.EquipItem( Slot, false );
 				}
 				items[index] = NULL;
 				continue;
@@ -784,7 +784,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	// -24,-23,-22,-21 - quiver
 	ieDword Equipped;
 	str->ReadDword( &Equipped );
-	act->inventory.SetEquippedSlot( ((short)Equipped));
+	act->inventory.SetEquippedSlot( (short)Equipped, false);
 
 	// Reading spellbook
 	CREKnownSpell **known_spells=(CREKnownSpell **) calloc(KnownSpellsCount, sizeof(CREKnownSpell *) );
