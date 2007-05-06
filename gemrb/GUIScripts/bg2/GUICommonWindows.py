@@ -425,13 +425,24 @@ def EquipmentPressed ():
 
 def GetActorClassTitle (actor):
 	ClassTitle = GemRB.GetPlayerStat (actor, IE_TITLE1)
-	KitIndex = GemRB.GetPlayerStat (actor, IE_KIT) & 0xfff
+	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
+	KitIndex = 0
+	if Kit&0xc000ffff == 0x40000000:
+		KitIndex = Kit>>16 & 0xfff
 	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
 	ClassTable = GemRB.LoadTable ("classes")
 	Class = GemRB.FindTableValue ( ClassTable, 5, Class )
 	KitTable = GemRB.LoadTable ("kitlist")
 
-	if ClassTitle==0:
+	#looking for kit by the usability flag
+	if KitIndex == 0:
+		KitIndex = GemRB.FindTableValue (KitTable, Kit, 6)
+		if KitIndex == -1:
+			KitIndex = 0
+ 		elif Class != GemRB.GetTableValue (KitTable, KitIndex, 5):
+			KitIndex = 0
+
+	if ClassTitle == 0:
 		if KitIndex == 0:
 			ClassTitle=GemRB.GetTableValue (ClassTable, Class, 2)
 		else:
