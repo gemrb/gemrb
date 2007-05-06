@@ -100,7 +100,10 @@ Effect* EFFImp::GetEffectV1(Effect *fx)
 	str->ReadDword( &fx->SavingThrowType );
 	str->ReadDword( &fx->SavingThrowBonus );
 	str->ReadWord( &fx->IsVariable );
-  str->ReadWord( &fx->IsSaveForHalfDamage );
+	str->ReadWord( &fx->IsSaveForHalfDamage );
+
+	fx->PosX=0xffffffff;
+	fx->PosY=0xffffffff;
 	return fx;
 }
 
@@ -149,5 +152,11 @@ Effect* EFFImp::GetEffectV20(Effect *fx)
 	str->ReadDword( &fx->SecondaryType );
 	str->Seek( 60, GEM_CURRENT_POS );
 
+	//FIXME:
+	//actually the effect positions are saved somewhere
+	//and there is a position for source and target too
+	//if Pos is only a word, consider using a point 
+	fx->PosX=0xffffffff;
+	fx->PosY=0xffffffff;
 	return fx;
 }

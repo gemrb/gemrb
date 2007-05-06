@@ -104,9 +104,10 @@ struct Effect {
 	ieResRef Source;
 	ieDword SecondaryType;
 	ieDword SecondaryDelay; //still not sure about this
-	ieDword PosX, PosY;
 	// These are not in the IE files, but are our precomputed values
 	ieDword random_value;
+	// These could be in the effv2.0 fields, but not used in comparison
+	ieDword PosX, PosY;
 };
 
 // FIXME: what about area spells? They can have map & coordinates as target
