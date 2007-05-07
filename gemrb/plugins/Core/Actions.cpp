@@ -3555,6 +3555,8 @@ void GameScript::XEquipItem(Scriptable *Sender, Action* parameters)
 	if (slot<0) {
 		return;
 	}
+	actor->inventory.EquipItem(slot);
+	actor->ReinitQuickSlots();
 }
 
 //iwd2 also has a flag for unequip (it might collide with original!)
@@ -3570,9 +3572,16 @@ void GameScript::EquipItem(Scriptable *Sender, Action* parameters)
 	}
 	if (parameters->int0Parameter==0) { //unequip
 		//move item to inventory if possible
+		if (actor->inventory.UnEquipItem(slot, true)) {
+			CREItem *si = actor->inventory.RemoveItem(slot);
+			actor->inventory.AddSlotItem(si, -1);
+		}
 	} else { //equip
 		//equip item if possible
+		///
+		actor->inventory.EquipItem(slot);
 	}
+	actor->ReinitQuickSlots();
 }
 
 void GameScript::DropItem(Scriptable *Sender, Action* parameters)
@@ -5175,7 +5184,7 @@ void GameScript::SelectWeaponAbility(Scriptable* Sender, Action* parameters)
 		if (slot<0 || slot>=MAX_QUICKWEAPONSLOT) {
 			return;
 		}
-		scr->SetEquippedQuickSlot(slot, true);
+		scr->SetEquippedQuickSlot(slot);
 		if (scr->PCStats) {
 			scr->PCStats->QuickWeaponHeaders[slot]=(ieWord) parameters->int1Parameter;
 		}

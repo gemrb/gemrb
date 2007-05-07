@@ -229,7 +229,7 @@ public:
 	void SetOwner(Actor* act) { Owner = act; };
 
 	/** returns number of all slots in the inventory */
-	int GetSlotCount() { return (int)Slots.size(); };
+	int GetSlotCount() const { return (int)Slots.size(); };
 
 	/** sets inventory size, for the first time */
 	void SetSlotCount(unsigned int size);
@@ -267,19 +267,19 @@ public:
 	int FindItem(const char *resref, unsigned int flags);
 	bool DropItemAtLocation(unsigned int slot, unsigned int flags, Map *map, Point &loc);
 	bool DropItemAtLocation(const char *resref, unsigned int flags, Map *map, Point &loc);
-	bool SetEquippedSlot(int slotcode, bool reequip);
+	bool SetEquippedSlot(int slotcode);
 	int GetEquipped();
 	//right hand
 	int GetEquippedSlot();
 	//left hand
 	int GetShieldSlot();
-	void AddSlotEffects( CREItem* slot, int type, bool reequip );
+	void AddSlotEffects( CREItem* slot, int type);
 	//void AddAllEffects();
 	/** Returns item in specified slot. Does NOT change inventory */
 	CREItem* GetSlotItem(unsigned int slot);
 	bool ChangeItemFlag(unsigned int slot, ieDword value, int mode);
 	/** Equips the item, don't use it directly for weapons */
-	bool EquipItem(unsigned int slot, bool reequip);
+	bool EquipItem(unsigned int slot);
 	bool UnEquipItem(unsigned int slot, bool removecurse);
 	/** Returns equipped weapon */
 	CREItem *GetUsedWeapon(bool leftorright);

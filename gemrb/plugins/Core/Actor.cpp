@@ -1565,9 +1565,31 @@ const char* Actor::GetActorNameByID(ieDword ID)
 
 void Actor::SetMap(Map *map, ieWord LID, ieWord GID)
 {
+	bool effinit=false;
+	if (!GetCurrentArea()) {
+		effinit = true;
+	}
 	Scriptable::SetMap(map);
 	localID = LID;
 	globalID = GID;
+
+	//this hack is to delay the equipping effects until the actor has
+	//an area (and the game object is also existing)
+	if (effinit) {
+		int SlotCount = inventory.GetSlotCount();
+		for (int Slot = 0; Slot<SlotCount;Slot++) {
+			int slottype = core->QuerySlotEffects( Slot );
+			switch (slottype) {
+			case SLOT_EFFECT_NONE:
+			case SLOT_EFFECT_MELEE:
+				break;
+			default:
+				inventory.EquipItem( Slot );
+				break;
+			}
+		}
+	}
+	inventory.SetEquippedSlot( Equipped );
 }
 
 void Actor::SetPosition(Point &position, int jump, int radius)
@@ -3161,13 +3183,13 @@ int Actor::GetQuickSlot(int slot)
 }
 
 //marks the quickslot as equipped
-int Actor::SetEquippedQuickSlot(int slot, bool reequip)
+int Actor::SetEquippedQuickSlot(int slot)
 {
 	//creatures and such
 	if (PCStats) {
 		slot = PCStats->QuickWeaponSlots[slot]-inventory.GetWeaponSlot();
 	}
-	if (inventory.SetEquippedSlot(slot, reequip)) {
+	if (inventory.SetEquippedSlot(slot)) {
 		return 0;
 	}
 	return STR_MAGICWEAPON;

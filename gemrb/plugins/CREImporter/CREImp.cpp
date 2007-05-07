@@ -753,13 +753,16 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 			CREItem *item = items[index];
 			if (item && core->Exists(item->ItemResRef, IE_ITM_CLASS_ID)) {
 				act->inventory.SetSlotItem( item, Slot );
+				/* this stuff will be done in Actor::SetMap
+				 * after the actor gets an area (and game obj)
 				int slottype = core->QuerySlotEffects( Slot );
 				//weapons will be equipped differently, see SetEquippedSlot later
 				//i think missiles equipping effects are always
 				//in effect, if not, then add SLOT_EFFECT_MISSILE
 				if (slottype != SLOT_EFFECT_NONE && slottype != SLOT_EFFECT_MELEE) {
-					act->inventory.EquipItem( Slot, false );
+					act->inventory.EquipItem( Slot, true );
 				}
+				*/
 				items[index] = NULL;
 				continue;
 			}
@@ -782,9 +785,10 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	// 0,1,2,3 - weapon slots
 	// 1000 - fist
 	// -24,-23,-22,-21 - quiver
-	ieDword Equipped;
-	str->ReadDword( &Equipped );
-	act->inventory.SetEquippedSlot( (short)Equipped, false);
+	//the equipping effects are delayed until the actor gets an area
+	//ieDword Equipped;
+	str->ReadDword( &act->Equipped );
+	//act->inventory.SetEquippedSlot( (short)Equipped, true);
 
 	// Reading spellbook
 	CREKnownSpell **known_spells=(CREKnownSpell **) calloc(KnownSpellsCount, sizeof(CREKnownSpell *) );

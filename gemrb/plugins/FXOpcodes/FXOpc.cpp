@@ -2462,12 +2462,20 @@ int fx_remove_item (Actor* /*Owner*/, Actor* target, Effect* fx)
 //0x71 Item:Equip
 int fx_equip_item (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (core->QuerySlotEffects( fx->Parameter2 )) {
-		target->inventory.EquipItem(fx->Parameter2, true);
-	}
+	int eff = core->QuerySlotEffects( fx->Parameter2 );
+	switch(eff) {
+        case SLOT_EFFECT_NONE:
+        case SLOT_EFFECT_MELEE:
+		target->inventory.SetEquippedSlot( fx->Parameter2 );
+	        break;
+        default:
+		target->inventory.EquipItem( fx->Parameter2 );
+                break;
+        }
 	target->ReinitQuickSlots();
 	return FX_NOT_APPLIED;
 }
+
 //0x72 Dither
 int fx_dither (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {

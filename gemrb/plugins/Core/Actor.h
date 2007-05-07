@@ -133,6 +133,7 @@ public:
 	ieVariable KillVar; //this second field is present in pst and iwd1
 
 	Inventory inventory;
+	ieDword Equipped;   //i found no better place for this :(
 	Spellbook spellbook;
 	//savefile version (creatures embedded in area)
 	int version;
@@ -434,7 +435,7 @@ public:
 	/* returns which slot belongs to the quickweapon slot */
 	int GetQuickSlot(int slot);
 	/* Sets equipped Quick slot */
-	int SetEquippedQuickSlot(int slot, bool reequip);
+	int SetEquippedQuickSlot(int slot);
 	/* Uses an item on the target or point */
 	bool UseItemPoint(int slot, ieDword header, Point &point, bool silent);
 	bool UseItem(int slot, ieDword header, Scriptable *target, bool silent);
