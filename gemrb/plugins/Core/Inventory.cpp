@@ -183,7 +183,7 @@ void Inventory::CalculateWeight()
 }
 
 //hmm, dunno how to implement type
-void Inventory::AddSlotEffects(CREItem* slot, int /*type*/)
+void Inventory::AddSlotEffects(CREItem* slot, int type)
 {
 	Item* itm = core->GetItem( slot->ItemResRef );
 	if (!itm) {
@@ -200,6 +200,25 @@ void Inventory::AddSlotEffects(CREItem* slot, int /*type*/)
 	//get the equipping effects
 	EffectQueue *eqfx = itm->GetEffectBlock(-1);
 	core->FreeItem( itm, slot->ItemResRef, false );
+
+	//make any adjustments necessary for off-hand weapon colours
+	int cnt = eqfx->GetEffectsCount();
+	for (int i = 0; i < cnt; i++) {
+		Effect* fx = eqfx->GetEffect(i);
+		
+		// If a weapon is in the off-hand, it needs to set the off-hand palette
+		// If it is in the main hand, it should set the weapon palette
+		// TODO: move this code into the effects?
+		if (IsColorslotEffect(fx->Opcode)) {
+			unsigned int gradienttype = fx->Parameter2 & 0xF0;
+			if (type == SLOT_EFFECT_MELEE && gradienttype == 0x20)
+				gradienttype = 0x10; // weapon
+			else if (type == SLOT_EFFECT_LEFT && gradienttype == 0x10)
+				gradienttype = 0x20; // off-hand
+			fx->Parameter2 &= ~0xF0;
+			fx->Parameter2 |= gradienttype;
+		}	
+	}		
 	eqfx->SetOwner(Owner);
 	eqfx->AddAllEffects( Owner, Owner->Pos);
 	delete eqfx;
