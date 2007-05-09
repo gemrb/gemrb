@@ -30,6 +30,7 @@
 #define PROJECTILE_H
 
 #include "../../includes/ie_types.h"
+#include "Palette.h"
 #include "PathFinder.h"
 #include "CharAnimations.h"  //contains MAX_ORIENT
 #include "Map.h"
@@ -119,7 +120,7 @@ public:
 	ieWord LightX;
 	ieWord LightY;
 	ieWord LightZ;
-	ieResRef Palette;
+	ieResRef PaletteRes;
 	ieByte Gradients[7];
 	ieByte SmokeSpeed;
 	ieByte SmokeGrad[7];
@@ -130,6 +131,8 @@ public:
 	//
 	ProjectileExtension *Extension;
 	bool autofree;
+	Palette *palette;
+	//Palette *shadpal;
 	//internals
 protected:
 	//attributes from moveable object
@@ -220,6 +223,7 @@ private:
 	int GetShadowPos(int face);
 	void SetPos(int face, int frame1, int frame2);
 	void NextTarget(Point &p);
+	void SetupPalette(Animation *anim[], Palette *&pal, ieByte *gradients);
 };
 
 #endif // PROJECTILE_H

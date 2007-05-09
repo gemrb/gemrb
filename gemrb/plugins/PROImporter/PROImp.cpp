@@ -83,7 +83,7 @@ Projectile* PROImp::GetProjectile(Projectile *s)
 	str->ReadWord( &s->LightZ );
 	str->ReadWord( &s->LightX );
 	str->ReadWord( &s->LightY );
-	str->ReadResRef( s->Palette );
+	str->ReadResRef( s->PaletteRes );
 	str->Read( s->Gradients, 7);
 	str->Read( &s->SmokeSpeed, 1);
 	str->Read( s->SmokeGrad, 7);

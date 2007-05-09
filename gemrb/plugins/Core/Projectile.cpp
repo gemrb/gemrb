@@ -43,6 +43,8 @@ Projectile::Projectile()
 	autofree = false;
 	Extension = NULL;
 	area = NULL;
+	palette = NULL;
+	//shadpal = NULL;
 	Pos.empty();
 	Destination = Pos;
 	Orientation = 0;
@@ -62,6 +64,8 @@ Projectile::~Projectile()
 	if (effects) {
 		delete effects;
 	}
+	core->FreePalette(palette);
+	//core->FreePalette(shadpal);
 	ClearPath();
 }
 
@@ -122,6 +126,23 @@ void Projectile::CreateAnimations(Animation **anims, ieResRef bamres, int Seq)
 	}
 }
 
+//apply gradient colors
+void Projectile::SetupPalette(Animation *anim[], Palette *&pal, ieByte *gradients)
+{
+	ieDword Colors[7];
+
+	for (int i=0;i<7;i++) {
+		Colors[i]=gradients[i];
+	}
+        Sprite2D* spr = anim[0]->GetFrame(0);
+        if (spr) {
+	        pal = core->GetVideoDriver()->GetPalette(spr)->Copy();
+        }
+	if (pal) {
+		pal->SetupPaperdollColours(Colors, 0);
+	}
+}
+
 // load animations, start sound
 void Projectile::Setup()
 {
@@ -131,12 +152,21 @@ void Projectile::Setup()
 	memset(shadow,0,sizeof(shadow));
 	light = NULL;
 	CreateAnimations(travel, BAMRes1, Seq1);
+	if (TFlags&PTF_COLOUR) {
+		SetupPalette(travel, palette, Gradients);
+	}
 	if (TFlags&PTF_SHADOW) {
 		CreateAnimations(shadow, BAMRes2, Seq2);
+		//if (TFlags&PTF_SHADOWCOLOR) {
+		//	SetupPalette(shadow, shadpal, Gradients);
+		//}
 	}
 	if (TFlags&PTF_LIGHT) {
 		//light = CreateLight(LightX, LightY, LightZ);
 	}
+	//just for sure
+	core->FreePalette(palette);
+        palette=core->GetPalette(PaletteRes);
 }
 
 //control the phase change when the projectile reached its target
@@ -431,7 +461,7 @@ void Projectile::DrawTravel(Region &screen)
 	}
 	if (travel[face]) {
 		Sprite2D *frame = travel[face]->NextFrame();
-		video->BlitGameSprite( frame, Pos.x + screen.x, Pos.y + screen.y, flag, tint, NULL, NULL, &screen);
+		video->BlitGameSprite( frame, Pos.x + screen.x, Pos.y + screen.y, flag, tint, NULL, palette, &screen);
 	}
 
 	if (shadow[face]) {
