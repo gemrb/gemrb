@@ -3568,15 +3568,20 @@ int fx_play_visual_effect (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (!fx->Resource[0]) {
 		return FX_NOT_APPLIED;
 	}
+	//if it is sticky, don't add it if it is already played
+	if (fx->Parameter2) {
+		if (!target->HasVVCCell(fx->Resource) ) {
+			return FX_NOT_APPLIED;
+		}
+	}
+
 	ScriptedAnimation* sca = core->GetScriptedAnimation(fx->Resource, false);
 	if (fx->TimingMode!=FX_DURATION_INSTANT_PERMANENT) {
 		sca->SetDefaultDuration(fx->Duration-core->GetGame()->Ticks);
 	}
 	if (fx->Parameter2) {
 		//play over target (sticky)
-		if (!target->HasVVCCell(fx->Resource) ) {
-			target->AddVVCell( sca );
-		}
+		target->AddVVCell( sca );
 		return FX_APPLIED;
 	}
 

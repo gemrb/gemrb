@@ -362,7 +362,7 @@ int CanSee(Scriptable* Sender, Scriptable* target, bool range, int nodead)
 		if (Sender->Type == ST_ACTOR) {
 			Actor* snd = ( Actor* ) Sender;
 			dist = snd->Modified[IE_VISUALRANGE];
-		} else { 
+		} else {
 			dist = 30;
 		}
 
@@ -1152,7 +1152,7 @@ void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int 
 		return;
 	}
 	//it shouldn't be a problem to call this the second time (in case of attackreevaluate)
-	//because ReleaseCurrentAction() allows NULL 
+	//because ReleaseCurrentAction() allows NULL
 	Sender->ReleaseCurrentAction();
 }
 
@@ -1889,7 +1889,7 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, bool *valid)
 				printf("Invalid variable %s in checkvariable\n",VarName);
 			}
 		}
-	}	else {
+	} else {
 		game->locals->Lookup( &VarName[6], value );
 	}
 	if (InDebug&ID_VARIABLES) {

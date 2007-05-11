@@ -406,7 +406,7 @@ int GameScript::Specifics(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::BitCheck(Scriptable* Sender, Trigger* parameters)
 {
-	bool valid;
+	bool valid=true;
 
 	ieDword value = CheckVariable(Sender, parameters->string0Parameter, &valid );
 	if (valid) {
@@ -417,7 +417,7 @@ int GameScript::BitCheck(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::BitCheckExact(Scriptable* Sender, Trigger* parameters)
 {
-	bool valid;
+	bool valid=true;
 
 	ieDword value = CheckVariable(Sender, parameters->string0Parameter, &valid );
 	if (valid) {
@@ -431,7 +431,7 @@ int GameScript::BitCheckExact(Scriptable* Sender, Trigger* parameters)
 //should I do that???
 int GameScript::BitGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 {
-	bool valid;
+	bool valid=true;
 
 	ieDword value = CheckVariable(Sender, parameters->string0Parameter, &valid );
 	if (valid) {
@@ -443,7 +443,7 @@ int GameScript::BitGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::GlobalOrGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 {
-	bool valid;
+	bool valid=true;
 
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, &valid );
 	if (valid) {
@@ -458,7 +458,7 @@ int GameScript::GlobalOrGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::GlobalAndGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 {
-	bool valid;
+	bool valid=true;
 
 	ieDword value1 = CheckVariable( Sender, parameters->string0Parameter, &valid );
 	if (valid && value1) {
@@ -470,7 +470,7 @@ int GameScript::GlobalAndGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::GlobalBAndGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 {
-	bool valid;
+	bool valid=true;
 
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, &valid );
 	if (valid) {
@@ -484,7 +484,7 @@ int GameScript::GlobalBAndGlobal_Trigger(Scriptable* Sender, Trigger* parameters
 
 int GameScript::GlobalBAndGlobalExact(Scriptable* Sender, Trigger* parameters)
 {
-	bool valid;
+	bool valid=true;
 
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, &valid );
 	if (valid) {
@@ -498,7 +498,7 @@ int GameScript::GlobalBAndGlobalExact(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::GlobalBitGlobal_Trigger(Scriptable* Sender, Trigger* parameters)
 {
-	bool valid;
+	bool valid=true;
 
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, &valid );
 	if (valid) {
@@ -522,7 +522,7 @@ int GameScript::TriggerSetGlobal(Scriptable* Sender, Trigger* parameters)
 //would this function also alter the variable?
 int GameScript::Xor(Scriptable* Sender, Trigger* parameters)
 {
-	bool valid;
+	bool valid=true;
 
 	ieDword value = CheckVariable(Sender, parameters->string0Parameter, &valid );
 	if (valid) {
@@ -582,7 +582,7 @@ int GameScript::G_Trigger(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::Global(Scriptable* Sender, Trigger* parameters)
 {
-	bool valid;
+	bool valid=true;
 
 	long value = CheckVariable(Sender, parameters->string0Parameter, &valid );
 	if (valid) {
@@ -599,7 +599,7 @@ int GameScript::GLT_Trigger(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::GlobalLT(Scriptable* Sender, Trigger* parameters)
 {
-	bool valid;
+	bool valid=true;
 
 	long value = CheckVariable(Sender, parameters->string0Parameter, &valid );
 	if (valid) {
@@ -616,7 +616,7 @@ int GameScript::GGT_Trigger(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::GlobalGT(Scriptable* Sender, Trigger* parameters)
 {
-	bool valid;
+	bool valid=true;
 
 	long value = CheckVariable(Sender, parameters->string0Parameter, &valid );
 	if (valid) {
@@ -627,7 +627,7 @@ int GameScript::GlobalGT(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::GlobalLTGlobal(Scriptable* Sender, Trigger* parameters)
 {
-	bool valid;
+	bool valid=true;
 
 	long value1 = CheckVariable(Sender, parameters->string0Parameter, &valid );
 	if (valid) {
@@ -641,7 +641,7 @@ int GameScript::GlobalLTGlobal(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::GlobalGTGlobal(Scriptable* Sender, Trigger* parameters)
 {
-	bool valid;
+	bool valid=true;
 
 	long value1 = CheckVariable(Sender, parameters->string0Parameter, &valid );
 	if (valid) {
@@ -697,7 +697,7 @@ int GameScript::LocalsLT(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::RealGlobalTimerExact(Scriptable* Sender, Trigger* parameters)
 {
-	bool valid;
+	bool valid=true;
 
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter, &valid );
 	if (valid && value1) {
@@ -709,7 +709,7 @@ int GameScript::RealGlobalTimerExact(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::RealGlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
 {
-	bool valid;
+	bool valid=true;
 
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter, &valid );
 	if (valid && value1) {
@@ -720,7 +720,7 @@ int GameScript::RealGlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::RealGlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters)
 {
-	bool valid;
+	bool valid=true;
 
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter, &valid );
 	if (valid && value1) {
@@ -731,7 +731,7 @@ int GameScript::RealGlobalTimerNotExpired(Scriptable* Sender, Trigger* parameter
 
 int GameScript::GlobalTimerExact(Scriptable* Sender, Trigger* parameters)
 {
-	bool valid;
+	bool valid=true;
 
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter, &valid );
 	if (valid) {
@@ -742,7 +742,7 @@ int GameScript::GlobalTimerExact(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::GlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
 {
-	bool valid;
+	bool valid=true;
 
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter, &valid );
 	if (valid && value1) {    
@@ -754,7 +754,7 @@ int GameScript::GlobalTimerExpired(Scriptable* Sender, Trigger* parameters)
 //globaltimernotexpired returns false if the timer doesn't exist
 int GameScript::GlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters)
 {
-	bool valid;
+	bool valid=true;
 
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter, &valid );
 	if (valid && value1) {
@@ -767,7 +767,7 @@ int GameScript::GlobalTimerNotExpired(Scriptable* Sender, Trigger* parameters)
 //is it the same as globaltimernotexpired?
 int GameScript::GlobalTimerStarted(Scriptable* Sender, Trigger* parameters)
 {
-	bool valid;
+	bool valid=true;
 
 	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, parameters->string1Parameter, &valid );
 	if (valid && value1) {

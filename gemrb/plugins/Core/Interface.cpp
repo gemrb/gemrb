@@ -4895,7 +4895,7 @@ void Interface::ApplyEffect(Effect *effect, Actor *actor, Actor *caster)
 {
 	EffectQueue *fxqueue = new EffectQueue();
 	fxqueue->AddEffect( effect );
-	delete effect;
+	//hmm, don't delete the effect
 
 	int res = fxqueue->CheckImmunity ( actor );
 	if (res) {
