@@ -8,12 +8,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * $Id$
  *
@@ -32,7 +32,7 @@
 #include "../../includes/ie_types.h"
 #include "Palette.h"
 #include "PathFinder.h"
-#include "CharAnimations.h"  //contains MAX_ORIENT
+#include "CharAnimations.h" //contains MAX_ORIENT
 #include "Map.h"
 
 #ifdef WIN32
@@ -46,6 +46,9 @@
 #else
 #define GEM_EXPORT
 #endif
+
+//this is the height of the projectile when Spark Flag Fly = 1
+#define FLY_HEIGHT 50
 
 //projectile phases
 #define P_UNINITED  -1
@@ -174,6 +177,9 @@ public:
 	}
 	//no idea if projectiles got height, using y
 	inline int GetHeight() const {
+		if (SFlags&PSF_FLYING) {
+			return Pos.y+FLY_HEIGHT;
+		}
 		return Pos.y;
 	}
 
@@ -215,6 +221,8 @@ public:
 	//draw object
 	void Draw(Region &screen);
 private:
+	void GetPaletteCopy(Animation *anim[], Palette *&pal);
+	void SetBlend();
 	void CheckTrigger(unsigned int radius);
 	void DrawTravel(Region &screen);
 	void DrawExplosion(Region &screen);

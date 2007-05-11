@@ -44,6 +44,7 @@ Projectile::Projectile()
 	Extension = NULL;
 	area = NULL;
 	palette = NULL;
+	PaletteRes[0]=0;
 	//shadpal = NULL;
 	Pos.empty();
 	Destination = Pos;
@@ -64,7 +65,7 @@ Projectile::~Projectile()
 	if (effects) {
 		delete effects;
 	}
-	core->FreePalette(palette);
+	core->FreePalette(palette, PaletteRes);
 	//core->FreePalette(shadpal);
 	ClearPath();
 }
@@ -134,12 +135,33 @@ void Projectile::SetupPalette(Animation *anim[], Palette *&pal, ieByte *gradient
 	for (int i=0;i<7;i++) {
 		Colors[i]=gradients[i];
 	}
-        Sprite2D* spr = anim[0]->GetFrame(0);
-        if (spr) {
-	        pal = core->GetVideoDriver()->GetPalette(spr)->Copy();
-        }
+	GetPaletteCopy(anim, pal);
 	if (pal) {
 		pal->SetupPaperdollColours(Colors, 0);
+	}
+}
+
+void Projectile::GetPaletteCopy(Animation *anim[], Palette *&pal)
+{
+	if (pal)
+		return;
+	for (unsigned int i=0;i<MAX_ORIENT;i++) {
+		if (anim[i]) {
+			Sprite2D* spr = anim[i]->GetFrame(0);
+			if (spr) {
+				pal = core->GetVideoDriver()->GetPalette(spr)->Copy();
+			}
+		}
+	}
+}
+
+void Projectile::SetBlend()
+{
+	GetPaletteCopy(travel, palette);
+	if (!palette)
+		return;
+	if (!palette->alpha) {
+		palette->CreateShadedAlphaChannel();
 	}
 }
 
@@ -151,10 +173,16 @@ void Projectile::Setup()
 	memset(travel,0,sizeof(travel));
 	memset(shadow,0,sizeof(shadow));
 	light = NULL;
+
 	CreateAnimations(travel, BAMRes1, Seq1);
+
 	if (TFlags&PTF_COLOUR) {
 		SetupPalette(travel, palette, Gradients);
+	} else {
+		core->FreePalette(palette, PaletteRes);
+		palette=core->GetPalette(PaletteRes);
 	}
+
 	if (TFlags&PTF_SHADOW) {
 		CreateAnimations(shadow, BAMRes2, Seq2);
 		//if (TFlags&PTF_SHADOWCOLOR) {
@@ -164,9 +192,9 @@ void Projectile::Setup()
 	if (TFlags&PTF_LIGHT) {
 		//light = CreateLight(LightX, LightY, LightZ);
 	}
-	//just for sure
-	core->FreePalette(palette);
-        palette=core->GetPalette(PaletteRes);
+	if (TFlags&PTF_BLEND) {
+		SetBlend();
+	}
 }
 
 //control the phase change when the projectile reached its target
@@ -369,7 +397,7 @@ void Projectile::Draw(Region &screen)
 			return;
 		case P_TRIGGER:
 			if (Extension->AFlags&PAF_VISIBLE) {
-			  DrawTravel(screen);
+				DrawTravel(screen);
 			}
 			CheckTrigger(Extension->TriggerRadius);
 		case P_TRAVEL:
@@ -419,9 +447,6 @@ void Projectile::DrawExplosion(Region & /*screen*/)
 			area->AddProjectile(pro, Pos, Pos);
 		}
 	}
-/*
-	Video *video = core->GetVideoDriver();
-*/
 }
 
 int Projectile::GetTravelPos(int face)
@@ -454,23 +479,32 @@ void Projectile::DrawTravel(Region &screen)
 {
 	Video *video = core->GetVideoDriver();
 	ieDword flag = 0;
+
 	Color tint = {128,128,128,255};
 	unsigned int face = GetNextFace();
 	if (face!=Orientation) {
 		SetPos(face, GetTravelPos(face), GetShadowPos(face));
 	}
-	if (travel[face]) {
-		Sprite2D *frame = travel[face]->NextFrame();
-		video->BlitGameSprite( frame, Pos.x + screen.x, Pos.y + screen.y, flag, tint, NULL, palette, &screen);
-	}
+	Point pos = Pos;
+	pos.x+=screen.x;
+	pos.y+=screen.y;
 
 	if (shadow[face]) {
 		Sprite2D *frame = shadow[face]->NextFrame();
-		video->BlitGameSprite( frame, Pos.x + screen.x, Pos.y + screen.y, flag, tint, NULL, NULL, &screen);
+		video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, NULL, &screen);
+	}
+	if (light) {
+		video->BlitGameSprite( light, pos.x, pos.y, flag, tint, NULL, NULL, &screen);
 	}
 
-	if (light) {
-		video->BlitGameSprite( light, Pos.x + screen.x, Pos.y + screen.y, flag, tint, NULL, NULL, &screen);
+	if (SFlags&PSF_FLYING) {
+		pos.y-=FLY_HEIGHT;
 	}
+
+	if (travel[face]) {
+		Sprite2D *frame = travel[face]->NextFrame();
+		video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, palette, &screen);
+	}
+
 }
 

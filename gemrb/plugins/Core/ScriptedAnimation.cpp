@@ -111,16 +111,6 @@ void ScriptedAnimation::PrepareAnimation(Animation *anim, ieDword Transparency)
 	if (Transparency&IE_VVC_MIRRORY) {
 		anim->MirrorAnimationVert();
 	}
-
-	//make this the last if possible, because of the return
-	if (Transparency&IE_VVC_BLENDED) {
-		GetPaletteCopy();
-		if (!palette)
-			return;
-		if (!palette->alpha) {
-			palette->CreateShadedAlphaChannel();
-		}
-	}
 }
 
 /* Creating animation from BAM */
@@ -338,6 +328,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 				anims[p_release]->Flags |= S_ANI_PLAYONCE;
 			}
 		}
+		PreparePalette();
 	}
 
 	//copying resource name to the object, so it could be referenced by it
@@ -600,19 +591,24 @@ bool ScriptedAnimation::Draw(Region &screen, Point &Pos, Color &p_tint, Map *are
 	return false;
 }
 
+void ScriptedAnimation::PreparePalette()
+{
+	if (Transparency&IE_VVC_BLENDED) {
+		GetPaletteCopy();
+		if (!palette)
+			return;
+		if (!palette->alpha) {
+			palette->CreateShadedAlphaChannel();
+		}
+	}
+}
+
 void ScriptedAnimation::SetBlend()
 {
 	Transparency |= IE_VVC_BLENDED;
-
-	for(unsigned int i=0;i<3*MAX_ORIENT;i++) {
-		if (anims[i]) {
-			//don't call mirror again
-			PrepareAnimation(anims[i], IE_VVC_BLENDED);
-		}
-	}
-	if (twin) {
+	PreparePalette();
+	if (twin)
 		twin->SetBlend();
-	}
 }
 
 void ScriptedAnimation::SetFade(ieByte initial, int speed)

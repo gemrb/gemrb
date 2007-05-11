@@ -111,6 +111,7 @@ public:
 	ScriptedAnimation *DetachTwin();
 private:
 	void PrepareAnimation(Animation *anim, ieDword Transparency);
+	void PreparePalette();
 	bool HandlePhase(Sprite2D *&frame);
 	void GetPaletteCopy();
 };
