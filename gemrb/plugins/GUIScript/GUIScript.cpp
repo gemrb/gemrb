@@ -201,12 +201,12 @@ static inline void SetFunctionTooltip(int WindowIndex, int ControlIndex, char *t
 			} else {
 				sprintf(txt2,"F%d - %s",ControlIndex+1,txt);
 			}
-			free(txt);
+			core->FreeString(txt);
 			core->SetTooltip((ieWord) WindowIndex, (ieWord) ControlIndex, txt2);
 			free (txt2);
 			return;
 		}
-		free(txt);
+		core->FreeString(txt);
 	}
 	core->SetTooltip((ieWord) WindowIndex, (ieWord) ControlIndex, "");
 }
@@ -6945,7 +6945,9 @@ static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 			btn->SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, BM_SET);
 			int tip = core->GetItemTooltip(item->itemname, item->headerindex);
 			if (tip>0) {
-				btn->SetTooltip(core->GetString((ieDword) tip,0));
+				char *tmp = core->GetString((ieStrRef) tip,0);
+				btn->SetTooltip(tmp);
+				core->FreeString(tmp);
 			} else {
 				btn->SetTooltip(NULL);
 			}
@@ -7051,7 +7053,9 @@ static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 			SetButtonCycle(bam, btn, 3, IE_GUI_BUTTON_DISABLED);
 			btn->SetPicture( Picture );
 			btn->SetFlags(IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_RIGHT, BM_SET);
-			btn->SetTooltip(core->GetString(spell->strref,0));
+			char *tmp = core->GetString(spell->strref,0);
+			btn->SetTooltip(tmp);
+			core->FreeString(tmp);
 			char usagestr[10];
 
 			if (spell->count>0) {
