@@ -114,7 +114,7 @@ static bool QuitOnError = false;
 static int CHUWidth = 0;
 static int CHUHeight = 0;
 
-EffectRef learn_spell_ref={"Spell:Learn",NULL,-1};
+static EffectRef fx_learn_spell_ref={"Spell:Learn",NULL,-1};
 
 // Like PyString_FromString(), but for ResRef
 inline PyObject* PyString_FromResRef(char* ResRef)
@@ -6079,8 +6079,8 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 		f = eh->features; //+0
 
 		//normally the learn spell opcode is 147
-		EffectQueue::ResolveEffect(learn_spell_ref);
-		if (f->Opcode!=(ieDword) learn_spell_ref.EffText) {
+		EffectQueue::ResolveEffect(fx_learn_spell_ref);
+		if (f->Opcode!=(ieDword) fx_learn_spell_ref.EffText) {
 			goto not_a_scroll;
 		}
 		//maybe further checks for school exclusion?
