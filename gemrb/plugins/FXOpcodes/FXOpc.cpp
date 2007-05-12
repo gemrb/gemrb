@@ -819,7 +819,7 @@ int fx_attacks_per_round_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 // 0x02 Cure:Sleep (Awaken)
 // this effect clears the STATE_SLEEP (1) bit, but clearing it alone wouldn't remove the
 // unconscious effect, which is combined with STATE_HELPLESS (0x20+1)
-EffectRef fx_set_sleep_state_ref={"State:Sleep",NULL,-1};
+static EffectRef fx_set_sleep_state_ref={"State:Helpless",NULL,-1};
 
 int fx_cure_sleep_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -832,7 +832,7 @@ int fx_cure_sleep_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 // 0x03 Cure:Berserk
 // this effect clears the STATE_BERSERK (2) bit, but bg2 actually ignores the bit
 // it also removes effect 04
-EffectRef fx_set_berserk_state_ref={"State:Berserk",NULL,-1};
+static EffectRef fx_set_berserk_state_ref={"State:Berserk",NULL,-1};
 
 int fx_cure_berserk_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -989,7 +989,7 @@ int fx_constitution_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x0B Cure:Poison
-EffectRef fx_poisoned_state_ref={"State:Poison",NULL,-1};
+static EffectRef fx_poisoned_state_ref={"State:Poison",NULL,-1};
 
 int fx_cure_poisoned_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1079,9 +1079,9 @@ int fx_dexterity_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_PERMANENT;
 }
 
-EffectRef fx_set_slow_state_ref={"State:Slowed",NULL,-1};
+static EffectRef fx_set_slow_state_ref={"State:Slowed",NULL,-1};
 //this reference is used by many other effects
-EffectRef fx_display_portrait_icon_ref={"Icon:Display",NULL,-1};
+static EffectRef fx_display_portrait_icon_ref={"Icon:Display",NULL,-1};
 
 // 0x10 State:Hasted
 // this function removes slowed state, or sets hasted state
@@ -1320,8 +1320,8 @@ int fx_set_poisoned_state (Actor* Owner, Actor* target, Effect* fx)
 }
 
 // 0x1a
-EffectRef fx_apply_effect_curse_ref={"ApplyEffectCurse",NULL,-1};
-EffectRef fx_pst_jumble_curse_ref={"JumbleCurse",NULL,-1};
+static EffectRef fx_apply_effect_curse_ref={"ApplyEffectCurse",NULL,-1};
+static EffectRef fx_pst_jumble_curse_ref={"JumbleCurse",NULL,-1};
 
 // gemrb extension: if the resource field is filled, it will remove curse only from the specified item
 int fx_remove_curse (Actor* /*Owner*/, Actor* target, Effect* fx)
@@ -1462,7 +1462,7 @@ int fx_set_silenced_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-EffectRef fx_animation_stance_ref = {"AnimationStateChange",NULL,-1};
+static EffectRef fx_animation_stance_ref = {"AnimationStateChange",NULL,-1};
 
 // 0x27 State:Helpless
 // this effect sets both bits, but 'awaken' only removes the sleep bit
@@ -1486,7 +1486,7 @@ int fx_set_unconscious_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 // 0x28 State:Slowed
 // this function removes hasted state, or sets slowed state
-EffectRef fx_set_haste_state_ref={"State:Hasted",NULL,-1};
+static EffectRef fx_set_haste_state_ref={"State:Hasted",NULL,-1};
 
 int fx_set_slowed_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1570,8 +1570,8 @@ int fx_set_stun_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x2E Cure:Stun
-EffectRef fx_set_stun_state_ref={"State:Stun",NULL,-1};
-EffectRef fx_hold_creature_no_icon_ref={"State:Hold3",NULL,-1};
+static EffectRef fx_set_stun_state_ref={"State:Stun",NULL,-1};
+static EffectRef fx_hold_creature_no_icon_ref={"State:Hold3",NULL,-1};
 
 int fx_cure_stun_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1583,7 +1583,7 @@ int fx_cure_stun_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x2F Cure:Invisible
-EffectRef fx_set_invisible_state_ref={"State:Invisible",NULL,-1};
+static EffectRef fx_set_invisible_state_ref={"State:Invisible",NULL,-1};
 
 int fx_cure_invisible_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1596,7 +1596,7 @@ int fx_cure_invisible_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x30 Cure:Silence
-EffectRef fx_set_silenced_state_ref={"State:Silence",NULL,-1};
+static EffectRef fx_set_silenced_state_ref={"State:Silence",NULL,-1};
 
 int fx_cure_silenced_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1654,7 +1654,7 @@ int fx_glow_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 // 0x35 AnimationIDModifier
-EffectRef fx_animation_id_modifier_ref={"AnimationIDModifier",NULL,-1};
+static EffectRef fx_animation_id_modifier_ref={"AnimationIDModifier",NULL,-1};
 
 int fx_animation_id_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1685,7 +1685,7 @@ int fx_to_hit_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x37 KillCreatureType
-EffectRef fx_death_ref={"Death",NULL,-1};
+static EffectRef fx_death_ref={"Death",NULL,-1};
 
 int fx_kill_creature_type (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1859,7 +1859,7 @@ int fx_set_infravision_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x40 Cure:Infravision
-EffectRef fx_set_infravision_state_ref={"State:Infravision",NULL,-1};
+static EffectRef fx_set_infravision_state_ref={"State:Infravision",NULL,-1};
 
 int fx_cure_infravision_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1949,7 +1949,7 @@ int fx_set_nondetection_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x46 Cure:Nondetection
-EffectRef fx_set_nondetection_state_ref={"State:Nondetection",NULL,-1};
+static EffectRef fx_set_nondetection_state_ref={"State:Nondetection",NULL,-1};
 
 int fx_cure_nondetection_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -2029,7 +2029,7 @@ int fx_set_blind_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x4b Cure:Blind
-EffectRef fx_set_blind_state_ref={"State:Blind",NULL,-1};
+static EffectRef fx_set_blind_state_ref={"State:Blind",NULL,-1};
 
 int fx_cure_blind_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -2049,7 +2049,7 @@ int fx_set_feebleminded_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x4d Cure:Feeblemind
-EffectRef fx_set_feebleminded_state_ref={"State:Feeblemind",NULL,-1};
+static EffectRef fx_set_feebleminded_state_ref={"State:Feeblemind",NULL,-1};
 int fx_cure_feebleminded_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_feebleminded_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -2113,7 +2113,7 @@ int fx_set_diseased_state (Actor* Owner, Actor* target, Effect* fx)
 
 
 //0x4f Cure:Disease
-EffectRef fx_diseased_state_ref={"State:Disease",NULL,-1};
+static EffectRef fx_diseased_state_ref={"State:Disease",NULL,-1};
 
 int fx_cure_diseased_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -2141,7 +2141,7 @@ int fx_set_deaf_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x51 Cure:Deafness
-EffectRef fx_deaf_state_ref={"State:Deaf",NULL,-1};
+static EffectRef fx_deaf_state_ref={"State:Deaf",NULL,-1};
 
 //removes the deaf effect
 int fx_cure_deaf_state (Actor* /*Owner*/, Actor* target, Effect* fx)
@@ -2433,7 +2433,7 @@ int fx_retreat_from (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 
 //0x6f Item:CreateMagic
 
-EffectRef fx_remove_item_ref={"Item:Remove",NULL,-1};
+static EffectRef fx_remove_item_ref={"Item:Remove",NULL,-1};
 
 int fx_create_magic_item (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -2464,14 +2464,14 @@ int fx_equip_item (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	int eff = core->QuerySlotEffects( fx->Parameter2 );
 	switch(eff) {
-        case SLOT_EFFECT_NONE:
-        case SLOT_EFFECT_MELEE:
+	case SLOT_EFFECT_NONE:
+	case SLOT_EFFECT_MELEE:
 		target->inventory.SetEquippedSlot( fx->Parameter2 );
-	        break;
-        default:
+		break;
+	default:
 		target->inventory.EquipItem( fx->Parameter2 );
-                break;
-        }
+		break;
+	}
 	target->ReinitQuickSlots();
 	return FX_NOT_APPLIED;
 }
@@ -2536,7 +2536,7 @@ int fx_reveal_creatures (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 }
 
 // 0x77 MirrorImage
-EffectRef fx_mirror_image_modifier_ref={"MirrorImageModifier",NULL,-1};
+static EffectRef fx_mirror_image_modifier_ref={"MirrorImageModifier",NULL,-1};
 
 int fx_mirror_image (Actor* Owner, Actor* target, Effect* fx)
 {
@@ -2569,7 +2569,7 @@ int fx_visual_animation_effect (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 }
 
 // 0x7a Item:CreateInventory
-EffectRef fx_remove_inventory_item_ref={"Item:RemoveInventory",NULL,-1};
+static EffectRef fx_remove_inventory_item_ref={"Item:RemoveInventory",NULL,-1};
 
 int fx_create_inventory_item (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -2814,7 +2814,7 @@ int fx_casting_glow (Actor* /*Owner*/, Actor* target, Effect* fx)
 		sca->ZPos+=heightmod;
 		sca->SetBlend();
 		if (fx->Duration) {
-			sca->SetDefaultDuration(fx->Duration-core->GetGame()->Ticks);
+			sca->SetDefaultDuration(fx->Duration-core->GetGame()->GameTime);
 		} else {
 			sca->SetDefaultDuration(10000);
 		}
@@ -3066,7 +3066,7 @@ int fx_mirror_image_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0xa0 Cure:Sanctuary
-EffectRef fx_sanctuary_state_ref={"Overlay:Sanctuary",NULL,-1};
+static EffectRef fx_sanctuary_state_ref={"Overlay:Sanctuary",NULL,-1};
 
 int fx_cure_sanctuary_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -3077,7 +3077,7 @@ int fx_cure_sanctuary_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0xa1 Cure:Panic
-EffectRef fx_set_panic_state_ref={"State:Panic",NULL,-1};
+static EffectRef fx_set_panic_state_ref={"State:Panic",NULL,-1};
 
 int fx_cure_panic_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -3088,7 +3088,7 @@ int fx_cure_panic_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0xa2 Cure:Hold
-EffectRef fx_hold_creature_ref={"State:Hold",NULL,-1};
+static EffectRef fx_hold_creature_ref={"State:Hold",NULL,-1};
 
 int fx_cure_hold_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -3099,7 +3099,7 @@ int fx_cure_hold_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0xa3 FreeAction
-EffectRef fx_movement_modifier_ref={"MovementModifier",NULL,-1};
+static EffectRef fx_movement_modifier_ref={"MovementModifier",NULL,-1};
 
 int fx_cure_slow_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -3535,8 +3535,8 @@ int fx_imprisonment (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 //0xd4 Cure:Imprisonment
 
-EffectRef fx_imprisonment_ref={"Imprisonment",NULL,-1};
-EffectRef fx_maze_ref={"Maze",NULL,-1};
+static EffectRef fx_imprisonment_ref={"Imprisonment",NULL,-1};
+static EffectRef fx_maze_ref={"Maze",NULL,-1};
 
 int fx_freedom (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -3602,7 +3602,7 @@ int fx_leveldrain_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 //d9 PowerWordSleep
 
-EffectRef fx_sleep_ref={"State:Sleep",NULL,-1};
+static EffectRef fx_sleep_ref={"State:Sleep",NULL,-1};
 
 int fx_power_word_sleep (Actor* Owner, Actor* target, Effect* fx)
 {
@@ -3658,7 +3658,7 @@ int fx_teleport_field (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 //0xDF decrementing school immunity (general)
 //0xE0 Cure:LevelDrain
-EffectRef fx_leveldrain_ref={"LevelDrainModifier",NULL,-1};
+static EffectRef fx_leveldrain_ref={"LevelDrainModifier",NULL,-1};
 
 int fx_cure_leveldrain (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -4002,7 +4002,7 @@ int fx_create_spell_sequencer(Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 }
 
 // 0x102 Sequencer:Activate
-EffectRef fx_spell_sequencer_active_ref={"Sequencer:Store",NULL,-1};
+static EffectRef fx_spell_sequencer_active_ref={"Sequencer:Store",NULL,-1};
 
 int fx_activate_spell_sequencer(Actor* Owner, Actor* target, Effect* fx)
 {
@@ -4141,7 +4141,7 @@ int fx_screenshake (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 }
 
 // 0x10e Cure:CasterHold
-EffectRef fx_pause_caster_modifier_ref={"PauseTarget",NULL,-1};
+static EffectRef fx_pause_caster_modifier_ref={"PauseTarget",NULL,-1};
 
 int fx_unpause_caster (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -4245,7 +4245,7 @@ int fx_to_hit_bonus_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x117 RenableButton
-EffectRef fx_disable_button_ref={"DisableButton",NULL,-1};
+static EffectRef fx_disable_button_ref={"DisableButton",NULL,-1};
 
 int fx_renable_button (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
