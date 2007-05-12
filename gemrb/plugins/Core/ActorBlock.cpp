@@ -609,17 +609,18 @@ void Scriptable::SpellCast(ieResRef SpellResRef)
 	}
 
 	//cfb
-	int level = 0;
 	if (Type==ST_ACTOR) {
+		int level = ((Actor *) this)->GetXPLevel(true);
+		SpellHeader = spl->GetHeaderIndexFromLevel(level);
 		Actor *actor = (Actor *) this;
-		EffectQueue *fxqueue=spl->GetEffectBlock(-1);
+		EffectQueue *fxqueue=spl->GetEffectBlock(-1, SpellHeader);
 		fxqueue->SetOwner(actor);
-		fxqueue->ApplyAllEffects(actor);
+		fxqueue->AddAllEffects(actor, actor->Pos);
 		delete fxqueue;
-		level = ((Actor *) this)->GetXPLevel(true);
+	} else {
+		SpellHeader = 0;
 	}
 
-	SpellHeader = spl->GetHeaderIndexFromLevel(level);
 	SPLExtHeader *header = spl->GetExtHeader(SpellHeader);
 	SetWait(header->CastingTime*AI_UPDATE_TIME);
 	core->FreeSpell(spl, SpellResRef, false);

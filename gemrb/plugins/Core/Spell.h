@@ -8,12 +8,12 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * $Id$
  *
@@ -50,14 +50,14 @@ class Projectile;
 
 //values for Spell usability Flags
 
-#define SF_HOSTILE 0x400
-#define SF_NO_LOS  0x800
-#define SF_NOT_INDOORS 0x2000
-#define SF_HLA 0x4000 // probably this means a nonmagical ability
-#define SF_TRIGGER 0x8000
+#define SF_HOSTILE	0x400
+#define SF_NO_LOS	0x800
+#define SF_NOT_INDOORS	0x2000
+#define SF_HLA  	0x4000 // probably this means a nonmagical ability
+#define SF_TRIGGER	0x8000
 #define SF_NOT_IN_COMBAT 0x10000
 //this is a relocated bit (used in iwd2 as 0x4000)
-#define SF_SIMPLIFIED_DURATION   0x40
+#define SF_SIMPLIFIED_DURATION 0x40
 
 //spelltypes in spells
 #define  IE_SPL_ITEM   0
@@ -167,7 +167,7 @@ public:
 	//converts a wanted level to block index count
 	int GetHeaderIndexFromLevel(int level) const;
 	//-1 will return the cfb
-	EffectQueue *GetEffectBlock(int block_index) const;
+	EffectQueue *GetEffectBlock(int block_index, int ext_index=-1) const;
 	//returns a projectile created from an extended header
 	Projectile *GetProjectile(int headerindex) const;
 };

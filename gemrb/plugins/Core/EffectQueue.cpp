@@ -33,21 +33,6 @@ static EffectRef *effectnames = NULL;
 static EffectRef effect_refs[MAX_EFFECTS];
 
 static int opcodes_count = 0;
-/*
-#define FX_DURATION_INSTANT_LIMITED          0
-#define FX_DURATION_INSTANT_PERMANENT        1
-#define FX_DURATION_INSTANT_WHILE_EQUIPPED   2
-#define FX_DURATION_DELAY_LIMITED            3 //this contains a relative onset time (delay) also used as duration, transforms to 6 when applied
-#define FX_DURATION_DELAY_PERMANENT          4 //this transforms to 7 (i guess)
-#define FX_DURATION_DELAY_UNSAVED            5 //this transforms to 8
-#define FX_DURATION_DELAY_LIMITED_PENDING    6 //this contains an absolute onset time and a duration
-#define FX_DURATION_AFTER_EXPIRES            7 //this is a delayed non permanent effect (resolves to JUST_EXPIRED)
-#define FX_DURATION_PERMANENT_UNSAVED        8
-#define FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES   9//this is a special permanent
-#define FX_DURATION_JUST_EXPIRED             10
-
-#define MAX_TIMING_MODE 11
-*/
 
 bool EffectQueue::match_ids(Actor *target, int table, ieDword value)
 {
@@ -333,6 +318,8 @@ Effect *EffectQueue::CreateEffect(ieDword opcode, ieDword param1, ieDword param2
 	fx->Parameter1=param1;
 	fx->Parameter2=param2;
 	fx->TimingMode=timing;
+	fx->PosX=0xffffffff;
+	fx->PosY=0xffffffff;
 	return fx;
 }
 
@@ -719,9 +706,9 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 	ieDword GameTime = core->GetGame()->GameTime;
 
 	if (first_apply) {
-		if ((fx->PosX==0xffff) && (fx->PosY==0xffff)) {
-			fx->PosX = (ieWord) target->Pos.x;
-			fx->PosY = (ieWord) target->Pos.y;
+		if ((fx->PosX==0xffffffff) && (fx->PosY==0xffffffff)) {
+			fx->PosX = target->Pos.x;
+			fx->PosY = target->Pos.y;
 		}
 		//the effect didn't pass the probability check
 		if (!check_probability(fx) ) {

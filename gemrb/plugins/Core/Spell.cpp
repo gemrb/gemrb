@@ -62,7 +62,9 @@ int Spell::GetHeaderIndexFromLevel(int level) const
 //-1 will return cfb
 //0 will always return first spell block
 //otherwise set to caster level
-EffectQueue *Spell::GetEffectBlock(int block_index) const
+static EffectRef fx_casting_glow_ref={"CastingGlow",NULL,-1};
+
+EffectQueue *Spell::GetEffectBlock(int block_index, int ext_index) const
 {
 	Effect *features;
 	int count;
@@ -81,7 +83,14 @@ EffectQueue *Spell::GetEffectBlock(int block_index) const
 		count = CastingFeatureCount;
 	}
 	EffectQueue *fxqueue = new EffectQueue();
-	
+
+	//add casting glow
+	if (block_index==-1) {
+		assert(ext_index>=0);
+		Effect *fx = EffectQueue::CreateEffect(fx_casting_glow_ref, 0, CastingGraphics, FX_DURATION_INSTANT_LIMITED);
+		fx->Duration=ext_headers[ext_index].CastingTime;
+		fxqueue->AddEffect(fx);
+	}
 	for (int i=0;i<count;i++) {
 		if (Flags & SF_SIMPLIFIED_DURATION) {
 			//hack the effect according to Level
