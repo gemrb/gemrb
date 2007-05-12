@@ -312,7 +312,7 @@ static int check_iwd_targeting(Actor* Owner, Actor* target, ieDword value, ieDwo
 
 //iwd got a hardcoded 'fireshield' system
 //this effect applies damage on ALL nearby actors, except the center
-EffectRef fx_damage_opcode_ref={"Damage",NULL,-1};
+static EffectRef fx_damage_opcode_ref={"Damage",NULL,-1};
 
 static void ApplyDamageNearby(Actor* Owner, Actor* target, Effect *fx, ieDword damagetype)
 {
@@ -628,7 +628,7 @@ int fx_recitation_bad (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 //fb LichTouch (how)
-EffectRef fx_hold_creature_ref={"State:Hold",NULL,-1};
+static EffectRef fx_hold_creature_ref={"State:Hold",NULL,-1};
 
 int fx_lich_touch (Actor* Owner, Actor* target, Effect* fx)
 {
@@ -648,7 +648,7 @@ int fx_lich_touch (Actor* Owner, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 //fc BlindingOrb (how)
-EffectRef fx_state_blind_ref={"State:Blind",NULL,-1};
+static EffectRef fx_state_blind_ref={"State:Blind",NULL,-1};
 
 int fx_blinding_orb (Actor* Owner, Actor* target, Effect* fx)
 {
@@ -847,8 +847,9 @@ int fx_cloak_of_fear(Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 }
 //0x10a MovementRateModifier3 (Like bg2)
 //0x10b RemoveConfusion
-EffectRef fx_confusion_ref={"State:Confused",NULL,-1};
-EffectRef fx_umberhulk_gaze_ref={"UmberHulkGaze",NULL,-1};
+static EffectRef fx_confusion_ref={"State:Confused",NULL,-1};
+static EffectRef fx_umberhulk_gaze_ref={"UmberHulkGaze",NULL,-1};
+
 int fx_remove_confusion (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_remove_confusion (%2d)\n", fx->Opcode );
@@ -913,13 +914,13 @@ int fx_eye_of_stone (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 //0x113 RemoveSevenEyes
-EffectRef fx_eye1_ref={"EyeOfTheMind",NULL,-1};
-EffectRef fx_eye2_ref={"EyeOfTheSword",NULL,-1};
-EffectRef fx_eye3_ref={"EyeOfTheMage",NULL,-1};
-EffectRef fx_eye4_ref={"EyeOfVenom",NULL,-1};
-EffectRef fx_eye5_ref={"EyeOfThespirit",NULL,-1};
-EffectRef fx_eye6_ref={"EyeOfFortitude",NULL,-1};
-EffectRef fx_eye7_ref={"EyeOfStone",NULL,-1};
+static EffectRef fx_eye1_ref={"EyeOfTheMind",NULL,-1};
+static EffectRef fx_eye2_ref={"EyeOfTheSword",NULL,-1};
+static EffectRef fx_eye3_ref={"EyeOfTheMage",NULL,-1};
+static EffectRef fx_eye4_ref={"EyeOfVenom",NULL,-1};
+static EffectRef fx_eye5_ref={"EyeOfThespirit",NULL,-1};
+static EffectRef fx_eye6_ref={"EyeOfFortitude",NULL,-1};
+static EffectRef fx_eye7_ref={"EyeOfStone",NULL,-1};
 
 int fx_remove_seven_eyes (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1135,7 +1136,8 @@ int fx_resist_spell (Actor* Owner, Actor* target, Effect *fx)
 	//this has effect only on first apply, it will stop applying the spell
 	return FX_ABORT;
 }
-EffectRef fx_resist_spell_ref={"ResistSpell2",NULL,-1};
+
+static EffectRef fx_resist_spell_ref={"ResistSpell2",NULL,-1};
 
 //0x122 Protection:Spell3 ??? IWD ids targeting
 // this is a variant of resist spell, used in iwd2

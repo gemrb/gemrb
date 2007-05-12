@@ -333,7 +333,7 @@ int fx_overlay (Actor* /*Owner*/, Actor* target, Effect* fx)
 //0xca fx_unknown
 
 //0x82 fx_bless
-static EffectRef glow_ref ={"Color:PulseRGBGlobal",NULL,-1};
+static EffectRef fx_glow_ref ={"Color:PulseRGBGlobal",NULL,-1};
 //pst bless effect spawns a color glow automatically
 int fx_bless (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -344,8 +344,8 @@ int fx_bless (Actor* /*Owner*/, Actor* target, Effect* fx)
 	//invis checks at core level)
 	if (STATE_GET (STATE_BLESS) ) //curse is non cummulative
 		return FX_NOT_APPLIED;
-	if (!target->fxqueue.HasEffectWithParamPair(glow_ref, 0xc8c8c800,0x300018)) {
-		Effect *newfx = EffectQueue::CreateEffect(glow_ref, 0xc8c8c800,0x300018, fx->TimingMode);
+	if (!target->fxqueue.HasEffectWithParamPair(fx_glow_ref, 0xc8c8c800,0x300018)) {
+		Effect *newfx = EffectQueue::CreateEffect(fx_glow_ref, 0xc8c8c800,0x300018, fx->TimingMode);
 		//calculating duration
 		newfx->Duration=(fx->Duration-core->GetGame()->GameTime)/6;
 		core->ApplyEffect(newfx, target, target);
@@ -381,8 +381,9 @@ int fx_curse (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0xcc fx_prayer
-EffectRef curse_ref={"Curse",NULL,-1};
-EffectRef bless_ref={"Bless",NULL,-1};
+static EffectRef fx_curse_ref={"Curse",NULL,-1};
+static EffectRef fx_bless_ref={"Bless",NULL,-1};
+
 int fx_prayer (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_prayer (%2d): Par1: %d\n", fx->Opcode, fx->Parameter1 );
@@ -400,7 +401,7 @@ int fx_prayer (Actor* Owner, Actor* target, Effect* fx)
 		if (ea>EA_EVILCUTOFF) type^=1;
 		else if (ea>EA_GOODCUTOFF) continue;
 		//this isn't a real perma effect, just applying the effect now
-		Effect *newfx = EffectQueue::CreateEffect(type?curse_ref:bless_ref, fx->Parameter1, fx->Parameter2, FX_DURATION_INSTANT_LIMITED);
+		Effect *newfx = EffectQueue::CreateEffect(type?fx_curse_ref:fx_bless_ref, fx->Parameter1, fx->Parameter2, FX_DURATION_INSTANT_LIMITED);
 		memcpy(newfx, fx->Source,sizeof(ieResRef));
 		newfx->Duration=60;
 		//no idea how this should work with spell resistances, etc
@@ -481,7 +482,7 @@ int fx_hostile_image (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 }
 
 //0xd2 fx_detect_evil
-EffectRef single_color_pulse_ref={"Color:BriefRGB",NULL,-1};
+static EffectRef fx_single_color_pulse_ref={"Color:BriefRGB",NULL,-1};
 
 int fx_detect_evil (Actor* Owner, Actor* target, Effect* fx)
 {
@@ -495,7 +496,7 @@ int fx_detect_evil (Actor* Owner, Actor* target, Effect* fx)
 		ieDword color = fx->Parameter1;
 		//default is magenta (rgba)
 		if (!color) color = 0xff00ff00;
-		Effect *newfx = EffectQueue::CreateEffect(single_color_pulse_ref, color, speed<<16, FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES);
+		Effect *newfx = EffectQueue::CreateEffect(fx_single_color_pulse_ref, color, speed<<16, FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES);
 		newfx->Target=FX_TARGET_PRESET;
 		EffectQueue *fxqueue = new EffectQueue();
 		fxqueue->SetOwner(Owner);
