@@ -576,6 +576,9 @@ ieDword fullstone[7]={STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIEN
 
 void pcf_state(Actor *actor, ieDword Value)
 {
+	if (actor->InParty) {
+		core->SetEventFlag(EF_PORTRAIT);
+	}
 	if (Value & STATE_PETRIFIED) {
 		SetLockedPalette( actor, fullstone);
 		return;
@@ -599,6 +602,9 @@ void pcf_hitpoint(Actor *actor, ieDword Value)
 		actor->Die(NULL);
 	}
 	actor->Modified[IE_MINHITPOINTS]=Value;
+	if (actor->InParty) {
+		core->SetEventFlag(EF_PORTRAIT);
+	}
 }
 
 void pcf_maxhitpoint(Actor *actor, ieDword Value)
@@ -606,6 +612,9 @@ void pcf_maxhitpoint(Actor *actor, ieDword Value)
 	if ((signed) Value<(signed) actor->Modified[IE_HITPOINTS]) {
 		actor->Modified[IE_HITPOINTS]=Value;
 		pcf_hitpoint(actor,Value);
+	}
+	if (actor->InParty) {
+		core->SetEventFlag(EF_PORTRAIT);
 	}
 }
 
@@ -629,6 +638,9 @@ void pcf_stat(Actor *actor, ieDword Value)
 {
 	if ((signed) Value<=0) {
 		actor->Die(NULL);
+	}
+	if (actor->InParty) {
+		core->SetEventFlag(EF_PORTRAIT);
 	}
 }
 

@@ -1406,7 +1406,7 @@ static PyObject* GemRB_SetVisible(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 	if (!WindowIndex) {
-		core->EventFlag|=EF_CONTROL;
+		core->SetEventFlag(EF_CONTROL);
 	}
 
 	Py_INCREF( Py_None );
@@ -2870,15 +2870,16 @@ static PyObject* GemRB_SetButtonBAM(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetAnimation__doc,
-"SetAnimation(WindowIndex, ControlIndex, BAMResRef)\n\n"
-"Sets the animation of a Button Control from a BAM file.");
+"SetAnimation(WindowIndex, ControlIndex, BAMResRef[, Cycle])\n\n"
+"Sets the animation of a Control (usually a Button) from a BAM file. Optionally an animation cycle could be set too.");
 
 static PyObject* GemRB_SetAnimation(PyObject * /*self*/, PyObject* args)
 {
 	int wi, ci;
 	char* ResRef;
+	int Cycle = 0;
 
-	if (!PyArg_ParseTuple( args, "iis", &wi, &ci, &ResRef )) {
+	if (!PyArg_ParseTuple( args, "iis|i", &wi, &ci, &ResRef, &Cycle )) {
 		return AttributeError( GemRB_SetAnimation__doc );
 	}
 
@@ -2887,8 +2888,14 @@ static PyObject* GemRB_SetAnimation(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	//who knows, there might have been lurking an active animation
+	//who knows, there might have been an active animation lurking
 	if (ctl->animation) {
+		//if this control says the resource is the same
+		//we are just setting now don't reset it
+		if(ctl->animation->SameResource(ResRef, Cycle)) {
+			Py_INCREF( Py_None );
+			return Py_None;
+		}
 		delete ctl->animation;
 		ctl->animation = NULL;
 	}
@@ -2899,7 +2906,7 @@ static PyObject* GemRB_SetAnimation(PyObject * /*self*/, PyObject* args)
 		return Py_None;
 	}
 
-	ControlAnimation* anim = new ControlAnimation( ctl, ResRef );
+	ControlAnimation* anim = new ControlAnimation( ctl, ResRef, Cycle );
 
 	anim->UpdateAnimation();
 

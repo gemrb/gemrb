@@ -542,6 +542,15 @@ void Interface::HandleEvents()
 		return;
 	}
 
+	if (EventFlag&EF_PORTRAIT) {
+		ieDword tmp = (ieDword) ~0;
+		vars->Lookup( "PortraitWindow", tmp );
+		if (tmp != (ieDword) ~0) {
+			EventFlag&=~EF_PORTRAIT;
+			guiscript->RunFunction( "UpdatePortraitWindow" );
+		}
+	}
+
 	if (EventFlag&EF_CONTROL) {
 		EventFlag&=~EF_CONTROL;
 		guiscript->RunFunction( "UpdateControlStatus" );

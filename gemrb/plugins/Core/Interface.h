@@ -156,6 +156,7 @@ public:
 //they wait until the condition is right
 #define EF_CONTROL       1
 #define EF_SHOWMAP       2
+#define EF_PORTRAIT      4
 
 //autopause
 #define AP_UNUSABLE      0
@@ -677,14 +678,19 @@ public:
 	/** Sends a termination signal to the Video Driver */
 	bool Quit(void);
 	/** CheatKey support */
-	void EnableCheatKeys(int Flag)
+	inline void EnableCheatKeys(int Flag)
 	{
 		CheatFlag=(Flag > 0);
 	}
 
-	bool CheatEnabled()
+	inline bool CheatEnabled()
 	{
 		return CheatFlag;
+	}
+
+	inline void SetEventFlag(int Flag)
+	{
+		EventFlag|=Flag;
 	}
 
 	/** Next Script Name */

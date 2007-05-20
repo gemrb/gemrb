@@ -27,11 +27,11 @@
 #include "Button.h"
 
 
-ControlAnimation::ControlAnimation(Control* ctl, ieResRef ResRef)
+ControlAnimation::ControlAnimation(Control* ctl, ieResRef ResRef, int Cycle)
 {
 	control = NULL;
 	bam = NULL;
-	cycle = 0;
+	cycle = Cycle;
 	frame = 0;
 	anim_phase = 0;
 
@@ -55,19 +55,37 @@ ControlAnimation::~ControlAnimation(void)
 	bam = NULL;
 }
 
+bool ControlAnimation::SameResource(ieResRef ResRef, int Cycle)
+{
+	if (!control ) return false;
+	if (!bam) return false;
+	if (memcmp(ResRef, bam->ResRef, sizeof(ieResRef) )) return false;
+	int c = cycle;
+	if (control->Flags&IE_GUI_BUTTON_PLAYRANDOM) {
+		c&=~1;
+	}
+	if (Cycle!=c) return false;
+	return true;
+}
+
 void ControlAnimation::UpdateAnimation(void)
 {
 	unsigned long time;
+	int Cycle = cycle;
 
 	if (control->Flags & IE_GUI_BUTTON_PLAYRANDOM) {
 		// simple Finite-State Machine
 		if (anim_phase == 0) {
-			cycle = 0;
 			frame = 0;
 			anim_phase = 1;
 			time = 500 + 500 * (rand() % 20);
+			cycle&=~1;
+			Cycle=cycle;
 		} else if (anim_phase == 1) {
-			if (rand() % 30 == 0) cycle = 1;
+			if (rand() % 30 == 0) {
+				cycle|=1;
+				Cycle=cycle;
+			}
 			anim_phase = 2;
 			time = 100;
 		} else {
@@ -79,7 +97,7 @@ void ControlAnimation::UpdateAnimation(void)
 		time = 15;
 	}
 
-	Sprite2D* pic = bam->GetFrame( (unsigned short) frame, (unsigned char) cycle );
+	Sprite2D* pic = bam->GetFrame( (unsigned short) frame, (unsigned char) Cycle );
 
 	if (pic == NULL) {
 		//stopping at end frame

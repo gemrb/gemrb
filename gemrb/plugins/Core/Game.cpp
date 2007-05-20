@@ -941,7 +941,7 @@ void Game::SetControlStatus(int value, int mode)
 		case BM_AND: ControlStatus&=value; break;
 		case BM_XOR: ControlStatus^=value; break;
 	}
-	core->EventFlag|=EF_CONTROL;
+	core->SetEventFlag(EF_CONTROL);
 }
 
 void Game::AddGold(ieDword add)

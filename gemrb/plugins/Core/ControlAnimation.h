@@ -54,9 +54,11 @@ private:
 	unsigned int frame;
 	unsigned int anim_phase;
 public:
-	ControlAnimation(Control* ctl, ieResRef ResRef);
+	ControlAnimation(Control* ctl, ieResRef ResRef, int Cycle = 0);
 	~ControlAnimation(void);
 	void UpdateAnimation();
+	//report if the current resource is the same as descripted by the params
+	bool SameResource(ieResRef ResRef, int Cycle);
 };
 
 #endif

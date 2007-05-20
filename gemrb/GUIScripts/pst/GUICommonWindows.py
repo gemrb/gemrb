@@ -305,18 +305,39 @@ def UpdatePortraitWindow ():
 			GemRB.SetButtonFlags (Window, ButtonHP, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			continue
 		
-		#sel = GemRB.GameIsPCSelected (i+1)
 		sel = GemRB.GameGetSelectedPCSingle () == i + 1
 		GemRB.SetButtonBAM (Window, Button, pic, 0, 0, -1)
-		GemRB.SetAnimation (Window, Button, pic)
-		
-		GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED | IE_GUI_BUTTON_PLAYRANDOM, OP_SET)
-		#GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_ANIMATED, OP_SET)
 
-		GemRB.SetButtonFlags(Window, ButtonHP, IE_GUI_BUTTON_PICTURE, OP_SET)
-
+		state = GemRB.GetPlayerStat (i+1, IE_STATE_ID)
 		hp = GemRB.GetPlayerStat (i+1, IE_HITPOINTS)
 		hp_max = GemRB.GetPlayerStat (i+1, IE_MAXHITPOINTS)
+
+		if state & STATE_DEAD:
+				cycle = 9
+		elif state & STATE_HELPLESS:
+				cycle = 8
+		elif state & STATE_PETRIFIED:
+				cycle = 7
+		elif state & STATE_PANIC:
+				cycle = 6
+		elif state & STATE_POISONED:
+				cycle = 2
+		elif hp<hp_max/5:
+			cycle = 4
+		else:
+			cycle = 0
+
+		print "HP:",hp, ", ", hp_max
+		print "State:", state, "Cycle: ", cycle
+
+		GemRB.SetAnimation (Window, Button, pic, cycle)
+		
+		if cycle<6:
+			GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED | IE_GUI_BUTTON_PLAYRANDOM, OP_SET)
+		else:
+			GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
+
+		GemRB.SetButtonFlags(Window, ButtonHP, IE_GUI_BUTTON_PICTURE, OP_SET)
 
 		ratio = (hp + 0.0) / hp_max
 		if ratio > 1.0: ratio = 1.0
