@@ -11,7 +11,8 @@ OpenWorldMapWindow():
    This function is called when the worldmap window must be opened.
 
 UpdatePortraitWindow():
-   This function is called when there was a change in the party.
+   This function is called when there was a change in the party, this includes
+   party order and PC hitpoints or state changes that may affect portraits.
 
 SelectionChanged():
    This function is called when there was a change in selection of a team member.
