@@ -72,6 +72,7 @@ class Palette;
 
 #define IE_GUI_BUTTON_CENTER_PICTURES 0x00080000 // center button's PictureList
 #define IE_GUI_BUTTON_BG1_PAPERDOLL   0x00100000 // BG1-style paperdoll PictureList
+#define IE_GUI_BUTTON_HORIZONTAL      0x00200000 // horizontal clipping of overlay
 
 #define IE_GUI_BUTTON_NORMAL       0x00000004   // default button, doesn't stick
 
@@ -143,6 +144,8 @@ public:
 	void StackPicture(Sprite2D* Picture);
 	/** Sets border/frame parameters */
 	void SetBorder(int index, int dx1, int dy1, int dx2, int dy2, Color* color, bool enabled = false, bool filled = false);
+	/** Sets horizontal overlay, used in portrait hp overlay */
+	void SetHorizontalOverlay(double clip, Color src, Color dest);
 	/** Sets font used for drawing button label */
 	void SetFont(Font* newfont);
 	/** Enables or disables specified border/frame */
@@ -202,9 +205,13 @@ private: // Private attributes
 	unsigned char State;
 	double Clipping;
 	Point drag_start;
+	/** HP Bar over portraits */
+	Color SourceRGB, DestRGB;
+	unsigned long starttime;
 	/** frame settings */
 	ButtonBorder borders[MAX_NUM_BORDERS];
 	bool IsPixelTransparent (unsigned short x, unsigned short y);
+	void CloseUpColor();
 };
 
 #endif

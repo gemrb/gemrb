@@ -55,6 +55,7 @@ Button::Button()
 	Picture = NULL;
 	Clipping = 1.0;
 	memset( borders, 0, sizeof( borders ));
+	starttime = 0;
 }
 Button::~Button()
 {
@@ -105,6 +106,34 @@ void Button::SetImage(unsigned char type, Sprite2D* img)
 	}
 	Changed = true;
 }
+
+/** make SourceRGB go closer to DestRGB */
+void Button::CloseUpColor()
+{
+	if (!starttime) return;
+	//using the realtime timer, because i don't want to
+	//handle Game at this point
+	unsigned long newtime;
+
+	GetTime( newtime );
+	if (newtime<starttime) {
+		return;
+	}
+	Changed = true;
+	SourceRGB.r = (SourceRGB.r + DestRGB.r) / 2;
+	SourceRGB.g = (SourceRGB.g + DestRGB.g) / 2;
+	SourceRGB.b = (SourceRGB.b + DestRGB.b) / 2;
+	SourceRGB.a = (SourceRGB.a + DestRGB.a) / 2;
+	if (SourceRGB.r == DestRGB.r && 
+		SourceRGB.g == DestRGB.g && 
+		SourceRGB.b == DestRGB.b && 
+		SourceRGB.a == DestRGB.a) {
+		starttime = 0;
+		return;
+	}
+	starttime = newtime + 40;
+}
+
 /** Draws the Control on the Output Display */
 void Button::Draw(unsigned short x, unsigned short y)
 {
@@ -168,8 +197,18 @@ void Button::Draw(unsigned short x, unsigned short y)
 		// Picture is drawn centered
 		int xOffs = ( Width / 2 ) - ( Picture->Width / 2 );
 		int yOffs = ( Height / 2 ) - ( Picture->Height / 2 );
-		Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(Picture->Width * Clipping), Picture->Height );
-		video->BlitSprite( Picture, x + XPos + xOffs + Picture->XPos, y + YPos + yOffs + Picture->YPos, true, &r );
+		if (Flags & IE_GUI_BUTTON_HORIZONTAL) {
+			xOffs += x + XPos + Picture->XPos;
+			yOffs += y + YPos + Picture->YPos;
+			video->BlitSprite( Picture, xOffs, yOffs, true );
+			Region r = Region( xOffs, yOffs + (int) (Picture->Height * Clipping), Picture->Width, (int) (Picture->Height*(1.0 - Clipping)) );
+			video->DrawRect( r, SourceRGB, true );
+			CloseUpColor();
+		}
+		else {
+			Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(Picture->Width * Clipping), Picture->Height );
+			video->BlitSprite( Picture, x + XPos + xOffs + Picture->XPos, y + YPos + yOffs + Picture->YPos, true, &r );
+		}
 	}
 
 	// Composite pictures (paperdolls/description icons)
@@ -579,3 +618,15 @@ void Button::SetTextColor(Color fore, Color back)
 	Changed = true;
 }
 
+void Button::SetHorizontalOverlay(double clip, Color src, Color dest)
+{
+	if (Clipping>clip) {
+		SourceRGB=src;
+		DestRGB=dest;
+		GetTime( starttime );
+		starttime += 40;
+	}
+	Clipping = clip;
+	Flags |= IE_GUI_BUTTON_HORIZONTAL;
+	Changed = true;
+}

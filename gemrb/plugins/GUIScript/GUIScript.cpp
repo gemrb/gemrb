@@ -1865,6 +1865,44 @@ static PyObject* GemRB_SetButtonSprites(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetButtonOverlay__doc,
+"SetButtonOverlay(WindowIndex, ControlIndex, Current, Max, r,g,b,a, r,g,b,a)\n\n"
+"Sets up a portrait button for hitpoint overlay" );
+
+static PyObject* GemRB_SetButtonOverlay(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex;
+	int Max, Current;
+	int r1,g1,b1,a1;
+	int r2,g2,b2,a2;
+
+	if (!PyArg_ParseTuple( args, "iiiiiiiiiiii", &WindowIndex, &ControlIndex,
+		&Max, &Current, &r1, &g1, &b1, &a1, &r2, &g2, &b2, &a2)) {
+		return AttributeError( GemRB_SetButtonOverlay__doc );
+	}
+
+	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
+	if (!btn) {
+		return NULL;
+	}
+
+	Color src = { r1, g1, b1, a1 };
+	Color dest = { r2, g2, b2, a2 };
+	double ratio = 0.0;
+	if (Max>0) {
+		if (Current>=Max) {
+			ratio = 1.0;
+		} else {
+			ratio = (double) Current / Max;
+		}
+	}
+
+	//can't call clipping, because the change of ratio triggers color change
+	btn->SetHorizontalOverlay(ratio, src, dest);
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_SetButtonBorder__doc,
 "SetButtonBorder(WindowIndex, ControlIndex, BorderIndex, dx1, dy1, dx2, dy2, R, G, B, A, [enabled, filled])\n\n"
 "Sets border/frame parameters for a button." );
@@ -1874,7 +1912,7 @@ static PyObject* GemRB_SetButtonBorder(PyObject * /*self*/, PyObject* args)
 	int WindowIndex, ControlIndex, BorderIndex, dx1, dy1, dx2, dy2, r, g, b, a, enabled = 0, filled = 0;
 
 	if (!PyArg_ParseTuple( args, "iiiiiiiiiii|ii", &WindowIndex, &ControlIndex,
-			&BorderIndex, &dx1, &dy1, &dx2, &dy2, &r, &g, &b, &a, &enabled, &filled)) {
+		&BorderIndex, &dx1, &dy1, &dx2, &dy2, &r, &g, &b, &a, &enabled, &filled)) {
 		return AttributeError( GemRB_SetButtonBorder__doc );
 	}
 
@@ -7939,6 +7977,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetButtonSprites, METH_VARARGS),
 	METHOD(SetButtonBorder, METH_VARARGS),
 	METHOD(EnableButtonBorder, METH_VARARGS),
+	METHOD(SetButtonOverlay, METH_VARARGS),
 	METHOD(SetButtonFont, METH_VARARGS),
 	METHOD(SetButtonTextColor, METH_VARARGS),
 	METHOD(AdjustScrolling, METH_VARARGS),
