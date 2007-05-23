@@ -41,7 +41,12 @@
 #include <windows.h>
 #endif
 
-int main(int argc, char** argv)
+//this supposed to convince SDL to work on OS/X
+#ifdef __APPLE_CC__ // we need startup SDL here
+#include "SDL.h"
+#endif
+
+int main(int argc, char* argv[])
 {
 	core = new Interface( argc, argv );
 	if (core->Init() == GEM_ERROR) {
