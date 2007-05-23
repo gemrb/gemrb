@@ -234,7 +234,7 @@ int SDLVideoDriver::SwapBuffers(void)
 	}
 	lastTime = time;
 
-	unsigned char key;
+	unsigned char key = 0;
 	bool ConsolePopped = core->ConsolePopped;
 
 	if (ConsolePopped) {
@@ -256,9 +256,7 @@ int SDLVideoDriver::SwapBuffers(void)
 					key = GEM_ALT;
 					break;
 				default:
-					if (event.key.keysym.sym>=256) {
-						key=0;
-					} else {
+					if (event.key.keysym.sym<256) {
 						key=(unsigned char) event.key.keysym.sym;
 					}
 					break;
