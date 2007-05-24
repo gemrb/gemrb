@@ -1124,6 +1124,12 @@ int fx_current_hp_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	} else {
 		STAT_MOD( IE_HITPOINTS );
 	}
+	if (fx->Parameter2&1) {
+		target->Resurrect();
+	}
+	if (fx->Parameter2&2) {
+		target->fxqueue.RemoveAllNonPermanentEffects();
+	}
 	return FX_PERMANENT;
 }
 

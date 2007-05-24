@@ -1893,7 +1893,9 @@ static PyObject* GemRB_SetButtonOverlay(PyObject * /*self*/, PyObject* args)
 		if (Current>=Max) {
 			ratio = 1.0;
 		} else {
-			ratio = (double) Current / Max;
+			if (Current>0) {
+				ratio = (double) Current / Max;
+			}
 		}
 	}
 

@@ -515,6 +515,8 @@ void GameControl::SelectActor(int whom, int type)
 		}
 }
 
+static EffectRef heal_ref={"CurrentHPModifier", NULL, -1};
+
 /** Key Release Event */
 void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 {
@@ -676,7 +678,10 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					lastActor = area->GetActor( p, GA_DEFAULT);
 				}
 				if (lastActor) {
-					lastActor->Resurrect();
+					Effect *fx = EffectQueue::CreateEffect(heal_ref, lastActor->GetStat(IE_MAXHITPOINTS), 3, FX_DURATION_INSTANT_LIMITED);
+					if (fx) {
+						core->ApplyEffect(fx, lastActor, lastActor);
+					}
 				}
 				break;
 			case 't'://advances time

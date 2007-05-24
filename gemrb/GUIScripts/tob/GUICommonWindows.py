@@ -565,6 +565,7 @@ def UpdatePortraitWindow ():
 		hp_max = GemRB.GetPlayerStat (i+1, IE_MAXHITPOINTS)
 		state = GemRB.GetPlayerStat (i+1, IE_STATE_ID)
 
+		print i, ": ",state,", ", hp
 		if hp<1 or (state & STATE_DEAD):
 			GemRB.SetButtonOverlay (Window, Button, hp_max, hp, 64,64,64,200, 64,64,64,200)
 		else:

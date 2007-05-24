@@ -532,14 +532,18 @@ def UpdatePortraitWindow ():
 
 		hp = GemRB.GetPlayerStat (i+1, IE_HITPOINTS)
 		hp_max = GemRB.GetPlayerStat (i+1, IE_MAXHITPOINTS)
+		state = GemRB.GetPlayerStat (i+1, IE_STATE_ID)
 
-		GemRB.SetText (Window, Button, "%d/%d" %(hp, hp_max))
+		if hp<1 or (state & STATE_DEAD):
+			GemRB.SetButtonOverlay (Window, Button, hp_max, hp, 64,64,64,200, 64,64,64,200)
+		else:
+			GemRB.SetButtonOverlay (Window, Button, hp_max, hp, 255,0,0,200, 128,0,0,64)
+
+		#GemRB.SetText (Window, Button, "%d/%d" %(hp, hp_max))
 		GemRB.SetTooltip (Window, Button, GemRB.GetPlayerName (i+1, 1) + "\n%d/%d" %(hp, hp_max))
 		if sel:
-			#GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SELECTED)
 			GemRB.EnableButtonBorder (Window, Button, FRAME_PC_SELECTED, 1)
 		else:
-			#GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_UNPRESSED)
 			GemRB.EnableButtonBorder (Window, Button, FRAME_PC_SELECTED, 0)
 
 

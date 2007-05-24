@@ -98,7 +98,7 @@ static ieWordSigned *dexmod = NULL;
 static ieWordSigned *conmod = NULL;
 static ieWordSigned *chrmod = NULL;
 
-Interface::Interface(int iargc, char** iargv)
+Interface::Interface(int iargc, char* iargv[])
 {
 	argc = iargc;
 	argv = iargv;

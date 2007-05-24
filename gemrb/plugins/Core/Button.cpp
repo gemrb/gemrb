@@ -115,11 +115,11 @@ void Button::CloseUpColor()
 	//handle Game at this point
 	unsigned long newtime;
 
+	Changed = true;
 	GetTime( newtime );
 	if (newtime<starttime) {
 		return;
 	}
-	Changed = true;
 	SourceRGB.r = (SourceRGB.r + DestRGB.r) / 2;
 	SourceRGB.g = (SourceRGB.g + DestRGB.g) / 2;
 	SourceRGB.b = (SourceRGB.b + DestRGB.b) / 2;

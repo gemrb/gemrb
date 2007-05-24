@@ -313,7 +313,7 @@ public:
 	Sprite2D *WindowFrames[4];
 	Sprite2D *GroundCircles[MAX_CIRCLE_SIZE][6];
 public:
-	Interface(int iargc, char **iargv);
+	Interface(int iargc, char *iargv[]);
 	~Interface(void);
 	int Init(void);
 	//TODO: Core Methods in Interface Class
