@@ -3397,7 +3397,7 @@ void GameScript::RegainRangerHood(Scriptable* Sender, Action* /*parameters*/)
 void GameScript::GetItem(Scriptable* Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	MoveItemCore(tar, Sender, parameters->string0Parameter,0);
+	MoveItemCore(tar, Sender, parameters->string0Parameter,0,0);
 }
 
 //getting one single item
@@ -3406,7 +3406,7 @@ void GameScript::TakePartyItem(Scriptable* Sender, Action* parameters)
 	Game *game=core->GetGame();
 	int i=game->GetPartySize(false);
 	while (i--) {
-		int res=MoveItemCore(game->GetPC(i,false), Sender, parameters->string0Parameter,0);
+		int res=MoveItemCore(game->GetPC(i,false), Sender, parameters->string0Parameter,0,IE_INV_ITEM_UNSTEALABLE);
 		if (res!=MIC_NOITEM) return;
 	}
 }
@@ -3418,7 +3418,7 @@ void GameScript::TakePartyItemNum(Scriptable* Sender, Action* parameters)
 	Game *game=core->GetGame();
 	int i=game->GetPartySize(false);
 	while (i--) {
-		int res=MoveItemCore(game->GetPC(i,false), Sender, parameters->string0Parameter,0);
+		int res=MoveItemCore(game->GetPC(i,false), Sender, parameters->string0Parameter,0, IE_INV_ITEM_UNSTEALABLE);
 		if (res == MIC_GOTITEM) {
 			i++;
 			count--;
@@ -3434,7 +3434,7 @@ void GameScript::TakePartyItemRange(Scriptable* Sender, Action* parameters)
 	while (i--) {
 		Actor *ac = game->GetPC(i,false);
 		if (Distance(Sender, ac)<MAX_OPERATING_DISTANCE) {
-			while (MoveItemCore(ac, Sender, parameters->string0Parameter,0)==MIC_GOTITEM);
+			while (MoveItemCore(ac, Sender, parameters->string0Parameter,0,IE_INV_ITEM_UNSTEALABLE)==MIC_GOTITEM);
 		}
 	}
 }
@@ -3444,7 +3444,7 @@ void GameScript::TakePartyItemAll(Scriptable* Sender, Action* parameters)
 	Game *game=core->GetGame();
 	int i=game->GetPartySize(false);
 	while (i--) {
-		while (MoveItemCore(game->GetPC(i,false), Sender, parameters->string0Parameter,0)==MIC_GOTITEM);
+		while (MoveItemCore(game->GetPC(i,false), Sender, parameters->string0Parameter,0, IE_INV_ITEM_UNSTEALABLE)==MIC_GOTITEM);
 	}
 }
 
@@ -3452,7 +3452,7 @@ void GameScript::TakePartyItemAll(Scriptable* Sender, Action* parameters)
 void GameScript::GiveItem(Scriptable *Sender, Action* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
-	MoveItemCore(Sender, tar, parameters->string0Parameter,0);
+	MoveItemCore(Sender, tar, parameters->string0Parameter,0,0);
 }
 
 //this action creates an item in a container or a creature
@@ -3661,7 +3661,7 @@ void GameScript::GivePartyAllEquipment(Scriptable *Sender, Action* /*parameters*
 	int i = game->GetPartySize(false);
 	while (i--) {
 		Actor *tar = game->GetPC(i,false);
-		while(MoveItemCore(Sender, tar, "",0)!=MIC_NOITEM);
+		while(MoveItemCore(Sender, tar, "",0,0)!=MIC_NOITEM);
 	}
 }
 
@@ -3689,7 +3689,7 @@ void GameScript::Plunder(Scriptable *Sender, Action* parameters)
 	}
 	//move all movable item from the target to the Sender
 	//the rest will be dropped at the feet of Sender
-	while(MoveItemCore(tar, Sender, "",0)!=MIC_NOITEM);
+	while(MoveItemCore(tar, Sender, "",0,0)!=MIC_NOITEM);
 }
 
 void GameScript::MoveInventory(Scriptable *Sender, Action* parameters)
@@ -3704,7 +3704,7 @@ void GameScript::MoveInventory(Scriptable *Sender, Action* parameters)
 	}
 	//move all movable item from the target to the Sender
 	//the rest will be dropped at the feet of Sender
-	while(MoveItemCore(src, tar, "",0)!=MIC_NOITEM);
+	while(MoveItemCore(src, tar, "",0,0)!=MIC_NOITEM);
 }
 
 void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
@@ -3752,7 +3752,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		return;
 	}
 	// now this is a kind of giveitem
-	MoveItemCore(tar, Sender, "", slot);
+	MoveItemCore(tar, Sender, "", IE_INV_ITEM_UNSTEALABLE|IE_INV_ITEM_EQUIPPED, IE_INV_ITEM_STOLEN);
 	Sender->ReleaseCurrentAction();
 }
 
@@ -3770,7 +3770,7 @@ void GameScript::TakeItemList(Scriptable * Sender, Action* parameters)
 	if (tab) {
 		int rows = tab->GetRowCount();
 		for (int i=0;i<rows;i++) {
-			MoveItemCore(tar, Sender, tab->QueryField(i,0), 0);
+			MoveItemCore(tar, Sender, tab->QueryField(i,0), 0, IE_INV_ITEM_UNSTEALABLE);
 		}
 	}
 	core->DelTable(table);
@@ -3790,7 +3790,7 @@ void GameScript::TakeItemListParty(Scriptable * Sender, Action* parameters)
 			int j = game->GetPartySize(false);
 			while (j--) {
 				Actor *tar = game->GetPC(j, false);
-				MoveItemCore(tar, Sender, tab->QueryField(i,0), 0);
+				MoveItemCore(tar, Sender, tab->QueryField(i,0), 0, IE_INV_ITEM_UNSTEALABLE);
 			}
 		}
 	}

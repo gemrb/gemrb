@@ -57,7 +57,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags);
 Targets* GetAllObjects(Scriptable* Sender, Object* oC, int ga_flags);
 Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags = 0);
 int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos);
-int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int flags);
+int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int flags, int setflag);
 void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, bool untilsee);
 void CreateItemCore(CREItem *item, const char *resref, int a, int b, int c);
 void AttackCore(Scriptable *Sender, Scriptable *target, Action *parameters, int flags);
