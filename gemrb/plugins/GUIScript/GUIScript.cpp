@@ -2897,7 +2897,7 @@ static PyObject* GemRB_SetAnimation(PyObject * /*self*/, PyObject* args)
 	//who knows, there might have been an active animation lurking
 	if (ctl->animation) {
 		//if this control says the resource is the same
-		//we are just setting now don't reset it
+		//we wanted to set, we don't reset it
 		if(ctl->animation->SameResource(ResRef, Cycle)) {
 			Py_INCREF( Py_None );
 			return Py_None;
@@ -7414,14 +7414,15 @@ static PyObject* GemRB_SetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_GetEquippedQuickSlot__doc,
-"GetEquippedQuickSlot(PartyID) => QSlot\n\n"
-"returns the equipped weapon slot." );
+"GetEquippedQuickSlot(PartyID[, NoTrans]) => Slot\n\n"
+"Returns the inventory slot (translation) or quick weapon index (no translation) of the equipped weapon." );
 
 static PyObject* GemRB_GetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 {
 	int PartyID;
+	int NoTrans = 0;
 
-	if (!PyArg_ParseTuple( args, "i", &PartyID)) {
+	if (!PyArg_ParseTuple( args, "i|i", &PartyID, &NoTrans)) {
 		return AttributeError( GemRB_GetEquippedQuickSlot__doc );
 	}
 
@@ -7442,6 +7443,9 @@ static PyObject* GemRB_GetEquippedQuickSlot(PyObject * /*self*/, PyObject* args)
 	if (actor->PCStats) {
 		for(int i=0;i<4;i++) {
 			if (ret == actor->PCStats->QuickWeaponSlots[i]) {
+				if (NoTrans) {
+					return PyInt_FromLong(i);
+				}
 				ret = i+actor->inventory.GetWeaponSlot();
 				break;
 			}

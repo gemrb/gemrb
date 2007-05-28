@@ -1,10 +1,13 @@
-Prototype: GemRB.GetEquippedQuickSlot(PartyID)
+Prototype: GemRB.GetEquippedQuickSlot(PartyID[, NoTrans])
 
-Description: Returns the equipped weapon quickslot.
+Description: Returns the quickweapon slot index or the inventory slot.
 
-Parameters: PartyID - the PC's position in the party (1 based)
+Parameters:
+  PartyID - the PC's position in the party (1 based)
+  NoTrans - 0 - return the inventory slot
+            1 - return the quickweapon slot index
 
-Return value: Inventory slot.
+Return value: numeric
 
 See also: SetEquippedQuickSlot, GetEquippedAmmunition
 
