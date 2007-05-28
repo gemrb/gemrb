@@ -62,6 +62,8 @@ public:
 	{
 		return 1;
 	}
+
+	ImageFactory* GetImageFactory(const char* /*ResRef*/) { return 0; }
 public:
 	void release(void)
 	{

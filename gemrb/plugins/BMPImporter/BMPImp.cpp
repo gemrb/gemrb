@@ -24,6 +24,7 @@
 #include "../../includes/RGBAColor.h"
 #include "../Core/Interface.h"
 #include "../Core/Video.h"
+#include "../Core/ImageFactory.h"
 
 static ieDword red_mask = 0x00ff0000;
 static ieDword green_mask = 0x0000ff00;
@@ -427,4 +428,10 @@ void BMPImp::PutImage(DataStream *output)
 		}
 		output->Write( filling, stuff);
 	}
+}
+
+ImageFactory* BMPImp::GetImageFactory(const char* ResRef)
+{
+	ImageFactory* fact = new ImageFactory( ResRef, GetImage() );
+	return fact;
 }

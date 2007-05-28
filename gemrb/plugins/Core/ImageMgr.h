@@ -26,6 +26,8 @@
 #include "DataStream.h"
 #include "Sprite2D.h"
 
+class ImageFactory;
+
 #ifdef WIN32
 
 #ifdef GEM_BUILD_DLL
@@ -62,6 +64,8 @@ public:
 	// FIXME: should be abstract, but I don't want to implement it for all
 	// image managers right now
 	virtual void PutImage(DataStream *output);
+
+	virtual ImageFactory* GetImageFactory(const char* ResRef) = 0;
 protected:
 	/** not virtual */
 	Color GetPixelSum(unsigned int x, unsigned int y, unsigned int ratio);

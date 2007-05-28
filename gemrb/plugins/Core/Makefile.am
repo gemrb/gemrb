@@ -54,6 +54,7 @@ libgemrb_core_la_SOURCES = \
 	InterfaceDesc.cpp \
 	Interface.cpp \
 	ImageMgr.cpp \
+	ImageFactory.cpp \
 	Font.cpp \
 	FileStream.cpp \
 	FactoryObject.cpp \

@@ -26,6 +26,8 @@
 #include "../Core/Interface.h"
 #include "../Core/ArchiveImporter.h"
 #include "../Core/AnimationMgr.h"
+#include "../Core/ImageMgr.h"
+#include "../Core/ImageFactory.h"
 #include "../Core/Factory.h"
 #ifndef WIN32
 #include <unistd.h>
@@ -348,30 +350,61 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
 void* KeyImp::GetFactoryResource(const char* resname, SClass_ID type,
 	unsigned char mode)
 {
-	if (type != IE_BAM_CLASS_ID) {
+	int fobjindex = core->GetFactory()->IsLoaded(resname,type);
+	// already cached
+	if ( fobjindex != -1)
+		return core->GetFactory()->GetFactoryObject( fobjindex );
+
+	switch (type) {
+	case IE_BAM_CLASS_ID:
+	{
+		DataStream* ret = GetResource( resname, type );
+		if (ret) {
+			AnimationMgr* ani = ( AnimationMgr* )
+				core->GetInterface( IE_BAM_CLASS_ID );
+			if (!ani)
+				return NULL;
+			ani->Open( ret, true );
+			AnimationFactory* af = ani->GetAnimationFactory( resname, mode );
+			core->FreeInterface( ani );
+			core->GetFactory()->AddFactoryObject( af );
+			return af;
+		}
+		return NULL;
+	}
+	case IE_BMP_CLASS_ID:
+	{
+		// check PNG first
+		DataStream* ret = GetResource( resname, IE_PNG_CLASS_ID );
+		if (ret) {
+			ImageMgr* img = (ImageMgr*) core->GetInterface( IE_PNG_CLASS_ID );
+			if (img) {
+				img->Open( ret, true );
+				ImageFactory* fact = img->GetImageFactory( resname );
+				core->FreeInterface( img );
+				core->GetFactory()->AddFactoryObject( fact );
+				return fact;
+			}
+		}
+
+		ret = GetResource( resname, IE_BMP_CLASS_ID );
+		if (ret) {
+			ImageMgr* img = (ImageMgr*) core->GetInterface( IE_BMP_CLASS_ID );
+			if (img) {
+				img->Open( ret, true );
+				ImageFactory* fact = img->GetImageFactory( resname );
+				core->FreeInterface( img );
+				core->GetFactory()->AddFactoryObject( fact );
+				return fact;
+			}
+		}
+
+		return NULL;
+	}
+	default:
 		printf( "\n" );
 		printMessage( "KEYImporter", " ", WHITE );
 		printf( "%s files are not supported.\n", core->TypeExt( type ) );
 		return NULL;
 	}
-	int fobjindex;
-	if (( fobjindex = core->GetFactory()->IsLoaded( resname, type ) ) != -1) {
-		//printf("\n");
-		//printMessage("KEYImporter", "Factory Object Found!\n", WHITE);
-		return core->GetFactory()->GetFactoryObject( fobjindex );
-	}
-
-	DataStream* ret = GetResource( resname, type );
-	if (ret) {
-		AnimationMgr* ani = ( AnimationMgr* )
-			core->GetInterface( IE_BAM_CLASS_ID );
-		if (!ani)
-			return NULL;
-		ani->Open( ret, true );
-		AnimationFactory* af = ani->GetAnimationFactory( resname, mode );
-		core->FreeInterface( ani );
-		core->GetFactory()->AddFactoryObject( af );
-		return af;
-	}
-	return NULL;
 }

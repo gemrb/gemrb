@@ -43,6 +43,7 @@
 #include "../Core/DataFileMgr.h"
 #include "../Core/WorldMap.h"
 #include "../Core/EffectQueue.h"
+#include "../Core/ImageFactory.h"
 
 //this stuff is missing from Python 2.2
 #ifndef PyDoc_VAR
@@ -2648,44 +2649,15 @@ static PyObject* GemRB_SetButtonPicture(PyObject * /*self*/, PyObject* args)
 	}
 
 	ResourceMgr * rm = core->GetResourceMgr();
-	DataStream* str;
-	int restype = IE_BMP_CLASS_ID;
+	ImageFactory* fact = ( ImageFactory* )
+		rm->GetFactoryResource( ResRef, IE_BMP_CLASS_ID, IE_NORMAL );
 
-	//png is optional
-	if (core->IsAvailable(IE_PNG_CLASS_ID) ) {
-		if (rm->HasResource(ResRef, IE_PNG_CLASS_ID) ) {
-			restype = IE_PNG_CLASS_ID;
-		}
-	}
-	str = rm->GetResource( ResRef, restype );
-	//default portrait
-	if (str == NULL && DefResRef) {
-		str = rm->GetResource( DefResRef, IE_BMP_CLASS_ID );
-		restype = IE_BMP_CLASS_ID;
-	}
-	if (str == NULL) {
-		return NULL;
-	}
-	ImageMgr* im = ( ImageMgr* ) core->GetInterface( restype );
-	if (im == NULL) {
-		delete ( str );
-		return NULL;
-	}
-
-	if (!im->Open( str, true )) {
-		core->FreeInterface( im );
-		return NULL;
-	}
-
-	Sprite2D* Picture = im->GetImage();
+	Sprite2D* Picture = fact->GetImage();
 	if (Picture == NULL) {
-		core->FreeInterface( im );
 		return NULL;
 	}
 
 	btn->SetPicture( Picture );
-
-	core->FreeInterface( im );
 
 	Py_INCREF( Py_None );
 	return Py_None;
