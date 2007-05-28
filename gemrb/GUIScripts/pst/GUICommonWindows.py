@@ -327,9 +327,6 @@ def UpdatePortraitWindow ():
 		else:
 			cycle = 0
 
-		print "HP:",hp, ", ", hp_max
-		print "State:", state, "Cycle: ", cycle
-
 		GemRB.SetAnimation (Window, Button, pic, cycle)
 		
 		if cycle<6:
@@ -339,8 +336,11 @@ def UpdatePortraitWindow ():
 
 		GemRB.SetButtonFlags(Window, ButtonHP, IE_GUI_BUTTON_PICTURE, OP_SET)
 
-		ratio = (hp + 0.0) / hp_max
-		if ratio > 1.0: ratio = 1.0
+		if hp_max<1:
+			ratio = 0.0
+		else:
+			ratio = (hp + 0.0) / hp_max
+			if ratio > 1.0: ratio = 1.0
 		r = int (255 * (1.0 - ratio))
 		g = int (255 * ratio)
 

@@ -362,7 +362,7 @@ def ActionCastPressed ():
 def ActionQItemPressed (action):
 	pc = GemRB.GameGetFirstSelectedPC ()
 	#quick slot
-	GemRB.UseItem(pc, -2, action)
+	GemRB.UseItem (pc, -2, action)
 	return
 
 def ActionQItem1Pressed ():
@@ -487,7 +487,7 @@ def OpenPortraitWindow (needcontrols):
 		GemRB.SetTooltip (Window, Button, 10485)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
 	else:
-		PortraitWindow = Window = GemRB.LoadWindow(1)
+		PortraitWindow = Window = GemRB.LoadWindow (1)
 
 	for i in range (PARTY_SIZE):
 		Button = GemRB.GetControl (Window, i)
@@ -534,10 +534,15 @@ def UpdatePortraitWindow ():
 		hp_max = GemRB.GetPlayerStat (i+1, IE_MAXHITPOINTS)
 		state = GemRB.GetPlayerStat (i+1, IE_STATE_ID)
 
-		if hp<1 or (state & STATE_DEAD):
-			GemRB.SetButtonOverlay (Window, Button, hp_max, hp, 64,64,64,200, 64,64,64,200)
+		if (hp_max<1):
+			ratio = 0.0
 		else:
-			GemRB.SetButtonOverlay (Window, Button, hp_max, hp, 255,0,0,200, 128,0,0,200)
+			ratio = (hp+0.0) / hp_max
+
+		if hp<1 or (state & STATE_DEAD):
+			GemRB.SetButtonOverlay (Window, Button, ratio, 64,64,64,200, 64,64,64,200)
+		else:
+			GemRB.SetButtonOverlay (Window, Button, ratio, 255,0,0,200, 128,0,0,200)
 
 		#GemRB.SetText (Window, Button, "%d/%d" %(hp, hp_max))
 		GemRB.SetTooltip (Window, Button, GemRB.GetPlayerName (i+1, 1) + "\n%d/%d" %(hp, hp_max))

@@ -195,7 +195,7 @@ def OpenActionsWindowControls (Window):
 	ActionsWindow = Window
 	UpdateActionsWindow ()
 	return
- 
+
 def UpdateActionsWindow ():
 	global ActionsWindow, PortraitWindow, OptionsWindow
 
@@ -228,7 +228,6 @@ def UpdateActionsWindow ():
 		GemRB.SetButtonFont (ActionsWindow, Button, "NUMBER")
 		GemRB.SetText (ActionsWindow, Button, "")
 
-
 	if pc == 0:
 		EmptyControls ()
 		return
@@ -244,10 +243,10 @@ def UpdateActionsWindow ():
 	elif level == 1:
 		GemRB.SetupEquipmentIcons(ActionsWindow, pc, TopIndex)
 	elif level == 2: #spells
-		GemRB.SetVar("Type", 3)
+		GemRB.SetVar ("Type", 3)
 		GemRB.SetupSpellIcons(ActionsWindow, pc, 3, TopIndex)
 	elif level == 3: #innates
-		GemRB.SetVar("Type", 4)
+		GemRB.SetVar ("Type", 4)
 		GemRB.SetupSpellIcons(ActionsWindow, pc, 4, TopIndex)
 	return
 
@@ -264,7 +263,7 @@ def ActionDefendPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_DEFEND)
 
 def ActionQWeaponPressed (which):
-	pc = GemRB.GameGetFirstSelectedPC()
+	pc = GemRB.GameGetFirstSelectedPC ()
 
 	if GemRB.GetEquippedQuickSlot (pc)==which and not (GemRB.GameControlGetTargetMode() &TARGET_MODE_ATTACK):
 		GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_ATTACK)
@@ -307,7 +306,7 @@ def ActionLeftPressed ():
 
 #no check needed because the button wouldn't be drawn if illegal
 def ActionRightPressed ():
-	pc = GemRB.GameGetFirstSelectedPC()
+	pc = GemRB.GameGetFirstSelectedPC ()
 	TopIndex = GemRB.GetVar ("TopIndex")
 	Type = GemRB.GetVar ("Type")
 	Max = GemRB.GetMemorizedSpellsCount(pc, Type)
@@ -323,25 +322,25 @@ def ActionRightPressed ():
 	return
 
 def ActionSongPressed ():
-	pc = GemRB.GameGetFirstSelectedPC()
+	pc = GemRB.GameGetFirstSelectedPC ()
 	GemRB.SetModalState (pc, MS_BATTLESONG)
 	UpdateActionsWindow ()
 	return
 
 def ActionSearchPressed ():
-	pc = GemRB.GameGetFirstSelectedPC()
+	pc = GemRB.GameGetFirstSelectedPC ()
 	GemRB.SetModalState (pc, MS_DETECTTRAPS)
 	UpdateActionsWindow ()
 	return
 
 def ActionStealthPressed ():
-	pc = GemRB.GameGetFirstSelectedPC()
+	pc = GemRB.GameGetFirstSelectedPC ()
 	GemRB.SetModalState (pc, MS_STEALTH)
 	UpdateActionsWindow ()
 	return
 
 def ActionTurnPressed ():
-	pc = GemRB.GameGetFirstSelectedPC()
+	pc = GemRB.GameGetFirstSelectedPC ()
 	GemRB.SetModalState (pc, MS_TURNUNDEAD)
 	UpdateActionsWindow ()
 	return
@@ -359,9 +358,9 @@ def ActionCastPressed ():
 	return
 
 def ActionQItemPressed (action):
-	pc = GemRB.GameGetFirstSelectedPC()
+	pc = GemRB.GameGetFirstSelectedPC ()
 	#quick slot
-	GemRB.UseItem(pc, -2, action)
+	GemRB.UseItem (pc, -2, action)
 	return
 
 def ActionQItem1Pressed ():
@@ -391,23 +390,23 @@ def ActionInnatePressed ():
 	return
 
 def SpellPressed ():
-	pc = GemRB.GameGetFirstSelectedPC()
+	pc = GemRB.GameGetFirstSelectedPC ()
 
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_CAST)
-	Spell = GemRB.GetVar("Spell")
-	Type = GemRB.GetVar("Type")
-	GemRB.SpellCast(pc, Type, Spell)
+	Spell = GemRB.GetVar ("Spell")
+	Type = GemRB.GetVar ("Type")
+	GemRB.SpellCast (pc, Type, Spell)
 	GemRB.SetVar ("ActionLevel", 0)
 	UpdateActionsWindow ()
 	return
 
 def EquipmentPressed ():
-	pc = GemRB.GameGetFirstSelectedPC()
+	pc = GemRB.GameGetFirstSelectedPC ()
 
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_CAST)
-	Item = GemRB.GetVar("Equipment")
+	Item = GemRB.GetVar ("Equipment")
 	#equipment index
-	GemRB.UseItem(pc, -1, Item)
+	GemRB.UseItem (pc, -1, Item)
 	GemRB.SetVar ("ActionLevel", 0)
 	UpdateActionsWindow ()
 	return
@@ -461,7 +460,8 @@ def RunSelectionChangeHandler ():
 def OpenPortraitWindow (needcontrols):
 	global PortraitWindow
 
-	PortraitWindow = Window = GemRB.LoadWindow(1)
+	#take care, this window is different in how/iwd
+	PortraitWindow = Window = GemRB.LoadWindow (1)
 	if needcontrols:
 		# AI
 		Button = GemRB.GetControl (Window, 6)
@@ -512,7 +512,7 @@ def UpdatePortraitWindow ():
 			GemRB.SetText (Window, Button, "")
 			GemRB.SetTooltip (Window, Button, "")
 			continue
-		
+
 		sel = GemRB.GameGetSelectedPCSingle () == i + 1
 		GemRB.SetButtonPicture (Window, Button, pic, "NOPORTSM")
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
@@ -525,10 +525,15 @@ def UpdatePortraitWindow ():
 		hp_max = GemRB.GetPlayerStat (i+1, IE_MAXHITPOINTS)
 		state = GemRB.GetPlayerStat (i+1, IE_STATE_ID)
 
-		if hp<1 or (state & STATE_DEAD):
-			GemRB.SetButtonOverlay (Window, Button, hp_max, hp, 64,64,64,200, 64,64,64,200)
+		if (hp_max<1):
+			ratio = 0.0
 		else:
-			GemRB.SetButtonOverlay (Window, Button, hp_max, hp, 255,0,0,200, 128,0,0,200)
+			ratio = (hp+0.0) / hp_max
+
+		if hp<1 or (state & STATE_DEAD):
+			GemRB.SetButtonOverlay (Window, Button, ratio, 64,64,64,200, 64,64,64,200)
+		else:
+			GemRB.SetButtonOverlay (Window, Button, ratio, 255,0,0,200, 128,0,0,200)
 
 		#GemRB.SetText (Window, Button, "%d/%d" %(hp, hp_max))
 		GemRB.SetTooltip (Window, Button, GemRB.GetPlayerName (i+1, 1) + "\n%d/%d" %(hp, hp_max))

@@ -1872,12 +1872,12 @@ PyDoc_STRVAR( GemRB_SetButtonOverlay__doc,
 static PyObject* GemRB_SetButtonOverlay(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
-	int Max, Current;
+	double Clipping;
 	int r1,g1,b1,a1;
 	int r2,g2,b2,a2;
 
-	if (!PyArg_ParseTuple( args, "iiiiiiiiiiii", &WindowIndex, &ControlIndex,
-		&Max, &Current, &r1, &g1, &b1, &a1, &r2, &g2, &b2, &a2)) {
+	if (!PyArg_ParseTuple( args, "iidiiiiiiii", &WindowIndex, &ControlIndex,
+		&Clipping, &r1, &g1, &b1, &a1, &r2, &g2, &b2, &a2)) {
 		return AttributeError( GemRB_SetButtonOverlay__doc );
 	}
 
@@ -1888,19 +1888,11 @@ static PyObject* GemRB_SetButtonOverlay(PyObject * /*self*/, PyObject* args)
 
 	Color src = { r1, g1, b1, a1 };
 	Color dest = { r2, g2, b2, a2 };
-	double ratio = 0.0;
-	if (Max>0) {
-		if (Current>=Max) {
-			ratio = 1.0;
-		} else {
-			if (Current>0) {
-				ratio = (double) Current / Max;
-			}
-		}
-	}
 
+        if (Clipping<0.0) Clipping = 0.0;
+        else if (Clipping>1.0) Clipping = 1.0;
 	//can't call clipping, because the change of ratio triggers color change
-	btn->SetHorizontalOverlay(ratio, src, dest);
+	btn->SetHorizontalOverlay(Clipping, src, dest);
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -2622,6 +2614,8 @@ static PyObject* GemRB_SetButtonPictureClipping(PyObject * /*self*/, PyObject* a
 		return NULL;
 	}
 
+        if (Clipping<0.0) Clipping = 0.0;
+        else if (Clipping>1.0) Clipping = 1.0;
 	btn->SetPictureClipping( Clipping );
 
 	Py_INCREF( Py_None );
