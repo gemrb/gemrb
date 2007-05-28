@@ -265,7 +265,7 @@ def ActionDefendPressed ():
 def ActionQWeaponPressed (which):
 	pc = GemRB.GameGetFirstSelectedPC ()
 
-	if GemRB.GetEquippedQuickSlot (pc)==which and not (GemRB.GameControlGetTargetMode() &TARGET_MODE_ATTACK):
+	if GemRB.GetEquippedQuickSlot (pc,1)==which and not (GemRB.GameControlGetTargetMode() &TARGET_MODE_ATTACK):
 		GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_ATTACK)
 	else:
 		GemRB.GameControlSetTargetMode (TARGET_MODE_ALL)
