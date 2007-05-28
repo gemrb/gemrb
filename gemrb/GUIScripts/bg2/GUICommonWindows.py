@@ -255,10 +255,10 @@ def UpdateActionsWindow ():
 	elif level == 1:
 		GemRB.SetupEquipmentIcons(ActionsWindow, pc, TopIndex)
 	elif level == 2: #spells
-		GemRB.SetVar("Type", 3)
+		GemRB.SetVar ("Type", 3)
 		GemRB.SetupSpellIcons(ActionsWindow, pc, 3, TopIndex)
 	elif level == 3: #innates
-		GemRB.SetVar("Type", 4)
+		GemRB.SetVar ("Type", 4)
 		GemRB.SetupSpellIcons(ActionsWindow, pc, 4, TopIndex)
 	return
 
@@ -405,9 +405,9 @@ def SpellPressed ():
 	pc = GemRB.GameGetFirstSelectedPC ()
 
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_CAST)
-	Spell = GemRB.GetVar("Spell")
-	Type = GemRB.GetVar("Type")
-	GemRB.SpellCast(pc, Type, Spell)
+	Spell = GemRB.GetVar ("Spell")
+	Type = GemRB.GetVar ("Type")
+	GemRB.SpellCast (pc, Type, Spell)
 	GemRB.SetVar ("ActionLevel", 0)
 	UpdateActionsWindow ()
 	return
@@ -416,9 +416,9 @@ def EquipmentPressed ():
 	pc = GemRB.GameGetFirstSelectedPC ()
 
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_CAST)
-	Item = GemRB.GetVar("Equipment")
+	Item = GemRB.GetVar ("Equipment")
 	#equipment index
-	GemRB.UseItem(pc, -1, Item)
+	GemRB.UseItem (pc, -1, Item)
 	GemRB.SetVar ("ActionLevel", 0)
 	UpdateActionsWindow ()
 	return
@@ -568,7 +568,7 @@ def UpdatePortraitWindow ():
 		if hp<1 or (state & STATE_DEAD):
 			GemRB.SetButtonOverlay (Window, Button, hp_max, hp, 64,64,64,200, 64,64,64,200)
 		else:
-			GemRB.SetButtonOverlay (Window, Button, hp_max, hp, 255,0,0,200, 128,0,0,64)
+			GemRB.SetButtonOverlay (Window, Button, hp_max, hp, 255,0,0,200, 128,0,0,200)
 		#GemRB.SetText (Window, Button, "%d/%d" %(hp, hp_max))
 		GemRB.SetTooltip (Window, Button, GemRB.GetPlayerName (i+1, 1) + "\n%d/%d" %(hp, hp_max))
 
@@ -624,11 +624,13 @@ def PortraitButtonOnMouseEnter ():
 	if GemRB.IsDraggingItem ():
 		Button = GemRB.GetControl (PortraitWindow, i)
 		GemRB.EnableButtonBorder (PortraitWindow, Button, FRAME_PC_TARGET, 1)
+	return
 
 def PortraitButtonOnMouseLeave ():
 	i = GemRB.GetVar ("PressedPortrait")
 	Button = GemRB.GetControl (PortraitWindow, i)
 	GemRB.EnableButtonBorder (PortraitWindow, Button, FRAME_PC_TARGET, 0)
+	return
 
 def GetSavingThrow (SaveName, row, level):
 	SaveTable = GemRB.LoadTable (SaveName)
@@ -645,8 +647,17 @@ def SetupSavingThrows (pc):
 		level2 = 20
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	ClassTable = GemRB.LoadTable ("classes")
+
+	Race = GemRB.GetPlayerStat (pc, IE_RACE)
+	RaceTable = GemRB.LoadTable ("races")
+	
 	Class = GemRB.FindTableValue (ClassTable, 5, Class)
-	Multi = GemRB.GetTableValue (ClassTable, 4, Class)
+	Multi = GemRB.GetTableValue (ClassTable, Class, 4)
+
+	Race = GemRB.FindTableValue (RaceTable, 3, Race)
+	RaceSaveTableName = GemRB.GetTableValue (RaceTable, Race, 4)
+
+	#todo fix multi class
 	if Multi:
 		if Class == 7:
 			#fighter/mage
@@ -666,6 +677,14 @@ def SetupSavingThrows (pc):
 			if tmp2<tmp1:
 				tmp1=tmp2
 		GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+row, tmp1)
+	if RaceSaveTableName!="*":
+		Con = GemRB.GetPlayerStat (pc, IE_CON)
+		RaceSaveTable = GemRB.LoadTable (RaceSaveTableName)
+		for row in range (5):
+			tmp1 = GemRB.GetPlayerStat (pc, IE_SAVEVSDEATH+row)
+			tmp1 += GemRB.GetTableValue (RaceSaveTable, row, Con)
+			GemRB.SetPlayerStat (pc, IE_SAVEVSDEATH+row, tmp1)
+		GemRB.UnloadTable (RaceSaveTable)
 	return
 
 def SetEncumbranceLabels (Window, Label, Label2, pc):
