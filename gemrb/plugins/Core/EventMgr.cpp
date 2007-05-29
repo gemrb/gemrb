@@ -159,13 +159,15 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 				//Let's check if we have a Control under the Mouse Pointer
 				Control* ctrl = win->GetControl( x, y, true );
 				//look for the low priority flagged controls (mostly static labels)
-				if (ctrl != NULL) {
+				if (ctrl == NULL) {
 					ctrl = win->GetControl( x, y, false );
 				}
 				if (ctrl != win->GetOver()) {
 					// Remove tooltip if mouse moved to different control
 					core->DisplayTooltip( 0, 0, NULL );
-					last_win_focused->OnMouseLeave( x, y );
+					if (last_win_over) {
+						last_win_over->OnMouseLeave( x, y );
+					}
 					last_win_over = win;
 					win->OnMouseEnter( x, y, ctrl );
 				}
@@ -207,7 +209,6 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y,
 				if (!ctrl) {
 					ctrl = ( *m )->GetControl( x, y, false);
 				}
-				//printf( "dn: ctrl: %p\n", ctrl );
 				last_win_focused = *m;
 				if (ctrl != NULL) {
 					last_win_focused->SetFocused( ctrl );
@@ -228,7 +229,6 @@ void EventMgr::MouseUp(unsigned short x, unsigned short y,
 	unsigned char Button, unsigned short Mod)
 {
 	MButtons &= ~Button;
-	//printf( "up lastF: %p\n", lastF );
 	if (last_win_focused == NULL) return;
 	Control *last_ctrl_focused = last_win_focused->GetFocus();
 	if (last_ctrl_focused == NULL) return;

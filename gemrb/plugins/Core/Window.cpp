@@ -354,9 +354,12 @@ void Window::OnMouseEnter(unsigned short x, unsigned short y, Control *ctrl)
 
 void Window::OnMouseLeave(unsigned short x, unsigned short y)
 {
+printf("window::OnMOUSELEAVE\n");
 	if (!lastOver) {
+printf("lastover was null\n");
 		return;
 	}
+printf("Calling lastover onmouseleave\n");
 	lastOver->OnMouseLeave( x - XPos - lastOver->XPos, y - YPos - lastOver->YPos );
 	lastOver = NULL;
 }
