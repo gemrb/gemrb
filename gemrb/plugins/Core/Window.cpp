@@ -349,7 +349,7 @@ void Window::OnMouseEnter(unsigned short x, unsigned short y, Control *ctrl)
 	if (!lastOver) {
 		return;
 	}
-	lastOver->OnMouseOver( x - XPos - lastOver->XPos, y - YPos - lastOver->YPos );
+	lastOver->OnMouseEnter( x - XPos - lastOver->XPos, y - YPos - lastOver->YPos );
 }
 
 void Window::OnMouseLeave(unsigned short x, unsigned short y)
