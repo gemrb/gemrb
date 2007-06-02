@@ -284,7 +284,7 @@ def UpdateSlot (pc, i):
 
 	Button = GemRB.GetControl (Window, ControlID)
 	ItemHash[ControlID] = [slot, slot_item]
-	GemRB.SetButtonSprites (Window, Button, 'IVSLOT', 0, 0, 0, 0, 0)
+	GemRB.SetButtonSprites (Window, Button, 'IVSLOT', 0, 0, 1, 2, 3)
 	if slot_item:
 		item = GemRB.GetItem (slot_item['ItemResRef'])
 		identified = slot_item['Flags'] & IE_INV_ITEM_IDENTIFIED
@@ -317,7 +317,7 @@ def UpdateSlot (pc, i):
 		GemRB.SetText (Window, Button, '')
 
 		if slot_list[i]>=0:
-			GemRB.SetButtonSprites (Window, Button, SlotType["ResRef"], 0, 0, 0, 0, 0)
+			GemRB.SetButtonSprites (Window, Button, SlotType["ResRef"], 0, 0, 1, 2, 3)
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnDragItem")
 			GemRB.SetTooltip (Window, Button, SlotType["Tip"])
@@ -344,7 +344,7 @@ def UpdateSlot (pc, i):
 		else:
 			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SECOND)
 
-		if slot_item and (GemRB.GetEquippedQuickSlot (pc)==slot+1 or GemRB.GetEquippedAmmunition (pc)==slot+1):
+		if slot_item and (GemRB.GetEquippedQuickSlot (pc)==slot or GemRB.GetEquippedAmmunition (pc)==slot):
 			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_THIRD)
 	return
 

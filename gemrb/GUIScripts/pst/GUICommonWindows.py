@@ -327,12 +327,12 @@ def UpdatePortraitWindow ():
 		else:
 			cycle = 0
 
-		GemRB.SetAnimation (Window, Button, pic, cycle)
-		
 		if cycle<6:
 			GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED | IE_GUI_BUTTON_PLAYRANDOM, OP_SET)
 		else:
 			GemRB.SetButtonFlags(Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
+		GemRB.SetAnimation (Window, Button, pic, cycle)
+		
 
 		GemRB.SetButtonFlags(Window, ButtonHP, IE_GUI_BUTTON_PICTURE, OP_SET)
 
