@@ -508,9 +508,6 @@ def OpenPortraitWindow (needcontrols):
 		GemRB.SetTooltip (Window, Button, 10485)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
 
-	pc = GemRB.GameGetSelectedPCSingle ()
-	Inventory = GemRB.GetVar ("Inventory")
-
 	for i in range (PARTY_SIZE):
 		Button = GemRB.GetControl (Window, i)
 		GemRB.SetVarAssoc (Window, Button, "PressedPortrait", i)
@@ -524,12 +521,6 @@ def OpenPortraitWindow (needcontrols):
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnDropItemToPC")
 		GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_ENTER_BUTTON, "PortraitButtonOnMouseEnter")
 		GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_LEAVE_BUTTON, "PortraitButtonOnMouseLeave")
-
-		if Inventory and pc !=i+1:
-			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
-			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
-			GemRB.SetText (Window, Button, "")
-			GemRB.SetTooltip (Window, Button, "")
 
 		GemRB.SetButtonBorder (Window, Button, FRAME_PC_SELECTED, 1, 1, 2, 2, 0, 255, 0, 255)
 		GemRB.SetButtonBorder (Window, Button, FRAME_PC_TARGET, 3, 3, 4, 4, 255, 255, 0, 255)
@@ -558,6 +549,7 @@ def UpdatePortraitWindow ():
 			continue
 
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
+		#GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 		GemRB.SetButtonPicture (Window, Button, pic, "NOPORTSM")
 		hp = GemRB.GetPlayerStat (i+1, IE_HITPOINTS)
