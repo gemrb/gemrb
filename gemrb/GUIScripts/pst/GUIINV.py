@@ -170,7 +170,6 @@ def UpdateInventoryWindow ():
 
 	# get a list which maps slot number to slot type/icon/tooltip
 	row = GemRB.GetPlayerStat (pc, IE_SPECIFIC)
-	#usability = GemRB.GetTableValue (AvSlotsTable, row, 0)
 	slot_list = map (int, string.split (GemRB.GetTableValue (AvSlotsTable, row, 1, 0), ','))
 
 	# populate inventory slot controls
@@ -333,7 +332,7 @@ def UpdateSlot (pc, i):
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
 
-	if OverSlot == slot+1:
+	if OverSlot == slot-1:
 		if GemRB.CanUseItemType (SlotType["Type"], itemname):
 			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SELECTED)
 		else:
@@ -720,19 +719,30 @@ def MouseEnterSlot ():
 	global OverSlot
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	OverSlot = GemRB.GetVar ("ItemButton")
+	slot = GemRB.GetVar ('ItemButton')
+	if not ItemHash.has_key(slot):
+		return
+	OverSlot = ItemHash[slot][0]-1
 	if GemRB.IsDraggingItem ():
-		UpdateSlot (pc, OverSlot-1)
+		for i in range(len(slot_list)):
+			if slot_list[i]==OverSlot:
+				UpdateSlot (pc, i)
 	return
 
 def MouseLeaveSlot ():
 	global OverSlot
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	slot = GemRB.GetVar ("ItemButton")
+	slot = GemRB.GetVar ('ItemButton')
+	if not ItemHash.has_key(slot):
+		return
+	slot = ItemHash[slot][0]-1
 	if slot == OverSlot or not GemRB.IsDraggingItem ():
 		OverSlot = None
-	UpdateSlot (pc, slot-1)
+
+	for i in range(len(slot_list)):
+		if slot_list[i]==slot:
+			UpdateSlot (pc, i)
 	return
 
 def MouseEnterGround ():
