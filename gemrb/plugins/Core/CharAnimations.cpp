@@ -212,6 +212,22 @@ void CharAnimations::SetOffhandRef(const char* ref)
 	core->FreePalette(modifiedPalette[PAL_OFFHAND], 0);
 }
 
+void CharAnimations::LockPalette(ieDword *gradients)
+{
+	if (lockPalette) return;
+	//cannot lock colors for PST animations
+	if (GetAnimType() >= IE_ANI_PST_ANIMATION_1)
+	{
+		return;
+	}
+	//force initialisation of animation
+	SetColors( gradients );
+	GetAnimation(0,0);
+	if (palette[PAL_MAIN]) {
+		lockPalette=true;
+	}
+}
+
 void CharAnimations::SetColors(ieDword *arg)
 {
 	Colors = arg;
@@ -248,6 +264,8 @@ void CharAnimations::SetupColors(PaletteType type)
 		// but we ignore them, i'm not sure this is correct
 		int colorcount = Colors[6];
 		int size = 32;
+		//the color count shouldn't be more than 6!
+		if (colorcount>6) colorcount=6;
 		int dest = 256-colorcount*size;
 		bool needmod = false;
 		if (GlobalColorMod.type != RGBModifier::NONE) {

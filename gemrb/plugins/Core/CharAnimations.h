@@ -152,6 +152,7 @@ public:
 	void SetOffhandRef(const char* ref);
 	void SetupColors(PaletteType type);
 	void SetColors(ieDword *Colors);
+	void LockPalette(ieDword *Colors);
 
 	// returns an array of animations of size GetTotalPartCount()
 	Animation** GetAnimation(unsigned char Stance, unsigned char Orient);

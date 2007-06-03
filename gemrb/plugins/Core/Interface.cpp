@@ -542,6 +542,11 @@ void Interface::HandleEvents()
 		return;
 	}
 
+	if (EventFlag&EF_UPDATEANIM) {
+		EventFlag&=~EF_UPDATEANIM;
+		guiscript->RunFunction( "UpdateAnimation", false);
+	}
+
 	if (EventFlag&EF_PORTRAIT) {
 		ieDword tmp = (ieDword) ~0;
 		vars->Lookup( "PortraitWindow", tmp );
@@ -3663,9 +3668,9 @@ void Interface::LoadGame(int index)
 	Game* new_game = NULL;
 	WorldMapArray* new_worldmap = NULL;
 
-	LoadProgress(10);
-	DelTree((const char *) CachePath, true);
 	LoadProgress(15);
+	DelTree((const char *) CachePath, true);
+	LoadProgress(20);
 
 	if (index == -1) {
 		//Load the Default Game
@@ -3716,7 +3721,7 @@ void Interface::LoadGame(int index)
 	wmp_mgr = NULL;
 	wmp_str = NULL;
 
-	LoadProgress(20);
+	LoadProgress(30);
 	// Unpack SAV (archive) file to Cache dir
 	if (sav_str) {
 		ArchiveImporter * ai = (ArchiveImporter*)GetInterface(IE_BIF_CLASS_ID);

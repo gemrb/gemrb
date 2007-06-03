@@ -37,9 +37,8 @@ static bool IWD2Style = false;
 
 //spell header-->spell book type conversion (iwd2 is different)
 static int spelltypes[NUM_SPELL_TYPES]={
-  IE_SPELL_TYPE_INNATE, IE_SPELL_TYPE_WIZARD,
-  IE_SPELL_TYPE_PRIEST, IE_SPELL_TYPE_WIZARD, IE_SPELL_TYPE_INNATE,
-  IE_SPELL_TYPE_SONG
+	IE_SPELL_TYPE_INNATE, IE_SPELL_TYPE_WIZARD, IE_SPELL_TYPE_PRIEST,
+	IE_SPELL_TYPE_WIZARD, IE_SPELL_TYPE_INNATE, IE_SPELL_TYPE_SONG
 };
 
 /* temporarily out

@@ -95,8 +95,9 @@ void Progressbar::Draw(unsigned short x, unsigned short y)
 		Region r( x + XPos + KnobXPos, y + YPos + KnobYPos, Count, h );
 		core->GetVideoDriver()->BlitSprite( BackGround2, 
 			r.x, r.y, true, &r );
+
 		core->GetVideoDriver()->BlitSprite( PBarCap,
-			x+XPos+CapXPos+Count, y+YPos+CapYPos, true );
+			x+XPos+CapXPos+Count-PBarCap->Width, y+YPos+CapYPos, true );
 		return;
 	}
 

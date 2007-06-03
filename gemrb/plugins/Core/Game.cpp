@@ -270,7 +270,7 @@ void Game::ConsolidateParty()
 		} else i++;
 	}
 	for ( m = PCs.begin(); m != PCs.end(); ++m) {
-		(*m)->RefreshEffects();
+		(*m)->RefreshEffects(NULL);
 	}
 }
 

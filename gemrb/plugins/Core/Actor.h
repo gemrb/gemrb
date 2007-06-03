@@ -223,7 +223,7 @@ public:
 	/** returns the animations */
 	CharAnimations* GetAnims();
 	/** Re/Inits the Modified vector */
-	void RefreshEffects();
+	void RefreshEffects(EffectQueue *eqfx);
 	/** gets saving throws */
 	void RollSaves();
 	/** returns a saving throw */

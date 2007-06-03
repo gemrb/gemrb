@@ -92,11 +92,19 @@ int fx_set_status (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_status (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
 	if (fx->Parameter1) {
-		BASE_STATE_SET (fx->Parameter2);
+		if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
+			BASE_STATE_SET (fx->Parameter2);
+		} else {
+			STATE_SET (fx->Parameter2);
+		}
 	} else {
-		BASE_STATE_CURE (fx->Parameter2);
+		if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
+			BASE_STATE_CURE (fx->Parameter2);
+		} else {
+			STATE_CURE (fx->Parameter2);
+		}
 	}
-	return FX_NOT_APPLIED;
+	return FX_PERMANENT;
 }
 
 //bb fx_play_bam_bb (play multi-part blended sticky animation)

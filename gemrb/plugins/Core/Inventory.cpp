@@ -219,10 +219,8 @@ void Inventory::AddSlotEffects(CREItem* slot, int type)
 			fx->Parameter2 |= gradienttype;
 		}	
 	}		
-	eqfx->SetOwner(Owner);
-	eqfx->AddAllEffects( Owner, Owner->Pos);
-	delete eqfx;
-	core->GetGUIScriptEngine()->RunFunction("UpdateAnimation", false);
+	Owner->RefreshEffects(eqfx);
+	core->SetEventFlag(EF_UPDATEANIM);
 }
 
 void Inventory::RemoveSlotEffects(CREItem* slot)
@@ -235,17 +233,7 @@ void Inventory::RemoveSlotEffects(CREItem* slot)
 	ItemExcl&=~itm->ItemExcl;
 	EffectQueue *eqfx = itm->GetEffectBlock(-1);
 	core->FreeItem( itm, slot->ItemResRef, false );
-	//this block is also ok, but knows too much about the item effect block
-	//if item wants other equipping effects (like pst weapon pulse)
-	//this one isn't good enough
-/*
-	for (int i = 0; i < itm->EquippingFeatureCount; i++) {
-		Effect* fx = &itm->equipping_features[i];
-		if (fx->TimingMode == FX_DURATION_INSTANT_WHILE_EQUIPPED) {
-			Owner->fxqueue.RemoveEffect( fx );
-		}
-	}
-*/
+
 	int cnt = eqfx->GetEffectsCount();
 	for (int i = 0; i < cnt; i++) {
 		Effect* fx = eqfx->GetEffect(i);
@@ -254,7 +242,7 @@ void Inventory::RemoveSlotEffects(CREItem* slot)
 		}
 	}
 	delete eqfx;
-	core->GetGUIScriptEngine()->RunFunction("UpdateAnimation", false);
+	core->SetEventFlag(EF_UPDATEANIM);
 }
 
 void Inventory::SetInventoryType(int arg)
@@ -826,6 +814,7 @@ bool Inventory::EquipItem(unsigned int slot)
 		}
 		break;
 	}
+	core->FreeItem(itm, item->ItemResRef, false);
 	if (effect) {
 		item->Flags|=IE_INV_ITEM_EQUIPPED;
 		if (item->Flags & IE_INV_ITEM_CURSED) {
@@ -833,7 +822,6 @@ bool Inventory::EquipItem(unsigned int slot)
 		}
 		AddSlotEffects( item, effect );
 	}
-	core->FreeItem(itm, item->ItemResRef, false);
 	return true;
 }
 

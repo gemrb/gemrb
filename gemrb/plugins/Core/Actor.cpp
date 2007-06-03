@@ -552,13 +552,7 @@ static void SetLockedPalette(Actor *actor, ieDword *gradients)
 {
 	CharAnimations *anims = actor->GetAnims();
 	if (!anims) return; //cannot apply it (yet)
-	if (anims->lockPalette) return;
-	//force initialisation of animation
-	anims->SetColors( gradients );
-	anims->GetAnimation(0,0);
-	if (anims->palette[PAL_MAIN]) {
-		anims->lockPalette=true;
-	}
+	anims->LockPalette(gradients);
 }
 
 static void UnlockPalette(Actor *actor)
@@ -1212,7 +1206,7 @@ void Actor::DisablePortraitIcon(ieByte icon)
 }
 
 /** call this after load, to apply effects */
-void Actor::RefreshEffects()
+void Actor::RefreshEffects(EffectQueue *fx)
 {
 	ieDword previous[MAX_STATS];
 
@@ -1239,6 +1233,12 @@ void Actor::RefreshEffects()
 		memcpy( previous, Modified, MAX_STATS * sizeof( ieDword ) );
 	}
 	memcpy( Modified, BaseStats, MAX_STATS * sizeof( ieDword ) );
+
+	if (fx) {
+		fx->SetOwner(this);
+		fx->AddAllEffects(this, Pos);
+		delete fx;
+	}
 
 	fxqueue.ApplyAllEffects( this );
 

@@ -1031,7 +1031,7 @@ void Map::UpdateEffects()
 {
 	size_t i = actors.size();
 	while (i--) {
-		actors[i]->RefreshEffects();
+		actors[i]->RefreshEffects(NULL);
 	}
 }
 
@@ -2265,7 +2265,7 @@ void Map::SpawnCreature(Point &pos, char *CreName, int radius)
 		if ( creature ) {
 			AddActor(creature);
 			creature->SetPosition( pos, true, radius );
-			creature->RefreshEffects();
+			creature->RefreshEffects(NULL);
 		}
 		return;
 	}
@@ -2279,7 +2279,7 @@ void Map::SpawnCreature(Point &pos, char *CreName, int radius)
 		if ( creature ) {
 			AddActor(creature);
 			creature->SetPosition( pos, true, radius );
-			creature->RefreshEffects();
+			creature->RefreshEffects(NULL);
 		}
 	}
 }

@@ -157,6 +157,7 @@ public:
 #define EF_CONTROL       1
 #define EF_SHOWMAP       2
 #define EF_PORTRAIT      4
+#define EF_UPDATEANIM    8
 
 //autopause
 #define AP_UNUSABLE      0

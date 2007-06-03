@@ -1890,8 +1890,8 @@ static PyObject* GemRB_SetButtonOverlay(PyObject * /*self*/, PyObject* args)
 	Color src = { r1, g1, b1, a1 };
 	Color dest = { r2, g2, b2, a2 };
 
-        if (Clipping<0.0) Clipping = 0.0;
-        else if (Clipping>1.0) Clipping = 1.0;
+			  if (Clipping<0.0) Clipping = 0.0;
+			  else if (Clipping>1.0) Clipping = 1.0;
 	//can't call clipping, because the change of ratio triggers color change
 	btn->SetHorizontalOverlay(Clipping, src, dest);
 	Py_INCREF( Py_None );
@@ -2615,8 +2615,8 @@ static PyObject* GemRB_SetButtonPictureClipping(PyObject * /*self*/, PyObject* a
 		return NULL;
 	}
 
-        if (Clipping<0.0) Clipping = 0.0;
-        else if (Clipping>1.0) Clipping = 1.0;
+			  if (Clipping<0.0) Clipping = 0.0;
+			  else if (Clipping>1.0) Clipping = 1.0;
 	btn->SetPictureClipping( Clipping );
 
 	Py_INCREF( Py_None );
@@ -6218,7 +6218,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		si = cc->RemoveItem(Slot, Count);
 	} else {
 		si = TryToUnequip( actor, core->QuerySlot(Slot), Count );
-		actor->RefreshEffects();
+		actor->RefreshEffects(NULL);
 		actor->ReinitQuickSlots();
 	}
 	if (! si) {
@@ -6349,7 +6349,8 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		if (res==ASI_SUCCESS) {
 			core->ReleaseDraggedItem ();
 		}
-		actor->RefreshEffects();
+		//EquipItem (in AddSlotItem) already called RefreshEffects
+		//actor->RefreshEffects();
 		actor->ReinitQuickSlots();
 	//couldn't place item there, try swapping (only if slot is explicit)
 	} else if ( Slot >= 0 ) {
@@ -6368,7 +6369,8 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 			DragItem(tmp);
 			// switched items, not returned by normal AddSlotItem
 			res = ASI_SWAPPED;
-			actor->RefreshEffects();
+			//EquipItem (in AddSlotItem) already called RefreshEffects
+			//actor->RefreshEffects();
 			actor->ReinitQuickSlots();
 		} else {
 			res = ASI_FAILED;
@@ -6440,7 +6442,8 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 		// in the slot without properly unequipping it
 		actor->inventory.SetSlotItemRes( ItemResRef, SlotID, Charge0, Charge1, Charge2 );
 		actor->inventory.EquipItem(SlotID);
-		actor->RefreshEffects();
+		//EquipItem already called RefreshEffects
+		//actor->RefreshEffects();
 		actor->ReinitQuickSlots();
 	}
 	Py_INCREF( Py_None );

@@ -781,7 +781,7 @@ Map* AREImp::GetMap(const char *ResRef)
 			}
 			ab->SetOrientation( Orientation,0 );
 			ab->TalkCount = TalkCount;
-			ab->RefreshEffects();
+			ab->RefreshEffects(NULL);
 			//maybe there is a flag (deactivate), but 
 			//right now we just set this
 			//it is automatically enabled, we should disable it
