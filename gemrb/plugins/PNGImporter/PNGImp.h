@@ -74,7 +74,7 @@ public:
 	int GetWidth() { return (int) Width; }
 	int GetHeight() { return (int) Height; }
 
-	ImageFactory* GetImageFactory(const char* /*ResRef*/) { return 0; }
+	ImageFactory* GetImageFactory(const char* ResRef);
 public:
 	void release(void)
 	{

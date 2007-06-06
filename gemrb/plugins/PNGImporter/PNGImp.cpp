@@ -230,3 +230,9 @@ void PNGImp::PutImage(DataStream* /*output*/)
 {
 	// FIXME: add png code here
 }
+
+ImageFactory* BMPImp::GetImageFactory(const char* ResRef)
+{
+	ImageFactory* fact = new ImageFactory( ResRef, GetImage() );
+	return fact;
+}
