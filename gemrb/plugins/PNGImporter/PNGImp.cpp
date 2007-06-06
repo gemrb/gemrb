@@ -24,6 +24,7 @@
 #include "../../includes/RGBAColor.h"
 #include "../Core/Interface.h"
 #include "../Core/Video.h"
+#include "../Core/ImageFactory.h"
 
 // CHECKME: how should we include png.h ? (And how should we check for it?)
 #include <png.h>
@@ -231,7 +232,7 @@ void PNGImp::PutImage(DataStream* /*output*/)
 	// FIXME: add png code here
 }
 
-ImageFactory* BMPImp::GetImageFactory(const char* ResRef)
+ImageFactory* PNGImp::GetImageFactory(const char* ResRef)
 {
 	ImageFactory* fact = new ImageFactory( ResRef, GetImage() );
 	return fact;
