@@ -1182,7 +1182,7 @@ void Targets::Clear()
 }
 
 /********************** GameScript *******************************/
-GameScript::GameScript(ieResRef ResRef, ScriptableType ScriptType,
+GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 	Variables* local, int ScriptLevel)
 {
 	if (local) {

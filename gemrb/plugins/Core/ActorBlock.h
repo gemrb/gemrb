@@ -206,7 +206,7 @@ public:
 	void SetDialog(const char *resref) {
 		strnuprcpy(Dialog, resref, 8);
 	}
-	void SetScript(ieResRef aScript, int idx);
+	void SetScript(const ieResRef aScript, int idx);
 	void SetWait(unsigned long time);
 	unsigned long GetWait();
 	void LeaveDialog();

@@ -627,7 +627,7 @@ private: //Script Internal Variables
 //	bool continueExecution;
 	bool freeLocals;
 public:
-	GameScript(ieResRef ResRef, ScriptableType ScriptType,
+	GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 		Variables* local = NULL, int ScriptLevel = 0);
 	~GameScript();
 	static void ReleaseMemory();

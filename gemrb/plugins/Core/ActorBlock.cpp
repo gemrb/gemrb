@@ -134,7 +134,7 @@ void Scriptable::SetMap(Map *map)
 	area = map;
 }
 
-void Scriptable::SetScript(ieResRef aScript, int idx)
+void Scriptable::SetScript(const ieResRef aScript, int idx)
 {
 	if (idx >= MAX_SCRIPTS) {
 		printMessage("Scriptable","Invalid script index!",LIGHT_RED);
