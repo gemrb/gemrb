@@ -506,7 +506,7 @@ void Scriptable::AddTrigger(ieDword *actorref)
 	tolist.push_back(actorref);
 }
 
-void Scriptable::CastSpellPointEnd( ieResRef SpellResRef )
+void Scriptable::CastSpellPointEnd( const ieResRef SpellResRef )
 {
 	if (Type==ST_ACTOR) {
 		((Actor *) this)->SetStance(IE_ANI_CONJURE);
@@ -534,7 +534,7 @@ void Scriptable::CastSpellPointEnd( ieResRef SpellResRef )
 	LastTargetPos.empty();
 }
 
-void Scriptable::CastSpellEnd( ieResRef SpellResRef )
+void Scriptable::CastSpellEnd( const ieResRef SpellResRef )
 {
 	if (Type==ST_ACTOR) {
 		((Actor *) this)->SetStance(IE_ANI_CONJURE);
@@ -563,7 +563,7 @@ void Scriptable::CastSpellEnd( ieResRef SpellResRef )
 //set target as point
 //if spell needs to be depleted, do it
 //if spell is illegal stop casting
-void Scriptable::CastSpellPoint( ieResRef SpellResRef, Point &target, bool deplete )
+void Scriptable::CastSpellPoint( const ieResRef SpellResRef, Point &target, bool deplete )
 {
 	LastTarget = 0;
 	LastTargetPos.empty();
@@ -580,7 +580,7 @@ void Scriptable::CastSpellPoint( ieResRef SpellResRef, Point &target, bool deple
 //set target as actor (if target isn't actor, use its position)
 //if spell needs to be depleted, do it
 //if spell is illegal stop casting
-void Scriptable::CastSpell( ieResRef SpellResRef, Scriptable* target, bool deplete )
+void Scriptable::CastSpell( const ieResRef SpellResRef, Scriptable* target, bool deplete )
 {
 	LastTarget = 0;
 	LastTargetPos.empty();
@@ -600,7 +600,7 @@ void Scriptable::CastSpell( ieResRef SpellResRef, Scriptable* target, bool deple
 }
 
 //start spellcasting (common part)
-void Scriptable::SpellCast(ieResRef SpellResRef)
+void Scriptable::SpellCast(const ieResRef SpellResRef)
 {
 	Spell* spl = core->GetSpell( SpellResRef );
 	if (!spl) {

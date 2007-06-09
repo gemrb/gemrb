@@ -323,7 +323,7 @@ public:
 	/* called when actor was hit */
 	void GetHit();
 	/* called when actor starts to cast a spell*/
-	bool HandleCastingStance(ieResRef SpellResRef, bool deplete);
+	bool HandleCastingStance(const ieResRef SpellResRef, bool deplete);
 	/* deals damage to this actor */
 	int Damage(int damage, int damagetype, Actor *hitter);
 	/* drops items from inventory to current spot */

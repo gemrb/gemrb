@@ -576,6 +576,7 @@ static EffectRef effectnames[] = {
 	{ "MovementRateModifier", fx_movement_modifier, 0 }, //fast (7e)
 	{ "MovementRateModifier2", fx_movement_modifier, 0 },//slow (b0)
 	{ "MovementRateModifier3", fx_movement_modifier, 0 },//forced (IWD - 10a)
+	{ "MovementRateModifier4", fx_movement_modifier, 0 },//slow (IWD2 - 1b9)
 	{ "MoveToArea", fx_move_to_area, 0 }, //0xba
 	{ "NoCircleState", fx_no_circle_state, 0 },
 	{ "NPCBump", fx_npc_bump, 0 },

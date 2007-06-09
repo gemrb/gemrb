@@ -157,7 +157,7 @@ STOItem *Store::GetItem(unsigned int idx)
 	return NULL;
 }
 
-unsigned int Store::FindItem(ieResRef itemname, bool usetrigger) const
+unsigned int Store::FindItem(const ieResRef itemname, bool usetrigger) const
 {
 	for (unsigned int i=0;i<ItemsCount;i++) {
 		if (usetrigger) {

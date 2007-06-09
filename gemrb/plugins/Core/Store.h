@@ -175,7 +175,7 @@ public: //queries
 	void AddItem(CREItem* item);
 	void RemoveItem(unsigned int idx);
 	/** Returns index of item */
-	unsigned int FindItem(ieResRef item, bool usetrigger) const;
+	unsigned int FindItem(const ieResRef item, bool usetrigger) const;
 	const char *GetOwner() const;
 	void SetOwner(const char* name);
 private:

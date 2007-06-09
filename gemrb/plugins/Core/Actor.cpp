@@ -1451,7 +1451,7 @@ void Actor::GetHit()
 	DisplayStringCore(this, VB_DAMAGE, DS_CONSOLE|DS_CONST );
 }
 
-bool Actor::HandleCastingStance(ieResRef SpellResRef, bool deplete)
+bool Actor::HandleCastingStance(const ieResRef SpellResRef, bool deplete)
 {
 	if (deplete) {
 		if (! spellbook.HaveSpell( SpellResRef, HS_DEPLETE )) {

@@ -246,15 +246,15 @@ public:
 	/* re/draws overhead text on the map screen */
 	void DrawOverheadText(Region &screen);
 	/* actor/scriptable casts spell */
-	void CastSpellPoint( ieResRef SpellResRef, Point &Target, bool deplete );
-	void CastSpell( ieResRef SpellResRef, Scriptable* Target, bool deplete );
+	void CastSpellPoint( const ieResRef SpellResRef, Point &Target, bool deplete );
+	void CastSpell( const ieResRef SpellResRef, Scriptable* Target, bool deplete );
 	/* spellcasting finished */
-	void CastSpellPointEnd( ieResRef SpellResRef);
-	void CastSpellEnd( ieResRef SpellResRef);
+	void CastSpellPointEnd( const ieResRef SpellResRef);
+	void CastSpellEnd( const ieResRef SpellResRef);
 	ieWord GetGlobalID();
 private:
 	/* used internally to handle start of spellcasting */
-	void SpellCast(ieResRef SpellResRef);
+	void SpellCast(const ieResRef SpellResRef);
 };
 
 class GEM_EXPORT Selectable : public Scriptable {

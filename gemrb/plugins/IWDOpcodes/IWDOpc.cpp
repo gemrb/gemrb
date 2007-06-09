@@ -34,7 +34,14 @@ static int shcount = -1;
 
 #define PI_PROTFROMEVIL 9
 #define PI_FREEACTION 19
+#define PI_NAUSEA 43
 #define PI_HOPELESSNESS 47
+#define PI_RIGHTEOUS 67
+#define PI_HOLYPOWER 86
+#define PI_DEATHWARD 87
+#define PI_ENFEEBLEMENT 90
+#define PI_FIRESHIELD 121
+#define PI_ICESHIELD 122
 
 static int fx_fade_rgb (Actor* Owner, Actor* target, Effect* fx);//e8
 static int fx_iwd_visual_spell_hit (Actor* Owner, Actor* target, Effect* fx);//e9
@@ -109,9 +116,17 @@ static int fx_jackalwere_gaze (Actor* Owner, Actor* target, Effect* fx); //127
 //0x129 HideInShadows (same as bg2)
 static int fx_use_magic_device_modifier (Actor* Owner, Actor* target, Effect* fx);//12a
 
-static int fx_hopelessness (Actor* /*Owner*/, Actor* target, Effect* fx);//400
-static int fx_protection_from_evil (Actor* /*Owner*/, Actor* target, Effect* fx);//401
-static int fx_free_action_iwd2 (Actor* /*Owner*/, Actor* target, Effect* fx); //418
+//iwd2 specific effects
+static int fx_hopelessness (Actor* Owner, Actor* target, Effect* fx);//400
+static int fx_protection_from_evil (Actor* Owner, Actor* target, Effect* fx);//401
+static int fx_nausea (Actor* Owner, Actor* target, Effect* fx); //404
+static int fx_enfeeblement (Actor* Owner, Actor* target, Effect* fx); //405
+static int fx_fireshield (Actor* Owner, Actor* target, Effect* fx); //406
+static int fx_death_ward (Actor* Owner, Actor* target, Effect* fx); //407
+static int fx_holy_power (Actor* Owner, Actor* target, Effect* fx); //408
+static int fx_righteous_wrath (Actor* Owner, Actor* target, Effect* fx); //409
+static int fx_free_action_iwd2 (Actor* Owner, Actor* target, Effect* fx); //418
+static int fx_prevent_ai_slowdown (Actor* Owner, Actor* target, Effect* fx); //439
 
 //No need to make these ordered, they will be ordered by EffectQueue
 static EffectRef effectnames[] = {
@@ -174,8 +189,15 @@ static EffectRef effectnames[] = {
 	//iwd2 effects
 	{ "Hopelessness", fx_hopelessness, 0}, //400
 	{ "ProtectionFromEvil", fx_protection_from_evil, 0}, //401
+	{ "Nausea", fx_nausea, 0}, //404
+	{ "Enfeeblement", fx_enfeeblement, 0}, //405
+	{ "FireShield", fx_fireshield, 0}, //406
+	{ "DeathWard", fx_death_ward, 0}, //407
+	{ "HolyPower", fx_holy_power, 0}, //408
+	{ "RighteousWrath", fx_righteous_wrath, 0}, //409
 	{ "FreeAction2", fx_free_action_iwd2, 0}, //418
 	{ "ControlUndead2", fx_control_undead, 0}, //425
+	{ "PreventAISlowDown", fx_prevent_ai_slowdown, 0}, //439
 	{ NULL, NULL, 0 },
 };
 
@@ -1219,11 +1241,51 @@ int fx_protection_from_evil (Actor* /*Owner*/, Actor* target, Effect* fx)
 //402 AddEffectsList
 //403 ArmorOfFaith
 //404 Nausea
+int fx_nausea (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_nausea (%2d)\n", fx->Opcode);
+	target->AddPortraitIcon(PI_NAUSEA); // is it ok?
+	return FX_APPLIED;
+}
 //405 Enfeeblement
+int fx_enfeeblement (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_enfeeblement (%2d)\n", fx->Opcode);
+	target->AddPortraitIcon(PI_ENFEEBLEMENT); // is it ok?
+	return FX_APPLIED;
+}
 //406 FireShield
+int fx_fireshield (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_fireshield (%2d) Type: %d\n", fx->Opcode, fx->Parameter2);
+	if (fx->Parameter2) {
+		target->AddPortraitIcon(PI_ICESHIELD);
+	} else {
+		target->AddPortraitIcon(PI_FIRESHIELD);
+	}
+	return FX_APPLIED;
+}
 //407 DeathWard
+int fx_death_ward (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_death_ward (%2d)\n", fx->Opcode);
+	target->AddPortraitIcon(PI_DEATHWARD); // is it ok?
+	return FX_APPLIED;
+}
 //408 HolyPower
+int fx_holy_power (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_holy_power (%2d)\n", fx->Opcode);
+	target->AddPortraitIcon(PI_HOLYPOWER); // is it ok?
+	return FX_APPLIED;
+}
 //409 RighteousWrath
+int fx_righteous_wrath (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_righteous_wrath (%2d)\n", fx->Opcode);
+	target->AddPortraitIcon(PI_RIGHTEOUS); // is it ok?
+	return FX_APPLIED;
+}
 //410 SummonAllyIWD2
 //411 SummonEnemyIWD2
 //412 Control2
@@ -1259,9 +1321,16 @@ int fx_free_action_iwd2 (Actor* /*Owner*/, Actor* target, Effect* fx)
 //436
 //437
 //438
-//439
+//439 PreventAISlowDown
+int fx_prevent_ai_slowdown (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+// see also: BG2 OffscreenAIModifier
+	if (0) printf( "fx_prevent_ai_slowdown (%2d)\n", fx->Opcode);
+	STAT_SET(IE_ENABLEOFFSCREENAI,1);
+	return FX_APPLIED;
+}
 //440
-//441
+//441 MovementRateModifier4
 //442
 //443
 //444
