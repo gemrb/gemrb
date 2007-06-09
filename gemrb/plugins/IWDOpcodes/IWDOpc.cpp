@@ -37,11 +37,34 @@ static int shcount = -1;
 #define PI_NAUSEA 43
 #define PI_HOPELESSNESS 47
 #define PI_RIGHTEOUS 67
+#define PI_FAITHARMOR 84
 #define PI_HOLYPOWER 86
 #define PI_DEATHWARD 87
 #define PI_ENFEEBLEMENT 90
 #define PI_FIRESHIELD 121
 #define PI_ICESHIELD 122
+
+#define SS_HOPELESSNESS 0
+#define SS_PROTFROMEVIL 1
+#define SS_ARMOROFFAITH 2
+#define SS_NAUSEA       3
+#define SS_ENFEEBLED    4
+#define SS_FIRESHIELD   5
+#define SS_ICESHIELD    6
+#define SS_HELD         7
+#define SS_DEATHWARD    8
+#define SS_HOLYPOWER    9
+#define SS_GOODCHANT    10
+#define SS_BADCHANT     11
+#define SS_GOODPRAYER   12
+#define SS_BADPRAYER    13
+#define SS_GOODRECIT    14
+#define SS_BADRECIT     15
+#define SS_RIGHTEOUS    16    //allied
+#define SS_RIGHTEOUS2   17    //allied and same alignment
+#define SS_STONESKIN    18
+#define SS_IRONSKIN     19
+#define SS_SANCTUARY    20
 
 static int fx_fade_rgb (Actor* Owner, Actor* target, Effect* fx);//e8
 static int fx_iwd_visual_spell_hit (Actor* Owner, Actor* target, Effect* fx);//e9
@@ -330,6 +353,17 @@ static int check_iwd_targeting(Actor* Owner, Actor* target, ieDword value, ieDwo
 	default:
 		return DiffCore(target->GetStat(idx), val, spellres[type].relation);
 	}
+}
+
+//returns true if spell state is already set or illegal
+static bool SetSpellState(Actor *target, unsigned int spellstate)
+{
+	if (spellstate>=192) return true;
+	unsigned int pos = IE_SPLSTATE_ID1+(spellstate>>5);
+	unsigned int bit = 1<<(spellstate&31);
+	if (target->GetStat(pos)&bit) return true;
+	STAT_BIT_OR(pos, bit);
+	return false;
 }
 
 //iwd got a hardcoded 'fireshield' system
@@ -1226,8 +1260,9 @@ int fx_use_magic_device_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_hopelessness (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_hopelessness (%2d)\n", fx->Opcode);
-	//what else we need
+	if (SetSpellState(target, SS_HOPELESSNESS)) return FX_APPLIED;
 	target->AddPortraitIcon(PI_HOPELESSNESS);
+	STATE_SET(STATE_HELPLESS);
 	return FX_APPLIED;
 }
 
@@ -1235,22 +1270,56 @@ int fx_hopelessness (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_protection_from_evil (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_protection_from_evil (%2d)\n", fx->Opcode);
+	//
+	if (SetSpellState(target, SS_PROTFROMEVIL)) return FX_APPLIED;
 	target->AddPortraitIcon(PI_PROTFROMEVIL);
 	return FX_APPLIED;
 }
 //402 AddEffectsList
+int fx_add_effects_list (Actor* Owner, Actor* target, Effect* fx)
+{
+	//after iwd2 style ids targeting, apply the spell named in the resource field
+	if (check_iwd_targeting(Owner, target, fx->Parameter1, fx->Parameter2) ) {
+		return FX_NOT_APPLIED;
+	}
+	core->ApplySpell(fx->Resource, Owner, target, fx->Power);
+	return FX_NOT_APPLIED;
+}
+
 //403 ArmorOfFaith
+int fx_faith_armor (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_faith_armor (%2d)\n", fx->Opcode);
+	if (SetSpellState(target, SS_ARMOROFFAITH)) return FX_APPLIED;
+	//TODO: damage reduction (all types)
+	target->AddPortraitIcon(PI_FAITHARMOR);
+	return FX_APPLIED;
+}
 //404 Nausea
-int fx_nausea (Actor* /*Owner*/, Actor* target, Effect* fx)
+static EffectRef fx_unconscious_state_ref={"State:Helpless",NULL,-1};
+
+int fx_nausea (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_nausea (%2d)\n", fx->Opcode);
-	target->AddPortraitIcon(PI_NAUSEA); // is it ok?
+	//FIXME: i'm not sure if this part is there
+	//create the sleep effect only once?
+	if (!fx->Parameter3) {
+		Effect *newfx = EffectQueue::CreateEffect(fx_unconscious_state_ref,
+			fx->Parameter1, 1, fx->Duration);
+		core->ApplyEffect(newfx, Owner, target);
+		fx->Parameter3=1;
+	}
+	//end of unsure part
+	if (SetSpellState(target, SS_NAUSEA)) return FX_APPLIED;
+	target->AddPortraitIcon(PI_NAUSEA);
+	STATE_SET(STATE_HELPLESS|STATE_SLEEP);
 	return FX_APPLIED;
 }
 //405 Enfeeblement
 int fx_enfeeblement (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_enfeeblement (%2d)\n", fx->Opcode);
+	if (SetSpellState(target, SS_ENFEEBLED)) return FX_APPLIED;
 	target->AddPortraitIcon(PI_ENFEEBLEMENT); // is it ok?
 	return FX_APPLIED;
 }
@@ -1259,16 +1328,20 @@ int fx_fireshield (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_fireshield (%2d) Type: %d\n", fx->Opcode, fx->Parameter2);
 	if (fx->Parameter2) {
+		if (SetSpellState(target, SS_ICESHIELD)) return FX_APPLIED;
 		target->AddPortraitIcon(PI_ICESHIELD);
 	} else {
+		if (SetSpellState(target, SS_FIRESHIELD)) return FX_APPLIED;
 		target->AddPortraitIcon(PI_FIRESHIELD);
 	}
+	//target->SetSpellOnHit(fx->Resource);
 	return FX_APPLIED;
 }
 //407 DeathWard
 int fx_death_ward (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_death_ward (%2d)\n", fx->Opcode);
+	if (SetSpellState(target, SS_DEATHWARD)) return FX_APPLIED;
 	target->AddPortraitIcon(PI_DEATHWARD); // is it ok?
 	return FX_APPLIED;
 }
@@ -1276,14 +1349,25 @@ int fx_death_ward (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_holy_power (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_holy_power (%2d)\n", fx->Opcode);
-	target->AddPortraitIcon(PI_HOLYPOWER); // is it ok?
+	if (SetSpellState(target, SS_HOLYPOWER)) return FX_APPLIED;
+	target->AddPortraitIcon(PI_HOLYPOWER);
 	return FX_APPLIED;
 }
 //409 RighteousWrath
 int fx_righteous_wrath (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_righteous_wrath (%2d)\n", fx->Opcode);
-	target->AddPortraitIcon(PI_RIGHTEOUS); // is it ok?
+	if (0) printf( "fx_righteous_wrath (%2d) Type: %d\n", fx->Opcode, fx->Parameter2);
+	target->AddPortraitIcon(PI_RIGHTEOUS);
+	if (fx->Parameter2)
+	{
+		if (SetSpellState(target, SS_RIGHTEOUS2)) return FX_APPLIED;
+		//
+	}
+	else
+	{
+		if (SetSpellState(target, SS_RIGHTEOUS)) return FX_APPLIED;
+		//
+	}
 	return FX_APPLIED;
 }
 //410 SummonAllyIWD2
@@ -1304,23 +1388,23 @@ int fx_free_action_iwd2 (Actor* /*Owner*/, Actor* target, Effect* fx)
 //419 Unconsciousness
 //420 Death2 (see in core effects)
 //421 EntropyShield
-//422
-//423
-//424
+//422 StormShell
+//423 ProtectionFromElements
+//424 HoldUndead
 //425 ControlUndead2 (see above)
-//426
-//427
-//428
-//429
-//430
-//431
-//432
-//433
-//434
-//435
-//436
-//437
-//438
+//426 Aegis
+//427 ExecutionerEyes
+//428 Banish
+//429 WhenStruckUseEffectList
+//430 ProjectileUseEffectList
+//431 EnergyDrain
+//432 TortoiseShell
+//433 Blink
+//434 PersistentUseEffectList
+//435 DayBlindness
+//436 DamageReduction
+//437 Disguise
+//438 HeroicInspiration
 //439 PreventAISlowDown
 int fx_prevent_ai_slowdown (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1329,22 +1413,22 @@ int fx_prevent_ai_slowdown (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_SET(IE_ENABLEOFFSCREENAI,1);
 	return FX_APPLIED;
 }
-//440
+//440 BarbarianRage
 //441 MovementRateModifier4
-//442
-//443
-//444
-//445
-//446
-//447
-//448
-//449
-//450
-//451
-//452
-//453
-//454
-//455
-//456
-//457
+//442 Unknown
+//443 MissileDamageReduction
+//444 TensersTransformation
+//445 Unknown
+//446 SmiteEvil
+//447 Restoration
+//448 AlicornLance
+//449 CallLightning
+//450 GlobeInvulnerability
+//451 LowerResistance
+//452 Bane
+//453 PowerAttack
+//454 Expertise
+//455 ArterialStrike
+//456 HamString
+//457 RapidShot
 
