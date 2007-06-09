@@ -429,8 +429,13 @@
 #define IE_GENERAL		233
 #define IE_EA			234
 #define IE_SPECIFIC		235
+#define IE_SAVEDXPOS             236
+#define IE_SAVEDYPOS             237
+#define IE_SAVEDFACE             238
+#define IE_USERSTAT              239 //user defined stat
 //These are in IWD2, but in a different place
-#define IE_LEVELBARBARIAN        240 //iwd2 class levels (fighter, mage, thief are already stored)
+//core class levels (fighter, mage, thief are already stored)
+#define IE_LEVELBARBARIAN        240
 #define IE_LEVELBARD             241 
 #define IE_LEVELCLERIC           242 
 #define IE_LEVELDRUID            243
@@ -438,9 +443,15 @@
 #define IE_LEVELPALADIN          245
 #define IE_LEVELRANGER           246
 #define IE_LEVELSORCEROR         247
-// place for more classes
-#define IE_SAVEDXPOS             253
-#define IE_SAVEDYPOS             254
-#define IE_SAVEDFACE             255
+// place for 2 more classes
+#define IE_LEVELCLASS12          248
+#define IE_LEVELCLASS13          249
+// these are iwd2 spell states, iwd2 uses ~180, we have place for 192
+#define IE_SPLSTATE_ID1          250
+#define IE_SPLSTATE_ID2          251
+#define IE_SPLSTATE_ID3          252
+#define IE_SPLSTATE_ID4          253
+#define IE_SPLSTATE_ID5          254
+#define IE_SPLSTATE_ID6          255
 
 #endif  // ! IE_STATS_H

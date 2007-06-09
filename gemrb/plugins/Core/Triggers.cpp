@@ -2320,6 +2320,24 @@ int GameScript::MoraleLT(Scriptable* Sender, Trigger* parameters)
 	return (signed) actor->GetStat(IE_MORALEBREAK) < parameters->int0Parameter;
 }
 
+int GameScript::CheckSpellState(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	if (parameters->int0Parameter>255) {
+		return 0;
+	}
+	unsigned int position = parameters->int0Parameter>>5;
+	unsigned int bit = 1<<(parameters->int0Parameter&31);
+	if (actor->GetStat(IE_SPLSTATE_ID1+position) & bit) {
+		return 1;
+	}
+	return 0;
+}
+
 int GameScript::StateCheck(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );

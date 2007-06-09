@@ -680,6 +680,7 @@ public: //Script Functions
 	static int CheckSkill(Scriptable* Sender, Trigger* parameters);
 	static int CheckSkillGT(Scriptable* Sender, Trigger* parameters);
 	static int CheckSkillLT(Scriptable* Sender, Trigger* parameters);
+	static int CheckSpellState(Scriptable* Sender, Trigger* parameters);
 	static int CheckStat(Scriptable* Sender, Trigger* parameters);
 	static int CheckStatGT(Scriptable* Sender, Trigger* parameters);
 	static int CheckStatLT(Scriptable* Sender, Trigger* parameters);

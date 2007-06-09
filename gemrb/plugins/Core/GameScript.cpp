@@ -69,6 +69,7 @@ static TriggerLink triggernames[] = {
 	{"checkskill", GameScript::CheckSkill, 0},
 	{"checkskillgt", GameScript::CheckSkillGT, 0},
 	{"checkskilllt", GameScript::CheckSkillLT, 0},
+	{"checkspellstate", GameScript::CheckSpellState, 0},
 	{"checkstat", GameScript::CheckStat, 0},
 	{"checkstatgt", GameScript::CheckStatGT, 0},
 	{"checkstatlt", GameScript::CheckStatLT, 0},
