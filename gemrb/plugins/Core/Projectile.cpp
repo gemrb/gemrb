@@ -35,8 +35,8 @@ extern Interface* core;
 extern HANDLE hConsole;
 #endif
 
-static ieByte SixteenToNine[MAX_ORIENT]={0,1,2,3,4,5,6,7,8,7,6,5,4,3,2,1};
-static ieByte SixteenToFive[MAX_ORIENT]={0,0,1,1,2,2,3,3,4,4,3,3,2,2,1,1};
+static const ieByte SixteenToNine[MAX_ORIENT]={0,1,2,3,4,5,6,7,8,7,6,5,4,3,2,1};
+static const ieByte SixteenToFive[MAX_ORIENT]={0,0,1,1,2,2,3,3,4,4,3,3,2,2,1,1};
 
 Projectile::Projectile()
 {
