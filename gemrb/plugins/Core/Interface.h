@@ -354,7 +354,7 @@ public:
 	/** Returns a PC index, by loading a creature */
 	int LoadCreature(const char *ResRef, int InParty, bool character=false);
 	/** core for summoning creatures */
-	bool SummonCreature(const ieResRef resource, ieResRef vvcres, Actor *Owner, Actor *target, Point &position, int eamod, int level);
+	bool SummonCreature(const ieResRef resource, const ieResRef vvcres, Actor *Owner, Actor *target, Point &position, int eamod, int level);
 	/** Sets a stat for the creature in actor index Slot */
 	int SetCreatureStat(unsigned int Slot, unsigned int StatID, int StatValue);
 	/** returns the stat of a creature (mod:1-modified, 0-base) */
@@ -608,16 +608,18 @@ public:
 	/** frees the data */
 	void FreeResRefTable(ieResRef *&table, int &count);
 	/** Returns the item tooltip value for the xth extension header */
-	int GetItemTooltip(ieResRef itemname, int idx);
+	int GetItemTooltip(const ieResRef itemname, int idx);
 	/** Returns the item exclusion value */
-	int GetItemExcl(ieResRef itemname);
+	int GetItemExcl(const ieResRef itemname);
 	/** Returns the strref for the item dialog */
-	int GetItemDialStr(ieResRef itemname);
+	int GetItemDialStr(const ieResRef itemname);
 	/** Returns the strref for the item dialog */
-	int GetItemDialRes(ieResRef itemname, ieResRef dialog);
+	int GetItemDialRes(const ieResRef itemname, ieResRef dialog);
 	/** Returns the virtual worldmap entry of a sub-area */
-	int GetAreaAlias(ieResRef areaname);
-	void GetResRefFrom2DA(ieResRef resref, ieResRef resource1, ieResRef resource2, ieResRef resource3);
+	int GetAreaAlias(const ieResRef areaname);
+	/** Returns up to 3 resources from resref, choosing rows randomly 
+	    unwanted return variables could be omitted */
+	void GetResRefFrom2DA(const ieResRef resref, ieResRef resource1, ieResRef resource2 = NULL, ieResRef resource3 = NULL);
 private:
 	bool LoadConfig(void);
 	bool LoadConfig(const char *filename);

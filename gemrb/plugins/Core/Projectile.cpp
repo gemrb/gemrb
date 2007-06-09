@@ -90,7 +90,7 @@ PathNode *Projectile::GetNextStep(int x)
 	return node;
 }
 
-void Projectile::CreateAnimations(Animation **anims, ieResRef bamres, int Seq)
+void Projectile::CreateAnimations(Animation **anims, const ieResRef bamres, int Seq)
 {
 	AnimationFactory* af = ( AnimationFactory* )
 		core->GetResourceMgr()->GetFactoryResource( bamres,

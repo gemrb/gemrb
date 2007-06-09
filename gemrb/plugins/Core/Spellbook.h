@@ -150,9 +150,9 @@ private:
 	/** invalidates the spellinfo list */
 	void ClearSpellInfo();
 	/** looks up the spellinfo list for an element */
-	SpellExtHeader *FindSpellInfo(unsigned int level, unsigned int type, ieResRef name);
+	SpellExtHeader *FindSpellInfo(unsigned int level, unsigned int type, const ieResRef name);
 	/** removes all instances of a spell from a given page */
-	void RemoveMemorization(CRESpellMemorization* sm, ieResRef ResRef);
+	void RemoveMemorization(CRESpellMemorization* sm, const ieResRef ResRef);
 public: 
 	Spellbook();
 	~Spellbook();
@@ -179,7 +179,7 @@ public:
 	/** removes a spell from memory/book */
 	bool RemoveSpell(CREKnownSpell* spell);
 	/** this removes ALL spells of name ResRef */
-	void RemoveSpell(ieResRef ResRef);
+	void RemoveSpell(const ieResRef ResRef);
 	/** this removes ALL spells matching spellid */
 	void RemoveSpell(int spellid);
 

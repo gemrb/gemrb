@@ -187,6 +187,7 @@ void HandleBitMod(ieDword &value1, ieDword value2, int opcode)
 static const char *spell_suffices[]={"SPIT","SPPR","SPWI","SPIN","SPCL"};
 
 //this function handles the polymorphism of Spell[RES] actions
+//it returns spellres
 bool ResolveSpellName(ieResRef spellres, Action *parameters)
 {
 	if (parameters->string0Parameter[0]) {
@@ -203,7 +204,7 @@ bool ResolveSpellName(ieResRef spellres, Action *parameters)
 	return true;
 }
 
-bool StoreHasItemCore(ieResRef storename, ieResRef itemname)
+bool StoreHasItemCore(const ieResRef storename, const ieResRef itemname)
 {
 	bool has_current=false;
 	ieResRef current;
@@ -258,7 +259,7 @@ void TransformItemCore(Actor *actor, Action *parameters, bool onlyone)
 }
 
 //check if an inventory (container or actor) has item (could be recursive ?)
-bool HasItemCore(Inventory *inventory, ieResRef itemname, ieDword flags)
+bool HasItemCore(Inventory *inventory, const ieResRef itemname, ieDword flags)
 {
 	if (inventory->HasItem(itemname, flags)) {
 		return true;

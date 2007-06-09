@@ -27,7 +27,7 @@
 #include "Button.h"
 
 
-ControlAnimation::ControlAnimation(Control* ctl, ieResRef ResRef, int Cycle)
+ControlAnimation::ControlAnimation(Control* ctl, const ieResRef ResRef, int Cycle)
 {
 	control = NULL;
 	bam = NULL;

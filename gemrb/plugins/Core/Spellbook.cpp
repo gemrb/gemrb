@@ -269,7 +269,7 @@ unsigned int Spellbook::GetKnownSpellsCount(int type, unsigned int level) const
 
 //called when a spell was removed from spellbook
 //this one purges all instances of known spells of the same name from memory
-void Spellbook::RemoveMemorization(CRESpellMemorization* sm, ieResRef ResRef)
+void Spellbook::RemoveMemorization(CRESpellMemorization* sm, const ieResRef ResRef)
 {
 	std::vector< CREMemorizedSpell* >::iterator ms;
 
@@ -337,7 +337,7 @@ void Spellbook::RemoveSpell(int spellid)
 }
 
 //removes spell from both memorized/book
-void Spellbook::RemoveSpell(ieResRef ResRef)
+void Spellbook::RemoveSpell(const ieResRef ResRef)
 {
 	for(int type =0; type<NUM_BOOK_TYPES; type++) {
 		std::vector< CRESpellMemorization* >::iterator sm;
@@ -784,7 +784,7 @@ unsigned int Spellbook::GetSpellInfoSize(int type)
 	return count;
 }
 
-SpellExtHeader *Spellbook::FindSpellInfo(unsigned int level, unsigned int type, ieResRef spellname)
+SpellExtHeader *Spellbook::FindSpellInfo(unsigned int level, unsigned int type, const ieResRef spellname)
 {
 	size_t i = spellinfo.size();
 	while(i--) {

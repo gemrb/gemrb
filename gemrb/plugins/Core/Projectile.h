@@ -106,7 +106,7 @@ public:
 	Projectile();
 	~Projectile();
 	void InitExtension();
-	void CreateAnimations(Animation **anims, ieResRef bam, int Seq);
+	void CreateAnimations(Animation **anims, const ieResRef bam, int Seq);
 
 	ieWord Type;
 	ieWord Speed;

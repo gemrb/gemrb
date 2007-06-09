@@ -808,7 +808,7 @@ aux_3:
 	return flag;
 }
 
-int Interface::GetItemExcl(ieResRef itemname)
+int Interface::GetItemExcl(const ieResRef itemname)
 {
 	ieDword value;
 
@@ -818,7 +818,7 @@ int Interface::GetItemExcl(ieResRef itemname)
 	return 0;
 }
 
-int Interface::GetItemTooltip(ieResRef itemname, int header)
+int Interface::GetItemTooltip(const ieResRef itemname, int header)
 {
 	int *value = NULL;
 
@@ -839,7 +839,7 @@ int Interface::GetItemTooltip(ieResRef itemname, int header)
 	return ret;
 }
 
-int Interface::GetItemDialStr(ieResRef itemname)
+int Interface::GetItemDialStr(const ieResRef itemname)
 {
 	ieDword value;
 
@@ -849,7 +849,8 @@ int Interface::GetItemDialStr(ieResRef itemname)
 	return -1;
 }
 
-int Interface::GetItemDialRes(ieResRef itemname, ieResRef retval)
+//second value is the item dialog resource returned by this method
+int Interface::GetItemDialRes(const ieResRef itemname, ieResRef retval)
 {
 	if (ItemDial2Table && ItemDial2Table->Lookup(itemname, retval, sizeof(ieResRef))) {
 		return 1;
@@ -890,7 +891,7 @@ bool Interface::ReadAreaAliasTable(const ieResRef tablename)
 }
 
 //this isn't const
-int Interface::GetAreaAlias(ieResRef areaname)
+int Interface::GetAreaAlias(const ieResRef areaname)
 {
 	ieDword value;
 
@@ -2444,7 +2445,7 @@ int Interface::LoadCreature(const char* ResRef, int InParty, bool character)
 	}
 }
 
-bool Interface::SummonCreature(const ieResRef resource, ieResRef vvcres, Actor *Owner, Actor *target, Point &position, int eamod, int level)
+bool Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres, Actor *Owner, Actor *target, Point &position, int eamod, int level)
 {
 	DataStream* ds = key->GetResource( resource, IE_CRE_CLASS_ID );
 	level = level * 100;
@@ -5188,7 +5189,7 @@ void Interface::SetInfoTextColor(Color &color)
 }
 
 //todo row?
-void Interface::GetResRefFrom2DA(ieResRef resref, ieResRef resource1, ieResRef resource2, ieResRef resource3)
+void Interface::GetResRefFrom2DA(const ieResRef resref, ieResRef resource1, ieResRef resource2, ieResRef resource3)
 {
 	if (!resource1) {
 		return;
@@ -5209,6 +5210,6 @@ void Interface::GetResRefFrom2DA(ieResRef resref, ieResRef resource1, ieResRef r
 		if (resource2)
 			strnuprcpy(resource2, tab->QueryField(row,1), 8);
 		if (resource3)
-		strnuprcpy(resource3, tab->QueryField(row,2), 8);
+			strnuprcpy(resource3, tab->QueryField(row,2), 8);
 	}
 }
