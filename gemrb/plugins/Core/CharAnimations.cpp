@@ -1060,7 +1060,7 @@ const int* CharAnimations::GetZOrder(unsigned char Orient)
 void CharAnimations::AddPSTSuffix(char* ResRef, unsigned char StanceID,
 	unsigned char& Cycle, unsigned char Orient)
 {
-	char *Prefix;
+	const char *Prefix;
 
 	switch (StanceID) {
 		case IE_ANI_ATTACK:
@@ -1193,9 +1193,9 @@ void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 	}
 }
 //                            0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
-static char *StancePrefix[]={"3","2","5","5","4","4","2","2","5","4","1","3","3","3","4","1","4","4","4"};
-static char *CyclePrefix[]= {"0","0","1","1","1","1","0","0","1","1","0","1","1","1","1","1","1","1","1"};
-static unsigned int CycleOffset[] = {0,  0,  0,  0,  0,  9,  0,  0,  0, 18,  0,  0,  9,  18,  0,  0,  0,  0,  0};
+static const char *StancePrefix[]={"3","2","5","5","4","4","2","2","5","4","1","3","3","3","4","1","4","4","4"};
+static const char *CyclePrefix[]= {"0","0","1","1","1","1","0","0","1","1","0","1","1","1","1","1","1","1","1"};
+static const unsigned int CycleOffset[] = {0,  0,  0,  0,  0,  9,  0,  0,  0, 18,  0,  0,  9,  18,  0,  0,  0,  0,  0};
 
 
 // Note: almost like SixSuffix
@@ -1275,11 +1275,11 @@ void CharAnimations::AddNFSuffix(char* ResRef, unsigned char StanceID,
 
 //Attack
 //h1, h2, w2
-static char *SlashPrefix[]={"a1","a4","a7"};
-static char *BackPrefix[]={"a2","a5","a8"};
-static char *JabPrefix[]={"a3","a6","a9"};
-static char *RangedPrefix[]={"sa","sx","ss"};
-static char *RangedPrefixOld[]={"sa","sx","a1"};
+static const char *SlashPrefix[]={"a1","a4","a7"};
+static const char *BackPrefix[]={"a2","a5","a8"};
+static const char *JabPrefix[]={"a3","a6","a9"};
+static const char *RangedPrefix[]={"sa","sx","ss"};
+static const char *RangedPrefixOld[]={"sa","sx","a1"};
 
 void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 	unsigned char& Cycle, unsigned char Orient, EquipResRefData*& EquipData)
@@ -1399,8 +1399,8 @@ void CharAnimations::AddVHRSuffix(char* ResRef, unsigned char StanceID,
 }
 
 void CharAnimations::GetVHREquipmentRef(char* ResRef, unsigned char& Cycle,
-										const char* equipRef, bool offhand,
-										EquipResRefData* equip)
+			const char* equipRef, bool offhand,
+			EquipResRefData* equip)
 {
 	Cycle = equip->Cycle;
 	if (offhand) {

@@ -157,7 +157,7 @@ inline PyObject* RuntimeError(char* msg)
  * can be called in `return'. The exception should be set by previous
  * call to e.g. PyArg_ParseTuple()
  */
-inline PyObject* AttributeError(char* doc_string)
+inline PyObject* AttributeError(const char* doc_string)
 {
 	printMessage( "GUIScript", "Syntax Error:\n", LIGHT_RED );
 	PyErr_SetString(PyExc_AttributeError, doc_string);
