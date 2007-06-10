@@ -446,10 +446,10 @@ public:
 	void InitButtons(ieDword cls);
 	void SetFeat(unsigned int feat, int mode);
 	int GetFeat(unsigned int feat);
-	void SetUsedWeapon(char *AnimationType, ieWord *MeleeAnimation,
+	void SetUsedWeapon(const char *AnimationType, ieWord *MeleeAnimation,
 		int WeaponType=-1);
-	void SetUsedShield(char *AnimationType, int WeaponType=-1);
-	void SetUsedHelmet(char *AnimationType);
+	void SetUsedShield(const char *AnimationType, int WeaponType=-1);
+	void SetUsedHelmet(const char *AnimationType);
 	void SetupFist();
 	/* Returns nonzero if the caster is held */
 	int Immobile();

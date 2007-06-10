@@ -91,7 +91,7 @@ void Control::ResetEventHandler(EventHandler handler)
 	handler[0] = 0;
 }
 
-void Control::SetEventHandler(EventHandler handler, char* funcName)
+void Control::SetEventHandler(EventHandler handler, const char* funcName)
 {
 	strncpy( handler, funcName, sizeof( EventHandler ) );
 }

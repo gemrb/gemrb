@@ -3334,7 +3334,7 @@ int Actor::GetFeat(unsigned int feat)
 	return 0;
 }
 
-void Actor::SetUsedWeapon(char* AnimationType, ieWord* MeleeAnimation, int wt)
+void Actor::SetUsedWeapon(const char* AnimationType, ieWord* MeleeAnimation, int wt)
 {
 	memcpy(WeaponRef, AnimationType, sizeof(WeaponRef) );
 	if (wt != -1) WeaponType = wt;
@@ -3345,7 +3345,7 @@ void Actor::SetUsedWeapon(char* AnimationType, ieWord* MeleeAnimation, int wt)
 	SetAttackMoveChances(MeleeAnimation);
 }
 
-void Actor::SetUsedShield(char* AnimationType, int wt)
+void Actor::SetUsedShield(const char* AnimationType, int wt)
 {
 	memcpy(ShieldRef, AnimationType, sizeof(ShieldRef) );
 	if (wt != -1) WeaponType = wt;
@@ -3359,7 +3359,7 @@ void Actor::SetUsedShield(char* AnimationType, int wt)
 	anims->SetWeaponType(WeaponType);
 }
 
-void Actor::SetUsedHelmet(char* AnimationType)
+void Actor::SetUsedHelmet(const char* AnimationType)
 {
 	memcpy(HelmetRef, AnimationType, sizeof(HelmetRef) );
 	if (!anims)

@@ -123,7 +123,7 @@ void ResolveFilePath(char* FilePath);
 GEM_EXPORT char* FindInDir(const char* Dir, const char* Filename, bool wildcard=false);
 GEM_EXPORT bool dir_exists(const char* path);
 
-GEM_EXPORT char* PathAppend (char* target, char* dir);
+GEM_EXPORT char* PathAppend (char* target, const char* dir);
 GEM_EXPORT char* PathJoin (char* target, ...);
 GEM_EXPORT void FixPath (char *path, bool needslash);
 

@@ -133,7 +133,7 @@ public: //Events
 	/** Reset/init event handler */
 	void ResetEventHandler(EventHandler handler);
 	/** Set handler from function name */
-	void SetEventHandler(EventHandler handler, char* funcName);
+	void SetEventHandler(EventHandler handler, const char* funcName);
 	/** Returns the Owner */
 	Window *GetOwner() const { return Owner; }
 	/** Set the Flags */
