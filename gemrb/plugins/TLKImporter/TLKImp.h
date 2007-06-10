@@ -52,6 +52,7 @@ private:
 	int BuiltinToken(char* Token, char* dest);
 	int RaceStrRef(int slot);
  	int GenderStrRef(int slot, int malestrref, int femalestrref);
+	char *Gabber();
 	char *CharName(int slot);
 public:
 	void release(void)

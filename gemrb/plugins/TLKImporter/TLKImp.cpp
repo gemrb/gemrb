@@ -32,6 +32,15 @@ static int monthnamecount=0;
 //set this to -1 if charname is gabber (iwd2)
 static int charname=0;
 
+static char *CS(const char *src)
+{
+	if(!src) return NULL;
+	int len=strlen(src)+1;
+	char *ret = (char *) malloc(len);
+	memcpy(ret, src, len);
+	return ret;
+}
+
 TLKImp::TLKImp(void)
 {
 	if (core->HasFeature(GF_CHARNAMEISGABBER)) {
@@ -132,15 +141,26 @@ inline Actor *GetActorFromSlot(int slot)
 	return game->FindPC(slot);
 }
 
+char *TLKImp::Gabber()
+{
+	Actor *act;
+
+	act=core->GetGameControl()->GetSpeaker();
+	if (act) {
+		return CS(act->LongName);
+	}
+	return CS("?");
+}
+
 char *TLKImp::CharName(int slot)
 {
 	Actor *act;
 
 	act=GetActorFromSlot(slot);
 	if (act) {
-		return act->LongName;
+		return CS(act->LongName);
 	}
-	return "?";
+	return CS("?");
 }
 
 int TLKImp::RaceStrRef(int slot)
@@ -207,7 +227,6 @@ void TLKImp::GetMonthName(int dayandmonth)
 int TLKImp::BuiltinToken(char* Token, char* dest)
 {
 	char* Decoded = NULL;
-	bool freeup = true;
 	int TokenLength;	 //decoded token length
 
 	//these are hardcoded, all engines are the same or don't use them
@@ -266,19 +285,15 @@ int TLKImp::BuiltinToken(char* Token, char* dest)
 	}
 	if (!strncmp( Token, "PLAYER",6 )) {
 		Decoded = CharName(Token[6]-'1');
-		freeup = false;
 		goto exit_function;
 	}
 
 	if (!strcmp( Token, "GABBER" )) {
-		//don't free this!
-		Decoded=core->GetGameControl()->GetSpeaker()->LongName;
-		freeup = false;
+		Decoded = Gabber();
 		goto exit_function;
 	}
 	if (!strcmp( Token, "CHARNAME" )) {
 		Decoded = CharName(charname);
-		freeup = false;
 		goto exit_function;
 	}
 	if (!strcmp( Token, "PRO_RACE" )) {
@@ -343,9 +358,8 @@ int TLKImp::BuiltinToken(char* Token, char* dest)
 		if (dest) {
 			memcpy( dest, Decoded, TokenLength );
 		}
-		if (freeup) {
-			free( Decoded );
-		}
+		//Decoded is always a copy
+		free( Decoded );
 		return TokenLength;
 	}
 	return -1;
