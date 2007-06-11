@@ -527,7 +527,7 @@ public:
 	void LoadProgress(int percent);
 
 	Palette* GetPalette(const ieResRef resname);
-	Palette* CreatePalette(Color color, Color back);
+	Palette* CreatePalette(const Color &color, const Color &back);
 	void FreePalette(Palette *&pal, const ieResRef name=NULL);  
 
 	void DragItem(CREItem* item, const ieResRef Picture);
@@ -602,7 +602,7 @@ public:
 	/** receives an autopause reason, returns 1 if pause was triggered by this call, -1 if it was already triggered */
 	int Autopause(ieDword reason);
 	/** registers engine opcodes */
-	void RegisterOpcodes(int count, EffectRef *opcodes);
+	void RegisterOpcodes(int count, const EffectRef *opcodes);
 	/** reads a list of resrefs into an array, returns array size */
 	int ReadResRefTable(const ieResRef tablename, ieResRef *&data);
 	/** frees the data */

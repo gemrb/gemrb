@@ -30,6 +30,8 @@ unsigned int lastX = 0;
 
 #define PARAGRAPH_START_X 5;
 
+static const Color black = {0, 0, 0, 0};
+
 inline size_t mystrlen(const char* string)
 {
 	if (!string) {
@@ -180,9 +182,8 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 				unsigned int r,g,b;
 				if (sscanf( tag, "color=%02X%02X%02X", &r, &g, &b ) != 3)
 					continue;
-				Color c = {(unsigned char) r,(unsigned char)g, (unsigned char)b, 0};
-				Color back = {0, 0, 0, 0};
-				Palette* newPal = core->CreatePalette( c, back );
+				const Color c = {(unsigned char) r,(unsigned char)g, (unsigned char)b, 0};
+				Palette* newPal = core->CreatePalette( c, black );
 				video->SetPalette( sprBuffer, newPal );
 				core->FreePalette( newPal );
 			} else {
@@ -315,9 +316,8 @@ void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 				unsigned int r,g,b;
 				if (sscanf( tag, "color=%02X%02X%02X", &r, &g, &b ) != 3)
 					continue;
-				Color c = {(unsigned char) r,(unsigned char) g,(unsigned char)  b, 0};
-				Color back = {0, 0, 0, 0};
-				Palette* newPal = core->CreatePalette( c, back );
+				const Color c = {(unsigned char) r,(unsigned char) g,(unsigned char)  b, 0};
+				Palette* newPal = core->CreatePalette( c, black );
 				video->SetPalette( sprBuffer, newPal );
 				core->FreePalette( newPal );
 			} else {

@@ -279,7 +279,7 @@ public:
 	void SetOver(bool over);
 	bool IsSelected();
 	void Select(int Value);
-	void SetCircle(int size, Color color, Sprite2D* normal_circle, Sprite2D* selected_circle);
+	void SetCircle(int size, const Color &color, Sprite2D* normal_circle, Sprite2D* selected_circle);
 
 	/* store SpriteCover */
 	void SetSpriteCover(SpriteCover* c);

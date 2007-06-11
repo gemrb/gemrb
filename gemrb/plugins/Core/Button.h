@@ -143,9 +143,9 @@ public:
 	/** Add picture to the end of the list of Pictures */
 	void StackPicture(Sprite2D* Picture);
 	/** Sets border/frame parameters */
-	void SetBorder(int index, int dx1, int dy1, int dx2, int dy2, Color* color, bool enabled = false, bool filled = false);
+	void SetBorder(int index, int dx1, int dy1, int dx2, int dy2, const Color &color, bool enabled = false, bool filled = false);
 	/** Sets horizontal overlay, used in portrait hp overlay */
-	void SetHorizontalOverlay(double clip, Color src, Color dest);
+	void SetHorizontalOverlay(double clip, const Color &src, const Color &dest);
 	/** Sets font used for drawing button label */
 	void SetFont(Font* newfont);
 	/** Enables or disables specified border/frame */
@@ -179,7 +179,7 @@ public: // Public Events
 	/** Refreshes the button from a radio group */
 	void RedrawButton(const char* VariableName, unsigned int Sum);
 	/** Set palette used for drawing button label in normal state.  */
-	void SetTextColor(Color fore, Color back);
+	void SetTextColor(const Color &fore, const Color &back);
 	/** Sets percent (0-1.0) of width for clipping picture */
 	void SetPictureClipping(double clip)  { Clipping = clip; };
 private: // Private attributes

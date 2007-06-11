@@ -181,6 +181,7 @@ void Scriptable::DisplayHeadText(const char* text)
 }
 
 #define MAX_DELAY  6000
+static const Color black={0,0,0,0};
 
 void Scriptable::DrawOverheadText(Region &screen)
 {
@@ -198,13 +199,8 @@ void Scriptable::DrawOverheadText(Region &screen)
 	} else {
 		time = MAX_DELAY-time;
 		if (time<256) {
-			Color black={0,0,0,0};
-			Color overHeadColor;
-			overHeadColor.a=(ieByte) time;
-			overHeadColor.b=(ieByte) time;
-			overHeadColor.r=(ieByte) time;
-			overHeadColor.g=(ieByte) time;
-			palette = core->CreatePalette(overHeadColor,black);
+			const Color overHeadColor = {time,time,time,time};
+			palette = core->CreatePalette(overHeadColor, black);
 		}
 	}
 
@@ -713,7 +709,7 @@ void Selectable::Select(int Value)
 	SetSpriteCover(NULL);
 }
 
-void Selectable::SetCircle(int circlesize, Color color, Sprite2D* normal_circle, Sprite2D* selected_circle)
+void Selectable::SetCircle(int circlesize, const Color &color, Sprite2D* normal_circle, Sprite2D* selected_circle)
 {
 	size = circlesize;
 	selectedColor = color;

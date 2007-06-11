@@ -142,7 +142,7 @@ inline PyObject* PyString_FromAnimID(char* AnimID)
 /* Sets RuntimeError exception and returns NULL, so this function
  * can be called in `return'.
  */
-inline PyObject* RuntimeError(char* msg)
+inline PyObject* RuntimeError(const char* msg)
 {
 	printMessage( "GUIScript", "Runtime Error:\n", LIGHT_RED );
 	PyErr_SetString( PyExc_RuntimeError, msg );
@@ -1876,22 +1876,22 @@ static PyObject* GemRB_SetButtonOverlay(PyObject * /*self*/, PyObject* args)
 	double Clipping;
 	int r1,g1,b1,a1;
 	int r2,g2,b2,a2;
-
+	
 	if (!PyArg_ParseTuple( args, "iidiiiiiiii", &WindowIndex, &ControlIndex,
 		&Clipping, &r1, &g1, &b1, &a1, &r2, &g2, &b2, &a2)) {
 		return AttributeError( GemRB_SetButtonOverlay__doc );
 	}
-
+	
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
 	if (!btn) {
 		return NULL;
 	}
-
-	Color src = { r1, g1, b1, a1 };
-	Color dest = { r2, g2, b2, a2 };
-
-			  if (Clipping<0.0) Clipping = 0.0;
-			  else if (Clipping>1.0) Clipping = 1.0;
+	
+	const Color src = { r1, g1, b1, a1 };
+	const Color dest = { r2, g2, b2, a2 };
+	
+	if (Clipping<0.0) Clipping = 0.0;
+	else if (Clipping>1.0) Clipping = 1.0;
 	//can't call clipping, because the change of ratio triggers color change
 	btn->SetHorizontalOverlay(Clipping, src, dest);
 	Py_INCREF( Py_None );
@@ -1916,8 +1916,8 @@ static PyObject* GemRB_SetButtonBorder(PyObject * /*self*/, PyObject* args)
 		return NULL;
 	}
 
-	Color color = { r, g, b, a };
-	btn->SetBorder( BorderIndex, dx1, dy1, dx2, dy2, &color, (bool)enabled, (bool)filled );
+	const Color color = { r, g, b, a };
+	btn->SetBorder( BorderIndex, dx1, dy1, dx2, dy2, color, (bool)enabled, (bool)filled );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -2615,8 +2615,8 @@ static PyObject* GemRB_SetButtonPictureClipping(PyObject * /*self*/, PyObject* a
 		return NULL;
 	}
 
-			  if (Clipping<0.0) Clipping = 0.0;
-			  else if (Clipping>1.0) Clipping = 1.0;
+	if (Clipping<0.0) Clipping = 0.0;
+	else if (Clipping>1.0) Clipping = 1.0;
 	btn->SetPictureClipping( Clipping );
 
 	Py_INCREF( Py_None );
@@ -2688,7 +2688,7 @@ static PyObject* GemRB_SetButtonMOS(PyObject * /*self*/, PyObject* args)
 	}
 
 	DataStream* str = core->GetResourceMgr()->GetResource( ResRef,
-												IE_MOS_CLASS_ID );
+		IE_MOS_CLASS_ID );
 	if (str == NULL) {
 		return NULL;
 	}

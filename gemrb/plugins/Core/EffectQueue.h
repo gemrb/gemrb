@@ -125,7 +125,7 @@ struct EffectRef {
 bool Init_EffectQueue();
 
 /** Registers opcodes implemented by an effect plugin */
-void EffectQueue_RegisterOpcodes(int count, EffectRef *opcodes);
+void EffectQueue_RegisterOpcodes(int count, const EffectRef *opcodes);
 
 /** release effect list when Interface is destroyed */
 void EffectQueue_ReleaseMemory();

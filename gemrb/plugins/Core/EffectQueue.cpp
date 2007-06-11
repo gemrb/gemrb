@@ -272,7 +272,7 @@ void EffectQueue_ReleaseMemory()
 	effectnames = NULL;
 }
 
-void EffectQueue_RegisterOpcodes(int count, EffectRef* opcodes)
+void EffectQueue_RegisterOpcodes(int count, const EffectRef* opcodes)
 {
 	if (! effectnames) {
 		effectnames = (EffectRef*) malloc( (count+1) * sizeof( EffectRef ) );
@@ -765,13 +765,12 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 
 	EffectFunction fn = effect_refs[fx->Opcode].Function;
 	int res = FX_ABORT;
-	if (fn) {
-		if ( effect_refs[fx->Opcode].EffText > 0 ) {
-			char *text = core->GetString( effect_refs[fx->Opcode].EffText );
-			core->DisplayString( text );
-			free( text );
+	if (fn) {    
+		if ( target && first_apply ) {
+			core->DisplayStringName( effect_refs[fx->Opcode].EffText, 0xf0f0f0, 
+				target, IE_STR_SOUND);
 		}
-
+		
 		res=fn( Owner?Owner:target, target, fx );
 
 		//if there is no owner, we assume it is the target

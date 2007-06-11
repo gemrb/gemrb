@@ -293,7 +293,7 @@ void Button::SetState(unsigned char state)
 	}
 	State = state;
 }
-void Button::SetBorder(int index, int dx1, int dy1, int dx2, int dy2, Color* color, bool enabled, bool filled)
+void Button::SetBorder(int index, int dx1, int dy1, int dx2, int dy2, const Color &color, bool enabled, bool filled)
 {
 	if (index >= MAX_NUM_BORDERS)
 		return;
@@ -303,7 +303,7 @@ void Button::SetBorder(int index, int dx1, int dy1, int dx2, int dy2, Color* col
 	fr->dy1 = dy1;
 	fr->dx2 = dx2;
 	fr->dy2 = dy2;
-	memcpy( &(fr->color), color, sizeof( Color ));
+	fr->color = color;
 	fr->enabled = enabled;
 	fr->filled = filled;
 	Changed = true;
@@ -611,14 +611,14 @@ bool Button::IsPixelTransparent(unsigned short x, unsigned short y)
 }
 
 // Set palette used for drawing button label in normal state
-void Button::SetTextColor(Color fore, Color back)
+void Button::SetTextColor(const Color &fore, const Color &back)
 {
 	core->FreePalette( normal_palette );
 	normal_palette = core->CreatePalette( fore, back );
 	Changed = true;
 }
 
-void Button::SetHorizontalOverlay(double clip, Color src, Color dest)
+void Button::SetHorizontalOverlay(double clip, const Color &src, const Color &dest)
 {
 	if (Clipping>clip) {
 		SourceRGB=src;

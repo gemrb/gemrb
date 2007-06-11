@@ -901,6 +901,10 @@ int Interface::GetAreaAlias(const ieResRef areaname)
 	return -1;
 }
 
+static const Color fpscolor = {0xff,0xff,0xff,0xff};
+static const Color fpsblack = {0x00,0x00,0x00,0xff};
+static const Region bg( 0, 0, 100, 30 );
+
 /** this is the main loop */
 void Interface::Main()
 {
@@ -913,11 +917,9 @@ void Interface::Main()
 	video->SetGamma( 	brightness, contrast);
 	Font* fps = GetFont( ( unsigned int ) 0 );
 	char fpsstring[40]={"???.??? fps"};
-	Color fpscolor = {0xff,0xff,0xff,0xff}, fpsblack = {0x00,0x00,0x00,0xff};
 	unsigned long frame = 0, time, timebase;
 	GetTime(timebase);
 	double frames = 0.0;
-	Region bg( 0, 0, 100, 30 );
 	Palette* palette = CreatePalette( fpscolor, fpsblack );
 	do {
 		//don't change script when quitting is pending
@@ -940,7 +942,7 @@ void Interface::Main()
 				sprintf( fpsstring, "%.3f fps", frames );
 			}
 			video->DrawRect( bg, fpsblack );
-			fps->Print( Region( 0, 0, 100, 20 ),
+			fps->Print( bg,
 						( unsigned char * ) fpsstring, palette,
 						IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true );
 		}
@@ -1186,6 +1188,7 @@ int Interface::Init()
 			}
 			strncpy( fnt->ResRef, ResRef, 8 );
 			if (needpalette) {
+
 				Color fore = {0xff, 0xff, 0xff, 0};
 				Color back = {0x00, 0x00, 0x00, 0};
 				if (!strnicmp( TooltipFont, ResRef, 8) ) {
@@ -2282,7 +2285,7 @@ Palette *Interface::GetPalette(const ieResRef resname)
 	return palette;
 }
 
-Palette* Interface::CreatePalette(Color color, Color back)
+Palette* Interface::CreatePalette(const Color &color, const Color &back)
 {
 	Palette* pal = new Palette();
 	pal->col[0].r = 0;
@@ -4028,6 +4031,7 @@ static const char* DisplayFormatValue = "[/color][p][color=%lX]%s: %d[/color][/p
 
 void Interface::DisplayConstantString(int stridx, unsigned int color)
 {
+	if (stridx<0) return;
 	char* text = GetString( strref_table[stridx], IE_STR_SOUND );
 	int newlen = (int)(strlen( DisplayFormat ) + strlen( text ) + 12);
 	char* newstr = ( char* ) malloc( newlen );
@@ -4039,6 +4043,7 @@ void Interface::DisplayConstantString(int stridx, unsigned int color)
 
 void Interface::DisplayString(int stridx, unsigned int color, ieDword flags)
 {
+	if (stridx<0) return;
 	char* text = GetString( stridx, flags);
 	int newlen = (int)(strlen( DisplayFormat) + strlen( text ) + 10);
 	char* newstr = ( char* ) malloc( newlen );
@@ -4050,6 +4055,7 @@ void Interface::DisplayString(int stridx, unsigned int color, ieDword flags)
 
 void Interface::DisplayConstantStringValue(int stridx, unsigned int color, ieDword value)
 {
+	if (stridx<0) return;
 	char* text = GetString( strref_table[stridx], IE_STR_SOUND );
 	int newlen = (int)(strlen( DisplayFormat ) + strlen( text ) + 28);
 	char* newstr = ( char* ) malloc( newlen );
@@ -4067,6 +4073,7 @@ void Interface::DisplayConstantStringName(int stridx, unsigned int color, Script
 	unsigned int speaker_color;
 	const char *name;
 
+	if (stridx<0) return;
 	switch (speaker->Type) {
 		case ST_ACTOR:
 			name = ((Actor *) speaker)->GetName(-1);
@@ -4100,6 +4107,7 @@ void Interface::DisplayConstantStringAction(int stridx, unsigned int color, Scri
 	const char *name1;
 	const char *name2;
 
+	if (stridx<0) return;
 	switch (attacker->Type) {
 		case ST_ACTOR:
 			name1 = ((Actor *) attacker)->GetName(-1);
@@ -4136,6 +4144,7 @@ void Interface::DisplayStringName(int stridx, unsigned int color, Scriptable *sp
 	unsigned int speaker_color;
 	const char *name;
 
+	if (stridx<0) return;
 	switch (speaker->Type) {
 		case ST_ACTOR:
 			name = ((Actor *) speaker)->GetName(-1);
@@ -5174,7 +5183,7 @@ int Interface::Autopause(ieDword flag)
 	return 0;
 }
 
-void Interface::RegisterOpcodes(int count, EffectRef *opcodes)
+void Interface::RegisterOpcodes(int count, const EffectRef *opcodes)
 {
 	EffectQueue_RegisterOpcodes(count, opcodes);
 }

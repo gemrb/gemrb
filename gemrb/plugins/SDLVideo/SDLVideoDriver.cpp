@@ -951,6 +951,7 @@ void SDLVideoDriver::BlitSpriteHalfTrans(Sprite2D* spr, int x, int y,
 	}
 }
 
+//cannot make const reference from tint, it is modified locally
 void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 									unsigned int flags, Color tint,
 									SpriteCover* cover, Palette *palette,
@@ -1429,7 +1430,7 @@ void SDLVideoDriver::ConvertToVideoFormat(Sprite2D* sprite)
 }
 
 /** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
-void SDLVideoDriver::DrawRect(Region& rgn, Color& color, bool fill, bool clipped)
+void SDLVideoDriver::DrawRect(const Region& rgn, const Color& color, bool fill, bool clipped)
 {
 	SDL_Rect drect = {
 		rgn.x, rgn.y, rgn.w, rgn.h
@@ -1460,7 +1461,7 @@ void SDLVideoDriver::DrawRect(Region& rgn, Color& color, bool fill, bool clipped
 }
 
 /** This function Draws a clipped sprite */
-void SDLVideoDriver::DrawRectSprite(Region& rgn, Color& color, Sprite2D* sprite)
+void SDLVideoDriver::DrawRectSprite(const Region& rgn, const Color& color, Sprite2D* sprite)
 {
 	if (sprite->BAM) {
 		printMessage( "SDLVideo", "DrawRectSprite not supported for this sprite\n", LIGHT_RED );
@@ -1489,7 +1490,7 @@ void SDLVideoDriver::DrawRectSprite(Region& rgn, Color& color, Sprite2D* sprite)
 	}
 }
 
-void SDLVideoDriver::SetPixel(short x, short y, Color& color, bool clipped)
+void SDLVideoDriver::SetPixel(short x, short y, const Color& color, bool clipped)
 {
 	//printf("x: %d; y: %d; XC: %d; YC: %d, VX: %d, VY: %d, VW: %d, VH: %d\n", x, y, xCorr, yCorr, Viewport.x, Viewport.y, Viewport.w, Viewport.h);
 	if (clipped) {
@@ -1635,7 +1636,7 @@ bool SDLVideoDriver::IsSpritePixelTransparent(Sprite2D* sprite, unsigned short x
  * to Area origin and clips it by Area viewport borders,
  * else it draws relative to screen origin and ignores the vieport
  */
-void SDLVideoDriver::DrawHLine(short x1, short y, short x2, Color& color, bool clipped)
+void SDLVideoDriver::DrawHLine(short x1, short y, short x2, const Color& color, bool clipped)
 {
 	if (x1 > x2) {
 		short tmpx = x1;
@@ -1656,7 +1657,7 @@ void SDLVideoDriver::DrawHLine(short x1, short y, short x2, Color& color, bool c
  * to Area origin and clips it by Area viewport borders,
  * else it draws relative to screen origin and ignores the vieport
  */
-void SDLVideoDriver::DrawVLine(short x, short y1, short y2, Color& color, bool clipped)
+void SDLVideoDriver::DrawVLine(short x, short y1, short y2, const Color& color, bool clipped)
 {
 	if (y1 > y2) {
 		short tmpy = y1;
@@ -1674,7 +1675,7 @@ void SDLVideoDriver::DrawVLine(short x, short y1, short y2, Color& color, bool c
 }
 
 void SDLVideoDriver::DrawLine(short x1, short y1, short x2, short y2,
-	Color& color, bool clipped)
+	const Color& color, bool clipped)
 {
 	if (clipped) {
 		x1 -= Viewport.x;
@@ -1731,7 +1732,7 @@ void SDLVideoDriver::DrawLine(short x1, short y1, short x2, short y2,
 }
 /** This functions Draws a Circle */
 void SDLVideoDriver::DrawCircle(short cx, short cy, unsigned short r,
-	Color& color, bool clipped)
+	const Color& color, bool clipped)
 {
 	//Uses the Breshenham's Circle Algorithm
 	long x, y, xc, yc, re;
@@ -1771,7 +1772,7 @@ void SDLVideoDriver::DrawCircle(short cx, short cy, unsigned short r,
 }
 /** This functions Draws an Ellipse */
 void SDLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr,
-	unsigned short yr, Color& color, bool clipped)
+	unsigned short yr, const Color& color, bool clipped)
 {
 	//Uses Bresenham's Ellipse Algorithm
 	long x, y, xc, yc, ee, tas, tbs, sx, sy;
@@ -1835,7 +1836,7 @@ void SDLVideoDriver::DrawEllipse(short cx, short cy, unsigned short xr,
 	}
 }
 
-void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, Color& color, bool fill)
+void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fill)
 {
 	if (!poly->count) {
 		return;

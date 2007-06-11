@@ -42,19 +42,19 @@ extern Interface* core;
 extern HANDLE hConsole;
 #endif
 
-static Color green = {
+static const Color green = {
 	0x00, 0xff, 0x00, 0xff
 };
-static Color red = {
+static const Color red = {
 	0xff, 0x00, 0x00, 0xff
 };
-static Color yellow = {
+static const Color yellow = {
 	0xff, 0xff, 0x00, 0xff
 };
-static Color cyan = {
+static const Color cyan = {
 	0x00, 0xff, 0xff, 0xff
 };
-static Color magenta = {
+static const Color magenta = {
 	0xff, 0x00, 0xff, 0xff
 };
 
@@ -385,7 +385,7 @@ ieDword Actor::GetStat(unsigned int StatIndex) const
 
 void Actor::SetCircleSize()
 {
-	Color* color;
+	const Color *color;
 	int color_index;
 
 	if (Modified[IE_UNSELECTABLE]) {
@@ -2654,10 +2654,10 @@ void Actor::DrawActorSprite(Region &screen, int cx, int cy, Region& bbox,
 }
 
 
-int OrientdX[16] = { 0, -4, -7, -9, -10, -9, -7, -4, 0, 4, 7, 9, 10, 9, 7, 4 };
-int OrientdY[16] = { 10, 9, 7, 4, 0, -4, -7, -9, -10, -9, -7, -4, 0, 4, 7, 9 };
-unsigned int MirrorImageLocation[8] = { 4, 12, 8, 0, 6, 14, 10, 2 };
-unsigned int MirrorImageZOrder[8] = { 2, 4, 6, 0, 1, 7, 5, 3 };
+static const int OrientdX[16] = { 0, -4, -7, -9, -10, -9, -7, -4, 0, 4, 7, 9, 10, 9, 7, 4 };
+static const int OrientdY[16] = { 10, 9, 7, 4, 0, -4, -7, -9, -10, -9, -7, -4, 0, 4, 7, 9 };
+static const unsigned int MirrorImageLocation[8] = { 4, 12, 8, 0, 6, 14, 10, 2 };
+static const unsigned int MirrorImageZOrder[8] = { 2, 4, 6, 0, 1, 7, 5, 3 };
 
 void Actor::Draw(Region &screen)
 {

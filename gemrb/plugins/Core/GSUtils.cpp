@@ -319,7 +319,7 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 			if(flags&DS_NONAME) {
 				core->DisplayString( sb.text );
 			} else {
-				core->DisplayStringName( Strref,0xf0f0f0,Sender, 0);
+				core->DisplayStringName( Strref, 0xf0f0f0, Sender, 0);
 			}
 		}
 		if (flags & DS_HEAD) {

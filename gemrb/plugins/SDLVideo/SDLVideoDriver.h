@@ -103,20 +103,20 @@ public:
 	/** No descriptions */
 	void SetPalette(Sprite2D* spr, Palette* pal);
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
-	void DrawRect(Region& rgn, Color& color, bool fill = true, bool clipped = false);
-	void DrawRectSprite(Region& rgn, Color& color, Sprite2D* sprite);
+	void DrawRect(const Region& rgn, const Color& color, bool fill = true, bool clipped = false);
+	void DrawRectSprite(const Region& rgn, const Color& color, Sprite2D* sprite);
 	/** This functions Draws a Circle */
-	void SetPixel(short x, short y, Color& color, bool clipped = true);
+	void SetPixel(short x, short y, const Color& color, bool clipped = true);
 	void GetPixel(short x, short y, Color* color);
-	void DrawCircle(short cx, short cy, unsigned short r, Color& color, bool clipped = true);
+	void DrawCircle(short cx, short cy, unsigned short r, const Color& color, bool clipped = true);
 	/** This functions Draws an Ellipse */
 	void DrawEllipse(short cx, short cy, unsigned short xr, unsigned short yr,
-		Color& color, bool clipped = true);
+		const Color& color, bool clipped = true);
 	/** This function Draws a Polygon on the Screen */
-	void DrawPolyline(Gem_Polygon* poly, Color& color, bool fill = false);
-	inline void DrawHLine(short x1, short y, short x2, Color& color, bool clipped = false);
-	inline void DrawVLine(short x, short y1, short y2, Color& color, bool clipped = false);
-	inline void DrawLine(short x1, short y1, short x2, short y2, Color& color, bool clipped = false);
+	void DrawPolyline(Gem_Polygon* poly, const Color& color, bool fill = false);
+	inline void DrawHLine(short x1, short y, short x2, const Color& color, bool clipped = false);
+	inline void DrawVLine(short x, short y1, short y2, const Color& color, bool clipped = false);
+	inline void DrawLine(short x1, short y1, short x2, short y2, const Color& color, bool clipped = false);
 	/** Blits a Sprite filling the Region */
 	void BlitTiled(Region rgn, Sprite2D* img, bool anchor = false);
 	/** Send a Quit Signal to the Event Queue */

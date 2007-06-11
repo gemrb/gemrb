@@ -92,38 +92,38 @@ public:
 	virtual short GetHeight() = 0;
 
 	virtual void InitSpriteCover(SpriteCover* sc, int flags) = 0;
-	virtual void AddPolygonToSpriteCover(SpriteCover* sc,
-										 Wall_Polygon* poly) = 0;
+	virtual void AddPolygonToSpriteCover(SpriteCover* sc, Wall_Polygon* poly) = 0;
 	virtual void DestroySpriteCover(SpriteCover* sc) = 0;
 
 	virtual Sprite2D* CreateSprite(int w, int h, int bpp, ieDword rMask,
-		ieDword gMask, ieDword bMask, ieDword aMask, void* pixels, bool cK = false,
-		int index = 0) = 0;
+		ieDword gMask, ieDword bMask, ieDword aMask, void* pixels,
+		bool cK = false, int index = 0) = 0;
 	virtual Sprite2D* CreateSprite8(int w, int h, int bpp, void* pixels,
 		void* palette, bool cK = false, int index = 0) = 0;
 	virtual Sprite2D* CreateSpriteBAM8(int /*w*/, int /*h*/, bool /* RLE */,
-									   const unsigned char* /*pixeldata*/,
-									   unsigned int /*datasize*/,
-									   Palette* /*palette*/,
-									   int /*transindex*/) { return 0; }
+		 const unsigned char* /*pixeldata*/,
+		 unsigned int /*datasize*/,
+		 Palette* /*palette*/,
+		 int /*transindex*/) { return 0; }
 	virtual bool SupportsBAMSprites() { return false; }
 	virtual void FreeSprite(Sprite2D* &spr) = 0;
 	virtual Sprite2D* DuplicateSprite(Sprite2D* spr) = 0;
 	virtual void BlitSprite(Sprite2D* spr, int x, int y, bool anchor = false,
 		Region* clip = NULL) = 0;
 	virtual void BlitSpriteHalfTrans(Sprite2D* spr, int x, int y,
-									 bool anchor = false,
-									 Region* clip = NULL) = 0;
+		bool anchor = false,
+		Region* clip = NULL) = 0;
 
 	// Note: BlitSpriteRegion's clip region is shifted by Viewport.x/y if
 	// anchor is false. This is different from the other BlitSprite functions.
 	virtual void BlitSpriteRegion(Sprite2D* spr, Region& size, int x, int y,
 		bool anchor = true, Region* clip = NULL) = 0;
-
+	// Note: Tint cannot be constified, because it is modified locally
+	// not a pretty interface :)
 	virtual void BlitGameSprite(Sprite2D* spr, int x, int y,
-								unsigned int flags, Color tint,
-								SpriteCover* cover, Palette *palette = NULL,
-								Region* clip = NULL) = 0;
+		unsigned int flags, Color tint,
+		SpriteCover* cover, Palette *palette = NULL,
+		Region* clip = NULL) = 0;
 	virtual void SetCursor(Sprite2D* up, Sprite2D* down) = 0;
 	/** Sets a temporary cursor when dragging an Item from Inventory */
 	virtual void SetDragCursor(Sprite2D* drag) = 0;
@@ -137,22 +137,22 @@ public:
 	/** No descriptions */
 	virtual void SetPalette(Sprite2D* spr, Palette* pal) = 0;
 	/** This function Draws the Border of a Rectangle as described by the Region parameter. The Color used to draw the rectangle is passes via the Color parameter. */
-	virtual void DrawRect(Region& rgn, Color& color, bool fill = true, bool clipped = false) = 0;
+	virtual void DrawRect(const Region& rgn, const Color& color, bool fill = true, bool clipped = false) = 0;
 	/** this function draws a clipped sprite */
-	virtual void DrawRectSprite(Region& rgn, Color& color, Sprite2D* sprite) = 0;
-	virtual void SetPixel(short x, short y, Color& color, bool clipped = false) = 0;
+	virtual void DrawRectSprite(const Region& rgn, const Color& color, Sprite2D* sprite) = 0;
+	virtual void SetPixel(short x, short y, const Color& color, bool clipped = false) = 0;
 	virtual void GetPixel(short x, short y, Color* color) = 0;
 	/** Draws a circle */
-	virtual void DrawCircle(short cx, short cy, unsigned short r, Color& color, bool clipped = true) = 0;
+	virtual void DrawCircle(short cx, short cy, unsigned short r, const Color& color, bool clipped = true) = 0;
 	/** Draws an ellipse */
 	virtual void DrawEllipse(short cx, short cy, unsigned short xr,
-		unsigned short yr, Color& color, bool clipped = true) = 0;
+		unsigned short yr, const Color& color, bool clipped = true) = 0;
 	/** Draws a polygon on the screen */
-	virtual void DrawPolyline(Gem_Polygon* poly, Color& color,
+	virtual void DrawPolyline(Gem_Polygon* poly, const Color& color,
 		bool fill = false) = 0;
 	/** Draws a line segment */
 	virtual void DrawLine(short x1, short y1, short x2, short y2,
-		Color& color, bool clipped = false) = 0;
+		const Color& color, bool clipped = false) = 0;
 	/** Blits a Sprite filling the Region */
 	virtual void BlitTiled(Region rgn, Sprite2D* img, bool anchor = false) = 0;
 	/** Sets Event Manager */
