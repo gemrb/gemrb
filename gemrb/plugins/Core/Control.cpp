@@ -96,11 +96,6 @@ void Control::SetEventHandler(EventHandler handler, const char* funcName)
 	strncpy( handler, funcName, sizeof( EventHandler ) );
 }
 
-bool Control::SetEvent(int /*eventType*/, const char * /*handler*/)
-{
-	return false;
-}
-
 int Control::RunEventHandler(EventHandler handler)
 {
 	if (InHandler) {

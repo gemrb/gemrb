@@ -429,7 +429,7 @@ void MapControl::OnSpecialKeyPress(unsigned char Key)
 		ScrollY = 0;
 }
 
-bool MapControl::SetEvent(int eventType, EventHandler handler)
+bool MapControl::SetEvent(int eventType, const char *handler)
 {
 	Changed = true;
 
@@ -438,7 +438,7 @@ bool MapControl::SetEvent(int eventType, EventHandler handler)
 		SetEventHandler( MapControlOnPress, handler );
 		break;
 	default:
-		return Control::SetEvent( eventType, handler );
+		return false;
 	}
 
 	return true;

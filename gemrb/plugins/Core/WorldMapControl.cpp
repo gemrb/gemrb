@@ -334,7 +334,7 @@ void WorldMapControl::OnSpecialKeyPress(unsigned char Key)
 		ScrollY = 0;
 }
 
-bool WorldMapControl::SetEvent(int eventType, EventHandler handler)
+bool WorldMapControl::SetEvent(int eventType, const char *handler)
 {
 	Changed = true;
 
@@ -346,7 +346,7 @@ bool WorldMapControl::SetEvent(int eventType, EventHandler handler)
 		SetEventHandler( WorldMapControlOnEnter, handler );
 		break;
 	default:
-		return Control::SetEvent( eventType, handler );
+		return false;
 	}
 
 	return true;

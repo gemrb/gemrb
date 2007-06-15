@@ -107,7 +107,7 @@ public:
 	/** Special Key Press */
 	void OnSpecialKeyPress(unsigned char Key);
 	/** Set handler for specified event */
-	bool SetEvent(int eventType, EventHandler handler);
+	bool SetEvent(int eventType, const char *handler);
 private:
 	/** Call event handler on click */
 	void ClickHandle();

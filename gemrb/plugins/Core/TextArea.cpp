@@ -675,7 +675,7 @@ bool TextArea::SetEvent(int eventType, const char *handler)
 		SetEventHandler( TextAreaOutOfText, handler );
 		break;
 	default:
-		return Control::SetEvent( eventType, handler );
+		return false;
 	}
 
 	return true;

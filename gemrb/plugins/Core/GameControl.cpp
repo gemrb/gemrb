@@ -2154,3 +2154,7 @@ void GameControl::SetupCasting(int type, int level, int idx, Actor *u, int targe
 	spellCount = cnt;
 }
 
+bool GameControl::SetEvent(int /*eventType*/, const char * /*handler*/)
+{
+	return false;
+}

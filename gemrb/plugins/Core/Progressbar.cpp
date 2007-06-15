@@ -171,7 +171,7 @@ int Progressbar::SetText(const char* /*string*/, int /*pos*/)
 	return 0;
 }
 
-bool Progressbar::SetEvent(int eventType, EventHandler handler)
+bool Progressbar::SetEvent(int eventType, const char *handler)
 {
 	Changed = true;
 
@@ -180,7 +180,7 @@ bool Progressbar::SetEvent(int eventType, EventHandler handler)
 		SetEventHandler( EndReached, handler );
 		break;
 	default:
-		return Control::SetEvent( eventType, handler );
+		return false;
 	}
 
 	return true;

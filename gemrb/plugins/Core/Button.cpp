@@ -539,7 +539,7 @@ bool Button::SetEvent(int eventType, const char *handler)
 			SetEventHandler( ButtonOnDrag, handler );
 			break;
 	default:
-		return Control::SetEvent( eventType, handler );
+		return false;
 	}
 
 	return true;

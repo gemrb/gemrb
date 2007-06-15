@@ -119,7 +119,7 @@ void Label::OnMouseUp(unsigned short x, unsigned short y,
 	}
 }
 
-bool Label::SetEvent(int eventType, EventHandler handler)
+bool Label::SetEvent(int eventType, const char *handler)
 {
 	Changed = true;
 
@@ -128,7 +128,7 @@ bool Label::SetEvent(int eventType, EventHandler handler)
 		SetEventHandler( LabelOnPress, handler );
 		break;
 	default:
-		return Control::SetEvent( eventType, handler );
+		return false;
 	}
 
 	return true;

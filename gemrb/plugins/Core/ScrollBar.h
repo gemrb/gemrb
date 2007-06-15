@@ -100,7 +100,7 @@ public: // Public Events
 	/** Mouse Over Event */
 	void OnMouseOver(unsigned short x, unsigned short y);
 	/** Set handler for specified event */
-	bool SetEvent(int eventType, EventHandler handler);
+	bool SetEvent(int eventType, const char *handler);
 	/** OnChange Scripted Event Function Name */
 	EventHandler ScrollBarOnChange;
 };

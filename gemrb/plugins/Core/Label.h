@@ -73,7 +73,7 @@ public:
 	void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
 		unsigned short Mod);
 	/** Set handler for specified event */
-	bool SetEvent(int eventType, EventHandler handler);
+	bool SetEvent(int eventType, const char *handler);
 	/** Use the RGB Color for the Font */
 	bool useRGB;
 	/** OnPress Scripted Event Function Name */

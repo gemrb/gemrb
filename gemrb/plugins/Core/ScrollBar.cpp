@@ -246,7 +246,7 @@ void ScrollBar::SetMax(unsigned short Max)
 	Changed = true;
 }
 
-bool ScrollBar::SetEvent(int eventType, EventHandler handler)
+bool ScrollBar::SetEvent(int eventType, const char *handler)
 {
 	Changed = true;
 
@@ -255,7 +255,7 @@ bool ScrollBar::SetEvent(int eventType, EventHandler handler)
 		SetEventHandler( ScrollBarOnChange, handler );
 		break;
 	default:
-		return Control::SetEvent( eventType, handler );
+		return false;
 	}
 
 	return true;

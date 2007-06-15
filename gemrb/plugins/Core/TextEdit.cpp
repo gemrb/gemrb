@@ -201,7 +201,7 @@ const char* TextEdit::QueryText()
 	return ( const char * ) Buffer;
 }
 
-bool TextEdit::SetEvent(int eventType, EventHandler handler)
+bool TextEdit::SetEvent(int eventType, const char *handler)
 {
 	Changed = true;
 
@@ -216,7 +216,7 @@ bool TextEdit::SetEvent(int eventType, EventHandler handler)
 		SetEventHandler( EditOnCancel, handler );
 		break;
 	default:
-		return Control::SetEvent( eventType, handler );
+		return false;
 	}
 
 	return true;

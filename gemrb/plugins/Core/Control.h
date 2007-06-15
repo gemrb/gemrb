@@ -139,7 +139,7 @@ public: //Events
 	/** Set the Flags */
 	int SetFlags(int arg_flags, int opcode);
 	/** Set handler for specified event. Override in child classes */
-	virtual bool SetEvent(int eventType, const char *handler);
+	virtual bool SetEvent(int eventType, const char *handler) = 0;
 	/** Run specified handler, it may return error code */
 	int RunEventHandler(EventHandler handler);
 	/** Key Press Event */

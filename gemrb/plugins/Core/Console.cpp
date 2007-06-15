@@ -212,3 +212,8 @@ void Console::HistoryAdd(bool force)
 		HistMax++;
 	}
 }
+
+bool Console::SetEvent(int /*eventType*/, const char * /*handler*/)
+{
+	return false;
+}
