@@ -4172,7 +4172,7 @@ void Interface::DisplayStringName(int stridx, unsigned int color, Scriptable *sp
 	free( newstr );
 }
 
-static char *saved_extensions[]={".are",".sto",".tot",".toh",0};
+static const char *saved_extensions[]={".are",".sto",".tot",".toh",0};
 
 //returns true if file should be saved
 bool Interface::SavedExtension(const char *filename)
@@ -4187,7 +4187,7 @@ bool Interface::SavedExtension(const char *filename)
 	return false;
 }
 
-static char *protected_extensions[]={".exe",".dll",".so",0};
+static const char *protected_extensions[]={".exe",".dll",".so",0};
 
 //returns true if file should be saved
 bool Interface::ProtectedExtension(const char *filename)
