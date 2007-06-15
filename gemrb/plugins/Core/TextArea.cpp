@@ -663,7 +663,7 @@ const char* TextArea::QueryText()
 	return ( const char *) "";
 }
 
-bool TextArea::SetEvent(int eventType, EventHandler handler)
+bool TextArea::SetEvent(int eventType, const char *handler)
 {
 	Changed = true;
 

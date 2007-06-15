@@ -509,7 +509,7 @@ int Button::SetText(const char* string, int /*pos*/)
 }
 
 /** Set Event Handler */
-bool Button::SetEvent(int eventType, EventHandler handler)
+bool Button::SetEvent(int eventType, const char *handler)
 {
 	Changed = true;
 

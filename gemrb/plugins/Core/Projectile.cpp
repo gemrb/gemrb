@@ -128,7 +128,7 @@ void Projectile::CreateAnimations(Animation **anims, const ieResRef bamres, int 
 }
 
 //apply gradient colors
-void Projectile::SetupPalette(Animation *anim[], Palette *&pal, ieByte *gradients)
+void Projectile::SetupPalette(Animation *anim[], Palette *&pal, const ieByte *gradients)
 {
 	ieDword Colors[7];
 

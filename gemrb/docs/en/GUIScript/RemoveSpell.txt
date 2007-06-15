@@ -13,4 +13,4 @@ Return value: boolean, 1 on success
 
 See also: UnmemorizeSpell, GetKnownSpellsCount, GetKnownSpell, LearnSpell
 
-MD5: 09f911029d74e35bd84156c5635688c0
+MD5: 455fe10422ca29c4933f95052b792ab2

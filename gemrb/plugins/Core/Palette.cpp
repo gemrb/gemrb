@@ -54,7 +54,7 @@ Palette* Palette::Copy()
 	return pal;
 }
 
-void Palette::SetupPaperdollColours(ieDword* Colors, unsigned int type)
+void Palette::SetupPaperdollColours(const ieDword* Colors, unsigned int type)
 {
 	unsigned int s = 8*type;
 	//metal

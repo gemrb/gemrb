@@ -166,7 +166,7 @@ public: // Public Events
 	/** A special key has been pressed */
 	void OnSpecialKeyPress(unsigned char Key);
 	/** Set handler for specified event */
-	bool SetEvent(int eventType, EventHandler handler);
+	bool SetEvent(int eventType, const char *handler);
 	/** Button Pressed Event Script Function Name */
 	EventHandler ButtonOnPress;
 	EventHandler ButtonOnShiftPress;

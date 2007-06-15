@@ -243,8 +243,7 @@ void GameScript::SetNamelessClass(Scriptable* /*Sender*/, Action* parameters)
 void GameScript::SetNamelessDisguise(Scriptable* Sender, Action* parameters)
 {
 	SetVariable(Sender, "APPEARANCE", "GLOBAL", parameters->int0Parameter);
-  core->SetEventFlag(EF_UPDATEANIM);
-	//core->GetGUIScriptEngine()->RunFunction("UpdateAnimation");
+	core->SetEventFlag(EF_UPDATEANIM);
 }
 
 void GameScript::ChangeSpecifics(Scriptable* Sender, Action* parameters)

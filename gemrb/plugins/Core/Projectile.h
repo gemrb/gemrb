@@ -231,7 +231,7 @@ private:
 	int GetShadowPos(int face);
 	void SetPos(int face, int frame1, int frame2);
 	void NextTarget(Point &p);
-	void SetupPalette(Animation *anim[], Palette *&pal, ieByte *gradients);
+	void SetupPalette(Animation *anim[], Palette *&pal, const ieByte *gradients);
 };
 
 #endif // PROJECTILE_H

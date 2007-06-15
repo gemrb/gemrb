@@ -99,7 +99,7 @@ void strnspccpy(char* dest, const char *source, int count)
 	}
 }
 
-static unsigned char orientations[25]={
+static const unsigned char orientations[25]={
 6,7,8,9,10,
 5,6,8,10,11,
 4,4,0,12,12,

@@ -96,7 +96,7 @@ void Control::SetEventHandler(EventHandler handler, const char* funcName)
 	strncpy( handler, funcName, sizeof( EventHandler ) );
 }
 
-bool Control::SetEvent(int /*eventType*/, EventHandler /*handler*/)
+bool Control::SetEvent(int /*eventType*/, const char * /*handler*/)
 {
 	return false;
 }
@@ -104,7 +104,7 @@ bool Control::SetEvent(int /*eventType*/, EventHandler /*handler*/)
 int Control::RunEventHandler(EventHandler handler)
 {
 	if (InHandler) {
-		printf("[Control] Nested event handlers are not supported!");
+		printMessage("Control","Nested event handlers are not supported!", YELLOW);
 		return -1;
 	}
 	if (handler[0]) {

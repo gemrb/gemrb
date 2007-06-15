@@ -1,5 +1,5 @@
 IDS
-0x0	ACVsDamageTypeModifier
+0x0	ACVsDamageTypeModifierIWD2
 0x1	AttacksPerRoundModifier
 0x2	Cure:Sleep
 0x3	State:Berserk
@@ -326,7 +326,7 @@ IDS
 425	ControlUndead2
 426	Aegis
 427	ExecutionerEyes
-428	Banish
+428	Unsummon
 429	EffectsOnStruck
 430	EffectsOnProjectile
 431	EnergyDrain
@@ -337,9 +337,9 @@ IDS
 436	DamageReduction
 437	Disguise
 438	HeroicInspiration
-439	PreventAISlowdown
+439	OffscreenAIModifier
 440	BarbarianRage
-441	Slow
+441	MovementRateModifier4
 443	ProtectionFromArrows
 444	TensersTransformation
 446	SmiteEvil

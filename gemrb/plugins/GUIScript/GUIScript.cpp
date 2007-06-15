@@ -129,7 +129,7 @@ inline PyObject* PyString_FromResRef(char* ResRef)
 }
 
 // Like PyString_FromString(), but for ResRef
-inline PyObject* PyString_FromAnimID(char* AnimID)
+inline PyObject* PyString_FromAnimID(const char* AnimID)
 {
 	unsigned int i;
 
@@ -212,7 +212,7 @@ static inline void SetFunctionTooltip(int WindowIndex, int ControlIndex, char *t
 	core->SetTooltip((ieWord) WindowIndex, (ieWord) ControlIndex, "");
 }
 
-void ReadItemSounds()
+static void ReadItemSounds()
 {
 	int table = core->LoadTable( "itemsnd" );
 	if (table<0) {
@@ -1693,7 +1693,7 @@ PyDoc_STRVAR( GemRB_CreateLabel__doc,
 static PyObject* GemRB_CreateLabel(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlID, x, y, w, h, align;
-	char* font, * text;
+	char *font, *text;
 
 	if (!PyArg_ParseTuple( args, "iiiiiissi", &WindowIndex, &ControlID, &x,
 			&y, &w, &h, &font, &text, &align )) {
@@ -1752,7 +1752,7 @@ PyDoc_STRVAR( GemRB_CreateTextEdit__doc,
 static PyObject* GemRB_CreateTextEdit(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlID, x, y, w, h;
-	char* font, * text;
+	char *font, *text;
 
 	if (!PyArg_ParseTuple( args, "iiiiiiss", &WindowIndex, &ControlID, &x,
 			&y, &w, &h, &font, &text )) {
@@ -1826,7 +1826,7 @@ static PyObject* GemRB_SetButtonSprites(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex, cycle, unpressed, pressed, selected,
 		disabled;
-	char* ResRef;
+	char *ResRef;
 
 	if (!PyArg_ParseTuple( args, "iisiiiii", &WindowIndex, &ControlIndex,
 			&ResRef, &cycle, &unpressed, &pressed, &selected, &disabled )) {
@@ -1954,7 +1954,7 @@ PyDoc_STRVAR( GemRB_SetButtonFont__doc,
 static PyObject* GemRB_SetButtonFont(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
-	char* FontResRef;
+	char *FontResRef;
 
 	if (!PyArg_ParseTuple( args, "iis", &WindowIndex, &ControlIndex,
 			&FontResRef)) {
@@ -2131,7 +2131,7 @@ PyDoc_STRVAR( GemRB_CreateWorldMapControl__doc,
 static PyObject* GemRB_CreateWorldMapControl(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlID, x, y, w, h, direction;
-	char *font="";
+	char *font=NULL;
 
 	if (!PyArg_ParseTuple( args, "iiiiiii|s", &WindowIndex, &ControlID, &x,
 			&y, &w, &h, &direction, &font )) {
@@ -2152,7 +2152,7 @@ static PyObject* GemRB_CreateWorldMapControl(PyObject * /*self*/, PyObject* args
 		//flags = ctrl->Value;
 		win->DelControl( CtrlIndex );
 	}
-	WorldMapControl* wmap = new WorldMapControl( font, direction );
+	WorldMapControl* wmap = new WorldMapControl( font?font:"", direction );
 	wmap->XPos = x;
 	wmap->YPos = y;
 	wmap->Width = w;
@@ -2630,8 +2630,8 @@ PyDoc_STRVAR( GemRB_SetButtonPicture__doc,
 static PyObject* GemRB_SetButtonPicture(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
-	char* ResRef;
-	char* DefResRef = NULL;
+	char *ResRef;
+	char *DefResRef = NULL;
 
 	if (!PyArg_ParseTuple( args, "iis|s", &WindowIndex, &ControlIndex, &ResRef, &DefResRef )) {
 		return AttributeError( GemRB_SetButtonPicture__doc );
@@ -2670,7 +2670,7 @@ PyDoc_STRVAR( GemRB_SetButtonMOS__doc,
 static PyObject* GemRB_SetButtonMOS(PyObject * /*self*/, PyObject* args)
 {
 	int WindowIndex, ControlIndex;
-	char* ResRef;
+	char *ResRef;
 
 	if (!PyArg_ParseTuple( args, "iis", &WindowIndex, &ControlIndex, &ResRef )) {
 		return AttributeError( GemRB_SetButtonMOS__doc );
@@ -2726,7 +2726,7 @@ static PyObject* GemRB_SetButtonPLT(PyObject * /*self*/, PyObject* args)
 	int WindowIndex, ControlIndex;
 	ieDword col[8];
 	int type = 0;
-	char* ResRef;
+	char *ResRef;
 
 	memset(col,-1,sizeof(col));
 	if (!PyArg_ParseTuple( args, "iis|iiiiiiiii", &WindowIndex, &ControlIndex,
@@ -2861,7 +2861,7 @@ static PyObject* SetButtonBAM(int wi, int ci, const char *ResRef, int CycleIndex
 static PyObject* GemRB_SetButtonBAM(PyObject * /*self*/, PyObject* args)
 {
 	int wi, ci, CycleIndex, FrameIndex, col1 = -1;
-	char* ResRef;
+	char *ResRef;
 
 	if (!PyArg_ParseTuple( args, "iisii|i", &wi, &ci,
 			&ResRef, &CycleIndex, &FrameIndex, &col1 )) {
@@ -2882,7 +2882,7 @@ PyDoc_STRVAR( GemRB_SetAnimation__doc,
 static PyObject* GemRB_SetAnimation(PyObject * /*self*/, PyObject* args)
 {
 	int wi, ci;
-	char* ResRef;
+	char *ResRef;
 	int Cycle = 0;
 
 	if (!PyArg_ParseTuple( args, "iis|i", &wi, &ci, &ResRef, &Cycle )) {
@@ -2927,7 +2927,7 @@ PyDoc_STRVAR( GemRB_PlaySound__doc,
 
 static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 {
-	char* ResRef;
+	char *ResRef;
 
 	if (!PyArg_ParseTuple( args, "s", &ResRef )) {
 		return AttributeError( GemRB_PlaySound__doc );
@@ -2975,7 +2975,7 @@ PyDoc_STRVAR( GemRB_LoadMusicPL__doc,
 
 static PyObject* GemRB_LoadMusicPL(PyObject * /*self*/, PyObject* args)
 {
-	char* ResRef;
+	char *ResRef;
 	int HardEnd = 0;
 
 	if (!PyArg_ParseTuple( args, "s|i", &ResRef, &HardEnd )) {
@@ -3018,8 +3018,8 @@ PyDoc_STRVAR( GemRB_SetToken__doc,
 
 static PyObject* GemRB_SetToken(PyObject * /*self*/, PyObject* args)
 {
-	char* Variable;
-	char* value;
+	char *Variable;
+	char *value;
 
 	if (!PyArg_ParseTuple( args, "ss", &Variable, &value )) {
 		return AttributeError( GemRB_SetToken__doc );
@@ -3036,7 +3036,7 @@ PyDoc_STRVAR( GemRB_SetVar__doc,
 
 static PyObject* GemRB_SetVar(PyObject * /*self*/, PyObject* args)
 {
-	char* Variable;
+	char *Variable;
 	//this should be 32 bits, always, but i cannot tell that to Python
 	unsigned long value;
 
@@ -3069,8 +3069,8 @@ PyDoc_STRVAR( GemRB_GetToken__doc,
 
 static PyObject* GemRB_GetToken(PyObject * /*self*/, PyObject* args)
 {
-	char* Variable;
-	char* value;
+	char *Variable;
+	char *value;
 
 	if (!PyArg_ParseTuple( args, "s", &Variable )) {
 		return AttributeError( GemRB_GetToken__doc );
@@ -3090,7 +3090,7 @@ PyDoc_STRVAR( GemRB_GetVar__doc,
 
 static PyObject* GemRB_GetVar(PyObject * /*self*/, PyObject* args)
 {
-	char* Variable;
+	char *Variable;
 	ieDword value;
 
 	if (!PyArg_ParseTuple( args, "s", &Variable )) {
@@ -3113,8 +3113,8 @@ PyDoc_STRVAR( GemRB_CheckVar__doc,
 
 static PyObject* GemRB_CheckVar(PyObject * /*self*/, PyObject* args)
 {
-	char* Variable;
-	char* Context;
+	char *Variable;
+	char *Context;
 
 	if (!PyArg_ParseTuple( args, "ss", &Variable, &Context )) {
 		return AttributeError( GemRB_CheckVar__doc );
@@ -3144,8 +3144,8 @@ PyDoc_STRVAR( GemRB_SetGlobal__doc,
 
 static PyObject* GemRB_SetGlobal(PyObject * /*self*/, PyObject* args)
 {
-	char* Variable;
-	char* Context;
+	char *Variable;
+	char *Context;
 	int Value;
 
 	if (!PyArg_ParseTuple( args, "ssi", &Variable, &Context, &Value )) {
@@ -3174,7 +3174,7 @@ PyDoc_STRVAR( GemRB_GetGameVar__doc,
 
 static PyObject* GemRB_GetGameVar(PyObject * /*self*/, PyObject* args)
 {
-	char* Variable;
+	char *Variable;
 	ieDword value;
 
 	if (!PyArg_ParseTuple( args, "s", &Variable )) {
@@ -3194,7 +3194,7 @@ PyDoc_STRVAR( GemRB_PlayMovie__doc,
 
 static PyObject* GemRB_PlayMovie(PyObject * /*self*/, PyObject* args)
 {
-	char* string;
+	char *string;
 	int flag = 0;
 
 	if (!PyArg_ParseTuple( args, "s|i", &string, &flag )) {
@@ -3854,7 +3854,8 @@ PyDoc_STRVAR( GemRB_GetINIQuestsKey__doc,
 
 static PyObject* GemRB_GetINIQuestsKey(PyObject * /*self*/, PyObject* args)
 {
-	char* Tag, * Key, * Default;
+	char *Tag, *Key, *Default;
+
 	if (!PyArg_ParseTuple( args, "sss", &Tag, &Key, &Default )) {
 		return AttributeError( GemRB_GetINIQuestsKey__doc );
 	}
@@ -3871,7 +3872,8 @@ PyDoc_STRVAR( GemRB_GetINIBeastsKey__doc,
 
 static PyObject* GemRB_GetINIBeastsKey(PyObject * /*self*/, PyObject* args)
 {
-	char* Tag, * Key, * Default;
+	char *Tag, *Key, *Default;
+
 	if (!PyArg_ParseTuple( args, "sss", &Tag, &Key, &Default )) {
 		return AttributeError( GemRB_GetINIBeastsKey__doc );
 	}
@@ -3888,7 +3890,8 @@ PyDoc_STRVAR( GemRB_GetINIPartyKey__doc,
 
 static PyObject* GemRB_GetINIPartyKey(PyObject * /*self*/, PyObject* args)
 {
-	char* Tag, * Key, * Default;
+	char *Tag, *Key, *Default;
+
 	if (!PyArg_ParseTuple( args, "sss", &Tag, &Key, &Default )) {
 		return AttributeError( GemRB_GetINIPartyKey__doc );
 	}
@@ -3905,7 +3908,7 @@ PyDoc_STRVAR( GemRB_CreatePlayer__doc,
 
 static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 {
-	char* CreResRef;
+	char *CreResRef;
 	int PlayerSlot, Slot;
 	int Import=0;
 
@@ -4434,7 +4437,7 @@ PyObject *SetSpellIcon(int wi, int ci, ieResRef SpellResRef, int type, int toolt
 		return NULL;
 	}
 
-	if (! SpellResRef[0]) {
+	if (!SpellResRef[0]) {
 		btn->SetPicture( NULL );
 		//no incref here!
 		return Py_None;
@@ -4484,7 +4487,7 @@ PyObject *SetSpellIcon(int wi, int ci, ieResRef SpellResRef, int type, int toolt
 static PyObject* GemRB_SetSpellIcon(PyObject * /*self*/, PyObject* args)
 {
 	int wi, ci;
-	char* SpellResRef;
+	char *SpellResRef;
 	int type=0;
 	int tooltip=0;
 	int Function=0;
@@ -4539,64 +4542,65 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 		return NULL;
 	}
 
-	if (ItemResRef[0]) {
-		Item* item = core->GetItem(ItemResRef);
-		if (item == NULL) {
-			btn->SetPicture(NULL);
-			//no incref here!
-			return Py_None;
-		}
-
-		btn->SetFlags( IE_GUI_BUTTON_PICTURE, BM_OR );
-		Sprite2D* Picture;
-		bool setpicture = true;
-		int i;
-		switch (Which) {
-		case 0: case 1:
-			Picture = core->GetBAMSprite(item->ItemIcon, -1, Which);
-			break;
-		case 2:
-			btn->SetPicture( NULL ); // also calls ClearPictureList
-			for (i=0;i<4;i++) {
-				Picture = core->GetBAMSprite(item->DescriptionIcon, -1, i);
-				if (Picture)
-					btn->StackPicture(Picture);
-			}
-			setpicture = false;
-			Picture = NULL;
-			break;
-		case 4: case 5:
-			Picture = GetUsedWeaponIcon(item, Which-4);
-			if (Item2ResRef) {
-				btn->SetPicture( NULL ); // also calls ClearPictureList
-				Item* item2 = core->GetItem(Item2ResRef);
-				if (item2) {
-					Sprite2D* Picture2;
-					Picture2 = core->GetBAMSprite(item2->ItemIcon, -1, Which-4);
-					if (Picture2) btn->StackPicture(Picture2);
-					core->FreeItem( item2, Item2ResRef, false );
-				}
-				if (Picture) btn->StackPicture(Picture);
-				setpicture = false;
-			}
-			break;
-		default:
-			Picture = NULL;
-		}
-
-		if (setpicture)
-			btn->SetPicture( Picture );
-		if (tooltip) {
-			//later getitemname could also return tooltip stuff
-			char *str = core->GetString(item->GetItemName(tooltip==2),0);
-			//this will free str, no need of freeing it
-			SetFunctionTooltip(wi, ci, str, Function);
-		}
-
-		core->FreeItem( item, ItemResRef, false );
-	} else {
+	if (!ItemResRef[0]) {
 		btn->SetPicture( NULL );
+		//no incref here!
+		return Py_None;
 	}
+	Item* item = core->GetItem(ItemResRef);
+	if (item == NULL) {
+		btn->SetPicture(NULL);
+		//no incref here!
+		return Py_None;
+	}
+	
+	btn->SetFlags( IE_GUI_BUTTON_PICTURE, BM_OR );
+	Sprite2D* Picture;
+	bool setpicture = true;
+	int i;
+	switch (Which) {
+	case 0: case 1:
+		Picture = core->GetBAMSprite(item->ItemIcon, -1, Which);
+		break;
+	case 2:
+		btn->SetPicture( NULL ); // also calls ClearPictureList
+		for (i=0;i<4;i++) {
+			Picture = core->GetBAMSprite(item->DescriptionIcon, -1, i);
+			if (Picture)
+				btn->StackPicture(Picture);
+		}
+		setpicture = false;
+		Picture = NULL;
+		break;
+	case 4: case 5:
+		Picture = GetUsedWeaponIcon(item, Which-4);
+		if (Item2ResRef) {
+			btn->SetPicture( NULL ); // also calls ClearPictureList
+			Item* item2 = core->GetItem(Item2ResRef);
+			if (item2) {
+				Sprite2D* Picture2;
+				Picture2 = core->GetBAMSprite(item2->ItemIcon, -1, Which-4);
+				if (Picture2) btn->StackPicture(Picture2);
+				core->FreeItem( item2, Item2ResRef, false );
+			}
+			if (Picture) btn->StackPicture(Picture);
+			setpicture = false;
+		}
+		break;
+	default:
+		Picture = NULL;
+	}
+	
+	if (setpicture)
+		btn->SetPicture( Picture );
+	if (tooltip) {
+		//later getitemname could also return tooltip stuff
+		char *str = core->GetString(item->GetItemName(tooltip==2),0);
+		//this will free str, no need of freeing it
+		SetFunctionTooltip(wi, ci, str, Function);
+	}
+	
+	core->FreeItem( item, ItemResRef, false );
 	//no incref here!
 	return Py_None;
 }
@@ -4604,11 +4608,11 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 static PyObject* GemRB_SetItemIcon(PyObject * /*self*/, PyObject* args)
 {
 	int wi, ci;
-	char* ItemResRef;
+	char *ItemResRef;
 	int Which = 0;
 	int tooltip = 0;
 	int Function = 0;
-	const char* Item2ResRef = 0;
+	const char *Item2ResRef = NULL;
 
 	if (!PyArg_ParseTuple( args, "iis|iiis", &wi, &ci, &ItemResRef, &Which, &tooltip, &Function, &Item2ResRef )) {
 		return AttributeError( GemRB_SetItemIcon__doc );
@@ -6936,7 +6940,7 @@ static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 	for (i=0;i<GUIBT_COUNT-(more?1:0);i++) {
 		int ci = core->GetControl(wi, i+(Start?1:0) );
 		Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
-		btn->SetEvent(IE_GUI_BUTTON_ON_PRESS,"EquipmentPressed");
+		btn->SetEvent(IE_GUI_BUTTON_ON_PRESS, "EquipmentPressed");
 		strcpy(btn->VarName,"Equipment");
 		btn->Value = Start+i;
 

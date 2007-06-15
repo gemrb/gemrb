@@ -548,7 +548,7 @@ void pcf_animid(Actor *actor, ieDword Value)
 	actor->SetAnimationID(Value);
 }
 
-static void SetLockedPalette(Actor *actor, ieDword *gradients)
+static void SetLockedPalette(Actor *actor, const ieDword *gradients)
 {
 	CharAnimations *anims = actor->GetAnims();
 	if (!anims) return; //cannot apply it (yet)
@@ -564,9 +564,9 @@ static void UnlockPalette(Actor *actor)
 	}
 }
 
-ieDword fullwhite[7]={ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT};
+static const ieDword fullwhite[7]={ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT};
 
-ieDword fullstone[7]={STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT};
+static const ieDword fullstone[7]={STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT};
 
 void pcf_state(Actor *actor, ieDword Value)
 {

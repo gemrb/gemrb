@@ -272,7 +272,7 @@ int Slider::SetText(const char* /*string*/, int /*pos*/)
 	return 0;
 }
 
-bool Slider::SetEvent(int eventType, EventHandler handler)
+bool Slider::SetEvent(int eventType, const char *handler)
 {
 	Changed = true;
 

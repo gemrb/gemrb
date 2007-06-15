@@ -133,13 +133,13 @@ public: //Events
 	/** Reset/init event handler */
 	void ResetEventHandler(EventHandler handler);
 	/** Set handler from function name */
-	void SetEventHandler(EventHandler handler, const char* funcName);
+	void SetEventHandler(EventHandler handler, const char *funcName);
 	/** Returns the Owner */
 	Window *GetOwner() const { return Owner; }
 	/** Set the Flags */
 	int SetFlags(int arg_flags, int opcode);
 	/** Set handler for specified event. Override in child classes */
-	virtual bool SetEvent(int eventType, EventHandler handler);
+	virtual bool SetEvent(int eventType, const char *handler);
 	/** Run specified handler, it may return error code */
 	int RunEventHandler(EventHandler handler);
 	/** Key Press Event */

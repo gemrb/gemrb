@@ -127,7 +127,7 @@ private:
 	char WeaponRef[2];
 	char OffhandRef[2];
 public:
-	ieDword *Colors;  //these are the custom color indices
+	const ieDword *Colors;  //these are the custom color indices
 	RGBModifier ColorMods[32]; // color modification effects
 	unsigned long lastModUpdate;
 	RGBModifier GlobalColorMod; // global color modification effect
@@ -151,8 +151,8 @@ public:
 	void SetWeaponRef(const char* ref);
 	void SetOffhandRef(const char* ref);
 	void SetupColors(PaletteType type);
-	void SetColors(ieDword *Colors);
-	void LockPalette(ieDword *Colors);
+	void SetColors(const ieDword *Colors);
+	void LockPalette(const ieDword *Colors);
 
 	// returns an array of animations of size GetTotalPartCount()
 	Animation** GetAnimation(unsigned char Stance, unsigned char Orient);

@@ -169,8 +169,11 @@ public:
 	void ApplyAllEffects(Actor* target);
 	/* returns true if the process should abort applying a stack of effects */
 	int ApplyEffect(Actor* target, Effect* fx, bool first_apply);
+
 	/* directly removes effects with specified opcode, use effect_reference when you can */
 	void RemoveAllEffects(ieDword opcode);
+	void RemoveAllEffectsWithResource(ieDword opcode, const ieResRef resource);
+
 	/* removes all effects of a given spell */
 	void RemoveAllEffects(ieResRef Removed);
 	void RemoveAllEffects(ieResRef Removed, ieDword timing);
@@ -183,6 +186,7 @@ public:
 	void RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword param2);
 	void RemoveAllEffectsWithResource(EffectRef &effect_reference, const ieResRef resource);
 	void RemoveLevelEffects(ieDword level, ieDword flags, ieDword match);
+
 	Effect *GetEffect(ieDword idx) const;
 	/* returns true if the timing method supports simplified duration */
 	static bool HasDuration(Effect *fx);
@@ -219,7 +223,6 @@ public:
 private:
 	//use the effect reference style calls from outside
 	static Effect *CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieDword timing);
-	void RemoveAllEffectsWithResource(ieDword opcode, const ieResRef resource);
 	void RemoveAllEffectsWithParam(ieDword opcode, ieDword param2);
 	Effect *HasOpcode(ieDword opcode) const;
 	Effect *HasOpcodeWithParam(ieDword opcode, ieDword param2) const;

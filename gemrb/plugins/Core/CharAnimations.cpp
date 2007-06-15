@@ -212,7 +212,7 @@ void CharAnimations::SetOffhandRef(const char* ref)
 	core->FreePalette(modifiedPalette[PAL_OFFHAND], 0);
 }
 
-void CharAnimations::LockPalette(ieDword *gradients)
+void CharAnimations::LockPalette(const ieDword *gradients)
 {
 	if (lockPalette) return;
 	//cannot lock colors for PST animations
@@ -228,7 +228,7 @@ void CharAnimations::LockPalette(ieDword *gradients)
 	}
 }
 
-void CharAnimations::SetColors(ieDword *arg)
+void CharAnimations::SetColors(const ieDword *arg)
 {
 	Colors = arg;
 	SetupColors(PAL_MAIN);
