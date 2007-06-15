@@ -2538,7 +2538,7 @@ int Interface::SetCreatureStat(unsigned int Slot, unsigned int StatID,
 	return 1;
 }
 
-void Interface::RedrawControls(char *varname, unsigned int value)
+void Interface::RedrawControls(const char *varname, unsigned int value)
 {
 	for (unsigned int i = 0; i < windows.size(); i++) {
 		Window *win = windows[i];
