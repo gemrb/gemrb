@@ -217,7 +217,7 @@ IDS
 0xd7	PlayVisualEffect
 0xd8	LevelDrainModifier
 0xd9	PowerWordSleep
-0xda	StoneskinModifier
+0xda	IronSkins
 0xdb	ACVsCreatureType
 0xdc	DispelSchool
 0xdd	DispelSecondaryType

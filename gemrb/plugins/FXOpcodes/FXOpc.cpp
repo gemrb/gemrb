@@ -221,6 +221,7 @@ int fx_find_traps (Actor* Owner, Actor* target, Effect *fx);//96
 int fx_replace_creature (Actor* Owner, Actor* target, Effect *fx);//97
 int fx_play_movie (Actor* Owner, Actor* target, Effect* fx);//98
 int fx_set_sanctuary_state (Actor* Owner, Actor* target, Effect* fx);//99
+int fx_set_sanctuary_state2 (Actor* Owner, Actor* target, Effect* fx);//99
 int fx_set_entangle_state (Actor* Owner, Actor* target, Effect* fx);//9a
 int fx_set_minorglobe_state (Actor* Owner, Actor* target, Effect* fx);//9b
 int fx_set_shieldglobe_state (Actor* Owner, Actor* target, Effect* fx);//9c
@@ -729,6 +730,15 @@ FXOpc::~FXOpc(void)
 {
 	core->FreeResRefTable(casting_glows, cgcount);
 	core->FreeResRefTable(spell_hits, shcount);
+}
+
+static inline void SetGradient(Actor *target, ieDword gradient)
+{
+	gradient |= (gradient <<16);
+	gradient |= (gradient <<8);
+	for(int i=0;i<7;i++) {
+	  STAT_SET(IE_COLORS+i, gradient);
+	}
 }
 
 static inline void HandleBonus(Actor *target, int stat, int mod, int mode)
@@ -2347,12 +2357,24 @@ int fx_spell_duration_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	}
 	return FX_APPLIED;
 }
-
-// 0x64, 65, 66 Protection:Creature
+// 0x64, 65 Protection:Creature
 int fx_generic_effect (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_generic_effect (%2d): Param1: %d, Param2: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	return FX_APPLIED;
+}
+
+//0x66 Protection:Level
+int fx_protection_from_spell_level (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_protection_from_spell_level (%2d) Level: %d\n", fx->Opcode, fx->Parameter1);
+
+	int value = fx->Parameter1;
+	if (value<9) {
+	  STAT_BIT_OR(IE_MINORGLOBE, 1<<value);
+	  return FX_APPLIED;
+	}
+	return FX_NOT_APPLIED;
 }
 
 //0x67 ChangeName
@@ -3008,8 +3030,17 @@ int fx_play_movie (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 // 0x99 Overlay:Sanctuary
 int fx_set_sanctuary_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
+	//iwd and bg are a bit different, but we solve the whole stuff in a single opcode
 	if (0) printf( "fx_set_sanctuary_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STAT_SET_PCF( IE_SANCTUARY, 1);
+	if (!fx->Parameter2) {
+	  //this is just one way to decide if we have iwd or bg
+	  if(core->HasFeature(GF_MAGICBIT)) {
+	    fx->Parameter2=1;
+	  } else {
+	    fx->Parameter2=2;
+	  }
+	}
+	STAT_SET_PCF( IE_SANCTUARY, fx->Parameter2);
 	return FX_APPLIED;
 }
 
@@ -3018,7 +3049,6 @@ int fx_set_entangle_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_entangle_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET_PCF( IE_ENTANGLE, 1);
-	//STAT_SET(IE_MOVEMENTRATE, 0); //
 	return FX_APPLIED;
 }
 
@@ -3026,7 +3056,9 @@ int fx_set_entangle_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_minorglobe_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_minorglobe_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STAT_SET_PCF( IE_MINORGLOBE, 1);
+	//the resisted levels are stored in minor globe (bit 2-)
+	//the globe effect is stored in the first bit
+	STAT_BIT_OR_PCF( IE_MINORGLOBE, 1);
 	return FX_APPLIED;
 }
 
@@ -3634,6 +3666,7 @@ int fx_stoneskin_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_stoneskin_modifier (%2d): Mod: %d\n", fx->Opcode, fx->Parameter1 );
 	STAT_SET(IE_STONESKINS, fx->Parameter1);
+	SetGradient(target, 14);
 	return FX_APPLIED;
 }
 //0xDB ac vs creature type (general effect)
@@ -4570,6 +4603,7 @@ int fx_golem_stoneskin_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_golem_stoneskin_modifier (%2d): Mod: %d\n", fx->Opcode, fx->Parameter2 );
 	STAT_SET(IE_STONESKINSGOLEM, fx->Parameter1);
+	SetGradient(target, 14);
 	return FX_APPLIED;
 }
 

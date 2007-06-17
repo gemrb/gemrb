@@ -324,7 +324,7 @@ void CharAnimations::SetupColors(PaletteType type)
 	}
 
 	pal->SetupPaperdollColours(Colors, (int)type);
-	if (!lockPalette) {
+	if (lockPalette) {
 		return;
 	}
 

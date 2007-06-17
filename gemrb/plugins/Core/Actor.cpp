@@ -664,7 +664,7 @@ void pcf_entangle(Actor *actor, ieDword Value)
 
 //de/activates the sanctuary overlay
 //the sanctuary effect draws the globe half transparent
-
+//if value has the 2 bit set, the palette will be altered to full white
 void pcf_sanctuary(Actor *actor, ieDword Value)
 {
 	if (Value) {
@@ -672,7 +672,9 @@ void pcf_sanctuary(Actor *actor, ieDword Value)
 			ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_SANCTUARY], false);
 			actor->AddVVCell(sca);
 		}
-		SetLockedPalette(actor, fullwhite);
+	  if (Value&2) {
+		  SetLockedPalette(actor, fullwhite);
+	  }
 		return;
 	}
 	actor->RemoveVVCell(overlay[OV_SANCTUARY], true);
@@ -2493,6 +2495,7 @@ void Actor::SetColorMod( ieDword location, RGBModifier::Type type, int speed,
 		ca->GlobalColorMod.rgb.r = r;
 		ca->GlobalColorMod.rgb.g = g;
 		ca->GlobalColorMod.rgb.b = b;
+	  ca->GlobalColorMod.rgb.a = 0;
 		if (phase >= 0)
 			ca->GlobalColorMod.phase = phase;
 		else {
@@ -2509,6 +2512,7 @@ void Actor::SetColorMod( ieDword location, RGBModifier::Type type, int speed,
 	ca->ColorMods[location].rgb.r = r;
 	ca->ColorMods[location].rgb.g = g;
 	ca->ColorMods[location].rgb.b = b;
+	ca->ColorMods[location].rgb.a = 0;
 	if (phase >= 0)
 		ca->ColorMods[location].phase = phase;
 	else {

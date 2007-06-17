@@ -38,19 +38,28 @@ static int shcount = -1;
 #define PI_NAUSEA       43
 #define PI_HOPELESSNESS 47
 #define PI_RIGHTEOUS    67
+#define PI_ELEMENTS     76
 #define PI_FAITHARMOR   84
+#define PI_BLEEDING     85
 #define PI_HOLYPOWER    86
 #define PI_DEATHWARD    87
 #define PI_UNCONSCIOUS  88
 #define PI_ENFEEBLEMENT 90
 #define PI_ELEMPROT     93
+#define PI_MINORGLOBE   96
+#define PI_MAJORGLOBE   97
+
 #define PI_ENTROPY      103
 #define PI_STORMSHELL   105
+#define PI_LOWERRESIST  106
 
 #define PI_AEGIS        119
 #define PI_EXECUTIONER  120
 #define PI_FIRESHIELD   121
 #define PI_ICESHIELD    122
+
+#define PI_BLINK        130
+#define PI_EMPTYBODY    145
 
 #define SS_HOPELESSNESS 0
 #define SS_PROTFROMEVIL 1
@@ -117,8 +126,57 @@ static int shcount = -1;
 #define SS_GHOSTARMOR   62
 #define SS_REFLECTION   63
 #define SS_KAI          64
+#define SS_CALLEDSHOT   65
+#define SS_MIRRORIMAGE  66
+#define SS_TURNED       67
+#define SS_BLADEBARRIER 68
+#define SS_POISONWEAPON 69
+#define SS_STUNNINGBLOW 70
+#define SS_QUIVERPALM   71
+#define SS_DOMINATION   72
+#define SS_MAJORGLOBE   73
+#define SS_SHIELD       74
+#define SS_ANTIMAGIC    75
+#define SS_POWERATTACK  76
+//more powerattack
+#define SS_EXPERTISE    81
+//more expertise
+#define SS_ARTERIAL     86
+#define SS_HAMSTRING    87
+#define SS_RAPIDSHOT    88
+#define SS_IRONBODY     89
+#define SS_TENSER       90
+#define SS_SMITEEVIL    91
+#define SS_ALICORNLANCE 92
+#define SS_LIGHTNING    93
+#define SS_CHAMPIONS    94
+#define SS_BONECIRCLE   95
+#define SS_CLOAKOFFEAR  96
+#define SS_PESTILENCE   97
+#define SS_CONTAGION    98
+#define SS_BANE         99
+#define SS_DEFENSIVE    100
+#define SS_DESTRUCTION  101
+#define SS_DOLOROUS     102
+#define SS_DOOM         103
+#define SS_EXALTATION   104
+#define SS_FAERIEFIRE   105
+#define SS_FINDTRAPS    106
+#define SS_GREATERLATH  107
+#define SS_MAGICRESIST  108
+#define SS_NPROTECTION  109
+#define SS_PROTFROMFIRE 110
+#define SS_PROTFROMLIGHTNING 111
+#define SS_ELEMENTAL    112
+#define SS_LATHANDER    113
+#define SS_SLOWPOISON   114
+#define SS_SPELLSHIELD  115
+#define SS_STATICCHARGE 116
+#define SS_LOWERRESIST  140
+#define SS_
 
 static int fx_ac_vs_damage_type_modifier_iwd2 (Actor* Owner, Actor* target, Effect* fx);//0
+static int fx_ironskins (Actor* Owner, Actor* target, Effect* fx);//da (iwd2)
 static int fx_fade_rgb (Actor* Owner, Actor* target, Effect* fx);//e8
 static int fx_iwd_visual_spell_hit (Actor* Owner, Actor* target, Effect* fx);//e9
 static int fx_cold_damage (Actor* Owner, Actor* target, Effect* fx);//ea
@@ -147,7 +205,7 @@ static int fx_remove_effects (Actor* Owner, Actor* target, Effect* fx); //fe
 static int fx_salamander_aura (Actor* Owner, Actor* target, Effect* fx); //ff
 static int fx_umberhulk_gaze (Actor* Owner, Actor* target, Effect* fx); //100
 static int fx_zombielord_aura (Actor* Owner, Actor* target, Effect* fx); //101
-//int fx_resist_spell (Actor* Owner, Actor* target, Effect* fx); //102
+static int fx_resist_spell (Actor* Owner, Actor* target, Effect* fx); //102
 static int fx_summon_creature2 (Actor* Owner, Actor* target, Effect* fx); //103
 //int fx_avatar_removal (Actor* Owner, Actor* target, Effect* fx); //104
 //int fx_immunity_effect2 (Actor* Owner, Actor* target, Effect* fx); //105
@@ -215,10 +273,12 @@ static int fx_protection_from_elements (Actor* Owner, Actor* target, Effect* fx)
 static int fx_aegis (Actor* Owner, Actor* target, Effect* fx); //426
 static int fx_executioner_eyes (Actor* Owner, Actor* target, Effect* fx); //427
 //static int fx_prevent_ai_slowdown (Actor* Owner, Actor* target, Effect* fx); //439
+static int fx_bane (Actor* Owner, Actor* target, Effect* fx); //452
 
 //No need to make these ordered, they will be ordered by EffectQueue
 static EffectRef effectnames[] = {
 	{ "ACVsDamageTypeModifierIWD2", fx_ac_vs_damage_type_modifier_iwd2, 0}, //0
+	{ "IronSkins", fx_ironskins, 0}, //da (iwd2)
 	{ "Color:FadeRGB", fx_fade_rgb, 0}, //e8
 	{ "IWDVisualSpellHit", fx_iwd_visual_spell_hit, 0}, //e9
 	{ "ColdDamage", fx_cold_damage, 0}, //ea
@@ -299,6 +359,7 @@ static EffectRef effectnames[] = {
 	{ "ExecutionerEyes", fx_executioner_eyes, 0}, //427
 
 	//{ "PreventAISlowDown", fx_prevent_ai_slowdown, 0}, //439 same as bg2
+	{ "Bane", fx_bane, 0},
 	{ NULL, NULL, 0 },
 };
 
@@ -433,14 +494,33 @@ static int check_iwd_targeting(Actor* Owner, Actor* target, ieDword value, ieDwo
 	}
 }
 
+static inline void SetGradient(Actor *target, ieDword gradient)
+{
+	gradient |= (gradient <<16);
+	gradient |= (gradient <<8);
+	for(int i=0;i<7;i++) {
+		STAT_SET(IE_COLORS+i, gradient);
+	}
+}
+
 //returns true if spell state is already set or illegal
-static bool SetSpellState(Actor *target, unsigned int spellstate)
+static inline bool SetSpellState(Actor *target, unsigned int spellstate)
 {
 	if (spellstate>=192) return true;
 	unsigned int pos = IE_SPLSTATE_ID1+(spellstate>>5);
 	unsigned int bit = 1<<(spellstate&31);
 	if (target->GetStat(pos)&bit) return true;
 	STAT_BIT_OR(pos, bit);
+	return false;
+}
+
+//returns true if the feat exists
+static inline bool HasFeat(Actor *target, unsigned int featindex)
+{
+	if (featindex>=96) return false;
+	unsigned int pos = IE_FEATS1+(featindex>>5);
+	unsigned int bit = 1<<(featindex&31);
+	if (target->GetStat(pos)&bit) return true;
 	return false;
 }
 
@@ -537,7 +617,25 @@ int fx_ac_vs_damage_type_modifier_iwd2 (Actor* /*Owner*/, Actor* target, Effect*
 	return FX_PERMANENT;
 }
 
-// 0xe8 Colour:FadeRGB
+//0xda IronSkins (iwd2)
+int fx_ironskins (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	//todo: calculate buffered damage in param3 on first run
+	//somehow deduct suffered damage from param3
+	//abort effect when param3 goes below 0
+	if (fx->Parameter2) {
+		//ironskins
+		if (SetSpellState(target, SS_IRONSKIN)) return FX_NOT_APPLIED;
+		
+		return FX_APPLIED;
+	}
+	//stoneskins (iwd2)
+	if (SetSpellState(target, SS_STONESKIN)) return FX_NOT_APPLIED;
+	SetGradient(target, 14);
+	return FX_APPLIED;
+}
+
+//0xe8 Colour:FadeRGB
 int fx_fade_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_fade_rgb (%2d): \n", fx->Opcode  );
@@ -938,6 +1036,7 @@ int fx_zombielord_aura (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0x102 Protection:Spell (this is the same as in bg2?)
+
 //0x103 SummonCreature2
 
 static int eamods[]={EAM_DEFAULT,EAM_SOURCEALLY,EAM_SOURCEENEMY,EAM_NEUTRAL};
@@ -1216,6 +1315,7 @@ int fx_animal_rage (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_SET( IE_CHECKFORBERSERK, 1 );
 	return FX_APPLIED;
 }
+
 //0x118 TurnUndead how
 int fx_turn_undead (Actor* Owner, Actor* target, Effect* fx)
 {
@@ -1256,6 +1356,7 @@ int fx_turn_undead2 (Actor* Owner, Actor* target, Effect* fx)
 	}
 	return FX_APPLIED;
 }
+
 //0x119 VitriolicSphere
 int fx_vitriolic_sphere (Actor* Owner, Actor* target, Effect* fx)
 {
@@ -1397,6 +1498,7 @@ int fx_harpy_wail (Actor* /*Owner*/, Actor* target, Effect* fx)
 	target->Panic();
 	return FX_NOT_APPLIED;
 }
+
 //0x127 JackalWereGaze (Charm ?)
 int fx_jackalwere_gaze (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1406,6 +1508,7 @@ int fx_jackalwere_gaze (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 //0x128 ModifyGlobalVariable (same as bg2)
 //0x129 HideInShadows (same as bg2)
+
 //0x12a UseMagicDevice
 int fx_use_magic_device_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1443,6 +1546,7 @@ int fx_protection_from_evil (Actor* /*Owner*/, Actor* target, Effect* fx)
 	//immune to control
 	return FX_APPLIED;
 }
+
 //402 AddEffectsList
 int fx_add_effects_list (Actor* Owner, Actor* target, Effect* fx)
 {
@@ -1484,6 +1588,7 @@ int fx_nausea (Actor* Owner, Actor* target, Effect* fx)
 	STATE_SET(STATE_HELPLESS|STATE_SLEEP);
 	return FX_APPLIED;
 }
+
 //405 Enfeeblement
 //minimum stats in 3rd ed are 1, so this effect won't kill the target
 int fx_enfeeblement (Actor* /*Owner*/, Actor* target, Effect* fx)
@@ -1494,6 +1599,7 @@ int fx_enfeeblement (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD(IE_STR, -15);
 	return FX_APPLIED;
 }
+
 //406 FireShield
 int fx_fireshield (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1508,22 +1614,28 @@ int fx_fireshield (Actor* /*Owner*/, Actor* target, Effect* fx)
 	//target->SetSpellOnHit(fx->Resource);
 	return FX_APPLIED;
 }
+
 //407 DeathWard
 int fx_death_ward (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_death_ward (%2d)\n", fx->Opcode);
 	if (SetSpellState(target, SS_DEATHWARD)) return FX_APPLIED;
 	target->AddPortraitIcon(PI_DEATHWARD); // is it ok?
+
 	return FX_APPLIED;
 }
+
 //408 HolyPower
 int fx_holy_power (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_holy_power (%2d)\n", fx->Opcode);
 	if (SetSpellState(target, SS_HOLYPOWER)) return FX_APPLIED;
 	target->AddPortraitIcon(PI_HOLYPOWER);
+
+	target->SetColorMod(0xff, RGBModifier::ADD, 20, 0x80, 0x80, 0x80);
 	return FX_APPLIED;
 }
+
 //409 RighteousWrath
 int fx_righteous_wrath (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1539,13 +1651,23 @@ int fx_righteous_wrath (Actor* /*Owner*/, Actor* target, Effect* fx)
 		if (SetSpellState(target, SS_RIGHTEOUS)) return FX_APPLIED;
 		//
 	}
+	target->SetColorMod(0xff, RGBModifier::ADD, 30, 0xd7, 0xb6, 0 );
 	return FX_APPLIED;
 }
+
 //410 SummonAllyIWD2
+
 //411 SummonEnemyIWD2
+
 //412 Control2
+
+static EffectRef fx_protection_from_evil_ref={"ProtectionFromEvil",NULL,-1};
+
 int fx_control (Actor* Owner, Actor* target, Effect* fx)
 {
+	//prot from evil deflects it
+	if (target->fxqueue.HasEffect(fx_protection_from_evil_ref)) return FX_NOT_APPLIED;
+
 	if (0) printf( "fx_control (%2d)\n", fx->Opcode);
 	bool enemyally = Owner->GetStat(IE_EA)>EA_GOODCUTOFF;
 	switch(fx->Parameter2)
@@ -1563,17 +1685,18 @@ int fx_control (Actor* Owner, Actor* target, Effect* fx)
 		break;
 	}
 	STATE_SET( STATE_CHARMED );
-        STAT_SET( IE_EA, enemyally?EA_ENEMY:EA_CHARMED );
+		    STAT_SET( IE_EA, enemyally?EA_ENEMY:EA_CHARMED );
 	return FX_APPLIED;
 }
 
 //413 VisualEffectIWD2
 int fx_visual_effect_iwd2 (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
-        if (0) printf( "fx_visual_effect_iwd2 (%2d)\n", fx->Opcode);
-        //what else
-        return FX_APPLIED;
+		    if (0) printf( "fx_visual_effect_iwd2 (%2d)\n", fx->Opcode);
+		    //what else
+		    return FX_APPLIED;
 }
+
 //414 ResilientSphere
 int fx_resilient_sphere (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1582,6 +1705,7 @@ int fx_resilient_sphere (Actor* /*Owner*/, Actor* target, Effect* fx)
 	//what else
 	return FX_APPLIED;
 }
+
 //415 Barkskin
 int fx_barkskin (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1601,10 +1725,48 @@ int fx_barkskin (Actor* /*Owner*/, Actor* target, Effect* fx)
 		bonus=3;
 	}
 	STAT_ADD(IE_ARMORCLASS,bonus);
+	SetGradient(target, 2);
 	return FX_APPLIED;
 }
+
+//regen/poison/disease types (works for bleeding wounds too)
+#define RPD_PERCENT 1
+#define RPD_SECONDS 2
+#define RPD_POINTS  3
+
 //416 BleedingWounds
+int fx_bleeding_wounds (Actor* Owner, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_bleeding_wounds (%2d): Damage: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	target->AddPortraitIcon(PI_BLEEDING);
+	//also this effect is executed every update
+	ieDword damage;
+
+	switch(fx->Parameter2) {
+	case RPD_PERCENT:
+		damage = target->GetStat(IE_MAXHITPOINTS) * fx->Parameter1 / 100;
+		break;
+	case RPD_SECONDS:
+		damage = 1;
+		if (fx->Parameter1 && (core->GetGame()->GameTime%fx->Parameter1)) {
+			return FX_APPLIED;
+		}
+		break;
+	case RPD_POINTS:
+		damage = fx->Parameter1;
+		break;
+	default:
+		damage = 1;
+		break;
+	}
+	//percent
+	target->Damage(damage, DAMAGE_POISON, Owner);
+	return FX_APPLIED;
+}
+
 //417 AreaEffect
+
 //418 FreeAction2
 int fx_free_action_iwd2 (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1651,6 +1813,15 @@ int fx_protection_from_elements (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_protection_from_elements (%2d)\n", fx->Opcode);
 	if (SetSpellState(target, SS_ELEMPROT)) return FX_APPLIED;
 	target->AddPortraitIcon(PI_ELEMPROT);
+	STAT_ADD(IE_RESISTFIRE, 15);
+	STAT_ADD(IE_RESISTCOLD, 15);
+	STAT_ADD(IE_RESISTACID, 15);
+	STAT_ADD(IE_RESISTELECTRICITY, 15);
+	//compatible with 2nd ed
+	STAT_ADD(IE_RESISTMAGICFIRE, 15);
+	STAT_ADD(IE_RESISTMAGICCOLD, 15);
+
+	target->SetColorMod(0xff, RGBModifier::ADD, 0x4f, 0, 0, 0xc0);
 	return FX_APPLIED;
 }
 //424 HoldUndead
@@ -1682,6 +1853,8 @@ int fx_aegis (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD(IE_SAVEWILL, 2);
 	STAT_ADD(IE_SAVEREFLEX, 2);
 
+	target->SetColorMod(0xff, RGBModifier::ADD, 30, 0x80, 0x60, 0x60);
+	SetGradient(target, 14);
 	return FX_APPLIED;
 }
 //427 ExecutionerEyes
@@ -1694,6 +1867,7 @@ int fx_executioner_eyes (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD(IE_CRITICALHITBONUS, 4);
 	STAT_ADD(IE_TOHIT, 4);
 
+	SetGradient(target, 8);
 	return FX_APPLIED;
 }
 //428 Banish (same as unsummon?)
@@ -1702,6 +1876,19 @@ int fx_executioner_eyes (Actor* /*Owner*/, Actor* target, Effect* fx)
 //431 EnergyDrain
 //432 TortoiseShell
 //433 Blink
+int fx_blink (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_blink (%2d) Type: %d\n", fx->Opcode, fx->Parameter2);
+	if (SetSpellState(target, SS_BLINK)) return FX_APPLIED;
+	if(fx->Parameter2) {
+		target->AddPortraitIcon(PI_EMPTYBODY);
+		return FX_APPLIED;
+	}
+	target->AddPortraitIcon(PI_BLINK);
+
+	return FX_APPLIED;
+}
+
 //434 PersistentUseEffectList
 //435 DayBlindness
 //436 DamageReduction
@@ -1726,20 +1913,119 @@ int fx_heroic_inspiration (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 //440 BarbarianRage
 //441 MovementRateModifier4
-//442 Unknown
+//442 Unknown (needs research)
 //443 MissileDamageReduction
 //444 TensersTransformation
-//445 Unknown
+
+int fx_tenser_transformation (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_tenser_transformation (%2d)\n", fx->Opcode);
+	if (SetSpellState(target, SS_TENSER)) return FX_APPLIED;
+	STAT_SUB(IE_ARMORCLASS, 2);
+	
+	SetGradient(target, 0x3e);
+	return FX_APPLIED;
+}
+
+//445 Unknown (empty function in iwd2)
 //446 SmiteEvil
 //447 Restoration
 //448 AlicornLance
+int fx_alicorn_lance (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_alicorn_lance (%2d)\n", fx->Opcode);
+	if (SetSpellState(target, SS_ALICORNLANCE)) return FX_APPLIED;
+	////target->AddPortraitIcon(PI_ALICORN); //no portrait icon
+	STAT_SUB(IE_ARMORCLASS, 2);
+	//color glow
+	return FX_APPLIED;
+}
 //449 CallLightning
 //450 GlobeInvulnerability
-//451 LowerResistance
-//452 Bane
-//453 PowerAttack
-//454 Expertise
-//455 ArterialStrike
-//456 HamString
-//457 RapidShot
+int fx_minor_globe (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_minor_globe (%2d)\n", fx->Opcode);
+	int state;
+	int icon;
+	int value;
 
+	if (fx->Parameter2) {
+		state = SS_MAJORGLOBE;
+		icon = PI_MAJORGLOBE;
+		value = 30; //if globe is needed, use 31
+	} else {
+		state = SS_MINORGLOBE;
+		icon = PI_MINORGLOBE;
+		value = 14; //if globe is needed use 15
+	}
+
+	if (SetSpellState(target, state)) return FX_APPLIED;
+	target->AddPortraitIcon(icon);
+
+	STAT_BIT_OR(IE_MINORGLOBE, value);
+	return FX_APPLIED;
+}
+
+//451 LowerResistance
+int fx_lower_resistance (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_lower_resistance (%2d)\n", fx->Opcode);
+	if (SetSpellState(target, SS_LOWERRESIST)) return FX_APPLIED;
+	target->AddPortraitIcon(PI_LOWERRESIST);
+
+	STAT_SUB(IE_RESISTMAGIC, 15);
+	return FX_APPLIED;
+}
+//452 Bane
+static EffectRef fx_bless_ref={"Bless",NULL,-1};
+
+int fx_bane (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_bane (%2d)\n", fx->Opcode);
+	
+	if (SetSpellState(target, SS_BANE)) return FX_APPLIED;
+	target->SetColorMod(0xff, RGBModifier::ADD, 20, 0, 0, 0x80);
+	//do this once
+	target->fxqueue.RemoveAllEffects(fx_bless_ref);
+	return FX_APPLIED;
+}
+
+//453 PowerAttack
+int fx_power_attack (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_power_attack (%2d)\n", fx->Opcode);
+	if (SetSpellState(target, SS_POWERATTACK)) return FX_APPLIED;
+	return FX_APPLIED;
+}
+
+//454 Expertise
+int fx_expertise (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_expertise (%2d)\n", fx->Opcode);
+	if (SetSpellState(target, SS_EXPERTISE)) return FX_APPLIED;
+	return FX_APPLIED;
+}
+
+//455 ArterialStrike
+int fx_arterial_strike (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_arterial_strike (%2d)\n", fx->Opcode);
+	if (SetSpellState(target, SS_ARTERIAL)) return FX_APPLIED;
+	return FX_APPLIED;
+}
+
+//456 HamString
+int fx_hamstring (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_hamstring (%2d)\n", fx->Opcode);
+	if (SetSpellState(target, SS_HAMSTRING)) return FX_APPLIED;
+	return FX_APPLIED;
+}
+
+//457 RapidShot
+int fx_rapid_shot (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_rapid_shot (%2d)\n", fx->Opcode);
+	if (SetSpellState(target, SS_RAPIDSHOT)) return FX_APPLIED;
+	return FX_APPLIED;
+}

@@ -87,6 +87,7 @@ class Map;
 #define STAT_BIT_OR(stat, mod) target->SetStat( stat, STAT_GET( stat ) | ( mod ), 0 )
 #define STAT_SET(stat, mod) target->SetStat( stat, ( mod ), 0 )
 #define STAT_SET_PCF(stat, mod) target->SetStat( stat, ( mod ), 1 )
+#define STAT_BIT_OR_PCF(stat, mod) target->SetStat( stat, STAT_GET( stat ) | ( mod ), 1 )
 #define STAT_MUL(stat, mod) target->SetStat( stat, STAT_GET(stat) * ( mod ) / 100, 0 )
 //if an effect sticks around
 #define STATE_CURE( mod ) target->Modified[ IE_STATE_ID ] &= ~(ieDword) ( mod )
