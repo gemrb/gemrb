@@ -334,15 +334,16 @@ int fx_special_effect (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 int fx_overlay (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_overlay (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
-	target->add_animation(fx->Resource,-1,0,true);
+	target->AddAnimation(fx->Resource,-1,0,true);
 	//special effects based on fx_param2
 	return FX_NOT_APPLIED;
 }
 //0xca fx_unknown
 
 //0x82 fx_bless
-static EffectRef fx_glow_ref ={"Color:PulseRGBGlobal",NULL,-1};
+//static EffectRef fx_glow_ref ={"Color:PulseRGBGlobal",NULL,-1};
 //pst bless effect spawns a color glow automatically
+//but i would rather use the IWD2 method
 int fx_bless (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_curse (%2d): Par1: %d\n", fx->Opcode, fx->Parameter1 );
@@ -350,14 +351,18 @@ int fx_bless (Actor* /*Owner*/, Actor* target, Effect* fx)
 	//it should be considered what if we replace the pst invis bit
 	//with this one (losing binary compatibility, gaining easier
 	//invis checks at core level)
-	if (STATE_GET (STATE_BLESS) ) //curse is non cummulative
+	if (STATE_GET (STATE_BLESS) ) //curse is non-cumulative
 		return FX_NOT_APPLIED;
+
+	target->SetColorMod(255, RGBModifier::ADD, 0x18, 0xc8, 0xc8, 0xc8);
+/*
 	if (!target->fxqueue.HasEffectWithParamPair(fx_glow_ref, 0xc8c8c800,0x300018)) {
 		Effect *newfx = EffectQueue::CreateEffect(fx_glow_ref, 0xc8c8c800,0x300018, fx->TimingMode);
 		//calculating duration
 		newfx->Duration=(fx->Duration-core->GetGame()->GameTime)/6;
 		core->ApplyEffect(newfx, target, target);
 	}
+*/
 	STATE_SET( STATE_BLESS );
 	STAT_SUB( IE_TOHIT, fx->Parameter1);
 	STAT_SUB( IE_SAVEVSDEATH, fx->Parameter1);

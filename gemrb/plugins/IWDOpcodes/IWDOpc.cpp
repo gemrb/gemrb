@@ -30,6 +30,8 @@
 #include "IWDOpc.h"
 
 static ieResRef *iwd_spell_hits = NULL;
+
+static bool enhanced_effects = false;
 static int shcount = -1;
 
 #define PI_PROTFROMEVIL 9
@@ -48,15 +50,22 @@ static int shcount = -1;
 #define PI_ELEMPROT     93
 #define PI_MINORGLOBE   96
 #define PI_MAJORGLOBE   97
-
+#define PI_SHROUD       98
+#define PI_ANTIMAGIC    99
+#define PI_RESILIENT    100
+#define PI_MINDFLAYER   101
+#define PI_CLOAKOFFEAR  102
 #define PI_ENTROPY      103
+#define PI_INSECT       104
 #define PI_STORMSHELL   105
-#define PI_LOWERRESIST  106
+//#define PI_LOWERRESIST  106 //this is different in iwd2 and bg2
 
 #define PI_AEGIS        119
 #define PI_EXECUTIONER  120
 #define PI_FIRESHIELD   121
 #define PI_ICESHIELD    122
+
+#define PI_TORTOISE     125
 
 #define PI_BLINK        130
 #define PI_EMPTYBODY    145
@@ -173,7 +182,40 @@ static int shcount = -1;
 #define SS_SPELLSHIELD  115
 #define SS_STATICCHARGE 116
 #define SS_LOWERRESIST  140
-#define SS_
+
+//icewind visuals (overlays)
+#define IWV_SANCTUARY   0
+#define IWV_ENTANGLE    1
+//#define iWV_WISP      2
+#define IWV_SHIELDGLOBE 3
+#define IWV_GREASE      4
+#define IWV_WEB         5
+#define IWV_MINORGLOBE  6
+#define IWV_GLOBEINVUL  7
+#define IWV_FLAMESHROUD 8
+#define IWV_ANTIMAGIC   9
+#define IWV_RESILIENT   10
+#define IWV_PROTFROM    11
+#define IWV_CLOAKFEAR   12
+#define IWV_ENTROPY     13
+#define IWV_FIREAURA    14
+#define IWV_FROSTAURA   15
+#define IWV_INSECT      16
+#define IWV_STORMSHELL  17
+#define IWV_LATHANDER   18
+#define IWV_LATHANDER2  19
+#define IWV_GLATHANDER  20 
+#define IWV_GLATHANDER2 21
+#define IWV_SEVENEYES   22
+#define IWV_SEVENEYES2  23
+///24
+///25
+#define IWV_FIRESHIELD  26
+#define IWV_ICESHIELD   27
+#define IWV_FIRESHIELD2 28
+#define IWV_ICESHIELD2  29
+#define IWV_TORTOISE    30
+#define IWV_DEATHARMOR  31
 
 static int fx_ac_vs_damage_type_modifier_iwd2 (Actor* Owner, Actor* target, Effect* fx);//0
 static int fx_ironskins (Actor* Owner, Actor* target, Effect* fx);//da (iwd2)
@@ -367,6 +409,7 @@ static EffectRef effectnames[] = {
 IWDOpc::IWDOpc(void)
 {
 	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectRef ) - 1, effectnames );
+	enhanced_effects=!!core->HasFeature(GF_ENHANCED_EFFECTS);
 }
 
 IWDOpc::~IWDOpc(void)
@@ -501,6 +544,12 @@ static inline void SetGradient(Actor *target, ieDword gradient)
 	for(int i=0;i<7;i++) {
 		STAT_SET(IE_COLORS+i, gradient);
 	}
+}
+
+static inline void SetOverlay(Actor *target, unsigned int overlay)
+{
+	if (overlay>=32) return;
+	STAT_BIT_OR(IE_SANCTUARY, 1<<overlay);
 }
 
 //returns true if spell state is already set or illegal
@@ -1073,6 +1122,7 @@ int fx_summon_pomab (Actor* Owner, Actor* target, Effect* fx)
 }
 
 //0x107 ControlUndead (like charm?)
+//425 ControlUndead2
 int fx_control_undead (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_control_undead (%2d): General: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -1160,7 +1210,7 @@ int fx_eye_of_the_mind (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_the_mind (%2d)\n", fx->Opcode );
 	if (SetSpellState(target, SS_EYEMIND)) return FX_APPLIED;
-	target->add_animation("eyemind",-1,0,true);
+	target->AddAnimation("eyemind",-1,0,true);
 	EXTSTATE_SET(EXTSTATE_EYE_MIND);
 	return FX_APPLIED;
 }
@@ -1169,7 +1219,7 @@ int fx_eye_of_the_sword (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_the_sword (%2d)\n", fx->Opcode );
 	if (SetSpellState(target, SS_EYESWORD)) return FX_APPLIED;
-	target->add_animation("eyesword",-1,0,true);
+	target->AddAnimation("eyesword",-1,0,true);
 	EXTSTATE_SET(EXTSTATE_EYE_SWORD);
 	return FX_APPLIED;
 }
@@ -1178,7 +1228,7 @@ int fx_eye_of_the_mage (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_the_mage (%2d)\n", fx->Opcode );
 	if (SetSpellState(target, SS_EYEMAGE)) return FX_APPLIED;
-	target->add_animation("eyemage",-1,0,true);
+	target->AddAnimation("eyemage",-1,0,true);
 	EXTSTATE_SET(EXTSTATE_EYE_MAGE);
 	return FX_APPLIED;
 }
@@ -1187,7 +1237,7 @@ int fx_eye_of_venom (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_venom (%2d)\n", fx->Opcode );
 	if (SetSpellState(target, SS_EYEVENOM)) return FX_APPLIED;
-	target->add_animation("eyevenom",-1,0,true);
+	target->AddAnimation("eyevenom",-1,0,true);
 	EXTSTATE_SET(EXTSTATE_EYE_VENOM);
 	return FX_APPLIED;
 }
@@ -1196,7 +1246,7 @@ int fx_eye_of_the_spirit (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_the_spirit (%2d)\n", fx->Opcode );
 	if (SetSpellState(target, SS_EYESPIRIT)) return FX_APPLIED;
-	target->add_animation("eyespir",-1,0,true);
+	target->AddAnimation("eyespir",-1,0,true);
 	EXTSTATE_SET(EXTSTATE_EYE_SPIRIT);
 	return FX_APPLIED;
 }
@@ -1205,7 +1255,7 @@ int fx_eye_of_fortitude (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_fortitude (%2d)\n", fx->Opcode );
 	if (SetSpellState(target, SS_EYEFORTITUDE)) return FX_APPLIED;
-	target->add_animation("eyefort",-1,0,true);
+	target->AddAnimation("eyefort",-1,0,true);
 	EXTSTATE_SET(EXTSTATE_EYE_FORT);
 	return FX_APPLIED;
 }
@@ -1214,7 +1264,7 @@ int fx_eye_of_stone (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_eye_of_stone (%2d)\n", fx->Opcode );
 	if (SetSpellState(target, SS_EYESTONE)) return FX_APPLIED;
-	target->add_animation("eyestone",-1,0,true);
+	target->AddAnimation("eyestone",-1,0,true);
 	EXTSTATE_SET(0x00000400);
 	return FX_APPLIED;
 }
@@ -1630,9 +1680,11 @@ int fx_holy_power (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_holy_power (%2d)\n", fx->Opcode);
 	if (SetSpellState(target, SS_HOLYPOWER)) return FX_APPLIED;
-	target->AddPortraitIcon(PI_HOLYPOWER);
 
-	target->SetColorMod(0xff, RGBModifier::ADD, 20, 0x80, 0x80, 0x80);
+	if (enhanced_effects) {
+		target->AddPortraitIcon(PI_HOLYPOWER);
+		target->SetColorMod(0xff, RGBModifier::ADD, 20, 0x80, 0x80, 0x80);
+	}
 	return FX_APPLIED;
 }
 
@@ -1640,7 +1692,6 @@ int fx_holy_power (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_righteous_wrath (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_righteous_wrath (%2d) Type: %d\n", fx->Opcode, fx->Parameter2);
-	target->AddPortraitIcon(PI_RIGHTEOUS);
 	if (fx->Parameter2)
 	{
 		if (SetSpellState(target, SS_RIGHTEOUS2)) return FX_APPLIED;
@@ -1651,7 +1702,10 @@ int fx_righteous_wrath (Actor* /*Owner*/, Actor* target, Effect* fx)
 		if (SetSpellState(target, SS_RIGHTEOUS)) return FX_APPLIED;
 		//
 	}
-	target->SetColorMod(0xff, RGBModifier::ADD, 30, 0xd7, 0xb6, 0 );
+	if (enhanced_effects) {
+		target->AddPortraitIcon(PI_RIGHTEOUS);
+		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0xd7, 0xb6, 0 );
+	}
 	return FX_APPLIED;
 }
 
@@ -1685,16 +1739,41 @@ int fx_control (Actor* Owner, Actor* target, Effect* fx)
 		break;
 	}
 	STATE_SET( STATE_CHARMED );
-		    STAT_SET( IE_EA, enemyally?EA_ENEMY:EA_CHARMED );
+	STAT_SET( IE_EA, enemyally?EA_ENEMY:EA_CHARMED );
 	return FX_APPLIED;
 }
 
 //413 VisualEffectIWD2
-int fx_visual_effect_iwd2 (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+//there are 32 bits, so they will fit on IE_SANCTUARY stat
+//i put them there because the first bit is sanctuary
+int fx_visual_effect_iwd2 (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-		    if (0) printf( "fx_visual_effect_iwd2 (%2d)\n", fx->Opcode);
-		    //what else
-		    return FX_APPLIED;
+	//
+	if (0) printf( "fx_visual_effect_iwd2 (%2d) Type: %d\n", fx->Opcode, fx->Parameter2);
+	unsigned int type = fx->Parameter2;
+	if (type<32) {    
+		switch(type) {
+		case 1:
+			STAT_BIT_OR(IE_ENTANGLE, 1);
+			break;
+		case 3:
+			STAT_BIT_OR(IE_SHIELDGLOBE, 1);
+			break;
+		case 4:
+			STAT_BIT_OR(IE_GREASE, 1);
+			break;
+		case 5:
+			STAT_BIT_OR(IE_WEB, 1);
+			break;
+		case 6: case 7:
+			STAT_BIT_OR(IE_MINORGLOBE, 1);
+			break;
+		// some more
+		}
+		STAT_BIT_OR(IE_SANCTUARY, 1<<type);
+		return FX_APPLIED;
+	}  
+	return FX_NOT_APPLIED;
 }
 
 //414 ResilientSphere
@@ -1702,7 +1781,11 @@ int fx_resilient_sphere (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_resilient_sphere (%2d)\n", fx->Opcode);
 	SetSpellState(target, SS_HELD|SS_RESILIENT);
-	//what else
+	STATE_SET(STATE_HELPLESS);
+	if (enhanced_effects) {
+		target->AddPortraitIcon(PI_RESILIENT);
+		SetOverlay(target, IWV_RESILIENT);
+	}
 	return FX_APPLIED;
 }
 
@@ -1711,7 +1794,6 @@ int fx_barkskin (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_barkskin (%2d)\n", fx->Opcode);
 	if (SetSpellState(target, SS_BARKSKIN)) return FX_APPLIED;
-	target->AddPortraitIcon(PI_BARKSKIN);
 
 	int bonus;
 	int level = target->GetStat(IE_LEVELCLERIC);
@@ -1725,7 +1807,10 @@ int fx_barkskin (Actor* /*Owner*/, Actor* target, Effect* fx)
 		bonus=3;
 	}
 	STAT_ADD(IE_ARMORCLASS,bonus);
-	SetGradient(target, 2);
+	if (enhanced_effects) {
+		target->AddPortraitIcon(PI_BARKSKIN);
+		SetGradient(target, 2);
+	}
 	return FX_APPLIED;
 }
 
@@ -1739,7 +1824,6 @@ int fx_bleeding_wounds (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_bleeding_wounds (%2d): Damage: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	target->AddPortraitIcon(PI_BLEEDING);
 	//also this effect is executed every update
 	ieDword damage;
 
@@ -1762,6 +1846,7 @@ int fx_bleeding_wounds (Actor* Owner, Actor* target, Effect* fx)
 	}
 	//percent
 	target->Damage(damage, DAMAGE_POISON, Owner);
+	target->AddPortraitIcon(PI_BLEEDING);
 	return FX_APPLIED;
 }
 
@@ -1772,41 +1857,70 @@ int fx_free_action_iwd2 (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_free_action_iwd2 (%2d)\n", fx->Opcode);
 	if (SetSpellState(target, SS_FREEACTION)) return FX_APPLIED;
-	target->AddPortraitIcon(PI_FREEACTION);
+
+	// immunity to the following effects: 
+	// 0x9a Overlay:Entangle, 
+	// 0x9d Overlay:Web
+	// 0x9e Overlay:Grease
+	// 0x6d State:Hold3
+	// 0x28 State:Slowed
+	// 0xb0 MovementModifier
+	if (enhanced_effects) {
+		target->AddPortraitIcon(PI_FREEACTION);
+		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0x80, 0x60, 0x60);
+	}
 	return FX_APPLIED;
 }
+
 //419 Unconsciousness
 int fx_unconsciousness (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_unconsciousness (%2d)\n", fx->Opcode);
 	STATE_SET(STATE_HELPLESS|STATE_SLEEP);
-	target->AddPortraitIcon(PI_UNCONSCIOUS);
 	if (fx->Parameter2) {
 		SetSpellState(target, SS_NOAWAKE);
 	}
 	//
+	if (enhanced_effects) {
+		target->AddPortraitIcon(PI_UNCONSCIOUS);
+	}
 	return FX_APPLIED;
 }
+
 //420 Death2 (see in core effects)
+
 //421 EntropyShield
 int fx_entropy_shield (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_entropy_shield (%2d)\n", fx->Opcode);
 	if (SetSpellState(target, SS_ENTROPY)) return FX_APPLIED;
-	target->AddPortraitIcon(PI_ENTROPY);
 	//immunity to certain projectiles?
 	//
 	//
+	if (enhanced_effects) {
+		target->AddPortraitIcon(PI_ENTROPY);
+		//entropy shield overlay
+		SetOverlay(target, IWV_ENTROPY);
+		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0x40, 0xc0, 0x40);
+	}
 	return FX_APPLIED;
 }
+
 //422 StormShell
 int fx_storm_shell (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_storm_shell (%2d)\n", fx->Opcode);
 	if (SetSpellState(target, SS_STORMSHELL)) return FX_APPLIED;
-	//
+	STAT_ADD(IE_RESISTFIRE, 15);
+	STAT_ADD(IE_RESISTCOLD, 15);
+	STAT_ADD(IE_RESISTELECTRICITY, 15);
+
+	if (enhanced_effects) {
+		SetOverlay(target, IWV_STORMSHELL);
+	}
 	return FX_APPLIED;
 }
+
 //423 ProtectionFromElements
 int fx_protection_from_elements (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1821,17 +1935,19 @@ int fx_protection_from_elements (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD(IE_RESISTMAGICFIRE, 15);
 	STAT_ADD(IE_RESISTMAGICCOLD, 15);
 
-	target->SetColorMod(0xff, RGBModifier::ADD, 0x4f, 0, 0, 0xc0);
+	if (enhanced_effects) {
+		target->SetColorMod(0xff, RGBModifier::ADD, 0x4f, 0, 0, 0xc0);
+	}
 	return FX_APPLIED;
 }
-//424 HoldUndead
+
+//424 HoldUndead (see in core effects, 0x6d)
 //425 ControlUndead2 (see above)
 //426 Aegis
 int fx_aegis (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_aegis (%2d)\n", fx->Opcode);
 	if (SetSpellState(target, SS_AEGIS)) return FX_APPLIED;
-	target->AddPortraitIcon(PI_AEGIS);
 	//deflection AC bonus
 	//
 	//physical damage reduction
@@ -1853,28 +1969,65 @@ int fx_aegis (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD(IE_SAVEWILL, 2);
 	STAT_ADD(IE_SAVEREFLEX, 2);
 
-	target->SetColorMod(0xff, RGBModifier::ADD, 30, 0x80, 0x60, 0x60);
-	SetGradient(target, 14);
+	if (enhanced_effects) {
+		target->AddPortraitIcon(PI_AEGIS);
+		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0x80, 0x60, 0x60);
+		SetGradient(target, 14);
+	}
 	return FX_APPLIED;
 }
+
 //427 ExecutionerEyes
 int fx_executioner_eyes (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_executioner_eyes (%2d)\n", fx->Opcode);
 	if (SetSpellState(target, SS_EXECUTIONER)) return FX_APPLIED;
-	target->AddPortraitIcon(PI_EXECUTIONER);
 
 	STAT_ADD(IE_CRITICALHITBONUS, 4);
 	STAT_ADD(IE_TOHIT, 4);
 
-	SetGradient(target, 8);
+	if (enhanced_effects) {
+		target->AddPortraitIcon(PI_EXECUTIONER);
+		SetGradient(target, 8);
+	}
 	return FX_APPLIED;
 }
+
 //428 Banish (same as unsummon?)
+
 //429 WhenStruckUseEffectList
+
 //430 ProjectileUseEffectList
+
 //431 EnergyDrain
+
+static EffectRef fx_energy_drain_ref={"EnergyDrain",NULL,-1};
+
+int fx_energy_drain (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_energy_drain (%2d) Type: %d\n", fx->Opcode, fx->Parameter2);
+	Effect *oldfx = target->fxqueue.HasEffect(fx_energy_drain_ref);
+	if (oldfx) {
+		oldfx->Parameter2+=fx->Parameter2;
+		return FX_NOT_APPLIED;
+	}
+	//if there is another energy drain effect, add it up
+	STAT_SET(IE_LEVELDRAIN, fx->Parameter2);
+	return FX_APPLIED;
+}
+
 //432 TortoiseShell
+int fx_tortoise_shell (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_tortoise_shell (%2d) Type: %d\n", fx->Opcode, fx->Parameter2);
+	if (SetSpellState(target, SS_TORTOISE)) return FX_NOT_APPLIED;
+	if (enhanced_effects) {
+		target->AddPortraitIcon(PI_TORTOISE);
+		SetOverlay(target, IWV_TORTOISE);
+	}
+	return FX_APPLIED;
+}
+
 //433 Blink
 int fx_blink (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1929,7 +2082,45 @@ int fx_tenser_transformation (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 //445 Unknown (empty function in iwd2)
 //446 SmiteEvil
+int fx_smite_evil (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_smite_evil (%2d)\n", fx->Opcode);
+	SetSpellState(target, SS_SMITEEVIL);
+	return FX_NOT_APPLIED;
+}
+
 //447 Restoration
+
+static EffectRef fx_disease_ref={"Disease",NULL,-1};
+static EffectRef fx_str_ref={"StrengthModifier",NULL,-1};
+static EffectRef fx_int_ref={"IntelligenceModifier",NULL,-1};
+static EffectRef fx_wis_ref={"WisdomModifier",NULL,-1};
+static EffectRef fx_con_ref={"ConstitutionModifier",NULL,-1};
+static EffectRef fx_dex_ref={"DexterityModifier",NULL,-1};
+static EffectRef fx_cha_ref={"CharismaModifier",NULL,-1};
+
+int fx_restoration (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_restoration (%2d)\n", fx->Opcode);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_disease_ref, 4);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_disease_ref, 5);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_disease_ref, 6);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_disease_ref, 7);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_disease_ref, 8);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_disease_ref, 9);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_disease_ref, 13);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_disease_ref, 14);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_disease_ref, 15);
+
+	target->fxqueue.RemoveAllDetrimentalEffects(fx_str_ref, BASE_GET(IE_STR));
+	target->fxqueue.RemoveAllDetrimentalEffects(fx_int_ref, BASE_GET(IE_INT));
+	target->fxqueue.RemoveAllDetrimentalEffects(fx_wis_ref, BASE_GET(IE_WIS));
+	target->fxqueue.RemoveAllDetrimentalEffects(fx_con_ref, BASE_GET(IE_CON));
+	target->fxqueue.RemoveAllDetrimentalEffects(fx_dex_ref, BASE_GET(IE_DEX));
+	target->fxqueue.RemoveAllDetrimentalEffects(fx_cha_ref, BASE_GET(IE_CHR));
+	return FX_NOT_APPLIED;
+}
+
 //448 AlicornLance
 int fx_alicorn_lance (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1938,9 +2129,20 @@ int fx_alicorn_lance (Actor* /*Owner*/, Actor* target, Effect* fx)
 	////target->AddPortraitIcon(PI_ALICORN); //no portrait icon
 	STAT_SUB(IE_ARMORCLASS, 2);
 	//color glow
+	if (enhanced_effects) {
+		target->SetColorMod(0xff, RGBModifier::ADD, 1, 0xb9, 0xb9, 0xb9);
+	}
 	return FX_APPLIED;
 }
+
 //449 CallLightning
+int fx_call_lightning (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_call_lightning (%2d)\n", fx->Opcode);
+	//TODO: implement
+	return FX_NOT_APPLIED;
+}
+
 //450 GlobeInvulnerability
 int fx_minor_globe (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1948,21 +2150,26 @@ int fx_minor_globe (Actor* /*Owner*/, Actor* target, Effect* fx)
 	int state;
 	int icon;
 	int value;
+	int overlay;
 
 	if (fx->Parameter2) {
 		state = SS_MAJORGLOBE;
 		icon = PI_MAJORGLOBE;
 		value = 30; //if globe is needed, use 31
+		overlay = IWV_GLOBEINVUL;
 	} else {
 		state = SS_MINORGLOBE;
 		icon = PI_MINORGLOBE;
 		value = 14; //if globe is needed use 15
+		overlay = IWV_MINORGLOBE;
 	}
-
 	if (SetSpellState(target, state)) return FX_APPLIED;
-	target->AddPortraitIcon(icon);
 
 	STAT_BIT_OR(IE_MINORGLOBE, value);
+	if (enhanced_effects) {
+		target->AddPortraitIcon(icon);
+		SetOverlay(target,overlay);
+	}
 	return FX_APPLIED;
 }
 
@@ -1971,7 +2178,6 @@ int fx_lower_resistance (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_lower_resistance (%2d)\n", fx->Opcode);
 	if (SetSpellState(target, SS_LOWERRESIST)) return FX_APPLIED;
-	target->AddPortraitIcon(PI_LOWERRESIST);
 
 	STAT_SUB(IE_RESISTMAGIC, 15);
 	return FX_APPLIED;
@@ -1984,9 +2190,11 @@ int fx_bane (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_bane (%2d)\n", fx->Opcode);
 	
 	if (SetSpellState(target, SS_BANE)) return FX_APPLIED;
-	target->SetColorMod(0xff, RGBModifier::ADD, 20, 0, 0, 0x80);
 	//do this once
 	target->fxqueue.RemoveAllEffects(fx_bless_ref);
+	if (enhanced_effects) {
+		target->SetColorMod(0xff, RGBModifier::ADD, 20, 0, 0, 0x80);
+	}
 	return FX_APPLIED;
 }
 

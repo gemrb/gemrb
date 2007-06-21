@@ -184,6 +184,7 @@ public:
 	void RemoveExpiredEffects(ieDword futuretime);
 	/* removes all effects except timing mode 9 */
 	void RemoveAllNonPermanentEffects();
+	void RemoveAllDetrimentalEffects(EffectRef &effect_reference, ieDword current);
 	void RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword param2);
 	void RemoveAllEffectsWithResource(EffectRef &effect_reference, const ieResRef resource);
 	void RemoveLevelEffects(ieDword level, ieDword flags, ieDword match);
@@ -224,6 +225,7 @@ public:
 private:
 	//use the effect reference style calls from outside
 	static Effect *CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieDword timing);
+	void RemoveAllDetrimentalEffects(ieDword opcode, ieDword current);
 	void RemoveAllEffectsWithParam(ieDword opcode, ieDword param2);
 	Effect *HasOpcode(ieDword opcode) const;
 	Effect *HasOpcodeWithParam(ieDword opcode, ieDword param2) const;

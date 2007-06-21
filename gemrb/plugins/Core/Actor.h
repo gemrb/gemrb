@@ -420,7 +420,9 @@ public:
 	/* draw videocells */
 	void DrawVideocells(Region &screen, vvcVector &vvcCells, Color &tint);
 	
-	void add_animation(const ieResRef resource, int gradient, int height, int flags);
+	void SetLockedPalette(const ieDword *gradients);
+	void UnlockPalette();
+	void AddAnimation(const ieResRef resource, int gradient, int height, int flags);
 	void PlayDamageAnimation(int x);
 	/* restores a spell of maximum maxlevel level, type is a mask of disabled spells */
 	int RestoreSpellLevel(ieDword maxlevel, ieDword typemask);

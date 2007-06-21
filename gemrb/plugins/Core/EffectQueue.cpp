@@ -889,6 +889,29 @@ void EffectQueue::RemoveAllEffectsWithResource(EffectRef &effect_reference, cons
 	RemoveAllEffectsWithResource(effect_reference.EffText, resource);
 }
 
+void EffectQueue::RemoveAllDetrimentalEffects(ieDword opcode, ieDword current)
+{
+	std::vector< Effect* >::iterator f;
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
+		MATCH_OPCODE();
+		MATCH_LIVE_FX();
+		switch((*f)->Parameter2) {
+		case 0:case 3:
+			if (((signed) (*f)->Parameter1)>=0) continue;
+			break;
+		case 1:case 4:
+			if (((signed) (*f)->Parameter1)>=(signed) current) continue;
+			break;
+		case 2:case 5:
+			if (((signed) (*f)->Parameter1)>=100) continue;
+			break;
+		default:
+			break;
+		}
+		(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;
+	}
+}
+
 void EffectQueue::RemoveAllEffectsWithParam(ieDword opcode, ieDword param2)
 {
 	std::vector< Effect* >::iterator f;
@@ -937,6 +960,13 @@ void EffectQueue::RemoveAllNonPermanentEffects()
 }
 
 //this will modify effect reference
+
+void EffectQueue::RemoveAllDetrimentalEffects(EffectRef &effect_reference, ieDword current)
+{
+	ResolveEffectRef(effect_reference);
+	RemoveAllDetrimentalEffects(effect_reference.EffText, current);
+}
+
 void EffectQueue::RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword param2)
 {
 	ResolveEffectRef(effect_reference);

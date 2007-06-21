@@ -35,7 +35,7 @@
 
 #include "ie_types.h"
 
-#define VERSION_GEMRB "0.2.8"
+#define VERSION_GEMRB "0.2.9"
 
 #define GEMRB_STRING "GemRB v" VERSION_GEMRB
 
@@ -122,9 +122,13 @@
 #define  GF_SAVE_FOR_HALF       	25 //pst
 #define  GF_CHARNAMEISGABBER   		26 //iwd2
 #define  GF_MAGICBIT            	27 //iwd, iwd2
-#define  GF_CHECK_ABILITIES             28 //bg2 (others?)
-#define  GF_CHALLENGERATING             29 //iwd2
-#define  GF_SPELLBOOKICONHACK		30 //bg2
+#define  GF_CHECK_ABILITIES     	28 //bg2 (others?)
+#define  GF_CHALLENGERATING     	29 //iwd2
+#define  GF_SPELLBOOKICONHACK   	30 //bg2
+#define  GF_ENHANCED_EFFECTS    	31 //iwd2 (maybe iwd/how too)
+
+//update this
+#define GF_COUNT 32
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3

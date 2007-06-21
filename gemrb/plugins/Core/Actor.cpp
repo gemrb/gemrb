@@ -137,18 +137,45 @@ static int d_gradient[DAMAGE_LEVELS] = {
 	-1,-1,-1,
 	ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,
 };
-//the possible hardcoded overlays (they got separate stats)
-#define OVERLAY_COUNT  8
-#define OV_ENTANGLE    0
-#define OV_SANCTUARY   1
-#define OV_MINORGLOBE  2
+//the possible hardcoded overlays (they got separate stats or bits)
+#define OVERLAY_COUNT  32
+
+#define OV_SANCTUARY   0
+#define OV_ENTANGLE    1
+#define OV_WISP        2  //iwd2
 #define OV_SHIELDGLOBE 3
 #define OV_GREASE      4
-#define OV_WEB	 5
-#define OV_BOUNCE      6  //bouncing
-#define OV_BOUNCE2     7  //bouncing activated
-static ieResRef overlay[OVERLAY_COUNT]={"SPENTACI","SANCTRY","MINORGLB","SPSHIELD",
-"GREASED","WEBENTD","SPTURNI2","SPTURNI"};
+#define OV_WEB         5
+#define OV_MINORGLOBE  6
+#define OV_GLOBE       7
+#define OV_SHROUD      8
+#define OV_ANTIMAGIC   9
+#define OV_RESILIENT   10
+#define OV_NORMALMISS  11
+#define OV_CLOAKFEAR   12
+#define OV_ENTROPY     13
+#define OV_FIREAURA    14
+#define OV_FROSTAURA   15
+#define OV_INSECT      16
+#define OV_STORMSHELL  17
+#define OV_LATH1       18
+#define OV_LATH2       19
+#define OV_GLATH1      20
+#define OV_GLATH2      21
+#define OV_SEVENEYES1  22
+#define OV_SEVENEYES2  23
+#define OV_BOUNCE      24  //bouncing
+#define OV_BOUNCE2     25  //bouncing activated
+#define OV_FIRESHIELD1 26
+#define OV_FIRESHIELD2 27
+#define OV_ICESHIELD1  28
+#define OV_ICESHIELD2  29
+#define OV_TORTOISE    30
+#define OV_DEATHARMOR  31
+
+static ieResRef overlay[OVERLAY_COUNT]={"SANCTRY","SPENTACI","","SPSHIELD",
+"GREASED","WEBENTD","MINORGLB","","","","","","","","","","","","","","",
+"","","","SPTURNI2","SPTURNI","","","","","",""};
 static int *mxsplwis = NULL;
 static int spllevels;
 
@@ -505,7 +532,8 @@ found_row:
 }
 
 //call this when morale or moralebreak changed
-void pcf_morale (Actor *actor, ieDword /*Value*/)
+//cannot use old or new value, because it is called two ways
+void pcf_morale (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	if (actor->Modified[IE_MORALE]<=actor->Modified[IE_MORALEBREAK] ) {
 		actor->Panic();
@@ -514,13 +542,13 @@ void pcf_morale (Actor *actor, ieDword /*Value*/)
 	actor->SetCircleSize();
 }
 
-void pcf_ea (Actor *actor, ieDword /*Value*/)
+void pcf_ea (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	actor->SetCircleSize();
 }
 
 //this is a good place to recalculate level up stuff
-void pcf_level (Actor *actor, ieDword /*Value*/)
+void pcf_level (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	ieDword sum =
 		actor->BaseStats[IE_LEVELFIGHTER]+
@@ -538,107 +566,96 @@ void pcf_level (Actor *actor, ieDword /*Value*/)
 	actor->SetupFist();
 }
 
-void pcf_class (Actor *actor, ieDword Value)
+void pcf_class (Actor *actor, ieDword /*Value*/, ieDword /*newValue*/)
 {
-	actor->InitButtons(Value);
+	actor->InitButtons(actor->Modified[IE_CLASS]);
 }
 
-void pcf_animid(Actor *actor, ieDword Value)
+void pcf_animid(Actor *actor, ieDword /*Value*/, ieDword newValue)
 {
-	actor->SetAnimationID(Value);
-}
-
-static void SetLockedPalette(Actor *actor, const ieDword *gradients)
-{
-	CharAnimations *anims = actor->GetAnims();
-	if (!anims) return; //cannot apply it (yet)
-	anims->LockPalette(gradients);
-}
-
-static void UnlockPalette(Actor *actor)
-{
-	CharAnimations *anims = actor->GetAnims();
-	if (anims) {
-		anims->lockPalette=false;
-		anims->SetColors(actor->Modified+IE_COLORS);
-	}
+	actor->SetAnimationID(newValue);
 }
 
 static const ieDword fullwhite[7]={ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT};
 
 static const ieDword fullstone[7]={STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT};
 
-void pcf_state(Actor *actor, ieDword Value)
+void pcf_state(Actor *actor, ieDword /*Value*/, ieDword State)
 {
 	if (actor->InParty) {
 		core->SetEventFlag(EF_PORTRAIT);
 	}
-	if (Value & STATE_PETRIFIED) {
-		SetLockedPalette( actor, fullstone);
+	if (State & STATE_PETRIFIED) {
+		actor->SetLockedPalette(fullstone);
 		return;
 	}
-	if (Value & STATE_FROZEN) {
-		SetLockedPalette(actor, fullwhite);
+	if (State & STATE_FROZEN) {
+		actor->SetLockedPalette(fullwhite);
 		return;
 	}
-	UnlockPalette(actor);
+	actor->UnlockPalette();
 }
 
-void pcf_hitpoint(Actor *actor, ieDword Value)
+void pcf_hitpoint(Actor *actor, ieDword /*Value*/, ieDword hp)
 {
-	if ((signed) Value>(signed) actor->Modified[IE_MAXHITPOINTS]) {
-		Value=actor->Modified[IE_MAXHITPOINTS];
+	if ((signed) hp>(signed) actor->Modified[IE_MAXHITPOINTS]) {
+		hp=actor->Modified[IE_MAXHITPOINTS];
 	}
-	if ((signed) Value<(signed) actor->Modified[IE_MINHITPOINTS]) {
-		Value=actor->Modified[IE_MINHITPOINTS];
+	if ((signed) hp<(signed) actor->Modified[IE_MINHITPOINTS]) {
+		hp=actor->Modified[IE_MINHITPOINTS];
 	}
-	if ((signed) Value<=0) {
+	if ((signed) hp<=0) {
 		actor->Die(NULL);
 	}
-	actor->Modified[IE_MINHITPOINTS]=Value;
+	
+	actor->Modified[IE_MINHITPOINTS]=hp;
+
 	if (actor->InParty) {
 		core->SetEventFlag(EF_PORTRAIT);
 	}
 }
 
-void pcf_maxhitpoint(Actor *actor, ieDword Value)
+void pcf_maxhitpoint(Actor *actor, ieDword /*Value*/, ieDword hp)
 {
-	if ((signed) Value<(signed) actor->Modified[IE_HITPOINTS]) {
-		actor->Modified[IE_HITPOINTS]=Value;
-		pcf_hitpoint(actor,Value);
-	}
-	if (actor->InParty) {
-		core->SetEventFlag(EF_PORTRAIT);
-	}
-}
-
-void pcf_minhitpoint(Actor *actor, ieDword Value)
-{
-	if ((signed) Value>(signed) actor->Modified[IE_HITPOINTS]) {
-		actor->Modified[IE_HITPOINTS]=Value;
-		pcf_hitpoint(actor,Value);
-	}
-}
-
-void pcf_con(Actor *actor, ieDword Value)
-{
-	if ((signed) Value<=0) {
-		actor->Die(NULL);
-	}
-	pcf_hitpoint(actor, actor->Modified[IE_HITPOINTS]);
-}
-
-void pcf_stat(Actor *actor, ieDword Value)
-{
-	if ((signed) Value<=0) {
-		actor->Die(NULL);
+	if ((signed) hp<(signed) actor->Modified[IE_HITPOINTS]) {
+		actor->Modified[IE_HITPOINTS]=hp;
+		//passing 0 because it is ignored anyway
+		pcf_hitpoint(actor, 0, hp);
 	}
 	if (actor->InParty) {
 		core->SetEventFlag(EF_PORTRAIT);
 	}
 }
 
-void pcf_gold(Actor *actor, ieDword /*Value*/)
+void pcf_minhitpoint(Actor *actor, ieDword /*Value*/, ieDword hp)
+{
+	if ((signed) hp>(signed) actor->Modified[IE_HITPOINTS]) {
+		actor->Modified[IE_HITPOINTS]=hp;
+		//passing 0 because it is ignored anyway
+		pcf_hitpoint(actor, 0, hp);
+	}
+}
+
+void pcf_con(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+{
+	if ((signed) newValue<=0) {
+		actor->Die(NULL);
+	}
+	//passing 0 because it is ignored anyway
+	pcf_hitpoint(actor, 0, actor->Modified[IE_HITPOINTS]);
+}
+
+void pcf_stat(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+{
+	if ((signed) newValue<=0) {
+		actor->Die(NULL);
+	}
+	if (actor->InParty) {
+		core->SetEventFlag(EF_PORTRAIT);
+	}
+}
+
+void pcf_gold(Actor *actor, ieDword /*Value*/, ieDword /*newValue*/)
 {
 	//this function will make a party member automatically donate their
 	//gold to the party pool, not the same as in the original engine
@@ -650,112 +667,127 @@ void pcf_gold(Actor *actor, ieDword /*Value*/)
 }
 
 //de/activates the entangle overlay
-void pcf_entangle(Actor *actor, ieDword Value)
+void pcf_entangle(Actor *actor, ieDword oldValue, ieDword newValue)
 {
-	if (Value) {
+	if (newValue&1) {
 		if (actor->HasVVCCell(overlay[OV_ENTANGLE]))
 			return;
 		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_ENTANGLE], false);
 		actor->AddVVCell(sca);
-	} else {
+		return;
+	}
+	if (oldValue&1) {
 		actor->RemoveVVCell(overlay[OV_ENTANGLE], true);
 	}
 }
 
 //de/activates the sanctuary overlay
-//the sanctuary effect draws the globe half transparent
-//if value has the 2 bit set, the palette will be altered to full white
-void pcf_sanctuary(Actor *actor, ieDword Value)
+//the sanctuary vvc draws the globe half transparent
+void pcf_sanctuary(Actor *actor, ieDword oldValue, ieDword newValue)
 {
-	if (Value) {
-		if (!actor->HasVVCCell(overlay[OV_SANCTUARY])) {
-			ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_SANCTUARY], false);
-			actor->AddVVCell(sca);
+	ieDword changed = newValue^oldValue;
+	ieDword mask = 1;
+	for (int i=0;i<32;i++) {
+		if (changed&mask) {
+			if (newValue&mask) {
+				if (!actor->HasVVCCell(overlay[i])) {
+					ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[i], false);
+					actor->AddVVCell(sca);
+				}
+			} else {
+				actor->RemoveVVCell(overlay[i], true);
+			}
 		}
-	  if (Value&2) {
-		  SetLockedPalette(actor, fullwhite);
-	  }
-		return;
 	}
-	actor->RemoveVVCell(overlay[OV_SANCTUARY], true);
-	UnlockPalette(actor);
 }
 
 //de/activates the prot from missiles overlay
-void pcf_shieldglobe(Actor *actor, ieDword Value)
+void pcf_shieldglobe(Actor *actor, ieDword oldValue, ieDword newValue)
 {
-	if (Value) {
+	if (newValue&1) {
 		if (actor->HasVVCCell(overlay[OV_SHIELDGLOBE]))
 			return;
 		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_SHIELDGLOBE], false);
 		actor->AddVVCell(sca);
-	} else {
+		return;
+	}
+	if (oldValue&1) {
 		actor->RemoveVVCell(overlay[OV_SHIELDGLOBE], true);
 	}
 }
 
 //de/activates the globe of invul. overlay
-void pcf_minorglobe(Actor *actor, ieDword Value)
+void pcf_minorglobe(Actor *actor, ieDword oldValue, ieDword newValue)
 {
-	if (Value) {
+	if (newValue&1) {
 		if (actor->HasVVCCell(overlay[OV_MINORGLOBE]))
 			return;
 		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_MINORGLOBE], false);
 		actor->AddVVCell(sca);
-	} else {
+		return;
+	}
+	if (oldValue&1) {
 		actor->RemoveVVCell(overlay[OV_MINORGLOBE], true);
 	}
 }
 
 //de/activates the grease background
-void pcf_grease(Actor *actor, ieDword Value)
+void pcf_grease(Actor *actor, ieDword oldValue, ieDword newValue)
 {
-	if (Value) {
+	if (newValue&1) {
 		if (actor->HasVVCCell(overlay[OV_GREASE]))
 			return;
-		actor->add_animation(overlay[OV_GREASE], -1, -1, 0);
-	} else {
+		actor->AddAnimation(overlay[OV_GREASE], -1, -1, 0);
+		return;
+	}
+	if (oldValue&1) {
 		actor->RemoveVVCell(overlay[OV_GREASE], true);
 	}
 }
 
 //de/activates the web overlay
 //the web effect also immobilizes the actor!
-void pcf_web(Actor *actor, ieDword Value)
+void pcf_web(Actor *actor, ieDword oldValue, ieDword newValue)
 {
-	if (Value) {
+	if (newValue&1) {
 		if (actor->HasVVCCell(overlay[OV_WEB]))
 			return;
-		actor->add_animation(overlay[OV_WEB], -1, 0, 0);
-	} else {
+		actor->AddAnimation(overlay[OV_WEB], -1, 0, 0);
+		return;
+	}
+	if (oldValue&1) {
 		actor->RemoveVVCell(overlay[OV_WEB], true);
 	}
 }
 
 //de/activates the spell bounce background
-void pcf_bounce(Actor *actor, ieDword Value)
+void pcf_bounce(Actor *actor, ieDword oldValue, ieDword newValue)
 {
-	if (Value) {
-		actor->add_animation(overlay[OV_BOUNCE], -1, -1, 0);
-	} else {
+	if (newValue&1) {
+		if (actor->HasVVCCell(overlay[OV_BOUNCE]))
+			return;
+		actor->AddAnimation(overlay[OV_BOUNCE], -1, -1, 0);
+		return;
+	}
+	if (oldValue&1) {
 		//it seems we have to remove it abruptly
 		actor->RemoveVVCell(overlay[OV_BOUNCE], false);
 	}
 }
 
 //no separate values (changes are permanent)
-void pcf_fatigue(Actor *actor, ieDword Value)
+void pcf_fatigue(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
-	actor->BaseStats[IE_FATIGUE]=Value;
+	actor->BaseStats[IE_FATIGUE]=newValue;
 }
 
 //no separate values (changes are permanent)
-void pcf_intoxication(Actor *actor, ieDword Value)
+void pcf_intoxication(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
-	actor->BaseStats[IE_INTOXICATION]=Value;
+	actor->BaseStats[IE_INTOXICATION]=newValue;
 }
 
-void pcf_color(Actor *actor, ieDword /*Value*/)
+void pcf_color(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	CharAnimations *anims = actor->GetAnims();
 	if (anims) {
@@ -763,11 +795,11 @@ void pcf_color(Actor *actor, ieDword /*Value*/)
 	}
 }
 
-void pcf_armorlevel(Actor *actor, ieDword Value)
+void pcf_armorlevel(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
 	CharAnimations *anims = actor->GetAnims();
 	if (anims) {
-		anims->SetArmourLevel(Value);
+		anims->SetArmourLevel(newValue);
 	}
 }
 
@@ -791,7 +823,7 @@ MAX_LEVEL,MAX_LEVEL,MAX_LEVEL,MAX_LEVEL, MAX_LEVEL,MAX_LEVEL,MAX_LEVEL,MAX_LEVEL
 MAX_LEVEL,MAX_LEVEL,MAX_LEVEL,MAX_LEVEL, 255,65535,65535,15//ff
 };
 
-typedef void (*PostChangeFunctionType)(Actor *actor, ieDword Value);
+typedef void (*PostChangeFunctionType)(Actor *actor, ieDword oldValue, ieDword newValue);
 static PostChangeFunctionType post_change_functions[256]={
 pcf_hitpoint, pcf_maxhitpoint, NULL, NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //0f
@@ -1017,7 +1049,20 @@ static void InitActorTables()
 	}
 }
 
-void Actor::add_animation(const ieResRef resource, int gradient, int height, int flags)
+void Actor::SetLockedPalette(const ieDword *gradients)
+{
+	if (!anims) return; //cannot apply it (yet)
+	anims->LockPalette(gradients);
+}
+
+void Actor::UnlockPalette()
+{
+	if (!anims) return;
+	anims->lockPalette=false;
+	anims->SetColors(Modified+IE_COLORS);
+}
+
+void Actor::AddAnimation(const ieResRef resource, int gradient, int height, int flags)
 {
 	ScriptedAnimation *sca = core->GetScriptedAnimation(resource, false);
 	if (!sca)
@@ -1044,28 +1089,28 @@ void Actor::PlayDamageAnimation(int type)
 		case 0: case 1: case 2: case 3: //blood
 			i = (int) GetStat(IE_ANIMATION_ID)>>16;
 			if (!i) i = d_gradient[type];
-			add_animation(d_main[type], i, 0, AA_PLAYONCE);
+			AddAnimation(d_main[type], i, 0, AA_PLAYONCE);
 			break;
 		case 4: case 5: case 7: //fire
-			add_animation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
+			AddAnimation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
 			for(i=DL_FIRE;i<=type;i++) {
-				add_animation(d_splash[i], d_gradient[i], 0, AA_PLAYONCE);
+				AddAnimation(d_splash[i], d_gradient[i], 0, AA_PLAYONCE);
 			}
 			break;
 		case 8: case 9: case 10: //electricity
-			add_animation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
+			AddAnimation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
 			for(i=DL_ELECTRICITY;i<=type;i++) {
-				add_animation(d_splash[i], d_gradient[i], 0, AA_PLAYONCE);
+				AddAnimation(d_splash[i], d_gradient[i], 0, AA_PLAYONCE);
 			}
 			break;
 		case 11: case 12: case 13://cold
-			add_animation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
+			AddAnimation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
 			break;
 		case 14: case 15: case 16://acid
-			add_animation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
+			AddAnimation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
 			break;
 		case 17: case 18: case 19://disintegrate
-			add_animation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
+			AddAnimation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
 			break;
 	}
 }
@@ -1086,12 +1131,13 @@ bool Actor::SetStat(unsigned int StatIndex, ieDword Value, int pcf)
 		}
 	}
 
-	if (pcf && Modified[StatIndex]!=Value) {
-		Modified[StatIndex] = Value;
-		PostChangeFunctionType f = post_change_functions[StatIndex];
-		if (f) (*f)(this, Value);
-	} else {
-		Modified[StatIndex] = Value;
+	unsigned int previous = Modified[StatIndex];
+	if (Modified[StatIndex]!=Value) {
+		if (pcf) {
+			Modified[StatIndex] = Value;
+			PostChangeFunctionType f = post_change_functions[StatIndex];
+			if (f) (*f)(this, previous, Value);
+		}
 	}
 	return true;
 }
@@ -1273,7 +1319,7 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		if (first || (Modified[i]!=previous[i]) ) {
 			PostChangeFunctionType f = post_change_functions[i];
 			if (f) {
-				(*f)(this, Modified[i]);
+				(*f)(this, first?0:previous[i], Modified[i]);
 			}
 		}
 	}
@@ -2495,7 +2541,7 @@ void Actor::SetColorMod( ieDword location, RGBModifier::Type type, int speed,
 		ca->GlobalColorMod.rgb.r = r;
 		ca->GlobalColorMod.rgb.g = g;
 		ca->GlobalColorMod.rgb.b = b;
-	  ca->GlobalColorMod.rgb.a = 0;
+		ca->GlobalColorMod.rgb.a = 0;
 		if (phase >= 0)
 			ca->GlobalColorMod.phase = phase;
 		else {

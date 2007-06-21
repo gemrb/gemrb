@@ -61,8 +61,9 @@
 static ieResRef *casting_glows = NULL;
 static int cgcount = -1;
 static ieResRef *spell_hits = NULL;
+static bool enhanced_effects = false;
 static int shcount = -1;
-//static Color sparkle_rgb[12][5];
+
 static ScriptedAnimation default_spell_hit;
 
 int fx_ac_vs_damage_type_modifier (Actor* Owner, Actor* target, Effect* fx);//00
@@ -221,7 +222,6 @@ int fx_find_traps (Actor* Owner, Actor* target, Effect *fx);//96
 int fx_replace_creature (Actor* Owner, Actor* target, Effect *fx);//97
 int fx_play_movie (Actor* Owner, Actor* target, Effect* fx);//98
 int fx_set_sanctuary_state (Actor* Owner, Actor* target, Effect* fx);//99
-int fx_set_sanctuary_state2 (Actor* Owner, Actor* target, Effect* fx);//99
 int fx_set_entangle_state (Actor* Owner, Actor* target, Effect* fx);//9a
 int fx_set_minorglobe_state (Actor* Owner, Actor* target, Effect* fx);//9b
 int fx_set_shieldglobe_state (Actor* Owner, Actor* target, Effect* fx);//9c
@@ -677,6 +677,7 @@ static EffectRef effectnames[] = {
 	{ "State:Hold", fx_hold_creature, 0 }, //175
 	{ "State:Hold2", fx_hold_creature, 0 },//185
 	{ "State:Hold3", fx_hold_creature_no_icon, 0 }, //109
+	{ "HoldUndead", fx_hold_creature_no_icon, 0 }, //0x1a8 (iwd2)
 	{ "State:Imprisonment", fx_imprisonment, 0 },
 	{ "State:Infravision", fx_set_infravision_state, 0 },
 	{ "State:Invisible", fx_set_invisible_state, 0 }, //both invis or improved invis
@@ -723,6 +724,7 @@ static EffectRef effectnames[] = {
 FXOpc::FXOpc(void)
 {
 	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectRef ) - 1, effectnames );
+	enhanced_effects=!!core->HasFeature(GF_ENHANCED_EFFECTS);
 	default_spell_hit.SequenceFlags|=IE_VVC_BAM;
 }
 
@@ -737,7 +739,7 @@ static inline void SetGradient(Actor *target, ieDword gradient)
 	gradient |= (gradient <<16);
 	gradient |= (gradient <<8);
 	for(int i=0;i<7;i++) {
-	  STAT_SET(IE_COLORS+i, gradient);
+		STAT_SET(IE_COLORS+i, gradient);
 	}
 }
 
@@ -2371,8 +2373,8 @@ int fx_protection_from_spell_level (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 	int value = fx->Parameter1;
 	if (value<9) {
-	  STAT_BIT_OR(IE_MINORGLOBE, 1<<value);
-	  return FX_APPLIED;
+		STAT_BIT_OR(IE_MINORGLOBE, 1<<value);
+		return FX_APPLIED;
 	}
 	return FX_NOT_APPLIED;
 }
@@ -3028,19 +3030,24 @@ int fx_play_movie (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 // 0x99 Overlay:Sanctuary
+#define ICE_GRADIENT 71
+
+static const ieDword fullwhite[7]={ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT};
+
 int fx_set_sanctuary_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	//iwd and bg are a bit different, but we solve the whole stuff in a single opcode
 	if (0) printf( "fx_set_sanctuary_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	if (!fx->Parameter2) {
-	  //this is just one way to decide if we have iwd or bg
-	  if(core->HasFeature(GF_MAGICBIT)) {
-	    fx->Parameter2=1;
-	  } else {
-	    fx->Parameter2=2;
-	  }
+		fx->Parameter2=1;
 	}
 	STAT_SET_PCF( IE_SANCTUARY, fx->Parameter2);
+	//a rare event, but this effect gives more in bg2 than in iwd2
+	//so we use this flag
+	if (!enhanced_effects)
+	{
+		target->SetLockedPalette(fullwhite);
+	}
 	return FX_APPLIED;
 }
 
@@ -3048,7 +3055,10 @@ int fx_set_sanctuary_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_entangle_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_entangle_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STAT_SET_PCF( IE_ENTANGLE, 1);
+	if (!fx->Parameter2) {
+		fx->Parameter2=1;
+	}
+	STAT_SET_PCF( IE_ENTANGLE, fx->Parameter2);
 	return FX_APPLIED;
 }
 
@@ -3258,6 +3268,7 @@ int fx_playsound (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0x6d State:Hold3
+//0x1a8 HoldUndead (iwd2)
 int fx_hold_creature_no_icon (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_hold_creature_no_icon (%2d): Value: %d, IDS: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -4464,7 +4475,7 @@ int fx_chaos_shield_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_chaos_shield_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_MOD( IE_CHAOSSHIELD );
 	if (fx->Parameter2) {
-		target->AddPortraitIcon(PI_CSHIELD);  //162
+		target->AddPortraitIcon(PI_CSHIELD); //162
 	} else {
 		target->AddPortraitIcon(PI_CSHIELD2); //163
 	}

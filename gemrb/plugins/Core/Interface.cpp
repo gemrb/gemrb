@@ -2098,6 +2098,41 @@ static void upperlower(int upper, int lower)
 	pl_lowercase[upper]=(ieByte) lower;
 }
 
+static const char *game_flags[GF_COUNT]={
+	"HasKaputz",          //0 GF_HAS_KAPUTZ
+	"AllStringsTagged",   //1 GF_ALL_STRINGS_TAGGED
+	"HasSongList",        //2 GF_HAS_SONGLIST
+	"TeamMovement",       //3 GF_TEAM_MOVEMENT
+	"UpperButtonText",    //4 GF_UPPER_BUTTON_TEXT
+	"LowerLabelText",     //5 GF_LOWER_LABEL_TEXT
+	"HasPartyIni",        //6 GF_HAS_PARTY_INI
+	"SoundFolders",       //7 GF_SOUNDFOLDERS
+	"IgnoreButtonFrames", //8 GF_IGNORE_BUTTON_FRAMES
+	"OneByteAnimationID", //9 GF_ONE_BYTE_ANIMID
+	"HasDPLAYER",         //10GF_HAS_DPLAYER
+	"HasEXPTABLE",        //11GF_HAS_EXPTABLE
+	"HasBeastsIni",       //12GF_HAS_BEASTS_INI
+	"HasDescIcon",        //13GF_HAS_DESC_ICON
+	"HasPickSound",       //14GF_HAS_PICK_SOUND
+	"IWDMapDimensions",   //15GF_IWD_MAP_DIMENSIONS
+	"AutomapIni",         //16GF_AUTOMAP_INI
+	"SmallFog",           //17GF_SMALL_FOG
+	"ReverseDoor",        //18GF_REVERSE_DOOR
+	"ProtagonistTalks",   //19GF_PROTAGONIST_TALKS
+	"HasSpellList",       //20GF_HAS_SPELLLIST
+	"IWD2ScriptName",     //21GF_IWD2_SCRIPTNAME
+	"DialogueScrolls",    //22GF_DIALOGUE_SCROLLS
+	"KnowWorld",          //23GF_KNOW_WORLD
+	"ReverseToHit",       //24GF_REVERSE_TOHIT
+	"SaveForHalfDamage",  //25GF_SAVE_FOR_HALF
+	"CharNameIsGabber",   //26GF_CHARNAMEISGABBER
+	"MagicBit",           //27GF_MAGICBIT
+	"CheckAbilities",     //28GF_CHECK_ABILITIES
+	"ChallengeRating",    //29GF_CHALLENGERATING
+	"SpellBookIconHack",  //30GF_SPELLBOOKICONHACK
+	"EnhancedEffects",    //31GF_ENHANCED_EFFECTS
+};
+
 /** Loads gemrb.ini */
 bool Interface::LoadGemRBINI()
 {
@@ -2218,37 +2253,13 @@ bool Interface::LoadGemRBINI()
 	MaximumAbility = ini->GetKeyAsInt ("resources", "MaximumAbility", 25 );
 
 	RedrawTile = ini->GetKeyAsInt( "resources", "RedrawTile", 0 )!=0;
-	SetFeature( ini->GetKeyAsInt( "resources", "CharNameIsGabber", 0 ), GF_CHARNAMEISGABBER );
-	SetFeature( ini->GetKeyAsInt( "resources", "IWD2ScriptName", 0 ), GF_IWD2_SCRIPTNAME );
-	SetFeature( ini->GetKeyAsInt( "resources", "HasSpellList", 0 ), GF_HAS_SPELLLIST );
-	SetFeature( ini->GetKeyAsInt( "resources", "ProtagonistTalks", 0 ), GF_PROTAGONIST_TALKS );
-	SetFeature( ini->GetKeyAsInt( "resources", "AutomapIni", 0 ), GF_AUTOMAP_INI );
-	SetFeature( ini->GetKeyAsInt( "resources", "IWDMapDimensions", 0 ), GF_IWD_MAP_DIMENSIONS );
-	SetFeature( ini->GetKeyAsInt( "resources", "OneByteAnimationID", 0 ), GF_ONE_BYTE_ANIMID );
-	SetFeature( ini->GetKeyAsInt( "resources", "IgnoreButtonFrames", 1 ), GF_IGNORE_BUTTON_FRAMES );
-	SetFeature( ini->GetKeyAsInt( "resources", "AllStringsTagged", 1 ), GF_ALL_STRINGS_TAGGED );
-	SetFeature( ini->GetKeyAsInt( "resources", "HasDPLAYER", 0 ), GF_HAS_DPLAYER );
-	SetFeature( ini->GetKeyAsInt( "resources", "HasPickSound", 0 ), GF_HAS_PICK_SOUND );
-	SetFeature( ini->GetKeyAsInt( "resources", "HasDescIcon", 0 ), GF_HAS_DESC_ICON );
-	SetFeature( ini->GetKeyAsInt( "resources", "HasEXPTABLE", 0 ), GF_HAS_EXPTABLE );
-	SetFeature( ini->GetKeyAsInt( "resources", "HasKaputz", 0 ), GF_HAS_KAPUTZ );
-	SetFeature( ini->GetKeyAsInt( "resources", "SoundFolders", 0 ), GF_SOUNDFOLDERS );
-	SetFeature( ini->GetKeyAsInt( "resources", "HasSongList", 0 ), GF_HAS_SONGLIST );
-	SetFeature( ini->GetKeyAsInt( "resources", "UpperButtonText", 0 ), GF_UPPER_BUTTON_TEXT );
-	SetFeature( ini->GetKeyAsInt( "resources", "LowerLabelText", 0 ), GF_LOWER_LABEL_TEXT );
-	SetFeature( ini->GetKeyAsInt( "resources", "HasPartyIni", 0 ), GF_HAS_PARTY_INI );
-	SetFeature( ini->GetKeyAsInt( "resources", "HasBeastsIni", 0 ), GF_HAS_BEASTS_INI );
-	SetFeature( ini->GetKeyAsInt( "resources", "TeamMovement", 0 ), GF_TEAM_MOVEMENT );
-	SetFeature( ini->GetKeyAsInt( "resources", "SmallFog", 1 ), GF_SMALL_FOG );
-	SetFeature( ini->GetKeyAsInt( "resources", "ReverseDoor", 0 ), GF_REVERSE_DOOR );
-	SetFeature( ini->GetKeyAsInt( "resources", "DialogueScrolls", 0 ), GF_DIALOGUE_SCROLLS );
-	SetFeature( ini->GetKeyAsInt( "resources", "KnowWorld", 0 ), GF_KNOW_WORLD );
-	SetFeature( ini->GetKeyAsInt( "resources", "ReverseToHit", 1 ), GF_REVERSE_TOHIT );
-	SetFeature( ini->GetKeyAsInt( "resources", "SaveForHalfDamage", 0 ), GF_SAVE_FOR_HALF );
-	SetFeature( ini->GetKeyAsInt( "resources", "MagicBit", 0 ), GF_MAGICBIT );
-	SetFeature( ini->GetKeyAsInt( "resources", "CheckAbilities", 0 ), GF_CHECK_ABILITIES );
-	SetFeature( ini->GetKeyAsInt( "resources", "ChallengeRating", 0 ), GF_CHALLENGERATING );
-	SetFeature( ini->GetKeyAsInt( "resources", "SpellBookIconHack", 0), GF_SPELLBOOKICONHACK );
+
+	for (i=0;i<GF_COUNT;i++) {
+		SetFeature( ini->GetKeyAsInt( "resources", game_flags[i], 0 ), i );
+		printMessage("Option", "", GREEN);
+		printf("%s = %s\n", game_flags[i], HasFeature(i)?"yes":"no");
+	}
+	
 	ForceStereo = ini->GetKeyAsInt( "resources", "ForceStereo", 0 );
 
 	FreeInterface( ini );
