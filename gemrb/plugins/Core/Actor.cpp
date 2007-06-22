@@ -85,7 +85,8 @@ static ActionButtonRow *GUIBTDefaults = NULL; //qslots row count
 ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
  ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE,
  ACT_NONE, ACT_INNATE};
-static int QslotTranslation = false;
+static bool QslotTranslation = false;
+static bool DeathOnZeroStat = true;
 
 static char iwd2gemrb[32] = {
 	0,0,20,2,22,25,0,14,
@@ -180,8 +181,8 @@ static int *mxsplwis = NULL;
 static int spllevels;
 
 //for every game except IWD2 we need to reverse TOHIT
-static bool REVERSE_TOHIT=true;
-static bool CHECK_ABILITIES=false;
+static bool ReverseToHit=true;
+static bool CheckAbilities=false;
 
 //internal flags for calculating to hit
 #define WEAPON_FIST	0
@@ -636,26 +637,52 @@ void pcf_minhitpoint(Actor *actor, ieDword /*Value*/, ieDword hp)
 	}
 }
 
-void pcf_con(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+void pcf_stat(Actor *actor, ieDword newValue, ieDword stat)
 {
 	if ((signed) newValue<=0) {
-		actor->Die(NULL);
-	}
-	//passing 0 because it is ignored anyway
-	pcf_hitpoint(actor, 0, actor->Modified[IE_HITPOINTS]);
-}
-
-void pcf_stat(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
-{
-	if ((signed) newValue<=0) {
-		actor->Die(NULL);
+		if (DeathOnZeroStat) {
+			actor->Die(NULL);
+		} else {
+			actor->Modified[stat]=1;
+		}
 	}
 	if (actor->InParty) {
 		core->SetEventFlag(EF_PORTRAIT);
 	}
 }
 
-void pcf_gold(Actor *actor, ieDword /*Value*/, ieDword /*newValue*/)
+void pcf_stat_str(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+{
+	pcf_stat(actor, newValue, IE_STR);
+}
+
+void pcf_stat_int(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+{
+	pcf_stat(actor, newValue, IE_INT);
+}
+
+void pcf_stat_wis(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+{
+	pcf_stat(actor, newValue, IE_WIS);
+}
+
+void pcf_stat_dex(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+{
+	pcf_stat(actor, newValue, IE_DEX);
+}
+
+void pcf_stat_con(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+{
+	pcf_stat(actor, newValue, IE_CON);
+	pcf_hitpoint(actor, 0, actor->Modified[IE_HITPOINTS]);
+}
+
+void pcf_stat_cha(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
+{
+	pcf_stat(actor, newValue, IE_CHR);
+}
+
+void pcf_gold(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	//this function will make a party member automatically donate their
 	//gold to the party pool, not the same as in the original engine
@@ -829,8 +856,8 @@ pcf_hitpoint, pcf_maxhitpoint, NULL, NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //0f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, pcf_fatigue, pcf_intoxication, //1f
-NULL,NULL,pcf_level,NULL, pcf_stat, NULL, pcf_stat, pcf_stat,
-pcf_stat,pcf_con,NULL,NULL, NULL, pcf_gold, pcf_morale, NULL, //2f
+NULL,NULL,pcf_level,NULL, pcf_stat_str, NULL, pcf_stat_int, pcf_stat_wis,
+pcf_stat_dex,pcf_stat_con,pcf_stat_cha,NULL, NULL, pcf_gold, pcf_morale, NULL, //2f
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, pcf_entangle, pcf_sanctuary, //3f
 pcf_minorglobe, pcf_shieldglobe, pcf_grease, pcf_web, pcf_level, pcf_level, NULL, NULL,
@@ -909,8 +936,9 @@ static void InitActorTables()
 	} else {
 		sharexp=SX_DIVIDE;
 	}
-	REVERSE_TOHIT=(bool) core->HasFeature(GF_REVERSE_TOHIT);
-	CHECK_ABILITIES=(bool) core->HasFeature(GF_CHECK_ABILITIES);
+	ReverseToHit=(bool) core->HasFeature(GF_REVERSE_TOHIT);
+	CheckAbilities=(bool) core->HasFeature(GF_CHECK_ABILITIES);
+	DeathOnZeroStat=(bool) core->HasFeature(GF_DEATH_ON_ZERO_STAT);
 
 	//this table lists skill groups assigned to classes
 	//it is theoretically possible to create hybrid classes
@@ -942,7 +970,7 @@ static void InitActorTables()
 	maximum_values[IE_CON]=i;
 	maximum_values[IE_CHR]=i;
 	maximum_values[IE_WIS]=i;
-	if (REVERSE_TOHIT) {
+	if (ReverseToHit) {
 		//all games except iwd2
 		maximum_values[IE_ARMORCLASS]=20;
 	} else {
@@ -2322,7 +2350,7 @@ void Actor::InitRound(ieDword gameTime, bool secondround)
 int Actor::GetToHit(int bonus, ieDword Flags)
 {
 	int tohit = GetStat(IE_TOHIT);
-	if (REVERSE_TOHIT) {
+	if (ReverseToHit) {
 		tohit = ATTACKROLL-tohit;
 	}
 	tohit += bonus;
@@ -2450,7 +2478,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	//get target's defense against attack
 	int defense = target->GetStat(IE_ARMORCLASS);
 	defense += core->GetDexterityBonus(STAT_DEX_AC, target->GetStat(IE_DEX) );
-	if (REVERSE_TOHIT) {
+	if (ReverseToHit) {
 		defense = DEFAULTAC - defense;
 	}
 
@@ -3336,7 +3364,7 @@ void Actor::ChargeItem(int slot, ieDword header, CREItem *item, Item *itm, bool 
 
 bool Actor::IsReverseToHit()
 {
-	return REVERSE_TOHIT;
+	return ReverseToHit;
 }
 
 void Actor::InitButtons(ieDword cls)
@@ -3513,7 +3541,7 @@ resolve_stat:
 		}
 	}
 
-	if (!CHECK_ABILITIES) {
+	if (!CheckAbilities) {
 		return 0;
 	}
 

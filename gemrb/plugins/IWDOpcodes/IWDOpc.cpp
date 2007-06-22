@@ -302,20 +302,43 @@ static int fx_fireshield (Actor* Owner, Actor* target, Effect* fx); //406
 static int fx_death_ward (Actor* Owner, Actor* target, Effect* fx); //407
 static int fx_holy_power (Actor* Owner, Actor* target, Effect* fx); //408
 static int fx_righteous_wrath (Actor* Owner, Actor* target, Effect* fx); //409
+//static int fx_summon_ally_iwd2 (Actor* Owner, Actor* target, Effect* fx); //410
+//static int fx_summon_enemy_iwd2 (Actor* Owner, Actor* target, Effect* fx); //411
 static int fx_control (Actor* Owner, Actor* target, Effect* fx); //412
 static int fx_visual_effect_iwd2 (Actor* Owner, Actor* target, Effect* fx); //413
 static int fx_resilient_sphere (Actor* Owner, Actor* target, Effect* fx); //414
 static int fx_barkskin (Actor* Owner, Actor* target, Effect* fx); //415
+static int fx_bleeding_wounds (Actor* Owner, Actor* target, Effect* fx); //416
 static int fx_free_action_iwd2 (Actor* Owner, Actor* target, Effect* fx); //418
 static int fx_unconsciousness (Actor* Owner, Actor* target, Effect* fx); //419
 static int fx_entropy_shield (Actor* Owner, Actor* target, Effect* fx); //421
 static int fx_storm_shell (Actor* Owner, Actor* target, Effect* fx); //422
 static int fx_protection_from_elements (Actor* Owner, Actor* target, Effect* fx); //423
-
+//424 HoldUndead (same as 0x6d)
+//425 ControlUndead
 static int fx_aegis (Actor* Owner, Actor* target, Effect* fx); //426
 static int fx_executioner_eyes (Actor* Owner, Actor* target, Effect* fx); //427
+
+static int fx_energy_drain (Actor* Owner, Actor* target, Effect* fx); //431
+static int fx_tortoise_shell (Actor* Owner, Actor* target, Effect* fx); //432
+static int fx_blink (Actor* Owner, Actor* target, Effect* fx); //433
+
+static int fx_heroic_inspiration (Actor* Owner, Actor* target, Effect* fx); //438
 //static int fx_prevent_ai_slowdown (Actor* Owner, Actor* target, Effect* fx); //439
+static int fx_tenser_transformation (Actor* Owner, Actor* target, Effect* fx); //444
+//static int fx_445 (Actor* Owner, Actor* target, Effect* fx); //445 unused
+static int fx_smite_evil (Actor* Owner, Actor* target, Effect* fx); //446
+static int fx_restoration (Actor* Owner, Actor* target, Effect* fx); //447
+static int fx_alicorn_lance (Actor* Owner, Actor* target, Effect* fx); //448
+static int fx_call_lightning (Actor* Owner, Actor* target, Effect* fx); //449
+static int fx_globe_invulnerability (Actor* Owner, Actor* target, Effect* fx); //450
+static int fx_lower_resistance (Actor* Owner, Actor* target, Effect* fx); //451
 static int fx_bane (Actor* Owner, Actor* target, Effect* fx); //452
+static int fx_power_attack (Actor* Owner, Actor* target, Effect* fx); //453
+static int fx_expertise (Actor* Owner, Actor* target, Effect* fx); //454
+static int fx_arterial_strike (Actor* Owner, Actor* target, Effect* fx); //455
+static int fx_hamstring (Actor* Owner, Actor* target, Effect* fx); //456
+static int fx_rapid_shot (Actor* Owner, Actor* target, Effect* fx); //457
 
 //No need to make these ordered, they will be ordered by EffectQueue
 static EffectRef effectnames[] = {
@@ -387,10 +410,13 @@ static EffectRef effectnames[] = {
 	{ "DeathWard", fx_death_ward, 0}, //407
 	{ "HolyPower", fx_holy_power, 0}, //408
 	{ "RighteousWrath", fx_righteous_wrath, 0}, //409
+
 	{ "Control2", fx_control, 0}, //412
 	{ "VisualEffectIWD2", fx_visual_effect_iwd2, 0}, //413
 	{ "ResilientSphere", fx_resilient_sphere, 0}, //414
 	{ "BarkSkin", fx_barkskin, 0}, //415
+	{ "BleedingWounds", fx_bleeding_wounds, 0},//416
+
 	{ "FreeAction2", fx_free_action_iwd2, 0}, //418
 	{ "Unconsciousness", fx_unconsciousness, 0}, //419
 	{ "EntropyShield", fx_entropy_shield, 0}, //421
@@ -399,9 +425,24 @@ static EffectRef effectnames[] = {
 	{ "ControlUndead2", fx_control_undead, 0}, //425
 	{ "Aegis", fx_aegis, 0}, //426
 	{ "ExecutionerEyes", fx_executioner_eyes, 0}, //427
-
+	{ "EnergyDrain", fx_energy_drain, 0}, //431
+	{ "TortoiseShell", fx_tortoise_shell, 0}, //432
+	{ "Blink", fx_blink, 0},//433
+	{ "HeroicInspiration", fx_heroic_inspiration, 0},//438
 	//{ "PreventAISlowDown", fx_prevent_ai_slowdown, 0}, //439 same as bg2
-	{ "Bane", fx_bane, 0},
+	{ "TensersTransformation", fx_tenser_transformation, 0}, //444
+	{ "SmiteEvil", fx_smite_evil, 0}, //446
+	{ "Restoration", fx_restoration, 0}, //447
+	{ "AlicornLance", fx_alicorn_lance, 0}, //448
+	{ "CallLightning", fx_call_lightning, 0}, //449
+	{ "GlobeInvulnerability", fx_globe_invulnerability, 0}, //450
+	{ "LowerResistance", fx_lower_resistance, 0}, //451
+	{ "Bane", fx_bane, 0}, //452
+	{ "PowerAttack", fx_power_attack, 0}, //453
+	{ "Expertise", fx_expertise, 0}, //454
+	{ "ArterialStrike", fx_arterial_strike, 0}, //455
+	{ "HamString", fx_hamstring, 0}, //456
+	{ "RapidShot", fx_rapid_shot, 0}, //457
 	{ NULL, NULL, 0 },
 };
 
@@ -1573,7 +1614,7 @@ int fx_use_magic_device_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_hopelessness (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_hopelessness (%2d)\n", fx->Opcode);
-	if (SetSpellState(target, SS_HOPELESSNESS)) return FX_APPLIED;
+	if (SetSpellState(target, SS_HOPELESSNESS)) return FX_NOT_APPLIED;
 	target->AddPortraitIcon(PI_HOPELESSNESS);
 	STATE_SET(STATE_HELPLESS);
 	return FX_APPLIED;
@@ -2065,11 +2106,21 @@ int fx_heroic_inspiration (Actor* /*Owner*/, Actor* target, Effect* fx)
 //same as BG2 OffscreenAIModifier
 
 //440 BarbarianRage
-//441 MovementRateModifier4
-//442 Unknown (needs research)
-//443 MissileDamageReduction
-//444 TensersTransformation
 
+//441 MovementRateModifier4
+
+//442 Unknown (needs research)
+
+//443 MissileDamageReduction
+int fx_missile_damage_reduction (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_missile_damage_reduction (%2d)\n", fx->Opcode);
+	STAT_SET(IE_RESISTMISSILE, fx->Parameter1);
+	//didn't set the pluses
+	return FX_APPLIED;
+}
+
+//444 TensersTransformation
 int fx_tenser_transformation (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_tenser_transformation (%2d)\n", fx->Opcode);
@@ -2081,6 +2132,7 @@ int fx_tenser_transformation (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //445 Unknown (empty function in iwd2)
+
 //446 SmiteEvil
 int fx_smite_evil (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -2144,9 +2196,9 @@ int fx_call_lightning (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 }
 
 //450 GlobeInvulnerability
-int fx_minor_globe (Actor* /*Owner*/, Actor* target, Effect* fx)
+int fx_globe_invulnerability (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_minor_globe (%2d)\n", fx->Opcode);
+	if (0) printf( "fx_globe_invulnerability (%2d)\n", fx->Opcode);
 	int state;
 	int icon;
 	int value;

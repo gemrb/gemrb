@@ -2098,7 +2098,7 @@ static void upperlower(int upper, int lower)
 	pl_lowercase[upper]=(ieByte) lower;
 }
 
-static const char *game_flags[GF_COUNT]={
+static const char *game_flags[GF_COUNT+1]={
 	"HasKaputz",          //0 GF_HAS_KAPUTZ
 	"AllStringsTagged",   //1 GF_ALL_STRINGS_TAGGED
 	"HasSongList",        //2 GF_HAS_SONGLIST
@@ -2131,6 +2131,9 @@ static const char *game_flags[GF_COUNT]={
 	"ChallengeRating",    //29GF_CHALLENGERATING
 	"SpellBookIconHack",  //30GF_SPELLBOOKICONHACK
 	"EnhancedEffects",    //31GF_ENHANCED_EFFECTS
+	"DeathOnZeroStat",    //32GF_DEATH_ON_ZERO_STAT
+
+	NULL                  //for our own safety, this marks the end of the pole
 };
 
 /** Loads gemrb.ini */
@@ -2255,6 +2258,10 @@ bool Interface::LoadGemRBINI()
 	RedrawTile = ini->GetKeyAsInt( "resources", "RedrawTile", 0 )!=0;
 
 	for (i=0;i<GF_COUNT;i++) {
+		if (!game_flags[i]) {
+			printf("Fix the game flags!\n");
+			abort();
+		}
 		SetFeature( ini->GetKeyAsInt( "resources", game_flags[i], 0 ), i );
 		printMessage("Option", "", GREEN);
 		printf("%s = %s\n", game_flags[i], HasFeature(i)?"yes":"no");
