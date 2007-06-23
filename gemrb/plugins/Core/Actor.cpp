@@ -26,6 +26,7 @@
 #include "Actor.h"
 #include "Interface.h"
 #include "../../includes/strrefs.h"
+#include "../../includes/overlays.h"
 #include "Item.h"
 #include "Spell.h"
 #include "Projectile.h"
@@ -138,45 +139,12 @@ static int d_gradient[DAMAGE_LEVELS] = {
 	-1,-1,-1,
 	ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,
 };
-//the possible hardcoded overlays (they got separate stats or bits)
-#define OVERLAY_COUNT  32
 
-#define OV_SANCTUARY   0
-#define OV_ENTANGLE    1
-#define OV_WISP        2  //iwd2
-#define OV_SHIELDGLOBE 3
-#define OV_GREASE      4
-#define OV_WEB         5
-#define OV_MINORGLOBE  6
-#define OV_GLOBE       7
-#define OV_SHROUD      8
-#define OV_ANTIMAGIC   9
-#define OV_RESILIENT   10
-#define OV_NORMALMISS  11
-#define OV_CLOAKFEAR   12
-#define OV_ENTROPY     13
-#define OV_FIREAURA    14
-#define OV_FROSTAURA   15
-#define OV_INSECT      16
-#define OV_STORMSHELL  17
-#define OV_LATH1       18
-#define OV_LATH2       19
-#define OV_GLATH1      20
-#define OV_GLATH2      21
-#define OV_SEVENEYES1  22
-#define OV_SEVENEYES2  23
-#define OV_BOUNCE      24  //bouncing
-#define OV_BOUNCE2     25  //bouncing activated
-#define OV_FIRESHIELD1 26
-#define OV_FIRESHIELD2 27
-#define OV_ICESHIELD1  28
-#define OV_ICESHIELD2  29
-#define OV_TORTOISE    30
-#define OV_DEATHARMOR  31
-
-static ieResRef overlay[OVERLAY_COUNT]={"SANCTRY","SPENTACI","","SPSHIELD",
+static ieResRef hc_overlays[OVERLAY_COUNT]={"SANCTRY","SPENTACI","","SPSHIELD",
 "GREASED","WEBENTD","MINORGLB","","","","","","","","","","","","","","",
 "","","","SPTURNI2","SPTURNI","","","","","",""};
+static ieDword hc_locations=0x2ba80030;
+
 static int *mxsplwis = NULL;
 static int spllevels;
 
@@ -693,18 +661,27 @@ void pcf_gold(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 	}
 }
 
+static void handle_overlay(Actor*actor, ieResRef overlay, ieDword flag)
+{
+	if (actor->HasVVCCell(overlay))
+		return;
+	ScriptedAnimation *sca = core->GetScriptedAnimation(overlay, false);
+	if (sca) {
+		if (flag) {
+			sca->ZPos=-1;
+		}
+		actor->AddVVCell(sca);
+	}
+}
+
 //de/activates the entangle overlay
 void pcf_entangle(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	if (newValue&1) {
-		if (actor->HasVVCCell(overlay[OV_ENTANGLE]))
-			return;
-		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_ENTANGLE], false);
-		actor->AddVVCell(sca);
-		return;
+		handle_overlay(actor, hc_overlays[OV_ENTANGLE], hc_locations&(1<<OV_ENTANGLE));
 	}
 	if (oldValue&1) {
-		actor->RemoveVVCell(overlay[OV_ENTANGLE], true);
+		actor->RemoveVVCell(hc_overlays[OV_ENTANGLE], true);
 	}
 }
 
@@ -717,14 +694,12 @@ void pcf_sanctuary(Actor *actor, ieDword oldValue, ieDword newValue)
 	for (int i=0;i<32;i++) {
 		if (changed&mask) {
 			if (newValue&mask) {
-				if (!actor->HasVVCCell(overlay[i])) {
-					ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[i], false);
-					actor->AddVVCell(sca);
-				}
+				handle_overlay(actor, hc_overlays[i], hc_locations&mask);
 			} else {
-				actor->RemoveVVCell(overlay[i], true);
+				actor->RemoveVVCell(hc_overlays[i], true);
 			}
 		}
+		mask<<=1;
 	}
 }
 
@@ -732,14 +707,11 @@ void pcf_sanctuary(Actor *actor, ieDword oldValue, ieDword newValue)
 void pcf_shieldglobe(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	if (newValue&1) {
-		if (actor->HasVVCCell(overlay[OV_SHIELDGLOBE]))
-			return;
-		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_SHIELDGLOBE], false);
-		actor->AddVVCell(sca);
+		handle_overlay(actor, hc_overlays[OV_SHIELDGLOBE],hc_locations&(1<<OV_SHIELDGLOBE) );
 		return;
 	}
 	if (oldValue&1) {
-		actor->RemoveVVCell(overlay[OV_SHIELDGLOBE], true);
+		actor->RemoveVVCell(hc_overlays[OV_SHIELDGLOBE], true);
 	}
 }
 
@@ -747,14 +719,11 @@ void pcf_shieldglobe(Actor *actor, ieDword oldValue, ieDword newValue)
 void pcf_minorglobe(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	if (newValue&1) {
-		if (actor->HasVVCCell(overlay[OV_MINORGLOBE]))
-			return;
-		ScriptedAnimation *sca = core->GetScriptedAnimation(overlay[OV_MINORGLOBE], false);
-		actor->AddVVCell(sca);
+		handle_overlay(actor, hc_overlays[OV_MINORGLOBE],hc_locations&(1<<OV_MINORGLOBE) );
 		return;
 	}
 	if (oldValue&1) {
-		actor->RemoveVVCell(overlay[OV_MINORGLOBE], true);
+		actor->RemoveVVCell(hc_overlays[OV_MINORGLOBE], true);
 	}
 }
 
@@ -762,13 +731,11 @@ void pcf_minorglobe(Actor *actor, ieDword oldValue, ieDword newValue)
 void pcf_grease(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	if (newValue&1) {
-		if (actor->HasVVCCell(overlay[OV_GREASE]))
-			return;
-		actor->AddAnimation(overlay[OV_GREASE], -1, -1, 0);
+		handle_overlay(actor, hc_overlays[OV_GREASE],hc_locations&(1<<OV_GREASE) );
 		return;
 	}
 	if (oldValue&1) {
-		actor->RemoveVVCell(overlay[OV_GREASE], true);
+		actor->RemoveVVCell(hc_overlays[OV_GREASE], true);
 	}
 }
 
@@ -777,13 +744,11 @@ void pcf_grease(Actor *actor, ieDword oldValue, ieDword newValue)
 void pcf_web(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	if (newValue&1) {
-		if (actor->HasVVCCell(overlay[OV_WEB]))
-			return;
-		actor->AddAnimation(overlay[OV_WEB], -1, 0, 0);
+		handle_overlay(actor, hc_overlays[OV_WEB],hc_locations&(1<<OV_WEB) );
 		return;
 	}
 	if (oldValue&1) {
-		actor->RemoveVVCell(overlay[OV_WEB], true);
+		actor->RemoveVVCell(hc_overlays[OV_WEB], true);
 	}
 }
 
@@ -791,14 +756,12 @@ void pcf_web(Actor *actor, ieDword oldValue, ieDword newValue)
 void pcf_bounce(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	if (newValue&1) {
-		if (actor->HasVVCCell(overlay[OV_BOUNCE]))
-			return;
-		actor->AddAnimation(overlay[OV_BOUNCE], -1, -1, 0);
+		handle_overlay(actor, hc_overlays[OV_BOUNCE],hc_locations&(1<<OV_BOUNCE) );
 		return;
 	}
 	if (oldValue&1) {
 		//it seems we have to remove it abruptly
-		actor->RemoveVVCell(overlay[OV_BOUNCE], false);
+		actor->RemoveVVCell(hc_overlays[OV_BOUNCE], false);
 	}
 }
 
@@ -1002,9 +965,14 @@ static void InitActorTables()
 	table = core->LoadTable( "overlay" );
 	tm = core->GetTable( table );
 	if (tm) {
+		ieDword mask = 1;
 		for (i=0;i<OVERLAY_COUNT;i++) {
 			const char *tmp = tm->QueryField( i, 0 );
-			strnlwrcpy(overlay[i], tmp, 8);
+			strnlwrcpy(hc_overlays[i], tmp, 8);
+			if (atoi(tm->QueryField( i, 1))) {
+				hc_locations|=mask;
+			}
+			mask<<=1;
 		}
 		core->DelTable( table );
 	}
@@ -3578,3 +3546,40 @@ resolve_stat:
 	return 0;
 }
 
+//full palette will be shaded in gradient color
+void Actor::SetGradient(ieDword gradient)
+{
+	gradient |= (gradient <<16);
+	gradient |= (gradient <<8);
+	for(int i=0;i<7;i++) {
+		Modified[IE_COLORS+i]=gradient;
+	}
+}
+
+//sets one bit of the sanctuary stat (used for overlays)
+void Actor::SetOverlay(unsigned int overlay)
+{
+	if (overlay>=32) return;
+	Modified[IE_SANCTUARY]|=1<<overlay;
+}
+
+//returns true if spell state is already set or illegal
+bool Actor::SetSpellState(unsigned int spellstate)
+{
+	if (spellstate>=192) return true;
+	unsigned int pos = IE_SPLSTATE_ID1+(spellstate>>5);
+	unsigned int bit = 1<<(spellstate&31);
+	if (Modified[pos]&bit) return true;
+	Modified[pos]|=bit;
+	return false;
+}
+
+//returns true if the feat exists
+bool Actor::HasFeat(unsigned int featindex)
+{
+	if (featindex>=96) return false;
+	unsigned int pos = IE_FEATS1+(featindex>>5);
+	unsigned int bit = 1<<(featindex&31);
+	if (Modified[pos]&bit) return true;
+	return false;
+}

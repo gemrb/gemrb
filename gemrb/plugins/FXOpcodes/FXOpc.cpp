@@ -47,7 +47,10 @@
 //FIXME: find a way to handle portrait icons better
 #define PI_HELD   13
 #define PI_HASTED 38
+#define PI_FATIGUE 39
 #define PI_SLOWED 41
+#define PI_HOPELESS 44
+#define PI_FEEBLEMIND 54
 #define PI_STUN   55
 #define PI_BOUNCE 65
 #define PI_BOUNCE2 67
@@ -488,6 +491,7 @@ static EffectRef effectnames[] = {
 	{ "DamageVsCreature", fx_generic_effect, 0 },
 	{ "Death", fx_death, 0 },
 	{ "Death2", fx_death, 0 }, //(iwd2 effect)
+	{ "Death3", fx_death, 0 }, //(iwd2 effect too, Banish)
 	{ "DetectAlignment", fx_detect_alignment, 0 },
 	{ "DetectIllusionsModifier", fx_detect_illusion_modifier, 0 },
 	{ "DexterityModifier", fx_dexterity_modifier, 0 },
@@ -1598,6 +1602,8 @@ int fx_cure_stun_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	BASE_STATE_CURE( STATE_STUNNED );
 	target->fxqueue.RemoveAllEffects(fx_set_stun_state_ref);
 	target->fxqueue.RemoveAllEffects(fx_hold_creature_no_icon_ref);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_HELD);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_HOPELESS);
 	return FX_NOT_APPLIED;
 }
 
@@ -2064,6 +2070,9 @@ int fx_set_feebleminded_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_set_feebleminded_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STATE_SET( STATE_FEEBLE );
 	STAT_SET( IE_INT, 3);
+	if (enhanced_effects) {
+		target->AddPortraitIcon(PI_FEEBLEMIND);
+	}
 	return FX_APPLIED;
 }
 
@@ -2074,6 +2083,7 @@ int fx_cure_feebleminded_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_cure_feebleminded_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STATE_CURE( STATE_FEEBLE );
 	target->fxqueue.RemoveAllEffects(fx_set_feebleminded_state_ref);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_FEEBLEMIND);
 	return FX_NOT_APPLIED;
 }
 
@@ -2749,6 +2759,7 @@ int fx_set_holy_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (STATE_GET (STATE_HOLY) ) //holy power is non cummulative
 		return FX_NOT_APPLIED;
 	STATE_SET( STATE_HOLY );
+	//SetSpellState(SS_HOLYMIGHT);
 	STAT_ADD( IE_STR, fx->Parameter1);
 	STAT_ADD( IE_CON, fx->Parameter1);
 	STAT_ADD( IE_DEX, fx->Parameter1);
@@ -4406,6 +4417,9 @@ int fx_title_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 //0x123 DisableOverlay
+//FIXME: which overlay is disabled?
+//if one of the overlays marked by sanctuary, then
+//make the bit correspond to it
 int fx_disable_overlay_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_disable_overlay_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -4413,7 +4427,10 @@ int fx_disable_overlay_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 //0x124 Protection:Backstab (bg2)
-//0x11f Protection:Backstab (how)
+//0x11f Protection:Backstab (how, iwd2)
+//3 different games, 3 different methods of flagging this
+#define SS_NOBACKSTAB   40
+
 int fx_no_backstab_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_no_backstab_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -4421,6 +4438,8 @@ int fx_no_backstab_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_SET( IE_DISABLEBACKSTAB, fx->Parameter1 );
 	//how
 	EXTSTATE_SET(EXTSTATE_NO_BACKSTAB);
+	//iwd2
+	target->SetSpellState(SS_NOBACKSTAB);
 	return FX_APPLIED;
 }
 //0x125 OffscreenAIModifier
@@ -4625,12 +4644,13 @@ int fx_avatar_removal_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_SET(IE_AVATARREMOVAL, fx->Parameter2);
 	return FX_APPLIED;
 }
-// 0x13c MagicalRest
+// 0x13c MagicalRest (also 0x124 Rest)
 int fx_magical_rest (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_magical_rest (%2d)\n", fx->Opcode );
 	//instant, full rest
 	target->Rest(0);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_FATIGUE);
 	return FX_NOT_APPLIED;
 }
 

@@ -457,5 +457,13 @@ public:
 	int Immobile();
 	/* Returns negative error code if the item is unusable */
 	int Unusable(Item *item) const;
+	/* Sets all clown colour to the given gradient */
+	void SetGradient(ieDword gradient);
+	/* Enables an overlay */
+	void SetOverlay(unsigned int overlay);
+	/* Checks and sets a spellstate if it wasn't set yet */
+	bool SetSpellState(unsigned int spellstate);
+	/* Checks a feat */
+	bool HasFeat(unsigned int featindex);
 };
 #endif
