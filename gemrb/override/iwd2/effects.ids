@@ -131,7 +131,7 @@ IDS
 0x81	AidNonCumulative
 0x82	BlessNonCumulative
 0x83    ChantNonCumulative
-0x84    HolyNonCumulative
+0x84    DrawUponHolyMight
 0x85	LuckNonCumulative
 0x86	State:Petrification
 0x87	Polymorph
@@ -326,7 +326,7 @@ IDS
 425	ControlUndead2
 426	Aegis
 427	ExecutionerEyes
-428	Unsummon
+428	Death3
 429	EffectsOnStruck
 430	EffectsOnProjectile
 431	EnergyDrain
@@ -340,13 +340,13 @@ IDS
 439	OffscreenAIModifier
 440	BarbarianRage
 441	MovementRateModifier4
-443	ProtectionFromArrows
+443	MissileDamageReduction
 444	TensersTransformation
 446	SmiteEvil
 447	Restoration
 448	AlicornLance
 449	CallLightning
-450	GlobeOfInvulnerability
+450	GlobeInvulnerability
 451	LowerResistance
 452	Bane
 453	PowerAttack
