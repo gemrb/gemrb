@@ -155,9 +155,11 @@ public:
 //events that are called out of drawwindow
 //they wait until the condition is right
 #define EF_CONTROL       1
-#define EF_SHOWMAP       2
-#define EF_PORTRAIT      4
-#define EF_UPDATEANIM    8
+#define EF_SHOWMAP       2        //starts worldmap
+#define EF_PORTRAIT      4        //updates portraits
+#define EF_UPDATEANIM    8        //updates avatar animation
+#define EF_SEQUENCER     16       //starts sequencer/contingency creation
+#define EF_IDENTIFY      32       //starts identify screen
 
 //autopause
 #define AP_UNUSABLE      0
@@ -353,8 +355,8 @@ public:
 	Actor *GetCreature(DataStream *stream);
 	/** Returns a PC index, by loading a creature */
 	int LoadCreature(const char *ResRef, int InParty, bool character=false);
-	/** core for summoning creatures */
-	bool SummonCreature(const ieResRef resource, const ieResRef vvcres, Actor *Owner, Actor *target, Point &position, int eamod, int level);
+	/** core for summoning creatures, returns the last created Actor */
+	Actor *SummonCreature(const ieResRef resource, const ieResRef vvcres, Actor *Owner, Actor *target, Point &position, int eamod, int level);
 	/** Sets a stat for the creature in actor index Slot */
 	int SetCreatureStat(unsigned int Slot, unsigned int StatID, int StatValue);
 	/** returns the stat of a creature (mod:1-modified, 0-base) */

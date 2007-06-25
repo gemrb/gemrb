@@ -577,6 +577,18 @@ void Interface::HandleEvents()
 		}
 		return;
 	}
+
+	if (EventFlag&EF_SEQUENCER) {
+		EventFlag&=~EF_SEQUENCER;
+		guiscript->RunFunction( "OpenSequencerWindow" );
+		return;
+	}
+
+	if (EventFlag&EF_IDENTIFY) {
+		EventFlag&=~EF_IDENTIFY;
+		guiscript->RunFunction( "OpenIdentifyWindow" );
+		return;
+	}
 }
 
 /* handle main loop events that might destroy or create windows
@@ -2466,7 +2478,8 @@ int Interface::LoadCreature(const char* ResRef, int InParty, bool character)
 	}
 }
 
-bool Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres, Actor *Owner, Actor *target, Point &position, int eamod, int level)
+//NOTE: if there were more summoned creatures, it will return only the last
+Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres, Actor *Owner, Actor *target, Point &position, int eamod, int level)
 {
 	DataStream* ds = key->GetResource( resource, IE_CRE_CLASS_ID );
 	level = level * 100;
@@ -2475,7 +2488,7 @@ bool Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres, A
 retry:
 	Actor *ab = GetCreature(ds);
 	if (!ab) {
-		return false;
+		return NULL;
 	}
 
 	ab->LastSummoner = Owner->GetID();
@@ -2529,7 +2542,7 @@ retry:
 	if (cnt-- && level>0) {
 		goto retry;
 	}
-	return true;
+	return ab;
 }
 
 int Interface::GetCreatureStat(unsigned int Slot, unsigned int StatID, int Mod)

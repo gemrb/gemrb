@@ -1011,7 +1011,7 @@ static EffectRef fx_poisoned_state_ref={"State:Poison",NULL,-1};
 int fx_cure_poisoned_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_poisoned_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STATE_CURE( STATE_POISONED ); //this actually isn't in the engine code, i think
+	BASE_STATE_CURE( STATE_POISONED ); //this actually isn't in the engine code, i think
 	target->fxqueue.RemoveAllEffects( fx_poisoned_state_ref ); //this is what actually happens in bg2
 	return FX_NOT_APPLIED;
 }
@@ -1079,7 +1079,7 @@ int fx_death (Actor* Owner, Actor* target, Effect* fx)
 int fx_cure_frozen_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_frozen_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STATE_CURE( STATE_FROZEN );
+	BASE_STATE_CURE( STATE_FROZEN );
 	return FX_NOT_APPLIED;
 }
 
@@ -1889,7 +1889,7 @@ static EffectRef fx_set_infravision_state_ref={"State:Infravision",NULL,-1};
 int fx_cure_infravision_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_infravision_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STATE_CURE( STATE_INFRA );
+	BASE_STATE_CURE( STATE_INFRA );
 	target->fxqueue.RemoveAllEffects(fx_set_infravision_state_ref);
 	return FX_NOT_APPLIED;
 }
@@ -2059,7 +2059,7 @@ static EffectRef fx_set_blind_state_ref={"State:Blind",NULL,-1};
 int fx_cure_blind_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_blind_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STATE_CURE( STATE_BLIND );
+	BASE_STATE_CURE( STATE_BLIND );
 	target->fxqueue.RemoveAllEffects(fx_set_blind_state_ref);
 	return FX_NOT_APPLIED;
 }
@@ -2078,10 +2078,11 @@ int fx_set_feebleminded_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 // 0x4d Cure:Feeblemind
 static EffectRef fx_set_feebleminded_state_ref={"State:Feeblemind",NULL,-1};
+
 int fx_cure_feebleminded_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_feebleminded_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STATE_CURE( STATE_FEEBLE );
+	BASE_STATE_CURE( STATE_FEEBLE );
 	target->fxqueue.RemoveAllEffects(fx_set_feebleminded_state_ref);
 	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_FEEBLEMIND);
 	return FX_NOT_APPLIED;
@@ -2550,8 +2551,9 @@ int fx_detect_alignment (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_cure_improved_invisible_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_improved_invisible_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STATE_CURE( STATE_INVISIBLE );
-	STATE_CURE( STATE_INVIS2 );
+	//the modified state will be cured automagically when the invis effect is removed
+	BASE_STATE_CURE( STATE_INVISIBLE );
+	BASE_STATE_CURE( STATE_INVIS2 );
 	target->fxqueue.RemoveAllEffects(fx_set_invisible_state_ref);
 	return FX_NOT_APPLIED;
 }
@@ -2972,7 +2974,8 @@ int fx_cast_scroll (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 int fx_identify (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_identify (%2d): Resource:%s Mode: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
-	STAT_SET (IE_IDENTIFYMODE, 1);
+	BASE_SET (IE_IDENTIFYMODE, 1);
+	core->SetEventFlag(EF_IDENTIFY);
 	return FX_NOT_APPLIED;
 }
 // 0x96 FindTraps
@@ -3142,7 +3145,7 @@ static EffectRef fx_set_panic_state_ref={"State:Panic",NULL,-1};
 int fx_cure_panic_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_panic_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STATE_CURE( STATE_PANIC );
+	BASE_STATE_CURE( STATE_PANIC );
 	target->fxqueue.RemoveAllEffects(fx_set_panic_state_ref);
 	return FX_NOT_APPLIED;
 }
@@ -3398,12 +3401,16 @@ int fx_castinglevel_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	}
 	return FX_APPLIED;
 }
+
 // 0xc0 FindFamiliar
 // param2 = 1 alignment is in param1
 // param2 = 2 resource used
 #define FAMILIAR_NORMAL    0
 #define FAMILIAR_ALIGNMENT 1
 #define FAMILIAR_RESOURCE  2
+
+static EffectRef fx_familiar_constitution_loss_ref={"FamiliarBond",NULL,-1};
+static EffectRef fx_familiar_marker_ref={"FamiliarMarker",NULL,-1};
 
 int fx_find_familiar (Actor* Owner, Actor* target, Effect* fx)
 {
@@ -3425,9 +3432,18 @@ int fx_find_familiar (Actor* Owner, Actor* target, Effect* fx)
 	}
 	//summon familiar with fx->Resource
 	Point p(fx->PosX, fx->PosY);
-	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, p, -1,0);
+	Actor *fam = core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, p, -1,0);
+	if (fam) {
+		Effect *newfx;
+
+		newfx = EffectQueue::CreateEffect(fx_familiar_constitution_loss_ref, (ieDword) -10, 0, FX_DURATION_INSTANT_PERMANENT);
+		core->ApplyEffect(newfx, fam, fam);
+		newfx = EffectQueue::CreateEffect(fx_familiar_marker_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
+		core->ApplyEffect(newfx, fam, fam);
+	}
 	return FX_NOT_APPLIED;
 }
+
 // 0xc1 InvisibleDetection
 int fx_see_invisible_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -3445,18 +3461,43 @@ int fx_ignore_dialogpause_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0xc3 FamiliarBond
-int fx_familiar_constitution_loss (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+//when this effect's target dies it should incur damage on protagonist
+static EffectRef fx_damage_opcode_ref={"Damage",NULL,-1};
+static EffectRef fx_maximum_hp_modifier_ref={"MaximumHPModifier",NULL,-1};
+
+int fx_familiar_constitution_loss (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_familiar_constitution_loss (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
-	//when this effect's target dies it should incur damage on protagonist
-	return FX_APPLIED;
+	if (0) printf( "fx_familiar_constitution_loss (%2d): Loss: %d\n", fx->Opcode,(signed) fx->Parameter1 );
+	if (! (STAT_GET(IE_STATE_ID)&STATE_NOSAVE)) {
+		return FX_APPLIED;
+	}
+	Effect *newfx;
+	//familiar died
+	Actor *master = core->GetGame()->FindPC(1);
+	if (!master) return FX_NOT_APPLIED;
+	//maximum hp (param1 is a negative value)
+	newfx = EffectQueue::CreateEffect(fx_maximum_hp_modifier_ref, fx->Parameter1, 0, FX_DURATION_INSTANT_PERMANENT);
+	core->ApplyEffect(newfx, master, master);
+	//damage
+	newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
+	core->ApplyEffect(newfx, master, master);
+	return FX_NOT_APPLIED;
 }
+
 //0xc4 FamiliarMarker
-int fx_familiar_marker (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_familiar_marker (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_familiar_marker (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
-	return FX_APPLIED;
+	if (0) printf( "fx_familiar_marker (%2d)\n", fx->Opcode );
+	if (! (STAT_GET(IE_STATE_ID)&STATE_NOSAVE)) {
+		//TODO: where to disable familiar?
+		//core->GetGame()->WeatherBits|=1;
+		return FX_APPLIED;
+	}
+	//TODO: enable familiar?
+	//core->GetGame()->WeatherBits&=~1;
+	return FX_NOT_APPLIED;
 }
+
 // 0xc5 Bounce:Projectile
 int fx_bounce_projectile (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -3541,6 +3582,8 @@ int fx_bounce_spell (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0xd0 MinimumHPModifier
+// the original engine didn't allow modifying of this stat
+// it allowed only setting it, and only by one instance
 int fx_minimum_hp_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_minimum_hp_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -3858,10 +3901,11 @@ int fx_proficiency (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0xea CreateContingency
-int fx_create_contingency (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_create_contingency (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_create_contingency (%2d): Value: %d, Stat: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-
+	BASE_SET(IE_IDENTIFYMODE,2);
+	core->SetEventFlag(EF_SEQUENCER);
 	return FX_NOT_APPLIED;
 }
 
@@ -3947,10 +3991,14 @@ int fx_remove_portrait_icon (Actor* /*Owner*/, Actor* target, Effect* fx)
 // 0xf1 control creature (same as charm)
 
 // 0xF2 Cure:Confusion
+
+static EffectRef fx_confused_state_ref={"State:Confused",NULL,-1};
+
 int fx_cure_confused_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_confused_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STATE_CURE( STATE_CONFUSED );
+	BASE_STATE_CURE( STATE_CONFUSED );
+	target->fxqueue.RemoveAllEffects(fx_confused_state_ref);
 	return FX_NOT_APPLIED;
 }
 // 0xf3 DrainItems
@@ -3970,7 +4018,14 @@ int fx_drain_spells (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_drain_spells (%2d): Count: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	ieDword i=fx->Parameter1;
-	if (fx->Parameter2)
+	if (fx->Parameter2) {
+		while(i--) {
+			if (!target->spellbook.DepleteSpell(IE_SPELL_TYPE_PRIEST)) {
+				break;
+			}
+		}
+		return FX_NOT_APPLIED;
+	}
 	while(i--) {
 		if (!target->spellbook.DepleteSpell(IE_SPELL_TYPE_WIZARD)) {
 			break;
@@ -3996,7 +4051,7 @@ int fx_berserkstage1_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_berserkstage2_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_berserkstage2_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STAT_SET( IE_BERSERKSTAGE1, fx->Parameter2 );
+	STAT_SET( IE_BERSERKSTAGE2, fx->Parameter2 );
 	return FX_APPLIED;
 }
 // 0xf8 set melee effect generic effect?
@@ -4023,6 +4078,7 @@ int fx_set_map_marker_name (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 	if (0) printf( "fx_set_map_marker_name (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	return FX_NOT_APPLIED;
 }
+
 // 0xfe SetMapMarkerPosition
 int fx_set_map_marker_position (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
@@ -4047,6 +4103,7 @@ int fx_create_item_days (Actor* /*Owner*/, Actor* target, Effect* fx)
 	}
 	return FX_NOT_APPLIED;
 }
+
 // 0x100 Sequencer:Store
 int fx_store_spell_sequencer(Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -4055,11 +4112,14 @@ int fx_store_spell_sequencer(Actor* /*Owner*/, Actor* target, Effect* fx)
 	target->AddPortraitIcon(PI_SEQUENCER);
 	return FX_APPLIED;
 }
+
 // 0x101 Sequencer:Create
-int fx_create_spell_sequencer(Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_create_spell_sequencer(Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_create_spell_sequencer (%2d)\n", fx->Opcode );
 	//just a call to activate the spell sequencer creation gui
+	BASE_SET(IE_IDENTIFYMODE,3);
+	core->SetEventFlag(EF_SEQUENCER);
 	return FX_NOT_APPLIED;
 }
 
@@ -4076,7 +4136,7 @@ int fx_activate_spell_sequencer(Actor* Owner, Actor* target, Effect* fx)
 		core->ApplySpell(sequencer->Resource2, Owner, target, fx->Power);
 		core->ApplySpell(sequencer->Resource3, Owner, target, fx->Power);
 		core->ApplySpell(sequencer->Resource4, Owner, target, fx->Power);
-		//remove the spell sequencer store effec
+		//remove the spell sequencer store effect
 		sequencer->TimingMode=FX_DURATION_JUST_EXPIRED;
 	}
 	return FX_NOT_APPLIED;
