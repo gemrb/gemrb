@@ -1048,7 +1048,7 @@ void Movable::ClearPath()
 	//don't call ReleaseCurrentAction
 }
 
-static unsigned long tp_steps[8]={3,2,1,0,1,2,3,4};
+static const unsigned long tp_steps[8]={3,2,1,0,1,2,3,4};
 
 void Movable::DrawTargetPoint(Region &vp)
 {

@@ -216,7 +216,7 @@ public:
 	int CheckImmunity(Actor *target);
 	// apply this effectqueue on all actors matching ids targeting
 	// from pos, in range (no cone size yet)
-	void AffectAllInRange(Map *map, Point &pos, int idstype, int idsvalue, unsigned int range);
+	void AffectAllInRange(Map *map, Point &pos, int idstype, int idsvalue, unsigned int range, Actor *except);
 	/** Lists contents of the queue on a terminal for debugging */
 	void dump();
 	//resolve effect

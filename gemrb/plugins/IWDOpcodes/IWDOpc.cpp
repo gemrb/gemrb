@@ -25,6 +25,7 @@
 #include "../Core/EffectQueue.h"
 #include "../Core/Interface.h"
 #include "../Core/Game.h"
+#include "../Core/Spell.h"
 #include "../Core/damages.h"
 #include "../Core/GSUtils.h"  //needs for displaystringcore
 #include "IWDOpc.h"
@@ -45,9 +46,11 @@ static ieResRef SevenEyes[7]={"spin126","spin127","spin128","spin129","spin130",
 static bool enhanced_effects = false;
 static int shcount = -1;
 
+#define PI_CONFUSION    3
 #define PI_PROTFROMEVIL 9
 #define PI_FREEACTION   19
 #define PI_BARKSKIN     20
+#define PI_PANIC        36
 #define PI_NAUSEA       43
 #define PI_HOPELESSNESS 44
 #define PI_RIGHTEOUS    67
@@ -194,6 +197,9 @@ static int shcount = -1;
 #define SS_STATICCHARGE 116
 #define SS_LOWERRESIST  140
 
+//tested for this, splstate is wrong or this entry has two uses
+#define SS_DAYBLINDNESS 178   
+
 static int fx_ac_vs_damage_type_modifier_iwd2 (Actor* Owner, Actor* target, Effect* fx);//0
 static int fx_draw_upon_holy_might (Actor* Owner, Actor* target, Effect* fx);//84 (iwd2)
 static int fx_ironskins (Actor* Owner, Actor* target, Effect* fx);//da (iwd2)
@@ -281,15 +287,17 @@ static int fx_fireshield (Actor* Owner, Actor* target, Effect* fx); //406
 static int fx_death_ward (Actor* Owner, Actor* target, Effect* fx); //407
 static int fx_holy_power (Actor* Owner, Actor* target, Effect* fx); //408
 static int fx_righteous_wrath (Actor* Owner, Actor* target, Effect* fx); //409
-//static int fx_summon_ally_iwd2 (Actor* Owner, Actor* target, Effect* fx); //410
-//static int fx_summon_enemy_iwd2 (Actor* Owner, Actor* target, Effect* fx); //411
+static int fx_summon_ally (Actor* Owner, Actor* target, Effect* fx); //410
+static int fx_summon_enemy (Actor* Owner, Actor* target, Effect* fx); //411
 static int fx_control (Actor* Owner, Actor* target, Effect* fx); //412
 static int fx_visual_effect_iwd2 (Actor* Owner, Actor* target, Effect* fx); //413
 static int fx_resilient_sphere (Actor* Owner, Actor* target, Effect* fx); //414
 static int fx_barkskin (Actor* Owner, Actor* target, Effect* fx); //415
 static int fx_bleeding_wounds (Actor* Owner, Actor* target, Effect* fx); //416
+static int fx_area_effect  (Actor* Owner, Actor* target, Effect* fx); //417
 static int fx_free_action_iwd2 (Actor* Owner, Actor* target, Effect* fx); //418
 static int fx_unconsciousness (Actor* Owner, Actor* target, Effect* fx); //419
+//420 Death2 (same as 0xd)
 static int fx_entropy_shield (Actor* Owner, Actor* target, Effect* fx); //421
 static int fx_storm_shell (Actor* Owner, Actor* target, Effect* fx); //422
 static int fx_protection_from_elements (Actor* Owner, Actor* target, Effect* fx); //423
@@ -297,13 +305,21 @@ static int fx_protection_from_elements (Actor* Owner, Actor* target, Effect* fx)
 //425 ControlUndead
 static int fx_aegis (Actor* Owner, Actor* target, Effect* fx); //426
 static int fx_executioner_eyes (Actor* Owner, Actor* target, Effect* fx); //427
-
+//428 DeathMagic (same as 0xd)
+//429
+//430
 static int fx_energy_drain (Actor* Owner, Actor* target, Effect* fx); //431
 static int fx_tortoise_shell (Actor* Owner, Actor* target, Effect* fx); //432
 static int fx_blink (Actor* Owner, Actor* target, Effect* fx); //433
-
+static int fx_persistent_use_effect_list (Actor* Owner, Actor* target, Effect* fx); //434
+static int fx_day_blindness (Actor* Owner, Actor* target, Effect* fx); //435
+static int fx_damage_reduction (Actor* Owner, Actor* target, Effect* fx); //436
+static int fx_disguise (Actor* Owner, Actor* target, Effect* fx); //437
 static int fx_heroic_inspiration (Actor* Owner, Actor* target, Effect* fx); //438
 //static int fx_prevent_ai_slowdown (Actor* Owner, Actor* target, Effect* fx); //439
+static int fx_barbarian_rage (Actor* Owner, Actor* target, Effect* fx); //440
+//441 MovementModifier
+//442 unknown
 static int fx_missile_damage_reduction (Actor* Owner, Actor* target, Effect* fx); //443
 static int fx_tenser_transformation (Actor* Owner, Actor* target, Effect* fx); //444
 //static int fx_445 (Actor* Owner, Actor* target, Effect* fx); //445 unused
@@ -392,13 +408,14 @@ static EffectRef effectnames[] = {
 	{ "DeathWard", fx_death_ward, 0}, //407
 	{ "HolyPower", fx_holy_power, 0}, //408
 	{ "RighteousWrath", fx_righteous_wrath, 0}, //409
-
+	{ "SummonAlly", fx_summon_ally, 0}, //410
+	{ "SummonEnemy", fx_summon_enemy, 0}, //411
 	{ "Control2", fx_control, 0}, //412
 	{ "VisualEffectIWD2", fx_visual_effect_iwd2, 0}, //413
 	{ "ResilientSphere", fx_resilient_sphere, 0}, //414
 	{ "BarkSkin", fx_barkskin, 0}, //415
 	{ "BleedingWounds", fx_bleeding_wounds, 0},//416
-
+	{ "AreaEffect", fx_area_effect, 0}, //417
 	{ "FreeAction2", fx_free_action_iwd2, 0}, //418
 	{ "Unconsciousness", fx_unconsciousness, 0}, //419
 	{ "EntropyShield", fx_entropy_shield, 0}, //421
@@ -410,8 +427,13 @@ static EffectRef effectnames[] = {
 	{ "EnergyDrain", fx_energy_drain, 0}, //431
 	{ "TortoiseShell", fx_tortoise_shell, 0}, //432
 	{ "Blink", fx_blink, 0},//433
+	{ "PersistentUseEffectList", fx_persistent_use_effect_list, 0}, //434
+	{ "DayBlindness", fx_day_blindness, 0}, //435
+	{ "DamageReduction", fx_damage_reduction, 0}, //436
+	{ "Disguise", fx_disguise, 0}, //437
 	{ "HeroicInspiration", fx_heroic_inspiration, 0},//438
 	//{ "PreventAISlowDown", fx_prevent_ai_slowdown, 0}, //439 same as bg2
+	{ "BarbarianRage", fx_barbarian_rage, 0}, //440
 	{ "MissileDamageReduction", fx_missile_damage_reduction, 0}, //443
 	{ "TensersTransformation", fx_tenser_transformation, 0}, //444
 	{ "SmiteEvil", fx_smite_evil, 0}, //446
@@ -765,6 +787,9 @@ int fx_chill_touch_panic (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_chill_touch_panic (%2d)\n", fx->Opcode);
 	STAT_SET(IE_MORALE, STAT_GET(IE_MORALEBREAK));
+	if (enhanced_effects) {
+		target->AddPortraitIcon(PI_PANIC);
+	}
 	return FX_APPLIED;
 }
 
@@ -1199,12 +1224,15 @@ int fx_cloak_of_fear(Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 //0x10b RemoveConfusion
 static EffectRef fx_confusion_ref={"State:Confused",NULL,-1};
 static EffectRef fx_umberhulk_gaze_ref={"UmberHulkGaze",NULL,-1};
+static EffectRef fx_display_portrait_icon_ref={"Icon:Display",NULL,-1};
 
 int fx_remove_confusion (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_remove_confusion (%2d)\n", fx->Opcode );
+	BASE_STATE_CURE(STATE_CONFUSED);
 	target->fxqueue.RemoveAllEffects(fx_confusion_ref);
 	target->fxqueue.RemoveAllEffects(fx_umberhulk_gaze_ref);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref,PI_CONFUSION);
 	return FX_APPLIED;
 }
 //0x10c EyeOfTheMind
@@ -1474,42 +1502,42 @@ int fx_mace_of_disruption (Actor* Owner, Actor* target, Effect* fx)
 	int chance = 0;
 	switch (race) {
 		case 156: // outsider
-	    chance = 5;
+			chance = 5;
 			break;
-	  case 108: case 115: case 167:  //ghoul, skeleton, undead
-	    switch (STAT_GET(IE_LEVEL)) {
-	    case 1: case 2: case 3: case 4:
-	      chance = 100;
-	      break;
-	    case 5:
-	      chance = 95;
-	      break;
-	    case 6:
-	      chance = 80;
-	      break;
-	    case 7:
-	      chance = 65;
-	      break;
-	    case 8: case 9:
-	      chance = 50;
-	      break;
-	    case 10:
-	      chance = 35;
-	      break;
-	    default:
-	      chance = 20;
-	      break;
-	    }
-	    break;
+		case 108: case 115: case 167:  //ghoul, skeleton, undead
+			switch (STAT_GET(IE_LEVEL)) {
+			case 1: case 2: case 3: case 4:
+				chance = 100;
+				break;
+			case 5:
+				chance = 95;
+				break;
+			case 6:
+				chance = 80;
+				break;
+			case 7:
+				chance = 65;
+				break;
+			case 8: case 9:
+				chance = 50;
+				break;
+			case 10:
+				chance = 35;
+				break;
+			default:
+				chance = 20;
+				break;
+			}
+			break;
 		default:;
 	}
 	if (chance>core->Roll(1,100,0)) {
-	  return FX_NOT_APPLIED;
+		return FX_NOT_APPLIED;
 	}
 
 
 	Effect *newfx = EffectQueue::CreateEffect(fx_death_ref, 0,
-	    8, FX_DURATION_INSTANT_PERMANENT);
+			8, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, Owner, target);
 	return FX_NOT_APPLIED;
 }
@@ -1525,7 +1553,7 @@ int fx_set_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	target->SetSpellState(fx->Parameter2);
 	//in HoW this sets only the 10 last bits of extstate (until it runs out of bits)
 	if (fx->Parameter2<11) {
-	  EXTSTATE_SET(0x40000<<fx->Parameter2);
+		EXTSTATE_SET(0x40000<<fx->Parameter2);
 	}
 	return FX_APPLIED;
 }
@@ -1588,31 +1616,31 @@ int fx_rod_of_smithing (Actor* Owner, Actor* target, Effect* fx)
 
 	switch (race) {
 		case 144: // golem
-	    if (core->Roll(1,100,0)>5) {
-	      damage = core->Roll(1,8,3);
-	    } else {
-	      damage = -1;
-	    }
+			if (core->Roll(1,100,0)>5) {
+				damage = core->Roll(1,8,3);
+			} else {
+				damage = -1;
+			}
 			break;
-	  case 156: //outsider
-	    if (core->Roll(1,100,0)>5) {
-	      return FX_NOT_APPLIED;
-	    }
-	    damage = core->Roll(8,3,0);
-	    break;
+		case 156: //outsider
+			if (core->Roll(1,100,0)>5) {
+				return FX_NOT_APPLIED;
+			}
+			damage = core->Roll(8,3,0);
+			break;
 		default:;
-	    return FX_NOT_APPLIED;
+			return FX_NOT_APPLIED;
 	}
 
 	Effect *newfx;
 	if (damage<0) {
-	  //create death effect (chunked death)
-	  newfx = EffectQueue::CreateEffect(fx_death_ref, 0,
-	    8, FX_DURATION_INSTANT_PERMANENT);
+		//create death effect (chunked death)
+		newfx = EffectQueue::CreateEffect(fx_death_ref, 0,
+			8, FX_DURATION_INSTANT_PERMANENT);
 	} else {
-	  //create damage effect (blunt)
-	  newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, (ieDword) damage,
-	    0, FX_DURATION_INSTANT_PERMANENT);
+		//create damage effect (blunt)
+		newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, (ieDword) damage,
+			0, FX_DURATION_INSTANT_PERMANENT);
 	}
 	core->ApplyEffect(newfx, Owner, target);
 	return FX_NOT_APPLIED;
@@ -1789,8 +1817,18 @@ int fx_righteous_wrath (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //410 SummonAllyIWD2
+int fx_summon_ally (Actor* Owner, Actor* target, Effect* fx)
+{
+	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, target->Pos, EAM_ALLY, 0);
+	return FX_NOT_APPLIED;
+}
 
 //411 SummonEnemyIWD2
+int fx_summon_enemy (Actor* Owner, Actor* target, Effect* fx)
+{
+	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, target->Pos, EAM_ENEMY, 0);
+	return FX_NOT_APPLIED;
+}
 
 //412 Control2
 
@@ -1847,11 +1885,11 @@ int fx_visual_effect_iwd2 (Actor* /*Owner*/, Actor* target, Effect* fx)
 		case OV_MINORGLOBE: case OV_GLOBE:
 			STAT_BIT_OR(IE_MINORGLOBE, 1);
 			break;
-	  case OV_SEVENEYES:
-	      target->SetOverlay(OV_SEVENEYES2);
+		case OV_SEVENEYES:
+			target->SetOverlay(OV_SEVENEYES2);
 		// some more
 		}
-	  target->SetOverlay(type);
+		target->SetOverlay(type);
 		//STAT_BIT_OR(IE_SANCTUARY, 1<<type);
 		return FX_APPLIED;
 	}  
@@ -1933,6 +1971,28 @@ int fx_bleeding_wounds (Actor* Owner, Actor* target, Effect* fx)
 }
 
 //417 AreaEffect
+int fx_area_effect (Actor* Owner, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_area_effect (%2d) Type: %d\n", fx->Opcode, fx->Parameter2);
+
+	Point pos(fx->PosX, fx->PosY);
+
+	Spell *spell = core->GetSpell(fx->Resource);
+	if (!spell) {
+		return FX_NOT_APPLIED;
+	}
+
+	EffectQueue *fxqueue = spell->GetEffectBlock(0);
+	fxqueue->SetOwner(Owner);
+	fxqueue->AffectAllInRange(target->GetCurrentArea(), pos, 0, 0,fx->Parameter1, target);
+
+	delete fxqueue;
+
+	if (fx->Parameter2&1) {
+		 return FX_APPLIED;
+	}
+	return FX_NOT_APPLIED;
+}
 
 //418 FreeAction2
 int fx_free_action_iwd2 (Actor* /*Owner*/, Actor* target, Effect* fx)
@@ -2125,7 +2185,41 @@ int fx_blink (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //434 PersistentUseEffectList
+int fx_persistent_use_effect_list (Actor* Owner, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_persistent_use_effect_list (%2d) Interval: %d Resource: %.8s\n", fx->Opcode, fx->Parameter1, fx->Resource);
+	if (fx->Parameter3) {
+		fx->Parameter3--;
+	} else {
+		core->ApplySpell(fx->Resource, Owner, target, fx->Power);
+		fx->Parameter3=fx->Parameter1;
+	}
+	return FX_APPLIED;
+}
+
 //435 DayBlindness
+int fx_day_blindness (Actor* Owner, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_day_blindness (%2d) Amount: %d\n", fx->Opcode, fx->Parameter2);
+	if (target->SetSpellState(SS_DAYBLINDNESS)) return FX_NOT_APPLIED;
+	// medium hack (better than original)
+	// the original used explicit race/subrace values
+	ieDword penalty;
+
+	if (check_iwd_targeting(Owner, target, 0, 82)) penalty = 2; //dark elf
+	else if (check_iwd_targeting(Owner, target, 0, 84)) penalty = 2; //duergar
+	else penalty = 0;
+
+ 	STAT_ADD(IE_SAVEFORTITUDE, penalty);
+	STAT_ADD(IE_SAVEREFLEX, penalty);
+	STAT_ADD(IE_SAVEWILL, penalty);
+	//for compatibility reasons
+	STAT_ADD(IE_SAVEVSBREATH, penalty);
+	STAT_ADD(IE_SAVEVSSPELL, penalty);
+
+	//TODO: implement the rest
+	return FX_APPLIED;
+}
 
 //436 DamageReduction
 int fx_damage_reduction (Actor* /*Owner*/, Actor* target, Effect* fx)
@@ -2138,6 +2232,23 @@ int fx_damage_reduction (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //437 Disguise
+//modifies character animations to look like clerics of same gender/race
+int fx_disguise (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_disguise (%2d) Amount: %d\n", fx->Opcode, fx->Parameter2);
+	ieDword anim = BASE_GET(IE_ANIMATION_ID);
+	if (anim>=0x6000 || anim<=0x6fff) {
+		STAT_SET(IE_ANIMATION_ID, anim&0x600f);
+		return FX_APPLIED;
+	}
+
+	if (anim>=0x5000 || anim<=0x5fff) {
+		STAT_SET(IE_ANIMATION_ID, anim&0x500f);
+		return FX_APPLIED;
+	}
+	//set avatar anim?
+	return FX_NOT_APPLIED;
+}
 //438 HeroicInspiration
 int fx_heroic_inspiration (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -2157,8 +2268,14 @@ int fx_heroic_inspiration (Actor* /*Owner*/, Actor* target, Effect* fx)
 //same as BG2 OffscreenAIModifier
 
 //440 BarbarianRage
+int fx_barbarian_rage (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_barbarian_rage (%2d) Amount:%d\n", fx->Opcode, fx->Parameter1);
+	//TODO: implement this
+	return FX_APPLIED;
+}
 
-//441 MovementRateModifier4
+//441 MovementRateModifier4 (same as others)
 
 //442 Unknown (needs research)
 
@@ -2179,7 +2296,7 @@ int fx_tenser_transformation (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_SUB(IE_ARMORCLASS, 2);
 	
 	if (enhanced_effects) {
-	  target->SetGradient(0x3e);
+		target->SetGradient(0x3e);
 	}
 	return FX_APPLIED;
 }

@@ -79,15 +79,15 @@ bool EffectQueue::match_ids(Actor *target, int table, ieDword value)
 	return false;
 }
 
-static bool fx_instant[MAX_TIMING_MODE]={true,true,true,false,false,false,false,false,true,true,true};
+static const bool fx_instant[MAX_TIMING_MODE]={true,true,true,false,false,false,false,false,true,true,true};
 
 inline bool IsInstant(ieByte timingmode)
 {
 	if (timingmode>=MAX_TIMING_MODE) return false;
 	return fx_instant[timingmode];
 }
-//                                        0    1     2     3    4    5    6     7       8   9     10
-static bool fx_relative[MAX_TIMING_MODE]={true,false,false,true,true,true,false,false,false,false,false};
+//                                               0    1     2     3    4    5    6     7       8   9     10
+static const bool fx_relative[MAX_TIMING_MODE]={true,false,false,true,true,true,false,false,false,false,false};
 
 inline bool NeedPrepare(ieByte timingmode)
 {
@@ -100,7 +100,7 @@ inline bool NeedPrepare(ieByte timingmode)
 #define DELAYED   1
 #define DURATION  2
 
-static int fx_prepared[MAX_TIMING_MODE]={DURATION,PERMANENT,PERMANENT,DELAYED, //0-3
+static const int fx_prepared[MAX_TIMING_MODE]={DURATION,PERMANENT,PERMANENT,DELAYED, //0-3
 DELAYED,DELAYED,DELAYED,DELAYED,PERMANENT,PERMANENT,PERMANENT};                //4-7
 
 inline int IsPrepared(ieByte timingmode)
@@ -1085,7 +1085,7 @@ Effect *EffectQueue::HasEffectWithParamPair(EffectRef &effect_reference, ieDword
 }
 
 //this function does IDS targeting for effects (extra damage/thac0 against creature)
-static int ids_stats[7]={IE_EA, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, IE_SEX, IE_ALIGNMENT};
+static const int ids_stats[7]={IE_EA, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, IE_SEX, IE_ALIGNMENT};
 
 int EffectQueue::BonusAgainstCreature(ieDword opcode, Actor *actor) const
 {
@@ -1266,11 +1266,14 @@ int EffectQueue::CheckImmunity(Actor *target)
 }
 
 void EffectQueue::AffectAllInRange(Map *map, Point &pos, int idstype, int idsvalue,
-		unsigned int range)
+		unsigned int range, Actor *except)
 {
 	int cnt = map->GetActorCount(true);
 	while(cnt--) {
 		Actor *actor = map->GetActor(cnt,true);
+		if (except==actor) {
+			continue;
+		}
 		//distance
 		if (Distance(pos, actor)>range) {
 			continue;
