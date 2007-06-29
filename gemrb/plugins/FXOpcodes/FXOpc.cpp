@@ -2636,10 +2636,33 @@ int fx_remove_inventory_item (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x7c DimensionDoor
-int fx_dimension_door (Actor* /*Owner*/, Actor* target, Effect* fx)
+// iwd2 has several options
+int fx_dimension_door (Actor* Owner, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_dimension_door (%2d)\n", fx->Opcode );
-	Point p(fx->PosX, fx->PosY);
+	if (0) printf( "fx_dimension_door (%2d) Type:%d\n", fx->Opcode, fx->Parameter2 );
+	Point p;
+	
+	switch(fx->Parameter2)
+	{
+	case 0: //target to point
+		p.x=fx->PosX;
+		p.y=fx->PosY;
+		break;
+	case 1: //owner to target
+		p=target->Pos;
+		target = Owner;
+		break;
+	case 2: //target to saved location
+		p.x=STAT_GET(IE_SAVEDXPOS);
+		p.x=STAT_GET(IE_SAVEDYPOS);
+		target->SetOrientation(STAT_GET(IE_SAVEDFACE), false);
+		break;
+	case 3: //owner swapped with target
+		p=target->Pos;
+		target->SetPosition(Owner->Pos, true, 0);
+		target = Owner;
+		break;
+	}
 	target->SetPosition(p, true, 0 );
 	return FX_NOT_APPLIED;
 }
@@ -2795,14 +2818,17 @@ int fx_polymorph (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_SET( IE_POLYMORPHED, 1 );
 	return FX_APPLIED;
 }
+
 // 0x88 ForceVisible
 int fx_force_visible (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_force_visible (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	BASE_STATE_CURE(STATE_INVISIBLE);
-	target->fxqueue.RemoveAllEffects(fx_set_invisible_state_ref);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_set_invisible_state_ref,0);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_set_invisible_state_ref,2);
 	return FX_NOT_APPLIED;
 }
+
 // 0x89 ChantBadNonCumulative
 int fx_set_chantbad_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -2814,6 +2840,7 @@ int fx_set_chantbad_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_SUB( IE_LUCK, fx->Parameter1 );
 	return FX_APPLIED;
 }
+
 // 0x8A AnimationStateChange
 int fx_animation_stance (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -2821,6 +2848,7 @@ int fx_animation_stance (Actor* /*Owner*/, Actor* target, Effect* fx)
 	target->SetStance(fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
+
 // 0x8B DisplayString
 // gemrb extension: rgb colour for displaystring
 int fx_display_string (Actor* /*Owner*/, Actor* target, Effect* fx)
@@ -2830,9 +2858,10 @@ int fx_display_string (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-int ypos_by_direction[16]={10,10,10,0,-10,-10,-10,-10,-10,-10,-10,-10,0,10,10,10};
-int xpos_by_direction[16]={0,-2,-4,-6,-8,-6,-4,-2,0,2,4,6,8,6,4,2};
 //0x8c CastingGlow
+static const int ypos_by_direction[16]={10,10,10,0,-10,-10,-10,-10,-10,-10,-10,-10,0,10,10,10};
+static const int xpos_by_direction[16]={0,-2,-4,-6,-8,-6,-4,-2,0,2,4,6,8,6,4,2};
+
 int fx_casting_glow (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_casting_glow (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
@@ -2911,6 +2940,7 @@ int fx_display_portrait_icon (Actor* /*Owner*/, Actor* target, Effect* fx)
 	target->AddPortraitIcon(fx->Parameter2);
 	return FX_APPLIED;
 }
+
 //0x8f Item:CreateInSlot
 int fx_create_item_in_slot (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -2925,6 +2955,7 @@ int fx_create_item_in_slot (Actor* /*Owner*/, Actor* target, Effect* fx)
 	}
 	return FX_NOT_APPLIED;
 }
+
 // 0x90 DisableButton
 int fx_disable_button (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
@@ -2932,13 +2963,18 @@ int fx_disable_button (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 	//
 	return FX_APPLIED;
 }
+
 //0x91 DisableSpellCasting
+//iwd2: 
+// 0 - all, 1 - mage+cleric, 2 - mage,3 - cleric ,4 - innate
 int fx_disable_spellcasting (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_disable_spellcasting (%2d): Button: %d\n", fx->Opcode, fx->Parameter2 );
+	
 	//
 	return FX_APPLIED;
 }
+
 //0x92 Spell:Cast
 int fx_cast_spell (Actor* Owner, Actor* target, Effect* fx)
 {
