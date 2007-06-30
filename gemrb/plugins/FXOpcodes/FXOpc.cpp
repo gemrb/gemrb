@@ -3708,7 +3708,7 @@ int fx_play_visual_effect (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (!fx->Resource[0]) {
 		return FX_NOT_APPLIED;
 	}
-	//if it is sticky, don't add it if it is already played
+	//if it is sticky, don't add it if it is already played  
 	if (fx->Parameter2) {
 		if (!target->HasVVCCell(fx->Resource) ) {
 			return FX_NOT_APPLIED;

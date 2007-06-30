@@ -535,12 +535,12 @@ void pcf_level (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 	actor->SetupFist();
 }
 
-void pcf_class (Actor *actor, ieDword /*Value*/, ieDword /*newValue*/)
+void pcf_class (Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 {
 	actor->InitButtons(actor->Modified[IE_CLASS]);
 }
 
-void pcf_animid(Actor *actor, ieDword /*Value*/, ieDword newValue)
+void pcf_animid(Actor *actor, ieDword /*oldValue*/, ieDword newValue)
 {
 	actor->SetAnimationID(newValue);
 }
@@ -549,7 +549,7 @@ static const ieDword fullwhite[7]={ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,ICE_GR
 
 static const ieDword fullstone[7]={STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT,STONE_GRADIENT};
 
-void pcf_state(Actor *actor, ieDword /*Value*/, ieDword State)
+void pcf_state(Actor *actor, ieDword /*oldValue*/, ieDword State)
 {
 	if (actor->InParty) {
 		core->SetEventFlag(EF_PORTRAIT);
@@ -565,7 +565,25 @@ void pcf_state(Actor *actor, ieDword /*Value*/, ieDword State)
 	actor->UnlockPalette();
 }
 
-void pcf_hitpoint(Actor *actor, ieDword /*Value*/, ieDword hp)
+//changes based on extended state bits, right now it is only the seven eyes
+//animation (used in how/iwd2)
+void pcf_extstate(Actor *actor, ieDword oldValue, ieDword State)
+{
+	if ((oldValue^State)&EXTSTATE_SEVEN_EYES) {
+		ieDword mask = EXTSTATE_EYE_MIND;
+		int eyeCount = 0;
+		for (int i=0;i<7;i++)
+		{
+			if (State&mask) eyeCount++;
+			mask<<=1;
+		}
+		ScriptedAnimation *sca = actor->FindOverlay(OV_SEVENEYES);
+		if (!sca) return;
+		sca->SetOrientation(7-eyeCount);
+	}
+}
+
+void pcf_hitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 {
 	if ((signed) hp>(signed) actor->Modified[IE_MAXHITPOINTS]) {
 		hp=actor->Modified[IE_MAXHITPOINTS];
@@ -584,7 +602,7 @@ void pcf_hitpoint(Actor *actor, ieDword /*Value*/, ieDword hp)
 	}
 }
 
-void pcf_maxhitpoint(Actor *actor, ieDword /*Value*/, ieDword hp)
+void pcf_maxhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 {
 	if ((signed) hp<(signed) actor->Modified[IE_HITPOINTS]) {
 		actor->Modified[IE_HITPOINTS]=hp;
@@ -596,7 +614,7 @@ void pcf_maxhitpoint(Actor *actor, ieDword /*Value*/, ieDword hp)
 	}
 }
 
-void pcf_minhitpoint(Actor *actor, ieDword /*Value*/, ieDword hp)
+void pcf_minhitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 {
 	if ((signed) hp>(signed) actor->Modified[IE_HITPOINTS]) {
 		actor->Modified[IE_HITPOINTS]=hp;
@@ -661,11 +679,12 @@ void pcf_gold(Actor *actor, ieDword /*oldValue*/, ieDword /*newValue*/)
 	}
 }
 
-static void handle_overlay(Actor*actor, ieResRef overlay, ieDword flag)
+static void handle_overlay(Actor *actor, ieDword idx)
 {
-	if (actor->HasVVCCell(overlay))
+	if (actor->FindOverlay(idx))
 		return;
-	ScriptedAnimation *sca = core->GetScriptedAnimation(overlay, false);
+	ieDword flag = hc_locations&(1<<idx);
+	ScriptedAnimation *sca = core->GetScriptedAnimation(hc_overlays[idx], false);
 	if (sca) {
 		if (flag) {
 			sca->ZPos=-1;
@@ -678,7 +697,7 @@ static void handle_overlay(Actor*actor, ieResRef overlay, ieDword flag)
 void pcf_entangle(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	if (newValue&1) {
-		handle_overlay(actor, hc_overlays[OV_ENTANGLE], hc_locations&(1<<OV_ENTANGLE));
+		handle_overlay(actor, OV_ENTANGLE);
 	}
 	if (oldValue&1) {
 		actor->RemoveVVCell(hc_overlays[OV_ENTANGLE], true);
@@ -694,7 +713,7 @@ void pcf_sanctuary(Actor *actor, ieDword oldValue, ieDword newValue)
 	for (int i=0;i<32;i++) {
 		if (changed&mask) {
 			if (newValue&mask) {
-				handle_overlay(actor, hc_overlays[i], hc_locations&mask);
+				handle_overlay(actor, i);
 			} else {
 				actor->RemoveVVCell(hc_overlays[i], true);
 			}
@@ -707,7 +726,7 @@ void pcf_sanctuary(Actor *actor, ieDword oldValue, ieDword newValue)
 void pcf_shieldglobe(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	if (newValue&1) {
-		handle_overlay(actor, hc_overlays[OV_SHIELDGLOBE],hc_locations&(1<<OV_SHIELDGLOBE) );
+		handle_overlay(actor, OV_SHIELDGLOBE);
 		return;
 	}
 	if (oldValue&1) {
@@ -719,7 +738,7 @@ void pcf_shieldglobe(Actor *actor, ieDword oldValue, ieDword newValue)
 void pcf_minorglobe(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	if (newValue&1) {
-		handle_overlay(actor, hc_overlays[OV_MINORGLOBE],hc_locations&(1<<OV_MINORGLOBE) );
+		handle_overlay(actor, OV_MINORGLOBE);
 		return;
 	}
 	if (oldValue&1) {
@@ -731,7 +750,7 @@ void pcf_minorglobe(Actor *actor, ieDword oldValue, ieDword newValue)
 void pcf_grease(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	if (newValue&1) {
-		handle_overlay(actor, hc_overlays[OV_GREASE],hc_locations&(1<<OV_GREASE) );
+		handle_overlay(actor, OV_GREASE);
 		return;
 	}
 	if (oldValue&1) {
@@ -744,7 +763,7 @@ void pcf_grease(Actor *actor, ieDword oldValue, ieDword newValue)
 void pcf_web(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	if (newValue&1) {
-		handle_overlay(actor, hc_overlays[OV_WEB],hc_locations&(1<<OV_WEB) );
+		handle_overlay(actor, OV_WEB);
 		return;
 	}
 	if (oldValue&1) {
@@ -756,7 +775,7 @@ void pcf_web(Actor *actor, ieDword oldValue, ieDword newValue)
 void pcf_bounce(Actor *actor, ieDword oldValue, ieDword newValue)
 {
 	if (newValue&1) {
-		handle_overlay(actor, hc_overlays[OV_BOUNCE],hc_locations&(1<<OV_BOUNCE) );
+		handle_overlay(actor, OV_BOUNCE);
 		return;
 	}
 	if (oldValue&1) {
@@ -840,7 +859,7 @@ NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //af
 NULL,NULL,NULL,NULL, pcf_morale, pcf_bounce, NULL, NULL,
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL, //bf
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
-NULL,NULL,NULL,NULL, NULL, pcf_animid,pcf_state, NULL, //cf
+NULL,NULL,NULL,NULL, NULL, pcf_animid,pcf_state, pcf_extstate, //cf
 pcf_color,pcf_color,pcf_color,pcf_color, pcf_color, pcf_color, pcf_color, NULL,
 NULL,NULL,NULL,pcf_armorlevel, NULL, NULL, NULL, NULL, //df
 NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL,
@@ -3151,6 +3170,33 @@ retry:
 	}
 	vvcCells=&vvcOverlays;
 	if (j) { j = false; goto retry; }
+}
+
+//this is a faster version of hasvvccell, because it knows where to look
+//for the overlay, it also returns the vvc for further manipulation
+//use this for the seven eyes overlay
+ScriptedAnimation *Actor::FindOverlay(int index)
+{
+	vvcVector *vvcCells;
+	
+	if (index>31) return NULL;
+
+	if (hc_locations&(1<<index)) vvcCells=&vvcOverlays;
+	else vvcCells=&vvcShields;
+
+	const char *resRef = hc_overlays[index];
+
+	size_t i=vvcCells->size();
+	while (i--) {
+		ScriptedAnimation *vvc = (*vvcCells)[i];
+		if (vvc == NULL) {
+			continue;
+		}
+		if ( strnicmp(vvc->ResName, resRef, 8) == 0) {
+			return vvc;
+		}
+	}
+	return NULL;
 }
 
 void Actor::AddVVCell(ScriptedAnimation* vvc)

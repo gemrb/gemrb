@@ -30,7 +30,7 @@
 #define EFFECTQUEUE_H
 
 
-#include <vector>
+#include <list>
 #include "Effect.h"
 
 class Actor;
@@ -141,7 +141,7 @@ bool IsColorslotEffect(int opcode);
 
 class GEM_EXPORT EffectQueue {
 	/** List of Effects applied on the Actor */
-	std::vector< Effect* > effects;
+	std::list< Effect* > effects;
 	/** Actor which is target of the Effects */
 	Actor* Owner;
 
@@ -174,6 +174,7 @@ public:
 	/* directly removes effects with specified opcode, use effect_reference when you can */
 	void RemoveAllEffects(ieDword opcode);
 	void RemoveAllEffectsWithResource(ieDword opcode, const ieResRef resource);
+	void RemoveEquippingEffects(EffectQueue &target);
 
 	/* removes all effects of a given spell */
 	void RemoveAllEffects(ieResRef Removed);
@@ -189,16 +190,18 @@ public:
 	void RemoveAllEffectsWithResource(EffectRef &effect_reference, const ieResRef resource);
 	void RemoveLevelEffects(ieDword level, ieDword flags, ieDword match);
 
-	Effect *GetEffect(ieDword idx) const;
+	//Effect *GetEffect(ieDword idx) const;
 	/* returns true if the timing method supports simplified duration */
 	static bool HasDuration(Effect *fx);
 	/* returns true if the effect should be saved */
 	static bool Persistent(Effect* fx);
 	/* returns next saved effect, increases index */
-	Effect *GetNextSavedEffect(ieDword &idx) const;
+	Effect *GetNextSavedEffect(std::list< Effect* >::const_iterator f) const;
 	/* returns the number of saved effects */
 	ieDword GetSavedEffectsCount() const;
 	size_t GetEffectsCount() const { return effects.size(); }
+	/* this method hacks the offhand weapon color effects */
+	void HackColorEffects(int type);
 	static Effect *CreateEffect(EffectRef &effect_reference, ieDword param1, ieDword param2, ieDword timing);
 
 	//locating opcodes

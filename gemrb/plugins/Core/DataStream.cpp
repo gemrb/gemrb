@@ -101,7 +101,7 @@ int DataStream::ReadWord(ieWord *dest)
 	return len;
 }
 
-int DataStream::WriteWord(ieWord *src)
+int DataStream::WriteWord(const ieWord *src)
 {
 	int len;
 	if (EndianSwitch) {
@@ -131,7 +131,7 @@ int DataStream::ReadDword(ieDword *dest)
 	return len;
 }
 
-int DataStream::WriteDword(ieDword *src)
+int DataStream::WriteDword(const ieDword *src)
 {
 	int len;
 	if (EndianSwitch) {

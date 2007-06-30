@@ -2329,19 +2329,19 @@ int CREImp::PutMemorizedSpells(DataStream *stream, Actor *actor)
 	}
 	return 0;
 }
+
 int CREImp::PutEffects( DataStream *stream, Actor *actor)
 {
-	ieDword index = 0;
 	ieWord tmpWord;
 	ieByte tmpByte;
 	char filling[60];
 
 	memset(filling,0,sizeof(filling) );
+	std::list< Effect* >::const_iterator f;
 	for(unsigned int i=0;i<EffectsCount;i++) {
-		//just for now
-		assert(index<actor->fxqueue.GetEffectsCount() );
+		const Effect *fx = actor->fxqueue.GetNextSavedEffect(f);
 
-		Effect *fx = actor->fxqueue.GetNextSavedEffect(index);
+		assert(fx!=NULL);
 
 		if (TotSCEFF) {
 			stream->Write( filling,8 ); //signature

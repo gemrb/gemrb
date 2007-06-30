@@ -67,8 +67,8 @@ public:
 	int ReadDword(ieDword* dest);
 	int ReadResRef(ieResRef dest);
 	virtual int Write(const void* src, unsigned int len) = 0;
-	int WriteWord(ieWord* src);
-	int WriteDword(ieDword* src);
+	int WriteWord(const ieWord* src);
+	int WriteDword(const ieDword* src);
 	int WriteResRef(const ieResRef src);
 	virtual int Seek(int pos, int startpos) = 0;
 	unsigned long Remains() const;

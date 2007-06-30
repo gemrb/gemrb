@@ -202,7 +202,10 @@ void Inventory::AddSlotEffects(CREItem* slot, int type)
 	core->FreeItem( itm, slot->ItemResRef, false );
 
 	//make any adjustments necessary for off-hand weapon colours
+  eqfx->HackColorEffects(type);
+  /*
 	int cnt = eqfx->GetEffectsCount();
+  
 	for (int i = 0; i < cnt; i++) {
 		Effect* fx = eqfx->GetEffect(i);
 		
@@ -218,7 +221,8 @@ void Inventory::AddSlotEffects(CREItem* slot, int type)
 			fx->Parameter2 &= ~0xF0;
 			fx->Parameter2 |= gradienttype;
 		}	
-	}		
+	}
+  */
 	Owner->RefreshEffects(eqfx);
 	core->SetEventFlag(EF_UPDATEANIM);
 }
@@ -231,17 +235,13 @@ void Inventory::RemoveSlotEffects(CREItem* slot)
 	if (!itm)
 		return;
 	ItemExcl&=~itm->ItemExcl;
+	//collect equipping effects
 	EffectQueue *eqfx = itm->GetEffectBlock(-1);
 	core->FreeItem( itm, slot->ItemResRef, false );
-
-	int cnt = eqfx->GetEffectsCount();
-	for (int i = 0; i < cnt; i++) {
-		Effect* fx = eqfx->GetEffect(i);
-		if (fx->TimingMode == FX_DURATION_INSTANT_WHILE_EQUIPPED) {
-			Owner->fxqueue.RemoveEffect( fx );
-		}
-	}
+	//remove all matching equipping effects from Owner's effect queue
+	eqfx->RemoveEquippingEffects(Owner->fxqueue);
 	delete eqfx;
+	//call gui for possible paperdoll animation changes
 	core->SetEventFlag(EF_UPDATEANIM);
 }
 

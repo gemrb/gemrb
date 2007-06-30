@@ -415,8 +415,11 @@ public:
 	void AddVVCell(ScriptedAnimation* vvc);
 	/* remove a vvc from the list, graceful means animated removal */
 	void RemoveVVCell(const ieResRef vvcname, bool graceful);
-	/* returns true if actor already has the overlay */
+	/* returns true if actor already has the overlay (slow) */
 	bool HasVVCCell(const ieResRef resource);
+	/* returns the vvc pointer to a hardcoded overlay */
+	/* if it exists (faster than hasvvccell) */
+	ScriptedAnimation *FindOverlay(int index);
 	/* draw videocells */
 	void DrawVideocells(Region &screen, vvcVector &vvcCells, Color &tint);
 	

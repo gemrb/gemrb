@@ -296,8 +296,11 @@ EffectQueue::EffectQueue()
 
 EffectQueue::~EffectQueue()
 {
-	for (unsigned i = 0; i < effects.size(); i++) {
-		delete( effects[i] );
+	std::list< Effect* >::iterator f;
+
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
+		delete (*f);
+		//delete( effects[i] );
 	}
 }
 
@@ -344,7 +347,7 @@ bool EffectQueue::RemoveEffect(Effect* fx)
 {
 	int invariant_size = offsetof( Effect, random_value );
 
-	for (std::vector< Effect* >::iterator f = effects.begin(); f != effects.end(); f++ ) {
+	for (std::list< Effect* >::iterator f = effects.begin(); f != effects.end(); f++ ) {
 		Effect* fx2 = *f;
 
 		//TODO:
@@ -365,18 +368,19 @@ void EffectQueue::ApplyAllEffects(Actor* target)
 	//nah, we already been through this
 	//ieDword random_value = core->Roll( 1, 100, 0 );
 
-	std::vector< Effect* >::iterator f;
+	std::list< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		//(*f)->random_value = random_value;
 		//no idea if we should honour FX_ABORT here (resistspell)
 		//if yes, then break when applyeffect returned true
 		ApplyEffect( target, *f, false );
 	}
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
+	for ( f = effects.begin(); f != effects.end(); ) {
 		if ((*f)->TimingMode==FX_DURATION_JUST_EXPIRED) {
 			delete *f;
-			effects.erase(f);
-			f--;
+			effects.erase(f++);
+		} else {
+		  f++;
 		}
 	}
 }
@@ -477,7 +481,7 @@ void EffectQueue::AddAllEffects(Actor* target, Point &destination)
 	// pre-roll dice for fx needing them and stow them in the effect
 	ieDword random_value = core->Roll( 1, 100, 0 );
 
-	std::vector< Effect* >::const_iterator f;
+	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		//handle resistances and saving throws here
 		(*f)->random_value = random_value;
@@ -831,7 +835,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 //will be killed along with it
 void EffectQueue::RemoveAllEffects(ieDword opcode)
 {
-	std::vector< Effect* >::iterator f;
+	std::list< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_OPCODE();
 		MATCH_LIVE_FX();
@@ -840,10 +844,22 @@ void EffectQueue::RemoveAllEffects(ieDword opcode)
 	}
 }
 
+//call this on the item's effectqueue, pass the wearer's effectqueue
+//it will remove all effects from target that were originating from
+//this effectqueue (the item's)
+void EffectQueue::RemoveEquippingEffects(EffectQueue &target)
+{
+	std::list< Effect* >::iterator f;
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
+		if ((*f)->TimingMode!=FX_DURATION_INSTANT_WHILE_EQUIPPED) continue;
+		target.RemoveEffect(*f);
+	}
+}
+
 //remove effects belonging to a given spell
 void EffectQueue::RemoveAllEffects(ieResRef Removed)
 {
-	std::vector< Effect* >::iterator f;
+	std::list< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_LIVE_FX();
 		MATCH_SOURCE();
@@ -855,7 +871,7 @@ void EffectQueue::RemoveAllEffects(ieResRef Removed)
 //remove effects belonging to a given spell, but only if they match timing method x
 void EffectQueue::RemoveAllEffects(ieResRef Removed, ieDword timing)
 {
-	std::vector< Effect* >::iterator f;
+	std::list< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_TIMING();
 		MATCH_SOURCE();
@@ -873,7 +889,7 @@ void EffectQueue::RemoveAllEffects(EffectRef &effect_reference)
 
 void EffectQueue::RemoveAllEffectsWithResource(ieDword opcode, const ieResRef resource)
 {
-	std::vector< Effect* >::iterator f;
+	std::list< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_OPCODE();
 		MATCH_LIVE_FX();
@@ -891,7 +907,7 @@ void EffectQueue::RemoveAllEffectsWithResource(EffectRef &effect_reference, cons
 
 void EffectQueue::RemoveAllDetrimentalEffects(ieDword opcode, ieDword current)
 {
-	std::vector< Effect* >::iterator f;
+	std::list< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_OPCODE();
 		MATCH_LIVE_FX();
@@ -914,7 +930,7 @@ void EffectQueue::RemoveAllDetrimentalEffects(ieDword opcode, ieDword current)
 
 void EffectQueue::RemoveAllEffectsWithParam(ieDword opcode, ieDword param2)
 {
-	std::vector< Effect* >::iterator f;
+	std::list< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_OPCODE();
 		MATCH_LIVE_FX();
@@ -935,7 +951,7 @@ void EffectQueue::RemoveExpiredEffects(ieDword futuretime)
 		GameTime+=futuretime;
 	}
 
-	std::vector< Effect* >::iterator f;
+	std::list< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		//FIXME: how this method handles delayed effects???
 		//it should remove them as well, i think
@@ -951,7 +967,7 @@ void EffectQueue::RemoveExpiredEffects(ieDword futuretime)
 //which i call permanent after death (iesdp calls it permanent after bonuses)
 void EffectQueue::RemoveAllNonPermanentEffects()
 {
-	std::vector< Effect* >::iterator f;
+	std::list< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		if( (*f)->TimingMode != FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES) {
 			(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;
@@ -978,7 +994,7 @@ void EffectQueue::RemoveLevelEffects(ieDword level, ieDword Flags, ieDword match
 	ieResRef Removed;
 
 	Removed[0]=0;
-	std::vector< Effect* >::iterator f;
+	std::list< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		if ( (*f)->Power>level) {
 			continue;
@@ -1014,7 +1030,7 @@ void EffectQueue::RemoveLevelEffects(ieDword level, ieDword Flags, ieDword match
 
 Effect *EffectQueue::HasOpcode(ieDword opcode) const
 {
-	std::vector< Effect* >::const_iterator f;
+	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_OPCODE();
 		MATCH_LIVE_FX();
@@ -1035,7 +1051,7 @@ Effect *EffectQueue::HasEffect(EffectRef &effect_reference)
 
 Effect *EffectQueue::HasOpcodeWithParam(ieDword opcode, ieDword param2) const
 {
-	std::vector< Effect* >::const_iterator f;
+	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_OPCODE();
 		MATCH_LIVE_FX();
@@ -1060,7 +1076,7 @@ Effect *EffectQueue::HasEffectWithParam(EffectRef &effect_reference, ieDword par
 
 Effect *EffectQueue::HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDword param2) const
 {
-	std::vector< Effect* >::const_iterator f;
+	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_OPCODE();
 		MATCH_LIVE_FX();
@@ -1090,7 +1106,7 @@ static const int ids_stats[7]={IE_EA, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC
 int EffectQueue::BonusAgainstCreature(ieDword opcode, Actor *actor) const
 {
 	int sum = 0;
-	std::vector< Effect* >::const_iterator f;
+	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_OPCODE();
 		MATCH_LIVE_FX();
@@ -1121,7 +1137,7 @@ int EffectQueue::BonusAgainstCreature(EffectRef &effect_reference, Actor *actor)
 //useful for immunity vs spell, can't use item, etc.
 Effect *EffectQueue::HasOpcodeWithResource(ieDword opcode, const ieResRef resource) const
 {
-	std::vector< Effect* >::const_iterator f;
+	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_OPCODE();
 		MATCH_LIVE_FX();
@@ -1140,7 +1156,7 @@ Effect *EffectQueue::HasEffectWithResource(EffectRef &effect_reference, const ie
 
 bool EffectQueue::HasAnyDispellableEffect() const
 {
-	std::vector< Effect* >::const_iterator f;
+	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		if ((*f)->Resistance&FX_CAN_DISPEL) {
 			return true;
@@ -1152,18 +1168,20 @@ bool EffectQueue::HasAnyDispellableEffect() const
 void EffectQueue::dump()
 {
 	printf( "EFFECT QUEUE:\n" );
-	for (unsigned int i = 0; i < effects.size (); i++ ) {
-		Effect* fx = effects[i];
+	int i = 0;
+	std::list< Effect* >::const_iterator f;
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
+		Effect* fx = *f;
 		if (fx) {
 			char *Name = NULL;
 			if (fx->Opcode < MAX_EFFECTS)
 				Name = (char*) effect_refs[fx->Opcode].Name;
 
-			printf( " %2d: 0x%02x: %s (%d, %d)\n", i, fx->Opcode, Name, fx->Parameter1, fx->Parameter2 );
+			printf( " %2d: 0x%02x: %s (%d, %d)\n", i++, fx->Opcode, Name, fx->Parameter1, fx->Parameter2 );
 		}
 	}
 }
-
+/*
 Effect *EffectQueue::GetEffect(ieDword idx) const
 {
 	if (effects.size()<=idx) {
@@ -1171,6 +1189,7 @@ Effect *EffectQueue::GetEffect(ieDword idx) const
 	}
 	return effects[idx];
 }
+*/
 
 //returns true if the effect supports simplified duration
 bool EffectQueue::HasDuration(Effect *fx)
@@ -1209,10 +1228,33 @@ bool EffectQueue::Persistent(Effect* fx)
 	return true;
 }
 
-Effect *EffectQueue::GetNextSavedEffect(ieDword &idx) const
+//fix the effect color locations based on the item's equipping location
+void EffectQueue::HackColorEffects(int type)
 {
-	while(effects.size()>idx) {
-		Effect *effect = effects[idx++];
+	std::list< Effect* >::iterator f;
+
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
+		Effect *fx=*f;
+		// If a weapon is in the off-hand, it needs to set the off-hand palette
+		// If it is in the main hand, it should set the weapon palette
+		if (IsColorslotEffect(fx->Opcode)) {
+			unsigned int gradienttype = fx->Parameter2 & 0xF0;
+			if (type == SLOT_EFFECT_MELEE && gradienttype == 0x20)
+				gradienttype = 0x10; // weapon
+			else if (type == SLOT_EFFECT_LEFT && gradienttype == 0x10)
+				gradienttype = 0x20; // off-hand
+			fx->Parameter2 &= ~0xF0;
+			fx->Parameter2 |= gradienttype;
+		}	
+	}		
+}
+
+//iterate through saved effects
+Effect *EffectQueue::GetNextSavedEffect(std::list< Effect* >::const_iterator f) const
+{
+	while(f!=effects.end()) {
+		Effect *effect = *f;
+		f++;
 		if (Persistent(effect)) {
 			return effect;
 		}
@@ -1220,12 +1262,15 @@ Effect *EffectQueue::GetNextSavedEffect(ieDword &idx) const
 	return NULL;
 }
 
+//count effects that get saved
 ieDword EffectQueue::GetSavedEffectsCount() const
 {
 	ieDword cnt = 0;
 
-	for (unsigned int i = 0; i < effects.size (); i++ ) {
-		Effect* fx = effects[i];
+	std::list< Effect* >::const_iterator f;
+
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
+		Effect* fx = *f;
 		if (Persistent(fx))
 			cnt++;
 	}
@@ -1255,7 +1300,7 @@ int EffectQueue::ResolveEffect(EffectRef &effect_reference)
 int EffectQueue::CheckImmunity(Actor *target)
 {
 	if (effects.size() ) {
-		Effect* fx = effects[0];
+		Effect* fx = *effects.begin();
 
 		//check level resistances
 		//check specific spell immunity
