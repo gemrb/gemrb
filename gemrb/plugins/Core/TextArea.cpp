@@ -343,7 +343,7 @@ void TextArea::DiscardLines()
 	PopLines(drop, true);
 }
 
-static char inserted_crap[]="[/color][color=ffffff]";
+static const char inserted_crap[]="[/color][color=ffffff]";
 #define CRAPLENGTH sizeof(inserted_crap)-1
 
 /** Appends a String to the current Text */

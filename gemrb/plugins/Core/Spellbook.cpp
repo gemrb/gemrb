@@ -36,7 +36,7 @@ static int NUM_BOOK_TYPES = 3;
 static bool IWD2Style = false;
 
 //spell header-->spell book type conversion (iwd2 is different)
-static int spelltypes[NUM_SPELL_TYPES]={
+static const int spelltypes[NUM_SPELL_TYPES]={
 	IE_SPELL_TYPE_INNATE, IE_SPELL_TYPE_WIZARD, IE_SPELL_TYPE_PRIEST,
 	IE_SPELL_TYPE_WIZARD, IE_SPELL_TYPE_INNATE, IE_SPELL_TYPE_SONG
 };
@@ -374,7 +374,7 @@ int Spellbook::GetSpellType(int spelltype)
 	return IE_SPELL_TYPE_INNATE;
 }
 
-int Spellbook::LearnSpell(Spell *spell)
+int Spellbook::LearnSpell(Spell *spell, int memo)
 {
 	CREKnownSpell *spl = new CREKnownSpell();
 	strncpy(spl->SpellResRef, spell->Name, 8);
@@ -385,18 +385,21 @@ int Spellbook::LearnSpell(Spell *spell)
 	else {
 		spl->Level = (ieWord) (spell->SpellLevel-1);
 	}
-	bool ret=AddKnownSpell(spl->Type, spl->Level, spl);
+	bool ret=AddKnownSpell(spl, memo);
 	if (!ret) {
 		delete spl;
 	}
 	return spell->SpellLevel*100;
 }
 
-bool Spellbook::AddKnownSpell(int type, unsigned int level, CREKnownSpell *spl)
+//if flg is set, it will be also memorized
+bool Spellbook::AddKnownSpell(CREKnownSpell *spl, int flg)
 {
+	int type = spl->Type;
 	if (type >= NUM_BOOK_TYPES) {
 		return false;
 	}
+	unsigned int level = spl->Level;
 	if ( level >= GetSpellLevelCount(type) ) {
 		CRESpellMemorization *sm = new CRESpellMemorization();
 		sm->Type = (ieWord) type;
@@ -408,6 +411,13 @@ bool Spellbook::AddKnownSpell(int type, unsigned int level, CREKnownSpell *spl)
 		}
 	}
 	spells[type][level]->known_spells.push_back(spl);
+	if (type==IE_SPELL_TYPE_INNATE) {
+		spells[type][level]->Number++;
+		spells[type][level]->Number2++;
+	}
+	if (flg) {
+		MemorizeSpell(spl, true);
+	}
 	return true;
 }
 

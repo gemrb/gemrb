@@ -43,16 +43,16 @@
 #define DEBUG_SHOW_LIGHTMAP     0x08
 #define DEBUG_XXX		0x10
 
-static Color cyan = {
+static const Color cyan = {
 	0x00, 0xff, 0xff, 0xff
 };
-static Color red = {
+static const Color red = {
 	0xff, 0x00, 0x00, 0xff
 };
-static Color magenta = {
+static const Color magenta = {
 	0xff, 0x00, 0xff, 0xff
 };
-static Color green = {
+static const Color green = {
 	0x00, 0xff, 0x00, 0xff
 };
 /*
@@ -60,10 +60,10 @@ static Color white = {
 	0xff, 0xff, 0xff, 0xff
 };
 */
-static Color black = {
+static const Color black = {
 	0x00, 0x00, 0x00, 0xff
 };
-static Color blue = {
+static const Color blue = {
 	0x00, 0x00, 0xff, 0x80
 };
 

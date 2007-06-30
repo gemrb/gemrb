@@ -34,10 +34,10 @@
 // 8 - action execution
 //16 - trigger evaluation
 
-static bool charnameisgabber;
+static bool charnameisgabber = false;
 
 //Make this an ordered list, so we could use bsearch!
-static TriggerLink triggernames[] = {
+static const TriggerLink triggernames[] = {
 	{"actionlistempty", GameScript::ActionListEmpty, 0},
 	{"actuallyincombat", GameScript::ActuallyInCombat,0},
 	{"acquired", GameScript::Acquired, 0},
@@ -364,7 +364,7 @@ static TriggerLink triggernames[] = {
 };
 
 //Make this an ordered list, so we could use bsearch!
-static ActionLink actionnames[] = {
+static const ActionLink actionnames[] = {
 	{"actionoverride",NULL, AF_INVALID}, //will this function ever be reached
 	{"activate", GameScript::Activate, 0},
 	{"activateportalcursor", GameScript::ActivatePortalCursor, 0},
@@ -877,7 +877,7 @@ static ActionLink actionnames[] = {
 };
 
 //Make this an ordered list, so we could use bsearch!
-static ObjectLink objectnames[] = {
+static const ObjectLink objectnames[] = {
 	{"bestac", GameScript::BestAC},
 	{"eighthnearest", GameScript::EighthNearest},
 	{"eighthnearestdoor", GameScript::EighthNearestDoor},
@@ -983,7 +983,7 @@ static ObjectLink objectnames[] = {
 	{ NULL,NULL}
 };
 
-static IDSLink idsnames[] = {
+static const IDSLink idsnames[] = {
 	{"align", GameScript::ID_Alignment},
 	{"alignmen", GameScript::ID_Alignment},
 	{"alignmnt", GameScript::ID_Alignment},
@@ -1001,7 +1001,7 @@ static IDSLink idsnames[] = {
 	{ NULL,NULL}
 };
 
-static TriggerLink* FindTrigger(const char* triggername, int index)
+static const TriggerLink* FindTrigger(const char* triggername, int index)
 {
 	if (!triggername) {
 		return NULL;
@@ -1018,7 +1018,7 @@ static TriggerLink* FindTrigger(const char* triggername, int index)
 	return NULL;
 }
 
-static ActionLink* FindAction(const char* actionname, int index)
+static const ActionLink* FindAction(const char* actionname, int index)
 {
 	if (!actionname) {
 		return NULL;
@@ -1035,7 +1035,7 @@ static ActionLink* FindAction(const char* actionname, int index)
 	return NULL;
 }
 
-static ObjectLink* FindObject(const char* objectname, int index)
+static const ObjectLink* FindObject(const char* objectname, int index)
 {
 	if (!objectname) {
 		return NULL;
@@ -1052,7 +1052,7 @@ static ObjectLink* FindObject(const char* objectname, int index)
 	return NULL;
 }
 
-static IDSLink* FindIdentifier(const char* idsname)
+static const IDSLink* FindIdentifier(const char* idsname)
 {
 	if (!idsname) {
 		return NULL;
@@ -1238,7 +1238,7 @@ GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 		for (i = 0; i < ObjectIDSCount; i++) {
 			const char *idsname;
 			idsname=objNameTable->QueryField( 0, i + 1 );
-			IDSLink *poi=FindIdentifier( idsname );
+			const IDSLink *poi=FindIdentifier( idsname );
 			if (poi==NULL) {
 				idtargets[i]=NULL;
 			}
@@ -1271,7 +1271,7 @@ GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 		while (j--) {
 			i = triggersTable->GetValueIndex( j );
 			//maybe we should watch for this bit?
-			TriggerLink* poi = FindTrigger(triggersTable->GetStringIndex( j ), i );
+			const TriggerLink* poi = FindTrigger(triggersTable->GetStringIndex( j ), i );
 			//bool triggerflag = i & 0x4000;
 			i &= 0x3fff;
 			if (triggers[i]) {
@@ -1297,7 +1297,7 @@ GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 		j = actionsTable->GetSize();
 		while (j--) {
 			i = actionsTable->GetValueIndex( j );
-			ActionLink* poi = FindAction( actionsTable->GetStringIndex( j ), i );
+			const ActionLink* poi = FindAction( actionsTable->GetStringIndex( j ), i );
 			if (actions[i]) {
 				if (poi && actions[i]!=poi->Function) {
 					printMessage("GameScript"," ", YELLOW);
@@ -1320,7 +1320,7 @@ GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 		j = objectsTable->GetSize();
 		while (j--) {
 			i = objectsTable->GetValueIndex( j );
-			ObjectLink* poi = FindObject( objectsTable->GetStringIndex( j ), i );
+			const ObjectLink* poi = FindObject( objectsTable->GetStringIndex( j ), i );
 			if (objects[i]) {
 				if (poi && objects[i]!=poi->Function) {
 					printMessage("GameScript"," ", YELLOW);

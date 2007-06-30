@@ -89,13 +89,13 @@ ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
 static bool QslotTranslation = false;
 static bool DeathOnZeroStat = true;
 
-static char iwd2gemrb[32] = {
+static const char iwd2gemrb[32] = {
 	0,0,20,2,22,25,0,14,
 	15,23,13,0,1,24,8,21,
 	0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0
 };
-static char gemrb2iwd[32] = {
+static const char gemrb2iwd[32] = {
 	11,12,3,71,72,73,0,0, //0
 	14,80,83,82,81,10,7,8, //8
 	0,0,0,0,2,15,4,9, //16
@@ -571,15 +571,20 @@ void pcf_extstate(Actor *actor, ieDword oldValue, ieDword State)
 {
 	if ((oldValue^State)&EXTSTATE_SEVEN_EYES) {
 		ieDword mask = EXTSTATE_EYE_MIND;
-		int eyeCount = 0;
+		int eyeCount = 7;
 		for (int i=0;i<7;i++)
 		{
-			if (State&mask) eyeCount++;
+			if (State&mask) eyeCount--;
 			mask<<=1;
 		}
 		ScriptedAnimation *sca = actor->FindOverlay(OV_SEVENEYES);
-		if (!sca) return;
-		sca->SetOrientation(7-eyeCount);
+		if (sca) {
+			sca->SetOrientation(eyeCount);
+		}
+		sca = actor->FindOverlay(OV_SEVENEYES2);
+		if (sca) {
+			sca->SetOrientation(eyeCount);
+		}
 	}
 }
 
@@ -2167,7 +2172,7 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 	if (!spell) {
 		return LSR_INVALID; //not existent spell
 	}
-	int exp = spellbook.LearnSpell(spell);
+	int exp = spellbook.LearnSpell(spell, flags&LS_MEMO);
 	int tmp = spell->SpellNameIdentified;
 	if (flags&LS_LEARN) {
 		core->GetTokenDictionary()->SetAt("SPECIALABILITYNAME", core->GetString(tmp));
@@ -2476,7 +2481,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	DealDamage (target, damage, damagetype, false);
 }
 
-static int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
+static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
 	DAMAGE_CRUSHING, DAMAGE_SLASHING, DAMAGE_MISSILE, DAMAGE_STUNNING};
 
 void Actor::DealDamage(Actor *target, int damage, int damagetype, bool critical)
@@ -3181,8 +3186,8 @@ ScriptedAnimation *Actor::FindOverlay(int index)
 	
 	if (index>31) return NULL;
 
-	if (hc_locations&(1<<index)) vvcCells=&vvcOverlays;
-	else vvcCells=&vvcShields;
+	if (hc_locations&(1<<index)) vvcCells=&vvcShields;
+	else vvcCells=&vvcOverlays;
 
 	const char *resRef = hc_overlays[index];
 

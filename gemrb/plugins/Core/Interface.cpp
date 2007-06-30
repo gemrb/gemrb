@@ -86,7 +86,7 @@ GEM_EXPORT HANDLE hConsole;
 //#include "../../includes/strrefs.h"
 
 //use DialogF.tlk if the protagonist is female, that's why we leave space
-static char dialogtlk[] = "dialog.tlk\0";
+static const char dialogtlk[] = "dialog.tlk\0";
 
 static int strref_table[STRREF_COUNT];
 
@@ -913,8 +913,8 @@ int Interface::GetAreaAlias(const ieResRef areaname)
 	return -1;
 }
 
-static const Color fpscolor = {0xff,0xff,0xff,0xff};
-static const Color fpsblack = {0x00,0x00,0x00,0xff};
+static const Color white = {0xff,0xff,0xff,0xff};
+static const Color black = {0x00,0x00,0x00,0xff};
 static const Region bg( 0, 0, 100, 30 );
 
 /** this is the main loop */
@@ -932,7 +932,7 @@ void Interface::Main()
 	unsigned long frame = 0, time, timebase;
 	GetTime(timebase);
 	double frames = 0.0;
-	Palette* palette = CreatePalette( fpscolor, fpsblack );
+	Palette* palette = CreatePalette( white, black );
 	do {
 		//don't change script when quitting is pending
 
@@ -953,7 +953,7 @@ void Interface::Main()
 				frame = 0;
 				sprintf( fpsstring, "%.3f fps", frames );
 			}
-			video->DrawRect( bg, fpsblack );
+			video->DrawRect( bg, black );
 			fps->Print( bg,
 						( unsigned char * ) fpsstring, palette,
 						IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true );
@@ -5221,11 +5221,10 @@ void Interface::RegisterOpcodes(int count, const EffectRef *opcodes)
 
 void Interface::SetInfoTextColor(Color &color)
 {
-	static Color black = {0x00,0x00,0x00,0xff};
 	if (InfoTextPalette) {
 		FreePalette(InfoTextPalette);
 	}
-	InfoTextPalette = CreatePalette(color,black);
+	InfoTextPalette = CreatePalette(color, black);
 }
 
 //todo row?

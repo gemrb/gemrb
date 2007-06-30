@@ -35,19 +35,20 @@
 #define DOUBLE 4          //has twin (pst)
 #define FIVE 8            //five faces (orientation)
 #define NINE 16           //nine faces (orientation)
+#define SEVENEYES 32      //special hack for seven eyes
 
 #define MAX_CYCLE_TYPE 16
-static ieByte ctypes[MAX_CYCLE_TYPE]={
+static const ieByte ctypes[MAX_CYCLE_TYPE]={
 	ILLEGAL, ONE, TWO, THREE, TWO|DOUBLE, ONE|FIVE, THREE|DOUBLE, ILLEGAL,
-	ILLEGAL,ONE|NINE, TWO|FIVE, ILLEGAL, ILLEGAL, ILLEGAL, ILLEGAL,THREE|FIVE,
+	SEVENEYES, ONE|NINE, TWO|FIVE, ILLEGAL, ILLEGAL, ILLEGAL, ILLEGAL,THREE|FIVE,
 };
 
-static ieByte SixteenToNine[3*MAX_ORIENT]={
+static const ieByte SixteenToNine[3*MAX_ORIENT]={
 	0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1,
 	9,10,11,12,13,14,15,16,17,16,15,14,13,12,11,10,
 	18,19,20,21,22,23,24,25,26,25,24,23,22,21,20,19
 };
-static ieByte SixteenToFive[3*MAX_ORIENT]={
+static const ieByte SixteenToFive[3*MAX_ORIENT]={
 	0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 3, 3, 2, 2, 1, 1,
 	5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 8, 8, 7, 7, 6, 6,
 	10,10,11,11,12,12,13,13,14,14,13,13,12,12,11,11
@@ -172,7 +173,9 @@ void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af, int gettwin)
 		} else if (type&NINE) {
 			c=SixteenToNine[c];
 			if ((i&15)>=9) mirror = true;
-		} else p*=MAX_ORIENT;
+		} else if (!(type&SEVENEYES)) {
+			p*=MAX_ORIENT;
+		}
 
 		anims[p] = af->GetCycle( (ieByte) c );
 		if (anims[p]) {
@@ -184,8 +187,7 @@ void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af, int gettwin)
 		}
 	}
 
-	for (unsigned int o = 0; o<MAX_ORIENT; o++)
-	{
+	for (unsigned int o = 0; o<MAX_ORIENT; o++) {
 		unsigned int p_hold = P_HOLD*MAX_ORIENT+o;
 		unsigned int p_onset = P_ONSET*MAX_ORIENT+o;
 		unsigned int p_release = P_RELEASE*MAX_ORIENT+o;
@@ -471,7 +473,7 @@ bool ScriptedAnimation::HandlePhase(Sprite2D *&frame)
 {
 	if (justCreated) {
 		if (Phase == P_NOTINITED) {
-			printMessage("ScriptedAnimation", "Not fully initialised VVC!", LIGHT_RED);
+			printMessage("ScriptedAnimation", "Not fully initialised VVC!\n", LIGHT_RED);
 			return true;
 		}
 		justCreated = false;

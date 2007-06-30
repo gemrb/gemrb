@@ -31,7 +31,7 @@
 #include "Interface.h"
 #include "GSUtils.h"
 
-static int StatValues[9]={
+static const int StatValues[9]={
 IE_EA, IE_FACTION, IE_TEAM, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, 
 IE_SEX, IE_ALIGNMENT };
 

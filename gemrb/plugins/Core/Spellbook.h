@@ -57,6 +57,7 @@ class Spell;
 #define LS_ADDXP   1   //give xp for learning it
 #define LS_LEARN   2   //give message when learned it
 #define LS_STATS   4   //check stats (alignment, etc)
+#define LS_MEMO    8   //memorize it instantly (add innate)
 
 //LearnSpell return values
 #define LSR_OK      0
@@ -153,6 +154,8 @@ private:
 	SpellExtHeader *FindSpellInfo(unsigned int level, unsigned int type, const ieResRef name);
 	/** removes all instances of a spell from a given page */
 	void RemoveMemorization(CRESpellMemorization* sm, const ieResRef ResRef);
+	/** adds a spell to the book, internal */
+	bool AddKnownSpell(CREKnownSpell *spl, int memo);
 public: 
 	Spellbook();
 	~Spellbook();
@@ -186,9 +189,7 @@ public:
 	/** returns the page number for the spelltype */
 	static int GetSpellType(int spelltype);
 	/** adds a spell to the book, returns experience if learned */
-	int LearnSpell(Spell *spell);
-	/** adds a spell to the book, internal */
-	bool AddKnownSpell(int type, unsigned int level, CREKnownSpell *spl);
+	int LearnSpell(Spell *spell, int memo);
 	CREKnownSpell* GetKnownSpell(int type, unsigned int level, unsigned int index) const;
 	unsigned int GetMemorizedSpellsCount(int type) const;
 	unsigned int GetMemorizedSpellsCount(int type, unsigned int level) const;

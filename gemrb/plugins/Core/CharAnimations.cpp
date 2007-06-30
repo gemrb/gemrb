@@ -8,12 +8,12 @@
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  *
  * $Id$
  *
@@ -33,7 +33,6 @@ static int AvatarsCount = 0;
 static AvatarStruct *AvatarTable = NULL;
 static const ieByte SixteenToNine[16]={0,1,2,3,4,5,6,7,8,7,6,5,4,3,2,1};
 static const ieByte SixteenToFive[16]={0,0,1,1,2,2,3,3,4,4,3,3,2,2,1,1};
-
 
 static const int zOrder_Mirror16[16][4] = {
 	{ 0, 3, 2, 1 },
@@ -584,7 +583,7 @@ IE_ANI_PST_ANIMATION_3:
 			NOTE: Walking/Running animations store 9 Orientations.
 			The second variation is missing the resting stance (STD) and the transitions.
 			These creatures are always in combat stance (don't rest).
-			Animation_3 is without STC  (combat stance), they are always standing
+			Animation_3 is without STC (combat stance), they are always standing
 
 IE_ANI_PST_STAND:	This is a modified PST animation, it contains only a
 			Standing image for every orientations, it follows the
@@ -594,17 +593,17 @@ IE_ANI_PST_GHOST:	This is a special static animation with no standard
 			All armourlevels are drawn simultaneously. There is no orientation or stance.
 
 
-	WEST PART  |  EAST PART
-			 |
-		NW  NNW  N  NNE  NE
+  WEST PART  |  EAST PART
+             |
+    NW  NNW  N  NNE  NE
  NW 006 007 008 009 010 NE
 WNW 005      |      011 ENE
-	W 004     xxx     012 E
+  W 004     xxx     012 E
 WSW 003      |      013 ESE
  SW 002 001 000 015 014 SE
-		SW  SSW  S  SSE  SE
-			 |
-			 |
+    SW  SSW  S  SSE  SE
+             |
+             |
 
 */
 
@@ -852,8 +851,8 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 			case IE_ANI_BIRD:
 			case IE_ANI_CODE_MIRROR:
 			case IE_ANI_CODE_MIRROR_2: //9 orientations
-			case IE_ANI_PST_ANIMATION_3:  //no stc just std
-			case IE_ANI_PST_ANIMATION_2:  //no std just stc
+			case IE_ANI_PST_ANIMATION_3: //no stc just std
+			case IE_ANI_PST_ANIMATION_2: //no std just stc
 			case IE_ANI_PST_ANIMATION_1:
 				if (Orient > 8) {
 					a->MirrorAnimation( );
@@ -901,8 +900,8 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 			Anims[StanceID][Orient + 1] = anims;
 			break;
 
-		case IE_ANI_PST_ANIMATION_3:  //no stc just std
-		case IE_ANI_PST_ANIMATION_2:  //no std just stc
+		case IE_ANI_PST_ANIMATION_3: //no stc just std
+		case IE_ANI_PST_ANIMATION_2: //no std just stc
 		case IE_ANI_PST_ANIMATION_1:
 			switch (StanceID) {
 				case IE_ANI_WALK:
@@ -937,7 +936,7 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 	return Anims[StanceID][Orient];
 }
 
-static int one_file[19]={2, 1, 0, 0, 2, 3, 0, 1, 0, 4, 1, 0, 0, 0, 3, 1, 4, 4, 4};
+static const int one_file[19]={2, 1, 0, 0, 2, 3, 0, 1, 0, 4, 1, 0, 0, 0, 3, 1, 4, 4, 4};
 
 void CharAnimations::GetAnimResRef(unsigned char StanceID,
 									 unsigned char Orient,
@@ -972,11 +971,11 @@ void CharAnimations::GetAnimResRef(unsigned char StanceID,
 			AddSixSuffix( NewResRef, StanceID, Cycle, Orient );
 			break;
 
-		case IE_ANI_TWENTYTWO:  //5+3 animations
+		case IE_ANI_TWENTYTWO: //5+3 animations
 			AddMHRSuffix( NewResRef, StanceID, Cycle, Orient, EquipData );
 			break;
 
-		case IE_ANI_TWO_FILES_2:  //4+4 animations
+		case IE_ANI_TWO_FILES_2: //4+4 animations
 			AddLR2Suffix( NewResRef, StanceID, Cycle, Orient );
 			break;
 
@@ -1196,7 +1195,6 @@ void CharAnimations::AddVHR2Suffix(char* ResRef, unsigned char StanceID,
 static const char *StancePrefix[]={"3","2","5","5","4","4","2","2","5","4","1","3","3","3","4","1","4","4","4"};
 static const char *CyclePrefix[]= {"0","0","1","1","1","1","0","0","1","1","0","1","1","1","1","1","1","1","1"};
 static const unsigned int CycleOffset[] = {0,  0,  0,  0,  0,  9,  0,  0,  0, 18,  0,  0,  9,  18,  0,  0,  0,  0,  0};
-
 
 // Note: almost like SixSuffix
 void CharAnimations::AddFFSuffix(char* ResRef, unsigned char StanceID,

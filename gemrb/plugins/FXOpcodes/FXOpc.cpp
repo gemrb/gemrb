@@ -681,6 +681,7 @@ static EffectRef effectnames[] = {
 	{ "State:Hold", fx_hold_creature, 0 }, //175
 	{ "State:Hold2", fx_hold_creature, 0 },//185
 	{ "State:Hold3", fx_hold_creature_no_icon, 0 }, //109
+	{ "State:Hold4", fx_hold_creature_no_icon, 0 }, //0xfb (iwd/iwd2)
 	{ "HoldUndead", fx_hold_creature_no_icon, 0 }, //0x1a8 (iwd2)
 	{ "State:Imprisonment", fx_imprisonment, 0 },
 	{ "State:Infravision", fx_set_infravision_state, 0 },
@@ -692,6 +693,7 @@ static EffectRef effectnames[] = {
 	{ "State:Regenerating", fx_set_regenerating_state, 0 },
 	{ "State:Silenced", fx_set_silenced_state, 0 },
 	{ "State:Helpless", fx_set_unconscious_state, 0 },
+	{ "State:Sleep", fx_set_unconscious_state, 0},
 	{ "State:Slowed", fx_set_slowed_state, 0 },
 	{ "State:Stun", fx_set_stun_state, 0 },
 	{ "StealthModifier", fx_stealth_modifier, 0 },
@@ -829,7 +831,7 @@ int fx_attacks_per_round_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 		BASE_MOD_VAR(IE_NUMBEROFATTACKS, tmp);
 	} else {
 		STAT_MOD_VAR(IE_NUMBEROFATTACKS, tmp);
-	}	
+	}
 	return FX_PERMANENT;
 }
 
@@ -1538,7 +1540,7 @@ int fx_sparkle (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_bonus_wizard_spells (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_bonus_wizard_spells (%2d): Spell Add: %d ; Spell Level: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	
+
 	int i=1;
 	//if param2 is 0, then double spells
 	if(!fx->Parameter2) {
@@ -1855,7 +1857,7 @@ int fx_alchemy_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_bonus_priest_spells (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_bonus_priest_spells (%2d): Spell Add: %d ; Spell Level: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	
+
 	int i=1;
 	//if param2 is 0, then double spells
 	if(!fx->Parameter2) {
@@ -2177,7 +2179,7 @@ static EffectRef fx_deaf_state_ref={"State:Deaf",NULL,-1};
 int fx_cure_deaf_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_deaf_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	
+
 	target->fxqueue.RemoveAllEffects(fx_deaf_state_ref);
 	return FX_NOT_APPLIED;
 }
@@ -2346,7 +2348,7 @@ int fx_set_regenerating_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 		damage = 1;
 		break;
 	}
-	
+
 	target->NewBase( IE_HITPOINTS, damage, MOD_ADDITIVE );
 	if (target->BaseStats[IE_HITPOINTS]> target->BaseStats[IE_MAXHITPOINTS]) {
 		target->SetBase(IE_HITPOINTS, target->BaseStats[IE_MAXHITPOINTS]);
@@ -2469,7 +2471,7 @@ int fx_reputation_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_retreat_from (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_retreat_from (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	
+
 	return FX_NOT_APPLIED;
 }
 
@@ -2536,7 +2538,7 @@ int fx_detect_alignment (Actor* /*Owner*/, Actor* target, Effect* fx)
 				//glow red
 				break;
 			case AL_GOOD:
-				core->DisplayConstantStringName(STR_GOOD, 0x00ff00, target);			
+				core->DisplayConstantStringName(STR_GOOD, 0x00ff00, target);
 				//glow green
 				break;
 			case AL_GNE_NEUTRAL:
@@ -2641,7 +2643,7 @@ int fx_dimension_door (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_dimension_door (%2d) Type:%d\n", fx->Opcode, fx->Parameter2 );
 	Point p;
-	
+
 	switch(fx->Parameter2)
 	{
 	case 0: //target to point
@@ -2965,12 +2967,12 @@ int fx_disable_button (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 }
 
 //0x91 DisableSpellCasting
-//iwd2: 
+//iwd2:
 // 0 - all, 1 - mage+cleric, 2 - mage,3 - cleric ,4 - innate
 int fx_disable_spellcasting (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_disable_spellcasting (%2d): Button: %d\n", fx->Opcode, fx->Parameter2 );
-	
+
 	//
 	return FX_APPLIED;
 }
@@ -2984,7 +2986,7 @@ int fx_cast_spell (Actor* Owner, Actor* target, Effect* fx)
 		core->ApplySpell(fx->Resource, Owner, target, fx->Power);
 	} else {
 		//cast spell on target
-		//Owner->CastSpell...
+		Owner->CastSpell(fx->Resource, target, false);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -2992,17 +2994,18 @@ int fx_cast_spell (Actor* Owner, Actor* target, Effect* fx)
 // 0x93 Spell:Learn
 int fx_learn_spell (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_learn_spell (%2d): Resource:%s Mode: %d\n", fx->Opcode, fx->Resource, fx->Parameter1 );
+	if (0) printf( "fx_learn_spell (%2d): Resource:%s Mode: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
 	//parameter1 is unused, gemrb lets you to make it not give XP
 	//probably we should also let this via a game flag if we want
 	//full compatibility with bg1
-	target->LearnSpell(fx->Resource, fx->Parameter1^LS_ADDXP);
+	target->LearnSpell(fx->Resource, fx->Parameter2^LS_ADDXP);
 	return FX_NOT_APPLIED;
 }
-// 0x94 Spell:CastAsScroll
-int fx_cast_scroll (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+// 0x94 Spell:CastSpellPoint
+int fx_cast_scroll (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cast_scroll (%2d): Resource:%s Mode: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
+	Owner->CastSpellPoint(fx->Resource, target->Pos, false);
 	return FX_NOT_APPLIED;
 }
 
@@ -3268,8 +3271,8 @@ int fx_damage_animation (Actor* /*Owner*/, Actor* target, Effect* fx)
 // 0xAB Spell:Add
 int fx_add_innate (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_add_innate (%2d): Resource: %s\n", fx->Opcode, fx->Resource );
-	target->LearnSpell(fx->Resource,0);
+	if (0) printf( "fx_add_innate (%2d): Resource: %s Mode: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
+	target->LearnSpell(fx->Resource, fx->Parameter2^LS_MEMO);
 	//this is an instant, so it shouldn't stick
 	return FX_NOT_APPLIED;
 }
@@ -3318,6 +3321,7 @@ int fx_playsound (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0x6d State:Hold3
+//0xfb State:Hold4
 //0x1a8 HoldUndead (iwd2)
 int fx_hold_creature_no_icon (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -3708,7 +3712,7 @@ int fx_play_visual_effect (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (!fx->Resource[0]) {
 		return FX_NOT_APPLIED;
 	}
-	//if it is sticky, don't add it if it is already played  
+	//if it is sticky, don't add it if it is already played
 	if (fx->Parameter2) {
 		if (!target->HasVVCCell(fx->Resource) ) {
 			return FX_NOT_APPLIED;
