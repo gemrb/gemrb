@@ -52,7 +52,7 @@ SDLVideoDriver::SDLVideoDriver(void)
 	CursorPos.y = 0;
 	moveX = 0;
 	moveY = 0;
-	DisableMouse = false;
+	DisableMouse = 0;
 	DisableScroll = false;
 	xCorr = 0;
 	yCorr = 0;
@@ -322,7 +322,7 @@ int SDLVideoDriver::SwapBuffers(void)
 			MouseMovement(event.motion.x, event.motion.y);
 			break;
 		case SDL_MOUSEBUTTONDOWN:
-			if (DisableMouse)
+			if (DisableMouse)          //grayed mouse is disabled in this sense 
 				break;
 			if (CursorIndex != 2)
 				CursorIndex = 1;
@@ -334,14 +334,14 @@ int SDLVideoDriver::SwapBuffers(void)
 			break;
 
 		case SDL_MOUSEBUTTONUP:
-			if (DisableMouse)
+			if (DisableMouse)         //grayed mouse is disabled in this sense 
 				break;
 			if (CursorIndex != 2)
-				CursorIndex = 0;
+			  CursorIndex = 0;
 			CursorPos.x = event.button.x;
 			CursorPos.y = event.button.y;
 			if (Evnt && !ConsolePopped)
-				Evnt->MouseUp( event.button.x, event.button.y, 1 << ( event.button.button - 1 ), GetModState(SDL_GetModState()) );
+			  Evnt->MouseUp( event.button.x, event.button.y, 1 << ( event.button.button - 1 ), GetModState(SDL_GetModState()) );
 
 			break;
 		 case SDL_ACTIVEEVENT:
@@ -369,10 +369,15 @@ int SDLVideoDriver::SwapBuffers(void)
 		SDL_BlitSurface( extra, &src, disp, &dst );
 	}
 
-	if (Cursor[CursorIndex] && !DisableMouse) {
+	if (Cursor[CursorIndex] && !(DisableMouse&MOUSE_DISABLED)) {
 		SDL_Surface* temp = backBuf;
 		backBuf = disp; // FIXME: UGLY HACK!
-		BlitSprite(Cursor[CursorIndex], CursorPos.x, CursorPos.y, true);
+		if (DisableMouse&MOUSE_GRAYED) {
+			//used for greyscale blitting, fadeColor is unused
+			BlitGameSprite(Cursor[CursorIndex], CursorPos.x, CursorPos.y, BLIT_GREY, fadeColor, NULL, NULL, NULL, true);
+		} else {
+			BlitSprite(Cursor[CursorIndex], CursorPos.x, CursorPos.y, true);
+		}
 		backBuf = temp;
 	}
 
@@ -539,9 +544,9 @@ Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, int bpp, void* pixels,
 }
 
 Sprite2D* SDLVideoDriver::CreateSpriteBAM8(int w, int h, bool rle,
-										   const unsigned char* pixeldata,
-										   unsigned int datasize,
-										   Palette* palette, int transindex)
+											 const unsigned char* pixeldata,
+											 unsigned int datasize,
+											 Palette* palette, int transindex)
 {
 	Sprite2D* spr = new Sprite2D();
 	spr->BAM = true;
@@ -955,7 +960,7 @@ void SDLVideoDriver::BlitSpriteHalfTrans(Sprite2D* spr, int x, int y,
 void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 									unsigned int flags, Color tint,
 									SpriteCover* cover, Palette *palette,
-									Region* clip)
+									Region* clip, bool anchor)
 {
 	if (!spr->vptr) return;
 	if (!spr->BAM) {
@@ -999,8 +1004,14 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 
 
 	const Uint8* rle = (const Uint8*)spr->pixels;
-	int tx = x - spr->XPos - Viewport.x;
-	int ty = y - spr->YPos - Viewport.y;
+	//int tx = x - spr->XPos - Viewport.x;
+	//int ty = y - spr->YPos - Viewport.y;
+	int tx = x - spr->XPos;
+	int ty = y - spr->YPos;
+	if (!anchor) {
+		tx-=Viewport.x;
+		ty-=Viewport.y;
+	}
 	if (tx > backBuf->w) return;
 	if (tx+spr->Width <= 0) return;
 	SDL_LockSurface(backBuf);
@@ -1015,7 +1026,7 @@ void SDLVideoDriver::BlitGameSprite(Sprite2D* spr, int x, int y,
 
 	if (flags & BLIT_TRANSSHADOW) {
 		shadowcol32 = SDL_MapRGBA(backBuf->format, palette->col[1].r/2,
-								  palette->col[1].g/2, palette->col[1].b/2, 0);
+									palette->col[1].g/2, palette->col[1].b/2, 0);
 		shadowcol16 = (Uint16)shadowcol32;
 	}
 
@@ -1942,7 +1953,7 @@ void SDLVideoDriver::BlitTiled(Region rgn, Sprite2D* img, bool anchor)
 	for (int y = 0; y < yrep; y++) {
 		for (int x = 0; x < xrep; x++) {
 			BlitSprite(img, rgn.x + (x*img->Width), rgn.y + (y*img->Height),
-					   false, &rgn);
+					 false, &rgn);
 		}
 	}
 }
@@ -2209,7 +2220,7 @@ void SDLVideoDriver::GetMousePos(int &x, int &y)
 void SDLVideoDriver::MouseMovement(int x, int y)
 {
 	GetTime( lastMouseTime );
-	if (DisableMouse)
+	if (DisableMouse&MOUSE_DISABLED)
 		return;
 	CursorPos.x = x; // - mouseAdjustX[CursorIndex];
 	CursorPos.y = y; // - mouseAdjustY[CursorIndex];

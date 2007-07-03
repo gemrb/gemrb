@@ -90,6 +90,8 @@ public:
 	void DelWindow(Window* win);
 	/** Frees and Removes all the Windows in the Array */
 	void Clear();
+	/** Call this to change the cursor (moving over windows will change it back) */
+	void RefreshCursor(int idx);
 	/** BroadCast Mouse Move Event */
 	void MouseMove(unsigned short x, unsigned short y);
 	/** BroadCast Mouse Move Event */

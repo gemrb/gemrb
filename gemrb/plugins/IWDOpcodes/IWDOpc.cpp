@@ -21,6 +21,7 @@
 
 #include "../../includes/win32def.h"
 #include "../../includes/overlays.h"
+#include "../../includes/opcode_params.h"
 #include "../Core/Actor.h"
 #include "../Core/EffectQueue.h"
 #include "../Core/Interface.h"
@@ -31,15 +32,6 @@
 #include "IWDOpc.h"
 
 static ieResRef *iwd_spell_hits = NULL;
-
-//resources for the seven eyes effect
-#define EYE_MIND   0
-#define EYE_SWORD  1
-#define EYE_MAGE   2
-#define EYE_VENOM  3
-#define EYE_SPIRIT 4
-#define EYE_FORT   5
-#define EYE_STONE  6
 
 static const ieResRef SevenEyes[7]={"spin126","spin127","spin128","spin129","spin130","spin131","spin132"};
 
@@ -83,122 +75,6 @@ static int shcount = -1;
 
 #define PI_BLINK        130
 #define PI_EMPTYBODY    145
-
-#define SS_HOPELESSNESS 0
-#define SS_PROTFROMEVIL 1
-#define SS_ARMOROFFAITH 2
-#define SS_NAUSEA       3
-#define SS_ENFEEBLED    4
-#define SS_FIRESHIELD   5
-#define SS_ICESHIELD    6
-#define SS_HELD         7
-#define SS_DEATHWARD    8
-#define SS_HOLYPOWER    9
-#define SS_GOODCHANT    10
-#define SS_BADCHANT     11
-#define SS_GOODPRAYER   12
-#define SS_BADPRAYER    13
-#define SS_GOODRECIT    14
-#define SS_BADRECIT     15
-#define SS_RIGHTEOUS    16    //allied
-#define SS_RIGHTEOUS2   17    //allied and same alignment
-#define SS_STONESKIN    18
-#define SS_IRONSKIN     19
-#define SS_SANCTUARY    20
-#define SS_RESILIENT    21
-#define SS_BLESS        22
-#define SS_AID          23
-#define SS_BARKSKIN     24
-#define SS_HOLYMIGHT    25
-#define SS_ENTANGLE     26
-#define SS_WEB          27
-#define SS_GREASE       28
-#define SS_FREEACTION   29
-#define SS_ENTROPY      30
-#define SS_STORMSHELL   31
-#define SS_ELEMPROT     32
-#define SS_BERSERK      33
-#define SS_BLOODRAGE    34
-#define SS_NOHPINFO     35
-#define SS_NOAWAKE      36
-#define SS_AWAKE        37
-#define SS_DEAF         38
-#define SS_ANIMALRAGE   39
-#define SS_NOBACKSTAB   40
-#define SS_CHAOTICCMD   41
-#define SS_MISCAST      42
-#define SS_PAIN         43
-#define SS_MALISON      44
-//#define SS_CATSGRACE    45   //used explicitly
-#define SS_MOLDTOUCH    46
-#define SS_FLAMESHROUD  47
-#define SS_EYEMIND      48
-#define SS_EYESWORD     49
-#define SS_EYEMAGE      50
-#define SS_EYEVENOM     51
-#define SS_EYESPIRIT    52
-#define SS_EYEFORTITUDE 53
-#define SS_EYESTONE     54
-#define SS_AEGIS        55
-#define SS_EXECUTIONER  56
-#define SS_ENERGYDRAIN  57
-#define SS_TORTOISE     58
-#define SS_BLINK        59
-#define SS_MINORGLOBE   60
-#define SS_PROTFROMMISS 61
-#define SS_GHOSTARMOR   62
-#define SS_REFLECTION   63
-#define SS_KAI          64
-#define SS_CALLEDSHOT   65
-#define SS_MIRRORIMAGE  66
-#define SS_TURNED       67
-#define SS_BLADEBARRIER 68
-#define SS_POISONWEAPON 69
-#define SS_STUNNINGBLOW 70
-#define SS_QUIVERPALM   71
-#define SS_DOMINATION   72
-#define SS_MAJORGLOBE   73
-#define SS_SHIELD       74
-#define SS_ANTIMAGIC    75
-#define SS_POWERATTACK  76
-//more powerattack
-#define SS_EXPERTISE    81
-//more expertise
-#define SS_ARTERIAL     86
-#define SS_HAMSTRING    87
-#define SS_RAPIDSHOT    88
-#define SS_IRONBODY     89
-#define SS_TENSER       90
-#define SS_SMITEEVIL    91
-#define SS_ALICORNLANCE 92
-#define SS_LIGHTNING    93
-#define SS_CHAMPIONS    94
-#define SS_BONECIRCLE   95
-#define SS_CLOAKOFFEAR  96
-#define SS_PESTILENCE   97
-#define SS_CONTAGION    98
-#define SS_BANE         99
-#define SS_DEFENSIVE    100
-#define SS_DESTRUCTION  101
-#define SS_DOLOROUS     102
-#define SS_DOOM         103
-#define SS_EXALTATION   104
-#define SS_FAERIEFIRE   105
-#define SS_FINDTRAPS    106
-#define SS_GREATERLATH  107
-#define SS_MAGICRESIST  108
-#define SS_NPROTECTION  109
-#define SS_PROTFROMFIRE 110
-#define SS_PROTFROMLIGHTNING 111
-#define SS_ELEMENTAL    112
-#define SS_LATHANDER    113
-#define SS_SLOWPOISON   114
-#define SS_SPELLSHIELD  115
-#define SS_STATICCHARGE 116
-#define SS_LOWERRESIST  140
-
-//tested for this, splstate is wrong or this entry has two uses
-#define SS_DAYBLINDNESS 178
 
 static int fx_ac_vs_damage_type_modifier_iwd2 (Actor* Owner, Actor* target, Effect* fx);//0
 static int fx_draw_upon_holy_might (Actor* Owner, Actor* target, Effect* fx);//84 (iwd2)
@@ -338,116 +214,116 @@ static int fx_rapid_shot (Actor* Owner, Actor* target, Effect* fx); //457
 
 //No need to make these ordered, they will be ordered by EffectQueue
 static EffectRef effectnames[] = {
-	{ "ACVsDamageTypeModifierIWD2", fx_ac_vs_damage_type_modifier_iwd2, 0}, //0
-	{ "DrawUponHolyMight", fx_draw_upon_holy_might, 0},//84 (iwd2)
-	{ "IronSkins", fx_ironskins, 0}, //da (iwd2)
-	{ "Color:FadeRGB", fx_fade_rgb, 0}, //e8
-	{ "IWDVisualSpellHit", fx_iwd_visual_spell_hit, 0}, //e9
-	{ "ColdDamage", fx_cold_damage, 0}, //ea
-	{ "ChillTouch", fx_chill_touch, 0}, //ec (how)
-	{ "ChillTouchPanic", fx_chill_touch_panic, 0}, //ec (iwd2)
-	{ "CrushingDamage", fx_crushing_damage, 0}, //ed
-	{ "SaveBonus", fx_save_bonus, 0}, //ee
-	{ "SlowPoison", fx_slow_poison, 0}, //ef
-	{ "IWDMonsterSummoning", fx_iwd_monster_summoning, 0}, //f0
-	{ "VampiricTouch", fx_vampiric_touch, 0}, //f1
-	{ "AnimateDead", fx_animate_dead, 0}, //f3
-	{ "SummonMonster2", fx_summon_monster2, 0}, //f6
-	{ "BurningBlood", fx_burning_blood, 0}, //f7
-	{ "BurningBlood2", fx_burning_blood2, 0}, //f7
-	{ "SummonShadowMonster", fx_summon_shadow_monster, 0}, //f8
-	{ "Recitation", fx_recitation, 0}, //f9
-	{ "RecitationBad", fx_recitation_bad, 0},//fa
-	{ "LichTouch", fx_lich_touch, 0},//fb
-	{ "BlindingOrb", fx_blinding_orb, 0}, //fc
-	{ "RemoveEffects", fx_remove_effects, 0}, //fe
-	{ "SalamanderAura", fx_salamander_aura, 0}, //ff
-	{ "UmberHulkGaze", fx_umberhulk_gaze, 0}, //100
-	{ "ZombieLordAura", fx_zombielord_aura, 0},//101
-	{ "SummonCreature2", fx_summon_creature2, 0}, //103
-	{ "SummonPomab", fx_summon_pomab, 0}, //106
-	{ "ControlUndead", fx_control_undead, 0}, //107
-	{ "StaticCharge", fx_static_charge, 0}, //108
-	{ "CloakOfFear", fx_cloak_of_fear, 0}, //109
-	{ "RemoveConfusion", fx_remove_confusion, 0},//10b
-	{ "EyeOfTheMind", fx_eye_of_the_mind, 0}, //10c
-	{ "EyeOfTheSword", fx_eye_of_the_sword, 0}, //10d
-	{ "EyeOfTheMage", fx_eye_of_the_mage, 0}, //10e
-	{ "EyeOfVenom", fx_eye_of_venom, 0}, //10f
-	{ "EyeOfTheSpirit", fx_eye_of_the_spirit, 0}, //110
-	{ "EyeOfFortitude", fx_eye_of_fortitude, 0}, //111
-	{ "EyeOfStone", fx_eye_of_stone, 0}, //112
-	{ "RemoveSevenEyes", fx_remove_seven_eyes, 0}, //113
-	{ "RemoveEffect", fx_remove_effect, 0}, //114
-	{ "SoulEater", fx_soul_eater, 0}, //115
-	{ "ShroudOfFlame", fx_shroud_of_flame, 0},//116
-	{ "ShroudOfFlame2", fx_shroud_of_flame2, 0},//116
-	{ "AnimalRage", fx_animal_rage, 0}, //117 - berserk?
-	{ "TurnUndead", fx_turn_undead, 0}, //118 how
-	{ "TurnUndead2", fx_turn_undead2, 0}, //118 iwd2
-	{ "VitriolicSphere", fx_vitriolic_sphere, 0}, //119
-	{ "SuppressHP", fx_suppress_hp, 0}, //11a -- some stat???
-	{ "FloatText", fx_floattext, 0}, //11b
-	{ "MaceOfDisruption", fx_mace_of_disruption, 0}, //11c
-	{ "State:Set", fx_set_state, 0}, //120
-	{ "CutScene", fx_cutscene, 0}, //121
-	{ "Protection:Spell2", fx_resist_spell, 0}, //ce
-	{ "Protection:Spell3", fx_resist_spell_and_message, 0}, //122
-	{ "RodOfSmithing", fx_rod_of_smithing, 0}, //123
-	{ "HarpyWail", fx_harpy_wail, 0}, //126
-	{ "JackalWereGaze", fx_jackalwere_gaze, 0}, //127
-	{ "UseMagicDeviceModifier", fx_use_magic_device_modifier, 0}, //12a
+	{ "ACVsDamageTypeModifierIWD2", fx_ac_vs_damage_type_modifier_iwd2, -1}, //0
+	{ "DrawUponHolyMight", fx_draw_upon_holy_might, -1},//84 (iwd2)
+	{ "IronSkins", fx_ironskins, -1}, //da (iwd2)
+	{ "Color:FadeRGB", fx_fade_rgb, -1}, //e8
+	{ "IWDVisualSpellHit", fx_iwd_visual_spell_hit, -1}, //e9
+	{ "ColdDamage", fx_cold_damage, -1}, //ea
+	{ "ChillTouch", fx_chill_touch, -1}, //ec (how)
+	{ "ChillTouchPanic", fx_chill_touch_panic, -1}, //ec (iwd2)
+	{ "CrushingDamage", fx_crushing_damage, -1}, //ed
+	{ "SaveBonus", fx_save_bonus, -1}, //ee
+	{ "SlowPoison", fx_slow_poison, -1}, //ef
+	{ "IWDMonsterSummoning", fx_iwd_monster_summoning, -1}, //f0
+	{ "VampiricTouch", fx_vampiric_touch, -1}, //f1
+	{ "AnimateDead", fx_animate_dead, -1}, //f3
+	{ "SummonMonster2", fx_summon_monster2, -1}, //f6
+	{ "BurningBlood", fx_burning_blood, -1}, //f7
+	{ "BurningBlood2", fx_burning_blood2, -1}, //f7
+	{ "SummonShadowMonster", fx_summon_shadow_monster, -1}, //f8
+	{ "Recitation", fx_recitation, -1}, //f9
+	{ "RecitationBad", fx_recitation_bad, -1},//fa
+	{ "LichTouch", fx_lich_touch, -1},//fb
+	{ "BlindingOrb", fx_blinding_orb, -1}, //fc
+	{ "RemoveEffects", fx_remove_effects, -1}, //fe
+	{ "SalamanderAura", fx_salamander_aura, -1}, //ff
+	{ "UmberHulkGaze", fx_umberhulk_gaze, -1}, //100
+	{ "ZombieLordAura", fx_zombielord_aura, -1},//101
+	{ "SummonCreature2", fx_summon_creature2, -1}, //103
+	{ "SummonPomab", fx_summon_pomab, -1}, //106
+	{ "ControlUndead", fx_control_undead, -1}, //107
+	{ "StaticCharge", fx_static_charge, -1}, //108
+	{ "CloakOfFear", fx_cloak_of_fear, -1}, //109
+	{ "RemoveConfusion", fx_remove_confusion, -1},//10b
+	{ "EyeOfTheMind", fx_eye_of_the_mind, -1}, //10c
+	{ "EyeOfTheSword", fx_eye_of_the_sword, -1}, //10d
+	{ "EyeOfTheMage", fx_eye_of_the_mage, -1}, //10e
+	{ "EyeOfVenom", fx_eye_of_venom, -1}, //10f
+	{ "EyeOfTheSpirit", fx_eye_of_the_spirit, -1}, //110
+	{ "EyeOfFortitude", fx_eye_of_fortitude, -1}, //111
+	{ "EyeOfStone", fx_eye_of_stone, -1}, //112
+	{ "RemoveSevenEyes", fx_remove_seven_eyes, -1}, //113
+	{ "RemoveEffect", fx_remove_effect, -1}, //114
+	{ "SoulEater", fx_soul_eater, -1}, //115
+	{ "ShroudOfFlame", fx_shroud_of_flame, -1},//116
+	{ "ShroudOfFlame2", fx_shroud_of_flame2, -1},//116
+	{ "AnimalRage", fx_animal_rage, -1}, //117 - berserk?
+	{ "TurnUndead", fx_turn_undead, -1}, //118 how
+	{ "TurnUndead2", fx_turn_undead2, -1}, //118 iwd2
+	{ "VitriolicSphere", fx_vitriolic_sphere, -1}, //119
+	{ "SuppressHP", fx_suppress_hp, -1}, //11a -- some stat???
+	{ "FloatText", fx_floattext, -1}, //11b
+	{ "MaceOfDisruption", fx_mace_of_disruption, -1}, //11c
+	{ "State:Set", fx_set_state, -1}, //120
+	{ "CutScene", fx_cutscene, -1}, //121
+	{ "Protection:Spell2", fx_resist_spell, -1}, //ce
+	{ "Protection:Spell3", fx_resist_spell_and_message, -1}, //122
+	{ "RodOfSmithing", fx_rod_of_smithing, -1}, //123
+	{ "HarpyWail", fx_harpy_wail, -1}, //126
+	{ "JackalWereGaze", fx_jackalwere_gaze, -1}, //127
+	{ "UseMagicDeviceModifier", fx_use_magic_device_modifier, -1}, //12a
 	//iwd2 effects
-	{ "Hopelessness", fx_hopelessness, 0}, //400
-	{ "ProtectionFromEvil", fx_protection_from_evil, 0}, //401
-	{ "AddEffectsList", fx_add_effects_list, 0}, //402
-	{ "ArmorOfFaith", fx_armor_of_faith, 0}, //403
-	{ "Nausea", fx_nausea, 0}, //404
-	{ "Enfeeblement", fx_enfeeblement, 0}, //405
-	{ "FireShield", fx_fireshield, 0}, //406
-	{ "DeathWard", fx_death_ward, 0}, //407
-	{ "HolyPower", fx_holy_power, 0}, //408
-	{ "RighteousWrath", fx_righteous_wrath, 0}, //409
-	{ "SummonAlly", fx_summon_ally, 0}, //410
-	{ "SummonEnemy", fx_summon_enemy, 0}, //411
-	{ "Control2", fx_control, 0}, //412
-	{ "VisualEffectIWD2", fx_visual_effect_iwd2, 0}, //413
-	{ "ResilientSphere", fx_resilient_sphere, 0}, //414
-	{ "BarkSkin", fx_barkskin, 0}, //415
-	{ "BleedingWounds", fx_bleeding_wounds, 0},//416
-	{ "AreaEffect", fx_area_effect, 0}, //417
-	{ "FreeAction2", fx_free_action_iwd2, 0}, //418
-	{ "Unconsciousness", fx_unconsciousness, 0}, //419
-	{ "EntropyShield", fx_entropy_shield, 0}, //421
-	{ "StormShell", fx_storm_shell, 0}, //422
-	{ "ProtectionFromElements", fx_protection_from_elements, 0}, //423
-	{ "ControlUndead2", fx_control_undead, 0}, //425
-	{ "Aegis", fx_aegis, 0}, //426
-	{ "ExecutionerEyes", fx_executioner_eyes, 0}, //427
-	{ "EnergyDrain", fx_energy_drain, 0}, //431
-	{ "TortoiseShell", fx_tortoise_shell, 0}, //432
-	{ "Blink", fx_blink, 0},//433
-	{ "PersistentUseEffectList", fx_persistent_use_effect_list, 0}, //434
-	{ "DayBlindness", fx_day_blindness, 0}, //435
-	{ "DamageReduction", fx_damage_reduction, 0}, //436
-	{ "Disguise", fx_disguise, 0}, //437
-	{ "HeroicInspiration", fx_heroic_inspiration, 0},//438
-	//{ "PreventAISlowDown", fx_prevent_ai_slowdown, 0}, //439 same as bg2
-	{ "BarbarianRage", fx_barbarian_rage, 0}, //440
-	{ "MissileDamageReduction", fx_missile_damage_reduction, 0}, //443
-	{ "TensersTransformation", fx_tenser_transformation, 0}, //444
-	{ "SmiteEvil", fx_smite_evil, 0}, //446
-	{ "Restoration", fx_restoration, 0}, //447
-	{ "AlicornLance", fx_alicorn_lance, 0}, //448
-	{ "CallLightning", fx_call_lightning, 0}, //449
-	{ "GlobeInvulnerability", fx_globe_invulnerability, 0}, //450
-	{ "LowerResistance", fx_lower_resistance, 0}, //451
-	{ "Bane", fx_bane, 0}, //452
-	{ "PowerAttack", fx_power_attack, 0}, //453
-	{ "Expertise", fx_expertise, 0}, //454
-	{ "ArterialStrike", fx_arterial_strike, 0}, //455
-	{ "HamString", fx_hamstring, 0}, //456
-	{ "RapidShot", fx_rapid_shot, 0}, //457
+	{ "Hopelessness", fx_hopelessness, -1}, //400
+	{ "ProtectionFromEvil", fx_protection_from_evil, -1}, //401
+	{ "AddEffectsList", fx_add_effects_list, -1}, //402
+	{ "ArmorOfFaith", fx_armor_of_faith, -1}, //403
+	{ "Nausea", fx_nausea, -1}, //404
+	{ "Enfeeblement", fx_enfeeblement, -1}, //405
+	{ "FireShield", fx_fireshield, -1}, //406
+	{ "DeathWard", fx_death_ward, -1}, //407
+	{ "HolyPower", fx_holy_power, -1}, //408
+	{ "RighteousWrath", fx_righteous_wrath, -1}, //409
+	{ "SummonAlly", fx_summon_ally, -1}, //410
+	{ "SummonEnemy", fx_summon_enemy, -1}, //411
+	{ "Control2", fx_control, -1}, //412
+	{ "VisualEffectIWD2", fx_visual_effect_iwd2, -1}, //413
+	{ "ResilientSphere", fx_resilient_sphere, -1}, //414
+	{ "BarkSkin", fx_barkskin, -1}, //415
+	{ "BleedingWounds", fx_bleeding_wounds, -1},//416
+	{ "AreaEffect", fx_area_effect, -1}, //417
+	{ "FreeAction2", fx_free_action_iwd2, -1}, //418
+	{ "Unconsciousness", fx_unconsciousness, -1}, //419
+	{ "EntropyShield", fx_entropy_shield, -1}, //421
+	{ "StormShell", fx_storm_shell, -1}, //422
+	{ "ProtectionFromElements", fx_protection_from_elements, -1}, //423
+	{ "ControlUndead2", fx_control_undead, -1}, //425
+	{ "Aegis", fx_aegis, -1}, //426
+	{ "ExecutionerEyes", fx_executioner_eyes, -1}, //427
+	{ "EnergyDrain", fx_energy_drain, -1}, //431
+	{ "TortoiseShell", fx_tortoise_shell, -1}, //432
+	{ "Blink", fx_blink, -1},//433
+	{ "PersistentUseEffectList", fx_persistent_use_effect_list, -1}, //434
+	{ "DayBlindness", fx_day_blindness, -1}, //435
+	{ "DamageReduction", fx_damage_reduction, -1}, //436
+	{ "Disguise", fx_disguise, -1}, //437
+	{ "HeroicInspiration", fx_heroic_inspiration, -1},//438
+	//{ "PreventAISlowDown", fx_prevent_ai_slowdown, -1}, //439 same as bg2
+	{ "BarbarianRage", fx_barbarian_rage, -1}, //440
+	{ "MissileDamageReduction", fx_missile_damage_reduction, -1}, //443
+	{ "TensersTransformation", fx_tenser_transformation, -1}, //444
+	{ "SmiteEvil", fx_smite_evil, -1}, //446
+	{ "Restoration", fx_restoration, -1}, //447
+	{ "AlicornLance", fx_alicorn_lance, -1}, //448
+	{ "CallLightning", fx_call_lightning, -1}, //449
+	{ "GlobeInvulnerability", fx_globe_invulnerability, -1}, //450
+	{ "LowerResistance", fx_lower_resistance, -1}, //451
+	{ "Bane", fx_bane, -1}, //452
+	{ "PowerAttack", fx_power_attack, -1}, //453
+	{ "Expertise", fx_expertise, -1}, //454
+	{ "ArterialStrike", fx_arterial_strike, -1}, //455
+	{ "HamString", fx_hamstring, -1}, //456
+	{ "RapidShot", fx_rapid_shot, -1}, //457
 	{ NULL, NULL, 0 },
 };
 
@@ -758,7 +634,7 @@ int fx_iwd_visual_spell_hit (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-//0xea ColdDamage (special)
+//0xea ColdDamage (how)
 int fx_cold_damage (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cold_damage (%2d): Damage %d\n", fx->Opcode, fx->Parameter1 );
@@ -786,14 +662,27 @@ int fx_chill_touch (Actor* Owner, Actor* target, Effect* fx)
 int fx_chill_touch_panic (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_chill_touch_panic (%2d)\n", fx->Opcode);
-	STAT_SET(IE_MORALE, STAT_GET(IE_MORALEBREAK));
+	//STAT_SET(IE_MORALE, STAT_GET(IE_MORALEBREAK));
 	if (enhanced_effects) {
 		target->AddPortraitIcon(PI_PANIC);
 	}
-	return FX_APPLIED;
+	ieDword state;
+
+	if (fx->Parameter2) {
+		state = STATE_HELPLESS|STATE_STUNNED;
+	}
+	else {
+		state = STATE_PANIC;
+	}
+	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
+		BASE_STATE_SET(state);
+	} else {
+		STATE_SET(state);
+	}
+	return FX_PERMANENT;
 }
 
-//0xed CrushingDamage (special)
+//0xed CrushingDamage (how)
 int fx_crushing_damage (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_crushing_damage (%2d): Damage %d\n", fx->Opcode, fx->Parameter1 );
@@ -814,9 +703,42 @@ int fx_save_bonus (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0xef SlowPoison
-int fx_slow_poison (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+//gemrb extension: can slow bleeding wounds (like bandage)
+static EffectRef fx_poison_ref={"Poison",NULL,-1};
+static EffectRef fx_wound_ref={"BleedingWounds",NULL,-1};
+
+int fx_slow_poison (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
+	ieDword my_opcode;
+	if (fx->Parameter2) my_opcode = EffectQueue::ResolveEffect(fx_wound_ref);
+	else my_opcode = EffectQueue::ResolveEffect(fx_poison_ref);
 	if (0) printf( "fx_slow_poison (%2d): Damage %d\n", fx->Opcode, fx->Parameter1 );
+	std::list< Effect* >::const_iterator f=target->fxqueue.GetFirstEffect();
+	Effect *poison;
+	//this is intentionally an assignment
+	while( (poison = target->fxqueue.GetNextEffect(f)) ) {
+		if (poison->Opcode!=my_opcode) continue;
+		switch (poison->Parameter2) {
+		case RPD_SECONDS:
+			poison->Parameter2=RPD_ROUNDS;
+			break;
+		case RPD_POINTS:
+			//i'm not sure if this is ok
+			//the hardcoded formula is supposed to be this:
+			//duration = (duration - gametime)*7+gametime;
+			//duration = duration*7 - gametime*6;
+			//but in fact it is like this.
+			//it is (duration - gametime)*8+gametime;
+			//like the damage is spread for a longer time than
+			//it should
+			poison->Duration=poison->Duration*8-core->GetGame()->GameTime*7;
+			poison->Parameter1*=7;
+			break;
+		case RPD_ROUNDS:
+			poison->Parameter2=RPD_TURNS;
+			break;
+		}
+	}
 	return FX_NOT_APPLIED;
 }
 
@@ -988,16 +910,43 @@ int fx_summon_shadow_monster (Actor* Owner, Actor* target, Effect* fx)
 int fx_recitation (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_recitation (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
-	if (EXTSTATE_GET(EXTSTATE_RECITATION)) return FX_NOT_APPLIED;
-	EXTSTATE_SET(EXTSTATE_RECITATION);
+	ieDword value;
+	
+	if (fx->Parameter2)
+	{
+		if (target->SetSpellState(SS_BADRECIT)) return FX_NOT_APPLIED;
+		EXTSTATE_SET(EXTSTATE_REC_BAD);
+		value = (ieDword) -2;
+	}
+	else
+	{
+		if (target->SetSpellState(SS_GOODRECIT)) return FX_NOT_APPLIED;
+		EXTSTATE_SET(EXTSTATE_RECITATION);
+		value = 2;
+	}
+
+	STAT_ADD( IE_TOHIT, value);
+	STAT_ADD( IE_SAVEFORTITUDE, value);
+	STAT_ADD( IE_SAVEREFLEX, value);
+	STAT_ADD( IE_SAVEWILL, value);
+	//make it compatible with 2nd edition
+	STAT_ADD( IE_SAVEVSBREATH, value);
+	STAT_ADD( IE_SAVEVSSPELL, value);
 	return FX_APPLIED;
 }
 //fa RecitationBad
 int fx_recitation_bad (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_recitation (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
-	if (EXTSTATE_GET(EXTSTATE_REC_BAD)) return FX_NOT_APPLIED;
+	if (target->SetSpellState(SS_BADRECIT)) return FX_NOT_APPLIED;
 	EXTSTATE_SET(EXTSTATE_REC_BAD);
+	STAT_ADD( IE_TOHIT, -2);
+	STAT_ADD( IE_SAVEFORTITUDE, -2);
+	STAT_ADD( IE_SAVEREFLEX, -2);
+	STAT_ADD( IE_SAVEWILL, -2);
+	//make it compatible with 2nd edition
+	STAT_ADD( IE_SAVEVSBREATH, -2);
+	STAT_ADD( IE_SAVEVSSPELL, -2);
 	return FX_APPLIED;
 }
 //fb LichTouch (how)
@@ -1021,6 +970,7 @@ int fx_lich_touch (Actor* Owner, Actor* target, Effect* fx)
 	PrepareDuration(fx);
 	return FX_APPLIED;
 }
+
 //fc BlindingOrb (how)
 static EffectRef fx_state_blind_ref={"State:Blind",NULL,-1};
 
@@ -1044,6 +994,7 @@ int fx_blinding_orb (Actor* Owner, Actor* target, Effect* fx)
 	PrepareDuration(fx);
 	return FX_APPLIED;
 }
+
 //0xfe RemoveEffects
 int fx_remove_effects (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1355,6 +1306,11 @@ int fx_soul_eater (Actor* Owner, Actor* target, Effect* fx)
 int fx_shroud_of_flame (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_shroud_of_flame (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+
+	if ( STATE_GET(STATE_DEAD) ) {
+		return FX_NOT_APPLIED;
+	}
+
 	//timing
 	if (core->GetGame()->GameTime%6) {
 		return FX_APPLIED;
@@ -1376,13 +1332,23 @@ int fx_shroud_of_flame (Actor* Owner, Actor* target, Effect* fx)
 int fx_shroud_of_flame2 (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_shroud_of_flame2 (%2d)\n", fx->Opcode );
+
+	if ( STATE_GET(STATE_DEAD) ) {
+		return FX_NOT_APPLIED;
+	}
+
 	if (target->SetSpellState( SS_FLAMESHROUD)) return FX_APPLIED;
+
+	if(enhanced_effects) {
+		target->SetColorMod(0xff, RGBModifier::ADD, 1, 0xa0, 0, 0);
+	}
+
 	//timing
 	if (core->GetGame()->GameTime%6) {
 		return FX_APPLIED;
 	}
-	//apply effsof1 on target
-	//apply effsof2 on nearby
+
+	//apply resource on hitter
 	return FX_APPLIED;
 }
 
@@ -1935,11 +1901,6 @@ int fx_barkskin (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-//regen/poison/disease types (works for bleeding wounds too)
-#define RPD_PERCENT 1
-#define RPD_SECONDS 2
-#define RPD_POINTS  3
-
 //416 BleedingWounds
 int fx_bleeding_wounds (Actor* Owner, Actor* target, Effect* fx)
 {
@@ -1947,14 +1908,21 @@ int fx_bleeding_wounds (Actor* Owner, Actor* target, Effect* fx)
 
 	//also this effect is executed every update
 	ieDword damage;
+	int tmp = fx->Parameter1;
 
 	switch(fx->Parameter2) {
 	case RPD_PERCENT:
 		damage = STAT_GET(IE_MAXHITPOINTS) * fx->Parameter1 / 100;
 		break;
+	case RPD_ROUNDS:
+		tmp *= 6;
+		goto seconds;
+	case RPD_TURNS:
+		tmp *= 30;
 	case RPD_SECONDS:
+seconds:
 		damage = 1;
-		if (fx->Parameter1 && (core->GetGame()->GameTime%fx->Parameter1)) {
+		if (tmp && (core->GetGame()->GameTime%tmp)) {
 			return FX_APPLIED;
 		}
 		break;
@@ -2412,7 +2380,7 @@ int fx_bane (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_bane (%2d)\n", fx->Opcode);
 
-	if (target->SetSpellState( SS_BANE)) return FX_APPLIED;
+	if (target->SetSpellState( SS_BANE)) return FX_NOT_APPLIED;
 	//do this once
 	target->fxqueue.RemoveAllEffects(fx_bless_ref);
 	if (enhanced_effects) {

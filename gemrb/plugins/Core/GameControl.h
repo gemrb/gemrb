@@ -74,10 +74,11 @@ class Window;
 #define TARGET_MODE_ATTACK  0x02
 #define TARGET_MODE_CAST    0x04
 #define TARGET_MODE_DEFEND  0x08
+#define TARGET_MODE_PICK    0x10
 
-#define TARGET_MODE_ALLY    0x10
-#define TARGET_MODE_ENEMY   0x20
-#define TARGET_MODE_NEUTRAL 0x40
+#define TARGET_MODE_ALLY    0x100
+#define TARGET_MODE_ENEMY   0x200
+#define TARGET_MODE_NEUTRAL 0x400
 
 /**
  * @class GameControl
@@ -181,11 +182,18 @@ public:
 	int HideGUI();
 	int UnhideGUI();
 	void TryToAttack(Actor *source, Actor *target);
+	void TryToBash(Actor *source, Scriptable *tgt);
 	void TryToCast(Actor *source, Point &p);
 	void TryToCast(Actor *source, Actor *target);
 	void TryToDefend(Actor *source, Actor *target);
 	void TryToTalk(Actor *source, Actor *target);
+	void TryToPick(Actor *source, Actor *tgt);
+	void TryToPick(Actor *source, Door *tgt);
+	void TryToPick(Actor *source, Container *tgt);
+	void TryToDisarm(Actor *source, InfoPoint *tgt);
+	int GetCursorOverContainer(Container *overContainer);
 	void HandleContainer(Container *container, Actor *actor);
+	int GetCursorOverDoor(Door *overDoor);
 	void HandleDoor(Door *door, Actor *actor);
 	bool HandleActiveRegion(InfoPoint *trap, Actor *actor, Point &p);
 	Point GetFormationOffset(ieDword formation, ieDword pos);

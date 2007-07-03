@@ -184,11 +184,11 @@ inline static void ResolveEffectRef(EffectRef &effect_reference)
 {
 	if (effect_reference.EffText==-1) {
 		EffectRef* ref = FindEffect(effect_reference.Name);
-		if (ref) {
+		if (ref && ref->EffText>=0) {
 			effect_reference.EffText = ref->EffText;
-		} else {
-			effect_reference.EffText = -2;
+			return;
 		}
+		effect_reference.EffText = -2;
 	}
 }
 
@@ -202,6 +202,9 @@ bool Init_EffectQueue()
 	TableMgr* efftextTable=NULL;
 	SymbolMgr* effectsTable;
 	memset( effect_refs, 0, sizeof( effect_refs ) );
+	for(i=0;i<MAX_EFFECTS;i++) {
+		effect_refs[i].EffText=-1;
+	}
 
 	initialized = 1;
 
@@ -238,7 +241,7 @@ bool Init_EffectQueue()
 			effect_refs[i].Name = poi->Name;
 			//reverse linking opcode number
 			//using this unused field
-			if (poi->EffText && effectname[0]!='*') {
+			if ((poi->EffText!=-1) && effectname[0]!='*') {
 				printf("Clashing opcodes FN: %d vs. %d, %s\n", i, poi->EffText, effectname);
 				abort();
 			}
@@ -380,7 +383,7 @@ void EffectQueue::ApplyAllEffects(Actor* target)
 			delete *f;
 			effects.erase(f++);
 		} else {
-		  f++;
+			f++;
 		}
 	}
 }
@@ -541,7 +544,7 @@ inline bool check_level(Actor *target, Effect *fx)
 				fx->IsSaveForHalfDamage=1;
 			}
 		} else {
-			if ((fx->Parameter2&0xff)==3) {
+			if ((fx->Parameter2&3)==3) {
 				fx->IsSaveForHalfDamage=1;
 			}
 		}
@@ -1250,7 +1253,7 @@ void EffectQueue::HackColorEffects(int type)
 }
 
 //iterate through saved effects
-Effect *EffectQueue::GetNextSavedEffect(std::list< Effect* >::const_iterator f) const
+const Effect *EffectQueue::GetNextSavedEffect(std::list< Effect* >::const_iterator f) const
 {
 	while(f!=effects.end()) {
 		Effect *effect = *f;
@@ -1259,6 +1262,12 @@ Effect *EffectQueue::GetNextSavedEffect(std::list< Effect* >::const_iterator f) 
 			return effect;
 		}
 	}
+	return NULL;
+}
+
+Effect *EffectQueue::GetNextEffect(std::list< Effect* >::const_iterator f) const
+{
+	if (f!=effects.end()) return *f++;
 	return NULL;
 }
 

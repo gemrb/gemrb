@@ -262,6 +262,9 @@ def ActionAttackPressed ():
 def ActionDefendPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_DEFEND)
 
+def ActionThievingPressed ():
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_PICK) 
+
 def ActionQWeaponPressed (which):
 	pc = GemRB.GameGetFirstSelectedPC ()
 

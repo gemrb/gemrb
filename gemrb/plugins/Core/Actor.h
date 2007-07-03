@@ -112,12 +112,25 @@ class ScriptedAnimation;
 typedef ieByte ActionButtonRow[GUIBT_COUNT];
 
 typedef std::vector< ScriptedAnimation*> vvcVector;
+typedef std::list<ieResRef*> resourceList;
 
 class GEM_EXPORT Actor : public Movable {
 public:
 	//CRE DATA FIELDS
 	ieDword BaseStats[MAX_STATS];
 	ieDword Modified[MAX_STATS];
+
+	ieResRef applyWhenHittingMelee;  //set melee effect
+	ieResRef applyWhenHittingRanged; //set ranged effect
+	ieResRef applyWhenNearLiving;    //cast spell on condition
+	ieResRef applyWhen50Damage;      //cast spell on condition
+	ieResRef applyWhen90Damage;      //cast spell on condition
+	ieResRef applyWhenEnemySighted;  //cast spell on condition
+	ieResRef applyWhenPoisoned;      //cast spell on condition
+	ieResRef applyWhenHelpless;      //cast spell on condition
+	ieResRef applyWhenAttacked;      //cast spell on condition
+	ieResRef applyWhenBeingHit;      //cast spell on condition
+
 	PCStatsStruct*  PCStats;
 	ieResRef SmallPortrait;
 	ieResRef LargePortrait;

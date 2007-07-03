@@ -1153,8 +1153,8 @@ bool Actor::SetStat(unsigned int StatIndex, ieDword Value, int pcf)
 
 	unsigned int previous = Modified[StatIndex];
 	if (Modified[StatIndex]!=Value) {
+		Modified[StatIndex] = Value;
 		if (pcf) {
-			Modified[StatIndex] = Value;
 			PostChangeFunctionType f = post_change_functions[StatIndex];
 			if (f) (*f)(this, previous, Value);
 		}
@@ -1536,7 +1536,21 @@ int Actor::Damage(int damage, int damagetype, Actor *hitter)
 {
 	//recalculate damage based on resistances and difficulty level
 	//the lower 2 bits are actually modifier types
-	NewBase(IE_HITPOINTS, (ieDword) -damage, damagetype&3);
+	switch(damagetype&3)
+	{
+	case MOD_ADDITIVE:
+		NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
+		break;
+	case MOD_ABSOLUTE:
+		NewBase(IE_HITPOINTS, (ieDword) damage, MOD_ABSOLUTE);
+		break;
+	case MOD_PERCENT:
+		NewBase(IE_HITPOINTS, (ieDword) damage, MOD_PERCENT);
+		break;
+	default:
+		//this shouldn't happen
+		printMessage("Actor","Invalid damagetype!\n",RED);
+	}
 	//this is just a guess, probably morale is much more complex
 	//add lastdamagetype up
 	LastDamageType|=damagetype;

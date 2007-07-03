@@ -94,6 +94,8 @@
 #define IE_CURSOR_STAIR2  50 //PST
 #define IE_CURSOR_EXTRA   52 //PST
 
+#define IE_CURSOR_MASK    127
+#define IE_CURSOR_GRAY    128
 /**
  * @class Window
  * Class serving as a container for Control/widget objects 

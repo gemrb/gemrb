@@ -789,6 +789,34 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			break;
 	}
 }
+
+int GameControl::GetCursorOverDoor(Door *overDoor)
+{
+	overDoor->Highlight = true;
+	overDoor->outlineColor = cyan;
+	if (overDoor->Flags & DOOR_LOCKED) {
+		return IE_CURSOR_LOCK;
+	}
+	return overDoor->Cursor;
+}
+
+int GameControl::GetCursorOverContainer(Container *overContainer)
+{
+	overContainer->Highlight = true;
+	if (overContainer->TrapDetected && overContainer->Trapped) {
+		overContainer->outlineColor = red;
+		return IE_CURSOR_TRAP;
+	}
+	overContainer->outlineColor = cyan;
+	if (overContainer->Type==IE_CONTAINER_PILE) {
+		return IE_CURSOR_TAKE;
+	}
+	if (target_mode&TARGET_MODE_PICK) {
+		return IE_CURSOR_TRAP;
+	}
+	return IE_CURSOR_PICK;
+}
+
 /** Mouse Over Event */
 void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 {
@@ -825,47 +853,31 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 	if (overDoor) {
 		overDoor->Highlight = false;
 	}
-	overDoor = area->TMap->GetDoor( p );
-	if (overDoor) {
-		overDoor->Highlight = true;
-		if (overDoor->Flags & DOOR_LOCKED) {
-			nextCursor = IE_CURSOR_LOCK;
-		} else {
-			nextCursor = overDoor->Cursor;
-		}
-		overDoor->outlineColor = cyan;
-	}
-
 	if (overContainer) {
 		overContainer->Highlight = false;
 	}
-	overContainer = area->TMap->GetContainer( p );
-	if (overContainer) {
-		overContainer->Highlight = true;
-		if (overContainer->TrapDetected && overContainer->Trapped) {
-			nextCursor = IE_CURSOR_TRAP;
-			overContainer->outlineColor = red;
-		} else {
-			if (overContainer->Flags & CONT_LOCKED) {
-				nextCursor = IE_CURSOR_LOCK2;
-			} else if (overContainer->Type==IE_CONTAINER_PILE) {
-				nextCursor = IE_CURSOR_TAKE;
-			} else {
-				nextCursor = IE_CURSOR_CHEST;
-			}
-			overContainer->outlineColor = cyan;
-		}
+	Actor *lastActor = area->GetActorByGlobalID(lastActorID);
+	if (lastActor) {
+		lastActor->SetOver( false );
 	}
 
+	overDoor = area->TMap->GetDoor( p );
+	overContainer = area->TMap->GetContainer( p );
+
 	if (!DrawSelectionRect) {
-		Actor* actor = area->GetActor( p, GA_DEFAULT | GA_SELECT | GA_NO_DEAD);
-		Actor *lastActor = area->GetActorByGlobalID(lastActorID);
-		if (lastActor)
-			lastActor->SetOver( false );
-		if (actor) {
-			lastActorID = actor->globalID;
-			actor->SetOver( true );
-			ieDword type = actor->GetStat(IE_EA);
+		if (overDoor) {
+			nextCursor = GetCursorOverDoor(overDoor);
+		}
+		
+		if (overContainer) {
+			nextCursor = GetCursorOverContainer(overContainer);
+		}
+
+		lastActor = area->GetActor( p, GA_DEFAULT | GA_SELECT | GA_NO_DEAD);
+		if (lastActor) {
+			lastActorID = lastActor->globalID;
+			lastActor->SetOver( true );
+			ieDword type = lastActor->GetStat(IE_EA);
 			if (type >= EA_EVILCUTOFF) {
 				nextCursor = IE_CURSOR_ATTACK;
 			} else if ( type > EA_CHARMED ) {
@@ -885,11 +897,22 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			nextCursor = IE_CURSOR_CAST;
 		} else if (target_mode & TARGET_MODE_DEFEND) {
 			nextCursor = IE_CURSOR_DEFEND;
+		} else if (target_mode & TARGET_MODE_PICK) {
+			if (lastActor) {
+			  nextCursor = IE_CURSOR_PICK;
+			  if (lastActor == core->GetFirstSelectedPC()) {
+			    nextCursor |= IE_CURSOR_GRAY;
+			  }
+			} else {
+			  if (!overContainer && !overDoor) {
+			    nextCursor = IE_CURSOR_STEALTH|IE_CURSOR_GRAY;
+			  }
+			}
+			goto end_function;
 		}
-
 		
-		if (actor) {
-			switch (actor->GetStat(IE_EA)) {
+		if (lastActor) {
+			switch (lastActor->GetStat(IE_EA)) {
 				case EA_EVILCUTOFF:
 				case EA_GOODCUTOFF:
 					break;
@@ -916,6 +939,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			}
 		}
 	}
+end_function:
 	if (lastCursor != nextCursor) {
 		Owner->Cursor = nextCursor;
 		lastCursor = (unsigned char) nextCursor;
@@ -940,6 +964,58 @@ void GameControl::TryToDefend(Actor *source, Actor *tgt)
 	source->ClearActions();
 	strncpy(Tmp,"NIDSpecial4()",sizeof(Tmp) );
 	source->AddAction( GenerateActionDirect( Tmp, tgt) );
+}
+
+void GameControl::TryToPick(Actor *source, Actor *tgt)
+{
+	char Tmp[40];
+
+	source->ClearPath();
+	source->ClearActions();
+	strncpy(Tmp,"PickPockets([-1])", sizeof(Tmp) );
+	source->AddAction( GenerateActionDirect( Tmp, tgt) );
+}
+
+void GameControl::TryToPick(Actor *source, Door *tgt)
+{
+	char Tmp[40];
+
+	source->ClearPath();
+	source->ClearActions();
+	snprintf(Tmp, sizeof(Tmp), "PickLock(\"%s\")", tgt->GetScriptName() );
+	source->AddAction( GenerateAction( Tmp ) );
+}
+
+void GameControl::TryToPick(Actor *source, Container *tgt)
+{
+	char Tmp[40];
+
+	source->ClearPath();
+	source->ClearActions();
+	snprintf(Tmp, sizeof(Tmp), "PickLock(\"%s\")", tgt->GetScriptName() );
+	source->AddAction( GenerateAction( Tmp ) );
+}
+
+void GameControl::TryToDisarm(Actor *source, InfoPoint *tgt)
+{
+	if (tgt->Type!=ST_PROXIMITY) return;
+
+	char Tmp[40];
+
+	source->ClearPath();
+	source->ClearActions();
+	snprintf(Tmp, sizeof(Tmp), "RemoveTraps(\"%s\")", tgt->GetScriptName() );
+	source->AddAction( GenerateAction( Tmp ) );
+}
+
+void GameControl::TryToBash(Actor *source, Scriptable *tgt)
+{
+	char Tmp[40];
+
+	source->ClearPath();
+	source->ClearActions();
+	snprintf(Tmp, sizeof(Tmp), "NIDSpecial9(\"%s\")", tgt->GetScriptName() );
+	source->AddAction( GenerateAction( Tmp ) );
 }
 
 void GameControl::TryToCast(Actor *source, Point &tgt)
@@ -1035,6 +1111,17 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 		TryToCast(actor, container->Pos);
 		return;
 	}
+
+	if (target_mode&TARGET_MODE_ATTACK) {
+		TryToBash(actor, container);
+		return;
+	}
+
+	if (target_mode&TARGET_MODE_PICK) {
+		TryToPick(actor, container);
+		return;
+	}
+
 	actor->ClearPath();
 	actor->ClearActions();
 	strncpy(Tmp,"UseContainer()",sizeof(Tmp) );
@@ -1049,6 +1136,16 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 	if (spellCount) {
 		//we'll get the door back from the coordinates
 		TryToCast(actor, door->Pos);
+		return;
+	}
+
+	if (target_mode&TARGET_MODE_ATTACK) {
+		TryToBash(actor, door);
+		return;
+	}
+
+	if (target_mode&TARGET_MODE_PICK) {
+		TryToPick(actor, door);
 		return;
 	}
 
@@ -1262,6 +1359,8 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 		type = ACT_CAST;
 	} else if (target_mode&TARGET_MODE_DEFEND) {
 		type = ACT_DEFEND;
+	} else if (target_mode&TARGET_MODE_PICK) {
+		type = ACT_THIEVING;
 	}
 
 	//we shouldn't zero this for two reasons in case of spell or item
@@ -1308,7 +1407,14 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			for(i=0;i<game->selected.size();i++) {
 				TryToDefend(game->selected[i], actor);
 			}
-			
+			break;
+		case ACT_THIEVING:
+			if (game->selected.size()==1) {
+				Actor *source;
+				source = core->GetFirstSelectedPC();
+			  TryToPick(source, actor);
+			}
+			break;
 	}
 }
 /** Special Key Press */

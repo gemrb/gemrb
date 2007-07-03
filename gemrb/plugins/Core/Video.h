@@ -67,6 +67,10 @@ enum SpriteBlitFlags {
 	// Note: bits 29,30,31 are used by SDLVideo internally
 };
 
+//disable mouse flags
+#define MOUSE_DISABLED  1
+#define MOUSE_GRAYED    2
+
 /**
  * @class Video
  * Base class for video output plugins.
@@ -123,7 +127,7 @@ public:
 	virtual void BlitGameSprite(Sprite2D* spr, int x, int y,
 		unsigned int flags, Color tint,
 		SpriteCover* cover, Palette *palette = NULL,
-		Region* clip = NULL) = 0;
+		Region* clip = NULL, bool anchor = false) = 0;
 	virtual void SetCursor(Sprite2D* up, Sprite2D* down) = 0;
 	/** Sets a temporary cursor when dragging an Item from Inventory */
 	virtual void SetDragCursor(Sprite2D* drag) = 0;
@@ -203,10 +207,11 @@ public:
 	EventMgr* Evnt;
 	short moveX, moveY;
 
-	void SetMouseEnabled(bool enabled);
+	void SetMouseEnabled(int enabled);
+	void SetMouseGrayed(bool grayed);
 
 protected:
-	bool DisableMouse;
+	int DisableMouse;
 
 public:
 	bool DisableScroll;

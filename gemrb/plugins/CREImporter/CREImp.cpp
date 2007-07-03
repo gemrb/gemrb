@@ -2337,7 +2337,7 @@ int CREImp::PutEffects( DataStream *stream, Actor *actor)
 	char filling[60];
 
 	memset(filling,0,sizeof(filling) );
-	std::list< Effect* >::const_iterator f;
+	std::list< Effect* >::const_iterator f=actor->fxqueue.GetFirstEffect();
 	for(unsigned int i=0;i<EffectsCount;i++) {
 		const Effect *fx = actor->fxqueue.GetNextSavedEffect(f);
 

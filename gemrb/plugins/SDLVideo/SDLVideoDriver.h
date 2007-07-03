@@ -92,7 +92,7 @@ public:
 	void BlitGameSprite(Sprite2D* spr, int x, int y,
 		unsigned int flags, Color tint,
 		SpriteCover* cover, Palette *palette = NULL,
-		Region* clip = NULL);
+		Region* clip = NULL, bool anchor = false);
 	void SetCursor(Sprite2D* up, Sprite2D* down);
 	void SetDragCursor(Sprite2D* drag);
 	Sprite2D* GetScreenshot( Region r );

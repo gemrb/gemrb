@@ -3720,16 +3720,27 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	Actor *snd = (Actor *) Sender;
 	Actor *scr = (Actor *) tar;
 	//for PP one must go REALLY close
+	
 	if (PersonalDistance(Sender, tar)>10 ) {
-		GoNearAndRetry(Sender, tar, true, 10);
+		GoNearAndRetry(Sender, tar, true, 10+snd->size+scr->size);
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+	//not sure about the real formula
+	int skill = snd->GetStat(IE_PICKPOCKET) - scr->GetXPLevel(0)*10;
+	skill+=core->Roll(1,100,1);
+	if (skill<100)
+	{
+		//noticed
+		tar->LastOpenFailed=snd->GetID();
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
 	//find a candidate item for stealing (unstealable items are noticed)
-	Actor *actor = (Actor *) tar;
-	int slot = actor->inventory.FindItem("", IE_INV_ITEM_UNSTEALABLE | IE_INV_ITEM_EQUIPPED);
-	int money=0;
-	if (slot<0) {
+	int ret = MoveItemCore(tar, Sender, "", IE_INV_ITEM_UNSTEALABLE, IE_INV_ITEM_STOLEN);
+	if (ret==MIC_NOITEM) {
+		int money=0;
 		//go for money too
 		if (scr->GetStat(IE_GOLD)>0)
 		{
@@ -3737,21 +3748,13 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		}
 		if (!money) {
 			//no stuff to steal
-				Sender->ReleaseCurrentAction();
-				return;
+			Sender->ReleaseCurrentAction();
+			return;
 		}
-	}
-	//check for success, failure sends an attackedby trigger and a
-	//pickpocket failed trigger sent to the target and sender respectively
-	//slot == -1 here means money
-	if (slot == -1) {
 		scr->SetBase(IE_GOLD,scr->GetBase(IE_GOLD)-money);
 		snd->SetBase(IE_GOLD,snd->GetBase(IE_GOLD)+money);
-		Sender->ReleaseCurrentAction();
-		return;
 	}
-	// now this is a kind of giveitem
-	MoveItemCore(tar, Sender, "", IE_INV_ITEM_UNSTEALABLE|IE_INV_ITEM_EQUIPPED, IE_INV_ITEM_STOLEN);
+	
 	Sender->ReleaseCurrentAction();
 }
 

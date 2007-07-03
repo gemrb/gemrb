@@ -217,6 +217,9 @@ def ActionAttackPressed ():
 def ActionDefendPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_DEFEND)
 
+def ActionThievingPressed ():
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_PICK)
+
 def ActionStopPressed ():
 	for i in range (PARTY_SIZE):
 		if GemRB.GameIsPCSelected(i + 1):

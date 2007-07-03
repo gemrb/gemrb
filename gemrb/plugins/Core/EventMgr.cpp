@@ -174,7 +174,7 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 				if (ctrl != NULL) {
 					win->OnMouseOver( x, y );
 				}
-				core->GetVideoDriver()->SetCursor( core->Cursors[win->Cursor], core->Cursors[win->Cursor ^ 1] );
+		    RefreshCursor(win->Cursor);
 				return;
 			}
 		}
@@ -183,6 +183,18 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 			break;
 	}
 	core->DisplayTooltip( 0, 0, NULL );
+}
+
+void EventMgr::RefreshCursor(int idx)
+{
+	Video *video = core->GetVideoDriver();
+	if (idx&IE_CURSOR_GRAY) {
+		video->SetMouseGrayed(true);
+	} else {
+		video->SetMouseGrayed(false);
+	}
+	idx &= IE_CURSOR_MASK;
+	video->SetCursor( core->Cursors[idx], core->Cursors[idx ^ 1] );
 }
 
 /** BroadCast Mouse Move Event */

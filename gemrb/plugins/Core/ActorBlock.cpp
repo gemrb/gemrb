@@ -118,17 +118,14 @@ const char* Scriptable::GetScriptName(void)
 
 Map* Scriptable::GetCurrentArea() const
 {
-	//removed currentarea abort (casting glow/spell hit are delayed based on this)
-	if (!area) {
-		printMessage("Scriptable","No current area", YELLOW);
-	}
+	//this could be NULL, always check it
 	return area;
 }
 
 void Scriptable::SetMap(Map *map)
 {
 	if (!map) {
-		printMessage("Scriptable","Null map set!",LIGHT_RED);
+		printMessage("Scriptable","Null map set!\n",LIGHT_RED);
 		abort();
 	}
 	area = map;
@@ -137,7 +134,7 @@ void Scriptable::SetMap(Map *map)
 void Scriptable::SetScript(const ieResRef aScript, int idx)
 {
 	if (idx >= MAX_SCRIPTS) {
-		printMessage("Scriptable","Invalid script index!",LIGHT_RED);
+		printMessage("Scriptable","Invalid script index!\n",LIGHT_RED);
 		abort();
 	}
 	if (Scripts[idx]) {
@@ -155,7 +152,7 @@ void Scriptable::SetScript(const ieResRef aScript, int idx)
 void Scriptable::SetScript(int index, GameScript* script)
 {
 	if (index >= MAX_SCRIPTS) {
-		printMessage("Scriptable","Invalid script index!",LIGHT_RED);
+		printMessage("Scriptable","Invalid script index!\n",LIGHT_RED);
 		return;
 	}
 	if (Scripts[index] ) {

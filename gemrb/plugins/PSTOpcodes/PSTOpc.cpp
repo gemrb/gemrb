@@ -54,27 +54,27 @@ int fx_jumble_curse (Actor* Owner, Actor* target, Effect* fx);//d3
 
 // FIXME: Make this an ordered list, so we could use bsearch!
 static EffectRef effectnames[] = {
-	{ "Bless", fx_bless, 0},//82
-	{ "Curse", fx_curse, 0},//cb
-	{ "DetectEvil", fx_detect_evil, 0}, //d2
-	{ "Embalm", fx_embalm, 0}, //0xce
-	{ "FlashScreen", fx_flash_screen, 0}, //c2
-	{ "HostileImage", fx_hostile_image, 0},//d1
-	{ "IronFist", fx_iron_fist, 0}, //d0
-	{ "JumbleCurse", fx_jumble_curse, 0}, //d3
-	{ "MoveView", fx_move_view, 0},//cd
-	{ "Overlay", fx_overlay, 0}, //c9
-	{ "PlayBAM1", fx_play_bam_blended, 0}, //bb
-	{ "PlayBAM2", fx_play_bam_not_blended, 0},//bc
-	{ "PlayBAM3", fx_play_bam_not_blended, 0}, //bd
-	{ "PlayBAM4", fx_play_bam_not_blended, 0}, //be
-	{ "PlayBAM5", fx_play_bam_not_blended, 0}, //bf
-	{ "Prayer", fx_prayer, 0},//cc
-	{ "SetStatus", fx_set_status, 0}, //ba
-	{ "SpecialEffect", fx_special_effect, 0},//c4
-	{ "StopAllAction", fx_stop_all_action, 0}, //cf
-	{ "TintScreen", fx_tint_screen, 0}, //c3
-	{ "TransferHP", fx_transfer_hp, 0}, //c0
+	{ "Bless", fx_bless, -1},//82
+	{ "Curse", fx_curse, -1},//cb
+	{ "DetectEvil", fx_detect_evil, -1}, //d2
+	{ "Embalm", fx_embalm, -1}, //0xce
+	{ "FlashScreen", fx_flash_screen, -1}, //c2
+	{ "HostileImage", fx_hostile_image, -1},//d1
+	{ "IronFist", fx_iron_fist, -1}, //d0
+	{ "JumbleCurse", fx_jumble_curse, -1}, //d3
+	{ "MoveView", fx_move_view, -1},//cd
+	{ "Overlay", fx_overlay, -1}, //c9
+	{ "PlayBAM1", fx_play_bam_blended, -1}, //bb
+	{ "PlayBAM2", fx_play_bam_not_blended, -1},//bc
+	{ "PlayBAM3", fx_play_bam_not_blended, -1}, //bd
+	{ "PlayBAM4", fx_play_bam_not_blended, -1}, //be
+	{ "PlayBAM5", fx_play_bam_not_blended, -1}, //bf
+	{ "Prayer", fx_prayer, -1},//cc
+	{ "SetStatus", fx_set_status, -1}, //ba
+	{ "SpecialEffect", fx_special_effect, -1},//c4
+	{ "StopAllAction", fx_stop_all_action, -1}, //cf
+	{ "TintScreen", fx_tint_screen, -1}, //c3
+	{ "TransferHP", fx_transfer_hp, -1}, //c0
 	{ NULL, NULL, 0 },
 };
 
@@ -381,7 +381,7 @@ int fx_curse (Actor* /*Owner*/, Actor* target, Effect* fx)
 	//it should be considered what if we replace the pst invis bit
 	//with this one (losing binary compatibility, gaining easier
 	//invis checks at core level)
-	if (STATE_GET (STATE_PST_CURSE) ) //curse is non cummulative
+	if (STATE_GET (STATE_PST_CURSE) ) //curse is non cumulative
 		return FX_NOT_APPLIED;
 	STATE_SET( STATE_PST_CURSE );
 	STAT_SUB( IE_TOHIT, fx->Parameter1);
@@ -437,7 +437,7 @@ int fx_move_view (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 int fx_embalm (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_embalm (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
-	if (STATE_GET (STATE_EMBALM) ) //embalm is non cummulative
+	if (STATE_GET (STATE_EMBALM) ) //embalm is non cumulative
 		return FX_NOT_APPLIED;
 	STATE_SET( STATE_EMBALM );
 	if (!fx->Parameter1) {

@@ -196,7 +196,12 @@ public:
 	/* returns true if the effect should be saved */
 	static bool Persistent(Effect* fx);
 	/* returns next saved effect, increases index */
-	Effect *GetNextSavedEffect(std::list< Effect* >::const_iterator f) const;
+	std::list< Effect* >::iterator GetFirstEffect()
+	{
+		return effects.begin();
+	}
+	const Effect *GetNextSavedEffect(std::list< Effect* >::const_iterator f) const;
+	Effect *GetNextEffect(std::list< Effect* >::const_iterator f) const;
 	/* returns the number of saved effects */
 	ieDword GetSavedEffectsCount() const;
 	size_t GetEffectsCount() const { return effects.size(); }

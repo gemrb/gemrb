@@ -39,7 +39,18 @@ void Video::SetEventMgr(EventMgr* evnt)
 	Evnt = evnt;
 }
 
-void Video::SetMouseEnabled(bool enabled)
+/** Mouse is invisible and cannot interact */
+void Video::SetMouseEnabled(int enabled)
 {
-	DisableMouse = !enabled;
+	DisableMouse = enabled^MOUSE_DISABLED;
+}
+
+/** Mouse cursor is grayed and doesn't click (but visible and movable) */
+void Video::SetMouseGrayed(bool grayed)
+{
+	if (grayed) {
+		DisableMouse |= MOUSE_GRAYED;
+	} else {
+		DisableMouse &= ~MOUSE_GRAYED;
+	}
 }

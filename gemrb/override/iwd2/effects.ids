@@ -132,7 +132,7 @@ IDS
 0x82	BlessNonCumulative
 0x83    ChantNonCumulative
 0x84    DrawUponHolyMight
-0x85	LuckNonCumulative
+0x85	LuckCumulative
 0x86	State:Petrification
 0x87	Polymorph
 0x88	ForceVisible
@@ -250,7 +250,7 @@ IDS
 0xf8	SummonShadowMonster
 0xf9	Prayer2
 0xfa	Curse2
-0xfb	Hold2
+0xfb	State:Hold4
 0xfc	State:Blind2
 0xfd	ACVsDamageTypeModifier2
 0xfe	RemoveEffects
@@ -284,7 +284,7 @@ IDS
 0x11a	SuppressHP
 0x11b	FloatText
 0x11c	MaceOfDisruption
-0x11d	Sleep2
+0x11d	State:Sleep
 0x11e	Reveal:Tracks
 0x11f	Protection:Backstab
 0x120	State:Set
@@ -308,8 +308,8 @@ IDS
 407	DeathWard
 408	HolyPower
 409	RighteousWrath
-410	SummonAllyIWD2
-411	SummonEnemyIWD2
+410	SummonAlly
+411	SummonEnemy
 412	Control2
 413	VisualEffectIWD2
 414	ResilientSphere
@@ -332,7 +332,7 @@ IDS
 431	EnergyDrain
 432	TortoiseShell
 433	Blink
-434	ApplyEffects
+434	PersistentUseEffectList
 435	DayBlindness
 436	DamageReduction
 437	Disguise

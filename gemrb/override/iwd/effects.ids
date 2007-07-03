@@ -284,7 +284,7 @@ IDS
 0x11a	SuppressHP
 0x11b	FloatText
 0x11c	MaceOfDisruption
-0x11d	Sleep2
+0x11d	State:Sleep
 0x11e	Reveal:Tracks
 0x11f	Protection:Backstab
 0x120	State:Set

@@ -274,6 +274,9 @@ def ActionAttackPressed ():
 def ActionDefendPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_DEFEND)
 
+def ActionThievingPressed ():
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_PICK)
+
 def ActionQWeaponPressed (which):
 	pc = GemRB.GameGetFirstSelectedPC ()
 
@@ -549,7 +552,6 @@ def UpdatePortraitWindow ():
 			continue
 
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
-		#GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 		GemRB.SetButtonPicture (Window, Button, pic, "NOPORTSM")
 		hp = GemRB.GetPlayerStat (i+1, IE_HITPOINTS)
