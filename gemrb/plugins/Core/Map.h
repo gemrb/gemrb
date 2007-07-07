@@ -223,6 +223,9 @@ public:
 	ieWord localActorCounter;
 	bool MasterArea;
 private:
+	ieStrRef trackString;
+	bool trackFlag;
+	ieWord trackDiff;
 	unsigned short* MapSet;
 	std::queue< unsigned int> InternalStack;
 	unsigned int Width, Height;
@@ -279,7 +282,7 @@ public:
 		Walls = walls;	
 	}
 	SpriteCover* BuildSpriteCover(int x, int y, int xpos, int ypos,
-			  unsigned int width, unsigned int height, int flag);
+		unsigned int width, unsigned int height, int flag);
 	void ActivateWallgroups(unsigned int baseindex, unsigned int count, int flg);
 	void Shout(Actor* actor, int shoutID, unsigned int radius);
 	void AddActor(Actor* actor);
@@ -290,6 +293,7 @@ public:
 	Actor* GetActorByGlobalID(ieDword objectID);
 	Actor* GetActor(Point &p, int flags);
 	Actor* GetActorInRadius(Point &p, int flags, unsigned int radius);
+	Actor **GetAllActorsInRadius(Point &p, int flags, unsigned int radius);
 	Actor* GetActor(const char* Name, int flags);
 	Actor* GetActor(int i, bool any);
 	Actor* GetActorByDialog(const char* resref);
@@ -400,7 +404,8 @@ public:
 	bool HasWeather();
 	int GetWeather();
 	void ClearTrap(Actor *actor, ieDword InTrap);
-
+	void SetTrackString(ieStrRef strref, bool flg, int difficulty);
+	void DisplayTrackString();
 private:
 	AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime);
 	Particles *GetNextSpark(spaIterator &iter);

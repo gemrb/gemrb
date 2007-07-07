@@ -159,7 +159,8 @@ public:
 	ieWord ItemType;
 	ieDword UsabilityBitmask;
 	char AnimationType[2];
-	ieWord MinLevel; //minlevel is actually just one byte, but who cares
+	ieByte MinLevel;
+	ieByte unknown1;
 	ieByte MinStrength;
 	ieByte unknown2;
 	ieByte MinStrengthBonus;

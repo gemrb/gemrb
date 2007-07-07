@@ -1182,6 +1182,49 @@ Actor* Map::GetActorInRadius(Point &p, int flags, unsigned int radius)
 	return NULL;
 }
 
+Actor **Map::GetAllActorsInRadius(Point &p, int flags, unsigned int radius)
+{
+	ieDword count = 1;
+	size_t i;
+
+	ieDword gametime = core->GetGame()->GameTime;
+	i = actors.size();
+	while (i--) {
+		Actor* actor = actors[i];
+
+		if (PersonalDistance( p, actor ) > radius)
+			continue;
+		if (!actor->ValidTarget(flags) ) {
+			continue;
+		}
+		if (!actor->Schedule(gametime) ) {
+			continue;
+		}
+		count++;
+	}
+
+	Actor **ret = (Actor **) malloc( sizeof(Actor*) * count);
+	i = actors.size();
+	int j = 0;
+	while (i--) {
+		Actor* actor = actors[i];
+
+		if (PersonalDistance( p, actor ) > radius)
+			continue;
+		if (!actor->ValidTarget(flags) ) {
+			continue;
+		}
+		if (!actor->Schedule(gametime) ) {
+			continue;
+		}
+		ret[j++]=actor;
+	}
+
+	ret[j]=NULL;
+	return ret;
+}
+
+
 Actor* Map::GetActor(const char* Name, int flags)
 {
 	size_t i = actors.size();
@@ -2107,7 +2150,7 @@ PathNode* Map::FindPath(const Point &s, const Point &d, int MinDistance)
 			tar.x=StartNode->Parent->x*16;
 			tar.y=StartNode->Parent->y*12;
 			int dist = Distance(tar,d);
-			if (dist>=MinDistance) {
+			if (dist+14>=MinDistance) {
 				break;
 			}
 			StartNode = StartNode->Parent;
@@ -2665,6 +2708,25 @@ void Map::ClearTrap(Actor *actor, ieDword InTrap)
 		}
 	}
 }
+
+void Map::SetTrackString(ieStrRef strref, bool flg, int difficulty)
+{
+	trackString = strref;
+	trackFlag = flg;
+	trackDiff = (ieWord) difficulty;
+}
+
+void Map::DisplayTrackString()
+{
+	if (trackFlag) {
+			char * str = core->GetString( trackString);
+			core->GetTokenDictionary()->SetAt( "CREATURES", str);
+			core->DisplayConstantString(STR_TRACKING, 0x808080);
+			return;
+	}
+	core->DisplayString(trackString, 0x808080, 0);
+}
+
 ////////////////////AreaAnimation//////////////////
 //Area animation
 

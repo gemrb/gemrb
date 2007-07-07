@@ -137,6 +137,9 @@
 /////AI global defines
 #define AI_UPDATE_TIME	10
 
+/////maximum animation orientation count (used in many places)
+#define MAX_ORIENT				16
+
 /////globally used functions
 #ifdef WIN32
 

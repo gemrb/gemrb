@@ -50,7 +50,16 @@ static ieResRef Sounds[DEF_COUNT] = {
 	{UNINITIALIZED_BYTE},
 };
 
+typedef struct ResRefToStrRef {
+	ieResRef areaName;
+	ieStrRef text;
+	bool trackFlag;
+	int difficulty;
+} ResRefToStrRef;
+
 DataFileMgr *INInote = NULL;
+ResRefToStrRef *tracks = NULL;
+int trackcount = 0;
 
 //called from ~Interface
 void AREImp::ReleaseMemory()
@@ -58,6 +67,11 @@ void AREImp::ReleaseMemory()
 	if(INInote) {
 		core->FreeInterface( INInote );
 		INInote = NULL;
+	}
+
+	if (tracks) {
+		delete [] tracks;
+		tracks = NULL;
 	}
 }
 
@@ -71,6 +85,44 @@ void ReadAutonoteINI()
 	ResolveFilePath( tINInote );
 	fs->Open( tINInote, true );
 	INInote->Open( fs, true );
+}
+
+int GetTrackString(const ieResRef areaName)
+{
+	int i;
+
+	if (!tracks) {
+		int trackdata = core->LoadTable( "tracking" );
+		if (trackdata < 0) {
+			return -1;
+		}
+		TableMgr* tm = core->GetTable( trackdata );
+		if (!tm) {
+			core->DelTable( trackdata );
+			return -1;
+		}
+		trackcount = tm->GetRowCount();
+		tracks = new ResRefToStrRef[trackcount];
+		for (i=0;i<trackcount;i++) {
+			const char *poi = tm->QueryField(i,0);
+			if (poi[0]=='O' && poi[1]=='_') {
+				tracks[i].trackFlag=false;
+				poi+=2;
+			} else {
+				tracks[i].trackFlag=true;
+			}
+			tracks[i].text=(ieStrRef) atoi(poi);
+			tracks[i].difficulty=atoi(tm->QueryField(i,1));
+			strnlwrcpy(tracks[i].areaName, tm->GetRowName(i), 8 );
+		}
+	}
+
+	for (i=0;i<trackcount;i++) {
+		if (!strnicmp(tracks[i].areaName, areaName, 8)) {
+			return i;
+		}
+	}
+	return -1;
 }
 
 AREImp::AREImp(void)
@@ -199,6 +251,12 @@ Map* AREImp::GetMap(const char *ResRef)
 	//we have to set this here because the actors will receive their
 	//current area setting here, areas' 'scriptname' is their name
 	map->SetScriptName( ResRef );
+	int idx = GetTrackString( ResRef );
+	if (idx>=0) {
+		map->SetTrackString(tracks[idx].text, tracks[idx].trackFlag, tracks[idx].difficulty);
+	} else {
+		map->SetTrackString((ieStrRef) -1, false, 0);
+	}
 
 	if (!core->IsAvailable( IE_WED_CLASS_ID )) {
 		printf( "[AREImporter]: No Tile Map Manager Available.\n" );
@@ -429,7 +487,7 @@ Map* AREImp::GetMap(const char *ResRef)
 
 		str->Seek( VerticesOffset + ( firstIndex * 4 ), GEM_STREAM_START );
 		Point* points = ( Point* ) malloc( vertCount*sizeof( Point ) );
-		for (unsigned int x = 0; x < vertCount; x++) {
+		for (x = 0; x < vertCount; x++) {
 			ieWord tmp;
 			str->ReadWord( &tmp );
 			points[x].x = tmp;

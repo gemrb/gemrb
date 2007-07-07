@@ -1912,27 +1912,49 @@ void GameScript::PickLock(Scriptable* Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	if (tar->Type != ST_DOOR) {
-		Sender->ReleaseCurrentAction();
-		return;
-	}
-	Door* door = ( Door* ) tar;
-	if (door->IsOpen()) {
-		//door is already open
-		Sender->ReleaseCurrentAction();
-		return;
-	}
 	unsigned int distance;
-	Point *p = door->toOpen;
-	Point *otherp = door->toOpen+1;
-	distance = FindNearPoint( Sender, p, otherp);
+	Point *p, *otherp;
+	Door *door = NULL;
+	Container *container = NULL;
+	ScriptableType type = tar->Type;
+	ieDword flags;
+
+	switch (type) {
+	case ST_DOOR:
+		door = ( Door* ) tar;
+		if (door->IsOpen()) {
+			//door is already open
+			Sender->ReleaseCurrentAction();
+			return;
+		}
+		p = door->toOpen;
+		otherp = door->toOpen+1;
+		distance = FindNearPoint( Sender, p, otherp);
+		flags = door->Flags&DOOR_LOCKED;
+		break;
+	case ST_CONTAINER:
+		container = (Container *) tar;
+		p = &container->Pos;
+		otherp = p;
+		distance = Distance(*p, Sender);
+		flags = container->Flags&CONT_LOCKED;
+		break;
+	default:
+		Sender->ReleaseCurrentAction();
+		return;
+	}
 	Actor * actor = (Actor *) Sender;
 	actor->SetOrientation( GetOrient( *otherp, actor->Pos ), false);
 	if (distance <= MAX_OPERATING_DISTANCE) {
-		if (door->Flags&DOOR_LOCKED) {
-			door->TryPickLock(actor);
+		if (flags) {
+			if (type==ST_DOOR) {
+				door->TryPickLock(actor);
+			} else {
+				container->TryPickLock(actor);
+			}
 		} else {
 			//notlocked
+			//core->DisplayString(STR_NOT_LOCKED);
 		}
 	} else {
 		GoNearAndRetry(Sender, *p, MAX_OPERATING_DISTANCE);
@@ -5717,4 +5739,10 @@ void GameScript::DoubleClickRButtonPoint(Scriptable* /*Sender*/, Action* paramet
 	ClickCore(parameters->pointParameter, GEM_MB_MENU|GEM_MB_DOUBLECLICK, parameters->int0Parameter);
 }
 
-
+//this is a gemrb extension for scriptable tracks
+void GameScript::SetTrackString(Scriptable* Sender, Action* parameters)
+{
+	Map *map = Sender->GetCurrentArea();
+	if (!map) return;
+	map->SetTrackString(parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter);
+}

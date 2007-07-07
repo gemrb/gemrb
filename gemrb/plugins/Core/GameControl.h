@@ -66,6 +66,7 @@ class Window;
 #define SF_GUIENABLED    8  //
 #define SF_LOCKSCROLL    16 //don't scroll
 #define SF_CUTSCENE      32 //don't push new actions onto the action queue
+#define SF_TRACKING      64 //draw blue arrows on the edge for creatures
 
 // target modes
 // !!! Keep these synchronized with GUIDefines.py !!!
@@ -99,10 +100,13 @@ public:
 	int SetText(const char* string, int pos = 0);
 	/** Sets multiple quicksaves flag*/
 	static void MultipleQuickSaves(int arg);
+	void SetTracker(Actor *actor, ieDword dist);
 private:
 	//Actor* lastActor;
 	//using global ID which is safer
 	ieWord lastActorID;
+	ieWord trackerID;
+	ieDword distance;  //tracking distance
 	std::vector< Actor*> highlighted;
 	bool DrawSelectionRect;
 	bool MouseIsDown;
@@ -156,6 +160,8 @@ private:
 	void HandleWindowHide(const char *WindowName, const char *WindowPosition);
 	void HandleWindowReveal(const char *WindowName, const char *WindowPosition);
 	void ReadFormations();
+	/** Draws an arrow on the edge of the screen based on the point (points at offscreen actors) */
+	void DrawArrowMarker(Region &screen, Point p, Region &viewport);
 
 private:
 	unsigned char LeftCount, BottomCount, RightCount, TopCount;

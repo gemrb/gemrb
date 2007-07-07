@@ -1313,6 +1313,7 @@ public:
 	static void SetTextColor(Scriptable* Sender, Action* parameters);
 	static void SetToken(Scriptable* Sender, Action* parameters);
 	static void SetTokenGlobal(Scriptable* Sender, Action* parameters);
+	static void SetTrackString(Scriptable* Sender, Action* parameters);
 	static void SetVisualRange(Scriptable* Sender, Action* parameters);
 	static void SG(Scriptable* Sender, Action* parameters);
 	static void Shout(Scriptable* Sender, Action* parameters);

@@ -85,22 +85,23 @@ Item* ITMImp::GetItem(Item *s)
 			s->AnimationType[i]=0;
 		}
 	}
-	str->ReadWord( &s->MinLevel );
+	str->Read( &s->MinLevel, 1 );
+	str->Read( &s->unknown1, 1 );
 	str->Read( &s->MinStrength,1 );
-	str->Read( &s->unknown2,1 );
-	str->Read( &s->MinStrengthBonus,1 );
+	str->Read( &s->unknown2, 1 );
+	str->Read( &s->MinStrengthBonus, 1 );
 	str->Read( &k1,1 );
-	str->Read( &s->MinIntelligence,1 );
+	str->Read( &s->MinIntelligence, 1 );
 	str->Read( &k2,1 );
-	str->Read( &s->MinDexterity,1 );
+	str->Read( &s->MinDexterity, 1 );
 	str->Read( &k3,1 );
-	str->Read( &s->MinWisdom,1 );
+	str->Read( &s->MinWisdom, 1 );
 	str->Read( &k4,1 );
 	s->KitUsability=(k1<<24) | (k2<<16) | (k3<<8) | k4; //bg2/iwd2 specific
-	str->Read( &s->MinConstitution,1 );
-	str->Read( &s->WeaProf,1 ); //bg2 specific
-	str->Read( &s->MinCharisma,1 );
-	str->Read( &s->unknown3,1 );
+	str->Read( &s->MinConstitution, 1 );
+	str->Read( &s->WeaProf, 1 ); //bg2 specific
+	str->Read( &s->MinCharisma, 1 );
+	str->Read( &s->unknown3, 1 );
 	str->ReadDword( &s->Price );
 	str->ReadWord( &s->StackAmount );
 	str->ReadResRef( s->ItemIcon );

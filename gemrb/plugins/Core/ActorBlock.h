@@ -462,7 +462,6 @@ class GEM_EXPORT Container : public Highlightable {
 public:
 	Container(void);
 	~Container(void);
-	void DebugDump();
 	void SetContainerLocked(bool lock);
 	//turns the container to a pile
 	void DestroyContainer();
@@ -474,6 +473,9 @@ public:
 	void DrawPile(bool highlight, Region screen, Color tint);
 	//returns dithering option
 	int WantDither();
+	bool IsOpen() const;
+	void TryPickLock(Actor *actor);
+	void DebugDump();
 private:
 	//updates the ground icons for a pile
 	void RefreshGroundIcons();
@@ -506,7 +508,7 @@ public:
 	//if you want to see discovered traps, false is for cheats
 	bool VisibleTrap(bool only_detected);
 	//returns true if trap has been triggered, tumble skill???
-	bool TriggerTrap(int skill);
+	bool TriggerTrap(int skill, ieDword ID);
 	//call this to check if an actor entered the trigger zone
 	bool Entered(Actor *actor);
 	//checks if the actor may use this travel trigger

@@ -49,7 +49,6 @@
 #define AV_USE_PALETTE  6
 #define AV_SIZE         7
 
-#define MAX_ORIENT				16
 #define MAX_ANIMS				19
 
 #define IE_ANI_ATTACK			0

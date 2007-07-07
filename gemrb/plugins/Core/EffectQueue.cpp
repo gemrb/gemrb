@@ -738,6 +738,8 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 			}
 		}
 		if (NeedPrepare((ieByte) fx->TimingMode) ) {
+			//save delay for later
+			fx->SecondaryDelay=fx->Duration;
 			PrepareDuration(fx);
 		}
 	}
@@ -748,13 +750,13 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 			return FX_NOT_APPLIED;
 		}
 		//effect triggered
-		fx->TimingMode=TriggeredEffect((ieByte) fx->TimingMode);
 		//delayed duration (3)
 		if (NeedPrepare((ieByte) fx->TimingMode) ) {
 			//prepare for delayed duration effects
 			fx->Duration=fx->SecondaryDelay;
 			PrepareDuration(fx);
 		}
+		fx->TimingMode=TriggeredEffect((ieByte) fx->TimingMode);
 		break;
 	case DURATION:
 		if (fx->Duration<=GameTime) {

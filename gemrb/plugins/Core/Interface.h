@@ -311,6 +311,7 @@ public:
 	Variables * ItemTooltipTable;
 	Sprite2D **Cursors;
 	int CursorCount;
+	Sprite2D *ArrowSprites[MAX_ORIENT/2];
 	Sprite2D *FogSprites[32];
 	Sprite2D **TooltipBack;
 	Sprite2D *WindowFrames[4];
@@ -620,9 +621,10 @@ public:
 	/** Returns the virtual worldmap entry of a sub-area */
 	int GetAreaAlias(const ieResRef areaname);
 	/** Returns up to 3 resources from resref, choosing rows randomly 
-	    unwanted return variables could be omitted */
+	unwanted return variables could be omitted */
 	void GetResRefFrom2DA(const ieResRef resref, ieResRef resource1, ieResRef resource2 = NULL, ieResRef resource3 = NULL);
 private:
+	int LoadSprites();
 	bool LoadConfig(void);
 	bool LoadConfig(const char *filename);
 	bool LoadGemRBINI();

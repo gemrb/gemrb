@@ -1,23 +1,23 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2003-2005 The GemRB Project
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+* Copyright (C) 2003-2005 The GemRB Project
+*
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License
+* as published by the Free Software Foundation; either version 2
+* of the License, or (at your option) any later version.
 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
-
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- *
- * $Id$
- *
- */
+ 
+	* You should have received a copy of the GNU General Public License
+	* along with this program; if not, write to the Free Software
+	* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+	*
+	* $Id$
+	*
+*/
 
 #ifndef INTERFACE
 #define INTERFACE
@@ -134,21 +134,21 @@ Interface::Interface(int iargc, char* iargv[])
 	console = NULL;
 	slottypes = NULL;
 	slotmatrix = NULL;
-
+	
 	ModalWindow = NULL;
 	tooltip_x = 0;
 	tooltip_y = 0;
 	tooltip_ctrl = NULL;
 	plugin = NULL;
 	factory = NULL;
-
+	
 	pal16 = NULL;
 	pal32 = NULL;
 	pal256 = NULL;
-
+	
 	CursorCount = 0;
 	Cursors = NULL;
-
+	
 	ConsolePopped = false;
 	CheatFlag = false;
 	FogOfWar = 1;
@@ -195,16 +195,17 @@ Interface::Interface(int iargc, char* iargv[])
 	TooltipColor.b = 0;
 	TooltipColor.a = 255;
 	TooltipMargin = 10;
-
+	
 	TooltipBack = NULL;
 	DraggedItem = NULL;
 	DraggedCursor = NULL;
 	DefSound = NULL;
 	DSCount = -1;
-	for(unsigned int i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) FogSprites[i]=NULL;
 	GameFeatures = 0;
 	memset( WindowFrames, 0, sizeof( WindowFrames ));
 	memset( GroundCircles, 0, sizeof( GroundCircles ));
+	memset(FogSprites, 0, sizeof( FogSprites ));
+	memset(ArrowSprites, 0, sizeof( ArrowSprites ));
 	AreaAliasTable = NULL;
 	ItemExclTable = NULL;
 	ItemDialTable = NULL;
@@ -228,7 +229,7 @@ Interface::Interface(int iargc, char* iargv[])
 	size_t i=variable.size(); \
 	while(i--) { \
 		if (variable[i]) { \
-			delete variable[i]; \
+		delete variable[i]; \
 		} \
 	} \
 	variable.clear(); \
@@ -330,7 +331,7 @@ Interface::~Interface(void)
 		mm->ReleaseMemory();
 		FreeInterface(mm);
 	}
-
+	
 	EffectQueue_ReleaseMemory();
 	CharAnimations::ReleaseMemory();
 	if (CurrentStore) {
@@ -340,9 +341,9 @@ Interface::~Interface(void)
 	SpellCache.RemoveAll(ReleaseSpell);
 	EffectCache.RemoveAll(ReleaseEffect);
 	PaletteCache.RemoveAll(ReleasePalette);
-
+	
 	FreeResRefTable(DefSound, DSCount);
-
+	
 	if (slottypes) {
 		free( slottypes );
 	}
@@ -368,18 +369,18 @@ Interface::~Interface(void)
 		}
 		delete[] Cursors;
 	}
-
+	
 	FreeResourceVector( Font, fonts );
 	FreeResourceVector( Window, windows );
-
+	
 	if (projserv) {
 		delete( projserv );
 	}
-
+	
 	if (console) {
 		delete( console );
 	}
-
+	
 	if (key) {
 		FreeInterface( key );
 	}
@@ -392,30 +393,37 @@ Interface::~Interface(void)
 	if (pal16) {
 		FreeInterface( pal16 );
 	}
-
+	
 	if (timer) {
 		delete( timer );
 	}
-
+	
 	if (windowmgr) {
 		FreeInterface( windowmgr );
 	}
-
+	
 	if (video) {
 		unsigned int i;
-
+		
+		for(i=0;i<sizeof(ArrowSprites)/sizeof(Sprite2D *);i++ ) {
+			video->FreeSprite(ArrowSprites[i]);
+		}
+		
 		for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
 			//freesprite checks for null pointer
 			video->FreeSprite(FogSprites[i]);
 		}
+		
 		for(i=0;i<4;i++) {
 			video->FreeSprite(WindowFrames[i]);
 		}
+		
 		for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
 			for(i=0;i<6;i++) {
 				video->FreeSprite(GroundCircles[size][i]);
 			}
 		}
+		
 		if (TooltipBack) {
 			for(i=0;i<3;i++) {
 				//freesprite checks for null pointer
@@ -428,7 +436,7 @@ Interface::~Interface(void)
 		}
 		FreeInterface( video );
 	}
-
+	
 	if (evntmgr) {
 		delete( evntmgr );
 	}
@@ -461,7 +469,7 @@ Interface::~Interface(void)
 		ItemTooltipTable->RemoveAll(ReleaseItemTooltip);
 		delete( ItemTooltipTable );
 	}
-
+	
 	FreeInterfaceVector( Table, tables, tm );
 	FreeInterfaceVector( Symbol, symbols, sm );
 	if (opcodemgrs) {
@@ -469,7 +477,7 @@ Interface::~Interface(void)
 		delete opcodemgrs;
 		opcodemgrs=NULL;
 	}
-
+	
 	if (INIquests) {
 		FreeInterface(INIquests);
 	}
@@ -482,11 +490,11 @@ Interface::~Interface(void)
 	Map::ReleaseMemory();
 	GameScript::ReleaseMemory();
 	Actor::ReleaseMemory();
-
+	
 	if (strings) {
 		FreeInterface( strings );
 	}
-
+	
 	if(plugin) {
 		delete( plugin );
 	}
@@ -527,26 +535,26 @@ GameControl* Interface::StartGameControl()
 		guiscript->RunFunction( "OnLoad" );
 		gc->UnhideGUI();
 	}
-
+	
 	return gc;
 }
 
 /* handle main loop events that might destroy or create windows
-	 thus cannot be called from DrawWindows directly
-	 these events are pending until conditions are right
- */
+thus cannot be called from DrawWindows directly
+these events are pending until conditions are right
+*/
 void Interface::HandleEvents()
 {
 	GameControl *gc = GetGameControl();
 	if (!gc || !gc->Owner || !gc->Owner->Visible) {
 		return;
 	}
-
+	
 	if (EventFlag&EF_UPDATEANIM) {
 		EventFlag&=~EF_UPDATEANIM;
 		guiscript->RunFunction( "UpdateAnimation", false);
 	}
-
+	
 	if (EventFlag&EF_PORTRAIT) {
 		ieDword tmp = (ieDword) ~0;
 		vars->Lookup( "PortraitWindow", tmp );
@@ -555,7 +563,7 @@ void Interface::HandleEvents()
 			guiscript->RunFunction( "UpdatePortraitWindow" );
 		}
 	}
-
+	
 	if (EventFlag&EF_CONTROL) {
 		EventFlag&=~EF_CONTROL;
 		guiscript->RunFunction( "UpdateControlStatus" );
@@ -577,13 +585,13 @@ void Interface::HandleEvents()
 		}
 		return;
 	}
-
+	
 	if (EventFlag&EF_SEQUENCER) {
 		EventFlag&=~EF_SEQUENCER;
 		guiscript->RunFunction( "OpenSequencerWindow" );
 		return;
 	}
-
+	
 	if (EventFlag&EF_IDENTIFY) {
 		EventFlag&=~EF_IDENTIFY;
 		guiscript->RunFunction( "OpenIdentifyWindow" );
@@ -592,29 +600,29 @@ void Interface::HandleEvents()
 }
 
 /* handle main loop events that might destroy or create windows
-	 thus cannot be called from DrawWindows directly
- */
+thus cannot be called from DrawWindows directly
+*/
 void Interface::HandleFlags()
 {
 	EventFlag = EF_CONTROL; //clear events because the context changed
-
+	
 	if (QuitFlag&(QF_QUITGAME|QF_EXITGAME) ) {
 		// when reaching this, quitflag should be 1 or 2
 		// if Exitgame was set, we'll set Start.py too
-			QuitGame (QuitFlag&QF_EXITGAME);
-			QuitFlag &= ~(QF_QUITGAME|QF_EXITGAME);
+		QuitGame (QuitFlag&QF_EXITGAME);
+		QuitFlag &= ~(QF_QUITGAME|QF_EXITGAME);
 	}
-
+	
 	if (QuitFlag&QF_LOADGAME) {
 		QuitFlag &= ~QF_LOADGAME;
 		LoadGame(LoadGameIndex);
 	}
-
+	
 	if (QuitFlag&QF_ENTERGAME) {
 		QuitFlag &= ~QF_ENTERGAME;
 		if (game) {
 			timer->Init();
-
+			
 			//rearrange party slots
 			game->ConsolidateParty();
 			GameControl* gc = StartGameControl();
@@ -631,7 +639,7 @@ void Interface::HandleFlags()
 			QuitFlag = QF_QUITGAME;
 		}
 	}
-
+	
 	if (QuitFlag&QF_CHANGESCRIPT) {
 		QuitFlag &= ~QF_CHANGESCRIPT;
 		guiscript->LoadScript( NextScript );
@@ -642,7 +650,7 @@ void Interface::HandleFlags()
 bool GenerateAbilityTables()
 {
 	FreeAbilityTables();
-
+	
 	//range is: 0 - maximumability
 	int tablesize = MaximumAbility+1;
 	strmod = (ieWordSigned *) malloc (tablesize * 4 * sizeof(ieWordSigned) );
@@ -670,7 +678,7 @@ bool Interface::ReadAbilityTable(const ieResRef tablename, ieWordSigned *mem, in
 {
 	TableMgr * tab;
 	int table=LoadTable( tablename );
-
+	
 	if (table<0) {
 		return false;
 	}
@@ -721,7 +729,7 @@ bool Interface::ReadAuxItemTables()
 	TableMgr* aa;
 	int table;
 	bool flag = true;
-
+	
 	if (ItemExclTable) {
 		ItemExclTable->RemoveAll(NULL);
 	} else {
@@ -729,7 +737,7 @@ bool Interface::ReadAuxItemTables()
 		ItemExclTable->SetType(GEM_VARIABLES_INT);
 	}
 	table = LoadTable( "itemexcl" );
-
+	
 	if (table < 0) {
 		//don't report error when the file doesn't exist
 		goto aux_1;
@@ -743,7 +751,7 @@ bool Interface::ReadAuxItemTables()
 	idx = aa->GetRowCount();
 	while (idx--) {
 		ieResRef key;
-
+		
 		strnlwrcpy(key,aa->GetRowName(idx),8);
 		ieDword value = atoi(aa->QueryField(idx,0));
 		ItemExclTable->SetAt(key, value);
@@ -763,7 +771,7 @@ aux_1:
 		ItemDial2Table->SetType(GEM_VARIABLES_STRING);
 	}
 	table = LoadTable( "itemdial" );
-
+	
 	if (table < 0) {
 		//don't report error when the file doesn't exist
 		goto aux_2;
@@ -777,7 +785,7 @@ aux_1:
 	idx = aa->GetRowCount();
 	while (idx--) {
 		ieResRef key, dlgres;
-
+		
 		strnlwrcpy(key,aa->GetRowName(idx),8);
 		ieDword value = atoi(aa->QueryField(idx,0));
 		ItemDialTable->SetAt(key, value);
@@ -793,7 +801,7 @@ aux_2:
 		ItemTooltipTable->SetType(GEM_VARIABLES_POINTER);
 	}
 	table = LoadTable( "tooltip" );
-
+	
 	if (table < 0) {
 		//don't report error when the file doesn't exist
 		goto aux_3;
@@ -808,7 +816,7 @@ aux_2:
 	while (idx--) {
 		ieResRef key;
 		int *tmppoi = (int *) malloc(sizeof(int)*3);
-
+		
 		strnlwrcpy(key,aa->GetRowName(idx),8);
 		for (int i=0;i<3;i++) {
 			tmppoi[i] = atoi(aa->QueryField(idx,i));
@@ -823,7 +831,7 @@ aux_3:
 int Interface::GetItemExcl(const ieResRef itemname)
 {
 	ieDword value;
-
+	
 	if (ItemExclTable && ItemExclTable->Lookup(itemname, value)) {
 		return (int) value;
 	}
@@ -833,7 +841,7 @@ int Interface::GetItemExcl(const ieResRef itemname)
 int Interface::GetItemTooltip(const ieResRef itemname, int header)
 {
 	int *value = NULL;
-
+	
 	if (ItemTooltipTable) {
 		void* lookup = NULL;
 		ItemTooltipTable->Lookup(itemname, lookup);
@@ -854,7 +862,7 @@ int Interface::GetItemTooltip(const ieResRef itemname, int header)
 int Interface::GetItemDialStr(const ieResRef itemname)
 {
 	ieDword value;
-
+	
 	if (ItemDialTable && ItemDialTable->Lookup(itemname, value)) {
 		return (int) value;
 	}
@@ -878,9 +886,9 @@ bool Interface::ReadAreaAliasTable(const ieResRef tablename)
 		AreaAliasTable = new Variables();
 		AreaAliasTable->SetType(GEM_VARIABLES_INT);
 	}
-
+	
 	int table = LoadTable( tablename );
-
+	
 	if (table < 0) {
 		//don't report error when the file doesn't exist
 		return true;
@@ -893,7 +901,7 @@ bool Interface::ReadAreaAliasTable(const ieResRef tablename)
 	int idx = aa->GetRowCount();
 	while (idx--) {
 		ieResRef key;
-
+		
 		strnlwrcpy(key,aa->GetRowName(idx),8);
 		ieDword value = atoi(aa->QueryField(idx,0));
 		AreaAliasTable->SetAt(key, value);
@@ -906,7 +914,7 @@ bool Interface::ReadAreaAliasTable(const ieResRef tablename)
 int Interface::GetAreaAlias(const ieResRef areaname)
 {
 	ieDword value;
-
+	
 	if (AreaAliasTable && AreaAliasTable->Lookup(areaname, value)) {
 		return (int) value;
 	}
@@ -935,14 +943,14 @@ void Interface::Main()
 	Palette* palette = CreatePalette( white, black );
 	do {
 		//don't change script when quitting is pending
-
+		
 		while (QuitFlag) {
 			HandleFlags();
 		}
 		if (EventFlag) {
 			HandleEvents();
 		}
-
+		
 		DrawWindows();
 		if (DrawFPS) {
 			frame++;
@@ -955,8 +963,8 @@ void Interface::Main()
 			}
 			video->DrawRect( bg, black );
 			fps->Print( bg,
-						( unsigned char * ) fpsstring, palette,
-						IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true );
+				( unsigned char * ) fpsstring, palette,
+				IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true );
 		}
 	} while (video->SwapBuffers() == GEM_OK);
 	FreePalette( palette );
@@ -986,7 +994,7 @@ end:
 int Interface::ReadResRefTable(const ieResRef tablename, ieResRef *&data)
 {
 	int count = 0;
-
+	
 	if (data) {
 		free(data);
 		data = NULL;
@@ -1009,6 +1017,230 @@ int Interface::ReadResRefTable(const ieResRef tablename, ieResRef *&data)
 	return count;
 }
 
+int Interface::LoadSprites()
+{
+	ieDword i;
+	int size;
+	int ret = GEM_ERROR;
+	
+	AnimationMgr* anim = ( AnimationMgr* ) GetInterface( IE_BAM_CLASS_ID );
+	if (!anim) {
+		printf( "No BAM Importer Available.\nTermination in Progress...\n" );
+		return GEM_ERROR;
+	}
+	
+	DataStream* str = NULL;
+	int table = -1;
+	if (!IsAvailable( IE_2DA_CLASS_ID )) {
+		printf( "No 2DA Importer Available.\nTermination in Progress...\n" );
+		goto end_of_init;
+	}
+	
+	//loading cursors
+	printMessage( "Core", "Loading Cursors...", WHITE );
+	
+	str = key->GetResource( "cursors", IE_BAM_CLASS_ID );
+	if (anim->Open( str, true ))
+	{
+		CursorCount = anim->GetCycleCount();
+		Cursors = new Sprite2D * [CursorCount];
+		for (int i = 0; i < CursorCount; i++) {
+			Cursors[i] = anim->GetFrameFromCycle( (ieByte) i, 0 );
+		}
+	}
+	
+	// this is the last existing cursor type
+	if (CursorCount<IE_CURSOR_WAY) {
+		printStatus( "ERROR", LIGHT_RED );
+		goto end_of_init;
+	}
+	video->SetCursor( Cursors[0], Cursors[1] );
+	printStatus( "OK", LIGHT_GREEN );
+
+	// Load arrow cursors
+	str = key->GetResource( "cursarw", IE_BAM_CLASS_ID );
+	printMessage( "Core", "Loading arrow cursor bitmaps...", WHITE );
+	anim->Open( str, true );
+	if (anim->GetCycleCount( ) != MAX_ORIENT/2) {
+		printStatus( "ERROR", LIGHT_RED );
+		goto end_of_init;
+	}
+
+	for(i=0;i<MAX_ORIENT/2;i++) {
+		ArrowSprites[i] = anim->GetFrameFromCycle( i, 0);
+	}
+
+	// Load fog-of-war bitmaps
+	str = key->GetResource( "fogowar", IE_BAM_CLASS_ID );
+	printMessage( "Core", "Loading Fog-Of-War bitmaps...", WHITE );
+	anim->Open( str, true );
+	if (anim->GetCycleSize( 0 ) != 8) {
+		// unknown type of fog anim
+		printStatus( "ERROR", LIGHT_RED );
+		goto end_of_init;
+	}
+	
+	FogSprites[0] = NULL;
+	FogSprites[1] = anim->GetFrameFromCycle( 0, 0 );
+	FogSprites[2] = anim->GetFrameFromCycle( 0, 1 );
+	FogSprites[3] = anim->GetFrameFromCycle( 0, 2 );
+	
+	FogSprites[4] = video->MirrorSpriteVertical( FogSprites[1], false );
+	
+	FogSprites[5] = NULL;
+	
+	FogSprites[6] = video->MirrorSpriteVertical( FogSprites[3], false );
+	
+	FogSprites[7] = NULL;
+	
+	FogSprites[8] = video->MirrorSpriteHorizontal( FogSprites[2], false );
+	
+	FogSprites[9] = video->MirrorSpriteHorizontal( FogSprites[3], false );
+	
+	FogSprites[10] = NULL;
+	FogSprites[11] = NULL;
+	
+	FogSprites[12] = video->MirrorSpriteHorizontal( FogSprites[6], false );
+	
+	FogSprites[16] = anim->GetFrameFromCycle( 0, 3 );
+	FogSprites[17] = anim->GetFrameFromCycle( 0, 4 );
+	FogSprites[18] = anim->GetFrameFromCycle( 0, 5 );
+	FogSprites[19] = anim->GetFrameFromCycle( 0, 6 );
+	
+	FogSprites[20] = video->MirrorSpriteVertical( FogSprites[17], false );
+	
+	FogSprites[21] = NULL;
+	
+	FogSprites[23] = NULL;
+	
+	FogSprites[24] = video->MirrorSpriteHorizontal( FogSprites[18], false );
+	
+	FogSprites[25] = anim->GetFrameFromCycle( 0, 7 );
+	
+	{
+		Sprite2D *tmpsprite = video->MirrorSpriteVertical( FogSprites[25], false );
+		FogSprites[22] = video->MirrorSpriteHorizontal( tmpsprite, false );
+		video->FreeSprite( tmpsprite );
+	}
+	
+	FogSprites[26] = NULL;
+	FogSprites[27] = NULL;
+	
+	{
+		Sprite2D *tmpsprite = video->MirrorSpriteVertical( FogSprites[19], false );
+		FogSprites[28] = video->MirrorSpriteHorizontal( tmpsprite, false );
+		video->FreeSprite( tmpsprite );
+	}
+	
+	i = 0;
+	vars->Lookup("3D Acceleration", i);
+	if (i) {
+		for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
+			video->CreateAlpha( FogSprites[i] );
+		}
+	}
+	
+	printStatus( "OK", LIGHT_GREEN );
+	
+	// Load ground circle bitmaps (PST only)
+	printMessage( "Core", "Loading Ground circle bitmaps...", WHITE );
+	//block required due to msvc6.0 incompatibility
+	for (size = 0; size < MAX_CIRCLE_SIZE; size++) {
+		if (GroundCircleBam[size][0]) {
+			str = key->GetResource( GroundCircleBam[size], IE_BAM_CLASS_ID );
+			anim->Open( str, true );
+			if (anim->GetCycleCount() != 6) {
+				// unknown type of circle anim
+				printStatus( "ERROR", LIGHT_RED );
+				goto end_of_init;
+			}
+			
+			for (int i = 0; i < 6; i++) {
+				Sprite2D* sprite = anim->GetFrameFromCycle( (ieByte) i, 0 );
+				if (GroundCircleScale[size]) {
+					GroundCircles[size][i] = video->SpriteScaleDown( sprite, GroundCircleScale[size] );
+					video->FreeSprite( sprite );
+				} else {
+					GroundCircles[size][i] = sprite;
+				}
+			}
+		}
+	}
+	
+	printStatus( "OK", LIGHT_GREEN );
+	
+	printMessage( "Core", "Loading Fonts...\n", WHITE );
+	table = LoadTable( "fonts" );
+	if (table < 0) {
+		printStatus( "ERROR", LIGHT_RED );
+		printf( "Cannot find fonts.2da.\nTermination in Progress...\n" );
+		goto end_of_init;
+	} else {
+		TableMgr* tab = GetTable( table );
+		int count = tab->GetRowCount();
+		for (int i = 0; i < count; i++) {
+			const char* ResRef = tab->QueryField( i, 0 );
+			int needpalette = atoi( tab->QueryField( i, 1 ) );
+			int first_char = atoi( tab->QueryField( i, 2 ) );
+			str = key->GetResource( ResRef, IE_BAM_CLASS_ID );
+			if (!anim->Open( str, true )) {
+				// opening with autofree makes this delete unwanted!!!
+				//				delete( fstr );
+				continue;
+			}
+			Font* fnt = anim->GetFont();
+			if (!fnt) {
+				continue;
+			}
+			strncpy( fnt->ResRef, ResRef, 8 );
+			if (needpalette) {
+				
+				Color fore = {0xff, 0xff, 0xff, 0};
+				Color back = {0x00, 0x00, 0x00, 0};
+				if (!strnicmp( TooltipFont, ResRef, 8) ) {
+					if (TooltipColor.a==0xff) {
+						fore = TooltipColor;
+					} else {
+						fore = back;
+						back = TooltipColor;
+					}
+				}
+				Palette* pal = CreatePalette( fore, back );
+				pal->CreateShadedAlphaChannel();
+				fnt->SetPalette(pal);
+				FreePalette( pal );
+			}
+			fnt->SetFirstChar( (ieByte) first_char );
+			fonts.push_back( fnt );
+		}
+		DelTable( table );
+	}
+	printMessage( "Core", "Fonts Loaded...", WHITE );
+	printStatus( "OK", LIGHT_GREEN );
+	
+	if (TooltipBackResRef[0]) {
+		printMessage( "Core", "Initializing Tooltips...", WHITE );
+		str = key->GetResource( TooltipBackResRef, IE_BAM_CLASS_ID );
+		if (!anim->Open( str, true )) {
+			printStatus( "ERROR", LIGHT_RED );
+			goto end_of_init;
+		}
+		TooltipBack = new Sprite2D * [3];
+		for (int i = 0; i < 3; i++) {
+			TooltipBack[i] = anim->GetFrameFromCycle( (ieByte) i, 0 );
+			TooltipBack[i]->XPos = 0;
+			TooltipBack[i]->YPos = 0;
+		}
+		printStatus( "OK", LIGHT_GREEN );
+	}
+	
+	ret = GEM_OK;
+	
+end_of_init:
+	FreeInterface( anim );
+	return ret;
+}
+
 int Interface::Init()
 {
 	printMessage( "Core", "Initializing Variables Dictionary...", WHITE );
@@ -1017,14 +1249,14 @@ int Interface::Init()
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
 	}
-
+	
 	vars->SetAt( "Volume Ambients", 100 );
 	vars->SetAt( "Volume Movie", 100 );
 	vars->SetAt( "Volume Music", 100 );
 	vars->SetAt( "Volume SFX", 100 );
 	vars->SetAt( "Volume Voices", 100 );
 	printStatus( "OK", LIGHT_GREEN );
-
+	
 	if (!LoadConfig()) {
 		return GEM_ERROR;
 	}
@@ -1065,7 +1297,7 @@ int Interface::Init()
 	}
 	Color defcolor={255,255,255,200};
 	SetInfoTextColor(defcolor);
-
+	
 	printStatus( "OK", LIGHT_GREEN );
 	printMessage( "Core", "Searching for KEY Importer...", WHITE );
 	if (!IsAvailable( IE_KEY_CLASS_ID )) {
@@ -1089,10 +1321,10 @@ int Interface::Init()
 		printf( "Cannot Load INI\nTermination in Progress...\n" );
 		return GEM_ERROR;
 	}
-
+	
 	printMessage( "Core", "Creating Projectile Server...\n", WHITE );
 	projserv = new ProjectileServer();
-
+	
 	printMessage( "Core", "Checking for Dialogue Manager...", WHITE );
 	if (!IsAvailable( IE_TLK_CLASS_ID )) {
 		printStatus( "ERROR", LIGHT_RED );
@@ -1114,7 +1346,7 @@ int Interface::Init()
 	}
 	printStatus( "OK", LIGHT_GREEN );
 	strings->Open( fs, true );
-
+	
 	printMessage( "Core", "Loading Palettes...\n", WHITE );
 	DataStream* bmppal16 = NULL;
 	DataStream* bmppal32 = NULL;
@@ -1146,100 +1378,21 @@ int Interface::Init()
 		pal256 = NULL;
 	}
 	printMessage( "Core", "Palettes Loaded\n", WHITE );
-
+	
 	if (!IsAvailable( IE_BAM_CLASS_ID )) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "No BAM Importer Available.\nTermination in Progress...\n" );
 		return GEM_ERROR;
 	}
-	AnimationMgr* anim = ( AnimationMgr* ) GetInterface( IE_BAM_CLASS_ID );
-	if (!anim) {
-		printf( "No BAM Importer Available.\nTermination in Progress...\n" );
-		return GEM_ERROR;
-
-	}
-
-	DataStream* str = NULL;
-	int ret = GEM_ERROR;
-	int table = -1;
-	if (!IsAvailable( IE_2DA_CLASS_ID )) {
-		printf( "No 2DA Importer Available.\nTermination in Progress...\n" );
-		goto end_of_init;
-	}
-
+	
 	printMessage( "Core", "Initializing stock sounds...\n", WHITE );
 	DSCount = ReadResRefTable ("defsound", DefSound);
 	if (DSCount == 0) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "Cannot find defsound.2da.\nTermination in Progress...\n" );
-		goto end_of_init;
+		return GEM_ERROR;
 	}
-
-	printMessage( "Core", "Loading Fonts...\n", WHITE );
-	table = LoadTable( "fonts" );
-	if (table < 0) {
-		printStatus( "ERROR", LIGHT_RED );
-		printf( "Cannot find fonts.2da.\nTermination in Progress...\n" );
-		goto end_of_init;
-	} else {
-		TableMgr* tab = GetTable( table );
-		int count = tab->GetRowCount();
-		for (int i = 0; i < count; i++) {
-			const char* ResRef = tab->QueryField( i, 0 );
-			int needpalette = atoi( tab->QueryField( i, 1 ) );
-			int first_char = atoi( tab->QueryField( i, 2 ) );
-			str = key->GetResource( ResRef, IE_BAM_CLASS_ID );
-			if (!anim->Open( str, true )) {
-// opening with autofree makes this delete unwanted!!!
-//				delete( fstr );
-				continue;
-			}
-			Font* fnt = anim->GetFont();
-			if (!fnt) {
-				continue;
-			}
-			strncpy( fnt->ResRef, ResRef, 8 );
-			if (needpalette) {
-
-				Color fore = {0xff, 0xff, 0xff, 0};
-				Color back = {0x00, 0x00, 0x00, 0};
-				if (!strnicmp( TooltipFont, ResRef, 8) ) {
-					if (TooltipColor.a==0xff) {
-						fore = TooltipColor;
-					} else {
-						fore = back;
-						back = TooltipColor;
-					}
-				}
-				Palette* pal = CreatePalette( fore, back );
-				pal->CreateShadedAlphaChannel();
-				fnt->SetPalette(pal);
-				FreePalette( pal );
-			}
-			fnt->SetFirstChar( (ieByte) first_char );
-			fonts.push_back( fnt );
-		}
-		DelTable( table );
-	}
-	printMessage( "Core", "Fonts Loaded...", WHITE );
-	printStatus( "OK", LIGHT_GREEN );
-
-	if (TooltipBackResRef[0]) {
-		printMessage( "Core", "Initializing Tooltips...", WHITE );
-		str = key->GetResource( TooltipBackResRef, IE_BAM_CLASS_ID );
-		if (!anim->Open( str, true )) {
-			printStatus( "ERROR", LIGHT_RED );
-			goto end_of_init;
-		}
-		TooltipBack = new Sprite2D * [3];
-		for (int i = 0; i < 3; i++) {
-			TooltipBack[i] = anim->GetFrameFromCycle( (ieByte) i, 0 );
-			TooltipBack[i]->XPos = 0;
-			TooltipBack[i]->YPos = 0;
-		}
-		printStatus( "OK", LIGHT_GREEN );
-	}
-
+	
 	printMessage( "Core", "Initializing the Event Manager...", WHITE );
 	evntmgr = new EventMgr();
 	printStatus( "OK", LIGHT_GREEN );
@@ -1250,22 +1403,25 @@ int Interface::Init()
 	windowmgr = ( WindowMgr * ) GetInterface( IE_CHU_CLASS_ID );
 	if (windowmgr == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
-		goto end_of_init;
+		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
 	printMessage( "Core", "Initializing GUI Script Engine...", WHITE );
 	guiscript = ( ScriptEngine * ) GetInterface( IE_GUI_SCRIPT_CLASS_ID );
 	if (guiscript == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
-		goto end_of_init;
+		return GEM_ERROR;
 	}
 	if (!guiscript->Init()) {
 		printStatus( "ERROR", LIGHT_RED );
-		goto end_of_init;
+		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
 	strcpy( NextScript, "Start" );
 
+	int ret = LoadSprites();
+	if (ret) return ret;
+	 
 	printMessage( "Core", "Setting up the Console...", WHITE );
 	QuitFlag = QF_CHANGESCRIPT;
 	console = new Console();
@@ -1274,36 +1430,34 @@ int Interface::Init()
 	console->Width = (ieWord) Width;
 	console->Height = 25;
 	console->SetFont( fonts[0] );
-	{
-		Sprite2D *tmpsprite = GetCursorSprite();
-		if (tmpsprite) {
-			console->SetCursor (tmpsprite);
-			printStatus( "OK", LIGHT_GREEN );
-		} else {
-			printStatus( "ERROR", LIGHT_GREEN );
-		}
+	Sprite2D *tmpsprite = GetCursorSprite();
+	if (!tmpsprite) {
+		printStatus( "ERROR", LIGHT_RED );
+		return GEM_ERROR;
 	}
-
+	console->SetCursor (tmpsprite);
+	printStatus( "OK", LIGHT_GREEN );
+	
 	printMessage( "Core", "Starting up the Sound Manager...", WHITE );
 	soundmgr = ( SoundMgr * ) GetInterface( IE_WAV_CLASS_ID );
 	if (soundmgr == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
-		goto end_of_init;
+		return GEM_ERROR;
 	}
 	if (!soundmgr->Init()) {
 		printStatus( "ERROR", LIGHT_RED );
-		goto end_of_init;
+		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
-
+	
 	printMessage( "Core", "Allocating SaveGameIterator...", WHITE );
 	sgiterator = new SaveGameIterator();
 	if (sgiterator == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
-		goto end_of_init;
+		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
-
+	
 	printMessage( "Core", "Initializing Variables Dictionary...", WHITE );
 	vars->SetType( GEM_VARIABLES_INT );
 	{
@@ -1322,21 +1476,21 @@ int Interface::Init()
 	//no need of strdup, variables do copy the key!
 	vars->SetAt( "SkipIntroVideos", (unsigned long)SkipIntroVideos );
 	printStatus( "OK", LIGHT_GREEN );
-
+	
 	printMessage( "Core", "Initializing Token Dictionary...", WHITE );
 	tokens = new Variables();
 	if (!tokens) {
 		printStatus( "ERROR", LIGHT_RED );
-		goto end_of_init;
+		return GEM_ERROR;
 	}
 	tokens->SetType( GEM_VARIABLES_STRING );
 	printStatus( "OK", LIGHT_GREEN );
-
+	
 	printMessage( "Core", "Initializing Music Manager...", WHITE );
 	music = ( MusicMgr * ) GetInterface( IE_MUS_CLASS_ID );
 	if (!music) {
 		printStatus( "ERROR", LIGHT_RED );
-		goto end_of_init;
+		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
 	if (HasFeature( GF_HAS_PARTY_INI )) {
@@ -1369,7 +1523,7 @@ int Interface::Init()
 		} else {
 			printStatus( "OK", LIGHT_GREEN );
 		}
-
+		
 		printMessage( "Core", "Loading quests definition File...",
 			WHITE );
 		INIquests = ( DataFileMgr * ) GetInterface( IE_INI_CLASS_ID );
@@ -1385,174 +1539,48 @@ int Interface::Init()
 			printStatus( "OK", LIGHT_GREEN );
 		}
 	}
-	game = NULL;//new Game();
-	printMessage( "Core", "Loading Cursors...", WHITE );
-
-	str = key->GetResource( "cursors", IE_BAM_CLASS_ID );
-	if (anim->Open( str, true ))
-	{
-		CursorCount = anim->GetCycleCount();
-		Cursors = new Sprite2D * [CursorCount];
-		for (int i = 0; i < CursorCount; i++) {
-			Cursors[i] = anim->GetFrameFromCycle( (ieByte) i, 0 );
-		}
-	}
-
-	// this is the last existing cursor type
-	if (CursorCount<IE_CURSOR_WAY) {
-		printStatus( "ERROR", LIGHT_RED );
-		goto end_of_init;
-	}
-	video->SetCursor( Cursors[0], Cursors[1] );
-	printStatus( "OK", LIGHT_GREEN );
-
-	// Load fog-of-war bitmaps
-	str = key->GetResource( "fogowar", IE_BAM_CLASS_ID );
-	printMessage( "Core", "Loading Fog-Of-War bitmaps...", WHITE );
-	anim->Open( str, true );
-	if (anim->GetCycleSize( 0 ) != 8) {
-		// unknown type of fog anim
-		printStatus( "ERROR", LIGHT_RED );
-		goto end_of_init;
-	}
-
-	FogSprites[0] = NULL;
-	FogSprites[1] = anim->GetFrameFromCycle( 0, 0 );
-	FogSprites[2] = anim->GetFrameFromCycle( 0, 1 );
-	FogSprites[3] = anim->GetFrameFromCycle( 0, 2 );
-
-	FogSprites[4] = video->MirrorSpriteVertical( FogSprites[1], false );
-
-	FogSprites[5] = NULL;
-
-	FogSprites[6] = video->MirrorSpriteVertical( FogSprites[3], false );
-
-	FogSprites[7] = NULL;
-
-	FogSprites[8] = video->MirrorSpriteHorizontal( FogSprites[2], false );
-
-	FogSprites[9] = video->MirrorSpriteHorizontal( FogSprites[3], false );
-
-	FogSprites[10] = NULL;
-	FogSprites[11] = NULL;
-
-	FogSprites[12] = video->MirrorSpriteHorizontal( FogSprites[6], false );
-
-	FogSprites[16] = anim->GetFrameFromCycle( 0, 3 );
-	FogSprites[17] = anim->GetFrameFromCycle( 0, 4 );
-	FogSprites[18] = anim->GetFrameFromCycle( 0, 5 );
-	FogSprites[19] = anim->GetFrameFromCycle( 0, 6 );
-
-	FogSprites[20] = video->MirrorSpriteVertical( FogSprites[17], false );
-
-	FogSprites[21] = NULL;
-
-	FogSprites[23] = NULL;
-
-	FogSprites[24] = video->MirrorSpriteHorizontal( FogSprites[18], false );
-
-	FogSprites[25] = anim->GetFrameFromCycle( 0, 7 );
-
-	{
-	Sprite2D *tmpsprite = video->MirrorSpriteVertical( FogSprites[25], false );
-	FogSprites[22] = video->MirrorSpriteHorizontal( tmpsprite, false );
-	video->FreeSprite( tmpsprite );
-	}
-
-	FogSprites[26] = NULL;
-	FogSprites[27] = NULL;
-
-	{
-	Sprite2D *tmpsprite = video->MirrorSpriteVertical( FogSprites[19], false );
-	FogSprites[28] = video->MirrorSpriteHorizontal( tmpsprite, false );
-	video->FreeSprite( tmpsprite );
-	}
-
-	{
-		ieDword i = 0;
-		vars->Lookup("3D Acceleration", i);
-		if (i) {
-			for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
-				video->CreateAlpha( FogSprites[i] );
-			}
-		}
-	}
-
-	printStatus( "OK", LIGHT_GREEN );
-
-	// Load ground circle bitmaps (PST only)
-	printMessage( "Core", "Loading Ground circle bitmaps...", WHITE );
-	//block required due to msvc6.0 incompatibility
-	{
-	for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
-		if (GroundCircleBam[size][0]) {
-			str = key->GetResource( GroundCircleBam[size], IE_BAM_CLASS_ID );
-			anim->Open( str, true );
-			if (anim->GetCycleCount() != 6) {
-				// unknown type of circle anim
-				printStatus( "ERROR", LIGHT_RED );
-				goto end_of_init;
-			}
-
-			for (int i = 0; i < 6; i++) {
-				Sprite2D* sprite = anim->GetFrameFromCycle( (ieByte) i, 0 );
-				if (GroundCircleScale[size]) {
-					GroundCircles[size][i] = video->SpriteScaleDown( sprite, GroundCircleScale[size] );
-					video->FreeSprite( sprite );
-				} else {
-					GroundCircles[size][i] = sprite;
-				}
-			}
-		}
-	}
-	}
-
-	printStatus( "OK", LIGHT_GREEN );
-
-
+	game = NULL;
+	
 	printMessage( "Core", "Bringing up the Global Timer...", WHITE );
 	timer = new GlobalTimer();
 	if (!timer) {
 		printStatus( "ERROR", LIGHT_RED );
-		goto end_of_init;
+		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
-
+	
 	printMessage( "Core", "Initializing effect opcodes...", WHITE );
 	opcodemgrs = GetInterfaceVector(IE_FX_CLASS_ID);
 	if (!opcodemgrs || !opcodemgrs->size()) {
 		printStatus( "ERROR", LIGHT_RED );
-		goto end_of_init;
+		return GEM_ERROR;
 	}
-
+	
 	printf("Loaded %d opcode blocks\n", (int) opcodemgrs->size());
 	printStatus( "OK", LIGHT_GREEN );
-
+	
 	printMessage( "Core", "Initializing effects...", WHITE );
 	if (! Init_EffectQueue()) {
 		printStatus( "ERROR", LIGHT_RED );
-		goto end_of_init;
+		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
-
+	
 	printMessage( "Core", "Initializing Inventory Management...\n", WHITE );
 	ret = InitItemTypes();
-	if (ret) {
-		printStatus( "OK", LIGHT_GREEN );
-	}
-	else {
+	if (!ret) {
 		printStatus( "ERROR", LIGHT_RED );
+		return GEM_ERROR;
 	}
-
+	printStatus( "OK", LIGHT_GREEN );
+	
 	printMessage( "Core", "Initializing string constants...\n", WHITE );
 	ret = ReadStrrefs();
-	if (ret) {
-		printStatus( "OK", LIGHT_GREEN );
-	}
-	else {
+	if (!ret) {
 		printStatus( "ERROR", LIGHT_RED );
 	}
-
+	printStatus( "OK", LIGHT_GREEN );
+	
 	printMessage( "Core", "Initializing random treasure...\n", WHITE );
 	ret = ReadRandomItems();
 	if (ret) {
@@ -1561,17 +1589,14 @@ int Interface::Init()
 	else {
 		printStatus( "ERROR", LIGHT_RED );
 	}
-
-
+	
 	printMessage( "Core", "Initializing ability tables...\n", WHITE );
 	ret = ReadAbilityTables();
-	if (ret) {
-		printStatus( "OK", LIGHT_GREEN );
-	}
-	else {
+	if (!ret) {
 		printStatus( "ERROR", LIGHT_RED );
 	}
-
+	printStatus( "OK", LIGHT_GREEN );
+	
 	printMessage( "Core", "Initializing area aliases...\n", WHITE );
 	ret = ReadAreaAliasTable( "WMAPLAY" );
 	if (ret) {
@@ -1580,22 +1605,17 @@ int Interface::Init()
 	else {
 		printStatus( "ERROR", LIGHT_RED );
 	}
-
+	
 	printMessage( "Core", "Reading item tables...\n", WHITE);
 	ret = ReadAuxItemTables();
-	if (ret) {
-		printStatus( "OK", LIGHT_GREEN );
-	}
-	else {
+	if (!ret) {
 		printStatus( "ERROR", LIGHT_RED );
 	}
-
+	printStatus( "OK", LIGHT_GREEN );
+	
 	printMessage( "Core", "Core Initialization Complete!\n", WHITE );
-	ret = GEM_OK;
-end_of_init:
-	FreeInterface( anim );
-
-	return ret;
+	
+	return GEM_OK;
 }
 
 bool Interface::IsAvailable(SClass_ID filetype)
@@ -1645,112 +1665,112 @@ const char* Interface::TypeExt(SClass_ID type)
 	switch (type) {
 		case IE_2DA_CLASS_ID:
 			return ".2da";
-
+			
 		case IE_ACM_CLASS_ID:
 			return ".acm";
-
+			
 		case IE_ARE_CLASS_ID:
 			return ".are";
-
+			
 		case IE_BAM_CLASS_ID:
 			return ".bam";
-
+			
 		case IE_BCS_CLASS_ID:
 			return ".bcs";
-
+			
 		case IE_BIF_CLASS_ID:
 			return ".bif";
-
+			
 		case IE_BMP_CLASS_ID:
 			return ".bmp";
-
+			
 		case IE_PNG_CLASS_ID:
 			return ".png";
-
+			
 		case IE_CHR_CLASS_ID:
 			return ".chr";
-
+			
 		case IE_CHU_CLASS_ID:
 			return ".chu";
-
+			
 		case IE_CRE_CLASS_ID:
 			return ".cre";
-
+			
 		case IE_DLG_CLASS_ID:
 			return ".dlg";
-
+			
 		case IE_EFF_CLASS_ID:
 			return ".eff";
-
+			
 		case IE_GAM_CLASS_ID:
 			return ".gam";
-
+			
 		case IE_IDS_CLASS_ID:
 			return ".ids";
-
+			
 		case IE_INI_CLASS_ID:
 			return ".ini";
-
+			
 		case IE_ITM_CLASS_ID:
 			return ".itm";
-
+			
 		case IE_KEY_CLASS_ID:
 			return ".key";
-
+			
 		case IE_MOS_CLASS_ID:
 			return ".mos";
-
+			
 		case IE_MUS_CLASS_ID:
 			return ".mus";
-
+			
 		case IE_MVE_CLASS_ID:
 			return ".mve";
-
+			
 		case IE_PLT_CLASS_ID:
 			return ".plt";
-
+			
 		case IE_PRO_CLASS_ID:
 			return ".pro";
-
+			
 		case IE_SAV_CLASS_ID:
 			return ".sav";
-
+			
 		case IE_SPL_CLASS_ID:
 			return ".spl";
-
+			
 		case IE_SRC_CLASS_ID:
 			return ".src";
-
+			
 		case IE_STO_CLASS_ID:
 			return ".sto";
-
+			
 		case IE_TIS_CLASS_ID:
 			return ".tis";
-
+			
 		case IE_TLK_CLASS_ID:
 			return ".tlk";
-
+			
 		case IE_TOH_CLASS_ID:
 			return ".toh";
-
+			
 		case IE_TOT_CLASS_ID:
 			return ".tot";
-
+			
 		case IE_VAR_CLASS_ID:
 			return ".var";
-
+			
 		case IE_VVC_CLASS_ID:
 			return ".vvc";
-
+			
 		case IE_WAV_CLASS_ID:
 			return ".wav";
-
+			
 		case IE_WED_CLASS_ID:
 			return ".wed";
-
+			
 		case IE_WFX_CLASS_ID:
 			return ".wfx";
-
+			
 		case IE_WMP_CLASS_ID:
 			return ".wmp";
 	}
@@ -1768,7 +1788,7 @@ void Interface::FreeString(char *&str)
 char* Interface::GetString(ieStrRef strref, ieDword options)
 {
 	ieDword flags = 0;
-
+	
 	if (!(options & IE_STR_STRREFOFF)) {
 		vars->Lookup( "Strref On", flags );
 	}
@@ -1816,11 +1836,11 @@ bool Interface::LoadConfig(void)
 #ifndef WIN32
 	char path[_MAX_PATH];
 	char name[_MAX_PATH];
-
+	
 	// Find directory where user stores GemRB configurations (~/.gemrb).
 	// FIXME: Create it if it does not exist
 	// Use current dir if $HOME is not defined (or bomb out??)
-
+	
 	char* s = getenv( "HOME" );
 	if (s) {
 		strcpy( UserDir, s );
@@ -1828,7 +1848,7 @@ bool Interface::LoadConfig(void)
 	} else {
 		strcpy( UserDir, "./" );
 	}
-
+	
 	// Find basename of this program. It does the same as basename (3),
 	// but that's probably missing on some archs
 	s = strrchr( argv[0], PathDelimiter );
@@ -1837,11 +1857,11 @@ bool Interface::LoadConfig(void)
 	} else {
 		s = argv[0];
 	}
-
+	
 	strcpy( name, s );
 	//if (!name[0])		// FIXME: could this happen?
 	//	strcpy (name, PACKAGE); // ugly hack
-
+	
 	// If we were called as $0 -c <filename>, load config from filename
 	if (argc > 2 && ! strcmp("-c", argv[1])) {
 		if (LoadConfig( argv[2] )) {
@@ -1851,49 +1871,49 @@ bool Interface::LoadConfig(void)
 			return false;
 		}
 	}
-
+	
 	// FIXME: temporary hack, to be deleted??
 	if (LoadConfig( "GemRB.cfg" )) {
 		return true;
 	}
-
+	
 	PathJoin( path, UserDir, name, NULL );
 	strcat( path, ".cfg" );
-
+	
 	if (LoadConfig( path )) {
 		return true;
 	}
-
+	
 #ifdef SYSCONFDIR
 	PathJoin( path, SYSCONFDIR, name, NULL );
 	strcat( path, ".cfg" );
-
+	
 	if (LoadConfig( path )) {
 		return true;
 	}
 #endif
-
+	
 	// Don't try with default binary name if we have tried it already
 	if (!strcmp( name, PACKAGE )) {
 		return false;
 	}
-
+	
 	PathJoin( path, UserDir, PACKAGE, NULL );
 	strcat( path, ".cfg" );
-
+	
 	if (LoadConfig( path )) {
 		return true;
 	}
-
+	
 #ifdef SYSCONFDIR
 	PathJoin( path, SYSCONFDIR, PACKAGE, NULL );
 	strcat( path, ".cfg" );
-
+	
 	if (LoadConfig( path )) {
 		return true;
 	}
 #endif
-
+	
 	return false;
 #else // WIN32
 	strcpy( UserDir, ".\\" );
@@ -1904,7 +1924,7 @@ bool Interface::LoadConfig(void)
 bool Interface::LoadConfig(const char* filename)
 {
 	FILE* config;
-
+	
 	printMessage("Config"," ", WHITE);
 	printf("Trying to open %s\n", filename);
 	config = fopen( filename, "rb" );
@@ -1913,10 +1933,10 @@ bool Interface::LoadConfig(const char* filename)
 		return false;
 	}
 	char name[65], value[_MAX_PATH + 3];
-
+	
 	//one GemRB own format is working well, this might be set to 0
 	SaveAsOriginal = 1;
-
+	
 	while (!feof( config )) {
 		char rem;
 		fread( &rem, 1, 1, config );
@@ -2041,18 +2061,18 @@ bool Interface::LoadConfig(const char* filename)
 		}
 	}
 	fclose( config );
-
-
+	
+	
 	if (!GameType[0]) {
 		strcpy( GameType, "gemrb" );
 	}
-
+	
 #ifdef DATADIR
 	if (!GemRBPath[0]) {
 		strcpy( GemRBPath, DATADIR );
 	}
 #endif
-
+	
 	if (!PluginsPath[0]) {
 #ifdef PLUGINDIR
 		strcpy( PluginsPath, PLUGINDIR );
@@ -2060,38 +2080,38 @@ bool Interface::LoadConfig(const char* filename)
 		PathJoin( PluginsPath, GemRBPath, "plugins", NULL );
 #endif
 	}
-
+	
 	if (!GUIScriptsPath[0]) {
 		strcpy( GUIScriptsPath, GemRBPath );
 	}
-
+	
 	if (!GameName[0]) {
 		strcpy( GameName, GEMRB_STRING );
 	}
-
+	
 	if (!SavePath[0]) {
 		// FIXME: maybe should use UserDir instead of GamePath
 		strcpy( SavePath, GamePath );
 	}
-
+	
 	if (! CachePath[0]) {
 		PathJoin( CachePath, UserDir, "Cache", NULL );
 	}
-
-
+	
+	
 	FixPath( GUIScriptsPath, true );
 	FixPath( PluginsPath, true );
 	FixPath( GemRBPath, true );
-
+	
 	FixPath( SavePath, false );
 	mkdir( SavePath, S_IREAD|S_IWRITE|S_IEXEC );
 	chmod( SavePath, S_IREAD|S_IWRITE|S_IEXEC );
 	FixPath( SavePath, true );
-
+	
 	FixPath( CachePath, false );
 	mkdir( CachePath, S_IREAD|S_IWRITE|S_IEXEC );
 	chmod( CachePath, S_IREAD|S_IWRITE|S_IEXEC );
-
+	
 	printStatus( "OK", GREEN );
 	if ( StupidityDetector( CachePath )) {
 		printMessage("Core"," ",LIGHT_RED);
@@ -2100,7 +2120,7 @@ bool Interface::LoadConfig(const char* filename)
 	}
 	DelTree((const char *) CachePath, false);
 	FixPath( CachePath, true );
-
+	
 	return true;
 }
 
@@ -2112,40 +2132,40 @@ static void upperlower(int upper, int lower)
 
 static const char *game_flags[GF_COUNT+1]={
 	"HasKaputz",          //0 GF_HAS_KAPUTZ
-	"AllStringsTagged",   //1 GF_ALL_STRINGS_TAGGED
-	"HasSongList",        //2 GF_HAS_SONGLIST
-	"TeamMovement",       //3 GF_TEAM_MOVEMENT
-	"UpperButtonText",    //4 GF_UPPER_BUTTON_TEXT
-	"LowerLabelText",     //5 GF_LOWER_LABEL_TEXT
-	"HasPartyIni",        //6 GF_HAS_PARTY_INI
-	"SoundFolders",       //7 GF_SOUNDFOLDERS
-	"IgnoreButtonFrames", //8 GF_IGNORE_BUTTON_FRAMES
-	"OneByteAnimationID", //9 GF_ONE_BYTE_ANIMID
-	"HasDPLAYER",         //10GF_HAS_DPLAYER
-	"HasEXPTABLE",        //11GF_HAS_EXPTABLE
-	"HasBeastsIni",       //12GF_HAS_BEASTS_INI
-	"HasDescIcon",        //13GF_HAS_DESC_ICON
-	"HasPickSound",       //14GF_HAS_PICK_SOUND
-	"IWDMapDimensions",   //15GF_IWD_MAP_DIMENSIONS
-	"AutomapIni",         //16GF_AUTOMAP_INI
-	"SmallFog",           //17GF_SMALL_FOG
-	"ReverseDoor",        //18GF_REVERSE_DOOR
-	"ProtagonistTalks",   //19GF_PROTAGONIST_TALKS
-	"HasSpellList",       //20GF_HAS_SPELLLIST
-	"IWD2ScriptName",     //21GF_IWD2_SCRIPTNAME
-	"DialogueScrolls",    //22GF_DIALOGUE_SCROLLS
-	"KnowWorld",          //23GF_KNOW_WORLD
-	"ReverseToHit",       //24GF_REVERSE_TOHIT
-	"SaveForHalfDamage",  //25GF_SAVE_FOR_HALF
-	"CharNameIsGabber",   //26GF_CHARNAMEISGABBER
-	"MagicBit",           //27GF_MAGICBIT
-	"CheckAbilities",     //28GF_CHECK_ABILITIES
-	"ChallengeRating",    //29GF_CHALLENGERATING
-	"SpellBookIconHack",  //30GF_SPELLBOOKICONHACK
-	"EnhancedEffects",    //31GF_ENHANCED_EFFECTS
-	"DeathOnZeroStat",    //32GF_DEATH_ON_ZERO_STAT
-
-	NULL                  //for our own safety, this marks the end of the pole
+		"AllStringsTagged",   //1 GF_ALL_STRINGS_TAGGED
+		"HasSongList",        //2 GF_HAS_SONGLIST
+		"TeamMovement",       //3 GF_TEAM_MOVEMENT
+		"UpperButtonText",    //4 GF_UPPER_BUTTON_TEXT
+		"LowerLabelText",     //5 GF_LOWER_LABEL_TEXT
+		"HasPartyIni",        //6 GF_HAS_PARTY_INI
+		"SoundFolders",       //7 GF_SOUNDFOLDERS
+		"IgnoreButtonFrames", //8 GF_IGNORE_BUTTON_FRAMES
+		"OneByteAnimationID", //9 GF_ONE_BYTE_ANIMID
+		"HasDPLAYER",         //10GF_HAS_DPLAYER
+		"HasEXPTABLE",        //11GF_HAS_EXPTABLE
+		"HasBeastsIni",       //12GF_HAS_BEASTS_INI
+		"HasDescIcon",        //13GF_HAS_DESC_ICON
+		"HasPickSound",       //14GF_HAS_PICK_SOUND
+		"IWDMapDimensions",   //15GF_IWD_MAP_DIMENSIONS
+		"AutomapIni",         //16GF_AUTOMAP_INI
+		"SmallFog",           //17GF_SMALL_FOG
+		"ReverseDoor",        //18GF_REVERSE_DOOR
+		"ProtagonistTalks",   //19GF_PROTAGONIST_TALKS
+		"HasSpellList",       //20GF_HAS_SPELLLIST
+		"IWD2ScriptName",     //21GF_IWD2_SCRIPTNAME
+		"DialogueScrolls",    //22GF_DIALOGUE_SCROLLS
+		"KnowWorld",          //23GF_KNOW_WORLD
+		"ReverseToHit",       //24GF_REVERSE_TOHIT
+		"SaveForHalfDamage",  //25GF_SAVE_FOR_HALF
+		"CharNameIsGabber",   //26GF_CHARNAMEISGABBER
+		"MagicBit",           //27GF_MAGICBIT
+		"CheckAbilities",     //28GF_CHECK_ABILITIES
+		"ChallengeRating",    //29GF_CHALLENGERATING
+		"SpellBookIconHack",  //30GF_SPELLBOOKICONHACK
+		"EnhancedEffects",    //31GF_ENHANCED_EFFECTS
+		"DeathOnZeroStat",    //32GF_DEATH_ON_ZERO_STAT
+		
+		NULL                  //for our own safety, this marks the end of the pole
 };
 
 /** Loads gemrb.ini */
@@ -2156,10 +2176,10 @@ bool Interface::LoadGemRBINI()
 		printStatus( "ERROR", LIGHT_RED );
 		return false;
 	}
-
+	
 	printMessage( "Core", inifile->originalfile, WHITE);
 	printMessage( "Core", "Loading game type-specific GemRB setup...", WHITE );
-
+	
 	if (!IsAvailable( IE_INI_CLASS_ID )) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "[Core]: No INI Importer Available.\n" );
@@ -2167,32 +2187,32 @@ bool Interface::LoadGemRBINI()
 	}
 	DataFileMgr* ini = ( DataFileMgr* ) GetInterface( IE_INI_CLASS_ID );
 	ini->Open( inifile, true ); //autofree
-
+	
 	printStatus( "OK", LIGHT_GREEN );
-
+	
 	const char *s;
-
+	
 	// Resrefs are already initialized in Interface::Interface()
 	s = ini->GetKeyAsString( "resources", "CursorBAM", NULL );
 	if (s)
 		strcpy( CursorBam, s );
-
+	
 	s = ini->GetKeyAsString( "resources", "ButtonFont", NULL );
 	if (s)
 		strcpy( ButtonFont, s );
-
+	
 	s = ini->GetKeyAsString( "resources", "TooltipFont", NULL );
 	if (s)
 		strcpy( TooltipFont, s );
-
+	
 	s = ini->GetKeyAsString( "resources", "MovieFont", NULL );
 	if (s)
 		strcpy( MovieFont, s );
-
+	
 	s = ini->GetKeyAsString( "resources", "TooltipBack", NULL );
 	if (s)
 		strcpy( TooltipBackResRef, s );
-
+	
 	s = ini->GetKeyAsString( "resources", "TooltipColor", NULL );
 	if (s) {
 		if (s[0] == '#') {
@@ -2204,12 +2224,12 @@ bool Interface::LoadGemRBINI()
 			TooltipColor.a = (unsigned char) (c);
 		}
 	}
-
+	
 	//which stat determines the fist weapon (defaults to class)
 	Actor::SetFistStat(ini->GetKeyAsInt( "resources", "FistStat", IE_CLASS));
-
+	
 	TooltipMargin = ini->GetKeyAsInt( "resources", "TooltipMargin", TooltipMargin );
-
+	
 	// The format of GroundCircle can be:
 	// GroundCircleBAM1 = wmpickl/3
 	// to denote that the bitmap should be scaled down 3x
@@ -2228,29 +2248,29 @@ bool Interface::LoadGemRBINI()
 			}
 		}
 	}
-
+	
 	s = ini->GetKeyAsString( "resources", "INIConfig", NULL );
 	if (s)
 		strcpy( INIConfig, s );
-
+	
 	s = ini->GetKeyAsString( "resources", "Palette16", NULL );
 	if (s)
 		strcpy( Palette16, s );
-
+	
 	s = ini->GetKeyAsString( "resources", "Palette32", NULL );
 	if (s)
 		strcpy( Palette32, s );
-
+	
 	s = ini->GetKeyAsString( "resources", "Palette256", NULL );
 	if (s)
 		strcpy( Palette256, s );
-
+	
 	unsigned int i;
 	for(i=0;i<256;i++) {
 		pl_uppercase[i]=(ieByte) toupper(i);
 		pl_lowercase[i]=(ieByte) tolower(i);
 	}
-
+	
 	i = (unsigned int) ini->GetKeyAsInt ("charset", "CharCount", 0);
 	if (i>99) i=99;
 	while(i--) {
@@ -2264,11 +2284,11 @@ bool Interface::LoadGemRBINI()
 			}
 		}
 	}
-
+	
 	MaximumAbility = ini->GetKeyAsInt ("resources", "MaximumAbility", 25 );
-
+	
 	RedrawTile = ini->GetKeyAsInt( "resources", "RedrawTile", 0 )!=0;
-
+	
 	for (i=0;i<GF_COUNT;i++) {
 		if (!game_flags[i]) {
 			printf("Fix the game flags!\n");
@@ -2280,7 +2300,7 @@ bool Interface::LoadGemRBINI()
 	}
 	
 	ForceStereo = ini->GetKeyAsInt( "resources", "ForceStereo", 0 );
-
+	
 	FreeInterface( ini );
 	return true;
 }
@@ -2306,7 +2326,7 @@ Palette *Interface::GetPalette(const ieResRef resname)
 		FreeInterface( im );
 		return NULL;
 	}
-
+	
 	palette = new Palette();
 	im->GetPalette(0,256,palette->col);
 	FreeInterface( im );
@@ -2338,7 +2358,7 @@ Palette* Interface::CreatePalette(const Color &color, const Color &back)
 void Interface::FreePalette(Palette *&pal, const ieResRef name)
 {
 	int res;
-
+	
 	if (!pal) {
 		return;
 	}
@@ -2441,7 +2461,7 @@ Actor *Interface::GetCreature(DataStream *stream)
 int Interface::LoadCreature(const char* ResRef, int InParty, bool character)
 {
 	DataStream *stream;
-
+	
 	if (character) {
 		char nPath[_MAX_PATH], fName[16];
 		snprintf( fName, sizeof(fName), "%s.chr", ResRef);
@@ -2469,7 +2489,7 @@ int Interface::LoadCreature(const char* ResRef, int InParty, bool character)
 		actor->SetStance( IE_ANI_AWAKE );
 	}
 	actor->SetOrientation( 0, false );
-
+	
 	if ( InParty ) {
 		return game->JoinParty( actor, JP_JOIN|JP_INITPOS );
 	}
@@ -2490,12 +2510,12 @@ retry:
 	if (!ab) {
 		return NULL;
 	}
-
+	
 	ab->LastSummoner = Owner->GetID();
 	level -= ab->GetStat(IE_XP);
-
+	
 	int enemyally;
-
+	
 	if (eamod==EAM_SOURCEALLY || eamod==EAM_SOURCEENEMY) {
 		enemyally = Owner->GetStat(IE_EA)>EA_GOODCUTOFF;
 	} else {
@@ -2505,7 +2525,7 @@ retry:
 			enemyally = true;
 		}
 	}
-
+	
 	switch (eamod) {
 		case EAM_SOURCEALLY:
 		case EAM_ALLY:
@@ -2529,7 +2549,7 @@ retry:
 		default:
 			break;
 	}
-
+	
 	Map *map = target->GetCurrentArea();
 	map->AddActor(ab);
 	ab->SetPosition(position, true, 0);
@@ -2551,7 +2571,7 @@ int Interface::GetCreatureStat(unsigned int Slot, unsigned int StatID, int Mod)
 	if (!actor) {
 		return 0xdadadada;
 	}
-
+	
 	if (Mod) {
 		return actor->GetStat( StatID );
 	}
@@ -2559,7 +2579,7 @@ int Interface::GetCreatureStat(unsigned int Slot, unsigned int StatID, int Mod)
 }
 
 int Interface::SetCreatureStat(unsigned int Slot, unsigned int StatID,
-	int StatValue)
+		int StatValue)
 {
 	Actor * actor = game->FindPC(Slot);
 	if (!actor) {
@@ -2603,10 +2623,10 @@ bool Interface::LoadWindowPack(const char* name)
 		printf( "%s.chu\n", name );
 		return false;
 	}
-
+	
 	strncpy( WindowPack, name, sizeof( WindowPack ) );
 	WindowPack[sizeof( WindowPack ) - 1] = '\0';
-
+	
 	return true;
 }
 
@@ -2614,7 +2634,7 @@ bool Interface::LoadWindowPack(const char* name)
 int Interface::LoadWindow(unsigned short WindowID)
 {
 	unsigned int i;
-
+	
 	for (i = 0; i < windows.size(); i++) {
 		Window *win = windows[i];
 		if (win == NULL)
@@ -2634,7 +2654,7 @@ int Interface::LoadWindow(unsigned short WindowID)
 		return -1;
 	}
 	memcpy( win->WindowPack, WindowPack, sizeof(WindowPack) );
-
+	
 	int slot = -1;
 	for (i = 0; i < windows.size(); i++) {
 		if (windows[i] == NULL) {
@@ -2656,23 +2676,23 @@ int Interface::LoadWindow(unsigned short WindowID)
 int Interface::CreateWindow(unsigned short WindowID, int XPos, int YPos, unsigned int Width, unsigned int Height, char* Background)
 {
 	unsigned int i;
-
+	
 	for (i = 0; i < windows.size(); i++) {
 		if (windows[i] == NULL)
 			continue;
 		if (windows[i]->WindowID == WindowID && !stricmp( WindowPack,
-													windows[i]->WindowPack )) {
+			windows[i]->WindowPack )) {
 			SetOnTop( i );
 			windows[i]->Invalidate();
 			return i;
 		}
 	}
-
+	
 	Window* win = new Window( WindowID, (ieWord) XPos, (ieWord) YPos, (ieWord) Width, (ieWord) Height );
 	if (Background[0]) {
 		if (IsAvailable( IE_MOS_CLASS_ID )) {
 			DataStream* bkgr = key->GetResource( Background,
-														IE_MOS_CLASS_ID );
+				IE_MOS_CLASS_ID );
 			if (bkgr != NULL) {
 				ImageMgr* mos = ( ImageMgr* )
 					GetInterface( IE_MOS_CLASS_ID );
@@ -2684,9 +2704,9 @@ int Interface::CreateWindow(unsigned short WindowID, int XPos, int YPos, unsigne
 		} else
 			printf( "[Core]: No MOS Importer Available, skipping background\n" );
 	}
-
+	
 	strcpy( win->WindowPack, WindowPack );
-
+	
 	int slot = -1;
 	for (i = 0; i < windows.size(); i++) {
 		if (windows[i] == NULL) {
@@ -2725,7 +2745,7 @@ void Interface::AddWindow(Window * win)
 	int slot = -1;
 	for(unsigned int i = 0; i < windows.size(); i++) {
 		Window *w = windows[i];
-
+		
 		if(w==NULL) {
 			slot = i;
 			break;
@@ -2762,7 +2782,7 @@ int Interface::GetControl(unsigned short WindowIndex, unsigned long ControlID)
 }
 /** Adjust the Scrolling factor of a control (worldmap atm) */
 int Interface::AdjustScrolling(unsigned short WindowIndex,
-	unsigned short ControlIndex, short x, short y)
+		unsigned short ControlIndex, short x, short y)
 {
 	if (WindowIndex >= windows.size()) {
 		return -1;
@@ -2787,7 +2807,7 @@ int Interface::AdjustScrolling(unsigned short WindowIndex,
 
 /** Set the Text of a Control */
 int Interface::SetText(unsigned short WindowIndex,
-	unsigned short ControlIndex, const char* string)
+		unsigned short ControlIndex, const char* string)
 {
 	if (WindowIndex >= windows.size()) {
 		return -1;
@@ -2804,7 +2824,7 @@ int Interface::SetText(unsigned short WindowIndex,
 }
 /** Set the Tooltip text of a Control */
 int Interface::SetTooltip(unsigned short WindowIndex,
-	unsigned short ControlIndex, const char* string)
+		unsigned short ControlIndex, const char* string)
 {
 	if (WindowIndex >= windows.size()) {
 		return -1;
@@ -2862,7 +2882,7 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 			}
 			evntmgr->DelWindow( win );
 			break;
-
+			
 		case WINDOW_VISIBLE:
 			if (win->WindowID==65535) {
 				video->SetViewport( win->XPos, win->YPos, win->Width, win->Height);
@@ -2882,7 +2902,7 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 
 /** Set the Status of a Control in a Window */
 int Interface::SetControlStatus(unsigned short WindowIndex,
-	unsigned short ControlIndex, unsigned long Status)
+		unsigned short ControlIndex, unsigned long Status)
 {
 	//don't set the status of an already invalidated window
 	Window* win = GetWindow(WindowIndex);
@@ -2894,19 +2914,19 @@ int Interface::SetControlStatus(unsigned short WindowIndex,
 		return -1;
 	}
 	if (Status&IE_GUI_CONTROL_FOCUSED) {
-			evntmgr->SetFocused( win, ctrl);
+		evntmgr->SetFocused( win, ctrl);
 	}
 	if (ctrl->ControlType != ((Status >> 24) & 0xff) ) {
 		return -2;
 	}
 	switch (ctrl->ControlType) {
 		case IE_GUI_BUTTON:
-		//Button
-		 {
-			Button* btn = ( Button* ) ctrl;
-			btn->SetState( ( unsigned char ) ( Status & 0x7f ) );
-		}
-		break;
+			//Button
+			{
+				Button* btn = ( Button* ) ctrl;
+				btn->SetState( ( unsigned char ) ( Status & 0x7f ) );
+			}
+			break;
 		default:
 			ctrl->Value = Status & 0x7f;
 			break;
@@ -2931,26 +2951,26 @@ int Interface::ShowModal(unsigned short WindowIndex, int Shadow)
 	//evntmgr->Clear();
 	SetOnTop( WindowIndex );
 	evntmgr->AddWindow( win );
-
+	
 	ModalWindow = NULL;
 	DrawWindows();
 	win->Invalidate();
-
+	
 	Color gray = {
 		0, 0, 0, 128
 	};
 	Color black = {
 		0, 0, 0, 255
 	};
-
+	
 	Region r( 0, 0, Width, Height );
-
+	
 	if (Shadow == MODAL_SHADOW_GRAY) {
 		video->DrawRect( r, gray );
 	} else if (Shadow == MODAL_SHADOW_BLACK) {
 		video->DrawRect( r, black );
 	}
-
+	
 	ModalWindow = win;
 	return 0;
 }
@@ -2965,13 +2985,13 @@ void Interface::DrawWindows(void)
 		//this variable is used all over in the following hacks
 		int flg = gc->GetDialogueFlags();
 		GSUpdate(!(flg & DF_FREEZE_SCRIPTS) );
-
+		
 		//the following part is a series of hardcoded gui behaviour
-
+		
 		//updating panes according to the saved game
 		//pst requires this before initiating dialogs because it has
 		//no dialog window by default
-
+		
 		//initiating dialog
 		if (flg & DF_IN_DIALOG) {
 			// -3 noaction
@@ -2994,7 +3014,7 @@ void Interface::DrawWindows(void)
 				gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW|DF_OPENENDWINDOW, BM_NAND);
 			}
 		}
-
+		
 		//handling container
 		if (CurrentContainer && UseContainer) {
 			if (!(flg & DF_IN_CONTAINER) ) {
@@ -3009,7 +3029,7 @@ void Interface::DrawWindows(void)
 		}
 		//end of gui hacks
 	}
-
+	
 	//here comes the REAL drawing of windows
 	if (ModalWindow) {
 		ModalWindow->DrawWindow();
@@ -3018,10 +3038,10 @@ void Interface::DrawWindows(void)
 	size_t i = topwin.size();
 	while(i--) {
 		unsigned int t = topwin[i];
-
+		
 		if ( t >=windows.size() )
 			continue;
-
+		
 		//visible ==1 or 2 will be drawn
 		Window* win = windows[t];
 		if (win != NULL) {
@@ -3041,15 +3061,15 @@ void Interface::DrawTooltip ()
 {
 	if (! tooltip_ctrl || !tooltip_ctrl->Tooltip)
 		return;
-
+	
 	Font* fnt = GetFont( TooltipFont );
 	char *tooltip_text = tooltip_ctrl->Tooltip;
-
+	
 	int w1 = 0;
 	int w2 = 0;
 	int w = fnt->CalcStringWidth( tooltip_text ) + 8;
 	int h = fnt->maxHeight;
-
+	
 	if (TooltipBack) {
 		h = TooltipBack[0]->Height;
 		w1 = TooltipBack[1]->Width;
@@ -3059,10 +3079,10 @@ void Interface::DrawTooltip ()
 		if (w>TooltipBack[0]->Width)
 			w=TooltipBack[0]->Width;
 	}
-
+	
 	int x = tooltip_x - w / 2;
 	int y = tooltip_y - h / 2;
-
+	
 	// Ensure placement within the screen
 	if (x < 0) x = 0;
 	else if (x + w + w1 + w2 > Width)
@@ -3070,8 +3090,8 @@ void Interface::DrawTooltip ()
 	if (y < 0) y = 0;
 	else if (y + h > Height)
 		y = Height - h;
-
-
+	
+	
 	// FIXME: add tooltip scroll animation for bg. also, take back[0] from
 	// center, not from left end
 	Region r2 = Region( x, y, w, h );
@@ -3080,7 +3100,7 @@ void Interface::DrawTooltip ()
 		video->BlitSprite( TooltipBack[1], x, y, true );
 		video->BlitSprite( TooltipBack[2], x + w, y, true );
 	}
-
+	
 	r2.x+=TooltipMargin;
 	fnt->Print( r2, (ieByte *) tooltip_text, NULL,
 		IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_MIDDLE, true );
@@ -3376,11 +3396,11 @@ int Interface::PlayMovie(const char* ResRef)
 	}
 	if (!mp->Open( str, true )) {
 		FreeInterface( mp );
-	// since mp was opened with autofree, this delete would cause double free
-	//	delete( str );
+		// since mp was opened with autofree, this delete would cause double free
+		//	delete( str );
 		return -1;
 	}
-
+	
 	ieDword subtitles = 0;
 	Font *SubtitleFont = NULL;
 	Palette *palette = NULL;
@@ -3417,7 +3437,7 @@ int Interface::PlayMovie(const char* ResRef)
 			}
 		}
 	}
-
+	
 	//shutting down music and ambients before movie
 	if (music)
 		music->HardEnd();
@@ -3438,7 +3458,7 @@ int Interface::PlayMovie(const char* ResRef)
 	//this will fix redraw all windows as they looked like
 	//before the movie
 	RedrawAll();
-
+	
 	//Setting the movie name to 1
 	vars->SetAt( ResRef, 1 );
 	return 0;
@@ -3468,7 +3488,7 @@ int Interface::GetPortraits(TextArea* ta, bool smallorlarge)
 {
 	int count = 0;
 	char Path[_MAX_PATH];
-
+	
 	if (smallorlarge) {
 		bmp_suffix[0]='S';
 		png_suffix[0]='S';
@@ -3516,7 +3536,7 @@ int Interface::GetCharSounds(TextArea* ta)
 	bool hasfolders;
 	int count = 0;
 	char Path[_MAX_PATH];
-
+	
 	PathJoin( Path, GamePath, GameSounds, NULL );
 	hasfolders = ( HasFeature( GF_SOUNDFOLDERS ) != 0 );
 	DIR* dir = opendir( Path );
@@ -3556,7 +3576,7 @@ int Interface::GetCharacters(TextArea* ta)
 {
 	int count = 0;
 	char Path[_MAX_PATH];
-
+	
 	PathJoin( Path, GamePath, GameCharacters, NULL );
 	DIR* dir = opendir( Path );
 	if (dir == NULL) {
@@ -3656,9 +3676,9 @@ void Interface::QuitGame(int BackToMain)
 		timer->Init();
 		timer->SetFadeFromColor(0);
 	}
-
+	
 	DelWindow(0xffff); //delete all windows, including GameControl
-
+	
 	//shutting down ingame music
 	//(do it before deleting the game)
 	if (music) {
@@ -3689,24 +3709,24 @@ void Interface::LoadGame(int index)
 	// This function has rather painful error handling,
 	// as it should swap all the objects or none at all
 	// and the loading can fail for various reasons
-
+	
 	// Yes, it uses goto. Other ways seemed too awkward for me.
-
+	
 	tokens->RemoveAll(NULL); //clearing the token dictionary
 	DataStream* gam_str = NULL;
 	DataStream* sav_str = NULL;
 	DataStream* wmp_str = NULL;
-
+	
 	SaveGameMgr* gam_mgr = NULL;
 	WorldMapMgr* wmp_mgr = NULL;
-
+	
 	Game* new_game = NULL;
 	WorldMapArray* new_worldmap = NULL;
-
+	
 	LoadProgress(15);
 	DelTree((const char *) CachePath, true);
 	LoadProgress(20);
-
+	
 	if (index == -1) {
 		//Load the Default Game
 		gam_str = key->GetResource( GameNameResRef, IE_GAM_CLASS_ID );
@@ -3721,41 +3741,41 @@ void Interface::LoadGame(int index)
 		wmp_str = sg->GetWmap();
 		delete sg;
 	}
-
+	
 	if (!gam_str || !wmp_str)
 		goto cleanup;
-
-
+	
+	
 	// Load GAM file
 	gam_mgr = ( SaveGameMgr* ) GetInterface( IE_GAM_CLASS_ID );
 	if (!gam_mgr)
 		goto cleanup;
-
+	
 	if (!gam_mgr->Open( gam_str, true ))
 		goto cleanup;
-
+	
 	new_game = gam_mgr->LoadGame(new Game());
 	if (!new_game)
 		goto cleanup;
-
+	
 	FreeInterface( gam_mgr );
 	gam_mgr = NULL;
 	gam_str = NULL;
-
+	
 	// Load WMP (WorldMap) file
 	wmp_mgr = ( WorldMapMgr* ) GetInterface( IE_WMP_CLASS_ID );
 	if (! wmp_mgr)
 		goto cleanup;
-
+	
 	if (!wmp_mgr->Open( wmp_str, true ))
 		goto cleanup;
-
+	
 	new_worldmap = wmp_mgr->GetWorldMapArray( );
-
+	
 	FreeInterface( wmp_mgr );
 	wmp_mgr = NULL;
 	wmp_str = NULL;
-
+	
 	LoadProgress(30);
 	// Unpack SAV (archive) file to Cache dir
 	if (sav_str) {
@@ -3768,27 +3788,27 @@ void Interface::LoadGame(int index)
 		delete( sav_str );
 		sav_str = NULL;
 	}
-
+	
 	// Let's assume that now is everything loaded OK and swap the objects
-
+	
 	if (game)
 		delete( game );
-
+	
 	if (worldmap)
 		delete( worldmap );
-
+	
 	game = new_game;
 	worldmap = new_worldmap;
-
+	
 	LoadProgress(100);
 	return;
- cleanup:
+cleanup:
 	// Something went wrong, so try to clean after itself
 	if (new_game)
 		delete( new_game );
 	if (new_worldmap)
 		delete( new_worldmap );
-
+	
 	if (gam_mgr) {
 		FreeInterface( gam_mgr );
 		gam_str = NULL;
@@ -3797,7 +3817,7 @@ void Interface::LoadGame(int index)
 		FreeInterface( wmp_mgr );
 		wmp_str = NULL;
 	}
-
+	
 	if (gam_str) delete gam_str;
 	if (wmp_str) delete wmp_str;
 	if (sav_str) delete sav_str;
@@ -3809,7 +3829,7 @@ GameControl *Interface::GetGameControl()
 	// in the beginning, there's no window at all
 	if (! window)
 		return NULL;
-
+	
 	Control* gc = window->GetControl(0);
 	if (gc->ControlType!=IE_GUI_GAMECONTROL) {
 		return NULL;
@@ -3824,7 +3844,7 @@ bool Interface::InitItemTypes()
 	}
 	int ItemTypeTable = LoadTable( "itemtype" );
 	TableMgr *it = GetTable(ItemTypeTable);
-
+	
 	ItemTypes = 0;
 	if (it) {
 		ItemTypes = it->GetRowCount(); //number of itemtypes
@@ -3850,7 +3870,7 @@ bool Interface::InitItemTypes()
 		}
 		DelTable(ItemTypeTable);
 	}
-
+	
 	//slottype describes the inventory structure
 	Inventory::Init(HasFeature(GF_MAGICBIT));
 	int SlotTypeTable = LoadTable( "slottype" );
@@ -3896,18 +3916,18 @@ bool Interface::InitItemTypes()
 			}
 			switch (slottypes[i].sloteffects) {
 				//fist slot, not saved, default weapon
-				case SLOT_EFFECT_FIST: Inventory::SetFistSlot(i); break;
+			case SLOT_EFFECT_FIST: Inventory::SetFistSlot(i); break;
 				//magic weapon slot, overrides all weapons
-				case SLOT_EFFECT_MAGIC: Inventory::SetMagicSlot(i); break;
+			case SLOT_EFFECT_MAGIC: Inventory::SetMagicSlot(i); break;
 				//weapon slot, Equipping marker is relative to it
-				case SLOT_EFFECT_MELEE: Inventory::SetWeaponSlot(i); break;
+			case SLOT_EFFECT_MELEE: Inventory::SetWeaponSlot(i); break;
 				//ranged slot
-				case SLOT_EFFECT_MISSILE: Inventory::SetRangedSlot(i); break;
+			case SLOT_EFFECT_MISSILE: Inventory::SetRangedSlot(i); break;
 				//right hand
-				case SLOT_EFFECT_LEFT: Inventory::SetShieldSlot(i); break;
+			case SLOT_EFFECT_LEFT: Inventory::SetShieldSlot(i); break;
 				//head (for averting critical hit)
-				case SLOT_EFFECT_HEAD: Inventory::SetHeadSlot(i); break;
-				default:;
+			case SLOT_EFFECT_HEAD: Inventory::SetHeadSlot(i); break;
+			default:;
 			}
 		}
 		DelTable( SlotTypeTable );
@@ -3918,7 +3938,7 @@ bool Interface::InitItemTypes()
 ieDword Interface::FindSlot(unsigned int idx) const
 {
 	ieDword i;
-
+	
 	for (i=0;i<SlotTypes;i++) {
 		if (idx==slottypes[i].slot) {
 			break;
@@ -3990,19 +4010,19 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor) const
 			return 0;
 		}
 	}
-
+	
 	if ( (unsigned int) item->ItemType>=(unsigned int) ItemTypes) {
 		//invalid itemtype
 		return 0;
 	}
-
+	
 	//if actor is supplied, check its usability fields
 	if (actor) {
 		if (actor->Unusable(item)) {
 			return 0;
 		}
 	}
-
+	
 	//if any bit is true, the answer counts as true
 	int ret = (slotmatrix[item->ItemType]&slottype);
 	return ret;
@@ -4012,7 +4032,7 @@ Label *Interface::GetMessageLabel()
 {
 	ieDword WinIndex = (ieDword) -1;
 	ieDword TAIndex = (ieDword) -1;
-
+	
 	vars->Lookup( "OtherWindow", WinIndex );
 	if (( WinIndex != (ieDword) -1 ) &&
 		( vars->Lookup( "MessageLabel", TAIndex ) )) {
@@ -4030,7 +4050,7 @@ TextArea *Interface::GetMessageTextArea()
 {
 	ieDword WinIndex = (ieDword) -1;
 	ieDword TAIndex = (ieDword) -1;
-
+	
 	vars->Lookup( "MessageWindow", WinIndex );
 	if (( WinIndex != (ieDword) -1 ) &&
 		( vars->Lookup( "MessageTextArea", TAIndex ) )) {
@@ -4103,7 +4123,7 @@ void Interface::DisplayConstantStringName(int stridx, unsigned int color, Script
 {
 	unsigned int speaker_color;
 	const char *name;
-
+	
 	if (stridx<0) return;
 	switch (speaker->Type) {
 		case ST_ACTOR:
@@ -4120,7 +4140,7 @@ void Interface::DisplayConstantStringName(int stridx, unsigned int color, Script
 			speaker_color = 0x800000;
 			break;
 	}
-
+	
 	char* text = GetString( strref_table[stridx], IE_STR_SOUND|IE_STR_SPEECH );
 	int newlen = (int)(strlen( DisplayFormatName ) + strlen( name ) +
 		+ strlen( text ) + 18);
@@ -4137,7 +4157,7 @@ void Interface::DisplayConstantStringAction(int stridx, unsigned int color, Scri
 	unsigned int attacker_color;
 	const char *name1;
 	const char *name2;
-
+	
 	if (stridx<0) return;
 	switch (attacker->Type) {
 		case ST_ACTOR:
@@ -4158,7 +4178,7 @@ void Interface::DisplayConstantStringAction(int stridx, unsigned int color, Scri
 			name2 = "";
 			break;
 	}
-
+	
 	char* text = GetString( strref_table[stridx], IE_STR_SOUND|IE_STR_SPEECH );
 	int newlen = (int)(strlen( DisplayFormatAction ) + strlen( name1 ) +
 		+ strlen( name2 ) + strlen( text ) + 18);
@@ -4174,7 +4194,7 @@ void Interface::DisplayStringName(int stridx, unsigned int color, Scriptable *sp
 {
 	unsigned int speaker_color;
 	const char *name;
-
+	
 	if (stridx<0) return;
 	switch (speaker->Type) {
 		case ST_ACTOR:
@@ -4191,7 +4211,7 @@ void Interface::DisplayStringName(int stridx, unsigned int color, Scriptable *sp
 			speaker_color = 0x800000;
 			break;
 	}
-
+	
 	char* text = GetString( stridx, flags);
 	int newlen = (int)(strlen( DisplayFormatName ) + strlen( name ) +
 		+ strlen( text ) + 10);
@@ -4236,7 +4256,7 @@ bool Interface::ProtectedExtension(const char *filename)
 void Interface::RemoveFromCache(const ieResRef resref, SClass_ID ClassID)
 {
 	char filename[_MAX_PATH];
-
+	
 	strcpy( filename, CachePath );
 	strcat( filename, resref );
 	strcat( filename, TypeExt( ClassID ) );
@@ -4339,7 +4359,7 @@ void Interface::DragItem(CREItem *item, const ieResRef Picture)
 	if (item) {
 		DraggedCursor = GetBAMSprite( Picture, 0, 0 );
 	}
-
+	
 	video->SetDragCursor (DraggedCursor);
 }
 
@@ -4348,7 +4368,7 @@ bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)
 	ieResRef ItemName;
 	TableMgr * tab;
 	int i,j;
-
+	
 	int table=LoadTable(TableName);
 	if (table<0) {
 		return false;
@@ -4387,7 +4407,7 @@ bool Interface::ReadRandomItems()
 	ieResRef RtResRef;
 	int i;
 	TableMgr * tab;
-
+	
 	int table=LoadTable( "randitem" );
 	ieDword difflev=0; //rt norm or rt fury
 	vars->Lookup("Nightmare Mode", difflev);
@@ -4437,7 +4457,7 @@ end:
 CREItem *Interface::ReadItem(DataStream *str)
 {
 	CREItem *itm = new CREItem();
-
+	
 	str->ReadResRef( itm->ItemResRef );
 	str->ReadWord( &itm->Expired );
 	str->ReadWord( &itm->Usages[0] );
@@ -4462,7 +4482,7 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 		int i,j,k;
 		char *endptr;
 		ieResRef NewItem;
-
+		
 		void* lookup;
 		if ( !RtRows->Lookup( itm->ItemResRef, lookup ) ) {
 			return true;
@@ -4515,7 +4535,7 @@ Item* Interface::GetItem(const ieResRef resname)
 		FreeInterface( sm );
 		return NULL;
 	}
-
+	
 	item = new Item();
 	//this is required for storing the 'source'
 	strnlwrcpy(item->Name, resname, 8);
@@ -4524,7 +4544,7 @@ Item* Interface::GetItem(const ieResRef resname)
 		FreeInterface( sm );
 		return NULL;
 	}
-
+	
 	FreeInterface( sm );
 	ItemCache.SetAt(resname, (void *) item);
 	return item;
@@ -4534,7 +4554,7 @@ Item* Interface::GetItem(const ieResRef resname)
 void Interface::FreeItem(Item const *itm, const ieResRef name, bool free)
 {
 	int res;
-
+	
 	res=ItemCache.DecRef((void *) itm, name, free);
 	if (res<0) {
 		printMessage( "Core", "Corrupted Item cache encountered (reference count went below zero), ", LIGHT_RED );
@@ -4561,7 +4581,7 @@ Spell* Interface::GetSpell(const ieResRef resname)
 		FreeInterface( sm );
 		return NULL;
 	}
-
+	
 	spell = new Spell();
 	//this is required for storing the 'source'
 	strnlwrcpy(spell->Name, resname, 8);
@@ -4570,9 +4590,9 @@ Spell* Interface::GetSpell(const ieResRef resname)
 		FreeInterface( sm );
 		return NULL;
 	}
-
+	
 	FreeInterface( sm );
-
+	
 	SpellCache.SetAt(resname, (void *) spell);
 	return spell;
 }
@@ -4580,7 +4600,7 @@ Spell* Interface::GetSpell(const ieResRef resname)
 void Interface::FreeSpell(Spell *spl, const ieResRef name, bool free)
 {
 	int res;
-
+	
 	res=SpellCache.DecRef((void *) spl, name, free);
 	if (res<0) {
 		printMessage( "Core", "Corrupted Spell cache encountered (reference count went below zero), ", LIGHT_RED );
@@ -4607,15 +4627,15 @@ Effect* Interface::GetEffect(const ieResRef resname)
 		FreeInterface( em );
 		return NULL;
 	}
-
+	
 	effect = em->GetEffect(new Effect() );
 	if (effect == NULL) {
 		FreeInterface( em );
 		return NULL;
 	}
-
+	
 	FreeInterface( em );
-
+	
 	EffectCache.SetAt(resname, (void *) effect);
 	return effect;
 }
@@ -4623,7 +4643,7 @@ Effect* Interface::GetEffect(const ieResRef resname)
 void Interface::FreeEffect(Effect *eff, const ieResRef name, bool free)
 {
 	int res;
-
+	
 	res=EffectCache.DecRef((void *) eff, name, free);
 	if (res<0) {
 		printMessage( "Core", "Corrupted Effect cache encountered (reference count went below zero), ", LIGHT_RED );
@@ -4727,10 +4747,10 @@ int Interface::CloseCurrentStore()
 	}
 	int size = sm->GetStoredFileSize (CurrentStore);
 	if (size > 0) {
-	 	//created streams are always autofree (close file on destruct)
+		//created streams are always autofree (close file on destruct)
 		//this one will be destructed when we return from here
 		FileStream str;
-
+		
 		str.Create( CurrentStore->Name, IE_STO_CLASS_ID );
 		int ret = sm->PutStore (&str, CurrentStore);
 		if (ret <0) {
@@ -4756,11 +4776,11 @@ Store *Interface::SetCurrentStore(const ieResRef resname, const ieVariable owner
 		if ( !strnicmp(CurrentStore->Name, resname, 8) ) {
 			return CurrentStore;
 		}
-
+		
 		//not simply delete the old store, but save it
 		CloseCurrentStore();
 	}
-
+	
 	DataStream* str = key->GetResource( resname, IE_STO_CLASS_ID );
 	StoreMgr* sm = ( StoreMgr* ) GetInterface( IE_STO_CLASS_ID );
 	if (sm == NULL) {
@@ -4771,7 +4791,7 @@ Store *Interface::SetCurrentStore(const ieResRef resname, const ieVariable owner
 		FreeInterface( sm );
 		return NULL;
 	}
-
+	
 	// FIXME - should use some already allocated in core
 	// not really, only one store is open at a time, then it is
 	// unloaded, we don't really have to cache it, it will be saved in
@@ -4795,14 +4815,14 @@ ieStrRef Interface::GetRumour(const ieResRef dlgref)
 	dm->Open( key->GetResource( dlgref, IE_DLG_CLASS_ID ), true );
 	Dialog *dlg = dm->GetDialog();
 	FreeInterface( dm );
-
+	
 	if (!dlg) {
 		printMessage("Interface"," ", LIGHT_RED);
 		printf( "Cannot load dialog: %s\n", dlgref );
 		return (ieStrRef) -1;
 	}
 	Scriptable *pc=game->GetPC( game->GetSelectedPCSingle(), false );
-
+	
 	ieStrRef ret = (ieStrRef) -1;
 	int i = dlg->FindRandomState( pc );
 	if (i>=0 ) {
@@ -4816,13 +4836,13 @@ void Interface::DoTheStoreHack(Store *s)
 {
 	size_t size = s->PurchasedCategoriesCount * sizeof( ieDword );
 	s->purchased_categories=(ieDword *) malloc(size);
-
+	
 	size = s->CuresCount * sizeof( STOCure );
 	s->cures=(STOCure *) malloc(size);
-
+	
 	size = s->DrinksCount * sizeof( STODrink );
 	s->drinks=(STODrink *) malloc(size);
-
+	
 	for(size=0;size<s->ItemsCount;size++)
 		s->items.push_back( new STOItem() );
 }
@@ -4846,13 +4866,13 @@ bool Interface::Exists(const char *ResRef, SClass_ID type)
 ScriptedAnimation* Interface::GetScriptedAnimation( const char *effect, bool doublehint)
 {
 	ScriptedAnimation *ret = NULL;
-
+	
 	if (Exists( effect, IE_VVC_CLASS_ID ) ) {
 		DataStream *ds = key->GetResource( effect, IE_VVC_CLASS_ID );
 		ret = new ScriptedAnimation(ds, true);
 	} else {
 		AnimationFactory *af = (AnimationFactory *)
-		key->GetFactoryResource( effect, IE_BAM_CLASS_ID, IE_NORMAL );
+			key->GetFactoryResource( effect, IE_BAM_CLASS_ID, IE_NORMAL );
 		if (af) {
 			ret = new ScriptedAnimation();
 			ret->LoadAnimationFactory( af, doublehint?2:0);
@@ -4915,12 +4935,12 @@ void Interface::ApplySpell(const ieResRef resname, Actor *actor, Actor *caster, 
 	if (!spell) {
 		return;
 	}
-
+	
 	actor->RollSaves();
-
+	
 	level = spell->GetHeaderIndexFromLevel(level);
 	EffectQueue *fxqueue = spell->GetEffectBlock(level);
-
+	
 	//check effect immunities
 	int res = fxqueue->CheckImmunity ( actor );
 	if (res) {
@@ -4951,7 +4971,7 @@ void Interface::ApplyEffect(Effect *effect, Actor *actor, Actor *caster)
 	EffectQueue *fxqueue = new EffectQueue();
 	fxqueue->AddEffect( effect );
 	//hmm, don't delete the effect
-
+	
 	int res = fxqueue->CheckImmunity ( actor );
 	if (res) {
 		if (res == -1 ) {
@@ -4985,10 +5005,10 @@ int Interface::SwapoutArea(Map *map)
 	}
 	int size = mm->GetStoredFileSize (map);
 	if (size > 0) {
-	 	//created streams are always autofree (close file on destruct)
+		//created streams are always autofree (close file on destruct)
 		//this one will be destructed when we return from here
 		FileStream str;
-
+		
 		str.Create( map->GetScriptName(), IE_ARE_CLASS_ID );
 		int ret = mm->PutArea (&str, map);
 		if (ret <0) {
@@ -5009,7 +5029,7 @@ int Interface::SwapoutArea(Map *map)
 int Interface::WriteCharacter(const char *name, Actor *actor)
 {
 	char Path[_MAX_PATH];
-
+	
 	PathJoin( Path, GamePath, GameCharacters, NULL );
 	if (!actor) {
 		return -1;
@@ -5019,9 +5039,9 @@ int Interface::WriteCharacter(const char *name, Actor *actor)
 		return -1;
 	}
 	FileStream str;
-
+	
 	str.Create( Path, name, IE_CHR_CLASS_ID );
-
+	
 	//this is not needed, because the chr header writer automatically
 	//calls it
 	//int size = gm->GetStoredFileSize (actor);
@@ -5040,13 +5060,13 @@ int Interface::WriteGame(const char *folder)
 	if (gm == NULL) {
 		return -1;
 	}
-
+	
 	int size = gm->GetStoredFileSize (game);
 	if (size > 0) {
-	 	//created streams are always autofree (close file on destruct)
+		//created streams are always autofree (close file on destruct)
 		//this one will be destructed when we return from here
 		FileStream str;
-
+		
 		str.Create( folder, GameNameResRef, IE_GAM_CLASS_ID );
 		int ret = gm->PutGame (&str, game);
 		if (ret <0) {
@@ -5068,13 +5088,13 @@ int Interface::WriteWorldMap(const char *folder)
 	if (wmm == NULL) {
 		return -1;
 	}
-
+	
 	int size = wmm->GetStoredFileSize (worldmap);
 	if (size > 0) {
-	 	//created streams are always autofree (close file on destruct)
+		//created streams are always autofree (close file on destruct)
 		//this one will be destructed when we return from here
 		FileStream str;
-
+		
 		str.Create( folder, WorldMapName, IE_WMP_CLASS_ID );
 		int ret = wmm->PutWorldMap (&str, worldmap);
 		if (ret <0) {
@@ -5093,7 +5113,7 @@ int Interface::WriteWorldMap(const char *folder)
 int Interface::CompressSave(const char *folder)
 {
 	FileStream str;
-
+	
 	str.Create( folder, GameNameResRef, IE_SAV_CLASS_ID );
 	DIR* dir = opendir( CachePath );
 	if (dir == NULL) {
@@ -5107,7 +5127,7 @@ int Interface::CompressSave(const char *folder)
 	//BIF and SAV are the same
 	ArchiveImporter * ai = (ArchiveImporter*)GetInterface(IE_BIF_CLASS_ID);
 	ai->CreateArchive( &str);
-
+	
 	do {
 		char dtmp[_MAX_PATH];
 		struct stat fst;
@@ -5132,57 +5152,57 @@ int Interface::GetMaximumAbility() { return MaximumAbility; }
 
 int Interface::GetStrengthBonus(int column, int value, int ex)
 {
-//to hit, damage, open doors, weight allowance
+	//to hit, damage, open doors, weight allowance
 	if (column<0 || column>3)
 		return -9999;
-
+	
 	if (value<0)
 		value = 0;
 	else if (value>25)
 		value = 25;
-
+	
 	if (ex<0)
 		ex=0;
 	else if (ex>100)
 		ex=100;
-
+	
 	return strmod[column*MaximumAbility+value]+strmodex[column*101+ex];
 }
 
 //only the first 3 columns are supported
 int Interface::GetIntelligenceBonus(int column, int value)
 {
-//learn spell, max spell level, max spell number on level
+	//learn spell, max spell level, max spell number on level
 	if (column<0 || column>2)
 		return -9999;
-
+	
 	return intmod[column*MaximumAbility+value];
 }
 
 int Interface::GetDexterityBonus(int column, int value)
 {
-//reaction, missile, ac
+	//reaction, missile, ac
 	if (column<0 || column>2)
 		return -9999;
-
+	
 	return dexmod[column*MaximumAbility+value];
 }
 
 int Interface::GetConstitutionBonus(int column, int value)
 {
-//normal, warrior, minimum, regen hp, regen fatigue
+	//normal, warrior, minimum, regen hp, regen fatigue
 	if (column<0 || column>4)
 		return -9999;
-
+	
 	return conmod[column*MaximumAbility+value];
 }
 
 int Interface::GetCharismaBonus(int column, int value)
 {
-//?reaction
+	//?reaction
 	if (column<0 || column>0)
 		return -9999;
-
+	
 	return chrmod[column*MaximumAbility+value];
 }
 
@@ -5204,7 +5224,7 @@ int Interface::Autopause(ieDword flag)
 		return -1;
 	}
 	ieDword autopause_flags = 0;
-
+	
 	vars->Lookup("Auto Pause State", autopause_flags);
 	if (autopause_flags & flag) {
 		DisplayConstantString(STR_AP_UNUSABLE+flag, 0xff0000);
@@ -5242,7 +5262,7 @@ void Interface::GetResRefFrom2DA(const ieResRef resref, ieResRef resource1, ieRe
 	}
 	int table = LoadTable(resref);
 	TableMgr *tab = GetTable(table);
-
+	
 	if (tab) {
 		unsigned int row = (unsigned int) Roll(1,tab->GetRowCount(),-1);
 		strnuprcpy(resource1, tab->QueryField(row,0), 8);

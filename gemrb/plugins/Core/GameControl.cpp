@@ -75,6 +75,12 @@ ieDword formationcount;
 static formation_type *formations=NULL;
 static bool mqs = false;
 
+void GameControl::SetTracker(Actor *actor, ieDword dist)
+{
+	trackerID = actor->GetID();
+	distance = dist;
+}
+
 void GameControl::MultipleQuickSaves(int arg)
 {
 	mqs=arg==1;
@@ -93,6 +99,8 @@ GameControl::GameControl(void)
 	spellCount = 0;
 	user = NULL;
 	lastActorID = 0;
+	trackerID = 0;
+	distance = 0;
 	MouseIsDown = false;
 	DrawSelectionRect = false;
 	overDoor = NULL;
@@ -242,6 +250,61 @@ void GameControl::QuickSave()
 	}
 }
 
+// ArrowSprite cycles
+//  321
+//  4 0
+//  567
+
+#define D_LEFT   1
+#define D_UP     2
+#define D_RIGHT  4
+#define D_BOTTOM 8
+// Direction Bits
+//  326
+//  1 4
+//  98c
+
+static const int arrow_orientations[16]={
+// 0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
+	-1, 4, 2, 3, 0,-1, 1,-1, 6, 5,-1,-1, 7,-1,-1,-1
+};
+
+//don't use reference for point!!!
+void GameControl::DrawArrowMarker(Region &screen, Point p, Region &viewport)
+{
+	Video* video = core->GetVideoDriver();
+
+	//p.x-=viewport.x;
+	//p.y-=viewport.y;
+	ieDword draw = 0;
+	if (p.x<viewport.x) {
+		p.x=viewport.x;
+		draw|= D_LEFT;
+	}
+	if (p.y<viewport.y) {
+		p.y=viewport.y;
+		draw |= D_UP;
+	}
+	int tmp;
+	
+	tmp = core->ArrowSprites[0]->Width;
+
+	if (p.x>viewport.x+viewport.w-tmp) {
+		p.x=viewport.x+viewport.w-tmp;
+		draw |= D_RIGHT;
+	}
+
+	tmp = core->ArrowSprites[0]->Height;
+
+	if (p.y>viewport.y+viewport.h-tmp) {
+		p.y=viewport.y+viewport.h-tmp;
+		draw |= D_BOTTOM;
+	}
+	if (arrow_orientations[draw]>=0) {
+		video->BlitGameSprite( core->ArrowSprites[arrow_orientations[draw]], p.x+screen.x, p.y+screen.y, 0, black, NULL);
+	}
+}
+
 /** Draws the Control on the Output Display */
 void GameControl::Draw(unsigned short x, unsigned short y)
 {
@@ -258,8 +321,8 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		ChangeMap(core->GetFirstSelectedPC(), false);
 	}
 	Video* video = core->GetVideoDriver();
+	Region viewport = video->GetViewport();
 	if (video->moveX || video->moveY) {
-		Region viewport = video->GetViewport();
 		viewport.x += video->moveX;
 		viewport.y += video->moveY;
 		core->timer->SetMoveViewPort( viewport.x, viewport.y, 0, false );
@@ -275,6 +338,25 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	//drawmap should be here so it updates fog of war
 	area->DrawMap( screen, this );
 	game->DrawWeather(screen, update_scripts);
+
+	if (trackerID) {
+		Actor *actor = area->GetActorByGlobalID(trackerID);
+		
+		if (actor) {
+			Actor **monsters = area->GetAllActorsInRadius(actor->Pos, GA_NO_DEAD, distance);
+			
+			int i = 0;
+			while(monsters[i]) {
+				Actor *target = monsters[i++];
+				if (target->InParty) continue;
+				//if (target->GetStat(IE_STATE_ID)&STATE_NOSAVE) continue;
+				DrawArrowMarker(screen, target->Pos, viewport);
+			}
+			delete monsters;
+		} else {
+			trackerID = 0;
+		}
+	}
 
 	//in multi player (if we ever get to it), only the server must call this
 	if (update_scripts) {
@@ -812,9 +894,9 @@ int GameControl::GetCursorOverContainer(Container *overContainer)
 		return IE_CURSOR_TAKE;
 	}
 	if (target_mode&TARGET_MODE_PICK) {
-		return IE_CURSOR_TRAP;
+		return IE_CURSOR_LOCK2;
 	}
-	return IE_CURSOR_PICK;
+	return IE_CURSOR_TAKE;
 }
 
 /** Mouse Over Event */
@@ -899,14 +981,14 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			nextCursor = IE_CURSOR_DEFEND;
 		} else if (target_mode & TARGET_MODE_PICK) {
 			if (lastActor) {
-			  nextCursor = IE_CURSOR_PICK;
-			  if (lastActor == core->GetFirstSelectedPC()) {
-			    nextCursor |= IE_CURSOR_GRAY;
-			  }
+				nextCursor = IE_CURSOR_PICK;
+				if (lastActor == core->GetFirstSelectedPC()) {
+					nextCursor |= IE_CURSOR_GRAY;
+				}
 			} else {
-			  if (!overContainer && !overDoor) {
-			    nextCursor = IE_CURSOR_STEALTH|IE_CURSOR_GRAY;
-			  }
+				if (!overContainer && !overDoor) {
+					nextCursor = IE_CURSOR_STEALTH|IE_CURSOR_GRAY;
+				}
 			}
 			goto end_function;
 		}
@@ -1412,7 +1494,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			if (game->selected.size()==1) {
 				Actor *source;
 				source = core->GetFirstSelectedPC();
-			  TryToPick(source, actor);
+				TryToPick(source, actor);
 			}
 			break;
 	}

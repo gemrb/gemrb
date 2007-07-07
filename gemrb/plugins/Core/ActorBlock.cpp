@@ -18,6 +18,7 @@
  * $Id$
  */
 #include "../../includes/win32def.h"
+#include "../../includes/strrefs.h"
 #include "ActorBlock.h"
 #include "Interface.h"
 #include "SpriteCover.h"
@@ -1342,21 +1343,29 @@ void Door::SetPolygon(bool Open, Gem_Polygon* poly)
 void Door::TryPickLock(Actor *actor)
 {
 	if (Trapped) {
+		LastPickLockFailed = actor->GetID();
+		LastTrigger = actor->GetID();
 		TrapDetected = 1;
 		//trap fired
 		if (!(Flags & DOOR_RESET) ) {
 			//trap removed
 			Trapped = 0;
 		}
+		ImmediateEvent();
 		return;
 	}
 	if (actor->GetStat(IE_LOCKPICKING)<LockDifficulty) {
 		if (LockDifficulty==100) {
-			//special message
+			core->DisplayConstantStringName(STR_DOOR_NOPICK, 0xffffff, actor);
+		} else {
+			core->DisplayConstantStringName(STR_DOOR_CANTPICK, 0xffffff, actor);
 		}
 		return;
 	}
 	SetDoorLocked( false, true);
+	core->DisplayConstantStringName(STR_LOCKPICK_DONE, 0xfffff, actor);
+	LastUnlocked = actor->GetID();
+	ImmediateEvent();
 	//add XP ?
 }
 
@@ -1452,7 +1461,7 @@ bool InfoPoint::VisibleTrap(bool see_all)
 }
 
 //trap that will fire now
-bool InfoPoint::TriggerTrap(int skill)
+bool InfoPoint::TriggerTrap(int skill, ieDword ID)
 {
 	if (Type!=ST_PROXIMITY) {
 		return true;
@@ -1472,6 +1481,7 @@ bool InfoPoint::TriggerTrap(int skill)
 			return false;
 		}
 	}
+	LastTrigger = LastEntered = ID;
 	ImmediateEvent();
 	if (Flags&TRAP_RESET) {
 		return true;
@@ -1502,8 +1512,7 @@ bool InfoPoint::Entered(Actor *actor)
 check:
 	if (actor->InParty || (Flags&TRAP_NPC) ) {
 		//skill?
-		if (TriggerTrap(0) ) {
-			LastTrigger = LastEntered = actor->GetID();
+		if (TriggerTrap(0, actor->GetID()) ) {
 			return true;
 		}
 	}
@@ -1709,6 +1718,43 @@ int Container::WantDither()
 	}
 	//if pile isn't highlighted, dither it if the polygon wants
 	return 1;
+}
+
+bool Container::IsOpen() const
+{
+	if (Flags&CONT_LOCKED) {
+		return false;
+	}
+	return true;
+}
+
+void Container::TryPickLock(Actor *actor)
+{
+	if (Trapped) {
+		LastPickLockFailed = actor->GetID();
+		LastTrigger = actor->GetID();
+		TrapDetected = 1;
+		//trap fired
+		if (!(Flags & CONT_RESET) ) {
+			//trap removed
+			Trapped = 0;
+		}
+		ImmediateEvent();
+		return;
+	}
+	if (actor->GetStat(IE_LOCKPICKING)<LockDifficulty) {
+		if (LockDifficulty==100) {
+			core->DisplayConstantStringName(STR_CONT_NOPICK, 0xffffff, actor);
+		} else {
+			core->DisplayConstantStringName(STR_CONT_CANTPICK, 0xffffff, actor);
+		}
+		return;
+	}
+	SetContainerLocked(false);
+	core->DisplayConstantStringName(STR_LOCKPICK_DONE, 0xfffff, actor);
+	LastUnlocked = actor->GetID();
+	ImmediateEvent();
+	//add XP ?
 }
 
 void Container::DebugDump()
