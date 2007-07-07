@@ -196,7 +196,8 @@ int fx_set_aid_state (Actor* Owner, Actor* target, Effect* fx);//81
 int fx_set_bless_state (Actor* Owner, Actor* target, Effect* fx);//82
 int fx_set_chant_state (Actor* Owner, Actor* target, Effect* fx);//83
 int fx_set_holy_state (Actor* Owner, Actor* target, Effect* fx);//84
-int fx_set_luck_state (Actor* Owner, Actor* target, Effect* fx);//85
+int fx_luck_non_cumulative (Actor* Owner, Actor* target, Effect* fx);//85
+int fx_luck_cumulative (Actor* Owner, Actor* target, Effect* fx);//85
 int fx_set_petrified_state (Actor* Owner, Actor* target, Effect* fx);//86
 int fx_polymorph (Actor* Owner, Actor* target, Effect* fx);//87
 int fx_force_visible (Actor* Owner, Actor* target, Effect* fx);//88
@@ -547,7 +548,8 @@ static EffectRef effectnames[] = {
 	{ "LevelDrainModifier", fx_leveldrain_modifier, -1 },
 	{ "LoreModifier", fx_lore_modifier, -1 },
 	{ "LuckModifier", fx_luck_modifier, -1 },
-	{ "LuckNonCumulative", fx_set_luck_state, -1 },
+	{ "LuckCumulative", fx_luck_cumulative, -1 },
+	{ "LuckNonCumulative", fx_luck_non_cumulative, -1 },
 	{ "MagicalColdResistanceModifier", fx_magical_cold_resistance_modifier, -1 },
 	{ "MagicalFireResistanceModifier", fx_magical_fire_resistance_modifier, -1 },
 	{ "MagicalRest", fx_magical_rest, -1 },
