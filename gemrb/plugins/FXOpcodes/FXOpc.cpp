@@ -28,6 +28,7 @@
 #include "../Core/ResourceMgr.h"
 #include "../Core/SoundMgr.h"
 #include "../Core/Game.h"
+#include "../Core/GameControl.h"
 #include "../Core/damages.h"
 #include "../Core/TileMap.h" //needs for knock!
 #include "../Core/GSUtils.h" //needs for movebetweenareascore
@@ -4714,13 +4715,26 @@ int fx_right_to_hit_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x133 Reveal:Tracks
-int fx_reveal_tracks (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_reveal_tracks (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_reveal_tracks (%2d): Distance: %d\n", fx->Opcode, fx->Parameter1 );
-	//write tracks.2da entry
-	//highlight all creatures
-	return FX_NOT_APPLIED; //this is an instant effect
+	Map *map = target->GetCurrentArea();
+	if (!map) return FX_APPLIED;
+	if (!fx->Parameter2) {
+		fx->Parameter2=1;
+		//write tracks.2da entry
+		if (map->DisplayTrackString(target)) {
+			return FX_NOT_APPLIED;
+		}
+	}
+	GameControl *gc = core->GetGameControl();
+	if (gc) {
+		//highlight all living creatures (not in party, but within range)
+		gc->SetTracker(target, fx->Parameter1);
+	}
+	return FX_APPLIED;
 }
+
 // 0x134 Protection:Tracking
 int fx_protection_from_tracking (Actor* /*Owner*/, Actor* target, Effect* fx)
 {

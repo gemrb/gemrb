@@ -349,7 +349,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			while(monsters[i]) {
 				Actor *target = monsters[i++];
 				if (target->InParty) continue;
-				//if (target->GetStat(IE_STATE_ID)&STATE_NOSAVE) continue;
+				if (target->GetStat(IE_NOTRACKING)) continue;
 				DrawArrowMarker(screen, target->Pos, viewport);
 			}
 			delete monsters;

@@ -20,6 +20,7 @@
  */
 
 #include "../../includes/win32def.h"
+#include "../../includes/strrefs.h"
 #include "AREImp.h"
 #include "../Core/TileMapMgr.h"
 #include "../Core/AnimationMgr.h"
@@ -90,6 +91,7 @@ void ReadAutonoteINI()
 int GetTrackString(const ieResRef areaName)
 {
 	int i;
+	bool trackflag = core->GetStringReference(STR_TRACKING)!=(ieStrRef) -1;
 
 	if (!tracks) {
 		int trackdata = core->LoadTable( "tracking" );
@@ -109,7 +111,7 @@ int GetTrackString(const ieResRef areaName)
 				tracks[i].trackFlag=false;
 				poi+=2;
 			} else {
-				tracks[i].trackFlag=true;
+				tracks[i].trackFlag=trackflag;
 			}
 			tracks[i].text=(ieStrRef) atoi(poi);
 			tracks[i].difficulty=atoi(tm->QueryField(i,1));

@@ -2716,15 +2716,23 @@ void Map::SetTrackString(ieStrRef strref, bool flg, int difficulty)
 	trackDiff = (ieWord) difficulty;
 }
 
-void Map::DisplayTrackString()
+bool Map::DisplayTrackString(Actor *target)
 {
+	ieDword skill = target->GetStat(IE_TRACKING);
+	//remove this, if it can succeed without skill
+	if (!skill) return true;
+	if (core->Roll(1,20,skill)<trackDiff) {
+		core->DisplayConstantStringName(STR_TRACKINGFAILED, 0xd7d7be, target);
+		return true;
+	}
 	if (trackFlag) {
 			char * str = core->GetString( trackString);
-			core->GetTokenDictionary()->SetAt( "CREATURES", str);
-			core->DisplayConstantString(STR_TRACKING, 0x808080);
-			return;
+			core->GetTokenDictionary()->SetAt( "CREATURE", str);
+			core->DisplayConstantStringName(STR_TRACKING, 0xd7d7be, target);
+			return false;
 	}
-	core->DisplayString(trackString, 0x808080, 0);
+	core->DisplayStringName(trackString, 0xd7d7be, target, 0);
+	return false;
 }
 
 ////////////////////AreaAnimation//////////////////

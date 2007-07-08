@@ -393,6 +393,8 @@ public:
 	Label *GetMessageLabel();
 	/** returns the textarea of the main game screen */
 	TextArea *GetMessageTextArea();
+	/** returns a string reference from a string reference index constant*/
+	ieStrRef GetStringReference(int stridx);
 	/** displays any string in the textarea */
 	void DisplayString(const char *txt);
 	/** displays a string constant in the textarea */

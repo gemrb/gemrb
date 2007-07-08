@@ -405,7 +405,8 @@ public:
 	int GetWeather();
 	void ClearTrap(Actor *actor, ieDword InTrap);
 	void SetTrackString(ieStrRef strref, bool flg, int difficulty);
-	void DisplayTrackString();
+	//returns true if tracking failed
+	bool DisplayTrackString(Actor *actor);
 private:
 	AreaAnimation *GetNextAreaAnimation(aniIterator &iter, ieDword gametime);
 	Particles *GetNextSpark(spaIterator &iter);
