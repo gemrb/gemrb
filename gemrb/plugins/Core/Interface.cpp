@@ -1578,6 +1578,7 @@ int Interface::Init()
 	ret = ReadStrrefs();
 	if (!ret) {
 		printStatus( "ERROR", LIGHT_RED );
+		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
 	
@@ -1603,7 +1604,7 @@ int Interface::Init()
 		printStatus( "OK", LIGHT_GREEN );
 	}
 	else {
-		printStatus( "ERROR", LIGHT_RED );
+		printStatus( "NOT FOUND", YELLOW );
 	}
 	
 	printMessage( "Core", "Reading item tables...\n", WHITE);
