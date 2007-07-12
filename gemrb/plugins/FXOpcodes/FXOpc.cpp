@@ -31,11 +31,12 @@
 #include "../Core/GameControl.h"
 #include "../Core/damages.h"
 #include "../Core/TileMap.h" //needs for knock!
-#include "../Core/GSUtils.h" //needs for movebetweenareascore
+#include "../Core/GSUtils.h" //needs for MoveBetweenAreasCore
 #include "FXOpc.h"
 
 //FIXME: find a way to handle portrait icons better
 #define PI_HELD    13
+#define PI_SLEEP   14
 #define PI_BLESS   17
 #define PI_HASTED  38
 #define PI_FATIGUE 39
@@ -180,7 +181,7 @@ int fx_remove_item (Actor* Owner, Actor* target, Effect* fx);//70
 int fx_equip_item (Actor* Owner, Actor* target, Effect* fx);//71
 int fx_dither (Actor* Owner, Actor* target, Effect* fx);//72
 int fx_detect_alignment (Actor* Owner, Actor* target, Effect* fx);//73
-int fx_cure_improved_invisible_state (Actor* Owner, Actor* target, Effect* fx);//74
+//int fx_cure_improved_invisible_state (Actor* Owner, Actor* target, Effect* fx);//74 (2f)
 int fx_reveal_area (Actor* Owner, Actor* target, Effect* fx);//75
 int fx_reveal_creatures (Actor* Owner, Actor* target, Effect* fx);//76
 int fx_mirror_image (Actor* Owner, Actor* target, Effect* fx);//77
@@ -466,8 +467,9 @@ static EffectRef effectnames[] = {
 	{ "Cure:Hold", fx_cure_hold_state, -1 },
 	{ "Cure:Imprisonment", fx_freedom, -1 },
 	{ "Cure:Infravision", fx_cure_infravision_state, -1 },
-	{ "Cure:Invisible", fx_cure_invisible_state, -1 },
-	{ "Cure:ImprovedInvisible", fx_cure_improved_invisible_state, -1 },
+	{ "Cure:Invisible", fx_cure_invisible_state, -1 },  //0x2f
+	{ "Cure:Invisible2", fx_cure_invisible_state, -1 }, //0x74
+	//{ "Cure:ImprovedInvisible", fx_cure_improved_invisible_state, -1 },
 	{ "Cure:LevelDrain", fx_cure_leveldrain, -1}, //restoration
 	{ "Cure:Nondetection", fx_cure_nondetection_state, -1 },
 	{ "Cure:Panic", fx_cure_panic_state, -1 },
@@ -834,12 +836,15 @@ int fx_attacks_per_round_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 // this effect clears the STATE_SLEEP (1) bit, but clearing it alone wouldn't remove the
 // unconscious effect, which is combined with STATE_HELPLESS (0x20+1)
 static EffectRef fx_set_sleep_state_ref={"State:Helpless",NULL,-1};
+//this reference is used by many other effects
+static EffectRef fx_display_portrait_icon_ref={"Icon:Display",NULL,-1};
 
 int fx_cure_sleep_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_sleep_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	BASE_STATE_CURE( STATE_SLEEP );
 	target->fxqueue.RemoveAllEffects(fx_set_sleep_state_ref);
+	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_SLEEP);
 	return FX_NOT_APPLIED;
 }
 
@@ -1099,9 +1104,6 @@ int fx_dexterity_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 static EffectRef fx_set_slow_state_ref={"State:Slowed",NULL,-1};
-//this reference is used by many other effects
-static EffectRef fx_display_portrait_icon_ref={"Icon:Display",NULL,-1};
-
 // 0x10 State:Hasted
 // this function removes slowed state, or sets hasted state
 int fx_set_hasted_state (Actor* /*Owner*/, Actor* target, Effect* fx)
@@ -1604,6 +1606,7 @@ int fx_cure_stun_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x2F Cure:Invisible
+// 0x74 Cure:Invisible2
 static EffectRef fx_set_invisible_state_ref={"State:Invisible",NULL,-1};
 
 int fx_cure_invisible_state (Actor* /*Owner*/, Actor* target, Effect* fx)
@@ -2552,21 +2555,12 @@ int fx_detect_alignment (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-// 0x74 Cure:ImprovedInvisible
-int fx_cure_improved_invisible_state (Actor* /*Owner*/, Actor* target, Effect* fx)
-{
-	if (0) printf( "fx_cure_improved_invisible_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	//the modified state will be cured automagically when the invis effect is removed
-	BASE_STATE_CURE( STATE_INVISIBLE );
-	BASE_STATE_CURE( STATE_INVIS2 );
-	target->fxqueue.RemoveAllEffects(fx_set_invisible_state_ref);
-	return FX_NOT_APPLIED;
-}
+// 0x74 Cure:Invisible2 (see 0x2f)
 
 // 0x75 Reveal:Area
 int fx_reveal_area (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_cure_improved_invisible_state (%2d): Value: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_reveal_area (%2d): Value: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	//reveals whole area
 	if (fx->Parameter2) {
 		target->GetCurrentArea()->Explore(fx->Parameter1);
@@ -4798,14 +4792,14 @@ int fx_golem_stoneskin_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-// 0x13b AvatarRemovalModifier
+// 0x13b AvatarRemovalModifier (also 0x104 iwd)
 int fx_avatar_removal_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_avatar_removal_modifier (%2d): Mod: %d\n", fx->Opcode, fx->Parameter2 );
 	STAT_SET(IE_AVATARREMOVAL, fx->Parameter2);
 	return FX_APPLIED;
 }
-// 0x13c MagicalRest (also 0x124 Rest)
+// 0x13c MagicalRest (also 0x124 iwd)
 int fx_magical_rest (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_magical_rest (%2d)\n", fx->Opcode );

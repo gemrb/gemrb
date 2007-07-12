@@ -115,7 +115,7 @@ IDS
 0x71	Item:Equip
 0x72	Dither
 0x73	DetectAlignment
-0x74	Cure:ImprovedInvisible
+0x74	Cure:Invisible2
 0x75	Reveal:Area
 0x76	Reveal:Creatures
 0x77	MirrorImage
