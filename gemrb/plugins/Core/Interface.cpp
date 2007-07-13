@@ -546,8 +546,8 @@ these events are pending until conditions are right
 void Interface::HandleEvents()
 {
 	GameControl *gc = GetGameControl();
-	if (!gc || !gc->Owner || !gc->Owner->Visible) {
-		return;
+	if (gc && (!gc->Owner || !gc->Owner->Visible)) {
+		gc=NULL;
 	}
 	
 	if (EventFlag&EF_UPDATEANIM) {
@@ -564,7 +564,7 @@ void Interface::HandleEvents()
 		}
 	}
 	
-	if (EventFlag&EF_CONTROL) {
+	if ((EventFlag&EF_CONTROL) && gc) {
 		EventFlag&=~EF_CONTROL;
 		guiscript->RunFunction( "UpdateControlStatus" );
 		//this is the only value we can use here
@@ -574,14 +574,12 @@ void Interface::HandleEvents()
 			gc->UnhideGUI();
 		return;
 	}
-	if (EventFlag&EF_SHOWMAP) {
-		if (gc && gc->Owner && gc->Owner->Visible) {
-			ieDword tmp = (ieDword) ~0;
-			vars->Lookup( "OtherWindow", tmp );
-			if (tmp == (ieDword) ~0) {
-				EventFlag &= ~EF_SHOWMAP;
-				guiscript->RunFunction( "ShowMap" );
-			}
+	if ((EventFlag&EF_SHOWMAP) && gc) {
+		ieDword tmp = (ieDword) ~0;
+		vars->Lookup( "OtherWindow", tmp );
+		if (tmp == (ieDword) ~0) {
+			EventFlag &= ~EF_SHOWMAP;
+			guiscript->RunFunction( "ShowMap" );
 		}
 		return;
 	}
@@ -4083,7 +4081,7 @@ static const char* DisplayFormatValue = "[/color][p][color=%lX]%s: %d[/color][/p
 
 ieStrRef Interface::GetStringReference(int stridx)
 {
-  return strref_table[stridx];
+	return strref_table[stridx];
 }
 
 void Interface::DisplayConstantString(int stridx, unsigned int color)

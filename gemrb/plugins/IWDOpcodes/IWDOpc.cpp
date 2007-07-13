@@ -1391,7 +1391,10 @@ int fx_turn_undead2 (Actor* Owner, Actor* target, Effect* fx)
 		target->Panic();
 		break;
 	case 1://rebuke
-		target->Panic();
+		if (target->SetSpellState(SS_REBUKED)) {
+			//display string rebuked
+		}
+		STAT_SUB(IE_ARMORCLASS,4);
 		break;
 	case 2://destroy
 		target->Die(Owner);

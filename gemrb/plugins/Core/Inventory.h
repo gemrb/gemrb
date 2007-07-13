@@ -273,14 +273,14 @@ public:
 	int GetEquippedSlot();
 	//left hand
 	int GetShieldSlot();
-	void AddSlotEffects( CREItem* slot, int type);
+	void AddSlotEffects( ieDword slot);
 	//void AddAllEffects();
 	/** Returns item in specified slot. Does NOT change inventory */
-	CREItem* GetSlotItem(unsigned int slot);
-	bool ChangeItemFlag(unsigned int slot, ieDword value, int mode);
+	CREItem* GetSlotItem(ieDword slot);
+	bool ChangeItemFlag(ieDword slot, ieDword value, int mode);
 	/** Equips the item, don't use it directly for weapons */
-	bool EquipItem(unsigned int slot);
-	bool UnEquipItem(unsigned int slot, bool removecurse);
+	bool EquipItem(ieDword slot);
+	bool UnEquipItem(ieDword slot, bool removecurse);
 	/** Returns equipped weapon */
 	CREItem *GetUsedWeapon(bool leftorright);
 	/** returns slot of launcher weapon currently equipped */
@@ -288,7 +288,7 @@ public:
 	/** returns slot of launcher weapon for specified projectile type */
 	int FindTypedRangedWeapon(unsigned int type);
 	/** returns slot of launcher weapon for projectile in specified slot */
-	int FindSlotRangedWeapon(unsigned int slot);
+	int FindSlotRangedWeapon(ieDword slot);
 	/** Returns a slot which might be empty, or capable of holding item (or part of it) */
 	int FindCandidateSlot(int slottype, size_t first_slot, const char *resref = NULL);
 	/** Creates an item in the slot*/
@@ -303,8 +303,6 @@ public:
 	void EquipBestWeapon(int flags);
 	/** returns the struct of the usable items, returns true if there are more */
 	bool GetEquipmentInfo(ItemExtHeader *array, int startindex, int count);
-	/** uses the item in the given slot */
-	bool UseItem(unsigned int slotindex, unsigned int headerindex, Actor *target);
 	/** returns the exclusion bits */
 	ieDword GetEquipExclusion() const;
 	/** returns if a slot is temporarily blocked */
@@ -333,8 +331,8 @@ public:
 private:
 	int FindRangedProjectile(unsigned int type);
 	// called by KillSlot
-	void RemoveSlotEffects( CREItem* slot );
-	void KillSlot(unsigned int index);
+	void RemoveSlotEffects( /*CREItem* slot*/ ieDword slot );
+	void KillSlot(ieDword index);
 	inline const Item *GetItemPointer(ieDword slot, CREItem *&Slot);
 	void UpdateWeaponAnimation();
 	void UpdateShieldAnimation(Item *it);

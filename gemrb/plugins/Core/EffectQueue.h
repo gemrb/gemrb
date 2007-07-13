@@ -174,7 +174,9 @@ public:
 	/* directly removes effects with specified opcode, use effect_reference when you can */
 	void RemoveAllEffects(ieDword opcode);
 	void RemoveAllEffectsWithResource(ieDword opcode, const ieResRef resource);
-	void RemoveEquippingEffects(EffectQueue &target);
+
+	/* removes equipping effects with specified inventory slot code */
+	void RemoveEquippingEffects(ieDwordSigned slotcode);
 
 	/* removes all effects of a given spell */
 	void RemoveAllEffects(ieResRef Removed);
@@ -206,7 +208,7 @@ public:
 	ieDword GetSavedEffectsCount() const;
 	size_t GetEffectsCount() const { return effects.size(); }
 	/* this method hacks the offhand weapon color effects */
-	void HackColorEffects(int type);
+	static void HackColorEffects(Actor *Owner, Effect *fx);
 	static Effect *CreateEffect(EffectRef &effect_reference, ieDword param1, ieDword param2, ieDword timing);
 
 	//locating opcodes

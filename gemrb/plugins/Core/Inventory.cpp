@@ -182,10 +182,12 @@ void Inventory::CalculateWeight()
 	Changed = false;
 }
 
-//hmm, dunno how to implement type
-void Inventory::AddSlotEffects(CREItem* slot, int type)
+void Inventory::AddSlotEffects(ieDword index)
 {
-	Item* itm = core->GetItem( slot->ItemResRef );
+	CREItem* slot;
+
+	const Item *itm = GetItemPointer(index, slot);
+	//Item* itm = core->GetItem( slot->ItemResRef );
 	if (!itm) {
 		printMessage("Inventory","Invalid item equipped...\n",LIGHT_RED);
 		return;
@@ -198,29 +200,21 @@ void Inventory::AddSlotEffects(CREItem* slot, int type)
 	}
 	
 	//get the equipping effects
-	EffectQueue *eqfx = itm->GetEffectBlock(-1);
+	EffectQueue *eqfx = itm->GetEffectBlock(-1, index, 0);
 	core->FreeItem( itm, slot->ItemResRef, false );
 
 	//make any adjustments necessary for off-hand weapon colours
-	eqfx->HackColorEffects(type);
+	//eqfx->HackColorEffects();
 	Owner->RefreshEffects(eqfx);
 	core->SetEventFlag(EF_UPDATEANIM);
 }
 
-void Inventory::RemoveSlotEffects(CREItem* slot)
+//no need to know the item effects 'personally', the equipping slot
+//is stored in them
+void Inventory::RemoveSlotEffects(ieDword index)
 {
-	if (!slot)
-		return;
-	Item* itm = core->GetItem( slot->ItemResRef );
-	if (!itm)
-		return;
-	ItemExcl&=~itm->ItemExcl;
-	//collect equipping effects
-	EffectQueue *eqfx = itm->GetEffectBlock(-1);
-	core->FreeItem( itm, slot->ItemResRef, false );
-	//remove all matching equipping effects from Owner's effect queue
-	eqfx->RemoveEquippingEffects(Owner->fxqueue);
-	delete eqfx;
+	Owner->fxqueue.RemoveEquippingEffects(index);
+	Owner->RefreshEffects(NULL);
 	//call gui for possible paperdoll animation changes
 	core->SetEventFlag(EF_UPDATEANIM);
 }
@@ -322,7 +316,7 @@ void Inventory::KillSlot(unsigned int index)
 	if (!effect) {
 		return;
 	}
-	RemoveSlotEffects( item );
+	RemoveSlotEffects( index );
 	Item *itm = core->GetItem(item->ItemResRef);
 	switch (effect) {
 		case SLOT_EFFECT_LEFT:
@@ -342,7 +336,9 @@ void Inventory::KillSlot(unsigned int index)
 			Owner->SetUsedHelmet("");
 			break;
 		case SLOT_EFFECT_ITEM:
-			Owner->SetBase(IE_ARMOR_TYPE, 0);
+			if (itm->AnimationType[0]-'1') {
+				Owner->SetBase(IE_ARMOR_TYPE, 0);
+			}
 			break;
 	}
 	core->FreeItem(itm, item->ItemResRef, false);
@@ -800,7 +796,7 @@ bool Inventory::EquipItem(unsigned int slot)
 		if (item->Flags & IE_INV_ITEM_CURSED) {
 			item->Flags|=IE_INV_ITEM_UNDROPPABLE;
 		}
-		AddSlotEffects( item, effect );
+		AddSlotEffects( slot );
 	}
 	return true;
 }
@@ -1015,7 +1011,7 @@ int Inventory::GetEquippedSlot()
 bool Inventory::SetEquippedSlot(int slotcode)
 {
 	if (Equipped != IW_NO_EQUIPPED) {
-		RemoveSlotEffects( GetSlotItem(SLOT_MELEE+Equipped) );
+		RemoveSlotEffects( SLOT_MELEE+Equipped);
 	}
 
 	//doesn't work if magic slot is used
@@ -1042,7 +1038,7 @@ bool Inventory::SetEquippedSlot(int slotcode)
 		if (item->Flags & IE_INV_ITEM_CURSED) {
 			item->Flags|=IE_INV_ITEM_UNDROPPABLE;
 		}
-		AddSlotEffects( item, effects);
+		AddSlotEffects( SLOT_MELEE+Equipped);
 	}
 	UpdateWeaponAnimation();
 	return true;
@@ -1316,33 +1312,6 @@ bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count
 	}
 
 	return false;
-}
-
-bool Inventory::UseItem(unsigned int slotindex, unsigned int headerindex, Actor *target)
-{
-	if (slotindex >= Slots.size())
-		return false;
-	CREItem *slot = Slots[slotindex];
-
-	if (!slot || !slot->ItemResRef[0]) {
-		return false;
-	}
-	unsigned short usagecount;
-
-	if (headerindex>2) {
-		usagecount=0;
-	} else {
-		usagecount = slot->Usages[headerindex];
-	}
-	const Item *itm = core->GetItem(slot->ItemResRef);
-	if (!itm) {
-		return false;
-	}
-	
-	EffectQueue *fxqueue = itm->GetEffectBlock(headerindex);
-	core->FreeItem(itm, slot->ItemResRef, false);
-	fxqueue->ApplyAllEffects(target);
-	return true;
 }
 
 ieDword Inventory::GetEquipExclusion() const

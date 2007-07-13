@@ -45,7 +45,7 @@ Item::~Item(void)
 
 //-1 will return equipping feature block
 //otherwise returns the n'th feature block
-EffectQueue *Item::GetEffectBlock(int usage) const
+EffectQueue *Item::GetEffectBlock(int usage, ieDwordSigned invslot, ieDword pro) const
 {
 	Effect *features;
 	int count;
@@ -63,14 +63,20 @@ EffectQueue *Item::GetEffectBlock(int usage) const
 	EffectQueue *fxqueue = new EffectQueue();
 	
 	for (int i=0;i<count;i++) {
-		fxqueue->AddEffect( features+i );
+		Effect *fx = features+i;
+		fx->InventorySlot=invslot;
+		fx->Projectile=pro;
+		fxqueue->AddEffect( fx );
 	}
 
 	//adding a pulse effect for weapons (PST)
-	if (WieldColor!=0xffff) {
+	//if it is an equipping effect block
+	if ((usage==-1) && (WieldColor!=0xffff)) {
 		if (Flags&IE_ITEM_PULSATING) {
 			Effect *tmp = BuildGlowEffect(WieldColor);
 			if (tmp) {
+				tmp->InventorySlot = invslot;
+				tmp->Projectile=pro;
 				fxqueue->AddEffect( tmp );
 				delete tmp;
 			}
@@ -135,14 +141,15 @@ int Item::UseCharge(ieWord *Charges, int header) const
 }
 
 //returns a projectile loaded with the effect queue
-Projectile *Item::GetProjectile(int header) const
+Projectile *Item::GetProjectile(ieDwordSigned invslot, int header) const
 {
 	ITMExtHeader *eh = GetExtHeader(header);
 	if (!eh) {
 		return NULL;
 	}
-	EffectQueue *fx = GetEffectBlock(header);
-	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(eh->ProjectileAnimation);
+	ieDword idx = eh->ProjectileAnimation;
+	EffectQueue *fx = GetEffectBlock(header, invslot, idx);
+	Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(idx);
 	pro->SetEffects(fx);
 	return pro;
 }

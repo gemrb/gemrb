@@ -173,12 +173,14 @@ static EffectRef diced_effects2[] = {
 	{"LichTouch",NULL,-1}, //how
 {NULL,NULL,0} };
 
+/*
 //effects that take a color slot as parameter
 static EffectRef colorslot_effects[] = {
 	{"Color:SetPalette",NULL,-1},
 	{"Color:SetRGB",NULL,-1},
 	{"Color:PulseRGB",NULL,-1},
 {NULL,NULL,0} };
+*/
 
 inline static void ResolveEffectRef(EffectRef &effect_reference)
 {
@@ -259,10 +261,11 @@ bool Init_EffectQueue()
 	for (i=0;diced_effects2[i].Name;i++) {
 		ResolveEffectRef(diced_effects2[i]);
 	}
+	/*
 	for (i=0;colorslot_effects[i].Name;i++) {
 		ResolveEffectRef(colorslot_effects[i]);
 	}
-
+*/
 	return true;
 }
 
@@ -520,6 +523,7 @@ bool IsDicedEffect2(int opcode)
 	return false;
 }
 
+/*
 bool IsColorslotEffect(int opcode)
 {
 	int i;
@@ -531,6 +535,7 @@ bool IsColorslotEffect(int opcode)
 	}
 	return false;
 }
+*/
 
 //resisted effect based on level
 inline bool check_level(Actor *target, Effect *fx)
@@ -822,6 +827,8 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 
 #define MATCH_OPCODE() if((*f)->Opcode!=opcode) { continue; }
 
+#define MATCH_SLOTCODE() if((*f)->InventorySlot!=slotcode) { continue; }
+
 #define MATCH_LIVE_FX() {ieDword tmp=(*f)->TimingMode; \
 		if (tmp!=FX_DURATION_INSTANT_LIMITED && \
 			tmp!=FX_DURATION_INSTANT_PERMANENT && \
@@ -852,12 +859,14 @@ void EffectQueue::RemoveAllEffects(ieDword opcode)
 //call this on the item's effectqueue, pass the wearer's effectqueue
 //it will remove all effects from target that were originating from
 //this effectqueue (the item's)
-void EffectQueue::RemoveEquippingEffects(EffectQueue &target)
+void EffectQueue::RemoveEquippingEffects(ieDwordSigned slotcode)
 {
 	std::list< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		if ((*f)->TimingMode!=FX_DURATION_INSTANT_WHILE_EQUIPPED) continue;
-		target.RemoveEffect(*f);
+		MATCH_SLOTCODE();
+
+		(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;
 	}
 }
 
@@ -1234,6 +1243,7 @@ bool EffectQueue::Persistent(Effect* fx)
 }
 
 //fix the effect color locations based on the item's equipping location
+/*
 void EffectQueue::HackColorEffects(int type)
 {
 	std::list< Effect* >::iterator f;
@@ -1252,6 +1262,20 @@ void EffectQueue::HackColorEffects(int type)
 			fx->Parameter2 |= gradienttype;
 		}	
 	}		
+}
+*/
+
+//alter the color effect in case the item is equipped in the shield slot
+void EffectQueue::HackColorEffects(Actor *Owner, Effect *fx)
+{
+	if (fx->InventorySlot!=Owner->inventory.GetShieldSlot()) return;
+
+	unsigned int gradienttype = fx->Parameter2 & 0xF0;
+	if (gradienttype == 0x10) {
+		gradienttype = 0x20; // off-hand
+		fx->Parameter2 &= ~0xF0;
+		fx->Parameter2 |= gradienttype;
+	}
 }
 
 //iterate through saved effects

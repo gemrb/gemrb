@@ -92,10 +92,10 @@
 #define STR_DIRECHARMED     58
 #define STR_CONTROLLED      59
 #define STR_EVIL            60
-#define STR_GNE_NEUTRAL     61
+#define STR_GE_NEUTRAL      61
 #define STR_GOOD            62
 #define STR_LAWFUL          63
-#define STR_LNC_NEUTRAL     64
+#define STR_LC_NEUTRAL      64
 #define STR_CHAOTIC         65
 #define STR_ACTION_CAST     66
 #define STR_ACTION_ATTACK   67

@@ -191,5 +191,6 @@
 #define SS_LUCK         141
 //tested for this, splstate is wrong or this entry has two uses
 #define SS_DAYBLINDNESS 178
+#define SS_REBUKED      179
 
 #endif //IE_OPCODE_PARAMS_H

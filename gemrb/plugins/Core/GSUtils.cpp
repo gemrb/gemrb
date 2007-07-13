@@ -136,7 +136,7 @@ int GetHappiness(Scriptable* Sender, int reputation)
 		return 0;
 	}
 	Actor* ab = ( Actor* ) Sender;
-	int alignment = ab->GetStat(IE_ALIGNMENT)&AL_GNE_MASK; //good, neutral, evil
+	int alignment = ab->GetStat(IE_ALIGNMENT)&AL_GE_MASK; //good / evil
 	if (reputation>19) {
 		reputation=19;
 	}

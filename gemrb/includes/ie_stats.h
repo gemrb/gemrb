@@ -65,11 +65,14 @@
 #define SEX_SUMMON    6
 
 //alignment values
-#define AL_GNE_MASK    3  //good neutral evil
+#define AL_GE_MASK     3  //good / evil
 #define AL_GOOD        1
-#define AL_GNE_NEUTRAL 2
+#define AL_GE_NEUTRAL  2
 #define AL_EVIL        3
-#define AL_LNC_MASK    0x30 //lawful neutral evil
+#define AL_LC_MASK     0x30 //lawful / chaotic
+#define AL_LAWFUL      0x10
+#define AL_LC_NEUTRAL  0x20
+#define AL_CHAOTIC     0x30
 
 //state bits (IE_STATE)
 #define STATE_SLEEP      0x00000001

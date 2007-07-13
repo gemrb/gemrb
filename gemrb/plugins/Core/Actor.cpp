@@ -3321,7 +3321,7 @@ int Actor::SetEquippedQuickSlot(int slot)
 //if target is a non living scriptable, then we simply shoot for its position
 //the fx should get a NULL target, and handle itself by using the position
 //(shouldn't crash when target is NULL)
-bool Actor::UseItemPoint(int slot, ieDword header, Point &target, bool silent)
+bool Actor::UseItemPoint(ieDword slot, ieDword header, Point &target, bool silent)
 {
 	CREItem *item = inventory.GetSlotItem(slot);
 	if (!item)
@@ -3332,7 +3332,7 @@ bool Actor::UseItemPoint(int slot, ieDword header, Point &target, bool silent)
 		return false;
 	}
 
-	Projectile *pro = itm->GetProjectile(header);
+	Projectile *pro = itm->GetProjectile(slot, header);
 	ChargeItem(slot, header, item, itm, silent);
 	core->FreeItem(itm,item->ItemResRef, false);
 	if (pro) {
@@ -3343,7 +3343,7 @@ bool Actor::UseItemPoint(int slot, ieDword header, Point &target, bool silent)
 	return false;
 }
 
-bool Actor::UseItem(int slot, ieDword header, Scriptable* target, bool silent)
+bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, bool silent)
 {
 	if (target->Type!=ST_ACTOR) {
 		return UseItemPoint(slot, header, target->Pos, silent);
@@ -3359,7 +3359,7 @@ bool Actor::UseItem(int slot, ieDword header, Scriptable* target, bool silent)
 		return false;
 	}
 
-	Projectile *pro = itm->GetProjectile(header);
+	Projectile *pro = itm->GetProjectile(slot, header);
 	ChargeItem(slot, header, item, itm, silent);
 	core->FreeItem(itm,item->ItemResRef, false);
 	if (pro) {
@@ -3370,7 +3370,7 @@ bool Actor::UseItem(int slot, ieDword header, Scriptable* target, bool silent)
 	return false;
 }
 
-void Actor::ChargeItem(int slot, ieDword header, CREItem *item, Item *itm, bool silent)
+void Actor::ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, bool silent)
 {
 	if (!itm) {
 		item = inventory.GetSlotItem(slot);

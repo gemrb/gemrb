@@ -750,16 +750,16 @@ static inline void HandleBonus(Actor *target, int stat, int mod, int mode)
 {
 	if (mode==FX_DURATION_INSTANT_PERMANENT) {
 		if (target->IsReverseToHit()) {
-			BASE_SUB( stat, mod );
-		} else {
 			BASE_ADD( stat, mod );
+		} else {
+			BASE_SUB( stat, mod );
 		}
 		return;
 	}
 	if (target->IsReverseToHit()) {
-		STAT_SUB( stat, mod );
-	} else {
 		STAT_ADD( stat, mod );
+	} else {
+		STAT_SUB( stat, mod );
 	}
 }
 
@@ -940,7 +940,7 @@ int fx_charisma_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_color_gradient (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_color_gradient (%2d): Gradient: %d, Location: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-
+	EffectQueue::HackColorEffects(target, fx);
 	target->SetColor( fx->Parameter2, fx->Parameter1 );
 	return FX_APPLIED;
 }
@@ -949,7 +949,7 @@ int fx_set_color_gradient (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_color_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_color_rgb (%2d): RGB: %x, Location: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-
+	EffectQueue::HackColorEffects(target, fx);
 	ieDword location = fx->Parameter2 & 0xff;
 	target->SetColorMod(location, RGBModifier::ADD, -1, fx->Parameter1 >> 8,
 			fx->Parameter1 >> 16, fx->Parameter1 >> 24);
@@ -960,7 +960,7 @@ int fx_set_color_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_color_rgb_global (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_color_rgb_global (%2d): RGB: %x, Location: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-
+	
 	target->SetColorMod(0xff, RGBModifier::ADD, -1, fx->Parameter1 >> 8,
 			fx->Parameter1 >> 16, fx->Parameter1 >> 24);
 
@@ -971,7 +971,7 @@ int fx_set_color_rgb_global (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_color_pulse_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_color_pulse_rgb (%2d): RGB: %x, Location: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-
+	EffectQueue::HackColorEffects(target, fx);
 	ieDword location = fx->Parameter2 & 0xff;
 	int speed = (fx->Parameter2 >> 16) & 0xFF;
 	target->SetColorMod(location, RGBModifier::ADD, speed,
@@ -1659,7 +1659,7 @@ int fx_brief_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_darken_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_darken_rgb (%2d): RGB: %d, Location and speed: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-
+	EffectQueue::HackColorEffects(target, fx);
 	ieDword location = fx->Parameter2 & 0xff;
 	target->SetColorMod(location, RGBModifier::TINT, -1, fx->Parameter1 >> 8,
 			fx->Parameter1 >> 16, fx->Parameter1 >> 24);
@@ -1669,7 +1669,7 @@ int fx_darken_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_glow_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_glow_rgb (%2d): RGB: %d, Location and speed: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-
+	EffectQueue::HackColorEffects(target, fx);
 	ieDword location = fx->Parameter2 & 0xff;
 	target->SetColorMod(location, RGBModifier::BRIGHTEN, -1,
 			fx->Parameter1 >> 8, fx->Parameter1 >> 16,
@@ -1743,7 +1743,7 @@ int fx_alignment_invert (Actor* /*Owner*/, Actor* target, Effect* fx)
 	register ieDword newalign = target->GetStat( IE_ALIGNMENT );
 	//compress the values. GNE is the first 2 bits originally
 	//LNC is the 4/5. bits.
-	newalign = (newalign & AL_GNE_MASK) | ((newalign & AL_LNC_MASK)>>2);
+	newalign = (newalign & AL_GE_MASK) | ((newalign & AL_LC_MASK)>>2);
 	switch (fx->Parameter2) {
 	default:
 		newalign = al_switch_both[newalign];
@@ -2533,24 +2533,62 @@ int fx_dither (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 }
 
 //0x73 DetectAlignment
+//gemrb extension: chaotic/lawful detection
 int fx_detect_alignment (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	ieDword msk = fx->Parameter2+1;
-	if ( (target->GetStat(IE_ALIGNMENT)&AL_GNE_MASK) == msk) {
-		switch (msk) {
-			case AL_EVIL:
-				core->DisplayConstantStringName(STR_EVIL, 0xff0000, target);
-				//glow red
-				break;
-			case AL_GOOD:
-				core->DisplayConstantStringName(STR_GOOD, 0x00ff00, target);
-				//glow green
-				break;
-			case AL_GNE_NEUTRAL:
-				core->DisplayConstantStringName(STR_GNE_NEUTRAL, 0x00ff00, target);
-				//glow blue
-				break;
-		}
+	ieDword msk;
+	ieDword stat;
+
+	if (fx->Parameter2<3) {
+		//0,1,2 -> 1,2,3
+		msk = fx->Parameter2+1;
+		stat = target->GetStat(IE_ALIGNMENT)&AL_GE_MASK;
+	}
+	else {
+		//3,4,5 -> 0x10, 0x20, 0x30
+		msk = (fx->Parameter2-2)<<4;
+		stat = target->GetStat(IE_ALIGNMENT)&AL_LC_MASK;
+	}
+	if (stat != msk) return FX_NOT_APPLIED;
+	
+	ieDword color = fx->Parameter1;
+	switch (msk) {
+	case AL_EVIL:
+		if (!color) color = 0xff0000;
+		core->DisplayConstantStringName(STR_EVIL, color, target);
+		//glow red
+		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0xff, 0, 0, 0);
+		break;
+	case AL_GOOD:
+		if (!color) color = 0xff00;
+		core->DisplayConstantStringName(STR_GOOD, color, target);
+		//glow green
+		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0, 0xff, 0, 0);
+		break;
+	case AL_GE_NEUTRAL:
+		if (!color) color = 0xff;
+		core->DisplayConstantStringName(STR_GE_NEUTRAL, color, target);
+		//glow blue
+		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0, 0, 0xff, 0);
+		break;
+	case AL_CHAOTIC:
+		if (!color) color = 0xff00ff;
+		core->DisplayConstantStringName(STR_CHAOTIC, color, target);
+		//glow purple
+		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0xff, 0, 0xff, 0);
+		break;
+	case AL_LAWFUL:
+		if (!color) color = 0xffffff;
+		core->DisplayConstantStringName(STR_LAWFUL, color, target);
+		//glow white
+		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0xff, 0xff, 0xff, 0);
+		break;
+	case AL_LC_NEUTRAL:
+		if (!color) color = 0xff;
+		core->DisplayConstantStringName(STR_LC_NEUTRAL, color, target);
+		//glow blue
+		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0, 0, 0xff, 0);
+		break;
 	}
 	return FX_NOT_APPLIED;
 }
@@ -3503,7 +3541,7 @@ int fx_find_familiar (Actor* Owner, Actor* target, Effect* fx)
 			alignment = fx->Parameter1;
 		} else {
 			alignment = Owner->GetStat(IE_ALIGNMENT);
-			alignment = ((alignment&AL_LNC_MASK)>>4)*3+(alignment&AL_GNE_MASK)-4;
+			alignment = ((alignment&AL_LC_MASK)>>4)*3+(alignment&AL_GE_MASK)-4;
 		}
 		if (alignment>8) {
 			return FX_NOT_APPLIED;

@@ -102,6 +102,9 @@ struct Effect {
 	ieDword Parameter3;
 	ieDword Parameter4;
 	ieResRef Source;
+	ieDword Projectile;
+	ieDwordSigned InventorySlot;
+	ieDword CasterLevel;
 	ieDword SecondaryType;
 	ieDword SecondaryDelay; //still not sure about this
 	// These are not in the IE files, but are our precomputed values

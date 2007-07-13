@@ -355,14 +355,7 @@ int fx_bless (Actor* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 
 	target->SetColorMod(255, RGBModifier::ADD, 0x18, 0xc8, 0xc8, 0xc8);
-/*
-	if (!target->fxqueue.HasEffectWithParamPair(fx_glow_ref, 0xc8c8c800,0x300018)) {
-		Effect *newfx = EffectQueue::CreateEffect(fx_glow_ref, 0xc8c8c800,0x300018, fx->TimingMode);
-		//calculating duration
-		newfx->Duration=(fx->Duration-core->GetGame()->GameTime)/6;
-		core->ApplyEffect(newfx, target, target);
-	}
-*/
+
 	STATE_SET( STATE_BLESS );
 	STAT_SUB( IE_TOHIT, fx->Parameter1);
 	STAT_SUB( IE_SAVEVSDEATH, fx->Parameter1);
