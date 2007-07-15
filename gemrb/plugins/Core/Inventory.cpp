@@ -336,7 +336,8 @@ void Inventory::KillSlot(unsigned int index)
 			Owner->SetUsedHelmet("");
 			break;
 		case SLOT_EFFECT_ITEM:
-			if (itm->AnimationType[0]-'1') {
+			//remove the armor type only if this item is responsible for it
+			if ((ieDword) (itm->AnimationType[0]-'1') == Owner->GetBase(IE_ARMOR_TYPE)) {
 				Owner->SetBase(IE_ARMOR_TYPE, 0);
 			}
 			break;
