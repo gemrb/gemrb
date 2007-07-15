@@ -37,6 +37,8 @@ static const ieResRef SevenEyes[7]={"spin126","spin127","spin128","spin129","spi
 
 static bool enhanced_effects = false;
 static int shcount = -1;
+//a scripting object for enemy (used for enemy in line of sight check)
+static Trigger *Enemy = NULL;
 
 #define PI_CONFUSION    3
 #define PI_PROTFROMEVIL 9
@@ -332,10 +334,21 @@ IWDOpc::IWDOpc(void)
 {
 	core->RegisterOpcodes( sizeof( effectnames ) / sizeof( EffectRef ) - 1, effectnames );
 	enhanced_effects=!!core->HasFeature(GF_ENHANCED_EFFECTS);
+	//create enemy trigger object for enemy in line of sight check
+	if (!Enemy) {
+		Enemy = new Trigger;
+		Object *o = new Object;
+		Enemy->objectParameter = o;
+		o->objectFields[0]=EA_ENEMY;
+	}
 }
 
 IWDOpc::~IWDOpc(void)
 {
+	if (Enemy) {
+		delete Enemy;
+	}
+	Enemy=NULL;
 }
 
 //iwd got a weird targeting system
@@ -844,6 +857,12 @@ int fx_summon_monster2 (Actor* Owner, Actor* target, Effect* fx)
 int fx_burning_blood (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_burning_blood (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+
+	//if the target is dead, this effect ceases to exist
+	if (STATE_GET(STATE_DEAD)) {
+		return FX_NOT_APPLIED;
+	}
+
 	//inflicts damage calculated by dice values+parameter1
 	//creates damage opcode on everyone around. fx->Parameter2 - 0 fire, 1 - ice
 	ieDword damage = DAMAGE_FIRE;
@@ -860,11 +879,17 @@ int fx_burning_blood (Actor* Owner, Actor* target, Effect* fx)
 int fx_burning_blood2 (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_burning_blood2 (%2d): Count: %d Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	//if the target is dead, this effect ceases to exist
+	if (STATE_GET(STATE_DEAD)) {
+		return FX_NOT_APPLIED;
+	}
+
 	//timing
 	if (core->GetGame()->GameTime%6) {
 		return FX_APPLIED;
 	}
-	//inflicts damage calculated by dice values+parameter1
+	
 	if (!fx->Parameter1) {
 		return FX_NOT_APPLIED;
 	}
@@ -1019,6 +1044,12 @@ int fx_salamander_aura (Actor* Owner, Actor* target, Effect* fx)
 	if (0) printf( "fx_salamander_aura (%2d): ResRef:%s Type: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
 	//inflicts damage calculated by dice values+parameter1
 	//creates damage opcode on everyone around. fx->Parameter2 - 0 fire, 1 - ice
+
+	//if the target is dead, this effect ceases to exist
+	if (STATE_GET(STATE_DEAD)) {
+		return FX_NOT_APPLIED;
+	}
+
 	ieDword damage = DAMAGE_FIRE;
 
 	if (fx->Parameter2==1) {
@@ -1143,6 +1174,12 @@ int fx_control_undead (Actor* Owner, Actor* target, Effect* fx)
 int fx_static_charge(Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_static_charge (%2d): Count: %d \n", fx->Opcode, fx->Parameter1 );
+
+	//if the target is dead, this effect ceases to exist
+	if (STATE_GET(STATE_DEAD)) {
+		return FX_NOT_APPLIED;
+	}
+
 	//timing
 	if (core->GetGame()->GameTime%6) {
 		return FX_APPLIED;
@@ -1157,9 +1194,18 @@ int fx_static_charge(Actor* Owner, Actor* target, Effect* fx)
 }
 
 //0x109
-int fx_cloak_of_fear(Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+
+static EffectRef fx_umberhulk_gaze_ref={"UmberHulkGaze",NULL,-1};
+
+int fx_cloak_of_fear(Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cloak_of_fear (%2d): Count: %d \n", fx->Opcode, fx->Parameter1 );
+
+	//if the target is dead, this effect ceases to exist
+	if (STATE_GET(STATE_DEAD)) {
+		return FX_NOT_APPLIED;
+	}
+
 	//timing
 	if (core->GetGame()->GameTime%6) {
 		return FX_APPLIED;
@@ -1169,13 +1215,31 @@ int fx_cloak_of_fear(Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 	fx->Parameter1--;
-	//
+
+ 	Effect *newfx = EffectQueue::CreateEffect(fx_umberhulk_gaze_ref, 0,
+		8, FX_DURATION_INSTANT_PERMANENT);
+	newfx->Power = fx->Power;
+
+	//collect targets and apply effect on targets
+	Map *area = target->GetCurrentArea();
+	int i = area->GetActorCount(true);
+	while(i--) {
+		Actor *victim = area->GetActor(i,true);
+		if (target!=victim) continue;
+		if (PersonalDistance(target, victim)<20) {
+		  Effect *tmp = new Effect();
+		  memcpy(tmp, newfx, sizeof(Effect));
+		  
+		  core->ApplyEffect(tmp, Owner, target);
+		}
+	}
+	delete newfx;
+
 	return FX_APPLIED;
 }
 //0x10a MovementRateModifier3 (Like bg2)
 //0x10b RemoveConfusion
 static EffectRef fx_confusion_ref={"State:Confused",NULL,-1};
-static EffectRef fx_umberhulk_gaze_ref={"UmberHulkGaze",NULL,-1};
 static EffectRef fx_display_portrait_icon_ref={"Icon:Display",NULL,-1};
 
 int fx_remove_confusion (Actor* /*Owner*/, Actor* target, Effect* fx)
@@ -1344,28 +1408,63 @@ int fx_shroud_of_flame2 (Actor* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	//timing
-	if (core->GetGame()->GameTime%6) {
-		return FX_APPLIED;
-	}
+	//if (core->GetGame()->GameTime%6) {
+	//	return FX_APPLIED;
+	//}
 
 	//apply resource on hitter
+	memcpy(target->applyWhenBeingHit,fx->Resource,sizeof(ieResRef));
 	return FX_APPLIED;
 }
 
 //0x117 AnimalRage
 int fx_animal_rage (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_animal_rage (%2d): Count %d\n", fx->Opcode, fx->Parameter1 );
-	if (target->SetSpellState( SS_ANIMALRAGE)) return FX_APPLIED;
+	if (0) printf( "fx_animal_rage (%2d): Mode: %d\n", fx->Opcode, fx->Parameter2 );
+
+	if ( STATE_GET(STATE_DEAD) ) {
+		return FX_NOT_APPLIED;
+	}
+	//param2==1 sets only the spell state
+	if (fx->Parameter2) {
+		target->SetSpellState( SS_ANIMALRAGE);
+		return FX_APPLIED;
+	}
+
+	//param2==0 doesn't set the spell state
+
+	//don't do anything if already berserking
+	//FIXME: is it berserkstage2 or 1?
+	if (STAT_GET(IE_BERSERKSTAGE1)) {
+		return FX_APPLIED;
+	}
+
+	//it has 5% of going berserk
+	//FIXME: how much is the original bg berserking chance
+	//if it is different, use checkforberserk as a percentile chance
+	STAT_SET( IE_CHECKFORBERSERK, 1 );
+
+	//and attacks the first enemy in sight
 	//timing
 	if (core->GetGame()->GameTime%6) {
 		return FX_APPLIED;
 	}
-	if (!fx->Parameter1) {
-		return FX_NOT_APPLIED;
+	//if enemy is in sight
+	//attack them
+	//FIXME: would the circle color change?
+	if (!target->LastTarget) {
+		//depends on whom it considers enemy
+		if (STAT_GET(IE_EA)<EA_EVILCUTOFF) {
+		  Enemy->objectParameter->objectFilters[0]=EA_ENEMY;
+		} else {
+		  Enemy->objectParameter->objectFilters[0]=EA_ALLY;
+		}
+		if (SeeCore(target, Enemy, false)) {
+		  target->SetTarget(target->GetCurrentArea()->GetActorByGlobalID(target->LastSeen));
+		  //this is highly unsure
+		  //fx->Parameter1=1;
+		}
 	}
-	fx->Parameter1--;
-	STAT_SET( IE_CHECKFORBERSERK, 1 );
 	return FX_APPLIED;
 }
 
@@ -1707,6 +1806,7 @@ int fx_nausea (Actor* Owner, Actor* target, Effect* fx)
 		Effect *newfx = EffectQueue::CreateEffect(fx_unconscious_state_ref,
 			fx->Parameter1, 1, fx->Duration);
 		core->ApplyEffect(newfx, Owner, target);
+		newfx->Power = fx->Power;
 		fx->Parameter3=1;
 	}
 	//end of unsure part
@@ -1738,7 +1838,7 @@ int fx_fireshield (Actor* /*Owner*/, Actor* target, Effect* fx)
 		if (target->SetSpellState( SS_FIRESHIELD)) return FX_APPLIED;
 		target->AddPortraitIcon(PI_FIRESHIELD);
 	}
-	//target->SetSpellOnHit(fx->Resource);
+	memcpy(target->applyWhenBeingHit,fx->Resource,sizeof(ieResRef));
 	return FX_APPLIED;
 }
 

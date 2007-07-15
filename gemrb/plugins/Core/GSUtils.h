@@ -56,7 +56,6 @@ void PolymorphCopyCore(Actor *src, Actor *tar, bool base);
 void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags);
 Targets* GetAllObjects(Scriptable* Sender, Object* oC, int ga_flags);
 Scriptable* GetActorFromObject(Scriptable* Sender, Object* oC, int ga_flags = 0);
-int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos);
 int MoveItemCore(Scriptable *Sender, Scriptable *target, const char *resref, int flags, int setflag);
 void MoveToObjectCore(Scriptable *Sender, Action *parameters, ieDword flags, bool untilsee);
 void CreateItemCore(CREItem *item, const char *resref, int a, int b, int c);
@@ -102,6 +101,7 @@ int GetObjectCount(Scriptable* Sender, Object* oC);
 int GetObjectLevelCount(Scriptable* Sender, Object* oC);
 void SetVariable(Scriptable* Sender, const char* VarName, ieDword value);
 //these are used from other plugins
+GEM_EXPORT int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos);
 GEM_EXPORT int DiffCore(ieDword a, ieDword b, int diffmode);
 GEM_EXPORT void DisplayStringCore(Scriptable* Sender, int Strref, int flags);
 GEM_EXPORT void SetVariable(Scriptable* Sender, const char* VarName, const char* Context, ieDword value);
