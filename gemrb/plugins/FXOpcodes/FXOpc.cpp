@@ -35,6 +35,7 @@
 #include "FXOpc.h"
 
 //FIXME: find a way to handle portrait icons better
+#define PI_CONFUSED 3
 #define PI_HELD    13
 #define PI_SLEEP   14
 #define PI_BLESS   17
@@ -2768,9 +2769,17 @@ int fx_monster_summoning (Actor* Owner, Actor* target, Effect* fx)
 int fx_set_confused_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_confused_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STATE_SET( STATE_CONFUSED );
-	//target->SetSpellState(SS_CONFUSED);
-	return FX_APPLIED;
+	if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
+		BASE_STATE_SET( STATE_CONFUSED );
+	} else {
+		STATE_SET( STATE_CONFUSED );
+	}
+	//NOTE: iwd2 is also unable to display the portrait icon
+	//for permanent confusion
+	if (enhanced_effects) {
+		target->AddPortraitIcon(PI_CONFUSED);
+	}
+	return FX_PERMANENT;
 }
 
 // 0x81 AidNonCumulative

@@ -371,7 +371,7 @@ public:
 	void DoStep(unsigned int walk_speed);
 	void AddWayPoint(Point &Des);
 	void RunAwayFrom(Point &Des, int PathLength, int flags);
-	void RandomWalk(bool can_stop);
+	void RandomWalk(bool can_stop, bool run);
 	void MoveLine(int steps, int Pass, ieDword Orient);
 	void FixPosition();
 	void WalkTo(Point &Des, int MinDistance = 0);

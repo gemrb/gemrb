@@ -210,7 +210,7 @@ public:
 	/* this method hacks the offhand weapon color effects */
 	static void HackColorEffects(Actor *Owner, Effect *fx);
 	static Effect *CreateEffect(EffectRef &effect_reference, ieDword param1, ieDword param2, ieDword timing);
-
+	static Effect *CreateEffectCopy(Effect *oldfx, EffectRef &effect_reference, ieDword param1, ieDword param2);
 	//locating opcodes
 	Effect *HasEffect(EffectRef &effect_reference);
 	Effect *HasEffectWithParam(EffectRef &effect_reference, ieDword param2);
@@ -235,6 +235,7 @@ public:
 private:
 	//use the effect reference style calls from outside
 	static Effect *CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieDword timing);
+	static Effect *CreateEffectCopy(Effect *oldfx, ieDword opcode, ieDword param1, ieDword param2);
 	void RemoveAllDetrimentalEffects(ieDword opcode, ieDword current);
 	void RemoveAllEffectsWithParam(ieDword opcode, ieDword param2);
 	Effect *HasOpcode(ieDword opcode) const;

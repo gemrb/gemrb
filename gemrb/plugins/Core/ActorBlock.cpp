@@ -1001,7 +1001,7 @@ void Movable::RunAwayFrom(Point &Des, int PathLength, int flags)
 	path = area->RunAway( Pos, Des, PathLength, flags );
 }
 
-void Movable::RandomWalk(bool can_stop)
+void Movable::RandomWalk(bool can_stop, bool run)
 {
 	if (path) {
 		return;
@@ -1010,6 +1010,9 @@ void Movable::RandomWalk(bool can_stop)
 	if (can_stop && (rand()&3) ) {
 		SetWait((rand()&7)+7);
 		return;
+	}
+	if (run) {
+		InternalFlags|=IF_RUNNING;
 	}
 	area->BlockSearchMap( Pos, size, 0);
 	Point p = Pos;

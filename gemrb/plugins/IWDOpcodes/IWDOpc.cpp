@@ -108,7 +108,7 @@ static int fx_blinding_orb (Actor* Owner, Actor* target, Effect* fx); //fc
 static int fx_remove_effects (Actor* Owner, Actor* target, Effect* fx); //fe
 static int fx_salamander_aura (Actor* Owner, Actor* target, Effect* fx); //ff
 static int fx_umberhulk_gaze (Actor* Owner, Actor* target, Effect* fx); //100
-static int fx_zombielord_aura (Actor* Owner, Actor* target, Effect* fx); //101
+//static int fx_zombielord_aura (Actor* Owner, Actor* target, Effect* fx); //101, duff
 static int fx_resist_spell (Actor* Owner, Actor* target, Effect* fx); //102
 static int fx_summon_creature2 (Actor* Owner, Actor* target, Effect* fx); //103
 //int fx_avatar_removal (Actor* Owner, Actor* target, Effect* fx); //104
@@ -241,12 +241,12 @@ static EffectRef effectnames[] = {
 	{ "RemoveEffects", fx_remove_effects, -1}, //fe
 	{ "SalamanderAura", fx_salamander_aura, -1}, //ff
 	{ "UmberHulkGaze", fx_umberhulk_gaze, -1}, //100
-	{ "ZombieLordAura", fx_zombielord_aura, -1},//101
+	//{ "ZombieLordAura", fx_zombielord_aura, -1},//101, duff
 	{ "SummonCreature2", fx_summon_creature2, -1}, //103
 	{ "SummonPomab", fx_summon_pomab, -1}, //106
 	{ "ControlUndead", fx_control_undead, -1}, //107
 	{ "StaticCharge", fx_static_charge, -1}, //108
-	{ "CloakOfFear", fx_cloak_of_fear, -1}, //109
+	{ "CloakOfFear", fx_cloak_of_fear, -1}, //109 how/iwd2  
 	{ "RemoveConfusion", fx_remove_confusion, -1},//10b
 	{ "EyeOfTheMind", fx_eye_of_the_mind, -1}, //10c
 	{ "EyeOfTheSword", fx_eye_of_the_sword, -1}, //10d
@@ -1059,41 +1059,69 @@ int fx_salamander_aura (Actor* Owner, Actor* target, Effect* fx)
 	ApplyDamageNearby(Owner, target, fx, damage);
 	return FX_APPLIED;
 }
-//0x100 UmberHulkGaze (causes confusion or other stuff)
 
-int fx_umberhulk_gaze (Actor* /*Owner*/, Actor* target, Effect* fx)
+//0x100 UmberHulkGaze (causes confusion)
+//it is a specially hacked effect to ignore certain races
+//from the confusion effect
+static EffectRef fx_confusion_ref={"State:Confused",NULL,-1};
+static EffectRef fx_display_portrait_icon_ref={"Icon:Display",NULL,-1};
+
+int fx_umberhulk_gaze (Actor* Owner, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_umberhulk_gaze (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_umberhulk_gaze (%2d): Count: %d\n", fx->Opcode, fx->Parameter1);
+	///STATE_SET( STATE_CONFUSED );
+
+	if (!fx->Parameter1) {
+		return FX_NOT_APPLIED;
+	}
+
+	//timing (set up next fire)  
+	fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
+	fx->Duration=core->GetGame()->GameTime+7*15;
+	fx->Parameter1--;
+	//check if target is golem/umber hulk/minotaur, the effect is not working
+	if (check_iwd_targeting(Owner, target, 0, 17)) { //umber hulk
+		return FX_NOT_APPLIED;
+	}
+	if (check_iwd_targeting(Owner, target, 0, 27)) { //golem
+		return FX_NOT_APPLIED;
+	}
+	if (check_iwd_targeting(Owner, target, 0, 29)) { //minotaur
+		return FX_NOT_APPLIED;
+	}
+
+	Effect * newfx;
+
+	//apply a confusion opcode on target (0x80)
+ 	newfx = EffectQueue::CreateEffectCopy(fx, fx_confusion_ref, 0, 0);
+	core->ApplyEffect(newfx, Owner, target);
+
+	//apply a confusion icon on target
+ 	newfx = EffectQueue::CreateEffectCopy(fx, fx_display_portrait_icon_ref, 0, PI_CONFUSION);
+	core->ApplyEffect(newfx, Owner, target);
+
+	return FX_NOT_APPLIED;
+}
+
+//0x101 ZombieLordAura unused in all games
+/*
+int fx_zombielord_aura (Actor* Owner, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_zombielord_aura (%2d): Count: %d\n", fx->Opcode, fx->Parameter1);
 	STATE_SET( STATE_CONFUSED );
 	//timing
 	if (core->GetGame()->GameTime%6) {
 		return FX_APPLIED;
 	}
-	if (!fx->Parameter1) {
-		return FX_NOT_APPLIED;
-	}
-	//random event???
+	//timing (set up next fire)  
+	fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
+	fx->Duration=core->GetGame()->GameTime+7*15;
 	fx->Parameter1--;
+	//apply a confusion opcode on target (0x80)
+	//
 	return FX_APPLIED;
 }
-
-//0x101 ZombieLordAura (causes fear?)
-int fx_zombielord_aura (Actor* /*Owner*/, Actor* target, Effect* fx)
-{
-	if (0) printf( "fx_zombielord_aura (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	STATE_SET( STATE_CONFUSED );
-	//timing
-	if (core->GetGame()->GameTime%6) {
-		return FX_APPLIED;
-	}
-	if (!fx->Parameter1) {
-		return FX_NOT_APPLIED;
-	}
-	//random event???
-	fx->Parameter1--;
-	return FX_APPLIED;
-}
-
+*/
 //0x102 Protection:Spell (this is the same as in bg2?)
 
 //0x103 SummonCreature2
@@ -1180,20 +1208,28 @@ int fx_static_charge(Actor* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	//timing
-	if (core->GetGame()->GameTime%6) {
-		return FX_APPLIED;
-	}
 	if (!fx->Parameter1) {
 		return FX_NOT_APPLIED;
 	}
+
+	//timing
+	fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
+	fx->Duration=core->GetGame()->GameTime+70*15;
 	fx->Parameter1--;
-	//
-	target->Damage(fx->Parameter1, DAMAGE_ELECTRICITY, Owner);
+
+	//iwd2 style
+	if (fx->Resource[0]) {
+		core->ApplySpell(fx->Resource, Owner, target, fx->Power);
+		return FX_APPLIED;
+	}
+
+	//how style
+	target->Damage(DICE_ROLL(0), DAMAGE_ELECTRICITY, Owner);
 	return FX_APPLIED;
 }
 
-//0x109
+//0x109 CloakOfFear (HoW/IWD2)
+//if the resource is not specified, it will work like in HoW
 
 static EffectRef fx_umberhulk_gaze_ref={"UmberHulkGaze",NULL,-1};
 
@@ -1206,16 +1242,22 @@ int fx_cloak_of_fear(Actor* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	//timing
-	if (core->GetGame()->GameTime%6) {
-		return FX_APPLIED;
-	}
-
 	if (!fx->Parameter1) {
 		return FX_NOT_APPLIED;
 	}
+
+	//timing (set up next fire)  
+	fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
+	fx->Duration=core->GetGame()->GameTime+3*15;
 	fx->Parameter1--;
 
+	//iwd2 style
+	if (fx->Resource[0]) {
+		core->ApplySpell(fx->Resource, Owner, target, fx->Power);
+		return FX_APPLIED;
+	}
+
+	//how style (probably better would be to provide effcof.spl)
  	Effect *newfx = EffectQueue::CreateEffect(fx_umberhulk_gaze_ref, 0,
 		8, FX_DURATION_INSTANT_PERMANENT);
 	newfx->Power = fx->Power;
@@ -1227,21 +1269,19 @@ int fx_cloak_of_fear(Actor* Owner, Actor* target, Effect* fx)
 		Actor *victim = area->GetActor(i,true);
 		if (target!=victim) continue;
 		if (PersonalDistance(target, victim)<20) {
-		  Effect *tmp = new Effect();
-		  memcpy(tmp, newfx, sizeof(Effect));
-		  
-		  core->ApplyEffect(tmp, Owner, target);
+			Effect *tmp = new Effect();
+			memcpy(tmp, newfx, sizeof(Effect));
+			
+			core->ApplyEffect(tmp, Owner, target);
 		}
 	}
 	delete newfx;
 
 	return FX_APPLIED;
 }
+
 //0x10a MovementRateModifier3 (Like bg2)
 //0x10b RemoveConfusion
-static EffectRef fx_confusion_ref={"State:Confused",NULL,-1};
-static EffectRef fx_display_portrait_icon_ref={"Icon:Display",NULL,-1};
-
 int fx_remove_confusion (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_remove_confusion (%2d)\n", fx->Opcode );
@@ -1455,14 +1495,14 @@ int fx_animal_rage (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (!target->LastTarget) {
 		//depends on whom it considers enemy
 		if (STAT_GET(IE_EA)<EA_EVILCUTOFF) {
-		  Enemy->objectParameter->objectFilters[0]=EA_ENEMY;
+			Enemy->objectParameter->objectFilters[0]=EA_ENEMY;
 		} else {
-		  Enemy->objectParameter->objectFilters[0]=EA_ALLY;
+			Enemy->objectParameter->objectFilters[0]=EA_ALLY;
 		}
 		if (SeeCore(target, Enemy, false)) {
-		  target->SetTarget(target->GetCurrentArea()->GetActorByGlobalID(target->LastSeen));
-		  //this is highly unsure
-		  //fx->Parameter1=1;
+			target->SetTarget(target->GetCurrentArea()->GetActorByGlobalID(target->LastSeen));
+			//this is highly unsure
+			//fx->Parameter1=1;
 		}
 	}
 	return FX_APPLIED;

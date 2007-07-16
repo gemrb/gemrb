@@ -158,10 +158,10 @@ static EffectRef diced_effects[] = {
 	{"CurrentHPModifier",NULL,-1},
 	{"MaximumHPModifier",NULL,-1},
 	//iwd effects
+	{"BurningBlood",NULL,-1}, //iwd
 	{"ColdDamage",NULL,-1},
 	{"CrushingDamage",NULL,-1},
 	{"VampiricTouch",NULL,-1},
-	{"BurningBlood",NULL,-1},
 	{"VitriolicSphere",NULL,-1},
 	//pst effects
 	{"TransferHP",NULL,-1},
@@ -169,18 +169,10 @@ static EffectRef diced_effects[] = {
 
 //special effects without level check (but with damage dices not precalculated)
 static EffectRef diced_effects2[] = {
-	{"BurningBlood2",NULL,-1}, //iwd2
+	{"BurningBlood2",NULL,-1}, //how/iwd2
+	{"StaticCharge",NULL,-1}, //how/iwd2
 	{"LichTouch",NULL,-1}, //how
 {NULL,NULL,0} };
-
-/*
-//effects that take a color slot as parameter
-static EffectRef colorslot_effects[] = {
-	{"Color:SetPalette",NULL,-1},
-	{"Color:SetRGB",NULL,-1},
-	{"Color:PulseRGB",NULL,-1},
-{NULL,NULL,0} };
-*/
 
 inline static void ResolveEffectRef(EffectRef &effect_reference)
 {
@@ -261,11 +253,7 @@ bool Init_EffectQueue()
 	for (i=0;diced_effects2[i].Name;i++) {
 		ResolveEffectRef(diced_effects2[i]);
 	}
-	/*
-	for (i=0;colorslot_effects[i].Name;i++) {
-		ResolveEffectRef(colorslot_effects[i]);
-	}
-*/
+
 	return true;
 }
 
@@ -336,6 +324,28 @@ Effect *EffectQueue::CreateEffect(EffectRef &effect_reference, ieDword param1, i
 {
 	ResolveEffectRef(effect_reference);
 	return CreateEffect(effect_reference.EffText, param1, param2, timing);
+}
+
+Effect *EffectQueue::CreateEffectCopy(Effect *oldfx, ieDword opcode, ieDword param1, ieDword param2)
+{
+	if (opcode==0xffffffff) {
+		return NULL;
+	}
+	Effect *fx = new Effect();
+	if (!fx) {
+		return NULL;
+	}
+	memcpy(fx,oldfx,sizeof(Effect) );
+	fx->Opcode=opcode;
+	fx->Parameter1=param1;
+	fx->Parameter2=param2;
+	return fx;
+}
+
+Effect *EffectQueue::CreateEffectCopy(Effect *oldfx, EffectRef &effect_reference, ieDword param1, ieDword param2)
+{
+	ResolveEffectRef(effect_reference);
+	return CreateEffectCopy(oldfx, effect_reference.EffText, param1, param2);
 }
 
 void EffectQueue::AddEffect(Effect* fx, bool insert)
@@ -522,20 +532,6 @@ bool IsDicedEffect2(int opcode)
 	}
 	return false;
 }
-
-/*
-bool IsColorslotEffect(int opcode)
-{
-	int i;
-
-	for(i=0;colorslot_effects[i].Name;i++) {
-		if(colorslot_effects[i].EffText==opcode) {
-			return true;
-		}
-	}
-	return false;
-}
-*/
 
 //resisted effect based on level
 inline bool check_level(Actor *target, Effect *fx)
@@ -1241,29 +1237,6 @@ bool EffectQueue::Persistent(Effect* fx)
 	}
 	return true;
 }
-
-//fix the effect color locations based on the item's equipping location
-/*
-void EffectQueue::HackColorEffects(int type)
-{
-	std::list< Effect* >::iterator f;
-
-	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		Effect *fx=*f;
-		// If a weapon is in the off-hand, it needs to set the off-hand palette
-		// If it is in the main hand, it should set the weapon palette
-		if (IsColorslotEffect(fx->Opcode)) {
-			unsigned int gradienttype = fx->Parameter2 & 0xF0;
-			if (type == SLOT_EFFECT_MELEE && gradienttype == 0x20)
-				gradienttype = 0x10; // weapon
-			else if (type == SLOT_EFFECT_LEFT && gradienttype == 0x10)
-				gradienttype = 0x20; // off-hand
-			fx->Parameter2 &= ~0xF0;
-			fx->Parameter2 |= gradienttype;
-		}	
-	}		
-}
-*/
 
 //alter the color effect in case the item is equipped in the shield slot
 void EffectQueue::HackColorEffects(Actor *Owner, Effect *fx)

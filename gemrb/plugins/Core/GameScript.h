@@ -1218,6 +1218,7 @@ public:
 	static void ProtectPoint(Scriptable* Sender, Action* parameters);
 	static void QuitGame(Scriptable* Sender, Action* parameters);
 	static void RandomFly(Scriptable* Sender, Action* parameters);
+	static void RandomRun(Scriptable* Sender, Action* parameters);
 	static void RandomTurn(Scriptable* Sender, Action* parameters);
 	static void RandomWalk(Scriptable* Sender, Action* parameters);
 	static void RandomWalkContinuous(Scriptable* Sender, Action* parameters);

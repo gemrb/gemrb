@@ -694,10 +694,6 @@ void GameScript::StartCutScene(Scriptable* Sender, Action* parameters)
 	gs->EvaluateAllBlocks();
 	delete( gs );
 	Sender->ClearCutsceneID();
-/*
-	Sender->Active &= ~SCR_CUTSCENEID;
-	Sender->CutSceneId = NULL;
-*/
 }
 
 void GameScript::CutSceneID(Scriptable* Sender, Action* parameters)
@@ -1526,7 +1522,6 @@ void GameScript::UnhideGUI(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
 	Game* game = core->GetGame();
 	game->SetControlStatus(CS_HIDEGUI, BM_NAND);
-	//core->SetCutSceneMode( false );
 }
 
 void GameScript::HideGUI(Scriptable* /*Sender*/, Action* /*parameters*/)
@@ -4466,7 +4461,18 @@ void GameScript::RandomWalk(Scriptable* Sender, Action* /*parameters*/)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->RandomWalk( true );
+	actor->RandomWalk( true, false );
+	Sender->ReleaseCurrentAction();
+}
+
+void GameScript::RandomRun(Scriptable* Sender, Action* /*parameters*/)
+{
+	if (Sender->Type != ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	Actor* actor = ( Actor* ) Sender;
+	actor->RandomWalk( true, true );
 	Sender->ReleaseCurrentAction();
 }
 
@@ -4477,7 +4483,7 @@ void GameScript::RandomWalkContinuous(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->RandomWalk( false );
+	actor->RandomWalk( false, false );
 	Sender->AddAction( parameters );
 	Sender->ReleaseCurrentAction();
 }
