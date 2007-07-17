@@ -1752,10 +1752,10 @@ int GameScript::Dead(Scriptable* Sender, Trigger* parameters)
 	}
 	Scriptable* target = GetActorFromObject( Sender, parameters->objectParameter );
 	if (!target) {
-		return 0;
+		return 1;
 	}
 	if (target->Type != ST_ACTOR) {
-		return 0;
+		return 1;
 	}
 	Actor* actor = ( Actor* ) target;
 	if (actor->GetStat( IE_STATE_ID ) & STATE_DEAD) {

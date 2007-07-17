@@ -983,15 +983,17 @@ Map* AREImp::GetMap(const char *ResRef)
 	printf( "Loading automap notes\n" );
 	str->Seek( NoteOffset, GEM_STREAM_START );
 
-	Point point;
-	ieDword color;
-	char *text;
-	//Don't bother with autonote.ini if the area has autonotes (ie. it is a saved area)
-	int pst = core->HasFeature( GF_AUTOMAP_INI );
-	if (pst) {
+	//this feature exists in all blackisle games but not in bioware games
+	if (core->HasFeature(GF_SPAWN_INI)) {
 		map->LoadIniSpawn();
 	}
 
+	Point point;
+	ieDword color;
+	char *text;
+
+	//Don't bother with autonote.ini if the area has autonotes (ie. it is a saved area)
+	int pst = core->HasFeature( GF_AUTOMAP_INI );
 	if (pst && !NoteCount) {
 		if( !INInote ) {
 			ReadAutonoteINI();

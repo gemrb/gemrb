@@ -2163,7 +2163,8 @@ static const char *game_flags[GF_COUNT+1]={
 		"SpellBookIconHack",  //30GF_SPELLBOOKICONHACK
 		"EnhancedEffects",    //31GF_ENHANCED_EFFECTS
 		"DeathOnZeroStat",    //32GF_DEATH_ON_ZERO_STAT
-		
+		"SpawnIni",           //33GF_SPAWN_INI
+
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
