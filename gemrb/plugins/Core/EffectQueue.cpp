@@ -825,6 +825,8 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 
 #define MATCH_SLOTCODE() if((*f)->InventorySlot!=slotcode) { continue; }
 
+#define MATCH_PROJECTILE() if((*f)->Projectile!=projectile) { continue; }
+
 #define MATCH_LIVE_FX() {ieDword tmp=(*f)->TimingMode; \
 		if (tmp!=FX_DURATION_INSTANT_LIMITED && \
 			tmp!=FX_DURATION_INSTANT_PERMANENT && \
@@ -852,15 +854,24 @@ void EffectQueue::RemoveAllEffects(ieDword opcode)
 	}
 }
 
-//call this on the item's effectqueue, pass the wearer's effectqueue
-//it will remove all effects from target that were originating from
-//this effectqueue (the item's)
+//removes all equipping effects that match slotcode
 void EffectQueue::RemoveEquippingEffects(ieDwordSigned slotcode)
 {
 	std::list< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		if ((*f)->TimingMode!=FX_DURATION_INSTANT_WHILE_EQUIPPED) continue;
 		MATCH_SLOTCODE();
+
+		(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;
+	}
+}
+
+//removes all effects that match projectile
+void EffectQueue::RemoveAllEffectsWithProjectile(ieDword projectile)
+{
+	std::list< Effect* >::iterator f;
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
+		MATCH_PROJECTILE();
 
 		(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;
 	}

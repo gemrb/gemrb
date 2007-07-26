@@ -39,6 +39,7 @@ static bool enhanced_effects = false;
 static int shcount = -1;
 //a scripting object for enemy (used for enemy in line of sight check)
 static Trigger *Enemy = NULL;
+static ieDword *projectilelist = NULL;
 
 #define PI_CONFUSION    3
 #define PI_PROTFROMEVIL 9
@@ -349,6 +350,11 @@ IWDOpc::~IWDOpc(void)
 		delete Enemy;
 	}
 	Enemy=NULL;
+
+	if (projectilelist) {
+		free (projectilelist);
+	}
+	projectilelist = NULL;
 }
 
 //iwd got a weird targeting system
@@ -1827,10 +1833,24 @@ int fx_add_effects_list (Actor* Owner, Actor* target, Effect* fx)
 //403 ArmorOfFaith
 static int fx_armor_of_faith (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_armor_of_faith (%2d)\n", fx->Opcode);
+	if (0) printf( "fx_armor_of_faith (%2d) Amount: %d\n", fx->Opcode, fx->Parameter1);
 	if (target->SetSpellState( SS_ARMOROFFAITH)) return FX_APPLIED;
+	if (!fx->Parameter1) {
+		fx->Parameter1=1;
+	}
 	//TODO: damage reduction (all types)
-	target->AddPortraitIcon(PI_FAITHARMOR);
+	STAT_ADD(IE_RESISTFIRE,fx->Parameter1 );
+	STAT_ADD(IE_RESISTCOLD,fx->Parameter1 );
+	STAT_ADD(IE_RESISTELECTRICITY,fx->Parameter1 );
+	STAT_ADD(IE_RESISTACID,fx->Parameter1 );
+	STAT_ADD(IE_RESISTMAGIC,fx->Parameter1 );
+	STAT_ADD(IE_RESISTSLASHING,fx->Parameter1 );
+	STAT_ADD(IE_RESISTCRUSHING,fx->Parameter1 );
+	STAT_ADD(IE_RESISTPIERCING,fx->Parameter1 );
+	STAT_ADD(IE_RESISTMISSILE,fx->Parameter1 );
+	if (enhanced_effects) {
+		target->AddPortraitIcon(PI_FAITHARMOR);
+	}
 	return FX_APPLIED;
 }
 
@@ -2026,9 +2046,8 @@ int fx_barkskin (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (target->SetSpellState( SS_BARKSKIN)) return FX_APPLIED;
 
 	int bonus;
-	int level = STAT_GET(IE_LEVELCLERIC);
-	if (level>6) {
-		if (level>12) {
+	if (fx->CasterLevel>6) {
+		if (fx->CasterLevel>12) {
 			bonus=5;
 		} else {
 			bonus=4;
@@ -2144,13 +2163,19 @@ int fx_unconsciousness (Actor* /*Owner*/, Actor* target, Effect* fx)
 //420 Death2 (see in core effects)
 
 //421 EntropyShield
+
 int fx_entropy_shield (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_entropy_shield (%2d)\n", fx->Opcode);
 	if (target->SetSpellState( SS_ENTROPY)) return FX_APPLIED;
-	//immunity to certain projectiles?
-	//
-	//
+	//immunity to certain projectiles
+	if (!projectilelist) {
+		projectilelist = core->GetListFrom2DA("entropy");
+		ieDword i = projectilelist[0];
+		while(i) {
+			target->AddProjectileImmunity(projectilelist[i--]);
+		}
+	}
 	if (enhanced_effects) {
 		target->AddPortraitIcon(PI_ENTROPY);
 		//entropy shield overlay

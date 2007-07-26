@@ -175,6 +175,9 @@ public:
 	void RemoveAllEffects(ieDword opcode);
 	void RemoveAllEffectsWithResource(ieDword opcode, const ieResRef resource);
 
+	/* removes any effects (delayed or not) which were using projectile */
+ 	void RemoveAllEffectsWithProjectile(ieDword projectile);
+
 	/* removes equipping effects with specified inventory slot code */
 	void RemoveEquippingEffects(ieDwordSigned slotcode);
 

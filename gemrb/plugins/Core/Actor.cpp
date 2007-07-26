@@ -475,7 +475,7 @@ bool Actor::ApplyKit(ieDword Value)
 		row = table->GetRowCount();
 		while (row) {
 			row--;
-			ieDword Unusability = (ieDword) atoi(table->QueryField(row, 6));
+			ieDword Unusability = (ieDword) strtol(table->QueryField(row, 6),NULL,0);
 			if (Value == Unusability) {
 				goto found_row;
 			}
@@ -3647,4 +3647,10 @@ bool Actor::HasFeat(unsigned int featindex)
 	unsigned int bit = 1<<(featindex&31);
 	if (Modified[pos]&bit) return true;
 	return false;
+}
+
+void Actor::AddProjectileImmunity(ieDword /*projectile*/)
+{
+  //TODO
+  
 }

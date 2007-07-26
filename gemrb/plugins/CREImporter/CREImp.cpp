@@ -2332,6 +2332,7 @@ int CREImp::PutMemorizedSpells(DataStream *stream, Actor *actor)
 
 int CREImp::PutEffects( DataStream *stream, Actor *actor)
 {
+	ieDword tmpDword1,tmpDword2;
 	ieWord tmpWord;
 	ieByte tmpByte;
 	char filling[60];
@@ -2374,9 +2375,19 @@ int CREImp::PutEffects( DataStream *stream, Actor *actor)
 				stream->Write(fx->Resource2, 8);
 				stream->Write(fx->Resource3, 8);
 			}
-			stream->Write( filling,20 );
+			tmpDword1 = (ieDword) fx->PosX;
+			tmpDword2 = (ieDword) fx->PosY;
+			stream->WriteDword( &tmpDword1 );
+			stream->WriteDword( &tmpDword2 );
+			stream->WriteDword( &tmpDword1 );
+			stream->WriteDword( &tmpDword2 );
+			stream->Write( filling,4 );
 			stream->Write(fx->Source, 8);
-			stream->Write( filling,52 ); //12+32+8
+			stream->Write( filling,4 );
+			stream->WriteDword( &fx->Projectile );
+			tmpDword1 = (ieDword) fx->InventorySlot;
+			stream->WriteDword( &tmpDword1 );
+			stream->Write( filling,40 ); //12+32+8
 			stream->WriteDword( &fx->SecondaryType );
 			stream->Write( filling,60 );
 		} else {

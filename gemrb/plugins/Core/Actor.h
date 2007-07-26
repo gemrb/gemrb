@@ -481,5 +481,7 @@ public:
 	bool SetSpellState(unsigned int spellstate);
 	/* Checks a feat */
 	bool HasFeat(unsigned int featindex);
+	/* Sets projectile immunity */
+	void AddProjectileImmunity(ieDword projectile);
 };
 #endif

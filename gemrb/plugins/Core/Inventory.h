@@ -277,6 +277,9 @@ public:
 	//void AddAllEffects();
 	/** Returns item in specified slot. Does NOT change inventory */
 	CREItem* GetSlotItem(ieDword slot);
+	/** Returns the item's inventory flags */
+	ieDword GetItemFlag(unsigned int slot);
+	/** Changes the inventory flags */
 	bool ChangeItemFlag(ieDword slot, ieDword value, int mode);
 	/** Equips the item, don't use it directly for weapons */
 	bool EquipItem(ieDword slot);

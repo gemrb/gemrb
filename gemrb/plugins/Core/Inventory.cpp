@@ -696,6 +696,15 @@ CREItem *Inventory::GetSlotItem(unsigned int slot)
 	return Slots[slot];
 }
 
+ieDword Inventory::GetItemFlag(unsigned int slot)
+{
+	CREItem *item = GetSlotItem(slot);
+	if (!item) {
+		return 0;
+	}
+	return item->Flags;
+}
+
 bool Inventory::ChangeItemFlag(unsigned int slot, ieDword arg, int op)
 {
 	CREItem *item = GetSlotItem(slot);

@@ -202,6 +202,7 @@ Interface::Interface(int iargc, char* iargv[])
 	DefSound = NULL;
 	DSCount = -1;
 	GameFeatures = 0;
+	GameFeatures2 = 0;
 	memset( WindowFrames, 0, sizeof( WindowFrames ));
 	memset( GroundCircles, 0, sizeof( GroundCircles ));
 	memset(FogSprites, 0, sizeof( FogSprites ));
@@ -751,7 +752,7 @@ bool Interface::ReadAuxItemTables()
 		ieResRef key;
 		
 		strnlwrcpy(key,aa->GetRowName(idx),8);
-		ieDword value = atoi(aa->QueryField(idx,0));
+		ieDword value = strtol(aa->QueryField(idx,0),NULL,0);
 		ItemExclTable->SetAt(key, value);
 	}
 	DelTable( table );
@@ -785,7 +786,7 @@ aux_1:
 		ieResRef key, dlgres;
 		
 		strnlwrcpy(key,aa->GetRowName(idx),8);
-		ieDword value = atoi(aa->QueryField(idx,0));
+		ieDword value = strtol(aa->QueryField(idx,0),NULL,0);
 		ItemDialTable->SetAt(key, value);
 		strnlwrcpy(dlgres,aa->QueryField(idx,1),8);
 		ItemDial2Table->SetAtCopy(key, dlgres);
@@ -1813,6 +1814,7 @@ void Interface::SetFeature(int flag, int position)
 		} else {
 			GameFeatures2 &= ~( 1 << position );
 		}
+		return;
 	}
 	if (flag) {
 		GameFeatures |= 1 << position;
@@ -5276,4 +5278,26 @@ void Interface::GetResRefFrom2DA(const ieResRef resref, ieResRef resource1, ieRe
 		if (resource3)
 			strnuprcpy(resource3, tab->QueryField(row,2), 8);
 	}
+}
+
+ieDword *Interface::GetListFrom2DA(const ieResRef resref)
+{
+	ieDword *ret;
+
+	int table = LoadTable(resref);
+	TableMgr *tab = GetTable(table);
+	
+	if (tab) {
+		ieDword cnt = tab->GetRowCount();
+		ret = (ieDword *) malloc((1+cnt)*sizeof(ieDword));
+		ret[0]=cnt;
+		while(cnt) {
+			ret[cnt]=strtol(tab->QueryField(cnt-1, 0),NULL, 0);
+			cnt--;
+		}
+		return ret;
+	}
+	ret = (ieDword *) malloc(sizeof(ieDword));
+	ret[0]=0;
+	return ret;
 }

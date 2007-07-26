@@ -340,7 +340,7 @@ int fx_screenshake (Actor* Owner, Actor* target, Effect* fx);//10d
 int fx_unpause_caster (Actor* Owner, Actor* target, Effect* fx);//10e
 int fx_avatar_removal (Actor* Owner, Actor* target, Effect* fx);//10f
 int fx_apply_effect_repeat (Actor* Owner, Actor* target, Effect* fx);//110
-int fx_remove_area_effect (Actor* Owner, Actor* target, Effect* fx);//111
+int fx_remove_projectile (Actor* Owner, Actor* target, Effect* fx);//111
 int fx_teleport_to_target (Actor* Owner, Actor* target, Effect* fx);//112
 int fx_hide_in_shadows_modifier (Actor* Owner, Actor* target, Effect* fx);//113
 int fx_detect_illusion_modifier (Actor* Owner, Actor* target, Effect* fx);//114
@@ -632,7 +632,7 @@ static EffectRef effectnames[] = {
 	{ "Reveal:Tracks", fx_reveal_tracks, -1 },
 	{ "RemoveCurse", fx_remove_curse, -1 },
 	{ "RemoveImmunity", fx_remove_immunity, -1 },
-	{ "RemoveProjectile", fx_remove_area_effect, -1 },
+	{ "RemoveProjectile", fx_remove_projectile, -1 }, //removes effects from actor and area
 	{ "RenableButton", fx_renable_button, -1 }, //removes disable button flag
 	{ "RemoveCreature", fx_remove_creature, -1 },
 	{ "ReplaceCreature", fx_replace_creature, -1 },
@@ -1357,17 +1357,22 @@ int fx_remove_curse (Actor* /*Owner*/, Actor* target, Effect* fx)
 		target->fxqueue.RemoveAllEffects(fx_pst_jumble_curse_ref);
 		break;
 	default:
+		Inventory *inv = &target->inventory;
 		int i = target->inventory.GetSlotCount();
 		while(i--) {
 			//does this slot need unequipping
 			if (core->QuerySlotEffects(i) ) {
-				if (fx->Resource[0] && strnicmp(target->inventory.GetSlotItem(i)->ItemResRef, fx->Resource,8) ) {
+				if (fx->Resource[0] && strnicmp(inv->GetSlotItem(i)->ItemResRef, fx->Resource,8) ) {
 					continue;
 				}
-				if (target->inventory.UnEquipItem(i,true)) {
-					//
+				if (!(inv->GetItemFlag(i)&IE_INV_ITEM_CURSED)) {
+					continue;
 				}
-				target->inventory.ChangeItemFlag(i, IE_INV_ITEM_CURSED, BM_NAND);
+				inv->ChangeItemFlag(i, IE_INV_ITEM_CURSED, BM_NAND);
+				if (inv->UnEquipItem(i,true)) {
+					CREItem *tmp = inv->RemoveItem(i);
+					inv->AddSlotItem(tmp,-3);
+				}
 			}
 		}
 		target->fxqueue.RemoveAllEffects(fx_apply_effect_curse_ref);
@@ -1583,11 +1588,33 @@ int fx_strength_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x2D State:Stun
+int power_word_stun_iwd2(Actor *target, Effect *fx)
+{
+	int hp = STAT_GET(IE_HITPOINTS);
+	if (hp>150) return FX_NOT_APPLIED;
+	int stuntime;
+	if (hp>100) stuntime = core->Roll(1,4,0);
+	else if (hp>50) stuntime = core->Roll(2,4,0);
+	else stuntime = core->Roll(4,4,0);
+	fx->Parameter2 = 0;
+	fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
+	fx->Duration = stuntime*6 + core->GetGame()->GameTime;
+	STATE_SET( STATE_STUNNED );
+	target->AddPortraitIcon(PI_STUN);
+	return FX_APPLIED;
+}
+
 int fx_set_stun_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_stun_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (fx->Parameter2==2) {
+		return power_word_stun_iwd2(target, fx);
+	}
 	STATE_SET( STATE_STUNNED );
 	target->AddPortraitIcon(PI_STUN);
+	if (fx->Parameter2==1) {
+		target->SetSpellState(SS_AWAKE);
+	}
 	return FX_APPLIED;
 }
 
@@ -4445,11 +4472,36 @@ int fx_apply_effect_repeat (Actor* Owner, Actor* target, Effect* fx)
 	}
 	return FX_APPLIED;
 }
+
 // 0x111 RemoveProjectile
-int fx_remove_area_effect (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_remove_projectile (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
+	ieDword *projectilelist;
+
 	//instant effect
-	if (0) printf( "fx_remove_area_effect (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_remove_projectile (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	switch (fx->Parameter2) {
+	case 0: //standard bg2
+		projectilelist = core->GetListFrom2DA("clearair");
+		break;
+	case 1:
+		projectilelist = core->GetListFrom2DA(fx->Resource);
+		break;
+	case 2:
+		projectilelist = (ieDword *) malloc(2*sizeof(ieDword));
+		projectilelist[0]=1;
+		projectilelist[1]=fx->Parameter1;
+		break;
+	default:
+		return FX_NOT_APPLIED;
+	}
+	while(projectilelist[0]) {
+		target->fxqueue.RemoveAllEffectsWithProjectile(projectilelist[projectilelist[0]--]);
+	}
+	free(projectilelist);
+	//TODO:
+	// also remove projectile from area
+	//
 	return FX_NOT_APPLIED;
 }
 
