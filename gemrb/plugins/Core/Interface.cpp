@@ -2116,7 +2116,7 @@ bool Interface::LoadConfig(const char* filename)
 	printStatus( "OK", GREEN );
 	if ( StupidityDetector( CachePath )) {
 		printMessage("Core"," ",LIGHT_RED);
-		printf( "Cache folder %s doesn't exist, invalid or contains executable files!\n", CachePath );
+		printf( "Cache path %s doesn't exist, not a folder or contains alien files!\n", CachePath );
 		return false;
 	}
 	DelTree((const char *) CachePath, false);
@@ -2179,8 +2179,8 @@ bool Interface::LoadGemRBINI()
 		return false;
 	}
 	
-	printMessage( "Core", inifile->originalfile, WHITE);
-	printMessage( "Core", "Loading game type-specific GemRB setup...", WHITE );
+	printMessage( "Core", "Loading game type-specific GemRB setup...\n", WHITE );
+	printf( "%s",inifile->originalfile);
 	
 	if (!IsAvailable( IE_INI_CLASS_ID )) {
 		printStatus( "ERROR", LIGHT_RED );
@@ -4279,11 +4279,13 @@ bool Interface::StupidityDetector(const char* Pt)
 	strcpy( Path, Pt );
 	DIR* dir = opendir( Path );
 	if (dir == NULL) {
+		printf("\n**cannot open**\n");
 		return true; //no directory?
 	}
 	struct dirent* de = readdir( dir ); //Lookup the first entry in the Directory
 	if (de == NULL) {
 		closedir( dir );
+		printf("\n**cannot read**\n");
 		return true; //cannot read it?
 	}
 	do {
@@ -4295,10 +4297,12 @@ bool Interface::StupidityDetector(const char* Pt)
 			if (de->d_name[0] == '.')
 				continue;
 			closedir( dir );
+			printf("\n**contains another dir**\n");
 			return true; //a directory in there???
 		}
 		if (ProtectedExtension(de->d_name) ) {
 			closedir( dir );
+			printf("\n**contains alien files**\n");
 			return true; //a directory in there???
 		}
 	} while (( de = readdir( dir ) ) != NULL);
@@ -4362,12 +4366,14 @@ void Interface::DragItem(CREItem *item, const ieResRef Picture)
 		delete DraggedItem;
 	}
 	DraggedItem = item;
-	video->FreeSprite (DraggedCursor);
-	if (item) {
-		DraggedCursor = GetBAMSprite( Picture, 0, 0 );
+	if (video) {
+		video->FreeSprite (DraggedCursor);
+		if (item) {
+			DraggedCursor = GetBAMSprite( Picture, 0, 0 );
+		}
+		
+		video->SetDragCursor (DraggedCursor);
 	}
-	
-	video->SetDragCursor (DraggedCursor);
 }
 
 bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)
