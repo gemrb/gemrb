@@ -494,7 +494,7 @@ static void ApplyDamageNearby(Actor* Owner, Actor* target, Effect *fx, ieDword d
 	int i = area->GetActorCount(true);
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
-		if (target!=victim) continue;
+		if (target==victim) continue;
 		if (PersonalDistance(target, victim)<20) {
 			Effect *tmp = new Effect();
 			memcpy(tmp, newfx, sizeof(Effect));
@@ -1273,7 +1273,7 @@ int fx_cloak_of_fear(Actor* Owner, Actor* target, Effect* fx)
 	int i = area->GetActorCount(true);
 	while(i--) {
 		Actor *victim = area->GetActor(i,true);
-		if (target!=victim) continue;
+		if (target==victim) continue;
 		if (PersonalDistance(target, victim)<20) {
 			Effect *tmp = new Effect();
 			memcpy(tmp, newfx, sizeof(Effect));
@@ -1764,18 +1764,52 @@ int fx_rod_of_smithing (Actor* Owner, Actor* target, Effect* fx)
 //0x124 MagicalRest (same as bg2)
 //0x125 BeholderDispelMagic (???)
 //0x126 HarpyWail (???)
-int fx_harpy_wail (Actor* /*Owner*/, Actor* target, Effect* fx)
+int fx_harpy_wail (Actor* Owner, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_harpy_wail (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	target->Panic();
+	if (0) printf( "fx_harpy_wail (%2d): Spell: %s\n", fx->Opcode, fx->Resource );
+	if (!fx->Resource[0]) {
+		strcpy(fx->Resource,"SPIN166");
+	}
+	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
+		return FX_NOT_APPLIED;
+	}
+
+	Map *area = target->GetCurrentArea();
+	int i = area->GetActorCount(true);
+	while(i--) {
+		Actor *victim = area->GetActor(i,true);
+		if (target==victim) continue;
+		if (PersonalDistance(target, victim)<20) {
+			//this function deletes tmp
+			core->ApplySpell(fx->Resource, victim, Owner, fx->Power);
+		}
+	}
+
 	return FX_NOT_APPLIED;
 }
 
 //0x127 JackalWereGaze (Charm ?)
-int fx_jackalwere_gaze (Actor* /*Owner*/, Actor* target, Effect* fx)
+int fx_jackalwere_gaze (Actor* Owner, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_jackalwere_gaze (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	target->Panic();
+	if (0) printf( "fx_jackalwere_gaze (%2d): Spell: %s\n", fx->Opcode, fx->Resource );
+	if (!fx->Resource[0]) {
+		strcpy(fx->Resource,"SPIN179");
+	}
+	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
+		return FX_NOT_APPLIED;
+	}
+
+	Map *area = target->GetCurrentArea();
+	int i = area->GetActorCount(true);
+	while(i--) {
+		Actor *victim = area->GetActor(i,true);
+		if (target==victim) continue;
+		if (PersonalDistance(target, victim)<20) {
+			//this function deletes tmp
+			core->ApplySpell(fx->Resource, victim, Owner, fx->Power);
+		}
+	}
+
 	return FX_APPLIED;
 }
 //0x128 ModifyGlobalVariable (same as bg2)
