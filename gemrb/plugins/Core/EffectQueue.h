@@ -182,8 +182,8 @@ public:
 	void RemoveEquippingEffects(ieDwordSigned slotcode);
 
 	/* removes all effects of a given spell */
-	void RemoveAllEffects(ieResRef Removed);
-	void RemoveAllEffects(ieResRef Removed, ieDword timing);
+	void RemoveAllEffects(const ieResRef Removed);
+	void RemoveAllEffects(const ieResRef Removed, ieDword timing);
 	/* removes all effects of type */
 	void RemoveAllEffects(EffectRef &effect_reference);
 	/* removes expired or to be expired effects */

@@ -147,7 +147,7 @@ private:
 	void SpawnCreature(CritterEntry &critter);
 	void SpawnGroup(SpawnEntry &event);
 public:
-	void InitSpawn(ieResRef DefaultArea);
+	void InitSpawn(const ieResRef DefaultArea);
 	void RespawnNameless();
 	void InitialSpawn();
 	void CheckSpawn();

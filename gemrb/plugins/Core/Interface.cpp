@@ -4264,15 +4264,13 @@ void Interface::RemoveFromCache(const ieResRef resref, SClass_ID ClassID)
 {
 	char filename[_MAX_PATH];
 	
-	strcpy( filename, CachePath );
-	strcat( filename, resref );
-	strcat( filename, TypeExt( ClassID ) );
+	snprintf(filename, _MAX_PATH, "%s%.8s%s", CachePath, resref, TypeExt( ClassID ) );
 	unlink ( filename);
 }
 
 //this function checks if the path is eligible as a cache
 //if it contains a directory, or suspicious file extensions
-//we bail out
+//we bail out, because the cache will be purged regularly.
 bool Interface::StupidityDetector(const char* Pt)
 {
 	char Path[_MAX_PATH];
@@ -4303,7 +4301,7 @@ bool Interface::StupidityDetector(const char* Pt)
 		if (ProtectedExtension(de->d_name) ) {
 			closedir( dir );
 			printf("\n**contains alien files**\n");
-			return true; //a directory in there???
+			return true; //an executable file in there???
 		}
 	} while (( de = readdir( dir ) ) != NULL);
 	closedir( dir );

@@ -55,7 +55,7 @@ ControlAnimation::~ControlAnimation(void)
 	bam = NULL;
 }
 
-bool ControlAnimation::SameResource(ieResRef ResRef, int Cycle)
+bool ControlAnimation::SameResource(const ieResRef ResRef, int Cycle)
 {
 	if (!control ) return false;
 	if (!bam) return false;

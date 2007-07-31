@@ -878,7 +878,7 @@ void EffectQueue::RemoveAllEffectsWithProjectile(ieDword projectile)
 }
 
 //remove effects belonging to a given spell
-void EffectQueue::RemoveAllEffects(ieResRef Removed)
+void EffectQueue::RemoveAllEffects(const ieResRef Removed)
 {
 	std::list< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
@@ -890,7 +890,7 @@ void EffectQueue::RemoveAllEffects(ieResRef Removed)
 }
 
 //remove effects belonging to a given spell, but only if they match timing method x
-void EffectQueue::RemoveAllEffects(ieResRef Removed, ieDword timing)
+void EffectQueue::RemoveAllEffects(const ieResRef Removed, ieDword timing)
 {
 	std::list< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {

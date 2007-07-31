@@ -58,7 +58,7 @@ public:
 	~ControlAnimation(void);
 	void UpdateAnimation();
 	//report if the current resource is the same as descripted by the params
-	bool SameResource(ieResRef ResRef, int Cycle);
+	bool SameResource(const ieResRef ResRef, int Cycle);
 };
 
 #endif

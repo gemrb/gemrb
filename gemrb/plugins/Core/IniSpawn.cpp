@@ -52,7 +52,7 @@ IniSpawn::~IniSpawn()
 	}
 }
 
-DataFileMgr *GetIniFile(ieResRef DefaultArea)
+DataFileMgr *GetIniFile(const ieResRef DefaultArea)
 {
 	DataStream* inifile = core->GetResourceMgr()->GetResource( DefaultArea, IE_INI_CLASS_ID );
 	if (!inifile) {
@@ -268,7 +268,7 @@ void IniSpawn::ReadSpawnEntry(DataFileMgr *inifile, const char *entryname, Spawn
 	delete[] critters;
 }
 
-void IniSpawn::InitSpawn(ieResRef DefaultArea)
+void IniSpawn::InitSpawn(const ieResRef DefaultArea)
 {
 	DataFileMgr *inifile;
 	const char *s;
