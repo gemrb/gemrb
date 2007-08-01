@@ -148,7 +148,7 @@ static int fx_resist_spell (Actor* Owner, Actor* target, Effect *fx);//ce
 static int fx_resist_spell_and_message (Actor* Owner, Actor* target, Effect *fx);//122
 static int fx_rod_of_smithing (Actor* Owner, Actor* target, Effect* fx); //123
 //0x124 MagicalRest (same as bg2)
-//0x125 BeholderDispelMagic (???)
+static int fx_beholder_dispel_magic (Actor* Owner, Actor* target, Effect* fx); //125
 static int fx_harpy_wail (Actor* Owner, Actor* target, Effect* fx); //126
 static int fx_jackalwere_gaze (Actor* Owner, Actor* target, Effect* fx); //127
 //0x128 ModifyGlobalVariable (same as bg2)
@@ -273,6 +273,7 @@ static EffectRef effectnames[] = {
 	{ "Protection:Spell2", fx_resist_spell, -1}, //ce
 	{ "Protection:Spell3", fx_resist_spell_and_message, -1}, //122
 	{ "RodOfSmithing", fx_rod_of_smithing, -1}, //123
+	{ "BeholderDispelMagic", fx_beholder_dispel_magic, -1},//125
 	{ "HarpyWail", fx_harpy_wail, -1}, //126
 	{ "JackalWereGaze", fx_jackalwere_gaze, -1}, //127
 	{ "UseMagicDeviceModifier", fx_use_magic_device_modifier, -1}, //12a
@@ -1762,8 +1763,35 @@ int fx_rod_of_smithing (Actor* Owner, Actor* target, Effect* fx)
 }
 
 //0x124 MagicalRest (same as bg2)
-//0x125 BeholderDispelMagic (???)
-//0x126 HarpyWail (???)
+
+//0x125 BeholderDispelMagic (applies resource on nearby actors)
+//TODO: range, affected actors
+int fx_beholder_dispel_magic (Actor* Owner, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_beholder_dispel_magic (%2d): Spell: %s\n", fx->Opcode, fx->Resource );
+	if (!fx->Resource[0]) {
+		strcpy(fx->Resource,"SPIN164");
+	}
+	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
+		return FX_NOT_APPLIED;
+	}
+
+	Map *area = target->GetCurrentArea();
+	int i = area->GetActorCount(true);
+	while(i--) {
+		Actor *victim = area->GetActor(i,true);
+		if (target==victim) continue;
+		if (PersonalDistance(target, victim)<20) {
+			//this function deletes tmp
+			core->ApplySpell(fx->Resource, victim, Owner, fx->Power);
+		}
+	}
+
+	return FX_NOT_APPLIED;
+}
+
+//0x126 HarpyWail (applies resource on nearby actors)
+//TODO: range, affected actors, sound effect
 int fx_harpy_wail (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_harpy_wail (%2d): Spell: %s\n", fx->Opcode, fx->Resource );
@@ -1788,7 +1816,8 @@ int fx_harpy_wail (Actor* Owner, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-//0x127 JackalWereGaze (Charm ?)
+//0x127 JackalWereGaze (applies resource on nearby actors)
+//TODO: range, affected actors
 int fx_jackalwere_gaze (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_jackalwere_gaze (%2d): Spell: %s\n", fx->Opcode, fx->Resource );
@@ -2420,6 +2449,7 @@ int fx_disguise (Actor* /*Owner*/, Actor* target, Effect* fx)
 	//set avatar anim?
 	return FX_NOT_APPLIED;
 }
+
 //438 HeroicInspiration
 int fx_heroic_inspiration (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -2575,6 +2605,7 @@ int fx_lower_resistance (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_SUB(IE_RESISTMAGIC, 15);
 	return FX_APPLIED;
 }
+
 //452 Bane
 static EffectRef fx_bless_ref={"Bless",NULL,-1};
 
