@@ -95,8 +95,8 @@ static int fx_iwd_monster_summoning (Actor* Owner, Actor* target, Effect* fx); /
 static int fx_vampiric_touch (Actor* Owner, Actor* target, Effect* fx); //f1
 // int fx_overlay f2 (same as PST)
 static int fx_animate_dead (Actor* Owner, Actor* target, Effect* fx);//f3
-//int fx_prayer (Actor* Owner, Actor* target, Effect* fx); //f4 pst
-//int fx_prayer_bad (Actor* Owner, Actor* target, Effect* fx); //f5 pst
+static int fx_prayer (Actor* Owner, Actor* target, Effect* fx); //f4
+static int fx_curse (Actor* Owner, Actor* target, Effect* fx); //f5
 static int fx_summon_monster2 (Actor* Owner, Actor* target, Effect* fx); //f6
 static int fx_burning_blood (Actor* Owner, Actor* target, Effect* fx); //f7 iwd
 static int fx_burning_blood2 (Actor* Owner, Actor* target, Effect* fx); //f7 how, iwd2
@@ -231,6 +231,8 @@ static EffectRef effectnames[] = {
 	{ "IWDMonsterSummoning", fx_iwd_monster_summoning, -1}, //f0
 	{ "VampiricTouch", fx_vampiric_touch, -1}, //f1
 	{ "AnimateDead", fx_animate_dead, -1}, //f3
+	{ "Prayer2", fx_prayer, -1}, //f4
+	{ "Curse2", fx_curse, -1}, //f5
 	{ "SummonMonster2", fx_summon_monster2, -1}, //f6
 	{ "BurningBlood", fx_burning_blood, -1}, //f7
 	{ "BurningBlood2", fx_burning_blood2, -1}, //f7
@@ -833,7 +835,49 @@ int fx_animate_dead (Actor* Owner, Actor* target, Effect* fx)
 	core->SummonCreature(monster, areahit, Owner, target, p, -1, fx->Parameter1);
 	return FX_NOT_APPLIED;
 }
-//f4,f5 (implemented in PST)
+//f4 Prayer
+int fx_prayer (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_prayer (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	ieDword value;
+	
+	if (fx->Parameter2)
+	{
+		if (target->SetSpellState(SS_BADPRAYER)) return FX_NOT_APPLIED;
+		EXTSTATE_SET(EXTSTATE_PRAYER_BAD);
+		value = (ieDword) -1;
+	}
+	else
+	{
+		if (target->SetSpellState(SS_GOODPRAYER)) return FX_NOT_APPLIED;
+		EXTSTATE_SET(EXTSTATE_PRAYER);
+		value = 1;
+	}
+
+	STAT_ADD( IE_TOHIT, value);
+	STAT_ADD( IE_SAVEFORTITUDE, value);
+	STAT_ADD( IE_SAVEREFLEX, value);
+	STAT_ADD( IE_SAVEWILL, value);
+	//make it compatible with 2nd edition
+	STAT_ADD( IE_SAVEVSBREATH, value);
+	STAT_ADD( IE_SAVEVSSPELL, value);
+	return FX_APPLIED;
+}
+//0xf5 
+int fx_curse (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_curse (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	if (target->SetSpellState(SS_BADPRAYER)) return FX_NOT_APPLIED;
+	EXTSTATE_SET(EXTSTATE_PRAYER_BAD);
+	STAT_ADD( IE_TOHIT, -1);
+	STAT_ADD( IE_SAVEFORTITUDE, -1);
+	STAT_ADD( IE_SAVEREFLEX, -1);
+	STAT_ADD( IE_SAVEWILL, -1);
+	//make it compatible with 2nd edition
+	STAT_ADD( IE_SAVEVSBREATH, -1);
+	STAT_ADD( IE_SAVEVSSPELL, -1);
+	return FX_APPLIED;
+}
 
 //0xf6 SummonMonster2
 #define IWD_SM2 11
@@ -2374,13 +2418,33 @@ int fx_tortoise_shell (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_blink (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_blink (%2d) Type: %d\n", fx->Opcode, fx->Parameter2);
+
 	if (target->SetSpellState( SS_BLINK)) return FX_APPLIED;
+
+	//pulsating translucence (like with invisibility)
+	ieDword Trans = fx->Parameter4;
+	if (fx->Parameter3) {
+		if (Trans>=240) {
+			fx->Parameter3=0;
+		} else {
+			Trans+=16;
+		}
+	} else {
+		if (Trans<=32) {
+			fx->Parameter3=1;
+		} else {
+			Trans-=16;
+		}
+	}
+	fx->Parameter4=Trans;
+	STAT_SET( IE_TRANSLUCENT, Trans);
+
 	if(fx->Parameter2) {
 		target->AddPortraitIcon(PI_EMPTYBODY);
 		return FX_APPLIED;
 	}
-	target->AddPortraitIcon(PI_BLINK);
 
+	target->AddPortraitIcon(PI_BLINK);
 	return FX_APPLIED;
 }
 
