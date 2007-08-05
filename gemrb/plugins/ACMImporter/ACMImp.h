@@ -25,9 +25,6 @@
 #include "../Core/SoundMgr.h"
 #include "../Core/FileStream.h"
 
-#include <SDL.h>
-#include <SDL_thread.h>
-
 class AmbientMgrAL;
 
 #ifndef WIN32
@@ -44,15 +41,6 @@ class AmbientMgrAL;
 
 // the distance at which sound is played at full volume
 #define REFERENCE_DISTANCE 50
-
-typedef struct AudioStream {
-	ALuint Buffer;
-	ALuint Source;
-	int Duration;
-	bool free;
-	//bool playing;
-	//CSoundReader* reader;
-} AudioStream;
 
 class ACMImp : public SoundMgr {
 private:

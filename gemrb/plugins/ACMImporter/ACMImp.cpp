@@ -26,6 +26,8 @@
 #include "../Core/Variables.h"
 #include "ACMImp.h"
 
+#include "SDL.h"
+
 #include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -40,6 +42,15 @@
 #define DisplayALError(string, error) printf("%s0x%04X", string, error);
 #define ACM_BUFFERSIZE 8192
 #define MUSICBUFFERS 10
+
+struct AudioStream {
+	ALuint Buffer;
+	ALuint Source;
+	int Duration;
+	bool free;
+	//bool playing;
+	//CSoundReader* reader;
+};
 
 static AudioStream streams[MAX_STREAMS], speech;
 static ALuint MusicSource, MusicBuffers[MUSICBUFFERS];

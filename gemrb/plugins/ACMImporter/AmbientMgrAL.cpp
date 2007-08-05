@@ -28,6 +28,8 @@
 #include "ACMImp.h"
 #include "AmbientMgrAL.h"
 
+#include "SDL.h"
+
 // legal nop if already reset
 void AmbientMgrAL::reset()
 {
