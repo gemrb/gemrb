@@ -246,6 +246,39 @@ static void GetItemSound(ieResRef &Sound, ieDword ItemType, ieDword Col)
 	strnlwrcpy(Sound, ItemSounds[ItemType][Col], 8);
 }
 
+static int GetCreatureStrRef(unsigned int Slot, unsigned int Str)
+{
+	Actor * actor = core->GetGame()->FindPC(Slot);
+	if (!actor || Str>=VCONST_COUNT) {
+		return 0xdadadada;
+	}
+	
+	return actor->StrRefs[Str];
+}
+
+static int GetCreatureStat(unsigned int Slot, unsigned int StatID, int Mod)
+{
+	Actor * actor = core->GetGame()->FindPC(Slot);
+	if (!actor) {
+		return 0xdadadada;
+	}
+	
+	if (Mod) {
+		return actor->GetStat( StatID );
+	}
+	return actor->GetBase( StatID );
+}
+
+static int SetCreatureStat(unsigned int Slot, unsigned int StatID, int StatValue)
+{
+	Actor * actor = core->GetGame()->FindPC(Slot);
+	if (!actor) {
+		return 0;
+	}
+	actor->SetBase( StatID, StatValue );
+	return 1;
+}
+
 PyDoc_STRVAR( GemRB_SetInfoTextColor__doc,
 "SetInfoTextColor(red, green, blue, [alpha])\n\n"
 "Sets the color of Floating Messages in GameControl." );
@@ -1973,8 +2006,8 @@ static PyObject* GemRB_SetButtonFont(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_SetButtonTextColor__doc,
-"SetButtonTextColor(WindowIndex, ControlIndex, red, green, blue)\n\n"
-"Sets the Text Color of a Button Control." );
+"SetButtonTextColor(WindowIndex, ControlIndex, red, green, blue[, invert=false])\n\n"
+"Sets the Text Color of a Button Control. Invert is used for fonts with swapped background and text colors." );
 
 static PyObject* GemRB_SetButtonTextColor(PyObject * /*self*/, PyObject* args)
 {
@@ -4329,6 +4362,22 @@ static PyObject* GemRB_GetPlayerPortrait(PyObject * /*self*/, PyObject* args)
 	return PyString_FromString( MyActor->GetPortrait(Which) );
 }
 
+PyDoc_STRVAR( GemRB_GetPlayerString__doc,
+"GetPlayerString(Slot, ID) => int\n\n"
+"Queries a string reference (verbal constant) from the actor." );
+
+static PyObject* GemRB_GetPlayerString(PyObject * /*self*/, PyObject* args)
+{
+	int PlayerSlot, Index, StatValue;
+
+	if (!PyArg_ParseTuple( args, "ii", &PlayerSlot, &Index)) {
+		return AttributeError( GemRB_GetPlayerString__doc );
+	}
+	//returning the modified stat if BaseStat was 0 (default)
+	StatValue = GetCreatureStrRef( PlayerSlot, Index );
+	return PyInt_FromLong( StatValue );
+}
+
 PyDoc_STRVAR( GemRB_GetPlayerStat__doc,
 "GetPlayerStat(Slot, ID[, BaseStat]) => int\n\n"
 "Queries a stat." );
@@ -4342,7 +4391,7 @@ static PyObject* GemRB_GetPlayerStat(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GetPlayerStat__doc );
 	}
 	//returning the modified stat if BaseStat was 0 (default)
-	StatValue = core->GetCreatureStat( PlayerSlot, StatID, !BaseStat );
+	StatValue = GetCreatureStat( PlayerSlot, StatID, !BaseStat );
 	return PyInt_FromLong( StatValue );
 }
 
@@ -4358,7 +4407,7 @@ static PyObject* GemRB_SetPlayerStat(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetPlayerStat__doc );
 	}
 	//Setting the creature's base stat
-	if (!core->SetCreatureStat( PlayerSlot, StatID, StatValue)) {
+	if (!SetCreatureStat( PlayerSlot, StatID, StatValue)) {
 		return RuntimeError("Cannot find actor!\n");
 	}
 	Py_INCREF( Py_None );
@@ -8012,6 +8061,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(CreatePlayer, METH_VARARGS),
 	METHOD(SetPlayerStat, METH_VARARGS),
 	METHOD(GetPlayerStat, METH_VARARGS),
+	METHOD(GetPlayerString, METH_VARARGS),
 	METHOD(GameSelectPC, METH_VARARGS),
 	METHOD(GameIsPCSelected, METH_VARARGS),
 	METHOD(GameSelectPCSingle, METH_VARARGS),

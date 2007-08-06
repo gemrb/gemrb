@@ -32,15 +32,6 @@ static int monthnamecount=0;
 //set this to -1 if charname is gabber (iwd2)
 static int charname=0;
 
-static char *CS(const char *src)
-{
-	if(!src) return NULL;
-	int len=strlen(src)+1;
-	char *ret = (char *) malloc(len);
-	memcpy(ret, src, len);
-	return ret;
-}
-
 TLKImp::TLKImp(void)
 {
 	if (core->HasFeature(GF_CHARNAMEISGABBER)) {
@@ -49,6 +40,7 @@ TLKImp::TLKImp(void)
 		charname=0;
 	}
 	str = NULL;
+	override = NULL;
 	autoFree = false;
 	if (monthnamecount==0) {
 		int i;
@@ -84,6 +76,27 @@ TLKImp::~TLKImp(void)
 	if (str && autoFree) {
 		delete( str );
 	}
+	CloseAux();
+}
+
+void TLKImp::CloseAux()
+{
+	if (override) {
+		delete override;
+	}
+	override = NULL;
+}
+
+void TLKImp::OpenAux()
+{
+	CloseAux();
+	override = new CTlkOverride();
+	if (override) {
+		if (!override->Init()) {
+			CloseAux();
+			printMessage("TlkImporter","Cannot open tlk override",RED);
+		}
+	}
 }
 
 bool TLKImp::Open(DataStream* stream, bool autoFree)
@@ -99,7 +112,7 @@ bool TLKImp::Open(DataStream* stream, bool autoFree)
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "TLK\x20V1\x20\x20", 8 ) != 0) {
-		printf( "[TLKImporter]: Not a valid TLK File." );
+		printMessage( "TLKImporter","Not a valid TLK File.",RED );
 		return false;
 	}
 	str->Seek( 2, GEM_CURRENT_POS );
@@ -147,9 +160,9 @@ char *TLKImp::Gabber()
 
 	act=core->GetGameControl()->GetSpeaker();
 	if (act) {
-		return CS(act->LongName);
+		return override->CS(act->LongName);
 	}
-	return CS("?");
+	return override->CS("?");
 }
 
 char *TLKImp::CharName(int slot)
@@ -158,9 +171,9 @@ char *TLKImp::CharName(int slot)
 
 	act=GetActorFromSlot(slot);
 	if (act) {
-		return CS(act->LongName);
+		return override->CS(act->LongName);
 	}
-	return CS("?");
+	return override->CS("?");
 }
 
 int TLKImp::RaceStrRef(int slot)
@@ -440,45 +453,48 @@ bool TLKImp::GetNewStringLength(char* string, int& Length)
 
 char* TLKImp::GetString(ieStrRef strref, ieDword flags)
 {
+	char* string;
+	
 	if (!(flags&IE_STR_ALLOW_ZERO) && !strref) {
 		goto empty;
 	}
+	ieWord type;
+	int Length;
+	ieResRef SoundResRef;
+
 	if (strref >= StrRefCount) {
 empty:
-		char* ret = ( char* ) malloc( 1 );
-		ret[0] = 0;
-		return ret;
-	}
-
-	ieDword Volume, Pitch, StrOffset;
-	ieDword l;
-	ieWord type;
-	ieResRef SoundResRef;
-	str->Seek( 18 + ( strref * 0x1A ), GEM_STREAM_START );
-	str->ReadWord( &type );
-	str->ReadResRef( SoundResRef );
-	str->ReadDword( &Volume );
-	str->ReadDword( &Pitch );
-	str->ReadDword( &StrOffset );
-	str->ReadDword( &l );
-	int Length;
-	if (l > 65535) {
-		Length = 65535; //safety limit, it could be a dword actually
-	}
-	else {
-		Length = l;
-	}
-	char* string;
-
-	if (type & 1) {
-		str->Seek( StrOffset + Offset, GEM_STREAM_START );
-		string = ( char * ) malloc( Length + 1 );
-		str->Read( string, Length );
+		string = override->ResolveAuxString(strref, Length);
+		type = 0;
+		SoundResRef[0]=0;
 	} else {
-		Length = 0;
-		string = ( char * ) malloc( 1 );
+		ieDword Volume, Pitch, StrOffset;
+		ieDword l;
+		str->Seek( 18 + ( strref * 0x1A ), GEM_STREAM_START );
+		str->ReadWord( &type );
+		str->ReadResRef( SoundResRef );
+		str->ReadDword( &Volume );
+		str->ReadDword( &Pitch );
+		str->ReadDword( &StrOffset );
+		str->ReadDword( &l );
+		if (l > 65535) {
+			Length = 65535; //safety limit, it could be a dword actually
+		}
+		else {
+			Length = l;
+		}
+		
+		if (type & 1) {
+			str->Seek( StrOffset + Offset, GEM_STREAM_START );
+			string = ( char * ) malloc( Length + 1 );
+			str->Read( string, Length );
+		} else {
+			Length = 0;
+			string = ( char * ) malloc( 1 );
+		}
+		string[Length] = 0; 
 	}
-	string[Length] = 0;
+
 	//tagged text, bg1 and iwd don't mark them specifically, all entries are tagged
 	if (core->HasFeature( GF_ALL_STRINGS_TAGGED ) || ( type & 4 )) {
 		//GetNewStringLength will look in string and return true
@@ -495,25 +511,9 @@ empty:
 	if (( type & 2 ) && ( flags & IE_STR_SOUND )) {
 		//if flags&IE_STR_SOUND play soundresref
 		if (SoundResRef[0] != 0) {
-/* this seems to be needless
-			Scriptable *target=core->GetGameControl()->GetTarget();
-			if (!target) {
-				target=core->GetGameControl()->GetSpeaker();
-			}
-*/
 			int xpos = 0;
 			int ypos = 0;
 			unsigned int flag = GEM_SND_RELATIVE | (flags&GEM_SND_SPEECH);
-/* this seems to be useless
-			if (target) {
-				xpos = target->Pos.x;
-				ypos = target->Pos.y;
-				//if it was speech, then it was spoken by target
-				if (flag) {
-					flag|=GEM_SND_RELATIVE;
-				}
-			}
-*/
 			//IE_STR_SPEECH will stop the previous sound source
 			core->GetSoundMgr()->Play( SoundResRef, xpos, ypos, flag);
 		}

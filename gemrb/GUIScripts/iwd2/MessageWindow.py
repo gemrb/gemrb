@@ -26,6 +26,7 @@ from GUIJRNL import *
 from GUIMA import *
 from GUIOPT import *
 from GUISPL import *
+from GUIREC import *
 from GUISTORE import *
 from GUIWORLD import *
 from TextScreen import *
@@ -105,7 +106,11 @@ def UpdateControlStatus():
 	GemRB.SetVar ("MessageTextArea", TMessageTA)
 
 	if Override:
-		GemRB.SetControlStatus (MessageWindow,MessageTA,IE_GUI_CONTROL_FOCUSED)
+		print "MessageWindow:",MessageWindow
+		print "MessageWindow:",MessageTA
+		print "MessageWindow:",TMessageWindow
+		print "MessageWindow:",TMessageTA
+		GemRB.SetControlStatus (TMessageWindow,TMessageTA,IE_GUI_CONTROL_FOCUSED)
 		#gets PC currently talking
 		pc = GemRB.GameGetSelectedPCSingle (1)
 		if pc:

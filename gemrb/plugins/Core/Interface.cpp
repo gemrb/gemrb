@@ -2567,30 +2567,6 @@ retry:
 	return ab;
 }
 
-int Interface::GetCreatureStat(unsigned int Slot, unsigned int StatID, int Mod)
-{
-	Actor * actor = game->FindPC(Slot);
-	if (!actor) {
-		return 0xdadadada;
-	}
-	
-	if (Mod) {
-		return actor->GetStat( StatID );
-	}
-	return actor->GetBase( StatID );
-}
-
-int Interface::SetCreatureStat(unsigned int Slot, unsigned int StatID,
-		int StatValue)
-{
-	Actor * actor = game->FindPC(Slot);
-	if (!actor) {
-		return 0;
-	}
-	actor->SetBase( StatID, StatValue );
-	return 1;
-}
-
 void Interface::RedrawControls(const char *varname, unsigned int value)
 {
 	for (unsigned int i = 0; i < windows.size(); i++) {
@@ -3714,6 +3690,7 @@ void Interface::LoadGame(int index)
 	
 	// Yes, it uses goto. Other ways seemed too awkward for me.
 	
+	strings->CloseAux();
 	tokens->RemoveAll(NULL); //clearing the token dictionary
 	DataStream* gam_str = NULL;
 	DataStream* sav_str = NULL;
@@ -3746,8 +3723,7 @@ void Interface::LoadGame(int index)
 	
 	if (!gam_str || !wmp_str)
 		goto cleanup;
-	
-	
+		
 	// Load GAM file
 	gam_mgr = ( SaveGameMgr* ) GetInterface( IE_GAM_CLASS_ID );
 	if (!gam_mgr)
@@ -3802,10 +3778,12 @@ void Interface::LoadGame(int index)
 	game = new_game;
 	worldmap = new_worldmap;
 	
+	strings->OpenAux();
 	LoadProgress(100);
 	return;
 cleanup:
 	// Something went wrong, so try to clean after itself
+
 	if (new_game)
 		delete( new_game );
 	if (new_worldmap)

@@ -358,10 +358,6 @@ public:
 	int LoadCreature(const char *ResRef, int InParty, bool character=false);
 	/** core for summoning creatures, returns the last created Actor */
 	Actor *SummonCreature(const ieResRef resource, const ieResRef vvcres, Actor *Owner, Actor *target, Point &position, int eamod, int level);
-	/** Sets a stat for the creature in actor index Slot */
-	int SetCreatureStat(unsigned int Slot, unsigned int StatID, int StatValue);
-	/** returns the stat of a creature (mod:1-modified, 0-base) */
-	int GetCreatureStat(unsigned int Slot, unsigned int StatID, int Mod);
 	/** Loads a WindowPack (CHUI file) in the Window Manager */
 	bool LoadWindowPack(const char *name);
 	/** Loads a Window in the Window Manager */

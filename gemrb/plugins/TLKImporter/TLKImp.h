@@ -23,6 +23,7 @@
 #define TLKIMP_H
 
 #include "../Core/StringMgr.h"
+#include "TlkOverride.h"
 
 class TLKImp : public StringMgr {
 private:
@@ -31,14 +32,26 @@ private:
 
 	//Data
 	ieDword StrRefCount, Offset;
+	CTlkOverride *override;
+
 public:
 	TLKImp(void);
 	~TLKImp(void);
+	/** open string refs coming from saved game */
+	void OpenAux();
+	/** purge string defs coming from saved game */
+	void CloseAux();
 	bool Open(DataStream* stream, bool autoFree = true);
 	char* GetString(ieStrRef strref, ieDword flags = 0);
 	StringBlock GetStringBlock(ieStrRef strref, unsigned int flags = 0);
 	void FreeString(char *str);
 private:
+	/** loads a string from the auxiliary resource, knowing the strref */
+	char* LocateString(ieStrRef strref);
+	/** loads a string from the auxiliary resource, knowing absolute offset in file*/
+	char* LocateString2(ieDword offset);
+	/** gets a cached string */
+	char* ResolveAuxString(ieStrRef strref, ieDword flags, int &Length);
 	/** resolves day and monthname tokens */
 	void GetMonthName(int dayandmonth);
 	/** replaces tags in dest, don't exceed Length */
@@ -47,8 +60,7 @@ private:
 		if there was no token, returns false */
 	bool GetNewStringLength(char* string, int& Length);
 	/**returns the decoded length of the built-in token
-	   if dest is not NULL it also returns the decoded value
-	   */
+		 if dest is not NULL it also returns the decoded value */
 	int BuiltinToken(char* Token, char* dest);
 	int RaceStrRef(int slot);
  	int GenderStrRef(int slot, int malestrref, int femalestrref);
