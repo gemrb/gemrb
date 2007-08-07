@@ -256,6 +256,26 @@ static int GetCreatureStrRef(unsigned int Slot, unsigned int Str)
 	return actor->StrRefs[Str];
 }
 
+//returns a numeric value associated with a stat name (symbol) from stats.ids
+static inline ieDword TranslateStat(const char *stat_name)
+{
+	int symbol = core->LoadSymbol( "stats" );
+	SymbolMgr *sym = core->GetSymbol( symbol );
+	ieDword stat = (ieDword) sym->GetValue( stat_name );
+	if (!stat) {
+		printMessage("GUIScript"," ",YELLOW);
+		printf("Cannot translate symbol: %s\n", stat_name);
+	}
+	return stat;
+}
+
+static inline bool CheckStat(Actor * actor, const char *stat_name, ieDword value)
+{
+	ieDword stat = TranslateStat(stat_name);
+	//some stats should check for exact value
+	return actor->GetBase(stat)>=value;
+}
+
 static int GetCreatureStat(unsigned int Slot, unsigned int StatID, int Mod)
 {
 	Actor * actor = core->GetGame()->FindPC(Slot);
@@ -843,7 +863,8 @@ static PyObject* GemRB_UnloadTable(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_GetTableValue__doc,
 "GetTableValue(TableIndex, RowIndex/RowString, ColIndex/ColString, type) => value\n\n"
-"Returns a field of a 2DA Table. If Type is omitted the return type is the autodetected, otherwise 1 means integer, 0 means string." );
+"Returns a field of a 2DA Table. If Type is omitted the return type is the autodetected, "
+"otherwise 0 means string, 1 means integer, 2 means stat symbol translation." );
 
 static PyObject* GemRB_GetTableValue(PyObject * /*self*/, PyObject* args)
 {
@@ -910,6 +931,10 @@ static PyObject* GemRB_GetTableValue(PyObject * /*self*/, PyObject* args)
 		//if which = 1 then return number
 		//if which = -1 (omitted) then return the best format
 		if (valid_number( ret, val ) || (which==1) ) {
+			return PyInt_FromLong( val );
+		}
+		if (which==2) {
+			val = TranslateStat(ret);
 			return PyInt_FromLong( val );
 		}
 		return PyString_FromString( ret );
@@ -6675,16 +6700,6 @@ static PyObject* GemRB_GamePause(PyObject * /*self*/, PyObject* args)
 
 	Py_INCREF( Py_None );
 	return Py_None;
-}
-
-static bool CheckStat(Actor * actor, const char *stat_name, ieDword value)
-{
-	int symbol = core->LoadSymbol( "stats" );
-	SymbolMgr *sym = core->GetSymbol( symbol );
-	long stat = sym->GetValue( stat_name );
-
-	//some stats should check for exact value
-	return actor->GetBase(stat)>=value;
 }
 
 PyDoc_STRVAR( GemRB_CheckFeatCondition__doc,
