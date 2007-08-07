@@ -11,6 +11,7 @@ Type                   - forces a specific return type
 -1 - default
  0 - string
  1 - int
+ 2 - stat symbol (translated to numeric)
 
 Return value: numeric or string, based on the indices or type
 
