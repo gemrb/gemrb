@@ -1,19 +1,19 @@
 2DA V1.0
 -1
-NAME			STAT
-Alchemy			115
-Animal_Empathy		116
-Bluff			117
-Concentration		118
-Diplomacy		119
-Disable_Device		28
-Hide			135
-Intimidate		120
-Knowledge_Arcana	25
-Move_Silently		27
-Open_Lock		26
-Pick_Pocket		29
-Search			121
-Spellcraft		122
-Use_Magic_Device	123
-Wilderness_Lore		33
+                 STAT          ABILITY
+Alchemy          ALCHEMY       INT
+Animal_Empathy   ANIMALS       CHA
+Bluff            BLUFF         CHA
+Concentration    CONCENTRATION CON
+Diplomacy        DIPLOMACY     CHA
+Disable_Device   TRAPS         INT
+Hide             HIDEINSHADOWS DEX
+Intimidate       INTIMIDATE    CHA
+Knowledge_Arcana LORE          INT
+Move_Silently    STEALTH       DEX
+Open_Lock        LOCKPICKING   DEX
+Pick_Pocket      PICKPOCKET    DEX
+Search           SEARCH        INT
+Spellcraft       SPELLCRAFT    INT
+Use_Magic_Device MAGICDEVICE   CHA
+Wilderness_Lore  TRACKING      WIS
