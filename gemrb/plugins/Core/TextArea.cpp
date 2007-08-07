@@ -300,8 +300,15 @@ void TextArea::SetScrollBar(Control* ptr)
 /** Sets the Actual Text */
 int TextArea::SetText(const char* text, int pos)
 {
-	if (( pos == 0 ) && ( lines.size() == 0 )) {
-		pos = -1;
+	if (pos==0) {
+		if (!text[0]) {
+			lines.clear();
+			lrows.clear();
+		}
+
+		if (lines.size() == 0) {
+			pos = -1;
+		}
 	}
 	if (pos >= ( int ) lines.size()) {
 		return -1;
