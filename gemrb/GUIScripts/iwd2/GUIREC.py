@@ -188,7 +188,6 @@ def DisplayGeneral (pc):
 	StateTable = GemRB.LoadTable ("statdesc") 
 	for c in effects:
 		tmp = GemRB.GetTableValue (StateTable, ord(c)-65, 0)
-		print c, GemRB.GetString(tmp)
 		GemRB.TextAreaAppend (Window, RecordsTextArea, tmp, -1)
  	GemRB.UnloadTable (StateTable)
 
@@ -275,7 +274,6 @@ def DisplaySkills (pc):
 			feat = GemRB.GetTableValue (FeatName, i, 1)
 			GemRB.TextAreaAppend (Window, RecordsTextArea, feat, -1)
 			stat = GemRB.GetTableValue (FeatTable, i, 9, 2)
-			print stat
 			if stat:
 				multi = GemRB.GetPlayerStat (pc, stat)
 				GemRB.TextAreaAppend (Window, RecordsTextArea, ": "+str(multi) )
@@ -604,6 +602,54 @@ def OpenBiographyWindow ():
 
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 	return 
+
+def OpenExportWindow ():
+	global ExportWindow, NameField, ExportDoneButton
+
+	ExportWindow = GemRB.LoadWindow(13)
+
+	TextArea = GemRB.GetControl(ExportWindow, 2)
+	GemRB.SetText(ExportWindow, TextArea, 10962)
+
+	TextArea = GemRB.GetControl(ExportWindow,0)
+	GemRB.GetCharacters (ExportWindow, TextArea)
+
+	ExportDoneButton = GemRB.GetControl(ExportWindow, 4)
+	GemRB.SetText(ExportWindow, ExportDoneButton, 11973)
+	GemRB.SetButtonState(ExportWindow, ExportDoneButton, IE_GUI_BUTTON_DISABLED)
+
+	CancelButton = GemRB.GetControl(ExportWindow,5)
+	GemRB.SetText(ExportWindow, CancelButton, 13727)
+
+	NameField = GemRB.GetControl(ExportWindow,6)
+
+	GemRB.SetEvent(ExportWindow, ExportDoneButton, IE_GUI_BUTTON_ON_PRESS, "ExportDonePress")
+	GemRB.SetEvent(ExportWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "ExportCancelPress")
+	GemRB.SetEvent(ExportWindow, NameField, IE_GUI_EDIT_ON_CHANGE, "ExportEditChanged")
+	GemRB.ShowModal (ExportWindow, MODAL_SHADOW_GRAY)
+	GemRB.SetControlStatus (ExportWindow, NameField,IE_GUI_CONTROL_FOCUSED)
+	return
+
+def ExportDonePress():
+	GemRB.UnloadWindow(ExportWindow)
+	#save file under name from EditControl
+	pc = GemRB.GameGetSelectedPCSingle ()
+	GemRB.SaveCharacter(pc, ExportFileName)
+	return
+
+def ExportCancelPress():
+	GemRB.UnloadWindow(ExportWindow)
+	return
+
+def ExportEditChanged():
+	global ExportFileName
+
+	ExportFileName = GemRB.QueryText(ExportWindow, NameField)
+	if ExportFileName == "":
+		GemRB.SetButtonState(ExportWindow, ExportDoneButton, IE_GUI_BUTTON_DISABLED)
+	else:
+		GemRB.SetButtonState(ExportWindow, ExportDoneButton, IE_GUI_BUTTON_ENABLED)
+	return
 
 ###################################################
 # End of file GUIREC.py
