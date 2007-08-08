@@ -1206,8 +1206,6 @@ void CREImp::GetActorIWD2(Actor *act)
 	str->Read( & tmpByte, 1 );
 	act->BaseStats[IE_LEVELFIGHTER]=tmpByte;
 	str->Read( & tmpByte, 1 );
-	act->BaseStats[IE_LEVELMAGE]=tmpByte;
-	str->Read( & tmpByte, 1 );
 	act->BaseStats[IE_LEVELMONK]=tmpByte;
 	str->Read( & tmpByte, 1 );
 	act->BaseStats[IE_LEVELPALADIN]=tmpByte;
@@ -1217,6 +1215,8 @@ void CREImp::GetActorIWD2(Actor *act)
 	act->BaseStats[IE_LEVELTHIEF]=tmpByte;
 	str->Read( & tmpByte, 1 );
 	act->BaseStats[IE_LEVELSORCEROR]=tmpByte;
+	str->Read( & tmpByte, 1 );
+	act->BaseStats[IE_LEVELMAGE]=tmpByte;
 	str->Seek( 22, GEM_CURRENT_POS ); //levels for classes
 	for (i=0;i<64;i++) {
 		str->ReadDword( &act->StrRefs[i] );
