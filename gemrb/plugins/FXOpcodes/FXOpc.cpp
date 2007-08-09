@@ -3502,6 +3502,11 @@ int fx_dontjump_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_move_to_area (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_move_to_area (%2d) %s", fx->Opcode, fx->Resource );
+	//delay effect until the target has an area
+	//hopefully this fixes an evil bug
+	if (!target->GetCurrentArea()) {
+		return FX_APPLIED;
+	}
 	Point p(fx->PosX,fx->PosY);
 	MoveBetweenAreasCore(target, fx->Resource, p, fx->Parameter2, true);
 	//this effect doesn't stick?
