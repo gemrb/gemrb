@@ -6771,7 +6771,7 @@ PyDoc_STRVAR( GemRB_GetAbilityBonus__doc,
 
 static PyObject* GemRB_GetAbilityBonus(PyObject * /*self*/, PyObject* args)
 {
-	int stat, column, value, ex;
+	int stat, column, value, ex = 0;
 	int ret;
 
 	if (!PyArg_ParseTuple( args, "iii|i", &stat, &column, &value, &ex)) {
