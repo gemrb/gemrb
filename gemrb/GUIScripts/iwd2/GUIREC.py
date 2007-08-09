@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
-# $Id: GUIINV.py 4503 2007-02-27 16:43:46Z wjpalenstijn $
+# $Id: GUIREC.py 4503 2007-02-27 16:43:46Z wjpalenstijn $
 
 
 # GUIREC.py - scripts to control character record windows from GUIREC winpack
@@ -146,20 +146,47 @@ def OpenRecordsWindow ():
 	return
 
 def ColorDiff (Window, Label, diff):
-#this is the bg2 style color diff
-#	if diff>0:
-#		GemRB.SetLabelTextColor (Window, Label, 0, 255, 0)
-#	elif diff<0:
-#		GemRB.SetLabelTextColor (Window, Label, 255, 0, 0)
-#	else:
-#		GemRB.SetLabelTextColor (Window, Label, 255, 255, 255)
+	if diff>0:
+		GemRB.SetLabelTextColor (Window, Label, 0, 255, 0)
+	elif diff<0:
+		GemRB.SetLabelTextColor (Window, Label, 255, 0, 0)
+	else:
+		GemRB.SetLabelTextColor (Window, Label, 255, 255, 255)
+	return
 
-#this is the iwd2 style color diff
+def ColorDiff2 (Window, Label, diff):
 	if diff:
 		GemRB.SetLabelTextColor (Window, Label, 255, 255, 0)
 	else:
 		GemRB.SetLabelTextColor (Window, Label, 255, 255, 255)
 	return
+
+def HasBonusSpells (pc):
+	return False
+
+def HasClassFeatures (pc):
+	#clerics turning
+	if GemRB.GetPlayerStat(pc, IE_TURNUNDEADLEVEL):
+		return True
+	#thieves backstabbing damage
+	if GemRB.GetPlayerStat(pc, IE_BACKSTABDAMAGEMULTIPLIER):
+		return True
+	#paladins healing
+	if GemRB.GetPlayerStat(pc, IE_LAYONHANDSAMOUNT):
+		return True
+	return False
+
+def GetFavoredClass (pc):
+	return "???"
+
+def GetAbilityBonus (pc, stat):
+	Ability = GemRB.GetPlayerStat (pc, stat)
+	return Ability//2-5
+
+#barbarian, bard, cleric, druid, fighter, monk, paladin, ranger, rogue, sorcerer, wizard
+Classes = [IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, \
+IE_LEVEL, IE_LEVELMONK, IE_LEVELPALADIN, IE_LEVELRANGER, IE_LEVEL3, \
+IE_LEVELSORCEROR, IE_LEVEL2]
 
 def DisplayGeneral (pc):
 	Window = RecordsWindow
@@ -168,60 +195,128 @@ def DisplayGeneral (pc):
 	AlignTable = GemRB.LoadTable("aligns")
 
 	#levels
-	GemRB.TextAreaAppend (Window, RecordsTextArea, "[color=0xffff00]")
+	GemRB.TextAreaAppend (Window, RecordsTextArea, "[color=ffff00]")
 	GemRB.TextAreaAppend (Window, RecordsTextArea, 40308)
+	GemRB.TextAreaAppend (Window, RecordsTextArea, " - ")
+	GemRB.TextAreaAppend (Window, RecordsTextArea, 40309)
+	tmp = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM)
+	GemRB.TextAreaAppend (Window, RecordsTextArea, ": "+str(tmp) )
 	GemRB.TextAreaAppend (Window, RecordsTextArea, "[/color]\n")
+	for i in range(11):
+		level = GemRB.GetPlayerStat (pc, Classes[i])
+		if level:
+			Class = GemRB.GetTableValue (ClassTable, i, 0)
+			GemRB.TextAreaAppend (Window, RecordsTextArea, Class, -1)
+			GemRB.TextAreaAppend (Window, RecordsTextArea, ": "+str(level) )
+
+	GemRB.TextAreaAppend (Window, RecordsTextArea, 40310,-1)
+	GemRB.TextAreaAppend (Window, RecordsTextArea, ": "+GetFavoredClass(pc) )
 
 	#experience
-	GemRB.TextAreaAppend (Window, RecordsTextArea, "[color=0xffff00]")
+	GemRB.TextAreaAppend (Window, RecordsTextArea, "\n\n[color=ffff00]")
 	GemRB.TextAreaAppend (Window, RecordsTextArea, 17089)
-	GemRB.TextAreaAppend (Window, RecordsTextArea, "[/color]\n")
+	GemRB.TextAreaAppend (Window, RecordsTextArea, "[/color]")
 
-	GemRB.TextAreaAppend (Window, RecordsTextArea, 36928)
-	GemRB.TextAreaAppend (Window, RecordsTextArea, 17091)
+	GemRB.TextAreaAppend (Window, RecordsTextArea, 36928,-1)
+	xp = GemRB.GetPlayerStat (pc, IE_XP)
+	GemRB.TextAreaAppend (Window, RecordsTextArea, ": "+str(xp) )
+	GemRB.TextAreaAppend (Window, RecordsTextArea, 17091,-1)
+	GemRB.TextAreaAppend (Window, RecordsTextArea, ": " )
 
 	#current effects
-	GemRB.TextAreaAppend (Window, RecordsTextArea, "[color=0xffff00]")
+	GemRB.TextAreaAppend (Window, RecordsTextArea, "\n\n[color=ffff00]")
 	GemRB.TextAreaAppend (Window, RecordsTextArea, 32052)
 	GemRB.TextAreaAppend (Window, RecordsTextArea, "[/color]")
 	effects = GemRB.GetPlayerStates (pc)
-	StateTable = GemRB.LoadTable ("statdesc") 
+	StateTable = GemRB.LoadTable ("statdesc")
 	for c in effects:
 		tmp = GemRB.GetTableValue (StateTable, ord(c)-65, 0)
 		GemRB.TextAreaAppend (Window, RecordsTextArea, tmp, -1)
  	GemRB.UnloadTable (StateTable)
 
 	#race
-	GemRB.TextAreaAppend (Window, RecordsTextArea, "\n\n[color=0xffff00]")
+	GemRB.TextAreaAppend (Window, RecordsTextArea, "\n\n[color=ffff00]")
 	GemRB.TextAreaAppend (Window, RecordsTextArea, 1048)
-	GemRB.TextAreaAppend (Window, RecordsTextArea, "[/color]\n")
-	Race = GemRB.GetTableValue(RaceTable,GemRB.GetPlayerStat(pc,IE_RACE)-1,2)
-	GemRB.TextAreaAppend (Window, RecordsTextArea, Race)
+	GemRB.TextAreaAppend (Window, RecordsTextArea, "[/color]")
+
+	Value = GemRB.GetPlayerStat(pc,IE_RACE)
+	Value2 = GemRB.GetPlayerStat(pc,IE_SUBRACE)
+	if Value2:
+		Value = Value<<16 | Value2
+	tmp = GemRB.FindTableValue (RaceTable, 3, Value)
+	Race = GemRB.GetTableValue (RaceTable, tmp, 2)
+	GemRB.TextAreaAppend (Window, RecordsTextArea, Race,-1)
 
 	#alignment
-	GemRB.TextAreaAppend (Window, RecordsTextArea, "\n\n[color=0xffff00]")
+	GemRB.TextAreaAppend (Window, RecordsTextArea, "\n\n[color=ffff00]")
 	GemRB.TextAreaAppend (Window, RecordsTextArea, 1049)
-	GemRB.TextAreaAppend (Window, RecordsTextArea, "[/color]\n")
+	GemRB.TextAreaAppend (Window, RecordsTextArea, "[/color]")
 	tmp = GemRB.FindTableValue ( AlignTable, 3, GemRB.GetPlayerStat (pc, IE_ALIGNMENT) )
-	Align = GemRB.GetTableValue (AlignTable, tmp, 0)
-	GemRB.TextAreaAppend (Window, RecordsTextArea, Align)
+	Align = GemRB.GetTableValue (AlignTable, tmp, 2)
+	GemRB.TextAreaAppend (Window, RecordsTextArea, Align,-1)
 
 	#saving throws
-	GemRB.TextAreaAppend (Window, RecordsTextArea, "\n\n[color=0xffff00]")
+	GemRB.TextAreaAppend (Window, RecordsTextArea, "\n\n[color=ffff00]")
 	GemRB.TextAreaAppend (Window, RecordsTextArea, 17379)
-	GemRB.TextAreaAppend (Window, RecordsTextArea, "[/color]\n")
-	tmp = GemRB.FindTableValue ( AlignTable, 3, GemRB.GetPlayerStat (pc, IE_SAVEFORTITUDE) )
-	Save = GemRB.GetTableValue (AlignTable, tmp, 0)
-	GemRB.TextAreaAppend (Window, RecordsTextArea, 17380)
-	GemRB.TextAreaAppend (Window, RecordsTextArea, Save)
-	tmp = GemRB.FindTableValue ( AlignTable, 3, GemRB.GetPlayerStat (pc, IE_SAVEREFLEX) )
-	Align = GemRB.GetTableValue (AlignTable, tmp, 0)
-	GemRB.TextAreaAppend (Window, RecordsTextArea, 17381)
-	GemRB.TextAreaAppend (Window, RecordsTextArea, Save)
-	tmp = GemRB.FindTableValue ( AlignTable, 3, GemRB.GetPlayerStat (pc, IE_SAVEWILL) )
-	Align = GemRB.GetTableValue (AlignTable, tmp, 0)
-	GemRB.TextAreaAppend (Window, RecordsTextArea, 17382)
-	GemRB.TextAreaAppend (Window, RecordsTextArea, Save)
+	GemRB.TextAreaAppend (Window, RecordsTextArea, "[/color]")
+	tmp = GemRB.GetPlayerStat (pc, IE_SAVEFORTITUDE)
+	tmp -= GemRB.GetPlayerStat (pc, IE_SAVEFORTITUDE, 1)
+	if tmp<0: stmp = str(tmp)
+	else: stmp = "+"+str(tmp)
+	GemRB.TextAreaAppend (Window, RecordsTextArea, 17380,-1)
+	GemRB.TextAreaAppend (Window, RecordsTextArea, ": "+stmp )
+	tmp = GemRB.GetPlayerStat (pc, IE_SAVEREFLEX)
+	tmp -= GemRB.GetPlayerStat (pc, IE_SAVEREFLEX, 1)
+	if tmp<0: stmp = str(tmp)
+	else: stmp = "+"+str(tmp)
+	GemRB.TextAreaAppend (Window, RecordsTextArea, 17381,-1)
+	GemRB.TextAreaAppend (Window, RecordsTextArea, ": "+stmp )
+	tmp = GemRB.GetPlayerStat (pc, IE_SAVEWILL)
+	tmp -= GemRB.GetPlayerStat (pc, IE_SAVEWILL, 1)
+	if tmp<0: stmp = str(tmp)
+	else: stmp = "+"+str(tmp)
+	GemRB.TextAreaAppend (Window, RecordsTextArea, 17382,-1)
+	GemRB.TextAreaAppend (Window, RecordsTextArea, ": "+stmp )
+
+	#class features
+	if HasClassFeatures(pc):
+		GemRB.TextAreaAppend (Window, RecordsTextArea, "\n\n[color=ffff00]")
+		GemRB.TextAreaAppend (Window, RecordsTextArea, 40314)
+		GemRB.TextAreaAppend (Window, RecordsTextArea, "[/color]\n")
+		tmp = GemRB.GetPlayerStat (pc, IE_TURNUNDEADLEVEL)
+		if tmp:
+			GemRB.TextAreaAppend (Window, RecordsTextArea, 12146,-1)
+			GemRB.TextAreaAppend (Window, RecordsTextArea, ": "+str(tmp) )
+		tmp = GemRB.GetPlayerStat (pc, IE_BACKSTABDAMAGEMULTIPLIER)
+		if tmp:
+			GemRB.TextAreaAppend (Window, RecordsTextArea, 24898,-1)
+			GemRB.TextAreaAppend (Window, RecordsTextArea, ": "+str(tmp)+"d6" )
+		tmp = GemRB.GetPlayerStat (pc, IE_LAYONHANDSAMOUNT)
+		if tmp:
+			GemRB.TextAreaAppend (Window, RecordsTextArea, 12127,-1)
+			GemRB.TextAreaAppend (Window, RecordsTextArea, ": "+str(tmp) )
+
+	#bonus spells
+	if HasBonusSpells(pc):
+		GemRB.TextAreaAppend (Window, RecordsTextArea, "\n\n[color=ffff00]")
+		GemRB.TextAreaAppend (Window, RecordsTextArea, 10344)
+		GemRB.TextAreaAppend (Window, RecordsTextArea, "[/color]\n")
+
+	#ability statistics
+	GemRB.TextAreaAppend (Window, RecordsTextArea, "\n\n[color=ffff00]")
+	GemRB.TextAreaAppend (Window, RecordsTextArea, 40315)
+	GemRB.TextAreaAppend (Window, RecordsTextArea, "[/color]")
+
+	GemRB.TextAreaAppend (Window, RecordsTextArea, 10338,-1) #strength
+	tmp = GemRB.GetAbilityBonus( IE_STR, 3, GemRB.GetPlayerStat(pc, IE_STR) )
+	GemRB.TextAreaAppend (Window, RecordsTextArea, ": " + str(tmp) )
+	tmp = GetAbilityBonus(pc, IE_CON)
+	GemRB.TextAreaAppend (Window, RecordsTextArea, 10342,-1)
+	GemRB.TextAreaAppend (Window, RecordsTextArea, ": " + str(tmp) ) #con bonus
+
+	GemRB.TextAreaAppend (Window, RecordsTextArea, 15581,-1) #spell resistance
+	tmp = GemRB.GetPlayerStat (pc, IE_MAGICDAMAGERESISTANCE)
+	GemRB.TextAreaAppend (Window, RecordsTextArea, ": "+str(tmp) )
 
 	GemRB.UnloadTable (RaceTable)
 	GemRB.UnloadTable (ClassTable)
@@ -241,7 +336,7 @@ def DisplaySkills (pc):
 	rows = GemRB.GetTableRowCount (SkillTable)
 
 	#skills
-	GemRB.TextAreaAppend (Window, RecordsTextArea, "[color=0xffff00]")
+	GemRB.TextAreaAppend (Window, RecordsTextArea, "[color=ffff00]")
 	GemRB.TextAreaAppend (Window, RecordsTextArea, 11983)
 	GemRB.TextAreaAppend (Window, RecordsTextArea, "[/color]")
 
@@ -250,7 +345,7 @@ def DisplaySkills (pc):
 		value = GemRB.GetPlayerStat (pc, stat)
 		base = GemRB.GetPlayerStat (pc, stat, 1)
 
-		if value:			
+		if value:
 			skill = GemRB.GetTableValue (SkillName, i, 1)
 			GemRB.TextAreaAppend (Window, RecordsTextArea, skill, -1)
 			GemRB.TextAreaAppend (Window, RecordsTextArea, " "+str(value)+"("+str(base)+")")
@@ -263,11 +358,11 @@ def DisplaySkills (pc):
 	rows = GemRB.GetTableRowCount (FeatTable)
 	#feats
 	featbits = [GemRB.GetPlayerStat (pc, IE_FEATS1), GemRB.GetPlayerStat (pc, IE_FEATS2), GemRB.GetPlayerStat (pc, IE_FEATS3)]
-	GemRB.TextAreaAppend (Window, RecordsTextArea, "\n\n[color=0xffff00]")
+	GemRB.TextAreaAppend (Window, RecordsTextArea, "\n\n[color=ffff00]")
 	GemRB.TextAreaAppend (Window, RecordsTextArea, 36361)
 	GemRB.TextAreaAppend (Window, RecordsTextArea, "[/color]")
 
-	for i in range(rows):		
+	for i in range(rows):
 		featidx = i/32
 		pos = 1<<(i%32)
 		if featbits[featidx]&pos:
@@ -279,6 +374,7 @@ def DisplaySkills (pc):
 				GemRB.TextAreaAppend (Window, RecordsTextArea, ": "+str(multi) )
 
 	GemRB.UnloadTable (FeatTable)
+	GemRB.UnloadTable (FeatName)
 	return
 
 #character information
@@ -299,7 +395,7 @@ def DisplayMisc (pc):
 	stat = GemRB.GetPCStats (pc)
 
 	#favourites
-	GemRB.TextAreaAppend (Window, RecordsTextArea, "[color=0xffff00]")
+	GemRB.TextAreaAppend (Window, RecordsTextArea, "[color=ffff00]")
 	GemRB.TextAreaAppend (Window, RecordsTextArea, 40320)
 	GemRB.TextAreaAppend (Window, RecordsTextArea, "[/color]\n")
 
@@ -308,7 +404,7 @@ def DisplayMisc (pc):
 	GemRB.TextAreaAppend (Window, RecordsTextArea, stat['FavouriteWeapon'])
 
 	#
-	GemRB.TextAreaAppend (Window, RecordsTextArea, "[color=0xffff00]")
+	GemRB.TextAreaAppend (Window, RecordsTextArea, "[color=ffff00]")
 	GemRB.TextAreaAppend (Window, RecordsTextArea, 40322)
 	GemRB.TextAreaAppend (Window, RecordsTextArea, "[/color]\n")
 
@@ -330,12 +426,12 @@ def DisplayMisc (pc):
 
 	GemRB.SetToken ('GAMEDAYS', str (days))
 	GemRB.SetToken ('HOUR', str (hours))
-	
+
 	#actually it is 16043 <DURATION>, but duration is translated to
 	#16041, hopefully this won't cause problem with international version
 	GemRB.TextAreaAppend (Window, RecordsTextArea, 16041)
 
-	#total xp 
+	#total xp
 	if TotalPartyExp != 0:
 		PartyExp = int ((stat['KillsTotalXP'] * 100) / TotalPartyExp)
 		GemRB.TextAreaAppend (Window, RecordsTextArea, str (PartyExp) + '%')
@@ -348,7 +444,7 @@ def DisplayMisc (pc):
 	else:
 		GemRB.TextAreaAppend (Window, RecordsTextArea, "0%")
 
-	#total xp 
+	#total xp
 	if TotalCount != 0:
 		PartyExp = int ((stat['KillsTotalCount'] * 100) / TotalCount)
 		GemRB.TextAreaAppend (Window, RecordsTextArea, str (PartyExp) + '%')
@@ -368,7 +464,7 @@ def DisplayMisc (pc):
 	GemRB.TextAreaAppend (Window, RecordsTextArea, str (stat['KillsChapterCount']))
 	GemRB.TextAreaAppend (Window, RecordsTextArea, str (stat['KillsTotalCount']))
 
-	return 
+	return
 
 def RefreshRecordsWindow ():
 	global RecordsTextArea
@@ -381,9 +477,9 @@ def RefreshRecordsWindow ():
 	Label = GemRB.GetControl (Window, 0x1000000e)
 	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc, 0))
 
-	#portrait 
+	#portrait
 	Button = GemRB.GetControl (Window, 2)
-	GemRB.SetButtonPicture (Window, Button, GemRB.GetPlayerPortrait (pc,0)) 
+	GemRB.SetButtonPicture (Window, Button, GemRB.GetPlayerPortrait (pc,0))
 
 	# armorclass
 	Label = GemRB.GetControl (Window, 0x10000028)
@@ -399,45 +495,75 @@ def RefreshRecordsWindow ():
 	Label = GemRB.GetControl (Window, 0x1000002a)
 	GemRB.SetText (Window, Label, str (GemRB.GetPlayerStat (pc, IE_MAXHITPOINTS)))
 	GemRB.SetTooltip (Window, Label, 17378)
- 
+
  	# stats
 
 	sstr = GemRB.GetPlayerStat (pc, IE_STR)
 	dstr = sstr-GemRB.GetPlayerStat (pc, IE_STR,1)
+	bstr = GetAbilityBonus (pc, IE_STR)
 	sint = GemRB.GetPlayerStat (pc, IE_INT)
 	dint = sint-GemRB.GetPlayerStat (pc, IE_INT,1)
+	bint = GetAbilityBonus (pc, IE_INT)
 	swis = GemRB.GetPlayerStat (pc, IE_WIS)
 	dwis = swis-GemRB.GetPlayerStat (pc, IE_WIS,1)
+	bwis = GetAbilityBonus (pc, IE_WIS)
 	sdex = GemRB.GetPlayerStat (pc, IE_DEX)
 	ddex = sdex-GemRB.GetPlayerStat (pc, IE_DEX,1)
+	bdex = GetAbilityBonus (pc, IE_DEX)
 	scon = GemRB.GetPlayerStat (pc, IE_CON)
 	dcon = scon-GemRB.GetPlayerStat (pc, IE_CON,1)
+	bcon = GetAbilityBonus (pc, IE_CON)
 	schr = GemRB.GetPlayerStat (pc, IE_CHR)
 	dchr = schr-GemRB.GetPlayerStat (pc, IE_CHR,1)
+	bchr = GetAbilityBonus (pc, IE_CHR)
 
 	Label = GemRB.GetControl (Window, 0x1000002f)
 	GemRB.SetText (Window, Label, str(sstr))
-	ColorDiff (Window, Label, dstr)
+	ColorDiff2 (Window, Label, dstr)
 
 	Label = GemRB.GetControl (Window, 0x10000009)
 	GemRB.SetText (Window, Label, str(sdex))
-	ColorDiff (Window, Label, ddex)
+	ColorDiff2 (Window, Label, ddex)
 
 	Label = GemRB.GetControl (Window, 0x1000000a)
 	GemRB.SetText (Window, Label, str(scon))
-	ColorDiff (Window, Label, dcon)
+	ColorDiff2 (Window, Label, dcon)
 
 	Label = GemRB.GetControl (Window, 0x1000000b)
 	GemRB.SetText (Window, Label, str(sint))
-	ColorDiff (Window, Label, dint)
+	ColorDiff2 (Window, Label, dint)
 
 	Label = GemRB.GetControl (Window, 0x1000000c)
 	GemRB.SetText (Window, Label, str(swis))
-	ColorDiff (Window, Label, dwis)
+	ColorDiff2 (Window, Label, dwis)
 
 	Label = GemRB.GetControl (Window, 0x1000000d)
 	GemRB.SetText (Window, Label, str(schr))
-	ColorDiff (Window, Label, dchr)
+	ColorDiff2 (Window, Label, dchr)
+
+	Label = GemRB.GetControl (Window, 0x10000035)
+	GemRB.SetText (Window, Label, str(bstr))
+	ColorDiff (Window, Label, bstr)
+
+	Label = GemRB.GetControl (Window, 0x10000036)
+	GemRB.SetText (Window, Label, str(bdex))
+	ColorDiff (Window, Label, bdex)
+
+	Label = GemRB.GetControl (Window, 0x10000037)
+	GemRB.SetText (Window, Label, str(bcon))
+	ColorDiff (Window, Label, bcon)
+
+	Label = GemRB.GetControl (Window, 0x10000038)
+	GemRB.SetText (Window, Label, str(bint))
+	ColorDiff (Window, Label, bint)
+
+	Label = GemRB.GetControl (Window, 0x10000039)
+	GemRB.SetText (Window, Label, str(bwis))
+	ColorDiff (Window, Label, bwis)
+
+	Label = GemRB.GetControl (Window, 0x1000003a)
+	GemRB.SetText (Window, Label, str(bchr))
+	ColorDiff (Window, Label, bchr)
 
 	RecordsTextArea = GemRB.GetControl (Window, 45)
 	GemRB.SetText (	Window, RecordsTextArea, "")
@@ -468,7 +594,7 @@ def CloseHelpWindow ():
 		DescTable = None
 	return
 
-#ingame help 
+#ingame help
 def OpenHelpWindow ():
 	global HelpTable, InformationWindow
 
@@ -485,7 +611,7 @@ def OpenHelpWindow ():
 
 		GemRB.SetVarAssoc (Window, Button, "Topic", i)
 		if title:
-			GemRB.SetText (Window, Label, title)			
+			GemRB.SetText (Window, Label, title)
 			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "UpdateHelpWindow")
 		else:
@@ -504,20 +630,20 @@ def UpdateHelpWindow ():
 	global DescTable, Topic
 
 	Window = InformationWindow
-	
+
 	if Topic!=GemRB.GetVar ("Topic"):
 		Topic = GemRB.GetVar ("Topic")
 		GemRB.SetVar ("TopIndex",0)
 		GemRB.SetVar ("Selected",0)
 
-	for i in range(11):		
+	for i in range(11):
 		Button = GemRB.GetControl (Window, i+27)
 		Label = GemRB.GetControl (Window, i+0x10000004)
 		if Topic==i:
 			GemRB.SetLabelTextColor (Window, Label, 255,255,0)
 		else:
 			GemRB.SetLabelTextColor (Window, Label, 255,255,255)
-		
+
 	resource = GemRB.GetTableValue (HelpTable, Topic, 1)
 	if DescTable:
 		GemRB.UnloadTable (DescTable)
@@ -536,7 +662,7 @@ def UpdateHelpWindow ():
 	if i<1: i=1
 
 	GemRB.SetVarAssoc (Window, ScrollBar, "TopIndex", i)
-	GemRB.SetEvent (Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "RefreshHelpWindow") 
+	GemRB.SetEvent (Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "RefreshHelpWindow")
 
 	RefreshHelpWindow ()
 	return
@@ -551,13 +677,13 @@ def RefreshHelpWindow ():
 	desccol = GemRB.GetTableValue (HelpTable, Topic, 3)
 	startrow = GemRB.GetTableValue (HelpTable, Topic, 4)
 	if startrow<0: startrow = 0
-		
+
 	for i in range(11):
 		title = GemRB.GetTableValue (DescTable, i+startrow+TopIndex, titlecol)
-		
+
 		Button = GemRB.GetControl (Window, i+71)
 		Label = GemRB.GetControl (Window, i+0x10000030)
-		
+
 		if i+TopIndex==Selected:
 			GemRB.SetLabelTextColor (Window, Label, 255,255,0)
 		else:
@@ -601,7 +727,7 @@ def OpenBiographyWindow ():
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseBiographyWindow")
 
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
-	return 
+	return
 
 def OpenExportWindow ():
 	global ExportWindow, NameField, ExportDoneButton

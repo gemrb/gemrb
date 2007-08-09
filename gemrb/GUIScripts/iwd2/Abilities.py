@@ -62,7 +62,7 @@ def RollPress():
 	for i in range(0,6):
 		CalcLimits(i)
 		v = 10+Add
-		b = v/2-5
+		b = v//2-5
 		GemRB.SetVar("Ability "+str(i), v )
 		Label = GemRB.GetControl(AbilityWindow, 0x10000003+i)
 		GemRB.SetText(AbilityWindow, Label, str(v) )
@@ -151,7 +151,7 @@ def RightPress():
 	Label = GemRB.GetControl(AbilityWindow, 0x10000003+Abidx)
 	GemRB.SetText(AbilityWindow, Label, str(Ability-1) )
 	Label = GemRB.GetControl(AbilityWindow, 0x10000024+Abidx)
-	b = (Ability-1)/2-5
+	b = Ability//2-5
 	if b<0:
 		GemRB.SetLabelTextColor(AbilityWindow,Label,255,0,0)
 	elif b>0:
@@ -195,7 +195,7 @@ def LeftPress():
 	Label = GemRB.GetControl(AbilityWindow, 0x10000003+Abidx)
 	GemRB.SetText(AbilityWindow, Label, str(Ability+1) )
 	Label = GemRB.GetControl(AbilityWindow, 0x10000024+Abidx)
-	b = (Ability+1)/2-5
+	b = Ability//2-5
 	if b<0:
 		GemRB.SetLabelTextColor(AbilityWindow,Label,255,0,0)
 	elif b>0:

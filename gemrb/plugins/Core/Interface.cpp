@@ -686,9 +686,20 @@ bool Interface::ReadAbilityTable(const ieResRef tablename, ieWordSigned *mem, in
 		DelTable(table);
 		return false;
 	}
+	//this is a hack for rows not starting at 0 in some cases
+	int fix = 0;
+	const char * tmp = tab->GetRowName(0);
+	if (tmp && (tmp[0]!='0')) {
+		fix = atoi(tmp);
+		for (int i=0;i<fix;i++) {
+			for (int j=0;j<columns;j++) {
+				mem[rows*j+i]=(ieWordSigned) strtol(tab->QueryField(0,j),NULL,0 );
+			}
+		}
+	}
 	for (int j=0;j<columns;j++) {
-		for( int i=0;i<rows;i++) {
-			mem[rows*j+i] = (ieWordSigned) strtol(tab->QueryField(i,j),NULL,0 );
+		for( int i=0;i<rows-fix;i++) {
+			mem[rows*j+i+fix] = (ieWordSigned) strtol(tab->QueryField(i,j),NULL,0 );
 		}
 	}
 	DelTable(table);
@@ -5155,7 +5166,7 @@ int Interface::GetStrengthBonus(int column, int value, int ex)
 	else if (ex>100)
 		ex=100;
 	
-	return strmod[column*MaximumAbility+value]+strmodex[column*101+ex];
+	return strmod[column*(MaximumAbility+1)+value]+strmodex[column*101+ex];
 }
 
 //only the first 3 columns are supported
@@ -5165,7 +5176,7 @@ int Interface::GetIntelligenceBonus(int column, int value)
 	if (column<0 || column>2)
 		return -9999;
 	
-	return intmod[column*MaximumAbility+value];
+	return intmod[column*(MaximumAbility+1)+value];
 }
 
 int Interface::GetDexterityBonus(int column, int value)
@@ -5174,7 +5185,7 @@ int Interface::GetDexterityBonus(int column, int value)
 	if (column<0 || column>2)
 		return -9999;
 	
-	return dexmod[column*MaximumAbility+value];
+	return dexmod[column*(MaximumAbility+1)+value];
 }
 
 int Interface::GetConstitutionBonus(int column, int value)
@@ -5183,7 +5194,7 @@ int Interface::GetConstitutionBonus(int column, int value)
 	if (column<0 || column>4)
 		return -9999;
 	
-	return conmod[column*MaximumAbility+value];
+	return conmod[column*(MaximumAbility+1)+value];
 }
 
 int Interface::GetCharismaBonus(int column, int value)
@@ -5192,7 +5203,7 @@ int Interface::GetCharismaBonus(int column, int value)
 	if (column<0 || column>0)
 		return -9999;
 	
-	return chrmod[column*MaximumAbility+value];
+	return chrmod[column*(MaximumAbility+1)+value];
 }
 
 // -3, -2 if request is illegal or in cutscene

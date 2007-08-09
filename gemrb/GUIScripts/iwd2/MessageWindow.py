@@ -106,10 +106,6 @@ def UpdateControlStatus():
 	GemRB.SetVar ("MessageTextArea", TMessageTA)
 
 	if Override:
-		print "MessageWindow:",MessageWindow
-		print "MessageWindow:",MessageTA
-		print "MessageWindow:",TMessageWindow
-		print "MessageWindow:",TMessageTA
 		GemRB.SetControlStatus (TMessageWindow,TMessageTA,IE_GUI_CONTROL_FOCUSED)
 		#gets PC currently talking
 		pc = GemRB.GameGetSelectedPCSingle (1)

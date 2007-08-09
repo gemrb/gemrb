@@ -112,7 +112,7 @@ def OnLoad():
 		v = GemRB.GetTableValue(AbilityTable, i,2)
 		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, v, -1)
 		v = GemRB.GetVar("Ability "+str(i) )
-		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": %d  (%+d)"%(v,v/2-5))
+		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": %d  (%+d)"%(v,v//2-5))
 
 
 	GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "StartOverPress")

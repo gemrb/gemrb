@@ -113,18 +113,46 @@ def OnLoad():
 		v = GemRB.GetTableValue(AbilityTable, i,2)
 		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, v, -1)
 		v = GemRB.GetVar("Ability "+str(i) )
-		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": %d  (%+d)"%(v,v/2-5))
-
+		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": %d  (%+d)"%(v,v//2-5))
+	
+	#skills
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"\n[color=FFFF00]",-1) #2 new lines
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,11983)
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"[/color]")
-	# todo: list skills
+	
+	SkillTable = GemRB.LoadTable ("skillsta")
+	SkillName = GemRB.LoadTable ("skills")
+	rows = GemRB.GetTableRowCount (SkillTable)
+	for i in range(rows):
+		stat = GemRB.GetTableValue (SkillTable, i, 0, 2)
+		value = GemRB.GetVar("Skill "+str(i) )
 
+		if value:
+			skill = GemRB.GetTableValue (SkillName, i, 1)
+			GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, skill, -1)
+			GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, " "+str(value) )
+	GemRB.UnloadTable (SkillTable)
+	GemRB.UnloadTable (SkillName)
+ 
+	#feats
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"\n[color=FFFF00]",-1) #2 new lines
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,36310)
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"[/color]")
-	# todo: list feats
+	FeatTable = GemRB.LoadTable ("featreq")
+	FeatName = GemRB.LoadTable ("feats")
+	rows = GemRB.GetTableRowCount (FeatTable)
+	for i in range(rows):
+		value = GemRB.GetVar("Feat "+str(i) )
+		if value:
+			feat = GemRB.GetTableValue (FeatName, i, 1)
+			GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, feat, -1)
+			stat = GemRB.GetTableValue (FeatTable, i, 9, 2) 
+			if stat:
+				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, ": "+str(value) )
 
+	GemRB.UnloadTable (FeatTable)
+	GemRB.UnloadTable (FeatName)
+ 
 	GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "StartOverPress")
 	GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
 	GemRB.SetEvent(CharGenWindow, AppearanceButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")

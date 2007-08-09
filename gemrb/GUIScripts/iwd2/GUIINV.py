@@ -286,10 +286,6 @@ def RefreshInventoryWindow ():
 	Color6 = GemRB.GetPlayerStat (pc, IE_ARMOR_COLOR)
 	Color7 = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
 
-	#GemRB.SetButtonBAM (Window, Button, GetActorPaperDoll (pc)+"G1",10,0,0)
-	print GetActorPaperDoll(pc)+"G11"
-	#GemRB.SetButtonPLT (Window, Button, GetActorPaperDoll (pc)+"G11",
-	#	Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 0)
 	GemRB.SetAnimation (Window, Button, GetActorPaperDoll (pc)+"G11")
 
 	# portrait
@@ -602,7 +598,6 @@ def OpenGroundItemInfoWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 
 	slot = GemRB.GetVar("TopIndex")+GemRB.GetVar("GroundItemButton")
-	print "OpenGroundItemInfo", slot
 	slot_item = GemRB.GetContainerItem (pc, slot)
 	if item["Flags"] & IE_INV_ITEM_IDENTIFIED:
 		value = 0

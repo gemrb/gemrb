@@ -38,7 +38,6 @@ def OnLoad():
 	if TableName == "*":
 		GemRB.SetNextScript("Skills")
 		return
-	print TableName
 	RaceTable = GemRB.LoadTable(TableName)
 	RaceCount = GemRB.GetTableRowCount(RaceTable)-11
 	if RaceCount<0:

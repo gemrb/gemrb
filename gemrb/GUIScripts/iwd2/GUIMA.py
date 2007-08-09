@@ -43,7 +43,6 @@ def OpenMapWindow ():
 	global OldPortraitWindow, OldOptionsWindow
 
 	if CloseOtherWindow (OpenMapWindow):
-		print "CLOSE********************************************"
 		GemRB.UnloadWindow (MapWindow)
 		GemRB.UnloadWindow (PortraitWindow)
 		GemRB.UnloadWindow (OptionsWindow)
@@ -171,7 +170,6 @@ def MoveToNewArea ():
 	global WorldMapWindow, WorldMapControl
 
 	tmp = GemRB.GetDestinationArea (WorldMapWindow, WorldMapControl)
-	print tmp
 	CloseWorldMapWindow ()
 	GemRB.CreateMovement (tmp["Destination"], tmp["Entrance"])
 	return
@@ -181,7 +179,6 @@ def ChangeTooltip ():
 	global str
 
 	tmp = GemRB.GetDestinationArea (WorldMapWindow, WorldMapControl)
-	print tmp
 	if (tmp):
 		str = "%s: %d"%(GemRB.GetString(23084),tmp["Distance"])
 	else:

@@ -1,14 +1,14 @@
 2DA V1.0
 *
-                    HATERACE   CLERICSPELL MAGESPELL STARTXP
-BARBARIAN           *          *           *         2000
-BARD                *          *           MXSPLBRD  2000 
-CLERIC              *          MXSPLPRS    *         2000 
-DRUID               *          MXSPLDRU    *         2000 
-FIGHTER             *          *           *         2000 
-MONK                *          *           *         2000 
-PALADIN             *          MXSPLPAL    *         2000 
-RANGER              HATERACE   MXSPLRAN    *         2000 
-ROGUE               *          *           *         2000 
-SORCERER            *          *           MXSPLSRC  2000 
-WIZARD              *          *           MXSPLWIZ  2000 
+                    HATERACE   CLERICSPELL MAGESPELL STARTXP BARDSKILL THIEFSKILL LAYHANDS TURNLEVEL 
+BARBARIAN           *          *           *         0       *         SKILLS     *        0
+BARD                *          *           MXSPLBRD  0       SKILLBRD  SKILLS     *        0
+CLERIC              *          MXSPLPRS    *         0       *         SKILLS     *        1
+DRUID               *          MXSPLDRU    *         0       *         SKILLS     *        0
+FIGHTER             *          *           *         0       *         SKILLS     *        0
+MONK                *          *           *         0       *         SKILLS     *        0
+PALADIN             *          MXSPLPAL    *         0       *         SKILLS     LAYHANDS 5
+RANGER              HATERACE   MXSPLRAN    *         0       *         SKILLS     *        0
+ROGUE               *          *           *         0       *         SKILLS     *        0
+SORCERER            *          *           MXSPLSRC  0       *         SKILLS     *        0
+WIZARD              *          *           MXSPLWIZ  0       *         SKILLS     *        0

@@ -61,7 +61,7 @@ bool CHUImp::Open(DataStream* stream, bool autoFree)
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "CHUIV1  ", 8 ) != 0) {
-		printMessage( "CHUImporter","Not a Valid CHU File\n",RED );
+		printMessage( "CHUImporter","Not a Valid CHU File\n",LIGHT_RED );
 		return false;
 	}
 	str->ReadDword( &WindowCount );
@@ -75,6 +75,7 @@ Window* CHUImp::GetWindow(unsigned int wid)
 {
 	ieWord WindowID, XPos, YPos, Width, Height, BackGround;
 	ieWord ControlsCount, FirstControl;
+	ieResRef MosFile;
 	unsigned int i;
 
 	bool found = false;
@@ -96,10 +97,11 @@ Window* CHUImp::GetWindow(unsigned int wid)
 	str->ReadWord( &Height );
 	str->ReadWord( &BackGround );
 	str->ReadWord( &ControlsCount );
+	str->ReadResRef( MosFile );
+	str->ReadWord( &FirstControl );
+
 	Window* win = new Window( WindowID, XPos, YPos, Width, Height );
 	if (BackGround == 1) {
-		ieResRef MosFile;
-		str->ReadResRef( MosFile );
 		if (core->IsAvailable( IE_MOS_CLASS_ID )) {
 			DataStream* bkgr = core->GetResourceMgr()->GetResource( MosFile, IE_MOS_CLASS_ID );
 			if (bkgr != NULL) {
@@ -110,14 +112,12 @@ Window* CHUImp::GetWindow(unsigned int wid)
 				core->FreeInterface( mos );
 			} else
 				printMessage( "CHUImporter","Cannot Load BackGround, skipping\n",YELLOW );
-		} else
-			printMessage( "CHUImporter","No MOS Importer Available, skipping background\n",RED );
-	} else {
-		str->Seek( 8, GEM_CURRENT_POS );
+		} else {
+			printMessage( "CHUImporter","No MOS Importer Available, skipping background\n",LIGHT_RED );
+		}
 	}
-	str->ReadWord( &FirstControl );
 	if (!core->IsAvailable( IE_BAM_CLASS_ID )) {
-		printMessage( "CHUImporter","No BAM Importer Available, skipping controls\n",RED );
+		printMessage( "CHUImporter","No BAM Importer Available, skipping controls\n",LIGHT_RED );
 		return win;
 	}
 	for (i = 0; i < ControlsCount; i++) {
@@ -172,7 +172,7 @@ Window* CHUImp::GetWindow(unsigned int wid)
 					core->GetResourceMgr()->GetFactoryResource( BAMFile,
 					IE_BAM_CLASS_ID, IE_NORMAL );
 				if (!bam ) {
-					printMessage( "CHUImporter","Cannot Load Button Images, skipping control\n",RED );
+					printMessage( "CHUImporter","Cannot Load Button Images, skipping control\n",LIGHT_RED );
 					/* IceWind Dale 2 has fake BAM ResRefs for some Buttons,
 					   this will handle bad ResRefs */
 					win->AddControl( btn );
@@ -294,8 +294,7 @@ Window* CHUImp::GetWindow(unsigned int wid)
 
 				AnimationFactory* bam = ( AnimationFactory* )
 					core->GetResourceMgr()->GetFactoryResource( BAMFile,
-															IE_BAM_CLASS_ID,
-															IE_NORMAL );
+					IE_BAM_CLASS_ID, IE_NORMAL );
 				if( bam ) {
 					img = bam->GetFrame( Knob, 0 );
 					sldr->SetImage( IE_GUI_SLIDER_KNOB, img );
@@ -496,7 +495,7 @@ endalign:
 			break;
 
 			default:
-				printMessage( "CHUImporter","Control Not Supported\n",RED );
+				printMessage( "CHUImporter","Control Not Supported\n",LIGHT_RED );
 		}
 	}
 	return win;
