@@ -265,18 +265,24 @@ def GetActorRaceTitle (actor):
 	GemRB.UnloadTable (Table)
 	return RaceTitle
 
-def GetActorClassTitle (actor):
-	ClassTitle = GemRB.GetPlayerStat (actor, IE_TITLE1)
+#find the kit title for a given class (multiple kits are available)
+def GetActorClassTitle (actor, Class):
+	#no idea if this still works
+	#ClassTitle = GemRB.GetPlayerStat (actor, IE_TITLE1)
 	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
-	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
 	ClassTable = GemRB.LoadTable ("classes")
-	if Kit==0x4000 or Kit==0: #pure class
-		ClassIndex = Class
-	else: #bad, because kit clashes with classid
-		ClassIndex = GemRB.FindTableValue (ClassTable, 2, Kit)
-
-	if ClassTitle==0:
-		ClassTitle=GemRB.GetTableValue (ClassTable, ClassIndex, 0)
+	ClassTitle = GemRB.GetTableValue (ClassTable, Class, 0)
+	#the real class value
+	Class += 1
+	row = 0
+	while row>=0:
+		row = GemRB.FindTableValue (ClassTable, 3, Class, row)
+		if row<0:
+			break
+		if Kit&GemRB.GetTableValue (ClassTable, row, 2):
+			ClassTitle=GemRB.GetTableValue (ClassTable, row, 0)
+			break
+		row+=1
 
 	GemRB.UnloadTable (ClassTable)
 	return ClassTitle

@@ -176,12 +176,28 @@ def HasClassFeatures (pc):
 		return True
 	return False
 
-def GetFavoredClass (pc):
-	return "???"
+def GetFavoredClass (pc, code):
+	if GemRB.GetPlayerStat (pc, IE_SEX)==1:
+		code = code&15
+	else:
+		code = (code>>8)&15
+
+	return code-1
 
 def GetAbilityBonus (pc, stat):
 	Ability = GemRB.GetPlayerStat (pc, stat)
 	return Ability//2-5
+
+#class is ignored
+def GetNextLevelExp (Level, Adjustment):
+	NextLevelTable = GemRB.LoadTable ("XPLEVEL")
+
+	if Adjustment>5:
+		Adjustment = 5
+	if (Level < GemRB.GetTableColumnCount (NextLevelTable, 4) - 5):
+		return str(GemRB.GetTableValue (NextLevelTable, 4, Level + Adjustment ) )
+
+	return GemRB.GetString(24342) #godhood
 
 #barbarian, bard, cleric, druid, fighter, monk, paladin, ranger, rogue, sorcerer, wizard
 Classes = [IE_LEVELBARBARIAN, IE_LEVELBARD, IE_LEVELCLERIC, IE_LEVELDRUID, \
@@ -190,27 +206,53 @@ IE_LEVELSORCEROR, IE_LEVEL2]
 
 def DisplayGeneral (pc):
 	Window = RecordsWindow
-	RaceTable = GemRB.LoadTable("races")
-	ClassTable = GemRB.LoadTable("classes")
-	AlignTable = GemRB.LoadTable("aligns")
 
 	#levels
 	GemRB.TextAreaAppend (Window, RecordsTextArea, "[color=ffff00]")
 	GemRB.TextAreaAppend (Window, RecordsTextArea, 40308)
 	GemRB.TextAreaAppend (Window, RecordsTextArea, " - ")
 	GemRB.TextAreaAppend (Window, RecordsTextArea, 40309)
-	tmp = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM)
-	GemRB.TextAreaAppend (Window, RecordsTextArea, ": "+str(tmp) )
+	levelsum = GemRB.GetPlayerStat (pc, IE_CLASSLEVELSUM)
+	#TODO: get special level penalty for subrace
+	adj = 0
+	GemRB.TextAreaAppend (Window, RecordsTextArea, ": "+str(levelsum) )
 	GemRB.TextAreaAppend (Window, RecordsTextArea, "[/color]\n")
+	#the class name for highest
+	highest = None
+	tmp = 0
 	for i in range(11):
 		level = GemRB.GetPlayerStat (pc, Classes[i])
+
 		if level:
-			Class = GemRB.GetTableValue (ClassTable, i, 0)
+			Class = GetActorClassTitle (pc, i )
 			GemRB.TextAreaAppend (Window, RecordsTextArea, Class, -1)
 			GemRB.TextAreaAppend (Window, RecordsTextArea, ": "+str(level) )
+			if tmp<level:
+				highest = i
+				tmp = level
 
 	GemRB.TextAreaAppend (Window, RecordsTextArea, 40310,-1)
-	GemRB.TextAreaAppend (Window, RecordsTextArea, ": "+GetFavoredClass(pc) )
+
+	RaceTable = GemRB.LoadTable("races")
+	ClassTable = GemRB.LoadTable("classes")
+	AlignTable = GemRB.LoadTable("aligns")
+
+	#get the subrace value
+	Value = GemRB.GetPlayerStat(pc,IE_RACE)
+	Value2 = GemRB.GetPlayerStat(pc,IE_SUBRACE)
+	if Value2:
+		Value = Value<<16 | Value2
+	tmp = GemRB.FindTableValue (RaceTable, 3, Value)
+	Race = GemRB.GetTableValue (RaceTable, tmp, 2)
+	tmp = GemRB.GetTableValue (RaceTable, tmp, 8)
+	if tmp == -1:
+		tmp = highest
+	else:
+		tmp = GetFavoredClass(pc, tmp)
+
+	tmp = GemRB.GetTableValue (ClassTable, tmp, 0)
+	GemRB.TextAreaAppend (Window, RecordsTextArea, ": ")
+	GemRB.TextAreaAppend (Window, RecordsTextArea, tmp)
 
 	#experience
 	GemRB.TextAreaAppend (Window, RecordsTextArea, "\n\n[color=ffff00]")
@@ -221,7 +263,8 @@ def DisplayGeneral (pc):
 	xp = GemRB.GetPlayerStat (pc, IE_XP)
 	GemRB.TextAreaAppend (Window, RecordsTextArea, ": "+str(xp) )
 	GemRB.TextAreaAppend (Window, RecordsTextArea, 17091,-1)
-	GemRB.TextAreaAppend (Window, RecordsTextArea, ": " )
+	tmp = GetNextLevelExp (levelsum, adj)
+	GemRB.TextAreaAppend (Window, RecordsTextArea, ": "+tmp )
 
 	#current effects
 	GemRB.TextAreaAppend (Window, RecordsTextArea, "\n\n[color=ffff00]")
@@ -239,12 +282,6 @@ def DisplayGeneral (pc):
 	GemRB.TextAreaAppend (Window, RecordsTextArea, 1048)
 	GemRB.TextAreaAppend (Window, RecordsTextArea, "[/color]")
 
-	Value = GemRB.GetPlayerStat(pc,IE_RACE)
-	Value2 = GemRB.GetPlayerStat(pc,IE_SUBRACE)
-	if Value2:
-		Value = Value<<16 | Value2
-	tmp = GemRB.FindTableValue (RaceTable, 3, Value)
-	Race = GemRB.GetTableValue (RaceTable, tmp, 2)
 	GemRB.TextAreaAppend (Window, RecordsTextArea, Race,-1)
 
 	#alignment

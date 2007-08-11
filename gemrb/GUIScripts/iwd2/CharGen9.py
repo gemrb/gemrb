@@ -155,9 +155,26 @@ def OnLoad():
 	GemRB.SetEvent (CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
 	GemRB.SetEvent (CharGenWindow, AcceptButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
 	GemRB.SetEvent (CharGenWindow, BiographyButton, IE_GUI_BUTTON_ON_PRESS, "BioPress")
-	GemRB.SetVisible (CharGenWindow,1)
+	GemRB.SetVisible (CharGenWindow, 1)
 	return
 	
+def SetRaceAbilities(MyChar, racetitle):
+	ability = GemRB.LoadTable ("racespab")
+	resource = GemRB.GetTableValue (ability, racetitle, "SPECIAL_ABILITIES_FILE")
+	GemRB.UnloadTable (ability)
+	if resource=="*":
+		return
+
+	ability = GemRB.LoadTable (resource)
+	rows = GemRB.GetTableRowCount (ability)
+	for i in range(rows):
+		resource = GemRB.GetTableValue (ability, i, 0)
+		count = GemRB.GetTableValue (ability, i,1)
+		for j in range(count):
+			GemRB.LearnSpell (MyChar, resource)
+	GemRB.UnloadTable (ability)
+	return
+
 def SetRaceResistances(MyChar, racetitle):
 	resistances = GemRB.LoadTable ("racersmd")
 	GemRB.SetPlayerStat (MyChar, IE_RESISTFIRE, GemRB.GetTableValue ( resistances, racetitle, "FIRE") )
@@ -243,7 +260,8 @@ def NextPress():
 	row = GemRB.FindTableValue (TmpTable, 3, race )
 	racename = GemRB.GetTableRowName (TmpTable, row)
 	if row!=-1:
-		SetRaceResistances( MyChar, GemRB.GetTableRowName (TmpTable, row) )
+		SetRaceResistances( MyChar, racename )
+		SetRaceAbilities( MyChar, racename )
 	GemRB.UnloadTable (TmpTable)
 
 	#base class
