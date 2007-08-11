@@ -3504,7 +3504,8 @@ int fx_move_to_area (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_move_to_area (%2d) %s", fx->Opcode, fx->Resource );
 	//delay effect until the target has an area
 	//hopefully this fixes an evil bug
-	if (!target->GetCurrentArea()) {
+	if (!target->GetCurrentArea() ||
+	    !target->GetCurrentArea()->HasActor(target)) {
 		return FX_APPLIED;
 	}
 	Point p(fx->PosX,fx->PosY);
