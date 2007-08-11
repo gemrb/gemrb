@@ -944,15 +944,16 @@ static PyObject* GemRB_GetTableValue(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_FindTableValue__doc,
-"FindTableValue(TableIndex, ColumnIndex, Value) => Row\n\n"
+"FindTableValue(TableIndex, ColumnIndex, Value[, StartRow]) => Row\n\n"
 "Returns the first rowcount of a field of a 2DA Table." );
 
 static PyObject* GemRB_FindTableValue(PyObject * /*self*/, PyObject* args)
 {
 	int ti, col;
+	int start = 0;
 	long Value;
 
-	if (!PyArg_ParseTuple( args, "iil", &ti, &col, &Value )) {
+	if (!PyArg_ParseTuple( args, "iil|i", &ti, &col, &Value, &start )) {
 		return AttributeError( GemRB_FindTableValue__doc );
 	}
 
@@ -960,7 +961,7 @@ static PyObject* GemRB_FindTableValue(PyObject * /*self*/, PyObject* args)
 	if (tm == NULL) {
 		return RuntimeError("Can't find resource");
 	}
-	return PyInt_FromLong(tm->FindTableValue(col, Value));
+	return PyInt_FromLong(tm->FindTableValue(col, Value, start));
 }
 
 PyDoc_STRVAR( GemRB_GetTableRowIndex__doc,

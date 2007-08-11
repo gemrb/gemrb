@@ -69,7 +69,7 @@ public:
 	virtual int GetRowIndex(const char* rowname) const = 0;
 	virtual const char* GetColumnName(unsigned int index) const = 0;
 	virtual const char* GetRowName(unsigned int index) const = 0;
-	virtual unsigned int FindTableValue(unsigned int column, long value) const = 0;
+	virtual unsigned int FindTableValue(unsigned int column, long value, int start = 0) const = 0;
 
 	/** Opens a Table File */
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
