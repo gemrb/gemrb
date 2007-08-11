@@ -55,7 +55,12 @@ TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 	tmp.g = 152;
 	tmp.b = 102;
 	lineselpal = core->CreatePalette( tmp, lowtextcolor );
-	BiteMyTail = false;
+	InternalFlags = 1;
+	//Drop Capitals means initials on!
+	core->GetDictionary()->Lookup("Drop Capitals", InternalFlags);
+	if (InternalFlags) {
+		InternalFlags = TA_INITIALS;
+	}
 }
 
 TextArea::~TextArea(void)
@@ -109,7 +114,7 @@ void TextArea::RefreshSprite(const char *portrait)
 void TextArea::Draw(unsigned short x, unsigned short y)
 {
 	/** Don't come back recursively */
-	if (BiteMyTail) {
+	if (InternalFlags&TA_BITEMYTAIL) {
 		return;
 	}
 	int tx=x+XPos;
@@ -144,9 +149,9 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 
 			/** Forcing redraw of whole screen before drawing text*/
 			Owner->Invalidate();
-			BiteMyTail = true;
+			InternalFlags |= TA_BITEMYTAIL;
 			Owner->DrawWindow();
-			BiteMyTail = false;
+			InternalFlags &= ~TA_BITEMYTAIL;
 		}
 	}
 
@@ -219,7 +224,6 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 		}
 		video->SetClipRect( &clip );
 		ftext->PrintFromLine( startrow, clip,
-			//Region( tx , ty, Width, Height - 5 ),
 			( unsigned char * ) Buffer, palette,
 			IE_FONT_ALIGN_LEFT, finit, NULL );
 		free( Buffer );
@@ -262,7 +266,6 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 		else
 			pal = palette;
 		ftext->PrintFromLine( sr, clip,
-			//Region( tx, ty, Width, Height - 5 ),
 			( unsigned char * ) lines[i], pal,
 			IE_FONT_ALIGN_LEFT, finit, NULL );
 		yl = lrows[i] - sr;
@@ -280,11 +283,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 		clip.h-=ftext->size[1].h;
 		ftext->Print( clip, ( unsigned char * ) lines[i], pal,
 			IE_FONT_ALIGN_LEFT, true );
-/*
-		ftext->Print( Region( tx, ty + ( yl * ftext->size[1].h ),
-			Width, Height - 5 - ( yl * ftext->maxHeight) ),
-			( unsigned char * ) lines[i], pal, IE_FONT_ALIGN_LEFT, true );
-*/
+
 		yl += lrows[i];
 	}
 }
@@ -452,15 +451,7 @@ void TextArea::UpdateControls()
 /** Sets the Fonts */
 void TextArea::SetFonts(Font* init, Font* text)
 {
-	ieDword initials = 1;
-	//Drop Capitals means initials on!
-	core->GetDictionary()->Lookup("Drop Capitals", initials);
-	if (initials) {
-		finit = init;
-	}
-	else {
-		finit = NULL;
-	}
+	finit = init;
 	ftext = text;
 	Changed = true;
 }

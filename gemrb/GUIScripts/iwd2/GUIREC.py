@@ -231,8 +231,13 @@ def DisplayGeneral (pc):
 				highest = i
 				tmp = level
 
-	GemRB.TextAreaAppend (Window, RecordsTextArea, 40310,-1)
+	#effective character level
+	if adj:
+		GemRB.TextAreaAppend (Window, RecordsTextArea, 40311,-1)
+		GemRB.TextAreaAppend (Window, RecordsTextArea, ": "+str(levelsum+adj) )
 
+	#favoured class
+	GemRB.TextAreaAppend (Window, RecordsTextArea, 40310,-1)
 	RaceTable = GemRB.LoadTable("races")
 	ClassTable = GemRB.LoadTable("classes")
 	AlignTable = GemRB.LoadTable("aligns")
@@ -245,6 +250,7 @@ def DisplayGeneral (pc):
 	tmp = GemRB.FindTableValue (RaceTable, 3, Value)
 	Race = GemRB.GetTableValue (RaceTable, tmp, 2)
 	tmp = GemRB.GetTableValue (RaceTable, tmp, 8)
+
 	if tmp == -1:
 		tmp = highest
 	else:
@@ -267,18 +273,22 @@ def DisplayGeneral (pc):
 	GemRB.TextAreaAppend (Window, RecordsTextArea, ": "+tmp )
 
 	#current effects
-	GemRB.TextAreaAppend (Window, RecordsTextArea, "\n\n[color=ffff00]")
-	GemRB.TextAreaAppend (Window, RecordsTextArea, 32052)
-	GemRB.TextAreaAppend (Window, RecordsTextArea, "[/color]")
 	effects = GemRB.GetPlayerStates (pc)
-	StateTable = GemRB.LoadTable ("statdesc")
-	for c in effects:
-		tmp = GemRB.GetTableValue (StateTable, ord(c)-65, 0)
-		GemRB.TextAreaAppend (Window, RecordsTextArea, tmp, -1)
- 	GemRB.UnloadTable (StateTable)
+	if len(effects):
+		GemRB.TextAreaAppend (Window, RecordsTextArea, "\n\n[color=ffff00]")
+		GemRB.TextAreaAppend (Window, RecordsTextArea, 32052)
+		GemRB.TextAreaAppend (Window, RecordsTextArea, "[/color][/capital][capital=2]")
+		StateTable = GemRB.LoadTable ("statdesc")
+		for c in effects:
+			print "State:",c
+			tmp = GemRB.GetTableValue (StateTable, ord(c)-66, 0)
+			print tmp
+			GemRB.TextAreaAppend (Window, RecordsTextArea, c+" ", -1)
+			GemRB.TextAreaAppend (Window, RecordsTextArea, tmp)
+ 		GemRB.UnloadTable (StateTable)
 
 	#race
-	GemRB.TextAreaAppend (Window, RecordsTextArea, "\n\n[color=ffff00]")
+	GemRB.TextAreaAppend (Window, RecordsTextArea, "\n\n[/capital][capital=0][color=ffff00]")
 	GemRB.TextAreaAppend (Window, RecordsTextArea, 1048)
 	GemRB.TextAreaAppend (Window, RecordsTextArea, "[/color]")
 
@@ -604,6 +614,7 @@ def RefreshRecordsWindow ():
 
 	RecordsTextArea = GemRB.GetControl (Window, 45)
 	GemRB.SetText (	Window, RecordsTextArea, "")
+	GemRB.TextAreaAppend ( Window, RecordsTextArea, "[capital=0]")
 
 	SelectWindow = GemRB.GetVar ("SelectWindow")
 	if SelectWindow == 1:
@@ -615,6 +626,7 @@ def RefreshRecordsWindow ():
 	elif SelectWindow == 4:
 		DisplayMisc (pc)
 
+	GemRB.TextAreaAppend ( Window, RecordsTextArea, "[/capital]")
 	#if actor is uncontrollable, make this grayed
 	GemRB.SetVisible (Window, 1)
 	GemRB.SetVisible (PortraitWindow, 1)

@@ -1232,7 +1232,7 @@ const unsigned char *Actor::GetStateString()
 	int j=0;
 	for (int i=0;i<MAX_PORTRAIT_ICONS;i++) {
 		if (!(Icons[i]&0xff00)) {
-			tmp[j++]=(ieByte) ((Icons[i]&0xff)+65);
+			tmp[j++]=(ieByte) ((Icons[i]&0xff)+66);
 		}
 	}
 	tmp[j]=0;

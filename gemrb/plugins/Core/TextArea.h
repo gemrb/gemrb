@@ -45,6 +45,11 @@
 #define IE_GUI_TEXTAREA_SMOOTHSCROLL 4
 #define IE_GUI_TEXTAREA_HISTORY      8
 #define IE_GUI_TEXTAREA_SPEAKER      16
+#define IE_GUI_TEXTAREA_ALT_FONT     32   //this one disables drop capitals
+
+// internal flags
+#define TA_INITIALS    1
+#define TA_BITEMYTAIL  2
 
 #ifdef WIN32
 
@@ -139,8 +144,8 @@ private: // Private attributes
 	Palette* initpalette;
 	Palette* selected;
 	Palette* lineselpal;
-	/** a hack for smooth windows */
-	bool BiteMyTail;
+	/** a hack for smooth windows, drop capitals */
+	ieDword InternalFlags;
 	/** Fonts */
 	Font* finit, * ftext;
 	ieResRef PortraitResRef;

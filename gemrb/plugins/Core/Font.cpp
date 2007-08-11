@@ -115,6 +115,15 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 	Palette* hicolor, unsigned char Alignment, Font* initials,
 	Sprite2D* cursor, unsigned int curpos, bool NoColor)
 {
+	bool enablecap=false;
+	int capital = 0;
+	if (initials)
+	{
+		capital=1;
+		enablecap=true;
+	}
+	int oldcapital=capital;
+
 	unsigned int psx = PARAGRAPH_START_X;
 	Palette *pal = hicolor;
 	if (!pal) {
@@ -178,6 +187,20 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 				}
 				tag[k] = tmp[i++];
 			}
+
+			if (oldcapital) {
+				if (strnicmp( tag, "capital=",8)==0) {
+					oldcapital=capital;
+					sscanf( tag, "capital=%d", &capital);
+					continue;
+				}
+
+				if (strnicmp( tag, "/capital",8)==0) {
+					capital=oldcapital;
+					continue;
+				}
+			}
+			
 			if (strnicmp( tag, "color=", 6 ) == 0) {
 				unsigned int r,g,b;
 				if (sscanf( tag, "color=%02X%02X%02X", &r, &g, &b ) != 3)
@@ -186,21 +209,23 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 				Palette* newPal = core->CreatePalette( c, black );
 				video->SetPalette( sprBuffer, newPal );
 				core->FreePalette( newPal );
-			} else {
-				if (stricmp( tag, "/color" ) == 0) {
-					video->SetPalette( sprBuffer, pal );
-				} else {
-					if (stricmp( "p", tag ) == 0) {
-						psx = x;
-					} else {
-						if (stricmp( "/p", tag ) == 0) {
-							psx = PARAGRAPH_START_X;
-						}
-					}
-				}
+				continue;
+			}
+			if (stricmp( tag, "/color" ) == 0) {
+				video->SetPalette( sprBuffer, pal );
+				continue;
+			}
+			
+			if (stricmp( "p", tag ) == 0) {
+				psx = x;
+				continue;
+			}
+			if (stricmp( "/p", tag ) == 0) {
+				psx = PARAGRAPH_START_X;
 			}
 			continue;
 		}
+
 		if (row < startrow) {
 			if (tmp[i] == 0) {
 				row++;
@@ -216,12 +241,16 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 			} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
 				x = ( rgn.w - w );
 			}
+			enablecap = true;
 			continue;
 		}
 		unsigned char currChar = ( unsigned char ) tmp[i] - 1;
-		if (initials) {
+		if (initials && capital && enablecap) {
 			x = initials->PrintInitial( x, y, rgn, currChar );
-			initials = NULL;
+			if (capital==1) {
+				initials = NULL;
+			}
+			enablecap = false;
 			continue;
 		}
 		video->BlitSpriteRegion( sprBuffer, size[currChar],
@@ -243,6 +272,15 @@ void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 	unsigned char Alignment, bool anchor, Font* initials,
 	Sprite2D* cursor, unsigned int curpos, bool NoColor)
 {
+	bool enablecap=false;
+	int capital = 0;
+	if (initials)
+	{
+		capital=1;
+		enablecap=true;
+	}
+	int oldcapital=capital;
+
 	unsigned int psx = PARAGRAPH_START_X;
 	Palette* pal = hicolor;
 	if (!pal) {
@@ -312,6 +350,20 @@ void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 				}
 				tag[k] = tmp[i++];
 			}
+
+			if (oldcapital) {
+				if (strnicmp( tag, "capital=",8)==0) {
+					oldcapital=capital;
+					sscanf( tag, "capital=%d", &capital);
+					continue;
+				}
+				
+				if (strnicmp( tag, "/capital",8)==0) {
+					capital=oldcapital;
+					continue;
+				}
+			}
+			
 			if (strnicmp( tag, "color=", 6 ) == 0) {
 				unsigned int r,g,b;
 				if (sscanf( tag, "color=%02X%02X%02X", &r, &g, &b ) != 3)
@@ -320,21 +372,23 @@ void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 				Palette* newPal = core->CreatePalette( c, black );
 				video->SetPalette( sprBuffer, newPal );
 				core->FreePalette( newPal );
-			} else {
-				if (stricmp( tag, "/color" ) == 0) {
-					video->SetPalette( sprBuffer, pal );
-				} else {
-					if (stricmp( "p", tag ) == 0) {
-						psx = x;
-					} else {
-						if (stricmp( "/p", tag ) == 0) {
-							psx = PARAGRAPH_START_X;
-						}
-					}
-				}
+				continue;
+			}
+			if (stricmp( tag, "/color" ) == 0) {
+				video->SetPalette( sprBuffer, pal );
+				continue;
+			}
+			if (stricmp( "p", tag ) == 0) {
+				psx = x;
+				continue;
+			}
+			if (stricmp( "/p", tag ) == 0) {
+				psx = PARAGRAPH_START_X;
+				continue;
 			}
 			continue;
 		}
+
 		if (tmp[i] == 0) {
 			y += ystep;
 			x = psx;
@@ -344,12 +398,16 @@ void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 			} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
 				x = ( rgn.w - w );
 			}
+			enablecap=true;
 			continue;
 		}
 		unsigned char currChar = ( unsigned char ) tmp[i] - 1;
-		if (initials) {
+		if (initials && capital) {
 			x = initials->PrintInitial( x, y, rgn, currChar );
-			initials = NULL;
+			if (capital==1) {
+				initials = NULL;
+			}
+			enablecap=false;
 			continue;
 		}
 		video->BlitSpriteRegion( sprBuffer, size[currChar],
@@ -442,10 +500,11 @@ void Font::SetupString(char* string, unsigned int width, bool NoColor)
 			}
 			if (stricmp( "p", tag ) == 0) {
 				psx = x;
-			} else {
-				if (stricmp( "/p", tag ) == 0) {
-					psx = PARAGRAPH_START_X;
-				}
+				continue;
+			}
+			if (stricmp( "/p", tag ) == 0) {
+				psx = PARAGRAPH_START_X;
+				continue;
 			}
 			continue;
 		}
