@@ -484,9 +484,9 @@ void Spellbook::BonusSpells(int type, int count, int *bonuses)
 {
 	int level = GetSpellLevelCount(type);
 	if (level>count) level=count;
-	while(level--) {
-		CRESpellMemorization* sm = spells[type][level];
-		sm->Number2+=bonuses[level];
+	for(int i=0;i<level;i++) {
+		CRESpellMemorization* sm = GetSpellMemorization(type, i);
+		sm->Number2+=bonuses[i];
 	}
 }
 
@@ -497,13 +497,29 @@ void Spellbook::ClearBonus()
 	int type;
 
 	for(type=0;type<NUM_BOOK_TYPES;type++) {
-		for(int level = GetSpellLevelCount(type); level--;) {
-			CRESpellMemorization* sm = spells[type][level];
+		int level = GetSpellLevelCount(type);
+		for(int i=0;i<level;i++) {
+			CRESpellMemorization* sm = GetSpellMemorization(type, i);
 			sm->Number2=sm->Number;
 		}
 	}
 }
 
+CRESpellMemorization *Spellbook::GetSpellMemorization(unsigned int type, unsigned int level)
+{
+	CRESpellMemorization *sm;
+	if (level>= GetSpellLevelCount(type) || !(sm = spells[type][level]) ) {
+		sm = new CRESpellMemorization();
+		sm->Type = (ieWord) type;
+		sm->Level = (ieWord) level;
+		sm->Number = sm->Number2 = 0;
+		if ( !AddSpellMemorization(sm) ) {
+			delete sm;
+			return NULL;
+		}
+	}
+	return sm;
+}
 //if bonus is not set, then sets the base value (adjusts bonus too)
 //if bonus is set, then sets only the bonus
 //  if the bonus value is 0, then the bonus is double base value
@@ -515,17 +531,8 @@ void Spellbook::SetMemorizableSpellsCount(int Value, int type, unsigned int leve
 	if (type >= NUM_BOOK_TYPES) {
 		return;
 	}
-	if ( level >= GetSpellLevelCount(type) ) {
-		CRESpellMemorization *sm = new CRESpellMemorization();
-		sm->Type = (ieWord) type;
-		sm->Level = (ieWord) level;
-		sm->Number = sm->Number2 = 0;
-		if ( !AddSpellMemorization(sm) ) {
-			delete sm;
-			return;
-		}
-	}
-	CRESpellMemorization* sm = spells[type][level];
+
+	CRESpellMemorization* sm = GetSpellMemorization(type, level);
 	if (bonus) {
 		if (!Value) {
 			Value=sm->Number;

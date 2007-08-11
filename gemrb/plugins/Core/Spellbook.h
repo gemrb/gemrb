@@ -156,6 +156,8 @@ private:
 	void RemoveMemorization(CRESpellMemorization* sm, const ieResRef ResRef);
 	/** adds a spell to the book, internal */
 	bool AddKnownSpell(CREKnownSpell *spl, int memo);
+	/** returns a CRESpellMemorization pointer */
+	CRESpellMemorization *GetSpellMemorization(unsigned int type, unsigned int level);
 public: 
 	Spellbook();
 	~Spellbook();

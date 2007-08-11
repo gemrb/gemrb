@@ -192,6 +192,9 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 				if (strnicmp( tag, "capital=",8)==0) {
 					oldcapital=capital;
 					sscanf( tag, "capital=%d", &capital);
+					if (capital) {
+						enablecap=true;
+					}
 					continue;
 				}
 
@@ -241,15 +244,11 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 			} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
 				x = ( rgn.w - w );
 			}
-			enablecap = true;
 			continue;
 		}
 		unsigned char currChar = ( unsigned char ) tmp[i] - 1;
 		if (initials && capital && enablecap) {
 			x = initials->PrintInitial( x, y, rgn, currChar );
-			if (capital==1) {
-				initials = NULL;
-			}
 			enablecap = false;
 			continue;
 		}
@@ -355,6 +354,9 @@ void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 				if (strnicmp( tag, "capital=",8)==0) {
 					oldcapital=capital;
 					sscanf( tag, "capital=%d", &capital);
+					if (capital) {
+						enablecap=true;
+					}
 					continue;
 				}
 				
@@ -398,15 +400,11 @@ void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 			} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
 				x = ( rgn.w - w );
 			}
-			enablecap=true;
 			continue;
 		}
 		unsigned char currChar = ( unsigned char ) tmp[i] - 1;
 		if (initials && capital) {
 			x = initials->PrintInitial( x, y, rgn, currChar );
-			if (capital==1) {
-				initials = NULL;
-			}
 			enablecap=false;
 			continue;
 		}
