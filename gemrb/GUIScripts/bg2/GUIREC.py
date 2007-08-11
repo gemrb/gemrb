@@ -121,6 +121,13 @@ def OpenRecordsWindow ():
 	GemRB.SetVisible (PortraitWindow, 1)
 	return
 
+def GetNextLevelExp (Level, Class):
+        NextLevelTable = GemRB.LoadTable ("XPLEVEL")
+
+        if Level < GemRB.GetTableColumnCount (NextLevelTable, Class):
+                return str(GemRB.GetTableValue (NextLevelTable, Class, Level) )
+
+        return 0;
 
 def UpdateRecordsWindow ():
 	global stats_overview, alignment_help
@@ -223,13 +230,6 @@ def UpdateRecordsWindow ():
 	else:
 		GemRB.SetText (Window, Label, 7199)
 
-	#collecting tokens for stat overview
-	ClassTitle = GemRB.GetString (GetActorClassTitle (pc) )
-
-	GemRB.SetToken("CLASS", ClassTitle)
-	GemRB.SetToken("LEVEL", str (GemRB.GetPlayerStat (pc, IE_LEVEL) ) )
-	GemRB.SetToken("EXPERIENCE", str (GemRB.GetPlayerStat (pc, IE_XP) ) )
-
 	# help, info textarea
 	stats_overview = GetStatOverview (pc)
 	Text = GemRB.GetControl (Window, 45)
@@ -254,17 +254,29 @@ def GetStatOverview (pc):
 	# Experience: <EXPERIENCE>
 	# Next Level: <NEXTLEVEL>
 
-	Main = GemRB.GetString (16480)
-	stats.append (None)
+	#todo: multiclasses
+	#collecting tokens for stat overview
+	Class = 0
+	ClassTitle = GemRB.GetString (GetActorClassTitle (pc) )
+
+	GemRB.SetToken("CLASS", ClassTitle)
+	Level = GemRB.GetPlayerStat (pc, IE_LEVEL)
+	GemRB.SetToken("LEVEL", str (Level) )
+	GemRB.SetToken("NEXTLEVEL", GetNextLevelExp (Level, Class) )
+	GemRB.SetToken("EXPERIENCE", str (GemRB.GetPlayerStat (pc, IE_XP) ) )
+	stats.append ( (16480,1,'c') )
 
 	effects = GemRB.GetPlayerStates (pc)
-	for c in effects:
-		tmp = GemRB.GetTableValue (StateTable, ord(c)-65, 0)
-		print c, GemRB.GetString(tmp)
-		stats.append (tmp)
+	if len(effects):
+		stats.append (None)
+		for c in effects:
+			tmp = GemRB.GetTableValue (StateTable, ord(c)-66, 0)
+			print c, GemRB.GetString(tmp)
+			stats.append ( (tmp,c,'a') )
 
 	stats.append (None)
-	stats.append (8442)
+	stats.append ( (8442,1,'c') )
+
 	stats.append ( (61932, GS (IE_THAC0), '') )
 	stats.append ( (9457, GS (IE_THAC0), '') )
 	tmp = GS (IE_NUMBEROFATTACKS)
@@ -395,6 +407,10 @@ def GetStatOverview (pc):
 				res.append (GemRB.GetString (strref) + ' '+ '+' * val)
 			elif type == 'x':
 				res.append (GemRB.GetString (strref)+': x' + str (val) )
+			elif type == 'a':
+				res.append ("[capital=2]"+val+" "+GemRB.GetString (strref)+"[/capital]")
+			elif type == 'c':
+				res.append ("[capital=0]"+GemRB.GetString (strref) )
 			else:
 				res.append (GemRB.GetString (strref) + ': ' + str (val) + type)
 			lines = 1
@@ -408,7 +424,7 @@ def GetStatOverview (pc):
 				res.append ("")
 				lines = 0
 
-	return Main + string.join (res, "\n")
+	return string.join (res, "\n")
 
 
 def GetReputation (repvalue):

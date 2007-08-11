@@ -280,9 +280,7 @@ def DisplayGeneral (pc):
 		GemRB.TextAreaAppend (Window, RecordsTextArea, "[/color][/capital][capital=2]")
 		StateTable = GemRB.LoadTable ("statdesc")
 		for c in effects:
-			print "State:",c
 			tmp = GemRB.GetTableValue (StateTable, ord(c)-66, 0)
-			print tmp
 			GemRB.TextAreaAppend (Window, RecordsTextArea, c+" ", -1)
 			GemRB.TextAreaAppend (Window, RecordsTextArea, tmp)
  		GemRB.UnloadTable (StateTable)
