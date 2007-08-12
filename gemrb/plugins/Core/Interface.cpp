@@ -2566,6 +2566,7 @@ retry:
 	Map *map = target->GetCurrentArea();
 	map->AddActor(ab);
 	ab->SetPosition(position, true, 0);
+	ab->RefreshEffects(NULL);
 	if (vvcres[0]) {
 		ScriptedAnimation* vvc = GetScriptedAnimation(vvcres, false);
 		vvc->XPos=position.x;
