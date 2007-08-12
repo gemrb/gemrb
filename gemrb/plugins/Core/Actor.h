@@ -315,7 +315,7 @@ public:
 		return which ? SmallPortrait : LargePortrait;
 	}
 
-	void SetText(char* ptr, unsigned char type);
+	void SetText(const char* ptr, unsigned char type);
 	void SetText(int strref, unsigned char type);
 	/* returns carried weight atm, could calculate with strength*/
 	int GetEncumbrance();

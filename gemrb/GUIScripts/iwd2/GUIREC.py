@@ -277,7 +277,7 @@ def DisplayGeneral (pc):
 	if len(effects):
 		GemRB.TextAreaAppend (Window, RecordsTextArea, "\n\n[color=ffff00]")
 		GemRB.TextAreaAppend (Window, RecordsTextArea, 32052)
-		GemRB.TextAreaAppend (Window, RecordsTextArea, "[/color][/capital][capital=2]")
+		GemRB.TextAreaAppend (Window, RecordsTextArea, "[/color][capital=2]")
 		StateTable = GemRB.LoadTable ("statdesc")
 		for c in effects:
 			tmp = GemRB.GetTableValue (StateTable, ord(c)-66, 0)
@@ -286,7 +286,7 @@ def DisplayGeneral (pc):
  		GemRB.UnloadTable (StateTable)
 
 	#race
-	GemRB.TextAreaAppend (Window, RecordsTextArea, "\n\n[/capital][capital=0][color=ffff00]")
+	GemRB.TextAreaAppend (Window, RecordsTextArea, "\n\n[capital=0][color=ffff00]")
 	GemRB.TextAreaAppend (Window, RecordsTextArea, 1048)
 	GemRB.TextAreaAppend (Window, RecordsTextArea, "[/color]")
 
@@ -624,7 +624,6 @@ def RefreshRecordsWindow ():
 	elif SelectWindow == 4:
 		DisplayMisc (pc)
 
-	GemRB.TextAreaAppend ( Window, RecordsTextArea, "[/capital]")
 	#if actor is uncontrollable, make this grayed
 	GemRB.SetVisible (Window, 1)
 	GemRB.SetVisible (PortraitWindow, 1)

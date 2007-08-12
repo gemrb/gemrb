@@ -129,8 +129,9 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 	if (!pal) {
 		pal = palette;
 	}
-	if (startrow || (initials==this) ) {
-		initials = NULL;
+	if (startrow) enablecap=false;
+	if (initials==this) {
+		enablecap=false;
 	}
 
 	Video* video = core->GetVideoDriver();
@@ -179,8 +180,9 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 		if (( ( unsigned char ) tmp[i] ) == '[' && !NoColor) {
 			i++;
 			char tag[256];
-			int k = 0;
-			for (k = 0; k < 256; k++) {
+			tag[0]=0;
+
+			for (int k = 0; k < 256 && i<len; k++) {
 				if (tmp[i] == ']') {
 					tag[k] = 0;
 					break;
@@ -188,21 +190,15 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 				tag[k] = tmp[i++];
 			}
 
-			if (oldcapital) {
-				if (strnicmp( tag, "capital=",8)==0) {
-					oldcapital=capital;
-					sscanf( tag, "capital=%d", &capital);
-					if (capital) {
-						enablecap=true;
-					}
-					continue;
+			if (strnicmp( tag, "capital=",8)==0) {
+				oldcapital=capital;
+				sscanf( tag, "capital=%d", &capital);
+				if (capital && (row>=startrow) ) {
+					enablecap=true;
 				}
-
-				if (strnicmp( tag, "/capital",8)==0) {
-					capital=oldcapital;
-					continue;
-				}
+				continue;
 			}
+
 			
 			if (strnicmp( tag, "color=", 6 ) == 0) {
 				unsigned int r,g,b;
@@ -339,10 +335,9 @@ void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 	for (size_t i = 0; i < len; i++) {
 		if (( ( unsigned char ) tmp[i] ) == '[' && !NoColor) {
 			i++;
-			if (i>=len)
-				break;
 			char tag[256];
-			for (int k = 0; k < 256; k++) {
+			tag[0]=0;
+			for (int k = 0; k < 256 && i<len; k++) {
 				if (tmp[i] == ']') {
 					tag[k] = 0;
 					break;
@@ -350,20 +345,13 @@ void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 				tag[k] = tmp[i++];
 			}
 
-			if (oldcapital) {
-				if (strnicmp( tag, "capital=",8)==0) {
-					oldcapital=capital;
-					sscanf( tag, "capital=%d", &capital);
-					if (capital) {
-						enablecap=true;
-					}
-					continue;
+			if (strnicmp( tag, "capital=",8)==0) {
+				oldcapital=capital;
+				sscanf( tag, "capital=%d", &capital);
+				if (capital) {
+					enablecap=true;
 				}
-				
-				if (strnicmp( tag, "/capital",8)==0) {
-					capital=oldcapital;
-					continue;
-				}
+				continue;
 			}
 			
 			if (strnicmp( tag, "color=", 6 ) == 0) {

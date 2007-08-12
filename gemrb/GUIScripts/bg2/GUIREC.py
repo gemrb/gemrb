@@ -122,12 +122,12 @@ def OpenRecordsWindow ():
 	return
 
 def GetNextLevelExp (Level, Class):
-        NextLevelTable = GemRB.LoadTable ("XPLEVEL")
+	NextLevelTable = GemRB.LoadTable ("XPLEVEL")
 
-        if Level < GemRB.GetTableColumnCount (NextLevelTable, Class):
-                return str(GemRB.GetTableValue (NextLevelTable, Class, Level) )
+	if Level < GemRB.GetTableColumnCount (NextLevelTable, Class):
+		return str(GemRB.GetTableValue (NextLevelTable, Class, Level) )
 
-        return 0;
+	return 0;
 
 def UpdateRecordsWindow ():
 	global stats_overview, alignment_help
@@ -239,15 +239,11 @@ def UpdateRecordsWindow ():
 	return
 
 def GetStatOverview (pc):
-	#dunno if bg2 has colour highlights
-	#won = "[color=FFFFFF]"
-	#woff = "[/color]"
-	won = ""
-	woff = ""
 	StateTable = GemRB.LoadTable ("statdesc")
 	str_None = GemRB.GetString (61560)
 
 	GS = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s)
+	GA = lambda s, col, pc=pc: GemRB.GetAbilityBonus (s, col, GS (s) ) 
 
 	stats = []
 	# 16480 <CLASS>: Level <LEVEL>
@@ -271,7 +267,6 @@ def GetStatOverview (pc):
 		stats.append (None)
 		for c in effects:
 			tmp = GemRB.GetTableValue (StateTable, ord(c)-66, 0)
-			print c, GemRB.GetString(tmp)
 			stats.append ( (tmp,c,'a') )
 
 	stats.append (None)
@@ -298,7 +293,9 @@ def GetStatOverview (pc):
 	stats.append ( (12128, GS (IE_BACKSTABDAMAGEMULTIPLIER), 'x') )
 	stats.append ( (12126, GS (IE_TURNUNDEADLEVEL), '') )
 	stats.append ( (12127, GS (IE_LAYONHANDSAMOUNT), '') )
-	stats.append (2078)
+	#script
+	aiscript = GemRB.GetPlayerScript (pc )
+	stats.append ( (2078, aiscript, '') )
 	stats.append (None)
 
 
@@ -344,29 +341,39 @@ def GetStatOverview (pc):
 	value = GemRB.GetPlayerStat (pc, IE_STR)
 	ex = GemRB.GetPlayerStat (pc, IE_STREXTRA)
 	# 10332 to hit
-	stats.append ( (10332, GemRB.GetAbilityBonus(IE_STR,0,value,ex), '') )
+	stats.append ( (10332, GemRB.GetAbilityBonus(IE_STR,0,value,ex), '0') )
 	# 10336 damage
-	stats.append ( (10336, GemRB.GetAbilityBonus(IE_STR,1,value,ex), '') )
+	stats.append ( (10336, GemRB.GetAbilityBonus(IE_STR,1,value,ex), '0') )
 	# 10337 open doors (bend bars lift gates)
-	stats.append ( (10337, GemRB.GetAbilityBonus(IE_STR,2,value,ex), '') )
+	stats.append ( (10337, GemRB.GetAbilityBonus(IE_STR,2,value,ex), '0') )
 	# 10338 weight allowance
-	stats.append ( (10338, GemRB.GetAbilityBonus(IE_STR,3,value,ex), '') )
+	stats.append ( (10338, GemRB.GetAbilityBonus(IE_STR,3,value,ex), '0') )
 	# 10339 AC
-	value = GemRB.GetPlayerStat (pc, IE_DEX)
-	stats.append ( (10339, GemRB.GetAbilityBonus(IE_DEX,2,value), '') )
+	stats.append ( (10339, GA(IE_DEX,2), '0') )
 	# 10340 Missile
-	stats.append ( (10340, GemRB.GetAbilityBonus(IE_DEX,1,value), '') )
+	stats.append ( (10340, GA(IE_DEX,1), '0') )
 	# 10341 Reaction
-	stats.append ( (10341, GemRB.GetAbilityBonus(IE_DEX,0,value), '') )
-	value = GemRB.GetPlayerStat (pc, IE_CON)
+	stats.append ( (10341, GA(IE_DEX,0), '0') )
 	# 10342 Hp/Level
-	stats.append ( (10342, GemRB.GetAbilityBonus(IE_CON,0,value), '') )
-	value = GemRB.GetPlayerStat (pc, IE_CHR)
-	stats.append ( (10347, GemRB.GetAbilityBonus(IE_CHR,0,value), '') )
-	stats.append (0)
+	stats.append ( (10342, GA(IE_CON,0), '0') )
+	# 10343 Chance To Learn spell
+	if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_WIZARD, 0, 0)>0:
+		stats.append ((10343, GA (IE_INT,0), '%' ))
+	# 10347 Reaction
+	stats.append ( (10347, GA(IE_CHR,0), '0') )
+	stats.append (None)
 
-	stats.append (10344)
-	stats.append (10345)
+	#Bonus spells
+	if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, 0, 0)>0:
+		stats.append (10344)
+		for level in range(7):
+			GemRB.SetToken ("SPELLLEVEL", str(level+1) )
+			#get the bonus spell count
+			base = GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, level, 0)
+			if base:
+				count = GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, level)
+				stats.append ( (GemRB.GetString(10345), count-base, 'b') )
+		stats.append (None)
 
 	# 32204 Resistances
 	stats.append (32204)
@@ -394,7 +401,10 @@ def GetStatOverview (pc):
 	stats.append ((67219, GS (IE_RESISTMISSILE), '%'))
 	stats.append (None)
 
+	#Weapon Style bonuses
 	stats.append (32131)
+	#
+	stats.append (None)
 
 	res = []
 	lines = 0
@@ -403,20 +413,24 @@ def GetStatOverview (pc):
 			strref, val, type = s
 			if val == 0 and type != '0':
 				continue
-			if type == '+':
-				res.append (GemRB.GetString (strref) + ' '+ '+' * val)
-			elif type == 'x':
-				res.append (GemRB.GetString (strref)+': x' + str (val) )
-			elif type == 'a':
-				res.append ("[capital=2]"+val+" "+GemRB.GetString (strref)+"[/capital]")
-			elif type == 'c':
+			if type == '+': #pluses
+				res.append ("[capital=0]"+GemRB.GetString (strref) + ' '+ '+' * val)
+			elif type == 'x': #x character before value
+				res.append ("[capital=0]"+GemRB.GetString (strref)+': x' + str (val) )
+			elif type == 'a': #value (portrait icon) + string
+				res.append ("[capital=2]"+val+" "+GemRB.GetString (strref))
+			elif type == 'b': #strref is an already resolved string
+				res.append ("[capital=0]"+strref+": "+str(val) )
+			elif type == 'c': #normal string
 				res.append ("[capital=0]"+GemRB.GetString (strref) )
-			else:
+			elif type == '0': #normal value
+				res.append (GemRB.GetString (strref) + ': ' + str (val) )
+			else: #normal value + type character, for example percent sign
 				res.append (GemRB.GetString (strref) + ': ' + str (val) + type)
 			lines = 1
 		except:
 			if s != None:
-				res.append (won + GemRB.GetString (s) + woff)
+				res.append ("[capital=0]"+ GemRB.GetString (s) )
 				lines = 0
 			else:
 				if not lines:

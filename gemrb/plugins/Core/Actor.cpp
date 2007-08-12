@@ -285,7 +285,7 @@ void Actor::SetDefaultActions(bool qslot, ieByte slot1, ieByte slot2, ieByte slo
 	DefaultButtons[2]=slot3;
 }
 
-void Actor::SetText(char* ptr, unsigned char type)
+void Actor::SetText(const char* ptr, unsigned char type)
 {
 	size_t len = strlen( ptr ) + 1;
 	//32 is the maximum possible length of the actor name in the original games

@@ -386,7 +386,7 @@ public:
 	/* May spawn creature(s), returns true in case of an interrupted rest */
 	bool Rest(Point &pos, int hours, int day);
 	/* Spawns creature(s) in radius of position */
-	void SpawnCreature(Point &pos, char *CreName, int radius = 0);
+	void SpawnCreature(Point &pos, const char *CreName, int radius = 0);
 
 	//spawns
 	void LoadIniSpawn();

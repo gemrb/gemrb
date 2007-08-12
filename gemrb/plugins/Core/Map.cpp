@@ -2297,7 +2297,7 @@ void Map::LoadIniSpawn()
 	INISpawn->InitSpawn(WEDResRef);
 }
 
-void Map::SpawnCreature(Point &pos, char *CreName, int radius)
+void Map::SpawnCreature(Point &pos, const char *CreName, int radius)
 {
 	SpawnGroup *sg=NULL;
 	Actor *creature;

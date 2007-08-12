@@ -96,7 +96,15 @@ def OpenRecordsWindow ():
 	UpdateRecordsWindow ()
 
 	GemRB.UnhideGUI ()
+	return
 
+def GetNextLevelExp (Level, Class):
+	NextLevelTable = GemRB.LoadTable ("XPLEVEL")
+	Row = GemRB.GetTableRowIndex (NextLevelTable, Class)
+	if Level < GemRB.GetTableColumnCount (NextLevelTable, Row):
+		return str(GemRB.GetTableValue (NextLevelTable, Row, Level) )
+
+	return 0;
 
 def UpdateRecordsWindow ():
 	global stats_overview, alignment_help
@@ -199,13 +207,6 @@ def UpdateRecordsWindow ():
 	else:
 		GemRB.SetText (Window, Label, 7199)
 
-	#collecting tokens for stat overview
-	ClassTitle = GemRB.GetString (GetActorClassTitle (pc) )
-
-	GemRB.SetToken("CLASS", ClassTitle)
-	GemRB.SetToken("LEVEL", str (GemRB.GetPlayerStat (pc, IE_LEVEL) ) )
-	GemRB.SetToken("EXPERIENCE", str (GemRB.GetPlayerStat (pc, IE_XP) ) )
-
 	# help, info textarea
 	stats_overview = GetStatOverview (pc)
 	Text = GemRB.GetControl (Window, 45)
@@ -213,153 +214,159 @@ def UpdateRecordsWindow ():
 
 
 def GetStatOverview (pc):
-	won = "[color=FFFFFF]"
-	woff = "[/color]"
-	str_None = GemRB.GetString (41275)
-	
 	GS = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s)
+	GA = lambda s, col, pc=pc: GemRB.GetAbilityBonus (s, col, GS (s) )
 
 	stats = []
+	# class levels
+	#todo: multiclasses
 	# 16480 <CLASS>: Level <LEVEL>
 	# Experience: <EXPERIENCE>
 	# Next Level: <NEXTLEVEL>
 
-	StateTable = GemRB.LoadTable ("statdesc")
-	Main = GemRB.GetString (16480)
+	#collecting tokens for stat overview
+	ClassTitle = GemRB.GetString (GetActorClassTitle (pc) )
+	GemRB.SetToken("CLASS", ClassTitle)
+	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
+	ClassTable = GemRB.LoadTable ("classes")
+	Class = GemRB.FindTableValue (ClassTable, 5, Class)
+	Multi = GemRB.GetTableValue (ClassTable, Class, 4)
+	Class = GemRB.GetTableRowName (ClassTable, Class)
+	if Multi:
+		Levels = [IE_LEVEL, IE_LEVEL2, IE_LEVEL3]
+		Classes = [0,0,0]
+		MultiCount = 0
+		stats.append ( (11993,1,'c') )
+		Mask = 1
+		for i in range (16):
+			if Multi&Mask:
+				Classes[MultiCount] = GemRB.FindTableValue (ClassTable, 5, i+1)
+				MultiCount += 1
+			Mask += Mask
 
-	# 59856 Current State
-	CurrentState = won + GemRB.GetString (59856) + woff + "\n\n"
+		for i in range (MultiCount):
+			#todo get classtitle for this class
+			Class = Classes[i]
+			ClassTitle = GemRB.GetString(GemRB.GetTableValue (ClassTable, Class, 2))
+			GemRB.SetToken("CLASS", ClassTitle)
+			Class = GemRB.GetTableRowName (ClassTable, i)
+			Level = GemRB.GetPlayerStat (pc, Levels[i])
+			GemRB.SetToken("LEVEL", str (Level) )
+			GemRB.SetToken("NEXTLEVEL", GetNextLevelExp (Level, Class) )
+			GemRB.SetToken("EXPERIENCE", str (GemRB.GetPlayerStat (pc, IE_XP)/MultiCount ) )
+			#resolve string immediately
+			stats.append ( (GemRB.GetString(16480),"",'b') )
+			stats.append (None)
+
+	else:
+		Level = GemRB.GetPlayerStat (pc, IE_LEVEL)
+		GemRB.SetToken("LEVEL", str (Level) )
+		GemRB.SetToken("NEXTLEVEL", GetNextLevelExp (Level, Class) )
+		GemRB.SetToken("EXPERIENCE", str (GemRB.GetPlayerStat (pc, IE_XP) ) )
+		stats.append ( (16480,1,'c') )
+
 	stats.append (None)
+	GemRB.UnloadTable (ClassTable)
+
+	#Current State
+	StateTable = GemRB.LoadTable ("statdesc")
 	effects = GemRB.GetPlayerStates (pc)
 	for c in effects:
-		tmp = GemRB.GetTableValue (StateTable, ord(c)-65, 0)
-		print c, GemRB.GetString(tmp)
-		stats.append (tmp)
-
+		tmp = GemRB.GetTableValue (StateTable, ord(c)-66, 0)
+		stats.append ( (tmp,c,'a') )
 	stats.append (None)
 
-	# 67049 AC Bonuses
-	stats.append (67049)
-	#   67204 AC vs. Slashing
-	stats.append ((67204, GS (IE_ACSLASHINGMOD), ''))
-	#   67205 AC vs. Piercing
-	stats.append ((67205, GS (IE_ACPIERCINGMOD), ''))
-	#   67206 AC vs. Crushing
-	stats.append ((67206, GS (IE_ACCRUSHINGMOD), ''))
-	#   67207 AC vs. Missile
-	stats.append ((67207, GS (IE_ACMISSILEMOD), ''))
-	stats.append (None)
-
-	
-	# 67208 Resistances
-	stats.append (67208)
-	#   67209 Normal Fire
-	stats.append ((67209, GS (IE_RESISTFIRE), '%'))
-	#   67210 Magic Fire
-	stats.append ((67210, GS (IE_RESISTMAGICFIRE), '%'))
-	#   67211 Normal Cold
-	stats.append ((67211, GS (IE_RESISTCOLD), '%'))
-	#   67212 Magic Cold
-	stats.append ((67212, GS (IE_RESISTMAGICCOLD), '%'))
-	#   67213 Electricity
-	stats.append ((67213, GS (IE_RESISTELECTRICITY), '%'))
-	#   67214 Acid
-	stats.append ((67214, GS (IE_RESISTACID), '%'))
-	#   67215 Magic
-	stats.append ((67215, GS (IE_RESISTMAGIC), '%'))
-	#   67216 Slashing Attacks
-	stats.append ((67216, GS (IE_RESISTSLASHING), '%'))
-	#   67217 Piercing Attacks
-	stats.append ((67217, GS (IE_RESISTPIERCING), '%'))
-	#   67218 Crushing Attacks
-	stats.append ((67218, GS (IE_RESISTCRUSHING), '%'))
-	#   67219 Missile Attacks
-	stats.append ((67219, GS (IE_RESISTMISSILE), '%'))
-	stats.append (None)
-
-	# 4220 Proficiencies
-	stats.append (4220)
-	#   4208 THAC0
-	stats.append ((4208, GS (IE_THAC0), ''))
-	#   4209 Number of Attacks
+	#proficiencies
+	stats.append ( (8442,1,'c') )
+	stats.append ( (9457, GS (IE_THAC0), '') )
 	tmp = GS (IE_NUMBEROFATTACKS)
 	if (tmp&1):
 		tmp2 = str(tmp/2) + chr(188)
 	else:
 		tmp2 = str(tmp/2)
-	stats.append ((4209, tmp2, ''))
-	#   4210 Lore
-	stats.append ((4210, GS (IE_LORE), ''))
-	#   4211 Open Locks
-	stats.append ((4211, GS (IE_LOCKPICKING), ''))
-	#   4212 Stealth
-	stats.append ((4212, GS (IE_STEALTH), ''))
-	#   4213 Find/Remove Traps
-	stats.append ((4213, GS (IE_TRAPS), ''))
-	#   4214 Pick Pockets
-	stats.append ((4214, GS (IE_PICKPOCKET), ''))
-	#   4215 Tracking
-	stats.append ((4215, GS (IE_TRACKING), ''))
-	#   4216 Reputation
-	stats.append ((4216, GS (IE_REPUTATION), ''))
-	#   4217 Turn Undead Level
-	stats.append ((4217, GS (IE_TURNUNDEADLEVEL), ''))
-	#   4218 Lay on Hands Amount
-	stats.append ((4218, GS (IE_LAYONHANDSAMOUNT), ''))
-	#   4219 Backstab Damage
-	stats.append ((4219, GS (IE_BACKSTABDAMAGEMULTIPLIER), ''))
+	stats.append ( (9458, tmp2, '') )
+	stats.append ( (9459, GS (IE_LORE), '') )
+	stats.append ( (19224, GS (IE_MAGICDAMAGERESISTANCE), '') )
+	#reputation
+	reptxt = GetReputation (GemRB.GameGetReputation()/10)
+	stats.append ( (9465, reptxt, '') )
+	#script
+	aiscript = GemRB.GetPlayerScript (pc )
+	stats.append ( (2078, aiscript, '') )
 	stats.append (None)
 
-	# 4221 Saving Throws
-	stats.append (4221)
-	#   4222 Paralyze/Poison/Death
-	stats.append ((4222, GS (IE_SAVEVSDEATH), ''))
-	#   4223 Rod/Staff/Wand
-	stats.append ((4223, GS (IE_SAVEVSWANDS), ''))
-	#   4224 Petrify/Polymorph
-	stats.append ((4224, GS (IE_SAVEVSPOLY), ''))
-	#   4225 Breath Weapon
-	stats.append ((4225, GS (IE_SAVEVSBREATH), ''))
-	#   4226 Spells
-	stats.append ((4226, GS (IE_SAVEVSSPELL), ''))
-	stats.append (None)
-	
-	# 4227 Weapon Proficiencies
-	stats.append (4227)
-	#   55011 Unused Slots
-	#   33642 Fist
-	#   33649 Edged Weapon
-	#   33651 Hammer
-	#   44990 Axe
-	stats.append ((44990, GS (IE_PROFICIENCYAXE), ''))
-	#   33653 Club
-	#   33655 Bow
-	stats.append (None)
-	
-	# 4228 Ability Bonuses
-	stats.append (4228)
-	#   4229 To Hit
-	#   4230 Damage
-	#   4231 Open Doors
-	#   4232 Weight Allowance
-	#   4233 Armor Class Bonus
-	#   4234 Missile Adjustment
-	stats.append ((4234, GS (IE_ACMISSILEMOD), ''))
-	#   4236 CON HP Bonus/Level
-	#   4240 Reaction
+	# 17379 Saving throws
+	stats.append (17379)
+	#   17380 Paralyze/Poison/Death
+	stats.append ((17380, GS (IE_SAVEVSDEATH), ''))
+	#   17381 Rod/Staff/Wand
+	stats.append ((17381, GS (IE_SAVEVSWANDS), ''))
+	#   17382 Petrify/Polymorph
+	stats.append ((17382, GS (IE_SAVEVSPOLY), ''))
+	#   17383 Breath Weapon
+	stats.append ((17383, GS (IE_SAVEVSBREATH), ''))
+	#   17384 Spells
+	stats.append ((17384, GS (IE_SAVEVSSPELL), ''))
 	stats.append (None)
 
-	# 4238 Magical Defense Adjustment
-	stats.append (4238)
-	#   4239 Bonus Priest Spells
-	stats.append ((4239, GS (IE_CASTINGLEVELBONUSCLERIC), ''))
+	# 9466 Weapon Proficiencies
+	stats.append (9466)
+	table = GemRB.LoadTable("weapprof")
+	RowCount = GemRB.GetTableRowCount (table)
+	for i in range(RowCount):
+		text = GemRB.GetTableValue (table, i, 1)
+		stat = GemRB.GetTableValue (table, i, 0)
+		stats.append ( (text, GS(stat), '+') )
 	stats.append (None)
-	
-	# 4237 Chance to learn spell
-	#SpellLearnChance = won + GemRB.GetString (4237) + woff
 
-	# ??? 4235 Reaction Adjustment
+	# 11766 AC Bonuses
+	stats.append (11766)
+	#   11767 AC vs. Missile
+	stats.append ((11767, GS (IE_ACMISSILEMOD), ''))
+	#   11768 AC vs. Piercing
+	stats.append ((11768, GS (IE_ACSLASHINGMOD), ''))
+	#   11769 AC vs. Crushing
+	stats.append ((11769, GS (IE_ACPIERCINGMOD), ''))
+	#   11770 AC vs. Slashing
+	stats.append ((11770, GS (IE_ACCRUSHINGMOD), ''))
+	stats.append (None)
 
+	# 10315 Ability Bonuses
+	stats.append (10315)
+	#   10332 To Hit
+	stats.append ((10332, GA (IE_STR,0), '0' ))
+	#   10336 Damage
+	stats.append ((10336, GA (IE_STR,1), '0' ))
+	#   10337 Open Doors
+	stats.append ((10337, GA (IE_STR,2), '0' ))
+	#   10338 Weight Allowance
+	stats.append ((10338, GA (IE_STR,3), '0' ))
+	#   10339 Armor Class
+	stats.append ((10339, GA (IE_DEX,0), '0' ))
+	#   10340 Missile Adjustment
+	stats.append ((10340, GA (IE_DEX,1), '0' ))
+	#   10341 Reaction Adjustment
+	stats.append ((10341, GA (IE_DEX,2), '0' ))
+	#   10342 CON HP Bonus/Level
+	stats.append ((10342, GA (IE_CON,0), '0' ))
+	#   10343 Chance To Learn spell
+	if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_WIZARD, 0, 0)>0:
+		stats.append ((10343, GA (IE_INT,0), '%' ))
+	#   10347 Reaction
+	stats.append ((10347, GA (IE_CHR,0), '0' ))
+
+	#   10344 Bonus Priest Spell
+	if GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, 0, 0)>0:
+		stats.append (10344)
+		for level in range(7):
+			GemRB.SetToken ("SPELLLEVEL", str(level+1) )
+			#get the bonus spell count
+			base = GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, level, 0)
+			if base:
+				count = GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, level)
+				stats.append ( (GemRB.GetString(10345), count-base, 'b') )
+		stats.append (None)
+ 
 	res = []
 	lines = 0
 	for s in stats:
@@ -367,19 +374,39 @@ def GetStatOverview (pc):
 			strref, val, type = s
 			if val == 0 and type != '0':
 				continue
-			res.append (GemRB.GetString (strref) + ': ' + str (val) + type)
+			if type == '+':
+				res.append ("[capital=0]"+GemRB.GetString (strref) + ' '+ '+' * val)
+			elif type == 'x':
+				res.append ("[capital=0]"+GemRB.GetString (strref)+': x' + str (val) )
+			elif type == 'a':
+				res.append ("[capital=2]"+val+" "+GemRB.GetString (strref))
+			elif type == 'b':
+				res.append ("[capital=0]"+strref+": "+str(val) )
+			elif type == 'c':
+				res.append ("[capital=0]"+GemRB.GetString (strref))
+			elif type == '0':
+				res.append (GemRB.GetString (strref) + ': ' + str (val) )
+			else:
+				res.append ("[capital=0]"+GemRB.GetString (strref) + ': ' + str (val) + type)
 			lines = 1
 		except:
 			if s != None:
-				res.append (won + GemRB.GetString (s) + woff)
+				res.append ( GemRB.GetString (s) )
 				lines = 0
 			else:
-				if not lines:
-					res.append (str_None)
-				res.append ("")
+				if lines:
+					res.append ("")
 				lines = 0
 
-	return Main + CurrentState + string.join (res, "\n")
+	return string.join (res, "\n")
+
+def GetReputation (repvalue):
+	table = GemRB.LoadTable ("reptxt")
+	if repvalue>20:
+		repvalue=20
+	txt = GemRB.GetString (GemRB.GetTableValue (table, repvalue, 0) )
+	GemRB.UnloadTable (table)
+	return txt+"("+str(repvalue)+")"
 
 def OpenInformationWindow ():
 	global InformationWindow
