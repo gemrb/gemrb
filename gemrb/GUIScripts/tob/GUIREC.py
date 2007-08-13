@@ -49,7 +49,7 @@ def OpenRecordsWindow ():
 
 	if CloseOtherWindow (OpenRecordsWindow):
 		if InformationWindow: OpenInformationWindow ()
-	
+
 		GemRB.UnloadWindow (RecordsWindow)
 		GemRB.UnloadWindow (OptionsWindow)
 		GemRB.UnloadWindow (PortraitWindow)
@@ -243,43 +243,64 @@ def GetStatOverview (pc):
 	str_None = GemRB.GetString (61560)
 
 	GS = lambda s, pc=pc: GemRB.GetPlayerStat (pc, s)
-	GA = lambda s, col, pc=pc: GemRB.GetAbilityBonus (s, col, GS (s) ) 
+	GA = lambda s, col, pc=pc: GemRB.GetAbilityBonus (s, col, GS (s) )
 
 	stats = []
+	# class levels
 	# 16480 <CLASS>: Level <LEVEL>
 	# Experience: <EXPERIENCE>
 	# Next Level: <NEXTLEVEL>
 
-	#todo: multiclasses
 	#collecting tokens for stat overview
-	Class = 0
 	ClassTitle = GemRB.GetString (GetActorClassTitle (pc) )
-
 	GemRB.SetToken("CLASS", ClassTitle)
-	Level = GemRB.GetPlayerStat (pc, IE_LEVEL)
-	GemRB.SetToken("LEVEL", str (Level) )
-        Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-        print "L:",Level, "class: ", Class
-        ClassTable = GemRB.LoadTable ("classes")
-        Class = GemRB.FindTableValue (ClassTable, 5, Class)
-        print "Row: ", Class
-        Multi = GemRB.GetTableValue (ClassTable, Class, 4)
-        print "Multi: ", Multi
-        Class = GemRB.GetTableRowName (ClassTable, Class)
-        print "Class name: ", Class
-        GemRB.UnloadTable (ClassTable)
-	GemRB.SetToken("NEXTLEVEL", GetNextLevelExp (Level, Class) )
-	GemRB.SetToken("EXPERIENCE", str (GemRB.GetPlayerStat (pc, IE_XP) ) )
-	stats.append ( (16480,1,'c') )
+	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
+	ClassTable = GemRB.LoadTable ("classes")
+	Class = GemRB.FindTableValue (ClassTable, 5, Class)
+	Multi = GemRB.GetTableValue (ClassTable, Class, 4)
+	Class = GemRB.GetTableRowName (ClassTable, Class)
+	if Multi:
+		Levels = [IE_LEVEL, IE_LEVEL2, IE_LEVEL3]
+		Classes = [0,0,0]
+		MultiCount = 0
+		stats.append ( (19721,1,'c') )
+		Mask = 1
+		for i in range (16):
+			if Multi&Mask:
+				Classes[MultiCount] = GemRB.FindTableValue (ClassTable, 5, i+1)
+				MultiCount += 1
+			Mask += Mask
+
+		for i in range (MultiCount):
+			#todo get classtitle for this class
+			Class = Classes[i]
+			ClassTitle = GemRB.GetString(GemRB.GetTableValue (ClassTable, Class, 2))
+			GemRB.SetToken("CLASS", ClassTitle)
+			Class = GemRB.GetTableRowName (ClassTable, i)
+			Level = GemRB.GetPlayerStat (pc, Levels[i])
+			GemRB.SetToken("LEVEL", str (Level) )
+			GemRB.SetToken("NEXTLEVEL", GetNextLevelExp (Level, Class) )
+			GemRB.SetToken("EXPERIENCE", str (GemRB.GetPlayerStat (pc, IE_XP)/MultiCount ) )
+			#resolve string immediately
+			stats.append ( (GemRB.GetString(16480),"",'b') )
+			stats.append (None)
+
+	else:
+		Level = GemRB.GetPlayerStat (pc, IE_LEVEL)
+		GemRB.SetToken("LEVEL", str (Level) )
+		GemRB.SetToken("NEXTLEVEL", GetNextLevelExp (Level, Class) )
+		GemRB.SetToken("EXPERIENCE", str (GemRB.GetPlayerStat (pc, IE_XP) ) )
+		stats.append ( (16480,1,'c') )
+		stats.append (None)
+	GemRB.UnloadTable (ClassTable)
 
 	effects = GemRB.GetPlayerStates (pc)
 	if len(effects):
-		stats.append (None)
 		for c in effects:
 			tmp = GemRB.GetTableValue (StateTable, ord(c)-66, 0)
 			stats.append ( (tmp,c,'a') )
+		stats.append (None)
 
-	stats.append (None)
 	stats.append ( (8442,1,'c') )
 
 	stats.append ( (61932, GS (IE_THAC0), '') )
@@ -313,7 +334,7 @@ def GetStatOverview (pc):
 	stats.append (17379)
 	#   17380 Death
 	stats.append ( (17380, GS (IE_SAVEVSDEATH), '') )
-	#   17381 
+	#   17381
 	stats.append ( (17381, GS (IE_SAVEVSWANDS), '') )
 	#   17382 AC vs. Crushing
 	stats.append ( (17382, GS (IE_SAVEVSPOLY), '') )
@@ -471,7 +492,7 @@ def OpenInformationWindow ():
 		GemRB.SetVisible (RecordsWindow, 3)
 		GemRB.SetVisible (PortraitWindow, 3)
 		InformationWindow = None
-	
+
 		return
 
 	InformationWindow = Window = GemRB.LoadWindow (4)
@@ -544,7 +565,7 @@ def OpenInformationWindow ():
 	#are they used?
 	GemRB.SetText (Window, Label, stat['FavouriteWeapon'])
 
-	#total xp 
+	#total xp
 	Label = GemRB.GetControl (Window, 0x1000000f)
 	if TotalPartyExp != 0:
 		PartyExp = int ((stat['KillsTotalXP'] * 100) / TotalPartyExp)
@@ -559,7 +580,7 @@ def OpenInformationWindow ():
 	else:
 		GemRB.SetText (Window, Label, "0%")
 
-	#total xp 
+	#total xp
 	Label = GemRB.GetControl (Window, 0x10000010)
 	if TotalCount != 0:
 		PartyExp = int ((stat['KillsTotalCount'] * 100) / TotalCount)

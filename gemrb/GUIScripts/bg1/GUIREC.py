@@ -42,15 +42,15 @@ def OpenRecordsWindow ():
 
 	if CloseOtherWindow (OpenRecordsWindow):
 		if InformationWindow: OpenInformationWindow ()
-		
+	
 		GemRB.HideGUI ()
 		GemRB.UnloadWindow (RecordsWindow)
 		RecordsWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
 		SetSelectionChangeHandler (None)
-		
+	
 		GemRB.UnhideGUI ()
-		return	
+		return
 
 	GemRB.HideGUI ()
 	GemRB.LoadWindowPack ("GUIREC")
@@ -108,14 +108,14 @@ def GetNextLevelExp (Level, Class):
 
 def UpdateRecordsWindow ():
 	global stats_overview, alignment_help
-	
+
 	Window = RecordsWindow
 	if not RecordsWindow:
 		print "SelectionChange handler points to non existing window\n"
 		return
 
 	pc = GemRB.GameGetSelectedPCSingle ()
-	
+
 	# exportable
 	Button = GemRB.GetControl (Window, 36)
 	if GemRB.GetPlayerStat (pc, IE_MC_FLAGS)&MC_EXPORTABLE:
@@ -190,7 +190,7 @@ def UpdateRecordsWindow ():
 	Table = GemRB.LoadTable ("races")
 	text = GemRB.GetTableValue (Table, GemRB.GetPlayerStat (pc, IE_RACE) - 1, 0)
 	GemRB.UnloadTable (Table)
-	
+
 	Label = GemRB.GetControl (Window, 0x1000000f)
 	GemRB.SetText (Window, Label, text)
 
@@ -219,7 +219,6 @@ def GetStatOverview (pc):
 
 	stats = []
 	# class levels
-	#todo: multiclasses
 	# 16480 <CLASS>: Level <LEVEL>
 	# Experience: <EXPERIENCE>
 	# Next Level: <NEXTLEVEL>
@@ -236,7 +235,7 @@ def GetStatOverview (pc):
 		Levels = [IE_LEVEL, IE_LEVEL2, IE_LEVEL3]
 		Classes = [0,0,0]
 		MultiCount = 0
-		stats.append ( (11993,1,'c') )
+		stats.append ( (19721,1,'c') )
 		Mask = 1
 		for i in range (16):
 			if Multi&Mask:
@@ -366,7 +365,7 @@ def GetStatOverview (pc):
 				count = GemRB.GetMemorizableSpellsCount (pc, IE_SPELL_TYPE_PRIEST, level)
 				stats.append ( (GemRB.GetString(10345), count-base, 'b') )
 		stats.append (None)
- 
+
 	res = []
 	lines = 0
 	for s in stats:
@@ -410,16 +409,16 @@ def GetReputation (repvalue):
 
 def OpenInformationWindow ():
 	global InformationWindow
-	
+
 	GemRB.HideGUI ()
-	
+
 	if InformationWindow != None:
 		if BiographyWindow: OpenBiographyWindow ()
 
 		GemRB.UnloadWindow (InformationWindow)
 		InformationWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
-		
+	
 		GemRB.UnhideGUI()
 		return
 
@@ -445,12 +444,12 @@ def OpenBiographyWindow ():
 	global BiographyWindow
 
 	GemRB.HideGUI ()
-	
+
 	if BiographyWindow != None:
 		GemRB.UnloadWindow (BiographyWindow)
 		BiographyWindow = None
 		GemRB.SetVar ("FloatWindow", InformationWindow)
-		
+	
 		GemRB.UnhideGUI()
 		GemRB.ShowModal (InformationWindow, MODAL_SHADOW_GRAY)
 		return
@@ -461,7 +460,6 @@ def OpenBiographyWindow ():
 	TextArea = GemRB.GetControl (Window, 0)
 	GemRB.SetText (Window, TextArea, 39424)
 
-	
 	# Done
 	Button = GemRB.GetControl (Window, 2)
 	GemRB.SetText (Window, Button, 11973)
