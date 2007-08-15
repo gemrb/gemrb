@@ -138,6 +138,27 @@ public:
 		}
 		return atoi( ret );
 	}
+
+	const bool GetKeyAsBool(const char* Key, const bool Default)
+	{
+	  const char* ret = NULL;
+		for (unsigned int i = 0; i < pairs.size(); i++) {
+			if (stricmp( Key, pairs[i].Name ) == 0) {
+				ret = pairs[i].Value;
+	      break;
+			}
+		}
+	  if (!ret) {
+		  return Default;
+	  }
+	  if (!stricmp( ret, "true") ) {
+	    return true;
+	  }
+	  if (!stricmp( ret, "false") ) {
+	    return false;
+	  }
+	  return (atoi( ret ) )!=0;
+	}
 };
 
 class INIImp : public DataFileMgr {
@@ -156,7 +177,10 @@ public:
 	}
 	const char* GetKeyAsString(const char* Tag, const char* Key,
 		const char* Default);
-	const int GetKeyAsInt(const char* Tag, const char* Key, const int Default);
+	const int GetKeyAsInt(const char* Tag, const char* Key, 
+		const int Default);
+	const int GetKeyAsBool(const char* Tag, const char* Key, 
+		const bool Default);
 public:
 	void release(void)
 	{

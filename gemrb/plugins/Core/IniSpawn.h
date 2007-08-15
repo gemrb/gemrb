@@ -54,6 +54,12 @@ class Map;
 //critter flags
 #define CF_IGNORENOSEE 1
 #define CF_DEATHVAR    2
+#define CF_NO_DIFF_1 4
+#define CF_NO_DIFF_2 8
+#define CF_NO_DIFF_3 16
+#define CF_CHECKVIEWPORT 32
+#define CF_CHECKCROWD 64
+#define CF_SAFESTPOINT 128
 
 //spec ids flags
 #define AI_EA		0
@@ -90,8 +96,11 @@ struct CritterEntry {
 	ieResRef Dialog;          //override dialog
 	ieVariable SpawnPointVar; //spawn point saved location
 	Point SpawnPoint;         //spawn point
+	int SpecVarOperator;      //operation performed on spec var
+	int SpecVarValue;         //using this value with the operation
+	int SpecVarInc;           //add this to spec var at each spawn
 	int Orientation;          //spawn orientation
-	int Flags;                //CF_IGNORENOSEE, CF_DEATHVAR
+	int Flags;                //CF_IGNORENOSEE, CF_DEATHVAR, etc
 	int TotalQuantity;        //total number
 	int SpawnCount;           //create quantity
 };
@@ -146,6 +155,8 @@ private:
 	//spawns a single creature
 	void SpawnCreature(CritterEntry &critter);
 	void SpawnGroup(SpawnEntry &event);
+	//gets the spec var operation code from a keyword
+	int GetDiffMode(const char *keyword);
 public:
 	void InitSpawn(const ieResRef DefaultArea);
 	void RespawnNameless();

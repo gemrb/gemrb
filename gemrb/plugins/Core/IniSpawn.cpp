@@ -116,20 +116,78 @@ inline void GetElements(const char *s, ieVariable *storage, int count)
 	}
 }
 
+// possible values implemented in DiffMode, but not needed here
+// BINARY_LESS_OR_EQUALS 6 //(left has only bits in right)
+// BINARY_MORE_OR_EQUALS 7 //(left has equal or more bits than right)
+// BINARY_INTERSECT 8      //(left and right has at least one common bit)
+// BINARY_NOT_INTERSECT 9  //(no common bits)
+// BINARY_MORE 10          //left has more bits than right
+// BINARY_LESS 11          //left has less bits than right
+
+int IniSpawn::GetDiffMode(const char *keyword)
+{
+	if (keyword[0]==0) return NO_OPERATION; //-1
+	if (!stricmp(keyword,"less_or_equal_to") ) return LESS_OR_EQUALS; //0 (gemrb ext)
+	if (!stricmp(keyword,"equal_to") ) return EQUALS; // 1
+	if (!stricmp(keyword,"less_than") ) return LESS_THAN; // 2
+	if (!stricmp(keyword,"greater_than") ) return GREATER_THAN; //3
+	if (!stricmp(keyword,"greater_or_equal_to") ) return GREATER_THAN; //4 (gemrb ext)
+	if (!stricmp(keyword,"not_equal_to") ) return NOT_EQUALS; //5
+	return NO_OPERATION;
+}
+
+//unimplemented tags:
+// check_crowd
+// good_mod, law_mod, lady_mod, murder_mod
+// control_var
+// spec_area
+// spec_var_inc
+// death_faction
+// death_team
+// check_by_view_port
+// do_not_spawn
+// time_of_day
+// hold_selected_point_key
+// inc_spawn_point_index
+// Save_selected_point, Save_selected_facing
+// find_safest_point
+// exit
+// spawn_time_of_day
+// PST only
+// auto_buddy
+// detail_level
 void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, CritterEntry &critter)
 {
 	const char *s;
+	int ps;
 	
 	memset(&critter,0,sizeof(critter));
-	s = inifile->GetKeyAsString(crittername,"spec",NULL);
+
+	//all specvars are using global, but sometimes it is explicitly given
 	s = inifile->GetKeyAsString(crittername,"spec_var",NULL);
-	if (s && (strlen(s)>9) && s[6]==':' && s[6]==':') {
+	if (s && (strlen(s)>9) && s[6]==':' && s[7]==':') {
 		strnuprcpy(critter.SpecContext, s, 6);
 		strnlwrcpy(critter.SpecVar, s+8, 32);
+	} else {
+		strnuprcpy(critter.SpecContext, "GLOBAL", 6);
+		strnlwrcpy(critter.SpecVar, s, 32);
 	}
+
+	//add this to specvar at each spawn
+	ps = inifile->GetKeyAsInt(crittername,"spec_var_inc", 0);
+	critter.SpecVarInc=ps;
+
+	//use this value with spec_var_operation to determine spawn
+	ps = inifile->GetKeyAsInt(crittername,"spec_var_value",0);
+	critter.SpecVarValue=ps;
+	//this operation uses DiffCore
+	s = inifile->GetKeyAsString(crittername,"spec_var_operation","");
+	critter.SpecVarOperator=GetDiffMode(s);
+	//the amount of critters to spawn
 	critter.TotalQuantity = inifile->GetKeyAsInt(crittername,"spec_qty",1);
 	critter.SpawnCount = inifile->GetKeyAsInt(crittername,"create_qty",critter.TotalQuantity);
 
+	//the creature resource(s)
 	s = inifile->GetKeyAsString(crittername,"cre_file",NULL);
 	if (s) {
 		critter.creaturecount = CountElements(s,',');
@@ -137,7 +195,7 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 		GetElements(s, critter.CreFile, critter.creaturecount);
 	}
 	s = inifile->GetKeyAsString(crittername,"point_select",NULL);
-	int ps;
+	
 	if (s) {
 		ps=s[0];
 	} else {
@@ -164,6 +222,7 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 		}
 	}
 	
+	//store or retrieve spawn point
 	s = inifile->GetKeyAsString(crittername,"spawn_point_global", NULL);
 	if (s) {
 		switch (ps) {
@@ -172,6 +231,19 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 			break;
 		default:
 			SetVariable(map, s+8, s, critter.SpawnPoint.asDword());
+			break;
+		}
+	}
+
+	//take facing from variable
+	s = inifile->GetKeyAsString(crittername,"spawn_facing_global", NULL);
+	if (s) {
+		switch (ps) {
+		case 'e':
+			critter.Orientation=(int) CheckVariable(map, s+8,s);
+			break;
+		default:
+			SetVariable(map, s+8, s, (ieDword) critter.Orientation);
 			break;
 		}
 	}
@@ -209,6 +281,41 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	if (s) {
 		strnuprcpy(critter.ScriptName, s, 32);
 	}
+
+	//iwd2 script names
+	//todo
+	s = inifile->GetKeyAsString(crittername,"script_special_1",NULL);
+	if (s) {
+		strnuprcpy(critter.GeneralScript,s, 8);
+	}
+	//todo
+	s = inifile->GetKeyAsString(crittername,"script_special_2",NULL);
+	if (s) {
+		strnuprcpy(critter.OverrideScript,s, 8);
+	}
+	//todo
+	s = inifile->GetKeyAsString(crittername,"script_special_3",NULL);
+	if (s) {
+		strnuprcpy(critter.DefaultScript,s, 8);
+	}
+	//todo
+	s = inifile->GetKeyAsString(crittername,"script_team",NULL);
+	if (s) {
+		strnuprcpy(critter.ClassScript,s, 8);
+	}
+
+	//combat == race
+	s = inifile->GetKeyAsString(crittername,"script_combat",NULL);
+	if (s) {
+		strnuprcpy(critter.RaceScript,s, 8);
+	}
+	//todo
+	s = inifile->GetKeyAsString(crittername,"script_movement",NULL);
+	if (s) {
+		strnuprcpy(critter.SpecificScript,s, 8);
+	}
+
+	//pst script names
 	s = inifile->GetKeyAsString(crittername,"script_override",NULL);
 	if (s) {
 		strnuprcpy(critter.OverrideScript,s, 8);
@@ -241,13 +348,31 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	if (s) {
 		strnuprcpy(critter.Dialog,s, 8);
 	}
-	s = inifile->GetKeyAsString(crittername,"death_scriptname",NULL);
-	if (s && atoi(s)) {
+
+	//flags
+	if (inifile->GetKeyAsBool(crittername,"death_scriptname",false)) {
 		critter.Flags|=CF_DEATHVAR;
 	}
-	s = inifile->GetKeyAsString(crittername,"ignore_no_see",NULL);
-	if (s && atoi(s)) {
+	if (inifile->GetKeyAsBool(crittername,"ignore_can_see",false)) {
 		critter.Flags|=CF_IGNORENOSEE;
+	}
+	if (inifile->GetKeyAsBool(crittername,"check_view_port", false)) {
+		critter.Flags|=CF_CHECKVIEWPORT;
+	}
+	if (inifile->GetKeyAsBool(crittername,"check_crowd", false)) {
+		critter.Flags|=CF_CHECKCROWD;
+	}
+	if (inifile->GetKeyAsBool(crittername,"find_safest_point", false)) {
+		critter.Flags|=CF_SAFESTPOINT;
+	}
+	if (inifile->GetKeyAsBool(crittername,"area_diff_1", false)) {
+		critter.Flags|=CF_NO_DIFF_1;
+	}
+	if (inifile->GetKeyAsBool(crittername,"area_diff_2", false)) {
+		critter.Flags|=CF_NO_DIFF_2;
+	}
+	if (inifile->GetKeyAsBool(crittername,"area_diff_3", false)) {
+		critter.Flags|=CF_NO_DIFF_3;
 	}
 }
 
@@ -340,9 +465,18 @@ void IniSpawn::RespawnNameless()
 
 void IniSpawn::SpawnCreature(CritterEntry &critter)
 {
+	ieDword specvar = CheckVariable(map, critter.SpecVar, critter.SpecContext);
+
 	if (critter.SpecVar[0]) {
-		if (!CheckVariable(map,critter.SpecVar, critter.SpecContext)) {
-			return;
+		if (critter.SpecVarOperator>=0) {
+			// dunno if this should be negated
+			if (DiffCore(specvar, critter.SpecVarValue, critter.SpecVarOperator) ) {
+				return;
+			}
+		} else {
+			if (!specvar) {
+				return;
+			}
 		}
 	}
 
@@ -380,6 +514,8 @@ void IniSpawn::SpawnCreature(CritterEntry &critter)
 	if (!cre) {
 		return;
 	}
+
+	SetVariable(map, critter.SpecVar, critter.SpecContext, specvar+(ieDword) critter.SpecVarInc);
 	map->AddActor(cre);
 	for (x=0;x<9;x++) {
 		if (critter.SetSpec[x]) {
