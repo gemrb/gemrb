@@ -141,7 +141,6 @@ int IniSpawn::GetDiffMode(const char *keyword)
 // good_mod, law_mod, lady_mod, murder_mod
 // control_var
 // spec_area
-// spec_var_inc
 // death_faction
 // death_team
 // check_by_view_port
@@ -149,7 +148,6 @@ int IniSpawn::GetDiffMode(const char *keyword)
 // time_of_day
 // hold_selected_point_key
 // inc_spawn_point_index
-// Save_selected_point, Save_selected_facing
 // find_safest_point
 // exit
 // spawn_time_of_day
@@ -219,6 +217,12 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 			critter.SpawnPoint.x=(short) x;
 			critter.SpawnPoint.y=(short) y;
 			critter.Orientation=o;
+		} else {
+			if (sscanf(s,"[%d.%d]", &x, &y)==2) {
+				critter.SpawnPoint.x=(short) x;
+				critter.SpawnPoint.y=(short) y;
+				critter.Orientation=core->Roll(1,16,-1);
+			}
 		}
 	}
 	
@@ -230,7 +234,8 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 			critter.SpawnPoint.fromDword(CheckVariable(map, s+8,s));
 			break;
 		default:
-			SetVariable(map, s+8, s, critter.SpawnPoint.asDword());
+			//see save_selected_point
+			//SetVariable(map, s+8, s, critter.SpawnPoint.asDword());
 			break;
 		}
 	}
@@ -243,8 +248,26 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 			critter.Orientation=(int) CheckVariable(map, s+8,s);
 			break;
 		default:
-			SetVariable(map, s+8, s, (ieDword) critter.Orientation);
+			//see save_selected_point
+			//SetVariable(map, s+8, s, (ieDword) critter.Orientation);
 			break;
+		}
+	}
+
+	s = inifile->GetKeyAsString(crittername,"save_selected_point",NULL);
+	if (s) {
+		if ((strlen(s)>9) && s[6]==':' && s[7]==':') {
+			SetVariable(map, s+8, s, critter.SpawnPoint.asDword());
+		} else {
+			SetVariable(map, s, "GLOBAL", critter.SpawnPoint.asDword());
+		}
+	}
+	s = inifile->GetKeyAsString(crittername,"save_selected_facing",NULL);
+	if (s) {
+		if ((strlen(s)>9) && s[6]==':' && s[7]==':') {
+			SetVariable(map, s+8, s, (ieDword) critter.Orientation);
+		} else {
+			SetVariable(map, s, "GLOBAL", (ieDword) critter.Orientation);
 		}
 	}
 
@@ -353,18 +376,23 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	if (inifile->GetKeyAsBool(crittername,"death_scriptname",false)) {
 		critter.Flags|=CF_DEATHVAR;
 	}
+	//don't spawn when spawnpoint is visible
 	if (inifile->GetKeyAsBool(crittername,"ignore_can_see",false)) {
 		critter.Flags|=CF_IGNORENOSEE;
 	}
+	//unsure, but could be similar to previous
 	if (inifile->GetKeyAsBool(crittername,"check_view_port", false)) {
 		critter.Flags|=CF_CHECKVIEWPORT;
 	}
+	//unknown, this is used only in pst
 	if (inifile->GetKeyAsBool(crittername,"check_crowd", false)) {
 		critter.Flags|=CF_CHECKCROWD;
 	}
+	//unknown, this is used only in pst
 	if (inifile->GetKeyAsBool(crittername,"find_safest_point", false)) {
 		critter.Flags|=CF_SAFESTPOINT;
 	}
+	//disable spawn based on game difficulty
 	if (inifile->GetKeyAsBool(crittername,"area_diff_1", false)) {
 		critter.Flags|=CF_NO_DIFF_1;
 	}
@@ -477,6 +505,30 @@ void IniSpawn::SpawnCreature(CritterEntry &critter)
 			if (!specvar) {
 				return;
 			}
+		}
+	}
+
+	if (critter.Flags&CF_NO_DIFF_MASK) {
+		ieDword difficulty;
+		ieDword diff_bit;
+
+		core->GetDictionary()->Lookup("Difficulty Level", difficulty);
+		switch (difficulty)
+		{
+		case 0:
+			diff_bit = CF_NO_DIFF_1;
+			break;
+		case 1:
+			diff_bit = CF_NO_DIFF_2;
+			break;
+		case 2:
+			diff_bit = CF_NO_DIFF_3;
+			break;
+		default:
+			diff_bit = 0;
+		}
+		if (critter.Flags&diff_bit) {
+			return;
 		}
 	}
 

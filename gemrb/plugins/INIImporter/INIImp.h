@@ -179,7 +179,7 @@ public:
 		const char* Default);
 	const int GetKeyAsInt(const char* Tag, const char* Key, 
 		const int Default);
-	const int GetKeyAsBool(const char* Tag, const char* Key, 
+	const bool GetKeyAsBool(const char* Tag, const char* Key, 
 		const bool Default);
 public:
 	void release(void)

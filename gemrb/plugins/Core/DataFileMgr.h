@@ -59,7 +59,7 @@ public:
 		const char* Default) = 0;
 	virtual const int GetKeyAsInt(const char* Tag, const char* Key,
 		const int Default) = 0;
-	virtual const int GetKeyAsBool(const char* Tag, const char* Key,
+	virtual const bool GetKeyAsBool(const char* Tag, const char* Key,
 		const bool Default) = 0;
 };
 

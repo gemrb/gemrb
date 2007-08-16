@@ -60,6 +60,7 @@ class Map;
 #define CF_CHECKVIEWPORT 32
 #define CF_CHECKCROWD 64
 #define CF_SAFESTPOINT 128
+#define CF_NO_DIFF_MASK 28
 
 //spec ids flags
 #define AI_EA		0
