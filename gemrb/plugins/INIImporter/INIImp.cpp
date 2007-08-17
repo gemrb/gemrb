@@ -83,6 +83,28 @@ bool INIImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
+int INIImp::GetKeysCount(const char* Tag)
+{
+	for (unsigned int i = 0; i < tags.size(); i++) {
+		const char* TagName = tags[i]->GetTagName();
+		if (stricmp( TagName, Tag ) == 0) {
+			return tags[i]->GetKeyCount();
+		}
+	}
+	return 0;
+}
+
+const char* INIImp::GetKeyNameByIndex(const char* Tag, int index)
+{
+	for (unsigned int i = 0; i < tags.size(); i++) {
+		const char* TagName = tags[i]->GetTagName();
+		if (stricmp( TagName, Tag ) == 0) {
+			return tags[i]->GetKeyNameByIndex(index);
+		}
+	}
+	return NULL;
+}
+
 const char* INIImp::GetKeyAsString(const char* Tag, const char* Key,
 	const char* Default)
 {

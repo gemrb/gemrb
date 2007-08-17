@@ -55,6 +55,16 @@ public:
 		return TagName;
 	}
 
+	int GetKeyCount()
+	{
+		return (int) pairs.size();
+	}
+
+	const char* GetKeyNameByIndex(int index)
+	{
+		return pairs[index].Name;
+	}
+
 	void AddLine(char* Line)
 	{
 		INIPair p;
@@ -141,23 +151,23 @@ public:
 
 	const bool GetKeyAsBool(const char* Key, const bool Default)
 	{
-	  const char* ret = NULL;
+		const char* ret = NULL;
 		for (unsigned int i = 0; i < pairs.size(); i++) {
 			if (stricmp( Key, pairs[i].Name ) == 0) {
 				ret = pairs[i].Value;
-	      break;
+		    break;
 			}
 		}
-	  if (!ret) {
-		  return Default;
-	  }
-	  if (!stricmp( ret, "true") ) {
-	    return true;
-	  }
-	  if (!stricmp( ret, "false") ) {
-	    return false;
-	  }
-	  return (atoi( ret ) )!=0;
+		if (!ret) {
+			return Default;
+		}
+		if (!stricmp( ret, "true") ) {
+		  return true;
+		}
+		if (!stricmp( ret, "false") ) {
+		  return false;
+		}
+		return (atoi( ret ) )!=0;
 	}
 };
 
@@ -175,6 +185,13 @@ public:
 	{
 		return ( int ) tags.size();
 	}
+	const char* GetTagNameByIndex(int index)
+	{
+		return tags[index]->GetTagName();
+	}
+
+	int GetKeysCount(const char* Tag);
+	const char* GetKeyNameByIndex(const char* Tag, int index);
 	const char* GetKeyAsString(const char* Tag, const char* Key,
 		const char* Default);
 	const int GetKeyAsInt(const char* Tag, const char* Key, 

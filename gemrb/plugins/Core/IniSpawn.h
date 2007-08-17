@@ -61,7 +61,7 @@ class Map;
 #define CF_CHECKCROWD 64
 #define CF_SAFESTPOINT 128
 #define CF_NO_DIFF_MASK 28
-
+#define CF_CHECK_NAME 246
 //spec ids flags
 #define AI_EA		0
 #define AI_FACTION	1
@@ -134,6 +134,11 @@ public:
  * Class for the special creature re/spawn features that are unique to PST.
  */
 
+typedef struct VariableSpec {
+	ieVariable Name;
+	ieDword Value;
+} VariableSpec;
+
 class GEM_EXPORT IniSpawn {
 public:
 	IniSpawn(Map *owner);
@@ -142,11 +147,15 @@ public:
 private:
 	Map *map; //owner
 	ieResRef NamelessSpawnArea;
+	int namelessvarcount;
+	VariableSpec *NamelessVar;
+	int localscount;
+	VariableSpec *Locals;
 	Point NamelessSpawnPoint;
 	int NamelessState;
 	SpawnEntry enterspawn;
-	int eventcount;
 	int last_spawndate;
+	int eventcount;
 	SpawnEntry *eventspawns;
 
 	void ReadCreature(DataFileMgr *inifile,

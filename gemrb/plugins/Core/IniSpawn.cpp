@@ -40,6 +40,8 @@ IniSpawn::IniSpawn(Map *owner)
 	map = owner;
 	NamelessSpawnArea[0] = 0;
 	NamelessState = 35;
+	NamelessVar = NULL;
+	Locals = NULL;
 	eventspawns = NULL;
 	eventcount = 0;
 	last_spawndate = 0;
@@ -296,8 +298,14 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 
 	ps = sscanf(s,"[%d.%d.%d.%d.%d.%d.%d.%d.%d]", x, x+1, x+2, x+3, x+4, x+5,
 		x+6, x+7, x+8);
-	while(ps--) {
-		critter.Spec[ps]=(ieByte) x[ps];
+	if (ps == 0) {
+		strnuprcpy(critter.ScriptName, s, 32);
+		critter.Flags|=CF_CHECK_NAME;
+		memset(critter.Spec,-1,sizeof(critter.Spec));
+	} else {
+		while(ps--) {
+		  critter.Spec[ps]=(ieByte) x[ps];
+		}
 	}
 
 	s = inifile->GetKeyAsString(crittername,"script_name",NULL);
@@ -305,26 +313,26 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 		strnuprcpy(critter.ScriptName, s, 32);
 	}
 
-	//iwd2 script names
-	//todo
+	//iwd2 script names (override remains the same)
+	//special 1 == area
 	s = inifile->GetKeyAsString(crittername,"script_special_1",NULL);
+	if (s) {
+		strnuprcpy(critter.AreaScript,s, 8);
+	}
+	//special 2 == class
+	s = inifile->GetKeyAsString(crittername,"script_special_2",NULL);
+	if (s) {
+		strnuprcpy(critter.ClassScript,s, 8);
+	}
+	//special 3 == general
+	s = inifile->GetKeyAsString(crittername,"script_special_3",NULL);
 	if (s) {
 		strnuprcpy(critter.GeneralScript,s, 8);
 	}
-	//todo
-	s = inifile->GetKeyAsString(crittername,"script_special_2",NULL);
-	if (s) {
-		strnuprcpy(critter.OverrideScript,s, 8);
-	}
-	//todo
-	s = inifile->GetKeyAsString(crittername,"script_special_3",NULL);
-	if (s) {
-		strnuprcpy(critter.DefaultScript,s, 8);
-	}
-	//todo
+	//team == specific
 	s = inifile->GetKeyAsString(crittername,"script_team",NULL);
 	if (s) {
-		strnuprcpy(critter.ClassScript,s, 8);
+		strnuprcpy(critter.SpecificScript,s, 8);
 	}
 
 	//combat == race
@@ -332,10 +340,10 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	if (s) {
 		strnuprcpy(critter.RaceScript,s, 8);
 	}
-	//todo
+	//movement == default
 	s = inifile->GetKeyAsString(crittername,"script_movement",NULL);
 	if (s) {
-		strnuprcpy(critter.SpecificScript,s, 8);
+		strnuprcpy(critter.DefaultScript,s, 8);
 	}
 
 	//pst script names
@@ -446,6 +454,26 @@ void IniSpawn::InitSpawn(const ieResRef DefaultArea)
 	//36 - getting up
 	NamelessState = inifile->GetKeyAsInt("nameless","state",35);
 
+	x = inifile->GetKeysCount("namelessvar");
+	if (x) {
+		NamelessVar = new VariableSpec[x];
+		for (y=0;y<x;y++) {
+		  const char* Key = inifile->GetKeyNameByIndex("namelessvar",y);
+		  strnlwrcpy(NamelessVar[y].Name, Key, sizeof(ieVariable));
+		  NamelessVar[y].Value = inifile->GetKeyAsInt("namelessvar",Key,0);
+		}
+	}
+
+	x = inifile->GetKeysCount("locals");
+	if (x) {
+		Locals = new VariableSpec[x];
+		for (y=0;y<x;y++) {
+		  const char* Key = inifile->GetKeyNameByIndex("locals",y);
+		  strnlwrcpy(Locals[y].Name, Key, sizeof(ieVariable));
+		  Locals[y].Value = inifile->GetKeyAsInt("locals",Key,0);
+		}
+	}
+
 	s = inifile->GetKeyAsString("spawn_main","enter",NULL);
 	if (s) {
 		ReadSpawnEntry(inifile, s, enterspawn);
@@ -486,8 +514,15 @@ void IniSpawn::RespawnNameless()
 	if (NamelessState==36) {
 		nameless->SetStance(IE_ANI_PST_START);
 	}
-	for (int i=0;i<game->GetPartySize(false);i++) {
+	int i;
+
+	for (i=0;i<game->GetPartySize(false);i++) {
 		MoveBetweenAreasCore(game->GetPC(i, false),NamelessSpawnArea,NamelessSpawnPoint,-1, true);
+	}
+
+	//certain variables are set when nameless dies
+	for (i=0;i<namelessvarcount;i++) {
+		SetVariable(game, NamelessVar[i].Name,"GLOBAL", NamelessVar[i].Value);
 	}
 }
 
@@ -532,7 +567,7 @@ void IniSpawn::SpawnCreature(CritterEntry &critter)
 		}
 	}
 
-	if (critter.ScriptName[0]) {
+	if (critter.ScriptName[0] && (critter.Flags&CF_CHECK_NAME) ) {
 		//maybe this one needs to be using getobjectcount as well
 		//currently we cannot count objects with scriptname???
 		if (map->GetActor( critter.ScriptName, 0 )) {
@@ -630,6 +665,10 @@ void IniSpawn::SpawnGroup(SpawnEntry &event)
 void IniSpawn::InitialSpawn()
 {
 	SpawnGroup(enterspawn);
+	//these variables are set when entering first
+	for (int i=0;i<localscount;i++) {
+		SetVariable(map, Locals[i].Name,"LOCALS", NamelessVar[i].Value);
+	}
 }
 
 //checks if a respawn event occurred

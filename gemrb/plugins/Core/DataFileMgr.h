@@ -55,6 +55,9 @@ public:
 	virtual ~DataFileMgr(void);
 	virtual bool Open(DataStream* stream, bool autoFree = false) = 0;
 	virtual int GetTagsCount() = 0;
+	virtual const char* GetTagNameByIndex(int index) = 0;
+	virtual int GetKeysCount(const char* Tag) = 0;
+	virtual const char* GetKeyNameByIndex(const char* Tag, int index) = 0;
 	virtual const char* GetKeyAsString(const char* Tag, const char* Key,
 		const char* Default) = 0;
 	virtual const int GetKeyAsInt(const char* Tag, const char* Key,
