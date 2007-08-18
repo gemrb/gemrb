@@ -304,7 +304,7 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 		memset(critter.Spec,-1,sizeof(critter.Spec));
 	} else {
 		while(ps--) {
-		  critter.Spec[ps]=(ieByte) x[ps];
+			critter.Spec[ps]=(ieByte) x[ps];
 		}
 	}
 
@@ -386,7 +386,7 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	}
 	//don't spawn when spawnpoint is visible
 	if (inifile->GetKeyAsBool(crittername,"ignore_can_see",false)) {
-		critter.Flags|=CF_IGNORENOSEE;
+		critter.Flags|=CF_IGNORECANSEE;
 	}
 	//unsure, but could be similar to previous
 	if (inifile->GetKeyAsBool(crittername,"check_view_port", false)) {
@@ -458,9 +458,9 @@ void IniSpawn::InitSpawn(const ieResRef DefaultArea)
 	if (x) {
 		NamelessVar = new VariableSpec[x];
 		for (y=0;y<x;y++) {
-		  const char* Key = inifile->GetKeyNameByIndex("namelessvar",y);
-		  strnlwrcpy(NamelessVar[y].Name, Key, sizeof(ieVariable));
-		  NamelessVar[y].Value = inifile->GetKeyAsInt("namelessvar",Key,0);
+			const char* Key = inifile->GetKeyNameByIndex("namelessvar",y);
+			strnlwrcpy(NamelessVar[y].Name, Key, sizeof(ieVariable));
+			NamelessVar[y].Value = inifile->GetKeyAsInt("namelessvar",Key,0);
 		}
 	}
 
@@ -468,9 +468,9 @@ void IniSpawn::InitSpawn(const ieResRef DefaultArea)
 	if (x) {
 		Locals = new VariableSpec[x];
 		for (y=0;y<x;y++) {
-		  const char* Key = inifile->GetKeyNameByIndex("locals",y);
-		  strnlwrcpy(Locals[y].Name, Key, sizeof(ieVariable));
-		  Locals[y].Value = inifile->GetKeyAsInt("locals",Key,0);
+			const char* Key = inifile->GetKeyNameByIndex("locals",y);
+			strnlwrcpy(Locals[y].Name, Key, sizeof(ieVariable));
+			Locals[y].Value = inifile->GetKeyAsInt("locals",Key,0);
 		}
 	}
 
@@ -533,13 +533,19 @@ void IniSpawn::SpawnCreature(CritterEntry &critter)
 	if (critter.SpecVar[0]) {
 		if (critter.SpecVarOperator>=0) {
 			// dunno if this should be negated
-			if (DiffCore(specvar, critter.SpecVarValue, critter.SpecVarOperator) ) {
+			if (!DiffCore(specvar, critter.SpecVarValue, critter.SpecVarOperator) ) {
 				return;
 			}
 		} else {
 			if (!specvar) {
 				return;
 			}
+		}
+	}
+
+	if (!(critter.Flags&CF_IGNORECANSEE)) {
+		if (map->IsVisible(critter.SpawnPoint, false) ) {
+			return;
 		}
 	}
 

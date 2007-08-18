@@ -52,7 +52,7 @@ class Map;
  */
 
 //critter flags
-#define CF_IGNORENOSEE 1
+#define CF_IGNORECANSEE 1
 #define CF_DEATHVAR    2
 #define CF_NO_DIFF_1 4
 #define CF_NO_DIFF_2 8

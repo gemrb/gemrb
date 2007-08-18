@@ -2162,7 +2162,7 @@ PathNode* Map::FindPath(const Point &s, const Point &d, int MinDistance)
 }
 
 //single point visible or not (visible/exploredbitmap)
-//if explored = true then visible in fog
+//if explored = true then explored otherwise currently visible
 bool Map::IsVisible(Point &pos, int explored)
 {
 	if (!VisibleBitmap)
