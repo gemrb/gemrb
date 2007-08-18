@@ -168,6 +168,7 @@ Interface::Interface(int iargc, char* iargv[])
 	SavePath[0] = 0;
 	GemRBPath[0] = 0;
 	PluginsPath[0] = 0;
+	CachePath[0] = 0;
 	GameName[0] = 0;
 	strncpy( GameOverride, "override", sizeof(GameOverride) );
 	strncpy( GameSounds, "sounds", sizeof(GameSounds) );
@@ -4302,6 +4303,8 @@ bool Interface::StupidityDetector(const char* Pt)
 void Interface::DelTree(const char* Pt, bool onlysave)
 {
 	char Path[_MAX_PATH];
+
+	if (!Pt[0]) return; //Don't delete the root filesystem :)
 	strcpy( Path, Pt );
 	DIR* dir = opendir( Path );
 	if (dir == NULL) {
