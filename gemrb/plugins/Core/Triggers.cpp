@@ -531,6 +531,8 @@ int GameScript::Xor(Scriptable* Sender, Trigger* parameters)
 	return 0;
 }
 
+//TODO:
+//no sprite is dead for iwd, they use KILL_<name>_CNT
 int GameScript::NumDead(Scriptable* Sender, Trigger* parameters)
 {
 	long value;

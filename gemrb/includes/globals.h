@@ -127,10 +127,11 @@
 #define  GF_SPELLBOOKICONHACK   	30 //bg2
 #define  GF_ENHANCED_EFFECTS    	31 //iwd2 (maybe iwd/how too)
 #define  GF_DEATH_ON_ZERO_STAT  	32 //not in iwd2
-#define  GF_SPAWN_INI           	33 //pst, iwd
+#define  GF_SPAWN_INI           	33 //pst, iwd, iwd2
+#define  GF_IWD_DEATHVARFORMAT          34 //iwd branch (maybe pst)
 
 //update this
-#define GF_COUNT 34
+#define GF_COUNT 35
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3
