@@ -1139,8 +1139,10 @@ Actor* Map::GetActorByGlobalID(ieDword objectID)
 }
 
 /** flags:
- GA_SELECT  1 - unselectable actors don't play
- GA_NO_DEAD 2 - dead actors don't play
+ GA_SELECT    16  - unselectable actors don't play
+ GA_NO_DEAD   32  - dead actors don't play
+ GA_POINT     64  - not actor specific
+ GA_NO_HIDDEN 128 - hidden actors don't play
 */
 Actor* Map::GetActor(Point &p, int flags)
 {
@@ -1358,14 +1360,6 @@ int Map::GetActorInRect(Actor**& actorlist, Region& rgn, bool onlyparty)
 			continue;
 		if (!actor->ValidTarget(GA_SELECT|GA_NO_DEAD) )
 			continue;
-		/*
-		if (( actor->BBox.x > ( rgn.x + rgn.w ) ) ||
-			( actor->BBox.y > ( rgn.y + rgn.h ) ))
-			continue;
-		if (( ( actor->BBox.x + actor->BBox.w ) < rgn.x ) ||
-			( ( actor->BBox.y + actor->BBox.h ) < rgn.y ))
-			continue;
-			*/
 		if ((actor->Pos.x<rgn.x) || (actor->Pos.y<rgn.y))
 			continue;
 		if ((actor->Pos.x>rgn.x+rgn.w) || (actor->Pos.y>rgn.y+rgn.h) )

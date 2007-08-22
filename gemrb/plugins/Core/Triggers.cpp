@@ -252,8 +252,8 @@ int GameScript::InParty(Scriptable* Sender, Trigger* parameters)
 	if (core->GetGame()->InParty( tar ) <0) {
 		return 0;
 	}
-	//don't allow dead
-	if (tar->ValidTarget(GA_NO_DEAD)) {
+	//don't allow dead, don't allow maze and similar effects
+	if (tar->ValidTarget(GA_NO_DEAD|GA_NO_HIDDEN)) {
 		return 1;
 	}
 	return 0;

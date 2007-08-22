@@ -955,7 +955,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			nextCursor = GetCursorOverContainer(overContainer);
 		}
 
-		lastActor = area->GetActor( p, GA_DEFAULT | GA_SELECT | GA_NO_DEAD);
+		lastActor = area->GetActor( p, GA_DEFAULT | GA_SELECT | GA_NO_DEAD | GA_NO_HIDDEN);
 		if (lastActor) {
 			lastActorID = lastActor->globalID;
 			lastActor->SetOver( true );

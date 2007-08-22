@@ -2067,6 +2067,12 @@ void Actor::SetupQuickSlot(unsigned int which, int slot, int headerindex)
 bool Actor::ValidTarget(int ga_flags)
 {
 	if (Immobile()) return false;
+	//scripts can still see this type of actor
+
+	if (ga_flags&GA_NO_HIDDEN) {
+		if (Modified[IE_MC_FLAGS]&MC_HIDDEN) return false;
+	}
+
 	switch(ga_flags&GA_ACTION) {
 	case GA_PICK:
 		if (Modified[IE_STATE_ID] & STATE_CANTSTEAL) return false;
@@ -2780,19 +2786,33 @@ void Actor::Draw(Region &screen)
 	if (!ca)
 		return;
 
+	//bg2 style
 	if (Modified[IE_AVATARREMOVAL]) {
 		return;
 	}
 
 	//explored or visibilitymap (bird animations are visible in fog)
 	//0 means opaque
+	int NoCircle = Modified[IE_NOCIRCLE];
 	int Trans = Modified[IE_TRANSLUCENT];
-	//int Trans = Modified[IE_TRANSLUCENT] * 255 / 100;
+
 	if (Trans>255) {
 		Trans=255;
 	}
+
+	//iwd style, the text is still visible over the actor
+	if (Modified[IE_MC_FLAGS]&MC_HIDDEN) {
+		Trans = 255;
+		NoCircle = 1;
+	}
+
 	int Frozen = Immobile();
 	int State = Modified[IE_STATE_ID];
+
+	if (State&STATE_DEAD) {
+		NoCircle = 1;
+	}
+
 	if (State&STATE_STILL) {
 		Frozen = 1;
 	}
@@ -2821,7 +2841,7 @@ void Actor::Draw(Region &screen)
 	Video* video = core->GetVideoDriver();
 	Region vp = video->GetViewport();
 
-	if (( !Modified[IE_NOCIRCLE] ) && ( !( State & STATE_DEAD ) )) {
+	if (NoCircle==0) {
 		DrawCircle(vp);
 		DrawTargetPoint(vp);
 	}
@@ -3651,6 +3671,6 @@ bool Actor::HasFeat(unsigned int featindex)
 
 void Actor::AddProjectileImmunity(ieDword /*projectile*/)
 {
-  //TODO
-  
+	//TODO
+	
 }
