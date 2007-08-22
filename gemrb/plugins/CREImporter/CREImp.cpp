@@ -1280,7 +1280,7 @@ void CREImp::GetActorIWD2(Actor *act)
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_SUBRACE]=tmpByte;
 	str->ReadWord( &tmpWord );
-	//skipping 2 bytes
+	//skipping 2 bytes, one is SEX (could use it for sounds)
 	str->Read( &tmpByte, 1 );
 	act->BaseStats[IE_STR]=tmpByte;
 	str->Read( &tmpByte, 1 );
@@ -1308,7 +1308,18 @@ void CREImp::GetActorIWD2(Actor *act)
 	ReadScript(act, SCR_RACE);
 	ReadScript(act, SCR_GENERAL);
 	ReadScript(act, SCR_DEFAULT);
-	str->Seek( 4, GEM_CURRENT_POS );
+	//new scripting flags, one on each byte
+	str->Read( &tmpByte, 1); //hidden
+	if (tmpByte) {
+		//no idea which one is best, if HideCreature removes it, then use
+		//the MC flags
+		//if it doesn't remove it, use the other
+		act->SetMCFlag(MC_HIDDEN, BM_OR);
+		//act->BaseStats[IE_AVATARREMOVAL]=1;
+	}
+	str->Read( &tmpByte, 1); //set death variable
+	str->Read( &tmpByte, 1); //increase kill count
+	str->Read( &tmpByte, 1); //unknown
 	for (i = 0; i<5; i++) {
 		str->ReadWord( &tmpWord );
 		act->BaseStats[IE_INTERNAL_0+i]=tmpWord;
@@ -1528,7 +1539,18 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	ReadScript(act, SCR_RACE);
 	ReadScript(act, SCR_GENERAL);
 	ReadScript(act, SCR_DEFAULT);
-	str->Seek( 4, GEM_CURRENT_POS );
+	//new scripting flags, one on each byte
+	str->Read( &tmpByte, 1); //hidden
+	if (tmpByte) {
+		//no idea which one is best, if HideCreature removes it, then use
+		//the MC flags
+		//if it doesn't remove it, use the other
+		act->SetMCFlag(MC_HIDDEN, BM_OR);
+		//act->BaseStats[IE_AVATARREMOVAL]=1;
+	}
+	str->Read( &tmpByte, 1); //set death variable
+	str->Read( &tmpByte, 1); //increase kill count
+	str->Read( &tmpByte, 1); //unknown
 	for (i = 0; i<5; i++) {
 		str->ReadWord( &tmpWord );
 		act->BaseStats[IE_INTERNAL_0+i]=tmpWord;
