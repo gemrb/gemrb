@@ -207,7 +207,7 @@ int GameScript::NearbyDialog(Scriptable* Sender, Trigger* parameters)
 	if ( !target ) {
 		return 0;
 	}
-	return CanSee( Sender, target, false, GA_NO_DEAD );
+	return CanSee( Sender, target, true, GA_NO_DEAD | GA_NO_HIDDEN );
 }
 
 //atm this checks for InParty and See, it is unsure what is required

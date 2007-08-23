@@ -340,18 +340,12 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 int CanSee(Scriptable* Sender, Scriptable* target, bool range, int nodead)
 {
 	Map *map;
-	unsigned int dist;
 
-	if (nodead) {
-		if (target->Type==ST_ACTOR) {
-			Actor *tar = (Actor *) target;
-			if (target->GetInternalFlag()&IF_REALLYDIED) {
-				return 0;
-			}
-			//we should rather use STATE_SPEECHLESS_MASK
-			if (tar->GetStat(IE_STATE_ID)&STATE_DEAD) {
-				return 0;
-			}
+	if (target->Type==ST_ACTOR) {
+		Actor *tar = (Actor *) target;
+		
+		if (!tar->ValidTarget(nodead)) {
+			return 0;
 		}
 	}
 	map = target->GetCurrentArea();
@@ -360,6 +354,8 @@ int CanSee(Scriptable* Sender, Scriptable* target, bool range, int nodead)
 	}
 
 	if (range) {
+		unsigned int dist;
+
 		if (Sender->Type == ST_ACTOR) {
 			Actor* snd = ( Actor* ) Sender;
 			dist = snd->Modified[IE_VISUALRANGE];
