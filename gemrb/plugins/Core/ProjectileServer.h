@@ -53,12 +53,12 @@ public:
 	Projectile *GetProjectileByIndex(unsigned int idx);
 	//it is highly unlikely we need this function
 	Projectile *GetProjectileByName(const ieResRef resname);
+	//returns the highest projectile id
+	unsigned int GetHighestProjectileNumber(); 
 
 private:
 	ProjectileEntry *projectiles; //this is the list of projectiles
 	int projectilecount;
-	//this method also initializes the projectile server, no need to call it from outside
-	unsigned int GetHighestProjectileNumber(); 
 	//this method is used internally
 	Projectile *GetProjectile(unsigned int idx);
 	Projectile *CreateDefaultProjectile(unsigned int idx);

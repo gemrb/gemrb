@@ -1,7 +1,7 @@
 2DA V1.0
 *
-                    HATERACE   CLERICSPELL MAGESPELL  STARTXP  BARDSKILL  THIEFSKILL  LAYHANDS	TURNLEVEL
-UNUSED              *          *           *          *        *          *	*	*
+                    HATERACE   CLERICSPELL MAGESPELL  STARTXP  BARDSKILL  THIEFSKILL  LAYHANDS	TURNLEVEL         BOOKTYPE
+UNUSED              *          *           *          *        *          *	*	* *
 MAGE                *          *           MXSPLWIZ   0        *          *	*	*
 FIGHTER             *          *           *          0        *          *	*	*
 CLERIC              *          MXSPLPRS    *          0        *          *	*	1

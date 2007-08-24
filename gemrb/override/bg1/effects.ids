@@ -199,8 +199,8 @@ IDS
 0xc5	Bounce:Projectile
 0xc6	Bounce:Opcode
 0xc7	Bounce:SpellLevel
-0xc8	Bounce:SpellLevelDecrement
-0xc9	Protection:SpellLevelDecrement
+0xc8	Bounce:SpellLevelDec
+0xc9	Protection:SpellLevelDec
 0xca	Bounce:School
 0xcb	Bounce:SecondaryType
 0xcc	Protection:School
@@ -222,12 +222,12 @@ IDS
 0xdc	DispelSchool
 0xdd	DispelSecondaryType
 0xde	RandomTeleport
-0xdf	Protection:SchoolDecrement
+0xdf	Protection:SchoolDec
 0xe0	Cure:LevelDrain
 0xe1	Reveal:Magic
-0xe2	Protection:SecondaryTypeDecrement
-0xe3	Bounce:SchoolDecrement
-0xe4	Bounce:SecondaryTypeDecrement
+0xe2	Protection:SecondaryTypeDec
+0xe3	Bounce:SchoolDec
+0xe4	Bounce:SecondaryTypeDec
 0xe5	DispelSchoolOne
 0xe6	DispelSecondaryTypeOne
 0xe7	TimeStop

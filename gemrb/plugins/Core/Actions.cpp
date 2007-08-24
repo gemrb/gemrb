@@ -2550,11 +2550,7 @@ void GameScript::HideCreature(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) tar;
-	if ( parameters->int0Parameter != 0 ) {
-		actor->SetMCFlag(MC_HIDDEN, BM_OR);
-	} else {
-		actor->SetMCFlag(MC_HIDDEN, BM_NAND);
-	}
+	actor->BaseStats[IE_AVATARREMOVAL]=parameters->int0Parameter;
 }
 
 //i have absolutely no idea why this is needed when we have HideCreature
@@ -2568,7 +2564,7 @@ void GameScript::ForceHide(Scriptable* Sender, Action* parameters)
 		return;
 	}
 	Actor* actor = ( Actor* ) tar;
-	actor->SetMCFlag(MC_HIDDEN, BM_OR);
+	actor->BaseStats[IE_AVATARREMOVAL]=1;
 }
 
 //this isn't sure

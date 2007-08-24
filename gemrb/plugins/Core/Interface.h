@@ -623,6 +623,8 @@ public:
 	void GetResRefFrom2DA(const ieResRef resref, ieResRef resource1, ieResRef resource2 = NULL, ieResRef resource3 = NULL);
 	/** returns a numeric list read from a 2da. The 0th element is the number of elements in the list */
 	ieDword *GetListFrom2DA(const ieResRef resref);
+	/** translates a stat symbol to numeric value */
+	ieDword TranslateStat(const char *stat_name);
 private:
 	int LoadSprites();
 	bool LoadConfig(void);

@@ -256,22 +256,9 @@ static int GetCreatureStrRef(unsigned int Slot, unsigned int Str)
 	return actor->StrRefs[Str];
 }
 
-//returns a numeric value associated with a stat name (symbol) from stats.ids
-static inline ieDword TranslateStat(const char *stat_name)
-{
-	int symbol = core->LoadSymbol( "stats" );
-	SymbolMgr *sym = core->GetSymbol( symbol );
-	ieDword stat = (ieDword) sym->GetValue( stat_name );
-	if (!stat) {
-		printMessage("GUIScript"," ",YELLOW);
-		printf("Cannot translate symbol: %s\n", stat_name);
-	}
-	return stat;
-}
-
 static inline bool CheckStat(Actor * actor, const char *stat_name, ieDword value)
 {
-	ieDword stat = TranslateStat(stat_name);
+	ieDword stat = core->TranslateStat(stat_name);
 	//some stats should check for exact value
 	return actor->GetBase(stat)>=value;
 }
@@ -934,7 +921,7 @@ static PyObject* GemRB_GetTableValue(PyObject * /*self*/, PyObject* args)
 			return PyInt_FromLong( val );
 		}
 		if (which==2) {
-			val = TranslateStat(ret);
+			val = core->TranslateStat(ret);
 			return PyInt_FromLong( val );
 		}
 		return PyString_FromString( ret );

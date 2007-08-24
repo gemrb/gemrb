@@ -20,6 +20,7 @@
  */
 
 #include "../../includes/win32def.h"
+#include <cassert>
 #include "TableMgr.h"
 #include "ResourceMgr.h"
 #include "SoundMgr.h" //pst (react to death sounds)
@@ -35,8 +36,8 @@
 #include "ScriptEngine.h"
 #include "GSUtils.h" //needed for DisplayStringCore
 #include "Video.h"
-#include <cassert>
 #include "damages.h"
+#include "ProjectileServer.h"
 
 extern Interface* core;
 #ifdef WIN32
@@ -63,6 +64,8 @@ static int sharexp = SX_DIVIDE;
 static int classcount = -1;
 static char **clericspelltables = NULL;
 static char **wizardspelltables = NULL;
+static int *turnlevels = NULL;
+
 static int FistRows = -1;
 typedef ieResRef FistResType[MAX_LEVEL+1];
 
@@ -82,12 +85,35 @@ static ItemUseType *itemuse = NULL;
 static int usecount = -1;
 static int fiststat = IE_CLASS;
 
+//conversion for 3rd ed
+static int isclass[11]={0,0,0,0,0,0,0,0,0,0,0};
+#define ISBARBARIAN 0
+#define ISBARD      1
+#define ISCLERIC    2
+#define ISDRUID     3
+#define ISFIGHTER   4
+#define ISMONK      5
+#define ISPALADIN   6
+#define ISRANGER    7
+#define ISROGUE     8
+#define ISSORCERER  9
+#define ISWIZARD    10
+static const int levelslots[11]={IE_LEVELFIGHTER,IE_LEVELMAGE,IE_LEVELTHIEF,
+	IE_LEVELBARBARIAN,IE_LEVELCLERIC,IE_LEVELDRUID,IE_LEVELMONK,
+	IE_LEVELPALADIN,IE_LEVELRANGER,IE_LEVELSORCEROR};
+
+//stat values are 0-255, so a byte is enough
+static ieByte featstats[MAX_FEATS]={0
+};
+
 static ActionButtonRow *GUIBTDefaults = NULL; //qslots row count
 ActionButtonRow DefaultButtons = {ACT_TALK, ACT_WEAPON1, ACT_WEAPON2,
  ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE, ACT_NONE,
  ACT_NONE, ACT_INNATE};
 static bool QslotTranslation = false;
 static bool DeathOnZeroStat = true;
+static ieDword TranslucentShadows = 0;
+static int ProjectileSize = 0;  //the size of the projectile immunity bitfield (dwords)
 
 static const char iwd2gemrb[32] = {
 	0,0,20,2,22,25,0,14,
@@ -106,8 +132,6 @@ static const char gemrb2iwd[32] = {
 static char csound[VCONST_COUNT];
 
 static void InitActorTables();
-
-static ieDword TranslucentShadows;
 
 #define DAMAGE_LEVELS 13
 #define ATTACKROLL    20
@@ -140,7 +164,7 @@ static int d_gradient[DAMAGE_LEVELS] = {
 	ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,
 };
 
-static ieResRef hc_overlays[OVERLAY_COUNT]={"SANCTRY","SPENTACI","","SPSHIELD",
+static ieResRef hc_overlays[OVERLAY_COUNT]={"SANCTRY","SPENTACI","SPMAGGLO","SPSHIELD",
 "GREASED","WEBENTD","MINORGLB","","","","","","","","","","","","","","",
 "","","","SPTURNI2","SPTURNI","","","","","",""};
 static ieDword hc_locations=0x2ba80030;
@@ -188,6 +212,7 @@ Actor::Actor()
 		BaseStats[i] = 0;
 		Modified[i] = 0;
 	}
+
 	SmallPortrait[0] = 0;
 	LargePortrait[0] = 0;
 
@@ -229,7 +254,9 @@ Actor::Actor()
 		TranslucentShadows = 0;
 		core->GetDictionary()->Lookup("Translucent Shadows",
 			TranslucentShadows);
+		ProjectileSize = (core->GetProjectileServer()->GetHighestProjectileNumber()+31)/32;
 	}
+	projectileImmunity = (ieDword *) malloc(ProjectileSize);
 	TalkCount = 0;
 	InteractCount = 0; //numtimesinteracted depends on this
 	appearance = 0xffffff; //might be important for created creatures
@@ -270,6 +297,8 @@ Actor::~Actor(void)
 	}
 	for (i = 0; i < EXTRA_ACTORCOVERS; i++)
 		delete extraCovers[i];
+
+	free(projectileImmunity);
 }
 
 void Actor::SetFistStat(ieDword stat)
@@ -877,7 +906,7 @@ NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL //ff
 void Actor::ReleaseMemory()
 {
 	int i;
-
+	
 	if (classcount>=0) {
 		if (clericspelltables) {
 			for (i=0;i<classcount;i++) {
@@ -886,6 +915,7 @@ void Actor::ReleaseMemory()
 				}
 			}
 			free(clericspelltables);
+			clericspelltables=NULL;
 		}
 		if (wizardspelltables) {
 			for (i=0;i<classcount;i++) {
@@ -894,6 +924,11 @@ void Actor::ReleaseMemory()
 				}
 			}
 			free(wizardspelltables);
+			wizardspelltables=NULL;
+		}
+		if (turnlevels) {
+			free(turnlevels);
+			turnlevels=NULL;
 		}
 	}
 	if (GUIBTDefaults) {
@@ -933,17 +968,54 @@ static void InitActorTables()
 	TableMgr *tm = core->GetTable( table );
 	if (tm) {
 		classcount = tm->GetRowCount();
+		memset (isclass,0,sizeof(isclass));
 		clericspelltables = (char **) calloc(classcount, sizeof(char*));
 		wizardspelltables = (char **) calloc(classcount, sizeof(char*));
+		turnlevels = (int *) calloc(classcount, sizeof(int));
+
+		ieDword bitmask = 1;
+
 		for(i = 0; i<classcount; i++) {
-			const char *spelltablename = tm->QueryField( i, 1 );
-			if (spelltablename[0]!='*') {
-				clericspelltables[i]=strdup(spelltablename);
+			const char *field;
+			int turnlevel = atoi(tm->QueryField( i, 7));
+			turnlevels[i]=turnlevel;
+
+			field = tm->QueryField( i, 0 );
+			if (field[0]!='*') {
+				isclass[ISRANGER] |= bitmask;
 			}
-			spelltablename = tm->QueryField( i, 2 );
-			if (spelltablename[0]!='*') {
-				wizardspelltables[i]=strdup(spelltablename);
+
+			field = tm->QueryField( i, 1 );
+			if (field[0]!='*') {				
+				if (turnlevel) {
+					isclass[ISCLERIC] |= bitmask;
+				} else {
+					isclass[ISDRUID] |= bitmask;
+				}
+				clericspelltables[i]=strdup(field);
 			}
+
+			field = tm->QueryField( i, 2 );
+			if (field[0]!='*') {
+				isclass[ISWIZARD] |= bitmask;
+				wizardspelltables[i]=strdup(field);
+			}
+
+			field = tm->QueryField( i, 4 );
+			if (field[0]!='*') {
+				isclass[ISBARD] |= bitmask;
+			}
+	
+			field = tm->QueryField( i, 6 );
+			if (field[0]!='*') {
+				isclass[ISPALADIN] |= bitmask;
+			}
+
+			field = tm->QueryField( i, 7 );
+			if (atoi(field)==2) {
+				isclass[ISSORCERER] |= bitmask;
+			}
+			bitmask <<=1;
 		}
 		core->DelTable( table );
 	} else {
@@ -1058,7 +1130,7 @@ static void InitActorTables()
 		spllevels = tm->GetColumnCount(0);
 		int max = core->GetMaximumAbility();
 		mxsplwis = (int *) calloc(max*spllevels, sizeof(int));
-		for (i = 0 ; i < spllevels; i++) {
+		for (i = 0; i < spllevels; i++) {
 			for(int j = 0; j < max; j++) {
 				int k = atoi(tm->GetRowName(j))-1;
 				if (k>=0 && k<max) {
@@ -1066,6 +1138,23 @@ static void InitActorTables()
 				}
 			}
 		}
+		core->DelTable( table );
+	}
+
+	table = core->LoadTable( "featreq" );
+	tm = core->GetTable( table );
+	if (tm) {
+		unsigned int tmp;
+
+		for(i=0;i<MAX_FEATS;i++) {
+			//we need the MULTIPLE column
+			tmp = core->TranslateStat(tm->QueryField(i,9));
+			if (tmp>=MAX_STATS) {
+			  printMessage("Actor","Invalid stat value in featreq.2da",YELLOW);
+			}
+			featstats[i] = (ieByte) tmp;
+		}
+		core->DelTable( table );
 	}
 }
 
@@ -1291,6 +1380,17 @@ void Actor::RefreshEffects(EffectQueue *fx)
 		}
 	}
 	spellbook.ClearBonus();
+	memset(applyWhenHittingMelee,0,sizeof(ieResRef));
+	memset(applyWhenHittingRanged,0,sizeof(ieResRef));
+	memset(applyWhenNearLiving,0,sizeof(ieResRef));
+	memset(applyWhen50Damage,0,sizeof(ieResRef));
+	memset(applyWhen90Damage,0,sizeof(ieResRef));
+	memset(applyWhenEnemySighted,0,sizeof(ieResRef));
+	memset(applyWhenPoisoned,0,sizeof(ieResRef));
+	memset(applyWhenHelpless,0,sizeof(ieResRef));
+	memset(applyWhenAttacked,0,sizeof(ieResRef));
+	memset(applyWhenBeingHit,0,sizeof(ieResRef));
+	memset(projectileImmunity,0,ProjectileSize);
 
 	//initialize base stats
 	bool first = !(InternalFlags&IF_INITIALIZED);
@@ -1705,10 +1805,16 @@ void Actor::SetPosition(Point &position, int jump, int radius)
 	 also with iwd2's 3rd ed rules, this is why it is a separate function */
 ieDword Actor::GetXPLevel(int modified) const
 {
+	const ieDword *stats;
+	
 	if (modified) {
-		return Modified[IE_LEVEL];
+		stats = Modified;
 	}
-	return BaseStats[IE_LEVEL];
+	else {
+		stats = BaseStats;
+	}
+
+	return stats[IE_LEVEL];
 }
 
 /** maybe this would be more useful if we calculate with the strength too
@@ -2070,7 +2176,7 @@ bool Actor::ValidTarget(int ga_flags)
 	//scripts can still see this type of actor
 
 	if (ga_flags&GA_NO_HIDDEN) {
-		if (Modified[IE_MC_FLAGS]&MC_HIDDEN) return false;
+		if (Modified[IE_AVATARREMOVAL]) return false;
 	}
 
 	switch(ga_flags&GA_ACTION) {
@@ -2301,7 +2407,7 @@ void Actor::StopAttack()
 	}
 }
 
-int Actor::Immobile()
+int Actor::Immobile() const
 {
 	if (GetStat(IE_CASTERHOLD)) {
 		return 1;
@@ -2786,11 +2892,6 @@ void Actor::Draw(Region &screen)
 	if (!ca)
 		return;
 
-	//bg2 style
-	if (Modified[IE_AVATARREMOVAL]) {
-		return;
-	}
-
 	//explored or visibilitymap (bird animations are visible in fog)
 	//0 means opaque
 	int NoCircle = Modified[IE_NOCIRCLE];
@@ -2800,8 +2901,8 @@ void Actor::Draw(Region &screen)
 		Trans=255;
 	}
 
-	//iwd style, the text is still visible over the actor
-	if (Modified[IE_MC_FLAGS]&MC_HIDDEN) {
+	//iwd has this flag saved in the creature
+	if (Modified[IE_AVATARREMOVAL]) {
 		Trans = 255;
 		NoCircle = 1;
 	}
@@ -2854,6 +2955,9 @@ void Actor::Draw(Region &screen)
 		int PartCount = ca->GetTotalPartCount();
 		Sprite2D* nextFrame = 0;
 		nextFrame = anims[0]->GetFrame(anims[0]->GetCurrentFrame());
+
+		//make actor unselectable and unselected when it is not moving
+		//dead, petriefied, frozen, paralysed etc.
 		if (Frozen) {
 			if (Selected!=0x80) {
 				Selected = 0x80;
@@ -2893,7 +2997,12 @@ void Actor::Draw(Region &screen)
 		//     Uses extraCovers 0-2
 		// * actor itself
 		//     Uses main spritecover
-
+		//
+		//comments by Avenger:
+		// currently we don't have a real direction, but the orientation field
+		// could be used with higher granularity. When we need the face value
+		// it could be divided so it will become a 0-15 number.
+		// 
 
 		SpriteCover *sc = 0, *newsc = 0;
 		int blurx = cx;
@@ -3436,7 +3545,7 @@ void Actor::InitButtons(ieDword cls)
 
 void Actor::SetFeat(unsigned int feat, int mode)
 {
-	if (feat>3*sizeof(ieDword)) {
+	if (feat>=MAX_FEATS) {
 		return;
 	}
 	ieDword mask = 1<<(feat&31);
@@ -3452,17 +3561,6 @@ void Actor::SetFeat(unsigned int feat, int mode)
 			BaseStats[IE_FEATS1+idx]^=mask;
 			break;
 	}
-}
-
-int Actor::GetFeat(unsigned int feat)
-{
-	if (feat>3*sizeof(ieDword)) {
-		return -1;
-	}
-	if (Modified[IE_FEATS1+(feat>>5)]&(1<<(feat&31)) ) {
-		return 1;
-	}
-	return 0;
 }
 
 void Actor::SetUsedWeapon(const char* AnimationType, ieWord* MeleeAnimation, int wt)
@@ -3659,18 +3757,107 @@ bool Actor::SetSpellState(unsigned int spellstate)
 	return false;
 }
 
-//returns true if the feat exists
-bool Actor::HasFeat(unsigned int featindex)
+//returns the numeric value of a feat, different from HasFeat
+//for multiple feats
+int Actor::GetFeat(unsigned int feat) const
 {
-	if (featindex>=96) return false;
+	if (feat>=MAX_FEATS) {
+		return -1;
+	}
+	if (Modified[IE_FEATS1+(feat>>5)]&(1<<(feat&31)) ) {
+		//return the numeric stat value, instead of the boolean
+		if (featstats[feat]) {
+			return Modified[featstats[feat]];
+		}
+		return 1;
+	}
+	return 0;
+}
+
+//returns true if the feat exists
+bool Actor::HasFeat(unsigned int featindex) const
+{
+	if (featindex>=MAX_FEATS) return false;
 	unsigned int pos = IE_FEATS1+(featindex>>5);
 	unsigned int bit = 1<<(featindex&31);
 	if (Modified[pos]&bit) return true;
 	return false;
 }
 
-void Actor::AddProjectileImmunity(ieDword /*projectile*/)
+ieDword Actor::ImmuneToProjectile(ieDword projectile) const
 {
-	//TODO
+	return projectileImmunity[projectile/32]&(1<<(projectile&31));
+}
+
+void Actor::AddProjectileImmunity(ieDword projectile)
+{
+	projectileImmunity[projectile/32]|=1<<(projectile&31);
+}
+
+//2nd edition rules
+void Actor::CreateDerivedStatsBG()
+{
+	int i;
+	int turnundeadlevel = 0;
+	int levels[3]={BaseStats[IE_LEVEL],BaseStats[IE_LEVEL2],BaseStats[IE_LEVEL3]};
 	
+	int classid = BaseStats[IE_CLASS];
+	int slot = 0;
+	
+	for (i=0;i<11;i++) {
+		//this is not good for multiclassing yet
+		if ((1<<classid)&isclass[i]) {
+			BaseStats[levelslots[i]]=levels[slot];
+			slot++;
+		}
+	}
+	//recalculate all level based changes
+	//cannot do this?
+	//pcf_level(this,0,0);
+	
+	if (isclass[ISCLERIC]&(1<<classid)) {
+		turnundeadlevel = BaseStats[IE_LEVELCLERIC]+1-turnlevels[classid];
+		if (turnundeadlevel<0) turnundeadlevel=0;
+	}
+	else if (isclass[ISPALADIN]&(1<<classid)) {
+		turnundeadlevel = BaseStats[IE_LEVELPALADIN]+1-turnlevels[classid];
+		if (turnundeadlevel<0) turnundeadlevel=0;
+	} else {
+		turnundeadlevel = 0;
+	}
+	
+	ieDword backstabdamagemultiplier=BaseStats[IE_LEVELTHIEF];
+	if (backstabdamagemultiplier) {
+		backstabdamagemultiplier=backstabdamagemultiplier+3/4;
+		if (backstabdamagemultiplier>7) backstabdamagemultiplier=7;
+	}
+	BaseStats[IE_TURNUNDEADLEVEL]=turnundeadlevel;
+	BaseStats[IE_BACKSTABDAMAGEMULTIPLIER]=backstabdamagemultiplier;
+	BaseStats[IE_LAYONHANDSAMOUNT]=BaseStats[IE_LEVELPALADIN]*2;
+}
+
+//3rd edition rules
+void Actor::CreateDerivedStatsIWD2()
+{
+	int i;
+	int turnundeadlevel = 0;
+	ieDword backstabdamagemultiplier = (BaseStats[IE_LEVELTHIEF]+1)/2;
+	int layonhandsamount = (int) BaseStats[IE_LEVELPALADIN];
+	if (layonhandsamount) {
+		layonhandsamount *= BaseStats[IE_CHR]/2-5;
+		if (layonhandsamount<1) layonhandsamount = 1;
+	}
+
+	for (i=0;i<11;i++) {
+		int tmp;
+		
+		if (turnlevels[i+1]) {
+			tmp = BaseStats[IE_LEVELBARBARIAN+i]+1-turnlevels[i+1];
+			if (tmp<0) tmp=0;
+			if (tmp>turnundeadlevel) turnundeadlevel=tmp;
+		}
+	}
+	BaseStats[IE_TURNUNDEADLEVEL]=turnundeadlevel;
+	BaseStats[IE_BACKSTABDAMAGEMULTIPLIER]=backstabdamagemultiplier;
+	BaseStats[IE_LAYONHANDSAMOUNT]=(ieDword) layonhandsamount;
 }

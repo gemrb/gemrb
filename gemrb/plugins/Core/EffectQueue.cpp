@@ -509,7 +509,7 @@ void EffectQueue::AddAllEffects(Actor* target, Point &destination)
 	}
 }
 
-bool IsDicedEffect(int opcode)
+inline static bool IsDicedEffect(int opcode)
 {
 	int i;
 
@@ -521,7 +521,7 @@ bool IsDicedEffect(int opcode)
 	return false;
 }
 
-bool IsDicedEffect2(int opcode)
+inline static bool IsDicedEffect2(int opcode)
 {
 	int i;
 
@@ -572,6 +572,7 @@ inline bool check_probability(Effect* fx)
 	return true;
 }
 
+//immunity effects
 static EffectRef fx_level_immunity_ref={"Protection:Spelllevel",NULL,-1};
 static EffectRef fx_opcode_immunity_ref={"Protection:Opcode",NULL,-1}; //bg2
 static EffectRef fx_opcode_immunity2_ref={"Protection:Opcode2",NULL,-1};//iwd
@@ -580,19 +581,47 @@ static EffectRef fx_spell_immunity2_ref={"Protection:Spell2",NULL,-1};//iwd
 static EffectRef fx_school_immunity_ref={"Protection:School",NULL,-1};
 static EffectRef fx_secondary_type_immunity_ref={"Protection:SecondaryType",NULL,-1};
 
+//decrementing immunity effects
+static EffectRef fx_level_immunity_dec_ref={"Protection:SpellLevelDec",NULL,-1};
+static EffectRef fx_spell_immunity_dec_ref={"Protection:SpellDec",NULL,-1};
+static EffectRef fx_school_immunity_dec_ref={"Protection:SchoolDec",NULL,-1};
+static EffectRef fx_secondary_type_immunity_dec_ref={"Protection:SecondaryTypeDec",NULL,-1};
+
+//bounce effects
 static EffectRef fx_level_bounce_ref={"Bounce:SpellLevel",NULL,-1};
 //static EffectRef fx_opcode_bounce_ref={"Bounce:Opcode",NULL,-1};
 static EffectRef fx_spell_bounce_ref={"Bounce:Spell",NULL,-1};
 static EffectRef fx_school_bounce_ref={"Bounce:School",NULL,-1};
 static EffectRef fx_secondary_type_bounce_ref={"Bounce:SecondaryType",NULL,-1};
 
+//decrementing bounce effects
+static EffectRef fx_level_bounce_dec_ref={"Bounce:SpellLevelDec",NULL,-1};
+static EffectRef fx_spell_bounce_dec_ref={"Bounce:SpellDec",NULL,-1};
+static EffectRef fx_school_bounce_dec_ref={"Bounce:SchoolDec",NULL,-1};
+static EffectRef fx_secondary_type_bounce_dec_ref={"Bounce:SecondaryTypeDec",NULL,-1};
+
+//spelltrap (multiple decrementing immunity)
+static EffectRef fx_spelltrap={"SpellTrap", NULL,-1};
+
 //this is for whole spell immunity/bounce
-inline int check_type(Actor* actor, Effect* fx)
+inline static void DecreaseEffect(Effect *efx)
 {
+	efx->Parameter1--;
+	if ((int) efx->Parameter1<1) {
+		//don't remove effects directly!!!
+		efx->TimingMode=FX_DURATION_JUST_EXPIRED;
+	}
+}
+
+static int check_type(Actor* actor, Effect* fx)
+{
+	//the protective effect (if any)
+	Effect *efx;
+
 	ieDword bounce = actor->GetStat(IE_BOUNCE);
 
 	//immunity checks
-/*opcode immunity is elsewhere
+/*opcode immunity is in the per opcode checks
 	if (actor->fxqueue.HasEffectWithParam(fx_opcode_immunity_ref, fx->Opcode) ) {
 		return 0;
 	}
@@ -600,9 +629,12 @@ inline int check_type(Actor* actor, Effect* fx)
 		return 0;
 	}
 */
+	//spell level immunity
 	if (actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_ref, fx->Power, 0) ) {
 		return 0;
 	}
+
+	//source immunity (spell name)
 	//if source is unspecified, don't resist it
 	if (fx->Source[0]) {
 		if (actor->fxqueue.HasEffectWithResource(fx_spell_immunity_ref, fx->Source) ) {
@@ -612,14 +644,51 @@ inline int check_type(Actor* actor, Effect* fx)
 			return 0;
 		}
 	}
+
+	//primary type immunity (school)
 	if (fx->PrimaryType) {
 		if (actor->fxqueue.HasEffectWithParam(fx_school_immunity_ref, fx->PrimaryType)) {
 			return 0;
 		}
 	}
 
+	//secondary type immunity (usage)
 	if (fx->SecondaryType) {
 		if (actor->fxqueue.HasEffectWithParam(fx_secondary_type_immunity_ref, fx->SecondaryType) ) {
+			return 0;
+		}
+	}
+
+	//decrementing immunity checks
+	//decrementing level immunity
+	efx = actor->fxqueue.HasEffectWithParamPair(fx_level_immunity_dec_ref, fx->Power, 0);
+	if (efx ) {
+		DecreaseEffect(efx);
+		return 0;
+	}
+
+	//decrementing spell immunity
+	if (fx->Source[0]) {
+		efx = actor->fxqueue.HasEffectWithResource(fx_spell_immunity_dec_ref, fx->Source);
+		if (efx) {
+			DecreaseEffect(efx);
+			return 0;
+		}
+	}
+	//decrementing primary type immunity (school)
+	if (fx->PrimaryType) {
+		efx = actor->fxqueue.HasEffectWithParam(fx_school_immunity_dec_ref, fx->PrimaryType);
+		if (efx) {
+			DecreaseEffect(efx);
+			return 0;
+		}
+	}
+
+	//decrementing secondary type immunity (usage)
+	if (fx->SecondaryType) {
+		efx = actor->fxqueue.HasEffectWithParam(fx_secondary_type_immunity_dec_ref, fx->SecondaryType);
+		if (efx) {
+			DecreaseEffect(efx);
 			return 0;
 		}
 	}
@@ -629,7 +698,7 @@ inline int check_type(Actor* actor, Effect* fx)
 		return 0;
 	}
 
-	if ((bounce&BNC_RESOURCE) && actor->fxqueue.HasEffectWithResource(fx_spell_bounce_ref, fx->Source) ) {
+	if (fx->Source[0] && (bounce&BNC_RESOURCE) && actor->fxqueue.HasEffectWithResource(fx_spell_bounce_ref, fx->Source) ) {
 		return -1;
 	}
 
@@ -644,12 +713,52 @@ inline int check_type(Actor* actor, Effect* fx)
 			return -1;
 		}
 	}
-
 	//decrementing bounce checks
+
+	//level decrementing bounce check
+	if ((bounce&BNC_LEVEL_DEC)) {
+		efx=actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_dec_ref, fx->Power, 0);
+		if (efx) {
+			DecreaseEffect(efx);
+			return -1;
+		}
+	}
+
+	if (fx->Source[0] && (bounce&BNC_RESOURCE_DEC)) {
+		efx=actor->fxqueue.HasEffectWithResource(fx_spell_bounce_dec_ref, fx->Resource);
+		if (efx) {
+			DecreaseEffect(efx);
+			return -1;
+		}
+	}
+
+	if (fx->PrimaryType && (bounce&BNC_SCHOOL_DEC) ) {
+		efx=actor->fxqueue.HasEffectWithParam(fx_school_bounce_dec_ref, fx->PrimaryType);
+		if (efx) {
+			DecreaseEffect(efx);
+			return -1;
+		}
+	}
+
+	if (fx->SecondaryType && (bounce&BNC_SECTYPE_DEC) ) {
+		efx=actor->fxqueue.HasEffectWithParam(fx_secondary_type_bounce_dec_ref, fx->SecondaryType);
+		if (efx) {
+			DecreaseEffect(efx);
+			return -1;
+		}
+	}
+
+  efx=actor->fxqueue.HasEffectWithParamPair(fx_spelltrap, 0, fx->Power);
+  if (efx) {
+    //storing the absorbed spell level
+    efx->Parameter3+=fx->Power;
+    efx->Parameter1--;
+    return -1;
+  }
 	return 1;
 }
 
-inline bool check_resistance(Actor* actor, Effect* fx)
+static bool check_resistance(Actor* actor, Effect* fx)
 {
 	//magic immunity
 	ieDword val = actor->GetStat(IE_RESISTMAGIC);
@@ -663,6 +772,7 @@ inline bool check_resistance(Actor* actor, Effect* fx)
 	if (actor->fxqueue.HasEffectWithParam(fx_opcode_immunity2_ref, fx->Opcode) ) {
 		return true;
 	}
+
 /* opcode bouncing isn't implemented?
 	//opcode bouncing
 	if (actor->fxqueue.HasEffectWithParam(fx_opcode_bounce_ref, fx->Opcode) ) {
@@ -819,12 +929,13 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 }
 
 // looks for opcode with param2
-// useful for: immunity vs projectile
 
 #define MATCH_OPCODE() if((*f)->Opcode!=opcode) { continue; }
 
+// useful for: remove equipped item
 #define MATCH_SLOTCODE() if((*f)->InventorySlot!=slotcode) { continue; }
 
+// useful for: remove projectile type
 #define MATCH_PROJECTILE() if((*f)->Projectile!=projectile) { continue; }
 
 #define MATCH_LIVE_FX() {ieDword tmp=(*f)->TimingMode; \
@@ -1047,7 +1158,6 @@ void EffectQueue::RemoveLevelEffects(ieDword level, ieDword Flags, ieDword match
 		}
 	}
 }
-
 
 Effect *EffectQueue::HasOpcode(ieDword opcode) const
 {
@@ -1311,7 +1421,8 @@ int EffectQueue::ResolveEffect(EffectRef &effect_reference)
 	return effect_reference.EffText;
 }
 
-// this is a complete level check
+// this check goes for the whole effect block, not individual effects
+// But it takes the first effect of the block for the common fields
 
 //returns 1 if effect block applicable
 //returns 0 if effect block disabled
@@ -1321,6 +1432,8 @@ int EffectQueue::CheckImmunity(Actor *target)
 	if (effects.size() ) {
 		Effect* fx = *effects.begin();
 
+		//projectile immunity
+		if (target->ImmuneToProjectile(fx->Projectile)) return 0;
 		//check level resistances
 		//check specific spell immunity
 		//check school/sectype immunity

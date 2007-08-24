@@ -514,6 +514,11 @@ Actor* CREImp::GetActor()
 		act->BaseStats[IE_HITPOINTS]=hp;
 	}
 	act->inventory.CalculateWeight();
+	if (act->BaseStats[IE_CLASSLEVELSUM]) {
+		act->CreateDerivedStatsIWD2();
+	} else {
+		act->CreateDerivedStatsBG();
+	}
 	return act;
 }
 
@@ -1311,11 +1316,7 @@ void CREImp::GetActorIWD2(Actor *act)
 	//new scripting flags, one on each byte
 	str->Read( &tmpByte, 1); //hidden
 	if (tmpByte) {
-		//no idea which one is best, if HideCreature removes it, then use
-		//the MC flags
-		//if it doesn't remove it, use the other
-		act->SetMCFlag(MC_HIDDEN, BM_OR);
-		//act->BaseStats[IE_AVATARREMOVAL]=1;
+		act->BaseStats[IE_AVATARREMOVAL]=tmpByte;
 	}
 	str->Read( &tmpByte, 1); //set death variable
 	str->Read( &tmpByte, 1); //increase kill count
@@ -1542,11 +1543,7 @@ void CREImp::GetActorIWD1(Actor *act) //9.0
 	//new scripting flags, one on each byte
 	str->Read( &tmpByte, 1); //hidden
 	if (tmpByte) {
-		//no idea which one is best, if HideCreature removes it, then use
-		//the MC flags
-		//if it doesn't remove it, use the other
-		act->SetMCFlag(MC_HIDDEN, BM_OR);
-		//act->BaseStats[IE_AVATARREMOVAL]=1;
+		act->BaseStats[IE_AVATARREMOVAL]=tmpByte;
 	}
 	str->Read( &tmpByte, 1); //set death variable
 	str->Read( &tmpByte, 1); //increase kill count
@@ -2205,7 +2202,9 @@ int CREImp::PutActorIWD1(DataStream *stream, Actor *actor)
 	char filling[52];
 
 	memset(filling,0,sizeof(filling));
-	stream->Write( filling, 4); //4 unknown
+	tmpByte=(ieByte) actor->BaseStats[IE_AVATARREMOVAL];
+	stream->Write( &tmpByte, 1);
+	stream->Write( filling, 3); //various scripting flags currently down the drain
 	for (i=0;i<5;i++) {
 		tmpWord = actor->BaseStats[IE_INTERNAL_0+i];
 		stream->WriteWord( &tmpWord);
@@ -2249,7 +2248,9 @@ int CREImp::PutActorIWD2(DataStream *stream, Actor *actor)
 	char filling[146];
 
 	memset(filling,0,sizeof(filling));
-	stream->Write( filling, 4); //4 unknown
+	tmpByte=(ieByte) actor->BaseStats[IE_AVATARREMOVAL];
+	stream->Write( &tmpByte, 1);
+	stream->Write( filling, 3); //various scripting flags currently down the drain
 	for (i=0;i<5;i++) {
 		tmpWord = actor->BaseStats[IE_INTERNAL_0+i];
 		stream->WriteWord( &tmpWord);
@@ -2613,4 +2614,3 @@ int CREImp::PutActor(DataStream *stream, Actor *actor, bool chr)
 	}
 	return 0;
 }
-

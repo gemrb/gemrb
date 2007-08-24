@@ -158,8 +158,6 @@ void ScriptedAnimation::LoadAnimationFactory(AnimationFactory *af, int gettwin)
 		FaceTarget = 0;
 	}
 
-	palette = NULL;
-
 	for(unsigned int i=0;i<cCount;i++) {
 		bool mirror = false;
 		int c = i;
@@ -333,18 +331,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 		PreparePalette();
 	}
 
-	//copying resource name to the object, so it could be referenced by it
-	//used by immunity/remove specific animation
-	//this is better done in Interface::GetScriptedAnimation
-	//where the original resref is more readily available
-	/*
-	memcpy(ResName, stream->filename, 8);
-	for(int i=0;i<8;i++) {
-		if (ResName[i]=='.') ResName[i]=0;
-	}
-	*/
 	SetPhase(P_ONSET);
-	PaletteName[0]=0;
 
 	if (autoFree) {
 		delete( stream );
@@ -627,11 +614,15 @@ void ScriptedAnimation::GetPaletteCopy()
 {
 	if (palette)
 		return;
+	//it is not sure that the first position will have a resource in it
+	//therefore the cycle
 	for (unsigned int i=0;i<3*MAX_ORIENT;i++) {
 		if (anims[i]) {
 			Sprite2D* spr = anims[i]->GetFrame(0);
 			if (spr) {
 				palette = core->GetVideoDriver()->GetPalette(spr)->Copy();
+				//we need only one palette, so break here
+				break;
 			}
 		}
 	}

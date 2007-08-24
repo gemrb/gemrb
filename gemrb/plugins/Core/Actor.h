@@ -58,6 +58,7 @@ class ScriptedAnimation;
 
 #define MAX_STATS 256
 #define MAX_LEVEL 30
+#define MAX_FEATS 96   //3*sizeof(ieDword)
 
 //modal states
 #define MS_NONE        0
@@ -192,6 +193,7 @@ public:
 	EffectQueue fxqueue;
 	vvcVector vvcOverlays;
 	vvcVector vvcShields;
+	ieDword *projectileImmunity; //classic bitfield
 private:
 	//this stuff doesn't get saved
 	CharAnimations* anims;
@@ -465,14 +467,14 @@ public:
 	bool IsReverseToHit();
 	void InitButtons(ieDword cls);
 	void SetFeat(unsigned int feat, int mode);
-	int GetFeat(unsigned int feat);
+	int GetFeat(unsigned int feat) const;
 	void SetUsedWeapon(const char *AnimationType, ieWord *MeleeAnimation,
 		int WeaponType=-1);
 	void SetUsedShield(const char *AnimationType, int WeaponType=-1);
 	void SetUsedHelmet(const char *AnimationType);
 	void SetupFist();
 	/* Returns nonzero if the caster is held */
-	int Immobile();
+	int Immobile() const;
 	/* Returns negative error code if the item is unusable */
 	int Unusable(Item *item) const;
 	/* Sets all clown colour to the given gradient */
@@ -482,8 +484,14 @@ public:
 	/* Checks and sets a spellstate if it wasn't set yet */
 	bool SetSpellState(unsigned int spellstate);
 	/* Checks a feat */
-	bool HasFeat(unsigned int featindex);
+	bool HasFeat(unsigned int featindex) const;
+	/* Reports projectile immunity, nonzero if immune */
+	ieDword ImmuneToProjectile(ieDword projectile) const;
 	/* Sets projectile immunity */
 	void AddProjectileImmunity(ieDword projectile);
+	/* Set up all the missing stats on load time, or after level up */
+	void CreateDerivedStatsBG();
+	/* Set up all the missing stats on load time, or after level up */
+	void CreateDerivedStatsIWD2();
 };
 #endif

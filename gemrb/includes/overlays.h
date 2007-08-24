@@ -29,6 +29,7 @@
 #define OV_SANCTUARY   0
 #define OV_ENTANGLE    1
 #define OV_WISP        2  //iwd2
+#define OV_SPELLTRAP   2  //bg2
 #define OV_SHIELDGLOBE 3
 #define OV_GREASE      4
 #define OV_WEB         5

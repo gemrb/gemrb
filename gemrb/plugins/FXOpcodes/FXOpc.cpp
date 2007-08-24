@@ -22,6 +22,7 @@
 #include "../../includes/win32def.h"
 #include "../../includes/strrefs.h"
 #include "../../includes/opcode_params.h"
+#include "../../includes/overlays.h"
 #include "../Core/Actor.h"
 #include "../Core/EffectQueue.h"
 #include "../Core/Interface.h"
@@ -418,12 +419,12 @@ static EffectRef effectnames[] = {
 	{ "BerserkStage2Modifier", fx_berserkstage2_modifier, -1},
 	{ "BlessNonCumulative", fx_set_bless_state, -1 },
 	{ "Bounce:School", fx_bounce_school, -1 },
-	{ "Bounce:SchoolDecrement", fx_bounce_school_dec, -1 },
+	{ "Bounce:SchoolDec", fx_bounce_school_dec, -1 },
 	{ "Bounce:SecondaryType", fx_bounce_secondary_type, -1 },
-	{ "Bounce:SecondaryTypeDecrement", fx_bounce_secondary_type_dec, -1 },
+	{ "Bounce:SecondaryTypeDec", fx_bounce_secondary_type_dec, -1 },
 	{ "Bounce:Spell", fx_bounce_spell, -1 },
 	{ "Bounce:SpellLevel", fx_bounce_spelllevel, -1},
-	{ "Bounce:SpellLevelDecrement", fx_bounce_spelllevel_dec, -1},
+	{ "Bounce:SpellLevelDec", fx_bounce_spelllevel_dec, -1},
 	{ "Bounce:Opcode", fx_bounce_opcode, -1 },
 	{ "Bounce:Projectile", fx_bounce_projectile, -1 },
 	{ "CantUseItem", fx_generic_effect, -1 },
@@ -614,12 +615,12 @@ static EffectRef effectnames[] = {
 	{ "Protection:Opcode2", fx_generic_effect, -1 },
 	{ "Protection:Projectile",fx_protection_from_projectile, -1},
 	{ "Protection:School",fx_generic_effect,-1},//overlay?
-	{ "Protection:SchoolDecrement",fx_generic_decrement_effect,-1},//overlay?
+	{ "Protection:SchoolDec",fx_generic_decrement_effect,-1},//overlay?
 	{ "Protection:SecondaryType",fx_generic_effect,-1},//overlay?
-	{ "Protection:SecondaryTypeDecrement",fx_generic_decrement_effect,-1},//overlay?
+	{ "Protection:SecondaryTypeDec",fx_generic_decrement_effect,-1},//overlay?
 	{ "Protection:Spell",fx_resist_spell,-1},//overlay?
 	{ "Protection:SpellLevel",fx_generic_effect,-1},//overlay?
-	{ "Protection:SpellLevelDecrement",fx_generic_decrement_effect,-1},//overlay?
+	{ "Protection:SpellLevelDec",fx_generic_decrement_effect,-1},//overlay?
 	{ "Protection:String", fx_generic_effect, -1 },
 	{ "Protection:Tracking", fx_protection_from_tracking, -1 },
 	{ "Protection:Turn", fx_protection_from_turn, -1},
@@ -666,7 +667,7 @@ static EffectRef effectnames[] = {
 	{ "Spell:CastAsScroll", fx_cast_scroll, -1 },
 	{ "Spell:Learn", fx_learn_spell, -1 },
 	{ "Spell:Remove", fx_remove_spell, -1 },
-	{ "Spelltrap",fx_spelltrap , -1 },
+	{ "Spelltrap",fx_spelltrap , -1 }, //overlay: spmagglo
 	{ "State:Berserk", fx_set_berserk_state, -1 },
 	{ "State:Blind", fx_set_blind_state, -1 },
 	{ "State:Blur", fx_set_blur_state, -1 },
@@ -3486,7 +3487,7 @@ int fx_apply_effect (Actor* Owner, Actor* target, Effect* fx)
 // b3 damagebonus generic effect DamageVsCreature
 // b4 can't use item (resource) generic effect CantUseItem
 // b5 can't use itemtype (resource) generic effect CantUseItemType
-// b6
+// b6 generic effect ApplyEffectItem
 // b7 generic effect ApplyEffectItemType
 // b8 DontJumpModifier
 int fx_dontjump_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
@@ -3496,21 +3497,22 @@ int fx_dontjump_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-// b9 see above: fx_hold_creature
+// 0xb9 see above: fx_hold_creature
 
 // 0xba MoveToArea
 int fx_move_to_area (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_move_to_area (%2d) %s", fx->Opcode, fx->Resource );
-	//delay effect until the target has an area
+	//delay effect until the target has finished the previous move to an area
 	//hopefully this fixes an evil bug
-	if (!target->GetCurrentArea() ||
-	    !target->GetCurrentArea()->HasActor(target)) {
+	Map *map = target->GetCurrentArea();
+	if (!map || !map->HasActor(target)) {
+		//stay around for the next evaluation
 		return FX_APPLIED;
 	}
 	Point p(fx->PosX,fx->PosY);
 	MoveBetweenAreasCore(target, fx->Resource, p, fx->Parameter2, true);
-	//this effect doesn't stick?
+	//this effect doesn't stick
 	return FX_NOT_APPLIED;
 }
 
@@ -4303,17 +4305,24 @@ int fx_activate_spell_sequencer(Actor* Owner, Actor* target, Effect* fx)
 	}
 	return FX_NOT_APPLIED;
 }
+
 // 0x103 SpellTrap (Protection:SpellLevelDecrement + recall spells)
 int fx_spelltrap(Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_spelltrap (%2d): Count: %d, Level: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (fx->Parameter3) {
+		target->RestoreSpellLevel(fx->Parameter3, 0);
+		fx->Parameter3=0;
+	}
 	if (fx->Parameter1<=0) {
 		//gone down to zero
 		return FX_NOT_APPLIED;
 	}
+	target->SetOverlay(OV_SPELLTRAP);
 	target->AddPortraitIcon(PI_SPELLTRAP);
 	return FX_APPLIED;
 }
+
 //0x104 Crash104
 //0x138 Crash138
 int fx_crash (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
