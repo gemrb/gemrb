@@ -606,7 +606,7 @@ CREMemorizedSpell* Spellbook::FindUnchargedSpell(int type, int level)
 		mask<<=1;
 		for (unsigned int j = 0; j<spells[i].size(); j++) {
 			CRESpellMemorization* sm = spells[i][j];
-			if (level && (sm->Level!=level)) {
+			if (level && (sm->Level!=level-1)) {
 				continue;
 			}
 

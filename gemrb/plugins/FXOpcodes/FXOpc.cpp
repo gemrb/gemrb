@@ -1143,14 +1143,16 @@ int fx_current_hp_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_current_hp_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
-		BASE_MOD( IE_HITPOINTS );
+		//BASE_MOD( IE_HITPOINTS );
+		target->NewBase( IE_HITPOINTS, fx->Parameter1, fx->Parameter2&0xffff);
 	} else {
-		STAT_MOD( IE_HITPOINTS );
+		//STAT_MOD( IE_HITPOINTS );
+		target->NewStat( IE_HITPOINTS, fx->Parameter1, fx->Parameter2&0xffff);
 	}
-	if (fx->Parameter2&1) {
+	if (fx->Parameter2&0x10000) {
 		target->Resurrect();
 	}
-	if (fx->Parameter2&2) {
+	if (fx->Parameter2&0x20000) {
 		target->fxqueue.RemoveAllNonPermanentEffects();
 	}
 	return FX_PERMANENT;

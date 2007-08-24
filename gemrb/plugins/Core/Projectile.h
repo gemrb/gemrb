@@ -185,6 +185,7 @@ public:
 
 	//don't forget to set effects to NULL when the projectile discharges
 	//unexploded projectiles are responsible to destruct their payload
+
 	inline void SetEffects(EffectQueue *fx) {
 		effects = fx;
 	}
@@ -230,6 +231,8 @@ private:
 	int GetTravelPos(int face);
 	int GetShadowPos(int face);
 	void SetPos(int face, int frame1, int frame2);
+	//logic to resolve target when single projectile hit destination
+	Actor *GetTarget();
 	void NextTarget(Point &p);
 	void SetupPalette(Animation *anim[], Palette *&pal, const ieByte *gradients);
 };

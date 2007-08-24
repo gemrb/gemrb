@@ -628,8 +628,7 @@ void pcf_hitpoint(Actor *actor, ieDword /*oldValue*/, ieDword hp)
 	if ((signed) hp<=0) {
 		actor->Die(NULL);
 	}
-	
-	actor->Modified[IE_MINHITPOINTS]=hp;
+	actor->Modified[IE_HITPOINTS]=hp;
 
 	if (actor->InParty) {
 		core->SetEventFlag(EF_PORTRAIT);
@@ -3377,10 +3376,10 @@ int Actor::RestoreSpellLevel(ieDword maxlevel, ieDword type)
 
 	switch (type) {
 		case 0: //allow only mage
-			typemask = ~1;
+			typemask = ~2;
 			break;
 		case 1: //allow only cleric
-			typemask = ~2;
+			typemask = ~1;
 			break;
 		default:
 			typemask = 0;
@@ -3812,8 +3811,7 @@ void Actor::CreateDerivedStatsBG()
 		}
 	}
 	//recalculate all level based changes
-	//cannot do this?
-	//pcf_level(this,0,0);
+	pcf_level(this,0,0);
 	
 	if (isclass[ISCLERIC]&(1<<classid)) {
 		turnundeadlevel = BaseStats[IE_LEVELCLERIC]+1-turnlevels[classid];

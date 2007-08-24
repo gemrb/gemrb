@@ -693,6 +693,15 @@ static int check_type(Actor* actor, Effect* fx)
 		}
 	}
 
+	//spelltrap (absorb)
+	efx=actor->fxqueue.HasEffectWithParamPair(fx_spelltrap, 0, fx->Power);
+	if (efx) {
+		//storing the absorbed spell level
+		efx->Parameter3+=fx->Power;
+		efx->Parameter1--;
+		return 0;
+	}
+
 	//bounce checks
 	if ((bounce&BNC_LEVEL) && actor->fxqueue.HasEffectWithParamPair(fx_level_bounce_ref, fx->Power, 0) ) {
 		return 0;
@@ -748,13 +757,6 @@ static int check_type(Actor* actor, Effect* fx)
 		}
 	}
 
-  efx=actor->fxqueue.HasEffectWithParamPair(fx_spelltrap, 0, fx->Power);
-  if (efx) {
-    //storing the absorbed spell level
-    efx->Parameter3+=fx->Power;
-    efx->Parameter1--;
-    return -1;
-  }
 	return 1;
 }
 

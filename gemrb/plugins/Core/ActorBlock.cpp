@@ -585,6 +585,8 @@ void Scriptable::CastSpell( const ieResRef SpellResRef, Scriptable* target, bool
 		}
 	}
 
+	if (!target) target = this;
+
 	if (target->Type!=ST_ACTOR) {
 		LastTargetPos = target->Pos;
 	} else {

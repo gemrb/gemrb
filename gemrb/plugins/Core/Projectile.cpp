@@ -190,11 +190,45 @@ void Projectile::Setup()
 		//}
 	}
 	if (TFlags&PTF_LIGHT) {
+		//TODO: create the light spot sprite
+		//it is a per pixel blend thingie, mostly white
 		//light = CreateLight(LightX, LightY, LightZ);
 	}
 	if (TFlags&PTF_BLEND) {
 		SetBlend();
 	}
+}
+
+Actor *Projectile::GetTarget()
+{
+	Actor *target;
+
+	if (Target) {
+		target = area->GetActorByGlobalID(Target);
+		if (!target) return NULL;
+		Actor *original = area->GetActorByGlobalID(Caster);
+		if (original==target) {
+			effects->SetOwner(target);
+			return target;
+		}
+		int res = effects->CheckImmunity ( target );
+		//resisted
+		if (!res) {
+			return NULL;
+		}
+		if (res==-1) {
+			phase = P_TRAVEL;
+			Target = original->GetID();
+			return NULL;
+		}
+		effects->SetOwner(original);
+		return target;
+	}
+	target = area->GetActorByGlobalID(Caster);
+	if (target) {
+		effects->SetOwner(target);
+	}
+	return target;
 }
 
 //control the phase change when the projectile reached its target
@@ -225,23 +259,26 @@ void Projectile::ChangePhase()
 		if (!effects) return;
 
 		Actor *target;
+
 		if (Target) {
-			target = area->GetActorByGlobalID(Target);
-			if (!target) {
-				return;
+			target = GetTarget();
+			if (target) {
+				//projectile rebounced
+				if (phase!=P_EXPIRED) {
+					return;
+				}
 			}
-			Actor *original = area->GetActorByGlobalID(Caster);
-			effects->SetOwner(original?original:target);
 		} else {
-			//the target is the original caster
+			//the target will be the original caster
 			//in case of single point area target (dimension door)
 			target = area->GetActorByGlobalID(Caster);
-			if (!target) {
-				return;
+			if (target) {
+				effects->SetOwner(target);
 			}
-			effects->SetOwner(target);
 		}
-		effects->AddAllEffects(target, Destination);
+		if (target) {
+			effects->AddAllEffects(target, Destination);
+		}
 		delete effects;
 		effects = NULL;
 		return;

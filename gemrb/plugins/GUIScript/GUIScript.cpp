@@ -7665,7 +7665,8 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 			break;
 		case TARGET_NONE:
 			//this is always instant casting
-			actor->CastSpell(spelldata.spellname, NULL, true);
+			core->ApplySpell(spelldata.spellname, actor, actor, 0);
+			//actor->CastSpell(spelldata.spellname, NULL, true);
 			break;
 		case TARGET_AREA:
 			gc->SetupCasting(spelldata.type, spelldata.level, spelldata.slot, actor, GA_POINT, spelldata.TargetNumber);

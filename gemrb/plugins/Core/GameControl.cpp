@@ -760,7 +760,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					lastActor = area->GetActor( p, GA_DEFAULT);
 				}
 				if (lastActor) {
-					Effect *fx = EffectQueue::CreateEffect(heal_ref, lastActor->GetStat(IE_MAXHITPOINTS), 3, FX_DURATION_INSTANT_LIMITED);
+					Effect *fx = EffectQueue::CreateEffect(heal_ref, lastActor->GetBase(IE_MAXHITPOINTS), 0x30001, FX_DURATION_INSTANT_PERMANENT);
 					if (fx) {
 						core->ApplyEffect(fx, lastActor, lastActor);
 					}
