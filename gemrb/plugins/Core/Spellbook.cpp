@@ -142,6 +142,7 @@ Spellbook::~Spellbook()
 			}
 		}
 	}
+	ClearSpellInfo(); 
 	delete [] spells;
 }
 
@@ -684,70 +685,6 @@ bool Spellbook::DepleteSpell(CREMemorizedSpell* spl)
 	}
 	return false;
 }
-
-/* returns true if there are more item usages not fitting in given array */
-/* FIXME: it should first build up a list and then return a subset */
-/*
-bool Spellbook::GetSpellInfo(SpellExtHeader *array, int type, int startindex, int count)
-{
-	int pos = 0;
-	int actual = 0;
-
-	memset(array, 0, count * sizeof(SpellExtHeader) );
-	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
-		for (unsigned int j = 0; j < spells[i].size(); j++) {
-			CRESpellMemorization* sm = spells[i][j];
-
-			if ( !(type & (1<<sm->Type)) ) {
-				continue;
-			}
-			for (unsigned int k = 0; k < sm->memorized_spells.size(); k++) {
-				CREMemorizedSpell* slot = sm->memorized_spells[k];
-				if (!slot)
-					continue;
-				if (!slot->Flags)
-					continue;
-				actual++;
-				if (actual>startindex) {
-					//store the item, return if we can't store more
-					if (!count) {
-						return true;
-					}
-					Spell *spl = core->GetSpell(slot->SpellResRef);
-					ieDword level = 0;
-					count--;
-					memcpy(array[pos].spellname, slot->SpellResRef, sizeof(ieResRef) );
-					int ehc;
-
-					for(ehc=0;ehc<spl->ExtHeaderCount-1;ehc++) {
-						if (level<spl->ext_headers[ehc+1].RequiredLevel) {
-							break;
-						}
-					}
-					SPLExtHeader *ext_header = spl->ext_headers+ehc;
-					array[pos].headerindex = ehc;
-					array[pos].level = sm->Level;
-					array[pos].type = sm->Type;
-					array[pos].slot = k;
-					array[pos].count = 1;
-					array[pos].SpellForm = ext_header->SpellForm;
-					memcpy(array[pos].MemorisedIcon, ext_header->MemorisedIcon,sizeof(ieResRef) );
-					array[pos].Target = ext_header->Target;
-					array[pos].TargetNumber = ext_header->TargetNumber;
-					array[pos].Range = ext_header->Range;
-					array[pos].Projectile = ext_header->ProjectileAnimation;
-					array[pos].CastingTime = (ieWord) ext_header->CastingTime;
-					array[pos].strref = spl->SpellName;
-					pos++;
-					core->FreeSpell(spl, slot->SpellResRef, false);
-				}
-			}
-		}
-	}
-
-	return false;
-}
-*/
 
 void Spellbook::ClearSpellInfo()
 {
