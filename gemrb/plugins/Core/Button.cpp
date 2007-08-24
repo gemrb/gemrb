@@ -620,13 +620,13 @@ void Button::SetTextColor(const Color &fore, const Color &back)
 
 void Button::SetHorizontalOverlay(double clip, const Color &src, const Color &dest)
 {
-	if (Clipping>clip) {
+	if ((Clipping>clip) || !(Flags&IE_GUI_BUTTON_HORIZONTAL) ) {
+		Flags |= IE_GUI_BUTTON_HORIZONTAL;
 		SourceRGB=src;
 		DestRGB=dest;
 		GetTime( starttime );
 		starttime += 40;
 	}
 	Clipping = clip;
-	Flags |= IE_GUI_BUTTON_HORIZONTAL;
 	Changed = true;
 }
