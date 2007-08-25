@@ -99,7 +99,7 @@ static int isclass[11]={0,0,0,0,0,0,0,0,0,0,0};
 #define ISSORCERER  9
 #define ISWIZARD    10
 static const int levelslots[11]={IE_LEVELFIGHTER,IE_LEVELMAGE,IE_LEVELTHIEF,
-	IE_LEVELBARBARIAN,IE_LEVELCLERIC,IE_LEVELDRUID,IE_LEVELMONK,
+	IE_LEVELBARBARIAN,IE_LEVELBARD,IE_LEVELCLERIC,IE_LEVELDRUID,IE_LEVELMONK,
 	IE_LEVELPALADIN,IE_LEVELRANGER,IE_LEVELSORCEROR};
 
 //stat values are 0-255, so a byte is enough
@@ -1149,7 +1149,7 @@ static void InitActorTables()
 			//we need the MULTIPLE column
 			tmp = core->TranslateStat(tm->QueryField(i,9));
 			if (tmp>=MAX_STATS) {
-			  printMessage("Actor","Invalid stat value in featreq.2da",YELLOW);
+				printMessage("Actor","Invalid stat value in featreq.2da",YELLOW);
 			}
 			featstats[i] = (ieByte) tmp;
 		}
@@ -2609,8 +2609,35 @@ void Actor::PerformAttack(ieDword gameTime)
 static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
 	DAMAGE_CRUSHING, DAMAGE_SLASHING, DAMAGE_MISSILE, DAMAGE_STUNNING};
 
+static EffectRef fx_stoneskin_ref={"StoneSkinModifier",NULL,-1};
+static EffectRef fx_stoneskin2_ref={"StoneSkin2Modifier",NULL,-1};
+static EffectRef fx_mirrorimage_ref={"MirrorImageModifier",NULL,-1};
+
 void Actor::DealDamage(Actor *target, int damage, int damagetype, bool critical)
 {
+	int stoneskins = target->Modified[IE_STONESKINS];
+	if (stoneskins) {
+		target->fxqueue.DecreaseParam1OfEffect(fx_stoneskin_ref, 1);
+		target->Modified[IE_STONESKINS]--;
+		return;
+	}
+
+	stoneskins = target->Modified[IE_STONESKINSGOLEM];
+	if (stoneskins) {
+		target->fxqueue.DecreaseParam1OfEffect(fx_stoneskin2_ref, 1);
+		target->Modified[IE_STONESKINSGOLEM]--;
+		return;
+	}
+
+	int mirrorimages = target->Modified[IE_MIRRORIMAGES];
+	if (mirrorimages) {
+		if (core->Roll(1,mirrorimages+1,0)!=1) {
+			target->fxqueue.DecreaseParam1OfEffect(fx_mirrorimage_ref, 1);
+			target->Modified[IE_MIRRORIMAGES]--;
+			return;
+		}
+	}
+
 	if (damage<0) damage = 0;
 	if (critical) {
 		//a critical surely raises the morale?

@@ -534,3 +534,8 @@ InfoPoint* TileMap::GetInfoPoint(unsigned int idx)
 	}
 	return infoPoints[idx];
 }
+
+Point TileMap::GetMapSize()
+{
+	return Point(XCellCount*64, YCellCount*64);
+}

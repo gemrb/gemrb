@@ -72,6 +72,7 @@ public:
 		x=0;
 		y=0;
 	}
+	bool PointInside(Point &p);
 
 	ieDword asDword() const; // store coordinates in uint32 ((y << 16) | x)
 	void fromDword(ieDword val); // extract coordinates from uint32

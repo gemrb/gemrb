@@ -5691,12 +5691,12 @@ void GameScript::ClickLButtonObject(Scriptable* Sender, Action* parameters)
 	if (!tar) {
 		return;
 	}
-	ClickCore(tar->Pos, GEM_MB_ACTION, parameters->int0Parameter);
+	ClickCore(Sender, tar->Pos, GEM_MB_ACTION, parameters->int0Parameter);
 }
 
-void GameScript::ClickLButtonPoint(Scriptable* /*Sender*/, Action* parameters)
+void GameScript::ClickLButtonPoint(Scriptable* Sender, Action* parameters)
 {
-	ClickCore(parameters->pointParameter, GEM_MB_ACTION, parameters->int0Parameter);
+	ClickCore(Sender, parameters->pointParameter, GEM_MB_ACTION, parameters->int0Parameter);
 }
 
 void GameScript::ClickRButtonObject(Scriptable* Sender, Action* parameters)
@@ -5705,12 +5705,12 @@ void GameScript::ClickRButtonObject(Scriptable* Sender, Action* parameters)
 	if (!tar) {
 		return;
 	}
-	ClickCore(tar->Pos, GEM_MB_MENU, parameters->int0Parameter);
+	ClickCore(Sender, tar->Pos, GEM_MB_MENU, parameters->int0Parameter);
 }
 
-void GameScript::ClickRButtonPoint(Scriptable* /*Sender*/, Action* parameters)
+void GameScript::ClickRButtonPoint(Scriptable* Sender, Action* parameters)
 {
-	ClickCore(parameters->pointParameter, GEM_MB_MENU, parameters->int0Parameter);
+	ClickCore(Sender, parameters->pointParameter, GEM_MB_MENU, parameters->int0Parameter);
 }
 
 void GameScript::DoubleClickLButtonObject(Scriptable* Sender, Action* parameters)
@@ -5719,12 +5719,12 @@ void GameScript::DoubleClickLButtonObject(Scriptable* Sender, Action* parameters
 	if (!tar) {
 		return;
 	}
-	ClickCore(tar->Pos, GEM_MB_ACTION|GEM_MB_DOUBLECLICK, parameters->int0Parameter);
+	ClickCore(Sender, tar->Pos, GEM_MB_ACTION|GEM_MB_DOUBLECLICK, parameters->int0Parameter);
 }
 
-void GameScript::DoubleClickLButtonPoint(Scriptable* /*Sender*/, Action* parameters)
+void GameScript::DoubleClickLButtonPoint(Scriptable* Sender, Action* parameters)
 {
-	ClickCore(parameters->pointParameter, GEM_MB_ACTION|GEM_MB_DOUBLECLICK, parameters->int0Parameter);
+	ClickCore(Sender, parameters->pointParameter, GEM_MB_ACTION|GEM_MB_DOUBLECLICK, parameters->int0Parameter);
 }
 
 void GameScript::DoubleClickRButtonObject(Scriptable* Sender, Action* parameters)
@@ -5733,12 +5733,12 @@ void GameScript::DoubleClickRButtonObject(Scriptable* Sender, Action* parameters
 	if (!tar) {
 		return;
 	}
-	ClickCore(tar->Pos, GEM_MB_MENU|GEM_MB_DOUBLECLICK, parameters->int0Parameter);
+	ClickCore(Sender, tar->Pos, GEM_MB_MENU|GEM_MB_DOUBLECLICK, parameters->int0Parameter);
 }
 
-void GameScript::DoubleClickRButtonPoint(Scriptable* /*Sender*/, Action* parameters)
+void GameScript::DoubleClickRButtonPoint(Scriptable* Sender, Action* parameters)
 {
-	ClickCore(parameters->pointParameter, GEM_MB_MENU|GEM_MB_DOUBLECLICK, parameters->int0Parameter);
+	ClickCore(Sender, parameters->pointParameter, GEM_MB_MENU|GEM_MB_DOUBLECLICK, parameters->int0Parameter);
 }
 
 //this is a gemrb extension for scriptable tracks

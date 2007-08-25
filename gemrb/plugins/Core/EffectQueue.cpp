@@ -694,11 +694,19 @@ static int check_type(Actor* actor, Effect* fx)
 	}
 
 	//spelltrap (absorb)
+	//FIXME:
+	//if the spelltrap effect already absorbed enough levels
+	//but still didn't get removed, it will absorb levels it shouldn't
+	//it will also absorb multiple spells in a single round
 	efx=actor->fxqueue.HasEffectWithParamPair(fx_spelltrap, 0, fx->Power);
 	if (efx) {
 		//storing the absorbed spell level
 		efx->Parameter3+=fx->Power;
-		efx->Parameter1--;
+		//instead of a single effect, they had to create an effect for each level
+		//HOW DAMN LAME
+		//if decrease needs the spell level, use fx->Power here
+		actor->fxqueue.DecreaseParam1OfEffect(fx_spelltrap, 1);
+		//efx->Parameter1--;
 		return 0;
 	}
 
@@ -1232,6 +1240,30 @@ Effect *EffectQueue::HasEffectWithParamPair(EffectRef &effect_reference, ieDword
 	}
 	return HasOpcodeWithParamPair(effect_reference.EffText, param1, param2);
 }
+
+//this could be used for stoneskins and mirror images as well
+void EffectQueue::DecreaseParam1OfEffect(ieDword opcode, ieDword amount)
+{
+	std::list< Effect* >::const_iterator f;
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
+		MATCH_OPCODE();
+		MATCH_LIVE_FX();
+		ieDword value = (*f)->Parameter1;
+		if (value>amount) value-=amount;
+		else value = 0;
+		(*f)->Parameter1=value;
+	}
+}
+
+void EffectQueue::DecreaseParam1OfEffect(EffectRef &effect_reference, ieDword amount)
+{
+	ResolveEffectRef(effect_reference);
+	if (effect_reference.EffText<0) {
+		return;
+	}
+	DecreaseParam1OfEffect(effect_reference.EffText, amount);
+}
+
 
 //this function does IDS targeting for effects (extra damage/thac0 against creature)
 static const int ids_stats[7]={IE_EA, IE_GENERAL, IE_RACE, IE_CLASS, IE_SPECIFIC, IE_SEX, IE_ALIGNMENT};

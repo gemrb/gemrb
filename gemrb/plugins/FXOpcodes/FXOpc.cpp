@@ -619,6 +619,7 @@ static EffectRef effectnames[] = {
 	{ "Protection:SecondaryType",fx_generic_effect,-1},//overlay?
 	{ "Protection:SecondaryTypeDec",fx_generic_decrement_effect,-1},//overlay?
 	{ "Protection:Spell",fx_resist_spell,-1},//overlay?
+	{ "Protection:SpellDec",fx_generic_effect,-1},//overlay?
 	{ "Protection:SpellLevel",fx_generic_effect,-1},//overlay?
 	{ "Protection:SpellLevelDec",fx_generic_decrement_effect,-1},//overlay?
 	{ "Protection:String", fx_generic_effect, -1 },
@@ -3768,7 +3769,9 @@ int fx_power_word_kill (Actor* Owner, Actor* target, Effect* fx)
 	}
 	//normally this would work only with hitpoints
 	//but why not add some extra features
-	if (target->GetStat (fx->Parameter2) < limit) {
+	ieDword stat = target->GetStat (fx->Parameter2&0xffff);
+
+	if (stat < limit) {
 		target->Die( Owner );
 	}
 	return FX_NOT_APPLIED;
@@ -3778,17 +3781,26 @@ int fx_power_word_kill (Actor* Owner, Actor* target, Effect* fx)
 int fx_power_word_stun (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_power_word_stun (%2d): HP: %d Stat: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	ieDword limit = 60;
+	ieDword limit = 90;
 
 	if (fx->Parameter1) {
 		limit = fx->Parameter1;
 	}
 	//normally this would work only with hitpoints
 	//but why not add some extra features
-	if (target->GetStat (fx->Parameter2) > limit) {
+	ieDword stat = target->GetStat (fx->Parameter2&0xffff);
+	ieDword x = fx->Parameter2>>16; //dice sides
+
+	if (stat > limit) {
 		return FX_NOT_APPLIED;
 	}
-	//hack duration into shape
+	//recalculate delay
+	stat = (stat * 3 + limit - 1) / limit;
+	//delay will be calculated as 1dx/2dx/3dx
+	//depending on the current hitpoints (or the stat in param2)
+	stat = core->Roll(stat,x?x:4,0) * 15;
+	fx->Duration = core->GetGame()->Ticks+stat;
+	fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
 	fx->Opcode = EffectQueue::ResolveEffect(fx_set_stun_state_ref);
 	return fx_set_stun_state(Owner,target,fx);
 }
@@ -3866,12 +3878,14 @@ int fx_play_visual_effect (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_leveldrain_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_leveldrain_modifier (%2d): Mod: %d\n", fx->Opcode, fx->Parameter1 );
-	STAT_SET(IE_LEVELDRAIN, fx->Parameter1);
+
+	STAT_ADD(IE_LEVELDRAIN, fx->Parameter1);
+	STAT_ADD(IE_MAXHITPOINTS, -fx->Parameter1*4);
+	STAT_ADD(IE_HITPOINTS, -fx->Parameter1*4);
 	return FX_APPLIED;
 }
 
 //d9 PowerWordSleep
-
 static EffectRef fx_sleep_ref={"State:Sleep",NULL,-1};
 
 int fx_power_word_sleep (Actor* Owner, Actor* target, Effect* fx)
@@ -3883,10 +3897,17 @@ int fx_power_word_sleep (Actor* Owner, Actor* target, Effect* fx)
 		limit = fx->Parameter1;
 	}
 
-	if (target->GetStat(fx->Parameter2)>limit) {
+	ieDword stat = target->GetStat (fx->Parameter2&0xffff);
+	ieDword x = fx->Parameter2>>16; //rounds
+	if (!x) x = 5;
+
+	if (stat>limit) {
 		return FX_NOT_APPLIED;
 	}
 	//translate this effect to a normal sleep effect
+	//recalculate delay
+	fx->Duration = core->GetGame()->Ticks+x*15;
+	fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
 	fx->Opcode = EffectQueue::ResolveEffect(fx_sleep_ref);
 	fx->Parameter2=0;
 	return fx_set_unconscious_state(Owner,target,fx);
@@ -3896,6 +3917,10 @@ int fx_power_word_sleep (Actor* Owner, Actor* target, Effect* fx)
 int fx_stoneskin_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_stoneskin_modifier (%2d): Mod: %d\n", fx->Opcode, fx->Parameter1 );
+	if (!fx->Parameter1) {
+		return FX_NOT_APPLIED;
+	}
+
 	STAT_SET(IE_STONESKINS, fx->Parameter1);
 	SetGradient(target, 14);
 	return FX_APPLIED;
@@ -4902,7 +4927,10 @@ int fx_immunity_sequester (Actor* /*Owner*/, Actor* target, Effect* fx)
 //0x13a StoneSkin2Modifier
 int fx_golem_stoneskin_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_golem_stoneskin_modifier (%2d): Mod: %d\n", fx->Opcode, fx->Parameter2 );
+	if (0) printf( "fx_golem_stoneskin_modifier (%2d): Mod: %d\n", fx->Opcode, fx->Parameter1 );
+	if (!fx->Parameter1) {
+		return FX_NOT_APPLIED;
+	}
 	STAT_SET(IE_STONESKINSGOLEM, fx->Parameter1);
 	SetGradient(target, 14);
 	return FX_APPLIED;

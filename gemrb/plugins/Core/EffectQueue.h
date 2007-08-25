@@ -222,6 +222,7 @@ public:
 	Effect *HasEffectWithParam(EffectRef &effect_reference, ieDword param2);
 	Effect *HasEffectWithParamPair(EffectRef &effect_reference, ieDword param1, ieDword param2);
 	Effect *HasEffectWithResource(EffectRef &effect_reference, const ieResRef resource);
+	void DecreaseParam1OfEffect(EffectRef &effect_reference, ieDword amount);
 	bool HasAnyDispellableEffect() const;
 	//transforming timing modes
 	static void TransformToDelay(ieDword &TimingMode);
@@ -248,6 +249,7 @@ private:
 	Effect *HasOpcodeWithParam(ieDword opcode, ieDword param2) const;
 	Effect *HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDword param2) const;
 	Effect *HasOpcodeWithResource(ieDword opcode, const ieResRef resource) const;
+	void DecreaseParam1OfEffect(ieDword opcode, ieDword amount);
 	int BonusAgainstCreature(ieDword opcode, Actor *actor) const;
 };
 

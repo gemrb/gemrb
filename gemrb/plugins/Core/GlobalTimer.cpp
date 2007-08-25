@@ -71,6 +71,11 @@ void GlobalTimer::Freeze()
 	game->RealTime+=advance;
 }
 
+bool GlobalTimer::ViewportIsMoving()
+{
+	return (goal.x!=currentVP.x) || (goal.y!=currentVP.y);
+}
+
 void GlobalTimer::SetMoveViewPort(ieDword x, ieDword y, int spd, bool center)
 {
 	speed=spd;
@@ -83,23 +88,9 @@ void GlobalTimer::SetMoveViewPort(ieDword x, ieDword y, int spd, bool center)
 	goal.y=(short) y;
 }
 
-void GlobalTimer::Update()
+void GlobalTimer::DoStep(int count)
 {
-	Map *map;
-	Game *game;
-	GameControl* gc;
-	unsigned long thisTime;
-	unsigned long advance;
 	Video *video = core->GetVideoDriver();
-
-	UpdateAnimations();
-
-	GetTime( thisTime );
-	advance = thisTime - startTime;
-	if ( advance < interval) {
-		return;
-	}
-	ieDword count = advance/interval;
 
 	int x = currentVP.x;
 	int y = currentVP.y;
@@ -126,6 +117,7 @@ void GlobalTimer::Update()
 		currentVP.x=x;
 		currentVP.y=y;
 	}
+
 	if (shakeCounter) {
 		shakeCounter-=count;
 		if (shakeCounter<0) {
@@ -137,6 +129,27 @@ void GlobalTimer::Update()
 		}
 	}
 	video->MoveViewportTo(x,y);
+}
+
+void GlobalTimer::Update()
+{
+	Map *map;
+	Game *game;
+	GameControl* gc;
+	unsigned long thisTime;
+	unsigned long advance;
+
+	Video *video = core->GetVideoDriver();
+	UpdateAnimations();
+
+	GetTime( thisTime );
+	advance = thisTime - startTime;
+	if ( advance < interval) {
+		return;
+	}
+	ieDword count = advance/interval;
+	DoStep(count);
+
 	if (fadeToCounter) {
 		fadeToCounter-=count;
 		if (fadeToCounter<0) {

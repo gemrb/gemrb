@@ -234,13 +234,37 @@ bool StoreHasItemCore(const ieResRef storename, const ieResRef itemname)
 	return ret;
 }
 
-void ClickCore(Point &point, int type, int speed)
+//don't pass this point by reference, it is subject to change
+void ClickCore(Scriptable *Sender, Point point, int type, int speed)
 {
-	core->timer->SetMoveViewPort( point.x, point.y, speed, true );
+	Map *map = Sender->GetCurrentArea();
+	if (!map) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	Point p=map->TMap->GetMapSize();
+	if (!p.PointInside(point)) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
 	Video *video = core->GetVideoDriver();
+	GlobalTimer *timer = core->timer;
+ 	timer->SetMoveViewPort( point.x, point.y, speed, true );
+	timer->DoStep(0);
+	if (timer->ViewportIsMoving()) {
+		Sender->AddActionInFront( Sender->CurrentAction );
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	
 	video->ConvertToScreen(point.x, point.y);
+	GameControl *win = core->GetGameControl();
+
+	point.x+=win->XPos;
+	point.y+=win->YPos;
 	video->MoveMouse(point.x, point.y);
 	video->ClickMouse(type);
+	Sender->ReleaseCurrentAction();
 }
 
 void TransformItemCore(Actor *actor, Action *parameters, bool onlyone)

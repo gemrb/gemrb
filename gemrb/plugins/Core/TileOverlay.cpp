@@ -49,12 +49,9 @@ void TileOverlay::AddTile(Tile* tile)
 	tiles[count++] = tile;
 }
 
-void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays)
+void TileOverlay::BumpViewport(Region &viewport, Region &vp)
 {
-	// if the video's viewport is partially outside of the map, bump it back
 	bool bump = false;
-	Video* vid = core->GetVideoDriver();
-	Region vp = vid->GetViewport();
 	vp.w = viewport.w;
 	vp.h = viewport.h;
 	if (( vp.x + vp.w ) > w * 64) {
@@ -76,7 +73,15 @@ void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays)
 	if( bump ) {
 		core->timer->SetMoveViewPort( vp.x, vp.y, 0, false );
 	}
+}
 
+void TileOverlay::Draw(Region viewport, std::vector< TileOverlay*> &overlays)
+{
+	Video* vid = core->GetVideoDriver();
+	Region vp = vid->GetViewport();
+
+	// if the video's viewport is partially outside of the map, bump it back
+	BumpViewport(viewport, vp);
 	// determine which tiles are visible
 	int sx = vp.x / 64;
 	int sy = vp.y / 64;

@@ -1512,22 +1512,35 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 		return; //don't accept keys in dialog
 	}
 	Region Viewport = core->GetVideoDriver()->GetViewport();
+	Point mapsize = core->GetGame()->GetCurrentArea()->TMap->GetMapSize();
 	switch (Key) {
 		case GEM_LEFT:
 			if (Viewport.x > 63)
 				Viewport.x -= 64;
+			else
+				Viewport.x = 0;
 			break;
 		case GEM_UP:
 			if (Viewport.y > 63)
 				Viewport.y -= 64;
+			else
+				Viewport.y = 0;
 			break;
 		case GEM_DOWN:
-			if (Viewport.y < 32000)
+			if (Viewport.y + Viewport.h + 64 < mapsize.y)
 				Viewport.y += 64;
+			else {
+				Viewport.y = mapsize.y - Viewport.h;
+				if (Viewport.y<0) Viewport.y=0;
+			}
 			break;
 		case GEM_RIGHT:
-			if (Viewport.x < 32000)
+			if (Viewport.x + Viewport.w + 64 < mapsize.x)
 				Viewport.x += 64;
+			else {
+				Viewport.x = mapsize.x - Viewport.w;
+				if (Viewport.x<0) Viewport.x=0;
+			}
 			break;
 		case GEM_ALT:
 			DebugFlags |= DEBUG_SHOW_CONTAINERS;

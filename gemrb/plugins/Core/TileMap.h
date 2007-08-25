@@ -88,6 +88,7 @@ public:
 	void AddRainOverlay(TileOverlay* overlay);
 	void DrawOverlays(Region screen, int rain);
 	void DrawFogOfWar(ieByte* explored_mask, ieByte* visible_mask, Region viewport);
+	Point GetMapSize();
 public:
 	int XCellCount, YCellCount;
 };

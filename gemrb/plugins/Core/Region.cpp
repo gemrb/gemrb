@@ -89,6 +89,18 @@ bool Point::isempty() const
 	}
 	return false;
 }
+
+bool Point::PointInside(Point &p)
+{
+	if (( p.x < 0 ) || ( p.x > x )) {
+		return false;
+	}
+	if (( p.y < 0 ) || ( p.y > y )) {
+		return false;
+	}
+	return true;
+}
+
 /*************** region ****************************/
 Region::Region(void)
 {
