@@ -588,7 +588,8 @@ int fx_draw_upon_holy_might (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-//0xda IronSkins (iwd2)
+//0xda IronSkins (iwd2) 
+//This is about damage reduction, not full stoneskin like in bg2
 int fx_ironskins (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	//todo: calculate buffered damage in param3 on first run
@@ -1259,8 +1260,10 @@ int fx_static_charge(Actor* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
-	if (!fx->Parameter1) {
-		return FX_NOT_APPLIED;
+	int ret = FX_APPLIED;
+
+	if (fx->Parameter1<=1) {
+		ret = FX_NOT_APPLIED;
 	}
 
 	//timing
@@ -1270,13 +1273,13 @@ int fx_static_charge(Actor* Owner, Actor* target, Effect* fx)
 
 	//iwd2 style
 	if (fx->Resource[0]) {
-		core->ApplySpell(fx->Resource, Owner, target, fx->Power);
-		return FX_APPLIED;
+		core->ApplySpell(fx->Resource, target, Owner, fx->Power);
+		return ret;
 	}
 
 	//how style
 	target->Damage(DICE_ROLL(0), DAMAGE_ELECTRICITY, Owner);
-	return FX_APPLIED;
+	return ret;
 }
 
 //0x109 CloakOfFear (HoW/IWD2)
@@ -1304,7 +1307,7 @@ int fx_cloak_of_fear(Actor* Owner, Actor* target, Effect* fx)
 
 	//iwd2 style
 	if (fx->Resource[0]) {
-		core->ApplySpell(fx->Resource, Owner, target, fx->Power);
+		core->ApplySpell(fx->Resource, target, Owner, fx->Power);
 		return FX_APPLIED;
 	}
 
@@ -1550,6 +1553,7 @@ int fx_animal_rage (Actor* /*Owner*/, Actor* target, Effect* fx)
 		} else {
 			Enemy->objectParameter->objectFilters[0]=EA_ALLY;
 		}
+		//see the nearest enemy
 		if (SeeCore(target, Enemy, false)) {
 			target->SetTarget(target->GetCurrentArea()->GetActorByGlobalID(target->LastSeen));
 			//this is highly unsure
@@ -2623,11 +2627,93 @@ int fx_alicorn_lance (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //449 CallLightning
-int fx_call_lightning (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+Actor *GetRandomEnemySeen(Map *map, Actor *origin)
+{
+	int type = 2; //neutral, has no enemies
+	if (origin->GetStat(IE_EA) <= EA_GOODCUTOFF) {
+		type = 1; //PC
+	}
+	if (origin->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+		type = 0;
+	}
+	if (type==2) {
+		return NULL; //no enemies
+	}
+	int i = map->GetActorCount(true);
+	//see a random enemy
+	int pos = core->Roll(1,i,-1);
+	i -= pos;
+	while(i--) {
+		Actor *ac = map->GetActor(i,true);
+		if (!CanSee(origin, ac, true, GA_NO_DEAD|GA_NO_HIDDEN)) continue;
+		if (type) { //origin is PC
+			if (ac->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+				return ac;
+			}
+		}
+		else {
+			if (ac->GetStat(IE_EA) <= EA_GOODCUTOFF) {
+				return ac;
+			}
+		}
+	}
+
+	i=map->GetActorCount(true);
+	while(i--!=pos) {
+		Actor *ac = map->GetActor(i,true);
+		if (!CanSee(origin, ac, true, GA_NO_DEAD|GA_NO_HIDDEN)) continue;
+		if (type) { //origin is PC
+			if (ac->GetStat(IE_EA) >= EA_EVILCUTOFF) {
+				return ac;
+			}
+		}
+		else {
+			if (ac->GetStat(IE_EA) <= EA_GOODCUTOFF) {
+				return ac;
+			}
+		}
+	}
+
+	return NULL;
+}
+
+int fx_call_lightning (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_call_lightning (%2d)\n", fx->Opcode);
-	//TODO: implement
-	return FX_NOT_APPLIED;
+
+	if (STATE_GET(STATE_DEAD)) {
+		return FX_NOT_APPLIED;
+	}
+	int ret = FX_APPLIED;
+
+	Map *map = target->GetCurrentArea();
+	if (!map) return ret;
+
+	if (fx->Parameter1<=1) {
+		ret = FX_NOT_APPLIED;
+	}
+
+	//timing
+	fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
+	fx->Duration=core->GetGame()->GameTime+70*15;
+	fx->Parameter1--;
+
+	//calculate victim (an opponent of target)
+	Actor *victim = GetRandomEnemySeen(map, target);
+	if (!victim) {
+		core->DisplayConstantStringName(STR_LIGHTNING_DISS, 0xf0f0f0, target);
+		return ret;
+	}
+
+	//iwd2 style
+	if (fx->Resource[0]) {
+		core->ApplySpell(fx->Resource, victim, target, fx->Power);
+		return ret;
+	}
+
+	//how style
+	victim->Damage(DICE_ROLL(0), DAMAGE_ELECTRICITY, target);
+	return ret;
 }
 
 //450 GlobeInvulnerability

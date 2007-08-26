@@ -49,7 +49,6 @@ void TransformItemCore(Actor *actor, Action *parameters, bool onlyone);
 void CreateVisualEffectCore(Actor *target, const char *effect, int iterations);
 void CreateVisualEffectCore(Scriptable *Sender, Point &position, const char *effect, int iterations);
 void GetPositionFromScriptable(Scriptable* scr, Point &position, bool trap);
-int CanSee(Scriptable* Sender, Scriptable* target, bool range, int nodead);
 void BeginDialog(Scriptable* Sender, Action* parameters, int flags);
 void ChangeAnimationCore(Actor *src, const char *resref, bool effect);
 void PolymorphCopyCore(Actor *src, Actor *tar, bool base);
@@ -102,6 +101,7 @@ int GetObjectCount(Scriptable* Sender, Object* oC);
 int GetObjectLevelCount(Scriptable* Sender, Object* oC);
 void SetVariable(Scriptable* Sender, const char* VarName, ieDword value);
 //these are used from other plugins
+GEM_EXPORT int CanSee(Scriptable* Sender, Scriptable* target, bool range, int nodead);
 GEM_EXPORT int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos);
 GEM_EXPORT int DiffCore(ieDword a, ieDword b, int diffmode);
 GEM_EXPORT void DisplayStringCore(Scriptable* Sender, int Strref, int flags);

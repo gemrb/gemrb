@@ -680,9 +680,10 @@ static EffectRef effectnames[] = {
 	{ "State:Hasted", fx_set_hasted_state, -1 },
 	{ "State:Hold", fx_hold_creature, -1 }, //175
 	{ "State:Hold2", fx_hold_creature, -1 },//185
-	{ "State:Hold3", fx_hold_creature_no_icon, -1 }, //109
-	{ "State:Hold4", fx_hold_creature_no_icon, -1 }, //0xfb (iwd/iwd2)
-	{ "HoldUndead", fx_hold_creature_no_icon, -1 }, //0x1a8 (iwd2)
+	{ "State:Hold3", fx_hold_creature, -1 },//185
+	{ "State:HoldNoIcon", fx_hold_creature_no_icon, -1 }, //109
+	{ "State:HoldNoIcon2", fx_hold_creature_no_icon, -1 }, //0xfb (iwd/iwd2)
+	{ "State:HoldNoIcon3", fx_hold_creature_no_icon, -1 }, //0x1a8 (iwd2)
 	{ "State:Imprisonment", fx_imprisonment, -1 },
 	{ "State:Infravision", fx_set_infravision_state, -1 },
 	{ "State:Invisible", fx_set_invisible_state, -1 }, //both invis or improved invis
@@ -2654,7 +2655,15 @@ static EffectRef fx_mirror_image_modifier_ref={"MirrorImageModifier",NULL,-1};
 int fx_mirror_image (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_mirror_image (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	ieDword images = core->Roll(1, fx->Parameter1, 0);
+	ieDword images;
+
+	if (fx->Parameter2) {
+		images = 1;         //reflection
+	}
+	else {
+		images = core->Roll(1, fx->Parameter1, 0); //mirror image
+	}
+
 	Effect *fx2 = target->fxqueue.HasEffect(fx_mirror_image_modifier_ref);
 	if (fx2) {
 		//update old effect with our numbers if our numbers are more
@@ -2668,6 +2677,7 @@ int fx_mirror_image (Actor* Owner, Actor* target, Effect* fx)
 	}
 	fx->Opcode = EffectQueue::ResolveEffect(fx_mirror_image_modifier_ref);
 	fx->Parameter1=images;
+	//parameter2 could be 0 or 1 (mirror image or reflection)
 	//execute the translated effect
 	return fx_mirror_image_modifier(Owner, target, fx);
 }
@@ -3256,6 +3266,8 @@ int fx_set_shieldglobe_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_web_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_web_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	target->SetSpellState(SS_WEB);
+	//attack penalty in IWD2
 	STAT_SET_PCF( IE_WEB, 1);
 	STAT_SET(IE_MOVEMENTRATE, 0); //
 	return FX_APPLIED;
@@ -3265,8 +3277,10 @@ int fx_set_web_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_grease_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_grease_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	target->SetSpellState(SS_GREASE);
 	STAT_SET_PCF( IE_GREASE, 1);
-	STAT_SET(IE_MOVEMENTRATE, 3); //
+	//apparently the movement rate is set by separate opcodes in all engines
+	//STAT_SET(IE_MOVEMENTRATE, 3); //iwd2 doesn't have this?
 	return FX_APPLIED;
 }
 
@@ -3281,6 +3295,11 @@ int fx_mirror_image_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 	STATE_SET( STATE_MIRROR );
+	if (fx->Parameter2) {
+		target->SetSpellState(SS_REFLECTION);
+	} else {
+		target->SetSpellState(SS_MIRRORIMAGE);
+	}
 	//actually, there is no such stat in the original IE
 	STAT_SET( IE_MIRRORIMAGES, fx->Parameter1);
 	return FX_APPLIED;
@@ -3441,23 +3460,24 @@ int fx_playsound (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 //0x6d State:Hold3
 //0xfb State:Hold4
-//0x1a8 HoldUndead (iwd2)
 int fx_hold_creature_no_icon (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_hold_creature_no_icon (%2d): Value: %d, IDS: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	if ( STATE_GET(STATE_DEAD) ) {
 		return FX_NOT_APPLIED;
 	}
- 	if (EffectQueue::match_ids( target, fx->Parameter1, fx->Parameter2) ) {
-		STAT_SET( IE_HELD, 1);
-		return FX_APPLIED;
+ 	if (!EffectQueue::match_ids( target, fx->Parameter1, fx->Parameter2) ) {
+		//if the ids don't match, the effect doesn't stick
+		return FX_NOT_APPLIED;
 	}
-	//if the ids don't match, the effect doesn't stick
-	return FX_NOT_APPLIED;
+	target->SetSpellState(SS_HELD);
+	STAT_SET( IE_HELD, 1);
+	return FX_APPLIED;
 }
 
 //0xaf State:Hold
 //0xb9 State:Hold2
+//(0x6d/0x1a8 for iwd2)
 int fx_hold_creature (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_hold_creature (%2d): Value: %d, IDS: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -3465,13 +3485,14 @@ int fx_hold_creature (Actor* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
- 	if (EffectQueue::match_ids( target, fx->Parameter1, fx->Parameter2) ) {
-		STAT_SET( IE_HELD, 1);
-		target->AddPortraitIcon(PI_HELD);
-		return FX_APPLIED;
+ 	if (!EffectQueue::match_ids( target, fx->Parameter1, fx->Parameter2) ) {
+		//if the ids don't match, the effect doesn't stick
+		return FX_NOT_APPLIED;
 	}
-	//if the ids don't match, the effect doesn't stick
-	return FX_NOT_APPLIED;
+	target->SetSpellState(SS_HELD);
+	STAT_SET( IE_HELD, 1);
+	target->AddPortraitIcon(PI_HELD);
+	return FX_APPLIED;
 }
 // b0 see: fx_movement_modifier
 
@@ -3920,11 +3941,19 @@ int fx_stoneskin_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (!fx->Parameter1) {
 		return FX_NOT_APPLIED;
 	}
-
+	//this is the bg2 style stoneskin, not normally using spell states
+	//but this way we can support hybrid games
+	if (fx->Parameter2) {
+		target->SetSpellState(SS_IRONSKIN);
+		//gradient for iron skins?
+	} else {
+		target->SetSpellState(SS_STONESKIN);
+		SetGradient(target, 14);
+	}
 	STAT_SET(IE_STONESKINS, fx->Parameter1);
-	SetGradient(target, 14);
 	return FX_APPLIED;
 }
+
 //0xDB ac vs creature type (general effect)
 //0xDC DispelSchool
 int fx_dispel_school (Actor* /*Owner*/, Actor* target, Effect* fx)
@@ -4712,8 +4741,6 @@ int fx_disable_overlay_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 //0x124 Protection:Backstab (bg2)
 //0x11f Protection:Backstab (how, iwd2)
 //3 different games, 3 different methods of flagging this
-#define SS_NOBACKSTAB   40
-
 int fx_no_backstab_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_no_backstab_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );

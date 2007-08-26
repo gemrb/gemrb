@@ -603,7 +603,7 @@ static const ActionLink actionnames[] = {
 	{"incrementkillstat", GameScript::IncrementKillStat, 0},
 	{"incrementproficiency", GameScript::IncrementProficiency, 0},
 	{"interact", GameScript::Interact, 0},
-	{"joinparty", GameScript::JoinParty, 0},
+	{"joinparty", GameScript::JoinParty, 0}, //this action appears to be blocking in bg2
 	{"journalentrydone", GameScript::SetQuestDone, 0},
 	{"jumptoobject", GameScript::JumpToObject, 0},
 	{"jumptopoint", GameScript::JumpToPoint, 0},
