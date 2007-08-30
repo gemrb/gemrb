@@ -7981,6 +7981,36 @@ static PyObject* GemRB_StealFailed(PyObject * /*self*/, PyObject* /*args*/)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_DisplayString__doc,
+"DisplayString(strref, color[,actor])\n\n"
+"Displays string on the MessageWindow using methods supplied by the engine core. "
+"The optional actor is the party ID of the character whose name will be displayed.\n\n");
+
+static PyObject* GemRB_DisplayString(PyObject * /*self*/, PyObject* args)
+{
+	int strref, color;
+	int PartyID = 0;
+
+	if (!PyArg_ParseTuple( args, "ii|i", &strref, &color, &PartyID)) {
+		return AttributeError( GemRB_DisplayString__doc );
+	}
+	if (PartyID) {
+		Game *game = core->GetGame();
+		if (!game) {
+			return RuntimeError( "No game loaded!" );
+		}
+		Actor *actor = game->FindPC(PartyID);
+		if (!actor) {
+			return RuntimeError( "Actor not found" );
+		}
+		core->DisplayStringName(strref, (unsigned int) color, actor, IE_STR_SOUND);
+	} else {
+		core->DisplayString(strref, (unsigned int) color, IE_STR_SOUND);
+	}
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 static PyMethodDef GemRBMethods[] = {
 	METHOD(SetInfoTextColor, METH_VARARGS),
 	METHOD(HideGUI, METH_NOARGS),
@@ -8206,6 +8236,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(HasSpecialSpell, METH_VARARGS),
 	METHOD(ApplyEffect, METH_VARARGS),
 	METHOD(StealFailed, METH_NOARGS),
+	METHOD(DisplayString, METH_NOARGS),
 	// terminating entry
 	{NULL, NULL, 0, NULL}
 };

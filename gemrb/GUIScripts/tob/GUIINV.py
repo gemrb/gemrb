@@ -517,12 +517,20 @@ def OnAutoEquip ():
 def OnDragItem ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
+
 	if not GemRB.IsDraggingItem ():
 		slot_item = GemRB.GetSlotItem (pc, slot)
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 0)
 	else:
 		SlotType = GemRB.GetSlotType (slot, pc)
+		#special monk check
+		if GemRB.GetPlayerStat (pc, IE_CLASS)==0x14:
+			#offhand slot mark
+			if SlotType["Effects"]==TYPE_OFFHAND:
+				SlotType["ResRef"]=""
+				GemRB.DisplayString (61355, 0xffffff)
+
 		if SlotType["ResRef"]!="":
 			GemRB.DropDraggedItem (pc, slot)
 		if GemRB.IsDraggingItem ():
