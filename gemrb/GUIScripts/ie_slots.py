@@ -40,4 +40,12 @@ SLOT_POTION    = 16384
 SLOT_INVENTORY = 32768
 SLOT_ANY       = 32767
 
+TYPE_NORMAL    = 0     #inventory
+TYPE_ARMOR     = 1     #normal armor
+TYPE_FIST      = 2     #fist weapon
+TYPE_MAGIC     = 3     #magic weapon
+TYPE_WEAPON    = 4     #normal weapon
+TYPE_QUIVER    = 5     #projectile slots
+TYPE_OFFHAND   = 6     #offhand (shield/weapon)
+TYPE_HELMET    = 7     #critical hit protection
 # End of file ie_slots.py

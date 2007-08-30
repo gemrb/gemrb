@@ -8236,7 +8236,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(HasSpecialSpell, METH_VARARGS),
 	METHOD(ApplyEffect, METH_VARARGS),
 	METHOD(StealFailed, METH_NOARGS),
-	METHOD(DisplayString, METH_NOARGS),
+	METHOD(DisplayString, METH_VARARGS),
 	// terminating entry
 	{NULL, NULL, 0, NULL}
 };
