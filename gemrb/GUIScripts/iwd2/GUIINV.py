@@ -9,12 +9,12 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 # $Id$
 
@@ -443,7 +443,7 @@ def OnAutoEquip ():
 	GemRB.DropDraggedItem (pc, -1)
 
 	if GemRB.IsDraggingItem ():
-		GemRB.PlaySound("GAM_47")  #failed equip
+		GemRB.PlaySound("GAM_47") #failed equip
 
 	UpdateInventoryWindow ()
 	return
@@ -458,8 +458,6 @@ def OnDragItem ():
 		GemRB.DragItem (pc, slot, item["ItemIcon"], 0, 0)
 	else:
 		GemRB.DropDraggedItem (pc, slot)
-		if GemRB.IsDraggingItem ():
-			GemRB.PlaySound("GAM_47")  #failed equip
 
 	UpdateInventoryWindow ()
 	return
@@ -469,7 +467,7 @@ def OnDropItemToPC ():
 
 	GemRB.DropDraggedItem (pc, -3)
 	if GemRB.IsDraggingItem ():
-		GemRB.PlaySound("GAM_47")  #failed equip
+		GemRB.DisplayString(17999,0xffffff)
 	UpdateInventoryWindow ()
 	return
 
@@ -603,7 +601,7 @@ def OpenGroundItemInfoWindow ():
 		value = 0
 	else:
 		value = 2
-	DisplayItem(slot_item["ItemResRef"], value)  #the ground items are only displayable
+	DisplayItem(slot_item["ItemResRef"], value) #the ground items are only displayable
 	return
 
 

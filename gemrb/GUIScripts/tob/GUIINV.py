@@ -9,12 +9,12 @@
 #
 #This program is distributed in the hope that it will be useful,
 #but WITHOUT ANY WARRANTY; without even the implied warranty of
-#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #GNU General Public License for more details.
 #
 #You should have received a copy of the GNU General Public License
 #along with this program; if not, write to the Free Software
-#Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 #$Id$
 
@@ -52,7 +52,7 @@ def OpenInventoryWindowClick():
 def OpenInventoryWindow ():
 	global InventoryWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow
-	
+
 	if CloseOtherWindow (OpenInventoryWindow):
 		if GemRB.IsDraggingItem ():
 			pc = GemRB.GameGetSelectedPCSingle ()
@@ -167,7 +167,7 @@ def OpenInventoryWindow ():
 			GemRB.SetButtonBorder (Window, Button, 1,2,2,5,5,32,32,255,0,0,0)
 			GemRB.SetButtonBorder (Window, Button, 2,0,0,0,0,255,128,128,64,0,1)
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
-	
+
 	GemRB.SetVar ("TopIndex", 0)
 	SetSelectionChangeHandler (UpdateInventoryWindow)
 	UpdateInventoryWindow ()
@@ -289,7 +289,7 @@ def RefreshInventoryWindow ():
 		item = GemRB.GetItem (slot_item["ItemResRef"])
 		if (item['AnimationType'] != ''):
 			GemRB.SetButtonPLT(Window, Button, "WP" + size + item['AnimationType'] + "INV", Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0, 1)
-		
+
 	#Shield
 	slot_item = GemRB.GetSlotItem (pc, 3)
 	if slot_item:
@@ -367,7 +367,7 @@ def RefreshInventoryWindow ():
 				GemRB.SetTooltip (Window, Button, item["ItemName"])
 				GemRB.EnableButtonBorder (Window, Button, 0, 1)
 				GemRB.EnableButtonBorder (Window, Button, 1, 0)
-	
+
 			else:
 				GemRB.SetTooltip (Window, Button, item["ItemNameIdentified"])
 				GemRB.EnableButtonBorder (Window, Button, 0, 0)
@@ -508,9 +508,6 @@ def OnAutoEquip ():
 	#-1 : drop stuff in equipable slots (but not inventory)
 	GemRB.DropDraggedItem (pc, -1)
 
-	if GemRB.IsDraggingItem ():
-		GemRB.PlaySound ("GAM_47")  #failed equip
-
 	UpdateInventoryWindow ()
 	return
 
@@ -533,8 +530,6 @@ def OnDragItem ():
 
 		if SlotType["ResRef"]!="":
 			GemRB.DropDraggedItem (pc, slot)
-		if GemRB.IsDraggingItem ():
-			GemRB.PlaySound ("GAM_47")  #failed equip
 
 	UpdateInventoryWindow ()
 	return
@@ -545,7 +540,7 @@ def OnDropItemToPC ():
 	#-3 : drop stuff in inventory (but not equippable slots)
 	GemRB.DropDraggedItem (pc, -3)
 	if GemRB.IsDraggingItem ():
-		GemRB.PlaySound ("GAM_47")  #failed equip
+		GemRB.DisplayString (61794,0xfffffff)
 	UpdateInventoryWindow ()
 	return
 
