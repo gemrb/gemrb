@@ -839,7 +839,7 @@ aux_3:
 	return flag;
 }
 
-int Interface::GetItemExcl(const ieResRef itemname)
+int Interface::GetItemExcl(const ieResRef itemname) const
 {
 	ieDword value;
 	
@@ -870,7 +870,7 @@ int Interface::GetItemTooltip(const ieResRef itemname, int header)
 	return ret;
 }
 
-int Interface::GetItemDialStr(const ieResRef itemname)
+int Interface::GetItemDialStr(const ieResRef itemname) const
 {
 	ieDword value;
 	
@@ -881,7 +881,7 @@ int Interface::GetItemDialStr(const ieResRef itemname)
 }
 
 //second value is the item dialog resource returned by this method
-int Interface::GetItemDialRes(const ieResRef itemname, ieResRef retval)
+int Interface::GetItemDialRes(const ieResRef itemname, ieResRef retval) const
 {
 	if (ItemDial2Table && ItemDial2Table->Lookup(itemname, retval, sizeof(ieResRef))) {
 		return 1;
@@ -922,7 +922,7 @@ bool Interface::ReadAreaAliasTable(const ieResRef tablename)
 }
 
 //this isn't const
-int Interface::GetAreaAlias(const ieResRef areaname)
+int Interface::GetAreaAlias(const ieResRef areaname) const
 {
 	ieDword value;
 	
@@ -1630,7 +1630,7 @@ int Interface::Init()
 	return GEM_OK;
 }
 
-bool Interface::IsAvailable(SClass_ID filetype)
+bool Interface::IsAvailable(SClass_ID filetype) const
 {
 	return plugin->IsAvailable( filetype );
 }
@@ -1641,7 +1641,7 @@ WorldMap *Interface::GetWorldMap(const char *map)
 	return worldmap->GetWorldMap(index);
 }
 
-void* Interface::GetInterface(SClass_ID filetype)
+void* Interface::GetInterface(SClass_ID filetype) const
 {
 	if (!plugin) {
 		return NULL;
@@ -1649,7 +1649,7 @@ void* Interface::GetInterface(SClass_ID filetype)
 	return plugin->GetPlugin( filetype );
 }
 
-std::vector<InterfaceElement>* Interface::GetInterfaceVector(SClass_ID filetype)
+std::vector<InterfaceElement>* Interface::GetInterfaceVector(SClass_ID filetype) const
 {
 	if (!plugin) {
 		return NULL;
@@ -1672,7 +1672,7 @@ ResourceMgr* Interface::GetResourceMgr() const
 	return key;
 }
 
-const char* Interface::TypeExt(SClass_ID type)
+const char* Interface::TypeExt(SClass_ID type) const
 {
 	switch (type) {
 		case IE_2DA_CLASS_ID:
@@ -2403,7 +2403,7 @@ void Interface::FreePalette(Palette *&pal, const ieResRef name)
 }
 
 /** No descriptions */
-Color* Interface::GetPalette(int index, int colors, Color *pal)
+Color* Interface::GetPalette(int index, int colors, Color *pal) const
 {
 	//Color* pal = NULL;
 	if (colors == 32) {
@@ -2752,7 +2752,7 @@ void Interface::AddWindow(Window * win)
 }
 
 /** Get a Control on a Window */
-int Interface::GetControl(unsigned short WindowIndex, unsigned long ControlID)
+int Interface::GetControl(unsigned short WindowIndex, unsigned long ControlID) const
 {
 	if (WindowIndex >= windows.size()) {
 		return -1;
@@ -2838,7 +2838,7 @@ void Interface::DisplayTooltip(int x, int y, Control *ctrl)
 	tooltip_ctrl = ctrl;
 }
 
-int Interface::GetVisible(unsigned short WindowIndex)
+int Interface::GetVisible(unsigned short WindowIndex) const
 {
 	if (WindowIndex >= windows.size()) {
 		return -1;
@@ -3099,7 +3099,7 @@ void Interface::DrawTooltip ()
 
 //interface for higher level functions, if the window was
 //marked for deletion it is not returned
-Window* Interface::GetWindow(unsigned short WindowIndex)
+Window* Interface::GetWindow(unsigned short WindowIndex) const
 {
 	if (WindowIndex < windows.size()) {
 		Window *win = windows[WindowIndex];
@@ -3112,7 +3112,7 @@ Window* Interface::GetWindow(unsigned short WindowIndex)
 
 // this function will determine if wnd is a valid window pointer
 // by checking if its WindowID is the same as the reference
-bool Interface::IsValidWindow(unsigned short WindowID, Window *wnd)
+bool Interface::IsValidWindow(unsigned short WindowID, Window *wnd) const
 {
 	size_t WindowIndex = windows.size();
 	while (WindowIndex--) {
@@ -3192,12 +3192,12 @@ void Interface::DrawConsole()
 }
 
 /** Get the Sound Manager */
-SoundMgr* Interface::GetSoundMgr()
+SoundMgr* Interface::GetSoundMgr() const
 {
 	return soundmgr;
 }
 /** Get the Sound Manager */
-SaveGameIterator* Interface::GetSaveGameIterator()
+SaveGameIterator* Interface::GetSaveGameIterator() const
 {
 	return sgiterator;
 }
@@ -3207,17 +3207,17 @@ bool Interface::Quit(void)
 	return video->Quit();
 }
 /** Returns the variables dictionary */
-Variables* Interface::GetDictionary()
+Variables* Interface::GetDictionary() const
 {
 	return vars;
 }
 /** Returns the token dictionary */
-Variables* Interface::GetTokenDictionary()
+Variables* Interface::GetTokenDictionary() const
 {
 	return tokens;
 }
 /** Get the Music Manager */
-MusicMgr* Interface::GetMusicMgr()
+MusicMgr* Interface::GetMusicMgr() const
 {
 	return music;
 }
@@ -3261,7 +3261,7 @@ int Interface::LoadTable(const ieResRef ResRef)
 	return ( int ) tables.size() - 1;
 }
 /** Gets the index of a loaded table, returns -1 on error */
-int Interface::GetTableIndex(const char* ResRef)
+int Interface::GetTableIndex(const char* ResRef) const
 {
 	for (size_t i = 0; i < tables.size(); i++) {
 		if (tables[i].free)
@@ -3272,7 +3272,7 @@ int Interface::GetTableIndex(const char* ResRef)
 	return -1;
 }
 /** Gets a Loaded Table by its index, returns NULL on error */
-TableMgr* Interface::GetTable(unsigned int index)
+TableMgr* Interface::GetTable(unsigned int index) const
 {
 	if (index >= tables.size()) {
 		return NULL;
@@ -3339,7 +3339,7 @@ int Interface::LoadSymbol(const char* ResRef)
 	return ( int ) symbols.size() - 1;
 }
 /** Gets the index of a loaded Symbol Table, returns -1 on error */
-int Interface::GetSymbolIndex(const char* ResRef)
+int Interface::GetSymbolIndex(const char* ResRef) const
 {
 	for (size_t i = 0; i < symbols.size(); i++) {
 		if (symbols[i].free)
@@ -3350,7 +3350,7 @@ int Interface::GetSymbolIndex(const char* ResRef)
 	return -1;
 }
 /** Gets a Loaded Symbol Table by its index, returns NULL on error */
-SymbolMgr* Interface::GetSymbol(unsigned int index)
+SymbolMgr* Interface::GetSymbol(unsigned int index) const
 {
 	if (index >= symbols.size()) {
 		return NULL;
@@ -3455,7 +3455,7 @@ int Interface::PlayMovie(const char* ResRef)
 	return 0;
 }
 
-int Interface::Roll(int dice, int size, int add)
+int Interface::Roll(int dice, int size, int add) const
 {
 	if (dice < 1) {
 		return add;
@@ -3653,7 +3653,7 @@ void Interface::SetCutSceneMode(bool active)
 	video->moveY = 0;
 }
 
-bool Interface::InCutSceneMode()
+bool Interface::InCutSceneMode() const
 {
 	return (GetGameControl()->GetScreenFlags()&SF_DISABLEMOUSE)!=0;
 }
@@ -3816,7 +3816,7 @@ cleanup:
 	if (sav_str) delete sav_str;
 }
 
-GameControl *Interface::GetGameControl()
+GameControl *Interface::GetGameControl() const
 {
  	Window *window = GetWindow( 0 );
 	// in the beginning, there's no window at all
@@ -3990,7 +3990,7 @@ const char *Interface::QuerySlotResRef(unsigned int idx) const
 
 // checks the itemtype vs. slottype, and also checks the usability flags
 // vs. Actor's stats (alignment, class, race, kit etc.)
-int Interface::CanUseItemType(int slottype, Item *item, Actor *actor) const
+int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedback) const
 {
 	//inventory is a special case, we allow any items to enter it
 	if ( slottype==SLOT_ALL ) {
@@ -4000,28 +4000,36 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor) const
 	//with twohandedness
 	if ((slottype&SLOT_SHIELD) && (slottype!=SLOT_ANY) ) {
 		if (item->Flags&IE_INV_ITEM_TWOHANDED) {
+			//cannot equip twohanded in offhand
+			if (feedback) core->DisplayConstantString(STR_2HANDEDOFFHAND, 0xf0f0f0);
 			return 0;
 		}
 	}
 	
 	if ( (unsigned int) item->ItemType>=(unsigned int) ItemTypes) {
 		//invalid itemtype
+		if (feedback) core->DisplayConstantString(STR_WRONGITEMTYPE, 0xf0f0f0);
 		return 0;
 	}
 	
 	//if actor is supplied, check its usability fields
 	if (actor) {
-		if (actor->Unusable(item)) {
+		ieStrRef str = actor->Unusable(item);
+		if (str) {
+			if (feedback) core->DisplayConstantString(str, 0xf0f0f0);
 			return 0;
 		}
 	}
 	
 	//if any bit is true, the answer counts as true
 	int ret = (slotmatrix[item->ItemType]&slottype);
+	if (!ret) {
+		if (feedback) core->DisplayConstantString(STR_WRONGITEMTYPE, 0xf0f0f0);
+	}
 	return ret;
 }
 
-Label *Interface::GetMessageLabel()
+Label *Interface::GetMessageLabel() const
 {
 	ieDword WinIndex = (ieDword) -1;
 	ieDword TAIndex = (ieDword) -1;
@@ -4039,7 +4047,7 @@ Label *Interface::GetMessageLabel()
 	return NULL;
 }
 
-TextArea *Interface::GetMessageTextArea()
+TextArea *Interface::GetMessageTextArea() const
 {
 	ieDword WinIndex = (ieDword) -1;
 	ieDword TAIndex = (ieDword) -1;
@@ -4920,7 +4928,7 @@ Sprite2D *Interface::GetCursorSprite()
 }
 
 /* we should return -1 if it isn't gold, otherwise return the gold value */
-int Interface::CanMoveItem(CREItem *item)
+int Interface::CanMoveItem(const CREItem *item) const
 {
 	if (item->Flags & IE_INV_ITEM_UNDROPPABLE)
 		return 0;
@@ -5152,9 +5160,9 @@ int Interface::CompressSave(const char *folder)
 	return 0;
 }
 
-int Interface::GetMaximumAbility() { return MaximumAbility; }
+int Interface::GetMaximumAbility() const { return MaximumAbility; }
 
-int Interface::GetStrengthBonus(int column, int value, int ex)
+int Interface::GetStrengthBonus(int column, int value, int ex) const
 {
 	//to hit, damage, open doors, weight allowance
 	if (column<0 || column>3)
@@ -5174,7 +5182,7 @@ int Interface::GetStrengthBonus(int column, int value, int ex)
 }
 
 //only the first 3 columns are supported
-int Interface::GetIntelligenceBonus(int column, int value)
+int Interface::GetIntelligenceBonus(int column, int value) const
 {
 	//learn spell, max spell level, max spell number on level
 	if (column<0 || column>2)
@@ -5183,7 +5191,7 @@ int Interface::GetIntelligenceBonus(int column, int value)
 	return intmod[column*(MaximumAbility+1)+value];
 }
 
-int Interface::GetDexterityBonus(int column, int value)
+int Interface::GetDexterityBonus(int column, int value) const
 {
 	//reaction, missile, ac
 	if (column<0 || column>2)
@@ -5192,7 +5200,7 @@ int Interface::GetDexterityBonus(int column, int value)
 	return dexmod[column*(MaximumAbility+1)+value];
 }
 
-int Interface::GetConstitutionBonus(int column, int value)
+int Interface::GetConstitutionBonus(int column, int value) const
 {
 	//normal, warrior, minimum, regen hp, regen fatigue
 	if (column<0 || column>4)
@@ -5201,7 +5209,7 @@ int Interface::GetConstitutionBonus(int column, int value)
 	return conmod[column*(MaximumAbility+1)+value];
 }
 
-int Interface::GetCharismaBonus(int column, int value)
+int Interface::GetCharismaBonus(int column, int value) const
 {
 	//?reaction
 	if (column<0 || column>0)
@@ -5300,7 +5308,7 @@ ieDword *Interface::GetListFrom2DA(const ieResRef resref)
 }
 
 //returns a numeric value associated with a stat name (symbol) from stats.ids
-ieDword Interface::TranslateStat(const char *stat_name)
+ieDword Interface::TranslateStat(const char *stat_name) 
 {
 	int symbol = LoadSymbol( "stats" );
 	SymbolMgr *sym = GetSymbol( symbol );

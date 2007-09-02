@@ -151,7 +151,7 @@ Control* Window::GetControl(unsigned short x, unsigned short y, bool ignore)
 			return lastC;
 		}
 	}
-	std::vector< Control*>::iterator m;
+	std::vector< Control*>::const_iterator m;
 	for (m = Controls.begin(); m != Controls.end(); m++) {
 		if (ignore && (*m)->ControlID&IGNORE_CONTROL) {
 			continue;
@@ -169,12 +169,12 @@ Control* Window::GetControl(unsigned short x, unsigned short y, bool ignore)
 	return ctrl;
 }
 
-Control* Window::GetOver()
+Control* Window::GetOver() const
 {
 	return lastOver;
 }
 
-Control* Window::GetFocus()
+Control* Window::GetFocus() const
 {
 	return lastFocus;
 }
@@ -193,7 +193,7 @@ void Window::SetFocused(Control* ctrl)
 	}
 }
 
-Control* Window::GetControl(unsigned short i)
+Control* Window::GetControl(unsigned short i) const
 {
 	if (i < Controls.size()) {
 		return Controls[i];
@@ -201,7 +201,7 @@ Control* Window::GetControl(unsigned short i)
 	return NULL;
 }
 
-bool Window::IsValidControl(unsigned short ID, Control *ctrl)
+bool Window::IsValidControl(unsigned short ID, Control *ctrl) const
 {
 	size_t i = Controls.size();
 	while (i--) {
@@ -231,7 +231,7 @@ void Window::DelControl(unsigned short i)
 	Invalidate();
 }
 
-Control* Window::GetDefaultControl()
+Control* Window::GetDefaultControl() const
 {
 	if (!Controls.size()) {
 		return NULL;

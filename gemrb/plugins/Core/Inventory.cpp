@@ -53,7 +53,7 @@ static void InvalidSlot(int slot)
 	abort();
 }
 
-inline const Item *Inventory::GetItemPointer(ieDword slot, CREItem *&item)
+inline Item *Inventory::GetItemPointer(ieDword slot, CREItem *&item) const
 {
 	item = GetSlotItem(slot);
 	if (!item) return NULL;
@@ -236,12 +236,12 @@ void Inventory::SetSlotCount(unsigned int size)
 }
 
 /** if you supply a "" string, then it checks if the slot is empty */
-bool Inventory::HasItemInSlot(const char *resref, unsigned int slot)
+bool Inventory::HasItemInSlot(const char *resref, unsigned int slot) const
 {
 	if (slot >= Slots.size()) {
 		return false;
 	}
-	CREItem *item = Slots[slot];
+	const CREItem *item = Slots[slot];
 	if (!item) {
 		return false;
 	}
@@ -256,12 +256,12 @@ bool Inventory::HasItemInSlot(const char *resref, unsigned int slot)
 
 /** counts the items in the inventory, if stacks == 1 then stacks are
 		accounted for their heap size */
-int Inventory::CountItems(const char *resref, bool stacks)
+int Inventory::CountItems(const char *resref, bool stacks) const
 {
 	int count = 0;
 	size_t slot = Slots.size();
 	while(slot--) {
-		CREItem *item = Slots[slot];
+		const CREItem *item = Slots[slot];
 		if (!item) {
 			continue;
 		}
@@ -282,11 +282,11 @@ int Inventory::CountItems(const char *resref, bool stacks)
 /** this function can look for stolen, equipped, identified, destructible
 		etc, items. You just have to specify the flags in the bitmask
 		specifying 1 in a bit signifies a requirement */
-bool Inventory::HasItem(const char *resref, ieDword flags)
+bool Inventory::HasItem(const char *resref, ieDword flags) const
 {
 	size_t slot = Slots.size();
 	while(slot--) {
-		CREItem *item = Slots[slot];
+		const CREItem *item = Slots[slot];
 		if (!item) {
 			continue;
 		}
@@ -563,7 +563,7 @@ int Inventory::AddStoreItem(STOItem* item, int action)
 }
 
 /* could the source item be dropped on the target item to merge them */
-bool Inventory::ItemsAreCompatible(CREItem* target, CREItem* source)
+bool Inventory::ItemsAreCompatible(CREItem* target, CREItem* source) const
 {
 	if (!target) {
 		//this isn't always ok, please check!
@@ -612,10 +612,10 @@ int Inventory::DepleteItem(ieDword flags)
 	return -1;
 }
 
-int Inventory::FindItem(const char *resref, unsigned int flags)
+int Inventory::FindItem(const char *resref, unsigned int flags) const
 {
 	for (size_t i = 0; i < Slots.size(); i++) {
-		CREItem *item = Slots[i];
+		const CREItem *item = Slots[i];
 		if (!item) {
 			continue;
 		}
@@ -688,7 +688,7 @@ bool Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *
 	return dropped;
 }
 
-CREItem *Inventory::GetSlotItem(unsigned int slot)
+CREItem *Inventory::GetSlotItem(unsigned int slot) const
 {
 	if (slot >= Slots.size() ) {
 		InvalidSlot(slot);
@@ -696,9 +696,9 @@ CREItem *Inventory::GetSlotItem(unsigned int slot)
 	return Slots[slot];
 }
 
-ieDword Inventory::GetItemFlag(unsigned int slot)
+ieDword Inventory::GetItemFlag(unsigned int slot) const
 {
-	CREItem *item = GetSlotItem(slot);
+	const CREItem *item = GetSlotItem(slot);
 	if (!item) {
 		return 0;
 	}
@@ -839,7 +839,7 @@ bool Inventory::UnEquipItem(unsigned int slot, bool removecurse)
 //        2 - xbow
 //        4 - sling
 //returns equipped code
-int Inventory::FindRangedProjectile(unsigned int type)
+int Inventory::FindRangedProjectile(unsigned int type) const
 {
 	for(int i=SLOT_RANGED;i<=LAST_RANGED;i++) {
 		CREItem *Slot;
@@ -861,17 +861,17 @@ int Inventory::FindRangedProjectile(unsigned int type)
 
 // find which bow is attached to the projectile marked by 'Equipped'
 // returns slotcode
-int Inventory::FindRangedWeapon()
+int Inventory::FindRangedWeapon() const
 {
 	if (Equipped>=0) return SLOT_FIST;
 	return FindSlotRangedWeapon(Equipped+SLOT_MELEE);
 }
 
-int Inventory::FindSlotRangedWeapon(unsigned int slot)
+int Inventory::FindSlotRangedWeapon(unsigned int slot) const
 {
 	if ((int)slot >= SLOT_MELEE) return SLOT_FIST;
 	CREItem *Slot;
-	const Item *itm = GetItemPointer(slot, Slot);
+	Item *itm = GetItemPointer(slot, Slot);
 	if (!itm) return SLOT_FIST;
 
 	ITMExtHeader *ext_header = itm->GetExtHeader(0);
@@ -885,7 +885,7 @@ int Inventory::FindSlotRangedWeapon(unsigned int slot)
 
 
 // find bow for a specific projectile type
-int Inventory::FindTypedRangedWeapon(unsigned int type)
+int Inventory::FindTypedRangedWeapon(unsigned int type) const
 {
 	if (!type) {
 		return SLOT_FIST;
@@ -987,13 +987,13 @@ int Inventory::GetInventorySlot()
 	return SLOT_INV;
 }
 
-int Inventory::GetEquipped()
+int Inventory::GetEquipped() const
 {
 	return Equipped;
 }
 
 //if shield slot is empty, call again for fist slot!
-int Inventory::GetShieldSlot()
+int Inventory::GetShieldSlot() const
 {	
 	if (IWD2) {
 		if (Equipped>=0 && Equipped<=3) {
@@ -1004,7 +1004,7 @@ int Inventory::GetShieldSlot()
 	return SLOT_LEFT;
 }
 
-int Inventory::GetEquippedSlot()
+int Inventory::GetEquippedSlot() const
 {
 	if (Equipped == IW_NO_EQUIPPED) {
 		return SLOT_FIST;
@@ -1012,7 +1012,9 @@ int Inventory::GetEquippedSlot()
 	if (IWD2 && Equipped>=0) {
 		//i've absolutely NO idea what is this 4 (Avenger)
 		//Equipped should be 0-3 in iWD2, no???
-		if (Equipped == 4) Equipped = 0;
+		if (Equipped >= 4) {
+		  return SLOT_MELEE;
+		}
 		return Equipped*2+SLOT_MELEE;
 	}
 	return Equipped+SLOT_MELEE;
@@ -1055,7 +1057,7 @@ bool Inventory::SetEquippedSlot(int slotcode)
 }
 
 //returns the fist weapon if there is nothing else
-CREItem *Inventory::GetUsedWeapon(bool leftorright)
+CREItem *Inventory::GetUsedWeapon(bool leftorright) const
 {
 	CREItem *ret;
 	int slot;
@@ -1404,7 +1406,7 @@ void Inventory::UpdateWeaponAnimation()
 }
 
 //this function will also check disabled slots (if that feature will be imped)
-bool Inventory::IsSlotBlocked(int slot)
+bool Inventory::IsSlotBlocked(int slot) const
 {
 	if (slot<SLOT_MELEE) return false;
 	if (slot>LAST_MELEE) return false;
@@ -1417,7 +1419,7 @@ bool Inventory::IsSlotBlocked(int slot)
 	return HasItemInSlot("",otherslot);
 }
 
-inline bool Inventory::TwoHandedInSlot(int slot)
+inline bool Inventory::TwoHandedInSlot(int slot) const
 {
 	CREItem *item;
 
@@ -1429,10 +1431,11 @@ inline bool Inventory::TwoHandedInSlot(int slot)
 	return false;
 }
 
-int Inventory::WhyCantEquip(int slot, int twohanded)
+int Inventory::WhyCantEquip(int slot, int twohanded) const
 {
 	//can't equip in shield slot if a weapon slot is twohanded
 	for (int i=SLOT_MELEE; i<=LAST_MELEE;i++) {
+		//see GetShieldSlot
 		int otherslot;
 		if (IWD2) {
 			otherslot = ++i;

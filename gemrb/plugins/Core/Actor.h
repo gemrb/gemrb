@@ -213,11 +213,13 @@ private:
 	/** fixes the palette */
 	void SetupColors();
 	/** debugging function, gets the scripting name of an actor referenced by a global ID */
-	const char* GetActorNameByID(ieDword ID);
+	const char* GetActorNameByID(ieDword ID) const;
 	/* if Lasttarget is gone, call this */
 	void StopAttack();
 	/* checks a weapon quick slot and resets it to fist if it is empty */
 	void CheckWeaponQuickSlot(unsigned int which);
+	/* helper for usability checks */
+	int CheckUsability(Item *item) const;
 public:
 	Actor(void);
 	~Actor(void);
@@ -246,7 +248,7 @@ public:
 	/** returns a saving throw */
 	bool GetSavingThrow(ieDword type, int modifier);
 	/** Returns true if the actor is targetable */
-	bool ValidTarget(int ga_flags);
+	bool ValidTarget(int ga_flags) const;
 	/** Returns a Stat value */
 	ieDword GetStat(unsigned int StatIndex) const;
 	/** Sets a Stat Value (unsaved) */
@@ -358,11 +360,10 @@ public:
 	void SetRunFlags(ieDword flags);
 	/* applies the kit abilities, returns false if kit is not applicable */
 	bool ApplyKit(ieDword Value);
-public:
 	/* calls InitQuickSlot in PCStatStruct */
 	void SetupQuickSlot(unsigned int which, int slot, int headerindex);
 	/* returns true if the actor is PC/joinable*/
-	bool Persistent();
+	bool Persistent() const;
 	/* assigns actor to party slot, 0 = NPC, areas won't remove it */
 	void SetPersistent(int partyslot);
 	/* resurrects actor */
@@ -380,10 +381,10 @@ public:
 	/* learns the given spell, possibly receive XP */
 	int LearnSpell(const ieResRef resref, ieDword flags);
 	/* returns the ranged weapon header associated with the currently equipped projectile */
-	int GetRangedWeapon(ITMExtHeader *&which);
+	int GetRangedWeapon(ITMExtHeader *&which) const;
 	/* Returns current weapon range and extended header
 	 if range is nonzero, then which is valid */
-	unsigned int GetWeapon(ITMExtHeader *&which, bool leftorright=false);
+	unsigned int GetWeapon(ITMExtHeader *&which, bool leftorright=false) const;
 	/* Creates player statistics */
 	void CreateStats();
 	/* Heals actor by days */

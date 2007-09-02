@@ -119,21 +119,21 @@ public:
 	/** Returns the Control at X,Y Coordinates */
 	Control* GetControl(unsigned short x, unsigned short y, bool ignore=0);
 	/** Returns the Control by Index */
-	Control* GetControl(unsigned short i);
+	Control* GetControl(unsigned short i) const;
 	/** Returns true if ctrl is valid and ctrl->ControlID is ID */
-	bool IsValidControl(unsigned short ID, Control *ctrl);
+	bool IsValidControl(unsigned short ID, Control *ctrl) const;
 	/** Deletes the xth. Control */
 	void DelControl(unsigned short i);
 	/** Returns the Default Control which may be a button/gamecontrol atm */
-	Control* GetDefaultControl();
+	Control* GetDefaultControl() const;
 	/** Sets 'ctrl' as currently under mouse */
 	void SetOver(Control* ctrl);
 	/** Returns last control under mouse */
-	Control* GetOver();
+	Control* GetOver() const;
 	/** Sets 'ctrl' as Focused */
 	void SetFocused(Control* ctrl);
 	/** Returns last focused control */
-	Control* GetFocus();
+	Control* GetFocus() const;
 	/** Redraw all the Window */
 	void Invalidate();
 	/** Redraw controls of the same group */

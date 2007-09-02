@@ -2272,3 +2272,21 @@ Targets *XthNearestEnemyOf(Targets *parameters, int count)
 	return XthNearestOf(parameters,count);
 }
 
+Point GetEntryPoint(const char *areaname, const char *entryname)
+{
+	Point p;
+
+	int table = core->LoadTable( "entries" );
+	if (table<0) {
+		return p;
+	}
+	TableMgr *tab = core->GetTable( table );
+	const char *tmpstr = tab->QueryField(areaname, entryname);
+	int x=-1;
+	int y=-1;
+	sscanf(tmpstr, "%d.%d", &x, &y);
+	core->DelTable(table);
+	p.x=(short) x;
+	p.y=(short) y;
+	return p;
+}

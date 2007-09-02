@@ -229,7 +229,7 @@ PluginMgr::~PluginMgr(void)
 #endif
 }
 
-bool PluginMgr::IsAvailable(SClass_ID plugintype)
+bool PluginMgr::IsAvailable(SClass_ID plugintype) const
 {
 	for (unsigned int i = 0; i < plugins.size(); i++) {
 		if (plugins[i]->SuperClassID() == plugintype) {
@@ -239,7 +239,7 @@ bool PluginMgr::IsAvailable(SClass_ID plugintype)
 	return false;
 }
 
-void* PluginMgr::GetPlugin(SClass_ID plugintype)
+void* PluginMgr::GetPlugin(SClass_ID plugintype) const
 {
 	if (!&plugins) {
 		return NULL;
@@ -253,7 +253,7 @@ void* PluginMgr::GetPlugin(SClass_ID plugintype)
 	return NULL;
 }
 
-std::vector<InterfaceElement> *PluginMgr::GetAllPlugin(SClass_ID plugintype)
+std::vector<InterfaceElement> *PluginMgr::GetAllPlugin(SClass_ID plugintype) const
 {
 	if (!&plugins) {
 		return NULL;

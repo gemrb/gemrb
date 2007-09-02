@@ -70,11 +70,11 @@ private:
 	std::vector< ClassDesc*> plugins;
 	std::vector< LibHandle> libs;
 public:
-	bool IsAvailable(SClass_ID plugintype);
-	void* GetPlugin(SClass_ID plugintype);
-	std::vector<InterfaceElement> *GetAllPlugin(SClass_ID plugintype);	
+	bool IsAvailable(SClass_ID plugintype) const;
+	void* GetPlugin(SClass_ID plugintype) const;
+	std::vector<InterfaceElement> *GetAllPlugin(SClass_ID plugintype) const;	
 	void FreePlugin(void* ptr);
-	size_t GetPluginCount() { return plugins.size(); }
+	size_t GetPluginCount() const { return plugins.size(); }
 };
 
 #endif

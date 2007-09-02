@@ -1409,7 +1409,7 @@ int GameScript::WalkedToTrigger(Scriptable* Sender, Trigger* parameters)
 	if (!target) {
 		return 0;
 	}
-	if (PersonalDistance(target, Sender) > MAX_OPERATING_DISTANCE ) {
+	if (PersonalDistance(target, Sender) > 3*MAX_OPERATING_DISTANCE ) {
 		return 0;
 	}
 	//now objects suicide themselves if they are empty objects

@@ -1747,7 +1747,7 @@ void Actor::DebugDump()
 	fxqueue.dump();
 }
 
-const char* Actor::GetActorNameByID(ieDword ID)
+const char* Actor::GetActorNameByID(ieDword ID) const
 {
 	Actor *actor = GetCurrentArea()->GetActorByGlobalID(ID);
 	if (!actor) {
@@ -2029,7 +2029,7 @@ void Actor::GetItemSlotInfo(ItemExtHeader *item, int which, int header)
 		idx=(ieWord) which;
 		headerindex=(ieWord) header;
 	}
-	CREItem *slot = inventory.GetSlotItem(idx);
+	const CREItem *slot = inventory.GetSlotItem(idx);
 	if (!slot) return; //quick item slot is empty
 	Item *itm = core->GetItem(slot->ItemResRef);
 	if (!itm) return; //quick item slot contains invalid item resref
@@ -2140,7 +2140,7 @@ void Actor::CheckWeaponQuickSlot(unsigned int which)
 		// If current quickweaponslot contains ammo, and bow not found, reset
 
 		if (core->QuerySlotEffects(slot) == SLOT_EFFECT_MISSILE) {
-			CREItem *slotitm = inventory.GetSlotItem(slot);
+			const CREItem *slotitm = inventory.GetSlotItem(slot);
 			assert(slotitm);
 			Item *itm = core->GetItem(slotitm->ItemResRef);
 			assert(itm);
@@ -2169,7 +2169,7 @@ void Actor::SetupQuickSlot(unsigned int which, int slot, int headerindex)
 	PCStats->InitQuickSlot(which, (ieWord) slot, (ieWord) headerindex);
 }
 
-bool Actor::ValidTarget(int ga_flags)
+bool Actor::ValidTarget(int ga_flags) const
 {
 	if (Immobile()) return false;
 	//scripts can still see this type of actor
@@ -2202,7 +2202,7 @@ bool Actor::ValidTarget(int ga_flags)
 //returns true if it won't be destroyed with an area
 //in this case it shouldn't be saved with the area either
 //it will be saved in the savegame
-bool Actor::Persistent()
+bool Actor::Persistent() const
 {
 	if (InParty) return true;
 	if (InternalFlags&IF_FROMGAME) return true;
@@ -2236,10 +2236,10 @@ void Actor::GetPrevAnimation()
 }
 
 //slot is the projectile slot
-int Actor::GetRangedWeapon(ITMExtHeader *&which)
+int Actor::GetRangedWeapon(ITMExtHeader *&which) const
 {
 	unsigned int slot = inventory.FindRangedWeapon();
-	CREItem *wield = inventory.GetSlotItem(slot);
+	const CREItem *wield = inventory.GetSlotItem(slot);
 	if (!wield) {
 		return 0;
 	}
@@ -2254,9 +2254,9 @@ int Actor::GetRangedWeapon(ITMExtHeader *&which)
 
 //returns weapon header currently used
 //if range is nonzero, then the returned header is valid
-unsigned int Actor::GetWeapon(ITMExtHeader *&which, bool leftorright)
+unsigned int Actor::GetWeapon(ITMExtHeader *&which, bool leftorright) const
 {
-	CREItem *wield = inventory.GetUsedWeapon(leftorright);
+	const CREItem *wield = inventory.GetUsedWeapon(leftorright);
 	if (!wield) {
 		return 0;
 	}
@@ -3685,13 +3685,8 @@ static ieDword ResolveTableValue(const char *resref, ieDword stat, ieDword mcol,
 	return 0;
 }
 
-//checks usability only
-int Actor::Unusable(Item *item) const
+int Actor::CheckUsability(Item *item) const
 {
-	if (GetStat(IE_CANUSEANYITEM)) {
-		return 0;
-	}
-
 	ieDword itembits[2]={item->UsabilityBitmask, item->KitUsability};
 
 	for (int i=0;i<usecount;i++) {
@@ -3714,8 +3709,18 @@ resolve_stat:
 			stat = ResolveTableValue(itemuse[i].table, stat, mcol, itemuse[i].vcol);
 		}
 		if (stat&itemvalue) {
-			return 1;
+			return STR_CANNOTUSEITEM;
 		}
+	}
+
+	return 0;
+}
+
+//checks usability only
+int Actor::Unusable(Item *item) const
+{
+	if (!GetStat(IE_CANUSEANYITEM)) {
+		return CheckUsability(item);
 	}
 
 	if (!CheckAbilities) {

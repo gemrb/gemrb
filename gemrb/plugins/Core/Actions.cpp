@@ -280,7 +280,7 @@ void GameScript::PermanentStatChange(Scriptable* Sender, Action* parameters)
 			value+= parameters->int2Parameter;
 			break;
 		case 3:
-		default: //no idea what happens 
+		default: //no idea what happens
 			value = parameters->int2Parameter;
 			break;
 	}
@@ -2611,15 +2611,13 @@ void GameScript::LeaveAreaLUAEntry(Scriptable* Sender, Action* parameters)
 	Actor *actor = (Actor *) Sender;
 	Game *game = core->GetGame();
 	strncpy(game->LoadMos, parameters->string1Parameter,8);
-	//no need to change the pathfinder just for getting the entrance
-	Map *map = game->GetMap(actor->Area, false);
-	Entrance *ent = map->GetEntrance(parameters->string1Parameter);
-	if (PersonalDistance(ent->Pos, Sender) <= MAX_OPERATING_DISTANCE) {
-		LeaveAreaLUA(Sender, parameters);
+	Point p = GetEntryPoint(actor->Area, parameters->string1Parameter);
+	if (p.isempty()) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	GoNearAndRetry( Sender, ent->Pos, MAX_OPERATING_DISTANCE);
+	parameters->pointParameter=p;
+	LeaveAreaLUA(Sender, parameters);
 	Sender->ReleaseCurrentAction();
 }
 
@@ -2643,15 +2641,13 @@ void GameScript::LeaveAreaLUAPanicEntry(Scriptable* Sender, Action* parameters)
 	Actor *actor = (Actor *) Sender;
 	Game *game = core->GetGame();
 	strncpy(game->LoadMos, parameters->string1Parameter,8);
-	//no need to change the pathfinder just for getting the entrance
-	Map *map = game->GetMap( actor->Area, false);
-	Entrance *ent = map->GetEntrance(parameters->string1Parameter);
-	if (PersonalDistance(ent->Pos, Sender) <= MAX_OPERATING_DISTANCE) {
-		LeaveAreaLUAPanic(Sender, parameters);
+	Point p = GetEntryPoint(actor->Area, parameters->string1Parameter);
+	if (p.isempty()) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	GoNearAndRetry( Sender, ent->Pos, MAX_OPERATING_DISTANCE);
+	parameters->pointParameter=p;
+	LeaveAreaLUAPanic(Sender, parameters);
 	Sender->ReleaseCurrentAction();
 }
 
@@ -3733,7 +3729,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	Actor *snd = (Actor *) Sender;
 	Actor *scr = (Actor *) tar;
 	//for PP one must go REALLY close
-	
+
 	if (PersonalDistance(Sender, tar)>10 ) {
 		GoNearAndRetry(Sender, tar, true, 10+snd->size+scr->size);
 		Sender->ReleaseCurrentAction();
@@ -3767,7 +3763,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		scr->SetBase(IE_GOLD,scr->GetBase(IE_GOLD)-money);
 		snd->SetBase(IE_GOLD,snd->GetBase(IE_GOLD)+money);
 	}
-	
+
 	Sender->ReleaseCurrentAction();
 }
 
@@ -5675,7 +5671,7 @@ void GameScript::SpellHitEffectSprite(Scriptable* Sender, Action* parameters)
 		//invalid effect name didn't resolve to opcode
 		return;
 	}
-	
+
 	//vvc type
 	fx->Parameter2 = parameters->int0Parameter;
 	//height (not sure if this is in the opcode, but seems acceptable)

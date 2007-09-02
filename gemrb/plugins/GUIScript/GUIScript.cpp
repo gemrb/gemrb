@@ -6082,7 +6082,7 @@ static PyObject* GemRB_CanUseItemType(PyObject * /*self*/, PyObject* args)
 		}
 	}
 
-	int ret=core->CanUseItemType(SlotType, item, actor);
+	int ret=core->CanUseItemType(SlotType, item, actor, false);
 	core->FreeItem(item, ItemName, false);
 	return PyInt_FromLong(ret);
 }
@@ -6189,10 +6189,10 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "LoreToID", PyInt_FromLong(item->LoreToID));
 
 	int function=0;
-	if (core->CanUseItemType(SLOT_POTION, item, actor) ) {
+	if (core->CanUseItemType(SLOT_POTION, item, actor, false) ) {
 			function|=CAN_DRINK;
 	}
-	if (core->CanUseItemType(SLOT_SCROLL, item, actor) ) {
+	if (core->CanUseItemType(SLOT_SCROLL, item, actor, false) ) {
 		ITMExtHeader *eh;
 		Effect *f;
 		//determining if this is a copyable scroll
@@ -6215,7 +6215,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 		function|=CAN_READ;
 	}
 not_a_scroll:
-	if (core->CanUseItemType(SLOT_BAG, item, NULL) ) {
+	if (core->CanUseItemType(SLOT_BAG, item, NULL, false) ) {
 		//allow the open container flag only if there is
 		//a store file (this fixes pst eye items, which
 		//got the same item type as bags)
@@ -6446,7 +6446,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		return PyInt_FromLong( 0 );
 	}
 	//CanUseItemType will check actor's class bits too
-	Slottype =core->CanUseItemType (Slottype, item, actor);
+	Slottype = core->CanUseItemType (Slottype, item, actor, true);
 	//resolve the equipping sound
 	if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
 		memcpy(Sound, item->ReplacementItem, 9);

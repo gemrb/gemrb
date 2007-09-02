@@ -324,10 +324,10 @@ public:
 	void SetFeature(int value, int position);
 	/* don't rely on the exact return value of this function */
 	ieDword HasFeature(int position) const;
-	bool IsAvailable(SClass_ID filetype);
-	void * GetInterface(SClass_ID filetype);
-	std::vector<InterfaceElement>* GetInterfaceVector(SClass_ID filetype);
-	const char * TypeExt(SClass_ID type);
+	bool IsAvailable(SClass_ID filetype) const;
+	void * GetInterface(SClass_ID filetype) const;
+	std::vector<InterfaceElement>* GetInterfaceVector(SClass_ID filetype) const;
+	const char * TypeExt(SClass_ID type) const;
 	ProjectileServer* GetProjectileServer() const;
 	Video * GetVideoDriver() const;
 	ResourceMgr * GetResourceMgr() const;
@@ -340,7 +340,7 @@ public:
 	/* sets the floattext color */
 	void SetInfoTextColor(Color &color);
 	/** returns a gradient set */
-	Color * GetPalette(int index, int colors, Color *buffer);
+	Color * GetPalette(int index, int colors, Color *buffer) const;
 	/** Returns a preloaded Font */
 	Font * GetFont(const char *) const;
 	Font * GetFont(unsigned int index) const;
@@ -374,7 +374,7 @@ public:
 	/** Add a window to the Window List */
 	void AddWindow(Window * win);
 	/** Get a Control on a Window */
-	int GetControl(unsigned short WindowIndex, unsigned long ControlID);
+	int GetControl(unsigned short WindowIndex, unsigned long ControlID) const;
 	/** Adjust the scrolling of the control (if applicable) */
 	int AdjustScrolling(unsigned short WindowIndex, unsigned short ControlIndex, short x, short y);
 	/** Set the Text of a Control */
@@ -386,9 +386,9 @@ public:
 	/** Actually draws tooltip on the screen. Called from SDLVideoDriver */
 	void DrawTooltip();
 	/** returns the label which should receive game messages (overrides messagetextarea) */
-	Label *GetMessageLabel();
+	Label *GetMessageLabel() const;
 	/** returns the textarea of the main game screen */
-	TextArea *GetMessageTextArea();
+	TextArea *GetMessageTextArea() const;
 	/** returns a string reference from a string reference index constant*/
 	ieStrRef GetStringReference(int stridx);
 	/** displays any string in the textarea */
@@ -406,7 +406,7 @@ public:
 	/** displays a string in the textarea, starting with speaker's name */
 	void DisplayStringName(int stridx, unsigned int color, Scriptable *speaker, ieDword flags);
 	/** returns the Window Visible Flag */
-	int GetVisible(unsigned short WindowIndex);
+	int GetVisible(unsigned short WindowIndex) const;
 	/** Set a Window Visible Flag */
 	int SetVisible(unsigned short WindowIndex, int visible);
 	/** Show a Window in Modal Mode */
@@ -414,9 +414,9 @@ public:
 	/** Set the Status of a Control in a Window */
 	int SetControlStatus(unsigned short WindowIndex, unsigned short ControlIndex, unsigned long Status);
 	/** Get a Window from the Loaded Window List */
-	Window * GetWindow(unsigned short WindowIndex);
+	Window * GetWindow(unsigned short WindowIndex) const;
 	/** Returns true if wnd is a valid window with WindowIndex */
-	bool IsValidWindow(unsigned short WindowID, Window *wnd);
+	bool IsValidWindow(unsigned short WindowID, Window *wnd) const;
 	/** Removes a Loaded Window */
 	int DelWindow(unsigned short WindowIndex);
 	/** Redraws all window */
@@ -428,41 +428,41 @@ public:
 	/** Draws the Console */
 	void DrawConsole();
 	/** Get the Sound Manager */
-	SoundMgr * GetSoundMgr();
+	SoundMgr * GetSoundMgr() const;
 	/** Get the SaveGameIterator */
-	SaveGameIterator * GetSaveGameIterator();
+	SaveGameIterator * GetSaveGameIterator() const;
 	/** Get the Variables Dictionary */
-	Variables * GetDictionary();
+	Variables * GetDictionary() const;
 	/** Get the Token Dictionary */
-	Variables * GetTokenDictionary();
+	Variables * GetTokenDictionary() const;
 	/** Get the Music Manager */
-	MusicMgr * GetMusicMgr();
+	MusicMgr * GetMusicMgr() const;
 	/** Loads a 2DA Table, returns -1 on error or the Table Index on success */
 	int LoadTable(const char * ResRef);
 	/** Gets the index of a loaded table, returns -1 on error */
-	int GetTableIndex(const char * ResRef);
+	int GetTableIndex(const char * ResRef) const;
 	/** Gets a Loaded Table by its index, returns NULL on error */
-	TableMgr * GetTable(unsigned int index);
+	TableMgr * GetTable(unsigned int index) const;
 	/** Frees a Loaded Table, returns false on error, true on success */
 	bool DelTable(unsigned int index);
 	/** Loads an IDS Table, returns -1 on error or the Symbol Table Index on success */
 	int LoadSymbol(const char * ResRef);
 	/** Gets the index of a loaded Symbol Table, returns -1 on error */
-	int GetSymbolIndex(const char * ResRef);
+	int GetSymbolIndex(const char * ResRef) const;
 	/** Gets a Loaded Symbol Table by its index, returns NULL on error */
-	SymbolMgr * GetSymbol(unsigned int index);
+	SymbolMgr * GetSymbol(unsigned int index) const;
 	/** Frees a Loaded Symbol Table, returns false on error, true on success */
 	bool DelSymbol(unsigned int index);
 	/** Plays a Movie */
 	int PlayMovie(const char * ResRef);
 	/** Generates traditional random number xdy+z */
-	int Roll(int dice, int size, int add);
+	int Roll(int dice, int size, int add) const;
 	/** Loads a Game Compiled Script */
 	int LoadScript(const char * ResRef);
 	/** Enables/Disables the CutScene Mode */
 	void SetCutSceneMode(bool active);
 	/** returns true if in cutscene mode */
-	bool InCutSceneMode();
+	bool InCutSceneMode() const;
 	/** Updates the Game Script Engine State */
 	void GSUpdate(bool update_scripts)
 	{
@@ -474,27 +474,27 @@ public:
 		}
 	}
 	/** Get the Party INI Interpreter */
-	DataFileMgr * GetPartyINI()
+	DataFileMgr * GetPartyINI() const
 	{
 		return INIparty;
 	}
-	DataFileMgr * GetBeastsINI()
+	DataFileMgr * GetBeastsINI() const
 	{
 		return INIbeasts;
 	}
-	DataFileMgr * GetQuestsINI()
+	DataFileMgr * GetQuestsINI() const
 	{
 		return INIquests;
 	}
 	/** Gets the Game class */
-	Game * GetGame()
+	Game * GetGame() const
 	{
 		return game;
 	}
 	/** Gets the WorldMap class, returns the current worldmap or the first worldmap containing the area*/
 	WorldMap * GetWorldMap(const char *area = NULL);
 	void SetWindowFrame(int i, Sprite2D *Picture);
-	GameControl *GetGameControl();
+	GameControl *GetGameControl() const;
 	/** if backtomain is not null then goes back to main screen */
 	void QuitGame(int backtomain);
 	void LoadGame(int index);
@@ -513,7 +513,7 @@ public:
 	ieDword QuerySlotEffects(unsigned int idx) const;
 	const char * QuerySlotResRef(unsigned int idx) const;
 	/*returns true if an itemtype is acceptable for a slottype, also checks the usability flags */
-	int CanUseItemType(int slottype, Item *item, Actor *actor=NULL) const;
+	int CanUseItemType(int slottype, Item *item, Actor *actor=NULL, bool feedback=false) const;
 	/*removes single file from cache*/
 	void RemoveFromCache(const ieResRef resref, SClass_ID SClassID);
 	/*removes all files from directory*/
@@ -532,7 +532,7 @@ public:
 	void FreePalette(Palette *&pal, const ieResRef name=NULL);  
 
 	void DragItem(CREItem* item, const ieResRef Picture);
-	CREItem* GetDraggedItem() { return DraggedItem; }
+	CREItem* GetDraggedItem() const { return DraggedItem; }
 	/* use this only when the dragged item is dropped */
 	void ReleaseDraggedItem();
 	CREItem *ReadItem(DataStream *str);
@@ -575,13 +575,13 @@ public:
 	Sprite2D *GetCursorSprite();
 	/** returns 0 for unmovable, -1 for movable items, otherwise it
 	returns gold value! */
-	int CanMoveItem(CREItem *item);
-	int GetMaximumAbility();
-	int GetStrengthBonus(int column, int value, int ex);
-	int GetIntelligenceBonus(int column, int value);
-	int GetDexterityBonus(int column, int value);
-	int GetConstitutionBonus(int column, int value);
-	int GetCharismaBonus(int column, int value);
+	int CanMoveItem(const CREItem *item) const;
+	int GetMaximumAbility() const;
+	int GetStrengthBonus(int column, int value, int ex) const;
+	int GetIntelligenceBonus(int column, int value) const;
+	int GetDexterityBonus(int column, int value) const;
+	int GetConstitutionBonus(int column, int value) const;
+	int GetCharismaBonus(int column, int value) const;
 
 	/** applies the spell on the target */
 	void ApplySpell(const ieResRef resname, Actor *target, Actor *caster, int level);
@@ -611,13 +611,13 @@ public:
 	/** Returns the item tooltip value for the xth extension header */
 	int GetItemTooltip(const ieResRef itemname, int idx);
 	/** Returns the item exclusion value */
-	int GetItemExcl(const ieResRef itemname);
+	int GetItemExcl(const ieResRef itemname) const;
 	/** Returns the strref for the item dialog */
-	int GetItemDialStr(const ieResRef itemname);
+	int GetItemDialStr(const ieResRef itemname) const;
 	/** Returns the strref for the item dialog */
-	int GetItemDialRes(const ieResRef itemname, ieResRef dialog);
+	int GetItemDialRes(const ieResRef itemname, ieResRef dialog) const;
 	/** Returns the virtual worldmap entry of a sub-area */
-	int GetAreaAlias(const ieResRef areaname);
+	int GetAreaAlias(const ieResRef areaname) const;
 	/** Returns up to 3 resources from resref, choosing rows randomly 
 	unwanted return variables could be omitted */
 	void GetResRefFrom2DA(const ieResRef resref, ieResRef resource1, ieResRef resource2 = NULL, ieResRef resource3 = NULL);

@@ -100,6 +100,7 @@ bool MatchActor(Scriptable *Sender, ieDword ID, Object* oC);
 int GetObjectCount(Scriptable* Sender, Object* oC);
 int GetObjectLevelCount(Scriptable* Sender, Object* oC);
 void SetVariable(Scriptable* Sender, const char* VarName, ieDword value);
+Point GetEntryPoint(const char *areaname, const char *entryname);
 //these are used from other plugins
 GEM_EXPORT int CanSee(Scriptable* Sender, Scriptable* target, bool range, int nodead);
 GEM_EXPORT int SeeCore(Scriptable* Sender, Trigger* parameters, int justlos);

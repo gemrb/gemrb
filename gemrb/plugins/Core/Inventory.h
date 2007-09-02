@@ -217,12 +217,12 @@ public:
 	/** adds an item to the inventory */
 	void AddItem(CREItem *item);
 	/** Returns number of items in the inventory */
-	int CountItems(const char *resref, bool charges);
+	int CountItems(const char *resref, bool charges) const;
 	/** looks for a particular item in a slot */
-	bool HasItemInSlot(const char *resref, unsigned int slot);
+	bool HasItemInSlot(const char *resref, unsigned int slot) const;
 	/** Looks for a particular item in the inventory. */
 	/* flags: see ieCREItemFlagBits */
-	bool HasItem(const char *resref, ieDword flags);
+	bool HasItem(const char *resref, ieDword flags) const;
 
 	void CalculateWeight(void);
 	void SetInventoryType(int arg);
@@ -258,40 +258,40 @@ public:
 	/** flags: see ieCREItemFlagBits */
 	void SetItemFlags(CREItem* item, ieDword flags);
 	void SetSlotItem(CREItem* item, unsigned int slot);
-	int GetWeight() {return Weight;}
+	int GetWeight() const {return Weight;}
 
-	bool ItemsAreCompatible(CREItem* target, CREItem* source);
+	bool ItemsAreCompatible(CREItem* target, CREItem* source) const;
 	//depletes charged items
 	int DepleteItem(ieDword flags);
 	/** Finds the first slot of named item, if resref is empty, finds the first filled! slot */
-	int FindItem(const char *resref, unsigned int flags);
+	int FindItem(const char *resref, unsigned int flags) const;
 	bool DropItemAtLocation(unsigned int slot, unsigned int flags, Map *map, Point &loc);
 	bool DropItemAtLocation(const char *resref, unsigned int flags, Map *map, Point &loc);
 	bool SetEquippedSlot(int slotcode);
-	int GetEquipped();
+	int GetEquipped() const;
 	//right hand
-	int GetEquippedSlot();
+	int GetEquippedSlot() const;
 	//left hand
-	int GetShieldSlot();
+	int GetShieldSlot() const;
 	void AddSlotEffects( ieDword slot);
 	//void AddAllEffects();
 	/** Returns item in specified slot. Does NOT change inventory */
-	CREItem* GetSlotItem(ieDword slot);
+	CREItem* GetSlotItem(ieDword slot) const;
 	/** Returns the item's inventory flags */
-	ieDword GetItemFlag(unsigned int slot);
+	ieDword GetItemFlag(unsigned int slot) const;
 	/** Changes the inventory flags */
 	bool ChangeItemFlag(ieDword slot, ieDword value, int mode);
 	/** Equips the item, don't use it directly for weapons */
 	bool EquipItem(ieDword slot);
 	bool UnEquipItem(ieDword slot, bool removecurse);
 	/** Returns equipped weapon */
-	CREItem *GetUsedWeapon(bool leftorright);
+	CREItem *GetUsedWeapon(bool leftorright) const;
 	/** returns slot of launcher weapon currently equipped */
-	int FindRangedWeapon(); 
+	int FindRangedWeapon() const; 
 	/** returns slot of launcher weapon for specified projectile type */
-	int FindTypedRangedWeapon(unsigned int type);
+	int FindTypedRangedWeapon(unsigned int type) const;
 	/** returns slot of launcher weapon for projectile in specified slot */
-	int FindSlotRangedWeapon(ieDword slot);
+	int FindSlotRangedWeapon(ieDword slot) const;
 	/** Returns a slot which might be empty, or capable of holding item (or part of it) */
 	int FindCandidateSlot(int slottype, size_t first_slot, const char *resref = NULL);
 	/** Creates an item in the slot*/
@@ -309,11 +309,11 @@ public:
 	/** returns the exclusion bits */
 	ieDword GetEquipExclusion() const;
 	/** returns if a slot is temporarily blocked */
-	bool IsSlotBlocked(int slot);
+	bool IsSlotBlocked(int slot) const;
 	/** returns true if a two handed weapon is in slot */
-	inline bool TwoHandedInSlot(int slot);
+	inline bool TwoHandedInSlot(int slot) const;
 	/** returns the strref for the reason why the item cannot be equipped */
-	int WhyCantEquip(int slot, int twohanded);
+	int WhyCantEquip(int slot, int twohanded) const;
 	//setting important constants
 	static void Init(int mb);
 	static void SetHeadSlot(int arg);
@@ -332,11 +332,11 @@ public:
 	static int GetQuickSlot();
 	static int GetInventorySlot();
 private:
-	int FindRangedProjectile(unsigned int type);
+	int FindRangedProjectile(unsigned int type) const;
 	// called by KillSlot
 	void RemoveSlotEffects( /*CREItem* slot*/ ieDword slot );
 	void KillSlot(ieDword index);
-	inline const Item *GetItemPointer(ieDword slot, CREItem *&Slot);
+	inline Item *GetItemPointer(ieDword slot, CREItem *&Slot) const;
 	void UpdateWeaponAnimation();
 	void UpdateShieldAnimation(Item *it);
 };
