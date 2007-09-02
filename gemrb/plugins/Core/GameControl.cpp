@@ -1393,8 +1393,8 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			actor->ClearActions();
 			sprintf( Tmp, "MoveToPoint([%d.%d])", p.x, p.y );
 			actor->AddAction( GenerateAction( Tmp) );
-			//we clicked over a searchmap travel region
-				if ( Owner->Cursor == IE_CURSOR_TRAVEL ) {
+			//p is a searchmap travel region
+			if ( actor->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL) {
 				sprintf( Tmp, "NIDSpecial2()" );
 				actor->AddAction( GenerateAction( Tmp) );
 			}
@@ -1410,8 +1410,8 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 			//of the leader? and destination
 			MoveToPointFormation(actor,p,orient);
 		}
-		//we clicked over a searchmap travel region
-		if ( Owner->Cursor == IE_CURSOR_TRAVEL ) {
+		//p is a searchmap travel region
+		if ( actor->GetCurrentArea()->GetCursor(p) == IE_CURSOR_TRAVEL) {
 			sprintf( Tmp, "NIDSpecial2()" );
 			actor->AddAction( GenerateAction( Tmp) );
 		}
