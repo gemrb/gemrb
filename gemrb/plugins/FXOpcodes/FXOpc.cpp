@@ -37,9 +37,11 @@
 
 //FIXME: find a way to handle portrait icons better
 #define PI_CONFUSED 3
+#define PI_POISONED 6
 #define PI_HELD    13
 #define PI_SLEEP   14
 #define PI_BLESS   17
+#define PI_PANIC        36
 #define PI_HASTED  38
 #define PI_FATIGUE 39
 #define PI_SLOWED  41
@@ -53,6 +55,7 @@
 #define PI_MAZE    78
 #define PI_PRISON  79
 #define PI_SEQUENCER 92
+#define PI_BLUR 109
 #define PI_SPELLTRAP 117
 #define PI_CSHIELD  162
 #define PI_CSHIELD2 163
@@ -1017,8 +1020,10 @@ static EffectRef fx_poisoned_state_ref={"State:Poison",NULL,-1};
 int fx_cure_poisoned_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_poisoned_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	BASE_STATE_CURE( STATE_POISONED ); //this actually isn't in the engine code, i think
-	target->fxqueue.RemoveAllEffects( fx_poisoned_state_ref ); //this is what actually happens in bg2
+	//all three steps are present in bg2 and iwd2
+	BASE_STATE_CURE( STATE_POISONED );
+	target->fxqueue.RemoveAllEffects( fx_poisoned_state_ref );
+	target->fxqueue.RemoveAllEffectsWithParam(fx_display_portrait_icon_ref, PI_POISONED);
 	return FX_NOT_APPLIED;
 }
 
@@ -1222,7 +1227,7 @@ int fx_maximum_hp_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_PERMANENT;
 }
 
-// 0x13
+// 0x13 IntelligenceModifier
 int fx_intelligence_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_intelligence_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -1235,7 +1240,7 @@ int fx_intelligence_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_PERMANENT;
 }
 
-// 0x14
+// 0x14 State:Invisible
 // this is more complex, there is a half-invisibility state
 // and there is a hidden state
 int fx_set_invisible_state (Actor* /*Owner*/, Actor* target, Effect* fx)
@@ -1269,7 +1274,7 @@ int fx_set_invisible_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-// 0x15
+// 0x15 LoreModifier
 int fx_lore_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_lore_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -1278,7 +1283,7 @@ int fx_lore_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-// 0x16
+// 0x16 LuckModifier
 int fx_luck_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_luck_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -1287,7 +1292,7 @@ int fx_luck_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-// 0x17
+// 0x17 MoraleModifier
 int fx_morale_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_morale_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -1296,18 +1301,22 @@ int fx_morale_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-// 0x18
+// 0x18 State:Panic
 int fx_set_panic_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_panic_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	//shall we set morale to 0 or just flick the panic flag on
-	//this requires a little research
-	BASE_STATE_SET( STATE_PANIC );
-	//target->NewStat( IE_MORALE, 0, fx->Parameter2 );
-	return FX_NOT_APPLIED;
+	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
+		BASE_STATE_SET( STATE_PANIC );
+	} else {
+		STATE_SET( STATE_PANIC );
+	}
+	if (enhanced_effects) {
+		target->AddPortraitIcon(PI_PANIC);
+	}
+	return FX_PERMANENT;
 }
 
-// 0x19
+// 0x19 State:Poisoned
 int fx_set_poisoned_state (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_poisoned_state (%2d): Damage: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -1346,7 +1355,7 @@ seconds:
 	return FX_APPLIED;
 }
 
-// 0x1a
+// 0x1a RemoveCurse
 static EffectRef fx_apply_effect_curse_ref={"ApplyEffectCurse",NULL,-1};
 static EffectRef fx_pst_jumble_curse_ref={"JumbleCurse",NULL,-1};
 
@@ -1929,7 +1938,7 @@ int fx_cure_infravision_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 //0x41 State:Blur
 int fx_set_blur_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_set_blur_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_set_blur_state (%2d)\n", fx->Opcode );
 	if (STATE_GET( STATE_DEAD) ) {
 		return FX_NOT_APPLIED;
 	}
@@ -1937,6 +1946,10 @@ int fx_set_blur_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 		BASE_STATE_SET( STATE_BLUR );
 	} else {
 		STATE_SET( STATE_BLUR );
+	}
+	//iwd2 specific
+	if (enhanced_effects) {
+		target->AddPortraitIcon(PI_BLUR);
 	}
 	return FX_PERMANENT;
 }
@@ -3147,6 +3160,9 @@ int fx_identify (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 // 0x96 FindTraps
+// (actually, in bg2 the effect targets area objects and the range is implemented
+// by the inareans projectile) - inanimate, area, no sprite
+// TODO: effects should target inanimates using different code
 int fx_find_traps (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_find_traps (%2d)\n", fx->Opcode );
@@ -4253,7 +4269,7 @@ int fx_drain_spells (Actor* /*Owner*/, Actor* target, Effect* fx)
 	}
 	return FX_NOT_APPLIED;
 }
-// 0xf5
+// 0xf5 CheckForBerserk
 int fx_checkforberserk_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_checkforberserk_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -4936,9 +4952,18 @@ int fx_timeless_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0x137 GenerateWish
-int fx_generate_wish (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+#define WISHCOUNT 25
+static int wishlevels[WISHCOUNT]={10,10,10,10,0,10,0,15,0,0,0,0,0,0,15,0,0,
+17,9,17,17,9,9,9,0};
+
+int fx_generate_wish (Actor* Owner, Actor* target, Effect* fx)
 {
+	ieResRef spl;
+
 	if (0) printf( "fx_generate_wish (%2d): Mod: %d\n", fx->Opcode, fx->Parameter2 );
+	int tmp = core->Roll(1,WISHCOUNT,0);
+	sprintf(spl,"SPWISH%02d",tmp);
+	core->ApplySpell(spl, target, Owner, wishlevels[tmp-1]);
 	return FX_NOT_APPLIED;
 }
 //0x138 //see fx_crash, this effect is not fully enabled in original bg2/tob

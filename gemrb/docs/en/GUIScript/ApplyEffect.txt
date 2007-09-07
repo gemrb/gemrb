@@ -1,5 +1,5 @@
 
-Prototype: GemRB.ApplyEffect(PartyID, opcode, param1, param2)
+Prototype: GemRB.ApplyEffect(PartyID, opcode, param1, param2[, resref])
 
 Description: Creates a basic effect and applies it on the player character
 marked by PartyID.
@@ -10,6 +10,7 @@ PartyID           - the player character's index in the party
 opcode            - the effect opcode (for values see effects.ids)
 param1            - parameter 1 for the opcode
 param2            - parameter 2 for the opcode
+resref            - optional resource reference to set in effect
 
 Return value: N/A
 
@@ -22,5 +23,5 @@ Example:
 
 The above example sets the weapon proficiencies in a bg2's CharGen9.py script.
 
-See also: SpellCast, SetPlayerStat, GetPlayerStat
+See also: SpellCast, SetPlayerStat, GetPlayerStat, CountEffects
 

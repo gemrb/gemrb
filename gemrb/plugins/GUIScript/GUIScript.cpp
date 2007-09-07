@@ -7907,9 +7907,10 @@ static PyObject* GemRB_HasSpecialSpell(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_ApplyEffect__doc,
-"ApplyEffect(pc, effect, param1, param2)\n\n"
-"Creates a basic effect and applies it on the player character."
-"This function could be used to add stats that are stored in effect blocks.\n\n");
+"ApplyEffect(pc, effect, param1, param2[,resref])\n\n"
+"Creates a basic effect and applies it on the player character. "
+"This function could be used to add stats that are stored in effect blocks. "
+"The resource field is optional.\n\n");
 
 static EffectRef work_ref;
 
@@ -7918,8 +7919,9 @@ static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 	int PartyID;
 	const char *opcodename;
 	int param1, param2;
+	const char *resref = NULL;
 
-	if (!PyArg_ParseTuple( args, "isii", &PartyID, &opcodename, &param1, &param2)) {
+	if (!PyArg_ParseTuple( args, "isii|s", &PartyID, &opcodename, &param1, &param2, &resref)) {
 		return AttributeError( GemRB_ApplyEffect__doc );
 	}
 	Game *game = core->GetGame();
@@ -7937,10 +7939,43 @@ static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 		//invalid effect name didn't resolve to opcode
 		return RuntimeError( "Invalid effect name!" );
 	}
+	if (resref) {
+		strnlwrcpy(fx->Resource, resref, 8);
+	}
 	//fx is freed by this function
 	core->ApplyEffect(fx, actor, actor);
 	Py_INCREF( Py_None );
 	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_CountEffects__doc,
+"CountEffects(pc, effect, param1, param2[,resref])\n\n"
+"Counts how many matching effects are applied on the player character. "
+"This function could be used to get HLA information in ToB. "
+"The resource field is optional.\n\n");
+
+static PyObject* GemRB_CountEffects(PyObject * /*self*/, PyObject* args)
+{
+	int PartyID;
+	const char *opcodename;
+	int param1, param2;
+	const char *resref = NULL;
+
+	if (!PyArg_ParseTuple( args, "isii|s", &PartyID, &opcodename, &param1, &param2, &resref)) {
+		return AttributeError( GemRB_CountEffects__doc );
+	}
+	Game *game = core->GetGame();
+	if (!game) {
+		return RuntimeError( "No game loaded!" );
+	}
+	Actor* actor = game->FindPC( PartyID );
+	if (!actor) {
+		return RuntimeError( "Actor not found" );
+	}
+	work_ref.Name=opcodename;
+	work_ref.EffText=-1;
+	ieDword ret = actor->fxqueue.CountEffects(work_ref, param1, param2, resref);
+	return PyInt_FromLong( ret );
 }
 
 PyDoc_STRVAR( GemRB_StealFailed__doc,
@@ -8235,6 +8270,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(HasSpecialItem, METH_VARARGS),
 	METHOD(HasSpecialSpell, METH_VARARGS),
 	METHOD(ApplyEffect, METH_VARARGS),
+	METHOD(CountEffects, METH_VARARGS),
 	METHOD(StealFailed, METH_NOARGS),
 	METHOD(DisplayString, METH_VARARGS),
 	// terminating entry

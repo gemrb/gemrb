@@ -320,6 +320,12 @@ Effect *EffectQueue::CreateEffect(ieDword opcode, ieDword param1, ieDword param2
 	return fx;
 }
 
+ieDword EffectQueue::CountEffects(EffectRef &effect_reference, ieDword param1, ieDword param2, const char *resource) const
+{
+	ResolveEffectRef(effect_reference);
+	return CountEffects(effect_reference.EffText, param1, param2, resource);
+}
+
 Effect *EffectQueue::CreateEffect(EffectRef &effect_reference, ieDword param1, ieDword param2, ieDword timing)
 {
 	ResolveEffectRef(effect_reference);
@@ -1423,6 +1429,26 @@ Effect *EffectQueue::GetNextEffect(std::list< Effect* >::const_iterator f) const
 {
 	if (f!=effects.end()) return *f++;
 	return NULL;
+}
+
+ieDword EffectQueue::CountEffects(ieDword opcode, ieDword param1, ieDword param2, const char *resource) const
+{
+	ieDword cnt = 0;
+
+	std::list< Effect* >::const_iterator f;
+
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
+		MATCH_OPCODE();
+		if (param1!=0xffffffff)
+			MATCH_PARAM1();
+		if (param2!=0xffffffff)
+			MATCH_PARAM2();
+		if (resource) {
+			MATCH_RESOURCE();
+		}
+		cnt++;
+	}
+	return cnt;
 }
 
 //count effects that get saved

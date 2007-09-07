@@ -210,6 +210,7 @@ public:
 	}
 	const Effect *GetNextSavedEffect(std::list< Effect* >::const_iterator f) const;
 	Effect *GetNextEffect(std::list< Effect* >::const_iterator f) const;
+	ieDword CountEffects(EffectRef &effect_reference, ieDword param1, ieDword param2, const char *ResRef) const;
 	/* returns the number of saved effects */
 	ieDword GetSavedEffectsCount() const;
 	size_t GetEffectsCount() const { return effects.size(); }
@@ -240,6 +241,7 @@ public:
 	static int ResolveEffect(EffectRef &effect_reference);
 	static bool match_ids(Actor *target, int table, ieDword value);
 private:
+	ieDword CountEffects(ieDword opcode, ieDword param1, ieDword param2, const char *ResRef) const;
 	//use the effect reference style calls from outside
 	static Effect *CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieDword timing);
 	static Effect *CreateEffectCopy(Effect *oldfx, ieDword opcode, ieDword param1, ieDword param2);
