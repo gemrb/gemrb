@@ -197,7 +197,7 @@ static int fx_disguise (Actor* Owner, Actor* target, Effect* fx); //437
 static int fx_heroic_inspiration (Actor* Owner, Actor* target, Effect* fx); //438
 //static int fx_prevent_ai_slowdown (Actor* Owner, Actor* target, Effect* fx); //439
 static int fx_barbarian_rage (Actor* Owner, Actor* target, Effect* fx); //440
-//441 MovementModifier
+//441 MovementRateModifier4
 //442 unknown
 static int fx_missile_damage_reduction (Actor* Owner, Actor* target, Effect* fx); //443
 static int fx_tenser_transformation (Actor* Owner, Actor* target, Effect* fx); //444
@@ -412,8 +412,9 @@ static void ReadSpellProtTable(const ieResRef tablename)
 		return;
 	}
 	for( int i=0;i<spellrescnt;i++) {
-		//spellres[i].stat = (ieWord) strtol(tab->QueryField(i,0),NULL,0 );
-		spellres[i].stat = core->TranslateStat(tab->QueryField(i,0) );
+		ieDword tmp = core->TranslateStat(tab->QueryField(i,0) );
+		spellres[i].stat = (ieWord) tmp;
+
 		spellres[i].value = (ieDword) strtol(tab->QueryField(i,1),NULL,0 );
 		spellres[i].relation = (ieWord) strtol(tab->QueryField(i,2),NULL,0 );
 	}
@@ -431,6 +432,7 @@ static void ReadSpellProtTable(const ieResRef tablename)
 #define STI_AREATYPE          0x106
 #define STI_DAYTIME           0x107
 #define STI_EA                0x108
+#define STI_INVALID           0xffff
 
 //returns true if iwd ids targeting resists the spell
 static int check_iwd_targeting(Actor* Owner, Actor* target, ieDword value, ieDword type)
@@ -449,6 +451,8 @@ static int check_iwd_targeting(Actor* Owner, Actor* target, ieDword value, ieDwo
 		val = value;
 	}
 	switch (idx) {
+	case STI_INVALID:
+		return 0;
 	case STI_EA:
 		return DiffCore(EARelation(Owner, target), val, spellres[type].relation);
 	case STI_DAYTIME:
@@ -2321,7 +2325,7 @@ int fx_free_action_iwd2 (Actor* /*Owner*/, Actor* target, Effect* fx)
 	// 0x9e Overlay:Grease
 	// 0x6d State:Hold3
 	// 0x28 State:Slowed
-	// 0xb0 MovementModifier
+	// 0xb0 MovementRateModifier2
 	if (enhanced_effects) {
 		target->AddPortraitIcon(PI_FREEACTION);
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0x80, 0x60, 0x60);

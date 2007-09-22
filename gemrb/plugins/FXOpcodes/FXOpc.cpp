@@ -2839,7 +2839,7 @@ int fx_knock (Actor* Owner, Actor* /*target*/, Effect* fx)
 }
 
 // 0x7e MovementRateModifier
-// 0xb0 MovementModifier
+// 0xb0 MovementRateModifier2
 int fx_movement_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_slow_factor (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -3415,7 +3415,7 @@ int fx_cure_hold_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0xa3 FreeAction
-static EffectRef fx_movement_modifier_ref={"MovementModifier",NULL,-1};
+static EffectRef fx_movement_modifier_ref={"MovementRateModifier2",NULL,-1};
 
 int fx_cure_slow_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {

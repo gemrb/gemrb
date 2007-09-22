@@ -5319,7 +5319,7 @@ ieDword Interface::TranslateStat(const char *stat_name)
 	int symbol = LoadSymbol( "stats" );
 	SymbolMgr *sym = GetSymbol( symbol );
 	ieDword stat = (ieDword) sym->GetValue( stat_name );
-	if (!stat) {
+	if (stat==(ieDword) ~0) {
 		printMessage("Core"," ",YELLOW);
 		printf("Cannot translate symbol: %s\n", stat_name);
 	}
