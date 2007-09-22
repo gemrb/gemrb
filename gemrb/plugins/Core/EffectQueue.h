@@ -171,8 +171,6 @@ public:
 
 	void AddAllEffects(Actor* target, Point &dest);
 	void ApplyAllEffects(Actor* target);
-	/* returns true if the process should abort applying a stack of effects */
-	int ApplyEffect(Actor* target, Effect* fx, bool first_apply);
 
 	/* directly removes effects with specified opcode, use effect_reference when you can */
 	void RemoveAllEffects(ieDword opcode);
@@ -241,6 +239,9 @@ public:
 	static int ResolveEffect(EffectRef &effect_reference);
 	static bool match_ids(Actor *target, int table, ieDword value);
 private:
+	/** returns true if the process should abort applying a stack of effects */
+	int ApplyEffect(Actor* target, Effect* fx, ieDword first_apply);
+	/** counts effects of specific opcode, parameters and resource */
 	ieDword CountEffects(ieDword opcode, ieDword param1, ieDword param2, const char *ResRef) const;
 	//use the effect reference style calls from outside
 	static Effect *CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieDword timing);

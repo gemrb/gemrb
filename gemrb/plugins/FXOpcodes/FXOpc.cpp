@@ -56,6 +56,7 @@
 #define PI_PRISON  79
 #define PI_SEQUENCER 92
 #define PI_BLUR 109
+#define PI_IMPROVEDHASTE 110
 #define PI_SPELLTRAP 117
 #define PI_CSHIELD  162
 #define PI_CSHIELD2 163
@@ -65,6 +66,8 @@ static int cgcount = -1;
 static ieResRef *spell_hits = NULL;
 static bool enhanced_effects = false;
 static int shcount = -1;
+static int *spell_abilities = NULL;
+static ieDword splabcount = 0;
 
 static ScriptedAnimation default_spell_hit;
 
@@ -324,8 +327,8 @@ int fx_berserkstage2_modifier (Actor* Owner, Actor* target, Effect* fx);//f7
 int fx_damageluck_modifier (Actor* Owner, Actor* target, Effect* fx);//fa
 int fx_change_bardsong (Actor* Owner, Actor* target, Effect* fx);//fb
 int fx_set_area_effect (Actor* Owner, Actor* target, Effect* fx);//fc (set trap)
-int fx_set_map_marker_name (Actor* Owner, Actor* target, Effect* fx);//fd
-int fx_set_map_marker_position (Actor* Owner, Actor* target, Effect* fx);//fe
+int fx_set_map_note (Actor* Owner, Actor* target, Effect* fx);//fd
+int fx_remove_map_note (Actor* Owner, Actor* target, Effect* fx);//fe
 int fx_create_item_days (Actor* Owner, Actor* target, Effect* fx);//ff
 int fx_store_spell_sequencer (Actor* Owner, Actor* target, Effect* fx);//0x100
 int fx_create_spell_sequencer (Actor* Owner, Actor* target, Effect* fx);//101
@@ -388,7 +391,7 @@ int fx_generate_wish (Actor* Owner, Actor* target, Effect* fx);//137
 int fx_golem_stoneskin_modifier (Actor* Owner, Actor* target, Effect* fx);//13a
 int fx_avatar_removal_modifier (Actor* Owner, Actor* target, Effect* fx);//13b
 int fx_magical_rest (Actor* Owner, Actor* target, Effect* fx);//13c
-int fx_improved_haste_state (Actor* Owner, Actor* target, Effect* fx);//13d
+//int fx_improved_haste_state (Actor* Owner, Actor* target, Effect* fx);//13d same as haste
 
 int fx_unknown (Actor* Owner, Actor* target, Effect* fx);//???
 
@@ -540,7 +543,6 @@ static EffectRef effectnames[] = {
 	{ "Icon:Remove", fx_remove_portrait_icon, -1 },
 	{ "Identify", fx_identify, -1 },
 	{ "IgnoreDialogPause", fx_ignore_dialogpause_modifier, -1 },
-	{ "ImprovedHaste", fx_improved_haste_state, -1 },
 	{ "IntelligenceModifier", fx_intelligence_modifier, -1 },
 	{ "IntoxicationModifier", fx_intoxication_modifier, -1 },
 	{ "InvisibleDetection", fx_see_invisible_modifier, -1 },
@@ -637,6 +639,7 @@ static EffectRef effectnames[] = {
 	{ "Reveal:Tracks", fx_reveal_tracks, -1 },
 	{ "RemoveCurse", fx_remove_curse, -1 },
 	{ "RemoveImmunity", fx_remove_immunity, -1 },
+	{ "RemoveMapNote", fx_remove_map_note, -1 },
 	{ "RemoveProjectile", fx_remove_projectile, -1 }, //removes effects from actor and area
 	{ "RenableButton", fx_renable_button, -1 }, //removes disable button flag
 	{ "RemoveCreature", fx_remove_creature, -1 },
@@ -655,8 +658,7 @@ static EffectRef effectnames[] = {
 	{ "Sequencer:Create", fx_create_spell_sequencer, -1 },
 	{ "Sequencer:Store", fx_store_spell_sequencer, -1 },
 	{ "SetAIScript", fx_set_ai_script, -1 },
-	{ "SetMapMarkerName", fx_set_map_marker_name, -1 },
-	{ "SetMapMarkerPosition", fx_set_map_marker_position, -1 },
+	{ "SetMapNote", fx_set_map_note, -1 },
 	{ "SetMeleeEffect", fx_generic_effect, -1 },
 	{ "SetRangedEffect", fx_generic_effect, -1 },
 	{ "SetTrap", fx_set_area_effect, -1 },
@@ -681,9 +683,10 @@ static EffectRef effectnames[] = {
 	{ "State:Diseased", fx_set_diseased_state, -1 },
 	{ "State:Feeblemind", fx_set_feebleminded_state, -1 },
 	{ "State:Hasted", fx_set_hasted_state, -1 },
-	{ "State:Hold", fx_hold_creature, -1 }, //175
-	{ "State:Hold2", fx_hold_creature, -1 },//185
-	{ "State:Hold3", fx_hold_creature, -1 },//185
+	{ "State:Haste2", fx_set_hasted_state, -1 },
+	{ "State:Hold", fx_hold_creature, -1 }, //175 (doesn't work in original iwd2)
+	{ "State:Hold2", fx_hold_creature, -1 },//185 (doesn't work in original iwd2)
+	{ "State:Hold3", fx_hold_creature, -1 },//109 iwd2
 	{ "State:HoldNoIcon", fx_hold_creature_no_icon, -1 }, //109
 	{ "State:HoldNoIcon2", fx_hold_creature_no_icon, -1 }, //0xfb (iwd/iwd2)
 	{ "State:HoldNoIcon3", fx_hold_creature_no_icon, -1 }, //0x1a8 (iwd2)
@@ -916,10 +919,11 @@ int fx_set_charmed_state (Actor* Owner, Actor* target, Effect* fx)
 	case 1004:
 		target->SetBase(IE_EA, EA_ENEMY);
 		break;
-	case 5: //thrullcharm?
+	case 5: //thrall (typo comes from original engine doc)
 		core->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
 	case 1005:
 		STAT_SET(IE_EA, EA_ENEMY );
+		STAT_SET(IE_THRULLCHARM, 1);
 		return FX_PERMANENT;
 	}
 
@@ -1100,9 +1104,49 @@ int fx_cure_frozen_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x0F DexterityModifier
+
+#define CSA_DEX  0
+#define CSA_STR  1
+
+#define CSA_CNT  2
+int SpellAbilityDieRoll(Actor *target, int which)
+{
+	if (which>=CSA_CNT) return 6;
+
+	ieDword cls = STAT_GET(IE_CLASS);
+	if (!spell_abilities) {
+		int table = core->LoadTable("clssplab");
+		TableMgr *tab = core->GetTable(table);
+		if (!tab) {
+			spell_abilities = (int *) malloc(sizeof(int)*CSA_CNT);
+			for (int ab=0;ab<CSA_CNT;ab++) {
+				spell_abilities[ab*splabcount]=6;
+			}
+			splabcount=1;
+			return 6;
+		}
+		splabcount = tab->GetRowCount();
+		spell_abilities=(int *) malloc(sizeof(int)*splabcount*CSA_CNT);
+		for (int ab=0;ab<CSA_CNT;ab++) {
+			for (ieDword i=0;i<splabcount;i++) {
+				spell_abilities[ab*splabcount+i]=atoi(tab->QueryField(i,ab));
+			}
+		}
+		core->DelTable(table);
+	}
+	if (cls>=splabcount) cls=0;
+	return spell_abilities[which*splabcount+cls];
+}
+
 int fx_dexterity_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_dexterity_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	////how cat's grace: value is based on class
+	if (fx->Parameter2==3) {
+		fx->Parameter1 = core->Roll(1,SpellAbilityDieRoll(target,0),0);
+		fx->Parameter2 = 0;
+	}
 
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
 		BASE_MOD( IE_DEX );
@@ -1118,30 +1162,34 @@ static EffectRef fx_set_slow_state_ref={"State:Slowed",NULL,-1};
 int fx_set_hasted_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_hasted_state (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	target->fxqueue.RemoveAllEffects(fx_set_slow_state_ref);
+	target->fxqueue.RemoveAllEffectsWithParam( fx_display_portrait_icon_ref, PI_SLOWED );
+	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
+		BASE_STATE_CURE( STATE_SLOWED );
+		BASE_STATE_SET( STATE_HASTED );
+	} else {
+		STATE_CURE( STATE_SLOWED );
+		STATE_SET( STATE_HASTED );
+	}
 	switch (fx->Parameter2) {
 	case 0: //normal haste
-		if ( STATE_GET(STATE_SLOWED) ) {
-			BASE_STATE_CURE( STATE_SLOWED );
-			target->fxqueue.RemoveAllEffects(fx_set_slow_state_ref);
-			target->fxqueue.RemoveAllEffectsWithParam( fx_display_portrait_icon_ref, PI_SLOWED );
-		} else {
-			BASE_STATE_SET( STATE_HASTED );
-		}
+		target->AddPortraitIcon(PI_HASTED);
+		STAT_SET(IE_IMPROVEDHASTE,0);
+		STAT_SET(IE_ATTACKNUMBERDOUBLE,0);
 		break;
 	case 1://improved haste
-		if ( STATE_GET(STATE_SLOWED) ) {
-			BASE_STATE_CURE( STATE_SLOWED );
-			target->fxqueue.RemoveAllEffects(fx_set_slow_state_ref);
-			target->fxqueue.RemoveAllEffectsWithParam( fx_display_portrait_icon_ref, PI_SLOWED );
-		} else {
-			BASE_STATE_SET( STATE_HASTED );
-		}
+		target->AddPortraitIcon(PI_IMPROVEDHASTE);
+		STAT_SET(IE_IMPROVEDHASTE,1);
+		STAT_SET(IE_ATTACKNUMBERDOUBLE,0);
 		break;
 	case 2://speed haste only
+		target->AddPortraitIcon(PI_HASTED);
+		STAT_SET(IE_IMPROVEDHASTE,0);
+		STAT_SET(IE_ATTACKNUMBERDOUBLE,1);
 		break;
 	}
-	//probably when this effect expires, it issues a set_slowed_state?
-	return FX_NOT_APPLIED;
+
+	return FX_PERMANENT;
 }
 
 // 0x11 CurrentHPModifier
@@ -1540,7 +1588,7 @@ int fx_set_slowed_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 		STATE_SET( STATE_SLOWED );
 		target->AddPortraitIcon(PI_SLOWED);
 	}
-	return FX_APPLIED;
+	return FX_PERMANENT;
 }
 
 // 0x29 Sparkle
@@ -1592,6 +1640,12 @@ int fx_cure_petrified_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_strength_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_strength_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	////how strength: value is based on class
+	if (fx->Parameter2==3) {
+		fx->Parameter1 = core->Roll(1,SpellAbilityDieRoll(target,1),0);
+		fx->Parameter2 = 0;
+	}
 
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
 		BASE_MOD( IE_STR );
@@ -2003,8 +2057,10 @@ int fx_unsummon_creature (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_unsummon_creature (%2d)\n", fx->Opcode );
 
-	if (target->LastSummoner) {
-		//animation
+	//to be compatible with the original engine, unsummon doesn't work with PC's
+	//but it works on anything else
+	if (!target->InParty) {
+		//TODO:animation
 		target->DestroySelf();
 	}
 	return FX_NOT_APPLIED;
@@ -2995,10 +3051,14 @@ int fx_animation_stance (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 // 0x8B DisplayString
 // gemrb extension: rgb colour for displaystring
+static EffectRef fx_protection_from_display_string_ref={"Protection:String",NULL,-1};
+
 int fx_display_string (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_display_string (%2d): StrRef: %d\n", fx->Opcode, fx->Parameter1 );
-	core->DisplayStringName(fx->Parameter1, fx->Parameter2?fx->Parameter2:0xffffff, target, IE_STR_SOUND|IE_STR_SPEECH);
+	if (!target->fxqueue.HasEffectWithParamPair(fx_protection_from_display_string_ref, fx->Parameter1, 0) ) {
+		core->DisplayStringName(fx->Parameter1, fx->Parameter2?fx->Parameter2:0xffffff, target, IE_STR_SOUND|IE_STR_SPEECH);
+	}
 	return FX_NOT_APPLIED;
 }
 
@@ -3992,8 +4052,8 @@ int fx_teleport_field (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_teleport_field (%2d): Mod: %d\n", fx->Opcode, fx->Parameter1 );
 	//this should be the target's position, i think
 	Point p = target->Pos;
-	p.x+=core->Roll(1,fx->Parameter1,-(signed) (fx->Parameter1/2));
-	p.y+=core->Roll(1,fx->Parameter1,-(signed) (fx->Parameter1/2));
+	p.x+=core->Roll(1,fx->Parameter1*2,-(signed) (fx->Parameter1));
+	p.y+=core->Roll(1,fx->Parameter1*2,-(signed) (fx->Parameter1));
 	target->SetPosition( p, true, 0);
 	return FX_NOT_APPLIED;
 }
@@ -4288,6 +4348,7 @@ int fx_berserkstage2_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_berserkstage2_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	STAT_SET( IE_BERSERKSTAGE2, fx->Parameter2 );
+	STATE_SET (STATE_BERSERK);
 	return FX_APPLIED;
 }
 // 0xf8 set melee effect generic effect?
@@ -4308,17 +4369,28 @@ int fx_set_area_effect (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-// 0xfd SetMapMarkerName
-int fx_set_map_marker_name (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+// 0xfd SetMapNote
+int fx_set_map_note (Actor* Owner, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_set_map_marker_name (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_set_map_note (%2d): StrRef: %d  Color: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	Actor *marker = target?target:Owner;
+	Map *map = marker->GetCurrentArea();
+	if (!map) return FX_APPLIED; //delay effect
+	Point p(fx->PosX, fx->PosY);
+	char *text = core->GetString(fx->Parameter1, 0);
+	map->AddMapNote(p, fx->Parameter2, text);
 	return FX_NOT_APPLIED;
 }
 
-// 0xfe SetMapMarkerPosition
-int fx_set_map_marker_position (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+// 0xfe RemoveMapNote
+int fx_remove_map_note (Actor* Owner, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_set_map_marker_position (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_remove_map_note (%2d)\n", fx->Opcode);
+	Actor *marker = target?target:Owner;
+	Map *map = marker->GetCurrentArea();
+	if (!map) return FX_APPLIED; //delay effect
+	Point p(fx->PosX, fx->PosY);
+	map->RemoveMapNote(p);
 	return FX_NOT_APPLIED;
 }
 
@@ -5005,14 +5077,8 @@ int fx_magical_rest (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-// 0x13d ImprovedHaste
-int fx_improved_haste_state (Actor* /*Owner*/, Actor* target, Effect* fx)
-{
-	if (0) printf( "fx_improved_haste_state (%2d): Value: %d\n", fx->Opcode, fx->Parameter2 );
-	STAT_SET(IE_IMPROVEDHASTE, fx->Parameter2);
-	return FX_APPLIED;
-}
-
+// 0x13d ImprovedHaste (See 0x10 Haste)
+// unknown
 int fx_unknown (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	printf( "fx_unknown (%2d): P1: %d P2: %d ResRef: %s\n", fx->Opcode, fx->Parameter1, fx->Parameter2, fx->Resource );

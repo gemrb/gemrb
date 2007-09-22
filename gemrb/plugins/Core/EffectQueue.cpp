@@ -151,6 +151,8 @@ static EffectRef* FindEffect(const char* effectname)
 	return (EffectRef *) tmp;
 }
 
+static EffectRef fx_protection_from_display_string_ref={"Protection:String",NULL,-1};
+
 //special effects without level check (but with damage dices precalculated)
 static EffectRef diced_effects[] = {
 	//core effects
@@ -392,10 +394,7 @@ void EffectQueue::ApplyAllEffects(Actor* target)
 
 	std::list< Effect* >::iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
-		//(*f)->random_value = random_value;
-		//no idea if we should honour FX_ABORT here (resistspell)
-		//if yes, then break when applyeffect returned true
-		ApplyEffect( target, *f, false );
+		ApplyEffect( target, *f, 0 );
 	}
 	for ( f = effects.begin(); f != effects.end(); ) {
 		if ((*f)->TimingMode==FX_DURATION_JUST_EXPIRED) {
@@ -418,7 +417,7 @@ int EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &des
 	case FX_TARGET_ORIGINAL:
 		fx->PosX=self->Pos.x;
 		fx->PosY=self->Pos.y;
-		flg = self->fxqueue.ApplyEffect( self, fx, true );
+		flg = self->fxqueue.ApplyEffect( self, fx, 1 );
 		if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
 			self->fxqueue.AddEffect( fx, flg==FX_INSERT );
 		}
@@ -426,7 +425,7 @@ int EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &des
 	case FX_TARGET_SELF:
 		fx->PosX=dest.x;
 		fx->PosY=dest.y;
-		flg = self->fxqueue.ApplyEffect( self, fx, true );
+		flg = self->fxqueue.ApplyEffect( self, fx, 1 );
 		if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
 			self->fxqueue.AddEffect( fx, flg==FX_INSERT );
 		}
@@ -435,7 +434,7 @@ int EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &des
 	case FX_TARGET_PRESET:
 		fx->PosX=pretarget->Pos.x;
 		fx->PosY=pretarget->Pos.y;
-		flg = self->fxqueue.ApplyEffect( pretarget, fx, true );
+		flg = self->fxqueue.ApplyEffect( pretarget, fx, 1 );
 		if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
 			pretarget->fxqueue.AddEffect( fx, flg==FX_INSERT );
 		}
@@ -447,7 +446,7 @@ int EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &des
 			Actor* actor = game->GetPC( i, true );
 			fx->PosX=actor->Pos.x;
 			fx->PosY=actor->Pos.y;
-			flg = self->fxqueue.ApplyEffect( actor, fx, true );
+			flg = self->fxqueue.ApplyEffect( actor, fx, 1 );
 			if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
 				actor->fxqueue.AddEffect( fx, flg==FX_INSERT );
 			}
@@ -461,7 +460,7 @@ int EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &des
 			Actor* actor = map->GetActor( i, true );
 			fx->PosX=actor->Pos.x;
 			fx->PosY=actor->Pos.y;
-			flg = self->fxqueue.ApplyEffect( actor, fx, true );
+			flg = self->fxqueue.ApplyEffect( actor, fx, 1 );
 			if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
 				actor->fxqueue.AddEffect( fx, flg==FX_INSERT );
 			}
@@ -475,7 +474,7 @@ int EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &des
 			Actor* actor = map->GetActor( i, false );
 			fx->PosX=actor->Pos.x;
 			fx->PosY=actor->Pos.y;
-			flg = self->fxqueue.ApplyEffect( actor, fx, true );
+			flg = self->fxqueue.ApplyEffect( actor, fx, 1 );
 			//GetActorCount can now return all nonparty critters
 			//if (actor->InParty) continue;
 			if (fx->TimingMode!=FX_DURATION_JUST_EXPIRED) {
@@ -818,14 +817,14 @@ static bool check_resistance(Actor* actor, Effect* fx)
 }
 
 // this function is called two different ways
-// when first_apply is set, then the effect isn't stuck on the target
+// when FirstApply is set, then the effect isn't stuck on the target
 // this happens when a new effect comes in contact with the target.
 // if the effect returns FX_DURATION_JUST_EXPIRED then it won't stick
 // when first_apply is unset, the effect is already on the target
 // this happens on load time too!
 // returns true if the process should stop calling applyeffect anymore
 
-int EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
+int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply)
 {
 	if (!target) {
 		fx->TimingMode=FX_DURATION_JUST_EXPIRED;
@@ -839,6 +838,7 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 
 	ieDword GameTime = core->GetGame()->GameTime;
 
+	fx->FirstApply=first_apply;
 	if (first_apply) {
 		if ((fx->PosX==0xffffffff) && (fx->PosY==0xffffffff)) {
 			fx->PosX = target->Pos.x;
@@ -899,12 +899,17 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, bool first_apply)
 		abort();
 	}
 
-	EffectFunction fn = effect_refs[fx->Opcode].Function;
+	EffectFunction fn = 0;
+	if (fx->Opcode<MAX_EFFECTS) {
+		fn = effect_refs[fx->Opcode].Function;
+	}
 	int res = FX_ABORT;
 	if (fn) {    
 		if ( target && first_apply ) {
-			core->DisplayStringName( effect_refs[fx->Opcode].EffText, 0xf0f0f0, 
-				target, IE_STR_SOUND);
+			if (!target->fxqueue.HasEffectWithParamPair(fx_protection_from_display_string_ref, fx->Parameter1, 0) ) {
+				core->DisplayStringName( effect_refs[fx->Opcode].EffText, 0xf0f0f0, 
+					target, IE_STR_SOUND);
+			}
 		}
 		
 		res=fn( Owner?Owner:target, target, fx );

@@ -109,7 +109,7 @@ static int fx_blinding_orb (Actor* Owner, Actor* target, Effect* fx); //fc
 static int fx_remove_effects (Actor* Owner, Actor* target, Effect* fx); //fe
 static int fx_salamander_aura (Actor* Owner, Actor* target, Effect* fx); //ff
 static int fx_umberhulk_gaze (Actor* Owner, Actor* target, Effect* fx); //100
-//static int fx_zombielord_aura (Actor* Owner, Actor* target, Effect* fx); //101, duff
+static int fx_zombielord_aura (Actor* Owner, Actor* target, Effect* fx); //101, duff in iwd2
 static int fx_resist_spell (Actor* Owner, Actor* target, Effect* fx); //102
 static int fx_summon_creature2 (Actor* Owner, Actor* target, Effect* fx); //103
 //int fx_avatar_removal (Actor* Owner, Actor* target, Effect* fx); //104
@@ -244,7 +244,7 @@ static EffectRef effectnames[] = {
 	{ "RemoveEffects", fx_remove_effects, -1}, //fe
 	{ "SalamanderAura", fx_salamander_aura, -1}, //ff
 	{ "UmberHulkGaze", fx_umberhulk_gaze, -1}, //100
-	//{ "ZombieLordAura", fx_zombielord_aura, -1},//101, duff
+	{ "ZombieLordAura", fx_zombielord_aura, -1},//101, duff in iwd2
 	{ "SummonCreature2", fx_summon_creature2, -1}, //103
 	{ "SummonPomab", fx_summon_pomab, -1}, //106
 	{ "ControlUndead", fx_control_undead, -1}, //107
@@ -412,7 +412,8 @@ static void ReadSpellProtTable(const ieResRef tablename)
 		return;
 	}
 	for( int i=0;i<spellrescnt;i++) {
-		spellres[i].stat = (ieWord) strtol(tab->QueryField(i,0),NULL,0 );
+		//spellres[i].stat = (ieWord) strtol(tab->QueryField(i,0),NULL,0 );
+		spellres[i].stat = core->TranslateStat(tab->QueryField(i,0) );
 		spellres[i].value = (ieDword) strtol(tab->QueryField(i,1),NULL,0 );
 		spellres[i].relation = (ieWord) strtol(tab->QueryField(i,2),NULL,0 );
 	}
@@ -592,16 +593,28 @@ int fx_draw_upon_holy_might (Actor* /*Owner*/, Actor* target, Effect* fx)
 //This is about damage reduction, not full stoneskin like in bg2
 int fx_ironskins (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	//todo: calculate buffered damage in param3 on first run
-	//somehow deduct suffered damage from param3
-	//abort effect when param3 goes below 0
+	ieDword tmp;
+
 	if (fx->Parameter2) {
 		//ironskins
-		if (target->SetSpellState( SS_IRONSKIN)) return FX_NOT_APPLIED;
-
+		tmp = STAT_GET(IE_STONESKINS);
+		if (fx->Parameter1>tmp) {
+		  STAT_SET(IE_STONESKINS, fx->Parameter1);
+		}
+		target->SetSpellState( SS_IRONSKIN);
 		return FX_APPLIED;
 	}
+
 	//stoneskins (iwd2)
+	if (fx->FirstApply) {
+		tmp=fx->CasterLevel*10;
+		if (tmp>150) tmp=150;
+		fx->Parameter3=tmp;
+	}
+	if (!fx->Parameter3) {
+		return FX_NOT_APPLIED;
+	}
+
 	if (target->SetSpellState( SS_STONESKIN)) return FX_NOT_APPLIED;
 	target->SetGradient(14);
 	return FX_APPLIED;
@@ -685,10 +698,6 @@ int fx_chill_touch (Actor* Owner, Actor* target, Effect* fx)
 int fx_chill_touch_panic (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_chill_touch_panic (%2d)\n", fx->Opcode);
-	//STAT_SET(IE_MORALE, STAT_GET(IE_MORALEBREAK));
-	if (enhanced_effects) {
-		target->AddPortraitIcon(PI_PANIC);
-	}
 	ieDword state;
 
 	if (fx->Parameter2) {
@@ -701,6 +710,9 @@ int fx_chill_touch_panic (Actor* /*Owner*/, Actor* target, Effect* fx)
 		BASE_STATE_SET(state);
 	} else {
 		STATE_SET(state);
+	}
+	if (enhanced_effects) {
+		target->AddPortraitIcon(PI_PANIC);
 	}
 	return FX_PERMANENT;
 }
@@ -1054,6 +1066,8 @@ static EffectRef fx_state_blind_ref={"State:Blind",NULL,-1};
 int fx_blinding_orb (Actor* Owner, Actor* target, Effect* fx)
 {
 	ieDword damage = fx->Parameter1;
+
+	//original code checks race: 0x6c, 0x73, 0xa7
 	if (STAT_GET(IE_GENERAL)==GEN_UNDEAD) {
 		damage *= 2;
 	}
@@ -1064,6 +1078,8 @@ int fx_blinding_orb (Actor* Owner, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 	target->Damage(damage, DAMAGE_FIRE, Owner);
+
+	//convert effect to a blind effect.
 	fx->Opcode = EffectQueue::ResolveEffect(fx_state_blind_ref);
 	fx->Duration = core->Roll(1,6,0);
 	fx->TimingMode = FX_DURATION_INSTANT_LIMITED;
@@ -1117,63 +1133,104 @@ int fx_salamander_aura (Actor* Owner, Actor* target, Effect* fx)
 //from the confusion effect
 static EffectRef fx_confusion_ref={"State:Confused",NULL,-1};
 static EffectRef fx_display_portrait_icon_ref={"Icon:Display",NULL,-1};
+static EffectRef fx_immunity_resource_ref={"Protection:Spell",NULL,-1};
 
 int fx_umberhulk_gaze (Actor* Owner, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_umberhulk_gaze (%2d): Count: %d\n", fx->Opcode, fx->Parameter1);
-	///STATE_SET( STATE_CONFUSED );
-
-	if (!fx->Parameter1) {
+	if (0) printf( "fx_umberhulk_gaze (%2d): Duration: %d\n", fx->Opcode, fx->Parameter1);
+	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
 		return FX_NOT_APPLIED;
 	}
-
-	//timing (set up next fire)  
-	fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
+	fx->TimingMode=FX_DURATION_AFTER_EXPIRES;
 	fx->Duration=core->GetGame()->GameTime+7*15;
-	fx->Parameter1--;
-	//check if target is golem/umber hulk/minotaur, the effect is not working
-	if (check_iwd_targeting(Owner, target, 0, 17)) { //umber hulk
-		return FX_NOT_APPLIED;
+
+	//collect targets and apply effect on targets
+	Map *area = target->GetCurrentArea();
+	int i = area->GetActorCount(true);
+	while(i--) {
+		Actor *victim = area->GetActor(i,true);
+		if (target==victim) continue;
+		if (PersonalDistance(target, victim)>20) continue;
+		
+		//check if target is golem/umber hulk/minotaur, the effect is not working
+		if (check_iwd_targeting(Owner, victim, 0, 17)) { //umber hulk
+		  continue;
+		}
+		if (check_iwd_targeting(Owner, victim, 0, 27)) { //golem
+		  continue;
+		}
+		if (check_iwd_targeting(Owner, victim, 0, 29)) { //minotaur
+		  continue;
+		}
+		if (check_iwd_targeting(Owner, victim, 0, 23)) { //blind
+		  continue;
+		}
+
+		Effect * newfx;
+		
+		//apply a confusion opcode on target (0x80)
+		newfx = EffectQueue::CreateEffectCopy(fx, fx_confusion_ref, 0, 0);
+		newfx->TimingMode = FX_DURATION_INSTANT_LIMITED;
+		newfx->Duration = fx->Parameter1;
+		core->ApplyEffect(newfx, Owner, victim);
+		
+		//apply a resource resistance against this spell to block flood
+		newfx = EffectQueue::CreateEffectCopy(fx, fx_immunity_resource_ref, 0, 0);
+		newfx->TimingMode = FX_DURATION_INSTANT_LIMITED;
+		newfx->Duration = fx->Parameter1;
+		memcpy(newfx->Resource, fx->Source, sizeof(newfx->Resource) );
+		core->ApplyEffect(newfx, Owner, victim);
 	}
-	if (check_iwd_targeting(Owner, target, 0, 27)) { //golem
-		return FX_NOT_APPLIED;
-	}
-	if (check_iwd_targeting(Owner, target, 0, 29)) { //minotaur
-		return FX_NOT_APPLIED;
-	}
 
-	Effect * newfx;
-
-	//apply a confusion opcode on target (0x80)
- 	newfx = EffectQueue::CreateEffectCopy(fx, fx_confusion_ref, 0, 0);
-	core->ApplyEffect(newfx, Owner, target);
-
-	//apply a confusion icon on target
- 	newfx = EffectQueue::CreateEffectCopy(fx, fx_display_portrait_icon_ref, 0, PI_CONFUSION);
-	core->ApplyEffect(newfx, Owner, target);
-
-	return FX_NOT_APPLIED;
-}
-
-//0x101 ZombieLordAura unused in all games
-/*
-int fx_zombielord_aura (Actor* Owner, Actor* target, Effect* fx)
-{
-	if (0) printf( "fx_zombielord_aura (%2d): Count: %d\n", fx->Opcode, fx->Parameter1);
-	STATE_SET( STATE_CONFUSED );
-	//timing
-	if (core->GetGame()->GameTime%6) {
-		return FX_APPLIED;
-	}
-	//timing (set up next fire)  
-	fx->TimingMode=FX_DURATION_DELAY_PERMANENT;
-	fx->Duration=core->GetGame()->GameTime+7*15;
-	fx->Parameter1--;
-	//apply a confusion opcode on target (0x80)
-	//
 	return FX_APPLIED;
 }
-*/
+
+//0x101 ZombieLordAura (causes Panic) unused in all games
+static EffectRef fx_fear_ref={"State:Panic",NULL,-1};
+
+int fx_zombielord_aura (Actor* Owner, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_zombie_lord_aura (%2d): Duration: %d\n", fx->Opcode, fx->Parameter1);
+	if (STATE_GET(STATE_DEAD|STATE_PETRIFIED|STATE_FROZEN) ) {
+		return FX_NOT_APPLIED;
+	}
+	fx->TimingMode=FX_DURATION_AFTER_EXPIRES;
+	fx->Duration=core->GetGame()->GameTime+7*15;
+
+	//collect targets and apply effect on targets
+	Map *area = target->GetCurrentArea();
+	int i = area->GetActorCount(true);
+	while(i--) {
+		Actor *victim = area->GetActor(i,true);
+		if (target==victim) continue;
+		if (PersonalDistance(target, victim)>20) continue;
+		
+		//check if target is golem/umber hulk/minotaur, the effect is not working
+		if (check_iwd_targeting(Owner, victim, 0, 27)) { //golem
+		  continue;
+		}
+		if (check_iwd_targeting(Owner, victim, 0, 1)) { //undead
+		  continue;
+		}
+
+		Effect * newfx;
+		
+		//apply a panic opcode on target (0x18)
+		newfx = EffectQueue::CreateEffectCopy(fx, fx_fear_ref, 0, 0);
+		newfx->TimingMode = FX_DURATION_INSTANT_LIMITED;
+		newfx->Duration = fx->Parameter1;
+		core->ApplyEffect(newfx, Owner, victim);
+		
+		//apply a resource resistance against this spell to block flood
+		newfx = EffectQueue::CreateEffectCopy(fx, fx_immunity_resource_ref, 0, 0);
+		newfx->TimingMode = FX_DURATION_INSTANT_LIMITED;
+		newfx->Duration = fx->Parameter1;
+		memcpy(newfx->Resource, fx->Source, sizeof(newfx->Resource) );
+		core->ApplyEffect(newfx, Owner, victim);
+	}
+
+	return FX_APPLIED;
+}
 //0x102 Protection:Spell (this is the same as in bg2?)
 
 //0x103 SummonCreature2
@@ -1221,29 +1278,31 @@ int fx_control_undead (Actor* Owner, Actor* target, Effect* fx)
 	}
 	bool enemyally = Owner->GetStat(IE_EA)>EA_GOODCUTOFF; //or evilcutoff?
 
-	//do this only on first use
-	switch (fx->Parameter2) {
-	case 0: //charmed (target neutral after charm)
-		core->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
-		break;
-	case 1: //charmed (target hostile after charm)
-		core->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
-		target->SetBase(IE_EA, EA_ENEMY);
-		break;
-	case 2: //controlled by cleric
-		core->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
-		break;
-	case 3: //controlled by cleric (hostile after charm)
-		core->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
-		target->SetBase(IE_EA, EA_ENEMY);
-		break;
-	case 4: //turn undead
-		core->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
-		target->SetBase(IE_EA, EA_ENEMY);
-		target->SetStat(IE_MORALE, 0, 0);
-		break;
+	if (fx->FirstApply) {
+		//do this only on first use
+		switch (fx->Parameter2) {
+		case 0: //charmed (target neutral after charm)
+		  core->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
+		  break;
+		case 1: //charmed (target hostile after charm)
+		  core->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
+		  target->SetBase(IE_EA, EA_ENEMY);
+		  break;
+		case 2: //controlled by cleric
+		  core->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
+		  break;
+		case 3: //controlled by cleric (hostile after charm)
+		  core->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
+		  target->SetBase(IE_EA, EA_ENEMY);
+		  break;
+		case 4: //turn undead
+		  core->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
+		  target->SetBase(IE_EA, EA_ENEMY);
+		  target->SetStat(IE_MORALE, 0, 0);
+		  break;
+		}
 	}
-
+	
 	STATE_SET( STATE_CHARMED );
 	STAT_SET( IE_EA, enemyally?EA_ENEMY:EA_CHARMED );
 	//don't stick if permanent
@@ -1351,8 +1410,10 @@ int fx_eye_of_the_mind (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_eye_of_the_mind (%2d)\n", fx->Opcode );
 	if (target->SetSpellState( SS_EYEMIND)) return FX_APPLIED;
 	EXTSTATE_SET(EXTSTATE_EYE_MIND);
-	//TODO: first run
-	target->LearnSpell(SevenEyes[EYE_MIND], LS_MEMO);
+	
+	if (fx->FirstApply) {
+		target->LearnSpell(SevenEyes[EYE_MIND], LS_MEMO);
+	}
 	return FX_APPLIED;
 }
 //0x10d EyeOfTheSword
@@ -1361,8 +1422,10 @@ int fx_eye_of_the_sword (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_eye_of_the_sword (%2d)\n", fx->Opcode );
 	if (target->SetSpellState( SS_EYESWORD)) return FX_APPLIED;
 	EXTSTATE_SET(EXTSTATE_EYE_SWORD);
-	//TODO: first run
-	target->LearnSpell(SevenEyes[EYE_SWORD], LS_MEMO);
+
+	if (fx->FirstApply) {
+		target->LearnSpell(SevenEyes[EYE_SWORD], LS_MEMO);
+	}
 	return FX_APPLIED;
 }
 
@@ -1372,8 +1435,10 @@ int fx_eye_of_the_mage (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_eye_of_the_mage (%2d)\n", fx->Opcode );
 	if (target->SetSpellState( SS_EYEMAGE)) return FX_APPLIED;
 	EXTSTATE_SET(EXTSTATE_EYE_MAGE);
-	//TODO: first run
-	target->LearnSpell(SevenEyes[EYE_MAGE], LS_MEMO);
+
+	if (fx->FirstApply) {
+		target->LearnSpell(SevenEyes[EYE_MAGE], LS_MEMO);
+	}
 	return FX_APPLIED;
 }
 
@@ -1383,8 +1448,10 @@ int fx_eye_of_venom (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_eye_of_venom (%2d)\n", fx->Opcode );
 	if (target->SetSpellState( SS_EYEVENOM)) return FX_APPLIED;
 	EXTSTATE_SET(EXTSTATE_EYE_VENOM);
-	//TODO: first run
-	target->LearnSpell(SevenEyes[EYE_VENOM], LS_MEMO);
+
+	if (fx->FirstApply) {
+		target->LearnSpell(SevenEyes[EYE_VENOM], LS_MEMO);
+	}
 	return FX_APPLIED;
 }
 
@@ -1394,8 +1461,10 @@ int fx_eye_of_the_spirit (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_eye_of_the_spirit (%2d)\n", fx->Opcode );
 	if (target->SetSpellState( SS_EYESPIRIT)) return FX_APPLIED;
 	EXTSTATE_SET(EXTSTATE_EYE_SPIRIT);
-	//TODO: first run
-	target->LearnSpell(SevenEyes[EYE_SPIRIT], LS_MEMO);
+
+	if (fx->FirstApply) {
+		target->LearnSpell(SevenEyes[EYE_SPIRIT], LS_MEMO);
+	}
 	return FX_APPLIED;
 }
 
@@ -1405,8 +1474,10 @@ int fx_eye_of_fortitude (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_eye_of_fortitude (%2d)\n", fx->Opcode );
 	if (target->SetSpellState( SS_EYEFORTITUDE)) return FX_APPLIED;
 	EXTSTATE_SET(EXTSTATE_EYE_FORT);
-	//TODO: first run
-	target->LearnSpell(SevenEyes[EYE_FORT], LS_MEMO);
+
+	if (fx->FirstApply) {
+		target->LearnSpell(SevenEyes[EYE_FORT], LS_MEMO);
+	}
 	return FX_APPLIED;
 }
 
@@ -1416,8 +1487,10 @@ int fx_eye_of_stone (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_eye_of_stone (%2d)\n", fx->Opcode );
 	if (target->SetSpellState( SS_EYESTONE)) return FX_APPLIED;
 	EXTSTATE_SET(EXTSTATE_EYE_STONE);
-	//TODO: first run
-	target->LearnSpell(SevenEyes[EYE_STONE], LS_MEMO);
+
+	if (fx->FirstApply) {
+		target->LearnSpell(SevenEyes[EYE_STONE], LS_MEMO);
+	}
 	return FX_APPLIED;
 }
 

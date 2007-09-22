@@ -398,6 +398,7 @@
 
 #define IE_ENABLEOFFSCREENAI    183 // bg2 has this on this spot
 #define IE_EXISTANCEDELAY       184 // (sound2mn)
+#define IE_ATTACKNUMBERDOUBLE   185 // used by haste option 2
 #define IE_DISABLECHUNKING      186 //
 #define IE_NOTURNABLE           187 // immune to turn
 #define IE_CHAOSSHIELD          189 // defense against wild surge

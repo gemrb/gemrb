@@ -1,0 +1,11 @@
+Description: This table implements spell resistances based on a simple condition of the target's stats.
+One row defines a certain 'semi-hardcoded' condition. For iwd/iwd2 these conditions were hardcoded into the engine.
+
+Columns - 
+STAT      - the name or number of the stat
+VALUE     - a value which has to match the stat
+RELATION  - a symbol for the comparation to be performed
+COMMENT   - unused by GemRB, it is just a reminder
+
+Rows - spell immunity conditions
+

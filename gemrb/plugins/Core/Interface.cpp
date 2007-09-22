@@ -5310,6 +5310,12 @@ ieDword *Interface::GetListFrom2DA(const ieResRef resref)
 //returns a numeric value associated with a stat name (symbol) from stats.ids
 ieDword Interface::TranslateStat(const char *stat_name) 
 {
+	long tmp;
+
+	if (valid_number(stat_name, tmp)) {
+		return (ieDword) tmp;
+	}
+
 	int symbol = LoadSymbol( "stats" );
 	SymbolMgr *sym = GetSymbol( symbol );
 	ieDword stat = (ieDword) sym->GetValue( stat_name );

@@ -250,7 +250,7 @@ IDS
 0xf8	SummonShadowMonster
 0xf9	Recitation
 0xfa	RecitationBad
-0xfb	State:Hold4
+0xfb	State:HoldNoIcon2
 0xfc	BlindingOrb
 0xfd	ACVsDamageTypeModifier2
 0xfe	RemoveEffects
@@ -322,7 +322,7 @@ IDS
 421	EntropyShield
 422	StormShell
 423	ProtectionFromElements
-424	HoldUndead
+424	State:HoldNoIcon3
 425	ControlUndead2
 426	Aegis
 427	ExecutionerEyes

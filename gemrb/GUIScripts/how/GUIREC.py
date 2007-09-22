@@ -262,8 +262,6 @@ def GetStatColor (pc, stat):
 	return (0,255,0)
 
 def GetStatOverview (pc):
-	won = "[color=FFFFFF]"
-	woff = "[/color]"
 	StateTable = GemRB.LoadTable ("statdesc")
 	str_None = GemRB.GetString (41275)
 
@@ -376,7 +374,7 @@ def GetStatOverview (pc):
 	RowCount = GemRB.GetTableRowCount (table)
 	# 
 	for i in range(RowCount):
-		text = GemRB.GetTableValue (table, i, 1)
+		text = GemRB.GetTableValue (table, i, 3)
 		stat = GemRB.GetTableValue (table, i, 0)
 		stats.append ( (text, GS(stat), '+') )
 	stats.append (None)
@@ -487,7 +485,7 @@ def GetStatOverview (pc):
 			lines = 1
 		except:
 			if s != None:
-				res.append (won + GemRB.GetString (s) + woff)
+				res.append (GemRB.GetString (s) )
 				lines = 0
 			else:
 				if not lines:

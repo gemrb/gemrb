@@ -1,18 +1,18 @@
 2DA V1.0
 -1
-               NAME_REF   DESC_REF   CAP_REF    
-BOW            11965      9591       8733       
-CROSSBOW       16034      18323      16033      
-MISSILE        11971      9596       9403       
-AXE            11969      9595       9404       
-CLUB           16030      18324      16029      
-DAGGER         16014      18325      16013      
-FLAIL          16021      18326      16020      
-HALBERD        16016      18327      16015      
-HAMMER         16027      18328      16022      
-MACE           16018      18329      16017      
-SPEAR          11972      9592       8734       
-QUARTER_STAFF  16032      18330      16031      
-GREAT_SWORD    16012      18331      16011      
-LARGE_SWORD    11968      9589       8668       
-SMALL_SWORD    11967      9590       8732       
+              ID         NAME_REF   DESC_REF   CAP_REF
+BOW           91         11965      9591       8733
+CROSSBOW      103        16034      18323      16033
+MISSILE       94         11971      9596       9403
+AXE           93         11969      9595       9402
+CLUB          101        16030      18324      16029
+DAGGER        96         16014      18325      16013
+FLAIL         99         16021      18326      16020
+HALBERD       97         16016      18327      16015
+HAMMER        100        16027      18328      16022
+MACE          98         16018      18329      16017
+SPEAR         92         11972      9592       8734
+QUARTER_STAFF 102        16032      18330      16031
+GREAT_SWORD   95         16012      18331      16011
+LARGE_SWORD   89         11968      9589       8668
+SMALL_SWORD   90         11967      9590       8732

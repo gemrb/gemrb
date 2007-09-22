@@ -101,16 +101,17 @@ struct Effect {
 	ieDword PrimaryType; //school
 	ieDword Parameter3;
 	ieDword Parameter4;
+	ieDword PosX, PosY;
 	ieResRef Source;
-	ieDword Projectile;
-	ieDwordSigned InventorySlot;
-	ieDword CasterLevel;
+	ieDword Projectile;           //9c
+	ieDwordSigned InventorySlot; //a0
+	//Original engine had a VariableName here, but it is stored in the resource fields
+	ieDword CasterLevel;  //c4 in both
+	ieDword FirstApply;   //c8 in bg2, cc in iwd2
 	ieDword SecondaryType;
 	ieDword SecondaryDelay; //still not sure about this
 	// These are not in the IE files, but are our precomputed values
 	ieDword random_value;
-	// These could be in the effv2.0 fields, but not used in comparison
-	ieDword PosX, PosY;
 };
 
 // FIXME: what about area spells? They can have map & coordinates as target
