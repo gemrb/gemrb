@@ -307,7 +307,7 @@ void MapControl::OnMouseOver(unsigned short x, unsigned short y)
 	}
 	switch (Value)
 	{
-	case MAP_REVEAL: //for clairvoyance effect
+	case MAP_REVEAL: //for farsee effect
 		Owner->Cursor = IE_CURSOR_CAST;
 		break;
 	case MAP_SET_NOTE:
@@ -377,6 +377,8 @@ void MapControl::OnMouseUp(unsigned short x, unsigned short y,
 	switch(Value) {
 		case MAP_REVEAL:
 			ViewHandle(x,y);
+			NotePosX = (short) SCREEN_TO_MAPX(x) * MAP_MULT / MAP_DIV;
+			NotePosY = (short) SCREEN_TO_MAPY(y) * MAP_MULT / MAP_DIV;
 			ClickHandle();
 			return;
 		case MAP_NO_NOTES:

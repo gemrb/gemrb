@@ -603,7 +603,7 @@ int fx_ironskins (Actor* /*Owner*/, Actor* target, Effect* fx)
 		//ironskins
 		tmp = STAT_GET(IE_STONESKINS);
 		if (fx->Parameter1>tmp) {
-		  STAT_SET(IE_STONESKINS, fx->Parameter1);
+			STAT_SET(IE_STONESKINS, fx->Parameter1);
 		}
 		target->SetSpellState( SS_IRONSKIN);
 		return FX_APPLIED;
@@ -790,6 +790,14 @@ ieResRef iwd_monster_2da[IWD_MSC]={"MSUMMO1","MSUMMO2","MSUMMO3","MSUMMO4",
 int fx_iwd_monster_summoning (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_iwd_monster_summoning (%2d): ResRef:%s Anim:%s Type: %d\n", fx->Opcode, fx->Resource, fx->Resource2, fx->Parameter2 );
+
+	if (!target) {
+		return FX_NOT_APPLIED;
+	}
+
+	if (!target->GetCurrentArea()) {
+		return FX_APPLIED;
+	}
 	//check the summoning limit?
 
 	ieResRef monster;
@@ -837,6 +845,13 @@ int fx_animate_dead (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_animate_dead (%2d): ResRef:%s Type: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
 	//check the summoning limit?
+	if (!target) {
+		return FX_NOT_APPLIED;
+	}
+
+	if (!target->GetCurrentArea()) {
+		return FX_APPLIED;
+	}
 
 	ieResRef monster;
 	ieResRef hit;
@@ -905,6 +920,13 @@ int fx_summon_monster2 (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_summon_monster2 (%2d): ResRef:%s Type: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
 	//check the summoning limit?
+	if (!target) {
+		return FX_NOT_APPLIED;
+	}
+
+	if (!target->GetCurrentArea()) {
+		return FX_APPLIED;
+	}
 
 	ieResRef monster;
 	ieResRef hit;
@@ -984,6 +1006,13 @@ int fx_summon_shadow_monster (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_summon_shadow_monster (%2d): ResRef:%s Type: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
 	//check the summoning limit?
+	if (!target) {
+		return FX_NOT_APPLIED;
+	}
+
+	if (!target->GetCurrentArea()) {
+		return FX_APPLIED;
+	}
 
 	ieResRef monster;
 	ieResRef hit;
@@ -1158,16 +1187,16 @@ int fx_umberhulk_gaze (Actor* Owner, Actor* target, Effect* fx)
 		
 		//check if target is golem/umber hulk/minotaur, the effect is not working
 		if (check_iwd_targeting(Owner, victim, 0, 17)) { //umber hulk
-		  continue;
+			continue;
 		}
 		if (check_iwd_targeting(Owner, victim, 0, 27)) { //golem
-		  continue;
+			continue;
 		}
 		if (check_iwd_targeting(Owner, victim, 0, 29)) { //minotaur
-		  continue;
+			continue;
 		}
 		if (check_iwd_targeting(Owner, victim, 0, 23)) { //blind
-		  continue;
+			continue;
 		}
 
 		Effect * newfx;
@@ -1211,10 +1240,10 @@ int fx_zombielord_aura (Actor* Owner, Actor* target, Effect* fx)
 		
 		//check if target is golem/umber hulk/minotaur, the effect is not working
 		if (check_iwd_targeting(Owner, victim, 0, 27)) { //golem
-		  continue;
+			continue;
 		}
 		if (check_iwd_targeting(Owner, victim, 0, 1)) { //undead
-		  continue;
+			continue;
 		}
 
 		Effect * newfx;
@@ -1245,6 +1274,13 @@ int fx_summon_creature2 (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_summon_creature2 (%2d): ResRef:%s Anim:%s Type: %d\n", fx->Opcode, fx->Resource, fx->Resource2, fx->Parameter2 );
 
+	if (!target) {
+		return FX_NOT_APPLIED;
+	}
+
+	if (!target->GetCurrentArea()) {
+		return FX_APPLIED;
+	}
 	//summon creature (resource), play vvc (resource2)
 	//creature's lastsummoner is Owner
 	//creature's target is target
@@ -1260,15 +1296,35 @@ int fx_summon_creature2 (Actor* Owner, Actor* target, Effect* fx)
 //0x104 AvatarRemovalModifier (same as bg2)
 //0x105 immunity to effect (same as bg2?)
 //0x106 SummonPomab
+
+static Point pomab_positions[6]={
+	Point(0x1e8, 0x20a),
+	Point(0x1c6, 0x1f6),
+	Point(0x1d0, 0x20a),
+	Point(0x1b5, 0x204),
+	Point(0x1c2, 0x216),
+	Point(0x1dd, 0x217)
+};
+static ieResRef pomab_resref[2]={"eepomab","pomimg"};
+
 int fx_summon_pomab (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_summon_pomab (%2d): ResRef:%s Anim:%s Type: %d\n", fx->Opcode, fx->Resource, fx->Resource2, fx->Parameter2 );
-	if (!fx->Resource[0]) {
-		strcpy(fx->Resource,"POMAB");
+
+	if (!target) {
+		return FX_NOT_APPLIED;
 	}
 
-	Point p(fx->PosX+core->Roll(1,20,0), fx->PosY+core->Roll(1,20,0) );
-	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, p, -1,100);
+	if (!target->GetCurrentArea()) {
+		return FX_APPLIED;
+	}
+
+	int real = core->Roll(1,6,-1);
+
+	for (int i=0;i<6;i++) {    
+		core->SummonCreature(real==i?pomab_resref[0]:pomab_resref[1], fx->Resource2, Owner,
+		  target, pomab_positions[i], -1, 100);
+	}
 	return FX_NOT_APPLIED;
 }
 
@@ -1286,24 +1342,24 @@ int fx_control_undead (Actor* Owner, Actor* target, Effect* fx)
 		//do this only on first use
 		switch (fx->Parameter2) {
 		case 0: //charmed (target neutral after charm)
-		  core->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
-		  break;
+			core->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
+			break;
 		case 1: //charmed (target hostile after charm)
-		  core->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
-		  target->SetBase(IE_EA, EA_ENEMY);
-		  break;
+			core->DisplayConstantStringName(STR_CHARMED, 0xf0f0f0, target);
+			target->SetBase(IE_EA, EA_ENEMY);
+			break;
 		case 2: //controlled by cleric
-		  core->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
-		  break;
+			core->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
+			break;
 		case 3: //controlled by cleric (hostile after charm)
-		  core->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
-		  target->SetBase(IE_EA, EA_ENEMY);
-		  break;
+			core->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
+			target->SetBase(IE_EA, EA_ENEMY);
+			break;
 		case 4: //turn undead
-		  core->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
-		  target->SetBase(IE_EA, EA_ENEMY);
-		  target->SetStat(IE_MORALE, 0, 0);
-		  break;
+			core->DisplayConstantStringName(STR_CONTROLLED, 0xf0f0f0, target);
+			target->SetBase(IE_EA, EA_ENEMY);
+			target->SetStat(IE_MORALE, 0, 0);
+			break;
 		}
 	}
 	
@@ -2137,6 +2193,13 @@ int fx_righteous_wrath (Actor* /*Owner*/, Actor* target, Effect* fx)
 //410 SummonAllyIWD2
 int fx_summon_ally (Actor* Owner, Actor* target, Effect* fx)
 {
+	if (!target) {
+		return FX_NOT_APPLIED;
+	}
+
+	if (!target->GetCurrentArea()) {
+		return FX_APPLIED;
+	}
 	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, target->Pos, EAM_ALLY, 0);
 	return FX_NOT_APPLIED;
 }
@@ -2144,6 +2207,13 @@ int fx_summon_ally (Actor* Owner, Actor* target, Effect* fx)
 //411 SummonEnemyIWD2
 int fx_summon_enemy (Actor* Owner, Actor* target, Effect* fx)
 {
+	if (!target) {
+		return FX_NOT_APPLIED;
+	}
+
+	if (!target->GetCurrentArea()) {
+		return FX_APPLIED;
+	}
 	core->SummonCreature(fx->Resource, fx->Resource2, Owner, target, target->Pos, EAM_ENEMY, 0);
 	return FX_NOT_APPLIED;
 }

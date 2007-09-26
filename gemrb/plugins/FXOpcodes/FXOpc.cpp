@@ -1595,8 +1595,16 @@ int fx_set_slowed_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_sparkle (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_sparkle (%2d): Sparkle colour: %d ; Sparkle type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (!target) {
+		return FX_NOT_APPLIED;
+	}
+
+	Map *map = target->GetCurrentArea();
+	if (!map) {
+		return FX_APPLIED;
+	}
 	Point p(fx->PosX, fx->PosY);
-	target->GetCurrentArea()->Sparkle( fx->Parameter1, fx->Parameter2, p);
+	map->Sparkle( fx->Parameter1, fx->Parameter2, p);
 	return FX_NOT_APPLIED;
 }
 
@@ -2039,6 +2047,13 @@ static int eamods[]={EAM_ALLY,EAM_ALLY,EAM_DEFAULT,EAM_ALLY,EAM_DEFAULT,EAM_ENEM
 int fx_summon_creature (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_summon_creature (%2d): ResRef:%s Anim:%s Type: %d\n", fx->Opcode, fx->Resource, fx->Resource2, fx->Parameter2 );
+	if (!target) {
+		return FX_NOT_APPLIED;
+	}
+
+	if (!target->GetCurrentArea()) {
+		return FX_APPLIED;
+	}
 
 	//summon creature (resource), play vvc (resource2)
 	//creature's lastsummoner is Owner
@@ -2698,14 +2713,20 @@ int fx_detect_alignment (Actor* /*Owner*/, Actor* target, Effect* fx)
 // 0x74 Cure:Invisible2 (see 0x2f)
 
 // 0x75 Reveal:Area
+// 0 reveal whole area
+// 1 reveal area in pattern
 int fx_reveal_area (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_reveal_area (%2d): Value: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	//reveals whole area
+	Map *map = target->GetCurrentArea();
+	if (!map) {
+		return FX_APPLIED;
+	}
+
 	if (fx->Parameter2) {
-		target->GetCurrentArea()->Explore(fx->Parameter1);
+		map->Explore(fx->Parameter1);
 	} else {
-		target->GetCurrentArea()->Explore(-1);
+		map->Explore(-1);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -2856,6 +2877,13 @@ int fx_monster_summoning (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_monster_summoning (%2d): Number: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	//check the summoning limit?
+	if (!target) {
+		return FX_NOT_APPLIED;
+	}
+
+	if (!target->GetCurrentArea()) {
+		return FX_APPLIED;
+	}
 
 	//get monster resref from 2da determined by fx->Resource or fx->Parameter2
 	ieResRef monster;
@@ -3678,13 +3706,22 @@ static EffectRef fx_familiar_marker_ref={"FamiliarMarker",NULL,-1};
 int fx_find_familiar (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_find_familiar (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+
+	if (!target) {
+		return FX_NOT_APPLIED;
+	}
+
+	if (!target->GetCurrentArea()) {
+		return FX_APPLIED;
+	}
+
 	if (fx->Parameter2!=FAMILIAR_RESOURCE) {
 		ieDword alignment;
 
 		if (fx->Parameter2==FAMILIAR_ALIGNMENT) {
 			alignment = fx->Parameter1;
 		} else {
-			alignment = Owner->GetStat(IE_ALIGNMENT);
+			alignment = target->GetStat(IE_ALIGNMENT);
 			alignment = ((alignment&AL_LC_MASK)>>4)*3+(alignment&AL_GE_MASK)-4;
 		}
 		if (alignment>8) {
@@ -4268,12 +4305,49 @@ int fx_disintegrate (Actor* Owner, Actor* target, Effect* fx)
 	}
 	return FX_NOT_APPLIED;
 }
-// 0xef Farsee
-int fx_farsee (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+// 0xef Farsee 
+// 1 view not explored sections too
+// 2 param1=range (otherwise visualrange)
+// 4 point already set (otherwise use gui)
+// 8 use line of sight
+#define FS_UNEXPLORED  1
+#define FS_VISUALRANGE 2
+#define FS_HASPOINT    4
+#define FS_LOS         8
+
+int fx_farsee (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_farsee (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	//invoke farsee guiscript
-	core->EventFlag|=EF_SHOWMAP;
+	Map *map = target->GetCurrentArea();
+	if (!map) {
+		return FX_APPLIED;
+	}
+
+	if (!(fx->Parameter2&FS_VISUALRANGE)) {
+		fx->Parameter1=STAT_GET(IE_VISUALRANGE);
+		fx->Parameter2|=FS_VISUALRANGE;
+	}
+
+	if (target->InParty) {
+		//don't start graphical interface if actor isn't in party
+		if (!(fx->Parameter2&FS_HASPOINT)) {
+			//start graphical interface
+			//it will do all the rest of the opcode
+			//using RevealMap guiscript action
+			core->EventFlag|=EF_SHOWMAP;
+			return FX_NOT_APPLIED;
+		}
+	}
+
+	Point p(fx->PosX, fx->PosY);
+
+	//don't explore unexplored points
+	if (!(fx->Parameter2&FS_UNEXPLORED)) {
+		if (!map->IsVisible(p, 1)) {
+			return FX_NOT_APPLIED;
+		}
+	}
+	map->ExploreMapChunk(p, fx->Parameter1, fx->Parameter2&FS_LOS);
 	return FX_NOT_APPLIED;
 }
 

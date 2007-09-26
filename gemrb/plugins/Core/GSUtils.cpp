@@ -1905,7 +1905,7 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, bool *valid)
 		if (map) {
 			map->locals->Lookup( &VarName[6], value);
 		} else {
-			if (*valid) {
+			if (valid) {
 				*valid=false;
 			}
 			if (InDebug&ID_VARIABLES) {
@@ -1956,7 +1956,7 @@ ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Conte
 		if (map) {
 			map->locals->Lookup( VarName, value);
 		} else {
-			if (*valid) {
+			if (valid) {
 				*valid=false;
 			}
 			if (InDebug&ID_VARIABLES) {

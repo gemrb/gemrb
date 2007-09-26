@@ -173,28 +173,28 @@ public:
 	void ApplyAllEffects(Actor* target);
 
 	/* directly removes effects with specified opcode, use effect_reference when you can */
-	void RemoveAllEffects(ieDword opcode);
-	void RemoveAllEffectsWithResource(ieDword opcode, const ieResRef resource);
+	void RemoveAllEffects(ieDword opcode) const;
+	void RemoveAllEffectsWithResource(ieDword opcode, const ieResRef resource) const;
 
 	/* removes any effects (delayed or not) which were using projectile */
- 	void RemoveAllEffectsWithProjectile(ieDword projectile);
+ 	void RemoveAllEffectsWithProjectile(ieDword projectile) const;
 
 	/* removes equipping effects with specified inventory slot code */
-	void RemoveEquippingEffects(ieDwordSigned slotcode);
+	void RemoveEquippingEffects(ieDwordSigned slotcode) const;
 
 	/* removes all effects of a given spell */
-	void RemoveAllEffects(const ieResRef Removed);
-	void RemoveAllEffects(const ieResRef Removed, ieDword timing);
+	void RemoveAllEffects(const ieResRef Removed) const;
+	void RemoveAllEffects(const ieResRef Removed, ieDword timing) const;
 	/* removes all effects of type */
-	void RemoveAllEffects(EffectRef &effect_reference);
+	void RemoveAllEffects(EffectRef &effect_reference) const;
 	/* removes expired or to be expired effects */
-	void RemoveExpiredEffects(ieDword futuretime);
+	void RemoveExpiredEffects(ieDword futuretime) const;
 	/* removes all effects except timing mode 9 */
-	void RemoveAllNonPermanentEffects();
-	void RemoveAllDetrimentalEffects(EffectRef &effect_reference, ieDword current);
-	void RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword param2);
-	void RemoveAllEffectsWithResource(EffectRef &effect_reference, const ieResRef resource);
-	void RemoveLevelEffects(ieDword level, ieDword flags, ieDword match);
+	void RemoveAllNonPermanentEffects() const;
+	void RemoveAllDetrimentalEffects(EffectRef &effect_reference, ieDword current) const;
+	void RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword param2) const;
+	void RemoveAllEffectsWithResource(EffectRef &effect_reference, const ieResRef resource) const;
+	void RemoveLevelEffects(ieDword level, ieDword flags, ieDword match) const;
 
 	//Effect *GetEffect(ieDword idx) const;
 	/* returns true if the timing method supports simplified duration */
@@ -209,6 +209,7 @@ public:
 	const Effect *GetNextSavedEffect(std::list< Effect* >::const_iterator f) const;
 	Effect *GetNextEffect(std::list< Effect* >::const_iterator f) const;
 	ieDword CountEffects(EffectRef &effect_reference, ieDword param1, ieDword param2, const char *ResRef) const;
+	void ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDword y);
 	/* returns the number of saved effects */
 	ieDword GetSavedEffectsCount() const;
 	size_t GetEffectsCount() const { return effects.size(); }
@@ -217,19 +218,19 @@ public:
 	static Effect *CreateEffect(EffectRef &effect_reference, ieDword param1, ieDword param2, ieDword timing);
 	static Effect *CreateEffectCopy(Effect *oldfx, EffectRef &effect_reference, ieDword param1, ieDword param2);
 	//locating opcodes
-	Effect *HasEffect(EffectRef &effect_reference);
-	Effect *HasEffectWithParam(EffectRef &effect_reference, ieDword param2);
-	Effect *HasEffectWithParamPair(EffectRef &effect_reference, ieDword param1, ieDword param2);
-	Effect *HasEffectWithResource(EffectRef &effect_reference, const ieResRef resource);
-	void DecreaseParam1OfEffect(EffectRef &effect_reference, ieDword amount);
+	Effect *HasEffect(EffectRef &effect_reference) const;
+	Effect *HasEffectWithParam(EffectRef &effect_reference, ieDword param2) const;
+	Effect *HasEffectWithParamPair(EffectRef &effect_reference, ieDword param1, ieDword param2) const;
+	Effect *HasEffectWithResource(EffectRef &effect_reference, const ieResRef resource) const;
+	void DecreaseParam1OfEffect(EffectRef &effect_reference, ieDword amount) const;
 	bool HasAnyDispellableEffect() const;
 	//transforming timing modes
 	static void TransformToDelay(ieDword &TimingMode);
 	//getting summarised effects
-	int BonusAgainstCreature(EffectRef &effect_reference, Actor *actor);
+	int BonusAgainstCreature(EffectRef &effect_reference, Actor *actor) const;
 
 	// returns -1 if bounced, 0 if resisted, 1 if accepted spell
-	int CheckImmunity(Actor *target);
+	int CheckImmunity(Actor *target) const;
 	// apply this effectqueue on all actors matching ids targeting
 	// from pos, in range (no cone size yet)
 	void AffectAllInRange(Map *map, Point &pos, int idstype, int idsvalue, unsigned int range, Actor *except);
@@ -243,16 +244,17 @@ private:
 	int ApplyEffect(Actor* target, Effect* fx, ieDword first_apply);
 	/** counts effects of specific opcode, parameters and resource */
 	ieDword CountEffects(ieDword opcode, ieDword param1, ieDword param2, const char *ResRef) const;
+	void ModifyEffectPoint(ieDword opcode, ieDword x, ieDword y) const;
 	//use the effect reference style calls from outside
 	static Effect *CreateEffect(ieDword opcode, ieDword param1, ieDword param2, ieDword timing);
 	static Effect *CreateEffectCopy(Effect *oldfx, ieDword opcode, ieDword param1, ieDword param2);
-	void RemoveAllDetrimentalEffects(ieDword opcode, ieDword current);
-	void RemoveAllEffectsWithParam(ieDword opcode, ieDword param2);
+	void RemoveAllDetrimentalEffects(ieDword opcode, ieDword current) const;
+	void RemoveAllEffectsWithParam(ieDword opcode, ieDword param2) const;
 	Effect *HasOpcode(ieDword opcode) const;
 	Effect *HasOpcodeWithParam(ieDword opcode, ieDword param2) const;
 	Effect *HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDword param2) const;
 	Effect *HasOpcodeWithResource(ieDword opcode, const ieResRef resource) const;
-	void DecreaseParam1OfEffect(ieDword opcode, ieDword amount);
+	void DecreaseParam1OfEffect(ieDword opcode, ieDword amount) const;
 	int BonusAgainstCreature(ieDword opcode, Actor *actor) const;
 };
 

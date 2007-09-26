@@ -2515,36 +2515,38 @@ int Interface::LoadCreature(const char* ResRef, int InParty, bool character)
 //NOTE: if there were more summoned creatures, it will return only the last
 Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres, Actor *Owner, Actor *target, Point &position, int eamod, int level)
 {
-	DataStream* ds = key->GetResource( resource, IE_CRE_CLASS_ID );
 	level = level * 100;
 	//maximum number of monsters summoned
 	int cnt=10;
-retry:
-	Actor *ab = GetCreature(ds);
-	if (!ab) {
-		return NULL;
-	}
-	
-	ab->LastSummoner = Owner->GetID();
-	level -= ab->GetStat(IE_XP);
-	
-	int enemyally;
-	
-	if (eamod==EAM_SOURCEALLY || eamod==EAM_SOURCEENEMY) {
-		enemyally = Owner->GetStat(IE_EA)>EA_GOODCUTOFF;
-	} else {
-		if (target) {
-			enemyally = target->GetStat(IE_EA)>EA_GOODCUTOFF;
-		} else {
-			enemyally = true;
+	Actor * ab = NULL;
+
+	while(cnt-- && level>0) {
+		DataStream* ds = key->GetResource( resource, IE_CRE_CLASS_ID );
+		ab = GetCreature(ds);
+		if (!ab) {
+			return NULL;
 		}
-	}
 	
-	switch (eamod) {
+		ab->LastSummoner = Owner->GetID();
+		level -= ab->GetStat(IE_XP);
+	
+		int enemyally;
+	
+		if (eamod==EAM_SOURCEALLY || eamod==EAM_SOURCEENEMY) {
+			enemyally = Owner->GetStat(IE_EA)>EA_GOODCUTOFF;
+		} else {
+			if (target) {
+				enemyally = target->GetStat(IE_EA)>EA_GOODCUTOFF;
+			} else {
+				enemyally = true;
+			}
+		}
+	
+		switch (eamod) {
 		case EAM_SOURCEALLY:
 		case EAM_ALLY:
 			if (enemyally) {
-				ab->SetBase(IE_EA, EA_ENEMY); //is this the summoned EA?
+			ab->SetBase(IE_EA, EA_ENEMY); //is this the summoned EA?
 			} else {
 				ab->SetBase(IE_EA, EA_ALLY); //is this the summoned EA?
 			}
@@ -2562,20 +2564,20 @@ retry:
 			break;
 		default:
 			break;
-	}
+		}
 	
-	Map *map = target->GetCurrentArea();
-	map->AddActor(ab);
-	ab->SetPosition(position, true, 0);
-	ab->RefreshEffects(NULL);
-	if (vvcres[0]) {
-		ScriptedAnimation* vvc = GetScriptedAnimation(vvcres, false);
-		vvc->XPos=position.x;
-		vvc->YPos=position.y;
-		map->AddVVCell( vvc );
-	}
-	if (cnt-- && level>0) {
-		goto retry;
+		Map *map = target->GetCurrentArea();
+		map->AddActor(ab);
+		ab->SetPosition(position, true, 0);
+		ab->RefreshEffects(NULL);
+		if (vvcres[0]) {
+			ScriptedAnimation* vvc = GetScriptedAnimation(vvcres, false);
+			if (vvc) {
+				vvc->XPos=position.x;
+				vvc->YPos=position.y;
+				map->AddVVCell( vvc );
+			}
+		}
 	}
 	return ab;
 }

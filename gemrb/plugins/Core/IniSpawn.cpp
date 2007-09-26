@@ -128,6 +128,7 @@ inline void GetElements(const char *s, ieVariable *storage, int count)
 
 int IniSpawn::GetDiffMode(const char *keyword)
 {
+	if (!keyword) return NO_OPERATION; //-1
 	if (keyword[0]==0) return NO_OPERATION; //-1
 	if (!stricmp(keyword,"less_or_equal_to") ) return LESS_OR_EQUALS; //0 (gemrb ext)
 	if (!stricmp(keyword,"equal_to") ) return EQUALS; // 1
@@ -165,12 +166,14 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 
 	//all specvars are using global, but sometimes it is explicitly given
 	s = inifile->GetKeyAsString(crittername,"spec_var",NULL);
-	if (s && (strlen(s)>9) && s[6]==':' && s[7]==':') {
-		strnuprcpy(critter.SpecContext, s, 6);
-		strnlwrcpy(critter.SpecVar, s+8, 32);
-	} else {
-		strnuprcpy(critter.SpecContext, "GLOBAL", 6);
-		strnlwrcpy(critter.SpecVar, s, 32);
+	if (s) {
+		if ((strlen(s)>9) && s[6]==':' && s[7]==':') {
+			strnuprcpy(critter.SpecContext, s, 6);
+			strnlwrcpy(critter.SpecVar, s+8, 32);
+		} else {
+			strnuprcpy(critter.SpecContext, "GLOBAL", 6);
+			strnlwrcpy(critter.SpecVar, s, 32);
+		}
 	}
 
 	//add this to specvar at each spawn
@@ -193,7 +196,11 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 		critter.creaturecount = CountElements(s,',');
 		critter.CreFile=new ieResRef[critter.creaturecount];
 		GetElements(s, critter.CreFile, critter.creaturecount);
+	} else {
+		printMessage( "IniSpawn"," ", LIGHT_RED);
+		printf("Invalid spawn entry: %s\n", crittername); 
 	}
+
 	s = inifile->GetKeyAsString(crittername,"point_select",NULL);
 	
 	if (s) {
@@ -294,17 +301,19 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 	if (ps!=-1) critter.SetSpec[AI_ALIGNMENT] = (ieByte) ps;
 
 	s = inifile->GetKeyAsString(crittername,"spec",NULL);
-	int x[9];
-
-	ps = sscanf(s,"[%d.%d.%d.%d.%d.%d.%d.%d.%d]", x, x+1, x+2, x+3, x+4, x+5,
-		x+6, x+7, x+8);
-	if (ps == 0) {
-		strnuprcpy(critter.ScriptName, s, 32);
-		critter.Flags|=CF_CHECK_NAME;
-		memset(critter.Spec,-1,sizeof(critter.Spec));
-	} else {
-		while(ps--) {
-			critter.Spec[ps]=(ieByte) x[ps];
+	if (s) {
+		int x[9];
+		
+		ps = sscanf(s,"[%d.%d.%d.%d.%d.%d.%d.%d.%d]", x, x+1, x+2, x+3, x+4, x+5,
+			x+6, x+7, x+8);
+		if (ps == 0) {
+			strnuprcpy(critter.ScriptName, s, 32);
+			critter.Flags|=CF_CHECK_NAME;
+			memset(critter.Spec,-1,sizeof(critter.Spec));
+		} else {
+			while(ps--) {
+				critter.Spec[ps]=(ieByte) x[ps];
+			}
 		}
 	}
 
@@ -528,6 +537,10 @@ void IniSpawn::RespawnNameless()
 
 void IniSpawn::SpawnCreature(CritterEntry &critter)
 {
+	if (!critter.creaturecount) {
+		return;
+	}
+
 	ieDword specvar = CheckVariable(map, critter.SpecVar, critter.SpecContext);
 
 	if (critter.SpecVar[0]) {

@@ -59,11 +59,11 @@ def RevealMap ():
 	PosY = GemRB.GetVar ("MapControlY")
 
 	GemRB.RevealArea (PosX, PosY, 30, 1)
-	GemRB.GamePause (1,0)
+	GemRB.GamePause (0,0)
 	return
 
 ###################################################
-# for clairvoyance effect
+# for farsight effect
 ###################################################
 def ShowMap ():
 	global MapWindow, OptionsWindow, PortraitWindow
@@ -124,6 +124,7 @@ def ShowMap ():
 	GemRB.SetVisible (PortraitWindow, 3)
 	GemRB.SetVisible (Window, 3)
 	GemRB.SetControlStatus(Window, Map, IE_GUI_CONTROL_FOCUSED)
+	GemRB.GamePause (0,0)
 	return
 
 ###################################################
@@ -280,11 +281,11 @@ def ChangeTooltip ():
 		str = "%s: %d"%(GemRB.GetString(23084),tmp["Distance"])
 	else:
 		str=""
-			
+
 	GemRB.SetTooltip (WorldMapWindow, WorldMapControl, str)
 	return
 
-def CloseWorldMapWindow():
+def CloseWorldMapWindow ():
 	global WorldMapWindow, WorldMapControl
 
 	GemRB.UnloadWindow (WorldMapWindow)
@@ -294,7 +295,7 @@ def CloseWorldMapWindow():
 	GemRB.UnhideGUI ()
 	return
 
-def WorldMapWindowCommon(Travel):
+def WorldMapWindowCommon (Travel):
 	global WorldMapWindow, WorldMapControl
 
 	if WorldMapWindow:

@@ -35,50 +35,36 @@ WorldMapControl = None
 
 def RevealMap ():
 	global MapWindow
-	global OldPortraitWindow, OldOptionsWindow
 
 	if CloseOtherWindow (ShowMap):
 		GemRB.UnloadWindow (MapWindow)
-		GemRB.UnloadWindow (OptionsWindow)
-		GemRB.UnloadWindow (PortraitWindow)
 
 		MapWindow = None
 		#this window type should block the game
 		GemRB.SetVar ("OtherWindow", -1)
 		GemRB.SetVisible (0,1)
 		GemRB.UnhideGUI ()
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		OldPortraitWindow = None
-		GUICommonWindows.OptionsWindow = OldOptionsWindow
-		OldOptionsWindow = None
 
 	PosX = GemRB.GetVar ("MapControlX")
 	PosY = GemRB.GetVar ("MapControlY")
 
 	GemRB.RevealArea (PosX, PosY, 30, 1)
-	GemRB.GamePause (1,0)
+	GemRB.GamePause (0,0)
 	return
 ###################################################
-# for clairvoyance effect
+# for farsight effect
 ###################################################
 def ShowMap ():
-	global MapWindow, OptionsWindow, PortraitWindow
-	global OldPortraitWindow, OldOptionsWindow
+	global MapWindow
 
 	if CloseOtherWindow (ShowMap):
 		GemRB.UnloadWindow (MapWindow)
-		GemRB.UnloadWindow (OptionsWindow)
-		GemRB.UnloadWindow (PortraitWindow)
 
 		MapWindow = None
 		#this window type should block the game
 		GemRB.SetVar ("OtherWindow", -1)
 		GemRB.SetVisible (0,1)
 		GemRB.UnhideGUI ()
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		OldPortraitWindow = None
-		GUICommonWindows.OptionsWindow = OldOptionsWindow
-		OldOptionsWindow = None
 		return
 
 	GemRB.HideGUI ()
@@ -89,12 +75,7 @@ def ShowMap ():
 	#this window type blocks the game normally, but map window doesn't
 	GemRB.SetVar ("OtherWindow", MapWindow)
 	#saving the original portrait window
-	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GemRB.LoadWindow (0)
-	SetupMenuWindowControls (OptionsWindow, 0, "ShowMap")
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = OpenPortraitWindow (0)
-	GemRB.SetWindowFrame (OptionsWindow)
+	GemRB.SetWindowFrame (MapWindow)
 
 	# World Map
 	Button = GemRB.GetControl (Window, 1)
@@ -109,12 +90,11 @@ def ShowMap ():
 	# Map Control
 	GemRB.CreateMapControl (Window, 2, 0, 0, 0, 0, 0x10000003, "FLAG1")
 	Map = GemRB.GetControl (Window, 2)
-	GemRB.SetVar("ShowMapNotes",3)
-	GemRB.SetVarAssoc (Window, Map, "ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
+	GemRB.SetVar("ShowMapNotes",IE_GUI_MAP_REVEAL_MAP)
+	GemRB.SetVarAssoc (Window, Map, "ShowMapNotes", IE_GUI_MAP_REVEAL_MAP)
 	GemRB.SetEvent (Window, Map, IE_GUI_MAP_ON_PRESS, "RevealMap")
-	GemRB.SetVisible (OptionsWindow, 2)
 	GemRB.SetVisible (Window, 1)
-	GemRB.SetVisible (PortraitWindow, 2)
+	GemRB.GamePause (0,0)
 	return
 
 ###################################################
@@ -135,7 +115,6 @@ def OpenMapWindow ():
 	GemRB.LoadWindowPack ("GUIMAP")
 	MapWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", MapWindow)
-	SetupMenuWindowControls (GUICommonWindows.OptionsWindow, 0, "OpenMapWindow")
 
 	# World Map
 	Button = GemRB.GetControl (Window, 1)

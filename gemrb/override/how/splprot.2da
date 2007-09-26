@@ -69,8 +69,8 @@
 65         RACE       160        5          race/not_orc 
 66         EXTSTATE   ?          9          extstate/deaf 
 67         EXTSTATE   ?          8          extstate/not_deaf 
-68         GENDER     6          1          gender/summoned 
-69         GENDER     6          5          gender/not_summoned 
+68         SEX        6          1          gender/summoned 
+69         SEX        6          5          gender/not_summoned 
 70         RACE       184        1          race/mindflayer 
 71         RACE       184        5          race/not_mindflayer 
 72         STATE      0x1000     9          state/silenced 

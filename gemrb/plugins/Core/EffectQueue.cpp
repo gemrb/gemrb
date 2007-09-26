@@ -325,12 +325,27 @@ Effect *EffectQueue::CreateEffect(ieDword opcode, ieDword param1, ieDword param2
 ieDword EffectQueue::CountEffects(EffectRef &effect_reference, ieDword param1, ieDword param2, const char *resource) const
 {
 	ResolveEffectRef(effect_reference);
+	if (effect_reference.EffText<0) {
+		return 0;
+	}
 	return CountEffects(effect_reference.EffText, param1, param2, resource);
+}
+
+void EffectQueue::ModifyEffectPoint(EffectRef &effect_reference, ieDword x, ieDword y)
+{
+	ResolveEffectRef(effect_reference);
+	if (effect_reference.EffText<0) {
+		return;
+	}
+	ModifyEffectPoint(effect_reference.EffText, x, y);
 }
 
 Effect *EffectQueue::CreateEffect(EffectRef &effect_reference, ieDword param1, ieDword param2, ieDword timing)
 {
 	ResolveEffectRef(effect_reference);
+	if (effect_reference.EffText<0) {
+		return NULL;
+	}
 	return CreateEffect(effect_reference.EffText, param1, param2, timing);
 }
 
@@ -353,6 +368,9 @@ Effect *EffectQueue::CreateEffectCopy(Effect *oldfx, ieDword opcode, ieDword par
 Effect *EffectQueue::CreateEffectCopy(Effect *oldfx, EffectRef &effect_reference, ieDword param1, ieDword param2)
 {
 	ResolveEffectRef(effect_reference);
+	if (effect_reference.EffText<0) {
+		return NULL;
+	}
 	return CreateEffectCopy(oldfx, effect_reference.EffText, param1, param2);
 }
 
@@ -975,9 +993,9 @@ int EffectQueue::ApplyEffect(Actor* target, Effect* fx, ieDword first_apply)
 
 //call this from an applied effect, after it returns, these effects
 //will be killed along with it
-void EffectQueue::RemoveAllEffects(ieDword opcode)
+void EffectQueue::RemoveAllEffects(ieDword opcode) const
 {
-	std::list< Effect* >::iterator f;
+	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_OPCODE();
 		MATCH_LIVE_FX();
@@ -987,9 +1005,9 @@ void EffectQueue::RemoveAllEffects(ieDword opcode)
 }
 
 //removes all equipping effects that match slotcode
-void EffectQueue::RemoveEquippingEffects(ieDwordSigned slotcode)
+void EffectQueue::RemoveEquippingEffects(ieDwordSigned slotcode) const
 {
-	std::list< Effect* >::iterator f;
+	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		if ((*f)->TimingMode!=FX_DURATION_INSTANT_WHILE_EQUIPPED) continue;
 		MATCH_SLOTCODE();
@@ -999,9 +1017,9 @@ void EffectQueue::RemoveEquippingEffects(ieDwordSigned slotcode)
 }
 
 //removes all effects that match projectile
-void EffectQueue::RemoveAllEffectsWithProjectile(ieDword projectile)
+void EffectQueue::RemoveAllEffectsWithProjectile(ieDword projectile) const
 {
-	std::list< Effect* >::iterator f;
+	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_PROJECTILE();
 
@@ -1010,9 +1028,9 @@ void EffectQueue::RemoveAllEffectsWithProjectile(ieDword projectile)
 }
 
 //remove effects belonging to a given spell
-void EffectQueue::RemoveAllEffects(const ieResRef Removed)
+void EffectQueue::RemoveAllEffects(const ieResRef Removed) const
 {
-	std::list< Effect* >::iterator f;
+	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_LIVE_FX();
 		MATCH_SOURCE();
@@ -1022,9 +1040,9 @@ void EffectQueue::RemoveAllEffects(const ieResRef Removed)
 }
 
 //remove effects belonging to a given spell, but only if they match timing method x
-void EffectQueue::RemoveAllEffects(const ieResRef Removed, ieDword timing)
+void EffectQueue::RemoveAllEffects(const ieResRef Removed, ieDword timing) const
 {
-	std::list< Effect* >::iterator f;
+	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_TIMING();
 		MATCH_SOURCE();
@@ -1034,15 +1052,18 @@ void EffectQueue::RemoveAllEffects(const ieResRef Removed, ieDword timing)
 }
 
 //this will modify effect reference
-void EffectQueue::RemoveAllEffects(EffectRef &effect_reference)
+void EffectQueue::RemoveAllEffects(EffectRef &effect_reference) const
 {
 	ResolveEffectRef(effect_reference);
+	if (effect_reference.EffText<0) {
+		return;
+	}
 	RemoveAllEffects(effect_reference.EffText);
 }
 
-void EffectQueue::RemoveAllEffectsWithResource(ieDword opcode, const ieResRef resource)
+void EffectQueue::RemoveAllEffectsWithResource(ieDword opcode, const ieResRef resource) const
 {
-	std::list< Effect* >::iterator f;
+	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_OPCODE();
 		MATCH_LIVE_FX();
@@ -1052,15 +1073,15 @@ void EffectQueue::RemoveAllEffectsWithResource(ieDword opcode, const ieResRef re
 	}
 }
 
-void EffectQueue::RemoveAllEffectsWithResource(EffectRef &effect_reference, const ieResRef resource)
+void EffectQueue::RemoveAllEffectsWithResource(EffectRef &effect_reference, const ieResRef resource) const
 {
 	ResolveEffectRef(effect_reference);
 	RemoveAllEffectsWithResource(effect_reference.EffText, resource);
 }
 
-void EffectQueue::RemoveAllDetrimentalEffects(ieDword opcode, ieDword current)
+void EffectQueue::RemoveAllDetrimentalEffects(ieDword opcode, ieDword current) const
 {
-	std::list< Effect* >::iterator f;
+	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_OPCODE();
 		MATCH_LIVE_FX();
@@ -1081,9 +1102,9 @@ void EffectQueue::RemoveAllDetrimentalEffects(ieDword opcode, ieDword current)
 	}
 }
 
-void EffectQueue::RemoveAllEffectsWithParam(ieDword opcode, ieDword param2)
+void EffectQueue::RemoveAllEffectsWithParam(ieDword opcode, ieDword param2) const
 {
-	std::list< Effect* >::iterator f;
+	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		MATCH_OPCODE();
 		MATCH_LIVE_FX();
@@ -1095,7 +1116,7 @@ void EffectQueue::RemoveAllEffectsWithParam(ieDword opcode, ieDword param2)
 
 //this function is called by FakeEffectExpiryCheck
 //probably also called by rest
-void EffectQueue::RemoveExpiredEffects(ieDword futuretime)
+void EffectQueue::RemoveExpiredEffects(ieDword futuretime) const
 {
 	ieDword GameTime = core->GetGame()->GameTime;
 	if (GameTime+futuretime<GameTime) {
@@ -1104,7 +1125,7 @@ void EffectQueue::RemoveExpiredEffects(ieDword futuretime)
 		GameTime+=futuretime;
 	}
 
-	std::list< Effect* >::iterator f;
+	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		//FIXME: how this method handles delayed effects???
 		//it should remove them as well, i think
@@ -1118,9 +1139,9 @@ void EffectQueue::RemoveExpiredEffects(ieDword futuretime)
 
 //this effect will expire all effects that are not truly permanent
 //which i call permanent after death (iesdp calls it permanent after bonuses)
-void EffectQueue::RemoveAllNonPermanentEffects()
+void EffectQueue::RemoveAllNonPermanentEffects() const
 {
-	std::list< Effect* >::iterator f;
+	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		if( (*f)->TimingMode != FX_DURATION_INSTANT_PERMANENT_AFTER_BONUSES) {
 			(*f)->TimingMode=FX_DURATION_JUST_EXPIRED;
@@ -1130,24 +1151,24 @@ void EffectQueue::RemoveAllNonPermanentEffects()
 
 //this will modify effect reference
 
-void EffectQueue::RemoveAllDetrimentalEffects(EffectRef &effect_reference, ieDword current)
+void EffectQueue::RemoveAllDetrimentalEffects(EffectRef &effect_reference, ieDword current) const
 {
 	ResolveEffectRef(effect_reference);
 	RemoveAllDetrimentalEffects(effect_reference.EffText, current);
 }
 
-void EffectQueue::RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword param2)
+void EffectQueue::RemoveAllEffectsWithParam(EffectRef &effect_reference, ieDword param2) const
 {
 	ResolveEffectRef(effect_reference);
 	RemoveAllEffectsWithParam(effect_reference.EffText, param2);
 }
 
-void EffectQueue::RemoveLevelEffects(ieDword level, ieDword Flags, ieDword match)
+void EffectQueue::RemoveLevelEffects(ieDword level, ieDword Flags, ieDword match) const
 {
 	ieResRef Removed;
 
 	Removed[0]=0;
-	std::list< Effect* >::iterator f;
+	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
 		if ( (*f)->Power>level) {
 			continue;
@@ -1192,7 +1213,7 @@ Effect *EffectQueue::HasOpcode(ieDword opcode) const
 	return NULL;
 }
 
-Effect *EffectQueue::HasEffect(EffectRef &effect_reference)
+Effect *EffectQueue::HasEffect(EffectRef &effect_reference) const
 {
 	ResolveEffectRef(effect_reference);
 	if (effect_reference.EffText<0) {
@@ -1214,7 +1235,7 @@ Effect *EffectQueue::HasOpcodeWithParam(ieDword opcode, ieDword param2) const
 	return NULL;
 }
 
-Effect *EffectQueue::HasEffectWithParam(EffectRef &effect_reference, ieDword param2)
+Effect *EffectQueue::HasEffectWithParam(EffectRef &effect_reference, ieDword param2) const
 {
 	ResolveEffectRef(effect_reference);
 	if (effect_reference.EffText<0) {
@@ -1243,7 +1264,7 @@ Effect *EffectQueue::HasOpcodeWithParamPair(ieDword opcode, ieDword param1, ieDw
 	return NULL;
 }
 
-Effect *EffectQueue::HasEffectWithParamPair(EffectRef &effect_reference, ieDword param1, ieDword param2)
+Effect *EffectQueue::HasEffectWithParamPair(EffectRef &effect_reference, ieDword param1, ieDword param2) const
 {
 	ResolveEffectRef(effect_reference);
 	if (effect_reference.EffText<0) {
@@ -1253,7 +1274,7 @@ Effect *EffectQueue::HasEffectWithParamPair(EffectRef &effect_reference, ieDword
 }
 
 //this could be used for stoneskins and mirror images as well
-void EffectQueue::DecreaseParam1OfEffect(ieDword opcode, ieDword amount)
+void EffectQueue::DecreaseParam1OfEffect(ieDword opcode, ieDword amount) const
 {
 	std::list< Effect* >::const_iterator f;
 	for ( f = effects.begin(); f != effects.end(); f++ ) {
@@ -1266,7 +1287,7 @@ void EffectQueue::DecreaseParam1OfEffect(ieDword opcode, ieDword amount)
 	}
 }
 
-void EffectQueue::DecreaseParam1OfEffect(EffectRef &effect_reference, ieDword amount)
+void EffectQueue::DecreaseParam1OfEffect(EffectRef &effect_reference, ieDword amount) const
 {
 	ResolveEffectRef(effect_reference);
 	if (effect_reference.EffText<0) {
@@ -1301,7 +1322,7 @@ int EffectQueue::BonusAgainstCreature(ieDword opcode, Actor *actor) const
 	return sum;
 }
 
-int EffectQueue::BonusAgainstCreature(EffectRef &effect_reference, Actor *actor)
+int EffectQueue::BonusAgainstCreature(EffectRef &effect_reference, Actor *actor) const
 {
 	ResolveEffectRef(effect_reference);
 	if (effect_reference.EffText<0) {
@@ -1324,7 +1345,7 @@ Effect *EffectQueue::HasOpcodeWithResource(ieDword opcode, const ieResRef resour
 	return NULL;
 }
 
-Effect *EffectQueue::HasEffectWithResource(EffectRef &effect_reference, const ieResRef resource)
+Effect *EffectQueue::HasEffectWithResource(EffectRef &effect_reference, const ieResRef resource) const
 {
 	ResolveEffectRef(effect_reference);
 	return HasOpcodeWithResource(effect_reference.EffText, resource);
@@ -1456,6 +1477,19 @@ ieDword EffectQueue::CountEffects(ieDword opcode, ieDword param1, ieDword param2
 	return cnt;
 }
 
+void EffectQueue::ModifyEffectPoint(ieDword opcode, ieDword x, ieDword y) const
+{
+	std::list< Effect* >::const_iterator f;
+
+	for ( f = effects.begin(); f != effects.end(); f++ ) {
+		MATCH_OPCODE();
+		(*f)->PosX=x;
+		(*f)->PosY=y;
+		(*f)->Parameter3=0;
+		return;
+	}
+}
+
 //count effects that get saved
 ieDword EffectQueue::GetSavedEffectsCount() const
 {
@@ -1492,7 +1526,7 @@ int EffectQueue::ResolveEffect(EffectRef &effect_reference)
 //returns 1 if effect block applicable
 //returns 0 if effect block disabled
 //returns -1 if effect block bounced
-int EffectQueue::CheckImmunity(Actor *target)
+int EffectQueue::CheckImmunity(Actor *target) const
 {
 	if (effects.size() ) {
 		Effect* fx = *effects.begin();
