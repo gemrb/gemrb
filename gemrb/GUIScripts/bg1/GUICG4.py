@@ -56,7 +56,6 @@ def RollPress():
 	GemRB.SetVar("Ability",0)
 	GemRB.SetVar("Ability -1",0)
 	PointsLeft = 0
-	GemRB.SetButtonState(AbilityWindow, DoneButton,IE_GUI_BUTTON_ENABLED)
 	SumLabel = GemRB.GetControl(AbilityWindow, 0x10000002)
 	GemRB.SetText(AbilityWindow, SumLabel, "0")
 	GemRB.SetLabelUseRGB(AbilityWindow, SumLabel, 1)
@@ -74,6 +73,7 @@ def RollPress():
 		Label = GemRB.GetControl(AbilityWindow, 0x10000003+i)
 		GemRB.SetText(AbilityWindow, Label, str(v) )
 		GemRB.SetLabelUseRGB(AbilityWindow, Label, 1)
+	GemRB.SetButtonState(AbilityWindow, DoneButton,IE_GUI_BUTTON_ENABLED)
 	return
 
 def OnLoad():
@@ -81,7 +81,7 @@ def OnLoad():
 	global PointsLeft
 	global AbilityTable
 	global KitIndex, Minimum, Maximum
-	
+
 	#Kit = GemRB.GetVar("Class Kit")
 	#if Kit == 0:
 	ClassTable = GemRB.LoadTable("classes")
@@ -95,9 +95,22 @@ def OnLoad():
 	Abclasrq = GemRB.LoadTable("ABCLASRQ")
 	KitIndex = GemRB.GetTableRowIndex(Abclasrq, KitName)
 
-	GemRB.LoadWindowPack("GUICG")
+	GemRB.LoadWindowPack("GUICG", 640, 480)
 	AbilityTable = GemRB.LoadTable("ability")
 	AbilityWindow = GemRB.LoadWindow(4)
+
+	RerollButton = GemRB.GetControl(AbilityWindow,2)
+	GemRB.SetText(AbilityWindow,RerollButton,11982)
+	StoreButton = GemRB.GetControl(AbilityWindow,37)
+	GemRB.SetText(AbilityWindow,StoreButton,17373)
+	RecallButton = GemRB.GetControl(AbilityWindow,38)
+	GemRB.SetText(AbilityWindow,RecallButton,17374)
+
+	BackButton = GemRB.GetControl(AbilityWindow,36)
+	GemRB.SetText(AbilityWindow,BackButton,15416)
+	DoneButton = GemRB.GetControl(AbilityWindow,0)
+	GemRB.SetText(AbilityWindow,DoneButton,11973)
+	GemRB.SetButtonFlags(AbilityWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	RollPress()
 	StorePress()
@@ -113,19 +126,6 @@ def OnLoad():
 		Button = GemRB.GetControl(AbilityWindow, i*2+17)
 		GemRB.SetEvent(AbilityWindow, Button, IE_GUI_BUTTON_ON_PRESS, "RightPress")
 		GemRB.SetVarAssoc(AbilityWindow, Button, "Ability", i )
-
-	RerollButton = GemRB.GetControl(AbilityWindow,2)
-	GemRB.SetText(AbilityWindow,RerollButton,11982)
-	StoreButton = GemRB.GetControl(AbilityWindow,37)
-	GemRB.SetText(AbilityWindow,StoreButton,17373)
-	RecallButton = GemRB.GetControl(AbilityWindow,38)
-	GemRB.SetText(AbilityWindow,RecallButton,17374)
-
-	BackButton = GemRB.GetControl(AbilityWindow,36)
-	GemRB.SetText(AbilityWindow,BackButton,15416)
-	DoneButton = GemRB.GetControl(AbilityWindow,0)
-	GemRB.SetText(AbilityWindow,DoneButton,11973)
-	GemRB.SetButtonFlags(AbilityWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
 	TextAreaControl = GemRB.GetControl(AbilityWindow, 29)
 	GemRB.SetText(AbilityWindow,TextAreaControl,17247)
@@ -199,18 +199,31 @@ def LeftPress():
 		GemRB.SetButtonState(AbilityWindow, DoneButton,IE_GUI_BUTTON_ENABLED)
 	return
 
+def EmptyPress():
+	TextAreaControl = GemRB.GetControl(AbilityWindow, 29)
+	GemRB.SetText(AbilityWindow,TextAreaControl,17247)
+	return
+
 def StorePress():
 	for i in range(-1,6):
 		GemRB.SetVar("Stored "+str(i),GemRB.GetVar("Ability "+str(i) ) )
 	return
 
 def RecallPress():
+	global PointsLeft
+
 	GemRB.InvalidateWindow(AbilityWindow)
 	for i in range(-1,6):
 		v = GemRB.GetVar("Stored "+str(i) )
 		GemRB.SetVar("Ability "+str(i), v)
 		Label = GemRB.GetControl(AbilityWindow, 0x10000003+i)
 		GemRB.SetText(AbilityWindow, Label, str(v) )
+
+	PointsLeft = GemRB.GetVar("Ability -1")
+	if PointsLeft == 0:
+		GemRB.SetButtonState(AbilityWindow, DoneButton,IE_GUI_BUTTON_ENABLED)
+	else:
+		GemRB.SetButtonState(AbilityWindow, DoneButton,IE_GUI_BUTTON_DISABLED)
 	return
 
 def BackPress():
