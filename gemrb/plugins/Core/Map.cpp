@@ -2660,7 +2660,9 @@ void Map::Sparkle(ieDword color, ieDword type, Point &pos)
 	sparkles->SetRegion(pos.x-20, pos.y-80, 40, 80);
 
 	int style, path, grow;
-	switch(type) {
+
+	//the high word is ignored in the original engine (compatibility hack)
+	switch(type&0xffff) {
 	case SPARKLE_SHOWER:
 		style = SP_TYPE_POINT;
 		path = SP_PATH_FALL;

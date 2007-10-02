@@ -1614,19 +1614,22 @@ int fx_bonus_wizard_spells (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_bonus_wizard_spells (%2d): Spell Add: %d ; Spell Level: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	int i=1;
-	//if param2 is 0, then double spells
+	//if param2 is 0, then double spells up to param1
 	if(!fx->Parameter2) {
 		for (unsigned int j=0;j<fx->Parameter1 && j<MAX_SPELL_LEVEL;j++) {
 			target->spellbook.SetMemorizableSpellsCount(0, IE_SPELL_TYPE_WIZARD, j, true);
 		}
 		return FX_APPLIED;
 	}
-	//no bonus to give
-	/*
-	if (!fx->Parameter1) {
-		return FX_NOT_APPLIED;
+	//HoW specific
+	//if param2 is 0x200, then double spells at param1
+	if (fx->Parameter2==0x200) {
+		unsigned int j = fx->Parameter1-1;
+		if (j<MAX_SPELL_LEVEL) {
+		  target->spellbook.SetMemorizableSpellsCount(0, IE_SPELL_TYPE_WIZARD, j, true);
+		}
 	}
-	*/
+
 	for(unsigned int j=0;j<MAX_SPELL_LEVEL;j++) {
 		if (fx->Parameter2&i) {
 			target->spellbook.SetMemorizableSpellsCount(fx->Parameter1, IE_SPELL_TYPE_WIZARD, j, true);
@@ -1960,14 +1963,21 @@ int fx_bonus_priest_spells (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_bonus_priest_spells (%2d): Spell Add: %d ; Spell Level: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	int i=1;
-	//if param2 is 0, then double spells
+	//if param2 is 0, then double spells up to param1
 	if(!fx->Parameter2) {
 		for (unsigned int j=0;j<fx->Parameter1 && j<MAX_SPELL_LEVEL;j++) {
 			target->spellbook.SetMemorizableSpellsCount(0, IE_SPELL_TYPE_PRIEST, j, true);
 		}
 		return FX_APPLIED;
 	}
-	//shall we check for 0 bonus here?
+
+	//HoW specific
+	//if param2 is 0x200, then double spells at param1
+	if (fx->Parameter2==0x200) {
+		unsigned int j = fx->Parameter1-1;
+		target->spellbook.SetMemorizableSpellsCount(fx->Parameter1, IE_SPELL_TYPE_PRIEST, j, true);
+		return FX_APPLIED;
+	}
 
 	for(unsigned int j=0;j<MAX_SPELL_LEVEL;j++) {
 		if (fx->Parameter2&i) {
