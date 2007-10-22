@@ -3430,8 +3430,8 @@ int GameScript::InWeaponRange(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor *actor = (Actor *) Sender;
 	ITMExtHeader *header;
-	unsigned int wrange = actor->GetWeapon(header, false) * 10;
-	unsigned int wrange2 = actor->GetWeapon(header, true) * 10;
+	unsigned int wrange = actor->GetWeapon(header, NULL, false) * 10;
+	unsigned int wrange2 = actor->GetWeapon(header, NULL, true) * 10;
 	if (wrange2>wrange) {
 		wrange=wrange2;
 	}
@@ -3457,7 +3457,7 @@ int GameScript::OutOfAmmo(Scriptable* Sender, Trigger* parameters)
 	}
 	Actor *actor = (Actor *) scr;
 	ITMExtHeader *header;
-	unsigned int weapon = actor->GetWeapon(header);
+	unsigned int weapon = actor->GetWeapon(header, NULL);
 	//no weapon wielded?
 	if (weapon==0) {
 		return 0;
@@ -3486,7 +3486,7 @@ int GameScript::HaveUsableWeaponEquipped(Scriptable* Sender, Trigger* /*paramete
 	}
 	Actor *actor = (Actor *) Sender;
 	ITMExtHeader *header;
-	unsigned int weapon = actor->GetWeapon(header);
+	unsigned int weapon = actor->GetWeapon(header, NULL);
 	//no weapon range
 	if (weapon==0) {
 		return 0;

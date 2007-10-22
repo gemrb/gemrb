@@ -140,6 +140,7 @@
 #define EXTSTATE_EYE_STONE   0x00000400
 #define EXTSTATE_NO_BACKSTAB 0x00004000
 #define EXTSTATE_DEAF        0x00020000
+#define EXTSTATE_NO_WAKEUP   0x80000000  //original HoW engine put this on top of eye_mind
 #define EXTSTATE_SEVEN_EYES  0x000007f0
 
 //Multiclass flags

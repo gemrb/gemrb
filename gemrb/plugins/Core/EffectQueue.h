@@ -228,6 +228,8 @@ public:
 	static void TransformToDelay(ieDword &TimingMode);
 	//getting summarised effects
 	int BonusAgainstCreature(EffectRef &effect_reference, Actor *actor) const;
+	//getting weapon immunity flag
+	bool WeaponImmunity(int enchantment, ieDword weapontype) const;
 
 	// returns -1 if bounced, 0 if resisted, 1 if accepted spell
 	int CheckImmunity(Actor *target) const;
@@ -256,6 +258,7 @@ private:
 	Effect *HasOpcodeWithResource(ieDword opcode, const ieResRef resource) const;
 	void DecreaseParam1OfEffect(ieDword opcode, ieDword amount) const;
 	int BonusAgainstCreature(ieDword opcode, Actor *actor) const;
+	bool WeaponImmunity(ieDword opcode, int enchantment, ieDword weapontype) const;
 };
 
 #endif // ! EFFECTQUEUE_H

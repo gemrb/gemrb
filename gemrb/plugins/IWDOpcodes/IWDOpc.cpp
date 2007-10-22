@@ -1323,7 +1323,7 @@ int fx_summon_pomab (Actor* Owner, Actor* target, Effect* fx)
 
 	for (int i=0;i<6;i++) {    
 		core->SummonCreature(real==i?pomab_resref[0]:pomab_resref[1], fx->Resource2, Owner,
-		  target, pomab_positions[i], -1, 100);
+			target, pomab_positions[i], -1, 100);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -2039,6 +2039,11 @@ int fx_use_magic_device_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_hopelessness (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_hopelessness (%2d)\n", fx->Opcode);
+
+	if (target->HasSpellState(SS_BLOODRAGE)) {
+		return FX_NOT_APPLIED;
+	}
+
 	if (target->SetSpellState( SS_HOPELESSNESS)) return FX_NOT_APPLIED;
 	target->AddPortraitIcon(PI_HOPELESSNESS);
 	STATE_SET(STATE_HELPLESS);
@@ -2390,12 +2395,12 @@ int fx_free_action_iwd2 (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (target->SetSpellState( SS_FREEACTION)) return FX_APPLIED;
 
 	// immunity to the following effects:
-	// 0x9a Overlay:Entangle,
-	// 0x9d Overlay:Web
-	// 0x9e Overlay:Grease
-	// 0x6d State:Hold3
-	// 0x28 State:Slowed
-	// 0xb0 MovementRateModifier2
+	// 0x9a Overlay:Entangle,       ok
+	// 0x9d Overlay:Web             ok
+	// 0x9e Overlay:Grease          ok
+	// 0x6d State:Hold3             ok
+	// 0x28 State:Slowed            ok
+	// 0xb0 MovementRateModifier2   ok
 	if (enhanced_effects) {
 		target->AddPortraitIcon(PI_FREEACTION);
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0x80, 0x60, 0x60);
@@ -2483,7 +2488,17 @@ int fx_protection_from_elements (Actor* /*Owner*/, Actor* target, Effect* fx)
 //426 Aegis
 int fx_aegis (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
+	ieDword tmp;
+
 	if (0) printf( "fx_aegis (%2d)\n", fx->Opcode);
+	//gives immunity against:
+	//0xda stoneskin
+	//0x9a entangle
+	//0x9e grease
+	//0x9d web
+	//0x6d hold
+	//0x28 slow
+	
 	if (target->SetSpellState( SS_AEGIS)) return FX_APPLIED;
 	//deflection AC bonus
 	//
@@ -2506,11 +2521,20 @@ int fx_aegis (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_ADD(IE_SAVEWILL, 2);
 	STAT_ADD(IE_SAVEREFLEX, 2);
 
+	if (fx->FirstApply) {
+		fx->Parameter1=8;
+	}
+	tmp = STAT_GET(IE_STONESKINS);
+	if (fx->Parameter1>tmp) {
+		STAT_SET(IE_STONESKINS, fx->Parameter1);
+	}
+	
 	if (enhanced_effects) {
 		target->AddPortraitIcon(PI_AEGIS);
 		target->SetColorMod(0xff, RGBModifier::ADD, 30, 0x80, 0x60, 0x60);
 		target->SetGradient(14);
 	}
+
 	return FX_APPLIED;
 }
 

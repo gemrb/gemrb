@@ -117,6 +117,11 @@ typedef ieByte ActionButtonRow[GUIBT_COUNT];
 typedef std::vector< ScriptedAnimation*> vvcVector;
 typedef std::list<ieResRef*> resourceList;
 
+typedef struct {
+	int enchantment;
+	ieDword itemflags;
+} WeaponInfo;
+
 class GEM_EXPORT Actor : public Movable {
 public:
 	//CRE DATA FIELDS
@@ -381,10 +386,10 @@ public:
 	/* learns the given spell, possibly receive XP */
 	int LearnSpell(const ieResRef resref, ieDword flags);
 	/* returns the ranged weapon header associated with the currently equipped projectile */
-	int GetRangedWeapon(ITMExtHeader *&which) const;
+	int GetRangedWeapon(ITMExtHeader *&which, WeaponInfo *wi) const;
 	/* Returns current weapon range and extended header
 	 if range is nonzero, then which is valid */
-	unsigned int GetWeapon(ITMExtHeader *&which, bool leftorright=false) const;
+	unsigned int GetWeapon(ITMExtHeader *&which, WeaponInfo *wi, bool leftorright=false) const;
 	/* Creates player statistics */
 	void CreateStats();
 	/* Heals actor by days */
@@ -404,7 +409,7 @@ public:
 	/* performs attack against target */
 	void PerformAttack(ieDword initiative);
 	/* deal damage to target */
-	void DealDamage(Actor *target, int damage,int damagetype, bool critical);
+	void DealDamage(Actor *target, int damage, int damagetype, WeaponInfo *wi, bool critical);
 	/* sets a colour gradient stat, handles location */
 	void SetColor( ieDword idx, ieDword grd);
 	/* sets an RGB colour modification effect; location 0xff for global */
@@ -484,6 +489,8 @@ public:
 	void SetOverlay(unsigned int overlay);
 	/* Checks and sets a spellstate if it wasn't set yet */
 	bool SetSpellState(unsigned int spellstate);
+	/* Checks a spellstate */
+	bool HasSpellState(unsigned int spellstate);
 	/* Checks a feat */
 	bool HasFeat(unsigned int featindex) const;
 	/* Reports projectile immunity, nonzero if immune */

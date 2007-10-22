@@ -42,17 +42,21 @@ class Action;
 #define DS_SILENT  32
 
 //verbal constant (bg2), we need a lookup table for other games
-#define VB_PANIC   1
-#define VB_TIRED   7
-#define VB_BORED   8
-#define VB_ATTACK  9
-#define VB_DAMAGE  18
-#define VB_DIE     19
-#define VB_SELECT  26
-#define VB_REACT   53
-#define VB_REACT_S 54
-#define VB_HOSTILE 59
-#define VB_DIALOG  60
+#define VB_PANIC     1
+#define VB_TIRED     7
+#define VB_BORED     8
+#define VB_ATTACK    9
+#define VB_DAMAGE    18
+#define VB_DIE       19
+#define VB_SELECT    26
+#define VB_REACT     53
+#define VB_REACT_S   54
+#define VB_HOSTILE   59
+#define VB_DIALOG    60
+#define VB_CRITHIT   65
+#define VB_CRITMISS  66
+#define VB_TIMMUNE   67
+#define VB_INVENTORY 68
 
 //diffmode (iwd2)
 #define DM_EQUAL   1

@@ -37,6 +37,7 @@
 
 //FIXME: find a way to handle portrait icons better
 #define PI_CONFUSED 3
+#define PI_BERSERK  4
 #define PI_POISONED 6
 #define PI_HELD    13
 #define PI_SLEEP   14
@@ -52,6 +53,8 @@
 #define PI_HOLY    59
 #define PI_BOUNCE  65
 #define PI_BOUNCE2 67
+
+#define PI_BLOODRAGE 76 //iwd2
 #define PI_MAZE    78
 #define PI_PRISON  79
 #define PI_SEQUENCER 92
@@ -193,7 +196,7 @@ int fx_detect_alignment (Actor* Owner, Actor* target, Effect* fx);//73
 int fx_reveal_area (Actor* Owner, Actor* target, Effect* fx);//75
 int fx_reveal_creatures (Actor* Owner, Actor* target, Effect* fx);//76
 int fx_mirror_image (Actor* Owner, Actor* target, Effect* fx);//77
-//78 protection from weapons is a generic effect
+int fx_immune_to_weapon (Actor* Owner, Actor* target, Effect* fx);//78
 int fx_visual_animation_effect (Actor* Owner, Actor* target, Effect* fx);//79 unknown
 int fx_create_inventory_item (Actor* Owner, Actor* target, Effect* fx);//7a
 int fx_remove_inventory_item (Actor* Owner, Actor* target, Effect* fx);//7b
@@ -615,7 +618,6 @@ static EffectRef effectnames[] = {
 	{ "Protection:Animation", fx_generic_effect, -1 },
 	{ "Protection:Backstab", fx_no_backstab_modifier, -1 },
 	{ "Protection:Creature", fx_generic_effect, -1 },
-	{ "Protection:Weapons", fx_generic_effect, -1 },
 	{ "Protection:Opcode", fx_generic_effect, -1 },
 	{ "Protection:Opcode2", fx_generic_effect, -1 },
 	{ "Protection:Projectile",fx_protection_from_projectile, -1},
@@ -630,6 +632,7 @@ static EffectRef effectnames[] = {
 	{ "Protection:String", fx_generic_effect, -1 },
 	{ "Protection:Tracking", fx_protection_from_tracking, -1 },
 	{ "Protection:Turn", fx_protection_from_turn, -1},
+	{ "Protection:Weapons", fx_immune_to_weapon, -1},
 	{ "PuppetMarker", fx_puppet_marker, -1},
 	{ "ProjectImage", fx_puppet_master, -1},
 	{ "RetreatFrom", fx_retreat_from, -1 },
@@ -882,14 +885,50 @@ int fx_set_berserk_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	} else {
 		STATE_SET( STATE_BERSERK );
 	}
+
+	switch(fx->Parameter2) {
+	case 1: //always berserk
+		target->SetSpellState(SS_BERSERK);
+	default:
+		target->AddPortraitIcon(PI_BERSERK);
+		break;
+	case 2: //blood rage
+		target->SetSpellState(SS_BERSERK);
+		//immunity to effects:
+		//5 charm
+		//0x11 heal
+		//0x18 panic
+		//0x27 sleep
+		//0x2d stun
+		//0x6d hold
+		//0x80 confusion
+		//400 hopelessness
+		//
+		target->SetSpellState(SS_BLOODRAGE);
+		target->SetSpellState(SS_NOHPINFO);
+		target->SetColorMod(0xff, RGBModifier::ADD, 15, 128, 0, 0);
+		target->AddPortraitIcon(PI_BLOODRAGE);
+		break;
+	}
 	return FX_PERMANENT;
 }
 
 // 0x05 State:Charmed
-// 0xf1 ControlCreature
+// 0xf1 ControlCreature (iwd2)
 int fx_set_charmed_state (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_charmed_state (%2d): General: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	//blood rage berserking gives immunity to charm (in iwd2)
+	if (target->HasSpellState(SS_BLOODRAGE)) {
+		return FX_NOT_APPLIED;
+	}
+
+	//protection from evil gives immunity to charm (in iwd2)
+	if (target->HasSpellState(SS_PROTFROMEVIL)) {
+		return FX_NOT_APPLIED;
+	}
+
 	if (fx->Parameter1 && (STAT_GET(IE_GENERAL)!=fx->Parameter1)) {
 		return FX_NOT_APPLIED;
 	}
@@ -1197,6 +1236,10 @@ int fx_current_hp_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_current_hp_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
+	if (target->HasSpellState(SS_BLOODRAGE)) {
+		return FX_NOT_APPLIED;
+	}
+
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
 		//BASE_MOD( IE_HITPOINTS );
 		target->NewBase( IE_HITPOINTS, fx->Parameter1, fx->Parameter2&0xffff);
@@ -1353,6 +1396,11 @@ int fx_morale_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_panic_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_panic_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	if (target->HasSpellState(SS_BLOODRAGE)) {
+		return FX_NOT_APPLIED;
+	}
+
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
 		BASE_STATE_SET( STATE_PANIC );
 	} else {
@@ -1559,6 +1607,11 @@ static EffectRef fx_animation_stance_ref = {"AnimationStateChange",NULL,-1};
 int fx_set_unconscious_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_unconscious_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	if (target->HasSpellState(SS_BLOODRAGE)) {
+		return FX_NOT_APPLIED;
+	}
+
 	target->SetStance(IE_ANI_SLEEP);
 	if (fx->Parameter2) {
 		BASE_STATE_SET( STATE_HELPLESS | STATE_SLEEP ); //don't awaken on damage
@@ -1580,6 +1633,11 @@ static EffectRef fx_set_haste_state_ref={"State:Hasted",NULL,-1};
 int fx_set_slowed_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_slowed_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	//iwd2 free action or aegis disables this effect
+	if (target->HasSpellState(SS_FREEACTION)) return FX_NOT_APPLIED;
+	if (target->HasSpellState(SS_AEGIS)) return FX_NOT_APPLIED;
+
 	if (STATE_GET(STATE_HASTED) ) {
 		BASE_STATE_CURE( STATE_HASTED );
 		target->fxqueue.RemoveAllEffects( fx_set_haste_state_ref );
@@ -1626,7 +1684,7 @@ int fx_bonus_wizard_spells (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (fx->Parameter2==0x200) {
 		unsigned int j = fx->Parameter1-1;
 		if (j<MAX_SPELL_LEVEL) {
-		  target->spellbook.SetMemorizableSpellsCount(0, IE_SPELL_TYPE_WIZARD, j, true);
+			target->spellbook.SetMemorizableSpellsCount(0, IE_SPELL_TYPE_WIZARD, j, true);
 		}
 	}
 
@@ -1686,6 +1744,11 @@ int power_word_stun_iwd2(Actor *target, Effect *fx)
 int fx_set_stun_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_stun_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	if (target->HasSpellState(SS_BLOODRAGE)) {
+		return FX_NOT_APPLIED;
+	}
+
 	if (fx->Parameter2==2) {
 		return power_word_stun_iwd2(target, fx);
 	}
@@ -1755,7 +1818,7 @@ int fx_brief_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_brief_rgb (%2d): RGB: %d, Location and speed: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
-	int speed = (fx->Parameter2 >> 16) & 0xFF;
+	int speed = (fx->Parameter2 >> 16) & 0xff;
 	target->SetColorMod(0xff, RGBModifier::ADD, speed,
 			fx->Parameter1 >> 8, fx->Parameter1 >> 16,
 			fx->Parameter1 >> 24, 0);
@@ -2781,7 +2844,70 @@ int fx_mirror_image (Actor* Owner, Actor* target, Effect* fx)
 	//execute the translated effect
 	return fx_mirror_image_modifier(Owner, target, fx);
 }
-// 0x78 Protection:Weapons (generic effect)
+
+// 0x78 Protection:Weapons
+int fx_immune_to_weapon (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_immune_to_weapon (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (!fx->FirstApply) return FX_APPLIED;
+
+	int level;
+	ieDword mask, value;
+
+	level = -1;
+	mask = 0;
+	value = 0;
+	switch(fx->Parameter2) {
+	case 0: //enchantment level
+		level = fx->Parameter1;
+		break;
+	case 1: //all magical weapons
+		mask = IE_INV_ITEM_MAGICAL;
+		//fallthrough
+	case 2: //all nonmagical weapons
+		value = IE_INV_ITEM_MAGICAL;
+		break;
+	case 3: //all silver weapons
+		mask = IE_INV_ITEM_SILVER;
+		//fallthrough
+	case 4: //all non silver weapons
+		value = IE_INV_ITEM_SILVER;
+		break;
+	case 5:
+		value = IE_INV_ITEM_SILVER;
+		level = 0;
+		break;
+	case 6: //all twohanded
+		mask = IE_INV_ITEM_TWOHANDED;
+		//fallthrough
+	case 7: //all not twohanded
+		value = IE_INV_ITEM_TWOHANDED;
+		break;
+	case 8: //all twohanded
+		mask = IE_INV_ITEM_CURSED;
+		//fallthrough
+	case 9: //all not twohanded
+		value = IE_INV_ITEM_CURSED;
+		break;
+	case 10: //all twohanded
+		mask = IE_INV_ITEM_COLDIRON;
+		//fallthrough
+	case 11: //all not twohanded
+		value = IE_INV_ITEM_COLDIRON;
+		break;
+	case 12:
+		mask = fx->Parameter1;
+	case 13:
+		value = fx->Parameter1;
+		break;
+	default:;
+	}
+
+	fx->Parameter1 = (ieDword) level; //putting the corrected value back
+	fx->Parameter3 = mask;
+	fx->Parameter4 = value;
+	return FX_APPLIED;
+}
 
 // 0x79 VisualAnimationEffect (unknown)
 int fx_visual_animation_effect (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
@@ -2873,7 +2999,14 @@ int fx_knock (Actor* Owner, Actor* /*target*/, Effect* fx)
 // 0xb0 MovementRateModifier2
 int fx_movement_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_slow_factor (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_movement_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	//iwd2 freeaction disables only 0xb0, who cares
+	if (target->HasSpellState(SS_FREEACTION)) return FX_NOT_APPLIED;
+	//iwd2 aegis doesn't protect against grease/acid fog slowness, but that is
+	//definitely a bug
+	if (target->HasSpellState(SS_AEGIS)) return FX_NOT_APPLIED;
+
 	STAT_MOD(IE_MOVEMENTRATE);
 	return FX_APPLIED;
 }
@@ -2917,6 +3050,11 @@ int fx_monster_summoning (Actor* Owner, Actor* target, Effect* fx)
 int fx_set_confused_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_confused_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	if (target->HasSpellState(SS_BLOODRAGE)) {
+		return FX_NOT_APPLIED;
+	}
+
 	if (fx->TimingMode==FX_DURATION_INSTANT_LIMITED) {
 		BASE_STATE_SET( STATE_CONFUSED );
 	} else {
@@ -3351,6 +3489,11 @@ int fx_set_sanctuary_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_entangle_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_entangle_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	
+	//iwd2 effects that disable entangle
+	if (target->HasSpellState(SS_FREEACTION)) return FX_NOT_APPLIED;
+	if (target->HasSpellState(SS_AEGIS)) return FX_NOT_APPLIED;
+
 	if (!fx->Parameter2) {
 		fx->Parameter2=1;
 	}
@@ -3380,6 +3523,11 @@ int fx_set_shieldglobe_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_web_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_web_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	//iwd2 effects that disable web
+	if (target->HasSpellState(SS_FREEACTION)) return FX_NOT_APPLIED;
+	if (target->HasSpellState(SS_AEGIS)) return FX_NOT_APPLIED;
+
 	target->SetSpellState(SS_WEB);
 	//attack penalty in IWD2
 	STAT_SET_PCF( IE_WEB, 1);
@@ -3391,10 +3539,15 @@ int fx_set_web_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_grease_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_grease_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	//iwd2 effects that disable grease
+	if (target->HasSpellState(SS_FREEACTION)) return FX_NOT_APPLIED;
+	if (target->HasSpellState(SS_AEGIS)) return FX_NOT_APPLIED;
+
 	target->SetSpellState(SS_GREASE);
 	STAT_SET_PCF( IE_GREASE, 1);
 	//apparently the movement rate is set by separate opcodes in all engines
-	//STAT_SET(IE_MOVEMENTRATE, 3); //iwd2 doesn't have this?
+	//STAT_SET(IE_MOVEMENTRATE, 3); //iwd2 doesn't have this either
 	return FX_APPLIED;
 }
 
@@ -3580,6 +3733,7 @@ int fx_hold_creature_no_icon (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if ( STATE_GET(STATE_DEAD) ) {
 		return FX_NOT_APPLIED;
 	}
+
  	if (!EffectQueue::match_ids( target, fx->Parameter1, fx->Parameter2) ) {
 		//if the ids don't match, the effect doesn't stick
 		return FX_NOT_APPLIED;
@@ -3598,6 +3752,11 @@ int fx_hold_creature (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if ( STATE_GET(STATE_DEAD) ) {
 		return FX_NOT_APPLIED;
 	}
+
+	//iwd2 free action or blood rage disables this effect
+	if (target->HasSpellState(SS_FREEACTION)) return FX_NOT_APPLIED;
+	if (target->HasSpellState(SS_BLOODRAGE)) return FX_NOT_APPLIED;
+	if (target->HasSpellState(SS_AEGIS)) return FX_NOT_APPLIED;
 
  	if (!EffectQueue::match_ids( target, fx->Parameter1, fx->Parameter2) ) {
 		//if the ids don't match, the effect doesn't stick
@@ -3699,6 +3858,8 @@ int fx_castinglevel_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	case 1:
 		STAT_SET( IE_CASTINGLEVELBONUSCLERIC, fx->Parameter1 );
 		break;
+	default:
+		return FX_NOT_APPLIED;
 	}
 	return FX_APPLIED;
 }

@@ -1612,10 +1612,19 @@ void Actor::DialogInterrupt()
 	}
 }
 
+static EffectRef fx_cure_sleep_ref={"Cure:Sleep",NULL,-1};
+
 void Actor::GetHit()
 {
 	SetStance( IE_ANI_DAMAGE );
 	DisplayStringCore(this, VB_DAMAGE, DS_CONSOLE|DS_CONST );
+	if (Modified[IE_STATE_ID]&STATE_SLEEP) {
+		if (Modified[IE_EXTSTATE_ID]&EXTSTATE_NO_WAKEUP) {
+			return;
+		}
+		Effect *fx = EffectQueue::CreateEffect(fx_cure_sleep_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
+		fxqueue.AddEffect(fx);
+	}
 }
 
 bool Actor::HandleCastingStance(const ieResRef SpellResRef, bool deplete)
@@ -2236,7 +2245,7 @@ void Actor::GetPrevAnimation()
 }
 
 //slot is the projectile slot
-int Actor::GetRangedWeapon(ITMExtHeader *&which) const
+int Actor::GetRangedWeapon(ITMExtHeader *&which, WeaponInfo *wi) const
 {
 	unsigned int slot = inventory.FindRangedWeapon();
 	const CREItem *wield = inventory.GetSlotItem(slot);
@@ -2247,6 +2256,10 @@ int Actor::GetRangedWeapon(ITMExtHeader *&which) const
 	if (!item) {
 		return 0;
 	}
+	if (wi) {
+		wi->enchantment = item->Enchantment;
+		wi->itemflags = wield->Flags;
+	}
 	which = item->GetWeaponHeader(true);
 	core->FreeItem(item, wield->ItemResRef, false);
 	return 0;
@@ -2254,7 +2267,7 @@ int Actor::GetRangedWeapon(ITMExtHeader *&which) const
 
 //returns weapon header currently used
 //if range is nonzero, then the returned header is valid
-unsigned int Actor::GetWeapon(ITMExtHeader *&which, bool leftorright) const
+unsigned int Actor::GetWeapon(ITMExtHeader *&which, WeaponInfo *wi, bool leftorright) const
 {
 	const CREItem *wield = inventory.GetUsedWeapon(leftorright);
 	if (!wield) {
@@ -2265,6 +2278,10 @@ unsigned int Actor::GetWeapon(ITMExtHeader *&which, bool leftorright) const
 		return 0;
 	}
 
+	if (wi) {
+		wi->enchantment = item->Enchantment;
+		wi->itemflags = wield->Flags;
+	}
 	//select first weapon header
 	which = item->GetWeaponHeader(false);
 	//make sure we use 'false' in this freeitem
@@ -2535,9 +2552,11 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 	//which hand is used
 	bool leftorright = (bool) (attackcount&1);
+	
+	WeaponInfo wi;
 	ITMExtHeader *header;
 	//can't reach target, zero range shouldn't be allowed
-	if (GetWeapon(header,leftorright)*10<PersonalDistance(this, target)+1) {
+	if (GetWeapon(header, &wi, leftorright)*10<PersonalDistance(this, target)+1) {
 		return;
 	}
 	ieDword Flags;
@@ -2550,7 +2569,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		Flags = WEAPON_RANGED;
 		break;
 	case ITEM_AT_BOW:
-		if (!GetRangedWeapon(rangedheader)) {
+		if (!GetRangedWeapon(rangedheader, &wi)) {
 			//out of ammo event
 			//try to refill
 			SetStance(IE_ANI_READY);
@@ -2571,6 +2590,7 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	int roll = core->Roll(1,ATTACKROLL,0);
 	if (roll==1) {
+		DisplayStringCore(this, VB_CRITMISS, DS_CONSOLE|DS_CONST );
 		//critical failure
 		return;
 	}
@@ -2587,7 +2607,8 @@ void Actor::PerformAttack(ieDword gameTime)
 
 	if (roll>=ATTACKROLL-(int) GetStat(IE_CRITICALHITBONUS) ) {
 		//critical success
-		DealDamage (target, damage, damagetype, true);
+		DisplayStringCore(this, VB_CRITHIT, DS_CONSOLE|DS_CONST );
+		DealDamage (target, damage, damagetype, &wi, true);
 		return;
 	}
 	tohit += roll;
@@ -2603,7 +2624,7 @@ void Actor::PerformAttack(ieDword gameTime)
 		//hit failed
 		return;
 	}
-	DealDamage (target, damage, damagetype, false);
+	DealDamage (target, damage, damagetype, &wi, false);
 }
 
 static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
@@ -2612,12 +2633,14 @@ static const int weapon_damagetype[] = {DAMAGE_CRUSHING, DAMAGE_PIERCING,
 static EffectRef fx_stoneskin_ref={"StoneSkinModifier",NULL,-1};
 static EffectRef fx_stoneskin2_ref={"StoneSkin2Modifier",NULL,-1};
 static EffectRef fx_mirrorimage_ref={"MirrorImageModifier",NULL,-1};
+static EffectRef fx_aegis_ref={"Aegis",NULL,-1};
 
-void Actor::DealDamage(Actor *target, int damage, int damagetype, bool critical)
+void Actor::DealDamage(Actor *target, int damage, int damagetype, WeaponInfo *wi, bool critical)
 {
 	int stoneskins = target->Modified[IE_STONESKINS];
 	if (stoneskins) {
 		target->fxqueue.DecreaseParam1OfEffect(fx_stoneskin_ref, 1);
+		target->fxqueue.DecreaseParam1OfEffect(fx_aegis_ref, 1);
 		target->Modified[IE_STONESKINS]--;
 		return;
 	}
@@ -2638,7 +2661,19 @@ void Actor::DealDamage(Actor *target, int damage, int damagetype, bool critical)
 		}
 	}
 
+	if (target->fxqueue.WeaponImmunity(wi->enchantment, wi->itemflags)) {
+		damage = 0;
+	}
+
 	if (damage<0) damage = 0;
+
+	//check casting failure
+
+	if (!damage) {
+		DisplayStringCore(this, VB_TIMMUNE, DS_CONSOLE|DS_CONST );
+		return;
+	}
+
 	if (critical) {
 		//a critical surely raises the morale?
 		NewBase(IE_MORALE, 1, MOD_ADDITIVE);
@@ -3785,6 +3820,16 @@ bool Actor::SetSpellState(unsigned int spellstate)
 	unsigned int bit = 1<<(spellstate&31);
 	if (Modified[pos]&bit) return true;
 	Modified[pos]|=bit;
+	return false;
+}
+
+//returns true if spell state is already set
+bool Actor::HasSpellState(unsigned int spellstate)
+{
+	if (spellstate>=192) return false;
+	unsigned int pos = IE_SPLSTATE_ID1+(spellstate>>5);
+	unsigned int bit = 1<<(spellstate&31);
+	if (Modified[pos]&bit) return true;
 	return false;
 }
 

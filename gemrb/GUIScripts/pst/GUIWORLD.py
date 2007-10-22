@@ -61,7 +61,7 @@ def OpenContainerWindow ():
 
        	hideflag = GemRB.HideGUI ()
 
-	GemRB.LoadWindowPack ("GUIWORLD")
+	GemRB.LoadWindowPack (GetWindowPack())
 	ContainerWindow = Window = GemRB.LoadWindow (8)
 	DisableAnimatedWindows ()
 	GemRB.SetVar ("ActionsWindow", Window)
@@ -262,7 +262,7 @@ def OpenReformPartyWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GemRB.LoadWindowPack ("GUIWORLD")
+	GemRB.LoadWindowPack (GetWindowPack())
 	ReformPartyWindow = Window = GemRB.LoadWindow (24)
 	GemRB.SetVar ("OtherWindow", Window)
 	DisableAnimatedWindows ()
@@ -297,7 +297,7 @@ def OpenFormationWindow ():
 		return
 
 	GemRB.HideGUI ()
-	GemRB.LoadWindowPack ("GUIWORLD")
+	GemRB.LoadWindowPack (GetWindowPack())
 	FormationWindow = Window = GemRB.LoadWindow (27)
 	GemRB.SetVar ("OtherWindow", Window)
 	DisableAnimatedWindows ()
@@ -348,3 +348,11 @@ def SelectFormation ():
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SELECTED)
 
 	last_formation = formation
+
+
+def GetWindowPack():
+	width = GemRB.GetSystemVariable (SV_WIDTH)
+	if width == 800:
+		return "GUIW08"
+	#default
+	return "GUIWORLD"
