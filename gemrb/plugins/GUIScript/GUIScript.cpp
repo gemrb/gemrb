@@ -7785,6 +7785,43 @@ static PyObject* GemRB_SetGamma(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetMouseScrollSpeed__doc,
+"SetMouseScrollSpeed(mouseSpeed)\n\n"
+"Adjusts mouse scroll speed.");
+
+static PyObject* GemRB_SetMouseScrollSpeed(PyObject * /*self*/, PyObject* args)
+{
+	int mouseSpeed;
+
+	if (!PyArg_ParseTuple( args, "i", &mouseSpeed)) {
+		return AttributeError( GemRB_SetMouseScrollSpeed__doc );
+	}
+
+	core->GetVideoDriver()->SetMouseScrollSpeed(mouseSpeed);
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_SetTooltipDelay__doc,
+"SetTooltipDelay(tooltipDelay)\n\n"
+"Adjusts tooltip appearing speed.");
+
+static PyObject* GemRB_SetTooltipDelay(PyObject * /*self*/, PyObject* args)
+{
+        int tooltipDelay;
+
+        if (!PyArg_ParseTuple( args, "i", &tooltipDelay)) {
+                return AttributeError( GemRB_SetTooltipDelay__doc );
+        }
+	
+	printf("%d\n", tooltipDelay);
+        core->TooltipDelay = tooltipDelay;
+
+        Py_INCREF( Py_None );
+        return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_SetFullScreen__doc,
 "SetFullScreen(int)\n\n"
 "0 - windowed, 1 - fullscreen, -1 - toggle");
@@ -8301,6 +8338,8 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(UseItem, METH_VARARGS),
 	METHOD(SpellCast, METH_VARARGS),
 	METHOD(SetGamma, METH_VARARGS),
+	METHOD(SetMouseScrollSpeed, METH_VARARGS),
+	METHOD(SetTooltipDelay, METH_VARARGS),
 	METHOD(SetFullScreen, METH_VARARGS),
 	METHOD(RestParty, METH_VARARGS),
 	METHOD(HasSpecialItem, METH_VARARGS),

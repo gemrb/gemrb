@@ -165,8 +165,8 @@ def OpenVideoOptionsWindow ():
 	OptDone ('VideoOptions', Window, 7)
 	OptCancel ('VideoOptions', Window, 8)
 
-	OptSlider ('VideoOptions', 'Brightness', Window, 1, 10, 31234, "Brightness Correction")
-	OptSlider ('VideoOptions', 'Contrast', Window, 2, 11, 31429, "Gamma Correction")
+	OptSlider ('VideoOptions', 'Brightness', Window, 1, 10, 31234, "Brightness Correction", 5)
+	OptSlider ('VideoOptions', 'Contrast', Window, 2, 11, 31429, "Gamma Correction", 5)
 
 	OptCheckbox ('VideoOptions', 'SoftwareBlitting', Window, 6, 15, 30898, "SoftBlt")
 	OptCheckbox ('VideoOptions', 'SoftwareMirroring', Window, 4, 13, 30896, "SoftMirrorBlt")
@@ -238,10 +238,10 @@ def OpenAudioOptionsWindow ():
 
 
 	OptSlider ('AudioOptions', 'AmbientVolume', Window, 1, 10, 31460, "Volume Ambients", "UpdateVolume")
-	OptSlider ('AudioOptions', 'SoundFXVolume', Window, 2, 11, 31466, "Volume SFX")
-	OptSlider ('AudioOptions', 'VoiceVolume', Window, 3, 12, 31467, "Volume Voices")
+	OptSlider ('AudioOptions', 'SoundFXVolume', Window, 2, 11, 31466, "Volume SFX", "UpdateVolume")
+	OptSlider ('AudioOptions', 'VoiceVolume', Window, 3, 12, 31467, "Volume Voices", "UpdateVolume")
 	OptSlider ('AudioOptions', 'MusicVolume', Window, 4, 13, 31468, "Volume Music", "UpdateVolume")
-	OptSlider ('AudioOptions', 'MovieVolume', Window, 5, 14, 31469, "Volume Movie")
+	OptSlider ('AudioOptions', 'MovieVolume', Window, 5, 14, 31469, "Volume Movie", "UpdateVolume")
 	
 	OptCheckbox ('AudioOptions', 'CreativeEAX', Window, 6, 15, 30900, "Environmental Audio")
 	OptCheckbox ('AudioOptions', 'SoundProcessing', Window, 16, 17, 63242, "Sound Processing")
@@ -256,8 +256,6 @@ def UpdateVolume ():
 	GemRB.UpdateAmbientsVolume ()
 	GemRB.UpdateMusicVolume ()
 	
-
-
 def DisplayHelpAudioOptions ():
 	GemRB.SetText (AudioOptionsWindow, AudioHelpText, 31210)
 
@@ -316,9 +314,9 @@ def OpenGameplayOptionsWindow ():
 	OptDone ('GameplayOptions', Window, 10)
 	OptCancel ('GameplayOptions', Window, 11)
 
-	OptSlider ('GameplayOptions', 'TooltipDelay', Window, 1, 13, 31481, "Tooltip")
-	OptSlider ('GameplayOptions', 'MouseScrollingSpeed', Window, 2, 14, 31482, "Mouse Scroll Speed")
-	OptSlider ('GameplayOptions', 'KeyboardScrollingSpeed', Window, 3, 15, 31480, "Keyboard Scroll Speed")
+	OptSlider ('GameplayOptions', 'TooltipDelay', Window, 1, 13, 31481, "Tooltips", "UpdateTooltips")
+	OptSlider ('GameplayOptions', 'MouseScrollingSpeed', Window, 2, 14, 31482, "Mouse Scroll Speed", "UpdateMouseSpeed")
+	OptSlider ('GameplayOptions', 'KeyboardScrollingSpeed', Window, 3, 15, 31480, "Keyboard Scroll Speed", "UpdateKeyboardSpeed")
 	OptSlider ('GameplayOptions', 'Difficulty', Window, 4, 16, 31479, "Difficulty Level")
 
 	OptCheckbox ('GameplayOptions', 'DitherAlways', Window, 5, 17, 31217, "Always Dither")
@@ -330,23 +328,32 @@ def OpenGameplayOptionsWindow ():
 
 	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
-
+	return
 
 def DisplayHelpGameplayOptions ():
 	GemRB.SetText (GameplayOptionsWindow, GameplayHelpText, 31212)
 
+def UpdateTooltips ():
+	GemRB.SetTooltipDelay (GemRB.GetVar ("Tooltips") )
+
 def DisplayHelpTooltipDelay ():
 	GemRB.SetText (GameplayOptionsWindow, GameplayHelpText, 31232)
 
+def UpdateMouseSpeed ():
+	GemRB.SetMouseScrollSpeed (GemRB.GetVar ("Mouse Scroll Speed") )
+
 def DisplayHelpMouseScrollingSpeed ():
 	GemRB.SetText (GameplayOptionsWindow, GameplayHelpText, 31230)
+
+def UpdateKeyboardSpeed ():
+	#GemRB.SetKeyboardScrollSpeed (GemRB.GetVar ("Keyboard Scroll Speed") )
+	return
 
 def DisplayHelpKeyboardScrollingSpeed ():
 	GemRB.SetText (GameplayOptionsWindow, GameplayHelpText, 31231)
 
 def DisplayHelpDifficulty ():
 	GemRB.SetText (GameplayOptionsWindow, GameplayHelpText, 31233)
-
 
 def DisplayHelpDitherAlways ():
 	GemRB.SetText (GameplayOptionsWindow, GameplayHelpText, 31222)
@@ -837,14 +844,14 @@ def OnCreditsPress ():
 #   control (button, slider ...) and a label
 
 
-def OptSlider (winname, ctlname, window, slider_id, label_id, label_strref, assoc_var, fn = None):
+def OptSlider (winname, ctlname, window, slider_id, label_id, label_strref, assoc_var, fn = None, scale = 1):
 	"""Standard slider for option windows"""
 	slider = GemRB.GetControl (window, slider_id)
 	#GemRB.SetEvent (window, slider, IE_GUI_MOUSE_ENTER_BUTTON, "DisplayHelp" + ctlname)
 	#GemRB.SetEvent (window, slider, IE_GUI_MOUSE_LEAVE_BUTTON, "DisplayHelp" + winname)
 	if fn: GemRB.SetEvent (window, slider, IE_GUI_SLIDER_ON_CHANGE, fn)
 
-	GemRB.SetVarAssoc (window, slider, assoc_var, 1)
+	GemRB.SetVarAssoc (window, slider, assoc_var, scale)
 	
 	label = GemRB.GetControl (window, label_id)
 	GemRB.SetText (window, label, label_strref)

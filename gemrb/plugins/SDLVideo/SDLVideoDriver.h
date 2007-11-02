@@ -49,6 +49,7 @@ private:
 	ieDword subtitlestrref;
 	int width,height,bpp;
 	bool fullscreen;
+	int mousescrollspd;
 public:
 	SDLVideoDriver(void);
 	~SDLVideoDriver(void);
@@ -165,6 +166,7 @@ public:
 	bool IsSpritePixelTransparent (Sprite2D* sprite, unsigned short x, unsigned short y);
 	Sprite2D* SpriteScaleDown( Sprite2D* sprite, unsigned int ratio );
 	void SetGamma(int brightness, int contrast);
+	void SetMouseScrollSpeed(int speed);
 	void release(void)
 	{
 		delete this;

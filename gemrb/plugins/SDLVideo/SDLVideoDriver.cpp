@@ -62,6 +62,7 @@ SDLVideoDriver::SDLVideoDriver(void)
 	extra=NULL;
 	subtitlestrref = 0;
 	subtitletext = NULL;
+	mousescrollspd = 10;
 }
 
 SDLVideoDriver::~SDLVideoDriver(void)
@@ -337,11 +338,11 @@ int SDLVideoDriver::SwapBuffers(void)
 			if (DisableMouse)         //grayed mouse is disabled in this sense 
 				break;
 			if (CursorIndex != 2)
-			  CursorIndex = 0;
+				CursorIndex = 0;
 			CursorPos.x = event.button.x;
 			CursorPos.y = event.button.y;
 			if (Evnt && !ConsolePopped)
-			  Evnt->MouseUp( event.button.x, event.button.y, 1 << ( event.button.button - 1 ), GetModState(SDL_GetModState()) );
+				Evnt->MouseUp( event.button.x, event.button.y, 1 << ( event.button.button - 1 ), GetModState(SDL_GetModState()) );
 
 			break;
 		 case SDL_ACTIVEEVENT:
@@ -381,10 +382,12 @@ int SDLVideoDriver::SwapBuffers(void)
 		backBuf = temp;
 	}
 
-	if (!ConsolePopped) {
+	//handle tooltips
+	unsigned int delay = core->TooltipDelay;
+	if (!ConsolePopped && (delay<100) ) {
 		GetTime( time );
 		/** Display tooltip if mouse is idle */
-		if (( time - lastMouseTime ) > core->TooltipDelay) {
+		if (( time - lastMouseTime ) > delay) {
 			if (Evnt)
 				Evnt->MouseIdle( time - lastMouseTime );
 		}
@@ -2217,6 +2220,8 @@ void SDLVideoDriver::GetMousePos(int &x, int &y)
 	y=CursorPos.y;
 }
 
+#define SCROLL_BORDER  5
+
 void SDLVideoDriver::MouseMovement(int x, int y)
 {
 	GetTime( lastMouseTime );
@@ -2228,19 +2233,19 @@ void SDLVideoDriver::MouseMovement(int x, int y)
 		moveX = 0;
 		moveY = 0;
 	} else {
-		if (x <= 1)
-			moveX = -5;
+		if (x <= SCROLL_BORDER)
+			moveX = -mousescrollspd;
 		else {
-			if (event.motion.x >= ( core->Width - 1 ))
-				moveX = 5;
+			if (event.motion.x >= ( core->Width - SCROLL_BORDER ))
+				moveX = mousescrollspd;
 			else
 				moveX = 0;
 		}
-		if (y <= 1)
-			moveY = -5;
+		if (y <= SCROLL_BORDER)
+			moveY = -mousescrollspd;
 		else {
-			if (y >= ( core->Height - 1 ))
-				moveY = 5;
+			if (y >= ( core->Height - SCROLL_BORDER ))
+				moveY = mousescrollspd;
 			else
 				moveY = 0;
 		}
@@ -2390,4 +2395,9 @@ void SDLVideoDriver::DrawMovieSubtitle(ieDword strRef)
 void SDLVideoDriver::SetGamma(int brightness, int /*contrast*/)
 {
 	SDL_SetGamma(0.8+brightness/50.0,0.8+brightness/50.0,0.8+brightness/50.0);
+}
+
+void SDLVideoDriver::SetMouseScrollSpeed(int speed)
+{
+	mousescrollspd=(speed+1)*2;
 }

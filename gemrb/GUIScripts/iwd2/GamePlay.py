@@ -92,6 +92,7 @@ def OnLoad():
 	
 def DelayPress():
 	GemRB.SetText(GamePlayWindow, TextAreaControl, 18017)
+	GemRB.SetTooltipDelay (GemRB.GetVar ("Tooltips") )
 	return
 	
 def KeySpdPress():
@@ -100,6 +101,7 @@ def KeySpdPress():
 	
 def MouseSpdPress():
 	GemRB.SetText(GamePlayWindow, TextAreaControl, 18018)
+	GemRB.SetMouseScrollSpeed (GemRB.GetVar ("Mouse Scroll Speed") )
 	return
 	
 def DifficultyPress():

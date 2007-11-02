@@ -943,9 +943,14 @@ void Interface::Main()
 	video->SetDisplayTitle( GameName, GameType );
 	ieDword brightness = 10;
 	ieDword contrast = 5;
+	ieDword speed = 10;
 	vars->Lookup("Brightness Correction", brightness);
 	vars->Lookup("Gamma Correction", contrast);
-	video->SetGamma( 	brightness, contrast);
+	vars->Lookup("Mouse Scroll Speed", speed);
+	video->SetGamma(brightness, contrast);
+	video->SetMouseScrollSpeed((int) speed);
+	vars->Lookup("Tooltips", TooltipDelay);
+
 	Font* fps = GetFont( ( unsigned int ) 0 );
 	char fpsstring[40]={"???.??? fps"};
 	unsigned long frame = 0, time, timebase;
@@ -1261,6 +1266,7 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	
+	vars->SetType( GEM_VARIABLES_INT );
 	vars->SetAt( "Volume Ambients", 100 );
 	vars->SetAt( "Volume Movie", 100 );
 	vars->SetAt( "Volume Music", 100 );
@@ -1327,10 +1333,27 @@ int Interface::Init()
 		printf( "Cannot Load Chitin.key\nTermination in Progress...\n" );
 		return GEM_ERROR;
 	}
+
+	printMessage( "Core", "Reading Game Options...\n", WHITE );
 	if (!LoadGemRBINI())
 	{
 		printf( "Cannot Load INI\nTermination in Progress...\n" );
 		return GEM_ERROR;
+	}
+
+	//loading baldur.ini
+	{
+		char ini_path[_MAX_PATH];
+		PathJoin( ini_path, GamePath, INIConfig, NULL );
+		ResolveFilePath( ini_path );
+		LoadINI( ini_path );
+		int i;
+		for (i = 0; i < 8; i++) {
+			if (INIConfig[i] == '.')
+				break;
+			GameNameResRef[i] = INIConfig[i];
+		}
+		GameNameResRef[i] = 0;
 	}
 	
 	printMessage( "Core", "Creating Projectile Server...\n", WHITE );
@@ -1469,21 +1492,6 @@ int Interface::Init()
 	}
 	printStatus( "OK", LIGHT_GREEN );
 	
-	printMessage( "Core", "Initializing Variables Dictionary...", WHITE );
-	vars->SetType( GEM_VARIABLES_INT );
-	{
-		char ini_path[_MAX_PATH];
-		PathJoin( ini_path, GamePath, INIConfig, NULL );
-		ResolveFilePath( ini_path );
-		LoadINI( ini_path );
-		int i;
-		for (i = 0; i < 8; i++) {
-			if (INIConfig[i] == '.')
-				break;
-			GameNameResRef[i] = INIConfig[i];
-		}
-		GameNameResRef[i] = 0;
-	}
 	//no need of strdup, variables do copy the key!
 	vars->SetAt( "SkipIntroVideos", (unsigned long)SkipIntroVideos );
 	printStatus( "OK", LIGHT_GREEN );
@@ -1979,24 +1987,10 @@ bool Interface::LoadConfig(const char* filename)
 			DataStream::SetEndianSwitch(atoi(value) );
 		} else if (stricmp( name, "CaseSensitive" ) == 0) {
 			CaseSensitive = ( atoi( value ) == 0 ) ? false : true;
-		} else if (stricmp( name, "SmoothFog" ) == 0) {
-			vars->SetAt( "3D Acceleration", atoi( value ) );
 		} else if (stricmp( name, "MultipleQuickSaves" ) == 0) {
 			GameControl::MultipleQuickSaves(atoi(value));
-		} else if (stricmp( name, "VolumeAmbients" ) == 0) {
-			vars->SetAt( "Volume Ambients", atoi( value ) );
-		} else if (stricmp( name, "VolumeMovie" ) == 0) {
-			vars->SetAt( "Volume Movie", atoi( value ) );
-		} else if (stricmp( name, "VolumeMusic" ) == 0) {
-			vars->SetAt( "Volume Music", atoi( value ) );
-		} else if (stricmp( name, "VolumeSFX" ) == 0) {
-			vars->SetAt( "Volume SFX", atoi( value ) );
-		} else if (stricmp( name, "VolumeVoices" ) == 0) {
-			vars->SetAt( "Volume Voices", atoi( value ) );
 		} else if (stricmp( name, "GameOnCD" ) == 0) {
 			GameOnCD = ( atoi( value ) == 0 ) ? false : true;
-		} else if (stricmp( name, "TooltipDelay" ) == 0) {
-			TooltipDelay = atoi( value );
 		} else if (stricmp( name, "GameDataPath" ) == 0) {
 			strncpy( GameData, value, sizeof(GameData) );
 		} else if (stricmp( name, "GameOverridePath" ) == 0) {

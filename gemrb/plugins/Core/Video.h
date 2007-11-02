@@ -223,6 +223,7 @@ public:
 	virtual bool IsSpritePixelTransparent(Sprite2D* sprite, unsigned short x, unsigned short y) = 0;
 	virtual Sprite2D* SpriteScaleDown( Sprite2D* sprite, unsigned int ratio ) = 0;
 	virtual void SetGamma(int brightness, int contrast) = 0;
+	virtual void SetMouseScrollSpeed(int speed) = 0;
 };
 
 #endif
