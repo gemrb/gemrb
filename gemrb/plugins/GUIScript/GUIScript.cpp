@@ -4343,7 +4343,7 @@ PyDoc_STRVAR( GemRB_GameGetFirstSelectedPC__doc,
 
 static PyObject* GemRB_GameGetFirstSelectedPC(PyObject * /*self*/, PyObject* /*args*/)
 {
-	Actor *actor = core->GetFirstSelectedPC();
+	Actor *actor = core->GetFirstSelectedPC(false);
 	if (actor) {
 		return PyInt_FromLong( actor->InParty);
 	}
@@ -4806,7 +4806,7 @@ static PyObject* GemRB_GetContainer(PyObject * /*self*/, PyObject* args)
 	if (PartyID) {
 		actor = game->FindPC( PartyID );
 	} else {
-		actor = core->GetFirstSelectedPC();
+		actor = core->GetFirstSelectedPC(false);
 	}
 	if (!actor) {
 		return RuntimeError( "Actor not found" );
@@ -4911,7 +4911,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 		Map *map = actor->GetCurrentArea();
 		container = map->TMap->GetContainer(actor->Pos, IE_CONTAINER_PILE);
 	} else {
-		actor = core->GetFirstSelectedPC();
+		actor = core->GetFirstSelectedPC(false);
 		if (!actor) {
 			return RuntimeError( "Actor not found" );
 		}
@@ -7666,7 +7666,6 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 		case TARGET_NONE:
 			//this is always instant casting
 			core->ApplySpell(spelldata.spellname, actor, actor, 0);
-			//actor->CastSpell(spelldata.spellname, NULL, true);
 			break;
 		case TARGET_AREA:
 			gc->SetupCasting(spelldata.type, spelldata.level, spelldata.slot, actor, GA_POINT, spelldata.TargetNumber);
@@ -7907,7 +7906,7 @@ static PyObject* GemRB_HasSpecialSpell(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_ApplyEffect__doc,
-"ApplyEffect(pc, effect, param1, param2[,resref[,resref2, resref3]])\n\n"
+"ApplyEffect(pc, effect, param1, param2[,resref,resref2, resref3]])\n\n"
 "Creates a basic effect and applies it on the player character. "
 "This function could be used to add stats that are stored in effect blocks. "
 "The resource fields are optional.\n\n");
@@ -7923,7 +7922,7 @@ static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 	const char *resref2 = NULL;
 	const char *resref3 = NULL;
 
-	if (!PyArg_ParseTuple( args, "isii|s|ss", &PartyID, &opcodename, &param1, &param2, &resref1, &resref2, &resref3)) {
+	if (!PyArg_ParseTuple( args, "isii|sss", &PartyID, &opcodename, &param1, &param2, &resref1, &resref2, &resref3)) {
 		return AttributeError( GemRB_ApplyEffect__doc );
 	}
 	Game *game = core->GetGame();

@@ -3086,11 +3086,18 @@ void GameScript::SetVisualRange(Scriptable* Sender, Action* parameters)
 
 void GameScript::MakeUnselectable(Scriptable* Sender, Action* parameters)
 {
+	Sender->UnselectableTimer=parameters->int0Parameter;
+
+	//update color
 	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
 	Actor* actor = ( Actor* ) Sender;
-	actor->SetBase(IE_UNSELECTABLE,parameters->int0Parameter);
+	if (parameters->int0Parameter) {
+		actor->Select(0);
+	}
+
+	actor->SetCircleSize();
 }
 
 void GameScript::Debug(Scriptable* /*Sender*/, Action* parameters)

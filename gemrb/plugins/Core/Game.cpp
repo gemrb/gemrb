@@ -1054,7 +1054,7 @@ void Game::UpdateScripts()
 			CombatCounter++;
 		}
 	}
-	ExecuteScript( Scripts[0] );
+	ExecuteScript( 1 );
 	ProcessActions(false);
 	size_t idx;
 

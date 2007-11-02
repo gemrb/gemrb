@@ -413,7 +413,10 @@ void Actor::SetCircleSize()
 	const Color *color;
 	int color_index;
 
-	if (Modified[IE_UNSELECTABLE]) {
+	if (!anims)
+		return;
+
+	if (UnselectableTimer) {
 		color = &magenta;
 		color_index = 4;
 	} else if (Modified[IE_STATE_ID] & STATE_PANIC) {
@@ -445,8 +448,6 @@ void Actor::SetCircleSize()
 		}
 	}
 
-	if (!anims)
-		return;
 	int csize = anims->GetCircleSize() - 1;
 	if (csize >= MAX_CIRCLE_SIZE)
 		csize = MAX_CIRCLE_SIZE - 1;
@@ -2203,7 +2204,7 @@ bool Actor::ValidTarget(int ga_flags) const
 		if (Modified[IE_STATE_ID] & STATE_DEAD) return false;
 	}
 	if (ga_flags&GA_SELECT) {
-		if (Modified[IE_UNSELECTABLE]) return false;
+		if (UnselectableTimer) return false;
 	}
 	return true;
 }

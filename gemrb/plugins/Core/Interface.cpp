@@ -4737,7 +4737,7 @@ int Interface::CloseCurrentContainer()
 void Interface::SetCurrentContainer(Actor *actor, Container *arg, bool flag)
 {
 	//abort action if the first selected PC isn't the original actor
-	if (actor!=GetFirstSelectedPC()) {
+	if (actor!=GetFirstSelectedPC(false)) {
 		CurrentContainer = NULL;
 		return;
 	}
@@ -4898,13 +4898,19 @@ ScriptedAnimation* Interface::GetScriptedAnimation( const char *effect, bool dou
 	return ret;
 }
 
-Actor *Interface::GetFirstSelectedPC()
+Actor *Interface::GetFirstSelectedPC(bool forced)
 {
-	for (int i = 0; i < game->GetPartySize( false ); i++) {
+	int partySize = game->GetPartySize( false );
+	if (!partySize) return NULL;
+	for (int i = 0; i < partySize; i++) {
 		Actor* actor = game->GetPC( i,false );
 		if (actor->IsSelected()) {
 			return actor;
 		}
+	}
+
+	if (forced) {
+		return game->GetPC(0,false);
 	}
 	return NULL;
 }

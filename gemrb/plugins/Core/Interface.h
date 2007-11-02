@@ -567,8 +567,9 @@ public:
 	bool Exists(const char *ResRef, SClass_ID type);
 	/** creates a vvc/bam animation object at point */
 	ScriptedAnimation* GetScriptedAnimation( const char *ResRef, bool doublehint);
-	/** returns the first selected PC */
-	Actor *GetFirstSelectedPC();
+	/** returns the first selected PC, if forced is set, then it returns 
+	    first PC if none was selected */
+	Actor *GetFirstSelectedPC(bool forced);
 	/** returns a single sprite (not cached) from a BAM resource */
 	Sprite2D* GetBAMSprite(const ieResRef ResRef, int cycle, int frame);
 	/** returns a cursor sprite (not cached) */

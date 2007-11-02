@@ -57,6 +57,7 @@
 #define PI_BLOODRAGE 76 //iwd2
 #define PI_MAZE    78
 #define PI_PRISON  79
+#define PI_DEAFNESS 83 //iwd2
 #define PI_SEQUENCER 92
 #define PI_BLUR 109
 #define PI_IMPROVEDHASTE 110
@@ -157,6 +158,7 @@ int fx_cure_feebleminded_state (Actor* Owner, Actor* target, Effect* fx);//4d
 int fx_set_diseased_state (Actor* Owner, Actor* target, Effect*fx);//4e
 int fx_cure_diseased_state (Actor* Owner, Actor* target, Effect* fx);//4f
 int fx_set_deaf_state (Actor* Owner, Actor* target, Effect* fx); //50
+int fx_set_deaf_state_iwd2 (Actor* Owner, Actor* target, Effect* fx); //50
 int fx_cure_deaf_state (Actor* Owner, Actor* target, Effect* fx);//51
 int fx_set_ai_script (Actor* Owner, Actor* target, Effect*fx);//52
 int fx_protection_from_projectile (Actor* Owner, Actor* target, Effect*fx);//53
@@ -683,6 +685,7 @@ static EffectRef effectnames[] = {
 	{ "State:Charmed", fx_set_charmed_state, -1 }, //0x05
 	{ "State:Confused", fx_set_confused_state, -1 },
 	{ "State:Deafness", fx_set_deaf_state, -1 },
+	{ "State:DeafnessIWD2", fx_set_deaf_state_iwd2, -1 }, //this is a modified version
 	{ "State:Diseased", fx_set_diseased_state, -1 },
 	{ "State:Feeblemind", fx_set_feebleminded_state, -1 },
 	{ "State:Hasted", fx_set_hasted_state, -1 },
@@ -1257,6 +1260,9 @@ int fx_current_hp_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0x12 MaximumHPModifier
+// 0 and 3 differ in that 3 doesn't modify current hitpoints
+// 1,4 are the same
+// 2,5 are the same
 int fx_maximum_hp_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_maximum_hp_modifier (%2d): Stat Modif: %d ; Modif Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -1271,25 +1277,9 @@ int fx_maximum_hp_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 			BASE_ADD( IE_HITPOINTS, fx->Parameter1 );
 		} else {
 			STAT_ADD( IE_MAXHITPOINTS, fx->Parameter1 );
-			STAT_ADD( IE_HITPOINTS, fx->Parameter1 );
-		}
-		break;
-	case 1:
-		if (base) {
-			BASE_SET( IE_MAXHITPOINTS, fx->Parameter1 );
-			BASE_SET( IE_HITPOINTS, fx->Parameter1 );
-		} else {
-			STAT_SET( IE_MAXHITPOINTS, fx->Parameter1 );
-			STAT_SET( IE_HITPOINTS, fx->Parameter1 );
-		}
-		break;
-	case 2:
-		if (base) {
-			BASE_MUL( IE_MAXHITPOINTS, fx->Parameter1 );
-			BASE_MUL( IE_HITPOINTS, fx->Parameter1 );
-		} else {
-			STAT_MUL( IE_MAXHITPOINTS, fx->Parameter1 );
-			STAT_MUL( IE_HITPOINTS, fx->Parameter1 );
+			if (fx->FirstApply) {
+			  BASE_ADD( IE_HITPOINTS, fx->Parameter1 );
+			}
 		}
 		break;
 	case 3:
@@ -1299,15 +1289,15 @@ int fx_maximum_hp_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 		} else {
 			STAT_ADD( IE_MAXHITPOINTS, fx->Parameter1 );
 		}
-		break;
-	case 4:
+		break;	
+	case 1:case 4:
 		if (base) {
 			BASE_SET( IE_MAXHITPOINTS, fx->Parameter1 );
 		} else {
 			STAT_SET( IE_MAXHITPOINTS, fx->Parameter1 );
 		}
 		break;
-	case 5:
+	case 2:case 5:
 		if (base) {
 			BASE_MUL( IE_MAXHITPOINTS, fx->Parameter1 );
 		} else {
@@ -1825,6 +1815,7 @@ int fx_brief_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 	return FX_NOT_APPLIED;
 }
+
 // 0x33 Color:DarkenRGB
 int fx_darken_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1835,6 +1826,7 @@ int fx_darken_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 			fx->Parameter1 >> 16, fx->Parameter1 >> 24);
 	return FX_APPLIED;
 }
+
 // 0x34 Color:GlowRGB
 int fx_glow_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -1847,6 +1839,7 @@ int fx_glow_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 	return FX_APPLIED;
 }
+
 // 0x35 AnimationIDModifier
 static EffectRef fx_animation_id_modifier_ref={"AnimationIDModifier",NULL,-1};
 
@@ -2344,30 +2337,61 @@ int fx_cure_diseased_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 // 0x50 State:Deafness
 // gemrb extension: modifiable amount
+// none of the engines care about stacking
 int fx_set_deaf_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_deaf_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	
+	//gemrb fix
+	if (target->SetSpellState(SS_DEAF)) return FX_APPLIED;
+
 	if (!fx->Parameter1) {
 		fx->Parameter1 = 50;
 	}
 	STAT_ADD(IE_SPELLFAILUREMAGE, fx->Parameter1);
 	if (!fx->Parameter2) {
-		fx->Parameter2 = 50;
+		fx->Parameter1 = 50;
 	}
 	STAT_ADD(IE_SPELLFAILUREPRIEST, fx->Parameter2);
-	EXTSTATE_SET(EXTSTATE_DEAF);
+	EXTSTATE_SET(EXTSTATE_DEAF); //iwd1/how needs this
+	if (enhanced_effects) {
+		target->AddPortraitIcon(PI_DEAFNESS);
+	}
+	return FX_APPLIED;
+}
+
+int fx_set_deaf_state_iwd2 (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_set_deaf_state_iwd2 (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	
+	//gemrb fix
+	if (target->SetSpellState(SS_DEAF)) return FX_APPLIED;
+
+	if (!fx->Parameter1) {
+		//this is a bad hack
+		fx->Parameter1 = 20;
+	}
+	STAT_ADD(IE_SPELLFAILUREMAGE, fx->Parameter1);
+	if (!fx->Parameter2) {
+		fx->Parameter1 = 20;
+	}
+	STAT_ADD(IE_SPELLFAILUREPRIEST, fx->Parameter2);
+	EXTSTATE_SET(EXTSTATE_DEAF); //iwd1/how needs this
+	target->AddPortraitIcon(PI_DEAFNESS); //iwd2 specific
 	return FX_APPLIED;
 }
 
 // 0x51 Cure:Deafness
-static EffectRef fx_deaf_state_ref={"State:Deaf",NULL,-1};
+static EffectRef fx_deaf_state_ref={"State:Deafness",NULL,-1};
+static EffectRef fx_deaf_state_iwd2_ref={"State:DeafnessIWD2",NULL,-1};
 
-//removes the deaf effect
+//removes the deafness effect
 int fx_cure_deaf_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_cure_deaf_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	target->fxqueue.RemoveAllEffects(fx_deaf_state_ref);
+	target->fxqueue.RemoveAllEffects(fx_deaf_state_iwd2_ref);
 	return FX_NOT_APPLIED;
 }
 
@@ -2518,6 +2542,16 @@ int fx_set_regenerating_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_set_regenerating_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	int damage;
 	int tmp = fx->Parameter1;
+	ieDword gameTime = core->GetGame()->GameTime;
+	ieDword nextHeal;
+
+	if (!fx->Parameter3) {
+		nextHeal = gameTime;
+	} else {
+		nextHeal = fx->Parameter3;
+	}
+
+	if (nextHeal>gameTime) return FX_APPLIED;
 
 	switch(fx->Parameter2) {
 	case RPD_PERCENT:
@@ -2530,15 +2564,15 @@ int fx_set_regenerating_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 		tmp *= 30;
 	case RPD_SECONDS:
 seconds:
-		if (tmp && (core->GetGame()->GameTime%tmp)) {
-			return FX_APPLIED;
-		}
+		fx->Parameter3 = nextHeal+tmp;
 		damage = 1;
 		break;
 	case RPD_POINTS:
 		damage = fx->Parameter1;
+		fx->Parameter3++;
 		break;
 	default:
+		fx->Parameter3++;
 		damage = 1;
 		break;
 	}
@@ -3433,6 +3467,11 @@ int fx_replace_creature (Actor* Owner, Actor* target, Effect *fx)
 {
 	if (0) printf( "fx_replace_creature (%2d): Resource: %s\n", fx->Opcode, fx->Resource );
 
+	//this safeguard exists in the original engine too
+	if (!core->Exists(fx->Resource,IE_CRE_CLASS_ID)) {
+		return FX_NOT_APPLIED;
+	}
+
 	//FIXME: the monster should appear near the effect position?
 	//or the target position, this needs experiment
 	Point p(fx->PosX, fx->PosY);
@@ -3982,6 +4021,7 @@ int fx_bounce_opcode (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_bounce_opcode (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
 	STAT_BIT_OR( IE_BOUNCE, BNC_OPCODE );
+	target->AddPortraitIcon(PI_BOUNCE2);
 	return FX_APPLIED;
 }
 
@@ -3990,10 +4030,11 @@ int fx_bounce_spelllevel (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_bounce_spellevel (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
 	STAT_BIT_OR( IE_BOUNCE, BNC_LEVEL );
+	target->AddPortraitIcon(PI_BOUNCE2);
 	return FX_APPLIED;
 }
 
-// 0xc8 Bounce:SpellLevelDecrement
+// 0xc8 Bounce:SpellLevelDec
 int fx_bounce_spelllevel_dec (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_bounce_spellevel_dec (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
@@ -4002,16 +4043,12 @@ int fx_bounce_spelllevel_dec (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-//0xc9 //Protection:SpellLevelDecrement
-//0xDF //Protection:SchoolDecrement
-//0xe2 //Protection:SecondaryTypeDecrement
-int fx_generic_decrement_effect (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+//0xc9 //Protection:SpellLevelDec
+int fx_immunity_spelllevel_dec (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_generic_decrement_effect (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
-	if (fx->Parameter1) {
-		return FX_APPLIED;
-	}
-	return FX_NOT_APPLIED;
+	if (0) printf( "fx_immunity_spelllevel_dec (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	target->AddPortraitIcon(PI_BOUNCE2);
+	return FX_APPLIED;
 }
 
 // 0xca Bounce:School
@@ -4265,8 +4302,19 @@ int fx_teleport_field (Actor* /*Owner*/, Actor* target, Effect* fx)
 	target->SetPosition( p, true, 0);
 	return FX_NOT_APPLIED;
 }
-//0xDF decrementing school immunity (general)
-//0xE0 Cure:LevelDrain
+
+//0xDF //Protection:SchoolDec
+//0xe2 //Protection:SecondaryTypeDec
+int fx_generic_decrement_effect (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+{
+	if (0) printf( "fx_generic_decrement_effect (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	if (fx->Parameter1) {
+		return FX_APPLIED;
+	}
+	return FX_NOT_APPLIED;
+}
+
+//0xe0 Cure:LevelDrain
 static EffectRef fx_leveldrain_ref={"LevelDrainModifier",NULL,-1};
 
 int fx_cure_leveldrain (Actor* /*Owner*/, Actor* target, Effect* fx)
@@ -4276,15 +4324,26 @@ int fx_cure_leveldrain (Actor* /*Owner*/, Actor* target, Effect* fx)
 	target->fxqueue.RemoveAllEffects( fx_leveldrain_ref );
 	return FX_NOT_APPLIED;
 }
-//0xE1 Reveal:Magic
+
+//0xe1 Reveal:Magic
+//gemrb special: speed and color are custom
 int fx_reveal_magic (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_reveal_magic (%2d)\n", fx->Opcode );
 	if (target->fxqueue.HasAnyDispellableEffect()) {
-		// make an one shot color pulse effect on target
+		if (!fx->Parameter1) {
+			fx->Parameter1=0xff00; //blue
+		}
+		
+		int speed = (fx->Parameter2 >> 16) & 0xFF;
+		if (!speed) speed=30;
+		target->SetColorMod(0xff, RGBModifier::ADD, speed,
+			fx->Parameter1 >> 8, fx->Parameter1 >> 16,
+			fx->Parameter1 >> 24, 0);
 	}
 	return FX_NOT_APPLIED;
 }
+
 //e2 decrementing secondary type immunity (general)
 //e3 Bounce:SchoolDecrement
 int fx_bounce_school_dec (Actor* /*Owner*/, Actor* target, Effect* fx)

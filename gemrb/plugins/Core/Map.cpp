@@ -593,7 +593,7 @@ void Map::UseExit(Actor *actor, InfoPoint *ip)
 	}
 	if (ip->Scripts[0]) {
 		ip->LastTrigger = ip->LastEntered = actor->GetID();
-		ip->ExecuteScript( ip->Scripts[0] );
+		ip->ExecuteScript( 1 );
 		ip->ProcessActions(true);
 	}
 }
@@ -607,9 +607,8 @@ void Map::UpdateScripts()
 	}
 
 	//Run the Map Script
-	if (Scripts[0]) {
-		ExecuteScript( Scripts[0] );
-	}
+	ExecuteScript( 1 );
+
 	//Execute Pending Actions
 	//if it is only here, then the drawing will fail
 	ProcessActions(false);
@@ -636,15 +635,7 @@ void Map::UpdateScripts()
 		if (timestop && actor!=timestop_owner && actor->Modified[IE_DISABLETIMESTOP] ) {
 			continue;
 		}
-		for (unsigned int i = 0; i < MAX_SCRIPTS; i++) {
-			if (actor->Scripts[i]) {
-				/* this will be handled by ExecuteScript
-				if (actor->GetNextAction())
-					break;
-				*/
-				actor->ExecuteScript( actor->Scripts[i] );
-			}
-		}
+		actor->ExecuteScript( MAX_SCRIPTS );
 		actor->ProcessActions(false);
 
 		actor->inventory.CalculateWeight();
@@ -681,7 +672,7 @@ void Map::UpdateScripts()
 			break;
 		if (!door->Scripts[0])
 			continue;
-		door->ExecuteScript( door->Scripts[0] );
+		door->ExecuteScript( 1 );
 		//Execute Pending Actions
 		door->ProcessActions(false);
 	}
@@ -706,7 +697,7 @@ void Map::UpdateScripts()
 			//Check if this InfoPoint was activated
 			if (ip->LastTrigger) {
 				//Run the InfoPoint script
-				ip->ExecuteScript( ip->Scripts[0] );
+				ip->ExecuteScript( 1 );
 				//Execute Pending Actions
 				ip->ProcessActions(false);
 			}
@@ -737,7 +728,7 @@ void Map::UpdateScripts()
 		}
 
 		if (ip->Type==ST_PROXIMITY) {
-			ip->ExecuteScript( ip->Scripts[0] );
+			ip->ExecuteScript( 1 );
 			//Execute Pending Actions
 			ip->ProcessActions(false);
 		}

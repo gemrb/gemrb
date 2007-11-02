@@ -609,7 +609,7 @@ public:
 	unsigned long scriptRunDelay;
 	int scriptlevel;
 	void RunNow();
-	void Update();
+	bool Update();
 	void EvaluateAllBlocks();
 private: //Internal Functions
 	Script* CacheScript(ieResRef ResRef);

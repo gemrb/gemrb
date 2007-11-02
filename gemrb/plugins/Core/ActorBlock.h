@@ -185,6 +185,7 @@ public:
 	char* overHeadText;
 	unsigned char textDisplaying;
 	unsigned long timeStartDisplaying;
+	ieDword UnselectableTimer;
 	ieDword LastTrigger;  // also LastClosed
 	ieDword LastEntered;  // also LastOpened
 	ieDword LastDisarmed; // also LastAttacker
@@ -228,7 +229,7 @@ public:
 	void SetScriptName(const char* text);
 	//call this to enable script running as soon as possible
 	void ImmediateEvent();
-	void ExecuteScript(GameScript* Script);
+	void ExecuteScript(int scriptCount);
 	void AddAction(Action* aC);
 	void AddActionInFront(Action* aC);
 	Action* GetNextAction();

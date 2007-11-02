@@ -61,6 +61,7 @@ Scriptable::Scriptable(ScriptableType type)
 	LastPickLockFailed = 0;
 	DialogName = 0;
 	CurrentAction = NULL;
+	UnselectableTimer = 0;
 	startTime = 0;
 	interval = ( 1000 / AI_UPDATE_TIME );
 	WaitCounter = 0;
@@ -73,7 +74,6 @@ Scriptable::Scriptable(ScriptableType type)
 	area = 0;
 	Pos.x = 0;
 	Pos.y = 0;
-	scriptName[0] = 0;
 
 	SpellHeader = -1;
 	LastTargetPos.empty();
@@ -223,7 +223,7 @@ void Scriptable::ImmediateEvent()
 	}
 }
 
-void Scriptable::ExecuteScript(GameScript* Script)
+void Scriptable::ExecuteScript(int scriptCount)
 {
 	if (core->GetGameControl()->GetScreenFlags()&SF_CUTSCENE) {
 		return;
@@ -231,8 +231,23 @@ void Scriptable::ExecuteScript(GameScript* Script)
 	if (WaitCounter) {
 		return;
 	}
-	if (Script) {
-		Script->Update();
+
+	bool alive = false;
+
+	for (int i=0;i<scriptCount;i++)
+	{
+		GameScript *Script = Scripts[i];
+		if (Script) {
+			alive |= Script->Update();
+		}
+	}
+	if (alive && UnselectableTimer) {
+			UnselectableTimer--;
+			if (!UnselectableTimer) {
+				if (Type==ST_ACTOR) {
+					((Actor *) this)->SetCircleSize();
+				}
+			}
 	}
 }
 

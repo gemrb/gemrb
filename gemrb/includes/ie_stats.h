@@ -396,7 +396,14 @@
 #define IE_TITLE2		173
 #define IE_DISABLEOVERLAY	174
 #define IE_DISABLEBACKSTAB	175
-
+//these are unknown, but already used in GemRB
+//176
+//177
+//178
+//179
+//180
+//181
+//182
 #define IE_ENABLEOFFSCREENAI    183 // bg2 has this on this spot
 #define IE_EXISTANCEDELAY       184 // (sound2mn)
 #define IE_ATTACKNUMBERDOUBLE   185 // used by haste option 2
@@ -406,6 +413,7 @@
 #define IE_NPCBUMP              190 // not entirely sure what is this
 #define IE_CANUSEANYITEM        191
 #define IE_ALWAYSBACKSTAB       192
+//193
 #define IE_SPELLFAILUREINNATE   194
 #define IE_NOTRACKING           195 // tracking doesn't detect this
 #define IE_DEADMAGIC            196
@@ -442,7 +450,7 @@
 #define IE_MC_FLAGS		215
 #define IE_CLASSLEVELSUM	216 //iwd2
 #define IE_ALIGNMENT		217
-#define IE_UNSELECTABLE		218
+//#define IE_UNSELECTABLE		218
 #define IE_ARMOR_TYPE		219
 #define IE_TEAM			220
 #define IE_FACTION		221

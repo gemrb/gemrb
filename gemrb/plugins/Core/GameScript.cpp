@@ -1567,30 +1567,23 @@ void GameScript::RunNow()
 	lastRunTime = 0;
 }
 
-void nop() {}
-
-void GameScript::Update()
+bool GameScript::Update()
 {
-	if (!MySelf || !(MySelf->GetInternalFlag()&IF_ACTIVE) ) {
-		return;
-	}
+	if (!MySelf)
+		return false;
+
+	if (!script)
+		return false;
+
 	ieDword thisTime = core->GetGame()->Ticks;
 	//GetTime( thisTime ); //this should be gametime too, pause holds it
 	if (( thisTime - lastRunTime ) < scriptRunDelay) {
-		return;
+		return false;
 	}
 	lastRunTime = thisTime;
-	if (!script) {
-		return;
+	if(!(MySelf->GetInternalFlag()&IF_ACTIVE) ) {
+		return true;
 	}
-	// this is only for testing purposes
-	/*
-	if (!memcmp(MySelf->GetScriptName(),"cat",4) ) {
-		if (MySelf->GetNextAction()) {
-			nop();
-		}
-	}
-	*/
 
 	bool continueExecution = false;
 
@@ -1604,11 +1597,11 @@ void GameScript::Update()
 			if (!continueExecution) {
 				if (MySelf->GetNextAction()) {
 					if (MySelf->GetInternalFlag()&IF_NOINT) {
-						return;
+						return true;
 					}
 
 					if (lastAction==a) {
-						return;
+						return true;
 					}
 
 					//movetoobjectfollow would break if this isn't called
@@ -1627,6 +1620,7 @@ void GameScript::Update()
 			//continueExecution = false;
 		}
 	}
+	return true;
 }
 
 void GameScript::EvaluateAllBlocks()

@@ -67,7 +67,7 @@ static const Color blue = {
 	0x00, 0x00, 0xff, 0x80
 };
 
-Animation* effect;
+//Animation* effect;
 
 #define FORMATIONSIZE 10
 typedef Point formation_type[FORMATIONSIZE];
@@ -112,7 +112,7 @@ GameControl::GameControl(void)
 	moveX = moveY = 0;
 	DebugFlags = 0;
 	AIUpdateCounter = 1;
-	effect = NULL;
+//	effect = NULL;
 	ieDword tmp=0;
 
 	target_mode = TARGET_MODE_NONE;
@@ -318,7 +318,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 		return;
 	}
 	if ( game->selected.size() > 0 ) {
-		ChangeMap(core->GetFirstSelectedPC(), false);
+		ChangeMap(core->GetFirstSelectedPC(true), false);
 	}
 	Video* video = core->GetVideoDriver();
 	Region viewport = video->GetViewport();
@@ -441,6 +441,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 
 	//Draw spell effect, this must be stored in the actors
 	//not like this
+	/*
 	if (effect) {
 		if (( game->selected.size() > 0 )) {
 			Actor* actor = core->GetFirstSelectedPC();
@@ -448,6 +449,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 					actor->Pos.y, false );
 		}
 	}
+	*/
 
 	// Show traps
 	if (DebugFlags & DEBUG_SHOW_INFOPOINTS) {
@@ -657,16 +659,9 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				}
 				break;
 			case 'l':
-				if (game->selected.size() > 0) {
-					if (!effect) {
-						AnimationFactory* af = ( AnimationFactory* )
-		 				core->GetResourceMgr()->GetFactoryResource( "S056ICBL", IE_BAM_CLASS_ID );
-
-						effect = af->GetCycle( 1 );
-					} else {
-						delete( effect );
-						effect = NULL;
-					}
+				//the original engine was able to swap through all animations
+				if (lastActor) {
+					lastActor->AddAnimation("S056ICBL", 0, 0, 0);
 				}
 				break;
 
@@ -982,7 +977,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		} else if (target_mode & TARGET_MODE_PICK) {
 			if (lastActor) {
 				nextCursor = IE_CURSOR_PICK;
-				if (lastActor == core->GetFirstSelectedPC()) {
+				if (lastActor == core->GetFirstSelectedPC(false)) {
 					nextCursor |= IE_CURSOR_GRAY;
 				}
 			} else {
@@ -1367,16 +1362,16 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 
 	if (!actor && ( game->selected.size() > 0 )) {
 		if (overDoor) {
-			HandleDoor(overDoor, core->GetFirstSelectedPC());
+			HandleDoor(overDoor, core->GetFirstSelectedPC(false));
 			return;
 		}
 		if (overInfoPoint) {
-			if (HandleActiveRegion(overInfoPoint, core->GetFirstSelectedPC(), p)) {
+			if (HandleActiveRegion(overInfoPoint, core->GetFirstSelectedPC(false), p)) {
 				return;
 			}
 		}
 		if (overContainer) {
-			HandleContainer(overContainer, core->GetFirstSelectedPC());
+			HandleContainer(overContainer, core->GetFirstSelectedPC(false));
 			return;
 		}
 
@@ -1384,7 +1379,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 		if (game->selected.size()==1) {
 			//the player is using an item or spell on the ground
 			if (spellCount) {
-				TryToCast(core->GetFirstSelectedPC(), p);
+				TryToCast(core->GetFirstSelectedPC(false), p);
 				return;
 			}
 
@@ -1467,7 +1462,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 				if (core->HasFeature(GF_PROTAGONIST_TALKS) ) {
 					source = game->FindPC(1); //protagonist
 				} else {
-					source = core->GetFirstSelectedPC();
+					source = core->GetFirstSelectedPC(false);
 				}
 				TryToTalk(source, actor);
 			}
@@ -1481,7 +1476,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 		case ACT_CAST: //cast on target or use item on target
 			if (game->selected.size()==1) {
 				Actor *source;
-				source = core->GetFirstSelectedPC();
+				source = core->GetFirstSelectedPC(false);
 				TryToCast(source, actor);
 			}
 			break;
@@ -1493,7 +1488,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 		case ACT_THIEVING:
 			if (game->selected.size()==1) {
 				Actor *source;
-				source = core->GetFirstSelectedPC();
+				source = core->GetFirstSelectedPC(false);
 				TryToPick(source, actor);
 			}
 			break;
