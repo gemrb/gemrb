@@ -277,21 +277,21 @@ int CRawPCMReader::read_samples(short* buffer, int count)
 inline void fix_endian(ieDword &dest)
 {
 	unsigned char tmp;
-	tmp=((unsigned char *) dest)[0];
-	((unsigned char *) dest)[0]=((unsigned char *) dest)[3];
-	((unsigned char *) dest)[3]=tmp;
+	tmp=((unsigned char *) &dest)[0];
+	((unsigned char *) &dest)[0]=((unsigned char *) &dest)[3];
+	((unsigned char *) &dest)[3]=tmp;
 	tmp=((unsigned char *) dest)[1];
-	((unsigned char *) dest)[1]=((unsigned char *) dest)[2];
-	((unsigned char *) dest)[2]=tmp;
+	((unsigned char *) &dest)[1]=((unsigned char *) &dest)[2];
+	((unsigned char *) &dest)[2]=tmp;
 
 }
 
 inline void fix_endian(ieWord &dest)
 {
 	unsigned char tmp;
-	tmp=((unsigned char *) dest)[0];
-	((unsigned char *) dest)[0]=((unsigned char *) dest)[1];
-	((unsigned char *) dest)[1]=tmp;
+	tmp=((unsigned char *) &dest)[0];
+	((unsigned char *) &dest)[0]=((unsigned char *) &dest)[1];
+	((unsigned char *) &dest)[1]=tmp;
 }
 
 int CWavPCMReader::init_reader()
