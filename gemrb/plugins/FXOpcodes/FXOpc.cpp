@@ -1127,6 +1127,8 @@ int fx_death (Actor* Owner, Actor* target, Effect* fx)
 	case 256:
 		damagetype = DAMAGE_ELECTRICITY;
 		break;
+	case 512:
+
 	default:
 		damagetype = DAMAGE_ACID;
 	}
@@ -1149,7 +1151,6 @@ int fx_cure_frozen_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 #define CSA_DEX  0
 #define CSA_STR  1
-
 #define CSA_CNT  2
 int SpellAbilityDieRoll(Actor *target, int which)
 {
@@ -1265,7 +1266,7 @@ int fx_current_hp_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 // 2,5 are the same
 int fx_maximum_hp_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_maximum_hp_modifier (%2d): Stat Modif: %d ; Modif Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_maximum_hp_modifier (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 
 	bool base = fx->TimingMode==FX_DURATION_INSTANT_PERMANENT;
 
@@ -1278,7 +1279,7 @@ int fx_maximum_hp_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 		} else {
 			STAT_ADD( IE_MAXHITPOINTS, fx->Parameter1 );
 			if (fx->FirstApply) {
-			  BASE_ADD( IE_HITPOINTS, fx->Parameter1 );
+				BASE_ADD( IE_HITPOINTS, fx->Parameter1 );
 			}
 		}
 		break;
@@ -1385,7 +1386,7 @@ int fx_morale_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 // 0x18 State:Panic
 int fx_set_panic_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_set_panic_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_set_panic_state (%2d)\n", fx->Opcode );
 
 	if (target->HasSpellState(SS_BLOODRAGE)) {
 		return FX_NOT_APPLIED;
@@ -1448,7 +1449,7 @@ static EffectRef fx_pst_jumble_curse_ref={"JumbleCurse",NULL,-1};
 // gemrb extension: if the resource field is filled, it will remove curse only from the specified item
 int fx_remove_curse (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_remove_curse (%2d): Resource: %s\n", fx->Opcode, fx->Resource );
+	if (0) printf( "fx_remove_curse (%2d): Resource: %s  Type: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
 
 	switch(fx->Parameter2)
 	{
@@ -1532,7 +1533,6 @@ int fx_cure_dead_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_cure_dead_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	//someone should clear the internal flags related to death
 	target->Resurrect();
-	//STATE_CURE( STATE_DEAD );
 	return FX_NOT_APPLIED;
 }
 
@@ -1584,7 +1584,7 @@ int fx_save_vs_spell_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 // 0x26 State:Silenced
 int fx_set_silenced_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_set_silenced_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_set_silenced_state (%2d)\n", fx->Opcode );
 	STATE_SET( STATE_SILENCED );
 	return FX_APPLIED;
 }
@@ -1594,26 +1594,31 @@ static EffectRef fx_animation_stance_ref = {"AnimationStateChange",NULL,-1};
 // 0x27 State:Helpless
 // this effect sets both bits, but 'awaken' only removes the sleep bit
 // FIXME: this is probably a persistent effect
-int fx_set_unconscious_state (Actor* /*Owner*/, Actor* target, Effect* fx)
+int fx_set_unconscious_state (Actor* Owner, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_set_unconscious_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_set_unconscious_state (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
 
 	if (target->HasSpellState(SS_BLOODRAGE)) {
 		return FX_NOT_APPLIED;
 	}
 
-	target->SetStance(IE_ANI_SLEEP);
-	if (fx->Parameter2) {
-		BASE_STATE_SET( STATE_HELPLESS | STATE_SLEEP ); //don't awaken on damage
-		//the effect directly sets the state bit, and doesn't stick
-		fx->Opcode=EffectQueue::ResolveEffect(fx_animation_stance_ref);
-		//convert effect to awaken
-		EffectQueue::TransformToDelay(fx->TimingMode);
-		//apply cure helpless timed
-		return FX_APPLIED;
+	if (fx->FirstApply) {
+		Effect *newfx;
+		
+		newfx = EffectQueue::CreateEffectCopy(fx, fx_animation_stance_ref, 0, IE_ANI_SLEEP);
+		core->ApplyEffect(newfx, target, Owner);
 	}
-	BASE_STATE_SET( STATE_SLEEP ); //awaken on damage
-	return FX_NOT_APPLIED;
+
+	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
+		BASE_STATE_SET( STATE_HELPLESS | STATE_SLEEP ); //don't awaken on damage
+	} else {
+		STATE_SET( STATE_HELPLESS | STATE_SLEEP ); //don't awaken on damage
+		if (fx->Parameter2) {
+			target->SetSpellState(SS_NOAWAKE);
+		}    
+		target->AddPortraitIcon(PI_SLEEP);
+	}
+	return FX_PERMANENT;
 }
 
 // 0x28 State:Slowed
@@ -1734,6 +1739,10 @@ int power_word_stun_iwd2(Actor *target, Effect *fx)
 int fx_set_stun_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_stun_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+
+	if ( STATE_GET(STATE_DEAD) ) {
+		return FX_NOT_APPLIED;
+	}
 
 	if (target->HasSpellState(SS_BLOODRAGE)) {
 		return FX_NOT_APPLIED;
@@ -1882,7 +1891,7 @@ int fx_kill_creature_type (Actor* /*Owner*/, Actor* target, Effect* fx)
 		fx->Opcode = EffectQueue::ResolveEffect(fx_death_ref);
 		fx->TimingMode = FX_DURATION_INSTANT_PERMANENT;
 		fx->Parameter1 = 0;
-		fx->Parameter2 = 0;
+		fx->Parameter2 = 4;
 		return FX_APPLIED;
 	}
 	//doesn't stick
@@ -3175,6 +3184,7 @@ int fx_set_holy_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (STATE_GET (STATE_HOLY) ) //holy power is non cumulative
 		return FX_NOT_APPLIED;
 	STATE_SET( STATE_HOLY );
+	//setting the spell state to be compatible with iwd2
 	target->SetSpellState(SS_HOLYMIGHT);
 	STAT_ADD( IE_STR, fx->Parameter1);
 	STAT_ADD( IE_CON, fx->Parameter1);
@@ -3282,14 +3292,15 @@ int fx_casting_glow (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (cgcount<0) {
 		cgcount = core->ReadResRefTable("cgtable",casting_glows);
 	}
-	//delay apply until map is loaded
+	//remove effect if map is not loaded
 	Map *map = target->GetCurrentArea();
 	if (!map) {
-		return FX_APPLIED;
+		return FX_NOT_APPLIED;
 	}
 
 	if (fx->Parameter2<(ieDword) cgcount) {
 		ScriptedAnimation *sca = core->GetScriptedAnimation(casting_glows[fx->Parameter2], false);
+		//remove effect if animation doesn't exist
 		if (!sca) {
 			return FX_NOT_APPLIED;
 		}
@@ -3317,13 +3328,14 @@ int fx_visual_spell_hit (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (shcount<0) {
 		shcount = core->ReadResRefTable("shtable",spell_hits);
 	}
-	//delay apply until map is loaded
+	//remove effect if map is not loaded
 	Map *map = target->GetCurrentArea();
 	if (!map) {
-		return FX_APPLIED;
+		return FX_NOT_APPLIED;
 	}
 	if (fx->Parameter2<(ieDword) shcount) {
 		ScriptedAnimation *sca = core->GetScriptedAnimation(spell_hits[fx->Parameter2], false);
+		//remove effect if animation doesn't exist
 		if (!sca) {
 			return FX_NOT_APPLIED;
 		}
@@ -4181,7 +4193,8 @@ int fx_maze (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_select_spell (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_select_spell (%2d) %d\n", fx->Opcode, fx->Parameter2 );
-	//if parameter2==0 ->
+	//if parameter2==0 -> cast spells from 2da (all spells listed in 2da)
+	//if parameter2==1 -> cast spells from book (all known spells, no need of memorize)
 	return FX_NOT_APPLIED;
 }
 
@@ -4189,9 +4202,16 @@ int fx_select_spell (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 int fx_play_visual_effect (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_play_visual_effect (%2d): Resource: %s Type: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
-	if (!fx->Resource[0]) {
+
+	//this is in the original engine (dead actors lose this effect)
+	if (STATE_GET( STATE_DEAD) ) {
 		return FX_NOT_APPLIED;
 	}
+
+	//delay action until area is loaded to avoid crash
+ 	Map *map = target->GetCurrentArea();
+	if (!map) return FX_APPLIED;
+
 	//if it is sticky, don't add it if it is already played
 	if (fx->Parameter2) {
 		if (!target->HasVVCCell(fx->Resource) ) {
@@ -4200,6 +4220,12 @@ int fx_play_visual_effect (Actor* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	ScriptedAnimation* sca = core->GetScriptedAnimation(fx->Resource, false);
+
+	//don't crash on nonexistent resources
+	if (!sca) {
+		return FX_NOT_APPLIED;
+	}
+
 	if (fx->TimingMode!=FX_DURATION_INSTANT_PERMANENT) {
 		sca->SetDefaultDuration(fx->Duration-core->GetGame()->Ticks);
 	}
@@ -4212,7 +4238,7 @@ int fx_play_visual_effect (Actor* /*Owner*/, Actor* target, Effect* fx)
 	//not sticky
 	sca->XPos=fx->PosX;
 	sca->YPos=fx->PosY;
-	target->GetCurrentArea()->AddVVCell( sca );
+	map->AddVVCell( sca );
 	return FX_NOT_APPLIED;
 }
 
@@ -4279,14 +4305,14 @@ int fx_stoneskin_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 //0xDC DispelSchool
 int fx_dispel_school (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_dispel_school (%2d): Mod: %d\n", fx->Opcode, fx->Parameter1 );
+	if (0) printf( "fx_dispel_school (%2d): Level: %d Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	target->fxqueue.RemoveLevelEffects(fx->Parameter1, RL_MATCHSCHOOL, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
 //0xDD DispelSecondaryType
 int fx_dispel_secondary_type (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_dispel_secondary_type (%2d): Mod: %d\n", fx->Opcode, fx->Parameter1 );
+	if (0) printf( "fx_dispel_secondary_type (%2d): Level: %d Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	target->fxqueue.RemoveLevelEffects(fx->Parameter1, RL_MATCHSECTYPE, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
@@ -4294,7 +4320,12 @@ int fx_dispel_secondary_type (Actor* /*Owner*/, Actor* target, Effect* fx)
 //0xDE RandomTeleport
 int fx_teleport_field (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_teleport_field (%2d): Mod: %d\n", fx->Opcode, fx->Parameter1 );
+	if (0) printf( "fx_teleport_field (%2d): Distance: %d\n", fx->Opcode, fx->Parameter1 );
+
+	Map *map = target->GetCurrentArea();
+	if (!map) {
+		return FX_NOT_APPLIED;
+	}
 	//this should be the target's position, i think
 	Point p = target->Pos;
 	p.x+=core->Roll(1,fx->Parameter1*2,-(signed) (fx->Parameter1));
@@ -4525,13 +4556,16 @@ int fx_puppet_marker (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0xee Disintegrate
-int fx_disintegrate (Actor* Owner, Actor* target, Effect* fx)
+int fx_disintegrate (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_disintegrate (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
  	if (EffectQueue::match_ids( target, fx->Parameter1, fx->Parameter2) ) {
-		target->Damage(0, fx->Parameter2, Owner); //hmm?
-		//death has damage type too
-		target->Die(Owner);
+		//convert it to a death opcode or apply the new effect?
+		fx->Opcode = EffectQueue::ResolveEffect(fx_death_ref);
+		fx->TimingMode = FX_DURATION_INSTANT_PERMANENT;
+		fx->Parameter1 = 0;
+		fx->Parameter2 = 0x200;
+		return FX_APPLIED;
 	}
 	return FX_NOT_APPLIED;
 }

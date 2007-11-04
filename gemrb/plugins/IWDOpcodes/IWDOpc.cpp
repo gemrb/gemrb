@@ -39,7 +39,8 @@ static bool enhanced_effects = false;
 static int shcount = -1;
 //a scripting object for enemy (used for enemy in line of sight check)
 static Trigger *Enemy = NULL;
-static ieDword *projectilelist = NULL;
+//a list of projectiles Entropy Shield protects against
+static ieDword *EntropyProjectileList = NULL;
 
 #define PI_CONFUSION    3
 #define PI_PROTFROMEVIL 9
@@ -354,10 +355,10 @@ IWDOpc::~IWDOpc(void)
 	}
 	Enemy=NULL;
 
-	if (projectilelist) {
-		free (projectilelist);
+	if (EntropyProjectileList) {
+		free (EntropyProjectileList);
 	}
-	projectilelist = NULL;
+	EntropyProjectileList = NULL;
 }
 
 //iwd got a weird targeting system
@@ -367,7 +368,7 @@ IWDOpc::~IWDOpc(void)
 //this is partly superior, partly inferior to the bioware
 //ids targeting.
 //superior because it can handle other stats and conditions
-//inferior because it is not moddable
+//inferior because it is not so readily moddable
 //The hardcoded conditions are simulated via the IWDIDSEntry
 //structure.
 //stat is usually a stat, but for special conditions it is a
@@ -514,6 +515,8 @@ static void ApplyDamageNearby(Actor* Owner, Actor* target, Effect *fx, ieDword d
 	delete newfx;
 }
 
+//this function implements AC bonus handling
+//ReverseToHit is the 2nd ed way of AC (lower is better)
 static inline void HandleBonus(Actor *target, int stat, int mod, int mode)
 {
 	if (mode==FX_DURATION_INSTANT_PERMANENT) {
@@ -582,6 +585,7 @@ int fx_ac_vs_damage_type_modifier_iwd2 (Actor* /*Owner*/, Actor* target, Effect*
 // 0x84 DrawUponHolyMight
 // this effect differs from bg2 because it doesn't use the actor state field
 // it uses the spell state field
+// in bg2 the effect is called: HolyNonCumulative
 int fx_draw_upon_holy_might (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_draw_upon_holy_might (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -627,7 +631,7 @@ int fx_ironskins (Actor* /*Owner*/, Actor* target, Effect* fx)
 //0xe8 Colour:FadeRGB
 int fx_fade_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_fade_rgb (%2d): \n", fx->Opcode  );
+	if (0) printf( "fx_fade_rgb (%2d): RGB:%x\n", fx->Opcode, fx->Parameter1 );
 
 	int speed = (fx->Parameter2 >> 16) & 0xFF;
 	target->SetColorMod(0xff, RGBModifier::ADD, speed,
@@ -644,13 +648,15 @@ int fx_iwd_visual_spell_hit (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (shcount<0) {
 		shcount = core->ReadResRefTable("iwdshtab",iwd_spell_hits);
 	}
-	//delay apply until map is loaded
+	
+	//remove effect if there is no current area
 	Map *map = target->GetCurrentArea();
 	if (!map) {
-		return FX_APPLIED;
+		return FX_NOT_APPLIED;
 	}
 	if (fx->Parameter2<(ieDword) shcount) {
 		ScriptedAnimation *sca = core->GetScriptedAnimation(iwd_spell_hits[fx->Parameter2], false);
+		//remove effect if there is no animation
 		if (!sca) {
 			return FX_NOT_APPLIED;
 		}
@@ -682,7 +688,7 @@ int fx_cold_damage (Actor* Owner, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-//0xeb CastingGlow2 will be same as original casting glow
+//0xeb CastingGlow2 will be same as original casting glow (iwd2 does the same)
 
 //0xec ChillTouch (how)
 //this effect is to simulate the composite effects of chill touch
@@ -1589,6 +1595,17 @@ int fx_soul_eater (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_soul_eater (%2d): Damage %d\n", fx->Opcode, fx->Parameter1 );
 	target->Damage(fx->Parameter1, DAMAGE_SOULEATER, Owner);
+	if (STATE_GET(STATE_DEAD) ) {
+		ieResRef monster;
+		ieResRef hit;
+		ieResRef areahit;
+
+		//todo: supply the souleatr.2da file
+		core->GetResRefFrom2DA("souleatr", monster, hit, areahit);
+		//the monster should appear near the effect position
+		Point p(fx->PosX, fx->PosY);
+		core->SummonCreature(monster, areahit, Owner, target, p, -1, fx->Parameter1);
+	}
 	return FX_NOT_APPLIED;
 }
 
@@ -2394,7 +2411,7 @@ int fx_free_action_iwd2 (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_free_action_iwd2 (%2d)\n", fx->Opcode);
 	if (target->SetSpellState( SS_FREEACTION)) return FX_APPLIED;
 
-	// immunity to the following effects:
+	// immunity to the following effects, coded in the effects:
 	// 0x9a Overlay:Entangle,       ok
 	// 0x9d Overlay:Web             ok
 	// 0x9e Overlay:Grease          ok
@@ -2409,9 +2426,10 @@ int fx_free_action_iwd2 (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //419 Unconsciousness
+//same as the sleep effect, but different icon
 int fx_unconsciousness (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_unconsciousness (%2d)\n", fx->Opcode);
+	if (0) printf( "fx_unconsciousness (%2d): Type: %d\n", fx->Opcode, fx->Parameter2);
 	STATE_SET(STATE_HELPLESS|STATE_SLEEP);
 	if (fx->Parameter2) {
 		target->SetSpellState(SS_NOAWAKE);
@@ -2426,17 +2444,18 @@ int fx_unconsciousness (Actor* /*Owner*/, Actor* target, Effect* fx)
 //420 Death2 (see in core effects)
 
 //421 EntropyShield
-
 int fx_entropy_shield (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_entropy_shield (%2d)\n", fx->Opcode);
 	if (target->SetSpellState( SS_ENTROPY)) return FX_APPLIED;
 	//immunity to certain projectiles
-	if (!projectilelist) {
-		projectilelist = core->GetListFrom2DA("entropy");
-		ieDword i = projectilelist[0];
+	if (!EntropyProjectileList) {
+		EntropyProjectileList = core->GetListFrom2DA("entropy");
+		ieDword i = EntropyProjectileList[0];
+		//the index is handled differently because
+		//the list's first element is the element count
 		while(i) {
-			target->AddProjectileImmunity(projectilelist[i--]);
+			target->AddProjectileImmunity(EntropyProjectileList[i--]);
 		}
 	}
 	if (enhanced_effects) {

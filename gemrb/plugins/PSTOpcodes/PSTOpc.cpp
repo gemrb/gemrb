@@ -26,6 +26,7 @@
 #include "../Core/EffectQueue.h"
 #include "../Core/Interface.h"
 #include "../Core/Video.h" //for tints
+#include "../Core/TileMap.h"
 #include "PSTOpc.h"
 
 
@@ -422,7 +423,10 @@ int fx_prayer (Actor* Owner, Actor* target, Effect* fx)
 int fx_move_view (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_move_view (%2d): Speed: %d\n", fx->Opcode, fx->Parameter1 );
-	core->timer->SetMoveViewPort( fx->PosX, fx->PosY, fx->Parameter1, true);
+	Map *map = core->GetGame()->GetCurrentArea();
+	if (map) {
+	  core->timer->SetMoveViewPort( fx->PosX, fx->PosY, fx->Parameter1, true);
+	}
 	return FX_NOT_APPLIED;
 }
 
@@ -435,18 +439,18 @@ int fx_embalm (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STATE_SET( STATE_EMBALM );
 	if (!fx->Parameter1) {
 		if (fx->Parameter2) {
-			fx->Parameter1=fx->Power*2;
+			fx->Parameter1=fx->CasterLevel*2;
 		} else {
 			fx->Parameter1=core->Roll(1,6,1);
 		}
 		BASE_ADD( IE_HITPOINTS, fx->Parameter1 );
 	}
+	STAT_ADD( IE_MAXHITPOINTS, fx->Parameter1);
 	if (fx->Parameter2) {
 		STAT_ADD( IE_ARMORCLASS,2 );
 	} else {
 		STAT_ADD( IE_ARMORCLASS,1 );
 	}
-	//set global flag
 	return FX_APPLIED;
 }
 //0xcf fx_stop_all_action
