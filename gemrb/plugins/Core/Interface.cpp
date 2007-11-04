@@ -1440,7 +1440,7 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
-	printMessage( "Core", "Initializing GUI Script Engine...", WHITE );
+	printMessage( "Core", "Initializing GUI Script Engine...\n", WHITE );
 	guiscript = ( ScriptEngine * ) GetInterface( IE_GUI_SCRIPT_CLASS_ID );
 	if (guiscript == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
