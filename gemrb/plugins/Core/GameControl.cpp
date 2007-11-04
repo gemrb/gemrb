@@ -325,6 +325,20 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	if (video->moveX || video->moveY) {
 		viewport.x += video->moveX;
 		viewport.y += video->moveY;
+		Point mapsize = core->GetGame()->GetCurrentArea()->TMap->GetMapSize();
+		if ( viewport.x + video->moveX < 0 )//if we are at top of the map
+			viewport.x = 0;
+		else if ( (viewport.x + video->moveX + viewport.w) >= mapsize.x) //if we are at the bottom
+			viewport.x = mapsize.x - viewport.w;
+		else
+			viewport.x += video->moveX; //middle :)
+				
+		if ( viewport.y + video->moveY < 0 ) //if we are at the left of the map
+			viewport.y = 0;
+		else if ( (viewport.y + video->moveY + viewport.h ) >= mapsize.y ) //if we are at the right
+			viewport.y = mapsize.y - viewport.h;
+		else
+			viewport.y += video->moveY; //middle :)
 		core->timer->SetMoveViewPort( viewport.x, viewport.y, 0, false );
 	}
 	Region screen( x + XPos, y + YPos, Width, Height );

@@ -1568,7 +1568,7 @@ int Interface::Init()
 	}
 	printStatus( "OK", LIGHT_GREEN );
 	
-	printMessage( "Core", "Initializing effect opcodes...", WHITE );
+	printMessage( "Core", "Initializing effect opcodes...\n", WHITE );
 	opcodemgrs = GetInterfaceVector(IE_FX_CLASS_ID);
 	if (!opcodemgrs || !opcodemgrs->size()) {
 		printStatus( "ERROR", LIGHT_RED );
@@ -1578,7 +1578,7 @@ int Interface::Init()
 	printf("Loaded %d opcode blocks\n", (int) opcodemgrs->size());
 	printStatus( "OK", LIGHT_GREEN );
 	
-	printMessage( "Core", "Initializing effects...", WHITE );
+	printMessage( "Core", "Initializing effects...\n", WHITE );
 	if (! Init_EffectQueue()) {
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
