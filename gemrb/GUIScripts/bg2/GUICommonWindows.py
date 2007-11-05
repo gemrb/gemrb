@@ -118,10 +118,12 @@ def AIPress ():
 
 	if AI:
 		GemRB.GameSetScreenFlags(GS_PARTYAI, OP_NAND)
-		GemRB.SetTooltip (PortraitWindow, Button, 15917)
+		GemRB.SetTooltip (PortraitWindow, Button, 15918)
+		GemRB.SetVar ("AI", 0)
 	else:
 		GemRB.GameSetScreenFlags(GS_PARTYAI, OP_OR)
-		GemRB.SetTooltip (PortraitWindow, Button, 15918)
+		GemRB.SetTooltip (PortraitWindow, Button, 15917)
+		GemRB.SetVar ("AI", GS_PARTYAI)
 	return
 
 def RestPress ():
@@ -498,9 +500,14 @@ def OpenPortraitWindow (needcontrols):
 
 		# AI
 		Button = GemRB.GetControl (Window, 6)
+		#fixing a gui bug, and while we are at it, hacking it to be easier
+		GemRB.SetButtonSprites (Window, Button, "GUIBTACT",0,48,47,46,49)
 		GSFlags = GemRB.GetMessageWindowSize ()&GS_PARTYAI
+		
+		GemRB.SetVar ("AI", GSFlags)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "AIPress")
-		GemRB.SetVarAssoc (Window, Button, "", GSFlags)
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
+		GemRB.SetVarAssoc (Window, Button, "AI", 1)
 		if GSFlags:
 			GemRB.SetTooltip (PortraitWindow, Button, 15917)
 		else:
