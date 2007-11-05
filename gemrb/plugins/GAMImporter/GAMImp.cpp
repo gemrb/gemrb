@@ -365,7 +365,6 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 			SanityCheck( pcInfo.QuickWeaponSlot[i], tmpWord, "weapon");
 			pcInfo.QuickWeaponHeader[i]=tmpWord;
 		}
-		//str->Seek( 8, GEM_CURRENT_POS);
 		for (i = 0; i < 3; i++) {
 			str->Read( &pcInfo.QuickSpellResRef[i], 8 );
 		}
@@ -398,6 +397,7 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 	ieDword pos = str->GetPos();
 
 	Actor* actor = NULL;
+	tmpWord = is_in_party ? (pcInfo.PartyOrder + 1) : 0;
 
 	if (pcInfo.OffsetToCRE) {
 		str->Seek( pcInfo.OffsetToCRE, GEM_STREAM_START );
@@ -408,7 +408,7 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 		MemoryStream* ms = new MemoryStream( Buffer, pcInfo.CRESize, false );
 		if (ms) {
 			aM->Open( ms, true );
-			actor = aM->GetActor();
+			actor = aM->GetActor(tmpWord);
 		}
 		free (Buffer);
 
@@ -424,7 +424,7 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 		//so auto free is a no-no
 		if (ds) {
 			aM->Open( ds, true );
-			actor = aM->GetActor();
+			actor = aM->GetActor(pcInfo.PartyOrder);
 		}
 	}
 	if (!actor) {
@@ -451,7 +451,7 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 	actor->TalkCount = pcInfo.TalkCount;
 	actor->ModalState = pcInfo.ModalState;
 
-	actor->SetPersistent( is_in_party ? (pcInfo.PartyOrder + 1) : 0);
+	actor->SetPersistent( tmpWord );
 
 	actor->Selected = pcInfo.Selected;
 	return actor;

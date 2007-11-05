@@ -820,7 +820,7 @@ Map* AREImp::GetMap(const char *ResRef)
 				printf("Couldn't read actor: %s!\n", CreResRef);
 				continue;
 			}
-			ab = actmgr->GetActor();
+			ab = actmgr->GetActor(0);
 			if(!ab)
 				continue;
 			map->AddActor(ab);

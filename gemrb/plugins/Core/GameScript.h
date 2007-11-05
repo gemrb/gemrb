@@ -596,6 +596,7 @@ struct IDSLink {
 #define MAX_TRIGGERS			0xFF
 #define MAX_ACTIONS			400
 #define MAX_OBJECTS			128
+#define AI_SCRIPT_LEVEL 4             //the script level of special ai scripts
 
 extern void SetScriptDebugMode(int arg);
 extern int RandomNumValue;
@@ -606,13 +607,13 @@ public:
 	Script* script;
 	Scriptable* MySelf;
 	unsigned int lastAction;
-	unsigned long scriptRunDelay;
+//	unsigned long scriptRunDelay;
 	int scriptlevel;
-	void RunNow();
+//	void RunNow();
 	bool Update();
 	void EvaluateAllBlocks();
 private: //Internal Functions
-	Script* CacheScript(ieResRef ResRef);
+	Script* CacheScript(ieResRef ResRef, SClass_ID type);
 	ResponseBlock* ReadResponseBlock(DataStream* stream);
 	ResponseSet* ReadResponseSet(DataStream* stream);
 	Response* ReadResponse(DataStream* stream);
@@ -624,7 +625,7 @@ private: //Internal Functions
 	static int ParseInt(const char*& src);
 	static void ParseString(const char*& src, char* tmp);
 private: //Internal variables
-	unsigned long lastRunTime;
+	//unsigned long lastRunTime;
 	unsigned long scriptType;
 private: //Script Internal Variables
 	ieResRef Name;
@@ -632,7 +633,7 @@ private: //Script Internal Variables
 	bool freeLocals;
 public:
 	GameScript(const ieResRef ResRef, ScriptableType ScriptType,
-		Variables* local = NULL, int ScriptLevel = 0);
+		Variables* local = NULL, int ScriptLevel = 0, bool AIScript = false);
 	~GameScript();
 	static void ReleaseMemory();
 	const char *GetName() { return this?Name:"NONE\0\0\0\0"; }
@@ -752,6 +753,8 @@ public: //Script Functions
 	static int HappinessGT(Scriptable* Sender, Trigger* parameters);
 	static int HappinessLT(Scriptable* Sender, Trigger* parameters);
 	static int HarmlessEntered(Scriptable* Sender, Trigger* parameters);
+	static int HasBounceEffects(Scriptable* Sender, Trigger* parameters);
+	static int HasImmunityEffects(Scriptable* Sender, Trigger* parameters);
 	static int HasInnateAbility(Scriptable* Sender, Trigger* parameters);
 	static int HasItem(Scriptable* Sender, Trigger* parameters);
 	static int HasItemEquipped(Scriptable* Sender, Trigger* parameters);

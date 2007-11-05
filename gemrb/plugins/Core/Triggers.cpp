@@ -2561,12 +2561,12 @@ int GameScript::UnselectableVariable(Scriptable* Sender, Trigger* parameters)
 	if (!tar) {
 		return 0;
 	}
-  /*
+	/*
 	if (tar->Type != ST_ACTOR) {
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-  */
+	*/
 	return tar->UnselectableTimer == (unsigned) parameters->int0Parameter;
 }
 
@@ -3721,16 +3721,19 @@ int GameScript::IsWeather( Scriptable* /*Sender*/, Trigger* parameters)
 	return 0;
 }
 
-int GameScript::Delay( Scriptable* /*Sender*/, Trigger* parameters)
+int GameScript::Delay( Scriptable* Sender, Trigger* parameters)
 {
 	ieDword delay = (ieDword) parameters->int0Parameter;
 	if (delay<=1) {
 		return 1;
+	}  
+	ieDword time1=Sender->lastDelay/1000/delay;
+	ieDword time2=Sender->lastRunTime/1000/delay;
+
+	if (time1!=time2) {
+		return 1;
 	}
-	if ( core->GetGame()->GameTime%delay) {
-		return 0;
-	}
-	return 1;
+	return 0;
 }
 
 int GameScript::TimeOfDay(Scriptable* /*Sender*/, Trigger* parameters)
@@ -3872,6 +3875,29 @@ int GameScript::Unusable(Scriptable* Sender, Trigger* parameters)
 	return ret;
 }
 
+int GameScript::HasBounceEffects(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable *tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	if (actor->GetStat(IE_BOUNCE)) return 1;
+	return 0;
+}
+
+int GameScript::HasImmunityEffects(Scriptable* Sender, Trigger* parameters)
+{
+	Scriptable *tar = GetActorFromObject( Sender, parameters->objectParameter );
+	if (!tar || tar->Type != ST_ACTOR) {
+		return 0;
+	}
+	Actor* actor = ( Actor* ) tar;
+	//this isn't ok
+	if (actor->GetStat(IE_BOUNCE)) return 1;
+	return 0;
+}
+
 // this is a GemRB specific trigger, to transfer some system variables
 // to a global (game variable), it will always return true, and the
 // variable could be checked in a subsequent trigger (like triggersetglobal)
@@ -3899,7 +3925,7 @@ int GameScript::SystemVariable_Trigger(Scriptable* Sender, Trigger* parameters)
 		value = core->GetGame()->PartyGold;
 		break;
 	default:
-		value = 0;
+		return 0;
 	}
 
 	SetVariable(Sender, parameters->string0Parameter, value);

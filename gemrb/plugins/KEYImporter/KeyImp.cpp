@@ -172,40 +172,42 @@ bool KeyImp::LoadResFile(const char* resfile)
 	return true;
 }
 
-#define FindIn(BasePath, Path, ResRef, Type) \
-{ \
-	char p[_MAX_PATH], f[_MAX_PATH] = {0}; \
-	strncpy(f, ResRef, 8); \
-	f[8] = 0; \
-	strcat(f, core->TypeExt(Type)); \
-	strlwr(f); \
-	PathJoin( p, BasePath, Path, f, NULL ); \
-	ResolveFilePath(p); \
-	FILE * exist = fopen(p, "rb"); \
-	if(exist) { \
-		fclose(exist); \
-		return true; \
-	} \
+static bool FindIn(const char *BasePath, const char *Path, const char *ResRef, SClass_ID Type)
+{
+	char p[_MAX_PATH], f[_MAX_PATH] = {0};
+	strncpy(f, ResRef, 8);
+	f[8] = 0;
+	strcat(f, core->TypeExt(Type));
+	strlwr(f);
+	PathJoin( p, BasePath, Path, f, NULL );
+	ResolveFilePath(p);
+	FILE * exist = fopen(p, "rb");
+	if(exist) {
+		fclose(exist);
+		return true;
+	}
+	return false;
 }
 
-#define SearchIn(BasePath, Path, ResRef, Type, foundMessage) \
-{ \
-	char p[_MAX_PATH], f[_MAX_PATH] = {0}; \
-	strncpy(f, ResRef, 8); \
-	f[8] = 0; \
-	strcat(f, core->TypeExt(Type)); \
-	strlwr(f); \
-	PathJoin( p, BasePath, Path, f, NULL ); \
-	ResolveFilePath(p); \
-	FILE * exist = fopen(p, "rb"); \
-	if(exist) { \
-		fclose(exist); \
-		FileStream * fs = new FileStream(); \
-		if(!fs) return NULL; \
-		fs->Open(p, true); \
-		printBracket(foundMessage, LIGHT_GREEN); printf("\n"); \
-		return fs; \
-	} \
+static FileStream *SearchIn(const char * BasePath,const char * Path,const char * ResRef, SClass_ID Type, const char *foundMessage)
+{
+	char p[_MAX_PATH], f[_MAX_PATH] = {0};
+	strncpy(f, ResRef, 8);
+	f[8] = 0;
+	strcat(f, core->TypeExt(Type));
+	strlwr(f);
+	PathJoin( p, BasePath, Path, f, NULL );
+	ResolveFilePath(p);
+	FILE * exist = fopen(p, "rb");
+	if(exist) {
+		fclose(exist);
+		FileStream * fs = new FileStream();
+		if(!fs) return NULL;
+		fs->Open(p, true);
+		printBracket(foundMessage, LIGHT_GREEN); printf("\n");
+		return fs;
+	}
+	return NULL;
 }
 
 bool KeyImp::HasResource(const char* resname, SClass_ID type)
@@ -213,13 +215,14 @@ bool KeyImp::HasResource(const char* resname, SClass_ID type)
 	char path[_MAX_PATH];
 	//Search it in the GemRB override Directory
 	PathJoin( path, "override", core->GameType, NULL ); //this shouldn't change
-	FindIn( core->CachePath, "", resname, type);
-	FindIn( core->GemRBPath, path, resname, type);
-	FindIn( core->GamePath, core->GameOverride, resname, type);
-	FindIn( core->GamePath, core->GameSounds, resname, type);
-	FindIn( core->GamePath, core->GameScripts, resname, type);
-	FindIn( core->GamePath, core->GamePortraits, resname, type);
-	FindIn( core->GamePath, core->GameData, resname, type);
+	if (FindIn( core->CachePath, "", resname, type)) return true;
+	if (FindIn( core->GemRBPath, path, resname, type)) return true;
+	if (FindIn( core->GamePath, core->GameOverride, resname, type)) return true;
+	if (FindIn( core->GamePath, core->GameSounds, resname, type)) return true;
+	if (FindIn( core->GamePath, core->GameScripts, resname, type)) return true;
+	if (FindIn( core->GamePath, core->GamePortraits, resname, type)) return true;
+	if (FindIn( core->GamePath, core->GameData, resname, type)) return true;
+
 	unsigned int ResLocator;
 	if (resources.Lookup( resname, type, ResLocator )) {
 		return true;
@@ -240,22 +243,41 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
 	printf( "%.8s%s...", resname, core->TypeExt( type ) );
 	//Search it in the GemRB override Directory
 	PathJoin( path, "override", core->GameType, NULL ); //this shouldn't change
-	SearchIn( core->CachePath, "", resname, type,
+
+	FileStream *fs;
+
+	fs=SearchIn( core->CachePath, "", resname, type,
 		"Found in Cache" );
-	SearchIn( core->GemRBPath, path, resname, type,
+	if (fs) return fs;
+
+	fs=SearchIn( core->GemRBPath, path, resname, type,
 		"Found in GemRB Override" );
-	SearchIn( core->GamePath, core->GameOverride, resname, type,
+	if (fs) return fs;
+
+	fs=SearchIn( core->GamePath, core->GameOverride, resname, type,
 		"Found in Override" );
-	SearchIn( core->GamePath, core->GameSounds, resname, type,
+	if (fs) return fs;
+
+	fs=SearchIn( core->GamePath, core->GameSounds, resname, type,
 		"Found in Sounds" );
-	SearchIn( core->GamePath, core->GameScripts, resname, type,
+	if (fs) return fs;
+
+	fs=SearchIn( core->GamePath, core->GameScripts, resname, type,
 		"Found in Scripts" );
-	SearchIn( core->GamePath, core->GamePortraits, resname, type,
+	if (fs) return fs;
+
+	fs=SearchIn( core->GamePath, core->GamePortraits, resname, type,
 		"Found in Portraits" );
-	SearchIn( core->GamePath, core->GameData, resname, type,
+	if (fs) return fs;
+
+	fs=SearchIn( core->GamePath, core->GameData, resname, type,
 		"Found in Data" );
+	if (fs) return fs;
+
 	unsigned int ResLocator;
-	if (resources.Lookup( resname, type, ResLocator )) {
+
+	//the word masking is a hack for synonyms, currently used for bcs==bs
+	if (resources.Lookup( resname, type&0xffff, ResLocator )) {
 		if (!core->IsAvailable( IE_BIF_CLASS_ID )) {
 			printf( "[ERROR]\nAn Archive Plug-in is not Available\n" );
 			return NULL;

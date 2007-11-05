@@ -734,7 +734,7 @@ void GameScript::ChangeAIScript(Scriptable* Sender, Action* parameters)
 	if (Sender->Type!=ST_ACTOR && parameters->int0Parameter) {
 		return;
 	}
-	Sender->SetScript( parameters->string0Parameter, parameters->int0Parameter );
+	Sender->SetScript( parameters->string0Parameter, parameters->int0Parameter, false );
 }
 
 void GameScript::ForceAIScript(Scriptable* Sender, Action* parameters)
@@ -746,7 +746,7 @@ void GameScript::ForceAIScript(Scriptable* Sender, Action* parameters)
 	Actor* actor = ( Actor* ) tar;
 	//changeaiscript clears the queue, i believe
 	//	actor->ClearActions();
-	actor->SetScript( parameters->string0Parameter, parameters->int0Parameter );
+	actor->SetScript( parameters->string0Parameter, parameters->int0Parameter, false );
 }
 
 void GameScript::SetPlayerSound(Scriptable* Sender, Action* parameters)
@@ -2511,7 +2511,8 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 	Actor* act = ( Actor* ) Sender;
 	act->SetBase( IE_EA, EA_PC );
 	if (core->HasFeature( GF_HAS_DPLAYER )) {
-		act->SetScript( "DPLAYER2", SCR_DEFAULT );
+		act->SetScript( "", AI_SCRIPT_LEVEL, true );
+		act->SetScript( "DPLAYER2", SCR_DEFAULT, false );
 	}
 	int pdtable = core->LoadTable( "pdialog" );
 	if ( pdtable >= 0 ) {

@@ -325,7 +325,7 @@ void CREImp::ReadScript(Actor *act, int ScriptLevel)
 {
 	ieResRef aScript;
 	str->ReadResRef( aScript );
-	act->SetScript( aScript, ScriptLevel);
+	act->SetScript( aScript, ScriptLevel, act->InParty!=0);
 }
 
 CRESpellMemorization* CREImp::GetSpellMemorization()
@@ -391,14 +391,14 @@ void CREImp::SetupColor(ieDword &stat)
 	}
 }
 
-Actor* CREImp::GetActor()
+Actor* CREImp::GetActor(unsigned char is_in_party)
 {
 	if (!str)
 		return NULL;
 	Actor* act = new Actor();
 	if (!act)
 		return NULL;
-	act->InParty = 0;
+	act->InParty = is_in_party;
 	str->ReadDword( &act->LongStrRef );
 	//Beetle name in IWD needs the allow zero flag
 	char* poi = core->GetString( act->LongStrRef, IE_STR_ALLOW_ZERO );

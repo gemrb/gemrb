@@ -146,6 +146,8 @@ static const TriggerLink triggernames[] = {
 	{"harmlessclosed", GameScript::Closed, 0}, //pst, not sure
 	{"harmlessentered", GameScript::HarmlessEntered, 0}, //???
 	{"harmlessopened", GameScript::Opened, 0}, //pst, not sure
+  {"hasbounceeffects", GameScript::HasBounceEffects, 0},
+  {"hasimmunityeffects", GameScript::HasImmunityEffects, 0},
 	{"hasinnateability", GameScript::HaveSpell, 0}, //these must be the same
 	{"hasitem", GameScript::HasItem, 0},
 	{"hasitemequiped", GameScript::HasItemEquipped, 0}, //typo in bg2
@@ -1188,7 +1190,7 @@ void Targets::Clear()
 
 /********************** GameScript *******************************/
 GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
-	Variables* local, int ScriptLevel)
+	Variables* local, int ScriptLevel, bool AIScript)
 {
 	if (local) {
 		locals = local;
@@ -1349,11 +1351,12 @@ GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 		initialized = 2;
 	}
 	strnlwrcpy( Name, ResRef, 8 );
-	script = CacheScript( Name );
+
+  script = CacheScript( Name, AIScript?IE_BS_CLASS_ID:IE_BCS_CLASS_ID);
 	MySelf = NULL;
-	scriptRunDelay = 1000;
+//	scriptRunDelay = 1000;
 	scriptType = ScriptType;
-	lastRunTime = 0;
+	//lastRunTime = 0;
 }
 
 GameScript::~GameScript(void)
@@ -1397,20 +1400,19 @@ void GameScript::ReleaseMemory()
 	initialized = 0;
 }
 
-Script* GameScript::CacheScript(ieResRef ResRef)
+Script* GameScript::CacheScript(ieResRef ResRef, SClass_ID type)
 {
 	char line[10];
 
 	Script *newScript = (Script *) BcsCache.GetResource(ResRef);
-	if ( newScript ) {
-		if (InDebug&ID_REFERENCE) {
-			printf("Caching %s for the %d. time\n", ResRef, BcsCache.RefCount(ResRef) );
-		}
-		return newScript;
-}
+  if ( newScript ) {
+    if (InDebug&ID_REFERENCE) {
+      printf("Caching %s for the %d. time\n", ResRef, BcsCache.RefCount(ResRef) );
+    }
+    return newScript;
+  }
 
-	DataStream* stream = core->GetResourceMgr()->GetResource( ResRef,
-		IE_BCS_CLASS_ID );
+	DataStream* stream = core->GetResourceMgr()->GetResource( ResRef, type );
 	if (!stream) {
 		return NULL;
 	}
@@ -1562,11 +1564,12 @@ static Condition* ReadCondition(DataStream* stream)
 
 //call this whenever a script was triggered by an event
 //(death, trap entered)
+/*
 void GameScript::RunNow()
 {
 	lastRunTime = 0;
 }
-
+*/
 bool GameScript::Update()
 {
 	if (!MySelf)
@@ -1575,12 +1578,13 @@ bool GameScript::Update()
 	if (!script)
 		return false;
 
-	ieDword thisTime = core->GetGame()->Ticks;
-	//GetTime( thisTime ); //this should be gametime too, pause holds it
-	if (( thisTime - lastRunTime ) < scriptRunDelay) {
-		return false;
-	}
-	lastRunTime = thisTime;
+	//ieDword thisTime = core->GetGame()->Ticks;
+	//if (( thisTime - lastRunTime ) < scriptRunDelay) {
+	//	return false;
+	//}
+
+	//lastRunTime = thisTime;
+
 	if(!(MySelf->GetInternalFlag()&IF_ACTIVE) ) {
 		return true;
 	}
@@ -1628,17 +1632,12 @@ void GameScript::EvaluateAllBlocks()
 	if (!MySelf || !(MySelf->GetInternalFlag()&IF_ACTIVE) ) {
 		return;
 	}
-	ieDword thisTime = core->GetGame()->Ticks;
-	//GetTime( thisTime ); //this should be gametime too, pause holds it
-	if (( thisTime - lastRunTime ) < scriptRunDelay) {
-		return;
-	}
-	lastRunTime = thisTime;
+
 	if (!script) {
 		return;
 	}
 //according to research, cutscenes don't evaluate conditions, and always
-//runs the first response, this is a serious cutback on possible
+//run the first response, this is a serious cutback on possible
 //functionality, so i kept the gemrb specific code too.
 #ifdef GEMRB_CUTSCENES
 //this is the logical way of executing a cutscene

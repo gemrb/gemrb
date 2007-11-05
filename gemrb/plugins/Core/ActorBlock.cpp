@@ -62,7 +62,10 @@ Scriptable::Scriptable(ScriptableType type)
 	DialogName = 0;
 	CurrentAction = NULL;
 	UnselectableTimer = 0;
-	startTime = 0;
+	startTime = 0;   //executing scripts
+	lastRunTime = 0; //evaluating scripts
+	lastDelay = 0;
+
 	interval = ( 1000 / AI_UPDATE_TIME );
 	WaitCounter = 0;
 	playDeadCounter = 0;
@@ -132,7 +135,10 @@ void Scriptable::SetMap(Map *map)
 	area = map;
 }
 
-void Scriptable::SetScript(const ieResRef aScript, int idx)
+//ai is nonzero if this is an actor currently in the party
+//if the script level is AI_SCRIPT_LEVEL, then we need to 
+//load an AI script (.bs) instead of (.bcs)
+void Scriptable::SetScript(const ieResRef aScript, int idx, bool ai)
 {
 	if (idx >= MAX_SCRIPTS) {
 		printMessage("Scriptable","Invalid script index!\n",LIGHT_RED);
@@ -145,7 +151,8 @@ void Scriptable::SetScript(const ieResRef aScript, int idx)
 	// NONE is an 'invalid' script name, never used seriously
 	// This hack is to prevent flooding of the console
 	if (aScript[0] && stricmp(aScript, "NONE") ) {
-		Scripts[idx] = new GameScript( aScript, Type, locals, idx );
+		if (idx!=AI_SCRIPT_LEVEL) ai=false;
+		Scripts[idx] = new GameScript( aScript, Type, locals, idx, ai );
 		Scripts[idx]->MySelf = this;
 	}
 }
@@ -216,11 +223,14 @@ void Scriptable::DrawOverheadText(Region &screen)
 
 void Scriptable::ImmediateEvent()
 {
+	lastRunTime=0;
+	/*
 	for(int i=0;i<MAX_SCRIPTS;i++) {
 		if (Scripts[i]) {
 			Scripts[i]->RunNow();
 		}
 	}
+	*/
 }
 
 void Scriptable::ExecuteScript(int scriptCount)
@@ -232,10 +242,26 @@ void Scriptable::ExecuteScript(int scriptCount)
 		return;
 	}
 
+	ieDword thisTime = core->GetGame()->Ticks;
+	if (( thisTime - lastRunTime ) < 1000) {
+		return;
+	}
+
+	lastDelay = lastRunTime;
+	lastRunTime = thisTime;
+
 	bool alive = false;
 
-	for (int i=0;i<scriptCount;i++)
-	{
+	for (int i=0;i<scriptCount;i++) {
+		//disable AI script level for actors in party when the player disabled them
+		if ((i==AI_SCRIPT_LEVEL) && (Type==ST_ACTOR) ) {
+			if (((Actor *) this)->InParty) {
+				if (core->GetGame()->ControlStatus&CS_PARTY_AI) {
+					continue;
+				}
+			}
+		}
+
 		GameScript *Script = Scripts[i];
 		if (Script) {
 			alive |= Script->Update();

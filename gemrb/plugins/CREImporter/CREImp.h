@@ -63,7 +63,7 @@ public:
 	CREImp(void);
 	~CREImp(void);
 	bool Open(DataStream* stream, bool autoFree = true);
-	Actor* GetActor();
+	Actor* GetActor(unsigned char is_in_party);
 
 	//returns saved size, updates internal offsets before save
 	int GetStoredFileSize(Actor *ac);

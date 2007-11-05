@@ -353,7 +353,7 @@ public:
 	/** Get GUI Script Manager */
 	ScriptEngine * GetGUIScriptEngine() const;
 	/** Returns actor */
-	Actor *GetCreature(DataStream *stream);
+	Actor *GetCreature(DataStream *stream, unsigned char InParty=0);
 	/** Returns a PC index, by loading a creature */
 	int LoadCreature(const char *ResRef, int InParty, bool character=false);
 	/** core for summoning creatures, returns the last created Actor */

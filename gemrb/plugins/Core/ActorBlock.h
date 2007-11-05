@@ -177,6 +177,8 @@ protected: //let Actor access this
 	Scriptable* CutSceneId;
 	ieResRef Dialog;
 public:
+	ieDword lastDelay;
+	ieDword lastRunTime;
 	Variables* locals;
 	ScriptableType Type;
 	Point Pos;
@@ -207,7 +209,7 @@ public:
 	void SetDialog(const char *resref) {
 		strnuprcpy(Dialog, resref, 8);
 	}
-	void SetScript(const ieResRef aScript, int idx);
+	void SetScript(const ieResRef aScript, int idx, bool ai=false);
 	void SetWait(unsigned long time);
 	unsigned long GetWait();
 	void LeaveDialog();
