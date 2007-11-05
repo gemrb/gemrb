@@ -159,6 +159,9 @@ TileMap* WEDImp::GetTileMap()
 		printf( "[WEDImporter]: No TileSet Importer Available.\n" );
 		return NULL;
 	}
+	if (!overlays.size()) {
+		return NULL;
+	}
 	TileMap* tm = new TileMap();
 
 	usedoverlays = AddOverlay(tm, &overlays.at(0), false);
