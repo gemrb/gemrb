@@ -906,7 +906,7 @@ NULL,NULL,NULL,NULL, NULL, NULL, NULL, NULL //ff
 void Actor::ReleaseMemory()
 {
 	int i;
-	
+
 	if (classcount>=0) {
 		if (clericspelltables) {
 			for (i=0;i<classcount;i++) {
@@ -986,7 +986,7 @@ static void InitActorTables()
 			}
 
 			field = tm->QueryField( i, 1 );
-			if (field[0]!='*') {				
+			if (field[0]!='*') {
 				if (turnlevel) {
 					isclass[ISCLERIC] |= bitmask;
 				} else {
@@ -1005,7 +1005,7 @@ static void InitActorTables()
 			if (field[0]!='*') {
 				isclass[ISBARD] |= bitmask;
 			}
-	
+
 			field = tm->QueryField( i, 6 );
 			if (field[0]!='*') {
 				isclass[ISPALADIN] |= bitmask;
@@ -1815,7 +1815,7 @@ void Actor::SetPosition(Point &position, int jump, int radius)
 ieDword Actor::GetXPLevel(int modified) const
 {
 	const ieDword *stats;
-	
+
 	if (modified) {
 		stats = Modified;
 	}
@@ -2553,7 +2553,7 @@ void Actor::PerformAttack(ieDword gameTime)
 	}
 	//which hand is used
 	bool leftorright = (bool) (attackcount&1);
-	
+
 	WeaponInfo wi;
 	ITMExtHeader *header;
 	//can't reach target, zero range shouldn't be allowed
@@ -3236,23 +3236,14 @@ bool Actor::HandleActorStance()
 	return false;
 }
 
-void Actor::ResolveStringConstant(ieResRef Sound, unsigned int index)
+void Actor::GetSoundFrom2DA(ieResRef Sound, unsigned int index)
 {
-	TableMgr * tab;
-
-	//resolving soundset (bg1/bg2 style)
-	if (PCStats && PCStats->SoundSet[0]&& csound[index]) {
-		snprintf(Sound, sizeof(ieResRef), "%s%c", PCStats->SoundSet, csound[index]);
-		return;
-	}
-
-	Sound[0]=0;
 	int table=core->LoadTable( anims->ResRef );
 
 	if (table<0) {
 		return;
 	}
-	tab = core->GetTable( table );
+	TableMgr * tab = core->GetTable( table );
 	if (!tab) {
 		goto end;
 	}
@@ -3274,7 +3265,54 @@ void Actor::ResolveStringConstant(ieResRef Sound, unsigned int index)
 	strnlwrcpy(Sound, tab->QueryField (index, 0), 8);
 end:
 	core->DelTable( table );
+}
 
+void Actor::GetSoundFromINI(ieResRef Sound, unsigned int index)
+{
+	const char *resource = "";
+	char section[12];
+	snprintf(section,10,"%d", BaseStats[IE_ANIMATION_ID]);
+
+	switch(index) {
+		case VB_ATTACK:
+			resource = core->GetResDataINI()->GetKeyAsString(section, "at1sound","");
+			break;
+		case VB_DAMAGE:
+			resource = core->GetResDataINI()->GetKeyAsString(section, "hitsound","");
+			break;
+		case VB_DIE:
+			resource = core->GetResDataINI()->GetKeyAsString(section, "dfbsound","");
+			break;
+		case VB_SELECT:
+			break;
+	}
+	int count = CountElements(resource,',');
+	if (count<=0) return;
+	count = core->Roll(1,count,-1);
+	while(count--) {
+		while(*resource && *resource!=',') resource++;
+			if (*resource==',') resource++;
+	}
+	strncpy(Sound, resource, 8);
+	for(count=0;count<8 && Sound[count]!=',';count++);
+	Sound[count]=0;
+}
+
+void Actor::ResolveStringConstant(ieResRef Sound, unsigned int index)
+{
+	//resolving soundset (bg1/bg2 style)
+	if (PCStats && PCStats->SoundSet[0]&& csound[index]) {
+		snprintf(Sound, sizeof(ieResRef), "%s%c", PCStats->SoundSet, csound[index]);
+		return;
+	}
+
+	Sound[0]=0;
+
+	if (core->HasFeature(GF_RESDATA_INI)) {
+		GetSoundFromINI(Sound, index);
+	} else {
+		GetSoundFrom2DA(Sound, index);
+	}
 }
 
 void Actor::SetActionButtonRow(ActionButtonRow &ar)
@@ -3388,7 +3426,7 @@ retry:
 ScriptedAnimation *Actor::FindOverlay(int index)
 {
 	vvcVector *vvcCells;
-	
+
 	if (index>31) return NULL;
 
 	if (hc_locations&(1<<index)) vvcCells=&vvcShields;
@@ -3877,10 +3915,10 @@ void Actor::CreateDerivedStatsBG()
 	int i;
 	int turnundeadlevel = 0;
 	int levels[3]={BaseStats[IE_LEVEL],BaseStats[IE_LEVEL2],BaseStats[IE_LEVEL3]};
-	
+
 	int classid = BaseStats[IE_CLASS];
 	int slot = 0;
-	
+
 	for (i=0;i<11;i++) {
 		//this is not good for multiclassing yet
 		if ((1<<classid)&isclass[i]) {
@@ -3890,7 +3928,7 @@ void Actor::CreateDerivedStatsBG()
 	}
 	//recalculate all level based changes
 	pcf_level(this,0,0);
-	
+
 	if (isclass[ISCLERIC]&(1<<classid)) {
 		turnundeadlevel = BaseStats[IE_LEVELCLERIC]+1-turnlevels[classid];
 		if (turnundeadlevel<0) turnundeadlevel=0;
@@ -3901,7 +3939,7 @@ void Actor::CreateDerivedStatsBG()
 	} else {
 		turnundeadlevel = 0;
 	}
-	
+
 	ieDword backstabdamagemultiplier=BaseStats[IE_LEVELTHIEF];
 	if (backstabdamagemultiplier) {
 		backstabdamagemultiplier=backstabdamagemultiplier+3/4;
@@ -3926,7 +3964,7 @@ void Actor::CreateDerivedStatsIWD2()
 
 	for (i=0;i<11;i++) {
 		int tmp;
-		
+
 		if (turnlevels[i+1]) {
 			tmp = BaseStats[IE_LEVELBARBARIAN+i]+1-turnlevels[i+1];
 			if (tmp<0) tmp=0;

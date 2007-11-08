@@ -425,7 +425,7 @@ int fx_move_view (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 	if (0) printf( "fx_move_view (%2d): Speed: %d\n", fx->Opcode, fx->Parameter1 );
 	Map *map = core->GetGame()->GetCurrentArea();
 	if (map) {
-	  core->timer->SetMoveViewPort( fx->PosX, fx->PosY, fx->Parameter1, true);
+		core->timer->SetMoveViewPort( fx->PosX, fx->PosY, fx->Parameter1, true);
 	}
 	return FX_NOT_APPLIED;
 }
@@ -524,7 +524,13 @@ int fx_detect_evil (Actor* Owner, Actor* target, Effect* fx)
 int fx_jumble_curse (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_jumble_curse (%2d)\n", fx->Opcode );
-	if (!(core->GetGame()->GameTime%100)) {
+
+	if (STATE_GET( STATE_DEAD) ) {
+		return FX_NOT_APPLIED;
+	}
+	Game *game = core->GetGame();
+	//do a hiccup every 75th refresh
+	if (fx->Parameter3/75!=fx->Parameter4/75) {
 		//hiccups
 		//PST has this hardcoded deep in the engine
 		//gemrb lets you specify the strref in P#1
@@ -535,6 +541,8 @@ int fx_jumble_curse (Actor* /*Owner*/, Actor* target, Effect* fx)
 		//tmpstr shouldn't be freed, it is taken care by Actor
 		target->GetHit();
 	}
+	fx->Parameter4=fx->Parameter3;
+	fx->Parameter3=game->GameTime;
 	STAT_SET( IE_DEADMAGIC, 1);
 	STAT_SET( IE_SPELLFAILUREMAGE, 100);
 	STAT_SET( IE_SPELLFAILUREPRIEST, 100);

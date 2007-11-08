@@ -263,6 +263,7 @@ private:
 	DataFileMgr * INIparty;
 	DataFileMgr * INIbeasts;
 	DataFileMgr * INIquests;
+	DataFileMgr * INIresdata;
 	Game * game;
 	WorldMapArray* worldmap;
 	ieDword GameFeatures;   //the first 32 bits
@@ -486,6 +487,10 @@ public:
 	{
 		return INIquests;
 	}
+	DataFileMgr * GetResDataINI() const
+	{
+		return INIresdata;
+	}
 	/** Gets the Game class */
 	Game * GetGame() const
 	{
@@ -568,7 +573,7 @@ public:
 	/** creates a vvc/bam animation object at point */
 	ScriptedAnimation* GetScriptedAnimation( const char *ResRef, bool doublehint);
 	/** returns the first selected PC, if forced is set, then it returns 
-	    first PC if none was selected */
+	first PC if none was selected */
 	Actor *GetFirstSelectedPC(bool forced);
 	/** returns a single sprite (not cached) from a BAM resource */
 	Sprite2D* GetBAMSprite(const ieResRef ResRef, int cycle, int frame);

@@ -434,6 +434,7 @@
 #define IE_MIRRORIMAGES         182 
 //
 
+#define IE_IMMUNITY             203
 #define IE_DISABLEDBUTTON       204
 #define IE_ANIMATION_ID		205 //cd
 #define IE_STATE_ID		206

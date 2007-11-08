@@ -122,6 +122,7 @@ Interface::Interface(int iargc, char* iargv[])
 	INIparty = NULL;
 	INIbeasts = NULL;
 	INIquests = NULL;
+	INIresdata = NULL;
 	game = NULL;
 	worldmap = NULL;
 	CurrentStore = NULL;
@@ -488,6 +489,9 @@ Interface::~Interface(void)
 	}
 	if (INIparty) {
 		FreeInterface(INIparty);
+	}
+	if (INIresdata) {
+		FreeInterface(INIresdata);
 	}
 	Map::ReleaseMemory();
 	GameScript::ReleaseMemory();
@@ -1512,6 +1516,24 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
+
+	if (HasFeature( GF_RESDATA_INI )) {
+		printMessage( "Core", "Loading resource data File...",
+			WHITE );
+		INIresdata = ( DataFileMgr * ) GetInterface( IE_INI_CLASS_ID );
+		FileStream* fs = new FileStream();
+		char tINIresdata[_MAX_PATH];
+		PathJoin( tINIresdata, GamePath, "resdata.ini", NULL );
+		ResolveFilePath( tINIresdata );
+		// FIXME: crashes if file does not open
+		fs->Open( tINIresdata, true );
+		if (!INIresdata->Open( fs, true )) {
+			printStatus( "ERROR", LIGHT_RED );
+		} else {
+			printStatus( "OK", LIGHT_GREEN );
+		}
+	}
+
 	if (HasFeature( GF_HAS_PARTY_INI )) {
 		printMessage( "Core", "Loading precreated teams setup...",
 			WHITE );
@@ -2176,6 +2198,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"DeathOnZeroStat",    //32GF_DEATH_ON_ZERO_STAT
 		"SpawnIni",           //33GF_SPAWN_INI
 		"IWDDeathVarFormat",  //34GF_IWD_DEATHVARFORMAT
+		"HasResDataIni",      //35GF_RESDATA_INI
 		NULL                  //for our own safety, this marks the end of the pole
 };
 

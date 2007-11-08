@@ -3893,8 +3893,7 @@ int GameScript::HasImmunityEffects(Scriptable* Sender, Trigger* parameters)
 		return 0;
 	}
 	Actor* actor = ( Actor* ) tar;
-	//this isn't ok
-	if (actor->GetStat(IE_BOUNCE)) return 1;
+	if (actor->GetStat(IE_IMMUNITY)) return 1;
 	return 0;
 }
 

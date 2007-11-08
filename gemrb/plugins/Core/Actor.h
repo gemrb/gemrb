@@ -423,6 +423,8 @@ public:
 	void WalkTo(Point &Des, ieDword flags, int MinDistance = 0);
 	/* resolve string constant (sound will be altered) */
 	void ResolveStringConstant(ieResRef sound, unsigned int index);
+	void GetSoundFromINI(ieResRef Sound, unsigned int index);
+	void GetSoundFrom2DA(ieResRef Sound, unsigned int index);
 	/* sets the quick slots */
 	void SetActionButtonRow(ActionButtonRow &ar);
 	/* updates the quick slots */

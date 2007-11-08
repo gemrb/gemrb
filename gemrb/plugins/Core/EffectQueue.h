@@ -57,6 +57,7 @@ class Map;
 #define RL_MATCHSECTYPE 4  //match secondary type
 #define RL_REMOVEFIRST  8  //remove only one spell (could be more effects)
 
+//bouncing immunities
 #define BNC_PROJECTILE  1
 #define BNC_OPCODE      2
 #define BNC_LEVEL       4
@@ -69,6 +70,20 @@ class Map;
 #define BNC_SCHOOL_DEC  0x800
 #define BNC_SECTYPE_DEC 0x1000
 #define BNC_RESOURCE_DEC 0x2000
+
+//normal immunities
+#define IMM_PROJECTILE  1
+#define IMM_OPCODE      2
+#define IMM_LEVEL       4
+#define IMM_SCHOOL      8
+#define IMM_SECTYPE     16
+#define IMM_RESOURCE    32
+#define IMM_PROJECTILE_DEC 0x100
+#define IMM_OPCODE_DEC  0x200
+#define IMM_LEVEL_DEC   0x400
+#define IMM_SCHOOL_DEC  0x800
+#define IMM_SECTYPE_DEC 0x1000
+#define IMM_RESOURCE_DEC 0x2000
 
 // FIXME: Dice roll should be probably done just once, e.g. when equipping
 // the item, not each time the fx are applied

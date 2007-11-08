@@ -590,9 +590,14 @@ int Inventory::DepleteItem(ieDword flags)
 		if (!item) {
 			continue;
 		}
-		if ( !(item->Flags&IE_INV_ITEM_MAGICAL) ) {
-				continue;
+
+		//don't harm critical items
+		//don't harm nonmagical items
+		//don't harm indestructible items
+		if ( (item->Flags&(IE_INV_ITEM_CRITICAL|IE_INV_DEPLETABLE)) != IE_INV_DEPLETABLE) {
+			continue;
 		}
+
 		//if flags = 0 then weapons are not depleted
 		if (!flags) {
 			Item *itm = core->GetItem( item->ItemResRef );
@@ -1013,7 +1018,7 @@ int Inventory::GetEquippedSlot() const
 		//i've absolutely NO idea what is this 4 (Avenger)
 		//Equipped should be 0-3 in iWD2, no???
 		if (Equipped >= 4) {
-		  return SLOT_MELEE;
+			return SLOT_MELEE;
 		}
 		return Equipped*2+SLOT_MELEE;
 	}

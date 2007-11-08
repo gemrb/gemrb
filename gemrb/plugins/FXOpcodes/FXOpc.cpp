@@ -179,8 +179,8 @@ int fx_strength_bonus_modifier (Actor* Owner, Actor* target, Effect* fx);//61
 int fx_set_regenerating_state (Actor* Owner, Actor* target, Effect* fx);//62
 int fx_spell_duration_modifier (Actor* Owner, Actor* target, Effect* fx);///63
 int fx_generic_effect (Actor* Owner, Actor* target, Effect* fx);//64 protection from creature is a generic effect
-//65 protection from opcode is a generic effect
-//66 protection from spell level is a generic effect
+int fx_protection_opcode(Actor* Owner, Actor* target, Effect* fx); //65
+int fx_protection_spelllevel (Actor* Owner, Actor* target, Effect* fx); //66
 int fx_change_name (Actor* Owner, Actor* target, Effect* fx);//67
 int fx_experience_modifier (Actor* Owner, Actor* target, Effect* fx);//68
 int fx_gold_modifier (Actor* Owner, Actor* target, Effect* fx);//69
@@ -243,7 +243,7 @@ int fx_cure_sanctuary_state (Actor* Owner, Actor* target, Effect* fx);//a0
 int fx_cure_panic_state (Actor* Owner, Actor* target, Effect* fx);//a1
 int fx_cure_hold_state (Actor* Owner, Actor* target, Effect* fx);//a2 //cures 175
 int fx_cure_slow_state (Actor* Owner, Actor* target, Effect* fx);//a3
-//a4 slow poison is a generic effect?
+int fx_cure_intoxication (Actor* Owner, Actor* target, Effect* fx);//a4
 int fx_pause_target (Actor* Owner, Actor* target, Effect* fx);//a5
 int fx_magic_resistance_modifier (Actor* Owner, Actor* target, Effect* fx);//a6
 int fx_missile_to_hit_modifier (Actor* Owner, Actor* target, Effect* fx);//a7
@@ -280,13 +280,15 @@ int fx_bounce_projectile (Actor* Owner, Actor* target, Effect* fx);//c5
 int fx_bounce_opcode (Actor* Owner, Actor* target, Effect* fx);//c6
 int fx_bounce_spelllevel (Actor* Owner, Actor* target, Effect* fx);//c7
 int fx_bounce_spelllevel_dec (Actor* Owner, Actor* target, Effect* fx);//c8
-int fx_generic_decrement_effect (Actor* Owner, Actor* target, Effect* fx);//c9
+int fx_protection_spelllevel_dec (Actor* Owner, Actor* target, Effect* fx);//c9
 int fx_bounce_school (Actor* Owner, Actor* target, Effect* fx);//ca
 int fx_bounce_secondary_type (Actor* Owner, Actor* target, Effect* fx);//cb
-//cc resist school
-//cd resist sectype
+int fx_protection_school (Actor* Owner, Actor* target, Effect* fx); //cc
+int fx_protection_secondary_type (Actor* Owner, Actor* target, Effect* fx); //cd
 int fx_resist_spell (Actor* Owner, Actor* target, Effect* fx);//ce
+int fx_resist_spell_dec (Actor* Owner, Actor* target, Effect* fx);//??
 int fx_bounce_spell (Actor* Owner, Actor* target, Effect* fx);//cf
+int fx_bounce_spell_dec (Actor* Owner, Actor* target, Effect* fx);//??
 int fx_minimum_hp_modifier (Actor* Owner, Actor* target, Effect* fx);//d0
 int fx_power_word_kill (Actor* Owner, Actor* target, Effect* fx);//d1
 int fx_power_word_stun (Actor* Owner, Actor* target, Effect* fx);//d2
@@ -302,10 +304,10 @@ int fx_stoneskin_modifier (Actor* Owner, Actor* target, Effect* fx);//da
 int fx_dispel_school (Actor* Owner, Actor* target, Effect* fx);//dc
 int fx_dispel_secondary_type (Actor* Owner, Actor* target, Effect* fx);//dd
 int fx_teleport_field (Actor* Owner, Actor* target, Effect* fx);//de
-//df decrementing school immunity (fx_generic_decrement_effect)
+int fx_protection_school_dec (Actor* Owner, Actor* target, Effect* fx);//df
 int fx_cure_leveldrain (Actor* Owner, Actor* target, Effect* fx);//e0
 int fx_reveal_magic (Actor* Owner, Actor* target, Effect* fx);//e1
-//e2 decrementing secondary type immunity (fx_generic_decrement_effect)
+int fx_protection_secondary_type_dec (Actor* Owner, Actor* target, Effect* fx);//e2
 int fx_bounce_school_dec (Actor* Owner, Actor* target, Effect* fx);//e3
 int fx_bounce_secondary_type_dec (Actor* Owner, Actor* target, Effect* fx);//e4
 int fx_dispel_school_one (Actor* Owner, Actor* target, Effect* fx);//e5
@@ -434,6 +436,7 @@ static EffectRef effectnames[] = {
 	{ "Bounce:SecondaryType", fx_bounce_secondary_type, -1 },
 	{ "Bounce:SecondaryTypeDec", fx_bounce_secondary_type_dec, -1 },
 	{ "Bounce:Spell", fx_bounce_spell, -1 },
+	{ "Bounce:SpellDec", fx_bounce_spell_dec, -1 },
 	{ "Bounce:SpellLevel", fx_bounce_spelllevel, -1},
 	{ "Bounce:SpellLevelDec", fx_bounce_spelllevel_dec, -1},
 	{ "Bounce:Opcode", fx_bounce_opcode, -1 },
@@ -480,6 +483,7 @@ static EffectRef effectnames[] = {
 	{ "Cure:Hold", fx_cure_hold_state, -1 },
 	{ "Cure:Imprisonment", fx_freedom, -1 },
 	{ "Cure:Infravision", fx_cure_infravision_state, -1 },
+	{ "Cure:Intoxication", fx_cure_intoxication, -1 }, //0xa4 (iwd2 has this working)
 	{ "Cure:Invisible", fx_cure_invisible_state, -1 },  //0x2f
 	{ "Cure:Invisible2", fx_cure_invisible_state, -1 }, //0x74
 	//{ "Cure:ImprovedInvisible", fx_cure_improved_invisible_state, -1 },
@@ -620,17 +624,17 @@ static EffectRef effectnames[] = {
 	{ "Protection:Animation", fx_generic_effect, -1 },
 	{ "Protection:Backstab", fx_no_backstab_modifier, -1 },
 	{ "Protection:Creature", fx_generic_effect, -1 },
-	{ "Protection:Opcode", fx_generic_effect, -1 },
-	{ "Protection:Opcode2", fx_generic_effect, -1 },
+	{ "Protection:Opcode", fx_protection_opcode, -1 },
+	{ "Protection:Opcode2", fx_protection_opcode, -1 },
 	{ "Protection:Projectile",fx_protection_from_projectile, -1},
 	{ "Protection:School",fx_generic_effect,-1},//overlay?
-	{ "Protection:SchoolDec",fx_generic_decrement_effect,-1},//overlay?
-	{ "Protection:SecondaryType",fx_generic_effect,-1},//overlay?
-	{ "Protection:SecondaryTypeDec",fx_generic_decrement_effect,-1},//overlay?
+	{ "Protection:SchoolDec",fx_protection_school_dec,-1},//overlay?
+	{ "Protection:SecondaryType",fx_protection_secondary_type,-1},//overlay?
+	{ "Protection:SecondaryTypeDec",fx_protection_secondary_type_dec,-1},//overlay?
 	{ "Protection:Spell",fx_resist_spell,-1},//overlay?
-	{ "Protection:SpellDec",fx_generic_effect,-1},//overlay?
-	{ "Protection:SpellLevel",fx_generic_effect,-1},//overlay?
-	{ "Protection:SpellLevelDec",fx_generic_decrement_effect,-1},//overlay?
+	{ "Protection:SpellDec",fx_resist_spell_dec,-1},//overlay?
+	{ "Protection:SpellLevel",fx_protection_spelllevel,-1},//overlay?
+	{ "Protection:SpellLevelDec",fx_protection_spelllevel_dec,-1},//overlay?
 	{ "Protection:String", fx_generic_effect, -1 },
 	{ "Protection:Tracking", fx_protection_from_tracking, -1 },
 	{ "Protection:Turn", fx_protection_from_turn, -1},
@@ -2413,9 +2417,10 @@ int fx_set_ai_script (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0x53 Protection:Projectile
-int fx_protection_from_projectile (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_protection_from_projectile (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_protection_from_projectile (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	STAT_BIT_OR( IE_IMMUNITY, IMM_PROJECTILE);
 	return FX_APPLIED;
 }
 
@@ -2609,21 +2614,30 @@ int fx_spell_duration_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 	}
 	return FX_APPLIED;
 }
-// 0x64, 65 Protection:Creature
+// 0x64 Protection:Creature
 int fx_generic_effect (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 {
 	if (0) printf( "fx_generic_effect (%2d): Param1: %d, Param2: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	return FX_APPLIED;
 }
 
-//0x66 Protection:Level
-int fx_protection_from_spell_level (Actor* /*Owner*/, Actor* target, Effect* fx)
+//0x65 Protection:Opcode
+int fx_protection_opcode (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_protection_from_spell_level (%2d) Level: %d\n", fx->Opcode, fx->Parameter1);
+	if (0) printf( "fx_protection_opcode (%2d): Opcode: %d\n", fx->Opcode, fx->Parameter2 );
+	STAT_BIT_OR(IE_IMMUNITY, IMM_OPCODE);
+	return FX_APPLIED;
+}
+
+//0x66 Protection:SpellLevel
+int fx_protection_spelllevel (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_protection_spelllevel (%2d) Level: %d\n", fx->Opcode, fx->Parameter1);
 
 	int value = fx->Parameter1;
 	if (value<9) {
 		STAT_BIT_OR(IE_MINORGLOBE, 1<<value);
+		STAT_BIT_OR(IE_IMMUNITY, IMM_LEVEL);
 		return FX_APPLIED;
 	}
 	return FX_NOT_APPLIED;
@@ -3667,7 +3681,16 @@ int fx_cure_slow_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-// 0xA4 //slow poison: generic effect
+// 0xA4 Cure:Intoxication
+static EffectRef fx_intoxication_ref={"IntoxicationModifier",NULL,-1};
+
+int fx_cure_intoxication (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_cure_intoxication (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	target->fxqueue.RemoveAllEffects( fx_intoxication_ref );
+	BASE_SET(IE_INTOXICATION,0);
+	return FX_NOT_APPLIED;
+}
 
 // 0xA5 PauseTarget
 int fx_pause_target (Actor* /*Owner*/, Actor *target, Effect* fx)
@@ -4055,15 +4078,16 @@ int fx_bounce_spelllevel_dec (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-//0xc9 //Protection:SpellLevelDec
-int fx_immunity_spelllevel_dec (Actor* /*Owner*/, Actor* target, Effect* fx)
+//0xc9 Protection:SpellLevelDec
+int fx_protection_spelllevel_dec (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_immunity_spelllevel_dec (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	if (0) printf( "fx_protection_spelllevel_dec (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	STAT_BIT_OR( IE_IMMUNITY, IMM_LEVEL_DEC );
 	target->AddPortraitIcon(PI_BOUNCE2);
 	return FX_APPLIED;
 }
 
-// 0xca Bounce:School
+//0xca Bounce:School
 int fx_bounce_school (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_bounce_school (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
@@ -4082,11 +4106,39 @@ int fx_bounce_secondary_type (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 // 0xcc //resist school
-// 0xcd //resist sectype
-// 0xce //resist spell
-int fx_resist_spell (Actor* /*Owner*/, Actor* /*target*/, Effect *fx)
+int fx_protection_school (Actor* /*Owner*/, Actor* target, Effect *fx)
 {
+	if (0) printf( "fx_protection_school (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	STAT_BIT_OR( IE_IMMUNITY, IMM_SCHOOL);
+	return FX_APPLIED;
+}
+
+// 0xcd //resist sectype
+int fx_protection_secondary_type (Actor* /*Owner*/, Actor* target, Effect *fx)
+{
+	if (0) printf( "fx_protection_secondary_type (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	STAT_BIT_OR( IE_IMMUNITY, IMM_SECTYPE);
+	return FX_APPLIED;
+}
+
+//0xce Protection:Spell
+int fx_resist_spell (Actor* /*Owner*/, Actor* target, Effect *fx)
+{
+	if (0) printf( "fx_resist_spell (%2d): Resource: %s\n", fx->Opcode, fx->Resource );
+ 	if (strnicmp(fx->Resource,fx->Source,sizeof(fx->Resource)) ) {
+		STAT_BIT_OR( IE_IMMUNITY, IMM_RESOURCE);
+		return FX_APPLIED;
+	}
+	//this has effect only on first apply, it will stop applying the spell
+	return FX_ABORT;
+}
+
+// ??? Protection:SpellDec
+int fx_resist_spell_dec (Actor* /*Owner*/, Actor* target, Effect *fx)
+{
+	if (0) printf( "fx_resist_spell_dec (%2d): Resource: %s\n", fx->Opcode, fx->Resource );
 	if (strnicmp(fx->Resource,fx->Source,sizeof(fx->Resource)) ) {
+		STAT_BIT_OR( IE_IMMUNITY, IMM_RESOURCE_DEC);
 		return FX_APPLIED;
 	}
 	//this has effect only on first apply, it will stop applying the spell
@@ -4098,6 +4150,14 @@ int fx_bounce_spell (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_bounce_spell (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
 	STAT_BIT_OR( IE_BOUNCE, BNC_RESOURCE );
+	return FX_APPLIED;
+}
+
+// ??? Bounce:SpellDec
+int fx_bounce_spell_dec (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_bounce_spell (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	STAT_BIT_OR( IE_BOUNCE, BNC_RESOURCE_DEC );
 	return FX_APPLIED;
 }
 
@@ -4335,11 +4395,11 @@ int fx_teleport_field (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //0xDF //Protection:SchoolDec
-//0xe2 //Protection:SecondaryTypeDec
-int fx_generic_decrement_effect (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
+int fx_protection_school_dec (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_generic_decrement_effect (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	if (0) printf( "fx_protection_school_dec (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
 	if (fx->Parameter1) {
+		STAT_BIT_OR( IE_IMMUNITY, IMM_SCHOOL_DEC );
 		return FX_APPLIED;
 	}
 	return FX_NOT_APPLIED;
@@ -4375,8 +4435,18 @@ int fx_reveal_magic (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-//e2 decrementing secondary type immunity (general)
-//e3 Bounce:SchoolDecrement
+//0xe2 Protection:SecondaryTypeDec
+int fx_protection_secondary_type_dec (Actor* /*Owner*/, Actor* target, Effect* fx)
+{
+	if (0) printf( "fx_protection_secondary_type_dec (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
+	if (fx->Parameter1) {
+		STAT_BIT_OR( IE_IMMUNITY, IMM_SECTYPE_DEC );
+		return FX_APPLIED;
+	}
+	return FX_NOT_APPLIED;
+}
+
+//0xe3 Bounce:SchoolDecrement
 int fx_bounce_school_dec (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_bounce_school_dec (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
@@ -4385,7 +4455,7 @@ int fx_bounce_school_dec (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_APPLIED;
 }
 
-//e4 Bounce:SecondaryTypeDecrement
+//0xe4 Bounce:SecondaryTypeDecrement
 int fx_bounce_secondary_type_dec (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_bounce_secondary_type_dec (%2d): Type: %d\n", fx->Opcode, fx->Parameter2 );
@@ -4401,6 +4471,7 @@ int fx_dispel_school_one (Actor* /*Owner*/, Actor* target, Effect* fx)
 	target->fxqueue.RemoveLevelEffects(fx->Parameter1, RL_MATCHSCHOOL|RL_REMOVEFIRST, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
+
 //0xE6 DispelSecondaryTypeOne
 int fx_dispel_secondary_type_one (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -4408,6 +4479,7 @@ int fx_dispel_secondary_type_one (Actor* /*Owner*/, Actor* target, Effect* fx)
 	target->fxqueue.RemoveLevelEffects(fx->Parameter1,RL_MATCHSECTYPE|RL_REMOVEFIRST, fx->Parameter2);
 	return FX_NOT_APPLIED;
 }
+
 //0xE7 Timestop
 int fx_timestop (Actor* Owner, Actor* /*target*/, Effect* fx)
 {
@@ -4430,6 +4502,7 @@ int fx_cast_spell_on_condition (Actor* Owner, Actor* target, Effect* fx)
 		//last attacker
 	case 1: actor = map->GetActorByGlobalID(target->LastHitter); break;
 		//nearest enemy
+		//fix this!
 	case 2: actor = map->GetActorByGlobalID(target->LastSeen); break;
 		//nearest creature
 	case 3: actor = map->GetActorByGlobalID(target->LastSeen); break;
@@ -4547,6 +4620,7 @@ int fx_puppet_master (Actor* /*Owner*/, Actor* target, Effect* fx)
 	STAT_SET (IE_PUPPETMASTERTYPE, fx->Parameter1);
 	return FX_APPLIED;
 }
+
 // 0xed PuppetMarker
 int fx_puppet_marker (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
@@ -4569,6 +4643,7 @@ int fx_disintegrate (Actor* /*Owner*/, Actor* target, Effect* fx)
 	}
 	return FX_NOT_APPLIED;
 }
+
 // 0xef Farsee 
 // 1 view not explored sections too
 // 2 param1=range (otherwise visualrange)
@@ -4625,7 +4700,6 @@ int fx_remove_portrait_icon (Actor* /*Owner*/, Actor* target, Effect* fx)
 // 0xf1 control creature (same as charm)
 
 // 0xF2 Cure:Confusion
-
 static EffectRef fx_confused_state_ref={"State:Confused",NULL,-1};
 
 int fx_cure_confused_state (Actor* /*Owner*/, Actor* target, Effect* fx)
@@ -4635,7 +4709,8 @@ int fx_cure_confused_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 	target->fxqueue.RemoveAllEffects(fx_confused_state_ref);
 	return FX_NOT_APPLIED;
 }
-// 0xf3 DrainItems
+
+// 0xf3 DrainItems (this is disabled in ToB)
 int fx_drain_items (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_drain_items (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
@@ -4788,7 +4863,7 @@ int fx_activate_spell_sequencer(Actor* Owner, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-// 0x103 SpellTrap (Protection:SpellLevelDecrement + recall spells)
+// 0x103 SpellTrap (Protection:SpellLevelDec + recall spells)
 int fx_spelltrap(Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_spelltrap (%2d): Count: %d, Level: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );

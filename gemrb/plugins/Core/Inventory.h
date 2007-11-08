@@ -121,6 +121,8 @@ typedef enum ieCREItemFlagBits {
 	IE_INV_ITEM_PULSATING = 0x100000
 } ieCREItemFlagBits;
 
+#define IE_INV_DEPLETABLE (IE_INV_ITEM_MAGICAL|IE_INV_ITEM_DESTRUCTIBLE)
+
 //equip flags
 #define EQUIP_ANY   0
 #define EQUIP_MELEE 1
