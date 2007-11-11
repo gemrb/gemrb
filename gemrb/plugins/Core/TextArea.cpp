@@ -709,6 +709,7 @@ void TextArea::Clear()
 	}
 	lines.clear();
 	lrows.clear();
+	rows = 0;
 }
 
 //setting up the textarea for smooth scrolling, the first

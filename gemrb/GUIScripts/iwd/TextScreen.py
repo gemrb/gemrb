@@ -79,8 +79,9 @@ def StartTextScreen ():
 	GemRB.SetVisible (0, 0) #removing the gamecontrol screen
 	GemRB.SetVisible (TextScreen, 1)
 	GemRB.RewindTA (TextScreen, TextArea, 200)
+	GemRB.DisplayString (17556, 0xff0000)
 	GemRB.GamePause (1, 1)
-
+	return
 
 def FeedScroll ():
 	global TextScreen, TextArea, Feed
@@ -93,14 +94,16 @@ def FeedScroll ():
 	Table = GemRB.LoadTable ("chapters")
 	Value = GemRB.GetTableValue (Table, Chapter, 1)
 	GemRB.UnloadTable (Table)
-	GemRB.TextAreaAppend (TextScreen, TextArea, Value, -1)
+	GemRB.TextAreaAppend (TextScreen, TextArea, Value, -1, 7)
+	return
 
 def ReplayTextScreen ():
-	global TextScreen, TextArea
+	global TextScreen, TextArea, Feed
 
 	GemRB.SetEvent (TextScreen, TextArea, IE_GUI_TEXTAREA_OUT_OF_TEXT, "FeedScroll")
 	Feed = 0
 	GemRB.RewindTA (TextScreen, TextArea, 200)
+	return
 
 def EndTextScreen ():
 	global TextScreen
@@ -110,4 +113,4 @@ def EndTextScreen ():
 	GemRB.SetVisible (0, 1) #enabling gamecontrol screen
 	GemRB.UnhideGUI ()
 	GemRB.GamePause (0, 1)
-
+	return
