@@ -355,10 +355,10 @@ def AcceptPress():
 	else:
 		GemRB.SetPlayerStat (MyChar, IE_STREXTRA, 0)
 
-	GemRB.SetPlayerStat (MyChar, IE_INT, GemRB.GetVar ("Ability2"))
-	GemRB.SetPlayerStat (MyChar, IE_WIS, GemRB.GetVar ("Ability3"))
-	GemRB.SetPlayerStat (MyChar, IE_DEX, GemRB.GetVar ("Ability4"))
-	GemRB.SetPlayerStat (MyChar, IE_CON, GemRB.GetVar ("Ability5"))
+	GemRB.SetPlayerStat (MyChar, IE_DEX, GemRB.GetVar ("Ability2"))
+	GemRB.SetPlayerStat (MyChar, IE_CON, GemRB.GetVar ("Ability3"))
+	GemRB.SetPlayerStat (MyChar, IE_INT, GemRB.GetVar ("Ability4"))
+	GemRB.SetPlayerStat (MyChar, IE_WIS, GemRB.GetVar ("Ability5"))
 	GemRB.SetPlayerStat (MyChar, IE_CHR, GemRB.GetVar ("Ability6"))
 
 	GemRB.SetPlayerName (MyChar, GemRB.GetToken ("CHARNAME"), 0)
