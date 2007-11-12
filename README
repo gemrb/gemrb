@@ -22,13 +22,13 @@ the CDs using tool `unshield'.
 What little is there of documentation is mostly in gemrb/docs/en/ and
 subdirectories, gemrb.1 man page and this file.
 
-Supported (i.e. semi-working) systems:
+Supported (i.e. we got reports about successfully running GemRB) systems:
 
 Linux x86
 FreeBSD x86
 MS Windows
 Linux amd64 ? - used to work ...
-
+various Macintosh systems also should work ...
 
 Requirements:
 
