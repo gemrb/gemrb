@@ -127,7 +127,12 @@
 #define STR_2HANDEDEQUIP    92
 #define STR_CANNOTUSEITEM   93
 #define STR_2HANDEDOFFHAND  94
+#define STR_PICKPOCKET_DONE 95       //done
+#define STR_PICKPOCKET_NONE 96       //no items to steal
+#define STR_PICKPOCKET_FAIL 97       //failed, noticed
+#define STR_PICKPOCKET_EVIL 98       //can't pick hostiles
+#define STR_PICKPOCKET_ARMOR 99      //armor restriction
 
-#define STRREF_COUNT 95
+#define STRREF_COUNT 100
 
 #endif //! IE_STRINGS_H
