@@ -61,8 +61,6 @@ inline Item *Inventory::GetItemPointer(ieDword slot, CREItem *&item) const
 	return core->GetItem(item->ItemResRef);
 }
 
-#define addr(s,m)   (size_t)&(((s->m)
-
 void Inventory::Init(int mb)
 {
 	SLOT_MAGIC=-1;
@@ -417,6 +415,8 @@ CREItem *Inventory::RemoveItem(unsigned int slot, unsigned int count)
 	return returned;
 }
 
+//flags set disable item transfer
+//except for undroppable and equipped, which are opposite (and shouldn't be set)
 int Inventory::RemoveItem(const char *resref, unsigned int flags, CREItem **res_item)
 {
 	size_t slot = Slots.size();
@@ -425,7 +425,7 @@ int Inventory::RemoveItem(const char *resref, unsigned int flags, CREItem **res_
 		if (!item) {
 			continue;
 		}
-		if ( (flags&(item->Flags^(IE_INV_ITEM_UNDROPPABLE|IE_INV_ITEM_EQUIPPED) ) )!=flags) {
+		if ( (flags&(item->Flags^(IE_INV_ITEM_UNDROPPABLE|IE_INV_ITEM_EQUIPPED) ) )==flags) {
 				continue;
 		}
 		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
@@ -630,7 +630,7 @@ int Inventory::FindItem(const char *resref, unsigned int flags) const
 		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
 			continue;
 		}
-		return  (int) i;
+		return (int) i;
 	}
 	return -1;
 }
@@ -747,7 +747,7 @@ bool Inventory::EquipItem(unsigned int slot)
 	int effect = core->QuerySlotEffects( slot );
 	Item *itm = core->GetItem(item->ItemResRef);
 	if (!itm) {
-		printf("Invalid item Equipped: %s  Slot: %d\n", item->ItemResRef, slot);
+		printf("Invalid item Equipped: %s Slot: %d\n", item->ItemResRef, slot);
 		return false;
 	}
 	switch (effect) {

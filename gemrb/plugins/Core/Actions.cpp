@@ -3547,7 +3547,7 @@ void GameScript::TakeItemReplace(Scriptable *Sender, Action* parameters)
 
 	Actor *scr = (Actor *) tar;
 	CREItem *item;
-	int slot = scr->inventory.RemoveItem(parameters->string1Parameter, false, &item);
+	int slot = scr->inventory.RemoveItem(parameters->string1Parameter, 0, &item);
 	if (!item) {
 		item = new CREItem();
 	}
@@ -3743,12 +3743,19 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
+
+	if (scr->LastTarget) {
+		core->DisplayConstantString(STR_PICKPOCKET_EVIL,0xffffff);
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
 	//not sure about the real formula
 	int skill = snd->GetStat(IE_PICKPOCKET) - scr->GetXPLevel(0)*10;
 	skill+=core->Roll(1,100,1);
-	if (skill<100)
-	{
+	if (skill<100) {
 		//noticed
+		core->DisplayConstantString(STR_PICKPOCKET_FAIL,0xffffff);
 		tar->LastOpenFailed=snd->GetID();
 		Sender->ReleaseCurrentAction();
 		return;
@@ -3759,12 +3766,12 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	if (ret==MIC_NOITEM) {
 		int money=0;
 		//go for money too
-		if (scr->GetStat(IE_GOLD)>0)
-		{
+		if (scr->GetStat(IE_GOLD)>0) {
 			money=RandomNumValue%(scr->GetStat(IE_GOLD)+1);
 		}
 		if (!money) {
 			//no stuff to steal
+			core->DisplayConstantString(STR_PICKPOCKET_NONE,0xffffff);
 			Sender->ReleaseCurrentAction();
 			return;
 		}
@@ -3772,6 +3779,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 		snd->SetBase(IE_GOLD,snd->GetBase(IE_GOLD)+money);
 	}
 
+	core->DisplayConstantString(STR_PICKPOCKET_DONE,0xffffff);
 	Sender->ReleaseCurrentAction();
 }
 

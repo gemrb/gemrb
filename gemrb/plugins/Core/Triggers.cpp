@@ -1772,6 +1772,14 @@ int GameScript::CreatureHidden(Scriptable* Sender, Trigger* /*parameters*/)
 		return 0;
 	}
 	Actor *act=(Actor *) Sender;
+
+	//this stuff is not completely clear, but HoW has a flag for this
+	//and GemRB uses the avatarremoval stat for it.
+	//HideCreature also sets this stat, so...
+	if (act->GetStat(IE_AVATARREMOVAL)) {
+		return 1;
+	}
+
 	if (act->GetInternalFlag()&IF_VISIBLE) {
 		return 0;
 	}

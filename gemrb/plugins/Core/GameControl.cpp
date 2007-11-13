@@ -1358,7 +1358,8 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 		return;
 	}
 
-	Actor* actor = area->GetActor( p, GA_DEFAULT | GA_SELECT | GA_NO_DEAD);
+	//hidden actors are not selectable by clicking on them
+	Actor* actor = area->GetActor( p, GA_DEFAULT | GA_SELECT | GA_NO_DEAD | GA_NO_HIDDEN);
 	if (Button == GEM_MB_MENU) {
 		if (actor) {
 			//from GSUtils
