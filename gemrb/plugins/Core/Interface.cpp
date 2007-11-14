@@ -1057,7 +1057,7 @@ int Interface::LoadSprites()
 	}
 
 	//loading cursors
-	printMessage( "Core", "Loading Cursors...", WHITE );
+	printMessage( "Core", "Loading Cursors...\n", WHITE );
 
 	str = key->GetResource( "cursors", IE_BAM_CLASS_ID );
 	if (anim->Open( str, true ))
@@ -1079,7 +1079,7 @@ int Interface::LoadSprites()
 
 	// Load arrow cursors
 	str = key->GetResource( "cursarw", IE_BAM_CLASS_ID );
-	printMessage( "Core", "Loading arrow cursor bitmaps...", WHITE );
+	printMessage( "Core", "Loading arrow cursor bitmaps...\n", WHITE );
 	anim->Open( str, true );
 	if (anim->GetCycleCount( ) != MAX_ORIENT/2) {
 		printStatus( "ERROR", LIGHT_RED );
@@ -1092,7 +1092,7 @@ int Interface::LoadSprites()
 
 	// Load fog-of-war bitmaps
 	str = key->GetResource( "fogowar", IE_BAM_CLASS_ID );
-	printMessage( "Core", "Loading Fog-Of-War bitmaps...", WHITE );
+	printMessage( "Core", "Loading Fog-Of-War bitmaps...\n", WHITE );
 	anim->Open( str, true );
 	if (anim->GetCycleSize( 0 ) != 8) {
 		// unknown type of fog anim
@@ -1163,7 +1163,7 @@ int Interface::LoadSprites()
 	printStatus( "OK", LIGHT_GREEN );
 
 	// Load ground circle bitmaps (PST only)
-	printMessage( "Core", "Loading Ground circle bitmaps...", WHITE );
+	printMessage( "Core", "Loading Ground circle bitmaps...\n", WHITE );
 	//block required due to msvc6.0 incompatibility
 	for (size = 0; size < MAX_CIRCLE_SIZE; size++) {
 		if (GroundCircleBam[size][0]) {
@@ -1362,8 +1362,12 @@ int Interface::Init()
 
 	printMessage( "Core", "Creating Projectile Server...\n", WHITE );
 	projserv = new ProjectileServer();
+	if (!projserv->GetHighestProjectileNumber()) {
+		printStatus( "ERROR", LIGHT_RED );
+		printf( "No projectiles are available...\n" );
+	}
 
-	printMessage( "Core", "Checking for Dialogue Manager...", WHITE );
+	printMessage( "Core", "Checking for Dialogue Manager...\n", WHITE );
 	if (!IsAvailable( IE_TLK_CLASS_ID )) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "No TLK Importer Available.\nTermination in Progress...\n" );
@@ -1460,7 +1464,7 @@ int Interface::Init()
 	int ret = LoadSprites();
 	if (ret) return ret;
 	 
-	printMessage( "Core", "Setting up the Console...", WHITE );
+	printMessage( "Core", "Setting up the Console...\n", WHITE );
 	QuitFlag = QF_CHANGESCRIPT;
 	console = new Console();
 	console->XPos = 0;
@@ -1476,7 +1480,7 @@ int Interface::Init()
 	console->SetCursor (tmpsprite);
 	printStatus( "OK", LIGHT_GREEN );
 
-	printMessage( "Core", "Starting up the Sound Manager...", WHITE );
+	printMessage( "Core", "Starting up the Sound Manager...\n", WHITE );
 	soundmgr = ( SoundMgr * ) GetInterface( IE_WAV_CLASS_ID );
 	if (soundmgr == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
@@ -1488,7 +1492,7 @@ int Interface::Init()
 	}
 	printStatus( "OK", LIGHT_GREEN );
 
-	printMessage( "Core", "Allocating SaveGameIterator...", WHITE );
+	printMessage( "Core", "Allocating SaveGameIterator...\n", WHITE );
 	sgiterator = new SaveGameIterator();
 	if (sgiterator == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
@@ -1498,9 +1502,8 @@ int Interface::Init()
 
 	//no need of strdup, variables do copy the key!
 	vars->SetAt( "SkipIntroVideos", (unsigned long)SkipIntroVideos );
-	printStatus( "OK", LIGHT_GREEN );
 
-	printMessage( "Core", "Initializing Token Dictionary...", WHITE );
+	printMessage( "Core", "Initializing Token Dictionary...\n", WHITE );
 	tokens = new Variables();
 	if (!tokens) {
 		printStatus( "ERROR", LIGHT_RED );
@@ -1509,7 +1512,7 @@ int Interface::Init()
 	tokens->SetType( GEM_VARIABLES_STRING );
 	printStatus( "OK", LIGHT_GREEN );
 
-	printMessage( "Core", "Initializing Music Manager...", WHITE );
+	printMessage( "Core", "Initializing Music Manager...\n", WHITE );
 	music = ( MusicMgr * ) GetInterface( IE_MUS_CLASS_ID );
 	if (!music) {
 		printStatus( "ERROR", LIGHT_RED );
@@ -1518,8 +1521,7 @@ int Interface::Init()
 	printStatus( "OK", LIGHT_GREEN );
 
 	if (HasFeature( GF_RESDATA_INI )) {
-		printMessage( "Core", "Loading resource data File...",
-			WHITE );
+		printMessage( "Core", "Loading resource data File...\n", WHITE );
 		INIresdata = ( DataFileMgr * ) GetInterface( IE_INI_CLASS_ID );
 		FileStream* fs = new FileStream();
 		char tINIresdata[_MAX_PATH];
@@ -1535,7 +1537,7 @@ int Interface::Init()
 	}
 
 	if (HasFeature( GF_HAS_PARTY_INI )) {
-		printMessage( "Core", "Loading precreated teams setup...",
+		printMessage( "Core", "Loading precreated teams setup...\n",
 			WHITE );
 		INIparty = ( DataFileMgr * ) GetInterface( IE_INI_CLASS_ID );
 		FileStream* fs = new FileStream();
@@ -1550,7 +1552,7 @@ int Interface::Init()
 		}
 	}
 	if (HasFeature( GF_HAS_BEASTS_INI )) {
-		printMessage( "Core", "Loading beasts definition File...",
+		printMessage( "Core", "Loading beasts definition File...\n",
 			WHITE );
 		INIbeasts = ( DataFileMgr * ) GetInterface( IE_INI_CLASS_ID );
 		FileStream* fs = new FileStream();
@@ -1565,7 +1567,7 @@ int Interface::Init()
 			printStatus( "OK", LIGHT_GREEN );
 		}
 	
-		printMessage( "Core", "Loading quests definition File...",
+		printMessage( "Core", "Loading quests definition File...\n",
 			WHITE );
 		INIquests = ( DataFileMgr * ) GetInterface( IE_INI_CLASS_ID );
 		FileStream* fs2 = new FileStream();
@@ -1582,7 +1584,7 @@ int Interface::Init()
 	}
 	game = NULL;
 
-	printMessage( "Core", "Bringing up the Global Timer...", WHITE );
+	printMessage( "Core", "Bringing up the Global Timer...\n", WHITE );
 	timer = new GlobalTimer();
 	if (!timer) {
 		printStatus( "ERROR", LIGHT_RED );

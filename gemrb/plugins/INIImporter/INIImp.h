@@ -65,13 +65,12 @@ public:
 		return pairs[index].Name;
 	}
 
-	void AddLine(char* Line)
+	bool AddLine(char* Line)
 	{
 		INIPair p;
 		char* equal = strchr( Line, '=' );
 		if(!equal) {
-			printf("Bad line: %s\n",Line);
-			return;
+			return true;
 		}
 		*equal = 0;
 		char* NameKey = Line;
@@ -104,16 +103,6 @@ public:
 			*endValueKey-- = 0;
 			ValueKeyLen--;
 		}
-		/*
-				//Re-NewLine the string
-				char * VKptr = ValueKey;
-				while(*VKptr != '\0') {
-					if((*VKptr == ' ') && (*(VKptr+1) == ' ')) {
-						*VKptr++ = '\n';
-						*VKptr = '\n';
-					}
-					VKptr++;
-				}*/
 		//Allocating Buffers
 		p.Name = ( char * ) malloc( NameKeyLen + 1 );
 		p.Value = ( char * ) malloc( ValueKeyLen + 1 );
@@ -122,6 +111,7 @@ public:
 		memcpy( p.Value, ValueKey, ValueKeyLen + 1 );
 		//Adding to Tag Pairs
 		pairs.push_back( p );
+		return false;
 	}
 
 	const char* GetKeyAsString(const char* Key, const char* Default)
@@ -155,17 +145,17 @@ public:
 		for (unsigned int i = 0; i < pairs.size(); i++) {
 			if (stricmp( Key, pairs[i].Name ) == 0) {
 				ret = pairs[i].Value;
-		    break;
+				break;
 			}
 		}
 		if (!ret) {
 			return Default;
 		}
 		if (!stricmp( ret, "true") ) {
-		  return true;
+			return true;
 		}
 		if (!stricmp( ret, "false") ) {
-		  return false;
+			return false;
 		}
 		return (atoi( ret ) )!=0;
 	}
