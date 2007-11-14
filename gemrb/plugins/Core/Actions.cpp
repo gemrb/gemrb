@@ -1025,7 +1025,11 @@ void GameScript::ReturnToSavedLocation(Scriptable* Sender, Action* parameters)
 	}
 
 	Actor* actor = ( Actor* ) tar;
-	Point p((short) actor->GetStat(IE_SAVEDXPOS),(short) actor->GetStat(IE_SAVEDYPOS) );
+	Point p((short) actor->GetBase(IE_SAVEDXPOS),(short) actor->GetBase(IE_SAVEDYPOS) );
+	if (p.isnull()) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
 	actor->WalkTo( p, 0, 0 );
 }
 
@@ -1042,8 +1046,12 @@ void GameScript::RunToSavedLocation(Scriptable* Sender, Action* parameters)
 	}
 
 	Actor* actor = ( Actor* ) tar;
-	Point p((short) actor->GetStat(IE_SAVEDXPOS),(short) actor->GetStat(IE_SAVEDYPOS) );
-	actor->WalkTo( parameters->pointParameter, IF_RUNNING, 0 );
+	Point p((short) actor->GetBase(IE_SAVEDXPOS),(short) actor->GetBase(IE_SAVEDYPOS) );
+	if (p.isnull()) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	actor->WalkTo( p, IF_RUNNING, 0 );
 }
 
 //iwd2
@@ -1059,8 +1067,14 @@ void GameScript::ReturnToSavedLocationDelete(Scriptable* Sender, Action* paramet
 	}
 
 	Actor* actor = ( Actor* ) tar;
-	Point p((short) actor->GetStat(IE_SAVEDXPOS),(short) actor->GetStat(IE_SAVEDYPOS) );
-	actor->WalkTo( parameters->pointParameter, 0, 0 );
+	Point p((short) actor->GetBase(IE_SAVEDXPOS),(short) actor->GetBase(IE_SAVEDYPOS) );
+	actor->SetBase(IE_SAVEDXPOS,0);
+	actor->SetBase(IE_SAVEDYPOS,0);
+	if (p.isnull()) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	actor->WalkTo( p, 0, 0 );
 	//what else?
 }
 
