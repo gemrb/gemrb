@@ -42,6 +42,7 @@ IniSpawn::IniSpawn(Map *owner)
 	NamelessState = 35;
 	NamelessVar = NULL;
 	Locals = NULL;
+	localscount = 0;
 	eventspawns = NULL;
 	eventcount = 0;
 	last_spawndate = 0;
@@ -473,10 +474,10 @@ void IniSpawn::InitSpawn(const ieResRef DefaultArea)
 		}
 	}
 
-	x = inifile->GetKeysCount("locals");
-	if (x) {
-		Locals = new VariableSpec[x];
-		for (y=0;y<x;y++) {
+	localscount = inifile->GetKeysCount("locals");
+	if (localscount) {
+		Locals = new VariableSpec[localscount];
+		for (y=0;y<localscount;y++) {
 			const char* Key = inifile->GetKeyNameByIndex("locals",y);
 			strnlwrcpy(Locals[y].Name, Key, sizeof(ieVariable));
 			Locals[y].Value = inifile->GetKeyAsInt("locals",Key,0);
