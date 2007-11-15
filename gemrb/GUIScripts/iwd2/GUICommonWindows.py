@@ -162,6 +162,7 @@ def GroupControls ():
 	GemRB.SetVar ("Formation", GemRB.GameGetFormation ())
 	for i in range (5):
 		Button = GemRB.GetControl (Window, 13+i)
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 		idx = GemRB.GameGetFormation (i)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_RADIOBUTTON|IE_GUI_BUTTON_NORMAL, OP_SET)
 		GemRB.SetButtonSprites (Window, Button, "GUIBTBUT",0,0,1,2,3)
