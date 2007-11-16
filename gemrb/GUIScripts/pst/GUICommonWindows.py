@@ -290,6 +290,7 @@ def OpenPortraitWindow (needcontrols):
 		portrait_hp_numeric[i] = 0
 
 	UpdatePortraitWindow ()
+	SelectionChanged()
 	return Window
 
 def UpdatePortraitWindow ():
@@ -305,7 +306,7 @@ def UpdatePortraitWindow ():
 			GemRB.SetButtonFlags (Window, ButtonHP, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
 			continue
 		
-		sel = GemRB.GameGetSelectedPCSingle () == i + 1
+		#sel = GemRB.GameGetSelectedPCSingle () == i + 1
 		GemRB.SetButtonBAM (Window, Button, pic, 0, 0, -1)
 
 		state = GemRB.GetPlayerStat (i+1, IE_STATE_ID)
@@ -357,18 +358,18 @@ def UpdatePortraitWindow ():
 		GemRB.SetButtonFlags (Window, ButtonHP, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_NO_TEXT, op)
 
 
-		if sel:
-			#GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_SELECTED)
-			GemRB.EnableButtonBorder(Window, Button, FRAME_PC_SELECTED, 1)
-		else:
-			#GemRB.SetButtonState(Window, Button, IE_GUI_BUTTON_UNPRESSED)
-			GemRB.EnableButtonBorder(Window, Button, FRAME_PC_SELECTED, 0)
+		#if sel:
+		#	GemRB.EnableButtonBorder(Window, Button, FRAME_PC_SELECTED, 1)
+		#else:
+		#	GemRB.EnableButtonBorder(Window, Button, FRAME_PC_SELECTED, 0)
 
 
 def PortraitButtonOnPress ():
 	i = GemRB.GetVar ('PressedPortrait')
 
 	if (not SelectionChangeHandler):
+		if GemRB.GameIsPCSelected (i+1):
+			GemRB.GameControlSetScreenFlags (SF_CENTERONACTOR, OP_OR)
 		GemRB.GameSelectPC (i + 1, True, SELECT_REPLACE)
 	else:
 		GemRB.GameSelectPCSingle (i + 1)
