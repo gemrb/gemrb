@@ -551,6 +551,8 @@ def PortraitButtonOnPress ():
 	i = GemRB.GetVar ("PressedPortrait")
 
 	if (not SelectionChangeHandler):
+		if GemRB.GameIsPCSelected (i+1):
+			GemRB.GameControlSetScreenFlags (SF_CENTERONACTOR, OP_OR)
 		GemRB.GameSelectPC (i + 1, True, SELECT_REPLACE)
 	else:
 		GemRB.GameSelectPCSingle (i + 1)
