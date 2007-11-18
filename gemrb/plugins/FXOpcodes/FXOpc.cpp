@@ -1890,7 +1890,7 @@ static EffectRef fx_death_ref={"Death",NULL,-1};
 int fx_kill_creature_type (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_kill_creature_type (%2d): Value: %d, IDS: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	if (EffectQueue::match_ids( target, fx->Parameter1, fx->Parameter2) ) {
+	if (EffectQueue::match_ids( target, fx->Parameter2, fx->Parameter1) ) {
 		//convert it to a death opcode or apply the new effect?
 		fx->Opcode = EffectQueue::ResolveEffect(fx_death_ref);
 		fx->TimingMode = FX_DURATION_INSTANT_PERMANENT;
@@ -3808,7 +3808,7 @@ int fx_hold_creature_no_icon (Actor* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 
- 	if (!EffectQueue::match_ids( target, fx->Parameter1, fx->Parameter2) ) {
+ 	if (!EffectQueue::match_ids( target, fx->Parameter2, fx->Parameter1) ) {
 		//if the ids don't match, the effect doesn't stick
 		return FX_NOT_APPLIED;
 	}
@@ -3832,7 +3832,7 @@ int fx_hold_creature (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (target->HasSpellState(SS_BLOODRAGE)) return FX_NOT_APPLIED;
 	if (target->HasSpellState(SS_AEGIS)) return FX_NOT_APPLIED;
 
- 	if (!EffectQueue::match_ids( target, fx->Parameter1, fx->Parameter2) ) {
+ 	if (!EffectQueue::match_ids( target, fx->Parameter2, fx->Parameter1) ) {
 		//if the ids don't match, the effect doesn't stick
 		return FX_NOT_APPLIED;
 	}
@@ -3847,7 +3847,7 @@ int fx_hold_creature (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_apply_effect (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_apply_effect (%2d) %s", fx->Opcode, fx->Resource );
- 	if (EffectQueue::match_ids( target, fx->Parameter1, fx->Parameter2) ) {
+ 	if (EffectQueue::match_ids( target, fx->Parameter2, fx->Parameter1) ) {
 		//apply effect
 		core->ApplyEffect(fx->Resource, target, Owner, fx->Power);
 	}
@@ -4633,7 +4633,7 @@ int fx_puppet_marker (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_disintegrate (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_disintegrate (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
- 	if (EffectQueue::match_ids( target, fx->Parameter1, fx->Parameter2) ) {
+ 	if (EffectQueue::match_ids( target, fx->Parameter2, fx->Parameter1) ) {
 		//convert it to a death opcode or apply the new effect?
 		fx->Opcode = EffectQueue::ResolveEffect(fx_death_ref);
 		fx->TimingMode = FX_DURATION_INSTANT_PERMANENT;
@@ -5164,7 +5164,7 @@ int fx_scripting_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_apply_effect_curse (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_apply_effect_curse (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	if (EffectQueue::match_ids( target, fx->Parameter1, fx->Parameter2) ) {
+	if (EffectQueue::match_ids( target, fx->Parameter2, fx->Parameter1) ) {
 		//load effect and add it to the end of the effect queue?
 		core->ApplyEffect(fx->Resource, target, Owner, fx->Power);
 	}
