@@ -1731,7 +1731,7 @@ def MageSpellsSelect(SpellTable, Level, SpellLevel):
 		GemRB.SetButtonFlags (MageSpellsWindow, SpellButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_CHECKBOX, OP_OR)
 		if i < len(Learnable):
 			Spell = GemRB.GetSpell (Learnable[i])
-			GemRB.SetSpellIcon(MageSpellsWindow, SpellButton, Learnable[i])
+			GemRB.SetSpellIcon(MageSpellsWindow, SpellButton, Learnable[i], 1)
 			GemRB.SetButtonState (MageSpellsWindow, SpellButton, IE_GUI_BUTTON_ENABLED)
 			GemRB.SetEvent (MageSpellsWindow, SpellButton, IE_GUI_BUTTON_ON_PRESS, "MageSpellsSelectPress")
 			GemRB.SetVarAssoc (MageSpellsWindow, SpellButton, "SpellMask", 1 << i)
