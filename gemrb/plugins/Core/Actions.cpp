@@ -2174,7 +2174,7 @@ void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 	}
 
 	//if target was set, fire spell
-	if (!Sender->LastTarget) {
+	if (Sender->LastTarget) {
 		Sender->CastSpellEnd( spellres );
 		Sender->ReleaseCurrentAction();
 		return;
