@@ -10,7 +10,8 @@ The fields of the dictionary are the following:
 "SpellName"           - strref of unidentified name.
 "SpellDesc"           - strref of unidentified description.
 "SpellbookIcon"       - the spell's icon (.bam resref)
+"SpellSchool"         - the excluded schools and alignments
+"SpellDivine"         - this field tells divine magics apart
 
-
-See also: GetItem, SetSpellIcon
+See also: GetItem, SetSpellIcon, spell structure
 
