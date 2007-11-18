@@ -99,7 +99,7 @@ if [[ -n $AUTOMAKE ]];
 then
   my_automake=$AUTOMAKE
 else
-  for file in automake automake-1.7 automake-1.8 automake-1.9; do
+  for file in automake automake-1.7 automake-1.8 automake-1.9 automake-1.10 automake-1.11; do
     version=`$file --version | sed -n '1s/^[^ ]* (.*) //;s/ .*$//;1p'`
     if (( ${version//./} > 17 ));
     then
