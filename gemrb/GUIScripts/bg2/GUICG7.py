@@ -33,6 +33,7 @@ def OnLoad():
 	
 	AlignmentTable = GemRB.LoadTable("aligns")
 	ClassTable = GemRB.LoadTable("classes")
+	KitTable = GemRB.LoadTable("kitlist")
 	ClassRow = GemRB.GetVar("Class")-1
 	Class = GemRB.GetTableValue(ClassTable, ClassRow, 5)
 	TmpTable = GemRB.LoadTable("clskills")
@@ -44,7 +45,11 @@ def OnLoad():
 	GemRB.LoadWindowPack("GUICG", 640, 480)
 	MageSpellsWindow = GemRB.LoadWindow(7)
 	v = GemRB.GetVar("Alignment")
-	Learnable = GetLearnableMageSpells( GemRB.GetVar("Class Kit"), v, 1)
+	KitIndex = GemRB.GetVar("Class Kit")
+	print "KitIndex",KitIndex
+	KitValue = GemRB.GetTableValue(KitTable, KitIndex, 6)
+	print "KitValue",KitValue
+	Learnable = GetLearnableMageSpells( KitValue, v, 1)
 	GemRB.SetVar("MageSpellBook", 0)
 	GemRB.SetVar("SpellMask", 0)
 

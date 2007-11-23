@@ -53,21 +53,17 @@ def OnLoad():
 			Button = GemRB.GetControl(KitWindow, i+1)
 		else:
 			Button = GemRB.GetControl(KitWindow, i+5)
+
 		if KitTable == -1:
 			if ClassID == 1:
 				Kit=GemRB.GetVar("MAGESCHOOL")
 				KitName = GemRB.GetTableValue(SchoolList, i, 0)
+				Kit = GemRB.GetTableValue (SchoolList, Kit, 3)
 			else:
-				Kit = 0
 				KitName = GemRB.GetTableValue(ClassList, GemRB.GetVar("Class")-1, 0)
 
 		else:
 			Kit = GemRB.GetTableValue(KitTable,i,0)
-			#if ClassID == 1:
-			#	if Kit:
-			#		Kit = Kit - 21
-			#	KitName = GemRB.GetTableValue(SchoolList, Kit, 0)
-			#else:
 			if Kit:
 				KitName = GemRB.GetTableValue(KitList, Kit, 1)
 			else:
@@ -100,9 +96,6 @@ def KitPress():
 	if Kit == 0:
 		KitName = GemRB.GetTableValue(ClassList, GemRB.GetVar("Class")-1, 1)
 	else:
-		#if ClassID==1:
-		#	KitName = GemRB.GetTableValue(SchoolList, Kit, 1)
-		#else:
 		KitName = GemRB.GetTableValue(KitList, Kit, 3)
 	GemRB.SetText(KitWindow, TextAreaControl, KitName)
 	GemRB.SetButtonState(KitWindow, DoneButton, IE_GUI_BUTTON_ENABLED)

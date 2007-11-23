@@ -122,6 +122,7 @@ def NextPress():
 	MyChar = GemRB.GetVar ("Slot")
 	GemRB.CreatePlayer ("charbase", MyChar )
 	GemRB.SetPlayerStat (MyChar, IE_SEX, GemRB.GetVar ("Gender") )
+	KitTable = GemRB.LoadTable ("kitlist")
 	RaceTable = GemRB.LoadTable ("races")
 	Race = GemRB.GetVar ("Race")-1
 	GemRB.SetPlayerStat (MyChar, IE_RACE, GemRB.GetTableValue (RaceTable, Race, 3) )
@@ -130,7 +131,8 @@ def NextPress():
 	Class = GemRB.GetTableValue (ClassTable, ClassIndex, 5)
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 	KitIndex = GemRB.GetVar ("Class Kit")
-	GemRB.SetPlayerStat (MyChar, IE_KIT, KitIndex)
+	KitValue = GemRB.GetTableValue(KitTable, KitIndex, 6)
+	GemRB.SetPlayerStat (MyChar, IE_KIT, KitValue)
 	t = GemRB.GetVar ("Alignment")
 	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, t)
 
@@ -139,7 +141,7 @@ def NextPress():
 	TableName = GemRB.GetTableValue (TmpTable, Class, 1, 0)
 	if TableName != "*":
 		SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_WIZARD, 1)
-		Learnable = GetLearnableMageSpells( KitIndex, t, 1)
+		Learnable = GetLearnableMageSpells( KitValue, t, 1)
 		SpellBook = GemRB.GetVar ("MageSpellBook")
 		j=1
 		for i in range(len(Learnable) ):
