@@ -213,7 +213,7 @@ inline bool valid_number(const char* string, long& val)
 {
         char* endpr;
 
-        val = strtol( string, &endpr, 0 );
+        val = (long) strtoul( string, &endpr, 0 );
         return ( const char * ) endpr != string;
 }
 
