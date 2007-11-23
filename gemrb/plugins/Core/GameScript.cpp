@@ -841,6 +841,7 @@ static const ActionLink actionnames[] = {
 	{"swingonce", GameScript::SwingOnce, AF_ALIVE},
 	{"takeitemlist", GameScript::TakeItemList, 0},
 	{"takeitemlistparty", GameScript::TakeItemListParty, 0},
+	{"takeitemlistpartynum", GameScript::TakeItemListPartyNum, 0},
 	{"takeitemreplace", GameScript::TakeItemReplace, 0},
 	{"takepartygold", GameScript::TakePartyGold, 0},
 	{"takepartyitem", GameScript::TakePartyItem, 0},

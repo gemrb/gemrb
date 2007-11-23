@@ -3838,6 +3838,33 @@ void GameScript::TakeItemListParty(Scriptable * Sender, Action* parameters)
 	core->DelTable(table);
 }
 
+void GameScript::TakeItemListPartyNum(Scriptable * Sender, Action* parameters)
+{
+	int table = core->LoadTable(parameters->string0Parameter);
+	if (table<0) {
+		return;
+	}
+	Game *game = core->GetGame();
+	TableMgr *tab=core->GetTable( table );
+	if (tab) {
+		int rows = tab->GetRowCount();
+		for (int i=0;i<rows;i++) {
+		 	int count = parameters->int0Parameter;
+			int j = game->GetPartySize(false);
+			while (j--) {
+				Actor *tar = game->GetPC(j, false);
+				int res=MoveItemCore(tar, Sender, tab->QueryField(i,0), 0, IE_INV_ITEM_UNSTEALABLE);
+				if (res==MIC_GOTITEM) {
+					j++;
+					count--;
+				}
+				if (!count) break;
+			}
+		}
+	}
+	core->DelTable(table);
+}
+
 //bg2
 void GameScript::SetRestEncounterProbabilityDay(Scriptable* Sender, Action* parameters)
 {

@@ -1360,6 +1360,7 @@ public:
 	static void SwingOnce(Scriptable* Sender, Action* parameters);
 	static void TakeItemList(Scriptable* Sender, Action* parameters);
 	static void TakeItemListParty(Scriptable* Sender, Action* parameters);
+	static void TakeItemListPartyNum(Scriptable* Sender, Action* parameters);
 	static void TakeItemReplace(Scriptable* Sender, Action* parameters);
 	static void TakePartyGold(Scriptable* Sender, Action* parameters);
 	static void TakePartyItem(Scriptable* Sender, Action* parameters);
