@@ -425,6 +425,8 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 	}
 	snprintf( Path, _MAX_PATH, "%09d-%s", index, slotname );
 	save_slots.insert( save_slots.end(), strdup( Path ) );
+	snprintf( Path, _MAX_PATH, "%s%s", core->SavePath, PlayMode() );
+	mkdir(Path,S_IWRITE|S_IREAD|S_IEXEC);
 	snprintf( Path, _MAX_PATH, "%s%s%s%09d-%s", core->SavePath, PlayMode(), SPathDelimiter, index, slotname );
 	core->DelTree(Path, false); //this is required in case the old slot wasn't recognised but still there
 	mkdir(Path,S_IWRITE|S_IREAD|S_IEXEC);
