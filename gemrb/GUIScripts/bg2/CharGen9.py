@@ -60,7 +60,11 @@ def OnLoad():
 	GemRB.SetButtonState (CharGenWindow,BackButton,IE_GUI_BUTTON_ENABLED)
 
 	AcceptButton = GemRB.GetControl (CharGenWindow, 8)
-	GemRB.SetText (CharGenWindow, AcceptButton, 11962)
+	playmode = GemRB.GetVar ("PlayMode")
+	if playmode>=0:
+		GemRB.SetText (CharGenWindow, AcceptButton, 11962)
+	else:
+		GemRB.SetText (CharGenWindow, AcceptButton, 13956)
 	GemRB.SetButtonState (CharGenWindow,AcceptButton,IE_GUI_BUTTON_ENABLED)
 	GemRB.SetButtonFlags(CharGenWindow,AcceptButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
@@ -110,7 +114,10 @@ def OnLoad():
 
 	GemRB.SetEvent (CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	GemRB.SetEvent (CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
-	GemRB.SetEvent (CharGenWindow, AcceptButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
+	if playmode>=0:
+		GemRB.SetEvent (CharGenWindow, AcceptButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
+	else:
+		GemRB.SetEvent (CharGenWindow, AcceptButton, IE_GUI_BUTTON_ON_PRESS, "ExportPress")
 	GemRB.SetEvent (CharGenWindow, ImportButton, IE_GUI_BUTTON_ON_PRESS, "ImportPress")
 	GemRB.SetVisible (CharGenWindow,1)
 	return
@@ -126,20 +133,31 @@ def NextPress():
 	RaceTable = GemRB.LoadTable ("races")
 	Race = GemRB.GetVar ("Race")-1
 	GemRB.SetPlayerStat (MyChar, IE_RACE, GemRB.GetTableValue (RaceTable, Race, 3) )
+	t = GemRB.GetVar ("Alignment")
+	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, t)
+
+	#a little explanation for the different handling of mage kit values:
+	#Originally, the IE had only mage schools, and the kit field
+	#was simply an unusability field (with a single bit set)
+	#then BG2 crammed in a lot more kits, and 32 bits were not enough.
+	#They solved this by making the generalist value 0x4000 to hold
+	#the kit index in the lower portions.
+	#When you see 0x4000 in a kit value, you need to translate
+	#the kit index to unusability value, using the kitlist
+	#So, for mages, the kit equals to the unusability value
+	#but for others there is an additional mapping by kitlist.2da
+
 	ClassTable = GemRB.LoadTable ("classes")
 	ClassIndex = GemRB.GetVar ("Class")-1
 	Class = GemRB.GetTableValue (ClassTable, ClassIndex, 5)
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
 	KitIndex = GemRB.GetVar ("Class Kit")
-	KitValue = GemRB.GetTableValue(KitTable, KitIndex, 6)
-	GemRB.SetPlayerStat (MyChar, IE_KIT, KitValue)
-	t = GemRB.GetVar ("Alignment")
-	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, t)
-
 	TmpTable = GemRB.LoadTable ("clskills")
 	#mage spells
-	TableName = GemRB.GetTableValue (TmpTable, Class, 1, 0)
+	TableName = GemRB.GetTableValue (TmpTable, Class, 2, 0)
+
 	if TableName != "*":
+		KitValue = GemRB.GetTableValue(KitTable, KitIndex, 6)
 		SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_WIZARD, 1)
 		Learnable = GetLearnableMageSpells( KitValue, t, 1)
 		SpellBook = GemRB.GetVar ("MageSpellBook")
@@ -148,6 +166,11 @@ def NextPress():
 			if SpellBook & j:
 				GemRB.LearnSpell (MyChar, Learnable[i], 0)
 			j=j<<1
+	else:
+		KitValue = 0x4000 + KitIndex
+
+	print "KitValue**********:",KitValue
+	GemRB.SetPlayerStat (MyChar, IE_KIT, KitValue)
 
 	#priest spells
 	TableName = GemRB.GetTableValue (TmpTable, Class, 1, 0)
@@ -237,13 +260,15 @@ def NextPress():
 	SmallPortrait = GemRB.GetToken ("SmallPortrait")
 	GemRB.FillPlayerInfo (MyChar, LargePortrait, SmallPortrait)
 
-	#LETS PLAY!!
 	playmode = GemRB.GetVar ("PlayMode")
 	if playmode >=0:
+		#LETS PLAY!!
 		GemRB.EnterGame()
 	else:
 		#leaving multi player pregen
 		GemRB.UnloadWindow (CharGenWindow)
+		#FIXME:
+		#i think this should go to the party creation screen
 		GemRB.SetNextScript ("Start")
 	return
 
@@ -261,5 +286,11 @@ def ImportPress():
 	GemRB.UnloadWindow (CharGenWindow)
 	GemRB.SetToken ("NextScript","CharGen9")
 	GemRB.SetNextScript ("ImportFile") #import
+	return
+
+def ExportPress():
+	GemRB.UnloadWindow (CharGenWindow)
+	GemRB.SetToken ("Start2","CharGen9")  #when export done, go to start2
+	GemRB.SetNextScript ("ExportFile") #export
 	return
 

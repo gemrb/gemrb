@@ -120,9 +120,10 @@ def PregenPress():
 	GemRB.UnloadWindow(QuitWindow)
 	GemRB.UnloadWindow(TutorialWindow)
 	#do not start game after chargen
-	GemRB.SetVar("PlayMode",-1) #will return to pregen screen
+	GemRB.SetVar("PlayMode",-1) #will allow export
 	GemRB.SetVar("Slot",0)
-	GemRB.SetNextScript("CharGen") #should be pregen screen
+	GemRB.LoadGame(-1)
+	GemRB.SetNextScript("CharGen")
 	return
 
 def LoadSingle():

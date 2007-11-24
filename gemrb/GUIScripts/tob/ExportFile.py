@@ -9,10 +9,10 @@ def OnLoad():
 	global ImportWindow, TextAreaControl
 
 	GemRB.LoadWindowPack("GUICG",640,480)
-	ImportWindow = GemRB.LoadWindow(20)
+	ImportWindow = GemRB.LoadWindow(21)
 
 	TextAreaControl = GemRB.GetControl(ImportWindow, 4)
-	GemRB.SetText(ImportWindow, TextAreaControl, 10963)
+	GemRB.SetText(ImportWindow, TextAreaControl, 10962)
 
 	TextAreaControl = GemRB.GetControl(ImportWindow,2)
 	GemRB.SetTextAreaFlags (ImportWindow, TextAreaControl, IE_GUI_TEXTAREA_SELECTABLE)
@@ -39,9 +39,9 @@ def SelectPress():
 def DonePress():
 	FileName = GemRB.QueryText(ImportWindow, TextAreaControl)
 	Slot = GemRB.GetVar("Slot")
-	GemRB.CreatePlayer(FileName, Slot| 0x8000, 1)
+	GemRB.ExportPlayer(FileName, Slot| 0x8000, 1)
 	GemRB.UnloadWindow(ImportWindow)
-	GemRB.SetNextScript("CharGen7")
+	GemRB.SetNextScript(GemRB.GetToken("NextScript"))
 	return
 	
 def CancelPress():

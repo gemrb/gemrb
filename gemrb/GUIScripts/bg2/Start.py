@@ -83,7 +83,7 @@ def OnLoad():
 	GemRB.SetVisible(QuitWindow, 0)
 	GemRB.SetVisible(TutorialWindow, 0)
 	GemRB.SetVisible(StartWindow, 1)
-	GemRB.LoadMusicPL("Theme.mus")
+	GemRB.LoadMusicPL("Theme.mus",1)
 	return
 	
 def SinglePlayerPress():
@@ -127,6 +127,7 @@ def PregenPress():
 	#do not start game after chargen
 	GemRB.SetVar("PlayMode",-1) #will return to pregen screen
 	GemRB.SetVar("Slot",0)
+	GemRB.LoadGame(-1)
 	GemRB.SetNextScript("CharGen") #should be pregen screen
 	return
 
