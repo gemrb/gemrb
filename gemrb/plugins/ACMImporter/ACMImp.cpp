@@ -407,10 +407,10 @@ ALuint ACMImp::LoadSound(const char *ResRef, int *time_length)
 	int riff_chans = acm->get_channels();
 	int samplerate = acm->get_samplerate();
 	//multiply always by 2 because it is in 16 bits
-	int rawsize = cnt * riff_chans * 2;
+	int rawsize = cnt * 2;
 	unsigned char * memory = (unsigned char*) malloc(rawsize);
 	//multiply always with 2 because it is in 16 bits
-	int cnt1 = acm->read_samples( ( short* ) memory, cnt ) * riff_chans * 2;
+	int cnt1 = acm->read_samples( ( short* ) memory, cnt ) * 2;
 	//Sound Length in milliseconds
 	if (time_length) *time_length = ((cnt / riff_chans) * 1000) / samplerate;
 	//it is always reading the stuff into 16 bits
