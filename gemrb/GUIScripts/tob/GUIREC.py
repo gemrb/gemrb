@@ -127,7 +127,7 @@ def GetNextLevelExp (Level, Class):
 	if Level < GemRB.GetTableColumnCount (NextLevelTable, Row):
 		return str(GemRB.GetTableValue (NextLevelTable, Row, Level) )
 
-	return 0;
+	return 0
 
 def UpdateRecordsWindow ():
 	global stats_overview, alignment_help

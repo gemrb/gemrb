@@ -25,6 +25,8 @@ from GUICommon import GetLearnableMageSpells, GetLearnablePriestSpells
 MageSpellsWindow = 0
 MageSpellsTextArea = 0
 DoneButton = 0
+SpellMask = 0
+Random = 1
 Learnable = []
 
 def OnLoad():
@@ -46,11 +48,14 @@ def OnLoad():
 	MageSpellsWindow = GemRB.LoadWindow(7)
 	v = GemRB.GetVar("Alignment")
 	KitIndex = GemRB.GetVar("Class Kit")
-	print "KitIndex",KitIndex
-	KitValue = GemRB.GetTableValue(KitTable, KitIndex, 6)
-	print "KitValue",KitValue
+	if KitIndex:
+		KitValue = GemRB.GetTableValue(KitTable, KitIndex, 6)
+	else:
+		KitValue = 0x4000
+
 	Learnable = GetLearnableMageSpells( KitValue, v, 1)
 	GemRB.SetVar("MageSpellBook", 0)
+	SpellMask = 0
 	GemRB.SetVar("SpellMask", 0)
 
 	MageSpellsSelectPointsLeft = 2
@@ -96,7 +101,6 @@ def OnLoad():
 	return
 
 def MageSpellsSelectPress():
-	global MageSpellsWindow, MageSpellsTextArea, DoneButton
 	global MageSpellsSelectPointsLeft, Learnable
 
 	MageSpellBook = GemRB.GetVar("MageSpellBook")
@@ -112,23 +116,33 @@ def MageSpellsSelectPress():
 	GemRB.SetText(MageSpellsWindow, MageSpellsTextArea, Spell["SpellDesc"])
 	if SpellMask < MageSpellBook:
 		MageSpellsSelectPointsLeft = MageSpellsSelectPointsLeft + 1
-		for i in range (len(Learnable)):
-			SpellButton = GemRB.GetControl(MageSpellsWindow, i + 2)
-			if (((1 << i) & SpellMask) == 0):
-				GemRB.SetButtonState(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_ENABLED)
 		GemRB.SetButtonState(MageSpellsWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
 	else:
+		if MageSpellsSelectPointsLeft == 0:
+			GemRB.SetVar("SpellMask", MageSpellBook)
+			MarkButton(i)
+			return
+
 		MageSpellsSelectPointsLeft = MageSpellsSelectPointsLeft - 1
 		if MageSpellsSelectPointsLeft == 0:
-			for i in range (len(Learnable)):
-				SpellButton = GemRB.GetControl(MageSpellsWindow, i + 2)
-				if ((1 << i) & SpellMask) == 0:
-					GemRB.SetButtonState(MageSpellsWindow, SpellButton, IE_GUI_BUTTON_DISABLED)
 			GemRB.SetButtonState(MageSpellsWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
+
+	for i in range (len(Learnable)):
+		SpellButton = GemRB.GetControl(MageSpellsWindow, i + 2)
+		if (((1 << i) & SpellMask) == 0):
+			MarkButton(i)
 
 	PointsLeftLabel = GemRB.GetControl(MageSpellsWindow, 0x1000001b)
 	GemRB.SetText(MageSpellsWindow, PointsLeftLabel, str(MageSpellsSelectPointsLeft))
 	GemRB.SetVar("MageSpellBook", SpellMask)
+	return
+
+def MarkButton(i):
+	print "IIII:::",i
+	type = IE_GUI_BUTTON_ENABLED
+	#if the spell is specialist spell then type = IE_GUI_BUTTON_THIRD
+	SpellButton = GemRB.GetControl(MageSpellsWindow, i + 2)
+	GemRB.SetButtonState(MageSpellsWindow, SpellButton, type)
 	return
 
 def MageSpellsCancelPress():
@@ -142,20 +156,33 @@ def MageSpellsDonePress():
 	return
 
 def MageSpellsPickPress():
-	global MageSpellsSelectPointsLeft, Learnable
+	global MageSpellsSelectPointsLeft, Learnable, SpellMask
 
 	SpellMask = 0
 	Range = len(Learnable)
 	if MageSpellsSelectPointsLeft > Range:
 		MageSpellsSelectPointsLeft = Range
 	if MageSpellsSelectPointsLeft:
-		#make this less ugly without ruining Learnable
 		for i in range(MageSpellsSelectPointsLeft):
-			j = GemRB.Roll(1,Range,-1)
-			if SpellMask & (1<<j):
-				continue
+			if Random:
+				j = RandomPick(Range)
+			else:
+				j = AutoPick(Range)
 			SpellMask = SpellMask | (1<<j)
 		GemRB.SetVar("MageSpellBook", SpellMask)
 	MageSpellsDonePress()
 	return
+
+def RandomPick (Range):
+	global SpellMask
+
+	j = GemRB.Roll(1,Range,-1)
+	while SpellMask & (1<<j):
+		j = j - 1
+		if j<0:
+			j=Range-1
+	return j
+
+def AutoPick (Range):
+	return j
 

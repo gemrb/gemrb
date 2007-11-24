@@ -76,10 +76,11 @@ def OnLoad():
 
 		if KitTable == -1:
 			if ClassID == 1:
-				Kit=GemRB.GetVar("MAGESCHOOL")
+				Kit = GemRB.GetVar("MAGESCHOOL")
 				KitName = GemRB.GetTableValue(SchoolList, i, 0)
 				Kit = GemRB.GetTableValue (SchoolList, Kit, 3)
 			else:
+				Kit = 0
 				KitName = GemRB.GetTableValue(ClassList, GemRB.GetVar("Class")-1, 0)
 
 		else:

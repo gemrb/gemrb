@@ -8,43 +8,43 @@ TextAreaControl = 0
 def OnLoad():
 	global ImportWindow, TextAreaControl
 
-	GemRB.LoadWindowPack("GUICG",640,480)
-	ImportWindow = GemRB.LoadWindow(21)
+	GemRB.LoadWindowPack ("GUICG",640,480)
+	ImportWindow = GemRB.LoadWindow (21)
 
-	TextAreaControl = GemRB.GetControl(ImportWindow, 4)
-	GemRB.SetText(ImportWindow, TextAreaControl, 10962)
+	TextAreaControl = GemRB.GetControl (ImportWindow, 4)
+	GemRB.SetText (ImportWindow, TextAreaControl, 10962)
 
-	TextAreaControl = GemRB.GetControl(ImportWindow,2)
+	TextAreaControl = GemRB.GetControl (ImportWindow,2)
 	GemRB.SetTextAreaFlags (ImportWindow, TextAreaControl, IE_GUI_TEXTAREA_SELECTABLE)
-	GemRB.GetCharacters(ImportWindow, TextAreaControl)
+	GemRB.GetCharacters (ImportWindow, TextAreaControl)
  
-	DoneButton = GemRB.GetControl(ImportWindow, 0)
-	GemRB.SetText(ImportWindow, DoneButton, 2610)
-	GemRB.SetButtonState(ImportWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
+	DoneButton = GemRB.GetControl (ImportWindow, 0)
+	GemRB.SetText (ImportWindow, DoneButton, 2610)
+	GemRB.SetButtonState (ImportWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
 
-	CancelButton = GemRB.GetControl(ImportWindow,1)
-	GemRB.SetText(ImportWindow, CancelButton, 15416)
+	CancelButton = GemRB.GetControl (ImportWindow,1)
+	GemRB.SetText (ImportWindow, CancelButton, 15416)
 
-	GemRB.SetEvent(ImportWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS, "DonePress")
-	GemRB.SetEvent(ImportWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-	GemRB.SetEvent(ImportWindow, TextAreaControl, IE_GUI_TEXTAREA_ON_CHANGE, "SelectPress")
-	GemRB.SetVisible(ImportWindow,1)
+	GemRB.SetEvent (ImportWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS, "DonePress")
+	GemRB.SetEvent (ImportWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	GemRB.SetEvent (ImportWindow, TextAreaControl, IE_GUI_TEXTAREA_ON_CHANGE, "SelectPress")
+	GemRB.SetVisible (ImportWindow,1)
 	return
 
-def SelectPress():
-	DoneButton = GemRB.GetControl(ImportWindow, 0)
-	GemRB.SetButtonState(ImportWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
+def SelectPress ():
+	DoneButton = GemRB.GetControl (ImportWindow, 0)
+	GemRB.SetButtonState (ImportWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
 	return
 
-def DonePress():
-	FileName = GemRB.QueryText(ImportWindow, TextAreaControl)
-	Slot = GemRB.GetVar("Slot")
-	GemRB.ExportPlayer(FileName, Slot| 0x8000, 1)
-	GemRB.UnloadWindow(ImportWindow)
-	GemRB.SetNextScript(GemRB.GetToken("NextScript"))
+def DonePress ():
+	FileName = GemRB.QueryText (ImportWindow, TextAreaControl)
+	Slot = GemRB.GetVar ("Slot")
+	GemRB.SaveCharacter (Slot, FileName)
+	GemRB.UnloadWindow (ImportWindow)
+	GemRB.SetNextScript (GemRB.GetToken("NextScript"))
 	return
 	
-def CancelPress():
-	GemRB.UnloadWindow(ImportWindow)
-	GemRB.SetNextScript(GemRB.GetToken("NextScript"))
+def CancelPress ():
+	GemRB.UnloadWindow (ImportWindow)
+	GemRB.SetNextScript (GemRB.GetToken("NextScript"))
 	return 

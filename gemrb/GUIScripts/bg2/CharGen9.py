@@ -114,10 +114,7 @@ def OnLoad():
 
 	GemRB.SetEvent (CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	GemRB.SetEvent (CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
-	if playmode>=0:
-		GemRB.SetEvent (CharGenWindow, AcceptButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
-	else:
-		GemRB.SetEvent (CharGenWindow, AcceptButton, IE_GUI_BUTTON_ON_PRESS, "ExportPress")
+	GemRB.SetEvent (CharGenWindow, AcceptButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
 	GemRB.SetEvent (CharGenWindow, ImportButton, IE_GUI_BUTTON_ON_PRESS, "ImportPress")
 	GemRB.SetVisible (CharGenWindow,1)
 	return
@@ -267,9 +264,9 @@ def NextPress():
 	else:
 		#leaving multi player pregen
 		GemRB.UnloadWindow (CharGenWindow)
-		#FIXME:
-		#i think this should go to the party creation screen
-		GemRB.SetNextScript ("Start")
+		#when export is done, go to start
+		GemRB.SetToken ("NextScript","Start")
+		GemRB.SetNextScript ("ExportFile") #export
 	return
 
 def CancelPress():
@@ -287,10 +284,3 @@ def ImportPress():
 	GemRB.SetToken ("NextScript","CharGen9")
 	GemRB.SetNextScript ("ImportFile") #import
 	return
-
-def ExportPress():
-	GemRB.UnloadWindow (CharGenWindow)
-	GemRB.SetToken ("Start2","CharGen9")  #when export done, go to start2
-	GemRB.SetNextScript ("ExportFile") #export
-	return
-
