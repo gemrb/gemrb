@@ -28,10 +28,11 @@ DoneButton = 0
 SpellMask = 0
 Random = 1
 Learnable = []
+KitValue = 0
 
 def OnLoad():
 	global MageSpellsWindow, MageSpellsTextArea, DoneButton
-	global MageSpellsSelectPointsLeft, Learnable
+	global MageSpellsSelectPointsLeft, Learnable, KitValue
 	
 	AlignmentTable = GemRB.LoadTable("aligns")
 	ClassTable = GemRB.LoadTable("classes")
@@ -138,7 +139,9 @@ def MageSpellsSelectPress():
 	return
 
 def MarkButton(i):
-	print "IIII:::",i
+	Spell = GemRB.GetSpell(Learnable[i])
+	print "IIII:::",Spell
+	print "MySchool", KitValue
 	type = IE_GUI_BUTTON_ENABLED
 	#if the spell is specialist spell then type = IE_GUI_BUTTON_THIRD
 	SpellButton = GemRB.GetControl(MageSpellsWindow, i + 2)

@@ -29,8 +29,6 @@ def OnLoad():
 		GemRB.SetMasterScript("BALDUR","WORLDMAP")
 		GemRB.SetVar("oldgame",1)
 		GemRB.SetNextScript("Start2")
-		if not skip_videos:
-			GemRB.PlayMovie ("INTRO15F")
 		return
 
 	GemRB.LoadWindowPack("START", 640, 480)

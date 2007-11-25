@@ -54,7 +54,7 @@ def GetLearnableMageSpells (Kit, Alignment, Level):
 		ms = GemRB.GetSpell(SpellName)
 		if ms == None:
 			continue
-		if Usability & ms['SpellSchool']:
+		if Usability & ms['SpellExclusion']:
 			continue
 		Learnable.append (SpellName)
 	return Learnable
@@ -74,7 +74,7 @@ def GetLearnablePriestSpells (Class, Alignment, Level):
 			continue
 		if Class & ms['SpellDivine']:
 			continue
-		if Usability & ms['SpellSchool']:
+		if Usability & ms['SpellExclusion']:
 			continue
 		Learnable.append (SpellName)
 	return Learnable
