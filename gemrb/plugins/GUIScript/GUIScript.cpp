@@ -2452,11 +2452,14 @@ static PyObject* GemRB_GameSetExpansion(PyObject * /*self*/, PyObject* args)
 	}
 
 	Game *game = core->GetGame();
-	if (!game) {
-		return RuntimeError( "No game loaded!" );
+	if (game) {
+		game->SetExpansion( Flags );
 	}
 
-	game->SetExpansion( Flags );
+	SaveGameIterator *sg = core->GetSaveGameIterator();
+	if (sg) {
+		sg->Invalidate();
+	}
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -5867,7 +5870,7 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "SpellName", PyInt_FromLong (spell->SpellName));
 	PyDict_SetItemString(dict, "SpellDesc", PyInt_FromLong (spell->SpellDesc));
 	PyDict_SetItemString(dict, "SpellbookIcon", PyString_FromResRef (spell->SpellbookIcon));
-	PyDict_SetItemString(dict, "SpellSchool", PyInt_FromLong (spell->ExclusionSchool)); //this will list school exclusions and alignment
+	PyDict_SetItemString(dict, "SpellExclusion", PyInt_FromLong (spell->ExclusionSchool)); //this will list school exclusions and alignment
 	PyDict_SetItemString(dict, "SpellDivine", PyInt_FromLong (spell->PriestType)); //this will tell apart a priest spell from a druid spell
 	core->FreeSpell( spell, ResRef, false );
 	return dict;
@@ -7809,17 +7812,16 @@ PyDoc_STRVAR( GemRB_SetTooltipDelay__doc,
 
 static PyObject* GemRB_SetTooltipDelay(PyObject * /*self*/, PyObject* args)
 {
-        int tooltipDelay;
+	int tooltipDelay;
 
-        if (!PyArg_ParseTuple( args, "i", &tooltipDelay)) {
-                return AttributeError( GemRB_SetTooltipDelay__doc );
-        }
+	if (!PyArg_ParseTuple( args, "i", &tooltipDelay)) {
+		return AttributeError( GemRB_SetTooltipDelay__doc );
+	}
 	
-	printf("%d\n", tooltipDelay);
-        core->TooltipDelay = tooltipDelay;
+	core->TooltipDelay = tooltipDelay;
 
-        Py_INCREF( Py_None );
-        return Py_None;
+	Py_INCREF( Py_None );
+	return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_SetFullScreen__doc,

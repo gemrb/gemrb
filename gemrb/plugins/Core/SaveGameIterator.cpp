@@ -126,6 +126,11 @@ SaveGameIterator::~SaveGameIterator(void)
 	}
 }
 
+void SaveGameIterator::Invalidate()
+{
+	loaded = false;
+}
+
 static const char* PlayMode()
 {
 	ieDword playmode = 1;

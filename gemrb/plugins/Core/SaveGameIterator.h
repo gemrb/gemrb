@@ -94,6 +94,7 @@ private:
 public:
 	SaveGameIterator(void);
 	~SaveGameIterator(void);
+	void Invalidate();
 	bool RescanSaveGames();
 	int GetSaveGameCount();
 	SaveGame* GetSaveGame(int index);
