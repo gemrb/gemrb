@@ -3161,8 +3161,9 @@ void GameScript::AddJournalEntry(Scriptable* /*Sender*/, Action* parameters)
 
 void GameScript::SetQuestDone(Scriptable* /*Sender*/, Action* parameters)
 {
-	core->GetGame()->DeleteJournalEntry(parameters->int0Parameter);
-	core->GetGame()->AddJournalEntry(parameters->int0Parameter, IE_GAM_QUEST_DONE, parameters->int2Parameter);
+	Game *game = core->GetGame();
+	game->DeleteJournalEntry(parameters->int0Parameter);
+	game->AddJournalEntry(parameters->int0Parameter, IE_GAM_QUEST_DONE, parameters->int2Parameter);
 
 }
 

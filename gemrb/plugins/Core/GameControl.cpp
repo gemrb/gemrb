@@ -1950,6 +1950,9 @@ void GameControl::EndDialog(bool try_to_break)
 	DialogueFlags = 0;
 }
 
+//translate section values (journal, solved, unsolved, user)
+static const int sectionMap[4]={4,1,2,0};
+
 void GameControl::DialogChoose(unsigned int choose)
 {
 	char Tmp[256];
@@ -2023,7 +2026,7 @@ void GameControl::DialogChoose(unsigned int choose)
 			if (tr->Flags&IE_DLG_SOLVED) {
 				Section |= 2;
 			}
-			if (core->GetGame()->AddJournalEntry(tr->journalStrRef, Section, tr->Flags>>16) ) {
+			if (core->GetGame()->AddJournalEntry(tr->journalStrRef, sectionMap[Section], tr->Flags>>16) ) {
 				core->DisplayConstantString(STR_JOURNALCHANGE,0xffff00);
 				char *string = core->GetString( tr->journalStrRef );
 				//cutting off the strings at the first crlf

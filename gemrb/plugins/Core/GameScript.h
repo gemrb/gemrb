@@ -327,7 +327,8 @@ public:
 		int i;
 
 		GSASSERT( canary == (unsigned long) 0xdeadbeef, canary );
-		printf("String1: %s, String2: %s\n", string0Parameter?string0Parameter:"<NULL>", string1Parameter?string1Parameter:"<NULL>");
+		printf("Int0: %d, Int1: %d, Int2: %d\n",int0Parameter, int1Parameter, int2Parameter);
+		printf("String0: %s, String1: %s\n", string0Parameter?string0Parameter:"<NULL>", string1Parameter?string1Parameter:"<NULL>");
 		for (i=0;i<3;i++) {
 			if (objects[i]) {
 				printf( "%d. ",i+1);
