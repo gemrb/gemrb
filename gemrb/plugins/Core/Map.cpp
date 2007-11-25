@@ -2237,6 +2237,7 @@ int Map::WhichEdge(Point &s)
 void Map::SetupAmbients()
 {
 	AmbientMgr *ambim = core->GetSoundMgr()->GetAmbientMgr();
+	if (!ambim) return;
 	ambim->reset();
 	ambim->setAmbients( ambients );
 }
