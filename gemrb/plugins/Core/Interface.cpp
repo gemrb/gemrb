@@ -318,7 +318,8 @@ Interface::~Interface(void)
 	}
 	// stop any ambients which are still enqueued
 	if (soundmgr) {
-		soundmgr->GetAmbientMgr()->deactivate();
+		AmbientMgr *ambim = soundmgr->GetAmbientMgr();
+		if (ambim) ambim->deactivate();
 	}
 	//destroy the highest objects in the hierarchy first!
 	if (game) {
@@ -3456,7 +3457,8 @@ int Interface::PlayMovie(const char* ResRef)
 	//shutting down music and ambients before movie
 	if (music)
 		music->HardEnd();
-	soundmgr->GetAmbientMgr()->deactivate();
+	AmbientMgr *ambim = soundmgr->GetAmbientMgr();
+	if (ambim) ambim->deactivate();
 	video->SetMovieFont(SubtitleFont, palette );
 	mp->CallBackAtFrames(cnt, frames, strrefs);
 	mp->Play();
@@ -3469,7 +3471,7 @@ int Interface::PlayMovie(const char* ResRef)
 	//restarting music
 	if (music)
 		music->Start();
-	soundmgr->GetAmbientMgr()->activate();
+	if (ambim) ambim->activate();
 	//this will fix redraw all windows as they looked like
 	//before the movie
 	RedrawAll();
@@ -3701,7 +3703,8 @@ void Interface::QuitGame(int BackToMain)
 	}
 	// stop any ambients which are still enqueued
 	if (soundmgr) {
-		soundmgr->GetAmbientMgr()->deactivate();
+		AmbientMgr *ambim = soundmgr->GetAmbientMgr();
+		if (ambim) ambim->deactivate();
 	}
 	//delete game, worldmap
 	if (game) {
