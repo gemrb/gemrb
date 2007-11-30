@@ -103,6 +103,28 @@ static void GemRBalutExit()
 }
 //
 
+static int CountAvailableSources(int limit)
+{
+	ALuint* src = new ALuint[limit+2];
+	int i;
+	for (i = 0; i < limit+2; ++i) {
+		alGenSources(1, &src[i]);
+		if (alGetError() != AL_NO_ERROR) {
+			--i;
+			break;
+		}
+	}
+	alDeleteSources(i+1, src);
+	delete[] src;
+
+	// Leave two sources free for internal OpenAL usage
+	i -= 2;
+
+	// Return number of succesfully allocated sources
+	return (i+1);	
+}
+
+
 static int isWAVC(DataStream* stream)
 {
 	if (!stream) {
@@ -161,7 +183,7 @@ void ACMImp::clearstreams()
 				alDeleteBuffers( 1, &MusicBuffers[i] );
 		}
 	}
-	for (int i = 0; i < MAX_STREAMS; i++) {
+	for (int i = 0; i < num_streams; i++) {
 		if(!streams[i].free) {
 			if (alIsSource(streams[i].Source)) {
 				alSourceStop( streams[i].Source );
@@ -279,6 +301,15 @@ ACMImp::ACMImp(void)
 	for (i = 0; i < MAX_STREAMS; i++) {
 		streams[i].free = true;
 	}
+
+	// MAX_STREAMS + 1 for music + 1 for speech
+	int sources = CountAvailableSources(MAX_STREAMS+2);
+	num_streams = sources - 2;
+
+	if (num_streams < MAX_STREAMS) {
+		printMessage( "ACMImp","Allocated fewer streams than desired. ", YELLOW );
+	} 
+
 	speech.free = true;
 	MusicReader = NULL;
 	musicPlaying = false;
@@ -434,8 +465,6 @@ ALuint ACMImp::LoadSound(const char *ResRef, int *time_length)
  */
 unsigned int ACMImp::Play(const char* ResRef, int XPos, int YPos, unsigned int flags)
 {
-	unsigned int i;
-
 	int time_length;
 	ALuint Buffer = LoadSound(ResRef, &time_length);
 	if (0 == Buffer) {
@@ -507,7 +536,8 @@ unsigned int ACMImp::Play(const char* ResRef, int XPos, int YPos, unsigned int f
 		return 0;
 	}
 
-	for (i = 0; i < MAX_STREAMS; i++) {
+	int i;
+	for (i = 0; i < num_streams; i++) {
 		if (!streams[i].free && alIsSource(streams[i].Source)) {
 			alGetSourcei( streams[i].Source, AL_SOURCE_STATE, &state );
 			if (state == AL_STOPPED) {

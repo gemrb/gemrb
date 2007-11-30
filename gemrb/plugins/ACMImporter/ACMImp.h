@@ -60,11 +60,14 @@ public:
 	void UpdateViewportPos(int XPos, int YPos);
 	void UpdateVolume( unsigned int which = GEM_SND_VOL_MUSIC | GEM_SND_VOL_AMBIENTS );
 	static ALuint LoadSound(const char *sound, int *time_length = NULL);
-public:
+	
 	void release(void)
 	{
 		delete this;
 	}
+
+private:
+	int num_streams;
 };
 
 #endif
