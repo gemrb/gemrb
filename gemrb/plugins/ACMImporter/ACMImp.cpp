@@ -53,6 +53,7 @@
 
 // TODO: limit the number of ambient streams
 // TODO: is loading resources as done in LoadSound thread-safe?
+// TODO: rename ACMImp to OpenALSound, SoundReader to ACMImp?
 
 struct AudioStream {
 	ALuint Buffer;

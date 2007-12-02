@@ -30,6 +30,8 @@
 
 #include "SDL.h"
 
+// TODO: remove last dependencies on OpenAL, and then rename and move it?
+
 // legal nop if already reset
 void AmbientMgrAL::reset()
 {
