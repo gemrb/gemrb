@@ -107,6 +107,7 @@ bool LRUCache::Remove(const char* key)
 	VarEntry* e = (VarEntry*) p;
 	v.Remove(key);
 	removeFromList(e);
+	delete[] e->key;
 	delete e;
 	return true;
 }
