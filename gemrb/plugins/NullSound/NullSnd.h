@@ -37,6 +37,13 @@ public:
 	bool IsSpeaking();
 	void ResetMusics();
 	void UpdateViewportPos(int XPos, int YPos);
+
+	int SetupAmbientStream(ieWord x, ieWord y, ieWord z, ieWord gain, bool point);
+	int QueueAmbient(int stream, const char* sound);
+	bool ReleaseAmbientStream(int stream, bool hardstop);
+	void SetAmbientStreamVolume(int stream, int gain);
+
+
 public:
 	void release(void)
 	{

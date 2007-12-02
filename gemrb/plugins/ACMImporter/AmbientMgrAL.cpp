@@ -152,77 +152,51 @@ unsigned int AmbientMgrAL::tick(unsigned int ticks)
 	return delay;
 }
 
-AmbientMgrAL::AmbientSource::AmbientSource(Ambient *a)
-: ambient(a), lastticks(0), enqueued(0)
+AmbientMgrAL::AmbientSource::AmbientSource(const Ambient *a)
+: stream(-1), ambient(a), lastticks(0), enqueued(0), loaded(false)
 {
-	alGenSources( 1, &source );
-	
-	ALfloat position[] = { (float) a->getOrigin().x, (float) a->getOrigin().y, (float) a->getHeight() };
-	alSourcefv( source, AL_POSITION, position );
-	alSourcef( source, AL_GAIN, 0.01f * a->getGain() );
-	alSourcei( source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
-	alSourcei( source, AL_ROLLOFF_FACTOR, (a->getFlags() & IE_AMBI_POINT) ? 1 : 0 );
-	
-/*	ALint state, queued, processed;
-	alGetSourcei( source, AL_SOURCE_STATE, &state );
-	alGetSourcei( source, AL_BUFFERS_QUEUED, &queued );
-	alGetSourcei( source, AL_BUFFERS_PROCESSED, &processed );
-	printf("ambient %s: source %x, state %x, queued %d, processed %d\n", ambient->getName().c_str(), source, state, queued, processed);
-	if (!alIsSource( source )) printf("hey, it's not a source!\n");*/
-	
-	// preload sounds
-	unsigned int i=a->sounds.size();
-	buffers.reserve(i);
-	buflens.reserve(i);
+	// TODO: wait random amount of time before beginning?
+}
+
+void AmbientMgrAL::AmbientSource::ensureLoaded()
+{
+	// TODO: implement this after caching in ACMImp is done
+	if (loaded) return;
+
+	unsigned int i=ambient->sounds.size();
+	soundrefs.reserve(i);
 	while(i--) {
-		int timelen;
-		ALuint buffer = ACMImp::LoadSound(a->sounds[i], &timelen);
-		if (!buffer) {
-			printf("Invalid SoundResRef: %.8s, Dequeueing...\n",a->sounds[i]);
-			free(a->sounds[i]);
-			a->sounds.erase(a->sounds.begin() + i);
-		} else {
-			buffers.push_back(buffer);
-			buflens.push_back(timelen);
-		}		
+		// TODO: cache this sound
+		// (and skip it if it turns out to be invalid)
+		soundrefs.push_back(ambient->sounds[i]);
 	}
-/*	
-	// use OpenAL to loop in this special case so we don't have to
-	if ((buffers.size() == 1) && (a->getInterval() == 0)) {
-		alSourcei( source, AL_LOOPING, 1 );
-		alSourcei( source, AL_BUFFER, buffers[0] );
-	}*/
+
+	loaded = true;
 }
 
 AmbientMgrAL::AmbientSource::~AmbientSource()
 {
-	alSourceStop( source );	// legal nop if not playing
-//	printf("deleting source %x\n", source);
-	alDeleteSources( 1, &source );
-	for (std::vector<ALuint>::iterator it = buffers.begin(); it != buffers.end(); ++it) {
-		alDeleteBuffers( 1, &(*it) );
+	if (stream >= 0) {
+		core->GetSoundMgr()->ReleaseAmbientStream(stream, true);
+		stream = -1;
 	}
 }
 
 unsigned int AmbientMgrAL::AmbientSource::tick(unsigned int ticks, Point listener, ieDword timeslice)
 {
-	ALint state;
-/*	ALint queued, processed;
-	alGetSourcei( source, AL_SOURCE_STATE, &state );
-	alGetSourcei( source, AL_BUFFERS_QUEUED, &queued );
-	alGetSourcei( source, AL_BUFFERS_PROCESSED, &processed );
-	printf("ambient %s: source %x, state %x, queued %d, processed %d\n", ambient->getName().c_str(), source, state, queued, processed);
-	if (!alIsSource( source )) printf("hey, it's not a source!\n");*/
-
 	/* if we are out of sounds do nothing */
 	if(!ambient->sounds.size()) {
 		return UINT_MAX;
 	}
+	if (loaded && soundrefs.empty()) return UINT_MAX;
 	
 	if ((! (ambient->getFlags() & IE_AMBI_ENABLED)) || (! ambient->getAppearance()&timeslice)) {
-		// don't really stop the source, since we don't want to stop playing abruptly in the middle of
-		// a sample (do we?), and it would end playing by itself in a while (Divide)
-		//this is correct (Avenger)
+		// disabled
+
+		if (stream >= 0) {
+			// release the stream without immediately stopping it
+			core->GetSoundMgr()->ReleaseAmbientStream(stream, false);
+		}
 		return UINT_MAX;
 	}
 	
@@ -240,11 +214,28 @@ unsigned int AmbientMgrAL::AmbientSource::tick(unsigned int ticks, Point listene
 		delay = 1000;
 	
 	if (! (ambient->getFlags() & IE_AMBI_MAIN) && !isHeard( listener )) { // we are out of range
+		if (delay > 500) {
+			// release stream if we're inactive for a while
+			core->GetSoundMgr()->ReleaseAmbientStream(stream);
+		}	
 		return delay;
 	}
+
+	ensureLoaded();
+	if (soundrefs.empty()) return UINT_MAX;
 	
-	dequeProcessed();
-	
+	if (stream < 0) {
+		// we need to allocate a stream
+		stream = core->GetSoundMgr()->SetupAmbientStream(ambient->getOrigin().x, ambient->getOrigin().y, ambient->getHeight(), ambient->getGain(), (ambient->getFlags() & IE_AMBI_POINT));
+
+		if (stream == -1) {
+			// no streams available...
+			// Try again later
+			return delay;
+		}
+	}
+
+
 	/* it seems that the following (commented out) is not the purpose of the perset field, as
 	it leads to ambients playing non-stop and queues overfilled */
 /*	int leftNum = ambient -> getPerset(); */
@@ -254,46 +245,27 @@ unsigned int AmbientMgrAL::AmbientSource::tick(unsigned int ticks, Point listene
 		leftNum = 0;
 		leftMS = 1000 - enqueued; // let's have at least 1 second worth queue
 	}
+
+
 	while (0 < leftNum || 0 < leftMS) {
 		int len = enqueue();
+		if (len < 0) break;
 		--leftNum;
 		leftMS -= len;
 		enqueued += len;
 	}
-	
-	// oh, and don't forget to push play
-	alGetSourcei( source, AL_SOURCE_STATE, &state );
-	if (AL_PLAYING != state) { // play on playing source would rewind it
-		alSourcePlay( source );
-	}
-	
+
 	return delay;
 }
 
-/* dequeues already processed buffers */
-void AmbientMgrAL::AmbientSource::dequeProcessed()
-{
-	ALint processed=0; //don't crash when algetsourcei doesn't return anything
-
-	alGetSourcei( source, AL_BUFFERS_PROCESSED, &processed );
-	if (0 == processed) return;
-	ALuint * b = (ALuint *) malloc ( processed * sizeof(ALuint) );
-	alSourceUnqueueBuffers( source, processed, b );
-	free(b);
-	// do not destroy buffers since we reuse them
-}
-
 /* enqueues a random sound and returns its length */
-unsigned int AmbientMgrAL::AmbientSource::enqueue()
+int AmbientMgrAL::AmbientSource::enqueue()
 {
-	int index = rand() % buffers.size();
-	/* yeah, yeah, I know what rand(3) says... but we don't need much randomness here and this is fast
-	 * (fast to write, also ;-)
-	 */
-	
-	alSourceQueueBuffers( source, 1, &(buffers[index]) );
-	
-	return buflens[index];
+	if (soundrefs.empty()) return -1;
+	if (stream < 0) return -1;
+	int index = rand() % soundrefs.size();
+	//printf("Playing ambient %p, %s, %d/%ld on stream %d\n", (void*)this, soundrefs[index], index, soundrefs.size(), stream);
+	return core->GetSoundMgr()->QueueAmbient(stream, soundrefs[index]);
 }
 
 bool AmbientMgrAL::AmbientSource::isHeard(const Point &listener) const
@@ -306,8 +278,10 @@ bool AmbientMgrAL::AmbientSource::isHeard(const Point &listener) const
 
 void AmbientMgrAL::AmbientSource::hardStop()
 {
-	alSourceStop( source );
-	dequeProcessed();
+	if (stream >= 0) {
+		core->GetSoundMgr()->ReleaseAmbientStream(stream, true);
+		stream = -1;
+	}
 }
 
 void AmbientMgrAL::UpdateVolume(unsigned short volume)
@@ -324,6 +298,11 @@ void AmbientMgrAL::UpdateVolume(unsigned short volume)
  */
 void AmbientMgrAL::AmbientSource::SetVolume(unsigned short volume)
 {
-	alSourcef( source, AL_GAIN, 0.0001f * ambient->getGain() * volume );
+	if (stream >= 0) {
+		int v = volume;
+		v *= ambient->getGain();
+		v /= 100;
+		core->GetSoundMgr()->SetAmbientStreamVolume(stream, v);
+	}
 }
 

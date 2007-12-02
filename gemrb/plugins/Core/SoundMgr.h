@@ -22,6 +22,7 @@
 #ifndef SOUNDMGR_H
 #define SOUNDMGR_H
 
+#include "../../includes/ie_types.h"
 #include "Plugin.h"
 #include "AmbientMgr.h"
 
@@ -48,16 +49,32 @@ public:
 	virtual ~SoundMgr(void);
 	virtual bool Init(void) = 0;
 	virtual unsigned int Play(const char* ResRef, int XPos = 0, int YPos = 0, unsigned int flags = GEM_SND_RELATIVE) = 0;
+
+	// cue music (from file). Don't start playing if stopped.
 	virtual unsigned int StreamFile(const char* filename) = 0;
+
+	// stop playing and delete MusicSource
 	virtual bool Stop() = 0;
+	// start cued music
 	virtual bool Play() = 0;
+
+	// able to actually play sounds?
 	virtual bool CanPlay() = 0;
+
+	// is speech playing?
 	virtual bool IsSpeaking() = 0;
 	virtual void ResetMusics() = 0;
+
+	// update position of listener
 	virtual void UpdateViewportPos(int XPos, int YPos) = 0;
 	// update volumes (possibly on-the-fly)
 	virtual void UpdateVolume( unsigned int = GEM_SND_VOL_MUSIC | GEM_SND_VOL_AMBIENTS ) {}
+
 	virtual AmbientMgr *GetAmbientMgr() { return ambim; }
+	virtual int SetupAmbientStream(ieWord x, ieWord y, ieWord z, ieWord gain, bool point) = 0; 
+	virtual int QueueAmbient(int stream, const char* sound) = 0;
+	virtual bool ReleaseAmbientStream(int stream, bool hardstop=false) = 0;
+	virtual void SetAmbientStreamVolume(int stream, int gain) = 0;
 protected:
 	AmbientMgr *ambim;
 };

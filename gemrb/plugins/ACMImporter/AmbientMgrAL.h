@@ -52,22 +52,22 @@ public:
 private:
 	class AmbientSource {
 	public:
-		//not const, we drop invalid resources here
-		AmbientSource(Ambient *a);
+		AmbientSource(const Ambient *a);
 		~AmbientSource();
 		unsigned int tick(unsigned int ticks, Point listener, ieDword timeslice);
 		void hardStop();
 		void SetVolume(unsigned short volume);
 	private:
-		ALuint source;
-		std::vector<ALuint> buffers;
-		std::vector<unsigned int> buflens;
-		const Ambient * ambient;
+		int stream;
+		std::vector<const char*> soundrefs;
+		const Ambient* ambient;
 		unsigned int lastticks;
 		int enqueued;
+		bool loaded;
+
+		void ensureLoaded();
 		bool isHeard(const Point &listener) const;
-		unsigned int enqueue();
-		void dequeProcessed();
+		int enqueue();
 	};
 	std::vector<AmbientSource *> ambientSources;
 	

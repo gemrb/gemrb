@@ -23,6 +23,7 @@
 #define ACMIMP_H
 
 #include "../Core/SoundMgr.h"
+#include "../Core/LRUCache.h"
 #include "../Core/FileStream.h"
 
 class AmbientMgrAL;
@@ -36,11 +37,6 @@ class AmbientMgrAL;
 #endif
 
 #include "readers.h"
-
-#define MAX_STREAMS  30
-
-// the distance at which sound is played at full volume
-#define REFERENCE_DISTANCE 50
 
 class ACMImp : public SoundMgr {
 private:
@@ -59,7 +55,11 @@ public:
 	void ResetMusics();
 	void UpdateViewportPos(int XPos, int YPos);
 	void UpdateVolume( unsigned int which = GEM_SND_VOL_MUSIC | GEM_SND_VOL_AMBIENTS );
-	static ALuint LoadSound(const char *sound, int *time_length = NULL);
+
+	int SetupAmbientStream(ieWord x, ieWord y, ieWord z, ieWord gain, bool point);
+	int QueueAmbient(int stream, const char* sound);
+	bool ReleaseAmbientStream(int stream, bool hardstop);
+	void SetAmbientStreamVolume(int stream, int gain);
 	
 	void release(void)
 	{
@@ -68,6 +68,14 @@ public:
 
 private:
 	int num_streams;
+
+	LRUCache buffercache;
+
+	// Delete LRU unused buffer from the buffer cache.
+	// Returns true if a buffer was deleted.
+	bool evictBuffer();
+
+	ALuint LoadSound(const char *sound, int *time_length = NULL);
 };
 
 #endif

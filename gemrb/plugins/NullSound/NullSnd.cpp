@@ -75,3 +75,24 @@ bool NullSnd::IsSpeaking()
 void NullSnd::UpdateViewportPos(int, int)
 {
 }
+
+int NullSnd::SetupAmbientStream(ieWord, ieWord, ieWord, ieWord, bool)
+{
+	return -1;
+}
+
+int NullSnd::QueueAmbient(int, const char*)
+{
+	return -1;
+}
+
+bool NullSnd::ReleaseAmbientStream(int, bool)
+{
+	return true;
+}
+
+void NullSnd::SetAmbientStreamVolume(int, int)
+{
+
+}
+

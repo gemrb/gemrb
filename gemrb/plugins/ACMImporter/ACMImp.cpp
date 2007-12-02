@@ -25,6 +25,7 @@
 #include "../Core/MusicMgr.h"
 #include "../Core/Variables.h"
 #include "ACMImp.h"
+#include "StackLock.h"
 
 #include "SDL.h"
 
@@ -43,13 +44,31 @@
 #define ACM_BUFFERSIZE 8192
 #define MUSICBUFFERS 10
 
+#define BUFFER_CACHE_SIZE 100
+
+// the distance at which sound is played at full volume
+#define REFERENCE_DISTANCE 50
+
+#define MAX_STREAMS  30
+
+// TODO: limit the number of ambient streams
+
 struct AudioStream {
 	ALuint Buffer;
 	ALuint Source;
 	int Duration;
 	bool free;
+	bool ambient;
 	//bool playing;
 	//CSoundReader* reader;
+
+	void clearIfStopped();
+	void clearProcessedBuffers(bool del=false);
+};
+
+struct CacheEntry {
+	ALuint Buffer;
+	unsigned int length; // time in ms
 };
 
 static AudioStream streams[MAX_STREAMS], speech;
@@ -60,6 +79,7 @@ static SDL_mutex* musicMutex = NULL;
 static SDL_Thread* musicThread = NULL;
 static unsigned char* static_memory = NULL;
 static ALCcontext *alutContext = NULL;
+static SDL_mutex* streamMutex = NULL;
 
 //This stuff is a modified version of alut
 
@@ -117,6 +137,7 @@ static int CountAvailableSources(int limit)
 	delete[] src;
 
 	// Leave two sources free for internal OpenAL usage
+	// (Might not be strictly necessary...)
 	i -= 2;
 
 	// Return number of succesfully allocated sources
@@ -169,8 +190,44 @@ static ALenum GetFormatEnum(int channels, int bits)
 	return AL_FORMAT_MONO8;
 }
 
+void AudioStream::clearIfStopped()
+{
+	if (free) return;
+
+	if (alIsSource(Source)) {
+		ALint state;
+		alGetSourcei( Source, AL_SOURCE_STATE, &state );
+		if (state == AL_STOPPED) {
+			clearProcessedBuffers(false);
+			alDeleteSources( 1, &Source );
+			Source = 0;
+			Buffer = 0;
+			free = true;
+			ambient = false;
+		}
+	}
+}
+
+void AudioStream::clearProcessedBuffers(bool del)
+{
+	ALint processed = 0;
+	alGetSourcei( Source, AL_BUFFERS_PROCESSED, &processed );
+	if (processed > 0) {
+		ALuint * b = new ALuint[processed];
+		alSourceUnqueueBuffers( Source, processed, b );
+
+		if (del)
+			alDeleteBuffers(processed, b); 
+
+		delete[] b;
+	}
+
+}
+
 void ACMImp::clearstreams()
 {
+	StackLock l(streamMutex, "streamMutex in clearstreams()");
+
 	if (musicPlaying) {
 		if (alIsSource( MusicSource )) {
 			alSourceStop( MusicSource );
@@ -191,6 +248,7 @@ void ACMImp::clearstreams()
 			if (alIsBuffer(speech.Buffer))
 				alDeleteBuffers( 1, &streams[i].Buffer );
 			streams[i].free = true;
+			streams[i].ambient = false;
 		}
 	}
 	if (!speech.free) {
@@ -214,7 +272,8 @@ int ACMImp::PlayListManager(void* /*data*/)
 	ALuint buffersreturned = 0;
 	ALboolean bFinished = AL_FALSE;
 	while (stayAlive) {
-		SDL_mutexP( musicMutex );
+		SDL_Delay(30);
+		StackLock l(musicMutex, "musicMutex in PlayListManager()");
 		if (musicPlaying) {
 			ALint state;
 			alGetSourcei( MusicSource, AL_SOURCE_STATE, &state );
@@ -223,7 +282,6 @@ int ACMImp::PlayListManager(void* /*data*/)
 					printf( "WARNING: Unhandled Music state: %x\n", state );
 					musicPlaying = false;
 					alSourcePlay( MusicSource );
-					SDL_mutexV( musicMutex );
 					return -1;
 				case AL_INITIAL:
 					 {
@@ -284,13 +342,11 @@ int ACMImp::PlayListManager(void* /*data*/)
 				}
 			}
 		}
-		SDL_mutexV( musicMutex );
-		SDL_Delay( 30 );
 	}
 	return 0;
 }
 
-ACMImp::ACMImp(void)
+ACMImp::ACMImp(void) : buffercache()
 {
 	unsigned int i;
 
@@ -299,6 +355,7 @@ ACMImp::ACMImp(void)
 	MusicSource = 0;
 	for (i = 0; i < MAX_STREAMS; i++) {
 		streams[i].free = true;
+		streams[i].ambient = false;
 	}
 
 	// MAX_STREAMS + 1 for music + 1 for speech
@@ -308,8 +365,14 @@ ACMImp::ACMImp(void)
 	if (num_streams < MAX_STREAMS) {
 		printMessage( "ACMImp","Allocated fewer streams than desired. ", YELLOW );
 	} 
+	if (num_streams > MAX_STREAMS) {
+		printMessage( "ACMImp","Allocated more streams than desired?! ", YELLOW );
+	}
+
+	streamMutex = SDL_CreateMutex();
 
 	speech.free = true;
+	speech.ambient = false;
 	MusicReader = NULL;
 	musicPlaying = false;
 	musicMutex = SDL_CreateMutex();
@@ -324,14 +387,18 @@ ACMImp::~ACMImp(void)
 	//signal the thread to quit on its own
 	stayAlive = false;
 	SDL_Delay( 30 );
-	//locking the mutex so we could gracefully kill the thread
-	SDL_mutexP( musicMutex );
-	//the thread is safely killable now
-	SDL_KillThread( musicThread );
-	//release the mutex after the thread was killed
-	SDL_mutexV( musicMutex );
+
+	{
+		//locking the mutex so we could gracefully kill the thread
+		StackLock l(musicMutex, "musicMutex in ~ACMImp()");	
+	
+		SDL_KillThread( musicThread );
+	}
+
 	//the mutex could be removed now too
 	SDL_DestroyMutex( musicMutex );
+	musicMutex = 0;
+
 	clearstreams( );
 	if(MusicReader) {
 		delete MusicReader;
@@ -341,6 +408,19 @@ ACMImp::~ACMImp(void)
 	free(static_memory);
 
 	delete ambim;
+
+	// clear buffer cache
+	unsigned int count = buffercache.GetCount();
+	for (unsigned int i = 0; i < count; --i) {
+		evictBuffer();
+	}
+	if (buffercache.GetCount()) {
+		printMessage("ACMImp", "Used buffers remaining on exit\n", YELLOW);
+		printf("%d\n", buffercache.GetCount());
+	}
+
+	SDL_DestroyMutex( streamMutex );
+	streamMutex = 0;
 
 	GemRBalutExit();
 }
@@ -402,6 +482,18 @@ bool ACMImp::Init(void)
  */
 ALuint ACMImp::LoadSound(const char *ResRef, int *time_length)
 {
+	CacheEntry* e;
+	void* p;
+	if (buffercache.Lookup(ResRef, p)) {
+		// Found in cache
+		e = (CacheEntry*)p;
+		if (time_length) *time_length = e->length;
+
+		//printf("LoadSound: found %s in cache: %d\n", ResRef, e->Buffer);
+
+		return e->Buffer;
+	}
+
 	DataStream* stream = core->GetResourceMgr()->GetResource( ResRef, IE_WAV_CLASS_ID );
 	if (!stream) {
 		return 0;
@@ -453,6 +545,17 @@ ALuint ACMImp::LoadSound(const char *ResRef, int *time_length)
 		alDeleteBuffers( 1, &Buffer );
 		return 0;
 	}
+
+	e = new CacheEntry;
+	e->Buffer = Buffer;
+	e->length = ((cnt / riff_chans) * 1000) / samplerate;
+	buffercache.SetAt(ResRef, (void*)e);
+	//printf("LoadSound: added %s to cache: %d. Cache size now %d\n", ResRef, e->Buffer, buffercache.GetCount());
+
+	if (buffercache.GetCount() > BUFFER_CACHE_SIZE) {
+		evictBuffer();
+	}
+
 	return Buffer;
 }
 
@@ -478,7 +581,6 @@ unsigned int ACMImp::Play(const char* ResRef, int XPos, int YPos, unsigned int f
 	};
 
 	ALenum error;
-	ALint state;
 	ieDword volume = 100;
 
 	if (flags & GEM_SND_SPEECH) {
@@ -513,6 +615,24 @@ unsigned int ACMImp::Play(const char* ResRef, int XPos, int YPos, unsigned int f
 		return time_length;
 	}
 
+	StackLock l(streamMutex, "streamMutex in Play()");
+
+	// Find a free (or finished) stream for this sound
+	int stream = -1;
+	for (int i = 0; i < num_streams; i++) {
+		streams[i].clearIfStopped();
+		if (streams[i].free) {
+			stream = i;
+			break;
+		}
+	}
+
+	if (stream == -1) {
+		// Failed to assign new sound.
+		// The buffercache will handle deleting Buffer.
+		return 0;
+	}
+
 	// not speech
 	alGenSources( 1, &Source );
 	if (( error = alGetError() ) != AL_NO_ERROR) {
@@ -535,32 +655,11 @@ unsigned int ACMImp::Play(const char* ResRef, int XPos, int YPos, unsigned int f
 		return 0;
 	}
 
-	int i;
-	for (i = 0; i < num_streams; i++) {
-		if (!streams[i].free && alIsSource(streams[i].Source)) {
-			alGetSourcei( streams[i].Source, AL_SOURCE_STATE, &state );
-			if (state == AL_STOPPED) {
-				alDeleteSources( 1, &streams[i].Source );
-				alDeleteBuffers( 1, &streams[i].Buffer );
-				streams[i].Buffer = Buffer;
-				streams[i].Source = Source;
-				alSourcePlay( Source );
-				return time_length;
-			}
-		} else {
-			streams[i].Buffer = Buffer;
-			streams[i].Source = Source;
-			streams[i].free = false;
-			alSourcePlay( Source );
-			return time_length;
-		}
-	}
-
-	//failed to assign new sound
-	alDeleteSources( 1, &Source );
-	alDeleteBuffers( 1, &Buffer );
-
-	return 0;
+	streams[stream].Buffer = Buffer;
+	streams[stream].Source = Source;
+	streams[stream].free = false;
+	alSourcePlay( Source );
+	return time_length;
 }
 
 unsigned int ACMImp::StreamFile(const char* filename)
@@ -690,3 +789,130 @@ void ACMImp::UpdateVolume( unsigned int which )
 		((AmbientMgrAL *) ambim) -> UpdateVolume( volume );
 	}
 }
+
+int ACMImp::SetupAmbientStream(ieWord x, ieWord y, ieWord z,
+		ieWord gain, bool point)
+{
+	StackLock l(streamMutex, "streamMutex in SetupAmbientStream()");
+	// Find a free (or finished) stream for this sound
+	int stream = -1;
+	for (int i = 0; i < num_streams; i++) {
+		streams[i].clearIfStopped();
+		if (streams[i].free) {
+			stream = i;
+			break;
+		}
+	}
+	if (stream == -1) return -1;
+
+	ALuint source;
+	alGenSources(1, &source);
+
+	ALfloat position[] = { (float) x, (float) y, (float) z };
+	alSourcef( source, AL_PITCH, 1.0f );
+	alSourcefv( source, AL_POSITION, position );
+	alSourcef( source, AL_GAIN, 0.01f * gain );
+	alSourcei( source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
+	alSourcei( source, AL_ROLLOFF_FACTOR, point ? 1 : 0 );
+
+	streams[stream].Buffer = 0;
+	streams[stream].Source = source;
+	streams[stream].free = false;
+	streams[stream].ambient = true;
+
+	return stream;
+}
+
+
+int ACMImp::QueueAmbient(int stream, const char* sound)
+{
+	StackLock l(streamMutex, "streamMutex in QueueAmbient()");
+
+	if (streams[stream].free || !streams[stream].ambient)
+		return -1;
+
+	ALuint source = streams[stream].Source;
+
+	// first dequeue any processed buffers
+	streams[stream].clearProcessedBuffers(false);
+
+	if (sound == 0)
+		return 0;
+
+	int time_length;
+	ALuint Buffer = LoadSound(sound, &time_length);
+	if (0 == Buffer) {
+		return -1;
+	}
+
+	alSourceQueueBuffers(source, 1, &Buffer);
+
+	// play
+	ALint state;
+	alGetSourcei( source, AL_SOURCE_STATE, &state );
+	if (state != AL_PLAYING) { // play on playing source would rewind it
+		alSourcePlay( source );
+	}
+
+	return time_length;
+}
+
+bool ACMImp::ReleaseAmbientStream(int stream, bool hardstop)
+{
+	StackLock l(streamMutex, "streamMutex in ReleaseAmbientStream()");
+
+	if (!hardstop) return true;
+	if (streams[stream].free || !streams[stream].ambient)
+		return false;
+
+	ALuint source = streams[stream].Source;
+	alSourceStop(source);
+
+	// delete all processed buffers
+	if (QueueAmbient(stream, 0) != 0)
+		return false;
+	
+	alDeleteSources(1, &streams[stream].Source);
+	streams[stream].Source = 0;
+	streams[stream].free = true;
+	streams[stream].ambient = false;
+
+	return true;
+}
+
+void ACMImp::SetAmbientStreamVolume(int stream, int gain)
+{
+	StackLock l(streamMutex, "streamMutex in SetAmbientStreamVolume()");
+	if (streams[stream].free || !streams[stream].ambient)
+		return;
+
+	ALuint source = streams[stream].Source;
+	alSourcef( source, AL_GAIN, 0.01f * gain );
+}
+
+bool ACMImp::evictBuffer()
+{
+	// Room for optimization: this is O(n^2) in the number of buffers
+	// at the tail that are used. It can be O(n) if LRUCache supports it.
+
+	unsigned int n = 0;
+	void* p;
+	const char* k;
+	bool res;
+
+	while ((res = buffercache.getLRU(n, k, p)) == true) {
+		CacheEntry* e = (CacheEntry*)p;
+		alDeleteBuffers(1, &e->Buffer);
+		if (alGetError() == AL_NO_ERROR) {
+			// Buffer was unused. An error would have indicated
+			// the buffer was still attached to a source.
+
+			//printf("Removed buffer %s from ACMImp cache\n", k);
+			break;
+		}
+		++n;
+	}
+
+	return res;
+}
+
