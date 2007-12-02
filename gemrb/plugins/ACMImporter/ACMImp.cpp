@@ -81,6 +81,7 @@ static SDL_Thread* musicThread = NULL;
 static unsigned char* static_memory = NULL;
 static ALCcontext *alutContext = NULL;
 static SDL_mutex* streamMutex = NULL;
+static SDL_mutex* bufferMutex = NULL;
 
 //This stuff is a modified version of alut
 
@@ -371,6 +372,7 @@ ACMImp::ACMImp(void) : buffercache()
 	}
 
 	streamMutex = SDL_CreateMutex();
+	bufferMutex = SDL_CreateMutex();
 
 	speech.free = true;
 	speech.ambient = false;
@@ -410,18 +412,23 @@ ACMImp::~ACMImp(void)
 
 	delete ambim;
 
-	// clear buffer cache
-	unsigned int count = buffercache.GetCount();
-	for (unsigned int i = 0; i < count; --i) {
-		evictBuffer();
-	}
-	if (buffercache.GetCount()) {
-		printMessage("ACMImp", "Used buffers remaining on exit\n", YELLOW);
-		printf("%d\n", buffercache.GetCount());
+	{
+		StackLock l(bufferMutex, "bufferMutex in ~ACMImp()");
+		// clear buffer cache
+		unsigned int count = buffercache.GetCount();
+		for (unsigned int i = 0; i < count; --i) {
+			evictBuffer();
+		}
+		if (buffercache.GetCount()) {
+			printMessage("ACMImp", "Used buffers remaining on exit\n", YELLOW);
+			printf("%d\n", buffercache.GetCount());
+		}
 	}
 
 	SDL_DestroyMutex( streamMutex );
 	streamMutex = 0;
+	SDL_DestroyMutex( bufferMutex );
+	bufferMutex = 0;
 
 	GemRBalutExit();
 }
@@ -485,14 +492,16 @@ ALuint ACMImp::LoadSound(const char *ResRef, int *time_length)
 {
 	CacheEntry* e;
 	void* p;
-	if (buffercache.Lookup(ResRef, p)) {
-		// Found in cache
-		e = (CacheEntry*)p;
-		if (time_length) *time_length = e->length;
+	{
+		StackLock l(bufferMutex, "bufferMutex in LoadSound (lookup)");
+		if (buffercache.Lookup(ResRef, p)) {
+			// Found in cache
+			e = (CacheEntry*)p;
+			if (time_length) *time_length = e->length;
 
-		//printf("LoadSound: found %s in cache: %d\n", ResRef, e->Buffer);
-
-		return e->Buffer;
+			//printf("LoadSound: found %s in cache: %d\n", ResRef, e->Buffer);
+			return e->Buffer;
+		}
 	}
 
 	DataStream* stream = core->GetResourceMgr()->GetResource( ResRef, IE_WAV_CLASS_ID );
@@ -550,11 +559,15 @@ ALuint ACMImp::LoadSound(const char *ResRef, int *time_length)
 	e = new CacheEntry;
 	e->Buffer = Buffer;
 	e->length = ((cnt / riff_chans) * 1000) / samplerate;
-	buffercache.SetAt(ResRef, (void*)e);
-	//printf("LoadSound: added %s to cache: %d. Cache size now %d\n", ResRef, e->Buffer, buffercache.GetCount());
 
-	if (buffercache.GetCount() > BUFFER_CACHE_SIZE) {
-		evictBuffer();
+	{
+		StackLock l(bufferMutex, "bufferMutex in LoadSound (store)");
+		buffercache.SetAt(ResRef, (void*)e);
+		//printf("LoadSound: added %s to cache: %d. Cache size now %d\n", ResRef, e->Buffer, buffercache.GetCount());
+
+		if (buffercache.GetCount() > BUFFER_CACHE_SIZE) {
+			evictBuffer();
+		}
 	}
 
 	return Buffer;
@@ -893,6 +906,8 @@ void ACMImp::SetAmbientStreamVolume(int stream, int gain)
 
 bool ACMImp::evictBuffer()
 {
+	// Note: this function assumes the caller holds bufferMutex
+
 	// Room for optimization: this is O(n^2) in the number of buffers
 	// at the tail that are used. It can be O(n) if LRUCache supports it.
 
