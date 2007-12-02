@@ -109,19 +109,18 @@ static int CountAvailableSources(int limit)
 	int i;
 	for (i = 0; i < limit+2; ++i) {
 		alGenSources(1, &src[i]);
-		if (alGetError() != AL_NO_ERROR) {
-			--i;
+		if (alGetError() != AL_NO_ERROR)
 			break;
-		}
 	}
-	alDeleteSources(i+1, src);
+	if (i > 0)
+		alDeleteSources(i, src);
 	delete[] src;
 
 	// Leave two sources free for internal OpenAL usage
 	i -= 2;
 
 	// Return number of succesfully allocated sources
-	return (i+1);	
+	return i;
 }
 
 
