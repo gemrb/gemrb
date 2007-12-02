@@ -52,6 +52,7 @@
 #define MAX_STREAMS  30
 
 // TODO: limit the number of ambient streams
+// TODO: is loading resources as done in LoadSound thread-safe?
 
 struct AudioStream {
 	ALuint Buffer;
