@@ -67,7 +67,7 @@ static int ovfd_seek(void *datasource, int64_t offset, int whence) {
 	return vb->GetPos();
 }
 
-static int ovfd_close(void */*datasource*/) {
+static int ovfd_close(void * /*datasource*/) {
 	return 0;
 }
 

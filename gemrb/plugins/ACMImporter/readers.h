@@ -41,6 +41,8 @@
 class CSoundReader {
 protected:
 	int samples; // total count of sound samples
+	             // one sample consists of 
+	             // channels * (is16bit ? 2 : 1) bytes
 	int channels;
 	int samplerate;
 	int samples_left; // count of unread samples
