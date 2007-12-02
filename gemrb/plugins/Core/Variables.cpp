@@ -416,3 +416,30 @@ void Variables::SetAt(const char* key, ieDword value)
 		pAssoc->nHashValue = nHash;
 	}
 }
+
+void Variables::Remove(const char* key)
+{
+	unsigned int nHash;
+	Variables::MyAssoc* pAssoc;
+
+	pAssoc = GetAssocAt( key, nHash );
+	if (!pAssoc) return; // not in there
+
+	if (pAssoc == m_pHashTable[nHash]) {
+		// head
+		m_pHashTable[nHash] = pAssoc->pNext;
+	} else {
+		Variables::MyAssoc* prev = m_pHashTable[nHash];
+		// Room for optimization: make each bucket a doubly linked
+		// list to make removes from a bucket O(1).
+		// (This will have limited use in gemrb's case, because we
+		//  use relatively large tables and small buckets.)
+		while (prev->pNext != pAssoc) {
+			prev = prev->pNext;
+			MYASSERT( prev != NULL );
+		}
+		prev->pNext = pAssoc->pNext;		
+	}
+	pAssoc->pNext = 0;
+	FreeAssoc(pAssoc);
+}
