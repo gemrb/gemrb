@@ -40,6 +40,7 @@ class Action;
 #define DS_CONST   8
 #define DS_NONAME  16
 #define DS_SILENT  32
+#define DS_SPEECH  64
 
 //verbal constant (bg2), we need a lookup table for other games
 #define VB_PANIC     1

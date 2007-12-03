@@ -354,7 +354,9 @@ void DisplayStringCore(Scriptable* Sender, int Strref, int flags)
 		}
 	}
 	if (sb.Sound[0] && !(flags&DS_SILENT) ) {
-		ieDword len = core->GetSoundMgr()->Play( sb.Sound );
+		ieDword speech = GEM_SND_RELATIVE; //disable position
+		if (flags&DS_SPEECH) speech|=GEM_SND_SPEECH;
+		ieDword len = core->GetSoundMgr()->Play( sb.Sound,0,0,speech );
 		ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
 		if ((counter != 0) && (flags &DS_WAIT) )
 			Sender->SetWait( counter );
