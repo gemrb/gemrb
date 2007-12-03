@@ -1275,7 +1275,7 @@ void GameScript::DisplayStringHead(Scriptable* Sender, Action* parameters)
 		printf("DisplayStringHead/FloatMessage got no target, assuming Sender!\n");
 	}
 
-	DisplayStringCore(target, parameters->int0Parameter, DS_CONSOLE|DS_HEAD );
+	DisplayStringCore(target, parameters->int0Parameter, DS_CONSOLE|DS_HEAD|DS_SPEECH );
 }
 
 void GameScript::KillFloatMessage(Scriptable* Sender, Action* parameters)

@@ -63,6 +63,7 @@ static const Color magenta = {
 static int sharexp = SX_DIVIDE;
 static int classcount = -1;
 static char **clericspelltables = NULL;
+static char **druidspelltables = NULL;
 static char **wizardspelltables = NULL;
 static int *turnlevels = NULL;
 
@@ -917,6 +918,15 @@ void Actor::ReleaseMemory()
 			free(clericspelltables);
 			clericspelltables=NULL;
 		}
+		if (druidspelltables) {
+			for (i=0;i<classcount;i++) {
+				if (druidspelltables[i]) {
+					free (druidspelltables[i]);
+				}
+			}
+			free(druidspelltables);
+			druidspelltables=NULL;
+		}
 		if (wizardspelltables) {
 			for (i=0;i<classcount;i++) {
 				if (wizardspelltables[i]) {
@@ -970,6 +980,7 @@ static void InitActorTables()
 		classcount = tm->GetRowCount();
 		memset (isclass,0,sizeof(isclass));
 		clericspelltables = (char **) calloc(classcount, sizeof(char*));
+		druidspelltables = (char **) calloc(classcount, sizeof(char*));
 		wizardspelltables = (char **) calloc(classcount, sizeof(char*));
 		turnlevels = (int *) calloc(classcount, sizeof(int));
 
@@ -980,18 +991,19 @@ static void InitActorTables()
 			int turnlevel = atoi(tm->QueryField( i, 7));
 			turnlevels[i]=turnlevel;
 
-			field = tm->QueryField( i, 0 );
+			field = tm->QueryField( i, 9 );
 			if (field[0]!='*') {
 				isclass[ISRANGER] |= bitmask;
 			}
 
+			field = tm->QueryField( i, 0 );
+			if (field[0]!='*') {
+				isclass[ISDRUID] |= bitmask;
+				druidspelltables[i]=strdup(field);
+			}
 			field = tm->QueryField( i, 1 );
 			if (field[0]!='*') {
-				if (turnlevel) {
-					isclass[ISCLERIC] |= bitmask;
-				} else {
-					isclass[ISDRUID] |= bitmask;
-				}
+				isclass[ISCLERIC] |= bitmask;
 				clericspelltables[i]=strdup(field);
 			}
 
