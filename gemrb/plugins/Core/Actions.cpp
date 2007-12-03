@@ -456,20 +456,23 @@ void GameScript::TriggerActivation(Scriptable* Sender, Action* parameters)
 	}
 }
 
-void GameScript::FadeToColor(Scriptable* /*Sender*/, Action* parameters)
+void GameScript::FadeToColor(Scriptable* Sender, Action* parameters)
 {
 	core->timer->SetFadeToColor( parameters->pointParameter.x );
+	Sender->SetWait( parameters->pointParameter.x );
 }
 
-void GameScript::FadeFromColor(Scriptable* /*Sender*/, Action* parameters)
+void GameScript::FadeFromColor(Scriptable* Sender, Action* parameters)
 {
 	core->timer->SetFadeFromColor( parameters->pointParameter.x );
+	Sender->SetWait( parameters->pointParameter.x );
 }
 
-void GameScript::FadeToAndFromColor(Scriptable* /*Sender*/, Action* parameters)
+void GameScript::FadeToAndFromColor(Scriptable* Sender, Action* parameters)
 {
 	core->timer->SetFadeToColor( parameters->pointParameter.x );
 	core->timer->SetFadeFromColor( parameters->pointParameter.x );
+	Sender->SetWait( parameters->pointParameter.x<<1 ); //multiply by 2
 }
 
 void GameScript::JumpToPoint(Scriptable* Sender, Action* parameters)
@@ -1345,19 +1348,22 @@ void GameScript::FloatMessageRnd(Scriptable* Sender, Action* parameters)
 //apparently this should not display over head
 void GameScript::DisplayString(Scriptable* Sender, Action* parameters)
 {
-	//DisplayStringCore( Sender, parameters->int0Parameter, DS_HEAD);
 	Scriptable* target = GetActorFromObject( Sender, parameters->objects[1]);
 	if (!target) {
 		target=Sender;
 	}
-	//DisplayStringCore( target, parameters->int0Parameter, DS_CONSOLE|DS_SILENT);
 	DisplayStringCore( target, parameters->int0Parameter, DS_CONSOLE);
 }
 
+//DisplayStringHead, but wait for previous talk to succeed
 void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
 {
-	//DisplayStringCore( Sender, parameters->int0Parameter, DS_HEAD|DS_WAIT);
-	DisplayStringCore( Sender, parameters->int0Parameter, DS_CONSOLE|DS_WAIT);
+	if (core->GetSoundMgr()->IsSpeaking()) {
+		Sender->AddActionInFront( Sender->CurrentAction );
+		return;
+	}
+	DisplayStringCore( Sender, parameters->int0Parameter, DS_CONSOLE|DS_WAIT|DS_SPEECH);
+	Sender->ReleaseCurrentAction();
 }
 
 void GameScript::ForceFacing(Scriptable* Sender, Action* parameters)

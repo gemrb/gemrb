@@ -156,9 +156,11 @@ void GlobalTimer::Update()
 			fadeToCounter=0;
 		}
 		video->SetFadePercent( ( ( fadeToMax - fadeToCounter ) * 100 ) / fadeToMax );
-		goto end; //hmm, freeze gametime?
+		//bug/patch #1837747 made this unneeded
+		//goto end; //hmm, freeze gametime?
 	}
-	if (fadeFromCounter!=fadeFromMax) {
+	//i think this 'else' is needed now because of the 'goto' cut above
+	else if (fadeFromCounter!=fadeFromMax) {
 		if (fadeFromCounter>fadeFromMax) {
 			fadeFromCounter-=advance/interval;
 			if (fadeFromCounter<fadeFromMax) {
@@ -171,7 +173,8 @@ void GlobalTimer::Update()
 				fadeToCounter=fadeFromMax;
 			}
 			video->SetFadePercent( ( ( fadeFromMax - fadeFromCounter ) * 100 ) / fadeFromMax );
-			goto end; //freeze gametime?
+			//bug/patch #1837747 made this unneeded
+			//goto end; //freeze gametime?
 		}
 	}
 	if (fadeFromCounter==fadeFromMax) {
