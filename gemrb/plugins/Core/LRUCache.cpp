@@ -150,12 +150,13 @@ void LRUCache::removeFromList(VarEntry* e)
 
 void testLRUCache()
 {
+	int i;
 	LRUCache c;
 
 	int t[100];
-	for (int i = 0; i < 100; ++i) t[i] = 1000+i;
+	for (i = 0; i < 100; ++i) t[i] = 1000+i;
 	char* k[100];
-	for (int i = 0; i < 100; ++i) {
+	for (i = 0; i < 100; ++i) {
 		k[i] = new char[5];
 		sprintf(k[i], "k%03d", i);
 	}
@@ -172,7 +173,7 @@ void testLRUCache()
 	assert(r);
 	assert(p == &t[50]);
 
-	for (int i = 0; i < 100; ++i)
+	for (i = 0; i < 100; ++i)
 		c.SetAt(k[i], &t[i]);
 
 	r = c.getLRU(0, k2, p);
@@ -198,7 +199,7 @@ void testLRUCache()
 	assert(strcmp(k2, "k002") == 0);
 	assert(p == &t[2]);
 
-	for (int i = 0; i < 98; ++i) {
+	for (i = 0; i < 98; ++i) {
 		r = c.getLRU(0, k2, p);
 		assert(r);
 		assert(strcmp(k2, k[2+i]) == 0);
