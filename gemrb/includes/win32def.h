@@ -29,6 +29,11 @@
 #ifndef WIN32DEF_H
 #define WIN32DEF_H
 
+//mingw should compile more like unix
+#ifdef __MINGW32
+#undef WIN32
+#endif
+
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -44,11 +49,7 @@
 
 #define ADV_TEXT
 #include <conio.h>
-#ifndef INTERFACE
 #define textcolor(i) SetConsoleTextAttribute(hConsole, i)
-#else
-#define textcolor(i) SetConsoleTextAttribute(hConsole, i)
-#endif
 #define printf cprintf
 
 #else
