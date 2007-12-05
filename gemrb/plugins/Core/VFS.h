@@ -42,10 +42,12 @@
 #include <dlfcn.h>
 #endif
 
+#ifndef _MAX_PATH
 #ifdef WIN32
 #define _MAX_PATH 260
 #else
 #define _MAX_PATH FILENAME_MAX
+#endif
 #endif
 
 //#ifndef S_ISDIR
@@ -69,9 +71,11 @@
 #define GEM_EXPORT
 #endif
 
-#ifdef WIN32
-
+#ifndef R_OK
 #define R_OK 04
+#endif
+
+#ifdef WIN32
 
 typedef struct DIR {
 	char path[_MAX_PATH];
