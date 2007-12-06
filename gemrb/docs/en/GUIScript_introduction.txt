@@ -253,16 +253,16 @@ GUIScripter's Workflow
   the strrefs as they are displayed instead of the labels. This
   however does not work with Planescape: Torment.
 
-- Put the strrefs into the SetText() functions in the script
+- Put the strrefs into the SetText() functions in the script.
 
-- Now when the trivial parts are done, real fun can begin. But that's
-  a subject too advanced for this file :-).
+- Now when the trivial parts are done, the real fun can begin.
+  But that's a subject too advanced for this file :-).
 
 
 Notes
 -----
 
-Please try to follow indentation style of other GUIScript scripts,
+Please try to follow the indentation style of other GUIScript scripts,
 in particular:
 
   - indent each level with 1 TAB character
@@ -275,8 +275,6 @@ in particular:
     e.g. between setting of different controls
 
   - insert blank lines after functions and a row of hashes
-
-  - if a function does not return a value, do NOT end it with `return'
 
   - keep naming convention for windows, callback etc.
 
