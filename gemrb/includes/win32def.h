@@ -29,11 +29,6 @@
 #ifndef WIN32DEF_H
 #define WIN32DEF_H
 
-//mingw should compile more like unix
-#ifdef __MINGW32
-#undef WIN32
-#endif
-
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -50,7 +45,12 @@
 #define ADV_TEXT
 #include <conio.h>
 #define textcolor(i) SetConsoleTextAttribute(hConsole, i)
-#define printf cprintf
+
+#ifndef __MINGW32
+#define printf cprintf //broken in mingw !!
+#else
+#define HAVE_SNPRINTF
+#endif
 
 #else
 #include <config.h>
@@ -91,7 +91,7 @@ typedef __POSITION* POSITION;
 				abort(); \
   }
 #else
-#define MYASSERT(f) 
+#define MYASSERT(f)
 #endif
 
 #ifdef ADV_TEXT
