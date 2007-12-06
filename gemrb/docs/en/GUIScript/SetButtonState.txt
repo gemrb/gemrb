@@ -1,7 +1,8 @@
 
 Prototype: GemRB.SetButtonState(WindowIndex, ControlIndex, State)
 
-Description: Sets the state of a Button Control.
+Description: Sets the state of a Button Control. Doesn't work if the button
+is a checkbox or a radio button though, their states are handled internally.
 
 Parameters: WindowIndex, ControlIndex  - the control's reference
 State - the new state of the button:
