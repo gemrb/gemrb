@@ -5872,6 +5872,8 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "SpellbookIcon", PyString_FromResRef (spell->SpellbookIcon));
 	PyDict_SetItemString(dict, "SpellExclusion", PyInt_FromLong (spell->ExclusionSchool)); //this will list school exclusions and alignment
 	PyDict_SetItemString(dict, "SpellDivine", PyInt_FromLong (spell->PriestType)); //this will tell apart a priest spell from a druid spell
+	PyDict_SetItemString(dict, "SpellSchool", PyInt_FromLong (spell->PrimaryType));
+	PyDict_SetItemString(dict, "SpellType", PyInt_FromLong (spell->SecondaryType));
 	core->FreeSpell( spell, ResRef, false );
 	return dict;
 }
