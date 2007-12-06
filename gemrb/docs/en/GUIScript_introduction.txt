@@ -1,5 +1,5 @@
 GUISCRIPT INTRODUCTION
-**********************
+----------------------
 $Id$
 
 This file is intended as a brief overview for one of two scripting systems
@@ -23,7 +23,7 @@ and GameScript. What's the difference between them?
 
 The first one, GUIScript, concerns mostly with game GUI, i.e. user
 interaction, opening and closing windows, pushing of character sheet
-buttons, inventory, etc. This functionality has been hardwired in the
+buttons, inventory, etc. This functionality was hardwired in the
 original games (probably with Lua scripts compiled-in into the main
 EXE) and so we need to implement it anew. GUIScript scripts have to be
 tailored for each game type, because each game uses more or less
@@ -98,13 +98,13 @@ imported too.
 Typical GUIScript
 -----------------
 
-Typical script's task is to open a window, setting button labels and
+A typical script's task is to open a window, setting button labels and
 callbacks and then return control back to GemRB. The script also
 provides a mean to close the window created.
 
 Since most scripts are modules of MessageWindow.py instead of
-independent scripts, we will use simplified version of one of them for
-an example
+independent scripts, we will use a simplified version of one of them
+for an example
 
 
 
