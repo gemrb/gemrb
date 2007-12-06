@@ -1,9 +1,9 @@
 Accessing GUI controls.
 
 Description: To access a GUI control, you must know its window index and control index. You must use LoadWindow and GetControl to obtain these indices. 
-Usually a GUI command works only one type of controls, a wrong control type will cause a Runtime Error and terminates the GUI script (not the game or the engine).
+Usually a GUI command works only on one type of controls. A wrong control type will cause a Runtime Error and terminates the GUI script (not the game or the engine).
 
-Example code: 
+Example: 
         StartWindow = GemRB.LoadWindow(7)
         Label = GemRB.GetControl(StartWindow, 0x0fff0000)
         GemRB.SetText(StartWindow, Label, GEMRB_VERSION)
