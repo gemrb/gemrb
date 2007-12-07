@@ -53,7 +53,7 @@ file they mostly use.
   Example: 
      Planescape: Torment startup script:
        gemrb/GUIScripts/pst/Start.py   
-
+  
      Baldur's Gate 2 inventory:
        gemrb/GUIScripts/bg2/GUIINV.py
 
@@ -85,10 +85,8 @@ commonly used in the scripts. Other files in this directory can be
 imported too.
 
   Example:
-
     import GemRB
     from ie_stats import IE_SAVEVSPOLY
-
     def OnLoad():
         print IE_GUI_BUTTON_NORMAL, IE_SAVEVSPOLY
         GemRB.SetNextScript("MessageWindow")
@@ -107,34 +105,33 @@ independent scripts, we will use a simplified version of one of them
 for an example
 
 
-
     ## Standard header and boilerplate, put in all the scripts.
-
+  
     # -*-python-*-
     # GemRB - Infinity Engine Emulator
     # Copyright (C) 2003 The GemRB Project
     .....
     # $Id$
-
-
+  
+  
     ## Since this is only a module, GemRB and GUIDefines have to be explicitly 
     ## imported
-
+  
     ###################################################
     import GemRB
     from GUIDefines import *
     from GUICommon import CloseOtherWindow
-
+  
     ###################################################
     JournalWindow = None
     LogWindow = None
     QuestsWindow = None
     ## Function called from a callback in MessageWindow.py
-
+  
     ###################################################
     def OpenJournalWindow ():
 	global JournalWindow
-
+  
         ## This is a common way of closing another window before opening
 	## our own one (here Journal window). If Journal window already
 	## exists, it's closed and the control is returned to the caller
@@ -142,83 +139,82 @@ for an example
   
 	if CloseOtherWindow (OpenJournalWindow):
 	        ## this part is called if we are closing Journal window
-
+  
 	        ## Close any opened children windows
-
+  
 		if LogWindow: OpenLogWindow()
 		if QuestsWindow: OpenQuestsWindow()
-
+  
 		## Freezes the GUI
 		GemRB.HideGUI ()
-		
+  		
 		## Free the window resource and delete Journal window
 		## from window manager
 		GemRB.UnloadWindow(JournalWindow)
 		JournalWindow = None
 		GemRB.SetVar("OtherWindow", -1)
-		
+  		
 		## Unfreeze the GUI, redraws screen, reshuffles windows in 
 		## window manager
-
+  
 		GemRB.UnhideGUI ()
-
+  
 		## Return to the caller
 		return
-	
+  	
 	## This part is executed when we did not close Journal window
 	## and will open it instead
-
+  
 	## Freeze the GUI
 	GemRB.HideGUI ()
-
+  
 	## Loads CHU resource file. This one contains windows for Journal,
 	## Log, and PC/NPC encyclopedia. 
-
+  
 	GemRB.LoadWindowPack ("GUIJRNL")
-
+  
 	## Load window with ID 0 (Main Journal window) from GUIJRNL.CHU file.
-
+  
 	JournalWindow = GemRB.LoadWindow (0)
-
+  
 	## Add the new window to window manager. "OtherWindow" is name reserved
 	## for non-floating windows in the center of the screen.
-
+  
 	GemRB.SetVar("OtherWindow", JournalWindow)
-
+  
 	## Now access some buttons in the new window and assign 
 	## labels and callbacks to them
-
+  
 	## Comment the button processing with the label of the button for
 	## easy maintenance
-
+  
 	# Quests
-
+  
 	## Quest button has ID 0 in GUIJRNL.CHU in window ID 0
 	Button = GemRB.GetControl (JournalWindow, 0)
-
+  
 	## Set the label for the button to strref 20430 ("Quests")
 	GemRB.SetText (JournalWindow, Button, 20430)
-
+  
 	## When the button is clicked by mouse, call fn OpenQuestsWindow()
 	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenQuestsWindow")
-
+  
 	## Now some other buttons. Note that "Done" button calls this 
 	## function, which causes closing of the Journal window 
-
+  
 	# Beasts
 	Button = GemRB.GetControl (JournalWindow, 1)
 	GemRB.SetText (JournalWindow, Button, 20634)
 	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenBeastsWindow")
-
+  
 	# Done
 	Button = GemRB.GetControl (JournalWindow, 3)
 	GemRB.SetText (JournalWindow, Button, 20636)
 	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
-
-
+  
+  
 	## Unfreeze the GUI, redraw screen and restart window manager
 	GemRB.UnhideGUI()
-	
 
 
 GUIScripter's Workflow
