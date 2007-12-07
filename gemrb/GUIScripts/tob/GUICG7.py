@@ -36,7 +36,7 @@ def OnLoad():
 	
 	AlignmentTable = GemRB.LoadTable("aligns")
 	ClassTable = GemRB.LoadTable("classes")
-	KitTable = GemRB.LoadTable("kitlist")
+	KitTable = GemRB.LoadTable("magesch")
 	ClassRow = GemRB.GetVar("Class")-1
 	Class = GemRB.GetTableValue(ClassTable, ClassRow, 5)
 	TmpTable = GemRB.LoadTable("clskills")
@@ -50,7 +50,7 @@ def OnLoad():
 	v = GemRB.GetVar("Alignment")
 	KitIndex = GemRB.GetVar("Class Kit")
 	if KitIndex:
-		KitValue = GemRB.GetTableValue(KitTable, KitIndex, 6)
+		KitValue = GemRB.GetTableValue(KitTable, KitIndex - 21, 3)
 	else:
 		KitValue = 0x4000
 
