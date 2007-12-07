@@ -287,21 +287,25 @@ void GameControl::DrawArrowMarker(Region &screen, Point p, Region &viewport)
 	}
 	int tmp;
 	
-	tmp = core->ArrowSprites[0]->Width;
+	Sprite2D *spr = core->GetScrollCursorSprite(0,0);
+
+	tmp = spr->Width;
+	//tmp = core->ArrowSprites[0]->Width;
 
 	if (p.x>viewport.x+viewport.w-tmp) {
 		p.x=viewport.x+viewport.w-tmp;
 		draw |= D_RIGHT;
 	}
 
-	tmp = core->ArrowSprites[0]->Height;
+	tmp = spr->Height;
+	//tmp = core->ArrowSprites[0]->Height;
 
 	if (p.y>viewport.y+viewport.h-tmp) {
 		p.y=viewport.y+viewport.h-tmp;
 		draw |= D_BOTTOM;
 	}
 	if (arrow_orientations[draw]>=0) {
-		video->BlitGameSprite( core->ArrowSprites[arrow_orientations[draw]], p.x+screen.x, p.y+screen.y, 0, black, NULL);
+		video->BlitGameSprite( core->GetScrollCursorSprite(arrow_orientations[draw], 0), p.x+screen.x, p.y+screen.y, 0, black, NULL);
 	}
 }
 

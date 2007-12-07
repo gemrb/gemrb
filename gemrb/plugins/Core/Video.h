@@ -210,6 +210,11 @@ public:
 	void SetMouseEnabled(int enabled);
 	void SetMouseGrayed(bool grayed);
 
+	//Scroll Cursor stuff
+	virtual int whereIsTheCursor() =0;
+	virtual void drawScrollCursorSprite(int Position) = 0;
+	virtual bool isScrolling() = 0;
+
 protected:
 	int DisableMouse;
 

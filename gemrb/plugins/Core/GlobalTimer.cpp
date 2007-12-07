@@ -140,6 +140,11 @@ void GlobalTimer::Update()
 	unsigned long advance;
 
 	Video *video = core->GetVideoDriver();
+
+	if (video->isScrolling() )
+		video->drawScrollCursorSprite(video->whereIsTheCursor());
+
+
 	UpdateAnimations();
 
 	GetTime( thisTime );

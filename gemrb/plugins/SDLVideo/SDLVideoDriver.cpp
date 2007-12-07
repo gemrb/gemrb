@@ -323,7 +323,7 @@ int SDLVideoDriver::SwapBuffers(void)
 			MouseMovement(event.motion.x, event.motion.y);
 			break;
 		case SDL_MOUSEBUTTONDOWN:
-			if (DisableMouse)          //grayed mouse is disabled in this sense 
+			if (DisableMouse)          //grayed mouse is disabled in this sense
 				break;
 			if (CursorIndex != 2)
 				CursorIndex = 1;
@@ -335,7 +335,7 @@ int SDLVideoDriver::SwapBuffers(void)
 			break;
 
 		case SDL_MOUSEBUTTONUP:
-			if (DisableMouse)         //grayed mouse is disabled in this sense 
+			if (DisableMouse)         //grayed mouse is disabled in this sense
 				break;
 			if (CursorIndex != 2)
 				CursorIndex = 0;
@@ -1662,7 +1662,7 @@ void SDLVideoDriver::DrawHLine(short x1, short y, short x2, const Color& color, 
 		y -= Viewport.y;
 		x2 -= Viewport.x;
 	}
-	for ( ; x1 <= x2 ; x1++ )
+	for (; x1 <= x2 ; x1++ )
 		SetPixel( x1, y, color, clipped );
 }
 
@@ -1684,7 +1684,7 @@ void SDLVideoDriver::DrawVLine(short x, short y1, short y2, const Color& color, 
 		y2 -= Viewport.y;
 	}
 
-	for ( ; y1 <= y2 ; y1++ )
+	for (; y1 <= y2 ; y1++ )
 		SetPixel( x, y1, color, clipped );
 }
 
@@ -2250,6 +2250,15 @@ void SDLVideoDriver::MouseMovement(int x, int y)
 				moveY = 0;
 		}
 	}
+
+	if (moveX != 0 || moveY != 0) {
+		scrolling = true;
+		CursorPosition = moveX + moveY;
+	} else if (scrolling) {
+		scrolling = false;
+		SetDragCursor(NULL);
+	}
+
 	if (Evnt)
 		Evnt->MouseMove(x, y);
 }
@@ -2401,3 +2410,42 @@ void SDLVideoDriver::SetMouseScrollSpeed(int speed)
 {
 	mousescrollspd=(speed+1)*2;
 }
+
+int SDLVideoDriver::whereIsTheCursor()
+{
+	return CursorPosition;
+}
+
+bool SDLVideoDriver::isScrolling()
+{
+	return scrolling;
+}
+
+void SDLVideoDriver::drawScrollCursorSprite(int Position)
+{
+	if (Position == 0) {
+		if (moveX == -mousescrollspd) {//bottom left
+			SetDragCursor(core->GetScrollCursorSprite(5,numScrollCursor));
+		} else if (moveX == mousescrollspd ) {//upper right
+			SetDragCursor(core->GetScrollCursorSprite(1,numScrollCursor));
+		}
+	} else if (Position == mousescrollspd) {
+		if (moveX == mousescrollspd) {//right
+			SetDragCursor(core->GetScrollCursorSprite(0,numScrollCursor));
+		} else { //bottom
+			SetDragCursor(core->GetScrollCursorSprite(6,numScrollCursor));
+		}
+	} else if (Position == -mousescrollspd ) {
+		if (moveX == -mousescrollspd) {//left
+			SetDragCursor(core->GetScrollCursorSprite(4,numScrollCursor));
+		} else { //upper
+			SetDragCursor(core->GetScrollCursorSprite(2,numScrollCursor));
+		}
+	} else if (Position == -2 * mousescrollspd ) { //upper left
+		SetDragCursor(core->GetScrollCursorSprite(3,numScrollCursor));
+	}else if (Position == 2 * mousescrollspd ) { //bottom right
+		SetDragCursor(core->GetScrollCursorSprite(7,numScrollCursor));
+	}
+	numScrollCursor = (numScrollCursor+1) % 15;
+}
+

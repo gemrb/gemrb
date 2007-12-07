@@ -270,6 +270,7 @@ private:
 	ieDword GameFeatures2;  //the second 32 bits
 	ieResRef ButtonFont;
 	ieResRef CursorBam;
+	ieResRef ScrollCursorBam;
 	ieResRef GroundCircleBam[MAX_CIRCLE_SIZE];
 	int GroundCircleScale[MAX_CIRCLE_SIZE];
 	ieResRef TooltipFont;
@@ -312,7 +313,7 @@ public:
 	Variables * ItemTooltipTable;
 	Sprite2D **Cursors;
 	int CursorCount;
-	Sprite2D *ArrowSprites[MAX_ORIENT/2];
+	//Sprite2D *ArrowSprites[MAX_ORIENT/2];
 	Sprite2D *FogSprites[32];
 	Sprite2D **TooltipBack;
 	Sprite2D *WindowFrames[4];
@@ -579,6 +580,8 @@ public:
 	Sprite2D* GetBAMSprite(const ieResRef ResRef, int cycle, int frame);
 	/** returns a cursor sprite (not cached) */
 	Sprite2D *GetCursorSprite();
+	/** returns a scroll cursor sprite */
+	Sprite2D *GetScrollCursorSprite(int frameNum, int spriteNum);
 	/** returns 0 for unmovable, -1 for movable items, otherwise it
 	returns gold value! */
 	int CanMoveItem(const CREItem *item) const;

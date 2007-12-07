@@ -530,11 +530,11 @@ static const ActionLink actionnames[] = {
 	{"face", GameScript::Face,AF_BLOCKING},
 	{"faceobject", GameScript::FaceObject, AF_BLOCKING},
 	{"facesavedlocation", GameScript::FaceSavedLocation, AF_BLOCKING},
-	{"fadefromblack", GameScript::FadeFromColor, 0}, //probably the same
-	{"fadefromcolor", GameScript::FadeFromColor, 0},
-	{"fadetoandfromcolor", GameScript::FadeToAndFromColor, 0},
-	{"fadetoblack", GameScript::FadeToColor, 0}, //probably the same
-	{"fadetocolor", GameScript::FadeToColor, 0},
+	{"fadefromblack", GameScript::FadeFromColor, AF_BLOCKING}, //probably the same
+	{"fadefromcolor", GameScript::FadeFromColor, AF_BLOCKING},
+	{"fadetoandfromcolor", GameScript::FadeToAndFromColor, AF_BLOCKING},
+	{"fadetoblack", GameScript::FadeToColor, AF_BLOCKING}, //probably the same
+	{"fadetocolor", GameScript::FadeToColor, AF_BLOCKING},
 	{"fakeeffectexpirycheck", GameScript::FakeEffectExpiryCheck, 0},
 	{"finalsave", GameScript::SaveGame, 0}, //synonym
 	{"findtraps", GameScript::FindTraps, 0},

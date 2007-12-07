@@ -182,6 +182,7 @@ Interface::Interface(int iargc, char* iargv[])
 	strncpy( TooltipFont, "STONESML", sizeof(TooltipFont) );
 	strncpy( MovieFont, "STONESML", sizeof(MovieFont) );
 	strncpy( CursorBam, "CAROT", sizeof(CursorBam) );
+	strncpy( ScrollCursorBam, "CURSARW", sizeof(ScrollCursorBam) );
 	strncpy( GlobalScript, "BALDUR", sizeof(GlobalScript) );
 	strncpy( WorldMapName, "WORLDMAP", sizeof(WorldMapName) );
 	strncpy( Palette16, "MPALETTE", sizeof(Palette16) );
@@ -208,7 +209,7 @@ Interface::Interface(int iargc, char* iargv[])
 	memset( WindowFrames, 0, sizeof( WindowFrames ));
 	memset( GroundCircles, 0, sizeof( GroundCircles ));
 	memset(FogSprites, 0, sizeof( FogSprites ));
-	memset(ArrowSprites, 0, sizeof( ArrowSprites ));
+	//memset(ArrowSprites, 0, sizeof( ArrowSprites ));
 	AreaAliasTable = NULL;
 	ItemExclTable = NULL;
 	ItemDialTable = NULL;
@@ -408,26 +409,26 @@ Interface::~Interface(void)
 
 	if (video) {
 		unsigned int i;
-	
-		for(i=0;i<sizeof(ArrowSprites)/sizeof(Sprite2D *);i++ ) {
-			video->FreeSprite(ArrowSprites[i]);
-		}
-	
+
+		//for(i=0;i<sizeof(ArrowSprites)/sizeof(Sprite2D *);i++ ) {
+		//	video->FreeSprite(ArrowSprites[i]);
+		//}
+
 		for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
 			//freesprite checks for null pointer
 			video->FreeSprite(FogSprites[i]);
 		}
-	
+
 		for(i=0;i<4;i++) {
 			video->FreeSprite(WindowFrames[i]);
 		}
-	
+
 		for (int size = 0; size < MAX_CIRCLE_SIZE; size++) {
 			for(i=0;i<6;i++) {
 				video->FreeSprite(GroundCircles[size][i]);
 			}
 		}
-	
+
 		if (TooltipBack) {
 			for(i=0;i<3;i++) {
 				//freesprite checks for null pointer
@@ -627,7 +628,7 @@ void Interface::HandleFlags()
 		QuitFlag &= ~QF_ENTERGAME;
 		if (game) {
 			timer->Init();
-		
+	
 			//rearrange party slots
 			game->ConsolidateParty();
 			GameControl* gc = StartGameControl();
@@ -767,7 +768,7 @@ bool Interface::ReadAuxItemTables()
 	idx = aa->GetRowCount();
 	while (idx--) {
 		ieResRef key;
-	
+
 		strnlwrcpy(key,aa->GetRowName(idx),8);
 		ieDword value = strtol(aa->QueryField(idx,0),NULL,0);
 		ItemExclTable->SetAt(key, value);
@@ -801,7 +802,7 @@ aux_1:
 	idx = aa->GetRowCount();
 	while (idx--) {
 		ieResRef key, dlgres;
-	
+
 		strnlwrcpy(key,aa->GetRowName(idx),8);
 		ieDword value = strtol(aa->QueryField(idx,0),NULL,0);
 		ItemDialTable->SetAt(key, value);
@@ -832,7 +833,7 @@ aux_2:
 	while (idx--) {
 		ieResRef key;
 		int *tmppoi = (int *) malloc(sizeof(int)*3);
-	
+
 		strnlwrcpy(key,aa->GetRowName(idx),8);
 		for (int i=0;i<3;i++) {
 			tmppoi[i] = atoi(aa->QueryField(idx,i));
@@ -917,7 +918,7 @@ bool Interface::ReadAreaAliasTable(const ieResRef tablename)
 	int idx = aa->GetRowCount();
 	while (idx--) {
 		ieResRef key;
-	
+
 		strnlwrcpy(key,aa->GetRowName(idx),8);
 		ieDword value = atoi(aa->QueryField(idx,0));
 		AreaAliasTable->SetAt(key, value);
@@ -964,14 +965,14 @@ void Interface::Main()
 	Palette* palette = CreatePalette( white, black );
 	do {
 		//don't change script when quitting is pending
-	
+
 		while (QuitFlag) {
 			HandleFlags();
 		}
 		if (EventFlag) {
 			HandleEvents();
 		}
-	
+
 		DrawWindows();
 		if (DrawFPS) {
 			frame++;
@@ -1079,17 +1080,17 @@ int Interface::LoadSprites()
 	printStatus( "OK", LIGHT_GREEN );
 
 	// Load arrow cursors
-	str = key->GetResource( "cursarw", IE_BAM_CLASS_ID );
-	printMessage( "Core", "Loading arrow cursor bitmaps...\n", WHITE );
-	anim->Open( str, true );
-	if (anim->GetCycleCount( ) != MAX_ORIENT/2) {
-		printStatus( "ERROR", LIGHT_RED );
-		goto end_of_init;
-	}
+	//str = key->GetResource( "cursarw", IE_BAM_CLASS_ID );
+	//printMessage( "Core", "Loading arrow cursor bitmaps...\n", WHITE );
+	//anim->Open( str, true );
+	//if (anim->GetCycleCount( ) != MAX_ORIENT/2) {
+	//	printStatus( "ERROR", LIGHT_RED );
+	//	goto end_of_init;
+	//}
 
-	for(i=0;i<MAX_ORIENT/2;i++) {
-		ArrowSprites[i] = anim->GetFrameFromCycle( i, 0);
-	}
+	//for(i=0;i<MAX_ORIENT/2;i++) {
+	//	ArrowSprites[i] = anim->GetFrameFromCycle( i, 0);
+	//}
 
 	// Load fog-of-war bitmaps
 	str = key->GetResource( "fogowar", IE_BAM_CLASS_ID );
@@ -1175,7 +1176,7 @@ int Interface::LoadSprites()
 				printStatus( "ERROR", LIGHT_RED );
 				goto end_of_init;
 			}
-		
+	
 			for (int i = 0; i < 6; i++) {
 				Sprite2D* sprite = anim->GetFrameFromCycle( (ieByte) i, 0 );
 				if (GroundCircleScale[size]) {
@@ -1215,7 +1216,7 @@ int Interface::LoadSprites()
 			}
 			strncpy( fnt->ResRef, ResRef, 8 );
 			if (needpalette) {
-			
+		
 				Color fore = {0xff, 0xff, 0xff, 0};
 				Color back = {0x00, 0x00, 0x00, 0};
 				if (!strnicmp( TooltipFont, ResRef, 8) ) {
@@ -1567,7 +1568,7 @@ int Interface::Init()
 		} else {
 			printStatus( "OK", LIGHT_GREEN );
 		}
-	
+
 		printMessage( "Core", "Loading quests definition File...\n",
 			WHITE );
 		INIquests = ( DataFileMgr * ) GetInterface( IE_INI_CLASS_ID );
@@ -1710,115 +1711,115 @@ const char* Interface::TypeExt(SClass_ID type) const
 	switch (type) {
 		case IE_2DA_CLASS_ID:
 			return ".2da";
-		
+	
 		case IE_ACM_CLASS_ID:
 			return ".acm";
-		
+	
 		case IE_ARE_CLASS_ID:
 			return ".are";
-		
+	
 		case IE_BAM_CLASS_ID:
 			return ".bam";
-		
+	
 		case IE_BCS_CLASS_ID:
 			return ".bcs";
-		
+	
 		case IE_BS_CLASS_ID:
 			return ".bs";
 
 		case IE_BIF_CLASS_ID:
 			return ".bif";
-		
+	
 		case IE_BMP_CLASS_ID:
 			return ".bmp";
-		
+	
 		case IE_PNG_CLASS_ID:
 			return ".png";
-		
+	
 		case IE_CHR_CLASS_ID:
 			return ".chr";
-		
+	
 		case IE_CHU_CLASS_ID:
 			return ".chu";
-		
+	
 		case IE_CRE_CLASS_ID:
 			return ".cre";
-		
+	
 		case IE_DLG_CLASS_ID:
 			return ".dlg";
-		
+	
 		case IE_EFF_CLASS_ID:
 			return ".eff";
-		
+	
 		case IE_GAM_CLASS_ID:
 			return ".gam";
-		
+	
 		case IE_IDS_CLASS_ID:
 			return ".ids";
-		
+	
 		case IE_INI_CLASS_ID:
 			return ".ini";
-		
+	
 		case IE_ITM_CLASS_ID:
 			return ".itm";
-		
+	
 		case IE_KEY_CLASS_ID:
 			return ".key";
-		
+	
 		case IE_MOS_CLASS_ID:
 			return ".mos";
-		
+	
 		case IE_MUS_CLASS_ID:
 			return ".mus";
-		
+	
 		case IE_MVE_CLASS_ID:
 			return ".mve";
-		
+	
 		case IE_PLT_CLASS_ID:
 			return ".plt";
-		
+	
 		case IE_PRO_CLASS_ID:
 			return ".pro";
-		
+	
 		case IE_SAV_CLASS_ID:
 			return ".sav";
-		
+	
 		case IE_SPL_CLASS_ID:
 			return ".spl";
-		
+	
 		case IE_SRC_CLASS_ID:
 			return ".src";
-		
+	
 		case IE_STO_CLASS_ID:
 			return ".sto";
-		
+	
 		case IE_TIS_CLASS_ID:
 			return ".tis";
-		
+	
 		case IE_TLK_CLASS_ID:
 			return ".tlk";
-		
+	
 		case IE_TOH_CLASS_ID:
 			return ".toh";
-		
+	
 		case IE_TOT_CLASS_ID:
 			return ".tot";
-		
+	
 		case IE_VAR_CLASS_ID:
 			return ".var";
-		
+	
 		case IE_VVC_CLASS_ID:
 			return ".vvc";
-		
+	
 		case IE_WAV_CLASS_ID:
 			return ".wav";
-		
+	
 		case IE_WED_CLASS_ID:
 			return ".wed";
-		
+	
 		case IE_WFX_CLASS_ID:
 			return ".wfx";
-		
+	
 		case IE_WMP_CLASS_ID:
 			return ".wmp";
 	}
@@ -2233,6 +2234,10 @@ bool Interface::LoadGemRBINI()
 	s = ini->GetKeyAsString( "resources", "CursorBAM", NULL );
 	if (s)
 		strcpy( CursorBam, s );
+
+	s = ini->GetKeyAsString( "resources", "ScrollCursorBAM", NULL );
+	if (s)
+		strcpy( ScrollCursorBam, s );
 
 	s = ini->GetKeyAsString( "resources", "ButtonFont", NULL );
 	if (s)
@@ -2761,7 +2766,7 @@ void Interface::AddWindow(Window * win)
 	int slot = -1;
 	for(unsigned int i = 0; i < windows.size(); i++) {
 		Window *w = windows[i];
-	
+
 		if(w==NULL) {
 			slot = i;
 			break;
@@ -2898,7 +2903,7 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 			}
 			evntmgr->DelWindow( win );
 			break;
-		
+	
 		case WINDOW_VISIBLE:
 			if (win->WindowID==65535) {
 				video->SetViewport( win->XPos, win->YPos, win->Width, win->Height);
@@ -3001,13 +3006,13 @@ void Interface::DrawWindows(void)
 		//this variable is used all over in the following hacks
 		int flg = gc->GetDialogueFlags();
 		GSUpdate(!(flg & DF_FREEZE_SCRIPTS) );
-	
+
 		//the following part is a series of hardcoded gui behaviour
-	
+
 		//updating panes according to the saved game
 		//pst requires this before initiating dialogs because it has
 		//no dialog window by default
-	
+
 		//initiating dialog
 		if (flg & DF_IN_DIALOG) {
 			// -3 noaction
@@ -3030,7 +3035,7 @@ void Interface::DrawWindows(void)
 				gc->SetDialogueFlags(DF_OPENCONTINUEWINDOW|DF_OPENENDWINDOW, BM_NAND);
 			}
 		}
-	
+
 		//handling container
 		if (CurrentContainer && UseContainer) {
 			if (!(flg & DF_IN_CONTAINER) ) {
@@ -3054,10 +3059,10 @@ void Interface::DrawWindows(void)
 	size_t i = topwin.size();
 	while(i--) {
 		unsigned int t = topwin[i];
-	
+
 		if ( t >=windows.size() )
 			continue;
-	
+
 		//visible ==1 or 2 will be drawn
 		Window* win = windows[t];
 		if (win != NULL) {
@@ -3763,7 +3768,7 @@ void Interface::LoadGame(int index)
 
 	if (!gam_str || !wmp_str)
 		goto cleanup;
-	
+
 	// Load GAM file
 	gam_mgr = ( SaveGameMgr* ) GetInterface( IE_GAM_CLASS_ID );
 	if (!gam_mgr)
@@ -4397,7 +4402,7 @@ void Interface::DragItem(CREItem *item, const ieResRef Picture)
 		if (item) {
 			DraggedCursor = GetBAMSprite( Picture, 0, 0 );
 		}
-	
+
 		video->SetDragCursor (DraggedCursor);
 	}
 }
@@ -4521,7 +4526,7 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 		int i,j,k;
 		char *endptr;
 		ieResRef NewItem;
-	
+
 		void* lookup;
 		if ( !RtRows->Lookup( itm->ItemResRef, lookup ) ) {
 			return true;
@@ -4789,7 +4794,7 @@ int Interface::CloseCurrentStore()
 		//created streams are always autofree (close file on destruct)
 		//this one will be destructed when we return from here
 		FileStream str;
-	
+
 		str.Create( CurrentStore->Name, IE_STO_CLASS_ID );
 		int ret = sm->PutStore (&str, CurrentStore);
 		if (ret <0) {
@@ -4815,7 +4820,7 @@ Store *Interface::SetCurrentStore(const ieResRef resname, const ieVariable owner
 		if ( !strnicmp(CurrentStore->Name, resname, 8) ) {
 			return CurrentStore;
 		}
-	
+
 		//not simply delete the old store, but save it
 		CloseCurrentStore();
 	}
@@ -4960,6 +4965,11 @@ Sprite2D *Interface::GetCursorSprite()
 	return GetBAMSprite(CursorBam, 0, 0);
 }
 
+Sprite2D *Interface::GetScrollCursorSprite(int frameNum, int spriteNum)
+{
+	return GetBAMSprite(ScrollCursorBam, frameNum, spriteNum);
+}
+
 /* we should return -1 if it isn't gold, otherwise return the gold value */
 int Interface::CanMoveItem(const CREItem *item) const
 {
@@ -5053,7 +5063,7 @@ int Interface::SwapoutArea(Map *map)
 		//created streams are always autofree (close file on destruct)
 		//this one will be destructed when we return from here
 		FileStream str;
-	
+
 		str.Create( map->GetScriptName(), IE_ARE_CLASS_ID );
 		int ret = mm->PutArea (&str, map);
 		if (ret <0) {
@@ -5111,7 +5121,7 @@ int Interface::WriteGame(const char *folder)
 		//created streams are always autofree (close file on destruct)
 		//this one will be destructed when we return from here
 		FileStream str;
-	
+
 		str.Create( folder, GameNameResRef, IE_GAM_CLASS_ID );
 		int ret = gm->PutGame (&str, game);
 		if (ret <0) {
@@ -5139,7 +5149,7 @@ int Interface::WriteWorldMap(const char *folder)
 		//created streams are always autofree (close file on destruct)
 		//this one will be destructed when we return from here
 		FileStream str;
-	
+
 		str.Create( folder, WorldMapName, IE_WMP_CLASS_ID );
 		int ret = wmm->PutWorldMap (&str, worldmap);
 		if (ret <0) {

@@ -50,6 +50,10 @@ private:
 	int width,height,bpp;
 	bool fullscreen;
 	int mousescrollspd;
+	int numScrollCursor;
+	bool scrolling;
+	int CursorPosition;
+
 public:
 	SDLVideoDriver(void);
 	~SDLVideoDriver(void);
@@ -157,6 +161,10 @@ public:
 	unsigned int h, unsigned int dstx, unsigned int dsty, int truecolor,
 	unsigned char *palette, ieDword strRef);
 	int PollMovieEvents();
+	void drawScrollCursorSprite(int Position );
+	int whereIsTheCursor();
+	bool isScrolling();
+
 private:
 	void DrawMovieSubtitle(ieDword strRef);
 
