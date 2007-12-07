@@ -39,24 +39,42 @@ def CloseOtherWindow (NewWindowFn):
 		OtherWindowFn = NewWindowFn
 		return 0
 
-def GetLearnableMageSpells (Kit, Alignment, Level):
-	Learnable =[]
+def GetMageSpells (Kit, Alignment, Level):
+	MageSpells = []
+	SpellType = 99
+	Table = GemRB.LoadTable ("aligns")
+	v = GemRB.FindTableValue (Table, 3, Alignment)
+	Usability = Kit | GemRB.GetTableValue(Table, v, 5)
 
-	Table=GemRB.LoadTable("aligns")
-	v = GemRB.FindTableValue(Table, 3, Alignment)
-	print "%x=%x"%(Alignment,v)
-	#usability is the bitset we look for
-	Usability=Kit | GemRB.GetTableValue(Table, v, 5)
-
-	print "Alignment: %x, Kit:%x  Usability %x"%(Alignment, Kit, Usability)
-	for i in range(100):
+	for i in range(50):
 		SpellName = "SPWI%d%02d"%(Level,i)
-		ms = GemRB.GetSpell(SpellName)
+		ms = GemRB.GetSpell (SpellName)
 		if ms == None:
 			continue
+
 		if Usability & ms['SpellExclusion']:
-			continue
-		Learnable.append (SpellName)
+			SpellType = 0
+		else:
+			SpellType = 1
+			if Kit & (1 << ms['SpellSchool']+5): # of matching specialist school
+				SpellType = 2
+			# Wild mage spells are of normal schools, so we have to find them
+			# separately. Generalists can learn any spell but the wild ones, so
+			# we check if the mage is wild and if a generalist wouldn't be able
+			# to learn the spell.
+			if Kit == 0x8000 and (0x4000 & ms['SpellExclusion']):
+				SpellType = 2
+		#print "Spell type:", SpellType, "Spell", GemRB.GetString (ms['SpellName'],1)
+		MageSpells.append ([SpellName, SpellType])
+
+	return MageSpells
+
+def GetLearnableMageSpells (Kit, Alignment, Level):
+	Learnable = []
+
+	for Spell in GetMageSpells (Kit, Alignment, Level):
+		if Spell[1]: 
+			Learnable.append (Spell[0])
 	return Learnable
 
 def GetLearnablePriestSpells (Class, Alignment, Level):
