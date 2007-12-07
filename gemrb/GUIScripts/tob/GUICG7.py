@@ -53,9 +53,10 @@ def OnLoad():
 		KitValue = GemRB.GetTableValue(KitTable, KitIndex - 21, 3)
 		print "KitValue", KitValue
 		MageSpellsSelectPointsLeft = 3
-		#TODO the extra slot needs to be used for a matching specialist spell
-		#TODO also make sure the Pick button/method does this aswell
-		#TODO also write the specialist spells of greater level to the spellbook
+		# TODO the extra slot needs to be used for a matching specialist spell
+		# TODO also make sure the Pick button/method does this aswell
+		# TODO also write the specialist spells of greater level to the spellbook
+		#      or will it be done on levelup? Or was it just Edwin?
 	else:
 		KitValue = 0x4000
 		MageSpellsSelectPointsLeft = 2
