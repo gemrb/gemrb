@@ -51,15 +51,20 @@ def OnLoad():
 	KitIndex = GemRB.GetVar("Class Kit")
 	if KitIndex:
 		KitValue = GemRB.GetTableValue(KitTable, KitIndex - 21, 3)
+		print "KitValue", KitValue
+		MageSpellsSelectPointsLeft = 3
+		#TODO the extra slot needs to be used for a matching specialist spell
+		#TODO also make sure the Pick button/method does this aswell
+		#TODO also write the specialist spells of greater level to the spellbook
 	else:
 		KitValue = 0x4000
+		MageSpellsSelectPointsLeft = 2
 
 	Learnable = GetLearnableMageSpells( KitValue, v, 1)
 	GemRB.SetVar("MageSpellBook", 0)
 	SpellMask = 0
 	GemRB.SetVar("SpellMask", 0)
 
-	MageSpellsSelectPointsLeft = 2
 	PointsLeftLabel = GemRB.GetControl(MageSpellsWindow, 0x1000001b)
 	GemRB.SetLabelUseRGB(MageSpellsWindow, PointsLeftLabel, 1)
 	GemRB.SetText(MageSpellsWindow, PointsLeftLabel, str(MageSpellsSelectPointsLeft))
