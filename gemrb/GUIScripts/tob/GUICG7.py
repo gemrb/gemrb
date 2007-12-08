@@ -44,21 +44,26 @@ def OnLoad():
 		GemRB.SetNextScript("GUICG6")
 		return
 
+	MageSpellsSelectPointsLeft = 2
 	GemRB.LoadWindowPack("GUICG", 640, 480)
 	MageSpellsWindow = GemRB.LoadWindow(7)
 	v = GemRB.GetVar("Alignment")
 	KitIndex = GemRB.GetVar("Class Kit")
 	if KitIndex:
 		KitValue = GemRB.GetTableValue(KitTable, KitIndex - 21, 3)
-		print "KitValue", KitValue
-		MageSpellsSelectPointsLeft = 3
+
+		# bards have kits too
+		if KitValue == -1:
+			KitValue = 0x4000 # we only need it for the spells, so this is ok
+		if Class != 5:
+			MageSpellsSelectPointsLeft = 3
+
 		# TODO the extra slot needs to be used for a matching specialist spell
 		# TODO also make sure the Pick button/method does this aswell
 		# TODO also write the specialist spells of greater level to the spellbook
 		#      or will it be done on levelup? Or was it just Edwin?
 	else:
 		KitValue = 0x4000
-		MageSpellsSelectPointsLeft = 2
 
 	MageSpells = GetMageSpells (KitValue, v, 1)
 	GemRB.SetVar("MageSpellBook", 0)
