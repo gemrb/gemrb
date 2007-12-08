@@ -293,7 +293,7 @@ void GameControl::DrawArrowMarker(Region &screen, Point p, Region &viewport)
 	//tmp = core->ArrowSprites[0]->Width;
 
 	if (p.x>viewport.x+viewport.w-tmp) {
-		p.x=viewport.x+viewport.w-tmp;
+		p.x=viewport.x+viewport.w;//-tmp;
 		draw |= D_RIGHT;
 	}
 
@@ -301,7 +301,7 @@ void GameControl::DrawArrowMarker(Region &screen, Point p, Region &viewport)
 	//tmp = core->ArrowSprites[0]->Height;
 
 	if (p.y>viewport.y+viewport.h-tmp) {
-		p.y=viewport.y+viewport.h-tmp;
+		p.y=viewport.y+viewport.h;//-tmp;
 		draw |= D_BOTTOM;
 	}
 	if (arrow_orientations[draw]>=0) {
