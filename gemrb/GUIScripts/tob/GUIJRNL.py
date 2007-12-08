@@ -78,6 +78,7 @@ def OpenJournalWindow ():
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
+	MarkMenuButton (OptionsWindow)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenJournalWindow")
 	GemRB.SetWindowFrame (OptionsWindow)
 	OldPortraitWindow = GUICommonWindows.PortraitWindow

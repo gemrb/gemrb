@@ -81,6 +81,7 @@ def OpenOptionsWindow ():
 	if OldPortraitWindow == None:
 		OldOptionsWindow = GUICommonWindows.OptionsWindow
 		OptionsWindow = GemRB.LoadWindow (0)
+		MarkMenuButton (OptionsWindow)
 		SetupMenuWindowControls (OptionsWindow, 0, "OpenOptionsWindow")
 		GemRB.SetWindowFrame (OptionsWindow)
 		OldPortraitWindow = GUICommonWindows.PortraitWindow
