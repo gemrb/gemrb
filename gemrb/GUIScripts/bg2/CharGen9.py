@@ -164,7 +164,7 @@ def NextPress():
 				GemRB.LearnSpell (MyChar, Learnable[i], 0)
 			j=j<<1
 	else:
-		KitValue = 0x4000 + KitIndex
+		KitValue = (0x4000 + KitIndex)<<16
 
 	print "KitValue**********:",KitValue
 	GemRB.SetPlayerStat (MyChar, IE_KIT, KitValue)

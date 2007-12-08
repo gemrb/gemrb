@@ -156,7 +156,7 @@ def NextPress():
 	if TableName != "*":
 		KitValue = GemRB.GetTableValue(KitTable, KitIndex, 6)
 		if TableName != "MXSPLBRD" and KitValue == "*":
-			KitValue = 0x4000
+			KitValue = 0x40000000
 		SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_WIZARD, 1)
 		Learnable = GetLearnableMageSpells( KitValue, t, 1)
 		SpellBook = GemRB.GetVar ("MageSpellBook")
@@ -166,7 +166,7 @@ def NextPress():
 				GemRB.LearnSpell (MyChar, Learnable[i], 0)
 			j=j<<1
 	else:
-		KitValue = 0x4000 + KitIndex
+		KitValue = (0x4000 + KitIndex)<<16
 
 	print "KitValue**********:",KitValue
 	GemRB.SetPlayerStat (MyChar, IE_KIT, KitValue)

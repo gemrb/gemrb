@@ -35,7 +35,7 @@ def OnLoad():
 	ClassRow = GemRB.GetVar("Class")-1
 	Class = GemRB.GetTableValue(ClassTable, ClassRow, 5)
 	TmpTable = GemRB.LoadTable("clskills")
-	TableName = GemRB.GetTableValue(TmpTable, Class, 0)
+	TableName = GemRB.GetTableValue(TmpTable, Class, 9)
 	if TableName == "*":
 		GemRB.SetNextScript("GUICG7")
 		return
