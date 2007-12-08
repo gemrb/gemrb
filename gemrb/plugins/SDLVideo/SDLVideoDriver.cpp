@@ -299,6 +299,7 @@ int SDLVideoDriver::SwapBuffers(void)
 					key = GEM_DELETE;
 					break;
 				case SDLK_RETURN:
+				case SDLK_KP_ENTER:
 					key = GEM_RETURN;
 					break;
 				case SDLK_LALT:
