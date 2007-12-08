@@ -7669,6 +7669,8 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 			gc->TryToCast(actor, actor);
 			break;
 		case TARGET_NONE:
+			//reset the cursor
+			gc->target_mode = TARGET_MODE_NONE;
 			//this is always instant casting
 			core->ApplySpell(spelldata.spellname, actor, actor, 0);
 			break;
