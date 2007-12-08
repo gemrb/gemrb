@@ -321,7 +321,7 @@ def ActionRightPressed ():
 	UpdateActionsWindow ()
 	return
 
-def ActionSongPressed ():
+def ActionBardSongPressed ():
 	pc = GemRB.GameGetFirstSelectedPC ()
 	GemRB.SetModalState (pc, MS_BATTLESONG)
 	UpdateActionsWindow ()

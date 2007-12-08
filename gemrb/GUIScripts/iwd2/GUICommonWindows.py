@@ -9,12 +9,12 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 #
 # $Id$
 
@@ -24,6 +24,8 @@
 import GemRB
 from GUIDefines import *
 from ie_stats import *
+from ie_modal import *
+from ie_action import *
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
@@ -176,6 +178,7 @@ def GroupControls ():
 
 def UpdateActionsWindow ():
 	global PortraitWindow
+	global level, TopIndex
 
 	if PortraitWindow == -1:
 		return
@@ -202,8 +205,19 @@ def UpdateActionsWindow ():
 	if pc == -1:
 		GroupControls ()
 		return
-	#this is based on class
-	GemRB.SetupControls (PortraitWindow, pc, 6)
+
+	level = GemRB.GetVar ("ActionLevel")
+	TopIndex = GemRB.GetVar ("TopIndex")
+	if level == 0:
+		GemRB.SetupControls (PortraitWindow, pc, 6)
+	elif level == 1:
+		GemRB.SetupEquipmentIcons(PortraitWindow, pc, TopIndex)
+	elif level == 2: #spells
+		GemRB.SetVar ("Type", 3)
+		GemRB.SetupSpellIcons(PortraitWindow, pc, 3, TopIndex)
+	elif level == 3: #innates
+		GemRB.SetVar ("Type", 4)
+		GemRB.SetupSpellIcons(PortraitWindow, pc, 4, TopIndex)
 	return
 
 def OpenFloatMenuWindow ():
@@ -220,6 +234,33 @@ def ActionDefendPressed ():
 
 def ActionThievingPressed ():
 	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_PICK)
+
+def ActionQWeaponPressed (which):
+	global PortraitWindow
+
+	pc = GemRB.GameGetFirstSelectedPC ()
+
+	if GemRB.GetEquippedQuickSlot (pc,1)==which and not (GemRB.GameControlGetTargetMode() &TARGET_MODE_ATTACK):
+		GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_ATTACK)
+	else:
+		GemRB.GameControlSetTargetMode (TARGET_MODE_ALL)
+		GemRB.SetEquippedQuickSlot (pc, which)
+
+	GemRB.SetupControls (PortraitWindow, pc, 6)
+	UpdateActionsWindow ()
+	return
+
+def ActionQWeapon1Pressed ():
+	ActionQWeaponPressed(0)
+
+def ActionQWeapon2Pressed ():
+	ActionQWeaponPressed(1)
+
+def ActionQWeapon3Pressed ():
+	ActionQWeaponPressed(2)
+
+def ActionQWeapon4Pressed ():
+	ActionQWeaponPressed(3)
 
 def ActionStopPressed ():
 	for i in range (PARTY_SIZE):
@@ -251,6 +292,103 @@ def ActionRightPressed ():
 			TopIndex = 0
 
 	GemRB.SetVar ("TopIndex", TopIndex)
+	UpdateActionsWindow ()
+	return
+
+def ActionBardSongPressed ():
+	pc = GemRB.GameGetFirstSelectedPC ()
+	GemRB.SetModalState (pc, MS_BATTLESONG)
+	UpdateActionsWindow ()
+	return
+
+def ActionSearchPressed ():
+	pc = GemRB.GameGetFirstSelectedPC ()
+	GemRB.SetModalState (pc, MS_DETECTTRAPS)
+	UpdateActionsWindow ()
+	return
+
+def ActionStealthPressed ():
+	pc = GemRB.GameGetFirstSelectedPC ()
+	GemRB.SetModalState (pc, MS_STEALTH)
+	UpdateActionsWindow ()
+	return
+
+def ActionTurnPressed ():
+	pc = GemRB.GameGetFirstSelectedPC ()
+	GemRB.SetModalState (pc, MS_TURNUNDEAD)
+	UpdateActionsWindow ()
+	return
+
+def ActionUseItemPressed ():
+	GemRB.SetVar ("TopIndex", 0)
+	GemRB.SetVar ("ActionLevel", 1)
+	UpdateActionsWindow ()
+	return
+
+def ActionCastPressed ():
+	print "CASRRE"
+	GemRB.SetVar ("TopIndex", 0)
+	GemRB.SetVar ("ActionLevel", 2)
+	UpdateActionsWindow ()
+	return
+
+def ActionQItemPressed (action):
+	pc = GemRB.GameGetFirstSelectedPC ()
+	#quick slot
+	GemRB.UseItem (pc, -2, action)
+	return
+
+def ActionQItem1Pressed ():
+	ActionQItemPressed (ACT_QSLOT1)
+	return
+
+def ActionQItem2Pressed ():
+	ActionQItemPressed (ACT_QSLOT2)
+	return
+
+def ActionQItem3Pressed ():
+	ActionQItemPressed (ACT_QSLOT3)
+	return
+
+def ActionQItem4Pressed ():
+	ActionQItemPressed (ACT_QSLOT4)
+	return
+
+def ActionQItem5Pressed ():
+	ActionQItemPressed (ACT_QSLOT5)
+	return
+
+def ActionInnatePressed ():
+	GemRB.SetVar ("TopIndex", 0)
+	GemRB.SetVar ("ActionLevel", 3)
+	UpdateActionsWindow ()
+	return
+
+def ActionSkillsPressed ():
+	GemRB.SetVar ("TopIndex", 0)
+	GemRB.SetVar ("ActionLevel", 4)
+	UpdateActionsWindow ()
+	return
+
+def SpellPressed ():
+	pc = GemRB.GameGetFirstSelectedPC ()
+
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_CAST)
+	Spell = GemRB.GetVar ("Spell")
+	Type = GemRB.GetVar ("Type")
+	GemRB.SpellCast (pc, Type, Spell)
+	GemRB.SetVar ("ActionLevel", 0)
+	UpdateActionsWindow ()
+	return
+
+def EquipmentPressed ():
+	pc = GemRB.GameGetFirstSelectedPC ()
+
+	GemRB.GameControlSetTargetMode (TARGET_MODE_ALL | TARGET_MODE_CAST)
+	Item = GemRB.GetVar ("Equipment")
+	#equipment index
+	GemRB.UseItem (pc, -1, Item)
+	GemRB.SetVar ("ActionLevel", 0)
 	UpdateActionsWindow ()
 	return
 
@@ -303,8 +441,8 @@ def SetSelectionChangeHandler (handler):
 	global SelectionChangeHandler
 
 	# Switching from walking to non-walking environment:
-	#   set the first selected PC in walking env as a selected
-	#   in nonwalking env
+	# set the first selected PC in walking env as a selected
+	# in nonwalking env
 	if (not SelectionChangeHandler) and handler:
 		sel = GemRB.GameGetFirstSelectedPC ()
 		if not sel:
@@ -446,7 +584,7 @@ def SetupSavingThrows (pc):
 			#fighter/thief
 			Class = GemRB.FindTableValue (ClassTable, 5, 4)
 		SaveName2 = GemRB.GetTableValue (ClassTable, Class, 3)
-		Class = 0  #fighter
+		Class = 0 #fighter
 
 	SaveName1 = GemRB.GetTableValue (ClassTable, Class, 3)
 
