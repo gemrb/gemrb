@@ -28,10 +28,11 @@ DoneButton = 0
 Random = 1
 MageSpells = []
 KitValue = 0
+Class = 0
 
 def OnLoad():
 	global MageSpellsWindow, MageSpellsTextArea, DoneButton
-	global MageSpellsSelectPointsLeft, MageSpells
+	global MageSpellsSelectPointsLeft, MageSpells, Class, KitValue
 	
 	AlignmentTable = GemRB.LoadTable("aligns")
 	ClassTable = GemRB.LoadTable("classes")
@@ -57,9 +58,7 @@ def OnLoad():
 			KitValue = 0x4000 # we only need it for the spells, so this is ok
 		if Class != 5:
 			MageSpellsSelectPointsLeft = 3
-
-		# TODO the extra slot needs to be used for a matching specialist spell
-		# TODO also make sure the Pick button/method does this aswell
+		# TODO make the random Pick method enforce a specialist selection too?
 		# TODO also write the specialist spells of greater level to the spellbook
 		#      or will it be done on levelup? Or was it just Edwin?
 	else:
@@ -121,7 +120,7 @@ def OnLoad():
 	return
 
 def MageSpellsSelectPress():
-	global MageSpellsSelectPointsLeft, MageSpells
+	global MageSpellsSelectPointsLeft, MageSpells, Class, KitValue
 
 	MageSpellBook = GemRB.GetVar("MageSpellBook")
 	i = GemRB.GetVar("ButtonPressed")
@@ -139,6 +138,20 @@ def MageSpellsSelectPress():
 			if MageSpellsSelectPointsLeft == 0:
 				MarkButton(i,0)
 				return
+
+			# specialists need to pick at least one specialist spell
+			if Class == 1 and KitValue != 0x4000 and \
+			MageSpellsSelectPointsLeft == 1 and MageSpells[i][1] != 2:
+				HasSpecialistSpell = 0
+				# check if the current selection contains a specialist spell
+				for j in range (len(MageSpells)):
+					if (MageSpellBook & (1 << j)) and MageSpells[j][1] == 2:
+						HasSpecialistSpell = 1
+
+				if HasSpecialistSpell == 0:
+					GemRB.SetText (MageSpellsWindow, MageSpellsTextArea, 33381)
+					MarkButton (i,0)
+					return
 
 			MageSpellsSelectPointsLeft = MageSpellsSelectPointsLeft - 1
 			MageSpellBook = MageSpellBook | SpellMask
