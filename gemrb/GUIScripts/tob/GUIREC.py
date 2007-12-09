@@ -622,12 +622,12 @@ def OpenBiographyWindow ():
 	BiographyWindow = Window = GemRB.LoadWindow (12)
 
 	TextArea = GemRB.GetControl (Window, 0)
-	GemRB.SetText (Window, TextArea, 39424)
+	GemRB.SetText (Window, TextArea, 33347)
 
 
 	# Done
 	Button = GemRB.GetControl (Window, 2)
-	GemRB.SetText (Window, Button, 1403)
+	GemRB.SetText (Window, Button, 11973)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenBiographyWindow")
 
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
