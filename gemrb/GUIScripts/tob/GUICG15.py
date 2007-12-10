@@ -58,7 +58,7 @@ def OnLoad():
 	GemRB.SetButtonState(RaceWindow,DoneButton,IE_GUI_BUTTON_DISABLED)
 
 	TextAreaControl = GemRB.GetControl(RaceWindow, 2)
-	GemRB.SetText(RaceWindow,TextAreaControl,17237)
+	GemRB.SetText(RaceWindow,TextAreaControl,17256)
 	TopIndex = 0
 	GemRB.SetVar("TopIndex",0)
 	ScrollBarControl = GemRB.GetControl(RaceWindow, 1)
