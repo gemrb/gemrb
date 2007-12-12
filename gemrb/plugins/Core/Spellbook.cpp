@@ -379,7 +379,7 @@ int Spellbook::LearnSpell(Spell *spell, int memo)
 {
 	CREKnownSpell *spl = new CREKnownSpell();
 	strncpy(spl->SpellResRef, spell->Name, 8);
-	spl->Type = GetSpellType(spell->SpellType);
+	spl->Type = (ieWord) GetSpellType(spell->SpellType);
 	if ( spl->Type == IE_SPELL_TYPE_INNATE) {
 		spl->Level = 0;
 	}

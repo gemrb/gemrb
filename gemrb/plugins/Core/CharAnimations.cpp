@@ -713,7 +713,7 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 		// other things.
 		//this is longer than expected so it won't overflow
 		char NewResRef[12];
-		unsigned char Cycle;
+		unsigned char Cycle = 0;
 		if (part < actorPartCount) {
 			// Character animation parts
 

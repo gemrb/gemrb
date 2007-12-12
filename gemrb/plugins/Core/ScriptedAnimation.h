@@ -70,7 +70,7 @@ public:
 	int XPos, YPos, ZPos;
 	ieDword FrameRate;
 	ieDword FaceTarget;
-	unsigned char Orientation, NewOrientation;
+	ieByte Orientation, NewOrientation;
 	ieDword Duration;
 	bool justCreated;
 	ieResRef ResName;

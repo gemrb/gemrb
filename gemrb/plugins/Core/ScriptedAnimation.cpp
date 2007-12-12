@@ -450,7 +450,7 @@ void ScriptedAnimation::SetOrientation(int orientation)
 	if (orientation==-1) {
 		return;
 	}
-	Orientation=orientation;
+	Orientation=(ieByte) orientation;
 	if (twin) {
 		twin->Orientation=Orientation;
 	}
