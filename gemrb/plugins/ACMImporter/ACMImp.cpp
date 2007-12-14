@@ -924,6 +924,8 @@ bool ACMImp::evictBuffer()
 			// Buffer was unused. An error would have indicated
 			// the buffer was still attached to a source.
 
+			buffercache.Remove(k);
+
 			//printf("Removed buffer %s from ACMImp cache\n", k);
 			break;
 		}
