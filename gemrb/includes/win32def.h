@@ -118,21 +118,21 @@ typedef __POSITION* POSITION;
 	SetConsoleCursorPosition(hConsole, coord); \
 	}
 #else
-#define BLACK printf("\033[0m\033[30m");
-#define RED printf("\033[0m\033[31m");
-#define GREEN printf("\033[0m\033[32m");
-#define BROWN printf("\033[0m\033[33m");
-#define BLUE printf("\033[0m\033[34m");
-#define MAGENTA printf("\033[0m\033[35m");
-#define CYAN printf("\033[0m\033[36m");
-#define WHITE printf("\033[0m\033[37m");
-#define LIGHT_RED printf("\033[1m\033[31m");
-#define LIGHT_GREEN printf("\033[1m\033[32m");
-#define YELLOW printf("\033[1m\033[33m");
-#define LIGHT_BLUE printf("\033[1m\033[34m");
-#define LIGHT_MAGENTA printf("\033[1m\033[35m");
-#define LIGHT_CYAN printf("\033[1m\033[36m");
-#define LIGHT_WHITE printf("\033[1m\033[37m");
+#define BLACK printf("\033[0m\033[30;40m");
+#define RED printf("\033[0m\033[31;40m");
+#define GREEN printf("\033[0m\033[32;40m");
+#define BROWN printf("\033[0m\033[33;40m");
+#define BLUE printf("\033[0m\033[34;40m");
+#define MAGENTA printf("\033[0m\033[35;40m");
+#define CYAN printf("\033[0m\033[36;40m");
+#define WHITE printf("\033[0m\033[37;40m");
+#define LIGHT_RED printf("\033[1m\033[31;40m");
+#define LIGHT_GREEN printf("\033[1m\033[32;40m");
+#define YELLOW printf("\033[1m\033[33;40m");
+#define LIGHT_BLUE printf("\033[1m\033[34;40m");
+#define LIGHT_MAGENTA printf("\033[1m\033[35;40m");
+#define LIGHT_CYAN printf("\033[1m\033[36;40m");
+#define LIGHT_WHITE printf("\033[1m\033[37;40m");
 #define gotoxy(x,y) printf("\033[%d;%dH", y, x)
 #endif
 

@@ -57,5 +57,9 @@ int main(int argc, char* argv[])
 	}
 	core->Main();
 	delete( core );
+#ifndef WIN32
+	//reinitialize the console colors.
+	printf("\033[%sm","0") ;
+#endif
 	return 0;
 }
