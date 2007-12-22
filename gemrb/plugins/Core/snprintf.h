@@ -1,64 +1,41 @@
-/*
- * snprintf.c - a portable implementation of snprintf
+/* 
+ *	HT Editor
+ *	snprintf.h
  *
- * AUTHOR
- *   Mark Martinec <mark.martinec@ijs.si>, April 1999.
+ *	Copyright (C) 1999-2003 Sebastian Biallas (sb@biallas.net)
  *
- *   Copyright 1999, Mark Martinec. All rights reserved.
+ *	This program is free software; you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License version 2 as
+ *	published by the Free Software Foundation.
  *
- * TERMS AND CONDITIONS
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the "Frontier Artistic License" which comes
- *   with this Kit.
+ *	This program is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU General Public License for more details.
  *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty
- *   of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *   See the Frontier Artistic License for more details.
- *
- *   You should have received a copy of the Frontier Artistic License
- *   with this Kit in the file named LICENSE.txt .
- *   If not, I'll be glad to provide one.
- *
- * See snprintf.cpp for the rest of author specified docs
+ *	You should have received a copy of the GNU General Public License
+ *	along with this program; if not, write to the Free Software
+ *	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-/**
- * @file snprintf.h
- * portable implementation of snprintf
- * @author Mark Martinec <mark.martinec@ijs.si>, April 1999.
- */
+#ifndef __SNPRINTF_H__
+#define __SNPRINTF_H__
 
-#ifndef _PORTABLE_SNPRINTF_H_
-#define _PORTABLE_SNPRINTF_H_
-
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#define PORTABLE_SNPRINTF_VERSION_MAJOR 2
-#define PORTABLE_SNPRINTF_VERSION_MINOR 2
-
-#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <stdarg.h>
 
-#ifdef HAVE_SNPRINTF
-#include <stdio.h>
-#else
-extern int snprintf(char *, size_t, const char *, /*args*/ ...);
-extern int vsnprintf(char *, size_t, const char *, va_list);
-#endif
+int ht_asprintf(char **ptr, const char *format, ...);
+int ht_vasprintf(char **ptr, const char *format, va_list ap);
 
-#if defined(HAVE_SNPRINTF) && defined(PREFER_PORTABLE_SNPRINTF)
-extern int portable_snprintf(char *str, size_t str_m, const char *fmt, /*args*/ ...);
-extern int portable_vsnprintf(char *str, size_t str_m, const char *fmt, va_list ap);
-#define snprintf  portable_snprintf
-#define vsnprintf portable_vsnprintf
-#endif
+int ht_snprintf(char *str, size_t count, const char *fmt, ...);
+int ht_vsnprintf(char *str, size_t count, const char *fmt, va_list args);
 
-extern int asprintf  (char **ptr, const char *fmt, /*args*/ ...);
-extern int vasprintf (char **ptr, const char *fmt, va_list ap);
-extern int asnprintf (char **ptr, size_t str_m, const char *fmt, /*args*/ ...);
-extern int vasnprintf(char **ptr, size_t str_m, const char *fmt, va_list ap);
+int ht_fprintf(FILE *file, const char *fmt, ...);
+int ht_vfprintf(FILE *file, const char *fmt, va_list args);
 
+int ht_printf(const char *fmt, ...);
+int ht_vprintf(const char *fmt, va_list args);
+
+#define snprintf ht_snprintf
 #endif
