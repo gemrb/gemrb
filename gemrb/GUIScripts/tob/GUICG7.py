@@ -56,7 +56,8 @@ def OnLoad():
 		# bards have kits too
 		if KitValue == -1:
 			KitValue = 0x4000 # we only need it for the spells, so this is ok
-		if Class != 5:
+		#this is an ugly hack, to exclude bards from specialisation (and bonus spell)
+		if GemRB.GetTableValue(TmpTable, Class, 4)=='*':
 			MageSpellsSelectPointsLeft = 3
 		# TODO make the random Pick method enforce a specialist selection too?
 		# TODO also write the specialist spells of greater level to the spellbook
@@ -125,7 +126,6 @@ def MageSpellsSelectPress():
 	MageSpellBook = GemRB.GetVar("MageSpellBook")
 	i = GemRB.GetVar("ButtonPressed")
 	SpellMask = 1 << i
-	#print "MSB:", MageSpellBook, "SM:", SpellMask, "i:", i
 
 	Spell = GemRB.GetSpell(MageSpells[i][0])
 	GemRB.SetText(MageSpellsWindow, MageSpellsTextArea, Spell["SpellDesc"])
@@ -160,11 +160,9 @@ def MageSpellsSelectPress():
 
 	for j in range (len(MageSpells)):
 		if MageSpellBook & (1 << j):
-			print "Pressed:", j
 			MarkButton(j,1)
 		else:
 			MarkButton(j,0)
-	print "************"
 
 	PointsLeftLabel = GemRB.GetControl(MageSpellsWindow, 0x1000001b)
 	GemRB.SetText(MageSpellsWindow, PointsLeftLabel, str(MageSpellsSelectPointsLeft))
