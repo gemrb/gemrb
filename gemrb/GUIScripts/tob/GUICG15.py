@@ -50,6 +50,8 @@ def OnLoad():
 		Button = GemRB.GetControl(RaceWindow,i+6)
 		GemRB.SetButtonFlags(RaceWindow,Button,IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
 
+	GemRB.SetVar("HateRace",0)
+
 	BackButton = GemRB.GetControl(RaceWindow,4)
 	GemRB.SetText(RaceWindow,BackButton,15416)
 	DoneButton = GemRB.GetControl(RaceWindow,5)
