@@ -134,7 +134,7 @@ static char csound[VCONST_COUNT];
 
 static void InitActorTables();
 
-#define DAMAGE_LEVELS 13
+#define DAMAGE_LEVELS 19
 #define ATTACKROLL    20
 #define SAVEROLL      20
 #define DEFAULTAC     10
@@ -145,6 +145,8 @@ static ieResRef d_main[DAMAGE_LEVELS] = {
 	"SPFIRIMP","SPFIRIMP","SPFIRIMP",     //fire
 	"SPSHKIMP","SPSHKIMP","SPSHKIMP",     //spark
 	"SPFIRIMP","SPFIRIMP","SPFIRIMP",     //ice
+	"SHACID","SHACID","SHACID",           //acid
+	"SPDUSTY2","SPDUSTY2","SPDUSTY2"      //disintegrate
 };
 static ieResRef d_splash[DAMAGE_LEVELS] = {
 	"","","","",
