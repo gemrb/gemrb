@@ -1214,7 +1214,7 @@ void Actor::PlayDamageAnimation(int type)
 			if (!i) i = d_gradient[type];
 			AddAnimation(d_main[type], i, 0, AA_PLAYONCE);
 			break;
-		case 4: case 5: case 7: //fire
+		case 4: case 5: case 6: case 7: //fire
 			AddAnimation(d_main[type], d_gradient[type], 0, AA_PLAYONCE);
 			for(i=DL_FIRE;i<=type;i++) {
 				AddAnimation(d_splash[i], d_gradient[i], 0, AA_PLAYONCE);
