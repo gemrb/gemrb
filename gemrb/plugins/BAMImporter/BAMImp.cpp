@@ -160,47 +160,18 @@ Sprite2D* BAMImp::GetFrameInternal(unsigned short findex, unsigned char mode,
 
 	if (BAMsprite) {
 		bool RLECompressed = (frames[findex].FrameData & 0x80000000) == 0;
-		if (data) {
-			const unsigned char* framedata = data;
-			framedata += (frames[findex].FrameData & 0x7FFFFFFF) - DataStart;
-			if (RLECompressed) {
-				spr = core->GetVideoDriver()->CreateSpriteBAM8(
-					frames[findex].Width, frames[findex].Height,
-					true, framedata, 0, palette, CompressedColorIndex);
-			} else {
-				spr = core->GetVideoDriver()->CreateSpriteBAM8(
-					frames[findex].Width, frames[findex].Height, false,
-					framedata, 0, palette, CompressedColorIndex );
-			}
-		} else {
-			if (RLECompressed) {
-				// FIXME: get the real size of the RLE data somehow, or cache
-				// the entire BAM in memory consecutively
-				unsigned long RLESize =
-				( frames[findex].Width * frames[findex].Height * 3 ) / 2 + 1;
-				//without partial reads, we should be careful
-				str->Seek( ( frames[findex].FrameData & 0x7FFFFFFF ), GEM_STREAM_START );
-				unsigned long remains = str->Remains();
-				if (RLESize > remains) {
-					RLESize = remains;
-				}
-				unsigned char* RLEinpix = (unsigned char*)malloc( RLESize );
-				if (str->Read( RLEinpix, RLESize ) == GEM_ERROR) {
-					free( RLEinpix );
-					return NULL;
-				}
 
-				spr = core->GetVideoDriver()->CreateSpriteBAM8(
-					frames[findex].Width, frames[findex].Height,
-					true, RLEinpix, RLESize, palette, CompressedColorIndex);
-			} else {
-				const unsigned char* pixels;
-				pixels = (const unsigned char*)GetFramePixels(findex);
-				spr = core->GetVideoDriver()->CreateSpriteBAM8(
-					frames[findex].Width, frames[findex].Height, false,
-					pixels, frames[findex].Width*frames[findex].Height, 
-					palette, CompressedColorIndex );
-			}
+		assert(data);
+		const unsigned char* framedata = data;
+		framedata += (frames[findex].FrameData & 0x7FFFFFFF) - DataStart;
+		if (RLECompressed) {
+			spr = core->GetVideoDriver()->CreateSpriteBAM8(
+				frames[findex].Width, frames[findex].Height,
+				true, framedata, 0, palette, CompressedColorIndex);
+		} else {
+			spr = core->GetVideoDriver()->CreateSpriteBAM8(
+				frames[findex].Width, frames[findex].Height, false,
+				framedata, 0, palette, CompressedColorIndex );
 		}
 	} else {
 		void* pixels = GetFramePixels(findex);
