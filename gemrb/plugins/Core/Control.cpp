@@ -27,6 +27,7 @@
 #include "Window.h"
 #include "Interface.h"
 #include "ScriptEngine.h"
+#include "Video.h"
 
 
 Control::Control()
@@ -60,6 +61,8 @@ Control::~Control()
 	if (animation) {
 		delete animation;
 	}
+
+	core->GetVideoDriver()->FreeSprite(AnimPicture);
 }
 
 /** Sets the Tooltip text of the current control */
@@ -205,6 +208,7 @@ int Control::SetFlags(int arg_flags, int opcode)
 
 void Control::SetAnimPicture(Sprite2D* newpic)
 {
+	core->GetVideoDriver()->FreeSprite(AnimPicture);
 	AnimPicture = newpic;
 	Changed = true;
 }

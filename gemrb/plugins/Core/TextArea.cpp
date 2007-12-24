@@ -72,20 +72,14 @@ TextArea::~TextArea(void)
 	for (size_t i = 0; i < lines.size(); i++) {
 		free( lines[i] );
 	}
-	if (AnimPicture) {
-		core->GetVideoDriver()->FreeSprite(AnimPicture);
-		SetAnimPicture(NULL);
-	}
 }
 
 void TextArea::RefreshSprite(const char *portrait)
 {
-	Video *video = core->GetVideoDriver();
 	if (AnimPicture) {
 		if (!strnicmp(PortraitResRef, portrait, 8) ) {
 			return;
 		}
-		video->FreeSprite(AnimPicture);
 		SetAnimPicture(NULL);
 	}
 	strnlwrcpy(PortraitResRef, portrait, 8);
