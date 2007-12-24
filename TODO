@@ -1,19 +1,7 @@
 Scripts:
-1. (DONE) Run All creature scripts when the creatures are 'activated'. 
-2. (DONE) Run All area scripts not just the active areas. (now Game runs them all)
-3. (DONE) TLK tags
-4. (DONE) fix loading/saving of local variables of creatures (needs effect framework)
-5. (DONE) Handle the protagonist/party death event
-6. (DONE) Handle the party limit exceeded event
-
+no pending tasks
 
 Items:
-1. (DONE) Loading containers/items in areas
-2. (DONE) Dropping of items (first create an opcode)
-2a. (DONE) Render dropped items in area (ground icon)
-3. (DONE) Picking up an item (create opcode too)
-4. (DONE) Equipping items, weapons are special
-5. (DONE) Equipped weapon range (create triggers)
 6. (PARTLY) Break items, count charges
 7. Implement switching weapon abilities
 8. (PARTLY) Implement item usage (similar to spells)
@@ -27,30 +15,21 @@ Effects:
 6. Implement area/non-living affecting effects 
 
 Area:
-1. (DONE) Implement cover (wallgroups) (wjp)
 2. Don't load scripts for pile items? (research when a script is unused)
 3. Create real streaming ambients (do not preload them, just use them when needed)
-4. (DONE) in pathfinder, calculate with the actor's feet circle size 
-5. (DONE) fix door wallgroups and tiles
-6. (DONE) Improve pathfinder to not cancel pathfinding when the target point
-   is temporarily blocked by other actor
+4. (DONE) in pathfinder, calculate with the actor's feet circle size (npc blocking still needed)
+5. (DONE) fix door wallgroups and tiles (some problems with overlays still exist)
 
 Store:
-1. (DONE) Save stores, handle containers
-2. (DONE) Stores recharge rechargeable items
+no tasks
 
 Animation:
 1. (PARTLY) fix char animation sequences
-2. (DONE) animationfactory->one single palette
-3. (DONE) Use animationfactory in CharAnimations, and allow different palettes
-4. (DONE) Handle large multipart animations (2x2, 3x3)
 5. (PARTLY) Handle equipment animations (armourlevel, weapons)
-6. (DONE) Fix avatars for PST's actors marked with '*' in ANIMATE.IDS
 7. stanceID is still fuzzy. Fix it. (FIXED?)
 8. Implement projectile animations (area, cone, fragments)
 
 Actor:
-1. (DONE) Fix reputation
 2. Use the character sheet (Actor.cpp) itself to store attributes of the character 
    during character generation. 
    Benefits: data is already stored in the destination, data constraints and relations 
@@ -60,7 +39,6 @@ Actor:
 
 
 Game GUI:
-1. (DONE) fix TextScreen/IncrementChapter
 2. (PARTLY) implement class based (but customisable) action button bar. Generally port
    the IWD2 system to all engines
 3. implement grabbing mouse pointer by a control to fix dragging of PST Float menu window
@@ -105,8 +83,6 @@ Release:
 
 
 Documentation:
-1. (DONE) make tool to scan GUIScript.cpp and report functions with stale
-   documentation in docs/en/GUIScript
 2. (PARTLY) make tool to scan source files for those with non-standard
    copyright notices
 3. Add Doxygen doc comments to more objects
@@ -114,6 +90,5 @@ Documentation:
 
 
 Community:
-1. (DONE) fix CIA reporting email address
-2. Update the web page, get rid of postnuke
+2. (DONE-needs more work) Update the web page, get rid of postnuke
 3. Move this todo to bug/task tracker at Sourceforge :-)
