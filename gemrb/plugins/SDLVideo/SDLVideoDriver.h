@@ -83,7 +83,7 @@ public:
 	Sprite2D* CreateSprite8(int w, int h, int bpp, void* pixels,
 		void* palette, bool cK = false, int index = 0);
 	Sprite2D* CreateSpriteBAM8(int w, int h, bool RLE,
-		const unsigned char* pixeldata, unsigned int datasize,
+		const unsigned char* pixeldata, AnimationFactory* datasrc,
 		Palette* palette, int transindex);
 	bool SupportsBAMSprites() { return true; }
 	void FreeSprite(Sprite2D* &spr);

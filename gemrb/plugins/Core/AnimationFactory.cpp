@@ -31,6 +31,7 @@ AnimationFactory::AnimationFactory(const char* ResRef)
 {
 	FLTable = NULL;
 	FrameData = NULL;
+	datarefcount = 0;
 }
 
 AnimationFactory::~AnimationFactory(void)
@@ -40,7 +41,12 @@ AnimationFactory::~AnimationFactory(void)
 	}
 	if (FLTable)
 		free( FLTable);
-	// TODO: add assert here on refcount (which needs to be added...)
+
+	// FIXME: track down where sprites are being leaked
+	if (datarefcount) {
+		fprintf(stderr, "AnimationFactory %s has refcount %d\n", ResRef, datarefcount);
+		assert(datarefcount == 0);
+	}
 	if (FrameData)
 		free( FrameData);
 }
@@ -144,4 +150,15 @@ Sprite2D* AnimationFactory::GetPaperdollImage(ieDword *Colors,
 	//don't free pixels, createsprite stores it in spr
 
 	return spr;
+}
+
+void AnimationFactory::IncDataRefCount()
+{
+	++datarefcount;
+}
+
+void AnimationFactory::DecDataRefCount()
+{
+	assert(datarefcount > 0);
+	--datarefcount;
 }

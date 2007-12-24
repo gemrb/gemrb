@@ -28,6 +28,7 @@
 #include "../Core/Console.h"
 #include "../Core/SoundMgr.h"
 #include "../Core/Palette.h"
+#include "../Core/AnimationFactory.h"
 
 class Sprite2D_BAM_Internal {
 public:
@@ -35,11 +36,14 @@ public:
 	~Sprite2D_BAM_Internal() { if (pal) { pal->Release(); pal = 0; } }
 
 	Palette* pal;
-	unsigned int datasize;
 	bool RLE;
 	int transindex;
 	bool flip_hor;
 	bool flip_ver;
+
+	// The AnimationFactory in which the data for this sprite is stored.
+	// (Used for refcounting of the data.)
+	AnimationFactory* source;
 };
 
 SDLVideoDriver::SDLVideoDriver(void)
@@ -550,7 +554,7 @@ Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, int bpp, void* pixels,
 
 Sprite2D* SDLVideoDriver::CreateSpriteBAM8(int w, int h, bool rle,
 											 const unsigned char* pixeldata,
-											 unsigned int datasize,
+											 AnimationFactory* datasrc,
 											 Palette* palette, int transindex)
 {
 	Sprite2D* spr = new Sprite2D();
@@ -561,10 +565,11 @@ Sprite2D* SDLVideoDriver::CreateSpriteBAM8(int w, int h, bool rle,
 	palette->IncRef();
 	data->pal = palette;
 	data->transindex = transindex;
-	data->datasize = datasize;
 	data->flip_hor = false;
 	data->flip_ver = false;
 	data->RLE = rle;
+	data->source = datasrc;
+	datasrc->IncDataRefCount();
 
 	spr->pixels = (const void*)pixeldata;
 	spr->Width = w;
@@ -587,8 +592,7 @@ void SDLVideoDriver::FreeSprite(Sprite2D*& spr)
 	if (spr->BAM) {
 		if (spr->vptr) {
 			Sprite2D_BAM_Internal* tmp = (Sprite2D_BAM_Internal*)spr->vptr;
-			if (tmp->datasize)
-				free( (void*)spr->pixels );
+			tmp->source->DecDataRefCount();
 			delete tmp;
 			// this delete also calls Release() on the used palette
 		}
@@ -619,17 +623,11 @@ Sprite2D* SDLVideoDriver::DuplicateSprite(Sprite2D* sprite)
 	} else {
 		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)sprite->vptr;
 		const Uint8* rledata;
-		if (data->datasize) {
-			void* newdata = malloc(data->datasize);
-			memcpy(newdata, sprite->pixels, data->datasize);
-			rledata = (const Uint8*)newdata;
-		} else {
-			rledata = (const Uint8*)sprite->pixels;
-			// FIXME!!!!! increase refcount in AnimationFactory
-			// (currently AnimationFactories are never deleted, so safe for now
-		}
+
+		rledata = (const Uint8*)sprite->pixels;
+
 		dest = CreateSpriteBAM8(sprite->Width, sprite->Height, data->RLE,
-								rledata, data->datasize, data->pal,
+								rledata, data->source, data->pal,
 								data->transindex);
 		Sprite2D_BAM_Internal* destdata = (Sprite2D_BAM_Internal*)dest->vptr;
 		destdata->flip_ver = data->flip_ver;
@@ -1355,6 +1353,7 @@ void SDLVideoDriver::SetCursor(Sprite2D* up, Sprite2D* down)
 // Drag cursor is shown instead of all other cursors
 void SDLVideoDriver::SetDragCursor(Sprite2D* drag)
 {
+	FreeSprite(Cursor[2]);
 	if (drag) {
 		Cursor[2] = drag;
 		CursorIndex = 2;
@@ -2425,7 +2424,7 @@ void SDLVideoDriver::drawScrollCursorSprite(int Position)
 		}
 	} else if (Position == -2 * mousescrollspd ) { //upper left
 		SetDragCursor(core->GetScrollCursorSprite(3,numScrollCursor));
-	}else if (Position == 2 * mousescrollspd ) { //bottom right
+	} else if (Position == 2 * mousescrollspd ) { //bottom right
 		SetDragCursor(core->GetScrollCursorSprite(7,numScrollCursor));
 	}
 	numScrollCursor = (numScrollCursor+1) % 15;

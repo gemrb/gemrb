@@ -154,7 +154,8 @@ int BAMImp::GetCycleSize(unsigned char Cycle)
 }
 
 Sprite2D* BAMImp::GetFrameInternal(unsigned short findex, unsigned char mode,
-								   bool BAMsprite, const unsigned char* data)
+								   bool BAMsprite, const unsigned char* data,
+								   AnimationFactory* datasrc)
 {
 	Sprite2D* spr = 0;
 
@@ -167,11 +168,11 @@ Sprite2D* BAMImp::GetFrameInternal(unsigned short findex, unsigned char mode,
 		if (RLECompressed) {
 			spr = core->GetVideoDriver()->CreateSpriteBAM8(
 				frames[findex].Width, frames[findex].Height,
-				true, framedata, 0, palette, CompressedColorIndex);
+				true, framedata, datasrc, palette, CompressedColorIndex);
 		} else {
 			spr = core->GetVideoDriver()->CreateSpriteBAM8(
 				frames[findex].Width, frames[findex].Height, false,
-				framedata, 0, palette, CompressedColorIndex );
+				framedata, datasrc, palette, CompressedColorIndex );
 		}
 	} else {
 		void* pixels = GetFramePixels(findex);
@@ -288,7 +289,7 @@ AnimationFactory* BAMImp::GetAnimationFactory(const char* ResRef, unsigned char 
 	}
 
 	for (i = 0; i < FramesCount; ++i) {
-		Sprite2D* frame = GetFrameInternal( i, mode, videoBAMsupport, data );
+		Sprite2D* frame = GetFrameInternal(i, mode, videoBAMsupport, data, af);
 		assert(frame->BAM);
 		af->AddFrame(frame);
 	}

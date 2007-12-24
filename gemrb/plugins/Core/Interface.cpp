@@ -201,7 +201,6 @@ Interface::Interface(int iargc, char* iargv[])
 
 	TooltipBack = NULL;
 	DraggedItem = NULL;
-	DraggedCursor = NULL;
 	DefSound = NULL;
 	DSCount = -1;
 	GameFeatures = 0;
@@ -364,9 +363,6 @@ Interface::~Interface(void)
 	if (sgiterator) {
 		delete( sgiterator );
 	}
-	if (factory) {
-		delete( factory );
-	}
 	if (Cursors) {
 		for (int i = 0; i < CursorCount; i++) {
 			//freesprite doesn't free NULL
@@ -439,6 +435,13 @@ Interface::~Interface(void)
 		if (InfoTextPalette) {
 			FreePalette(InfoTextPalette);
 		}
+	}
+
+	if (factory) {
+		delete( factory );
+	}
+
+	if (video) {
 		FreeInterface( video );
 	}
 
@@ -1149,7 +1152,11 @@ int Interface::LoadSprites()
 	vars->Lookup("3D Acceleration", i);
 	if (i) {
 		for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
-			FogSprites[i] = video->CreateAlpha( FogSprites[i] );
+			if (FogSprites[i]) {
+				Sprite2D* alphasprite = video->CreateAlpha( FogSprites[i] );
+				video->FreeSprite ( FogSprites[i] );
+				FogSprites[i] = alphasprite;
+			}
 		}
 	}
 
@@ -4377,7 +4384,6 @@ void Interface::ReleaseDraggedItem()
 {
 	DraggedItem=NULL; //shouldn't free this
 	video->SetDragCursor (NULL);
-	video->FreeSprite(DraggedCursor); //but should free this
 }
 
 void Interface::DragItem(CREItem *item, const ieResRef Picture)
@@ -4391,11 +4397,10 @@ void Interface::DragItem(CREItem *item, const ieResRef Picture)
 	}
 	DraggedItem = item;
 	if (video) {
-		video->FreeSprite (DraggedCursor);
+		Sprite2D* DraggedCursor = NULL;
 		if (item) {
 			DraggedCursor = GetBAMSprite( Picture, 0, 0 );
 		}
-
 		video->SetDragCursor (DraggedCursor);
 	}
 }

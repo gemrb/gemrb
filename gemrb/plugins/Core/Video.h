@@ -37,6 +37,7 @@
 
 class SpriteCover;
 class Palette;
+class AnimationFactory;
 
 #ifdef WIN32
 
@@ -106,7 +107,7 @@ public:
 		void* palette, bool cK = false, int index = 0) = 0;
 	virtual Sprite2D* CreateSpriteBAM8(int /*w*/, int /*h*/, bool /* RLE */,
 		 const unsigned char* /*pixeldata*/,
-		 unsigned int /*datasize*/,
+		 AnimationFactory* /*datasrc*/,
 		 Palette* /*palette*/,
 		 int /*transindex*/) { return 0; }
 	virtual bool SupportsBAMSprites() { return false; }
@@ -129,7 +130,9 @@ public:
 		SpriteCover* cover, Palette *palette = NULL,
 		Region* clip = NULL, bool anchor = false) = 0;
 	virtual void SetCursor(Sprite2D* up, Sprite2D* down) = 0;
-	/** Sets a temporary cursor when dragging an Item from Inventory */
+	/** Sets a temporary cursor when dragging an Item from Inventory.
+	  * VideoDriver will call FreeSprite on it.
+	  */
 	virtual void SetDragCursor(Sprite2D* drag) = 0;
 	/** Return GemRB window screenshot.
 	 * It's generated from the momentary back buffer */

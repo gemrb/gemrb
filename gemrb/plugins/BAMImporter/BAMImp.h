@@ -50,7 +50,8 @@ private:
 	unsigned long DataStart;
 private:
 	Sprite2D* GetFrameInternal(unsigned short findex, unsigned char mode,
-							   bool BAMsprite, const unsigned char* data);
+							   bool BAMsprite, const unsigned char* data,
+							   AnimationFactory* datasrc);
 	void* GetFramePixels(unsigned short findex);
 	ieWord * CacheFLT(unsigned int &count);
 public:

@@ -292,7 +292,6 @@ private:
 	Control* tooltip_ctrl;
 	// Currently dragged item or NULL
 	CREItem* DraggedItem;
-	Sprite2D* DraggedCursor;
 	// Current Store
 	Store* CurrentStore;
 	// Index of current container
