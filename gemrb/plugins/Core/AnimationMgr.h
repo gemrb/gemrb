@@ -46,11 +46,7 @@ public:
 	virtual ~AnimationMgr(void);
 	virtual bool Open(DataStream* stream, bool autoFree = true) = 0;
 	virtual int GetCycleSize(unsigned char Cycle) = 0;
-	virtual Sprite2D* GetFrameFromCycle(unsigned char Cycle,
-		unsigned short frame) = 0;
 	virtual AnimationFactory* GetAnimationFactory(const char* ResRef,
-		unsigned char mode = IE_NORMAL) = 0;
-	virtual Sprite2D* GetFrame(unsigned short findex,
 		unsigned char mode = IE_NORMAL) = 0;
 	/** This function will load the Animation as a Font */
 	virtual Font* GetFont() = 0;

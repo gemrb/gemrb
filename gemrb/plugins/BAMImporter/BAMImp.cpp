@@ -153,23 +153,6 @@ int BAMImp::GetCycleSize(unsigned char Cycle)
 	return cycles[Cycle].FramesCount;
 }
 
-Sprite2D* BAMImp::GetFrameFromCycle(unsigned char Cycle, unsigned short frame)
-{
-	if(Cycle >= CyclesCount ) {
-		printf("[BAMImp] Invalid Cycle %d\n", (int) Cycle);
-		return NULL;
-	}
-	if(cycles[Cycle].FramesCount<=frame) {
-		printf("[BAMImp] Invalid Frame %d in Cycle %d\n",(int) frame, (int) Cycle);
-		return NULL;
-	}
-	str->Seek( FLTOffset + ( cycles[Cycle].FirstFrame + frame ) * sizeof( ieWord ),
-			GEM_STREAM_START );
-	ieWord findex;
-	str->ReadWord( &findex );
-	return GetFrame( findex );
-}
-
 Sprite2D* BAMImp::GetFrameInternal(unsigned short findex, unsigned char mode,
 								   bool BAMsprite, const unsigned char* data)
 {
@@ -236,16 +219,6 @@ Sprite2D* BAMImp::GetFrameInternal(unsigned short findex, unsigned char mode,
 		pal->Release();
 	}
 	return spr;
-}
-
-Sprite2D* BAMImp::GetFrame(unsigned short findex, unsigned char mode)
-{
-	if (findex >= FramesCount) {
-		findex = cycles[0].FirstFrame;
-	}
-	bool videoBAMsupport = core->GetVideoDriver()->SupportsBAMSprites();
-
-	return GetFrameInternal(findex, mode, videoBAMsupport, 0);
 }
 
 void* BAMImp::GetFramePixels(unsigned short findex)

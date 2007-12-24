@@ -58,10 +58,8 @@ public:
 	~BAMImp(void);
 	bool Open(DataStream* stream, bool autoFree = true);
 	int GetCycleSize(unsigned char Cycle);
-	Sprite2D* GetFrameFromCycle(unsigned char Cycle, unsigned short frame);
 	AnimationFactory* GetAnimationFactory(const char* ResRef,
 		unsigned char mode = IE_NORMAL);
-	Sprite2D* GetFrame(unsigned short findex, unsigned char mode = IE_NORMAL);
 	/** This function will load the Animation as a Font */
 	Font* GetFont();
 	/** Debug Function: Returns the Global Animation Palette as a Sprite2D Object.
