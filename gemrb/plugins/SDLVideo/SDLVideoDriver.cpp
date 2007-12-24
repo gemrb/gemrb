@@ -63,6 +63,7 @@ SDLVideoDriver::SDLVideoDriver(void)
 	subtitlestrref = 0;
 	subtitletext = NULL;
 	mousescrollspd = 10;
+	scrolling = false;
 }
 
 SDLVideoDriver::~SDLVideoDriver(void)
