@@ -2119,13 +2119,10 @@ Sprite2D* SDLVideoDriver::SpriteScaleDown( Sprite2D* sprite, unsigned int ratio 
 	return small;
 }
 
-void SDLVideoDriver::CreateAlpha( Sprite2D *sprite)
+Sprite2D* SDLVideoDriver::CreateAlpha( Sprite2D *sprite)
 {
-	// Note: we convert BAM sprites back to non-BAM (SDL_Surface) sprites
-	// for per-pixel non-indexed alpha.
-
-	if (!sprite || !sprite->vptr)
-		return;
+	if (!sprite)
+		return 0;
 
 	unsigned int *pixels = (unsigned int *) malloc (sprite->Width * sprite->Height * 4);
 	int i=0;
@@ -2146,25 +2143,8 @@ void SDLVideoDriver::CreateAlpha( Sprite2D *sprite)
 			pixels[i++]=tmp;
 		}
 	}
-	if (sprite->BAM) {
-		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)sprite->vptr;
-
-		// FIXME: if we're part of an AnimationFactory, this transformation
-		// will (potentially) confuse things. For now check this
-		// isn't the case.
-		assert(data->datasize);
-
-		if ( data->datasize )
-			free( (void*)sprite->pixels );
-		delete data;
-		sprite->BAM = false;
-	} else {
-		free( (void*)sprite->pixels );
-		SDL_FreeSurface ((SDL_Surface*)sprite->vptr);
-	}
-	sprite->pixels = pixels;
-	SDL_Surface* surf = SDL_CreateRGBSurfaceFrom( pixels, sprite->Width, sprite->Height, 32, sprite->Width*4, 0xff00, 0xff00, 0xff00, 255 );
-	sprite->vptr = surf;
+	return CreateSprite( sprite->Width, sprite->Height, 32, 0xFF000000,
+	                     0x00FF0000, 0x0000FF00, 0x000000FF, pixels );
 }
 
 void SDLVideoDriver::SetFadeColor(int r, int g, int b)

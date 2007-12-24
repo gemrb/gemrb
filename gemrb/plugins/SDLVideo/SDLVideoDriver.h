@@ -133,7 +133,7 @@ public:
 	/** Flips sprite horizontally */
 	Sprite2D *MirrorSpriteHorizontal(Sprite2D *sprite, bool MirrorAnchor);
 	/** Creates sprite with alpha channel */
-	void CreateAlpha(Sprite2D *sprite);
+	Sprite2D *CreateAlpha(Sprite2D *sprite);
 	/** Set Clip Rect */
 	void SetClipRect(const Region* clip);
 	/** Get Clip Rect */

@@ -1043,38 +1043,30 @@ int Interface::LoadSprites()
 {
 	ieDword i;
 	int size;
-	int ret = GEM_ERROR;
-
-	AnimationMgr* anim = ( AnimationMgr* ) GetInterface( IE_BAM_CLASS_ID );
-	if (!anim) {
-		printf( "No BAM Importer Available.\nTermination in Progress...\n" );
-		return GEM_ERROR;
-	}
-
-	DataStream* str = NULL;
 	int table = -1;
 	if (!IsAvailable( IE_2DA_CLASS_ID )) {
 		printf( "No 2DA Importer Available.\nTermination in Progress...\n" );
-		goto end_of_init;
+		return GEM_ERROR;
 	}
 
 	//loading cursors
 	printMessage( "Core", "Loading Cursors...\n", WHITE );
 
-	str = key->GetResource( "cursors", IE_BAM_CLASS_ID );
-	if (anim->Open( str, true ))
+	AnimationFactory* anim;
+	anim = (AnimationFactory*)GetResourceMgr()->GetFactoryResource("cursors", IE_BAM_CLASS_ID);
+	if (anim)
 	{
 		CursorCount = anim->GetCycleCount();
 		Cursors = new Sprite2D * [CursorCount];
 		for (int i = 0; i < CursorCount; i++) {
-			Cursors[i] = anim->GetFrameFromCycle( (ieByte) i, 0 );
+			Cursors[i] = anim->GetFrame( 0, (ieByte) i );
 		}
 	}
 
 	// this is the last existing cursor type
 	if (CursorCount<IE_CURSOR_WAY) {
 		printStatus( "ERROR", LIGHT_RED );
-		goto end_of_init;
+		return GEM_ERROR;
 	}
 	video->SetCursor( Cursors[0], Cursors[1] );
 	printStatus( "OK", LIGHT_GREEN );
@@ -1093,19 +1085,18 @@ int Interface::LoadSprites()
 	//}
 
 	// Load fog-of-war bitmaps
-	str = key->GetResource( "fogowar", IE_BAM_CLASS_ID );
 	printMessage( "Core", "Loading Fog-Of-War bitmaps...\n", WHITE );
-	anim->Open( str, true );
+	anim = (AnimationFactory*)GetResourceMgr()->GetFactoryResource("fogowar", IE_BAM_CLASS_ID);
 	if (anim->GetCycleSize( 0 ) != 8) {
 		// unknown type of fog anim
 		printStatus( "ERROR", LIGHT_RED );
-		goto end_of_init;
+		return GEM_ERROR;
 	}
 
 	FogSprites[0] = NULL;
-	FogSprites[1] = anim->GetFrameFromCycle( 0, 0 );
-	FogSprites[2] = anim->GetFrameFromCycle( 0, 1 );
-	FogSprites[3] = anim->GetFrameFromCycle( 0, 2 );
+	FogSprites[1] = anim->GetFrame( 0, 0 );
+	FogSprites[2] = anim->GetFrame( 1, 0 );
+	FogSprites[3] = anim->GetFrame( 2, 0 );
 
 	FogSprites[4] = video->MirrorSpriteVertical( FogSprites[1], false );
 
@@ -1124,10 +1115,10 @@ int Interface::LoadSprites()
 
 	FogSprites[12] = video->MirrorSpriteHorizontal( FogSprites[6], false );
 
-	FogSprites[16] = anim->GetFrameFromCycle( 0, 3 );
-	FogSprites[17] = anim->GetFrameFromCycle( 0, 4 );
-	FogSprites[18] = anim->GetFrameFromCycle( 0, 5 );
-	FogSprites[19] = anim->GetFrameFromCycle( 0, 6 );
+	FogSprites[16] = anim->GetFrame( 3, 0 );
+	FogSprites[17] = anim->GetFrame( 4, 0 );
+	FogSprites[18] = anim->GetFrame( 5, 0 );
+	FogSprites[19] = anim->GetFrame( 6, 0 );
 
 	FogSprites[20] = video->MirrorSpriteVertical( FogSprites[17], false );
 
@@ -1137,7 +1128,7 @@ int Interface::LoadSprites()
 
 	FogSprites[24] = video->MirrorSpriteHorizontal( FogSprites[18], false );
 
-	FogSprites[25] = anim->GetFrameFromCycle( 0, 7 );
+	FogSprites[25] = anim->GetFrame( 7, 0 );
 
 	{
 		Sprite2D *tmpsprite = video->MirrorSpriteVertical( FogSprites[25], false );
@@ -1158,7 +1149,7 @@ int Interface::LoadSprites()
 	vars->Lookup("3D Acceleration", i);
 	if (i) {
 		for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
-			video->CreateAlpha( FogSprites[i] );
+			FogSprites[i] = video->CreateAlpha( FogSprites[i] );
 		}
 	}
 
@@ -1169,16 +1160,15 @@ int Interface::LoadSprites()
 	//block required due to msvc6.0 incompatibility
 	for (size = 0; size < MAX_CIRCLE_SIZE; size++) {
 		if (GroundCircleBam[size][0]) {
-			str = key->GetResource( GroundCircleBam[size], IE_BAM_CLASS_ID );
-			anim->Open( str, true );
+			anim = (AnimationFactory*)GetResourceMgr()->GetFactoryResource(GroundCircleBam[size], IE_BAM_CLASS_ID);
 			if (anim->GetCycleCount() != 6) {
 				// unknown type of circle anim
 				printStatus( "ERROR", LIGHT_RED );
-				goto end_of_init;
+				return GEM_ERROR;
 			}
 	
 			for (int i = 0; i < 6; i++) {
-				Sprite2D* sprite = anim->GetFrameFromCycle( (ieByte) i, 0 );
+				Sprite2D* sprite = anim->GetFrame( 0, (ieByte) i );
 				if (GroundCircleScale[size]) {
 					GroundCircles[size][i] = video->SpriteScaleDown( sprite, GroundCircleScale[size] );
 					video->FreeSprite( sprite );
@@ -1196,8 +1186,15 @@ int Interface::LoadSprites()
 	if (table < 0) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "Cannot find fonts.2da.\nTermination in Progress...\n" );
-		goto end_of_init;
+		return GEM_ERROR;	
 	} else {
+		AnimationMgr* bamint = ( AnimationMgr* ) GetInterface( IE_BAM_CLASS_ID );
+		if (!bamint) {
+			printf( "No BAM Importer Available.\nTermination in Progress...\n" );
+			return GEM_ERROR;
+		}
+		DataStream* str = NULL;
+
 		TableMgr* tab = GetTable( table );
 		int count = tab->GetRowCount();
 		for (int i = 0; i < count; i++) {
@@ -1205,12 +1202,10 @@ int Interface::LoadSprites()
 			int needpalette = atoi( tab->QueryField( i, 1 ) );
 			int first_char = atoi( tab->QueryField( i, 2 ) );
 			str = key->GetResource( ResRef, IE_BAM_CLASS_ID );
-			if (!anim->Open( str, true )) {
-				// opening with autofree makes this delete unwanted!!!
-				//				delete( fstr );
+			if (!bamint->Open( str, true )) {
 				continue;
 			}
-			Font* fnt = anim->GetFont();
+			Font* fnt = bamint->GetFont();
 			if (!fnt) {
 				continue;
 			}
@@ -1236,31 +1231,29 @@ int Interface::LoadSprites()
 			fonts.push_back( fnt );
 		}
 		DelTable( table );
+
+		FreeInterface(bamint);
 	}
 	printMessage( "Core", "Fonts Loaded...", WHITE );
 	printStatus( "OK", LIGHT_GREEN );
 
 	if (TooltipBackResRef[0]) {
 		printMessage( "Core", "Initializing Tooltips...", WHITE );
-		str = key->GetResource( TooltipBackResRef, IE_BAM_CLASS_ID );
-		if (!anim->Open( str, true )) {
+		anim = (AnimationFactory*)GetResourceMgr()->GetFactoryResource(TooltipBackResRef, IE_BAM_CLASS_ID);
+		if (!anim) {
 			printStatus( "ERROR", LIGHT_RED );
-			goto end_of_init;
+			return GEM_ERROR;
 		}
 		TooltipBack = new Sprite2D * [3];
 		for (int i = 0; i < 3; i++) {
-			TooltipBack[i] = anim->GetFrameFromCycle( (ieByte) i, 0 );
+			TooltipBack[i] = anim->GetFrame( 0, (ieByte) i );
 			TooltipBack[i]->XPos = 0;
 			TooltipBack[i]->YPos = 0;
 		}
 		printStatus( "OK", LIGHT_GREEN );
 	}
 
-	ret = GEM_OK;
-
-end_of_init:
-	FreeInterface( anim );
-	return ret;
+	return GEM_OK;
 }
 
 int Interface::Init()
