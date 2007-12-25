@@ -2100,7 +2100,7 @@ bool Interface::LoadConfig(const char* filename)
 	mkdir( CachePath, S_IREAD|S_IWRITE|S_IEXEC );
 	chmod( CachePath, S_IREAD|S_IWRITE|S_IEXEC );
 
-	printStatus( "OK", GREEN );
+	printStatus( "OK", LIGHT_GREEN );
 	if ( StupidityDetector( CachePath )) {
 		printMessage("Core"," ",LIGHT_RED);
 		printf( "Cache path %s doesn't exist, not a folder or contains alien files!\n", CachePath );
