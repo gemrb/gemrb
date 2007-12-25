@@ -94,7 +94,7 @@ void TLKImp::OpenAux()
 	if (override) {
 		if (!override->Init()) {
 			CloseAux();
-			printMessage("TlkImporter","Cannot open tlk override",RED);
+			printMessage("TlkImporter","Cannot open tlk override!\n",RED);
 		}
 	}
 }
@@ -112,7 +112,7 @@ bool TLKImp::Open(DataStream* stream, bool autoFree)
 	char Signature[8];
 	str->Read( Signature, 8 );
 	if (strncmp( Signature, "TLK\x20V1\x20\x20", 8 ) != 0) {
-		printMessage( "TLKImporter","Not a valid TLK File.",RED );
+		printMessage( "TLKImporter","Not a valid TLK File.\n",RED );
 		return false;
 	}
 	str->Seek( 2, GEM_CURRENT_POS );
