@@ -1197,8 +1197,8 @@ int Interface::LoadSprites()
 	printStatus( "OK", LIGHT_GREEN );
 
 	if (TooltipBackResRef[0]) {
-		printMessage( "Core", "Initializing Tooltips...", WHITE );
 		anim = (AnimationFactory*)GetResourceMgr()->GetFactoryResource(TooltipBackResRef, IE_BAM_CLASS_ID);
+		printMessage( "Core", "Initializing Tooltips...", WHITE );
 		if (!anim) {
 			printStatus( "ERROR", LIGHT_RED );
 			return GEM_ERROR;
