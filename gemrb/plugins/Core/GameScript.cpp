@@ -3029,8 +3029,10 @@ void GameScript::ExecuteAction(Scriptable* Sender, Action* aC)
 	} else {
 		actions[actionID] = NoActionAtAll;
 		printMessage("GameScript", "Unknown ", YELLOW);
+		textcolor(YELLOW);
 		PrintAction(actionID);
 		Sender->ReleaseCurrentAction();
+		textcolor(WHITE);
 		return;
 	}
 
