@@ -165,6 +165,8 @@ static int d_gradient[DAMAGE_LEVELS] = {
 	FIRE_GRADIENT,FIRE_GRADIENT,FIRE_GRADIENT,
 	-1,-1,-1,
 	ICE_GRADIENT,ICE_GRADIENT,ICE_GRADIENT,
+	-1,-1,-1,
+	-1,-1,-1
 };
 
 static ieResRef hc_overlays[OVERLAY_COUNT]={"SANCTRY","SPENTACI","SPMAGGLO","SPSHIELD",
@@ -247,6 +249,7 @@ Actor::Actor()
 	attackcount = 0;
 	initiative = 0;
 	InTrap = 0;
+	PathTries = 0;
 
 	inventory.SetInventoryType(INVENTORY_CREATURE);
 	fxqueue.SetOwner( this );
@@ -1811,6 +1814,7 @@ void Actor::SetMap(Map *map, ieWord LID, ieWord GID)
 
 void Actor::SetPosition(Point &position, int jump, int radius)
 {
+	PathTries = 0;
 	ClearPath();
 	Point p;
 	p.x = position.x/16;
@@ -2828,8 +2832,12 @@ bool Actor::Schedule(ieDword gametime)
 
 void Actor::NewPath()
 {
+	PathTries++;
 	Point tmp = Destination;
 	ClearPath();
+	if (PathTries>10) {
+		return;
+	}
 	Movable::WalkTo(tmp, size );
 }
 
@@ -2851,6 +2859,7 @@ void Actor::SetRunFlags(ieDword flags)
 
 void Actor::WalkTo(Point &Des, ieDword flags, int MinDistance)
 {
+	PathTries = 0;
 	if (InternalFlags&IF_REALLYDIED) {
 		return;
 	}

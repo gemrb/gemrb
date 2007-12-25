@@ -288,6 +288,7 @@ public:
 	void AddActor(Actor* actor);
 	//returns true if an enemy is near P (used in resting/saving)
 	bool AnyEnemyNearPoint(Point &p);
+	bool GetBlocked(unsigned int x, unsigned int y, unsigned int size);
 	int GetBlocked(unsigned int x, unsigned int y);
 	int GetBlocked(Point &p);
 	Actor* GetActorByGlobalID(ieDword objectID);
@@ -345,24 +346,24 @@ public:
 	/* explore map from given point in map coordinates */
 	void ExploreMapChunk(Point &Pos, int range, int los);
 	/* block or unblock searchmap with value */
-	void BlockSearchMap(Point &Pos, int size, unsigned int value);
+	void BlockSearchMap(Point &Pos, unsigned int size, unsigned int value);
 	/* update VisibleBitmap by resolving vision of all explore actors */
 	void UpdateFog();
 	//PathFinder
 	/* Finds the nearest passable point */
 	void AdjustPosition(Point &goal, unsigned int radius=0);
 	/* Finds the path which leads the farthest from d */
-	PathNode* RunAway(Point &s, Point &d, unsigned int PathLen, int flags);
+	PathNode* RunAway(Point &s, Point &d, unsigned int size, unsigned int PathLen, int flags);
 	/* Returns true if there is no path to d */
-	bool TargetUnreachable(Point &s, Point &d);
+	bool TargetUnreachable(Point &s, Point &d, unsigned int size);
 	/* returns true if there is enemy visible */
 	bool AnyPCSeesEnemy();
 	/* Finds straight path from s, length l and orientation o, f=1 passes wall, f=2 rebounds from wall*/
 	PathNode* GetLine(Point &start, Point &dest, int flags);
 	PathNode* GetLine(Point &start, int Steps, int Orientation, int flags);
-	PathNode* GetLine(Point &start, Point &dest, int Steps, int Orientation, int flags);
+	PathNode* GetLine(Point &start, Point &dest, int speed, int Orientation, int flags);
 	/* Finds the path which leads to d */
-	PathNode* FindPath(const Point &s, const Point &d, int MinDistance = 0);
+	PathNode* FindPath(const Point &s, const Point &d, unsigned int size, int MinDistance = 0);
 	/* returns false if point isn't visible on visibility/explored map */
 	bool IsVisible(Point &s, int explored);
 	/* returns false if point d cannot be seen from point d due to searchmap */
@@ -420,7 +421,7 @@ private:
 	void DeleteActor(int i);
 	void Leveldown(unsigned int px, unsigned int py, unsigned int& level,
 		Point &p, unsigned int& diff);
-	void SetupNode(unsigned int x, unsigned int y, unsigned int Cost);
+	void SetupNode(unsigned int x, unsigned int y, unsigned int size, unsigned int Cost);
 	//actor uses travel region
 	void UseExit(Actor *pc, InfoPoint *ip);
 	//separated position adjustment, so their order could be randomised */

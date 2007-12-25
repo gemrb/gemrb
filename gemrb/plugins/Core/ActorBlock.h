@@ -231,6 +231,7 @@ public:
 	void SetScriptName(const char* text);
 	//call this to enable script running as soon as possible
 	void ImmediateEvent();
+	bool IsPC();
 	void ExecuteScript(int scriptCount);
 	void AddAction(Action* aC);
 	void AddActionInFront(Action* aC);

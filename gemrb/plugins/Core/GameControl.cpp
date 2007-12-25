@@ -703,7 +703,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 						nextNode = thisNode->Next;
 					}
 				}
-				drawPath = core->GetGame()->GetCurrentArea()->FindPath( pfs, p );
+				drawPath = core->GetGame()->GetCurrentArea()->FindPath( pfs, p, lastActor?lastActor->size:1 );
 
 				break;
 

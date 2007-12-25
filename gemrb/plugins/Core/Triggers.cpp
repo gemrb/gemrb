@@ -2716,6 +2716,7 @@ int GameScript::AreaRestDisabled(Scriptable* Sender, Trigger* /*parameters*/)
 	return 0;
 }
 
+//new optional parameter: size of actor (to reach target)
 int GameScript::TargetUnreachable(Scriptable* Sender, Trigger* parameters)
 {
 	Scriptable* tar = GetActorFromObject( Sender, parameters->objectParameter );
@@ -2723,7 +2724,20 @@ int GameScript::TargetUnreachable(Scriptable* Sender, Trigger* parameters)
 		return 1; //well, if it doesn't exist it is unreachable
 	}
 	Map *map=Sender->GetCurrentArea();
-	return map->TargetUnreachable( Sender->Pos, tar->Pos );
+	if (!map) {
+		return 1;
+	}
+	unsigned int size = parameters->int0Parameter;
+
+	if (!size) {
+		if (Sender->Type==ST_ACTOR) {
+			size = ((Movable *) Sender)->size;
+		}
+		else {
+			size = 1;
+		}
+	}
+	return map->TargetUnreachable( Sender->Pos, tar->Pos, size);
 }
 
 int GameScript::PartyCountEQ(Scriptable* /*Sender*/, Trigger* parameters)

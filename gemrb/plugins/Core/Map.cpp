@@ -54,8 +54,8 @@ extern Interface* core;
 extern HANDLE hConsole;
 #endif
 
-static int MAX_CIRCLESIZE = 8;
-static int PersonalPerimeter;
+static unsigned int MAX_CIRCLESIZE = 8;
+static unsigned int PersonalPerimeter;
 static int MaxVisibility = 30;
 static int VisibilityPerimeter; //calculated from MaxVisibility
 static int NormalCost = 10;
@@ -86,7 +86,7 @@ void Map::ReleaseMemory()
 	}
 
 	if (PersonalSpaces) {
-		for (int i=0;i<MAX_CIRCLESIZE;i++) {
+		for (unsigned int i=0;i<MAX_CIRCLESIZE;i++) {
 			free(PersonalSpaces[i]);
 		}
 		free(PersonalSpaces);
@@ -237,7 +237,7 @@ void AddLOS(int destx, int desty, int slot)
 
 void AddSpace(int destx, int desty, int slot)
 {
-	for (int i=0;i<MAX_CIRCLESIZE;i++) {
+	for (unsigned int i=0;i<MAX_CIRCLESIZE;i++) {
 		int x=(destx*i+MAX_CIRCLESIZE/2)/MAX_CIRCLESIZE*16;
 		int y=(desty*i+MAX_CIRCLESIZE/2)/MAX_CIRCLESIZE*12;
 		PersonalSpaces[i][slot].x=(short) x;
@@ -318,9 +318,10 @@ void InitExplore()
 		}
 	}
 
+	unsigned int j;
 	PersonalSpaces = (Point **) malloc(MAX_CIRCLESIZE * sizeof(Point *) );
-	for(i=0;i<MAX_CIRCLESIZE;i++) {
-		PersonalSpaces[i] = (Point *) malloc(PersonalPerimeter*sizeof(Point) );
+	for(j=0;j<MAX_CIRCLESIZE;j++) {
+		PersonalSpaces[j] = (Point *) malloc(PersonalPerimeter*sizeof(Point) );
 	}
 	x = MAX_CIRCLESIZE;
 	y = 0;
@@ -647,20 +648,20 @@ void Map::UpdateScripts()
 		}
 
 		if (actor->Modified[IE_DONOTJUMP]<2) {
-			BlockSearchMap( actor->Pos, actor->size, 0);
-			if (actor->GetNextStep()) {
+      BlockSearchMap( actor->Pos, actor->size, 0);
+      PathNode * step = actor->GetNextStep();
+			if (step && step->Next) {
 				//we should actually wait for a short time and check then
-				PathNode * step = actor->GetNextStep();
-				if (!(GetBlocked(step->x,step->y)&PATH_MAP_PASSABLE)) {
+				if (GetBlocked(step->Next->x*16,step->Next->y*12,actor->size)) {
 					actor->NewPath();
 				}
 			}
 		}
 		if (!(actor->GetBase(IE_STATE_ID)&STATE_CANTMOVE) ) {
 			if (!actor->Immobile()) {
-				actor->DoStep( speed );
+        actor->DoStep( speed );
+        BlockSearchMap( actor->Pos, actor->size, actor->InParty?PATH_MAP_PC:PATH_MAP_NPC);
 			}
-			BlockSearchMap( actor->Pos, actor->size, actor->InParty?PATH_MAP_PC:PATH_MAP_NPC);
 		}
 	}
 
@@ -1404,6 +1405,25 @@ int Map::GetBlocked(unsigned int x, unsigned int y)
 	return ret;
 }
 
+bool Map::GetBlocked(unsigned int px, unsigned int py, unsigned int size)
+{
+	if (size>MAX_CIRCLESIZE) {
+		size=MAX_CIRCLESIZE;
+	}
+	int p=PersonalPerimeter;
+	while (p--) {
+		for (unsigned int i=0;i<size;i++) {
+			unsigned int x = (px+PersonalSpaces[i][p].x)/16;
+			unsigned int y = (py+PersonalSpaces[i][p].y)/12;
+
+			if (!(GetBlocked(x,y)&PATH_MAP_PASSABLE)) {
+        return true;
+      }
+		}
+	}
+  return false;
+}
+
 int Map::GetBlocked(Point &c)
 {
 	return GetBlocked(c.x/16, c.y/12);
@@ -1731,7 +1751,7 @@ void Map::Leveldown(unsigned int px, unsigned int py,
 	}
 }
 
-void Map::SetupNode(unsigned int x, unsigned int y, unsigned int Cost)
+void Map::SetupNode(unsigned int x, unsigned int y, unsigned int size, unsigned int Cost)
 {
 	unsigned int pos;
 
@@ -1742,7 +1762,7 @@ void Map::SetupNode(unsigned int x, unsigned int y, unsigned int Cost)
 	if (MapSet[pos]) {
 		return;
 	}
-	if (!( GetBlocked(x,y) & PATH_MAP_PASSABLE)) {
+	if (GetBlocked(x*16,y*12,size)) {
 		MapSet[pos] = 65535;
 		return;
 	}
@@ -1839,7 +1859,7 @@ void Map::AdjustPosition(Point &goal, unsigned int radius)
 }
 
 //run away from dX, dY (ie.: find the best path of limited length that brings us the farthest from dX, dY)
-PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, int flags)
+PathNode* Map::RunAway(Point &s, Point &d, unsigned int size, unsigned int PathLen, int flags)
 {
 	Point start(s.x/16, s.y/12);
 	Point goal (d.x/16, d.y/12);
@@ -1881,16 +1901,16 @@ PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, int flags)
 			//printf("Path not found!\n");
 			break;
 		}
-		SetupNode( x - 1, y - 1, Cost );
-		SetupNode( x + 1, y - 1, Cost );
-		SetupNode( x + 1, y + 1, Cost );
-		SetupNode( x - 1, y + 1, Cost );
+		SetupNode( x - 1, y - 1, size, Cost );
+		SetupNode( x + 1, y - 1, size, Cost );
+		SetupNode( x + 1, y + 1, size, Cost );
+		SetupNode( x - 1, y + 1, size, Cost );
 
 		Cost += AdditionalCost;
-		SetupNode( x, y - 1, Cost );
-		SetupNode( x + 1, y, Cost );
-		SetupNode( x, y + 1, Cost );
-		SetupNode( x - 1, y, Cost );
+		SetupNode( x, y - 1, size, Cost );
+		SetupNode( x + 1, y, size, Cost );
+		SetupNode( x, y + 1, size, Cost );
+		SetupNode( x - 1, y, size, Cost );
 	}
 
 	//find path backwards from best to start
@@ -1938,7 +1958,7 @@ PathNode* Map::RunAway(Point &s, Point &d, unsigned int PathLen, int flags)
 	return Return;
 }
 
-bool Map::TargetUnreachable(Point &s, Point &d)
+bool Map::TargetUnreachable(Point &s, Point &d, unsigned int size)
 {
 	Point start( s.x/16, s.y/12 );
 	Point goal ( d.x/16, d.y/12 );
@@ -1946,10 +1966,10 @@ bool Map::TargetUnreachable(Point &s, Point &d)
 	while (InternalStack.size())
 		InternalStack.pop();
 
-	if (!( GetBlocked( goal.x, goal.y ) & PATH_MAP_PASSABLE )) {
+	if (GetBlocked( d.x, d.y, size )) {
 		return true;
 	}
-	if (!( GetBlocked( start.x, start.y ) & PATH_MAP_PASSABLE )) {
+	if (GetBlocked( s.x, s.y, size )) {
 		return true;
 	}
 
@@ -1964,14 +1984,14 @@ bool Map::TargetUnreachable(Point &s, Point &d)
 		unsigned int x = pos >> 16;
 		unsigned int y = pos & 0xffff;
 
-		SetupNode( x - 1, y - 1, 1 );
-		SetupNode( x + 1, y - 1, 1 );
-		SetupNode( x + 1, y + 1, 1 );
-		SetupNode( x - 1, y + 1, 1 );
-		SetupNode( x, y - 1, 1 );
-		SetupNode( x + 1, y, 1 );
-		SetupNode( x, y + 1, 1 );
-		SetupNode( x - 1, y, 1 );
+		SetupNode( x - 1, y - 1, size, 1 );
+		SetupNode( x + 1, y - 1, size, 1 );
+		SetupNode( x + 1, y + 1, size, 1 );
+		SetupNode( x - 1, y + 1, size, 1 );
+		SetupNode( x, y - 1, size, 1 );
+		SetupNode( x + 1, y, size, 1 );
+		SetupNode( x, y + 1, size, 1 );
+		SetupNode( x - 1, y, size, 1 );
 	}
 	return pos!=pos2;
 }
@@ -1991,7 +2011,7 @@ PathNode* Map::GetLine(Point &start, int Steps, int Orientation, int flags)
 	int count = Steps;
 
 	while(count) {
-		int st = Steps>MaxVisibility?MaxVisibility:Steps;
+		unsigned int st = Steps>MaxVisibility?MaxVisibility:Steps;
 		int p = VisibilityPerimeter*Orientation/MAX_ORIENT;
 		dest.x += VisibilityMasks[Steps][p].x;
 		dest.y += VisibilityMasks[Steps][p].y;
@@ -2047,7 +2067,7 @@ PathNode* Map::GetLine(Point &start, Point &dest, int Speed, int Orientation, in
 	return Return;
 }
 
-PathNode* Map::FindPath(const Point &s, const Point &d, int MinDistance)
+PathNode* Map::FindPath(const Point &s, const Point &d, unsigned int size, int MinDistance)
 {
 	Point start( s.x/16, s.y/12 );
 	Point goal ( d.x/16, d.y/12 );
@@ -2055,7 +2075,7 @@ PathNode* Map::FindPath(const Point &s, const Point &d, int MinDistance)
 	while (InternalStack.size())
 		InternalStack.pop();
 
-	if (!( GetBlocked( goal.x, goal.y ) & PATH_MAP_PASSABLE )) {
+	if (GetBlocked( d.x, d.y, size )) {
 		AdjustPosition( goal );
 	}
 	unsigned int pos = ( goal.x << 16 ) | goal.y;
@@ -2079,16 +2099,16 @@ PathNode* Map::FindPath(const Point &s, const Point &d, int MinDistance)
 			//printf("Path not found!\n");
 			break;
 		}
-		SetupNode( x - 1, y - 1, Cost );
-		SetupNode( x + 1, y - 1, Cost );
-		SetupNode( x + 1, y + 1, Cost );
-		SetupNode( x - 1, y + 1, Cost );
+		SetupNode( x - 1, y - 1, size, Cost );
+		SetupNode( x + 1, y - 1, size, Cost );
+		SetupNode( x + 1, y + 1, size, Cost );
+		SetupNode( x - 1, y + 1, size, Cost );
 
 		Cost += AdditionalCost;
-		SetupNode( x, y - 1, Cost );
-		SetupNode( x + 1, y, Cost );
-		SetupNode( x, y + 1, Cost );
-		SetupNode( x - 1, y, Cost );
+		SetupNode( x, y - 1, size, Cost );
+		SetupNode( x + 1, y, size, Cost );
+		SetupNode( x, y + 1, size, Cost );
+		SetupNode( x - 1, y, size, Cost );
 	}
 
 	//find path from start to goal
@@ -2457,14 +2477,14 @@ void Map::UpdateFog()
 }
 
 //Valid values are - PATH_MAP_FREE, PATH_MAP_PC, PATH_MAP_NPC
-void Map::BlockSearchMap(Point &Pos, int size, unsigned int value)
+void Map::BlockSearchMap(Point &Pos, unsigned int size, unsigned int value)
 {
 	if (size>MAX_CIRCLESIZE) {
 		size=MAX_CIRCLESIZE;
 	}
 	int p=PersonalPerimeter;
 	while (p--) {
-		for (int i=0;i<size;i++) {
+		for (unsigned int i=0;i<size;i++) {
 			unsigned int x = (Pos.x+PersonalSpaces[i][p].x)/16;
 			unsigned int y = (Pos.y+PersonalSpaces[i][p].y)/12;
 

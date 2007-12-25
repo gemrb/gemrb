@@ -165,6 +165,7 @@ public:
 	ieDword ModalState;
 	ieWord globalID;
 	ieWord localID;
+	int PathTries; //the # of previous tries to pick up a new walkpath
 public:
 	#define LastTarget LastDisarmFailed
 	//ieDword LastTarget; use lastdisarmfailed

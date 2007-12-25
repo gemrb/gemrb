@@ -233,6 +233,16 @@ void Scriptable::ImmediateEvent()
 	*/
 }
 
+bool Scriptable::IsPC()
+{
+	if(Type==ST_ACTOR) {
+		if (((Actor *) this)->InParty) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void Scriptable::ExecuteScript(int scriptCount)
 {
 	if (core->GetGameControl()->GetScreenFlags()&SF_CUTSCENE) {
@@ -254,11 +264,9 @@ void Scriptable::ExecuteScript(int scriptCount)
 
 	for (int i=0;i<scriptCount;i++) {
 		//disable AI script level for actors in party when the player disabled them
-		if ((i==AI_SCRIPT_LEVEL) && (Type==ST_ACTOR) ) {
-			if (((Actor *) this)->InParty) {
-				if (core->GetGame()->ControlStatus&CS_PARTY_AI) {
-					continue;
-				}
+		if ((i==AI_SCRIPT_LEVEL) && IsPC() ) {
+			if (core->GetGame()->ControlStatus&CS_PARTY_AI) {
+				continue;
 			}
 		}
 
@@ -1002,7 +1010,7 @@ void Movable::AddWayPoint(Point &Des)
 	}
 	Point p(endNode->x, endNode->y);
 	area->BlockSearchMap( Pos, size, 0);
-	PathNode *path2 = area->FindPath( p, Des );
+	PathNode *path2 = area->FindPath( p, Des, size );
 	endNode->Next=path2;
 	//probably it is wise to connect it both ways?
 	path2->Parent=endNode;
@@ -1017,6 +1025,8 @@ void Movable::FixPosition()
 	if (actor->GetStat(IE_DONOTJUMP)&DNJ_BIRD ) {
 		return;
 	}
+	//before fixposition, you should remove own shadow
+	area->BlockSearchMap( Pos, size, 0);
 	Pos.x/=16;
 	Pos.y/=12;
 	GetCurrentArea()->AdjustPosition(Pos);
@@ -1027,9 +1037,9 @@ void Movable::FixPosition()
 void Movable::WalkTo(Point &Des, int distance)
 {
 	ClearPath();
-	area->BlockSearchMap( Pos, size, 0);
 	FixPosition();
-	path = area->FindPath( Pos, Des, distance );
+	area->BlockSearchMap( Pos, size, 0);
+	path = area->FindPath( Pos, Des, size, distance );
 	//ClearPath sets destination, so Destination must be set after it
 	//also we should set Destination only if there is a walkable path
 	if (path) {
@@ -1041,7 +1051,7 @@ void Movable::RunAwayFrom(Point &Des, int PathLength, int flags)
 {
 	ClearPath();
 	area->BlockSearchMap( Pos, size, 0);
-	path = area->RunAway( Pos, Des, PathLength, flags );
+	path = area->RunAway( Pos, Des, size, PathLength, flags );
 }
 
 void Movable::RandomWalk(bool can_stop, bool run)
@@ -1057,18 +1067,19 @@ void Movable::RandomWalk(bool can_stop, bool run)
 	if (run) {
 		InternalFlags|=IF_RUNNING;
 	}
-	area->BlockSearchMap( Pos, size, 0);
+	//area->BlockSearchMap( Pos, size, 0);
 	Point p = Pos;
 	p.x+=core->Roll(1,50,-25);
 	p.y+=core->Roll(1,50,-25);
-	path = area->RunAway( Pos, p, 50, 0 );
+	path = area->RunAway( Pos, p, size, 50, 0 );
 }
 
 void Movable::MoveTo(Point &Des)
 {
+	area->BlockSearchMap( Pos, size, 0);
 	Pos = Des;
 	Destination = Des;
-	area->BlockSearchMap( Pos, size, PATH_MAP_PC);
+	area->BlockSearchMap( Pos, size, IsPC()?PATH_MAP_PC:PATH_MAP_NPC);
 }
 
 void Movable::ClearPath()
