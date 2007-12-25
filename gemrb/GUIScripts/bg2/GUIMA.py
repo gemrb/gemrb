@@ -171,7 +171,7 @@ def OpenMapWindow ():
 	Button = GemRB.GetControl (Window, 3)
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
 	# Is this an option?
-	GemRB.SetVar ("ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
+	GemRB.SetVar ("ShowMapNotes", 0)
 	GemRB.SetVarAssoc (Window, Button, "ShowMapNotes", IE_GUI_MAP_VIEW_NOTES)
 
 	Label = GemRB.GetControl (Window, 0x10000003)
