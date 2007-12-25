@@ -31,8 +31,7 @@
 
 #include <vector>
 #include "../../includes/ie_types.h"
-
-#include "AnimationMgr.h"
+#include "../../includes/globals.h"
 
 //bah!
 class CREItem;

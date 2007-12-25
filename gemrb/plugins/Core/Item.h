@@ -31,7 +31,6 @@
 
 #include "../../includes/ie_types.h"
 
-#include "AnimationMgr.h"
 #include "EffectQueue.h"
 
 class Projectile;

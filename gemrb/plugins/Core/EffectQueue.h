@@ -32,6 +32,7 @@
 
 #include <list>
 #include "Effect.h"
+#include "Region.h"
 
 class Actor;
 class Map;

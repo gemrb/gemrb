@@ -20,7 +20,6 @@
  */
 
 #include "../../includes/win32def.h"
-#include "AnimationMgr.h"
 #include "ControlAnimation.h"
 #include "Interface.h"
 #include "ResourceMgr.h"

@@ -53,8 +53,6 @@
 #include "../../includes/win32def.h"
 #include "../../includes/RGBAColor.h"
 
-#include "AnimationMgr.h"
-
 #ifdef WIN32
 
 #ifdef GEM_BUILD_DLL
@@ -76,6 +74,7 @@ typedef char EventHandler[64];
 
 class ControlAnimation;
 class Window;
+class Sprite2D;
 
 /**
  * @class Control

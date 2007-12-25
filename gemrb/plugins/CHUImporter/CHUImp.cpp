@@ -27,10 +27,10 @@
 #include "../Core/Progressbar.h"
 #include "../Core/Slider.h"
 #include "../Core/ScrollBar.h"
-#include "../Core/AnimationMgr.h"
 #include "../Core/TextArea.h"
 #include "../Core/TextEdit.h"
 #include "../Core/ResourceMgr.h"
+#include "../Core/AnimationFactory.h"
 #include "../Core/ImageMgr.h"
 #include "../../includes/RGBAColor.h"
 
@@ -42,8 +42,8 @@ CHUImp::CHUImp()
 
 CHUImp::~CHUImp()
 {
-	if (autoFree && str) {
-		delete( str );
+	if (autoFree) {
+		delete str;
 	}
 }
 
@@ -53,8 +53,8 @@ bool CHUImp::Open(DataStream* stream, bool autoFree)
 	if (stream == NULL) {
 		return false;
 	}
-	if (this->autoFree && str) {
-		delete( str );
+	if (this->autoFree) {
+		delete str;
 	}
 	str = stream;
 	this->autoFree = autoFree;

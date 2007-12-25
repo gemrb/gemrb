@@ -23,7 +23,6 @@
 #include "../Core/Interface.h"
 #include "../Core/ResourceMgr.h"
 #include "../Core/ImageMgr.h"
-#include "../Core/AnimationMgr.h"
 #include "WMPImp.h"
 
 WMPImp::WMPImp(void)

@@ -23,6 +23,8 @@
 #define AREIMP_H
 
 #include "../Core/MapMgr.h"
+class Animation;
+class AnimationFactory;
 
 class AREImp : public MapMgr {
 private:

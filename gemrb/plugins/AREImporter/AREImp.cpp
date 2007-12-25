@@ -23,7 +23,6 @@
 #include "../../includes/strrefs.h"
 #include "AREImp.h"
 #include "../Core/TileMapMgr.h"
-#include "../Core/AnimationMgr.h"
 #include "../Core/Interface.h"
 #include "../Core/ActorMgr.h"
 #include "../Core/CachedFileStream.h"

@@ -21,7 +21,6 @@
 
 #include "../../includes/win32def.h"
 #include "../Core/Interface.h"
-#include "../Core/AnimationMgr.h"
 #include "../Core/EffectMgr.h"
 #include "PROImp.h"
 
