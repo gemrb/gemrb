@@ -73,17 +73,17 @@ static int ItemSoundsCount = -1;
 
 //#define UIT_ALLOW_REPLACE    1 //item is replaceable with another item on this list
 
-typedef struct UsedItemType {
+struct UsedItemType {
 	ieResRef itemname;
 	ieVariable username; //death variable
 	ieStrRef value;
 //	int flags;           //UIT flags
-} UsedItemType;
+};
 
-typedef struct SpellDescType {
+struct SpellDescType {
 	ieResRef resref;
 	ieStrRef value;
-} SpellDescType;
+};
 
 typedef char EventNameType[17];
 #define IS_DROP   	0

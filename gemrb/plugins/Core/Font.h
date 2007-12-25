@@ -33,7 +33,7 @@
 
 class Palette;
 
-typedef struct StringList {
+struct StringList {
 	Sprite2D*** strings;
 	unsigned int* heights;
 	unsigned int* lengths;
@@ -41,7 +41,7 @@ typedef struct StringList {
 	int starty;
 	int curx;
 	int cury;
-} StringList;
+};
 
 #ifdef WIN32
 

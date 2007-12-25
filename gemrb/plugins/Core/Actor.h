@@ -117,10 +117,10 @@ typedef ieByte ActionButtonRow[GUIBT_COUNT];
 typedef std::vector< ScriptedAnimation*> vvcVector;
 typedef std::list<ieResRef*> resourceList;
 
-typedef struct {
+struct WeaponInfo {
 	int enchantment;
 	ieDword itemflags;
-} WeaponInfo;
+};
 
 class GEM_EXPORT Actor : public Movable {
 public:

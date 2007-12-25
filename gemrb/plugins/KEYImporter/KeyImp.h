@@ -26,16 +26,16 @@
 #include "../Core/ResourceMgr.h"
 #include "Dictionary.h"
 
-typedef struct RESEntry {
+struct RESEntry {
 	ieResRef ResRef;
 	ieWord   Type;
 	ieDword  ResLocator;
-} RESEntry;
+};
 
-typedef struct BIFEntry {
+struct BIFEntry {
 	char* name;
 	ieWord BIFLocator;
-} BIFEntry;
+};
 
 class KeyImp : public ResourceMgr {
 private:

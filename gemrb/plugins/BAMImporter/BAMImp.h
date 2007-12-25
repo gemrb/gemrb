@@ -26,13 +26,13 @@
 #include "../../includes/globals.h"
 #include "../../includes/RGBAColor.h"
 
-typedef struct FrameEntry {
+struct FrameEntry {
 	ieWord Width;
 	ieWord  Height;
 	ieWord  XPos;
 	ieWord  YPos;
 	ieDword FrameData;
-} FrameEntry;
+};
 
 class Palette;
 

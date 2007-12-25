@@ -101,10 +101,10 @@ class Action;
 
 typedef std::vector<ieDword> SrcVector;
 
-typedef struct targettype {
+struct targettype {
 	Scriptable *actor; //hmm, could be door
 	unsigned int distance;
-} targettype;
+};
 
 typedef std::list<targettype> targetlist;
 

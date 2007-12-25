@@ -57,10 +57,10 @@ typedef void *LibHandle;
  * and tries to load them one after another.
  */
 
-typedef struct InterfaceElement {
+struct InterfaceElement {
 	void *mgr;
 	bool free;
-} InterfaceElement;
+};
 
 class GEM_EXPORT PluginMgr {
 public:

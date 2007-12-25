@@ -37,10 +37,10 @@
  * Text and its associated sound.
  */
 
-typedef struct StringBlock {
+struct StringBlock {
 	char* text;
 	ieResRef Sound;
-} StringBlock;
+};
 
 #ifdef WIN32
 

@@ -379,11 +379,11 @@ IWDOpc::~IWDOpc(void)
 //diffmode for gemrb. (Thus scripts can use the very same relation
 //functions).
 
-typedef struct {
+struct IWDIDSEntry {
 	ieDword value;
 	ieWord stat;
 	ieWord relation;
-} IWDIDSEntry;
+};
 
 static int spellrescnt = -1;
 static IWDIDSEntry *spellres = NULL;

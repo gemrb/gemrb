@@ -106,14 +106,14 @@ public:
  * Defines connection and travelling between WorldMap areas
  */
 
-typedef struct WMPAreaLink {
+struct WMPAreaLink {
 	ieDword AreaIndex;
 	char DestEntryPoint[32];
 	ieDword DistanceScale;
 	ieDword DirectionFlags; //where will the player appear on dest. area
 	ieResRef EncounterAreaResRef[5];
 	ieDword EncounterChance;
-} WMPAreaLink;
+};
 
 /**
  * @class WorldMap

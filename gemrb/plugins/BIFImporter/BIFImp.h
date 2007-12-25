@@ -26,22 +26,22 @@
 #include "../Core/ArchiveImporter.h"
 #include "../Core/CachedFileStream.h"
 
-typedef struct FileEntry {
+struct FileEntry {
 	ieDword resLocator;
 	ieDword dataOffset;
 	ieDword fileSize;
 	ieWord  type;
 	ieWord  u1; //Unknown Field
-} FileEntry;
+};
 
-typedef struct TileEntry {
+struct TileEntry {
 	ieDword resLocator;
 	ieDword dataOffset;
 	ieDword tilesCount;
 	ieDword tileSize; //named tilesize so it isn't confused
 	ieWord  type;
 	ieWord  u1; //Unknown Field
-} TileEntry;
+};
 
 class BIFImp : public ArchiveImporter {
 private:

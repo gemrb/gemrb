@@ -95,7 +95,7 @@ typedef struct SlotType {
 	ieResRef slotresref;
 } SlotType;
 
-typedef class ItemList {
+class ItemList {
 public:
 	ieResRef *ResRefs;
 	unsigned int Count;
@@ -116,7 +116,7 @@ public:
 			free(ResRefs);
 		}
 	}
-} ItemList;
+};
 
 #ifdef WIN32
 

@@ -24,7 +24,7 @@
 
 #include <stdio.h>
 
-typedef struct {
+struct RIFF_HEADER {
 	char riff_sig[4];
 	unsigned int total_len_m8;
 	char wave_sig[8];
@@ -34,9 +34,9 @@ typedef struct {
 	unsigned short nBlockAlign, wBitsPerSample;
 	char data_sig[4];
 	unsigned int raw_data_len;
-} RIFF_HEADER;
+};
 
-typedef struct {
+struct WAVC_HEADER {
 	char wavc_sig[4];
 	char wavc_ver[4];
 	int uncompressed;
@@ -46,7 +46,7 @@ typedef struct {
 	short bits;
 	short samplespersec;
 	unsigned short unknown;
-} WAVC_HEADER;
+};
 
 void write_riff_header(void* memory, int samples, int channels,
 	int samplerate);

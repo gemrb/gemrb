@@ -31,8 +31,8 @@ EFFImp::EFFImp(void)
 
 EFFImp::~EFFImp(void)
 {
-	if (str && autoFree) {
-		delete( str );
+	if (autoFree) {
+		delete str;
 	}
 }
 
@@ -41,8 +41,8 @@ bool EFFImp::Open(DataStream* stream, bool autoFree)
 	if (stream == NULL) {
 		return false;
 	}
-	if (str && this->autoFree) {
-		delete( str );
+	if (this->autoFree) {
+		delete str;
 	}
 	str = stream;
 	this->autoFree = autoFree;

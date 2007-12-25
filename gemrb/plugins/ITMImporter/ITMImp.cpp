@@ -32,8 +32,8 @@ ITMImp::ITMImp(void)
 
 ITMImp::~ITMImp(void)
 {
-	if (str && autoFree) {
-		delete( str );
+	if (autoFree) {
+		delete str;
 	}
 	str = NULL;
 }
@@ -43,8 +43,8 @@ bool ITMImp::Open(DataStream* stream, bool autoFree)
 	if (stream == NULL) {
 		return false;
 	}
-	if (str && this->autoFree) {
-		delete( str );
+	if (this->autoFree) {
+		delete str;
 	}
 	str = stream;
 	this->autoFree = autoFree;

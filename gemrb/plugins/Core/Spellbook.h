@@ -94,18 +94,18 @@ typedef enum ieIWD2SpellType {
 
 #define NUM_IWD2_SPELLTYPES 11
 
-typedef struct {
+struct CREKnownSpell {
 	ieResRef SpellResRef;
 	ieWord Level;
 	ieWord Type;
-} CREKnownSpell;
+};
 
-typedef struct {
+struct CREMemorizedSpell {
 	ieResRef SpellResRef;
 	ieDword Flags;
-} CREMemorizedSpell;
+};
 
-typedef struct {
+struct CRESpellMemorization {
 	ieWord  Level;
 	ieWord  Number;
 	ieWord  Number2;
@@ -113,7 +113,7 @@ typedef struct {
 
 	std::vector<CREKnownSpell*> known_spells;
 	std::vector<CREMemorizedSpell*> memorized_spells;
-} CRESpellMemorization;
+};
 
 struct SpellExtHeader {
 	ieDword level;

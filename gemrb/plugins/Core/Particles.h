@@ -36,10 +36,10 @@
 #define P_EMPTY 2
 
 // this structure holds data for a single particle element
-typedef struct Element {
+struct Element {
 	int state;
 	Point pos;
-} Element;
+};
 
 /**
  * @class Particles 

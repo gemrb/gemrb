@@ -201,7 +201,7 @@ public:
 
 
 // WAVEFORMATEX structure (from MS SDK)
-typedef struct {
+struct cWAVEFORMATEX {
 	unsigned short wFormatTag;  	   /* format type */
 	unsigned short nChannels;   	   /* number of channels (i.e. mono, stereo...) */
 	unsigned int nSamplesPerSec;     /* sample rate */
@@ -210,12 +210,12 @@ typedef struct {
 	unsigned short wBitsPerSample;     /* number of bits per sample of mono data */
 	unsigned short cbSize;  		   /* the count in bytes of the size of */
 	/* extra information (after cbSize) */
-} cWAVEFORMATEX;
+};
 
-typedef struct {
+struct RIFF_CHUNK {
 	unsigned int fourcc;
 	unsigned int length;
-} RIFF_CHUNK;
+};
 
 const unsigned char RIFF_4cc[] = {
 	'R', 'I', 'F', 'F'

@@ -50,12 +50,12 @@ static ieResRef Sounds[DEF_COUNT] = {
 	{UNINITIALIZED_BYTE},
 };
 
-typedef struct ResRefToStrRef {
+struct ResRefToStrRef {
 	ieResRef areaName;
 	ieStrRef text;
 	bool trackFlag;
 	int difficulty;
-} ResRefToStrRef;
+};
 
 DataFileMgr *INInote = NULL;
 ResRefToStrRef *tracks = NULL;
@@ -64,15 +64,11 @@ int trackcount = 0;
 //called from ~Interface
 void AREImp::ReleaseMemory()
 {
-	if(INInote) {
-		core->FreeInterface( INInote );
-		INInote = NULL;
-	}
+	core->FreeInterface( INInote );
+	INInote = NULL;
 
-	if (tracks) {
-		delete [] tracks;
-		tracks = NULL;
-	}
+	delete [] tracks;
+	tracks = NULL;
 }
 
 void ReadAutonoteINI()
@@ -148,8 +144,8 @@ AREImp::AREImp(void)
 
 AREImp::~AREImp(void)
 {
-	if (autoFree && str) {
-		delete( str );
+	if (autoFree) {
+		delete str;
 	}
 	Sounds[0][0]=UNINITIALIZED_BYTE;
 }
@@ -159,8 +155,8 @@ bool AREImp::Open(DataStream* stream, bool autoFree)
 	if (stream == NULL) {
 		return false;
 	}
-	if (this->autoFree && str) {
-		delete( str );
+	if (this->autoFree) {
+		delete str;
 	}
 	str = stream;
 	this->autoFree = autoFree;

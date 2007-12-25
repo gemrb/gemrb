@@ -99,34 +99,34 @@ class Projectile;
 //in areas 10 is a magic number for resref counts
 #define MAX_RESCOUNT 10 
 
-typedef struct SongHeaderType {
+struct SongHeaderType {
 	ieDword SongList[MAX_RESCOUNT];
-} SongHeaderType;
+};
 
-typedef struct RestHeaderType {
+struct RestHeaderType {
 	ieDword Strref[MAX_RESCOUNT];
 	ieResRef CreResRef[MAX_RESCOUNT];
 	ieWord CreatureNum;
 	ieWord DayChance;
 	ieWord NightChance;
-} RestHeaderType;
+};
 
-typedef struct Entrance {
+struct Entrance {
 	ieVariable Name;
 	Point Pos;
 	ieWord Face;
-} Entrance;
+};
 
-typedef class MapNote {
+class MapNote {
 public:
 	Point Pos;
 	ieWord color;
 	char *text;
 	MapNote() { text=NULL; }
 	~MapNote() { if(text) free(text); }
-} MapNote;
+};
 
-typedef class Spawn {
+class Spawn {
 public:
 	ieVariable Name;
 	Point Pos;
@@ -140,9 +140,9 @@ public:
 	Spawn() { Creatures=NULL;  }
 	~Spawn() { if(Creatures) free(Creatures); } 
 	unsigned int GetCreatureCount() { return Count; }
-} Spawn;
+};
 
-typedef class SpawnGroup {
+class SpawnGroup {
 public:
 	ieResRef *ResRefs;
 	unsigned int Count;
@@ -157,7 +157,7 @@ public:
 			free(ResRefs);
 		}
 	}
-} SpawnGroup;
+};
 
 class GEM_EXPORT AreaAnimation {
 public:

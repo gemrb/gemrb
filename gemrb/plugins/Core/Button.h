@@ -100,7 +100,7 @@ class Palette;
 #endif
 
 /** Border/frame settings for a button */
-typedef struct ButtonBorder {
+struct ButtonBorder {
 	int dx1;
 	int dy1;
 	int dx2;
@@ -108,7 +108,7 @@ typedef struct ButtonBorder {
 	Color color;
 	bool filled;
 	bool enabled;
-} ButtonBorder;
+};
 
 #define MAX_NUM_BORDERS 3
 

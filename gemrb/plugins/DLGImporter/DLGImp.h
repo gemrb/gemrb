@@ -26,15 +26,15 @@
 #include "../../includes/globals.h"
 
 /*
-typedef struct State {
+struct State {
 	ieStrRef StrRef;
 	ieDword  FirstTransitionIndex;
 	ieDword  TransitionsCount;
 	ieDword  TriggerIndex;
-} State;
+};
 */
 /*
-typedef struct Transition {
+struct Transition {
 	ieDword  Flags;
 	ieStrRef AnswerStrRef;
 	ieStrRef JournalStrRef;
@@ -42,13 +42,13 @@ typedef struct Transition {
 	ieDword  ActionIndex;
 	ieResRef DLGResRef;
 	ieDword  NextStateIndex;
-} Transition;
+};
 */
 /*
-typedef struct VarOffset {
+struct VarOffset {
 	ieDword Offset;
 	ieDword Length;
-} VarOffset;
+};
 */
 class DLGImp : public DialogMgr {
 private:

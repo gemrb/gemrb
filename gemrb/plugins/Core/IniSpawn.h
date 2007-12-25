@@ -134,10 +134,10 @@ public:
  * Class for the special creature re/spawn features that are unique to PST.
  */
 
-typedef struct VariableSpec {
+struct VariableSpec {
 	ieVariable Name;
 	ieDword Value;
-} VariableSpec;
+};
 
 class GEM_EXPORT IniSpawn {
 public:

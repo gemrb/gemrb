@@ -46,12 +46,12 @@
 #define IE_DLG_SOLVED      0x100
 #define IE_DLG_QUEST_GROUP 0x4000 // this is a GemRB extension
 
-typedef struct DialogString {
+struct DialogString {
 	char** strings;
 	unsigned int count;
-} DialogString;
+};
 
-typedef struct DialogTransition {
+struct DialogTransition {
 	ieDword Flags;
 	ieStrRef textStrRef;
 	ieStrRef journalStrRef;
@@ -59,15 +59,15 @@ typedef struct DialogTransition {
 	DialogString* action;
 	ieResRef Dialog;
 	ieDword stateIndex;
-} DialogTransition;
+};
 
-typedef struct DialogState {
+struct DialogState {
 	ieStrRef StrRef;
 	DialogTransition** transitions;
 	unsigned int transitionsCount;
 	DialogString* trigger;
 	unsigned int weight;
-} DialogState;
+};
 
 class GEM_EXPORT Dialog {
 public:

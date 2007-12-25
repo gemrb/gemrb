@@ -24,10 +24,10 @@
 
 #include "../Core/SymbolMgr.h"
 
-typedef struct Pair {
+struct Pair {
 	int val;
 	char* str;
-} Pair;
+};
 
 class IDSImp : public SymbolMgr {
 private:

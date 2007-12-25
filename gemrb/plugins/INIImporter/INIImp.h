@@ -25,9 +25,9 @@
 #include "../Core/DataFileMgr.h"
 #include "../../includes/globals.h"
 
-typedef struct INIPair {
+struct INIPair {
 	char* Name, * Value;
-} INIPair;
+};
 
 class INITag {
 private:

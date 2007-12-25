@@ -24,14 +24,14 @@
 
 #include "../Core/TileMapMgr.h"
 
-typedef struct Overlay {
+struct Overlay {
 	ieWord  Width;
 	ieWord  Height;
 	ieResRef TilesetResRef;
 	ieDword unknown;
 	ieDword TilemapOffset;
 	ieDword TILOffset;
-} Overlay;
+};
 
 class WEDImp : public TileMapMgr {
 private:

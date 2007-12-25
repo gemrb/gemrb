@@ -110,7 +110,7 @@ class Game;
  * Information about party member.
  */
 
-typedef struct PCStruct {
+struct PCStruct {
 	ieWord   Selected;
 	ieWord   PartyOrder;
 	ieDword  OffsetToCRE;
@@ -134,7 +134,7 @@ typedef struct PCStruct {
 	ieDword  TalkCount;
 	ieByte QSlots[MAX_QSLOTS];
 	ieByte QuickSpellClass[MAX_QSLOTS];
-} PCStruct;
+};
 
 #define IE_GAM_JOURNAL 0
 #define IE_GAM_QUEST_UNSOLVED 1
@@ -146,14 +146,14 @@ typedef struct PCStruct {
  * Single entry in a journal
  */
 
-typedef struct GAMJournalEntry {
+struct GAMJournalEntry {
 	ieStrRef Text;
 	ieDword  GameTime; // in game time seconds
 	ieByte   Chapter;
 	ieByte   unknown09;
 	ieByte   Section;
 	ieByte   Group;   // this is a GemRB extension
-} GAMJournalEntry;
+};
 
 #define MAX_CRLEVEL 32
 

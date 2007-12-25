@@ -25,12 +25,12 @@
 #include "../Core/Interface.h"
 #include "../Core/ResourceMgr.h"
 
-typedef struct {
+struct wed_polygon {
 	ieDword FirstVertex;
 	ieDword CountVertex;
 	ieWord Flags;
 	ieWord MinX, MaxX, MinY, MaxY;
-} wed_polygon;
+};
 
 //the net sizeof(wed_polygon) is 0x12 but not all compilers know that
 #define WED_POLYGON_SIZE  0x12

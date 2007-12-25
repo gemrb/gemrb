@@ -82,7 +82,7 @@
 #define PAF_TGT       64    //target party or not party
 #define PAF_PARTY     128   //target party
 
-typedef struct ProjectileExtension
+struct ProjectileExtension
 {
 	ieDword AFlags;
 	ieWord TriggerRadius;
@@ -98,7 +98,7 @@ typedef struct ProjectileExtension
 	ieResRef VVCRes;
 	ieWord ConeWidth;
 	//there could be some more unused bytes we don't load
-} ProjectileExtension;
+};
 
 class GEM_EXPORT Projectile
 {

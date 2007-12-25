@@ -30,13 +30,13 @@
   *@author GemRB Developement Team
   */
 
-typedef struct PLString {
+struct PLString {
 	char PLFile[10];
 	char PLLoop[10];
 	char PLTag[10];
 	char PLEnd[10];
 	unsigned int soundID;
-} PLString;
+};
 
 class MUSImp : public MusicMgr {
 private:

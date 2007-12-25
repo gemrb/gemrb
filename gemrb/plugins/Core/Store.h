@@ -72,7 +72,7 @@ STA_CURE=3, STA_DONATE=4, STA_DRINK=5, STA_ROOMRENT=6, STA_OPTIONAL=0x80} StoreA
  * @struct STOItem
  * Item in a store, together with available amount etc.
  */
-typedef struct STOItem {
+struct STOItem {
 	ieResRef ItemResRef;
 	ieWord PurchasedAmount;
 	ieWord Usages[CHARGE_COUNTERS];
@@ -85,7 +85,7 @@ typedef struct STOItem {
 	// V1.1
 	//ieDword TriggerRef; use infinitesupply
 	char unknown2[56];
-} STOItem;
+};
 
 
 /**
@@ -93,12 +93,12 @@ typedef struct STOItem {
  * Kind of drink in a pub, with its associated rumour and price
  */
 
-typedef struct STODrink {
+struct STODrink {
 	ieResRef RumourResRef;
 	ieStrRef DrinkName;
 	ieDword Price;
 	ieDword Strength;
-} STODrink;
+};
 
 
 /**
@@ -106,10 +106,10 @@ typedef struct STODrink {
  * Kind of cure available in a temple, with its associated price
  */
 
-typedef struct STOCure {
+struct STOCure {
 	ieResRef CureResRef;
 	ieDword Price;
-} STOCure;
+};
 
 /**
  * @class Store

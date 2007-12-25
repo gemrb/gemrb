@@ -21,8 +21,10 @@
 
 #ifndef ANIMSTRUCTURES_H
 #define ANIMSTRUCTURES_H
-typedef struct CycleEntry {
+
+struct CycleEntry {
 	ieWord FramesCount;
 	ieWord FirstFrame;
-} CycleEntry;
+};
+
 #endif
