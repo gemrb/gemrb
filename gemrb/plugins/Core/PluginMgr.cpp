@@ -272,5 +272,6 @@ std::vector<InterfaceElement> *PluginMgr::GetAllPlugin(SClass_ID plugintype) con
 
 void PluginMgr::FreePlugin(void* ptr)
 {
-	( ( Plugin * ) ptr )->release();
+	if (ptr)
+		( ( Plugin * ) ptr )->release();
 }

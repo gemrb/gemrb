@@ -76,6 +76,11 @@ SDLVideoDriver::~SDLVideoDriver(void)
 	if(backBuf) SDL_FreeSurface( backBuf );
 	if(extra) SDL_FreeSurface( extra );
 	SDL_Quit();
+
+	// This sprite needs to have been freed earlier, because
+	// all AnimationFactories and Sprites have already been
+	// destructed before the video driver is freed.
+	assert(Cursor[2] == NULL);
 }
 
 int SDLVideoDriver::Init(void)

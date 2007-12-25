@@ -310,9 +310,8 @@ static void ReleaseItemTooltip(void *poi)
 Interface::~Interface(void)
 {
 	DragItem(NULL,NULL);
-	if (AreaAliasTable) {
-		delete( AreaAliasTable );
-	}
+	delete AreaAliasTable;
+
 	if (music) {
 		music->HardEnd();
 	}
@@ -322,12 +321,9 @@ Interface::~Interface(void)
 		if (ambim) ambim->deactivate();
 	}
 	//destroy the highest objects in the hierarchy first!
-	if (game) {
-		delete( game );
-	}
-	if (worldmap) {
-		delete( worldmap );
-	}
+	delete game;
+	delete worldmap;
+
 	FreeAbilityTables();
 	//aww, i'm sure this could be implemented better
 	MapMgr* mm = ( MapMgr* ) GetInterface( IE_ARE_CLASS_ID );
@@ -338,9 +334,7 @@ Interface::~Interface(void)
 
 	EffectQueue_ReleaseMemory();
 	CharAnimations::ReleaseMemory();
-	if (CurrentStore) {
-		delete CurrentStore;
-	}
+	delete CurrentStore;
 	ItemCache.RemoveAll(ReleaseItem);
 	SpellCache.RemoveAll(ReleaseSpell);
 	EffectCache.RemoveAll(ReleaseEffect);
@@ -348,24 +342,16 @@ Interface::~Interface(void)
 
 	FreeResRefTable(DefSound, DSCount);
 
-	if (slottypes) {
-		free( slottypes );
-	}
-	if (slotmatrix) {
-		free( slotmatrix );
-	}
-	if (music) {
-		FreeInterface( music );
-	}
-	if (soundmgr) {
-		FreeInterface( soundmgr );
-	}
-	if (sgiterator) {
-		delete( sgiterator );
-	}
+	free( slottypes );
+	free( slotmatrix );
+
+	FreeInterface( music );
+	FreeInterface( soundmgr );
+
+	delete sgiterator;
+
 	if (Cursors) {
 		for (int i = 0; i < CursorCount; i++) {
-			//freesprite doesn't free NULL
 			video->FreeSprite( Cursors[i] );
 		}
 		delete[] Cursors;
@@ -374,34 +360,18 @@ Interface::~Interface(void)
 	FreeResourceVector( Font, fonts );
 	FreeResourceVector( Window, windows );
 
-	if (projserv) {
-		delete( projserv );
-	}
+	delete projserv;
 
-	if (console) {
-		delete( console );
-	}
+	delete console;
 
-	if (key) {
-		FreeInterface( key );
-	}
-	if (pal256) {
-		FreeInterface( pal256 );
-	}
-	if (pal32) {
-		FreeInterface( pal32 );
-	}
-	if (pal16) {
-		FreeInterface( pal16 );
-	}
+	FreeInterface( key );
+	FreeInterface( pal256 );
+	FreeInterface( pal32 );
+	FreeInterface( pal16 );
 
-	if (timer) {
-		delete( timer );
-	}
+	delete timer;
 
-	if (windowmgr) {
-		FreeInterface( windowmgr );
-	}
+	FreeInterface( windowmgr );
 
 	if (video) {
 		unsigned int i;
@@ -411,7 +381,6 @@ Interface::~Interface(void)
 		//}
 
 		for(i=0;i<sizeof(FogSprites)/sizeof(Sprite2D *);i++ ) {
-			//freesprite checks for null pointer
 			video->FreeSprite(FogSprites[i]);
 		}
 
@@ -435,80 +404,63 @@ Interface::~Interface(void)
 		if (InfoTextPalette) {
 			FreePalette(InfoTextPalette);
 		}
+
+		video->SetDragCursor(NULL);
 	}
 
-	if (factory) {
-		delete( factory );
-	}
+	delete factory;
 
-	if (video) {
-		FreeInterface( video );
-	}
+	FreeInterface( video );
 
-	if (evntmgr) {
-		delete( evntmgr );
-	}
-	if (guiscript) {
-		FreeInterface( guiscript );
-	}
-	if (vars) {
-		delete( vars );
-	}
-	if (tokens) {
-		delete( tokens );
-	}
+	delete evntmgr;
+
+	FreeInterface( guiscript );
+
+	delete vars;
+	delete tokens;
 	if (RtRows) {
 		RtRows->RemoveAll(ReleaseItemList);
-		delete( RtRows );
+		delete RtRows;
 	}
 	if (ItemExclTable) {
 		ItemExclTable->RemoveAll(NULL);
-		delete( ItemExclTable );
+		delete ItemExclTable;
 	}
 	if (ItemDialTable) {
 		ItemDialTable->RemoveAll(NULL);
-		delete( ItemDialTable );
+		delete ItemDialTable;
 	}
 	if (ItemDial2Table) {
 		ItemDial2Table->RemoveAll(NULL);
-		delete( ItemDial2Table );
+		delete ItemDial2Table;
 	}
 	if (ItemTooltipTable) {
 		ItemTooltipTable->RemoveAll(ReleaseItemTooltip);
-		delete( ItemTooltipTable );
+		delete ItemTooltipTable;
 	}
 
 	FreeInterfaceVector( Table, tables, tm );
 	FreeInterfaceVector( Symbol, symbols, sm );
+
 	if (opcodemgrs) {
 		FreeInterfaceVector( InterfaceElement, *opcodemgrs, mgr );
 		delete opcodemgrs;
 		opcodemgrs=NULL;
 	}
 
-	if (INIquests) {
-		FreeInterface(INIquests);
-	}
-	if (INIbeasts) {
-		FreeInterface(INIbeasts);
-	}
-	if (INIparty) {
-		FreeInterface(INIparty);
-	}
-	if (INIresdata) {
-		FreeInterface(INIresdata);
-	}
+	FreeInterface(INIquests);
+	FreeInterface(INIbeasts);
+	FreeInterface(INIparty);
+	FreeInterface(INIresdata);
+
 	Map::ReleaseMemory();
 	GameScript::ReleaseMemory();
 	Actor::ReleaseMemory();
 
-	if (strings) {
-		FreeInterface( strings );
-	}
+	FreeInterface( strings );
 
-	if(plugin) {
-		delete( plugin );
-	}
+	delete plugin;
+
 	// Removing all stuff from Cache, except bifs
 	DelTree((const char *) CachePath, true);
 }
@@ -1385,7 +1337,7 @@ int Interface::Init()
 	if (!fs->Open( strpath, true )) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "Cannot find Dialog.tlk.\nTermination in Progress...\n" );
-		delete( fs );
+		delete fs;
 		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
@@ -3171,9 +3123,7 @@ int Interface::DelWindow(unsigned short WindowIndex)
 		vars->SetAt("FloatWindow", (ieDword) ~0);
 		for(unsigned int WindowIndex=0; WindowIndex<windows.size();WindowIndex++) {
 			Window* win = windows[WindowIndex];
-			if (win) {
-				delete( win );
-			}
+			delete win;
 		}
 		windows.clear();
 		topwin.clear();
@@ -3265,7 +3215,7 @@ int Interface::LoadTable(const ieResRef ResRef)
 	}
 	TableMgr* tm = ( TableMgr* ) GetInterface( IE_2DA_CLASS_ID );
 	if (!tm) {
-		delete( str );
+		delete str;
 		return -1;
 	}
 	if (!tm->Open( str, true )) {
@@ -3343,7 +3293,7 @@ int Interface::LoadSymbol(const char* ResRef)
 	}
 	SymbolMgr* sm = ( SymbolMgr* ) GetInterface( IE_IDS_CLASS_ID );
 	if (!sm) {
-		delete( str );
+		delete str;
 		return -1;
 	}
 	if (!sm->Open( str, true )) {
@@ -3418,7 +3368,7 @@ int Interface::PlayMovie(const char* ResRef)
 	if (!mp->Open( str, true )) {
 		FreeInterface( mp );
 		// since mp was opened with autofree, this delete would cause double free
-		//	delete( str );
+		//	delete str;
 		return -1;
 	}
 
@@ -3808,17 +3758,14 @@ void Interface::LoadGame(int index)
 			FreeInterface( ai );
 			ai = NULL;
 		}
-		delete( sav_str );
+		delete sav_str;
 		sav_str = NULL;
 	}
 
 	// Let's assume that now is everything loaded OK and swap the objects
 
-	if (game)
-		delete( game );
-
-	if (worldmap)
-		delete( worldmap );
+	delete game;
+	delete worldmap;
 
 	game = new_game;
 	worldmap = new_worldmap;
@@ -3829,10 +3776,8 @@ void Interface::LoadGame(int index)
 cleanup:
 	// Something went wrong, so try to clean after itself
 
-	if (new_game)
-		delete( new_game );
-	if (new_worldmap)
-		delete( new_worldmap );
+	delete new_game;
+	delete new_worldmap;
 
 	if (gam_mgr) {
 		FreeInterface( gam_mgr );
@@ -3843,9 +3788,9 @@ cleanup:
 		wmp_str = NULL;
 	}
 
-	if (gam_str) delete gam_str;
-	if (wmp_str) delete wmp_str;
-	if (sav_str) delete sav_str;
+	delete gam_str;
+	delete wmp_str;
+	delete sav_str;
 }
 
 GameControl *Interface::GetGameControl() const
