@@ -1418,7 +1418,8 @@ int Interface::Init()
 	int ret = LoadSprites();
 	if (ret) return ret;
 	 
-	printMessage( "Core", "Setting up the Console...\n", WHITE );
+	Sprite2D *tmpsprite = GetCursorSprite();
+	printMessage( "Core", "Setting up the Console...", WHITE );
 	QuitFlag = QF_CHANGESCRIPT;
 	console = new Console();
 	console->XPos = 0;
@@ -1426,7 +1427,6 @@ int Interface::Init()
 	console->Width = (ieWord) Width;
 	console->Height = 25;
 	console->SetFont( fonts[0] );
-	Sprite2D *tmpsprite = GetCursorSprite();
 	if (!tmpsprite) {
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
