@@ -1543,8 +1543,8 @@ int Interface::Init()
 	}
 	game = NULL;
 
-	printMessage( "Core", "Bringing up the Global Timer...\n", WHITE );
 	timer = new GlobalTimer();
+	printMessage( "Core", "Bringing up the Global Timer...", WHITE );
 	if (!timer) {
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
@@ -1558,34 +1558,35 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 
-	printf("Loaded %d opcode blocks\n", (int) opcodemgrs->size());
+	printf("Loaded %d opcode blocks", (int) opcodemgrs->size());
 	printStatus( "OK", LIGHT_GREEN );
 
-	printMessage( "Core", "Initializing effects...\n", WHITE );
-	if (! Init_EffectQueue()) {
+	ret = Init_EffectQueue();
+	printMessage( "Core", "Initializing effects...", WHITE );
+	if (!ret) {
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
 
-	printMessage( "Core", "Initializing Inventory Management...\n", WHITE );
 	ret = InitItemTypes();
+	printMessage( "Core", "Initializing Inventory Management...", WHITE );
 	if (!ret) {
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
 
-	printMessage( "Core", "Initializing string constants...\n", WHITE );
 	ret = ReadStrrefs();
+	printMessage( "Core", "Initializing string constants...", WHITE );
 	if (!ret) {
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
 	}
 	printStatus( "OK", LIGHT_GREEN );
 
-	printMessage( "Core", "Initializing random treasure...\n", WHITE );
 	ret = ReadRandomItems();
+	printMessage( "Core", "Initializing random treasure...", WHITE );
 	if (ret) {
 		printStatus( "OK", LIGHT_GREEN );
 	}
@@ -1593,24 +1594,26 @@ int Interface::Init()
 		printStatus( "ERROR", LIGHT_RED );
 	}
 
-	printMessage( "Core", "Initializing ability tables...\n", WHITE );
 	ret = ReadAbilityTables();
+	printMessage( "Core", "Initializing ability tables...", WHITE );
 	if (!ret) {
 		printStatus( "ERROR", LIGHT_RED );
 	}
 	printStatus( "OK", LIGHT_GREEN );
 
-	printMessage( "Core", "Initializing area aliases...\n", WHITE );
-	ret = ReadAreaAliasTable( "WMAPLAY" );
-	if (ret) {
-		printStatus( "OK", LIGHT_GREEN );
-	}
-	else {
-		printStatus( "NOT FOUND", YELLOW );
+	if (stricmp( GameType, "pst" ) == 0) {
+		ret = ReadAreaAliasTable( "WMAPLAY" );
+		printMessage( "Core", "Initializing area aliases...", WHITE );
+		if (ret) {
+			printStatus( "OK", LIGHT_GREEN );
+		}
+		else {
+			printStatus( "NOT FOUND", YELLOW );
+		}
 	}
 
-	printMessage( "Core", "Reading item tables...\n", WHITE);
 	ret = ReadAuxItemTables();
+	printMessage( "Core", "Reading item tables...", WHITE);
 	if (!ret) {
 		printStatus( "ERROR", LIGHT_RED );
 	}
