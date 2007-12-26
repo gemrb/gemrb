@@ -1120,7 +1120,7 @@ int Interface::LoadSprites()
 	for (size = 0; size < MAX_CIRCLE_SIZE; size++) {
 		if (GroundCircleBam[size][0]) {
 			anim = (AnimationFactory*)GetResourceMgr()->GetFactoryResource(GroundCircleBam[size], IE_BAM_CLASS_ID);
-			if (anim->GetCycleCount() != 6) {
+			if (!anim || anim->GetCycleCount() != 6) {
 				// unknown type of circle anim
 				printStatus( "ERROR", LIGHT_RED );
 				return GEM_ERROR;
