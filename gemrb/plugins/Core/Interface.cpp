@@ -1042,7 +1042,7 @@ int Interface::LoadSprites()
 	// Load fog-of-war bitmaps
 	printMessage( "Core", "Loading Fog-Of-War bitmaps...\n", WHITE );
 	anim = (AnimationFactory*)GetResourceMgr()->GetFactoryResource("fogowar", IE_BAM_CLASS_ID);
-	if (anim->GetCycleSize( 0 ) != 8) {
+	if (!anim || anim->GetCycleSize( 0 ) != 8) {
 		// unknown type of fog anim
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
