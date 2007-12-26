@@ -1481,7 +1481,11 @@ int Interface::Init()
 		char tINIresdata[_MAX_PATH];
 		PathJoin( tINIresdata, GamePath, "resdata.ini", NULL );
 		ResolveFilePath( tINIresdata );
-		// FIXME: crashes if file does not open
+               struct stat fst;
+               if ( stat(tINIresdata, &fst) == -1 ) {
+                       printStatus( "ERROR", LIGHT_RED );
+                       return GEM_ERROR;
+               }
 		fs->Open( tINIresdata, true );
 		if (!INIresdata->Open( fs, true )) {
 			printStatus( "ERROR", LIGHT_RED );
