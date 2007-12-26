@@ -1927,8 +1927,9 @@ bool Interface::LoadConfig(const char* filename)
 {
 	FILE* config;
 
-	printMessage("Config"," ", WHITE);
-	printf("Trying to open %s ", filename);
+	printMessage("Config","Trying to open ", WHITE);
+	textcolor(LIGHT_WHITE);
+	printf("%s ", filename);
 	config = fopen( filename, "rb" );
 	if (config == NULL) {
 		printStatus("NOT FOUND", LIGHT_RED);
