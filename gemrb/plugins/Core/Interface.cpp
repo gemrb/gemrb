@@ -1601,7 +1601,7 @@ int Interface::Init()
 	}
 	printStatus( "OK", LIGHT_GREEN );
 
-	if (stricmp( GameType, "pst" ) == 0) {
+	if ( Exists("WMAPLAY", IE_2DA_CLASS_ID) ) {
 		ret = ReadAreaAliasTable( "WMAPLAY" );
 		printMessage( "Core", "Initializing area aliases...", WHITE );
 		if (ret) {
