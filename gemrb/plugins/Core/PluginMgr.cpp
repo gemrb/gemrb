@@ -177,20 +177,20 @@ PluginMgr::PluginMgr(char* pluginpath)
 		bool error = false;
 		ClassDesc* plug = LibClassDesc();
 		if (plug == NULL) {
+			printMessage( "PluginMgr", "Plug-in Exports Error! ", WHITE );
 			printStatus( "ERROR", LIGHT_RED );
-			printf( "Plug-in Exports Error\n" );
 		} else {
 			for (unsigned int x = 0; x < plugins.size(); x++) {
 				if (plugins[x]->ClassID() == plug->ClassID()) {
+					printMessage( "PluginMgr", "Plug-in Already Loaded! ", WHITE );
 					printStatus( "SKIPPING", YELLOW );
-					printf( "Plug-in Already Loaded\n" );
 					error = true;
 					break;
 				}
 
 				if (plugins[x]->SuperClassID() == plug->SubClassID()) {
+					printMessage( "PluginMgr", "Duplicate Plug-in! ", WHITE );
 					printStatus( "SKIPPING", YELLOW );
-					printf( "Duplicate Plug-in\n" );
 					error = true;
 					break;
 				}
