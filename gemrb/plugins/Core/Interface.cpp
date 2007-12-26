@@ -1005,8 +1005,6 @@ int Interface::LoadSprites()
 	}
 
 	//loading cursors
-	printMessage( "Core", "Loading Cursors...\n", WHITE );
-
 	AnimationFactory* anim;
 	anim = (AnimationFactory*)GetResourceMgr()->GetFactoryResource("cursors", IE_BAM_CLASS_ID);
 	if (anim)
@@ -1017,6 +1015,7 @@ int Interface::LoadSprites()
 			Cursors[i] = anim->GetFrame( 0, (ieByte) i );
 		}
 	}
+	printMessage( "Core", "Loading Cursors...", WHITE );
 
 	// this is the last existing cursor type
 	if (CursorCount<IE_CURSOR_WAY) {
@@ -1040,8 +1039,8 @@ int Interface::LoadSprites()
 	//}
 
 	// Load fog-of-war bitmaps
-	printMessage( "Core", "Loading Fog-Of-War bitmaps...\n", WHITE );
 	anim = (AnimationFactory*)GetResourceMgr()->GetFactoryResource("fogowar", IE_BAM_CLASS_ID);
+	printMessage( "Core", "Loading Fog-Of-War bitmaps...", WHITE );
 	if (!anim || anim->GetCycleSize( 0 ) != 8) {
 		// unknown type of fog anim
 		printStatus( "ERROR", LIGHT_RED );
@@ -1115,13 +1114,13 @@ int Interface::LoadSprites()
 	printStatus( "OK", LIGHT_GREEN );
 
 	// Load ground circle bitmaps (PST only)
-	printMessage( "Core", "Loading Ground circle bitmaps...\n", WHITE );
 	//block required due to msvc6.0 incompatibility
 	for (size = 0; size < MAX_CIRCLE_SIZE; size++) {
 		if (GroundCircleBam[size][0]) {
 			anim = (AnimationFactory*)GetResourceMgr()->GetFactoryResource(GroundCircleBam[size], IE_BAM_CLASS_ID);
 			if (!anim || anim->GetCycleCount() != 6) {
 				// unknown type of circle anim
+				printMessage( "Core", "Loading Ground circle bitmaps...", WHITE );
 				printStatus( "ERROR", LIGHT_RED );
 				return GEM_ERROR;
 			}
@@ -1138,6 +1137,7 @@ int Interface::LoadSprites()
 		}
 	}
 
+	printMessage( "Core", "Loading Ground circle bitmaps...", WHITE );
 	printStatus( "OK", LIGHT_GREEN );
 
 	printMessage( "Core", "Loading Fonts...\n", WHITE );
@@ -1149,6 +1149,7 @@ int Interface::LoadSprites()
 	} else {
 		AnimationMgr* bamint = ( AnimationMgr* ) GetInterface( IE_BAM_CLASS_ID );
 		if (!bamint) {
+			printStatus( "ERROR", LIGHT_RED );
 			printf( "No BAM Importer Available.\nTermination in Progress...\n" );
 			return GEM_ERROR;
 		}
@@ -1321,7 +1322,7 @@ int Interface::Init()
 		printf( "No projectiles are available...\n" );
 	}
 
-	printMessage( "Core", "Checking for Dialogue Manager...\n", WHITE );
+	printMessage( "Core", "Checking for Dialogue Manager...", WHITE );
 	if (!IsAvailable( IE_TLK_CLASS_ID )) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "No TLK Importer Available.\nTermination in Progress...\n" );
