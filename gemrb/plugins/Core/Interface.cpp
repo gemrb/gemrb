@@ -1434,7 +1434,7 @@ int Interface::Init()
 	console->SetCursor (tmpsprite);
 	printStatus( "OK", LIGHT_GREEN );
 
-	printMessage( "Core", "Starting up the Sound Manager...\n", WHITE );
+	printMessage( "Core", "Starting up the Sound Manager...", WHITE );
 	soundmgr = ( SoundMgr * ) GetInterface( IE_WAV_CLASS_ID );
 	if (soundmgr == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
@@ -1446,7 +1446,7 @@ int Interface::Init()
 	}
 	printStatus( "OK", LIGHT_GREEN );
 
-	printMessage( "Core", "Allocating SaveGameIterator...\n", WHITE );
+	printMessage( "Core", "Allocating SaveGameIterator...", WHITE );
 	sgiterator = new SaveGameIterator();
 	if (sgiterator == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
@@ -1457,7 +1457,7 @@ int Interface::Init()
 	//no need of strdup, variables do copy the key!
 	vars->SetAt( "SkipIntroVideos", (unsigned long)SkipIntroVideos );
 
-	printMessage( "Core", "Initializing Token Dictionary...\n", WHITE );
+	printMessage( "Core", "Initializing Token Dictionary...", WHITE );
 	tokens = new Variables();
 	if (!tokens) {
 		printStatus( "ERROR", LIGHT_RED );
@@ -1466,7 +1466,7 @@ int Interface::Init()
 	tokens->SetType( GEM_VARIABLES_STRING );
 	printStatus( "OK", LIGHT_GREEN );
 
-	printMessage( "Core", "Initializing Music Manager...\n", WHITE );
+	printMessage( "Core", "Initializing Music Manager...", WHITE );
 	music = ( MusicMgr * ) GetInterface( IE_MUS_CLASS_ID );
 	if (!music) {
 		printStatus( "ERROR", LIGHT_RED );
@@ -1475,7 +1475,7 @@ int Interface::Init()
 	printStatus( "OK", LIGHT_GREEN );
 
 	if (HasFeature( GF_RESDATA_INI )) {
-		printMessage( "Core", "Loading resource data File...\n", WHITE );
+		printMessage( "Core", "Loading resource data File...", WHITE );
 		INIresdata = ( DataFileMgr * ) GetInterface( IE_INI_CLASS_ID );
 		FileStream* fs = new FileStream();
 		char tINIresdata[_MAX_PATH];
