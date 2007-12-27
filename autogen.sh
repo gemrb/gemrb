@@ -23,7 +23,7 @@ then
 else
   for file in aclocal aclocal-1.7 aclocal-1.8 aclocal-1.9 aclocal-1.10 aclocal-1.11; do
     version=`$file --version | sed -n '1s/^[^ ]* (.*) //;s/ .*$//;1p'`
-    if (( ${version//./} > 17 ));
+    if [ "${version//./}" -gt 17 ];
     then
       my_aclocal=$file
       break
@@ -49,7 +49,7 @@ then
 else
   for file in autoheader autoheader-2.57 autoheader-2.58 autoheader-2.59 autoheader-2.60 autoheader-2.61 autoheader-2.62; do
     version=`$file --version | sed -n '1s/^[^ ]* (.*) //;s/ .*$//;1p'`
-    if (( ${version//./} > 257 ));
+    if [ "${version//./}" -gt 257 ];
     then
       my_autoheader=$file
       break
@@ -75,7 +75,7 @@ then
 else
   for file in libtoolize; do
     version=`$file --version | sed -n '1s/^[^ ]* (.*) //;s/ .*$//;1p'`
-    if (( ${version//./} > 15 ));
+    if [ "${version//./}" -gt 15 ];
     then
       my_libtoolize=$file
       break
@@ -101,7 +101,7 @@ then
 else
   for file in automake automake-1.7 automake-1.8 automake-1.9 automake-1.10 automake-1.11; do
     version=`$file --version | sed -n '1s/^[^ ]* (.*) //;s/ .*$//;1p'`
-    if (( ${version//./} > 17 ));
+    if [ "${version//./}" -gt 17 ];
     then
       my_automake=$file
       break
@@ -127,7 +127,7 @@ then
 else
   for file in autoconf autoconf-2.57 autoconf-2.58 autoconf-2.59 autoconf-2.60 autoconf-2.61 autoconf-2.62; do
     version=`$file --version | sed -n '1s/^[^ ]* (.*) //;s/ .*$//;1p'`
-    if (( ${version//./} > 257 ));
+    if [ "${version//./}" -gt 257 ];
     then
       my_autoconf=$file
       break
