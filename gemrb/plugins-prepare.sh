@@ -1,5 +1,7 @@
 #!/bin/sh
 #copy all plugins
-(cd plugins; ln -sf */.libs/lib*.so .)
+cd `dirname $0`/plugins
+ln -sf */.libs/lib*.so .
+
 #remove the cuckoo's egg
-rm plugins/libgemrb_core.so
+rm libgemrb_core.so
