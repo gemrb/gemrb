@@ -1478,6 +1478,8 @@ int Interface::Init()
 	if (HasFeature( GF_RESDATA_INI )) {
 		printMessage( "Core", "Loading resource data File...", WHITE );
 		INIresdata = ( DataFileMgr * ) GetInterface( IE_INI_CLASS_ID );
+		DataStream* ds = key->GetResource("resdata", IE_INI_CLASS_ID);
+/*
 		FileStream* fs = new FileStream();
 		char tINIresdata[_MAX_PATH];
 		PathJoin( tINIresdata, GamePath, "resdata.ini", NULL );
@@ -1488,7 +1490,8 @@ int Interface::Init()
 			return GEM_ERROR;
 		}
 		fs->Open( tINIresdata, true );
-		if (!INIresdata->Open( fs, true )) {
+*/
+		if (!INIresdata->Open( ds, true )) {
 			printStatus( "ERROR", LIGHT_RED );
 		} else {
 			printStatus( "OK", LIGHT_GREEN );
