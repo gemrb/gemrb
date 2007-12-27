@@ -237,9 +237,9 @@ void AddLOS(int destx, int desty, int slot)
 
 void AddSpace(int destx, int desty, int slot)
 {
-	for (unsigned int i=0;i<MAX_CIRCLESIZE;i++) {
-		int x=(destx*i+MAX_CIRCLESIZE/2)/MAX_CIRCLESIZE*16;
-		int y=(desty*i+MAX_CIRCLESIZE/2)/MAX_CIRCLESIZE*12;
+	for (int i=0;i<(int)MAX_CIRCLESIZE;i++) {
+		int x=(destx*i+(int)MAX_CIRCLESIZE/2)/(int)MAX_CIRCLESIZE*16;
+		int y=(desty*i+(int)MAX_CIRCLESIZE/2)/(int)MAX_CIRCLESIZE*12;
 		PersonalSpaces[i][slot].x=(short) x;
 		PersonalSpaces[i][slot].y=(short) y;
 	}
