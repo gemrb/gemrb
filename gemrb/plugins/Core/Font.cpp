@@ -123,6 +123,8 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 		enablecap=true;
 	}
 	int oldcapital=capital;
+	int initials_rows = 0;
+	int initials_x = 0;
 
 	unsigned int psx = PARAGRAPH_START_X;
 	Palette *pal = hicolor;
@@ -235,6 +237,11 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 			y += ystep;
 			x = psx;
 			int w = CalcStringWidth( &tmp[i + 1], NoColor );
+			if (initials_rows > 0) {
+				initials_rows--;
+				x += initials_x;
+				w += initials_x;
+			}
 			if (Alignment & IE_FONT_ALIGN_CENTER) {
 				x = ( rgn.w - w ) / 2;
 			} else if (Alignment & IE_FONT_ALIGN_RIGHT) {
@@ -245,6 +252,8 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 		unsigned char currChar = ( unsigned char ) tmp[i] - 1;
 		if (initials && capital && enablecap) {
 			x = initials->PrintInitial( x, y, rgn, currChar );
+			initials_x = x;
+			initials_rows = 2; // 2 additional lines need to be indented
 			enablecap = false;
 			continue;
 		}
