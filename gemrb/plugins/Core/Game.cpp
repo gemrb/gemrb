@@ -59,6 +59,7 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	memset( script_timers,0, sizeof(script_timers));
 	weather = new Particles(200);
 	weather->SetRegion(0, 0, core->Width, core->Height);
+	LastScriptUpdate = 0;
 
 	//loading master areas
 	int mtab = core->LoadTable("mastarea");
@@ -1053,7 +1054,12 @@ bool Game::EveryoneDead() const
 
 void Game::UpdateScripts()
 {
-	bool StartTurn = GameTime%ROUND_SIZE==0;
+	// This function is called more than once for each value of GameTime.
+	// We keep track of the last GameTime we were called in to prevent
+	// InitRound() being called more than once per round.
+
+	bool StartTurn = (GameTime%ROUND_SIZE==0) && (GameTime != LastScriptUpdate);
+	LastScriptUpdate = GameTime;
 
 	if (StartTurn) {
 		size_t acnt=Attackers.size();

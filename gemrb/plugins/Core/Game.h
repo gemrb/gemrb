@@ -199,6 +199,7 @@ public:
 	ieDword Ticks;
 	ieDword interval; // 1000/AI_UPDATE (a tenth of a round in ms)
 	ieDword GameTime;
+	ieDword LastScriptUpdate; // GameTime at which UpdateScripts last ran
 	ieDword RealTime;
 	ieWord  WhichFormation;
 	ieWord  Formations[5];
