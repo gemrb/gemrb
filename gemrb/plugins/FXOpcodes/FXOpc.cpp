@@ -4548,7 +4548,7 @@ int fx_cast_spell_on_condition (Actor* Owner, Actor* target, Effect* fx)
 	}
 
 	if (condition) {
-		core->ApplySpell(fx->Resource, Owner, target, fx->Power);
+		core->ApplySpell(fx->Resource, actor, Owner, fx->Power);
 	}
 	return FX_APPLIED;
 }
