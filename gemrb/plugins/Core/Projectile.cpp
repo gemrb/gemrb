@@ -59,15 +59,22 @@ Projectile::Projectile()
 
 Projectile::~Projectile()
 {
-	if (Extension && autofree) {
+	if (autofree) {
 		free(Extension);
 	}
-	if (effects) {
-		delete effects;
-	}
+	delete effects;
+
 	core->FreePalette(palette, PaletteRes);
 	//core->FreePalette(shadpal);
 	ClearPath();
+
+	if (phase != P_UNINITED) {
+		int i;
+		for (i = 0; i < MAX_ORIENT; ++i) {
+			delete travel[i];
+			delete shadow[i];
+		}
+	}
 }
 
 void Projectile::InitExtension()
@@ -418,7 +425,7 @@ int Projectile::Update()
 	if (phase == P_EXPIRED) {
 		return 0;
 	}
-	if (phase ==P_UNINITED) {
+	if (phase == P_UNINITED) {
 		Setup();
 	}
 	if (phase == P_TRAVEL) {
