@@ -784,9 +784,17 @@ void ACMImp::ResetMusics()
 	SDL_mutexV( musicMutex );
 }
 
-void ACMImp::UpdateViewportPos(int XPos, int YPos)
+void ACMImp::UpdateListenerPos(int XPos, int YPos)
 {
 	alListener3f( AL_POSITION, ( float ) XPos, ( float ) YPos, 0.0f );
+}
+
+void ACMImp::GetListenerPos(int& XPos, int& YPos)
+{
+	ALfloat listen[3];
+	alGetListenerfv( AL_POSITION, listen );
+	XPos = (int) listen[0];
+	YPos = (int) listen[1];
 }
 
 void ACMImp::UpdateVolume( unsigned int which )

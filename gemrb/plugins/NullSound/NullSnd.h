@@ -36,7 +36,8 @@ public:
 	bool CanPlay();
 	bool IsSpeaking();
 	void ResetMusics();
-	void UpdateViewportPos(int XPos, int YPos);
+	void UpdateListenerPos(int XPos, int YPos);
+	void GetListenerPos(int& XPos, int& YPos);
 
 	int SetupAmbientStream(ieWord x, ieWord y, ieWord z, ieWord gain, bool point);
 	int QueueAmbient(int stream, const char* sound);
@@ -49,6 +50,9 @@ public:
 	{
 		delete this;
 	}
+
+private:
+	int XPos, YPos;
 };
 
 #endif

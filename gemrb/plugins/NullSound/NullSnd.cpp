@@ -25,6 +25,8 @@
 
 NullSnd::NullSnd(void)
 {
+	XPos = 0;
+	YPos = 0;
 	ambim = new AmbientMgr();
 }
 
@@ -72,8 +74,16 @@ bool NullSnd::IsSpeaking()
 	return false;
 }
 
-void NullSnd::UpdateViewportPos(int, int)
+void NullSnd::UpdateListenerPos(int x, int y)
 {
+	XPos = x;
+	YPos = y;
+}
+
+void NullSnd::GetListenerPos(int& x, int& y)
+{
+	x = XPos;
+	y = YPos;
 }
 
 int NullSnd::SetupAmbientStream(ieWord, ieWord, ieWord, ieWord, bool)

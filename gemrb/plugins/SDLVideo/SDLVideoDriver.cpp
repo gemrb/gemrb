@@ -1410,7 +1410,7 @@ void SDLVideoDriver::SetViewport(int x, int y, unsigned int w, unsigned int h)
 void SDLVideoDriver::MoveViewportTo(int x, int y)
 {
 	if (x != Viewport.x || y != Viewport.y) {
-		core->GetSoundMgr()->UpdateViewportPos( (x - xCorr) + disp->w / 2, (y - yCorr) + disp->h / 2 );
+		core->GetSoundMgr()->UpdateListenerPos( (x - xCorr) + disp->w / 2, (y - yCorr) + disp->h / 2 );
 		Viewport.x = x;
 		Viewport.y = y;
 	}

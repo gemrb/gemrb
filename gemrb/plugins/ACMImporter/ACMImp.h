@@ -53,7 +53,8 @@ public:
 	bool CanPlay();
 	bool IsSpeaking();
 	void ResetMusics();
-	void UpdateViewportPos(int XPos, int YPos);
+	void UpdateListenerPos(int XPos, int YPos);
+	void GetListenerPos(int& XPos, int& YPos);
 	void UpdateVolume( unsigned int which = GEM_SND_VOL_MUSIC | GEM_SND_VOL_AMBIENTS );
 
 	int SetupAmbientStream(ieWord x, ieWord y, ieWord z, ieWord gain, bool point);

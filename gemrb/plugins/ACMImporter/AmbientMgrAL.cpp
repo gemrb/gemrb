@@ -138,11 +138,11 @@ unsigned int AmbientMgrAL::tick(unsigned int ticks)
 	if (!active)
 		return delay;
 	
-	ALfloat listen[3];
-	alGetListenerfv( AL_POSITION, listen );
+	int xpos, ypos;
+	core->GetSoundMgr()->GetListenerPos(xpos, ypos);
 	Point listener;
-	listener.x = (short) listen[0];
-	listener.y = (short) listen[1];
+	listener.x = (short) xpos;
+	listener.y = (short) ypos;
 	
 	ieDword timeslice = 1<<(((core->GetGame()->GameTime / 60 + 30) / 60 - 1) % 24);
 	

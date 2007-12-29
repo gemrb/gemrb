@@ -66,7 +66,11 @@ public:
 	virtual void ResetMusics() = 0;
 
 	// update position of listener
-	virtual void UpdateViewportPos(int XPos, int YPos) = 0;
+	virtual void UpdateListenerPos(int XPos, int YPos) = 0;
+
+	// get listener position
+	virtual void GetListenerPos(int& XPos, int& YPos) = 0;
+
 	// update volumes (possibly on-the-fly)
 	virtual void UpdateVolume( unsigned int = GEM_SND_VOL_MUSIC | GEM_SND_VOL_AMBIENTS ) {}
 
