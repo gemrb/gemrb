@@ -48,7 +48,6 @@ private:
 public:
 	bool endReached;
 	unsigned int pos;
-	bool autofree;
 	int x, y;
 	unsigned char fps;
 	bool playReversed;

@@ -71,8 +71,6 @@ Tile* TISImp::GetTile(unsigned short* indexes, int count,
 {
 	Animation* ani = new Animation( count );
 	ani->x = ani->y = 0;
-	//not coming from factory
-	ani->autofree = true;
 	//pause key stops animation
 	ani->gameAnimation = true;
 	for (int i = 0; i < count; i++) {
@@ -81,8 +79,6 @@ Tile* TISImp::GetTile(unsigned short* indexes, int count,
 	if (secondary) {
 		Animation* sec = new Animation( count );
 		sec->x = sec->y = 0;
-		//not coming from factory
-		sec->autofree = true;
 		for (int i = 0; i < count; i++) {
 			sec->AddFrame( GetTile( secondary[i] ), i );
 		}

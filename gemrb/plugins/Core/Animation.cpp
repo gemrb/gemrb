@@ -47,7 +47,6 @@ Animation::Animation(int count)
 	starttime = 0;
 	x = 0;
 	y = 0;
-	autofree = false;
 	Flags = A_ANI_ACTIVE;
 	fps = 15;
 	endReached = false;
@@ -60,10 +59,8 @@ Animation::~Animation(void)
 {
 	Video *video = core->GetVideoDriver();
 	
-	if (autofree) {
-		for (unsigned int i = 0; i < indicesCount; i++) {
-			video->FreeSprite( frames[i] );
-		}
+	for (unsigned int i = 0; i < indicesCount; i++) {
+		video->FreeSprite( frames[i] );
 	}
 	free(frames);
 }
@@ -84,9 +81,7 @@ void Animation::AddFrame(Sprite2D* frame, unsigned int index)
 		printf("You tried to write past a buffer in animation, BAD!\n");
 		abort();
 	}
-	if (autofree && frames[index]) {
-		core->GetVideoDriver()->FreeSprite(frames[index]);
-	}
+	core->GetVideoDriver()->FreeSprite(frames[index]);
 	frames[index]=frame;
 
 	int x = -frame->XPos;
@@ -229,17 +224,11 @@ void Animation::MirrorAnimation()
 	for (size_t i = 0; i < indicesCount; i++) {
 		Sprite2D * tmp = frames[i];
 		frames[i] = video->MirrorSpriteHorizontal( tmp, true );
-		// we free the original sprite if it was referenced only by us
-		if (autofree) {
-			video->FreeSprite(tmp);
-		}
+		video->FreeSprite(tmp);
 	}
 
 	// flip animArea horizontally as well
 	animArea.x = -animArea.w - animArea.x;
-
-	// This function will create independent sprites we have to free
-	autofree = true;
 }
 
 void Animation::MirrorAnimationVert()
@@ -249,17 +238,11 @@ void Animation::MirrorAnimationVert()
 	for (size_t i = 0; i < indicesCount; i++) {
 		Sprite2D * tmp = frames[i];
 		frames[i] = video->MirrorSpriteVertical( tmp, true );
-		// we free the original sprite if it was referenced only by us
-		if (autofree) {
-			video->FreeSprite(tmp);
-		}
+		video->FreeSprite(tmp);
 	}
 
 	// flip animArea vertically as well
 //	animArea.y = -animArea.h - animArea.y;
-
-	// This function will create independent sprites we have to free
-	autofree = true;
 }
 
 void Animation::AddAnimArea(Animation* slave)
