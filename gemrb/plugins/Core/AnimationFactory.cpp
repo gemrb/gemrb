@@ -45,7 +45,7 @@ AnimationFactory::~AnimationFactory(void)
 	// FIXME: track down where sprites are being leaked
 	if (datarefcount) {
 		fprintf(stderr, "AnimationFactory %s has refcount %d\n", ResRef, datarefcount);
-		assert(datarefcount == 0);
+		//assert(datarefcount == 0);
 	}
 	if (FrameData)
 		free( FrameData);
@@ -82,10 +82,12 @@ Animation* AnimationFactory::GetCycle(unsigned char cycle)
 	if (cycle >= cycles.size()) {
 		return NULL;
 	}
-	int ff = cycles[cycle]. FirstFrame, lf = ff + cycles[cycle].FramesCount;
+	int ff = cycles[cycle].FirstFrame;
+	int lf = ff + cycles[cycle].FramesCount;
 	Animation* anim = new Animation( cycles[cycle].FramesCount );
 	int c = 0;
 	for (int i = ff; i < lf; i++) {
+		frames[FLTable[i]]->RefCount++;
 		anim->AddFrame( frames[FLTable[i]], c++ );
 	}
 	return anim;
