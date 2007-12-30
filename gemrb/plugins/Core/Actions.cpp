@@ -2107,7 +2107,8 @@ void GameScript::MoveBetweenAreas(Scriptable* Sender, Action* parameters)
 		parameters->pointParameter, parameters->int0Parameter, true);
 }
 
-//spell is depleted, casting time is calculated
+//spell is depleted, casting time is calculated, interruptible
+//FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::Spell(Scriptable* Sender, Action* parameters)
 {
 	ieResRef spellres;
@@ -2145,7 +2146,8 @@ void GameScript::Spell(Scriptable* Sender, Action* parameters)
 	}
 }
 
-//spell is depleted, casting time is calculated
+//spell is depleted, casting time is calculated, interruptible
+//FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
 {
 	ieResRef spellres;
@@ -2174,7 +2176,80 @@ void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
 	}
 }
 
-//spell isn't depleted, but casting time is calculated
+//spell is not depleted (doesn't need to be memorised or known)
+//casting time is calculated, interruptible
+//FIXME The caster must meet the level requirements as set in the spell file
+void GameScript::SpellNoDec(Scriptable* Sender, Action* parameters)
+{
+	ieResRef spellres;
+
+	//resolve spellname
+	if (!ResolveSpellName( spellres, parameters) ) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	//if target was set, fire spell
+	if (Sender->LastTarget) {
+		Sender->CastSpellEnd( spellres );
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	//parse target
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	//set target
+	Actor *actor = (Actor *) Sender;
+	if (tar != Sender) {
+		actor->SetOrientation( GetOrient( tar->Pos, actor->Pos ), false );
+	}
+	Sender->CastSpell( spellres, tar, false );
+
+	//if target was set, feed action back
+	if (Sender->LastTarget) {
+		Sender->AddActionInFront( Sender->CurrentAction );
+	}
+}
+
+//spell is not depleted (doesn't need to be memorised or known)
+//casting time is calculated, interruptible
+//FIXME The caster must meet the level requirements as set in the spell file
+void GameScript::SpellPointNoDec(Scriptable* Sender, Action* parameters)
+{
+	ieResRef spellres;
+
+	//resolve spellname
+	if (!ResolveSpellName( spellres, parameters) ) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	//if target was set, fire spell
+	if (!Sender->LastTargetPos.isempty()) {
+		Sender->CastSpellPointEnd( spellres );
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+
+	//set target
+	Actor *actor = (Actor *) Sender;
+	actor->SetOrientation( GetOrient( parameters->pointParameter, actor->Pos ), false );
+	Sender->CastSpellPoint( spellres, parameters->pointParameter, false );
+
+	//if target was set, feed action back
+	if (!Sender->LastTargetPos.isempty()) {
+		Sender->AddActionInFront( Sender->CurrentAction );
+	}
+}
+
+//spell is not depleted (doesn't need to be memorised or known)
+//casting time is calculated, not interruptable
+//FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 {
 	ieResRef spellres;
@@ -2212,7 +2287,9 @@ void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 	}
 }
 
-//spell isn't depleted, but casting time is calculated
+//spell is not depleted (doesn't need to be memorised or known)
+//casting time is calculated, not interruptable
+//FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::ForceSpellPoint(Scriptable* Sender, Action* parameters)
 {
 	ieResRef spellres;
@@ -2240,7 +2317,9 @@ void GameScript::ForceSpellPoint(Scriptable* Sender, Action* parameters)
 	}
 }
 
-//zero casting time, no depletion
+//ForceSpell with zero casting time
+//zero casting time, no depletion, not interruptable
+//FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::ReallyForceSpell(Scriptable* Sender, Action* parameters)
 {
 	ieResRef spellres;
@@ -2272,8 +2351,10 @@ void GameScript::ReallyForceSpell(Scriptable* Sender, Action* parameters)
 	Sender->ReleaseCurrentAction();
 }
 
-//zero casting time, no depletion (finish casting at point)
+//ForceSpellPoint with zero casting time
+//zero casting time, no depletion (finish casting at point), not interruptable
 //no CFB
+//FIXME The caster must meet the level requirements as set in the spell file
 void GameScript::ReallyForceSpellPoint(Scriptable* Sender, Action* parameters)
 {
 	ieResRef spellres;
