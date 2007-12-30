@@ -3366,7 +3366,11 @@ static PyObject *GetGameDate(DataStream *ds)
 		if (hours==1) c=core->GetString(10701);
 		else c=core->GetString(10700);
 	}
-	retval = PyString_FromFormat("%s%s%s",a?a:"",b?b:"",c?c:"");
+	if (b)
+		retval = PyString_FromFormat("%s %s %s",a,b,c?c:"");
+	else {
+		retval = PyString_FromFormat("%s%s",a?a:"",c?c:"");
+	}
 	core->FreeString(a);
 	core->FreeString(b);
 	core->FreeString(c);
