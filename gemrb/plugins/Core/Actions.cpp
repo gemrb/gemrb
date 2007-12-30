@@ -2133,6 +2133,10 @@ void GameScript::Spell(Scriptable* Sender, Action* parameters)
 	}
 
 	//set target
+	Actor *actor = (Actor *) Sender;
+	if (tar != Sender) {
+		actor->SetOrientation( GetOrient( tar->Pos, actor->Pos ), false );
+	}
 	Sender->CastSpell( spellres, tar, true );
 
 	//if target was set, feed action back
@@ -2160,6 +2164,8 @@ void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
 	}
 
 	//set target
+	Actor *actor = (Actor *) Sender;
+	actor->SetOrientation( GetOrient( parameters->pointParameter, actor->Pos ), false );
 	Sender->CastSpellPoint( spellres, parameters->pointParameter, true );
 
 	//if target was set, feed action back
