@@ -805,7 +805,9 @@ static const ActionLink actionnames[] = {
 	{"spawnptspawn", GameScript::SpawnPtSpawn, 0},
 	{"spell", GameScript::Spell, AF_BLOCKING|AF_ALIVE},
 	{"spellhiteffectsprite", GameScript::SpellHitEffectSprite, 0},
+	{"spellnodec", GameScript::SpellNoDec, AF_BLOCKING|AF_ALIVE},
 	{"spellpoint", GameScript::SpellPoint, AF_BLOCKING|AF_ALIVE},
+	{"spellpointnodec", GameScript::SpellPointNoDec, AF_BLOCKING|AF_ALIVE},
 	{"startcutscene", GameScript::StartCutScene, 0},
 	{"startcutsceneex", GameScript::StartCutScene, 0}, //pst (unknown)
 	{"startcutscenemode", GameScript::StartCutSceneMode, 0},
