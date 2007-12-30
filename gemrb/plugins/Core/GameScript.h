@@ -1335,7 +1335,9 @@ public:
 	static void SpawnPtSpawn(Scriptable* Sender, Action* parameters);
 	static void Spell(Scriptable* Sender, Action* parameters);
 	static void SpellHitEffectSprite(Scriptable* Sender, Action* parameters);
+	static void SpellNoDec(Scriptable* Sender, Action* parameters);
 	static void SpellPoint(Scriptable* Sender, Action* parameters);
+	static void SpellPointNoDec(Scriptable* Sender, Action* parameters);
 	static void StartCutScene(Scriptable* Sender, Action* parameters);
 	static void StartCutSceneMode(Scriptable* Sender, Action* parameters);
 	static void StartDialogue(Scriptable* Sender, Action* parameters);
