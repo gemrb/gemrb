@@ -2200,6 +2200,10 @@ void GameScript::ForceSpell(Scriptable* Sender, Action* parameters)
 	}
 
 	//set target
+	Actor *actor = (Actor *) Sender;
+	if (tar != Sender) {
+		actor->SetOrientation( GetOrient( tar->Pos, actor->Pos ), false );
+	}
 	Sender->CastSpell (spellres, tar, false);
 
 	//if target was set, feed action back
@@ -2226,6 +2230,8 @@ void GameScript::ForceSpellPoint(Scriptable* Sender, Action* parameters)
 	}
 
 	//set target
+	Actor *actor = (Actor *) Sender;
+	actor->SetOrientation( GetOrient( parameters->pointParameter, actor->Pos ), false );
 	Sender->CastSpellPoint (spellres, parameters->pointParameter, false);
 
 	//if target was set, feed action back
@@ -2251,6 +2257,9 @@ void GameScript::ReallyForceSpell(Scriptable* Sender, Action* parameters)
 	}
 	if (Sender->Type == ST_ACTOR) {
 		Actor *actor = (Actor *) Sender;
+		if (tar != Sender) {
+			actor->SetOrientation( GetOrient( tar->Pos, actor->Pos ), false );
+		}
 		actor->SetStance (IE_ANI_CONJURE);
 	}
 	if (tar->Type==ST_ACTOR) {
@@ -2281,6 +2290,7 @@ void GameScript::ReallyForceSpellPoint(Scriptable* Sender, Action* parameters)
 			return;
 		}
 		Actor *actor = (Actor *) Sender;
+		actor->SetOrientation( GetOrient( parameters->pointParameter, actor->Pos ), false );
 		actor->SetStance (IE_ANI_CONJURE);
 	}
 	Sender->CastSpellPointEnd(spellres);
