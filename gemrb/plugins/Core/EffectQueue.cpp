@@ -474,7 +474,7 @@ int EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &des
 
 	case FX_TARGET_GLOBAL_INCL_PARTY:
 		map=self->GetCurrentArea();
-		for (i = map->GetActorCount(true); i >= 0; i--) {
+		for (i = map->GetActorCount(true)-1; i >= 0; i--) {
 			Actor* actor = map->GetActor( i, true );
 			fx->PosX=actor->Pos.x;
 			fx->PosY=actor->Pos.y;
