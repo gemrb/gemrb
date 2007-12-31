@@ -496,9 +496,11 @@ void Projectile::DrawExplosion(Region & /*screen*/)
 	//these resources are listed in areapro.2da
 	if (Extension->ExplType!=0xff) {
 		ieResRef *res = core->GetProjectileServer()->GetExplosion(Extension->ExplType, 0);
-		ScriptedAnimation* vvc = core->GetScriptedAnimation(*res, false);
-		if (vvc) {
-			area->AddVVCell(vvc);
+		if (res) {
+			ScriptedAnimation* vvc = core->GetScriptedAnimation(*res, false);
+			if (vvc) {
+				area->AddVVCell(vvc);
+			}
 		}
 	}
 }
