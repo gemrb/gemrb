@@ -35,12 +35,17 @@ ProjectileServer::ProjectileServer()
 {
 	projectilecount = -1;
 	projectiles = NULL;
+	explosioncount = -1;
+	explosions = NULL;
 }
 
 ProjectileServer::~ProjectileServer()
 {
 	if (projectiles) {
 		delete[] projectiles;
+	}
+	if (explosions) {
+		delete[] explosions;
 	}
 }
 
@@ -152,4 +157,18 @@ unsigned int ProjectileServer::GetHighestProjectileNumber()
 		projectiles = new ProjectileEntry[projectilecount];
 	}
 	return (unsigned int) projectilecount;
+}
+
+ieResRef *ProjectileServer::GetExplosion(unsigned int idx, int type)
+{
+	if ((int) idx>=explosioncount) {
+		return NULL;
+	}
+	switch (type) {
+		case 0:
+			return &explosions[idx].resource1;
+		case 1:
+			return &explosions[idx].resource2;
+	}
+	return NULL;
 }

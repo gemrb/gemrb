@@ -491,6 +491,16 @@ void Projectile::DrawExplosion(Region & /*screen*/)
 			area->AddProjectile(pro, Pos, Pos);
 		}
 	}
+	
+	//the center of the explosion is based on hardcoded explosion type (this is fireball.cpp in the original engine)
+	//these resources are listed in areapro.2da
+	if (Extension->ExplType!=0xff) {
+		ieResRef *res = core->GetProjectileServer()->GetExplosion(Extension->ExplType, 0);
+		ScriptedAnimation* vvc = core->GetScriptedAnimation(*res, false);
+		if (vvc) {
+			area->AddVVCell(vvc);
+		}
+	}
 }
 
 int Projectile::GetTravelPos(int face)

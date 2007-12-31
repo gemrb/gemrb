@@ -43,6 +43,17 @@ public:
 	Projectile *projectile;
 };
 
+class ExplosionEntry
+{
+public:
+	ExplosionEntry()
+	{
+		memset(this,0,sizeof(ExplosionEntry));
+	}
+	ieResRef resource1;
+	ieResRef resource2;
+};
+
 //this singleton object serves the projectile objects
 class ProjectileServer  
 {
@@ -55,15 +66,18 @@ public:
 	Projectile *GetProjectileByName(const ieResRef resname);
 	//returns the highest projectile id
 	unsigned int GetHighestProjectileNumber(); 
-
+	ieResRef *GetExplosion(unsigned int idx, int type);
 private:
 	ProjectileEntry *projectiles; //this is the list of projectiles
 	int projectilecount;
+	ExplosionEntry *explosions;   //this is the list of explosion resources
+	int explosioncount;
 	//this method is used internally
 	Projectile *GetProjectile(unsigned int idx);
 	Projectile *CreateDefaultProjectile(unsigned int idx);
 	//creates a clone from the cached projectiles
 	Projectile *ReturnCopy(unsigned int idx);
+	//returns one of the resource names
 };
 
 #endif // PROJSERVER_H
