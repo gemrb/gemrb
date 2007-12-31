@@ -7161,12 +7161,20 @@ static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 	for (i=0;i<GUIBT_COUNT-(more?2:0);i++) {
 		int ci = core->GetControl(wi, i+(more?1:0) );
 		Button* btn = (Button *) GetControl( wi, ci, IE_GUI_BUTTON );
-		btn->SetEvent(IE_GUI_BUTTON_ON_PRESS,"SpellPressed");
-		btn->SetState(IE_GUI_BUTTON_UNPRESSED);
 		strcpy(btn->VarName,"Spell");
 		btn->Value = Start+i;
 
 		SpellExtHeader *spell = SpellArray+i;
+		// disable spells that should be cast from the inventory
+		// Identify is misclassified and has Target 3 (Dead char)
+		if (spell->Target == 2 || spell->strref == 12040) {
+			btn->SetState(IE_GUI_BUTTON_DISABLED);
+			btn->EnableBorder(1, IE_GUI_BUTTON_DISABLED);
+			btn->SetEvent(IE_GUI_BUTTON_ON_PRESS,"UpdateActionsWindow"); //noop
+		} else {
+			btn->SetState(IE_GUI_BUTTON_UNPRESSED);
+			btn->SetEvent(IE_GUI_BUTTON_ON_PRESS,"SpellPressed");
+		}
 		Sprite2D *Picture = NULL;
 
 		if (spell->MemorisedIcon[0]) {
