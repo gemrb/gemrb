@@ -5441,6 +5441,19 @@ table_loaded:
 	}
 }
 
+int GetSpecialSpell(ieResRef resref)
+{
+	if (SpecialSpellsCount==-1) {
+		ReadSpecialSpells();
+	}
+	for (int i=0;i<SpecialSpellsCount;i++) {
+		if (!strnicmp(resref, SpecialSpells[i].resref, sizeof(ieResRef))) {
+			return SpecialSpells[i].value;
+		}
+	}
+	return 0;
+}
+
 static void ReadUsedItems()
 {
 	int i;
@@ -7167,7 +7180,7 @@ static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 		SpellExtHeader *spell = SpellArray+i;
 		// disable spells that should be cast from the inventory
 		// Identify is misclassified and has Target 3 (Dead char)
-		if (spell->Target == 2 || spell->strref == 12040) {
+		if (GetSpecialSpell(spell->spellname) ) {
 			btn->SetState(IE_GUI_BUTTON_DISABLED);
 			btn->EnableBorder(1, IE_GUI_BUTTON_DISABLED);
 			btn->SetEvent(IE_GUI_BUTTON_ON_PRESS,"UpdateActionsWindow"); //noop
