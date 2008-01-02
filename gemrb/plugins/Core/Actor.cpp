@@ -3831,9 +3831,12 @@ int Actor::Unusable(Item *item) const
 	if (item->MinStrength>GetStat(IE_STR)) {
 		return 1;
 	}
+
 	if (item->MinStrength==18) {
-		if (item->MinStrengthBonus>GetStat(IE_STREXTRA)) {
-			return 1;
+		if (GetStat(IE_STR==18)) {
+			if (item->MinStrengthBonus>GetStat(IE_STREXTRA)) {
+				return 1;
+			}
 		}
 	}
 
