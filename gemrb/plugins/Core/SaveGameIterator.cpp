@@ -39,9 +39,7 @@ SaveGame::SaveGame(char* path, char* name, char* prefix, int pCount, int saveID)
 	char nPath[_MAX_PATH];
 	struct stat my_stat;
 	sprintf( nPath, "%s%s%s.bmp", Path, SPathDelimiter, Prefix );
-#ifndef WIN32
 	ResolveFilePath( nPath );
-#endif
 	memset(&my_stat,0,sizeof(my_stat));
 	stat( nPath, &my_stat );
 	strftime( Date, _MAX_PATH, "%c", localtime( &my_stat.st_mtime ) );
@@ -58,9 +56,7 @@ DataStream* SaveGame::GetPortrait(int index)
 		}
 		char nPath[_MAX_PATH];
 		sprintf( nPath, "%s%sPORTRT%d.bmp", Path, SPathDelimiter, index );
-#ifndef WIN32
 		ResolveFilePath( nPath );
-#endif
 		FileStream* fs = new FileStream();
 		fs->Open( nPath, true );
 		return fs;
@@ -70,9 +66,7 @@ DataStream* SaveGame::GetScreen()
 {
 		char nPath[_MAX_PATH];
 		sprintf( nPath, "%s%s%s.bmp", Path, SPathDelimiter, Prefix );
-#ifndef WIN32
 		ResolveFilePath( nPath );
-#endif
 		FileStream* fs = new FileStream();
 		fs->Open( nPath, true );
 		return fs;
@@ -82,9 +76,7 @@ DataStream* SaveGame::GetGame()
 {
 		char nPath[_MAX_PATH];
 		sprintf( nPath, "%s%s%s.gam", Path, SPathDelimiter, Prefix );
-#ifndef WIN32
 		ResolveFilePath( nPath );
-#endif
 		FileStream* fs = new FileStream();
 		fs->Open( nPath, true );
 		return fs;
@@ -94,9 +86,7 @@ DataStream* SaveGame::GetWmap()
 {
 		char nPath[_MAX_PATH];
 		sprintf( nPath, "%s%s%s.wmp", Path, SPathDelimiter, core->WorldMapName );
-#ifndef WIN32
 		ResolveFilePath( nPath );
-#endif
 		FileStream* fs = new FileStream();
 		fs->Open( nPath, true );
 		return fs;
@@ -106,9 +96,7 @@ DataStream* SaveGame::GetSave()
 {
 		char nPath[_MAX_PATH];
 		sprintf( nPath, "%s%s%s.sav", Path, SPathDelimiter, Prefix );
-#ifndef WIN32
 		ResolveFilePath( nPath );
-#endif
 		FileStream* fs = new FileStream();
 		fs->Open( nPath, true );
 		return fs;
@@ -213,9 +201,7 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 	snprintf( ftmp, _MAX_PATH, "%s%s%s.bmp", dtmp, SPathDelimiter,
 		 core->GameNameResRef );
 
-#ifndef WIN32
 	ResolveFilePath( ftmp );
-#endif
 	if (access( ftmp, R_OK )) {
 		printMessage("SaveGameIterator"," ",YELLOW);
 		printf("Ignoring slot %s because of no appropriate preview!\n", dtmp);
@@ -224,9 +210,7 @@ static bool IsSaveGameSlot(const char* Path, const char* slotname)
 
 	snprintf( ftmp, _MAX_PATH, "%s%s%s.wmp", dtmp, SPathDelimiter,
 		 core->WorldMapName );
-#ifndef WIN32
 	ResolveFilePath( ftmp );
-#endif
 	if (access( ftmp, R_OK )) {
 		printMessage("SaveGameIterator"," ",YELLOW);
 		printf("Ignoring slot %s because of no appropriate worldmap!\n", dtmp);

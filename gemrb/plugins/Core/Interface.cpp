@@ -2010,54 +2010,34 @@ bool Interface::LoadConfig(const char* filename)
 			strncpy( CachePath, value, sizeof(CachePath) );
 		} else if (stricmp( name, "GUIScriptsPath" ) == 0) {
 			strncpy( GUIScriptsPath, value, sizeof(GUIScriptsPath) );
-#ifndef WIN32
 			ResolveFilePath( GUIScriptsPath );
-#endif
 		} else if (stricmp( name, "PluginsPath" ) == 0) {
 			strncpy( PluginsPath, value, sizeof(PluginsPath) );
-#ifndef WIN32
 			ResolveFilePath( PluginsPath );
-#endif
 		} else if (stricmp( name, "GamePath" ) == 0) {
 			strncpy( GamePath, value, sizeof(GamePath) );
-#ifndef WIN32
 			ResolveFilePath( GamePath );
-#endif
 		} else if (stricmp( name, "SavePath" ) == 0) {
 			strncpy( SavePath, value, sizeof(SavePath) );
-#ifndef WIN32
 			ResolveFilePath( SavePath );
-#endif
 		} else if (stricmp( name, "CD1" ) == 0) {
 			strncpy( CD1, value, sizeof(CD1) );
-#ifndef WIN32
 			ResolveFilePath( CD1 );
-#endif
 		} else if (stricmp( name, "CD2" ) == 0) {
 			strncpy( CD2, value, sizeof(CD2) );
-#ifndef WIN32
 			ResolveFilePath( CD2 );
-#endif
 		} else if (stricmp( name, "CD3" ) == 0) {
 			strncpy( CD3, value, sizeof(CD3) );
-#ifndef WIN32
 			ResolveFilePath( CD3 );
-#endif
 		} else if (stricmp( name, "CD4" ) == 0) {
 			strncpy( CD4, value, sizeof(CD4) );
-#ifndef WIN32
 			ResolveFilePath( CD4 );
-#endif
 		} else if (stricmp( name, "CD5" ) == 0) {
 			strncpy( CD5, value, sizeof(CD5) );
-#ifndef WIN32
 			ResolveFilePath( CD5 );
-#endif
 		} else if (stricmp( name, "CD6" ) == 0) {
 			strncpy( CD6, value, sizeof(CD6) );
-#ifndef WIN32
 			ResolveFilePath( CD6 );
-#endif
 		}
 	}
 	fclose( config );
@@ -2472,9 +2452,7 @@ int Interface::LoadCreature(const char* ResRef, int InParty, bool character)
 		char nPath[_MAX_PATH], fName[16];
 		snprintf( fName, sizeof(fName), "%s.chr", ResRef);
 		PathJoin( nPath, GamePath, "characters", fName, NULL );
-#ifndef WIN32
 		ResolveFilePath( nPath );
-#endif
 		FileStream *fs = new FileStream();
 		fs -> Open( nPath, true );
 		stream = (DataStream *) fs;
@@ -3481,6 +3459,7 @@ int Interface::GetPortraits(TextArea* ta, bool smallorlarge)
 		png_suffix[0]='M';
 	}
 	PathJoin( Path, GamePath, GamePortraits, NULL );
+	ResolveFilePath( Path );
 	DIR* dir = opendir( Path );
 	if (dir == NULL) {
 		return -1;
@@ -3522,6 +3501,7 @@ int Interface::GetCharSounds(TextArea* ta)
 	char Path[_MAX_PATH];
 
 	PathJoin( Path, GamePath, GameSounds, NULL );
+	ResolveFilePath( Path );
 	hasfolders = ( HasFeature( GF_SOUNDFOLDERS ) != 0 );
 	DIR* dir = opendir( Path );
 	if (dir == NULL) {
@@ -3562,6 +3542,7 @@ int Interface::GetCharacters(TextArea* ta)
 	char Path[_MAX_PATH];
 
 	PathJoin( Path, GamePath, GameCharacters, NULL );
+	ResolveFilePath( Path );
 	DIR* dir = opendir( Path );
 	if (dir == NULL) {
 		return -1;
