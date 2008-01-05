@@ -276,9 +276,7 @@ def OpenGameplayOptionsWindow ():
 	OptDone ('GameplayOptions', Window, 7)
 	OptCancel ('GameplayOptions', Window, 20)
 
-	print "opengameplay:1TooltipDelay: ", GemRB.GetVar ("Tooltips")
-	OptSlider ('TooltipDelay', Window, 1, 'Tooltips', 250)
-	print "opengameplay:2TooltipDelay: ", GemRB.GetVar ("Tooltips")
+	OptSlider ('TooltipDelay', Window, 1, 'Tooltips', 10)
 	OptSlider ('MouseScrollingSpeed', Window, 2, 'Mouse Scroll Speed', 5)
 	OptSlider ('KeyboardScrollingSpeed', Window, 3, 'Keyboard Scroll Speed', 5)
 	OptSlider ('Difficulty', Window, 12, 'Difficulty Level', 0)
@@ -298,7 +296,6 @@ def OpenGameplayOptionsWindow ():
 
 def DisplayHelpTooltipDelay ():
 	GemRB.SetText (GameOptionsWindow, HelpTextArea, 18017)
-	print "DisplayHelpTooltipDelay: ", GemRB.GetVar ("Tooltips")
 	GemRB.SetTooltipDelay (GemRB.GetVar ("Tooltips") )
 
 def DisplayHelpMouseScrollingSpeed ():

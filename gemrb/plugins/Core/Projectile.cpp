@@ -99,11 +99,6 @@ PathNode *Projectile::GetNextStep(int x)
 
 void Projectile::CreateAnimations(Animation **anims, const ieResRef bamres, int Seq)
 {
-	if (!bamres) {
-		printMessage( "Core", "Projectile BAM resref is null!\n", LIGHT_RED );
-		return;
-	}
-
 	AnimationFactory* af = ( AnimationFactory* )
 		core->GetResourceMgr()->GetFactoryResource( bamres,
 		IE_BAM_CLASS_ID, IE_NORMAL );

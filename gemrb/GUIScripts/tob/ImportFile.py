@@ -40,8 +40,6 @@ def DonePress():
 	FileName = GemRB.QueryText(ImportWindow, TextAreaControl)
 	Slot = GemRB.GetVar("Slot")
 	GemRB.CreatePlayer(FileName, Slot| 0x8000, 1)
-#A new character will need additional SetPlayerStat() and FillPlayerInfo() 
-#calls to be a working character
 	GemRB.UnloadWindow(ImportWindow)
 	GemRB.SetNextScript("CharGen7")
 	return

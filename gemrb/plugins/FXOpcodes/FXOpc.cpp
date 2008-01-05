@@ -3093,8 +3093,6 @@ int fx_monster_summoning (Actor* Owner, Actor* target, Effect* fx)
 		strnuprcpy(monster,fx->Resource,8);
 		strnuprcpy(hit,fx->Resource2,8);
 		strnuprcpy(areahit,fx->Resource3,8);
-//areahit = 0
-printf("AREAHIT: %s",areahit);
 	} else {
 		core->GetResRefFrom2DA(monster_summoning_2da[fx->Parameter2], monster, hit, areahit);
 	}

@@ -1948,7 +1948,7 @@ bool Interface::LoadConfig(const char* filename)
 	}
 	char name[65], value[_MAX_PATH + 3];
 
-	//once GemRB own format is working well, this might be set to 0
+	//one GemRB own format is working well, this might be set to 0
 	SaveAsOriginal = 1;
 
 	while (!feof( config )) {
@@ -1968,8 +1968,6 @@ bool Interface::LoadConfig(const char* filename)
 			Bpp = atoi( value );
 		} else if (stricmp( name, "FullScreen" ) == 0) {
 			FullScreen = ( atoi( value ) == 0 ) ? false : true;
-		} else if (stricmp( name, "TooltipDelay" ) == 0) {
-			TooltipDelay = atoi( value );
 		} else if (stricmp( name, "SkipIntroVideos" ) == 0) {
 			SkipIntroVideos = ( atoi( value ) == 0 ) ? false : true;
 		} else if (stricmp( name, "DrawFPS" ) == 0) {

@@ -111,12 +111,13 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 
 def MarkMenuButton (WindowIndex):
 	Pressed = GemRB.GetVar ("SelectedWindow")
-	print "Pressed:", Pressed
+
 	for button in range (9):
 		Button = GemRB.GetControl (WindowIndex, button)
 		GemRB.SetButtonState (WindowIndex, Button, IE_GUI_BUTTON_ENABLED)
 
-	GemRB.SetButtonState (WindowIndex, Pressed, IE_GUI_BUTTON_SELECTED)
+	if Pressed: # don't draw the selection when returning to the game
+		GemRB.SetButtonState (WindowIndex, Pressed, IE_GUI_BUTTON_SELECTED)
 
 def AIPress ():
 	Button = GemRB.GetControl (PortraitWindow, 6)
@@ -441,7 +442,6 @@ def GetActorClassTitle (actor):
 	ClassTitle = GemRB.GetPlayerStat (actor, IE_TITLE1)
 	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
 	KitIndex = 0
-	print "KI0", Kit
 	if Kit&0xc000ffff == 0x40000000:
 		KitIndex = Kit>>16 & 0xfff
 	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
@@ -449,19 +449,14 @@ def GetActorClassTitle (actor):
 	Class = GemRB.FindTableValue ( ClassTable, 5, Class )
 	KitTable = GemRB.LoadTable ("kitlist")
 
-	print "KI", KitIndex
-
 	#looking for kit by the usability flag
 	if KitIndex == 0:
 		KitIndex = GemRB.FindTableValue (KitTable, Kit, 6)
-		print "KI2", KitIndex
 		if KitIndex == -1:
 			KitIndex = 0
  		elif Class != GemRB.GetTableValue (KitTable, KitIndex, 5):
 			KitIndex = 0
 
-	print "KI3", KitIndex
-	print "ClassTitle", ClassTitle
 	if ClassTitle == 0:
 		if KitIndex == 0:
 			ClassTitle=GemRB.GetTableValue (ClassTable, Class, 2)
@@ -470,7 +465,6 @@ def GetActorClassTitle (actor):
 
 	if ClassTitle == "*":
 		return 0
-	print "finalClassTitle", ClassTitle
 	return ClassTitle
 
 def GetActorPaperDoll (actor):
