@@ -395,7 +395,7 @@ int SDLVideoDriver::SwapBuffers(void)
 
 	//handle tooltips
 	unsigned int delay = core->TooltipDelay;
-	if (!ConsolePopped && (delay<100) ) {
+	if (!ConsolePopped && (delay<2500) ) {
 		GetTime( time );
 		/** Display tooltip if mouse is idle */
 		if (( time - lastMouseTime ) > delay) {

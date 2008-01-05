@@ -44,15 +44,15 @@ def CloseContinueWindow ():
 	if ContinueWindow == None:
 		return
 
-	hideflag = GemRB.HideGUI ()
+	#hideflag = GemRB.HideGUI ()
 
 	GemRB.UnloadWindow (ContinueWindow)
 	GemRB.SetVar ("ActionsWindow", OldActionsWindow)
 	GemRB.SetVar ("DialogChoose", GemRB.GetVar ("DialogOption"))
 	ContinueWindow = None
 	OldActionsWindow = None
-	if hideflag:
-		GemRB.UnhideGUI ()
+	#if hideflag:
+	##GemRB.UnhideGUI ()
 
 
 def OpenEndMessageWindow ():
