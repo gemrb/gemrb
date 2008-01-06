@@ -93,8 +93,8 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	GemRB.SetTooltip (Window, Button, 13902)
 	
 	if Gears:
-		# Pendulum, gears (time)
-		# FIXME: display both animations
+		# Pendulum, gears, sun/moon indicator  (time)
+		# FIXME: display all animations
 		Button = GemRB.GetControl (Window, 9)
 		GemRB.SetAnimation (Window, Button, "CPEN")
 		#GemRB.SetAnimation (Window, Button, "CGEAR")
