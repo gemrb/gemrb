@@ -39,7 +39,7 @@ def OnLoad():
 	GemRB.SetText(GamePlayWindow, AutoPauseButton, 17166)
 	GemRB.SetEvent(GamePlayWindow, DelayButton, IE_GUI_BUTTON_ON_PRESS, "DelayPress")
 	GemRB.SetEvent(GamePlayWindow, DelaySlider, IE_GUI_SLIDER_ON_CHANGE, "DelayPress")
-	GemRB.SetVarAssoc(GamePlayWindow, DelaySlider, "Tooltips",30)
+	GemRB.SetVarAssoc(GamePlayWindow, DelaySlider, "Tooltips",TOOLTIP_DELAY_FACTOR)
 
 	GemRB.SetEvent(GamePlayWindow, KeySpdButton, IE_GUI_BUTTON_ON_PRESS, "KeySpdPress")
 	GemRB.SetEvent(GamePlayWindow, KeySpdSlider, IE_GUI_SLIDER_ON_CHANGE, "KeySpdPress")

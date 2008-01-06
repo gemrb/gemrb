@@ -314,7 +314,7 @@ def OpenGameplayOptionsWindow ():
 	OptDone ('GameplayOptions', Window, 10)
 	OptCancel ('GameplayOptions', Window, 11)
 
-	OptSlider ('GameplayOptions', 'TooltipDelay', Window, 1, 13, 31481, "Tooltips", "UpdateTooltips")
+	OptSlider ('GameplayOptions', 'TooltipDelay', Window, 1, 13, 31481, "Tooltips", "UpdateTooltips", TOOLTIP_DELAY_FACTOR)
 	OptSlider ('GameplayOptions', 'MouseScrollingSpeed', Window, 2, 14, 31482, "Mouse Scroll Speed", "UpdateMouseSpeed")
 	OptSlider ('GameplayOptions', 'KeyboardScrollingSpeed', Window, 3, 15, 31480, "Keyboard Scroll Speed", "UpdateKeyboardSpeed")
 	OptSlider ('GameplayOptions', 'Difficulty', Window, 4, 16, 31479, "Difficulty Level")
