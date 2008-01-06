@@ -395,7 +395,8 @@ int SDLVideoDriver::SwapBuffers(void)
 
 	//handle tooltips
 	unsigned int delay = core->TooltipDelay;
-	if (!ConsolePopped && (delay<100) ) {
+	// The multiplication by 10 is there since the last, disabling slider position is the eleventh
+	if (!ConsolePopped && (delay<TOOLTIP_DELAY_FACTOR*10) ) {
 		GetTime( time );
 		/** Display tooltip if mouse is idle */
 		if (( time - lastMouseTime ) > delay) {

@@ -239,6 +239,9 @@ SHOP_SELECT = 0x40
 #game constants
 PARTY_SIZE = 6
 
+# !!! Keep this synchronized with Video.h !!!
+TOOLTIP_DELAY_FACTOR = 250
+
 #game strings
 STR_LOADMOS  = 0
 

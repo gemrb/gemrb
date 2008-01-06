@@ -72,6 +72,10 @@ enum SpriteBlitFlags {
 #define MOUSE_DISABLED  1
 #define MOUSE_GRAYED    2
 
+// !!! Keep this synchronized with GUIDefines.py !!!
+// used for calculating the tooltip delay limit and the real tooltip delay
+#define TOOLTIP_DELAY_FACTOR 250
+
 /**
  * @class Video
  * Base class for video output plugins.
