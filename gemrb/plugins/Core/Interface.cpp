@@ -910,7 +910,10 @@ void Interface::Main()
 	vars->Lookup("Mouse Scroll Speed", speed);
 	video->SetGamma(brightness, contrast);
 	video->SetMouseScrollSpeed((int) speed);
-	vars->Lookup("Tooltips", TooltipDelay);
+	if (vars->Lookup("Tooltips", TooltipDelay)) {
+		// the games store the slider position*10, not the actual delay
+		TooltipDelay *= TOOLTIP_DELAY_FACTOR/10;
+	}
 
 	Font* fps = GetFont( ( unsigned int ) 0 );
 	char fpsstring[40]={"???.??? fps"};
