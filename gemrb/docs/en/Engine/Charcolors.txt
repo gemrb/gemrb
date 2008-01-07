@@ -27,5 +27,3 @@ etc.
 
 The combined palette location is given in <p><s> format, where both numbers are 4 bits.
 
-TODO:
-palette locations for the slots (it could be that they are different for plt and bam).
