@@ -66,6 +66,7 @@ public:
 	Projectile *GetProjectileByName(const ieResRef resname);
 	//returns the highest projectile id
 	unsigned int GetHighestProjectileNumber(); 
+	int InitExplosion();
 	ieResRef *GetExplosion(unsigned int idx, int type);
 private:
 	ProjectileEntry *projectiles; //this is the list of projectiles

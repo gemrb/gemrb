@@ -499,6 +499,8 @@ void Projectile::DrawExplosion(Region & /*screen*/)
 		if (res) {
 			ScriptedAnimation* vvc = core->GetScriptedAnimation(*res, false);
 			if (vvc) {
+				vvc->XPos+=Pos.x;
+				vvc->YPos+=Pos.y;
 				area->AddVVCell(vvc);
 			}
 		}

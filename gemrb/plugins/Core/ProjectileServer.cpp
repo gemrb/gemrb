@@ -123,6 +123,30 @@ Projectile *ProjectileServer::GetProjectile(unsigned int idx)
 	return ReturnCopy(idx);
 }
 
+int ProjectileServer::InitExplosion()
+{
+	if (explosioncount>=0) {
+		return explosioncount;
+	}
+
+	unsigned int resource = core->LoadTable("areapro");
+	TableMgr *explist = core->GetTable(resource);
+	if (explist) {
+		explosioncount = 0;
+
+		unsigned int rows = (unsigned int) explist->GetRowCount();
+		explosioncount = rows;
+		explosions = new ExplosionEntry[rows];
+
+		while(rows--) {
+			strnuprcpy(explosions[ rows].resource1, explist->QueryField(rows, 0), 8);
+			strnuprcpy(explosions[ rows].resource2, explist->QueryField(rows, 1), 8);
+		}
+		core->DelSymbol(resource);
+	}
+	return explosioncount;
+}
+
 unsigned int ProjectileServer::GetHighestProjectileNumber()
 {
 	if (projectilecount>=0) {
@@ -161,7 +185,13 @@ unsigned int ProjectileServer::GetHighestProjectileNumber()
 
 ieResRef *ProjectileServer::GetExplosion(unsigned int idx, int type)
 {
-	if ((int) idx>=explosioncount) {
+	if (explosioncount==-1) {
+		if (InitExplosion()<0) {
+			printMessage("ProjectileServer","Problem with explosions\n", RED);
+			explosioncount=0;
+		}
+	}
+	if (idx>=(unsigned int) explosioncount) {
 		return NULL;
 	}
 	switch (type) {

@@ -296,35 +296,51 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 			}
 			
 			c = seq2;
-			switch (FaceTarget) {
-			case 5:
-				c=SixteenToFive[i];
-				break;
-			case 9:
-				c=SixteenToNine[i];
-				break;
-			case 16:
-				c=i;
-				break;
-			}
-			anims[p_hold] = af->GetCycle( c ); 
-			if (anims[p_hold]) {
-				PrepareAnimation(anims[p_hold], Transparency);
-				
-				anims[p_hold]->pos=0;
-				anims[p_hold]->gameAnimation=true;
-				if (!(SequenceFlags&IE_VVC_LOOP) ) {
-					anims[p_hold]->Flags |= S_ANI_PLAYONCE;
+			if (c) {
+				switch (FaceTarget) {
+				case 5:
+					c=SixteenToFive[i];
+					break;
+				case 9:
+					c=SixteenToNine[i];
+					break;
+				case 16:
+					c=i;
+					break;
+				}
+				anims[p_hold] = af->GetCycle( c ); 
+				if (anims[p_hold]) {
+					PrepareAnimation(anims[p_hold], Transparency);
+					
+					anims[p_hold]->pos=0;
+					anims[p_hold]->gameAnimation=true;
+					if (!(SequenceFlags&IE_VVC_LOOP) ) {
+						anims[p_hold]->Flags |= S_ANI_PLAYONCE;
+					}
 				}
 			}
 			
-			anims[p_release] = af->GetCycle( ( unsigned char ) seq3 ); 
-			if (anims[p_release]) {
-				PrepareAnimation(anims[p_release], Transparency);
-				
-				anims[p_release]->pos=0;
-				anims[p_release]->gameAnimation=true;
-				anims[p_release]->Flags |= S_ANI_PLAYONCE;
+			c = seq3;
+			if (c) {
+				switch (FaceTarget) {
+				case 5:
+					c=SixteenToFive[i];
+					break;
+				case 9:
+					c=SixteenToNine[i];
+					break;
+				case 16:
+					c=i;
+					break;
+				}
+				anims[p_release] = af->GetCycle( ( unsigned char ) c ); 
+				if (anims[p_release]) {
+					PrepareAnimation(anims[p_release], Transparency);
+					
+					anims[p_release]->pos=0;
+					anims[p_release]->gameAnimation=true;
+					anims[p_release]->Flags |= S_ANI_PLAYONCE;
+				}
 			}
 		}
 		PreparePalette();
