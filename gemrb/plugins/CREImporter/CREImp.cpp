@@ -2393,7 +2393,8 @@ int CREImp::PutEffects( DataStream *stream, Actor *actor)
 			stream->Write( filling,8 );
 			if (fx->IsVariable) {
 				stream->Write(fx->Resource+8, 8);
-				stream->Write(fx->Resource+16, 8);
+				//resource1-4 are used as a continuous memory
+				stream->Write(((ieByte *) fx->Resource)+16, 8);
 			} else {
 				stream->Write(fx->Resource2, 8);
 				stream->Write(fx->Resource3, 8);

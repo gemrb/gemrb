@@ -139,11 +139,10 @@ Effect* EFFImp::GetEffectV20(Effect *fx)
 	str->ReadResRef( fx->Source );
 	str->Seek( 12, GEM_CURRENT_POS );
 	//Variable simply overwrites the resource fields (Keep them grouped)
+        //They have to be continuous
 	if (fx->IsVariable) {
-		str->ReadResRef( fx->Resource );
-		str->ReadResRef( fx->Resource+8 );
-		str->ReadResRef( fx->Resource+16 );
-		str->ReadResRef( fx->Resource+24 );
+		str->Read( fx->Resource, 32 );
+		strnlwrcpy( fx->Resource, fx->Resource, 32 );
 	} else {
 		str->Seek( 32, GEM_CURRENT_POS);
 	}

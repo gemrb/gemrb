@@ -4937,9 +4937,12 @@ int fx_modify_global_variable (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 	Game *game = core->GetGame();
 	//convert it to internal variable format
 	if (!fx->IsVariable) {
-		memmove(fx->Resource+8, fx->Resource2,8);
-		memmove(fx->Resource+16, fx->Resource3,8);
-		memmove(fx->Resource+24, fx->Resource4,8);
+		char *poi=fx->Resource+8;
+		memmove(poi, fx->Resource2,8);
+		poi+=8;
+		memmove(poi, fx->Resource3,8);
+		poi+=8;
+		memmove(poi, fx->Resource4,8);
 		fx->IsVariable=1;
 	}
 
@@ -5411,9 +5414,12 @@ int fx_modify_local_variable (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	//convert it to internal variable format
 	if (!fx->IsVariable) {
-		memmove(fx->Resource+8, fx->Resource2,8);
-		memmove(fx->Resource+16, fx->Resource3,8);
-		memmove(fx->Resource+24, fx->Resource4,8);
+		char *poi = fx->Resource+8;
+		memmove(poi, fx->Resource2, 8);
+		poi+=8;
+		memmove(poi, fx->Resource3, 8);
+		poi+=8;
+		memmove(poi, fx->Resource4, 8);
 		fx->IsVariable=1;
 	}
 	if (0) printf( "fx_modify_local_variable (%2d): %s, Mod: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
