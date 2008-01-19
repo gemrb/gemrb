@@ -699,32 +699,47 @@ def KitInfoWindow():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
 	ClassTable = GemRB.LoadTable ("classes")
-	ClassRow = GemRB.FindTableValue (ClassTable, 5, Class)
-	Multi = GemRB.GetTableValue (ClassTable, ClassRow, 4)
+	ClassIndex = GemRB.FindTableValue (ClassTable, 5, Class)
+	Multi = GemRB.GetTableValue (ClassTable, ClassIndex, 4)
 	Dual = GemRB.GetPlayerStat (pc, IE_MC_FLAGS)
+	Dual = Dual & ~(MC_EXPORTABLE|MC_PLOT_CRITICAL|MC_BEENINPARTY|MC_HIDDEN)
 
 	if Multi and Dual <= 0: # true multi class
-		text = GemRB.GetTableValue (ClassTable, ClassRow, 1)
+		text = GemRB.GetTableValue (ClassTable, ClassIndex, 1)
 		GemRB.SetText (KitInfoWindow, TextArea, text)
+		GemRB.ShowModal (KitInfoWindow, MODAL_SHADOW_GRAY)
 		return
 
 	KitTable = GemRB.LoadTable ("kitlist")
 	KitIndex = GetKitIndex (pc)
 
 	if (Dual & MC_WAS_ANY_CLASS) > 0:
-		ClassIndex = GemRB.FindTableValue (ClassTable, 15, Dual & MC_WAS_ANY_CLASS)
-		text = GemRB.GetTableValue (ClassTable, ClassIndex, 1)
+		if KitIndex:
+			text = GemRB.GetTableValue (KitTable, KitIndex, 3)
+		else:
+			ClassIndex = GemRB.FindTableValue (ClassTable, 15, Dual & MC_WAS_ANY_CLASS)
+			text = GemRB.GetTableValue (ClassTable, ClassIndex, 1)
 		GemRB.SetText (KitInfoWindow, TextArea, text)
 		GemRB.TextAreaAppend (KitInfoWindow, TextArea, "\n\n")
 
 	if Multi: # dual class
-		# FIXME use the first class of the multiclass bunch
-		text = GemRB.GetTableValue (ClassTable, ClassRow, 1)
+		# use the first class of the multiclass bunch that isn't the same as the first class
+		FirstClassIndex = ClassIndex
+		Mask = 1
+		for i in range (16):
+			if Multi & Mask:
+				ClassIndex = GemRB.FindTableValue (ClassTable, 5, i+1)
+				if ClassIndex == FirstClassIndex:
+					Mask += Mask
+					continue
+				text = GemRB.GetTableValue (ClassTable, ClassIndex, 1)
+				break
+			Mask += Mask
 	else: # ordinary class or kit
 		if KitIndex:
 			text = GemRB.GetTableValue (KitTable, KitIndex, 3)
 		else:
-			text = GemRB.GetTableValue (ClassTable, ClassRow, 1)
+			text = GemRB.GetTableValue (ClassTable, ClassIndex, 1)
 
 	GemRB.TextAreaAppend (KitInfoWindow, TextArea, text)
 
