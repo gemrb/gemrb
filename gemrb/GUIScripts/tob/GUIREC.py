@@ -710,15 +710,7 @@ def KitInfoWindow():
 		return
 
 	KitTable = GemRB.LoadTable ("kitlist")
-	Kit = GemRB.GetPlayerStat (pc, IE_KIT)
-
-	KitIndex = 0
-	if Kit&0xc000ffff == 0x40000000:
-		KitIndex = Kit>>16 & 0xfff
-	if KitIndex == 0:
-		KitIndex = GemRB.FindTableValue (KitTable, 6, Kit)
-		if (KitIndex < 0):
-			KitIndex = 0
+	KitIndex = GetKitIndex (pc)
 
 	if KitIndex:
 		text = GemRB.GetTableValue (KitTable, KitIndex, 3)

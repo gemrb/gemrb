@@ -438,24 +438,34 @@ def EquipmentPressed ():
 	UpdateActionsWindow ()
 	return
 
-def GetActorClassTitle (actor):
-	ClassTitle = GemRB.GetPlayerStat (actor, IE_TITLE1)
+def GetKitIndex (actor):
+	KitTable = GemRB.LoadTable ("kitlist")
 	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
 	KitIndex = 0
+
 	if Kit&0xc000ffff == 0x40000000:
 		KitIndex = Kit>>16 & 0xfff
-	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-	ClassTable = GemRB.LoadTable ("classes")
-	Class = GemRB.FindTableValue ( ClassTable, 5, Class )
-	KitTable = GemRB.LoadTable ("kitlist")
 
 	#looking for kit by the usability flag
 	if KitIndex == 0:
 		KitIndex = GemRB.FindTableValue (KitTable, 6, Kit)
 		if KitIndex == -1:
 			KitIndex = 0
- 		elif Class != GemRB.GetTableValue (KitTable, KitIndex, 5):
-			KitIndex = 0
+# not sure if this check is needed, even the odd barbarian which is mentioned in
+# the kitlist with the fighter class id, has the matching id in classes.2da
+# 		elif Class != GemRB.GetTableValue (KitTable, KitIndex, 7):
+#			KitIndex = 0
+
+	return KitIndex
+
+def GetActorClassTitle (actor):
+	ClassTitle = GemRB.GetPlayerStat (actor, IE_TITLE1)
+
+	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
+	ClassTable = GemRB.LoadTable ("classes")
+	Class = GemRB.FindTableValue ( ClassTable, 5, Class )
+	KitTable = GemRB.LoadTable ("kitlist")
+	KitIndex = GetKitIndex (actor)
 
 	if ClassTitle == 0:
 		if KitIndex == 0:
