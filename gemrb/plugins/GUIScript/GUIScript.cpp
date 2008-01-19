@@ -1157,6 +1157,32 @@ static PyObject* GemRB_GetControl(PyObject * /*self*/, PyObject* args)
 	return PyInt_FromLong( ret );
 }
 
+PyDoc_STRVAR( GemRB_HasControl__doc,
+"HasControl(WindowIndex, ControlID[,ControlType]) => bool\n\n"
+"Returns true if the control exists." );
+
+static PyObject* GemRB_HasControl(PyObject * /*self*/, PyObject* args)
+{
+        int WindowIndex, ControlID;
+	int Type = -1;
+
+        if (!PyArg_ParseTuple( args, "ii|i", &WindowIndex, &ControlID, &Type )) {
+                return AttributeError( GemRB_HasControl__doc );
+        }
+	int ret = core->GetControl( WindowIndex, ControlID );
+	if (ret == -1) {
+		return PyInt_FromLong( 0 );
+	}
+
+	if (Type!=-1) {
+		Control *ctrl = GetControl(WindowIndex, ControlID, -1);
+		if (ctrl->ControlType!=Type) {
+			return PyInt_FromLong( 0 );
+		}
+	}
+	return PyInt_FromLong( 1 );
+}
+
 PyDoc_STRVAR( GemRB_QueryText__doc,
 "QueryText(WindowIndex, ControlIndex) => string\n\n"
 "Returns the Text of a TextEdit control." );
@@ -8206,6 +8232,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(UnloadSymbol, METH_VARARGS),
 	METHOD(GetSymbolValue, METH_VARARGS),
 	METHOD(GetControl, METH_VARARGS),
+	METHOD(HasControl, METH_VARARGS),
 	METHOD(SetBufferLength, METH_VARARGS),
 	METHOD(SetText, METH_VARARGS),
 	METHOD(QueryText, METH_VARARGS),
