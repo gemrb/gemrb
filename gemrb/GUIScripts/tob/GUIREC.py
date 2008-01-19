@@ -695,27 +695,45 @@ def KitInfoWindow():
 
 	#kit or class description
 	TextArea = GemRB.GetControl (KitInfoWindow,0)
+
 	pc = GemRB.GameGetSelectedPCSingle ()
+	Class = GemRB.GetPlayerStat (pc, IE_CLASS)
+	ClassTable = GemRB.LoadTable ("classes")
+	ClassRow = GemRB.FindTableValue (ClassTable, 5, Class)
+	Multi = GemRB.GetTableValue (ClassTable, ClassRow, 4)
+	Dual = GemRB.GetPlayerStat (pc, IE_MC_FLAGS)
+
+	# "and Dual" can be removed once the dual class is set properly in the engine
+	if Multi and Dual <= 0:
+		text = GemRB.GetTableValue (ClassTable, ClassRow, 1)
+		GemRB.SetText (KitInfoWindow, TextArea, text)
+		return
+
+	KitTable = GemRB.LoadTable ("kitlist")
 	Kit = GemRB.GetPlayerStat (pc, IE_KIT)
-        KitIndex = 0
-        if Kit&0xc000ffff == 0x40000000:
-                KitIndex = Kit>>16 & 0xfff
-	Table = GemRB.LoadTable ("kitlist")
-        if KitIndex == 0:
-                KitIndex = GemRB.FindTableValue (Table, Kit, 6)
+
+	KitIndex = 0
+	if Kit&0xc000ffff == 0x40000000:
+		KitIndex = Kit>>16 & 0xfff
+	if KitIndex == 0:
+		KitIndex = GemRB.FindTableValue (KitTable, 6, Kit)
 		if (KitIndex < 0):
 			KitIndex = 0
 
 	if KitIndex:
-		text = GemRB.GetTableValue (Table, KitIndex, 3)
+		text = GemRB.GetTableValue (KitTable, KitIndex, 3)
 	else:
-		Table = GemRB.LoadTable ("classes")
-		Class = GemRB.GetPlayerStat (pc, IE_CLASS)
-		Class = GemRB.FindTableValue ( Table, 5, Class )
-		print Class
-		text = GemRB.GetTableValue (Table, Class, 1)
+		text = GemRB.GetTableValue (ClassTable, ClassRow, 1)
 
 	GemRB.SetText (KitInfoWindow, TextArea, text)
+
+	if (Dual & ~MC_EXPORTABLE) > 0:
+		#text = GemRB.GetString (text) + "\n"
+		GemRB.TextAreaAppend (KitInfoWindow, TextArea, "\n\n")
+
+		ClassIndex = GemRB.FindTableValue (ClassTable, 15, Dual & MC_WAS_ANY_CLASS)
+		text2 = GemRB.GetTableValue (ClassTable, ClassIndex, 1)
+		GemRB.TextAreaAppend (KitInfoWindow, TextArea, text2)
 
 	GemRB.ShowModal (KitInfoWindow, MODAL_SHADOW_GRAY)
 	return
