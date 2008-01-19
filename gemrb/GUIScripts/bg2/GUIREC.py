@@ -39,6 +39,8 @@ PortraitWindow = None
 OptionsWindow = None
 OldPortraitWindow = None
 OldOptionsWindow = None
+ExportWindow = None
+KitInfoWindow = None
 ExportDoneButton = None
 ExportFileName = ""
 
@@ -74,6 +76,7 @@ def OpenRecordsWindow ():
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow(0)
+	MarkMenuButton (OptionsWindow)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenRecordsWindow")
 	GemRB.SetWindowFrame (OptionsWindow)
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
@@ -175,46 +178,34 @@ def UpdateRecordsWindow ():
 
 	sstr = GemRB.GetPlayerStat (pc, IE_STR)
 	sstrx = GemRB.GetPlayerStat (pc, IE_STREXTRA)
-	cstr = GetStatColor(pc, IE_STR)
 
 	if sstrx > 0 and sstr==18:
 		sstr = "%d/%02d" %(sstr, sstrx % 100)
 	else:
 		sstr = str(sstr)
 	sint = str(GemRB.GetPlayerStat (pc, IE_INT))
-	cint = GetStatColor(pc, IE_INT)
 	swis = str(GemRB.GetPlayerStat (pc, IE_WIS))
-	cwis = GetStatColor(pc, IE_WIS)
 	sdex = str(GemRB.GetPlayerStat (pc, IE_DEX))
-	cdex = GetStatColor(pc, IE_DEX)
 	scon = str(GemRB.GetPlayerStat (pc, IE_CON))
-	ccon = GetStatColor(pc, IE_CON)
 	schr = str(GemRB.GetPlayerStat (pc, IE_CHR))
-	cchr = GetStatColor(pc, IE_CHR)
 
 	Label = GemRB.GetControl (Window, 0x1000002f)
 	GemRB.SetText (Window, Label, sstr)
-	GemRB.SetLabelTextColor (Window, Label, cstr[0], cstr[1], cstr[2])
 
 	Label = GemRB.GetControl (Window, 0x10000009)
 	GemRB.SetText (Window, Label, sdex)
-	GemRB.SetLabelTextColor (Window, Label, cdex[0], cdex[1], cdex[2])
 
 	Label = GemRB.GetControl (Window, 0x1000000a)
 	GemRB.SetText (Window, Label, scon)
-	GemRB.SetLabelTextColor (Window, Label, ccon[0], ccon[1], ccon[2])
 
 	Label = GemRB.GetControl (Window, 0x1000000b)
 	GemRB.SetText (Window, Label, sint)
-	GemRB.SetLabelTextColor (Window, Label, cint[0], cint[1], cint[2])
 
 	Label = GemRB.GetControl (Window, 0x1000000c)
 	GemRB.SetText (Window, Label, swis)
-	GemRB.SetLabelTextColor (Window, Label, cwis[0], cwis[1], cwis[2])
 
 	Label = GemRB.GetControl (Window, 0x1000000d)
 	GemRB.SetText (Window, Label, schr)
-	GemRB.SetLabelTextColor (Window, Label, cchr[0], cchr[1], cchr[2])
 
 	# class
 	ClassTitle = GetActorClassTitle (pc)
@@ -249,15 +240,6 @@ def UpdateRecordsWindow ():
 	#making window visible/shaded depending on the pc's state
 	GemRB.SetVisible (Window, 1)
 	return
-
-def GetStatColor (pc, stat):
-	a = GemRB.GetPlayerStat(pc, stat)
-	b = GemRB.GetPlayerStat(pc, stat, 1)
-	if a==b:
-		return (255,255,255)
-	if a<b:
-		return (255,255,0)
-	return (0,255,0)
 
 def GetStatOverview (pc):
 	StateTable = GemRB.LoadTable ("statdesc")
@@ -642,12 +624,12 @@ def OpenBiographyWindow ():
 	BiographyWindow = Window = GemRB.LoadWindow (12)
 
 	TextArea = GemRB.GetControl (Window, 0)
-	GemRB.SetText (Window, TextArea, 39424)
+	GemRB.SetText (Window, TextArea, 33347)
 
 
 	# Done
 	Button = GemRB.GetControl (Window, 2)
-	GemRB.SetText (Window, Button, 1403)
+	GemRB.SetText (Window, Button, 11973)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenBiographyWindow")
 
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
@@ -699,6 +681,47 @@ def ExportEditChanged():
 		GemRB.SetButtonState(ExportWindow, ExportDoneButton, IE_GUI_BUTTON_DISABLED)
 	else:
 		GemRB.SetButtonState(ExportWindow, ExportDoneButton, IE_GUI_BUTTON_ENABLED)
+	return
+
+def KitInfoWindow():
+	global KitInfoWindow
+
+	KitInfoWindow = GemRB.LoadWindow (24)
+
+	#back button (setting first, to be less error prone)
+	DoneButton = GemRB.GetControl (KitInfoWindow, 2)
+	GemRB.SetText (KitInfoWindow, DoneButton, 11973)
+	GemRB.SetEvent (KitInfoWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS, "KitDonePress")
+
+	#kit or class description
+	TextArea = GemRB.GetControl (KitInfoWindow,0)
+	pc = GemRB.GameGetSelectedPCSingle ()
+	Kit = GemRB.GetPlayerStat (pc, IE_KIT)
+        KitIndex = 0
+        if Kit&0xc000ffff == 0x40000000:
+                KitIndex = Kit>>16 & 0xfff
+	Table = GemRB.LoadTable ("kitlist")
+        if KitIndex == 0:
+                KitIndex = GemRB.FindTableValue (Table, Kit, 6)
+		if (KitIndex < 0):
+			KitIndex = 0
+
+	if KitIndex:
+		text = GemRB.GetTableValue (Table, KitIndex, 3)
+	else:
+		Table = GemRB.LoadTable ("classes")
+		Class = GemRB.GetPlayerStat (pc, IE_CLASS)
+		Class = GemRB.FindTableValue ( Table, 5, Class )
+		print Class
+		text = GemRB.GetTableValue (Table, Class, 1)
+
+	GemRB.SetText (KitInfoWindow, TextArea, text)
+
+	GemRB.ShowModal (KitInfoWindow, MODAL_SHADOW_GRAY)
+	return
+
+def KitDonePress():
+	GemRB.UnloadWindow(KitInfoWindow)
 	return
 
 ###################################################

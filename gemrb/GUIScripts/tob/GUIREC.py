@@ -39,6 +39,8 @@ PortraitWindow = None
 OptionsWindow = None
 OldPortraitWindow = None
 OldOptionsWindow = None
+ExportWindow = None
+KitInfoWindow = None
 ExportDoneButton = None
 ExportFileName = ""
 
@@ -679,6 +681,47 @@ def ExportEditChanged():
 		GemRB.SetButtonState(ExportWindow, ExportDoneButton, IE_GUI_BUTTON_DISABLED)
 	else:
 		GemRB.SetButtonState(ExportWindow, ExportDoneButton, IE_GUI_BUTTON_ENABLED)
+	return
+
+def KitInfoWindow():
+	global KitInfoWindow
+
+	KitInfoWindow = GemRB.LoadWindow (24)
+
+	#back button (setting first, to be less error prone)
+	DoneButton = GemRB.GetControl (KitInfoWindow, 2)
+	GemRB.SetText (KitInfoWindow, DoneButton, 11973)
+	GemRB.SetEvent (KitInfoWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS, "KitDonePress")
+
+	#kit or class description
+	TextArea = GemRB.GetControl (KitInfoWindow,0)
+	pc = GemRB.GameGetSelectedPCSingle ()
+	Kit = GemRB.GetPlayerStat (pc, IE_KIT)
+        KitIndex = 0
+        if Kit&0xc000ffff == 0x40000000:
+                KitIndex = Kit>>16 & 0xfff
+	Table = GemRB.LoadTable ("kitlist")
+        if KitIndex == 0:
+                KitIndex = GemRB.FindTableValue (Table, Kit, 6)
+		if (KitIndex < 0):
+			KitIndex = 0
+
+	if KitIndex:
+		text = GemRB.GetTableValue (Table, KitIndex, 3)
+	else:
+		Table = GemRB.LoadTable ("classes")
+		Class = GemRB.GetPlayerStat (pc, IE_CLASS)
+		Class = GemRB.FindTableValue ( Table, 5, Class )
+		print Class
+		text = GemRB.GetTableValue (Table, Class, 1)
+
+	GemRB.SetText (KitInfoWindow, TextArea, text)
+
+	GemRB.ShowModal (KitInfoWindow, MODAL_SHADOW_GRAY)
+	return
+
+def KitDonePress():
+	GemRB.UnloadWindow(KitInfoWindow)
 	return
 
 ###################################################
