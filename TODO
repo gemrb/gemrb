@@ -12,7 +12,7 @@ Items:
 8. (PARTLY) Implement item usage (similar to spells)
 
 Effects:
-1. (PARTLY) Create base system for effect blocks (Avenger)
+1. (DONE) Create base system for effect blocks
 2. (DONE-almost) Implement common effects
 3. (PARTLY) Implement IWD2 effects
 4. (DONE-almost) Implement TOB effects
@@ -21,7 +21,7 @@ Effects:
 
 Area:
 2. Don't load scripts for pile items? (research when a script is unused)
-3. Create real streaming ambients (do not preload them, just use them when needed)
+3. (DONE) Create real streaming ambients (do not preload them, just use them when needed)
 4. (DONE) in pathfinder, calculate with the actor's feet circle size (npc blocking still needed)
 5. (DONE) fix door wallgroups and tiles (some problems with overlays still exist)
 
