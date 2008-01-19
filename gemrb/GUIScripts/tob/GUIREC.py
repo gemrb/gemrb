@@ -703,8 +703,7 @@ def KitInfoWindow():
 	Multi = GemRB.GetTableValue (ClassTable, ClassRow, 4)
 	Dual = GemRB.GetPlayerStat (pc, IE_MC_FLAGS)
 
-	# "and Dual" can be removed once the dual class is set properly in the engine
-	if Multi and Dual <= 0:
+	if Multi and Dual <= 0: # true multi class
 		text = GemRB.GetTableValue (ClassTable, ClassRow, 1)
 		GemRB.SetText (KitInfoWindow, TextArea, text)
 		return
@@ -712,16 +711,20 @@ def KitInfoWindow():
 	KitTable = GemRB.LoadTable ("kitlist")
 	KitIndex = GetKitIndex (pc)
 
-	if (Dual & ~MC_EXPORTABLE) > 0:
+	if (Dual & MC_WAS_ANY_CLASS) > 0:
 		ClassIndex = GemRB.FindTableValue (ClassTable, 15, Dual & MC_WAS_ANY_CLASS)
 		text = GemRB.GetTableValue (ClassTable, ClassIndex, 1)
 		GemRB.SetText (KitInfoWindow, TextArea, text)
 		GemRB.TextAreaAppend (KitInfoWindow, TextArea, "\n\n")
 
-	if KitIndex:
-		text = GemRB.GetTableValue (KitTable, KitIndex, 3)
-	else:
+	if Multi: # dual class
+		# FIXME use the first class of the multiclass bunch
 		text = GemRB.GetTableValue (ClassTable, ClassRow, 1)
+	else: # ordinary class or kit
+		if KitIndex:
+			text = GemRB.GetTableValue (KitTable, KitIndex, 3)
+		else:
+			text = GemRB.GetTableValue (ClassTable, ClassRow, 1)
 
 	GemRB.TextAreaAppend (KitInfoWindow, TextArea, text)
 
