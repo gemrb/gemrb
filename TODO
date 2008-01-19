@@ -1,5 +1,10 @@
 Scripts:
-no pending tasks
+1. ToB specific actions/triggers, like pocketplane (so ToB will work)
+
+Combat:
+1. fix combat round timings
+2. implement customisable combat calculation, it should be general enough to
+simulate all games, without any hardcoded parts
 
 Items:
 6. (PARTLY) Break items, count charges
@@ -11,7 +16,7 @@ Effects:
 2. (DONE-almost) Implement common effects
 3. (PARTLY) Implement IWD2 effects
 4. (DONE-almost) Implement TOB effects
-5. Implement PST effects
+5. (PARTLY) Implement PST effects
 6. Implement area/non-living affecting effects 
 
 Area:
@@ -43,9 +48,11 @@ Game GUI:
    the IWD2 system to all engines
 3. implement grabbing mouse pointer by a control to fix dragging of PST Float menu window
 4. Fix multi line editboxes. Allow attaching of scrollbar.
-5. Fix drop capitals (initials) Calculate text height/width correctly, display
+5. (PARTLY) Fix drop capitals (initials) Calculate text height/width correctly, display
    it correctly too.
-6. Fix unwanted screen shake (especially when on bottom of area)
+6. (PARTLY) Fix unwanted screen shake (especially when on bottom of area)
+7. Level up code, this should be written mostly in GuiScript!!!
+8. Contingency, spell trigger setup windows
 
 General:
 1. The Cache and Variables classes could be rewritten to incorporate the release 
@@ -62,14 +69,13 @@ Graphics:
    and in BMPImporter
 2. move SDLVideoDriver sprite functions to their own file, rename them to 
    SpriteIsPixelTransparent etc.
-3. Add PNG support? (still image done)
+3. (PARTLY) Add PNG support? (still image done)
 
 Sound:
 1. valgrind reports invalid memory access due to Unqueueing buffers and using 
    them in another thread (openal weirdness?)
-2. sounds get sometimes distorted, might be connected to problem #1
-3. make sure GemRB vs. OpenAL still works on both Win32 and Linux (done)
-4. Separate OpenAL interface from ACM loader and MVE player
+2. (PARTLY) sounds get sometimes distorted, might be connected to problem #1
+3. (PARTLY) Separate OpenAL interface from ACM loader and MVE player
 
 Building:
 1. fix include paths during compilation, so the files do not 
