@@ -451,7 +451,7 @@ def GetActorClassTitle (actor):
 
 	#looking for kit by the usability flag
 	if KitIndex == 0:
-		KitIndex = GemRB.FindTableValue (KitTable, Kit, 6)
+		KitIndex = GemRB.FindTableValue (KitTable, 6, Kit)
 		if KitIndex == -1:
 			KitIndex = 0
  		elif Class != GemRB.GetTableValue (KitTable, KitIndex, 5):
