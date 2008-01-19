@@ -712,19 +712,18 @@ def KitInfoWindow():
 	KitTable = GemRB.LoadTable ("kitlist")
 	KitIndex = GetKitIndex (pc)
 
+	if (Dual & ~MC_EXPORTABLE) > 0:
+		ClassIndex = GemRB.FindTableValue (ClassTable, 15, Dual & MC_WAS_ANY_CLASS)
+		text = GemRB.GetTableValue (ClassTable, ClassIndex, 1)
+		GemRB.SetText (KitInfoWindow, TextArea, text)
+		GemRB.TextAreaAppend (KitInfoWindow, TextArea, "\n\n")
+
 	if KitIndex:
 		text = GemRB.GetTableValue (KitTable, KitIndex, 3)
 	else:
 		text = GemRB.GetTableValue (ClassTable, ClassRow, 1)
 
-	GemRB.SetText (KitInfoWindow, TextArea, text)
-
-	if (Dual & ~MC_EXPORTABLE) > 0:
-		GemRB.TextAreaAppend (KitInfoWindow, TextArea, "\n\n")
-
-		ClassIndex = GemRB.FindTableValue (ClassTable, 15, Dual & MC_WAS_ANY_CLASS)
-		text2 = GemRB.GetTableValue (ClassTable, ClassIndex, 1)
-		GemRB.TextAreaAppend (KitInfoWindow, TextArea, text2)
+	GemRB.TextAreaAppend (KitInfoWindow, TextArea, text)
 
 	GemRB.ShowModal (KitInfoWindow, MODAL_SHADOW_GRAY)
 	return
