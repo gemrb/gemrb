@@ -2727,6 +2727,17 @@ static PyObject* GemRB_SetButtonPicture(PyObject * /*self*/, PyObject* args)
 	ImageFactory* fact = ( ImageFactory* )
 		rm->GetFactoryResource( ResRef, IE_BMP_CLASS_ID, IE_NORMAL );
 
+	//if the resource doesn't exist, but we have a default resource
+	//use this resource
+	if (!fact && DefResRef) {
+		fact = ( ImageFactory* )
+			rm->GetFactoryResource( DefResRef, IE_BMP_CLASS_ID, IE_NORMAL );
+	}
+
+	if (!fact) {
+		return NULL;
+	}
+
 	Sprite2D* Picture = fact->GetImage();
 	if (Picture == NULL) {
 		return NULL;
