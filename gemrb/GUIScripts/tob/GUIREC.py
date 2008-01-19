@@ -728,7 +728,6 @@ def KitInfoWindow():
 	GemRB.SetText (KitInfoWindow, TextArea, text)
 
 	if (Dual & ~MC_EXPORTABLE) > 0:
-		#text = GemRB.GetString (text) + "\n"
 		GemRB.TextAreaAppend (KitInfoWindow, TextArea, "\n\n")
 
 		ClassIndex = GemRB.FindTableValue (ClassTable, 15, Dual & MC_WAS_ANY_CLASS)
