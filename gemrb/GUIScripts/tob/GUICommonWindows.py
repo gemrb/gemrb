@@ -439,11 +439,13 @@ def EquipmentPressed ():
 	return
 
 def GetKitIndex (actor):
+	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
 	KitTable = GemRB.LoadTable ("kitlist")
 	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
 	KitIndex = 0
 
 	if Kit&0xc000ffff == 0x40000000:
+		print "Kit value: 0x%04X"%Kit
 		KitIndex = Kit>>16 & 0xfff
 
 	#looking for kit by the usability flag
@@ -453,8 +455,9 @@ def GetKitIndex (actor):
 			KitIndex = 0
 # not sure if this check is needed, even the odd barbarian which is mentioned in
 # the kitlist with the fighter class id, has the matching id in classes.2da
-# 		elif Class != GemRB.GetTableValue (KitTable, KitIndex, 7):
-#			KitIndex = 0
+ 		elif Class != GemRB.GetTableValue (KitTable, KitIndex, 7):
+			print "KitIndex before hack", KitIndex
+			KitIndex = 0
 
 	return KitIndex
 
