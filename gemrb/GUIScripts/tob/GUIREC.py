@@ -149,6 +149,14 @@ def UpdateRecordsWindow ():
 	else:
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
 
+	# dual-classable
+	Button = GemRB.GetControl (Window, 0)
+	Dual = IsDualClassed (pc,0)
+	if Dual[0] == 1:
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
+	else:
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
+
 	# name
 	Label = GemRB.GetControl (Window, 0x1000000e)
 	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc, 0))
@@ -262,11 +270,11 @@ def GetStatOverview (pc):
 	Class = GemRB.FindTableValue (ClassTable, 5, Class)
 	Multi = GemRB.GetTableValue (ClassTable, Class, 4)
 	Class = GemRB.GetTableRowName (ClassTable, Class)
+	Dual = IsDualClassed (pc, 1)
 	if Multi:
 		Levels = [IE_LEVEL, IE_LEVEL2, IE_LEVEL3]
 		Classes = [0,0,0]
 		MultiCount = 0
-		stats.append ( (19721,1,'c') )
 		Mask = 1
 		for i in range (16):
 			if Multi&Mask:
@@ -274,21 +282,55 @@ def GetStatOverview (pc):
 				MultiCount += 1
 			Mask += Mask
 
-		for i in range (MultiCount):
-			#todo get classtitle for this class
-			Class = Classes[i]
-			ClassTitle = GemRB.GetString(GemRB.GetTableValue (ClassTable, Class, 2))
+		if Dual[0] > 0: # dual classed
+			stats.append ( (19722,1,'c') )
+
+			if Dual[0] == 1:
+				ClassTitle = GemRB.GetString(GemRB.GetTableValue (KitTable, Dual[1], 2))
+			elif Dual[0] == 2:
+				ClassTitle = GemRB.GetString(GemRB.GetTableValue (ClassTable, Dual[1], 2))
 			GemRB.SetToken("CLASS", ClassTitle)
-			Class = GemRB.GetTableRowName (ClassTable, i)
-			Level = GemRB.GetPlayerStat (pc, Levels[i])
+
+			Level = GemRB.GetPlayerStat (pc, Levels[1]) # verify
 			GemRB.SetToken("LEVEL", str (Level) )
-			GemRB.SetToken("NEXTLEVEL", GetNextLevelExp (Level, Class) )
-			GemRB.SetToken("EXPERIENCE", str (GemRB.GetPlayerStat (pc, IE_XP)/MultiCount ) )
-			#resolve string immediately
-			stats.append ( (GemRB.GetString(16480),"",'b') )
+
+			# FIXME: find out what is the real old XP
+			XP1 = GemRB.GetPlayerStat (pc, IE_XP) / 17/2*Level
+			GemRB.SetToken("EXPERIENCE", str (XP1) )
+
+			stats.append ( (GemRB.GetString(19720),"",'b') )
 			stats.append (None)
 
-	else:
+			# the second class
+			ClassTitle = GemRB.GetString(GemRB.GetTableValue (ClassTable, Dual[2], 2))
+			GemRB.SetToken("CLASS", ClassTitle)
+			Class = GemRB.GetTableRowName (ClassTable, Dual[2])
+
+			Level = GemRB.GetPlayerStat (pc, Levels[0]) # verify
+			GemRB.SetToken("LEVEL", str (Level) )
+			GemRB.SetToken("NEXTLEVEL", GetNextLevelExp (Level, Class) )
+
+			# remove the first class's XP from IE_XP
+			XP2 = GemRB.GetPlayerStat (pc, IE_XP) - XP1
+			GemRB.SetToken("EXPERIENCE", str (XP2) )
+			stats.append ( (GemRB.GetString(16480),"",'b') )
+			stats.append (None)
+		else: # multi classed
+			stats.append ( (19721,1,'c') )
+			for i in range (MultiCount):
+				Class = Classes[i]
+				ClassTitle = GemRB.GetString(GemRB.GetTableValue (ClassTable, Class, 2))
+				GemRB.SetToken("CLASS", ClassTitle)
+				Class = GemRB.GetTableRowName (ClassTable, i)
+				Level = GemRB.GetPlayerStat (pc, Levels[i])
+				GemRB.SetToken("LEVEL", str (Level) )
+				GemRB.SetToken("NEXTLEVEL", GetNextLevelExp (Level, Class) )
+				GemRB.SetToken("EXPERIENCE", str (GemRB.GetPlayerStat (pc, IE_XP)/MultiCount ) )
+				#resolve string immediately
+				stats.append ( (GemRB.GetString(16480),"",'b') )
+				stats.append (None)
+
+	else: # single classed
 		Level = GemRB.GetPlayerStat (pc, IE_LEVEL)
 		GemRB.SetToken("LEVEL", str (Level) )
 		GemRB.SetToken("NEXTLEVEL", GetNextLevelExp (Level, Class) )
@@ -683,6 +725,50 @@ def ExportEditChanged():
 		GemRB.SetButtonState(ExportWindow, ExportDoneButton, IE_GUI_BUTTON_ENABLED)
 	return
 
+# returns an array: first field is 0 - not dual classed; 1 - kit/class; 2 - class/class
+# the second and third field hold the kit/class index for each class
+# if invoked with verbose==0 only returns 0 or 1 (is or is not dual classed)
+def IsDualClassed(actor, verbose):
+	Dual = GemRB.GetPlayerStat (actor, IE_MC_FLAGS)
+	Dual = Dual & ~(MC_EXPORTABLE|MC_PLOT_CRITICAL|MC_BEENINPARTY|MC_HIDDEN)
+	
+	if verbose:
+		Class = GemRB.GetPlayerStat (actor, IE_CLASS)
+		ClassTable = GemRB.LoadTable ("classes")
+		ClassIndex = GemRB.FindTableValue (ClassTable, 5, Class)
+		Multi = GemRB.GetTableValue (ClassTable, ClassIndex, 4)
+		DualInfo = []
+		KitIndex = GetKitIndex (actor)
+
+		if (Dual & MC_WAS_ANY_CLASS) > 0: # first (previous) class of the dual class
+			if KitIndex:
+				DualInfo.append (1)
+				DualInfo.append (KitIndex)
+			else:
+				DualInfo.append (2)
+				DualInfo.append (GemRB.FindTableValue (ClassTable, 15, Dual & MC_WAS_ANY_CLASS))
+
+			# use the first class of the multiclass bunch that isn't the same as the first class
+			FirstClassIndex = ClassIndex
+			Mask = 1
+			for i in range (16):
+				if Multi & Mask:
+					ClassIndex = GemRB.FindTableValue (ClassTable, 5, i+1)
+					if ClassIndex == FirstClassIndex:
+						Mask += Mask
+						continue
+					DualInfo.append (ClassIndex)
+					break
+				Mask += Mask
+			return DualInfo
+		else:
+			return (0,-1,-1)
+	else:
+		if (Dual & MC_WAS_ANY_CLASS) > 0:
+			return (1,-1,-1)
+		else:
+			return (0,-1,-1)
+
 def KitInfoWindow():
 	global KitInfoWindow
 
@@ -701,10 +787,9 @@ def KitInfoWindow():
 	ClassTable = GemRB.LoadTable ("classes")
 	ClassIndex = GemRB.FindTableValue (ClassTable, 5, Class)
 	Multi = GemRB.GetTableValue (ClassTable, ClassIndex, 4)
-	Dual = GemRB.GetPlayerStat (pc, IE_MC_FLAGS)
-	Dual = Dual & ~(MC_EXPORTABLE|MC_PLOT_CRITICAL|MC_BEENINPARTY|MC_HIDDEN)
+	Dual = IsDualClassed (pc, 1)
 
-	if Multi and Dual <= 0: # true multi class
+	if Multi and Dual[0] == 0: # true multi class
 		text = GemRB.GetTableValue (ClassTable, ClassIndex, 1)
 		GemRB.SetText (KitInfoWindow, TextArea, text)
 		GemRB.ShowModal (KitInfoWindow, MODAL_SHADOW_GRAY)
@@ -713,28 +798,17 @@ def KitInfoWindow():
 	KitTable = GemRB.LoadTable ("kitlist")
 	KitIndex = GetKitIndex (pc)
 
-	if (Dual & MC_WAS_ANY_CLASS) > 0:
-		if KitIndex:
-			text = GemRB.GetTableValue (KitTable, KitIndex, 3)
-		else:
-			ClassIndex = GemRB.FindTableValue (ClassTable, 15, Dual & MC_WAS_ANY_CLASS)
-			text = GemRB.GetTableValue (ClassTable, ClassIndex, 1)
+	if Dual[0]: # dual class
+		# first (previous) kit or class of the dual class
+		if Dual[0] == 1:
+			text = GemRB.GetTableValue (KitTable, Dual[1], 3)
+		elif Dual[0] == 2:
+			text = GemRB.GetTableValue (ClassTable, Dual[1], 1)
+
 		GemRB.SetText (KitInfoWindow, TextArea, text)
 		GemRB.TextAreaAppend (KitInfoWindow, TextArea, "\n\n")
+		text = GemRB.GetTableValue (ClassTable, Dual[2], 1)
 
-	if Multi: # dual class
-		# use the first class of the multiclass bunch that isn't the same as the first class
-		FirstClassIndex = ClassIndex
-		Mask = 1
-		for i in range (16):
-			if Multi & Mask:
-				ClassIndex = GemRB.FindTableValue (ClassTable, 5, i+1)
-				if ClassIndex == FirstClassIndex:
-					Mask += Mask
-					continue
-				text = GemRB.GetTableValue (ClassTable, ClassIndex, 1)
-				break
-			Mask += Mask
 	else: # ordinary class or kit
 		if KitIndex:
 			text = GemRB.GetTableValue (KitTable, KitIndex, 3)
