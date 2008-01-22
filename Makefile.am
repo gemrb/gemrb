@@ -22,8 +22,6 @@ dist_man1_MANS = gemrb.1
 
 install-data-hook:
 	rm -f $(DESTDIR)$(bindir)/plugins/libgemrb_core.so
-	mkdir -p $(DESTDIR)$(datadir)/gemrb/Cache 2>/dev/null
-	rm -rf $(DESTDIR)$(datadir)/gemrb/Cache/*
 
 docs:
 	doxygen
