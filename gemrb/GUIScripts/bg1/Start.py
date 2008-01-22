@@ -21,7 +21,8 @@ def OnLoad():
 		GemRB.SetVar ("SkipIntroVideos", 1)
 
 	GemRB.LoadWindowPack("START")
-#quit subwindow
+
+	#quit subwindow
 	QuitWindow = GemRB.LoadWindow(3)
 	QuitTextArea = GemRB.GetControl(QuitWindow,0)
 	CancelButton = GemRB.GetControl(QuitWindow, 2)
@@ -31,15 +32,14 @@ def OnLoad():
 	GemRB.SetText(QuitWindow, ConfirmButton, 15417)
 	GemRB.SetEvent(QuitWindow, ConfirmButton, 0, "ExitConfirmed")
 	GemRB.SetEvent(QuitWindow, CancelButton, 0, "ExitCancelled")
-#main window
+
+	#main window
 	StartWindow = GemRB.LoadWindow(0)
 	SinglePlayerButton = GemRB.GetControl(StartWindow, 0)
 	MultiPlayerButton = GemRB.GetControl(StartWindow, 1)
 	MoviesButton = GemRB.GetControl(StartWindow, 2)
 	ExitButton = GemRB.GetControl(StartWindow, 3)
 
-	#GemRB.CreateLabel(StartWindow, 0x0fff0000, 0,450,640,30, "REALMS", "GemRB Ver 0.0.1", 1)
-	
 	BackToMain()
 	
 	GemRB.LoadMusicPL("Theme.mus")
@@ -78,6 +78,7 @@ def PregenPress():
 	GemRB.UnloadWindow(StartWindow)
 	GemRB.UnloadWindow(QuitWindow)
 	GemRB.SetVar("PlayMode",0) #loadgame needs this hack
+	GemRB.GameSetExpansion(0)
 	GemRB.LoadGame(-1)
 	GemRB.SetVar("PlayMode",-1)
 	GemRB.SetNextScript("GUIMP")
@@ -87,13 +88,15 @@ def LoadSingle():
 	GemRB.UnloadWindow(StartWindow)
 	GemRB.UnloadWindow(QuitWindow)
 	GemRB.SetVar("PlayMode",0)
+	GemRB.GameSetExpansion(0)
 	GemRB.SetNextScript("GUILOAD")
 	return
 
 def MissionPack():
 	GemRB.UnloadWindow(StartWindow)
 	GemRB.UnloadWindow(QuitWindow)
-	GemRB.SetVar("PlayMode",2)
+	GemRB.SetVar("PlayMode",0)
+	GemRB.GameSetExpansion(1)
 	GemRB.SetNextScript("GUILOAD")
 	return
 
@@ -101,6 +104,7 @@ def NewSingle():
 	GemRB.UnloadWindow(StartWindow)
 	GemRB.UnloadWindow(QuitWindow)
 	GemRB.SetVar("PlayMode",0)
+	GemRB.GameSetExpansion(0)
 	GemRB.SetVar("Slot",1)
 	GemRB.LoadGame(-1)
 	GemRB.SetNextScript("CharGen") #temporarily
