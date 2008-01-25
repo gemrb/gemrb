@@ -657,12 +657,12 @@ private:
 	GameControl* StartGameControl();
 
 public:
-	char GameData[12];
-	char GameOverride[12];
-	char GameSounds[12];
-	char GameScripts[12];
-	char GamePortraits[12];
-	char GameCharacters[12];
+	char GameData[_MAX_PATH];
+	char GameOverride[_MAX_PATH];
+	char GameSounds[_MAX_PATH];
+	char GameScripts[_MAX_PATH];
+	char GamePortraits[_MAX_PATH];
+	char GameCharacters[_MAX_PATH];
 	ieResRef GameNameResRef;
 	ieResRef GoldResRef; //MISC07.itm
 	Variables *RtRows;
