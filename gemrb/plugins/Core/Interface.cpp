@@ -1962,7 +1962,17 @@ bool Interface::LoadConfig(const char* filename)
 			continue;
 		}
 		fseek( config, -1, SEEK_CUR );
+		memset(value,'\0',_MAX_PATH + 3);
 		fscanf( config, "%64[^=]=%[^\r\n]%*[\r\n]", name, value );
+		for (int i=_MAX_PATH + 2; i > 0; i--) {
+			if (value[i] == '\0') continue;
+			if (value[i] == ' ') {
+				value[i] = '\0';
+			} else {
+				break;
+			}
+		}
+
 		if (stricmp( name, "Width" ) == 0) {
 			Width = atoi( value );
 		} else if (stricmp( name, "Height" ) == 0) {
