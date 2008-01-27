@@ -1,14 +1,14 @@
-Begin3
+Begin4
 Title:          GemRB 
-Version:        0.1
-Entered-date:   
+Version:        0.3
+Entered-date:   2008-01-27
 Description:    OpenSource reimplementation of the InfinityEngine
-Keywords:       Infinity Engine 
-Author:         GemRB Developement Team <avenger_teambg@users.sourceforge.net> 
-Maintained-by:  GemRB Developement Team <avenger_teambg@users.sourceforge.net> 
-Primary-site:   	        
-Home-page:      http://gemrb.sourceforge.net 
+Keywords:       Infinity Engine roleplaying game rpg
+Author:         <avenger_teambg@users.sourceforge.net> GemRB Developement Team
+Maintained-by:  <avenger_teambg@users.sourceforge.net> GemRB Developement Team
+Primary-site:   http://gemrb.sourceforge.net 	        
+Alternate-site:
 Original-site:  
 Platforms:      Linux and other Unices, Windows
-Copying-policy: GNU Public License
+Copying-policy: GNU General Public License version 2 or later
 End
