@@ -74,13 +74,13 @@ for various tweaks hardcoded in GemRB engine.
 
 .TP
 .BR GameName =STRING
-Name of the game, as it appears in the window title-bar.
+Arbitrary name of the game. It will be displayed in the window's title bar.
 
 .TP
 .BR GamePath =PATH
-Path to directory where the original game is installed. If you can't
-install the game under MS Windows, you can try to unpack the data files
-with 
+Path to the directory where the original game is installed. If you can't
+install the game under MS Windows or with WINE, you can try to unpack the data files
+with the
 .I unshield
 program found at 
 .IR http://synce.sourceforge.net .
@@ -90,8 +90,8 @@ program found at
 .TP
 .BR CD2 =PATH
 .TP
-.BR CDn =....
-Path to data files from game's particular CDs.
+.BR CDn =...
+Path to the data files for the game's particular CDs.
 
 .\".TP
 .\".BR INIConfig =FILE
@@ -110,12 +110,12 @@ Game window height (in pixels).
 
 .TP
 .BR Bpp =INT
-Color depth of game window, (in bits per pixel).
+Color depth of the game window (in bits per pixel).
 
 .TP
 .BR Fullscreen =(0|1)
-Whether the game should run in fullscreen mode. Note that fullcreen mode is
-currently buggy.
+Whether the game should run in fullscreen mode. (Note that fullcreen mode is
+currently buggy).
 
 .\".TP
 .\".BR ForceStereo =(0|1)
@@ -126,33 +126,33 @@ currently buggy.
 
 .TP
 .BR TooltipDelay =INT
-Delay (in ms) before tooltips are displayed when mouse is not moving.
+Delay (in ms) before tooltips are displayed when the mouse is not moving.
 Reasonable number for this option is e.g.
 .IR 500 .
 
 .TP
 .BR VolumeAmbients =INT
-Volume of ambient sounds, in percents. Default is
+Volume of ambient sounds in percents. The default is
 .IR 100 .
 
 .TP
 .BR VolumeMovie =INT
-Volume during movie playback, in percents. Default is
+Volume during movie playback in percents. The default is
 .IR 100 .
 
 .TP
 .BR VolumeMusic =INT
-Volume of background music, in percents. Default is
+Volume of background music in percents. The default is
 .IR 100 .
 
 .TP
 .BR VolumeSFX =INT
-Volume of sound effects, in percents. Default is
+Volume of sound effects in percents. The default is
 .IR 100 .
 
 .TP
 .BR VolumeVoices =INT
-Volume of PC or NPC voices, in percents. Default is
+Volume of PC or NPC voices in percents. The default is
 .IR 100 .
 
 
@@ -160,21 +160,21 @@ Volume of PC or NPC voices, in percents. Default is
 .BR SkipIntroVideos =(0|1)
 This parameter is meant for developers. If set to
 .IR 1 ,
-the intro and logo videos are skipped to save developer's nerves. Default is
+the intro and logo videos are skipped to save developer's nerves. The default is
 .IR 0 .
 
 .TP
 .BR DrawFPS =(0|1)
 This parameter is meant for developers. If set to
 .IR 1 ,
-current FPS (Frames per Second) value is drawn in top left window corner. Default is
+the current FPS (Frames per Second) value is drawn in the top left window corner. The default is
 .IR 0 .
 
 .TP
 .BR FogOfWar =(0|1)
 This parameter is meant for developers. If set to
 .IR 1 ,
-unexplored parts of an area are blacked out. Since the unexplored bitmap is
+the unexplored parts of an area are blacked out. Since the unexplored bitmap is
 not updated by actors yet, it's set to
 .I 0 
 by default.
@@ -183,9 +183,10 @@ by default.
 .BR EnableCheatKeys =(0|1)
 This parameter is meant for developers. If set to
 .IR 1 ,
-certain keys allow you to inspect internal state of objects, do forbidden things, etc. The keys are listed in 
+certain keys allow you to inspect the internal state of objects, do forbidden things, etc.
+The keys are listed in the
 .I CheatKeys.txt
-file. Do NOT use this option unless you want to make your hands dirty :-). Default is
+file. Do NOT use this option unless you want to make your hands dirty :-). The default is
 .IR 0 .
 
 .TP
@@ -207,7 +208,7 @@ This parameter is meant for developers. It is a combination of bit values
 .IR 16
 - display trigger warnings.
 
-Default is
+The default is
 .IR 0 .
 
 .TP
@@ -238,20 +239,20 @@ files.
 
 .TP
 .BR GemRBPath =PATH
-Path to GemRB installation. Soon to be obsoleted.
+Path to the GemRB installation. (To be obsoleted).
 
 .TP
 .BR GUIScriptsPath =PATH
-Path to directory with scripts controlling game's GUI. 
+Path to the directory with scripts controlling the game's GUI. 
 
 .TP
 .BR SavePath =PATH
-Path to directory with save games. Note that this directory has to
+Path to the directory with save games. Note that this directory has to
 contain 
 .I save/
 and/or eventually
 .I mpsave/
-subdirectories and only these subdirectories contain the actual
+subdirectories and that only these subdirectories contain the actual
 saved games.
 
 .I SavePath
@@ -260,21 +261,31 @@ defaults to
 
 .TP
 .BR GameOnCD =(0|1)
+defaults to
+.IR 0 .
 
 
 .TP
 .BR GameDataPath =PATH
-Path to original game's installed data files, relative to GamePath.
+Path to the original game's installed data files, relative to GamePath.
 Usually it's 
 .IR data .
-???
+
 
 .TP
 .BR GameOverridePath =PATH
-Path to original game's override dir, relative to GamePath.
+Path to the original game's override dir, relative to GamePath.
 Usually it's 
 .IR override .
 Original games use this directory to place last-minute patches.
+
+.TP
+.BR GemRBOverridePath =PATH
+Path where gemrb looks for its game override directory.
+It defaults to
+.IR GemRBPath .
+The original games hardcoded this information in the engine.
+
 
 .\"###################################################
 .SH FILES
@@ -314,7 +325,7 @@ Many.
 is still in an early development stage and not nearly complete. 
 
 If you stumble over something which is supposed to work, either make a bug report
-at ...... or come to IRC channel 
+at http://sourceforge.net/projects/gemrb or come to IRC channel 
 .I #GemRB
 at FreeNode.
 
@@ -324,7 +335,7 @@ The GemRB Project development team at http://gemrb.sourceforge.net
 
 .\"###################################################
 .SH COPYING
-Copyright (C) 2003 The GemRB Project
+Copyright (C) 2003-2008 The GemRB Project
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
