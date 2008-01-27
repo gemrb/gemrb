@@ -170,6 +170,7 @@ Interface::Interface(int iargc, char* iargv[])
 	GemRBPath[0] = 0;
 	PluginsPath[0] = 0;
 	CachePath[0] = 0;
+	GemRBOverride[0] = 0;
 	GameName[0] = 0;
 	strncpy( GameOverride, "override", sizeof(GameOverride) );
 	strncpy( GameSounds, "sounds", sizeof(GameSounds) );
@@ -2003,6 +2004,8 @@ bool Interface::LoadConfig(const char* filename)
 			strncpy( GameData, value, sizeof(GameData) );
 		} else if (stricmp( name, "GameOverridePath" ) == 0) {
 			strncpy( GameOverride, value, sizeof(GameOverride) );
+		} else if (stricmp( name, "GemRBOverridePath" ) == 0) {
+			strncpy( GemRBOverride, value, sizeof(GemRBOverride) );
 		} else if (stricmp( name, "GameScriptsPath" ) == 0) {
 			strncpy( GameScripts, value, sizeof(GameScripts) );
 		} else if (stricmp( name, "GameSoundsPath" ) == 0) {
@@ -2068,6 +2071,10 @@ bool Interface::LoadConfig(const char* filename)
 	}
 #endif
 
+	if (!GemRBOverride[0]) {
+		strcpy( GemRBOverride, GemRBPath );
+	}
+
 	if (!PluginsPath[0]) {
 #ifdef PLUGINDIR
 		strcpy( PluginsPath, PLUGINDIR );
@@ -2097,6 +2104,7 @@ bool Interface::LoadConfig(const char* filename)
 	FixPath( GUIScriptsPath, true );
 	FixPath( PluginsPath, true );
 	FixPath( GemRBPath, true );
+	FixPath( GemRBOverride, true );
 
 	FixPath( SavePath, false );
 	mkdir( SavePath, S_IREAD|S_IWRITE|S_IEXEC );

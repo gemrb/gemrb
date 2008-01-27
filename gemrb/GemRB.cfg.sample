@@ -224,5 +224,16 @@ GUIScriptsPath=./
 #GameOverridePath=override
 
 #####################################################
+#  GemRB Data Override Path [String]                #
+#                                                   #
+#  This is the path where GemRB looks for the GemRB #
+#  data override directory.                         #
+#                                                   #
+#  You probably do NOT want to specify this!        #
+#####################################################
+
+#GemRBOverridePath=/usr/share/games/gemrb
+
+#####################################################
 #  END                                              #
 #####################################################

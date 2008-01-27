@@ -216,7 +216,7 @@ bool KeyImp::HasResource(const char* resname, SClass_ID type)
 	//Search it in the GemRB override Directory
 	PathJoin( path, "override", core->GameType, NULL ); //this shouldn't change
 	if (FindIn( core->CachePath, "", resname, type)) return true;
-	if (FindIn( core->GemRBPath, path, resname, type)) return true;
+	if (FindIn( core->GemRBOverride, path, resname, type)) return true;
 	if (FindIn( core->GamePath, core->GameOverride, resname, type)) return true;
 	if (FindIn( core->GamePath, core->GameSounds, resname, type)) return true;
 	if (FindIn( core->GamePath, core->GameScripts, resname, type)) return true;
@@ -250,7 +250,7 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
 		"Found in Cache" );
 	if (fs) return fs;
 
-	fs=SearchIn( core->GemRBPath, path, resname, type,
+	fs=SearchIn( core->GemRBOverride, path, resname, type,
 		"Found in GemRB Override" );
 	if (fs) return fs;
 
