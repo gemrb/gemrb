@@ -1,5 +1,6 @@
 Scripts:
 1. ToB specific actions/triggers, like pocketplane (so ToB will work)
+2. (PARTLY) Properly detect the play mode (sp/mp, normal/extended)
 
 Combat:
 1. fix combat round timings
@@ -60,7 +61,6 @@ General:
 2. various directories (GemRB override, game override ...) should be resolved 
    right after loading config files and remain static afterwards. Maybe define 
    some PATH variable describing all the directories searched for files
-3. employ ccache?
 4. valgrind reports a big heap of unreleased python objects
 
 
