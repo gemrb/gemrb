@@ -61,7 +61,6 @@ if test "x$gemrb_use_subdirs" = "xno" ; then
 else
   plugindir=$libdir/gemrb
   moddir=$datadir/gemrb
-  docdir=$docdir/gemrb
 fi
 
 AC_SUBST(plugindir)
