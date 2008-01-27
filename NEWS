@@ -1,3 +1,23 @@
+GemRB V0.3.0 (2008-xx-yy):
+  New features:
+    - 
+    - TLK override handling (custom biographies and map notes)
+    - weapon immunities
+    - party AI
+    - expansion playmode
+    - a few more actions, triggers and effects
+    - loading of projectile explosion animations
+    - kit information window
+
+  Improved features:
+    - sound (now perfect on linux!)
+    - character generation
+    - opcodes
+    - character record window
+    - pathfinding
+    - tooltip delay
+    - bugfixes
+
 GemRB V0.2.9 (2007-07-06):
   New features:
     - thieving
