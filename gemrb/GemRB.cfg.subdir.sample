@@ -154,7 +154,7 @@ GemRBPath=./
 #  Cache directory.                                 #
 #####################################################
 
-CachePath=./Cache/
+CachePath=/tmp/gemrb-cache
 
 #####################################################
 #  GemRB GUI Scripts Path [String]                  #
