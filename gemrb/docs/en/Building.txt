@@ -1,9 +1,10 @@
-BUILDING GEMRB FROM CVS SOURCES ON UNIX
+BUILDING GEMRB FROM SVN SOURCES ON UNIX
 ---------------------------------------
 $Id$
 
 
-Tools you will need to build GemRB from CVS:
+Tools you will need to build GemRB from SVN:
+  - subversion - SVN
 
   - libtool
   - automake
@@ -19,27 +20,26 @@ Libraries:
   - SDL 1.2
   - OpenAL
 
-
 (*) On some systems it means you have to build and install Python manually.
     Specify --enable-shared option when running Python's configure.
-
 
 
 Building GemRB the easy way:
 ----------------------------
 
-Following commands will try to configure, make and install GemRB.
+The following commands will try to configure, make and install GemRB.
 
   ./autogen.sh
   make
   make install
 
-By default, GemRB is installed into directory $HOME/GemRB/ . Supporting
+By default, GemRB is installed into the directory $HOME/GemRB/ . Supporting
 files are mostly installed into the same directory.
 
-If you want to install GemRB into system-wide dir, or if you prefer
-installation into bin/, lib/, man/ ... subdirs under installation directory,
-either edit autogen.sh or run the tools by hand (see following paragraphs).
+If you want to install GemRB into a system-wide dir, run autogen.sh with the
+target prefix as an argument. If you prefer the installation into bin/, lib/,
+man/ ... subdirs under the installation directory, either edit autogen.sh 
+(remove the --disable-subdirs flag) or run the tools by hand (see below).
 
 
 Running all the tools by hand:
@@ -53,12 +53,12 @@ Running all the tools by hand:
 
 
 To install GemRB into the same directory hierarchy as with autogen.sh, 
-use command similar to the one below:
+use a command similar to the one below:
 
   TGT=$HOME/GemRB/
   ./configure --prefix=$TGT --bindir=$TGT --sysconfdir=$TGT --datadir=$TGT --libdir=$TGT/plugins/ --disable-subdirs
 
-If you on the other hand want to install GemRB into standard directory 
+If you on the other hand want to install GemRB into a standard directory
 structure, run `configure' this way instead:
 
   ./configure --prefix=$HOME/GemRB/
