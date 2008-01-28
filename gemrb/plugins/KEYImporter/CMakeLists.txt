@@ -1,0 +1,4 @@
+ADD_LIBRARY(KEYImporter MODULE KEYImp.cpp KEYImpCD.cpp KEYImporter.cpp Dictionary.cpp)
+TARGET_LINK_LIBRARIES( KEYImporter gemrb_core )
+
+INSTALL( TARGETS KEYImporter DESTINATION ${PLUGIN_INSTALL_DIR} )

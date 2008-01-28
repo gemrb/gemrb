@@ -1,0 +1,4 @@
+ADD_LIBRARY(TLKImporter MODULE TLKImp.cpp TLKImpCD.cpp TLKImporter.cpp TlkOverride.cpp)
+TARGET_LINK_LIBRARIES( TLKImporter gemrb_core )
+
+INSTALL( TARGETS TLKImporter DESTINATION ${PLUGIN_INSTALL_DIR} )

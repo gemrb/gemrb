@@ -1,0 +1,4 @@
+ADD_LIBRARY(ZlibMgr MODULE ZlibManager.cpp ZlibMgr.cpp ZlibMgrDesc.cpp )
+TARGET_LINK_LIBRARIES( ZlibMgr gemrb_core ${ZLIB_LIBRARY} )
+
+INSTALL(TARGETS ZlibMgr DESTINATION ${PLUGIN_INSTALL_DIR} )
