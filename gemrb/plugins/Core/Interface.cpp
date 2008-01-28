@@ -2106,6 +2106,10 @@ bool Interface::LoadConfig(const char* filename)
 	FixPath( GemRBPath, true );
 	FixPath( GemRBOverride, true );
 
+	if (GamePath[0]) {
+		FixPath( GamePath, true );
+	}
+
 	FixPath( SavePath, false );
 	mkdir( SavePath, S_IREAD|S_IWRITE|S_IEXEC );
 	chmod( SavePath, S_IREAD|S_IWRITE|S_IEXEC );

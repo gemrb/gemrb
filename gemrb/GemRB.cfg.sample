@@ -121,12 +121,6 @@ CaseSensitive=1
 #####################################################
 #  Paths                                            #
 #####################################################
-#                                                   #
-#  Note: You have to terminate all paths with the   #
-#  path separator character ('\' for Windows users, #
-#  '/' for Linux users)                             #
-#                                                   #
-#####################################################
 
 #####################################################
 #  Game Paths [String]                              #
