@@ -1,0 +1,33 @@
+BUILDING GEMRB FROM SVN SOURCES ON WINDOWS
+---------------------------------------
+$Id: Building.txt 5014 2008-01-28 11:18:03Z lynxlupodian $
+
+
+Tools you will need to build GemRB from SVN:
+  - subversion - SVN
+  - cmake
+  - MinGW automated installer and utilities (base, g++, make)
+
+Libraries:
+  - ZLib
+  - Python 2.3 or better, compiled with shared libraries
+  - SDL 1.2
+  - OpenAL
+  - libpng
+
+
+Building GemRB
+----------------------------
+
+The following commands will try to configure, make and install GemRB.
+  mkdir build
+  cd build
+  cmake .. -G "MinGW MakeFiles"
+  mingw32-make
+  mingw32-make install
+
+By default, GemRB is installed into c:\Program Files\GemRB . Supporting
+files are mostly installed into the same directory.
+
+See the following for an extensive build walkthrough:
+http://forums.gibberlings3.net/index.php?showtopic=13087
