@@ -46,7 +46,7 @@
 #include <conio.h>
 #define textcolor(i) SetConsoleTextAttribute(hConsole, i)
 
-#ifndef __MINGW32
+#ifndef __MINGW32__
 #define printf cprintf //broken in mingw !!
 #else
 #define HAVE_SNPRINTF
