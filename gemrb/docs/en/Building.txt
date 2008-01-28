@@ -19,6 +19,7 @@ Libraries:
   - Python 2.3 or better, compiled with shared libraries (*)
   - SDL 1.2
   - OpenAL
+  - libpng
 
 (*) On some systems it means you have to build and install Python manually.
     Specify --enable-shared option when running Python's configure.
