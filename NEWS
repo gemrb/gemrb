@@ -8,6 +8,7 @@ GemRB V0.3.0 (2008-xx-yy):
     - a few more actions, triggers and effects
     - loading of projectile explosion animations
     - kit information window
+    - optional CMake build system (windows only)
 
   Improved features:
     - sound (now perfect on linux!)
