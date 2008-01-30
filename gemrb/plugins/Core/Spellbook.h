@@ -165,9 +165,12 @@ public:
 	static void ReleaseMemory();
 
 	void FreeSpellPage(CRESpellMemorization* sm);
-	/** Check if the spell exists, optionally deplete it (casting) */
+	/** Check if the spell is memorised, optionally deplete it (casting) */
 	bool HaveSpell(const char *resref, ieDword flags);
 	bool HaveSpell(int spellid, ieDword flags);
+        /** Check if the spell is in the book */
+	bool KnowSpell(const char *resref);
+	bool KnowSpell(int spellid);
 
 	bool AddSpellMemorization(CRESpellMemorization* sm);
 	int GetTypes() const;

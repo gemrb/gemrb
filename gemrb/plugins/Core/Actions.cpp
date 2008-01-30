@@ -546,6 +546,25 @@ void GameScript::TeleportParty(Scriptable* /*Sender*/, Action* parameters)
 	}
 }
 
+//add some animation effects too?
+void GameScript::ExitPocketPlane(Scriptable* /*Sender*/, Action* /*parameters*/)
+{
+	Game *game = core->GetGame();
+	int i = game->GetPartySize(false);
+	if (!i) return;
+	Actor *actor = game->GetPC(0, false);
+	ieResRef area;
+	Point p((short) actor->GetStat(IE_SAVEDXPOS), (short) actor->GetStat(IE_SAVEDYPOS) );
+        //FIXME: calculate area
+        //This action is not working now!!!
+        memcpy(area,actor->GetCurrentArea(),sizeof(ieResRef) );
+        //end of hack
+	while (i--) {
+		Actor *tar = game->GetPC(i, false);
+		MoveBetweenAreasCore( tar, area, p, -1, true);
+	}
+}
+
 //moves pcs and npcs from an area to another area
 void GameScript::MoveGlobalsTo(Scriptable* /*Sender*/, Action* parameters)
 {

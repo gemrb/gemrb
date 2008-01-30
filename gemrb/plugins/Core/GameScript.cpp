@@ -213,6 +213,7 @@ static const TriggerLink triggernames[] = {
 	{"isweather", GameScript::IsWeather, 0}, //gemrb extension
 	{"itemisidentified", GameScript::ItemIsIdentified, 0},
 	{"kit", GameScript::Kit, 0},
+	{"knowspell", GameScript::KnowSpell, 0}, //gemrb specific
 	{"lastmarkedobject", GameScript::LastMarkedObject_Trigger, 0},
 	{"lastpersontalkedto", GameScript::LastPersonTalkedTo, 0}, //pst
 	{"level", GameScript::Level, 0},
@@ -524,6 +525,7 @@ static const ActionLink actionnames[] = {
 	{"escapeareadestroy", GameScript::EscapeAreaDestroy, 0},
 	{"escapeareaobject", GameScript::EscapeAreaObject, 0},
 	{"escapeareaobjectnosee", GameScript::EscapeAreaObjectNoSee, 0},
+	{"exitpocketplane", GameScript::ExitPocketPlane, 0}, 
 	{"expansionendcredits", GameScript::QuitGame, 0},//ends game too
 	{"explore", GameScript::Explore, 0},
 	{"exploremapchunk", GameScript::ExploreMapChunk, 0},

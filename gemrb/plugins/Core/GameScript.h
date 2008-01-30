@@ -812,6 +812,7 @@ public: //Script Functions
 	static int IsWeather(Scriptable* Sender, Trigger* parameters);
 	static int ItemIsIdentified(Scriptable* Sender, Trigger* parameters);
 	static int Kit(Scriptable* Sender, Trigger* parameters);
+	static int KnowSpell(Scriptable* Sender, Trigger* parameters);
 	static int LastMarkedObject_Trigger(Scriptable* Sender, Trigger* parameters);
 	static int LastPersonTalkedTo(Scriptable* Sender, Trigger* parameters);
 	static int Level(Scriptable* Sender, Trigger* parameters);
@@ -1087,6 +1088,7 @@ public:
 	static void EquipMostDamagingMelee(Scriptable *Sender, Action *parameters);
 	static void EquipRanged(Scriptable *Sender, Action *parameters);
 	static void EquipWeapon(Scriptable *Sender, Action *parameters);
+	static void ExitPocketPlane(Scriptable* Sender, Action* parameters);
 	static void ExpansionEndCredits(Scriptable* Sender, Action* parameters);
 	static void Explore(Scriptable *Sender, Action *parameters);
 	static void ExploreMapChunk(Scriptable *Sender, Action *parameters);

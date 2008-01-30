@@ -190,6 +190,45 @@ bool Spellbook::HaveSpell(int spellid, ieDword flags)
 	return false;
 }
 
+bool Spellbook::KnowSpell(int spellid)
+{
+	int type = spellid/1000;
+	if (type>4) {
+		return false;
+	}
+	type = sections[type];
+	spellid = spellid % 1000;
+
+	for (unsigned int j = 0; j < GetSpellLevelCount(type); j++) {
+		CRESpellMemorization* sm = spells[type][j];
+		for (unsigned int k = 0; k < sm->memorized_spells.size(); k++) {
+			CREKnownSpell* ks = sm->known_spells[k];
+			if (atoi(ks->SpellResRef+4)==spellid) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+//if resref=="" then it is a knownanyspell
+bool Spellbook::KnowSpell(const char *resref)
+{
+	for (int i = 0; i < NUM_BOOK_TYPES; i++) {
+		for (unsigned int j = 0; j < spells[i].size(); j++) {
+			CRESpellMemorization* sm = spells[i][j];
+			for (unsigned int k = 0; k < sm->memorized_spells.size(); k++) {
+				CREKnownSpell* ks = sm->known_spells[k];
+				if (resref[0] && stricmp(ks->SpellResRef, resref) ) {
+					continue;
+				}
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 //if resref=="" then it is a haveanyspell
 bool Spellbook::HaveSpell(const char *resref, ieDword flags)
 {

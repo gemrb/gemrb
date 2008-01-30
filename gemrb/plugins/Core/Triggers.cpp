@@ -1161,6 +1161,18 @@ int GameScript::HaveSpellParty(Scriptable* /*Sender*/, Trigger *parameters)
 	return 0;
 }
 
+int GameScript::KnowSpell(Scriptable *Sender, Trigger *parameters)
+{
+	if (Sender->Type!=ST_ACTOR) {
+		return 0;
+	}
+	Actor *actor = (Actor *) Sender;
+	if (parameters->string0Parameter[0]) {
+		return actor->spellbook.KnowSpell(parameters->string0Parameter);
+	}
+	return actor->spellbook.KnowSpell(parameters->int0Parameter);
+}
+
 int GameScript::True(Scriptable * /* Sender*/, Trigger * /*parameters*/)
 {
 	return 1;
