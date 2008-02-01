@@ -331,7 +331,7 @@ def GetStatOverview (pc):
 			XP1 = GemRB.GetTableValue (XPTable, XP1, str(Level))
 			GemRB.SetToken("EXPERIENCE", str (XP1) )
 
-			stats.append ( (GemRB.GetString(19720),"",'b') )
+			stats.append ( (GemRB.GetString(19720),"",'d') )
 			stats.append (None)
 
 			# the second class
@@ -346,7 +346,7 @@ def GetStatOverview (pc):
 			# remove the first class's XP from IE_XP
 			XP2 = GemRB.GetPlayerStat (pc, IE_XP) - XP1
 			GemRB.SetToken("EXPERIENCE", str (XP2) )
-			stats.append ( (GemRB.GetString(16480),"",'b') )
+			stats.append ( (16480,1,'c') )
 			stats.append (None)
 		else: # multi classed
 			stats.append ( (19721,1,'c') )
@@ -360,7 +360,7 @@ def GetStatOverview (pc):
 				GemRB.SetToken("NEXTLEVEL", GetNextLevelExp (Level, Class) )
 				GemRB.SetToken("EXPERIENCE", str (GemRB.GetPlayerStat (pc, IE_XP)/MultiCount ) )
 				#resolve string immediately
-				stats.append ( (GemRB.GetString(16480),"",'b') )
+				stats.append ( (GemRB.GetString(16480),"",'d') )
 				stats.append (None)
 
 	else: # single classed
@@ -532,6 +532,8 @@ def GetStatOverview (pc):
 				res.append ("[capital=0]"+strref+": "+str(val) )
 			elif type == 'c': #normal string
 				res.append ("[capital=0]"+GemRB.GetString (strref) )
+			elif type == 'd': #strref is an already resolved string
+				res.append ("[capital=0]"+strref)
 			elif type == '0': #normal value
 				res.append (GemRB.GetString (strref) + ': ' + str (val) )
 			else: #normal value + type character, for example percent sign
