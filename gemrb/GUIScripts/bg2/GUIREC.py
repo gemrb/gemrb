@@ -150,8 +150,7 @@ def UpdateRecordsWindow ():
 
 	# dual-classable
 	Button = GemRB.GetControl (Window, 0)
-	Dual = IsDualClassed (pc,0)
-	if Dual[0] == 1:
+	if CanDualClass (pc):
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
 	else:
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
@@ -802,6 +801,21 @@ def IsDualClassed(actor, verbose):
 			return (1,-1,-1)
 		else:
 			return (0,-1,-1)
+
+def CanDualClass(actor):
+	Dual = IsDualClassed (actor,0)
+	if Dual[0] > 0:
+		return 1
+
+	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
+	ClassTable = GemRB.LoadTable ("classes")
+	ClassIndex = GemRB.FindTableValue (ClassTable, 5, Class)
+	Multi = GemRB.GetTableValue (ClassTable, ClassIndex, 4)
+	if Multi:
+		return 1
+
+	return 0
+	# TODO add other limitations for class, alignment and stats
 
 def KitInfoWindow():
 	global KitInfoWindow
