@@ -100,7 +100,7 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	if Gears:
 		# Gears (time)
 		Button = GemRB.GetControl (Window, 9)
-		GemRB.SetAnimation (Window, Button, "CGEAR")
+		GemRB.SetAnimation (Window, Button, "CPEN")
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 		rb = 11
@@ -203,7 +203,7 @@ def OpenActionsWindowControls (Window):
 	ActionsWindow = Window
 	# Gears (time) when options pane is down
 	Button = GemRB.GetControl (Window, 62)
-	GemRB.SetAnimation (Window, Button, "CGEAR")
+	GemRB.SetAnimation (Window, Button, "CPEN")
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 	UpdateActionsWindow ()
@@ -429,24 +429,37 @@ def EquipmentPressed ():
 	UpdateActionsWindow ()
 	return
 
-def GetActorClassTitle (actor):
-	ClassTitle = GemRB.GetPlayerStat (actor, IE_TITLE1)
+def GetKitIndex (actor):
+	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
+	KitTable = GemRB.LoadTable ("kitlist")
 	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
 	KitIndex = 0
+
 	if Kit&0xc000ffff == 0x40000000:
+		print "Kit value: 0x%04X"%Kit
 		KitIndex = Kit>>16 & 0xfff
-	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
-	ClassTable = GemRB.LoadTable ("classes")
-	Class = GemRB.FindTableValue ( ClassTable, 5, Class )
-	KitTable = GemRB.LoadTable ("kitlist")
 
 	#looking for kit by the usability flag
 	if KitIndex == 0:
 		KitIndex = GemRB.FindTableValue (KitTable, 6, Kit)
 		if KitIndex == -1:
 			KitIndex = 0
- 		elif Class != GemRB.GetTableValue (KitTable, KitIndex, 5):
+# not sure if this check is needed, even the odd barbarian which is mentioned in
+# the kitlist with the fighter class id, has the matching id in classes.2da
+		elif Class != GemRB.GetTableValue (KitTable, KitIndex, 7):
+			print "KitIndex before hack", KitIndex
 			KitIndex = 0
+
+	return KitIndex
+
+def GetActorClassTitle (actor):
+	ClassTitle = GemRB.GetPlayerStat (actor, IE_TITLE1)
+
+	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
+	ClassTable = GemRB.LoadTable ("classes")
+	Class = GemRB.FindTableValue ( ClassTable, 5, Class )
+	KitTable = GemRB.LoadTable ("kitlist")
+	KitIndex = GetKitIndex (actor)
 
 	if ClassTitle == 0:
 		if KitIndex == 0:
