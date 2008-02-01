@@ -312,11 +312,23 @@ def GetStatOverview (pc):
 				ClassTitle = GemRB.GetString(GemRB.GetTableValue (ClassTable, Dual[1], 2))
 			GemRB.SetToken("CLASS", ClassTitle)
 
-			Level = GemRB.GetPlayerStat (pc, Levels[1]) # verify
+			Level = GemRB.GetPlayerStat (pc, Levels[1])
 			GemRB.SetToken("LEVEL", str (Level) )
 
-			# FIXME: find out what is the real old XP
-			XP1 = GemRB.GetPlayerStat (pc, IE_XP) / 17/2*Level
+			# the xp table contains only classes
+			XPTable = GemRB.LoadTable ("xplevel")
+			if Dual[0] == 2:
+				XP1 = GemRB.GetTableRowName (XPTable, Dual[1])
+			else:
+				KitTable = GemRB.LoadTable ("kitlist")
+				BaseClass = GetKitIndex (pc)
+				BaseClass = GemRB.GetTableValue (KitTable, BaseClass, 7)
+				BaseClass = GemRB.GetTableRowName (ClassTable, BaseClass)
+				XP1 = GemRB.GetTableRowName (XPTable, BaseClass)
+			# the first class' XP is discarded and set to the minimum level 
+			# requirement, so if you don't dual class right after a levelup, 
+			# the game would eat some of your XP
+			XP1 = GemRB.GetTableValue (XPTable, XP1, str(Level))
 			GemRB.SetToken("EXPERIENCE", str (XP1) )
 
 			stats.append ( (GemRB.GetString(19720),"",'b') )
@@ -327,7 +339,7 @@ def GetStatOverview (pc):
 			GemRB.SetToken("CLASS", ClassTitle)
 			Class = GemRB.GetTableRowName (ClassTable, Dual[2])
 
-			Level = GemRB.GetPlayerStat (pc, Levels[0]) # verify
+			Level = GemRB.GetPlayerStat (pc, Levels[0])
 			GemRB.SetToken("LEVEL", str (Level) )
 			GemRB.SetToken("NEXTLEVEL", GetNextLevelExp (Level, Class) )
 
