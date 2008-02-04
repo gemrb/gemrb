@@ -239,7 +239,7 @@ void BMPImp::Read4To8(void *rpixels)
 	for (int i = Height; i; i--) {
 		dest -= Width;
 		for (unsigned int j=0;j<Width;j++) {
-			if (j) {
+			if (!(j&1)) {
 				dest[j] = ((unsigned) src[j/2])>>4;
 			} else {
 				dest[j] = src[j/2]&15;
