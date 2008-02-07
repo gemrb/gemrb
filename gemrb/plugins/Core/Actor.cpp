@@ -23,7 +23,7 @@
 #include <cassert>
 #include "TableMgr.h"
 #include "ResourceMgr.h"
-#include "SoundMgr.h" //pst (react to death sounds)
+#include "Audio.h" //pst (react to death sounds)
 #include "Actor.h"
 #include "Interface.h"
 #include "../../includes/strrefs.h"
@@ -1579,7 +1579,7 @@ void Actor::ReactToDeath(const char * deadname)
 			for(count=0;count<8 && resref[count]!=',';count++);
 			resref[count]=0;
 
-			ieDword len = core->GetSoundMgr()->Play( resref );
+			ieDword len = core->GetAudioDrv()->Play( resref );
 			ieDword counter = ( AI_UPDATE_TIME * len ) / 1000;
 			if (counter != 0)
 				SetWait( counter );

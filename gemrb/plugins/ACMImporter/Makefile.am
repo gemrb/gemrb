@@ -1,6 +1,6 @@
 plugin_LTLIBRARIES = libACMImporter.la
 INCLUDES = $(all_includes)
-libACMImporter_la_LDFLAGS = -module -version-info 0:0:0 @SDL_LIBS@ @LIBPTHREAD@ @OPENAL_LIBS@
+libACMImporter_la_LDFLAGS = -module -version-info 0:0:0 @SDL_LIBS@ @LIBPTHREAD@
 libACMImporter_la_METASOURCES = AUTO
-libACMImporter_la_SOURCES = unpacker.cpp riffhdr.cpp readers.cpp decoder.cpp ACMImporterCD.cpp ACMImporter.cpp ACMImp.cpp AmbientMgrAL.cpp StackLock.cpp
-noinst_HEADERS = ACMImp.h ACMImporterCD.h decoder.h general.h readers.h riffhdr.h unpacker.h AmbientMgrAL.h StackLock.h
+libACMImporter_la_SOURCES = unpacker.cpp riffhdr.cpp readers.cpp decoder.cpp ACMImporterCD.cpp ACMImporter.cpp ACMImp.cpp StackLock.cpp
+noinst_HEADERS = ACMImp.h ACMImporterCD.h decoder.h general.h readers.h riffhdr.h unpacker.h StackLock.h

@@ -45,7 +45,7 @@ unsigned int NullSnd::Play(const char*, int, int, unsigned int)
 	return 1000; //Returning 1 Second Length
 }
 
-unsigned int NullSnd::StreamFile(const char*)
+int NullSnd::StreamFile(const char*)
 {
 	return 0;
 }

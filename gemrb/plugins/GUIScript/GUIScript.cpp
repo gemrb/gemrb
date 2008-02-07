@@ -26,7 +26,7 @@
 #include "../Core/GameControl.h"
 #include "../Core/WorldMapControl.h"
 #include "../Core/MapControl.h"
-#include "../Core/SoundMgr.h"
+#include "../Core/Audio.h"
 #include "../Core/GSUtils.h" //checkvariable
 #include "../Core/TileMap.h"
 #include "../Core/ResourceMgr.h"
@@ -252,7 +252,7 @@ static int GetCreatureStrRef(unsigned int Slot, unsigned int Str)
 	if (!actor || Str>=VCONST_COUNT) {
 		return 0xdadadada;
 	}
-	
+
 	return actor->StrRefs[Str];
 }
 
@@ -269,7 +269,7 @@ static int GetCreatureStat(unsigned int Slot, unsigned int StatID, int Mod)
 	if (!actor) {
 		return 0xdadadada;
 	}
-	
+
 	if (Mod) {
 		return actor->GetStat( StatID );
 	}
@@ -1948,20 +1948,20 @@ static PyObject* GemRB_SetButtonOverlay(PyObject * /*self*/, PyObject* args)
 	double Clipping;
 	int r1,g1,b1,a1;
 	int r2,g2,b2,a2;
-	
+
 	if (!PyArg_ParseTuple( args, "iidiiiiiiii", &WindowIndex, &ControlIndex,
 		&Clipping, &r1, &g1, &b1, &a1, &r2, &g2, &b2, &a2)) {
 		return AttributeError( GemRB_SetButtonOverlay__doc );
 	}
-	
+
 	Button* btn = ( Button* ) GetControl(WindowIndex, ControlIndex, IE_GUI_BUTTON);
 	if (!btn) {
 		return NULL;
 	}
-	
+
 	const Color src = { r1, g1, b1, a1 };
 	const Color dest = { r2, g2, b2, a2 };
-	
+
 	if (Clipping<0.0) Clipping = 0.0;
 	else if (Clipping>1.0) Clipping = 1.0;
 	//can't call clipping, because the change of ratio triggers color change
@@ -3019,7 +3019,7 @@ static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_PlaySound__doc );
 	}
 
-	int ret = core->GetSoundMgr()->Play( ResRef );
+	int ret = core->GetAudioDrv()->Play( ResRef );
 	if (!ret) {
 		return NULL;
 	}
@@ -4707,7 +4707,7 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 		//no incref here!
 		return Py_None;
 	}
-	
+
 	btn->SetFlags( IE_GUI_BUTTON_PICTURE, BM_OR );
 	Sprite2D* Picture;
 	bool setpicture = true;
@@ -4744,7 +4744,7 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 	default:
 		Picture = NULL;
 	}
-	
+
 	if (setpicture)
 		btn->SetPicture( Picture );
 	if (tooltip) {
@@ -4753,7 +4753,7 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 		//this will free str, no need of freeing it
 		SetFunctionTooltip(wi, ci, str, Function);
 	}
-	
+
 	core->FreeItem( item, ItemResRef, false );
 	//no incref here!
 	return Py_None;
@@ -5041,7 +5041,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	if (Sound[0]) {
-		core->GetSoundMgr()->Play(Sound);
+		core->GetAudioDrv()->Play(Sound);
 	}
 
 	Py_INCREF( Py_None );
@@ -5669,7 +5669,7 @@ PyDoc_STRVAR( GemRB_UpdateMusicVolume__doc,
 
 static PyObject* GemRB_UpdateMusicVolume(PyObject * /*self*/, PyObject* /*args*/)
 {
-	core->GetSoundMgr()->UpdateVolume( GEM_SND_VOL_MUSIC );
+	core->GetAudioDrv()->UpdateVolume( GEM_SND_VOL_MUSIC );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -5681,7 +5681,7 @@ PyDoc_STRVAR( GemRB_UpdateAmbientsVolume__doc,
 
 static PyObject* GemRB_UpdateAmbientsVolume(PyObject * /*self*/, PyObject* /*args*/)
 {
-	core->GetSoundMgr()->UpdateVolume( GEM_SND_VOL_AMBIENTS );
+	core->GetAudioDrv()->UpdateVolume( GEM_SND_VOL_AMBIENTS );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -6408,7 +6408,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		core->FreeItem(item, si->ItemResRef,0);
 	}
 	if (Sound[0]) {
-		core->GetSoundMgr()->Play(Sound);
+		core->GetAudioDrv()->Play(Sound);
 	}
 	core->DragItem (si, ResRef);
 	Py_INCREF( Py_None );
@@ -6467,7 +6467,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 			}
 			core->FreeItem(item, si->ItemResRef,0);
 			if (Sound[0]) {
-				core->GetSoundMgr()->Play(Sound);
+				core->GetAudioDrv()->Play(Sound);
 			}
 		}
 		if (res == 2) {
@@ -6550,7 +6550,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		}
 	}
 	if (Sound[0]) {
-		core->GetSoundMgr()->Play(Sound);
+		core->GetAudioDrv()->Play(Sound);
 	}
 	return PyInt_FromLong( res );
 }
@@ -7883,7 +7883,7 @@ static PyObject* GemRB_SetTooltipDelay(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "i", &tooltipDelay)) {
 		return AttributeError( GemRB_SetTooltipDelay__doc );
 	}
-	
+
 	core->TooltipDelay = tooltipDelay;
 
 	Py_INCREF( Py_None );

@@ -10,7 +10,7 @@
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 * GNU General Public License for more details.
- 
+
 * You should have received a copy of the GNU General Public License
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -38,6 +38,7 @@
 #endif
 
 #include "Interface.h"
+#include "Audio.h"
 #include "FileStream.h"
 #include "AnimationMgr.h"
 #include "ArchiveImporter.h"
@@ -109,6 +110,7 @@ Interface::Interface(int iargc, char* iargv[])
 	printf( "GemRB Core Version v%s Loading...\n", VERSION_GEMRB );
 	projserv = NULL;
 	video = NULL;
+	AudioDriver = NULL ;
 	key = NULL;
 	strings = NULL;
 	guiscript = NULL;
@@ -117,7 +119,6 @@ Interface::Interface(int iargc, char* iargv[])
 	tokens = NULL;
 	RtRows = NULL;
 	music = NULL;
-	soundmgr = NULL;
 	sgiterator = NULL;
 	INIparty = NULL;
 	INIbeasts = NULL;
@@ -317,8 +318,8 @@ Interface::~Interface(void)
 		music->HardEnd();
 	}
 	// stop any ambients which are still enqueued
-	if (soundmgr) {
-		AmbientMgr *ambim = soundmgr->GetAmbientMgr();
+	if (AudioDriver) {
+		AmbientMgr *ambim = AudioDriver->GetAmbientMgr();
 		if (ambim) ambim->deactivate();
 	}
 	//destroy the highest objects in the hierarchy first!
@@ -347,7 +348,7 @@ Interface::~Interface(void)
 	free( slotmatrix );
 
 	FreeInterface( music );
-	FreeInterface( soundmgr );
+	FreeInterface( AudioDriver );
 
 	delete sgiterator;
 
@@ -584,7 +585,7 @@ void Interface::HandleFlags()
 		QuitFlag &= ~QF_ENTERGAME;
 		if (game) {
 			timer->Init();
-	
+
 			//rearrange party slots
 			game->ConsolidateParty();
 			GameControl* gc = StartGameControl();
@@ -1128,7 +1129,7 @@ int Interface::LoadSprites()
 				printStatus( "ERROR", LIGHT_RED );
 				return GEM_ERROR;
 			}
-	
+
 			for (int i = 0; i < 6; i++) {
 				Sprite2D* sprite = anim->GetFrame( 0, (ieByte) i );
 				if (GroundCircleScale[size]) {
@@ -1149,7 +1150,7 @@ int Interface::LoadSprites()
 	if (table < 0) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "Cannot find fonts.2da.\nTermination in Progress...\n" );
-		return GEM_ERROR;	
+		return GEM_ERROR;
 	} else {
 		AnimationMgr* bamint = ( AnimationMgr* ) GetInterface( IE_BAM_CLASS_ID );
 		if (!bamint) {
@@ -1175,7 +1176,7 @@ int Interface::LoadSprites()
 			}
 			strncpy( fnt->ResRef, ResRef, 8 );
 			if (needpalette) {
-		
+
 				Color fore = {0xff, 0xff, 0xff, 0};
 				Color back = {0x00, 0x00, 0x00, 0};
 				if (!strnicmp( TooltipFont, ResRef, 8) ) {
@@ -1422,7 +1423,7 @@ int Interface::Init()
 
 	int ret = LoadSprites();
 	if (ret) return ret;
-	 
+
 	Sprite2D *tmpsprite = GetCursorSprite();
 	printMessage( "Core", "Setting up the Console...", WHITE );
 	QuitFlag = QF_CHANGESCRIPT;
@@ -1439,13 +1440,13 @@ int Interface::Init()
 	console->SetCursor (tmpsprite);
 	printStatus( "OK", LIGHT_GREEN );
 
-	printMessage( "Core", "Starting up the Sound Manager...", WHITE );
-	soundmgr = ( SoundMgr * ) GetInterface( IE_WAV_CLASS_ID );
-	if (soundmgr == NULL) {
+	printMessage( "Core", "Starting up the Sound Driver...", WHITE );
+	AudioDriver = ( Audio * ) GetInterface( IE_AUDIO_CLASS_ID );
+	if (AudioDriver == NULL) {
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
 	}
-	if (!soundmgr->Init()) {
+	if (!AudioDriver->Init()) {
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
 	}
@@ -3189,11 +3190,6 @@ void Interface::DrawConsole()
 }
 
 /** Get the Sound Manager */
-SoundMgr* Interface::GetSoundMgr() const
-{
-	return soundmgr;
-}
-/** Get the Sound Manager */
 SaveGameIterator* Interface::GetSaveGameIterator() const
 {
 	return sgiterator;
@@ -3429,7 +3425,7 @@ int Interface::PlayMovie(const char* ResRef)
 	//shutting down music and ambients before movie
 	if (music)
 		music->HardEnd();
-	AmbientMgr *ambim = soundmgr->GetAmbientMgr();
+	AmbientMgr *ambim = AudioDriver->GetAmbientMgr();
 	if (ambim) ambim->deactivate();
 	video->SetMovieFont(SubtitleFont, palette );
 	mp->CallBackAtFrames(cnt, frames, strrefs);
@@ -3677,8 +3673,8 @@ void Interface::QuitGame(int BackToMain)
 		music->HardEnd();
 	}
 	// stop any ambients which are still enqueued
-	if (soundmgr) {
-		AmbientMgr *ambim = soundmgr->GetAmbientMgr();
+	if (AudioDriver) {
+		AmbientMgr *ambim = AudioDriver->GetAmbientMgr();
 		if (ambim) ambim->deactivate();
 	}
 	//delete game, worldmap
@@ -4858,7 +4854,7 @@ void Interface::DoTheStoreHack(Store *s)
 void Interface::PlaySound(int index)
 {
 	if (index<=DSCount) {
-		soundmgr->Play(DefSound[index]);
+		AudioDriver->Play(DefSound[index]);
 	}
 }
 
@@ -5314,7 +5310,7 @@ ieDword *Interface::GetListFrom2DA(const ieResRef resref)
 }
 
 //returns a numeric value associated with a stat name (symbol) from stats.ids
-ieDword Interface::TranslateStat(const char *stat_name) 
+ieDword Interface::TranslateStat(const char *stat_name)
 {
 	long tmp;
 

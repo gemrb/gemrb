@@ -22,7 +22,7 @@
 #include "../../includes/win32def.h"
 #include "TLKImp.h"
 #include "../Core/Interface.h"
-#include "../Core/SoundMgr.h"
+#include "../Core/Audio.h"
 #include "../Core/Game.h"
 #include "../Core/GameControl.h"
 
@@ -515,7 +515,7 @@ empty:
 			int ypos = 0;
 			unsigned int flag = GEM_SND_RELATIVE | (flags&GEM_SND_SPEECH);
 			//IE_STR_SPEECH will stop the previous sound source
-			core->GetSoundMgr()->Play( SoundResRef, xpos, ypos, flag);
+			core->GetAudioDrv()->Play( SoundResRef, xpos, ypos, flag);
 		}
 	}
 	if (flags & IE_STR_STRREFON) {

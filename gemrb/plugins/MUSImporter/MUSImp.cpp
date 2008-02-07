@@ -22,7 +22,7 @@
 #include "../../includes/win32def.h"
 #include "MUSImp.h"
 #include "../Core/Interface.h"
-#include "../Core/SoundMgr.h"
+#include "../Core/Audio.h"
 
 static char musicsubfolder[6] = "music";
 
@@ -59,7 +59,7 @@ bool MUSImp::OpenPlaylist(const char* name)
 	if (Playing) {
 		return false;
 	}
-	core->GetSoundMgr()->ResetMusics();
+	core->GetAudioDrv()->ResetMusics();
 	playlist.clear();
 	PLpos = 0;
 	if (name[0] == '*') {
@@ -193,7 +193,7 @@ void MUSImp::Start()
 				PLnext = -1;
 		}
 		PlayMusic( PLpos );
-		core->GetSoundMgr()->Play();
+		core->GetAudioDrv()->Play();
 		lastSound = playlist[PLpos].soundID;
 		Playing = true;
 	}
@@ -214,7 +214,7 @@ void MUSImp::End()
 
 void MUSImp::HardEnd()
 {
-	core->GetSoundMgr()->Stop();
+	core->GetAudioDrv()->Stop();
 	Playing = false;
 	PLpos = 0;
 }
@@ -265,7 +265,7 @@ void MUSImp::PlayNext()
 		}
 	} else {
 		Playing = false;
-		core->GetSoundMgr()->Stop();
+		core->GetAudioDrv()->Stop();
 	}
 }
 
@@ -278,11 +278,11 @@ void MUSImp::PlayMusic(char* name)
 {
 	char FName[_MAX_PATH];
 	if (strnicmp( name, "mx9000", 6 ) == 0) { //iwd2
-		snprintf( FName, _MAX_PATH, "%s%s%smx9000%s%s.acm", 
+		snprintf( FName, _MAX_PATH, "%s%s%smx9000%s%s.acm",
 			core->GamePath, musicsubfolder, SPathDelimiter,
 			SPathDelimiter, name);
 	} else if (strnicmp( name, "mx0000", 6 ) == 0) { //iwd
-		snprintf( FName, _MAX_PATH, "%s%s%smx0000%s%s.acm", 
+		snprintf( FName, _MAX_PATH, "%s%s%smx0000%s%s.acm",
 			core->GamePath, musicsubfolder, SPathDelimiter,
 			SPathDelimiter, name);
 	} else if (strnicmp( name, "SPC", 3 ) != 0) { //bg2
@@ -298,9 +298,9 @@ void MUSImp::PlayMusic(char* name)
 #ifndef WIN32
 		ResolveFilePath( FName );
 #endif
-	int soundID = core->GetSoundMgr()->StreamFile( FName );
+	int soundID = core->GetAudioDrv()->StreamFile( FName );
 	if (soundID == -1) {
-		core->GetSoundMgr()->Stop();
+		core->GetAudioDrv()->Stop();
 	}
 	printf( "Playing: %s\n", FName );
 }

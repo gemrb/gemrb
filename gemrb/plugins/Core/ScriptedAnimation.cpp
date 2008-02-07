@@ -23,7 +23,7 @@
 #include "ScriptedAnimation.h"
 #include "Interface.h"
 #include "ResourceMgr.h"
-#include "SoundMgr.h"
+#include "Audio.h"
 #include "Video.h"
 #include "Game.h"
 
@@ -229,7 +229,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 			delete( stream );
 		return;
 	}
-	ieResRef Anim1ResRef; 
+	ieResRef Anim1ResRef;
 	ieDword seq1, seq2, seq3;
 	stream->ReadResRef( Anim1ResRef );
 	//there is no proof it is a second resref
@@ -294,7 +294,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 				anims[p_onset]->gameAnimation=true;
 				anims[p_onset]->Flags |= S_ANI_PLAYONCE;
 			}
-			
+
 			c = seq2;
 			if (c) {
 				switch (FaceTarget) {
@@ -308,10 +308,10 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 					c=i;
 					break;
 				}
-				anims[p_hold] = af->GetCycle( c ); 
+				anims[p_hold] = af->GetCycle( c );
 				if (anims[p_hold]) {
 					PrepareAnimation(anims[p_hold], Transparency);
-					
+
 					anims[p_hold]->pos=0;
 					anims[p_hold]->gameAnimation=true;
 					if (!(SequenceFlags&IE_VVC_LOOP) ) {
@@ -319,7 +319,7 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 					}
 				}
 			}
-			
+
 			c = seq3;
 			if (c) {
 				switch (FaceTarget) {
@@ -333,10 +333,10 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 					c=i;
 					break;
 				}
-				anims[p_release] = af->GetCycle( ( unsigned char ) c ); 
+				anims[p_release] = af->GetCycle( ( unsigned char ) c );
 				if (anims[p_release]) {
 					PrepareAnimation(anims[p_release], Transparency);
-					
+
 					anims[p_release]->pos=0;
 					anims[p_release]->gameAnimation=true;
 					anims[p_release]->Flags |= S_ANI_PLAYONCE;
@@ -488,7 +488,7 @@ bool ScriptedAnimation::HandlePhase(Sprite2D *&frame)
 		}
 retry:
 		if (sounds[Phase][0] != 0) {
-			core->GetSoundMgr()->Play( sounds[Phase] );
+			core->GetAudioDrv()->Play( sounds[Phase] );
 		}
 	}
 

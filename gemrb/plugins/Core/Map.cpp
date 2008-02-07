@@ -33,7 +33,7 @@
 #include "ImageMgr.h"
 #include "Video.h"
 #include "ResourceMgr.h"
-#include "SoundMgr.h"
+#include "Audio.h"
 #include "MusicMgr.h"
 #include "Game.h"
 #include "WorldMap.h"
@@ -1697,7 +1697,7 @@ void Map::RemoveActor(Actor* actor)
 	size_t i=actors.size();
 	while (i--) {
 		if (actors[i] == actor) {
-			BlockSearchMap(actor->Pos, actor->size,0);
+			BlockSearchMap(actor->Pos, actor->size, PATH_MAP_FREE);
 			actors.erase( actors.begin()+i );
 			return;
 		}
@@ -2256,7 +2256,7 @@ int Map::WhichEdge(Point &s)
 //--------ambients----------------
 void Map::SetupAmbients()
 {
-	AmbientMgr *ambim = core->GetSoundMgr()->GetAmbientMgr();
+	AmbientMgr *ambim = core->GetAudioDrv()->GetAmbientMgr();
 	if (!ambim) return;
 	ambim->reset();
 	ambim->setAmbients( ambients );

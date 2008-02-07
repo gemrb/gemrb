@@ -26,7 +26,7 @@
 #include "Palette.h"
 #include "Variables.h"
 #include "GameControl.h"
-#include "SoundMgr.h"
+#include "Audio.h"
 #include "Actor.h"
 #include "ResourceMgr.h"  //for loading bmp image
 
@@ -227,7 +227,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			//the buffer is filled enough
 			return;
 		}
-		if (core->GetSoundMgr()->IsSpeaking() ) {
+		if (core->GetAudioDrv()->IsSpeaking() ) {
 			//the narrator is still talking
 			return;
 		}
@@ -454,7 +454,7 @@ void TextArea::SetFonts(Font* init, Font* text)
 void TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {
 	//Selectable=false for dialogs, rather unintuitive, but fact
-	if ((Flags & IE_GUI_TEXTAREA_SELECTABLE) || ( Key < '1' ) || ( Key > '9' )) 
+	if ((Flags & IE_GUI_TEXTAREA_SELECTABLE) || ( Key < '1' ) || ( Key > '9' ))
 		return;
 	GameControl *gc = core->GetGameControl();
 	if (gc && (gc->GetDialogueFlags()&DF_IN_DIALOG) ) {
@@ -557,7 +557,7 @@ void TextArea::CalcRowCount()
 						p++;
 						//tag[k] = tmp[p++];
 					}
-					
+
 					continue;
 				}
 				if (tmp[p] == 0) {

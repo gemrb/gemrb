@@ -24,7 +24,7 @@
 #include <sys/stat.h>
 #include "../Core/Interface.h"
 #include "../Core/Video.h"
-#include "../Core/SoundMgr.h"
+#include "../Core/Audio.h"
 #include "../Core/Variables.h"
 #include "MVEPlay.h"
 #include "libmve.h"
@@ -148,7 +148,7 @@ int MVEPlay::doPlay(const DataStream* mve)
 
 	ieDword volume;
 	core->GetDictionary()->Lookup( "Volume Movie", volume );
-	MVE_sndInit( core->GetSoundMgr()->CanPlay()?1:-1, volume );
+	MVE_sndInit( core->GetAudioDrv()->CanPlay()?1:-1, volume );
 	MVE_memCallbacks( malloc, free );
 	MVE_ioCallbacks( fileRead );
 	MVE_sfCallbacks( showFrame );

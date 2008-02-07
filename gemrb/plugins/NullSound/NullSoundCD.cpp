@@ -42,7 +42,7 @@ const char* NullSoundCD::ClassName(void)
 
 SClass_ID NullSoundCD::SuperClassID(void)
 {
-	return IE_WAV_CLASS_ID;
+	return IE_AUDIO_CLASS_ID;
 }
 
 Class_ID NullSoundCD::ClassID(void)

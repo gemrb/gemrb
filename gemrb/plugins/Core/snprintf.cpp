@@ -35,9 +35,9 @@
  *    original.  Also, there is now a builtin-test, just compile with:
  *           gcc -DTEST_SNPRINTF -o snprintf snprintf.c -lm
  *    and run snprintf for results.
- * 
+ *
  *  Thomas Roessler <roessler@guug.de> 01/27/98 for mutt 0.89i
- *    The PGP code was using unsigned hexadecimal formats. 
+ *    The PGP code was using unsigned hexadecimal formats.
  *    Unfortunately, unsigned formats simply didn't work.
  *
  *  Michael Elkins <me@cs.hmc.edu> 03/05/98 for mutt 0.90.8
@@ -61,6 +61,8 @@
  *    * added '%q[dioux]' for formatting qwords.
  *    * added '%b' for formatting in binary notation.
  **************************************************************/
+#include "../../includes/win32def.h"
+#ifndef HAVE_SNPRINTF
 
 #include <cctype>
 #include <cstring>
@@ -99,7 +101,7 @@
 #define LLONG long
 #endif
 
-static size_t dopr(char *buffer, size_t maxlen, const char *format, 
+static size_t dopr(char *buffer, size_t maxlen, const char *format,
 			    va_list args);
 static void fmtstr(char *buffer, size_t *currlen, size_t maxlen,
 				char *value, int flags, int min, int max);
@@ -666,12 +668,12 @@ static LDOUBLE abs_val(LDOUBLE value)
 static LDOUBLE POW10(int exp)
 {
 	LDOUBLE result = 1;
-	   
+
 	while (exp) {
 		result *= 10;
 		exp--;
 	}
-  
+
 	return result;
 }
 
@@ -732,14 +734,14 @@ static void fmtfp (char *buffer, size_t *currlen, size_t maxlen,
 	   int iplace = 0;
 	   int fplace = 0;
 	   int padlen = 0; /* amount to pad */
-	   int zpadlen = 0; 
+	   int zpadlen = 0;
 	   int caps = 0;
 	   int index;
 	   double intpart;
 	   double fracpart;
 	   double temp;
-  
-	   /* 
+
+	   /*
 	    * AIX manpage says the default is 0, but Solaris says the default
 	    * is 6, and sprintf on AIX defaults to 6
 	    */
@@ -767,8 +769,8 @@ static void fmtfp (char *buffer, size_t *currlen, size_t maxlen,
 	    if (max == 0) ufvalue += 0.5; /* if max = 0 we must round */
 #endif
 
-	   /* 
-	    * Sorry, we only support 16 digits past the decimal because of our 
+	   /*
+	    * Sorry, we only support 16 digits past the decimal because of our
 	    * conversion method
 	    */
 	   if (max > 16)
@@ -782,7 +784,7 @@ static void fmtfp (char *buffer, size_t *currlen, size_t maxlen,
 	   my_modf(temp, &intpart);
 
 	   fracpart = ROUND((POW10(max)) * (ufvalue - intpart));
-	   
+
 	   if (fracpart >= POW10(max)) {
 			 intpart++;
 			 fracpart -= POW10(max);
@@ -819,16 +821,16 @@ static void fmtfp (char *buffer, size_t *currlen, size_t maxlen,
 			 if (fplace == 311) fplace--;
 	   }
 	   fconvert[fplace] = 0;
-  
+
 	   /* -1 for decimal point, another -1 if we are printing a sign */
-	   padlen = min - iplace - max - 1 - ((signvalue) ? 1 : 0); 
+	   padlen = min - iplace - max - 1 - ((signvalue) ? 1 : 0);
 	   zpadlen = max - fplace;
 	   if (zpadlen < 0) zpadlen = 0;
-	   if (padlen < 0) 
+	   if (padlen < 0)
 			 padlen = 0;
-	   if (flags & DP_F_MINUS) 
+	   if (flags & DP_F_MINUS)
 			 padlen = -padlen; /* Left Justifty */
-	   
+
 	   if ((flags & DP_F_ZERO) && (padlen > 0)) {
 			 if (signvalue) {
 				    dopr_outch(buffer, currlen, maxlen, signvalue);
@@ -844,10 +846,10 @@ static void fmtfp (char *buffer, size_t *currlen, size_t maxlen,
 			 dopr_outch(buffer, currlen, maxlen, ' ');
 			 --padlen;
 	   }
-	   if (signvalue) 
+	   if (signvalue)
 			 dopr_outch(buffer, currlen, maxlen, signvalue);
-	   
-	   while (iplace > 0) 
+
+	   while (iplace > 0)
 			 dopr_outch(buffer, currlen, maxlen, iconvert[--iplace]);
 
 #ifdef DEBUG_SNPRINTF
@@ -860,11 +862,11 @@ static void fmtfp (char *buffer, size_t *currlen, size_t maxlen,
 	    */
 	   if (max > 0) {
 			 dopr_outch(buffer, currlen, maxlen, '.');
-			 
-			 while (fplace > 0) 
+
+			 while (fplace > 0)
 				    dopr_outch(buffer, currlen, maxlen, fconvert[--fplace]);
 	   }
-	   
+
 	   while (zpadlen > 0) {
 			 dopr_outch(buffer, currlen, maxlen, '0');
 			 --zpadlen;
@@ -979,3 +981,4 @@ int ht_printf(const char *fmt, ...)
 }
 
 
+#endif //HAVE_SNPRINTF

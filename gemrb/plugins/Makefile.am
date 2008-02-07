@@ -2,6 +2,7 @@ SUBDIRS = \
 	Core \
 	GUIScript \
 	SDLVideo \
+	OpenALAudio \
 	ZLibMgr \
 	2DAImporter \
 	ACMImporter \

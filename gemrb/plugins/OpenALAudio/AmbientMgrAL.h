@@ -39,7 +39,7 @@ class Ambient;
 
 class AmbientMgrAL : public AmbientMgr {
 public:
-	AmbientMgrAL() : AmbientMgr(), mutex(SDL_CreateMutex()), 
+	AmbientMgrAL() : AmbientMgr(), mutex(SDL_CreateMutex()),
 			player(NULL), cond(SDL_CreateCond()) { }
 	~AmbientMgrAL() { reset(); SDL_DestroyMutex(mutex); SDL_DestroyCond(cond); }
 	void reset();
@@ -70,11 +70,11 @@ private:
 		int enqueue();
 	};
 	std::vector<AmbientSource *> ambientSources;
-	
+
 	static int play(void *am);
 	unsigned int tick(unsigned int ticks);
 	void hardStop();
-	
+
 	SDL_mutex *mutex;
 	SDL_Thread *player;
 	SDL_cond *cond;

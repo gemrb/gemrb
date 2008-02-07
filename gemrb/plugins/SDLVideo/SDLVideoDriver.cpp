@@ -26,7 +26,7 @@
 #include <cassert>
 #include "../Core/SpriteCover.h"
 #include "../Core/Console.h"
-#include "../Core/SoundMgr.h"
+#include "../Core/Audio.h"
 #include "../Core/Palette.h"
 #include "../Core/AnimationFactory.h"
 
@@ -1411,7 +1411,7 @@ void SDLVideoDriver::SetViewport(int x, int y, unsigned int w, unsigned int h)
 void SDLVideoDriver::MoveViewportTo(int x, int y)
 {
 	if (x != Viewport.x || y != Viewport.y) {
-		core->GetSoundMgr()->UpdateListenerPos( (x - xCorr) + disp->w / 2, (y - yCorr) + disp->h / 2 );
+		core->GetAudioDrv()->UpdateListenerPos( (x - xCorr) + disp->w / 2, (y - yCorr) + disp->h / 2 );
 		Viewport.x = x;
 		Viewport.y = y;
 	}

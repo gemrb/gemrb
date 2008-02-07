@@ -25,7 +25,7 @@
 #include "TileMap.h"
 #include "Video.h"
 #include "ScriptEngine.h"
-#include "SoundMgr.h"
+#include "Audio.h"
 #include "MusicMgr.h"
 #include "Item.h"
 #include "SaveGameIterator.h"
@@ -1377,7 +1377,7 @@ void GameScript::DisplayString(Scriptable* Sender, Action* parameters)
 //DisplayStringHead, but wait for previous talk to succeed
 void GameScript::DisplayStringWait(Scriptable* Sender, Action* parameters)
 {
-	if (core->GetSoundMgr()->IsSpeaking()) {
+	if (core->GetAudioDrv()->IsSpeaking()) {
 		Sender->AddActionInFront( Sender->CurrentAction );
 		return;
 	}
@@ -1484,20 +1484,20 @@ void GameScript::SetMusic(Scriptable* Sender, Action* parameters)
 void GameScript::PlaySound(Scriptable* Sender, Action* parameters)
 {
 	printf( "PlaySound(%s)\n", parameters->string0Parameter );
-	core->GetSoundMgr()->Play( parameters->string0Parameter, Sender->Pos.x,
+	core->GetAudioDrv()->Play( parameters->string0Parameter, Sender->Pos.x,
 				Sender->Pos.y, parameters->int0Parameter );
 }
 
 void GameScript::PlaySoundPoint(Scriptable* /*Sender*/, Action* parameters)
 {
 	printf( "PlaySound(%s)\n", parameters->string0Parameter );
-	core->GetSoundMgr()->Play( parameters->string0Parameter, parameters->pointParameter.x, parameters->pointParameter.y );
+	core->GetAudioDrv()->Play( parameters->string0Parameter, parameters->pointParameter.x, parameters->pointParameter.y );
 }
 
 void GameScript::PlaySoundNotRanged(Scriptable* /*Sender*/, Action* parameters)
 {
 	printf( "PlaySound(%s)\n", parameters->string0Parameter );
-	core->GetSoundMgr()->Play( parameters->string0Parameter, 0, 0, 0);
+	core->GetAudioDrv()->Play( parameters->string0Parameter, 0, 0, 0);
 }
 
 void GameScript::Continue(Scriptable* /*Sender*/, Action* /*parameters*/)
@@ -1599,7 +1599,7 @@ void GameScript::DialogueForceInterrupt(Scriptable* Sender, Action* parameters)
 // not in IESDP but this one should affect ambients
 void GameScript::SoundActivate(Scriptable* /*Sender*/, Action* parameters)
 {
-	AmbientMgr * ambientmgr = core->GetSoundMgr()->GetAmbientMgr();
+	AmbientMgr * ambientmgr = core->GetAudioDrv()->GetAmbientMgr();
 	if (parameters->int0Parameter) {
 		ambientmgr->activate(parameters->objects[1]->objectName);
 	} else {
