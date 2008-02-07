@@ -17,7 +17,7 @@ else
   shift
 fi
 
-if [[ -n $ACLOCAL ]];
+if [ -n "$ACLOCAL" ];
 then
   my_aclocal=$ACLOCAL
 else
@@ -31,7 +31,7 @@ else
   done
 fi
 
-if [[ ! -n $my_aclocal ]];
+if [ -z "$my_aclocal" ];
 then 
   echo "***************************************************************"
   echo
@@ -43,7 +43,7 @@ then
   exit 1
 fi
 
-if [[ -n $AUTOHEADER ]];
+if [ -n "$AUTOHEADER" ];
 then
   my_autoheader=$AUTOHEADER
 else
@@ -57,7 +57,7 @@ else
   done
 fi
 
-if [[ ! -n $my_autoheader ]];
+if [ -z "$my_autoheader" ];
 then
   echo "*********************************************************************"
   echo
@@ -69,7 +69,7 @@ then
   exit 1
 fi
 
-if [[ -n $LIBTOOLIZE ]];
+if [ -n "$LIBTOOLIZE" ];
 then
   my_libtoolize=$LIBTOOLIZE
 else
@@ -83,7 +83,7 @@ else
   done
 fi
 
-if [[ ! -n $my_libtoolize ]];
+if [ -z "$my_libtoolize" ];
 then 
   echo "***************************************************************"
   echo
@@ -95,7 +95,7 @@ then
   exit 1
 fi
 
-if [[ -n $AUTOMAKE ]];
+if [ -n "$AUTOMAKE" ];
 then
   my_automake=$AUTOMAKE
 else
@@ -109,7 +109,7 @@ else
   done
 fi
 
-if [[ ! -n $my_automake ]];
+if [ -z "$my_automake" ];
 then 
   echo "***************************************************************"
   echo
@@ -121,7 +121,7 @@ then
   exit 1
 fi
 
-if [[ -n $AUTOCONF ]];
+if [ -n "$AUTOCONF" ];
 then
   my_autoconf=$AUTOCONF
 else
@@ -135,7 +135,7 @@ else
   done
 fi
 
-if [[ ! -n $my_autoconf ]];
+if [ -z "$my_autoconf" ];
 then
   echo "*****************************************************************"
   echo
