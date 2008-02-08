@@ -124,7 +124,7 @@ static const char* PlayMode()
 	ieDword playmode = 1;
 
 	core->GetDictionary()->Lookup( "PlayMode", playmode );
-	if (playmode == 2) {
+	if (playmode >= 2) {
 		return "mpsave";
 	}
 	return "save";

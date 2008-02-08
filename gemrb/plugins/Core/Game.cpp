@@ -303,8 +303,18 @@ int Game::LeaveParty (Actor* actor)
 	return ( int ) NPCs.size() - 1;
 }
 
+//determines if startpos.2da has rotation rows (it cannot have tutorial line)
+bool Game::DetermineStartPosType(TableMgr *strta)
+{
+	if ((strta->GetRowCount()>=6) && !stricmp(strta->GetRowName(4),"START_ROT" ) )
+	{
+		return true;
+	}
+	return false;
+}
 int Game::JoinParty(Actor* actor, int join)
 {
+	bool startorient = 0;
 	actor->CreateStats(); //create stats if they didn't exist yet
 	actor->InitButtons(actor->GetStat(IE_CLASS)); //init actor's buttons
 	actor->SetBase(IE_EXPLORE, 1);
@@ -314,6 +324,12 @@ int Game::JoinParty(Actor* actor, int join)
 		TableMgr* strta = core->GetTable( saindex );
 		ieDword playmode = 0;
 		core->GetDictionary()->Lookup( "PlayMode", playmode );
+		//hack for iwd2
+		startorient = DetermineStartPosType(strta);
+		if (startorient) {
+			playmode %= 2;
+			actor->SetOrientation( atoi( strta->QueryField( playmode+4, actor->InParty-1) ), false );
+		}
 		playmode *= 2;
 		actor->Pos.x = actor->Destination.x = (short) atoi( strta->QueryField( playmode, actor->InParty-1 ) );
 		actor->Pos.y = actor->Destination.y = (short) atoi( strta->QueryField( playmode + 1, actor->InParty-1 ) );
@@ -321,7 +337,7 @@ int Game::JoinParty(Actor* actor, int join)
 
 		saindex = core->LoadTable( "startare" );
 		strta = core->GetTable( saindex );
-		core->GetDictionary()->Lookup( "PlayMode", playmode );
+		playmode /= 2;
 		playmode *= 3;
 		strnlwrcpy(actor->Area, strta->QueryField( playmode, 0 ), 8 );
 		//TODO: set viewport

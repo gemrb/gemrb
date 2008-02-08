@@ -376,6 +376,8 @@ public:
 	void SetExpansion(int exp);
 	/** Dumps information about the object */
 	void DebugDump();
+private:
+	bool DetermineStartPosType(TableMgr *strta);
 };
 
 #endif  // ! GAME_H
