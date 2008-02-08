@@ -113,7 +113,7 @@ IDS
 105        FEAT_ENCHANTMENT                    
 106        FEAT_EVOCATION                      
 107        FEAT_NECROMANCY                     
-108        FEAT_TRANSMUTATION                  
+108        FEAT_TRANSMUTE                  
 109        FEAT_SPELL_PENETRATION              
 110        FEAT_EXTRA_RAGE                     
 111        FEAT_EXTRA_SHAPE                    
