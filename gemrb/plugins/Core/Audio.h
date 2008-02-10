@@ -1,6 +1,7 @@
 #ifndef AUDIO_H_INCLUDED
 #define AUDIO_H_INCLUDED
 
+#include "../../includes/win32def.h"
 #include "../../includes/globals.h"
 #include "Plugin.h"
 #include "AmbientMgr.h"

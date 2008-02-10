@@ -53,6 +53,7 @@ public:
     int get_channels() ;
     int get_samplerate() ;
     int read_samples(short* memory, int cnt) ;
+    void rewind(void) ;
 };
 
 #endif //ACMIMP_H

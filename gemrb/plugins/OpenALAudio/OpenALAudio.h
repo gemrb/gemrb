@@ -27,15 +27,18 @@
 #define MAX_STREAMS 30
 #define MUSICBUFFERS 10
 #define REFERENCE_DISTANCE 50
+#define ACM_BUFFERSIZE 8192
 
 #include "../Core/Audio.h"
 #include "../Core/LRUCache.h"
 #include "../Core/Interface.h"
+#include "../Core/MusicMgr.h"
 #include "../../includes/ie_types.h"
 #include "../Core/FileStream.h"
 #include "../Core/SoundMgr.h"
 #include "AmbientMgrAL.h"
 #include "../Core/ResourceMgr.h"
+#include "StackLock.h"
 #include "SDL.h"
 
 #ifndef WIN32
@@ -95,7 +98,7 @@ private:
     ALuint MusicSource;
     bool MusicPlaying;
     SDL_mutex* musicMutex;
-    ALuint MusicBuffers[MUSICBUFFERS];
+    ALuint MusicBuffer[MUSICBUFFERS];
     SoundMgr* MusicReader;
     LRUCache buffercache;
     AudioStream speech;
@@ -105,6 +108,10 @@ private:
     int CountAvailableSources(int limit);
     bool evictBuffer();
     ALenum GetFormatEnum(int channels, int bits);
+    static int MusicManager(void* args) ;
+    bool stayAlive ;
+    unsigned char* music_memory ;
+    SDL_Thread* musicThread ;
 };
 
 #endif // OPENALAUDIO_H_INCLUDED

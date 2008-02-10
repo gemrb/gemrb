@@ -79,3 +79,7 @@ int ACMImp::read_samples(short* memory, int cnt)
     return SoundReader->read_samples(memory, cnt) ;
 }
 
+void ACMImp::rewind()
+{
+    SoundReader->rewind() ;
+}

@@ -19,36 +19,20 @@
  *
  */
 
-#include "StackLock.h"
+#include "SDL_mutex.h"
 
-// adapted from ScummVM's mutex.cpp
+// Copied from ScummVM, mutex.h
 
-StackLock::StackLock(SDL_mutex* mutex, const char *mutexName)
-        : _mutex(mutex), _mutexName(mutexName) {
-        lock();
-}
+/**
+ * Auxillary class to (un)lock a mutex on the stack.
+ */
+class StackLock {
+	SDL_mutex* _mutex;
+	const char *_mutexName;
 
-StackLock::~StackLock() {
-        unlock();
-}
-
-void StackLock::lock() {
-#if 0
-        if (_mutexName != NULL) {
-                fprintf(stderr, "Locking mutex %s\n", _mutexName);
-	}
-#endif
-
-        SDL_mutexP(_mutex);
-}
-
-void StackLock::unlock() {
-#if 0
-        if (_mutexName != NULL) {
-                fprintf(stderr, "Unlocking mutex %s\n", _mutexName);
-	}
-#endif
-
-        SDL_mutexV(_mutex);
-}
-
+	void lock();
+	void unlock();
+public:
+	StackLock(SDL_mutex* mutex, const char *mutexName = NULL);
+	~StackLock();
+};

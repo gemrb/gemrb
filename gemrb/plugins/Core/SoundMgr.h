@@ -47,6 +47,7 @@ public:
     virtual int get_channels() = 0 ;
     virtual int get_samplerate() = 0 ;
     virtual int read_samples( short* memory, int cnt ) = 0 ;
+    virtual void rewind(void) = 0 ;
 
 };
 

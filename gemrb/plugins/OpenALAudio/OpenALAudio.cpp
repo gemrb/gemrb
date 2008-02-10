@@ -59,6 +59,9 @@ OpenALAudioDriver::OpenALAudioDriver(void)
 {
     alutContext = NULL ;
     MusicPlaying = false ;
+    music_memory = (unsigned char*) malloc(ACM_BUFFERSIZE) ;
+    MusicSource = 0 ;
+    memset(MusicBuffer, 0, MUSICBUFFERS*sizeof(ALuint)) ;
     musicMutex = SDL_CreateMutex() ;
 }
 
@@ -95,6 +98,9 @@ bool OpenALAudioDriver::Init(void)
 	if (num_streams > MAX_STREAMS) {
 		printMessage( "OpenAL","Allocated more streams than desired?! ", YELLOW );
 	}
+
+    stayAlive = true ;
+    musicThread = SDL_CreateThread( MusicManager, this ) ;
 
 	ambim = new AmbientMgrAL ;
 	speech.free = true ;
@@ -135,6 +141,16 @@ OpenALAudioDriver::~OpenALAudioDriver(void)
 		alcCloseDevice (device);
 	}
 	alutContext = NULL;
+	SDL_mutexP(musicMutex) ;
+	SDL_KillThread(musicThread) ;
+	SDL_mutexV(musicMutex) ;
+
+    SDL_DestroyMutex(musicMutex) ;
+    musicMutex = NULL ;
+
+    free(music_memory) ;
+    if(MusicReader)
+        core->FreeInterface(MusicReader) ;
 
 	delete ambim ;
 }
@@ -307,6 +323,7 @@ unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, uns
 
 bool OpenALAudioDriver::IsSpeaking()
 {
+	speech.ClearIfStopped() ;
     return !speech.free ;
 }
 
@@ -339,9 +356,9 @@ void OpenALAudioDriver::ResetMusics()
     if (alIsSource(MusicSource)) {
         alSourceStop(MusicSource) ;
         alDeleteSources(1, &MusicSource ) ;
-        for (int i=0; i<MUSICBUFFERS; i++) {
-            if (alIsBuffer(MusicBuffers[i]))
-                alDeleteBuffers(1, MusicBuffers+i) ;
+        for (int i=0; i<2; i++) {
+            if (alIsBuffer(MusicBuffer[i]))
+                alDeleteBuffers(1, MusicBuffer+i) ;
         }
     }
     SDL_mutexV( musicMutex ) ;
@@ -393,8 +410,8 @@ int OpenALAudioDriver::StreamFile(const char* filename)
 		MusicReader = NULL;
 		return -1 ;
 	}
-	if (MusicBuffers[0] == 0) {
-		alGenBuffers( MUSICBUFFERS, MusicBuffers );
+	if (MusicBuffer[0] == 0) {
+		alGenBuffers( MUSICBUFFERS, MusicBuffer );
 	}
 	MusicReader = (SoundMgr*) core->GetInterface( IE_WAV_CLASS_ID ) ;
 	if (!MusicReader->Open(str, true)) {
@@ -585,4 +602,82 @@ ALenum OpenALAudioDriver::GetFormatEnum(int channels, int bits)
 			break;
 	}
 	return AL_FORMAT_MONO8;
+}
+
+int OpenALAudioDriver::MusicManager(void* arg)
+{
+    OpenALAudioDriver* driver = (OpenALAudioDriver*) arg ;
+    ALuint buffersreturned = 0;
+	ALboolean bFinished = AL_FALSE;
+	while (driver->stayAlive) {
+		SDL_Delay(30);
+		StackLock l(driver->musicMutex, "musicMutex in PlayListManager()");
+		if (driver->MusicPlaying) {
+			ALint state;
+			alGetSourcei( driver->MusicSource, AL_SOURCE_STATE, &state );
+			switch (state) {
+				default:
+					printMessage("OpenAL", "WARNING: Unhandled Music state", WHITE );
+					printStatus("ERROR", YELLOW);
+					driver->MusicPlaying = false;
+					return -1;
+				case AL_INITIAL:
+					 {
+						printMessage("OPENAL", "Music in INITIAL State. AutoStarting\n", WHITE );
+						for (int i = 0; i < MUSICBUFFERS; i++) {
+							driver->MusicReader->read_samples( ( short* ) driver->music_memory, ACM_BUFFERSIZE >> 1 );
+							alBufferData( driver->MusicBuffer[i], AL_FORMAT_STEREO16,
+								driver->music_memory, ACM_BUFFERSIZE,
+								driver->MusicReader->get_samplerate() );
+						}
+						alSourceQueueBuffers( driver->MusicSource, MUSICBUFFERS, driver->MusicBuffer );
+						if (alIsSource( driver->MusicSource )) {
+							alSourcePlay( driver->MusicSource );
+						}
+					}
+					break;
+				case AL_STOPPED:
+					printMessage("OpenAL", "WARNING: Buffer Underrun. AutoRestarting Stream Playback\n", WHITE );
+					if (alIsSource( driver->MusicSource )) {
+						alSourcePlay( driver->MusicSource );
+					}
+					break;
+				case AL_PLAYING:
+					break;
+			}
+			ALint processed;
+			alGetSourcei( driver->MusicSource, AL_BUFFERS_PROCESSED, &processed );
+			if (processed > 0) {
+				buffersreturned += processed;
+				while (processed) {
+					ALuint BufferID;
+					alSourceUnqueueBuffers( driver->MusicSource, 1, &BufferID );
+					if (bFinished == AL_FALSE) {
+						int size = ACM_BUFFERSIZE;
+						int cnt = driver->MusicReader->read_samples( ( short* ) driver->music_memory, ACM_BUFFERSIZE >> 1 );
+						size -= ( cnt * 2 );
+						if (size != 0)
+							bFinished = AL_TRUE;
+						if (bFinished) {
+							printMessage("OpenAL", "Playing Next Music\n", WHITE );
+							core->GetMusicMgr()->PlayNext();
+							if (driver->MusicReader) {
+								printMessage( "OpenAL", "Queuing New Music\n", WHITE );
+								driver->MusicReader->read_samples( ( short* ) ( driver->music_memory + ( cnt*2 ) ), size >> 1 );
+								bFinished = AL_FALSE;
+							} else {
+								printMessage( "OpenAL", "No Other Music to play\n", WHITE );
+								memset( driver->music_memory + ( cnt * 2 ), 0, size );
+								driver->MusicPlaying = false;
+							}
+						}
+						alBufferData( BufferID, AL_FORMAT_STEREO16, driver->music_memory, ACM_BUFFERSIZE, driver->MusicReader->get_samplerate() );
+						alSourceQueueBuffers( driver->MusicSource, 1, &BufferID );
+						processed--;
+					}
+				}
+			}
+		}
+	}
+	return 0;
 }

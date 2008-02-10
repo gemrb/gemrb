@@ -93,6 +93,11 @@ public:
 
 	virtual int read_samples(short* buffer, int count) = 0; // returns actual count of read samples
 //	virtual short read_one_sample(); // returns next sound sample
+    void rewind()
+    {
+        stream->Seek(0, GEM_STREAM_START );
+        init_reader() ;
+    }
 };
 
 // RAW file reader
