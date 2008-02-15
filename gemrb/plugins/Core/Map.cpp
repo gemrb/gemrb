@@ -1108,6 +1108,7 @@ void Map::DeleteActor(int i)
 	Game *game = core->GetGame();
 	game->LeaveParty( actor );
 	game->DelNPC( game->InStore(actor) );
+	BlockSearchMap( actor->Pos, actor->size, PATH_MAP_FREE);
 	actors.erase( actors.begin()+i );
 	delete (actor);
 }
