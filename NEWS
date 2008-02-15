@@ -1,11 +1,10 @@
-GemRB V0.3.0 (2008-xx-yy):
+GemRB V0.3.0 (2008-02-15):
   New features:
-    - 
     - TLK override handling (custom biographies and map notes)
     - weapon immunities
     - party AI
     - expansion playmode
-    - a few more actions, triggers and effects
+    - more actions, triggers and effects
     - loading of projectile explosion animations
     - kit information window
     - optional CMake build system (windows only)
