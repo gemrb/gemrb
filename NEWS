@@ -10,7 +10,7 @@ GemRB V0.3.0 (2008-02-15):
     - optional CMake build system (windows only)
 
   Improved features:
-    - sound (now perfect on linux!)
+    - sound (now perfect!)
     - character generation
     - opcodes
     - character record window
