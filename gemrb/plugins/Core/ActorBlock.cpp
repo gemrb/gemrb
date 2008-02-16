@@ -723,8 +723,10 @@ void Selectable::DrawCircle(Region &vp)
 		core->GetVideoDriver()->BlitSprite( sprite, Pos.x - vp.x, Pos.y - vp.y, true );
 	}
 	else {
+		int csize = size;
+		if (csize < 2) csize = 2;
 		core->GetVideoDriver()->DrawEllipse( (ieWord) (Pos.x - vp.x), (ieWord) (Pos.y - vp.y),
-		(ieWord) (size * 10), (ieWord) ( ( size * 15 ) / 2 ), *col );
+		(ieWord) ((csize-1) * 16 ), (ieWord) ((csize-1) * 12 ), *col );
 	}
 }
 
