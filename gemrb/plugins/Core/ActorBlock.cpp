@@ -704,6 +704,15 @@ void Selectable::SetBBox(Region &newBBox)
 
 void Selectable::DrawCircle(Region &vp)
 {
+	/* TODO: BG2 colours ground circles as follows:
+		dark green for unselected party members
+		bright green for selected party members
+		flashing green/white for a party member the mouse is over
+		bright red for enemies
+		flashing red/white for enemies the mouse is over
+		flashing cyan/white for neutrals the mouse is over
+	*/
+
 	if (size<=0) {
 		return;
 	}
