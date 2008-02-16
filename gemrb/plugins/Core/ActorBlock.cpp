@@ -730,13 +730,23 @@ void Selectable::DrawCircle(Region &vp)
 	}
 }
 
-bool Selectable::IsOver(Point &Pos)
+// Check if P is over our ground circle
+bool Selectable::IsOver(Point &P)
 {
-	//actually, i'm not sure if bbox should be used or just the feet circle
-	if ((signed) Distance(Pos, this->Pos)<size*10) {
-		return true;
-	}
-	return BBox.PointInside( Pos );
+	int csize = size;
+	if (csize < 2) csize = 2;
+
+	int dx = P.x - Pos.x;
+	int dy = P.y - Pos.y;
+
+	// check rectangle first
+	if (dx < -(csize-1)*16 || dx > (csize-1)*16) return false;
+	if (dy < -(csize-1)*12 || dy > (csize-1)*12) return false;
+
+	// then check ellipse
+	int r = 9*dx*dx + 16*dy*dy; // 48^2 * (  (dx/16)^2 + (dy/12)^2  )
+
+	return (r <= 48*48*(csize-1)*(csize-1));
 }
 
 bool Selectable::IsSelected()
