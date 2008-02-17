@@ -391,15 +391,9 @@ Map::~Map(void)
 {
 	unsigned int i;
 
-	if (MapSet) {
-		free( MapSet );
-	}
-	if (TMap) {
-		delete TMap;
-	}
-	if (INISpawn) {
-		delete INISpawn;
-	}
+	free( MapSet );
+	delete TMap;
+	delete INISpawn;
 	aniIterator aniidx;
 	for (aniidx = animations.begin(); aniidx != animations.end(); aniidx++) {
 		delete (*aniidx);
@@ -414,24 +408,18 @@ Map::~Map(void)
 	}
 
 	for (i = 0; i < entrances.size(); i++) {
-		delete( entrances[i] );
+		delete entrances[i];
 	}
 	for (i = 0; i < spawns.size(); i++) {
-		delete( spawns[i] );
+		delete spawns[i];
 	}
-	if (LightMap)
-		core->FreeInterface( LightMap );
-	if (SearchMap)
-		core->FreeInterface( SearchMap );
-	if (HeightMap)
-		core->FreeInterface( HeightMap );
-	if (SmallMap)
-		core->FreeInterface( SmallMap );
+	core->FreeInterface( LightMap );
+	core->FreeInterface( SearchMap );
+	core->FreeInterface( HeightMap );
+	core->FreeInterface( SmallMap );
 	for (i = 0; i < QUEUE_COUNT; i++) {
-		if (queue[i]) {
-			free(queue[i]);
-			queue[i] = NULL;
-		}
+		free(queue[i]);
+		queue[i] = NULL;
 	}
 
 	proIterator pri;
@@ -460,15 +448,11 @@ Map::~Map(void)
 	}
 
 	//malloc-d in AREImp
-	if (ExploredBitmap) {
-		free( ExploredBitmap );
-	}
-	if (VisibleBitmap) {
-		free( VisibleBitmap );
-	}
+	free( ExploredBitmap );
+	free( VisibleBitmap );
 	if (Walls) {
 		for(i=0;i<WallCount;i++) {
-			delete(Walls[i]);
+			delete Walls[i];
 		}
 		free( Walls );
 	}
@@ -477,6 +461,7 @@ Map::~Map(void)
 
 void Map::AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm, ImageMgr* hm)
 {
+	// CHECKME: leaks? Should the old TMap, LightMap, etc... be freed?
 	TMap = tm;
 	LightMap = lm;
 	SearchMap = sr;
@@ -648,8 +633,8 @@ void Map::UpdateScripts()
 		}
 
 		if (actor->Modified[IE_DONOTJUMP]<2) {
-      BlockSearchMap( actor->Pos, actor->size, 0);
-      PathNode * step = actor->GetNextStep();
+			BlockSearchMap( actor->Pos, actor->size, 0);
+			PathNode * step = actor->GetNextStep();
 			if (step && step->Next) {
 				//we should actually wait for a short time and check then
 				if (GetBlocked(step->Next->x*16,step->Next->y*12,actor->size)) {
@@ -659,8 +644,8 @@ void Map::UpdateScripts()
 		}
 		if (!(actor->GetBase(IE_STATE_ID)&STATE_CANTMOVE) ) {
 			if (!actor->Immobile()) {
-        actor->DoStep( speed );
-        BlockSearchMap( actor->Pos, actor->size, actor->InParty?PATH_MAP_PC:PATH_MAP_NPC);
+				actor->DoStep( speed );
+				BlockSearchMap( actor->Pos, actor->size, actor->InParty?PATH_MAP_PC:PATH_MAP_NPC);
 			}
 		}
 	}
@@ -1422,7 +1407,7 @@ bool Map::GetBlocked(unsigned int px, unsigned int py, unsigned int size)
       }
 		}
 	}
-  return false;
+	return false;
 }
 
 int Map::GetBlocked(Point &c)
