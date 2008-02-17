@@ -3,9 +3,9 @@
            AT_1       AT_2       AT_3       AT_4       TYPE       SPACE      PALETTE    SIZE
 0x1000     MWYV       MWYV       MWYV       MWYV       11         5          1          *
 0x1100     MTAN       MTAN       MTAN       MTAN       11         5          1          *
-0x1200     MDR1       MDR1       MDR1       MDR1       12         5          1          *
-0x1201     MDR2       MDR2       MDR2       MDR2       12         5          1          *
-0x1202     MDR3       MDR3       MDR3       MDR3       12         5          1          *
+0x1200     MDR1       MDR1       MDR1       MDR1       12         7          1          *
+0x1201     MDR2       MDR2       MDR2       MDR2       12         7          1          *
+0x1202     MDR3       MDR3       MDR3       MDR3       12         7          1          *
 0x2000     MSIR       MSIR       MSIR       MSIR       2          2          0          *
 0x2100     UVOL       UVOL       UVOL       UVOL       2          2          1          *
 0x2200     MOGM       MOGM       MOGM       MOGM       2          2          0          S
@@ -173,7 +173,7 @@
 0x7F04     MIGO       MIGO       MIGO       MIGO       4          4          1          *
 0x7F05     MDJI       MDJI       MDJI       MDJI       4          2          1          *
 0x7F06     MDJL       MDJL       MDJL       MDJL       4          2          1          *
-0x7F07     MGLC       MGLC       MGLC       MGLC       4          3          1          *
+0x7F07     MGLC       MGLC       MGLC       MGLC       4          2          1          *
 0x7F08     MOTY       MOTY       MOTY       MOTY       4          4          1          *
 0x7F09     MSAH       MSAH       MSAH       MSAH       4          2          1          *
 0x7F0A     MGCP       MGCP       MGCP       MGCP       4          2          1          *
@@ -189,16 +189,16 @@
 0x7F14     MGIT       MGIT       MGIT       MGIT       4          2          1          *
 0x7F15     MBES       MBES       MBES       MBES       4          2          1          *
 0x7F16     AMOO       AMOO       AMOO       AMOO       4          3          1          *
-0x7F17     ARAB       ARAB       ARAB       ARAB       4          1          1          *
+0x7F17     ARAB       ARAB       ARAB       ARAB       4          2          1          *
 0x7F18     ADER       ADER       ADER       ADER       4          2          1          *
 0x7F19     MDSW       MDSW       MDSW       MDSW       4          2          1          *
 0x7F20     AGRO       AGRO       AGRO       AGRO       4          2          1          *
 0x7F21     APHE       APHE       APHE       APHE       4          2          1          *
 0x7F22     MVAF       MVAF       MVAF       MVAF       4          2          1          *
-0x7F23     MSAT       MSAT       MSAT       MSAT       4          3          1          *
+0x7F23     MSAT       MSAT       MSAT       MSAT       4          2          1          *
 0x7F24     NPIR       NPIR       NPIR       NPIR       4          2          1          *
 0x7F27     MDRO       MDRO       MDRO       MDRO       4          2          1          *
-0x7F28     MKUL       MKUL       MKUL       MKUL       4          3          1          *
+0x7F28     MKUL       MKUL       MKUL       MKUL       4          2          1          *
 0x7F29     MFDR       MFDR       MFDR       MFDR       4          2          1          *
 0x7F2A     NSAI       NSAI       NSAI       NSAI       4          2          1          *
 0x7F2B     MMAX       MMAX       MMAX       MMAX       4          2          1          *
@@ -211,7 +211,7 @@
 0x7F32     MSLY       MSLY       MSLY       MSLY       4          2          1          *
 0x7F33     MKUR       MKUR       MKUR       MKUR       4          2          1          *
 0x7F34     MDOC       MDOC       MDOC       MDOC       4          2          1          *
-0x7F35     MMIS       MMIS       MMIS       MMIS       4          3          1          *
+0x7F35     MMIS       MMIS       MMIS       MMIS       4          2          1          *
 0x7F36     NSHD       NSHD       NSHD       NSHD       4          2          1          *
 0x7F37     NIRE       NIRE       NIRE       NIRE       4          2          1          *
 0x7F38     MEYE       MEYE       MEYE       MEYE       2          1          1          *
@@ -265,7 +265,7 @@
 0xE000     MCYC       MCYC       MCYC       MCYC       9          4          1          *
 0xE010     METN       METN       METN       METN       9          4          1          *
 0xE020     MTAN       MTAN       MTAN       MTAN       9          4          1          *
-0xE040     MHIS       MHIS       MHIS       MHIS       9          4          1          *
+0xE040     MHIS       MHIS       MHIS       MHIS       9          2          1          *
 0xE050     MLER       MLER       MLER       MLER       9          2          1          *
 0xE060     MLIC       MLIC       MLIC       MLIC       9          2          1          *
 0xE070     MMIN       MMIN       MMIN       MMIN       9          2          1          *
