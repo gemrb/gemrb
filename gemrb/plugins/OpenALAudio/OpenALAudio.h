@@ -51,13 +51,14 @@
 
 
 struct AudioStream {
-    AudioStream() : Buffer(0), Source(0), Duration(0), free(true), ambient(false) { }
+    AudioStream() : Buffer(0), Source(0), Duration(0), free(true), ambient(false), locked(false) { }
 
     ALuint Buffer;
     ALuint Source;
     int Duration;
     bool free;
     bool ambient;
+    bool locked;
 
     void ClearIfStopped();
     void ClearProcessedBuffers(bool del=false);

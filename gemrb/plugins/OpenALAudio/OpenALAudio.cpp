@@ -39,7 +39,7 @@ void AudioStream::ClearProcessedBuffers(bool del)
 
 void AudioStream::ClearIfStopped()
 {
-	if (free) return;
+	if (free || locked) return;
 
 	if (alIsSource(Source)) {
 		ALint state;
@@ -51,18 +51,19 @@ void AudioStream::ClearIfStopped()
 			Buffer = 0;
 			free = true;
 			ambient = false;
+			locked = false;
 		}
 	}
 }
 
 OpenALAudioDriver::OpenALAudioDriver(void)
 {
-    alutContext = NULL ;
-    MusicPlaying = false ;
-    music_memory = (unsigned char*) malloc(ACM_BUFFERSIZE) ;
-    MusicSource = 0 ;
-    memset(MusicBuffer, 0, MUSICBUFFERS*sizeof(ALuint)) ;
-    musicMutex = SDL_CreateMutex() ;
+    alutContext = NULL;
+    MusicPlaying = false;
+    music_memory = (unsigned char*) malloc(ACM_BUFFERSIZE);
+    MusicSource = 0;
+    memset(MusicBuffer, 0, MUSICBUFFERS*sizeof(ALuint));
+    musicMutex = SDL_CreateMutex();
 }
 
 bool OpenALAudioDriver::Init(void)
@@ -99,12 +100,12 @@ bool OpenALAudioDriver::Init(void)
 		printMessage( "OpenAL","Allocated more streams than desired?! ", YELLOW );
 	}
 
-    stayAlive = true ;
-    musicThread = SDL_CreateThread( MusicManager, this ) ;
+    stayAlive = true;
+    musicThread = SDL_CreateThread( MusicManager, this );
 
-	ambim = new AmbientMgrAL ;
-	speech.free = true ;
-	speech.ambient = false ;
+	ambim = new AmbientMgrAL;
+	speech.free = true;
+	speech.ambient = false;
 	return true;
 }
 
@@ -141,52 +142,52 @@ OpenALAudioDriver::~OpenALAudioDriver(void)
 		alcCloseDevice (device);
 	}
 	alutContext = NULL;
-	SDL_mutexP(musicMutex) ;
-	SDL_KillThread(musicThread) ;
-	SDL_mutexV(musicMutex) ;
+	SDL_mutexP(musicMutex);
+	SDL_KillThread(musicThread);
+	SDL_mutexV(musicMutex);
 
-    SDL_DestroyMutex(musicMutex) ;
-    musicMutex = NULL ;
+    SDL_DestroyMutex(musicMutex);
+    musicMutex = NULL;
 
-    free(music_memory) ;
+    free(music_memory);
     if(MusicReader)
-        core->FreeInterface(MusicReader) ;
+        core->FreeInterface(MusicReader);
 
-	delete ambim ;
+	delete ambim;
 }
 
 ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_length)
 {
-    ALuint Buffer = 0 ;
+    ALuint Buffer = 0;
 
-    CacheEntry *e ;
-    void* p ;
+    CacheEntry *e;
+    void* p;
     if(buffercache.Lookup(ResRef, p))
     {
-        e = (CacheEntry*) p ;
-        time_length = e->Length ;
-        return e->Buffer ;
+        e = (CacheEntry*) p;
+        time_length = e->Length;
+        return e->Buffer;
     }
     //no cache entry...
-    DataStream* stream = core->GetResourceMgr()->GetResource(ResRef, IE_WAV_CLASS_ID) ;
+    DataStream* stream = core->GetResourceMgr()->GetResource(ResRef, IE_WAV_CLASS_ID);
     if (!stream)
-        return 0 ;
+        return 0;
     for (int i=0;i<RETRY;i++) {
-        alGenBuffers(1, &Buffer) ;
+        alGenBuffers(1, &Buffer);
         if ( alGetError()==AL_NO_ERROR )
-            break ;
+            break;
         else {
-            printMessage("OpenAL", "Unable to attach buffer", WHITE ) ;
-            printStatus("ERROR", YELLOW) ;
-            delete stream ;
-            return 0 ;
+            printMessage("OpenAL", "Unable to attach buffer", WHITE );
+            printStatus("ERROR", YELLOW);
+            delete stream;
+            return 0;
         }
     }
 
-    SoundMgr* acm = (SoundMgr*) core->GetInterface(IE_WAV_CLASS_ID) ;
+    SoundMgr* acm = (SoundMgr*) core->GetInterface(IE_WAV_CLASS_ID);
     if (!acm->Open(stream)) {
-        core->FreeInterface(acm) ;
-        return 0 ;
+        core->FreeInterface(acm);
+        return 0;
     }
     int cnt = acm->get_length();
     int riff_chans = acm->get_channels();
@@ -205,7 +206,7 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_lengt
 
     if (( alGetError() ) != AL_NO_ERROR) {
         printMessage( "OpenAL", "Error : unable to fill buffer", WHITE );
-        printStatus("ERROR", YELLOW ) ;
+        printStatus("ERROR", YELLOW );
         alDeleteBuffers( 1, &Buffer );
         return 0;
     }
@@ -220,17 +221,17 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_lengt
     if (buffercache.GetCount() > BUFFER_CACHE_SIZE) {
         evictBuffer();
     }
-    return Buffer ;
+    return Buffer;
 }
 
 unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, unsigned int flags)
 {
-    ALuint Buffer ;
-    unsigned int time_length ;
+    ALuint Buffer;
+    unsigned int time_length;
 
-    Buffer = loadSound( ResRef, time_length ) ;
+    Buffer = loadSound( ResRef, time_length );
     if (Buffer == 0) {
-        return 0 ;
+        return 0;
     }
 
     ALuint Source;
@@ -250,8 +251,8 @@ unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, uns
 			alGenSources( 1, &speech.Source );
 			if (alGetError() != AL_NO_ERROR) {
 				printMessage( "OpenAL", "Unable to attach a source for speech", WHITE );
-				printStatus( "ERROR", YELLOW ) ;
-				return 0 ;
+				printStatus( "ERROR", YELLOW );
+				return 0;
 			}
 
 			alSourcef( speech.Source, AL_PITCH, 1.0f );
@@ -296,7 +297,7 @@ unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, uns
 	if (alGetError() != AL_NO_ERROR) {
 		//failed to generate new sound source
 		printMessage( "OpenAL", "Unable to attach a source", WHITE );
-        printStatus( "ERROR", YELLOW ) ;
+        printStatus( "ERROR", YELLOW );
 		return 0;
 	}
 
@@ -323,55 +324,55 @@ unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, uns
 
 bool OpenALAudioDriver::IsSpeaking()
 {
-	speech.ClearIfStopped() ;
-    return !speech.free ;
+	speech.ClearIfStopped();
+    return !speech.free;
 }
 
 void OpenALAudioDriver::UpdateVolume(unsigned int flags)
 {
-    ieDword volume ;
+    ieDword volume;
     if (flags & GEM_SND_VOL_MUSIC) {
-        SDL_mutexP( musicMutex ) ;
-        core->GetDictionary()->Lookup("Volume Voices", volume) ;
+        SDL_mutexP( musicMutex );
+        core->GetDictionary()->Lookup("Volume Voices", volume);
         if (alIsSource(MusicSource))
-            alSourcef(MusicSource, AL_GAIN, volume * 0.01f) ;
-        SDL_mutexV(musicMutex) ;
+            alSourcef(MusicSource, AL_GAIN, volume * 0.01f);
+        SDL_mutexV(musicMutex);
     }
 
     if (flags & GEM_SND_VOL_AMBIENTS) {
-        core->GetDictionary()->Lookup("Volume Ambients", volume) ;
-        ((AmbientMgrAL*) ambim)->UpdateVolume(volume) ;
+        core->GetDictionary()->Lookup("Volume Ambients", volume);
+        ((AmbientMgrAL*) ambim)->UpdateVolume(volume);
     }
 }
 
 bool OpenALAudioDriver::CanPlay()
 {
-    return true ;
+    return true;
 }
 
 void OpenALAudioDriver::ResetMusics()
 {
-    MusicPlaying = false ;
-    SDL_mutexP( musicMutex ) ;
+    MusicPlaying = false;
+    SDL_mutexP( musicMutex );
     if (alIsSource(MusicSource)) {
-        alSourceStop(MusicSource) ;
-        alDeleteSources(1, &MusicSource ) ;
+        alSourceStop(MusicSource);
+        alDeleteSources(1, &MusicSource );
         for (int i=0; i<2; i++) {
             if (alIsBuffer(MusicBuffer[i]))
-                alDeleteBuffers(1, MusicBuffer+i) ;
+                alDeleteBuffers(1, MusicBuffer+i);
         }
     }
-    SDL_mutexV( musicMutex ) ;
+    SDL_mutexV( musicMutex );
 }
 
 bool OpenALAudioDriver::Play()
 {
-    SDL_mutexP( musicMutex ) ;
+    SDL_mutexP( musicMutex );
     if (!MusicPlaying)
-        MusicPlaying = true ;
-    SDL_mutexV( musicMutex ) ;
+        MusicPlaying = true;
+    SDL_mutexV( musicMutex );
 
-    return true ;
+    return true;
 }
 
 bool OpenALAudioDriver::Stop()
@@ -399,28 +400,28 @@ int OpenALAudioDriver::StreamFile(const char* filename)
 	FileStream* str = new FileStream();
 	if (!str->Open( path, true )) {
 		delete( str );
-		printMessage("OpenAL", "",WHITE) ;
+		printMessage("OpenAL", "",WHITE);
 		printf( "Cannot find %s", path );
-		printStatus("NOT FOUND", YELLOW ) ;
+		printStatus("NOT FOUND", YELLOW );
 		return 0xffffffff;
 	}
 	SDL_mutexP( musicMutex );
 	if (!MusicReader) {
-		core->FreeInterface(MusicReader) ;
+		core->FreeInterface(MusicReader);
 		MusicReader = NULL;
-		return -1 ;
+		return -1;
 	}
 	if (MusicBuffer[0] == 0) {
 		alGenBuffers( MUSICBUFFERS, MusicBuffer );
 	}
-	MusicReader = (SoundMgr*) core->GetInterface( IE_WAV_CLASS_ID ) ;
+	MusicReader = (SoundMgr*) core->GetInterface( IE_WAV_CLASS_ID );
 	if (!MusicReader->Open(str, true)) {
-	    delete str ;
-	    core->FreeInterface(MusicReader) ;
-	    MusicReader = NULL ;
-	    printMessage("OpenAL", "",WHITE) ;
+	    delete str;
+	    core->FreeInterface(MusicReader);
+	    MusicReader = NULL;
+	    printMessage("OpenAL", "",WHITE);
 		printf( "Cannot open %s", path );
-		printStatus("ERROR", YELLOW ) ;
+		printStatus("ERROR", YELLOW );
 	}
 
 	if (MusicSource == 0) {
@@ -453,7 +454,7 @@ int OpenALAudioDriver::StreamFile(const char* filename)
 
 void OpenALAudioDriver::UpdateListenerPos(int XPos, int YPos )
 {
-    alListener3f( AL_POSITION, (float) XPos, (float) YPos, 0.0f ) ;
+    alListener3f( AL_POSITION, (float) XPos, (float) YPos, 0.0f );
 }
 
 void OpenALAudioDriver::GetListenerPos(int &XPos, int &YPos )
@@ -466,18 +467,23 @@ void OpenALAudioDriver::GetListenerPos(int &XPos, int &YPos )
 
 bool OpenALAudioDriver::ReleaseAmbientStream(int stream, bool HardStop)
 {
-    if(!HardStop) return true ;
-    if (streams[stream].free || !streams[stream].ambient)
-        return false ;
+    if (streams[stream].free || !streams[stream].locked)
+        return false;
+    if (!HardStop) {
+        // unlock it, so it will automatically be reclaimed when needed
+        streams[stream].locked = false;
+        return true;
+	}
 
-    ALuint Source = streams[stream].Source ;
-    alSourceStop(Source) ;
+    ALuint Source = streams[stream].Source;
+    alSourceStop(Source);
 
-    streams[stream].ClearProcessedBuffers(false) ;
-    alDeleteSources(1, &streams[stream].Source) ;
+    streams[stream].ClearProcessedBuffers(false);
+    alDeleteSources(1, &streams[stream].Source);
     streams[stream].Source = 0;
-	streams[stream].free = true;
-	streams[stream].ambient = false;
+    streams[stream].free = true;
+    streams[stream].ambient = false;
+    streams[stream].locked = false;
 
 	return true;
 }
@@ -485,7 +491,7 @@ bool OpenALAudioDriver::ReleaseAmbientStream(int stream, bool HardStop)
 int OpenALAudioDriver::SetupAmbientStream( ieWord x, ieWord y, ieWord z,
                     ieWord gain, bool point )
 {
-// Find a free (or finished) stream for this sound
+	// Find a free (or finished) stream for this sound
 	int stream = -1;
 	for (int i = 0; i < num_streams; i++) {
 		streams[i].ClearIfStopped();
@@ -510,6 +516,7 @@ int OpenALAudioDriver::SetupAmbientStream( ieWord x, ieWord y, ieWord z,
 	streams[stream].Source = source;
 	streams[stream].free = false;
 	streams[stream].ambient = true;
+	streams[stream].locked = true;
 
 	return stream;
 }
@@ -606,7 +613,7 @@ ALenum OpenALAudioDriver::GetFormatEnum(int channels, int bits)
 
 int OpenALAudioDriver::MusicManager(void* arg)
 {
-    OpenALAudioDriver* driver = (OpenALAudioDriver*) arg ;
+    OpenALAudioDriver* driver = (OpenALAudioDriver*) arg;
     ALuint buffersreturned = 0;
 	ALboolean bFinished = AL_FALSE;
 	while (driver->stayAlive) {
