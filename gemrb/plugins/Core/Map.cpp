@@ -55,7 +55,6 @@ extern HANDLE hConsole;
 #endif
 
 static unsigned int MAX_CIRCLESIZE = 8;
-static unsigned int PersonalPerimeter;
 static int MaxVisibility = 30;
 static int VisibilityPerimeter; //calculated from MaxVisibility
 static int NormalCost = 10;
@@ -64,7 +63,6 @@ static int Passable[16] = {
 	4, 1, 1, 1, 1, 1, 1, 1, 0, 1, 8, 0, 0, 0, 3, 1
 };
 static Point **VisibilityMasks=NULL;
-static Point **PersonalSpaces=NULL;
 
 static bool PathFinderInited = false;
 static Variables Spawns;
@@ -83,14 +81,6 @@ void Map::ReleaseMemory()
 		}
 		free(VisibilityMasks);
 		VisibilityMasks=NULL;
-	}
-
-	if (PersonalSpaces) {
-		for (unsigned int i=0;i<MAX_CIRCLESIZE;i++) {
-			free(PersonalSpaces[i]);
-		}
-		free(PersonalSpaces);
-		PersonalSpaces=NULL;
 	}
 
 	Spawns.RemoveAll(ReleaseSpawnGroup);
@@ -235,16 +225,6 @@ void AddLOS(int destx, int desty, int slot)
 	}
 }
 
-void AddSpace(int destx, int desty, int slot)
-{
-	for (int i=0;i<(int)MAX_CIRCLESIZE;i++) {
-		int x=(destx*i+(int)MAX_CIRCLESIZE/2)/(int)MAX_CIRCLESIZE*16;
-		int y=(desty*i+(int)MAX_CIRCLESIZE/2)/(int)MAX_CIRCLESIZE*12;
-		PersonalSpaces[i][slot].x=(short) x;
-		PersonalSpaces[i][slot].y=(short) y;
-	}
-}
-
 void InitExplore()
 {
 	LargeFog = !core->HasFeature(GF_SMALL_FOG);
@@ -289,55 +269,6 @@ void InitExplore()
 		AddLOS (-y, x, VisibilityPerimeter++);
 		AddLOS (-y, -x, VisibilityPerimeter++);
 		AddLOS (y, -x, VisibilityPerimeter++);
-		y++;
-		re += yc;
-		yc += 2;
-		if (( ( 2 * re ) + xc ) > 0) {
-			x--;
-			re += xc;
-			xc += 2;
-		}
-	}
-
-	//circle perimeter size for MaxCirclesize
-	x = MAX_CIRCLESIZE;
-	y = 0;
-	xc = 1 - ( 2 * MAX_CIRCLESIZE );
-	yc = 1;
-	re = 0;
-	PersonalPerimeter = 0;
-	while (x>=y) {
-		PersonalPerimeter+=8;
-		y++;
-		re += yc;
-		yc += 2;
-		if (( ( 2 * re ) + xc ) > 0) {
-			x--;
-			re += xc;
-			xc += 2;
-		}
-	}
-
-	unsigned int j;
-	PersonalSpaces = (Point **) malloc(MAX_CIRCLESIZE * sizeof(Point *) );
-	for(j=0;j<MAX_CIRCLESIZE;j++) {
-		PersonalSpaces[j] = (Point *) malloc(PersonalPerimeter*sizeof(Point) );
-	}
-	x = MAX_CIRCLESIZE;
-	y = 0;
-	xc = 1 - ( 2 * MAX_CIRCLESIZE );
-	yc = 1;
-	re = 0;
-	PersonalPerimeter = 0;
-	while (x>=y) {
-		AddSpace (x, y, PersonalPerimeter++);
-		AddSpace (-x, y, PersonalPerimeter++);
-		AddSpace (-x, -y, PersonalPerimeter++);
-		AddSpace (x, -y, PersonalPerimeter++);
-		AddSpace (y, x, PersonalPerimeter++);
-		AddSpace (-y, x, PersonalPerimeter++);
-		AddSpace (-y, -x, PersonalPerimeter++);
-		AddSpace (y, -x, PersonalPerimeter++);
 		y++;
 		re += yc;
 		yc += 2;
@@ -633,7 +564,19 @@ void Map::UpdateScripts()
 		}
 
 		if (actor->Modified[IE_DONOTJUMP]<2) {
+			Actor** nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD, MAX_CIRCLE_SIZE*2*14);//14=sqrt(16*12)
 			BlockSearchMap( actor->Pos, actor->size, 0);
+
+			// Restore the searchmap areas of any nearby actors that could
+			// have been cleared by this BlockSearchMap(..., 0).
+			// (Necessary since blocked areas of actors may overlap.)
+			int i=0;
+			while(nearActors[i]!=NULL) {
+				if(nearActors[i]!=actor)
+					BlockSearchMap( nearActors[i]->Pos, nearActors[i]->size, nearActors[i]->InParty?PATH_MAP_PC:PATH_MAP_NPC);
+				++i;
+			}
+
 			PathNode * step = actor->GetNextStep();
 			if (step && step->Next) {
 				//we should actually wait for a short time and check then
@@ -1393,18 +1336,25 @@ int Map::GetBlocked(unsigned int x, unsigned int y)
 
 bool Map::GetBlocked(unsigned int px, unsigned int py, unsigned int size)
 {
-	if (size>MAX_CIRCLESIZE) {
-		size=MAX_CIRCLESIZE;
-	}
-	int p=PersonalPerimeter;
-	while (p--) {
-		for (unsigned int i=0;i<size;i++) {
-			unsigned int x = (px+PersonalSpaces[i][p].x)/16;
-			unsigned int y = (py+PersonalSpaces[i][p].y)/12;
+	// We check a circle of radius size-2 around (px,py)
+	// Note that this does not exactly match BG2. BG2's approximations of
+	//  these circles are slightly different for sizes 7 and up.
 
-			if (!(GetBlocked(x,y)&PATH_MAP_PASSABLE)) {
-        return true;
-      }
+	if (size > MAX_CIRCLESIZE) size = MAX_CIRCLESIZE;
+	if (size < 2) size = 2;	
+
+	unsigned int ppx = px/16;
+	unsigned int ppy = py/12;
+	unsigned int r=(size-2)*(size-2)+1;
+	if (size == 2) r = 0;
+	for (unsigned int i=0; i<size-1; i++) {
+		for (unsigned int j=0; j<size-1; j++) {
+			if (i*i+j*j <= r) {
+				if (!(GetBlocked(ppx+i,ppy+j)&PATH_MAP_PASSABLE)) return true;
+				if (!(GetBlocked(ppx+i,ppy-j)&PATH_MAP_PASSABLE)) return true;
+				if (!(GetBlocked(ppx-i,ppy+j)&PATH_MAP_PASSABLE)) return true;
+				if (!(GetBlocked(ppx-i,ppy-j)&PATH_MAP_PASSABLE)) return true;
+			}
 		}
 	}
 	return false;
@@ -2465,17 +2415,37 @@ void Map::UpdateFog()
 //Valid values are - PATH_MAP_FREE, PATH_MAP_PC, PATH_MAP_NPC
 void Map::BlockSearchMap(Point &Pos, unsigned int size, unsigned int value)
 {
-	if (size>MAX_CIRCLESIZE) {
-		size=MAX_CIRCLESIZE;
-	}
-	int p=PersonalPerimeter;
-	while (p--) {
-		for (unsigned int i=0;i<size;i++) {
-			unsigned int x = (Pos.x+PersonalSpaces[i][p].x)/16;
-			unsigned int y = (Pos.y+PersonalSpaces[i][p].y)/12;
+	// We block a circle of radius size-1 around (px,py)
+	// Note that this does not exactly match BG2. BG2's approximations of
+	//  these circles are slightly different for sizes 6 and up.
 
-			unsigned int tmp=SearchMap->GetPixelIndex(x,y)&PATH_MAP_NOTACTOR;//keep door flags too
-			SearchMap->SetPixelIndex(x,y,tmp|value);
+	// Note: this is a larger circle than the one tested in GetBlocked.
+	// This means that an actor can get closer to a wall than to another
+	// actor. This matches the behaviour of the original BG2.
+
+	if (size > MAX_CIRCLESIZE) size = MAX_CIRCLESIZE;
+	if (size < 1) size = 1;
+	unsigned int ppx = Pos.x/16;
+	unsigned int ppy = Pos.y/12;
+	unsigned int r=(size-1)*(size-1)+1;
+	if (size == 1) r = 0;
+	for (unsigned int i=0; i<size; i++) {
+		for (unsigned int j=0; j<size; j++) {
+			if (i*i+j*j <= r) {
+				unsigned int tmp;
+
+				tmp = SearchMap->GetPixelIndex(ppx+i,ppy+j)&PATH_MAP_NOTACTOR;
+				SearchMap->SetPixelIndex(ppx+i,ppy+j,tmp|value);
+
+				tmp = SearchMap->GetPixelIndex(ppx+i,ppy-j)&PATH_MAP_NOTACTOR;
+				SearchMap->SetPixelIndex(ppx+i,ppy-j,tmp|value);
+
+				tmp = SearchMap->GetPixelIndex(ppx-i,ppy+j)&PATH_MAP_NOTACTOR;
+				SearchMap->SetPixelIndex(ppx-i,ppy+j,tmp|value);
+
+				tmp = SearchMap->GetPixelIndex(ppx-i,ppy-j)&PATH_MAP_NOTACTOR;
+				SearchMap->SetPixelIndex(ppx-i,ppy-j,tmp|value);
+			}
 		}
 	}
 }
