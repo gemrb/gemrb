@@ -95,24 +95,28 @@ def OpenJournalWindow ():
 	GemRB.SetVar ("Section", Section)
 	# Quests
 	Button = GemRB.GetControl (JournalWindow, 6)
+	GemRB.SetButtonFlags (JournalWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	GemRB.SetVarAssoc (JournalWindow, Button, "Section", 1)
 	GemRB.SetText (JournalWindow, Button, 45485)
 	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
 
 	# Quests completed
 	Button = GemRB.GetControl (JournalWindow, 7)
+	GemRB.SetButtonFlags (JournalWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	GemRB.SetVarAssoc (JournalWindow, Button, "Section", 2)
 	GemRB.SetText (JournalWindow, Button, 45486)
 	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
 
 	# Journal
 	Button = GemRB.GetControl (JournalWindow, 8)
+	GemRB.SetButtonFlags (JournalWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	GemRB.SetVarAssoc (JournalWindow, Button, "Section", 4)
 	GemRB.SetText (JournalWindow, Button, 15333)
 	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
 
 	# User
 	Button = GemRB.GetControl (JournalWindow, 9)
+	GemRB.SetButtonFlags (JournalWindow, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	GemRB.SetVarAssoc (JournalWindow, Button, "Section", 0)
 	GemRB.SetText (JournalWindow, Button, 45487)
 	GemRB.SetEvent (JournalWindow, Button, IE_GUI_BUTTON_ON_PRESS, "UpdateLogWindow")
