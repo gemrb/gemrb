@@ -917,15 +917,14 @@ void Map::DrawSearchMap(Region &screen)
 
 	block.w=16;
 	block.h=12;
-	int w = screen.w/16;
-	int h = screen.h/12;
+	int w = screen.w/16+2;
+	int h = screen.h/12+2;
 
 	for(int x=0;x<w;x++) {
 		for(int y=0;y<h;y++) {
-			// CHECKME: this seems shifted?
-			if (!(GetBlocked( x+rgn.x/16, y+rgn.y/12) & PATH_MAP_PASSABLE) ) {
-				block.x=screen.x+x*16;
-				block.y=screen.y+y*12;
+			if (!(GetBlocked(x+rgn.x/16, y+rgn.y/12) & PATH_MAP_PASSABLE) ) {
+				block.x=screen.x+x*16-(rgn.x % 16);
+				block.y=screen.y+y*12-(rgn.y % 12);
 				vid->DrawRect(block,inaccessible);
 			}
 		}
