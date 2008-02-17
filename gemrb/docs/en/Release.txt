@@ -4,7 +4,7 @@
 How to make a release
 *********************
 
-Preparing and testing CVS
+Preparing and testing SVN
 =========================
 
 * Make sure that version numbers in 
@@ -16,18 +16,19 @@ Preparing and testing CVS
 
 * Update ChangeLog with entry about release
 
-* Make sure that GemRB CVS is in compilable and runnable state
+* Make sure that GemRB SVN is in compilable and runnable state
 
-  - download a clean CVS tree and test it.
+  - download a clean SVN tree and test it.
 
   - Make distribution .tar.gz  (make dist) and test it as well -
     especially make sure all needed files are included.
 
-* Tag current CVS to version number e.g. GEMRB_0_2_3
+* Tag current SVN to version number e.g. GEMRB_0_3_0
   i.e. in the gemrb root directory do
-    cvs tag GEMRB_0_2_3
+    svn cp https://gemrb.svn.sourceforge.net/svnroot/gemrb/gemrb/trunk \
+  https://gemrb.svn.sourceforge.net/svnroot/gemrb/gemrb/tags/GEMRB_0_3_0
 
-* Update from CVS to the tagged version
+* Update from SVN to the tagged version
 
 
 Source release
