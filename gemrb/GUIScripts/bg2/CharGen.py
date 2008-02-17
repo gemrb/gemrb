@@ -83,7 +83,7 @@ def OnLoad():
 	GemRB.SetButtonState(CharGenWindow,BiographyButton,IE_GUI_BUTTON_DISABLED)
 
 	TextAreaControl= GemRB.GetControl(CharGenWindow,9)
-	GemRB.SetText(CharGenWindow, TextAreaControl, 16575)
+	GemRB.SetText(CharGenWindow, TextAreaControl, "[capital=0]" + GemRB.GetString(16575))
 
 	GemRB.SetEvent(CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	GemRB.SetEvent(CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")

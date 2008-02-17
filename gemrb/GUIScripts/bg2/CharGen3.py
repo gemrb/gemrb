@@ -73,7 +73,7 @@ def OnLoad():
 	GemRB.SetButtonState(CharGenWindow,BiographyButton,IE_GUI_BUTTON_DISABLED)
 
 	TextAreaControl= GemRB.GetControl(CharGenWindow,9)
-	GemRB.SetText(CharGenWindow, TextAreaControl, 12135)
+	GemRB.SetText(CharGenWindow, TextAreaControl, "[capital=0]" + GemRB.GetString(12135))
 	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,": ")
 	if GemRB.GetVar("Gender") == 1:
 		GemRB.TextAreaAppend(CharGenWindow, TextAreaControl, 1050)
