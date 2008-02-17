@@ -188,7 +188,7 @@ def UpdateLogWindow ():
 def PrevChapterPress ():
 	global Chapter 
 
-	if Chapter > 1:
+	if Chapter > 0:
 		Chapter = Chapter - 1
 		GemRB.SetToken ("CurrentChapter", str(Chapter) )
 		UpdateLogWindow ()
