@@ -86,7 +86,7 @@ void NullSnd::GetListenerPos(int& x, int& y)
 	y = YPos;
 }
 
-int NullSnd::SetupAmbientStream(ieWord, ieWord, ieWord, ieWord, bool)
+int NullSnd::SetupNewStream(ieWord, ieWord, ieWord, ieWord, bool, bool)
 {
 	return -1;
 }
@@ -96,7 +96,7 @@ int NullSnd::QueueAmbient(int, const char*)
 	return -1;
 }
 
-bool NullSnd::ReleaseAmbientStream(int, bool)
+bool NullSnd::ReleaseStream(int, bool)
 {
 	return true;
 }
@@ -106,3 +106,7 @@ void NullSnd::SetAmbientStreamVolume(int, int)
 
 }
 
+void NullSnd::QueueBuffer(int, unsigned short, int, short*, int, int)
+{
+
+}

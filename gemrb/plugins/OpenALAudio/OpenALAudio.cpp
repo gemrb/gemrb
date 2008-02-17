@@ -89,9 +89,9 @@ bool OpenALAudioDriver::Init(void)
 	}
 	alutContext = context;
 
-    //1 for speech, 1 or movie...
-    int sources = CountAvailableSources(MAX_STREAMS+2);
-	num_streams = sources - 2;
+    //1 for speech
+    int sources = CountAvailableSources(MAX_STREAMS+1);
+	num_streams = sources - 1;
 
 	if (num_streams < MAX_STREAMS) {
 		printMessage( "OpenAL","Allocated fewer streams than desired. ", YELLOW );
@@ -172,16 +172,13 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_lengt
     DataStream* stream = core->GetResourceMgr()->GetResource(ResRef, IE_WAV_CLASS_ID);
     if (!stream)
         return 0;
-    for (int i=0;i<RETRY;i++) {
-        alGenBuffers(1, &Buffer);
-        if ( alGetError()==AL_NO_ERROR )
-            break;
-        else {
-            printMessage("OpenAL", "Unable to attach buffer", WHITE );
-            printStatus("ERROR", YELLOW);
-            delete stream;
-            return 0;
-        }
+
+    alGenBuffers(1, &Buffer);
+    if ( alGetError() != AL_NO_ERROR ) {
+        printMessage("OpenAL", "Unable to create buffer", WHITE );
+        printStatus("ERROR", YELLOW);
+        delete stream;
+        return 0;
     }
 
     SoundMgr* acm = (SoundMgr*) core->GetInterface(IE_WAV_CLASS_ID);
@@ -296,7 +293,7 @@ unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, uns
 	alGenSources( 1, &Source );
 	if (alGetError() != AL_NO_ERROR) {
 		//failed to generate new sound source
-		printMessage( "OpenAL", "Unable to attach a source", WHITE );
+		printMessage( "OpenAL", "Unable to create a source", WHITE );
         printStatus( "ERROR", YELLOW );
 		return 0;
 	}
@@ -465,7 +462,7 @@ void OpenALAudioDriver::GetListenerPos(int &XPos, int &YPos )
 	YPos = (int) listen[1];
 }
 
-bool OpenALAudioDriver::ReleaseAmbientStream(int stream, bool HardStop)
+bool OpenALAudioDriver::ReleaseStream(int stream, bool HardStop)
 {
     if (streams[stream].free || !streams[stream].locked)
         return false;
@@ -488,8 +485,9 @@ bool OpenALAudioDriver::ReleaseAmbientStream(int stream, bool HardStop)
 	return true;
 }
 
-int OpenALAudioDriver::SetupAmbientStream( ieWord x, ieWord y, ieWord z,
-                    ieWord gain, bool point )
+//This one is used for movies and ambients.
+int OpenALAudioDriver::SetupNewStream( ieWord x, ieWord y, ieWord z,
+                    ieWord gain, bool point, bool Ambient )
 {
 	// Find a free (or finished) stream for this sound
 	int stream = -1;
@@ -515,7 +513,7 @@ int OpenALAudioDriver::SetupAmbientStream( ieWord x, ieWord y, ieWord z,
 	streams[stream].Buffer = 0;
 	streams[stream].Source = source;
 	streams[stream].free = false;
-	streams[stream].ambient = true;
+	streams[stream].ambient = Ambient;
 	streams[stream].locked = true;
 
 	return stream;
@@ -687,4 +685,31 @@ int OpenALAudioDriver::MusicManager(void* arg)
 		}
 	}
 	return 0;
+}
+
+//This one is used for movies, might be useful for others ?
+void OpenALAudioDriver::QueueBuffer(int stream, unsigned short bits,
+                int channels, short* memory,
+                int size, int samplerate)
+{
+    ALuint Buffer ;
+
+    alGenBuffers(1, &Buffer) ;
+    if ( alGetError() != AL_NO_ERROR ) {
+        printMessage("OpenAL", "Unable to create buffer", WHITE ) ;
+        printStatus("ERROR", YELLOW) ;
+        return;
+    }
+
+    alBufferData(Buffer, GetFormatEnum(channels, bits), memory, size, samplerate) ;
+
+    alSourceQueueBuffers(streams[stream].Source, 1, &Buffer ) ;
+
+    ALenum state ;
+    alGetSourcei(streams[stream].Source, AL_SOURCE_STATE, &state) ;
+
+    if(state != AL_PLAYING )
+        alSourcePlay(streams[stream].Source) ;
+
+    return ;
 }

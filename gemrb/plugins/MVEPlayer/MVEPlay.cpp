@@ -153,6 +153,7 @@ int MVEPlay::doPlay(const DataStream* mve)
 	MVE_ioCallbacks( fileRead );
 	MVE_sfCallbacks( showFrame );
 	MVE_palCallbacks( setPalette );
+	MVE_audioCallbacks( setAudioStream, freeAudioStream, queueBuffer ) ;
 
 	int w,h;
 
@@ -213,4 +214,25 @@ void MVEPlay::setPalette(unsigned char* p, unsigned start, unsigned count)
 
 	//movie libs palette into our array
 	memcpy( g_palette + start * 3, p + start * 3, count * 3 );
+}
+
+int MVEPlay::setAudioStream()
+{
+    ieDword volume ;
+    core->GetDictionary()->Lookup( "Volume Movie", volume) ;
+    return core->GetAudioDrv()->SetupNewStream(0, 0, 0, volume,
+                                            false, false) ;
+}
+
+void MVEPlay::freeAudioStream(int stream)
+{
+    core->GetAudioDrv()->ReleaseStream(stream);
+}
+
+void MVEPlay::queueBuffer(int stream, unsigned short bits,
+                int channels, short* memory,
+                int size, int samplerate)
+{
+    core->GetAudioDrv()->QueueBuffer(stream, bits, channels,
+                memory, size, samplerate) ;
 }

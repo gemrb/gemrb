@@ -20,16 +20,6 @@
 # include <windows.h>
 #endif
 
-#if defined(AUDIO)
-# ifndef _WIN32
-#  include <AL/al.h>
-#  include <AL/alc.h>
-# else
-#  include <al.h>
-#  include <alc.h>
-# endif
-#endif
-
 #include "mvelib.h"
 #include "mve_audio.h"
 
@@ -247,9 +237,10 @@ static void do_timer_wait(void)
 #ifdef AUDIO
 
 static int audiobuf_created = 0;
-static ALuint mve_audio_source = 0;
-static ALenum mve_audio_format;
-static ALsizei mve_audio_samplerate;
+static int mve_audio_source = 0;
+static unsigned short mve_audio_samplerate;
+static int mve_audio_bitsize = 0;
+static int mve_audio_channels = 0 ;
 static int mve_audio_playing = 0;
 static int mve_audio_canplay = 0;
 static int mve_audio_compressed = 0;
@@ -260,34 +251,15 @@ static unsigned short mve_audio_volume = 100;
 
 #endif
 
-static void free_audio_source()
-{
-	if (!alIsSource( mve_audio_source ) )
-		return;
-	// destroy the buffers
-	alSourceStop( mve_audio_source );
-	ALint nbuffers;
-	ALuint *buffers;
-
-	alGetSourcei( mve_audio_source, AL_BUFFERS_PROCESSED, &nbuffers );
-	buffers = (ALuint *) mve_alloc( nbuffers * sizeof(ALuint) );
-	alSourceUnqueueBuffers( mve_audio_source, nbuffers, buffers );
-	alDeleteBuffers( nbuffers, buffers );
-	mve_free( buffers );
-
-	alDeleteSources( 1, &mve_audio_source );
-}
-
 static int create_audiobuf_handler(unsigned char /*major*/, unsigned char minor,
 	unsigned char* data, int /*len*/)
 {
 #ifdef AUDIO
 	int flags;
 	int desired_buffer;
-
-	int stereo;
-	int bitsize;
 	int compressed;
+	int stereo;
+	int bitsize ;
 
 	if (!mve_audio_enabled) {
 		return 1;
@@ -303,6 +275,8 @@ static int create_audiobuf_handler(unsigned char /*major*/, unsigned char minor,
 	mve_audio_samplerate = get_ushort( data + 4 );
 	desired_buffer = get_int( data + 6 );
 
+	mve_audio_channels = ( flags & MVE_AUDIO_FLAGS_STEREO ) ? 2 : 1;
+	mve_audio_bitsize = ( flags & MVE_AUDIO_FLAGS_16BIT ) ? 16 : 8;
 	stereo = ( flags & MVE_AUDIO_FLAGS_STEREO ) ? 1 : 0;
 	bitsize = ( flags & MVE_AUDIO_FLAGS_16BIT ) ? 1 : 0;
 
@@ -316,64 +290,25 @@ static int create_audiobuf_handler(unsigned char /*major*/, unsigned char minor,
 	// it's actually four bytes per sample in stereo 16-bit
 	mve_audio_memory = ( short * ) mve_alloc( desired_buffer * (1 << (stereo + bitsize)) );
 
-	if (bitsize == 1) {
-		mve_audio_format = ( stereo ? AL_FORMAT_STEREO16 : AL_FORMAT_MONO16 );
-	} else {
-		mve_audio_format = ( stereo ? AL_FORMAT_STEREO8 : AL_FORMAT_MONO8 );
-	}
-
 	fprintf( stderr, "creating audio source\n" );
 	fprintf( stderr,
 		"sample rate = %d, stereo = %d, bitsize = %d, compressed = %d\n",
-		mve_audio_samplerate, stereo, bitsize ? 16 : 8, compressed );
+		mve_audio_samplerate, stereo, mve_audio_bitsize, compressed );
 
-	free_audio_source();
+	mve_freeaudiostream(mve_audio_source);
 	mve_audio_source = 0;
 
-	alGenSources( 1, &mve_audio_source );
-	ALenum error = alGetError();
-	if ( error != AL_NO_ERROR) {
+	mve_audio_source = mve_createaudiostream();
+	if ( mve_audio_source == -1 ) {
 		fprintf( stderr, "   failure\n");
+		mve_audio_canplay = 0 ;
 	}
-
-	ALfloat SourcePos[] = {
-		0.0f, 0.0f, 0.0f
-	};
-	ALfloat SourceVel[] = {
-		0.0f, 0.0f, 0.0f
-	};
-
-	alSourcef( mve_audio_source, AL_PITCH, 1.0f );
-	alSourcef( mve_audio_source, AL_GAIN, 0.01f * mve_audio_volume );
-	alSourcefv( mve_audio_source, AL_POSITION, SourcePos );
-	alSourcefv( mve_audio_source, AL_VELOCITY, SourceVel );
-	alSourcei( mve_audio_source, AL_LOOPING, 0 );
-	alSourcei( mve_audio_source, AL_SOURCE_RELATIVE, 1 );
-
 	fprintf( stderr, "   success\n" );
 	mve_audio_canplay = 1;
 
 	mve_audio_underruns = 0;
 #endif
 
-	return 1;
-}
-
-static int play_audio_handler(unsigned char /*major*/, unsigned char /*minor*/,
-	unsigned char* /*data*/, int /*len*/)
-{
-#ifdef AUDIO
-	if (mve_audio_canplay &&
-		!mve_audio_playing) {
-
-		// we can play even if the queue is empty
-		// openal won't even start playing (it's a legal nop)
-		// and playing will be resumed at a buffer refill
-		// as though a buffer underrun has happened
-		alSourcePlay( mve_audio_source );
-		mve_audio_playing = 1;
-	}
-#endif
 	return 1;
 }
 
@@ -386,15 +321,6 @@ static int audio_data_handler(unsigned char major, unsigned char /*minor*/,
 	int nsamp;
 
 	if (mve_audio_canplay) {
-		ALuint buffer = 0;
-		ALint processed;
-		alGetSourcei( mve_audio_source, AL_BUFFERS_PROCESSED, &processed );
-		if (0 == processed) { // do we have to create a new buffer?
-			alGenBuffers( 1, &buffer );
-		} else {
-			alSourceUnqueueBuffers( mve_audio_source, 1, &buffer );
-		}
-
 		chan = get_ushort( data + 2 );
 		nsamp = get_ushort( data + 4 );
 		if (chan & selected_chan) {
@@ -405,33 +331,23 @@ static int audio_data_handler(unsigned char major, unsigned char /*minor*/,
 
 //					short * memory = (short *) mve_alloc( nsamp );
 					mveaudio_uncompress( mve_audio_memory, data, -1 ); /* XXX */
-					alBufferData( buffer, mve_audio_format, mve_audio_memory, nsamp, mve_audio_samplerate );
+					mve_queuebuffer( mve_audio_source, mve_audio_bitsize,
+					                 mve_audio_channels, mve_audio_memory,
+					                 nsamp, mve_audio_samplerate );
 				} else {
 					nsamp -= 8;
 					data += 8;
 
-					alBufferData( buffer, mve_audio_format, data, nsamp, mve_audio_samplerate );
+					mve_queuebuffer(mve_audio_source, mve_audio_bitsize,
+					                mve_audio_channels, (short*) data,
+					                nsamp, mve_audio_samplerate );
 				}
 			} else {
 					memset(mve_audio_memory,0, nsamp);
-					alBufferData( buffer, mve_audio_format, mve_audio_memory, nsamp, mve_audio_samplerate );
+					mve_queuebuffer(mve_audio_source, mve_audio_bitsize,
+					                mve_audio_channels, mve_audio_memory,
+					                nsamp, mve_audio_samplerate );
 			}
-			alSourceQueueBuffers( mve_audio_source, 1, &buffer );
-
-			ALenum state;
-			alGetSourcei( mve_audio_source, AL_SOURCE_STATE, &state );
-
-			if (AL_STOPPED == state) { // it seems we have a buffer underrun; press play to continue...
-				mve_audio_underruns ++;
-				fprintf( stderr, "\nbuffer underrun\n" );
-				alSourcePlay( mve_audio_source );
-			}
-
-			ALint queued, processed;
-			alGetSourcei( mve_audio_source, AL_BUFFERS_QUEUED, &queued );
-			alGetSourcei( mve_audio_source, AL_BUFFERS_PROCESSED, &processed );
-			fprintf(stderr, "audio buffers: %d queued, %d processed\r", queued, processed);
-
 		}
 	}
 #endif
@@ -644,6 +560,15 @@ void MVE_palCallbacks(mve_cb_SetPalette setpalette)
 	mve_setpalette = setpalette;
 }
 
+void MVE_audioCallbacks(mve_cb_CreateAudioStream createaudiostream,
+                    mve_cb_FreeAudioStream freeaudiostream,
+                    mve_cb_QueueBuffer queuebuffer)
+{
+    mve_createaudiostream = createaudiostream;
+    mve_freeaudiostream = freeaudiostream;
+    mve_queuebuffer = queuebuffer;
+}
+
 int MVE_rmPrepMovie(void* src, int x, int y, int /*track*/)
 {
 	int i;
@@ -670,7 +595,6 @@ int MVE_rmPrepMovie(void* src, int x, int y, int /*track*/)
 	mve_set_handler( mve, MVE_OPCODE_CREATETIMER, create_timer_handler );
 	mve_set_handler( mve, MVE_OPCODE_INITAUDIOBUFFERS,
 		create_audiobuf_handler );
-	mve_set_handler( mve, MVE_OPCODE_STARTSTOPAUDIO, play_audio_handler );
 	mve_set_handler( mve, MVE_OPCODE_INITVIDEOBUFFERS,
 		create_videobuf_handler );
 
@@ -692,7 +616,7 @@ int MVE_rmPrepMovie(void* src, int x, int y, int /*track*/)
 
 	g_framesToDrop = 0;
 	g_framesDropped = 0;
-	
+
 	return 0;
 }
 
@@ -740,7 +664,7 @@ void MVE_rmEndMovie()
 	timer_created = 0;
 
 #ifdef AUDIO
-	free_audio_source();
+	//free_audio_source();
 	if (mve_audio_memory) {
 	        mve_free( mve_audio_memory );
 	        mve_audio_memory = NULL;

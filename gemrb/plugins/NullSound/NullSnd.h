@@ -38,12 +38,14 @@ public:
 	void ResetMusics();
 	void UpdateListenerPos(int XPos, int YPos);
 	void GetListenerPos(int& XPos, int& YPos);
-	void UpdateVolume(unsigned int) {} ;
+	void UpdateVolume(unsigned int) {}
 
-	int SetupAmbientStream(ieWord x, ieWord y, ieWord z, ieWord gain, bool point);
+	int SetupNewStream(ieWord x, ieWord y, ieWord z, ieWord gain, bool point, bool Ambient);
 	int QueueAmbient(int stream, const char* sound);
-	bool ReleaseAmbientStream(int stream, bool hardstop);
+	bool ReleaseStream(int stream, bool hardstop);
 	void SetAmbientStreamVolume(int stream, int gain);
+	void QueueBuffer(int stream, unsigned short bits, int channels,
+                short* memory, int size, int samplerate);
 
 
 public:

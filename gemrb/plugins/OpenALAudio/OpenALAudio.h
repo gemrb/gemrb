@@ -89,11 +89,14 @@ public:
     int StreamFile( const char* filename );
     void UpdateListenerPos(int XPos, int YPos );
     void GetListenerPos( int &XPos, int &YPos );
-    bool ReleaseAmbientStream(int stream, bool HardStop);
-    int SetupAmbientStream( ieWord x, ieWord y, ieWord z,
-                    ieWord gain, bool point );
+    bool ReleaseStream(int stream, bool HardStop);
+    int SetupNewStream( ieWord x, ieWord y, ieWord z,
+                    ieWord gain, bool point, bool Ambient );
     int QueueAmbient(int stream, const char* sound);
     void SetAmbientStreamVolume(int stream, int volume);
+    void QueueBuffer(int stream, unsigned short bits,
+                int channels, short* memory,
+                int size, int samplerate) ;
 private:
     ALCcontext *alutContext;
     ALuint MusicSource;

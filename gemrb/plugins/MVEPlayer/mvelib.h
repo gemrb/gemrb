@@ -11,6 +11,9 @@ extern mve_cb_Alloc mve_alloc;
 extern mve_cb_Free mve_free;
 extern mve_cb_ShowFrame mve_showframe;
 extern mve_cb_SetPalette mve_setpalette;
+extern mve_cb_CreateAudioStream mve_createaudiostream;
+extern mve_cb_FreeAudioStream mve_freeaudiostream;
+extern mve_cb_QueueBuffer mve_queuebuffer;
 
 /*
  * structure for maintaining info on a MVEFILE stream

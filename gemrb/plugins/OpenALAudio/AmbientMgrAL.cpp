@@ -179,7 +179,7 @@ void AmbientMgrAL::AmbientSource::ensureLoaded()
 AmbientMgrAL::AmbientSource::~AmbientSource()
 {
 	if (stream >= 0) {
-		core->GetAudioDrv()->ReleaseAmbientStream(stream, true);
+		core->GetAudioDrv()->ReleaseStream(stream, true);
 		stream = -1;
 	}
 }
@@ -197,7 +197,7 @@ unsigned int AmbientMgrAL::AmbientSource::tick(unsigned int ticks, Point listene
 
 		if (stream >= 0) {
 			// release the stream without immediately stopping it
-			core->GetAudioDrv()->ReleaseAmbientStream(stream, false);
+			core->GetAudioDrv()->ReleaseStream(stream, false);
 		}
 		return UINT_MAX;
 	}
@@ -218,7 +218,7 @@ unsigned int AmbientMgrAL::AmbientSource::tick(unsigned int ticks, Point listene
 	if (! (ambient->getFlags() & IE_AMBI_MAIN) && !isHeard( listener )) { // we are out of range
 		if (delay > 500) {
 			// release stream if we're inactive for a while
-			core->GetAudioDrv()->ReleaseAmbientStream(stream);
+			core->GetAudioDrv()->ReleaseStream(stream);
 		}
 		return delay;
 	}
@@ -228,7 +228,7 @@ unsigned int AmbientMgrAL::AmbientSource::tick(unsigned int ticks, Point listene
 
 	if (stream < 0) {
 		// we need to allocate a stream
-		stream = core->GetAudioDrv()->SetupAmbientStream(ambient->getOrigin().x, ambient->getOrigin().y, ambient->getHeight(), ambient->getGain(), (ambient->getFlags() & IE_AMBI_POINT));
+		stream = core->GetAudioDrv()->SetupNewStream(ambient->getOrigin().x, ambient->getOrigin().y, ambient->getHeight(), ambient->getGain(), (ambient->getFlags() & IE_AMBI_POINT), true);
 
 		if (stream == -1) {
 			// no streams available...
@@ -281,7 +281,7 @@ bool AmbientMgrAL::AmbientSource::isHeard(const Point &listener) const
 void AmbientMgrAL::AmbientSource::hardStop()
 {
 	if (stream >= 0) {
-		core->GetAudioDrv()->ReleaseAmbientStream(stream, true);
+		core->GetAudioDrv()->ReleaseStream(stream, true);
 		stream = -1;
 	}
 }

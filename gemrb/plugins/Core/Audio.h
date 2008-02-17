@@ -60,11 +60,14 @@ public:
     virtual int StreamFile(const char* fileName ) = 0;
     virtual void UpdateListenerPos(int XPos, int YPos ) = 0;
     virtual void GetListenerPos(int &XPos, int &YPos ) = 0;
-    virtual bool ReleaseAmbientStream(int stream, bool HardStop=false ) = 0;
-    virtual int SetupAmbientStream( ieWord x, ieWord y, ieWord z,
-                    ieWord gain, bool point ) = 0;
+    virtual bool ReleaseStream(int stream, bool HardStop=false ) = 0;
+    virtual int SetupNewStream( ieWord x, ieWord y, ieWord z,
+                ieWord gain, bool point, bool Ambient) = 0;
     virtual int QueueAmbient(int stream, const char* sound) = 0;
     virtual void SetAmbientStreamVolume(int stream, int volume) = 0;
+    virtual void QueueBuffer(int stream, unsigned short bits,
+                int channels, short* memory, int size, int samplerate) = 0;
+
 protected:
     AmbientMgr* ambim;
 
