@@ -922,6 +922,7 @@ void Map::DrawSearchMap(Region &screen)
 
 	for(int x=0;x<w;x++) {
 		for(int y=0;y<h;y++) {
+			// CHECKME: this seems shifted?
 			if (!(GetBlocked( x+rgn.x/16, y+rgn.y/12) & PATH_MAP_PASSABLE) ) {
 				block.x=screen.x+x*16;
 				block.y=screen.y+y*12;
@@ -1638,6 +1639,7 @@ void Map::RemoveActor(Actor* actor)
 			return;
 		}
 	}
+	printMessage("Map","RemoveActor: actor not found?",YELLOW);
 }
 
 //returns true if none of the partymembers are on the map

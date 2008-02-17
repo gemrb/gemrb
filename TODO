@@ -42,6 +42,7 @@ Actor:
    are easily implemented.
    How to: replace GemRB.SetVar with GemRB.SetPlayerStat. Don't forget to create
    the character first.
+3. Move position of actor (and ground circle) to the center of a searchmap cell
 
 
 Game GUI:
