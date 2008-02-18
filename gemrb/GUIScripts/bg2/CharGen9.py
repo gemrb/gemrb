@@ -155,6 +155,8 @@ def NextPress():
 
 	if TableName != "*":
 		KitValue = GemRB.GetTableValue(KitTable, KitIndex, 6)
+		if KitValue == "*":
+			KitValue = 0x4000
 		SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_WIZARD, 1)
 		Learnable = GetLearnableMageSpells( KitValue, t, 1)
 		SpellBook = GemRB.GetVar ("MageSpellBook")
