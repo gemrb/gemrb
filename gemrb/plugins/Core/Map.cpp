@@ -563,7 +563,7 @@ void Map::UpdateScripts()
 		}
 
 		if (actor->Modified[IE_DONOTJUMP]<2) {
-			Actor** nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD, MAX_CIRCLE_SIZE*2*14);//14=sqrt(16*12)
+			Actor** nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD, MAX_CIRCLE_SIZE*2*16);
 			BlockSearchMap( actor->Pos, actor->size, 0);
 
 			// Restore the searchmap areas of any nearby actors that could
@@ -1022,12 +1022,26 @@ bool Map::AnyPCSeesEnemy()
 void Map::DeleteActor(int i)
 {
 	Actor *actor = actors[i];
+
+	Actor** nearActors = GetAllActorsInRadius(actor->Pos, GA_NO_DEAD, MAX_CIRCLE_SIZE*2*16);
+
 	Game *game = core->GetGame();
 	game->LeaveParty( actor );
 	game->DelNPC( game->InStore(actor) );
+
 	BlockSearchMap( actor->Pos, actor->size, PATH_MAP_FREE);
+	// Restore the searchmap areas of any nearby actors that could
+	// have been cleared by this BlockSearchMap(..., 0).
+	// (Necessary since blocked areas of actors may overlap.)
+	int j=0;
+	while(nearActors[j]!=NULL) {
+		if(nearActors[j]!=actor)
+			BlockSearchMap( nearActors[j]->Pos, nearActors[j]->size, nearActors[j]->InParty?PATH_MAP_PC:PATH_MAP_NPC);
+		++j;
+	}
+
 	actors.erase( actors.begin()+i );
-	delete (actor);
+	delete actor;
 }
 
 Actor* Map::GetActorByGlobalID(ieDword objectID)
