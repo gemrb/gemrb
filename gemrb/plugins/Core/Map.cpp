@@ -26,7 +26,6 @@
 #include "Ambient.h"
 #include "../../includes/strrefs.h"
 #include "AmbientMgr.h"
-#include "SpriteCover.h"
 #include "TileMap.h"
 #include "ScriptedAnimation.h"
 #include "Projectile.h"
@@ -813,23 +812,7 @@ void Map::DrawMap(Region screen, GameControl* gc)
 			break;
 		case AOT_AREA:
 			//draw animation
-			{
-				int animcount=a->animcount;
-
-				//always draw the animation tinted because tint is also used for
-				//transparency
-				Color tint = {255,255,255,255-(ieByte) a->transparency};
-				if ((a->Flags&A_ANI_NO_SHADOW)) {
-					tint = LightMap->GetPixel( a->Pos.x / 16, a->Pos.y / 12);
-					tint.a = 255-(ieByte) a->transparency;
-				}
-				while (animcount--) {
-					Animation *anim = a->animation[animcount];
-					video->BlitGameSprite( anim->NextFrame(),
-						a->Pos.x + screen.x, a->Pos.y + screen.y,
-						BLIT_TINTED, tint, 0, a->palette, &screen );
-				}
-			}
+			a->Draw( screen, this );
 			a = GetNextAreaAnimation(aniidx,gametime);
 			break;
 		case AOT_SCRIPTED:
@@ -943,6 +926,12 @@ void Map::AddAnimation(AreaAnimation* anim)
 	aniIterator iter;
 	for(iter=animations.begin(); (iter!=animations.end()) && ((*iter)->height<anim->height); iter++);
 	animations.insert(iter, anim);
+	/*
+	Animation *a = anim->animation[0];
+	anim->SetSpriteCover(BuildSpriteCover(anim->Pos.x, anim->Pos.y,-a->animArea.x,
+			-a->animArea.y, a->animArea.w, a->animArea.h,0
+		));
+	*/
 }
 
 //reapplying all of the effects on the actors of this map
@@ -1325,7 +1314,6 @@ int Map::GetBlocked(unsigned int x, unsigned int y)
 {
 	int ret = SearchMap->GetPixelIndex( x, y );
 	if (ret&(PATH_MAP_DOOR_TRANSPARENT|PATH_MAP_ACTOR)) {
-//  if (ret&PATH_MAP_DOOR_TRANSPARENT) {
 		ret&=~PATH_MAP_PASSABLE;
 	}
 	if (ret&PATH_MAP_DOOR_OPAQUE) {
@@ -1338,7 +1326,7 @@ bool Map::GetBlocked(unsigned int px, unsigned int py, unsigned int size)
 {
 	// We check a circle of radius size-2 around (px,py)
 	// Note that this does not exactly match BG2. BG2's approximations of
-	//  these circles are slightly different for sizes 7 and up.
+	// these circles are slightly different for sizes 7 and up.
 
 	if (size > MAX_CIRCLESIZE) size = MAX_CIRCLESIZE;
 	if (size < 2) size = 2;	
@@ -2418,7 +2406,7 @@ void Map::BlockSearchMap(Point &Pos, unsigned int size, unsigned int value)
 {
 	// We block a circle of radius size-1 around (px,py)
 	// Note that this does not exactly match BG2. BG2's approximations of
-	//  these circles are slightly different for sizes 6 and up.
+	// these circles are slightly different for sizes 6 and up.
 
 	// Note: this is a larger circle than the one tested in GetBlocked.
 	// This means that an actor can get closer to a wall than to another
@@ -2708,6 +2696,7 @@ AreaAnimation::AreaAnimation()
 	animation=NULL;
 	animcount=0;
 	palette=NULL;
+	covers=NULL;
 }
 
 AreaAnimation::~AreaAnimation()
@@ -2719,6 +2708,12 @@ AreaAnimation::~AreaAnimation()
 	}
 	free(animation);
 	core->FreePalette(palette, PaletteRef);
+	if (covers) {
+		for(int i=0;i<animcount;i++) {
+			delete covers[i];
+		}
+		free (covers);
+	}
 }
 
 void AreaAnimation::SetPalette(ieResRef Pal)
@@ -2760,4 +2755,37 @@ bool AreaAnimation::Schedule(ieDword gametime)
 		return true;
 	}
 	return false;
+}
+
+void AreaAnimation::Draw(Region &screen, Map *area)
+{
+	int ac=animcount;
+	Video* video = core->GetVideoDriver();
+	
+	//always draw the animation tinted because tint is also used for
+	//transparency
+	Color tint = {255,255,255,255-(ieByte) transparency};
+	if ((Flags&A_ANI_NO_SHADOW)) {
+		tint = area->LightMap->GetPixel( Pos.x / 16, Pos.y / 12);
+		tint.a = 255-(ieByte) transparency;
+	}
+	if (!(Flags&A_ANI_NO_WALL)) {
+		if (!covers) {
+			covers=(SpriteCover **) calloc( animcount, sizeof(SpriteCover *) );
+		}
+	}
+	ac=animcount;
+	while (ac--) {
+		Animation *anim = animation[ac];
+		Sprite2D *frame = anim->NextFrame();
+		if(covers) {
+			if(!covers[ac] || !covers[ac]->Covers(Pos.x, Pos.y, frame->XPos, frame->YPos, frame->Width, frame->Height)) {
+				delete covers[ac];
+				covers[ac] = area->BuildSpriteCover(Pos.x, Pos.y, -anim->animArea.x,
+					-anim->animArea.y, anim->animArea.w, anim->animArea.h, 0);
+			}
+		}
+		video->BlitGameSprite( frame, Pos.x + screen.x, Pos.y + screen.y,
+			BLIT_TINTED, tint, covers?covers[ac]:0, palette, &screen );
+	}
 }

@@ -27,6 +27,7 @@ class Map;
 #include "../../includes/globals.h"
 #include "ActorBlock.h"
 #include "IniSpawn.h"
+#include "SpriteCover.h"
 #include <queue>
 
 class Actor;
@@ -183,11 +184,13 @@ public:
 	ieResRef BAM; //not only for saving back (StaticSequence depends on this)
 	ieResRef PaletteRef;
 	Palette* palette;
+	SpriteCover** covers;
 	AreaAnimation();
 	~AreaAnimation();
 	void SetPalette(ieResRef PaletteRef);
 	void BlendAnimation();
 	bool Schedule(ieDword gametime);
+	void Draw(Region &screen, Map *area);
 };
 
 enum AnimationObjectType {AOT_AREA, AOT_SCRIPTED, AOT_ACTOR, AOT_SPARK, AOT_PROJECTILE};
