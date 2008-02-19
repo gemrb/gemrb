@@ -555,10 +555,10 @@ void GameScript::ExitPocketPlane(Scriptable* /*Sender*/, Action* /*parameters*/)
 	Actor *actor = game->GetPC(0, false);
 	ieResRef area;
 	Point p((short) actor->GetStat(IE_SAVEDXPOS), (short) actor->GetStat(IE_SAVEDYPOS) );
-        //FIXME: calculate area
-        //This action is not working now!!!
-        memcpy(area,actor->GetCurrentArea(),sizeof(ieResRef) );
-        //end of hack
+	//FIXME: calculate area
+	//This action is not working now!!!
+	memcpy(area,actor->GetCurrentArea(),sizeof(ieResRef) );
+	//end of hack
 	while (i--) {
 		Actor *tar = game->GetPC(i, false);
 		MoveBetweenAreasCore( tar, area, p, -1, true);
@@ -977,17 +977,37 @@ void GameScript::RunToPoint(Scriptable* Sender, Action* parameters)
 	Sender->ReleaseCurrentAction();
 }
 
-//not sure if this works correctly, but sounds like the way
+//movetopoint until timer is down or target reached
 void GameScript::TimedMoveToPoint(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	Actor *actor = ( Actor* ) Sender;
-	actor->WalkTo( parameters->pointParameter, 0, 0 );
-	actor->SetWait(parameters->int0Parameter * AI_UPDATE_TIME);
-	Sender->ReleaseCurrentAction();
+	if (parameters->int0Parameter<=0) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	Actor *actor = (Actor *) Sender;
+
+        actor->WalkTo( parameters->pointParameter, parameters->int1Parameter,0 );
+        Point dest = actor->Destination;
+        //hopefully this hack will prevent lockups
+        if (!actor->InMove()) {
+                Sender->ReleaseCurrentAction();
+                return;
+        }
+
+        //repeat movement...
+        Action *newaction = ParamCopyNoOverride(parameters);
+        if (newaction->int0Parameter!=1) {
+                if (newaction->int0Parameter) {
+                        newaction->int0Parameter--;
+                }
+                actor->AddActionInFront(newaction);
+        }
+
+        Sender->ReleaseCurrentAction();
 }
 
 void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
