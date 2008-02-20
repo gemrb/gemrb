@@ -199,6 +199,8 @@ def WorldMapWindowCommon (Travel):
 	GemRB.CreateWorldMapControl (Window, 4, 0, 62, 640, 418, Travel, "floattxt")
 	WorldMapControl = GemRB.GetControl (Window, 4)
 	GemRB.SetAnimation (Window, WorldMapControl, "WMDAG")
+	GemRB.SetEvent (Window, WorldMapControl, IE_GUI_WORLDMAP_ON_PRESS, "MoveToNewArea")
+	GemRB.SetEvent (Window, WorldMapControl, IE_GUI_MOUSE_ENTER_WORLDMAP, "ChangeTooltip")
 
 	#north
 	Button = GemRB.GetControl (Window, 1)
