@@ -22,15 +22,15 @@
 #ifndef NULLSND_H
 #define NULLSND_H
 
-#include "../Core/SoundMgr.h"
+#include "../Core/Audio.h"
 
-class NullSnd : public SoundMgr {
+class NullSnd : public Audio {
 public:
 	NullSnd(void);
 	~NullSnd(void);
 	bool Init(void);
 	unsigned int Play(const char* ResRef, int XPos = 0, int YPos = 0,  unsigned int flags = GEM_SND_RELATIVE);
-	unsigned int StreamFile(const char* filename);
+	int StreamFile(const char* filename);
 	bool Play();
 	bool Stop();
 	bool CanPlay();
@@ -38,11 +38,14 @@ public:
 	void ResetMusics();
 	void UpdateListenerPos(int XPos, int YPos);
 	void GetListenerPos(int& XPos, int& YPos);
+	void UpdateVolume(unsigned int) {}
 
-	int SetupAmbientStream(ieWord x, ieWord y, ieWord z, ieWord gain, bool point);
+	int SetupNewStream(ieWord x, ieWord y, ieWord z, ieWord gain, bool point, bool Ambient);
 	int QueueAmbient(int stream, const char* sound);
-	bool ReleaseAmbientStream(int stream, bool hardstop);
+	bool ReleaseStream(int stream, bool hardstop);
 	void SetAmbientStreamVolume(int stream, int gain);
+	void QueueBuffer(int stream, unsigned short bits, int channels,
+                short* memory, int size, int samplerate);
 
 
 public:

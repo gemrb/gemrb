@@ -4,6 +4,7 @@ ENDIF(WIN32)
 
 SET(gemrb_core_LIB_SRCS
    Actions.cpp
+   Audio.cpp
    Console.cpp
    DataFileMgr.cpp
    EventMgr.cpp

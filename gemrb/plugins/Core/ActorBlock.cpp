@@ -24,7 +24,7 @@
 #include "SpriteCover.h"
 #include "TileMap.h"
 #include "Video.h"
-#include "SoundMgr.h"
+#include "Audio.h"
 #include "Item.h"
 #include "Spell.h"
 #include "Map.h"
@@ -1282,11 +1282,11 @@ void Door::ToggleTiles(int State, bool playsound)
 	if (State) {
 		state = !closedIndex;
 		if (playsound && ( OpenSound[0] != '\0' ))
-			core->GetSoundMgr()->Play( OpenSound );
+			core->GetAudioDrv()->Play( OpenSound );
 	} else {
 		state = closedIndex;
 		if (playsound && ( CloseSound[0] != '\0' ))
-			core->GetSoundMgr()->Play( CloseSound );
+			core->GetAudioDrv()->Play( CloseSound );
 	}
 	for (i = 0; i < tilecount; i++) {
 		overlay->tiles[tiles[i]]->tileIndex = (ieByte) state;
@@ -1317,13 +1317,13 @@ void Door::SetDoorLocked(bool Locked, bool playsound)
 		if (Flags & DOOR_LOCKED) return;
 		Flags|=DOOR_LOCKED;
 		if (playsound && ( LockSound[0] != '\0' ))
-			core->GetSoundMgr()->Play( LockSound );
+			core->GetAudioDrv()->Play( LockSound );
 	}
 	else {
 		if (!(Flags & DOOR_LOCKED)) return;
 		Flags&=~DOOR_LOCKED;
 		if (playsound && ( UnLockSound[0] != '\0' ))
-			core->GetSoundMgr()->Play( UnLockSound );
+			core->GetAudioDrv()->Play( UnLockSound );
 	}
 }
 

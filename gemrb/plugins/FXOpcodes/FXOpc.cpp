@@ -27,7 +27,7 @@
 #include "../Core/EffectQueue.h"
 #include "../Core/Interface.h"
 #include "../Core/ResourceMgr.h"
-#include "../Core/SoundMgr.h"
+#include "../Core/Audio.h"
 #include "../Core/Game.h"
 #include "../Core/GameControl.h"
 #include "../Core/damages.h"
@@ -1017,7 +1017,7 @@ int fx_set_color_rgb (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_color_rgb_global (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_color_rgb_global (%2d): RGB: %x, Location: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	
+
 	target->SetColorMod(0xff, RGBModifier::ADD, -1, fx->Parameter1 >> 8,
 			fx->Parameter1 >> 16, fx->Parameter1 >> 24);
 
@@ -1294,7 +1294,7 @@ int fx_maximum_hp_modifier (Actor* /*Owner*/, Actor* target, Effect* fx)
 		} else {
 			STAT_ADD( IE_MAXHITPOINTS, fx->Parameter1 );
 		}
-		break;	
+		break;
 	case 1:case 4:
 		if (base) {
 			BASE_SET( IE_MAXHITPOINTS, fx->Parameter1 );
@@ -1608,7 +1608,7 @@ int fx_set_unconscious_state (Actor* Owner, Actor* target, Effect* fx)
 
 	if (fx->FirstApply) {
 		Effect *newfx;
-		
+
 		newfx = EffectQueue::CreateEffectCopy(fx, fx_animation_stance_ref, 0, IE_ANI_SLEEP);
 		core->ApplyEffect(newfx, target, Owner);
 	}
@@ -1619,7 +1619,7 @@ int fx_set_unconscious_state (Actor* Owner, Actor* target, Effect* fx)
 		STATE_SET( STATE_HELPLESS | STATE_SLEEP ); //don't awaken on damage
 		if (fx->Parameter2) {
 			target->SetSpellState(SS_NOAWAKE);
-		}    
+		}
 		target->AddPortraitIcon(PI_SLEEP);
 	}
 	return FX_PERMANENT;
@@ -2354,7 +2354,7 @@ int fx_cure_diseased_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_deaf_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_deaf_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	
+
 	//gemrb fix
 	if (target->SetSpellState(SS_DEAF)) return FX_APPLIED;
 
@@ -2376,7 +2376,7 @@ int fx_set_deaf_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_deaf_state_iwd2 (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_deaf_state_iwd2 (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	
+
 	//gemrb fix
 	if (target->SetSpellState(SS_DEAF)) return FX_APPLIED;
 
@@ -2797,7 +2797,7 @@ int fx_detect_alignment (Actor* /*Owner*/, Actor* target, Effect* fx)
 		stat = target->GetStat(IE_ALIGNMENT)&AL_LC_MASK;
 	}
 	if (stat != msk) return FX_NOT_APPLIED;
-	
+
 	ieDword color = fx->Parameter1;
 	switch (msk) {
 	case AL_EVIL:
@@ -3554,7 +3554,7 @@ int fx_set_sanctuary_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 int fx_set_entangle_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_set_entangle_state (%2d): Mod: %d, Type: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
-	
+
 	//iwd2 effects that disable entangle
 	if (target->HasSpellState(SS_FREEACTION)) return FX_NOT_APPLIED;
 	if (target->HasSpellState(SS_AEGIS)) return FX_NOT_APPLIED;
@@ -3791,9 +3791,9 @@ int fx_playsound (Actor* /*Owner*/, Actor* target, Effect* fx)
 	if (0) printf( "fx_playsound (%s)", fx->Resource );
 	//this is probably inaccurate
 	if (target) {
-		core->GetSoundMgr()->Play(fx->Resource, target->Pos.x, target->Pos.y);
+		core->GetAudioDrv()->Play(fx->Resource, target->Pos.x, target->Pos.y);
 	} else {
-		core->GetSoundMgr()->Play(fx->Resource);
+		core->GetAudioDrv()->Play(fx->Resource);
 	}
 	//this is an instant, it shouldn't stick
 	return FX_NOT_APPLIED;
@@ -4425,7 +4425,7 @@ int fx_reveal_magic (Actor* /*Owner*/, Actor* target, Effect* fx)
 		if (!fx->Parameter1) {
 			fx->Parameter1=0xff00; //blue
 		}
-		
+
 		int speed = (fx->Parameter2 >> 16) & 0xFF;
 		if (!speed) speed=30;
 		target->SetColorMod(0xff, RGBModifier::ADD, speed,
@@ -4644,7 +4644,7 @@ int fx_disintegrate (Actor* /*Owner*/, Actor* target, Effect* fx)
 	return FX_NOT_APPLIED;
 }
 
-// 0xef Farsee 
+// 0xef Farsee
 // 1 view not explored sections too
 // 2 param1=range (otherwise visualrange)
 // 4 point already set (otherwise use gui)

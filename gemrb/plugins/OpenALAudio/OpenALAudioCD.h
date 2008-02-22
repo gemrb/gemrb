@@ -1,5 +1,5 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2003 The GemRB Project
+ * Copyright (C) 2003-2004 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,46 +15,24 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Id$
+ * $Id: ACMImp.cpp 4947 2007-12-29 14:01:22Z wjpalenstijn $
  *
  */
 
-#ifndef ACMIMP_H
-#define ACMIMP_H
+#ifndef OPENALAUDIOCD_H_INCLUDED
+#define OPENALAUDIOCD_H_INCLUDED
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include "readers.h"
-#include "../Core/DataStream.h"
-#include "../Core/SoundMgr.h"
-
-#ifdef HAS_VORBIS_SUPPORT
-#include <vorbis/vorbisfile.h>
-#endif
-
-#define INIT_NO_ERROR_MSG 0
-#define INIT_NEED_ERROR_MSG 1
-
-// Abstract Sound Reader class
-class ACMImp : public SoundMgr {
-private:
-	CSoundReader* SoundReader ;
-
+class OpenALAudioCD : public ClassDesc {
 public:
-    ACMImp() ;
-    ~ACMImp() ;
-    void release()
-    {
-        delete this ;
-    }
-    bool Open(DataStream* stream, bool autofree );
-    int get_length() ;
-    int get_channels() ;
-    int get_samplerate() ;
-    int read_samples(short* memory, int cnt) ;
-    void rewind(void) ;
+	OpenALAudioCD(void);
+	~OpenALAudioCD(void);
+	void* Create(void);
+	const char* ClassName(void);
+	SClass_ID SuperClassID(void);
+	Class_ID ClassID(void);
+	const char* InternalName(void);
 };
+static OpenALAudioCD OpenALAudioCD;
 
-#endif //ACMIMP_H
 
+#endif // OPENALAUDIOCD_H_INCLUDED

@@ -40,6 +40,11 @@ private:
 		unsigned int dsty);
 	static void setPalette(unsigned char* p, unsigned start, unsigned count);
 	static int pollEvents();
+	static int setAudioStream();
+	static void freeAudioStream(int stream);
+	static void queueBuffer(int stream, unsigned short bits,
+                int channels, short* memory,
+                int size, int samplerate);
 public:
 	MVEPlay(void);
 	~MVEPlay(void);

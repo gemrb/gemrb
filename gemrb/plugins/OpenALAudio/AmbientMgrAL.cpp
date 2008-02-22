@@ -25,7 +25,7 @@
 #include "../Core/Ambient.h"
 #include "../Core/Interface.h"
 #include "../Core/Game.h"
-#include "ACMImp.h"
+#include "OpenALAudio.h"
 #include "AmbientMgrAL.h"
 
 #include "SDL.h"
@@ -55,17 +55,17 @@ void AmbientMgrAL::setAmbients(const std::vector<Ambient *> &a)
 {
 	AmbientMgr::setAmbients(a);
 	assert(NULL == player);
-	
+
 	ambientSources.reserve(a.size());
 	for (std::vector<Ambient *>::const_iterator it = a.begin(); it != a.end(); ++it) {
 		ambientSources.push_back(new AmbientSource(*it));
 	}
-	core->GetSoundMgr()->UpdateVolume( GEM_SND_VOL_AMBIENTS );
-	
+	core->GetAudioDrv()->UpdateVolume( GEM_SND_VOL_AMBIENTS );
+
 	player = SDL_CreateThread(&play, (void *) this);
 }
 
-void AmbientMgrAL::activate(const std::string &name) 
+void AmbientMgrAL::activate(const std::string &name)
 {
 	if (NULL != player)
 		SDL_mutexP(mutex);
@@ -87,7 +87,7 @@ void AmbientMgrAL::activate()
 	}
 }
 
-void AmbientMgrAL::deactivate(const std::string &name) 
+void AmbientMgrAL::deactivate(const std::string &name)
 {
 	if (NULL != player)
 		SDL_mutexP(mutex);
@@ -98,7 +98,7 @@ void AmbientMgrAL::deactivate(const std::string &name)
 	}
 }
 
-void AmbientMgrAL::deactivate() 
+void AmbientMgrAL::deactivate()
 {
 	if (NULL != player)
 		SDL_mutexP(mutex);
@@ -115,7 +115,7 @@ void AmbientMgrAL::hardStop()
 	}
 }
 
-int AmbientMgrAL::play(void *am) 
+int AmbientMgrAL::play(void *am)
 {
 	AmbientMgrAL * ambim = (AmbientMgrAL *) am;
 	SDL_mutexP(ambim->mutex);
@@ -134,18 +134,18 @@ int AmbientMgrAL::play(void *am)
 unsigned int AmbientMgrAL::tick(unsigned int ticks)
 {
 	unsigned int delay = 60000; // wait one minute if all sources are off
-	
+
 	if (!active)
 		return delay;
-	
+
 	int xpos, ypos;
-	core->GetSoundMgr()->GetListenerPos(xpos, ypos);
+	core->GetAudioDrv()->GetListenerPos(xpos, ypos);
 	Point listener;
 	listener.x = (short) xpos;
 	listener.y = (short) ypos;
-	
+
 	ieDword timeslice = 1<<(((core->GetGame()->GameTime / 60 + 30) / 60 - 1) % 24);
-	
+
 	for (std::vector<AmbientSource *>::iterator it = ambientSources.begin(); it != ambientSources.end(); ++it) {
 		unsigned int newdelay = (*it)->tick(ticks, listener, timeslice);
 		if (newdelay < delay)
@@ -179,7 +179,7 @@ void AmbientMgrAL::AmbientSource::ensureLoaded()
 AmbientMgrAL::AmbientSource::~AmbientSource()
 {
 	if (stream >= 0) {
-		core->GetSoundMgr()->ReleaseAmbientStream(stream, true);
+		core->GetAudioDrv()->ReleaseStream(stream, true);
 		stream = -1;
 	}
 }
@@ -191,17 +191,17 @@ unsigned int AmbientMgrAL::AmbientSource::tick(unsigned int ticks, Point listene
 		return UINT_MAX;
 	}
 	if (loaded && soundrefs.empty()) return UINT_MAX;
-	
+
 	if ((! (ambient->getFlags() & IE_AMBI_ENABLED)) || (! ambient->getAppearance()&timeslice)) {
 		// disabled
 
 		if (stream >= 0) {
 			// release the stream without immediately stopping it
-			core->GetSoundMgr()->ReleaseAmbientStream(stream, false);
+			core->GetAudioDrv()->ReleaseStream(stream, false);
 		}
 		return UINT_MAX;
 	}
-	
+
 	int delay = ambient->getInterval() * 1000;
 	int left = lastticks - ticks + delay;
 	if (0 < left) // we are still waiting
@@ -210,25 +210,25 @@ unsigned int AmbientMgrAL::AmbientSource::tick(unsigned int ticks, Point listene
 		enqueued += left;
 	if (enqueued < 0)
 		enqueued = 0;
-	
+
 	lastticks = ticks;
 	if (0 == delay) // it's a non-stop ambient, so in any case wait only a sec
 		delay = 1000;
-	
+
 	if (! (ambient->getFlags() & IE_AMBI_MAIN) && !isHeard( listener )) { // we are out of range
 		if (delay > 500) {
 			// release stream if we're inactive for a while
-			core->GetSoundMgr()->ReleaseAmbientStream(stream);
-		}	
+			core->GetAudioDrv()->ReleaseStream(stream);
+		}
 		return delay;
 	}
 
 	ensureLoaded();
 	if (soundrefs.empty()) return UINT_MAX;
-	
+
 	if (stream < 0) {
 		// we need to allocate a stream
-		stream = core->GetSoundMgr()->SetupAmbientStream(ambient->getOrigin().x, ambient->getOrigin().y, ambient->getHeight(), ambient->getGain(), (ambient->getFlags() & IE_AMBI_POINT));
+		stream = core->GetAudioDrv()->SetupNewStream(ambient->getOrigin().x, ambient->getOrigin().y, ambient->getHeight(), ambient->getGain(), (ambient->getFlags() & IE_AMBI_POINT), true);
 
 		if (stream == -1) {
 			// no streams available...
@@ -267,7 +267,7 @@ int AmbientMgrAL::AmbientSource::enqueue()
 	if (stream < 0) return -1;
 	int index = rand() % soundrefs.size();
 	//printf("Playing ambient %p, %s, %d/%ld on stream %d\n", (void*)this, soundrefs[index], index, soundrefs.size(), stream);
-	return core->GetSoundMgr()->QueueAmbient(stream, soundrefs[index]);
+	return core->GetAudioDrv()->QueueAmbient(stream, soundrefs[index]);
 }
 
 bool AmbientMgrAL::AmbientSource::isHeard(const Point &listener) const
@@ -281,7 +281,7 @@ bool AmbientMgrAL::AmbientSource::isHeard(const Point &listener) const
 void AmbientMgrAL::AmbientSource::hardStop()
 {
 	if (stream >= 0) {
-		core->GetSoundMgr()->ReleaseAmbientStream(stream, true);
+		core->GetAudioDrv()->ReleaseStream(stream, true);
 		stream = -1;
 	}
 }
@@ -304,7 +304,6 @@ void AmbientMgrAL::AmbientSource::SetVolume(unsigned short volume)
 		int v = volume;
 		v *= ambient->getGain();
 		v /= 100;
-		core->GetSoundMgr()->SetAmbientStreamVolume(stream, v);
+		core->GetAudioDrv()->SetAmbientStreamVolume(stream, v);
 	}
 }
-

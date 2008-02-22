@@ -1,5 +1,5 @@
 /* GemRB - Infinity Engine Emulator
- * Copyright (C) 2003 The GemRB Project
+ * Copyright (C) 2003-2004 The GemRB Project
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,42 +15,43 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
- * $Id$
+ * $Id: ACMImp.cpp 4947 2007-12-29 14:01:22Z wjpalenstijn $
  *
  */
 
-#include "NullSoundCD.h"
-#include "NullSnd.h"
+#include "OpenALAudio.h"
+#include "OpenALAudioCD.h"
 
-NullSoundCD::NullSoundCD(void)
+OpenALAudioCD::OpenALAudioCD(void)
 {
 }
 
-NullSoundCD::~NullSoundCD(void)
+OpenALAudioCD::~OpenALAudioCD(void)
 {
 }
 
-void* NullSoundCD::Create(void)
+void* OpenALAudioCD::Create(void)
 {
-	return new NullSnd();
+	return new OpenALAudioDriver();
 }
 
-const char* NullSoundCD::ClassName(void)
+const char* OpenALAudioCD::ClassName(void)
 {
-	return "NullSound";
+	return "OpenALAudioDriver";
 }
 
-SClass_ID NullSoundCD::SuperClassID(void)
+SClass_ID OpenALAudioCD::SuperClassID(void)
 {
 	return IE_AUDIO_CLASS_ID;
 }
 
-Class_ID NullSoundCD::ClassID(void)
+
+Class_ID OpenALAudioCD::ClassID(void)
 {
-	return Class_ID( 0x00000000, 0x00000001 );
+	return Class_ID( 0x578d45a, 0xd86327f2 );
 }
 
-const char* NullSoundCD::InternalName(void)
+const char* OpenALAudioCD::InternalName(void)
 {
-	return "NullSnd";
+	return "OpenALAudio";
 }

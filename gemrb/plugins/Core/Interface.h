@@ -33,6 +33,7 @@
 #include "GlobalTimer.h"
 #include "PluginMgr.h"
 
+class Audio;
 class Video;
 class ResourceMgr;
 class StringMgr;
@@ -228,6 +229,7 @@ class GEM_EXPORT Interface : public InterfaceDesc
 private:
 	PluginMgr * plugin;
 	Video * video;
+	Audio * AudioDriver ;
 	ResourceMgr * key;
 	ProjectileServer * projserv;
 public:
@@ -248,7 +250,6 @@ private:
 	Window* ModalWindow;
 	char WindowPack[10];
 	ScriptEngine * guiscript;
-	SoundMgr * soundmgr;
 	//OpcodeMgr * opcodemgr;
 	std::vector<InterfaceElement> *opcodemgrs;
 	SaveGameIterator *sgiterator;
@@ -276,7 +277,7 @@ private:
 	ieResRef TooltipFont;
 	ieResRef TooltipBackResRef;
 	ieResRef MovieFont;
-	ieResRef *DefSound; //default sounds 
+	ieResRef *DefSound; //default sounds
 	int DSCount;
 	Color TooltipColor;
 	int TooltipMargin;
@@ -428,8 +429,6 @@ public:
 	void PopupConsole();
 	/** Draws the Console */
 	void DrawConsole();
-	/** Get the Sound Manager */
-	SoundMgr * GetSoundMgr() const;
 	/** Get the SaveGameIterator */
 	SaveGameIterator * GetSaveGameIterator() const;
 	/** Get the Variables Dictionary */
@@ -534,7 +533,7 @@ public:
 
 	Palette* GetPalette(const ieResRef resname);
 	Palette* CreatePalette(const Color &color, const Color &back);
-	void FreePalette(Palette *&pal, const ieResRef name=NULL);  
+	void FreePalette(Palette *&pal, const ieResRef name=NULL);
 
 	void DragItem(CREItem* item, const ieResRef Picture);
 	CREItem* GetDraggedItem() const { return DraggedItem; }
@@ -572,7 +571,7 @@ public:
 	bool Exists(const char *ResRef, SClass_ID type);
 	/** creates a vvc/bam animation object at point */
 	ScriptedAnimation* GetScriptedAnimation( const char *ResRef, bool doublehint);
-	/** returns the first selected PC, if forced is set, then it returns 
+	/** returns the first selected PC, if forced is set, then it returns
 	first PC if none was selected */
 	Actor *GetFirstSelectedPC(bool forced);
 	/** returns a single sprite (not cached) from a BAM resource */
@@ -626,7 +625,7 @@ public:
 	int GetItemDialRes(const ieResRef itemname, ieResRef dialog) const;
 	/** Returns the virtual worldmap entry of a sub-area */
 	int GetAreaAlias(const ieResRef areaname) const;
-	/** Returns up to 3 resources from resref, choosing rows randomly 
+	/** Returns up to 3 resources from resref, choosing rows randomly
 	unwanted return variables could be omitted */
 	void GetResRefFrom2DA(const ieResRef resref, ieResRef resource1, ieResRef resource2 = NULL, ieResRef resource3 = NULL);
 	/** returns a numeric list read from a 2da. The 0th element is the number of elements in the list */
@@ -719,6 +718,10 @@ public:
 	bool CheatFlag;
 	/** The Console Object */
 	Console * console;
+
+	Audio* GetAudioDrv(void) {
+	    return AudioDriver ;
+	}
 
 #ifdef _DEBUG
 	int FileStreamPtrCount;

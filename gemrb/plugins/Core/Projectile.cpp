@@ -27,7 +27,7 @@
 #include "Video.h"
 #include "Game.h"
 #include "ResourceMgr.h"
-#include "SoundMgr.h"
+#include "Audio.h"
 #include "ProjectileServer.h"
 
 extern Interface* core;
@@ -176,7 +176,7 @@ void Projectile::SetBlend()
 void Projectile::Setup()
 {
 	phase = P_TRAVEL;
-	core->GetSoundMgr()->Play(SoundRes1, Pos.x, Pos.y, GEM_SND_RELATIVE);
+	core->GetAudioDrv()->Play(SoundRes1, Pos.x, Pos.y, GEM_SND_RELATIVE);
 	memset(travel,0,sizeof(travel));
 	memset(shadow,0,sizeof(shadow));
 	light = NULL;
@@ -491,7 +491,7 @@ void Projectile::DrawExplosion(Region & /*screen*/)
 			area->AddProjectile(pro, Pos, Pos);
 		}
 	}
-	
+
 	//the center of the explosion is based on hardcoded explosion type (this is fireball.cpp in the original engine)
 	//these resources are listed in areapro.2da
 	if (Extension->ExplType!=0xff) {
