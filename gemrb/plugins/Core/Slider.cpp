@@ -68,14 +68,12 @@ void Slider::Draw(unsigned short x, unsigned short y)
 	if (XPos == 65535) {
 		return;
 	}
+	Region r( x + XPos, y + YPos, Width, Height );
 	if (BackGround) {
 		if (( BackGround->Width < Width ) || ( BackGround->Height < Height )) {
-			core->GetVideoDriver()->BlitTiled( Region( x + XPos, y + YPos, Width, Height),
-										BackGround, true );
+			core->GetVideoDriver()->BlitTiled( r, BackGround, true );
 		} else {
-			Region r( x + XPos, y + YPos, Width, Height );
-			core->GetVideoDriver()->BlitSprite( BackGround,
-				x + XPos, y + YPos, true, &r );
+			core->GetVideoDriver()->BlitSprite( BackGround, x + XPos, y + YPos, true, &r );
 		}
 	}
 	switch (State) {
