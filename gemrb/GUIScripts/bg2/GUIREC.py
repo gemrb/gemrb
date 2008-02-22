@@ -76,6 +76,7 @@ def OpenRecordsWindow ():
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow(0)
+	MarkMenuButton (OptionsWindow)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenRecordsWindow")
 	GemRB.SetWindowFrame (OptionsWindow)
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
