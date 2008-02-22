@@ -1,10 +1,8 @@
 #ToB start window, precedes the SoA window
 import GemRB
+from GUICommon import GameIsTOB
 
 StartWindow = 0
-
-#the worldmap resource indicator
-IE_WMP_CLASS_ID = 0x000003F7
 
 def OnLoad():
 	global StartWindow, skip_videos
@@ -25,7 +23,7 @@ def OnLoad():
 		GemRB.LoadWindowFrame("STON10L", "STON10R", "STON10T", "STON10B")
 
 	#if not detected tob, we go right to the main menu
-	if not GemRB.HasResource("worldm25",IE_WMP_CLASS_ID):
+	if not GameIsTOB():
 		GemRB.SetMasterScript("BALDUR","WORLDMAP")
 		GemRB.SetVar("oldgame",1)
 		GemRB.SetNextScript("Start2")
