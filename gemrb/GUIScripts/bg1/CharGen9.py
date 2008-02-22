@@ -113,7 +113,7 @@ def NextPress():
 	GemRB.UnloadWindow (CharGenWindow)
 	#set my character up
 	MyChar = GemRB.GetVar ("Slot")
-	GemRB.CreatePlayer ("charbase", MyChar )
+	GemRB.CreatePlayer ("charbase", MyChar | 0x8000 )
 	GemRB.SetPlayerStat (MyChar, IE_SEX, GemRB.GetVar ("Gender") )
 	GemRB.SetPlayerStat (MyChar, IE_RACE, GemRB.GetVar ("Race") )
 	ClassTable = GemRB.LoadTable ("classes")

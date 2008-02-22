@@ -290,7 +290,7 @@ def CancelPress():
 
 def AcceptPress():
 	MyChar = GemRB.GetVar ("Slot")
-	GemRB.CreatePlayer("charbase", MyChar)
+	GemRB.CreatePlayer("charbase", MyChar | 0x8000)
 	GemRB.SetPlayerStat (MyChar, IE_SEX, GemRB.GetVar ("Gender") )
 	GemRB.SetPlayerStat (MyChar, IE_RACE, GemRB.GetVar ("Race") )
 
@@ -2388,6 +2388,7 @@ def NameCancelPress():
 
 def ImportPress():
 	global CharGenWindow, ImportWindow
+	global CharImportList
 
 	GemRB.SetVisible (CharGenWindow, 0)
 	ImportWindow = GemRB.LoadWindow (20)
@@ -2395,12 +2396,12 @@ def ImportPress():
 	TextAreaControl = GemRB.GetControl(ImportWindow, 4)
 	GemRB.SetText(ImportWindow, TextAreaControl, 10963)
 
-	TextAreaControl = GemRB.GetControl(ImportWindow,2)
-	GemRB.SetTextAreaFlags (ImportWindow, TextAreaControl, IE_GUI_TEXTAREA_SELECTABLE)
-	GemRB.GetCharacters(ImportWindow, TextAreaControl)
+	CharImportList = GemRB.GetControl(ImportWindow,2)
+	GemRB.SetTextAreaFlags (ImportWindow, CharImportList, IE_GUI_TEXTAREA_SELECTABLE)
+	GemRB.GetCharacters(ImportWindow, CharImportList)
 
 	ImportDoneButton = GemRB.GetControl (ImportWindow, 0)
-	GemRB.SetButtonState (ImportWindow, ImportDoneButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetButtonState (ImportWindow, ImportDoneButton, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetEvent (ImportWindow, ImportDoneButton, IE_GUI_BUTTON_ON_PRESS, "ImportDonePress")
 	GemRB.SetText (ImportWindow, ImportDoneButton, 11973)
 	GemRB.SetButtonFlags (ImportWindow, ImportDoneButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
@@ -2414,6 +2415,40 @@ def ImportPress():
 	return
 
 def ImportDonePress():
+	global CharGenWindow, ImportWindow
+	global CharImportList
+
+	# Import the character from the chosen name
+	MyChar = GemRB.GetVar ("Slot")
+	GemRB.CreatePlayer (GemRB.QueryText(ImportWindow, CharImportList), MyChar|0x8000, 1)
+
+	# We still have to set starting reputation and gold
+	Alignment = GemRB.GetPlayerStat (MyChar, IE_ALIGNMENT)
+	AlignmentTable = GemRB.LoadTable ("aligns")
+	TmpTable = GemRB.LoadTable ("repstart")
+	t = GemRB.GetTableValue ( AlignmentTable, Alignment-1, 3)
+	t = GemRB.FindTableValue (AlignmentTable, 3, t)
+	t = GemRB.GetTableValue (TmpTable, t, 0)
+	GemRB.SetPlayerStat (MyChar, IE_REPUTATION, t)
+
+	Class = GemRB.GetPlayerStat (MyChar, IE_CLASS)
+	TmpTable = GemRB.LoadTable ("strtgold")
+	a = GemRB.GetTableValue (TmpTable, Class, 1) #number of dice
+	b = GemRB.GetTableValue (TmpTable, Class, 0) #size
+	c = GemRB.GetTableValue (TmpTable, Class, 2) #adjustment
+	d = GemRB.GetTableValue (TmpTable, Class, 3) #external multiplier
+	e = GemRB.GetTableValue (TmpTable, Class, 4) #level bonus rate
+	t = GemRB.GetPlayerStat (MyChar, IE_LEVEL) #FIXME: calculate multiclass average
+	if t>1:
+	        e=e*(t-1)
+	else:
+	        e=0
+	t = GemRB.Roll (a,b,c)*d+e
+	GemRB.SetPlayerStat (MyChar, IE_GOLD, t)
+
+	GemRB.UnloadWindow (ImportWindow)
+	GemRB.UnloadWindow (CharGenWindow)
+	GemRB.SetNextScript ("PartyFormation")
 	return
 
 def ImportCancelPress():
