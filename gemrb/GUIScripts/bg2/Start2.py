@@ -1,5 +1,6 @@
 #this is essentially Start.py from the SoA game, except for a very small change
 import GemRB
+from GUICommon import GameIsTOB
 
 StartWindow = 0
 TutorialWindow = 0
@@ -42,7 +43,8 @@ def OnLoad():
 	GemRB.SetWindowFrame (StartWindow)
 	#this is the ToB specific part of Start.py
 	if GemRB.GetVar("oldgame")==1:
-		#GemRB.SetWindowPicture(StartWindow,"STARTOLD")
+		if GameIsTOB():
+			GemRB.SetWindowPicture(StartWindow,"STARTOLD")
 		GemRB.PlayMovie ("INTRO15F",skip_videos)
 	else:
 		GemRB.PlayMovie ("INTRO",skip_videos)

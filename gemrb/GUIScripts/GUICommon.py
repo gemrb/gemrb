@@ -124,3 +124,6 @@ def CheckStat20 (Actor, Stat, Diff):
 	if mystat>=goal:
 		return True
 	return False
+
+def GameIsTOB ():
+	return GemRB.HasResource ("worldm25", 0x000003F7)
