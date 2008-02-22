@@ -1952,18 +1952,15 @@ void SDLVideoDriver::DrawPolyline(Gem_Polygon* poly, const Color& color, bool fi
 }
 
 /** Blits a Sprite filling the Region */
+/** This method may be moved to Video.cpp, it is independent of SDL */
 void SDLVideoDriver::BlitTiled(Region rgn, Sprite2D* img, bool anchor)
 {
-	if (!anchor) {
-		rgn.x -= Viewport.x;
-		rgn.y -= Viewport.y;
-	}
 	int xrep = ( rgn.w + img->Width - 1 ) / img->Width;
 	int yrep = ( rgn.h + img->Height - 1 ) / img->Height;
 	for (int y = 0; y < yrep; y++) {
 		for (int x = 0; x < xrep; x++) {
-			BlitSprite(img, rgn.x + (x*img->Width), rgn.y + (y*img->Height),
-					 false, &rgn);
+			BlitSprite(img, rgn.x + (x*img->Width),
+				 rgn.y + (y*img->Height), anchor, &rgn);
 		}
 	}
 }
