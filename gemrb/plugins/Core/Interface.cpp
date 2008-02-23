@@ -2018,7 +2018,11 @@ bool Interface::LoadConfig(const char* filename)
 		} else if (stricmp( name, "GameName" ) == 0) {
 			strncpy( GameName, value, sizeof(GameName) );
 		} else if (stricmp( name, "GameType" ) == 0) {
-			strncpy( GameType, value, sizeof(GameType) );
+			if (stricmp( value, "tob" ) == 0) {
+				strncpy( GameType, "bg2", sizeof(GameType) );
+			} else {
+				strncpy( GameType, value, sizeof(GameType) );
+			}
 		} else if (stricmp( name, "SaveAsOriginal") == 0) {
 			SaveAsOriginal = atoi(value);
 		} else if (stricmp( name, "GemRBPath" ) == 0) {
