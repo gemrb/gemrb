@@ -25,6 +25,7 @@ import GemRB
 import GUICommonWindows
 from GUIDefines import *
 from GUICommon import CloseOtherWindow
+from GUICommon import GameIsTOB
 from GUICommonWindows import *
 
 ###################################################
@@ -187,8 +188,12 @@ def UpdateLogWindow ():
 ###################################################
 def PrevChapterPress ():
 	global Chapter 
+	if GameIsTOB():
+		firstChapter = 0
+	else:
+		firstChapter = 1
 
-	if Chapter > 1:
+	if Chapter > firstChapter:
 		Chapter = Chapter - 1
 		GemRB.SetToken ("CurrentChapter", str(Chapter) )
 		UpdateLogWindow ()
