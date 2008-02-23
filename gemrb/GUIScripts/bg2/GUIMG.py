@@ -19,7 +19,7 @@
 # $Id$
 
 
-# GUIMG.py - scripts to control mage spells windows from GUIMG winpack
+# GUIMG.py - scripts to control mage spells windows from the GUIMG winpack
 
 ###################################################
 

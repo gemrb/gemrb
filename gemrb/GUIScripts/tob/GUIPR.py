@@ -19,7 +19,7 @@
 # $Id$
 
 
-# GUIPR.py - scripts to control priest spells windows from GUIPR winpack
+# GUIPR.py - scripts to control the priest spells windows from the GUIPR winpack
 
 ###################################################
 

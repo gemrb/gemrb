@@ -19,7 +19,7 @@
 # $Id$
 
 
-# GUISTORE.py - script to open store/inn/temple windows from GUISTORE winpack
+# GUISTORE.py - script to open the store/inn/temple windows
 
 ###################################################
 

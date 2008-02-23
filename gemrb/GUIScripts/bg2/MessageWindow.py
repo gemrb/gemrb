@@ -18,7 +18,7 @@
 #
 # $Id$
 
-# MessageWindow.py - scripts and GUI for main (walk) window
+# MessageWindow.py - scripts and GUI for the main (walk) window
 
 ###################################################
 

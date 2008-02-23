@@ -19,7 +19,7 @@
 # $Id$
 
 
-# GUIREC.py - scripts to control stats/records windows from GUIREC winpack
+# GUIREC.py - scripts to control stats/records windows from the GUIREC winpack
 
 ###################################################
 import string

@@ -18,7 +18,7 @@
 #
 # $Id$
 
-# GUIOPT.py - scripts to control options windows mostly from GUIOPT winpack
+# GUIOPT.py - scripts to control options windows mostly from the GUIOPT winpack
 # Ingame options
 
 ###################################################

@@ -19,7 +19,7 @@
 # $Id$
 
 
-# GUIMA.py - scripts to control map windows from GUIMA and GUIWMAP winpacks
+# GUIMA.py - scripts to control map windows from the GUIMA and GUIWMAP winpacks
 
 ###################################################
 

@@ -19,7 +19,7 @@
 # $Id$
 
 
-# GUIW.py - scripts to control some windows from GUIWORLD winpack
+# GUIW.py - scripts to control some windows from the GUIWORLD winpack
 # except of Actions, Portrait, Options and Dialog windows
 #################################################################
 
