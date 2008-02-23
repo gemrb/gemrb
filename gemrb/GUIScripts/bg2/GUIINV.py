@@ -30,7 +30,7 @@ from GUISTORE import *
 from GUIDefines import *
 from ie_stats import *
 from ie_slots import *
-from GUICommon import CloseOtherWindow, SetColorStat
+from GUICommon import CloseOtherWindow, SetColorStat, GameIsTOB
 from GUICommonWindows import *
 
 InventoryWindow = None
@@ -544,7 +544,11 @@ def OnDropItemToPC ():
 	#-3 : drop stuff in inventory (but not equippable slots)
 	GemRB.DropDraggedItem (pc, -3)
 	if GemRB.IsDraggingItem ():
-		GemRB.DisplayString(17999,0xffffff)
+		if GameIsTOB():
+			GemRB.DisplayString (61794,0xfffffff)
+		else:
+			GemRB.DisplayString (17999,0xfffffff)
+
 	UpdateInventoryWindow ()
 	return
 
