@@ -23,6 +23,7 @@
 
 import GemRB
 import GUICommonWindows
+import string
 from GUIDefines import *
 from GUICommon import CloseOtherWindow
 from GUICommon import GameIsTOB
@@ -178,8 +179,15 @@ def UpdateLogWindow ():
 		GemRB.SetToken ("HOUR",str(hours%24 ) )
 		GemRB.SetVar ("DAYANDMONTH",dayandmonth)
 		GemRB.SetToken ("YEAR",year)
-		GemRB.TextAreaAppend (Window, Text, GemRB.GetString(15980), 3*i)
-		GemRB.TextAreaAppend (Window, Text, je['Text'], 3*i+1)
+
+		# each journal entry consists of the title and description
+		# but the game displays the entry date between the two
+		je2 = GemRB.GetString(je['Text']).partition("\n")
+		JournalTitle = "[color=d00000]" + je2[0] + "[/color]" + je2[1]
+		JournalText = je2[2]
+
+		GemRB.TextAreaAppend (Window, Text, JournalTitle + GemRB.GetString(15980), 3*i)
+		GemRB.TextAreaAppend (Window, Text, JournalText, 3*i+1)
 		GemRB.TextAreaAppend (Window, Text, "", 3*i + 2)
 
 	GemRB.SetVisible (Window, 1)
