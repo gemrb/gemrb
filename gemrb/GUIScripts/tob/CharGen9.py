@@ -266,8 +266,11 @@ def NextPress():
 	else:
 		#leaving multi player pregen
 		GemRB.UnloadWindow (CharGenWindow)
-		#when export is done, go to start2
-		GemRB.SetToken ("NextScript","Start2")
+		#when export is done, go to start
+		if GameIsTOB():
+			GemRB.SetToken ("NextScript","Start2")
+		else:
+			GemRB.SetToken ("NextScript","Start")
 		GemRB.SetNextScript ("ExportFile") #export
 	return
 

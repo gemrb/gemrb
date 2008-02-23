@@ -1,5 +1,6 @@
 #instead of credits, you can listen the songs of the game :)
 import GemRB
+from GUICommon import GameIsTOB
 
 MovieWindow = 0
 TextAreaControl = 0
@@ -42,5 +43,8 @@ def CreditsPress():
 
 def DonePress():
 	GemRB.UnloadWindow(MovieWindow)
-	GemRB.SetNextScript("Start2")
+	if GameIsTOB():
+		GemRB.SetToken ("NextScript","Start2")
+	else:
+		GemRB.SetToken ("NextScript","Start")
 	return
