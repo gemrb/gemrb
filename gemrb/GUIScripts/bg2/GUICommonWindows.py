@@ -93,7 +93,8 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	GemRB.SetTooltip (Window, Button, 13902)
 	
 	if Gears:
-		# Gears (time)
+		# Pendulum, gears, sun/moon dial  (time)
+		# FIXME: display all animations: CPEN, CGEAR, CDIAL
 		Button = GemRB.GetControl (Window, 9)
 		GemRB.SetAnimation (Window, Button, "CPEN")
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
@@ -208,6 +209,7 @@ def OpenActionsWindowControls (Window):
 	ActionsWindow = Window
 	# Gears (time) when options pane is down
 	Button = GemRB.GetControl (Window, 62)
+	# FIXME: display all animations
 	GemRB.SetAnimation (Window, Button, "CPEN")
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
