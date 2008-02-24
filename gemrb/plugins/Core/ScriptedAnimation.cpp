@@ -273,6 +273,11 @@ ScriptedAnimation::ScriptedAnimation(DataStream* stream, bool autoFree)
 			unsigned int p_hold = P_HOLD*MAX_ORIENT+i;
 			unsigned int p_onset = P_ONSET*MAX_ORIENT+i;
 			unsigned int p_release = P_RELEASE*MAX_ORIENT+i;
+			//if there are no separate stages, then fill the p_hold fields
+			if(!seq2 && !seq3) {
+				p_onset=p_hold;
+			}
+
 			int c = seq1;
 			switch (FaceTarget) {
 			case 5:
