@@ -484,7 +484,7 @@ static EffectRef effectnames[] = {
 	{ "Cure:Imprisonment", fx_freedom, -1 },
 	{ "Cure:Infravision", fx_cure_infravision_state, -1 },
 	{ "Cure:Intoxication", fx_cure_intoxication, -1 }, //0xa4 (iwd2 has this working)
-	{ "Cure:Invisible", fx_cure_invisible_state, -1 },  //0x2f
+	{ "Cure:Invisible", fx_cure_invisible_state, -1 }, //0x2f
 	{ "Cure:Invisible2", fx_cure_invisible_state, -1 }, //0x74
 	//{ "Cure:ImprovedInvisible", fx_cure_improved_invisible_state, -1 },
 	{ "Cure:LevelDrain", fx_cure_leveldrain, -1}, //restoration
@@ -1153,9 +1153,9 @@ int fx_cure_frozen_state (Actor* /*Owner*/, Actor* target, Effect* fx)
 
 // 0x0F DexterityModifier
 
-#define CSA_DEX  0
-#define CSA_STR  1
-#define CSA_CNT  2
+#define CSA_DEX 0
+#define CSA_STR 1
+#define CSA_CNT 2
 int SpellAbilityDieRoll(Actor *target, int which)
 {
 	if (which>=CSA_CNT) return 6;
@@ -1453,7 +1453,7 @@ static EffectRef fx_pst_jumble_curse_ref={"JumbleCurse",NULL,-1};
 // gemrb extension: if the resource field is filled, it will remove curse only from the specified item
 int fx_remove_curse (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_remove_curse (%2d): Resource: %s  Type: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
+	if (0) printf( "fx_remove_curse (%2d): Resource: %s Type: %d\n", fx->Opcode, fx->Resource, fx->Parameter2 );
 
 	switch(fx->Parameter2)
 	{
@@ -2878,7 +2878,7 @@ int fx_mirror_image (Actor* Owner, Actor* target, Effect* fx)
 	ieDword images;
 
 	if (fx->Parameter2) {
-		images = 1;         //reflection
+		images = 1; //reflection
 	}
 	else {
 		images = core->Roll(1, fx->Parameter1, 0); //mirror image
@@ -3089,17 +3089,26 @@ int fx_monster_summoning (Actor* Owner, Actor* target, Effect* fx)
 	ieResRef monster;
 	ieResRef hit;
 	ieResRef areahit;
+	int level = fx->Parameter1;
+
 	if (fx->Parameter2>=FX_MS) {
 		strnuprcpy(monster,fx->Resource,8);
 		strnuprcpy(hit,fx->Resource2,8);
 		strnuprcpy(areahit,fx->Resource3,8);
 	} else {
 		core->GetResRefFrom2DA(monster_summoning_2da[fx->Parameter2], monster, hit, areahit);
+
+		if (!hit[0]) {
+			strnuprcpy(hit,fx->Resource2,8);
+		}
+		if (!areahit[0]) {
+			strnuprcpy(areahit,fx->Resource3,8);
+		}
 	}
 
 	//the monster should appear near the effect position
 	Point p(fx->PosX, fx->PosY);
-	core->SummonCreature(monster, areahit, Owner, target, p, fx->Parameter2/5, fx->Parameter1);
+	core->SummonCreature(monster, hit, Owner, target, p, fx->Parameter2/5, level);
 	return FX_NOT_APPLIED;
 }
 
@@ -3848,10 +3857,15 @@ int fx_apply_effect (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_apply_effect (%2d) %s", fx->Opcode, fx->Resource );
  	if (EffectQueue::match_ids( target, fx->Parameter2, fx->Parameter1) ) {
-		//apply effect
-		core->ApplyEffect(fx->Resource, target, Owner, fx->Power);
+		//apply effect, if the effect is a goner, then kill
+		//this effect too
+		if(core->ApplyEffect(fx->Resource, target, Owner, fx->Power)) {
+			return FX_APPLIED;
+		}
+		return FX_NOT_APPLIED;
 	}
-	//if the ids don't match, the effect still sticks?
+	//FIXME:
+	//if the ids don't match, the effect will still stick?
 	return FX_APPLIED;
 }
 // b2 hitbonus generic effect ToHitVsCreature
@@ -4785,7 +4799,7 @@ int fx_set_area_effect (Actor* /*Owner*/, Actor* /*target*/, Effect* fx)
 // 0xfd SetMapNote
 int fx_set_map_note (Actor* Owner, Actor* target, Effect* fx)
 {
-	if (0) printf( "fx_set_map_note (%2d): StrRef: %d  Color: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
+	if (0) printf( "fx_set_map_note (%2d): StrRef: %d Color: %d\n", fx->Opcode, fx->Parameter1, fx->Parameter2 );
 	Actor *marker = target?target:Owner;
 	Map *map = marker->GetCurrentArea();
 	if (!map) return FX_APPLIED; //delay effect

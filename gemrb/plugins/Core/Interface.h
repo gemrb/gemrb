@@ -595,8 +595,8 @@ public:
 	/** applies the spell on the area or on a scriptable object */
 	void ApplySpellPoint(const ieResRef resname, Scriptable *target, Point &pos, Actor *caster, int level);
 	/** applies a single effect on the target */
-	void ApplyEffect(Effect *fx, Actor *target, Actor *caster);
-	void ApplyEffect(const ieResRef resname, Actor *target, Actor *caster, int level);
+	int ApplyEffect(Effect *fx, Actor *target, Actor *caster);
+	int ApplyEffect(const ieResRef resname, Actor *target, Actor *caster, int level);
 	/** dumps an area object to the cache */
 	int SwapoutArea(Map *map);
 	/** saves (exports a character to the characters folder */

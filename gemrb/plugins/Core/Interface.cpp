@@ -2517,7 +2517,6 @@ int Interface::LoadCreature(const char* ResRef, int InParty, bool character)
 //NOTE: if there were more summoned creatures, it will return only the last
 Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres, Actor *Owner, Actor *target, Point &position, int eamod, int level)
 {
-	level = level * 100;
 	//maximum number of monsters summoned
 	int cnt=10;
 	Actor * ab = NULL;
@@ -2530,7 +2529,8 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 		}
 
 		ab->LastSummoner = Owner->GetID();
-		level -= ab->GetStat(IE_XP);
+		//Always use Base stats for the recently summoned creature
+		level -= ab->GetBase(IE_XP);
 
 		int enemyally;
 
@@ -2538,7 +2538,7 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 			enemyally = Owner->GetStat(IE_EA)>EA_GOODCUTOFF;
 		} else {
 			if (target) {
-				enemyally = target->GetStat(IE_EA)>EA_GOODCUTOFF;
+				enemyally = target->GetBase(IE_EA)>EA_GOODCUTOFF;
 			} else {
 				enemyally = true;
 			}
@@ -4984,11 +4984,14 @@ void Interface::ApplySpellPoint(const ieResRef resname, Scriptable* /*area*/, Po
 	delete fxqueue;
 }
 
-void Interface::ApplyEffect(Effect *effect, Actor *actor, Actor *caster)
+//-1 means the effect was reflected back to the caster
+//0 means the effect was resisted and should be removed
+//1 means the effect was applied
+int Interface::ApplyEffect(Effect *effect, Actor *actor, Actor *caster)
 {
 	EffectQueue *fxqueue = new EffectQueue();
 	fxqueue->AddEffect( effect );
-	//hmm, don't delete the effect
+	//don't delete the effect, it is referenced by the effectqueue
 
 	int res = fxqueue->CheckImmunity ( actor );
 	if (res) {
@@ -4996,22 +4999,25 @@ void Interface::ApplyEffect(Effect *effect, Actor *actor, Actor *caster)
 			actor = caster;
 		}
 		fxqueue->SetOwner( caster );
-		fxqueue->AddAllEffects( actor, actor->Pos );
+		if (fxqueue->AddAllEffects( actor,actor->Pos )==FX_NOT_APPLIED) {
+			res=0;
+		}
 	}
 	delete fxqueue;
+	return res;
 }
 
-void Interface::ApplyEffect(const ieResRef resname, Actor *actor, Actor *caster, int level)
+int Interface::ApplyEffect(const ieResRef resname, Actor *actor, Actor *caster, int level)
 {
 	Effect *effect = GetEffect(resname);
 	if (!effect) {
-		return;
+		return 0;
 	}
 	if (!level) {
 		level = 1;
 	}
 	effect->Power=level;
-	ApplyEffect(effect, actor, caster);
+	return ApplyEffect(effect, actor, caster);
 }
 
 // dealing with saved games
@@ -5282,11 +5288,12 @@ void Interface::GetResRefFrom2DA(const ieResRef resref, ieResRef resource1, ieRe
 	TableMgr *tab = GetTable(table);
 
 	if (tab) {
+		unsigned int cols = tab->GetColumnCount();
 		unsigned int row = (unsigned int) Roll(1,tab->GetRowCount(),-1);
 		strnuprcpy(resource1, tab->QueryField(row,0), 8);
-		if (resource2)
+		if (resource2 && cols>1)
 			strnuprcpy(resource2, tab->QueryField(row,1), 8);
-		if (resource3)
+		if (resource3 && cols>2)
 			strnuprcpy(resource3, tab->QueryField(row,2), 8);
 	}
 }

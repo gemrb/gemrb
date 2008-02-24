@@ -515,8 +515,11 @@ int EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &des
 //this is where effects from spells first get in touch with the target
 //the effects are currently NOT in the target's fxqueue, those that stick
 //will get copied (hence the fxqueue.AddEffect call)
-void EffectQueue::AddAllEffects(Actor* target, Point &destination)
+//if this returns FX_NOT_APPLIED, then the whole stack was resisted
+//or expired 
+int EffectQueue::AddAllEffects(Actor* target, Point &destination)
 {
+	int res = FX_NOT_APPLIED;
 	// pre-roll dice for fx needing them and stow them in the effect
 	ieDword random_value = core->Roll( 1, 100, 0 );
 
@@ -526,10 +529,16 @@ void EffectQueue::AddAllEffects(Actor* target, Point &destination)
 		(*f)->random_value = random_value;
 		//if applyeffect returns true, we stop adding the future effects
 		//this is to simulate iwd2's on the fly spell resistance
-		if(AddEffect(*f, Owner, target, destination)==FX_ABORT) {		
+		int tmp = AddEffect(*f, Owner, target, destination);
+		if (tmp==FX_ABORT) {
+			res = FX_NOT_APPLIED;
 			break;
 		}
+		if (tmp!=FX_NOT_APPLIED) {
+			res = FX_APPLIED;
+		}
 	}
+	return res;
 }
 
 inline static bool IsDicedEffect(int opcode)

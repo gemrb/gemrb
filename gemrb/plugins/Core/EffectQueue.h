@@ -185,7 +185,7 @@ public:
 	 * Effects are matched based on their contents */
 	bool RemoveEffect(Effect* fx);
 
-	void AddAllEffects(Actor* target, Point &dest);
+	int AddAllEffects(Actor* target, Point &dest);
 	void ApplyAllEffects(Actor* target);
 
 	/* directly removes effects with specified opcode, use effect_reference when you can */
