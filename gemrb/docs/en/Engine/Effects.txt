@@ -62,7 +62,8 @@ Offset Size (data type) Description
 0x0060 4*2 (dword) unknown
 0x0068 8 (resref) VVC
 0x0070 8 (resref) 3. resource
-0x0078 4*4 (dword) unknown
+0x0078 4*2 (point) Source point
+0x0080 4*2 (point) Target point
 0x0088 4 (dword) Source type of effect (0 - none, 1 - item, 2 - spell)
 0x008c 8 (resref) Source of Effect (used for equipping and dispelling)
 0x0094 4 (dword) resource flags
