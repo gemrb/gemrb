@@ -102,7 +102,9 @@ struct Effect {
 	ieDword Parameter3;
 	ieDword Parameter4;
 	ieDword PosX, PosY;
+	ieDword SourceType; //1-item, 2-spell
 	ieResRef Source;
+	ieDword SourceFlags;
 	ieDword Projectile;           //9c
 	ieDwordSigned InventorySlot; //a0
 	//Original engine had a VariableName here, but it is stored in the resource fields

@@ -2378,7 +2378,7 @@ int CREImp::PutEffects( DataStream *stream, Actor *actor)
 			stream->WriteDword( &fx->Duration);
 			stream->WriteWord( &fx->Probability1);
 			stream->WriteWord( &fx->Probability2);
-			stream->Write(fx->Resource, 8);
+			stream->WriteResRef(fx->Resource);
 			stream->WriteDword( &fx->DiceThrown );
 			stream->WriteDword( &fx->DiceSides );
 			stream->WriteDword( &fx->SavingThrowType );
@@ -2396,18 +2396,19 @@ int CREImp::PutEffects( DataStream *stream, Actor *actor)
 				//resource1-4 are used as a continuous memory
 				stream->Write(((ieByte *) fx->Resource)+16, 8);
 			} else {
-				stream->Write(fx->Resource2, 8);
-				stream->Write(fx->Resource3, 8);
+				stream->WriteResRef(fx->Resource2);
+				stream->WriteResRef(fx->Resource3);
 			}
 			tmpDword1 = (ieDword) fx->PosX;
 			tmpDword2 = (ieDword) fx->PosY;
 			stream->WriteDword( &tmpDword1 );
 			stream->WriteDword( &tmpDword2 );
+			//FIXME: these two points are actually different
 			stream->WriteDword( &tmpDword1 );
 			stream->WriteDword( &tmpDword2 );
-			stream->Write( filling,4 );
-			stream->Write(fx->Source, 8);
-			stream->Write( filling,4 );
+			stream->WriteDword( &fx->SourceType );
+			stream->WriteResRef( fx->Source );
+			stream->WriteDword( &fx->SourceFlags );
 			stream->WriteDword( &fx->Projectile );
 			tmpDword1 = (ieDword) fx->InventorySlot;
 			stream->WriteDword( &tmpDword1 );
@@ -2460,7 +2461,8 @@ int CREImp::PutVariables( DataStream *stream, Actor *actor)
 		stream->WriteDword( &tmpDword);
 		stream->Write(filling,8); //type, power
 		stream->WriteDword( &value); //param #1
-		stream->Write( filling, 40); //param #2, timing, duration, chance, resource, dices, saves
+		//param #2, timing, duration, chance, resource, dices, saves
+		stream->Write( filling, 40);
 		tmpDword = FAKE_VARIABLE_MARKER;
 		stream->WriteDword( &tmpDword); //variable marker
 		stream->Write( filling, 92); //23 * 4

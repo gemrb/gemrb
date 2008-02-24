@@ -108,6 +108,7 @@ Effect* EFFImp::GetEffectV1(Effect *fx)
 
 Effect* EFFImp::GetEffectV20(Effect *fx)
 {
+	ieDword tmp;
 	memset( fx, 0, sizeof( Effect ) );
 
 	str->Seek(8, GEM_CURRENT_POS);
@@ -125,7 +126,7 @@ Effect* EFFImp::GetEffectV20(Effect *fx)
 	str->ReadDword( &fx->DiceSides );
 	str->ReadDword( &fx->SavingThrowType );
 	str->ReadDword( &fx->SavingThrowBonus );
-	str->ReadWord( &fx->IsVariable ); //if this field was set to 1, this is a variable	
+	str->ReadWord( &fx->IsVariable ); //if this field was set to 1, this is a variable
 	str->ReadWord( &fx->IsSaveForHalfDamage ); //if this field was set to 1, save for half damage
 	str->ReadDword( &fx->PrimaryType );
 	str->Seek( 12, GEM_CURRENT_POS );
@@ -135,11 +136,19 @@ Effect* EFFImp::GetEffectV20(Effect *fx)
 	str->Seek( 8, GEM_CURRENT_POS );
 	str->ReadResRef( fx->Resource2 );
 	str->ReadResRef( fx->Resource3 );	
-	str->Seek( 20, GEM_CURRENT_POS );//unsure fields, should be resource4, but also effect center
+	str->ReadDword( &fx->PosX);
+	str->ReadDword( &fx->PosY);
+	//FIXME: these two points are actually different
+	str->ReadDword( &fx->PosX);
+	str->ReadDword( &fx->PosY);
+	str->ReadDword( &fx->SourceType );
 	str->ReadResRef( fx->Source );
-	str->Seek( 12, GEM_CURRENT_POS );
+	str->ReadDword( &fx->SourceFlags );
+	str->ReadDword( &fx->Projectile );
+	str->ReadDword( &tmp );
+	fx->InventorySlot=(ieDwordSigned) (tmp);
 	//Variable simply overwrites the resource fields (Keep them grouped)
-        //They have to be continuous
+	//They have to be continuous
 	if (fx->IsVariable) {
 		str->Read( fx->Resource, 32 );
 		strnlwrcpy( fx->Resource, fx->Resource, 32 );
@@ -150,11 +159,5 @@ Effect* EFFImp::GetEffectV20(Effect *fx)
 	str->ReadDword( &fx->SecondaryType );
 	str->Seek( 60, GEM_CURRENT_POS );
 
-	//FIXME:
-	//actually the effect positions are saved somewhere
-	//and there is a position for source and target too
-	//if Pos is only a word, consider using a point 
-	fx->PosX=0xffffffff;
-	fx->PosY=0xffffffff;
 	return fx;
 }
