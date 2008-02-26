@@ -27,7 +27,7 @@ Supported (i.e. we got reports about successfully running GemRB) systems:
 Linux x86
 FreeBSD x86
 MS Windows
-Linux amd64 ? - used to work ...
+Linux amd64
 various Macintosh systems also should work ...
 
 Requirements:
