@@ -37,6 +37,10 @@ Container = None
 
 def CloseContinueWindow ():
 	GemRB.SetVar ("DialogChoose", GemRB.GetVar ("DialogOption"))
+	Window = GemRB.GetVar ("MessageWindow")
+	Button = GemRB.GetControl (Window, 0)
+	GemRB.SetText(Window, Button, 28082)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OnDecreaseSize")
 
 
 def OpenEndMessageWindow ():
