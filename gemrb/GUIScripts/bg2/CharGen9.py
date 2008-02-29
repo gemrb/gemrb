@@ -14,8 +14,6 @@ def OnLoad():
 
 # we need to redefine this or we're stuck in an include loop with CharGenCommon
 def NextPress():
-	global CharGenWindow
-	GemRB.UnloadWindow (CharGenWindow)
 	FinishCharGen()
 	return
 

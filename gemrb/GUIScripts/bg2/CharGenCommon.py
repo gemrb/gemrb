@@ -150,7 +150,7 @@ def DisplayOverview(step):
 					+ str(GemRB.GetVar ("Ability "+str(i))) )
 		elif part == 7:
 			break
-	# TODO: list known spells, proficiencies and thief skills, racial enemy? cleric school?
+	# TODO: list known spells, proficiencies and thief skills, racial enemy?
 
 	GemRB.SetVisible (CharGenWindow, 1)
 	return
