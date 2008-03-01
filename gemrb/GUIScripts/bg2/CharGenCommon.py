@@ -143,14 +143,23 @@ def DisplayOverview(step):
 			v = GemRB.FindTableValue (AlignmentTable, 3, GemRB.GetVar ("Alignment"))
 			GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,GemRB.GetTableValue (AlignmentTable,v,2))
 		elif part == 6:
+			GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, "\n")
 			for i in range(6):
 				v = GemRB.GetTableValue (AbilityTable, i, 2)
 				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, v, -1)
 				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, ": " \
 					+ str(GemRB.GetVar ("Ability "+str(i))) )
 		elif part == 7:
+			# TODO: list known spells, proficiencies and thief skills, racial enemy
+			GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, "\n")
+			#spells / thieving
+			#GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, "\n")
+			#racial enemy
+			#GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, "\n")
+			#weapon proficiencies
+
+		elif part == 8:
 			break
-	# TODO: list known spells, proficiencies and thief skills, racial enemy?
 
 	GemRB.SetVisible (CharGenWindow, 1)
 	return
