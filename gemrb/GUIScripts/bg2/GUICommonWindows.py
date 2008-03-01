@@ -451,8 +451,7 @@ def GetKitIndex (actor):
 		KitIndex = GemRB.FindTableValue (KitTable, 6, Kit)
 		if KitIndex == -1:
 			KitIndex = 0
-# not sure if this check is needed, even the odd barbarian which is mentioned in
-# the kitlist with the fighter class id, has the matching id in classes.2da
+		# needed so barbarians don't override other kits
 		elif Class != GemRB.GetTableValue (KitTable, KitIndex, 7):
 			print "KitIndex before hack", KitIndex
 			KitIndex = 0
