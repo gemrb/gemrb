@@ -24,17 +24,16 @@ subdirectories, the gemrb.1 man page and this file.
 
 Supported (i.e. we got reports about successfully running GemRB) systems:
 
-Linux x86
+Linux x86, x86-64, ppc
 FreeBSD x86
 MS Windows
-Linux amd64
 various Macintosh systems also should work ...
 
 Requirements:
 
 SDL 1.2
 OpenAL
-Python 2.2 or above, with shared libs (binaries are compiled with 2.3!)
+Python 2.2 or above, with shared libs (binaries are compiled with 2.5!)
 ZLib
 Png (optional)
 
@@ -54,8 +53,8 @@ New GemRB forum (users):
 http://forums.gibberlings3.net/index.php?showforum=91
 
 IRC channel:
-The best way to talk with us is by joining #GemRB channel
-at FreeNode IRC network. There's somebody to talk with most of
+The best way to talk with us is by joining the #GemRB channel
+on the FreeNode IRC network. There's somebody to talk with most of
 the time.
 
 
