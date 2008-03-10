@@ -65,10 +65,12 @@ class Projectile;
 #define IE_ITEM_UNSELLABLE   ( IE_ITEM_CRITICAL | IE_ITEM_STOLEN )
 
 //Extended header recharge flags
-#define IE_ITEM_USESTRENGTH  1
-#define IE_ITEM_RECHARGE     0x800
-#define IE_ITEM_IGNORESHIELD 0x10000
-#define IE_ITEM_KEEN	 0x20000
+#define IE_ITEM_USESTRENGTH  1          //weapon
+#define IE_ITEM_BREAKABLE    2          //weapon
+#define IE_ITEM_HOSTILE      0x400      //equipment
+#define IE_ITEM_RECHARGE     0x800      //equipment
+#define IE_ITEM_IGNORESHIELD 0x10000    //weapon
+#define IE_ITEM_KEEN	     0x20000    //weapon
 
 //item use locations (weapons are not listed in equipment list)
 #define ITEM_LOC_WEAPON    1   //this is a weapon slot (uses thac0 etc)
