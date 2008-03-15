@@ -44,9 +44,12 @@ PCStatsStruct::PCStatsStruct()
 	QSlots[0]=0xff;
 	memset( QuickSpells, 0, sizeof(QuickSpells) );
 	memset( QuickSpellClass, 0xff, sizeof(QuickSpellClass) );
-	memset( QuickItemSlots, 0, sizeof(QuickItemSlots) );
-	memset( QuickWeaponSlots, 0, sizeof(QuickWeaponSlots) );
+	memset( QuickItemSlots, -1, sizeof(QuickItemSlots) );
+	memset( QuickItemHeaders, -1, sizeof(QuickItemHeaders) );
+	memset( QuickWeaponSlots, -1, sizeof(QuickWeaponSlots) );
+	memset( QuickWeaponHeaders, -1, sizeof(QuickWeaponHeaders) );
 	memset( PortraitIcons, -1, sizeof(PortraitIcons) );
+	memset( PortraitIconString, 0, sizeof(PortraitIconString) );
 }
 
 void PCStatsStruct::IncrementChapter()
