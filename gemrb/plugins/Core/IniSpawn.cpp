@@ -551,7 +551,10 @@ void IniSpawn::SpawnCreature(CritterEntry &critter)
 				return;
 			}
 		} else {
-			if (!specvar) {
+			//ar0203 in PST seems to want the check this way.
+			//if other areas conflict and you want to use (!specvar),
+			//please research further
+			if (specvar) {
 				return;
 			}
 		}
