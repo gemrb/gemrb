@@ -2069,7 +2069,16 @@ void GameControl::DialogChoose(unsigned int choose)
 			ta->SetMinRow( false );
 			EndDialog();
 			return;
-		}		
+		}
+
+		// moved immediate execution of dialog actions here
+		if (DialogueFlags & DF_FREEZE_SCRIPTS) {
+			target->ProcessActions(true);
+			//clear queued actions that remained stacked?
+			target->ClearActions();
+		}
+
+		//displaying dialog for selected option
 		int si = tr->stateIndex;
 		//follow external linkage, if required
 		if (tr->Dialog[0] && strnicmp( tr->Dialog, dlg->ResRef, 8 )) {
@@ -2152,11 +2161,13 @@ end_of_choose:
 		ta->PadMinRow();
 	}
 	// is this correct?
+  /* this was moved upwards before evaluating the triggers
 	if (DialogueFlags & DF_FREEZE_SCRIPTS) {
 		target->ProcessActions(true);
 		//clear queued actions that remained stacked?
 		target->ClearActions();
 	}
+  */
 }
 
 void GameControl::DisplayString(Point &p, const char *Text)
