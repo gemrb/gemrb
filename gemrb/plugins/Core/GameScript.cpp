@@ -662,6 +662,7 @@ static const ActionLink actionnames[] = {
 	{"nidspecial6", GameScript::Spell, AF_BLOCKING|AF_DIRECT|AF_ALIVE},
 	{"nidspecial7", GameScript::UseItemPoint, AF_BLOCKING|AF_ALIVE},
 	{"nidspecial8", GameScript::SpellPoint, AF_BLOCKING|AF_ALIVE},
+	{"nidspecial9", GameScript::Attack, AF_BLOCKING|AF_ALIVE},
 	{"noaction", GameScript::NoAction, 0},
 	{"opendoor", GameScript::OpenDoor,AF_BLOCKING},
 	{"panic", GameScript::Panic, AF_ALIVE},

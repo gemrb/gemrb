@@ -50,6 +50,9 @@ class Game;
 #include "Particles.h"
 #include "Variables.h"
 
+//the size of the bestiary register
+#define BESTIARY_SIZE 260
+
 //timer counts
 #define MAX_TIMER 32
 
@@ -304,11 +307,17 @@ public:
 		if (!beasts) {
 			return false;
 		}
+		if (Index>=BESTIARY_SIZE) {
+		  return false;
+		}
 		return beasts[Index] != 0;
 	}
 	void SetBeastKnown(unsigned int Index) {
 		if (!beasts) {
 			return;
+		}
+		if (Index>=BESTIARY_SIZE) {
+		  return;
 		}
 		beasts[Index] = 1;
 	}
@@ -355,14 +364,14 @@ public:
 	/** Adds ticks to game time */
 	void AdvanceTime(ieDword add);
 	/** Runs the script engine on the global script and the area scripts 
-	  areas run scripts on door, infopoint, container, actors too */
+	areas run scripts on door, infopoint, container, actors too */
 	void UpdateScripts();
 	/** runs area functionality, sets partyrested trigger */
 	void RestParty(int checks, int dream, int hp);
 	/** timestop effect initiated by actor */
 	void TimeStop(Actor *actor, ieDword end);
 	/** gets the colour which should be applied over the game area,
-	  may return NULL */
+	may return NULL */
 	const Color *GetGlobalTint() const;
 	/** timer functions (numeric ID, not saved) */
 	bool TimerActive(ieDword ID);

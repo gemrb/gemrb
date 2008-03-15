@@ -288,6 +288,7 @@ public:
 		unsigned int width, unsigned int height, int flag);
 	void ActivateWallgroups(unsigned int baseindex, unsigned int count, int flg);
 	void Shout(Actor* actor, int shoutID, unsigned int radius);
+	void ActorSpottedByPlayer(Actor *actor);
 	void AddActor(Actor* actor);
 	//returns true if an enemy is near P (used in resting/saving)
 	bool AnyEnemyNearPoint(Point &p);

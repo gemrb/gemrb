@@ -31,7 +31,6 @@
 
 #define MAZE_DATA_SIZE 1720
 #define FAMILIAR_FILL_SIZE 324
-#define BESTIARY_SIZE 260
 // if your compiler chokes on this, use -1 or 0xff whichever works for you
 #define UNINITIALIZED_CHAR '\xff'
 
@@ -260,8 +259,10 @@ Game* GAMImp::LoadGame(Game *newGame)
 	// Loading known creatures array (beasts)
 	if(core->GetBeastsINI() != NULL) {
 		int beasts_count = BESTIARY_SIZE;
-		newGame->beasts = (ieByte*)malloc(beasts_count);
-		str->Read( newGame->beasts, beasts_count );
+		newGame->beasts = (ieByte*)calloc(sizeof(ieByte),beasts_count);
+		if(FamiliarsOffset) {
+			str->Read( newGame->beasts, beasts_count );
+		}
 	}
 
 	if (SavedLocCount && SavedLocOffset) {

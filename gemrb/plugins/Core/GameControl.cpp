@@ -1109,7 +1109,8 @@ void GameControl::TryToBash(Actor *source, Scriptable *tgt)
 
 	source->ClearPath();
 	source->ClearActions();
-	snprintf(Tmp, sizeof(Tmp), "NIDSpecial9(\"%s\")", tgt->GetScriptName() );
+	snprintf(Tmp, sizeof(Tmp), "Attack(\"%s\")", tgt->GetScriptName() );
+	//snprintf(Tmp, sizeof(Tmp), "NIDSpecial9(\"%s\")", tgt->GetScriptName() );
 	source->AddAction( GenerateAction( Tmp ) );
 }
 

@@ -985,6 +985,28 @@ bool Map::AnyEnemyNearPoint(Point &p)
 	return false;
 }
 
+void Map::ActorSpottedByPlayer(Actor *actor)
+{
+	unsigned int animid;
+	char section[10];
+
+	if(core->HasFeature(GF_HAS_BEASTS_INI)) {
+		animid=actor->BaseStats[IE_ANIMATION_ID];
+		if(core->HasFeature(GF_ONE_BYTE_ANIMID)) {
+			animid&=0xff;
+		}
+		sprintf(section,"%d",animid);
+		animid=(unsigned int) core->GetResDataINI()->GetKeyAsInt(section,"bestiary",-1);
+		core->GetGame()->SetBeastKnown(animid);
+	}
+
+	if (!(actor->GetInternalFlag()&IF_STOPATTACK)) {
+		if (actor->Modified[IE_EA]>=EA_EVILCUTOFF) {
+			core->Autopause(AP_ENEMY);
+		}
+	}
+}
+
 void Map::AddActor(Actor* actor)
 {
 	//setting the current area for the actor as this one
@@ -996,11 +1018,9 @@ void Map::AddActor(Actor* actor)
 	//if a visible aggressive actor was put on the map, it is an autopause reason
 	//guess game is always loaded? if not, then we'll crash
 	ieDword gametime = core->GetGame()->GameTime;
-
-	if (actor->Modified[IE_EA]>=EA_EVILCUTOFF) {
-		if (IsVisible(actor->Pos, false) && actor->Schedule(gametime) ) {
-			core->Autopause(AP_ENEMY);
-		}
+	
+	if (IsVisible(actor->Pos, false) && actor->Schedule(gametime) ) {
+		ActorSpottedByPlayer(actor);
 	}
 }
 
@@ -1474,11 +1494,7 @@ void Map::GenerateQueues()
 				if (IsVisible(actor->Pos, false) && actor->Schedule(gametime) ) {
 					priority = PR_SCRIPT; //run scripts and display, activated now
 					actor->Unhide();
-					if (!(actor->GetInternalFlag()&IF_STOPATTACK)) {
-						if (actor->Modified[IE_EA]>=EA_EVILCUTOFF) {
-							core->Autopause(AP_ENEMY);
-						}
-					}
+					ActorSpottedByPlayer(actor);
 				} else {
 					priority = PR_IGNORE;
 				}
