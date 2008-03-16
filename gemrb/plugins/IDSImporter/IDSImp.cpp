@@ -24,6 +24,7 @@
 #include "IDSImp.h"
 #include "IDSImpDefs.h"
 #include <ctype.h>
+#include <cstring>
 
 IDSImp::IDSImp(void)
 {

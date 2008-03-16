@@ -1576,7 +1576,7 @@ void Actor::ReactToDeath(const char * deadname)
 				if (*value==',') value++;
 			}
 			strncpy(resref, value, 8);
-			for(count=0;count<8 && resref[count]!=',';count++);
+			for(count=0;count<8 && resref[count]!=',';count++) ;
 			resref[count]=0;
 
 			ieDword len = core->GetAudioDrv()->Play( resref );
@@ -3317,7 +3317,7 @@ void Actor::GetSoundFromINI(ieResRef Sound, unsigned int index)
 			if (*resource==',') resource++;
 	}
 	strncpy(Sound, resource, 8);
-	for(count=0;count<8 && Sound[count]!=',';count++);
+	for(count=0;count<8 && Sound[count]!=',';count++) ;
 	Sound[count]=0;
 }
 

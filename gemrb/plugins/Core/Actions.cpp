@@ -3607,7 +3607,7 @@ void GameScript::TakePartyItemRange(Scriptable* Sender, Action* parameters)
 	while (i--) {
 		Actor *ac = game->GetPC(i,false);
 		if (Distance(Sender, ac)<MAX_OPERATING_DISTANCE) {
-			while (MoveItemCore(ac, Sender, parameters->string0Parameter,0,IE_INV_ITEM_UNSTEALABLE)==MIC_GOTITEM);
+			while (MoveItemCore(ac, Sender, parameters->string0Parameter,0,IE_INV_ITEM_UNSTEALABLE)==MIC_GOTITEM) ;
 		}
 	}
 }
@@ -3617,7 +3617,7 @@ void GameScript::TakePartyItemAll(Scriptable* Sender, Action* parameters)
 	Game *game=core->GetGame();
 	int i=game->GetPartySize(false);
 	while (i--) {
-		while (MoveItemCore(game->GetPC(i,false), Sender, parameters->string0Parameter,0, IE_INV_ITEM_UNSTEALABLE)==MIC_GOTITEM);
+		while (MoveItemCore(game->GetPC(i,false), Sender, parameters->string0Parameter,0, IE_INV_ITEM_UNSTEALABLE)==MIC_GOTITEM) ;
 	}
 }
 
@@ -3834,7 +3834,7 @@ void GameScript::GivePartyAllEquipment(Scriptable *Sender, Action* /*parameters*
 	int i = game->GetPartySize(false);
 	while (i--) {
 		Actor *tar = game->GetPC(i,false);
-		while(MoveItemCore(Sender, tar, "",0,0)!=MIC_NOITEM);
+		while(MoveItemCore(Sender, tar, "",0,0)!=MIC_NOITEM) ;
 	}
 }
 
@@ -3862,7 +3862,7 @@ void GameScript::Plunder(Scriptable *Sender, Action* parameters)
 	}
 	//move all movable item from the target to the Sender
 	//the rest will be dropped at the feet of Sender
-	while(MoveItemCore(tar, Sender, "",0,0)!=MIC_NOITEM);
+	while(MoveItemCore(tar, Sender, "",0,0)!=MIC_NOITEM) ;
 }
 
 void GameScript::MoveInventory(Scriptable *Sender, Action* parameters)
@@ -3877,7 +3877,7 @@ void GameScript::MoveInventory(Scriptable *Sender, Action* parameters)
 	}
 	//move all movable item from the target to the Sender
 	//the rest will be dropped at the feet of Sender
-	while(MoveItemCore(src, tar, "",0,0)!=MIC_NOITEM);
+	while(MoveItemCore(src, tar, "",0,0)!=MIC_NOITEM) ;
 }
 
 void GameScript::PickPockets(Scriptable *Sender, Action* parameters)

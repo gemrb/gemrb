@@ -246,7 +246,7 @@ bool SaveGameIterator::RescanSaveGames()
 		if (IsSaveGameSlot( Path, de->d_name )) {
 			charlist::iterator i;
 
-			for (i=save_slots.begin(); i!=save_slots.end() && stricmp((*i), de->d_name)<0; i++);
+			for (i=save_slots.begin(); i!=save_slots.end() && stricmp((*i), de->d_name)<0; i++) ;
 			save_slots.insert( i, strdup( de->d_name ) );
 		}
 	} while (( de = readdir( dir ) ) != NULL);
@@ -341,7 +341,7 @@ void SaveGameIterator::PruneQuickSave(const char *folder)
 		int tmp = IsQuickSaveSlot(folder, (*m) );
 		if (tmp) {
 			size_t pos = myslots.size();
-			while(pos-- && myslots[pos]>tmp);
+			while(pos-- && myslots[pos]>tmp) ;
 			myslots.insert(myslots.begin()+pos+1,tmp);
 		}
 	}

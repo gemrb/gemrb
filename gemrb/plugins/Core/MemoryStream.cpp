@@ -21,6 +21,7 @@
 
 #include "../../includes/win32def.h"
 #include "MemoryStream.h"
+#include <cstring>
 
 MemoryStream::MemoryStream(void* buffer, int length, bool autoFree)
 {

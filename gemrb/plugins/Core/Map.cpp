@@ -924,7 +924,7 @@ void Map::AddAnimation(AreaAnimation* anim)
 	}
 
 	aniIterator iter;
-	for(iter=animations.begin(); (iter!=animations.end()) && ((*iter)->height<anim->height); iter++);
+	for(iter=animations.begin(); (iter!=animations.end()) && ((*iter)->height<anim->height); iter++) ;
 	animations.insert(iter, anim);
 	/*
 	Animation *a = anim->animation[0];
@@ -1555,7 +1555,7 @@ void Map::AddProjectile(Projectile* pro, Point &source, ieWord actorID)
 	pro->MoveTo(this,source);
 	pro->SetTarget(actorID);
 	int height = pro->GetHeight();
-	for(iter=projectiles.begin();iter!=projectiles.end() && (*iter)->GetHeight()<height; iter++);
+	for(iter=projectiles.begin();iter!=projectiles.end() && (*iter)->GetHeight()<height; iter++) ;
 	projectiles.insert(iter, pro);
 }
 
@@ -1567,7 +1567,7 @@ void Map::AddProjectile(Projectile* pro, Point &source, Point &dest)
 	pro->MoveTo(this,source);
 	pro->SetTarget(dest);
 	int height = pro->GetHeight();
-	for(iter=projectiles.begin();iter!=projectiles.end() && (*iter)->GetHeight()<height; iter++);
+	for(iter=projectiles.begin();iter!=projectiles.end() && (*iter)->GetHeight()<height; iter++) ;
 	projectiles.insert(iter, pro);
 }
 
@@ -1576,7 +1576,7 @@ void Map::AddVVCell(ScriptedAnimation* vvc)
 {
 	scaIterator iter;
 
-	for(iter=vvcCells.begin();iter!=vvcCells.end() && (*iter)->ZPos<vvc->ZPos; iter++);
+	for(iter=vvcCells.begin();iter!=vvcCells.end() && (*iter)->ZPos<vvc->ZPos; iter++) ;
 	vvcCells.insert(iter, vvc);
 }
 
@@ -2675,7 +2675,7 @@ void Map::Sparkle(ieDword color, ieDword type, Point &pos)
 	spaIterator iter;
 	//this is pos.y we just set
 	//int h = sparkles->GetHeight();
-	for(iter=particles.begin(); (iter!=particles.end()) && ((*iter)->GetHeight()<pos.y); iter++);
+	for(iter=particles.begin(); (iter!=particles.end()) && ((*iter)->GetHeight()<pos.y); iter++) ;
 	particles.insert(iter, sparkles);
 }
 

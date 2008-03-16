@@ -218,7 +218,7 @@ void IniSpawn::ReadCreature(DataFileMgr *inifile, const char *crittername, Critt
 			int count = core->Roll(1,CountElements(s,']'),-1);
 			//go to the selected spawnpoint
 			while(count--) {
-				while(*s++!=']');
+				while(*s++!=']') ;
 			}
 		}
 		//parse the selected spawnpoint

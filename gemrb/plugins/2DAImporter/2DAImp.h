@@ -22,6 +22,7 @@
 #ifndef P2DAIMP_H
 #define P2DAIMP_H
 
+#include <cstring>
 #include "../Core/TableMgr.h"
 #include "../../includes/globals.h"
 

@@ -35,7 +35,7 @@
 static int MAP_DIV   = 3;
 static int MAP_MULT  = 32;
 
-typedef enum colorcode {black=0, gray, violet, green, orange, red, blue, darkblue, darkgreen};
+typedef enum {black=0, gray, violet, green, orange, red, blue, darkblue, darkgreen} colorcode;
 
 Color colors[]={
  { 0x00, 0x00, 0x00, 0xff }, //black

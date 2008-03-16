@@ -27,6 +27,7 @@
 #endif
 
 #include <vector>
+#include <cstring>
 #include "../../includes/ie_types.h"
 #include "Animation.h"
 #include "CharAnimations.h"
@@ -294,7 +295,7 @@ public:
 			strncpy( LargePortrait, ResRef, 8 );
 		}
 		if(!Which) {
-			for (i = 0; i < 8 && ResRef[i]; i++);
+			for (i = 0; i < 8 && ResRef[i]; i++) {};
 			SmallPortrait[i] = 'S';
 			LargePortrait[i] = 'M';
 		}

@@ -23,6 +23,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <cstring>
 
 Gem_Polygon::Gem_Polygon(Point* points, unsigned int cnt, Region *bbox)
 {

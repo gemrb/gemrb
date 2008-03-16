@@ -31,6 +31,7 @@
 #include "../../includes/win32def.h"
 #include "../../includes/globals.h"
 #include <vector>
+#include <cstring>
 
 #ifdef WIN32
 

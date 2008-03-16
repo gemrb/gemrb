@@ -121,7 +121,7 @@ const char* INIImp::GetKeyAsString(const char* Tag, const char* Key,
 	return Default;
 }
 
-const int INIImp::GetKeyAsInt(const char* Tag, const char* Key,
+int INIImp::GetKeyAsInt(const char* Tag, const char* Key,
 	const int Default)
 {
 	for (unsigned int i = 0; i < tags.size(); i++) {
@@ -133,7 +133,7 @@ const int INIImp::GetKeyAsInt(const char* Tag, const char* Key,
 	return Default;
 }
 
-const bool INIImp::GetKeyAsBool(const char* Tag, const char* Key,
+bool INIImp::GetKeyAsBool(const char* Tag, const char* Key,
 	const bool Default)
 {
 	for (unsigned int i = 0; i < tags.size(); i++) {

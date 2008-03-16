@@ -23,6 +23,7 @@
 #define CACHE_H
 
 #include <ctype.h>
+#include <cstring>
 #include "../../includes/win32def.h"
 #include "../../includes/globals.h"
 /////////////////////////////////////////////////////////////////////////////

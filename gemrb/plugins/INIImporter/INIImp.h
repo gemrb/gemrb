@@ -22,6 +22,7 @@
 #ifndef INIIMP_H
 #define INIIMP_H
 
+#include <cstring>
 #include "../Core/DataFileMgr.h"
 #include "../../includes/globals.h"
 
@@ -124,7 +125,7 @@ public:
 		return Default;
 	}
 
-	const int GetKeyAsInt(const char* Key, const int Default)
+	int GetKeyAsInt(const char* Key, const int Default)
 	{
 		const char* ret = NULL;
 		for (unsigned int i = 0; i < pairs.size(); i++) {
@@ -139,7 +140,7 @@ public:
 		return atoi( ret );
 	}
 
-	const bool GetKeyAsBool(const char* Key, const bool Default)
+	bool GetKeyAsBool(const char* Key, const bool Default)
 	{
 		const char* ret = NULL;
 		for (unsigned int i = 0; i < pairs.size(); i++) {
@@ -184,9 +185,9 @@ public:
 	const char* GetKeyNameByIndex(const char* Tag, int index);
 	const char* GetKeyAsString(const char* Tag, const char* Key,
 		const char* Default);
-	const int GetKeyAsInt(const char* Tag, const char* Key, 
+	int GetKeyAsInt(const char* Tag, const char* Key, 
 		const int Default);
-	const bool GetKeyAsBool(const char* Tag, const char* Key, 
+	bool GetKeyAsBool(const char* Tag, const char* Key, 
 		const bool Default);
 public:
 	void release(void)

@@ -60,9 +60,9 @@ public:
 	virtual const char* GetKeyNameByIndex(const char* Tag, int index) = 0;
 	virtual const char* GetKeyAsString(const char* Tag, const char* Key,
 		const char* Default) = 0;
-	virtual const int GetKeyAsInt(const char* Tag, const char* Key,
+	virtual int GetKeyAsInt(const char* Tag, const char* Key,
 		const int Default) = 0;
-	virtual const bool GetKeyAsBool(const char* Tag, const char* Key,
+	virtual bool GetKeyAsBool(const char* Tag, const char* Key,
 		const bool Default) = 0;
 };
 

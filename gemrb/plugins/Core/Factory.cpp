@@ -19,6 +19,7 @@
  *
  */
 
+#include <cstring>
 #include "../../includes/win32def.h"
 #include "Factory.h"
 
