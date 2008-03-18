@@ -356,7 +356,7 @@ unsigned int Inventory::DestroyItem(const char *resref, ieDword flags, ieDword c
 			continue;
 		}
 		// here you can simply destroy all items of a specific type
-		if ( ( flags&( item->Flags^(IE_INV_ITEM_UNDROPPABLE|IE_INV_ITEM_EQUIPPED)))!=flags) {
+		if ( ((flags^IE_INV_ITEM_UNDROPPABLE)&item->Flags)!=flags) {
 				continue;
 		}
 		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
@@ -425,7 +425,7 @@ int Inventory::RemoveItem(const char *resref, unsigned int flags, CREItem **res_
 		if (!item) {
 			continue;
 		}
-		if ( (flags&(item->Flags^(IE_INV_ITEM_UNDROPPABLE|IE_INV_ITEM_EQUIPPED) ) )==flags) {
+		if ( ((flags^(IE_INV_ITEM_UNDROPPABLE|IE_INV_ITEM_EQUIPPED))&item->Flags)!=flags) {
 				continue;
 		}
 		if (resref[0] && strnicmp(item->ItemResRef, resref, 8) ) {
