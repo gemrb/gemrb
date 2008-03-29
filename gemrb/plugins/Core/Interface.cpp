@@ -2179,6 +2179,7 @@ static const char *game_flags[GF_COUNT+1]={
 		"SpawnIni",           //33GF_SPAWN_INI
 		"IWDDeathVarFormat",  //34GF_IWD_DEATHVARFORMAT
 		"HasResDataIni",      //35GF_RESDATA_INI
+		"OverrideCursorPos",  //46GF_OVERRIDE_CURSORPOS
 		NULL                  //for our own safety, this marks the end of the pole
 };
 
@@ -4925,7 +4926,16 @@ Sprite2D* Interface::GetBAMSprite(const ieResRef ResRef, int cycle, int frame)
 
 Sprite2D *Interface::GetCursorSprite()
 {
-	return GetBAMSprite(CursorBam, 0, 0);
+	Sprite2D *spr = GetBAMSprite(CursorBam, 0, 0);
+	if (spr)
+	{
+		if(HasFeature(GF_OVERRIDE_CURSORPOS))
+		{
+			spr->XPos=1;
+			spr->YPos=spr->Height-1;
+		}
+	}
+	return spr;
 }
 
 Sprite2D *Interface::GetScrollCursorSprite(int frameNum, int spriteNum)
