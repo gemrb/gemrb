@@ -130,9 +130,9 @@
 #define  GF_SPAWN_INI           	33 //pst, iwd, iwd2
 #define  GF_IWD_DEATHVARFORMAT  	34 //iwd branch (maybe pst)
 #define  GF_RESDATA_INI         	35 //pst
-
+#define  GF_OVERRIDE_CURSORPOS  	36 //pst, iwd2
 //update this
-#define GF_COUNT 36
+#define GF_COUNT 37
 
 //the number of item usage fields (used in CREItem and STOItem)
 #define CHARGE_COUNTERS  3
