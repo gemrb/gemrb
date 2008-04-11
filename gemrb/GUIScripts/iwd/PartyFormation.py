@@ -32,8 +32,6 @@ ExitWindow = 0
 def OnLoad():
 	global PartyFormationWindow
 
-	GemRB.SetVar("PlayMode",2) #using mpsave
-
 	GemRB.LoadWindowPack("GUISP", 640, 480)
 	PartyFormationWindow = GemRB.LoadWindow(0)
 	GemRB.SetWindowFrame (PartyFormationWindow)
@@ -128,6 +126,7 @@ def ModifyCharsPress():
 	return
 
 def EnterGamePress():
+	GemRB.SetVar("PlayMode",2) #using mpsave and second row
 	GemRB.EnterGame()
 	return
 
