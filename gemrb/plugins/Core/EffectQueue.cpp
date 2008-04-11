@@ -101,7 +101,7 @@ inline bool NeedPrepare(ieByte timingmode)
 #define DURATION  2
 
 static const int fx_prepared[MAX_TIMING_MODE]={DURATION,PERMANENT,PERMANENT,DELAYED, //0-3
-DELAYED,DELAYED,DELAYED,DELAYED,PERMANENT,PERMANENT,PERMANENT};                //4-7
+DELAYED,DELAYED,DELAYED,DELAYED,PERMANENT,PERMANENT,PERMANENT};		//4-7
 
 inline int IsPrepared(ieByte timingmode)
 {
@@ -460,7 +460,8 @@ int EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &des
 
 	case FX_TARGET_PARTY:
 		game=core->GetGame();
-		for (i = game->GetPartySize(true); i >= 0; i--) {
+		i = game->GetPartySize(true);
+		while(i--) {
 			Actor* actor = game->GetPC( i, true );
 			fx->PosX=actor->Pos.x;
 			fx->PosY=actor->Pos.y;
@@ -474,7 +475,8 @@ int EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &des
 
 	case FX_TARGET_GLOBAL_INCL_PARTY:
 		map=self->GetCurrentArea();
-		for (i = map->GetActorCount(true)-1; i >= 0; i--) {
+		i= map->GetActorCount(true);
+		while(i--) {
 			Actor* actor = map->GetActor( i, true );
 			fx->PosX=actor->Pos.x;
 			fx->PosY=actor->Pos.y;
@@ -488,7 +490,8 @@ int EffectQueue::AddEffect(Effect* fx, Actor* self, Actor* pretarget, Point &des
 
 	case FX_TARGET_GLOBAL_EXCL_PARTY:
 		map=self->GetCurrentArea();
-		for (i = map->GetActorCount(false); i >= 0; i--) {
+		i = map->GetActorCount(false);
+		while(i--) {
 			Actor* actor = map->GetActor( i, false );
 			fx->PosX=actor->Pos.x;
 			fx->PosY=actor->Pos.y;
