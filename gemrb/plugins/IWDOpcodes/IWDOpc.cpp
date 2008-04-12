@@ -334,6 +334,14 @@ static EffectRef effectnames[] = {
 	{ NULL, NULL, 0 },
 };
 
+struct IWDIDSEntry {
+	ieDword value;
+	ieWord stat;
+	ieWord relation;
+};
+
+static int spellrescnt = -1;
+static IWDIDSEntry *spellres = NULL;
 
 IWDOpc::IWDOpc(void)
 {
@@ -359,6 +367,9 @@ IWDOpc::~IWDOpc(void)
 		free (EntropyProjectileList);
 	}
 	EntropyProjectileList = NULL;
+	if (spellres) {
+		free (spellres);
+	}
 }
 
 //iwd got a weird targeting system
@@ -378,15 +389,6 @@ IWDOpc::~IWDOpc(void)
 //The relation function is exactly the same as the extended
 //diffmode for gemrb. (Thus scripts can use the very same relation
 //functions).
-
-struct IWDIDSEntry {
-	ieDword value;
-	ieWord stat;
-	ieWord relation;
-};
-
-static int spellrescnt = -1;
-static IWDIDSEntry *spellres = NULL;
 
 static void ReadSpellProtTable(const ieResRef tablename)
 {
