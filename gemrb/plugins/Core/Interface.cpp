@@ -334,6 +334,7 @@ Interface::~Interface(void)
 		FreeInterface(mm);
 	}
 
+	ReleaseMemoryActor();
 	EffectQueue_ReleaseMemory();
 	CharAnimations::ReleaseMemory();
 	delete CurrentStore;

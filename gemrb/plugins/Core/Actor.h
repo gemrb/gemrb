@@ -123,6 +123,8 @@ struct WeaponInfo {
 	ieDword itemflags;
 };
 
+extern void ReleaseMemoryActor();
+
 class GEM_EXPORT Actor : public Movable {
 public:
 	//CRE DATA FIELDS
