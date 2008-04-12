@@ -23,11 +23,15 @@
 
 ACMImp::ACMImp()
 {
+	SoundReader = 0;
 }
 
 bool ACMImp::Open(DataStream* stream, bool autofree)
 {
-    if (!stream) {
+	delete SoundReader;
+	SoundReader = 0;
+
+	if (!stream) {
 		return false;
 	}
 	char Signature[4];
