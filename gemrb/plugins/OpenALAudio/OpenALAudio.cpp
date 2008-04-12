@@ -64,6 +64,7 @@ OpenALAudioDriver::OpenALAudioDriver(void)
     MusicSource = 0;
     memset(MusicBuffer, 0, MUSICBUFFERS*sizeof(ALuint));
     musicMutex = SDL_CreateMutex();
+    MusicReader = 0;
 }
 
 bool OpenALAudioDriver::Init(void)
@@ -93,12 +94,11 @@ bool OpenALAudioDriver::Init(void)
     int sources = CountAvailableSources(MAX_STREAMS+1);
 	num_streams = sources - 1;
 
-	if (num_streams < MAX_STREAMS) {
-		printMessage( "OpenAL","Allocated fewer streams than desired. ", YELLOW );
-	}
-	if (num_streams > MAX_STREAMS) {
-		printMessage( "OpenAL","Allocated more streams than desired?! ", YELLOW );
-	}
+    char buf[255];
+    sprintf(buf, "Allocated %d streams.%s", num_streams,
+            (num_streams < MAX_STREAMS ? " (Fewer than desired.)" : "" ) );
+
+    printMessage( "OpenAL", buf, WHITE );
 
     stayAlive = true;
     musicThread = SDL_CreateThread( MusicManager, this );
@@ -396,21 +396,22 @@ int OpenALAudioDriver::StreamFile(const char* filename)
 	strcpy( path, filename );
 	FileStream* str = new FileStream();
 	if (!str->Open( path, true )) {
-		delete( str );
+		delete str;
 		printMessage("OpenAL", "",WHITE);
 		printf( "Cannot find %s", path );
 		printStatus("NOT FOUND", YELLOW );
-		return 0xffffffff;
-	}
-	SDL_mutexP( musicMutex );
-	if (!MusicReader) {
-		core->FreeInterface(MusicReader);
-		MusicReader = NULL;
 		return -1;
 	}
+	SDL_mutexP( musicMutex );
+
+	// Free old MusicReader
+	core->FreeInterface(MusicReader);
+	MusicReader = NULL;
+
 	if (MusicBuffer[0] == 0) {
 		alGenBuffers( MUSICBUFFERS, MusicBuffer );
 	}
+
 	MusicReader = (SoundMgr*) core->GetInterface( IE_WAV_CLASS_ID );
 	if (!MusicReader->Open(str, true)) {
 	    delete str;
