@@ -326,7 +326,7 @@ int Game::JoinParty(Actor* actor, int join)
 		core->GetDictionary()->Lookup( "PlayMode", playmode );
 		//hack for iwd2
 		startorient = DetermineStartPosType(strta);
-		if (startorient) {
+		if (startorient || strta->GetRowCount()<6) {
 			playmode %= 2;
 			actor->SetOrientation( atoi( strta->QueryField( playmode+4, actor->InParty-1) ), false );
 		}

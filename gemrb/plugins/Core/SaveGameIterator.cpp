@@ -119,9 +119,10 @@ void SaveGameIterator::Invalidate()
 	loaded = false;
 }
 
+/* mission pack save */
 static const char* PlayMode()
 {
-	ieDword playmode = 1;
+	ieDword playmode = 0;
 
 	core->GetDictionary()->Lookup( "PlayMode", playmode );
 	if (playmode >= 2) {
