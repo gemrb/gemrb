@@ -583,6 +583,7 @@ void Map::UpdateScripts()
 					actor->NewPath();
 				}
 			}
+			free(nearActors);
 		}
 		if (!(actor->GetBase(IE_STATE_ID)&STATE_CANTMOVE) ) {
 			if (!actor->Immobile()) {
@@ -1062,6 +1063,7 @@ void Map::DeleteActor(int i)
 
 	actors.erase( actors.begin()+i );
 	delete actor;
+	free(nearActors);
 }
 
 Actor* Map::GetActorByGlobalID(ieDword objectID)
