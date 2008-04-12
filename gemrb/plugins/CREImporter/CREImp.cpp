@@ -747,7 +747,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 	for (i = 1; i <= Inventory_Size; i++) {
 		int Slot = core->QuerySlot( i );
 		ieWord index;
-		str->Read( &index, 2 );
+		str->ReadWord( &index );
 
 		if (index != 0xFFFF) {
 			if (index>=ItemsCount) {
