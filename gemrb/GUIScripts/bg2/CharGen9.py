@@ -20,7 +20,6 @@ def NextPress():
 def FinishCharGen():
 	#set my character up
 	MyChar = GemRB.GetVar ("Slot")
-	GemRB.CreatePlayer ("charbase", MyChar | 0x8000 )
 	GemRB.SetPlayerStat (MyChar, IE_SEX, GemRB.GetVar ("Gender") )
 	KitTable = GemRB.LoadTable ("kitlist")
 	RaceTable = GemRB.LoadTable ("races")
@@ -54,13 +53,6 @@ def FinishCharGen():
 		if KitValue == "*":
 			KitValue = 0x4000
 		SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_WIZARD, 1)
-		Learnable = GetLearnableMageSpells( KitValue, t, 1)
-		SpellBook = GemRB.GetVar ("MageSpellBook")
-		j=1
-		for i in range(len(Learnable) ):
-			if SpellBook & j:
-				GemRB.LearnSpell (MyChar, Learnable[i], 0)
-			j=j<<1
 	else:
 		KitValue = (0x4000 + KitIndex)<<16
 

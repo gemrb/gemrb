@@ -300,6 +300,7 @@ unsigned int Spellbook::GetTotalMemorizedSpellsCount() const
 	return total;
 }
 
+// returns the number of known spells of level (level+1)
 unsigned int Spellbook::GetKnownSpellsCount(int type, unsigned int level) const
 {
 	if (type >= NUM_BOOK_TYPES || level >= GetSpellLevelCount(type))

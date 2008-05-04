@@ -20,7 +20,8 @@
 # character generation, mage spells (GUICG7)
 
 import GemRB
-from GUICommon import GetMageSpells
+from GUIDefines import *
+from GUICommon import GetMageSpells, GetLearnableMageSpells
 
 MageSpellsWindow = 0
 MageSpellsTextArea = 0
@@ -60,8 +61,6 @@ def OnLoad():
 		if GemRB.GetTableValue(TmpTable, Class, 4)=='*':
 			MageSpellsSelectPointsLeft = 3
 		# TODO make the random Pick method enforce a specialist selection too?
-		# TODO also write the specialist spells of greater level to the spellbook
-		#      or will it be done on levelup? Or was it just Edwin?
 	else:
 		KitValue = 0x4000
 
@@ -69,6 +68,8 @@ def OnLoad():
 	GemRB.SetVar("MageSpellBook", 0)
 	SpellMask = 0
 	GemRB.SetVar("SpellMask", 0)
+
+	RemoveKnownSpells ()
 
 	PointsLeftLabel = GemRB.GetControl(MageSpellsWindow, 0x1000001b)
 	GemRB.SetLabelUseRGB(MageSpellsWindow, PointsLeftLabel, 1)
@@ -191,9 +192,27 @@ def MageSpellsCancelPress():
 	return
 
 def MageSpellsDonePress():
+	global KitValue
+	MageSpellBook = GemRB.GetVar ("MageSpellBook")
+	Learnable = []
+	j=1
+	for level in range(1, 10):
+		Learnable = GetLearnableMageSpells ( KitValue, GemRB.GetVar ("Alignment"), level)
+		for i in range (len(Learnable)):
+			if MageSpellBook & j:
+				print "Learning:", GemRB.GetString ((GemRB.GetSpell (Learnable[i])['SpellName']))
+				GemRB.LearnSpell (GemRB.GetVar ("Slot"), Learnable[i], 0)
+			j=j<<1
+
 	GemRB.UnloadWindow(MageSpellsWindow)
 	GemRB.SetNextScript("GUICG6") #abilities
 	return
+
+def RemoveKnownSpells():
+	slot = GemRB.GetVar ("Slot")
+	for level in range(0, 9):
+		for j in range(GemRB.GetKnownSpellsCount (slot, IE_SPELL_TYPE_WIZARD, level)-1, -1, -1):
+			GemRB.RemoveSpell (slot, IE_SPELL_TYPE_WIZARD, level, j)
 
 def MageSpellsPickPress():
 	global MageSpellsSelectPointsLeft, MageSpells

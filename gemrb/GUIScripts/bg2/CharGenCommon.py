@@ -3,7 +3,6 @@ import GemRB
 from ie_stats import *
 from GUIDefines import *
 from GUICommon import *
-#from CharGen9 import FinishCharGen
 
 CharGenWindow = 0
 TextAreaControl = 0
@@ -103,6 +102,8 @@ def DisplayOverview(step):
 	AlignmentTable = GemRB.LoadTable ("aligns")
 	AbilityTable = GemRB.LoadTable ("ability")
 
+	MyChar = GemRB.GetVar ("Slot")
+
 	for part in range(1, step+1):
 		if part == 1:
 			TextAreaControl= GemRB.GetControl (CharGenWindow,9)
@@ -151,12 +152,29 @@ def DisplayOverview(step):
 					+ str(GemRB.GetVar ("Ability "+str(i))) )
 		elif part == 7:
 			# TODO: list known spells, proficiencies and thief skills, racial enemy
-			GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, "\n")
-			#spells / thieving
+			GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, "\n\n")
+			# thieving and other skills
+			#GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 8442)
+			# arcane spells
+			info = ""
+			for level in range(0, 9):
+				for j in range(0, GemRB.GetKnownSpellsCount (MyChar, IE_SPELL_TYPE_WIZARD, level) ):
+					Spell = GemRB.GetKnownSpell (MyChar, IE_SPELL_TYPE_WIZARD, level, j)
+					Spell = GemRB.GetSpell (Spell['SpellResRef'])['SpellName']
+					info += GemRB.GetString (Spell) + "\n"
+			if info != "":
+				info = "\n" + info
+				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 11027)
+				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, info)
+
+			#divine spells
+			#GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 11028)
 			#GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, "\n")
 			#racial enemy
+			#GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 15982)
 			#GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, "\n")
 			#weapon proficiencies
+			#GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 9466)
 
 		elif part == 8:
 			break

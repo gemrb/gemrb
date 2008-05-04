@@ -5974,12 +5974,12 @@ static PyObject* GemRB_RemoveSpell(PyObject * /*self*/, PyObject* args)
 	}
 	Actor* actor = game->FindPC( PartyID );
 	if (!actor) {
-		return RuntimeError( "Actor not found" );
+		return RuntimeError( "Actor not found!" );
 	}
 
 	CREKnownSpell* ks = actor->spellbook.GetKnownSpell( SpellType, Level, Index );
 	if (! ks) {
-		return NULL;
+		return RuntimeError( "Spell not known!" );
 	}
 
 	return PyInt_FromLong( actor->spellbook.RemoveSpell( ks ) );

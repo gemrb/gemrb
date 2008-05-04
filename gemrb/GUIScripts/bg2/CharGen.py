@@ -21,6 +21,8 @@ def OnLoad():
 	GemRB.SetVar("Class Kit",0) #class
 	GemRB.SetVar("Alignment",-1) #alignment
 
+	MyChar = GemRB.GetVar ("Slot")
+	GemRB.CreatePlayer ("charbase", MyChar | 0x8000 )
 	DisplayOverview (1)	
 
 	return
