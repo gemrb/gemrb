@@ -447,11 +447,11 @@ public:
 	ieResRef Dialog;
 private:
 	void SetWallgroups(int count, int value);
-	void ToggleTiles(int State, bool playsound = false);
 	void ImpedeBlocks(int count, Point *points, unsigned int value);
 	void UpdateDoor();
 	bool BlockedOpen(bool Open, bool ForceOpen);
 public:
+	void ToggleTiles(int State, bool playsound = false);
 	void SetName(const char* Name); // sets door ID
 	void SetTiles(unsigned short* Tiles, int count);
 	void SetDoorLocked(bool Locked, bool playsound);

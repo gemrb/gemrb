@@ -1646,6 +1646,22 @@ void GameScript::AmbientActivate(Scriptable* Sender, Action* parameters)
 	}
 }
 
+void GameScript::ChangeTileState(Scriptable* Sender, Action* parameters)
+{
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1], GA_NO_DEAD );
+	if (!tar) {
+		return;
+	}
+	if (tar->Type != ST_DOOR) {
+		return;
+	}
+	Door* door = ( Door* ) tar;
+	int state = parameters->int0Parameter;
+	if(door) {
+		door->ToggleTiles(state); /* default is false for playsound */
+	}
+}
+
 void GameScript::StaticStart(Scriptable* Sender, Action* parameters)
 {
 	AreaAnimation *anim = Sender->GetCurrentArea()->GetAnimation(parameters->objects[1]->objectName);

@@ -1005,6 +1005,7 @@ public:
 	static void ChangeStat(Scriptable* Sender, Action* parameters);
 	static void ChangeStatGlobal(Scriptable* Sender, Action* parameters);
 	static void ChangeStoreMarkup(Scriptable* Sender, Action* parameters);
+	static void ChangeTileState(Scriptable* Sender, Action* parameters);
 	static void ClearActions(Scriptable* Sender, Action* parameters);
 	static void ClearAllActions(Scriptable* Sender, Action* parameters);
 	static void ClearPartyEffects(Scriptable* Sender, Action* parameters);
