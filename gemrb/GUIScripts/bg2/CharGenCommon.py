@@ -3,6 +3,7 @@ import GemRB
 from ie_stats import *
 from GUIDefines import *
 from GUICommon import *
+from GUICommonWindows import GetKitIndex
 
 CharGenWindow = 0
 TextAreaControl = 0
@@ -151,10 +152,35 @@ def DisplayOverview(step):
 				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, ": " \
 					+ str(GemRB.GetVar ("Ability "+str(i))) )
 		elif part == 7:
-			# TODO: list known spells, proficiencies and thief skills, racial enemy
+			# TODO: list known priest spells, proficiencies, racial enemy
 			GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, "\n\n")
 			# thieving and other skills
-			#GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 8442)
+			info = ""
+			SkillTable = GemRB.LoadTable ("skills")
+			KitList = GemRB.LoadTable ("kitlist")
+			ClassTable = GemRB.LoadTable ("classes")
+			Class = GemRB.GetVar ("Class") - 1
+			ClassID = GemRB.GetTableValue (ClassTable, Class, 5)
+			Class = GemRB.FindTableValue (ClassTable, 5, ClassID)
+			# TODO: what about monks, rangers, bards and others not in skills.2da?
+			KitName = GetKitIndex (MyChar)
+			if KitName == 0:
+				KitName = GemRB.GetTableRowName (ClassTable, Class)
+			else:
+				KitName = GemRB.GetTableValue (KitList, KitName, 0)
+
+			if GemRB.GetTableValue (SkillTable,"RATE", KitName) != "-1":
+				for skill in range(0, 7):
+					name = GemRB.GetTableValue (SkillTable, skill+2, 1)
+					name = GemRB.GetString (name)
+					value = GemRB.GetVar ("Skill " + str(skill))
+					if value >= 0:
+						info += name + ": " + str(value) + "\n"
+			if info != "":
+				info = "\n" + info + "\n"
+				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 8442)
+				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, info)
+
 			# arcane spells
 			info = ""
 			for level in range(0, 9):
@@ -163,7 +189,7 @@ def DisplayOverview(step):
 					Spell = GemRB.GetSpell (Spell['SpellResRef'])['SpellName']
 					info += GemRB.GetString (Spell) + "\n"
 			if info != "":
-				info = "\n" + info
+				info = "\n" + info + "\n"
 				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 11027)
 				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, info)
 
