@@ -990,24 +990,24 @@ void GameScript::TimedMoveToPoint(Scriptable* Sender, Action* parameters)
 	}
 	Actor *actor = (Actor *) Sender;
 
-        actor->WalkTo( parameters->pointParameter, parameters->int1Parameter,0 );
-        Point dest = actor->Destination;
-        //hopefully this hack will prevent lockups
-        if (!actor->InMove()) {
-                Sender->ReleaseCurrentAction();
-                return;
-        }
+	actor->WalkTo( parameters->pointParameter, parameters->int1Parameter,0 );
+	Point dest = actor->Destination;
+	//hopefully this hack will prevent lockups
+	if (!actor->InMove()) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
 
-        //repeat movement...
-        Action *newaction = ParamCopyNoOverride(parameters);
-        if (newaction->int0Parameter!=1) {
-                if (newaction->int0Parameter) {
-                        newaction->int0Parameter--;
-                }
-                actor->AddActionInFront(newaction);
-        }
+	//repeat movement...
+	Action *newaction = ParamCopyNoOverride(parameters);
+	if (newaction->int0Parameter!=1) {
+		if (newaction->int0Parameter) {
+			newaction->int0Parameter--;
+		}
+		actor->AddActionInFront(newaction);
+	}
 
-        Sender->ReleaseCurrentAction();
+	Sender->ReleaseCurrentAction();
 }
 
 void GameScript::MoveToPoint(Scriptable* Sender, Action* parameters)
@@ -3953,6 +3953,7 @@ void GameScript::PickPockets(Scriptable *Sender, Action* parameters)
 	}
 
 	core->DisplayConstantString(STR_PICKPOCKET_DONE,0xffffff);
+	DisplayStringCore(snd, VB_PP_SUCC, DS_CONSOLE|DS_CONST );
 	Sender->ReleaseCurrentAction();
 }
 
