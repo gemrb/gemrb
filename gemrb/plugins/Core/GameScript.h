@@ -44,20 +44,28 @@ class Action;
 
 //verbal constant (bg2), we need a lookup table for other games
 #define VB_PANIC     1
+#define VB_HAPPY     2
+#define VB_UNHAPPY   3
 #define VB_TIRED     7
 #define VB_BORED     8
 #define VB_ATTACK    9
 #define VB_DAMAGE    18
 #define VB_DIE       19
 #define VB_SELECT    26
+#define VB_INSULT    44
+#define VB_COMPLIMENT 47
+#define VB_SPECIAL   50
 #define VB_REACT     53
 #define VB_REACT_S   54
+#define VB_RESP_COMP 55
+#define VB_RESP_INS  58
 #define VB_HOSTILE   59
 #define VB_DIALOG    60
 #define VB_CRITHIT   65
 #define VB_CRITMISS  66
 #define VB_TIMMUNE   67
 #define VB_INVENTORY 68
+#define VB_PP_SUCC   69
 
 //diffmode (iwd2)
 #define DM_EQUAL   1
