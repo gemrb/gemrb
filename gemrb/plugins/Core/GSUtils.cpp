@@ -256,7 +256,7 @@ void ClickCore(Scriptable *Sender, Point point, int type, int speed)
 		Sender->ReleaseCurrentAction();
 		return;
 	}
-	
+
 	video->ConvertToScreen(point.x, point.y);
 	GameControl *win = core->GetGameControl();
 
@@ -369,7 +369,7 @@ int CanSee(Scriptable* Sender, Scriptable* target, bool range, int nodead)
 
 	if (target->Type==ST_ACTOR) {
 		Actor *tar = (Actor *) target;
-		
+
 		if (!tar->ValidTarget(nodead)) {
 			return 0;
 		}
@@ -821,6 +821,26 @@ void GetPositionFromScriptable(Scriptable* scr, Point &position, bool dest)
 	}
 }
 
+int CheckInteract(const char *talker, const char *target)
+{
+	int interact = -1;
+	interact = core->LoadTable( "interact" );
+	if(!interact)
+		return 0;
+	const char *value = core->GetTable(interact)->QueryField(talker, target);
+	if(!value)
+		return 0;
+	switch(value[0]) {
+		case 's':
+			return I_SPECIAL;
+		case 'c':
+			return I_COMPLIMENT;
+		case 'i':
+			return I_INSULT;
+	}
+	return 0;
+}
+
 static ieResRef PlayerDialogRes = "PLAYERx\0";
 
 void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
@@ -921,7 +941,6 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 		}
 	}
 
-
 	GameControl* gc = core->GetGameControl();
 	if (!gc) {
 		printMessage( "GameScript","Dialog cannot be initiated because there is no GameControl.", YELLOW );
@@ -963,8 +982,18 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 			Dialog = ( const char * ) PlayerDialogRes;
 			break;
 		case BD_INTERACT: //using the source for the dialog
-			pdtable = core->LoadTable( "interdia" );
 			const char* scriptingname = scr->GetScriptName();
+
+			/* use interact.2da for short, inlined dialogue */
+			int type = CheckInteract(scriptingname, target->GetScriptName());
+			if(type) {
+				speaker->Interact(type);
+				target->Response(type);
+				Sender->ReleaseCurrentAction();
+				goto end_of_quest;
+			}
+			/* banter dialogue */
+			pdtable = core->LoadTable( "interdia" );
 			//Dialog is a borrowed reference, we cannot free pdtable while it is being used
 			if (pdtable!=-1) {
 				Dialog = core->GetTable( pdtable )->QueryField( scriptingname, "FILE" );

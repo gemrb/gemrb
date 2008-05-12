@@ -110,6 +110,11 @@ class ScriptedAnimation;
 
 #define VCONST_COUNT 100
 
+//interact types
+#define I_INSULT     1
+#define I_COMPLIMENT 2
+#define I_SPECIAL    3
+
 // 3 for blur, 8 for mirror images
 #define EXTRA_ACTORCOVERS 11
 
@@ -344,6 +349,10 @@ public:
 	void Panic();
 	/* sets a multi class flag (actually this is a lot of else too) */
 	void SetMCFlag(ieDword bitmask, int op);
+	/* inlined dialogue start */
+	void Interact(int type);
+	/* inlined dialogue response */
+	void Response(int type);
 	/* called when someone died in the party */
 	void ReactToDeath(const char *deadname);
 	/* called when someone talks to Actor */

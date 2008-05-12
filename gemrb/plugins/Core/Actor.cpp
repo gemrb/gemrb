@@ -1548,6 +1548,45 @@ inline int CountElements(const char *s, char separator)
 	return ret;
 }
 
+void Actor::Interact(int type)
+{
+	int start;
+	int count;
+
+	switch(type) {
+		case I_INSULT: start=VB_INSULT; count=3; break;
+		case I_COMPLIMENT: start=VB_COMPLIMENT; count=3; break;
+		case I_SPECIAL: start=VB_SPECIAL; count=3; break;
+		default:
+			return;
+	}
+
+	count=rand()%count;
+	while(count && StrRefs[start+count]!=0xffff) count--;
+	if(count>=0) {
+		DisplayStringCore(this, start+count, DS_CONSOLE|DS_CONST );
+	}
+}
+
+void Actor::Response(int type)
+{
+	int start;
+	int count;
+
+	switch(type) {
+		case I_INSULT: start=VB_RESP_INS; count=3; break;
+		case I_COMPLIMENT: start=VB_RESP_COMP; count=3; break;
+		default:
+			return;
+	}
+
+	count=rand()%count;
+	while(count && StrRefs[start+count]!=0xffff) count--;
+	if(count>=0) {
+		DisplayStringCore(this, start+count, DS_CONSOLE|DS_CONST );
+	}
+}
+
 void Actor::ReactToDeath(const char * deadname)
 {
 	int table = core->LoadTable( "death" );
@@ -1623,6 +1662,8 @@ void Actor::DialogInterrupt()
 	//if dialoginterrupt was set, no verbal constant
 	if ( Modified[IE_MC_FLAGS]&MC_NO_TALK)
 		return;
+
+	/* this part is unsure */
 	if (Modified[IE_EA]>=EA_EVILCUTOFF) {
 		DisplayStringCore(this, VB_HOSTILE, DS_CONSOLE|DS_CONST );
 	} else {
@@ -2068,7 +2109,7 @@ void Actor::GetItemSlotInfo(ItemExtHeader *item, int which, int header)
 	item->slot = idx;
 	item->headerindex = headerindex;
 	memcpy(&(item->AttackType), &(ext_header->AttackType),
- ((char *) &(item->itemname)) -((char *) &(item->AttackType)) );
+		((char *) &(item->itemname)) -((char *) &(item->AttackType)) );
 	if (headerindex>=CHARGE_COUNTERS) {
 		item->Charges=0;
 	} else {

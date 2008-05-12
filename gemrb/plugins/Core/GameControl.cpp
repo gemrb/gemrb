@@ -286,7 +286,7 @@ void GameControl::DrawArrowMarker(Region &screen, Point p, Region &viewport)
 		draw |= D_UP;
 	}
 	int tmp;
-	
+
 	Sprite2D *spr = core->GetScrollCursorSprite(0,0);
 
 	tmp = spr->Width;
@@ -336,7 +336,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			viewport.x = mapsize.x - viewport.w;
 		else
 			viewport.x += video->moveX; //middle :)
-				
+
 		if ( viewport.y + video->moveY < 0 ) //if we are at the left of the map
 			viewport.y = 0;
 		else if ( (viewport.y + video->moveY + viewport.h ) >= mapsize.y ) //if we are at the right
@@ -359,10 +359,10 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 
 	if (trackerID) {
 		Actor *actor = area->GetActorByGlobalID(trackerID);
-		
+
 		if (actor) {
 			Actor **monsters = area->GetAllActorsInRadius(actor->Pos, GA_NO_DEAD, distance);
-			
+
 			int i = 0;
 			while(monsters[i]) {
 				Actor *target = monsters[i++];
@@ -430,7 +430,7 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			} else {
 				c->outlineColor = cyan;
 			}
-			c->DrawOutline();			
+			c->DrawOutline();
 		}
 	}
 
@@ -598,7 +598,7 @@ void GameControl::SelectActor(int whom, int type)
 
 	/* doesn't fall through here */
 	Actor* actor = game->GetPC( whom,false );
-	if (!actor) 
+	if (!actor)
 		return;
 
 	if (type==0) {
@@ -707,9 +707,9 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 
 				break;
 
-			case 'o': 
+			case 'o':
 				// origin
-				pfs.x = lastMouseX; 
+				pfs.x = lastMouseX;
 				pfs.y = lastMouseY;
 				core->GetVideoDriver()->ConvertToGame( pfs.x, pfs.y );
 				break;
@@ -768,6 +768,29 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 			case 'g'://shows loaded areas
 				game->DebugDump();
 				break;
+			case 'i':
+				if (!lastActor) {
+					lastActor = area->GetActor( p, GA_DEFAULT);
+				}
+				if (lastActor && !(lastActor->GetStat(IE_MC_FLAGS)&MC_EXPORTABLE)) {
+					Actor *target;
+					int i = game->GetPartySize(true);
+					if(i<2) break;
+					i=rand()%i;
+					do
+					{
+						target = game->GetPC(i, true);
+						if(target==lastActor) continue;
+						if(target->GetStat(IE_MC_FLAGS)&MC_EXPORTABLE) continue;
+
+						char Tmp[40];
+						snprintf(Tmp,sizeof(Tmp),"Interact(\"%s\")",target->GetScriptName() );
+						lastActor->AddAction(GenerateAction(Tmp));
+						break;
+					}
+					while(i--);
+				}
+				break;
 			case 'r'://resurrects actor
 				if (!lastActor) {
 					lastActor = area->GetActor( p, GA_DEFAULT);
@@ -818,7 +841,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 					lastActor->AddAction( GenerateAction(Tmp) );
 				}
 				break;
-			case 'z': 
+			case 'z':
 				if (lastActor) {
 					lastActor->GetPrevAnimation();
 				}
@@ -840,7 +863,7 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 				printf("Show searchmap %s\n", DebugFlags & DEBUG_SHOW_SEARCHMAP ? "ON" : "OFF");
 				break;
 			case '6':
-				//show the lightmap 
+				//show the lightmap
 				DebugFlags ^= DEBUG_SHOW_LIGHTMAP;
 				printf("Show lightmap %s\n", DebugFlags & DEBUG_SHOW_LIGHTMAP ? "ON" : "OFF");
 				break;
@@ -963,7 +986,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 		if (overDoor) {
 			nextCursor = GetCursorOverDoor(overDoor);
 		}
-		
+
 		if (overContainer) {
 			nextCursor = GetCursorOverContainer(overContainer);
 		}
@@ -1005,7 +1028,7 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 			}
 			goto end_function;
 		}
-		
+
 		if (lastActor) {
 			switch (lastActor->GetStat(IE_EA)) {
 				case EA_EVILCUTOFF:
@@ -1018,17 +1041,17 @@ void GameControl::OnMouseOver(unsigned short x, unsigned short y)
 				case EA_CONTROLLED:
 				case EA_CHARMED:
 				case EA_EVILBUTGREEN:
-					if (target_mode & TARGET_MODE_ALLY) 
+					if (target_mode & TARGET_MODE_ALLY)
 						nextCursor^=1;
 					break;
 
 				case EA_ENEMY:
 				case EA_GOODBUTRED:
-					if (target_mode & TARGET_MODE_ENEMY) 
+					if (target_mode & TARGET_MODE_ENEMY)
 						nextCursor^=1;
 					break;
 				default:
-					if (target_mode & TARGET_MODE_NEUTRAL) 
+					if (target_mode & TARGET_MODE_NEUTRAL)
 						nextCursor^=1;
 					break;
 			}
@@ -1272,10 +1295,10 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 			return false;
 		case ST_TRIGGER:
 			//the importer shouldn't load the script
-			//if it is unallowed anyway (though 
+			//if it is unallowed anyway (though
 			//deactivated scripts could be reactivated)
 			//only the 'trapped' flag should be honoured
-			//there. Here we have to check on the 
+			//there. Here we have to check on the
 			//reset trap and deactivated flags
 			if (trap->Scripts[0]) {
 				if (!(trap->Flags&TRAP_DEACTIVATED) ) {
@@ -1447,7 +1470,7 @@ void GameControl::OnMouseUp(unsigned short x, unsigned short y,
 	} else {
 		type = ACT_NONE; //party
 	}
-	
+
 	if (target_mode&TARGET_MODE_ATTACK) {
 		type = ACT_ATTACK;
 	} else if (target_mode&TARGET_MODE_TALK) {
@@ -1976,11 +1999,11 @@ void GameControl::DialogChoose(unsigned int choose)
 		return;
 	}
 	Actor *tgt;
-	Scriptable *target;  
-	
+	Scriptable *target;
+
 	if (targetID!=0xffff) {
 		tgt = GetTarget();
-		target = tgt;    
+		target = tgt;
 	} else {
 		//risky!!!
 		target = targetOB;
@@ -2006,7 +2029,7 @@ void GameControl::DialogChoose(unsigned int choose)
 
 		if (tgt) {
 			if (DialogueFlags&DF_TALKCOUNT) {
-				DialogueFlags&=~DF_TALKCOUNT; 
+				DialogueFlags&=~DF_TALKCOUNT;
 				tgt->TalkCount++;
 			} else if (DialogueFlags&DF_INTERACT) {
 				DialogueFlags&=~DF_INTERACT;
@@ -2103,7 +2126,7 @@ void GameControl::DialogChoose(unsigned int choose)
 	//displaying npc text
 	core->DisplayStringName( ds->StrRef, 0x70FF70, target, IE_STR_SOUND|IE_STR_SPEECH);
 	//adding a gap between options and npc text
-	ta->AppendText("",-1); 
+	ta->AppendText("",-1);
 	int i;
 	int idx = 0;
 	ta->SetMinRow( true );
@@ -2263,14 +2286,14 @@ Sprite2D* GameControl::GetPreview()
 {
 	// We get preview by first taking a screenshot of size 640x405,
 	// centered in the display. This is to get a decent picture for
-	// higher screen resolutions. 
+	// higher screen resolutions.
 	// FIXME: how do orig games solve that?
 	Video* video = core->GetVideoDriver();
 	int w = video->GetWidth();
 	int h = video->GetHeight();
 	int x = (w - 640) / 2;
 	int y = (h - 405) / 2;
-	
+
 	if (x < 0) {
 		x = 0;
 	} else {
@@ -2283,7 +2306,7 @@ Sprite2D* GameControl::GetPreview()
 		h = 405;
 	}
 
-	if (!x) 
+	if (!x)
 		y = 0;
 
 	HideGUI ();
@@ -2324,7 +2347,7 @@ Sprite2D* GameControl::GetPortraitPreview(int pcslot)
 	Sprite2D* img = im->GetImage();
 	core->FreeInterface(im);
 
-	if (ratio == 1) 
+	if (ratio == 1)
 		return img;
 
 	Sprite2D* img_scaled = video->SpriteScaleDown( img, ratio );
