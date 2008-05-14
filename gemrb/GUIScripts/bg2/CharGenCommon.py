@@ -152,7 +152,7 @@ def DisplayOverview(step):
 				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, ": " \
 					+ str(GemRB.GetVar ("Ability "+str(i))) )
 		elif part == 7:
-			# TODO: list known priest spells, proficiencies, racial enemy
+			# TODO: list known priest spells, proficiencies
 			GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, "\n\n")
 			# thieving and other skills
 			info = ""
@@ -199,8 +199,15 @@ def DisplayOverview(step):
 			#GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 11028)
 			#GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, "\n")
 			#racial enemy
-			#GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 15982)
-			#GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, "\n")
+			Race = GemRB.GetVar ("HateRace")
+			RaceTable = GemRB.LoadTable ("HATERACE")
+			Row = GemRB.FindTableValue (RaceTable, 1, Race)
+			info = GemRB.GetString (GemRB.GetTableValue(RaceTable, Row, 0))
+			if info != "":
+				info = "\n" + info + "\n"
+				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 15982)
+				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, info)
+
 			#weapon proficiencies
 			#GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 9466)
 
