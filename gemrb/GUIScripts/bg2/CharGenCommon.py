@@ -171,7 +171,7 @@ def DisplayOverview(step):
 
 			if GemRB.GetTableValue (SkillTable,"RATE", KitName) != "-1":
 				sum = 0
-				for skill in range(0, 7):
+				for skill in range(GemRB.GetTableRowCount (SkillTable) - 2):
 					name = GemRB.GetTableValue (SkillTable, skill+2, 1)
 					name = GemRB.GetString (name)
 					value = GemRB.GetVar ("Skill " + str(skill))
