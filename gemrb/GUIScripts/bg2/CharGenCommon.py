@@ -25,6 +25,7 @@ def DisplayOverview(step):
 	PortraitName = GemRB.GetToken ("LargePortrait")
 	if PortraitName != "":
 		GemRB.SetButtonPicture (CharGenWindow, PortraitButton, PortraitName, "NOPORTMD")
+	GemRB.SetButtonState (CharGenWindow, PortraitButton, IE_GUI_BUTTON_LOCKED)
 
 	GenderButton = GemRB.GetControl (CharGenWindow, 0)
 	GemRB.SetText (CharGenWindow, GenderButton, 11956)
