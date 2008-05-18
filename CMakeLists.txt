@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 2.4.4)
 PROJECT(GemRB)
 
 IF( NOT PLUGIN_INSTALL_DIR )
