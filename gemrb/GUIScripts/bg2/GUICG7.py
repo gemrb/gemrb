@@ -30,6 +30,7 @@ Random = 1
 MageSpells = []
 KitValue = 0
 Class = 0
+Slot = GemRB.GetVar ("Slot")
 
 def OnLoad():
 	global MageSpellsWindow, MageSpellsTextArea, DoneButton
@@ -192,16 +193,13 @@ def MageSpellsCancelPress():
 	return
 
 def MageSpellsDonePress():
-	global KitValue
+	global KitValue, Slot
 	MageSpellBook = GemRB.GetVar ("MageSpellBook")
-	Learnable = []
 	j=1
 	for level in range(1, 10):
-		Learnable = GetLearnableMageSpells ( KitValue, GemRB.GetVar ("Alignment"), level)
-		for i in range (len(Learnable)):
+		for i in range (len(MageSpells)):
 			if MageSpellBook & j:
-				print "Learning:", GemRB.GetString ((GemRB.GetSpell (Learnable[i])['SpellName']))
-				GemRB.LearnSpell (GemRB.GetVar ("Slot"), Learnable[i], 0)
+				GemRB.LearnSpell (Slot, MageSpells[i][0])
 			j=j<<1
 
 	GemRB.UnloadWindow(MageSpellsWindow)
@@ -209,10 +207,10 @@ def MageSpellsDonePress():
 	return
 
 def RemoveKnownSpells():
-	slot = GemRB.GetVar ("Slot")
+	global Slot
 	for level in range(0, 9):
-		for j in range(GemRB.GetKnownSpellsCount (slot, IE_SPELL_TYPE_WIZARD, level)-1, -1, -1):
-			GemRB.RemoveSpell (slot, IE_SPELL_TYPE_WIZARD, level, j)
+		for j in range(GemRB.GetKnownSpellsCount (Slot, IE_SPELL_TYPE_WIZARD, level)-1, -1, -1):
+			GemRB.RemoveSpell (Slot, IE_SPELL_TYPE_WIZARD, level, j)
 
 def MageSpellsPickPress():
 	global MageSpellsSelectPointsLeft, MageSpells

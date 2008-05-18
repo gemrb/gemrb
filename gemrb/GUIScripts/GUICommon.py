@@ -64,7 +64,6 @@ def GetMageSpells (Kit, Alignment, Level):
 			# to learn the spell.
 			if Kit == 0x8000 and (0x4000 & ms['SpellExclusion']):
 				SpellType = 2
-		#print "Spell type:", SpellType, "Spell", GemRB.GetString (ms['SpellName'],1)
 		MageSpells.append ([SpellName, SpellType])
 
 	return MageSpells
