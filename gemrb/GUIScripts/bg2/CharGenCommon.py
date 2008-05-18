@@ -170,16 +170,14 @@ def DisplayOverview(step):
 			else:
 				KitName = GemRB.GetTableValue (KitList, KitName, 0)
 
-			if GemRB.GetTableValue (SkillTable,"RATE", KitName) != "-1":
-				sum = 0
+			if GemRB.GetTableValue (SkillTable,"RATE", KitName) != -1:
 				for skill in range(GemRB.GetTableRowCount (SkillTable) - 2):
 					name = GemRB.GetTableValue (SkillTable, skill+2, 1)
 					name = GemRB.GetString (name)
 					value = GemRB.GetVar ("Skill " + str(skill))
 					if value >= 0:
 						info += name + ": " + str(value) + "\n"
-						sum += value
-			if info != "" and sum != 0:
+			if info != "":
 				info = "\n" + info + "\n"
 				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 8442)
 				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, info)
