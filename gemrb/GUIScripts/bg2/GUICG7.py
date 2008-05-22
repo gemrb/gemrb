@@ -60,7 +60,7 @@ def OnLoad():
 			KitValue = 0x4000 # we only need it for the spells, so this is ok
 		#this is an ugly hack, to exclude bards from specialisation (and bonus spell)
 		if GemRB.GetTableValue(TmpTable, Class, 4)=='*':
-			MageSpellsSelectPointsLeft++
+			MageSpellsSelectPointsLeft = MageSpellsSelectPointsLeft + 1
 		# TODO make the random Pick method enforce a specialist selection too?
 	else:
 		KitValue = 0x4000
