@@ -16,8 +16,9 @@ def CalcLimits(Abidx):
 
 	RaceTable = GemRB.LoadTable("races")
 	Abracead = GemRB.LoadTable("ABRACEAD")
-	Race = GemRB.GetVar("BaseRace")-1
-	RaceName = GemRB.GetTableRowName(RaceTable, Race)
+	RaceID = GemRB.GetVar("Race")
+	RowIndex = GemRB.FindTableValue(RaceTable, 3, RaceID)
+	RaceName = GemRB.GetTableRowName(RaceTable, RowIndex)
 
 	Minimum = 3
 	Maximum = 18
@@ -43,8 +44,6 @@ def CalcLimits(Abidx):
 	Minimum = Minimum + Add
 	if Minimum<1:
 		Minimum=1
-	if Maximum>25:
-		Maximum=25
 
 	return
 
@@ -143,15 +142,16 @@ def RightPress():
 	GemRB.SetText(AbilityWindow, TextAreaControl, GemRB.GetTableValue(AbilityTable, Abidx, 1) )
 	if Ability<=Minimum:
 		return
-	GemRB.SetVar("Ability "+str(Abidx), Ability-1)
+	Ability -= 1
+	GemRB.SetVar("Ability "+str(Abidx), Ability)
 	PointsLeft = PointsLeft + 1
 	SumLabel = GemRB.GetControl(AbilityWindow, 0x10000002)
 	GemRB.SetText(AbilityWindow, SumLabel, str(PointsLeft) )
 	GemRB.SetLabelTextColor(AbilityWindow,SumLabel, 255, 255, 0)
 	Label = GemRB.GetControl(AbilityWindow, 0x10000003+Abidx)
-	GemRB.SetText(AbilityWindow, Label, str(Ability-1) )
+	GemRB.SetText(AbilityWindow, Label, str(Ability) )
 	Label = GemRB.GetControl(AbilityWindow, 0x10000024+Abidx)
-	b = Ability//2-5
+	b = Ability // 2 - 5
 	if b<0:
 		GemRB.SetLabelTextColor(AbilityWindow,Label,255,0,0)
 	elif b>0:
@@ -186,16 +186,17 @@ def LeftPress():
 		return
 	if Ability>=Maximum:  #should be more elaborate
 		return
-	GemRB.SetVar("Ability "+str(Abidx), Ability+1)
+	Ability += 1
+	GemRB.SetVar("Ability "+str(Abidx), Ability)
 	PointsLeft = PointsLeft - 1
 	SumLabel = GemRB.GetControl(AbilityWindow, 0x10000002)
 	if PointsLeft == 0:
 		GemRB.SetLabelTextColor(AbilityWindow,SumLabel, 255, 255, 255)
 	GemRB.SetText(AbilityWindow, SumLabel, str(PointsLeft) )
 	Label = GemRB.GetControl(AbilityWindow, 0x10000003+Abidx)
-	GemRB.SetText(AbilityWindow, Label, str(Ability+1) )
+	GemRB.SetText(AbilityWindow, Label, str(Ability) )
 	Label = GemRB.GetControl(AbilityWindow, 0x10000024+Abidx)
-	b = Ability//2-5
+	b = Ability // 2 - 5
 	if b<0:
 		GemRB.SetLabelTextColor(AbilityWindow,Label,255,0,0)
 	elif b>0:
