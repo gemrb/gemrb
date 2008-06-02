@@ -224,6 +224,7 @@ public:
 private:
 	void GetPaletteCopy(Animation *anim[], Palette *&pal);
 	void SetBlend();
+	void SecondaryTarget();
 	void CheckTrigger(unsigned int radius);
 	void DrawTravel(Region &screen);
 	void DrawExplosion(Region &screen);

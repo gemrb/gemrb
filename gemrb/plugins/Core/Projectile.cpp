@@ -409,12 +409,26 @@ void Projectile::ClearPath()
 	step = NULL;
 }
 
-//get actors covered in area of effect radius
+//get actors covered in area of trigger radius
 void Projectile::CheckTrigger(unsigned int radius)
 {
 	//if there are any, then change phase to exploding
 	if (area->GetActorInRadius(Pos, 0, radius)) {
 		phase = P_EXPLODING;
+	}
+}
+
+//secondary projectiles target all in the explosion radius
+void Projectile::SecondaryTarget()
+{
+	int radius = Extension->ExplosionRadius;
+	Actor **actors = area->GetAllActorsInRadius(Pos, 0, radius);
+	Actor **poi=actors;
+	while(*poi) {
+		Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(Extension->ExplProjIdx);
+		pro->SetEffects(effects);
+		pro->SetCaster(Caster);
+		area->AddProjectile(pro, Pos, (*poi)->GetGlobalID());
 	}
 }
 
@@ -483,7 +497,16 @@ void Projectile::DrawExplosion(Region & /*screen*/)
 	//there is a secondary projectile
 	if (Extension->AFlags&PAF_SECONDARY) {
 		//the secondary projectile will target everyone in the area of effect
+		SecondaryTarget();
 	}
+
+	if (Extension->AFlags&PAF_FRAGMENT) {
+		//there is a character animation in the center of the explosion
+		//which will go towards the edges (flames, etc)
+		//Extension->ExplColor fake color for single shades (blue,green,red flames)
+		//Extension->FragAnimID the animation id for the character animation
+	}
+
 	//the center of the explosion could be another projectile played over the target
 	if (Extension->FragProjIdx) {
 		Projectile *pro = core->GetProjectileServer()->GetProjectileByIndex(Extension->FragProjIdx);
