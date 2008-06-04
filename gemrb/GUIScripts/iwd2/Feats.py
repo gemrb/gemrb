@@ -19,11 +19,6 @@ def GetBaseValue(feat):
 		Val += GemRB.GetTableValue(FeatTable, feat, KitColumn)
 	return Val
 
-
-def GetMaxDistributable(feat):
-	return 3
-
-
 def RedrawFeats():
 	global TopIndex, PointsLeft
 
@@ -104,17 +99,30 @@ def OnLoad():
 	#levels start with 1
 	Level = GemRB.GetVar("Level")-1
 
-	ClassColumn = 3+ ClassColumn
 	#this one exists only for clerics
+	# Although it should be made extendable to all kits
+	# A FEAT_COLUMN is needed in classes.2da or better yet, a whole new 2da
+	ClassColumn += 3
 	if KitColumn:
 		KitColumn = 3 + KitColumn + 11
-	RaceColumn = RaceColumn
-	#calculated value, 3 - crap columns
-	# 11 is the number of classes, 9 is number of cleric kits
 
 	#Always raise one level at once
 	PointsLeft += GemRB.GetTableValue(FeatLevelTable, Level, 0)
 	PointsLeft += GemRB.GetTableValue(FeatClassTable, Level, ClassColumn)
+	
+	# Humans get a bonus feat at first-level. This seems hard-coded
+	# Recommend FEATRACE.2da be created with levels as rows and race names as
+	# columns. Sample code follows:
+	
+	### Sample code for implementation of FEATRACE.2da:
+	# TmpTable = GemRB.LoadTable('featrace')
+	# PointsLeft += GemRB.GetTableValue(TmpTable, str(Level + 1), RaceName)
+	# GemRB.UnloadTable(TmpTable)
+	###
+	
+	### Human bonus feat hack:
+	if Level < 1 and RaceName == 'HUMAN': # Human sub-races do not receive free feat
+		PointsLeft += 1
 	
 	GemRB.SetToken("number",str(PointsLeft) )
 
@@ -197,6 +205,8 @@ def LeftPress():
 
 def BackPress():
 	GemRB.UnloadWindow(FeatWindow)
+	for i in range(GemRB.GetTableRowCount(FeatTable)):
+		GemRB.SetVar("Feat "+str(i),0)
 	GemRB.SetNextScript("Skills")
 	return
 
