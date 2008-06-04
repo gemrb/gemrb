@@ -317,7 +317,7 @@ def OpenReformPartyWindow ():
 		ReformPartyWindow = None
 
 		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.LoadWindowPack ("GUIREC")
+		GemRB.LoadWindowPack ("GUIREC", 800, 600)
 		if hideflag:
 			GemRB.UnhideGUI ()
 		return

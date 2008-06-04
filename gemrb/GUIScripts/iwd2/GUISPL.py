@@ -50,7 +50,7 @@ def OpenSpellBookWindow ():
 		GemRB.UnhideGUI ()
 		return
 		
-	GemRB.LoadWindowPack ("GUISPL")
+	GemRB.LoadWindowPack ("GUISPL", 800, 600)
 	SpellBookWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", SpellBookWindow)
 
