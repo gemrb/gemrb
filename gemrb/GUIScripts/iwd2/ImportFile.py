@@ -12,8 +12,9 @@ def OnLoad():
 	global MainWindow, PortraitButton
 	global ImportWindow, TextAreaControl, DoneButton
 
-	GemRB.LoadWindowPack("GUICG")
+	GemRB.LoadWindowPack("GUICG", 800, 600)
 	MainWindow = GemRB.LoadWindow(0)
+	GemRB.SetWindowFrame(MainWindow)
 
 	PortraitButton = GemRB.GetControl (MainWindow, 12)
 	GemRB.SetButtonFlags(MainWindow, PortraitButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
@@ -33,6 +34,11 @@ def OnLoad():
 
 	CancelButton = GemRB.GetControl(ImportWindow,1)
 	GemRB.SetText(ImportWindow, CancelButton, 15416)
+	
+	# disable the three extraneous buttons in the bottom row
+	for i in [16, 13, 15]:
+		TmpButton = GemRB.GetControl(MainWindow, i)
+		GemRB.SetButtonState(MainWindow, TmpButton, IE_GUI_BUTTON_DISABLED)
 
 	GemRB.SetEvent(ImportWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS, "DonePress")
 	GemRB.SetEvent(ImportWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
