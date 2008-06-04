@@ -44,7 +44,8 @@ def OnLoad():
 	ClassCount = GemRB.GetTableRowCount(ClassTable)+1
 	ClassWindow = GemRB.LoadWindow(2)
 	TmpTable=GemRB.LoadTable("races")
-	RaceName = GemRB.GetTableRowName(TmpTable, GemRB.GetVar("BaseRace")-1 )
+	rid = GemRB.FindTableValue(TmpTable, 3, GemRB.GetVar('BaseRace'))
+	RaceName = GemRB.GetTableRowName(TmpTable, rid)
 
 	#radiobutton groups must be set up before doing anything else to them
 	j = 0
@@ -145,6 +146,7 @@ def ClassPress2():
 
 def BackPress2():
 	GemRB.SetButtonState(ClassWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.UnloadWindow(ClassWindow)
 	OnLoad()
 	return
 
