@@ -126,7 +126,7 @@ def UpdateMageWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	type = IE_SPELL_TYPE_WIZARD
 	level = MageSpellLevel
-	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, type, level)
+	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, type, level, 1)
 
 	Label = GemRB.GetControl (Window, 0x10000032)
 	GemRB.SetToken("SPELLLEVEL", str(level+1) )
