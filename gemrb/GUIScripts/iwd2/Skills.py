@@ -25,41 +25,47 @@ def RedrawSkills():
 	for i in range(0,10):
 		Pos=TopIndex+i+1
 		Cost = GemRB.GetTableValue(CostTable, Pos, ClassColumn)
+		# Skill cost is currently restricted to base classes. This means it is fairly easy
+		# to add a class kit as it will use its parents skill cost values however it makes
+		# it impossible to add a new class entirely. Support for whole new classes is
+		# probably not massively important but could eventually allow Prestige classes to
+		# be implemented
 		SkillName = GemRB.GetTableValue(SkillTable, Pos, 1)
 		Label = GemRB.GetControl(SkillWindow, 0x10000001+i)
+		ActPoint = GemRB.GetVar("Skill "+str(Pos) )
 		if Cost>0:
 			#we use this function to retrieve the string
 			t=GemRB.StatComment(SkillName,0,0)
 			GemRB.SetText(SkillWindow, Label, "%s (%d)"%(t,Cost) )
+			GemRB.SetLabelTextColor(SkillWindow, Label, 255, 255, 255)
+			if PointsLeft < 1 or ActPoint * Cost >= Level + 3:
+				GemRB.SetLabelTextColor(SkillWindow, Label, 100, 100, 100)
 		else:
 			GemRB.SetText(SkillWindow, Label, SkillName)
+			GemRB.SetLabelTextColor(SkillWindow, Label, 100, 100, 100) # Grey
 
 		SkillName=GemRB.GetTableRowName(SkillTable, Pos) #row name
-		Untrained=GemRB.GetTableValue(SkillTable, Pos, 3)
-		
-		if Untrained==1:
-			Ok=1
-		else:
-			Ok=0
 
 		Button1 = GemRB.GetControl(SkillWindow, i*2+14)
 		Button2 = GemRB.GetControl(SkillWindow, i*2+15)
-		if Ok == 0:
-			GemRB.SetButtonState(SkillWindow, Button1, IE_GUI_BUTTON_DISABLED)
-			GemRB.SetButtonState(SkillWindow, Button2, IE_GUI_BUTTON_DISABLED)
-#			GemRB.SetButtonFlags(SkillWindow, Button1, IE_GUI_BUTTON_NO_IMAGE,OP_OR)
-#			GemRB.SetButtonFlags(SkillWindow, Button2, IE_GUI_BUTTON_NO_IMAGE,OP_OR)
+		
+		Btn1State = Btn2State = IE_GUI_BUTTON_ENABLED
+		if Cost < 1:
+			Btn1State = Btn2State = IE_GUI_BUTTON_DISABLED
 		else:
-			GemRB.SetButtonState(SkillWindow, Button1, IE_GUI_BUTTON_ENABLED)
-			GemRB.SetButtonState(SkillWindow, Button2, IE_GUI_BUTTON_ENABLED)
-#			GemRB.SetButtonFlags(SkillWindow, Button1, IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
-#			GemRB.SetButtonFlags(SkillWindow, Button2, IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
+			if ActPoint * Cost >= Level + 3 or PointsLeft < 1:
+				Btn1State = IE_GUI_BUTTON_DISABLED
+			if ActPoint < 1:
+				Btn2State = IE_GUI_BUTTON_DISABLED
+		GemRB.SetButtonState(SkillWindow, Button1, Btn1State)
+		GemRB.SetButtonState(SkillWindow, Button2, Btn2State)
 
 		Label = GemRB.GetControl(SkillWindow, 0x10000069+i)
-		ActPoint = GemRB.GetVar("Skill "+str(Pos) )
 		GemRB.SetText(SkillWindow, Label, str(ActPoint) )
 		if ActPoint>0:
 			GemRB.SetLabelTextColor(SkillWindow,Label,0,255,255)
+		elif Cost < 1 or PointsLeft < 1:
+			GemRB.SetLabelTextColor(SkillWindow,Label, 100, 100, 100)
 		else:
 			GemRB.SetLabelTextColor(SkillWindow,Label,255,255,255)
 
@@ -92,10 +98,26 @@ def OnLoad():
 		p=1
 
 	Level = GemRB.GetVar("Level")  #this is the level increase
+	PointsLeft = p
+	
+	# Humans recieve +2 skill points at level 1 and +1 skill points each level thereafter
+	# Recommend creation of SKILRACE.2da with levels as rows and race names as columns
+	
+	RaceTable = GemRB.LoadTable("RACES")
+	RaceName = GemRB.GetTableRowName(RaceTable, GemRB.FindTableValue(RaceTable, 3, GemRB.GetVar('Race')))
+	
+	### Example code for implementation of SKILRACE.2da
+	# TmpTable = GemRB.LoadTable('skilrace')
+	# PointsLeft += GemRB.GetTableValue(TmpTable, str(Level), RaceName)
+	###
+	
 	if Level < 2:
-		PointsLeft = p * 4
-	else:
-		PointsLeft = p * 4 + (Level-1) * p
+		PointsLeft = p * 4 # 4-times skill points @ first level
+	
+	### Human skill bonus hack (ignores intelligence modifier):
+	if RaceName == 'HUMAN':
+		if Level < 2: PointsLeft += 2
+		else: PointsLeft += 1
 	
 	GemRB.UnloadTable(SkillPtsTable)
 
@@ -105,16 +127,10 @@ def OnLoad():
 	CostTable = GemRB.LoadTable("skilcost")
 
 	SkillRacTable = GemRB.LoadTable("SKILLRAC")
-	RaceTable = GemRB.LoadTable("RACES")
-	RaceName = GemRB.GetTableRowName(RaceTable, GemRB.GetVar("BaseRace")-1)
 
 	for i in range(0,RowCount):
-		SkillName = GemRB.GetTableRowName(SkillTable,i)
-		if GemRB.GetTableValue(SkillTable,SkillName, KitName)==1:
-			b=GemRB.GetTableValue(SkillRacTable, RaceName, SkillName)
-			GemRB.SetVar("Skill "+str(i),b)
-		else:
-			GemRB.SetVar("Skill "+str(i),0)
+		GemRB.SetVar("Skill "+str(i),0) # Racial/Class bonuses don't factor in char-gen or leveling
+										# so can be safely ignored
 
 	GemRB.SetToken("number",str(PointsLeft) )
 
@@ -201,6 +217,8 @@ def LeftPress():
 
 def BackPress():
 	GemRB.UnloadWindow(SkillWindow)
+	for i in range(GemRB.GetTableRowCount(SkillTable)):
+		GemRB.SetVar("Skill "+str(i),0)
 	GemRB.SetNextScript("CharGen6")
 	return
 
