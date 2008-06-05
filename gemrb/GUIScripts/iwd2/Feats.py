@@ -110,19 +110,17 @@ def OnLoad():
 	PointsLeft += GemRB.GetTableValue(FeatLevelTable, Level, 0)
 	PointsLeft += GemRB.GetTableValue(FeatClassTable, Level, ClassColumn)
 	
-	# Humans get a bonus feat at first-level. This seems hard-coded
-	# Recommend FEATRACE.2da be created with levels as rows and race names as
-	# columns. Sample code follows:
-	
-	### Sample code for implementation of FEATRACE.2da:
-	# TmpTable = GemRB.LoadTable('featrace')
-	# PointsLeft += GemRB.GetTableValue(TmpTable, str(Level + 1), RaceName)
-	# GemRB.UnloadTable(TmpTable)
+	#racial abilities which seem to be hardcoded in the IWD2 engine
+	#are implemented in races.2da
+	if Level<1:
+		TmpTable = GemRB.LoadTable('races')
+		PointsLeft += GemRB.GetTableValue(TmpTable,RaceName,'FEATBONUS')
+		GemRB.UnloadTable(TmpTable)
 	###
 	
-	### Human bonus feat hack:
-	if Level < 1 and RaceName == 'HUMAN': # Human sub-races do not receive free feat
-		PointsLeft += 1
+	### Human bonus feat hack, no longer needed
+	#if Level < 1 and RaceName == 'HUMAN': # Human sub-races do not receive free feat
+	#	PointsLeft += 1
 	
 	GemRB.SetToken("number",str(PointsLeft) )
 
