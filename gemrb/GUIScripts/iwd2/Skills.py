@@ -23,7 +23,7 @@ def RedrawSkills():
 	GemRB.SetText(SkillWindow, SumLabel, str(PointsLeft) )
 
 	for i in range(0,10):
-		Pos=TopIndex+i+1
+		Pos=TopIndex+i
 		Cost = GemRB.GetTableValue(CostTable, Pos, ClassColumn)
 		# Skill cost is currently restricted to base classes. This means it is fairly easy
 		# to add a class kit as it will use its parents skill cost values however it makes
@@ -43,8 +43,6 @@ def RedrawSkills():
 		else:
 			GemRB.SetText(SkillWindow, Label, SkillName)
 			GemRB.SetLabelTextColor(SkillWindow, Label, 100, 100, 100) # Grey
-
-		SkillName=GemRB.GetTableRowName(SkillTable, Pos) #row name
 
 		Button1 = GemRB.GetControl(SkillWindow, i*2+14)
 		Button2 = GemRB.GetControl(SkillWindow, i*2+15)
@@ -182,7 +180,7 @@ def JustPress():
 def RightPress():
 	global PointsLeft
 
-	Pos = GemRB.GetVar("Skill")+TopIndex+1
+	Pos = GemRB.GetVar("Skill")+TopIndex
 	Cost = GemRB.GetTableValue(CostTable, Pos, ClassColumn)
 	if Cost==0:
 		return
@@ -199,7 +197,7 @@ def RightPress():
 def LeftPress():
 	global PointsLeft
 
-	Pos = GemRB.GetVar("Skill")+TopIndex+1
+	Pos = GemRB.GetVar("Skill")+TopIndex
 	Cost = GemRB.GetTableValue(CostTable, Pos, ClassColumn)
 	if Cost==0:
 		return
