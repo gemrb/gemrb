@@ -2,160 +2,16 @@
 import GemRB
 from ie_stats import *
 from GUICommon import SetColorStat
+from CharOverview import *
 
-
-CharGenWindow = 0
-TextAreaControl = 0
 BioWindow = 0
 EditControl = 0
 AlignmentTable = 0
 PortraitName = ""
 
 def OnLoad():
-	global CharGenWindow, TextAreaControl, AlignmentTable, PortraitName
-
-	GemRB.LoadWindowPack("GUICG", 800, 600)
-	CharGenWindow = GemRB.LoadWindow (0)
-	GemRB.SetWindowFrame ( CharGenWindow)
-	PortraitButton = GemRB.GetControl (CharGenWindow, 12)
-	GemRB.SetButtonFlags (CharGenWindow, PortraitButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
-	PortraitName = GemRB.GetToken ("LargePortrait")
-	GemRB.SetButtonPicture(CharGenWindow, PortraitButton, PortraitName,"NOPORTLG")
-
-	RaceTable = GemRB.LoadTable ("races")
-	ClassTable = GemRB.LoadTable ("classes")
-	KitTable = GemRB.LoadTable ("kitlist")
-	AlignmentTable = GemRB.LoadTable ("aligns")
-	AbilityTable = GemRB.LoadTable ("ability")
-
-	GenderButton = GemRB.GetControl (CharGenWindow,0)
-	GemRB.SetText (CharGenWindow,GenderButton,11956)
-	GemRB.SetButtonState (CharGenWindow,GenderButton,IE_GUI_BUTTON_DISABLED)
-
-	RaceButton = GemRB.GetControl (CharGenWindow,1)
-	GemRB.SetText (CharGenWindow,RaceButton, 11957)
-	GemRB.SetButtonState (CharGenWindow,RaceButton,IE_GUI_BUTTON_DISABLED)
-
-	ClassButton = GemRB.GetControl (CharGenWindow,2)
-	GemRB.SetText (CharGenWindow,ClassButton, 11959)
-	GemRB.SetButtonState (CharGenWindow,ClassButton,IE_GUI_BUTTON_DISABLED)
-
-	AlignmentButton = GemRB.GetControl (CharGenWindow,3)
-	GemRB.SetText (CharGenWindow,AlignmentButton, 11958)
-	GemRB.SetButtonState (CharGenWindow,AlignmentButton,IE_GUI_BUTTON_DISABLED)
-
-	AbilitiesButton = GemRB.GetControl (CharGenWindow,4)
-	GemRB.SetText (CharGenWindow,AbilitiesButton, 11960)
-	GemRB.SetButtonState (CharGenWindow,AbilitiesButton,IE_GUI_BUTTON_DISABLED)
-
-	SkillButton = GemRB.GetControl (CharGenWindow,5)
-	GemRB.SetText (CharGenWindow,SkillButton, 17372)
-	GemRB.SetButtonState (CharGenWindow,SkillButton,IE_GUI_BUTTON_DISABLED)
-
-	AppearanceButton = GemRB.GetControl (CharGenWindow,6)
-	GemRB.SetText (CharGenWindow,AppearanceButton, 11961)
-	GemRB.SetButtonState (CharGenWindow,AppearanceButton,IE_GUI_BUTTON_DISABLED)
-
-	NameButton = GemRB.GetControl (CharGenWindow,7)
-	GemRB.SetText (CharGenWindow,NameButton, 11963)
-	GemRB.SetButtonState (CharGenWindow,NameButton,IE_GUI_BUTTON_DISABLED)
-
-	BackButton = GemRB.GetControl (CharGenWindow, 11)
-	GemRB.SetText (CharGenWindow, BackButton, 15416)
-	GemRB.SetButtonState (CharGenWindow,BackButton,IE_GUI_BUTTON_ENABLED)
-
-	AcceptButton = GemRB.GetControl (CharGenWindow, 8)
-	GemRB.SetText (CharGenWindow, AcceptButton, 11962)
-	GemRB.SetButtonState (CharGenWindow,AcceptButton,IE_GUI_BUTTON_ENABLED)
-	GemRB.SetButtonFlags (CharGenWindow,AcceptButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
-
-	ImportButton = GemRB.GetControl (CharGenWindow, 13)
-	GemRB.SetText (CharGenWindow, ImportButton, 13955)
-	GemRB.SetButtonState (CharGenWindow,ImportButton,IE_GUI_BUTTON_DISABLED)
-
-	CancelButton = GemRB.GetControl (CharGenWindow, 15)
-	GemRB.SetText (CharGenWindow, CancelButton, 36788)
-	GemRB.SetButtonState (CharGenWindow,CancelButton,IE_GUI_BUTTON_ENABLED)
-
-	BiographyButton = GemRB.GetControl (CharGenWindow, 16)
-	GemRB.SetText (CharGenWindow, BiographyButton, 18003)
-	GemRB.SetButtonState (CharGenWindow,BiographyButton,IE_GUI_BUTTON_ENABLED)
-	TextAreaControl = GemRB.GetControl (CharGenWindow,9)
-	
-	GemRB.SetText (CharGenWindow, TextAreaControl, 1047)
-	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, ": ")
-	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, GemRB.GetToken ("CHARNAME") )
-
-	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 12135, -1)
-	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,": ")
-	if GemRB.GetVar ("Gender") == 1:
-		GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 1050)
-	else:
-		GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 1051)
-	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,1048,-1) # new line
-	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,": ")
-	row = GemRB.FindTableValue (RaceTable, 3, GemRB.GetVar ("Race") )
-	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,GemRB.GetTableValue (RaceTable,row,2))
-	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,12136, -1)
-	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,": ")
-	KitIndex = GemRB.GetVar ("Class Kit")
-	if KitIndex == 0:
-		GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,GemRB.GetTableValue (ClassTable,GemRB.GetVar ("Class")-1,0))
-	else:
-		GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, GemRB.GetTableValue (KitTable, KitIndex,2) )
-	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,1049, -1)
-	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,": ")
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,GemRB.GetTableValue (AlignmentTable,GemRB.GetVar("Alignment")-1,0))
-	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,"\n[color=FFFF00]",-1) #2 new lines
-	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,17088)
-	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,"[/color]")
-	for i in range(0,6):
-		v = GemRB.GetTableValue (AbilityTable, i,2)
-		GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, v, -1)
-		GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,": "+str(GemRB.GetVar ("Ability "+str(i))))
-
-	#skills
-	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,"\n[color=FFFF00]",-1) #2 new lines
-	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,11983)
-	GemRB.TextAreaAppend (CharGenWindow, TextAreaControl,"[/color]")
-	SkillTable = GemRB.LoadTable ("skillsta")
-	SkillName = GemRB.LoadTable ("skills")
-	rows = GemRB.GetTableRowCount (SkillTable)
-	for i in range(rows):
-		stat = GemRB.GetTableValue (SkillTable, i, 0, 2)
-		value = GemRB.GetVar("Skill "+str(i) )
-
-		if value:
-			skill = GemRB.GetTableValue (SkillName, i, 1)
-			GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, skill, -1)
-			GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, ": "+str(value) )
-	GemRB.UnloadTable (SkillTable)
-	GemRB.UnloadTable (SkillName)
- 
-	#feats
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"\n[color=FFFF00]",-1) #2 new lines
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,36310)
-	GemRB.TextAreaAppend(CharGenWindow, TextAreaControl,"[/color]")
-	FeatTable = GemRB.LoadTable ("featreq")
-	FeatName = GemRB.LoadTable ("feats")
-	rows = GemRB.GetTableRowCount (FeatTable)
-	for i in range(rows):
-		value = GemRB.GetVar("Feat "+str(i) )
-		if value:
-			feat = GemRB.GetTableValue (FeatName, i, 1)
-			GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, feat, -1)
-			stat = GemRB.GetTableValue (FeatTable, i, 9, 2) 
-			if stat:
-				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, ": "+str(value) )
-
-	GemRB.UnloadTable (FeatTable)
-	GemRB.UnloadTable (FeatName)
-
-	GemRB.SetEvent (CharGenWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-	GemRB.SetEvent (CharGenWindow, BackButton, IE_GUI_BUTTON_ON_PRESS, "BackPress")
-	GemRB.SetEvent (CharGenWindow, AcceptButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
-	GemRB.SetEvent (CharGenWindow, BiographyButton, IE_GUI_BUTTON_ON_PRESS, "BioPress")
-	GemRB.SetVisible (CharGenWindow, 1)
+	UpdateOverview(9)
+	GemRB.SetButtonState(CharGenWindow, PersistButtons['Next'], IE_GUI_BUTTON_UNPRESSED) # Fixes button being pre-pressed
 	return
 	
 def SetRaceAbilities(MyChar, racetitle):
@@ -349,17 +205,5 @@ def NextPress():
 	xp = GemRB.GetTableValue (TmpTable, racename, "VALUE")
 	GemRB.SetPlayerStat (MyChar, IE_XP, xp ) 
 
-	return
-
-def CancelPress():
-	GemRB.UnloadWindow (CharGenWindow)
-	GemRB.SetNextScript ("CharGen")
-	BioData = None
-	return
-
-def BackPress():
-	GemRB.UnloadWindow (CharGenWindow)
-	GemRB.SetNextScript ("CharGen8") #name
-	BioData = None
 	return
 
