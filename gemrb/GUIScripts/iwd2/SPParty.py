@@ -20,10 +20,13 @@ def OnLoad():
 	GemRB.SetVarAssoc(PartySelectWindow, ScrollBar, "TopIndex", PartyCount)
 	
 	ModifyButton = GemRB.GetControl(PartySelectWindow, 12)
+	GemRB.SetEvent(PartySelectWindow, ModifyButton, IE_GUI_BUTTON_ON_PRESS, "ModifyPress")
 	GemRB.SetText(PartySelectWindow, ModifyButton, 10316)
+
 	CancelButton = GemRB.GetControl(PartySelectWindow, 11)
 	GemRB.SetEvent(PartySelectWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	GemRB.SetText(PartySelectWindow, CancelButton, 13727)
+
 	DoneButton = GemRB.GetControl(PartySelectWindow, 10)
 	GemRB.SetEvent(PartySelectWindow, DoneButton, IE_GUI_BUTTON_ON_PRESS, "DonePress")
 	GemRB.SetText(PartySelectWindow, DoneButton, 11973)
@@ -66,6 +69,14 @@ def ScrollBarPress():
 			PartyDesc = GemRB.GetINIPartyKey(Tag, "Name", "")					
 			GemRB.SetText(PartySelectWindow, Button, PartyDesc)
 	return
+
+def ModifyPress():
+	Pos = GemRB.GetVar("PartyIdx")
+	if Pos == 0: # first entry - behaves same as pressing on done
+		GemRB.UnloadWindow(PartySelectWindow)
+		GemRB.LoadGame(-1)
+		GemRB.SetNextScript("SPPartyFormation")
+	#else: # here come the real modifications
 
 def DonePress():
 	global PartySelectWindow
