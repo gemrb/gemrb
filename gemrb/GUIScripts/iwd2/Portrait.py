@@ -30,6 +30,7 @@ def OnLoad():
 
 	PortraitButton = GemRB.GetControl(AppearanceWindow, 1)
 	GemRB.SetButtonFlags(AppearanceWindow, PortraitButton, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_NO_IMAGE,OP_SET)
+	GemRB.SetButtonState (AppearanceWindow, PortraitButton, IE_GUI_BUTTON_LOCKED)
 
 	LeftButton = GemRB.GetControl(AppearanceWindow,2)
 	RightButton = GemRB.GetControl(AppearanceWindow,3)
