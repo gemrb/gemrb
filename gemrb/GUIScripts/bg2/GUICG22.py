@@ -113,7 +113,14 @@ def OnLoad():
 	return
 
 def KitPress():
+	global ClassID
+
 	Kit = GemRB.GetVar("Class Kit")
+	if ClassID == 1 and Kit != 0:
+		GemRB.SetVar("MAGESCHOOL", Kit-21) # hack: -21 to make the generalist 0
+	else:
+		GemRB.SetVar("MAGESCHOOL", 0) # so bards don't get schools
+		
 	if Kit == 0:
 		KitName = GemRB.GetTableValue(ClassList, GemRB.GetVar("Class")-1, 1)
 	else:

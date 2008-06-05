@@ -17,9 +17,11 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
 # $Id$
+#
+# GUICommon.py - common functions for GUIScripts of all game types
 
 import GemRB
-# GUICommon.py - common functions for GUIScripts of all game types
+from GUIDefines import *
 
 OtherWindowFn = None
 #global OtherWindowFn
@@ -100,6 +102,12 @@ def SetupSpellLevels (pc, TableName, Type, Level):
 	Table=GemRB.LoadTable (TableName)
 	for i in range(GemRB.GetTableColumnCount (0)):
 		value = GemRB.GetTableValue (Table, Level, i)
+		# specialist mages get an extra spell if they already know that level
+		# FIXME: get a general routine to find specialists
+		school = GemRB.GetVar("MAGESCHOOL")
+		if Type == IE_SPELL_TYPE_WIZARD and school != 0:
+			if value > 0:
+				value += 1
 		GemRB.SetMemorizableSpellsCount (pc, value, Type, i)
 	return
 
