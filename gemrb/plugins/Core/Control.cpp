@@ -51,7 +51,7 @@ Control::Control()
 Control::~Control()
 {
 	if (InHandler) {
-		printMessage("Control","Destroying control inside event handler, crash may occur!", LIGHT_RED);
+		printMessage("Control","Destroying control inside event handler, crash may occur!\n", LIGHT_RED);
 	}
 	core->DisplayTooltip( 0, 0, NULL );
 	if (Tooltip) {
@@ -102,7 +102,7 @@ void Control::SetEventHandler(EventHandler handler, const char* funcName)
 int Control::RunEventHandler(EventHandler handler)
 {
 	if (InHandler) {
-		printMessage("Control","Nested event handlers are not supported!", YELLOW);
+		printMessage("Control","Nested event handlers are not supported!\n", YELLOW);
 		return -1;
 	}
 	if (handler[0]) {
