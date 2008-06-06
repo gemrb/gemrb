@@ -173,7 +173,7 @@ def OnLoad():
 
 
 def JustPress():
-	Pos = GemRB.GetVar("Skill")+TopIndex+1
+	Pos = GemRB.GetVar("Skill")+TopIndex
 	GemRB.SetText(SkillWindow, TextAreaControl, GemRB.GetTableValue(SkillTable,Pos,2) )
 	return
 
