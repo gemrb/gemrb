@@ -39,10 +39,10 @@ def RedrawSkills():
 			GemRB.SetText(SkillWindow, Label, "%s (%d)"%(t,Cost) )
 			GemRB.SetLabelTextColor(SkillWindow, Label, 255, 255, 255)
 			if PointsLeft < 1 or ActPoint * Cost >= Level + 3:
-				GemRB.SetLabelTextColor(SkillWindow, Label, 100, 100, 100)
+				GemRB.SetLabelTextColor(SkillWindow, Label, 150, 150, 150)
 		else:
 			GemRB.SetText(SkillWindow, Label, SkillName)
-			GemRB.SetLabelTextColor(SkillWindow, Label, 100, 100, 100) # Grey
+			GemRB.SetLabelTextColor(SkillWindow, Label, 150, 150, 150) # Grey
 
 		Button1 = GemRB.GetControl(SkillWindow, i*2+14)
 		Button2 = GemRB.GetControl(SkillWindow, i*2+15)
@@ -63,7 +63,7 @@ def RedrawSkills():
 		if ActPoint>0:
 			GemRB.SetLabelTextColor(SkillWindow,Label,0,255,255)
 		elif Cost < 1 or PointsLeft < 1:
-			GemRB.SetLabelTextColor(SkillWindow,Label, 100, 100, 100)
+			GemRB.SetLabelTextColor(SkillWindow,Label, 150, 150, 150)
 		else:
 			GemRB.SetLabelTextColor(SkillWindow,Label,255,255,255)
 
