@@ -808,15 +808,28 @@ def CanDualClass(actor):
 	if Dual[0] > 0:
 		return 1
 
+	# cannot dc if all the columns of the DualClassTable are 0
+	DualClassTable = GemRB.LoadTable ("dualclas")
 	Class = GemRB.GetPlayerStat (actor, IE_CLASS)
 	ClassTable = GemRB.LoadTable ("classes")
 	ClassIndex = GemRB.FindTableValue (ClassTable, 5, Class)
-	Multi = GemRB.GetTableValue (ClassTable, ClassIndex, 4)
-	if Multi:
+	ClassName = GemRB.GetTableRowName (ClassTable, ClassIndex)
+	KitIndex = GetKitIndex (actor)
+	if KitIndex == 0:
+		RowName = ClassName
+	else:
+		KitTable = GemRB.LoadTable ("kitlist")
+		RowName = GemRB.GetTableValue (KitTable, KitIndex, 0)
+	Row = GemRB.GetTableRowIndex (DualClassTable, RowName)
+
+	Sum = 0
+	for col in range(0, GemRB.GetTableColumnCount (DualClassTable)):
+		Sum += GemRB.GetTableValue (DualClassTable, Row, col)
+	if Sum == 0:
 		return 1
 
 	return 0
-	# TODO add other limitations for class, alignment and stats
+	# TODO add other limitations for alignment and stats (abdcd*.2da)
 
 def KitInfoWindow():
 	global KitInfoWindow
