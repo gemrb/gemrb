@@ -162,7 +162,7 @@ def OnLoad():
 	#decrease it with the number of controls on screen (list size)
 	TopIndex = 0
 	GemRB.SetVar("TopIndex",0)
-	GemRB.SetVarAssoc(SkillWindow, ScrollBarControl, "TopIndex",RowCount-10)
+	GemRB.SetVarAssoc(SkillWindow, ScrollBarControl, "TopIndex",RowCount-10+1)
 
 	GemRB.SetEvent(SkillWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	GemRB.SetEvent(SkillWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
