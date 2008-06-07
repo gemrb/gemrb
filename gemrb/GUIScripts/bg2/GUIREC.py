@@ -804,6 +804,11 @@ def IsDualClassed(actor, verbose):
 			return (0,-1,-1)
 
 def CanDualClass(actor):
+	# human
+	if GemRB.GetPlayerStat (actor, IE_RACE) != 1:
+		return 1
+
+	# already dualclassed
 	Dual = IsDualClassed (actor,0)
 	if Dual[0] > 0:
 		return 1
@@ -840,12 +845,21 @@ def CanDualClass(actor):
 	if Sum == 1 and ClassName in matches:
 		return 1
 
-	# human
-	if GemRB.GetPlayerStat (actor, IE_RACE) != 1:
+	AlignmentTable = GemRB.LoadTable ("alignmnt")
+	AlignsTable = GemRB.LoadTable ("aligns")
+	Alignment = GemRB.GetPlayerStat (actor, IE_ALIGNMENT)
+	AlignmentColName = GemRB.FindTableValue (AlignsTable, 3, Alignment)
+	AlignmentColName = GemRB.GetTableValue (AlignsTable, AlignmentColName, 4)
+	Sum = 0
+	for classy in matches:
+		Sum += GemRB.GetTableValue (AlignmentTable, classy, AlignmentColName)
+
+	# cannot dc if all the available classes forbid the chars alignment
+	if Sum == 0:
 		return 1
 
 	return 0
-	# TODO add other limitations for alignment (alignmnt.2da) and stats (abdc*.2da)
+	# TODO add limitations for stats (abdc*.2da)
 	# TODO (last) level > 1
 
 def KitInfoWindow():
