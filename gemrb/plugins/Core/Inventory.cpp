@@ -654,6 +654,9 @@ bool Inventory::DropItemAtLocation(unsigned int slot, unsigned int flags, Map *m
 	if ( ((flags^IE_INV_ITEM_UNDROPPABLE)&item->Flags)!=flags) {
 		return false;
 	}
+	if (!map) {
+		return false;
+	}
 	map->AddItemToLocation(loc, item);
 	Changed = true;
 	KillSlot(slot);
@@ -663,6 +666,10 @@ bool Inventory::DropItemAtLocation(unsigned int slot, unsigned int flags, Map *m
 bool Inventory::DropItemAtLocation(const char *resref, unsigned int flags, Map *map, Point &loc)
 {
 	bool dropped = false;
+
+	if (!map) {
+		return false;
+	}
 
 	//this loop is going from start
 	for (size_t i = 0; i < Slots.size(); i++) {
