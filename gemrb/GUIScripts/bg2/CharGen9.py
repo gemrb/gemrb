@@ -42,12 +42,20 @@ def FinishCharGen():
 	ClassTable = GemRB.LoadTable ("classes")
 	ClassIndex = GemRB.GetVar ("Class")-1
 	Class = GemRB.GetTableValue (ClassTable, ClassIndex, 5)
+	ClassName = GemRB.GetTableRowName (ClassTable, ClassIndex)
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
-	KitIndex = GemRB.GetVar ("Class Kit")
+	KitIndex = GetKitIndex (MyChar)
+	if KitIndex == 0:
+		EquipmentColName = ClassName
+	else:
+		EquipmentColName = GemRB.GetTableValue (KitTable, KitIndex, 0)
+
 	TmpTable = GemRB.LoadTable ("clskills")
 	#mage spells
 	TableName = GemRB.GetTableValue (TmpTable, Class, 2, 0)
 
+	# TODO check if this is really needed
+	KitIndex = GemRB.GetVar ("Class Kit")
 	if TableName != "*":
 		KitValue = GemRB.GetTableValue(KitTable, KitIndex, 6)
 		if KitValue == "*":
@@ -85,6 +93,7 @@ def FinishCharGen():
 	GemRB.SetPlayerStat (MyChar, IE_GOLD, t*GemRB.GetTableValue (TmpTable,Class,3) )
 	GemRB.UnloadTable (AlignmentTable)
 	GemRB.UnloadTable (ClassTable)
+	GemRB.UnloadTable (KitTable)
 	GemRB.UnloadTable (RaceTable)
 	GemRB.UnloadTable (TmpTable)
 
@@ -146,6 +155,29 @@ def FinishCharGen():
 	LargePortrait = GemRB.GetToken ("LargePortrait")
 	SmallPortrait = GemRB.GetToken ("SmallPortrait")
 	GemRB.FillPlayerInfo (MyChar, LargePortrait, SmallPortrait)
+
+	# add the starting inventory for tob
+	if GameIsTOB():
+		EquipmentTable = GemRB.LoadTable ("25stweap")
+		#loop over rows - item slots
+		for slot in range(0, GemRB.GetTableRowCount (EquipmentTable)):
+			slotname = GemRB.GetTableRowName (EquipmentTable, slot)
+			item = GemRB.GetTableValue (EquipmentTable, slotname, EquipmentColName)
+			if item == "*":
+				continue
+			# if an item contains a comma, the rest of the value is the stack
+			if "," in item:
+				item = item.split(",")
+				count = int(item[1])
+				item = item[0]
+				# TODO get the right slotid, so the item gets equipped;
+				#      also important since there are only 16 backpack slots
+				#      and possibly 20 items to give (no dropping)!
+				GemRB.CreateItem(MyChar, item, -1, count, 0, 0)
+			else:
+				GemRB.CreateItem(MyChar, item, -1, 1, 0, 0)
+
+		GemRB.UnloadTable (EquipmentTable)
 
 	playmode = GemRB.GetVar ("PlayMode")
 	if playmode >=0:
