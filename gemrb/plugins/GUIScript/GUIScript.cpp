@@ -286,6 +286,25 @@ static int SetCreatureStat(unsigned int Slot, unsigned int StatID, int StatValue
 	return 1;
 }
 
+/* create an item entry
+   TODO: this code snippet exists in many copies, maybe consolidate */
+static CREItem *CreateCreItem(const char *ItemResRef, int Charge0, int Charge1, int Charge2)
+{
+	CREItem *TmpItem = new CREItem();
+	strnlwrcpy(TmpItem->ItemResRef, ItemResRef, 8);
+	TmpItem->Expired=0;
+	TmpItem->Usages[0]=(ieWord) Charge0;
+	TmpItem->Usages[1]=(ieWord) Charge1;
+	TmpItem->Usages[2]=(ieWord) Charge2;
+	TmpItem->Flags=0;
+	if (core->ResolveRandomItem(TmpItem) && core->Exists(TmpItem->ItemResRef, IE_ITM_CLASS_ID)) {
+		return TmpItem;
+	}
+	/* item couldn't be resolved */
+	delete TmpItem;
+	return NULL;
+}
+
 PyDoc_STRVAR( GemRB_SetInfoTextColor__doc,
 "SetInfoTextColor(red, green, blue, [alpha])\n\n"
 "Sets the color of Floating Messages in GameControl." );
@@ -1163,12 +1182,12 @@ PyDoc_STRVAR( GemRB_HasControl__doc,
 
 static PyObject* GemRB_HasControl(PyObject * /*self*/, PyObject* args)
 {
-        int WindowIndex, ControlID;
+	int WindowIndex, ControlID;
 	int Type = -1;
 
-        if (!PyArg_ParseTuple( args, "ii|i", &WindowIndex, &ControlID, &Type )) {
-                return AttributeError( GemRB_HasControl__doc );
-        }
+	if (!PyArg_ParseTuple( args, "ii|i", &WindowIndex, &ControlID, &Type )) {
+		return AttributeError( GemRB_HasControl__doc );
+	}
 	int ret = core->GetControl( WindowIndex, ControlID );
 	if (ret == -1) {
 		return PyInt_FromLong( 0 );
@@ -6610,7 +6629,17 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 	if (SlotID==-1) {
 		SlotID=actor->inventory.FindCandidateSlot(SLOT_INVENTORY,0);
 	}
-	if (SlotID!=-1) {
+
+	if (SlotID==-1) {
+		// Create item on ground
+		Map *map = actor->GetCurrentArea();
+		if (map) {
+			CREItem *item = CreateCreItem(ItemResRef, Charge0, Charge1, Charge2 );
+			if (item) {
+				map->AddItemToLocation(actor->Pos, item);
+			}
+		}
+	} else {
 		// Note: this forcefully gets rid of any item currently
 		// in the slot without properly unequipping it
 		actor->inventory.SetSlotItemRes( ItemResRef, SlotID, Charge0, Charge1, Charge2 );
@@ -6651,8 +6680,7 @@ static PyObject* GemRB_SetMapnote(PyObject * /*self*/, PyObject* args)
 		char* newvalue = ( char* ) malloc( strlen( txt ) + 1 ); //duplicating the string
 		strcpy( newvalue, txt );
 		map->AddMapNote(point, color, newvalue);
-	}
-	else {
+	} else {
 		map->RemoveMapNote(point);
 	}
 	Py_INCREF( Py_None );
