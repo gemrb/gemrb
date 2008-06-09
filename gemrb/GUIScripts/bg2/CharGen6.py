@@ -8,6 +8,7 @@ def OnLoad():
 		GemRB.SetVar("Skill "+str(i),0) #thieving skills
 	for i in range(0,32):
 		GemRB.SetVar("Prof "+str(i),0)  #proficiencies
+	GemRB.SetVar("HateRace",0)
 
 	DisplayOverview (6)
 

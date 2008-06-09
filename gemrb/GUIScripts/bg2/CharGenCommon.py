@@ -203,10 +203,9 @@ def DisplayOverview(step):
 			Row = GemRB.FindTableValue (RaceTable, 1, Race)
 			info = GemRB.GetString (GemRB.GetTableValue(RaceTable, Row, 0))
 			if info != "":
-				info = "\n" + info + "\n"
+				info = "\n" + info + "\n\n"
 				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 15982)
 				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, info)
-			GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, "\n")
 
 			# weapon proficiencies
 			GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 9466)
