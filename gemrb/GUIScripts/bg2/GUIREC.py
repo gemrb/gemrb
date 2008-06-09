@@ -841,8 +841,8 @@ def CanDualClass(actor):
 		return 1
 
 	# if the only choice for dc is already the same as the actors base class
-	# TODO unverified; maybe you can dc to the base class
-	if Sum == 1 and ClassName in matches:
+	# TODO maybe you can't dc a kit to the base class
+	if Sum == 1 and ClassName in matches and KitIndex == 0:
 		return 1
 
 	AlignmentTable = GemRB.LoadTable ("alignmnt")
