@@ -206,9 +206,23 @@ def DisplayOverview(step):
 				info = "\n" + info + "\n"
 				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 15982)
 				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, info)
+			GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, "\n")
 
-			#weapon proficiencies
-			#GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 9466)
+			# weapon proficiencies
+			GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 9466)
+			GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, "\n")
+			TmpTable=GemRB.LoadTable ("weapprof")
+			ProfCount = GemRB.GetTableRowCount (TmpTable)
+			#bg2 weapprof.2da contains the bg1 proficiencies too, skipping those
+			for i in range(ProfCount-8):
+				Weapon = GemRB.GetString (GemRB.GetTableValue (TmpTable, i+8, 1))
+				Value = GemRB.GetVar ("Prof "+str(i) )
+				if Value:
+					pluses = " "
+					for plus in range(0, Value):
+						pluses += "+"
+					GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, Weapon + pluses + "\n")
+			GemRB.UnloadTable (TmpTable)
 
 		elif part == 8:
 			break
