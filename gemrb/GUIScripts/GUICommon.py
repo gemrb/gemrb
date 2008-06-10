@@ -111,6 +111,12 @@ def SetupSpellLevels (pc, TableName, Type, Level):
 		GemRB.SetMemorizableSpellsCount (pc, value, Type, i)
 	return
 
+def UnsetupSpellLevels (pc, TableName, Type, Level):
+	Table=GemRB.LoadTable (TableName)
+	for i in range(GemRB.GetTableColumnCount (0)):
+		GemRB.SetMemorizableSpellsCount (pc, 0, Type, i)
+	return
+
 def SetColorStat (Actor, Stat, Value):
 	t = Value & 0xFF
 	t |= t << 8
