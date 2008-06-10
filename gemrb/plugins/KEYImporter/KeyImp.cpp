@@ -210,7 +210,7 @@ static FileStream *SearchIn(const char * BasePath,const char * Path,const char *
 	return NULL;
 }
 
-bool KeyImp::HasResource(const char* resname, SClass_ID type)
+bool KeyImp::HasResource(const char* resname, SClass_ID type, bool silent)
 {
 	char path[_MAX_PATH];
 	//Search it in the GemRB override Directory
@@ -227,6 +227,9 @@ bool KeyImp::HasResource(const char* resname, SClass_ID type)
 	if (resources.Lookup( resname, type, ResLocator )) {
 		return true;
 	}
+	if (silent)
+		return false;
+
 	printMessage( "KEYImporter", "Searching for ", WHITE );
 	printf( "%.8s%s...", resname, core->TypeExt( type ) );
 	printStatus( "NOT FOUND", YELLOW );

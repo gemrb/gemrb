@@ -4864,10 +4864,10 @@ void Interface::PlaySound(int index)
 	}
 }
 
-bool Interface::Exists(const char *ResRef, SClass_ID type)
+bool Interface::Exists(const char *ResRef, SClass_ID type, bool silent)
 {
 	// TODO: check various caches before going to KeyImp
-	return key->HasResource( ResRef, type );
+	return key->HasResource( ResRef, type, silent );
 }
 
 //if the default setup doesn't fit for an animation

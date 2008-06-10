@@ -568,7 +568,7 @@ public:
 	/** plays stock gui sound referenced by index */
 	void PlaySound(int idx);
 	/** returns true if resource exists */
-	bool Exists(const char *ResRef, SClass_ID type);
+	bool Exists(const char *ResRef, SClass_ID type, bool silent=false);
 	/** creates a vvc/bam animation object at point */
 	ScriptedAnimation* GetScriptedAnimation( const char *ResRef, bool doublehint);
 	/** returns the first selected PC, if forced is set, then it returns

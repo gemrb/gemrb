@@ -44,7 +44,7 @@ public:
 	ResourceMgr(void);
 	virtual ~ResourceMgr(void);
 	virtual bool LoadResFile(const char* resfile) = 0;
-	virtual bool HasResource(const char* resname, SClass_ID type) = 0;
+	virtual bool HasResource(const char* resname, SClass_ID type, bool silent=false) = 0;
 	virtual DataStream* GetResource(const char* resname, SClass_ID type) = 0;
 	virtual void* GetFactoryResource(const char* resname, SClass_ID type,
 		unsigned char mode = IE_NORMAL) = 0;

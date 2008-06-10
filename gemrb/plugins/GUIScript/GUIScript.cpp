@@ -5928,9 +5928,15 @@ PyDoc_STRVAR( GemRB_GetSpell__doc,
 static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 {
 	const char* ResRef;
+	int silent = 0;
 
-	if (!PyArg_ParseTuple( args, "s", &ResRef)) {
+	if (!PyArg_ParseTuple( args, "s|i", &ResRef, &silent)) {
 		return AttributeError( GemRB_GetSpell__doc );
+	}
+
+	if (silent && !core->Exists(ResRef,IE_SPL_CLASS_ID, true)) {
+		Py_INCREF( Py_None );
+		return Py_None;
 	}
 
 	Spell* spell = core->GetSpell(ResRef);
@@ -7070,11 +7076,12 @@ static PyObject* GemRB_HasResource(PyObject * /*self*/, PyObject* args)
 {
 	const char *ResRef;
 	int ResType;
+	int silent = 0;
 
-	if (!PyArg_ParseTuple( args, "si", &ResRef, &ResType )) {
+	if (!PyArg_ParseTuple( args, "si|i", &ResRef, &ResType, silent )) {
 		return AttributeError( GemRB_HasResource__doc );
 	}
-	if (core->Exists(ResRef, ResType)) {
+	if (core->Exists(ResRef, ResType, silent)) {
 		Py_INCREF( Py_True );
 		return Py_True;
 	} else {

@@ -46,7 +46,7 @@ public:
 	~KeyImp(void);
 	bool LoadResFile(const char* resfile);
 	/* predicts the availability of a resource */
-	bool HasResource(const char* resname, SClass_ID type);
+	bool HasResource(const char* resname, SClass_ID type, bool silent=false);
 	/* returns resource */
 	DataStream* GetResource(const char* resname, SClass_ID type);
 	/* returns factory resource, currently works only with animations */
