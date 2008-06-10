@@ -86,7 +86,7 @@ def GetLearnablePriestSpells (Class, Alignment, Level):
 	#usability is the bitset we look for
 	Usability=GemRB.GetTableValue(Table, v, 5)
 
-	for i in range(100):
+	for i in range(50):
 		SpellName = "SPPR%d%02d"%(Level,i)
 		ms = GemRB.GetSpell(SpellName)
 		if ms == None:
