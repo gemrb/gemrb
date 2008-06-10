@@ -153,7 +153,6 @@ def DisplayOverview(step):
 				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, ": " \
 					+ str(GemRB.GetVar ("Ability "+str(i))) )
 		elif part == 7:
-			# TODO: list known priest spells, proficiencies
 			GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, "\n\n")
 			# thieving and other skills
 			info = ""
@@ -163,7 +162,8 @@ def DisplayOverview(step):
 			Class = GemRB.GetVar ("Class") - 1
 			ClassID = GemRB.GetTableValue (ClassTable, Class, 5)
 			Class = GemRB.FindTableValue (ClassTable, 5, ClassID)
-			# TODO: what about monks, rangers, bards and others not in skills.2da?
+			# TODO: what about monks and any others not in skills.2da?
+			# TODO also before: skill{rng,brd}.2da <-- add rangers to clskills.2da
 			KitName = GetKitIndex (MyChar)
 			if KitName == 0:
 				KitName = GemRB.GetTableRowName (ClassTable, Class)
@@ -194,10 +194,18 @@ def DisplayOverview(step):
 				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 11027)
 				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, info)
 
-			#divine spells
-			#GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 11028)
-			#GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, "\n")
-			#racial enemy
+			# divine spells
+			for level in range(0, 7):
+				for j in range(0, GemRB.GetKnownSpellsCount (MyChar, IE_SPELL_TYPE_PRIEST, level) ):
+					Spell = GemRB.GetKnownSpell (MyChar, IE_SPELL_TYPE_PRIEST, level, j)
+					Spell = GemRB.GetSpell (Spell['SpellResRef'])['SpellName']
+					info += GemRB.GetString (Spell) + "\n"
+			if info != "":
+				info = "\n" + info + "\n"
+				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 11028)
+				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, info)
+
+			# racial enemy
 			Race = GemRB.GetVar ("HateRace")
 			RaceTable = GemRB.LoadTable ("HATERACE")
 			Row = GemRB.FindTableValue (RaceTable, 1, Race)

@@ -53,6 +53,7 @@ def FinishCharGen():
 	TmpTable = GemRB.LoadTable ("clskills")
 	#mage spells
 	TableName = GemRB.GetTableValue (TmpTable, Class, 2, 0)
+	GemRB.UnloadTable (TmpTable)
 
 	# TODO check if this is really needed
 	KitIndex = GemRB.GetVar ("Class Kit")
@@ -67,16 +68,6 @@ def FinishCharGen():
 	print "KitValue**********:",KitValue
 	GemRB.SetPlayerStat (MyChar, IE_KIT, KitValue)
 
-	#priest spells
-	TableName = GemRB.GetTableValue (TmpTable, Class, 1, 0)
-	if TableName != "*":
-		SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
-		ClassFlag = 0 #set this according to class
-		Learnable = GetLearnablePriestSpells( ClassFlag, t, 1)
-		for i in range(len(Learnable) ):
-			GemRB.LearnSpell (MyChar, Learnable[i], 0)
-
-	GemRB.UnloadTable (TmpTable)
 	TmpTable=GemRB.LoadTable ("repstart")
 	AlignmentTable = GemRB.LoadTable ("aligns")
 	t = GemRB.FindTableValue (AlignmentTable, 3, t)

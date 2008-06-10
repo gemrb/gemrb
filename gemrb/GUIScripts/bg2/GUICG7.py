@@ -206,11 +206,11 @@ def MageSpellsDonePress():
 	GemRB.SetNextScript("GUICG6") #abilities
 	return
 
-def RemoveKnownSpells():
+def RemoveKnownSpells(type):
 	global Slot
 	for level in range(0, 9):
-		for j in range(GemRB.GetKnownSpellsCount (Slot, IE_SPELL_TYPE_WIZARD, level)-1, -1, -1):
-			GemRB.RemoveSpell (Slot, IE_SPELL_TYPE_WIZARD, level, j)
+		for j in range(GemRB.GetKnownSpellsCount (Slot, type, level)-1, -1, -1):
+			GemRB.RemoveSpell (Slot, type, level, j)
 
 def MageSpellsPickPress():
 	global MageSpellsSelectPointsLeft, MageSpells
