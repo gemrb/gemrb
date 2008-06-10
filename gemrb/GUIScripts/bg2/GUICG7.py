@@ -70,7 +70,7 @@ def OnLoad():
 	SpellMask = 0
 	GemRB.SetVar("SpellMask", 0)
 
-	RemoveKnownSpells ()
+	RemoveKnownSpells (IE_SPELL_TYPE_WIZARD)
 
 	PointsLeftLabel = GemRB.GetControl(MageSpellsWindow, 0x1000001b)
 	GemRB.SetLabelUseRGB(MageSpellsWindow, PointsLeftLabel, 1)
