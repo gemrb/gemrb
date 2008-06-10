@@ -13,8 +13,6 @@ def OnLoad():
 	DisplayOverview (6)
 
 	RemoveKnownSpells (IE_SPELL_TYPE_WIZARD)
-
-	# TODO need to unsetup spell levels too?
 	RemoveKnownSpells (IE_SPELL_TYPE_PRIEST)
 
 	# learn priest spells if appropriate
@@ -23,9 +21,15 @@ def OnLoad():
 	ClassTable = GemRB.LoadTable ("classes")
 	ClassIndex = GemRB.GetVar ("Class")-1
 	Class = GemRB.GetTableValue (ClassTable, ClassIndex, 5)
+	MyChar = GemRB.GetVar ("Slot")
 	TableName = GemRB.GetTableValue (ClassSkillsTable, Class, 1, 0)
+
+	# nulify the memorizable spell counts
+	# TODO: unset(up) also the mage levels
+	UnsetupSpellLevels (MyChar, "MXSPLPRS", IE_SPELL_TYPE_PRIEST, 1)
+	UnsetupSpellLevels (MyChar, "MXSPLPAL", IE_SPELL_TYPE_PRIEST, 1)
+
 	if TableName != "*":
-		MyChar = GemRB.GetVar ("Slot")
 		SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
 		ClassFlag = 0 #set this according to class
 		Learnable = GetLearnablePriestSpells( ClassFlag, GemRB.GetVar ("Alignment"), 1)
