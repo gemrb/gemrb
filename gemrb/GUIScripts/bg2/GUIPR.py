@@ -183,10 +183,16 @@ def UpdatePriestWindow ():
 			GemRB.EnableButtonBorder (Window, Button, 0, 0)
 
 	Table = GemRB.LoadTable ("clskills")
-	if (GemRB.GetTableValue (Table, GemRB.GetPlayerStat( GemRB.GameGetSelectedPCSingle(), IE_CLASS), 1)=="*"):
+	Class = GemRB.GetPlayerStat (GemRB.GameGetSelectedPCSingle(), IE_CLASS)
+	DivineCaster = GemRB.GetTableValue (Table, Class, 1)
+	if DivineCaster == "*":
+		# also check the DRUIDSPELL column
+		DivineCaster = GemRB.GetTableValue (Table, Class, 0)
+	if DivineCaster == "*":
 		GemRB.SetVisible (Window, 2)
 	else:
 		GemRB.SetVisible (Window, 1)
+	GemRB.UnloadTable (Table)
 	return
 
 def PriestPrevLevelPress ():
