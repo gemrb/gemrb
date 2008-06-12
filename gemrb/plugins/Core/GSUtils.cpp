@@ -224,7 +224,7 @@ bool StoreHasItemCore(const ieResRef storename, const ieResRef itemname)
 	}
 	bool ret = false;
 	//don't use triggers (pst style), it would be possible to create infinite loops
-	if (store->FindItem(itemname, false) ) {
+	if (store->FindItem(itemname, false) != (unsigned int)-1) {
 		ret=true;
 	}
 	if (has_current) {
