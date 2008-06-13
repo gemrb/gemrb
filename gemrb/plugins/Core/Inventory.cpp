@@ -244,7 +244,7 @@ bool Inventory::HasItemInSlot(const char *resref, unsigned int slot) const
 		return false;
 	}
 	if (!resref[0]) {
-			return true;
+		return true;
 	}
 	if (strnicmp( item->ItemResRef, resref, 8 )==0) {
 		return true;

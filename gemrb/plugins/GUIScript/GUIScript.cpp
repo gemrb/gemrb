@@ -287,7 +287,7 @@ static int SetCreatureStat(unsigned int Slot, unsigned int StatID, int StatValue
 }
 
 /* create an item entry
-   TODO: this code snippet exists in many copies, maybe consolidate */
+	 TODO: this code snippet exists in many copies, maybe consolidate */
 static CREItem *CreateCreItem(const char *ItemResRef, int Charge0, int Charge1, int Charge2)
 {
 	CREItem *TmpItem = new CREItem();
@@ -6174,13 +6174,18 @@ static PyObject* GemRB_CanUseItemType(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_GetSlots__doc,
 "GetSlots(PartyID, SlotType)=>dict\n\n"
-"Returns a tuple of slots of the inventory of a PC matching the slot type criteria." );
+"Returns a tuple of slots of the inventory of a PC matching the slot type criteria.\n"
+"If the flag is >0, it will ignore empty slots.\n"
+"If the flag is <0, it will ignore filled slots.\n"
+"If the flag is 0, it will return all slots.\n"
+"The default is 1." );
 
 static PyObject* GemRB_GetSlots(PyObject * /*self*/, PyObject* args)
 {
 	int SlotType, Count, MaxCount, PartyID;
+	int flag = 1;
 
-	if (!PyArg_ParseTuple( args, "ii", &PartyID, &SlotType)) {
+	if (!PyArg_ParseTuple( args, "ii|i", &PartyID, &SlotType, &flag)) {
 		return AttributeError( GemRB_GetSlots__doc );
 	}
 
@@ -6202,9 +6207,11 @@ static PyObject* GemRB_GetSlots(PyObject * /*self*/, PyObject* args)
 			continue;
 		}
 		CREItem *slot = actor->inventory.GetSlotItem( id );
-		if (slot) {
-			Count++;
+		if (flag) {
+			if(flag<0 && slot) continue;
+			if(flag>0 && !slot) continue;
 		}
+		Count++;
 	}
 
 	PyObject* tuple = PyTuple_New( Count );
@@ -6215,9 +6222,11 @@ static PyObject* GemRB_GetSlots(PyObject * /*self*/, PyObject* args)
 			continue;
 		}
 		CREItem *slot = actor->inventory.GetSlotItem( id );
-		if (slot) {
-			PyTuple_SetItem( tuple, Count++, PyInt_FromLong( i ) );
+		if (flag) {
+			if(flag<0 && slot) continue;
+			if(flag>0 && !slot) continue;
 		}
+		PyTuple_SetItem( tuple, Count++, PyInt_FromLong( i ) );
 	}
 
 	return tuple;
