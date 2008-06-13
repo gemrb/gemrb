@@ -2,6 +2,7 @@
 import GemRB
 from CharGenCommon import *
 from ie_stats import *
+from ie_slots import *
 from GUICommon import *
 
 CharGenWindow = 0
@@ -150,24 +151,31 @@ def FinishCharGen():
 	# add the starting inventory for tob
 	if GameIsTOB():
 		EquipmentTable = GemRB.LoadTable ("25stweap")
+		# a map of slots in the table to the real slots
+		# SLOT_BAG is invalid, so use the inventory (first occurence)
+		# SLOT_INVENTORY: use -1 instead, that's what CreateItem expects
+		RealSlots = [ SLOT_ARMOUR, SLOT_SHIELD, SLOT_HELM, -1, SLOT_RING, \
+					SLOT_RING, SLOT_CLOAK, SLOT_BOOT, SLOT_AMULET, SLOT_GLOVE, \
+					SLOT_BELT, SLOT_QUIVER, SLOT_QUIVER, SLOT_QUIVER, \
+					-1, -1, -1, -1, -1, SLOT_WEAPON ]
 		#loop over rows - item slots
 		for slot in range(0, GemRB.GetTableRowCount (EquipmentTable)):
 			slotname = GemRB.GetTableRowName (EquipmentTable, slot)
 			item = GemRB.GetTableValue (EquipmentTable, slotname, EquipmentColName)
 			if item == "*":
 				continue
+			realslot = GemRB.GetSlots (MyChar, RealSlots[slot])
+			if realslot == (): # this shouldn't happen!
+				continue
+			print "MMC", realslot, RealSlots[slot], slot
 			# if an item contains a comma, the rest of the value is the stack
 			if "," in item:
 				item = item.split(",")
 				count = int(item[1])
 				item = item[0]
-				# TODO get the right slotid, so the item gets equipped;
-				#      also important since there are only 16 backpack slots
-				#      and possibly 20 items to give (no dropping)!
-				GemRB.CreateItem(MyChar, item, -1, count, 0, 0)
 			else:
-				GemRB.CreateItem(MyChar, item, -1, 1, 0, 0)
-
+				count = 0
+			GemRB.CreateItem(MyChar, item, realslot, count, 0, 0)
 		GemRB.UnloadTable (EquipmentTable)
 
 	playmode = GemRB.GetVar ("PlayMode")
