@@ -164,10 +164,10 @@ def FinishCharGen():
 			item = GemRB.GetTableValue (EquipmentTable, slotname, EquipmentColName)
 			if item == "*":
 				continue
-			realslot = GemRB.GetSlots (MyChar, RealSlots[slot])
+			realslot = GemRB.GetSlots (MyChar, RealSlots[slot], -1)
+			print "MMC", realslot, RealSlots[slot], slot
 			if realslot == (): # this shouldn't happen!
 				continue
-			print "MMC", realslot, RealSlots[slot], slot
 			# if an item contains a comma, the rest of the value is the stack
 			if "," in item:
 				item = item.split(",")
@@ -175,7 +175,7 @@ def FinishCharGen():
 				item = item[0]
 			else:
 				count = 0
-			GemRB.CreateItem(MyChar, item, realslot, count, 0, 0)
+			GemRB.CreateItem(MyChar, item, realslot[0], count, 0, 0)
 		GemRB.UnloadTable (EquipmentTable)
 
 	playmode = GemRB.GetVar ("PlayMode")
