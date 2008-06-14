@@ -80,7 +80,6 @@ def FinishCharGen():
 	GemRB.SetPlayerStat (MyChar, IE_GOLD, t*GemRB.GetTableValue (TmpTable,Class,3) )
 	GemRB.UnloadTable (AlignmentTable)
 	GemRB.UnloadTable (ClassTable)
-	GemRB.UnloadTable (KitTable)
 	GemRB.UnloadTable (RaceTable)
 	GemRB.UnloadTable (TmpTable)
 
@@ -181,6 +180,7 @@ def FinishCharGen():
 			GemRB.CreateItem(MyChar, item, realslot[0], count, 0, 0)
 		GemRB.UnloadTable (EquipmentTable)
 
+	GemRB.UnloadTable (KitTable)
 	playmode = GemRB.GetVar ("PlayMode")
 	if playmode >=0:
 		#LETS PLAY!!
