@@ -45,11 +45,6 @@ def FinishCharGen():
 	Class = GemRB.GetTableValue (ClassTable, ClassIndex, 5)
 	ClassName = GemRB.GetTableRowName (ClassTable, ClassIndex)
 	GemRB.SetPlayerStat (MyChar, IE_CLASS, Class)
-	KitIndex = GetKitIndex (MyChar)
-	if KitIndex == 0:
-		EquipmentColName = ClassName
-	else:
-		EquipmentColName = GemRB.GetTableValue (KitTable, KitIndex, 0)
 
 	TmpTable = GemRB.LoadTable ("clskills")
 	#mage spells
@@ -150,6 +145,14 @@ def FinishCharGen():
 
 	# add the starting inventory for tob
 	if GameIsTOB():
+		KitIndex = GetKitIndex (MyChar)
+		if KitIndex == 0:
+			EquipmentColName = ClassName
+			# sorcerers are missing from the table, use the mage equipment instead
+			if EquipmentColName == "SORCERER":
+				EquipmentColName = "MAGE"
+		else:
+			EquipmentColName = GemRB.GetTableValue (KitTable, KitIndex, 0)
 		EquipmentTable = GemRB.LoadTable ("25stweap")
 		# a map of slots in the table to the real slots
 		# SLOT_BAG is invalid, so use the inventory (first occurence)
