@@ -35,6 +35,11 @@ def RefreshPDoll():
 	AnimID=AnimID+GemRB.GetTableValue(table, GemRB.GetVar("Gender"),0)
 
 	ResRef=GemRB.GetTableValue(PDollTable,hex(AnimID), "AT_1")+"G1"
+	if ResRef == "*G1":
+		print "ERROR, couldn't find the paperdoll! AnimID is", hex(AnimID)
+		print "Falling back to an elven paperdoll."
+		ResRef = "CEMB1G1"
+
 	GemRB.SetButtonFlags(ColorWindow, PDollButton, IE_GUI_BUTTON_ANIMATED,OP_OR)
 	GemRB.SetButtonPLT(ColorWindow, PDollButton, ResRef, \
 		0, Color4, Color3, Color2, 0, 0, Color1, 0)
