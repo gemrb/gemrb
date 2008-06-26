@@ -59,6 +59,7 @@ def OnLoad():
 	Color4=GemRB.GetTableValue(PortraitTable,PortraitIndex,4)
 	PDollButton = GemRB.GetControl(ColorWindow, 1)
 	GemRB.SetButtonFlags(ColorWindow, PDollButton, IE_GUI_BUTTON_PICTURE,OP_OR)
+	GemRB.SetButtonState(ColorWindow, PDollButton, IE_GUI_BUTTON_LOCKED)
 
 	HairButton = GemRB.GetControl(ColorWindow, 2)
 	GemRB.SetButtonFlags(ColorWindow, HairButton, IE_GUI_BUTTON_PICTURE,OP_OR)
