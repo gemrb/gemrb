@@ -147,6 +147,7 @@ def RightPress():
 		return
 	GemRB.SetVar("Prof "+str(Pos),ActPoint-1)
 	PointsLeft = PointsLeft + 1
+	GemRB.SetButtonState(SkillWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
 	RedrawSkills()
 	return
 
