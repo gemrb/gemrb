@@ -5,7 +5,7 @@ VoiceList = 0
 CharSoundWindow = 0
 
 # the available sounds
-SoundSequence = [ 'a', 'n', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', \
+SoundSequence = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', \
 				'm', 's', 't', 'u', 'v', '_', 'x', 'y', 'z', '0', '1', '2', \
 				'3', '4', '5', '6', '7', '8', '9']
 SoundIndex = 0
@@ -53,12 +53,16 @@ def PlayPress():
 	CharSound = GemRB.QueryText(CharSoundWindow, VoiceList)
 	# SClassID.h -> IE_WAV_CLASS_ID = 0x00000004
 	while (not GemRB.HasResource (CharSound + SoundSequence[SoundIndex], 0x00000004)):
-		SoundIndex +=1
+		NextSound()
 	GemRB.PlaySound (CharSound + SoundSequence[SoundIndex])
-	SoundIndex +=1
+	NextSound()
+	return
+
+def NextSound():
+	global SoundIndex, SoundSequence
+	SoundIndex += 1
 	if SoundIndex >= len(SoundSequence):
 		SoundIndex = 0
-	return
 
 # When a new voice is selected, play the sounds again from the beginning of the sequence
 def ChangeVoice():
