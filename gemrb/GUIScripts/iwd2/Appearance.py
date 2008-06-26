@@ -22,7 +22,10 @@ PDollButton = 0
 IE_ANIM_ID = 206
 
 def RefreshPDoll():
+	global ColorWindow, PDollButton
+	global Color1, Color2, Color3, Color4
 	PDollTable = GemRB.LoadTable("avatars")
+
 	AnimID=0x6000
 	table=GemRB.LoadTable("avprefr")
 	AnimID=AnimID+GemRB.GetTableValue(table,GemRB.GetVar("BaseRace"),0)
@@ -30,9 +33,12 @@ def RefreshPDoll():
 	AnimID=AnimID+GemRB.GetTableValue(table,GemRB.GetVar("BaseClass"),0)
 	table=GemRB.LoadTable("avprefg")
 	AnimID=AnimID+GemRB.GetTableValue(table, GemRB.GetVar("Gender"),0)
+
 	ResRef=GemRB.GetTableValue(PDollTable,hex(AnimID), "AT_1")+"G1"
-	GemRB.SetButtonBAM(ColorWindow, PDollButton, ResRef,10,0,0)
 	GemRB.SetButtonFlags(ColorWindow, PDollButton, IE_GUI_BUTTON_ANIMATED,OP_OR)
+	GemRB.SetButtonPLT(ColorWindow, PDollButton, ResRef, \
+		0, Color4, Color3, Color2, 0, 0, Color1, 0)
+	GemRB.SetButtonBAM(ColorWindow, PDollButton, ResRef,10,0,0)
 	return
 
 def OnLoad():
@@ -99,7 +105,7 @@ def RandomDonePress():
 	DonePress()
 	
 def DonePress():
-	global Color1, Color2, Color3, Color4, ColorWindow
+	global Color1, Color2, Color3, Color4, ColorWindow, ColorIndex, PickedColor, ColorPicker
 	GemRB.UnloadWindow(ColorPicker)
 	GemRB.SetVisible(ColorWindow,1)
 	
@@ -129,7 +135,7 @@ def DonePress():
 	return
 
 def GetColor():
-	global ColorPicker
+	global ColorPicker, ColorIndex, PickedColor
 
 	ColorPicker=GemRB.LoadWindow(14)
 	GemRB.SetVar("Selected",-1)
