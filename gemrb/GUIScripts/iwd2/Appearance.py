@@ -172,7 +172,7 @@ def GetColor():
 	#default button
 	GemRB.SetVarAssoc(ColorPicker, Button, "Selected", 0)
 	GemRB.SetEvent(ColorPicker, Button, IE_GUI_BUTTON_ON_PRESS, "RandomDonePress")
-	GemRB.SetText(ColorPicker, Button, "RANDOM")
+	GemRB.SetText(ColorPicker, Button, "RND")
 	GemRB.SetVisible(ColorPicker,1)
 	return
 
