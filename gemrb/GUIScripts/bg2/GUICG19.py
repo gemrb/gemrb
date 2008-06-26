@@ -4,6 +4,12 @@ import GemRB
 VoiceList = 0
 CharSoundWindow = 0
 
+# the available sounds
+SoundSequence = [ 'a', 'n', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', \
+				'm', 's', 't', 'u', 'v', '_', 'x', 'y', 'z', '0', '1', '2', \
+				'3', '4', '5', '6', '7', '8', '9']
+SoundIndex = 0
+
 def OnLoad():
 	global CharSoundWindow, VoiceList
 	
@@ -34,17 +40,30 @@ def OnLoad():
 	GemRB.SetText(CharSoundWindow,DoneButton,11973)
 	GemRB.SetButtonFlags(CharSoundWindow, DoneButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 
+	GemRB.SetEvent(CharSoundWindow, VoiceList, \
+					IE_GUI_TEXTAREA_ON_CHANGE, "ChangeVoice")
 	GemRB.SetEvent(CharSoundWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	GemRB.SetEvent(CharSoundWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	GemRB.SetVisible(CharSoundWindow,1)
 	return
 
 def PlayPress():
-	global CharSoundWindow
+	global CharSoundWindow, SoundIndex, SoundSequence
 
 	CharSound = GemRB.QueryText(CharSoundWindow, VoiceList)
-	GemRB.PlaySound (CharSound+"a")
+	# SClassID.h -> IE_WAV_CLASS_ID = 0x00000004
+	while (not GemRB.HasResource (CharSound + SoundSequence[SoundIndex], 0x00000004)):
+		SoundIndex +=1
+	GemRB.PlaySound (CharSound + SoundSequence[SoundIndex])
+	SoundIndex +=1
+	if SoundIndex >= len(SoundSequence):
+		SoundIndex = 0
 	return
+
+# When a new voice is selected, play the sounds again from the beginning of the sequence
+def ChangeVoice():
+	global SoundIndex
+	SoundIndex = 0
 
 def BackPress():
 	global CharSoundWindow
