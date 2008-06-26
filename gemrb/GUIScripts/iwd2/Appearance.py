@@ -98,9 +98,8 @@ def RandomDonePress():
 	DonePress()
 	
 def DonePress():
-	global Color1, Color2, Color3, Color4
+	global Color1, Color2, Color3, Color4, ColorWindow
 	GemRB.UnloadWindow(ColorPicker)
-	ColorWindow=GemRB.LoadWindow(13)
 	GemRB.SetVisible(ColorWindow,1)
 	
 	if ColorIndex==0:
