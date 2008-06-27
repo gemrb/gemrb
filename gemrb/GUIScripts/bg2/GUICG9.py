@@ -10,8 +10,8 @@ TopIndex = 0
 PointsLeft = 0
 ProfColumn = 0
 
-def RedrawSkills():
-	global TopIndex
+def RedrawSkills(First=0):
+	global TopIndex, ScrollBarControl
 
 	if PointsLeft == 0:
 		GemRB.SetButtonState(SkillWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
@@ -19,6 +19,7 @@ def RedrawSkills():
 	SumLabel = GemRB.GetControl(SkillWindow, 0x10000009)
 	GemRB.SetText(SkillWindow, SumLabel, str(PointsLeft) )  #points to distribute
 
+	SkipProfs = []
 	for i in range(8):
 		Pos=TopIndex+i
 		SkillName = GemRB.GetTableValue(SkillTable, Pos+8, 1) #we add the bg1 skill count offset
@@ -27,6 +28,7 @@ def RedrawSkills():
 		#invalid entry, adjusting scrollbar
 		if SkillName == -1:
 			GemRB.SetVar("TopIndex",TopIndex)
+			# TODO: remove more than -7, one more for each hit of this block?
 			GemRB.SetVarAssoc(SkillWindow, ScrollBarControl,"TopIndex",Pos-7)
 			break
 
@@ -37,6 +39,9 @@ def RedrawSkills():
 			GemRB.SetButtonState(SkillWindow, Button2, IE_GUI_BUTTON_DISABLED)
 			GemRB.SetButtonFlags(SkillWindow, Button1, IE_GUI_BUTTON_NO_IMAGE,OP_OR)
 			GemRB.SetButtonFlags(SkillWindow, Button2, IE_GUI_BUTTON_NO_IMAGE,OP_OR)
+			# skip proficiencies only if all the previous ones were skipped too
+			if i == 0 or ((i-1) in SkipProfs):
+				SkipProfs.append(i)
 		else:
 			GemRB.SetButtonState(SkillWindow, Button1, IE_GUI_BUTTON_ENABLED)
 			GemRB.SetButtonState(SkillWindow, Button2, IE_GUI_BUTTON_ENABLED)
@@ -53,6 +58,13 @@ def RedrawSkills():
 				GemRB.SetButtonFlags(SkillWindow, Star, IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
 			else:
 				GemRB.SetButtonFlags(SkillWindow, Star, IE_GUI_BUTTON_NO_IMAGE,OP_OR)
+
+	# skip unavaliable proficiencies on the first run
+	if len(SkipProfs) > 0 and First == 1:
+		TopIndex += SkipProfs[len(SkipProfs)-1] + 1
+		GemRB.SetVar("TopIndex",TopIndex)
+		RedrawSkills()
+
 	return
 
 def OnLoad():
@@ -121,7 +133,7 @@ def OnLoad():
 	GemRB.SetEvent(SkillWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	GemRB.SetButtonState(SkillWindow,DoneButton,IE_GUI_BUTTON_DISABLED)
 	TopIndex = 0
-	RedrawSkills()
+	RedrawSkills(1)
 	GemRB.SetVisible(SkillWindow,1)
 	return
 
