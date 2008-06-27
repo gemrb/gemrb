@@ -20,37 +20,23 @@ Color3 = 0
 Color4 = 0
 PDollButton = 0
 IE_ANIM_ID = 206
+PDollResRef = 0
 
 def RefreshPDoll():
 	global ColorWindow, PDollButton
-	global Color1, Color2, Color3, Color4
-	PDollTable = GemRB.LoadTable("avatars")
-
-	AnimID=0x6000
-	table=GemRB.LoadTable("avprefr")
-	AnimID=AnimID+GemRB.GetTableValue(table,GemRB.GetVar("BaseRace"),0)
-	table=GemRB.LoadTable("avprefc")
-	AnimID=AnimID+GemRB.GetTableValue(table,GemRB.GetVar("BaseClass"),0)
-	table=GemRB.LoadTable("avprefg")
-	AnimID=AnimID+GemRB.GetTableValue(table, GemRB.GetVar("Gender"),0)
-
-	ResRef=GemRB.GetTableValue(PDollTable,hex(AnimID), "AT_1")+"G1"
-	if ResRef == "*G1":
-		print "ERROR, couldn't find the paperdoll! AnimID is", hex(AnimID)
-		print "Falling back to an elven paperdoll."
-		ResRef = "CEMB1G1"
+	global Color1, Color2, Color3, Color4, PDollResRef
 
 	GemRB.SetButtonFlags(ColorWindow, PDollButton, IE_GUI_BUTTON_ANIMATED,OP_OR)
-	GemRB.SetButtonPLT(ColorWindow, PDollButton, ResRef, \
+	GemRB.SetButtonPLT(ColorWindow, PDollButton, PDollResRef, \
 		0, Color4, Color3, Color2, 0, 0, Color1, 0)
-	GemRB.SetButtonBAM(ColorWindow, PDollButton, ResRef,10,0,0)
+	GemRB.SetButtonBAM(ColorWindow, PDollButton, PDollResRef,10,0,0)
 	return
 
 def OnLoad():
 	global ColorWindow, DoneButton, PDollButton
 	global HairTable, SkinTable, ColorTable
 	global HairButton, SkinButton, MajorButton, MinorButton
-	global Color1, Color2, Color3, Color4
+	global Color1, Color2, Color3, Color4, PDollResRef
 	
 	GemRB.LoadWindowPack("GUICG", 800, 600)
 	ColorWindow=GemRB.LoadWindow(13)
@@ -100,6 +86,28 @@ def OnLoad():
 
 	GemRB.SetEvent(ColorWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	GemRB.SetEvent(ColorWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
+
+	# calculate the paperdoll animation id from the race, class and gender
+	PDollTable = GemRB.LoadTable ("avatars")
+	table = GemRB.LoadTable ("avprefr")
+	AnimID = 0x6000 + GemRB.GetTableValue (table, GemRB.GetVar("BaseRace"), 0)
+	GemRB.UnloadTable (table)
+
+	table = GemRB.LoadTable ("avprefc")
+	AnimID = AnimID + GemRB.GetTableValue (table, GemRB.GetVar("BaseClass"), 0)
+	GemRB.UnloadTable (table)
+
+	table = GemRB.LoadTable ("avprefg")
+	AnimID = AnimID + GemRB.GetTableValue (table, GemRB.GetVar("Gender"), 0)
+	GemRB.UnloadTable (table)
+
+	PDollResRef = GemRB.GetTableValue (PDollTable, hex(AnimID), "AT_1") + "G1"
+	if PDollResRef == "*G1":
+		print "ERROR, couldn't find the paperdoll! AnimID is", hex(AnimID)
+		print "Falling back to an elven paperdoll."
+		PDollResRef = "CEMB1G1"
+	GemRB.UnloadTable (PDollTable)
+
 	RefreshPDoll()
 	GemRB.SetVisible(ColorWindow,1)
 	return
