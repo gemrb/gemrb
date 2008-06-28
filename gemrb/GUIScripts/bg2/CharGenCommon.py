@@ -195,6 +195,7 @@ def DisplayOverview(step):
 				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, info)
 
 			# divine spells
+			info = ""
 			for level in range(0, 7):
 				for j in range(0, GemRB.GetKnownSpellsCount (MyChar, IE_SPELL_TYPE_PRIEST, level) ):
 					Spell = GemRB.GetKnownSpell (MyChar, IE_SPELL_TYPE_PRIEST, level, j)
