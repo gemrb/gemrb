@@ -113,6 +113,16 @@ public:
 		return -1;
 	};
 
+	inline int GetColumnIndex(const char* string) const
+	{
+		for (unsigned int index = 0; index < colNames.size(); index++) {
+			if (stricmp( colNames[index], string ) == 0) {
+				return index;
+			}
+		}
+		return -1;
+	};
+
 	inline const char* GetColumnName(unsigned int index) const
 	{
 		if (index < colNames.size()) {

@@ -1016,6 +1016,28 @@ static PyObject* GemRB_GetTableRowName(PyObject * /*self*/, PyObject* args)
 	return PyString_FromString( str );
 }
 
+PyDoc_STRVAR( GemRB_GetTableColumnIndex__doc,
+"GetTableColumnIndex(TableIndex, ColumnName) => Column\n\n"
+"Returns the Index of a Column in a 2DA Table." );
+
+static PyObject* GemRB_GetTableColumnIndex(PyObject * /*self*/, PyObject* args)
+{
+	int ti;
+	char* colname;
+
+	if (!PyArg_ParseTuple( args, "is", &ti, &colname )) {
+		return AttributeError( GemRB_GetTableColumnIndex__doc );
+	}
+
+	TableMgr* tm = core->GetTable( ti );
+	if (tm == NULL) {
+		return RuntimeError("Can't find resource");
+	}
+	int col = tm->GetColumnIndex( colname );
+	//no error if the column doesn't exist
+	return PyInt_FromLong( col );
+}
+
 PyDoc_STRVAR( GemRB_GetTableColumnName__doc,
 "GetTableColumnName(TableIndex, ColumnIndex) => string\n\n"
 "Returns the Name of a Column in a 2DA Table." );
@@ -8278,6 +8300,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(FindTableValue, METH_VARARGS),
 	METHOD(GetTableRowIndex, METH_VARARGS),
 	METHOD(GetTableRowName, METH_VARARGS),
+	METHOD(GetTableColumnIndex, METH_VARARGS),
 	METHOD(GetTableColumnName, METH_VARARGS),
 	METHOD(GetTableRowCount, METH_VARARGS),
 	METHOD(GetTableColumnCount, METH_VARARGS),
