@@ -147,6 +147,11 @@ def DonePress():
 	RefreshPDoll()
 	return
 
+def CancelPress():
+	global ColorPicker, ColorWindow
+	GemRB.UnloadWindow (ColorPicker)
+	GemRB.SetVisible (ColorWindow, 1)
+
 def GetColor():
 	global ColorPicker, ColorIndex, PickedColor
 
@@ -186,6 +191,11 @@ def GetColor():
 	GemRB.SetVarAssoc(ColorPicker, Button, "Selected", 0)
 	GemRB.SetEvent(ColorPicker, Button, IE_GUI_BUTTON_ON_PRESS, "RandomDonePress")
 	GemRB.SetText(ColorPicker, Button, "RND")
+
+	CancelButton = GemRB.GetControl(ColorPicker, 35)
+	GemRB.SetText(ColorPicker, CancelButton, 13727)
+	GemRB.SetEvent(ColorPicker, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+
 	GemRB.SetVisible(ColorPicker,1)
 	return
 
