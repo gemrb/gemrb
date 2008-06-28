@@ -77,23 +77,24 @@ def OnLoad():
 	Class = GemRB.FindTableValue(ClassTable, 5, ClassID)
 	ClassName = GemRB.GetTableRowName(ClassTable, Class)
 	Kit = GemRB.GetVar("Class Kit")
+	SkillTable = GemRB.LoadTable ("weapprof")
 	if Kit == 0:
 		KitName = ClassName
-		ProfColumn = GemRB.GetTableValue(ClassTable,Class,5)+2
+		ProfColumn = GemRB.GetTableColumnIndex (SkillTable, ClassName)
 	else:
 		#rowname is just a number, the kitname is the first data column
 		KitName = GemRB.GetTableValue(KitList, Kit, 0)
 		#this is the proficiency column number in kitlist
 		ProfColumn = GemRB.GetTableValue(KitList, Kit, 5)
 
-	SkillTable = GemRB.LoadTable("profs")
+	ProfCountTable = GemRB.LoadTable("profs")
 	Level = GemRB.GetVar("Level")-1
-	PointsLeft = GemRB.GetTableValue(SkillTable, ClassName, "FIRST_LEVEL")
+	PointsLeft = GemRB.GetTableValue(ProfCountTable, ClassName, "FIRST_LEVEL")
 	if Level>0:
 		PointsLeft=PointsLeft + Level/GemRB.GetTableValue(SkillTable, ClassName, "RATE")
+	GemRB.UnloadTable (ProfCountTable)
 
 	GemRB.LoadWindowPack("GUICG", 640, 480)
-	SkillTable = GemRB.LoadTable("weapprof")
 	RowCount = GemRB.GetTableRowCount(SkillTable)-7  #we decrease it with the bg1 skills
 	SkillWindow = GemRB.LoadWindow(9)
 
