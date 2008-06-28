@@ -28,7 +28,6 @@ def RedrawSkills(First=0):
 		#invalid entry, adjusting scrollbar
 		if SkillName == -1:
 			GemRB.SetVar("TopIndex",TopIndex)
-			# TODO: remove more than -7, one more for each hit of this block?
 			GemRB.SetVarAssoc(SkillWindow, ScrollBarControl,"TopIndex",Pos-7)
 			break
 
@@ -127,7 +126,13 @@ def OnLoad():
 	GemRB.SetVar("TopIndex",0)
 	ScrollBarControl = GemRB.GetControl(SkillWindow, 78)
 	GemRB.SetEvent(SkillWindow, ScrollBarControl, IE_GUI_SCROLLBAR_ON_CHANGE, "ScrollBarPress")
-	GemRB.SetVarAssoc(SkillWindow, ScrollBarControl, "TopIndex", RowCount-8) #decrease it with the number of controls
+	ProfCount = RowCount - 8 # decrease it with the number of controls
+	# decrease it with the number of invalid proficiencies
+	for i in range(RowCount):
+		SkillName = GemRB.GetTableValue (SkillTable, i+8, 1)
+		if SkillName == -1:
+			ProfCount -= 1
+	GemRB.SetVarAssoc (SkillWindow, ScrollBarControl, "TopIndex", ProfCount)
 
 	GemRB.SetEvent(SkillWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	GemRB.SetEvent(SkillWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
