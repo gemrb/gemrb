@@ -225,7 +225,9 @@ def DisplayOverview(step):
 			ProfCount = GemRB.GetTableRowCount (TmpTable)
 			#bg2 weapprof.2da contains the bg1 proficiencies too, skipping those
 			for i in range(ProfCount-8):
-				if GemRB.GetTableValue (TmpTable, i+8, 1) == -1:
+				# 4294967296 overflows to -1 on some arches, so we use a smaller invalid strref
+				strref = GemRB.GetTableValue (TmpTable, i+8, 1)
+				if strref == -1 or strref > 500000:
 					continue
 				Weapon = GemRB.GetString (GemRB.GetTableValue (TmpTable, i+8, 1))
 				Value = GemRB.GetVar ("Prof "+str(i) )
