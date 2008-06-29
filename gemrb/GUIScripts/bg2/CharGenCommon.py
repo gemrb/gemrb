@@ -207,10 +207,12 @@ def DisplayOverview(step):
 				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, info)
 
 			# racial enemy
+			info = ""
 			Race = GemRB.GetVar ("HateRace")
 			RaceTable = GemRB.LoadTable ("HATERACE")
 			Row = GemRB.FindTableValue (RaceTable, 1, Race)
-			info = GemRB.GetString (GemRB.GetTableValue(RaceTable, Row, 0))
+			if Row != -1:
+				info = GemRB.GetString (GemRB.GetTableValue(RaceTable, Row, 0))
 			if info != "":
 				info = "\n" + info + "\n\n"
 				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 15982)
@@ -223,6 +225,8 @@ def DisplayOverview(step):
 			ProfCount = GemRB.GetTableRowCount (TmpTable)
 			#bg2 weapprof.2da contains the bg1 proficiencies too, skipping those
 			for i in range(ProfCount-8):
+				if GemRB.GetTableValue (TmpTable, i+8, 1) == -1:
+					continue
 				Weapon = GemRB.GetString (GemRB.GetTableValue (TmpTable, i+8, 1))
 				Value = GemRB.GetVar ("Prof "+str(i) )
 				if Value:
