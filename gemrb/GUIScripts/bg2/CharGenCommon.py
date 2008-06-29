@@ -209,14 +209,14 @@ def DisplayOverview(step):
 			# racial enemy
 			info = ""
 			Race = GemRB.GetVar ("HateRace")
-			RaceTable = GemRB.LoadTable ("HATERACE")
-			Row = GemRB.FindTableValue (RaceTable, 1, Race)
-			if Row != -1:
+			if Race:
+				RaceTable = GemRB.LoadTable ("HATERACE")
+				Row = GemRB.FindTableValue (RaceTable, 1, Race)
 				info = GemRB.GetString (GemRB.GetTableValue(RaceTable, Row, 0))
-			if info != "":
-				info = "\n" + info + "\n\n"
-				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 15982)
-				GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, info)
+				if info != "":
+					info = "\n" + info + "\n\n"
+					GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 15982)
+					GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, info)
 
 			# weapon proficiencies
 			GemRB.TextAreaAppend (CharGenWindow, TextAreaControl, 9466)
