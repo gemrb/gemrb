@@ -47,6 +47,7 @@ IE_GUI_BUTTON_PLAYONCE   = 0x00040000   # the button animation won't restart
 
 IE_GUI_BUTTON_CENTER_PICTURES = 0x00080000 # center the button's PictureList
 IE_GUI_BUTTON_BG1_PAPERDOLL   = 0x00100000 # BG1-style paperdoll
+IE_GUI_BUTTON_HORIZONTAL      = 0x00200000 # horizontal clipping of overlay
 
 
 #textarea flags

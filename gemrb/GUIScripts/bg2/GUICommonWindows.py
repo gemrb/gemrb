@@ -28,6 +28,7 @@ from GUIDefines import *
 from ie_stats import *
 from ie_modal import *
 from ie_action import *
+from ie_slots import *
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
@@ -578,7 +579,7 @@ def UpdatePortraitWindow ():
 			GemRB.SetTooltip (Window, Button, "")
 			continue
 
-		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ALIGN_BOTTOM|IE_GUI_BUTTON_ALIGN_LEFT|IE_GUI_BUTTON_HORIZONTAL, OP_SET)
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 		GemRB.SetButtonPicture (Window, Button, pic, "NOPORTSM")
 		hp = GemRB.GetPlayerStat (i+1, IE_HITPOINTS)
@@ -741,3 +742,12 @@ def SetEncumbranceLabels (Window, Label, Label2, pc):
 		GemRB.SetLabelTextColor (Window, Label, 255, 255, 255)
 		GemRB.SetLabelTextColor (Window, Label2, 255, 0, 0)
 	return
+
+def DebugInventorySlots(func=""):
+	print
+	print func
+	pc = GemRB.GameGetSelectedPCSingle ()
+	for i in range(16):
+		print 2**i, GemRB.GetSlots (pc, 2**i, 1)
+	print SLOT_ANY, GemRB.GetSlots (pc, SLOT_ANY, 1)
+	print
