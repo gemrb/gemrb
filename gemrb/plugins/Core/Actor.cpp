@@ -84,6 +84,16 @@ struct ItemUseType {
 
 static ItemUseType *itemuse = NULL;
 static int usecount = -1;
+
+//item animation override array
+struct ItemAnimType {
+	ieResRef itemname;
+	ieByte animation;
+};
+
+static ItemAnimType *itemanim = NULL;
+static int animcount = -1;
+
 static int fiststat = IE_CLASS;
 
 //conversion for 3rd ed
@@ -201,9 +211,15 @@ void ReleaseMemoryActor()
 		delete [] fistres;
 		fistres = NULL;
 	}
+
 	if (itemuse) {
 		delete [] itemuse;
 		itemuse = NULL;
+	}
+
+	if (itemanim) {
+		delete [] itemanim;
+		itemanim = NULL;
 	}
 	FistRows = -1;
 }
@@ -1140,6 +1156,19 @@ static void InitActorTables()
 		}
 		core->DelTable( table );
 	}
+
+	table = core->LoadTable( "itemanim" );
+	tm = core->GetTable( table );
+	if (tm) {
+		animcount = tm->GetRowCount();
+		itemanim = new ItemAnimType[animcount];
+		for (i = 0; i < animcount; i++) {
+			strnlwrcpy(itemanim[i].itemname, tm->QueryField(i,0),8 );
+			itemanim[i].animation = (ieByte) atoi( tm->QueryField(i,1) );
+		}
+		core->DelTable( table );
+	}
+
 
 	table = core->LoadTable( "mxsplwis" );
 	tm = core->GetTable( table );
@@ -3672,6 +3701,18 @@ void Actor::ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, b
 		itm = core->GetItem(item->ItemResRef);
 	}
 	if (!itm) return; //quick item slot contains invalid item resref
+
+	if (!silent) {
+		ieByte stance = IE_ANI_ATTACK;
+		for (int i=0;i<animcount;i++) {
+			if ( strnicmp(item->ItemResRef, itemanim[i].itemname, 8) == 0) {
+				stance = itemanim[i].animation;
+			}
+		}
+		if (stance!=0xff) {
+			SetStance(stance);
+		}
+	}
 
 	switch(itm->UseCharge(item->Usages, header)) {
 		case CHG_NOSOUND: //remove item
