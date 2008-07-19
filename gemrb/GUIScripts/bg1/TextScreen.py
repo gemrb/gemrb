@@ -83,7 +83,7 @@ def FeedScroll ():
 	if Value == 'NONE':
 		Position = 1
 	else:
-		GemRB.TextAreaAppend (TextScreen, TextArea, Value, -1, 7)
+		GemRB.TextAreaAppend (TextScreen, TextArea, Value, -1, 6)
 		Position = Position + 1
 	return
 

@@ -88,7 +88,7 @@ def FeedScroll ():
 	Value = GemRB.GetTableValue (Table, line, 1)
 
 	GemRB.UnloadTable (Table)
-	GemRB.TextAreaAppend (TextScreen, TextArea, Value, -1, 7)
+	GemRB.TextAreaAppend (TextScreen, TextArea, Value, -1, 6)
 	return
 
 def ReplayTextScreen ():
