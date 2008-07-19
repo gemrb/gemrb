@@ -122,7 +122,6 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 		capital=1;
 		enablecap=true;
 	}
-	int oldcapital=capital;
 	int initials_rows = 0;
 	int initials_x = 0;
 
@@ -193,7 +192,6 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 			}
 
 			if (strnicmp( tag, "capital=",8)==0) {
-				oldcapital=capital;
 				sscanf( tag, "capital=%d", &capital);
 				if (capital && (row>=startrow) ) {
 					enablecap=true;
@@ -253,7 +251,9 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 		if (initials && capital && enablecap) {
 			x = initials->PrintInitial( x, y, rgn, currChar );
 			initials_x = x;
-			initials_rows = 2; // 2 additional lines need to be indented
+
+			//how many more lines to be indented (one was already indented)
+			initials_rows = (initials->maxHeight-1)/maxHeight;
 			enablecap = false;
 			continue;
 		}
@@ -283,7 +283,6 @@ void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 		capital=1;
 		enablecap=true;
 	}
-	int oldcapital=capital;
 
 	unsigned int psx = PARAGRAPH_START_X;
 	Palette* pal = hicolor;
@@ -355,7 +354,6 @@ void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 			}
 
 			if (strnicmp( tag, "capital=",8)==0) {
-				oldcapital=capital;
 				sscanf( tag, "capital=%d", &capital);
 				if (capital) {
 					enablecap=true;
