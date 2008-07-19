@@ -532,7 +532,7 @@ int EffectQueue::AddAllEffects(Actor* target, Point &destination)
 		(*f)->random_value = random_value;
 		//if applyeffect returns true, we stop adding the future effects
 		//this is to simulate iwd2's on the fly spell resistance
-		int tmp = AddEffect(*f, Owner, target, destination);
+		int tmp = AddEffect(*f, Owner?Owner:target, target, destination);
 		if (tmp==FX_ABORT) {
 			res = FX_NOT_APPLIED;
 			break;
