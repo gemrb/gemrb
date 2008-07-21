@@ -35,15 +35,17 @@
 
 ###################################################
 import GemRB
+import GUICommonWindows
 from GUIDefines import *
 from GUICommon import CloseOtherWindow
 from GUISAVE import *
-from GUICommonWindows import SetSelectionChangeHandler
+from GUICommonWindows import *
  
 ###################################################
 SubOptionsWindow = None
 SubSubOptionsWindow = None
 GameOptionsWindow = None
+OldOptionsWindow = None
 MoviesWindow = None
 KeysWindow = None
 HelpTextArea = None
@@ -55,17 +57,21 @@ hideflag = None
 
 
 def CloseOptionsWindow ():
-	global GameOptionsWindow
+	global GameOptionsWindow, OptionsWindow
+	global OldOptionsWindow
 
 	if GameOptionsWindow == None:
 		return
 
 	GemRB.UnloadWindow (GameOptionsWindow)
+	GemRB.UnloadWindow (OptionsWindow)
 
 	GameOptionsWindow = None
 	SetSelectionChangeHandler (None)
 	GemRB.SetVar ("OtherWindow", -1)
 	GemRB.SetVisible (0,1)
+	OptionsWindow = OldOptionsWindow
+	OldOptionsWindow = None
 	return
 
 def DummyWindow ():
@@ -74,7 +80,8 @@ def DummyWindow ():
 ###################################################
 def OpenOptionsWindow ():
 	"""Open main options window"""
-	global GameOptionsWindow, hideflag
+	global GameOptionsWindow, OptionsWindow, PortraitWindow
+	global OldOptionsWindow
 
 	if CloseOtherWindow(OpenOptionsWindow):
 		CloseOptionsWindow()
@@ -84,10 +91,14 @@ def OpenOptionsWindow ():
 	GemRB.SetVisible (0,0)
 	SetSelectionChangeHandler (DummyWindow)
 
-	GemRB.LoadWindowPack ("GUIOPT")
+	GemRB.LoadWindowPack ("GUIOPT", 640, 480)
 	GameOptionsWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", GameOptionsWindow)
-
+	if OldOptionsWindow == None:
+		OldOptionsWindow = OptionsWindow
+		OptionsWindow = GemRB.LoadWindow (0)
+		SetupMenuWindowControls (OptionsWindow, 0, "OpenOptionsWindow")
+		GemRB.SetWindowFrame (OptionsWindow)
 
 	# Load game
 	Button = GemRB.GetControl (Window, 5)
@@ -128,7 +139,10 @@ def OpenOptionsWindow ():
 	# game version, e.g. v1.1.0000
 	Label = GemRB.GetControl (Window, 0x1000000b)
 	GemRB.SetText (Window, Label, GEMRB_VERSION)
+
+	GemRB.SetVisible (OptionsWindow, 1)
 	GemRB.SetVisible (Window, 1)
+	GemRB.SetVisible (PortraitWindow, 1)
 	return
 
 

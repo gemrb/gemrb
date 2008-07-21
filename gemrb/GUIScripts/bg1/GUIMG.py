@@ -24,34 +24,43 @@
 ###################################################
 
 import GemRB
+import GUICommonWindows
 from GUIDefines import *
 from ie_stats import *
 from GUICommon import CloseOtherWindow
-from GUICommonWindows import SetSelectionChangeHandler
+from GUICommonWindows import *
 
 MageWindow = None
 MageSpellInfoWindow = None
 MageSpellLevel = 0
 MageSpellUnmemorizeWindow = None
+OldOptionsWindow = None
 
 
 def OpenMageWindow ():
-	global MageWindow
+	global MageWindow, OptionsWindow, PortraitWindow
+	global OldOptionsWindow
 
 	if CloseOtherWindow (OpenMageWindow):
-		GemRB.HideGUI ()
 		GemRB.UnloadWindow (MageWindow)
+		GemRB.UnloadWindow (OptionsWindow)
 		MageWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		
-		SetSelectionChangeHandler (None)
+		GemRB.SetVisible (0,1)
 		GemRB.UnhideGUI ()
+		OptionsWindow = OldOptionsWindow
+		OldOptionsWindow = None
 		return
 		
 	GemRB.HideGUI ()
+	GemRB.SetVisible (0,0)
 	GemRB.LoadWindowPack ("GUIMG")
 	MageWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", MageWindow)
+	OldOptionsWindow = GUICommonWindows.OptionsWindow
+	OptionsWindow = GemRB.LoadWindow (0)
+	SetupMenuWindowControls (OptionsWindow, 0, "OpenMageWindow")
+	GemRB.SetWindowFrame (OptionsWindow)
 	
 	Button = GemRB.GetControl (Window, 1)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "MagePrevLevelPress")
@@ -92,7 +101,10 @@ def OpenMageWindow ():
 	SetSelectionChangeHandler (UpdateMageWindow)
 	UpdateMageWindow ()
 
-	GemRB.UnhideGUI ()	
+	GemRB.SetVisible (OptionsWindow, 1)
+	GemRB.SetVisible (Window, 1)
+	GemRB.SetVisible (PortraitWindow, 1)
+	return
 
 
 def UpdateMageWindow ():

@@ -35,27 +35,37 @@ from GUIWORLD import OpenReformPartyWindow
 RecordsWindow = None
 InformationWindow = None
 BiographyWindow = None
+OldOptionsWindow = None
 
 ###################################################
 def OpenRecordsWindow ():
-	global RecordsWindow
+	global RecordsWindow, OptionsWindow, PortraitWindow
+	global OldOptionsWindow
 
 	if CloseOtherWindow (OpenRecordsWindow):
 		if InformationWindow: OpenInformationWindow ()
-	
-		GemRB.HideGUI ()
+
+                
 		GemRB.UnloadWindow (RecordsWindow)
+		GemRB.UnloadWindow (OptionsWindow)
 		RecordsWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		SetSelectionChangeHandler (None)
-	
+		GemRB.SetVisible (0,1)
 		GemRB.UnhideGUI ()
+		OptionsWindow = OldOptionsWindow
+		OldOptionsWindow = None
 		return
 
 	GemRB.HideGUI ()
+	GemRB.SetVisible (0,0)
+	
 	GemRB.LoadWindowPack ("GUIREC")
 	RecordsWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", RecordsWindow)
+	OldOptionsWindow = GUICommonWindows.OptionsWindow
+	OptionsWindow = GemRB.LoadWindow (0)
+	SetupMenuWindowControls (OptionsWindow, 0, "OpenRecordsWindow")
+	GemRB.SetWindowFrame (OptionsWindow)
 
 	# dual class
 	Button = GemRB.GetControl (Window, 0)
@@ -95,7 +105,9 @@ def OpenRecordsWindow ():
 	SetSelectionChangeHandler (UpdateRecordsWindow)
 	UpdateRecordsWindow ()
 
-	GemRB.UnhideGUI ()
+	GemRB.SetVisible (OptionsWindow, 1)
+	GemRB.SetVisible (Window, 1)
+	GemRB.SetVisible (PortraitWindow, 1)
 	return
 
 def GetNextLevelExp (Level, Class):
@@ -431,21 +443,12 @@ def GetReputation (repvalue):
 def OpenInformationWindow ():
 	global InformationWindow
 
-	GemRB.HideGUI ()
-
 	if InformationWindow != None:
 		if BiographyWindow: OpenBiographyWindow ()
 
-		GemRB.UnloadWindow (InformationWindow)
-		InformationWindow = None
-		GemRB.SetVar ("FloatWindow", -1)
-	
-		GemRB.UnhideGUI()
 		return
 
 	InformationWindow = Window = GemRB.LoadWindow (4)
-	GemRB.SetVar ("FloatWindow", InformationWindow)
-
 
 	# Biography
 	Button = GemRB.GetControl (Window, 26)
@@ -455,24 +458,25 @@ def OpenInformationWindow ():
 	# Done
 	Button = GemRB.GetControl (Window, 24)
 	GemRB.SetText (Window, Button, 11973)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenInformationWindow")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseInformationWindow")
 
-	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
+	return
+
+def CloseInformationWindow ():
+        global InformationWindow
+
+        GemRB.UnloadWindow (InformationWindow)
+	InformationWindow = None
+	GemRB.SetVisible (OptionsWindow, 1)
+	GemRB.SetVisible (RecordsWindow, 1)
+	GemRB.SetVisible (PortraitWindow, 1)
 	return
 
 def OpenBiographyWindow ():
 	global BiographyWindow
 
-	GemRB.HideGUI ()
-
 	if BiographyWindow != None:
-		GemRB.UnloadWindow (BiographyWindow)
-		BiographyWindow = None
-		GemRB.SetVar ("FloatWindow", InformationWindow)
-	
-		GemRB.UnhideGUI()
-		GemRB.ShowModal (InformationWindow, MODAL_SHADOW_GRAY)
 		return
 
 	BiographyWindow = Window = GemRB.LoadWindow (12)
@@ -484,10 +488,17 @@ def OpenBiographyWindow ():
 	# Done
 	Button = GemRB.GetControl (Window, 2)
 	GemRB.SetText (Window, Button, 11973)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenBiographyWindow")
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CloseBiographyWindow")
 
-	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
+	return
+
+def CloseBiographyWindow ():
+        global BiographyWindow
+
+        GemRB.UnloadWindow (BiographyWindow)
+	BiographyWindow = None
+	GemRB.SetVisible (InformationWindow, 1)
 	return
 
 def OpenExportWindow ():

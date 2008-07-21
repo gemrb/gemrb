@@ -397,16 +397,21 @@ def RemovePlayerCancel ():
 	return
 
 def OpenReformPartyWindow ():
-	global ReformPartyWindow
+	global ReformPartyWindow, OldActionsWindow, OldMessageWindow
 
 	GemRB.SetVar ("Selected", 0)
 	hideflag = GemRB.HideGUI ()
 
 	if ReformPartyWindow:
 		GemRB.UnloadWindow (ReformPartyWindow)
+		GemRB.SetVar ("ActionsWindow", OldActionsWindow)
+		GemRB.SetVar ("MessageWindow", OldMessageWindow)
+		GemRB.SetVar ("OtherWindow", -1)
+
+		OldActionsWindow = None
+		OldMessageWindow = None
 		ReformPartyWindow = None
 
-		GemRB.SetVar ("OtherWindow", -1)
 		#GemRB.LoadWindowPack ("GUIREC")
 		if hideflag:
 			GemRB.UnhideGUI ()
@@ -438,7 +443,11 @@ def OpenReformPartyWindow ():
 	Button = GemRB.GetControl (Window, 8)
 	GemRB.SetText (Window, Button, 11973)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenReformPartyWindow")
+
+	OldActionsWindow = GemRB.GetVar ("ActionsWindow")
+	OldMessageWindow = GemRB.GetVar ("MessageWindow")
 	GemRB.SetVar ("ActionsWindow", -1)
+	GemRB.SetVar ("MessageWindow", -1)
 	UpdateReformWindow ()
 	if hideflag:
 		GemRB.UnhideGUI ()
@@ -504,4 +513,5 @@ def GetWindowPack():
 		return "GUIW12"
 	#default
 	return "GUIW"
+
 

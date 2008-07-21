@@ -23,11 +23,15 @@
 
 ###################################################
 import GemRB
+import GUICommonWindows
 from GUIDefines import *
 from GUICommon import CloseOtherWindow
+from GUICommonWindows import *
 
 ###################################################
 JournalWindow = None
+OldOptionsWindow = None
+OverSlot = None
 Chapter = 0
 StartTime = 0
 StartYear = 0
@@ -35,7 +39,8 @@ StartYear = 0
 ###################################################
 def OpenJournalWindow ():
 	global StartTime, StartYear
-	global JournalWindow
+	global JournalWindow, OptionsWindow, PortraitWindow
+	global OldOptionsWindow
 
 	Table = GemRB.LoadTable("YEARS")
 	#StartTime is the time offset for ingame time, beginning from the startyear
@@ -45,18 +50,28 @@ def OpenJournalWindow ():
 	GemRB.UnloadTable(Table)
 
 	if CloseOtherWindow (OpenJournalWindow):
-		GemRB.HideGUI ()
 		GemRB.UnloadWindow (JournalWindow)
+		GemRB.UnloadWindow (OptionsWindow)
+		
 		JournalWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		
+		GemRB.SetVisible (0,1)
 		GemRB.UnhideGUI ()
+		OptionsWindow = OldOptionsWindow
+		OldOptionsWindow = None
 		return
 		
 	GemRB.HideGUI ()
-	GemRB.LoadWindowPack ("GUIJRNL")
+	GemRB.SetVisible (0,0)
+	
+	GemRB.LoadWindowPack ("GUIJRNL", 640, 480)
 	JournalWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar("OtherWindow", JournalWindow)
+	OldOptionsWindow = OptionsWindow
+	OptionsWindow = GemRB.LoadWindow (0)
+	SetupMenuWindowControls (OptionsWindow, 0, "OpenJournalWindow")
+	#saving the original portrait window
+	GemRB.SetWindowFrame (OptionsWindow)
 
 	
 	Button = GemRB.GetControl (Window, 3)
@@ -66,8 +81,13 @@ def OpenJournalWindow ():
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "JournalNextSectionPress")
 
 	Chapter = GemRB.GetGameVar("chapter")
+	GemRB.SetVar("TopIndex", 0)
+	SetSelectionChangeHandler (UpdateJournalWindow)
 	UpdateJournalWindow ()
-	GemRB.UnhideGUI ()
+	
+	GemRB.SetVisible (OptionsWindow, 1)
+	GemRB.SetVisible (Window, 1)
+	GemRB.SetVisible (PortraitWindow, 1)
 
 
 ###################################################
