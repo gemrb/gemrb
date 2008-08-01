@@ -2245,6 +2245,18 @@ void GameScript::SpellPoint(Scriptable* Sender, Action* parameters)
 		return;
 	}
 
+	if(Sender->Type==ST_ACTOR) {
+		Actor *act = (Actor *) Sender;
+		
+		unsigned int dist = GetSpellDistance(spellres, act);
+		
+		if (PersonalDistance(parameters->pointParameter, Sender) > dist) {
+			GoNearAndRetry(Sender, parameters->pointParameter, dist);
+			Sender->ReleaseCurrentAction();
+			return;
+		}
+	}
+
 	//set target
 	Actor *actor = (Actor *) Sender;
 	actor->SetOrientation( GetOrient( parameters->pointParameter, actor->Pos ), false );
