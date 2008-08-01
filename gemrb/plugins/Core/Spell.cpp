@@ -20,6 +20,7 @@
  */
 
 #include "../../includes/win32def.h"
+#include "Actor.h"
 #include "Spell.h"
 #include "Projectile.h"
 #include "ProjectileServer.h"
@@ -119,4 +120,32 @@ Projectile *Spell::GetProjectile(int header) const
 		return pro;
 	}
 	return NULL;
+}
+
+//get the casting distance of the spell
+//it depends on the casting level of the actor
+//if actor isn't given, then the first header is used
+//TODO: fix casting level for all class combos
+unsigned int Spell::GetCastingDistance(Actor *actor) const
+{
+	int level = 1;
+	if(!actor) {
+		level = actor->GetStat(IE_LEVEL);
+		if(SpellType==IE_SPL_WIZARD) {
+			level+=actor->GetStat(IE_CASTINGLEVELBONUSMAGE);
+		}
+		else if(SpellType==IE_SPL_PRIEST) {
+			level+=actor->GetStat(IE_CASTINGLEVELBONUSCLERIC);
+		}
+	}
+
+	if(level<1) level=1;
+	int idx = GetHeaderIndexFromLevel(level);
+	SPLExtHeader *seh = GetExtHeader(idx);
+	if (!seh) {
+		printMessage("Spell", "Cannot retrieve spell header!!! ",RED);
+		printf("required header: %d, maximum: %d\n", idx, (int) ExtHeaderCount);
+		return 0;
+	}
+	return (unsigned int) seh->Range;
 }

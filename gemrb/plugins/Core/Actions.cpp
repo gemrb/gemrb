@@ -546,6 +546,19 @@ void GameScript::TeleportParty(Scriptable* /*Sender*/, Action* parameters)
 	}
 }
 
+//this is unfinished, maybe the original moves actors too?
+//creates savegame?
+void GameScript::MoveToExpansion(Scriptable* /*Sender*/, Action* /*parameters*/)
+{
+	Game *game = core->GetGame();
+
+	game->SetExpansion(1);
+        SaveGameIterator *sg = core->GetSaveGameIterator();
+        if (sg) {
+                sg->Invalidate();
+        }
+}
+
 //add some animation effects too?
 void GameScript::ExitPocketPlane(Scriptable* /*Sender*/, Action* /*parameters*/)
 {
@@ -2186,6 +2199,18 @@ void GameScript::Spell(Scriptable* Sender, Action* parameters)
 	if (!tar) {
 		Sender->ReleaseCurrentAction();
 		return;
+	}
+
+	if(Sender->Type==ST_ACTOR) {
+		Actor *act = (Actor *) Sender;
+		
+		unsigned int dist = GetSpellDistance(spellres, act);
+		
+		if (PersonalDistance(tar, Sender) > dist) {
+			GoNearAndRetry(Sender, tar, true, dist);
+			Sender->ReleaseCurrentAction();
+			return;
+		}
 	}
 
 	//set target
@@ -5961,3 +5986,5 @@ void GameScript::SetTrackString(Scriptable* Sender, Action* parameters)
 	if (!map) return;
 	map->SetTrackString(parameters->int0Parameter, parameters->int1Parameter, parameters->int2Parameter);
 }
+
+

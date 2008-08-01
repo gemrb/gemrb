@@ -1199,6 +1199,7 @@ public:
 	static void MoveGlobalsTo(Scriptable* Sender, Action* parameters);
 	static void MoveInventory(Scriptable *Sender, Action* parameters);
 	static void MoveToCenterOfScreen(Scriptable* Sender, Action* parameters);
+        static void MoveToExpansion(Scriptable* Sender, Action* parameters);
 	static void MoveToObject(Scriptable* Sender, Action* parameters);
 	static void MoveToObjectFollow(Scriptable* Sender, Action* parameters);
 	static void MoveToObjectNoInterrupt(Scriptable* Sender, Action* parameters);

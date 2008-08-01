@@ -112,6 +112,7 @@ GEM_EXPORT ieDword CheckVariable(Scriptable* Sender, const char* VarName, bool *
 GEM_EXPORT ieDword CheckVariable(Scriptable* Sender, const char* VarName, const char* Context, bool *valid = NULL);
 Action* GenerateActionCore(const char *src, const char *str, int acIndex);
 Trigger *GenerateTriggerCore(const char *src, const char *str, int trIndex, int negate);
+unsigned int GetSpellDistance(ieResRef spellres, Actor *actor);
 
 inline int Bones(ieDword value)
 {

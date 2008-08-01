@@ -26,6 +26,7 @@
 #include "ResourceMgr.h"
 #include "Video.h"
 #include "Audio.h"
+#include "Spell.h"
 #include "Item.h"
 #include "Map.h"
 #include "Game.h"
@@ -2321,4 +2322,20 @@ Point GetEntryPoint(const char *areaname, const char *entryname)
 	p.x=(short) x;
 	p.y=(short) y;
 	return p;
+}
+
+/* returns a spell's casting distance, it depends on the caster */
+unsigned int GetSpellDistance(ieResRef spellres, Actor *actor)
+{
+	unsigned int dist;
+
+	Spell* spl = core->GetSpell( spellres );
+	if (!spl) {
+		printMessage("GameScript"," ",LIGHT_RED);
+		printf("Spell couldn't be found:%.8s.\n", spellres);
+		return 0;
+	}
+	dist=spl->GetCastingDistance(actor);
+	core->FreeSpell(spl, spellres, false);
+	return dist*15;
 }

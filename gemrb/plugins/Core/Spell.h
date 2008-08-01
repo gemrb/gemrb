@@ -169,6 +169,7 @@ public:
 	EffectQueue *GetEffectBlock(int block_index, int ext_index=-1) const;
 	//returns a projectile created from an extended header
 	Projectile *GetProjectile(int headerindex) const;
+	unsigned int GetCastingDistance(Actor *actor) const;
 };
 
 #endif  // ! SPELL_H
