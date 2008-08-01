@@ -1159,6 +1159,11 @@ void GameControl::TryToCast(Actor *source, Point &tgt)
 		CREMemorizedSpell *si;
 		//spell casting at target
 		si = source->spellbook.GetMemorizedSpell(spellOrItem, spellSlot, spellIndex);
+		if (!si)
+		{
+			target_mode = TARGET_MODE_NONE;
+			return;
+		}
 		sprintf(action->string0Parameter,"%.8s",si->SpellResRef);
 	}
 	else
@@ -1193,6 +1198,11 @@ void GameControl::TryToCast(Actor *source, Actor *tgt)
 		CREMemorizedSpell *si;
 		//spell casting at target
 		si = source->spellbook.GetMemorizedSpell(spellOrItem, spellSlot, spellIndex);
+		if (!si)
+		{
+			target_mode = TARGET_MODE_NONE;
+			return;
+		}
 		sprintf(action->string0Parameter,"%.8s",si->SpellResRef);
 	}
 	else
@@ -2185,13 +2195,13 @@ end_of_choose:
 		ta->PadMinRow();
 	}
 	// is this correct?
-  /* this was moved upwards before evaluating the triggers
+	/* this was moved upwards before evaluating the triggers
 	if (DialogueFlags & DF_FREEZE_SCRIPTS) {
 		target->ProcessActions(true);
 		//clear queued actions that remained stacked?
 		target->ClearActions();
 	}
-  */
+	*/
 }
 
 void GameControl::DisplayString(Point &p, const char *Text)
