@@ -235,6 +235,11 @@ bool SaveGameIterator::RescanSaveGames()
 	snprintf( Path, _MAX_PATH, "%s%s", core->SavePath, PlayMode() );
 
 	DIR* dir = opendir( Path );
+	// create the save game directory at first access
+	if (dir == NULL) {
+		mkdir(Path,S_IWRITE|S_IREAD|S_IEXEC);
+		dir = opendir( Path );
+	}
 	if (dir == NULL) { //If we cannot open the Directory
 		return false;
 	}
