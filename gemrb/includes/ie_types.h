@@ -30,7 +30,7 @@
 #define IE_TYPES_H
 
 #if HAVE_CONFIG_H
-#include "../../config.h"
+#include <config.h>
 #endif
 
 //we need this for Windows
