@@ -75,10 +75,17 @@ def OpenInventoryWindow ():
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenInventoryWindow")
 	GemRB.SetWindowFrame (Window)
 
+	#ground items scrollbar
+	ScrollBar = GemRB.GetControl (Window, 66)
+	GemRB.SetEvent (Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "RefreshInventoryWindow")
+
 	# Ground Items (6)
 	for i in range (5):
 		Button = GemRB.GetControl (Window, i+68)
 		GemRB.SetTooltip (Window, Button, 12011)
+		GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_ENTER_BUTTON, "MouseEnterGround")
+		GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_LEAVE_BUTTON, "MouseLeaveGround")
+		GemRB.AttachScrollBar (Window, Button, ScrollBar);
 		GemRB.SetVarAssoc (Window, Button, "GroundItemButton", i)
 		GemRB.SetButtonFont (Window, Button, "NUMFONT")
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
@@ -88,10 +95,6 @@ def OpenInventoryWindow ():
 	GemRB.SetButtonFont (Window, Button, "NUMFONT")
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
 	
-	#ground items scrollbar
-	ScrollBar = GemRB.GetControl (Window, 66)
-	GemRB.SetEvent (Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "RefreshInventoryWindow")
-
 	#major & minor clothing color
 	Button = GemRB.GetControl (Window, 62)
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE,OP_OR)
@@ -146,6 +149,8 @@ def OpenInventoryWindow ():
 		SlotType = GemRB.GetSlotType (slot+1)
 		if SlotType["ID"]:
 			Button = GemRB.GetControl (Window, SlotType["ID"])
+			GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_ENTER_BUTTON, "MouseEnterSlot")
+			GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_LEAVE_BUTTON, "MouseLeaveSlot")
 			GemRB.SetVarAssoc (Window, Button, "ItemButton", slot+1)
 			GemRB.SetButtonFont (Window, Button, "NUMFONT")
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
@@ -604,6 +609,40 @@ def OpenGroundItemInfoWindow ():
 	DisplayItem(slot_item["ItemResRef"], value) #the ground items are only displayable
 	return
 
+def MouseEnterSlot ():
+	global OverSlot
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	OverSlot = GemRB.GetVar ("ItemButton")
+	if GemRB.IsDraggingItem ():
+		UpdateSlot (pc, OverSlot-1)
+	return
+
+def MouseLeaveSlot ():
+	global OverSlot
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	if slot == OverSlot or not GemRB.IsDraggingItem ():
+		OverSlot = None
+	UpdateSlot (pc, slot-1)
+	return
+
+def MouseEnterGround ():
+	Window = InventoryWindow
+	i = GemRB.GetVar ("GroundItemButton")
+	Button = GemRB.GetControl (Window, i+68)
+	if GemRB.IsDraggingItem ():
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SELECTED)
+	return
+
+def MouseLeaveGround ():
+	Window = InventoryWindow
+	i = GemRB.GetVar ("GroundItemButton")
+	Button = GemRB.GetControl (Window, i+68)
+	if GemRB.IsDraggingItem ():
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_SECOND)
+	return
 
 ###################################################
 # End of file GUIINV.py
