@@ -96,11 +96,16 @@ def OpenInventoryWindow ():
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = OpenPortraitWindow (0)
 
+	#ground items scrollbar
+	ScrollBar = GemRB.GetControl (Window, 66)
+	GemRB.SetEvent (Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "RefreshInventoryWindow")
+
 	#Ground Item
 	for i in range (5):
 		Button = GemRB.GetControl (Window, i+68)
 		GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_ENTER_BUTTON, "MouseEnterGround")
 		GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_LEAVE_BUTTON, "MouseLeaveGround")
+		GemRB.AttachScrollBar (Window, Button, ScrollBar);
 		GemRB.SetVarAssoc (Window, Button, "GroundItemButton", i)
 		GemRB.SetButtonSprites (Window, Button, "STONSLOT",0,0,2,4,3)
 		GemRB.SetButtonFont (Window, Button, "NUMBER")
@@ -108,10 +113,6 @@ def OpenInventoryWindow ():
 		GemRB.SetButtonBorder (Window, Button, 1,2,2,5,5,32,32,255,0,0,0)
 		GemRB.SetButtonBorder (Window, Button, 2,0,0,0,0,255,128,128,64,0,1)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_PICTURE, OP_OR)
-
-	#ground items scrollbar
-	ScrollBar = GemRB.GetControl (Window, 66)
-	GemRB.SetEvent (Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "RefreshInventoryWindow")
 
 	#major & minor clothing color
 	Button = GemRB.GetControl (Window, 62)

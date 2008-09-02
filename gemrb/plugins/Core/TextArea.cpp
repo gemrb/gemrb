@@ -283,11 +283,11 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 }
 /** Sets the Scroll Bar Pointer. If 'ptr' is NULL no Scroll Bar will be linked
 	to this Text Area Control. */
-void TextArea::SetScrollBar(Control* ptr)
+int TextArea::SetScrollBar(Control* ptr)
 {
-	sb = ptr;
+	int ret = Control::SetScrollBar(ptr);
 	CalcRowCount();
-	Changed = true;
+	return ret;
 }
 
 /** Sets the Actual Text */
@@ -736,4 +736,23 @@ void TextArea::SetupScroll(unsigned long tck)
 	}
 	//recalculates rows
 	AppendText("\n",-1);
+}
+
+void TextArea::OnMouseDown(unsigned short /*x*/, unsigned short /*y*/,
+	unsigned char Button, unsigned short /*Mod*/)
+{
+
+	if (sb) {
+		ScrollBar* scrlbr = (ScrollBar*)sb;
+		switch(Button) {
+		case GEM_MB_SCRLUP:
+			scrlbr->ScrollUp();
+			core->RedrawAll();
+			break;
+		case GEM_MB_SCRLDOWN:
+			scrlbr->ScrollDown();
+			core->RedrawAll();
+			break;
+		}
+	}
 }

@@ -1661,6 +1661,41 @@ static PyObject* GemRB_SetControlStatus(PyObject * /*self*/, PyObject* args)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_AttachScrollBar__doc,
+"AttachScrollBar(WindowIndex, ControlIndex, ScrollBarControlIndex)\n\n"
+"Attaches a ScrollBar to another control." );
+
+static PyObject* GemRB_AttachScrollBar(PyObject * /*self*/, PyObject* args)
+{
+        int WindowIndex, ControlIndex, ScbControlIndex;
+
+        if (!PyArg_ParseTuple( args, "iii", &WindowIndex, &ControlIndex, &ScbControlIndex )) {
+                return AttributeError( GemRB_AttachScrollBar__doc );
+        }
+
+	Control *ctrl = GetControl(WindowIndex, ControlIndex, -1);
+	if (!ctrl) {
+		return NULL;
+	}
+
+	Control *scb = NULL;
+
+	if (ScbControlIndex != -1) {
+		scb = GetControl(WindowIndex, ScbControlIndex, IE_GUI_SCROLLBAR);
+		if (!scb) {
+			return NULL;
+		}
+	}
+
+        int ret = ctrl->SetScrollBar( scb );
+        if (ret == -1) {
+                return NULL;
+        }
+
+        Py_INCREF( Py_None );
+        return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_SetVarAssoc__doc,
 "SetVarAssoc(WindowIndex, ControlIndex, VariableName, LongValue)\n\n"
 "Sets the name of the Variable associated with a control." );
@@ -8323,6 +8358,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetTimedEvent, METH_VARARGS),
 	METHOD(SetNextScript, METH_VARARGS),
 	METHOD(SetControlStatus, METH_VARARGS),
+	METHOD(AttachScrollBar, METH_VARARGS),
 	METHOD(SetVarAssoc, METH_VARARGS),
 	METHOD(UnloadWindow, METH_VARARGS),
 	METHOD(CreateLabel, METH_VARARGS),

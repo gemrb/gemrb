@@ -23,7 +23,7 @@
  * @file Control.h
  * Declares Control, root class for all widgets except of windows
  */
- 
+
 #ifndef CONTROL_H
 #define CONTROL_H
 
@@ -65,8 +65,8 @@
 #define GEM_EXPORT
 #endif
 
-/** 
- * Event handler indicates code to be called when a particular 
+/**
+ * Event handler indicates code to be called when a particular
  * (usually GUI) event occurs.
  * Currently it's a name of a python function.
  */
@@ -83,7 +83,7 @@ class Sprite2D;
  */
 
 class GEM_EXPORT Control {
-public: 
+public:
 	Control();
 	virtual ~Control();
 	/** Draws the Control on the Output Display */
@@ -116,18 +116,20 @@ public: // Public attributes
 	ieWord Height;
 	/** Type of control */
 	ieByte ControlType;
-	/** Text to display as a tooltip when the mouse cursor hovers 
+	/** Text to display as a tooltip when the mouse cursor hovers
 	 * for some time over the control */
-	char* Tooltip;	
+	char* Tooltip;
 	/** Focused Control */
 	bool hasFocus;
-	/** If true, control is redrawn during next call to gc->DrawWindows. 
+	/** If true, control is redrawn during next call to gc->DrawWindows.
 	 * Then it's set back to false. */
 	bool Changed;
 	/** True if we are currently in an event handler */
 	bool InHandler;
 	/** Owner Window */
 	Window* Owner;
+       /** Attached Scroll Bar Pointer*/
+	Control* sb;
 public: //Events
 	/** Reset/init event handler */
 	void ResetEventHandler(EventHandler handler);
@@ -164,6 +166,8 @@ public: //Events
 	}
 	/** Sets the animation picture ref */
 	void SetAnimPicture(Sprite2D* Picture);
+	/** Sets the Scroll Bar Pointer */
+	int SetScrollBar(Control* ptr);
 };
 
 #endif

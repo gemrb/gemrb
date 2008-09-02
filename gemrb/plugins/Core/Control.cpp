@@ -212,3 +212,18 @@ void Control::SetAnimPicture(Sprite2D* newpic)
 	AnimPicture = newpic;
 	Changed = true;
 }
+
+/** Sets the Scroll Bar Pointer. If 'ptr' is NULL no Scroll Bar will be linked
+        to this Control. */
+int Control::SetScrollBar(Control* ptr)
+{
+        if (ptr && (ptr->ControlType!=IE_GUI_SCROLLBAR)) {
+                ptr = NULL;
+                printMessage("Control","Attached control is not a ScrollBar!\n",YELLOW);
+		return -1;
+        }
+        sb = ptr;
+        Changed = true;
+	if (ptr) return 1;
+	return 0;
+}

@@ -75,8 +75,6 @@ public:
 	~TextArea(void);
 	/** Draws the Control on the Output Display */
 	void Draw(unsigned short x, unsigned short y);
-	/** Sets the Scroll Bar Pointer */
-	void SetScrollBar(Control* ptr);
 	/** Sets the Actual Text */
 	int SetText(const char* text, int pos = 0);
 	/** Clears the textarea */
@@ -86,7 +84,7 @@ public:
 	void DiscardLines();
 	/** Appends a String to the current Text */
 	int AppendText(const char* text, int pos = 0);
-	/** Deletes `count' lines (either last or top lines)*/ 
+	/** Deletes `count' lines (either last or top lines)*/
 	void PopLines(unsigned int count, bool top = false);
 	/** Deletes last lines up to current 'minrow' */
 	void PopMinRow()
@@ -119,6 +117,7 @@ public:
 	const char* QueryText();
 	/** Marks textarea for redraw with a new value */
 	void RedrawTextArea(const char* VariableName, unsigned int Sum);
+	int SetScrollBar(Control *ptr);
 private: // Private attributes
 	std::vector< char*> lines;
 	std::vector< int> lrows;
@@ -137,8 +136,6 @@ private: // Private attributes
 	int rows;
 	/** Starting Row */
 	int startrow;
-	/** Attached Scroll Bar Pointer*/
-	Control* sb;
 	/** Text Colors */
 	Palette* palette;
 	Palette* initpalette;
@@ -161,6 +158,9 @@ public: //Events
 	void OnMouseOver(unsigned short x, unsigned short y);
 	/** Mouse Button Up */
 	void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
+		unsigned short Mod);
+	/** Mouse button down*/
+	void OnMouseDown(unsigned short x, unsigned short y, unsigned char Button,
 		unsigned short Mod);
 	/** Set handler for specified event */
 	bool SetEvent(int eventType, const char *handler);

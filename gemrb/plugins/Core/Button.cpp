@@ -124,9 +124,9 @@ void Button::CloseUpColor()
 	SourceRGB.g = (SourceRGB.g + DestRGB.g) / 2;
 	SourceRGB.b = (SourceRGB.b + DestRGB.b) / 2;
 	SourceRGB.a = (SourceRGB.a + DestRGB.a) / 2;
-	if (SourceRGB.r == DestRGB.r && 
-		SourceRGB.g == DestRGB.g && 
-		SourceRGB.b == DestRGB.b && 
+	if (SourceRGB.r == DestRGB.r &&
+		SourceRGB.g == DestRGB.g &&
+		SourceRGB.b == DestRGB.b &&
 		SourceRGB.a == DestRGB.a) {
 		starttime = 0;
 		return;
@@ -276,7 +276,7 @@ void Button::Draw(unsigned short x, unsigned short y)
 		for (int i = 0; i < MAX_NUM_BORDERS; i++) {
 			ButtonBorder *fr = &borders[i];
 			if (! fr->enabled) continue;
-			
+
 			Region r = Region( x + XPos + fr->dx1, y + YPos + fr->dy1, Width - (fr->dx1 + fr->dx2 + 1), Height - (fr->dy1 + fr->dy2 + 1) );
 			video->DrawRect( r, fr->color, fr->filled );
 		}
@@ -348,8 +348,11 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 	if (core->GetDraggedItem () && !ButtonOnDragDrop[0])
 		return;
 
+	ScrollBar* scrlbr = (ScrollBar*)sb;
+
 	//Button == 1 means Left Mouse Button
-	if (Button == GEM_MB_ACTION) {
+	switch(Button) {
+	case GEM_MB_ACTION:
 		// We use absolute screen position here, so drag_start
 		//   remains valid even after window/control is moved
 		drag_start.x = Owner->XPos + XPos + x;
@@ -363,6 +366,15 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 		if (Flags & IE_GUI_BUTTON_SOUND) {
 			core->PlaySound( DS_BUTTON_PRESSED );
 		}
+		break;
+	case GEM_MB_SCRLUP:
+		if (scrlbr)
+			scrlbr->ScrollUp();
+		break; 
+	case GEM_MB_SCRLDOWN:
+		if (scrlbr)
+			scrlbr->ScrollDown();
+		break;
 	}
 }
 /** Mouse Button Up */
@@ -415,7 +427,7 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 		RunEventHandler( ButtonOnDragDrop );
 		return;
 	}
-		
+
 /* spellbooks need the LOCKED state processing these events
 	if (State == IE_GUI_BUTTON_LOCKED) {
 		return;
@@ -425,10 +437,10 @@ void Button::OnMouseUp(unsigned short x, unsigned short y,
 	if (Button == GEM_MB_ACTION) {
 		if ((Mod & GEM_MOD_SHIFT) && ButtonOnShiftPress[0])
 			RunEventHandler( ButtonOnShiftPress );
-		else 
+		else
 			RunEventHandler( ButtonOnPress );
 	} else {
-		if (Button == GEM_MB_MENU && ButtonOnRightPress[0]) 
+		if (Button == GEM_MB_MENU && ButtonOnRightPress[0])
 			RunEventHandler( ButtonOnRightPress );
 	}
 }
@@ -438,7 +450,7 @@ void Button::OnMouseOver(unsigned short x, unsigned short y)
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;
 	}
-	
+
 	if ( RunEventHandler( MouseOverButton )) {
 		//event handler destructed this object
 		return;
@@ -590,7 +602,7 @@ void Button::ClearPictureList()
 		video->FreeSprite( *iter );
 	PictureList.clear();
 	Changed = true;
-	Owner->Invalidate();	
+	Owner->Invalidate();
 }
 
 /** Add picture to the end of the list of Pictures */
@@ -599,7 +611,7 @@ void Button::StackPicture(Sprite2D* Picture)
 	PictureList.push_back(Picture);
 	Changed = true;
 	Flags |= IE_GUI_BUTTON_PICTURE;
-	Owner->Invalidate();	
+	Owner->Invalidate();
 }
 
 bool Button::IsPixelTransparent(unsigned short x, unsigned short y)
