@@ -43,6 +43,7 @@ Control::Control()
 	XPos = 0;
 	YPos = 0;
 
+	sb = NULL;
 	animation = NULL;
 	AnimPicture = NULL;
 	ControlType = IE_GUI_INVALID;

@@ -41,7 +41,6 @@ TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 	minrow = 0;
 	seltext = -1;
 	Value = 0xffffffff;
-	sb = NULL;
 	ResetEventHandler( TextAreaOnChange );
 	ResetEventHandler( TextAreaOutOfText );
 	PortraitResRef[0]=0;
