@@ -71,6 +71,18 @@ void ScrollBar::RedrawScrollBar(const char* Variable, int Sum)
 	SetPos( Sum );
 }
 
+void ScrollBar::ScrollUp()
+{
+	if (Pos > 0)
+		SetPos( Pos - 1 );
+}
+
+void ScrollBar::ScrollDown()
+{
+       if ( (ieDword) Pos + 1 < Value )
+		SetPos( Pos + 1 );
+}
+
 void ScrollBar::Draw(unsigned short x, unsigned short y)
 {
 	if (!Changed && !(Owner->Flags&WF_FLOAT) ) {
@@ -133,9 +145,19 @@ void ScrollBar::SetImage(unsigned char type, Sprite2D* img)
 }
 /** Mouse Button Down */
 void ScrollBar::OnMouseDown(unsigned short x, unsigned short y,
-	unsigned char /*Button*/, unsigned short /*Mod*/)
+	unsigned char Button, unsigned short /*Mod*/)
 {
 	core->RedrawAll();
+
+	if (Button==GEM_MB_SCRLUP) {
+		ScrollUp();
+		return;
+	}
+	if (Button==GEM_MB_SCRLDOWN) {
+		ScrollDown();
+		return;
+	}
+
 	unsigned short upMx = (unsigned short) Frames[IE_GUI_SCROLLBAR_UP_UNPRESSED]->Width;
 	unsigned short upMy = (unsigned short) Frames[IE_GUI_SCROLLBAR_UP_UNPRESSED]->Height;
 	unsigned short domy = (unsigned short) (Height - Frames[IE_GUI_SCROLLBAR_DOWN_UNPRESSED]->Height);

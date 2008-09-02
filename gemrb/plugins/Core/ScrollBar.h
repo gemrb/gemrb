@@ -71,6 +71,8 @@ public:
 	~ScrollBar(void);
 	/**sets position, updates associated stuff */
 	void SetPos(int NewPos);
+	void ScrollUp();
+	void ScrollDown();
 	/**redraws scrollbar if associated with VarName */
 	void RedrawScrollBar(const char* VarName, int Sum);
 	/**/
