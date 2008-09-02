@@ -182,9 +182,9 @@ def UpdateLogWindow ():
 
 		# each journal entry consists of the title and description
 		# but the game displays the entry date between the two
-		je2 = GemRB.GetString(je['Text']).partition("\n")
-		JournalTitle = "[color=d00000]" + je2[0] + "[/color]" + je2[1]
-		JournalText = je2[2]
+		je2 = GemRB.GetString(je['Text']).split("\n",1)
+		JournalTitle = "[color=d00000]" + je2[0] + "[/color]" + "\n"
+		JournalText = je2[1]
 
 		GemRB.TextAreaAppend (Window, Text, JournalTitle + GemRB.GetString(15980), 3*i)
 		GemRB.TextAreaAppend (Window, Text, JournalText, 3*i+1)
