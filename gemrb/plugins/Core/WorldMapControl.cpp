@@ -278,12 +278,19 @@ void WorldMapControl::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
 void WorldMapControl::OnMouseDown(unsigned short x, unsigned short y,
 	unsigned char Button, unsigned short /*Mod*/)
 {
-	if ((Button != GEM_MB_ACTION) ) {
-		return;
+	switch(Button) {
+	case GEM_MB_ACTION:
+		MouseIsDown = true;
+		lastMouseX = x;
+		lastMouseY = y;
+		break;
+	case GEM_MB_SCRLUP:
+		OnSpecialKeyPress(GEM_UP);
+		break;
+	case GEM_MB_SCRLDOWN:
+		OnSpecialKeyPress(GEM_DOWN);
+		break;
 	}
-	MouseIsDown = true;
-	lastMouseX = x;
-	lastMouseY = y;
 }
 /** Mouse Button Up */
 void WorldMapControl::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
