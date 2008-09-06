@@ -174,8 +174,10 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_lengt
         return 0;
 
     alGenBuffers(1, &Buffer);
-    if ( alGetError() != AL_NO_ERROR ) {
+    int error = alGetError();
+    if ( error != AL_NO_ERROR ) {
         printMessage("OpenAL", "Unable to create buffer", WHITE );
+        printf (": %d", error);
         printStatus("ERROR", YELLOW);
         delete stream;
         return 0;
@@ -260,9 +262,7 @@ unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, uns
 			printf("speech.free: %d source:%d\n", speech.free,speech.Source);
 		} else {
 			alSourceStop( speech.Source );
-			if (alIsBuffer( speech.Buffer )) {
-				alDeleteBuffers( 1, &speech.Buffer );
-			}
+            speech.ClearProcessedBuffers(false);
 		}
 		core->GetDictionary()->Lookup( "Volume Voices", volume );
 		alSourcef( speech.Source, AL_GAIN, 0.01f * volume );
