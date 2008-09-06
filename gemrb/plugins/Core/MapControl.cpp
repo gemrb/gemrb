@@ -347,8 +347,17 @@ void MapControl::ViewHandle(unsigned short x, unsigned short y)
 
 /** Mouse Button Down */
 void MapControl::OnMouseDown(unsigned short x, unsigned short y,
-	unsigned char /*Button*/, unsigned short /*Mod*/)
+	unsigned char Button, unsigned short /*Mod*/)
 {
+	switch(Button) {
+	case GEM_MB_SCRLUP:
+		OnSpecialKeyPress(GEM_UP);
+		return;
+	case GEM_MB_SCRLDOWN:
+		OnSpecialKeyPress(GEM_DOWN);
+		return;
+	}
+
 	mouseIsDown = true;
 	short xp = (short) (SCREEN_TO_GAMEX(x));
 	short yp = (short) (SCREEN_TO_GAMEY(y));
