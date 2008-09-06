@@ -1346,18 +1346,29 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 void GameControl::OnMouseDown(unsigned short x, unsigned short y,
 	unsigned char Button, unsigned short /*Mod*/)
 {
-	if ((ScreenFlags&SF_DISABLEMOUSE) || (Button != GEM_MB_ACTION) ) {
+	if (ScreenFlags&SF_DISABLEMOUSE)
 		return;
+
+	short px=x;
+	short py=y;
+	switch(Button)
+	{
+	case GEM_MB_SCRLUP:
+		OnSpecialKeyPress(GEM_UP);
+		break;
+	case GEM_MB_SCRLDOWN:
+		OnSpecialKeyPress(GEM_DOWN);
+		break;
+	case GEM_MB_ACTION:
+		core->GetVideoDriver()->ConvertToGame( px, py );
+		MouseIsDown = true;
+		SelectionRect.x = px;
+		SelectionRect.y = py;
+		StartX = px;
+		StartY = py;
+		SelectionRect.w = 0;
+		SelectionRect.h = 0;
 	}
-	Point p(x,y);
-	core->GetVideoDriver()->ConvertToGame( p.x, p.y );
-	MouseIsDown = true;
-	SelectionRect.x = p.x;
-	SelectionRect.y = p.y;
-	StartX = p.x;
-	StartY = p.y;
-	SelectionRect.w = 0;
-	SelectionRect.h = 0;
 }
 /** Mouse Button Up */
 void GameControl::OnMouseUp(unsigned short x, unsigned short y,
