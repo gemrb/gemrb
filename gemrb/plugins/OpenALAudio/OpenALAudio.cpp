@@ -258,11 +258,18 @@ unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, uns
 			alSourcefv( speech.Source, AL_VELOCITY, SourceVel );
 			alSourcei( speech.Source, AL_LOOPING, 0 );
 			alSourcef( speech.Source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
+			if (alGetError() != AL_NO_ERROR) {
+				printMessage( "OpenAL", "Unable to set speech parameters", WHITE);
+			}
 			speech.free = false;
 			printf("speech.free: %d source:%d\n", speech.free,speech.Source);
 		} else {
 			alSourceStop( speech.Source );
-            speech.ClearProcessedBuffers(false);
+			if (alGetError() != AL_NO_ERROR) {
+				printMessage( "OpenAL", "Unable to stop speech", WHITE);
+				printStatus( "ERROR", YELLOW );
+			}
+			speech.ClearProcessedBuffers(false);
 		}
 		core->GetDictionary()->Lookup( "Volume Voices", volume );
 		alSourcef( speech.Source, AL_GAIN, 0.01f * volume );
@@ -271,6 +278,11 @@ unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, uns
 		alSourcei( speech.Source, AL_BUFFER, Buffer );
 		speech.Buffer = Buffer;
 		alSourcePlay( speech.Source );
+		if (alGetError() != AL_NO_ERROR) {
+			printMessage( "OpenAL", "Unable to play speech", WHITE);
+			printStatus( "ERROR", YELLOW );
+			return 0;
+		}
 		return time_length;
 	}
 
@@ -309,6 +321,8 @@ unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, uns
 	alSourcei( Source, AL_BUFFER, Buffer );
 
 	if (alGetError() != AL_NO_ERROR) {
+		printMessage( "OpenAL", "Unable to play sound", WHITE);
+		printStatus( "ERROR", YELLOW );
 		return 0;
 	}
 
