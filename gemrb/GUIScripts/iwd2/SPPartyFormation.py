@@ -51,6 +51,7 @@ def OnLoad():
 		GemRB.SetButtonState(PartyFormationWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
 	else:
 		GemRB.SetButtonState(PartyFormationWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
+		GemRB.SetButtonFlags(PartyFormationWindow, DoneButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
 	GemRB.SetEvent(PartyFormationWindow,DoneButton, IE_GUI_BUTTON_ON_PRESS,"EnterGamePress")
 
 	GemRB.SetVisible(PartyFormationWindow, 1)
