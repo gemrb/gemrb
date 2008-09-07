@@ -71,8 +71,8 @@ def DisplayOverview(step):
 	else:
 		GemRB.SetText (CharGenWindow, AcceptButton, 13956)
 	SetButtonStateFromStep ("AcceptButton", AcceptButton, step)
-	GemRB.SetButtonFlags(CharGenWindow,AcceptButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
-	GemRB.SetEvent (CharGenWindow, AcceptButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
+	#GemRB.SetButtonFlags(CharGenWindow,AcceptButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
+	#GemRB.SetEvent (CharGenWindow, AcceptButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
 
 	ImportButton = GemRB.GetControl (CharGenWindow, 13)
 	GemRB.SetText (CharGenWindow, ImportButton, 13955)
