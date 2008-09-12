@@ -507,10 +507,8 @@ static void ApplyDamageNearby(Actor* Owner, Actor* target, Effect *fx, ieDword d
 		Actor *victim = area->GetActor(i,true);
 		if (target==victim) continue;
 		if (PersonalDistance(target, victim)<20) {
-			Effect *tmp = new Effect();
-			memcpy(tmp, newfx, sizeof(Effect));
-			//this function deletes tmp
-			core->ApplyEffect(tmp, victim, Owner);
+			//this function deletes newfx (not anymore)
+			core->ApplyEffect(newfx, victim, Owner);
 		}
 	}
 	//finally remove the master copy
@@ -1185,6 +1183,18 @@ int fx_umberhulk_gaze (Actor* Owner, Actor* target, Effect* fx)
 	fx->TimingMode=FX_DURATION_AFTER_EXPIRES;
 	fx->Duration=core->GetGame()->GameTime+7*15;
 
+	//build effects to apply
+	Effect * newfx1, *newfx2;
+		
+	newfx1 = EffectQueue::CreateEffectCopy(fx, fx_confusion_ref, 0, 0);
+	newfx1->TimingMode = FX_DURATION_INSTANT_LIMITED;
+	newfx1->Duration = fx->Parameter1;
+
+	newfx2 = EffectQueue::CreateEffectCopy(fx, fx_immunity_resource_ref, 0, 0);
+	newfx2->TimingMode = FX_DURATION_INSTANT_LIMITED;
+	newfx2->Duration = fx->Parameter1;
+	memcpy(newfx2->Resource, fx->Source, sizeof(newfx2->Resource) );
+
 	//collect targets and apply effect on targets
 	Map *area = target->GetCurrentArea();
 	int i = area->GetActorCount(true);
@@ -1207,21 +1217,14 @@ int fx_umberhulk_gaze (Actor* Owner, Actor* target, Effect* fx)
 			continue;
 		}
 
-		Effect * newfx;
-		
 		//apply a confusion opcode on target (0x80)
-		newfx = EffectQueue::CreateEffectCopy(fx, fx_confusion_ref, 0, 0);
-		newfx->TimingMode = FX_DURATION_INSTANT_LIMITED;
-		newfx->Duration = fx->Parameter1;
-		core->ApplyEffect(newfx, Owner, victim);
-		
+		core->ApplyEffect(newfx1, Owner, victim);
+
 		//apply a resource resistance against this spell to block flood
-		newfx = EffectQueue::CreateEffectCopy(fx, fx_immunity_resource_ref, 0, 0);
-		newfx->TimingMode = FX_DURATION_INSTANT_LIMITED;
-		newfx->Duration = fx->Parameter1;
-		memcpy(newfx->Resource, fx->Source, sizeof(newfx->Resource) );
-		core->ApplyEffect(newfx, Owner, victim);
+		core->ApplyEffect(newfx2, Owner, victim);
 	}
+	delete newfx1;
+	delete newfx2;
 
 	return FX_APPLIED;
 }
@@ -1237,6 +1240,18 @@ int fx_zombielord_aura (Actor* Owner, Actor* target, Effect* fx)
 	}
 	fx->TimingMode=FX_DURATION_AFTER_EXPIRES;
 	fx->Duration=core->GetGame()->GameTime+7*15;
+
+	//build effects to apply
+	Effect * newfx1, *newfx2;
+
+	newfx1 = EffectQueue::CreateEffectCopy(fx, fx_fear_ref, 0, 0);
+	newfx1->TimingMode = FX_DURATION_INSTANT_LIMITED;
+	newfx1->Duration = fx->Parameter1;
+
+	newfx2 = EffectQueue::CreateEffectCopy(fx, fx_immunity_resource_ref, 0, 0);
+	newfx2->TimingMode = FX_DURATION_INSTANT_LIMITED;
+	newfx2->Duration = fx->Parameter1;
+	memcpy(newfx2->Resource, fx->Source, sizeof(newfx2->Resource) );
 
 	//collect targets and apply effect on targets
 	Map *area = target->GetCurrentArea();
@@ -1254,21 +1269,14 @@ int fx_zombielord_aura (Actor* Owner, Actor* target, Effect* fx)
 			continue;
 		}
 
-		Effect * newfx;
-		
 		//apply a panic opcode on target (0x18)
-		newfx = EffectQueue::CreateEffectCopy(fx, fx_fear_ref, 0, 0);
-		newfx->TimingMode = FX_DURATION_INSTANT_LIMITED;
-		newfx->Duration = fx->Parameter1;
-		core->ApplyEffect(newfx, Owner, victim);
+		core->ApplyEffect(newfx1, Owner, victim);
 		
 		//apply a resource resistance against this spell to block flood
-		newfx = EffectQueue::CreateEffectCopy(fx, fx_immunity_resource_ref, 0, 0);
-		newfx->TimingMode = FX_DURATION_INSTANT_LIMITED;
-		newfx->Duration = fx->Parameter1;
-		memcpy(newfx->Resource, fx->Source, sizeof(newfx->Resource) );
-		core->ApplyEffect(newfx, Owner, victim);
+		core->ApplyEffect(newfx2, Owner, victim);
 	}
+	delete newfx1;
+	delete newfx2;
 
 	return FX_APPLIED;
 }
@@ -1450,10 +1458,7 @@ int fx_cloak_of_fear(Actor* Owner, Actor* target, Effect* fx)
 		Actor *victim = area->GetActor(i,true);
 		if (target==victim) continue;
 		if (PersonalDistance(target, victim)<20) {
-			Effect *tmp = new Effect();
-			memcpy(tmp, newfx, sizeof(Effect));
-			
-			core->ApplyEffect(tmp, Owner, target);
+			core->ApplyEffect(newfx, Owner, target);
 		}
 	}
 	delete newfx;
@@ -1855,6 +1860,9 @@ int fx_mace_of_disruption (Actor* Owner, Actor* target, Effect* fx)
 	Effect *newfx = EffectQueue::CreateEffect(fx_death_ref, 0,
 			8, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, Owner, target);
+
+	delete newfx;
+
 	return FX_NOT_APPLIED;
 }
 //0x11d Sleep2 ??? power word sleep?
@@ -1959,6 +1967,9 @@ int fx_rod_of_smithing (Actor* Owner, Actor* target, Effect* fx)
 			0, FX_DURATION_INSTANT_PERMANENT);
 	}
 	core->ApplyEffect(newfx, Owner, target);
+
+	delete newfx;
+
 	return FX_NOT_APPLIED;
 }
 
@@ -2133,8 +2144,10 @@ int fx_nausea (Actor* Owner, Actor* target, Effect* fx)
 	if (!fx->Parameter3) {
 		Effect *newfx = EffectQueue::CreateEffect(fx_unconscious_state_ref,
 			fx->Parameter1, 1, fx->Duration);
-		core->ApplyEffect(newfx, Owner, target);
 		newfx->Power = fx->Power;
+		core->ApplyEffect(newfx, Owner, target);
+
+		delete newfx;
 		fx->Parameter3=1;
 	}
 	//end of unsure part
