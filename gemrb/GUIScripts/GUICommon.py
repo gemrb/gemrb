@@ -115,7 +115,7 @@ def SetupSpellLevels (pc, TableName, Type, Level):
 def UnsetupSpellLevels (pc, TableName, Type, Level):
 
 	#BG2 has no mxspldru table? (don't die on missing spell tables)
-	if !GemRB.HasResource (TableName, RES_2DA):
+	if not GemRB.HasResource (TableName, RES_2DA):
 		return
 
 	Table=GemRB.LoadTable (TableName)
