@@ -402,20 +402,22 @@ int fx_prayer (Actor* Owner, Actor* target, Effect* fx)
 
 	Map *map = target->GetCurrentArea();
 	int i = map->GetActorCount(true);
+	Effect *newfx = EffectQueue::CreateEffect(type?fx_curse_ref:fx_bless_ref, fx->Parameter1, fx->Parameter2, FX_DURATION_INSTANT_LIMITED);
+	memcpy(newfx, fx->Source,sizeof(ieResRef));
+	newfx->Duration=60;
 	while(i--) {
 		Actor *tar=map->GetActor(i,true);
 		ea = tar->GetStat(IE_EA);
 		if (ea>EA_EVILCUTOFF) type^=1;
 		else if (ea>EA_GOODCUTOFF) continue;
 		//this isn't a real perma effect, just applying the effect now
-		Effect *newfx = EffectQueue::CreateEffect(type?fx_curse_ref:fx_bless_ref, fx->Parameter1, fx->Parameter2, FX_DURATION_INSTANT_LIMITED);
-		memcpy(newfx, fx->Source,sizeof(ieResRef));
-		newfx->Duration=60;
 		//no idea how this should work with spell resistances, etc
 		//lets assume it is never resisted
-		//the effect will be destructed by ApplyEffect
+		//the effect will be destructed by ApplyEffect (not anymore)
+		//the effect is copied to a new memory area
 		core->ApplyEffect(newfx, tar, Owner);
 	}
+	delete newfx;
 	return FX_APPLIED;
 }
 
