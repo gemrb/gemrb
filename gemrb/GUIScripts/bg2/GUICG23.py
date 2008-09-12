@@ -1,43 +1,48 @@
 #character generation, biography (GUICG23)
 import GemRB
 
-ImportWindow = 0
+BioWindow = 0
+EditControl = 0
 
-def OnLoad():
-	global ImportWindow
+def OnLoad ():
+	global BioWindow, EditControl
 
-	GemRB.LoadWindowPack("GUICG", 640, 480)
-	ImportWindow = GemRB.LoadWindow(23)
+	GemRB.LoadWindowPack ("GUICG", 640, 480)
+	BioWindow = GemRB.LoadWindow (23)
 
-	TextAreaControl = GemRB.GetControl(ImportWindow, 0)
-	GemRB.SetText(ImportWindow, TextAreaControl, 53605)
+	EditControl = GemRB.GetControl (BioWindow, 3)
+	GemRB.SetText (BioWindow, EditControl, 53605)
 
-	FileButton = GemRB.GetControl(ImportWindow, 1)
-	GemRB.SetText(ImportWindow, FileButton, 53604)
+	OkButton = GemRB.GetControl (BioWindow, 1)
+	GemRB.SetText (BioWindow, OkButton, 53604)
 
-	SavedGameButton = GemRB.GetControl(ImportWindow,2)
-	GemRB.SetText(ImportWindow, SavedGameButton, 53602)
+	ClearButton = GemRB.GetControl (BioWindow,2)
+	GemRB.SetText (BioWindow, ClearButton, 53602)
 
-	CancelButton = GemRB.GetControl(ImportWindow,3)
-	GemRB.SetText(ImportWindow, CancelButton, 13727)
+	CancelButton = GemRB.GetControl (BioWindow,4)
+	GemRB.SetText (BioWindow, CancelButton, 13727)
 
-	GemRB.SetEvent(ImportWindow, FileButton, IE_GUI_BUTTON_ON_PRESS, "FilePress")
-	GemRB.SetEvent(ImportWindow, SavedGameButton, IE_GUI_BUTTON_ON_PRESS, "GamePress")
-	GemRB.SetEvent(ImportWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
-	GemRB.SetVisible(ImportWindow,1)
+	GemRB.SetEvent (BioWindow, OkButton, IE_GUI_BUTTON_ON_PRESS, "OkPress")
+	GemRB.SetEvent (BioWindow, ClearButton, IE_GUI_BUTTON_ON_PRESS, "ClearPress")
+	GemRB.SetEvent (BioWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
+	GemRB.SetVisible (BioWindow,1)
 	return
 
-def FilePress():
-	GemRB.UnloadWindow(ImportWindow)
-	GemRB.SetNextScript("ImportFile")
+def OkPress ():
+	global BioWindow, EditControl
+
+	BioData = GemRB.QueryText (BioWindow, EditControl)
+	GemRB.UnloadWindow (BioWindow)
+	GemRB.SetNextScript ("CharGen9")
+	GemRB.SetToken ("BIO", BioData)
 	return
 	
-def GamePress():
-	GemRB.UnloadWindow(ImportWindow)
-	GemRB.SetNextScript("ImportGame")
+def CancelPress ():
+	GemRB.UnloadWindow (BioWindow)
+	GemRB.SetNextScript ("CharGen9")
 	return
 
-def CancelPress():
-	GemRB.UnloadWindow(ImportWindow)
-	GemRB.SetNextScript("CharGen")
-	return
+def ClearPress ():
+        GemRB.SetToken ("BIO", "")
+        GemRB.SetText (BioWindow, EditControl, GemRB.GetToken ("BIO") )
+        return
