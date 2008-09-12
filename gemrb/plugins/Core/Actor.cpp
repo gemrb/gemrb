@@ -66,6 +66,14 @@ static char **clericspelltables = NULL;
 static char **druidspelltables = NULL;
 static char **wizardspelltables = NULL;
 static int *turnlevels = NULL;
+static int *xpbonus = NULL;
+static int xpbonustypes = -1;
+static int xpbonuslevels = -1;
+
+//xp bonus types (for xpbonus.2da)
+#define XP_LOCKPICK   0
+#define XP_DISARM     1
+#define XP_LEARNSPELL 2
 
 static int FistRows = -1;
 typedef ieResRef FistResType[MAX_LEVEL+1];
@@ -961,12 +969,18 @@ void Actor::ReleaseMemory()
 			free(turnlevels);
 			turnlevels=NULL;
 		}
+		if (xpbonus) {
+			free(xpbonus);
+			xpbonus=NULL;
+			xpbonuslevels = -1;
+			xpbonustypes = -1;
+		}
 	}
 	if (GUIBTDefaults) {
 		free (GUIBTDefaults);
 		GUIBTDefaults=NULL;
 	}
-	classcount=-1;
+	classcount = -1;
 }
 
 #define COL_HATERACE      0   //ranger type racial enemy
@@ -982,7 +996,7 @@ void Actor::ReleaseMemory()
 
 static void InitActorTables()
 {
-	int i;
+	int i, j;
 
 	if (core->HasFeature(GF_CHALLENGERATING)) {
 		sharexp=SX_DIVIDE|SX_CR;
@@ -993,10 +1007,32 @@ static void InitActorTables()
 	CheckAbilities=(bool) core->HasFeature(GF_CHECK_ABILITIES);
 	DeathOnZeroStat=(bool) core->HasFeature(GF_DEATH_ON_ZERO_STAT);
 
+	//this table lists various level based xp bonuses
+	int table = core->LoadTable( "xpbonus" );
+	TableMgr *tm = core->GetTable( table );
+
+	if (tm) {
+		xpbonustypes = tm->GetRowCount();
+		if (xpbonustypes == 0) {
+			core->DelTable( table );
+			xpbonuslevels = 0;
+		} else {
+			xpbonuslevels = tm->GetColumnCount(0);
+			xpbonus = (int *) calloc(xpbonuslevels*xpbonustypes, sizeof(int));
+			for (i = 0; i<xpbonustypes; i++) {
+				for(j = 0; j<xpbonuslevels; j++) {
+					xpbonus[i*xpbonuslevels+j] = atoi(tm->QueryField(i,j));
+				}
+			}
+		}
+	} else {
+		xpbonustypes = 0;
+		xpbonuslevels = 0;
+	}
 	//this table lists skill groups assigned to classes
 	//it is theoretically possible to create hybrid classes
-	int table = core->LoadTable( "clskills" );
-	TableMgr *tm = core->GetTable( table );
+	table = core->LoadTable( "clskills" );
+	tm = core->GetTable( table );
 	if (tm) {
 		classcount = tm->GetRowCount();
 		memset (isclass,0,sizeof(isclass));
@@ -2403,7 +2439,7 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 	if (!spell) {
 		return LSR_INVALID; //not existent spell
 	}
-	int exp = spellbook.LearnSpell(spell, flags&LS_MEMO);
+	int explev = spellbook.LearnSpell(spell, flags&LS_MEMO);
 	int tmp = spell->SpellNameIdentified;
 	if (flags&LS_LEARN) {
 		core->GetTokenDictionary()->SetAt("SPECIALABILITYNAME", core->GetString(tmp));
@@ -2420,14 +2456,14 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 		}
 	} else tmp = 0;
 	core->FreeSpell(spell, spellname, false);
-	if (!exp) {
+	if (!explev) {
 		return LSR_INVALID;
 	}
 	if (tmp) {
 		core->DisplayConstantStringName(tmp, 0xffffff, this);
 	}
 	if (flags&LS_ADDXP) {
-		AddExperience(exp);
+		AddExperience(XP_LEARNSPELL, explev);
 	}
 	return LSR_OK;
 }
@@ -2884,6 +2920,19 @@ void Actor::Heal(int days)
 void Actor::AddExperience(int exp)
 {
 	SetBase(IE_XP,BaseStats[IE_XP]+exp);
+}
+
+void Actor::AddExperience(int type, int level)
+{
+	if (type>=xpbonustypes) {
+		return;
+	}
+	unsigned int l = (unsigned int) (level - 1);
+
+	if (l>=(unsigned int) xpbonuslevels) {
+		l=xpbonuslevels-1;
+	}
+	AddExperience(xpbonus[type*xpbonuslevels+l]);
 }
 
 bool Actor::Schedule(ieDword gametime)

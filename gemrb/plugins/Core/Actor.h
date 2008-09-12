@@ -409,6 +409,8 @@ public:
 	void Heal(int days);
 	/* Receive experience (handle dual/multi class) */
 	void AddExperience(int exp);
+	/* Receive experience bonus */
+	void AddExperience(int type, int level);
 	/* Sets the modal state after checks */
 	void SetModal(ieDword newstate);
 	/* returns current attack style */

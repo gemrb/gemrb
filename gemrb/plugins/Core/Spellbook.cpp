@@ -430,7 +430,7 @@ int Spellbook::LearnSpell(Spell *spell, int memo)
 	if (!ret) {
 		delete spl;
 	}
-	return spell->SpellLevel*100;
+	return spell->SpellLevel; // return only the spell level (xp is based on xpbonus)
 }
 
 //if flg is set, it will be also memorized
