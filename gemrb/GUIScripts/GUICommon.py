@@ -21,6 +21,7 @@
 # GUICommon.py - common functions for GUIScripts of all game types
 
 import GemRB
+from ie_restype import *
 from GUIDefines import *
 
 OtherWindowFn = None
@@ -112,6 +113,11 @@ def SetupSpellLevels (pc, TableName, Type, Level):
 	return
 
 def UnsetupSpellLevels (pc, TableName, Type, Level):
+
+	#BG2 has no mxspldru table? (don't die on missing spell tables)
+	if !GemRB.HasResource (TableName, RES_2DA):
+		return
+
 	Table=GemRB.LoadTable (TableName)
 	for i in range(GemRB.GetTableColumnCount (0)):
 		GemRB.SetMemorizableSpellsCount (pc, 0, Type, i)
@@ -139,4 +145,4 @@ def CheckStat20 (Actor, Stat, Diff):
 	return False
 
 def GameIsTOB ():
-	return GemRB.HasResource ("worldm25", 0x000003F7)
+	return GemRB.HasResource ("worldm25", RES_WMP)
