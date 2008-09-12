@@ -1611,6 +1611,8 @@ int fx_set_unconscious_state (Actor* Owner, Actor* target, Effect* fx)
 
 		newfx = EffectQueue::CreateEffectCopy(fx, fx_animation_stance_ref, 0, IE_ANI_SLEEP);
 		core->ApplyEffect(newfx, target, Owner);
+
+		delete newfx;
 	}
 
 	if (fx->TimingMode==FX_DURATION_INSTANT_PERMANENT) {
@@ -3997,8 +3999,11 @@ int fx_find_familiar (Actor* Owner, Actor* target, Effect* fx)
 
 		newfx = EffectQueue::CreateEffect(fx_familiar_constitution_loss_ref, (ieDword) -10, 0, FX_DURATION_INSTANT_PERMANENT);
 		core->ApplyEffect(newfx, fam, fam);
+		delete newfx;
+
 		newfx = EffectQueue::CreateEffect(fx_familiar_marker_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
 		core->ApplyEffect(newfx, fam, fam);
+		delete newfx;
 	}
 	return FX_NOT_APPLIED;
 }
@@ -4037,9 +4042,13 @@ int fx_familiar_constitution_loss (Actor* /*Owner*/, Actor* target, Effect* fx)
 	//maximum hp (param1 is a negative value)
 	newfx = EffectQueue::CreateEffect(fx_maximum_hp_modifier_ref, fx->Parameter1, 0, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, master, master);
+	delete newfx;
+
 	//damage
 	newfx = EffectQueue::CreateEffect(fx_damage_opcode_ref, 0, 0, FX_DURATION_INSTANT_PERMANENT);
 	core->ApplyEffect(newfx, master, master);
+	delete newfx;
+
 	return FX_NOT_APPLIED;
 }
 
