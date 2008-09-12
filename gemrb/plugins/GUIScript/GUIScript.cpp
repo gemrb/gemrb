@@ -8153,8 +8153,12 @@ static PyObject* GemRB_ApplyEffect(PyObject * /*self*/, PyObject* args)
 	if (resref3) {
 		strnlwrcpy(fx->Resource3, resref3, 8);
 	}
-	//fx is freed by this function
+	//fx is freed by this function (not freed anymore)
 	core->ApplyEffect(fx, actor, actor);
+
+	//not freed, it seems, lets kill it
+	delete fx;
+
 	Py_INCREF( Py_None );
 	return Py_None;
 }
