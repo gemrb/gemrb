@@ -67,6 +67,7 @@ public:
 	void Draw(unsigned short x, unsigned short y);
 	/** Set Font */
 	void SetFont(Font* f);
+	Font *GetFont();
 	/** Set Cursor */
 	void SetCursor(Sprite2D* cur);
 	/** Set BackGround */

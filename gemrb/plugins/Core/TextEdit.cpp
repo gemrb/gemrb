@@ -84,6 +84,8 @@ void TextEdit::SetFont(Font* f)
 	printMessage("TextEdit","Invalid font set!\n", LIGHT_RED);
 }
 
+Font *TextEdit::GetFont() { return font; }
+
 /** Set Cursor */
 void TextEdit::SetCursor(Sprite2D* cur)
 {
