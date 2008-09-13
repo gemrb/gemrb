@@ -1388,7 +1388,7 @@ GameScript::~GameScript(void)
 			abort();
 		}
 		if (!res) {
-			printf("Freeing script %s because its refcount has reached 0.\n", Name);
+			//printf("Freeing script %s because its refcount has reached 0.\n", Name);
 			script->Release();
 		}
 		script = NULL;
