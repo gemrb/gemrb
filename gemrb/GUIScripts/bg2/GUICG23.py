@@ -45,6 +45,6 @@ def CancelPress ():
 	return
 
 def ClearPress ():
-        GemRB.SetToken ("BIO", "")
-        GemRB.SetText (BioWindow, EditControl, GemRB.GetToken ("BIO") )
-        return
+	GemRB.SetToken ("BIO", "")
+	GemRB.SetText (BioWindow, EditControl, GemRB.GetToken ("BIO") )
+	return
