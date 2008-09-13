@@ -11,16 +11,18 @@ def OnLoad ():
 	BioWindow = GemRB.LoadWindow (23)
 
 	EditControl = GemRB.GetControl (BioWindow, 3)
-	GemRB.SetText (BioWindow, EditControl, 53605)
+	GemRB.SetText (BioWindow, EditControl, 15882)
 
+	# done
 	OkButton = GemRB.GetControl (BioWindow, 1)
-	GemRB.SetText (BioWindow, OkButton, 53604)
+	GemRB.SetText (BioWindow, OkButton, 11973)
 
-	ClearButton = GemRB.GetControl (BioWindow,2)
-	GemRB.SetText (BioWindow, ClearButton, 53602)
+	ClearButton = GemRB.GetControl (BioWindow, 4)
+	GemRB.SetText (BioWindow, ClearButton, 34881)
 
-	CancelButton = GemRB.GetControl (BioWindow,4)
-	GemRB.SetText (BioWindow, CancelButton, 13727)
+	# back
+	CancelButton = GemRB.GetControl (BioWindow, 2)
+	GemRB.SetText (BioWindow, CancelButton, 12896)
 
 	GemRB.SetEvent (BioWindow, OkButton, IE_GUI_BUTTON_ON_PRESS, "OkPress")
 	GemRB.SetEvent (BioWindow, ClearButton, IE_GUI_BUTTON_ON_PRESS, "ClearPress")
