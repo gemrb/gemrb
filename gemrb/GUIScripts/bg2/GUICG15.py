@@ -46,9 +46,16 @@ def OnLoad():
 	if RaceCount<0:
 		RaceCount=0
 
+	TopIndex = 0
+	GemRB.SetVar("TopIndex", 0)
+	ScrollBarControl = GemRB.GetControl(RaceWindow, 1)
+	GemRB.SetVarAssoc(RaceWindow, ScrollBarControl, "TopIndex", RaceCount)
+	GemRB.SetEvent(RaceWindow, ScrollBarControl, IE_GUI_SCROLLBAR_ON_CHANGE, "DisplayRaces")
+
 	for i in range(LISTSIZE):
 		Button = GemRB.GetControl(RaceWindow,i+6)
 		GemRB.SetButtonFlags(RaceWindow,Button,IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
+		GemRB.AttachScrollBar (RaceWindow, Button, ScrollBarControl)
 
 	GemRB.SetVar("HateRace",0)
 
@@ -61,11 +68,6 @@ def OnLoad():
 
 	TextAreaControl = GemRB.GetControl(RaceWindow, 2)
 	GemRB.SetText(RaceWindow,TextAreaControl,17256)
-	TopIndex = 0
-	GemRB.SetVar("TopIndex",0)
-	ScrollBarControl = GemRB.GetControl(RaceWindow, 1)
-	GemRB.SetVarAssoc(RaceWindow, ScrollBarControl, "TopIndex",RaceCount)
-	GemRB.SetEvent(RaceWindow, ScrollBarControl, IE_GUI_SCROLLBAR_ON_CHANGE, "DisplayRaces")
 
 	GemRB.SetEvent(RaceWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	GemRB.SetEvent(RaceWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
