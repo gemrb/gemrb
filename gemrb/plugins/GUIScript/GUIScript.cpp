@@ -3972,7 +3972,7 @@ static PyObject* GemRB_GetJournalEntry(PyObject * /*self*/, PyObject * args)
 		if ((section == je->Section) && (chapter == je->Chapter)) {
 			if (index == count) {
 				PyObject* dict = PyDict_New();
-				PyDict_SetItemString(dict, "Text", PyInt_FromLong (je->Text));
+				PyDict_SetItemString(dict, "Text", PyInt_FromLong ((signed) je->Text));
 				PyDict_SetItemString(dict, "GameTime", PyInt_FromLong (je->GameTime));
 				PyDict_SetItemString(dict, "Section", PyInt_FromLong (je->Section));
 				PyDict_SetItemString(dict, "Chapter", PyInt_FromLong (je->Chapter));
@@ -4288,7 +4288,7 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 	PyObject* dict = PyDict_New();
 	PCStatsStruct* ps = MyActor->PCStats;
 
-	PyDict_SetItemString(dict, "BestKilledName", PyInt_FromLong (ps->BestKilledName));
+	PyDict_SetItemString(dict, "BestKilledName", PyInt_FromLong ((signed) ps->BestKilledName));
 	PyDict_SetItemString(dict, "BestKilledXP", PyInt_FromLong (ps->BestKilledXP));
 	PyDict_SetItemString(dict, "AwayTime", PyInt_FromLong (ps->AwayTime));
 	PyDict_SetItemString(dict, "JoinDate", PyInt_FromLong (ps->JoinDate));
@@ -4312,7 +4312,7 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 			return NULL;
 		}
 
-		PyDict_SetItemString(dict, "FavouriteSpell", PyInt_FromLong (spell->SpellName));
+		PyDict_SetItemString(dict, "FavouriteSpell", PyInt_FromLong ((signed) spell->SpellName));
 
 		core->FreeSpell( spell, ps->FavouriteSpells[largest], false );
 	} else {
@@ -4336,7 +4336,7 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 			return NULL;
 		}
 
-		PyDict_SetItemString(dict, "FavouriteWeapon", PyInt_FromLong (item->GetItemName(false)));
+		PyDict_SetItemString(dict, "FavouriteWeapon", PyInt_FromLong ((signed) item->GetItemName(false)));
 
 		core->FreeItem( item, ps->FavouriteWeapons[largest], false );
 	} else {
@@ -4995,8 +4995,8 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 	Item *item = core->GetItem( ci->ItemResRef );
 
 	int identified = !(ci->Flags & IE_INV_ITEM_IDENTIFIED);
-	PyDict_SetItemString(dict, "ItemName", PyInt_FromLong( item->GetItemName( (bool) identified )) );
-	PyDict_SetItemString(dict, "ItemDesc", PyInt_FromLong( item->GetItemDesc( (bool) identified )) );
+	PyDict_SetItemString(dict, "ItemName", PyInt_FromLong( (signed) item->GetItemName( (bool) identified )) );
+	PyDict_SetItemString(dict, "ItemDesc", PyInt_FromLong( (signed) item->GetItemDesc( (bool) identified )) );
 	core->FreeItem( item, ci->ItemResRef, false );
 	return dict;
 }
@@ -5164,7 +5164,7 @@ static PyObject* GemRB_GetStore(PyObject * /*self*/, PyObject* args)
 	}
 	PyObject* dict = PyDict_New();
 	PyDict_SetItemString(dict, "StoreType", PyInt_FromLong( store->Type ));
-	PyDict_SetItemString(dict, "StoreName", PyInt_FromLong( store->StoreName ));
+	PyDict_SetItemString(dict, "StoreName", PyInt_FromLong( (signed) store->StoreName ));
 	PyDict_SetItemString(dict, "StoreDrinkCount", PyInt_FromLong( store->DrinksCount ));
 	PyDict_SetItemString(dict, "StoreCureCount", PyInt_FromLong( store->CuresCount ));
 	PyDict_SetItemString(dict, "StoreItemCount", PyInt_FromLong( store->GetRealStockSize() ));
@@ -5486,8 +5486,8 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	int identified = !!(si->Flags & IE_INV_ITEM_IDENTIFIED);
-	PyDict_SetItemString(dict, "ItemName", PyInt_FromLong( item->GetItemName( (bool) identified )) );
-	PyDict_SetItemString(dict, "ItemDesc", PyInt_FromLong( item->GetItemDesc( (bool) identified )) );
+	PyDict_SetItemString(dict, "ItemName", PyInt_FromLong( (signed) item->GetItemName( (bool) identified )) );
+	PyDict_SetItemString(dict, "ItemDesc", PyInt_FromLong( (signed) item->GetItemDesc( (bool) identified )) );
 
 	int price = item->Price * store->SellMarkup / 100;
 	//calculate depreciation too
@@ -5527,7 +5527,7 @@ static PyObject* GemRB_GetStoreDrink(PyObject * /*self*/, PyObject* args)
 	}
 	PyObject* dict = PyDict_New();
 	STODrink *drink=store->GetDrink(index);
-	PyDict_SetItemString(dict, "DrinkName", PyInt_FromLong( drink->DrinkName ));
+	PyDict_SetItemString(dict, "DrinkName", PyInt_FromLong( (signed) drink->DrinkName ));
 	PyDict_SetItemString(dict, "Price", PyInt_FromLong( drink->Price ));
 	PyDict_SetItemString(dict, "Strength", PyInt_FromLong( drink->Strength ));
 	return dict;
@@ -5670,7 +5670,7 @@ static PyObject* GemRB_GetStoreCure(PyObject * /*self*/, PyObject* args)
 	STOCure *cure=store->GetCure(index);
 	PyDict_SetItemString(dict, "CureResRef", PyString_FromResRef( cure->CureResRef ));
 	PyDict_SetItemString(dict, "Price", PyInt_FromLong( cure->Price ));
-	PyDict_SetItemString(dict, "Description", PyInt_FromLong( GetSpellDesc(cure->CureResRef) ) );
+	PyDict_SetItemString(dict, "Description", PyInt_FromLong( (signed) GetSpellDesc(cure->CureResRef) ) );
 	return dict;
 }
 
@@ -6003,8 +6003,8 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 	}
 
 	PyObject* dict = PyDict_New();
-	PyDict_SetItemString(dict, "SpellName", PyInt_FromLong (spell->SpellName));
-	PyDict_SetItemString(dict, "SpellDesc", PyInt_FromLong (spell->SpellDesc));
+	PyDict_SetItemString(dict, "SpellName", PyInt_FromLong ((signed) spell->SpellName));
+	PyDict_SetItemString(dict, "SpellDesc", PyInt_FromLong ((signed) spell->SpellDesc));
 	PyDict_SetItemString(dict, "SpellbookIcon", PyString_FromResRef (spell->SpellbookIcon));
 	PyDict_SetItemString(dict, "SpellExclusion", PyInt_FromLong (spell->ExclusionSchool)); //this will list school exclusions and alignment
 	PyDict_SetItemString(dict, "SpellDivine", PyInt_FromLong (spell->PriestType)); //this will tell apart a priest spell from a druid spell
@@ -6320,16 +6320,16 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 	}
 
 	PyObject* dict = PyDict_New();
-	PyDict_SetItemString(dict, "ItemName", PyInt_FromLong (item->GetItemName(false)));
-	PyDict_SetItemString(dict, "ItemNameIdentified", PyInt_FromLong (item->GetItemName(true)));
-	PyDict_SetItemString(dict, "ItemDesc", PyInt_FromLong (item->GetItemDesc(false)));
-	PyDict_SetItemString(dict, "ItemDescIdentified", PyInt_FromLong (item->GetItemDesc(true)));
+	PyDict_SetItemString(dict, "ItemName", PyInt_FromLong ((signed) item->GetItemName(false)));
+	PyDict_SetItemString(dict, "ItemNameIdentified", PyInt_FromLong ((signed) item->GetItemName(true)));
+	PyDict_SetItemString(dict, "ItemDesc", PyInt_FromLong ((signed) item->GetItemDesc(false)));
+	PyDict_SetItemString(dict, "ItemDescIdentified", PyInt_FromLong ((signed)item->GetItemDesc(true)));
 	PyDict_SetItemString(dict, "ItemIcon", PyString_FromResRef (item->ItemIcon));
 	PyDict_SetItemString(dict, "DescIcon", PyString_FromResRef (item->DescriptionIcon));
 	PyDict_SetItemString(dict, "BrokenItem", PyString_FromResRef (item->ReplacementItem));
 	PyDict_SetItemString(dict, "StackAmount", PyInt_FromLong (item->StackAmount));
 	PyDict_SetItemString(dict, "Dialog", PyString_FromResRef (item->Dialog));
-	PyDict_SetItemString(dict, "DialogName", PyInt_FromLong (item->DialogName));
+	PyDict_SetItemString(dict, "DialogName", PyInt_FromLong ((signed)item->DialogName));
 	PyDict_SetItemString(dict, "Price", PyInt_FromLong (item->Price));
 	PyDict_SetItemString(dict, "Type", PyInt_FromLong (item->ItemType));
 	PyDict_SetItemString(dict, "AnimationType", PyString_FromAnimID(item->AnimationType));
