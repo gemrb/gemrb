@@ -1988,7 +1988,7 @@ static PyObject* GemRB_ConvertEdit(PyObject * /*self*/, PyObject* args)
 		return RuntimeError("Cannot find window!");
 	}
 
-	Control *ctrl = GetControl(WindowIndex, ControlIndex, IE_GUI_EDIT);
+	TextEdit *ctrl = (TextEdit *) GetControl(WindowIndex, ControlIndex, IE_GUI_EDIT);
 	if (!ctrl) {
 		return NULL;
 	}
@@ -2000,11 +2000,16 @@ static PyObject* GemRB_ConvertEdit(PyObject * /*self*/, PyObject* args)
 	ta->ControlID = ctrl->ControlID;
 	ta->ControlType = IE_GUI_TEXTAREA;
 	ta->Owner = win;
+	ta->SetFonts (ctrl->GetFont(), ctrl->GetFont() );
 	win->AddControl( ta );
+	win->Link( ScrollBarID, ( unsigned short ) ta->ControlID );
 
-	win->DelControl ( ControlIndex );
-	Py_INCREF( Py_None );
-	return Py_None;
+	int ret = core->GetControl( WindowIndex, ta->ControlID );
+
+	if (ret<0) {
+		return NULL;
+	}
+	return PyInt_FromLong( ret );
 }
 
 PyDoc_STRVAR( GemRB_SetButtonSprites__doc,
