@@ -11,7 +11,11 @@ def OnLoad ():
 	BioWindow = GemRB.LoadWindow (23)
 
 	EditControl = GemRB.GetControl (BioWindow, 3)
-	GemRB.CreateTextEdit(BioWindow, 3, 29, 73, 567, 195, "NORMAL", GemRB.GetString(15882))
+	bio = GemRB.GetToken("BIO")
+	if bio:
+		GemRB.CreateTextEdit(BioWindow, 3, 29, 73, 567, 195, "NORMAL", bio)
+	else:
+		GemRB.CreateTextEdit(BioWindow, 3, 29, 73, 567, 195, "NORMAL", GemRB.GetString(15882))
 
 	# done
 	OkButton = GemRB.GetControl (BioWindow, 1)
@@ -45,6 +49,5 @@ def CancelPress ():
 	return
 
 def ClearPress ():
-	GemRB.SetToken ("BIO", "")
-	GemRB.SetText (BioWindow, EditControl, GemRB.GetToken ("BIO") )
+	GemRB.SetText (BioWindow, EditControl, "")
 	return
