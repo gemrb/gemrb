@@ -11,11 +11,14 @@ def OnLoad ():
 	BioWindow = GemRB.LoadWindow (23)
 
 	EditControl = GemRB.GetControl (BioWindow, 3)
-	bio = GemRB.GetToken("BIO")
-	if bio:
-		GemRB.CreateTextEdit(BioWindow, 3, 29, 73, 567, 195, "NORMAL", bio)
+	BIO = GemRB.GetToken("BIO")
+	GemRB.ConvertEdit (BioWindow, EditControl, 5)
+
+	#EditControl = GemRB.GetControl (BioWindow, 3) #get the new index
+	if BIO:
+		#GemRB.SetText (BioWindow, EditControl, BIO)
 	else:
-		GemRB.CreateTextEdit(BioWindow, 3, 29, 73, 567, 195, "NORMAL", GemRB.GetString(15882))
+		#GemRB.SetText (BioWindow, EditControl, 15882)
 
 	# done
 	OkButton = GemRB.GetControl (BioWindow, 1)
