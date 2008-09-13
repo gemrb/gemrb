@@ -11,7 +11,7 @@ def OnLoad ():
 	BioWindow = GemRB.LoadWindow (23)
 
 	EditControl = GemRB.GetControl (BioWindow, 3)
-	GemRB.SetText (BioWindow, EditControl, 15882)
+	GemRB.CreateTextEdit(BioWindow, 3, 29, 73, 567, 195, "NORMAL", GemRB.GetString(15882))
 
 	# done
 	OkButton = GemRB.GetControl (BioWindow, 1)
