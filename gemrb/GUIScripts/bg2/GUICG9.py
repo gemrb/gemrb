@@ -98,10 +98,22 @@ def OnLoad():
 	RowCount = GemRB.GetTableRowCount(SkillTable)-7  #we decrease it with the bg1 skills
 	SkillWindow = GemRB.LoadWindow(9)
 
+	GemRB.SetVar("TopIndex",0)
+	ScrollBarControl = GemRB.GetControl(SkillWindow, 78)
+	GemRB.SetEvent(SkillWindow, ScrollBarControl, IE_GUI_SCROLLBAR_ON_CHANGE, "ScrollBarPress")
+	ProfCount = RowCount - 8 # decrease it with the number of controls
+	# decrease it with the number of invalid proficiencies
+	for i in range(RowCount):
+		SkillName = GemRB.GetTableValue (SkillTable, i+8, 1)
+		if SkillName == -1:
+			ProfCount -= 1
+	GemRB.SetVarAssoc (SkillWindow, ScrollBarControl, "TopIndex", ProfCount)
+
 	for i in range(8):
 		Button=GemRB.GetControl(SkillWindow, i+69)
 		GemRB.SetVarAssoc(SkillWindow, Button, "Prof", i)
 		GemRB.SetEvent(SkillWindow, Button, IE_GUI_BUTTON_ON_PRESS, "JustPress")
+		GemRB.AttachScrollBar (SkillWindow, Button, ScrollBarControl)
 
 		Button=GemRB.GetControl(SkillWindow, i*2+11)
 		GemRB.SetVarAssoc(SkillWindow, Button, "Prof", i)
@@ -113,7 +125,8 @@ def OnLoad():
 
 		for j in range(5):
 			Star=GemRB.GetControl(SkillWindow, i*5+j+27)
-			GemRB.SetButtonState(SkillWindow, Star, IE_GUI_BUTTON_DISABLED)
+			#GemRB.SetButtonState(SkillWindow, Star, IE_GUI_BUTTON_DISABLED)
+			GemRB.AttachScrollBar (SkillWindow, Star, ScrollBarControl)
 
 	BackButton = GemRB.GetControl(SkillWindow,77)
 	GemRB.SetText(SkillWindow,BackButton,15416)
@@ -123,17 +136,6 @@ def OnLoad():
 
 	TextAreaControl = GemRB.GetControl(SkillWindow, 68)
 	GemRB.SetText(SkillWindow,TextAreaControl,9588)
-
-	GemRB.SetVar("TopIndex",0)
-	ScrollBarControl = GemRB.GetControl(SkillWindow, 78)
-	GemRB.SetEvent(SkillWindow, ScrollBarControl, IE_GUI_SCROLLBAR_ON_CHANGE, "ScrollBarPress")
-	ProfCount = RowCount - 8 # decrease it with the number of controls
-	# decrease it with the number of invalid proficiencies
-	for i in range(RowCount):
-		SkillName = GemRB.GetTableValue (SkillTable, i+8, 1)
-		if SkillName == -1:
-			ProfCount -= 1
-	GemRB.SetVarAssoc (SkillWindow, ScrollBarControl, "TopIndex", ProfCount)
 
 	GemRB.SetEvent(SkillWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	GemRB.SetEvent(SkillWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
