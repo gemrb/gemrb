@@ -3130,18 +3130,21 @@ static PyObject* GemRB_SetAnimation(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_PlaySound__doc,
-"PlaySound(SoundResource)\n\n"
+"PlaySound(SoundResource, xpos, ypos, type)\n\n"
 "Plays a Sound." );
 
 static PyObject* GemRB_PlaySound(PyObject * /*self*/, PyObject* args)
 {
 	const char *ResRef;
+	int xpos = 0;
+	int ypos = 0;
+	unsigned int flags = 1; //GEM_SND_RELATIVE
 
-	if (!PyArg_ParseTuple( args, "s", &ResRef )) {
+	if (!PyArg_ParseTuple( args, "s|iii", &ResRef, &xpos, &ypos, &flags )) {
 		return AttributeError( GemRB_PlaySound__doc );
 	}
 
-	int ret = core->GetAudioDrv()->Play( ResRef );
+	int ret = core->GetAudioDrv()->Play( ResRef, xpos, ypos, flags );
 	if (!ret) {
 		return NULL;
 	}

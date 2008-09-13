@@ -54,7 +54,8 @@ def PlayPress():
 	# SClassID.h -> IE_WAV_CLASS_ID = 0x00000004
 	while (not GemRB.HasResource (CharSound + SoundSequence[SoundIndex], 0x00000004)):
 		NextSound()
-	GemRB.PlaySound (CharSound + SoundSequence[SoundIndex])
+	# play the sound like it was a speech, so any previous yells are quieted
+	GemRB.PlaySound (CharSound + SoundSequence[SoundIndex], 0, 0, 4)
 	NextSound()
 	return
 
