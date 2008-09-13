@@ -1798,7 +1798,7 @@ static PyObject* GemRB_CreateWindow(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_CreateLabelOnButton__doc,
-"CreateLabel(WindowIndex, ControlIndex, NewControlID, font, text, align)"
+"CreateLabelOnButton(WindowIndex, ControlIndex, NewControlID, font, text, align)"
 "Creates a label on top of a button, copying the button's size and position." );
 
 static PyObject* GemRB_CreateLabelOnButton(PyObject * /*self*/, PyObject* args)
@@ -1962,6 +1962,47 @@ static PyObject* GemRB_CreateButton(PyObject * /*self*/, PyObject* args)
 	btn->Owner = win;
 	win->AddControl( btn );
 
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+
+PyDoc_STRVAR( GemRB_ConvertEdit__doc,
+"ConvertEdit(WindowIndex, ControlIndex, ScrollBarID) => ControlIndex\n\n"
+"Converts a simple Edit Control to a TextArea, keeping its ControlID." );
+
+static PyObject* GemRB_ConvertEdit(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex;
+	Color fore={255,255,255,0};
+	Color init={255,255,255,0};
+	Color back={0,0,0,0};
+	int ScrollBarID=0;
+
+	if (!PyArg_ParseTuple( args, "ii|i", &WindowIndex, &ControlIndex, &ScrollBarID)) {
+		return AttributeError( GemRB_ConvertEdit__doc );
+	}
+
+	Window* win = core->GetWindow( WindowIndex );
+	if (win == NULL) {
+		return RuntimeError("Cannot find window!");
+	}
+
+	Control *ctrl = GetControl(WindowIndex, ControlIndex, IE_GUI_EDIT);
+	if (!ctrl) {
+		return NULL;
+	}
+	TextArea* ta = new TextArea( fore, init, back );
+	ta->XPos = ctrl->XPos;
+	ta->YPos = ctrl->YPos;
+	ta->Width = ctrl->Width;
+	ta->Height = ctrl->Height;
+	ta->ControlID = ctrl->ControlID;
+	ta->ControlType = IE_GUI_TEXTAREA;
+	ta->Owner = win;
+	win->AddControl( ta );
+
+	win->DelControl ( ControlIndex );
 	Py_INCREF( Py_None );
 	return Py_None;
 }
@@ -8370,6 +8411,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetLabelTextColor, METH_VARARGS),
 	METHOD(CreateTextEdit, METH_VARARGS),
 	METHOD(CreateButton, METH_VARARGS),
+	METHOD(ConvertEdit, METH_VARARGS),
 	METHOD(SetButtonSprites, METH_VARARGS),
 	METHOD(SetButtonBorder, METH_VARARGS),
 	METHOD(EnableButtonBorder, METH_VARARGS),
