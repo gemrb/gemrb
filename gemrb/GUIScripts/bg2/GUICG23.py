@@ -13,6 +13,7 @@ def OnLoad ():
 	EditControl = GemRB.GetControl (BioWindow, 3)
 	BIO = GemRB.GetToken("BIO")
 	EditControl = GemRB.ConvertEdit (BioWindow, EditControl, 5)
+	GemRB.SetVarAssoc (BioWindow, EditControl, "row", 0)
 	if BIO:
 		GemRB.SetText (BioWindow, EditControl, BIO)
 	else:
@@ -38,7 +39,22 @@ def OnLoad ():
 def OkPress ():
 	global BioWindow, EditControl
 
-	BioData = GemRB.QueryText (BioWindow, EditControl)
+	row = 0
+	line = None
+	BioData = ""
+
+	#there is no way to get the entire TextArea content
+	#this hack retrieves the TextArea content row by row
+	#there is no way to know how much data is in the TextArea
+	while 1:
+		GemRB.SetVar ("row", row)
+		GemRB.SetVarAssoc (BioWindow, EditControl, "row", row)
+		line = GemRB.QueryText (BioWindow, EditControl)
+		if len(line)<=0:
+			break
+		BioData += line+"\n"
+		row += 1
+	
 	GemRB.UnloadWindow (BioWindow)
 	GemRB.SetNextScript ("CharGen9")
 	GemRB.SetToken ("BIO", BioData)
