@@ -80,7 +80,7 @@ def DummyWindow ():
 ###################################################
 def OpenOptionsWindow ():
 	"""Open main options window"""
-	global GameOptionsWindow, OptionsWindow, PortraitWindow
+	global GameOptionsWindow, OptionsWindow
 	global OldOptionsWindow
 
 	if CloseOtherWindow(OpenOptionsWindow):
@@ -142,7 +142,7 @@ def OpenOptionsWindow ():
 
 	GemRB.SetVisible (OptionsWindow, 1)
 	GemRB.SetVisible (Window, 1)
-	GemRB.SetVisible (PortraitWindow, 1)
+	GemRB.SetVisible (GUICommonWindows.PortraitWindow, 1)
 	return
 
 
@@ -535,7 +535,7 @@ def CloseLoadMsgWindow ():
 
 	GemRB.UnloadWindow (LoadMsgWindow)
 	LoadMsgWindow = None
-	GemRB.SetVisible (OptionsWindow, 1)
+	#GemRB.SetVisible (OptionsWindow, 1)
 	return
 
 def LoadGamePress ():

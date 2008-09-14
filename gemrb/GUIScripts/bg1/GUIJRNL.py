@@ -39,7 +39,7 @@ StartYear = 0
 ###################################################
 def OpenJournalWindow ():
 	global StartTime, StartYear
-	global JournalWindow, OptionsWindow, PortraitWindow
+	global JournalWindow, OptionsWindow
 	global OldOptionsWindow
 
 	Table = GemRB.LoadTable("YEARS")
@@ -87,7 +87,7 @@ def OpenJournalWindow ():
 	
 	GemRB.SetVisible (OptionsWindow, 1)
 	GemRB.SetVisible (Window, 1)
-	GemRB.SetVisible (PortraitWindow, 1)
+	GemRB.SetVisible (GUICommonWindows.PortraitWindow, 1)
 
 
 ###################################################

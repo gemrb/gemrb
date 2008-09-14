@@ -38,7 +38,7 @@ OldOptionsWindow = None
 
 
 def OpenPriestWindow ():
-	global PriestWindow, PortraitWindow, OptionsWindow
+	global PriestWindow, OptionsWindow
 	global OldOptionsWindow
 
 
@@ -99,7 +99,7 @@ def OpenPriestWindow ():
 
 	GemRB.SetVisible (OptionsWindow, 1)
 	GemRB.SetVisible (Window, 1)
-	GemRB.SetVisible (PortraitWindow, 1)
+	GemRB.SetVisible (GUICommonWindows.PortraitWindow, 1)
 	return
 
 

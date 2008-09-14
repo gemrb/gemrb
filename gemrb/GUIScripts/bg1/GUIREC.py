@@ -36,10 +36,11 @@ RecordsWindow = None
 InformationWindow = None
 BiographyWindow = None
 OldOptionsWindow = None
+OptionsWindow = None
 
 ###################################################
 def OpenRecordsWindow ():
-	global RecordsWindow, OptionsWindow, PortraitWindow
+	global RecordsWindow, OptionsWindow
 	global OldOptionsWindow
 
 	if CloseOtherWindow (OpenRecordsWindow):
@@ -107,7 +108,7 @@ def OpenRecordsWindow ():
 
 	GemRB.SetVisible (OptionsWindow, 1)
 	GemRB.SetVisible (Window, 1)
-	GemRB.SetVisible (PortraitWindow, 1)
+	GemRB.SetVisible (GUICommonWindows.PortraitWindow, 1)
 	return
 
 def GetNextLevelExp (Level, Class):
@@ -470,7 +471,7 @@ def CloseInformationWindow ():
 	InformationWindow = None
 	GemRB.SetVisible (OptionsWindow, 1)
 	GemRB.SetVisible (RecordsWindow, 1)
-	GemRB.SetVisible (PortraitWindow, 1)
+	GemRB.SetVisible (GUICommonWindows.PortraitWindow, 1)
 	return
 
 def OpenBiographyWindow ():

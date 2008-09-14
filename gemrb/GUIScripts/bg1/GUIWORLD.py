@@ -25,6 +25,7 @@
 
 import GemRB
 from GUIDefines import *
+from ie_restype import *
 from GUICommon import CloseOtherWindow
 from GUICommonWindows import *
 
@@ -504,13 +505,16 @@ def LoadPress():
 	return
 
 def GetWindowPack():
+	ret = "GUIW"
 	width = GemRB.GetSystemVariable (SV_WIDTH)
 	if width == 800:
-		return "GUIW08"
+		ret = "GUIW08"
 	if width == 1024:
-		return "GUIW10"
+		ret = "GUIW10"
 	if width == 1280:
-		return "GUIW12"
+		ret = "GUIW12"
+	if GemRB.HasResource (ret, RES_CHU):
+		return ret
 	#default
 	return "GUIW"
 

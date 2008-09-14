@@ -59,7 +59,7 @@ def RevealMap ():
 # for farsight effect
 ###################################################
 def ShowMap ():
-	global MapWindow, OptionsWindow, PortraitWindow
+	global MapWindow, OptionsWindow
 	global OldOptionsWindow
 
 	if CloseOtherWindow (ShowMap):
@@ -97,7 +97,7 @@ def ShowMap ():
 	Map = GemRB.GetControl (Window, 2)
 	GemRB.SetEvent (Window, Map, IE_GUI_MAP_ON_PRESS, "RevealMap")
 	GemRB.SetVisible (Window, 1)
-	GemRB.SetVisible (PortraitWindow, 2)
+	GemRB.SetVisible (GUICommonWindows.PortraitWindow, 2)
 	GemRB.SetVisible (OptionsWindow, 3)
 	GemRB.SetVisible (Window, 3)
 	GemRB.SetControlStatus(Window, Map, IE_GUI_CONTROL_FOCUSED)

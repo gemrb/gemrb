@@ -35,7 +35,7 @@ from GUICommon import CheckStat100
 StoreWindow = None
 MessageWindow = None
 ActionWindow = None
-PortraitWindow = None
+#PortraitWindow = None
 StoreShoppingWindow = None
 StoreIdentifyWindow = None
 StoreStealWindow = None
@@ -43,7 +43,7 @@ StoreDonateWindow = None
 StoreHealWindow = None
 StoreRumourWindow = None
 StoreRentWindow = None
-OldPortraitWindow = None
+#OldPortraitWindow = None
 RentConfirmWindow = None
 LeftButton = None
 RightButton = None
@@ -93,17 +93,17 @@ def CloseWindows ():
 
 
 def CloseStoreWindow ():
-	global StoreWindow, ActionWindow, PortraitWindow
-	global OldPortraitWindow
+	global StoreWindow, ActionWindow #, PortraitWindow
+	#global OldPortraitWindow
 
 	GemRB.SetVar ("Inventory", 0)
 	CloseWindows ()
 	GemRB.UnloadWindow (StoreWindow)
 	GemRB.UnloadWindow (ActionWindow)
-	GemRB.UnloadWindow (PortraitWindow)
+	#GemRB.UnloadWindow (PortraitWindow)
 	StoreWindow = None
 	GemRB.LeaveStore ()
-	GUICommonWindows.PortraitWindow = OldPortraitWindow
+	#GUICommonWindows.PortraitWindow = OldPortraitWindow
 	if Inventory:
 		GemRB.RunEventHandler("OpenInventoryWindow")
 	else:
@@ -114,8 +114,8 @@ def CloseStoreWindow ():
 
 def OpenStoreWindow ():
 	global Store
-	global StoreWindow, ActionWindow, PortraitWindow
-	global OldPortraitWindow
+	global StoreWindow, ActionWindow #, PortraitWindow
+	#global OldPortraitWindow
 	global store_update_funcs
 	global Inventory
 
@@ -138,8 +138,8 @@ def OpenStoreWindow ():
 	GemRB.LoadWindowPack ("GUISTORE", 640, 480)
 	StoreWindow = Window = GemRB.LoadWindow (3)
 	#saving the original portrait window
-	OldPortraitWindow = GUICommonWindows.PortraitWindow
-	PortraitWindow = OpenPortraitWindow (0)
+	#OldPortraitWindow = GUICommonWindows.PortraitWindow
+	#PortraitWindow = OpenPortraitWindow (0)
 	ActionWindow = GemRB.LoadWindow (0)
 	#this window is static and grey, but good to stick the frame onto
 	GemRB.SetWindowFrame (ActionWindow)
@@ -177,7 +177,7 @@ def OpenStoreWindow ():
 	GemRB.SetVisible (ActionWindow, 1)
 	GemRB.SetVisible (Window, 1)
 	store_update_funcs[store_buttons[0]] ()
-	GemRB.SetVisible (PortraitWindow, 1)
+	GemRB.SetVisible (GUICommonWindows.PortraitWindow, 1)
 
 
 def OpenStoreShoppingWindow ():
@@ -196,16 +196,26 @@ def OpenStoreShoppingWindow ():
 	Label = GemRB.GetControl (Window, 0x1000002c)
 	GemRB.SetText (Window, Label, "0")
 
+	# left scrollbar
+	ScrollBarLeft = GemRB.GetControl (Window, 11)
+	GemRB.SetEvent (Window, ScrollBarLeft, IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawStoreShoppingWindow")
+
+	# right scrollbar
+	ScrollBarRight = GemRB.GetControl (Window, 12)
+	GemRB.SetEvent (Window, ScrollBarRight, IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawStoreShoppingWindow")
+
 	for i in range(4):
 		Button = GemRB.GetControl (Window, i+5)
 		GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,32,32,192,128,0,1)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectBuy")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "InfoLeftWindow")
+		GemRB.AttachScrollBar(Window, Button, ScrollBarLeft)
 
 		Button = GemRB.GetControl (Window, i+13)
 		GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,32,32,192,128,0,1)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectSell")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "InfoRightWindow")
+		GemRB.AttachScrollBar(Window, Button, ScrollBarRight)
 
 	# Buy
 	LeftButton = Button = GemRB.GetControl (Window, 2)
@@ -229,14 +239,6 @@ def OpenStoreShoppingWindow ():
 	# encumbrance
 	Label = GemRB.CreateLabel (Window, 0x10000043, 15,325,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
 	Label = GemRB.CreateLabel (Window, 0x10000044, 15,365,80,15,"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_TOP)
-
-	# left scrollbar
-	ScrollBar = GemRB.GetControl (Window, 11)
-	GemRB.SetEvent (Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawStoreShoppingWindow")
-
-	# right scrollbar
-	ScrollBar = GemRB.GetControl (Window, 12)
-	GemRB.SetEvent (Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawStoreShoppingWindow")
 
 	SetSelectionChangeHandler( UpdateStoreShoppingWindow )
 	UpdateStoreShoppingWindow ()
@@ -263,15 +265,16 @@ def OpenStoreIdentifyWindow ():
 	Label = GemRB.GetControl (Window, 0x10000003)
 	GemRB.SetText (Window, Label, "0")
 
+	ScrollBar = GemRB.GetControl (Window, 7)
+	GemRB.SetEvent (Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawStoreIdentifyWindow")
+
 	# 8-11 item slots, 0x1000000c-f labels
 	for i in range(4):
 		Button = GemRB.GetControl (Window, i+8)
 		GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,32,32,192,128,0,1)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "RedrawStoreIdentifyWindow")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "InfoIdentifyWindow")
-
-	ScrollBar = GemRB.GetControl (Window, 7)
-	GemRB.SetEvent (Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawStoreIdentifyWindow")
+		GemRB.AttachScrollBar(Window, Button, ScrollBar)
 
 	SetSelectionChangeHandler( UpdateStoreIdentifyWindow )
 	UpdateStoreIdentifyWindow ()
@@ -289,14 +292,24 @@ def OpenStoreStealWindow ():
 
 	StoreStealWindow = Window = GemRB.LoadWindow (6)
 
+	# left scrollbar
+	ScrollBarLeft = GemRB.GetControl (Window, 9)
+	GemRB.SetEvent (Window, ScrollBarLeft, IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawStoreStealWindow")
+
+	# right scrollbar
+	ScrollBarRight = GemRB.GetControl (Window, 10)
+	GemRB.SetEvent (Window, ScrollBarRight, IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawStoreStealWindow")
+
 	for i in range(4):
 		Button = GemRB.GetControl (Window, i+4)
 		GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,32,32,192,128,0,1)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "RedrawStoreStealWindow")
+		GemRB.AttachScrollBar(Window, Button, ScrollBarLeft)
 
 		Button = GemRB.GetControl (Window, i+11)
 		GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,32,32,192,128,0,1)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "InfoRightWindow")
+		GemRB.AttachScrollBar(Window, Button, ScrollBarRight)
 
 	# Steal
 	LeftButton = Button = GemRB.GetControl (Window, 1)
@@ -309,14 +322,6 @@ def OpenStoreStealWindow ():
 	# encumbrance
 	Label = GemRB.CreateLabel (Window, 0x10000043, 15,325,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
 	Label = GemRB.CreateLabel (Window, 0x10000044, 15,365,80,15,"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_TOP)
-
-	# left scrollbar
-	ScrollBar = GemRB.GetControl (Window, 9)
-	GemRB.SetEvent (Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawStoreStealWindow")
-
-	# right scrollbar
-	ScrollBar = GemRB.GetControl (Window, 10)
-	GemRB.SetEvent (Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "RedrawStoreStealWindow")
 
 	SetSelectionChangeHandler( UpdateStoreStealWindow )
 	UpdateStoreStealWindow ()
@@ -368,12 +373,16 @@ def OpenStoreHealWindow ():
 
 	StoreHealWindow = Window = GemRB.LoadWindow (5)
 
+	ScrollBar = GemRB.GetControl (Window, 7)
+	GemRB.SetEvent (Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "UpdateStoreHealWindow")
+
 	#spell buttons
 	for i in range(4):
 		Button = GemRB.GetControl (Window, i+8)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "UpdateStoreHealWindow")
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "InfoHealWindow")
+		GemRB.AttachScrollBar(Window, Button, ScrollBar)
 
 	# price tag
 	Label = GemRB.GetControl (Window, 0x10000003)
@@ -385,8 +394,6 @@ def OpenStoreHealWindow ():
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "BuyHeal")
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
 
-	ScrollBar = GemRB.GetControl (Window, 7)
-	GemRB.SetEvent (Window, ScrollBar, IE_GUI_SCROLLBAR_ON_CHANGE, "UpdateStoreHealWindow")
 	Count = Store['StoreCureCount']
 	if Count>4:
 		Count = Count-4

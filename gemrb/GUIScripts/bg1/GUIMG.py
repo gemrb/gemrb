@@ -38,7 +38,7 @@ OldOptionsWindow = None
 
 
 def OpenMageWindow ():
-	global MageWindow, OptionsWindow, PortraitWindow
+	global MageWindow, OptionsWindow
 	global OldOptionsWindow
 
 	if CloseOtherWindow (OpenMageWindow):
@@ -103,7 +103,7 @@ def OpenMageWindow ():
 
 	GemRB.SetVisible (OptionsWindow, 1)
 	GemRB.SetVisible (Window, 1)
-	GemRB.SetVisible (PortraitWindow, 1)
+	GemRB.SetVisible (GUICommonWindows.PortraitWindow, 1)
 	return
 
 
