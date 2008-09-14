@@ -50,6 +50,9 @@ IE_GUI_BUTTON_BG1_PAPERDOLL   = 0x00100000 # BG1-style paperdoll
 IE_GUI_BUTTON_HORIZONTAL      = 0x00200000 # horizontal clipping of overlay
 
 
+#scrollbar flags
+IE_GUI_SCROLLBAR_DEFAULT = 0x00000040   // mousewheel triggers it (same value as default button)
+
 #textarea flags
 IE_GUI_TEXTAREA_SELECTABLE = 0x05000001
 IE_GUI_TEXTAREA_AUTOSCROLL = 0x05000002
