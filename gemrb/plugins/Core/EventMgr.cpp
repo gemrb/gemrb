@@ -203,6 +203,8 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y,
 {
 	std::vector< int>::iterator t;
 	std::vector< Window*>::iterator m;
+	Control *ctrl;
+
 	MButtons |= Button;
 	for (t = topwin.begin(); t != topwin.end(); ++t) {
 		m = windows.begin();
@@ -217,7 +219,7 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y,
 				( ( *m )->YPos + ( *m )->Height >= y )) {
 				//Yes, we are on the Window
 				//Let's check if we have a Control under the Mouse Pointer
-				Control* ctrl = ( *m )->GetControl( x, y, true );
+				ctrl = ( *m )->GetControl( x, y, true );
 				if (!ctrl) {
 					ctrl = ( *m )->GetControl( x, y, false);
 				}
@@ -225,13 +227,21 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y,
 				if (ctrl != NULL) {
 					last_win_focused->SetFocused( ctrl );
 					ctrl->OnMouseDown( x - last_win_focused->XPos - ctrl->XPos, y - last_win_focused->YPos - ctrl->YPos, Button, Mod );
+					return;
 				}
-				return;
 			}
 		}
 		if (( *m )->Visible == WINDOW_FRONT) //stop looking further
 			break;
 	}
+
+	if (Button == GEM_MB_SCRLUP || Button == GEM_MB_SCRLDOWN) {
+		ctrl = last_win_focused->GetScrollControl();
+		if (ctrl) {
+			ctrl->OnMouseDown( x - last_win_focused->XPos - ctrl->XPos, y - last_win_focused->YPos - ctrl->YPos, Button, Mod );
+		}
+	}
+
 	if (last_win_focused) {
 		last_win_focused->SetFocused(NULL);
 	}
@@ -290,8 +300,20 @@ void EventMgr::OnSpecialKeyPress(unsigned char Key)
 	if (!ctrl) {
 		ctrl = last_win_focused->GetFocus();
 	}
+	//if one is under focus, use the default scroll focus
+	if (!ctrl) {
+		if (Key == GEM_UP || Key == GEM_DOWN) {
+			ctrl = last_win_focused->GetScrollControl();
+		}
+	}
 	if (ctrl) {
 		switch (ctrl->ControlType) {
+			//scrollbars will receive only mousewheel events
+			case IE_GUI_SCROLLBAR:
+				if (Key != GEM_UP && Key != GEM_DOWN) {
+					return;
+				}
+				break;
 			//buttons will receive only GEM_RETURN
 			case IE_GUI_BUTTON:
 				if (Key != GEM_RETURN) {

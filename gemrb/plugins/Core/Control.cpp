@@ -159,10 +159,15 @@ void Control::OnMouseOver(unsigned short /*x*/, unsigned short /*y*/)
 }
 
 /** Mouse Button Down */
-void Control::OnMouseDown(unsigned short /*x*/, unsigned short /*y*/,
-	unsigned char /*Button*/, unsigned short /*Mod*/)
+void Control::OnMouseDown(unsigned short x, unsigned short y,
+	unsigned char Button, unsigned short Mod)
 {
-	//printf("OnMouseDown: CtrlID = 0x%08X, x = %hd, y = %hd, Button = %d, Mos = %hd\n", (unsigned int) ControlID, x, y, Button, Mod);
+	if (Button == GEM_MB_SCRLUP || Button == GEM_MB_SCRLDOWN) {
+		Control *ctrl = Owner->GetScrollControl();
+		if (ctrl && (ctrl!=this)) {
+			ctrl->OnMouseDown(x,y,Button,Mod);
+		}
+	}
 }
 
 /** Mouse Button Up */
@@ -173,9 +178,14 @@ void Control::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 }
 
 /** Special Key Press */
-void Control::OnSpecialKeyPress(unsigned char /*Key*/)
+void Control::OnSpecialKeyPress(unsigned char Key)
 {
-	//printf("OnSpecialKeyPress: CtrlID = 0x%08X, Key = %d\n", (unsigned int) ControlID, Key);
+	if (Key == GEM_UP || Key == GEM_DOWN) {
+		Control *ctrl = Owner->GetScrollControl();
+		if (ctrl && (ctrl!=this)) {
+			ctrl->OnSpecialKeyPress(Key);
+		}
+	}
 }
 
 /** Sets the Display Flags */

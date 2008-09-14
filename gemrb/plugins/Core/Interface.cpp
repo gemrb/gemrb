@@ -5001,8 +5001,9 @@ void Interface::ApplySpellPoint(const ieResRef resname, Scriptable* /*area*/, Po
 int Interface::ApplyEffect(Effect *effect, Actor *actor, Actor *caster)
 {
 	EffectQueue *fxqueue = new EffectQueue();
+	//AddEffect now copies the fx data, please delete your effect reference
+	//if you created it. (Don't delete cached references)
 	fxqueue->AddEffect( effect );
-	//don't delete the effect, it is referenced by the effectqueue
 
 	int res = fxqueue->CheckImmunity ( actor );
 	if (res) {
@@ -5020,6 +5021,7 @@ int Interface::ApplyEffect(Effect *effect, Actor *actor, Actor *caster)
 
 int Interface::ApplyEffect(const ieResRef resname, Actor *actor, Actor *caster, int level)
 {
+	//Don't free this reference, it is cached!
 	Effect *effect = GetEffect(resname);
 	if (!effect) {
 		return 0;

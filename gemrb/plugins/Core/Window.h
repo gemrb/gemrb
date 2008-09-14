@@ -126,6 +126,8 @@ public:
 	void DelControl(unsigned short i);
 	/** Returns the Default Control which may be a button/gamecontrol atm */
 	Control* GetDefaultControl() const;
+	/** Returns the Control which should get mouse scroll events */
+	Control* GetScrollControl() const;
 	/** Sets 'ctrl' as currently under mouse */
 	void SetOver(Control* ctrl);
 	/** Returns last control under mouse */
@@ -165,6 +167,7 @@ public: //Public attributes
 	int Flags;
 	int Cursor;
 	int DefaultControl;
+	int ScrollControl;
 private: // Private attributes
 	/** BackGround Image. No BackGround if this variable is NULL. */
 	Sprite2D* BackGround;

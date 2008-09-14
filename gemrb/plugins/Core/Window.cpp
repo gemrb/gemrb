@@ -45,6 +45,7 @@ Window::Window(unsigned short WindowID, unsigned short XPos,
 	Flags = WF_CHANGED;
 	Cursor = IE_CURSOR_NORMAL;
 	DefaultControl = -1;
+	ScrollControl = -1;
 }
 
 Window::~Window()
@@ -239,6 +240,14 @@ Control* Window::GetDefaultControl() const
 	return GetControl( (ieWord) DefaultControl );
 }
 
+Control* Window::GetScrollControl() const
+{
+	if (!Controls.size()) {
+		return NULL;
+	}
+	return GetControl( (ieWord) ScrollControl );
+}
+
 void Window::release(void)
 {
 	Visible = WINDOW_INVALID;
@@ -251,12 +260,17 @@ void Window::release(void)
 void Window::Invalidate()
 {
 	DefaultControl = -1;
+	ScrollControl = -1;
 	for (unsigned int i = 0; i < Controls.size(); i++) {
 		if (!Controls[i]) {
 			continue;
 		}
 		Controls[i]->Changed = true;
 		switch (Controls[i]->ControlType) {
+			case IE_GUI_SCROLLBAR:
+				if (Controls[i]->Flags & IE_GUI_SCROLLBAR_DEFAULT)
+					ScrollControl = i;
+				break;
 			case IE_GUI_BUTTON:
 				if (!( Controls[i]->Flags & IE_GUI_BUTTON_DEFAULT ))
 					break;

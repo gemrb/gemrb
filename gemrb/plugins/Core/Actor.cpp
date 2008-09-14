@@ -1518,7 +1518,13 @@ void Actor::RefreshEffects(EffectQueue *fx)
 	Modified[IE_HITPOINTS]+=bonus;
 
 	for (unsigned int i=0;i<MAX_STATS;i++) {
-		if (first || (Modified[i]!=previous[i]) ) {
+		if (first ) {
+			PostChangeFunctionType f = post_change_functions[i];
+			if (f) {
+				(*f)(this, first?0:previous[i], Modified[i]);
+			}
+		} else
+		if (Modified[i]!=previous[i]) {
 			PostChangeFunctionType f = post_change_functions[i];
 			if (f) {
 				(*f)(this, first?0:previous[i], Modified[i]);

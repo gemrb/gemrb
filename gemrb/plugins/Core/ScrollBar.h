@@ -36,6 +36,7 @@
 // !!! Keep these synchronized with GUIDefines.py !!!
 #define IE_GUI_SCROLLBAR_ON_CHANGE  0x07000000
 
+#define IE_GUI_SCROLLBAR_DEFAULT      0x00000040   // mousewheel triggers it
 
 #define IE_GUI_SCROLLBAR_UP_UNPRESSED   0
 #define IE_GUI_SCROLLBAR_UP_PRESSED 	1

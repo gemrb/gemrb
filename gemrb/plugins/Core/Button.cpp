@@ -327,28 +327,37 @@ void Button::SetFont(Font* newfont)
 /** Handling The default button (enter) */
 void Button::OnSpecialKeyPress(unsigned char Key)
 {
-	if (State == IE_GUI_BUTTON_DISABLED || State == IE_GUI_BUTTON_LOCKED) {
-		return;
-	}
-	if (Flags & IE_GUI_BUTTON_DEFAULT) {
+	if (State != IE_GUI_BUTTON_DISABLED && State != IE_GUI_BUTTON_LOCKED) {
 		if (Key == GEM_RETURN) {
-			RunEventHandler( ButtonOnPress );
+			if (Flags & IE_GUI_BUTTON_DEFAULT) {
+				RunEventHandler( ButtonOnPress );
+				return;
+			}
 		}
 	}
+	Control::OnSpecialKeyPress(Key);
 }
 
 /** Mouse Button Down */
 void Button::OnMouseDown(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short /*Mod*/)
+	unsigned char Button, unsigned short Mod)
 {
 	if (State == IE_GUI_BUTTON_DISABLED) {
+		Control::OnMouseDown(x,y,Button,Mod);
 		return;
 	}
 
 	if (core->GetDraggedItem () && !ButtonOnDragDrop[0])
+		Control::OnMouseDown(x,y,Button,Mod);
 		return;
 
-	ScrollBar* scrlbr = (ScrollBar*)sb;
+	ScrollBar* scrlbr = (ScrollBar*) sb;
+	if (!scrlbr) {
+		Control *ctrl = Owner->GetScrollControl();
+		if (ctrl && (ctrl->ControlType == IE_GUI_SCROLLBAR)) {
+			scrlbr = (ScrollBar *) ctrl;
+		}
+	}
 
 	//Button == 1 means Left Mouse Button
 	switch(Button) {
@@ -368,12 +377,16 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 		}
 		break;
 	case GEM_MB_SCRLUP:
-		if (scrlbr)
+		if (scrlbr) {
 			scrlbr->ScrollUp();
+			core->RedrawAll();
+		}
 		break; 
 	case GEM_MB_SCRLDOWN:
-		if (scrlbr)
+		if (scrlbr) {
 			scrlbr->ScrollDown();
+			core->RedrawAll();
+		}
 		break;
 	}
 }
