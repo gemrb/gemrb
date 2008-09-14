@@ -9,7 +9,7 @@
 5          ARTERIAL_STRIKE         CLASSLEVELROGUE       1          0                   0          THAC0BONUSRIGHT        4          0                      0          0          
 6          BLIND_FIGHT             0                     0          0                   0          0                      0          0                      0          0          
 7          BULLHEADED              RACE                  1          0                   0          RACE                   4          0                      0          0          
-8          CLEAVE                  STR                   13         0                   0          FEATS1                 64         0                      0          FEAT_CLEAVE
+8          CLEAVE                  STR                   13         THAC0BONUSRIGHT     4          FEATS1                 64         0                      0          FEAT_CLEAVE
 9          COMBAT_CASTING          0                     0          0                   0          0                      0          0                      0          FEAT_COMBAT_CASTING
 10         COURTEOUS_MAGOCRACY     0                     0          0                   0          0                      0          0                      0          0          
 11         CRIPPLING_STRIKE        CLASSLEVELROGUE       10         0                   0          0                      0          0                      0          0          
