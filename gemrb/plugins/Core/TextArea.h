@@ -46,6 +46,7 @@
 #define IE_GUI_TEXTAREA_HISTORY      8
 #define IE_GUI_TEXTAREA_SPEAKER      16
 #define IE_GUI_TEXTAREA_ALT_FONT     32   //this one disables drop capitals
+#define IE_GUI_TEXTAREA_EDITABLE     64
 
 // internal flags
 #define TA_INITIALS    1
@@ -99,6 +100,8 @@ public:
 	void SetFonts(Font* init, Font* text);
 	/** Returns Number of Rows */
 	int GetRowCount();
+	/** Returns the length of a Row */
+	int GetRowLength(unsigned int row);
 	/** Returns Number of Visible Rows */
 	int GetVisibleRowCount();
 	/** Returns Starting Row */
@@ -146,9 +149,16 @@ private: // Private attributes
 	/** Fonts */
 	Font* finit, * ftext;
 	ieResRef PortraitResRef;
+
+	/** Text Editing Cursor Sprite */
+	Sprite2D* Cursor;
+	unsigned short CurPos, CurLine;
+
+private: //internal functions
 	void CalcRowCount();
 	void UpdateControls();
 	void RefreshSprite(const char *portrait);
+
 public: //Events
 	/** Key Press Event */
 	void OnKeyPress(unsigned char Key, unsigned short Mod);

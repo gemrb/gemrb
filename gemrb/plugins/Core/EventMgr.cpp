@@ -302,7 +302,8 @@ void EventMgr::OnSpecialKeyPress(unsigned char Key)
 				//gamecontrols will receive all special keys
 				break;
 			case IE_GUI_EDIT:
-				//editboxes will receive all special keys
+			case IE_GUI_TEXTAREA:
+				//editboxes and textareas will receive all special keys
 				break;
 			default:
 				//other controls don't receive any

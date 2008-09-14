@@ -39,6 +39,9 @@ TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 	rows = 0;
 	startrow = 0;
 	minrow = 0;
+	Cursor = NULL;
+	CurPos = 0;
+	CurLine = 0;
 	seltext = -1;
 	Value = 0xffffffff;
 	ResetEventHandler( TextAreaOnChange );
@@ -68,6 +71,7 @@ TextArea::~TextArea(void)
 	core->FreePalette( initpalette );
 	core->FreePalette( selected );
 	core->FreePalette( lineselpal );
+	core->GetVideoDriver()->FreeSprite( Cursor );
 	for (size_t i = 0; i < lines.size(); i++) {
 		free( lines[i] );
 	}
@@ -173,7 +177,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 	//but then it is like the dialog window in the main game screen:
 	//the selected value is encoded into the line
 	if (!(Flags & IE_GUI_TEXTAREA_SELECTABLE) ) {
-		char* Buffer = ( char* ) malloc( 1 );
+		char* Buffer = (char *) malloc( 1 );
 		Buffer[0] = 0;
 		int len = 0;
 		int lastlen = 0;
@@ -195,7 +199,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 				if (tlen < 0)
 					goto notmatched;
 				len += tlen + 23;
-				Buffer = ( char * ) realloc( Buffer, len + 2 );
+				Buffer = (char *) realloc( Buffer, len + 2 );
 				if (seltext == (int) i) {
 					sprintf( Buffer + lastlen, "[color=%6.6lX]%.*s[/color]",
 						acolor, tlen, rest + 1 );
@@ -206,7 +210,7 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			} else {
 				notmatched:
 				len += ( int ) strlen( lines[i] ) + 1;
-				Buffer = ( char * ) realloc( Buffer, len + 2 );
+				Buffer = (char *) realloc( Buffer, len + 2 );
 				memcpy( &Buffer[lastlen], lines[i], len - lastlen );
 			}
 			lastlen = len;
@@ -216,9 +220,17 @@ void TextArea::Draw(unsigned short x, unsigned short y)
 			}
 		}
 		video->SetClipRect( &clip );
+
+		int pos;
+
+		if (startrow==CurLine) {
+			pos = CurPos;
+		} else {
+			pos = -1;
+		}
 		ftext->PrintFromLine( startrow, clip,
 			( unsigned char * ) Buffer, palette,
-			IE_FONT_ALIGN_LEFT, finit, NULL );
+			IE_FONT_ALIGN_LEFT, finit, Cursor, pos );
 		free( Buffer );
 		video->SetClipRect( NULL );
 		//streaming text
@@ -308,14 +320,16 @@ int TextArea::SetText(const char* text, int pos)
 	int newlen = ( int ) strlen( text );
 
 	if (pos == -1) {
-		char* str = ( char* ) malloc( newlen + 1 );
+		char* str = (char *) malloc( newlen + 1 );
 		memcpy( str, text, newlen + 1 );
 		lines.push_back( str );
 		lrows.push_back( 0 );
 	} else {
-		lines[pos] = ( char * ) realloc( lines[pos], newlen + 1 );
+		lines[pos] = (char *) realloc( lines[pos], newlen + 1 );
 		memcpy( lines[pos], text, newlen + 1 );
 	}
+	CurPos = newlen;
+	CurLine = lines.size()-1;
 	UpdateControls();
 	return 0;
 }
@@ -358,12 +372,12 @@ int TextArea::AppendText(const char* text, int pos)
 		const char *note = strstr(text,"\r\n\r\nNOTE:");
 		char *str;
 		if (NULL == note) {
-			str = ( char* ) malloc( newlen +1 );
+			str = (char *) malloc( newlen +1 );
 			memcpy(str,text, newlen+1);
 		}
 		else {
 			unsigned int notepos = (unsigned int) (note - text);
-			str = ( char* ) malloc( newlen + CRAPLENGTH+1 );
+			str = (char *) malloc( newlen + CRAPLENGTH+1 );
 			memcpy(str,text,notepos);
 			memcpy(str+notepos,inserted_crap,CRAPLENGTH);
 			memcpy(str+notepos+CRAPLENGTH, text+notepos, newlen-notepos+1);
@@ -374,7 +388,7 @@ int TextArea::AppendText(const char* text, int pos)
 	} else {
 		int mylen = ( int ) strlen( lines[pos] );
 
-		lines[pos] = ( char * ) realloc( lines[pos], mylen + newlen + 1 );
+		lines[pos] = (char *) realloc( lines[pos], mylen + newlen + 1 );
 		memcpy( lines[pos]+mylen, text, newlen + 1 );
 		ret = pos;
 	}
@@ -452,6 +466,26 @@ void TextArea::SetFonts(Font* init, Font* text)
 /** Key Press Event */
 void TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 {
+	if (Flags & IE_GUI_TEXTAREA_EDITABLE) {
+		if (Key >= 0x20) {
+			Owner->Invalidate();
+			Changed = true;
+			int len = GetRowLength(CurLine);
+			printf("len: %d Before: %s\n",len, lines[CurLine]);
+			lines[CurLine] = (char *) realloc( lines[CurLine], len + 2 );
+			for (int i = len; i > CurPos; i--) {
+				lines[CurLine][i] = lines[CurLine][i - 1];
+			}
+			lines[CurLine][CurPos] = Key;
+			lines[CurLine][len + 1] = 0;
+			CurPos++;
+			printf("pos: %d After: %s\n",CurPos, lines[CurLine]);
+			CalcRowCount();
+			RunEventHandler( TextAreaOnChange );
+		}
+		return;
+	}
+
 	//Selectable=false for dialogs, rather unintuitive, but fact
 	if ((Flags & IE_GUI_TEXTAREA_SELECTABLE) || ( Key < '1' ) || ( Key > '9' ))
 		return;
@@ -481,15 +515,140 @@ void TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 		gc->DialogChoose( idx );
 	}
 }
+
 /** Special Key Press */
-void TextArea::OnSpecialKeyPress(unsigned char /*Key*/)
+void TextArea::OnSpecialKeyPress(unsigned char Key)
 {
+	int len;
+
+	if (!(Flags&IE_GUI_TEXTAREA_EDITABLE)) {
+		return;
+	}
+	Owner->Invalidate();
+	Changed = true;
+	switch (Key) {
+		case GEM_HOME:
+			CurPos = 0;
+			CurLine = 0;
+			break;
+		case GEM_UP:
+			if (CurLine) {
+				CurLine--;
+			}
+			break;
+		case GEM_DOWN:
+			if (CurLine<lines.size()) {
+				CurLine++;
+			}
+			break;
+		case GEM_END:
+			CurLine=lines.size()-1;
+			CurPos = GetRowLength((unsigned int) CurLine);
+			break;
+		case GEM_LEFT:
+			if (CurPos > 0) {
+				CurPos--;
+			} else {
+				if (CurLine) {
+					CurLine--;
+					CurPos = GetRowLength(CurLine);
+				}
+			}
+			break;
+		case GEM_RIGHT:
+			len = GetRowLength(CurLine);
+			if (CurPos < len) {
+				CurPos++;
+			} else {
+				if(CurLine<lines.size()) {
+					CurPos=0;
+					CurLine++;
+				}
+			}
+			break;
+		case GEM_DELETE:
+			len = GetRowLength(CurLine);
+			printf("len: %d Before: %s\n",len, lines[CurLine]);
+			if (CurPos>=len) {
+				//TODO: merge next line
+				break;
+			}
+			lines[CurLine] = (char *) realloc( lines[CurLine], len );
+			for (int i = CurPos; i < len; i++) {
+				lines[CurLine][i] = lines[CurLine][i + 1];
+			}
+			printf("pos: %d After: %s\n",CurPos, lines[CurLine]);
+			break;
+		case GEM_BACKSP:
+			len = GetRowLength(CurLine);
+			if (CurPos != 0) {
+				printf("len: %d Before: %s\n",len, lines[CurLine]);
+				if (len<1) {
+					break;
+				}
+				lines[CurLine] = (char *) realloc( lines[CurLine], len );
+				for (int i = CurPos; i < len; i++) {
+					lines[CurLine][i - 1] = lines[CurLine][i];
+				}
+				lines[CurLine][len - 1] = 0;
+				CurPos--;
+				printf("pos: %d After: %s\n",CurPos, lines[CurLine]);
+			} else {
+				if (CurLine) {
+					//TODO: merge lines
+					int oldline = CurLine;
+					CurLine--;
+					int old = GetRowLength(CurLine);
+					printf("len: %d Before: %s\n",old, lines[CurLine]);
+					printf("len: %d Before: %s\n",len, lines[oldline]);
+					lines[CurLine] = (char *) realloc (lines[CurLine], len+old);
+					memcpy(lines[CurLine]+old, lines[oldline],len);
+					free(lines[oldline]);
+					lines[CurLine][old+len]=0;
+					lines.erase(lines.begin()+oldline);
+					lrows.erase(lrows.begin()+oldline);
+					CurPos = old;
+					printf("pos: %d len: %d After: %s\n",CurPos, GetRowLength(CurLine), lines[CurLine]);
+				}
+			}
+			break;
+		 case GEM_RETURN:
+			//add an empty line after CurLine
+			printf("pos: %d Before: %s\n",CurPos, lines[CurLine]);
+			lrows.insert(lrows.begin()+CurLine, 0);
+			len = GetRowLength(CurLine);
+			//copy the text after the cursor into the new line
+			char *str = (char *) malloc(len-CurPos+2);
+			memcpy(str, lines[CurLine]+CurPos, len-CurPos+1);
+			str[len-CurPos+1] = 0;
+			lines.insert(lines.begin()+CurLine+1, str);
+			//truncate the current line
+			lines[CurLine] = (char *) realloc (lines[CurLine], CurPos+1);
+			lines[CurLine][CurPos]=0;
+			//move cursor to next line beginning
+			CurLine++;
+			CurPos=0;
+			printf("len: %d After: %s\n",GetRowLength(CurLine-1), lines[CurLine-1]);
+			printf("len: %d After: %s\n",GetRowLength(CurLine), lines[CurLine]);
+			break;
+	}
+	CalcRowCount();
+	RunEventHandler( TextAreaOnChange );
 }
 
 /** Returns Row count */
 int TextArea::GetRowCount()
 {
 	return ( int ) lines.size();
+}
+
+int TextArea::GetRowLength(unsigned int row)
+{
+	if (lines.size()<=row) {
+		return 0;
+	}
+	//this is just roughly the line size, escape sequences need to be removed
+	return strlen( lines[row] );
 }
 
 int TextArea::GetVisibleRowCount()
@@ -540,7 +699,7 @@ void TextArea::CalcRowCount()
 			rows++;
 			int tr = 0;
 			int len = ( int ) strlen( lines[i] );
-			char* tmp = ( char* ) malloc( len + 1 );
+			char* tmp = (char *) malloc( len + 1 );
 			memcpy( tmp, lines[i], len + 1 );
 			ftext->SetupString( tmp, w );
 			for (int p = 0; p <= len; p++) {
@@ -569,6 +728,21 @@ void TextArea::CalcRowCount()
 			free( tmp );
 		}
 	}
+
+	if (lines.size())
+	{
+		if (CurLine>=lines.size()) {
+			CurLine=lines.size()-1;
+		}
+		w = strlen(lines[CurLine]);
+		if (CurPos>w) {
+			CurPos = w;
+		}
+	} else {
+		CurLine=0;
+		CurPos=0;
+	}
+
 	if (!sb) {
 		return;
 	}
