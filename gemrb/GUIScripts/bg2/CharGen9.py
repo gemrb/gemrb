@@ -178,6 +178,13 @@ def FinishCharGen():
 			else:
 				count = 0
 			GemRB.CreateItem(MyChar, item, realslot[0], count, 0, 0)
+#			GemRB.ChangeItemFlag (MyChar, realslot[0], IE_INV_ITEM_IDENTIFIED, OP_OR)
+		# identify all the items; FIXME: remove the current hack
+#		for slot in GemRB.GetSlots (MyChar, SLOT_ANY, 1):
+		for slot in range(0,50):
+			if not GemRB.ChangeItemFlag (MyChar, slot, IE_INV_ITEM_IDENTIFIED, OP_OR):
+				pass
+				#print "NNN", slot
 		GemRB.UnloadTable (EquipmentTable)
 
 	GemRB.UnloadTable (KitTable)
