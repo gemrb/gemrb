@@ -5,7 +5,7 @@
 1          AMBIDEXTERITY           DEX                   15         0                   0          0                      0          0                      0          0          
 2          AQUA_MORTIS             SPELLCRAFT            10         0                   0          CLASSLEVELMAGE         7          CLASSLEVELSORCEROR     7          0          
 3          ARMOUR_PROFICIENCY      0                     0          0                   0          0                      0          0                      0          FEAT_ARMOUR
-4          ARMORED_ARCANA          CLASSLEVELMAGE        1          CLASSLEVELSORCEROR  7          0                      0          0                      0          0          
+4          ARMORED_ARCANA          CLASSLEVELMAGE        1          CLASSLEVELSORCEROR  1          0                      0          0                      0          0          
 5          ARTERIAL_STRIKE         CLASSLEVELROGUE       1          0                   0          THAC0BONUSRIGHT        4          0                      0          0          
 6          BLIND_FIGHT             0                     0          0                   0          0                      0          0                      0          0          
 7          BULLHEADED              RACE                  1          0                   0          RACE                   4          0                      0          0          
