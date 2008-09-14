@@ -54,6 +54,11 @@ def RedrawFeats():
 #			GemRB.SetButtonFlags(FeatWindow, Button1, IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
 #			GemRB.SetButtonFlags(FeatWindow, Button2, IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
 
+		if PointsLeft == 0:
+			GemRB.SetButtonState(FeatWindow, Button1, IE_GUI_BUTTON_DISABLED)
+			GemRB.SetLabelTextColor(FeatWindow, Label, 150, 150, 150)
+		else:
+			GemRB.SetLabelTextColor(FeatWindow, Label, 255, 255, 255)
 	return
 
 def ScrollBarPress():
@@ -117,10 +122,6 @@ def OnLoad():
 		PointsLeft += GemRB.GetTableValue(TmpTable,RaceName,'FEATBONUS')
 		GemRB.UnloadTable(TmpTable)
 	###
-	
-	### Human bonus feat hack, no longer needed
-	#if Level < 1 and RaceName == 'HUMAN': # Human sub-races do not receive free feat
-	#	PointsLeft += 1
 	
 	GemRB.SetToken("number",str(PointsLeft) )
 
