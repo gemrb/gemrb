@@ -39,23 +39,27 @@ def RedrawFeats():
 		GemRB.SetText(FeatWindow, Label, FeatName)
 
 		FeatName=GemRB.GetTableRowName(FeatTable, Pos) #row name
-		
-		Button1 = GemRB.GetControl(FeatWindow, i*2+14)
-		Button2 = GemRB.GetControl(FeatWindow, i*2+15)
-		Ok = 1
-		if Ok == 0:
-			GemRB.SetButtonState(FeatWindow, Button1, IE_GUI_BUTTON_DISABLED)
-			GemRB.SetButtonState(FeatWindow, Button2, IE_GUI_BUTTON_DISABLED)
-#			GemRB.SetButtonFlags(FeatWindow, Button1, IE_GUI_BUTTON_NO_IMAGE,OP_OR)
-#			GemRB.SetButtonFlags(FeatWindow, Button2, IE_GUI_BUTTON_NO_IMAGE,OP_OR)
+		FeatValue = GemRB.GetVar("Feat "+str(Pos))
+
+		ButtonPlus = GemRB.GetControl(FeatWindow, i*2+14)
+		ButtonMinus = GemRB.GetControl(FeatWindow, i*2+15)
+		if FeatValue == 0:
+			GemRB.SetButtonState(FeatWindow, ButtonMinus, IE_GUI_BUTTON_DISABLED)
+			# TODO: check if feat is usable
+			if True:
+				GemRB.SetButtonState(FeatWindow, ButtonPlus, IE_GUI_BUTTON_ENABLED)
+			else:
+				GemRB.SetButtonState(FeatWindow, ButtonPlus, IE_GUI_BUTTON_DISABLED)
 		else:
-			GemRB.SetButtonState(FeatWindow, Button1, IE_GUI_BUTTON_ENABLED)
-			GemRB.SetButtonState(FeatWindow, Button2, IE_GUI_BUTTON_ENABLED)
-#			GemRB.SetButtonFlags(FeatWindow, Button1, IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
-#			GemRB.SetButtonFlags(FeatWindow, Button2, IE_GUI_BUTTON_NO_IMAGE,OP_NAND)
+			# TODO: check for maximum if there are more feat levels
+			if True:
+				GemRB.SetButtonState(FeatWindow, ButtonPlus, IE_GUI_BUTTON_ENABLED)
+			else:
+				GemRB.SetButtonState(FeatWindow, ButtonPlus, IE_GUI_BUTTON_DISABLED)
+			GemRB.SetButtonState(FeatWindow, ButtonMinus, IE_GUI_BUTTON_ENABLED)
 
 		if PointsLeft == 0:
-			GemRB.SetButtonState(FeatWindow, Button1, IE_GUI_BUTTON_DISABLED)
+			GemRB.SetButtonState(FeatWindow, ButtonPlus, IE_GUI_BUTTON_DISABLED)
 			GemRB.SetLabelTextColor(FeatWindow, Label, 150, 150, 150)
 		else:
 			GemRB.SetLabelTextColor(FeatWindow, Label, 255, 255, 255)
