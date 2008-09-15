@@ -62,6 +62,7 @@ def OpenSaveWindow ():
 		TopIndex = 0
 	GemRB.SetVar ("TopIndex",TopIndex)
 	GemRB.SetVarAssoc (Window, ScrollBar, "TopIndex", TopIndex+1)
+	GemRB.SetDefaultScrollBar (Window, ScrollBar)
 	ScrollBarPress ()
 	GemRB.SetVisible (Window,1)
 	return
@@ -173,7 +174,10 @@ def SavePress():
 	GemRB.SetText (ConfirmWindow, SaveButton, 15588)
 	GemRB.SetEvent (ConfirmWindow, SaveButton, IE_GUI_BUTTON_ON_PRESS, "ConfirmedSaveGame")
 	GemRB.SetButtonFlags (ConfirmWindow, SaveButton, IE_GUI_BUTTON_DEFAULT, OP_OR) 
-	GemRB.SetButtonState (ConfirmWindow, SaveButton, IE_GUI_BUTTON_DISABLED)
+	#GemRB.SetButtonState (ConfirmWindow, SaveButton, IE_GUI_BUTTON_DISABLED)
+	if Slotname == "":
+		GemRB.SetButtonState (ConfirmWindow, SaveButton, IE_GUI_BUTTON_DISABLED)
+
 	
 	#cancel
 	CancelButton=GemRB.GetControl (ConfirmWindow, 8)
