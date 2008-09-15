@@ -74,6 +74,9 @@ def DisplayOverview(step):
 	#GemRB.SetButtonFlags(CharGenWindow,AcceptButton, IE_GUI_BUTTON_DEFAULT,OP_OR)
 	#GemRB.SetEvent (CharGenWindow, AcceptButton, IE_GUI_BUTTON_ON_PRESS, "NextPress")
 
+	ScrollBar = GemRB.GetControl (CharGenWindow, 10)
+	GemRB.SetDefaultScrollBar (CharGenWindow, ScrollBar)
+
 	ImportButton = GemRB.GetControl (CharGenWindow, 13)
 	GemRB.SetText (CharGenWindow, ImportButton, 13955)
 	GemRB.SetButtonState (CharGenWindow,ImportButton,IE_GUI_BUTTON_ENABLED)
