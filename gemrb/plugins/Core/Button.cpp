@@ -347,9 +347,10 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 		return;
 	}
 
-	if (core->GetDraggedItem () && !ButtonOnDragDrop[0])
+	if (core->GetDraggedItem () && !ButtonOnDragDrop[0]) {
 		Control::OnMouseDown(x,y,Button,Mod);
 		return;
+	}
 
 	ScrollBar* scrlbr = (ScrollBar*) sb;
 	if (!scrlbr) {
