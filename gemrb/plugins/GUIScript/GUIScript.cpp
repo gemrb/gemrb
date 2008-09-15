@@ -2001,6 +2001,7 @@ static PyObject* GemRB_ConvertEdit(PyObject * /*self*/, PyObject* args)
 	ta->ControlType = IE_GUI_TEXTAREA;
 	ta->Owner = win;
 	ta->SetFonts (ctrl->GetFont(), ctrl->GetFont() );
+	ta->Flags |= IE_GUI_TEXTAREA_EDITABLE;
 	win->AddControl( ta );
 	win->Link( ScrollBarID, ( unsigned short ) ta->ControlID );
 
@@ -2766,6 +2767,29 @@ static PyObject* GemRB_SetTextAreaFlags(PyObject * /*self*/, PyObject* args)
 		printMessage ("GUIScript", "Flag cannot be set!\n",LIGHT_RED);
 		return NULL;
 	}
+
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
+PyDoc_STRVAR( GemRB_SetDefaultScrollBar__doc,
+"SetDefaultScrollBar(WindowIndex, ControlIndex)\n\n"
+"Sets the ScrollBar control as default." );
+
+static PyObject* GemRB_SetDefaultScrollBar(PyObject * /*self*/, PyObject* args)
+{
+	int WindowIndex, ControlIndex;
+
+	if (!PyArg_ParseTuple( args, "ii", &WindowIndex, &ControlIndex)) {
+		return AttributeError( GemRB_SetDefaultScrollBar__doc );
+	}
+
+	Control* sb = ( Control* ) GetControl(WindowIndex, ControlIndex, IE_GUI_SCROLLBAR);
+	if (!sb) {
+		return NULL;
+	}
+
+	sb->SetFlags( (IE_GUI_SCROLLBAR<<24) | IE_GUI_SCROLLBAR_DEFAULT, BM_OR );
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -8442,6 +8466,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(GameControlSetTargetMode, METH_VARARGS),
 	METHOD(GameControlGetTargetMode, METH_NOARGS),
 	METHOD(SetButtonFlags, METH_VARARGS),
+	METHOD(SetDefaultScrollBar, METH_VARARGS),
 	METHOD(SetButtonState, METH_VARARGS),
 	METHOD(SetButtonPictureClipping, METH_VARARGS),
 	METHOD(SetButtonPicture, METH_VARARGS),
