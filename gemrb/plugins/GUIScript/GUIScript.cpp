@@ -6314,7 +6314,7 @@ static PyObject* GemRB_CanUseItemType(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_GetSlots__doc,
-"GetSlots(PartyID, SlotType)=>dict\n\n"
+"GetSlots(PartyID, SlotType, flag)=>dict\n\n"
 "Returns a tuple of slots of the inventory of a PC matching the slot type criteria.\n"
 "If the flag is >0, it will ignore empty slots.\n"
 "If the flag is <0, it will ignore filled slots.\n"
@@ -6344,7 +6344,7 @@ static PyObject* GemRB_GetSlots(PyObject * /*self*/, PyObject* args)
 	Count = 0;
 	for (i=0;i<MaxCount;i++) {
 		int id = core->QuerySlot(i);
-		if ((core->QuerySlotType( id ) & (ieDword) SlotType) != (ieDword) SlotType) {
+		if ((core->QuerySlotType( id ) & (ieDword) SlotType)) {
 			continue;
 		}
 		CREItem *slot = actor->inventory.GetSlotItem( id );
@@ -6359,7 +6359,7 @@ static PyObject* GemRB_GetSlots(PyObject * /*self*/, PyObject* args)
 	Count = 0;
 	for (i=0;i<MaxCount;i++) {
 		int id = core->QuerySlot(i);
-		if ((core->QuerySlotType( id ) & (ieDword) SlotType) != (ieDword) SlotType) {
+		if ((core->QuerySlotType( id ) & (ieDword) SlotType)) {
 			continue;
 		}
 		CREItem *slot = actor->inventory.GetSlotItem( id );
