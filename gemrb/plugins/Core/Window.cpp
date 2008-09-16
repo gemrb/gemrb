@@ -268,7 +268,7 @@ void Window::Invalidate()
 		Controls[i]->Changed = true;
 		switch (Controls[i]->ControlType) {
 			case IE_GUI_SCROLLBAR:
-				if (Controls[i]->Flags & IE_GUI_SCROLLBAR_DEFAULT)
+				if ((ScrollControl == -1) || (Controls[i]->Flags & IE_GUI_SCROLLBAR_DEFAULT))
 					ScrollControl = i;
 				break;
 			case IE_GUI_BUTTON:
