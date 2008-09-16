@@ -101,6 +101,7 @@ def OnLoad():
 	GemRB.SetVar("TopIndex",0)
 	ScrollBarControl = GemRB.GetControl(SkillWindow, 78)
 	GemRB.SetEvent(SkillWindow, ScrollBarControl, IE_GUI_SCROLLBAR_ON_CHANGE, "ScrollBarPress")
+	GemRB.SetDefaultScrollBar (SkillWindow, ScrollBarControl)
 	ProfCount = RowCount - 8 # decrease it with the number of controls
 	# decrease it with the number of invalid proficiencies
 	for i in range(RowCount):
@@ -113,7 +114,6 @@ def OnLoad():
 		Button=GemRB.GetControl(SkillWindow, i+69)
 		GemRB.SetVarAssoc(SkillWindow, Button, "Prof", i)
 		GemRB.SetEvent(SkillWindow, Button, IE_GUI_BUTTON_ON_PRESS, "JustPress")
-		GemRB.AttachScrollBar (SkillWindow, Button, ScrollBarControl)
 
 		Button=GemRB.GetControl(SkillWindow, i*2+11)
 		GemRB.SetVarAssoc(SkillWindow, Button, "Prof", i)
@@ -126,7 +126,6 @@ def OnLoad():
 		for j in range(5):
 			Star=GemRB.GetControl(SkillWindow, i*5+j+27)
 			#GemRB.SetButtonState(SkillWindow, Star, IE_GUI_BUTTON_DISABLED)
-			GemRB.AttachScrollBar (SkillWindow, Star, ScrollBarControl)
 
 	BackButton = GemRB.GetControl(SkillWindow,77)
 	GemRB.SetText(SkillWindow,BackButton,15416)
