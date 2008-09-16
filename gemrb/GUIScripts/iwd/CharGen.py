@@ -304,7 +304,7 @@ def AcceptPress():
 	t = GemRB.GetTableValue ( AlignmentTable, GemRB.GetVar ("Alignment")-1, 3)
 	GemRB.SetPlayerStat (MyChar, IE_ALIGNMENT, t)
 
-	TmpTable = GemRB.LoadTable ("clskills") 
+	TmpTable = GemRB.LoadTable ("clskills")
 	#mage spells
 	TableName = GemRB.GetTableValue (TmpTable, Class, 2, 0)
 	if TableName != "*":
@@ -372,7 +372,7 @@ def AcceptPress():
 		StatID = GemRB.GetTableValue (TmpTable, i, 0)
 		Value = GemRB.GetVar ("Proficiency"+str(i) )
 		GemRB.SetPlayerStat (MyChar, StatID, Value )
-	GemRB.UnloadTable (TmpTable) 
+	GemRB.UnloadTable (TmpTable)
 
 	SetColorStat (MyChar, IE_SKIN_COLOR, GemRB.GetVar ("SkinColor") )
 	SetColorStat (MyChar, IE_HAIR_COLOR, GemRB.GetVar ("HairColor") )
@@ -383,8 +383,8 @@ def AcceptPress():
 	SetColorStat (MyChar, IE_ARMOR_COLOR, 0x17 )
 
 	GemRB.FillPlayerInfo(MyChar, PortraitName+"L", PortraitName+"S")
-	#35 is a weapon slot
-	GemRB.CreateItem(MyChar, "staf01", 35, 1, 0, 0)
+	#10 is a weapon slot (see slottype.2da row 10)
+	GemRB.CreateItem(MyChar, "staf01", 10, 1, 0, 0)
 	GemRB.SetEquippedQuickSlot(MyChar, 0)
 
 	GemRB.UnloadWindow (CharGenWindow)
@@ -789,7 +789,7 @@ def ClassPress():
 	GemRB.SetText (ClassWindow, ClassMultiButton, 11993)
 
 	KitButton = GemRB.GetControl (ClassWindow, 11)
-	#only the mage class has schools 
+	#only the mage class has schools
 	Allowed = GemRB.GetTableValue (ClassTable, "MAGE", RaceName)
 	if Allowed:
 		GemRB.SetButtonState (ClassWindow, KitButton, IE_GUI_BUTTON_ENABLED)
@@ -1014,7 +1014,7 @@ def AlignmentPress():
 def AlignmentSelectPress():
 	global AlignmentWindow, AlignmentTable, AlignmentTextArea, AlignmentDoneButton
 
-	Alignment = GemRB.GetVar ("Alignment") - 1 
+	Alignment = GemRB.GetVar ("Alignment") - 1
 	GemRB.SetText (AlignmentWindow, AlignmentTextArea, GemRB.GetTableValue (AlignmentTable, Alignment, 1))
 	GemRB.SetButtonState (AlignmentWindow, AlignmentDoneButton, IE_GUI_BUTTON_ENABLED)
 	return
