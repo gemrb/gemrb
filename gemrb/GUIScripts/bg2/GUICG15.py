@@ -51,11 +51,11 @@ def OnLoad():
 	ScrollBarControl = GemRB.GetControl(RaceWindow, 1)
 	GemRB.SetVarAssoc(RaceWindow, ScrollBarControl, "TopIndex", RaceCount)
 	GemRB.SetEvent(RaceWindow, ScrollBarControl, IE_GUI_SCROLLBAR_ON_CHANGE, "DisplayRaces")
+	GemRB.SetDefaultScrollBar (RaceWindow, ScrollBarControl)
 
 	for i in range(LISTSIZE):
 		Button = GemRB.GetControl(RaceWindow,i+6)
 		GemRB.SetButtonFlags(RaceWindow,Button,IE_GUI_BUTTON_RADIOBUTTON,OP_OR)
-		GemRB.AttachScrollBar (RaceWindow, Button, ScrollBarControl)
 
 	GemRB.SetVar("HateRace",0)
 

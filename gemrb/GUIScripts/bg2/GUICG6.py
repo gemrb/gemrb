@@ -109,12 +109,12 @@ def OnLoad():
 	GemRB.SetEvent(SkillWindow, ScrollBarControl, IE_GUI_SCROLLBAR_ON_CHANGE, "ScrollBarPress")
 	#decrease it with the number of controls on screen (list size)
 	GemRB.SetVarAssoc(SkillWindow, ScrollBarControl, "TopIndex", RowCount-3)
+	GemRB.SetDefaultScrollBar (SkillWindow, ScrollBarControl)
 
 	for i in range(4):
 		Button = GemRB.GetControl(SkillWindow, i+21)
 		GemRB.SetVarAssoc(SkillWindow, Button, "Skill",i)
 		GemRB.SetEvent(SkillWindow, Button, IE_GUI_BUTTON_ON_PRESS, "JustPress")
-		GemRB.AttachScrollBar (SkillWindow, Button, ScrollBarControl)
 
 		Button = GemRB.GetControl(SkillWindow, i*2+11)
 		GemRB.SetVarAssoc(SkillWindow, Button, "Skill",i)
