@@ -125,7 +125,7 @@ def ConfirmedSaveGame():
 	Label = GemRB.GetControl (ConfirmWindow, 3)
 	Slotname = GemRB.QueryText (ConfirmWindow, Label)
 	StartLoadScreen()
-	GemRB.SaveGame(Pos, Slotname) #loads and enters savegame
+	GemRB.SaveGame(Pos, Slotname, 22) #saves a game with version 2.2
 	GemRB.UnloadWindow (ConfirmWindow)
 	#CloseSaveWindow ()
 	GemRB.SetVisible (SaveWindow,1)
