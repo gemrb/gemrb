@@ -6314,7 +6314,7 @@ static PyObject* GemRB_CanUseItemType(PyObject * /*self*/, PyObject* args)
 
 
 PyDoc_STRVAR( GemRB_GetSlots__doc,
-"GetSlots(PartyID, SlotType)=>dict\n\n"
+"GetSlots(PartyID, SlotType[,flag])=>dict\n\n"
 "Returns a tuple of slots of the inventory of a PC matching the slot type criteria.\n"
 "If the flag is >0, it will ignore empty slots.\n"
 "If the flag is <0, it will ignore filled slots.\n"
@@ -6798,6 +6798,7 @@ static PyObject* GemRB_CreateItem(PyObject * /*self*/, PyObject* args)
 	} else {
 		// Note: this forcefully gets rid of any item currently
 		// in the slot without properly unequipping it
+		SlotID = core->QuerySlot(SlotID);
 		actor->inventory.SetSlotItemRes( ItemResRef, SlotID, Charge0, Charge1, Charge2 );
 		actor->inventory.EquipItem(SlotID);
 		//EquipItem already called RefreshEffects
