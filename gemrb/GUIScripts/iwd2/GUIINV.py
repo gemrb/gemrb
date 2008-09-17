@@ -85,7 +85,6 @@ def OpenInventoryWindow ():
 		GemRB.SetTooltip (Window, Button, 12011)
 		GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_ENTER_BUTTON, "MouseEnterGround")
 		GemRB.SetEvent (Window, Button, IE_GUI_MOUSE_LEAVE_BUTTON, "MouseLeaveGround")
-		GemRB.AttachScrollBar (Window, Button, ScrollBar);
 		GemRB.SetVarAssoc (Window, Button, "GroundItemButton", i)
 		GemRB.SetButtonFont (Window, Button, "NUMFONT")
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_ALIGN_RIGHT | IE_GUI_BUTTON_ALIGN_BOTTOM | IE_GUI_BUTTON_PICTURE, OP_OR)
