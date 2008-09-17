@@ -159,6 +159,7 @@ def OnLoad():
 
 	ScrollBarControl = GemRB.GetControl(SkillWindow, 104)
 	GemRB.SetEvent(SkillWindow, ScrollBarControl,IE_GUI_SCROLLBAR_ON_CHANGE,"ScrollBarPress")
+	GemRB.SetDefaultScrollBar (SkillWindow, ScrollBarControl)
 	#decrease it with the number of controls on screen (list size)
 	TopIndex = 0
 	GemRB.SetVar("TopIndex",0)
