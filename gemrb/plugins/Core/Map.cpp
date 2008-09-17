@@ -136,11 +136,13 @@ inline static AnimationObjectType SelectObject(Actor *actor, AreaAnimation *a, S
 }
 
 //returns true if creature must be embedded in the area
+//npcs in saved game shouldn't be embedded either
 inline static bool MustSave(Actor *actor)
 {
-	if (actor->InParty) {
+	if (actor->Persistent()) {
 		return false;
 	}
+
 	//check for familiars, summons?
 	return true;
 }
