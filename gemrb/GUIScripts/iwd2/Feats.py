@@ -15,7 +15,6 @@ PointsLeft = 0
 
 def IsFeatUsable(feat):
 	global FeatReqTable
-	return True
 
 	a_stat = GemRB.GetTableValue(FeatReqTable, feat, "A_STAT", 0)
 	b_stat = GemRB.GetTableValue(FeatReqTable, feat, "B_STAT", 0)
@@ -65,8 +64,10 @@ def RedrawFeats():
 			# check if feat is usable - can be taken
 			if IsFeatUsable(FeatName):
 				GemRB.SetButtonState(FeatWindow, ButtonPlus, IE_GUI_BUTTON_ENABLED)
+				GemRB.SetLabelTextColor(FeatWindow, Label, 255, 255, 255)
 			else:
 				GemRB.SetButtonState(FeatWindow, ButtonPlus, IE_GUI_BUTTON_DISABLED)
+				GemRB.SetLabelTextColor(FeatWindow, Label, 150, 150, 150)
 		else:
 			# TODO: check for maximum if there are more feat levels
 			if True:
@@ -78,8 +79,7 @@ def RedrawFeats():
 		if PointsLeft == 0:
 			GemRB.SetButtonState(FeatWindow, ButtonPlus, IE_GUI_BUTTON_DISABLED)
 			GemRB.SetLabelTextColor(FeatWindow, Label, 150, 150, 150)
-		else:
-			GemRB.SetLabelTextColor(FeatWindow, Label, 255, 255, 255)
+
 	return
 
 def ScrollBarPress():
@@ -181,6 +181,7 @@ def OnLoad():
 	TopIndex = 0
 	GemRB.SetVar("TopIndex",0)
 	GemRB.SetVarAssoc(FeatWindow, ScrollBarControl, "TopIndex",RowCount-10)
+	GemRB.SetDefaultScrollBar (FeatWindow, ScrollBarControl)
 
 	GemRB.SetEvent(FeatWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	GemRB.SetEvent(FeatWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
