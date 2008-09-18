@@ -7007,7 +7007,7 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "No game loaded!" );
 	}
 
-	Actor *actor = game->GetPC(slot, false);
+	Actor *actor = core->GetGame()->FindPC(slot);
 	if (!actor) {
 		return RuntimeError( "Actor not found" );
 	}
