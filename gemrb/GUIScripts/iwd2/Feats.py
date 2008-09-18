@@ -5,12 +5,29 @@ FeatWindow = 0
 TextAreaControl = 0
 DoneButton = 0
 FeatTable = 0
+FeatReqTable = 0
 TopIndex = 0
 Level = 0
 ClassColumn = 0
 KitColumn = 0
 RaceColumn = 0
 PointsLeft = 0
+
+def IsFeatUsable(feat):
+	global FeatReqTable
+	return True
+
+	a_stat = GemRB.GetTableValue(FeatReqTable, feat, "A_STAT", 0)
+	b_stat = GemRB.GetTableValue(FeatReqTable, feat, "B_STAT", 0)
+	c_stat = GemRB.GetTableValue(FeatReqTable, feat, "C_STAT", 0)
+	d_stat = GemRB.GetTableValue(FeatReqTable, feat, "D_STAT", 0)
+	a_value = GemRB.GetTableValue(FeatReqTable, feat, "A_VALUE")
+	b_value = GemRB.GetTableValue(FeatReqTable, feat, "B_VALUE")
+	c_value = GemRB.GetTableValue(FeatReqTable, feat, "C_VALUE")
+	d_value = GemRB.GetTableValue(FeatReqTable, feat, "D_VALUE")
+	slot = GemRB.GetVar("Slot")
+
+	return GemRB.CheckFeatCondition(slot, a_stat, a_value, b_stat, b_value, c_stat, c_value, d_stat, d_value)
 
 def GetBaseValue(feat):
 	Val = GemRB.GetTableValue(FeatTable, feat, ClassColumn)
@@ -45,8 +62,8 @@ def RedrawFeats():
 		ButtonMinus = GemRB.GetControl(FeatWindow, i*2+15)
 		if FeatValue == 0:
 			GemRB.SetButtonState(FeatWindow, ButtonMinus, IE_GUI_BUTTON_DISABLED)
-			# TODO: check if feat is usable
-			if True:
+			# check if feat is usable - can be taken
+			if IsFeatUsable(FeatName):
 				GemRB.SetButtonState(FeatWindow, ButtonPlus, IE_GUI_BUTTON_ENABLED)
 			else:
 				GemRB.SetButtonState(FeatWindow, ButtonPlus, IE_GUI_BUTTON_DISABLED)
@@ -74,7 +91,7 @@ def ScrollBarPress():
 
 def OnLoad():
 	global FeatWindow, TextAreaControl, DoneButton, TopIndex
-	global FeatTable
+	global FeatTable, FeatReqTable
 	global KitName, Level, PointsLeft
 	global ClassColumn, KitColumn, RaceColumn
 	
@@ -97,6 +114,7 @@ def OnLoad():
 
 	FeatTable = GemRB.LoadTable("feats")
 	RowCount = GemRB.GetTableRowCount(FeatTable)
+	FeatReqTable = GemRB.LoadTable("featreq")
 
 	for i in range(RowCount):
 			GemRB.SetVar("Feat "+str(i),0)
