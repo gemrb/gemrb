@@ -11,7 +11,8 @@ PortraitName = ""
 
 def OnLoad():
 	UpdateOverview(9)
-	GemRB.SetButtonState(CharGenWindow, PersistButtons['Next'], IE_GUI_BUTTON_UNPRESSED) # Fixes button being pre-pressed
+	if CharGenWindow:
+		GemRB.SetButtonState(CharGenWindow, PersistButtons['Next'], IE_GUI_BUTTON_UNPRESSED) # Fixes button being pre-pressed
 	return
 	
 def SetRaceAbilities(MyChar, racetitle):
@@ -106,8 +107,7 @@ def NextPress():
 
 	GemRB.UnloadWindow (CharGenWindow)
 	#set my character up
-	MyChar = GemRB.GetVar ("Slot") 
-	GemRB.CreatePlayer ("charbase", MyChar | 0x8000 )
+	MyChar = GemRB.GetVar ("Slot")
 	GemRB.SetPlayerStat (MyChar, IE_SEX, GemRB.GetVar ("Gender") )
 	GemRB.SetPlayerStat (MyChar, IE_RACE, GemRB.GetVar ("BaseRace") )
 	race = GemRB.GetVar ("Race")
