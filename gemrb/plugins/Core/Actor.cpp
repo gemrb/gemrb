@@ -1230,7 +1230,7 @@ static void InitActorTables()
 
 		for(i=0;i<MAX_FEATS;i++) {
 			//we need the MULTIPLE column
-			tmp = core->TranslateStat(tm->QueryField(i,9));
+			tmp = core->TranslateStat(tm->QueryField(i,8));
 			if (tmp>=MAX_STATS) {
 				printMessage("Actor","Invalid stat value in featreq.2da",YELLOW);
 			}
