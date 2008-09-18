@@ -3998,7 +3998,9 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 	//if we look for ALL slot types, then SLOT_SHIELD shouldn't interfere
 	//with twohandedness
 	if ((slottype&SLOT_SHIELD) && (slottype!=SLOT_ANY) ) {
-		if (item->Flags&IE_INV_ITEM_TWOHANDED) {
+		//As long as this is an Item, use the ITEM constant
+		//switch for IE_INV_ITEM_* if it is a CREItem
+		if (item->Flags&IE_ITEM_TWO_HANDED) {
 			//cannot equip twohanded in offhand
 			if (feedback) core->DisplayConstantString(STR_2HANDEDOFFHAND, 0xf0f0f0);
 			return 0;
@@ -4947,6 +4949,7 @@ Sprite2D *Interface::GetScrollCursorSprite(int frameNum, int spriteNum)
 /* we should return -1 if it isn't gold, otherwise return the gold value */
 int Interface::CanMoveItem(const CREItem *item) const
 {
+	//This is an inventory slot, switch to IE_ITEM_* if you use Item
 	if (item->Flags & IE_INV_ITEM_UNDROPPABLE)
 		return 0;
 	//not gold, we allow only one single coin ResRef, this is good
