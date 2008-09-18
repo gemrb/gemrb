@@ -167,9 +167,10 @@ def FinishCharGen():
 			if item == "*":
 				continue
 			realslot = GemRB.GetSlots (MyChar, RealSlots[slot], -1)
-			print "MMC", realslot, RealSlots[slot], slot
+			
 			if realslot == (): # this shouldn't happen!
 				continue
+
 			# if an item contains a comma, the rest of the value is the stack
 			if "," in item:
 				item = item.split(",")
@@ -177,15 +178,18 @@ def FinishCharGen():
 				item = item[0]
 			else:
 				count = 0
-			GemRB.CreateItem(MyChar, item, realslot[0], count, 0, 0)
- 			GemRB.ChangeItemFlag (MyChar, realslot[0], IE_INV_ITEM_IDENTIFIED, OP_OR)
 
-		# identify all the items; FIXME: remove the current hack
-#		for slot in GemRB.GetSlots (MyChar, SLOT_ANY, 1):
-#		for slot in range(0,50):
-#			if not GemRB.ChangeItemFlag (MyChar, slot, IE_INV_ITEM_IDENTIFIED, OP_OR):
-#				pass
-#				#print "NNN", slot
+			targetslot = realslot[0]
+			SlotType = GemRB.GetSlotType (targetslot, MyChar)
+			i = 1
+			# if there are no free slots, CreateItem will create the item on the ground
+			while not GemRB.CanUseItemType (SlotType["Type"], item, MyChar) and i <= len(realslot):
+				targetslot = realslot[i]
+				SlotType = GemRB.GetSlotType (targetslot, MyChar)
+				i = i + 1
+
+			GemRB.CreateItem(MyChar, item, targetslot, count, 0, 0)
+ 			GemRB.ChangeItemFlag (MyChar, targetslot, IE_INV_ITEM_IDENTIFIED, OP_OR)
 		GemRB.UnloadTable (EquipmentTable)
 
 	GemRB.UnloadTable (KitTable)
