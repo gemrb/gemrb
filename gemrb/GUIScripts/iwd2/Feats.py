@@ -13,6 +13,20 @@ KitColumn = 0
 RaceColumn = 0
 PointsLeft = 0
 
+# returns the number of feat levels (for example cleave can be taken twice)
+# FIXME: doesn't check for higher level prerequisites (eg. cleave2 needs +4 BAB)
+# FIXME: doesn't return the real number of levels
+def MultiLevelFeat(feat):
+	global FeatReqTable
+
+	# if the MULTIPLE column contains 0, the feat has only one level
+	# otherwise it contains a string
+	multi = GemRB.GetTableValue(FeatReqTable, feat, "MULTIPLE", 0)
+	if multi == "0":
+		return 1
+	else:
+		return 2
+
 def IsFeatUsable(feat):
 	global FeatReqTable
 
@@ -69,11 +83,13 @@ def RedrawFeats():
 				GemRB.SetButtonState(FeatWindow, ButtonPlus, IE_GUI_BUTTON_DISABLED)
 				GemRB.SetLabelTextColor(FeatWindow, Label, 150, 150, 150)
 		else:
-			# TODO: check for maximum if there are more feat levels
-			if True:
+			# check for maximum if there are more feat levels
+			if MultiLevelFeat(FeatName) > FeatValue:
 				GemRB.SetButtonState(FeatWindow, ButtonPlus, IE_GUI_BUTTON_ENABLED)
+				GemRB.SetLabelTextColor(FeatWindow, Label, 255, 255, 255)
 			else:
 				GemRB.SetButtonState(FeatWindow, ButtonPlus, IE_GUI_BUTTON_DISABLED)
+				GemRB.SetLabelTextColor(FeatWindow, Label, 150, 150, 150)
 			GemRB.SetButtonState(FeatWindow, ButtonMinus, IE_GUI_BUTTON_ENABLED)
 
 		if PointsLeft == 0:
@@ -129,9 +145,10 @@ def OnLoad():
 	#this one exists only for clerics
 	# Although it should be made extendable to all kits
 	# A FEAT_COLUMN is needed in classes.2da or better yet, a whole new 2da
-	ClassColumn += 3
-	if KitColumn:
-		KitColumn = 3 + KitColumn + 11
+	if GemRB.GetTableValue(ClassTable, Class, 3) == "CLERIC":
+		ClassColumn += 3
+		if KitColumn:
+			KitColumn = 3 + KitColumn + 11
 
 	#Always raise one level at once
 	PointsLeft += GemRB.GetTableValue(FeatLevelTable, Level, 0)
@@ -218,8 +235,8 @@ def LeftPress():
 	if PointsLeft < 1:
 		return
 	ActPoint = GemRB.GetVar("Feat "+str(Pos) )
-	if ActPoint > Level: #Level is 0 for level 1
-		return
+#	if ActPoint > Level: #Level is 0 for level 1
+#		return
 	GemRB.SetVar("Feat "+str(Pos), ActPoint+1)
 	PointsLeft = PointsLeft - 1 
 	RedrawFeats()
