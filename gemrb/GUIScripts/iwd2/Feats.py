@@ -14,19 +14,12 @@ RaceColumn = 0
 PointsLeft = 0
 
 # returns the number of feat levels (for example cleave can be taken twice)
-# FIXME: doesn't check for higher level prerequisites (eg. cleave2 needs +4 BAB)
-# FIXME: doesn't return the real number of levels
 def MultiLevelFeat(feat):
 	global FeatReqTable
+	return GemRB.GetTableValue(FeatReqTable, feat, "MAX_LEVEL")
 
-	# if the MULTIPLE column contains 0, the feat has only one level
-	# otherwise it contains a string
-	multi = GemRB.GetTableValue(FeatReqTable, feat, "MULTIPLE", 0)
-	if multi == "0":
-		return 1
-	else:
-		return 2
-
+# FIXME: CheckFeatCondition doesn't check for higher level prerequisites
+# (eg. cleave2 needs +4 BAB and weapon specialisation needs 4 fighter levels)
 def IsFeatUsable(feat):
 	global FeatReqTable
 
@@ -84,6 +77,7 @@ def RedrawFeats():
 				GemRB.SetLabelTextColor(FeatWindow, Label, 150, 150, 150)
 		else:
 			# check for maximum if there are more feat levels
+			# FIXME also verify that the next level of the feat is usable
 			if MultiLevelFeat(FeatName) > FeatValue:
 				GemRB.SetButtonState(FeatWindow, ButtonPlus, IE_GUI_BUTTON_ENABLED)
 				GemRB.SetLabelTextColor(FeatWindow, Label, 255, 255, 255)
