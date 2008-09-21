@@ -1229,7 +1229,9 @@ static void InitActorTables()
 		unsigned int tmp;
 
 		for(i=0;i<MAX_FEATS;i++) {
-			//we need the MULTIPLE column
+			//we need the MULTIPLE column only
+			//it stores the FEAT_* stat index, and could be taken multiple
+			//times
 			tmp = core->TranslateStat(tm->QueryField(i,8));
 			if (tmp>=MAX_STATS) {
 				printMessage("Actor","Invalid stat value in featreq.2da",YELLOW);
