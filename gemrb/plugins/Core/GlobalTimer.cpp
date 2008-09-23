@@ -144,10 +144,15 @@ void GlobalTimer::Update()
 	if (video->isScrolling() )
 		video->drawScrollCursorSprite(video->whereIsTheCursor());
 
-
 	UpdateAnimations();
 
 	GetTime( thisTime );
+
+	if (!startTime) {
+		startTime = thisTime;
+		return;
+	}
+
 	advance = thisTime - startTime;
 	if ( advance < interval) {
 		return;
