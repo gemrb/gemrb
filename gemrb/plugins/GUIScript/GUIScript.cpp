@@ -6964,6 +6964,11 @@ static PyObject* GemRB_GamePause(PyObject * /*self*/, PyObject* args)
 
 	GameControl *gc = core->GetGameControl();
 	if (gc) {
+		//this will trigger when pause is not 0 or 1
+		if ((unsigned int) pause > 1) {
+			pause = gc->GetDialogueFlags()&DF_FREEZE_SCRIPTS;
+		}
+
 		if (pause) {
 			gc->SetDialogueFlags(DF_FREEZE_SCRIPTS, BM_OR);
 		} else {
