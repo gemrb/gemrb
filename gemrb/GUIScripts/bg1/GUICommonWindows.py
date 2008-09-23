@@ -100,6 +100,17 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	Button = GemRB.GetControl (Window, 8)
 	GemRB.SetTooltip (Window, Button, 16312)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenPartyWindow")
+	
+	#gears
+	if Gears:
+		# Pendulum, gears, sun/moon dial  (time)
+		# FIXME: display all animations: CPEN, CGEAR, CDIAL
+		Button = GemRB.GetControl (Window, 9)
+		GemRB.SetAnimation (Window, Button, "CGEAR")
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
+		GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "GearsClicked")
+		GemRB.SetTooltip(Window, Button, 16041)
 
 	return
 
@@ -693,3 +704,6 @@ def SetEncumbranceLabels (Window, Label, Label2, pc):
 		GemRB.SetLabelTextColor (Window, Label, 255, 255, 255)
 		GemRB.SetLabelTextColor (Window, Label2, 255, 0, 0)
 	return
+
+def GearsClicked():
+	GemRB.GamePause(2,0)

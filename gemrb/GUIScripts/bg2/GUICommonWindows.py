@@ -98,8 +98,10 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 		# FIXME: display all animations: CPEN, CGEAR, CDIAL
 		Button = GemRB.GetControl (Window, 9)
 		GemRB.SetAnimation (Window, Button, "CPEN")
-		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
-		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
+		GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "GearsClicked")
+		GemRB.SetTooltip(Window, Button, 16041)
 		rb = 11
 	else:
 		rb = 9
@@ -212,8 +214,10 @@ def OpenActionsWindowControls (Window):
 	Button = GemRB.GetControl (Window, 62)
 	# FIXME: display all animations
 	GemRB.SetAnimation (Window, Button, "CPEN")
-	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
-	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
+	GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "GearsClicked")
+	GemRB.SetTooltip(Window, Button, 16041)
 	UpdateActionsWindow ()
 	return
 
@@ -751,3 +755,6 @@ def DebugInventorySlots(func=""):
 		print 2**i, GemRB.GetSlots (pc, 2**i, 1)
 	print SLOT_ANY, GemRB.GetSlots (pc, SLOT_ANY, 1)
 	print
+	
+def GearsClicked():
+	GemRB.GamePause(2,0)
