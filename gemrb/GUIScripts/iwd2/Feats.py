@@ -43,7 +43,7 @@ def GetBaseValue(feat):
 	return Val
 
 def RedrawFeats():
-	global TopIndex, PointsLeft
+	global TopIndex, PointsLeft, FeatWindow, FeatReqTable
 
 	SumLabel = GemRB.GetControl(FeatWindow, 0x1000000c)
 	if PointsLeft == 0:
@@ -90,6 +90,30 @@ def RedrawFeats():
 			GemRB.SetButtonState(FeatWindow, ButtonPlus, IE_GUI_BUTTON_DISABLED)
 			GemRB.SetLabelTextColor(FeatWindow, Label, 150, 150, 150)
 
+		levels = GemRB.GetTableValue(FeatReqTable, FeatName, "MAX_LEVEL")
+		FeatValueCounter = FeatValue
+		# count backwards, since the controls follow each other in rtl order,
+		# while we need to change the bams in ltr order
+		for j in range(4, -1, -1):
+			Star = GemRB.GetControl(FeatWindow, i*5+j+36)
+			if 5 - j - 1 < levels:
+				# the star should be there, but which one?
+				if FeatValueCounter > 0:
+					# the full one - the character has already taken a level of this feat
+					GemRB.SetButtonState(FeatWindow, Star, IE_GUI_BUTTON_LOCKED)
+					GemRB.SetButtonBAM(FeatWindow, Star, "GUIPFC", 0, 0, -1)
+					GemRB.SetButtonFlags(FeatWindow, Star, IE_GUI_BUTTON_PICTURE, OP_OR)
+					FeatValueCounter = FeatValueCounter - 1
+				else:
+					# the empty one - the character hasn't taken any levels of this feat yet
+					GemRB.SetButtonState(FeatWindow, Star, IE_GUI_BUTTON_LOCKED)
+					GemRB.SetButtonBAM(FeatWindow, Star, "GUIPFC", 0, 1, -1)
+					GemRB.SetButtonFlags(FeatWindow, Star, IE_GUI_BUTTON_PICTURE, OP_OR)
+			else:
+				# no star, no bad bam crap
+				GemRB.SetButtonState(FeatWindow, Star, IE_GUI_BUTTON_DISABLED)
+				GemRB.SetButtonFlags(FeatWindow, Star, IE_GUI_BUTTON_NO_IMAGE, OP_OR)
+				GemRB.SetButtonFlags(FeatWindow, Star, IE_GUI_BUTTON_PICTURE, OP_NAND)
 	return
 
 def ScrollBarPress():
