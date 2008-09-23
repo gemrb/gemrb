@@ -6952,7 +6952,7 @@ static PyObject* GemRB_GetRumour(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_GamePause__doc,
 "GamePause(Pause, Quiet)\n\n"
-"Pause or Unpause the game.");
+"Pause or unpause the game or just toggle the pause.");
 
 static PyObject* GemRB_GamePause(PyObject * /*self*/, PyObject* args)
 {
