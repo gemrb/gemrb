@@ -222,8 +222,8 @@ def OpenActionsWindowControls (Window):
 
 	# FIXME: display all animations
 	GemRB.SetAnimation (Window, Label, "CPEN")
-	#GemRB.SetAnimation (Window, Button, "CGEAR")
-	#GemRB.SetButtonBAM (Window, Button, "CDIAL", 0, 0)
+	GemRB.SetAnimation (Window, Button, "CGEAR")
+	GemRB.SetButtonBAM (Window, Button, "CDIAL", 0, 0)
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
 	GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "GearsClicked")
