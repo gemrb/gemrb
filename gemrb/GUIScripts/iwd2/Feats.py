@@ -11,6 +11,7 @@ Level = 0
 ClassColumn = 0
 KitColumn = 0
 RaceColumn = 0
+FeatsClassColumn = 0
 PointsLeft = 0
 
 # returns the number of feat levels (for example cleave can be taken twice)
@@ -35,11 +36,28 @@ def IsFeatUsable(feat):
 
 	return GemRB.CheckFeatCondition(slot, a_stat, a_value, b_stat, b_value, c_stat, c_value, d_stat, d_value)
 
+# checks if a feat was granted due to class/kit/race and returns the number
+# of granted levels. The bonuses aren't cumulative.
 def GetBaseValue(feat):
-	Val = GemRB.GetTableValue(FeatTable, feat, ClassColumn)
-	Val += GemRB.GetTableValue(FeatTable, feat, RaceColumn)
+	global FeatsClassColumn, RaceColumn, KitName
+
+	Val1 = GemRB.GetTableValue(FeatTable, feat, FeatsClassColumn)
+	Val2 = GemRB.GetTableValue(FeatTable, feat, RaceColumn)
+	if Val2 < Val1:
+		Val = Val1
+	else:
+		Val = Val2
+
+	Val3 = 0
+	# only cleric kits have feat bonuses in the original, but the column names are shortened
+	KitName = KitName.replace("CLERIC_","C_")
+	KitColumn = GemRB.GetTableColumnIndex(FeatTable, KitName)
 	if KitColumn != 0:
-		Val += GemRB.GetTableValue(FeatTable, feat, KitColumn)
+		Val3 = GemRB.GetTableValue(FeatTable, feat, KitColumn)
+		if Val3 > Val:
+			Val = Val3
+
+	#print "AAAA", Val, Val1, Val2, Val3
 	return Val
 
 def RedrawFeats():
@@ -127,7 +145,7 @@ def OnLoad():
 	global FeatWindow, TextAreaControl, DoneButton, TopIndex
 	global FeatTable, FeatReqTable
 	global KitName, Level, PointsLeft
-	global ClassColumn, KitColumn, RaceColumn
+	global ClassColumn, KitColumn, RaceColumn, FeatsClassColumn
 	
 	GemRB.SetVar("Level",1) #for simplicity
 
@@ -141,17 +159,20 @@ def OnLoad():
 	Class = GemRB.GetVar("Class") - 1
 	ClassTable = GemRB.LoadTable("classes")
 	KitName = GemRB.GetTableRowName(ClassTable, Class)
-	#classcolumn is base class
+	# classcolumn is base class or 0 if it is not a kit
 	ClassColumn = GemRB.GetTableValue(ClassTable, Class, 3) - 1
 	if ClassColumn < 0:  #it was already a base class
 		ClassColumn = Class
+		FeatsClassColumn = GemRB.GetTableValue(ClassTable, Class, 2) + 2
+	else:
+		FeatsClassColumn = GemRB.GetTableValue(ClassTable, Class, 3) + 2
 
 	FeatTable = GemRB.LoadTable("feats")
 	RowCount = GemRB.GetTableRowCount(FeatTable)
 	FeatReqTable = GemRB.LoadTable("featreq")
 
 	for i in range(RowCount):
-			GemRB.SetVar("Feat "+str(i),0)
+		GemRB.SetVar("Feat "+str(i), GetBaseValue(i))
 
 	FeatLevelTable = GemRB.LoadTable("featlvl")
 	FeatClassTable = GemRB.LoadTable("featclas")

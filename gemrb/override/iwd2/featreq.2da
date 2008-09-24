@@ -4,7 +4,7 @@
 AEGIS_OF_RIME           SPELLCRAFT            10         0                   0          CLASSLEVELMAGE         7          CLASSLEVELSORCEROR     7          0                        1
 AMBIDEXTERITY           DEX                   15         0                   0          0                      0          0                      0          0                        1
 AQUA_MORTIS             SPELLCRAFT            10         0                   0          CLASSLEVELMAGE         7          CLASSLEVELSORCEROR     7          0                        1
-ARMOUR_PROFICIENCY      0                     0          0                   0          0                      0          0                      0          FEAT_ARMOUR              3
+ARMOR_PROF              0                     0          0                   0          0                      0          0                      0          FEAT_ARMOUR              3
 ARMORED_ARCANA          CLASSLEVELMAGE        1          CLASSLEVELSORCEROR  1          0                      0          0                      0          FEAT_ARMORED_ARCANA      3
 ARTERIAL_STRIKE         CLASSLEVELTHIEF       1          0                   0          THAC0BONUSRIGHT        4          0                      0          0                        1
 BLIND_FIGHT             0                     0          0                   0          0                      0          0                      0          0                        1
