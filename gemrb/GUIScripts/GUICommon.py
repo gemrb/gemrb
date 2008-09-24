@@ -146,3 +146,10 @@ def CheckStat20 (Actor, Stat, Diff):
 
 def GameIsTOB ():
 	return GemRB.HasResource ("worldm25", RES_WMP)
+
+def SetGamedaysAndHourToken ():
+	currentTime = GemRB.GetGameTime()
+	days = currentTime / 7200
+	hours = (currentTime % 7200) / 300
+	GemRB.SetToken ('GAMEDAYS', str (days))
+	GemRB.SetToken ('HOUR', str (hours))

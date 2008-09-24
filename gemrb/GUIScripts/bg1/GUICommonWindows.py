@@ -28,6 +28,7 @@ from GUIDefines import *
 from ie_stats import *
 from ie_modal import *
 from ie_action import *
+from GUICommon import SetGamedaysAndHourToken
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
@@ -110,6 +111,7 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
 		GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "GearsClicked")
+		SetGamedaysAndHourToken()
 		GemRB.SetTooltip(Window, Button, 16041)
 
 	return

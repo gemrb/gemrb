@@ -26,6 +26,7 @@
 import GemRB
 from GUIDefines import *
 from GUICommon import CloseOtherWindow
+from GUICommon import SetGamedaysAndHourToken
 from GUICommonWindows import *
 
 FRAME_PC_SELECTED = 0
@@ -227,6 +228,7 @@ def OpenContainerWindow ():
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
 	GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "GearsClicked")
+	SetGamedaysAndHourToken()
 	GemRB.SetTooltip(Window, Button, 16041)
 
 	# 0 - 5 - Ground Item
