@@ -1798,7 +1798,7 @@ static PyObject* GemRB_CreateWindow(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_CreateLabelOnButton__doc,
-"CreateLabelOnButton(WindowIndex, ControlIndex, NewControlID, font, text, align)"
+"CreateLabelOnButton(WindowIndex, ControlIndex, NewControlID, font, align)"
 "Creates a label on top of a button, copying the button's size and position." );
 
 static PyObject* GemRB_CreateLabelOnButton(PyObject * /*self*/, PyObject* args)
@@ -1830,8 +1830,14 @@ static PyObject* GemRB_CreateLabelOnButton(PyObject * /*self*/, PyObject* args)
 	lbl->SetAlignment( align );
 	win->AddControl( lbl );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	int ret = core->GetControl( WindowIndex, ControlID );
+
+	if (ret<0) {
+		return NULL;
+	}
+	return PyInt_FromLong( ret );
+	//Py_INCREF( Py_None );
+	//return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_CreateLabel__doc,
@@ -1864,8 +1870,14 @@ static PyObject* GemRB_CreateLabel(PyObject * /*self*/, PyObject* args)
 	lbl->SetAlignment( align );
 	win->AddControl( lbl );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	int ret = core->GetControl( WindowIndex, ControlID );
+
+	if (ret<0) {
+		return NULL;
+	}
+	return PyInt_FromLong( ret );
+	//Py_INCREF( Py_None );
+	//return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_SetLabelTextColor__doc,
@@ -1930,8 +1942,14 @@ static PyObject* GemRB_CreateTextEdit(PyObject * /*self*/, PyObject* args)
 
 	win->AddControl( edit );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	int ret = core->GetControl( WindowIndex, ControlID );
+
+	if (ret<0) {
+		return NULL;
+	}
+	return PyInt_FromLong( ret );
+	//Py_INCREF( Py_None );
+	//return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_CreateButton__doc,
@@ -1962,8 +1980,14 @@ static PyObject* GemRB_CreateButton(PyObject * /*self*/, PyObject* args)
 	btn->Owner = win;
 	win->AddControl( btn );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	int ret = core->GetControl( WindowIndex, ControlID );
+
+	if (ret<0) {
+		return NULL;
+	}
+	return PyInt_FromLong( ret );
+	//Py_INCREF( Py_None );
+	//return Py_None;
 }
 
 
@@ -2357,8 +2381,14 @@ static PyObject* GemRB_CreateWorldMapControl(PyObject * /*self*/, PyObject* args
 	wmap->Owner = win;
 	win->AddControl( wmap );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	int ret = core->GetControl( WindowIndex, ControlID );
+
+	if (ret<0) {
+		return NULL;
+	}
+	return PyInt_FromLong( ret );
+	//Py_INCREF( Py_None );
+	//return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_SetWorldMapTextColor__doc,
@@ -2466,8 +2496,14 @@ static PyObject* GemRB_CreateMapControl(PyObject * /*self*/, PyObject* args)
 setup_done:
 	win->AddControl( map );
 
-	Py_INCREF( Py_None );
-	return Py_None;
+	int ret = core->GetControl( WindowIndex, ControlID );
+
+	if (ret<0) {
+		return NULL;
+	}
+	return PyInt_FromLong( ret );
+	//Py_INCREF( Py_None );
+	//return Py_None;
 }
 
 PyDoc_STRVAR( GemRB_SetControlPos__doc,

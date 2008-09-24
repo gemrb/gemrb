@@ -59,6 +59,14 @@ void Label::Draw(unsigned short x, unsigned short y)
 			useRGB?palette:NULL,
 					 Alignment | IE_FONT_SINGLE_LINE, true );
 	}
+
+	if (AnimPicture) {
+		int xOffs = ( Width / 2 ) - ( AnimPicture->Width / 2 );
+		int yOffs = ( Height / 2 ) - ( AnimPicture->Height / 2 );
+		Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(AnimPicture->Width), AnimPicture->Height );
+		core->GetVideoDriver()->BlitSprite( AnimPicture, x + XPos + xOffs, y + YPos + yOffs, true, &r );
+	}
+
 }
 /** This function sets the actual Label Text */
 int Label::SetText(const char* string, int /*pos*/)
