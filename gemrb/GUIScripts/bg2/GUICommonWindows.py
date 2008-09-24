@@ -98,7 +98,11 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 		# Pendulum, gears, sun/moon dial  (time)
 		# FIXME: display all animations: CPEN, CGEAR, CDIAL
 		Button = GemRB.GetControl (Window, 9)
-		GemRB.SetAnimation (Window, Button, "CPEN")
+		Label = GemRB.CreateLabelOnButton (Window, Button, 0x10000009, "NORMAL", 0)
+
+		GemRB.SetAnimation (Window, Label, "CPEN")
+		GemRB.SetAnimation (Window, Button, "CGEAR")
+		GemRB.SetButtonBAM (Window, Button, "CDIAL", 0, 0)
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
 		GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "GearsClicked")
@@ -214,8 +218,12 @@ def OpenActionsWindowControls (Window):
 	ActionsWindow = Window
 	# Gears (time) when options pane is down
 	Button = GemRB.GetControl (Window, 62)
+	Label = GemRB.CreateLabelOnButton (Window, Button, 0x1000003e, "NORMAL", 0)
+
 	# FIXME: display all animations
-	GemRB.SetAnimation (Window, Button, "CPEN")
+	GemRB.SetAnimation (Window, Label, "CPEN")
+	#GemRB.SetAnimation (Window, Button, "CGEAR")
+	#GemRB.SetButtonBAM (Window, Button, "CDIAL", 0, 0)
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
 	GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "GearsClicked")
@@ -750,14 +758,5 @@ def SetEncumbranceLabels (Window, Label, Label2, pc):
 		GemRB.SetLabelTextColor (Window, Label2, 255, 0, 0)
 	return
 
-def DebugInventorySlots(func=""):
-	print
-	print func
-	pc = GemRB.GameGetSelectedPCSingle ()
-	for i in range(16):
-		print 2**i, GemRB.GetSlots (pc, 2**i, 1)
-	print SLOT_ANY, GemRB.GetSlots (pc, SLOT_ANY, 1)
-	print
-	
 def GearsClicked():
 	GemRB.GamePause(2,0)

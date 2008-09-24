@@ -224,7 +224,11 @@ def OpenContainerWindow ():
 
 	# Gears (time) when options pane is down
 	Button = GemRB.GetControl (Window, 62)
+	Label = GemRB.CreateLabelOnButton (Window, Button, 0x1000003e, "NORMAL", 0)
+
+	GemRB.SetAnimation (Window, Label, "CPEN")
 	GemRB.SetAnimation (Window, Button, "CGEAR")
+	GemRB.SetButtonBAM (Window, Button, "CDIAL", 0, 0)
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
 	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
 	GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "GearsClicked")
