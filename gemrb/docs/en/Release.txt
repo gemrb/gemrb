@@ -35,6 +35,7 @@ Source release
 ==============
 
 * on Unix/Linux: 
+  sed -i 's,-Werror,,' configure.in
   ./autogen.sh
   make dist
 
