@@ -25,10 +25,10 @@
 
 import GemRB
 from GUIDefines import *
-from GUICommon import CloseOtherWindow
 from ie_stats import *
 from ie_modal import *
 from ie_action import *
+from GUICommon import SetGamedaysAndHourToken
 
 FRAME_PC_SELECTED = 0
 FRAME_PC_TARGET   = 1
@@ -44,54 +44,55 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	Button = GemRB.GetControl (Window, 0)
 	GemRB.SetTooltip (Window, Button, 16313)
 	#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	GemRB.SetVarAssoc(Window, Button, "SelectedWindow", 0)
+	GemRB.SetVarAssoc (Window, Button, "SelectedWindow", 0)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, ReturnToGame)
 
 	# Map
 	Button = GemRB.GetControl (Window, 1)
 	GemRB.SetTooltip (Window, Button, 16310)
 	#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	GemRB.SetVarAssoc(Window, Button, "SelectedWindow", 1)
+	GemRB.SetVarAssoc (Window, Button, "SelectedWindow", 1)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenMapWindow")
 
 	# Journal
 	Button = GemRB.GetControl (Window, 2)
 	GemRB.SetTooltip (Window, Button, 16308)
 	#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	GemRB.SetVarAssoc(Window, Button, "SelectedWindow", 2)
+	GemRB.SetVarAssoc (Window, Button, "SelectedWindow", 2)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
+
 	# Inventory
 	Button = GemRB.GetControl (Window, 3)
 	GemRB.SetTooltip (Window, Button, 16307)
 	#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	GemRB.SetVarAssoc(Window, Button, "SelectedWindow", 3)
+	GemRB.SetVarAssoc (Window, Button, "SelectedWindow", 3)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenInventoryWindow")
 
 	# Records
 	Button = GemRB.GetControl (Window, 4)
 	GemRB.SetTooltip (Window, Button, 16306)
 	#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	GemRB.SetVarAssoc(Window, Button, "SelectedWindow", 4)
+	GemRB.SetVarAssoc (Window, Button, "SelectedWindow", 4)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenRecordsWindow")
 
 	# Mage
 	Button = GemRB.GetControl (Window, 5)
 	GemRB.SetTooltip (Window, Button, 16309)
 	#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	GemRB.SetVarAssoc(Window, Button, "SelectedWindow", 5)
+	GemRB.SetVarAssoc (Window, Button, "SelectedWindow", 5)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenMageWindow")
 	# Priest
 	Button = GemRB.GetControl (Window, 6)
 	GemRB.SetTooltip (Window, Button, 14930)
 	#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	GemRB.SetVarAssoc(Window, Button, "SelectedWindow", 6)
+	GemRB.SetVarAssoc (Window, Button, "SelectedWindow", 6)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenPriestWindow")
 
 	# Options
 	Button = GemRB.GetControl (Window, 7)
 	GemRB.SetTooltip (Window, Button, 16311)
 	#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
-	GemRB.SetVarAssoc(Window, Button, "SelectedWindow", 7)
+	GemRB.SetVarAssoc (Window, Button, "SelectedWindow", 7)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenOptionsWindow")
 
 	# Party mgmt
@@ -105,8 +106,11 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 		GemRB.CreateButton (Window, 9, 6, pos, 64, 71)
 		Button = GemRB.GetControl (Window, 9)
 		GemRB.SetAnimation (Window, Button, "CGEAR")
-		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ANIMATED, OP_SET)
-		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE|IE_GUI_BUTTON_ANIMATED|IE_GUI_BUTTON_NORMAL, OP_SET)
+		GemRB.SetEvent(Window, Button, IE_GUI_BUTTON_ON_PRESS, "GearsClicked")
+		SetGamedaysAndHourToken()
+		GemRB.SetTooltip(Window, Button, 16041)
 
 	return
 
@@ -424,7 +428,7 @@ def GetActorClassTitle (actor):
 	ClassTable = GemRB.LoadTable ("classes")
 	Class = GemRB.FindTableValue ( ClassTable, 5, Class )
 
-	if ClassTitle==0:
+	if ClassTitle == 0:
 		if KitIndex == 0:
 			ClassTitle=GemRB.GetTableValue (ClassTable, Class, 2)
 		#else:
@@ -475,19 +479,29 @@ def OpenPortraitWindow (needcontrols):
 		Button = GemRB.GetControl (Window, 8)
 		GemRB.SetButtonSprites (Window, Button, "GUIRSBUT", 0,0,1,0,0)
 		GemRB.SetTooltip (Window, Button, 11942)
+		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "RestPress")
 
 		# AI
 		pos = pos - 37
 		GemRB.CreateButton (Window, 6, 6, pos, 27, 36)
 		Button = GemRB.GetControl (Window, 6)
-		GemRB.SetButtonSprites (Window, Button, "GUIBTACT",0,46,47,48,49)
-		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
+		#fixing a gui bug, and while we are at it, hacking it to be easier
+		GemRB.SetButtonSprites (Window, Button, "GUIBTACT", 0, 46, 47, 48, 49)
+		GSFlags = GemRB.GetMessageWindowSize ()&GS_PARTYAI
+
+		GemRB.SetVar ("AI", GSFlags)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "AIPress")
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
+		GemRB.SetVarAssoc (Window, Button, "AI", 1)
+		if GSFlags:
+			GemRB.SetTooltip (PortraitWindow, Button, 15917)
+		else:
+			GemRB.SetTooltip (PortraitWindow, Button, 15918)
 
 		#Select All
 		GemRB.CreateButton (Window, 7, 33, pos, 27, 36)
 		Button = GemRB.GetControl (Window, 7)
-		GemRB.SetButtonSprites (Window, Button, "GUIBTACT",0,50,51,50,51)
+		GemRB.SetButtonSprites (Window, Button, "GUIBTACT", 0, 50, 51, 50, 51)
 		GemRB.SetTooltip (Window, Button, 10485)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SelectAllOnPress")
 	else:
@@ -700,3 +714,7 @@ def SetEncumbranceLabels (Window, Label, Label2, pc):
 		GemRB.SetLabelTextColor (Window, Label, 255, 255, 255)
 		GemRB.SetLabelTextColor (Window, Label2, 255, 0, 0)
 	return
+
+def GearsClicked():
+	GemRB.GamePause(2,0)
+

@@ -63,6 +63,7 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	#GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	GemRB.SetVarAssoc (Window, Button, "SelectedWindow", 2)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenJournalWindow")
+
 	# Inventory
 	Button = GemRB.GetControl (Window, 3)
 	GemRB.SetTooltip (Window, Button, 16307)
@@ -482,7 +483,7 @@ def OpenPortraitWindow (needcontrols):
 	if needcontrols:
 		Button = GemRB.GetControl (Window, 6)
 		GSFlags = GemRB.GetMessageWindowSize ()&GS_PARTYAI
-		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX,OP_OR)
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
 		#this control is crippled
 		GemRB.SetButtonSprites (Window, Button, "GUIBTACT", 0, 46, 47, 48, 49)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "AIPress")
@@ -551,9 +552,9 @@ def UpdatePortraitWindow ():
 		state = GemRB.GetPlayerStat (i+1, IE_STATE_ID)
 
 		if (hp_max<1):
-			 ratio = 0.0
+			ratio = 0.0
 		else:
-			 ratio = (hp+0.0) / hp_max
+			ratio = (hp+0.0) / hp_max
 
 		if hp<1 or (state & STATE_DEAD):
 			GemRB.SetButtonOverlay (Window, Button, ratio, 64,64,64,200, 64,64,64,200)

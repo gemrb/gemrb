@@ -93,7 +93,7 @@ def SetupMenuWindowControls (Window, Gears, ReturnToGame):
 	# Multi player team setup?
 	Button = GemRB.GetControl (Window, 8)
 	GemRB.SetTooltip (Window, Button, 13902)
-	
+
 	if Gears:
 		# Pendulum, gears, sun/moon dial  (time)
 		# FIXME: display all animations: CPEN, CGEAR, CDIAL
@@ -379,13 +379,13 @@ def ActionStealthPressed ():
 	GemRB.SetModalState (pc, MS_STEALTH)
 	UpdateActionsWindow ()
 	return
-	
+
 def ActionTurnPressed ():
 	pc = GemRB.GameGetFirstSelectedPC ()
 	GemRB.SetModalState (pc, MS_TURNUNDEAD)
 	UpdateActionsWindow ()
 	return
-	
+
 def ActionUseItemPressed ():
 	GemRB.SetVar ("TopIndex", 0)
 	GemRB.SetVar ("ActionLevel", 1)
@@ -403,7 +403,7 @@ def ActionQItemPressed (action):
 	#quick slot
 	GemRB.UseItem (pc, -2, action)
 	return
-	
+
 def ActionQItem1Pressed ():
 	ActionQItemPressed (ACT_QSLOT1)
 	return
@@ -537,9 +537,9 @@ def OpenPortraitWindow (needcontrols):
 		# AI
 		Button = GemRB.GetControl (Window, 6)
 		#fixing a gui bug, and while we are at it, hacking it to be easier
-		GemRB.SetButtonSprites (Window, Button, "GUIBTACT",0,48,47,46,49)
+		GemRB.SetButtonSprites (Window, Button, "GUIBTACT", 0, 48, 47, 46, 49)
 		GSFlags = GemRB.GetMessageWindowSize ()&GS_PARTYAI
-		
+
 		GemRB.SetVar ("AI", GSFlags)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "AIPress")
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
@@ -602,9 +602,9 @@ def UpdatePortraitWindow ():
 		state = GemRB.GetPlayerStat (i+1, IE_STATE_ID)
 
 		if (hp_max<1):
-			 ratio = 0.0
+			ratio = 0.0
 		else:
-			 ratio = (hp+0.0) / hp_max
+			ratio = (hp+0.0) / hp_max
 
 		if hp<1 or (state & STATE_DEAD):
 			GemRB.SetButtonOverlay (Window, Button, ratio, 64,64,64,200, 64,64,64,200)
@@ -692,7 +692,7 @@ def SetupSavingThrows (pc):
 
 	Race = GemRB.GetPlayerStat (pc, IE_RACE)
 	RaceTable = GemRB.LoadTable ("races")
-	
+
 	Class = GemRB.FindTableValue (ClassTable, 5, Class)
 	Multi = GemRB.GetTableValue (ClassTable, Class, 4)
 
