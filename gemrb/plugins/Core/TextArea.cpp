@@ -520,6 +520,7 @@ void TextArea::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 void TextArea::OnSpecialKeyPress(unsigned char Key)
 {
 	int len;
+	int i;
 
 	if (!(Flags&IE_GUI_TEXTAREA_EDITABLE)) {
 		return;
@@ -574,7 +575,7 @@ void TextArea::OnSpecialKeyPress(unsigned char Key)
 				break;
 			}
 			lines[CurLine] = (char *) realloc( lines[CurLine], len );
-			for (int i = CurPos; i < len; i++) {
+			for (i = CurPos; i < len; i++) {
 				lines[CurLine][i] = lines[CurLine][i + 1];
 			}
 			//printf("pos: %d After: %s\n",CurPos, lines[CurLine]);
@@ -587,7 +588,7 @@ void TextArea::OnSpecialKeyPress(unsigned char Key)
 					break;
 				}
 				lines[CurLine] = (char *) realloc( lines[CurLine], len );
-				for (int i = CurPos; i < len; i++) {
+				for (i = CurPos; i < len; i++) {
 					lines[CurLine][i - 1] = lines[CurLine][i];
 				}
 				lines[CurLine][len - 1] = 0;
