@@ -80,7 +80,7 @@ CHECK_CXX_SOURCE_COMPILES("typedef void *(* voidvoid)(void);
 void *object = 0;
 voidvoid function;
 function = (voidvoid) object;
-", PERMITS_OBJECT_TO_FUNCTION_CAST)
+" PERMITS_OBJECT_TO_FUNCTION_CAST)
 
 IF( NOT PERMITS_OBJECT_TO_FUNCTION_CAST )
  SET(HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST 1)
