@@ -1,0 +1,6 @@
+#define PACKAGE "gemrb"
+
+#cmakedefine SIZEOF_INT ${SIZEOF_INT}
+#cmakedefine SIZEOF_LONG_INT ${SIZEOF_LONG_INT}
+#cmakedefine HAVE_SNPRINTF 1
+#cmakedefine HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST 1
