@@ -113,7 +113,7 @@ public:
 	bool SetEvent(int eventType, const char *handler);
 private:
 	/** Call event handler on click */
-	void ClickHandle(unsigned char Button);
+	void ClickHandle(unsigned short Button);
 	/** Move viewport */
 	void ViewHandle(unsigned short x, unsigned short y);
 };

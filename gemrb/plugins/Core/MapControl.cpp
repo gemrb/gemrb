@@ -327,7 +327,7 @@ void MapControl::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
 	Owner->Cursor = IE_CURSOR_NORMAL;
 }
 
-void MapControl::ClickHandle(unsigned char Button)
+void MapControl::ClickHandle(unsigned short Button)
 {
 	core->GetDictionary()->SetAt( "MapControlX", NotePosX );
 	core->GetDictionary()->SetAt( "MapControlY", NotePosY );
@@ -373,7 +373,7 @@ void MapControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short 
 		return;
 	case GEM_MB_ACTION:
 		if (Button & GEM_MB_DOUBLECLICK) {
-			ClickHandle((unsigned char) Button);
+			ClickHandle(Button);
 		}
 	}
 
@@ -407,7 +407,7 @@ void MapControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short Bu
 			ViewHandle(x,y);
 			NotePosX = (short) SCREEN_TO_MAPX(x) * MAP_MULT / MAP_DIV;
 			NotePosY = (short) SCREEN_TO_MAPY(y) * MAP_MULT / MAP_DIV;
-			ClickHandle((unsigned char) Button);
+			ClickHandle(Button);
 			return;
 		case MAP_NO_NOTES:
 			ViewHandle(x,y);
@@ -417,10 +417,10 @@ void MapControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short Bu
 			if ((Button == GEM_MB_ACTION) ) {
 				ViewHandle(x,y);
 			}
-			ClickHandle((unsigned char) Button);
+			ClickHandle(Button);
 			return;
 		default:
-			ClickHandle((unsigned char) Button);
+			ClickHandle(Button);
 			return;
 	}
 }

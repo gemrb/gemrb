@@ -174,14 +174,6 @@ def LeftDoublePressMap ():
 	print "MoveToPoint"
 	return
 
-def LeftPressMap ():
-	print "MoveRectangle"
-	return
-
-def AddNoteWindow ():
-	print "Add Note"
-	return
-
 def OpenWorldMapWindowInside ():
 	OpenMapWindow ()
 	WorldMapWindowCommon (-1)
