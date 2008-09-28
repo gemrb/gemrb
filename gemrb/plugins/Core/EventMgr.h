@@ -84,7 +84,7 @@ private:
 	std::vector< int> topwin;
 
 	unsigned short dc_x, dc_y;
-	unsigned long dc_time;
+	unsigned long dc_time, dc_delay;
 public:
 	EventMgr(void);
 	~EventMgr(void);
@@ -115,6 +115,9 @@ public:
 	void OnSpecialKeyPress(unsigned char Key);
 	/** Sets focus to the control of the window */
 	void SetFocused(Window *win, Control *ctrl);
+	/** Sets the maximum accepted doubleclick delay */
+	void SetDCDelay(unsigned long t);
+
 	/** Mask of which Mouse Buttons are pressed */
 	unsigned char MButtons;
 private:
@@ -125,6 +128,7 @@ private:
 	/** Sets a Window on the Top of the Window Queue */
 	void SetDefaultFocus(Window *win);
 	void SetOnTop(int Index);
+	bool ClickMatch(unsigned short x, unsigned short y, unsigned long thisTime);
 };
 
 #endif // ! EVENTMGR_H

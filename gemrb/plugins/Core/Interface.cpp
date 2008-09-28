@@ -1224,6 +1224,9 @@ int Interface::LoadSprites()
 
 int Interface::Init()
 {
+	printMessage( "Core", "Initializing the Event Manager...", WHITE );
+	evntmgr = new EventMgr();
+
 	printMessage( "Core", "Initializing Variables Dictionary...", WHITE );
 	vars = new Variables();
 	if (!vars) {
@@ -1396,10 +1399,8 @@ int Interface::Init()
 		return GEM_ERROR;
 	}
 
-	printMessage( "Core", "Initializing the Event Manager...", WHITE );
-	evntmgr = new EventMgr();
 	printStatus( "OK", LIGHT_GREEN );
-	printMessage( "Core", "BroadCasting Event Manager...", WHITE );
+	printMessage( "Core", "Broadcasting Event Manager...", WHITE );
 	video->SetEventMgr( evntmgr );
 	printStatus( "OK", LIGHT_GREEN );
 	printMessage( "Core", "Initializing Window Manager...", WHITE );
@@ -1485,18 +1486,6 @@ int Interface::Init()
 		printMessage( "Core", "Loading resource data File...", WHITE );
 		INIresdata = ( DataFileMgr * ) GetInterface( IE_INI_CLASS_ID );
 		DataStream* ds = key->GetResource("resdata", IE_INI_CLASS_ID);
-/*
-		FileStream* fs = new FileStream();
-		char tINIresdata[_MAX_PATH];
-		PathJoin( tINIresdata, GamePath, "resdata.ini", NULL );
-		ResolveFilePath( tINIresdata );
-		struct stat fst;
-		if ( stat(tINIresdata, &fst) == -1 ) {
-			printStatus( "ERROR", LIGHT_RED );
-			return GEM_ERROR;
-		}
-		fs->Open( tINIresdata, true );
-*/
 		if (!INIresdata->Open( ds, true )) {
 			printStatus( "ERROR", LIGHT_RED );
 		} else {
@@ -1986,6 +1975,8 @@ bool Interface::LoadConfig(const char* filename)
 			FullScreen = ( atoi( value ) == 0 ) ? false : true;
 		} else if (stricmp( name, "TooltipDelay" ) == 0) {
 			TooltipDelay = atoi( value );
+		} else if (stricmp( name, "DoubleClickDelay" ) == 0) {
+			evntmgr->SetDCDelay( atoi( value ) );
 		} else if (stricmp( name, "SkipIntroVideos" ) == 0) {
 			SkipIntroVideos = ( atoi( value ) == 0 ) ? false : true;
 		} else if (stricmp( name, "DrawFPS" ) == 0) {

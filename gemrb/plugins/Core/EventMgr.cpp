@@ -24,9 +24,6 @@
 #include "Interface.h"
 #include "Video.h"
 
-//double click time (configure? system variable?)
-#define DC_TIME  500
-
 EventMgr::EventMgr(void)
 {
 	last_win_focused = NULL;
@@ -36,6 +33,7 @@ EventMgr::EventMgr(void)
 	dc_x = 0;
 	dc_y = 0;
 	dc_time = 0;
+	dc_delay = 500;
 }
 
 EventMgr::~EventMgr(void)
@@ -203,6 +201,16 @@ void EventMgr::RefreshCursor(int idx)
 	video->SetCursor( core->Cursors[idx], core->Cursors[idx ^ 1] );
 }
 
+bool EventMgr::ClickMatch(unsigned short x, unsigned short y, unsigned long thisTime)
+{
+	if (dc_x+10<x) return false;
+	if (dc_x>x+10) return false;
+	if (dc_y+10<y) return false;
+	if (dc_y>y+10) return false;
+	if (dc_time<thisTime) return false;
+	return true;
+}
+
 /** BroadCast Mouse Move Event */
 void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Button,
 	unsigned short Mod)
@@ -213,7 +221,7 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 	unsigned long thisTime;
 
 	GetTime( thisTime );
-	if (dc_x==x && dc_y==y && dc_time>thisTime) {
+	if (ClickMatch(x, y, thisTime)) {
 		Button |= GEM_MB_DOUBLECLICK;
 		dc_x = 0;
 		dc_y = 0;
@@ -223,7 +231,7 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 		printf("time: %d\n", (int) (thisTime-dc_time) );
 		dc_x = x;
 		dc_y = y;
-		dc_time = thisTime+DC_TIME;
+		dc_time = thisTime+dc_delay;
 	}
 	MButtons |= Button;
 	for (t = topwin.begin(); t != topwin.end(); ++t) {
@@ -364,3 +372,9 @@ void EventMgr::SetFocused(Window *win, Control *ctrl)
 	core->GetVideoDriver()->GetMousePos(x,y);
 	MouseMove((unsigned short) x, (unsigned short) y);
 }
+
+void EventMgr::SetDCDelay(unsigned long t)
+{
+	dc_delay = t;
+}
+
