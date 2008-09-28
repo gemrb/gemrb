@@ -33,8 +33,9 @@ class MapControl;
 #include "Interface.h"
 
 // !!! Keep these synchronized with GUIDefines.py !!!
-#define IE_GUI_MAP_ON_PRESS	0x09000000
-
+#define IE_GUI_MAP_ON_PRESS     	0x09000000
+#define IE_GUI_MAP_ON_RIGHT_PRESS	0x09000001
+#define IE_GUI_MAP_ON_DOUBLE_PRESS	0x09000002
 
 #ifdef WIN32
 
@@ -77,6 +78,8 @@ public:
 	short ViewWidth, ViewHeight;
 	short XCenter, YCenter;
 	EventHandler MapControlOnPress;
+	EventHandler MapControlOnRightPress;
+	EventHandler MapControlOnDoublePress;
 
 	MapControl(void);
 	~MapControl(void);
@@ -97,10 +100,10 @@ public:
 	/** Mouse Leave Event */
 	void OnMouseLeave(unsigned short x, unsigned short y);
 	/** Mouse Button Down */
-	void OnMouseDown(unsigned short x, unsigned short y, unsigned char Button,
+	void OnMouseDown(unsigned short x, unsigned short y, unsigned short Button,
 		unsigned short Mod);
 	/** Mouse Button Up */
-	void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
+	void OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
 		unsigned short Mod);
 	/** Key Release Event */
 	void OnKeyRelease(unsigned char Key, unsigned short Mod);
@@ -110,7 +113,7 @@ public:
 	bool SetEvent(int eventType, const char *handler);
 private:
 	/** Call event handler on click */
-	void ClickHandle();
+	void ClickHandle(unsigned char Button);
 	/** Move viewport */
 	void ViewHandle(unsigned short x, unsigned short y);
 };

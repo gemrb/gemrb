@@ -167,10 +167,10 @@ public: //Events
 	/** Mouse Over Event */
 	void OnMouseOver(unsigned short x, unsigned short y);
 	/** Mouse Button Up */
-	void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
+	void OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
 		unsigned short Mod);
 	/** Mouse button down*/
-	void OnMouseDown(unsigned short x, unsigned short y, unsigned char Button,
+	void OnMouseDown(unsigned short x, unsigned short y, unsigned short Button,
 		unsigned short Mod);
 	/** Set handler for specified event */
 	bool SetEvent(int eventType, const char *handler);

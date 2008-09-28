@@ -114,7 +114,7 @@ void Label::SetAlignment(unsigned char Alignment)
 }
 
 void Label::OnMouseUp(unsigned short x, unsigned short y,
-	unsigned char /*Button*/, unsigned short /*Mod*/)
+	unsigned short /*Button*/, unsigned short /*Mod*/)
 {
 	printf( "Label::OnMouseUp\n" );
 	if (( x <= Width ) && ( y <= Height )) {

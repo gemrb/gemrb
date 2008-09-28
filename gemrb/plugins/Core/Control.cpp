@@ -160,7 +160,7 @@ void Control::OnMouseOver(unsigned short /*x*/, unsigned short /*y*/)
 
 /** Mouse Button Down */
 void Control::OnMouseDown(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short Mod)
+	unsigned short Button, unsigned short Mod)
 {
 	if (Button == GEM_MB_SCRLUP || Button == GEM_MB_SCRLDOWN) {
 		Control *ctrl = Owner->GetScrollControl();
@@ -172,7 +172,7 @@ void Control::OnMouseDown(unsigned short x, unsigned short y,
 
 /** Mouse Button Up */
 void Control::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
-	unsigned char /*Button*/, unsigned short /*Mod*/)
+	unsigned short /*Button*/, unsigned short /*Mod*/)
 {
 	//printf("OnMouseUp: CtrlID = 0x%08X, x = %hd, y = %hd, Button = %d, Mos = %hd\n", (unsigned int) ControlID, x, y, Button, Mod);
 }

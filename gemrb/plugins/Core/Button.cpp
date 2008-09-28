@@ -340,7 +340,7 @@ void Button::OnSpecialKeyPress(unsigned char Key)
 
 /** Mouse Button Down */
 void Button::OnMouseDown(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short Mod)
+	unsigned short Button, unsigned short Mod)
 {
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		Control::OnMouseDown(x,y,Button,Mod);
@@ -393,7 +393,7 @@ void Button::OnMouseDown(unsigned short x, unsigned short y,
 }
 /** Mouse Button Up */
 void Button::OnMouseUp(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short Mod)
+	unsigned short Button, unsigned short Mod)
 {
 	if (State == IE_GUI_BUTTON_DISABLED) {
 		return;

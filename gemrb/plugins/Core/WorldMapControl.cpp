@@ -276,7 +276,7 @@ void WorldMapControl::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
 
 /** Mouse Button Down */
 void WorldMapControl::OnMouseDown(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short /*Mod*/)
+	unsigned short Button, unsigned short /*Mod*/)
 {
 	switch(Button) {
 	case GEM_MB_ACTION:
@@ -294,7 +294,7 @@ void WorldMapControl::OnMouseDown(unsigned short x, unsigned short y,
 }
 /** Mouse Button Up */
 void WorldMapControl::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
-	unsigned char Button, unsigned short /*Mod*/)
+	unsigned short Button, unsigned short /*Mod*/)
 {
 	if (Button != GEM_MB_ACTION) {
 		return;

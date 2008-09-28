@@ -24,12 +24,18 @@
 #include "Interface.h"
 #include "Video.h"
 
+//double click time (configure? system variable?)
+#define DC_TIME  500
+
 EventMgr::EventMgr(void)
 {
 	last_win_focused = NULL;
 	// Last window we were over. Used to determine MouseEnter and MouseLeave events
 	last_win_over = NULL;
 	MButtons = 0;
+	dc_x = 0;
+	dc_y = 0;
+	dc_time = 0;
 }
 
 EventMgr::~EventMgr(void)
@@ -198,13 +204,27 @@ void EventMgr::RefreshCursor(int idx)
 }
 
 /** BroadCast Mouse Move Event */
-void EventMgr::MouseDown(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short Mod)
+void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Button,
+	unsigned short Mod)
 {
 	std::vector< int>::iterator t;
 	std::vector< Window*>::iterator m;
 	Control *ctrl;
+	unsigned long thisTime;
 
+	GetTime( thisTime );
+	if (dc_x==x && dc_y==y && dc_time>thisTime) {
+		Button |= GEM_MB_DOUBLECLICK;
+		dc_x = 0;
+		dc_y = 0;
+		dc_time = 0;
+	} else {
+		printMessage("EventMgr","",GREEN);
+		printf("time: %d\n", (int) (thisTime-dc_time) );
+		dc_x = x;
+		dc_y = y;
+		dc_time = thisTime+DC_TIME;
+	}
 	MButtons |= Button;
 	for (t = topwin.begin(); t != topwin.end(); ++t) {
 		m = windows.begin();
@@ -247,8 +267,8 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y,
 	}
 }
 /** BroadCast Mouse Up Event */
-void EventMgr::MouseUp(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short Mod)
+void EventMgr::MouseUp(unsigned short x, unsigned short y, unsigned short Button,
+	unsigned short Mod)
 {
 	MButtons &= ~Button;
 	if (last_win_focused == NULL) return;

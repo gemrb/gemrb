@@ -108,10 +108,10 @@ private:
 	/** Mouse Leave Event */
 	void OnMouseLeave(unsigned short x, unsigned short y);
 	/** Mouse Button Down */
-	void OnMouseDown(unsigned short x, unsigned short y, unsigned char Button,
+	void OnMouseDown(unsigned short x, unsigned short y, unsigned short Button,
 		unsigned short Mod);
 	/** Mouse Button Up */
-	void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button,
+	void OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
 		unsigned short Mod);
 	/** Key Release Event */
 	void OnKeyRelease(unsigned char Key, unsigned short Mod);

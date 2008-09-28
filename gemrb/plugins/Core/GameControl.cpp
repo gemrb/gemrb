@@ -1343,8 +1343,8 @@ bool GameControl::HandleActiveRegion(InfoPoint *trap, Actor * actor, Point &p)
 	return false;
 }
 /** Mouse Button Down */
-void GameControl::OnMouseDown(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short /*Mod*/)
+void GameControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short Button,
+	unsigned short /*Mod*/)
 {
 	if (ScreenFlags&SF_DISABLEMOUSE)
 		return;
@@ -1371,8 +1371,8 @@ void GameControl::OnMouseDown(unsigned short x, unsigned short y,
 	}
 }
 /** Mouse Button Up */
-void GameControl::OnMouseUp(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short /*Mod*/)
+void GameControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
+	unsigned short /*Mod*/)
 {
 	unsigned int i;
 	char Tmp[256];

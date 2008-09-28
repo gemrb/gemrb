@@ -145,7 +145,7 @@ void ScrollBar::SetImage(unsigned char type, Sprite2D* img)
 }
 /** Mouse Button Down */
 void ScrollBar::OnMouseDown(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short /*Mod*/)
+	unsigned short Button, unsigned short /*Mod*/)
 {
 	core->RedrawAll();
 
@@ -212,7 +212,7 @@ void ScrollBar::OnMouseDown(unsigned short x, unsigned short y,
 }
 /** Mouse Button Up */
 void ScrollBar::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
-	unsigned char /*Button*/, unsigned short /*Mod*/)
+	unsigned short /*Button*/, unsigned short /*Mod*/)
 {
 	Changed = true;
 	State = 0;

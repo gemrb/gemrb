@@ -90,11 +90,13 @@ void Slider::Draw(unsigned short x, unsigned short y)
 			break;
 	}
 }
+
 /** Returns the actual Slider Position */
 unsigned int Slider::GetPosition()
 {
 	return Pos;
 }
+
 /** Sets the actual Slider Position trimming to the Max and Min Values */
 void Slider::SetPosition(unsigned int pos)
 {
@@ -108,6 +110,7 @@ void Slider::SetPosition(unsigned int pos)
 	}	
 	Changed = true;
 }
+
 /** Redraws a slider which is associated with VariableName */
 void Slider::RedrawSlider(const char* VariableName, int Sum)
 {
@@ -123,6 +126,7 @@ void Slider::RedrawSlider(const char* VariableName, int Sum)
 	}
 	Changed = true;
 }
+
 /** Sets the selected image */
 void Slider::SetImage(unsigned char type, Sprite2D* img)
 {
@@ -149,8 +153,8 @@ void Slider::SetImage(unsigned char type, Sprite2D* img)
 }
 
 /** Mouse Button Down */
-void Slider::OnMouseDown(unsigned short x, unsigned short y,
-	unsigned char /*Button*/, unsigned short /*Mod*/)
+void Slider::OnMouseDown(unsigned short x, unsigned short y, unsigned short /*Button*/,
+	unsigned short /*Mod*/)
 {
 	Changed = true;
 	unsigned int oldPos = Pos;
@@ -220,15 +224,17 @@ void Slider::OnMouseDown(unsigned short x, unsigned short y,
 		}
 	}
 }
+
 /** Mouse Button Up */
-void Slider::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
-	unsigned char /*Button*/, unsigned short /*Mod*/)
+void Slider::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/, unsigned short /*Button*/,
+	unsigned short /*Mod*/)
 {
 	if (State != IE_GUI_SLIDER_KNOB) {
 		Changed = true;
 	}
 	State = IE_GUI_SLIDER_KNOB;
 }
+
 /** Mouse Over Event */
 void Slider::OnMouseOver(unsigned short x, unsigned short /*y*/)
 {
@@ -270,6 +276,7 @@ int Slider::SetText(const char* /*string*/, int /*pos*/)
 	return 0;
 }
 
+/** Sets the slider change event */
 bool Slider::SetEvent(int eventType, const char *handler)
 {
 	Changed = true;

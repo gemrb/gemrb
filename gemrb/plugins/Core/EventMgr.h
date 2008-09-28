@@ -56,7 +56,8 @@
 #define GEM_MB_MENU             4
 #define GEM_MB_SCRLUP           8
 #define GEM_MB_SCRLDOWN         16
-//not working actually
+
+#define GEM_MB_NORMAL           255
 #define GEM_MB_DOUBLECLICK      256
 
 #ifdef WIN32
@@ -82,6 +83,8 @@ private:
 	std::vector< Window*> windows;
 	std::vector< int> topwin;
 
+	unsigned short dc_x, dc_y;
+	unsigned long dc_time;
 public:
 	EventMgr(void);
 	~EventMgr(void);
@@ -97,10 +100,10 @@ public:
 	/** BroadCast Mouse Move Event */
 	void MouseMove(unsigned short x, unsigned short y);
 	/** BroadCast Mouse Move Event */
-	void MouseDown(unsigned short x, unsigned short y, unsigned char Button,
+	void MouseDown(unsigned short x, unsigned short y, unsigned short Button,
 		unsigned short Mod);
 	/** BroadCast Mouse Move Event */
-	void MouseUp(unsigned short x, unsigned short y, unsigned char Button,
+	void MouseUp(unsigned short x, unsigned short y, unsigned short Button,
 		unsigned short Mod);
 	/** BroadCast Mouse Idle Event */
 	void MouseIdle(unsigned long time);

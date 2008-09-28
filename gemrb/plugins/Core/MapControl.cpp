@@ -86,6 +86,8 @@ MapControl::MapControl(void)
 	// initialize var and event callback to no-ops
 	VarName[0] = 0;
 	ResetEventHandler( MapControlOnPress );
+	ResetEventHandler( MapControlOnRightPress );
+	ResetEventHandler( MapControlOnDoublePress );
 
 	MyMap = core->GetGame()->GetCurrentArea();
 	MapMOS = MyMap->SmallMap->GetImage();
@@ -325,11 +327,24 @@ void MapControl::OnMouseLeave(unsigned short /*x*/, unsigned short /*y*/)
 	Owner->Cursor = IE_CURSOR_NORMAL;
 }
 
-void MapControl::ClickHandle()
+void MapControl::ClickHandle(unsigned char Button)
 {
 	core->GetDictionary()->SetAt( "MapControlX", NotePosX );
 	core->GetDictionary()->SetAt( "MapControlY", NotePosY );
-	RunEventHandler( MapControlOnPress );
+	switch(Button&GEM_MB_NORMAL)
+	{
+        case GEM_MB_ACTION:
+		if (Button&GEM_MB_DOUBLECLICK) {
+			RunEventHandler( MapControlOnDoublePress );
+			printMessage("MapControl","Doubleclick detected\n",GREEN);
+		} else {
+			RunEventHandler( MapControlOnPress );
+		}
+		break;
+        case GEM_MB_MENU:
+		RunEventHandler( MapControlOnRightPress );
+		break;
+	}
 }
 
 void MapControl::ViewHandle(unsigned short x, unsigned short y)
@@ -346,16 +361,20 @@ void MapControl::ViewHandle(unsigned short x, unsigned short y)
 }
 
 /** Mouse Button Down */
-void MapControl::OnMouseDown(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short /*Mod*/)
+void MapControl::OnMouseDown(unsigned short x, unsigned short y, unsigned short Button,
+	unsigned short /*Mod*/)
 {
-	switch(Button) {
+	switch((unsigned char) Button) {
 	case GEM_MB_SCRLUP:
 		OnSpecialKeyPress(GEM_UP);
 		return;
 	case GEM_MB_SCRLDOWN:
 		OnSpecialKeyPress(GEM_DOWN);
 		return;
+	case GEM_MB_ACTION:
+		if (Button & GEM_MB_DOUBLECLICK) {
+			ClickHandle((unsigned char) Button);
+		}
 	}
 
 	mouseIsDown = true;
@@ -374,8 +393,8 @@ void MapControl::OnMouseDown(unsigned short x, unsigned short y,
 }
 
 /** Mouse Button Up */
-void MapControl::OnMouseUp(unsigned short x, unsigned short y,
-	unsigned char Button, unsigned short /*Mod*/)
+void MapControl::OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
+	unsigned short /*Mod*/)
 {
 	if (!mouseIsDown) {
 		return;
@@ -388,7 +407,7 @@ void MapControl::OnMouseUp(unsigned short x, unsigned short y,
 			ViewHandle(x,y);
 			NotePosX = (short) SCREEN_TO_MAPX(x) * MAP_MULT / MAP_DIV;
 			NotePosY = (short) SCREEN_TO_MAPY(y) * MAP_MULT / MAP_DIV;
-			ClickHandle();
+			ClickHandle((unsigned char) Button);
 			return;
 		case MAP_NO_NOTES:
 			ViewHandle(x,y);
@@ -398,10 +417,10 @@ void MapControl::OnMouseUp(unsigned short x, unsigned short y,
 			if ((Button == GEM_MB_ACTION) ) {
 				ViewHandle(x,y);
 			}
-			ClickHandle();
-			break;
+			ClickHandle((unsigned char) Button);
+			return;
 		default:
-			ClickHandle();
+			ClickHandle((unsigned char) Button);
 			return;
 	}
 }
@@ -447,6 +466,12 @@ bool MapControl::SetEvent(int eventType, const char *handler)
 	switch (eventType) {
 	case IE_GUI_MAP_ON_PRESS:
 		SetEventHandler( MapControlOnPress, handler );
+		break;
+	case IE_GUI_MAP_ON_RIGHT_PRESS:
+		SetEventHandler( MapControlOnRightPress, handler );
+		break;
+	case IE_GUI_MAP_ON_DOUBLE_PRESS:
+		SetEventHandler( MapControlOnDoublePress, handler );
 		break;
 	default:
 		return false;

@@ -101,9 +101,11 @@ private: // Private attributes
 	unsigned int Pos;
 public: // Public Events
 	/** Mouse Button Down */
-	void OnMouseDown(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
+	void OnMouseDown(unsigned short x, unsigned short y, unsigned short Button,
+		unsigned short Mod);
 	/** Mouse Button Up */
-	void OnMouseUp(unsigned short x, unsigned short y, unsigned char Button, unsigned short Mod);
+	void OnMouseUp(unsigned short x, unsigned short y, unsigned short Button,
+		unsigned short Mod);
 	/** Mouse Over Event */
 	void OnMouseOver(unsigned short x, unsigned short y);
 	/** Set handler for specified event */

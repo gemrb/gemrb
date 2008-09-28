@@ -155,10 +155,10 @@ public: //Events
 	virtual void OnMouseOver(unsigned short x, unsigned short y);
 	/** Mouse Button Down */
 	virtual void OnMouseDown(unsigned short x, unsigned short y,
-		unsigned char Button, unsigned short Mod);
+		unsigned short Button, unsigned short Mod);
 	/** Mouse Button Up */
 	virtual void OnMouseUp(unsigned short x, unsigned short y,
-		unsigned char Button, unsigned short Mod);
+		unsigned short Button, unsigned short Mod);
 	/** Special Key Press */
 	virtual void OnSpecialKeyPress(unsigned char Key);
 	virtual bool IsPixelTransparent(unsigned short /*x*/, unsigned short /*y*/) {

@@ -775,8 +775,8 @@ void TextArea::OnMouseOver(unsigned short /*x*/, unsigned short y)
 }
 
 /** Mouse Button Up */
-void TextArea::OnMouseUp(unsigned short x, unsigned short y,
-	unsigned char /*Button*/, unsigned short /*Mod*/)
+void TextArea::OnMouseUp(unsigned short x, unsigned short y, unsigned short /*Button*/,
+	unsigned short /*Mod*/)
 {
 	if (( x <= Width ) && ( y <= ( Height - 5 ) ) && ( seltext != -1 )) {
 		Value = (unsigned int) seltext;
@@ -912,8 +912,8 @@ void TextArea::SetupScroll(unsigned long tck)
 	AppendText("\n",-1);
 }
 
-void TextArea::OnMouseDown(unsigned short /*x*/, unsigned short /*y*/,
-	unsigned char Button, unsigned short /*Mod*/)
+void TextArea::OnMouseDown(unsigned short /*x*/, unsigned short /*y*/, unsigned short Button,
+	unsigned short /*Mod*/)
 {
 
 	ScrollBar* scrlbr = (ScrollBar*) sb;
