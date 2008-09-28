@@ -33,7 +33,9 @@ EventMgr::EventMgr(void)
 	dc_x = 0;
 	dc_y = 0;
 	dc_time = 0;
-	dc_delay = 500;
+	dc_delay = 250;
+	rk_delay = 250;
+	rk_flags = GEM_RK_DISABLE;
 }
 
 EventMgr::~EventMgr(void)
@@ -227,8 +229,6 @@ void EventMgr::MouseDown(unsigned short x, unsigned short y, unsigned short Butt
 		dc_y = 0;
 		dc_time = 0;
 	} else {
-		printMessage("EventMgr","",GREEN);
-		printf("time: %d\n", (int) (thisTime-dc_time) );
 		dc_x = x;
 		dc_y = y;
 		dc_time = thisTime+dc_delay;
@@ -378,3 +378,28 @@ void EventMgr::SetDCDelay(unsigned long t)
 	dc_delay = t;
 }
 
+void EventMgr::SetRKDelay(unsigned long t)
+{
+	rk_delay = t;
+}
+
+unsigned long EventMgr::GetRKDelay()
+{
+	if (rk_flags&GEM_RK_DISABLE) return (unsigned long) ~0;
+	if (rk_flags&GEM_RK_DOUBLESPEED) return rk_delay/2;
+	return rk_delay;
+}
+
+unsigned long EventMgr::SetRKFlags(unsigned long arg, unsigned int op)
+{
+	unsigned long tmp = rk_flags;
+        switch (op) {
+        case BM_SET: tmp = arg; break;
+        case BM_OR: tmp |= arg; break;
+        case BM_NAND: tmp &= ~arg; break;
+        case BM_XOR: tmp ^= arg; break;
+        case BM_AND: tmp &= arg; break;
+        }
+	rk_flags=tmp;
+	return rk_flags;
+}

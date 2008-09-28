@@ -8,9 +8,12 @@ SkillTable = 0
 TopIndex = 0
 PointsLeft = 0
 RowCount = 0
+ClickCount = 0
+OldDirection = 0
+OldPos = 0
 
-def RedrawSkills():
-	global TopIndex
+def RedrawSkills(direction):
+	global TopIndex, OldDirection, ClickCount
 
 	if PointsLeft == 0:
 		GemRB.SetButtonState(SkillWindow, DoneButton, IE_GUI_BUTTON_ENABLED)
@@ -43,13 +46,23 @@ def RedrawSkills():
 		ActPoint = GemRB.GetVar("Skill "+str(Pos) )
 		GemRB.SetText(SkillWindow, Label, str(ActPoint) )
 
+	if direction:
+		if OldDirection == direction:
+			ClickCount = ClickCount + 1
+			if ClickCount>20:
+				GemRB.SetRepeatClickFlags(GEM_RK_DOUBLESPEED, OP_OR)
+			return
+
+	OldDirection = direction
+	ClickCount = 0
+	GemRB.SetRepeatClickFlags(GEM_RK_DOUBLESPEED, OP_NAND)
 	return
 
 def ScrollBarPress():
 	global TopIndex
 
 	TopIndex = GemRB.GetVar("TopIndex")
-	RedrawSkills()
+	RedrawSkills(0)
 	return
 
 def OnLoad():
@@ -137,8 +150,9 @@ def OnLoad():
 	GemRB.SetEvent(SkillWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	GemRB.SetButtonState(SkillWindow,DoneButton,IE_GUI_BUTTON_DISABLED)
 	TopIndex = 0
-	RedrawSkills()
+	RedrawSkills(0)
 	GemRB.SetVisible(SkillWindow,1)
+	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	return
 
 
@@ -148,7 +162,7 @@ def JustPress():
 	return
 
 def RightPress():
-	global PointsLeft
+	global PointsLeft, ClickCount, OldPos
 
 	Pos = GemRB.GetVar("Skill")+TopIndex
 	GemRB.SetText(SkillWindow, TextAreaControl, GemRB.GetTableValue(SkillTable,Pos+2,0) )
@@ -157,11 +171,15 @@ def RightPress():
 		return
 	GemRB.SetVar("Skill "+str(Pos),ActPoint-1)
 	PointsLeft = PointsLeft + 1
-	RedrawSkills()
+	if OldPos <> Pos:
+		OldPos = Pos
+		ClickCount = 0
+
+	RedrawSkills(2)
 	return
 
 def LeftPress():
-	global PointsLeft
+	global PointsLeft, ClickCount, OldPos
 
 	Pos = GemRB.GetVar("Skill")+TopIndex
 	GemRB.SetText(SkillWindow, TextAreaControl, GemRB.GetTableValue(SkillTable,Pos+2,0) )
@@ -172,7 +190,11 @@ def LeftPress():
 		return
 	GemRB.SetVar("Skill "+str(Pos), ActPoint+1)
 	PointsLeft = PointsLeft - 1
-	RedrawSkills()
+	if OldPos <> Pos:
+		OldPos = Pos
+		ClickCount = 0
+
+	RedrawSkills(1)
 	return
 
 def BackPress():
@@ -180,9 +202,11 @@ def BackPress():
 	GemRB.SetNextScript("CharGen6")
 	for i in range(RowCount):
 		GemRB.SetVar("Skill "+str(i), 0)
+	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	return
 
 def NextPress():
 	GemRB.UnloadWindow(SkillWindow)
 	GemRB.SetNextScript("GUICG9") #weapon proficiencies
+	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	return

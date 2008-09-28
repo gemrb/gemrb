@@ -1977,6 +1977,8 @@ bool Interface::LoadConfig(const char* filename)
 			TooltipDelay = atoi( value );
 		} else if (stricmp( name, "DoubleClickDelay" ) == 0) {
 			evntmgr->SetDCDelay( atoi( value ) );
+		} else if (stricmp( name, "RepeatKeyDelay" ) == 0) {
+			evntmgr->SetRKDelay( atoi( value ) );
 		} else if (stricmp( name, "SkipIntroVideos" ) == 0) {
 			SkipIntroVideos = ( atoi( value ) == 0 ) ? false : true;
 		} else if (stricmp( name, "DrawFPS" ) == 0) {

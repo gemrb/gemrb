@@ -60,6 +60,9 @@
 #define GEM_MB_NORMAL           255
 #define GEM_MB_DOUBLECLICK      256
 
+#define GEM_RK_DOUBLESPEED      1
+#define GEM_RK_DISABLE          2
+
 #ifdef WIN32
 
 #ifdef GEM_BUILD_DLL
@@ -85,6 +88,7 @@ private:
 
 	unsigned short dc_x, dc_y;
 	unsigned long dc_time, dc_delay;
+	unsigned long rk_delay, rk_flags;
 public:
 	EventMgr(void);
 	~EventMgr(void);
@@ -117,6 +121,9 @@ public:
 	void SetFocused(Window *win, Control *ctrl);
 	/** Sets the maximum accepted doubleclick delay */
 	void SetDCDelay(unsigned long t);
+	void SetRKDelay(unsigned long t);
+	unsigned long GetRKDelay();
+	unsigned long SetRKFlags(unsigned long arg, unsigned int op);
 
 	/** Mask of which Mouse Buttons are pressed */
 	unsigned char MButtons;

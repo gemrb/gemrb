@@ -236,7 +236,7 @@ inline int GetModState(int modstate)
 
 int SDLVideoDriver::SwapBuffers(void)
 {
-	static bool lastevent = false;
+	static bool lastevent = false; /* last event was a mousedown */
 	static unsigned long lastmousetime = 0;
 	int x,y;
 
@@ -336,31 +336,35 @@ int SDLVideoDriver::SwapBuffers(void)
 			}
 			break;
 		case SDL_MOUSEMOTION:
+			lastevent = false;
 			MouseMovement(event.motion.x, event.motion.y);
 			break;
 		case SDL_MOUSEBUTTONDOWN:
-			if (DisableMouse)          //grayed mouse is disabled in this sense
+			if (DisableMouse || !Evnt) //grayed mouse is disabled in this sense
 				break;
 			lastevent = true;
-			lastmousetime=time+1000;
+			lastmousetime=Evnt->GetRKDelay();
+			if (lastmousetime != (unsigned long) ~0) {
+				lastmousetime += lastmousetime+time;
+			}
 			if (CursorIndex != 2)
 				CursorIndex = 1;
 			CursorPos.x = event.button.x; // - mouseAdjustX[CursorIndex];
 			CursorPos.y = event.button.y; // - mouseAdjustY[CursorIndex];
-			if (Evnt && !ConsolePopped)
+			if (!ConsolePopped)
 				Evnt->MouseDown( event.button.x, event.button.y, 1 << ( event.button.button - 1 ), GetModState(SDL_GetModState()) );
 
 			break;
 
 		case SDL_MOUSEBUTTONUP:
-			if (DisableMouse)         //grayed mouse is disabled in this sense
-				break;
 			lastevent = false;
+			if (DisableMouse || !Evnt) //grayed mouse is disabled in this sense
+				break;
 			if (CursorIndex != 2)
 				CursorIndex = 0;
 			CursorPos.x = event.button.x;
 			CursorPos.y = event.button.y;
-			if (Evnt && !ConsolePopped)
+			if (!ConsolePopped)
 				Evnt->MouseUp( event.button.x, event.button.y, 1 << ( event.button.button - 1 ), GetModState(SDL_GetModState()) );
 
 			break;
@@ -378,9 +382,9 @@ int SDLVideoDriver::SwapBuffers(void)
 		}
 	}
 
-	if (!DisableMouse && lastevent && (SDL_GetMouseState(&x,&y)==SDL_BUTTON(1)) && time>lastmousetime && CursorPos.x==x && CursorPos.y==y) {
-		lastmousetime=time+500;
-		if (Evnt && !ConsolePopped)
+	if (Evnt && !DisableMouse && lastevent && time>lastmousetime && SDL_GetMouseState(&x,&y)==SDL_BUTTON(1)) {
+		lastmousetime=time+Evnt->GetRKDelay();
+		if (!ConsolePopped)
 			Evnt->MouseUp( x, y, 1 << ( 0 ), GetModState(SDL_GetModState()) );
 	}
 

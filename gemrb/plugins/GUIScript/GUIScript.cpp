@@ -8388,6 +8388,22 @@ static PyObject* GemRB_StealFailed(PyObject * /*self*/, PyObject* /*args*/)
 	return Py_None;
 }
 
+PyDoc_STRVAR( GemRB_SetRepeatClickFlags__doc,
+"SetRepeatClickFlags(value, op)\n\n"
+"Sets the mode repeat clicks are handled.\n\n");
+
+static PyObject* GemRB_SetRepeatClickFlags(PyObject * /*self*/, PyObject* args)
+{
+	int value, op;
+	unsigned long ret;
+
+	if (!PyArg_ParseTuple( args, "ii", &value, &op)) {
+		return AttributeError( GemRB_SetRepeatClickFlags__doc );
+	}
+	ret = core->GetEventMgr()->SetRKFlags( (unsigned long) value, (unsigned long) op);
+	return PyInt_FromLong( ret );
+}
+
 PyDoc_STRVAR( GemRB_DisplayString__doc,
 "DisplayString(strref, color[,actor])\n\n"
 "Displays string on the MessageWindow using methods supplied by the engine core. "
@@ -8616,6 +8632,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SetPlayerStat, METH_VARARGS),
 	METHOD(SetPlayerSound, METH_VARARGS),
 	METHOD(SetPurchasedAmount, METH_VARARGS),
+	METHOD(SetRepeatClickFlags, METH_VARARGS),
 	METHOD(SetSaveGamePreview, METH_VARARGS),
 	METHOD(SetSaveGamePortrait, METH_VARARGS),
 	METHOD(SetSpellIcon, METH_VARARGS),

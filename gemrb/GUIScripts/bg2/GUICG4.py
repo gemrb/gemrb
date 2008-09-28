@@ -153,6 +153,7 @@ def OnLoad():
 	GemRB.SetEvent(AbilityWindow,DoneButton,IE_GUI_BUTTON_ON_PRESS,"NextPress")
 	GemRB.SetEvent(AbilityWindow,BackButton,IE_GUI_BUTTON_ON_PRESS,"BackPress")
 	GemRB.SetVisible(AbilityWindow,1)
+	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	return
 
 def RightPress():
@@ -261,11 +262,13 @@ def BackPress():
 	GemRB.SetVar("StrExtra",0)
 	for i in range(-1,6):
 		GemRB.SetVar("Ability "+str(i),0)  #scrapping the abilities
+	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	return
 
 def NextPress():
 	GemRB.UnloadWindow(AbilityWindow)
 	GemRB.SetNextScript("CharGen6") #
+	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	return
 
 def OverPress0():
