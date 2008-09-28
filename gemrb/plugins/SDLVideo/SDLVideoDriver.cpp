@@ -236,6 +236,10 @@ inline int GetModState(int modstate)
 
 int SDLVideoDriver::SwapBuffers(void)
 {
+	static bool lastevent = false;
+	static unsigned long lastmousetime = 0;
+	int x,y;
+
 	int ret = GEM_OK;
 	unsigned long time;
 	GetTime( time );
@@ -251,7 +255,8 @@ int SDLVideoDriver::SwapBuffers(void)
 	if (ConsolePopped) {
 		core->DrawConsole();
 	}
-	while (SDL_PollEvent( &event )) {
+
+	while ( SDL_PollEvent(&event) ) {
 		/* Loop until there are no events left on the queue */
 		switch (event.type) {
 		/* Process the appropriate event type */
@@ -336,6 +341,8 @@ int SDLVideoDriver::SwapBuffers(void)
 		case SDL_MOUSEBUTTONDOWN:
 			if (DisableMouse)          //grayed mouse is disabled in this sense
 				break;
+			lastevent = true;
+			lastmousetime=time+1000;
 			if (CursorIndex != 2)
 				CursorIndex = 1;
 			CursorPos.x = event.button.x; // - mouseAdjustX[CursorIndex];
@@ -348,6 +355,7 @@ int SDLVideoDriver::SwapBuffers(void)
 		case SDL_MOUSEBUTTONUP:
 			if (DisableMouse)         //grayed mouse is disabled in this sense
 				break;
+			lastevent = false;
 			if (CursorIndex != 2)
 				CursorIndex = 0;
 			CursorPos.x = event.button.x;
@@ -369,6 +377,13 @@ int SDLVideoDriver::SwapBuffers(void)
 
 		}
 	}
+
+	if (!DisableMouse && lastevent && (SDL_GetMouseState(&x,&y)==SDL_BUTTON(1)) && time>lastmousetime && CursorPos.x==x && CursorPos.y==y) {
+		lastmousetime=time+500;
+		if (Evnt && !ConsolePopped)
+			Evnt->MouseUp( x, y, 1 << ( 0 ), GetModState(SDL_GetModState()) );
+	}
+
 	SDL_BlitSurface( backBuf, NULL, disp, NULL );
 	if (fadeColor.a) {
 		SDL_SetAlpha( extra, SDL_SRCALPHA, fadeColor.a );
