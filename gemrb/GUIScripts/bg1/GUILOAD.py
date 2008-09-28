@@ -98,6 +98,7 @@ def ScrollBarPress():
 	return
 
 def LoadGamePress():
+	GemRB.UnloadWindow(LoadWindow)
 	Pos = GemRB.GetVar("TopIndex")+GemRB.GetVar("LoadIdx")
 	StartLoadScreen()
 	GemRB.LoadGame(Pos) #loads and enters savegame
