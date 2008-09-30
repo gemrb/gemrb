@@ -578,9 +578,9 @@ Sprite2D* SDLVideoDriver::CreateSprite8(int w, int h, int bpp, void* pixels,
 }
 
 Sprite2D* SDLVideoDriver::CreateSpriteBAM8(int w, int h, bool rle,
-											 const unsigned char* pixeldata,
-											 AnimationFactory* datasrc,
-											 Palette* palette, int transindex)
+					 const unsigned char* pixeldata,
+					 AnimationFactory* datasrc,
+					 Palette* palette, int transindex)
 {
 	Sprite2D* spr = new Sprite2D();
 	spr->BAM = true;
@@ -646,10 +646,10 @@ Sprite2D* SDLVideoDriver::DuplicateSprite(Sprite2D* sprite)
 							 newpixels, tmp->format->palette->colors, true, 0);
 		SDL_UnlockSurface( tmp );
 	} else {
-		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)sprite->vptr;
-		const Uint8* rledata;
+		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*) sprite->vptr;
+		const unsigned char * rledata;
 
-		rledata = (const Uint8*)sprite->pixels;
+		rledata = (const unsigned char*) sprite->pixels;
 
 		dest = CreateSpriteBAM8(sprite->Width, sprite->Height, data->RLE,
 								rledata, data->source, data->pal,
@@ -1570,7 +1570,7 @@ void SDLVideoDriver::GetPixel(short x, short y, Color* color)
 	memcpy( &val, pixels, disp->format->BytesPerPixel );
 	SDL_UnlockSurface( backBuf );
 
-	SDL_GetRGBA( val, backBuf->format, &color->r, &color->g, &color->b, &color->a );
+	SDL_GetRGBA( val, backBuf->format, (Uint8 *) &color->r, (Uint8 *) &color->g, (Uint8 *) &color->b, (Uint8 *) &color->a );
 }
 
 Color SDLVideoDriver::SpriteGetPixel(Sprite2D* sprite, unsigned short x, unsigned short y)
@@ -1589,7 +1589,7 @@ Color SDLVideoDriver::SpriteGetPixel(Sprite2D* sprite, unsigned short x, unsigne
 		memcpy( &val, pixels, surf->format->BytesPerPixel );
 		SDL_UnlockSurface( surf );
 
-		SDL_GetRGBA( val, surf->format, &c.r, &c.g, &c.b, &c.a );
+		SDL_GetRGBA( val, surf->format, (Uint8 *) &c.r, (Uint8 *) &c.g, (Uint8 *) &c.b, (Uint8 *) &c.a );
 	} else {
 		Sprite2D_BAM_Internal* data = (Sprite2D_BAM_Internal*)sprite->vptr;
 
