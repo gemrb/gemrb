@@ -33,7 +33,9 @@ MapWindow = None
 NoteWindow = None
 WorldMapWindow = None
 WorldMapControl = None
+PortraitWindow = None
 OldPortraitWindow = None
+OptionsWindow = None
 OldOptionsWindow = None
 
 def RevealMap ():
@@ -114,7 +116,7 @@ def ShowMap ():
 	# Map Control
 	GemRB.CreateMapControl (Window, 2, 0, 0, 0, 0, 0x10000003, "FLAG1")
 	Map = GemRB.GetControl (Window, 2)
-	GemRB.SetVar("ShowMapNotes",IE_GUI_MAP_REVEAL_MAP)
+	GemRB.SetVar ("ShowMapNotes",IE_GUI_MAP_REVEAL_MAP)
 	GemRB.SetVarAssoc (Window, Map, "ShowMapNotes", IE_GUI_MAP_REVEAL_MAP)
 	GemRB.SetEvent (Window, Map, IE_GUI_MAP_ON_PRESS, "RevealMap")
 	GemRB.SetVisible (Window, 1)
@@ -256,7 +258,7 @@ def AddNoteWindow ():
 	return
 
 def OpenWorldMapWindowInside ():
-	OpenMapWindow() #closes mapwindow
+	OpenMapWindow () #closes mapwindow
 	WorldMapWindowCommon (-1)
 	return
 
@@ -268,7 +270,6 @@ def MoveToNewArea ():
 	global WorldMapWindow, WorldMapControl
 
 	tmp = GemRB.GetDestinationArea (WorldMapWindow, WorldMapControl)
-	print tmp
 	CloseWorldMapWindow ()
 	GemRB.CreateMovement (tmp["Destination"], tmp["Entrance"])
 	return
@@ -278,7 +279,6 @@ def ChangeTooltip ():
 	global str
 
 	tmp = GemRB.GetDestinationArea (WorldMapWindow, WorldMapControl)
-	print tmp
 	if (tmp):
 		str = "%s: %d"%(GemRB.GetString(23084),tmp["Distance"])
 	else:
@@ -301,7 +301,7 @@ def WorldMapWindowCommon (Travel):
 	global WorldMapWindow, WorldMapControl
 
 	if WorldMapWindow:
-		CloseWorldMapWindow()
+		CloseWorldMapWindow ()
 		return
 
 	GemRB.HideGUI ()
