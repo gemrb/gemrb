@@ -34,10 +34,10 @@ SpellBookWindow = None
 SpellBookSpellInfoWindow = None
 SpellBookSpellLevel = 0
 SpellBookSpellUnmemorizeWindow = None
-
+TopIndex = 0
 
 def OpenSpellBookWindow ():
-	global SpellBookWindow
+	global SpellBookWindow, TopIndex
 
 	GemRB.HideGUI ()
 	
@@ -54,11 +54,11 @@ def OpenSpellBookWindow ():
 	SpellBookWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", SpellBookWindow)
 
-	Button = GemRB.GetControl (Window, 1)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SpellBookPrevLevelPress")
+	Button = GemRB.GetControl (Window, 92)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SpellBookPrevPress")
 
-	Button = GemRB.GetControl (Window, 2)
-	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SpellBookNextLevelPress")
+	Button = GemRB.GetControl (Window, 93)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SpellBookNextPress")
 
 	#setup level buttons
 	for i in range (9):
@@ -68,20 +68,27 @@ def OpenSpellBookWindow ():
 
 	for i in range (9):
 		Button = GemRB.GetControl (Window, 55 + i)
+		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 		GemRB.SetVarAssoc (Window, Button, "SpellBookSpellLevel", i)
 		
 	# Setup memorized spells buttons
-	for i in range (12):
-		Button = GemRB.GetControl (Window, 3 + i)
+	for i in range (24):
+		Button = GemRB.GetControl (Window, 6 + i)
 		GemRB.SetButtonBorder (Window, Button, 0,0,0,0,0,0,0,0,160,0,1)
-		GemRB.SetButtonBAM (Window, Button, "SPELFRAM",0,0,0)
+		#GemRB.SetButtonBAM (Window, Button, "SPELFRAM",0,0,0)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_OR)
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 
 	# Setup book spells buttons
-	for i in range (24):
-		Button = GemRB.GetControl (Window, 27 + i)
+	for i in range (8):
+		Button = GemRB.GetControl (Window, 30 + i)
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+		GemRB.SetVarAssoc (Window, Button, "SpellIndex", i)
+
+	ScrollBar = GemRB.GetControl (Window, 54)
+	TopIndex = 0
+	GemRB.SetVar ("TopIndex",0)
+	GemRB.SetVarAssoc (Window, ScrollBar, "TopIndex", 0)
 
 	SetSelectionChangeHandler (UpdateSpellBookWindow)
 	UpdateSpellBookWindow ()
@@ -90,7 +97,7 @@ def OpenSpellBookWindow ():
 	
 
 def UpdateSpellBookWindow ():
-	global SpellBookMemorizedSpellList, PriestKnownSpellList
+	global SpellBookMemorizedSpellList, PriestKnownSpellList, TopIndex
 
 	SpellBookMemorizedSpellList = []
 	SpellBookKnownSpellList = []
@@ -101,16 +108,19 @@ def UpdateSpellBookWindow ():
 	level = SpellBookSpellLevel
 	max_mem_cnt = GemRB.GetMemorizableSpellsCount (pc, type, level)
 
-	Label = GemRB.GetControl (Window, 0x10000032)
-	GemRB.SetText (Window, Label, GemRB.GetString(12137)+str(level+1) )
+	#Label = GemRB.GetControl (Window, 0x10000032)
+	#GemRB.SetText (Window, Label, GemRB.GetString(12137)+str(level+1) )
 
 	Name = GemRB.GetPlayerName (pc, 0)
-	Label = GemRB.GetControl (Window, 0x10000035)
-	GemRB.SetText (Window, Label, Name)
+	#Label = GemRB.GetControl (Window, 0xffffffff)
+	#GemRB.SetText (Window, Label, Name)
+
+	Button = GemRB.GetControl (Window, 1)
+	GemRB.SetButtonPicture (Window, Button, GemRB.GetPlayerPortrait (pc,0))
 
 	mem_cnt = GemRB.GetMemorizedSpellsCount (pc, type, level)
-	for i in range (12):
-		Button = GemRB.GetControl (Window, 3 + i)
+	for i in range (24):
+		Button = GemRB.GetControl (Window, 6 + i)
 		if i < mem_cnt:
 			ms = GemRB.GetMemorizedSpell (pc, type, level, i)
 			GemRB.SetSpellIcon (Window, Button, ms['SpellResRef'])
@@ -140,10 +150,10 @@ def UpdateSpellBookWindow ():
 
 
 	known_cnt = GemRB.GetKnownSpellsCount (pc, type, level)
-	for i in range (24):
-		Button = GemRB.GetControl (Window, 27 + i)
-		if i < known_cnt:
-			ks = GemRB.GetKnownSpell (pc, type, level, i)
+	for i in range (8):
+		Button = GemRB.GetControl (Window, 30 + i)
+		if i+TopIndex < known_cnt:
+			ks = GemRB.GetKnownSpell (pc, type, level, i+TopIndex)
 			GemRB.SetSpellIcon (Window, Button, ks['SpellResRef'])
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_NO_IMAGE, OP_NAND)
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OnSpellBookMemorizeSpell")
@@ -162,22 +172,18 @@ def UpdateSpellBookWindow ():
 			GemRB.EnableButtonBorder (Window, Button, 0, 0)
 	return
 
+#TODO: spell type selector
+def SpellBookPrevPress ():
+	global SpellType
 
-def SpellBookPrevLevelPress ():
-	global SpellBookSpellLevel
-
-	if SpellBookSpellLevel > 0:
-		SpellBookSpellLevel = PriestSpellLevel - 1
-		UpdateSpellBookWindow ()
+	UpdateSpellBookWindow ()
 	return
 
-
-def SpellBookNextLevelPress ():
+#TODO: spell type selector 
+def SpellBookNextPress ():
 	global SpellBookSpellLevel
 
-	if SpellBookSpellLevel < 6:
-		SpellBookSpellLevel = PriestSpellLevel + 1
-		UpdateSpellBookWindow ()
+	UpdateSpellBookWindow ()
 	return
 
 def RefreshSpellBookLevel ():
@@ -241,7 +247,7 @@ def OnSpellBookMemorizeSpell ():
 	level = SpellBookSpellLevel
 	type = IE_SPELL_TYPE_PRIEST
 
-	index = GemRB.GetVar ("SpellButton") - 100
+	index = GemRB.GetVar ("SpellButton") - 100 + TopIndex
 
 	if GemRB.MemorizeSpell (pc, type, level, index):
 		UpdateSpellBookWindow ()
