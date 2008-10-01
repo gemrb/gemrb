@@ -2488,7 +2488,7 @@ static PyObject* GemRB_CreateMapControl(PyObject * /*self*/, PyObject* args)
 			IE_BAM_CLASS_ID, IE_NORMAL );
 		if (af) {
 			for (int i=0;i<8;i++) {
-				map->Flag[i] = af->GetFrame(i,0);
+				map->Flag[i] = af->GetFrame(0,i);
 			}
 
 		}
