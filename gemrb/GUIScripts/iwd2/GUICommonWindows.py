@@ -404,27 +404,68 @@ def GetActorRaceTitle (actor):
 	GemRB.UnloadTable (Table)
 	return RaceTitle
 
-#find the kit title for a given class (multiple kits are available)
-def GetActorClassTitle (actor, Class):
-	#no idea if this still works
-	#ClassTitle = GemRB.GetPlayerStat (actor, IE_TITLE1)
+def GetKitIndex (actor, Class):
+	#Class = GemRB.GetPlayerStat (actor, IE_CLASS)
+	KitTable = GemRB.LoadTable ("kitlist")
 	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
-	ClassTable = GemRB.LoadTable ("classes")
-	ClassTitle = GemRB.GetTableValue (ClassTable, Class, 0)
-	#the real class value
-	Class += 1
-	row = 0
-	while row>=0:
-		row = GemRB.FindTableValue (ClassTable, 3, Class, row)
-		if row<0:
-			break
-		if Kit&GemRB.GetTableValue (ClassTable, row, 2):
-			ClassTitle=GemRB.GetTableValue (ClassTable, row, 0)
-			break
-		row+=1
+	KitIndex = 0
 
-	GemRB.UnloadTable (ClassTable)
+	if Kit&0xc000ffff == 0x40000000:
+		print "Kit value: 0x%04X"%Kit
+		KitIndex = Kit>>16 & 0xfff
+
+	#looking for kit by the usability flag
+	if KitIndex == 0:
+		KitIndex = GemRB.FindTableValue (KitTable, 6, Kit)
+		if KitIndex == -1:
+			KitIndex = 0
+		# needed so barbarians don't override other kits
+		elif Class != GemRB.GetTableValue (KitTable, KitIndex, 7):
+			print "KitIndex before hack", KitIndex
+			KitIndex = 0
+
+	return KitIndex
+
+def GetActorClassTitle (actor, Class):
+	ClassTitle = GemRB.GetPlayerStat (actor, IE_TITLE1)
+
+	#Class = GemRB.GetPlayerStat (actor, IE_CLASS)
+	ClassTable = GemRB.LoadTable ("classes")
+	Class = GemRB.FindTableValue ( ClassTable, 5, Class )
+	KitTable = GemRB.LoadTable ("kitlist")
+	KitIndex = GetKitIndex (actor, Class)
+
+	if ClassTitle == 0:
+		if KitIndex == 0:
+			ClassTitle=GemRB.GetTableValue (ClassTable, Class, 2)
+		else:
+			ClassTitle=GemRB.GetTableValue (KitTable, KitIndex, 2)
+
+	if ClassTitle == "*":
+		return 0
 	return ClassTitle
+
+#find the kit title for a given class (multiple kits are available)
+#def GetActorClassTitle (actor, Class):
+#	#no idea if this still works
+#	#ClassTitle = GemRB.GetPlayerStat (actor, IE_TITLE1)
+#	Kit = GemRB.GetPlayerStat (actor, IE_KIT)
+#	ClassTable = GemRB.LoadTable ("classes")
+#	ClassTitle = GemRB.GetTableValue (ClassTable, Class, 0)
+#	#the real class value
+#	Class += 1
+#	row = 0
+#	while row>=0:
+##		row = GemRB.FindTableValue (ClassTable, 3, Class, row)
+#		if row<0:
+#			break
+#		if Kit&GemRB.GetTableValue (ClassTable, row, 2):
+#			ClassTitle=GemRB.GetTableValue (ClassTable, row, 0)
+#			break
+#		row+=1
+#
+#	GemRB.UnloadTable (ClassTable)
+#	return ClassTitle
 
 def GetActorPaperDoll (actor):
 	PortraitTable = GemRB.LoadTable ("avatars")
