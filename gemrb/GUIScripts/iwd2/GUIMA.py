@@ -129,14 +129,17 @@ def AddNoteWindow ():
 	Text = GemRB.QueryText (MapWindow, Label)
 	NoteWindow = GemRB.LoadWindow (5)
 	Label = GemRB.GetControl (NoteWindow, 1)
-	GemRB.SetBufferLength (NoteWindow, Label, 100)
+	Label = GemRB.ConvertEdit (NoteWindow, Label, 1)
 	GemRB.SetText (NoteWindow, Label, Text)
 	GemRB.SetControlStatus (NoteWindow, Label, IE_GUI_CONTROL_FOCUSED)
+
 	for i in range(8):
 		Label = GemRB.GetControl (NoteWindow, 4+i)
 		GemRB.SetButtonSprites (NoteWindow, Label, "FLAG1", i,0,1,2,0)
 		GemRB.SetButtonFlags (NoteWindow, Label, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 		GemRB.SetVarAssoc (NoteWindow, Label, "Color", i)
+
+	#convert to multiline, destroy unwanted resources
 
 	#set
 	Label = GemRB.GetControl (NoteWindow, 0)
