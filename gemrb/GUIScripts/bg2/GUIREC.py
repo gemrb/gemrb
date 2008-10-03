@@ -701,7 +701,7 @@ def OpenBiographyWindow ():
 
 	TextArea = GemRB.GetControl (Window, 0)
 	pc = GemRB.GameGetSelectedPCSingle ()
-	GemRB.SetText (Window, TextArea, GemRB.GetPlayerString(pc, 63) )
+	GemRB.SetText (Window, TextArea, GemRB.GetPlayerString(pc, 74) )
 
 	# Done
 	Button = GemRB.GetControl (Window, 2)
