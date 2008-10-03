@@ -700,8 +700,8 @@ def OpenBiographyWindow ():
 	BiographyWindow = Window = GemRB.LoadWindow (12)
 
 	TextArea = GemRB.GetControl (Window, 0)
-	GemRB.SetText (Window, TextArea, 33347)
-
+	pc = GemRB.GameGetSelectedPCSingle ()
+	GemRB.SetText (Window, TextArea, GemRB.GetPlayerString(pc, 63) )
 
 	# Done
 	Button = GemRB.GetControl (Window, 2)
@@ -765,7 +765,7 @@ def ExportEditChanged():
 def IsDualClassed(actor, verbose):
 	Dual = GemRB.GetPlayerStat (actor, IE_MC_FLAGS)
 	Dual = Dual & ~(MC_EXPORTABLE|MC_PLOT_CRITICAL|MC_BEENINPARTY|MC_HIDDEN)
-	
+
 	if verbose:
 		Class = GemRB.GetPlayerStat (actor, IE_CLASS)
 		ClassTable = GemRB.LoadTable ("classes")

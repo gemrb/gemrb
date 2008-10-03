@@ -372,7 +372,7 @@ def GetStatOverview (pc):
 	stats.append (9466)
 	table = GemRB.LoadTable("weapprof")
 	RowCount = GemRB.GetTableRowCount (table)
-	# 
+	#
 	for i in range(RowCount):
 		text = GemRB.GetTableValue (table, i, 3)
 		stat = GemRB.GetTableValue (table, i, 0)
@@ -506,47 +506,138 @@ def GetReputation (repvalue):
 def OpenInformationWindow ():
 	global InformationWindow
 
-	GemRB.HideGUI ()
-
 	if InformationWindow != None:
 		if BiographyWindow: OpenBiographyWindow ()
 
 		GemRB.UnloadWindow (InformationWindow)
 		InformationWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
-
-		GemRB.UnhideGUI()
 		return
 
 	InformationWindow = Window = GemRB.LoadWindow (4)
 	GemRB.SetVar ("FloatWindow", InformationWindow)
 
 
-	# Biography
+	#Biography
 	Button = GemRB.GetControl (Window, 26)
 	GemRB.SetText (Window, Button, 18003)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenBiographyWindow")
 
-	# Done
+	#Done
 	Button = GemRB.GetControl (Window, 24)
 	GemRB.SetText (Window, Button, 11973)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenInformationWindow")
 
-	GemRB.UnhideGUI ()
-	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
+	TotalPartyExp = 0
+	ChapterPartyExp = 0
+	TotalCount = 0
+	ChapterCount = 0
+	for i in range (1, GemRB.GetPartySize() + 1):
+		stat = GemRB.GetPCStats(i)
+		TotalPartyExp = TotalPartyExp + stat['KillsChapterXP']
+		ChapterPartyExp = ChapterPartyExp + stat['KillsTotalXP']
+		TotalCount = TotalCount + stat['KillsChapterCount']
+		ChapterCount = ChapterCount + stat['KillsTotalCount']
 
+	# These are used to get the stats
+	pc = GemRB.GameGetSelectedPCSingle ()
+	stat = GemRB.GetPCStats (pc)
+
+	Label = GemRB.GetControl (Window, 0x10000000)
+	GemRB.SetText (Window, Label, GemRB.GetPlayerName (pc, 1))
+	# class
+	ClassTitle = GetActorClassTitle(pc)
+	Label = GemRB.GetControl (Window, 0x10000018)
+	GemRB.SetText (Window, Label, ClassTitle)
+
+	#most powerful vanquished
+	Label = GemRB.GetControl (Window, 0x10000005)
+	#we need getstring, so -1 will translate to empty string
+	GemRB.SetText (Window, Label, GemRB.GetString (stat['BestKilledName']))
+
+	# NOTE: currentTime is in seconds, joinTime is in seconds * 15
+	#   (script updates???). In each case, there are 60 seconds
+	#   in a minute, 24 hours in a day, but ONLY 5 minutes in an hour!!
+	# Hence currentTime (and joinTime after div by 15) has
+	#   7200 secs a day (60 * 5 * 24)
+	currentTime = GemRB.GetGameTime()
+	joinTime = stat['JoinDate'] - stat['AwayTime']
+
+	party_time = currentTime - (joinTime / 15)
+	days = party_time / 7200
+	hours = (party_time % 7200) / 300
+
+	GemRB.SetToken ('GAMEDAYS', str (days))
+	GemRB.SetToken ('HOUR', str (hours))
+	Label = GemRB.GetControl (Window, 0x10000006)
+	#actually it is 16043 <DURATION>, but duration is translated to
+	#16041, hopefully this won't cause problem with international version
+	GemRB.SetText (Window, Label, 16041)
+
+	#favourite spell
+	Label = GemRB.GetControl (Window, 0x10000007)
+	GemRB.SetText (Window, Label, stat['FavouriteSpell'])
+
+	#favourite weapon
+	Label = GemRB.GetControl (Window, 0x10000008)
+	#actually it is 10479 <WEAPONNAME>, but weaponname is translated to
+	#the real weapon name (which we should set using SetToken)
+	#there are other strings like bow+wname/xbow+wname/sling+wname
+	#are they used?
+	GemRB.SetText (Window, Label, stat['FavouriteWeapon'])
+
+	#total xp
+	Label = GemRB.GetControl (Window, 0x1000000f)
+	if TotalPartyExp != 0:
+		PartyExp = int ((stat['KillsTotalXP'] * 100) / TotalPartyExp)
+		GemRB.SetText (Window, Label, str (PartyExp) + '%')
+	else:
+		GemRB.SetText (Window, Label, "0%")
+
+	Label = GemRB.GetControl (Window, 0x10000013)
+	if ChapterPartyExp != 0:
+		PartyExp = int ((stat['KillsChapterXP'] * 100) / ChapterPartyExp)
+		GemRB.SetText (Window, Label, str (PartyExp) + '%')
+	else:
+		GemRB.SetText (Window, Label, "0%")
+
+	#total xp
+	Label = GemRB.GetControl (Window, 0x10000010)
+	if TotalCount != 0:
+		PartyExp = int ((stat['KillsTotalCount'] * 100) / TotalCount)
+		GemRB.SetText (Window, Label, str (PartyExp) + '%')
+	else:
+		GemRB.SetText (Window, Label, "0%")
+
+	Label = GemRB.GetControl (Window, 0x10000014)
+	if ChapterCount != 0:
+		PartyExp = int ((stat['KillsChapterCount'] * 100) / ChapterCount)
+		GemRB.SetText (Window, Label, str (PartyExp) + '%')
+	else:
+		GemRB.SetText (Window, Label, "0%")
+
+	Label = GemRB.GetControl (Window, 0x10000011)
+	GemRB.SetText (Window, Label, str (stat['KillsChapterXP']))
+	Label = GemRB.GetControl (Window, 0x10000015)
+	GemRB.SetText (Window, Label, str (stat['KillsTotalXP']))
+
+	#count of kills in chapter/game
+	Label = GemRB.GetControl (Window, 0x10000012)
+	GemRB.SetText (Window, Label, str (stat['KillsChapterCount']))
+	Label = GemRB.GetControl (Window, 0x10000016)
+	GemRB.SetText (Window, Label, str (stat['KillsTotalCount']))
+
+	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
+	return
 
 def OpenBiographyWindow ():
 	global BiographyWindow
-
-	GemRB.HideGUI ()
 
 	if BiographyWindow != None:
 		GemRB.UnloadWindow (BiographyWindow)
 		BiographyWindow = None
 		GemRB.SetVar ("FloatWindow", InformationWindow)
 
-		GemRB.UnhideGUI()
 		GemRB.ShowModal (InformationWindow, MODAL_SHADOW_GRAY)
 		return
 
@@ -554,14 +645,14 @@ def OpenBiographyWindow ():
 	GemRB.SetVar ("FloatWindow", BiographyWindow)
 
 	TextArea = GemRB.GetControl (Window, 0)
-	GemRB.SetText (Window, TextArea, 39424)
+	pc = GemRB.GameGetSelectedPCSingle ()
+	GemRB.SetText (Window, TextArea, GemRB.GetPlayerString(pc, 63) )
 
 	# Done
 	Button = GemRB.GetControl (Window, 2)
 	GemRB.SetText (Window, Button, 11973)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenBiographyWindow")
 
-	GemRB.UnhideGUI ()
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 	return
 
