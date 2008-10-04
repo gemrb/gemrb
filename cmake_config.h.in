@@ -5,4 +5,7 @@
 #ifndef HAVE_SNPRINTF
 #cmakedefine HAVE_SNPRINTF 1
 #endif
+#ifndef HAVE_STRNDUP
+#cmakedefine HAVE_STRNDUP 1
+#endif
 #cmakedefine HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST 1

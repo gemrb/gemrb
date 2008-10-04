@@ -73,6 +73,7 @@ CHECK_TYPE_SIZE("long int" SIZEOF_LONG_INT)
 
 INCLUDE (CheckFunctionExists)
 CHECK_FUNCTION_EXISTS("snprintf" HAVE_SNPRINTF)
+CHECK_FUNCTION_EXISTS("strndup" HAVE_STRNDUP)
 
 #Unneeded on windows
 IF(NOT WIN32)
