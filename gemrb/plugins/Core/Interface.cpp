@@ -2109,9 +2109,9 @@ bool Interface::LoadConfig(const char* filename)
 		FixPath( GamePath, true );
 	}
 
-	FixPath( SavePath, false );
-	mkdir( SavePath, S_IREAD|S_IWRITE|S_IEXEC );
-	chmod( SavePath, S_IREAD|S_IWRITE|S_IEXEC );
+	//FixPath( SavePath, false );
+	//mkdir( SavePath, S_IREAD|S_IWRITE|S_IEXEC );
+	//chmod( SavePath, S_IREAD|S_IWRITE|S_IEXEC );
 	FixPath( SavePath, true );
 
 	FixPath( CachePath, false );

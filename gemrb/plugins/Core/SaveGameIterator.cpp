@@ -234,10 +234,12 @@ bool SaveGameIterator::RescanSaveGames()
 	char Path[_MAX_PATH];
 	snprintf( Path, _MAX_PATH, "%s%s", core->SavePath, PlayMode() );
 
+	ResolveFilePath( Path );
 	DIR* dir = opendir( Path );
 	// create the save game directory at first access
 	if (dir == NULL) {
 		mkdir(Path,S_IWRITE|S_IREAD|S_IEXEC);
+		chmod(Path,S_IWRITE|S_IREAD|S_IEXEC);
 		dir = opendir( Path );
 	}
 	if (dir == NULL) { //If we cannot open the Directory
@@ -300,6 +302,7 @@ SaveGame* SaveGameIterator::GetSaveGame(int index)
 		return false;
 	}
 
+	ResolveFilePath( Path );
 	DIR* ndir = opendir( Path );
 	//If we cannot open the Directory
 	if (ndir == NULL) {
@@ -421,10 +424,19 @@ int SaveGameIterator::CreateSaveGame(int index, const char *slotname, bool mqs)
 	snprintf( Path, _MAX_PATH, "%09d-%s", index, slotname );
 	save_slots.insert( save_slots.end(), strdup( Path ) );
 	snprintf( Path, _MAX_PATH, "%s%s", core->SavePath, PlayMode() );
+
+	//if the path exists in different case, don't make it again
+	ResolveFilePath( Path );
 	mkdir(Path,S_IWRITE|S_IREAD|S_IEXEC);
-	snprintf( Path, _MAX_PATH, "%s%s%s%09d-%s", core->SavePath, PlayMode(), SPathDelimiter, index, slotname );
-	core->DelTree(Path, false); //this is required in case the old slot wasn't recognised but still there
+	chmod(Path,S_IWRITE|S_IREAD|S_IEXEC);
+	//keep the first part we already determined existing
+	int len = strlen(Path);
+	snprintf( Path+len, _MAX_PATH-len, "%s%09d-%s", SPathDelimiter, index, slotname );
+	ResolveFilePath( Path );
+        //this is required in case the old slot wasn't recognised but still there
+	core->DelTree(Path, false);
 	mkdir(Path,S_IWRITE|S_IREAD|S_IEXEC);
+	chmod(Path,S_IWRITE|S_IREAD|S_IEXEC);
 	//save files here
 
 	Game *game = core->GetGame();
