@@ -258,7 +258,11 @@ def AddNoteWindow ():
 	return
 
 def OpenWorldMapWindowInside ():
+	global MapWindow
+
 	OpenMapWindow () #closes mapwindow
+	MapWindow = -1
+	print "MapWindow=",MapWindow
 	WorldMapWindowCommon (-1)
 	return
 
@@ -289,6 +293,15 @@ def ChangeTooltip ():
 
 def CloseWorldMapWindow ():
 	global WorldMapWindow, WorldMapControl
+
+	print "CloseWorldMapWindow found Mapwindow = ",MapWindow
+	if MapWindow:
+		# reopen map window
+		GemRB.UnloadWindow (WorldMapWindow)
+		WorldMapWindow = None
+		WorldMapControl = None
+		OpenMapWindow ()
+		return
 
 	GemRB.UnloadWindow (WorldMapWindow)
 	WorldMapWindow = None
