@@ -812,23 +812,27 @@ void Game::LoadCRTable()
 	}
 }
 
+int Game::GetXPFromCR(int cr)
+{
+	if (!crtable) LoadCRTable();
+	if (crtable) {
+		int level = GetPartyLevel(true);
+		if (cr>=MAX_CRLEVEL) {
+			cr=MAX_CRLEVEL-1;
+		}
+		printf("Challenge Rating: %d, party level: %d ", cr, level);
+		return crtable[level][cr];
+	}
+	printMessage("Game","Cannot find moncrate.2da!\n", LIGHT_RED);
+	return 0;
+}
+
 void Game::ShareXP(int xp, int flags)
 {
 	int individual;
 
 	if (flags&SX_CR) {
-		if (!crtable) LoadCRTable();
-		if (crtable) {
-			int level = GetPartyLevel(true);
-			if (xp>=MAX_CRLEVEL) {
-				xp=MAX_CRLEVEL-1;
-			}
-			printf("Challenge Rating: %d, party level: %d ", xp, level);
-			xp = crtable[level][xp];
-			printf(" to %d xp.\n",xp);
-		} else {
-			printMessage("Game","Cannot find moncrate.2da!", LIGHT_RED);
-		}
+		xp = GetXPFromCR(xp);
 	}
 
 	if (flags&SX_DIVIDE) {

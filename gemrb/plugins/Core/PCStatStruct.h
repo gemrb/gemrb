@@ -113,6 +113,7 @@ public:
 public:
 	PCStatsStruct();
 	void IncrementChapter();
+	void NotifyKill(ieDword xp, ieStrRef name);
 	void InitQuickSlot(unsigned int which, ieWord slot, ieWord headerindex);
 	void SetSlotIndex(unsigned int which, ieWord headerindex);
 	void GetSlotAndIndex(unsigned int which, ieWord &slot, ieWord &headerindex);

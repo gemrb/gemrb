@@ -331,6 +331,9 @@ public:
 		return Attackers.size();
 	}
 
+	/** converts challenge rating to xp */
+	int GetXPFromCR(int cr);
+	/** shares XP among all party members */
 	void ShareXP(int XP, int flags);
 	/** returns true if we should start the party overflow window */
 	bool PartyOverflow() const;

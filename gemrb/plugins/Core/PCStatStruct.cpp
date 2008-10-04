@@ -58,6 +58,20 @@ void PCStatsStruct::IncrementChapter()
 	KillsChapterCount = 0;
 }
 
+void PCStatsStruct::NotifyKill(ieDword xp, ieStrRef name)
+{
+	if (BestKilledXP<=xp) {
+		BestKilledXP = xp;
+		BestKilledName = name;
+	}
+
+	KillsTotalXP += xp;
+	KillsChapterXP += xp;
+	KillsTotalCount ++;
+	KillsChapterCount ++;
+printf("Killcount increased\n");
+}
+
 //init quick weapon/item slots
 void PCStatsStruct::InitQuickSlot(unsigned int which, ieWord slot, ieWord headerindex)
 {

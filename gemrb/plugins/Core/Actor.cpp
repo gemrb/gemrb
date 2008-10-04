@@ -1774,28 +1774,28 @@ bool Actor::HandleCastingStance(const ieResRef SpellResRef, bool deplete)
 //returns actual damage
 int Actor::Damage(int damage, int damagetype, Actor *hitter)
 {
+	//add lastdamagetype up
+	LastDamageType|=damagetype;
+	LastHitter=hitter->GetID();
 	//recalculate damage based on resistances and difficulty level
 	//the lower 2 bits are actually modifier types
 	switch(damagetype&3)
 	{
 	case MOD_ADDITIVE:
-		NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
+		damage = -NewBase(IE_HITPOINTS, (ieDword) -damage, MOD_ADDITIVE);
 		break;
 	case MOD_ABSOLUTE:
-		NewBase(IE_HITPOINTS, (ieDword) damage, MOD_ABSOLUTE);
+		damage = -NewBase(IE_HITPOINTS, (ieDword) damage, MOD_ABSOLUTE);
 		break;
 	case MOD_PERCENT:
-		NewBase(IE_HITPOINTS, (ieDword) damage, MOD_PERCENT);
+		damage = -NewBase(IE_HITPOINTS, (ieDword) damage, MOD_PERCENT);
 		break;
 	default:
 		//this shouldn't happen
 		printMessage("Actor","Invalid damagetype!\n",RED);
+		return 0;
 	}
-	//this is just a guess, probably morale is much more complex
-	//add lastdamagetype up
-	LastDamageType|=damagetype;
 	LastDamage=damage;
-	LastHitter=hitter->GetID();
 	InternalFlags|=IF_ACTIVE;
 	int chp = (signed) Modified[IE_HITPOINTS];
 	int damagelevel = 3;
@@ -2040,9 +2040,13 @@ void Actor::Die(Scriptable *killer)
 				act = (Actor *) killer;
 			}
 		}
+
 		if (act && act->InParty) {
-			//adjust game statistics here
-			//game->KillStat(this, killer);
+			//adjust kill statistics here
+			PCStatsStruct *stat = act->PCStats;
+			if (stat) {
+				stat->NotifyKill(Modified[IE_XPVALUE], ShortStrRef);
+			}
 			InternalFlags|=IF_GIVEXP;
 		}
 	}
@@ -2095,7 +2099,6 @@ bool Actor::CheckOnDeath()
 		//give experience to party
 		game->ShareXP(Modified[IE_XPVALUE], sharexp );
 		//handle reputation here
-		//
 	}
 
 	if (KillVar[0]) {
