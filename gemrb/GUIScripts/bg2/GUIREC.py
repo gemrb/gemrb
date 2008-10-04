@@ -622,10 +622,11 @@ def OpenInformationWindow ():
 	joinTime = stat['JoinDate'] - stat['AwayTime']
 
 	party_time = currentTime - (joinTime / 15)
+	print "CurrentTime",currentTime
 	days = party_time / 7200
 	hours = (party_time % 7200) / 300
 
-	GemRB.SetToken ('GAMEDAYS', str (days))
+	GemRB.SetToken ('GAMEDAY', str (days))
 	GemRB.SetToken ('HOUR', str (hours))
 	Label = GemRB.GetControl (Window, 0x10000006)
 	#actually it is 16043 <DURATION>, but duration is translated to
