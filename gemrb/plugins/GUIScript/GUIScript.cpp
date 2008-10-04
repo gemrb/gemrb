@@ -8782,6 +8782,11 @@ bool GUIScript::Init(void)
 		printMessage( "GUIScript", string, RED );
 		return false;
 	}
+
+	// warn about python stuff that will go away in 3.0
+	const char *python_version = Py_GetVersion();
+	if (!strncmp(python_version, "2.6", 3)) Py_Py3kWarningFlag = true;
+
 	if (PyRun_SimpleString( "from GUIDefines import *" ) == -1) {
 		printMessage( "GUIScript", " ", RED );
 		printf("Check if %s/GUIDefines.py exists! ", path);
