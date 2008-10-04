@@ -8783,9 +8783,12 @@ bool GUIScript::Init(void)
 		return false;
 	}
 
+#if PY_MAJOR_VERSION == 2
+#if PY_MINOR_VERSION > 5
 	// warn about python stuff that will go away in 3.0
-	const char *python_version = Py_GetVersion();
-	if (!strncmp(python_version, "2.6", 3)) Py_Py3kWarningFlag = true;
+	Py_Py3kWarningFlag = true;
+#endif
+#endif
 
 	if (PyRun_SimpleString( "from GUIDefines import *" ) == -1) {
 		printMessage( "GUIScript", " ", RED );
