@@ -183,7 +183,7 @@ def FinishCharGen():
 			SlotType = GemRB.GetSlotType (targetslot, MyChar)
 			i = 1
 			# if there are no free slots, CreateItem will create the item on the ground
-			while not GemRB.CanUseItemType (SlotType["Type"], item, MyChar) and i <= len(realslot):
+			while not GemRB.CanUseItemType (SlotType["Type"], item, MyChar) and i < len(realslot):
 				targetslot = realslot[i]
 				SlotType = GemRB.GetSlotType (targetslot, MyChar)
 				i = i + 1
