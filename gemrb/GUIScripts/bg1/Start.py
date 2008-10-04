@@ -95,7 +95,7 @@ def LoadSingle():
 def MissionPack():
 	GemRB.UnloadWindow(StartWindow)
 	GemRB.UnloadWindow(QuitWindow)
-	GemRB.SetVar("PlayMode",0)
+	GemRB.SetVar("PlayMode",3) #use mpsave for saved games
 	GemRB.GameSetExpansion(1)
 	GemRB.SetNextScript("GUILOAD")
 	return
