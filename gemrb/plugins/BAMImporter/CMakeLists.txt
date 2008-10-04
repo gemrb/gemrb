@@ -1,4 +1,3 @@
-ADD_LIBRARY(BAMImporter MODULE BAMImp.cpp BAMImpCD.cpp BAMImporter.cpp)
-TARGET_LINK_LIBRARIES( BAMImporter gemrb_core )
+ADD_GEMRB_PLUGIN (BAMImporter BAMImp.cpp BAMImpCD.cpp BAMImporter.cpp)
 
 INSTALL( TARGETS BAMImporter DESTINATION ${PLUGIN_INSTALL_DIR} )

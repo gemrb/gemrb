@@ -1,4 +1,3 @@
-ADD_LIBRARY(IDSImporter MODULE IDSImp.cpp IDSImpCD.cpp IDSImporter.cpp)
-TARGET_LINK_LIBRARIES( IDSImporter gemrb_core )
+ADD_GEMRB_PLUGIN (IDSImporter IDSImp.cpp IDSImpCD.cpp IDSImporter.cpp)
 
 INSTALL( TARGETS IDSImporter DESTINATION ${PLUGIN_INSTALL_DIR} )

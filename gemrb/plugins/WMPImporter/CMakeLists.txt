@@ -1,4 +1,3 @@
-ADD_LIBRARY(WMPImporter MODULE WMPImp.cpp WMPImpCD.cpp WMPImporter.cpp)
-TARGET_LINK_LIBRARIES( WMPImporter gemrb_core )
+ADD_GEMRB_PLUGIN (WMPImporter WMPImp.cpp WMPImpCD.cpp WMPImporter.cpp)
 
 INSTALL( TARGETS WMPImporter DESTINATION ${PLUGIN_INSTALL_DIR} )

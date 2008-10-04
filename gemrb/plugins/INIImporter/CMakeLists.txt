@@ -1,4 +1,3 @@
-ADD_LIBRARY(INIImporter MODULE INIImp.cpp INIImpCD.cpp INIImporter.cpp)
-TARGET_LINK_LIBRARIES( INIImporter gemrb_core )
+ADD_GEMRB_PLUGIN (INIImporter INIImp.cpp INIImpCD.cpp INIImporter.cpp)
 
 INSTALL( TARGETS INIImporter DESTINATION ${PLUGIN_INSTALL_DIR} )

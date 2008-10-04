@@ -74,6 +74,8 @@ CHECK_TYPE_SIZE("long int" SIZEOF_LONG_INT)
 INCLUDE (CheckFunctionExists)
 CHECK_FUNCTION_EXISTS("snprintf" HAVE_SNPRINTF)
 
+#Unneeded on windows
+IF(NOT WIN32)
 INCLUDE (CheckCXXSourceCompiles)
 CHECK_CXX_SOURCE_COMPILES("typedef void *(* voidvoid)(void);
 
@@ -85,7 +87,16 @@ function = (voidvoid) object;
 IF( NOT PERMITS_OBJECT_TO_FUNCTION_CAST )
  SET(HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST 1)
 ENDIF( NOT PERMITS_OBJECT_TO_FUNCTION_CAST )
+ENDIF(NOT WIN32)
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+
+#Plugin addtion macro
+MACRO(ADD_GEMRB_PLUGIN plugin_name)
+ADD_LIBRARY(${plugin_name} MODULE ${ARGN})
+IF(WIN32)
+ TARGET_LINK_LIBRARIES(${plugin_name} gemrb_core)
+ENDIF(WIN32)
+ENDMACRO(ADD_GEMRB_PLUGIN)
 
 ADD_SUBDIRECTORY( gemrb ) 

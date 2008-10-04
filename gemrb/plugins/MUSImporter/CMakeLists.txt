@@ -1,4 +1,3 @@
-ADD_LIBRARY(MUSImporter MODULE MUSImp.cpp MUSImpCD.cpp MUSImporter.cpp)
-TARGET_LINK_LIBRARIES( MUSImporter gemrb_core )
+ADD_GEMRB_PLUGIN (MUSImporter MUSImp.cpp MUSImpCD.cpp MUSImporter.cpp)
 
 INSTALL( TARGETS MUSImporter DESTINATION ${PLUGIN_INSTALL_DIR} )

@@ -1,4 +1,3 @@
-ADD_LIBRARY(EFFImporter MODULE EFFImp.cpp EFFImpCD.cpp EFFImporter.cpp)
-TARGET_LINK_LIBRARIES( EFFImporter gemrb_core )
+ADD_GEMRB_PLUGIN (EFFImporter EFFImp.cpp EFFImpCD.cpp EFFImporter.cpp)
 
 INSTALL( TARGETS EFFImporter DESTINATION ${PLUGIN_INSTALL_DIR} )

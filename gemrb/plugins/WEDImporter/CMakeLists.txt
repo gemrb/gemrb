@@ -1,4 +1,3 @@
-ADD_LIBRARY(WEDImporter MODULE WEDImp.cpp WEDImpCD.cpp WEDImporter.cpp)
-TARGET_LINK_LIBRARIES( WEDImporter gemrb_core )
+ADD_GEMRB_PLUGIN (WEDImporter WEDImp.cpp WEDImpCD.cpp WEDImporter.cpp)
 
 INSTALL( TARGETS WEDImporter DESTINATION ${PLUGIN_INSTALL_DIR} )

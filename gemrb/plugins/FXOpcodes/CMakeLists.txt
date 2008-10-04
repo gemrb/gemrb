@@ -1,4 +1,3 @@
-ADD_LIBRARY(FXOpcodes MODULE FXOpc.cpp FXOpcodesCD.cpp FXOpcodes.cpp)
-TARGET_LINK_LIBRARIES( FXOpcodes gemrb_core )
+ADD_GEMRB_PLUGIN (FXOpcodes FXOpc.cpp FXOpcodesCD.cpp FXOpcodes.cpp)
 
 INSTALL( TARGETS FXOpcodes DESTINATION ${PLUGIN_INSTALL_DIR} )

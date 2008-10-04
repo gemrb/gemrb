@@ -1,4 +1,3 @@
-ADD_LIBRARY(DLGImporter MODULE DLGImp.cpp DLGImpCD.cpp DLGImporter.cpp)
-TARGET_LINK_LIBRARIES( DLGImporter gemrb_core )
+ADD_GEMRB_PLUGIN (DLGImporter DLGImp.cpp DLGImpCD.cpp DLGImporter.cpp)
 
 INSTALL( TARGETS DLGImporter DESTINATION ${PLUGIN_INSTALL_DIR} )

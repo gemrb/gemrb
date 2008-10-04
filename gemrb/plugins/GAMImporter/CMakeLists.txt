@@ -1,4 +1,3 @@
-ADD_LIBRARY(GAMImporter MODULE GAMImp.cpp GAMImpCD.cpp GAMImporter.cpp)
-TARGET_LINK_LIBRARIES( GAMImporter gemrb_core )
+ADD_GEMRB_PLUGIN (GAMImporter GAMImp.cpp GAMImpCD.cpp GAMImporter.cpp)
 
 INSTALL( TARGETS GAMImporter DESTINATION ${PLUGIN_INSTALL_DIR} )

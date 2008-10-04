@@ -1,4 +1,3 @@
-ADD_LIBRARY(SPLImporter MODULE SPLImp.cpp SPLImpCD.cpp SPLImporter.cpp)
-TARGET_LINK_LIBRARIES( SPLImporter gemrb_core )
+ADD_GEMRB_PLUGIN (SPLImporter SPLImp.cpp SPLImpCD.cpp SPLImporter.cpp)
 
 INSTALL( TARGETS SPLImporter DESTINATION ${PLUGIN_INSTALL_DIR} )

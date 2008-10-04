@@ -1,4 +1,3 @@
-ADD_LIBRARY(STOImporter MODULE STOImp.cpp STOImpCD.cpp STOImporter.cpp)
-TARGET_LINK_LIBRARIES( STOImporter gemrb_core )
+ADD_GEMRB_PLUGIN (STOImporter STOImp.cpp STOImpCD.cpp STOImporter.cpp)
 
 INSTALL( TARGETS STOImporter DESTINATION ${PLUGIN_INSTALL_DIR} )

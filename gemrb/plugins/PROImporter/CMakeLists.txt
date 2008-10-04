@@ -1,4 +1,3 @@
-ADD_LIBRARY(PROImporter MODULE PROImp.cpp PROImpCD.cpp PROImporter.cpp)
-TARGET_LINK_LIBRARIES( PROImporter gemrb_core )
+ADD_GEMRB_PLUGIN (PROImporter PROImp.cpp PROImpCD.cpp PROImporter.cpp)
 
 INSTALL( TARGETS PROImporter DESTINATION ${PLUGIN_INSTALL_DIR} )

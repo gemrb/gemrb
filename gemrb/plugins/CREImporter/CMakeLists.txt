@@ -1,4 +1,3 @@
-ADD_LIBRARY(CREImporter MODULE CREImp.cpp CREImpCD.cpp CREImporter.cpp)
-TARGET_LINK_LIBRARIES( CREImporter gemrb_core )
+ADD_GEMRB_PLUGIN (CREImporter CREImp.cpp CREImpCD.cpp CREImporter.cpp)
 
 INSTALL( TARGETS CREImporter DESTINATION ${PLUGIN_INSTALL_DIR} )

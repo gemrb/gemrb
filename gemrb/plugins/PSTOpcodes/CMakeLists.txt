@@ -1,4 +1,3 @@
-ADD_LIBRARY(PSTOpcodes MODULE PSTOpc.cpp PSTOpcodes.cpp PSTOpcodesCD.cpp)
-TARGET_LINK_LIBRARIES( PSTOpcodes gemrb_core )
+ADD_GEMRB_PLUGIN (PSTOpcodes PSTOpc.cpp PSTOpcodes.cpp PSTOpcodesCD.cpp)
 
 INSTALL( TARGETS PSTOpcodes DESTINATION ${PLUGIN_INSTALL_DIR} )

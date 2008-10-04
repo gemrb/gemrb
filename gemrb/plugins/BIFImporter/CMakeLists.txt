@@ -1,4 +1,3 @@
-ADD_LIBRARY(BIFImporter MODULE BIFImp.cpp BIFImpCD.cpp BIFImporter.cpp)
-TARGET_LINK_LIBRARIES( BIFImporter gemrb_core )
+ADD_GEMRB_PLUGIN (BIFImporter BIFImp.cpp BIFImpCD.cpp BIFImporter.cpp)
 
 INSTALL( TARGETS BIFImporter DESTINATION ${PLUGIN_INSTALL_DIR} )

@@ -1,5 +1,3 @@
-ADD_LIBRARY(AREImporter MODULE AREImp.cpp AREImpCD.cpp AREImporter.cpp)
-
-TARGET_LINK_LIBRARIES(AREImporter gemrb_core)
+ADD_GEMRB_PLUGIN (AREImporter AREImp.cpp AREImpCD.cpp AREImporter.cpp)
 
 INSTALL( TARGETS AREImporter DESTINATION ${PLUGIN_INSTALL_DIR} )

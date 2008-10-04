@@ -1,4 +1,3 @@
-ADD_LIBRARY(BMPImporter MODULE BMPImp.cpp BMPImpCD.cpp BMPImporter.cpp)
-TARGET_LINK_LIBRARIES( BMPImporter gemrb_core )
+ADD_GEMRB_PLUGIN (BMPImporter BMPImp.cpp BMPImpCD.cpp BMPImporter.cpp)
 
 INSTALL( TARGETS BMPImporter DESTINATION ${PLUGIN_INSTALL_DIR} )

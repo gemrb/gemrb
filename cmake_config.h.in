@@ -2,5 +2,7 @@
 
 #cmakedefine SIZEOF_INT ${SIZEOF_INT}
 #cmakedefine SIZEOF_LONG_INT ${SIZEOF_LONG_INT}
+#ifndef HAVE_SNPRINTF
 #cmakedefine HAVE_SNPRINTF 1
+#endif
 #cmakedefine HAVE_FORBIDDEN_OBJECT_TO_FUNCTION_CAST 1

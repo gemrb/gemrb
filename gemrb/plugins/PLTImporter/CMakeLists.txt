@@ -1,4 +1,3 @@
-ADD_LIBRARY(PLTImporter MODULE PLTImp.cpp PLTImpCD.cpp PLTImporter.cpp)
-TARGET_LINK_LIBRARIES( PLTImporter gemrb_core )
+ADD_GEMRB_PLUGIN (PLTImporter PLTImp.cpp PLTImpCD.cpp PLTImporter.cpp)
 
 INSTALL( TARGETS PLTImporter DESTINATION ${PLUGIN_INSTALL_DIR} )

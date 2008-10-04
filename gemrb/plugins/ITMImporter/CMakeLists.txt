@@ -1,4 +1,3 @@
-ADD_LIBRARY(ITMImporter MODULE ITMImp.cpp ITMImpCD.cpp ITMImporter.cpp)
-TARGET_LINK_LIBRARIES( ITMImporter gemrb_core )
+ADD_GEMRB_PLUGIN (ITMImporter ITMImp.cpp ITMImpCD.cpp ITMImporter.cpp)
 
 INSTALL( TARGETS ITMImporter DESTINATION ${PLUGIN_INSTALL_DIR} )

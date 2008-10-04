@@ -1,4 +1,3 @@
-ADD_LIBRARY(CHUImporter MODULE CHUImp.cpp CHUImpCD.cpp CHUImporter.cpp)
-TARGET_LINK_LIBRARIES( CHUImporter gemrb_core )
+ADD_GEMRB_PLUGIN (CHUImporter CHUImp.cpp CHUImpCD.cpp CHUImporter.cpp)
 
 INSTALL( TARGETS CHUImporter DESTINATION ${PLUGIN_INSTALL_DIR} )

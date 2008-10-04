@@ -1,4 +1,3 @@
-ADD_LIBRARY(IWDOpcodes MODULE IWDOpc.cpp IWDOpcodes.cpp IWDOpcodesCD.cpp)
-TARGET_LINK_LIBRARIES( IWDOpcodes gemrb_core )
+ADD_GEMRB_PLUGIN (IWDOpcodes IWDOpc.cpp IWDOpcodes.cpp IWDOpcodesCD.cpp)
 
 INSTALL( TARGETS IWDOpcodes DESTINATION ${PLUGIN_INSTALL_DIR} )

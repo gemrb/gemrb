@@ -1,4 +1,3 @@
-ADD_LIBRARY(TISImporter MODULE TISImp.cpp TISImpCD.cpp TISImporter.cpp)
-TARGET_LINK_LIBRARIES( TISImporter gemrb_core )
+ADD_GEMRB_PLUGIN (TISImporter TISImp.cpp TISImpCD.cpp TISImporter.cpp)
 
 INSTALL( TARGETS TISImporter DESTINATION ${PLUGIN_INSTALL_DIR} )

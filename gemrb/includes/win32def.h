@@ -48,7 +48,7 @@
 
 #ifndef __MINGW32__
 #define printf cprintf //broken in mingw !!
-#else
+#elif not defined HAVE_SNPRINTF
 #define HAVE_SNPRINTF
 #endif
 

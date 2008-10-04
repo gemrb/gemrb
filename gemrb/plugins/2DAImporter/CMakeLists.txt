@@ -1,5 +1,3 @@
-ADD_LIBRARY(2DAImporter MODULE 2DAImp.cpp 2DAImpCD.cpp 2DAImporter.cpp 2DAImp.h 2DAImpCD.h )
-
-TARGET_LINK_LIBRARIES(2DAImporter gemrb_core)
+ADD_GEMRB_PLUGIN(2DAImporter 2DAImp.cpp 2DAImpCD.cpp 2DAImporter.cpp 2DAImp.h 2DAImpCD.h )
 
 INSTALL( TARGETS 2DAImporter DESTINATION ${PLUGIN_INSTALL_DIR} )

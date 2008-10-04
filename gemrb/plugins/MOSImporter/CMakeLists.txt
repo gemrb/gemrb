@@ -1,4 +1,3 @@
-ADD_LIBRARY(MOSImporter MODULE MOSImp.cpp MOSImpCD.cpp MOSImporter.cpp)
-TARGET_LINK_LIBRARIES( MOSImporter gemrb_core )
+ADD_GEMRB_PLUGIN (MOSImporter MOSImp.cpp MOSImpCD.cpp MOSImporter.cpp)
 
 INSTALL( TARGETS MOSImporter DESTINATION ${PLUGIN_INSTALL_DIR} )
