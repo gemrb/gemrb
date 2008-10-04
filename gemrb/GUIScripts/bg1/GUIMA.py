@@ -93,7 +93,7 @@ def ShowMap ():
 	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
 
 	# Map Control
-	GemRB.CreateMapControl (Window, 2, 0, 0, 0, 0, 0x10000003, "FLAG1")
+	GemRB.CreateMapControl (Window, 2, 0, 0, 0, 0)
 	Map = GemRB.GetControl (Window, 2)
 	GemRB.SetEvent (Window, Map, IE_GUI_MAP_ON_PRESS, "RevealMap")
 	GemRB.SetVisible (Window, 1)
@@ -141,7 +141,7 @@ def OpenMapWindow ():
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenWorldMapWindowInside")
 
 	# Map Control
-	GemRB.CreateMapControl (Window, 2, 0, 0, 0, 0, 0x10000003, "FLAG1")
+	GemRB.CreateMapControl (Window, 2, 0, 0, 0, 0)
 	Map = GemRB.GetControl (Window, 2)
 	GemRB.SetVisible (OptionsWindow, 1)
 	GemRB.SetVisible (Window, 1)
