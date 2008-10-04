@@ -39,7 +39,7 @@ def RevealMap ():
 
 	if CloseOtherWindow (ShowMap):
 		GemRB.UnloadWindow (MapWindow)
-		GemRB.UnloadWindow (OptionsWindow) ;
+		GemRB.UnloadWindow (OptionsWindow)
 
 		MapWindow = None
 		#this window type should block the game
@@ -147,18 +147,18 @@ def OpenMapWindow ():
 	GemRB.SetVisible (Window, 1)
 	GemRB.SetVisible (PortraitWindow, 1)
 	GemRB.SetControlStatus(Window, Map, IE_GUI_CONTROL_FOCUSED)
-
+	return
 
 def LeftDoublePressMap ():
 	print "MoveToPoint"
 	return
 
 def OpenWorldMapWindowInside ():
+	OpenMapWindow () #closes mapwindow
 	WorldMapWindowCommon (-1)
 	return
 
 def OpenWorldMapWindow ():
-	OpenMapWindow() #closes MapWindow
 	WorldMapWindowCommon (GemRB.GetVar ("Travel"))
 	return
 
@@ -166,18 +166,15 @@ def MoveToNewArea ():
 	global WorldMapWindow, WorldMapControl
 
 	tmp = GemRB.GetDestinationArea (WorldMapWindow, WorldMapControl)
-	print tmp
 	CloseWorldMapWindow ()
 	GemRB.CreateMovement (tmp["Destination"], tmp["Entrance"])
 	return
-
 
 def ChangeTooltip ():
 	global WorldMapWindow, WorldMapControl
 	global str
 
 	tmp = GemRB.GetDestinationArea (WorldMapWindow, WorldMapControl)
-	print tmp
 	if (tmp):
 		str = "%s: %d"%(GemRB.GetString(23084),tmp["Distance"])
 	else:
@@ -186,8 +183,7 @@ def ChangeTooltip ():
 	GemRB.SetTooltip (WorldMapWindow, WorldMapControl, str)
 	return
 
-
-def CloseWorldMapWindow():
+def CloseWorldMapWindow ():
 	global WorldMapWindow, WorldMapControl
 
 	GemRB.UnloadWindow (WorldMapWindow)
@@ -196,7 +192,6 @@ def CloseWorldMapWindow():
 	GemRB.SetVisible (0,1)
 	GemRB.UnhideGUI ()
 	return
-
 
 def WorldMapWindowCommon (Travel):
 	global WorldMapWindow, WorldMapControl
