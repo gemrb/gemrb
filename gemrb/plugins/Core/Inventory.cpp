@@ -316,6 +316,8 @@ void Inventory::KillSlot(unsigned int index)
 	}
 	RemoveSlotEffects( index );
 	Item *itm = core->GetItem(item->ItemResRef);
+	ItemExcl &= ~itm->ItemExcl;
+
 	switch (effect) {
 		case SLOT_EFFECT_LEFT:
 			UpdateShieldAnimation(0);
