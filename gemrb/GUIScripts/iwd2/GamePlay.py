@@ -89,63 +89,67 @@ def OnLoad():
 	GemRB.SetEvent(GamePlayWindow, CancelButton, IE_GUI_BUTTON_ON_PRESS, "CancelPress")
 	GemRB.SetVisible(GamePlayWindow,1)
 	return
-	
+
 def DelayPress():
 	GemRB.SetText(GamePlayWindow, TextAreaControl, 18017)
 	GemRB.SetTooltipDelay (GemRB.GetVar ("Tooltips") )
 	return
-	
+
 def KeySpdPress():
 	GemRB.SetText(GamePlayWindow, TextAreaControl, 18019)
 	return
-	
+
 def MouseSpdPress():
 	GemRB.SetText(GamePlayWindow, TextAreaControl, 18018)
 	GemRB.SetMouseScrollSpeed (GemRB.GetVar ("Mouse Scroll Speed") )
 	return
-	
+
 def DifficultyPress():
 	GemRB.SetText(GamePlayWindow, TextAreaControl, 18020)
 	return
-	
+
 def BloodPress():
 	GemRB.SetText(GamePlayWindow, TextAreaControl, 18023)
 	return
-	
+
 def DitherPress():
 	GemRB.SetText(GamePlayWindow, TextAreaControl, 18021)
 	return
-	
+
 def InfravisionPress():
 	GemRB.SetText(GamePlayWindow, TextAreaControl, 11797)
 	return
-	
+
 def WeatherPress():
 	GemRB.SetText(GamePlayWindow, TextAreaControl, 20619)
 	return
-	
-def MaxHPPress():
+
+def RestUntilHealPress():
 	GemRB.SetText(GamePlayWindow, TextAreaControl, 2242)
 	return
-	
+
+def MaxHPPress():
+	GemRB.SetText(GamePlayWindow, TextAreaControl, 15136)
+	return
+
 def FeedbackPress():
 	GemRB.SetVisible(GamePlayWindow, 0)
 	GemRB.UnloadWindow(GamePlayWindow)
 	GemRB.SetNextScript("Feedback")
 	return
-	
+
 def AutoPausePress():
 	GemRB.SetVisible(GamePlayWindow, 0)
 	GemRB.UnloadWindow(GamePlayWindow)
 	GemRB.SetNextScript("AutoPause")
 	return
-	
+
 def OkPress():
 	GemRB.SetVisible(GamePlayWindow, 0)
 	GemRB.UnloadWindow(GamePlayWindow)
 	GemRB.SetNextScript("Options")
 	return
-	
+
 def CancelPress():
 	GemRB.SetVisible(GamePlayWindow, 0)
 	GemRB.UnloadWindow(GamePlayWindow)
