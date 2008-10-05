@@ -32,10 +32,12 @@ various Macintosh systems also should work ...
 Requirements:
 
 SDL 1.2
-OpenAL
+OpenAL 0.0.7 or above
 Python 2.2 or above, with shared libs (binaries are compiled with 2.5!)
-ZLib
-Png (optional)
+ZLib 1.2
+Png 1.2 (optional)
+
+If you compile from source, you will need the development packages!
 
 Contacts
 --------
