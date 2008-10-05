@@ -32,7 +32,7 @@ ScrollBar::ScrollBar(void)
 	State = 0;
 	ResetEventHandler( ScrollBarOnChange );
 	ta = NULL;
-	for(int i=0;i<6;i++)  {
+	for(int i=0;i<SB_RES_COUNT;i++)  {
 		Frames[i]=NULL;
 	}
 }
@@ -40,13 +40,15 @@ ScrollBar::ScrollBar(void)
 ScrollBar::~ScrollBar(void)
 {
 	Video *video=core->GetVideoDriver();
-	for(int i=0;i<6;i++)  {
+	for(int i=0;i<SB_RES_COUNT;i++)  {
 		if(Frames[i]) {
 			video->FreeSprite(Frames[i]);
 		}
 	}
 }
 
+/** Sets a new position, relays the change to an associated textarea and calls
+    any existing GUI OnChange callback */
 void ScrollBar::SetPos(int NewPos)
 {
 	if (Pos && ( Pos == NewPos )) {
@@ -64,6 +66,7 @@ void ScrollBar::SetPos(int NewPos)
 	RunEventHandler( ScrollBarOnChange );
 }
 
+/** Refreshes the ScrollBar according to a guiscript variable */
 void ScrollBar::RedrawScrollBar(const char* Variable, int Sum)
 {
 	if (strnicmp( VarName, Variable, MAX_VARIABLE_LENGTH )) {
@@ -72,6 +75,7 @@ void ScrollBar::RedrawScrollBar(const char* Variable, int Sum)
 	SetPos( Sum );
 }
 
+/** Mousewheel support */
 void ScrollBar::ScrollUp()
 {
 	if (Pos > 0) {
@@ -79,6 +83,7 @@ void ScrollBar::ScrollUp()
 	}
 }
 
+/** Mousewheel support */
 void ScrollBar::ScrollDown()
 {
 	if ( (ieDword) Pos + 1 < Value ) {
@@ -86,6 +91,7 @@ void ScrollBar::ScrollDown()
 	}
 }
 
+/** Draws the ScrollBar control */
 void ScrollBar::Draw(unsigned short x, unsigned short y)
 {
 	if (!Changed && !(Owner->Flags&WF_FLOAT) ) {
@@ -135,9 +141,10 @@ void ScrollBar::Draw(unsigned short x, unsigned short y)
 			true );
 }
 
+/** Sets a ScrollBar GUI resource */
 void ScrollBar::SetImage(unsigned char type, Sprite2D* img)
 {
-	if (type > IE_GUI_SCROLLBAR_SLIDER) {
+	if (type >= SB_RES_COUNT) {
 		return;
 	}
 	if (Frames[type]) {
@@ -146,6 +153,7 @@ void ScrollBar::SetImage(unsigned char type, Sprite2D* img)
 	Frames[type] = img;
 	Changed = true;
 }
+
 /** Mouse Button Down */
 void ScrollBar::OnMouseDown(unsigned short x, unsigned short y,
 	unsigned short Button, unsigned short /*Mod*/)
@@ -212,6 +220,7 @@ void ScrollBar::OnMouseDown(unsigned short x, unsigned short y,
 		SetPos( aftst );
 	}
 }
+
 /** Mouse Button Up */
 void ScrollBar::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 	unsigned short /*Button*/, unsigned short /*Mod*/)
@@ -219,6 +228,7 @@ void ScrollBar::OnMouseUp(unsigned short /*x*/, unsigned short /*y*/,
 	Changed = true;
 	State = 0;
 }
+
 /** Mouse Over Event */
 void ScrollBar::OnMouseOver(unsigned short /*x*/, unsigned short y)
 {
@@ -269,6 +279,7 @@ void ScrollBar::SetMax(unsigned short Max)
 	}
 }
 
+/** Sets the ScrollBarOnChange event (guiscript callback) */
 bool ScrollBar::SetEvent(int eventType, const char *handler)
 {
 	Changed = true;

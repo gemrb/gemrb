@@ -334,9 +334,9 @@ public:
 	Video * GetVideoDriver() const;
 	ResourceMgr * GetResourceMgr() const;
 	/* returns a newly created string */
-	char * GetString(ieStrRef strref, ieDword options = 0);
+	char * GetString(ieStrRef strref, ieDword options = 0) const;
 	/* makes sure the string is freed in TLKImp */
-	void FreeString(char *&str);
+	void FreeString(char *&str) const;
 	void FreeInterface(void * ptr);
 	Factory * GetFactory() const;
 	/* sets the floattext color */
@@ -392,21 +392,21 @@ public:
 	/** returns the textarea of the main game screen */
 	TextArea *GetMessageTextArea() const;
 	/** returns a string reference from a string reference index constant*/
-	ieStrRef GetStringReference(int stridx);
+	ieStrRef GetStringReference(int stridx) const;
 	/** displays any string in the textarea */
-	void DisplayString(const char *txt);
+	void DisplayString(const char *txt) const;
 	/** displays a string constant in the textarea */
-	void DisplayConstantString(int stridx, unsigned int color);
+	void DisplayConstantString(int stridx, unsigned int color) const;
 	/** displays a string constant followed by a number in the textarea */
-	void DisplayConstantStringValue(int stridx, unsigned int color, ieDword value);
+	void DisplayConstantStringValue(int stridx, unsigned int color, ieDword value) const;
 	/** displays a string constant in the textarea, starting with speaker's name */
-	void DisplayConstantStringName(int stridx, unsigned int color, Scriptable *speaker);
+	void DisplayConstantStringName(int stridx, unsigned int color, Scriptable *speaker) const;
 	/** displays a string constant in the textarea, starting with actor, and ending with target */
-	void DisplayConstantStringAction(int stridx, unsigned int color, Scriptable *actor, Scriptable *target);
+	void DisplayConstantStringAction(int stridx, unsigned int color, Scriptable *actor, Scriptable *target) const;
 	/** displays a string in the textarea */
-	void DisplayString(int stridx, unsigned int color, ieDword flags);
+	void DisplayString(int stridx, unsigned int color, ieDword flags) const;
 	/** displays a string in the textarea, starting with speaker's name */
-	void DisplayStringName(int stridx, unsigned int color, Scriptable *speaker, ieDword flags);
+	void DisplayStringName(int stridx, unsigned int color, Scriptable *speaker, ieDword flags) const;
 	/** returns the Window Visible Flag */
 	int GetVisible(unsigned short WindowIndex) const;
 	/** Set a Window Visible Flag */

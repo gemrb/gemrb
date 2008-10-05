@@ -1784,7 +1784,7 @@ const char* Interface::TypeExt(SClass_ID type) const
 	return NULL;
 }
 
-void Interface::FreeString(char *&str)
+void Interface::FreeString(char *&str) const
 {
 	if (str) {
 		strings->FreeString(str);
@@ -1792,7 +1792,7 @@ void Interface::FreeString(char *&str)
 	str = NULL;
 }
 
-char* Interface::GetString(ieStrRef strref, ieDword options)
+char* Interface::GetString(ieStrRef strref, ieDword options) const
 {
 	ieDword flags = 0;
 
@@ -3995,14 +3995,14 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 		//switch for IE_INV_ITEM_* if it is a CREItem
 		if (item->Flags&IE_ITEM_TWO_HANDED) {
 			//cannot equip twohanded in offhand
-			if (feedback) core->DisplayConstantString(STR_2HANDEDOFFHAND, 0xf0f0f0);
+			if (feedback) DisplayConstantString(STR_2HANDEDOFFHAND, 0xf0f0f0);
 			return 0;
 		}
 	}
 
 	if ( (unsigned int) item->ItemType>=(unsigned int) ItemTypes) {
 		//invalid itemtype
-		if (feedback) core->DisplayConstantString(STR_WRONGITEMTYPE, 0xf0f0f0);
+		if (feedback) DisplayConstantString(STR_WRONGITEMTYPE, 0xf0f0f0);
 		return 0;
 	}
 
@@ -4010,7 +4010,7 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 	if (actor) {
 		ieStrRef str = actor->Unusable(item);
 		if (str) {
-			if (feedback) core->DisplayConstantString(str, 0xf0f0f0);
+			if (feedback) DisplayConstantString(str, 0xf0f0f0);
 			return 0;
 		}
 	}
@@ -4018,7 +4018,7 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 	//if any bit is true, the answer counts as true
 	int ret = (slotmatrix[item->ItemType]&slottype);
 	if (!ret) {
-		if (feedback) core->DisplayConstantString(STR_WRONGITEMTYPE, 0xf0f0f0);
+		if (feedback) DisplayConstantString(STR_WRONGITEMTYPE, 0xf0f0f0);
 	}
 	return ret;
 }
@@ -4059,7 +4059,7 @@ TextArea *Interface::GetMessageTextArea() const
 	return NULL;
 }
 
-void Interface::DisplayString(const char* Text)
+void Interface::DisplayString(const char* Text) const
 {
 	Label *l = GetMessageLabel();
 	if (l) {
@@ -4075,12 +4075,12 @@ static const char* DisplayFormatAction = "[color=%lX]%s - [/color][p][color=%lX]
 static const char* DisplayFormat = "[/color][p][color=%lX]%s[/color][/p]";
 static const char* DisplayFormatValue = "[/color][p][color=%lX]%s: %d[/color][/p]";
 
-ieStrRef Interface::GetStringReference(int stridx)
+ieStrRef Interface::GetStringReference(int stridx) const
 {
 	return strref_table[stridx];
 }
 
-void Interface::DisplayConstantString(int stridx, unsigned int color)
+void Interface::DisplayConstantString(int stridx, unsigned int color) const
 {
 	if (stridx<0) return;
 	char* text = GetString( strref_table[stridx], IE_STR_SOUND );
@@ -4092,7 +4092,7 @@ void Interface::DisplayConstantString(int stridx, unsigned int color)
 	free( newstr );
 }
 
-void Interface::DisplayString(int stridx, unsigned int color, ieDword flags)
+void Interface::DisplayString(int stridx, unsigned int color, ieDword flags) const
 {
 	if (stridx<0) return;
 	char* text = GetString( stridx, flags);
@@ -4104,7 +4104,7 @@ void Interface::DisplayString(int stridx, unsigned int color, ieDword flags)
 	free( newstr );
 }
 
-void Interface::DisplayConstantStringValue(int stridx, unsigned int color, ieDword value)
+void Interface::DisplayConstantStringValue(int stridx, unsigned int color, ieDword value) const
 {
 	if (stridx<0) return;
 	char* text = GetString( strref_table[stridx], IE_STR_SOUND );
@@ -4119,7 +4119,7 @@ void Interface::DisplayConstantStringValue(int stridx, unsigned int color, ieDwo
 #define PALSIZE 8
 static Color ActorColor[PALSIZE];
 
-void Interface::DisplayConstantStringName(int stridx, unsigned int color, Scriptable *speaker)
+void Interface::DisplayConstantStringName(int stridx, unsigned int color, Scriptable *speaker) const
 {
 	unsigned int speaker_color;
 	const char *name;
@@ -4152,7 +4152,7 @@ void Interface::DisplayConstantStringName(int stridx, unsigned int color, Script
 	free( newstr );
 }
 
-void Interface::DisplayConstantStringAction(int stridx, unsigned int color, Scriptable *attacker, Scriptable *target)
+void Interface::DisplayConstantStringAction(int stridx, unsigned int color, Scriptable *attacker, Scriptable *target) const
 {
 	unsigned int attacker_color;
 	const char *name1;
@@ -4190,7 +4190,7 @@ void Interface::DisplayConstantStringAction(int stridx, unsigned int color, Scri
 	free( newstr );
 }
 
-void Interface::DisplayStringName(int stridx, unsigned int color, Scriptable *speaker, ieDword flags)
+void Interface::DisplayStringName(int stridx, unsigned int color, Scriptable *speaker, ieDword flags) const
 {
 	unsigned int speaker_color;
 	const char *name;

@@ -66,6 +66,8 @@
  * Widget displaying scrollbars for paging in long text windows
  */
 
+#define SB_RES_COUNT 6
+
 class GEM_EXPORT ScrollBar : public Control {
 public:
 	ScrollBar(void);
@@ -80,7 +82,7 @@ public:
 	void Draw(unsigned short x, unsigned short y);
 private: //Private attributes
 	/** Images for drawing the Scroll Bar */
-	Sprite2D* Frames[6];
+	Sprite2D* Frames[SB_RES_COUNT];
 	/** Cursor Position */
 	unsigned short Pos;
 	/** Scroll Bar Status */
