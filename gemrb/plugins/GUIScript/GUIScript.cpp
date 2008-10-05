@@ -6712,17 +6712,21 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	}
 	// can't equip item because of similar already equipped
 	if (Effect && item->ItemExcl & actor->inventory.GetEquipExclusion()) {
+		core->DisplayConstantString(STR_ITEMEXCL, 0xf0f0f0);
+		//freeing the item before returning 
 		core->FreeItem( item, slotitem->ItemResRef, false );
 		return PyInt_FromLong( 0 );
 	}
 	//CanUseItemType will check actor's class bits too
 	Slottype = core->CanUseItemType (Slottype, item, actor, true);
-	//resolve the equipping sound
+	//resolve the equipping sound, it needs to be resolved before
+	//the item is freed
 	if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
 		memcpy(Sound, item->ReplacementItem, 9);
 	} else {
 		GetItemSound(Sound, item->ItemType, IS_DROP);
 	}
+	//freeing the item before returning 
 	core->FreeItem( item, slotitem->ItemResRef, false );
 	if ( !Slottype) {
 		return PyInt_FromLong( 0 );
@@ -7540,6 +7544,10 @@ static PyObject* GemRB_SetupControls(PyObject * /*self*/, PyObject* args)
 	int tmp;
 	for (int i=0;i<GUIBT_COUNT;i++) {
 		int ci = core->GetControl(wi, i+Start);
+		if (ci<0) {
+			printf("Couldn't find button #%d on Window #%d\n", i+Start, wi);
+			return RuntimeError ("No such control!\n");
+		}
 		int action = myrow[i];
 		if (action==100) {
 			action = -1;
