@@ -52,6 +52,7 @@ void ScrollBar::SetPos(int NewPos)
 	if (Pos && ( Pos == NewPos )) {
 		return;
 	}
+	Changed = true;
 	Pos = (ieWord) NewPos;
 	if (ta) {
 		TextArea* t = ( TextArea* ) ta;
@@ -73,14 +74,16 @@ void ScrollBar::RedrawScrollBar(const char* Variable, int Sum)
 
 void ScrollBar::ScrollUp()
 {
-	if (Pos > 0)
+	if (Pos > 0) {
 		SetPos( Pos - 1 );
+	}
 }
 
 void ScrollBar::ScrollDown()
 {
-       if ( (ieDword) Pos + 1 < Value )
+	if ( (ieDword) Pos + 1 < Value ) {
 		SetPos( Pos + 1 );
+	}
 }
 
 void ScrollBar::Draw(unsigned short x, unsigned short y)
@@ -147,8 +150,9 @@ void ScrollBar::SetImage(unsigned char type, Sprite2D* img)
 void ScrollBar::OnMouseDown(unsigned short x, unsigned short y,
 	unsigned short Button, unsigned short /*Mod*/)
 {
-	core->RedrawAll();
-
+	//removing the double click flag, use a more sophisticated method
+	//if it is needed later
+	Button&=GEM_MB_NORMAL;
 	if (Button==GEM_MB_SCRLUP) {
 		ScrollUp();
 		return;
@@ -157,6 +161,8 @@ void ScrollBar::OnMouseDown(unsigned short x, unsigned short y,
 		ScrollDown();
 		return;
 	}
+
+	core->RedrawAll();
 
 	unsigned short upMx = (unsigned short) Frames[IE_GUI_SCROLLBAR_UP_UNPRESSED]->Width;
 	unsigned short upMy = (unsigned short) Frames[IE_GUI_SCROLLBAR_UP_UNPRESSED]->Height;
@@ -170,16 +176,13 @@ void ScrollBar::OnMouseDown(unsigned short x, unsigned short y,
 	unsigned short slMx = (unsigned short) Frames[IE_GUI_SCROLLBAR_SLIDER]->Width;
 	unsigned short slmy = (unsigned short) (upMy + Pos * step);
 	unsigned short slMy = (unsigned short) (slmy + Frames[IE_GUI_SCROLLBAR_SLIDER]->Height);
-	//if (( x >= 0 ) && ( y >= 0 )) {
 	if (( x <= upMx ) && ( y <= upMy )) {
 		if (Pos > 0)
 			SetPos( Pos - 1 );
 		State |= UP_PRESS;
 		return;
-	//	}
 	}
 	if (y >= domy) {
-	//if (( x >= 0 ) && ( y >= domy )) {
 		if (( x <= doMx ) && ( y <= Height )) {
 			if ( (ieDword) Pos + 1 < Value )
 				SetPos( Pos + 1 );
@@ -188,7 +191,6 @@ void ScrollBar::OnMouseDown(unsigned short x, unsigned short y,
 		}
 	}
 	if (y >= slmy) {
-	//if (( x >= 0 ) && ( y >= slmy )) {
 		if (( x <= slMx ) && ( y <= slMy )) {
 			State |= SLIDER_GRAB;
 			return;
@@ -265,7 +267,6 @@ void ScrollBar::SetMax(unsigned short Max)
 	} else if (Pos >= Max) {
 		SetPos( Max - 1 );
 	}
-	Changed = true;
 }
 
 bool ScrollBar::SetEvent(int eventType, const char *handler)
