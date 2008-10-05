@@ -172,11 +172,13 @@ def DisplayHelpBPP ():
 
 def DisplayHelpBrightness ():
 	GemRB.SetText (GameOptionsWindow, HelpTextArea, 17203)
-	GemRB.SetGamma (GemRB.GetVar("Brightness Correction"),GemRB.GetVar("Gamma Correction"))
+	GemRB.SetGamma (GemRB.GetVar("Brightness Correction"),GemRB.GetVar("Gamma Correction")/2)
+	return
 
 def DisplayHelpContrast ():
 	GemRB.SetText (GameOptionsWindow, HelpTextArea, 17204)
-	GemRB.SetGamma (GemRB.GetVar("Brightness Correction"),GemRB.GetVar("Gamma Correction"))
+	GemRB.SetGamma (GemRB.GetVar("Brightness Correction"),GemRB.GetVar("Gamma Correction")/2)
+	return
 
 def DisplayHelpSoftMirrBlt ():
 	GemRB.SetText (GameOptionsWindow, HelpTextArea, 18004)
@@ -702,6 +704,7 @@ def OptRadio (name, window, button_id, label_id, variable, value):
 	GemRB.SetButtonFlags (window, button, IE_GUI_BUTTON_RADIOBUTTON, OP_OR)
 	GemRB.SetEvent (window, button, IE_GUI_BUTTON_ON_PRESS, "DisplayHelp" + name)
 	GemRB.SetVarAssoc (window, button, variable, value)
+	GemRB.SetButtonSprites(window, button, "GBTNOPT4", 0, 0, 1, 2, 3)
 
 	label = GemRB.GetControl (window, label_id)
 	GemRB.SetButtonFlags (window, label, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
@@ -716,6 +719,7 @@ def OptCheckbox (name, window, button_id, label_id, variable, value):
 	GemRB.SetButtonFlags (window, button, IE_GUI_BUTTON_CHECKBOX, OP_OR)
 	GemRB.SetEvent (window, button, IE_GUI_BUTTON_ON_PRESS, "DisplayHelp" + name)
 	GemRB.SetVarAssoc (window, button, variable, value)
+	GemRB.SetButtonSprites(window, button, "GBTNOPT4", 0, 0, 1, 2, 3)
 
 	label = GemRB.GetControl (window, label_id)
 	GemRB.SetButtonFlags (window, label, IE_GUI_BUTTON_NO_IMAGE, OP_SET)
