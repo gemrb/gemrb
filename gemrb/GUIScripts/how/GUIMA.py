@@ -124,30 +124,24 @@ def ShowMap ():
 
 ###################################################
 def OpenMapWindow ():
-	global MapWindow, PortraitWindow, OptionsWindow
+	global MapWindow, OptionsWindow, PortraitWindow
 	global OldPortraitWindow, OldOptionsWindow
 
 	if CloseOtherWindow (OpenMapWindow):
 		if WorldMapWindow: OpenWorldMapWindowInside ()
 
+		GemRB.HideGUI ()
 		GemRB.UnloadWindow (MapWindow)
-		GemRB.UnloadWindow (OptionsWindow)
-		GemRB.UnloadWindow (PortraitWindow)
 		MapWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.SetVisible (0,1)
 		GemRB.UnhideGUI ()
-		GUICommonWindows.PortraitWindow = OldPortraitWindow
-		OldPortraitWindow = None
-		GUICommonWindows.OptionsWindow = OldOptionsWindow
-		OldOptionsWindow = None
 		return
 
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0,0)
 
 	GemRB.LoadWindowPack ("GUIMAP", 640, 480)
 	MapWindow = Window = GemRB.LoadWindow (2)
+	#this window type blocks the game normally, but map window doesn't
 	GemRB.SetVar ("OtherWindow", MapWindow)
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
@@ -156,6 +150,7 @@ def OpenMapWindow ():
 	GemRB.SetWindowFrame (OptionsWindow)
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = OpenPortraitWindow (0)
+	GemRB.SetWindowFrame (OptionsWindow)
 
 	# World Map
 	Button = GemRB.GetControl (Window, 1)
@@ -168,14 +163,15 @@ def OpenMapWindow ():
 	GemRB.SetVisible (OptionsWindow, 1)
 	GemRB.SetVisible (Window, 1)
 	GemRB.SetVisible (PortraitWindow, 1)
-
+	GemRB.SetControlStatus (Window, Map, IE_GUI_CONTROL_FOCUSED)
+	GemRB.UnhideGUI ()
+	return
 
 def LeftDoublePressMap ():
 	print "MoveToPoint"
 	return
 
 def OpenWorldMapWindowInside ():
-	OpenMapWindow ()
 	WorldMapWindowCommon (-1)
 	return
 
@@ -187,7 +183,6 @@ def MoveToNewArea ():
 	global WorldMapWindow, WorldMapControl
 
 	tmp = GemRB.GetDestinationArea (WorldMapWindow, WorldMapControl)
-	print tmp
 	CloseWorldMapWindow ()
 	GemRB.CreateMovement (tmp["Destination"], tmp["Entrance"])
 	return
@@ -197,7 +192,6 @@ def ChangeTooltip ():
 	global str
 
 	tmp = GemRB.GetDestinationArea (WorldMapWindow, WorldMapControl)
-	print tmp
 	if (tmp):
 		str = "%s: %d"%(GemRB.GetString(23084),tmp["Distance"])
 	else:
@@ -216,7 +210,6 @@ def CloseWorldMapWindow ():
 	GemRB.UnhideGUI ()
 	return
 
-
 def WorldMapWindowCommon (Travel):
 	global WorldMapWindow, WorldMapControl
 
@@ -230,6 +223,7 @@ def WorldMapWindowCommon (Travel):
 	GemRB.LoadWindowPack ("GUIWMAP", 640, 480)
 	WorldMapWindow = Window = GemRB.LoadWindow (0)
 	MapWindow = None
+	GemRB.SetWindowFrame (Window)
 
 	GemRB.CreateWorldMapControl (Window, 4, 0, 62, 640, 418, Travel, "infofont")
 	WorldMapControl = GemRB.GetControl (Window, 4)

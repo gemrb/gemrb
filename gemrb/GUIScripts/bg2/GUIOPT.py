@@ -131,13 +131,11 @@ def OpenOptionsWindow ():
 	GemRB.SetVisible (PortraitWindow, 1)
 	return
 
-
 ###################################################
 
 def CloseVideoOptionsWindow ():
 	OpenOptionsWindow ()
 	OpenOptionsWindow ()
-
 
 def OpenVideoOptionsWindow ():
 	"""Open video options window"""
@@ -168,7 +166,7 @@ def OpenVideoOptionsWindow ():
 	OptCheckbox ('SoftStandBlt', Window, 42, 48, 'SoftBltFast' ,1)
 
 	GemRB.ShowModal (GameOptionsWindow, MODAL_SHADOW_GRAY)
-
+	return
 
 def DisplayHelpFullScreen ():
 	GemRB.SetText (GameOptionsWindow, HelpTextArea, 18000)
@@ -203,7 +201,6 @@ def DisplayHelpTransShadow ():
 def CloseAudioOptionsWindow ():
 	OpenOptionsWindow ()
 	OpenOptionsWindow ()
-
 
 def OpenAudioOptionsWindow ():
 	"""Open audio options window"""
@@ -258,7 +255,6 @@ def CloseGameplayOptionsWindow ():
 	OpenOptionsWindow ()
 	OpenOptionsWindow ()
 
-
 def OpenGameplayOptionsWindow ():
 	"""Open gameplay options window"""
 	global GameOptionsWindow, HelpTextArea
@@ -292,7 +288,7 @@ def OpenGameplayOptionsWindow ():
 	OptButton ('HotkeyOptions', Window, 51, 816)
 
 	GemRB.ShowModal (GameOptionsWindow, MODAL_SHADOW_GRAY)
-
+	return
 
 def DisplayHelpTooltipDelay ():
 	GemRB.SetText (GameOptionsWindow, HelpTextArea, 18017)
@@ -360,7 +356,7 @@ def OpenFeedbackOptionsWindow ():
 	OptCheckbox ('Miscellaneous', Window, 15, 37, 'Miscellaneous Text', 1)
 
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
-
+	return
 
 def DisplayHelpMarkerFeedback ():
 	GemRB.SetText (GameOptionsWindow, HelpTextArea, 18024)
@@ -395,7 +391,7 @@ def CloseAutopauseOptionsWindow ():
 	GemRB.UnloadWindow (GameOptionsWindow)
 	GameOptionsWindow = None
 	OpenGameplayOptionsWindow ()
-
+	return
 
 def OpenAutopauseOptionsWindow ():
 	"""Open autopause options window"""
@@ -425,7 +421,7 @@ def OpenAutopauseOptionsWindow ():
 	OptCheckbox ('CenterOnActor', Window, 31, 33, 'Auto Pause Center', 1)
 
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
-
+	return
 
 def DisplayHelpCharacterHit ():
 	GemRB.SetText (GameOptionsWindow, HelpTextArea, 18032)
@@ -468,7 +464,7 @@ def CloseCharacterSoundsWindow ():
 	GemRB.UnloadWindow (GameOptionsWindow)
 	GameOptionsWindow = None
 	OpenGameplayOptionsWindow ()
-
+	return
 
 def OpenCharacterSoundsWindow ():
 	"""Open character sounds window"""
@@ -568,7 +564,7 @@ def LoadGamePress ():
 	return
 
 #save game AND quit
-def SaveGamePress():
+def SaveGamePress ():
 	global QuitMsgWindow
 
 	GemRB.UnloadWindow (QuitMsgWindow)
@@ -579,7 +575,7 @@ def SaveGamePress():
 	OpenSaveWindow ()
 	return
 
-def QuitGamePress():
+def QuitGamePress ():
 	global QuitMsgWindow
 
 	GemRB.UnloadWindow (QuitMsgWindow)
@@ -616,7 +612,7 @@ def OpenQuitMsgWindow ():
 
 	# The game has not been saved ....
 	Text = GemRB.GetControl (Window, 3)
-	GemRB.SetText (Window, Text, 16456) 
+	GemRB.SetText (Window, Text, 16456)
 
 	GemRB.ShowModal (Window, MODAL_SHADOW_GRAY)
 	return
@@ -700,7 +696,6 @@ def OptHelpText (name, window, text_id, text_strref):
 	text = GemRB.GetControl (window, text_id)
 	GemRB.SetText (window, text, text_strref)
 	return text
-
 
 ###################################################
 # End of file GUIOPT.py

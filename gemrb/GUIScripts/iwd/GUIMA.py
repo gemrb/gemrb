@@ -110,8 +110,10 @@ def OpenMapWindow ():
 		return
 
 	GemRB.HideGUI ()
+
 	GemRB.LoadWindowPack ("GUIMAP", 640, 480)
 	MapWindow = Window = GemRB.LoadWindow (2)
+	#this window type blocks the game normally, but map window doesn't
 	GemRB.SetVar ("OtherWindow", MapWindow)
 
 	# World Map
@@ -121,8 +123,9 @@ def OpenMapWindow ():
 	# Map Control
 	GemRB.CreateMapControl (Window, 2, 0, 0, 0, 0)
 	Map = GemRB.GetControl (Window, 2)
-
+	GemRB.SetControlStatus (Window, Map, IE_GUI_CONTROL_FOCUSED)
 	GemRB.UnhideGUI ()
+	return
 
 def LeftDoublePressMap ():
 	print "MoveToPoint"
@@ -140,7 +143,6 @@ def MoveToNewArea ():
 	global WorldMapWindow, WorldMapControl
 
 	tmp = GemRB.GetDestinationArea (WorldMapWindow, WorldMapControl)
-	print tmp
 	CloseWorldMapWindow ()
 	GemRB.CreateMovement (tmp["Destination"], tmp["Entrance"])
 	return
@@ -150,7 +152,6 @@ def ChangeTooltip ():
 	global str
 
 	tmp = GemRB.GetDestinationArea (WorldMapWindow, WorldMapControl)
-	print tmp
 	if (tmp):
 		str = "%s: %d"%(GemRB.GetString(23084),tmp["Distance"])
 	else:
@@ -182,7 +183,7 @@ def WorldMapWindowCommon (Travel):
 	GemRB.LoadWindowPack ("GUIWMAP", 640, 480)
 	WorldMapWindow = Window = GemRB.LoadWindow (0)
 	MapWindow = None
-	GemRB.SetVar ("OtherWindow", WorldMapWindow)
+	GemRB.SetWindowFrame (Window)
 
 	GemRB.CreateWorldMapControl (Window, 4, 0, 62, 640, 418, Travel, "infofont")
 	WorldMapControl = GemRB.GetControl (Window, 4)

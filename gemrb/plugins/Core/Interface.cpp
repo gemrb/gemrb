@@ -934,6 +934,7 @@ void Interface::Main()
 			HandleEvents();
 		}
 
+		GameLoop();
 		DrawWindows();
 		if (DrawFPS) {
 			frame++;
@@ -994,6 +995,10 @@ int Interface::ReadResRefTable(const ieResRef tablename, ieResRef *&data)
 		data = (ieResRef *) calloc( count, sizeof(ieResRef) );
 		for (int i = 0; i < count; i++) {
 			strnlwrcpy( data[i], tm->QueryField( i, 0 ), 8 );
+			//* marks an empty resource
+			if (data[i][0]=='*') {
+				data[i][0]=0;
+			}
 		}
 		DelTable( table );
 	}
@@ -1669,115 +1674,115 @@ const char* Interface::TypeExt(SClass_ID type) const
 	switch (type) {
 		case IE_2DA_CLASS_ID:
 			return ".2da";
-	
+
 		case IE_ACM_CLASS_ID:
 			return ".acm";
-	
+
 		case IE_ARE_CLASS_ID:
 			return ".are";
-	
+
 		case IE_BAM_CLASS_ID:
 			return ".bam";
-	
+
 		case IE_BCS_CLASS_ID:
 			return ".bcs";
-	
+
 		case IE_BS_CLASS_ID:
 			return ".bs";
 
 		case IE_BIF_CLASS_ID:
 			return ".bif";
-	
+
 		case IE_BMP_CLASS_ID:
 			return ".bmp";
-	
+
 		case IE_PNG_CLASS_ID:
 			return ".png";
-	
+
 		case IE_CHR_CLASS_ID:
 			return ".chr";
-	
+
 		case IE_CHU_CLASS_ID:
 			return ".chu";
-	
+
 		case IE_CRE_CLASS_ID:
 			return ".cre";
-	
+
 		case IE_DLG_CLASS_ID:
 			return ".dlg";
-	
+
 		case IE_EFF_CLASS_ID:
 			return ".eff";
-	
+
 		case IE_GAM_CLASS_ID:
 			return ".gam";
-	
+
 		case IE_IDS_CLASS_ID:
 			return ".ids";
-	
+
 		case IE_INI_CLASS_ID:
 			return ".ini";
-	
+
 		case IE_ITM_CLASS_ID:
 			return ".itm";
-	
+
 		case IE_KEY_CLASS_ID:
 			return ".key";
-	
+
 		case IE_MOS_CLASS_ID:
 			return ".mos";
-	
+
 		case IE_MUS_CLASS_ID:
 			return ".mus";
-	
+
 		case IE_MVE_CLASS_ID:
 			return ".mve";
-	
+
 		case IE_PLT_CLASS_ID:
 			return ".plt";
-	
+
 		case IE_PRO_CLASS_ID:
 			return ".pro";
-	
+
 		case IE_SAV_CLASS_ID:
 			return ".sav";
-	
+
 		case IE_SPL_CLASS_ID:
 			return ".spl";
-	
+
 		case IE_SRC_CLASS_ID:
 			return ".src";
-	
+
 		case IE_STO_CLASS_ID:
 			return ".sto";
-	
+
 		case IE_TIS_CLASS_ID:
 			return ".tis";
-	
+
 		case IE_TLK_CLASS_ID:
 			return ".tlk";
-	
+
 		case IE_TOH_CLASS_ID:
 			return ".toh";
-	
+
 		case IE_TOT_CLASS_ID:
 			return ".tot";
-	
+
 		case IE_VAR_CLASS_ID:
 			return ".var";
-	
+
 		case IE_VVC_CLASS_ID:
 			return ".vvc";
-	
+
 		case IE_WAV_CLASS_ID:
 			return ".wav";
-	
+
 		case IE_WED_CLASS_ID:
 			return ".wed";
-	
+
 		case IE_WFX_CLASS_ID:
 			return ".wfx";
-	
+
 		case IE_WMP_CLASS_ID:
 			return ".wmp";
 	}
@@ -2137,7 +2142,7 @@ static void upperlower(int upper, int lower)
 }
 
 static const char *game_flags[GF_COUNT+1]={
-	"HasKaputz",          //0 GF_HAS_KAPUTZ
+		"HasKaputz",          //0 GF_HAS_KAPUTZ
 		"AllStringsTagged",   //1 GF_ALL_STRINGS_TAGGED
 		"HasSongList",        //2 GF_HAS_SONGLIST
 		"TeamMovement",       //3 GF_TEAM_MOVEMENT
@@ -2872,7 +2877,7 @@ int Interface::SetVisible(unsigned short WindowIndex, int visible)
 			}
 			evntmgr->DelWindow( win );
 			break;
-	
+
 		case WINDOW_VISIBLE:
 			if (win->WindowID==65535) {
 				video->SetViewport( win->XPos, win->YPos, win->Width, win->Height);
@@ -2965,16 +2970,35 @@ int Interface::ShowModal(unsigned short WindowIndex, int Shadow)
 	return 0;
 }
 
+void Interface::GameLoop(void)
+{
+	bool update_scripts = false;
+
+	GameControl *gc = GetGameControl();
+	if (gc) {
+		update_scripts = !(gc->GetDialogueFlags() & DF_FREEZE_SCRIPTS);
+	}
+
+	GSUpdate(update_scripts);
+
+	//i'm not sure if this should be here
+
+	//in multi player (if we ever get to it), only the server must call this
+	if (update_scripts) {
+		if ( game->selected.size() > 0 ) {
+		      gc->ChangeMap(core->GetFirstSelectedPC(true), false);
+		}
+		// the game object will run the area scripts as well
+		game->UpdateScripts();
+	}
+}
+
 void Interface::DrawWindows(void)
 {
 	GameControl *gc = GetGameControl();
-	if (!gc) {
-		GSUpdate(false);
-	}
-	else {
+	if (gc) {
 		//this variable is used all over in the following hacks
 		int flg = gc->GetDialogueFlags();
-		GSUpdate(!(flg & DF_FREEZE_SCRIPTS) );
 
 		//the following part is a series of hardcoded gui behaviour
 

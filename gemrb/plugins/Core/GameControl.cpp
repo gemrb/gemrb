@@ -321,9 +321,22 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	if (((short) Width) <=0 || ((short) Height) <= 0) {
 		return;
 	}
-	if ( game->selected.size() > 0 ) {
-		ChangeMap(core->GetFirstSelectedPC(true), false);
+
+	//i'm not sure if this should be here
+	//if ( game->selected.size() > 0 ) {
+	//	ChangeMap(core->GetFirstSelectedPC(true), false);
+	//}
+
+	//in multi player (if we ever get to it), only the server must call this
+	//if (update_scripts) {
+	//	// the game object will run the area scripts as well
+	//	game->UpdateScripts();
+	//}
+
+	if (Owner->Visible!=WINDOW_VISIBLE) {
+		return;
 	}
+
 	Video* video = core->GetVideoDriver();
 	Region viewport = video->GetViewport();
 	if (video->moveX || video->moveY) {
@@ -377,10 +390,10 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 	}
 
 	//in multi player (if we ever get to it), only the server must call this
-	if (update_scripts) {
-		// the game object will run the area scripts as well
-		game->UpdateScripts();
-	}
+	//if (update_scripts) {
+	//	// the game object will run the area scripts as well
+	//	game->UpdateScripts();
+	//}
 
 	if (ScreenFlags & SF_DISABLEMOUSE)
 		return;
@@ -455,19 +468,6 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 			video->DrawPolyline( poly, c, true );
 		}
 	}
-
-
-	//Draw spell effect, this must be stored in the actors
-	//not like this
-	/*
-	if (effect) {
-		if (( game->selected.size() > 0 )) {
-			Actor* actor = core->GetFirstSelectedPC();
-			video->BlitSprite( effect->NextFrame(), actor->Pos.x,
-					actor->Pos.y, false );
-		}
-	}
-	*/
 
 	// Show traps
 	if (DebugFlags & DEBUG_SHOW_INFOPOINTS) {
@@ -1708,7 +1708,7 @@ int GameControl::HideGUI()
 		return 0;
 	}
 	//no gamecontrol visible
-	if (core->GetVisible(0) == 0 ) {
+	if (Owner->Visible == WINDOW_INVISIBLE ) {
 		return 0;
 	}
 	ScreenFlags &=~SF_GUIENABLED;

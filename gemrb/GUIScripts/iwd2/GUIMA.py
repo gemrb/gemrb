@@ -188,6 +188,7 @@ def OpenMapWindow ():
 	GemRB.SetVisible( Window, 1)
 
 def LeftDoublePressMap ():
+	OpenMapWindow()
 	print "MoveToPoint"
 	return
 

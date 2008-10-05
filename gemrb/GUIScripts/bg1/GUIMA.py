@@ -100,29 +100,26 @@ def ShowMap ():
 	GemRB.SetVisible (GUICommonWindows.PortraitWindow, 2)
 	GemRB.SetVisible (OptionsWindow, 3)
 	GemRB.SetVisible (Window, 3)
-	GemRB.SetControlStatus(Window, Map, IE_GUI_CONTROL_FOCUSED)
+	GemRB.SetControlStatus (Window, Map, IE_GUI_CONTROL_FOCUSED)
 	GemRB.GamePause (0,0)
 	return
 
 ###################################################
 def OpenMapWindow ():
-	global MapWindow, OptionsWindow, OldOptionsWindow, PortraitWindow
+	global MapWindow, OptionsWindow, PortraitWindow
+	global OldOptionsWindow
 
 	if CloseOtherWindow (OpenMapWindow):
-		GemRB.UnloadWindow (MapWindow)
-		GemRB.UnloadWindow (OptionsWindow)
+		if WorldMapWindow: OpenWorldMapWindowInside ()
 
+		GemRB.HideGUI ()
+		GemRB.UnloadWindow (MapWindow)
 		MapWindow = None
-		#this window type should block the game
- 		GemRB.SetVar ("OtherWindow", -1)
-		GemRB.SetVisible (0,1)
- 		GemRB.UnhideGUI ()
-		GUICommonWindows.OptionsWindow = OldOptionsWindow
-		OldOptionsWindow = None
- 		return
+		GemRB.SetVar ("OtherWindow", -1)
+		GemRB.UnhideGUI ()
+		return
 
 	GemRB.HideGUI ()
-	GemRB.SetVisible (0,0)
 
 	GemRB.LoadWindowPack ("GUIMAP", 640, 480)
 	MapWindow = Window = GemRB.LoadWindow (2)
@@ -146,7 +143,8 @@ def OpenMapWindow ():
 	GemRB.SetVisible (OptionsWindow, 1)
 	GemRB.SetVisible (Window, 1)
 	GemRB.SetVisible (PortraitWindow, 1)
-	GemRB.SetControlStatus(Window, Map, IE_GUI_CONTROL_FOCUSED)
+	GemRB.SetControlStatus (Window, Map, IE_GUI_CONTROL_FOCUSED)
+	GemRB.UnhideGUI ()
 	return
 
 def LeftDoublePressMap ():
@@ -154,7 +152,6 @@ def LeftDoublePressMap ():
 	return
 
 def OpenWorldMapWindowInside ():
-	OpenMapWindow () #closes mapwindow
 	WorldMapWindowCommon (-1)
 	return
 
@@ -205,6 +202,7 @@ def WorldMapWindowCommon (Travel):
 
 	GemRB.LoadWindowPack ("GUIWMAP", 640, 480)
 	WorldMapWindow = Window = GemRB.LoadWindow (0)
+	MapWindow = None
 	GemRB.SetWindowFrame (Window)
 
 	GemRB.CreateWorldMapControl (Window, 4, 0, 62, 640, 418, Travel, "floattxt")

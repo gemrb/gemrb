@@ -58,13 +58,13 @@ void AudioStream::ClearIfStopped()
 
 OpenALAudioDriver::OpenALAudioDriver(void)
 {
-    alutContext = NULL;
-    MusicPlaying = false;
-    music_memory = (unsigned char*) malloc(ACM_BUFFERSIZE);
-    MusicSource = 0;
-    memset(MusicBuffer, 0, MUSICBUFFERS*sizeof(ALuint));
-    musicMutex = SDL_CreateMutex();
-    MusicReader = 0;
+	alutContext = NULL;
+	MusicPlaying = false;
+	music_memory = (unsigned char*) malloc(ACM_BUFFERSIZE);
+	MusicSource = 0;
+	memset(MusicBuffer, 0, MUSICBUFFERS*sizeof(ALuint));
+	musicMutex = SDL_CreateMutex();
+	MusicReader = 0;
 }
 
 bool OpenALAudioDriver::Init(void)
@@ -90,18 +90,18 @@ bool OpenALAudioDriver::Init(void)
 	}
 	alutContext = context;
 
-    //1 for speech
-    int sources = CountAvailableSources(MAX_STREAMS+1);
+	//1 for speech
+	int sources = CountAvailableSources(MAX_STREAMS+1);
 	num_streams = sources - 1;
 
-    char buf[255];
-    sprintf(buf, "Allocated %d streams.%s", num_streams,
-            (num_streams < MAX_STREAMS ? " (Fewer than desired.)" : "" ) );
+	char buf[255];
+	sprintf(buf, "Allocated %d streams.%s", num_streams,
+		    (num_streams < MAX_STREAMS ? " (Fewer than desired.)" : "" ) );
 
-    printMessage( "OpenAL", buf, WHITE );
+	printMessage( "OpenAL", buf, WHITE );
 
-    stayAlive = true;
-    musicThread = SDL_CreateThread( MusicManager, this );
+	stayAlive = true;
+	musicThread = SDL_CreateThread( MusicManager, this );
 
 	ambim = new AmbientMgrAL;
 	speech.free = true;
@@ -146,94 +146,98 @@ OpenALAudioDriver::~OpenALAudioDriver(void)
 	SDL_KillThread(musicThread);
 	SDL_mutexV(musicMutex);
 
-    SDL_DestroyMutex(musicMutex);
-    musicMutex = NULL;
+	SDL_DestroyMutex(musicMutex);
+	musicMutex = NULL;
 
-    free(music_memory);
-    if(MusicReader)
-        core->FreeInterface(MusicReader);
+	free(music_memory);
+	if(MusicReader)
+		core->FreeInterface(MusicReader);
 
 	delete ambim;
 }
 
 ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_length)
 {
-    ALuint Buffer = 0;
+	ALuint Buffer = 0;
 
-    CacheEntry *e;
-    void* p;
-    if(buffercache.Lookup(ResRef, p))
-    {
-        e = (CacheEntry*) p;
-        time_length = e->Length;
-        return e->Buffer;
-    }
-    //no cache entry...
-    DataStream* stream = core->GetResourceMgr()->GetResource(ResRef, IE_WAV_CLASS_ID);
-    if (!stream)
-        return 0;
+	CacheEntry *e;
+	void* p;
 
-    alGenBuffers(1, &Buffer);
-    int error = alGetError();
-    if ( error != AL_NO_ERROR ) {
-        printMessage("OpenAL", "Unable to create buffer", WHITE );
-        printf (": %d", error);
-        printStatus("ERROR", YELLOW);
-        delete stream;
-        return 0;
-    }
+	if (!ResRef[0]) {
+		return 0;
+	}
+	if(buffercache.Lookup(ResRef, p))
+	{
+		e = (CacheEntry*) p;
+		time_length = e->Length;
+		return e->Buffer;
+	}
+	//no cache entry...
+	DataStream* stream = core->GetResourceMgr()->GetResource(ResRef, IE_WAV_CLASS_ID);
+	if (!stream)
+		return 0;
 
-    SoundMgr* acm = (SoundMgr*) core->GetInterface(IE_WAV_CLASS_ID);
-    if (!acm->Open(stream)) {
-        core->FreeInterface(acm);
-        return 0;
-    }
-    int cnt = acm->get_length();
-    int riff_chans = acm->get_channels();
-    int samplerate = acm->get_samplerate();
-    //multiply always by 2 because it is in 16 bits
-    int rawsize = cnt * 2;
-    unsigned char * memory = (unsigned char*) malloc(rawsize);
-    //multiply always with 2 because it is in 16 bits
-    int cnt1 = acm->read_samples( ( short* ) memory, cnt ) * 2;
-    //Sound Length in milliseconds
-    time_length = ((cnt / riff_chans) * 1000) / samplerate;
-    //it is always reading the stuff into 16 bits
-    alBufferData( Buffer, GetFormatEnum( riff_chans, 16 ), memory, cnt1, samplerate );
-    core->FreeInterface( acm );
-    free(memory);
+	alGenBuffers(1, &Buffer);
+	int error = alGetError();
+	if ( error != AL_NO_ERROR ) {
+		printMessage("OpenAL", "Unable to create buffer", WHITE );
+		printf (": %d", error);
+		printStatus("ERROR", YELLOW);
+		delete stream;
+		return 0;
+	}
 
-    if (( alGetError() ) != AL_NO_ERROR) {
-        printMessage( "OpenAL", "Error : unable to fill buffer", WHITE );
-        printStatus("ERROR", YELLOW );
-        alDeleteBuffers( 1, &Buffer );
-        return 0;
-    }
+	SoundMgr* acm = (SoundMgr*) core->GetInterface(IE_WAV_CLASS_ID);
+	if (!acm->Open(stream)) {
+		core->FreeInterface(acm);
+		return 0;
+	}
+	int cnt = acm->get_length();
+	int riff_chans = acm->get_channels();
+	int samplerate = acm->get_samplerate();
+	//multiply always by 2 because it is in 16 bits
+	int rawsize = cnt * 2;
+	unsigned char * memory = (unsigned char*) malloc(rawsize);
+	//multiply always with 2 because it is in 16 bits
+	int cnt1 = acm->read_samples( ( short* ) memory, cnt ) * 2;
+	//Sound Length in milliseconds
+	time_length = ((cnt / riff_chans) * 1000) / samplerate;
+	//it is always reading the stuff into 16 bits
+	alBufferData( Buffer, GetFormatEnum( riff_chans, 16 ), memory, cnt1, samplerate );
+	core->FreeInterface( acm );
+	free(memory);
 
-    e = new CacheEntry;
-    e->Buffer = Buffer;
-    e->Length = ((cnt / riff_chans) * 1000) / samplerate;
+	if (( alGetError() ) != AL_NO_ERROR) {
+		printMessage( "OpenAL", "Error : unable to fill buffer", WHITE );
+		printStatus("ERROR", YELLOW );
+		alDeleteBuffers( 1, &Buffer );
+		return 0;
+	}
 
-    buffercache.SetAt(ResRef, (void*)e);
-    //printf("LoadSound: added %s to cache: %d. Cache size now %d\n", ResRef, e->Buffer, buffercache.GetCount());
+	e = new CacheEntry;
+	e->Buffer = Buffer;
+	e->Length = ((cnt / riff_chans) * 1000) / samplerate;
 
-    if (buffercache.GetCount() > BUFFER_CACHE_SIZE) {
-        evictBuffer();
-    }
-    return Buffer;
+	buffercache.SetAt(ResRef, (void*)e);
+	//printf("LoadSound: added %s to cache: %d. Cache size now %d\n", ResRef, e->Buffer, buffercache.GetCount());
+
+	if (buffercache.GetCount() > BUFFER_CACHE_SIZE) {
+		evictBuffer();
+	}
+	return Buffer;
 }
 
 unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, unsigned int flags)
 {
-    ALuint Buffer;
-    unsigned int time_length;
+	ALuint Buffer;
+	unsigned int time_length;
 
-    Buffer = loadSound( ResRef, time_length );
-    if (Buffer == 0) {
-        return 0;
-    }
+	Buffer = loadSound( ResRef, time_length );
+	if (Buffer == 0) {
+		return 0;
+	}
 
-    ALuint Source;
+	ALuint Source;
 	ALfloat SourcePos[] = {
 		(float) XPos, (float) YPos, 0.0f
 	};
@@ -260,6 +264,7 @@ unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, uns
 			alSourcef( speech.Source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
 			if (alGetError() != AL_NO_ERROR) {
 				printMessage( "OpenAL", "Unable to set speech parameters", WHITE);
+				printStatus( "ERROR", YELLOW );
 			}
 			speech.free = false;
 			printf("speech.free: %d source:%d\n", speech.free,speech.Source);
@@ -286,7 +291,7 @@ unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, uns
 		return time_length;
 	}
 
-    int stream = -1;
+	int stream = -1;
 	for (int i = 0; i < num_streams; i++) {
 		streams[i].ClearIfStopped();
 		if (streams[i].free) {
@@ -306,7 +311,7 @@ unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, uns
 	if (alGetError() != AL_NO_ERROR) {
 		//failed to generate new sound source
 		printMessage( "OpenAL", "Unable to create a source", WHITE );
-        printStatus( "ERROR", YELLOW );
+		printStatus( "ERROR", YELLOW );
 		return 0;
 	}
 
@@ -336,59 +341,59 @@ unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, uns
 bool OpenALAudioDriver::IsSpeaking()
 {
 	speech.ClearIfStopped();
-    return !speech.free;
+	return !speech.free;
 }
 
 void OpenALAudioDriver::UpdateVolume(unsigned int flags)
 {
-    ieDword volume;
-    if (flags & GEM_SND_VOL_MUSIC) {
-        SDL_mutexP( musicMutex );
-        core->GetDictionary()->Lookup("Volume Voices", volume);
-        if (alIsSource(MusicSource))
-            alSourcef(MusicSource, AL_GAIN, volume * 0.01f);
-        SDL_mutexV(musicMutex);
-    }
+	ieDword volume;
+	if (flags & GEM_SND_VOL_MUSIC) {
+		SDL_mutexP( musicMutex );
+		core->GetDictionary()->Lookup("Volume Voices", volume);
+		if (alIsSource(MusicSource))
+		    alSourcef(MusicSource, AL_GAIN, volume * 0.01f);
+		SDL_mutexV(musicMutex);
+	}
 
-    if (flags & GEM_SND_VOL_AMBIENTS) {
-        core->GetDictionary()->Lookup("Volume Ambients", volume);
-        ((AmbientMgrAL*) ambim)->UpdateVolume(volume);
-    }
+	if (flags & GEM_SND_VOL_AMBIENTS) {
+		core->GetDictionary()->Lookup("Volume Ambients", volume);
+		((AmbientMgrAL*) ambim)->UpdateVolume(volume);
+	}
 }
 
 bool OpenALAudioDriver::CanPlay()
 {
-    return true;
+	return true;
 }
 
 void OpenALAudioDriver::ResetMusics()
 {
-    MusicPlaying = false;
-    SDL_mutexP( musicMutex );
-    if (alIsSource(MusicSource)) {
-        alSourceStop(MusicSource);
-        alDeleteSources(1, &MusicSource );
-        for (int i=0; i<2; i++) {
-            if (alIsBuffer(MusicBuffer[i]))
-                alDeleteBuffers(1, MusicBuffer+i);
-        }
-    }
-    SDL_mutexV( musicMutex );
+	MusicPlaying = false;
+	SDL_mutexP( musicMutex );
+	if (alIsSource(MusicSource)) {
+		alSourceStop(MusicSource);
+		alDeleteSources(1, &MusicSource );
+		for (int i=0; i<2; i++) {
+		    if (alIsBuffer(MusicBuffer[i]))
+		        alDeleteBuffers(1, MusicBuffer+i);
+		}
+	}
+	SDL_mutexV( musicMutex );
 }
 
 bool OpenALAudioDriver::Play()
 {
-    SDL_mutexP( musicMutex );
-    if (!MusicPlaying)
-        MusicPlaying = true;
-    SDL_mutexV( musicMutex );
+	SDL_mutexP( musicMutex );
+	if (!MusicPlaying)
+		MusicPlaying = true;
+	SDL_mutexV( musicMutex );
 
-    return true;
+	return true;
 }
 
 bool OpenALAudioDriver::Stop()
 {
-    SDL_mutexP( musicMutex );
+	SDL_mutexP( musicMutex );
 	if (!alIsSource( MusicSource )) {
 		SDL_mutexV( musicMutex );
 		return false;
@@ -403,7 +408,7 @@ bool OpenALAudioDriver::Stop()
 
 int OpenALAudioDriver::StreamFile(const char* filename)
 {
-    char path[_MAX_PATH];
+	char path[_MAX_PATH];
 	ALenum error;
 
 	strcpy( path, core->GamePath );
@@ -428,10 +433,10 @@ int OpenALAudioDriver::StreamFile(const char* filename)
 
 	MusicReader = (SoundMgr*) core->GetInterface( IE_WAV_CLASS_ID );
 	if (!MusicReader->Open(str, true)) {
-	    delete str;
-	    core->FreeInterface(MusicReader);
-	    MusicReader = NULL;
-	    printMessage("OpenAL", "",WHITE);
+		delete str;
+		core->FreeInterface(MusicReader);
+		MusicReader = NULL;
+		printMessage("OpenAL", "",WHITE);
 		printf( "Cannot open %s", path );
 		printStatus("ERROR", YELLOW );
 	}
@@ -466,7 +471,7 @@ int OpenALAudioDriver::StreamFile(const char* filename)
 
 void OpenALAudioDriver::UpdateListenerPos(int XPos, int YPos )
 {
-    alListener3f( AL_POSITION, (float) XPos, (float) YPos, 0.0f );
+	alListener3f( AL_POSITION, (float) XPos, (float) YPos, 0.0f );
 }
 
 void OpenALAudioDriver::GetListenerPos(int &XPos, int &YPos )
@@ -479,30 +484,30 @@ void OpenALAudioDriver::GetListenerPos(int &XPos, int &YPos )
 
 bool OpenALAudioDriver::ReleaseStream(int stream, bool HardStop)
 {
-    if (streams[stream].free || !streams[stream].locked)
-        return false;
-    if (!HardStop) {
-        // unlock it, so it will automatically be reclaimed when needed
-        streams[stream].locked = false;
-        return true;
+	if (streams[stream].free || !streams[stream].locked)
+		return false;
+	if (!HardStop) {
+		// unlock it, so it will automatically be reclaimed when needed
+		streams[stream].locked = false;
+		return true;
 	}
 
-    ALuint Source = streams[stream].Source;
-    alSourceStop(Source);
+	ALuint Source = streams[stream].Source;
+	alSourceStop(Source);
 
-    streams[stream].ClearProcessedBuffers(false);
-    alDeleteSources(1, &streams[stream].Source);
-    streams[stream].Source = 0;
-    streams[stream].free = true;
-    streams[stream].ambient = false;
-    streams[stream].locked = false;
+	streams[stream].ClearProcessedBuffers(false);
+	alDeleteSources(1, &streams[stream].Source);
+	streams[stream].Source = 0;
+	streams[stream].free = true;
+	streams[stream].ambient = false;
+	streams[stream].locked = false;
 
    	return true;
 }
 
 //This one is used for movies and ambients.
 int OpenALAudioDriver::SetupNewStream( ieWord x, ieWord y, ieWord z,
-                    ieWord gain, bool point, bool Ambient )
+		            ieWord gain, bool point, bool Ambient )
 {
 	// Find a free (or finished) stream for this sound
 	int stream = -1;
@@ -536,7 +541,7 @@ int OpenALAudioDriver::SetupNewStream( ieWord x, ieWord y, ieWord z,
 
 int OpenALAudioDriver::QueueAmbient(int stream, const char* sound)
 {
-    if (streams[stream].free || !streams[stream].ambient)
+	if (streams[stream].free || !streams[stream].ambient)
 		return -1;
 
 	ALuint source = streams[stream].Source;
@@ -567,7 +572,7 @@ int OpenALAudioDriver::QueueAmbient(int stream, const char* sound)
 
 void OpenALAudioDriver::SetAmbientStreamVolume(int stream, int volume)
 {
-    if (streams[stream].free || !streams[stream].ambient)
+	if (streams[stream].free || !streams[stream].ambient)
 		return;
 
 	ALuint source = streams[stream].Source;
@@ -626,8 +631,8 @@ ALenum OpenALAudioDriver::GetFormatEnum(int channels, int bits)
 
 int OpenALAudioDriver::MusicManager(void* arg)
 {
-    OpenALAudioDriver* driver = (OpenALAudioDriver*) arg;
-    ALuint buffersreturned = 0;
+	OpenALAudioDriver* driver = (OpenALAudioDriver*) arg;
+	ALuint buffersreturned = 0;
 	ALboolean bFinished = AL_FALSE;
 	while (driver->stayAlive) {
 		SDL_Delay(30);
@@ -704,27 +709,27 @@ int OpenALAudioDriver::MusicManager(void* arg)
 
 //This one is used for movies, might be useful for others ?
 void OpenALAudioDriver::QueueBuffer(int stream, unsigned short bits,
-                int channels, short* memory,
-                int size, int samplerate)
+		        int channels, short* memory,
+		        int size, int samplerate)
 {
-    ALuint Buffer ;
+	ALuint Buffer;
 
-    alGenBuffers(1, &Buffer) ;
-    if ( alGetError() != AL_NO_ERROR ) {
-        printMessage("OpenAL", "Unable to create buffer", WHITE ) ;
-        printStatus("ERROR", YELLOW) ;
-        return;
-    }
+	alGenBuffers(1, &Buffer);
+	if ( alGetError() != AL_NO_ERROR ) {
+		printMessage("OpenAL", "Unable to create buffer", WHITE );
+		printStatus("ERROR", YELLOW);
+		return;
+	}
 
-    alBufferData(Buffer, GetFormatEnum(channels, bits), memory, size, samplerate) ;
+	alBufferData(Buffer, GetFormatEnum(channels, bits), memory, size, samplerate);
 
-    alSourceQueueBuffers(streams[stream].Source, 1, &Buffer ) ;
+	alSourceQueueBuffers(streams[stream].Source, 1, &Buffer );
 
-    ALenum state ;
-    alGetSourcei(streams[stream].Source, AL_SOURCE_STATE, &state) ;
+	ALenum state;
+	alGetSourcei(streams[stream].Source, AL_SOURCE_STATE, &state);
 
-    if(state != AL_PLAYING )
-        alSourcePlay(streams[stream].Source) ;
+	if(state != AL_PLAYING )
+		alSourcePlay(streams[stream].Source);
 
-    return ;
+	return;
 }

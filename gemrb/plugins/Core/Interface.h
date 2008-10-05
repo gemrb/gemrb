@@ -690,6 +690,8 @@ public:
 	bool FullScreen, CaseSensitive, GameOnCD, SkipIntroVideos, DrawFPS;
 	/** The Main program loop */
 	void Main(void);
+	/** Executes everything (non graphical) in the main game loop */
+	void GameLoop(void);
 	/** Draws the Visible windows in the Windows Array */
 	void DrawWindows(void);
 	/** Sends a termination signal to the Video Driver */

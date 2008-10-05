@@ -316,6 +316,10 @@ void Inventory::KillSlot(unsigned int index)
 	}
 	RemoveSlotEffects( index );
 	Item *itm = core->GetItem(item->ItemResRef);
+	//this cannot happen, but stuff happens!
+	if (!itm) {
+		return;
+	}
 	ItemExcl &= ~itm->ItemExcl;
 
 	switch (effect) {
