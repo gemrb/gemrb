@@ -24,35 +24,55 @@
 ###################################################
 
 import GemRB
+import GUICommonWindows
 from GUIDefines import *
+from GUICommon import CloseOtherWindow
+from GUICommonWindows import *
 
-#from GUICommonWindows import OpenCommonWindows, CloseCommonWindows
-#import GUICommonWindows
-from GUICommonWindows import SetSelectionChangeHandler
-
+TopIndex = 0
 SpellBookWindow = None
 SpellBookSpellInfoWindow = None
 SpellBookSpellLevel = 0
 SpellBookSpellUnmemorizeWindow = None
-TopIndex = 0
+PortraitWindow = None
+OldPortraitWindow = None
+OptionsWindow = None
+OldOptionsWindow = None
 
 def OpenSpellBookWindow ():
-	global SpellBookWindow, TopIndex
+	global SpellBookWindow, OptionsWindow, PortraitWindow
+	global OldPortraitWindow, OldOptionsWindow, TopIndex
 
-	GemRB.HideGUI ()
-	
-	if SpellBookWindow != None:
+	if CloseOtherWindow (OpenSpellBookWindow):
 		GemRB.UnloadWindow (SpellBookWindow)
+		GemRB.UnloadWindow (OptionsWindow)
+		GemRB.UnloadWindow (PortraitWindow)
+
 		SpellBookWindow = None
 		GemRB.SetVar ("OtherWindow", -1)
-		
-		SetSelectionChangeHandler (None)
+		GemRB.SetVisible (0,1)
 		GemRB.UnhideGUI ()
+		GUICommonWindows.PortraitWindow = OldPortraitWindow
+		OldPortraitWindow = None
+		GUICommonWindows.OptionsWindow = OldOptionsWindow
+		OldOptionsWindow = None
+		SetSelectionChangeHandler (None)
 		return
-		
+
+	GemRB.HideGUI ()
+	GemRB.SetVisible (0,0)
+
 	GemRB.LoadWindowPack ("GUISPL", 800, 600)
 	SpellBookWindow = Window = GemRB.LoadWindow (2)
 	GemRB.SetVar ("OtherWindow", SpellBookWindow)
+	#saving the original portrait window
+	OldPortraitWindow = GUICommonWindows.PortraitWindow
+	PortraitWindow = OpenPortraitWindow ()
+	OldOptionsWindow = GUICommonWindows.OptionsWindow
+	OptionsWindow = GUICommonWindows.OptionsWindow
+	OptionsWindow = GemRB.LoadWindow (0)
+	SetupMenuWindowControls (OptionsWindow, 0, "OpenSpellBookWindow")
+	GemRB.SetWindowFrame (Window)
 
 	Button = GemRB.GetControl (Window, 92)
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "SpellBookPrevPress")
@@ -70,7 +90,7 @@ def OpenSpellBookWindow ():
 		Button = GemRB.GetControl (Window, 55 + i)
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_RADIOBUTTON, OP_SET)
 		GemRB.SetVarAssoc (Window, Button, "SpellBookSpellLevel", i)
-		
+
 	# Setup memorized spells buttons
 	for i in range (24):
 		Button = GemRB.GetControl (Window, 6 + i)
@@ -92,9 +112,7 @@ def OpenSpellBookWindow ():
 
 	SetSelectionChangeHandler (UpdateSpellBookWindow)
 	UpdateSpellBookWindow ()
-
-	GemRB.UnhideGUI ()
-	
+	return
 
 def UpdateSpellBookWindow ():
 	global SpellBookMemorizedSpellList, PriestKnownSpellList, TopIndex
@@ -170,6 +188,11 @@ def UpdateSpellBookWindow ():
 			GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_RIGHT_PRESS, "")
 			GemRB.SetTooltip (Window, Button, '')
 			GemRB.EnableButtonBorder (Window, Button, 0, 0)
+
+	#if actor is uncontrollable, make this grayed
+	GemRB.SetVisible (Window, 1)
+	GemRB.SetVisible (PortraitWindow, 1)
+	GemRB.SetVisible (OptionsWindow, 1)
 	return
 
 #TODO: spell type selector
@@ -179,7 +202,7 @@ def SpellBookPrevPress ():
 	UpdateSpellBookWindow ()
 	return
 
-#TODO: spell type selector 
+#TODO: spell type selector
 def SpellBookNextPress ():
 	global SpellBookSpellLevel
 
@@ -192,20 +215,20 @@ def RefreshSpellBookLevel ():
 	SpellBookSpellLevel = GemRB.GetVar ("PriestSpellLevel")
 	UpdateSpellBookWindow ()
 	return
-	
+
 def OpenSpellBookSpellInfoWindow ():
 	global SpellBookSpellInfoWindow
 
 	GemRB.HideGUI ()
-	
+
 	if SpellBookSpellInfoWindow != None:
 		GemRB.UnloadWindow (SpellBookSpellInfoWindow)
 		SpellBookSpellInfoWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
-		
+
 		GemRB.UnhideGUI ()
 		return
-		
+
 	SpellBookSpellInfoWindow = Window = GemRB.LoadWindow (3)
 	GemRB.SetVar ("FloatWindow", SpellBookSpellInfoWindow)
 
@@ -232,7 +255,7 @@ def OpenSpellBookSpellInfoWindow ():
 	GemRB.SetText (Window, Text, spell['SpellDesc'])
 
 	#IconResRef = 'SPL' + spell['SpellBookIcon'][2:]
-	
+
 	#Button = GemRB.GetControl (Window, 5)
 	#GemRB.SetButtonSprites (Window, Button, IconResRef, 0, 0, 0, 0, 0)
 
@@ -255,17 +278,17 @@ def OnSpellBookMemorizeSpell ():
 
 def OpenSpellBookSpellRemoveWindow ():
 	global SpellBookSpellUnmemorizeWindow
-	
+
 	GemRB.HideGUI ()
-	
+
 	if SpellBookSpellUnmemorizeWindow != None:
 		GemRB.UnloadWindow (SpellBookSpellUnmemorizeWindow)
 		SpellBookSpellUnmemorizeWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
-		
+
 		GemRB.UnhideGUI ()
 		return
-		
+
 	SpellBookSpellUnmemorizeWindow = Window = GemRB.LoadWindow (5)
 	GemRB.SetVar ("FloatWindow", SpellBookSpellUnmemorizeWindow)
 
@@ -289,17 +312,17 @@ def OpenSpellBookSpellRemoveWindow ():
 
 def OpenSpellBookSpellUnmemorizeWindow ():
 	global SpellBookSpellUnmemorizeWindow
-	
+
 	GemRB.HideGUI ()
-	
+
 	if SpellBookSpellUnmemorizeWindow != None:
 		GemRB.UnloadWindow (SpellBookSpellUnmemorizeWindow)
 		SpellBookSpellUnmemorizeWindow = None
 		GemRB.SetVar ("FloatWindow", -1)
-		
+
 		GemRB.UnhideGUI ()
 		return
-		
+
 	SpellBookSpellUnmemorizeWindow = Window = GemRB.LoadWindow (5)
 	GemRB.SetVar ("FloatWindow", SpellBookSpellUnmemorizeWindow)
 
