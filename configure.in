@@ -125,15 +125,21 @@ AM_PATH_SDL(1.2.0, [], [AC_MSG_ERROR([
 ])])
 
 dnl Check for OpenAL, fail if not found.
-AC_CHECK_LIB([openal], [alGetError], [ $(which true) ], [AC_MSG_ERROR([
-*** You need OpenAL (www.openal.org) to compile GemRB
+dnl Check for libSDL Version 1.2 or greater, fail if not found.
+AM_PATH_OPENAL(0.0.7, [], [AC_MSG_ERROR([
+
+*** You need OpenAL (www.openal.org) version 0.0.7 or greater to compile GemRB
 ])])
-#AC_CHECK_LIB([alut], [alutInit], [ $(which true) ], [AC_MSG_ERROR([
+
+#AC_CHECK_LIB([openal], [alGetError], [ $(which true) ], [AC_MSG_ERROR([
 #*** You need OpenAL (www.openal.org) to compile GemRB
 #])])
-OPENAL_LIBS="`openal-config --libs`"
+##AC_CHECK_LIB([alut], [alutInit], [ $(which true) ], [AC_MSG_ERROR([
+##*** You need OpenAL (www.openal.org) to compile GemRB
+##])])
+#OPENAL_LIBS="`openal-config --libs`"
 
-#GEMRB_CHECK_ALUT()
+##GEMRB_CHECK_ALUT()
 
 dnl Check for Python version >= 2.3.0, fail if not found.
 AM_PATH_PYTHON(2.3.0, [], [AC_MSG_ERROR([
