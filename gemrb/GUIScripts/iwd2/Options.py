@@ -43,6 +43,7 @@ def OnLoad():
 	GemRB.SetText(OptionsWindow, MoviesButton, 15415)
 	GemRB.SetEvent(OptionsWindow, MoviesButton, IE_GUI_BUTTON_ON_PRESS, "MoviePress")
 	GemRB.SetText(OptionsWindow, KeyboardButton, 33468)
+	GemRB.SetEvent(OptionsWindow, MoviesButton, IE_GUI_BUTTON_ON_PRESS, "KeyboardPress")
 	GemRB.SetText(OptionsWindow, ReturnButton, 10308)
 	GemRB.SetEvent(OptionsWindow, ReturnButton, IE_GUI_BUTTON_ON_PRESS, "ReturnPress")
 	

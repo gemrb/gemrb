@@ -127,7 +127,6 @@ def ConfirmedSaveGame():
 	StartLoadScreen()
 	GemRB.SaveGame(Pos, Slotname, 22) #saves a game with version 2.2
 	GemRB.UnloadWindow (ConfirmWindow)
-	#CloseSaveWindow ()
 	GemRB.SetVisible (SaveWindow,1)
 	return
 

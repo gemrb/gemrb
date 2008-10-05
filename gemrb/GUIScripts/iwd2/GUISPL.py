@@ -69,7 +69,6 @@ def OpenSpellBookWindow ():
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = OpenPortraitWindow ()
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
-	OptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenSpellBookWindow")
 	GemRB.SetWindowFrame (Window)
