@@ -63,7 +63,7 @@ def CreditsPress():
 def DonePress():
 	GemRB.UnloadWindow (MovieWindow)
 	if GameIsTOB():
-		GemRB.SetToken ("NextScript","Start2")
+		GemRB.SetNextScript ("Start2")
 	else:
-		GemRB.SetToken ("NextScript","Start")
+		GemRB.SetNextScript ("Start")
 	return
