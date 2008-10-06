@@ -168,7 +168,10 @@ def UpdateRecordsWindow ():
 
 	# armorclass
 	Label = GemRB.GetControl (Window, 0x10000028)
-	GemRB.SetText (Window, Label, str (GemRB.GetPlayerStat (pc, IE_ARMORCLASS)))
+	ac = GemRB.GetPlayerStat (pc, IE_ARMORCLASS)
+	#This is a temporary solution, the core engine should set the stat correctly!
+	ac += GemRB.GetAbilityBonus(IE_DEX, 2, GemRB.GetPlayerStat(pc, IE_DEX) )
+	GemRB.SetText (Window, Label, str (ac))
 	GemRB.SetTooltip (Window, Label, 17183)
 
 	# hp now
