@@ -171,7 +171,7 @@ def RightPress():
 		return
 	GemRB.SetVar("Skill "+str(Pos),ActPoint-1)
 	PointsLeft = PointsLeft + 1
-	if OldPos <> Pos:
+	if OldPos != Pos:
 		OldPos = Pos
 		ClickCount = 0
 
@@ -190,7 +190,7 @@ def LeftPress():
 		return
 	GemRB.SetVar("Skill "+str(Pos), ActPoint+1)
 	PointsLeft = PointsLeft - 1
-	if OldPos <> Pos:
+	if OldPos != Pos:
 		OldPos = Pos
 		ClickCount = 0
 

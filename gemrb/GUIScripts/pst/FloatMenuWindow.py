@@ -318,7 +318,7 @@ def RefreshSpellList(pc, innate):
 			# Spell was already used up
 			if not ms['Flags']: continue
 
-			if spell_hash.has_key (ms['SpellResRef']):
+			if ms['SpellResRef'] in spell_hash:
 				spell_hash[ms['SpellResRef']] = spell_hash[ms['SpellResRef']] + 1
 			else:
 				spell_hash[ms['SpellResRef']] = 1

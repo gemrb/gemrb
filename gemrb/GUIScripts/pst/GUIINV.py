@@ -460,7 +460,7 @@ def LeftItemScroll ():
 	if tmp < 0:
 		tmp = 43
 
-	while not ItemHash.has_key(tmp) or not ItemHash[tmp][1]:
+	while tmp not in ItemHash or not ItemHash[tmp][1]:
 		tmp = tmp - 1
 		if tmp < 0:
 			tmp = 43
@@ -476,7 +476,7 @@ def RightItemScroll ():
 	if tmp > 43:
 		tmp = 0
 
-	while not ItemHash.has_key(tmp) or not ItemHash[tmp][1]:
+	while tmp not in ItemHash or not ItemHash[tmp][1]:
 		tmp = tmp + 1
 		if tmp > 43:
 			tmp = 0
@@ -720,7 +720,7 @@ def MouseEnterSlot ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ('ItemButton')
-	if not ItemHash.has_key(slot):
+	if slot not in ItemHash:
 		return
 	OverSlot = ItemHash[slot][0]-1
 	if GemRB.IsDraggingItem ():
@@ -734,7 +734,7 @@ def MouseLeaveSlot ():
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ('ItemButton')
-	if not ItemHash.has_key(slot):
+	if slot not in ItemHash:
 		return
 	slot = ItemHash[slot][0]-1
 	if slot == OverSlot or not GemRB.IsDraggingItem ():
