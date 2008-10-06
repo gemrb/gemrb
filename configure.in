@@ -126,9 +126,9 @@ AM_PATH_SDL(1.2.0, [], [AC_MSG_ERROR([
 
 dnl Check for OpenAL, fail if not found.
 dnl Check for libSDL Version 1.2 or greater, fail if not found.
-AM_PATH_OPENAL(0.0.7, [], [AC_MSG_ERROR([
+AM_PATH_OPENAL([], [AC_MSG_ERROR([
 
-*** You need OpenAL (www.openal.org) version 0.0.7 or greater to compile GemRB
+*** You need OpenAL (www.openal.org) to compile GemRB
 ])])
 
 #AC_CHECK_LIB([openal], [alGetError], [ $(which true) ], [AC_MSG_ERROR([
