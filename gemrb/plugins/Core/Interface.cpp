@@ -516,6 +516,11 @@ void Interface::HandleEvents()
 		gc=NULL;
 	}
 
+	if (EventFlag&EF_SELECTION) {
+		EventFlag&=~EF_SELECTION;
+		guiscript->RunFunction( "SelectionChanged", false);
+	}
+
 	if (EventFlag&EF_UPDATEANIM) {
 		EventFlag&=~EF_UPDATEANIM;
 		guiscript->RunFunction( "UpdateAnimation", false);

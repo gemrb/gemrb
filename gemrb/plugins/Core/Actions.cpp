@@ -2078,6 +2078,8 @@ void GameScript::OpenDoor(Scriptable* Sender, Action* parameters)
 		actor->SetOrientation( GetOrient( *otherp, actor->Pos ), false);
 		if (door->Flags&DOOR_LOCKED) {
 			const char *Key = door->GetKey();
+			//TODO: the original engine allowed opening of a door when the
+			//key was on any of the partymembers
 			if (!Key || !actor->inventory.HasItem(Key,0) ) {
 				//playsound unsuccessful opening of door
 				core->PlaySound(DS_OPEN_FAIL);

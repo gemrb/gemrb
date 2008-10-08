@@ -320,6 +320,7 @@ void Inventory::KillSlot(unsigned int index)
 	if (!itm) {
 		return;
 	}
+printf("Equipped is: %d\n", Equipped);
 	ItemExcl &= ~itm->ItemExcl;
 
 	switch (effect) {
@@ -331,8 +332,12 @@ void Inventory::KillSlot(unsigned int index)
 			// reset Equipped if it was the removed item
 			if (Equipped+SLOT_MELEE == (int)index)
 				Equipped = IW_NO_EQUIPPED;
-			if (Equipped < 0 && FindRangedWeapon() == SLOT_FIST)
-				Equipped = IW_NO_EQUIPPED;
+			// reset Equipped if it is a ranged weapon slot
+			// but not magic weapon slot!
+			if (Equipped != SLOT_MAGIC-SLOT_MELEE) {
+				if (Equipped < 0 && FindRangedWeapon() == SLOT_FIST)
+					Equipped = IW_NO_EQUIPPED;
+			}
 				
 			UpdateWeaponAnimation();
 			break;
@@ -346,6 +351,7 @@ void Inventory::KillSlot(unsigned int index)
 			}
 			break;
 	}
+printf("Equipped is: %d\n", Equipped);
 	core->FreeItem(itm, item->ItemResRef, false);
 }
 /** if resref is "", then destroy ALL items
@@ -464,9 +470,11 @@ int Inventory::AddSlotItem(CREItem* item, int slot, int slottype)
 			InvalidSlot(slot);
 		}
 
+		//check for equipping weapons
 		if (WhyCantEquip(slot,twohanded)) {
 			return ASI_FAILED;
 		}
+
 		if (!Slots[slot]) {
 			item->Flags |= IE_INV_ITEM_ACQUIRED;
 			Slots[slot] = item;
@@ -1040,26 +1048,30 @@ int Inventory::GetEquippedSlot() const
 
 bool Inventory::SetEquippedSlot(int slotcode)
 {
+	//doesn't work if magic slot is used, refresh the magic slot just in case
+	if (HasItemInSlot("",SLOT_MAGIC) && (slotcode!=SLOT_MAGIC-SLOT_MELEE)) {
+		Equipped = SLOT_MAGIC-SLOT_MELEE;
+		UpdateWeaponAnimation();
+		return false;
+	}
+
+	//unequipping (fist slot will be used now)
+	if (slotcode == IW_NO_EQUIPPED || !HasItemInSlot("",slotcode+SLOT_MELEE)) {
+		if (Equipped != IW_NO_EQUIPPED) {
+			RemoveSlotEffects( SLOT_MELEE+Equipped);
+		}
+		Equipped = IW_NO_EQUIPPED;
+		//fist slot equipping effects
+		AddSlotEffects(0);
+		UpdateWeaponAnimation();
+		return true;
+	}
+
+	//equipping a weapon, but remove its effects first
 	if (Equipped != IW_NO_EQUIPPED) {
 		RemoveSlotEffects( SLOT_MELEE+Equipped);
 	}
 
-	//doesn't work if magic slot is used
-	if (HasItemInSlot("",SLOT_MAGIC)) {
-		Equipped = SLOT_MAGIC-SLOT_MELEE;
-		return false;
-	}
-
-	if (slotcode == IW_NO_EQUIPPED) {
-		Equipped = IW_NO_EQUIPPED;
-		UpdateWeaponAnimation();
-		return true;
-	}
-	if (!HasItemInSlot("",slotcode+SLOT_MELEE)) {
-		Equipped = IW_NO_EQUIPPED;
-		UpdateWeaponAnimation();
-		return true;
-	}
 	Equipped = slotcode;
 	int effects = core->QuerySlotEffects( SLOT_MELEE+Equipped );
 	if (effects) {
@@ -1219,6 +1231,11 @@ void Inventory::EquipBestWeapon(int flags)
 	CREItem *Slot;
 	char AnimationType[2]={0,0};
 	ieWord MeleeAnimation[3]={100,0,0};
+
+	//cannot change equipment when holding magic weapons
+	if (Equipped == SLOT_MELEE-SLOT_MAGIC) {
+		return;
+	}
 
 	if (flags&EQUIP_RANGED) {
 		for(i=SLOT_RANGED;i<LAST_RANGED;i++) {
@@ -1421,6 +1438,8 @@ void Inventory::UpdateWeaponAnimation()
 	if (itm)
 		core->FreeItem( itm, Slot->ItemResRef, false );
 	Owner->SetUsedWeapon(AnimationType, MeleeAnimation, WeaponType);
+	//update the weapon animation
+	core->SetEventFlag(EF_SELECTION);
 }
 
 //this function will also check disabled slots (if that feature will be imped)
@@ -1451,6 +1470,17 @@ inline bool Inventory::TwoHandedInSlot(int slot) const
 
 int Inventory::WhyCantEquip(int slot, int twohanded) const
 {
+	// check only for hand slots
+	if ((slot<SLOT_MELEE || slot>LAST_MELEE) && (slot != SLOT_LEFT) ) {
+		return 0;
+	}
+
+	//magic items have the highest priority
+	if ( HasItemInSlot("", GetMagicSlot())) {
+		//magic weapon is in use
+		return STR_MAGICWEAPON;
+	}
+
 	//can't equip in shield slot if a weapon slot is twohanded
 	for (int i=SLOT_MELEE; i<=LAST_MELEE;i++) {
 		//see GetShieldSlot
@@ -1481,10 +1511,6 @@ int Inventory::WhyCantEquip(int slot, int twohanded) const
 		//cannot equip two handed while shield slot is in use?
 			return STR_OFFHAND_USED;
 		}
-	}
-	if ( HasItemInSlot("", GetMagicSlot())) {
-		//magic weapon is in use
-		return STR_MAGICWEAPON;
 	}
 	return 0;
 }

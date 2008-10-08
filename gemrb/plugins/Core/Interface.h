@@ -161,6 +161,7 @@ public:
 #define EF_UPDATEANIM    8        //updates avatar animation
 #define EF_SEQUENCER     16       //starts sequencer/contingency creation
 #define EF_IDENTIFY      32       //starts identify screen
+#define EF_SELECTION     64       //selection changed
 
 //autopause
 #define AP_UNUSABLE      0

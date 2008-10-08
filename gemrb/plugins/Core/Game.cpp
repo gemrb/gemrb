@@ -445,8 +445,9 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 			}
 		}
 
-		if (! (flags & SELECT_QUIET)) { 
-			core->GetGUIScriptEngine()->RunFunction( "SelectionChanged" );
+		if (! (flags & SELECT_QUIET)) {
+			core->SetEventFlag(EF_SELECTION);
+			//core->GetGUIScriptEngine()->RunFunction( "SelectionChanged" );
 		}
 		return true;
 	}
@@ -480,7 +481,8 @@ bool Game::SelectActor(Actor* actor, bool select, unsigned flags)
 	}
 
 	if (! (flags & SELECT_QUIET)) { 
-		core->GetGUIScriptEngine()->RunFunction( "SelectionChanged" );
+		core->SetEventFlag(EF_SELECTION);
+		//core->GetGUIScriptEngine()->RunFunction( "SelectionChanged" );
 	}
 	return true;
 }
