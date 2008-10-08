@@ -320,7 +320,6 @@ void Inventory::KillSlot(unsigned int index)
 	if (!itm) {
 		return;
 	}
-printf("Equipped is: %d\n", Equipped);
 	ItemExcl &= ~itm->ItemExcl;
 
 	switch (effect) {
@@ -351,7 +350,6 @@ printf("Equipped is: %d\n", Equipped);
 			}
 			break;
 	}
-printf("Equipped is: %d\n", Equipped);
 	core->FreeItem(itm, item->ItemResRef, false);
 }
 /** if resref is "", then destroy ALL items

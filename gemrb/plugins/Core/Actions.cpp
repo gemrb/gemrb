@@ -284,8 +284,6 @@ void GameScript::PermanentStatChange(Scriptable* Sender, Action* parameters)
 			value = parameters->int2Parameter;
 			break;
 	}
-parameters->Dump();
-printf("Setting STat to: %d\n", (int) value);
 	actor->SetBase( parameters->int0Parameter, value);
 }
 

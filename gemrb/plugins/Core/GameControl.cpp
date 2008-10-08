@@ -2331,7 +2331,10 @@ Sprite2D* GameControl::GetPreview()
 		y = 0;
 
 	HideGUI ();
+	signed char v = Owner->Visible;
+	Owner->Visible = WINDOW_VISIBLE;
 	Draw (0, 0);
+	Owner->Visible = v;
 	Sprite2D *screenshot = video->GetScreenshot( Region(x, y, w, h) );
 	UnhideGUI ();
 	core->DrawWindows();
