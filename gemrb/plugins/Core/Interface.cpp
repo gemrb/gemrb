@@ -5377,7 +5377,7 @@ ieDword Interface::TranslateStat(const char *stat_name)
 	return stat;
 }
 
-bool Interface::WaitForDisc(int disc_number, const char* path)
+void Interface::WaitForDisc(int disc_number, const char* path)
 {
         Video* video = GetVideoDriver();
 
