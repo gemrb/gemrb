@@ -5371,3 +5371,22 @@ ieDword Interface::TranslateStat(const char *stat_name)
 	}
 	return stat;
 }
+
+bool Interface::WaitForDisc(int disc_number, const char* path)
+{
+        Video* video = GetVideoDriver();
+
+	GetDictionary()->SetAt( "WaitForDisc", (ieDword) disc_number );
+	//GetDictionary()->SetAt( "WaitForDiscPath", (char*) path );
+
+        GetGUIScriptEngine()->RunFunction( "OpenWaitForDiscWindow" );
+        do {
+                core->DrawWindows ();
+		if (dir_exists (path)) {
+        		GetGUIScriptEngine()->RunFunction( "OpenWaitForDiscWindow" );
+			break;
+		}
+                
+        } while (video->SwapBuffers() == GEM_OK);
+}
+

@@ -309,16 +309,22 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
 			}
 		}
 		if (exist == NULL) {
+			int CD;
 			if (( biffiles[bifnum].BIFLocator & ( 1 << 2 ) ) != 0) {
 				strcpy( BasePath, core->CD1 );
+				CD = 1;
 			} else if (( biffiles[bifnum].BIFLocator & ( 1 << 3 ) ) != 0) {
 				strcpy( BasePath, core->CD2 );
+				CD = 2;
 			} else if (( biffiles[bifnum].BIFLocator & ( 1 << 4 ) ) != 0) {
 				strcpy( BasePath, core->CD3 );
+				CD = 3;
 			} else if (( biffiles[bifnum].BIFLocator & ( 1 << 5 ) ) != 0) {
 				strcpy( BasePath, core->CD4 );
+				CD = 4;
 			} else if (( biffiles[bifnum].BIFLocator & ( 1 << 6 ) ) != 0) {
 				strcpy( BasePath, core->CD5 );
+				CD = 5;
 			} else {
 					printStatus( "ERROR", LIGHT_RED );
 				printf( "Cannot find %s... Resource unavailable.\n",
@@ -330,6 +336,10 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
 			ResolveFilePath(path);
 #endif
 			exist = fopen( path, "rb" );
+			if (exist == NULL && core->GameOnCD) {
+				core->WaitForDisc( CD, BasePath );
+				exist = fopen( path, "rb" );
+			}
 			if (exist == NULL) {
 				//Trying CBF Extension
 				PathJoin( path, BasePath, biffiles[bifnum].name, NULL );

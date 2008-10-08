@@ -24,6 +24,7 @@
 ###################################################
 
 import GemRB
+from GUICommonWindows import OpenWaitForDiscWindow
 
 StartWindow = 0
 QuitWindow = 0

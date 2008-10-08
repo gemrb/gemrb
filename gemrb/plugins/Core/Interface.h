@@ -632,6 +632,8 @@ public:
 	ieDword *GetListFrom2DA(const ieResRef resref);
 	/** translates a stat symbol to numeric value */
 	ieDword TranslateStat(const char *stat_name);
+	/** Opens CD prompt window and waits for the specified disc */
+	bool WaitForDisc(int disc_number, const char* path);
 private:
 	int LoadSprites();
 	bool LoadConfig(void);

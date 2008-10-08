@@ -24,6 +24,7 @@
 
 import GemRB
 from LoadScreen import *
+from GUICommonWindows import OpenWaitForDiscWindow
 
 LoadWindow = 0
 TextAreaControl = 0
