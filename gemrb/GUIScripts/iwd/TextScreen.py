@@ -38,7 +38,7 @@ def StartTextScreen ():
 	print "LoadPic", LoadPic
 	#if there is no preset loadpic, try to determine it from the chapter
 	#fixme: we always assume there isn't
-	ID = GemRB.GetGameVar("CHAPTER") + 1
+	ID = (GemRB.GetGameVar("CHAPTER") + 1) & 0x7fffffff
 	#set ID according to the Chapter?
 	Chapter = ID + 1
 

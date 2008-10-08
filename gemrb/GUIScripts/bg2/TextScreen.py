@@ -38,7 +38,7 @@ def StartTextScreen ():
 
 	#if there is no preset loadpic, try to determine it from the chapter
 	if TableName == "":
-		Chapter = GemRB.GetGameVar ("CHAPTER")
+		Chapter = GemRB.GetGameVar ("CHAPTER") & 0x7fffffff
 		TableName = "CHPTXT"+str(Chapter)
 		#set ID according to the Chapter?
 

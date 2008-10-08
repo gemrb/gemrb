@@ -38,7 +38,7 @@ def StartTextScreen ():
 	if TableName[:6] == "chptxt":
 		GemRB.LoadMusicPL("chapter.mus")
 
-	Chapter = GemRB.GetGameVar("CHAPTER")
+	Chapter = GemRB.GetGameVar("CHAPTER") & 0x7fffffff
 	#set ID according to the Chapter?
 	ID = Chapter+1
 	TextScreen = GemRB.LoadWindow (ID)
