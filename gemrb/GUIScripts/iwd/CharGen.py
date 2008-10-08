@@ -321,6 +321,9 @@ def AcceptPress():
 	#priest spells
 	TableName = GemRB.GetTableValue (TmpTable, Class, 1, 0)
 	if TableName != "*":
+		#there is no separate druid table, falling back to priest
+		if TableName == "MXSPLDRU":
+			TableName = "MXSPLPRS"
 		#todo: set up ALL spell levels not just level 1
 		SetupSpellLevels(MyChar, TableName, IE_SPELL_TYPE_PRIEST, 1)
 		ClassFlag = 0 #set this according to class

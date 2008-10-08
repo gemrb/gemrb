@@ -35,7 +35,6 @@ def StartTextScreen ():
 
 	GemRB.LoadWindowPack ("GUICHAP", 640, 480)
 	LoadPic = GemRB.GetGameString (STR_LOADMOS)
-	print "LoadPic", LoadPic
 	#if there is no preset loadpic, try to determine it from the chapter
 	#fixme: we always assume there isn't
 	ID = (GemRB.GetGameVar("CHAPTER") + 1) & 0x7fffffff
@@ -48,7 +47,6 @@ def StartTextScreen ():
 	else:
 		GemRB.LoadMusicPL ("chap1.mus")
 
-	print "Load ",ID
 	TextScreen = GemRB.LoadWindow (ID)
 	GemRB.SetWindowFrame (TextScreen)
 
