@@ -504,14 +504,21 @@ def UpdateStoreShoppingWindow ():
 	LeftCount = Store['StoreItemCount']
 	ScrollBar = GemRB.GetControl (Window, 11)
 	GemRB.SetVarAssoc (Window, ScrollBar, "LeftTopIndex", LeftCount-3)
+	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
+	if LeftTopIndex>LeftCount-3:
+		GemRB.SetVar ("LeftTopIndex", LeftCount-3)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
 	RightCount = len(inventory_slots)
 	ScrollBar = GemRB.GetControl (Window, 12)
 	GemRB.SetVarAssoc (Window, ScrollBar, "RightTopIndex", RightCount-3)
-	RedrawStoreShoppingWindow ()
+	RightTopIndex = GemRB.GetVar ("RightTopIndex")
+	if RightTopIndex>RightCount-3:
+		GemRB.SetVar ("RightTopIndex", RightCount-3)
 
+	RedrawStoreShoppingWindow ()
+	return
 
 def SelectBuy ():
 	Window = StoreShoppingWindow
