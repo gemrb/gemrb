@@ -26,13 +26,14 @@ Supported (i.e. we got reports about successfully running GemRB) systems:
 
 Linux x86, x86-64, ppc
 FreeBSD x86
-MS Windows
-various Macintosh systems also should work ...
+MS Windows (98, XP or Vista)
+some Nokia N8x0 systems
+various Macintosh systems (even pre x86) also should work ...
 
 Requirements:
 
 SDL 1.2
-OpenAL 0.0.7 or above
+OpenAL 0.0.7 or above, (not required if you don't want sound)
 Python 2.2 or above, with shared libs (binaries are compiled with 2.5!)
 ZLib 1.2
 Png 1.2 (optional)
