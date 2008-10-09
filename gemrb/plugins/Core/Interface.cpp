@@ -516,6 +516,7 @@ void Interface::HandleEvents()
 		gc=NULL;
 	}
 
+
 	if (EventFlag&EF_SELECTION) {
 		EventFlag&=~EF_SELECTION;
 		guiscript->RunFunction( "SelectionChanged", false);
@@ -564,6 +565,11 @@ void Interface::HandleEvents()
 	if (EventFlag&EF_IDENTIFY) {
 		EventFlag&=~EF_IDENTIFY;
 		guiscript->RunFunction( "OpenIdentifyWindow" );
+		return;
+	}
+	if (EventFlag&EF_OPENSTORE) {
+		EventFlag&=~EF_OPENSTORE;
+		guiscript->RunFunction( "OpenStoreWindow" );
 		return;
 	}
 }

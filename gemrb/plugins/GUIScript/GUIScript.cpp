@@ -4988,14 +4988,14 @@ static PyObject* GemRB_EnterStore(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_EnterStore__doc );
 	}
 
-	if (core->GetCurrentStore()) {
-		return RuntimeError( "Already in a store!\n");
-	}
-
+	//stores are cached, bags could be opened while in shops
+	//so better just switch to the requested store silently
+	//the core will be intelligent enough to not do excess work
 	core->SetCurrentStore( StoreResRef, NULL );
 
 	//the error flag is not optional, we should open a store now
-	core->GetGUIScriptEngine()->RunFunction( "OpenStoreWindow", true);
+	//core->GetGUIScriptEngine()->RunFunction( "OpenStoreWindow", true);
+	core->SetEventFlag(EF_OPENSTORE);
 	Py_INCREF( Py_None );
 	return Py_None;
 }

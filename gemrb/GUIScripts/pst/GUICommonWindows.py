@@ -575,6 +575,8 @@ def SetItemButton (Window, Button, Slot, PressHandler, RightPressHandler):
 		#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_SHIFT_PRESS, "")
 		#GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "")
 
+def GearsClicked():
+        GemRB.GamePause(2,0)
 
 def OpenWaitForDiscWindow ():
 	global DiscWindow

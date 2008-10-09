@@ -760,3 +760,49 @@ def SetEncumbranceLabels (Window, Label, Label2, pc):
 
 def GearsClicked():
 	GemRB.GamePause(2,0)
+
+def OpenWaitForDiscWindow ():
+        global DiscWindow
+        #print "OpenWaitForDiscWindow"
+
+        if DiscWindow:
+                GemRB.HideGUI ()
+                GemRB.UnloadWindow (DiscWindow)
+                GemRB.SetVar ("OtherWindow", -1)
+                # ...LoadWindowPack()
+                EnableAnimatedWindows ()
+                DiscWindow = None
+                GemRB.UnhideGUI ()
+                return
+
+        try:
+                GemRB.HideGUI ()
+        except:
+                pass
+
+        GemRB.LoadWindowPack ("GUIID")
+        DiscWindow = Window = GemRB.LoadWindow (0)
+        GemRB.SetVar ("OtherWindow", Window)
+        label = GemRB.GetControl (DiscWindow, 0)
+
+        disc_num = GemRB.GetVar ("WaitForDisc")
+        #disc_path = GemRB.GetVar ("WaitForDiscPath")
+        disc_path = 'XX:'
+
+        text = GemRB.GetString (31483) + " " + str (disc_num) + " " + GemRB.GetString (31569) + " " + disc_path + "\n" + GemRB.GetString (49152)
+        GemRB.SetText (DiscWindow, label, text)
+        DisableAnimatedWindows ()
+        # 31483 - Please place PS:T disc number
+        # 31568 - Please  place the PS:T DVD
+        # 31569 - in drive
+        # 31570 - Wrong disc in drive
+        # 31571 - There is no disc in drive
+        # 31578 - No disc could be found in drive. Please place Disc 1 in drive.
+        # 49152 - To quit the game, press Alt-F4
+
+
+        try:
+                GemRB.UnhideGUI ()
+        except:
+                GemRB.SetVisible (DiscWindow, 1)
+

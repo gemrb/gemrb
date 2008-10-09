@@ -162,6 +162,7 @@ public:
 #define EF_SEQUENCER     16       //starts sequencer/contingency creation
 #define EF_IDENTIFY      32       //starts identify screen
 #define EF_SELECTION     64       //selection changed
+#define EF_OPENSTORE     128      //open store window
 
 //autopause
 #define AP_UNUSABLE      0
