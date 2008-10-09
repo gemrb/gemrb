@@ -537,6 +537,19 @@ def OnDropItemToPC ():
 	UpdateInventoryWindow ()
 	return
 
+def OpenItemWindow ():
+	#close inventory
+	GemRB.SetVar ("Inventory", 1)
+	GemRB.UnloadWindow (ItemInfoWindow)
+	OpenInventoryWindow ()
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	slot_item = GemRB.GetSlotItem (pc, slot)
+	ResRef = slot_item['ItemResRef']
+	#the store will have to reopen the inventory
+	GemRB.EnterStore (ResRef)
+	return
+
 def DialogItemWindow ():
 	GemRB.UnloadWindow (ItemInfoWindow)
 	OpenInventoryWindow ()
@@ -667,7 +680,7 @@ def DisplayItem (itemresref, type):
 		GemRB.SetText (Window, Button, 17104)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "ReadItemWindow")
 	elif container:
-		GemRB.SetText (Window, Button, 14133)
+		GemRB.SetText (Window, Button, 24891)
 		GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "OpenItemWindow")
 	elif dialog:
 		GemRB.SetText (Window, Button, item["DialogName"])

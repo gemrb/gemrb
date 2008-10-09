@@ -72,7 +72,7 @@ total_income = 0
 # 5 - drink
 # 6 - rent
 
-storebams = ("STORSTOR","STORTVRN","STORINN","STORTMPL","STORBAG","STORBAG")
+storebams = ("STORSTOR","STORTVRN","STORINN","STORTMPL","STORSTOR","STORSTOR")
 storetips = (14288,14292,14291,12138,15013,14289,14287)
 roomtypes = (17389,17517,17521,17519)
 store_funcs = ( "OpenStoreShoppingWindow", "OpenStoreIdentifyWindow",
