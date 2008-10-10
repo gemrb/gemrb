@@ -7059,26 +7059,21 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 
 	bool ret = true;
 
-	if (*a_s=='0' && a_v==0)
+	if (*a_s!='0' && a_v!=0)
+		ret = CheckStat(actor, a_s, a_v);
+
+	if (*b_s!='0' && b_v!=0)
+		ret |= CheckStat(actor, b_s, b_v);
+
+	if (!ret)
 		goto endofquest;
 
-	ret = CheckStat(actor, a_s, a_v);
+	if (*c_s!='0' && c_v!=0)
+		// no | because the formula is (a|b) & (c|d)
+		ret = CheckStat(actor, c_s, c_v);
 
-	if (*b_s=='0' && b_v==0)
-		goto endofquest;
-
-	ret |= CheckStat(actor, b_s, b_v);
-
-	if (*c_s=='0' && c_v==0)
-		goto endofquest;
-
-	// no | because the formula is (a|b) & (c|d)
-	ret = CheckStat(actor, c_s, c_v);
-
-	if (*d_s=='0' && d_v==0)
-		goto endofquest;
-
-	ret |= CheckStat(actor, d_s, d_v);
+	if (*d_s!='0' && d_v!=0)
+		ret |= CheckStat(actor, d_s, d_v);
 
 endofquest:
 	if (ret) {
