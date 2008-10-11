@@ -9,3 +9,15 @@ COMMENT   - unused by GemRB, it is just a reminder
 
 Rows - spell immunity conditions
 
+Stats over 255 (0x100 and above) are not real stats, but either virtual stats, or
+composite conditions.
+
+0x100   - caster is source of the spell (spell effect won't affect self)
+0x101   - caster isn't source of the spell (spell effect won't affect others)
+0x102   - the personal space of the target, set in avatars.2da  (SPACE column)
+0x103   - both rows are true (the two fields designate 2 other rows in this file)
+0x104   - neither rows are true (similar to 0x103)
+0x105   - only the lowest 2 bits of alignment are calculated
+0x106   - area flags (outdoor, forest, etc)
+0x107   - daytime flag
+0x108   - caster and target EA relation (using the EA fields to calculate this)
