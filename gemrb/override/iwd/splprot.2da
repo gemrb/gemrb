@@ -12,8 +12,8 @@
 8          GENERAL    2          5          general/not_animal 
 9          RACE       152        1          race/elemental 
 10         RACE       152        5          race/not_elemental 
-11         RACE       162        1          race/fungus 
-12         RACE       162        5          race/not_fungus 
+11         RACE       159        1          race/fungus 
+12         RACE       159        5          race/not_fungus 
 13         0x102      3          0          huge_creature 
 14         0x102      3          3          not_huge_creature 
 15         RACE       2          1          race/elf   
@@ -95,3 +95,11 @@
 91         RACE       190        5          race/not_keg 
 92         RACE       *          *          outsider   
 93         RACE       *          *          not_outsider 
+94         RACE       215        1          race/plate
+95         RACE       215        5          race/not_plate
+96         0x103      90         94         race/keg_or_plate
+97         0x104      90         94         race/not_keg_or_plate
+98         RACE       161        1          race/salamander
+99         RACE       161        5          race/not_salamander
+100        RACE       164        1          race/tanari
+101        RACE       164        5          race/not_tanari
