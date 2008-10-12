@@ -230,7 +230,7 @@ static void ReadItemSounds()
 	core->DelTable( table );
 }
 
-static void GetItemSound(ieResRef &Sound, ieDword ItemType, ieDword Col)
+static void GetItemSound(ieResRef &Sound, ieDword ItemType, const char *ID, ieDword Col)
 {
 	Sound[0]=0;
 	if (Col>1) {
@@ -240,10 +240,19 @@ static void GetItemSound(ieResRef &Sound, ieDword ItemType, ieDword Col)
 	if (ItemSoundsCount<0) {
 		ReadItemSounds();
 	}
+
+	printf("Item animation type: %c%c\n",ID[0], ID[1]);
+	if (ID[1]=='A') {
+		//the last 4 item sounds are used for '1A', '2A', '3A' and '4A'
+                //item animation types
+		ItemType = ItemSoundsCount-4+ID[0]-'1';
+	}
+
 	if (ItemType>=(ieDword) ItemSoundsCount) {
 		return;
 	}
 	strnlwrcpy(Sound, ItemSounds[ItemType][Col], 8);
+	printf("Sound resource retrieved: %s\n", Sound);
 }
 
 static int GetCreatureStrRef(unsigned int Slot, unsigned int Str)
@@ -5190,7 +5199,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
  			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
 	 			memcpy(Sound,item->ReplacementItem,8);
 			} else {
-				GetItemSound(Sound, item->ItemType, IS_DROP);
+				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 			}
 			core->FreeItem(item, si->ItemResRef,0);
 		}
@@ -5222,7 +5231,7 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
  			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->DescriptionIcon[0]) {
 	 			memcpy(Sound,item->DescriptionIcon,8);
 			} else {
-				GetItemSound(Sound, item->ItemType, IS_GET);
+				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_GET);
 			}
 			core->FreeItem(item, si->ItemResRef,0);
 		}
@@ -6614,7 +6623,7 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		if (core->HasFeature(GF_HAS_PICK_SOUND) && item->DescriptionIcon[0]) {
 			memcpy(Sound,item->DescriptionIcon,8);
 		} else {
-			GetItemSound(Sound, item->ItemType, IS_GET);
+			GetItemSound(Sound, item->ItemType, item->AnimationType, IS_GET);
 		}
 		core->FreeItem(item, si->ItemResRef,0);
 	}
@@ -6674,7 +6683,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
  			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
 	 			memcpy(Sound,item->ReplacementItem,8);
 			} else {
-				GetItemSound(Sound, item->ItemType, IS_DROP);
+				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 			}
 			core->FreeItem(item, si->ItemResRef,0);
 			if (Sound[0]) {
@@ -6724,7 +6733,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
 		memcpy(Sound, item->ReplacementItem, 9);
 	} else {
-		GetItemSound(Sound, item->ItemType, IS_DROP);
+		GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 	}
 	//freeing the item before returning 
 	core->FreeItem( item, slotitem->ItemResRef, false );
