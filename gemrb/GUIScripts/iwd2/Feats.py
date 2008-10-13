@@ -21,6 +21,16 @@ def MultiLevelFeat(feat):
 
 # FIXME: CheckFeatCondition doesn't check for higher level prerequisites
 # (eg. cleave2 needs +4 BAB and weapon specialisation needs 4 fighter levels)
+
+# NOTE: cleave formula is now:
+# HITBONUS>=4 OR FEAT_CLEAVE<1
+#
+# specialisation formulas:
+# FIGHTERLEVEL>=4 OR FEAT_*<2
+# The default operator was set to 4 (greater or equal), so the majority of the formulas
+# don't need any more change
+# Avenger
+
 def IsFeatUsable(feat):
 	global FeatReqTable
 
