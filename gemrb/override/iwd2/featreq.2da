@@ -1,78 +1,79 @@
 2DA V1.0
-1
-                        A_STAT                A_VALUE    B_STAT              B_VALUE    C_STAT                 C_VALUE    D_STAT                 D_VALUE    MULTIPLE                 MAX_LEVEL
-AEGIS_OF_RIME           SPELLCRAFT            10         0                   0          CLASSLEVELMAGE         7          CLASSLEVELSORCEROR     7          0                        1
-AMBIDEXTERITY           DEX                   15         0                   0          0                      0          0                      0          0                        1
-AQUA_MORTIS             SPELLCRAFT            10         0                   0          CLASSLEVELMAGE         7          CLASSLEVELSORCEROR     7          0                        1
-ARMOR_PROF              0                     0          0                   0          0                      0          0                      0          FEAT_ARMOUR              3
-ARMORED_ARCANA          CLASSLEVELMAGE        1          CLASSLEVELSORCEROR  1          0                      0          0                      0          FEAT_ARMORED_ARCANA      3
-ARTERIAL_STRIKE         CLASSLEVELTHIEF       1          0                   0          THAC0BONUSRIGHT        4          0                      0          0                        1
-BLIND_FIGHT             0                     0          0                   0          0                      0          0                      0          0                        1
-BULLHEADED              RACE                  1          RACE                4          0                      0          0                      0          0                        1
-CLEAVE                  STR                   13         0                   0          FEATS1                 64         0                      0          FEAT_CLEAVE              2
-COMBAT_CASTING          0                     0          0                   0          0                      0          0                      0          0                        1
-COURTEOUS_MAGOCRACY     0                     0          0                   0          0                      0          0                      0          0                        1
-CRIPPLING_STRIKE        CLASSLEVELTHIEF       10         0                   0          0                      0          0                      0          0                        1
-DASH                    0                     0          0                   0          0                      0          0                      0          0                        1
-DEFLECT_ARROWS          DEX                   13         0                   0          0                      0          0                      0          0                        1
-DIRTY_FIGHTING          DEX                   13         0                   0          THAC0BONUSRIGHT        2          0                      0          0                        1
-DISCIPLINE              0                     0          0                   0          0                      0          0                      0          0                        1
-DODGE                   DEX                   13         0                   0          0                      0          0                      0          0                        1
-ENVENOM_WEAPON          CLASSLEVELTHIEF       1          0                   0          ALCHEMY                8          0                      0          0                        1
-EXOTIC_BASTARD          0                     0          0                   0          0                      0          0                      0          FEAT_BASTARDSWORD        3
-EXPERTISE               INT                   13         0                   0          0                      0          0                      0          0                        1
-EXTRA_RAGE              CLASSLEVELBARBARIAN   1          0                   0          0                      0          0                      0          FEAT_EXTRA_RAGE          3
-EXTRA_SHAPESHIFTING     CLASSLEVELDRUID       3          0                   0          0                      0          0                      0          FEAT_EXTRA_SHAPE         3
-EXTRA_SMITING           CLASSLEVELPALADIN     2          0                   0          0                      0          0                      0          FEAT_EXTRA_SMITING       3
-EXTRA_TURNING           TURNUNDEADLEVEL       1          0                   0          0                      0          0                      0          FEAT_EXTRA_TURNING       3
-FIENDSLAYER             CLASSLEVELPALADIN     8          0                   0          FEAT_LARGE_SWORDS      1          FEAT_GREAT_SWORDS      1          0                        1
-FORESTER                0                     0          0                   0          0                      0          0                      0          0                        1
-GREAT_FORTITUDE         0                     0          0                   0          0                      0          0                      0          0                        1
-HAMSTRING               CLASSLEVELTHIEF       3          0                   0          0                      0          0                      0          0                        1
-HERETICS_BANE           CLASSLEVELCLERIC      1          CLASSLEVELPALADIN   3          THAC0BONUSRIGHT        4          0                      0          0                        1
-HEROIC_INSPIRATION      CLASSLEVELPALADIN     1          CLASSLEVELBARBARIAN 1          0                      0          0                      0          0                        1
-IMPROVED_CRITICAL       THAC0BONUSRIGHT       8          0                   0          0                      0          0                      0          0                        1
-IMPROVED_EVASION        CLASSLEVELTHIEF       10         0                   0          0                      0          0                      0          0                        1
-IMPROVED_INITIATIVE     0                     0          0                   0          0                      0          0                      0          0                        1
-IMPROVED_TURNING        CLASSLEVELCLERIC      1          0                   0          CLASSLEVELPALADIN      3          0                      0          0                        1
-IRON_WILL               0                     0          0                   0          0                      0          0                      0          0                        1
-LIGHTNING_REFLEXES      0                     0          0                   0          0                      0          0                      0          0                        1
-LINGERING_SONG          CLASSLEVELBARD        1          0                   0          0                      0          0                      0          0                        1
-LUCK_OF_HEROES          RACE                  1          0                   0          0                      0          0                      0          0                        1
-MARTIAL_AXE             0                     0          0                   0          0                      0          0                      0          FEAT_AXE                 3
-MARTIAL_BOW             0                     0          0                   0          0                      0          0                      0          FEAT_BOW                 3
-MARTIAL_FLAIL           0                     0          0                   0          0                      0          0                      0          FEAT_FLAIL               3
-MARTIAL_GREATSWORD      0                     0          0                   0          0                      0          0                      0          FEAT_GREAT_SWORD         3
-MARTIAL_HAMMER          0                     0          0                   0          0                      0          0                      0          FEAT_HAMMER              3
-MARTIAL_LARGESWORD      0                     0          0                   0          0                      0          0                      0          FEAT_LARGE_SWORD         3
-MARTIAL_POLEARM         0                     0          0                   0          0                      0          0                      0          FEAT_POLEARM             3
-MAXIMIZED_ATTACKS       CONCENTRATION         4          0                   0          0                      0          0                      0          0                        1
-MERCANTILE_BACKGROUND   RACE                  1          0                   0          0                      0          0                      0          0                        1
-POWER_ATTACK            STR                   13         0                   0          0                      0          0                      0          0                        1
-PRECISE_SHOT            0                     0          0                   0          0                      0          0                      0          0                        1
-RAPID_SHOT              DEX                   13         0                   0          0                      0          0                      0          0                        1
-RESIST_POISON           CLASSLEVELSUM         1          0                   0          RACE                   0x40002    RACE                   7          0                        1
-SCION_OF_STORMS         SPELLCRAFT            10         0                   0          CLASSLEVELMAGE         7          CLASSLEVELSORCEROR     7          0                        1
-SHIELD_PROF             0                     0          0                   0          0                      0          0                      0          0                        1
-SIMPLE_CROSSBOW         0                     0          0                   0          0                      0          0                      0          FEAT_CROSSBOW            3
-SIMPLE_MACE             0                     0          0                   0          0                      0          0                      0          FEAT_MACE                3
-SIMPLE_MISSILE          0                     0          0                   0          0                      0          0                      0          FEAT_SLING               3
-SIMPLE_QUARTERSTAFF     0                     0          0                   0          0                      0          0                      0          FEAT_STAFF               3
-SIMPLE_SMALLBLADE       0                     0          0                   0          0                      0          0                      0          FEAT_SMALL_SWORD         3
-SLIPPERY_MIND           CLASSLEVELTHIEF       10         0                   0          0                      0          0                      0          0                        1
-SNAKE_BLOOD             RACE                  1          0                   0          CLASSLEVELSUM          1          0                      0          0                        1
-SPELL_FOCUS_ENCHANTMENT 0                     0          0                   0          0                      0          0                      0          FEAT_ENCHANTMENT         2
-SPELL_FOCUS_EVOCATION   0                     0          0                   0          0                      0          0                      0          FEAT_EVOCATION           2
-SPELL_FOCUS_NECROMANCY  0                     0          0                   0          0                      0          0                      0          FEAT_NECROMANCY          2
-SPELL_FOCUS_TRANSMUTE   0                     0          0                   0          0                      0          0                      0          FEAT_TRANSMUTE           2
-SPELL_PENETRATION       0                     0          0                   0          0                      0          0                      0          FEAT_SPELL_PENETRATION   2
-SPIRIT_OF_FLAME         SPELLCRAFT            10         0                   0          CLASSLEVELMAGE         7          CLASSLEVELSORCEROR     7          0                        1
-STRONG_BACK             0                     0          0                   0          0                      0          0                      0          0                        1
-STUNNING_FIST           DEX                   13         0                   0          WIS                    13         0                      0          0                        1
-SUBVOCAL_CASTING        0                     0          0                   0          0                      0          0                      0          0                        1
-TOUGHNESS               0                     0          0                   0          0                      0          0                      0          FEAT_TOUGHNESS           5
-TWO_WEAPON_FIGHTING     0                     0          0                   0          0                      0          0                      0          0                        1
-WEAPON_FINESSE          FEAT_SMALL_SWORD      1          0                   0          THAC0BONUSRIGHT        1          0                      0          0                        1
-WILDSHAPE_BOAR          CLASSLEVELDRUID       5          0                   0          0                      0          0                      0          0                        1
-WILDSHAPE_PANTHER       CLASSLEVELDRUID       5          0                   0          0                      0          0                      0          0                        1
-WILDSHAPE_SHAMBLER      CLASSLEVELDRUID       8          0                   0          0                      0          0                      0          0                        1
+4
+                        MULTIPLE               MAX_LEVEL  A_STAT              A_VALUE    B_STAT              B_VALUE    C_STAT            C_VALUE    D_STAT             D_VALUE    A_OP       B_OP       C_OP       D_OP       
+AEGIS_OF_RIME           0                      1          SPELLCRAFT          10         0                   0          CLASSLEVELMAGE    7          CLASSLEVELSORCEROR 7          *          *          *          *          
+AMBIDEXTERITY           0                      1          DEX                 15         0                   0          0                 0          0                  0          *          *          *          *          
+AQUA_MORTIS             0                      1          SPELLCRAFT          10         0                   0          CLASSLEVELMAGE    7          CLASSLEVELSORCEROR 7          *          *          *          *          
+ARMOR_PROF              FEAT_ARMOUR            3          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
+ARMORED_ARCANA          FEAT_ARMORED_ARCANA    3          CLASSLEVELMAGE      1          CLASSLEVELSORCEROR  1          0                 0          0                  0          *          *          *          *          
+ARTERIAL_STRIKE         0                      1          CLASSLEVELTHIEF     1          0                   0          THAC0BONUSRIGHT   4          0                  0          *          *          *          *          
+BLIND_FIGHT             0                      1          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
+BULLHEADED              0                      1          RACE                1          RACE                4          0                 0          0                  0          *          *          *          *          
+CLEAVE                  FEAT_CLEAVE            2          HITBONUS            4          FEAT_CLEAVE         1          0                 0          0                  0          *          0          *          *          
+COMBAT_CASTING          0                      1          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
+COURTEOUS_MAGOCRACY     0                      1          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
+CRIPPLING_STRIKE        0                      1          CLASSLEVELTHIEF     10         0                   0          0                 0          0                  0          *          *          *          *          
+DASH                    0                      1          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
+DEFLECT_ARROWS          0                      1          DEX                 13         0                   0          0                 0          0                  0          *          *          *          *          
+DIRTY_FIGHTING          0                      1          DEX                 13         0                   0          THAC0BONUSRIGHT   2          0                  0          *          *          *          *          
+DISCIPLINE              0                      1          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
+DODGE                   0                      1          DEX                 13         0                   0          0                 0          0                  0          *          *          *          *          
+ENVENOM_WEAPON          0                      1          CLASSLEVELTHIEF     1          0                   0          ALCHEMY           8          0                  0          *          *          *          *          
+EXOTIC_BASTARD          FEAT_BASTARDSWORD      3          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
+EXPERTISE               0                      1          INT                 13         0                   0          0                 0          0                  0          *          *          *          *          
+EXTRA_RAGE              FEAT_EXTRA_RAGE        3          CLASSLEVELBARBARIAN 1          0                   0          0                 0          0                  0          *          *          *          *          
+EXTRA_SHAPESHIFTING     FEAT_EXTRA_SHAPE       3          CLASSLEVELDRUID     3          0                   0          0                 0          0                  0          *          *          *          *          
+EXTRA_SMITING           FEAT_EXTRA_SMITING     3          CLASSLEVELPALADIN   2          0                   0          0                 0          0                  0          *          *          *          *          
+EXTRA_TURNING           FEAT_EXTRA_TURNING     3          TURNUNDEADLEVEL     1          0                   0          0                 0          0                  0          *          *          *          *          
+FIENDSLAYER             0                      1          CLASSLEVELPALADIN   8          0                   0          FEAT_LARGE_SWORDS 1          FEAT_GREAT_SWORDS  1          *          *          *          *          
+FORESTER                0                      1          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
+GREAT_FORTITUDE         0                      1          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
+HAMSTRING               0                      1          CLASSLEVELTHIEF     3          0                   0          0                 0          0                  0          *          *          *          *          
+HERETICS_BANE           0                      1          CLASSLEVELCLERIC    1          CLASSLEVELPALADIN   3          THAC0BONUSRIGHT   4          0                  0          *          *          *          *          
+HEROIC_INSPIRATION      0                      1          CLASSLEVELPALADIN   1          CLASSLEVELBARBARIAN 1          0                 0          0                  0          *          *          *          *          
+IMPROVED_CRITICAL       0                      1          THAC0BONUSRIGHT     8          0                   0          0                 0          0                  0          *          *          *          *          
+IMPROVED_EVASION        0                      1          CLASSLEVELTHIEF     10         0                   0          0                 0          0                  0          *          *          *          *          
+IMPROVED_INITIATIVE     0                      1          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
+IMPROVED_TURNING        0                      1          CLASSLEVELCLERIC    1          0                   0          CLASSLEVELPALADIN 3          0                  0          *          *          *          *          
+IRON_WILL               0                      1          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
+LIGHTNING_REFLEXES      0                      1          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
+LINGERING_SONG          0                      1          CLASSLEVELBARD      1          0                   0          0                 0          0                  0          *          *          *          *          
+LUCK_OF_HEROES          0                      1          RACE                1          0                   0          0                 0          0                  0          *          *          *          *          
+MARTIAL_AXE             FEAT_AXE               3          CLASSLEVELFIGHTER   4          FEAT_AXE            2          0                 0          0                  0          *          0          *          *          
+MARTIAL_BOW             FEAT_BOW               3          CLASSLEVELFIGHTER   4          FEAT_BOW            2          0                 0          0                  0          *          0          *          *          
+MARTIAL_FLAIL           FEAT_FLAIL             3          CLASSLEVELFIGHTER   4          FEAT_FLAIL          2          0                 0          0                  0          *          0          *          *          
+MARTIAL_GREATSWORD      FEAT_GREAT_SWORD       3          CLASSLEVELFIGHTER   4          FEAT_GREAT_SWORD    2          0                 0          0                  0          *          0          *          *          
+MARTIAL_HAMMER          FEAT_HAMMER            3          CLASSLEVELFIGHTER   4          FEAT_HAMMER         2          0                 0          0                  0          *          0          *          *          
+MARTIAL_LARGESWORD      FEAT_LARGE_SWORD       3          CLASSLEVELFIGHTER   4          FEAT_LARGE_SWORD    2          0                 0          0                  0          *          0          *          *          
+MARTIAL_POLEARM         FEAT_POLEARM           3          CLASSLEVELFIGHTER   4          FEAT_POLEARM        2          0                 0          0                  0          *          0          *          *          
+MAXIMIZED_ATTACKS       0                      1          CONCENTRATION       4          0                   0          0                 0          0                  0          *          *          *          *          
+MERCANTILE_BACKGROUND   0                      1          RACE                1          0                   0          0                 0          0                  0          *          *          *          *          
+POWER_ATTACK            0                      1          STR                 13         0                   0          0                 0          0                  0          *          *          *          *          
+PRECISE_SHOT            0                      1          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
+RAPID_SHOT              0                      1          DEX                 13         0                   0          0                 0          0                  0          *          *          *          *          
+RESIST_POISON           0                      1          CLASSLEVELSUM       1          0                   0          RACE              0x40002    RACE               7          *          *          *          *          
+SCION_OF_STORMS         0                      1          SPELLCRAFT          10         0                   0          CLASSLEVELMAGE    7          CLASSLEVELSORCEROR 7          *          *          *          *          
+SHIELD_PROF             0                      1          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
+SIMPLE_CROSSBOW         FEAT_CROSSBOW          3          CLASSLEVELFIGHTER   4          FEAT_CROSSBOW       2          0                 0          0                  0          *          0          *          *          
+SIMPLE_MACE             FEAT_MACE              3          CLASSLEVELFIGHTER   4          FEAT_MACE           2          0                 0          0                  0          *          0          *          *          
+SIMPLE_MISSILE          FEAT_SLING             3          CLASSLEVELFIGHTER   4          FEAT_SLING          2          0                 0          0                  0          *          0          *          *          
+SIMPLE_QUARTERSTAFF     FEAT_STAFF             3          CLASSLEVELFIGHTER   4          FEAT_STAFF          2          0                 0          0                  0          *          0          *          *          
+SIMPLE_SMALLBLADE       FEAT_SMALL_SWORD       3          CLASSLEVELFIGHTER   4          FEAT_SMALL_SWORD    2          0                 0          0                  0          *          0          *          *          
+SLIPPERY_MIND           0                      1          CLASSLEVELTHIEF     10         0                   0          0                 0          0                  0          *          *          *          *          
+SNAKE_BLOOD             0                      1          RACE                1          0                   0          CLASSLEVELSUM     1          0                  0          *          *          *          *          
+SPELL_FOCUS_ENCHANTMENT FEAT_ENCHANTMENT       2          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
+SPELL_FOCUS_EVOCATION   FEAT_EVOCATION         2          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
+SPELL_FOCUS_NECROMANCY  FEAT_NECROMANCY        2          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
+SPELL_FOCUS_TRANSMUTE   FEAT_TRANSMUTE         2          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
+SPELL_PENETRATION       FEAT_SPELL_PENETRATION 2          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
+SPIRIT_OF_FLAME         0                      1          SPELLCRAFT          10         0                   0          CLASSLEVELMAGE    7          CLASSLEVELSORCEROR 7          *          *          *          *          
+STRONG_BACK             0                      1          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
+STUNNING_FIST           0                      1          DEX                 13         0                   0          WIS               13         0                  0          *          *          *          *          
+SUBVOCAL_CASTING        0                      1          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
+TOUGHNESS               FEAT_TOUGHNESS         5          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
+TWO_WEAPON_FIGHTING     0                      1          0                   0          0                   0          0                 0          0                  0          *          *          *          *          
+WEAPON_FINESSE          0                      1          FEAT_SMALL_SWORD    1          0                   0          THAC0BONUSRIGHT   1          0                  0          *          *          *          *          
+WILDSHAPE_BOAR          0                      1          CLASSLEVELDRUID     5          0                   0          0                 0          0                  0          *          *          *          *          
+WILDSHAPE_PANTHER       0                      1          CLASSLEVELDRUID     5          0                   0          0                 0          0                  0          *          *          *          *          
+WILDSHAPE_SHAMBLER      0                      1          CLASSLEVELDRUID     8          0                   0          0                 0          0                  0          *          *          *          *          
+
