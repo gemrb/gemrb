@@ -48,7 +48,7 @@ def IsFeatUsable(feat):
 	d_op = GemRB.GetTableValue(FeatReqTable, feat, "D_OP")
 	slot = GemRB.GetVar("Slot")
 
-	return GemRB.CheckFeatCondition(slot, a_stat, a_value, b_stat, b_value, c_stat, c_value, d_stat, d_value)
+	return GemRB.CheckFeatCondition(slot, a_stat, a_value, b_stat, b_value, c_stat, c_value, d_stat, d_value, a_op, b_op, c_op, d_op)
 
 # checks if a feat was granted due to class/kit/race and returns the number
 # of granted levels. The bonuses aren't cumulative.
