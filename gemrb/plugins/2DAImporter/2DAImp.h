@@ -70,6 +70,9 @@ public:
 		if (rows[row].size() <= column) {
 			return ( char * ) defVal;
 		}
+		if (rows[row][column][0]=='*' && !rows[row][column][1]) {
+			return defVal;
+		}
 		return rows[row][column];
 	};
 	/** Returns a pointer to a zero terminated 2da element,
