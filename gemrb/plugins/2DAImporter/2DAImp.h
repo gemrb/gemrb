@@ -71,7 +71,7 @@ public:
 			return ( char * ) defVal;
 		}
 		if (rows[row][column][0]=='*' && !rows[row][column][1]) {
-			return defVal;
+			return ( char * ) defVal;
 		}
 		return rows[row][column];
 	};
@@ -102,6 +102,9 @@ public:
 		}
 		if (rows[rowi].size() <= ( unsigned int ) coli) {
 			return ( char * ) defVal;
+		}
+		if (rows[rowi][coli][0]=='*' && !rows[rowi][coli][1]) {
+			return ( char *) defVal;
 		}
 		return rows[rowi][coli];
 	};
