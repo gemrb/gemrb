@@ -265,11 +265,12 @@ static int GetCreatureStrRef(unsigned int Slot, unsigned int Str)
 	return actor->StrRefs[Str];
 }
 
-static inline bool CheckStat(Actor * actor, const char *stat_name, ieDword value)
+static inline bool CheckStat(Actor * actor, const char *stat_name, ieDword value, int op)
 {
 	ieDword stat = core->TranslateStat(stat_name);
 	//some stats should check for exact value
-	return actor->GetBase(stat)>=value;
+	//return actor->GetBase(stat)>=value;
+	return DiffCore(actor->GetBase(stat), value, op);
 }
 
 static int GetCreatureStat(unsigned int Slot, unsigned int StatID, int Mod)
@@ -7051,8 +7052,12 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 	int b_v;
 	int c_v;
 	int d_v;
+	int a_op = GREATER_OR_EQUALS;
+	int b_op = GREATER_OR_EQUALS;
+	int c_op = GREATER_OR_EQUALS;
+	int d_op = GREATER_OR_EQUALS;
 
-	if (!PyArg_ParseTuple( args, "isisisisi", &slot, &a_s, &a_v, &b_s, &b_v, &c_s, &c_v, &d_s, &d_v)) {
+	if (!PyArg_ParseTuple( args, "isisisisi|iiii", &slot, &a_s, &a_v, &b_s, &b_v, &c_s, &c_v, &d_s, &d_v, &a_op, &b_op, &c_op, &d_op)) {
 		return AttributeError( GemRB_CheckFeatCondition__doc );
 	}
 
@@ -7069,20 +7074,20 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 	bool ret = true;
 
 	if (*a_s!='0' && a_v!=0)
-		ret = CheckStat(actor, a_s, a_v);
+		ret = CheckStat(actor, a_s, a_v, a_op);
 
 	if (*b_s!='0' && b_v!=0)
-		ret |= CheckStat(actor, b_s, b_v);
+		ret |= CheckStat(actor, b_s, b_v, b_op);
 
 	if (!ret)
 		goto endofquest;
 
 	if (*c_s!='0' && c_v!=0)
 		// no | because the formula is (a|b) & (c|d)
-		ret = CheckStat(actor, c_s, c_v);
+		ret = CheckStat(actor, c_s, c_v, c_op);
 
 	if (*d_s!='0' && d_v!=0)
-		ret |= CheckStat(actor, d_s, d_v);
+		ret |= CheckStat(actor, d_s, d_v, d_op);
 
 endofquest:
 	if (ret) {
