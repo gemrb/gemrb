@@ -34,11 +34,16 @@ def MultiLevelFeat(feat):
 def IsFeatUsable(feat):
 	global FeatReqTable
 
-	a_stat = GemRB.GetTableValue(FeatReqTable, feat, "A_STAT", 0)
-	b_stat = GemRB.GetTableValue(FeatReqTable, feat, "B_STAT", 0)
-	c_stat = GemRB.GetTableValue(FeatReqTable, feat, "C_STAT", 0)
-	d_stat = GemRB.GetTableValue(FeatReqTable, feat, "D_STAT", 0)
 	a_value = GemRB.GetTableValue(FeatReqTable, feat, "A_VALUE")
+	if a_value<0:
+		#string
+		a_stat = GemRB.GetTableValue(FeatReqTable, feat, "A_STAT", 0)
+	else:
+		#stat
+		a_stat = GemRB.GetTableValue(FeatReqTable, feat, "A_STAT",2)
+	b_stat = GemRB.GetTableValue(FeatReqTable, feat, "B_STAT",2)
+	c_stat = GemRB.GetTableValue(FeatReqTable, feat, "C_STAT",2)
+	d_stat = GemRB.GetTableValue(FeatReqTable, feat, "D_STAT",2)
 	b_value = GemRB.GetTableValue(FeatReqTable, feat, "B_VALUE")
 	c_value = GemRB.GetTableValue(FeatReqTable, feat, "C_VALUE")
 	d_value = GemRB.GetTableValue(FeatReqTable, feat, "D_VALUE")
@@ -47,7 +52,6 @@ def IsFeatUsable(feat):
 	c_op = GemRB.GetTableValue(FeatReqTable, feat, "C_OP")
 	d_op = GemRB.GetTableValue(FeatReqTable, feat, "D_OP")
 	slot = GemRB.GetVar("Slot")
-	print "AAAAAAAA", a_stat, a_value, b_stat, b_value, c_stat, c_value, d_stat, d_value, a_op, b_op, c_op, d_op
 	return GemRB.CheckFeatCondition(slot, a_stat, a_value, b_stat, b_value, c_stat, c_value, d_stat, d_value, a_op, b_op, c_op, d_op)
 
 # checks if a feat was granted due to class/kit/race and returns the number
@@ -71,7 +75,6 @@ def GetBaseValue(feat):
 		if Val3 > Val:
 			Val = Val3
 
-	#print "AAAA", Val, Val1, Val2, Val3
 	return Val
 
 def RedrawFeats():
@@ -219,7 +222,7 @@ def OnLoad():
 
 	GemRB.LoadWindowPack("GUICG", 800, 600)
 	FeatWindow = GemRB.LoadWindow(55)
-	for i in range(0,10):
+	for i in range(10):
 		Button = GemRB.GetControl(FeatWindow, i+93)
 		GemRB.SetVarAssoc(FeatWindow, Button, "Feat",i)
 		GemRB.SetEvent(FeatWindow, Button, IE_GUI_BUTTON_ON_PRESS, "JustPress")
@@ -231,7 +234,7 @@ def OnLoad():
 		Button = GemRB.GetControl(FeatWindow, i*2+15)
 		GemRB.SetVarAssoc(FeatWindow, Button, "Feat",i)
 		GemRB.SetEvent(FeatWindow, Button, IE_GUI_BUTTON_ON_PRESS, "RightPress")
-		for j in range(0,5):
+		for j in range(5):
 			Star=GemRB.GetControl(FeatWindow, i*5+j+36)
 			GemRB.SetButtonState(FeatWindow, Star, IE_GUI_BUTTON_DISABLED)
 			GemRB.SetButtonFlags(FeatWindow, Star, IE_GUI_BUTTON_NO_IMAGE,OP_OR)
@@ -306,3 +309,10 @@ def NextPress():
 	GemRB.UnloadWindow(FeatWindow)
 	GemRB.SetNextScript("CharGen7")
 	return
+
+#Custom feat check functions
+def Check_AnyOfThree(pl, a, as, b, bs, c, cs, *garbage):
+	if GemRB.GetPlayerStat(pl, as)==a: return True
+	if GemRB.GetPlayerStat(pl, bs)==b: return True
+	if GemRB.GetPlayerStat(pl, cs)==c: return True
+	return False

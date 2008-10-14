@@ -265,9 +265,9 @@ static int GetCreatureStrRef(unsigned int Slot, unsigned int Str)
 	return actor->StrRefs[Str];
 }
 
-static inline bool CheckStat(Actor * actor, const char *stat_name, ieDword value, int op)
+static inline bool CheckStat(Actor * actor, ieDword stat, ieDword value, int op)
 {
-	ieDword stat = core->TranslateStat(stat_name);
+	//ieDword stat = core->TranslateStat(stat_name);
 	//some stats should check for exact value
 	//return actor->GetBase(stat)>=value;
 	return DiffCore(actor->GetBase(stat), value, op);
@@ -888,75 +888,74 @@ static PyObject* GemRB_GetTableValue(PyObject * /*self*/, PyObject* args)
 	PyObject* type = NULL;
 	int which = -1;
 
-	if (PyArg_UnpackTuple( args, "ref", 3, 4, &ti, &row, &col, &type )) {
-		if (type!=NULL) {
-			if (!PyObject_TypeCheck( type, &PyInt_Type )) {
-				return AttributeError( GemRB_GetTableValue__doc );
-			}
-			which = PyInt_AsLong( type );
-		}
-
-		if (!PyObject_TypeCheck( ti, &PyInt_Type )) {
+	if (!PyArg_UnpackTuple( args, "ref", 3, 4, &ti, &row, &col, &type )) {
+		return AttributeError( GemRB_GetTableValue__doc );
+	}
+	if (type!=NULL) {
+		if (!PyObject_TypeCheck( type, &PyInt_Type )) {
 			return AttributeError( GemRB_GetTableValue__doc );
 		}
-		long TableIndex = PyInt_AsLong( ti );
-		if (( !PyObject_TypeCheck( row, &PyInt_Type ) ) &&
-			( !PyObject_TypeCheck( row, &PyString_Type ) )) {
-			return AttributeError( GemRB_GetTableValue__doc );
-		}
-		if (( !PyObject_TypeCheck( col, &PyInt_Type ) ) &&
-			( !PyObject_TypeCheck( col, &PyString_Type ) )) {
-			return AttributeError( GemRB_GetTableValue__doc );
-		}
-		if (PyObject_TypeCheck( row, &PyInt_Type ) &&
-			( !PyObject_TypeCheck( col, &PyInt_Type ) )) {
-			printMessage( "GUIScript",
-				"Type Error: RowIndex/RowString and ColIndex/ColString must be the same type\n",
-				LIGHT_RED );
-			return NULL;
-		}
-		if (PyObject_TypeCheck( row, &PyString_Type ) &&
-			( !PyObject_TypeCheck( col, &PyString_Type ) )) {
-			printMessage( "GUIScript",
-				"Type Error: RowIndex/RowString and ColIndex/ColString must be the same type\n",
-				LIGHT_RED );
-			return NULL;
-		}
-		TableMgr* tm = core->GetTable( TableIndex );
-		if (!tm) {
-			return RuntimeError("Can't find resource");
-		}
-		const char* ret;
-		if (PyObject_TypeCheck( row, &PyString_Type )) {
-			char* rows = PyString_AsString( row );
-			char* cols = PyString_AsString( col );
-			ret = tm->QueryField( rows, cols );
-		} else {
-			long rowi = PyInt_AsLong( row );
-			long coli = PyInt_AsLong( col );
-			ret = tm->QueryField( rowi, coli );
-		}
-		if (ret == NULL)
-			return NULL;
-
-		long val;
-		//if which = 0, then return string
-		if (!which) {
-			return PyString_FromString( ret );
-		}
-		//if which = 1 then return number
-		//if which = -1 (omitted) then return the best format
-		if (valid_number( ret, val ) || (which==1) ) {
-			return PyInt_FromLong( val );
-		}
-		if (which==2) {
-			val = core->TranslateStat(ret);
-			return PyInt_FromLong( val );
-		}
-		return PyString_FromString( ret );
+		which = PyInt_AsLong( type );
 	}
 
-	return NULL;
+	if (!PyObject_TypeCheck( ti, &PyInt_Type )) {
+		return AttributeError( GemRB_GetTableValue__doc );
+	}
+	long TableIndex = PyInt_AsLong( ti );
+	if (( !PyObject_TypeCheck( row, &PyInt_Type ) ) &&
+		( !PyObject_TypeCheck( row, &PyString_Type ) )) {
+		return AttributeError( GemRB_GetTableValue__doc );
+	}
+	if (( !PyObject_TypeCheck( col, &PyInt_Type ) ) &&
+		( !PyObject_TypeCheck( col, &PyString_Type ) )) {
+		return AttributeError( GemRB_GetTableValue__doc );
+	}
+	if (PyObject_TypeCheck( row, &PyInt_Type ) &&
+		( !PyObject_TypeCheck( col, &PyInt_Type ) )) {
+		printMessage( "GUIScript",
+			"Type Error: RowIndex/RowString and ColIndex/ColString must be the same type\n",
+			LIGHT_RED );
+		return NULL;
+	}
+	if (PyObject_TypeCheck( row, &PyString_Type ) &&
+		( !PyObject_TypeCheck( col, &PyString_Type ) )) {
+		printMessage( "GUIScript",
+			"Type Error: RowIndex/RowString and ColIndex/ColString must be the same type\n",
+			LIGHT_RED );
+		return NULL;
+	}
+	TableMgr* tm = core->GetTable( TableIndex );
+	if (!tm) {
+		return RuntimeError("Can't find resource");
+	}
+	const char* ret;
+	if (PyObject_TypeCheck( row, &PyString_Type )) {
+		char* rows = PyString_AsString( row );
+		char* cols = PyString_AsString( col );
+		ret = tm->QueryField( rows, cols );
+	} else {
+		long rowi = PyInt_AsLong( row );
+		long coli = PyInt_AsLong( col );
+		ret = tm->QueryField( rowi, coli );
+	}
+	if (ret == NULL)
+		return NULL;
+
+	long val;
+	//if which = 0, then return string
+	if (!which) {
+		return PyString_FromString( ret );
+	}
+	//if which = 1 then return number
+	//if which = -1 (omitted) then return the best format
+	if (valid_number( ret, val ) || (which==1) ) {
+		return PyInt_FromLong( val );
+	}
+	if (which==2) {
+		val = core->TranslateStat(ret);
+		return PyInt_FromLong( val );
+	}
+	return PyString_FromString( ret );
 }
 
 PyDoc_STRVAR( GemRB_FindTableValue__doc,
@@ -1353,54 +1352,53 @@ static PyObject* GemRB_TextAreaAppend(PyObject * /*self*/, PyObject* args)
 	char* string;
 	int ret;
 
-	if (PyArg_UnpackTuple( args, "ref", 3, 5, &wi, &ci, &str, &row, &flag )) {
-		if (!PyObject_TypeCheck( wi, &PyInt_Type ) ||
-			!PyObject_TypeCheck( ci, &PyInt_Type ) ||
-			( !PyObject_TypeCheck( str, &PyString_Type ) &&
-			!PyObject_TypeCheck( str, &PyInt_Type ) )) {
-			return AttributeError( GemRB_TextAreaAppend__doc );
-		}
-		WindowIndex = PyInt_AsLong( wi );
-		ControlIndex = PyInt_AsLong( ci );
+	if (!PyArg_UnpackTuple( args, "ref", 3, 5, &wi, &ci, &str, &row, &flag )) {
+		return AttributeError( GemRB_TextAreaAppend__doc );
+	}
+	if (!PyObject_TypeCheck( wi, &PyInt_Type ) ||
+		!PyObject_TypeCheck( ci, &PyInt_Type ) ||
+		( !PyObject_TypeCheck( str, &PyString_Type ) &&
+		!PyObject_TypeCheck( str, &PyInt_Type ) )) {
+		return AttributeError( GemRB_TextAreaAppend__doc );
+	}
+	WindowIndex = PyInt_AsLong( wi );
+	ControlIndex = PyInt_AsLong( ci );
 
-		TextArea* ta = ( TextArea* ) GetControl( WindowIndex, ControlIndex, IE_GUI_TEXTAREA);
-		if (!ta) {
+	TextArea* ta = ( TextArea* ) GetControl( WindowIndex, ControlIndex, IE_GUI_TEXTAREA);
+	if (!ta) {
+		return NULL;
+	}
+	if (row) {
+		if (!PyObject_TypeCheck( row, &PyInt_Type )) {
+			printMessage( "GUIScript",
+				"Syntax Error: AppendText row must be integer\n", LIGHT_RED );
 			return NULL;
 		}
-		if (row) {
-			if (!PyObject_TypeCheck( row, &PyInt_Type )) {
-				printMessage( "GUIScript",
-					"Syntax Error: AppendText row must be integer\n", LIGHT_RED );
-				return NULL;
-			}
-			Row = PyInt_AsLong( row );
-			if (Row > ta->GetRowCount() - 1)
-				Row = -1;
-		} else
-			Row = ta->GetRowCount() - 1;
+		Row = PyInt_AsLong( row );
+		if (Row > ta->GetRowCount() - 1)
+			Row = -1;
+	} else
+		Row = ta->GetRowCount() - 1;
 
-		if (flag) {
-			if (!PyObject_TypeCheck( flag, &PyInt_Type )) {
-				printMessage( "GUIScript",
-					"Syntax Error: GetString flag must be integer\n", LIGHT_RED );
-				return NULL;
-			}
-			Flag = PyInt_AsLong( flag );
+	if (flag) {
+		if (!PyObject_TypeCheck( flag, &PyInt_Type )) {
+			printMessage( "GUIScript",
+				"Syntax Error: GetString flag must be integer\n", LIGHT_RED );
+			return NULL;
 		}
+		Flag = PyInt_AsLong( flag );
+	}
 
-		if (PyObject_TypeCheck( str, &PyString_Type )) {
-			string = PyString_AsString( str );
-			if (string == NULL)
-				return NULL;
-			ret = ta->AppendText( string, Row );
-		} else {
-			StrRef = PyInt_AsLong( str );
-			char* str = core->GetString( StrRef, Flag );
-			ret = ta->AppendText( str, Row );
-			core->FreeString( str );
-		}
+	if (PyObject_TypeCheck( str, &PyString_Type )) {
+		string = PyString_AsString( str );
+		if (string == NULL)
+			return RuntimeError("Null string received");
+		ret = ta->AppendText( string, Row );
 	} else {
-		return NULL;
+		StrRef = PyInt_AsLong( str );
+		char* str = core->GetString( StrRef, Flag );
+		ret = ta->AppendText( str, Row );
+		core->FreeString( str );
 	}
 
 	return PyInt_FromLong( ret );
@@ -1415,21 +1413,20 @@ static PyObject* GemRB_TextAreaClear(PyObject * /*self*/, PyObject* args)
 	PyObject* wi, * ci;
 	long WindowIndex, ControlIndex;
 
-	if (PyArg_UnpackTuple( args, "ref", 2, 2, &wi, &ci )) {
-		if (!PyObject_TypeCheck( wi, &PyInt_Type ) ||
-			!PyObject_TypeCheck( ci, &PyInt_Type )) {
-			return AttributeError( GemRB_TextAreaClear__doc );
-		}
-		WindowIndex = PyInt_AsLong( wi );
-		ControlIndex = PyInt_AsLong( ci );
-		TextArea* ta = ( TextArea* ) GetControl( WindowIndex, ControlIndex, IE_GUI_TEXTAREA);
-		if (!ta) {
-			return NULL;
-		}
-		ta->Clear();
-	} else {
+	if (!PyArg_UnpackTuple( args, "ref", 2, 2, &wi, &ci )) {
+		return AttributeError( GemRB_TextAreaClear__doc );
+	}
+	if (!PyObject_TypeCheck( wi, &PyInt_Type ) ||
+		!PyObject_TypeCheck( ci, &PyInt_Type )) {
+		return AttributeError( GemRB_TextAreaClear__doc );
+	}
+	WindowIndex = PyInt_AsLong( wi );
+	ControlIndex = PyInt_AsLong( ci );
+	TextArea* ta = ( TextArea* ) GetControl( WindowIndex, ControlIndex, IE_GUI_TEXTAREA);
+	if (!ta) {
 		return NULL;
 	}
+	ta->Clear();
 
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -1471,42 +1468,39 @@ static PyObject* GemRB_SetTooltip(PyObject * /*self*/, PyObject* args)
 	char* string;
 	int ret;
 
-	if (PyArg_UnpackTuple( args, "ref", 3, 3, &wi, &ci, &str )) {
-		if (!PyObject_TypeCheck( wi, &PyInt_Type ) ||
-			!PyObject_TypeCheck( ci,
-														&PyInt_Type ) ||
-			( !PyObject_TypeCheck( str, &PyString_Type ) &&
-			!PyObject_TypeCheck( str,
-																&PyInt_Type ) )) {
-			return AttributeError( GemRB_SetTooltip__doc );
-		}
+	if (!PyArg_UnpackTuple( args, "ref", 3, 3, &wi, &ci, &str )) {
+		return AttributeError( GemRB_SetTooltip__doc );
+	}
+	if (!PyObject_TypeCheck( wi, &PyInt_Type ) ||
+		!PyObject_TypeCheck( ci, &PyInt_Type ) ||
+		( !PyObject_TypeCheck( str, &PyString_Type ) &&
+		!PyObject_TypeCheck( str, &PyInt_Type ) )) {
+		return AttributeError( GemRB_SetTooltip__doc );
+	}
 
-		WindowIndex = PyInt_AsLong( wi );
-		ControlIndex = PyInt_AsLong( ci );
-		if (PyObject_TypeCheck( str, &PyString_Type )) {
-			string = PyString_AsString( str );
-			if (string == NULL) {
-				return NULL;
-			}
-			ret = core->SetTooltip( (ieWord) WindowIndex, (ieWord) ControlIndex, string );
-			if (ret == -1) {
-				return NULL;
-			}
-		} else {
-			StrRef = PyInt_AsLong( str );
-			if (StrRef == -1) {
-				ret = core->SetTooltip( (ieWord) WindowIndex, (ieWord) ControlIndex, GEMRB_STRING );
-			} else {
-				char* str = core->GetString( StrRef );
-				ret = core->SetTooltip( (ieWord) WindowIndex, (ieWord) ControlIndex, str );
-				core->FreeString( str );
-			}
-			if (ret == -1) {
-				return NULL;
-			}
+	WindowIndex = PyInt_AsLong( wi );
+	ControlIndex = PyInt_AsLong( ci );
+	if (PyObject_TypeCheck( str, &PyString_Type )) {
+		string = PyString_AsString( str );
+		if (string == NULL) {
+			return RuntimeError("Null string received");
+		}
+		ret = core->SetTooltip( (ieWord) WindowIndex, (ieWord) ControlIndex, string );
+		if (ret == -1) {
+			return RuntimeError("Cannot set tooltip");
 		}
 	} else {
-		return NULL;
+		StrRef = PyInt_AsLong( str );
+		if (StrRef == -1) {
+			ret = core->SetTooltip( (ieWord) WindowIndex, (ieWord) ControlIndex, GEMRB_STRING );
+		} else {
+			char* str = core->GetString( StrRef );
+			ret = core->SetTooltip( (ieWord) WindowIndex, (ieWord) ControlIndex, str );
+			core->FreeString( str );
+		}
+		if (ret == -1) {
+			return RuntimeError("Cannot set tooltip");
+		}
 	}
 
 	return PyInt_FromLong( ret );
@@ -6723,7 +6717,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	// can't equip item because of similar already equipped
 	if (Effect && item->ItemExcl & actor->inventory.GetEquipExclusion()) {
 		core->DisplayConstantString(STR_ITEMEXCL, 0xf0f0f0);
-		//freeing the item before returning 
+		//freeing the item before returning
 		core->FreeItem( item, slotitem->ItemResRef, false );
 		return PyInt_FromLong( 0 );
 	}
@@ -6736,7 +6730,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	} else {
 		GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 	}
-	//freeing the item before returning 
+	//freeing the item before returning
 	core->FreeItem( item, slotitem->ItemResRef, false );
 	if ( !Slottype) {
 		return PyInt_FromLong( 0 );
@@ -7038,27 +7032,47 @@ static PyObject* GemRB_GamePause(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_CheckFeatCondition__doc,
-"CheckFeatCondition(partyslot, a_stat, a_value, b_stat, b_value, c_stat, c_value, d_stat, d_value)==> bool\n\n"
-"Checks if actor in partyslot is eligible for a feat, the formula is: (stat[a]>=a or stat[b]>=b) and (stat[c]>=c or stat[d]>=d).");
+"CheckFeatCondition(partyslot, a_stat, a_value, b_stat, b_value, c_stat, c_value, d_stat, d_value[,a_op, b_op, c_op, d_op])==> bool\n\n"
+"Checks if actor in partyslot is eligible for a feat, the formula is: (stat[a]~a or stat[b]~b) and (stat[c]~c or stat[d]~d). Where ~ is a relational operator. If the operators are omitted, the default operator is <=.");
 
 static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 {
-	int slot;
-	const char *a_s;
-	const char *b_s;
-	const char *c_s;
-	const char *d_s;
-	int a_v;
-	int b_v;
-	int c_v;
-	int d_v;
-	int a_op = GREATER_OR_EQUALS;
-	int b_op = GREATER_OR_EQUALS;
-	int c_op = GREATER_OR_EQUALS;
-	int d_op = GREATER_OR_EQUALS;
+	int i;
+	const char *callback = NULL;
+	PyObject* p[13];
+	int v[13];
+	for(i=10;i<13;i++) {
+		p[i]=NULL;
+		v[i]=GREATER_OR_EQUALS;
+	}
 
-	if (!PyArg_ParseTuple( args, "isisisisi|iiii", &slot, &a_s, &a_v, &b_s, &b_v, &c_s, &c_v, &d_s, &d_v, &a_op, &b_op, &c_op, &d_op)) {
+	if (!PyArg_UnpackTuple( args, "ref", 9, 13, &p[0], &p[1], &p[2], &p[3], &p[4], &p[5], &p[6], &p[7], &p[8], &p[9], &p[10], &p[11], &p[12] )) {
 		return AttributeError( GemRB_CheckFeatCondition__doc );
+	}
+
+	if (!PyObject_TypeCheck( p[0], &PyInt_Type )) {
+		return AttributeError( GemRB_CheckFeatCondition__doc );
+	}
+	v[0]=PyInt_AsLong( p[0] ); //slot
+
+	if (PyObject_TypeCheck( p[1], &PyInt_Type )) {
+		v[1]=PyInt_AsLong( p[1] ); //a_stat
+	} else {
+		if (!PyObject_TypeCheck( p[1], &PyString_Type )) {
+			return AttributeError( GemRB_CheckFeatCondition__doc );
+		}
+		callback = PyString_AsString( p[1] ); // callback
+		if (callback == NULL) {
+			return RuntimeError("Null string received");
+		}
+	}
+	v[0]=PyInt_AsLong( p[0] );
+
+	for(i=2;i<10;i++) {
+		if (!PyObject_TypeCheck( p[i], &PyInt_Type )) {
+			return AttributeError( GemRB_CheckFeatCondition__doc );
+		}
+		v[i]=PyInt_AsLong( p[i] );
 	}
 
 	Game *game = core->GetGame();
@@ -7066,28 +7080,53 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 		return RuntimeError( "No game loaded!" );
 	}
 
-	Actor *actor = core->GetGame()->FindPC(slot);
+	Actor *actor = core->GetGame()->FindPC(v[0]);
 	if (!actor) {
 		return RuntimeError( "Actor not found" );
 	}
 
+	/* see if the special function exists */
+	if (callback) {
+		char fname[32];
+
+		snprintf(fname, 32, "Check_%s", callback);
+		PyObject* param = PyTuple_New( 11 );
+		PyTuple_SetItem( param, 0, PyInt_FromLong(v[0]) );
+		for (i = 3;i<13;i++) {
+			PyTuple_SetItem( param, i-2, PyInt_FromLong( v[i] ) );
+		}
+
+		//conversion is needed, because the interface is more generic
+		GUIScript *gs = (GUIScript *) core->GetGUIScriptEngine();
+
+		PyObject *pValue = gs->CallbackFunction(fname, param);
+
+		/* we created this parameter, now we don't need it*/
+		Py_DECREF( param );
+		if (pValue) {
+			/* don't think we need any incref */
+			return pValue;
+		}
+		return RuntimeError( "Callback failed" );
+	}
+
 	bool ret = true;
 
-	if (*a_s!='0' && a_v!=0)
-		ret = CheckStat(actor, a_s, a_v, a_op);
+	if (v[1] || v[2])
+		ret = CheckStat(actor, v[1], v[2], v[9]);
 
-	if (*b_s!='0' && b_v!=0)
-		ret |= CheckStat(actor, b_s, b_v, b_op);
+	if (v[3] || v[4])
+		ret |= CheckStat(actor, v[3], v[4], v[10]);
 
 	if (!ret)
 		goto endofquest;
 
-	if (*c_s!='0' && c_v!=0)
+	if (v[5] || v[6])
 		// no | because the formula is (a|b) & (c|d)
-		ret = CheckStat(actor, c_s, c_v, c_op);
+		ret = CheckStat(actor, v[5], v[6], v[11]);
 
-	if (*d_s!='0' && d_v!=0)
-		ret |= CheckStat(actor, d_s, d_v, d_op);
+	if (v[7] || v[8])
+		ret |= CheckStat(actor, v[7], v[8], v[12]);
 
 endofquest:
 	if (ret) {
@@ -8857,6 +8896,31 @@ bool GUIScript::LoadScript(const char* filename)
 	}
 	printStatus( "OK", LIGHT_GREEN );
 	return true;
+}
+
+/* Similar to RunFunction, but with parameters, and doesn't necessarily fails */
+PyObject *GUIScript::CallbackFunction(const char* fname, PyObject* pArgs)
+{
+	if (!Py_IsInitialized()) {
+		return NULL;
+	}
+	if (pDict == NULL) {
+		return NULL;
+	}
+	PyObject *pFunc = PyDict_GetItemString( pDict, (char *) fname );
+	/* pFunc: Borrowed reference */
+	if (( !pFunc ) || ( !PyCallable_Check( pFunc ) )) {
+		printMessage("GUIScript", " ", LIGHT_RED);
+		printf("%s is not callable!\n", fname);
+		return NULL;
+	}
+	PyObject *pValue = PyObject_CallObject( pFunc, pArgs );
+	if (pValue == NULL) {
+		if (PyErr_Occurred()) {
+			PyErr_Print();
+		}
+	}
+	return pValue;
 }
 
 bool GUIScript::RunFunction(const char* fname, bool error)

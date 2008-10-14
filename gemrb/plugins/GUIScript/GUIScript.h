@@ -54,6 +54,8 @@ public:
 	bool RunFunction(const char* fname, bool error=true);
 	/** Exec a single String */
 	void ExecString(const char* string);
+	/** lets hope this one can be here without screwing up the general interface */
+	PyObject *CallbackFunction(const char* fname, PyObject* pArgs);
 public:
 	void release(void)
 	{
