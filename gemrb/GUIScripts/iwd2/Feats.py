@@ -47,7 +47,7 @@ def IsFeatUsable(feat):
 	c_op = GemRB.GetTableValue(FeatReqTable, feat, "C_OP")
 	d_op = GemRB.GetTableValue(FeatReqTable, feat, "D_OP")
 	slot = GemRB.GetVar("Slot")
-
+	print "AAAAAAAA", a_stat, a_value, b_stat, b_value, c_stat, c_value, d_stat, d_value, a_op, b_op, c_op, d_op
 	return GemRB.CheckFeatCondition(slot, a_stat, a_value, b_stat, b_value, c_stat, c_value, d_stat, d_value, a_op, b_op, c_op, d_op)
 
 # checks if a feat was granted due to class/kit/race and returns the number
@@ -88,7 +88,7 @@ def RedrawFeats():
 	GemRB.SetText(FeatWindow, SumLabel, str(PointsLeft) )
 
 	for i in range(0,10):
-		Pos=TopIndex+i+1
+		Pos=TopIndex+i
 		FeatName = GemRB.GetTableValue(FeatTable, Pos, 1)
 		Label = GemRB.GetControl(FeatWindow, 0x10000001+i)
 		GemRB.SetText(FeatWindow, Label, FeatName)
@@ -261,14 +261,14 @@ def OnLoad():
 
 
 def JustPress():
-	Pos = GemRB.GetVar("Feat")+TopIndex+1
+	Pos = GemRB.GetVar("Feat")+TopIndex
 	GemRB.SetText(FeatWindow, TextAreaControl, GemRB.GetTableValue(FeatTable,Pos,2) )
 	return
 
 def RightPress():
 	global PointsLeft
 
-	Pos = GemRB.GetVar("Feat")+TopIndex+1
+	Pos = GemRB.GetVar("Feat")+TopIndex
 
 	GemRB.SetText(FeatWindow, TextAreaControl, GemRB.GetTableValue(FeatTable,Pos,2) )
 	ActPoint = GemRB.GetVar("Feat "+str(Pos) )
@@ -282,7 +282,7 @@ def RightPress():
 def LeftPress():
 	global PointsLeft
 
-	Pos = GemRB.GetVar("Feat")+TopIndex+1
+	Pos = GemRB.GetVar("Feat")+TopIndex
 
 	GemRB.SetText(FeatWindow, TextAreaControl, GemRB.GetTableValue(FeatTable,Pos,2) )
 	if PointsLeft < 1:
