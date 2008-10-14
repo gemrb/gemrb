@@ -81,6 +81,8 @@ def OnLoad():
 	global SkillTable, CostTable, PointsLeft
 	global KitName, Level, ClassColumn
 	
+	#enable repeated clicks
+	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	GemRB.SetVar("Level",1) #for simplicity
 	Class = GemRB.GetVar("Class") - 1
 	ClassTable = GemRB.LoadTable("classes")

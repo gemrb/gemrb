@@ -306,6 +306,7 @@ def BackPress():
 	return
 
 def NextPress():
+	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_OR)
 	GemRB.UnloadWindow(FeatWindow)
 	GemRB.SetNextScript("CharGen7")
 	return
