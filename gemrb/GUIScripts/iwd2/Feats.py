@@ -1,5 +1,6 @@
 #character generation, skills (GUICG6)
 import GemRB
+from ie_stats import *
 
 FeatWindow = 0
 TextAreaControl = 0
@@ -324,3 +325,15 @@ def Check_AllOfThreeGE(pl, a, ass, b, bs, c, cs, *garbage):
 	if GemRB.GetPlayerStat(pl, cs) < c: return False
 	return True
 
+def Check_IsCaster(pl, *garbage):
+	# CLASSLEVELMAGE is IE_LEVEL2 (pst)
+	possible_casters = { IE_LEVEL2:1, IE_LEVELCLERIC:1, IE_LEVELDRUID:1,
+		IE_LEVELSORCEROR:1, IE_LEVELPALADIN:4, IE_LEVELRANGER:4, IE_LEVELBARD:2 }
+	Caster = False
+
+	for stat in possible_casters:
+		if GemRB.GetPlayerStat(pl, stat) >= possible_casters[stat]:
+			Caster = True
+			break
+
+	return Caster
