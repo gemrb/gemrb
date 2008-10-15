@@ -312,8 +312,15 @@ def NextPress():
 	return
 
 #Custom feat check functions
-def Check_AnyOfThree(pl, a, as, b, bs, c, cs, *garbage):
-	if GemRB.GetPlayerStat(pl, as)==a: return True
+def Check_AnyOfThree(pl, a, ass, b, bs, c, cs, *garbage):
+	if GemRB.GetPlayerStat(pl, ass)==a: return True
 	if GemRB.GetPlayerStat(pl, bs)==b: return True
 	if GemRB.GetPlayerStat(pl, cs)==c: return True
 	return False
+
+def Check_AllOfThreeGE(pl, a, ass, b, bs, c, cs, *garbage):
+	if GemRB.GetPlayerStat(pl, ass) < a: return False
+	if GemRB.GetPlayerStat(pl, bs) < b: return False
+	if GemRB.GetPlayerStat(pl, cs) < c: return False
+	return True
+
