@@ -2358,7 +2358,7 @@ int SDLVideoDriver::PollMovieEvents()
 	while (SDL_PollEvent( &event )) {
 		switch (event.type) {
 			case SDL_QUIT:
-			case SDL_MOUSEBUTTONDOWN:
+			case SDL_MOUSEBUTTONUP:
 				return 1;
 			case SDL_KEYDOWN:
 				switch (event.key.keysym.sym) {
