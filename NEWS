@@ -15,7 +15,11 @@ GemRB svn r5449 (2008-10-15):
 	- magic item exclusion
 	- stores and bags
 	- feat prerequisites in iwd2
+        - fixed attack loop when target dies
     - bugfixes
+
+  Applied patches:
+	 #2159734 Zefklop (Mouse activity during movies)
 
 GemRB V0.3.1 (2008-09-25):
   New features:
