@@ -337,3 +337,17 @@ def Check_IsCaster(pl, *garbage):
 			break
 
 	return Caster
+
+# besides Concentration > 3, this feat requires Weapon Specialization in 2 weapons.
+def Check_MaximizedAttacks(pl, a, ass, *garbage):
+	if GemRB.GetPlayerStat(pl, ass) < a: return False
+	# tuple of all weapon proficiency types
+	proficiencies = ( IE_FEAT_BASTARDSWORD, IE_FEAT_AXE, IE_FEAT_BOW, IE_FEAT_FLAIL,
+		IE_FEAT_GREAT_SWORD, IE_FEAT_HAMMER, IE_FEAT_LARGE_SWORD, IE_FEAT_POLEARM )
+	SpecializationCount = 0
+
+	for proficiency in proficiencies:
+		if GemRB.GetPlayerStat(pl, proficiency) == 3:
+			SpecializationCount += 1
+
+	return SpecializationCount >= 2
