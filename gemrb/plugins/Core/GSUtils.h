@@ -82,13 +82,13 @@ void GoNearAndRetry(Scriptable *Sender, Point &p, int distance);
 #define BINARY_MORE 10          //left has more bits than right
 #define BINARY_LESS 11          //left has less bits than right
 
-Targets *GetMyTarget(Scriptable *Sender, Actor *actor, Targets *parameters);
-Targets *XthNearestOf(Targets *parameters, int count);
+Targets *GetMyTarget(Scriptable *Sender, Actor *actor, Targets *parameters, int ga_flags);
+Targets *XthNearestOf(Targets *parameters, int count, int ga_flags);
 Targets *XthNearestDoor(Targets *parameters, unsigned int count);
-Targets *XthNearestEnemyOf(Targets *parameters, int count);
-Targets *NearestEnemySummoned(Scriptable *origin, Targets *parameters);
-Targets *XthNearestEnemyOfType(Scriptable *origin, Targets *parameters, unsigned int count);
-Targets *XthNearestMyGroupOfType(Scriptable *origin, Targets *parameters, unsigned int count);
+Targets *XthNearestEnemyOf(Targets *parameters, int count, int ga_flags);
+Targets *ClosestEnemySummoned(Scriptable *origin, Targets *parameters, int ga_flags);
+Targets *XthNearestEnemyOfType(Scriptable *origin, Targets *parameters, unsigned int count, int ga_flags);
+Targets *XthNearestMyGroupOfType(Scriptable *origin, Targets *parameters, unsigned int count, int ga_flags);
 
 void FreeSrc(SrcVector *poi, const ieResRef key);
 SrcVector *LoadSrc(const ieResRef resname);

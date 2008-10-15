@@ -508,6 +508,11 @@ static Targets* EvaluateObject(Scriptable* Sender, Object* oC, int ga_flags)
 
 	if (oC->objectFields[0]==-1) {
 		Actor* aC = map->GetActorByGlobalID( (ieDword) oC->objectFields[1] );
+		/* TODO: this hack will throw away an invalid target */
+		/* Consider putting this in GetActorByGlobalID */
+		if (aC && !aC->ValidTarget(ga_flags)) {
+			aC = NULL;
+		}
 		return ReturnActorAsTarget(aC);
 	}
 
@@ -586,7 +591,7 @@ Targets* GetAllObjects(Scriptable* Sender, Object* oC, int ga_flags)
 		}
 		ObjectFunction func = objects[filterid];
 		if (func) {
-			tgts = func( Sender, tgts);
+			tgts = func( Sender, tgts, ga_flags);
 		}
 		else {
 			printMessage("GameScript"," ", YELLOW);
@@ -2073,7 +2078,7 @@ int DiffCore(ieDword a, ieDword b, int diffmode)
 	return 0;
 }
 
-Targets *GetMyTarget(Scriptable *Sender, Actor *actor, Targets *parameters)
+Targets *GetMyTarget(Scriptable *Sender, Actor *actor, Targets *parameters, int ga_flags)
 {
 	if (!actor) {
 		if (Sender->Type==ST_ACTOR) {
@@ -2084,7 +2089,7 @@ Targets *GetMyTarget(Scriptable *Sender, Actor *actor, Targets *parameters)
 	if (actor) {
 		Actor *target = actor->GetCurrentArea()->GetActorByGlobalID(actor->LastTarget);
 		if (target) {
-			parameters->AddTarget(target, 0, 0);
+			parameters->AddTarget(target, 0, ga_flags);
 		}
 	}
 	return parameters;
@@ -2120,7 +2125,7 @@ Targets *XthNearestDoor(Targets *parameters, unsigned int count)
 	return parameters;
 }
 
-Targets *XthNearestOf(Targets *parameters, int count)
+Targets *XthNearestOf(Targets *parameters, int count, int ga_flags)
 {
 	Scriptable *origin;
 
@@ -2134,12 +2139,12 @@ Targets *XthNearestOf(Targets *parameters, int count)
 	if (!origin) {
 		return parameters;
 	}
-	parameters->AddTarget(origin, 0, 0);
+	parameters->AddTarget(origin, 0, ga_flags);
 	return parameters;
 }
 
 //mygroup means the same specifics as origin
-Targets *XthNearestMyGroupOfType(Scriptable *origin, Targets *parameters, unsigned int count)
+Targets *XthNearestMyGroupOfType(Scriptable *origin, Targets *parameters, unsigned int count, int ga_flags)
 {
 	if (origin->Type != ST_ACTOR) {
 		parameters->Clear();
@@ -2167,10 +2172,10 @@ Targets *XthNearestMyGroupOfType(Scriptable *origin, Targets *parameters, unsign
 		}
 		t = parameters->GetNextTarget(m, ST_ACTOR);
 	}
-	return XthNearestOf(parameters,count);
+	return XthNearestOf(parameters,count, ga_flags);
 }
 
-Targets *NearestEnemySummoned(Scriptable *origin, Targets *parameters)
+Targets *ClosestEnemySummoned(Scriptable *origin, Targets *parameters, int ga_flags)
 {
 	if (origin->Type != ST_ACTOR) {
 		parameters->Clear();
@@ -2215,11 +2220,11 @@ Targets *NearestEnemySummoned(Scriptable *origin, Targets *parameters)
 		t = parameters->GetNextTarget(m, ST_ACTOR);
 	}
 	parameters->Clear();
-	parameters->AddTarget(actor, 0, GA_NO_DEAD);
+	parameters->AddTarget(actor, 0, ga_flags);
 	return parameters;
 }
 
-Targets *XthNearestEnemyOfType(Scriptable *origin, Targets *parameters, unsigned int count)
+Targets *XthNearestEnemyOfType(Scriptable *origin, Targets *parameters, unsigned int count, int ga_flags)
 {
 	if (origin->Type != ST_ACTOR) {
 		parameters->Clear();
@@ -2264,10 +2269,10 @@ Targets *XthNearestEnemyOfType(Scriptable *origin, Targets *parameters, unsigned
 		}
 		t = parameters->GetNextTarget(m, ST_ACTOR);
 	}
-	return XthNearestOf(parameters,count);
+	return XthNearestOf(parameters,count, ga_flags);
 }
 
-Targets *XthNearestEnemyOf(Targets *parameters, int count)
+Targets *XthNearestEnemyOf(Targets *parameters, int count, int ga_flags)
 {
 	Actor *origin = (Actor *) parameters->GetTarget(0, ST_ACTOR);
 	parameters->Clear();
@@ -2293,16 +2298,16 @@ Targets *XthNearestEnemyOf(Targets *parameters, int count)
 		int distance = Distance(ac, origin);
 		if (type) { //origin is PC
 			if (ac->GetStat(IE_EA) >= EA_EVILCUTOFF) {
-				parameters->AddTarget(ac, distance, GA_NO_DEAD);
+				parameters->AddTarget(ac, distance, ga_flags);
 			}
 		}
 		else {
 			if (ac->GetStat(IE_EA) <= EA_GOODCUTOFF) {
-				parameters->AddTarget(ac, distance, GA_NO_DEAD);
+				parameters->AddTarget(ac, distance, ga_flags);
 			}
 		}
 	}
-	return XthNearestOf(parameters,count);
+	return XthNearestOf(parameters,count, ga_flags);
 }
 
 Point GetEntryPoint(const char *areaname, const char *entryname)
