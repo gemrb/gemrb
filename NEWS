@@ -1,3 +1,22 @@
+GemRB svn r5449 (2008-10-15):
+  New features:
+	- 
+	- double click (used in the map window)
+	- click-and-hold incrementing/decrementing
+	- accumulate kill statistics
+	- characters can move while the map is open
+	- sound on item equip
+    - arbitrary feat prerequisites in iwd2
+
+  Improved features:
+	- 
+	- various guiscripts
+	- cmake build system (now really works on *nix)
+	- magic item exclusion
+	- stores and bags
+	- feat prerequisites in iwd2
+    - bugfixes
+
 GemRB V0.3.1 (2008-09-25):
   New features:
     - mouse scroll support
