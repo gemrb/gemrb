@@ -215,7 +215,7 @@ def BackPress():
 	GemRB.SetRepeatClickFlags(GEM_RK_DISABLE, OP_NAND)
 	GemRB.UnloadWindow(AbilityWindow)
 	GemRB.SetNextScript("CharGen5")
-	for i in range(0,6):
+	for i in range(6):
 		GemRB.SetVar("Ability "+str(i),0)  #scrapping the abilities
 	return
 

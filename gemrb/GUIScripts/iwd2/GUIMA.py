@@ -207,14 +207,14 @@ def RemoveMapNote ():
 def QueryText ():
 	Data = ""
 	row = 0
-        while 1:
-                GemRB.SetVar ("row", row)
-                GemRB.SetVarAssoc (NoteWindow, NoteLabel, "row", row)
-                line = GemRB.QueryText (NoteWindow, NoteLabel)
-                if len(line)<=0:
-                        break
-                Data += line+"\n"
-                row += 1
+	while 1:
+		GemRB.SetVar ("row", row)
+		GemRB.SetVarAssoc (NoteWindow, NoteLabel, "row", row)
+		line = GemRB.QueryText (NoteWindow, NoteLabel)
+		if len(line)<=0:
+			break
+		Data += line+"\n"
+		row += 1
 	return Data
 
 def SetMapNote ():

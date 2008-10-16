@@ -9,6 +9,7 @@
 
 import GemRB
 from GUIDefines import *
+from ie_stats import *
 
 CharGenWindow = 0
 TextAreaControl = 0

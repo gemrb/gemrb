@@ -22,7 +22,7 @@ def RedrawSkills():
 		GemRB.SetLabelTextColor(SkillWindow,SumLabel, 255, 255, 0)
 	GemRB.SetText(SkillWindow, SumLabel, str(PointsLeft) )
 
-	for i in range(0,10):
+	for i in range(10):
 		Pos=TopIndex+i
 		Cost = GemRB.GetTableValue(CostTable, Pos, ClassColumn)
 		# Skill cost is currently restricted to base classes. This means it is fairly easy
@@ -130,7 +130,7 @@ def OnLoad():
 
 	for i in range(0,RowCount):
 		GemRB.SetVar("Skill "+str(i),0) # Racial/Class bonuses don't factor in char-gen or leveling
-										# so can be safely ignored
+						# so can be safely ignored
 
 	GemRB.SetToken("number",str(PointsLeft) )
 
@@ -217,13 +217,26 @@ def LeftPress():
 	return
 
 def BackPress():
-	GemRB.UnloadWindow(SkillWindow)
-	for i in range(GemRB.GetTableRowCount(SkillTable)):
+	MyChar = GemRB.GetVar("Slot")
+	TmpTable = GemRB.LoadTable ("skillsta")
+	for i in range(GemRB.GetTableRowCount(TmpTable)):
 		GemRB.SetVar("Skill "+str(i),0)
+		StatID=GemRB.GetTableValue (TmpTable, i, 2)
+		GemRB.SetPlayerStat (MyChar, StatID, 0)
+	GemRB.UnloadTable (TmpTable)
+	GemRB.UnloadWindow(SkillWindow)
 	GemRB.SetNextScript("CharGen6")
 	return
 
 def NextPress():
+	MyChar = GemRB.GetVar("Slot")
+	#setting skills
+	TmpTable = GemRB.LoadTable ("skillsta")
+	SkillCount = GemRB.GetTableRowCount (TmpTable)
+	for i in range (SkillCount):
+		StatID=GemRB.GetTableValue (TmpTable, i, 2)
+		GemRB.SetPlayerStat (MyChar, StatID, GemRB.GetVar ("Skill "+str(i) ) )
+	GemRB.UnloadTable (TmpTable)
 	GemRB.UnloadWindow(SkillWindow)
 	GemRB.SetNextScript("Feats") #feats
 	return
