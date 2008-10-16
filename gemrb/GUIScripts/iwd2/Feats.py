@@ -53,6 +53,9 @@ def IsFeatUsable(feat):
 	c_op = GemRB.GetTableValue(FeatReqTable, feat, "C_OP")
 	d_op = GemRB.GetTableValue(FeatReqTable, feat, "D_OP")
 	slot = GemRB.GetVar("Slot")
+
+	print "Stats:",a_stat, b_stat, c_stat, d_stat
+	print "Vals :",a_value, b_value, c_value, d_value
 	return GemRB.CheckFeatCondition(slot, a_stat, a_value, b_stat, b_value, c_stat, c_value, d_stat, d_value, a_op, b_op, c_op, d_op)
 
 # checks if a feat was granted due to class/kit/race and returns the number
@@ -313,13 +316,26 @@ def NextPress():
 	return
 
 #Custom feat check functions
-def Check_AnyOfThree(pl, a, ass, b, bs, c, cs, *garbage):
+def Check_AnyOfThree(pl, ass, a, bs, b, cs, c, *garbage):
+
+	print a,ass,b,bs,c,cs
 	if GemRB.GetPlayerStat(pl, ass)==a: return True
 	if GemRB.GetPlayerStat(pl, bs)==b: return True
 	if GemRB.GetPlayerStat(pl, cs)==c: return True
 	return False
 
-def Check_AllOfThreeGE(pl, a, ass, b, bs, c, cs, *garbage):
+#Custom feat check functions
+def Check_AnyOfThreeGE(pl, ass, a, bs, b, cs, c, *garbage):
+
+	print a,ass,b,bs,c,cs
+	if GemRB.GetPlayerStat(pl, ass)>=a: return True
+	if GemRB.GetPlayerStat(pl, bs)>=b: return True
+	if GemRB.GetPlayerStat(pl, cs)>=c: return True
+	return False
+
+def Check_AllOfThreeGE(pl, ass, a, bs, b, cs, c, *garbage):
+
+	print a,ass,b,bs,c,cs
 	if GemRB.GetPlayerStat(pl, ass) < a: return False
 	if GemRB.GetPlayerStat(pl, bs) < b: return False
 	if GemRB.GetPlayerStat(pl, cs) < c: return False
