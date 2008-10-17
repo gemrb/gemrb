@@ -4143,3 +4143,12 @@ void Actor::CreateDerivedStatsIWD2()
 	BaseStats[IE_BACKSTABDAMAGEMULTIPLIER]=backstabdamagemultiplier;
 	BaseStats[IE_LAYONHANDSAMOUNT]=(ieDword) layonhandsamount;
 }
+
+void Actor::CreateDerivedStats()
+{
+        if (BaseStats[IE_CLASSLEVELSUM]) {
+                CreateDerivedStatsIWD2();
+        } else {
+                CreateDerivedStatsBG();
+        }
+}

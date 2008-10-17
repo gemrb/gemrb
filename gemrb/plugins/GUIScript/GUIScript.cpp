@@ -270,7 +270,10 @@ static inline bool CheckStat(Actor * actor, ieDword stat, ieDword value, int op)
 	//ieDword stat = core->TranslateStat(stat_name);
 	//some stats should check for exact value
 	//return actor->GetBase(stat)>=value;
-	return DiffCore(actor->GetBase(stat), value, op);
+	//return DiffCore(actor->GetBase(stat), value, op);
+	int dc = DiffCore(actor->GetBase(stat), value, op);
+	printf ("diffcore - %d %d %d: %d\n",actor->GetBase(stat), value, op, dc);
+	return dc;
 }
 
 static int GetCreatureStat(unsigned int Slot, unsigned int StatID, int Mod)
@@ -293,6 +296,7 @@ static int SetCreatureStat(unsigned int Slot, unsigned int StatID, int StatValue
 		return 0;
 	}
 	actor->SetBase( StatID, StatValue );
+	actor->CreateDerivedStats();
 	return 1;
 }
 
@@ -7041,7 +7045,7 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 	const char *callback = NULL;
 	PyObject* p[13];
 	int v[13];
-	for(i=10;i<13;i++) {
+	for(i=9;i<13;i++) {
 		p[i]=NULL;
 		v[i]=GREATER_OR_EQUALS;
 	}
@@ -7068,11 +7072,20 @@ static PyObject* GemRB_CheckFeatCondition(PyObject * /*self*/, PyObject* args)
 	}
 	v[0]=PyInt_AsLong( p[0] );
 
-	for(i=2;i<10;i++) {
+	for(i=2;i<9;i++) {
 		if (!PyObject_TypeCheck( p[i], &PyInt_Type )) {
 			return AttributeError( GemRB_CheckFeatCondition__doc );
 		}
 		v[i]=PyInt_AsLong( p[i] );
+	}
+
+	if (p[9]) {
+		for(i=9;i<13;i++) {
+			if (!PyObject_TypeCheck( p[i], &PyInt_Type )) {
+				return AttributeError( GemRB_CheckFeatCondition__doc );
+			}
+			v[i]=PyInt_AsLong( p[i] );
+		}
 	}
 
 	Game *game = core->GetGame();

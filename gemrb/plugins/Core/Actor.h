@@ -234,6 +234,10 @@ private:
 	void CheckWeaponQuickSlot(unsigned int which);
 	/* helper for usability checks */
 	int CheckUsability(Item *item) const;
+	/* Set up all the missing stats on load time, or after level up */
+	void CreateDerivedStatsBG();
+	/* Set up all the missing stats on load time, or after level up */
+	void CreateDerivedStatsIWD2();
 public:
 	Actor(void);
 	~Actor(void);
@@ -514,9 +518,7 @@ public:
 	ieDword ImmuneToProjectile(ieDword projectile) const;
 	/* Sets projectile immunity */
 	void AddProjectileImmunity(ieDword projectile);
-	/* Set up all the missing stats on load time, or after level up */
-	void CreateDerivedStatsBG();
-	/* Set up all the missing stats on load time, or after level up */
-	void CreateDerivedStatsIWD2();
+	/* Set up all the missing stats on load time, chargen, or after level up */
+	void CreateDerivedStats();
 };
 #endif

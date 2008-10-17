@@ -514,11 +514,7 @@ Actor* CREImp::GetActor(unsigned char is_in_party)
 		act->BaseStats[IE_HITPOINTS]=hp;
 	}
 	act->inventory.CalculateWeight();
-	if (act->BaseStats[IE_CLASSLEVELSUM]) {
-		act->CreateDerivedStatsIWD2();
-	} else {
-		act->CreateDerivedStatsBG();
-	}
+	act->CreateDerivedStats();
 	return act;
 }
 
