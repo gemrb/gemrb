@@ -53,12 +53,15 @@ private:
 	unsigned int cycle;
 	unsigned int frame;
 	unsigned int anim_phase;
+	bool has_palette;
+	ieDword colors[8];
 public:
 	ControlAnimation(Control* ctl, const ieResRef ResRef, int Cycle = 0);
 	~ControlAnimation(void);
 	void UpdateAnimation();
 	//report if the current resource is the same as descripted by the params
 	bool SameResource(const ieResRef ResRef, int Cycle);
+	void SetPaletteGradients(ieDword *col);
 };
 
 #endif

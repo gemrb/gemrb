@@ -239,7 +239,12 @@ void Button::Draw(unsigned short x, unsigned short y)
 		int xOffs = ( Width / 2 ) - ( AnimPicture->Width / 2 );
 		int yOffs = ( Height / 2 ) - ( AnimPicture->Height / 2 );
 		Region r( x + XPos + xOffs, y + YPos + yOffs, (int)(AnimPicture->Width * Clipping), AnimPicture->Height );
-		video->BlitSprite( AnimPicture, x + XPos + xOffs, y + YPos + yOffs, true, &r );
+
+		if (Flags & IE_GUI_BUTTON_CENTER_PICTURES) {
+			video->BlitSprite( AnimPicture, x + XPos + xOffs + AnimPicture->XPos, y + YPos + yOffs + AnimPicture->YPos, true, &r );
+		} else {
+			video->BlitSprite( AnimPicture, x + XPos + xOffs, y + YPos + yOffs, true, &r );
+		}
 	}
 
 	// Button label

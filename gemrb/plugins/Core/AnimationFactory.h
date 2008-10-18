@@ -44,7 +44,7 @@ private:
 	std::vector< CycleEntry> cycles;
 	unsigned short* FLTable;	// Frame Lookup Table
 	unsigned char* FrameData;
-    int datarefcount;
+	int datarefcount;
 public:
 	AnimationFactory(const char* ResRef);
 	~AnimationFactory(void);
@@ -62,8 +62,8 @@ public:
 	Sprite2D* GetPaperdollImage(ieDword *Colors, Sprite2D *&Picture2,
 		unsigned int type);
 
-    void IncDataRefCount();
-    void DecDataRefCount();
+	void IncDataRefCount();
+	void DecDataRefCount();
 };
 
 #endif

@@ -289,7 +289,9 @@ def RefreshInventoryWindow ():
 	Color6 = GemRB.GetPlayerStat (pc, IE_ARMOR_COLOR)
 	Color7 = GemRB.GetPlayerStat (pc, IE_HAIR_COLOR)
 
+	GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_CENTER_PICTURES, OP_OR)
 	GemRB.SetAnimation (Window, Button, GetActorPaperDoll (pc)+"G11")
+	GemRB.SetAnimationPalette (Window, Button, Color1, Color2, Color3, Color4, Color5, Color6, Color7, 0)
 
 	# portrait
 	Button = GemRB.GetControl (Window, 84)

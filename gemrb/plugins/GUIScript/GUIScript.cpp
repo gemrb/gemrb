@@ -3151,6 +3151,37 @@ static PyObject* GemRB_SetButtonBAM(PyObject * /*self*/, PyObject* args)
 	return ret;
 }
 
+PyDoc_STRVAR( GemRB_SetAnimationPalette__doc,
+"SetAnimationPalette(WindowIndex, ControlIndex, col1, col2, col3, col4, col5, col6, col7, col8)\n\n"
+"Sets the palette of an animation already assigned to the button.");
+
+static PyObject* GemRB_SetAnimationPalette(PyObject * /*self*/, PyObject* args)
+{
+	int wi, ci;
+	ieDword col[8];
+
+	memset(col,-1,sizeof(col));
+	if (!PyArg_ParseTuple( args, "iiiiiiiiii", &wi, &ci,
+			&(col[0]), &(col[1]), &(col[2]), &(col[3]),
+			&(col[4]), &(col[5]), &(col[6]), &(col[7])) ) {
+		return AttributeError( GemRB_SetAnimationPalette__doc );
+	}
+
+	Control* ctl = GetControl(wi, ci, -1);
+	if (!ctl) {
+		return NULL;
+	}
+
+	ControlAnimation* anim = ctl->animation;
+	if (!anim) {
+		return RuntimeError("No animation!");
+	}
+
+	anim->SetPaletteGradients(col);
+	Py_INCREF( Py_None );
+	return Py_None;
+}
+
 PyDoc_STRVAR( GemRB_SetAnimation__doc,
 "SetAnimation(WindowIndex, ControlIndex, BAMResRef[, Cycle])\n\n"
 "Sets the animation of a Control (usually a Button) from a BAM file. Optionally an animation cycle could be set too.");
@@ -8661,6 +8692,7 @@ static PyMethodDef GemRBMethods[] = {
 	METHOD(SaveGame, METH_VARARGS),
 	METHOD(SetActionIcon, METH_VARARGS),
 	METHOD(SetAnimation, METH_VARARGS),
+	METHOD(SetAnimationPalette, METH_VARARGS),
 	METHOD(SetBufferLength, METH_VARARGS),
 	METHOD(SetButtonSprites, METH_VARARGS),
 	METHOD(SetButtonBorder, METH_VARARGS),

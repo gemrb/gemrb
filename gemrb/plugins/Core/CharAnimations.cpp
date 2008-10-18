@@ -753,8 +753,7 @@ Animation** CharAnimations::GetAnimation(unsigned char StanceID, unsigned char O
 
 		AnimationFactory* af = ( AnimationFactory* )
 			core->GetResourceMgr()->GetFactoryResource( NewResRef,
-														IE_BAM_CLASS_ID,
-														IE_NORMAL );
+														IE_BAM_CLASS_ID, IE_NORMAL );
 
 		if (!af) {
 			if (part < actorPartCount) {

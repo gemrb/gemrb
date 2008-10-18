@@ -221,7 +221,11 @@ void Control::SetAnimPicture(Sprite2D* newpic)
 {
 	core->GetVideoDriver()->FreeSprite(AnimPicture);
 	AnimPicture = newpic;
-	Changed = true;
+	//apparently this is needed too, so the artifacts are not visible
+	if (Owner->Visible==WINDOW_VISIBLE) {
+		Changed = true;
+		Owner->Invalidate();
+	}
 }
 
 /** Sets the Scroll Bar Pointer. If 'ptr' is NULL no Scroll Bar will be linked

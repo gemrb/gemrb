@@ -23,8 +23,9 @@
 #include "ControlAnimation.h"
 #include "Interface.h"
 #include "ResourceMgr.h"
+#include "Video.h"      /* needed only for paperdoll palettes */
+#include "Palette.h"    /* needed only for paperdoll palettes */
 #include "Button.h"
-
 
 ControlAnimation::ControlAnimation(Control* ctl, const ieResRef ResRef, int Cycle)
 {
@@ -34,15 +35,15 @@ ControlAnimation::ControlAnimation(Control* ctl, const ieResRef ResRef, int Cycl
 	frame = 0;
 	anim_phase = 0;
 
-	bam = ( AnimationFactory* )
-		core->GetResourceMgr()->GetFactoryResource( ResRef,
-													IE_BAM_CLASS_ID,
-													IE_NORMAL );
+	bam = ( AnimationFactory* ) core->GetResourceMgr()->GetFactoryResource( ResRef,
+		IE_BAM_CLASS_ID, IE_NORMAL );
+
 	if (! bam)
 		return;
 
 	control = ctl;
 	control->animation = this;
+	has_palette = false;
 }
 
 //freeing the bitmaps only once, but using an intelligent algorithm
@@ -93,7 +94,11 @@ void ControlAnimation::UpdateAnimation(void)
 		}
 	} else {
 		frame ++;
-		time = 15;
+		if (has_palette) {
+			time = 100;  //hack for slower movement
+		} else {
+			time = 15;
+		}
 	}
 
 	Sprite2D* pic = bam->GetFrame( (unsigned short) frame, (unsigned char) Cycle );
@@ -106,9 +111,28 @@ void ControlAnimation::UpdateAnimation(void)
 		}
 		anim_phase = 0;
 		frame = 0;
-		pic = bam->GetFrame( 0, 0 );
+		pic = bam->GetFrame( 0, (unsigned char) Cycle );
+	}
+
+	if (pic == NULL) {
+		return;
+	}
+
+	if (has_palette) {
+		Video *video = core->GetVideoDriver();
+                Palette* palette = video->GetPalette(pic);
+                palette->SetupPaperdollColours(colors, 0);
+                video->SetPalette(pic, palette);
+                palette->Release();
 	}
 
 	control->SetAnimPicture( pic );
 	core->timer->AddAnimation( this, time );
 }
+
+void ControlAnimation::SetPaletteGradients(ieDword *col)
+{
+	memcpy(colors, col, 8*sizeof(ieDword));
+	has_palette = true;
+}
+
