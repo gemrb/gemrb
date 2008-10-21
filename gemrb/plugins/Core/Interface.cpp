@@ -4030,7 +4030,7 @@ int Interface::CanUseItemType(int slottype, Item *item, Actor *actor, bool feedb
 		//switch for IE_INV_ITEM_* if it is a CREItem
 		if (item->Flags&IE_ITEM_TWO_HANDED) {
 			//cannot equip twohanded in offhand
-			if (feedback) DisplayConstantString(STR_2HANDEDOFFHAND, 0xf0f0f0);
+			if (feedback) DisplayConstantString(STR_NOT_IN_OFFHAND, 0xf0f0f0);
 			return 0;
 		}
 	}

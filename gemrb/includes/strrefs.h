@@ -123,17 +123,15 @@
 //
 //
 #define STR_WRONGITEMTYPE   90
-#define STR_OFFHANDINUSE    91
-#define STR_2HANDEDEQUIP    92
-#define STR_CANNOTUSEITEM   93
-#define STR_2HANDEDOFFHAND  94
-#define STR_ITEMEXCL        95
-#define STR_PICKPOCKET_DONE 96       //done
-#define STR_PICKPOCKET_NONE 97       //no items to steal
-#define STR_PICKPOCKET_FAIL 98       //failed, noticed
-#define STR_PICKPOCKET_EVIL 99       //can't pick hostiles
-#define STR_PICKPOCKET_ARMOR 100      //armor restriction
+#define STR_ITEMEXCL        91
+#define STR_PICKPOCKET_DONE 92       //done
+#define STR_PICKPOCKET_NONE 93       //no items to steal
+#define STR_PICKPOCKET_FAIL 94       //failed, noticed
+#define STR_PICKPOCKET_EVIL 95       //can't pick hostiles
+#define STR_PICKPOCKET_ARMOR 96      //armor restriction
+#define STR_USING_FEAT      97
+#define STR_STOPPED_FEAT    98
 
-#define STRREF_COUNT 101
+#define STRREF_COUNT 99
 
 #endif //! IE_STRINGS_H

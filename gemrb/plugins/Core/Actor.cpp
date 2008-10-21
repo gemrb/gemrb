@@ -3948,7 +3948,7 @@ resolve_stat:
 			stat = ResolveTableValue(itemuse[i].table, stat, mcol, itemuse[i].vcol);
 		}
 		if (stat&itemvalue) {
-			return STR_CANNOTUSEITEM;
+			return STR_CANNOT_USE_ITEM;
 		}
 	}
 
