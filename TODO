@@ -49,7 +49,7 @@ Game GUI:
 2. (PARTLY) implement class based (but customisable) action button bar. Generally port
    the IWD2 system to all engines
 3. implement grabbing mouse pointer by a control to fix dragging of PST Float menu window
-4. Fix multi line editboxes. Allow attaching of scrollbar.
+4. (DONE) Fix multi line editboxes. Allow attaching of scrollbar. - Avenger, i think it is done
 5. (PARTLY) Fix drop capitals (initials) Calculate text height/width correctly, display
    it correctly too.
 6. (PARTLY) Fix unwanted screen shake (especially when on bottom of area)
