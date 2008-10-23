@@ -39,7 +39,7 @@ GenderTextArea = 0
 GenderDoneButton = 0
 
 Portrait = 0
-PortraitTable = 0
+PortraitsTable = 0
 PortraitPortraitButton = 0
 
 RaceButton = 0
@@ -385,7 +385,11 @@ def AcceptPress():
 	SetColorStat (MyChar, IE_LEATHER_COLOR, 0x16 )
 	SetColorStat (MyChar, IE_ARMOR_COLOR, 0x17 )
 
-	GemRB.FillPlayerInfo(MyChar, PortraitName+"L", PortraitName+"S")
+	#does all the rest
+	LargePortrait = GemRB.GetToken ("LargePortrait")
+	SmallPortrait = GemRB.GetToken ("SmallPortrait")
+	GemRB.FillPlayerInfo (MyChar, LargePortrait, SmallPortrait)
+
 	#10 is a weapon slot (see slottype.2da row 10)
 	GemRB.CreateItem(MyChar, "staf01", 10, 1, 0, 0)
 	GemRB.SetEquippedQuickSlot(MyChar, 0)
@@ -589,13 +593,13 @@ def GenderCancelPress():
 	return
 
 def PortraitSelect():
-	global CharGenWindow, PortraitWindow, Portrait, PortraitPortraitButton, PortraitTable
+	global CharGenWindow, PortraitWindow, Portrait, PortraitPortraitButton, PortraitsTable
 
 	GemRB.SetVisible (CharGenWindow, 0)
 	PortraitWindow = GemRB.LoadWindow (11)
 
 	# this is not the correct one, but I don't know which is
-	PortraitTable = GemRB.LoadTable ("PICTURES")
+	PortraitsTable = GemRB.LoadTable ("PICTURES")
 	Portrait = 0
 
 	PortraitPortraitButton = GemRB.GetControl (PortraitWindow, 1)
@@ -627,43 +631,155 @@ def PortraitSelect():
 	GemRB.SetEvent (PortraitWindow, PortraitCancelButton, IE_GUI_BUTTON_ON_PRESS, "PortraitCancelPress")
 	GemRB.SetText (PortraitWindow, PortraitCancelButton, 13727)
 
-	while GemRB.GetTableValue (PortraitTable, Portrait, 0) != GemRB.GetVar ("Gender"):
+	while GemRB.GetTableValue (PortraitsTable, Portrait, 0) != GemRB.GetVar ("Gender"):
 		Portrait = Portrait + 1
-	GemRB.SetButtonPicture(PortraitWindow, PortraitPortraitButton, GemRB.GetTableRowName (PortraitTable, Portrait) + "G")
+	GemRB.SetButtonPicture(PortraitWindow, PortraitPortraitButton, GemRB.GetTableRowName (PortraitsTable, Portrait) + "G")
 
 	GemRB.SetVisible (PortraitWindow, 1)
 	return
 
 def PortraitLeftPress():
-	global PortraitWindow, Portrait, PortraitTable, PortraitPortraitButton
+	global PortraitWindow, Portrait, PortraitsTable, PortraitPortraitButton
 
 	while True:
 		Portrait = Portrait - 1
 		if Portrait < 0:
-			Portrait = GemRB.GetTableRowCount (PortraitTable) - 1
-		if GemRB.GetTableValue (PortraitTable, Portrait, 0) == GemRB.GetVar ("Gender"):
-			GemRB.SetButtonPicture(PortraitWindow, PortraitPortraitButton, GemRB.GetTableRowName (PortraitTable, Portrait) + "G")
+			Portrait = GemRB.GetTableRowCount (PortraitsTable) - 1
+		if GemRB.GetTableValue (PortraitsTable, Portrait, 0) == GemRB.GetVar ("Gender"):
+			GemRB.SetButtonPicture(PortraitWindow, PortraitPortraitButton, GemRB.GetTableRowName (PortraitsTable, Portrait) + "G")
 			return
 
 def PortraitRightPress():
-	global PortraitWindow, Portrait, PortraitTable, PortraitPortraitButton
+	global PortraitWindow, Portrait, PortraitsTable, PortraitPortraitButton
 
 	while True:
 		Portrait = Portrait + 1
-		if Portrait == GemRB.GetTableRowCount (PortraitTable):
+		if Portrait == GemRB.GetTableRowCount (PortraitsTable):
 			Portrait = 0
-		if GemRB.GetTableValue (PortraitTable, Portrait, 0) == GemRB.GetVar ("Gender"):
-			GemRB.SetButtonPicture(PortraitWindow, PortraitPortraitButton, GemRB.GetTableRowName (PortraitTable, Portrait) + "G")
+		if GemRB.GetTableValue (PortraitsTable, Portrait, 0) == GemRB.GetVar ("Gender"):
+			GemRB.SetButtonPicture(PortraitWindow, PortraitPortraitButton, GemRB.GetTableRowName (PortraitsTable, Portrait) + "G")
 			return
 
+def CustomDone():
+	global CharGenWindow, CharGenState, PortraitWindow, PortraitButton, PortraitsTable, Portrait, GenderButton, RaceButton
+
+	Window = CustomWindow
+
+	PortraitName = GemRB.QueryText (Window, PortraitList2)
+	GemRB.SetToken ("SmallPortrait", PortraitName)
+	PortraitName = GemRB.QueryText (Window, PortraitList1)
+	GemRB.SetToken ("LargePortrait", PortraitName)
+	GemRB.UnloadWindow (Window)
+
+	GemRB.UnloadWindow (PortraitWindow)
+	GemRB.SetButtonPicture(CharGenWindow, PortraitButton, PortraitName)
+	GemRB.SetButtonState (CharGenWindow, GenderButton, IE_GUI_BUTTON_DISABLED)
+	GemRB.SetButtonFlags (CharGenWindow, GenderButton, IE_GUI_BUTTON_DEFAULT, OP_NAND)
+	GemRB.SetButtonState (CharGenWindow, RaceButton, IE_GUI_BUTTON_ENABLED)
+	GemRB.SetButtonFlags (CharGenWindow, RaceButton, IE_GUI_BUTTON_DEFAULT, OP_OR)
+	CharGenState = 1
+	Portrait = -1
+	SetCharacterDescription()
+	GemRB.SetVisible (CharGenWindow, 1)
+	return
+
+def CustomAbort():
+	GemRB.UnloadWindow (CustomWindow)
+	return
+
+def LargeCustomPortrait():
+	Window = CustomWindow
+
+	Portrait = GemRB.QueryText (Window, PortraitList1)
+	#small hack
+	if GemRB.GetVar ("Row1") == RowCount1:
+		return
+
+	Label = GemRB.GetControl (Window, 0x10000007)
+	GemRB.SetText (Window, Label, Portrait)
+
+	Button = GemRB.GetControl (Window, 6)
+	if Portrait=="":
+		Portrait = "NOPORTMD"
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
+	else:
+		if GemRB.QueryText (Window, PortraitList2)!="":
+			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
+
+	Button = GemRB.GetControl (Window, 0)
+	GemRB.SetButtonPicture (Window, Button, Portrait, "NOPORTMD")
+	return
+
+def SmallCustomPortrait():
+	Window = CustomWindow
+
+	Portrait = GemRB.QueryText (Window, PortraitList2)
+	#small hack
+	if GemRB.GetVar ("Row2") == RowCount2:
+		return
+
+	Label = GemRB.GetControl (Window, 0x10000008)
+	GemRB.SetText (Window, Label, Portrait)
+
+	Button = GemRB.GetControl (Window, 6)
+	if Portrait=="":
+		Portrait = "NOPORTSM"
+		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
+	else:
+		if GemRB.QueryText (Window, PortraitList1)!="":
+			GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
+
+	Button = GemRB.GetControl (Window, 1)
+	GemRB.SetButtonPicture (Window, Button, Portrait, "NOPORTSM")
+	return
+
 def PortraitCustomPress():
+	global PortraitList1, PortraitList2
+	global RowCount1, RowCount2
+	global CustomWindow
+
+	CustomWindow = Window = GemRB.LoadWindow (18)
+	PortraitList1 = GemRB.GetControl (Window, 2)
+	RowCount1 = GemRB.GetPortraits (Window, PortraitList1, 0)
+	GemRB.SetEvent (Window, PortraitList1, IE_GUI_TEXTAREA_ON_CHANGE, "LargeCustomPortrait")
+	GemRB.SetVar ("Row1", RowCount1)
+	GemRB.SetVarAssoc (Window, PortraitList1, "Row1",RowCount1)
+
+	PortraitList2 = GemRB.GetControl (Window, 4)
+	RowCount2 = GemRB.GetPortraits (Window, PortraitList2, 1)
+	GemRB.SetEvent (Window, PortraitList2, IE_GUI_TEXTAREA_ON_CHANGE, "SmallCustomPortrait")
+	GemRB.SetVar ("Row2", RowCount2)
+	GemRB.SetVarAssoc (Window, PortraitList2, "Row2",RowCount2)
+
+	Button = GemRB.GetControl (Window, 6)
+	GemRB.SetText (Window, Button, 11973)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CustomDone")
+	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_DISABLED)
+
+	Button = GemRB.GetControl (Window, 7)
+	GemRB.SetText (Window, Button, 15416)
+	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_PRESS, "CustomAbort")
+
+	Button = GemRB.GetControl (Window, 0)
+	PortraitName = GemRB.GetTableRowName (PortraitsTable, Portrait)+"L"
+	GemRB.SetButtonPicture (Window, Button, PortraitName, "NOPORTMD")
+	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+
+	Button = GemRB.GetControl (Window, 1)
+	PortraitName = GemRB.GetTableRowName (PortraitsTable, Portrait)+"S"
+	GemRB.SetButtonPicture (Window, Button, PortraitName, "NOPORTSM")
+	GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_LOCKED)
+
+	GemRB.ShowModal (Window, MODAL_SHADOW_NONE)
 	return
 
 def PortraitDonePress():
-	global CharGenWindow, CharGenState, PortraitWindow, PortraitButton, PortraitTable, Portrait, GenderButton, RaceButton
+	global CharGenWindow, CharGenState, PortraitWindow, PortraitButton, PortraitsTable, Portrait, GenderButton, RaceButton
 
-	GemRB.UnloadWindow (PortraitWindow)
-	GemRB.SetButtonPicture(CharGenWindow, PortraitButton, GemRB.GetTableRowName (PortraitTable, Portrait) + "L")
+	PortraitName = GemRB.GetTableRowName (PortraitsTable, Portrait )
+	GemRB.SetToken ("SmallPortrait", PortraitName+"S")
+	GemRB.SetToken ("LargePortrait", PortraitName+"L")
+	GemRB.SetButtonPicture(CharGenWindow, PortraitButton, GemRB.GetTableRowName (PortraitsTable, Portrait) + "L")
 	GemRB.SetButtonState (CharGenWindow, GenderButton, IE_GUI_BUTTON_DISABLED)
 	GemRB.SetButtonFlags (CharGenWindow, GenderButton, IE_GUI_BUTTON_DEFAULT, OP_NAND)
 	GemRB.SetButtonState (CharGenWindow, RaceButton, IE_GUI_BUTTON_ENABLED)
@@ -671,6 +787,7 @@ def PortraitDonePress():
 	CharGenState = 1
 	SetCharacterDescription()
 	GemRB.SetVisible (CharGenWindow, 1)
+	GemRB.UnloadWindow (PortraitWindow)
 	return
 
 def PortraitCancelPress():
@@ -2049,16 +2166,21 @@ def PriestMemorizeCancelPress():
 
 def AppearancePress():
 	global CharGenWindow, AppearanceWindow, AppearanceTable
-	global PortraitTable, Portrait, AppearanceAvatarButton, PortraitName
+	global PortraitsTable, Portrait, AppearanceAvatarButton, PortraitName
 	global AppearanceHairButton, AppearanceSkinButton
 	global AppearanceMajorButton, AppearanceMinorButton
 	global HairColor, SkinColor, MajorColor, MinorColor
 
 	GemRB.SetVisible (CharGenWindow, 0)
 	AppearanceWindow = GemRB.LoadWindow (13)
-	PortraitName = GemRB.GetTableRowName (PortraitTable, Portrait)
 	AppearanceTable = GemRB.LoadTable ("PORTCOLR")
-	PortraitIndex = GemRB.GetTableRowIndex (AppearanceTable, PortraitName + "L")
+
+	if Portrait<0:
+		PortraitIndex = 0
+	else:
+		PortraitName = GemRB.GetTableRowName (PortraitsTable, Portrait)
+		PortraitIndex = GemRB.GetTableRowIndex (AppearanceTable, PortraitName + "L")
+	
 	HairColor = GemRB.GetTableValue (AppearanceTable, PortraitIndex, 1)
 	GemRB.SetVar ("HairColor", HairColor)
 	SkinColor = GemRB.GetTableValue (AppearanceTable, PortraitIndex, 2)
