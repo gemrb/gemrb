@@ -28,7 +28,6 @@ def RefreshPDoll():
 	AnimID = AnimID+GemRB.GetTableValue(table, GemRB.GetVar("Class"),0)
 	table = GemRB.LoadTable("avprefg")
 	AnimID = AnimID+GemRB.GetTableValue(table, GemRB.GetVar("Gender"),0)
-	print "AnimID:",hex(AnimID)
 	ResRef = GemRB.GetTableValue(PDollTable,hex(AnimID), "LEVEL1")
 	GemRB.SetButtonPLT(ColorWindow, PDollButton, ResRef,
 		0, MinorColor, MajorColor, SkinColor, 0, 0, HairColor, 0)
@@ -49,11 +48,17 @@ def OnLoad():
 	PortraitName = GemRB.GetToken("LargePortrait")
 	PortraitName = PortraitName[0:len(PortraitName)-1]
 	PortraitIndex = GemRB.GetTableRowIndex(PortraitTable, PortraitName)
-	HairColor=GemRB.GetTableValue(PortraitTable,PortraitIndex,1)
-	SkinColor=GemRB.GetTableValue(PortraitTable,PortraitIndex,2)
-	MinorColor=GemRB.GetTableValue(PortraitTable,PortraitIndex,3)
-	MajorColor=GemRB.GetTableValue(PortraitTable,PortraitIndex,4)
-	print HairColor, SkinColor, MinorColor, MajorColor
+	if PortraitIndex<0:
+		HairColor=GemRB.GetTableValue(PortraitTable,0,1)
+		SkinColor=GemRB.GetTableValue(PortraitTable,0,2)
+		MinorColor=GemRB.GetTableValue(PortraitTable,0,3)
+		MajorColor=GemRB.GetTableValue(PortraitTable,0,4)
+	else:
+		HairColor=GemRB.GetTableValue(PortraitTable,PortraitIndex,1)
+		SkinColor=GemRB.GetTableValue(PortraitTable,PortraitIndex,2)
+		MinorColor=GemRB.GetTableValue(PortraitTable,PortraitIndex,3)
+		MajorColor=GemRB.GetTableValue(PortraitTable,PortraitIndex,4)
+
 	PDollButton = GemRB.GetControl(ColorWindow, 1)
 	GemRB.SetButtonFlags(ColorWindow, PDollButton, IE_GUI_BUTTON_PICTURE,OP_OR)
 

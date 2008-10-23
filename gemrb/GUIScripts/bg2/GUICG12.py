@@ -92,9 +92,9 @@ def CustomDone():
 	Window = CustomWindow
 
 	Portrait = GemRB.QueryText (Window, PortraitList1)
-	GemRB.SetToken ("SmallPortrait", Portrait)
-	Portrait = GemRB.QueryText (Window, PortraitList2)
 	GemRB.SetToken ("LargePortrait", Portrait)
+	Portrait = GemRB.QueryText (Window, PortraitList2)
+	GemRB.SetToken ("SmallPortrait", Portrait)
 	GemRB.UnloadWindow (Window)
 	GemRB.UnloadWindow (AppearanceWindow)
 	GemRB.SetNextScript ("CharGen2")
