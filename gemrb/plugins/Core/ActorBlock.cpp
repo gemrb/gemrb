@@ -702,20 +702,23 @@ void Selectable::SetBBox(Region &newBBox)
 	BBox = newBBox;
 }
 
+static const unsigned long tp_steps[8]={3,2,1,0,1,2,3,4};
+
 void Selectable::DrawCircle(Region &vp)
 {
-	/* TODO: BG2 colours ground circles as follows:
-		dark green for unselected party members
-		bright green for selected party members
-		flashing green/white for a party member the mouse is over
-		bright red for enemies
-		flashing red/white for enemies the mouse is over
-		flashing cyan/white for neutrals the mouse is over
+	/*  BG2 colours ground circles as follows:
+	dark green for unselected party members
+	bright green for selected party members
+	flashing green/white for a party member the mouse is over
+	bright red for enemies
+	flashing red/white for enemies the mouse is over
+	flashing cyan/white for neutrals the mouse is over
 	*/
 
 	if (size<=0) {
 		return;
 	}
+	Color mix;
 	Color* col = NULL;
 	Sprite2D* sprite = circleBitmap[0];
 
@@ -723,7 +726,16 @@ void Selectable::DrawCircle(Region &vp)
 		col = &selectedColor;
 		sprite = circleBitmap[1];
 	} else if (Over) {
-		col = &overColor;
+		//doing a time dependent flashing of colors
+		//if it is too fast, increase the 6 to 7
+		unsigned long step;
+		GetTime( step );
+		step = tp_steps [(step >> 6) & 7];
+		mix.a=overColor.a;
+		mix.r=(overColor.r*step+selectedColor.r*(8-step))/8;
+		mix.g=(overColor.g*step+selectedColor.g*(8-step))/8;
+		mix.b=(overColor.b*step+selectedColor.b*(8-step))/8;
+		col = &mix;
 	} else {
 		return;
 	}
@@ -1125,8 +1137,6 @@ void Movable::ClearPath()
 	step = NULL;
 	//don't call ReleaseCurrentAction
 }
-
-static const unsigned long tp_steps[8]={3,2,1,0,1,2,3,4};
 
 void Movable::DrawTargetPoint(Region &vp)
 {
