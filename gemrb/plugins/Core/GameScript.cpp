@@ -745,7 +745,7 @@ static const ActionLink actionnames[] = {
 	{"setbeeninpartyflags", GameScript::SetBeenInPartyFlags, 0},
 	{"setbestweapon", GameScript::SetBestWeapon, 0},
 	{"setcorpseenabled", GameScript::AmbientActivate, 0},//another weird name
-	{"setcreatureareaflags", GameScript::SetCreatureAreaFlags, 0},
+	{"setcreatureareaflag", GameScript::SetCreatureAreaFlag, 0},
 	{"setcriticalpathobject", GameScript::SetCriticalPathObject, 0},
 	{"setdialog", GameScript::SetDialogue,0},
 	{"setdialogrange", GameScript::SetDialogueRange, 0},

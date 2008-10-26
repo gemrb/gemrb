@@ -3253,7 +3253,7 @@ void GameScript::SetBeenInPartyFlags(Scriptable* Sender, Action* /*parameters*/)
 }
 
 /*iwd2 sets the high MC bits this way*/
-void GameScript::SetCreatureAreaFlags(Scriptable* Sender, Action* parameters)
+void GameScript::SetCreatureAreaFlag(Scriptable* Sender, Action* parameters)
 {
 	if (Sender->Type != ST_ACTOR) {
 		return;
