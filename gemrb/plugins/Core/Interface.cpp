@@ -4105,16 +4105,44 @@ void Interface::DisplayString(const char* Text) const
 		ta->AppendText( Text, -1 );
 }
 
+#define PALSIZE 8
+static Color ActorColor[PALSIZE];
 static const char* DisplayFormatName = "[color=%lX]%s - [/color][p][color=%lX]%s[/color][/p]";
 static const char* DisplayFormatAction = "[color=%lX]%s - [/color][p][color=%lX]%s %s[/color][/p]";
 static const char* DisplayFormat = "[/color][p][color=%lX]%s[/color][/p]";
 static const char* DisplayFormatValue = "[/color][p][color=%lX]%s: %d[/color][/p]";
+static const char* DisplayFormatNameString = "[color=%lX]%s - [/color][p][color=%lX]%s: %s[/color][/p]";
 
 ieStrRef Interface::GetStringReference(int stridx) const
 {
 	return strref_table[stridx];
 }
 
+
+unsigned int Interface::GetSpeakerColor(const char *&name, Scriptable *&speaker) const
+{
+	unsigned int speaker_color;
+
+	switch (speaker->Type) {
+		case ST_ACTOR:
+			name = ((Actor *) speaker)->GetName(-1);
+			GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR), PALSIZE, ActorColor );
+			speaker_color = (ActorColor[4].r<<16) | (ActorColor[4].g<<8) | ActorColor[4].b;
+			break;
+		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
+			name = GetString( ((InfoPoint *) speaker)->DialogName );
+			speaker_color = 0xc0c0c0;
+			break;
+		default:
+			name = "";
+			speaker_color = 0x800000;
+			break;
+	}
+	return speaker_color;
+}
+
+
+//simply displaying a constant string
 void Interface::DisplayConstantString(int stridx, unsigned int color) const
 {
 	if (stridx<0) return;
@@ -4133,12 +4161,14 @@ void Interface::DisplayString(int stridx, unsigned int color, ieDword flags) con
 	char* text = GetString( stridx, flags);
 	int newlen = (int)(strlen( DisplayFormat) + strlen( text ) + 10);
 	char* newstr = ( char* ) malloc( newlen );
-	sprintf( newstr, DisplayFormat, color, text );
+	snprintf( newstr, newlen, DisplayFormat, color, text );
 	FreeString( text );
 	DisplayString( newstr );
 	free( newstr );
 }
 
+// String format is
+// blah : whatever
 void Interface::DisplayConstantStringValue(int stridx, unsigned int color, ieDword value) const
 {
 	if (stridx<0) return;
@@ -4151,36 +4181,44 @@ void Interface::DisplayConstantStringValue(int stridx, unsigned int color, ieDwo
 	free( newstr );
 }
 
-#define PALSIZE 8
-static Color ActorColor[PALSIZE];
+// String format is
+// <charname> - blah blah : whatever
+void Interface::DisplayConstantStringNameString(int stridx, unsigned int color, int stridx2, Scriptable *actor) const
+{
+	unsigned int actor_color;
+	const char *name;
 
+	if (stridx<0) return;
+	actor_color = GetSpeakerColor(name, actor);
+	char* text = GetString( strref_table[stridx], IE_STR_SOUND );
+	char* text2 = GetString( strref_table[stridx2], IE_STR_SOUND );
+	int newlen = (int)(strlen( DisplayFormat ) + strlen(name) + strlen( text ) + strlen(text2) + 18);
+	char* newstr = ( char* ) malloc( newlen );
+	if (strlen(text2)) {
+		snprintf( newstr, newlen, DisplayFormatNameString, actor_color, name, color, text, text2 );
+	} else {
+		snprintf( newstr, newlen, DisplayFormatName, color, name, color, text );
+	}
+	FreeString( text );
+	FreeString( text2 );
+	DisplayString( newstr );
+	free( newstr );
+}
+
+// String format is
+// <charname> - blah blah
 void Interface::DisplayConstantStringName(int stridx, unsigned int color, Scriptable *speaker) const
 {
 	unsigned int speaker_color;
 	const char *name;
 
 	if (stridx<0) return;
-	switch (speaker->Type) {
-		case ST_ACTOR:
-			name = ((Actor *) speaker)->GetName(-1);
-			GetPalette( ((Actor *) speaker)->GetStat(IE_MAJOR_COLOR), PALSIZE, ActorColor );
-			speaker_color = (ActorColor[4].r<<16) | (ActorColor[4].g<<8) | ActorColor[4].b;
-			break;
-		case ST_TRIGGER: case ST_PROXIMITY: case ST_TRAVEL:
-			name = GetString( ((InfoPoint *) speaker)->DialogName );
-			speaker_color = 0xc0c0c0;
-			break;
-		default:
-			name = "";
-			speaker_color = 0x800000;
-			break;
-	}
-
+	speaker_color = GetSpeakerColor(name, speaker);
 	char* text = GetString( strref_table[stridx], IE_STR_SOUND|IE_STR_SPEECH );
 	int newlen = (int)(strlen( DisplayFormatName ) + strlen( name ) +
 		+ strlen( text ) + 18);
 	char* newstr = ( char* ) malloc( newlen );
-	sprintf( newstr, DisplayFormatName, speaker_color, name, color,
+	snprintf( newstr, newlen, DisplayFormatName, speaker_color, name, color,
 		text );
 	FreeString( text );
 	DisplayString( newstr );
@@ -4194,6 +4232,10 @@ void Interface::DisplayConstantStringAction(int stridx, unsigned int color, Scri
 	const char *name2;
 
 	if (stridx<0) return;
+
+	GetSpeakerColor(name2, target);
+	attacker_color = GetSpeakerColor(name1, attacker);
+/*
 	switch (attacker->Type) {
 		case ST_ACTOR:
 			name1 = ((Actor *) attacker)->GetName(-1);
@@ -4213,12 +4255,12 @@ void Interface::DisplayConstantStringAction(int stridx, unsigned int color, Scri
 			name2 = "";
 			break;
 	}
-
+*/
 	char* text = GetString( strref_table[stridx], IE_STR_SOUND|IE_STR_SPEECH );
 	int newlen = (int)(strlen( DisplayFormatAction ) + strlen( name1 ) +
 		+ strlen( name2 ) + strlen( text ) + 18);
 	char* newstr = ( char* ) malloc( newlen );
-	sprintf( newstr, DisplayFormatAction, attacker_color, name1, color,
+	snprintf( newstr, newlen, DisplayFormatAction, attacker_color, name1, color,
 		text, name2);
 	FreeString( text );
 	DisplayString( newstr );
@@ -4251,8 +4293,7 @@ void Interface::DisplayStringName(int stridx, unsigned int color, Scriptable *sp
 	int newlen = (int)(strlen( DisplayFormatName ) + strlen( name ) +
 		+ strlen( text ) + 10);
 	char* newstr = ( char* ) malloc( newlen );
-	sprintf( newstr, DisplayFormatName, speaker_color, name, color,
-		text );
+	snprintf( newstr, newlen, DisplayFormatName, speaker_color, name, color, text );
 	FreeString( text );
 	DisplayString( newstr );
 	free( newstr );

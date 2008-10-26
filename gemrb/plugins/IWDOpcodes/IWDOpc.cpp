@@ -22,6 +22,7 @@
 #include "../../includes/win32def.h"
 #include "../../includes/overlays.h"
 #include "../../includes/opcode_params.h"
+#include "../../includes/ie_feats.h" //cannot avoid declaring these
 #include "../Core/Actor.h"
 #include "../Core/EffectQueue.h"
 #include "../Core/Interface.h"
@@ -2397,6 +2398,10 @@ seconds:
 }
 
 //417 AreaEffect
+//move these flags to a header file if used by elsewhere
+#define AE_REPEAT     1
+#define AE_TARGETEXCL 2
+
 int fx_area_effect (Actor* Owner, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_area_effect (%2d) Type: %d\n", fx->Opcode, fx->Parameter2);
@@ -2410,11 +2415,12 @@ int fx_area_effect (Actor* Owner, Actor* target, Effect* fx)
 
 	EffectQueue *fxqueue = spell->GetEffectBlock(0);
 	fxqueue->SetOwner(Owner);
-	fxqueue->AffectAllInRange(target->GetCurrentArea(), pos, 0, 0,fx->Parameter1, target);
-
+	//bit 2 original target is excluded or not excluded
+	fxqueue->AffectAllInRange(target->GetCurrentArea(), pos, 0, 0,fx->Parameter1, fx->Parameter2&AE_TARGETEXCL?target:NULL);
 	delete fxqueue;
 
-	if (fx->Parameter2&1) {
+	//bit 1 repeat or only once
+	if (fx->Parameter2&AE_REPEAT) {
 		 return FX_APPLIED;
 	}
 	return FX_NOT_APPLIED;
@@ -2978,38 +2984,94 @@ int fx_bane (Actor* /*Owner*/, Actor* target, Effect* fx)
 }
 
 //453 PowerAttack
+static EffectRef fx_expertise_ref={"Expertise",NULL,-1};
+
 int fx_power_attack (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_power_attack (%2d)\n", fx->Opcode);
-	if (target->SetSpellState( SS_POWERATTACK)) return FX_APPLIED;
-	//TODO:
+
+	if (fx->FirstApply) {
+		if (target->HasSpellState(SS_EXPERTISE)) {
+			//stopped using feat: Expertise
+			target->fxqueue.RemoveAllEffects(fx_expertise_ref);
+		}
+	}
+	unsigned int x;
+        x = target->GetFeat(FEAT_POWER_ATTACK);
+	if (x>5) x=5;
+	for(unsigned int i = 0;i<5;i++) {
+		if (i<x) {
+			target->SetSpellState( SS_POWERATTACK);
+		} else {
+			//FIXME: doubt we need UnSetSpellState
+			//target->UnSetSpellState(SS_POWERATTACK+x);
+		}
+	}
 	return FX_APPLIED;
 }
 
 //454 Expertise
+static EffectRef fx_powerattack_ref={"PowerAttack",NULL,-1};
+
 int fx_expertise (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
+//expertise feat:
+//convert positive base attack bonus into AC (dodge bonus)
+//up to feat_expertise count (player's choice)
 	if (0) printf( "fx_expertise (%2d)\n", fx->Opcode);
-	if (target->SetSpellState( SS_EXPERTISE)) return FX_APPLIED;
-	//TODO:
+	if (fx->FirstApply) {
+		if (target->HasSpellState(SS_POWERATTACK)) {
+			target->fxqueue.RemoveAllEffects(fx_powerattack_ref);
+		}
+	}
+	unsigned int x;
+
+        x = target->GetFeat(FEAT_EXPERTISE);
+	if (x>5) x=5;
+	for(unsigned int i = 0;i<5;i++) {
+		if (i<x) {
+			target->SetSpellState(SS_EXPERTISE+x);
+		} else {
+			//FIXME: doubt we need UnSetSpellState
+			//target->UnSetSpellState(SS_EXPERTISE+x);
+		}
+	}
 	return FX_APPLIED;
 }
 
 //455 ArterialStrike
+static EffectRef fx_hamstring_ref={"HamString",NULL,-1};
+
 int fx_arterial_strike (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_arterial_strike (%2d)\n", fx->Opcode);
-	if (target->SetSpellState( SS_ARTERIAL)) return FX_APPLIED;
-	//TODO:
+	if (fx->FirstApply) {
+		if (target->HasSpellState(SS_HAMSTRING)) {
+			target->fxqueue.RemoveAllEffects(fx_hamstring_ref);
+		}
+	}
+	if (target->SetSpellState( SS_ARTERIAL)) {
+		//TODO:display using feat arterial strike
+		return FX_APPLIED;
+	}
 	return FX_APPLIED;
 }
 
 //456 HamString
+static EffectRef fx_arterialstrike_ref={"ArterialStrike",NULL,-1};
+
 int fx_hamstring (Actor* /*Owner*/, Actor* target, Effect* fx)
 {
 	if (0) printf( "fx_hamstring (%2d)\n", fx->Opcode);
-	if (target->SetSpellState( SS_HAMSTRING)) return FX_APPLIED;
-	//TODO:
+	if (fx->FirstApply) {
+		if (target->HasSpellState(SS_ARTERIAL)) {
+			target->fxqueue.RemoveAllEffects(fx_arterialstrike_ref);
+		}
+	}
+	if (target->SetSpellState( SS_HAMSTRING)) {
+		//TODO:display using feat hamstring
+		return FX_APPLIED;
+	}
 	return FX_APPLIED;
 }
 

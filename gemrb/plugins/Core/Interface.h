@@ -395,10 +395,14 @@ public:
 	TextArea *GetMessageTextArea() const;
 	/** returns a string reference from a string reference index constant*/
 	ieStrRef GetStringReference(int stridx) const;
+	/** returns the speaker's color and name */
+	unsigned int GetSpeakerColor(const char *&name, Scriptable *&speaker) const;
 	/** displays any string in the textarea */
 	void DisplayString(const char *txt) const;
 	/** displays a string constant in the textarea */
 	void DisplayConstantString(int stridx, unsigned int color) const;
+	/** displays actor name - action : parameter */
+	void DisplayConstantStringNameString(int stridx, unsigned int color, int stridx2, Scriptable *actor) const;
 	/** displays a string constant followed by a number in the textarea */
 	void DisplayConstantStringValue(int stridx, unsigned int color, ieDword value) const;
 	/** displays a string constant in the textarea, starting with speaker's name */
