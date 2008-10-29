@@ -911,6 +911,10 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 int GameControl::GetCursorOverDoor(Door *overDoor)
 {
 	overDoor->Highlight = true;
+	if (overDoor->TrapDetected && overDoor->Trapped) {
+		overDoor->outlineColor = red;
+		return IE_CURSOR_TRAP;
+	}
 	overDoor->outlineColor = cyan;
 	if (overDoor->Flags & DOOR_LOCKED) {
 		return IE_CURSOR_LOCK;
@@ -1100,7 +1104,11 @@ void GameControl::TryToPick(Actor *source, Door *tgt)
 
 	source->ClearPath();
 	source->ClearActions();
-	snprintf(Tmp, sizeof(Tmp), "PickLock(\"%s\")", tgt->GetScriptName() );
+	if (tgt->TrapDetected) {
+		snprintf(Tmp, sizeof(Tmp), "RemoveTraps(\"%s\")", tgt->GetScriptName() );
+	} else {
+		snprintf(Tmp, sizeof(Tmp), "PickLock(\"%s\")", tgt->GetScriptName() );
+	}
 	source->AddAction( GenerateAction( Tmp ) );
 }
 
@@ -1110,7 +1118,11 @@ void GameControl::TryToPick(Actor *source, Container *tgt)
 
 	source->ClearPath();
 	source->ClearActions();
-	snprintf(Tmp, sizeof(Tmp), "PickLock(\"%s\")", tgt->GetScriptName() );
+	if (tgt->TrapDetected) {
+		snprintf(Tmp, sizeof(Tmp), "RemoveTraps(\"%s\")", tgt->GetScriptName() );
+	} else {
+		snprintf(Tmp, sizeof(Tmp), "PickLock(\"%s\")", tgt->GetScriptName() );
+	}
 	source->AddAction( GenerateAction( Tmp ) );
 }
 
@@ -1246,7 +1258,7 @@ void GameControl::HandleContainer(Container *container, Actor *actor)
 		return;
 	}
 
-	if (target_mode&TARGET_MODE_PICK) {
+	if ((target_mode&TARGET_MODE_PICK) || container->TrapDetected) {
 		TryToPick(actor, container);
 		return;
 	}
@@ -1273,7 +1285,7 @@ void GameControl::HandleDoor(Door *door, Actor *actor)
 		return;
 	}
 
-	if (target_mode&TARGET_MODE_PICK) {
+	if ( (target_mode&TARGET_MODE_PICK) || door->TrapDetected) {
 		TryToPick(actor, door);
 		return;
 	}

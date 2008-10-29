@@ -1981,6 +1981,87 @@ void GameScript::SetDoorFlag(Scriptable* Sender, Action* parameters)
 	}
 }
 
+void GameScript::RemoveTraps(Scriptable* Sender, Action* parameters)
+{
+	//only actors may try to pick a lock
+	if (Sender->Type != ST_ACTOR) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	Scriptable* tar = GetActorFromObject( Sender, parameters->objects[1] );
+	if (!tar) {
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	unsigned int distance;
+	Point *p, *otherp;
+	Door *door = NULL;
+	Container *container = NULL;
+	InfoPoint *trigger = NULL;
+	ScriptableType type = tar->Type;
+	ieDword flags;
+
+	switch (type) {
+	case ST_DOOR:
+		door = ( Door* ) tar;
+		if (door->IsOpen()) {
+			//door is already open
+			Sender->ReleaseCurrentAction();
+			return;
+		}
+		p = door->toOpen;
+		otherp = door->toOpen+1;
+		distance = FindNearPoint( Sender, p, otherp);
+		flags = door->Trapped && door->TrapDetected;
+		break;
+	case ST_CONTAINER:
+		container = (Container *) tar;
+		p = &container->Pos;
+		otherp = p;
+		distance = Distance(*p, Sender);
+		flags = container->Trapped && container->TrapDetected;
+		break;
+	case ST_PROXIMITY:
+		trigger = (InfoPoint *) tar;
+		distance = Distance(tar, Sender);
+		flags = trigger->Trapped && trigger->TrapDetected;
+		break;
+	default:
+		Sender->ReleaseCurrentAction();
+		return;
+	}
+	Actor * actor = (Actor *) Sender;
+	actor->SetOrientation( GetOrient( *otherp, actor->Pos ), false);
+	if (distance <= MAX_OPERATING_DISTANCE) {
+		if (flags) {
+			switch(type) {
+			case ST_DOOR:
+printf("RemoveTraps on door\n");
+				door->TryDisarm(actor);
+				break;
+			case ST_CONTAINER:
+printf("RemoveTraps on container\n");
+				container->TryDisarm(actor);
+				break;
+			case ST_PROXIMITY:
+printf("RemoveTraps on trap\n");
+				trigger->TryDisarm(actor);
+				break;
+			default:
+				//not gonna happen!
+				assert(false);
+			}
+		} else {
+			//no trap here
+			//core->DisplayString(STR_NOT_TRAPPED);
+		}
+	} else {
+		GoNearAndRetry(Sender, *p, MAX_OPERATING_DISTANCE);
+	}
+	Sender->SetWait(1);
+	Sender->ReleaseCurrentAction();
+}
+
 void GameScript::PickLock(Scriptable* Sender, Action* parameters)
 {
 	//only actors may try to pick a lock

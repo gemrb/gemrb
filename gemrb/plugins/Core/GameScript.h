@@ -1257,6 +1257,7 @@ public:
 	static void RemovePaladinHood(Scriptable* Sender, Action* parameters);
 	static void RemoveRangerHood(Scriptable* Sender, Action* parameters);
 	static void RemoveSpell(Scriptable* Sender, Action* parameters);
+	static void RemoveTraps(Scriptable* Sender, Action* parameters);
 	static void ReputationInc(Scriptable* Sender, Action* parameters);
 	static void ReputationSet(Scriptable* Sender, Action* parameters);
 	static void RestorePartyLocation(Scriptable *Sender, Action* parameters);

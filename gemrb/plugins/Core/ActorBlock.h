@@ -458,6 +458,7 @@ public:
 	void SetDoorOpen(bool Open, bool playsound, ieDword ID);
 	void SetPolygon(bool Open, Gem_Polygon* poly);
 	bool IsOpen() const;
+	void TryDisarm(Actor *actor);
 	void TryPickLock(Actor *actor);
 	void DebugDump();
 };
@@ -478,6 +479,7 @@ public:
 	//returns dithering option
 	int WantDither();
 	bool IsOpen() const;
+	void TryDisarm(Actor *actor);
 	void TryPickLock(Actor *actor);
 	void DebugDump();
 private:
@@ -506,6 +508,7 @@ class GEM_EXPORT InfoPoint : public Highlightable {
 public:
 	InfoPoint(void);
 	~InfoPoint(void);
+	void TryDisarm(Actor *actor);
 	//detect trap, set skill to 256 if you want sure fire
 	void DetectTrap(int skill);
 	//returns true if trap is visible, only_detected must be true

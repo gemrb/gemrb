@@ -1430,6 +1430,16 @@ void Door::SetPolygon(bool Open, Gem_Polygon* poly)
 	}
 }
 
+void Door::TryDisarm(Actor *actor)
+{
+//first lets do this automatically succeeding
+//TODO: skill check, set off
+	Trapped = 0;
+	TrapDetected = 0;
+	LastDisarmed = actor->GetID();
+	ImmediateEvent();
+}
+
 void Door::TryPickLock(Actor *actor)
 {
 	if (Trapped) {
@@ -1521,6 +1531,16 @@ int InfoPoint::CheckTravel(Actor *actor)
 		return CT_SELECTED;
 	}
 	return CT_ACTIVE;
+}
+
+void InfoPoint::TryDisarm(Actor *actor)
+{
+//first lets do this automatically succeeding
+//TODO: skill check, set off
+	Trapped = 0;
+	TrapDetected = 0;
+	LastDisarmed = actor->GetID();
+	ImmediateEvent();
 }
 
 //detect this trap, using a skill, skill could be set to 256 for 'sure'
@@ -1626,7 +1646,7 @@ void InfoPoint::DebugDump()
 			break;
 	}
 	printf( "TrapDetected: %d, Trapped: %s\n", TrapDetected, YESNO(Trapped));
-	printf( "Trap detection: %d, Trap removal: %d\n", TrapDetectionDiff,
+	printf( "Trap detection: %d%%, Trap removal: %d%%\n", TrapDetectionDiff,
 		TrapRemovalDiff );
 	const char *name = "NONE";
 	if (Scripts[0]) {
@@ -1818,6 +1838,16 @@ bool Container::IsOpen() const
 	return true;
 }
 
+void Container::TryDisarm(Actor *actor)
+{
+//first lets do this automatically succeeding
+//TODO: skill check, set off
+	Trapped = 0;
+	TrapDetected = 0;
+	LastDisarmed = actor->GetID();
+	ImmediateEvent();
+}
+
 void Container::TryPickLock(Actor *actor)
 {
 	if (Trapped) {
@@ -1851,8 +1881,8 @@ void Container::DebugDump()
 {
 	printf( "Debugdump of Container %s\n", GetScriptName() );
 	printf( "Type: %d,  LockDifficulty: %d\n", Type, LockDifficulty );
-	printf( "Flags: %d, Trapped: %d\n", Flags, Trapped );
-	printf( "Trap detection: %d, Trap removal: %d\n", TrapDetectionDiff,
+	printf( "Flags: %d, Trapped: %s, Detected: %d\n", Flags, YESNO(Trapped), TrapDetected );
+	printf( "Trap detection: %d%%, Trap removal: %d%%\n", TrapDetectionDiff,
 		TrapRemovalDiff );
 	const char *name = "NONE";
 	if (Scripts[0]) {

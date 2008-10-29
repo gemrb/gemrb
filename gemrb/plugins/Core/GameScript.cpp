@@ -708,6 +708,7 @@ static const ActionLink actionnames[] = {
 	{"removepaladinhood", GameScript::RemovePaladinHood, 0},
 	{"removerangerhood", GameScript::RemoveRangerHood, 0},
 	{"removespell", GameScript::RemoveSpell, 0},
+	{"removetraps", GameScript::RemoveTraps, AF_BLOCKING},
 	{"reputationinc", GameScript::ReputationInc, 0},
 	{"reputationset", GameScript::ReputationSet, 0},
 	{"resetfogofwar", GameScript::UndoExplore, 0}, //pst
