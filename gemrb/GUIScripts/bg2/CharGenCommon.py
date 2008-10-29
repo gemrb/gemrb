@@ -291,6 +291,9 @@ def CancelPress():
 
 	step = GemRB.GetVar ("Step")
 	if step == 1:
+		#free up the slot before exiting
+		MyChar = GemRB.GetVar ("Slot")
+		GemRB.CreatePlayer ("", MyChar | 0x8000 )
 		GemRB.SetNextScript ("Start")
 	else:
 		GemRB.SetNextScript ("CharGen")
