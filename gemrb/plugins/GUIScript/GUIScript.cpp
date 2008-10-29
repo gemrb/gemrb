@@ -4229,7 +4229,7 @@ static PyObject* GemRB_GetINIPartyKey(PyObject * /*self*/, PyObject* args)
 
 PyDoc_STRVAR( GemRB_CreatePlayer__doc,
 "CreatePlayer(CREResRef, Slot [,Import] ) => PlayerSlot\n\n"
-"Creates a player slot. If import is nonzero, then reads a CHR instead of a CRE." );
+"Creates or removes a player character in a given party slot. If import is nonzero, then reads a CHR instead of a CRE." );
 
 static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 {
@@ -4254,13 +4254,17 @@ static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 		if (PlayerSlot >= 0) {
 			game->DelPC(PlayerSlot, true);
 		}
-		PlayerSlot = core->LoadCreature( CreResRef, Slot, (bool) Import );
 	} else {
 		PlayerSlot = game->FindPlayer( PlayerSlot );
 		if (PlayerSlot >= 0) {
 			return RuntimeError("Slot is already filled!");
 		}
-		PlayerSlot = core->LoadCreature( CreResRef, Slot, (bool) Import ); //inparty flag
+	}
+	if (CreResRef[0]) {
+		PlayerSlot = core->LoadCreature( CreResRef, Slot, (bool) Import );
+	} else {
+		//just destroyed the previous actor, not going to create one
+		PlayerSlot = 0;
 	}
 	if (PlayerSlot < 0) {
 		return RuntimeError("File not found!");

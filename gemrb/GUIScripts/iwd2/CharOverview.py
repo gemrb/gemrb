@@ -222,6 +222,9 @@ def NextPress():
 	return
 
 def CancelPress():
+	#destroy the half generated character
+	slot = GemRB.GetVar("Slot")
+	GemRB.CreatePlayer("", slot|0x8000)
 	GemRB.UnloadWindow(CharGenWindow)
 	GemRB.UnloadWindow(StartOverWindow)
 	GemRB.SetNextScript('SPPartyFormation')
