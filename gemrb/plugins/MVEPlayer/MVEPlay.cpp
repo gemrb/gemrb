@@ -226,7 +226,7 @@ int MVEPlay::setAudioStream()
 
 void MVEPlay::freeAudioStream(int stream)
 {
-    core->GetAudioDrv()->ReleaseStream(stream);
+    core->GetAudioDrv()->ReleaseStream(stream, true);
 }
 
 void MVEPlay::queueBuffer(int stream, unsigned short bits,
