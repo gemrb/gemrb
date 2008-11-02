@@ -201,7 +201,12 @@ void CREImp::WriteChrHeader(DataStream *stream, Actor *act)
 	for (i=0;i<QSPCount;i++) {
 		stream->WriteResRef (act->PCStats->QuickSpells[i]);
 	}
+	//This is 9 for IWD2 and GemRB
 	if (QSPCount==9) {
+		//NOTE: the gemrb internal format stores
+		//0xff or 0xfe in case of innates and bardsongs
+		//if IWD2 doesn't tolerate this, then this field
+		//should be sanitized for IWD2 (not for GemRB)
 		stream->Write( act->PCStats->QuickSpellClass,9);
 		tmpByte = 0;
 		stream->Write( &tmpByte, 1);
@@ -216,15 +221,25 @@ void CREImp::WriteChrHeader(DataStream *stream, Actor *act)
 	}
 	switch (CREVersion) {
 	case IE_CRE_V2_2:
-		//IWD2 quick innates are saved elsewhere, redundantly
+		//gemrb format doesn't save these redundantly
 		for (i=0;i<QSPCount;i++) {
-			stream->WriteResRef (act->PCStats->QuickSpells[i]);
+			if (act->PCStats->QuickSpellClass[i]==0xff) {
+				stream->WriteResRef (act->PCStats->QuickSpells[i]);
+			} else {
+				//empty field
+				stream->Write( Signature, 8);
+			}
+		}
+		for (i=0;i<QSPCount;i++) {
+			if (act->PCStats->QuickSpellClass[i]==0xfe) {
+				stream->WriteResRef (act->PCStats->QuickSpells[i]);
+			} else {
+				//empty field
+				stream->Write( Signature, 8);
+			}
 		}
 		//fallthrough
 	case IE_CRE_GEMRB:
-		for (i=0;i<18;i++) {
-			stream->WriteDword( &tmpDword);
-		}
 		for (i=0;i<QSPCount;i++) {
 			tmpDword = act->PCStats->QSlots[i];
 			stream->WriteDword( &tmpDword);

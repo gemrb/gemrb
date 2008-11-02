@@ -339,20 +339,33 @@ Actor* GAMImp::GetActor( ActorMgr* aM, bool is_in_party )
 		}
 		pcInfo.QuickItemHeader[3]=0xffff;
 		pcInfo.QuickItemHeader[4]=0xffff;
-		//innates, we spare some memory and time by storing them in the
-		//same place
 		if (version == GAM_VER_IWD2) {
+			//quick innates
+			//we spare some memory and time by storing them in the same place
+			//this may be slightly buggy because IWD2 doesn't clear the
+			//fields, but QuickSpellClass is set correctly, problem is
+			//that GemRB doesn't clear QuickSpellClass
 			for (i = 0; i < MAX_QSLOTS; i++) {
 				str->Read( &tmp[i], 8 );
 				if ((tmp[0]!=0) && (pcInfo.QuickSpellResRef[0]==0)) {
 					memcpy( pcInfo.QuickSpellResRef[i], tmp, 8);
+					//innates
 					pcInfo.QuickSpellClass[i]=0xff;
+				}
+			}
+			//recently discovered fields (bard songs)
+			//str->Seek( 72, GEM_CURRENT_POS);
+			for(i = 0; i<MAX_QSLOTS;i++) {
+				str->Read( &tmp[i], 8 );
+				if ((tmp[0]!=0) && (pcInfo.QuickSpellResRef[0]==0)) {
+					memcpy( pcInfo.QuickSpellResRef[i], tmp, 8);
+					//bardsongs
+					pcInfo.QuickSpellClass[i]=0xfe;
 				}
 			}
 		}
 		//QuickSlots are customisable in iwd2 and GemRB
 		//thus we adopt the iwd2 style actor info
-		str->Seek( 72, GEM_CURRENT_POS);
 		for (i=0;i<MAX_QSLOTS;i++) {
 			str->ReadDword( &tmpDword );
 			pcInfo.QSlots[i] = (ieByte) tmpDword;
@@ -805,15 +818,23 @@ int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CRE
 	//quickspells
 	if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
 		for (i=0;i<MAX_QSLOTS;i++) {
-			if (ac->PCStats->QuickSpellClass[i]==0xff) {
+			if ( (ieByte) ac->PCStats->QuickSpellClass[i]>=0xfe) {
 				stream->Write(filling,8);
 			} else {
 				stream->Write(ac->PCStats->QuickSpells[i],8);
 			}
 		}
-		//quick spell classes
-		stream->Write(ac->PCStats->QuickSpellClass,MAX_QSLOTS);
-		stream->Write(filling,1);
+		//quick spell classes, clear the field for iwd2 if it is
+		//a bard song/innate slot (0xfe or 0xff)
+		memcpy(filling, ac->PCStats->QuickSpellClass, MAX_QSLOTS);
+		if (version==GAM_VER_IWD2) {
+			for(i=0;i<MAX_QSLOTS;i++) {
+				if((ieByte) filling[i]>=0xfe) {
+					filling[i]=0;
+				}
+			}
+		}
+		stream->Write(filling,10);
 	} else {
 		for (i=0;i<3;i++) {
 			stream->Write(ac->PCStats->QuickSpells[i],8);
@@ -840,19 +861,22 @@ int GAMImp::PutActor(DataStream *stream, Actor *ac, ieDword CRESize, ieDword CRE
 		break;
 	}
 
-	//innates
+	//innates, bard songs and quick slots are saved only in iwd2
 	if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
 		for (i=0;i<MAX_QSLOTS;i++) {
-			if (ac->PCStats->QuickSpellClass[i]==0xff) {
+			if ( (ieByte) ac->PCStats->QuickSpellClass[i]==0xff) {
 				stream->Write(ac->PCStats->QuickSpells[i],8);
 			} else {
 				stream->Write(filling,8);
 			}
 		}
-	}
-
-	if (version==GAM_VER_IWD2 || version==GAM_VER_GEMRB) {
-		stream->Write( filling, 72);
+		for (i=0;i<MAX_QSLOTS;i++) {
+			if ((ieByte) ac->PCStats->QuickSpellClass[i]==0xfe) {
+				stream->Write(ac->PCStats->QuickSpells[i],8);
+			} else {
+				stream->Write(filling,8);
+			}
+		}
 		for (i=0;i<MAX_QSLOTS;i++) {
 			tmpDword = ac->PCStats->QSlots[i];
 			stream->WriteDword( &tmpDword);
