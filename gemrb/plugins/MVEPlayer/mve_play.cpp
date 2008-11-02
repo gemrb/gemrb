@@ -666,9 +666,9 @@ void MVE_rmEndMovie()
 #ifdef AUDIO
 	//free_audio_source();
 	if (mve_audio_memory) {
-            mve_freeaudiostream( mve_audio_source );
-	        mve_free( mve_audio_memory );
-	        mve_audio_memory = NULL;
+		mve_freeaudiostream( mve_audio_source );
+		mve_free( mve_audio_memory );
+		mve_audio_memory = NULL;
 	}
 
 	mve_audio_source = 0;
