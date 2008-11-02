@@ -347,9 +347,10 @@ bool OpenALAudioDriver::IsSpeaking()
 void OpenALAudioDriver::UpdateVolume(unsigned int flags)
 {
 	ieDword volume;
+
 	if (flags & GEM_SND_VOL_MUSIC) {
 		SDL_mutexP( musicMutex );
-		core->GetDictionary()->Lookup("Volume Voices", volume);
+		core->GetDictionary()->Lookup("Volume Music", volume);
 		if (alIsSource(MusicSource))
 		    alSourcef(MusicSource, AL_GAIN, volume * 0.01f);
 		SDL_mutexV(musicMutex);
