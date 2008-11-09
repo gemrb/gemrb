@@ -159,7 +159,7 @@ def FinishCharGen():
 		RealSlots = [ SLOT_ARMOUR, SLOT_SHIELD, SLOT_HELM, -1, SLOT_RING, \
 					SLOT_RING, SLOT_CLOAK, SLOT_BOOT, SLOT_AMULET, SLOT_GLOVE, \
 					SLOT_BELT, SLOT_QUIVER, SLOT_QUIVER, SLOT_QUIVER, \
-					-1, -1, -1, -1, -1, SLOT_WEAPON ]
+					SLOT_ITEM, SLOT_ITEM, SLOT_ITEM, -1, -1, SLOT_WEAPON ]
 		#loop over rows - item slots
 		for slot in range(0, GemRB.GetTableRowCount (EquipmentTable)):
 			slotname = GemRB.GetTableRowName (EquipmentTable, slot)
