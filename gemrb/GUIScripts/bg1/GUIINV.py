@@ -124,20 +124,22 @@ def OpenInventoryWindow ():
 	GemRB.SetEvent (Window, Button, IE_GUI_BUTTON_ON_DRAG_DROP, "OnAutoEquip")
 
 	#encumbrance
-	Label = GemRB.CreateLabel (Window, 0x10000043, 5,385,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
-	Label = GemRB.CreateLabel (Window, 0x10000044, 5,455,80,15,"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_TOP)
+	Label = GemRB.CreateLabel (Window, 0x10000043, 14,375,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
+	Label = GemRB.CreateLabel (Window, 0x10000044, 8,445,80,15,"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_TOP)
+	#Label = GemRB.CreateLabel (Window, 0x10000043, 5,385,60,15,"NUMBER","0:",IE_FONT_ALIGN_LEFT|IE_FONT_ALIGN_TOP)
+	#Label = GemRB.CreateLabel (Window, 0x10000044, 5,455,80,15,"NUMBER","0:",IE_FONT_ALIGN_RIGHT|IE_FONT_ALIGN_TOP)
 
 	#armor class
 	Label = GemRB.GetControl (Window, 0x10000038)
-	GemRB.SetTooltip (Window, Label, 4197)
+	GemRB.SetTooltip (Window, Label, 17183)
 
 	#hp current
 	Label = GemRB.GetControl (Window, 0x10000039)
-	GemRB.SetTooltip (Window, Label, 4198)
+	GemRB.SetTooltip (Window, Label, 17184)
 
 	#hp max
 	Label = GemRB.GetControl (Window, 0x1000003a)
-	GemRB.SetTooltip (Window, Label, 4199)
+	GemRB.SetTooltip (Window, Label, 17378)
 
 	#info label, game paused, etc
 	Label = GemRB.GetControl (Window, 0x1000003f)
