@@ -127,10 +127,11 @@ int Item::UseCharge(ieWord *Charges, int header) const
 	if (header>=CHARGE_COUNTERS) {
 		header = 0;
 	}
-	ccount = --Charges[header];
+	//if the item started from 0 charges, then it isn't depleting
 	if (ieh->Charges==0) {
 		return CHG_NONE;
 	}
+	ccount = --Charges[header];
 	if (ccount>0) {
 		return CHG_NONE;
 	}

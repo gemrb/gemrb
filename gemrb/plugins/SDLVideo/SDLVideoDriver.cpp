@@ -2114,6 +2114,37 @@ Color SDLVideoDriver::SpriteGetPixelSum(Sprite2D* sprite, unsigned short xbase, 
 	return sum;
 }
 
+//both parameters must be signed for correct calculation
+Sprite2D* SDLVideoDriver::CreateLight(int radius, int intensity)
+{
+	if(!radius) return NULL;
+	Point p, q;
+	int a;
+	void* pixels = malloc( radius * radius * 4 * 4);
+	int i = 0;
+
+	for (p.y = -radius; p.y < radius; p.y++) {
+		for (p.x = -radius; p.x < radius; p.x++) {
+			a = intensity*(radius-(signed) Distance(p,q))/radius;      
+
+			if(a<0) a=0;
+			else if(a>255) a = 255;
+
+			*((unsigned char*)pixels + i++) = 255;
+			*((unsigned char*)pixels + i++) = 255;
+			*((unsigned char*)pixels + i++) = 255;
+			*((unsigned char*)pixels + i++) = (unsigned char) a/2;
+		}
+	}
+
+	Sprite2D* light = CreateSprite( radius*2, radius*2, 32, 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000, pixels);
+
+	light->XPos = radius;
+	light->YPos = radius;
+
+	return light;
+}
+
 Sprite2D* SDLVideoDriver::SpriteScaleDown( Sprite2D* sprite, unsigned int ratio )
 {
 	unsigned int Width = sprite->Width / ratio;

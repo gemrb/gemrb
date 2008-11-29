@@ -233,7 +233,11 @@ public:
 	 * is transparent.
 	 * It is used to mask clicks to non-rectangular shaped controls */
 	virtual bool IsSpritePixelTransparent(Sprite2D* sprite, unsigned short x, unsigned short y) = 0;
+	/** Scales down a sprite by a ratio */
 	virtual Sprite2D* SpriteScaleDown( Sprite2D* sprite, unsigned int ratio ) = 0;
+	/** Creates an ellipse or circle shaped sprite with various intensity
+	 *  for projectile light spots */
+	virtual Sprite2D* CreateLight(int radius, int intensity) = 0;
 	virtual void SetGamma(int brightness, int contrast) = 0;
 	virtual void SetMouseScrollSpeed(int speed) = 0;
 };

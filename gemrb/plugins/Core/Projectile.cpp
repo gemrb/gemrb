@@ -197,9 +197,7 @@ void Projectile::Setup()
 		//}
 	}
 	if (TFlags&PTF_LIGHT) {
-		//TODO: create the light spot sprite
-		//it is a per pixel blend thingie, mostly white
-		//light = CreateLight(LightX, LightY, LightZ);
+		light = core->GetVideoDriver()->CreateLight(LightX, LightZ);
 	}
 	if (TFlags&PTF_BLEND) {
 		SetBlend();
@@ -574,8 +572,11 @@ void Projectile::DrawTravel(Region &screen)
 		Sprite2D *frame = shadow[face]->NextFrame();
 		video->BlitGameSprite( frame, pos.x, pos.y, flag, tint, NULL, NULL, &screen);
 	}
+
 	if (light) {
-		video->BlitGameSprite( light, pos.x, pos.y, flag, tint, NULL, NULL, &screen);
+		//FIXME: wallgroup cover for light is not rendered correctly
+		//it is not a BAM sprite, we need a conversion?
+		video->BlitGameSprite( light, pos.x, pos.y, 0, tint, NULL, NULL, &screen);
 	}
 
 	if (SFlags&PSF_FLYING) {
