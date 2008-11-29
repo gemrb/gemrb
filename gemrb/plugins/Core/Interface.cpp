@@ -1964,14 +1964,21 @@ bool Interface::LoadConfig(const char* filename)
 
 	while (!feof( config )) {
 		char rem;
-		fread( &rem, 1, 1, config );
+
+		if (fread( &rem, 1, 1, config ) != 1)
+			break;
+
 		if (rem == '#') {
-			fscanf( config, "%*[^\r\n]%*[\r\n]" );
+			//it should always return 0
+			if (fscanf( config, "%*[^\r\n]%*[\r\n]" )!=0)
+				break;
 			continue;
 		}
 		fseek( config, -1, SEEK_CUR );
 		memset(value,'\0',_MAX_PATH + 3);
-		fscanf( config, "%64[^=]=%[^\r\n]%*[\r\n]", name, value );
+		//the * element is not counted
+		if (fscanf( config, "%64[^=]=%[^\r\n]%*[\r\n]", name, value )!=2)
+			continue;
 		for (int i=_MAX_PATH + 2; i > 0; i--) {
 			if (value[i] == '\0') continue;
 			if (value[i] == ' ') {
@@ -3641,7 +3648,10 @@ bool Interface::LoadINI(const char* filename)
 		name[0] = 0;
 		value[0] = 0;
 		char rem;
-		fread( &rem, 1, 1, config );
+
+		if (fread( &rem, 1, 1, config ) != 1)
+			break;
+
 		if (( rem == '#' ) ||
 			( rem == '[' ) ||
 			( rem == '\r' ) ||
@@ -3652,11 +3662,16 @@ bool Interface::LoadINI(const char* filename)
 				continue;
 			} else if (rem == '\n')
 				continue;
-			fscanf( config, "%*[^\r\n]%*[\r\n]" );
+
+			//it should always return zero
+			if (fscanf( config, "%*[^\r\n]%*[\r\n]" )!=0)
+				break;
 			continue;
 		}
 		fseek( config, -1, SEEK_CUR );
-		fscanf( config, "%[^=]=%[^\r\n]%*[\r\n]", name, value );
+		//the * element is not counted
+		if (fscanf( config, "%[^=]=%[^\r\n]%*[\r\n]", name, value )!=2)
+			continue;
 		if (( value[0] >= '0' ) && ( value[0] <= '9' )) {
 			vars->SetAt( name, atoi( value ) );
 		}
