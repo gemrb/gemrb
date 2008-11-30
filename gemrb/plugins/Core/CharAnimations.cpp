@@ -1799,7 +1799,7 @@ void CharAnimations::AddLR3Suffix( char* ResRef, unsigned char StanceID,
 			break;
 		case IE_ANI_ATTACK_JAB:
 			strcat( ResRef, "g2" );
-			Cycle = 16 + Orient / 2;
+			Cycle = 8 + Orient / 2;  //there is no third attack animation
 			break;
 		case IE_ANI_CAST:
 		case IE_ANI_CONJURE:
