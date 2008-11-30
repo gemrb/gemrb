@@ -121,7 +121,11 @@ def RedrawFeats():
 			else:
 				GemRB.SetButtonState(FeatWindow, ButtonPlus, IE_GUI_BUTTON_DISABLED)
 				GemRB.SetLabelTextColor(FeatWindow, Label, 150, 150, 150)
-			GemRB.SetButtonState(FeatWindow, ButtonMinus, IE_GUI_BUTTON_ENABLED)
+			BaseValue = GemRB.GetVar("BaseFeatValue " + str(Pos))
+			if FeatValue > BaseValue:
+				GemRB.SetButtonState(FeatWindow, ButtonMinus, IE_GUI_BUTTON_ENABLED)
+			else:
+				GemRB.SetButtonState(FeatWindow, ButtonMinus, IE_GUI_BUTTON_DISABLED)
 
 		if PointsLeft == 0:
 			GemRB.SetButtonState(FeatWindow, ButtonPlus, IE_GUI_BUTTON_DISABLED)
@@ -192,6 +196,7 @@ def OnLoad():
 
 	for i in range(RowCount):
 		GemRB.SetVar("Feat "+str(i), GetBaseValue(i))
+		GemRB.SetVar("BaseFeatValue " + str(i), GetBaseValue(i))
 
 	FeatLevelTable = GemRB.LoadTable("featlvl")
 	FeatClassTable = GemRB.LoadTable("featclas")
@@ -277,7 +282,8 @@ def RightPress():
 
 	GemRB.SetText(FeatWindow, TextAreaControl, GemRB.GetTableValue(FeatTable,Pos,2) )
 	ActPoint = GemRB.GetVar("Feat "+str(Pos) )
-	if ActPoint <= 0:
+	BaseValue = GemRB.GetVar("BaseFeatValue " + str(Pos))
+	if ActPoint <= 0 or ActPoint <= BaseValue:
 		return
 	GemRB.SetVar("Feat "+str(Pos),ActPoint-1)
 	PointsLeft = PointsLeft + 1
