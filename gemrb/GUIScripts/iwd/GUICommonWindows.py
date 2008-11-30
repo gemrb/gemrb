@@ -533,7 +533,7 @@ def UpdatePortraitWindow ():
 		GemRB.SetButtonPicture (Window, Button, pic, "NOPORTSM")
 		GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE | IE_GUI_BUTTON_ALIGN_TOP | IE_GUI_BUTTON_ALIGN_LEFT, OP_SET)
 		GemRB.SetButtonState (Window, Button, IE_GUI_BUTTON_ENABLED)
-		GemRB.SetButtonFont (Window, Button, 'NUMFONT')
+		GemRB.SetButtonFont (Window, Button, "NUMFONT")
 
 		GemRB.SetVarAssoc (Window, Button, "PressedPortrait", i)
 
@@ -551,7 +551,7 @@ def UpdatePortraitWindow ():
 		else:
 			GemRB.SetButtonOverlay (Window, Button, ratio, 255,0,0,200, 128,0,0,200)
 
-		#GemRB.SetText (Window, Button, "%d/%d" %(hp, hp_max))
+		GemRB.SetText (Window, Button, "%d/%d" %(hp, hp_max))
 		GemRB.SetTooltip (Window, Button, GemRB.GetPlayerName (i+1, 1) + "\n%d/%d" %(hp, hp_max))
 		if sel:
 			GemRB.EnableButtonBorder (Window, Button, FRAME_PC_SELECTED, 1)
