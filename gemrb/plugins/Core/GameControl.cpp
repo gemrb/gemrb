@@ -41,7 +41,6 @@
 #define DEBUG_SHOW_DOORS	DEBUG_SHOW_CONTAINERS
 #define DEBUG_SHOW_SEARCHMAP    0x04
 #define DEBUG_SHOW_LIGHTMAP     0x08
-#define DEBUG_XXX		0x10
 
 static const Color cyan = {
 	0x00, 0xff, 0xff, 0xff
@@ -572,16 +571,6 @@ void GameControl::OnKeyPress(unsigned char Key, unsigned short /*Mod*/)
 		case '9':
 			SelectActor(Key-'1');
 			break;
-			/*
-	case ' ':
-		DialogueFlags ^= DF_FREEZE_SCRIPTS;
-		if (DialogueFlags&DF_FREEZE_SCRIPTS) {
-			core->DisplayConstantString(STR_PAUSED,0xff0000);
-		} else {
-			core->DisplayConstantString(STR_UNPAUSED,0xff0000);
-		}
-		break;
-		*/
 	default:
 		core->GetGame()->SetHotKey(toupper(Key));
 		break;
@@ -884,6 +873,9 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 		return; //return from cheatkeys
 	}
 	switch (Key) {
+		case '\t':
+			if (DialogueFlags & DF_FREEZE_SCRIPTS) break;
+			//fallthrough
 		case ' ':
 			DialogueFlags ^= DF_FREEZE_SCRIPTS;
 	 		if (DialogueFlags&DF_FREEZE_SCRIPTS) {
@@ -898,11 +890,6 @@ void GameControl::OnKeyRelease(unsigned char Key, unsigned short Mod)
 		case GEM_ALT:
 			DebugFlags &= ~DEBUG_SHOW_CONTAINERS;
 			break;
-		case '\t':
-			//not GEM_TAB
-			DebugFlags &= ~DEBUG_XXX;
-			printf( "TAB released\n" );
-			return;
 		default:
 			break;
 	}
@@ -1617,8 +1604,7 @@ void GameControl::OnSpecialKeyPress(unsigned char Key)
 			DebugFlags |= DEBUG_SHOW_CONTAINERS;
 			return;
 		case GEM_TAB:
-			DebugFlags |= DEBUG_XXX;
-			printf( "TAB pressed\n" );
+			//no effect, i think
 			return;
 		case GEM_MOUSEOUT:
 			moveX = 0;
