@@ -7,10 +7,12 @@ VALUE     - a value which has to match the stat
 RELATION  - a symbol for the comparation to be performed
 COMMENT   - unused by GemRB, it is just a reminder
 
-Rows - spell immunity conditions
+Rows - spell immunity conditions used by some iwd effects.
 
+Stat names are coming from stats.ids
 Stats over 255 (0x100 and above) are not real stats, but either virtual stats, or
 composite conditions.
+
 
 0x100   - caster is source of the spell (spell effect won't affect self)
 0x101   - caster isn't source of the spell (spell effect won't affect others)
@@ -21,3 +23,19 @@ composite conditions.
 0x106   - area flags (outdoor, forest, etc)
 0x107   - daytime flag
 0x108   - caster and target EA relation (using the EA fields to calculate this)
+
+The relation could be
+0       - less or equal
+1       - equal
+2       - less
+3       - greater
+4       - greater or equal
+5       - not equal
+6       - binary less or equal (all bits of left side are in right side)
+7       - binary more or equal (all bits of right side are in left side)
+8       - binary intersect (left and right side has at least one common bit)
+9       - binary not intersect (left and right side has no common bits)
+10      - binary more (left side has bits that are not in right side)
+11      - binary less (right side has bits that are not in left side)
+
+See also: featreq
