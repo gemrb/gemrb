@@ -62,6 +62,7 @@ struct AudioStream {
 
     void ClearIfStopped();
     void ClearProcessedBuffers(bool del=false);
+    void ForceClear();
 };
 
 struct CacheEntry {
@@ -111,11 +112,12 @@ private:
     int num_streams;
     int CountAvailableSources(int limit);
     bool evictBuffer();
+    void clearBufferCache();
     ALenum GetFormatEnum(int channels, int bits);
-    static int MusicManager(void* args) ;
-    bool stayAlive ;
-    unsigned char* music_memory ;
-    SDL_Thread* musicThread ;
+    static int MusicManager(void* args);
+    bool stayAlive;
+    unsigned char* music_memory;
+    SDL_Thread* musicThread;
 };
 
 #endif // OPENALAUDIO_H_INCLUDED

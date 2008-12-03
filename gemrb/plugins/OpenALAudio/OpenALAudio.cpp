@@ -41,19 +41,28 @@ void AudioStream::ClearIfStopped()
 {
 	if (free || locked) return;
 
-	if (alIsSource(Source)) {
-		ALint state;
-		alGetSourcei( Source, AL_SOURCE_STATE, &state );
-		if (state == AL_STOPPED) {
-			ClearProcessedBuffers(false);
-			alDeleteSources( 1, &Source );
-			Source = 0;
-			Buffer = 0;
-			free = true;
-			ambient = false;
-			locked = false;
-		}
+	if (!alIsSource(Source)) return;
+
+	ALint state;
+	alGetSourcei( Source, AL_SOURCE_STATE, &state );
+	if (state == AL_STOPPED) {
+		ClearProcessedBuffers(false);
+		alDeleteSources( 1, &Source );
+		Source = 0;
+		Buffer = 0;
+		free = true;
+		ambient = false;
+		locked = false;
 	}
+}
+
+void AudioStream::ForceClear()
+{
+	if (!alIsSource(Source)) return;
+
+	alSourceStop(Source);
+	ClearProcessedBuffers(true);
+	ClearIfStopped();
 }
 
 OpenALAudioDriver::OpenALAudioDriver(void)
@@ -132,6 +141,13 @@ int OpenALAudioDriver::CountAvailableSources(int limit)
 
 OpenALAudioDriver::~OpenALAudioDriver(void)
 {
+	for(int i =0; i<num_streams; i++) {
+		streams[i].ForceClear();
+	}
+	speech.ForceClear();
+	ResetMusics();
+	clearBufferCache();
+
 	ALCdevice *device;
 
 	alcMakeContextCurrent (NULL);
@@ -352,7 +368,7 @@ void OpenALAudioDriver::UpdateVolume(unsigned int flags)
 		SDL_mutexP( musicMutex );
 		core->GetDictionary()->Lookup("Volume Music", volume);
 		if (alIsSource(MusicSource))
-		    alSourcef(MusicSource, AL_GAIN, volume * 0.01f);
+			alSourcef(MusicSource, AL_GAIN, volume * 0.01f);
 		SDL_mutexV(musicMutex);
 	}
 
@@ -374,9 +390,10 @@ void OpenALAudioDriver::ResetMusics()
 	if (alIsSource(MusicSource)) {
 		alSourceStop(MusicSource);
 		alDeleteSources(1, &MusicSource );
-		for (int i=0; i<2; i++) {
-		    if (alIsBuffer(MusicBuffer[i]))
-		        alDeleteBuffers(1, MusicBuffer+i);
+		MusicSource = 0;
+		for (int i=0; i<MUSICBUFFERS; i++) {
+			if (alIsBuffer(MusicBuffer[i]))
+				alDeleteBuffers(1, MusicBuffer+i);
 		}
 	}
 	SDL_mutexV( musicMutex );
@@ -430,6 +447,11 @@ int OpenALAudioDriver::StreamFile(const char* filename)
 
 	if (MusicBuffer[0] == 0) {
 		alGenBuffers( MUSICBUFFERS, MusicBuffer );
+		if( alGetError() != AL_NO_ERROR ) {
+			printMessage( "OpenAL", "Unable to create music buffers", WHITE);
+			printStatus( "ERROR", YELLOW );
+			return -1;
+		}
 	}
 
 	MusicReader = (SoundMgr*) core->GetInterface( IE_WAV_CLASS_ID );
@@ -495,15 +517,9 @@ bool OpenALAudioDriver::ReleaseStream(int stream, bool HardStop)
 
 	ALuint Source = streams[stream].Source;
 	alSourceStop(Source);
+	streams[stream].ClearIfStopped();
 
-	streams[stream].ClearProcessedBuffers(false);
-	alDeleteSources(1, &streams[stream].Source);
-	streams[stream].Source = 0;
-	streams[stream].free = true;
-	streams[stream].ambient = false;
-	streams[stream].locked = false;
-
-   	return true;
+	return true;
 }
 
 //This one is used for movies and ambients.
@@ -608,6 +624,23 @@ bool OpenALAudioDriver::evictBuffer()
 	}
 
 	return res;
+}
+
+void OpenALAudioDriver::clearBufferCache()
+{
+	// Room for optimization: any method of iterating over the buffers
+	// would suffice. It doesn't have to be in LRU-order.
+	void* p;
+	const char* k;
+	int n = 0;
+	while (buffercache.getLRU(n, k, p)) {
+		CacheEntry* e = (CacheEntry*)p;
+		alDeleteBuffers(1, &e->Buffer);
+		if (alGetError() == AL_NO_ERROR)
+			buffercache.Remove(k);
+		else
+			++n;
+	}
 }
 
 ALenum OpenALAudioDriver::GetFormatEnum(int channels, int bits)
