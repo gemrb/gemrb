@@ -207,7 +207,7 @@ def UpdateActionsWindow ():
 	if ActionsWindow == -1:
 		return
 
-	if ActionsWindow == None:
+	if ActionsWindow is None:
 		return
 
 	#fully redraw the side panes to cover the actions window
@@ -553,10 +553,7 @@ def UpdatePortraitWindow ():
 
 		GemRB.SetText (Window, Button, "%d/%d" %(hp, hp_max))
 		GemRB.SetTooltip (Window, Button, GemRB.GetPlayerName (i+1, 1) + "\n%d/%d" %(hp, hp_max))
-		if sel:
-			GemRB.EnableButtonBorder (Window, Button, FRAME_PC_SELECTED, 1)
-		else:
-			GemRB.EnableButtonBorder (Window, Button, FRAME_PC_SELECTED, 0)
+		GemRB.EnableButtonBorder (Window, Button, FRAME_PC_SELECTED, sel)
 	return
 
 def PortraitButtonOnPress ():
@@ -695,13 +692,11 @@ def SetEncumbranceLabels (Window, Label, Label2, pc):
 	ratio = (0.0 + encumbrance) / max_encumb
 	if ratio > 1.0:
 		GemRB.SetLabelTextColor (Window, Label, 255, 0, 0)
-		GemRB.SetLabelTextColor (Window, Label2, 255, 0, 0)
 	elif ratio > 0.8:
 		GemRB.SetLabelTextColor (Window, Label, 255, 255, 0)
-		GemRB.SetLabelTextColor (Window, Label2, 255, 0, 0)
 	else:
 		GemRB.SetLabelTextColor (Window, Label, 255, 255, 255)
-		GemRB.SetLabelTextColor (Window, Label2, 255, 0, 0)
+	GemRB.SetLabelTextColor (Window, Label2, 255, 0, 0)
 	return
 
 def GearsClicked():
