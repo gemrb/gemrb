@@ -25,13 +25,14 @@ Area:
 3. (DONE) Create real streaming ambients (do not preload them, just use them when needed)
 4. (DONE) in pathfinder, calculate with the actor's feet circle size (npc blocking still needed)
 5. (DONE) fix door wallgroups and tiles (some problems with overlays still exist)
+6. Handle extended night flag (alternate lightmap, tileset, minimap)
 
 Store:
 no tasks
 
 Animation:
 1. (PARTLY) fix char animation sequences
-5. (PARTLY) Handle equipment animations (armourlevel, weapons)
+5. (DONE) Handle equipment animations (armourlevel, weapons) - this seems to be done by wjp/avenger
 7. stanceID is still fuzzy. Fix it. (FIXED?)
 8. Implement projectile animations (area, cone, fragments)
 
@@ -41,7 +42,7 @@ Actor:
    Benefits: data is already stored in the destination, data constraints and relations 
    are easily implemented.
    How to: replace GemRB.SetVar with GemRB.SetPlayerStat. Don't forget to create
-   the character first.
+   the character first. - see iwd2 chargen for a partially implemented solution
 3. Move position of actor (and ground circle) to the center of a searchmap cell
 
 
