@@ -1,4 +1,4 @@
-GemRB svn r5449 (2008-10-15):
+GemRB svn r5497 (2008-12-06):
   New features:
 	- 
 	- double click (used in the map window)
@@ -7,6 +7,8 @@ GemRB svn r5449 (2008-10-15):
 	- characters can move while the map is open
 	- sound on item equip
     - arbitrary feat prerequisites in iwd2
+        - hard pause/TAB for all games (originally a ToB feature)
+        - extended night areas (originally a bg2 feature)
 
   Improved features:
 	- 
@@ -20,6 +22,9 @@ GemRB svn r5449 (2008-10-15):
 
   Applied patches:
 	 #2159734 Zefklop (Mouse activity during movies)
+	 #2243323 Zefklop (correct Openal cleanup)
+	 #2263333 Whiteclone (bg1 guiinv)
+	 #2380891 Amikrop (iwd1 guicommonwindows)
 
 GemRB V0.3.1 (2008-09-25):
   New features:
