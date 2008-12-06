@@ -1,5 +1,12 @@
-Description: This table lists the resting movies. The resting movie index is determined by 3 bits of the areatype. (CITY/FOREST/DUNGEON).
+Description: This table lists the resting and day/night switching movies.
+The resting movie index is determined by 3 bits of the areatype. (CITY/FOREST/DUNGEON).
+Day/night switching occurs only for areas marked by the EXTENDED_NIGHT flag (also in areatype).
+The original engine showed only a single switching movie (for a city environment), but
+GemRB allows for 8 different movies (based on the areatype bit combinations).
 
-Columns - <N/A>
+Columns - 
+ resting movies
+ day switching movies
+ night movies
 
-Rows - The movie resrefs for each areatype.
+Rows - The movie resource references for each areatype.
