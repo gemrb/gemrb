@@ -225,7 +225,63 @@ bool AREImp::Open(DataStream* stream, bool autoFree)
 	return true;
 }
 
-Map* AREImp::GetMap(const char *ResRef)
+//alter a map to the night/day version in case of an extended night map (bg2 specific)
+//return true, if change happened, in which case a movie is played by the Game object
+bool AREImp::ChangeMap(Map *map, bool day_or_night)
+{
+	ieResRef TmpResRef;
+
+	//get the right tilemap name
+	if (day_or_night) {
+		memcpy( TmpResRef, map->WEDResRef, 9);
+	} else {
+		snprintf( TmpResRef, 9, "%sN", map->WEDResRef);
+	}
+	TileMapMgr* tmm = ( TileMapMgr* ) core->GetInterface( IE_WED_CLASS_ID );
+	DataStream* wedfile = core->GetResourceMgr()->GetResource( TmpResRef, IE_WED_CLASS_ID );
+	tmm->Open( wedfile );
+
+	//alter the tilemap object, not all parts of that object are coming from the wed/tis
+	//this is why we have to be careful
+	//TODO: consider refactoring TileMap so invariable data coming from the .ARE file
+	//are not handled by it, then TileMap could be simply swapped
+	TileMap* tm = map->GetTileMap();
+
+	if (tm) {
+		tm->ClearOverlays();
+	}
+	tm = tmm->GetTileMap(tm);
+	if (!tm) {
+		printf( "[AREImporter]: No Tile Map Available.\n" );
+		core->FreeInterface( tmm );
+		return false;
+	}
+
+	// Small map for MapControl
+	ImageMgr* sm = ( ImageMgr* ) core->GetInterface( IE_MOS_CLASS_ID );
+	DataStream* smstr = core->GetResourceMgr()->GetResource( TmpResRef, IE_MOS_CLASS_ID );
+	sm->Open( smstr, true );
+
+	//the map state was altered, no need to hold this off for any later
+	map->DayNight = day_or_night;
+
+	//get the lightmap name
+	if (day_or_night) {
+		snprintf( TmpResRef, 9, "%sLM", map->WEDResRef);
+	} else {
+		snprintf( TmpResRef, 9, "%sLN", map->WEDResRef);
+	}
+
+	ImageMgr* lm = ( ImageMgr* ) core->GetInterface( IE_BMP_CLASS_ID );
+	DataStream* lmstr = core->GetResourceMgr()->GetResource( TmpResRef, IE_BMP_CLASS_ID );
+	lm->Open( lmstr, true );
+
+	//alter the lightmap and the minimap (the tileset was already swapped)
+	map->ChangeTileMap(lm, sm);
+	return true;
+}
+
+Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 {
 	unsigned int i,x;
 
@@ -238,12 +294,13 @@ Map* AREImp::GetMap(const char *ResRef)
 		map->version = bigheader;
 	}
 
-	map->AreaFlags=AreaFlags;
-	map->Rain=WRain;
-	map->Snow=WSnow;
-	map->Fog=WFog;
-	map->Lightning=WLightning;
-	map->AreaType=AreaType;
+	map->AreaFlags = AreaFlags;
+	map->Rain = WRain;
+	map->Snow = WSnow;
+	map->Fog = WFog;
+	map->Lightning = WLightning;
+	map->AreaType = AreaType;
+	map->DayNight = day_or_night;
 
 	//we have to set this here because the actors will receive their
 	//current area setting here, areas' 'scriptname' is their name
@@ -259,15 +316,29 @@ Map* AREImp::GetMap(const char *ResRef)
 		printf( "[AREImporter]: No Tile Map Manager Available.\n" );
 		return false;
 	}
+	ieResRef TmpResRef;
+
+	if (day_or_night) {
+		memcpy( TmpResRef, map->WEDResRef, 9);
+	} else {
+		snprintf( TmpResRef, 9, "%sN", map->WEDResRef);
+	}
 	TileMapMgr* tmm = ( TileMapMgr* ) core->GetInterface( IE_WED_CLASS_ID );
 	DataStream* wedfile = core->GetResourceMgr()->GetResource( WEDResRef, IE_WED_CLASS_ID );
 	tmm->Open( wedfile );
-	TileMap* tm = tmm->GetTileMap();
+
+	//there was no tilemap set yet, so lets just send a NULL
+	TileMap* tm = tmm->GetTileMap(NULL);
 	if (!tm) {
 		printf( "[AREImporter]: No Tile Map Available.\n" );
 		core->FreeInterface( tmm );
 		return false;
 	}
+
+	// Small map for MapControl
+	ImageMgr* sm = ( ImageMgr* ) core->GetInterface( IE_MOS_CLASS_ID );
+	DataStream* smstr = core->GetResourceMgr()->GetResource( TmpResRef, IE_MOS_CLASS_ID );
+	sm->Open( smstr, true );
 
 	if (Script[0]) {
 		map->Scripts[0] = new GameScript( Script, ST_AREA );
@@ -278,8 +349,11 @@ Map* AREImp::GetMap(const char *ResRef)
 		map->Scripts[0]->MySelf = map;
 	}
 
-	ieResRef TmpResRef;
-	snprintf( TmpResRef, 9, "%sLM", WEDResRef);
+	if (day_or_night) {
+		snprintf( TmpResRef, 9, "%sLM", WEDResRef);
+	} else {
+		snprintf( TmpResRef, 9, "%sLN", WEDResRef);
+	}
 
 	ImageMgr* lm = ( ImageMgr* ) core->GetInterface( IE_BMP_CLASS_ID );
 	DataStream* lmstr = core->GetResourceMgr()->GetResource( TmpResRef, IE_BMP_CLASS_ID );
@@ -296,11 +370,6 @@ Map* AREImp::GetMap(const char *ResRef)
 	ImageMgr* hm = ( ImageMgr* ) core->GetInterface( IE_BMP_CLASS_ID );
 	DataStream* hmstr = core->GetResourceMgr()->GetResource( TmpResRef, IE_BMP_CLASS_ID );
 	hm->Open( hmstr, true );
-
-	// Small map for MapControl
-	ImageMgr* sm = ( ImageMgr* ) core->GetInterface( IE_MOS_CLASS_ID );
-	DataStream* smstr = core->GetResourceMgr()->GetResource( WEDResRef, IE_MOS_CLASS_ID );
-	sm->Open( smstr, true );
 
 	map->AddTileMap( tm, lm, sr, sm, hm );
 	strnlwrcpy( map->WEDResRef, WEDResRef, 8);

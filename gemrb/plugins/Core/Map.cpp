@@ -38,6 +38,7 @@
 #include "WorldMap.h"
 #include "GameControl.h"
 #include "Palette.h"
+#include "MapMgr.h"
 
 #include <cmath>
 #include <cassert>
@@ -391,6 +392,23 @@ Map::~Map(void)
 	WallCount=0;
 }
 
+void Map::ChangeTileMap(ImageMgr* lm, ImageMgr* sm)
+{
+	delete LightMap;
+	delete SmallMap;
+ 
+	LightMap = lm;
+	SmallMap = sm;
+
+/*  move this to the tilemap swapper code
+	if (Width!=(unsigned int) (TMap->XCellCount * 4) ||
+	    Height!=(unsigned int) (( TMap->YCellCount * 64 ) / 12) ) {
+		printMessage("Map", " ", RED);
+		printf( "TileSet dimensions for %s and %sN are different \n", WEDResRef, WEDResRef );
+	}
+*/
+}
+
 void Map::AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm, ImageMgr* hm)
 {
 	// CHECKME: leaks? Should the old TMap, LightMap, etc... be freed?
@@ -399,8 +417,8 @@ void Map::AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm, Imag
 	SearchMap = sr;
 	HeightMap = hm;
 	SmallMap = sm;
-	Width=TMap->XCellCount * 4;
-	Height=( TMap->YCellCount * 64 ) / 12;
+	Width = (unsigned int) (TMap->XCellCount * 4);
+	Height = (unsigned int) (( TMap->YCellCount * 64 ) / 12);
 	//Filling Matrices
 	MapSet = (unsigned short *) malloc(sizeof(unsigned short) * Width * Height);
 	//converting searchmap to internal format
@@ -2823,3 +2841,21 @@ void AreaAnimation::Draw(Region &screen, Map *area)
 			BLIT_TINTED, tint, covers?covers[ac]:0, palette, &screen );
 	}
 }
+
+//change the tileset if needed and possible, return true if changed
+bool Map::ChangeMap(bool day_or_night)
+{
+        //no need of change if the area is not extended night
+        if (! (AreaType&AT_EXTENDED_NIGHT)) return false;
+        //no need of change if the area already has the right tilemap
+        if ((DayNight == day_or_night) && GetTileMap()) return false;
+	
+        MapMgr* mM = ( MapMgr* ) core->GetInterface( IE_ARE_CLASS_ID );
+	//no need to open and read the .are file again
+	//using the ARE class for this because ChangeMap is similar to LoadMap
+	//it loads the lightmap and the minimap too, besides swapping the tileset
+        mM->ChangeMap(this, day_or_night);
+        core->FreeInterface( mM );
+	return true;
+}
+

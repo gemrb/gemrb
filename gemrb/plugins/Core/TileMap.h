@@ -84,6 +84,7 @@ public:
 	TileObject* GetTile(const char* Name);
 	size_t GetTileCount() { return tiles.size(); }
 
+	void ClearOverlays();
 	void AddOverlay(TileOverlay* overlay);
 	void AddRainOverlay(TileOverlay* overlay);
 	void DrawOverlays(Region screen, int rain);

@@ -75,16 +75,21 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 		core->DelTable(mtab);
 	}
 
-	//loading rest movies (only bg2 has them)
+	//loading rest/daylight switching movies (only bg2 has them)
 	memset(restmovies,'*',sizeof(restmovies));
+	memset(daymovies,'*',sizeof(restmovies));
+	memset(nightmovies,'*',sizeof(restmovies));
 	mtab = core->LoadTable("restmov");
 	table = core->GetTable(mtab);
 	if (table) {
 		for(int i=0;i<8;i++) {
 			strnuprcpy(restmovies[i],table->QueryField(i,0),8);
+			strnuprcpy(daymovies[i],table->QueryField(i,1),8);
+			strnuprcpy(nightmovies[i],table->QueryField(i,2),8);
 		}
 		core->DelTable(mtab);
 	}
+
 	interval = 1000/AI_UPDATE_TIME;
 	//FIXME:i'm not sure in this...
 	NoInterrupt();
@@ -532,6 +537,8 @@ Map *Game::GetMap(const char *areaname, bool change)
 			area = GetMap(index);
 			memcpy (CurrentArea, areaname, 8);
 			area->SetupAmbients();
+			//change the tileset if needed
+			area->ChangeMap(IsDay());
 			ChangeSong();
 			return area;
 		}
@@ -655,7 +662,7 @@ int Game::LoadMap(const char* ResRef)
 		core->FreeInterface( mM );
 		return -1;
 	}
-	Map* newMap = mM->GetMap(ResRef);
+	Map* newMap = mM->GetMap(ResRef, IsDay());
 	core->FreeInterface( mM );
 	if (!newMap) {
 		return -1;
@@ -907,6 +914,7 @@ bool Game::EveryoneNearPoint(Map *area, Point &p, int flags) const
 //called when someone died
 void Game::PartyMemberDied(Actor *actor)
 {
+	//this could be null, in some extreme cases...
 	Map *area = actor->GetCurrentArea();
 
 	for (unsigned int i=0; i<PCs.size(); i++) {
@@ -1000,6 +1008,25 @@ void Game::AdvanceTime(ieDword add)
 		WeatherBits&=~WB_HASWEATHER;
 	}
 	Ticks+=add*interval;
+	//change the tileset if needed
+	Map *map = GetCurrentArea();
+	if (map && map->ChangeMap(IsDay())) {
+		//play the daylight transition movie appropriate for the area
+		//it is needed to play only when the area truly changed its tileset
+		//this is signalled by ChangeMap
+		int areatype = (area->AreaType&(AT_FOREST|AT_CITY|AT_DUNGEON))>>3;
+		ieResRef *res;
+
+		printMessage("Game","Switching DayLight\n",GREEN);
+		if (IsDay()) {
+			res=&nightmovies[areatype];
+		} else {
+			res=&daymovies[areatype];
+		}
+		if (*res[0]!='*') {
+			core->PlayMovie(*res);
+		}
+	}
 }
 
 //returns true if there are excess players in the team
@@ -1283,14 +1310,23 @@ const Color *Game::GetGlobalTint() const
 	if ((map->AreaType&(AT_OUTDOOR|AT_DAYNIGHT|AT_EXTENDED_NIGHT)) == (AT_OUTDOOR|AT_DAYNIGHT) ) {
 		//get daytime colour
 		ieDword daynight = (GameTime%7200/300);
-		if (daynight<2 || daynight>11) {
+		if (daynight<2 || daynight>22) {
 			return &NightTint;
 		}
-		if (daynight>9 || daynight<4) {
+		if (daynight>20 || daynight<4) {
 			return &DuskTint;
 		}
 	}
 	return NULL;
+}
+
+bool Game::IsDay()
+{
+	ieDword daynight = (GameTime%7200/300);
+	if(daynight<4 || daynight>20) {
+		return false;
+	}
+	return true;
 }
 
 void Game::InAttack(ieDword globalID)

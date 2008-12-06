@@ -180,6 +180,8 @@ private:
 	std::vector< ieDword> Attackers;
 	CRRow *crtable;
 	ieResRef restmovies[8];
+	ieResRef daymovies[8];
+	ieResRef nightmovies[8];
 	int MapIndex;
 public:
 	std::vector< Actor*> selected;
@@ -270,8 +272,6 @@ public:
 	Map* GetMap(const char *areaname, bool change);
 	/** Returns slot of the map if found */
 	int FindMap(const char *ResRef);
-	/* use GetCurrentArea() */
-	//Map * GetCurrentMap();
 	int AddMap(Map* map);
 	/** Determine if area is master area*/
 	bool MasterArea(const char *area);
@@ -284,6 +284,7 @@ public:
 	int DelMap(unsigned int index, int forced = 0);
 	int AddNPC(Actor* npc);
 	Actor* GetNPC(unsigned int Index);
+	bool IsDay();
 	void InAttack(ieDword globalID);
 	void OutAttack(ieDword globalID);
 	int AttackersOf(ieDword globalID, Map *area) const;

@@ -54,6 +54,21 @@ TileMap::~TileMap(void)
 	}
 }
 
+//this needs in case of a tileset switch (for extended night)
+void TileMap::ClearOverlays()
+{
+	size_t i;
+
+	for (i = 0; i < overlays.size(); i++) {
+		delete( overlays[i] );
+	}
+	overlays.clear();
+	for (i = 0; i < overlays.size(); i++) {
+		delete( rain_overlays[i]);
+	}
+	rain_overlays.clear();
+}
+
 //tiled objects
 TileObject* TileMap::AddTile(const char *ID, const char* Name, unsigned int Flags,
 	unsigned short* openindices, int opencount, unsigned short* closeindices, int closecount)

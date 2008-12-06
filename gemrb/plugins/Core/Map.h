@@ -225,6 +225,8 @@ public:
 	ieResRef WEDResRef;
 	ieWord localActorCounter;
 	bool MasterArea;
+	//this is set by the importer (not stored in the file)
+	bool DayNight;
 private:
 	ieStrRef trackString;
 	bool trackFlag;
@@ -253,6 +255,12 @@ public:
 
 	/** prints useful information on console */
 	void DebugDump();
+	TileMap *GetTileMap() { return TMap; }
+	/* gets the signal of daylight changes */
+	bool ChangeMap(bool day_or_night);
+	/* low level function to perform the daylight changes */
+	void ChangeTileMap(ImageMgr* lm, ImageMgr* sm);
+	/* sets all the auxiliary maps and the tileset */
 	void AddTileMap(TileMap* tm, ImageMgr* lm, ImageMgr* sr, ImageMgr* sm, ImageMgr* hm);
 	void UpdateScripts();
 	void UpdateEffects();

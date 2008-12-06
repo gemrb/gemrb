@@ -151,7 +151,8 @@ int WEDImp::AddOverlay(TileMap *tm, Overlay *overlays, bool rain)
 	return usedoverlays;
 }
 
-TileMap* WEDImp::GetTileMap()
+//this will replace the tileset of an existing tilemap, or create a new one
+TileMap* WEDImp::GetTileMap(TileMap *tm)
 {
 	int usedoverlays;
 
@@ -162,7 +163,10 @@ TileMap* WEDImp::GetTileMap()
 	if (!overlays.size()) {
 		return NULL;
 	}
-	TileMap* tm = new TileMap();
+
+	if (!tm) {
+		tm = new TileMap();
+	}
 
 	usedoverlays = AddOverlay(tm, &overlays.at(0), false);
 	AddOverlay(tm, &overlays.at(0), true);

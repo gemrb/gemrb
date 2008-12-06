@@ -54,7 +54,8 @@ public:
 	WEDImp(void);
 	~WEDImp(void);
 	bool Open(DataStream* stream, bool autoFree = true);
-	TileMap* GetTileMap();
+	//if tilemap already exists, don't create it
+	TileMap* GetTileMap(TileMap *tm);
 	ieWord* GetDoorIndices(char* ResRef, int* count, bool& BaseClosed);
 	Wall_Polygon **GetWallGroups();
 	ieDword GetWallPolygonsCount() { return WallPolygonsCount; }

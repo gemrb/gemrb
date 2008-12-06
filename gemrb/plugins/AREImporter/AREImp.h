@@ -55,7 +55,8 @@ public:
 	AREImp(void);
 	~AREImp(void);
 	bool Open(DataStream* stream, bool autoFree = true);
-	Map* GetMap(const char* ResRef);
+	bool ChangeMap(Map *map, bool day_or_night);
+	Map* GetMap(const char* ResRef, bool day_or_night);
 	int GetStoredFileSize(Map *map);
 	/* stores an area in the Cache (swaps it out) */
 	int PutArea(DataStream *stream, Map *map);
