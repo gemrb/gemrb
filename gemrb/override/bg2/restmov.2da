@@ -1,11 +1,11 @@
 2DA V1.0
 *
-           MOVIE      
-0          *          
-1          RESTINN    
-2          RESTCAMP   
-3          RESTCAMP   
-4          RESTDUNG   
-5          RESTDUNG   
-6          RESTDUNG   
-7          RESTDUNG   
+           REST      	DAY	NIGHT
+0          *         	DAYNITE NITEDAY 
+1          RESTINN    	DAYNITE NITEDAY
+2          RESTCAMP  	DAYNITE NITEDAY 
+3          RESTCAMP  	DAYNITE NITEDAY 
+4          RESTDUNG  	DAYNITE NITEDAY 
+5          RESTDUNG  	DAYNITE NITEDAY 
+6          RESTDUNG  	DAYNITE NITEDAY 
+7          RESTDUNG  	DAYNITE NITEDAY 
