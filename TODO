@@ -25,7 +25,7 @@ Area:
 3. (DONE) Create real streaming ambients (do not preload them, just use them when needed)
 4. (DONE) in pathfinder, calculate with the actor's feet circle size (npc blocking still needed)
 5. (DONE) fix door wallgroups and tiles (some problems with overlays still exist)
-6. Handle extended night flag (alternate lightmap, tileset, minimap)
+6. (DONE) Handle extended night flag (alternate lightmap, tileset, minimap)
 
 Store:
 no tasks
