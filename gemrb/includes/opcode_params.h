@@ -30,8 +30,8 @@
 
 //regen/poison/disease types
 #define RPD_PERCENT 1
-#define RPD_SECONDS 2
-#define RPD_POINTS  3
+#define RPD_POINTS  2
+#define RPD_SECONDS 3
 //only poison
 #define RPD_ROUNDS  4
 #define RPD_TURNS   5
