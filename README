@@ -20,7 +20,7 @@ extracted manually from the CDs using the tool `unshield'.
 
 
 What little documentation exists is mostly in gemrb/docs/en/ and
-subdirectories, the gemrb.1 man page and this file.
+subdirectories, the gemrb.6 man page and this file.
 
 Supported (i.e. we got reports about successfully running GemRB) systems:
 
