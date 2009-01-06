@@ -567,7 +567,8 @@ def ReadItemWindow ():
 	pc = GemRB.GameGetSelectedPCSingle ()
 	slot = GemRB.GetVar ("ItemButton")
 	# the learn scroll header is always the second
-	GemRB.UseItem (pc, slot, 1)
+	# 5 is TARGET_SELF, because some scrolls are buggy
+	GemRB.UseItem (pc, slot, 1, 5)
 	GemRB.UnloadWindow (ItemInfoWindow)
 	return
 

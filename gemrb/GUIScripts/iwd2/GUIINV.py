@@ -476,10 +476,70 @@ def OnDropItemToPC ():
 	UpdateInventoryWindow ()
 	return
 
+def DrinkItemWindow ():
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	# the drink item header is always the first
+	GemRB.UseItem (pc, slot, 0)
+	GemRB.UnloadWindow (ItemInfoWindow)
+	return
+
+def ReadItemWindow ():
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	# the learn scroll header is always the second
+	# 5 is TARGET_SELF, because some scrolls are buggy
+	GemRB.UseItem (pc, slot, 1, 5)
+	GemRB.UnloadWindow (ItemInfoWindow)
+	return
+
+def OpenItemWindow ():
+	#close inventory
+	GemRB.SetVar ("Inventory", 1)
+	GemRB.UnloadWindow (ItemInfoWindow)
+	OpenInventoryWindow ()
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	slot_item = GemRB.GetSlotItem (pc, slot)
+	ResRef = slot_item['ItemResRef']
+	#the store will have to reopen the inventory
+	GemRB.EnterStore (ResRef)
+	return
+
+def DialogItemWindow ():
+	GemRB.UnloadWindow (ItemInfoWindow)
+	OpenInventoryWindow ()
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	slot_item = GemRB.GetSlotItem (pc, slot)
+	ResRef = slot_item['ItemResRef']
+	item = GemRB.GetItem (ResRef)
+	dialog=item["Dialog"]
+	GemRB.ExecuteString ("StartDialog(\""+dialog+"\",Myself)", pc)
+	return
+
 def IdentifyUseSpell ():
+	global ItemIdentifyWindow
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	GemRB.UnloadWindow (ItemIdentifyWindow)
+	GemRB.HasSpecialSpell (pc, 1, 1)
+	GemRB.UnloadWindow (ItemInfoWindow)
+	GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
+	OpenItemInfoWindow()
 	return
 
 def IdentifyUseScroll ():
+	global ItemIdentifyWindow
+
+	pc = GemRB.GameGetSelectedPCSingle ()
+	slot = GemRB.GetVar ("ItemButton")
+	GemRB.UnloadWindow (ItemIdentifyWindow)
+	GemRB.HasSpecialItem (pc, 1, 1)
+	GemRB.UnloadWindow (ItemInfoWindow)
+	GemRB.ChangeItemFlag (pc, slot, IE_INV_ITEM_IDENTIFIED, OP_OR)
+	OpenItemInfoWindow()
 	return
 
 def CloseIdentifyItemWindow ():

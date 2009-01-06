@@ -95,6 +95,10 @@ typedef ieResRef ResRefPairs[2];
 
 static SpellDescType *SpecialItems = NULL;
 static SpellDescType *SpecialSpells = NULL;
+
+#define SP_IDENTIFY  1      //any spell that cannot be cast from the menu
+#define SP_SILENCE   2      //any spell that can be cast in silence
+
 static SpellDescType *StoreSpells = NULL;
 static ItemExtHeader *ItemArray = NULL;
 static SpellExtHeader *SpellArray = NULL;
@@ -5730,6 +5734,26 @@ int GetSpecialSpell(ieResRef resref)
 	return 0;
 }
 
+//disable spells based on some circumstances
+int CheckSpecialSpell(ieResRef resref, Actor *actor)
+{
+	int sp = GetSpecialSpell(resref);
+
+	//the identify spell is always disabled on the menu
+	if (sp&SP_IDENTIFY) {
+		return 1;
+	}
+
+	//if actor is silenced, and spell cannot be cast in silence, disable it
+	if (actor->GetStat(IE_STATE_ID) & STATE_SILENCED ) {
+		if (!(sp&SP_SILENCE)) {
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
 static void ReadUsedItems()
 {
 	int i;
@@ -7544,7 +7568,8 @@ static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 		SpellExtHeader *spell = SpellArray+i;
 		// disable spells that should be cast from the inventory
 		// Identify is misclassified and has Target 3 (Dead char)
-		if (GetSpecialSpell(spell->spellname) ) {
+
+		if (CheckSpecialSpell(spell->spellname, actor) ) {
 			btn->SetState(IE_GUI_BUTTON_DISABLED);
 			btn->EnableBorder(1, IE_GUI_BUTTON_DISABLED);
 			btn->SetEvent(IE_GUI_BUTTON_ON_PRESS,"UpdateActionsWindow"); //noop
@@ -8088,7 +8113,7 @@ static PyObject* GemRB_SpellCast(PyObject * /*self*/, PyObject* args)
 }
 
 PyDoc_STRVAR( GemRB_UseItem__doc,
-"UseItem(actor, slot, header)\n\n"
+"UseItem(actor, slot, header[,forcetarget])\n\n"
 "Makes the actor try to use an item. "
 "If slot is -1, then header is the index of the item functionality in the use item list. "
 "If slot is -2, then header is the quickslot index. "
@@ -8099,8 +8124,9 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 	int PartyID;
 	int slot;
 	int header;
+	int forcetarget=-1; //some crappy scrolls don't target self correctly!
 
-	if (!PyArg_ParseTuple( args, "iii", &PartyID, &slot, &header )) {
+	if (!PyArg_ParseTuple( args, "iii|i", &PartyID, &slot, &header, &forcetarget )) {
 		return AttributeError( GemRB_UseItem__doc );
 	}
 
@@ -8131,15 +8157,18 @@ static PyObject* GemRB_UseItem(PyObject * /*self*/, PyObject* args)
 			break;
 	}
 
+	if(forcetarget==-1) {
+		forcetarget = itemdata.Target;
+	}
 	/// remove this after projectile is done
 	printf("Use item: %s\n", itemdata.itemname);
 	printf("Extended header: %d\n", itemdata.headerindex);
 	printf("Attacktype: %d\n",itemdata.AttackType);
 	printf("Range: %d\n",itemdata.Range);
-	printf("Target: %d\n",itemdata.Target);
+	printf("Target: %d\n",forcetarget);
 	printf("Projectile: %d\n", itemdata.ProjectileAnimation);
 	//
-	switch (itemdata.Target) {
+	switch (forcetarget) {
 		case TARGET_SELF:
 			actor->UseItem(itemdata.slot, itemdata.headerindex, actor, silent);
 			break;
