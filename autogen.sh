@@ -164,7 +164,7 @@ $my_automake --add-missing || exit 1
 
 echo Running configure
 
-cmd="./configure --prefix=$dest/ --bindir=$dest/ --sysconfdir=$dest/ --datadir=$dest/ --libdir=$dest/plugins/ --disable-subdirs"
+cmd="./configure --prefix=$dest/ --bindir=$dest/ --sysconfdir=$dest/ --datadir=$dest/ --libdir=$dest --disable-subdirs"
 $cmd
 
 echo
