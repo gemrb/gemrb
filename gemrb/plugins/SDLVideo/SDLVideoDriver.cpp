@@ -1530,6 +1530,27 @@ void SDLVideoDriver::DrawRectSprite(const Region& rgn, const Color& color, Sprit
 	}
 }
 
+inline void ReadPixel(long &val, unsigned char *pixels, int BytesPerPixel) {
+	if (BytesPerPixel == 1) {
+		val = *pixels;
+	} else if (BytesPerPixel == 2) {
+		val = *(Uint16 *)pixels;
+	} else if (BytesPerPixel == 4) {
+		val = *(Uint32 *)pixels;
+	}
+}
+inline void WritePixel(const long val, unsigned char *pixels, int BytesPerPixel) {
+	if (BytesPerPixel == 1) {
+		*pixels = (unsigned char)val;
+	} else if (BytesPerPixel == 2) {
+		*(Uint16 *)pixels = (Uint16)val;
+	} else if (BytesPerPixel == 4) {
+		*(Uint32 *)pixels = val;
+	}
+}
+
+
+
 void SDLVideoDriver::SetPixel(short x, short y, const Color& color, bool clipped)
 {
 	//printf("x: %d; y: %d; XC: %d; YC: %d, VX: %d, VY: %d, VW: %d, VH: %d\n", x, y, xCorr, yCorr, Viewport.x, Viewport.y, Viewport.w, Viewport.h);
@@ -1556,8 +1577,7 @@ void SDLVideoDriver::SetPixel(short x, short y, const Color& color, bool clipped
 
 	long val = SDL_MapRGBA( backBuf->format, color.r, color.g, color.b, color.a );
 	SDL_LockSurface( backBuf );
-	// FIXME: is it endian safe?
-	memcpy( pixels, &val, disp->format->BytesPerPixel );
+	WritePixel(val, pixels, backBuf->format->BytesPerPixel);
 	SDL_UnlockSurface( backBuf );
 }
 
@@ -1567,7 +1587,7 @@ void SDLVideoDriver::GetPixel(short x, short y, Color* color)
 	unsigned char * pixels = ( ( unsigned char * ) backBuf->pixels ) +
 		( ( y * disp->w + x) * disp->format->BytesPerPixel );
 	long val = 0;
-	memcpy( &val, pixels, disp->format->BytesPerPixel );
+	ReadPixel(val, pixels, backBuf->format->BytesPerPixel);
 	SDL_UnlockSurface( backBuf );
 
 	SDL_GetRGBA( val, backBuf->format, (Uint8 *) &color->r, (Uint8 *) &color->g, (Uint8 *) &color->b, (Uint8 *) &color->a );
@@ -1586,7 +1606,7 @@ Color SDLVideoDriver::SpriteGetPixel(Sprite2D* sprite, unsigned short x, unsigne
 		unsigned char * pixels = ( ( unsigned char * ) surf->pixels ) +
 			( ( y * surf->w + x) * surf->format->BytesPerPixel );
 		long val = 0;
-		memcpy( &val, pixels, surf->format->BytesPerPixel );
+		ReadPixel(val, pixels, surf->format->BytesPerPixel);
 		SDL_UnlockSurface( surf );
 
 		SDL_GetRGBA( val, surf->format, (Uint8 *) &c.r, (Uint8 *) &c.g, (Uint8 *) &c.b, (Uint8 *) &c.a );
@@ -1637,7 +1657,7 @@ bool SDLVideoDriver::IsSpritePixelTransparent(Sprite2D* sprite, unsigned short x
 		unsigned char * pixels = ( ( unsigned char * ) surf->pixels ) +
 			( ( y * surf->w + x) * surf->format->BytesPerPixel );
 		long val = 0;
-		memcpy( &val, pixels, surf->format->BytesPerPixel );
+		ReadPixel(val, pixels, surf->format->BytesPerPixel);
 		SDL_UnlockSurface( surf );
 
 		return val == 0;
