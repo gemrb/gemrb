@@ -401,6 +401,8 @@ void OpenALAudioDriver::ResetMusics()
 
 bool OpenALAudioDriver::Play()
 {
+	if (!MusicReader) return false;
+
 	SDL_mutexP( musicMutex );
 	if (!MusicPlaying)
 		MusicPlaying = true;
@@ -459,6 +461,7 @@ int OpenALAudioDriver::StreamFile(const char* filename)
 		delete str;
 		core->FreeInterface(MusicReader);
 		MusicReader = NULL;
+		MusicPlaying = false;
 		printMessage("OpenAL", "",WHITE);
 		printf( "Cannot open %s", path );
 		printStatus("ERROR", YELLOW );
