@@ -19,7 +19,7 @@ def OnLoad():
 	GemRB.GetCharacters(ImportWindow, TextAreaControl)
 
 	DoneButton = GemRB.GetControl(ImportWindow, 0)
-	GemRB.SetText(ImportWindow, DoneButton, 2610)
+	GemRB.SetText(ImportWindow, DoneButton, 13955)
 	GemRB.SetButtonState(ImportWindow, DoneButton, IE_GUI_BUTTON_DISABLED)
 
 	CancelButton = GemRB.GetControl(ImportWindow,1)
