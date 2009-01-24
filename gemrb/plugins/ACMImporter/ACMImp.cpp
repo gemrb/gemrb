@@ -35,7 +35,10 @@ bool ACMImp::Open(DataStream* stream, bool autofree)
 		return false;
 	}
 	char Signature[4];
+	ieDword SignatureDword;
 	stream->Read( Signature, 4 );
+	stream->Seek( 0, GEM_STREAM_START );
+	stream->ReadDword( &SignatureDword );
 	stream->Seek( 0, GEM_STREAM_START );
 #ifdef HAS_VORBIS_SUPPORT
 	if(strnicmp(Signature, "oggs", 4) == 0) {
@@ -45,7 +48,7 @@ bool ACMImp::Open(DataStream* stream, bool autofree)
 	if(strnicmp(Signature, "RIFF", 4) == 0) {
 		SoundReader = CreateSoundReader(stream, SND_READER_WAV, stream->Size(), autofree) ;
 	} //wav
-	if (*( unsigned int * ) Signature == IP_ACM_SIG) {
+	if (SignatureDword == IP_ACM_SIG) {
 		SoundReader = CreateSoundReader(stream, SND_READER_ACM, stream->Size(), autofree) ;
 	} //acm
 	if (memcmp( Signature, "WAVC", 4 ) == 0) {

@@ -333,10 +333,10 @@ int CWavPCMReader::init_reader()
 		fix_endian(fmt.wFormatTag);
 		fix_endian(fmt.nChannels);
 		fix_endian(fmt.nSamplesPerSec);
+		fix_endian(fmt.wBitsPerSample);
 		//we don't use these fields, so who cares
 		//fix_endian(fmt.nAvgBytesPerSec);
 		//fix_endian(fmt.nBlockAlign);
-		//fix_endian(fmt.wBitsPerSample);
 		//fix_endian(fmt.cbSize);
 	}
 	if (fmt.wFormatTag != 1) {
