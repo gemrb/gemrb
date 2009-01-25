@@ -28,9 +28,10 @@ from GUIDefines import *
 TextScreen = None
 TextArea = None
 Position = 1
+Row = 1
 
 def StartTextScreen ():
-	global TextScreen, TextArea
+	global TextScreen, TextArea, Row
 
 	GemRB.LoadWindowPack ("GUICHAP", 640, 480)
 	TableName = GemRB.GetGameString (STR_LOADMOS)
@@ -38,9 +39,12 @@ def StartTextScreen ():
 	if TableName[:6] == "chptxt":
 		GemRB.LoadMusicPL("chapter.mus")
 
+	print "TABLENAME:",TableName
 	Chapter = GemRB.GetGameVar("CHAPTER")
+	print "Chapter:",Chapter
 	#set ID according to the Chapter?
 	ID = (Chapter+1) & 0x7fffffff
+	print "ID: ", ID
 	TextScreen = GemRB.LoadWindow (ID)
 	GemRB.SetWindowFrame (TextScreen)
 	TextArea = GemRB.GetControl (TextScreen, 2)
@@ -49,7 +53,10 @@ def StartTextScreen ():
 
 	#caption	
 	Table = GemRB.LoadTable (TableName)
-	Value = GemRB.GetTableValue (Table, 2, 0)
+
+	#these suckers couldn't use a fix row
+	Row = GemRB.GetTableRowIndex(Table, "DEFAULT")
+	Value = GemRB.GetTableValue (Table, Row, 0)
 	GemRB.UnloadTable (Table)
 	Label=GemRB.GetControl (TextScreen, 0x10000000)
 	GemRB.SetText (TextScreen, Label, Value)
@@ -78,7 +85,7 @@ def FeedScroll ():
 
 	TableName = GemRB.GetGameString (STR_LOADMOS)
 	Table = GemRB.LoadTable (TableName)
-	Value = GemRB.GetTableValue (Table, 2, Position)
+	Value = GemRB.GetTableValue (Table, Row, Position)
 	GemRB.UnloadTable (Table)
 	if Value == 'NONE':
 		Position = 1
