@@ -54,10 +54,7 @@ SDLVideoDriver::SDLVideoDriver(void)
 	Cursor[2] = NULL;
 	CursorPos.x = 0;
 	CursorPos.y = 0;
-	moveX = 0;
-	moveY = 0;
 	DisableMouse = 0;
-	DisableScroll = false;
 	xCorr = 0;
 	yCorr = 0;
 	lastTime = 0;
@@ -66,8 +63,6 @@ SDLVideoDriver::SDLVideoDriver(void)
 	extra=NULL;
 	subtitlestrref = 0;
 	subtitletext = NULL;
-	mousescrollspd = 10;
-	scrolling = false;
 }
 
 SDLVideoDriver::~SDLVideoDriver(void)
@@ -2274,8 +2269,6 @@ void SDLVideoDriver::GetMousePos(int &x, int &y)
 	y=CursorPos.y;
 }
 
-#define SCROLL_BORDER  5
-
 void SDLVideoDriver::MouseMovement(int x, int y)
 {
 	GetTime( lastMouseTime );
@@ -2283,36 +2276,6 @@ void SDLVideoDriver::MouseMovement(int x, int y)
 		return;
 	CursorPos.x = x; // - mouseAdjustX[CursorIndex];
 	CursorPos.y = y; // - mouseAdjustY[CursorIndex];
-	if (DisableScroll) {
-		moveX = 0;
-		moveY = 0;
-	} else {
-		if (x <= SCROLL_BORDER)
-			moveX = -mousescrollspd;
-		else {
-			if (event.motion.x >= ( core->Width - SCROLL_BORDER ))
-				moveX = mousescrollspd;
-			else
-				moveX = 0;
-		}
-		if (y <= SCROLL_BORDER)
-			moveY = -mousescrollspd;
-		else {
-			if (y >= ( core->Height - SCROLL_BORDER ))
-				moveY = mousescrollspd;
-			else
-				moveY = 0;
-		}
-	}
-
-	if (moveX != 0 || moveY != 0) {
-		scrolling = true;
-		CursorPosition = moveX + moveY;
-	} else if (scrolling) {
-		scrolling = false;
-		SetDragCursor(NULL);
-	}
-
 	if (Evnt)
 		Evnt->MouseMove(x, y);
 }
@@ -2459,48 +2422,5 @@ void SDLVideoDriver::DrawMovieSubtitle(ieDword strRef)
 void SDLVideoDriver::SetGamma(int brightness, int /*contrast*/)
 {
 	SDL_SetGamma(0.8+brightness/50.0,0.8+brightness/50.0,0.8+brightness/50.0);
-}
-
-void SDLVideoDriver::SetMouseScrollSpeed(int speed)
-{
-	mousescrollspd=(speed+1)*2;
-}
-
-int SDLVideoDriver::whereIsTheCursor()
-{
-	return CursorPosition;
-}
-
-bool SDLVideoDriver::isScrolling()
-{
-	return scrolling;
-}
-
-void SDLVideoDriver::drawScrollCursorSprite(int Position)
-{
-	if (Position == 0) {
-		if (moveX == -mousescrollspd) {//bottom left
-			SetDragCursor(core->GetScrollCursorSprite(5,numScrollCursor));
-		} else if (moveX == mousescrollspd ) {//upper right
-			SetDragCursor(core->GetScrollCursorSprite(1,numScrollCursor));
-		}
-	} else if (Position == mousescrollspd) {
-		if (moveX == mousescrollspd) {//right
-			SetDragCursor(core->GetScrollCursorSprite(0,numScrollCursor));
-		} else { //bottom
-			SetDragCursor(core->GetScrollCursorSprite(6,numScrollCursor));
-		}
-	} else if (Position == -mousescrollspd ) {
-		if (moveX == -mousescrollspd) {//left
-			SetDragCursor(core->GetScrollCursorSprite(4,numScrollCursor));
-		} else { //upper
-			SetDragCursor(core->GetScrollCursorSprite(2,numScrollCursor));
-		}
-	} else if (Position == -2 * mousescrollspd ) { //upper left
-		SetDragCursor(core->GetScrollCursorSprite(3,numScrollCursor));
-	} else if (Position == 2 * mousescrollspd ) { //bottom right
-		SetDragCursor(core->GetScrollCursorSprite(7,numScrollCursor));
-	}
-	numScrollCursor = (numScrollCursor+1) % 15;
 }
 

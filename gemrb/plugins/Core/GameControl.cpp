@@ -109,6 +109,8 @@ GameControl::GameControl(void)
 	pfs.null();
 	lastCursor = IE_CURSOR_NORMAL;
 	moveX = moveY = 0;
+	scrolling = false;
+	numScrollCursor = 0;
 	DebugFlags = 0;
 	AIUpdateCounter = 1;
 //	effect = NULL;
@@ -338,23 +340,20 @@ void GameControl::Draw(unsigned short x, unsigned short y)
 
 	Video* video = core->GetVideoDriver();
 	Region viewport = video->GetViewport();
-	if (video->moveX || video->moveY) {
-		viewport.x += video->moveX;
-		viewport.y += video->moveY;
+	if (moveX || moveY) {
+		viewport.x += moveX;
+		viewport.y += moveY;
 		Point mapsize = core->GetGame()->GetCurrentArea()->TMap->GetMapSize();
-		if ( viewport.x + video->moveX < 0 )//if we are at top of the map
+		if ( viewport.x < 0 )//if we are at top of the map
 			viewport.x = 0;
-		else if ( (viewport.x + video->moveX + viewport.w) >= mapsize.x) //if we are at the bottom
+		else if ( (viewport.x + viewport.w) >= mapsize.x) //if we are at the bottom
 			viewport.x = mapsize.x - viewport.w;
-		else
-			viewport.x += video->moveX; //middle :)
 
-		if ( viewport.y + video->moveY < 0 ) //if we are at the left of the map
+		if ( viewport.y < 0 ) //if we are at the left of the map
 			viewport.y = 0;
-		else if ( (viewport.y + video->moveY + viewport.h ) >= mapsize.y ) //if we are at the right
+		else if ( (viewport.y + viewport.h ) >= mapsize.y ) //if we are at the right
 			viewport.y = mapsize.y - viewport.h;
-		else
-			viewport.y += video->moveY; //middle :)
+		
 		core->timer->SetMoveViewPort( viewport.x, viewport.y, 0, false );
 	}
 	Region screen( x + XPos, y + YPos, Width, Height );
@@ -1055,6 +1054,75 @@ end_function:
 	}
 }
 
+#define SCROLL_BORDER 5
+
+/** Global Mouse Move Event */
+void GameControl::OnGlobalMouseMove(unsigned short x, unsigned short y)
+{
+	if (ScreenFlags & SF_DISABLEMOUSE) {
+		return;
+	}
+	
+	if (Owner->Visible!=WINDOW_VISIBLE) {
+		return;
+	}
+
+	int mousescrollspd = core->GetMouseScrollSpeed();
+
+	if (x <= SCROLL_BORDER)
+		moveX = -mousescrollspd;
+	else {
+		if (x >= ( core->Width - SCROLL_BORDER ))
+			moveX = mousescrollspd;
+		else
+			moveX = 0;
+	}
+	if (y <= SCROLL_BORDER)
+		moveY = -mousescrollspd;
+	else {
+		if (y >= ( core->Height - SCROLL_BORDER ))
+			moveY = mousescrollspd;
+		else
+			moveY = 0;
+	}
+
+	if (moveX != 0 || moveY != 0) {
+		scrolling = true;
+	} else if (scrolling) {
+		scrolling = false;
+
+		Video* video = core->GetVideoDriver();
+		video->SetDragCursor(NULL);
+	}
+}
+
+void GameControl::UpdateScrolling() {
+	if (!scrolling) return;
+	
+	int mousescrollspd = core->GetMouseScrollSpeed(); // TODO: why check against this value and not +/-?
+	Video* video = core->GetVideoDriver();
+
+	if (moveX == mousescrollspd && moveY == 0) { // right
+		video->SetDragCursor(core->GetScrollCursorSprite(0,numScrollCursor));
+	} else if (moveX == mousescrollspd && moveY == -mousescrollspd) { // upper right
+		video->SetDragCursor(core->GetScrollCursorSprite(1,numScrollCursor));
+	} else if (moveX == 0 && moveY == -mousescrollspd) { // up
+		video->SetDragCursor(core->GetScrollCursorSprite(2,numScrollCursor));
+	} else if (moveX == -mousescrollspd && moveY == -mousescrollspd) { // upper left
+		video->SetDragCursor(core->GetScrollCursorSprite(3,numScrollCursor));
+	} else if (moveX == -mousescrollspd && moveY == 0) { // left
+		video->SetDragCursor(core->GetScrollCursorSprite(4,numScrollCursor));
+	} else if (moveX == -mousescrollspd && moveY == mousescrollspd) { // bottom left
+		video->SetDragCursor(core->GetScrollCursorSprite(5,numScrollCursor));
+	} else if (moveX == 0 && moveY == mousescrollspd) { // bottom
+		video->SetDragCursor(core->GetScrollCursorSprite(6,numScrollCursor));
+	} else if (moveX == mousescrollspd && moveY == mousescrollspd) { // bottom right
+		video->SetDragCursor(core->GetScrollCursorSprite(7,numScrollCursor));
+	}
+
+	numScrollCursor = (numScrollCursor+1) % 15;
+}
+
 void GameControl::TryToAttack(Actor *source, Actor *tgt)
 {
 	char Tmp[40];
@@ -1673,6 +1741,8 @@ void GameControl::SetCutSceneMode(bool active)
 {
 	if (active) {
 		ScreenFlags |= (SF_DISABLEMOUSE | SF_LOCKSCROLL | SF_CUTSCENE);
+		moveX = 0;
+		moveY = 0;
 	} else {
 		ScreenFlags &= ~(SF_DISABLEMOUSE | SF_LOCKSCROLL | SF_CUTSCENE);
 	}

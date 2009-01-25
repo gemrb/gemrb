@@ -8226,7 +8226,7 @@ static PyObject* GemRB_SetMouseScrollSpeed(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_SetMouseScrollSpeed__doc );
 	}
 
-	core->GetVideoDriver()->SetMouseScrollSpeed(mouseSpeed);
+	core->SetMouseScrollSpeed(mouseSpeed);
 
 	Py_INCREF( Py_None );
 	return Py_None;

@@ -300,6 +300,8 @@ private:
 	// Index of current container
 	Container* CurrentContainer;
 	bool UseContainer;
+	// Scrolling speed
+	int mousescrollspd;
 public:
 	Palette *InfoTextPalette;
 	int SaveAsOriginal; //if true, saves files in compatible mode
@@ -560,6 +562,8 @@ public:
 	Store *GetCurrentStore();
 	int CloseCurrentStore();
 	Store *SetCurrentStore(const ieResRef resname, const ieVariable owner);
+	void SetMouseScrollSpeed(int speed);
+	int GetMouseScrollSpeed();
 	// FIXME: due to Win32 we have to allocate/release all common
 	// memory from Interface. Yes, it is ugly.
 	ITMExtHeader *GetITMExt(int count);

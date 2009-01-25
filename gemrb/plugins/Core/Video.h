@@ -212,21 +212,14 @@ public:
 public:
 	/** Event Manager Pointer */
 	EventMgr* Evnt;
-	short moveX, moveY;
 
 	void SetMouseEnabled(int enabled);
 	void SetMouseGrayed(bool grayed);
-
-	//Scroll Cursor stuff
-	virtual int whereIsTheCursor() =0;
-	virtual void drawScrollCursorSprite(int Position) = 0;
-	virtual bool isScrolling() = 0;
 
 protected:
 	int DisableMouse;
 
 public:
-	bool DisableScroll;
 	short xCorr, yCorr;
 
 	/** Returns true if a pixel on a given position in the sprite 
@@ -239,7 +232,6 @@ public:
 	 *  for projectile light spots */
 	virtual Sprite2D* CreateLight(int radius, int intensity) = 0;
 	virtual void SetGamma(int brightness, int contrast) = 0;
-	virtual void SetMouseScrollSpeed(int speed) = 0;
 };
 
 #endif

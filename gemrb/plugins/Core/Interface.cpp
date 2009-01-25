@@ -151,6 +151,8 @@ Interface::Interface(int iargc, char* iargv[])
 	CursorCount = 0;
 	Cursors = NULL;
 
+	mousescrollspd = 10;
+
 	ConsolePopped = false;
 	CheatFlag = false;
 	FogOfWar = 1;
@@ -923,7 +925,7 @@ void Interface::Main()
 	vars->Lookup("Gamma Correction", contrast);
 	vars->Lookup("Mouse Scroll Speed", speed);
 	video->SetGamma(brightness, contrast);
-	video->SetMouseScrollSpeed((int) speed);
+	SetMouseScrollSpeed((int) speed);
 	if (vars->Lookup("Tooltips", TooltipDelay)) {
 		// the games store the slider position*10, not the actual delay
 		TooltipDelay *= TOOLTIP_DELAY_FACTOR/10;
@@ -3695,8 +3697,6 @@ void Interface::SetCutSceneMode(bool active)
 		}
 	}
 	video->SetMouseEnabled(!active);
-	video->moveX = 0;
-	video->moveY = 0;
 }
 
 bool Interface::InCutSceneMode() const
@@ -4904,6 +4904,14 @@ Store *Interface::SetCurrentStore(const ieResRef resname, const ieVariable owner
 	return CurrentStore;
 }
 
+void Interface::SetMouseScrollSpeed(int speed) {
+	mousescrollspd = (speed+1)*2;
+}
+
+int Interface::GetMouseScrollSpeed() {
+	return mousescrollspd;
+}
+	
 ieStrRef Interface::GetRumour(const ieResRef dlgref)
 {
 	DialogMgr* dm = ( DialogMgr* ) GetInterface( IE_DLG_CLASS_ID );

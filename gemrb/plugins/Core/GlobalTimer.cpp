@@ -141,8 +141,9 @@ void GlobalTimer::Update()
 
 	Video *video = core->GetVideoDriver();
 
-	if (video->isScrolling() )
-		video->drawScrollCursorSprite(video->whereIsTheCursor());
+	gc = core->GetGameControl();
+	if (gc)
+		gc->UpdateScrolling();
 
 	UpdateAnimations();
 
@@ -190,7 +191,6 @@ void GlobalTimer::Update()
 	if (fadeFromCounter==fadeFromMax) {
 		video->SetFadePercent( 0 );
 	}
-	gc = core->GetGameControl();
 	if (!gc) {
 		goto end;
 	}

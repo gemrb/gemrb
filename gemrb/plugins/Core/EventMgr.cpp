@@ -21,6 +21,7 @@
 
 #include "../../includes/win32def.h"
 #include "EventMgr.h"
+#include "GameControl.h"
 #include "Interface.h"
 #include "Video.h"
 
@@ -146,6 +147,11 @@ void EventMgr::MouseMove(unsigned short x, unsigned short y)
 	}
 	if (!last_win_focused) {
 		return;
+	}
+	GameControl *gc = core->GetGameControl();
+	if (gc) {
+		// for scrolling
+		gc->OnGlobalMouseMove(x, y);
 	}
 	std::vector< int>::iterator t;
 	std::vector< Window*>::iterator m;
