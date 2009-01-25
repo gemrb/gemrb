@@ -46,12 +46,12 @@ TLKImp::TLKImp(void)
 		int i;
 		TableMgr * tab;
 
-		int table=core->LoadTable("months");
+		int table=gamedata->LoadTable("months");
 		if (table<0) {
 			monthnamecount=-1;
 			return;
 		}
-		tab = core->GetTable(table);
+		tab = gamedata->GetTable(table);
 		if (!tab) {
 			monthnamecount=-1;
 			goto end;
@@ -64,7 +64,7 @@ TLKImp::TLKImp(void)
 			monthnames[i]=atoi(tab->QueryField(i,1));
 		}
 end:
-		core->DelTable(table);
+		gamedata->DelTable(table);
 	}
 }
 
@@ -187,11 +187,11 @@ int TLKImp::RaceStrRef(int slot)
 	} else {
 		race=0;
 	}
-	int table = core->LoadTable("races");
+	int table = gamedata->LoadTable("races");
 	if (table<0) {
 		return -1;
 	}
-	TableMgr *tab=core->GetTable(table);
+	TableMgr *tab=gamedata->GetTable(table);
 	if (!tab) {
 		return -1;
 	}
@@ -354,8 +354,8 @@ int TLKImp::BuiltinToken(char* Token, char* dest)
 		ieDword row = 0; //default value is 0 (generalist)
 		//this is subject to change, the row number in magesch.2da
 		core->GetDictionary()->Lookup( "MAGESCHOOL", row ); 
-		int ind = core->LoadTable( "magesch" );
-		TableMgr* tm = core->GetTable( ind );
+		int ind = gamedata->LoadTable( "magesch" );
+		TableMgr* tm = gamedata->GetTable( ind );
 		if (tm) {
 			const char* value = tm->QueryField( row, 2 );
 			Decoded = GetString( atoi( value ), 0 );

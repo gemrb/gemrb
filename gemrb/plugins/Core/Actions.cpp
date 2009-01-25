@@ -1484,9 +1484,9 @@ void GameScript::FaceSavedLocation(Scriptable* Sender, Action* parameters)
 /*switchplaylist could implement fade */
 void GameScript::StartSong(Scriptable* /*Sender*/, Action* parameters)
 {
-	int MusicTable = core->LoadTable( "music" );
+	int MusicTable = gamedata->LoadTable( "music" );
 	if (MusicTable >= 0) {
-		TableMgr* music = core->GetTable( MusicTable );
+		TableMgr* music = gamedata->GetTable( MusicTable );
 		const char* string = music->QueryField( parameters->int0Parameter, 0 );
 		if (string[0] == '*') {
 			core->GetMusicMgr()->HardEnd();
@@ -2692,9 +2692,9 @@ void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
 	int xptable;
 
 	if (core->HasFeature(GF_HAS_EXPTABLE) ) {
-		xptable = core->LoadTable("exptable");
+		xptable = gamedata->LoadTable("exptable");
 	} else {
-		xptable = core->LoadTable( "xplist" );
+		xptable = gamedata->LoadTable( "xplist" );
 	}
 
 	if (parameters->int0Parameter>0) {
@@ -2704,7 +2704,7 @@ void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
 		printMessage("GameScript","Can't perform ADDXP2DA",LIGHT_RED);
 		return;
 	}
-	const char * xpvalue = core->GetTable( xptable )->QueryField( parameters->string0Parameter, "0" ); //level is unused
+	const char * xpvalue = gamedata->GetTable( xptable )->QueryField( parameters->string0Parameter, "0" ); //level is unused
 
 	if ( xpvalue[0]=='P' && xpvalue[1]=='_') {
 		//divide party xp
@@ -2713,7 +2713,7 @@ void GameScript::AddXP2DA(Scriptable* /*Sender*/, Action* parameters)
 		//give xp everyone
 		core->GetGame()->ShareXP(atoi(xpvalue), 0 );
 	}
-	core->DelTable( xptable );
+	gamedata->DelTable( xptable );
 }
 
 void GameScript::AddExperienceParty(Scriptable* /*Sender*/, Action* parameters)
@@ -2804,17 +2804,17 @@ void GameScript::JoinParty(Scriptable* Sender, Action* parameters)
 		act->SetScript( "", AI_SCRIPT_LEVEL, true );
 		act->SetScript( "DPLAYER2", SCR_DEFAULT, false );
 	}
-	int pdtable = core->LoadTable( "pdialog" );
+	int pdtable = gamedata->LoadTable( "pdialog" );
 	if ( pdtable >= 0 ) {
 		const char* scriptname = act->GetScriptName();
 		ieResRef resref;
-		TableMgr *tab=core->GetTable( pdtable );
+		TableMgr *tab=gamedata->GetTable( pdtable );
 		//set dialog only if we got a row
 		if (tab->GetRowIndex( scriptname ) != -1) {
 			strnlwrcpy(resref, tab->QueryField( scriptname, "JOIN_DIALOG_FILE"),8);
 			act->SetDialog( resref );
 		}
-		core->DelTable( pdtable );
+		gamedata->DelTable( pdtable );
 	}
 	core->GetGame()->JoinParty( act, JP_JOIN );
 	core->GetGUIScriptEngine()->RunFunction( "UpdatePortraitWindow" );
@@ -3288,12 +3288,12 @@ void GameScript::SetLeavePartyDialogFile(Scriptable* Sender, Action* /*parameter
 	if (Sender->Type != ST_ACTOR) {
 		return;
 	}
-	int pdtable = core->LoadTable( "pdialog" );
+	int pdtable = gamedata->LoadTable( "pdialog" );
 	Actor* act = ( Actor* ) Sender;
 	const char* scriptingname = act->GetScriptName();
-	act->SetDialog( core->GetTable( pdtable )->QueryField( scriptingname,
+	act->SetDialog( gamedata->GetTable( pdtable )->QueryField( scriptingname,
 			"POST_DIALOG_FILE" ) );
-	core->DelTable( pdtable );
+	gamedata->DelTable( pdtable );
 }
 
 void GameScript::TextScreen(Scriptable* /*Sender*/, Action* parameters)
@@ -4081,28 +4081,28 @@ void GameScript::TakeItemList(Scriptable * Sender, Action* parameters)
 	if (!tar || tar->Type!=ST_ACTOR) {
 		return;
 	}
-	int table = core->LoadTable(parameters->string0Parameter);
+	int table = gamedata->LoadTable(parameters->string0Parameter);
 	if (table<0) {
 		return;
 	}
-	TableMgr *tab=core->GetTable( table );
+	TableMgr *tab=gamedata->GetTable( table );
 	if (tab) {
 		int rows = tab->GetRowCount();
 		for (int i=0;i<rows;i++) {
 			MoveItemCore(tar, Sender, tab->QueryField(i,0), 0, IE_INV_ITEM_UNSTEALABLE);
 		}
 	}
-	core->DelTable(table);
+	gamedata->DelTable(table);
 }
 
 void GameScript::TakeItemListParty(Scriptable * Sender, Action* parameters)
 {
-	int table = core->LoadTable(parameters->string0Parameter);
+	int table = gamedata->LoadTable(parameters->string0Parameter);
 	if (table<0) {
 		return;
 	}
 	Game *game = core->GetGame();
-	TableMgr *tab=core->GetTable( table );
+	TableMgr *tab=gamedata->GetTable( table );
 	if (tab) {
 		int rows = tab->GetRowCount();
 		for (int i=0;i<rows;i++) {
@@ -4113,17 +4113,17 @@ void GameScript::TakeItemListParty(Scriptable * Sender, Action* parameters)
 			}
 		}
 	}
-	core->DelTable(table);
+	gamedata->DelTable(table);
 }
 
 void GameScript::TakeItemListPartyNum(Scriptable * Sender, Action* parameters)
 {
-	int table = core->LoadTable(parameters->string0Parameter);
+	int table = gamedata->LoadTable(parameters->string0Parameter);
 	if (table<0) {
 		return;
 	}
 	Game *game = core->GetGame();
-	TableMgr *tab=core->GetTable( table );
+	TableMgr *tab=gamedata->GetTable( table );
 	if (tab) {
 		int rows = tab->GetRowCount();
 		for (int i=0;i<rows;i++) {
@@ -4140,7 +4140,7 @@ void GameScript::TakeItemListPartyNum(Scriptable * Sender, Action* parameters)
 			}
 		}
 	}
-	core->DelTable(table);
+	gamedata->DelTable(table);
 }
 
 //bg2
@@ -5078,9 +5078,9 @@ void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 	char FolderName[_MAX_PATH];
 	const char *folder = "";
 
-	int SlotTable = core->LoadTable( "savegame" );
+	int SlotTable = gamedata->LoadTable( "savegame" );
 	if (SlotTable >= 0) {
-		TableMgr* tab = core->GetTable( SlotTable );
+		TableMgr* tab = gamedata->GetTable( SlotTable );
 		type = atoi(tab->QueryField((unsigned int) -1));
 		if (type) {
 			char * str = core->GetString( parameters->int0Parameter, IE_STR_STRREFOFF);
@@ -5093,7 +5093,7 @@ void GameScript::SaveGame(Scriptable* /*Sender*/, Action* parameters)
 	}
 	core->GetSaveGameIterator()->CreateSaveGame(parameters->int0Parameter, folder);
 	if (SlotTable >= 0) {
-		core->DelTable(SlotTable);
+		gamedata->DelTable(SlotTable);
 	}
 }
 
@@ -5896,15 +5896,15 @@ void GameScript::TransformPartyItemAll(Scriptable* /*Sender*/, Action* parameter
 
 void GameScript::GeneratePartyMember(Scriptable* /*Sender*/, Action* parameters)
 {
-	int PCTable = core->LoadTable( "bios" );
+	int PCTable = gamedata->LoadTable( "bios" );
 	if (PCTable<0) {
 		return;
 	}
-	TableMgr* pcs = core->GetTable( PCTable );
+	TableMgr* pcs = gamedata->GetTable( PCTable );
 	const char* string = pcs->QueryField( parameters->int0Parameter, 0 );
 printf ("GeneratePartyMember: %s\n", string);
-	int pos = core->LoadCreature(string,0,false);
-	core->DelTable( PCTable );
+	int pos = gamedata->LoadCreature(string,0,false);
+	gamedata->DelTable( PCTable );
 	if (pos<0) {
 		return;
 	}
@@ -5959,7 +5959,7 @@ void GameScript::FloatRebus(Scriptable* Sender, Action* parameters)
 	}
 	Actor *actor = (Actor *)tar;
 	RebusResRef[5]=(char) core->Roll(1,5,'0');
-	ScriptedAnimation *vvc = core->GetScriptedAnimation(RebusResRef, 0);
+	ScriptedAnimation *vvc = gamedata->GetScriptedAnimation(RebusResRef, 0);
 	if (vvc) {
 		//setting the height
 		vvc->ZPos=actor->size*20;

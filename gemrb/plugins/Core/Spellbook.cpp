@@ -76,17 +76,17 @@ static ieResRef *ResolveShapeName(ieDword index)
 */
 static ieResRef *GetSpellTable(const ieResRef tableresref, int column)
 {
-	int table = core->LoadTable(tableresref);
+	int table = gamedata->LoadTable(tableresref);
 	if (table<0) {
 		return NULL;
 	}
-	TableMgr *tab = core->GetTable((unsigned int) table);
+	TableMgr *tab = gamedata->GetTable((unsigned int) table);
 	int count = tab->GetRowCount();
 	ieResRef *reslist = (ieResRef *) malloc (sizeof(ieResRef) * count);
 	for(int i = 0; i<count;i++) {
 		strnlwrcpy(reslist[i], tab->QueryField(i, column), 8);
 	}
-	core->DelTable((unsigned int) table);
+	gamedata->DelTable((unsigned int) table);
 	return reslist;
 }
 
@@ -805,7 +805,7 @@ void Spellbook::GenerateSpellInfo()
 					continue;
 				if (!slot->Flags)
 					continue;
-				Spell *spl = core->GetSpell(slot->SpellResRef);
+				Spell *spl = gamedata->GetSpell(slot->SpellResRef);
 				ieDword level = 0;
 				SpellExtHeader *seh = FindSpellInfo(sm->Level, sm->Type, slot->SpellResRef);
 				if (seh) {
@@ -837,7 +837,7 @@ void Spellbook::GenerateSpellInfo()
 				seh->Projectile = ext_header->ProjectileAnimation;
 				seh->CastingTime = (ieWord) ext_header->CastingTime;
 				seh->strref = spl->SpellName;
-				core->FreeSpell(spl, slot->SpellResRef, false);
+				gamedata->FreeSpell(spl, slot->SpellResRef, false);
 			}
 		}
 	}

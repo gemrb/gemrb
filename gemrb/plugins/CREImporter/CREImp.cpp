@@ -362,8 +362,8 @@ void CREImp::SetupColor(ieDword &stat)
 	if (RandColor==-1) {
 		RandColor=0;
 		RandRows=0;
-		int table = core->LoadTable( "randcolr" );
-		TableMgr *rndcol = core->GetTable( table );
+		int table = gamedata->LoadTable( "randcolr" );
+		TableMgr *rndcol = gamedata->GetTable( table );
 		if (rndcol) {
 			RandColor = rndcol->GetColumnCount();
 			RandRows = rndcol->GetRowCount();
@@ -383,7 +383,7 @@ void CREImp::SetupColor(ieDword &stat)
 		else {
 			RandColor=0;
 		}
-		core->DelTable( table );
+		gamedata->DelTable( table );
 	}
 
 	if (stat<200) return;
@@ -767,7 +767,7 @@ void CREImp::ReadInventory(Actor *act, unsigned int Inventory_Size)
 				continue;
 			}
 			CREItem *item = items[index];
-			if (item && core->Exists(item->ItemResRef, IE_ITM_CLASS_ID)) {
+			if (item && gamedata->Exists(item->ItemResRef, IE_ITM_CLASS_ID)) {
 				act->inventory.SetSlotItem( item, Slot );
 				/* this stuff will be done in Actor::SetMap
 				 * after the actor gets an area (and game obj)

@@ -624,7 +624,7 @@ void IniSpawn::SpawnCreature(CritterEntry &critter)
 	if (!stream) {
 		return;
 	}
-	Actor* cre = core->GetCreature(stream);
+	Actor* cre = gamedata->GetCreature(stream);
 	if (!cre) {
 		return;
 	}

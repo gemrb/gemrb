@@ -39,13 +39,13 @@ KeyImp::KeyImp(void)
 	// FIXME: Use FindInPath() and do NOT compile out for Windows
 	if (core->CaseSensitive) {
 		char path[_MAX_PATH];
-		PathJoin( path, core->GamePath, core->GameOverride, NULL );
+		PathJoin( path, core->GamePath, core->GameOverridePath, NULL );
 		if (!dir_exists( path )) {
-			core->GameOverride[0] = toupper( core->GameOverride[0] );
+			core->GameOverridePath[0] = toupper( core->GameOverridePath[0] );
 		}
-		PathJoin( path, core->GamePath, core->GameData, NULL );
+		PathJoin( path, core->GamePath, core->GameDataPath, NULL );
 		if (!dir_exists( path )) {
-			core->GameData[0] = toupper( core->GameData[0] );
+			core->GameDataPath[0] = toupper( core->GameDataPath[0] );
 		}
 	}
 #endif
@@ -216,12 +216,12 @@ bool KeyImp::HasResource(const char* resname, SClass_ID type, bool silent)
 	//Search it in the GemRB override Directory
 	PathJoin( path, "override", core->GameType, NULL ); //this shouldn't change
 	if (FindIn( core->CachePath, "", resname, type)) return true;
-	if (FindIn( core->GemRBOverride, path, resname, type)) return true;
-	if (FindIn( core->GamePath, core->GameOverride, resname, type)) return true;
-	if (FindIn( core->GamePath, core->GameSounds, resname, type)) return true;
-	if (FindIn( core->GamePath, core->GameScripts, resname, type)) return true;
-	if (FindIn( core->GamePath, core->GamePortraits, resname, type)) return true;
-	if (FindIn( core->GamePath, core->GameData, resname, type)) return true;
+	if (FindIn( core->GemRBOverridePath, path, resname, type)) return true;
+	if (FindIn( core->GamePath, core->GameOverridePath, resname, type)) return true;
+	if (FindIn( core->GamePath, core->GameSoundsPath, resname, type)) return true;
+	if (FindIn( core->GamePath, core->GameScriptsPath, resname, type)) return true;
+	if (FindIn( core->GamePath, core->GamePortraitsPath, resname, type)) return true;
+	if (FindIn( core->GamePath, core->GameDataPath, resname, type)) return true;
 
 	unsigned int ResLocator;
 	if (resources.Lookup( resname, type, ResLocator )) {
@@ -253,27 +253,27 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
 		"Found in Cache" );
 	if (fs) return fs;
 
-	fs=SearchIn( core->GemRBOverride, path, resname, type,
+	fs=SearchIn( core->GemRBOverridePath, path, resname, type,
 		"Found in GemRB Override" );
 	if (fs) return fs;
 
-	fs=SearchIn( core->GamePath, core->GameOverride, resname, type,
+	fs=SearchIn( core->GamePath, core->GameOverridePath, resname, type,
 		"Found in Override" );
 	if (fs) return fs;
 
-	fs=SearchIn( core->GamePath, core->GameSounds, resname, type,
+	fs=SearchIn( core->GamePath, core->GameSoundsPath, resname, type,
 		"Found in Sounds" );
 	if (fs) return fs;
 
-	fs=SearchIn( core->GamePath, core->GameScripts, resname, type,
+	fs=SearchIn( core->GamePath, core->GameScriptsPath, resname, type,
 		"Found in Scripts" );
 	if (fs) return fs;
 
-	fs=SearchIn( core->GamePath, core->GamePortraits, resname, type,
+	fs=SearchIn( core->GamePath, core->GamePortraitsPath, resname, type,
 		"Found in Portraits" );
 	if (fs) return fs;
 
-	fs=SearchIn( core->GamePath, core->GameData, resname, type,
+	fs=SearchIn( core->GamePath, core->GameDataPath, resname, type,
 		"Found in Data" );
 	if (fs) return fs;
 
@@ -385,10 +385,10 @@ DataStream* KeyImp::GetResource(const char* resname, SClass_ID type)
 void* KeyImp::GetFactoryResource(const char* resname, SClass_ID type,
 	unsigned char mode)
 {
-	int fobjindex = core->GetFactory()->IsLoaded(resname,type);
+	int fobjindex = gamedata->GetFactory()->IsLoaded(resname,type);
 	// already cached
 	if ( fobjindex != -1)
-		return core->GetFactory()->GetFactoryObject( fobjindex );
+		return gamedata->GetFactory()->GetFactoryObject( fobjindex );
 
 	switch (type) {
 	case IE_BAM_CLASS_ID:
@@ -402,7 +402,7 @@ void* KeyImp::GetFactoryResource(const char* resname, SClass_ID type,
 			ani->Open( ret, true );
 			AnimationFactory* af = ani->GetAnimationFactory( resname, mode );
 			core->FreeInterface( ani );
-			core->GetFactory()->AddFactoryObject( af );
+			gamedata->GetFactory()->AddFactoryObject( af );
 			return af;
 		}
 		return NULL;
@@ -417,7 +417,7 @@ void* KeyImp::GetFactoryResource(const char* resname, SClass_ID type,
 				img->Open( ret, true );
 				ImageFactory* fact = img->GetImageFactory( resname );
 				core->FreeInterface( img );
-				core->GetFactory()->AddFactoryObject( fact );
+				gamedata->GetFactory()->AddFactoryObject( fact );
 				return fact;
 			}
 		}
@@ -429,7 +429,7 @@ void* KeyImp::GetFactoryResource(const char* resname, SClass_ID type,
 				img->Open( ret, true );
 				ImageFactory* fact = img->GetImageFactory( resname );
 				core->FreeInterface( img );
-				core->GetFactory()->AddFactoryObject( fact );
+				gamedata->GetFactory()->AddFactoryObject( fact );
 				return fact;
 			}
 		}

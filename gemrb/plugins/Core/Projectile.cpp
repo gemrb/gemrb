@@ -64,8 +64,8 @@ Projectile::~Projectile()
 	}
 	delete effects;
 
-	core->FreePalette(palette, PaletteRes);
-	//core->FreePalette(shadpal);
+	gamedata->FreePalette(palette, PaletteRes);
+	//gamedata->FreePalette(shadpal);
 	ClearPath();
 
 	if (phase != P_UNINITED) {
@@ -186,8 +186,8 @@ void Projectile::Setup()
 	if (TFlags&PTF_COLOUR) {
 		SetupPalette(travel, palette, Gradients);
 	} else {
-		core->FreePalette(palette, PaletteRes);
-		palette=core->GetPalette(PaletteRes);
+		gamedata->FreePalette(palette, PaletteRes);
+		palette=gamedata->GetPalette(PaletteRes);
 	}
 
 	if (TFlags&PTF_SHADOW) {
@@ -518,7 +518,7 @@ void Projectile::DrawExplosion(Region & /*screen*/)
 	if (Extension->ExplType!=0xff) {
 		ieResRef *res = core->GetProjectileServer()->GetExplosion(Extension->ExplType, 0);
 		if (res) {
-			ScriptedAnimation* vvc = core->GetScriptedAnimation(*res, false);
+			ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(*res, false);
 			if (vvc) {
 				vvc->XPos+=Pos.x;
 				vvc->YPos+=Pos.y;

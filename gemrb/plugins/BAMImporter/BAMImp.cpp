@@ -45,7 +45,7 @@ BAMImp::~BAMImp(void)
 	}
 	delete[] frames;
 	delete[] cycles;
-	core->FreePalette(palette);
+	gamedata->FreePalette(palette);
 }
 
 bool BAMImp::Open(DataStream* stream, bool autoFree)
@@ -60,7 +60,7 @@ bool BAMImp::Open(DataStream* stream, bool autoFree)
 	}
 	delete[] frames;
 	delete[] cycles;
-	core->FreePalette(palette);
+	gamedata->FreePalette(palette);
 
 	str = stream;
 	this->autoFree = autoFree;

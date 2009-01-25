@@ -69,8 +69,8 @@ Button::~Button()
 	if (Text) {
 		free( Text );
 	}
-	core->FreePalette( normal_palette);
-	core->FreePalette( disabled_palette);
+	gamedata->FreePalette( normal_palette);
+	gamedata->FreePalette( disabled_palette);
 }
 /** Sets the 'type' Image of the Button to 'img'.
 'type' may assume the following values:
@@ -644,7 +644,7 @@ bool Button::IsPixelTransparent(unsigned short x, unsigned short y)
 // Set palette used for drawing button label in normal state
 void Button::SetTextColor(const Color &fore, const Color &back)
 {
-	core->FreePalette( normal_palette );
+	gamedata->FreePalette( normal_palette );
 	normal_palette = core->CreatePalette( fore, back );
 	Changed = true;
 }

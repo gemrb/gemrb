@@ -68,9 +68,9 @@ void InitScriptTables()
 {
 	//initializing the skill->stats conversion table
 	{
-	int table = core->LoadTable( "skillsta" );
+	int table = gamedata->LoadTable( "skillsta" );
 	if (table!=-1) {
-		TableMgr *tab = core->GetTable( table );
+		TableMgr *tab = gamedata->GetTable( table );
 		int rowcount = tab->GetRowCount();
 		SkillCount = rowcount;
 		if (rowcount) {
@@ -83,39 +83,39 @@ void InitScriptTables()
 	}
 	//initializing the happiness table
 	{
-	int table = core->LoadTable( "happy" );
+	int table = gamedata->LoadTable( "happy" );
 	if (table!=-1) {
-		TableMgr *tab = core->GetTable( table );
+		TableMgr *tab = gamedata->GetTable( table );
 		for (int alignment=0;alignment<3;alignment++) {
 			for (int reputation=0;reputation<20;reputation++) {
 				happiness[alignment][reputation]=strtol(tab->QueryField(reputation,alignment), NULL, 0);
 			}
 		}
-		core->DelTable( table );
+		gamedata->DelTable( table );
 	}
 	}
 
 	//initializing the reaction mod. reputation table
 	{
-	int table = core->LoadTable( "rmodrep" );
+	int table = gamedata->LoadTable( "rmodrep" );
 	if (table!=-1) {
-		TableMgr *tab = core->GetTable( table );
+		TableMgr *tab = gamedata->GetTable( table );
 		for (int reputation=0;reputation<20;reputation++) {
 			rmodrep[reputation]=strtol(tab->QueryField(0,reputation), NULL, 0);
 		}
-		core->DelTable( table );
+		gamedata->DelTable( table );
 	}
 	}
 
 	//initializing the reaction mod. charisma table
 	{
-	int table = core->LoadTable( "rmodchr" );
+	int table = gamedata->LoadTable( "rmodchr" );
 	if (table!=-1) {
-		TableMgr *tab = core->GetTable( table );
+		TableMgr *tab = gamedata->GetTable( table );
 		for (int charisma=0;charisma<25;charisma++) {
 			rmodchr[charisma]=strtol(tab->QueryField(0,charisma), NULL, 0);
 		}
-		core->DelTable( table );
+		gamedata->DelTable( table );
 	}
 	}
 }
@@ -295,7 +295,7 @@ bool HasItemCore(Inventory *inventory, const ieResRef itemname, ieDword flags)
 		CREItem *itemslot = inventory->GetSlotItem(i);
 		if (!itemslot)
 			continue;
-		Item *item = core->GetItem(itemslot->ItemResRef);
+		Item *item = gamedata->GetItem(itemslot->ItemResRef);
 		if (!item)
 			continue;
 		bool ret = false;
@@ -303,7 +303,7 @@ bool HasItemCore(Inventory *inventory, const ieResRef itemname, ieDword flags)
 			//the store is the same as the item's name
 			ret = StoreHasItemCore(itemslot->ItemResRef, itemname);
 		}
-		core->FreeItem(item, itemslot->ItemResRef);
+		gamedata->FreeItem(item, itemslot->ItemResRef);
 		if (ret) {
 			return true;
 		}
@@ -662,7 +662,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 	else {
 		ds = core->GetResourceMgr()->GetResource( parameters->string0Parameter, IE_CRE_CLASS_ID );
 	}
-	Actor *ab = core->GetCreature(ds);
+	Actor *ab = gamedata->GetCreature(ds);
 
 	//iwd2 allows an optional scriptname to be set
 	//but bg2 doesn't have this feature
@@ -725,7 +725,7 @@ void CreateCreatureCore(Scriptable* Sender, Action* parameters, int flags)
 static ScriptedAnimation *GetVVCEffect(const char *effect, int iterations)
 {
 	if (effect[0]) {
-		ScriptedAnimation* vvc = core->GetScriptedAnimation(effect, false);
+		ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(effect, false);
 		if (!vvc) {
 			printMessage("GameScript","Failed to create effect.",LIGHT_RED);
 			return NULL;
@@ -760,7 +760,7 @@ void CreateVisualEffectCore(Scriptable *Sender, Point &position, const char *eff
 void ChangeAnimationCore(Actor *src, const char *resref, bool effect)
 {
 	DataStream* ds = core->GetResourceMgr()->GetResource( resref, IE_CRE_CLASS_ID );
-	Actor *tar = core->GetCreature(ds);
+	Actor *tar = gamedata->GetCreature(ds);
 	if (tar) {
 		Map *map = src->GetCurrentArea();
 		map->AddActor( tar );
@@ -830,10 +830,10 @@ void GetPositionFromScriptable(Scriptable* scr, Point &position, bool dest)
 int CheckInteract(const char *talker, const char *target)
 {
 	int interact = -1;
-	interact = core->LoadTable( "interact" );
+	interact = gamedata->LoadTable( "interact" );
 	if(!interact)
 		return 0;
-	const char *value = core->GetTable(interact)->QueryField(talker, target);
+	const char *value = gamedata->GetTable(interact)->QueryField(talker, target);
 	if(!value)
 		return 0;
 	switch(value[0]) {
@@ -999,10 +999,10 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 				goto end_of_quest;
 			}
 			/* banter dialogue */
-			pdtable = core->LoadTable( "interdia" );
+			pdtable = gamedata->LoadTable( "interdia" );
 			//Dialog is a borrowed reference, we cannot free pdtable while it is being used
 			if (pdtable!=-1) {
-				Dialog = core->GetTable( pdtable )->QueryField( scriptingname, "FILE" );
+				Dialog = gamedata->GetTable( pdtable )->QueryField( scriptingname, "FILE" );
 			}
 			break;
 	}
@@ -1058,7 +1058,7 @@ void BeginDialog(Scriptable* Sender, Action* parameters, int Flags)
 //if pdtable was allocated, free it now, it will release Dialog
 end_of_quest:
 	if (pdtable!=-1) {
-		core->DelTable( pdtable );
+		gamedata->DelTable( pdtable );
 	}
 }
 
@@ -1135,12 +1135,12 @@ void CreateItemCore(CREItem *item, const char *resref, int a, int b, int c)
 {
 	strncpy(item->ItemResRef, resref, 8);
 	if (a==-1) {
-		Item *origitem = core->GetItem(resref);
+		Item *origitem = gamedata->GetItem(resref);
 		for(int i=0;i<3;i++) {
 			ITMExtHeader *e = origitem->GetExtHeader(i);
 			item->Usages[i]=e?e->Charges:0;
 		}
-		core->FreeItem(origitem, resref, false);
+		gamedata->FreeItem(origitem, resref, false);
 	} else {
 		item->Usages[0]=(ieWord) a;
 		item->Usages[1]=(ieWord) b;
@@ -2314,16 +2314,16 @@ Point GetEntryPoint(const char *areaname, const char *entryname)
 {
 	Point p;
 
-	int table = core->LoadTable( "entries" );
+	int table = gamedata->LoadTable( "entries" );
 	if (table<0) {
 		return p;
 	}
-	TableMgr *tab = core->GetTable( table );
+	TableMgr *tab = gamedata->GetTable( table );
 	const char *tmpstr = tab->QueryField(areaname, entryname);
 	int x=-1;
 	int y=-1;
 	sscanf(tmpstr, "%d.%d", &x, &y);
-	core->DelTable(table);
+	gamedata->DelTable(table);
 	p.x=(short) x;
 	p.y=(short) y;
 	return p;
@@ -2334,13 +2334,13 @@ unsigned int GetSpellDistance(ieResRef spellres, Actor *actor)
 {
 	unsigned int dist;
 
-	Spell* spl = core->GetSpell( spellres );
+	Spell* spl = gamedata->GetSpell( spellres );
 	if (!spl) {
 		printMessage("GameScript"," ",LIGHT_RED);
 		printf("Spell couldn't be found:%.8s.\n", spellres);
 		return 0;
 	}
 	dist=spl->GetCastingDistance(actor);
-	core->FreeSpell(spl, spellres, false);
+	gamedata->FreeSpell(spl, spellres, false);
 	return dist*15;
 }

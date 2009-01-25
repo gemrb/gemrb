@@ -185,8 +185,8 @@ void CharAnimations::SetHelmetRef(const char* ref)
 	// Note: this doesn't happen "often", so this isn't a performance
 	//       bottleneck. (wjp)
 	DropAnims();
-	core->FreePalette(palette[PAL_HELMET], 0);
-	core->FreePalette(modifiedPalette[PAL_HELMET], 0);
+	gamedata->FreePalette(palette[PAL_HELMET], 0);
+	gamedata->FreePalette(modifiedPalette[PAL_HELMET], 0);
 }
 
 void CharAnimations::SetWeaponRef(const char* ref)
@@ -196,8 +196,8 @@ void CharAnimations::SetWeaponRef(const char* ref)
 
 	// TODO: Only drop weapon anims?
 	DropAnims();
-	core->FreePalette(palette[PAL_WEAPON], 0);
-	core->FreePalette(modifiedPalette[PAL_WEAPON], 0);
+	gamedata->FreePalette(palette[PAL_WEAPON], 0);
+	gamedata->FreePalette(modifiedPalette[PAL_WEAPON], 0);
 }
 
 void CharAnimations::SetOffhandRef(const char* ref)
@@ -207,8 +207,8 @@ void CharAnimations::SetOffhandRef(const char* ref)
 
 	// TODO: Only drop shield/offhand anims?
 	DropAnims();
-	core->FreePalette(palette[PAL_OFFHAND], 0);
-	core->FreePalette(modifiedPalette[PAL_OFFHAND], 0);
+	gamedata->FreePalette(palette[PAL_OFFHAND], 0);
+	gamedata->FreePalette(modifiedPalette[PAL_OFFHAND], 0);
 }
 
 void CharAnimations::LockPalette(const ieDword *gradients)
@@ -271,7 +271,7 @@ void CharAnimations::SetupColors(PaletteType type)
 			needmod = true;
 		}
 		if ((colorcount == 0) && (needmod==false) ) {
-			core->FreePalette(palette[PAL_MAIN], PaletteResRef);
+			gamedata->FreePalette(palette[PAL_MAIN], PaletteResRef);
 			PaletteResRef[0]=0;
 			return;
 		}
@@ -286,7 +286,7 @@ void CharAnimations::SetupColors(PaletteType type)
 				modifiedPalette[PAL_MAIN] = new Palette();
 			modifiedPalette[PAL_MAIN]->SetupGlobalRGBModification(palette[PAL_MAIN], GlobalColorMod);
 		} else {
-			core->FreePalette(modifiedPalette[PAL_MAIN], 0);
+			gamedata->FreePalette(modifiedPalette[PAL_MAIN], 0);
 		}
 		return;
 	}
@@ -298,14 +298,14 @@ void CharAnimations::SetupColors(PaletteType type)
 			needmod = true;
 		}
 		if (!needmod && PaletteResRef[0]) {
-			core->FreePalette(palette[PAL_MAIN], PaletteResRef);
+			gamedata->FreePalette(palette[PAL_MAIN], PaletteResRef);
 		}
 		PaletteResRef[0]=0;
 		//handling special palettes like MBER_BL (black bear)
 		if (PType!=1) {
 			snprintf(PaletteResRef,8,"%.4s_%-.2s",ResRef, (char *) &PType);
 			strlwr(PaletteResRef);
-			Palette *tmppal = core->GetPalette(PaletteResRef);
+			Palette *tmppal = gamedata->GetPalette(PaletteResRef);
 			if (tmppal) {
 				palette[PAL_MAIN] = tmppal;
 			} else {
@@ -317,7 +317,7 @@ void CharAnimations::SetupColors(PaletteType type)
 				modifiedPalette[PAL_MAIN] = new Palette();
 			modifiedPalette[PAL_MAIN]->SetupGlobalRGBModification(palette[PAL_MAIN], GlobalColorMod);
 		} else {
-			core->FreePalette(modifiedPalette[PAL_MAIN], 0);
+			gamedata->FreePalette(modifiedPalette[PAL_MAIN], 0);
 		}
 		return;
 	}
@@ -349,7 +349,7 @@ void CharAnimations::SetupColors(PaletteType type)
 			modifiedPalette[(int)type]->SetupRGBModification(palette[(int)type],ColorMods, (int)type);
 		}
 	} else {
-		core->FreePalette(modifiedPalette[(int)type], 0);
+		gamedata->FreePalette(modifiedPalette[(int)type], 0);
 	}
 
 }
@@ -371,12 +371,12 @@ Palette* CharAnimations::GetPartPalette(int part)
 
 void CharAnimations::InitAvatarsTable()
 {
-	int tmp= core->LoadTable( "avatars" );
+	int tmp= gamedata->LoadTable( "avatars" );
 	if (tmp<0) {
 		printMessage("CharAnimations", "A critical animation file is missing!\n", LIGHT_RED);
 		abort();
 	}
-	TableMgr *Avatars = core->GetTable( tmp );
+	TableMgr *Avatars = gamedata->GetTable( tmp );
 	AvatarTable = (AvatarStruct *) calloc ( AvatarsCount = Avatars->GetRowCount(), sizeof(AvatarStruct) );
 	int i=AvatarsCount;
 	while(i--) {
@@ -400,7 +400,7 @@ void CharAnimations::InitAvatarsTable()
 		}
 		AvatarTable[i].Size=Avatars->QueryField(i,AV_SIZE)[0];
 	}
-	core->DelTable( tmp );
+	gamedata->DelTable( tmp );
 }
 
 CharAnimations::CharAnimations(unsigned int AnimID, ieDword ArmourLevel)
@@ -491,12 +491,12 @@ void CharAnimations::DropAnims()
 CharAnimations::~CharAnimations(void)
 {
 	DropAnims();
-	core->FreePalette(palette[PAL_MAIN], PaletteResRef);
+	gamedata->FreePalette(palette[PAL_MAIN], PaletteResRef);
 	int i;
 	for (i = 1; i < 4; ++i)
-		core->FreePalette(palette[i], 0);
+		gamedata->FreePalette(palette[i], 0);
 	for (i = 0; i < 4; ++i)
-		core->FreePalette(modifiedPalette[i], 0);
+		gamedata->FreePalette(modifiedPalette[i], 0);
 }
 /*
 This is a simple Idea of how the animation are coded
@@ -1096,13 +1096,13 @@ void CharAnimations::AddPSTSuffix(char* ResRef, unsigned char StanceID,
 			if (rand()&1) {
 				Prefix="sf2";
 				sprintf(ResRef,"%c%3s%4s",this->ResRef[0], Prefix, this->ResRef+1);
-				if (core->Exists(ResRef, IE_BAM_CLASS_ID) ) {
+				if (gamedata->Exists(ResRef, IE_BAM_CLASS_ID) ) {
 					return;
 				}
 			}
 			Prefix="sf1";
 			sprintf(ResRef,"%c%3s%4s",this->ResRef[0], Prefix, this->ResRef+1);
-			if (core->Exists(ResRef, IE_BAM_CLASS_ID) ) {
+			if (gamedata->Exists(ResRef, IE_BAM_CLASS_ID) ) {
 				return;
 			}
 			Prefix = "stc";

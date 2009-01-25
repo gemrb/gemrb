@@ -67,10 +67,10 @@ TextArea::TextArea(Color hitextcolor, Color initcolor, Color lowtextcolor)
 
 TextArea::~TextArea(void)
 {
-	core->FreePalette( palette );
-	core->FreePalette( initpalette );
-	core->FreePalette( selected );
-	core->FreePalette( lineselpal );
+	gamedata->FreePalette( palette );
+	gamedata->FreePalette( initpalette );
+	gamedata->FreePalette( selected );
+	gamedata->FreePalette( lineselpal );
 	core->GetVideoDriver()->FreeSprite( Cursor );
 	for (size_t i = 0; i < lines.size(); i++) {
 		free( lines[i] );

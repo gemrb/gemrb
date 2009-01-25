@@ -487,8 +487,8 @@ void Actor::SetCircleSize()
 
 void ApplyClab(Actor *actor, const char *clab, int level)
 {
-	int tidx = core->LoadTable(clab);
-	TableMgr *table = core->GetTable(tidx);
+	int tidx = gamedata->LoadTable(clab);
+	TableMgr *table = gamedata->GetTable(tidx);
 	if (table) {
 		int row = table->GetRowCount();
 		for(int i=0;i<level;i++) {
@@ -514,7 +514,7 @@ void ApplyClab(Actor *actor, const char *clab, int level)
 				}
 			}
 		}
-		core->DelTable(tidx);
+		gamedata->DelTable(tidx);
 	}
 }
 
@@ -527,8 +527,8 @@ bool Actor::ApplyKit(ieDword Value)
 {
 	//get current unmodified level (i guess)
 	int level = GetXPLevel(false);
-	int tidx = core->LoadTable("kitlist");
-	TableMgr *table = core->GetTable(tidx);
+	int tidx = gamedata->LoadTable("kitlist");
+	TableMgr *table = gamedata->GetTable(tidx);
 	if (table) {
 		ieDword row;
 		//find row by unusability
@@ -748,7 +748,7 @@ static void handle_overlay(Actor *actor, ieDword idx)
 	if (actor->FindOverlay(idx))
 		return;
 	ieDword flag = hc_locations&(1<<idx);
-	ScriptedAnimation *sca = core->GetScriptedAnimation(hc_overlays[idx], false);
+	ScriptedAnimation *sca = gamedata->GetScriptedAnimation(hc_overlays[idx], false);
 	if (sca) {
 		if (flag) {
 			sca->ZPos=-1;
@@ -1008,13 +1008,13 @@ static void InitActorTables()
 	DeathOnZeroStat=(bool) core->HasFeature(GF_DEATH_ON_ZERO_STAT);
 
 	//this table lists various level based xp bonuses
-	int table = core->LoadTable( "xpbonus" );
-	TableMgr *tm = core->GetTable( table );
+	int table = gamedata->LoadTable( "xpbonus" );
+	TableMgr *tm = gamedata->GetTable( table );
 
 	if (tm) {
 		xpbonustypes = tm->GetRowCount();
 		if (xpbonustypes == 0) {
-			core->DelTable( table );
+			gamedata->DelTable( table );
 			xpbonuslevels = 0;
 		} else {
 			xpbonuslevels = tm->GetColumnCount(0);
@@ -1031,8 +1031,8 @@ static void InitActorTables()
 	}
 	//this table lists skill groups assigned to classes
 	//it is theoretically possible to create hybrid classes
-	table = core->LoadTable( "clskills" );
-	tm = core->GetTable( table );
+	table = gamedata->LoadTable( "clskills" );
+	tm = gamedata->GetTable( table );
 	if (tm) {
 		classcount = tm->GetRowCount();
 		memset (isclass,0,sizeof(isclass));
@@ -1086,7 +1086,7 @@ static void InitActorTables()
 			}
 			bitmask <<=1;
 		}
-		core->DelTable( table );
+		gamedata->DelTable( table );
 	} else {
 		classcount = 0; //well
 	}
@@ -1107,8 +1107,8 @@ static void InitActorTables()
 	}
 
 	//initializing the vvc resource references
-	table = core->LoadTable( "damage" );
-	tm = core->GetTable( table );
+	table = gamedata->LoadTable( "damage" );
+	tm = gamedata->GetTable( table );
 	if (tm) {
 		for (i=0;i<DAMAGE_LEVELS;i++) {
 			const char *tmp = tm->QueryField( i, COL_MAIN );
@@ -1124,11 +1124,11 @@ static void InitActorTables()
 			tmp = tm->QueryField( i, COL_GRADIENT );
 			d_gradient[i]=atoi(tmp);
 		}
-		core->DelTable( table );
+		gamedata->DelTable( table );
 	}
 
-	table = core->LoadTable( "overlay" );
-	tm = core->GetTable( table );
+	table = gamedata->LoadTable( "overlay" );
+	tm = gamedata->GetTable( table );
 	if (tm) {
 		ieDword mask = 1;
 		for (i=0;i<OVERLAY_COUNT;i++) {
@@ -1139,14 +1139,14 @@ static void InitActorTables()
 			}
 			mask<<=1;
 		}
-		core->DelTable( table );
+		gamedata->DelTable( table );
 	}
 
 	//csound for bg1/bg2
 	memset(csound,0,sizeof(csound));
 	if (!core->HasFeature(GF_SOUNDFOLDERS)) {
-		table = core->LoadTable( "csound" );
-		tm = core->GetTable( table );
+		table = gamedata->LoadTable( "csound" );
+		tm = gamedata->GetTable( table );
 		if (tm) {
 			for(i=0;i<VCONST_COUNT;i++) {
 				const char *tmp = tm->QueryField( i, 0 );
@@ -1154,12 +1154,12 @@ static void InitActorTables()
 					csound[i]=tmp[0];
 				}
 			}
-			core->DelTable( table );
+			gamedata->DelTable( table );
 		}
 	}
 
-	table = core->LoadTable( "qslots" );
-	tm = core->GetTable( table );
+	table = gamedata->LoadTable( "qslots" );
+	tm = gamedata->GetTable( table );
 	GUIBTDefaults = (ActionButtonRow *) calloc( classcount,sizeof(ActionButtonRow) );
 
 	for (i = 0; i < classcount; i++) {
@@ -1171,11 +1171,11 @@ static void InitActorTables()
 		}
 	}
 	if (tm) {
-		core->DelTable( table );
+		gamedata->DelTable( table );
 	}
 
-	table = core->LoadTable( "itemuse" );
-	tm = core->GetTable( table );
+	table = gamedata->LoadTable( "itemuse" );
+	tm = gamedata->GetTable( table );
 	if (tm) {
 		usecount = tm->GetRowCount();
 		itemuse = new ItemUseType[usecount];
@@ -1190,11 +1190,11 @@ static void InitActorTables()
 				itemuse[i].which=0;
 			}
 		}
-		core->DelTable( table );
+		gamedata->DelTable( table );
 	}
 
-	table = core->LoadTable( "itemanim" );
-	tm = core->GetTable( table );
+	table = gamedata->LoadTable( "itemanim" );
+	tm = gamedata->GetTable( table );
 	if (tm) {
 		animcount = tm->GetRowCount();
 		itemanim = new ItemAnimType[animcount];
@@ -1202,12 +1202,12 @@ static void InitActorTables()
 			strnlwrcpy(itemanim[i].itemname, tm->QueryField(i,0),8 );
 			itemanim[i].animation = (ieByte) atoi( tm->QueryField(i,1) );
 		}
-		core->DelTable( table );
+		gamedata->DelTable( table );
 	}
 
 
-	table = core->LoadTable( "mxsplwis" );
-	tm = core->GetTable( table );
+	table = gamedata->LoadTable( "mxsplwis" );
+	tm = gamedata->GetTable( table );
 	if (tm) {
 		spllevels = tm->GetColumnCount(0);
 		int max = core->GetMaximumAbility();
@@ -1220,11 +1220,11 @@ static void InitActorTables()
 				}
 			}
 		}
-		core->DelTable( table );
+		gamedata->DelTable( table );
 	}
 
-	table = core->LoadTable( "featreq" );
-	tm = core->GetTable( table );
+	table = gamedata->LoadTable( "featreq" );
+	tm = gamedata->GetTable( table );
 	if (tm) {
 		unsigned int tmp;
 
@@ -1238,7 +1238,7 @@ static void InitActorTables()
 			}
 			featstats[i] = (ieByte) tmp;
 		}
-		core->DelTable( table );
+		gamedata->DelTable( table );
 	}
 }
 
@@ -1257,7 +1257,7 @@ void Actor::UnlockPalette()
 
 void Actor::AddAnimation(const ieResRef resource, int gradient, int height, int flags)
 {
-	ScriptedAnimation *sca = core->GetScriptedAnimation(resource, false);
+	ScriptedAnimation *sca = gamedata->GetScriptedAnimation(resource, false);
 	if (!sca)
 		return;
 	sca->ZPos=height;
@@ -1662,8 +1662,8 @@ void Actor::Response(int type)
 
 void Actor::ReactToDeath(const char * deadname)
 {
-	int table = core->LoadTable( "death" );
-	TableMgr *tm = core->GetTable( table );
+	int table = gamedata->LoadTable( "death" );
+	TableMgr *tm = gamedata->GetTable( table );
 	if (!tm) return;
 	// lookup value based on died's scriptingname and ours
 	// if value is 0 - use reactdeath
@@ -1698,7 +1698,7 @@ void Actor::ReactToDeath(const char * deadname)
 			break;
 		}
 	}
-	core->DelTable(table);
+	gamedata->DelTable(table);
 }
 
 //call this only from gui selects
@@ -2176,7 +2176,7 @@ void Actor::GetItemSlotInfo(ItemExtHeader *item, int which, int header)
 	}
 	const CREItem *slot = inventory.GetSlotItem(idx);
 	if (!slot) return; //quick item slot is empty
-	Item *itm = core->GetItem(slot->ItemResRef);
+	Item *itm = gamedata->GetItem(slot->ItemResRef);
 	if (!itm) return; //quick item slot contains invalid item resref
 	ITMExtHeader *ext_header = itm->GetExtHeader(headerindex);
 	//item has no extended header, or header index is wrong
@@ -2191,7 +2191,7 @@ void Actor::GetItemSlotInfo(ItemExtHeader *item, int which, int header)
 	} else {
 		item->Charges=slot->Usages[headerindex];
 	}
-	core->FreeItem(itm,slot->ItemResRef, false);
+	gamedata->FreeItem(itm,slot->ItemResRef, false);
 }
 
 void Actor::ReinitQuickSlots()
@@ -2287,7 +2287,7 @@ void Actor::CheckWeaponQuickSlot(unsigned int which)
 		if (core->QuerySlotEffects(slot) == SLOT_EFFECT_MISSILE) {
 			const CREItem *slotitm = inventory.GetSlotItem(slot);
 			assert(slotitm);
-			Item *itm = core->GetItem(slotitm->ItemResRef);
+			Item *itm = gamedata->GetItem(slotitm->ItemResRef);
 			assert(itm);
 			ITMExtHeader *ext_header = itm->GetExtHeader(header);
 			if (ext_header) {
@@ -2299,7 +2299,7 @@ void Actor::CheckWeaponQuickSlot(unsigned int which)
 			} else {
 				empty = true;
 			}
-			core->FreeItem(itm,slotitm->ItemResRef, false);
+			gamedata->FreeItem(itm,slotitm->ItemResRef, false);
 		}
 	}
 
@@ -2388,7 +2388,7 @@ int Actor::GetRangedWeapon(ITMExtHeader *&which, WeaponInfo *wi) const
 	if (!wield) {
 		return 0;
 	}
-	Item *item = core->GetItem(wield->ItemResRef);
+	Item *item = gamedata->GetItem(wield->ItemResRef);
 	if (!item) {
 		return 0;
 	}
@@ -2397,7 +2397,7 @@ int Actor::GetRangedWeapon(ITMExtHeader *&which, WeaponInfo *wi) const
 		wi->itemflags = wield->Flags;
 	}
 	which = item->GetWeaponHeader(true);
-	core->FreeItem(item, wield->ItemResRef, false);
+	gamedata->FreeItem(item, wield->ItemResRef, false);
 	return 0;
 }
 
@@ -2409,7 +2409,7 @@ unsigned int Actor::GetWeapon(ITMExtHeader *&which, WeaponInfo *wi, bool leftorr
 	if (!wield) {
 		return 0;
 	}
-	Item *item = core->GetItem(wield->ItemResRef);
+	Item *item = gamedata->GetItem(wield->ItemResRef);
 	if (!item) {
 		return 0;
 	}
@@ -2422,7 +2422,7 @@ unsigned int Actor::GetWeapon(ITMExtHeader *&which, WeaponInfo *wi, bool leftorr
 	which = item->GetWeaponHeader(false);
 	//make sure we use 'false' in this freeitem
 	//so 'which' won't point into invalid memory
-	core->FreeItem(item, wield->ItemResRef, false);
+	gamedata->FreeItem(item, wield->ItemResRef, false);
 	if (!which) {
 		return 0;
 	}
@@ -2446,7 +2446,7 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 	if (spellbook.HaveSpell(spellname, 0) ) {
 		return LSR_KNOWN;
 	}
-	Spell *spell = core->GetSpell(spellname);
+	Spell *spell = gamedata->GetSpell(spellname);
 	if (!spell) {
 		return LSR_INVALID; //not existent spell
 	}
@@ -2466,7 +2466,7 @@ int Actor::LearnSpell(const ieResRef spellname, ieDword flags)
 			break;
 		}
 	} else tmp = 0;
-	core->FreeSpell(spell, spellname, false);
+	gamedata->FreeSpell(spell, spellname, false);
 	if (!explev) {
 		return LSR_INVALID;
 	}
@@ -3391,12 +3391,12 @@ bool Actor::HandleActorStance()
 
 void Actor::GetSoundFrom2DA(ieResRef Sound, unsigned int index)
 {
-	int table=core->LoadTable( anims->ResRef );
+	int table=gamedata->LoadTable( anims->ResRef );
 
 	if (table<0) {
 		return;
 	}
-	TableMgr * tab = core->GetTable( table );
+	TableMgr * tab = gamedata->GetTable( table );
 	if (!tab) {
 		goto end;
 	}
@@ -3417,7 +3417,7 @@ void Actor::GetSoundFrom2DA(ieResRef Sound, unsigned int index)
 	}
 	strnlwrcpy(Sound, tab->QueryField (index, 0), 8);
 end:
-	core->DelTable( table );
+	gamedata->DelTable( table );
 }
 
 void Actor::GetSoundFromINI(ieResRef Sound, unsigned int index)
@@ -3708,7 +3708,7 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, Point &target, bool silen
 	CREItem *item = inventory.GetSlotItem(slot);
 	if (!item)
 		return false;
-	Item *itm = core->GetItem(item->ItemResRef);
+	Item *itm = gamedata->GetItem(item->ItemResRef);
 	if (!itm) return false; //quick item slot contains invalid item resref
 	if ((header<CHARGE_COUNTERS) && !item->Usages[header]) {
 		return false;
@@ -3716,7 +3716,7 @@ bool Actor::UseItemPoint(ieDword slot, ieDword header, Point &target, bool silen
 
 	Projectile *pro = itm->GetProjectile(slot, header);
 	ChargeItem(slot, header, item, itm, silent);
-	core->FreeItem(itm,item->ItemResRef, false);
+	gamedata->FreeItem(itm,item->ItemResRef, false);
 	if (pro) {
 		pro->SetCaster(globalID);
 		GetCurrentArea()->AddProjectile(pro, Pos, target);
@@ -3735,7 +3735,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, bool silen
 	CREItem *item = inventory.GetSlotItem(slot);
 	if (!item)
 		return false;
-	Item *itm = core->GetItem(item->ItemResRef);
+	Item *itm = gamedata->GetItem(item->ItemResRef);
 	if (!itm) return false; //quick item slot contains invalid item resref
 	if ((header<CHARGE_COUNTERS) && !item->Usages[header]) {
 		return false;
@@ -3743,7 +3743,7 @@ bool Actor::UseItem(ieDword slot, ieDword header, Scriptable* target, bool silen
 
 	Projectile *pro = itm->GetProjectile(slot, header);
 	ChargeItem(slot, header, item, itm, silent);
-	core->FreeItem(itm,item->ItemResRef, false);
+	gamedata->FreeItem(itm,item->ItemResRef, false);
 	if (pro) {
 		pro->SetCaster(globalID);
 		GetCurrentArea()->AddProjectile(pro, Pos, tar->globalID);
@@ -3758,7 +3758,7 @@ void Actor::ChargeItem(ieDword slot, ieDword header, CREItem *item, Item *itm, b
 		item = inventory.GetSlotItem(slot);
 		if (!item)
 			return;
-		itm = core->GetItem(item->ItemResRef);
+		itm = gamedata->GetItem(item->ItemResRef);
 	}
 	if (!itm) return; //quick item slot contains invalid item resref
 
@@ -3872,8 +3872,8 @@ void Actor::SetupFist()
 
 	if (FistRows<0) {
 		FistRows=0;
-		int table = core->LoadTable( "fistweap" );
-		TableMgr *fist = core->GetTable( table );
+		int table = gamedata->LoadTable( "fistweap" );
+		TableMgr *fist = gamedata->GetTable( table );
 		if (fist) {
 			//default value
 			strnlwrcpy( DefaultFist, fist->QueryField( (unsigned int) -1), 8);
@@ -3887,7 +3887,7 @@ void Actor::SetupFist()
 				*(int *) fistres[i] = atoi(fist->GetRowName( i));
 			}
 		}
-		core->DelTable( table );
+		gamedata->DelTable( table );
 	}
 	if (col>MAX_LEVEL) col=MAX_LEVEL;
 	if (col<1) col=1;
@@ -3904,8 +3904,8 @@ void Actor::SetupFist()
 static ieDword ResolveTableValue(const char *resref, ieDword stat, ieDword mcol, ieDword vcol) {
 	long ret = 0;
 	//don't close this table, it can mess with the guiscripts
-	int table = core->LoadTable(resref);
-	TableMgr *tm = core->GetTable(table);
+	int table = gamedata->LoadTable(resref);
+	TableMgr *tm = gamedata->GetTable(table);
 	if (tm) {
 		unsigned int row;
 		if (mcol == 0xff) {

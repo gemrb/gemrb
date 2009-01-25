@@ -51,7 +51,7 @@ Console::~Console(void)
 	}
 	Video *video = core->GetVideoDriver();
 
-	core->FreePalette( palette );
+	gamedata->FreePalette( palette );
 	video->FreeSprite( Cursor );
 }
 

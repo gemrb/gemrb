@@ -204,8 +204,8 @@ bool Init_EffectQueue()
 
 	initialized = 1;
 
-	int effT = core->LoadTable( "efftext" );
-	efftextTable = core->GetTable( effT );
+	int effT = gamedata->LoadTable( "efftext" );
+	efftextTable = gamedata->GetTable( effT );
 
 	int eT = core->LoadSymbol( "effects" );
 	if (eT < 0) {
@@ -246,7 +246,7 @@ bool Init_EffectQueue()
 		//printf("-------- FN: %d, %s\n", i, effectname);
 	}
 	core->DelSymbol( eT );
-	if ( efftextTable ) core->DelTable( effT );
+	if ( efftextTable ) gamedata->DelTable( effT );
 
 	//additional initialisations
 	for (i=0;diced_effects[i].Name;i++) {

@@ -38,7 +38,7 @@ Label::Label(Font* font)
 }
 Label::~Label()
 {
-	core->FreePalette( palette );
+	gamedata->FreePalette( palette );
 	if (Buffer) {
 		free( Buffer );
 	}
@@ -97,7 +97,7 @@ int Label::SetText(const char* string, int /*pos*/)
 /** Sets the Foreground Font Color */
 void Label::SetColor(Color col, Color bac)
 {
-	core->FreePalette( palette );
+	gamedata->FreePalette( palette );
 	palette = core->CreatePalette( col, bac );
 	Changed = true;
 }

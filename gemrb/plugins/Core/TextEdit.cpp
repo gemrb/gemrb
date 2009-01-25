@@ -44,7 +44,7 @@ TextEdit::TextEdit(unsigned short maxLength)
 TextEdit::~TextEdit(void)
 {
 	Video *video = core->GetVideoDriver();
-	core->FreePalette( palette );
+	gamedata->FreePalette( palette );
 	free( Buffer );
 	video->FreeSprite( Back );
 	video->FreeSprite( Cursor );

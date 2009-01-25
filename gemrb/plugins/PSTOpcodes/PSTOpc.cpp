@@ -118,7 +118,7 @@ int fx_play_bam_blended (Actor* Owner, Actor* target, Effect* fx)
 	if (0) printf( "fx_play_bam_blended (%2d): Par2: %d\n", fx->Opcode, fx->Parameter2 );
 	//play once set to true
 	//check tearring.itm (0xbb effect)
-	ScriptedAnimation *sca = core->GetScriptedAnimation(fx->Resource, true);
+	ScriptedAnimation *sca = gamedata->GetScriptedAnimation(fx->Resource, true);
 	if (!sca)
 		return FX_NOT_APPLIED;
 
@@ -186,7 +186,7 @@ int fx_play_bam_not_blended (Actor* Owner, Actor* target, Effect* fx)
 	} else {
 		doublehint = false;
 	}
-	ScriptedAnimation *sca = core->GetScriptedAnimation(fx->Resource, doublehint);
+	ScriptedAnimation *sca = gamedata->GetScriptedAnimation(fx->Resource, doublehint);
 	if (!sca)
 		return FX_NOT_APPLIED;
 

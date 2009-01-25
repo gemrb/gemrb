@@ -72,7 +72,7 @@ Font::Font(int w, int h, Palette* pal)
 Font::~Font(void)
 {
 	Video *video = core->GetVideoDriver();
-	core->FreePalette( palette );
+	gamedata->FreePalette( palette );
 	video->FreeSprite( sprBuffer );
 }
 
@@ -207,7 +207,7 @@ void Font::PrintFromLine(int startrow, Region rgn, const unsigned char* string,
 				const Color c = {(unsigned char) r,(unsigned char)g, (unsigned char)b, 0};
 				Palette* newPal = core->CreatePalette( c, black );
 				video->SetPalette( sprBuffer, newPal );
-				core->FreePalette( newPal );
+				gamedata->FreePalette( newPal );
 				continue;
 			}
 			if (stricmp( tag, "/color" ) == 0) {
@@ -368,7 +368,7 @@ void Font::Print(Region rgn, const unsigned char* string, Palette* hicolor,
 				const Color c = {(unsigned char) r,(unsigned char) g,(unsigned char)  b, 0};
 				Palette* newPal = core->CreatePalette( c, black );
 				video->SetPalette( sprBuffer, newPal );
-				core->FreePalette( newPal );
+				gamedata->FreePalette( newPal );
 				continue;
 			}
 			if (stricmp( tag, "/color" ) == 0) {

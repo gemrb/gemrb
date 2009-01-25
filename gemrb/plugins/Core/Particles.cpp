@@ -51,12 +51,12 @@ void InitSparks()
 	int i,j;
 	TableMgr * tab;
 
-	int table=core->LoadTable( "sprklclr" );
+	int table=gamedata->LoadTable( "sprklclr" );
 
 	if (table<0) {
 		return;
 	}
-	tab = core->GetTable( table );
+	tab = gamedata->GetTable( table );
 	if (!tab) {
 		goto end;
 	}
@@ -78,7 +78,7 @@ void InitSparks()
 		}
 	}
 end:
-	core->DelTable( table );
+	gamedata->DelTable( table );
 }
 
 Particles::Particles(int s)

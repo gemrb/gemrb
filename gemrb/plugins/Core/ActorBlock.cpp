@@ -218,7 +218,7 @@ void Scriptable::DrawOverheadText(Region &screen)
 	font->Print( rgn, ( unsigned char * ) overHeadText,
 		palette?palette:core->InfoTextPalette, IE_FONT_ALIGN_CENTER | IE_FONT_ALIGN_TOP, false );
 	//core->GetVideoDriver()->FreePalette(palette);
-	core->FreePalette(palette);
+	gamedata->FreePalette(palette);
 }
 
 void Scriptable::ImmediateEvent()
@@ -565,7 +565,7 @@ void Scriptable::CastSpellPointEnd( const ieResRef SpellResRef )
 		return;
 	}
 
-	Spell* spl = core->GetSpell( SpellResRef );
+	Spell* spl = gamedata->GetSpell( SpellResRef );
 	//create projectile from known spellheader
 	Projectile *pro=spl->GetProjectile(SpellHeader);
 	SpellHeader = -1;
@@ -591,14 +591,14 @@ void Scriptable::CastSpellEnd( const ieResRef SpellResRef )
 		SpellHeader = -1;
 		return;
 	}
-	Spell* spl = core->GetSpell( SpellResRef );
+	Spell* spl = gamedata->GetSpell( SpellResRef );
 	//create projectile from known spellheader
 	Projectile *pro=spl->GetProjectile(SpellHeader);
 	if (pro) {
 		pro->SetCaster(GetGlobalID());
 		GetCurrentArea()->AddProjectile(pro, Pos, LastTarget);
 	}
-	core->FreeSpell(spl, SpellResRef, false);
+	gamedata->FreeSpell(spl, SpellResRef, false);
 	LastTarget = 0;
 	LastTargetPos.empty();
 }
@@ -647,7 +647,7 @@ void Scriptable::CastSpell( const ieResRef SpellResRef, Scriptable* target, bool
 //start spellcasting (common part)
 void Scriptable::SpellCast(const ieResRef SpellResRef)
 {
-	Spell* spl = core->GetSpell( SpellResRef );
+	Spell* spl = gamedata->GetSpell( SpellResRef );
 	if (!spl) {
 		SpellHeader = -1;
 		return;
@@ -668,7 +668,7 @@ void Scriptable::SpellCast(const ieResRef SpellResRef)
 
 	SPLExtHeader *header = spl->GetExtHeader(SpellHeader);
 	SetWait(header->CastingTime*AI_UPDATE_TIME);
-	core->FreeSpell(spl, SpellResRef, false);
+	gamedata->FreeSpell(spl, SpellResRef, false);
 }
 
 /********************
@@ -1811,11 +1811,11 @@ void Container::RefreshGroundIcons()
 	FreeGroundIcons();
 	while (i--) {
 		CREItem *slot = inventory.GetSlotItem(i); //borrowed reference
-		Item *itm = core->GetItem( slot->ItemResRef ); //cached reference
+		Item *itm = gamedata->GetItem( slot->ItemResRef ); //cached reference
 		//well, this is required in PST, needs more work if some other
 		//game is broken by not using -1,0
-		groundicons[i] = core->GetBAMSprite( itm->GroundIcon, 0, 0 );
-		core->FreeItem( itm, slot->ItemResRef ); //decref
+		groundicons[i] = gamedata->GetBAMSprite( itm->GroundIcon, 0, 0 );
+		gamedata->FreeItem( itm, slot->ItemResRef ); //decref
 	}
 }
 

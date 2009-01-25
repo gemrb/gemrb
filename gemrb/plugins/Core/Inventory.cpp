@@ -58,7 +58,7 @@ inline Item *Inventory::GetItemPointer(ieDword slot, CREItem *&item) const
 	item = GetSlotItem(slot);
 	if (!item) return NULL;
 	if (!item->ItemResRef[0]) return NULL;
-	return core->GetItem(item->ItemResRef);
+	return gamedata->GetItem(item->ItemResRef);
 }
 
 void Inventory::Init(int mb)
@@ -127,7 +127,7 @@ void Inventory::CalculateWeight()
 		}
 		//printf ("%2d: %8s : %d x %d\n", (int) i, slot->ItemResRef, slot->Weight, slot->Usages[0]);
 		if (slot->Weight == -1) {
-			Item *itm = core->GetItem( slot->ItemResRef );
+			Item *itm = gamedata->GetItem( slot->ItemResRef );
 			if (itm) {
 				//simply adding the item flags to the slot
 				slot->Flags |= (itm->Flags<<8);
@@ -163,7 +163,7 @@ void Inventory::CalculateWeight()
 
 				slot->Weight = itm->Weight;
 				slot->StackAmount = itm->StackAmount;
-				core->FreeItem( itm, slot->ItemResRef, false );
+				gamedata->FreeItem( itm, slot->ItemResRef, false );
 			}
 			else {
 				printMessage( "Inventory", " ", LIGHT_RED);
@@ -185,7 +185,7 @@ void Inventory::AddSlotEffects(ieDword index)
 	CREItem* slot;
 
 	const Item *itm = GetItemPointer(index, slot);
-	//Item* itm = core->GetItem( slot->ItemResRef );
+	//Item* itm = gamedata->GetItem( slot->ItemResRef );
 	if (!itm) {
 		printMessage("Inventory","Invalid item equipped...\n",LIGHT_RED);
 		return;
@@ -199,7 +199,7 @@ void Inventory::AddSlotEffects(ieDword index)
 	
 	//get the equipping effects
 	EffectQueue *eqfx = itm->GetEffectBlock(-1, index, 0);
-	core->FreeItem( itm, slot->ItemResRef, false );
+	gamedata->FreeItem( itm, slot->ItemResRef, false );
 
 	//make any adjustments necessary for off-hand weapon colours
 	//eqfx->HackColorEffects();
@@ -315,7 +315,7 @@ void Inventory::KillSlot(unsigned int index)
 		return;
 	}
 	RemoveSlotEffects( index );
-	Item *itm = core->GetItem(item->ItemResRef);
+	Item *itm = gamedata->GetItem(item->ItemResRef);
 	//this cannot happen, but stuff happens!
 	if (!itm) {
 		return;
@@ -350,7 +350,7 @@ void Inventory::KillSlot(unsigned int index)
 			}
 			break;
 	}
-	core->FreeItem(itm, item->ItemResRef, false);
+	gamedata->FreeItem(itm, item->ItemResRef, false);
 }
 /** if resref is "", then destroy ALL items
 this function can look for stolen, equipped, identified, destructible
@@ -612,12 +612,12 @@ int Inventory::DepleteItem(ieDword flags)
 
 		//if flags = 0 then weapons are not depleted
 		if (!flags) {
-			Item *itm = core->GetItem( item->ItemResRef );
+			Item *itm = gamedata->GetItem( item->ItemResRef );
 			if (!itm)
 				continue;
 			//if the item is usable in weapon slot, then it is weapon
 			int weapon = core->CanUseItemType( SLOT_WEAPON, itm );
-			core->FreeItem( itm, item->ItemResRef, false );
+			gamedata->FreeItem( itm, item->ItemResRef, false );
 			if (weapon)
 				continue;
 		}	
@@ -764,7 +764,7 @@ bool Inventory::EquipItem(unsigned int slot)
 
 	// add effects of an item just being equipped to actor's effect queue
 	int effect = core->QuerySlotEffects( slot );
-	Item *itm = core->GetItem(item->ItemResRef);
+	Item *itm = gamedata->GetItem(item->ItemResRef);
 	if (!itm) {
 		printf("Invalid item Equipped: %s Slot: %d\n", item->ItemResRef, slot);
 		return false;
@@ -824,7 +824,7 @@ bool Inventory::EquipItem(unsigned int slot)
 		}
 		break;
 	}
-	core->FreeItem(itm, item->ItemResRef, false);
+	gamedata->FreeItem(itm, item->ItemResRef, false);
 	if (effect) {
 		//item->Flags|=IE_INV_ITEM_EQUIPPED; //no need to set this, only for weapons
 		if (item->Flags & IE_INV_ITEM_CURSED) {
@@ -875,7 +875,7 @@ int Inventory::FindRangedProjectile(unsigned int type) const
 		if (ext_header) {
 			weapontype = ext_header->ProjectileQualifier;
 		}
-		core->FreeItem(itm, Slot->ItemResRef, false);
+		gamedata->FreeItem(itm, Slot->ItemResRef, false);
 		if (weapontype & type) {
 			return i-SLOT_MELEE;
 		}
@@ -903,7 +903,7 @@ int Inventory::FindSlotRangedWeapon(unsigned int slot) const
 	if (ext_header) {
 		type = ext_header->ProjectileQualifier;
 	}
-	core->FreeItem(itm, Slot->ItemResRef, false);
+	gamedata->FreeItem(itm, Slot->ItemResRef, false);
 	return FindTypedRangedWeapon(type);	
 }
 
@@ -924,7 +924,7 @@ int Inventory::FindTypedRangedWeapon(unsigned int type) const
 		if (ext_header) {
 			weapontype = ext_header->ProjectileQualifier;
 		}
-		core->FreeItem(itm, Slot->ItemResRef, false);
+		gamedata->FreeItem(itm, Slot->ItemResRef, false);
 		if (weapontype & type) {
 			return i;
 		}
@@ -1161,7 +1161,7 @@ void Inventory::AddSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 	TmpItem->Usages[1]=(ieWord) Charge1;
 	TmpItem->Usages[2]=(ieWord) Charge2;
 	TmpItem->Flags=0;
-	if (core->ResolveRandomItem(TmpItem) &&core->Exists(TmpItem->ItemResRef, IE_ITM_CLASS_ID)) {
+	if (core->ResolveRandomItem(TmpItem) && gamedata->Exists(TmpItem->ItemResRef, IE_ITM_CLASS_ID)) {
 		AddSlotItem( TmpItem, SlotID );
 	} else {
 		delete TmpItem;
@@ -1178,7 +1178,7 @@ void Inventory::SetSlotItemRes(const ieResRef ItemResRef, int SlotID, int Charge
 	TmpItem->Usages[1]=(ieWord) Charge1;
 	TmpItem->Usages[2]=(ieWord) Charge2;
 	TmpItem->Flags=0;
-	if (core->ResolveRandomItem(TmpItem) &&core->Exists(TmpItem->ItemResRef, IE_ITM_CLASS_ID)) {
+	if (core->ResolveRandomItem(TmpItem) && gamedata->Exists(TmpItem->ItemResRef, IE_ITM_CLASS_ID)) {
 		SetSlotItem( TmpItem, SlotID );
 	} else {
 		//if the item isn't creatable, we still destroy the old item
@@ -1196,7 +1196,7 @@ void Inventory::BreakItemSlot(ieDword slot)
 	const Item *itm = GetItemPointer(slot, Slot);
 	if (!itm) return;
 	memcpy(newItem, itm->ReplacementItem,sizeof(newItem) );
-	core->FreeItem( itm, Slot->ItemResRef, true );
+	gamedata->FreeItem( itm, Slot->ItemResRef, true );
 	//this depends on setslotitemres using setslotitem
 	SetSlotItemRes(newItem, slot, 0,0,0);
 }
@@ -1247,7 +1247,7 @@ void Inventory::EquipBestWeapon(int flags)
 				memcpy(AnimationType,itm->AnimationType,sizeof(AnimationType) );
 				memcpy(MeleeAnimation,header->MeleeAnimation,sizeof(MeleeAnimation) );
 			}
-			core->FreeItem( itm, Slot->ItemResRef, false );
+			gamedata->FreeItem( itm, Slot->ItemResRef, false );
 		}
 
 		//ranged melee weapons like throwing daggers (not bows!)
@@ -1262,7 +1262,7 @@ void Inventory::EquipBestWeapon(int flags)
 				memcpy(AnimationType,itm->AnimationType,sizeof(AnimationType) );
 				memcpy(MeleeAnimation,header->MeleeAnimation,sizeof(MeleeAnimation) );
 			}
-			core->FreeItem( itm, Slot->ItemResRef, false );
+			gamedata->FreeItem( itm, Slot->ItemResRef, false );
 		}
 	}
 
@@ -1281,7 +1281,7 @@ void Inventory::EquipBestWeapon(int flags)
 				memcpy(AnimationType,itm->AnimationType,sizeof(AnimationType) );
 				memcpy(MeleeAnimation,header->MeleeAnimation,sizeof(MeleeAnimation) );
 			}
-			core->FreeItem( itm, Slot->ItemResRef, false );
+			gamedata->FreeItem( itm, Slot->ItemResRef, false );
 		}
 	}
 
@@ -1331,7 +1331,7 @@ bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count
 
 				//store the item, return if we can't store more
 				if (!count) {
-					core->FreeItem(itm, slot->ItemResRef, false);
+					gamedata->FreeItem(itm, slot->ItemResRef, false);
 					return true;
 				}
 				count--;
@@ -1353,7 +1353,7 @@ bool Inventory::GetEquipmentInfo(ItemExtHeader *array, int startindex, int count
 				pos++;
 			}
 		}
-		core->FreeItem(itm, slot->ItemResRef, false);
+		gamedata->FreeItem(itm, slot->ItemResRef, false);
 	}
 
 	return false;
@@ -1417,10 +1417,10 @@ void Inventory::UpdateWeaponAnimation()
 			}
 			//CREItem* si = GetSlotItem( core->QuerySlot(GetShieldSlot()) );
 			if (si) {
-				Item* it = core->GetItem(si->ItemResRef);
+				Item* it = gamedata->GetItem(si->ItemResRef);
 				if (core->CanUseItemType(SLOT_WEAPON, it))
 					twoweapon = true;
-				core->FreeItem(it, si->ItemResRef, false);
+				gamedata->FreeItem(it, si->ItemResRef, false);
 			}
 
 			if (twoweapon)
@@ -1434,7 +1434,7 @@ void Inventory::UpdateWeaponAnimation()
 		memcpy(MeleeAnimation,header->MeleeAnimation,
 			 sizeof(MeleeAnimation) );
 	if (itm)
-		core->FreeItem( itm, Slot->ItemResRef, false );
+		gamedata->FreeItem( itm, Slot->ItemResRef, false );
 	Owner->SetUsedWeapon(AnimationType, MeleeAnimation, WeaponType);
 	//update the weapon animation
 	core->SetEventFlag(EF_SELECTION);

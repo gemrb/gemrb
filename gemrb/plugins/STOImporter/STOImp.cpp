@@ -164,12 +164,12 @@ void STOImp::GetItem(STOItem *it)
 		it->AmountInStock = 1;
 	}
 	//another hack-fix
-	Item *item = core->GetItem( it->ItemResRef );
+	Item *item = gamedata->GetItem( it->ItemResRef );
 	if (item) {
 		if (!item->LoreToID) {
 			it->Flags |= IE_INV_ITEM_IDENTIFIED;
 		}
-		core->FreeItem( item, it->ItemResRef, false );
+		gamedata->FreeItem( item, it->ItemResRef, false );
 	}
 	str->ReadDword( (ieDword *) &it->InfiniteSupply );
 	ieDwordSigned tmp;

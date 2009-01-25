@@ -171,8 +171,8 @@ Game* GAMImp::LoadGame(Game *newGame)
 
 	if (!newGame->CurrentArea[0]) {
 		// 0 - normal, 1 - tutorial, 2 - extension
-		int i = core->LoadTable( "STARTARE" );
-		TableMgr* tm = core->GetTable( i );
+		int i = gamedata->LoadTable( "STARTARE" );
+		TableMgr* tm = gamedata->GetTable( i );
 		ieDword playmode = 0;
 		//only bg2 has 9 rows (iwd's have 6 rows - normal+extension)
 		if (tm->GetRowCount()==9) {

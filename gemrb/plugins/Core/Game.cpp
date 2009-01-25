@@ -62,8 +62,8 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 	LastScriptUpdate = 0;
 
 	//loading master areas
-	int mtab = core->LoadTable("mastarea");
-	TableMgr *table = core->GetTable(mtab);
+	int mtab = gamedata->LoadTable("mastarea");
+	TableMgr *table = gamedata->GetTable(mtab);
 	if (table) {
 		int i = table->GetRowCount();
 		mastarea.reserve(i);
@@ -72,22 +72,22 @@ Game::Game(void) : Scriptable( ST_GLOBAL )
 			strnuprcpy (tmp,table->QueryField(i,0),8);
 			mastarea.push_back( tmp );
 		}
-		core->DelTable(mtab);
+		gamedata->DelTable(mtab);
 	}
 
 	//loading rest/daylight switching movies (only bg2 has them)
 	memset(restmovies,'*',sizeof(restmovies));
 	memset(daymovies,'*',sizeof(restmovies));
 	memset(nightmovies,'*',sizeof(restmovies));
-	mtab = core->LoadTable("restmov");
-	table = core->GetTable(mtab);
+	mtab = gamedata->LoadTable("restmov");
+	table = gamedata->GetTable(mtab);
 	if (table) {
 		for(int i=0;i<8;i++) {
 			strnuprcpy(restmovies[i],table->QueryField(i,0),8);
 			strnuprcpy(daymovies[i],table->QueryField(i,1),8);
 			strnuprcpy(nightmovies[i],table->QueryField(i,2),8);
 		}
-		core->DelTable(mtab);
+		gamedata->DelTable(mtab);
 	}
 
 	interval = 1000/AI_UPDATE_TIME;
@@ -325,8 +325,8 @@ int Game::JoinParty(Actor* actor, int join)
 	actor->SetBase(IE_EXPLORE, 1);
 	if (join&JP_INITPOS) {
 		// 0 - single player, 1 - tutorial, 2 - expansion
-		int saindex = core->LoadTable( "startpos" );
-		TableMgr* strta = core->GetTable( saindex );
+		int saindex = gamedata->LoadTable( "startpos" );
+		TableMgr* strta = gamedata->GetTable( saindex );
 		ieDword playmode = 0;
 		core->GetDictionary()->Lookup( "PlayMode", playmode );
 		//hack for iwd2
@@ -338,15 +338,15 @@ int Game::JoinParty(Actor* actor, int join)
 		playmode *= 2;
 		actor->Pos.x = actor->Destination.x = (short) atoi( strta->QueryField( playmode, actor->InParty-1 ) );
 		actor->Pos.y = actor->Destination.y = (short) atoi( strta->QueryField( playmode + 1, actor->InParty-1 ) );
-		core->DelTable( saindex );
+		gamedata->DelTable( saindex );
 
-		saindex = core->LoadTable( "startare" );
-		strta = core->GetTable( saindex );
+		saindex = gamedata->LoadTable( "startare" );
+		strta = gamedata->GetTable( saindex );
 		playmode /= 2;
 		playmode *= 3;
 		strnlwrcpy(actor->Area, strta->QueryField( playmode, 0 ), 8 );
 		//TODO: set viewport
-		core->DelTable( saindex );
+		gamedata->DelTable( saindex );
 
 		SelectActor(actor,true, SELECT_QUIET);
 	}
@@ -802,8 +802,8 @@ char *Game::GetFamiliar(unsigned int Index)
 //reading the challenge rating table for iwd2 (only when needed)
 void Game::LoadCRTable()
 {
-	int mtab = core->LoadTable("moncrate");
-	TableMgr *table = core->GetTable(mtab);
+	int mtab = gamedata->LoadTable("moncrate");
+	TableMgr *table = gamedata->GetTable(mtab);
 	if (table) {
 		int maxrow = table->GetRowCount()-1;
 		crtable = new CRRow[MAX_LEVEL];
@@ -817,7 +817,7 @@ void Game::LoadCRTable()
 				crtable[i][j]=atoi(table->QueryField(row,col) );
 			}
 		}
-		core->DelTable(mtab);
+		gamedata->DelTable(mtab);
 	}
 }
 

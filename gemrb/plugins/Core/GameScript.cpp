@@ -1230,7 +1230,7 @@ GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 		int tT = core->LoadSymbol( "trigger" );
 		int aT = core->LoadSymbol( "action" );
 		int oT = core->LoadSymbol( "object" );
-		int iT = core->LoadTable( "script" );
+		int iT = gamedata->LoadTable( "script" );
 		if (tT < 0 || aT < 0 || oT < 0 || iT < 0) {
 			printMessage( "GameScript","A critical scripting file is missing!\n",LIGHT_RED );
 			abort();
@@ -1238,7 +1238,7 @@ GameScript::GameScript(const ieResRef ResRef, ScriptableType ScriptType,
 		triggersTable = core->GetSymbol( tT );
 		actionsTable = core->GetSymbol( aT );
 		objectsTable = core->GetSymbol( oT );
-		TableMgr* objNameTable = core->GetTable( iT );
+		TableMgr* objNameTable = gamedata->GetTable( iT );
 		if (!triggersTable || !actionsTable || !objectsTable || !objNameTable) {
 			printMessage( "GameScript","A critical scripting file is damaged!\n",LIGHT_RED );
 			abort();

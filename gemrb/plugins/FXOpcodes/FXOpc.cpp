@@ -1162,8 +1162,8 @@ int SpellAbilityDieRoll(Actor *target, int which)
 
 	ieDword cls = STAT_GET(IE_CLASS);
 	if (!spell_abilities) {
-		int table = core->LoadTable("clssplab");
-		TableMgr *tab = core->GetTable(table);
+		int table = gamedata->LoadTable("clssplab");
+		TableMgr *tab = gamedata->GetTable(table);
 		if (!tab) {
 			spell_abilities = (int *) malloc(sizeof(int)*CSA_CNT);
 			for (int ab=0;ab<CSA_CNT;ab++) {
@@ -1179,7 +1179,7 @@ int SpellAbilityDieRoll(Actor *target, int which)
 				spell_abilities[ab*splabcount+i]=atoi(tab->QueryField(i,ab));
 			}
 		}
-		core->DelTable(table);
+		gamedata->DelTable(table);
 	}
 	if (cls>=splabcount) cls=0;
 	return spell_abilities[which*splabcount+cls];
@@ -3326,7 +3326,7 @@ int fx_casting_glow (Actor* /*Owner*/, Actor* target, Effect* fx)
 	}
 
 	if (fx->Parameter2<(ieDword) cgcount) {
-		ScriptedAnimation *sca = core->GetScriptedAnimation(casting_glows[fx->Parameter2], false);
+		ScriptedAnimation *sca = gamedata->GetScriptedAnimation(casting_glows[fx->Parameter2], false);
 		//remove effect if animation doesn't exist
 		if (!sca) {
 			return FX_NOT_APPLIED;
@@ -3361,7 +3361,7 @@ int fx_visual_spell_hit (Actor* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 	if (fx->Parameter2<(ieDword) shcount) {
-		ScriptedAnimation *sca = core->GetScriptedAnimation(spell_hits[fx->Parameter2], false);
+		ScriptedAnimation *sca = gamedata->GetScriptedAnimation(spell_hits[fx->Parameter2], false);
 		//remove effect if animation doesn't exist
 		if (!sca) {
 			return FX_NOT_APPLIED;
@@ -3507,7 +3507,7 @@ int fx_replace_creature (Actor* Owner, Actor* target, Effect *fx)
 	if (0) printf( "fx_replace_creature (%2d): Resource: %s\n", fx->Opcode, fx->Resource );
 
 	//this safeguard exists in the original engine too
-	if (!core->Exists(fx->Resource,IE_CRE_CLASS_ID)) {
+	if (!gamedata->Exists(fx->Resource,IE_CRE_CLASS_ID)) {
 		return FX_NOT_APPLIED;
 	}
 
@@ -4304,7 +4304,7 @@ int fx_play_visual_effect (Actor* /*Owner*/, Actor* target, Effect* fx)
 		}
 	}
 
-	ScriptedAnimation* sca = core->GetScriptedAnimation(fx->Resource, false);
+	ScriptedAnimation* sca = gamedata->GetScriptedAnimation(fx->Resource, false);
 
 	//don't crash on nonexistent resources
 	if (!sca) {
@@ -4568,7 +4568,7 @@ int fx_cast_spell_on_condition (Actor* Owner, Actor* target, Effect* fx)
 	case COND_ALWAYS:
 		condition = 1;
 		break;
-	default:;
+	default:
 		condition = 0;
 	}
 

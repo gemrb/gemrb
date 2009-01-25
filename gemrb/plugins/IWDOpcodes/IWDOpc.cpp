@@ -399,20 +399,20 @@ static void ReadSpellProtTable(const ieResRef tablename)
 	}
 	spellres = NULL;
 	spellrescnt = 0;
-	int table=core->LoadTable( tablename );
+	int table=gamedata->LoadTable( tablename );
 
 	if (table<0) {
 		return;
 	}
-	tab = core->GetTable( table );
+	tab = gamedata->GetTable( table );
 	if (!tab) {
-		core->DelTable(table);
+		gamedata->DelTable(table);
 		return;
 	}
 	spellrescnt=tab->GetRowCount();
 	spellres = (IWDIDSEntry *) malloc(sizeof(IWDIDSEntry) * spellrescnt);
 	if (!spellres) {
-		core->DelTable(table);
+		gamedata->DelTable(table);
 		return;
 	}
 	for( int i=0;i<spellrescnt;i++) {
@@ -422,7 +422,7 @@ static void ReadSpellProtTable(const ieResRef tablename)
 		spellres[i].value = (ieDword) strtol(tab->QueryField(i,1),NULL,0 );
 		spellres[i].relation = (ieWord) strtol(tab->QueryField(i,2),NULL,0 );
 	}
-	core->DelTable(table);
+	gamedata->DelTable(table);
 	return;
 }
 
@@ -656,7 +656,7 @@ int fx_iwd_visual_spell_hit (Actor* /*Owner*/, Actor* target, Effect* fx)
 		return FX_NOT_APPLIED;
 	}
 	if (fx->Parameter2<(ieDword) shcount) {
-		ScriptedAnimation *sca = core->GetScriptedAnimation(iwd_spell_hits[fx->Parameter2], false);
+		ScriptedAnimation *sca = gamedata->GetScriptedAnimation(iwd_spell_hits[fx->Parameter2], false);
 		//remove effect if there is no animation
 		if (!sca) {
 			return FX_NOT_APPLIED;
@@ -2408,7 +2408,7 @@ int fx_area_effect (Actor* Owner, Actor* target, Effect* fx)
 
 	Point pos(fx->PosX, fx->PosY);
 
-	Spell *spell = core->GetSpell(fx->Resource);
+	Spell *spell = gamedata->GetSpell(fx->Resource);
 	if (!spell) {
 		return FX_NOT_APPLIED;
 	}

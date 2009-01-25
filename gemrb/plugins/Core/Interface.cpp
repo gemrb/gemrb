@@ -75,8 +75,10 @@
 #include "WorldMapControl.h"
 #include "Palette.h"
 #include "ProjectileServer.h"
+#include "GameData.h"
 
 GEM_EXPORT Interface* core;
+GEM_EXPORT GameData* gamedata;
 
 #ifdef WIN32
 GEM_EXPORT HANDLE hConsole;
@@ -142,7 +144,6 @@ Interface::Interface(int iargc, char* iargv[])
 	tooltip_y = 0;
 	tooltip_ctrl = NULL;
 	plugin = NULL;
-	factory = NULL;
 
 	pal16 = NULL;
 	pal32 = NULL;
@@ -173,14 +174,14 @@ Interface::Interface(int iargc, char* iargv[])
 	GemRBPath[0] = 0;
 	PluginsPath[0] = 0;
 	CachePath[0] = 0;
-	GemRBOverride[0] = 0;
+	GemRBOverridePath[0] = 0;
 	GameName[0] = 0;
-	strncpy( GameOverride, "override", sizeof(GameOverride) );
-	strncpy( GameSounds, "sounds", sizeof(GameSounds) );
-	strncpy( GameScripts, "scripts", sizeof(GameScripts) );
-	strncpy( GamePortraits, "portraits", sizeof(GamePortraits) );
-	strncpy( GameCharacters, "characters", sizeof(GameCharacters) );
-	strncpy( GameData, "data", sizeof(GameData) );
+	strncpy( GameOverridePath, "override", sizeof(GameOverridePath) );
+	strncpy( GameSoundsPath, "sounds", sizeof(GameSoundsPath) );
+	strncpy( GameScriptsPath, "scripts", sizeof(GameScriptsPath) );
+	strncpy( GamePortraitsPath, "portraits", sizeof(GamePortraitsPath) );
+	strncpy( GameCharactersPath, "characters", sizeof(GameCharactersPath) );
+	strncpy( GameDataPath, "data", sizeof(GameDataPath) );
 	strncpy( INIConfig, "baldur.ini", sizeof(INIConfig) );
 	strncpy( ButtonFont, "STONESML", sizeof(ButtonFont) );
 	strncpy( TooltipFont, "STONESML", sizeof(TooltipFont) );
@@ -218,6 +219,9 @@ Interface::Interface(int iargc, char* iargv[])
 	ItemDialTable = NULL;
 	ItemDial2Table = NULL;
 	ItemTooltipTable = NULL;
+
+	gamedata = new GameData();
+	::gamedata = gamedata;
 }
 
 #define FreeInterfaceVector(type, variable, member) \
@@ -240,29 +244,6 @@ Interface::Interface(int iargc, char* iargv[])
 		} \
 	} \
 	variable.clear(); \
-}
-
-static void ReleaseItem(void *poi)
-{
-	delete ((Item *) poi);
-}
-
-static void ReleaseSpell(void *poi)
-{
-	delete ((Spell *) poi);
-}
-
-static void ReleaseEffect(void *poi)
-{
-	delete ((Effect *) poi);
-}
-
-static void ReleasePalette(void *poi)
-{
-	//we allow nulls, but we shouldn't release them
-	if (!poi) return;
-	//as long as palette has its own refcount, this should be Release
-	((Palette *) poi)->Release();
 }
 
 static void ReleaseItemList(void *poi)
@@ -340,10 +321,9 @@ Interface::~Interface(void)
 	EffectQueue_ReleaseMemory();
 	CharAnimations::ReleaseMemory();
 	delete CurrentStore;
-	ItemCache.RemoveAll(ReleaseItem);
-	SpellCache.RemoveAll(ReleaseSpell);
-	EffectCache.RemoveAll(ReleaseEffect);
-	PaletteCache.RemoveAll(ReleasePalette);
+
+	gamedata->ClearCaches();
+	delete gamedata; gamedata = 0;
 
 	FreeResRefTable(DefSound, DSCount);
 
@@ -407,13 +387,11 @@ Interface::~Interface(void)
 			delete[] TooltipBack;
 		}
 		if (InfoTextPalette) {
-			FreePalette(InfoTextPalette);
+			gamedata->FreePalette(InfoTextPalette);
 		}
 
 		video->SetDragCursor(NULL);
 	}
-
-	delete factory;
 
 	FreeInterface( video );
 
@@ -444,7 +422,6 @@ Interface::~Interface(void)
 		delete ItemTooltipTable;
 	}
 
-	FreeInterfaceVector( Table, tables, tm );
 	FreeInterfaceVector( Symbol, symbols, sm );
 
 	if (opcodemgrs) {
@@ -483,7 +460,7 @@ GameControl* Interface::StartGameControl()
 		PopupConsole();
 	}
 	DelWindow(0xffffu);//deleting ALL windows
-	DelTable(0xffffu); //dropping ALL tables
+	gamedata->DelTable(0xffffu); //dropping ALL tables
 	Window* gamewin = new Window( 0xffff, 0, 0, (ieWord) Width, (ieWord) Height );
 	gamewin->WindowPack[0]=0;
 	GameControl* gc = new GameControl();
@@ -654,14 +631,14 @@ bool GenerateAbilityTables()
 bool Interface::ReadAbilityTable(const ieResRef tablename, ieWordSigned *mem, int columns, int rows)
 {
 	TableMgr * tab;
-	int table=LoadTable( tablename );
+	int table=gamedata->LoadTable( tablename );
 
 	if (table<0) {
 		return false;
 	}
-	tab = GetTable( table );
+	tab = gamedata->GetTable( table );
 	if (!tab) {
-		DelTable(table);
+		gamedata->DelTable(table);
 		return false;
 	}
 	//this is a hack for rows not starting at 0 in some cases
@@ -680,7 +657,7 @@ bool Interface::ReadAbilityTable(const ieResRef tablename, ieWordSigned *mem, in
 			mem[rows*j+i+fix] = (ieWordSigned) strtol(tab->QueryField(i,j),NULL,0 );
 		}
 	}
-	DelTable(table);
+	gamedata->DelTable(table);
 	return true;
 }
 
@@ -724,15 +701,15 @@ bool Interface::ReadAuxItemTables()
 		ItemExclTable = new Variables();
 		ItemExclTable->SetType(GEM_VARIABLES_INT);
 	}
-	table = LoadTable( "itemexcl" );
+	table = gamedata->LoadTable( "itemexcl" );
 
 	if (table < 0) {
 		//don't report error when the file doesn't exist
 		goto aux_1;
 	}
-	aa = GetTable( table );
+	aa = gamedata->GetTable( table );
 	if (!aa) {
-		DelTable( table );
+		gamedata->DelTable( table );
 		flag = false;
 		goto aux_1;
 	}
@@ -744,7 +721,7 @@ bool Interface::ReadAuxItemTables()
 		ieDword value = strtol(aa->QueryField(idx,0),NULL,0);
 		ItemExclTable->SetAt(key, value);
 	}
-	DelTable( table );
+	gamedata->DelTable( table );
 aux_1:
 	if (ItemDialTable) {
 		ItemDialTable->RemoveAll(NULL);
@@ -758,15 +735,15 @@ aux_1:
 		ItemDial2Table = new Variables();
 		ItemDial2Table->SetType(GEM_VARIABLES_STRING);
 	}
-	table = LoadTable( "itemdial" );
+	table = gamedata->LoadTable( "itemdial" );
 
 	if (table < 0) {
 		//don't report error when the file doesn't exist
 		goto aux_2;
 	}
-	aa = GetTable( table );
+	aa = gamedata->GetTable( table );
 	if (!aa) {
-		DelTable( table );
+		gamedata->DelTable( table );
 		flag = false;
 		goto aux_2;
 	}
@@ -780,7 +757,7 @@ aux_1:
 		strnlwrcpy(dlgres,aa->QueryField(idx,1),8);
 		ItemDial2Table->SetAtCopy(key, dlgres);
 	}
-	DelTable( table );
+	gamedata->DelTable( table );
 aux_2:
 	if (ItemTooltipTable) {
 		ItemTooltipTable->RemoveAll(ReleaseItemTooltip);
@@ -788,15 +765,15 @@ aux_2:
 		ItemTooltipTable = new Variables();
 		ItemTooltipTable->SetType(GEM_VARIABLES_POINTER);
 	}
-	table = LoadTable( "tooltip" );
+	table = gamedata->LoadTable( "tooltip" );
 
 	if (table < 0) {
 		//don't report error when the file doesn't exist
 		goto aux_3;
 	}
-	aa = GetTable( table );
+	aa = gamedata->GetTable( table );
 	if (!aa) {
-		DelTable( table );
+		gamedata->DelTable( table );
 		flag = false;
 		goto aux_3;
 	}
@@ -811,7 +788,7 @@ aux_2:
 		}
 		ItemTooltipTable->SetAt(key, (void*)tmppoi);
 	}
-	DelTable( table );
+	gamedata->DelTable( table );
 aux_3:
 	return flag;
 }
@@ -838,12 +815,12 @@ int Interface::GetItemTooltip(const ieResRef itemname, int header)
 	if (value && (value[header]>=0)) {
 		return value[header];
 	}
-	Item *item = GetItem(itemname);
+	Item *item = gamedata->GetItem(itemname);
 	if (!item) {
 		return -1;
 	}
 	int ret = item->ItemName;
-	FreeItem(item, itemname, 0);
+	gamedata->FreeItem(item, itemname, 0);
 	return ret;
 }
 
@@ -875,15 +852,15 @@ bool Interface::ReadAreaAliasTable(const ieResRef tablename)
 		AreaAliasTable->SetType(GEM_VARIABLES_INT);
 	}
 
-	int table = LoadTable( tablename );
+	int table = gamedata->LoadTable( tablename );
 
 	if (table < 0) {
 		//don't report error when the file doesn't exist
 		return true;
 	}
-	TableMgr* aa = GetTable( table );
+	TableMgr* aa = gamedata->GetTable( table );
 	if (!aa) {
-		DelTable( table );
+		gamedata->DelTable( table );
 		return false;
 	}
 	int idx = aa->GetRowCount();
@@ -894,7 +871,7 @@ bool Interface::ReadAreaAliasTable(const ieResRef tablename)
 		ieDword value = atoi(aa->QueryField(idx,0));
 		AreaAliasTable->SetAt(key, value);
 	}
-	DelTable( table );
+	gamedata->DelTable( table );
 	return true;
 }
 
@@ -964,19 +941,19 @@ void Interface::Main()
 				IE_FONT_ALIGN_LEFT | IE_FONT_ALIGN_MIDDLE, true );
 		}
 	} while (video->SwapBuffers() == GEM_OK);
-	FreePalette( palette );
+	gamedata->FreePalette( palette );
 }
 
 bool Interface::ReadStrrefs()
 {
 	int i;
 	TableMgr * tab;
-	int table=LoadTable("strings");
+	int table=gamedata->LoadTable("strings");
 	memset(strref_table,-1,sizeof(strref_table) );
 	if (table<0) {
 		return false;
 	}
-	tab = GetTable(table);
+	tab = gamedata->GetTable(table);
 	if (!tab) {
 		goto end;
 	}
@@ -984,7 +961,7 @@ bool Interface::ReadStrrefs()
 		strref_table[i]=atoi(tab->QueryField(i,0));
 	}
 end:
-	DelTable(table);
+	gamedata->DelTable(table);
 	return true;
 }
 
@@ -996,13 +973,13 @@ int Interface::ReadResRefTable(const ieResRef tablename, ieResRef *&data)
 		free(data);
 		data = NULL;
 	}
-	int table = LoadTable( tablename );
+	int table = gamedata->LoadTable( tablename );
 	if (table < 0) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "Cannot find %s.2da.\n",tablename );
 		return 0;
 	}
-	TableMgr* tm = GetTable( table );
+	TableMgr* tm = gamedata->GetTable( table );
 	if (tm) {
 		count = tm->GetRowCount();
 		data = (ieResRef *) calloc( count, sizeof(ieResRef) );
@@ -1013,7 +990,7 @@ int Interface::ReadResRefTable(const ieResRef tablename, ieResRef *&data)
 				data[i][0]=0;
 			}
 		}
-		DelTable( table );
+		gamedata->DelTable( table );
 	}
 	return count;
 }
@@ -1165,7 +1142,7 @@ int Interface::LoadSprites()
 	printStatus( "OK", LIGHT_GREEN );
 
 	printMessage( "Core", "Loading Fonts...\n", WHITE );
-	table = LoadTable( "fonts" );
+	table = gamedata->LoadTable( "fonts" );
 	if (table < 0) {
 		printStatus( "ERROR", LIGHT_RED );
 		printf( "Cannot find fonts.2da.\nTermination in Progress...\n" );
@@ -1179,7 +1156,7 @@ int Interface::LoadSprites()
 		}
 		DataStream* str = NULL;
 
-		TableMgr* tab = GetTable( table );
+		TableMgr* tab = gamedata->GetTable( table );
 		int count = tab->GetRowCount();
 		for (int i = 0; i < count; i++) {
 			const char* ResRef = tab->QueryField( i, 0 );
@@ -1209,12 +1186,12 @@ int Interface::LoadSprites()
 				Palette* pal = CreatePalette( fore, back );
 				pal->CreateShadedAlphaChannel();
 				fnt->SetPalette(pal);
-				FreePalette( pal );
+				gamedata->FreePalette( pal );
 			}
 			fnt->SetFirstChar( (ieByte) first_char );
 			fonts.push_back( fnt );
 		}
-		DelTable( table );
+		gamedata->DelTable( table );
 
 		FreeInterface(bamint);
 	}
@@ -1273,9 +1250,6 @@ int Interface::Init()
 		printStatus( "ERROR", LIGHT_RED );
 		return GEM_ERROR;
 	}
-	printMessage( "Core", "Creating Object Factory...", WHITE );
-	factory = new Factory();
-	printStatus( "OK", LIGHT_GREEN );
 	time_t t;
 	t = time( NULL );
 	srand( ( unsigned int ) t );
@@ -1617,7 +1591,7 @@ int Interface::Init()
 	}
 	printStatus( "OK", LIGHT_GREEN );
 
-	if ( Exists("WMAPLAY", IE_2DA_CLASS_ID) ) {
+	if ( gamedata->Exists("WMAPLAY", IE_2DA_CLASS_ID) ) {
 		ret = ReadAreaAliasTable( "WMAPLAY" );
 		printMessage( "Core", "Initializing area aliases...", WHITE );
 		if (ret) {
@@ -1825,11 +1799,6 @@ void Interface::FreeInterface(void* ptr)
 	plugin->FreePlugin( ptr );
 }
 
-Factory* Interface::GetFactory(void) const
-{
-	return factory;
-}
-
 void Interface::SetFeature(int flag, int position)
 {
 	if (position>=32) {
@@ -2021,19 +1990,19 @@ bool Interface::LoadConfig(const char* filename)
 		} else if (stricmp( name, "GameOnCD" ) == 0) {
 			GameOnCD = ( atoi( value ) == 0 ) ? false : true;
 		} else if (stricmp( name, "GameDataPath" ) == 0) {
-			strncpy( GameData, value, sizeof(GameData) );
+			strncpy( GameDataPath, value, sizeof(GameDataPath) );
 		} else if (stricmp( name, "GameOverridePath" ) == 0) {
-			strncpy( GameOverride, value, sizeof(GameOverride) );
+			strncpy( GameOverridePath, value, sizeof(GameOverridePath) );
 		} else if (stricmp( name, "GemRBOverridePath" ) == 0) {
-			strncpy( GemRBOverride, value, sizeof(GemRBOverride) );
+			strncpy( GemRBOverridePath, value, sizeof(GemRBOverridePath) );
 		} else if (stricmp( name, "GameScriptsPath" ) == 0) {
-			strncpy( GameScripts, value, sizeof(GameScripts) );
+			strncpy( GameScriptsPath, value, sizeof(GameScriptsPath) );
 		} else if (stricmp( name, "GameSoundsPath" ) == 0) {
-			strncpy( GameSounds, value, sizeof(GameSounds) );
+			strncpy( GameSoundsPath, value, sizeof(GameSoundsPath) );
 		} else if (stricmp( name, "GamePortraitsPath" ) == 0) {
-			strncpy( GamePortraits, value, sizeof(GamePortraits) );
+			strncpy( GamePortraitsPath, value, sizeof(GamePortraitsPath) );
 		} else if (stricmp( name, "GameCharactersPath" ) == 0) {
-			strncpy( GameCharacters, value, sizeof(GameCharacters) );
+			strncpy( GameCharactersPath, value, sizeof(GameCharactersPath) );
 		} else if (stricmp( name, "GameName" ) == 0) {
 			strncpy( GameName, value, sizeof(GameName) );
 		} else if (stricmp( name, "GameType" ) == 0) {
@@ -2095,8 +2064,8 @@ bool Interface::LoadConfig(const char* filename)
 	}
 #endif
 
-	if (!GemRBOverride[0]) {
-		strcpy( GemRBOverride, GemRBPath );
+	if (!GemRBOverridePath[0]) {
+		strcpy( GemRBOverridePath, GemRBPath );
 	}
 
 	if (!PluginsPath[0]) {
@@ -2128,7 +2097,7 @@ bool Interface::LoadConfig(const char* filename)
 	FixPath( GUIScriptsPath, true );
 	FixPath( PluginsPath, true );
 	FixPath( GemRBPath, true );
-	FixPath( GemRBOverride, true );
+	FixPath( GemRBOverridePath, true );
 
 	if (GamePath[0]) {
 		FixPath( GamePath, true );
@@ -2343,36 +2312,6 @@ bool Interface::LoadGemRBINI()
 	return true;
 }
 
-Palette *Interface::GetPalette(const ieResRef resname)
-{
-	Palette *palette = (Palette *) PaletteCache.GetResource(resname);
-	if (palette) {
-		return palette;
-	}
-	//additional hack for allowing NULL's
-	if (PaletteCache.RefCount(resname)!=-1) {
-		return NULL;
-	}
-	DataStream* str = key->GetResource( resname, IE_BMP_CLASS_ID );
-	ImageMgr* im = ( ImageMgr* ) GetInterface( IE_BMP_CLASS_ID );
-	if (im == NULL) {
-		delete ( str );
-		return NULL;
-	}
-	if (!im->Open( str, true )) {
-		PaletteCache.SetAt(resname, NULL);
-		FreeInterface( im );
-		return NULL;
-	}
-
-	palette = new Palette();
-	im->GetPalette(0,256,palette->col);
-	FreeInterface( im );
-	palette->named=true;
-	PaletteCache.SetAt(resname, (void *) palette);
-	return palette;
-}
-
 Palette* Interface::CreatePalette(const Color &color, const Color &back)
 {
 	Palette* pal = new Palette();
@@ -2391,39 +2330,6 @@ Palette* Interface::CreatePalette(const Color &color, const Color &back)
 			( unsigned char ) ( ( ( color.a - back.a ) * ( i ) ) / 255.0 );
 	}
 	return pal;
-}
-
-void Interface::FreePalette(Palette *&pal, const ieResRef name)
-{
-	int res;
-
-	if (!pal) {
-		return;
-	}
-	if (!name || !name[0]) {
-		if(pal->named) {
-			printf("Palette is supposed to be named, but got no name!\n");
-			abort();
-		} else {
-			pal->Release();
-			pal=NULL;
-		}
-		return;
-	}
-	if (!pal->named) {
-		printf("Unnamed palette, it should be %s!\n", name);
-		abort();
-	}
-	res=PaletteCache.DecRef((void *) pal, name, true);
-	if (res<0) {
-		printMessage( "Core", "Corrupted Palette cache encountered (reference count went below zero), ", LIGHT_RED );
-		printf( "Palette name is: %.8s\n", name);
-		abort();
-	}
-	if (!res) {
-		pal->Release();
-	}
-	pal = NULL;
 }
 
 /** No descriptions */
@@ -2484,56 +2390,6 @@ ScriptEngine* Interface::GetGUIScriptEngine() const
 	return guiscript;
 }
 
-Actor *Interface::GetCreature(DataStream *stream, unsigned char InParty)
-{
-	ActorMgr* actormgr = ( ActorMgr* ) GetInterface( IE_CRE_CLASS_ID );
-	if (!actormgr->Open( stream, true )) {
-		FreeInterface( actormgr );
-		return NULL;
-	}
-	Actor* actor = actormgr->GetActor(InParty);
-	FreeInterface( actormgr );
-	return actor;
-}
-
-int Interface::LoadCreature(const char* ResRef, int InParty, bool character)
-{
-	DataStream *stream;
-
-	if (character) {
-		char nPath[_MAX_PATH], fName[16];
-		snprintf( fName, sizeof(fName), "%s.chr", ResRef);
-		PathJoin( nPath, GamePath, "characters", fName, NULL );
-		ResolveFilePath( nPath );
-		FileStream *fs = new FileStream();
-		fs -> Open( nPath, true );
-		stream = (DataStream *) fs;
-	}
-	else {
-		stream = key->GetResource( ResRef, IE_CRE_CLASS_ID );
-	}
-	Actor* actor = GetCreature(stream, InParty);
-	if ( !actor ) {
-		return -1;
-	}
-	//actor->InParty = (ieByte) InParty;
-	//both fields are of length 9, make this sure!
-	memcpy(actor->Area, game->CurrentArea, sizeof(actor->Area) );
-	if (actor->BaseStats[IE_STATE_ID] & STATE_DEAD) {
-		actor->SetStance( IE_ANI_TWITCH );
-	} else {
-		actor->SetStance( IE_ANI_AWAKE );
-	}
-	actor->SetOrientation( 0, false );
-
-	if ( InParty ) {
-		return game->JoinParty( actor, JP_JOIN|JP_INITPOS );
-	}
-	else {
-		return game->AddNPC( actor );
-	}
-}
-
 //NOTE: if there were more summoned creatures, it will return only the last
 Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres, Actor *Owner, Actor *target, Point &position, int eamod, int level)
 {
@@ -2543,7 +2399,7 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 
 	while(cnt-- && level>0) {
 		DataStream* ds = key->GetResource( resource, IE_CRE_CLASS_ID );
-		ab = GetCreature(ds);
+		ab = gamedata->GetCreature(ds);
 		if (!ab) {
 			return NULL;
 		}
@@ -2593,7 +2449,7 @@ Actor *Interface::SummonCreature(const ieResRef resource, const ieResRef vvcres,
 		ab->SetPosition(position, true, 0);
 		ab->RefreshEffects(NULL);
 		if (vvcres[0]) {
-			ScriptedAnimation* vvc = GetScriptedAnimation(vvcres, false);
+			ScriptedAnimation* vvc = gamedata->GetScriptedAnimation(vvcres, false);
 			if (vvc) {
 				vvc->XPos=position.x;
 				vvc->YPos=position.y;
@@ -3257,85 +3113,6 @@ MusicMgr* Interface::GetMusicMgr() const
 {
 	return music;
 }
-/** Loads a 2DA Table, returns -1 on error or the Table Index on success */
-int Interface::LoadTable(const ieResRef ResRef)
-{
-	int ind = GetTableIndex( ResRef );
-	if (ind != -1) {
-		return ind;
-	}
-	//printf("(%s) Table not found... Loading from file\n", ResRef);
-	DataStream* str = key->GetResource( ResRef, IE_2DA_CLASS_ID );
-	if (!str) {
-		return -1;
-	}
-	TableMgr* tm = ( TableMgr* ) GetInterface( IE_2DA_CLASS_ID );
-	if (!tm) {
-		delete str;
-		return -1;
-	}
-	if (!tm->Open( str, true )) {
-		FreeInterface( tm );
-		return -1;
-	}
-	Table t;
-	t.free = false;
-	strncpy( t.ResRef, ResRef, 8 );
-	t.tm = tm;
-	ind = -1;
-	for (size_t i = 0; i < tables.size(); i++) {
-		if (tables[i].free) {
-			ind = ( int ) i;
-			break;
-		}
-	}
-	if (ind != -1) {
-		tables[ind] = t;
-		return ind;
-	}
-	tables.push_back( t );
-	return ( int ) tables.size() - 1;
-}
-/** Gets the index of a loaded table, returns -1 on error */
-int Interface::GetTableIndex(const char* ResRef) const
-{
-	for (size_t i = 0; i < tables.size(); i++) {
-		if (tables[i].free)
-			continue;
-		if (strnicmp( tables[i].ResRef, ResRef, 8 ) == 0)
-			return ( int ) i;
-	}
-	return -1;
-}
-/** Gets a Loaded Table by its index, returns NULL on error */
-TableMgr* Interface::GetTable(unsigned int index) const
-{
-	if (index >= tables.size()) {
-		return NULL;
-	}
-	if (tables[index].free) {
-		return NULL;
-	}
-	return tables[index].tm;
-}
-/** Frees a Loaded Table, returns false on error, true on success */
-bool Interface::DelTable(unsigned int index)
-{
-	if (index==0xffffffff) {
-		FreeInterfaceVector( Table, tables, tm );
-		tables.clear();
-		return true;
-	}
-	if (index >= tables.size()) {
-		return false;
-	}
-	if (tables[index].free) {
-		return false;
-	}
-	FreeInterface( tables[index].tm );
-	tables[index].free = true;
-	return true;
-}
 /** Loads an IDS Table, returns -1 on error or the Symbol Table Index on success */
 int Interface::LoadSymbol(const char* ResRef)
 {
@@ -3436,8 +3213,8 @@ int Interface::PlayMovie(const char* ResRef)
 	int cnt = 0;
 	vars->Lookup("Display Movie Subtitles", subtitles);
 	if (subtitles) {
-		int table = LoadTable(ResRef);
-		TableMgr *sttable = GetTable(table);
+		int table = gamedata->LoadTable(ResRef);
+		TableMgr *sttable = gamedata->GetTable(table);
 		if (sttable) {
 			cnt = sttable->GetRowCount()-3;
 			if (cnt>0) {
@@ -3456,7 +3233,7 @@ int Interface::PlayMovie(const char* ResRef)
 			int g = atoi(sttable->QueryField("green", "frame"));
 			int b = atoi(sttable->QueryField("blue", "frame"));
 			SubtitleFont = GetFont (MovieFont); //will change
-			DelTable(table);
+			gamedata->DelTable(table);
 			if (SubtitleFont) {
 				Color fore = {(unsigned char) r,(unsigned char) g,(unsigned char) b, 0x00};
 				Color back = {0x00, 0x00, 0x00, 0x00};
@@ -3474,7 +3251,7 @@ int Interface::PlayMovie(const char* ResRef)
 	mp->CallBackAtFrames(cnt, frames, strrefs);
 	mp->Play();
 	FreeInterface( mp );
-	FreePalette( palette );
+	gamedata->FreePalette( palette );
 	if (frames)
 		free(frames);
 	if (strrefs)
@@ -3524,7 +3301,7 @@ int Interface::GetPortraits(TextArea* ta, bool smallorlarge)
 		bmp_suffix[0]='M';
 		png_suffix[0]='M';
 	}
-	PathJoin( Path, GamePath, GamePortraits, NULL );
+	PathJoin( Path, GamePath, GamePortraitsPath, NULL );
 	ResolveFilePath( Path );
 	DIR* dir = opendir( Path );
 	if (dir == NULL) {
@@ -3566,7 +3343,7 @@ int Interface::GetCharSounds(TextArea* ta)
 	int count = 0;
 	char Path[_MAX_PATH];
 
-	PathJoin( Path, GamePath, GameSounds, NULL );
+	PathJoin( Path, GamePath, GameSoundsPath, NULL );
 	ResolveFilePath( Path );
 	hasfolders = ( HasFeature( GF_SOUNDFOLDERS ) != 0 );
 	DIR* dir = opendir( Path );
@@ -3607,7 +3384,7 @@ int Interface::GetCharacters(TextArea* ta)
 	int count = 0;
 	char Path[_MAX_PATH];
 
-	PathJoin( Path, GamePath, GameCharacters, NULL );
+	PathJoin( Path, GamePath, GameCharactersPath, NULL );
 	ResolveFilePath( Path );
 	DIR* dir = opendir( Path );
 	if (dir == NULL) {
@@ -3877,8 +3654,8 @@ bool Interface::InitItemTypes()
 	if (slotmatrix) {
 		free(slotmatrix);
 	}
-	int ItemTypeTable = LoadTable( "itemtype" );
-	TableMgr *it = GetTable(ItemTypeTable);
+	int ItemTypeTable = gamedata->LoadTable( "itemtype" );
+	TableMgr *it = gamedata->GetTable(ItemTypeTable);
 
 	ItemTypes = 0;
 	if (it) {
@@ -3903,13 +3680,13 @@ bool Interface::InitItemTypes()
 			}
 			slotmatrix[i] = (ieDword) value;
 		}
-		DelTable(ItemTypeTable);
+		gamedata->DelTable(ItemTypeTable);
 	}
 
 	//slottype describes the inventory structure
 	Inventory::Init(HasFeature(GF_MAGICBIT));
-	int SlotTypeTable = LoadTable( "slottype" );
-	TableMgr *st = GetTable(SlotTypeTable);
+	int SlotTypeTable = gamedata->LoadTable( "slottype" );
+	TableMgr *st = gamedata->GetTable(SlotTypeTable);
 	if (slottypes) {
 		free(slottypes);
 		slottypes = NULL;
@@ -3965,7 +3742,7 @@ bool Interface::InitItemTypes()
 			default:;
 			}
 		}
-		DelTable( SlotTypeTable );
+		gamedata->DelTable( SlotTypeTable );
 	}
 	return (it && st);
 }
@@ -4452,7 +4229,7 @@ void Interface::DragItem(CREItem *item, const ieResRef Picture)
 	if (video) {
 		Sprite2D* DraggedCursor = NULL;
 		if (item) {
-			DraggedCursor = GetBAMSprite( Picture, 0, 0 );
+			DraggedCursor = gamedata->GetBAMSprite( Picture, 0, 0 );
 		}
 		video->SetDragCursor (DraggedCursor);
 	}
@@ -4464,11 +4241,11 @@ bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)
 	TableMgr * tab;
 	int i,j;
 
-	int table=LoadTable(TableName);
+	int table=gamedata->LoadTable(TableName);
 	if (table<0) {
 		return false;
 	}
-	tab = GetTable(table);
+	tab = gamedata->GetTable(table);
 	if (!tab) {
 		goto end;
 	}
@@ -4493,7 +4270,7 @@ bool Interface::ReadItemTable(const ieResRef TableName, const char * Prefix)
 		RtRows->SetAt(ItemName, (void*)itemlist);
 	}
 end:
-	DelTable(table);
+	gamedata->DelTable(table);
 	return true;
 }
 
@@ -4503,7 +4280,7 @@ bool Interface::ReadRandomItems()
 	int i;
 	TableMgr * tab;
 
-	int table=LoadTable( "randitem" );
+	int table=gamedata->LoadTable( "randitem" );
 	ieDword difflev=0; //rt norm or rt fury
 	vars->Lookup("Nightmare Mode", difflev);
 	if (RtRows) {
@@ -4519,7 +4296,7 @@ bool Interface::ReadRandomItems()
 	if (table<0) {
 		return false;
 	}
-	tab = GetTable( table );
+	tab = gamedata->GetTable( table );
 	if (!tab) {
 		goto end;
 	}
@@ -4528,7 +4305,7 @@ bool Interface::ReadRandomItems()
 	}
 	strncpy( GoldResRef, tab->QueryField((unsigned int) 0,(unsigned int) 0), sizeof(ieResRef) ); //gold
 	if ( GoldResRef[0]=='*' ) {
-		DelTable( table );
+		gamedata->DelTable( table );
 		return false;
 	}
 	strncpy( RtResRef, tab->QueryField( 1, difflev ), sizeof(ieResRef) );
@@ -4545,7 +4322,7 @@ bool Interface::ReadRandomItems()
 		ReadItemTable( RtResRef,tab->GetRowName(2+i) );
 	}
 end:
-	DelTable( table );
+	gamedata->DelTable( table );
 	return true;
 }
 
@@ -4612,141 +4389,6 @@ bool Interface::ResolveRandomItem(CREItem *itm)
 	printf("Loop detected while generating random item:%s",itm->ItemResRef);
 	printStatus("ERROR", LIGHT_RED);
 	return false;
-}
-
-Item* Interface::GetItem(const ieResRef resname)
-{
-	Item *item = (Item *) ItemCache.GetResource(resname);
-	if (item) {
-		return item;
-	}
-	DataStream* str = key->GetResource( resname, IE_ITM_CLASS_ID );
-	ItemMgr* sm = ( ItemMgr* ) GetInterface( IE_ITM_CLASS_ID );
-	if (sm == NULL) {
-		delete ( str );
-		return NULL;
-	}
-	if (!sm->Open( str, true )) {
-		FreeInterface( sm );
-		return NULL;
-	}
-
-	item = new Item();
-	//this is required for storing the 'source'
-	strnlwrcpy(item->Name, resname, 8);
-	sm->GetItem( item );
-	if (item == NULL) {
-		FreeInterface( sm );
-		return NULL;
-	}
-
-	FreeInterface( sm );
-	ItemCache.SetAt(resname, (void *) item);
-	return item;
-}
-
-//you can supply name for faster access
-void Interface::FreeItem(Item const *itm, const ieResRef name, bool free)
-{
-	int res;
-
-	res=ItemCache.DecRef((void *) itm, name, free);
-	if (res<0) {
-		printMessage( "Core", "Corrupted Item cache encountered (reference count went below zero), ", LIGHT_RED );
-		printf( "Item name is: %.8s\n", name);
-		abort();
-	}
-	if (res) return;
-	if (free) delete itm;
-}
-
-Spell* Interface::GetSpell(const ieResRef resname)
-{
-	Spell *spell = (Spell *) SpellCache.GetResource(resname);
-	if (spell) {
-		return spell;
-	}
-	DataStream* str = key->GetResource( resname, IE_SPL_CLASS_ID );
-	SpellMgr* sm = ( SpellMgr* ) GetInterface( IE_SPL_CLASS_ID );
-	if (sm == NULL) {
-		delete ( str );
-		return NULL;
-	}
-	if (!sm->Open( str, true )) {
-		FreeInterface( sm );
-		return NULL;
-	}
-
-	spell = new Spell();
-	//this is required for storing the 'source'
-	strnlwrcpy(spell->Name, resname, 8);
-	sm->GetSpell( spell );
-	if (spell == NULL) {
-		FreeInterface( sm );
-		return NULL;
-	}
-
-	FreeInterface( sm );
-
-	SpellCache.SetAt(resname, (void *) spell);
-	return spell;
-}
-
-void Interface::FreeSpell(Spell *spl, const ieResRef name, bool free)
-{
-	int res;
-
-	res=SpellCache.DecRef((void *) spl, name, free);
-	if (res<0) {
-		printMessage( "Core", "Corrupted Spell cache encountered (reference count went below zero), ", LIGHT_RED );
-		printf( "Spell name is: %.8s or %.8s\n", name, spl->Name);
-		abort();
-	}
-	if (res) return;
-	if (free) delete spl;
-}
-
-Effect* Interface::GetEffect(const ieResRef resname)
-{
-	Effect *effect = (Effect *) EffectCache.GetResource(resname);
-	if (effect) {
-		return effect;
-	}
-	DataStream* str = key->GetResource( resname, IE_EFF_CLASS_ID );
-	EffectMgr* em = ( EffectMgr* ) GetInterface( IE_EFF_CLASS_ID );
-	if (em == NULL) {
-		delete ( str );
-		return NULL;
-	}
-	if (!em->Open( str, true )) {
-		FreeInterface( em );
-		return NULL;
-	}
-
-	effect = em->GetEffect(new Effect() );
-	if (effect == NULL) {
-		FreeInterface( em );
-		return NULL;
-	}
-
-	FreeInterface( em );
-
-	EffectCache.SetAt(resname, (void *) effect);
-	return effect;
-}
-
-void Interface::FreeEffect(Effect *eff, const ieResRef name, bool free)
-{
-	int res;
-
-	res=EffectCache.DecRef((void *) eff, name, free);
-	if (res<0) {
-		printMessage( "Core", "Corrupted Effect cache encountered (reference count went below zero), ", LIGHT_RED );
-		printf( "Effect name is: %.8s\n", name);
-		abort();
-	}
-	if (res) return;
-	if (free) delete eff;
 }
 
 //now that we store spell name in spl, i guess, we shouldn't pass 'ieResRef name'
@@ -4958,35 +4600,6 @@ void Interface::PlaySound(int index)
 	}
 }
 
-bool Interface::Exists(const char *ResRef, SClass_ID type, bool silent)
-{
-	// TODO: check various caches before going to KeyImp
-	return key->HasResource( ResRef, type, silent );
-}
-
-//if the default setup doesn't fit for an animation
-//create a vvc for it!
-ScriptedAnimation* Interface::GetScriptedAnimation( const char *effect, bool doublehint)
-{
-	ScriptedAnimation *ret = NULL;
-
-	if (Exists( effect, IE_VVC_CLASS_ID ) ) {
-		DataStream *ds = key->GetResource( effect, IE_VVC_CLASS_ID );
-		ret = new ScriptedAnimation(ds, true);
-	} else {
-		AnimationFactory *af = (AnimationFactory *)
-			key->GetFactoryResource( effect, IE_BAM_CLASS_ID, IE_NORMAL );
-		if (af) {
-			ret = new ScriptedAnimation();
-			ret->LoadAnimationFactory( af, doublehint?2:0);
-		}
-	}
-	if (ret) {
-		strnlwrcpy(ret->ResName, effect, 8);
-	}
-	return ret;
-}
-
 Actor *Interface::GetFirstSelectedPC(bool forced)
 {
 	int partySize = game->GetPartySize( false );
@@ -5004,24 +4617,9 @@ Actor *Interface::GetFirstSelectedPC(bool forced)
 	return NULL;
 }
 
-// Return single BAM frame as a sprite. Use if you want one frame only,
-// otherwise it's not efficient
-Sprite2D* Interface::GetBAMSprite(const ieResRef ResRef, int cycle, int frame)
-{
-	Sprite2D *tspr;
-	AnimationFactory* af = ( AnimationFactory* )
-		key->GetFactoryResource( ResRef, IE_BAM_CLASS_ID, IE_NORMAL );
-	if (!af) return 0;
-	if (cycle == -1)
-		tspr = af->GetFrameWithoutCycle( (unsigned short) frame );
-	else
-		tspr = af->GetFrame( (unsigned short) frame, (unsigned char) cycle );
-	return tspr;
-}
-
 Sprite2D *Interface::GetCursorSprite()
 {
-	Sprite2D *spr = GetBAMSprite(CursorBam, 0, 0);
+	Sprite2D *spr = gamedata->GetBAMSprite(CursorBam, 0, 0);
 	if (spr)
 	{
 		if(HasFeature(GF_OVERRIDE_CURSORPOS))
@@ -5035,7 +4633,7 @@ Sprite2D *Interface::GetCursorSprite()
 
 Sprite2D *Interface::GetScrollCursorSprite(int frameNum, int spriteNum)
 {
-	return GetBAMSprite(ScrollCursorBam, frameNum, spriteNum);
+	return gamedata->GetBAMSprite(ScrollCursorBam, frameNum, spriteNum);
 }
 
 /* we should return -1 if it isn't gold, otherwise return the gold value */
@@ -5055,7 +4653,7 @@ int Interface::CanMoveItem(const CREItem *item) const
 // dealing with applying effects
 void Interface::ApplySpell(const ieResRef resname, Actor *actor, Actor *caster, int level)
 {
-	Spell *spell = GetSpell(resname);
+	Spell *spell = gamedata->GetSpell(resname);
 	if (!spell) {
 		return;
 	}
@@ -5079,7 +4677,7 @@ void Interface::ApplySpell(const ieResRef resname, Actor *actor, Actor *caster, 
 
 void Interface::ApplySpellPoint(const ieResRef resname, Scriptable* /*area*/, Point &/*pos*/, Actor *caster, int level)
 {
-	Spell *spell = GetSpell(resname);
+	Spell *spell = gamedata->GetSpell(resname);
 	if (!spell) {
 		return;
 	}
@@ -5117,7 +4715,7 @@ int Interface::ApplyEffect(Effect *effect, Actor *actor, Actor *caster)
 int Interface::ApplyEffect(const ieResRef resname, Actor *actor, Actor *caster, int level)
 {
 	//Don't free this reference, it is cached!
-	Effect *effect = GetEffect(resname);
+	Effect *effect = gamedata->GetEffect(resname);
 	if (!effect) {
 		return 0;
 	}
@@ -5162,7 +4760,7 @@ int Interface::WriteCharacter(const char *name, Actor *actor)
 {
 	char Path[_MAX_PATH];
 
-	PathJoin( Path, GamePath, GameCharacters, NULL );
+	PathJoin( Path, GamePath, GameCharactersPath, NULL );
 	if (!actor) {
 		return -1;
 	}
@@ -5374,7 +4972,7 @@ void Interface::RegisterOpcodes(int count, const EffectRef *opcodes)
 void Interface::SetInfoTextColor(Color &color)
 {
 	if (InfoTextPalette) {
-		FreePalette(InfoTextPalette);
+		gamedata->FreePalette(InfoTextPalette);
 	}
 	InfoTextPalette = CreatePalette(color, black);
 }
@@ -5392,8 +4990,8 @@ void Interface::GetResRefFrom2DA(const ieResRef resref, ieResRef resource1, ieRe
 	if (resource3) {
 		resource3[0]=0;
 	}
-	int table = LoadTable(resref);
-	TableMgr *tab = GetTable(table);
+	int table = gamedata->LoadTable(resref);
+	TableMgr *tab = gamedata->GetTable(table);
 
 	if (tab) {
 		unsigned int cols = tab->GetColumnCount();
@@ -5410,8 +5008,8 @@ ieDword *Interface::GetListFrom2DA(const ieResRef resref)
 {
 	ieDword *ret;
 
-	int table = LoadTable(resref);
-	TableMgr *tab = GetTable(table);
+	int table = gamedata->LoadTable(resref);
+	TableMgr *tab = gamedata->GetTable(table);
 
 	if (tab) {
 		ieDword cnt = tab->GetRowCount();

@@ -33,6 +33,9 @@
 #include "GlobalTimer.h"
 #include "PluginMgr.h"
 
+// TODO: remove this header dependency
+#include "GameData.h"
+
 class Audio;
 class Video;
 class ResourceMgr;
@@ -75,26 +78,21 @@ class Control;
 class Palette;
 class ProjectileServer;
 
-typedef struct Table {
-	TableMgr * tm;
-	char ResRef[8];
-	bool free;
-} Table;
 
-typedef struct Symbol {
+struct Symbol {
 	SymbolMgr * sm;
 	char ResRef[8];
 	bool free;
-} Symbol;
+};
 
-typedef struct SlotType {
+struct SlotType {
 	ieDword slot;
 	ieDword slottype;
 	ieDword slottip;
 	ieDword slotid;
 	ieDword sloteffects;
 	ieResRef slotresref;
-} SlotType;
+};
 
 class ItemList {
 public:
@@ -234,15 +232,11 @@ private:
 	Audio * AudioDriver ;
 	ResourceMgr * key;
 	ProjectileServer * projserv;
+	GameData * gamedata;
 public:
 	StringMgr *strings;
 	GlobalTimer * timer;
 private:
-	Cache ItemCache;
-	Cache SpellCache;
-	Cache EffectCache;
-	Cache PaletteCache;
-	Factory * factory;
 	ImageMgr * pal256;
 	ImageMgr * pal32;
 	ImageMgr * pal16;
@@ -261,7 +255,6 @@ private:
 	Variables * vars;
 	Variables * tokens;
 	MusicMgr * music;
-	std::vector<Table> tables;
 	std::vector<Symbol> symbols;
 	DataFileMgr * INIparty;
 	DataFileMgr * INIbeasts;
@@ -342,7 +335,6 @@ public:
 	/* makes sure the string is freed in TLKImp */
 	void FreeString(char *&str) const;
 	void FreeInterface(void * ptr);
-	Factory * GetFactory() const;
 	/* sets the floattext color */
 	void SetInfoTextColor(Color &color);
 	/** returns a gradient set */
@@ -358,10 +350,6 @@ public:
 	WindowMgr * GetWindowMgr() const;
 	/** Get GUI Script Manager */
 	ScriptEngine * GetGUIScriptEngine() const;
-	/** Returns actor */
-	Actor *GetCreature(DataStream *stream, unsigned char InParty=0);
-	/** Returns a PC index, by loading a creature */
-	int LoadCreature(const char *ResRef, int InParty, bool character=false);
 	/** core for summoning creatures, returns the last created Actor */
 	Actor *SummonCreature(const ieResRef resource, const ieResRef vvcres, Actor *Owner, Actor *target, Point &position, int eamod, int level);
 	/** Loads a WindowPack (CHUI file) in the Window Manager */
@@ -445,14 +433,6 @@ public:
 	Variables * GetTokenDictionary() const;
 	/** Get the Music Manager */
 	MusicMgr * GetMusicMgr() const;
-	/** Loads a 2DA Table, returns -1 on error or the Table Index on success */
-	int LoadTable(const char * ResRef);
-	/** Gets the index of a loaded table, returns -1 on error */
-	int GetTableIndex(const char * ResRef) const;
-	/** Gets a Loaded Table by its index, returns NULL on error */
-	TableMgr * GetTable(unsigned int index) const;
-	/** Frees a Loaded Table, returns false on error, true on success */
-	bool DelTable(unsigned int index);
 	/** Loads an IDS Table, returns -1 on error or the Symbol Table Index on success */
 	int LoadSymbol(const char * ResRef);
 	/** Gets the index of a loaded Symbol Table, returns -1 on error */
@@ -539,9 +519,7 @@ public:
 	/*handles the load screen*/
 	void LoadProgress(int percent);
 
-	Palette* GetPalette(const ieResRef resname);
 	Palette* CreatePalette(const Color &color, const Color &back);
-	void FreePalette(Palette *&pal, const ieResRef name=NULL);
 
 	void DragItem(CREItem* item, const ieResRef Picture);
 	CREItem* GetDraggedItem() const { return DraggedItem; }
@@ -549,12 +527,6 @@ public:
 	void ReleaseDraggedItem();
 	CREItem *ReadItem(DataStream *str);
 	bool ResolveRandomItem(CREItem *itm);
-	Item* GetItem(const ieResRef resname);
-	void FreeItem(Item const *itm, const ieResRef name, bool free=false);
-	Spell* GetSpell(const ieResRef resname);
-	void FreeSpell(Spell *spl, const ieResRef name, bool free=false);
-	Effect* GetEffect(const ieResRef resname);
-	void FreeEffect(Effect *eff, const ieResRef name, bool free=false);
 	ieStrRef GetRumour(const ieResRef resname);
 	Container *GetCurrentContainer();
 	int CloseCurrentContainer();
@@ -577,15 +549,9 @@ public:
 	void DoTheStoreHack(Store *s);
 	/** plays stock gui sound referenced by index */
 	void PlaySound(int idx);
-	/** returns true if resource exists */
-	bool Exists(const char *ResRef, SClass_ID type, bool silent=false);
-	/** creates a vvc/bam animation object at point */
-	ScriptedAnimation* GetScriptedAnimation( const char *ResRef, bool doublehint);
 	/** returns the first selected PC, if forced is set, then it returns
 	first PC if none was selected */
 	Actor *GetFirstSelectedPC(bool forced);
-	/** returns a single sprite (not cached) from a BAM resource */
-	Sprite2D* GetBAMSprite(const ieResRef ResRef, int cycle, int frame);
 	/** returns a cursor sprite (not cached) */
 	Sprite2D *GetCursorSprite();
 	/** returns a scroll cursor sprite */
@@ -668,13 +634,13 @@ private:
 	GameControl* StartGameControl();
 
 public:
-	char GameData[_MAX_PATH];
-	char GameOverride[_MAX_PATH];
-	char GameSounds[_MAX_PATH];
-	char GameScripts[_MAX_PATH];
-	char GamePortraits[_MAX_PATH];
-	char GameCharacters[_MAX_PATH];
-	char GemRBOverride[_MAX_PATH];
+	char GameDataPath[_MAX_PATH];
+	char GameOverridePath[_MAX_PATH];
+	char GameSoundsPath[_MAX_PATH];
+	char GameScriptsPath[_MAX_PATH];
+	char GamePortraitsPath[_MAX_PATH];
+	char GameCharactersPath[_MAX_PATH];
+	char GemRBOverridePath[_MAX_PATH];
 	ieResRef GameNameResRef;
 	ieResRef GoldResRef; //MISC07.itm
 	Variables *RtRows;
@@ -747,6 +713,7 @@ public:
 
 #ifndef INTERFACE
 extern Interface* core;
+extern GameData* gamedata;
 #ifdef WIN32
 extern HANDLE hConsole;
 #endif
@@ -755,9 +722,11 @@ extern HANDLE hConsole;
 #else
 #ifdef WIN32
 GEM_EXPORT Interface * core;
+GEM_EXPORT GameData * gamedata;
 GEM_EXPORT HANDLE hConsole;
 #else
 extern Interface * core;
+extern GameData * gamedata;
 #endif
 #endif
 

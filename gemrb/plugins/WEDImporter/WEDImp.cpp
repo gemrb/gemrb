@@ -101,7 +101,7 @@ int WEDImp::AddOverlay(TileMap *tm, Overlay *overlays, bool rain)
 	if (rain) {
 		strncat(res,"R",8);
 		//no rain tileset available, rolling back
-		if (!core->Exists(res,IE_TIS_CLASS_ID)) {
+		if (!gamedata->Exists(res,IE_TIS_CLASS_ID)) {
 			memcpy(res, overlays->TilesetResRef,sizeof(ieResRef));
 		}
 	}

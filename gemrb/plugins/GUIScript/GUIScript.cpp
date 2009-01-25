@@ -218,20 +218,20 @@ static inline void SetFunctionTooltip(int WindowIndex, int ControlIndex, char *t
 
 static void ReadItemSounds()
 {
-	int table = core->LoadTable( "itemsnd" );
+	int table = gamedata->LoadTable( "itemsnd" );
 	if (table<0) {
 		ItemSoundsCount = 0;
 		ItemSounds = NULL;
 		return;
 	}
-	TableMgr *tab = core->GetTable( table );
+	TableMgr *tab = gamedata->GetTable( table );
 	ItemSoundsCount = tab->GetRowCount();
 	ItemSounds = (ResRefPairs *) malloc( sizeof(ResRefPairs)*ItemSoundsCount);
 	for (int i = 0; i < ItemSoundsCount; i++) {
 		strnlwrcpy(ItemSounds[i][0], tab->QueryField(i,0), 8);
 		strnlwrcpy(ItemSounds[i][1], tab->QueryField(i,1), 8);
 	}
-	core->DelTable( table );
+	gamedata->DelTable( table );
 }
 
 static void GetItemSound(ieResRef &Sound, ieDword ItemType, const char *ID, ieDword Col)
@@ -315,7 +315,7 @@ static CREItem *CreateCreItem(const char *ItemResRef, int Charge0, int Charge1, 
 	TmpItem->Usages[1]=(ieWord) Charge1;
 	TmpItem->Usages[2]=(ieWord) Charge2;
 	TmpItem->Flags=0;
-	if (core->ResolveRandomItem(TmpItem) && core->Exists(TmpItem->ItemResRef, IE_ITM_CLASS_ID)) {
+	if (core->ResolveRandomItem(TmpItem) && gamedata->Exists(TmpItem->ItemResRef, IE_ITM_CLASS_ID)) {
 		return TmpItem;
 	}
 	/* item couldn't be resolved */
@@ -857,7 +857,7 @@ static PyObject* GemRB_LoadTable(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_LoadTable__doc );
 	}
 
-	int ind = core->LoadTable( tablename );
+	int ind = gamedata->LoadTable( tablename );
 	if (!noerror && ind == -1) {
 		return RuntimeError("Can't find resource");
 	}
@@ -876,7 +876,7 @@ static PyObject* GemRB_UnloadTable(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_UnloadTable__doc );
 	}
 
-	int ind = core->DelTable( ti );
+	int ind = gamedata->DelTable( ti );
 	if (ind == -1) {
 		return RuntimeError("Can't find resource");
 	}
@@ -932,7 +932,7 @@ static PyObject* GemRB_GetTableValue(PyObject * /*self*/, PyObject* args)
 			LIGHT_RED );
 		return NULL;
 	}
-	TableMgr* tm = core->GetTable( TableIndex );
+	TableMgr* tm = gamedata->GetTable( TableIndex );
 	if (!tm) {
 		return RuntimeError("Can't find resource");
 	}
@@ -980,7 +980,7 @@ static PyObject* GemRB_FindTableValue(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_FindTableValue__doc );
 	}
 
-	TableMgr* tm = core->GetTable( ti );
+	TableMgr* tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
 		return RuntimeError("Can't find resource");
 	}
@@ -1000,7 +1000,7 @@ static PyObject* GemRB_GetTableRowIndex(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GetTableRowIndex__doc );
 	}
 
-	TableMgr* tm = core->GetTable( ti );
+	TableMgr* tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
 		return RuntimeError("Can't find resource");
 	}
@@ -1021,7 +1021,7 @@ static PyObject* GemRB_GetTableRowName(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GetTableRowName__doc );
 	}
 
-	TableMgr* tm = core->GetTable( ti );
+	TableMgr* tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
 		return RuntimeError("Can't find resource");
 	}
@@ -1046,7 +1046,7 @@ static PyObject* GemRB_GetTableColumnIndex(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GetTableColumnIndex__doc );
 	}
 
-	TableMgr* tm = core->GetTable( ti );
+	TableMgr* tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
 		return RuntimeError("Can't find resource");
 	}
@@ -1067,7 +1067,7 @@ static PyObject* GemRB_GetTableColumnName(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GetTableColumnName__doc );
 	}
 
-	TableMgr* tm = core->GetTable( ti );
+	TableMgr* tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
 		return RuntimeError("Can't find resource");
 	}
@@ -1091,7 +1091,7 @@ static PyObject* GemRB_GetTableRowCount(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GetTableRowCount__doc );
 	}
 
-	TableMgr* tm = core->GetTable( ti );
+	TableMgr* tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
 		return RuntimeError("Can't find resource");
 	}
@@ -1112,7 +1112,7 @@ static PyObject* GemRB_GetTableColumnCount(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GetTableColumnCount__doc );
 	}
 
-	TableMgr* tm = core->GetTable( ti );
+	TableMgr* tm = gamedata->GetTable( ti );
 	if (tm == NULL) {
 		return RuntimeError("Can't find resource");
 	}
@@ -3961,18 +3961,18 @@ static PyObject* GemRB_GameSetReputation(PyObject * /*self*/, PyObject* args)
 
 void ReadReputation()
 {
-	int table = core->LoadTable( "reputati" );
+	int table = gamedata->LoadTable( "reputati" );
 	if (table<0) {
 		memset(ReputationIncrease,0,sizeof(ReputationIncrease) );
 		memset(ReputationDonation,0,sizeof(ReputationDonation) );
 		return;
 	}
-	TableMgr *tab = core->GetTable( table );
+	TableMgr *tab = gamedata->GetTable( table );
 	for (int i = 0; i < 20; i++) {
 		ReputationIncrease[i] = atoi( tab->QueryField(i,4) );
 		ReputationDonation[i] = atoi( tab->QueryField(i,8) );
 	}
-	core->DelTable( table );
+	gamedata->DelTable( table );
 }
 
 PyDoc_STRVAR( GemRB_IncreaseReputation__doc,
@@ -4267,7 +4267,7 @@ static PyObject* GemRB_CreatePlayer(PyObject * /*self*/, PyObject* args)
 		}
 	}
 	if (CreResRef[0]) {
-		PlayerSlot = core->LoadCreature( CreResRef, Slot, (bool) Import );
+		PlayerSlot = gamedata->LoadCreature( CreResRef, Slot, (bool) Import );
 	} else {
 		//just destroyed the previous actor, not going to create one
 		PlayerSlot = 0;
@@ -4476,14 +4476,14 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 			}
 		}
 
-		Spell* spell = core->GetSpell(ps->FavouriteSpells[largest]);
+		Spell* spell = gamedata->GetSpell(ps->FavouriteSpells[largest]);
 		if (spell == NULL) {
 			return NULL;
 		}
 
 		PyDict_SetItemString(dict, "FavouriteSpell", PyInt_FromLong ((signed) spell->SpellName));
 
-		core->FreeSpell( spell, ps->FavouriteSpells[largest], false );
+		gamedata->FreeSpell( spell, ps->FavouriteSpells[largest], false );
 	} else {
 		PyDict_SetItemString(dict, "FavouriteSpell", PyString_FromString (""));
 	}
@@ -4500,14 +4500,14 @@ static PyObject* GemRB_GetPCStats(PyObject * /*self*/, PyObject* args)
 			}
 		}
 
-		Item* item = core->GetItem(ps->FavouriteWeapons[largest]);
+		Item* item = gamedata->GetItem(ps->FavouriteWeapons[largest]);
 		if (item == NULL) {
 			return NULL;
 		}
 
 		PyDict_SetItemString(dict, "FavouriteWeapon", PyInt_FromLong ((signed) item->GetItemName(false)));
 
-		core->FreeItem( item, ps->FavouriteWeapons[largest], false );
+		gamedata->FreeItem( item, ps->FavouriteWeapons[largest], false );
 	} else {
 		PyDict_SetItemString(dict, "FavouriteWeapon", PyString_FromString (""));
 	}
@@ -4794,8 +4794,8 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	if (Portrait2) {
 		MyActor->SetPortrait( Portrait2, 2);
 	}
-	int mastertable = core->LoadTable( "avprefix" );
-	TableMgr* mtm = core->GetTable( mastertable );
+	int mastertable = gamedata->LoadTable( "avprefix" );
+	TableMgr* mtm = gamedata->GetTable( mastertable );
 	int count = mtm->GetRowCount();
 	if (count< 1 || count>8) {
 		printMessage( "GUIScript", "Table is invalid.\n", LIGHT_RED );
@@ -4805,13 +4805,13 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	int AnimID = strtoul( poi, NULL, 0 );
 	for (int i = 1; i < count; i++) {
 		poi = mtm->QueryField( i );
-		int table = core->LoadTable( poi );
-		TableMgr* tm = core->GetTable( table );
+		int table = gamedata->LoadTable( poi );
+		TableMgr* tm = gamedata->GetTable( table );
 		int StatID = atoi( tm->QueryField() );
 		StatID = MyActor->GetBase( StatID );
 		poi = tm->QueryField( StatID );
 		AnimID += strtoul( poi, NULL, 0 );
-		core->DelTable( table );
+		gamedata->DelTable( table );
 	}
 	MyActor->SetBase(IE_ANIMATION_ID, AnimID);
 	//setting PST's starting stance to 18
@@ -4819,7 +4819,7 @@ static PyObject* GemRB_FillPlayerInfo(PyObject * /*self*/, PyObject* args)
 	if (*poi != '*') {
 		MyActor->SetStance( atoi( poi ) );
 	}
-	core->DelTable( mastertable );
+	gamedata->DelTable( mastertable );
 	MyActor->SetOver( false );
 	Py_INCREF( Py_None );
 	return Py_None;
@@ -4842,7 +4842,7 @@ PyObject *SetSpellIcon(int wi, int ci, const ieResRef SpellResRef, int type, int
 		return Py_None;
 	}
 
-	Spell* spell = core->GetSpell( SpellResRef );
+	Spell* spell = gamedata->GetSpell( SpellResRef );
 	if (spell == NULL) {
 		btn->SetPicture( NULL );
 		printMessage( "GUIScript", " ", LIGHT_RED);
@@ -4878,7 +4878,7 @@ PyObject *SetSpellIcon(int wi, int ci, const ieResRef SpellResRef, int type, int
 		char *str = core->GetString(spell->SpellName,0);
 		SetFunctionTooltip(wi, ci, str, Function); //will free str
 	}
-	core->FreeSpell( spell, SpellResRef, false );
+	gamedata->FreeSpell( spell, SpellResRef, false );
 	//no incref here!
 	return Py_None;
 }
@@ -4909,9 +4909,9 @@ static Sprite2D* GetUsedWeaponIcon(Item *item, int which)
 		ieh = item->GetWeaponHeader(true);
 	}
 	if (ieh) {
-		return core->GetBAMSprite(ieh->UseIcon, -1, which);
+		return gamedata->GetBAMSprite(ieh->UseIcon, -1, which);
 	}
-	return core->GetBAMSprite(item->ItemIcon, -1, which);
+	return gamedata->GetBAMSprite(item->ItemIcon, -1, which);
 }
 
 static void SetItemText(int wi, int ci, int charges, bool oneisnone)
@@ -4946,7 +4946,7 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 		//no incref here!
 		return Py_None;
 	}
-	Item* item = core->GetItem(ItemResRef);
+	Item* item = gamedata->GetItem(ItemResRef);
 	if (item == NULL) {
 		btn->SetPicture(NULL);
 		//no incref here!
@@ -4959,12 +4959,12 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 	int i;
 	switch (Which) {
 	case 0: case 1:
-		Picture = core->GetBAMSprite(item->ItemIcon, -1, Which);
+		Picture = gamedata->GetBAMSprite(item->ItemIcon, -1, Which);
 		break;
 	case 2:
 		btn->SetPicture( NULL ); // also calls ClearPictureList
 		for (i=0;i<4;i++) {
-			Picture = core->GetBAMSprite(item->DescriptionIcon, -1, i);
+			Picture = gamedata->GetBAMSprite(item->DescriptionIcon, -1, i);
 			if (Picture)
 				btn->StackPicture(Picture);
 		}
@@ -4975,12 +4975,12 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 		Picture = GetUsedWeaponIcon(item, Which-4);
 		if (Item2ResRef) {
 			btn->SetPicture( NULL ); // also calls ClearPictureList
-			Item* item2 = core->GetItem(Item2ResRef);
+			Item* item2 = gamedata->GetItem(Item2ResRef);
 			if (item2) {
 				Sprite2D* Picture2;
-				Picture2 = core->GetBAMSprite(item2->ItemIcon, -1, Which-4);
+				Picture2 = gamedata->GetBAMSprite(item2->ItemIcon, -1, Which-4);
 				if (Picture2) btn->StackPicture(Picture2);
-				core->FreeItem( item2, Item2ResRef, false );
+				gamedata->FreeItem( item2, Item2ResRef, false );
 			}
 			if (Picture) btn->StackPicture(Picture);
 			setpicture = false;
@@ -4999,7 +4999,7 @@ PyObject *SetItemIcon(int wi, int ci, const char *ItemResRef, int Which, int too
 		SetFunctionTooltip(wi, ci, str, Function);
 	}
 
-	core->FreeItem( item, ItemResRef, false );
+	gamedata->FreeItem( item, ItemResRef, false );
 	//no incref here!
 	return Py_None;
 }
@@ -5161,12 +5161,12 @@ static PyObject* GemRB_GetContainerItem(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "Usages2", PyInt_FromLong (ci->Usages[2]));
 	PyDict_SetItemString(dict, "Flags", PyInt_FromLong (ci->Flags));
 
-	Item *item = core->GetItem( ci->ItemResRef );
+	Item *item = gamedata->GetItem( ci->ItemResRef );
 
 	int identified = !(ci->Flags & IE_INV_ITEM_IDENTIFIED);
 	PyDict_SetItemString(dict, "ItemName", PyInt_FromLong( (signed) item->GetItemName( (bool) identified )) );
 	PyDict_SetItemString(dict, "ItemDesc", PyInt_FromLong( (signed) item->GetItemDesc( (bool) identified )) );
-	core->FreeItem( item, ci->ItemResRef, false );
+	gamedata->FreeItem( item, ci->ItemResRef, false );
 	return dict;
 }
 
@@ -5234,14 +5234,14 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 			Py_INCREF( Py_None );
 			return Py_None;
 		}
- 		Item *item = core->GetItem(si->ItemResRef);
+ 		Item *item = gamedata->GetItem(si->ItemResRef);
 		if (item) {
  			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
 	 			memcpy(Sound,item->ReplacementItem,8);
 			} else {
 				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 			}
-			core->FreeItem(item, si->ItemResRef,0);
+			gamedata->FreeItem(item, si->ItemResRef,0);
 		}
 		if (res!=-1) { //it is gold!
 			game->PartyGold += res;
@@ -5266,14 +5266,14 @@ static PyObject* GemRB_ChangeContainerItem(PyObject * /*self*/, PyObject* args)
 			Py_INCREF( Py_None );
 			return Py_None;
 		}
- 		Item *item = core->GetItem(si->ItemResRef);
+ 		Item *item = gamedata->GetItem(si->ItemResRef);
 		if (item) {
  			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->DescriptionIcon[0]) {
 	 			memcpy(Sound,item->DescriptionIcon,8);
 			} else {
 				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_GET);
 			}
-			core->FreeItem(item, si->ItemResRef,0);
+			gamedata->FreeItem(item, si->ItemResRef,0);
 		}
 		actor->ReinitQuickSlots();
 
@@ -5429,7 +5429,7 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 		ItemResRef = si->ItemResRef;
 		Flags = si->Flags;
 	}
-	Item *item = core->GetItem( ItemResRef );
+	Item *item = gamedata->GetItem( ItemResRef );
 	if (!item) {
 		printMessage("GUIScript", " ", LIGHT_RED);
 		printf("Invalid resource reference: %s\n", ItemResRef);
@@ -5440,7 +5440,7 @@ static PyObject* GemRB_IsValidStoreItem(PyObject * /*self*/, PyObject* args)
 	if (Flags & IE_INV_ITEM_SELECTED) {
 		ret |= IE_INV_ITEM_SELECTED;
 	}
-	core->FreeItem( item, ItemResRef, false );
+	gamedata->FreeItem( item, ItemResRef, false );
 	return PyInt_FromLong(ret);
 }
 
@@ -5646,7 +5646,7 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 		PyDict_SetItemString(dict, "Amount", PyInt_FromLong( amount ) );
 	}
 
-	Item *item = core->GetItem( si->ItemResRef );
+	Item *item = gamedata->GetItem( si->ItemResRef );
 
 	if (!item) {
 		printMessage("GUIScript","Item is not available???",YELLOW);
@@ -5671,7 +5671,7 @@ static PyObject* GemRB_GetStoreItem(PyObject * /*self*/, PyObject* args)
 	}
 	PyDict_SetItemString(dict, "Price", PyInt_FromLong( price ) );
 
-	core->FreeItem( item, si->ItemResRef, false );
+	gamedata->FreeItem( item, si->ItemResRef, false );
 	return dict;
 }
 
@@ -5707,9 +5707,9 @@ static void ReadSpecialSpells()
 	int i;
 
 	SpecialSpellsCount = 0;
-	int table = core->LoadTable("splspec");
+	int table = gamedata->LoadTable("splspec");
 	if (table>=0) {
-		TableMgr *tab = core->GetTable(table);
+		TableMgr *tab = gamedata->GetTable(table);
 		if (!tab) goto table_loaded;
 		SpecialSpellsCount = tab->GetRowCount();
 		SpecialSpells = (SpellDescType *) malloc( sizeof(SpellDescType) * SpecialSpellsCount);
@@ -5719,7 +5719,7 @@ static void ReadSpecialSpells()
 			SpecialSpells[i].value = atoi(tab->QueryField(i,0) );
 		}
 table_loaded:
-		core->DelTable(table);
+		gamedata->DelTable(table);
 	}
 }
 
@@ -5761,9 +5761,9 @@ static void ReadUsedItems()
 	int i;
 
 	UsedItemsCount = 0;
-	int table = core->LoadTable("item_use");
+	int table = gamedata->LoadTable("item_use");
 	if (table>=0) {
-		TableMgr *tab = core->GetTable(table);
+		TableMgr *tab = gamedata->GetTable(table);
 		if (!tab) goto table_loaded;
 		UsedItemsCount = tab->GetRowCount();
 		UsedItems = (UsedItemType *) malloc( sizeof(UsedItemType) * UsedItemsCount);
@@ -5774,7 +5774,7 @@ static void ReadUsedItems()
 			UsedItems[i].value = atoi(tab->QueryField(i,1) );
 		}
 table_loaded:
-		core->DelTable(table);
+		gamedata->DelTable(table);
 	}
 }
 
@@ -5783,9 +5783,9 @@ static void ReadSpecialItems()
 	int i;
 
 	SpecialItemsCount = 0;
-	int table = core->LoadTable("itemspec");
+	int table = gamedata->LoadTable("itemspec");
 	if (table>=0) {
-		TableMgr *tab = core->GetTable(table);
+		TableMgr *tab = gamedata->GetTable(table);
 		if (!tab) goto table_loaded;
 		SpecialItemsCount = tab->GetRowCount();
 		SpecialItems = (SpellDescType *) malloc( sizeof(SpellDescType) * SpecialItemsCount);
@@ -5795,7 +5795,7 @@ static void ReadSpecialItems()
 			SpecialItems[i].value = atoi(tab->QueryField(i,0) );
 		}
 table_loaded:
-		core->DelTable(table);
+		gamedata->DelTable(table);
 	}
 }
 
@@ -5805,9 +5805,9 @@ static ieStrRef GetSpellDesc(ieResRef CureResRef)
 
 	if (StoreSpellsCount==-1) {
 		StoreSpellsCount = 0;
-		int table = core->LoadTable("speldesc");
+		int table = gamedata->LoadTable("speldesc");
 		if (table>=0) {
-			TableMgr *tab = core->GetTable(table);
+			TableMgr *tab = gamedata->GetTable(table);
 			if (!tab) goto table_loaded;
 			StoreSpellsCount = tab->GetRowCount();
 			StoreSpells = (SpellDescType *) malloc( sizeof(SpellDescType) * StoreSpellsCount);
@@ -5816,16 +5816,16 @@ static ieStrRef GetSpellDesc(ieResRef CureResRef)
 				StoreSpells[i].value = atoi(tab->QueryField(i,0) );
 			}
 table_loaded:
-			core->DelTable(table);
+			gamedata->DelTable(table);
 		}
 	}
 	if (StoreSpellsCount==0) {
-		Spell *spell = core->GetSpell(CureResRef);
+		Spell *spell = gamedata->GetSpell(CureResRef);
 		if (!spell) {
 			return 0;
 		}
 		int ret = spell->SpellDescIdentified;
-		core->FreeSpell(spell, CureResRef, false);
+		gamedata->FreeSpell(spell, CureResRef, false);
 		return ret;
 	}
 	for (i=0;i<StoreSpellsCount;i++) {
@@ -6180,12 +6180,12 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 		return AttributeError( GemRB_GetSpell__doc );
 	}
 
-	if (silent && !core->Exists(ResRef,IE_SPL_CLASS_ID, true)) {
+	if (silent && !gamedata->Exists(ResRef,IE_SPL_CLASS_ID, true)) {
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
 
-	Spell* spell = core->GetSpell(ResRef);
+	Spell* spell = gamedata->GetSpell(ResRef);
 	if (spell == NULL) {
 		Py_INCREF( Py_None );
 		return Py_None;
@@ -6199,7 +6199,7 @@ static PyObject* GemRB_GetSpell(PyObject * /*self*/, PyObject* args)
 	PyDict_SetItemString(dict, "SpellDivine", PyInt_FromLong (spell->PriestType)); //this will tell apart a priest spell from a druid spell
 	PyDict_SetItemString(dict, "SpellSchool", PyInt_FromLong (spell->PrimaryType));
 	PyDict_SetItemString(dict, "SpellType", PyInt_FromLong (spell->SecondaryType));
-	core->FreeSpell( spell, ResRef, false );
+	gamedata->FreeSpell( spell, ResRef, false );
 	return dict;
 }
 
@@ -6396,7 +6396,7 @@ static PyObject* GemRB_CanUseItemType(PyObject * /*self*/, PyObject* args)
 	if (!ItemName[0]) {
 		return PyInt_FromLong(0);
 	}
-	Item *item = core->GetItem(ItemName);
+	Item *item = gamedata->GetItem(ItemName);
 	if (!item) {
 		return PyInt_FromLong(0);
 	}
@@ -6413,7 +6413,7 @@ static PyObject* GemRB_CanUseItemType(PyObject * /*self*/, PyObject* args)
 	}
 
 	int ret=core->CanUseItemType(SlotType, item, actor, false);
-	core->FreeItem(item, ItemName, false);
+	gamedata->FreeItem(item, ItemName, false);
 	return PyInt_FromLong(ret);
 }
 
@@ -6504,7 +6504,7 @@ static PyObject* GemRB_GetItem(PyObject * /*self*/, PyObject* args)
 		actor = game->FindPC( PartyID );
 	}
 
-	Item* item = core->GetItem(ResRef);
+	Item* item = gamedata->GetItem(ResRef);
 	if (item == NULL) {
 		Py_INCREF( Py_None );
 		return Py_None;
@@ -6559,12 +6559,12 @@ not_a_scroll:
 		//a store file (this fixes pst eye items, which
 		//got the same item type as bags)
 		//this isn't required anymore, as bag itemtypes are customisable
-		if (core->Exists( ResRef, IE_STO_CLASS_ID) ) {
+		if (gamedata->Exists( ResRef, IE_STO_CLASS_ID) ) {
 			function|=CAN_STUFF;
 		}
 	}
 	PyDict_SetItemString(dict, "Function", PyInt_FromLong(function));
-	core->FreeItem( item, ResRef, false );
+	gamedata->FreeItem( item, ResRef, false );
 	return dict;
 }
 
@@ -6573,12 +6573,12 @@ void DragItem(CREItem *si)
 	if (!si) {
 		return;
 	}
-	Item *item = core->GetItem (si->ItemResRef );
+	Item *item = gamedata->GetItem (si->ItemResRef );
 	if (!item) {
 		return;
 	}
 	core->DragItem(si, item->ItemIcon);
-	core->FreeItem( item, si->ItemResRef, false );
+	gamedata->FreeItem( item, si->ItemResRef, false );
 }
 
 int CheckRemoveItem(Actor *actor, CREItem *si)
@@ -6678,14 +6678,14 @@ static PyObject* GemRB_DragItem(PyObject * /*self*/, PyObject* args)
 		Py_INCREF( Py_None );
 		return Py_None;
 	}
-	Item *item = core->GetItem(si->ItemResRef);
+	Item *item = gamedata->GetItem(si->ItemResRef);
 	if (item) {
 		if (core->HasFeature(GF_HAS_PICK_SOUND) && item->DescriptionIcon[0]) {
 			memcpy(Sound,item->DescriptionIcon,8);
 		} else {
 			GetItemSound(Sound, item->ItemType, item->AnimationType, IS_GET);
 		}
-		core->FreeItem(item, si->ItemResRef,0);
+		gamedata->FreeItem(item, si->ItemResRef,0);
 	}
 	if (Sound[0]) {
 		core->GetAudioDrv()->Play(Sound);
@@ -6738,14 +6738,14 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		}
 		CREItem *si = core->GetDraggedItem();
 		res = cc->AddItem(si);
- 		Item *item = core->GetItem(si->ItemResRef);
+ 		Item *item = gamedata->GetItem(si->ItemResRef);
 		if (item) {
  			if (core->HasFeature(GF_HAS_PICK_SOUND) && item->ReplacementItem[0]) {
 	 			memcpy(Sound,item->ReplacementItem,8);
 			} else {
 				GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 			}
-			core->FreeItem(item, si->ItemResRef,0);
+			gamedata->FreeItem(item, si->ItemResRef,0);
 			if (Sound[0]) {
 				core->GetAudioDrv()->Play(Sound);
 			}
@@ -6775,7 +6775,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		Effect = core->QuerySlotEffects( Slot );
 	}
 	CREItem * slotitem = core->GetDraggedItem();
-	Item *item = core->GetItem( slotitem->ItemResRef );
+	Item *item = gamedata->GetItem( slotitem->ItemResRef );
 	if (!item) {
 		return PyInt_FromLong( -1 );
 	}
@@ -6783,7 +6783,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 	if (Effect && item->ItemExcl & actor->inventory.GetEquipExclusion()) {
 		core->DisplayConstantString(STR_ITEMEXCL, 0xf0f0f0);
 		//freeing the item before returning
-		core->FreeItem( item, slotitem->ItemResRef, false );
+		gamedata->FreeItem( item, slotitem->ItemResRef, false );
 		return PyInt_FromLong( 0 );
 	}
 	//CanUseItemType will check actor's class bits too
@@ -6796,7 +6796,7 @@ static PyObject* GemRB_DropDraggedItem(PyObject * /*self*/, PyObject* args)
 		GetItemSound(Sound, item->ItemType, item->AnimationType, IS_DROP);
 	}
 	//freeing the item before returning
-	core->FreeItem( item, slotitem->ItemResRef, false );
+	gamedata->FreeItem( item, slotitem->ItemResRef, false );
 	if ( !Slottype) {
 		return PyInt_FromLong( 0 );
 	}
@@ -7284,11 +7284,11 @@ static void ReadActionButtons()
 	memset(GUITooltip, -1, sizeof(GUITooltip));
 	memset(GUIResRef, 0, sizeof(GUIResRef));
 	memset(GUIEvent, 0, sizeof(GUIEvent));
-	int table = core->LoadTable( "guibtact" );
+	int table = gamedata->LoadTable( "guibtact" );
 	if (table<0) {
 		return;
 	}
-	TableMgr *tab = core->GetTable( table );
+	TableMgr *tab = gamedata->GetTable( table );
 	for (i = 0; i < MAX_ACT_COUNT; i++) {
 		packtype row;
 
@@ -7301,7 +7301,7 @@ static void ReadActionButtons()
 		strnlwrcpy(GUIResRef[i], tab->QueryField(i,5), 8);
 		strncpy(GUIEvent[i], tab->GetRowName(i), 16);
 	}
-	core->DelTable( table );
+	gamedata->DelTable( table );
 }
 
 static void SetButtonCycle(AnimationFactory *bam, Button *btn, int cycle, unsigned char which)
@@ -7399,7 +7399,7 @@ static PyObject* GemRB_HasResource(PyObject * /*self*/, PyObject* args)
 	if (!PyArg_ParseTuple( args, "si|i", &ResRef, &ResType, silent )) {
 		return AttributeError( GemRB_HasResource__doc );
 	}
-	if (core->Exists(ResRef, ResType, silent)) {
+	if (gamedata->Exists(ResRef, ResType, silent)) {
 		Py_INCREF( Py_True );
 		return Py_True;
 	} else {
@@ -7461,7 +7461,7 @@ static PyObject* GemRB_SetupEquipmentIcons(PyObject * /*self*/, PyObject* args)
 		Sprite2D *Picture = NULL;
 
 		if (item->UseIcon[0]) {
-			Picture = core->GetBAMSprite(item->UseIcon, 1, 0);
+			Picture = gamedata->GetBAMSprite(item->UseIcon, 1, 0);
 		}
 
 		if (!Picture) {
@@ -7582,7 +7582,7 @@ static PyObject* GemRB_SetupSpellIcons(PyObject * /*self*/, PyObject* args)
 		Sprite2D *Picture = NULL;
 
 		if (spell->MemorisedIcon[0]) {
-			Picture = core->GetBAMSprite(spell->MemorisedIcon, 0, 0);
+			Picture = gamedata->GetBAMSprite(spell->MemorisedIcon, 0, 0);
 		}
 
 		if (!Picture) {

@@ -154,7 +154,7 @@ void InitSpawnGroups()
 	int i;
 	TableMgr * tab;
 
-	int table=core->LoadTable( "spawngrp" );
+	int table=gamedata->LoadTable( "spawngrp" );
 
 	Spawns.RemoveAll(NULL);
 	Spawns.SetType( GEM_VARIABLES_POINTER );
@@ -162,7 +162,7 @@ void InitSpawnGroups()
 	if (table<0) {
 		return;
 	}
-	tab = core->GetTable( table );
+	tab = gamedata->GetTable( table );
 	if (!tab) {
 		goto end;
 	}
@@ -185,15 +185,15 @@ void InitSpawnGroups()
 		}
 	}
 end:
-	core->DelTable( table );
+	gamedata->DelTable( table );
 }
 
 void InitPathFinder()
 {
 	PathFinderInited = true;
-	int passabletable = core->LoadTable( "pathfind" );
+	int passabletable = gamedata->LoadTable( "pathfind" );
 	if (passabletable >= 0) {
-		TableMgr* tm = core->GetTable( passabletable );
+		TableMgr* tm = gamedata->GetTable( passabletable );
 		if (tm) {
 			const char* poi;
 
@@ -208,7 +208,7 @@ void InitPathFinder()
 			poi = tm->QueryField( 1, 1 );
 			if (*poi != '*')
 				AdditionalCost = atoi( poi );
-			core->DelTable( passabletable );
+			gamedata->DelTable( passabletable );
 		}
 	}
 }
@@ -1353,13 +1353,13 @@ void Map::PlayAreaSong(int SongType)
 		column = 0;
 		tablename = "music";
 	}
-	int songlist = core->LoadTable( tablename );
+	int songlist = gamedata->LoadTable( tablename );
 	if (songlist < 0) {
 		return;
 	}
-	TableMgr* tm = core->GetTable( songlist );
+	TableMgr* tm = gamedata->GetTable( songlist );
 	if (!tm) {
-		core->DelTable( songlist );
+		gamedata->DelTable( songlist );
 		return;
 	}
 	const char* poi = tm->QueryField( SongHeader.SongList[SongType], column );
@@ -2287,7 +2287,7 @@ void Map::SpawnCreature(Point &pos, const char *CreName, int radius)
 	void* lookup;
 	if ( !Spawns.Lookup( CreName, lookup) ) {
 		DataStream *stream = core->GetResourceMgr()->GetResource( CreName, IE_CRE_CLASS_ID );
-		creature = core->GetCreature(stream);
+		creature = gamedata->GetCreature(stream);
 		if ( creature ) {
 			AddActor(creature);
 			creature->SetPosition( pos, true, radius );
@@ -2301,7 +2301,7 @@ void Map::SpawnCreature(Point &pos, const char *CreName, int radius)
 	//unsigned int difficulty = sg->Level;
 	while ( count-- ) {
 		DataStream *stream = core->GetResourceMgr()->GetResource( sg->ResRefs[count], IE_CRE_CLASS_ID );
-		creature = core->GetCreature(stream);
+		creature = gamedata->GetCreature(stream);
 		if ( creature ) {
 			AddActor(creature);
 			creature->SetPosition( pos, true, radius );
@@ -2759,7 +2759,7 @@ AreaAnimation::~AreaAnimation()
 		}
 	}
 	free(animation);
-	core->FreePalette(palette, PaletteRef);
+	gamedata->FreePalette(palette, PaletteRef);
 	if (covers) {
 		for(int i=0;i<animcount;i++) {
 			delete covers[i];
@@ -2771,9 +2771,9 @@ AreaAnimation::~AreaAnimation()
 void AreaAnimation::SetPalette(ieResRef Pal)
 {
 	Flags |= A_ANI_PALETTE;
-	core->FreePalette(palette, PaletteRef);
+	gamedata->FreePalette(palette, PaletteRef);
 	strnlwrcpy(PaletteRef, Pal, 8);
-	palette = core->GetPalette(PaletteRef);
+	palette = gamedata->GetPalette(PaletteRef);
 	if (Flags&A_ANI_BLEND) {
 		//re-blending after palette change
 		BlendAnimation();

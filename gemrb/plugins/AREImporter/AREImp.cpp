@@ -89,13 +89,13 @@ int GetTrackString(const ieResRef areaName)
 	bool trackflag = core->GetStringReference(STR_TRACKING)!=(ieStrRef) -1;
 
 	if (!tracks) {
-		int trackdata = core->LoadTable( "tracking" );
+		int trackdata = gamedata->LoadTable( "tracking" );
 		if (trackdata < 0) {
 			return -1;
 		}
-		TableMgr* tm = core->GetTable( trackdata );
+		TableMgr* tm = gamedata->GetTable( trackdata );
 		if (!tm) {
-			core->DelTable( trackdata );
+			gamedata->DelTable( trackdata );
 			return -1;
 		}
 		trackcount = tm->GetRowCount();
@@ -128,8 +128,8 @@ AREImp::AREImp(void)
 	str = NULL;
 	if (Sounds[0][0] == UNINITIALIZED_BYTE) {
 		memset( Sounds, 0, sizeof( Sounds ) );
-		int SoundTable = core->LoadTable( "defsound" );
-		TableMgr* at = core->GetTable( SoundTable );
+		int SoundTable = gamedata->LoadTable( "defsound" );
+		TableMgr* at = gamedata->GetTable( SoundTable );
 		if (at) {
 			for (int i = 0; i < DEF_COUNT; i++) {
 				strncpy( Sounds[i], at->QueryField( i, 0 ), 8 );
@@ -138,7 +138,7 @@ AREImp::AREImp(void)
 				}
 			}
 		}
-		core->DelTable( SoundTable );
+		gamedata->DelTable( SoundTable );
 	}
 }
 

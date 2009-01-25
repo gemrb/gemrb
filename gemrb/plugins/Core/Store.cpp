@@ -202,7 +202,7 @@ STOItem *Store::FindItem(CREItem *item, bool exact)
 void Store::RechargeItem(CREItem *item)
 {
 //is there any flag which store can recharge?
-	Item *itm = core->GetItem(item->ItemResRef);
+	Item *itm = gamedata->GetItem(item->ItemResRef);
 	if (!itm) {
 		return;
 	}
@@ -222,7 +222,7 @@ void Store::RechargeItem(CREItem *item)
 			}
 		}
 	}
-	core->FreeItem(itm, item->ItemResRef, 0);
+	gamedata->FreeItem(itm, item->ItemResRef, 0);
 }
 
 void Store::AddItem(CREItem *item)

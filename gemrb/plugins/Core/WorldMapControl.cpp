@@ -79,9 +79,9 @@ WorldMapControl::~WorldMapControl(void)
 {
 	//Video *video = core->GetVideoDriver();
 
-	core->FreePalette( pal_normal );
-	core->FreePalette( pal_selected );
-	core->FreePalette( pal_notvisited );
+	gamedata->FreePalette( pal_normal );
+	gamedata->FreePalette( pal_selected );
+	gamedata->FreePalette( pal_notvisited );
 }
 
 /** Draws the Control on the Output Display */
@@ -364,15 +364,15 @@ void WorldMapControl::SetColor(int which, Color color)
 	Color black = { 0x00, 0x00, 0x00, 0x00 };
 	switch (which) {
 	case IE_GUI_WMAP_COLOR_NORMAL:
-		core->FreePalette( pal_normal );
+		gamedata->FreePalette( pal_normal );
 		pal_normal = core->CreatePalette( color, black );
 		break;
 	case IE_GUI_WMAP_COLOR_SELECTED:
-		core->FreePalette( pal_selected );
+		gamedata->FreePalette( pal_selected );
 		pal_selected = core->CreatePalette( color, black );
 		break;
 	case IE_GUI_WMAP_COLOR_NOTVISITED:
-		core->FreePalette( pal_notvisited );
+		gamedata->FreePalette( pal_notvisited );
 		pal_notvisited = core->CreatePalette( color, black );
 		break;
 	default:

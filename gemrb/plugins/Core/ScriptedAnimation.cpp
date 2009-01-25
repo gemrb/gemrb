@@ -365,7 +365,7 @@ ScriptedAnimation::~ScriptedAnimation(void)
 			delete( anims[i] );
 		}
 	}
-	core->FreePalette(palette, PaletteName);
+	gamedata->FreePalette(palette, PaletteName);
 
 	if (cover) {
 		SetSpriteCover(NULL);
@@ -409,8 +409,8 @@ void ScriptedAnimation::PlayOnce()
 
 void ScriptedAnimation::SetFullPalette(const ieResRef PaletteResRef)
 {
-	core->FreePalette(palette, PaletteName);
-	palette=core->GetPalette(PaletteResRef);
+	gamedata->FreePalette(palette, PaletteName);
+	palette=gamedata->GetPalette(PaletteResRef);
 	memcpy(PaletteName, PaletteResRef, sizeof(PaletteName) );
 	if (twin) {
 		twin->SetFullPalette(PaletteResRef);

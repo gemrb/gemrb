@@ -129,8 +129,8 @@ int ProjectileServer::InitExplosion()
 		return explosioncount;
 	}
 
-	unsigned int resource = core->LoadTable("areapro");
-	TableMgr *explist = core->GetTable(resource);
+	unsigned int resource = gamedata->LoadTable("areapro");
+	TableMgr *explist = gamedata->GetTable(resource);
 	if (explist) {
 		explosioncount = 0;
 
