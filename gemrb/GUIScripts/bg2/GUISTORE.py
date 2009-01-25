@@ -519,7 +519,7 @@ def UpdateStoreShoppingWindow ():
 	Window = StoreShoppingWindow
 	#reget store in case of a change
 	Store = GemRB.GetStore ()
-	LeftCount = Store['StoreItemCount']
+	LeftCount = Store['StoreItemCount']-3
 	if LeftCount<0:
 		LeftCount=0
 	ScrollBar = GemRB.GetControl (Window, 11)

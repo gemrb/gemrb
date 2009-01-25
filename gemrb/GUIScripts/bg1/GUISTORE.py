@@ -501,21 +501,25 @@ def UpdateStoreShoppingWindow ():
 	Window = StoreShoppingWindow
 	#reget store in case of a change
 	Store = GemRB.GetStore ()
-	LeftCount = Store['StoreItemCount']
+	LeftCount = Store['StoreItemCount']-3
+	if LeftCount<0:
+		LeftCount=0
 	ScrollBar = GemRB.GetControl (Window, 11)
-	GemRB.SetVarAssoc (Window, ScrollBar, "LeftTopIndex", LeftCount-3)
+	GemRB.SetVarAssoc (Window, ScrollBar, "LeftTopIndex", LeftCount)
 	LeftTopIndex = GemRB.GetVar ("LeftTopIndex")
-	if LeftTopIndex>LeftCount-3:
-		GemRB.SetVar ("LeftTopIndex", LeftCount-3)
+	if LeftTopIndex>LeftCount:
+		GemRB.SetVar ("LeftTopIndex", LeftCount)
 
 	pc = GemRB.GameGetSelectedPCSingle ()
 	inventory_slots = GemRB.GetSlots (pc, SLOT_INVENTORY)
-	RightCount = len(inventory_slots)
+	RightCount = len(inventory_slots)-3
+	if RightCount<0:
+		RightCount=0
 	ScrollBar = GemRB.GetControl (Window, 12)
-	GemRB.SetVarAssoc (Window, ScrollBar, "RightTopIndex", RightCount-3)
+	GemRB.SetVarAssoc (Window, ScrollBar, "RightTopIndex", RightCount)
 	RightTopIndex = GemRB.GetVar ("RightTopIndex")
-	if RightTopIndex>RightCount-3:
-		GemRB.SetVar ("RightTopIndex", RightCount-3)
+	if RightTopIndex>RightCount:
+		GemRB.SetVar ("RightTopIndex", RightCount)
 
 	RedrawStoreShoppingWindow ()
 	return
@@ -660,7 +664,9 @@ def RedrawStoreShoppingWindow ():
 			GemRB.SetButtonFlags (Window, Button, IE_GUI_BUTTON_PICTURE, OP_NAND)
 			GemRB.SetText (Window, Label, "")
 
+		print i, " ", RightTopIndex, " ", RightCount
 		if i+RightTopIndex<RightCount:
+			print i+RightTopIndex,"vs",RightCount
 			Slot = GemRB.GetSlotItem (pc, inventory_slots[i+RightTopIndex])
 		else:
 			Slot = None
