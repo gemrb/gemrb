@@ -91,7 +91,8 @@ public:
 	virtual void SetDisplayTitle(char* title, char* icon) = 0;
 	virtual VideoModes GetVideoModes(bool fullscreen = false) = 0;
 	virtual bool TestVideoMode(VideoMode& vm) = 0;
-	/** Toggles GemRB between fullscreen and windowed mode */
+	/** Toggles GemRB between fullscreen and windowed mode.
+	  * 0 = windowed, 1 = fullscreen, -1 (default) = toggle */
 	virtual bool ToggleFullscreenMode(int set_reset=-1) = 0;
 	/** Swaps displayed and back buffers */
 	virtual int SwapBuffers(void) = 0;
