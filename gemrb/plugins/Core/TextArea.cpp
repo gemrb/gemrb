@@ -780,6 +780,7 @@ void TextArea::OnMouseUp(unsigned short x, unsigned short y, unsigned short /*Bu
 {
 	if (( x <= Width ) && ( y <= ( Height - 5 ) ) && ( seltext != -1 )) {
 		Value = (unsigned int) seltext;
+		Changed = true;
 		if (strnicmp( lines[seltext], "[s=", 3 ) == 0) {
 			if (minrow > seltext)
 				return;
@@ -797,6 +798,7 @@ void TextArea::OnMouseUp(unsigned short x, unsigned short y, unsigned short /*Bu
 			}
 		}
 	}
+
 	if (VarName[0] != 0) {
 		core->GetDictionary()->SetAt( VarName, Value );
 	}
