@@ -250,6 +250,27 @@ int CRawPCMReader::init_reader()
 	return 1;
 }
 
+inline void fix_endian(ieDword &dest)
+{
+	unsigned char tmp;
+	tmp=((unsigned char *) &dest)[0];
+	((unsigned char *) &dest)[0]=((unsigned char *) &dest)[3];
+	((unsigned char *) &dest)[3]=tmp;
+	tmp=((unsigned char *) &dest)[1];
+	((unsigned char *) &dest)[1]=((unsigned char *) &dest)[2];
+	((unsigned char *) &dest)[2]=tmp;
+
+}
+
+inline void fix_endian(ieWord &dest)
+{
+	unsigned char tmp;
+	tmp=((unsigned char *) &dest)[0];
+	((unsigned char *) &dest)[0]=((unsigned char *) &dest)[1];
+	((unsigned char *) &dest)[1]=tmp;
+}
+
+
 int CRawPCMReader::read_samples(short* buffer, int count)
 {
 	if (count > samples_left) {
@@ -269,29 +290,14 @@ int CRawPCMReader::read_samples(short* buffer, int count)
 	}
 	if(is16bit) {
 		res >>= 1;
+		if (stream->IsEndianSwitch()) {
+			for (size_t i = 0; i < (size_t)count; i++) {
+				fix_endian(((ieWord *)buffer)[i]);
+			}
+		}
 	}
 	samples_left -= res;
 	return res;
-}
-
-inline void fix_endian(ieDword &dest)
-{
-	unsigned char tmp;
-	tmp=((unsigned char *) &dest)[0];
-	((unsigned char *) &dest)[0]=((unsigned char *) &dest)[3];
-	((unsigned char *) &dest)[3]=tmp;
-	tmp=((unsigned char *) dest)[1];
-	((unsigned char *) &dest)[1]=((unsigned char *) &dest)[2];
-	((unsigned char *) &dest)[2]=tmp;
-
-}
-
-inline void fix_endian(ieWord &dest)
-{
-	unsigned char tmp;
-	tmp=((unsigned char *) &dest)[0];
-	((unsigned char *) &dest)[0]=((unsigned char *) &dest)[1];
-	((unsigned char *) &dest)[1]=tmp;
 }
 
 int CWavPCMReader::init_reader()
