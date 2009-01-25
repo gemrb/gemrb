@@ -3615,14 +3615,16 @@ static PyObject* GemRB_DeleteSaveGame(PyObject * /*self*/, PyObject* args)
 
 static PyObject *GetGameDate(DataStream *ds)
 {
-	ieDword inbuff[3];
-
-	ds->Read(inbuff, 12);
+	char Signature[8];
+	ieDword GameTime;
+	ds->Read(Signature, 8);
+	ds->ReadDword(&GameTime);
 	delete ds;
-	if (memcmp(inbuff,"GAME",4) ) {
+	if (memcmp(Signature,"GAME",4) ) {
 		return NULL;
 	}
-	int hours = ((int) inbuff[2])/4500;
+
+	int hours = ((int)GameTime)/4500;
 	int days = hours/24;
 	hours -= days*24;
 	char tmpstr[10];
