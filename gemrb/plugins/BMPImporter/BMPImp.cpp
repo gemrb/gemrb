@@ -45,15 +45,11 @@ BMPImp::BMPImp(void)
 
 BMPImp::~BMPImp(void)
 {
-	if (str && autoFree) {
-		delete( str );
+	if (autoFree) {
+		delete str;
 	}
-	if (Palette) {
-		free( Palette );
-	}
-	if (pixels) {
-		free( pixels );
-	}
+	free( Palette );
+	free( pixels );
 }
 
 bool BMPImp::Open(DataStream* stream, bool autoFree, bool convert)
@@ -61,18 +57,15 @@ bool BMPImp::Open(DataStream* stream, bool autoFree, bool convert)
 	if (stream == NULL) {
 		return false;
 	}
-	if (str && this->autoFree) {
-		delete( str );
+	if (this->autoFree) {
+		delete str;
 	}
 	//we release the previous pixel data
-	if (pixels) {
-		free( pixels );
-		pixels = NULL;
-	}
-	if (Palette) {
-		free( Palette );
-		Palette = NULL;
-	}
+	free( pixels );
+	pixels = NULL;
+	free( Palette );
+	Palette = NULL;
+
 	str = stream;
 	this->autoFree = autoFree;
 	//BITMAPFILEHEADER
@@ -268,19 +261,14 @@ bool BMPImp::OpenFromImage(Sprite2D* sprite, bool autoFree)
 	if (sprite == NULL) {
 		return false;
 	}
-	if (str && this->autoFree) {
-		delete( str );
+	if (this->autoFree) {
+		delete str;
 	}
 
-	if (pixels) {
-		free( pixels );
-		pixels = NULL;
-	}
-
-	if (Palette) {
-		free( Palette );
-		Palette = NULL;
-	}
+	free( pixels );
+	pixels = NULL;
+	free( Palette );
+	Palette = NULL;
 
 	// the previous stream was destructed and there won't be next
 	this->autoFree = false;
