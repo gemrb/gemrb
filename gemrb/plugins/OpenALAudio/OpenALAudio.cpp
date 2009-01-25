@@ -56,7 +56,7 @@ void AudioStream::ClearIfStopped()
 
 	ALint state;
 	alGetSourcei( Source, AL_SOURCE_STATE, &state );
-	if (checkALError("Failed to check source state", "WARNING") ||
+	if (!checkALError("Failed to check source state", "WARNING") ||
 			state == AL_STOPPED)
 	{
 		ClearProcessedBuffers(false);
