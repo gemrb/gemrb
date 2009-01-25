@@ -33,6 +33,7 @@ MapWindow = None
 WorldMapWindow = None
 WorldMapControl = None
 OldOptionsWindow = None
+OldPortraitWindow = None
 
 def RevealMap ():
 	global MapWindow, OldOptionsWindow
@@ -107,19 +108,28 @@ def ShowMap ():
 ###################################################
 def OpenMapWindow ():
 	global MapWindow, OptionsWindow, PortraitWindow
-	global OldOptionsWindow
+	global OldPortraitWindow, OldOptionsWindow
 
 	if CloseOtherWindow (OpenMapWindow):
-		if WorldMapWindow: OpenWorldMapWindowInside ()
-
-		GemRB.HideGUI ()
 		GemRB.UnloadWindow (MapWindow)
+		GemRB.UnloadWindow (OptionsWindow)
+		GemRB.UnloadWindow (PortraitWindow)
+
 		MapWindow = None
+		#this window type should block the game
 		GemRB.SetVar ("OtherWindow", -1)
+		GemRB.SetVisible (0,1)
+		GemRB.SetVisible (OldOptionsWindow, 1)
+		GemRB.SetVisible (OldPortraitWindow, 1)
 		GemRB.UnhideGUI ()
+		GUICommonWindows.PortraitWindow = OldPortraitWindow
+		OldPortraitWindow = None
+		GUICommonWindows.OptionsWindow = OldOptionsWindow
+		OldOptionsWindow = None
 		return
 
 	GemRB.HideGUI ()
+	GemRB.SetVisible (0,0)
 
 	GemRB.LoadWindowPack ("GUIMAP", 640, 480)
 	MapWindow = Window = GemRB.LoadWindow (2)
@@ -128,6 +138,7 @@ def OpenMapWindow ():
 	#saving the original portrait window
 	OldOptionsWindow = GUICommonWindows.OptionsWindow
 	OptionsWindow = GemRB.LoadWindow (0)
+	MarkMenuButton (OptionsWindow)
 	SetupMenuWindowControls (OptionsWindow, 0, "OpenMapWindow")
 	OldPortraitWindow = GUICommonWindows.PortraitWindow
 	PortraitWindow = OpenPortraitWindow (0)
@@ -140,14 +151,19 @@ def OpenMapWindow ():
 	# Map Control
 	GemRB.CreateMapControl (Window, 2, 0, 0, 0, 0)
 	Map = GemRB.GetControl (Window, 2)
+	GemRB.SetEvent (Window, Map, IE_GUI_MAP_ON_DOUBLE_PRESS, "LeftDoublePressMap")
+	
+	GemRB.SetVisible (OldOptionsWindow, 0)
+	GemRB.SetVisible (OldPortraitWindow, 0)
 	GemRB.SetVisible (OptionsWindow, 1)
 	GemRB.SetVisible (Window, 1)
 	GemRB.SetVisible (PortraitWindow, 1)
 	GemRB.SetControlStatus (Window, Map, IE_GUI_CONTROL_FOCUSED)
-	GemRB.UnhideGUI ()
+	#GemRB.UnhideGUI ()
 	return
 
 def LeftDoublePressMap ():
+	OpenMapWindow()
 	print "MoveToPoint"
 	return
 
