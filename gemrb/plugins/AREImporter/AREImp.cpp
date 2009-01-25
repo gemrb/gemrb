@@ -285,6 +285,10 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 {
 	unsigned int i,x;
 
+	// if this area does not have extended night, force it to day mode
+	if (!(AreaFlags & AT_EXTENDED_NIGHT))
+		day_or_night = true;
+
 	Map* map = new Map();
 	if(!map) {
 		printf("Can't allocate map (out of memory).\n");
