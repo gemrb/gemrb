@@ -535,7 +535,7 @@ int GameScript::Xor(Scriptable* Sender, Trigger* parameters)
 //no sprite is dead for iwd, they use KILL_<name>_CNT
 int GameScript::NumDead(Scriptable* Sender, Trigger* parameters)
 {
-	long value;
+	ieDword value;
 
 	if (core->HasFeature(GF_HAS_KAPUTZ) ) {
 		value = CheckVariable(Sender, parameters->string0Parameter, "KAPUTZ");
@@ -544,12 +544,12 @@ int GameScript::NumDead(Scriptable* Sender, Trigger* parameters)
 		snprintf(VariableName,32, "SPRITE_IS_DEAD%s",parameters->string0Parameter);
 		value = CheckVariable(Sender, VariableName, "GLOBAL" );
 	}
-	return ( value == parameters->int0Parameter );
+	return ( value == (ieDword) parameters->int0Parameter );
 }
 
 int GameScript::NumDeadGT(Scriptable* Sender, Trigger* parameters)
 {
-	long value;
+	ieDword value;
 
 	if (core->HasFeature(GF_HAS_KAPUTZ) ) {
 		value = CheckVariable(Sender, parameters->string0Parameter, "KAPUTZ");
@@ -558,12 +558,12 @@ int GameScript::NumDeadGT(Scriptable* Sender, Trigger* parameters)
 		snprintf(VariableName,32, "SPRITE_IS_DEAD%s",parameters->string0Parameter);
 		value = CheckVariable(Sender, VariableName, "GLOBAL" );
 	}
-	return ( value > parameters->int0Parameter );
+	return ( value > (ieDword) parameters->int0Parameter );
 }
 
 int GameScript::NumDeadLT(Scriptable* Sender, Trigger* parameters)
 {
-	long value;
+	ieDword value;
 
 	if (core->HasFeature(GF_HAS_KAPUTZ) ) {
 		value = CheckVariable(Sender, parameters->string0Parameter, "KAPUTZ");
@@ -573,12 +573,12 @@ int GameScript::NumDeadLT(Scriptable* Sender, Trigger* parameters)
 		snprintf(VariableName,32, "SPRITE_IS_DEAD%s",parameters->string0Parameter);
 		value = CheckVariable(Sender, VariableName, "GLOBAL" );
 	}
-	return ( value < parameters->int0Parameter );
+	return ( value < (ieDword) parameters->int0Parameter );
 }
 
 int GameScript::G_Trigger(Scriptable* Sender, Trigger* parameters)
 {
-	long value = CheckVariable(Sender, parameters->string0Parameter, "GLOBAL" );
+	ieDwordSigned value = CheckVariable(Sender, parameters->string0Parameter, "GLOBAL" );
 	return ( value == parameters->int0Parameter );
 }
 
@@ -586,7 +586,7 @@ int GameScript::Global(Scriptable* Sender, Trigger* parameters)
 {
 	bool valid=true;
 
-	long value = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDwordSigned value = CheckVariable(Sender, parameters->string0Parameter, &valid );
 	if (valid) {
 		if ( value == parameters->int0Parameter ) return 1;
 	}
@@ -595,7 +595,7 @@ int GameScript::Global(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::GLT_Trigger(Scriptable* Sender, Trigger* parameters)
 {
-	long value = CheckVariable(Sender, parameters->string0Parameter,"GLOBAL" );
+	ieDwordSigned value = CheckVariable(Sender, parameters->string0Parameter,"GLOBAL" );
 	return ( value < parameters->int0Parameter );
 }
 
@@ -603,7 +603,7 @@ int GameScript::GlobalLT(Scriptable* Sender, Trigger* parameters)
 {
 	bool valid=true;
 
-	long value = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDwordSigned value = CheckVariable(Sender, parameters->string0Parameter, &valid );
 	if (valid) {
 		if ( value < parameters->int0Parameter ) return 1;
 	}
@@ -612,7 +612,7 @@ int GameScript::GlobalLT(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::GGT_Trigger(Scriptable* Sender, Trigger* parameters)
 {
-	long value = CheckVariable(Sender, parameters->string0Parameter, "GLOBAL" );
+	ieDwordSigned value = CheckVariable(Sender, parameters->string0Parameter, "GLOBAL" );
 	return ( value > parameters->int0Parameter );
 }
 
@@ -620,7 +620,7 @@ int GameScript::GlobalGT(Scriptable* Sender, Trigger* parameters)
 {
 	bool valid=true;
 
-	long value = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDwordSigned value = CheckVariable(Sender, parameters->string0Parameter, &valid );
 	if (valid) {
 		if ( value > parameters->int0Parameter ) return 1;
 	}
@@ -631,9 +631,9 @@ int GameScript::GlobalLTGlobal(Scriptable* Sender, Trigger* parameters)
 {
 	bool valid=true;
 
-	long value1 = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDwordSigned value1 = CheckVariable(Sender, parameters->string0Parameter, &valid );
 	if (valid) {
-		long value2 = CheckVariable(Sender, parameters->string1Parameter, &valid );
+		ieDwordSigned value2 = CheckVariable(Sender, parameters->string1Parameter, &valid );
 		if (valid) {
 			if ( value1 < value2 ) return 1;
 		}
@@ -645,9 +645,9 @@ int GameScript::GlobalGTGlobal(Scriptable* Sender, Trigger* parameters)
 {
 	bool valid=true;
 
-	long value1 = CheckVariable(Sender, parameters->string0Parameter, &valid );
+	ieDwordSigned value1 = CheckVariable(Sender, parameters->string0Parameter, &valid );
 	if (valid) {
-		long value2 = CheckVariable(Sender, parameters->string1Parameter, &valid );
+		ieDwordSigned value2 = CheckVariable(Sender, parameters->string1Parameter, &valid );
 		if (valid) {
 			if ( value1 > value2 ) return 1;
 		}
@@ -657,43 +657,43 @@ int GameScript::GlobalGTGlobal(Scriptable* Sender, Trigger* parameters)
 
 int GameScript::GlobalsEqual(Scriptable* Sender, Trigger* parameters)
 {
-	long value1 = CheckVariable(Sender, parameters->string0Parameter, "GLOBAL" );
-	long value2 = CheckVariable(Sender, parameters->string1Parameter, "GLOBAL" );
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, "GLOBAL" );
+	ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, "GLOBAL" );
 	return ( value1 == value2 );
 }
 
 int GameScript::GlobalsGT(Scriptable* Sender, Trigger* parameters)
 {
-	long value1 = CheckVariable(Sender, parameters->string0Parameter, "GLOBAL" );
-	long value2 = CheckVariable(Sender, parameters->string1Parameter, "GLOBAL" );
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, "GLOBAL" );
+	ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, "GLOBAL" );
 	return ( value1 > value2 );
 }
 
 int GameScript::GlobalsLT(Scriptable* Sender, Trigger* parameters)
 {
-	long value1 = CheckVariable(Sender, parameters->string0Parameter, "GLOBAL" );
-	long value2 = CheckVariable(Sender, parameters->string1Parameter, "GLOBAL" );
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, "GLOBAL" );
+	ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, "GLOBAL" );
 	return ( value1 < value2 );
 }
 
 int GameScript::LocalsEqual(Scriptable* Sender, Trigger* parameters)
 {
-	long value1 = CheckVariable(Sender, parameters->string0Parameter, "LOCALS" );
-	long value2 = CheckVariable(Sender, parameters->string1Parameter, "LOCALS" );
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, "LOCALS" );
+	ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, "LOCALS" );
 	return ( value1 == value2 );
 }
 
 int GameScript::LocalsGT(Scriptable* Sender, Trigger* parameters)
 {
-	long value1 = CheckVariable(Sender, parameters->string0Parameter, "LOCALS" );
-	long value2 = CheckVariable(Sender, parameters->string1Parameter, "LOCALS" );
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, "LOCALS" );
+	ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, "LOCALS" );
 	return ( value1 > value2 );
 }
 
 int GameScript::LocalsLT(Scriptable* Sender, Trigger* parameters)
 {
-	long value1 = CheckVariable(Sender, parameters->string0Parameter, "LOCALS" );
-	long value2 = CheckVariable(Sender, parameters->string1Parameter, "LOCALS" );
+	ieDword value1 = CheckVariable(Sender, parameters->string0Parameter, "LOCALS" );
+	ieDword value2 = CheckVariable(Sender, parameters->string1Parameter, "LOCALS" );
 	return ( value1 < value2 );
 }
 
@@ -1750,7 +1750,7 @@ int GameScript::IsOverMe(Scriptable* Sender, Trigger* parameters)
 int GameScript::Dead(Scriptable* Sender, Trigger* parameters)
 {
 	if (parameters->string0Parameter[0]) {
-		long value;
+		ieDword value;
 		ieVariable Variable;
 
 		if (core->HasFeature( GF_HAS_KAPUTZ )) {
