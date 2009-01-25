@@ -305,6 +305,8 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 	map->Lightning = WLightning;
 	map->AreaType = AreaType;
 	map->DayNight = day_or_night;
+	strnlwrcpy( map->WEDResRef, WEDResRef, 8);
+
 
 	//we have to set this here because the actors will receive their
 	//current area setting here, areas' 'scriptname' is their name
@@ -323,10 +325,11 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 	ieResRef TmpResRef;
 
 	if (day_or_night) {
-		memcpy( TmpResRef, map->WEDResRef, 9);
+		memcpy( TmpResRef, WEDResRef, 9);
 	} else {
-		snprintf( TmpResRef, 9, "%sN", map->WEDResRef);
+		snprintf( TmpResRef, 9, "%sN", WEDResRef);
 	}
+
 	TileMapMgr* tmm = ( TileMapMgr* ) core->GetInterface( IE_WED_CLASS_ID );
 	DataStream* wedfile = core->GetResourceMgr()->GetResource( WEDResRef, IE_WED_CLASS_ID );
 	tmm->Open( wedfile );
@@ -376,7 +379,6 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 	hm->Open( hmstr, true );
 
 	map->AddTileMap( tm, lm, sr, sm, hm );
-	strnlwrcpy( map->WEDResRef, WEDResRef, 8);
 
 	str->Seek( SongHeader, GEM_STREAM_START );
 	//5 is the number of song indices
