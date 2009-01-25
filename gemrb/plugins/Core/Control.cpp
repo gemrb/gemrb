@@ -55,13 +55,9 @@ Control::~Control()
 		printMessage("Control","Destroying control inside event handler, crash may occur!\n", LIGHT_RED);
 	}
 	core->DisplayTooltip( 0, 0, NULL );
-	if (Tooltip) {
-		free (Tooltip);
-	}
+	free (Tooltip);
 
-	if (animation) {
-		delete animation;
-	}
+	delete animation;
 
 	core->GetVideoDriver()->FreeSprite(AnimPicture);
 }
@@ -69,8 +65,7 @@ Control::~Control()
 /** Sets the Tooltip text of the current control */
 int Control::SetTooltip(const char* string)
 {
-	if (Tooltip)
-		free(Tooltip);
+	free(Tooltip);
 
 	if ((string == NULL) || (string[0] == 0)) {
 		Tooltip = NULL;
