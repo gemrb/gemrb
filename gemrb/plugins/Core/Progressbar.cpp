@@ -43,18 +43,10 @@ Progressbar::~Progressbar()
 	if (!Clear) {
 		return;
 	}
-	if (BackGround) {
-		core->GetVideoDriver()->FreeSprite( BackGround );
-	}
-	if (BackGround2) {
-		core->GetVideoDriver()->FreeSprite( BackGround2 );
-	}
-	if (PBarAnim) {
-		delete( PBarAnim );
-	}
-	if (PBarCap) {
-		core->GetVideoDriver()->FreeSprite( PBarCap );
-	}
+	core->GetVideoDriver()->FreeSprite( BackGround );
+	core->GetVideoDriver()->FreeSprite( BackGround2 );
+	delete PBarAnim;
+	core->GetVideoDriver()->FreeSprite( PBarCap );
 }
 
 /** Draws the Control on the Output Display */
@@ -150,11 +142,13 @@ void Progressbar::SetImage(Sprite2D* img, Sprite2D* img2)
 
 void Progressbar::SetBarCap(Sprite2D* img3)
 {
+	core->GetVideoDriver()->FreeSprite( PBarCap );
 	PBarCap = img3;
 }
 
 void Progressbar::SetAnimation(Animation *arg)
 {
+	delete PBarAnim;
 	PBarAnim = arg;
 }
 
