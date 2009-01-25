@@ -56,7 +56,7 @@ void AudioStream::ClearIfStopped()
 
 	ALint state;
 	alGetSourcei( Source, AL_SOURCE_STATE, &state );
-	if (!checkALError("Failed to check source state", "WARNING") ||
+	if (!checkALError("Failed to check source state", "WARNING") &&
 			state == AL_STOPPED)
 	{
 		ClearProcessedBuffers(false);
@@ -598,7 +598,7 @@ int OpenALAudioDriver::QueueAmbient(int stream, const char* sound)
 	// play
 	ALint state;
 	alGetSourcei( source, AL_SOURCE_STATE, &state );
-	if (!checkALError("Unable to query ambient source state", "ERROR") ||
+	if (!checkALError("Unable to query ambient source state", "ERROR") &&
 			state != AL_PLAYING)
 	{ // play on playing source would rewind it
 		alSourcePlay( source );
