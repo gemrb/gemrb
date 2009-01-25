@@ -21,6 +21,17 @@
 
 #include "OpenALAudio.h"
 
+bool checkALError(const char* msg, const char* status) {
+	int error = alGetError();
+	if (error != AL_NO_ERROR) {
+		printMessage("OpenAL", msg, WHITE );
+		printf (": %d ", error);
+		printStatus(status, YELLOW);
+		return true;
+	}
+	return false;
+}
+
 void AudioStream::ClearProcessedBuffers(bool del)
 {
 	ALint processed = 0;
@@ -45,9 +56,12 @@ void AudioStream::ClearIfStopped()
 
 	ALint state;
 	alGetSourcei( Source, AL_SOURCE_STATE, &state );
-	if (state == AL_STOPPED) {
+	if (checkALError("Failed to check source state", "WARNING") ||
+			state == AL_STOPPED)
+	{
 		ClearProcessedBuffers(false);
 		alDeleteSources( 1, &Source );
+		checkALError("Failed to delete source", "WARNING");
 		Source = 0;
 		Buffer = 0;
 		free = true;
@@ -61,6 +75,7 @@ void AudioStream::ForceClear()
 	if (!alIsSource(Source)) return;
 
 	alSourceStop(Source);
+	checkALError("Failed to stop source", "WARNING");
 	ClearProcessedBuffers(true);
 	ClearIfStopped();
 }
@@ -135,6 +150,8 @@ int OpenALAudioDriver::CountAvailableSources(int limit)
 	// (Might not be strictly necessary...)
 	i -= 2;
 
+	checkALError("Error while auto-detecting number of sources", "WARNING");
+
 	// Return number of succesfully allocated sources
 	return i;
 }
@@ -194,11 +211,7 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_lengt
 		return 0;
 
 	alGenBuffers(1, &Buffer);
-	int error = alGetError();
-	if ( error != AL_NO_ERROR ) {
-		printMessage("OpenAL", "Unable to create buffer", WHITE );
-		printf (": %d", error);
-		printStatus("ERROR", YELLOW);
+	if (checkALError("Unable to create sound buffer", "ERROR")) {
 		delete stream;
 		return 0;
 	}
@@ -223,10 +236,9 @@ ALuint OpenALAudioDriver::loadSound(const char *ResRef, unsigned int &time_lengt
 	core->FreeInterface( acm );
 	free(memory);
 
-	if (( alGetError() ) != AL_NO_ERROR) {
-		printMessage( "OpenAL", "Error : unable to fill buffer", WHITE );
-		printStatus("ERROR", YELLOW );
+	if (checkALError("Unable to fill buffer", "ERROR")) {
 		alDeleteBuffers( 1, &Buffer );
+		checkALError("Error deleting buffer", "WARNING");
 		return 0;
 	}
 
@@ -268,9 +280,7 @@ unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, uns
 		//we stop the previous one
 		if (speech.free || !alIsSource( speech.Source )) {
 			alGenSources( 1, &speech.Source );
-			if (alGetError() != AL_NO_ERROR) {
-				printMessage( "OpenAL", "Unable to attach a source for speech", WHITE );
-				printStatus( "ERROR", YELLOW );
+			if (checkALError("Error creating source for speech", "ERROR")) {
 				return 0;
 			}
 
@@ -278,18 +288,12 @@ unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, uns
 			alSourcefv( speech.Source, AL_VELOCITY, SourceVel );
 			alSourcei( speech.Source, AL_LOOPING, 0 );
 			alSourcef( speech.Source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
-			if (alGetError() != AL_NO_ERROR) {
-				printMessage( "OpenAL", "Unable to set speech parameters", WHITE);
-				printStatus( "ERROR", YELLOW );
-			}
+			checkALError("Unable to set speech parameters", "WARNING");
 			speech.free = false;
 			printf("speech.free: %d source:%d\n", speech.free,speech.Source);
 		} else {
 			alSourceStop( speech.Source );
-			if (alGetError() != AL_NO_ERROR) {
-				printMessage( "OpenAL", "Unable to stop speech", WHITE);
-				printStatus( "ERROR", YELLOW );
-			}
+			checkALError("Unable to stop speech", "WARNING");
 			speech.ClearProcessedBuffers(false);
 		}
 		core->GetDictionary()->Lookup( "Volume Voices", volume );
@@ -297,11 +301,10 @@ unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, uns
 		alSourcei( speech.Source, AL_SOURCE_RELATIVE, flags & GEM_SND_RELATIVE );
 		alSourcefv( speech.Source, AL_POSITION, SourcePos );
 		alSourcei( speech.Source, AL_BUFFER, Buffer );
+		checkALError("Unable to set speech parameters", "WARNING");
 		speech.Buffer = Buffer;
 		alSourcePlay( speech.Source );
-		if (alGetError() != AL_NO_ERROR) {
-			printMessage( "OpenAL", "Unable to play speech", WHITE);
-			printStatus( "ERROR", YELLOW );
+		if (checkALError("Unable to play speech", "ERROR")) {
 			return 0;
 		}
 		return time_length;
@@ -324,10 +327,7 @@ unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, uns
 
 	// not speech
 	alGenSources( 1, &Source );
-	if (alGetError() != AL_NO_ERROR) {
-		//failed to generate new sound source
-		printMessage( "OpenAL", "Unable to create a source", WHITE );
-		printStatus( "ERROR", YELLOW );
+	if (checkALError("Unable to create source", "ERROR")) {
 		return 0;
 	}
 
@@ -341,9 +341,7 @@ unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, uns
 	alSourcefv( Source, AL_POSITION, SourcePos );
 	alSourcei( Source, AL_BUFFER, Buffer );
 
-	if (alGetError() != AL_NO_ERROR) {
-		printMessage( "OpenAL", "Unable to play sound", WHITE);
-		printStatus( "ERROR", YELLOW );
+	if (checkALError("Unable to set sound parameters", "ERROR")) {
 		return 0;
 	}
 
@@ -351,6 +349,11 @@ unsigned int OpenALAudioDriver::Play(const char* ResRef, int XPos, int YPos, uns
 	streams[stream].Source = Source;
 	streams[stream].free = false;
 	alSourcePlay( Source );
+
+	if (checkALError("Unable to play sound", "ERROR")) {
+		return 0;
+	}
+
 	return time_length;
 }
 
@@ -389,11 +392,15 @@ void OpenALAudioDriver::ResetMusics()
 	SDL_mutexP( musicMutex );
 	if (alIsSource(MusicSource)) {
 		alSourceStop(MusicSource);
+		checkALError("Unable to stop music source", "WARNING");
 		alDeleteSources(1, &MusicSource );
+		checkALError("Unable to delete music source", "WARNING");
 		MusicSource = 0;
 		for (int i=0; i<MUSICBUFFERS; i++) {
-			if (alIsBuffer(MusicBuffer[i]))
+			if (alIsBuffer(MusicBuffer[i])) {
 				alDeleteBuffers(1, MusicBuffer+i);
+				checkALError("Unable to delete music buffer", "WARNING");
+			}
 		}
 	}
 	SDL_mutexV( musicMutex );
@@ -419,8 +426,10 @@ bool OpenALAudioDriver::Stop()
 		return false;
 	}
 	alSourceStop( MusicSource );
+	checkALError("Unable to stop music source", "WARNING");
 	MusicPlaying = false;
 	alDeleteSources( 1, &MusicSource );
+	checkALError("Unable to delete music source", "WARNING");
 	MusicSource = 0;
 	SDL_mutexV( musicMutex );
 	return true;
@@ -429,7 +438,6 @@ bool OpenALAudioDriver::Stop()
 int OpenALAudioDriver::StreamFile(const char* filename)
 {
 	char path[_MAX_PATH];
-	ALenum error;
 
 	strcpy( path, core->GamePath );
 	strcpy( path, filename );
@@ -449,9 +457,7 @@ int OpenALAudioDriver::StreamFile(const char* filename)
 
 	if (MusicBuffer[0] == 0) {
 		alGenBuffers( MUSICBUFFERS, MusicBuffer );
-		if( alGetError() != AL_NO_ERROR ) {
-			printMessage( "OpenAL", "Unable to create music buffers", WHITE);
-			printStatus( "ERROR", YELLOW );
+		if (checkALError("Unable to create music buffers", "ERROR")) {
 			return -1;
 		}
 	}
@@ -469,9 +475,8 @@ int OpenALAudioDriver::StreamFile(const char* filename)
 
 	if (MusicSource == 0) {
 		alGenSources( 1, &MusicSource );
-		if (( error = alGetError() ) != AL_NO_ERROR) {
-			printMessage("OpenAL", "error : unable to attach a source", WHITE );
-			printStatus("ERROR", YELLOW);
+		if (checkALError("Unable to create music source", "ERROR")) {
+			return -1;
 		}
 
 		ALfloat SourcePos[] = {
@@ -489,6 +494,7 @@ int OpenALAudioDriver::StreamFile(const char* filename)
 		alSourcefv( MusicSource, AL_POSITION, SourcePos );
 		alSourcefv( MusicSource, AL_VELOCITY, SourceVel );
 		alSourcei( MusicSource, AL_LOOPING, 0 );
+		checkALError("Unable to set music parameters", "WARNING");
 	}
 
 	SDL_mutexV( musicMutex );
@@ -504,6 +510,7 @@ void OpenALAudioDriver::GetListenerPos(int &XPos, int &YPos )
 {
 	ALfloat listen[3];
 	alGetListenerfv( AL_POSITION, listen );
+	if (checkALError("Unable to get listener pos", "ERROR")) return;
 	XPos = (int) listen[0];
 	YPos = (int) listen[1];
 }
@@ -520,6 +527,7 @@ bool OpenALAudioDriver::ReleaseStream(int stream, bool HardStop)
 
 	ALuint Source = streams[stream].Source;
 	alSourceStop(Source);
+	checkALError("Unable to stop source", "WARNING");
 	streams[stream].ClearIfStopped();
 
 	return true;
@@ -542,6 +550,9 @@ int OpenALAudioDriver::SetupNewStream( ieWord x, ieWord y, ieWord z,
 
 	ALuint source;
 	alGenSources(1, &source);
+	if (checkALError("Unable to create new source", "ERROR")) {
+		return -1;
+	}
 
 	ALfloat position[] = { (float) x, (float) y, (float) z };
 	alSourcef( source, AL_PITCH, 1.0f );
@@ -549,6 +560,7 @@ int OpenALAudioDriver::SetupNewStream( ieWord x, ieWord y, ieWord z,
 	alSourcef( source, AL_GAIN, 0.01f * gain );
 	alSourcei( source, AL_REFERENCE_DISTANCE, REFERENCE_DISTANCE );
 	alSourcei( source, AL_ROLLOFF_FACTOR, point ? 1 : 0 );
+	checkALError("Unable to set stream parameters", "WARNING");
 
 	streams[stream].Buffer = 0;
 	streams[stream].Source = source;
@@ -579,12 +591,19 @@ int OpenALAudioDriver::QueueAmbient(int stream, const char* sound)
 	}
 
 	alSourceQueueBuffers(source, 1, &Buffer);
+	if (checkALError("Unable to queueu ambient buffer","ERROR")) {
+		return -1;
+	}
 
 	// play
 	ALint state;
 	alGetSourcei( source, AL_SOURCE_STATE, &state );
-	if (state != AL_PLAYING) { // play on playing source would rewind it
+	if (!checkALError("Unable to query ambient source state", "ERROR") ||
+			state != AL_PLAYING)
+	{ // play on playing source would rewind it
 		alSourcePlay( source );
+		if (checkALError("Unable to play ambient source", "ERROR"))
+			return -1;
 	}
 
 	return time_length;
@@ -597,6 +616,7 @@ void OpenALAudioDriver::SetAmbientStreamVolume(int stream, int volume)
 
 	ALuint source = streams[stream].Source;
 	alSourcef( source, AL_GAIN, 0.01f * volume );
+	checkALError("Unable to set ambient volume", "WARNING");
 }
 
 bool OpenALAudioDriver::evictBuffer()
@@ -677,6 +697,10 @@ int OpenALAudioDriver::MusicManager(void* arg)
 		if (driver->MusicPlaying) {
 			ALint state;
 			alGetSourcei( driver->MusicSource, AL_SOURCE_STATE, &state );
+			if (checkALError("Unable to query music source state", "ERROR")) {
+				driver->MusicPlaying = false;
+				return -1;
+			}
 			switch (state) {
 				default:
 					printMessage("OpenAL", "WARNING: Unhandled Music state", WHITE );
@@ -695,6 +719,7 @@ int OpenALAudioDriver::MusicManager(void* arg)
 						alSourceQueueBuffers( driver->MusicSource, MUSICBUFFERS, driver->MusicBuffer );
 						if (alIsSource( driver->MusicSource )) {
 							alSourcePlay( driver->MusicSource );
+							checkALError("Error playing music source", "ERROR");
 						}
 					}
 					break;
@@ -702,6 +727,7 @@ int OpenALAudioDriver::MusicManager(void* arg)
 					printMessage("OpenAL", "WARNING: Buffer Underrun. AutoRestarting Stream Playback\n", WHITE );
 					if (alIsSource( driver->MusicSource )) {
 						alSourcePlay( driver->MusicSource );
+						checkALError("Error playing music source", "ERROR");
 					}
 					break;
 				case AL_PLAYING:
@@ -709,11 +735,19 @@ int OpenALAudioDriver::MusicManager(void* arg)
 			}
 			ALint processed;
 			alGetSourcei( driver->MusicSource, AL_BUFFERS_PROCESSED, &processed );
+			if (checkALError("Unable to query music source state", "ERROR")) {
+				driver->MusicPlaying = false;
+				return -1;
+			}
 			if (processed > 0) {
 				buffersreturned += processed;
 				while (processed) {
 					ALuint BufferID;
 					alSourceUnqueueBuffers( driver->MusicSource, 1, &BufferID );
+					if (checkALError("Unable to unqueue music buffers", "ERROR")) {
+						driver->MusicPlaying = false;
+						return -1;
+					}
 					if (bFinished == AL_FALSE) {
 						int size = ACM_BUFFERSIZE;
 						int cnt = driver->MusicReader->read_samples( ( short* ) driver->music_memory, ACM_BUFFERSIZE >> 1 );
@@ -734,7 +768,15 @@ int OpenALAudioDriver::MusicManager(void* arg)
 							}
 						}
 						alBufferData( BufferID, AL_FORMAT_STEREO16, driver->music_memory, ACM_BUFFERSIZE, driver->MusicReader->get_samplerate() );
+						if (checkALError("Unable to buffer music data", "ERROR")) {
+							driver->MusicPlaying = false;
+							return -1;
+						}
 						alSourceQueueBuffers( driver->MusicSource, 1, &BufferID );
+						if (checkALError("Unable to queue music buffers", "ERROR")) {
+							driver->MusicPlaying = false;
+							return -1;
+						}
 						processed--;
 					}
 				}
@@ -752,21 +794,30 @@ void OpenALAudioDriver::QueueBuffer(int stream, unsigned short bits,
 	ALuint Buffer;
 
 	alGenBuffers(1, &Buffer);
-	if ( alGetError() != AL_NO_ERROR ) {
-		printMessage("OpenAL", "Unable to create buffer", WHITE );
-		printStatus("ERROR", YELLOW);
+	if (checkALError("Unable to create buffer", "ERROR")) {
 		return;
 	}
 
 	alBufferData(Buffer, GetFormatEnum(channels, bits), memory, size, samplerate);
+	if (checkALError("Unable to buffer data", "ERROR")) {
+		return;
+	}
 
 	alSourceQueueBuffers(streams[stream].Source, 1, &Buffer );
+	if (checkALError("Unable to queue buffer", "ERROR")) {
+		return;
+	}
 
 	ALenum state;
 	alGetSourcei(streams[stream].Source, AL_SOURCE_STATE, &state);
+	if (checkALError("Unable to query source state", "ERROR")) {
+		return;
+	}
 
-	if(state != AL_PLAYING )
+	if (state != AL_PLAYING ) {
 		alSourcePlay(streams[stream].Source);
+		checkALError("Unable to play source", "ERROR");
+	}
 
 	return;
 }
