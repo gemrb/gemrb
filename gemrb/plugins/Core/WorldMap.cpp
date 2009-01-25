@@ -217,37 +217,19 @@ WMPAreaEntry* WorldMap::GetArea(const ieResRef AreaName, unsigned int &i)
 
 //this is a pathfinding algorithm
 //you have to find the optimal path
-/*
-void WorldMap::CalculateDistance(int i, int direction)
-{
-	WMPAreaEntry* ae=area_entries[i];
-	int j=ae->AreaLinksIndex[direction];
-	int k=j+ae->AreaLinksCount[direction];
-	for(;j<k;j++) {
-		WMPAreaLink* al = area_links[j];
-		WMPAreaEntry* ae2 = area_entries[al->AreaIndex];
-		int mydistance = Distances[i];
-		if (
-			( (ae->AreaStatus & WMP_ENTRY_PASSABLE) == WMP_ENTRY_PASSABLE) &&
-			( (ae2->AreaStatus & WMP_ENTRY_WALKABLE) == WMP_ENTRY_WALKABLE)
-			) {
-			//al->Flags is used for something else (entry direction?)
-			//maybe if the area is not passable (but visible, then you can still check on directions it directly links to)
-			mydistance += al->DistanceScale * 4;
-			if (Distances[al->AreaIndex] !=-1) {
-				Distances[al->AreaIndex] = mydistance;
-				GotHereFrom[al->AreaIndex] = j;
-			}
-		}
-	}
-}
-*/
+
 int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 {
-	if (direction<0 || direction>3)
+	if (direction<0 || direction>3) {
+		printMessage("WorldMap","", LIGHT_RED);
+		printf("CalculateDistances for invalid direction: %s\n", AreaName);
 		return -1;
+	}
+
 	unsigned int i;
 	if (!GetArea(AreaName, i)) {
+		printMessage("WorldMap","", LIGHT_RED);
+		printf("CalculateDistances for invalid Area: %s\n", AreaName);
 		return -1;
 	}
 	if (Distances) {
@@ -256,6 +238,9 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 	if (GotHereFrom) {
 		free(GotHereFrom);
 	}
+
+	printMessage("WorldMap","", GREEN);
+	printf("CalculateDistances for Area: %s\n", AreaName);
 	UpdateAreaVisibility(AreaName, direction);
 
 	size_t memsize =sizeof(int) * area_entries.size();
@@ -274,6 +259,8 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 		WMPAreaEntry* ae=area_entries[i];
 		//all directions should be used
 		for(int d=0;d<4;d++) {
+printf("Working on area: %s\n", ae->AreaName);
+
 			int j=ae->AreaLinksIndex[d];
 			int k=j+ae->AreaLinksCount[d];
 			if ((size_t) k>=area_links.size()) {
@@ -285,9 +272,12 @@ int WorldMap::CalculateDistances(const ieResRef AreaName, int direction)
 				WMPAreaLink* al = area_links[j];
 				WMPAreaEntry* ae2 = area_entries[al->AreaIndex];
 				unsigned int mydistance = (unsigned int) Distances[i];
+
+/*
 				if ( ( (ae->GetAreaStatus() & WMP_ENTRY_PASSABLE) == WMP_ENTRY_PASSABLE) &&
 				( (ae2->GetAreaStatus() & WMP_ENTRY_WALKABLE) == WMP_ENTRY_WALKABLE)
-				) {
+*/
+				if ( (ae2->GetAreaStatus() & WMP_ENTRY_WALKABLE) == WMP_ENTRY_WALKABLE) {
 					// al->Flags is the entry direction
 					mydistance += al->DistanceScale * 4;
 					//nonexisting distance is the biggest!
@@ -357,10 +347,11 @@ WMPAreaLink *WorldMap::GetEncounterLink(const ieResRef AreaName, bool &encounter
 	unsigned int i;
 	WMPAreaEntry *ae=GetArea( AreaName, i ); //target area
 	if (!ae) {
+		printf("No such area: %s\n", AreaName);
 		return NULL;
 	}
 	std::list<WMPAreaLink*> walkpath;
-	printf("Gathering path information\n");
+	printf("Gathering path information for: %s\n", AreaName);
 	while (GotHereFrom[i]!=-1) {
 		printf("Adding path to %d\n", i);
 		walkpath.push_back(area_links[GotHereFrom[i]]);
@@ -411,12 +402,15 @@ void WorldMap::UpdateAreaVisibility(const ieResRef AreaName, int direction)
 	if (!ae)
 		return;
 	//we are here, so we visited and it is visible too (i guess)
+	printf("Updated Area visibility: %s (visited, and visible)\n", AreaName);
+
 	ae->SetAreaStatus(WMP_ENTRY_VISITED|WMP_ENTRY_VISIBLE, BM_OR);
 	i=ae->AreaLinksCount[direction];
 	while (i--) {
 		WMPAreaLink* al = area_links[ae->AreaLinksIndex[direction]+i];
 		WMPAreaEntry* ae2 = area_entries[al->AreaIndex];
 		if (ae2->GetAreaStatus()&WMP_ENTRY_ADJACENT) {
+                	printf("Updated Area visibility: %s (accessible, and visible)\n", ae2->AreaName);
 			ae2->SetAreaStatus(WMP_ENTRY_VISIBLE|WMP_ENTRY_ACCESSIBLE, BM_OR);
 		}
 	}
@@ -428,6 +422,7 @@ void WorldMap::SetAreaStatus(const ieResRef AreaName, int Bits, int Op)
 	WMPAreaEntry* ae=GetArea(AreaName,i);
 	if (!ae)
 		return;
+	printf("Updated Area visibility: %s\n", ae->AreaName);
 	ae->SetAreaStatus(Bits, Op);
 }
 
