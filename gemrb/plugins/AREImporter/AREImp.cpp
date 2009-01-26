@@ -469,6 +469,8 @@ Map* AREImp::GetMap(const char *ResRef, bool day_or_night)
 		ip->TrapDetected = TrapDetected;
 		ip->TrapLaunch.x = LaunchX;
 		ip->TrapLaunch.y = LaunchY;
+		// translate door cursor on infopoint to correct cursor
+		//if (Cursor == IE_CURSOR_DOOR) Cursor = IE_CURSOR_PASS;
 		ip->Cursor = Cursor;
 		ip->overHeadText = string;
 		ip->StrRef = StrRef; //we need this when saving area
