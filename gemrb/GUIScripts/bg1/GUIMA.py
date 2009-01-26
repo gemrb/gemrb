@@ -199,6 +199,14 @@ def ChangeTooltip ():
 def CloseWorldMapWindow ():
 	global WorldMapWindow, WorldMapControl
 
+	if MapWindow:
+		# reopen map window
+		GemRB.UnloadWindow (WorldMapWindow)
+		WorldMapWindow = None
+		WorldMapControl = None
+		OpenMapWindow ()
+		return
+
 	GemRB.UnloadWindow (WorldMapWindow)
 	WorldMapWindow = None
 	WorldMapControl = None
