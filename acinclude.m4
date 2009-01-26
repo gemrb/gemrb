@@ -231,13 +231,19 @@ AC_ARG_ENABLE(openaltest, [  --disable-openaltest       Do not try to compile an
   AC_REQUIRE([AC_CANONICAL_TARGET])
   PATH="$prefix/bin:$prefix/usr/bin:$PATH"
   AC_PATH_PROG(OPENAL_CONFIG, openal-config, no, [$PATH])
+  AC_PATH_PROG(PKGCONFIG, pkg-config, no, [$PATH])
   AC_MSG_CHECKING(for OPENAL library)
   no_openal=""
-  if test "$OPENAL_CONFIG" = "no" ; then
+  if test "$OPENAL_CONFIG" = "no" && test "$PKGCONFIG" = "no" ; then
     no_openal=yes
   else
-    OPENAL_CFLAGS=`$OPENAL_CONFIG $openalconf_args --cflags`
-    OPENAL_LIBS="`$OPENAL_CONFIG $openalconf_args --libs` $LIBPTHREAD"
+    if test "$OPENAL_CONFIG" = "no" ; then
+      OPENAL_CFLAGS=`$PKGCONFIG openal --cflags`
+      OPENAL_LIBS="`$PKGCONFIG openal --libs` $LIBPTHREAD"
+    else
+      OPENAL_CFLAGS=`$OPENAL_CONFIG $openalconf_args --cflags`
+      OPENAL_LIBS="`$OPENAL_CONFIG $openalconf_args --libs` $LIBPTHREAD"
+    fi
 
     if test "x$enable_openaltest" = "xyes" ; then
       ac_save_CFLAGS="$CFLAGS"
