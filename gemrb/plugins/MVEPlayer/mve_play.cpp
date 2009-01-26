@@ -302,9 +302,10 @@ static int create_audiobuf_handler(unsigned char /*major*/, unsigned char minor,
 	if ( mve_audio_source == -1 ) {
 		fprintf( stderr, "   failure\n");
 		mve_audio_canplay = 0 ;
+	} else {
+		fprintf( stderr, "   success\n" );
+		mve_audio_canplay = 1;
 	}
-	fprintf( stderr, "   success\n" );
-	mve_audio_canplay = 1;
 
 	mve_audio_underruns = 0;
 #endif

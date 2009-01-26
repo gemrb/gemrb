@@ -519,9 +519,9 @@ bool OpenALAudioDriver::ReleaseStream(int stream, bool HardStop)
 {
 	if (streams[stream].free || !streams[stream].locked)
 		return false;
+	streams[stream].locked = false;
 	if (!HardStop) {
-		// unlock it, so it will automatically be reclaimed when needed
-		streams[stream].locked = false;
+		// it's now unlocked, so it will automatically be reclaimed when needed
 		return true;
 	}
 

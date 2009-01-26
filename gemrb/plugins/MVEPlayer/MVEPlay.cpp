@@ -218,22 +218,23 @@ void MVEPlay::setPalette(unsigned char* p, unsigned start, unsigned count)
 
 int MVEPlay::setAudioStream()
 {
-    ieDword volume ;
-    core->GetDictionary()->Lookup( "Volume Movie", volume) ;
-    return core->GetAudioDrv()->SetupNewStream(0, 0, 0, volume,
-                                            false, false) ;
+	ieDword volume ;
+	core->GetDictionary()->Lookup( "Volume Movie", volume) ;
+	int source = core->GetAudioDrv()->SetupNewStream(0, 0, 0, volume, false, false) ;
+	return source;
 }
 
 void MVEPlay::freeAudioStream(int stream)
 {
-    core->GetAudioDrv()->ReleaseStream(stream, true);
+	if (stream > -1)
+		core->GetAudioDrv()->ReleaseStream(stream, true);
 }
 
 void MVEPlay::queueBuffer(int stream, unsigned short bits,
                 int channels, short* memory,
                 int size, int samplerate)
 {
-    core->GetAudioDrv()->QueueBuffer(stream, bits, channels,
-                memory, size, samplerate) ;
+	if (stream > -1)
+		core->GetAudioDrv()->QueueBuffer(stream, bits, channels, memory, size, samplerate) ;
 }
 
